@@ -355,7 +355,7 @@ DataManager.processTargetRepeatNotetags = function(obj) {
   var notedata = obj.note.split(/[\r\n]+/);
   for (var i = 0; i < notedata.length; i++) {
     var line = notedata[i];
-    if (line.match(/<(?:REPEAT|REPEATS|REPEAT TIMES):[ ](\d+)>/i)) {
+    if (line.match(/<(?:REPEAT|REPEATS|REPEAT TIMES):\s*(\d+)>/i)) {
       obj.repeats = parseInt(RegExp.$1);
     }
   }
@@ -374,7 +374,7 @@ DataManager.processTargetNotetags1 = function(group) {
     if (!Imported.YEP_BattleEngineCore) this.processTargetRepeatNotetags(obj);
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<(?:TARGET|targets):[ ](.*)>/i)) {
+      if (line.match(/<(?:TARGET|targets):\s*(.*)>/i)) {
         var type = String(RegExp.$1).toUpperCase();
         this.makeTargetTypes(obj, type);
       } else if (line.match(/<CUSTOM TARGET TEXT>/i)) {

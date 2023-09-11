@@ -432,7 +432,7 @@ DataManager.processSLSNotetagsA = function(group) {
 DataManager.processSLSNotetags1 = function(group) {
   var note1 = /<(?:LEARN SKILL|learn skills):[ ]*(\d+(?:\s*,\s*\d+)*)>/i;
   var note2 =
-    /<(?:LEARN SKILL|learn skills):[ ](\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
+    /<(?:LEARN SKILL|learn skills):\s*(\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
   for (var n = 1; n < group.length; n++) {
     var obj = group[n];
     var notedata = obj.note.split(/[\r\n]+/);
@@ -456,13 +456,13 @@ DataManager.processSLSNotetags1 = function(group) {
 DataManager.processSLSNotetags2 = function(group) {
   var note1 = /<(?:LEARN COST)>/i;
   var note2 = /<\/(?:LEARN COST)>/i;
-  var note3 = /<(?:LEARN COST):[ ](\d+)[ ](?:GOLD)>/i;
-  var note4 = /<(?:LEARN COST):[ ](\d+)[ ](?:JP)>/i;
-  var note5 = /<(?:LEARN REQUIRE LEVEL):[ ](\d+)>/i;
+  var note3 = /<(?:LEARN COST):\s*(\d+)[ ](?:GOLD)>/i;
+  var note4 = /<(?:LEARN COST):\s*(\d+)[ ](?:JP)>/i;
+  var note5 = /<(?:LEARN REQUIRE LEVEL):\s*(\d+)>/i;
   var note6 = /<(?:LEARN REQUIRE SKILL):[ ]*(\d+(?:\s*,\s*\d+)*)>/i;
-  var note7 = /<(?:LEARN REQUIRE SKILL):[ ](\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
+  var note7 = /<(?:LEARN REQUIRE SKILL):\s*(\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
   var note8 = /<(?:LEARN REQUIRE SWITCH):[ ]*(\d+(?:\s*,\s*\d+)*)>/i;
-  var note9 = /<(?:LEARN REQUIRE SWITCH):[ ](\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
+  var note9 = /<(?:LEARN REQUIRE SWITCH):\s*(\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
   var note10 = /<(?:LEARN REQUIRE EVAL)>/i;
   var note11 = /<\/(?:LEARN REQUIRE EVAL)>/i;
   var note12 = /<(?:LEARN COST EVAL)>/i;
@@ -554,26 +554,26 @@ DataManager.processSLSNotetags2 = function(group) {
 DataManager.addLearnSkillCost = function(obj, line) {
     if (!obj) return;
     if (!line) return;
-    if (line.match(/ITEM[ ](\d+):[ ](\d+)/i)) {
+    if (line.match(/ITEM[ ](\d+):\s*(\d+)/i)) {
       var item = $dataItems[parseInt(RegExp.$1)];
       if (!item) return;
       if (Imported.YEP_ItemCore && DataManager.isIndependent(item)) return;
       obj.learnCost.push(line);
-    } else if (line.match(/WEAPON[ ](\d+):[ ](\d+)/i)) {
+    } else if (line.match(/WEAPON[ ](\d+):\s*(\d+)/i)) {
       var item = $dataWeapons[parseInt(RegExp.$1)];
       if (!item) return;
       if (Imported.YEP_ItemCore && DataManager.isIndependent(item)) return;
       obj.learnCost.push(line);
-    } else if (line.match(/ARMOR[ ](\d+):[ ](\d+)/i)) {
+    } else if (line.match(/ARMOR[ ](\d+):\s*(\d+)/i)) {
       var item = $dataArmors[parseInt(RegExp.$1)];
       if (!item) return;
       if (Imported.YEP_ItemCore && DataManager.isIndependent(item)) return;
       obj.learnCost.push(line);
-    } else if (line.match(/GOLD:[ ](\d+)/i)) {
+    } else if (line.match(/GOLD:\s*(\d+)/i)) {
       obj.learnCostGold = parseInt(RegExp.$1);
-    } else if (line.match(/JP:[ ](\d+)/i)) {
+    } else if (line.match(/JP:\s*(\d+)/i)) {
       obj.learnCostJp = parseInt(RegExp.$1);
-    } else if (line.match(/(.*):[ ](\d+)/i)) {
+    } else if (line.match(/(.*):\s*(\d+)/i)) {
       var name = String(RegExp.$1).toUpperCase();
       var amount = parseInt(RegExp.$2);
       if (Yanfly.ItemIdRef[name]) {
@@ -704,13 +704,13 @@ Game_Party.prototype.sufficientItemLearnSkill = function(skill) {
       var line = skill.learnCost[i];
       var obj = null;
       var value = 0;
-      if (line.match(/ITEM[ ](\d+):[ ](\d+)/i)) {
+      if (line.match(/ITEM[ ](\d+):\s*(\d+)/i)) {
         obj = $dataItems[parseInt(RegExp.$1)];
         value = parseInt(RegExp.$2);
-      } else if (line.match(/WEAPON[ ](\d+):[ ](\d+)/i)) {
+      } else if (line.match(/WEAPON[ ](\d+):\s*(\d+)/i)) {
         obj = $dataWeapons[parseInt(RegExp.$1)];
         value = parseInt(RegExp.$2);
-      } else if (line.match(/ARMOR[ ](\d+):[ ](\d+)/i)) {
+      } else if (line.match(/ARMOR[ ](\d+):\s*(\d+)/i)) {
         obj = $dataArmors[parseInt(RegExp.$1)];
         value = parseInt(RegExp.$2);
       }
@@ -726,13 +726,13 @@ Game_Party.prototype.processLearnSkillCost = function(skill) {
       var line = skill.learnCost[i];
       var obj = null;
       var value = 0;
-      if (line.match(/ITEM[ ](\d+):[ ](\d+)/i)) {
+      if (line.match(/ITEM[ ](\d+):\s*(\d+)/i)) {
         obj = $dataItems[parseInt(RegExp.$1)];
         value = parseInt(RegExp.$2);
-      } else if (line.match(/WEAPON[ ](\d+):[ ](\d+)/i)) {
+      } else if (line.match(/WEAPON[ ](\d+):\s*(\d+)/i)) {
         obj = $dataWeapons[parseInt(RegExp.$1)];
         value = parseInt(RegExp.$2);
-      } else if (line.match(/ARMOR[ ](\d+):[ ](\d+)/i)) {
+      } else if (line.match(/ARMOR[ ](\d+):\s*(\d+)/i)) {
         obj = $dataArmors[parseInt(RegExp.$1)];
         value = parseInt(RegExp.$2);
       }
@@ -1281,13 +1281,13 @@ Window_SkillLearnData.prototype.drawOtherCosts = function(wy) {
       var line = this._skill.learnCost[i];
       var obj = null;
       var value = 0;
-      if (line.match(/ITEM[ ](\d+):[ ](\d+)/i)) {
+      if (line.match(/ITEM[ ](\d+):\s*(\d+)/i)) {
         obj = $dataItems[parseInt(RegExp.$1)];
         value = parseInt(RegExp.$2);
-      } else if (line.match(/WEAPON[ ](\d+):[ ](\d+)/i)) {
+      } else if (line.match(/WEAPON[ ](\d+):\s*(\d+)/i)) {
         obj = $dataWeapons[parseInt(RegExp.$1)];
         value = parseInt(RegExp.$2);
-      } else if (line.match(/ARMOR[ ](\d+):[ ](\d+)/i)) {
+      } else if (line.match(/ARMOR[ ](\d+):\s*(\d+)/i)) {
         obj = $dataArmors[parseInt(RegExp.$1)];
         value = parseInt(RegExp.$2);
       }

@@ -1439,7 +1439,7 @@ DataManager.convertSequenceLine = function(obj, line, actionType) {
   if (actionType <= 0 || actionType > 5) return;
   Yanfly.BEC.SeqType;
   var seqArgs;
-  if (line.match(/[ ]*(.*):[ ](.*)/i)) {
+  if (line.match(/[ ]*(.*):\s*(.*)/i)) {
     Yanfly.BEC.SeqType = RegExp.$1.trim();
     seqArgs = RegExp.$2.split(',');
     var length = seqArgs.length;
@@ -1459,7 +1459,7 @@ DataManager.convertSequenceLine = function(obj, line, actionType) {
 };
 
 DataManager.processBECNotetags1 = function(group) {
-  var note1 = /<(?:CAST ANIMATION|cast ani):[ ](\d+)>/i;
+  var note1 = /<(?:CAST ANIMATION|cast ani):\s*(\d+)>/i;
   for (var n = 1; n < group.length; n++) {
     var obj = group[n];
     var notedata = obj.note.split(/[\r\n]+/);
@@ -1479,10 +1479,10 @@ DataManager.processBECNotetags1 = function(group) {
 };
 
 DataManager.processBECNotetags2 = function(group) {
-  var note1 = /<(?:ACTION COPY):[ ](.*):[ ]*(\d+)>/i;
-  var note2 = /<(?:SPEED):[ ]([\+\-]\d+)>/i;
-  var note3 = /<(?:DISPLAY NAME|DISPLAY TEXT):[ ](.*)>/i;
-  var note4 = /<(?:DISPLAY ICON):[ ](\d+)>/i;
+  var note1 = /<(?:ACTION COPY):\s*(.*):[ ]*(\d+)>/i;
+  var note2 = /<(?:SPEED):\s*([\+\-]\d+)>/i;
+  var note3 = /<(?:DISPLAY NAME|DISPLAY TEXT):\s*(.*)>/i;
+  var note4 = /<(?:DISPLAY ICON):\s*(\d+)>/i;
   for (var n = 1; n < group.length; n++) {
     var obj = group[n];
     var notedata = obj.note.split(/[\r\n]+/);
@@ -1519,7 +1519,7 @@ DataManager.processBECNotetags2 = function(group) {
 };
 
 DataManager.processBECNotetags3 = function(group) {
-  var note1 = /<(?:ATTACK ANIMATION|attack ani):[ ](\d+)>/i;
+  var note1 = /<(?:ATTACK ANIMATION|attack ani):\s*(\d+)>/i;
   for (var n = 1; n < group.length; n++) {
     var obj = group[n];
     var notedata = obj.note.split(/[\r\n]+/);
@@ -1536,7 +1536,7 @@ DataManager.processBECNotetags3 = function(group) {
 };
 
 DataManager.processBECNotetags4 = function(group) {
-  var note1 = /<(?:REFLECT ANIMATION|reflect ani):[ ](\d+)>/i;
+  var note1 = /<(?:REFLECT ANIMATION|reflect ani):\s*(\d+)>/i;
   for (var n = 1; n < group.length; n++) {
     var obj = group[n];
     var notedata = obj.note.split(/[\r\n]+/);
@@ -1567,9 +1567,9 @@ DataManager.processBECNotetags5 = function(group, isActor) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<(?:ANCHOR X):[ ](\d+)[.](\d+)>/i)) {
+      if (line.match(/<(?:ANCHOR X):\s*(\d+)[.](\d+)>/i)) {
         obj.anchorX = eval(String(RegExp.$1) + '.' + String(RegExp.$2));
-      } else if (line.match(/<(?:ANCHOR Y):[ ](\d+)[.](\d+)>/i)) {
+      } else if (line.match(/<(?:ANCHOR Y):\s*(\d+)[.](\d+)>/i)) {
         obj.anchorY = eval(String(RegExp.$1) + '.' + String(RegExp.$2));
       }
     }
@@ -1577,10 +1577,10 @@ DataManager.processBECNotetags5 = function(group, isActor) {
 };
 
 DataManager.processBECNotetags6 = function(group) {
-  var note1a = /<(?:ACTION START):[ ](\d+)>/i;
-  var note1b = /<(?:ACTION START):[ ](\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
-  var note2a = /<(?:TURN START):[ ](\d+)>/i;
-  var note2b = /<(?:TURN START):[ ](\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
+  var note1a = /<(?:ACTION START):\s*(\d+)>/i;
+  var note1b = /<(?:ACTION START):\s*(\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
+  var note2a = /<(?:TURN START):\s*(\d+)>/i;
+  var note2b = /<(?:TURN START):\s*(\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
   for (var n = 1; n < group.length; n++) {
     var obj = group[n];
     var notedata = obj.note.split(/[\r\n]+/);

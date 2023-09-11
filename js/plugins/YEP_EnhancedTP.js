@@ -3295,7 +3295,7 @@ DataManager.isDatabaseLoaded = function() {
 
 DataManager.processETPNotetags1 = function(group) {
   var noteU1 = /<(?:UNLOCK TP MODE):[ ]*(\d+(?:\s*,\s*\d+)*)>/i;
-  var noteU2 = /<(?:UNLOCK TP MODE):[ ](\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
+  var noteU2 = /<(?:UNLOCK TP MODE):\s*(\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
   for (var n = 1; n < group.length; n++) {
     var obj = group[n];
     var notedata = obj.note.split(/[\r\n]+/);
@@ -3306,7 +3306,7 @@ DataManager.processETPNotetags1 = function(group) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<(?:TP MODE):[ ](\d+)>/i)) {
+      if (line.match(/<(?:TP MODE):\s*(\d+)>/i)) {
         obj.tpMode = parseInt(RegExp.$1);
       } else if (line.match(noteU1)) {
         var array = JSON.parse('[' + RegExp.$1.match(/\d+/g) + ']');
@@ -3322,7 +3322,7 @@ DataManager.processETPNotetags1 = function(group) {
 
 DataManager.processETPNotetags2 = function(group) {
   var noteU1 = /<(?:UNLOCK TP MODE):[ ]*(\d+(?:\s*,\s*\d+)*)>/i;
-  var noteU2 = /<(?:UNLOCK TP MODE):[ ](\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
+  var noteU2 = /<(?:UNLOCK TP MODE):\s*(\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
   for (var n = 1; n < group.length; n++) {
     var obj = group[n];
     var notedata = obj.note.split(/[\r\n]+/);
@@ -3345,7 +3345,7 @@ DataManager.processETPNotetags2 = function(group) {
 
 DataManager.processETPNotetags3 = function(group) {
   var noteU1 = /<(?:LEARN UNLOCK TP MODE):[ ]*(\d+(?:\s*,\s*\d+)*)>/i;
-  var noteU2 = /<(?:LEARN UNLOCK TP MODE):[ ](\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
+  var noteU2 = /<(?:LEARN UNLOCK TP MODE):\s*(\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
   for (var n = 1; n < group.length; n++) {
     var obj = group[n];
     var notedata = obj.note.split(/[\r\n]+/);

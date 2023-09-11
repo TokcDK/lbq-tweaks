@@ -566,7 +566,7 @@ DataManager.isDatabaseLoaded = function() {
 };
 
 DataManager.processItemCoreNotetags = function(group) {
-  var note1 = /<(?:RANDOM VARIANCE):[ ](\d+)>/i;
+  var note1 = /<(?:RANDOM VARIANCE):\s*(\d+)>/i;
   var note2 = /<(?:NONINDEPENDENT ITEM|not independent item)>/i;
   var note3 = /<(?:PRIORITY NAME)>/i;
   for (var n = 1; n < group.length; n++) {
@@ -612,7 +612,7 @@ DataManager.processItemCoreNotetags = function(group) {
       } else if (evalMode === 'info text bottom') {
         if (obj.infoTextBottom !== '') obj.infoTextBottom += '\n';
         obj.infoTextBottom = obj.infoTextBottom + line;
-      } else if (line.match(/<(?:TEXT COLOR):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:TEXT COLOR):\s*(\d+)>/i)) {
         obj.textColor = parseInt(RegExp.$1);
       } else if (line.match(/<(?:ON CREATE EVAL|ON CREATION EVAL)>/i)) {
         evalMode = 'on create eval';

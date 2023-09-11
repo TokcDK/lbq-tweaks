@@ -317,7 +317,7 @@ DataManager.isDatabaseLoaded = function() {
 };
 
 DataManager.processEBSNotetags1 = function(group) {
-  var note1 = /<(?:STARTING SKILL SLOTS|starting skill slots):[ ](\d+)>/i;
+  var note1 = /<(?:STARTING SKILL SLOTS|starting skill slots):\s*(\d+)>/i;
   for (var n = 1; n < group.length; n++) {
     var obj = group[n];
     var notedata = obj.note.split(/[\r\n]+/);
@@ -334,9 +334,9 @@ DataManager.processEBSNotetags1 = function(group) {
 };
 
 DataManager.processEBSNotetags2 = function(group) {
-  var note1 = /<(?:EQUIP)[ ](.*):[ ]([\+\-]\d+)>/i;
+  var note1 = /<(?:EQUIP)[ ](.*):\s*([\+\-]\d+)>/i;
   var note2 = /<(?:EQUIP STATE):[ ]*(\d+(?:\s*,\s*\d+)*)>/i;
-  var note3 = /<(?:EQUIP STATE):[ ](\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
+  var note3 = /<(?:EQUIP STATE):\s*(\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
   var note4 = /<(?:UNEQUIPPABLE|cannot equip)>/i;
   var note5 = /<(?:ALL ACCESS EQUIPPABLE|ALL CLASS EQUIPPABLE)>/i;
   var note6 = /<(?:ACCESS ONLY EQUIPPABLE|CLASS ONLY EQUIPPABLE)>/i;
@@ -413,7 +413,7 @@ DataManager.processEBSNotetags2 = function(group) {
 };
 
 DataManager.processEBSNotetags3 = function(group) {
-  var note1 = /<(?:EQUIP SKILL SLOTS|equip skill slot):[ ]([\+\-]\d+)>/i;
+  var note1 = /<(?:EQUIP SKILL SLOTS|equip skill slot):\s*([\+\-]\d+)>/i;
   for (var n = 1; n < group.length; n++) {
     var obj = group[n];
     var notedata = obj.note.split(/[\r\n]+/);

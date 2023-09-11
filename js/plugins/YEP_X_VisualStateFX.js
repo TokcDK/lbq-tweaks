@@ -248,11 +248,11 @@ DataManager.processVSFXNotetags1 = function(group) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<(?:CUSTOM MOTION|STATE MOTION):[ ](.*)>/i)) {
+      if (line.match(/<(?:CUSTOM MOTION|STATE MOTION):\s*(.*)>/i)) {
         obj.motion = 4;
         obj.stateMotion = String(RegExp.$1).toLowerCase().trim();
         if (obj.stateMotion === 'idle') obj.stateMotion = 'walk';
-      } else if (line.match(/<(?:STATE ANIMATION|STATE ANI):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:STATE ANIMATION|STATE ANI):\s*(\d+)>/i)) {
         obj.stateAnimationId = parseInt(RegExp.$1);
       }
     }

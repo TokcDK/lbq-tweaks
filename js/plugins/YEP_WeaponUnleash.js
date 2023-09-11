@@ -333,7 +333,7 @@ DataManager.processWULNotetags1 = function(group) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<(?:ATTACK REPLACE|REPLACE ATTACK):[ ](.*)>/i)) {
+      if (line.match(/<(?:ATTACK REPLACE|REPLACE ATTACK):\s*(.*)>/i)) {
         var name = String(RegExp.$1).toUpperCase();
         if (name.match(/(\d+)/i)) {
           var id = parseInt(RegExp.$1);
@@ -343,7 +343,7 @@ DataManager.processWULNotetags1 = function(group) {
           continue;
         }
         obj.attackReplace = parseInt(id);
-      } else if (line.match(/<(?:GUARD REPLACE|REPLACE GUARD):[ ](.*)>/i)) {
+      } else if (line.match(/<(?:GUARD REPLACE|REPLACE GUARD):\s*(.*)>/i)) {
         var name = String(RegExp.$1).toUpperCase();
         if (name.match(/(\d+)/i)) {
           var id = parseInt(RegExp.$1);
@@ -353,7 +353,7 @@ DataManager.processWULNotetags1 = function(group) {
           continue;
         }
         obj.guardReplace = parseInt(id);
-      } else if (line.match(/<WEAPON UNLEASH[ ](\d+)([%％]):[ ](.*)>/i)) {
+      } else if (line.match(/<WEAPON UNLEASH[ ](\d+)([%％]):\s*(.*)>/i)) {
         var rate = parseFloat(RegExp.$1) * 0.01;
         var name = String(RegExp.$3).toUpperCase();
         if (name.match(/(\d+)/i)) {
@@ -365,7 +365,7 @@ DataManager.processWULNotetags1 = function(group) {
         }
         var arr = [id, rate, ''];
         obj.weaponUnleash.push(arr);
-      } else if (line.match(/<GUARD UNLEASH[ ](\d+)([%％]):[ ](.*)>/i)) {
+      } else if (line.match(/<GUARD UNLEASH[ ](\d+)([%％]):\s*(.*)>/i)) {
         var rate = parseFloat(RegExp.$1) * 0.01;
         var name = String(RegExp.$3).toUpperCase();
         if (name.match(/(\d+)/i)) {
@@ -377,11 +377,11 @@ DataManager.processWULNotetags1 = function(group) {
         }
         var arr = [id, rate, ''];
         obj.guardUnleash.push(arr);
-      } else if (line.match(/<WEAPON UNLEASH:[ ]([\+\-]\d+)([%％])>/i)) {
+      } else if (line.match(/<WEAPON UNLEASH:\s*([\+\-]\d+)([%％])>/i)) {
         obj.weaponUnleashRate['all'] = parseFloat(RegExp.$1) * 0.01;
-      } else if (line.match(/<GUARD UNLEASH:[ ]([\+\-]\d+)([%％])>/i)) {
+      } else if (line.match(/<GUARD UNLEASH:\s*([\+\-]\d+)([%％])>/i)) {
         obj.guardUnleashRate['all'] = parseFloat(RegExp.$1) * 0.01;
-      } else if (line.match(/<WEAPON UNLEASH[ ](.*):[ ]([\+\-]\d+)([%％])>/i)) {
+      } else if (line.match(/<WEAPON UNLEASH[ ](.*):\s*([\+\-]\d+)([%％])>/i)) {
         var name = String(RegExp.$1).toUpperCase();
         var rate = parseFloat(RegExp.$2) * 0.01;
         if (name.match(/(\d+)/i)) {
@@ -392,7 +392,7 @@ DataManager.processWULNotetags1 = function(group) {
           continue;
         }
         obj.weaponUnleashRate[id] = rate;
-      } else if (line.match(/<GUARD UNLEASH[ ](.*):[ ]([\+\-]\d+)([%％])>/i)) {
+      } else if (line.match(/<GUARD UNLEASH[ ](.*):\s*([\+\-]\d+)([%％])>/i)) {
         var name = String(RegExp.$1).toUpperCase();
         var rate = parseFloat(RegExp.$2) * 0.01;
         if (name.match(/(\d+)/i)) {
@@ -415,10 +415,10 @@ DataManager.processWULNotetags1 = function(group) {
         evalMode = 'none';
       } else if (evalMode === 'replaceGuard') {
         obj.guardReplaceEval = obj.guardReplaceEval + line + '\n';
-      } else if (line.match(/<(?:CUSTOM WEAPON UNLEASH):[ ](.*)>/i)) {
+      } else if (line.match(/<(?:CUSTOM WEAPON UNLEASH):\s*(.*)>/i)) {
         evalMode = 'weaponUnleash';
         evalLine = '';
-      } else if (line.match(/<\/(?:CUSTOM WEAPON UNLEASH):[ ](.*)>/i)) {
+      } else if (line.match(/<\/(?:CUSTOM WEAPON UNLEASH):\s*(.*)>/i)) {
         var rate = 0;
         var name = String(RegExp.$1).toUpperCase();
         if (name.match(/(\d+)/i)) {
@@ -434,10 +434,10 @@ DataManager.processWULNotetags1 = function(group) {
         evalLine = '';
       } else if (evalMode === 'weaponUnleash') {
         evalLine = evalLine + line + '\n';
-      } else if (line.match(/<(?:CUSTOM GUARD UNLEASH):[ ](.*)>/i)) {
+      } else if (line.match(/<(?:CUSTOM GUARD UNLEASH):\s*(.*)>/i)) {
         evalMode = 'guardUnleash';
         evalLine = '';
-      } else if (line.match(/<\/(?:CUSTOM GUARD UNLEASH):[ ](.*)>/i)) {
+      } else if (line.match(/<\/(?:CUSTOM GUARD UNLEASH):\s*(.*)>/i)) {
         var rate = 0;
         var name = String(RegExp.$1).toUpperCase();
         if (name.match(/(\d+)/i)) {
@@ -468,14 +468,14 @@ DataManager.processWULNotetags2 = function(group) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<(?:COMMAND NAME|COMMAND TEXT):[ ](.*)>/i)) {
+      if (line.match(/<(?:COMMAND NAME|COMMAND TEXT):\s*(.*)>/i)) {
         var name = String(RegExp.$1);
         obj.commandAttackText = name;
         obj.commandGuardText = name;
-      } else if (line.match(/<(?:ATTACK NAME|ATTACK TEXT):[ ](.*)>/i)) {
+      } else if (line.match(/<(?:ATTACK NAME|ATTACK TEXT):\s*(.*)>/i)) {
         var name = String(RegExp.$1);
         obj.commandAttackText = name;
-      } else if (line.match(/<(?:GUARD NAME|GUARD TEXT):[ ](.*)>/i)) {
+      } else if (line.match(/<(?:GUARD NAME|GUARD TEXT):\s*(.*)>/i)) {
         var name = String(RegExp.$1);
         obj.commandGuardText = name;
       }

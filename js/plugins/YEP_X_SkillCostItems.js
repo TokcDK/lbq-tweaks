@@ -355,19 +355,19 @@ DataManager.processSCINotetags1 = function(group) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<ITEM[ ](\d+)[ ]COST:[ ](\d+)>/i)) {
+      if (line.match(/<ITEM[ ](\d+)[ ]COST:\s*(\d+)>/i)) {
         var item = $dataItems[parseInt(RegExp.$1)];
         var cost = parseInt(RegExp.$2);
         this.processSCIObjItemCost(obj, item, cost, '');
-      } else if (line.match(/<WEAPON[ ](\d+)[ ]COST:[ ](\d+)>/i)) {
+      } else if (line.match(/<WEAPON[ ](\d+)[ ]COST:\s*(\d+)>/i)) {
         var item = $dataWeapons[parseInt(RegExp.$1)];
         var cost = parseInt(RegExp.$2);
         this.processSCIObjItemCost(obj, item, cost, '');
-      } else if (line.match(/<ARMOR[ ](\d+)[ ]COST:[ ](\d+)>/i)) {
+      } else if (line.match(/<ARMOR[ ](\d+)[ ]COST:\s*(\d+)>/i)) {
         var item = $dataArmors[parseInt(RegExp.$1)];
         var cost = parseInt(RegExp.$2);
         this.processSCIObjItemCost(obj, item, cost, '');
-      } else if (line.match(/<ITEM COST:[ ](\d+)[ ](.*)>/i)) {
+      } else if (line.match(/<ITEM COST:\s*(\d+)[ ](.*)>/i)) {
         var cost = parseInt(RegExp.$1);
         var name = String(RegExp.$2).toUpperCase();
         if (Yanfly.ItemIdRef[name]) {
@@ -407,10 +407,10 @@ DataManager.processSCINotetags1 = function(group) {
         this.processSCIObjItemCost(obj, item, 0, evalLine);
         evalMode = 'none';
         evalLine = '';
-      } else if (line.match(/<CUSTOM ITEM COST:[ ](.*)>/i)) {
+      } else if (line.match(/<CUSTOM ITEM COST:\s*(.*)>/i)) {
         evalMode = 'custom item cost';
         evalLine = '';
-      } else if (line.match(/<\/CUSTOM ITEM COST:[ ](.*)>/i)) {
+      } else if (line.match(/<\/CUSTOM ITEM COST:\s*(.*)>/i)) {
         var name = String(RegExp.$1).toUpperCase();
         if (Yanfly.ItemIdRef[name]) {
           var id = Yanfly.ItemIdRef[name];
@@ -450,10 +450,10 @@ DataManager.processSCIObjItemCost = function(obj, item, cost, code) {
 };
 
 DataManager.processSCINotetags2 = function(group) {
-  var note1 = /<(?:SWAP GAUGE|gauge)[ ](\d+):[ ](.*)>/i;
-  var note2 = /<(?:SWAP GAUGE ICON|swap gauge icon)[ ](\d+):[ ](.*)>/i;
-  var noteR1 = /<REPLACE[ ](.*)[ ](\d+)[ ]COST:[ ](.*)[ ](\d+)>/i;
-  var noteR2 = /<REPLACE[ ](.*)[ ]COST:[ ](.*)>/i;
+  var note1 = /<(?:SWAP GAUGE|gauge)[ ](\d+):\s*(.*)>/i;
+  var note2 = /<(?:SWAP GAUGE ICON|swap gauge icon)[ ](\d+):\s*(.*)>/i;
+  var noteR1 = /<REPLACE[ ](.*)[ ](\d+)[ ]COST:\s*(.*)[ ](\d+)>/i;
+  var noteR2 = /<REPLACE[ ](.*)[ ]COST:\s*(.*)>/i;
   for (var n = 1; n < group.length; n++) {
     var obj = group[n];
     var notedata = obj.note.split(/[\r\n]+/);
@@ -497,22 +497,22 @@ DataManager.processSCINotetags2 = function(group) {
         if (gauge === 1) obj.gaugeIcon1 = icon;
         if (gauge === 2) obj.gaugeIcon2 = icon;
         if (gauge === 3) obj.gaugeIcon3 = icon;
-      } else if (line.match(/<ITEM[ ](\d+)[ ]COST:[ ]([\+\-]\d+)>/i)) {
+      } else if (line.match(/<ITEM[ ](\d+)[ ]COST:\s*([\+\-]\d+)>/i)) {
         obj.useItemCostSet[parseInt(RegExp.$1)] = parseInt(RegExp.$2);
-      } else if (line.match(/<WEAPON[ ](\d+)[ ]COST:[ ]([\+\-]\d+)>/i)) {
+      } else if (line.match(/<WEAPON[ ](\d+)[ ]COST:\s*([\+\-]\d+)>/i)) {
         obj.useWeaponCostSet[parseInt(RegExp.$1)] = parseInt(RegExp.$2);
-      } else if (line.match(/<ARMOR[ ](\d+)[ ]COST:[ ]([\+\-]\d+)>/i)) {
+      } else if (line.match(/<ARMOR[ ](\d+)[ ]COST:\s*([\+\-]\d+)>/i)) {
         obj.useArmorCostSet[parseInt(RegExp.$1)] = parseInt(RegExp.$2);
-      } else if (line.match(/<ITEM[ ](\d+)[ ]COST:[ ](\d+)([%％])>/i)) {
+      } else if (line.match(/<ITEM[ ](\d+)[ ]COST:\s*(\d+)([%％])>/i)) {
         var value = parseFloat(RegExp.$2) * 0.01;
         obj.useItemCostRate[parseInt(RegExp.$1)] = value;
-      } else if (line.match(/<WEAPON[ ](\d+)[ ]COST:[ ](\d+)([%％])>/i)) {
+      } else if (line.match(/<WEAPON[ ](\d+)[ ]COST:\s*(\d+)([%％])>/i)) {
         var value = parseFloat(RegExp.$2) * 0.01;
         obj.useWeaponCostRate[parseInt(RegExp.$1)] = value;
-      } else if (line.match(/<ARMOR[ ](\d+)[ ]COST:[ ](\d+)([%％])>/i)) {
+      } else if (line.match(/<ARMOR[ ](\d+)[ ]COST:\s*(\d+)([%％])>/i)) {
         var value = parseFloat(RegExp.$2) * 0.01;
         obj.useArmorCostRate[parseInt(RegExp.$1)] = value;
-      } else if (line.match(/<ITEM COST:[ ]([\+\-]\d+)[ ](.*)>/i)) {
+      } else if (line.match(/<ITEM COST:\s*([\+\-]\d+)[ ](.*)>/i)) {
         var value = parseInt(RegExp.$1);
         var name = String(RegExp.$2).toUpperCase();
         if (Yanfly.ItemIdRef[name]) {
@@ -525,7 +525,7 @@ DataManager.processSCINotetags2 = function(group) {
           var id = Yanfly.ArmorIdRef[name];
           obj.useArmorCostSet[id] = value;
         }
-      } else if (line.match(/<ITEM COST:[ ](\d+)([%％])[ ](.*)>/i)) {
+      } else if (line.match(/<ITEM COST:\s*(\d+)([%％])[ ](.*)>/i)) {
         var value = parseFloat(RegExp.$1) * 0.01;
         var name = String(RegExp.$3).toUpperCase();
         if (Yanfly.ItemIdRef[name]) {
@@ -591,13 +591,13 @@ DataManager.processSCINotetags3 = function(group) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<(?:ITEM GAUGE COLOR 1):[ ](\d+)>/i)) {
+      if (line.match(/<(?:ITEM GAUGE COLOR 1):\s*(\d+)>/i)) {
         obj.itemGaugeColor1 = parseInt(RegExp.$1);
-      } else if (line.match(/<(?:ITEM GAUGE COLOR 2):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:ITEM GAUGE COLOR 2):\s*(\d+)>/i)) {
         obj.itemGaugeColor2 = parseInt(RegExp.$1);
-      } else if (line.match(/<(?:ITEM GAUGE TEXT):[ ](.*)>/i)) {
+      } else if (line.match(/<(?:ITEM GAUGE TEXT):\s*(.*)>/i)) {
         obj.itemGaugeText = String(RegExp.$1);
-      } else if (line.match(/<(?:ITEM GAUGE TEXT COLOR):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:ITEM GAUGE TEXT COLOR):\s*(\d+)>/i)) {
         obj.itemGaugeTextColor = parseInt(RegExp.$1);
       }
     }

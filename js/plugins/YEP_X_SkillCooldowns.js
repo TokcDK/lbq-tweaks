@@ -555,17 +555,17 @@ DataManager.processSCDNotetags1 = function(group) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<(?:COOLDOWN):[ ](\d+)>/i)) {
+      if (line.match(/<(?:COOLDOWN):\s*(\d+)>/i)) {
         obj.cooldown[obj.id] = parseInt(RegExp.$1);
-      } else if (line.match(/<(?:AFTER BATTLE COOLDOWN):[ ]([\+\-]\d+)>/i)) {
+      } else if (line.match(/<(?:AFTER BATTLE COOLDOWN):\s*([\+\-]\d+)>/i)) {
         obj.afterBattleCooldown = parseInt(RegExp.$1);
-      } else if (line.match(/<(?:COOLDOWN STEPS):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:COOLDOWN STEPS):\s*(\d+)>/i)) {
         obj.cooldownSteps = parseInt(RegExp.$1);
-      } else if (line.match(/<(?:WARMUP):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:WARMUP):\s*(\d+)>/i)) {
         obj.warmup = parseInt(RegExp.$1);
-      } else if (line.match(/<(?:SKILL)[ ](\d+)[ ](?:COOLDOWN):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:SKILL)[ ](\d+)[ ](?:COOLDOWN):\s*(\d+)>/i)) {
         obj.cooldown[parseInt(RegExp.$1)] = parseInt(RegExp.$2);
-      } else if (line.match(/<(?:SKILL)[ ](.*)[ ](?:COOLDOWN):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:SKILL)[ ](.*)[ ](?:COOLDOWN):\s*(\d+)>/i)) {
         var name = String(RegExp.$1).toUpperCase();
         if (Yanfly.SkillIdRef[name]) {
           var id = Yanfly.SkillIdRef[name];
@@ -573,9 +573,9 @@ DataManager.processSCDNotetags1 = function(group) {
           continue;
         }
         obj.cooldown[id] = parseInt(RegExp.$2);
-      } else if (line.match(/<(?:STYPE)[ ](\d+)[ ](?:COOLDOWN):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:STYPE)[ ](\d+)[ ](?:COOLDOWN):\s*(\d+)>/i)) {
         obj.stypeCooldown[parseInt(RegExp.$1)] = parseInt(RegExp.$2);
-      } else if (line.match(/<(?:GLOBAL COOLDOWN):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:GLOBAL COOLDOWN):\s*(\d+)>/i)) {
         obj.globalCooldown = parseInt(RegExp.$1);
       } else if (line.match(/<(?:BYPASS COOLDOWN)>/i)) {
         obj.bypassCooldown = true;
@@ -598,14 +598,14 @@ DataManager.processSCDNotetags1 = function(group) {
 };
 
 DataManager.processSCDNotetags2 = function(group) {
-  var note1 = /<(?:SKILL)[ ](\d+)[ ](?:COOLDOWN):[ ]([\+\-]\d+)>/i;
-  var note1a = /<(?:SKILL)[ ](.*)[ ](?:COOLDOWN):[ ]([\+\-]\d+)>/i;
-  var note2 = /<(?:STYPE)[ ](\d+)[ ](?:COOLDOWN):[ ]([\+\-]\d+)>/i;
-  var note3 = /<(?:GLOBAL COOLDOWN):[ ]([\+\-]\d+)>/i;
-  var note4 = /<(?:SKILL)[ ](\d+)[ ](?:WARMUP):[ ]([\+\-]\d+)>/i;
-  var note4a = /<(?:SKILL)[ ](.*)[ ](?:WARMUP):[ ]([\+\-]\d+)>/i;
-  var note5 = /<(?:STYPE)[ ](\d+)[ ](?:WARMUP):[ ]([\+\-]\d+)>/i;
-  var note6 = /<(?:GLOBAL WARMUP):[ ]([\+\-]\d+)>/i;
+  var note1 = /<(?:SKILL)[ ](\d+)[ ](?:COOLDOWN):\s*([\+\-]\d+)>/i;
+  var note1a = /<(?:SKILL)[ ](.*)[ ](?:COOLDOWN):\s*([\+\-]\d+)>/i;
+  var note2 = /<(?:STYPE)[ ](\d+)[ ](?:COOLDOWN):\s*([\+\-]\d+)>/i;
+  var note3 = /<(?:GLOBAL COOLDOWN):\s*([\+\-]\d+)>/i;
+  var note4 = /<(?:SKILL)[ ](\d+)[ ](?:WARMUP):\s*([\+\-]\d+)>/i;
+  var note4a = /<(?:SKILL)[ ](.*)[ ](?:WARMUP):\s*([\+\-]\d+)>/i;
+  var note5 = /<(?:STYPE)[ ](\d+)[ ](?:WARMUP):\s*([\+\-]\d+)>/i;
+  var note6 = /<(?:GLOBAL WARMUP):\s*([\+\-]\d+)>/i;
   for (var n = 1; n < group.length; n++) {
     var obj = group[n];
     var notedata = obj.note.split(/[\r\n]+/);
@@ -653,14 +653,14 @@ DataManager.processSCDNotetags2 = function(group) {
 };
 
 DataManager.processSCDNotetags3 = function(group) {
-  var note1 = /<(?:SKILL)[ ](\d+)[ ](?:COOLDOWN DURATION):[ ](\d+)([%％])>/i;
-  var note1a = /<(?:SKILL)[ ](.*)[ ](?:COOLDOWN DURATION):[ ](\d+)([%％])>/i;
-  var note2 = /<(?:STYPE)[ ](\d+)[ ](?:COOLDOWN DURATION):[ ](\d+)([%％])>/i;
-  var note3 = /<(?:GLOBAL COOLDOWN DURATION):[ ](\d+)([%％])>/i;
-  var note4 = /<(?:SKILL)[ ](\d+)[ ](?:COOLDOWN RATE):[ ](\d+)([%％])>/i;
-  var note4a = /<(?:SKILL)[ ](.*)[ ](?:COOLDOWN RATE):[ ](\d+)([%％])>/i;
-  var note5 = /<(?:STYPE)[ ](\d+)[ ](?:COOLDOWN RATE):[ ](\d+)([%％])>/i;
-  var note6 = /<(?:GLOBAL COOLDOWN RATE):[ ](\d+)([%％])>/i;
+  var note1 = /<(?:SKILL)[ ](\d+)[ ](?:COOLDOWN DURATION):\s*(\d+)([%％])>/i;
+  var note1a = /<(?:SKILL)[ ](.*)[ ](?:COOLDOWN DURATION):\s*(\d+)([%％])>/i;
+  var note2 = /<(?:STYPE)[ ](\d+)[ ](?:COOLDOWN DURATION):\s*(\d+)([%％])>/i;
+  var note3 = /<(?:GLOBAL COOLDOWN DURATION):\s*(\d+)([%％])>/i;
+  var note4 = /<(?:SKILL)[ ](\d+)[ ](?:COOLDOWN RATE):\s*(\d+)([%％])>/i;
+  var note4a = /<(?:SKILL)[ ](.*)[ ](?:COOLDOWN RATE):\s*(\d+)([%％])>/i;
+  var note5 = /<(?:STYPE)[ ](\d+)[ ](?:COOLDOWN RATE):\s*(\d+)([%％])>/i;
+  var note6 = /<(?:GLOBAL COOLDOWN RATE):\s*(\d+)([%％])>/i;
   for (var n = 1; n < group.length; n++) {
     var obj = group[n];
     var notedata = obj.note.split(/[\r\n]+/);

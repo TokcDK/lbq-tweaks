@@ -3949,14 +3949,16 @@ if(id1 == 0){
   } else {
     BattleManager._statusWindow.show();
   };
-  if ($gameSwitches.value(211)) {SceneManager._scene._bosshp_sprites.visible = true};
+  var _bosshp_sprites = SceneManager._scene._bosshp_sprites;
+  var _bosshp_spritesIsValid = _bosshp_sprites !== undefined;
+  if ($gameSwitches.value(211) && _bosshp_spritesIsValid) {_bosshp_sprites.visible = true};
 } else {
   if (Imported.MOG_BattleHud) {
     $gameSystem._bhud_visible = false;
   } else {
     BattleManager._statusWindow.hide();
   };
-  if ($gameSwitches.value(211)) {SceneManager._scene._bosshp_sprites.visible = false};
+  if ($gameSwitches.value(211) && _bosshp_spritesIsValid) {_bosshp_sprites.visible = false}; // add check for undefined
 };
 
 };

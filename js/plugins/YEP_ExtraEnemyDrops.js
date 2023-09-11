@@ -492,9 +492,9 @@ DataManager.processEEDNotetagsSys = function(group) {
 };
 
 DataManager.processEEDNotetags1 = function(group) {
-  var noteD1 = /<(?:ITEM|DROP ITEM)[ ](\d+):[ ](\d+)([%％])>/i;
-  var noteD2 = /<(?:WEAPON|DROP WEAPON)[ ](\d+):[ ](\d+)([%％])>/i;
-  var noteD3 = /<(?:ARMOR|DROP armor)[ ](\d+):[ ](\d+)([%％])>/i;
+  var noteD1 = /<(?:ITEM|DROP ITEM)[ ](\d+):\s*(\d+)([%％])>/i;
+  var noteD2 = /<(?:WEAPON|DROP WEAPON)[ ](\d+):\s*(\d+)([%％])>/i;
+  var noteD3 = /<(?:ARMOR|DROP armor)[ ](\d+):\s*(\d+)([%％])>/i;
   for (var n = 1; n < group.length; n++) {
     var obj = group[n];
     if (obj.dropsMade) continue;
@@ -519,7 +519,7 @@ DataManager.processEEDNotetags1 = function(group) {
         var id = parseInt(RegExp.$1);
         var rate = parseFloat(RegExp.$2) * 0.01;
         this.createEnemyDrop(obj, id, rate, 3);
-      } else if (line.match(/<DROP[ ](.*):[ ](\d+)([%％])>/i)) {
+      } else if (line.match(/<DROP[ ](.*):\s*(\d+)([%％])>/i)) {
         var name = String(RegExp.$1).toUpperCase();
         var rate = parseFloat(RegExp.$2) * 0.01;
         if (Yanfly.ItemIdRef[name]) {
@@ -540,19 +540,19 @@ DataManager.processEEDNotetags1 = function(group) {
       } else if (line.match(/<\/(?:ENEMY DROP|ENEMY DROPS)>/i)) {
         var evalMode = 'none';
       } else if (evalMode === 'drops') {
-        if (line.match(/ITEM[ ](\d+):[ ](\d+)([%％])/i)) {
+        if (line.match(/ITEM[ ](\d+):\s*(\d+)([%％])/i)) {
           var id = parseInt(RegExp.$1);
           var rate = parseFloat(RegExp.$2) * 0.01;
           this.createEnemyDrop(obj, id, rate, 1);
-        } else if (line.match(/WEAPON[ ](\d+):[ ](\d+)([%％])/i)) {
+        } else if (line.match(/WEAPON[ ](\d+):\s*(\d+)([%％])/i)) {
           var id = parseInt(RegExp.$1);
           var rate = parseFloat(RegExp.$2) * 0.01;
           this.createEnemyDrop(obj, id, rate, 2);
-        } else if (line.match(/ARMOR[ ](\d+):[ ](\d+)([%％])/i)) {
+        } else if (line.match(/ARMOR[ ](\d+):\s*(\d+)([%％])/i)) {
           var id = parseInt(RegExp.$1);
           var rate = parseFloat(RegExp.$2) * 0.01;
           this.createEnemyDrop(obj, id, rate, 3);
-        } else if (line.match(/(.*):[ ](\d+)([%％])/i)) {
+        } else if (line.match(/(.*):\s*(\d+)([%％])/i)) {
           var name = String(RegExp.$1).toUpperCase();
           var rate = parseFloat(RegExp.$2) * 0.01;
           if (Yanfly.ItemIdRef[name]) {
@@ -802,7 +802,7 @@ DropManager.getConditionalRate = function(conditions) {
     var length = conditions.length;
     for (var i = 0; i < length; ++i) {
       var condition = conditions[i];
-      if (condition.match(/(.*):[ ]([\+\-]\d+)([%％])/i)) {
+      if (condition.match(/(.*):\s*([\+\-]\d+)([%％])/i)) {
         var line = String(RegExp.$1);
         var value = parseFloat(RegExp.$2) * 0.01;
         if (this.meetsLineCondition(line)) rate += value;

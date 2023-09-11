@@ -643,7 +643,7 @@ DataManager.processSkillMasteryLevelsNotetags1 = function(group) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<(?:MAX MASTERY LEVEL):[ ](\d+)>/i)) {
+      if (line.match(/<(?:MAX MASTERY LEVEL):\s*(\d+)>/i)) {
         obj.masteryMaxLevel = parseInt(RegExp.$1);
       // Flat +/- per mastery level
       } else if (line.match(note1)) {
@@ -750,10 +750,10 @@ DataManager.processSkillMasteryLevelsNotetags2 = function(group) {
       } else if (line.match(/<\/STARTING SKILL (?:MASTERY|MASTERIES)>/i)) {
         var evalMode = 'none';
       } else if (evalMode === 'starting skill masteries') {
-        if (line.match(/SKILL[ ](\d+):[ ](\d+)/i)) {
+        if (line.match(/SKILL[ ](\d+):\s*(\d+)/i)) {
           var skillId = parseInt(RegExp.$1);
           var level = parseInt(RegExp.$2);
-        } else if (line.match(/(.*):[ ](\d+)/i)) {
+        } else if (line.match(/(.*):\s*(\d+)/i)) {
           var name = String(RegExp.$1).toUpperCase();
           var level = parseInt(RegExp.$2);
           if (Yanfly.SkillIdRef[name]) {
@@ -1147,6 +1147,7 @@ Window_Base.prototype.drawSkillMasteryGauge = function(skill, x, y, width) {
     width -= 1;
   }
   var rate = this._actor.skillMasteryRate(skill);
+  if (Number.isNaN(rate)) rate = 0; // rate sometimes can be NaN
   var fillW = Math.floor(width * rate);
   this.contents.gradientFillRect(x, gaugeY, fillW, gaugeH, color1, color2);
 };

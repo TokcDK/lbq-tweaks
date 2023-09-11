@@ -350,8 +350,8 @@ DataManager.isDatabaseLoaded = function() {
 };
 
 DataManager.processLunStProNotetags1 = function(group) {
-  var notetag1 = /<(.*)[ ](?:PROTECT|PROTECTION):[ ](.*)>/i;
-  var notetag2 = /<(?:PROTECT|PROTECTION)[ ](?:ANI|ANIMATION):[ ](\d+)>/i;
+  var notetag1 = /<(.*)[ ](?:PROTECT|PROTECTION):\s*(.*)>/i;
+  var notetag2 = /<(?:PROTECT|PROTECTION)[ ](?:ANI|ANIMATION):\s*(\d+)>/i;
   for (var n = 1; n < group.length; n++) {
     var obj = group[n];
     var notedata = obj.note.split(/[\r\n]+/);

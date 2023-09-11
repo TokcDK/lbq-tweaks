@@ -491,14 +491,14 @@ DataManager.isDatabaseLoaded = function() {
 };
 
 DataManager.processSkillNotetags = function(group) {
-  var note1 = /<(?:MP COST):[ ](\d+)>/i;
-  var note2 = /<(?:MP COST):[ ](\d+)([%％])>/i;
-  var note3 = /<(?:TP COST):[ ](\d+)>/i;
-  var note4 = /<(?:TP COST):[ ](\d+)([%％])>/i;
-  var note5 = /<(?:HP COST):[ ](\d+)>/i;
-  var note6 = /<(?:HP COST):[ ](\d+)([%％])>/i;
+  var note1 = /<(?:MP COST):\s*(\d+)>/i;
+  var note2 = /<(?:MP COST):\s*(\d+)([%％])>/i;
+  var note3 = /<(?:TP COST):\s*(\d+)>/i;
+  var note4 = /<(?:TP COST):\s*(\d+)([%％])>/i;
+  var note5 = /<(?:HP COST):\s*(\d+)>/i;
+  var note6 = /<(?:HP COST):\s*(\d+)([%％])>/i;
   var note7a = /<(?:HIDE IF LEARNED SKILL):[ ]*(\d+(?:\s*,\s*\d+)*)>/i;
-  var note7b = /<(?:HIDE IF LEARNED SKILL):[ ](\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
+  var note7b = /<(?:HIDE IF LEARNED SKILL):\s*(\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
   var note8a = /<(?:HIDE IN BATTLE|hide during battle)>/i;
   var note8b = /<(?:HIDE IN FIELD|hide during field)>/i;
   var noteMpEval1 = /<(?:MP COST EVAL|custom mp cost)>/i;
@@ -682,7 +682,7 @@ DataManager.processGSCNotetags1 = function(group) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<(?:SWAP GAUGE|gauge)[ ](\d+):[ ](.*)>/i)) {
+      if (line.match(/<(?:SWAP GAUGE|gauge)[ ](\d+):\s*(.*)>/i)) {
         var gauge = parseInt(RegExp.$1);
         var text = String(RegExp.$2).toUpperCase();
         if (['HP', 'MP', 'TP', 'NOTHING', 'NULL'].contains(text)) {
@@ -710,7 +710,7 @@ DataManager.processGSCNotetags2 = function(group) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<(?:SWAP GAUGE|gauge)[ ](\d+):[ ](.*)>/i)) {
+      if (line.match(/<(?:SWAP GAUGE|gauge)[ ](\d+):\s*(.*)>/i)) {
         var gauge = parseInt(RegExp.$1);
         var text = String(RegExp.$2).toUpperCase();
         if (['HP', 'MP', 'TP', 'NOTHING', 'NULL'].contains(text)) {

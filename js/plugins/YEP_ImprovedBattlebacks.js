@@ -264,11 +264,11 @@ BattleManager.alterBattleback = function(line) {
     console.log('Test Passed');
   // CHANGE TO
   } else if (line.match(/CHANGE TO/i)) {
-    if (line.match(/:[ ](.*),[ ](.*),[ ](\d+)/i)) {
+    if (line.match(/:\s*(.*),[ ](.*),[ ](\d+)/i)) {
       var folder = 'img/' + String(RegExp.$1) + '/';
       var filename = String(RegExp.$2);
       var hue = Number(RegExp.$3).clamp(0, 360);
-    } else if (line.match(/:[ ](.*),[ ](.*)/i)) {
+    } else if (line.match(/:\s*(.*),[ ](.*)/i)) {
       var folder = 'img/' + String(RegExp.$1) + '/';
       var filename = String(RegExp.$2);
       var hue = 0;
@@ -278,7 +278,7 @@ BattleManager.alterBattleback = function(line) {
     spriteset.changeBattlebackTo(id, folder, filename, hue);
   // FADE IN
   } else if (line.match(/FADE IN/i)) {
-    if (line.match(/:[ ](\d+)/i)) {
+    if (line.match(/:\s*(\d+)/i)) {
       var duration = parseInt(RegExp.$1);
     } else {
       var duration = 20;
@@ -286,7 +286,7 @@ BattleManager.alterBattleback = function(line) {
     spriteset.battlebackFadeIn(id, duration);
   // FADE OUT
   } else if (line.match(/FADE OUT/i)) {
-    if (line.match(/:[ ](\d+)/i)) {
+    if (line.match(/:\s*(\d+)/i)) {
       var duration = parseInt(RegExp.$1);
     } else {
       var duration = 20;
@@ -294,10 +294,10 @@ BattleManager.alterBattleback = function(line) {
     spriteset.battlebackFadeOut(id, duration);
   // OPACITY
   } else if (line.match(/OPACITY/i)) {
-    if (line.match(/:[ ](\d+)([%％])/i)) {
+    if (line.match(/:\s*(\d+)([%％])/i)) {
       var rate = parseFloat(RegExp.$1) * 0.01;
       var value = Math.round(rate * 255);
-    } else if (line.match(/:[ ](\d+)/i)) {
+    } else if (line.match(/:\s*(\d+)/i)) {
       var value = parseInt(RegExp.$1);
     } else {
       return;
@@ -307,20 +307,20 @@ BattleManager.alterBattleback = function(line) {
   } else if (line.match(/RESET SCROLL SPEED/i)) {
     spriteset.resetScrollSpeeds(id);
   // SCROLL SPEED X
-  } else if (line.match(/SCROLL SPEED X:[ ]([\+\-]\d+)/i)) {
+  } else if (line.match(/SCROLL SPEED X:\s*([\+\-]\d+)/i)) {
     var speed = parseInt(RegExp.$1);
     spriteset.setBattlebackScrollSpeedX(id, speed);
   // SCROLL SPEED Y
-  } else if (line.match(/SCROLL SPEED Y:[ ]([\+\-]\d+)/i)) {
+  } else if (line.match(/SCROLL SPEED Y:\s*([\+\-]\d+)/i)) {
     var speed = parseInt(RegExp.$1);
     spriteset.setBattlebackScrollSpeedY(id, speed);
   // ADD
   } else if (line.match(/ADD/i)) {
-    if (line.match(/:[ ](.*),[ ](.*),[ ](\d+)/i)) {
+    if (line.match(/:\s*(.*),[ ](.*),[ ](\d+)/i)) {
       var folder = 'img/' + String(RegExp.$1) + '/';
       var filename = String(RegExp.$2);
       var hue = Number(RegExp.$3).clamp(0, 360);
-    } else if (line.match(/:[ ](.*),[ ](.*)/i)) {
+    } else if (line.match(/:\s*(.*),[ ](.*)/i)) {
       var folder = 'img/' + String(RegExp.$1) + '/';
       var filename = String(RegExp.$2);
       var hue = 0;
