@@ -1,0 +1,9 @@
+[HumanType]
+[Big]
+[Variant]
+[Float]
+[Foodstuff]
+[MagicConductor]
+
+[Gold]
+[Silver]

@@ -1,0 +1,12 @@
+*.Backup
+*.bak
+*.rpgmvp
+*.rpgmvo
+*.rpgmvo
+*.rpgsave
+*.webm
+*.7z
+
+!*.json
+!*.js
+!*.txt

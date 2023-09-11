@@ -1,0 +1,497 @@
+{
+    "text_dispray2": {
+        "alpha": {
+            "list": [
+                {
+                    "time": 0,
+                    "value": 0
+                },
+                {
+                    "time": 0.2,
+                    "value": 0.5
+                },
+                {
+                    "time": 0.8,
+                    "value": 0.5
+                },
+                {
+                    "time": 1,
+                    "value": 0
+                }
+            ]
+        },
+        "scale": {
+            "list": [
+                {
+                    "time": 0,
+                    "value": 0.75
+                },
+                {
+                    "time": 1,
+                    "value": 0
+                }
+            ],
+            "minimumScaleMultiplier": 0.5
+        },
+        "speed": {
+            "list": [
+                {
+                    "time": 0,
+                    "value": 240
+                },
+                {
+                    "time": 1,
+                    "value": 241
+                }
+            ],
+            "minimumSpeedMultiplier": 0.5
+        },
+        "color": {
+            "list": [
+                {
+                    "time": 0,
+                    "value": "#70c0ff"
+                },
+                {
+                    "time": 1,
+                    "value": "#ffffff"
+                }
+            ]
+        },
+        "colorMode": 1,
+        "acceleration": {
+            "x": 1000,
+            "y": 0
+        },
+        "maxSpeed": null,
+        "startRotation": {
+            "min": 90,
+            "max": -90
+        },
+        "noRotation": false,
+        "rotationSpeed": {
+            "min": 0,
+            "max": 0
+        },
+        "angle": 0,
+        "mirrorType": 0,
+        "orderedArt": 0,
+        "lifetime": {
+            "min": 1,
+            "max": 5
+        },
+        "blendMode": "ADD",
+        "frequency": 0.01,
+        "spawnChance": 1,
+        "particlesPerWave": 10,
+        "emitterLifetime": 1.5,
+        "maxParticles": 10000,
+        "fluctuation": {
+            "max": 30,
+            "sensitivity": 0.5
+        },
+        "spawnType": "point",
+        "pos": {
+            "x": -800,
+            "y": -260
+        },
+        "spawnRect": null,
+        "spawnCircle": null,
+        "particleSpacing": 0,
+        "angleStart": 0,
+        "bdt": 0,
+        "brt": 0,
+        "br": 0,
+        "bdr": 0,
+        "bdx": 0,
+        "bdy": 0,
+        "addAtBack": false,
+        "image": "particle2",
+        "targetType": 5,
+        "comment": "220724"
+    },
+    "goods_shine2": {
+        "alpha": {
+            "list": [
+                {
+                    "time": 0,
+                    "value": 0
+                },
+                {
+                    "time": 0.5,
+                    "value": 1
+                },
+                {
+                    "time": 1,
+                    "value": 0
+                }
+            ]
+        },
+        "scale": {
+            "list": [
+                {
+                    "time": 0,
+                    "value": 0
+                },
+                {
+                    "time": 0.2,
+                    "value": 0.35
+                },
+                {
+                    "time": 0.5,
+                    "value": 0.35
+                },
+                {
+                    "time": 1,
+                    "value": 0
+                }
+            ],
+            "minimumScaleMultiplier": 0.3
+        },
+        "speed": {
+            "list": [
+                {
+                    "time": 0,
+                    "value": 30
+                },
+                {
+                    "time": 1,
+                    "value": 30
+                }
+            ],
+            "minimumSpeedMultiplier": 0.2
+        },
+        "color": {
+            "list": [
+                {
+                    "time": 0,
+                    "value": "#5697ff"
+                },
+                {
+                    "time": 0.5,
+                    "value": "#fff952"
+                },
+                {
+                    "time": 1,
+                    "value": "#3492c4"
+                }
+            ]
+        },
+        "colorMode": 1,
+        "acceleration": {
+            "x": 0,
+            "y": 0
+        },
+        "maxSpeed": null,
+        "startRotation": {
+            "min": -90,
+            "max": -90
+        },
+        "noRotation": false,
+        "rotationSpeed": {
+            "min": 0,
+            "max": 0
+        },
+        "angle": 0,
+        "mirrorType": 0,
+        "orderedArt": 0,
+        "lifetime": {
+            "min": 1,
+            "max": 1.2
+        },
+        "blendMode": "ADD",
+        "frequency": 1,
+        "spawnChance": 0.5,
+        "particlesPerWave": 3,
+        "emitterLifetime": -1,
+        "maxParticles": 10000,
+        "fluctuation": {
+            "max": 5,
+            "sensitivity": 0.5
+        },
+        "spawnType": "rect",
+        "pos": {
+            "x": 0,
+            "y": -20
+        },
+        "spawnRect": {
+            "x": -20,
+            "y": -20,
+            "w": 40,
+            "h": 40
+        },
+        "spawnCircle": null,
+        "particleSpacing": 0,
+        "angleStart": 0,
+        "bdt": 0,
+        "brt": 0,
+        "br": 0,
+        "bdr": 0,
+        "bdx": 0,
+        "bdy": 0,
+        "addAtBack": false,
+        "image": "shine3",
+        "targetType": 0,
+        "comment": "220728"
+    },
+    "Hestrus_direction": {
+        "alpha": {
+            "list": [
+                {
+                    "time": 0,
+                    "value": 0.5
+                },
+                {
+                    "time": 0.1,
+                    "value": 0
+                },
+                {
+                    "time": 0.2,
+                    "value": 0.5
+                },
+                {
+                    "time": 0.3,
+                    "value": 0
+                },
+                {
+                    "time": 0.4,
+                    "value": 0
+                },
+                {
+                    "time": 0.5,
+                    "value": 0.5
+                },
+                {
+                    "time": 0.6,
+                    "value": 0
+                },
+                {
+                    "time": 0.7,
+                    "value": 0.5
+                },
+                {
+                    "time": 0.8,
+                    "value": 0
+                },
+                {
+                    "time": 0.9,
+                    "value": 0.5
+                },
+                {
+                    "time": 1,
+                    "value": 0
+                }
+            ]
+        },
+        "scale": {
+            "list": [
+                {
+                    "time": 0,
+                    "value": 1
+                },
+                {
+                    "time": 0.8,
+                    "value": 0.6
+                },
+                {
+                    "time": 1,
+                    "value": 0
+                }
+            ],
+            "minimumScaleMultiplier": 0.5
+        },
+        "speed": {
+            "list": [
+                {
+                    "time": 0,
+                    "value": 3
+                },
+                {
+                    "time": 0.2,
+                    "value": 5
+                },
+                {
+                    "time": 1,
+                    "value": 0
+                }
+            ],
+            "minimumSpeedMultiplier": 0.5
+        },
+        "color": {
+            "list": [
+                {
+                    "time": 0,
+                    "value": "#f8cdff"
+                },
+                {
+                    "time": 1,
+                    "value": "#db05ff"
+                }
+            ]
+        },
+        "colorMode": 0,
+        "acceleration": {
+            "x": 0,
+            "y": 0
+        },
+        "maxSpeed": null,
+        "startRotation": {
+            "min": 0,
+            "max": 0
+        },
+        "noRotation": false,
+        "rotationSpeed": {
+            "min": 0,
+            "max": 0
+        },
+        "angle": 0,
+        "mirrorType": 0,
+        "orderedArt": 0,
+        "lifetime": {
+            "min": 3,
+            "max": 4
+        },
+        "blendMode": "ADD",
+        "frequency": 0.1,
+        "spawnChance": 1,
+        "particlesPerWave": 1,
+        "emitterLifetime": -1,
+        "maxParticles": 10000,
+        "fluctuation": {
+            "max": 0,
+            "sensitivity": 0
+        },
+        "spawnType": "ring",
+        "pos": {
+            "x": 0,
+            "y": 0
+        },
+        "spawnRect": null,
+        "spawnCircle": {
+            "x": 0,
+            "y": -48,
+            "r": 40,
+            "minR": 48
+        },
+        "particleSpacing": 0,
+        "angleStart": 0,
+        "bdt": 0,
+        "brt": 0,
+        "br": 0,
+        "bdr": 0,
+        "bdx": 0,
+        "bdy": 0,
+        "addAtBack": false,
+        "image": "heart4g,heart1g,flare2",
+        "targetType": 0,
+        "comment": "221010"
+    },
+    "test": {
+        "alpha": {
+            "list": [
+                {
+                    "time": 0,
+                    "value": 0.6
+                },
+                {
+                    "time": 1,
+                    "value": 0
+                }
+            ]
+        },
+        "scale": {
+            "list": [
+                {
+                    "time": 0,
+                    "value": 0
+                },
+                {
+                    "time": 1,
+                    "value": 30
+                }
+            ],
+            "minimumScaleMultiplier": 0.2
+        },
+        "speed": {
+            "list": [
+                {
+                    "time": 0,
+                    "value": 100
+                },
+                {
+                    "time": 1,
+                    "value": 50
+                }
+            ],
+            "minimumSpeedMultiplier": 1
+        },
+        "color": {
+            "list": [
+                {
+                    "time": 0,
+                    "value": "#ff6dfb"
+                },
+                {
+                    "time": 1,
+                    "value": "#ffffff"
+                }
+            ]
+        },
+        "colorMode": 1,
+        "acceleration": {
+            "x": 0,
+            "y": 0
+        },
+        "maxSpeed": null,
+        "startRotation": {
+            "min": 0,
+            "max": 0
+        },
+        "noRotation": false,
+        "rotationSpeed": {
+            "min": -25,
+            "max": 25
+        },
+        "angle": -1,
+        "mirrorType": 2,
+        "orderedArt": 0,
+        "lifetime": {
+            "min": 0.4,
+            "max": 0.6
+        },
+        "blendMode": "ADD",
+        "frequency": 0.03,
+        "spawnChance": 1,
+        "particlesPerWave": 0.5,
+        "emitterLifetime": 1,
+        "maxParticles": 10000,
+        "fluctuation": {
+            "max": 0,
+            "sensitivity": 0
+        },
+        "spawnType": "rect",
+        "pos": {
+            "x": 0,
+            "y": 0
+        },
+        "spawnRect": {
+            "x": -640,
+            "y": -368,
+            "w": 1200,
+            "h": 758
+        },
+        "spawnCircle": null,
+        "particleSpacing": 0,
+        "angleStart": 0,
+        "bdt": 0,
+        "brt": 0,
+        "br": 0,
+        "bdr": 0,
+        "bdx": 0,
+        "bdy": 0,
+        "addAtBack": false,
+        "image": "asterisk_thin1g1",
+        "targetType": 0,
+        "comment": "230818"
+    }
+}
