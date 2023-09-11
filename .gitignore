@@ -6,6 +6,7 @@
 *.rpgsave
 *.webm
 *.7z
+*.png
 
 !*.json
 !*.js
