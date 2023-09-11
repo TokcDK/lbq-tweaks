@@ -116,7 +116,7 @@ $gameVariables.setValue(501,Array(101).fill(0));
 
 };
 
-amygame_startUp = function(){
+amygame_startUp = function() {
 
 var start = 1;
 var end = $dataWeapons.length-1;
@@ -158,21 +158,23 @@ for (var i = 1; i <= $dataWeapons.length-1; i++) {
     };
   };
 };
-for (var i = 1; i <= $dataItems.length-1; i++) {
+
+var dataItemsLength = $dataItems.length;
+for (var i = 1; i < dataItemsLength; i++) {
   var itemI = $dataItems[i];
-  if(!itemI.name == '') {
+  if (itemI.name !== '') {
     var itemImetaItemNameAddSet = itemI.meta['ItemNameAddSet'];
     if(itemImetaItemNameAddSet) {
       var arr1 = itemImetaItemNameAddSet.split(',');
-	  var numberArr10 = Number(arr1[0];
-	  var numberArr11 = Number(arr1[1];
+	  var numberArr10 = Number(arr1[0]);
+	  var numberArr11 = Number(arr1[1]);
 	  var valueItems = null;
       if(numberArr10 == 0){valueItems = $dataItems[numberArr11].name}
-      else if(numberArr10 == 1){valueItems = $dataWeapons[numberArr11].name};
-      else if(numberArr10 == 2){valueItems = $dataArmors[numberArr11].name};
-      else if(numberArr10 == 3){valueItems = $dataStates[numberArr11].name};
-      else if(numberArr10 == 4){valueItems = $dataSkills[numberArr11].name};
-      else if(numberArr10 == 5){valueItems = $dataStates[numberArr11].name};
+      else if(numberArr10 == 1){valueItems = $dataWeapons[numberArr11].name}
+      else if(numberArr10 == 2){valueItems = $dataArmors[numberArr11].name}
+      else if(numberArr10 == 3){valueItems = $dataStates[numberArr11].name}
+      else if(numberArr10 == 4){valueItems = $dataSkills[numberArr11].name}
+      else if(numberArr10 == 5){valueItems = $dataStates[numberArr11].name}
       else if(numberArr10 == 6){valueItems = $dataSystem.switches[numberArr11]};
       if(Number(arr1[2]) == 0){
         itemI.name = `${valueItems}${itemI.name}`;
@@ -200,8 +202,8 @@ for (var i = 1; i <= $dataItems.length-1; i++) {
         };
         itemI.name = '[' + value1 + ']' + itemI.name;
         value1 += 1;
-      }
-      else if(itemImetaEICSwitchNum == 103) {
+      } 
+	  else if (itemImetaEICSwitchNum == 103) {
         if(i >= 501 && i <= 600){
           itemI.name = $dataCommonEvents[i].name;
         };
@@ -210,8 +212,8 @@ for (var i = 1; i <= $dataItems.length-1; i++) {
         };
         itemI.name = '[' + value2 + ']' + itemI.name;
         value2 += 1;
-      }
-      else if(itemImetaEICSwitchNum == 104 || itemImetaEICSwitchNum == 105) {//二つ名は説明の方に連番を付与する
+      } 
+	  else if (itemImetaEICSwitchNum == 104 || itemImetaEICSwitchNum == 105) {//二つ名は説明の方に連番を付与する
         itemI.description = '[' + value3 + ']' + itemI.description;
         value3 += 1;
           if (itemI.meta['KojinTitle']) {
@@ -219,8 +221,8 @@ for (var i = 1; i <= $dataItems.length-1; i++) {
               itemI.description += `[達成者:${$gameActors.actor($gameVariables.value(297)[i]).name()}]`;
             }
           };
-      }
-      else if(itemImetaEICSwitchNum == 108) {
+      } 
+	  else if (itemImetaEICSwitchNum == 108) {
         var itemImetaSGCategory = itemI.meta['SGカテゴリ'];
         if(itemImetaSGCategory == '受注クエスト' || itemImetaSGCategory == 'ＥＸ受注クエスト') {//特別クエスト使わない。クエスト801～を901に名前と解説とアイコンをコピーする
           itemI.name = '[' + value5 + ']' + itemI.name;
@@ -228,8 +230,8 @@ for (var i = 1; i <= $dataItems.length-1; i++) {
           $dataItems[i+100].name = `${itemI.name}[了]`;
           $dataItems[i+100].description = itemI.description;
           value5 += 1;
-        }
-        else if(itemImetaSGCategory == 'デイリークエスト') {
+        } 
+		else if (itemImetaSGCategory == 'デイリークエスト') {
           itemI.name = '[' + value6 + ']' + itemI.name;
           $dataItems[i+50].iconIndex = itemI.iconIndex;
           $dataItems[i+50].name = `${itemI.name}[了]`;
@@ -5762,8 +5764,8 @@ if(itemMetaTchestType){
   var valueItems = $dataItems 
   var arr1Value1Num = Number(arr1[value1]);
   //if(Number(arr1[value1]) == 0){var valueItems = $dataItems};
-  if(arr1Value1Num == 1){valueItems = $dataWeapons}
-  else if(Number(arr1Value1Num == 2){valueItems = $dataArmors};
+  if (arr1Value1Num == 1) {valueItems = $dataWeapons}
+  else if (arr1Value1Num == 2) {valueItems = $dataArmors};
   
   var arr2value1Num = Number(arr2[value1]);
   var valueItem = valueItems[arr2value1Num];
