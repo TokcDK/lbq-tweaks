@@ -242,7 +242,7 @@ for (var i = 1; i < dataItemsLength; i++) {
 }}};
 
 //不用なクエスト完了削除。辞典に反映させないため
-for (var i = 1; i <= $dataItems.length-1; i++) {
+/* for (var i = 1; i < dataItemsLength; i++) {
   if(Number($dataItems[i].meta['EICSwitch']) == 108) {
     if($dataItems[i].name == '') {
       if(i >= 801 && i <= 900){
@@ -253,7 +253,7 @@ for (var i = 1; i <= $dataItems.length-1; i++) {
         //const obj1 = $dataItems[2];
         //$dataItems[i+50] = Object.assign({}, obj1);
       };
-}}};
+}}}; */
 
 //ステート武器防具スキルに説明文追加。状態異常耐性付与の先に実行。反映させないため
 various_description(4);//ステートは最初
@@ -269,88 +269,65 @@ var arr2 = [];
 var start = 1;
 var end = $dataStates.length-1;
 for (var i = start; i <= end; i++) {
-  if($dataStates[i].meta['Category'] == ' StateNomal'){
+  var dataStateI = $dataStates[i];
+  if(dataStateI.meta['Category'] == ' StateNomal'){
       arr1.push(i);
-  };
-  if($dataStates[i].meta['Category'] == ' StateabNomal'){
+  }
+  else if(dataStateI.meta['Category'] == ' StateabNomal'){
     arr2.push(i);
   };
 };
 for (var j = 1; j <= 4; j++) {
-  if(j == 1){valueItems = $dataStates};
-  if(j == 2){valueItems = $dataWeapons};
-  if(j == 3){valueItems = $dataArmors};
-  if(j == 4){valueItems = $dataClasses};
+  if(j == 1){valueItems = $dataStates}
+  else if(j == 2){valueItems = $dataWeapons}
+  else if(j == 3){valueItems = $dataArmors}
+  else if(j == 4){valueItems = $dataClasses};
+  
   var start = 1;
-  if(j == 3){
-    var end = valueArmorsLength;
-  } else {
-    var end = valueItems.length-1;
-  };
+  var end = (j == 3 ? valueArmorsLength : valueItems.length - 1);
   for (var i = start; i <= end; i++) {
-    if(valueItems[i].meta['StateabNomalResist']){
-      var list = arr1;
-      list.forEach(function(id) {
-        var value1 = Number(valueItems[i].meta['StateabNomalResist']);
-          if(value1 == 0){
-            valueItems[i].traits.push({code: 14, dataId: id, value: 1});
-          } else {
-            valueItems[i].traits.push({code: 13, dataId: id, value: 1 - (value1/100)});
-          };
+	var valueItem = valueItems[i];
+	var valueItemTraits = valueItem.traits;
+	var valueItemStateabNomalResist = valueItem.meta['StateabNomalResist'];
+    if(valueItemStateabNomalResist){
+      var value1 = Number(valueItemStateabNomalResist);
+	  var value1IsZero = value1 == 0;
+	  var value1code = value1IsZero ? 14 : 13;
+	  var value1value = value1IsZero ? 1 : (1-value1/100);
+      arr1.forEach(function(id) {
+		  valueItemTraits.push({code: value1code, dataId: id, value: value1value});
       }, this);
     };
-    if(valueItems[i].meta['StateSPabNomalResist']){
-      var list = arr2;
-      list.forEach(function(id) {
-        var value1 = Number(valueItems[i].meta['StateSPabNomalResist']);
-          if(value1 == 0){
-            valueItems[i].traits.push({code: 14, dataId: id, value: 1});
-          } else {
-            valueItems[i].traits.push({code: 13, dataId: id, value: 1 - (value1/100)});
-          };
+	
+	var valueItemStateSPabNomalResist = valueItem.meta['StateSPabNomalResist'];
+    if(valueItemStateSPabNomalResist){
+      var value1 = Number(valueItemStateSPabNomalResist);
+	  var value1IsZero = value1 == 0;
+	  var value1code = value1IsZero ? 14 : 13;
+	  var value1value = value1IsZero ? 1 : (1-value1/100);
+      arr2.forEach(function(id) {
+		  valueItemTraits.push({code: value1code, dataId: id, value: value1value});
       }, this);
     };
-    if(valueItems[i].meta['elementRegist6']){
-      var value1 = Number(valueItems[i].meta['elementRegist6']);
-      if(value1 == 0){
-        valueItems[i].traits.push({code: 11, dataId: 3, value: 0});
-        valueItems[i].traits.push({code: 11, dataId: 4, value: 0});
-        valueItems[i].traits.push({code: 11, dataId: 5, value: 0});
-        valueItems[i].traits.push({code: 11, dataId: 6, value: 0});
-        valueItems[i].traits.push({code: 11, dataId: 7, value: 0});
-        valueItems[i].traits.push({code: 11, dataId: 8, value: 0});
-      } else {
-        valueItems[i].traits.push({code: 11, dataId: 3, value: 1 - (value1/100)});
-        valueItems[i].traits.push({code: 11, dataId: 4, value: 1 - (value1/100)});
-        valueItems[i].traits.push({code: 11, dataId: 5, value: 1 - (value1/100)});
-        valueItems[i].traits.push({code: 11, dataId: 6, value: 1 - (value1/100)});
-        valueItems[i].traits.push({code: 11, dataId: 7, value: 1 - (value1/100)});
-        valueItems[i].traits.push({code: 11, dataId: 8, value: 1 - (value1/100)});
-      };
+	
+	var valueItemElementRegist6 = valueItem.meta['elementRegist6'];
+    if(valueItemElementRegist6){
+      var value1 = Number(valueItemElementRegist6);
+	  var value1value = value1 == 0 ? 0 : (1-(value1/100));
+	  for (var dId = 3; dId <= 8; dId++) {
+        valueItemTraits.push({code: 11, dataId: dId, value: value1value});
+	  };
     };
-    if(valueItems[i].meta['elementRegist9']){
-      var value1 = Number(valueItems[i].meta['elementRegist9']);
-      if(value1 == 0){
-        valueItems[i].traits.push({code: 11, dataId: 3, value: 0});
-        valueItems[i].traits.push({code: 11, dataId: 4, value: 0});
-        valueItems[i].traits.push({code: 11, dataId: 5, value: 0});
-        valueItems[i].traits.push({code: 11, dataId: 6, value: 0});
-        valueItems[i].traits.push({code: 11, dataId: 7, value: 0});
-        valueItems[i].traits.push({code: 11, dataId: 8, value: 0});
-        valueItems[i].traits.push({code: 11, dataId: 9, value: 0});
-        valueItems[i].traits.push({code: 11, dataId: 16, value: 0});
-        valueItems[i].traits.push({code: 11, dataId: 17, value: 0});
-      } else {
-        valueItems[i].traits.push({code: 11, dataId: 3, value: 1 - (value1/100)});
-        valueItems[i].traits.push({code: 11, dataId: 4, value: 1 - (value1/100)});
-        valueItems[i].traits.push({code: 11, dataId: 5, value: 1 - (value1/100)});
-        valueItems[i].traits.push({code: 11, dataId: 6, value: 1 - (value1/100)});
-        valueItems[i].traits.push({code: 11, dataId: 7, value: 1 - (value1/100)});
-        valueItems[i].traits.push({code: 11, dataId: 8, value: 1 - (value1/100)});
-        valueItems[i].traits.push({code: 11, dataId: 9, value: 1 - (value1/100)});
-        valueItems[i].traits.push({code: 11, dataId: 16, value: 1 - (value1/100)});
-        valueItems[i].traits.push({code: 11, dataId: 17, value: 1 - (value1/100)});
-      };
+	
+	var valueItemElementRegist9 = valueItem.meta['elementRegist9'];
+    if(valueItemElementRegist9){
+      var value1 = Number(valueItemElementRegist9);
+	  var value1value = value1 == 0 ? 0 : (1-(value1/100));
+	  for (var dId = 3; dId <= 9; dId++) {
+        valueItemTraits.push({code: 11, dataId: dId, value: value1value});
+	  };
+	  valueItemTraits.push({code: 11, dataId: 16, value: value1value});
+	  valueItemTraits.push({code: 11, dataId: 17, value: value1value});
     };
   };
 };
@@ -360,10 +337,11 @@ enemy_troopPosition1();
 
 //ダンジョンユニーク採取品の解説文にマップ名追記
 for (var i = 1; i <= 9; i++) {
-  for (var j = 1; j <= $dataItems.length-1; j++) {
-    if($dataItems[j].meta['UniqueMaterial' + i]){
-      var arr1 = $dataItems[j].meta['UniqueMaterial' + i].split(',');
-      if($dataItems[j].meta['MapSwitch']){
+  for (var j = 1; j <= dataItemsLength-1; j++) {
+	var dataItemJ = $dataItems[j];
+    if(dataItemJ.meta['UniqueMaterial' + i]){
+      var arr1 = dataItemJ.meta['UniqueMaterial' + i].split(',');
+      if(dataItemJ.meta['MapSwitch']){
         $dataItems[Number(arr1[0])].description += ` \\C[2][${$dataSystem.switches[Number($dataItems[j].meta['MapSwitch'])]}で希少採取]\\C[0]`;
       };
     };
@@ -434,7 +412,7 @@ if($dataSystem.variables[61].match(/りしゃぶる/)){
 actor_stateCheck = function(id1){
 
 var array = [];
-var value1 = ``;
+
 var start = $gameVariables.value(75);
 var end = $gameVariables.value(76);
 for(var i = start; i <= end; i++){
@@ -442,15 +420,20 @@ for(var i = start; i <= end; i++){
   if(actor.isStateAffected(id1)){
     array.push(i);
 }};
-for(var i = 0; i <= array.length-1; i++){
-  if(id1 == 83){$gameSelfSwitches.setValue([$gameMap.mapId(), array[i], 'A'], true)};
-  value1 += `${$gameActors.actor(array[i]).name()} `;
+
+var value1 = ``;
+var id183 = id1 === 83;
+var arrayLength = array.length;
+for(var i = 0; i < arrayLength; i++){
+  var arrayI = array[i];
+  if(id183){$gameSelfSwitches.setValue([$gameMap.mapId(), arrayI, 'A'], true)};
+  value1 += `${$gameActors.actor(arrayI).name()} `;
 };
-if(array.length >= 2){
+if(arrayLength >= 2){
   value1 += `達`;
 };
 $gameActors.actor(21).setName(value1);
-$gameVariables.setValue(21,array.length-1);
+$gameVariables.setValue(21,arrayLength-1);
 $gameVariables.setValue(22,array);
 
 };
