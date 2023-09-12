@@ -193,22 +193,23 @@ for (var i = 1; i < dataItemsLength; i++) {
 	var itemImetaEICSwitch = itemI.meta['EICSwitch'];
     if(itemImetaEICSwitch) {
       var itemImetaEICSwitchNum = Number(itemImetaEICSwitch);
+	  var dataCommonEventsI = $dataCommonEvents[i];
       if(itemImetaEICSwitchNum == 102) {
         if(i >= 401 && i <= 500){
-          itemI.name = $dataCommonEvents[i].name;
+          itemI.name = dataCommonEventsI.name;
         };
         if(itemI.meta['追加コモンID']) {
-          itemI.name = $dataCommonEvents[i].name;
+          itemI.name = dataCommonEventsI.name;
         };
         itemI.name = '[' + value1 + ']' + itemI.name;
         value1 += 1;
       } 
 	  else if (itemImetaEICSwitchNum == 103) {
         if(i >= 501 && i <= 600){
-          itemI.name = $dataCommonEvents[i].name;
+          itemI.name = dataCommonEventsI.name;
         };
         if(itemI.meta['追加コモンID']) {
-          itemI.name = $dataCommonEvents[i].name;
+          itemI.name = dataCommonEventsI.name;
         };
         itemI.name = '[' + value2 + ']' + itemI.name;
         value2 += 1;
@@ -226,16 +227,18 @@ for (var i = 1; i < dataItemsLength; i++) {
         var itemImetaSGCategory = itemI.meta['SGカテゴリ'];
         if(itemImetaSGCategory == '受注クエスト' || itemImetaSGCategory == 'ＥＸ受注クエスト') {//特別クエスト使わない。クエスト801～を901に名前と解説とアイコンをコピーする
           itemI.name = '[' + value5 + ']' + itemI.name;
-          $dataItems[i+100].iconIndex = itemI.iconIndex;
-          $dataItems[i+100].name = `${itemI.name}[了]`;
-          $dataItems[i+100].description = itemI.description;
+		  var dataItemsi100 = $dataItems[i+100];
+          dataItemsi100.iconIndex = itemI.iconIndex;
+          dataItemsi100.name = `${itemI.name}[了]`;
+          dataItemsi100.description = itemI.description;
           value5 += 1;
         } 
 		else if (itemImetaSGCategory == 'デイリークエスト') {
           itemI.name = '[' + value6 + ']' + itemI.name;
-          $dataItems[i+50].iconIndex = itemI.iconIndex;
-          $dataItems[i+50].name = `${itemI.name}[了]`;
-          $dataItems[i+50].description = itemI.description;
+		  var dataItemsi50 = $dataItems[i+50];
+          dataItemsi50.iconIndex = itemI.iconIndex;
+          dataItemsi50.name = `${itemI.name}[了]`;
+          dataItemsi50.description = itemI.description;
           value6 += 1;
         };
       };
