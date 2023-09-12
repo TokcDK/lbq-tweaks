@@ -223,7 +223,7 @@ DataManager.processWANotetags1 = function(group) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<(?:WEAPON IMAGE):[ ](\d+)>/i)) {
+      if (line.match(/<(?:WEAPON IMAGE):\s*(\d+)>/i)) {
         obj.weaponImageIndex = parseInt(RegExp.$1);
         if (obj.weaponAttackMotion) continue;
         var motion = $dataSystem.attackMotions[parseInt(RegExp.$1)];
@@ -245,14 +245,14 @@ DataManager.processWANotetags1 = function(group) {
           this._loadedWeaponsSheets.push(filename);
           ImageManager.loadSystem(filename);
         }
-      } else if (line.match(/<(?:WEAPON IMAGE):[ ](.*)>/i)) {
+      } else if (line.match(/<(?:WEAPON IMAGE):\s*(.*)>/i)) {
         obj.weaponImageIndex = String(RegExp.$1);
         obj.weaponAttackMotion = Yanfly.Param.WAMotion;
-      } else if (line.match(/<(?:WEAPON MOTION):[ ](.*)>/i)) {
+      } else if (line.match(/<(?:WEAPON MOTION):\s*(.*)>/i)) {
         obj.weaponAttackMotion = String(RegExp.$1).toLowerCase();
-      } else if (line.match(/<(?:WEAPON ANIMATION):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:WEAPON ANIMATION):\s*(\d+)>/i)) {
         obj.weaponAnimationId = parseInt(RegExp.$1);
-      } else if (line.match(/<(?:WEAPON HUE):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:WEAPON HUE):\s*(\d+)>/i)) {
         obj.weaponHue = parseInt(RegExp.$1);
       }
     }

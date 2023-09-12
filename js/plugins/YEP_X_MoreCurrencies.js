@@ -375,10 +375,10 @@ DataManager.processMCNotetags1 = function(group, itemType) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<PROXY BUY:[ ](\d+)>/i)) {
+      if (line.match(/<PROXY BUY:\s*(\d+)>/i)) {
         obj.proxyBuy = parseInt(RegExp.$1);
         this.adjustProxyBuy(obj, itemType);
-      } else if (line.match(/<PROXY BUY:[ ](.*)>/i)) {
+      } else if (line.match(/<PROXY BUY:\s*(.*)>/i)) {
         var name = String(RegExp.$1).toUpperCase();
         if (itemType === 0 && Yanfly.ItemIdRef[name]) {
           obj.proxyBuy = Yanfly.ItemIdRef[name];
@@ -388,13 +388,13 @@ DataManager.processMCNotetags1 = function(group, itemType) {
           obj.proxyBuy = Yanfly.ArmorIdRef[name];
         }
         this.adjustProxyBuy(obj, itemType);
-      } else if (line.match(/<VARIABLE[ ](\d+)[ ]BUY PRICE:[ ](\d+)>/i)) {
+      } else if (line.match(/<VARIABLE[ ](\d+)[ ]BUY PRICE:\s*(\d+)>/i)) {
         var varId = parseInt(RegExp.$1);
         var value = parseInt(RegExp.$2);
         if (obj.variableBuyPrices.contains(varId)) continue;
         obj.variableBuyPrices.unshift(varId);
         obj.variableBuyPrice[varId] = value;
-      } else if (line.match(/<VARIABLE[ ](\d+)[ ]SELL PRICE:[ ](\d+)>/i)) {
+      } else if (line.match(/<VARIABLE[ ](\d+)[ ]SELL PRICE:\s*(\d+)>/i)) {
         var varId = parseInt(RegExp.$1);
         var value = parseInt(RegExp.$2);
         if (obj.variableSellPrices.contains(varId)) continue;
@@ -402,7 +402,7 @@ DataManager.processMCNotetags1 = function(group, itemType) {
         obj.variableSellPrice[varId] = value;
         obj.canSell = true;
         obj.cannotSell = false;
-      } else if (line.match(/<ITEM[ ](\d+)[ ]BUY PRICE:[ ](\d+)>/i)) {
+      } else if (line.match(/<ITEM[ ](\d+)[ ]BUY PRICE:\s*(\d+)>/i)) {
         var varId = parseInt(RegExp.$1);
         var value = parseInt(RegExp.$2);
         if (obj.itemBuyPrices.contains(varId)) continue;
@@ -411,7 +411,7 @@ DataManager.processMCNotetags1 = function(group, itemType) {
         }
         obj.itemBuyPrices.unshift(varId);
         obj.itemBuyPrice[varId] = value;
-      } else if (line.match(/<ITEM[ ](.*)[ ]BUY PRICE:[ ](\d+)>/i)) {
+      } else if (line.match(/<ITEM[ ](.*)[ ]BUY PRICE:\s*(\d+)>/i)) {
         var name = String(RegExp.$1).toUpperCase();
         var value = parseInt(RegExp.$2);
         var varId = Yanfly.ItemIdRef[name];
@@ -422,7 +422,7 @@ DataManager.processMCNotetags1 = function(group, itemType) {
         }
         obj.itemBuyPrices.unshift(varId);
         obj.itemBuyPrice[varId] = value;
-      } else if (line.match(/<ITEM[ ](\d+)[ ]SELL PRICE:[ ](\d+)>/i)) {
+      } else if (line.match(/<ITEM[ ](\d+)[ ]SELL PRICE:\s*(\d+)>/i)) {
         var varId = parseInt(RegExp.$1);
         var value = parseInt(RegExp.$2);
         if (obj.itemSellPrices.contains(varId)) continue;
@@ -433,7 +433,7 @@ DataManager.processMCNotetags1 = function(group, itemType) {
         obj.itemSellPrice[varId] = value;
         obj.canSell = true;
         obj.cannotSell = false;
-      } else if (line.match(/<ITEM[ ](.*)[ ]SELL PRICE:[ ](\d+)>/i)) {
+      } else if (line.match(/<ITEM[ ](.*)[ ]SELL PRICE:\s*(\d+)>/i)) {
         var name = String(RegExp.$1).toUpperCase();
         var value = parseInt(RegExp.$2);
         var varId = Yanfly.ItemIdRef[name];
@@ -446,7 +446,7 @@ DataManager.processMCNotetags1 = function(group, itemType) {
         obj.itemSellPrice[varId] = value;
         obj.canSell = true;
         obj.cannotSell = false;
-      } else if (line.match(/<WEAPON[ ](\d+)[ ]BUY PRICE:[ ](\d+)>/i)) {
+      } else if (line.match(/<WEAPON[ ](\d+)[ ]BUY PRICE:\s*(\d+)>/i)) {
         var varId = parseInt(RegExp.$1);
         var value = parseInt(RegExp.$2);
         if (obj.weaponBuyPrices.contains(varId)) continue;
@@ -455,7 +455,7 @@ DataManager.processMCNotetags1 = function(group, itemType) {
         }
         obj.weaponBuyPrices.unshift(varId);
         obj.weaponBuyPrice[varId] = value;
-      } else if (line.match(/<WEAPON[ ](.*)[ ]BUY PRICE:[ ](\d+)>/i)) {
+      } else if (line.match(/<WEAPON[ ](.*)[ ]BUY PRICE:\s*(\d+)>/i)) {
         var name = String(RegExp.$1).toUpperCase();
         var value = parseInt(RegExp.$2);
         var varId = Yanfly.WeaponIdRef[name];
@@ -466,7 +466,7 @@ DataManager.processMCNotetags1 = function(group, itemType) {
         }
         obj.weaponBuyPrices.unshift(varId);
         obj.weaponBuyPrice[varId] = value;
-      } else if (line.match(/<WEAPON[ ](\d+)[ ]SELL PRICE:[ ](\d+)>/i)) {
+      } else if (line.match(/<WEAPON[ ](\d+)[ ]SELL PRICE:\s*(\d+)>/i)) {
         var varId = parseInt(RegExp.$1);
         var value = parseInt(RegExp.$2);
         if (obj.weaponSellPrices.contains(varId)) continue;
@@ -477,7 +477,7 @@ DataManager.processMCNotetags1 = function(group, itemType) {
         obj.weaponSellPrice[varId] = value;
         obj.canSell = true;
         obj.cannotSell = false;
-      } else if (line.match(/<WEAPON[ ](.*)[ ]SELL PRICE:[ ](\d+)>/i)) {
+      } else if (line.match(/<WEAPON[ ](.*)[ ]SELL PRICE:\s*(\d+)>/i)) {
         var name = String(RegExp.$1).toUpperCase();
         var value = parseInt(RegExp.$2);
         var varId = Yanfly.WeaponIdRef[name];
@@ -490,7 +490,7 @@ DataManager.processMCNotetags1 = function(group, itemType) {
         obj.weaponSellPrice[varId] = value;
         obj.canSell = true;
         obj.cannotSell = false;
-      } else if (line.match(/<ARMOR[ ](\d+)[ ]BUY PRICE:[ ](\d+)>/i)) {
+      } else if (line.match(/<ARMOR[ ](\d+)[ ]BUY PRICE:\s*(\d+)>/i)) {
         var varId = parseInt(RegExp.$1);
         var value = parseInt(RegExp.$2);
         if (obj.armorBuyPrices.contains(varId)) continue;
@@ -499,7 +499,7 @@ DataManager.processMCNotetags1 = function(group, itemType) {
         }
         obj.armorBuyPrices.unshift(varId);
         obj.armorBuyPrice[varId] = value;
-      } else if (line.match(/<ARMOR[ ](.*)[ ]BUY PRICE:[ ](\d+)>/i)) {
+      } else if (line.match(/<ARMOR[ ](.*)[ ]BUY PRICE:\s*(\d+)>/i)) {
         var name = String(RegExp.$1).toUpperCase();
         var value = parseInt(RegExp.$2);
         var varId = Yanfly.ArmorIdRef[name];
@@ -510,7 +510,7 @@ DataManager.processMCNotetags1 = function(group, itemType) {
         }
         obj.armorBuyPrices.unshift(varId);
         obj.armorBuyPrice[varId] = value;
-      } else if (line.match(/<ARMOR[ ](\d+)[ ]SELL PRICE:[ ](\d+)>/i)) {
+      } else if (line.match(/<ARMOR[ ](\d+)[ ]SELL PRICE:\s*(\d+)>/i)) {
         var varId = parseInt(RegExp.$1);
         var value = parseInt(RegExp.$2);
         if (obj.armorSellPrices.contains(varId)) continue;
@@ -521,7 +521,7 @@ DataManager.processMCNotetags1 = function(group, itemType) {
         obj.armorSellPrice[varId] = value;
         obj.canSell = true;
         obj.cannotSell = false;
-      } else if (line.match(/<ARMOR[ ](.*)[ ]SELL PRICE:[ ](\d+)>/i)) {
+      } else if (line.match(/<ARMOR[ ](.*)[ ]SELL PRICE:\s*(\d+)>/i)) {
         var name = String(RegExp.$1).toUpperCase();
         var value = parseInt(RegExp.$2);
         var varId = Yanfly.ArmorIdRef[name];

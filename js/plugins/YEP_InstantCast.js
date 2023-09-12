@@ -261,13 +261,13 @@ DataManager.processInstantNotetags1 = function(group) {
 
 DataManager.processInstantNotetags2 = function(group) {
   var note1 = /<(?:INSTANT SKILL):[ ]*(\d+(?:\s*,\s*\d+)*)>/i;
-  var note2 = /<(?:INSTANT SKILL):[ ](\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
+  var note2 = /<(?:INSTANT SKILL):\s*(\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
   var note3 = /<(?:INSTANT ITEM):[ ]*(\d+(?:\s*,\s*\d+)*)>/i;
-  var note4 = /<(?:INSTANT ITEM):[ ](\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
+  var note4 = /<(?:INSTANT ITEM):\s*(\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
   var note5 = /<(?:CANCEL INSTANT SKILL):[ ]*(\d+(?:\s*,\s*\d+)*)>/i;
-  var note6 = /<(?:CANCEL INSTANT SKILL):[ ](\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
+  var note6 = /<(?:CANCEL INSTANT SKILL):\s*(\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
   var note7 = /<(?:CANCEL INSTANT ITEM):[ ]*(\d+(?:\s*,\s*\d+)*)>/i;
-  var note8 = /<(?:CANCEL INSTANT ITEM):[ ](\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
+  var note8 = /<(?:CANCEL INSTANT ITEM):\s*(\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
 	for (var n = 1; n < group.length; n++) {
 		var obj = group[n];
 		var notedata = obj.note.split(/[\r\n]+/);

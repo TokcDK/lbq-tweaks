@@ -251,7 +251,7 @@ DataManager.processOverkillBonusNotetags1 = function(group) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<OVERKILL REQUIREMENT:[ ](.*)>/i)) {
+      if (line.match(/<OVERKILL REQUIREMENT:\s*(.*)>/i)) {
         obj.overkillFormula = 'requirement = ' + String(RegExp.$1);
       } else if (line.match(/<OVERKILL REQUIREMENT FORMULA>/i)) {
         evalMode = 'overkill formula';
@@ -260,17 +260,17 @@ DataManager.processOverkillBonusNotetags1 = function(group) {
         evalMode = 'none';
       } else if (evalMode === 'overkill formula') {
         obj.overkillFormula += line + '\n';
-      } else if (line.match(/<OVERKILL ANIMATION:[ ](\d+)>/i)) {
+      } else if (line.match(/<OVERKILL ANIMATION:\s*(\d+)>/i)) {
         obj.overkillAnimationId = parseInt(RegExp.$1);
-      } else if (line.match(/<OVERKILL EXP RATE:[ ](\d+)([%％])>/i)) {
+      } else if (line.match(/<OVERKILL EXP RATE:\s*(\d+)([%％])>/i)) {
         obj.overkillExpRate = parseFloat(RegExp.$1) * 0.01;
-      } else if (line.match(/<OVERKILL EXP FLAT:[ ](\d+)>/i)) {
+      } else if (line.match(/<OVERKILL EXP FLAT:\s*(\d+)>/i)) {
         obj.overkillExpFlat = parseInt(RegExp.$1);
-      } else if (line.match(/<OVERKILL GOLD RATE:[ ](\d+)([%％])>/i)) {
+      } else if (line.match(/<OVERKILL GOLD RATE:\s*(\d+)([%％])>/i)) {
         obj.overkillGoldRate = parseFloat(RegExp.$1) * 0.01;
-      } else if (line.match(/<OVERKILL GOLD FLAT:[ ](\d+)>/i)) {
+      } else if (line.match(/<OVERKILL GOLD FLAT:\s*(\d+)>/i)) {
         obj.overkillGoldFlat = parseInt(RegExp.$1);
-      } else if (line.match(/<OVERKILL DROP RATE:[ ](\d+)([%％])>/i)) {
+      } else if (line.match(/<OVERKILL DROP RATE:\s*(\d+)([%％])>/i)) {
         obj.overkillDropRate = parseFloat(RegExp.$1) * 0.01;
       } else if (line.match(/<CUSTOM OVERKILL EFFECT>/i)) {
         evalMode = 'custom overkill effect';

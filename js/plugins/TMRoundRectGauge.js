@@ -47,6 +47,7 @@ Imported.TMRoundRectGauge = true;
   
   if (Imported.TMBitmapEx) {
     Window_Base.prototype.drawGauge = function(x, y, width, rate, color1, color2) {
+      if (Number.isNaN(rate)) rate = 0; // rate sometimes can be NaN in Yep_SkillMasteryLevels, add here in any case 
       var fillW = Math.floor((width - gaugeReduction * 2) * rate);
       var gaugeY = y + this.lineHeight() - 2 - gaugeHeight;
       this.contents.fillRoundRect(x, gaugeY, width, gaugeHeight, cornerRadius,

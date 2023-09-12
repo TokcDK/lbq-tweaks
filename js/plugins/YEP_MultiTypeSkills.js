@@ -78,7 +78,7 @@ DataManager.isDatabaseLoaded = function() {
 
 DataManager.processMTSNotetags1 = function(group) {
   var note1 = /<SKILL[ ](?:TYPE|TYPES):[ ]*(\d+(?:\s*,\s*\d+)*)>/i;
-  var note2 = /<SKILL[ ](?:TYPE|TYPES):[ ](\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
+  var note2 = /<SKILL[ ](?:TYPE|TYPES):\s*(\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
   for (var n = 1; n < group.length; n++) {
     var obj = group[n];
     var notedata = obj.note.split(/[\r\n]+/);

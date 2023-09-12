@@ -116,7 +116,7 @@ $gameVariables.setValue(501,Array(101).fill(0));
 
 };
 
-amygame_startUp = function(){
+amygame_startUp = function() {
 
 var start = 1;
 var end = $dataWeapons.length-1;
@@ -158,74 +158,84 @@ for (var i = 1; i <= $dataWeapons.length-1; i++) {
     };
   };
 };
-for (var i = 1; i <= $dataItems.length-1; i++) {
-  if(!$dataItems[i].name == '') {
-    if($dataItems[i].meta['ItemNameAddSet']) {
-      var arr1 = $dataItems[i].meta['ItemNameAddSet'].split(',');
-      if(Number(arr1[0]) == 0){var valueItems = $dataItems[Number(arr1[1])].name};
-      if(Number(arr1[0]) == 1){var valueItems = $dataWeapons[Number(arr1[1])].name};
-      if(Number(arr1[0]) == 2){var valueItems = $dataArmors[Number(arr1[1])].name};
-      if(Number(arr1[0]) == 3){var valueItems = $dataStates[Number(arr1[1])].name};
-      if(Number(arr1[0]) == 4){var valueItems = $dataSkills[Number(arr1[1])].name};
-      if(Number(arr1[0]) == 5){var valueItems = $dataStates[Number(arr1[1])].name};
-      if(Number(arr1[0]) == 6){var valueItems = $dataSystem.switches[Number(arr1[1])]};
+
+var dataItemsLength = $dataItems.length;
+for (var i = 1; i < dataItemsLength; i++) {
+  var itemI = $dataItems[i];
+  if (itemI.name !== '') {
+    var itemImetaItemNameAddSet = itemI.meta['ItemNameAddSet'];
+    if(itemImetaItemNameAddSet) {
+      var arr1 = itemImetaItemNameAddSet.split(',');
+	  var numberArr10 = Number(arr1[0]);
+	  var numberArr11 = Number(arr1[1]);
+	  var valueItems = null;
+      if(numberArr10 == 0){valueItems = $dataItems[numberArr11].name}
+      else if(numberArr10 == 1){valueItems = $dataWeapons[numberArr11].name}
+      else if(numberArr10 == 2){valueItems = $dataArmors[numberArr11].name}
+      else if(numberArr10 == 3){valueItems = $dataStates[numberArr11].name}
+      else if(numberArr10 == 4){valueItems = $dataSkills[numberArr11].name}
+      else if(numberArr10 == 5){valueItems = $dataStates[numberArr11].name}
+      else if(numberArr10 == 6){valueItems = $dataSystem.switches[numberArr11]};
       if(Number(arr1[2]) == 0){
-        $dataItems[i].name = `${valueItems}${$dataItems[i].name}`;
+        itemI.name = `${valueItems}${itemI.name}`;
       } else {
-        $dataItems[i].name = `${$dataItems[i].name}${valueItems}`;
+        itemI.name = `${itemI.name}${valueItems}`;
       };
     };
-    if($dataItems[i].meta['annihilationTitle']) {
-      if(Number($dataItems[i].meta['annihilationTitle'].split(',')[0]) >= 20) {
-        $dataItems[i].name = `${$dataItems[Number($dataItems[i].meta['annihilationTitle'].split(',')[0])].name}を殲滅せし者`;
+    if(itemI.meta['annihilationTitle']) {
+      if(Number(itemI.meta['annihilationTitle'].split(',')[0]) >= 20) {
+        itemI.name = `${$dataItems[Number(itemI.meta['annihilationTitle'].split(',')[0])].name}を殲滅せし者`;
       };
     };
-    if($dataItems[i].meta['MapSwitch']) {
-      $dataItems[i].name = `${$dataSystem.switches[Number($dataItems[i].meta['MapSwitch'])]}`;
+    if(itemI.meta['MapSwitch']) {
+      itemI.name = `${$dataSystem.switches[Number(itemI.meta['MapSwitch'])]}`;
     };
-    if($dataItems[i].meta['EICSwitch']) {
-      if(Number($dataItems[i].meta['EICSwitch']) == 102) {
+	var itemImetaEICSwitch = itemI.meta['EICSwitch'];
+    if(itemImetaEICSwitch) {
+      var itemImetaEICSwitchNum = Number(itemImetaEICSwitch);
+      if(itemImetaEICSwitchNum == 102) {
         if(i >= 401 && i <= 500){
-          $dataItems[i].name = $dataCommonEvents[i].name;
+          itemI.name = $dataCommonEvents[i].name;
         };
-        if($dataItems[i].meta['追加コモンID']) {
-          $dataItems[i].name = $dataCommonEvents[i].name;
+        if(itemI.meta['追加コモンID']) {
+          itemI.name = $dataCommonEvents[i].name;
         };
-        $dataItems[i].name = '[' + value1 + ']' + $dataItems[i].name;
+        itemI.name = '[' + value1 + ']' + itemI.name;
         value1 += 1;
-      };
-      if(Number($dataItems[i].meta['EICSwitch']) == 103) {
+      } 
+	  else if (itemImetaEICSwitchNum == 103) {
         if(i >= 501 && i <= 600){
-          $dataItems[i].name = $dataCommonEvents[i].name;
+          itemI.name = $dataCommonEvents[i].name;
         };
-        if($dataItems[i].meta['追加コモンID']) {
-          $dataItems[i].name = $dataCommonEvents[i].name;
+        if(itemI.meta['追加コモンID']) {
+          itemI.name = $dataCommonEvents[i].name;
         };
-        $dataItems[i].name = '[' + value2 + ']' + $dataItems[i].name;
+        itemI.name = '[' + value2 + ']' + itemI.name;
         value2 += 1;
-      };
-      if(Number($dataItems[i].meta['EICSwitch']) == 104 || Number($dataItems[i].meta['EICSwitch']) == 105) {//二つ名は説明の方に連番を付与する
-        $dataItems[i].description = '[' + value3 + ']' + $dataItems[i].description;
+      } 
+	  else if (itemImetaEICSwitchNum == 104 || itemImetaEICSwitchNum == 105) {//二つ名は説明の方に連番を付与する
+        itemI.description = '[' + value3 + ']' + itemI.description;
         value3 += 1;
-          if ($dataItems[i].meta['KojinTitle']) {
+          if (itemI.meta['KojinTitle']) {
             if($gameVariables.value(297)[i] >= 1){
-              $dataItems[i].description += `[達成者:${$gameActors.actor($gameVariables.value(297)[i]).name()}]`;
+              itemI.description += `[達成者:${$gameActors.actor($gameVariables.value(297)[i]).name()}]`;
             }
           };
-      };
-      if(Number($dataItems[i].meta['EICSwitch']) == 108) {
-        if($dataItems[i].meta['SGカテゴリ'] == '受注クエスト' || $dataItems[i].meta['SGカテゴリ'] == 'ＥＸ受注クエスト') {//特別クエスト使わない。クエスト801～を901に名前と解説とアイコンをコピーする
-          $dataItems[i].name = '[' + value5 + ']' + $dataItems[i].name;
-          $dataItems[i+100].iconIndex = $dataItems[i].iconIndex;
-          $dataItems[i+100].name = `${$dataItems[i].name}[了]`;
-          $dataItems[i+100].description = $dataItems[i].description;
+      } 
+	  else if (itemImetaEICSwitchNum == 108) {
+        var itemImetaSGCategory = itemI.meta['SGカテゴリ'];
+        if(itemImetaSGCategory == '受注クエスト' || itemImetaSGCategory == 'ＥＸ受注クエスト') {//特別クエスト使わない。クエスト801～を901に名前と解説とアイコンをコピーする
+          itemI.name = '[' + value5 + ']' + itemI.name;
+          $dataItems[i+100].iconIndex = itemI.iconIndex;
+          $dataItems[i+100].name = `${itemI.name}[了]`;
+          $dataItems[i+100].description = itemI.description;
           value5 += 1;
-        };
-        if($dataItems[i].meta['SGカテゴリ'] == 'デイリークエスト') {
-          $dataItems[i].name = '[' + value6 + ']' + $dataItems[i].name;
-          $dataItems[i+50].iconIndex = $dataItems[i].iconIndex;
-          $dataItems[i+50].name = `${$dataItems[i].name}[了]`;
-          $dataItems[i+50].description = $dataItems[i].description;
+        } 
+		else if (itemImetaSGCategory == 'デイリークエスト') {
+          itemI.name = '[' + value6 + ']' + itemI.name;
+          $dataItems[i+50].iconIndex = itemI.iconIndex;
+          $dataItems[i+50].name = `${itemI.name}[了]`;
+          $dataItems[i+50].description = itemI.description;
           value6 += 1;
         };
       };
@@ -5640,10 +5650,12 @@ dungeon_warpscript = function(id1){
 
 if(id1 == 1){
   $gameSwitches.setValue(380,false);
-  if($dataItems[$gameVariables.value(240)].meta['warpShare']){
+  var gameVariablesValue240 = $gameVariables.value(240);
+  var dataItemsGameVariablesValue240 = $dataItems[gameVariablesValue240];
+  if(dataItemsGameVariablesValue240.meta['warpShare']){
     for (var j = 1; j <= $dataWeapons.length-1; j++) {
       if($dataItems[j].meta['warpShare']){
-        if(Number($dataItems[j].meta['warpShare']) == Number($dataItems[$gameVariables.value(240)].meta['warpShare'])){
+        if(Number($dataItems[j].meta['warpShare']) == Number(dataItemsGameVariablesValue240.meta['warpShare'])){
           if($dataItems[j].meta['warpStart']){
             valueScriptArray1.push($dataItems[j].meta['warpStart'].split(','));      
           };
@@ -5658,13 +5670,13 @@ if(id1 == 1){
       };
     };
   } else {
-    if($dataItems[$gameVariables.value(240)].meta['warpStart']){
-      valueScriptArray1.push($dataItems[$gameVariables.value(240)].meta['warpStart'].split(','));      
+    if(dataItemsGameVariablesValue240.meta['warpStart']){
+      valueScriptArray1.push(dataItemsGameVariablesValue240.meta['warpStart'].split(','));      
     };
     for (var i = 1; i <= 9; i++) {
-      if($dataItems[$gameVariables.value(240)].meta['warpPoint' + i]){
-        if($gameVariables.value(211)[$gameVariables.value(240)][i] == 1){
-          valueScriptArray1.push($dataItems[$gameVariables.value(240)].meta['warpPoint' + i].split(','));
+      if(dataItemsGameVariablesValue240.meta['warpPoint' + i]){
+        if($gameVariables.value(211)[gameVariablesValue240][i] == 1){
+          valueScriptArray1.push(dataItemsGameVariablesValue240.meta['warpPoint' + i].split(','));
           $gameSwitches.setValue(380,true);
       }};
     };
@@ -5726,35 +5738,50 @@ if(id2 >= 20){
 //２回目以降殲滅時にボーナス
 annihilationItem_bonus = function(){
 
-if($dataItems[$gameVariables.value(240)].meta['TchestType']){
-  var arr1 = $dataItems[$gameVariables.value(240)].meta['TchestType'];
-  var arr2 = $dataItems[$gameVariables.value(240)].meta['Tchest'];
-  if($dataItems[$gameVariables.value(240)].meta['firstAnnihilationItem']){
-    var arr3 = $dataItems[$gameVariables.value(240)].meta['firstAnnihilationItem'];
+var dataItemsGameVariablesValue240 = $dataItems[$gameVariables.value(240)];
+var itemMetaTchestType = dataItemsGameVariablesValue240.meta['TchestType'];
+if(itemMetaTchestType){
+	
+  var arr1 = itemMetaTchestType;
+  var arr2 = dataItemsGameVariablesValue240.meta['Tchest'];
+  var firstAnnihilationItemMeta = dataItemsGameVariablesValue240.meta['firstAnnihilationItem'];
+  var arr3 = null;
+  if(firstAnnihilationItemMeta){
+    arr3 = firstAnnihilationItemMeta;
     arr1.push(Number(arr3[0]));
     arr2.push(Number(arr3[1]));
   };
-  if($dataItems[$gameVariables.value(240)].meta['TchestOnly']){
-    var arr4 = $dataItems[$gameVariables.value(240)].meta['TchestOnly'];
+  
+  var tchestOnly = dataItemsGameVariablesValue240.meta['TchestOnly'];
+  var arr4 = null;
+  if(isTchestOnly){
+    arr4 = isTchestOnly;
     arr1.push(Number(arr4[3]));
     arr2.push(Number(arr4[4]));
   };
+  
   var value1 = Math.floor( Math.random() * arr1.length);
-  if(Number(arr1[value1]) == 0){var valueItems = $dataItems}; 
-  if(Number(arr1[value1]) == 1){var valueItems = $dataWeapons}; 
-  if(Number(arr1[value1]) == 2){var valueItems = $dataArmors};
-  $gameParty.gainItem(valueItems[Number(arr2[value1])], 1);
-  valueWordSet1 = `全滅ボーナスとして\\C[24]\x1bI[${valueItems[Number(arr2[value1])].iconIndex}]${valueItems[Number(arr2[value1])].name}\\C[0]を入手した！`;
-  if($dataItems[$gameVariables.value(240)].meta['TchestRere']){
-    if( Number(arr2[value1]) == Number($dataItems[$gameVariables.value(240)].meta['TchestRere']) ){
+  var valueItems = $dataItems 
+  var arr1Value1Num = Number(arr1[value1]);
+  //if(Number(arr1[value1]) == 0){var valueItems = $dataItems};
+  if (arr1Value1Num == 1) {valueItems = $dataWeapons}
+  else if (arr1Value1Num == 2) {valueItems = $dataArmors};
+  
+  var arr2value1Num = Number(arr2[value1]);
+  var valueItem = valueItems[arr2value1Num];
+  $gameParty.gainItem(valueItem, 1);
+  valueWordSet1 = `全滅ボーナスとして\\C[24]\x1bI[${valueItem.iconIndex}]${valueItem.name}\\C[0]を入手した！`;
+  if(dataItemsGameVariablesValue240.meta['TchestRere']){
+    if( arr2value1Num == Number(dataItemsGameVariablesValue240.meta['TchestRere']) ){
       $gameSwitches.setValue(439,true);
   }};
-  if($dataItems[$gameVariables.value(240)].meta['firstAnnihilationItem']){
-    if( Number(arr2[value1]) == Number(arr3[1]) ){
+  
+  if(firstAnnihilationItemMeta){
+    if( arr2value1Num == Number(arr3[1]) ){
       $gameSwitches.setValue(439,true);
   }};
-  if($dataItems[$gameVariables.value(240)].meta['TchestOnly']){
-    if( Number(arr2[value1]) == Number(arr4[4]) ){
+  if(isTchestOnly){
+    if( arr2value1Num == Number(arr4[4]) ){
       $gameSwitches.setValue(439,true);
   }};
 };

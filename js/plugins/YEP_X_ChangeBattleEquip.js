@@ -121,7 +121,7 @@ DataManager.processCBENotetags = function(group) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<CHANGE BATTLE EQUIP COOLDOWN:[ ]([\+\-]\d+)>/i)) {
+      if (line.match(/<CHANGE BATTLE EQUIP COOLDOWN:\s*([\+\-]\d+)>/i)) {
         obj.changeBattleEquipCooldown = parseInt(RegExp.$1);
       } else if (line.match(/<DISABLE CHANGE BATTLE EQUIP>/i)) {
         obj.disableChangeBattleEquip = true;

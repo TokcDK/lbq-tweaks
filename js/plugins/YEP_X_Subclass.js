@@ -466,9 +466,9 @@ DataManager.isDatabaseLoaded = function() {
 
 DataManager.processSubclassNotetags1 = function(group) {
   var note1a = /<(?:RESTRICT CLASS):[ ]*(\d+(?:\s*,\s*\d+)*)>/i;
-  var note1b = /<(?:RESTRICT CLASS):[ ](\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
+  var note1b = /<(?:RESTRICT CLASS):\s*(\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
   var note2a = /<(?:RESTRICT SUBCLASS):[ ]*(\d+(?:\s*,\s*\d+)*)>/i;
-  var note2b = /<(?:RESTRICT SUBCLASS):[ ](\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
+  var note2b = /<(?:RESTRICT SUBCLASS):\s*(\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
   var note3 = /<(?:CANNOT CHANGE SUBCLASS|CANT CHANGE SUBCLASS)>/i;
   for (var n = 1; n < group.length; n++) {
     var obj = group[n];
@@ -481,7 +481,7 @@ DataManager.processSubclassNotetags1 = function(group) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<(?:SUBCLASS):[ ](\d+)>/i)) {
+      if (line.match(/<(?:SUBCLASS):\s*(\d+)>/i)) {
         obj.subclassId = parseInt(RegExp.$1);
       } else if (line.match(note1a)) {
         var array = JSON.parse('[' + RegExp.$1.match(/\d+/g) + ']');
@@ -505,8 +505,8 @@ DataManager.processSubclassNotetags1 = function(group) {
 };
 
 DataManager.processSubclassNotetags2 = function(group) {
-  var note1a = /<(?:SUBCLASS)[ ](\d+)[ ](?:COMBO NAME):[ ](.*)>/i;
-  var note1b = /<(.*)[ ](?:COMBO NAME):[ ](.*)>/i;
+  var note1a = /<(?:SUBCLASS)[ ](\d+)[ ](?:COMBO NAME):\s*(.*)>/i;
+  var note1b = /<(.*)[ ](?:COMBO NAME):\s*(.*)>/i;
   for (var n = 1; n < group.length; n++) {
     var obj = group[n];
     var notedata = obj.note.split(/[\r\n]+/);
@@ -539,9 +539,9 @@ DataManager.processSubclassNotetags2 = function(group) {
 
 DataManager.processSubclassNotetags3 = function(group) {
   var note1a = /<(?:REQUIRE CLASS):[ ]*(\d+(?:\s*,\s*\d+)*)>/i;
-  var note1b = /<(?:REQUIRE CLASS):[ ](\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
+  var note1b = /<(?:REQUIRE CLASS):\s*(\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
   var note2a = /<(?:REQUIRE SUBCLASS):[ ]*(\d+(?:\s*,\s*\d+)*)>/i;
-  var note2b = /<(?:REQUIRE SUBCLASS):[ ](\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
+  var note2b = /<(?:REQUIRE SUBCLASS):\s*(\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
   for (var n = 1; n < group.length; n++) {
     var obj = group[n];
     var notedata = obj.note.split(/[\r\n]+/);

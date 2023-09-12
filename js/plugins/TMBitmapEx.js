@@ -199,6 +199,7 @@ TMPlugin.BitmapEx.MinGaugeWidth  = Math.floor(TMPlugin.BitmapEx.MinGaugeRate *
       y = y + this.lineHeight() - TMPlugin.BitmapEx.GaugeHeight - 2;
       this.contents.fillRoundRect(x, y, width, TMPlugin.BitmapEx.GaugeHeight,
                                   TMPlugin.BitmapEx.CornerRadius, this.gaugeBackColor());
+      if (Number.isNaN(rate)) rate = 0; // rate sometimes can be NaN in Yep_SkillMasteryLevels, add here in any case 
       var fillW = Math.floor((width - TMPlugin.BitmapEx.GaugeReduction * 2) * rate);
       if (fillW > 0) {
         fillW = Math.max(fillW, TMPlugin.BitmapEx.MinGaugeWidth);

@@ -274,7 +274,7 @@ DataManager.processFootstepNotetags = function(group) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<TERRAIN[ ]TAG[ ](\d+)[ ]FOOTSTEP SOUND:[ ](.*)>/i)) {
+      if (line.match(/<TERRAIN[ ]TAG[ ](\d+)[ ]FOOTSTEP SOUND:\s*(.*)>/i)) {
         var tagId = parseInt(RegExp.$1).clamp(1, 7);
         var footstepData = String(RegExp.$2).split(',');
         footstepData[0] = footstepData[0].trim();
@@ -305,7 +305,7 @@ DataManager.processMapFootstepNotetags = function() {
   var notedata = $dataMap.note.split(/[\r\n]+/);
   for (var i = 0; i < notedata.length; i++) {
     var line = notedata[i];
-    if (line.match(/<REGION[ ](\d+)[ ]FOOTSTEP SOUND:[ ](.*)>/i)) {
+    if (line.match(/<REGION[ ](\d+)[ ]FOOTSTEP SOUND:\s*(.*)>/i)) {
       var regionId = parseInt(RegExp.$1).clamp(0, 255);
       var footstepData = String(RegExp.$2).split(',');
       footstepData[0] = footstepData[0].trim();

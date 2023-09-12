@@ -619,48 +619,48 @@ DataManager.processAugmentNotetags2 = function(group, isWeapon) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<AUGMENT:[ ](.*)>/i)) {
+      if (line.match(/<AUGMENT:\s*(.*)>/i)) {
         var evalMode = 'augment auto';
         var evalType = String(RegExp.$1).toUpperCase().trim();
         this.makeAugmentEvalType(obj, evalType);
-      } else if (line.match(/<\/AUGMENT:[ ](.*)>/i)) {
+      } else if (line.match(/<\/AUGMENT:\s*(.*)>/i)) {
         var evalMode = 'none';
         var evalType = 'none';
       } else if (evalMode === 'augment auto') {
         obj.augmentDataAttach[evalType].push(line);
         obj.augmentDataDetach[evalType].push(this.reverseAugmentAutoLine(line));
-      } else if (line.match(/<AUGMENT ATTACH:[ ](.*)>/i)) {
+      } else if (line.match(/<AUGMENT ATTACH:\s*(.*)>/i)) {
         var evalMode = 'augment attach';
         var evalType = String(RegExp.$1).toUpperCase().trim();
         this.makeAugmentEvalType(obj, evalType);
-      } else if (line.match(/<\/AUGMENT ATTACH:[ ](.*)>/i)) {
+      } else if (line.match(/<\/AUGMENT ATTACH:\s*(.*)>/i)) {
         var evalMode = 'none';
         var evalType = 'none';
       } else if (evalMode === 'augment attach') {
         obj.augmentDataAttach[evalType].push(line);
-      } else if (line.match(/<AUGMENT DETACH:[ ](.*)>/i)) {
+      } else if (line.match(/<AUGMENT DETACH:\s*(.*)>/i)) {
         var evalMode = 'augment detach';
         var evalType = String(RegExp.$1).toUpperCase().trim();
         this.makeAugmentEvalType(obj, evalType);
-      } else if (line.match(/<\/AUGMENT DETACH:[ ](.*)>/i)) {
+      } else if (line.match(/<\/AUGMENT DETACH:\s*(.*)>/i)) {
         var evalMode = 'none';
         var evalType = 'none';
       } else if (evalMode === 'augment detach') {
         obj.augmentDataDetach[evalType].push(line);
-      } else if (line.match(/<AUGMENT ATTACH EVAL:[ ](.*)>/i)) {
+      } else if (line.match(/<AUGMENT ATTACH EVAL:\s*(.*)>/i)) {
         var evalMode = 'augment eval attach';
         var evalType = String(RegExp.$1).toUpperCase().trim();
         this.makeAugmentEvalType(obj, evalType);
-      } else if (line.match(/<\/AUGMENT ATTACH EVAL:[ ](.*)>/i)) {
+      } else if (line.match(/<\/AUGMENT ATTACH EVAL:\s*(.*)>/i)) {
         var evalMode = 'none';
         var evalType = 'none';
       } else if (evalMode === 'augment eval attach') {
         obj.augmentEvalAttach[evalType] += line + '\n';
-      } else if (line.match(/<AUGMENT DETACH EVAL:[ ](.*)>/i)) {
+      } else if (line.match(/<AUGMENT DETACH EVAL:\s*(.*)>/i)) {
         var evalMode = 'augment eval detach';
         var evalType = String(RegExp.$1).toUpperCase().trim();
         this.makeAugmentEvalType(obj, evalType);
-      } else if (line.match(/<\/AUGMENT DETACH EVAL:[ ](.*)>/i)) {
+      } else if (line.match(/<\/AUGMENT DETACH EVAL:\s*(.*)>/i)) {
         var evalMode = 'none';
         var evalType = 'none';
       } else if (evalMode === 'augment eval detach') {
@@ -687,13 +687,13 @@ DataManager.reverseAugmentAutoLine = function(line) {
       var str1 = String(RegExp.$1);
       var str2 = String(RegExp.$2);
       return 'CHANGE ' + str1 + ':' + str2;
-    } else if (line.match(/(.*):[ ]([\+\-]\d+)([%％])/i)) {
+    } else if (line.match(/(.*):\s*([\+\-]\d+)([%％])/i)) {
     //  var str = String(RegExp.$1);
     //  var value = parseInt(RegExp.$2) * -1;
     //  if (value > 0) value = '+' + value;
     //  return str + ': ' + value + '%';
       return line;
-    } else if (line.match(/(.*):[ ]([\+\-]\d+)/i)) {
+    } else if (line.match(/(.*):\s*([\+\-]\d+)/i)) {
       var str = String(RegExp.$1);
       var value = parseInt(RegExp.$2) * -1;
       if (value > 0) value = '+' + value;
@@ -852,160 +852,160 @@ ItemManager.processAugmentEffect = function(line, mainItem, effectItem, slot) {
     return this.applyAugmentCanotDetach(mainItem, slot);
   }
   // ADD ATTACK ELEMENT: x
-  if (line.match(/ADD ATTACK ELEMENT:[ ](.*)/i)) {
+  if (line.match(/ADD ATTACK ELEMENT:\s*(.*)/i)) {
     var element = String(RegExp.$1).toUpperCase().trim();
     return this.applyAugmentAttackElement(mainItem, element, true);
-  } else if (line.match(/REMOVE ATTACK ELEMENT:[ ](.*)/i)) {
+  } else if (line.match(/REMOVE ATTACK ELEMENT:\s*(.*)/i)) {
     var element = String(RegExp.$1).toUpperCase().trim();
     return this.applyAugmentAttackElement(mainItem, element, false);
   }
   // ADD ATTACK STATE: x
-  if (line.match(/ADD ATTACK STATE:[ ](.*)/i)) {
+  if (line.match(/ADD ATTACK STATE:\s*(.*)/i)) {
     var text = String(RegExp.$1).toUpperCase().trim();
     return this.applyAugmentAttackState(mainItem, text, true);
-  } else if (line.match(/REMOVE ATTACK STATE:[ ](.*)/i)) {
+  } else if (line.match(/REMOVE ATTACK STATE:\s*(.*)/i)) {
     var text = String(RegExp.$1).toUpperCase().trim();
     return this.applyAugmentAttackState(mainItem, text, false);
   }
   // ADD DEBUFF RATE: x
-  if (line.match(/ADD DEBUFF:[ ](.*)/i)) {
+  if (line.match(/ADD DEBUFF:\s*(.*)/i)) {
     var text = String(RegExp.$1).toUpperCase().trim();
     return this.applyAugmentDebuff(mainItem, text, true);
-  } else if (line.match(/REMOVE DEBUFF:[ ](.*)/i)) {
+  } else if (line.match(/REMOVE DEBUFF:\s*(.*)/i)) {
     var text = String(RegExp.$1).toUpperCase().trim();
     return this.applyAugmentDebuff(mainItem, text, false);
   }
   // ADD ELEMENT RATE: x
-  if (line.match(/ADD ELEMENT RATE:[ ](.*)/i)) {
+  if (line.match(/ADD ELEMENT RATE:\s*(.*)/i)) {
     var text = String(RegExp.$1).toUpperCase().trim();
     return this.applyAugmentElement(mainItem, text, true);
-  } else if (line.match(/REMOVE ELEMENT RATE:[ ](.*)/i)) {
+  } else if (line.match(/REMOVE ELEMENT RATE:\s*(.*)/i)) {
     var text = String(RegExp.$1).toUpperCase().trim();
     return this.applyAugmentElement(mainItem, text, false);
   }
   // ADD PASSIVE STATE: x
   if (Imported.YEP_AutoPassiveStates) {
-    if (line.match(/ADD PASSIVE STATE:[ ](.*)/i)) {
+    if (line.match(/ADD PASSIVE STATE:\s*(.*)/i)) {
       var text = String(RegExp.$1).toUpperCase().trim();
       return this.applyAugmentPassiveState(mainItem, text, true);
-    } else if (line.match(/REMOVE PASSIVE STATE:[ ](.*)/i)) {
+    } else if (line.match(/REMOVE PASSIVE STATE:\s*(.*)/i)) {
       var text = String(RegExp.$1).toUpperCase().trim();
       return this.applyAugmentPassiveState(mainItem, text, false);
     }
   }
   // ADD SKILL: x
-  if (line.match(/ADD SKILL:[ ](.*)/i)) {
+  if (line.match(/ADD SKILL:\s*(.*)/i)) {
     var text = String(RegExp.$1).toUpperCase().trim();
     return this.applyAugmentSkill(mainItem, text, true);
-  } else if (line.match(/REMOVE SKILL:[ ](.*)/i)) {
+  } else if (line.match(/REMOVE SKILL:\s*(.*)/i)) {
     var text = String(RegExp.$1).toUpperCase().trim();
     return this.applyAugmentSkill(mainItem, text, false);
   }
   // ADD SKILL TYPE: x
-  if (line.match(/ADD SKILL TYPE:[ ](.*)/i)) {
+  if (line.match(/ADD SKILL TYPE:\s*(.*)/i)) {
     var text = String(RegExp.$1).toUpperCase().trim();
     return this.applyAugmentSkillType(mainItem, text, true);
-  } else if (line.match(/ADD STYPE:[ ](.*)/i)) {
+  } else if (line.match(/ADD STYPE:\s*(.*)/i)) {
     var text = String(RegExp.$1).toUpperCase().trim();
     return this.applyAugmentSkillType(mainItem, text, true);
-  } else if (line.match(/REMOVE SKILL TYPE:[ ](.*)/i)) {
+  } else if (line.match(/REMOVE SKILL TYPE:\s*(.*)/i)) {
     var text = String(RegExp.$1).toUpperCase().trim();
     return this.applyAugmentSkillType(mainItem, text, false);
-  } else if (line.match(/REMOVE STYPE:[ ](.*)/i)) {
+  } else if (line.match(/REMOVE STYPE:\s*(.*)/i)) {
     var text = String(RegExp.$1).toUpperCase().trim();
     return this.applyAugmentSkillType(mainItem, text, false);
   }
   // ADD STATE RATE: x
-  if (line.match(/ADD STATE RATE:[ ](.*)/i)) {
+  if (line.match(/ADD STATE RATE:\s*(.*)/i)) {
     var text = String(RegExp.$1).toUpperCase().trim();
     return this.applyAugmentStateRate(mainItem, text, true);
-  } else if (line.match(/REMOVE STATE RATE:[ ](.*)/i)) {
+  } else if (line.match(/REMOVE STATE RATE:\s*(.*)/i)) {
     var text = String(RegExp.$1).toUpperCase().trim();
     return this.applyAugmentStateRate(mainItem, text, false);
   }
   // ADD STATE RESIST: x
-  if (line.match(/ADD STATE RESIST:[ ](.*)/i)) {
+  if (line.match(/ADD STATE RESIST:\s*(.*)/i)) {
     var text = String(RegExp.$1).toUpperCase().trim();
     return this.applyAugmentStateResist(mainItem, text, true);
-  } else if (line.match(/REMOVE STATE RESIST:[ ](.*)/i)) {
+  } else if (line.match(/REMOVE STATE RESIST:\s*(.*)/i)) {
     var text = String(RegExp.$1).toUpperCase().trim();
     return this.applyAugmentStateResist(mainItem, text, false);
   }
   // CHANGE BASE NAME: x
-  if (line.match(/CHANGE BASE NAME:[ ](.*)/i)) {
+  if (line.match(/CHANGE BASE NAME:\s*(.*)/i)) {
     var text = String(RegExp.$1).trim();
     return this.applyAugmentSetBaseName(mainItem, text, slot, true);
-  } else if (line.match(/CANCEL BASE NAME:[ ](.*)/i)) {
+  } else if (line.match(/CANCEL BASE NAME:\s*(.*)/i)) {
     var text = String(RegExp.$1).trim();
     return this.applyAugmentSetBaseName(mainItem, text, slot, false);
   }
   // CHANGE PREFIX: x
-  if (line.match(/CHANGE PREFIX:[ ](.*)/i)) {
+  if (line.match(/CHANGE PREFIX:\s*(.*)/i)) {
     var text = String(RegExp.$1).trim();
     return this.applyAugmentSetPrefix(mainItem, text, slot, true);
-  } else if (line.match(/CANCEL PREFIX:[ ](.*)/i)) {
+  } else if (line.match(/CANCEL PREFIX:\s*(.*)/i)) {
     var text = String(RegExp.$1).trim();
     return this.applyAugmentSetPrefix(mainItem, text, slot, false);
   }
   // CHANGE SUFFIX: x
-  if (line.match(/CHANGE SUFFIX:[ ](.*)/i)) {
+  if (line.match(/CHANGE SUFFIX:\s*(.*)/i)) {
     var text = String(RegExp.$1).trim();
     return this.applyAugmentSetSuffix(mainItem, text, slot, true);
-  } else if (line.match(/CANCEL SUFFIX:[ ](.*)/i)) {
+  } else if (line.match(/CANCEL SUFFIX:\s*(.*)/i)) {
     var text = String(RegExp.$1).trim();
     return this.applyAugmentSetSuffix(mainItem, text, slot, false);
   }
   // CHANGE PRIORITY NAME: x
-  if (line.match(/CHANGE PRIORITY NAME:[ ](.*)/i)) {
+  if (line.match(/CHANGE PRIORITY NAME:\s*(.*)/i)) {
     var text = String(RegExp.$1).trim();
     return this.applyAugmentSetPriorityName(mainItem, text, slot, true);
-  } else if (line.match(/CANCEL PRIORITY NAME:[ ](.*)/i)) {
+  } else if (line.match(/CANCEL PRIORITY NAME:\s*(.*)/i)) {
     var text = String(RegExp.$1).trim();
     return this.applyAugmentSetPriorityName(mainItem, text, slot, false);
   }
   // CHANGE ICON: x
-  if (line.match(/CHANGE ICON:[ ](\d+)/i)) {
+  if (line.match(/CHANGE ICON:\s*(\d+)/i)) {
     var icon = parseInt(RegExp.$1);
     return this.applyAugmentSetIcon(mainItem, icon, slot, true);
-  } else if (line.match(/CANCEL ICON:[ ](\d+)/i)) {
+  } else if (line.match(/CANCEL ICON:\s*(\d+)/i)) {
     var icon = parseInt(RegExp.$1);
     return this.applyAugmentSetIcon(mainItem, icon, slot, false);
   }
   // Imported.YEP_X_ItemPictureImg
   if (Imported.YEP_X_ItemPictureImg) {
     // CHANGE PICTURE IMAGE: x
-    if (line.match(/CHANGE PICTURE IMAGE:[ ](.*)/i)) {
+    if (line.match(/CHANGE PICTURE IMAGE:\s*(.*)/i)) {
       var text = String(RegExp.$1).trim();
       return this.applyAugmentSetPictureImg(mainItem, text, slot, true);
-    } else if (line.match(/CANCEL PICTURE IMAGE:[ ](.*)/i)) {
+    } else if (line.match(/CANCEL PICTURE IMAGE:\s*(.*)/i)) {
       var text = String(RegExp.$1).trim();
       return this.applyAugmentSetPictureImg(mainItem, text, slot, false);
     }
     // CHANGE ICON: x
-    if (line.match(/CHANGE PICTURE HUE:[ ](\d+)/i)) {
+    if (line.match(/CHANGE PICTURE HUE:\s*(\d+)/i)) {
       var icon = parseInt(RegExp.$1).clamp(0, 360);
       return this.applyAugmentSetPictureHue(mainItem, icon, slot, true);
-    } else if (line.match(/CANCEL PICTURE HUE:[ ](\d+)/i)) {
+    } else if (line.match(/CANCEL PICTURE HUE:\s*(\d+)/i)) {
       var icon = parseInt(RegExp.$1).clamp(0, 360);
       return this.applyAugmentSetPictureHue(mainItem, icon, slot, false);
     }
   } // Imported.YEP_X_ItemPictureImg
   // CHANGE TEXT COLOR: x
-  if (line.match(/CHANGE TEXT COLOR:[ ](\d+)/i)) {
+  if (line.match(/CHANGE TEXT COLOR:\s*(\d+)/i)) {
     var color = parseInt(RegExp.$1);
     return this.applyAugmentSetTextColor(mainItem, color, slot, true);
-  } else if (line.match(/CANCEL TEXT COLOR:[ ](\d+)/i)) {
+  } else if (line.match(/CANCEL TEXT COLOR:\s*(\d+)/i)) {
     var color = parseInt(RegExp.$1);
     return this.applyAugmentSetTextColor(mainItem, color, slot, false);
   }
   // PARAM: +/-X%
-  if (line.match(/(.*):[ ]([\+\-]\d+)([%％])/i)) {
+  if (line.match(/(.*):\s*([\+\-]\d+)([%％])/i)) {
     var param = String(RegExp.$1).toUpperCase().trim();
     var value = parseFloat(RegExp.$2);
     return this.applyAugmentParamRate(mainItem, param, value);
   }
   // PARAM: +/-X
-  if (line.match(/(.*):[ ]([\+\-]\d+)/i)) {
+  if (line.match(/(.*):\s*([\+\-]\d+)/i)) {
     var param = String(RegExp.$1).toUpperCase().trim();
     var value = parseInt(RegExp.$2);
     return this.applyAugmentParamPlus(mainItem, param, value);

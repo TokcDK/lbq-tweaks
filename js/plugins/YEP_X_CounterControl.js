@@ -877,9 +877,9 @@ DataManager.processCounterNotetags1 = function(group) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<DEFAULT COUNTER:[ ](\d+)>/i)) {
+      if (line.match(/<DEFAULT COUNTER:\s*(\d+)>/i)) {
         obj.defaultCounter = parseInt(RegExp.$1);
-      } else if (line.match(/<DEFAULT COUNTER:[ ](.*)>/i)) {
+      } else if (line.match(/<DEFAULT COUNTER:\s*(.*)>/i)) {
         var name = String(RegExp.$1).toUpperCase();
         var id = Yanfly.SkillIdRef[name];
         if (id) obj.defaultCounter = id;
@@ -890,7 +890,7 @@ DataManager.processCounterNotetags1 = function(group) {
 
 DataManager.processCounterNotetags2 = function(group) {
   var noteA1 = /<(?:COUNTER SKILLS):[ ]*(\d+(?:\s*,\s*\d+)*)>/i;
-  var noteA2 = /<(?:COUNTER SKILLS):[ ](\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
+  var noteA2 = /<(?:COUNTER SKILLS):\s*(\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
   for (var n = 1; n < group.length; n++) {
     var obj = group[n];
     var notedata = obj.note.split(/[\r\n]+/);
@@ -915,15 +915,15 @@ DataManager.processCounterNotetags2 = function(group) {
         var range = Yanfly.Util.getRange(parseInt(RegExp.$1),
           parseInt(RegExp.$2));
         obj.counterSkills = obj.counterSkills.concat(range);
-      } else if (line.match(/<(?:COUNTER SKILL):[ ](.*)>/i)) {
+      } else if (line.match(/<(?:COUNTER SKILL):\s*(.*)>/i)) {
         var name = String(RegExp.$1).toUpperCase();
         var id = Yanfly.SkillIdRef[name];
         if (id) obj.counterSkills.push(id);
-      } else if (line.match(/<(?:COUNTER TOTAL):[ ]([\+\-]\d+)>/i)) {
+      } else if (line.match(/<(?:COUNTER TOTAL):\s*([\+\-]\d+)>/i)) {
         obj.counterTotal = parseInt(RegExp.$1);
-      } else if (line.match(/<(?:TARGET COUNTER):[ ](\d+)([%％])>/i)) {
+      } else if (line.match(/<(?:TARGET COUNTER):\s*(\d+)([%％])>/i)) {
         obj.targetCounterRate = parseFloat(RegExp.$1) * 0.01;
-      } else if (line.match(/<(?:TARGET COUNTER):[ ]([\+\-]\d+)([%％])>/i)) {
+      } else if (line.match(/<(?:TARGET COUNTER):\s*([\+\-]\d+)([%％])>/i)) {
         obj.targetCounterFlat = parseFloat(RegExp.$1) * 0.01;
       } else if (line.match(/<(?:EVADE COUNTER|COUNTER EVADE)>/i)) {
         obj.evadeCounter = true;
@@ -971,9 +971,9 @@ DataManager.processCounterNotetags3 = function(group) {
         obj.evadeCounter = true;
       } else if (line.match(/<(?:HIT COUNTER|COUNTER HIT)>/i)) {
         obj.evadeCounter = false;
-      } else if (line.match(/<(?:COUNTER NAME):[ ](.*)>/i)) {
+      } else if (line.match(/<(?:COUNTER NAME):\s*(.*)>/i)) {
         obj.counterName = String(RegExp.$1);
-      } else if (line.match(/<(?:COUNTER ICON):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:COUNTER ICON):\s*(\d+)>/i)) {
         obj.counterIcon = String(RegExp.$1);
       } else if (line.match(/<CANNOT COUNTER>/i)) {
         obj.cannotCounter = true;
@@ -1015,9 +1015,9 @@ DataManager.processCounterNotetags4 = function(group) {
         obj.allyCounter = false;
       } else if (line.match(/<CANNOT COUNTER>/i)) {
         obj.cannotCounter = true;
-      } else if (line.match(/<COUNTER RATE:[ ](\d+)([%％])>/i)) {
+      } else if (line.match(/<COUNTER RATE:\s*(\d+)([%％])>/i)) {
         obj.counterRate = parseFloat(RegExp.$1) * 0.01;
-      } else if (line.match(/<COUNTER RATE:[ ]([\+\-]\d+)([%％])>/i)) {
+      } else if (line.match(/<COUNTER RATE:\s*([\+\-]\d+)([%％])>/i)) {
         obj.counterMod = parseFloat(RegExp.$1) * 0.01;
       } else if (line.match(/<CUSTOM COUNTER RATE>/i)) {
         evalMode = 'custom counter rate';
@@ -1140,7 +1140,7 @@ BattleManager.getCounterCondition = function(skill, subject, target) {
 
 BattleManager.checkCounterLine = function(line, skill, subject, target) {
     // EVAL
-    if (line.match(/EVAL:[ ](.*)/i)) {
+    if (line.match(/EVAL:\s*(.*)/i)) {
       var value = String(RegExp.$1);
       return this.checkCounterEval(value, skill, subject, target);
     // CERTAIN HIT
@@ -1174,15 +1174,15 @@ BattleManager.checkCounterLine = function(line, skill, subject, target) {
     } else if (line.toUpperCase() === 'NOT COUNTER HIT') {
       return !this.checkCounterCounterHit();
     // RANDOM
-    } else if (line.match(/RANDOM:[ ](\d+)([%％])/i)) {
+    } else if (line.match(/RANDOM:\s*(\d+)([%％])/i)) {
       var value = parseFloat(RegExp.$1) * 0.01;
       return !this.checkCounterRandom(value);
     // NOT ELEMENT
-    } else if (line.match(/NOT ELEMENT:[ ](.*)/i)) {
+    } else if (line.match(/NOT ELEMENT:\s*(.*)/i)) {
       var value = String(RegExp.$1);
       return !this.checkCounterElement(value);
     // ELEMENT
-    } else if (line.match(/ELEMENT:[ ](.*)/i)) {
+    } else if (line.match(/ELEMENT:\s*(.*)/i)) {
       var value = String(RegExp.$1);
       return this.checkCounterElement(value);
     // SWITCH ON
@@ -1200,27 +1200,27 @@ BattleManager.checkCounterLine = function(line, skill, subject, target) {
       eval = '$gameVariables.value(' + varId + ') ' + eval;
       return this.checkCounterEval(eval, skill, subject, target);
     // NOT SKILL
-    } else if (line.match(/NOT SKILL:[ ](.*)/i)) {
+    } else if (line.match(/NOT SKILL:\s*(.*)/i)) {
       var value = String(RegExp.$1);
       return !this.checkCounterSkill(value);
     // SKILL
-    } else if (line.match(/SKILL:[ ](.*)/i)) {
+    } else if (line.match(/SKILL:\s*(.*)/i)) {
       var value = String(RegExp.$1);
       return this.checkCounterSkill(value);
     // NOT STYPE
-    } else if (line.match(/NOT STYPE:[ ](.*)/i)) {
+    } else if (line.match(/NOT STYPE:\s*(.*)/i)) {
       var value = String(RegExp.$1);
       return !this.checkCounterStype(value);
     // STYPE
-    } else if (line.match(/STYPE:[ ](.*)/i)) {
+    } else if (line.match(/STYPE:\s*(.*)/i)) {
       var value = String(RegExp.$1);
       return this.checkCounterStype(value);
     // NOT ITEM
-    } else if (line.match(/NOT ITEM:[ ](.*)/i)) {
+    } else if (line.match(/NOT ITEM:\s*(.*)/i)) {
       var value = String(RegExp.$1);
       return !this.checkCounterItem(value);
     // ITEM
-    } else if (line.match(/ITEM:[ ](.*)/i)) {
+    } else if (line.match(/ITEM:\s*(.*)/i)) {
       var value = String(RegExp.$1);
       return this.checkCounterItem(value);
     // ATTACKER PARAM

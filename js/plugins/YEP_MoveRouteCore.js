@@ -473,157 +473,157 @@ Game_Character.prototype.processMoveCommand = function(command) {
 
 Game_Character.prototype.processMoveRouteScriptCall = function(line) {
   // EVAL
-  if (line.match(/EVAL:[ ](.*)/i)) {
+  if (line.match(/EVAL:\s*(.*)/i)) {
     this.processMoveRouteEval(String(RegExp.$1));
   // ANIMATION
-  } else if (line.match(/(?:ANIMATION|REQUEST ANIMATION):[ ](\d+)/i)) {
+  } else if (line.match(/(?:ANIMATION|REQUEST ANIMATION):\s*(\d+)/i)) {
     var x = parseInt(RegExp.$1);
     this.requestAnimation(x);
   // ICON BALLOON
-  } else if (line.match(/(?:ICON BALLOON|REQUEST ICON BALLOON):[ ](.*)/i)) {
+  } else if (line.match(/(?:ICON BALLOON|REQUEST ICON BALLOON):\s*(.*)/i)) {
     var str = String(RegExp.$1);
     this.processMoveRouteIconBalloon(str);
   // BALLOON
-  } else if (line.match(/(?:BALLOON|REQUEST BALLOON):[ ](.*)/i)) {
+  } else if (line.match(/(?:BALLOON|REQUEST BALLOON):\s*(.*)/i)) {
     var str = String(RegExp.$1);
     this.processMoveRouteBalloon(str);
   // JUMP FORWARD
-  } else if (line.match(/(?:JUMP FORWARD|JUMP FORWARDS):[ ](\d+)/i)) {
+  } else if (line.match(/(?:JUMP FORWARD|JUMP FORWARDS):\s*(\d+)/i)) {
     var x = parseInt(RegExp.$1);
     this.jumpForward(x);
   // JUMP TO: POINT
-  } else if (line.match(/JUMP[ ](?:TO|TOWARD|TOWARDS):[ ](\d+),[ ](\d+)/i)) {
+  } else if (line.match(/JUMP[ ](?:TO|TOWARD|TOWARDS):\s*(\d+),[ ](\d+)/i)) {
     var x = parseInt(RegExp.$1);
     var y = parseInt(RegExp.$2);
     this.jumpToPoint(x, y);
   // JUMP TO: EVENT
-  } else if (line.match(/JUMP[ ](?:TO|TOWARD|TOWARDS):[ ]EVENT[ ](\d+)/i)) {
+  } else if (line.match(/JUMP[ ](?:TO|TOWARD|TOWARDS):[ ]*EVENT[ ](\d+)/i)) {
     var x = parseInt(RegExp.$1);
     this.jumpToEvent(x);
   // JUMP TO: PLAYER
-  } else if (line.match(/JUMP[ ](?:TO|TOWARD|TOWARDS):[ ]PLAYER/i)) {
+  } else if (line.match(/JUMP[ ](?:TO|TOWARD|TOWARDS):[ ]*PLAYER/i)) {
     this.jumpToEvent(0);
   // MOVE TO: POINT
-  } else if (line.match(/MOVE[ ](?:TO|TOWARD|TOWARDS):[ ](\d+),[ ](\d+)/i)) {
+  } else if (line.match(/MOVE[ ](?:TO|TOWARD|TOWARDS):\s*(\d+),[ ](\d+)/i)) {
     var x = parseInt(RegExp.$1);
     var y = parseInt(RegExp.$2);
     var collision = this.checkCollisionKeywords(line);
     this.moveToPoint(x, y, collision);
   // MOVE TO: EVENT
-  } else if (line.match(/MOVE[ ](?:TO|TOWARD|TOWARDS):[ ]EVENT[ ](\d+)/i)) {
+  } else if (line.match(/MOVE[ ](?:TO|TOWARD|TOWARDS):[ ]*EVENT[ ](\d+)/i)) {
     var x = parseInt(RegExp.$1);
     var collision = this.checkCollisionKeywords(line);
     this.moveToEvent(x, collision);
   // MOVE TO: PLAYER
-  } else if (line.match(/MOVE[ ](?:TO|TOWARD|TOWARDS):[ ]PLAYER/i)) {
+  } else if (line.match(/MOVE[ ](?:TO|TOWARD|TOWARDS):[ ]*PLAYER/i)) {
     this.moveToEvent(0);
   // PATTERN LOCK
-  } else if (line.match(/(?:PATTERN LOCK):[ ](\d+)/i)) {
+  } else if (line.match(/(?:PATTERN LOCK):\s*(\d+)/i)) {
     var x = parseInt(RegExp.$1);
     this.patternLock(x);
   // PATTERN UNLOCK
   } else if (line.match(/(?:PATTERN UNLOCK)/i)) {
     this.patternUnlock();
   // SELF SWITCH: ON
-  } else if (line.match(/(?:SELF SWITCH)[ ](.*):[ ]ON/i)) {
+  } else if (line.match(/(?:SELF SWITCH)[ ](.*):[ ]*ON/i)) {
     var str = String(RegExp.$1);
     this.processMoveRouteSelfSwitch(str, 'on');
   // SELF SWITCH: OFF
-  } else if (line.match(/(?:SELF SWITCH)[ ](.*):[ ]OFF/i)) {
+  } else if (line.match(/(?:SELF SWITCH)[ ](.*):[ ]*OFF/i)) {
     var str = String(RegExp.$1);
     this.processMoveRouteSelfSwitch(str, 'off');
   // SELF SWITCH: TOGGLE
-  } else if (line.match(/(?:SELF SWITCH)[ ](.*):[ ]TOGGLE/i)) {
+  } else if (line.match(/(?:SELF SWITCH)[ ](.*):[ ]*TOGGLE/i)) {
     var str = String(RegExp.$1);
     this.processMoveRouteSelfSwitch(str, 'toggle');
   // SELF VARIABLE
-  } else if (line.match(/(?:SELF VARIABLE)[ ](.*):[ ](.*)/i)) {
+  } else if (line.match(/(?:SELF VARIABLE)[ ](.*):\s*(.*)/i)) {
     var str = String(RegExp.$1);
     var code = String(RegExp.$2);
     this.processMoveRouteSelfVariable(str, code);
   // STEP AWAY FROM: POINT
-  } else if (line.match(/(?:STEP AWAY|STEP AWAY FROM):[ ](\d+),[ ](\d+)/i)) {
+  } else if (line.match(/(?:STEP AWAY|STEP AWAY FROM):\s*(\d+),[ ](\d+)/i)) {
     var x = parseInt(RegExp.$1);
     var y = parseInt(RegExp.$2);
     this.stepAwayFromPoint(x, y);
   // STEP AWAY FROM: EVENT
-  } else if (line.match(/(?:STEP AWAY|STEP AWAY FROM):[ ]EVENT[ ](\d+)/i)) {
+  } else if (line.match(/(?:STEP AWAY|STEP AWAY FROM):[ ]*EVENT[ ](\d+)/i)) {
     var x = parseInt(RegExp.$1);
     this.stepAwayFromEvent(x);
   // STEP AWAY FROM: PLAYER
-  } else if (line.match(/(?:STEP AWAY|STEP AWAY FROM):[ ]PLAYER/i)) {
+  } else if (line.match(/(?:STEP AWAY|STEP AWAY FROM):[ ]*PLAYER/i)) {
     this.stepAwayFromEvent(0);
   // STEP TOWARD: POINT
-  } else if (line.match(/(?:STEP TOWARD|STEP TOWARDS):[ ](\d+),[ ](\d+)/i)) {
+  } else if (line.match(/(?:STEP TOWARD|STEP TOWARDS):\s*(\d+),[ ](\d+)/i)) {
     var x = parseInt(RegExp.$1);
     var y = parseInt(RegExp.$2);
     this.stepTowardPoint(x, y);
   // STEP TOWARD: EVENT
-  } else if (line.match(/(?:STEP TOWARD|STEP TOWARDS):[ ]EVENT[ ](\d+)/i)) {
+  } else if (line.match(/(?:STEP TOWARD|STEP TOWARDS):[ ]*EVENT[ ](\d+)/i)) {
     var x = parseInt(RegExp.$1);
     this.stepTowardEvent(x);
   // STEP TOWARD: PLAYER
-  } else if (line.match(/(?:STEP TOWARD|STEP TOWARDS):[ ]PLAYER/i)) {
+  } else if (line.match(/(?:STEP TOWARD|STEP TOWARDS):[ ]*PLAYER/i)) {
     this.stepTowardEvent(0);
   // TELEPORT: POINT
-  } else if (line.match(/(?:TELEPORT|TELEPORT TO):[ ](\d+),[ ](\d+)/i)) {
+  } else if (line.match(/(?:TELEPORT|TELEPORT TO):\s*(\d+),[ ](\d+)/i)) {
     var x = parseInt(RegExp.$1);
     var y = parseInt(RegExp.$2);
     this.teleportToPoint(x, y);
   // TELEPORT: EVENT
-  } else if (line.match(/(?:TELEPORT):[ ]EVENT[ ](\d+)/i)) {
+  } else if (line.match(/(?:TELEPORT):[ ]*EVENT[ ](\d+)/i)) {
     var x = parseInt(RegExp.$1);
     this.teleportToEvent(x);
   // TELEPORT: PLAYER
-  } else if (line.match(/(?:TELEPORT):[ ]PLAYER/i)) {
+  } else if (line.match(/(?:TELEPORT):[ ]*PLAYER/i)) {
     this.teleportToEvent(0);
   // TURN AWAY FROM: POINT
-  } else if (line.match(/(?:TURN AWAY FROM|TURN AWAY):[ ](\d+),[ ](\d+)/i)) {
+  } else if (line.match(/(?:TURN AWAY FROM|TURN AWAY):\s*(\d+),[ ](\d+)/i)) {
     var x = parseInt(RegExp.$1);
     var y = parseInt(RegExp.$2);
     this.turnAwayFromPoint(x, y);
   // TURN AWAY FROM: EVENT
-  } else if (line.match(/(?:TURN AWAY FROM|TURN AWAY):[ ]EVENT[ ](\d+)/i)) {
+  } else if (line.match(/(?:TURN AWAY FROM|TURN AWAY):[ ]*EVENT[ ](\d+)/i)) {
     var x = parseInt(RegExp.$1);
     this.turnAwayFromEvent(x);
   // TURN AWAY FROM: PLAYER
-  } else if (line.match(/(?:TURN AWAY FROM|TURN AWAY):[ ]PLAYER/i)) {
+  } else if (line.match(/(?:TURN AWAY FROM|TURN AWAY):[ ]*PLAYER/i)) {
     this.turnAwayFromEvent(0);
   // TURN TOWARD: POINT
-  } else if (line.match(/(?:TURN TOWARD|TURN TOWARDS):[ ](\d+),[ ](\d+)/i)) {
+  } else if (line.match(/(?:TURN TOWARD|TURN TOWARDS):\s*(\d+),[ ](\d+)/i)) {
     var x = parseInt(RegExp.$1);
     var y = parseInt(RegExp.$2);
     this.turnTowardPoint(x, y);
   // TURN TOWARD: EVENT
-  } else if (line.match(/(?:TURN TOWARD|TURN TOWARDS):[ ]EVENT[ ](\d+)/i)) {
+  } else if (line.match(/(?:TURN TOWARD|TURN TOWARDS):[ ]*EVENT[ ](\d+)/i)) {
     var x = parseInt(RegExp.$1);
     this.turnTowardEvent(x);
   // TURN TOWARD: PLAYER
-  } else if (line.match(/(?:TURN TOWARD|TURN TOWARDS):[ ]PLAYER/i)) {
+  } else if (line.match(/(?:TURN TOWARD|TURN TOWARDS):[ ]*PLAYER/i)) {
     this.turnTowardEvent(0);
   // MOVE DIRECTION
-  } else if (line.match(/(?:MOVE LOWER LEFT|LOWER LEFT):[ ](\d+)/i)) {
+  } else if (line.match(/(?:MOVE LOWER LEFT|LOWER LEFT):\s*(\d+)/i)) {
     var x = parseInt(RegExp.$1);
     this.moveRepeat(1, x);
-  } else if (line.match(/(?:MOVE LOWER RIGHT|LOWER RIGHT):[ ](\d+)/i)) {
+  } else if (line.match(/(?:MOVE LOWER RIGHT|LOWER RIGHT):\s*(\d+)/i)) {
     var x = parseInt(RegExp.$1);
     this.moveRepeat(3, x);
-  } else if (line.match(/(?:MOVE UPPER LEFT|UPPER LEFT):[ ](\d+)/i)) {
+  } else if (line.match(/(?:MOVE UPPER LEFT|UPPER LEFT):\s*(\d+)/i)) {
     var x = parseInt(RegExp.$1);
     this.moveRepeat(7, x);
-  } else if (line.match(/(?:MOVE UPPER RIGHT|UPPER RIGHT):[ ](\d+)/i)) {
+  } else if (line.match(/(?:MOVE UPPER RIGHT|UPPER RIGHT):\s*(\d+)/i)) {
     var x = parseInt(RegExp.$1);
     this.moveRepeat(9, x);
-  } else if (line.match(/(?:MOVE UP|UP):[ ](\d+)/i)) {
+  } else if (line.match(/(?:MOVE UP|UP):\s*(\d+)/i)) {
     var x = parseInt(RegExp.$1);
     this.moveRepeat(8, x);
-  } else if (line.match(/(?:MOVE DOWN|DOWN):[ ](\d+)/i)) {
+  } else if (line.match(/(?:MOVE DOWN|DOWN):\s*(\d+)/i)) {
     var x = parseInt(RegExp.$1);
     this.moveRepeat(2, x);
-  } else if (line.match(/(?:MOVE LEFT|LEFT):[ ](\d+)/i)) {
+  } else if (line.match(/(?:MOVE LEFT|LEFT):\s*(\d+)/i)) {
     var x = parseInt(RegExp.$1);
     this.moveRepeat(4, x);
-  } else if (line.match(/(?:MOVE RIGHT|RIGHT):[ ](\d+)/i)) {
+  } else if (line.match(/(?:MOVE RIGHT|RIGHT):\s*(\d+)/i)) {
     var x = parseInt(RegExp.$1);
     this.moveRepeat(6, x);
   // ELSE/EVAL

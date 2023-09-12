@@ -187,9 +187,9 @@ Game_Event.prototype.setupSpriteOffsets = function() {
 
 Game_Event.prototype.setupNotetagSpriteOffsets = function() {
   if (this.event().note === '') return;
-  var note1 = /<SPRITE OFFSET X:[ ]([\+\-]\d+)>/i;
-  var note2 = /<SPRITE OFFSET Y:[ ]([\+\-]\d+)>/i;
-  var note3 = /<SPRITE OFFSET:[ ]([\+\-]\d+),[ ]([\+\-]\d+)>/i;
+  var note1 = /<SPRITE OFFSET X:\s*([\+\-]\d+)>/i;
+  var note2 = /<SPRITE OFFSET Y:\s*([\+\-]\d+)>/i;
+  var note3 = /<SPRITE OFFSET:\s*([\+\-]\d+),[ ]([\+\-]\d+)>/i;
   if (this.event().note.match(note1)) {
     this._spriteOffsetX = parseInt(RegExp.$1);
   }
@@ -204,9 +204,9 @@ Game_Event.prototype.setupNotetagSpriteOffsets = function() {
 
 Game_Event.prototype.setupCommentTagSpriteOffsets = function() {
   if (!this.page()) return;
-  var note1 = /<SPRITE OFFSET X:[ ]([\+\-]\d+)>/i;
-  var note2 = /<SPRITE OFFSET Y:[ ]([\+\-]\d+)>/i;
-  var note3 = /<SPRITE OFFSET:[ ]([\+\-]\d+),[ ]([\+\-]\d+)>/i;
+  var note1 = /<SPRITE OFFSET X:\s*([\+\-]\d+)>/i;
+  var note2 = /<SPRITE OFFSET Y:\s*([\+\-]\d+)>/i;
+  var note3 = /<SPRITE OFFSET:\s*([\+\-]\d+),[ ]([\+\-]\d+)>/i;
   var list = this.list();
   var length = list.length;
   for (var i = 0; i < length; ++i) {

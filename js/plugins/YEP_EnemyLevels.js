@@ -732,10 +732,10 @@ DataManager.processELVNotetagsS = function(group) {
 };
 
 DataManager.processELVNotetags1 = function(group) {
-  var note1a = /<(.*)[ ]RATE:[ ]([\+\-]\d+)([%％])[ ]PER LEVEL>/i;
-  var note1b = /<(.*)[ ]RATE:[ ]([\+\-]\d+).(\d+)[ ]PER LEVEL>/i;
-  var note2a = /<(.*)[ ]FLAT:[ ]([\+\-]\d+)[ ]PER LEVEL>/i;
-  var note2b = /<(.*)[ ]FLAT:[ ]([\+\-]\d+).(\d+)[ ]PER LEVEL>/i;
+  var note1a = /<(.*)[ ]RATE:\s*([\+\-]\d+)([%％])[ ]PER LEVEL>/i;
+  var note1b = /<(.*)[ ]RATE:\s*([\+\-]\d+).(\d+)[ ]PER LEVEL>/i;
+  var note2a = /<(.*)[ ]FLAT:\s*([\+\-]\d+)[ ]PER LEVEL>/i;
+  var note2b = /<(.*)[ ]FLAT:\s*([\+\-]\d+).(\d+)[ ]PER LEVEL>/i;
   for (var n = 1; n < group.length; n++) {
     var obj = group[n];
     var notedata = obj.note.split(/[\r\n]+/);
@@ -763,20 +763,20 @@ DataManager.processELVNotetags1 = function(group) {
         obj.showLevel = false;
       } else if (line.match(/<(?:IGNORE LEVEL BONUS|IGNORE LEVEL BONUSES)>/i)) {
         obj.ignoreLevelBonuses = true;
-      } else if (line.match(/<(?:MIN LEVEL|MINIMUM LEVEL):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:MIN LEVEL|MINIMUM LEVEL):\s*(\d+)>/i)) {
         obj.minLevel = parseInt(RegExp.$1);
-      } else if (line.match(/<(?:MAX LEVEL|MAXIMUM LEVEL):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:MAX LEVEL|MAXIMUM LEVEL):\s*(\d+)>/i)) {
         obj.maxLevel = parseInt(RegExp.$1);
-      } else if (line.match(/<(?:SET LEVEL|STATIC LEVEL):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:SET LEVEL|STATIC LEVEL):\s*(\d+)>/i)) {
         obj.minLevel = parseInt(RegExp.$1);
         obj.maxLevel = parseInt(RegExp.$1);
-      } else if (line.match(/<(?:LEVEL TYPE|STARTING LEVEL TYPE):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:LEVEL TYPE|STARTING LEVEL TYPE):\s*(\d+)>/i)) {
         obj.levelType = parseInt(RegExp.$1).clamp(0, 5);
-      } else if (line.match(/<POSITIVE LEVEL FLUCTUATION:[ ](\d+)>/i)) {
+      } else if (line.match(/<POSITIVE LEVEL FLUCTUATION:\s*(\d+)>/i)) {
         obj.positiveLevelFluctuation = parseInt(RegExp.$1);
-      } else if (line.match(/<NEGATIVE LEVEL FLUCTUATION:[ ](\d+)>/i)) {
+      } else if (line.match(/<NEGATIVE LEVEL FLUCTUATION:\s*(\d+)>/i)) {
         obj.negativeLevelFluctuation = parseInt(RegExp.$1);
-      } else if (line.match(/<LEVEL FLUCTUATION:[ ](\d+)>/i)) {
+      } else if (line.match(/<LEVEL FLUCTUATION:\s*(\d+)>/i)) {
         obj.positiveLevelFluctuation = parseInt(RegExp.$1);
         obj.negativeLevelFluctuation = parseInt(RegExp.$1);
       } else if (line.match(note1a)) {
@@ -927,11 +927,11 @@ DataManager.processELVNotetags1 = function(group) {
         obj.baseParamFormula[pId] = obj.baseParamFormula[pId] + line + '\n';
       } else if (line.match(/<(?:RESIST LEVEL CHANGE)>/i)) {
         obj.resistLevelChange = true;
-      } else if (line.match(/<SKILL[ ](\d+)[ ]REQUIRE LEVEL:[ ](\d+)>/i)) {
+      } else if (line.match(/<SKILL[ ](\d+)[ ]REQUIRE LEVEL:\s*(\d+)>/i)) {
         var skillId = parseInt(RegExp.$1);
         var level = parseInt(RegExp.$2);
         obj.skillLevelRequirements[skillId] = level;
-      } else if (line.match(/<SKILL[ ](.*)[ ]REQUIRE LEVEL:[ ](\d+)>/i)) {
+      } else if (line.match(/<SKILL[ ](.*)[ ]REQUIRE LEVEL:\s*(\d+)>/i)) {
         var name = String(RegExp.$1).toUpperCase();
         var level = parseInt(RegExp.$2);
         if (Yanfly.SkillIdRef[name]) {
@@ -984,7 +984,7 @@ DataManager.processELVNotetags2 = function(group) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<(?:CHANGE ENEMY LEVEL):[ ]([\+\-]\d+)>/i)) {
+      if (line.match(/<(?:CHANGE ENEMY LEVEL):\s*([\+\-]\d+)>/i)) {
         obj.changeEnemyLevel = parseInt(RegExp.$1);
       } else if (line.match(/<(?:RESET ENEMY LEVEL)>/i)) {
         obj.resetEnemyLevel = true;

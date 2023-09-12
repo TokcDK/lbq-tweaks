@@ -1183,11 +1183,11 @@ DataManager.processCORENotetags1 = function(group) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<(?:PRICE):[ ](\d+)>/i)) {
+      if (line.match(/<(?:PRICE):\s*(\d+)>/i)) {
         obj.price = parseInt(RegExp.$1);
-      } else if (line.match(/<(?:MAX ITEM):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:MAX ITEM):\s*(\d+)>/i)) {
         obj.maxItem = Math.max(1, parseInt(RegExp.$1));
-      } else if (line.match(/<(.*):[ ]([\+\-]\d+)>/i)) {
+      } else if (line.match(/<(.*):\s*([\+\-]\d+)>/i)) {
         var stat = String(RegExp.$1).toUpperCase();
         var value = parseInt(RegExp.$2);
         switch (stat) {
@@ -1243,9 +1243,9 @@ DataManager.processCORENotetags2 = function(group) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<(?:GOLD):[ ](\d+)>/i)) {
+      if (line.match(/<(?:GOLD):\s*(\d+)>/i)) {
         obj.gold = parseInt(RegExp.$1);
-      } else if (line.match(/<(.*):[ ](\d+)>/i)) {
+      } else if (line.match(/<(.*):\s*(\d+)>/i)) {
         var stat = String(RegExp.$1).toUpperCase();
         var value = parseInt(RegExp.$2);
         switch (stat) {
@@ -1304,10 +1304,10 @@ DataManager.processCORENotetags3 = function(group) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<(?:MAX LEVEL):[ ](\d+)>/i)) {
+      if (line.match(/<(?:MAX LEVEL):\s*(\d+)>/i)) {
         obj.maxLevel = parseInt(RegExp.$1);
         if (obj.maxLevel < 1) obj.maxLevel = 1;
-      } else if (line.match(/<(?:INITIAL LEVEL):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:INITIAL LEVEL):\s*(\d+)>/i)) {
         obj.initialLevel = parseInt(RegExp.$1);
         if (obj.initialLevel < 1) obj.initialLevel = 1;
       }
@@ -1321,7 +1321,7 @@ DataManager.processCORENotetags4 = function(group) {
     var notedata = obj.note.split(/[\r\n]+/);
 
     obj.learnings.forEach(function(learning) {
-      if (learning.note.match(/<(?:LEARN LEVEL|LEARN AT LEVEL):[ ](\d+)>/i)) {
+      if (learning.note.match(/<(?:LEARN LEVEL|LEARN AT LEVEL):\s*(\d+)>/i)) {
         learning.level = parseInt(RegExp.$1);
         if (learning.level < 1) obj.maxLevel = 1;
       }
