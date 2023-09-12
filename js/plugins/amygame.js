@@ -5734,16 +5734,16 @@ if(itemMetaTchestType){
   var arr3 = null;
   if(firstAnnihilationItemMeta){
     arr3 = firstAnnihilationItemMeta;
-    arr1?.push(Number(arr3[0]));
-    arr2?.push(Number(arr3[1]));
+    if(arr1 !== null) arr1.push(Number(arr3[0]));
+    arr2.push(Number(arr3[1]));
   };
   
   var tchestOnly = dataItemsGameVariablesValue240.meta['TchestOnly'];
   var arr4 = null;
   if(isTchestOnly){
     arr4 = isTchestOnly;
-    arr1?.push(Number(arr4[3]));
-    arr2?.push(Number(arr4[4]));
+    arr1.push(Number(arr4[3]));
+    arr2.push(Number(arr4[4]));
   };
   
   var value1 = Math.floor( Math.random() * arr1.length);
