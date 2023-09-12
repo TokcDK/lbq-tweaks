@@ -2743,99 +2743,86 @@ if(valueDropItems == 0 ){
 //汎用財布ドロップ設定
 drop_walletItemBoxGet = function(value12,id12){
 
-var value3 = valueFootpadSkillId;
-var arr12 = []; 
-var actor = $gameActors.actor($gameVariables.value(11));
-var value11 = 100;
-drop_probabilityCalculation(value11);
-  if(actor.isLearnedSkill(value3) && actor.skillMasteryLevel(value3) >= 1){
-    value13 += actor.skillMasteryLevel(value3) * 3;
-  };
-    if(value13 >= 90){
+	var value3 = valueFootpadSkillId;
+	var arr12 = []; 
+	var actor = $gameActors.actor($gameVariables.value(11));
+	var value11 = 100;
+	drop_probabilityCalculation(value11);
+	
+	if(actor.isLearnedSkill(value3) && actor.skillMasteryLevel(value3) >= 1){
+		value13 += actor.skillMasteryLevel(value3) * 3;
+	};
+	if(value13 < 90) return;
+	
+	if($gameVariables.value(240) >= 1){
+		var value = $dataItems[$gameVariables.value(240)];
+		if(value.meta.GenericDropRate){
+			var arr11 = value.meta.GenericDropRate.split(',');//直下のエネミー簡易討伐と採取物の設定で計算式同一
+			var value11 = Number(arr11[Math.floor(Math.random() * arr11.length)]);
+		} else {
+			var value11 = 1;
+		};
+	} else {
+		var value11 = value12;
+	};
 
-      if($gameVariables.value(240) >= 1){
-        var value = $dataItems[$gameVariables.value(240)];
-        if(value.meta.GenericDropRate){
-          var arr11 = value.meta.GenericDropRate.split(',');//直下のエネミー簡易討伐と採取物の設定で計算式同一
-          var value11 = Number(arr11[Math.floor(Math.random() * arr11.length)]);
-        } else {
-          var value11 = 1;
-        };
-      } else {
-        var value11 = value12;
-      };
-
-        if(id12 == 1){
-          for (var i = 1; i <= $dataItems.length-1; i++) {
-            if($dataItems[i].meta['walletIn']){
-              var list = $dataItems[i].meta['DropRate'].split(',');
-                list.forEach(function(id11) {
-                  if(id11 == value11){
-                    arr12.push(i);
-                  };
-                }, this);
-            };
-          };
-        } else {
-          for (var i = 1; i <= $dataItems.length-1; i++) {
-            if($dataItems[i].meta['ItemBag']){
-              var list = $dataItems[i].meta['DropRate'].split(',');
-                list.forEach(function(id11) {
-                  if(id11 == value11){
-                    arr12.push(i);
-                  };
-                }, this);
-            };
-          };
-        };
-        var value2 = Math.floor( Math.random() * 3) + 1;
-        for (var i = 1; i <= value2; i++) {
-          var value1 = Number(arr12[Math.floor(Math.random() * arr12.length)]);
-          CommonPopupManager.showInfo({},`\\C[24]\x1bI[${$dataItems[value1].iconIndex}]${$dataItems[value1].name}\\C[0]を獲得した。`,null);
-          $gameParty.gainItem($dataItems[value1], 1);
-        };
-    };
-
+	var dataItemsLength = $dataItems.length;
+	var type = id12 == 1 ? 'walletIn' : 'ItemBag';
+	for (var i = 1; i < dataItemsLength; i++) {
+		var dataItemsI = dataItems[i];
+		if(!dataItemsI.meta[type]) continue;
+		
+		var list = dataItemsI.meta['DropRate'].split(',');
+		list.forEach(function(id11) {
+			if(id11 !== value11) continue;						
+			arr12.push(i);						
+		}, this);
+	};
+	
+	var value2 = Math.floor( Math.random() * 3) + 1;
+	var arr12Length = arr12.length;
+	for (var i = 1; i <= value2; i++) {
+		var value1 = Number(arr12[Math.floor(Math.random() * arr12Length)]);
+		var item = $dataItems[value1];
+		CommonPopupManager.showInfo({},`\\C[24]\x1bI[${item.iconIndex}]${item.name}\\C[0]を獲得した。`,null);
+		$gameParty.gainItem(item, 1);
+	};
 };
 
 //汎用ドロップ設定
 drop_genericDropRate = function(value12,arr12){
+	var value11 = 1;
+	if($gameVariables.value(240) >= 1){
+		var value = $dataItems[$gameVariables.value(240)];
+		var valueMetaGenericDropRate = value.meta.GenericDropRate;
+		if(valueMetaGenericDropRate){
+			var arr11 = valueMetaGenericDropRate.split(',');//直下のエネミー簡易討伐と採取物の設定で計算式同一
+			value11 = Number(arr11[Math.floor(Math.random() * arr11.length)]);
+		}
+	}
 
-if($gameVariables.value(240) >= 1){
-  var value = $dataItems[$gameVariables.value(240)];
-  if(value.meta.GenericDropRate){
-    var arr11 = value.meta.GenericDropRate.split(',');//直下のエネミー簡易討伐と採取物の設定で計算式同一
-    var value11 = Number(arr11[Math.floor(Math.random() * arr11.length)]);
-  } else {
-    var value11 = 1;
-  };
-} else {
-  var value11 = 1;
-};
+	var valueItemDropRate1Length = valueItemDropRate1.length;
+	for (var i = 0; i < valueItemDropRate1Length; i++) {
+		var value14 = valueItemDropRate1[i];
+		var value13 = value12 == 0 ? !$dataItems[value14].meta['NoBattleDrop'] : $gameSwitches.value(2);
+		if(!value13) continue;
 
-  for (var i = 0; i <= valueItemDropRate1.length-1; i++) {
-    var value14 = valueItemDropRate1[i];
-    var value15 = 1;
-    if(value12 == 0){
-      var value13 = !$dataItems[value14].meta['NoBattleDrop'];
-    } else {
-      var value13 = $gameSwitches.value(2);//常にオンのスイッチ
-    };
-    if($dataItems[value14].meta['DropRate'] && value13){
-      var list = $dataItems[value14].meta['DropRate'].split(',');
-      list.forEach(function(id11) {
-        if(id11 == value11){
-          if($dataItems[value14].meta['DropLottery']){
-            var value15 = Number($dataItems[value14].meta['DropLottery']);
-          };
-            for (var j = 1; j <= value15; j++) {
-              arr12.push(value14);
-            };
-        };
-      }, this);
-  }};
-    valueDropItems = Number(arr12[Math.floor(Math.random() * arr12.length)]);
+		var itemDropRate = $dataItems[value14].meta['DropRate'];	
+		if(!itemDropRate) continue;
 
+		var value15 = 1;
+		var list = $dataItems[value14].meta['DropRate'].split(',');
+		var itemDropLottery = $dataItems[value14].meta['DropLottery'];
+		list.forEach(function(id11) {
+			if(id11 !== value11) continue;
+			if(itemDropLottery) value15 = Number(itemDropLottery);
+			
+			for (var j = 1; j <= value15; j++) {
+			  arr12.push(value14);
+			};
+		}, this);
+	};
+	valueDropItems = Number(arr12[Math.floor(Math.random() * arr12.length)]);
 };
 
 //汎用ドロップエネミー対象設定ダンジョンのみ。計算のみ計算結果はarr4に蓄積。簡易討伐時
@@ -2855,16 +2842,15 @@ drop_enemyDropRate = function(value12,arr4){
 		if(!dataItemsI.meta['LotteryRearity']) continue;
 		
 		var value19 = Number(dataItemsI.meta['LotteryRearity']);
-		if(value19 == 1){var value20 = 1}
-		else if(value19 == 2){var value20 = 1}
-		else if(value19 == 3){var value20 = 10}
-		else if(value19 == 4){var value20 = 20}
-		else if(value19 == 5){var value20 = 30}
-		else if(value19 == 6){var value20 = 30}
-		else if(value19 == 7){var value20 = 40}
-		else if(value19 == 8){var value20 = 40}
-		else if(value19 == 9){var value20 = 50}
-		else if(value19 == 10){var value20 = 50};
+		var value20 = 1; // 1,2
+		if(value19 < 3){}
+		else if(value19 == 3){value20 = 10}
+		else if(value19 == 4){value20 = 20}
+		else if(value19 == 5){value20 = 30}
+		else if(value19 == 6){value20 = 30}
+		else if(value19 == 7){value20 = 40}
+		else if(value19 == 8){value20 = 40}
+		else if(value19 > 8){value20 = 50} // 9, 10
 
 		if(value11 >= value20){ arr4.push(i); };
 	};
@@ -2874,82 +2860,80 @@ drop_enemyDropRate = function(value12,arr4){
 //drop_JobStateWAget(1,10);//1武器2防具ダンジョン外の場合の想定レベル
 drop_JobStateWAget = function(id11,value10){
 
-var arr4 = [0];
-if(!$gameParty.inBattle()){
-  var valueClassState = 0;
-  if($gameMap.event(valueEnemyEventId).event().meta['classStateDrop']){
-    var valueClassState = $gameMap.event(valueEnemyEventId).event().meta['classStateDrop'].split(',');//<classStateDrop:1,7,13>
-    if($gameVariables.value(240) == 0){
-      var valueEnemyLevel = 30;//value10
-    } else {
-      var value = $dataItems[$gameVariables.value(240)];
-      var arr1 = value.meta['EnemyLV'].split(',');
-      var valueEnemyLevel = Number(arr1[Math.floor(Math.random() * arr1.length)]);
-    };
-  };
-};
-if(valueClassState != 0){
-  var value11 = Number(valueClassState[0]);//使ってない＿？
-  var value14 = Math.round(valueEnemyLevel / 10);
-  if(value14 == 0){var value14 = 1};
-  if(value14 >= 11){var value14 = 10};
-    var start = 1;
-    if(id11 == 2){
-      var end = valueArmorsLength;
-      var valueItems = $dataArmors;
-      var value12 = Number(valueClassState[2]);
-    } else {
-      var end = $dataWeapons.length-1;
-      var valueItems = $dataWeapons;
-      var value12 = Number(valueClassState[1]);
-    };
-      for (var i = start; i <= end; i++) {
-        if(valueItems[i].meta['LotteryRearity']){
-          if(valueItems[i].meta['GatchaOutOfRange']){}else{
-            if(id11 == 2){
-              var valueTypeId = valueItems[i].atypeId
-            } else {
-              var valueTypeId = valueItems[i].wtypeId
-            };
-            if(value12 == valueTypeId && value14 >= Number(valueItems[i].meta['LotteryRearity'])){
-              arr4.push(i);
-            };
-      }}};
-//console.log(`arr4  ${arr4}`);
-        var value15 = Number(arr4[Math.floor(Math.random() * arr4.length)]);
-          if(value15 != 0){
-            if($gameParty.inBattle()){
-              $gameTroop.addDropItem(valueItems[value15]);
-            } else {
-              CommonPopupManager.showInfo({},`\\C[24]\x1bI[${valueItems[value15].iconIndex}]${valueItems[value15].name}\\C[0]を獲得した。`,null);
-              $gameParty.gainItem(valueItems[value15], 1);
-            };
-          };
-};
-
+	var arr4 = [0];
+	var isInBattle = $gameParty.inBattle();
+	if(!isInBattle){
+		var valueClassState = 0;
+		if($gameMap.event(valueEnemyEventId).event().meta['classStateDrop']){
+			var valueClassState = $gameMap.event(valueEnemyEventId).event().meta['classStateDrop'].split(',');//<classStateDrop:1,7,13>
+			if($gameVariables.value(240) == 0){
+				var valueEnemyLevel = 30;//value10
+			} else {
+				var value = $dataItems[$gameVariables.value(240)];
+				var arr1 = value.meta['EnemyLV'].split(',');
+				var valueEnemyLevel = Number(arr1[Math.floor(Math.random() * arr1.length)]);
+			};
+		};
+	};
+	
+	if(valueClassState === 0) return;
+	
+	var value11 = Number(valueClassState[0]);//使ってない＿？
+	var value14 = Math.round(valueEnemyLevel / 10);
+	if(value14 == 0){value14 = 1};
+	else if(value14 >= 11){value14 = 10};
+	
+	var end = id11 == 2 ? valueArmorsLength : $dataWeapons.length-1;
+	var valueItems = id11 == 2 ? $dataArmors : $dataWeapons;
+	var value12 = Number(id11 == 2 ? valueClassState[2] : valueClassState[1]);
+			
+	var start = 1;
+	for (var i = start; i <= end; i++) {
+		var item = valueItems[i];
+		if(item.meta['GatchaOutOfRange']) continue;
+		
+		var itemLotteryRearity = item.meta['LotteryRearity'];
+		if(!itemLotteryRearity) continue;
+		
+		var valueTypeId = id11 == 2 ? item.atypeId : item.wtypeId;
+		if(value12 == valueTypeId && value14 >= Number(itemLotteryRearity)){
+			arr4.push(i);
+		};
+	};
+	
+	var value15 = Number(arr4[Math.floor(Math.random() * arr4.length)]);
+	if(value15 === 0) return;
+	
+	if(isInBattle){
+		$gameTroop.addDropItem(valueItems[value15]);
+	} else {
+		CommonPopupManager.showInfo({},`\\C[24]\x1bI[${valueItems[value15].iconIndex}]${valueItems[value15].name}\\C[0]を獲得した。`,null);
+		$gameParty.gainItem(valueItems[value15], 1);
+	};
 };
 
 //追いはぎ時の確率と武器防具入手
 footpad_probabilityUp = function(id1){
 
-var value3 = valueFootpadSkillId;//追剥スキルID
-var value2 = 10;
-var actor = $gameActors.actor($gameVariables.value(11));
-if($gameVariables.value(240) >= 1){
-  var value = $dataItems[$gameVariables.value(240)];
-  var arr1 = value.meta['EnemyLV'].split(',');
-  var value1 = Number(arr1[Math.floor(Math.random() * arr1.length)]);
-} else {
-  var value1 = value2;
-};
-drop_probabilityCalculation(value1);
-  if(actor.isLearnedSkill(value3) && actor.skillMasteryLevel(value3) >= 1){
-    value13 += actor.skillMasteryLevel(value3) * 3;
-  };
-    if(value13 >= 90){
-      drop_JobStateWAget(id1,value1);
-    };
-
+	var value2 = 10;
+	var value1 = value2;
+	
+	if($gameVariables.value(240) >= 1){
+		var value = $dataItems[$gameVariables.value(240)];
+		var arr1 = value.meta['EnemyLV'].split(',');
+		value1 = Number(arr1[Math.floor(Math.random() * arr1.length)]);
+	};
+	
+	drop_probabilityCalculation(value1);
+	
+	var actor = $gameActors.actor($gameVariables.value(11));
+	var value3 = valueFootpadSkillId;//追剥スキルID
+	if(actor.isLearnedSkill(value3) && actor.skillMasteryLevel(value3) >= 1){
+		value13 += actor.skillMasteryLevel(value3) * 3;
+	};
+	if(value13 >= 90){
+		drop_JobStateWAget(id1,value1);
+	};
 };
 
 //アイテムボックス開封
@@ -2974,65 +2958,62 @@ var arr2 = $dataItems[itemId].meta['ItemBag'].split(',');
 var id2 = arr2[Math.floor(Math.random() * arr2.length)];
   for (var id3 = 0; id3 <= id2; id3++) {
     var id12 = arr1[Math.floor(Math.random() * arr1.length)];
-    if(id12 == 0){valueItems = $dataItems};
-    if(id12 == 1){valueItems = $dataWeapons};
-    if(id12 == 2){valueItems = $dataArmors};
+    if(id12 == 0){valueItems = $dataItems}
+    else if(id12 == 1){valueItems = $dataWeapons}
+    else if(id12 == 2){valueItems = $dataArmors};
+	
     if($dataItems[itemId].meta['HentaiBox']){
       valueItems = $dataItems;
       var value20 = $dataItems[itemId].meta['SeiyokuItem'];
     };
-      if(valueItems == $dataArmors){
-        var end = valueArmorsLength;
-      } else {
-        var end = valueItems.length-1;
-      };
-      var arr12 = [0];
-        for (var i = 1; i <= end; i++) {
-          var value19 = 0;
-          if(valueItems[i].meta['GatchaOutOfRange']){
-            value19 += 1;
-          };
-          if(valueItems[i].meta['Max Item']){
-            if(Number(valueItems[i].meta['Max Item']) == 1 && $gameParty.hasItem(valueItems[i])){
-            value19 += 1;
-          }};
-            if(value19 == 0){
-              if($dataItems[itemId].meta['HentaiBox']){
-                var value20 = $dataItems[i].meta['SeiyokuItem'];
-              };
-              if(valueItems[i].meta['LotteryRearity'] && value20){
-                var value11 = Number(valueItems[i].meta['LotteryRearity']);
-                  var list = $dataItems[itemId].meta['ItemBagRearity'].split(',');
-                  list.forEach(function(id11) {
-                    if(id11 == value11){
-                      for (var j = 10; j >= value11; j--) {
-                        arr12.push(i);
-                      };
-                    };
-                  }, this);
-              };
-            };
-        };
-          valueDropItems = Number(arr12[Math.floor(Math.random() * arr12.length)]);
-            if(valueDropItems >= 1){
-              var value16 = 1;
-              if(id12 == 0){
-                if(valueItems[valueDropItems].price <= 1000){var value16 = Math.floor( Math.random() * 6) + 1};
-                if(valueItems[valueDropItems].price <= 10000){var value16 = Math.floor( Math.random() * 3) + 1};
-                if(valueItems[valueDropItems].price == 0){var value16 = 1};
-              };
-              $gameParty.gainItem(valueItems[valueDropItems], value16);
-              valueItemBoxOpen += `[\x1bI[${valueItems[valueDropItems].iconIndex}]${valueItems[valueDropItems].name}×${value16}]`;
-              value17 += 1;
-              if((value17 %3) == 0){valueItemBoxOpen += `\n`};
-            };
+	
+	var end = valueItems == $dataArmors ? valueArmorsLength : valueItems.length-1;	
+	var arr12 = [0];
+	for (var i = 1; i <= end; i++) {
+		var value19 = 0;
+		var item = valueItems[i];
+		if(item.meta['GatchaOutOfRange']){
+			value19 += 1;
+		};
+		if(item.meta['Max Item']){
+			if(Number(item.meta['Max Item']) == 1 && $gameParty.hasItem(item)){
+				value19 += 1;
+			};
+		};
+		if(value19 == 0){
+			if($dataItems[itemId].meta['HentaiBox']){
+				var value20 = $dataItems[i].meta['SeiyokuItem'];
+			};
+			if(item.meta['LotteryRearity'] && value20){
+				var value11 = Number(item.meta['LotteryRearity']);
+				var list = $dataItems[itemId].meta['ItemBagRearity'].split(',');
+				list.forEach(function(id11) {
+					if(id11 !== value11) continue;
+					
+					for (var j = 10; j >= value11; j--) {
+						arr12.push(i);
+					};
+				}, this);
+			};
+		};
+	};
+	  valueDropItems = Number(arr12[Math.floor(Math.random() * arr12.length)]);
+		if(valueDropItems >= 1){
+		  var dropItem = valueItems[valueDropItems];
+		  var value16 = 1;
+		  if(id12 == 0){
+			if(dropItem.price <= 1000){var value16 = Math.floor( Math.random() * 6) + 1};
+			if(dropItem.price <= 10000){var value16 = Math.floor( Math.random() * 3) + 1};
+			if(dropItem.price == 0){var value16 = 1};
+		  };
+		  $gameParty.gainItem(dropItem, value16);
+		  valueItemBoxOpen += `[\x1bI[${dropItem.iconIndex}]${dropItem.name}×${value16}]`;
+		  value17 += 1;
+		  if((value17 %3) == 0){valueItemBoxOpen += `\n`};
+		};
     };
     WindowManager.show(0, 0, 0, 1280, 290);
-    if(value17 == 0){
-      WindowManager.drawText(0, `${valueItemBoxOpen}中身は空だった…。`);
-    } else {
-      WindowManager.drawText(0, `${valueItemBoxOpen}`);
-    };
+	WindowManager.drawText(0, value17 == 0 ? `${valueItemBoxOpen}中身は空だった…。` : `${valueItemBoxOpen}`);
   };
 };
 
