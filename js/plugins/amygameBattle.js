@@ -2608,22 +2608,23 @@ var end = Number(arr2[Math.floor(Math.random() * arr2.length)]);
   for (var i = start; i <= end; i++) {
     var value1 = Number(arr1[Math.floor(Math.random() * arr1.length)]);
     if(value1 == 0){var value1 = 1};
+	
     var value8 = Number(arr3[Math.floor(Math.random() * arr3.length)]);
     value2 += Math.round($dataEnemies[value8].exp * (1 + (value1 - 1) * value4) + (value5 * (value1 - 1)));
     value3 += Math.round($dataEnemies[value8].gold * (1 + (value1 - 1) * value6) + (value7 * (value1 - 1)));
     enemy_dropSelection(actor1);
-      drop_probabilityCalculation(value1);
-        if(value13 >= 90){
-          drop_enemyDropRate(0,arr4);//計算のみ。計算結果はarr4に蓄積。
-          drop_genericDropRate(0,arr4);//valueDropItemsに格納
-            var value1 = `\\C[24]\x1bI[${$dataItems[valueDropItems].iconIndex}]${$dataItems[valueDropItems].name}\\C[0]を獲得した。\n`;
-            valueWordSet1 += `${value1}`;
-            $gameSystem.pushInfoLog(value1);
-            //CommonPopupManager.showInfo({},`\\C[24]\x1bI[${$dataItems[valueDropItems].iconIndex}]${$dataItems[valueDropItems].name}\\C[0]を獲得した。`,null);
-            $gameParty.gainItem($dataItems[valueDropItems], 1);
-        };
-
+    drop_probabilityCalculation(value1);
+	if(value13 < 90) continue;
+	
+	drop_enemyDropRate(0,arr4);//計算のみ。計算結果はarr4に蓄積。
+	drop_genericDropRate(0,arr4);//valueDropItemsに格納
+	var value1 = `\\C[24]\x1bI[${$dataItems[valueDropItems].iconIndex}]${$dataItems[valueDropItems].name}\\C[0]を獲得した。\n`;
+	valueWordSet1 += `${value1}`;
+	$gameSystem.pushInfoLog(value1);
+	//CommonPopupManager.showInfo({},`\\C[24]\x1bI[${$dataItems[valueDropItems].iconIndex}]${$dataItems[valueDropItems].name}\\C[0]を獲得した。`,null);
+	$gameParty.gainItem($dataItems[valueDropItems], 1);
   };
+  
 var value1 = `\\C[2]BattleResult!\\C[0]\n経験値\\C[10]${value2}\\C[0]、\\C[14]${value3}\\C[0]\\Gを入手！ JPを1獲得した。`;
 $gameSystem.pushInfoLog(value1);
 valueWordSet2 = `${value1}\n`;
@@ -2846,24 +2847,27 @@ drop_enemyDropRate = function(value12,arr4){
     var value11 = Number(arrdrop1[Math.floor(Math.random() * arrdrop1.length)]);
     var value18 = Number(arrdrop3[Math.floor(Math.random() * arrdrop3.length)]);
 
-    for (var i = 1; i <= $dataItems.length-1; i++) {
-            if($dataEnemies[value18].meta['Conditional Item ' + i + ' Drop']){
-              if($dataItems[i].meta['LotteryRearity']){
-                var value19 = Number($dataItems[i].meta['LotteryRearity']);
-                  if(value19 == 1){var value20 = 1};
-                  if(value19 == 2){var value20 = 1};
-                  if(value19 == 3){var value20 = 10};
-                  if(value19 == 4){var value20 = 20};
-                  if(value19 == 5){var value20 = 30};
-                  if(value19 == 6){var value20 = 30};
-                  if(value19 == 7){var value20 = 40};
-                  if(value19 == 8){var value20 = 40};
-                  if(value19 == 9){var value20 = 50};
-                  if(value19 == 10){var value20 = 50};
-                    if(value11 >= value20){
-                      arr4.push(i);
-     }}}};
+    var dataItemsLength = $dataItems.length;
+    for (var i = 1; i < dataItemsLength; i++) {
+		if(!$dataEnemies[value18].meta['Conditional Item ' + i + ' Drop']) continue;
+		
+		var dataItemsI = $dataItems[i];
+		if(!dataItemsI.meta['LotteryRearity']) continue;
+		
+		var value19 = Number(dataItemsI.meta['LotteryRearity']);
+		if(value19 == 1){var value20 = 1}
+		else if(value19 == 2){var value20 = 1}
+		else if(value19 == 3){var value20 = 10}
+		else if(value19 == 4){var value20 = 20}
+		else if(value19 == 5){var value20 = 30}
+		else if(value19 == 6){var value20 = 30}
+		else if(value19 == 7){var value20 = 40}
+		else if(value19 == 8){var value20 = 40}
+		else if(value19 == 9){var value20 = 50}
+		else if(value19 == 10){var value20 = 50};
 
+		if(value11 >= value20){ arr4.push(i); };
+	};
 };
 
 //ジョブステートエネミーorジョブ持ち追いはぎスクリプト
