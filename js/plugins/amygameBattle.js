@@ -2618,11 +2618,11 @@ var end = Number(arr2[Math.floor(Math.random() * arr2.length)]);
 	
 	drop_enemyDropRate(0,arr4);//計算のみ。計算結果はarr4に蓄積。
 	drop_genericDropRate(0,arr4);//valueDropItemsに格納
-	var value1 = `\\C[24]\x1bI[${$dataItems[valueDropItems].iconIndex}]${$dataItems[valueDropItems].name}\\C[0]を獲得した。\n`;
+	var item = $dataItems[valueDropItems];
+	var value1 = `\\C[24]\x1bI[${item.iconIndex}]${item.name}\\C[0]を獲得した。\n`;
 	valueWordSet1 += `${value1}`;
 	$gameSystem.pushInfoLog(value1);
-	//CommonPopupManager.showInfo({},`\\C[24]\x1bI[${$dataItems[valueDropItems].iconIndex}]${$dataItems[valueDropItems].name}\\C[0]を獲得した。`,null);
-	$gameParty.gainItem($dataItems[valueDropItems], 1);
+	$gameParty.gainItem(item, 1);
   };
   
 var value1 = `\\C[2]BattleResult!\\C[0]\n経験値\\C[10]${value2}\\C[0]、\\C[14]${value3}\\C[0]\\Gを入手！ JPを1獲得した。`;
@@ -2774,8 +2774,7 @@ drop_walletItemBoxGet = function(value12,id12){
 		
 		var list = dataItemsI.meta['DropRate'].split(',');
 		list.forEach(function(id11) {
-			if(id11 !== value11) continue;						
-			arr12.push(i);						
+			if(id11 === value11) arr12.push(i);
 		}, this);
 	};
 	
@@ -2811,15 +2810,16 @@ drop_genericDropRate = function(value12,arr12){
 		if(!itemDropRate) continue;
 
 		var value15 = 1;
-		var list = $dataItems[value14].meta['DropRate'].split(',');
 		var itemDropLottery = $dataItems[value14].meta['DropLottery'];
+		var list = $dataItems[value14].meta['DropRate'].split(',');
 		list.forEach(function(id11) {
-			if(id11 !== value11) continue;
-			if(itemDropLottery) value15 = Number(itemDropLottery);
-			
-			for (var j = 1; j <= value15; j++) {
-			  arr12.push(value14);
-			};
+			if(id11 === value11){
+				if(itemDropLottery) value15 = Number(itemDropLottery);
+				
+				for (var j = 1; j <= value15; j++) {
+				  arr12.push(value14);
+				};
+			}
 		}, this);
 	};
 	valueDropItems = Number(arr12[Math.floor(Math.random() * arr12.length)]);
@@ -2880,7 +2880,7 @@ drop_JobStateWAget = function(id11,value10){
 	
 	var value11 = Number(valueClassState[0]);//使ってない＿？
 	var value14 = Math.round(valueEnemyLevel / 10);
-	if(value14 == 0){value14 = 1};
+	if(value14 == 0){value14 = 1}
 	else if(value14 >= 11){value14 = 10};
 	
 	var end = id11 == 2 ? valueArmorsLength : $dataWeapons.length-1;
@@ -2988,11 +2988,11 @@ var id2 = arr2[Math.floor(Math.random() * arr2.length)];
 				var value11 = Number(item.meta['LotteryRearity']);
 				var list = $dataItems[itemId].meta['ItemBagRearity'].split(',');
 				list.forEach(function(id11) {
-					if(id11 !== value11) continue;
-					
-					for (var j = 10; j >= value11; j--) {
-						arr12.push(i);
-					};
+					if(id11 === value11){
+						for (var j = 10; j >= value11; j--) {
+							arr12.push(i);
+						};
+					};					
 				}, this);
 			};
 		};
