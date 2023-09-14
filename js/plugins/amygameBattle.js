@@ -3155,8 +3155,10 @@ attack_DamageFormula = function (user, target, id1) {
         amygame_elementIcon(elementId);
 
         var isValidCondition = actorAmplifyRate !== 100 && elementRate !== 100;
-        if (isValidCondition) {
-            elementInfo += `\x1bI[${valueElementIconArr[1]}]:${actorAmplifyRate}-${elementRate} `;
+        var valueElementIcon = valueElementIconArr[1];
+        var isValidCondition2 = valueElementIcon !== 1 && valueElementIcon !== 16;
+        if (isValidCondition && isValidCondition2) {
+            elementInfo += `\x1bI[${valueElementIcon}]:${actorAmplifyRate}-${elementRate} `;
         }
     }
 
