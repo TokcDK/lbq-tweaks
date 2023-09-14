@@ -3120,47 +3120,59 @@ party_SoroCombiAddRemove = function () {
 
 //特殊なステートの時にダメージの計算式をバトルログに出力。
 attack_DamageFormula = function (user, target, id1) {
-
     if ($gameSwitches.value(141)) {
-        Math.max($attack1(Number($dataSkills[id1].meta['DamageFormula2'].split(',')[0]), user, target,
-            Number($dataSkills[id1].meta['DamageFormula2'].split(',')[1])) *
-            Number($dataSkills[id1].meta['DamageFormula2'].split(',')[2]), user.mdf / 10);
-        var value1 = damage;
-        var value5 = `基礎ダメージ値:\\C[10]${value1}\\C[0]`;
-        BattleManager._logWindow.push(`addText`, value5);
-        var arr1 = user.attackElements();
-        if ($dataSkills[id1].meta['Multiple Elements']) {
-            var arr2 = $dataSkills[id1].meta['Multiple Elements'].split(',');
-            var arr1 = arr1.concat(arr2);
-        };
-        var value6 = $dataSkills[1].damage.elementId;
-        if (value6 >= 1) {
-            arr1.push(value6);
-        };
-        for (var i = 0; i <= arr1.length - 1; i++) {
-            var value2 = arr1[i];
-            var value3 = Math.round(valueAttackAmplifysActorId[user.actorId()][value2]);
-            var value3 = value3 + Math.round(user.elementAmplifyRate(value2) * 100 + 100);
-            var value4 = Math.round(target.elementRate(value2) * 100);
-            var value5 = `[属性] `;
-            amygame_elementIcon(value2);
-            if (value3 != 100 || value4 != 100) {
-                if (valueElementIconArr[1] != 1 || valueElementIconArr[1] != 16) {
-                    value5 += `\x1bI[${valueElementIconArr[1]}]:${value3}-${value4} `;
-                }
-            };
-        };
-        if (value5 != `[属性] `) {
-            BattleManager._logWindow.push(`addText`, value5);
-        };
-        if (target.result().critical) {
-            var value5 = `[会心発生！] 倍率${user.criticalMultiplierBonus() * 100}%`;
-            BattleManager._logWindow.push(`addText`, value5);
-        };
-        var value5 = `[分散値] ${$dataSkills[id1].damage.variance}`;
-        BattleManager._logWindow.push(`addText`, value5);
-    };
+        var formulaData = $dataSkills[id1].meta['DamageFormula2'].split(',');
+        var coeff1 = Number(formulaData[0]);
+        var coeff2 = Number(formulaData[1]);
+        var coeff3 = Number(formulaData[2]);
 
+        var getDamage = function () {
+            return Math.max($attack1(coeff1, user, target, coeff2) * coeff3, user.mdf / 10);
+        };
+
+        var damage = getDamage();
+        var baseDamageText = `基礎ダメージ値: \\C[10]${damage}\\C[0]`;
+        BattleManager._logWindow.push('addText', baseDamageText);
+
+        var attackElements = user.attackElements();
+        var multipleElements = $dataSkills[id1].meta['Multiple Elements'];
+        if (multipleElements) {
+            var extraElements = multipleElements.split(',');
+            attackElements = attackElements.concat(extraElements);
+        }
+        var skillElementId = $dataSkills[1].damage.elementId;
+        if (skillElementId >= 1) {
+            attackElements.push(skillElementId);
+        }
+
+        for (var i = 0; i < attackElements.length; i++) {
+            var elementId = attackElements[i];
+            var actorAmplifyRate = Math.round(valueAttackAmplifysActorId[user.actorId()][elementId]);
+            actorAmplifyRate += Math.round(user.elementAmplifyRate(elementId) * 100 + 100);
+            var elementRate = Math.round(target.elementRate(elementId) * 100);
+            var elementInfo = `[属性] `;
+            amygame_elementIcon(elementId);
+
+            var isValidCondition = actorAmplifyRate !== 100 && elementRate !== 100;
+            if (isValidCondition) {
+                elementInfo += `\x1bI[${valueElementIconArr[1]}]:${actorAmplifyRate}-${elementRate} `;
+            }
+        }
+
+        if (elementInfo !== `[属性] `) {
+            BattleManager._logWindow.push('addText', elementInfo);
+        }
+
+        if (target.result().critical) {
+            var criticalMultiplier = user.criticalMultiplierBonus() * 100;
+            var criticalInfo = `[会心発生！] 倍率${criticalMultiplier}%`;
+            BattleManager._logWindow.push('addText', criticalInfo);
+        }
+
+        var variance = $dataSkills[id1].damage.variance;
+        var varianceText = `[分散値] ${variance}`;
+        BattleManager._logWindow.push('addText', varianceText);
+    }
 };
 
 //ボス行動パターン設定
