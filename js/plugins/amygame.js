@@ -2043,7 +2043,7 @@ if($gameVariables.value(230) >= 1){
 };
 if($gameVariables.value(240) >= 1){
   var value = $dataItems[$gameVariables.value(240)];
-  if($gameVariables.value(240) == $gameVariables.value(237)[2] && $gameVariables.value(237)[0] == 2){
+  if($gameVariables.value(240) == $gameVariables.value(237)[1] && $gameVariables.value(237)[0] == 2){
     $gameSwitches.setValue(216,true);
   } else {
     $gameVariables.setValue(237,[2,$gameVariables.value(240)]);
@@ -3143,10 +3143,10 @@ if(id13 >= 1){
     };
     var value7 = arr[Math.floor(Math.random() * arr.length)];
     //ガチャ称号取得でＵＲ，ＬＲ解放
-    if(!$gameParty.hasItem(657) && value7 >= 9){
+    if(!$gameParty.hasItem($dataItems[657],true) && value7 >= 9){
       var value7 = 8;
     };
-    if(!$gameParty.hasItem(656) && value7 >= 8){
+    if(!$gameParty.hasItem($dataItems[656],true) && value7 >= 8){
       var value7 = 7;
     };
 };
@@ -5621,7 +5621,7 @@ for (var i = 0; i < $gameVariables.value(520).length; i++) {
 if(value1 == 0){
   for (var i = 0; i < $gameVariables.value(520).length; i++) {
     if($gameVariables.value(520)[i] >= 1){
-      var value2 = i;
+      var value2 = $gameVariables.value(520)[i];
       $gameVariables.setValue(20,value2);
       var actor = $gameActors.actor($gameVariables.value(20));
       if($dataActors[$gameVariables.value(20)].meta['MainCloth']){
@@ -5727,34 +5727,37 @@ if(id2 >= 20){
 annihilationItem_bonus = function(){
 
 if($dataItems[$gameVariables.value(240)].meta['TchestType']){
-  var arr1 = $dataItems[$gameVariables.value(240)].meta['TchestType'];
-  var arr2 = $dataItems[$gameVariables.value(240)].meta['Tchest'];
+  var arr1 = [];
+  var arr2 = [];
+  arr1.push($dataItems[$gameVariables.value(240)].meta['TchestType'].split(','));
+  arr2.push($dataItems[$gameVariables.value(240)].meta['Tchest'].split(','));
   if($dataItems[$gameVariables.value(240)].meta['firstAnnihilationItem']){
-    var arr3 = $dataItems[$gameVariables.value(240)].meta['firstAnnihilationItem'];
+    var arr3 = $dataItems[$gameVariables.value(240)].meta['firstAnnihilationItem'].split(',');
     arr1.push(Number(arr3[0]));
     arr2.push(Number(arr3[1]));
   };
   if($dataItems[$gameVariables.value(240)].meta['TchestOnly']){
-    var arr4 = $dataItems[$gameVariables.value(240)].meta['TchestOnly'];
+    var arr4 = $dataItems[$gameVariables.value(240)].meta['TchestOnly'].split(',');
     arr1.push(Number(arr4[3]));
     arr2.push(Number(arr4[4]));
   };
-  var value1 = Math.floor( Math.random() * arr1.length);
-  if(Number(arr1[value1]) == 0){var valueItems = $dataItems}; 
-  if(Number(arr1[value1]) == 1){var valueItems = $dataWeapons}; 
-  if(Number(arr1[value1]) == 2){var valueItems = $dataArmors};
-  $gameParty.gainItem(valueItems[Number(arr2[value1])], 1);
-  valueWordSet1 = `全滅ボーナスとして\\C[24]\x1bI[${valueItems[Number(arr2[value1])].iconIndex}]${valueItems[Number(arr2[value1])].name}\\C[0]を入手した！`;
+  var value1 = arr2[Math.floor(Math.random() * arr2.length)];
+  let index = arr2.findIndex(arr2 => arr2 == value1); 
+  if(Number(arr1[index]) == 0){var valueItems = $dataItems}; 
+  if(Number(arr1[index]) == 1){var valueItems = $dataWeapons}; 
+  if(Number(arr1[index]) == 2){var valueItems = $dataArmors};
+  $gameParty.gainItem(valueItems[Number(arr2[index])], 1);
+  valueWordSet1 = `全滅ボーナスとして\\C[24]\x1bI[${valueItems[Number(arr2[index])].iconIndex}]${valueItems[Number(arr2[index])].name}\\C[0]を入手した！`;
   if($dataItems[$gameVariables.value(240)].meta['TchestRere']){
-    if( Number(arr2[value1]) == Number($dataItems[$gameVariables.value(240)].meta['TchestRere']) ){
+    if( Number(arr2[index]) == Number($dataItems[$gameVariables.value(240)].meta['TchestRere']) ){
       $gameSwitches.setValue(439,true);
   }};
   if($dataItems[$gameVariables.value(240)].meta['firstAnnihilationItem']){
-    if( Number(arr2[value1]) == Number(arr3[1]) ){
+    if( Number(arr2[index]) == Number(arr3[1]) ){
       $gameSwitches.setValue(439,true);
   }};
   if($dataItems[$gameVariables.value(240)].meta['TchestOnly']){
-    if( Number(arr2[value1]) == Number(arr4[4]) ){
+    if( Number(arr2[index]) == Number(arr4[4]) ){
       $gameSwitches.setValue(439,true);
   }};
 };

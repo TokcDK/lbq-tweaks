@@ -693,7 +693,7 @@ var value1 = 1;
 if(valueRegionMapArray[value1] >= 1){ 
 //$gameVariables.value(334);//最大数
 //$gameVariables.value(335);//討伐数
-  if(!$gameVariables.value(216)){
+  if($gameSwitches.value(655) && !$gameSwitches.value(216)  && $gameVariables.value(335) >= $gameVariables.value(334)){
     $gameVariables.setValue(335,0);
   };
   if(id2 == 0){

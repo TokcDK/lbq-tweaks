@@ -713,30 +713,12 @@ if(value41 != 0){
   };
 } else {
 
-if($gameSwitches.value(435) && !$gameParty.hasItem($dataItems[i])){
+if($gameSwitches.value(value24 + i)){// || $gameSwitches.value(435) && !$gameParty.hasItem($dataItems[i])
   value10 += 1;
 
-  var value14 = `${valueSceneName1}\n${valueSceneDescription1}\n`;
-    var value15 = 1;
-    if(value10 >= 11){var value15 = 2};
-    if(value10 >= 21){var value15 = 3};
-    if(value10 >= 31){var value15 = 4};
-    if(value10 >= 41){var value15 = 6};
-    if(value10 >= 51){var value15 = 7};
-    if(value10 >= 61){var value15 = 8};
-    if(value10 >= 71){var value15 = 9};
-    if(value10 >= 81){var value15 = 10};
-    var value0 = `${value14}`;
-    eval("valueWordSet" + valueCountSet2 +" += value0");
-    valueCountSet1 += 1;
-    if((valueCountSet1 %10) == 0){
-      valueCountSet2 += 1;
-      eval("valueWordSet" + valueCountSet2 +" = value46");
-    };
-    $gameVariables.setValue(value25,$gameVariables.value(value25)+1);
 } else {
 
-if(!$gameSwitches.value(value24 + i) && value12 >= 1 && value31 == 0){
+if(value12 >= 1 && value31 == 0){
 
   if(value12 >= 1){
     if(id1 ==1){$gameSwitches.setValue(479,true)};

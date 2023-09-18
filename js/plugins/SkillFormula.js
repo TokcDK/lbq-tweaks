@@ -86,7 +86,7 @@ if(value1 == 17){//斧
     var def = b.def;
 };
 if(value1 == 18){//銃
-    var atk = a.dex * 1;
+    var atk = a.mdf * 1;
     var def = b.def;
 };
 if(value1 == 19){//弓
@@ -159,7 +159,7 @@ if(value1 == 31){
       var value2 = (atk + def) * level;
     } else {
       if(user.isActor() && value1 == 18 && $dataWeapons[user._equips[0]._itemId].meta['GunDamage']){
-        var value2 = (Number($dataWeapons[user._equips[0]._itemId].meta['GunDamage']) + (atk - def)) * level;
+        var value2 = Number($dataWeapons[user._equips[0]._itemId].meta['GunDamage']) + (atk - def) * level;
       } else {
         var value2 = (atk - def) * level;
       };

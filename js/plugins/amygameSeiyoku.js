@@ -243,7 +243,7 @@ $gameVariables.setValue(435,id4);
 $gameVariables.setValue(436,id5);
 $gameVariables.setValue(437,id6);
 $gameVariables.setValue(438,id7);
-$gameVariables.setValue(439,id8);
+$gameVariables.setValue(427,id8);
 
 };
 
@@ -861,8 +861,8 @@ list.forEach(function(i) {
       $gameVariables.value(value12) >= value15 &&
       $gameVariables.value(380 + $gameVariables.value(20))[value16] >= value19 &&
       $gameVariables.value(380 + $gameVariables.value(20))[value17] >= value20 &&
-      $gameVariables.value(380 + $gameVariables.value(20))[value18] >= value21 &&
-      id1 == 1){
+      $gameVariables.value(380 + $gameVariables.value(20))[value18] >= value21
+      ){
         actor.learnSkill(i);
         var value0 = `──\\C[2]H-Passive\\C[0]\\C[27]\x1bSIN[${i}]\\C[0]Expression…──\n`;
         value0 += `${$dataSkills[i].description}\\C[0]\n`;
@@ -905,7 +905,9 @@ if(valueHskillLearnArr != 0 && id1 == 1){
       };
   };
 };
+if(id1 == 1){
 hskill_learn2();
+};
 
 };
 
@@ -2062,21 +2064,36 @@ seiyoku_parameterReset = function(id1){
 
 var actor = $gameActors.actor($gameVariables.value(20));
 if(id1 == 1){//選択肢作成
+  var start = 401; var end = 440;
+  for (var i = start; i <= end; i++) {
+    if(i != 405){
+      if(i >= 401 && i <= 430){
+        $gameVariables.setValue(i,$gameVariables.value($gameVariables.value(20)+380)[i-400]);
+      } else {
+        $gameVariables.setValue(i,actor.skillMasteryLevel(i-380));
+        if(!actor.isLearnedSkill(i-380)){$gameVariables.setValue(i,0)};
+      };
+  }};
   const id = 1;
   const choiceParams = {
-  text: `${actor.name()}の遍歴を一括で未経験に変更　　　　　　　　　　　　　　　　　　`,value: 0};
+  text: `一括で未経験に変更　　　　　　　　　　　　　　　　　　`,
+  value: 0};
   $gameSystem.addCustomChoice(id, choiceParams);
-  for (var i = 401; i <= 440; i++) {//431-439経験値
-    var value3 = $dataSystem.variables[i];
-    var value3 = value3.replace("　", "");
-    var value3 = value3.replace("　", "");
-    var value3 = value3.replace("　", "");
-    var value3 = value3.replace(" ", "");
-    var value3 = `${value3}${$gameVariables.value(i)}`;
-    const id = 1; 
-    const choiceParams = {
-    text: value3 ,value: i};
-    $gameSystem.addCustomChoice(id, choiceParams);
+  for (var i = 401; i <= 439; i++) {//431-439経験値
+    //if(i != 402 || i != 403 || i != 404 || i != 405 || i != 428 || i != 429){
+if( [402,403,404,405,428,429].some(function(id2){return id2 == i}) ){}else{
+      var value3 = $dataSystem.variables[i];
+    //var value3 = value3.replace("　", "");
+    //var value3 = value3.replace("　", "");
+    //var value3 = value3.replace("　", "");
+    //var value3 = value3.replace(" ", "");
+      var value3 = `${value3}${$gameVariables.value(i)}`;
+      const id = 1; 
+      const choiceParams = {
+      text: value3,
+      value: i};
+      $gameSystem.addCustomChoice(id, choiceParams);
+    };
   };
 };
 if(id1 == 2){//反映
@@ -2085,10 +2102,11 @@ if(id1 == 2){//反映
   if($gameVariables.value(19) == 0){
     var start = 1; var end = 30;
   };
-  if($gameVariables.value(19) - 400 >= 1 && $gameVariables.value(19) - 400 <= 30){
+  if($gameVariables.value(19) == 0 || $gameVariables.value(19) - 400 >= 1 && $gameVariables.value(19) - 400 <= 30){
     for (var i = start; i <= end; i++) {
       if($gameVariables.value($gameVariables.value(20)+380)[i] >= 1){
         $gameVariables.value($gameVariables.value(20)+380)[i] = 0;
+        $gameVariables.setValue(i + 400,0)
         var value3 = $dataSystem.variables[i + 400];
         var value3 = value3.replace("　", "");
         var value3 = value3.replace("　", "");
@@ -2108,7 +2126,7 @@ if(id1 == 2){//反映
   if($gameVariables.value(19) == 0){
     var start = 31; var end = 40;
   };
-  if($gameVariables.value(19) - 400 >= 31 && $gameVariables.value(19) - 400 <= 40){
+  if($gameVariables.value(19) == 0 || $gameVariables.value(19) - 400 >= 31 && $gameVariables.value(19) - 400 <= 40){
     for (var i = start; i <= end; i++) {
       if(actor.isLearnedSkill(i + 20)){
         actor.setSkillMasteryUses(i + 20, 0);
@@ -2119,8 +2137,8 @@ if(id1 == 2){//反映
       };
     };
   };
-};
 hskill_learn(2);//該当するHスキル忘却
+};
 
 };
 

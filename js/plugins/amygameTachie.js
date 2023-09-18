@@ -1215,7 +1215,7 @@ if($gameVariables.value(207) == 101 || $gameVariables.value(207) >= 1 && $gameVa
   $gameVariables.setValue(value1+33,value11);
 
 //☆☆共通パーツ前段↓☆☆
-if(!actor.isStateAffected(22)){//右腕乳房露出時
+if(actor.isStateAffected(22) || actor.isLearnedSkill(66)){}else{//右腕乳房露出時
   if($gameVariables.value(value1+21) == 0 && $gameVariables.value(value1+23) <= 3 &&
   $gameVariables.value(value1+25) == 0 && $gameVariables.value(value1+11) == 0){
     $gameVariables.setValue(value1+9,4);
