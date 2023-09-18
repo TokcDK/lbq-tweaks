@@ -126,12 +126,12 @@ DataManager.processItemImageNotetags1 = function(group) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<(?:PICTURE):[ ](.*)>/i)) {
+      if (line.match(/<(?:PICTURE):\s*(.*)>/i)) {
         obj.pictureImg = String(RegExp.$1);
         obj.pictureHue = 0;
-      } else if (line.match(/<(?:PICTURE IMAGE|PICTURE NAME):[ ](.*)>/i)) {
+      } else if (line.match(/<(?:PICTURE IMAGE|PICTURE NAME):\s*(.*)>/i)) {
         obj.pictureImg = String(RegExp.$1);
-      } else if (line.match(/<(?:PICTURE HUE):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:PICTURE HUE):\s*(\d+)>/i)) {
         obj.pictureHue = parseInt(RegExp.$1).clamp(0, 360);
       }
     }

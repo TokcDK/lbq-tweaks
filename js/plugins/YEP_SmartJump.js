@@ -177,7 +177,7 @@ DataManager.isDatabaseLoaded = function() {
 
 DataManager.processJumpNotetags1 = function(group) {
   var note1a = /<(?:ILLEGAL JUMP):[ ]*(\d+(?:\s*,\s*\d+)*)>/i;
-  var note1b = /<(?:ILLEGAL JUMP):[ ](\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
+  var note1b = /<(?:ILLEGAL JUMP):\s*(\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
   for (var n = 1; n < group.length; n++) {
     var obj = group[n];
     var notedata = obj.note.split(/[\r\n]+/);

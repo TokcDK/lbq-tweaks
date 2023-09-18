@@ -300,7 +300,7 @@ DataManager.processECSNotetags = function() {
   $dataMap.regionStealth = Yanfly.Param.ECSRegions.slice();
   if (!$dataMap.note) return;
   var noteA = /<STEALTH REGIONS:[ ]*(\d+(?:\s*,\s*\d+)*)>/i;
-  var noteB = /<STEALTH REGIONS:[ ](\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
+  var noteB = /<STEALTH REGIONS:\s*(\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
   var notedata = $dataMap.note.split(/[\r\n]+/);
   for (var i = 0; i < notedata.length; i++) {
     var line = notedata[i];

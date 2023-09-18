@@ -305,17 +305,17 @@ DataManager.processTODNotetags1 = function(group, isActor) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<(?:TURN ORDER ICON|TURN ICON):[ ](\d+)>/i)) {
+      if (line.match(/<(?:TURN ORDER ICON|TURN ICON):\s*(\d+)>/i)) {
         obj.turnOrderIcon = parseInt(RegExp.$1);
-      } else if (line.match(/<(?:TURN ORDER BORDER COLOR):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:TURN ORDER BORDER COLOR):\s*(\d+)>/i)) {
         obj.turnOrderBorderColor = parseInt(RegExp.$1);
-      } else if (line.match(/<(?:TURN ORDER BACKGROUND COLOR):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:TURN ORDER BACKGROUND COLOR):\s*(\d+)>/i)) {
         obj.turnOrderBackgroundColor = parseInt(RegExp.$1);
-      } else if (line.match(/<CLASS[ ](\d+)[ ]TURN ORDER ICON:[ ](\d+)>/i)) {
+      } else if (line.match(/<CLASS[ ](\d+)[ ]TURN ORDER ICON:\s*(\d+)>/i)) {
         var classId = parseInt(RegExp.$1);
         var icon = parseInt(RegExp.$2);
         obj.turnOrderClassIcon[classId] = icon;
-      } else if (line.match(/<(.*)[ ]TURN ORDER ICON:[ ](\d+)>/i)) {
+      } else if (line.match(/<(.*)[ ]TURN ORDER ICON:\s*(\d+)>/i)) {
         var name = String(RegExp.$1).toUpperCase();
         var icon = parseInt(RegExp.$2);
         var classId = Yanfly.ClassIdRef[name];

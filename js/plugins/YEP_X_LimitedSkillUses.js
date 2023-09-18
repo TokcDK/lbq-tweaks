@@ -437,20 +437,20 @@ DataManager.processLSUNotetags1 = function(group) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<(?:LIMIT USES|LIMIT USE|LIMITED USE):[ ](\d+)>/i)) {
+      if (line.match(/<(?:LIMIT USES|LIMIT USE|LIMITED USE):\s*(\d+)>/i)) {
         obj.limitUses = parseInt(RegExp.$1);
         obj.isLimitedUse = true;
       } else if (line.match(/<(?:RECOVER ALL USES)>/i)) {
         obj.limitRecoverAllUses = true;
       } else if (line.match(/<(?:NOT RECOVER ALL USES)>/i)) {
         obj.limitRecoverAllUses = false;
-      } else if (line.match(/<(?:VICTORY USES RECOVER):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:VICTORY USES RECOVER):\s*(\d+)>/i)) {
         obj.limitBattleRecover[0] = parseInt(RegExp.$1);
-      } else if (line.match(/<(?:ESCAPE USES RECOVER):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:ESCAPE USES RECOVER):\s*(\d+)>/i)) {
         obj.limitBattleRecover[1] = parseInt(RegExp.$1);
-      } else if (line.match(/<(?:LOSE USES RECOVER):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:LOSE USES RECOVER):\s*(\d+)>/i)) {
         obj.limitBattleRecover[2] = parseInt(RegExp.$1);
-      } else if (line.match(/<(?:AFTER BATTLE USES RECOVER):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:AFTER BATTLE USES RECOVER):\s*(\d+)>/i)) {
         obj.limitBattleRecover[0] = parseInt(RegExp.$1);
         obj.limitBattleRecover[1] = parseInt(RegExp.$1);
         obj.limitBattleRecover[2] = parseInt(RegExp.$1);
@@ -482,13 +482,13 @@ DataManager.processLSUNotetags2 = function(group) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<GLOBAL LIMITED USES:[ ]([\+\-]\d+)>/i)) {
+      if (line.match(/<GLOBAL LIMITED USES:\s*([\+\-]\d+)>/i)) {
         obj.globalLimitedUses = parseInt(RegExp.$1);
-      } else if (line.match(/<STYPE[ ](\d+)[ ]LIMITED USES:[ ]([\+\-]\d+)>/i)) {
+      } else if (line.match(/<STYPE[ ](\d+)[ ]LIMITED USES:\s*([\+\-]\d+)>/i)) {
         obj.stypeLimitedUses[parseInt(RegExp.$1)] = parseInt(RegExp.$2);
-      } else if (line.match(/<SKILL[ ](\d+)[ ]LIMITED USES:[ ]([\+\-]\d+)>/i)) {
+      } else if (line.match(/<SKILL[ ](\d+)[ ]LIMITED USES:\s*([\+\-]\d+)>/i)) {
         obj.skillLimitedUses[parseInt(RegExp.$1)] = parseInt(RegExp.$2);
-      } else if (line.match(/<SKILL[ ](.*)[ ]LIMITED USES:[ ]([\+\-]\d+)>/i)) {
+      } else if (line.match(/<SKILL[ ](.*)[ ]LIMITED USES:\s*([\+\-]\d+)>/i)) {
         var name = String(RegExp.$1).toUpperCase();
         if (Yanfly.SkillIdRef[name]) {
           var id = Yanfly.SkillIdRef[name];
@@ -551,13 +551,13 @@ DataManager.processLSUNotetags3 = function(group) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<GLOBAL USE MAX:[ ]([\+\-]\d+)>/i)) {
+      if (line.match(/<GLOBAL USE MAX:\s*([\+\-]\d+)>/i)) {
         obj.globalUseMax = parseInt(RegExp.$1);
-      } else if (line.match(/<STYPE[ ](\d+)[ ]USE MAX:[ ]([\+\-]\d+)>/i)) {
+      } else if (line.match(/<STYPE[ ](\d+)[ ]USE MAX:\s*([\+\-]\d+)>/i)) {
         obj.stypeUseMax[parseInt(RegExp.$1)] = parseInt(RegExp.$2);
-      } else if (line.match(/<SKILL[ ](\d+)[ ]USE MAX:[ ]([\+\-]\d+)>/i)) {
+      } else if (line.match(/<SKILL[ ](\d+)[ ]USE MAX:\s*([\+\-]\d+)>/i)) {
         obj.skillUseMax[parseInt(RegExp.$1)] = parseInt(RegExp.$2);
-      } else if (line.match(/<SKILL[ ](.*)[ ]USE MAX:[ ]([\+\-]\d+)>/i)) {
+      } else if (line.match(/<SKILL[ ](.*)[ ]USE MAX:\s*([\+\-]\d+)>/i)) {
         var name = String(RegExp.$1).toUpperCase();
         if (Yanfly.SkillIdRef[name]) {
           var id = Yanfly.SkillIdRef[name];

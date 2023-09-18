@@ -619,13 +619,13 @@ DataManager.processCTBNotetagsC = function(group) {
 };
 
 DataManager.processCTBNotetags1 = function(group) {
-  var noteA1 = /<(?:CTB SPEED):[ ](\d+)>/i;
-  var noteA2 = /<(?:CTB SPEED):[ ]([\+\-]\d+)>/i;
-  var noteA3 = /<(?:CTB SPEED):[ ](\d+)([%％])>/i;
-  var noteA4 = /<(?:CTB SPEED):[ ]([\+\-]\d+)([%％])>/i;
-  var noteB1 = /<(?:CTB ORDER):[ ]([\+\-]\d+)>/i;
-  var noteS1 = /<(?:AFTER CTB):[ ](\d+)>/i;
-  var noteS2 = /<(?:AFTER CTB):[ ](\d+)([%％])>/i;
+  var noteA1 = /<(?:CTB SPEED):\s*(\d+)>/i;
+  var noteA2 = /<(?:CTB SPEED):\s*([\+\-]\d+)>/i;
+  var noteA3 = /<(?:CTB SPEED):\s*(\d+)([%％])>/i;
+  var noteA4 = /<(?:CTB SPEED):\s*([\+\-]\d+)([%％])>/i;
+  var noteB1 = /<(?:CTB ORDER):\s*([\+\-]\d+)>/i;
+  var noteS1 = /<(?:AFTER CTB):\s*(\d+)>/i;
+  var noteS2 = /<(?:AFTER CTB):\s*(\d+)([%％])>/i;
     for (var n = 1; n < group.length; n++) {
       var obj = group[n];
       var notedata = obj.note.split(/[\r\n]+/);
@@ -690,10 +690,10 @@ DataManager.processCTBNotetags1 = function(group) {
 };
 
 DataManager.processCTBNotetags2 = function(group) {
-  var noteA1 = /<(?:CTB START):[ ]([\+\-]\d+)>/i;
-  var noteA2 = /<(?:CTB START):[ ]([\+\-]\d+)([%％])>/i;
-  var noteB1 = /<(?:CTB TURN):[ ]([\+\-]\d+)>/i;
-  var noteB2 = /<(?:CTB TURN):[ ]([\+\-]\d+)([%％])>/i;
+  var noteA1 = /<(?:CTB START):\s*([\+\-]\d+)>/i;
+  var noteA2 = /<(?:CTB START):\s*([\+\-]\d+)([%％])>/i;
+  var noteB1 = /<(?:CTB TURN):\s*([\+\-]\d+)>/i;
+  var noteB2 = /<(?:CTB TURN):\s*([\+\-]\d+)([%％])>/i;
   for (var n = 1; n < group.length; n++) {
     var obj = group[n];
     var notedata = obj.note.split(/[\r\n]+/);
@@ -742,17 +742,17 @@ DataManager.processCTBNotetags3 = function(group, isActor) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<(?:CTB ICON):[ ](\d+)>/i)) {
+      if (line.match(/<(?:CTB ICON):\s*(\d+)>/i)) {
         obj.ctbIcon = parseInt(RegExp.$1);
-      } else if (line.match(/<(?:CTB BORDER COLOR):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:CTB BORDER COLOR):\s*(\d+)>/i)) {
         obj.ctbBorderColor = parseInt(RegExp.$1);
-      } else if (line.match(/<(?:CTB BACKGROUND COLOR):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:CTB BACKGROUND COLOR):\s*(\d+)>/i)) {
         obj.ctbBackgroundColor = parseInt(RegExp.$1);
-      } else if (line.match(/<(?:CLASS)[ ](\d+)[ ](?:CTB ICON):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:CLASS)[ ](\d+)[ ](?:CTB ICON):\s*(\d+)>/i)) {
         var classId = parseInt(RegExp.$1);
         var icon = parseInt(RegExp.$2);
         obj.ctbClassIcon[classId] = icon;
-      } else if (line.match(/<(.*)[ ](?:CTB ICON):[ ](\d+)>/i)) {
+      } else if (line.match(/<(.*)[ ](?:CTB ICON):\s*(\d+)>/i)) {
         var name = String(RegExp.$1).toUpperCase();
         var icon = parseInt(RegExp.$2);
         var classId = Yanfly.ClassIdRef[name];

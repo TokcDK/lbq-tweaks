@@ -117,16 +117,16 @@ Game_Event.prototype.setupPage = function() {
 
 Game_Event.prototype.setupEventHitboxResizeNotetags = function() {
   if (this.event().note === '') return;
-  if (this.event().note.match(/<Hitbox (?:HEIGHT|UP):[ ](\d+)>/i)) {
+  if (this.event().note.match(/<Hitbox (?:HEIGHT|UP):\s*(\d+)>/i)) {
     this._addedHitboxUp = parseInt(RegExp.$1);
   }
-  if (this.event().note.match(/<Hitbox Left:[ ](\d+)>/i)) {
+  if (this.event().note.match(/<Hitbox Left:\s*(\d+)>/i)) {
     this._addedHitboxLeft = parseInt(RegExp.$1);
   }
-  if (this.event().note.match(/<Hitbox Right:[ ](\d+)>/i)) {
+  if (this.event().note.match(/<Hitbox Right:\s*(\d+)>/i)) {
     this._addedHitboxRight = parseInt(RegExp.$1);
   }
-  if (this.event().note.match(/<Hitbox Down:[ ](\d+)>/i)) {
+  if (this.event().note.match(/<Hitbox Down:\s*(\d+)>/i)) {
     this._addedHitboxDown = parseInt(RegExp.$1);
   }
 };
@@ -139,13 +139,13 @@ Game_Event.prototype.setupEventHitboxResizeCommentTags = function() {
   for (var i = 0; i < length; ++i) {
     var ev = list[i];
     if ([108, 408].contains(ev.code)) {
-      if (ev.parameters[0].match(/<Hitbox (?:HEIGHT|UP):[ ](\d+)>/i)) {
+      if (ev.parameters[0].match(/<Hitbox (?:HEIGHT|UP):\s*(\d+)>/i)) {
         this._addedHitboxUp = parseInt(RegExp.$1);
-      } else if (ev.parameters[0].match(/<Hitbox Left:[ ](\d+)>/i)) {
+      } else if (ev.parameters[0].match(/<Hitbox Left:\s*(\d+)>/i)) {
         this._addedHitboxLeft = parseInt(RegExp.$1);
-      } else if (ev.parameters[0].match(/<Hitbox Right:[ ](\d+)>/i)) {
+      } else if (ev.parameters[0].match(/<Hitbox Right:\s*(\d+)>/i)) {
         this._addedHitboxRight = parseInt(RegExp.$1);
-      } else if (ev.parameters[0].match(/<Hitbox Down:[ ](\d+)>/i)) {
+      } else if (ev.parameters[0].match(/<Hitbox Down:\s*(\d+)>/i)) {
         this._addedHitboxDown = parseInt(RegExp.$1);
       }
     }

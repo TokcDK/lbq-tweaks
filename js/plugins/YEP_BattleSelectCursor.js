@@ -200,9 +200,9 @@ DataManager.processBattleCursorNotetags1 = function(group, isActor) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<BATTLE SELECT CURSOR:[ ](.*)>/i)) {
+      if (line.match(/<BATTLE SELECT CURSOR:\s*(.*)>/i)) {
         obj.battleSelectCursor = String(RegExp.$1);
-      } else if (line.match(/<BATTLE SELECT CURSOR ANCHOR X:[ ](.*)>/i)) {
+      } else if (line.match(/<BATTLE SELECT CURSOR ANCHOR X:\s*(.*)>/i)) {
         var text = String(RegExp.$1);
         if (text.match(/LEFT/i)) {
           obj.battleSelectCursorSettings.anchorX = 'left';
@@ -211,7 +211,7 @@ DataManager.processBattleCursorNotetags1 = function(group, isActor) {
         } else {
           obj.battleSelectCursorSettings.anchorX = 'center';
         }
-      } else if (line.match(/<BATTLE SELECT CURSOR ANCHOR Y:[ ](.*)>/i)) {
+      } else if (line.match(/<BATTLE SELECT CURSOR ANCHOR Y:\s*(.*)>/i)) {
         var text = String(RegExp.$1);
         if (text.match(/TOP/i)) {
           obj.battleSelectCursorSettings.anchorY = 'top';
@@ -220,7 +220,7 @@ DataManager.processBattleCursorNotetags1 = function(group, isActor) {
         } else {
           obj.battleSelectCursorSettings.anchorY = 'center';
         }
-      } else if (line.match(/<BATTLE SELECT CURSOR POSITION X:[ ](.*)>/i)) {
+      } else if (line.match(/<BATTLE SELECT CURSOR POSITION X:\s*(.*)>/i)) {
         var text = String(RegExp.$1);
         if (text.match(/LEFT/i)) {
           obj.battleSelectCursorSettings.posX = 'left';
@@ -229,7 +229,7 @@ DataManager.processBattleCursorNotetags1 = function(group, isActor) {
         } else {
           obj.battleSelectCursorSettings.posX = 'center';
         }
-      } else if (line.match(/<BATTLE SELECT CURSOR POSITION Y:[ ](.*)>/i)) {
+      } else if (line.match(/<BATTLE SELECT CURSOR POSITION Y:\s*(.*)>/i)) {
         var text = String(RegExp.$1);
         if (text.match(/TOP/i)) {
           obj.battleSelectCursorSettings.posY = 'top';

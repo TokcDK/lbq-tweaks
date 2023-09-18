@@ -312,7 +312,7 @@ DataManager.isDatabaseLoaded = function() {
 };
 
 DataManager.processESTierNotetags1 = function(group) {
-	var note1 = /<(?:SKILL TIER):[ ](\d+)>/i;
+	var note1 = /<(?:SKILL TIER):\s*(\d+)>/i;
 	for (var n = 1; n < group.length; n++) {
 		var obj = group[n];
 		var notedata = obj.note.split(/[\r\n]+/);
@@ -330,7 +330,7 @@ DataManager.processESTierNotetags1 = function(group) {
 };
 
 DataManager.processESTierNotetags2 = function(group) {
-	var note1 = /<(?:SKILL TIER)[ ](\d+)[ ](?:SLOTS|SLOT):[ ]([\+\-]\d+)>/i;
+	var note1 = /<(?:SKILL TIER)[ ](\d+)[ ](?:SLOTS|SLOT):\s*([\+\-]\d+)>/i;
 	for (var n = 1; n < group.length; n++) {
 		var obj = group[n];
 		var notedata = obj.note.split(/[\r\n]+/);

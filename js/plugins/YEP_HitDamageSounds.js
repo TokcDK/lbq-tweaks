@@ -761,7 +761,7 @@ DataManager.processHDSNotetags1 = function(group) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<HIT DAMAGE SOUND:[ ](.*)>/i)) {
+      if (line.match(/<HIT DAMAGE SOUND:\s*(.*)>/i)) {
         var data = String(RegExp.$1).split(',');
         obj.hitDamageSound = this.processHitDamageSoundData(data);
       }

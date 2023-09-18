@@ -257,8 +257,8 @@ DataManager.processElementNotetagsSys = function(group) {
 
 DataManager.processElementNotetags1 = function(group) {
   var noteA1 = /<MULTIPLE ELEMENTS:[ ]*(\d+(?:\s*,\s*\d+)*)>/i;
-  var noteA2 = /<MULTIPLE ELEMENTS:[ ](\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
-  var noteA3 = /<MULTIPLE ELEMENTS:[ ](.*)>/i;
+  var noteA2 = /<MULTIPLE ELEMENTS:\s*(\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
+  var noteA3 = /<MULTIPLE ELEMENTS:\s*(.*)>/i;
   for (var n = 1; n < group.length; n++) {
     var obj = group[n];
     var notedata = obj.note.split(/[\r\n]+/);
@@ -269,17 +269,17 @@ DataManager.processElementNotetags1 = function(group) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<MULTI-ELEMENT RULE:[ ]LOWEST>/i)) {
+      if (line.match(/<MULTI-ELEMENT RULE:[ ]*LOWEST>/i)) {
         obj.elementMultiRule = 0;
-      } else if (line.match(/<MULTI-ELEMENT RULE:[ ]ADD>/i)) {
+      } else if (line.match(/<MULTI-ELEMENT RULE:[ ]*ADD>/i)) {
         obj.elementMultiRule = 1;
-      } else if (line.match(/<MULTI-ELEMENT RULE:[ ]MULTIPLY>/i)) {
+      } else if (line.match(/<MULTI-ELEMENT RULE:[ ]*MULTIPLY>/i)) {
         obj.elementMultiRule = 2;
-      } else if (line.match(/<MULTI-ELEMENT RULE:[ ]HIGHEST>/i)) {
+      } else if (line.match(/<MULTI-ELEMENT RULE:[ ]*HIGHEST>/i)) {
         obj.elementMultiRule = 3;
-      } else if (line.match(/<MULTI-ELEMENT RULE:[ ]AVERAGE>/i)) {
+      } else if (line.match(/<MULTI-ELEMENT RULE:[ ]*AVERAGE>/i)) {
         obj.elementMultiRule = 4;
-      } else if (line.match(/<MULTI-ELEMENT RULE:[ ](.*)>/i)) {
+      } else if (line.match(/<MULTI-ELEMENT RULE:\s*(.*)>/i)) {
         obj.elementMultiRule = String(RegExp.$1);
       } else if (line.match(noteA1)) {
         var array = JSON.parse('[' + RegExp.$1.match(/\d+/g) + ']');
@@ -307,17 +307,17 @@ DataManager.processElementNotetags1 = function(group) {
 };
 
 DataManager.processElementNotetags2 = function(group) {
-  var noteA1 = /<(?:ELEMENT ABSORB):[ ](\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
-  var noteB1 = /<(?:ELEMENT REFLECT)[ ](\d+):[ ]([\+\-]\d+)([%％])>/i;
-  var noteB2 = /<(?:ELEMENT REFLECT)[ ](.*):[ ]([\+\-]\d+)([%％])>/i;
-  var noteC1 = /<(?:ELEMENT AMPLIFY)[ ](\d+):[ ]([\+\-]\d+)([%％])>/i;
-  var noteC2 = /<(?:ELEMENT AMPLIFY)[ ](.*):[ ]([\+\-]\d+)([%％])>/i;
-  var noteC3 = /<(?:ELEMENT MAGNIFY)[ ](\d+):[ ]([\+\-]\d+)([%％])>/i;
-  var noteC4 = /<(?:ELEMENT MAGNIFY)[ ](.*):[ ]([\+\-]\d+)([%％])>/i;
-  var noteD1 = /<FORCE ELEMENT[ ](\d+)[ ]RATE:[ ](\d+)([%％])>/i;
-  var noteD2 = /<FORCE ELEMENT[ ](\d+)[ ]RATE:[ ]-(\d+)([%％])>/i;
-  var noteD3 = /<FORCE ELEMENT[ ](.*)[ ]RATE:[ ](\d+)([%％])>/i;
-  var noteD4 = /<FORCE ELEMENT[ ](.*)[ ]RATE:[ ]-(\d+)([%％])>/i;
+  var noteA1 = /<(?:ELEMENT ABSORB):\s*(\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
+  var noteB1 = /<(?:ELEMENT REFLECT)[ ](\d+):\s*([\+\-]\d+)([%％])>/i;
+  var noteB2 = /<(?:ELEMENT REFLECT)[ ](.*):\s*([\+\-]\d+)([%％])>/i;
+  var noteC1 = /<(?:ELEMENT AMPLIFY)[ ](\d+):\s*([\+\-]\d+)([%％])>/i;
+  var noteC2 = /<(?:ELEMENT AMPLIFY)[ ](.*):\s*([\+\-]\d+)([%％])>/i;
+  var noteC3 = /<(?:ELEMENT MAGNIFY)[ ](\d+):\s*([\+\-]\d+)([%％])>/i;
+  var noteC4 = /<(?:ELEMENT MAGNIFY)[ ](.*):\s*([\+\-]\d+)([%％])>/i;
+  var noteD1 = /<FORCE ELEMENT[ ](\d+)[ ]RATE:\s*(\d+)([%％])>/i;
+  var noteD2 = /<FORCE ELEMENT[ ](\d+)[ ]RATE:[ ]*-(\d+)([%％])>/i;
+  var noteD3 = /<FORCE ELEMENT[ ](.*)[ ]RATE:\s*(\d+)([%％])>/i;
+  var noteD4 = /<FORCE ELEMENT[ ](.*)[ ]RATE:[ ]*-(\d+)([%％])>/i;
   for (var n = 1; n < group.length; n++) {
     var obj = group[n];
     var notedata = obj.note.split(/[\r\n]+/);
@@ -338,7 +338,7 @@ DataManager.processElementNotetags2 = function(group) {
         var range = Yanfly.Util.getRange(parseInt(RegExp.$1),
           parseInt(RegExp.$2));
         obj.elementAbsorb = obj.elementAbsorb.concat(range);
-      } else if (line.match(/<(?:ELEMENT ABSORB):[ ](.*)>/i)) {
+      } else if (line.match(/<(?:ELEMENT ABSORB):\s*(.*)>/i)) {
         var text = String(RegExp.$1);
         var array = text.split(',');
         var length = array.length;

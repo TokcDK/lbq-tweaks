@@ -182,7 +182,7 @@ DataManager.processStCNotetags1 = function(group) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<CATEGORY:[ ](.*)>/i)) {
+      if (line.match(/<CATEGORY:\s*(.*)>/i)) {
         obj.category.push(String(RegExp.$1).toUpperCase())
       }
     }
@@ -201,17 +201,17 @@ DataManager.processStCNotetags2 = function(group) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<REMOVE STATE CATEGORY:[ ](.*)>/i)) {
+      if (line.match(/<REMOVE STATE CATEGORY:\s*(.*)>/i)) {
         var category = String(RegExp.$1).toUpperCase().trim();
         obj.removeCategory[category] = 'ALL';
-      } else if (line.match(/<REMOVE[ ](\d+)[ ]STATE CATEGORY:[ ](.*)>/i)) {
+      } else if (line.match(/<REMOVE[ ](\d+)[ ]STATE CATEGORY:\s*(.*)>/i)) {
         var value = parseInt(RegExp.$1);
         var category = String(RegExp.$2).toUpperCase().trim();
         obj.removeCategory[category] = value;
-      } else if (line.match(/<CUSTOM REMOVE STATE CATEGORY:[ ](.*)>/i)) {
+      } else if (line.match(/<CUSTOM REMOVE STATE CATEGORY:\s*(.*)>/i)) {
         var evalMode = 'custom remove state category';
         var evalLine = '';
-      } else if (line.match(/<\/CUSTOM REMOVE STATE CATEGORY:[ ](.*)>/i)) {
+      } else if (line.match(/<\/CUSTOM REMOVE STATE CATEGORY:\s*(.*)>/i)) {
         var category = String(RegExp.$1).toUpperCase().trim();
         obj.removeCategory[category] = obj.removeCategory[category] || 1;
         obj.removeCategoryEval[category] = evalLine;

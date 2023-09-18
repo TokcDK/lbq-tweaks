@@ -487,14 +487,14 @@ DataManager.processISNotetagsA = function(group) {
 
 DataManager.processISNotetags1 = function(group, type) {
   var note1 = /<(?:ITEM RECIPE):[ ]*(\d+(?:\s*,\s*\d+)*)>/i;
-  var note2 = /<(?:ITEM RECIPE):[ ](\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
+  var note2 = /<(?:ITEM RECIPE):\s*(\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
   var note3 = /<(?:WEAPON RECIPE):[ ]*(\d+(?:\s*,\s*\d+)*)>/i;
-  var note4 = /<(?:WEAPON RECIPE):[ ](\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
+  var note4 = /<(?:WEAPON RECIPE):\s*(\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
   var note5 = /<(?:ARMOR RECIPE):[ ]*(\d+(?:\s*,\s*\d+)*)>/i;
-  var note6 = /<(?:ARMOR RECIPE):[ ](\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
+  var note6 = /<(?:ARMOR RECIPE):\s*(\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
   var note7 = /<(?:SYNTHESIS INGREDIENTS)>/i;
   var note8 = /<\/(?:SYNTHESIS INGREDIENTS)>/i;
-  var note9 = /<(?:MASK NAME):[ ](.*)>/i;
+  var note9 = /<(?:MASK NAME):\s*(.*)>/i;
   var note10a = /<(?:CUSTOM SYNTHESIS EFFECT)>/i;
   var note10b = /<\/(?:CUSTOM SYNTHESIS EFFECT)>/i;
   for (var n = 1; n < group.length; n++) {
@@ -547,13 +547,13 @@ DataManager.processISNotetags1 = function(group, type) {
         obj.maskName = String(RegExp.$1);
       } else if (gatherIngredients) {
         this.addSynthesisIngredient(obj, line);
-      } else if (line.match(/<(?:SYNTHESIS SE):[ ](.*)>/i)) {
+      } else if (line.match(/<(?:SYNTHESIS SE):\s*(.*)>/i)) {
         obj.synthSeName = String(RegExp.$1);
-      } else if (line.match(/<(?:SYNTHESIS VOLUME):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:SYNTHESIS VOLUME):\s*(\d+)>/i)) {
         obj.synthSeVol = parseInt(RegExp.$1);
-      } else if (line.match(/<(?:SYNTHESIS PITCH):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:SYNTHESIS PITCH):\s*(\d+)>/i)) {
         obj.synthSePitch = parseInt(RegExp.$1);
-      } else if (line.match(/<(?:SYNTHESIS PAN):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:SYNTHESIS PAN):\s*(\d+)>/i)) {
         obj.synthSePan = parseInt(RegExp.$1);
       } else if (line.match(note10a)) {
         evalMode = 'custom synthesis effect';
@@ -571,10 +571,10 @@ DataManager.addSynthesisIngredient = function(obj, line) {
     var ingType;
     var ingId;
     var ingValue = 1;
-    if (line.match(/GOLD:[ ](\d+)/i)) {
+    if (line.match(/GOLD:\s*(\d+)/i)) {
       obj.synthCost = parseInt(RegExp.$1);
       return;
-    } else if (line.match(/ITEM[ ](\d+):[ ](\d+)/i)) {
+    } else if (line.match(/ITEM[ ](\d+):\s*(\d+)/i)) {
       ingId = parseInt(RegExp.$1);
       ingType = 0;
       ingValue = parseInt(RegExp.$2);
@@ -582,7 +582,7 @@ DataManager.addSynthesisIngredient = function(obj, line) {
       ingId = parseInt(RegExp.$1);
       ingType = 0;
       ingValue = 1;
-    } else if (line.match(/WEAPON[ ](\d+):[ ](\d+)/i)) {
+    } else if (line.match(/WEAPON[ ](\d+):\s*(\d+)/i)) {
       ingId = parseInt(RegExp.$1);
       ingType = 1;
       ingValue = parseInt(RegExp.$2);
@@ -590,7 +590,7 @@ DataManager.addSynthesisIngredient = function(obj, line) {
       ingId = parseInt(RegExp.$1);
       ingType = 1;
       ingValue = 1;
-    } else if (line.match(/ARMOR[ ](\d+):[ ](\d+)/i)) {
+    } else if (line.match(/ARMOR[ ](\d+):\s*(\d+)/i)) {
       ingId = parseInt(RegExp.$1);
       ingType = 2;
       ingValue = parseInt(RegExp.$2);
@@ -598,7 +598,7 @@ DataManager.addSynthesisIngredient = function(obj, line) {
       ingId = parseInt(RegExp.$1);
       ingType = 2;
       ingValue = 1;
-    } else if (line.match(/(.*):[ ](\d+)/i)) {
+    } else if (line.match(/(.*):\s*(\d+)/i)) {
       var name = String(RegExp.$1).toUpperCase();
       ingValue = parseInt(RegExp.$2);
       if (Yanfly.ItemIdRef[name]) {

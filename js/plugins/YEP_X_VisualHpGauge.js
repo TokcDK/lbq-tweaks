@@ -294,15 +294,15 @@ DataManager.processVHGNotetags = function(group) {
 				obj.hideHpGauge = true;
 			} else if (line.match(/<(?:SHOW HP GAUGE)>/i)) {
 				obj.showHpGauge = true;
-			} else if (line.match(/<(?:HP GAUGE WIDTH):[ ](\d+)>/i)) {
+			} else if (line.match(/<(?:HP GAUGE WIDTH):\s*(\d+)>/i)) {
 				obj.hpGaugeWidth = parseInt(RegExp.$1);
-			} else if (line.match(/<(?:HP GAUGE HEIGHT):[ ](\d+)>/i)) {
+			} else if (line.match(/<(?:HP GAUGE HEIGHT):\s*(\d+)>/i)) {
 				obj.hpGaugeHeight = parseInt(RegExp.$1);
-			} else if (line.match(/<(?:HP GAUGE BACK COLOR):[ ](\d+)>/i)) {
+			} else if (line.match(/<(?:HP GAUGE BACK COLOR):\s*(\d+)>/i)) {
 				obj.hpGaugeBackColor = parseInt(RegExp.$1);
-			} else if (line.match(/<(?:HP GAUGE COLOR 1):[ ](\d+)>/i)) {
+			} else if (line.match(/<(?:HP GAUGE COLOR 1):\s*(\d+)>/i)) {
 				obj.hpGaugeColor1 = parseInt(RegExp.$1);
-			} else if (line.match(/<(?:HP GAUGE COLOR 2):[ ](\d+)>/i)) {
+			} else if (line.match(/<(?:HP GAUGE COLOR 2):\s*(\d+)>/i)) {
 				obj.hpGaugeColor2 = parseInt(RegExp.$1);
 			}
 		}
@@ -699,6 +699,7 @@ if (Imported.YEP_CoreEngine && Yanfly.Param.VHGThick) {
 Window_VisualHPGauge.prototype.drawGauge =
 function(dx, dy, dw, rate, color1, color2) {
     var color3 = this.gaugeBackColor();
+    if (Number.isNaN(rate)) rate = 0; // rate sometimes can be NaN in Yep_SkillMasteryLevels, add here in any case 
     var fillW = Math.floor(dw * rate).clamp(0, dw);
     var gaugeH = this.gaugeHeight();
     var gaugeY = dy + this.lineHeight() - gaugeH - 2;

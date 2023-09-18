@@ -244,7 +244,7 @@ DataManager.processItemCategoriesNotetags1 = function(group) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<MENU[ ](?:CATEGORY|CATEGORIES):[ ](.*)>/i)) {
+      if (line.match(/<MENU[ ](?:CATEGORY|CATEGORIES):\s*(.*)>/i)) {
         var str = String(RegExp.$1).split(',');
         var length = str.length;
         for (var s = 0; s < length; s++) {

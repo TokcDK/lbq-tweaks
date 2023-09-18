@@ -315,9 +315,9 @@ DataManager.isDatabaseLoaded = function() {
 };
 
 DataManager.processJPNotetags1 = function(group) {
-  var note1 = /<(?:STARTING JP):[ ](\d+)>/i;
-  var note2 = /<(?:CLASS)[ ](\d+)[ ](?:STARTING JP):[ ](\d+)>/i;
-	var note3 = /<(?:JP RATE):[ ](\d+)([%％])>/i;
+  var note1 = /<(?:STARTING JP):\s*(\d+)>/i;
+  var note2 = /<(?:CLASS)[ ](\d+)[ ](?:STARTING JP):\s*(\d+)>/i;
+	var note3 = /<(?:JP RATE):\s*(\d+)([%％])>/i;
 	for (var n = 1; n < group.length; n++) {
 		var obj = group[n];
 		var notedata = obj.note.split(/[\r\n]+/);
@@ -339,8 +339,8 @@ DataManager.processJPNotetags1 = function(group) {
 };
 
 DataManager.processJPNotetags2 = function(group) {
-  var note1 = /<(?:GAIN JP|JP GAIN):[ ](\d+)>/i;
-  var note2 = /<(?:TARGET GAIN JP|TARGET JP GAIN):[ ](\d+)>/i;
+  var note1 = /<(?:GAIN JP|JP GAIN):\s*(\d+)>/i;
+  var note2 = /<(?:TARGET GAIN JP|TARGET JP GAIN):\s*(\d+)>/i;
 	for (var n = 1; n < group.length; n++) {
 		var obj = group[n];
 		var notedata = obj.note.split(/[\r\n]+/);
@@ -360,7 +360,7 @@ DataManager.processJPNotetags2 = function(group) {
 };
 
 DataManager.processJPNotetags3 = function(group) {
-  var note1 = /<(?:JP):[ ](\d+)>/i;
+  var note1 = /<(?:JP):\s*(\d+)>/i;
 	for (var n = 1; n < group.length; n++) {
 		var obj = group[n];
 		var notedata = obj.note.split(/[\r\n]+/);
@@ -377,7 +377,7 @@ DataManager.processJPNotetags3 = function(group) {
 };
 
 DataManager.processJPNotetags4 = function(group) {
-  var note1 = /<(?:JP RATE):[ ](\d+)([%％])>/i;
+  var note1 = /<(?:JP RATE):\s*(\d+)([%％])>/i;
 	for (var n = 1; n < group.length; n++) {
 		var obj = group[n];
 		var notedata = obj.note.split(/[\r\n]+/);

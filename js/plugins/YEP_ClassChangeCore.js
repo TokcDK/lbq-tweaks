@@ -431,13 +431,13 @@ DataManager.processCCCNotetags1 = function(group) {
 
 DataManager.processCCCNotetags2 = function(group) {
   var note1a = /<(?:UNLOCK CLASS|unlock classes):[ ]*(\d+(?:\s*,\s*\d+)*)>/i;
-  var note1b = /<(?:UNLOCK CLASS|unlock classes):[ ](\d+)[ ](?:TO)[ ](\d+)>/i;
-  var note2a = /<(?:CLASS)[ ](\d+)[ ](?:CHARACTER|SPRITE):[ ](.*)[ ](\d+)>/i;
-  var note2b = /<(.*)[ ](?:CHARACTER|SPRITE):[ ](.*)[ ](\d+)>/i;
-  var note3a = /<(?:CLASS)[ ](\d+)[ ](?:FACE):[ ](.*)[ ](\d+)>/i;
-  var note3b = /<(.*)[ ](?:FACE):[ ](.*)[ ](\d+)>/i;
-  var note4a = /<(?:CLASS)[ ](\d+)[ ](?:BATTLER):[ ](.*)>/i;
-  var note4b = /<(.*)[ ](?:BATTLER):[ ](.*)>/i;
+  var note1b = /<(?:UNLOCK CLASS|unlock classes):\s*(\d+)[ ](?:TO)[ ](\d+)>/i;
+  var note2a = /<(?:CLASS)[ ](\d+)[ ](?:CHARACTER|SPRITE):\s*(.*)[ ](\d+)>/i;
+  var note2b = /<(.*)[ ](?:CHARACTER|SPRITE):\s*(.*)[ ](\d+)>/i;
+  var note3a = /<(?:CLASS)[ ](\d+)[ ](?:FACE):\s*(.*)[ ](\d+)>/i;
+  var note3b = /<(.*)[ ](?:FACE):\s*(.*)[ ](\d+)>/i;
+  var note4a = /<(?:CLASS)[ ](\d+)[ ](?:BATTLER):\s*(.*)>/i;
+  var note4b = /<(.*)[ ](?:BATTLER):\s*(.*)>/i;
   for (var n = 1; n < group.length; n++) {
     var obj = group[n];
     var notedata = obj.note.split(/[\r\n]+/);
@@ -510,7 +510,7 @@ DataManager.processCCCNotetags3 = function(group) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<(?:ICON):[ ](\d+)>/i)) {
+      if (line.match(/<(?:ICON):\s*(\d+)>/i)) {
         obj.iconIndex = parseInt(RegExp.$1);
       } else if (line.match(/<(?:HELP DESCRIPTION)>/i)) {
         descMode = true;
@@ -525,11 +525,11 @@ DataManager.processCCCNotetags3 = function(group) {
       } else if (line.match(/<\/(?:LEVEL UNLOCK REQUIREMENTS)>/i)) {
         evalMode = 'none';
       } else if (evalMode === 'level unlock requirements') {
-        if (line.match(/CLASS[ ](\d+):[ ]LEVEL[ ](\d+)/i)) {
+        if (line.match(/CLASS[ ](\d+):[ ]*LEVEL[ ](\d+)/i)) {
           var classId = parseInt(RegExp.$1);
           var level = parseInt(RegExp.$2);
           obj.levelUnlockRequirements[classId] = level;
-        } else if (line.match(/(.*):[ ]LEVEL[ ](\d+)/i)) {
+        } else if (line.match(/(.*):[ ]*LEVEL[ ](\d+)/i)) {
           var name = String(RegExp.$1).toUpperCase();
           var level = parseInt(RegExp.$2);
           var classId = Yanfly.ClassIdRef[name];
