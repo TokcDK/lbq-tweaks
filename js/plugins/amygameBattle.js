@@ -2561,7 +2561,7 @@ if(enemy.level >= valueMaxEnemyLv){
 
 //エネミー簡易討伐
 enemy_instantwin = function(){
-
+	
 var actor1 = $gameActors.actor(20);
 var value = $dataItems[$gameVariables.value(240)];
 var value2 = 0;
@@ -2576,8 +2576,8 @@ var arr1 = value.meta['EnemyLV'].split(',');
 var arr2 = value.meta['BattleEnemyPopC'].split(',');
 var arr3 = $gameVariables.value(220);
 actor1_setup1(value,arr1[Math.floor(Math.random() * arr1.length)]);
-//特殊ステート対応討伐カウント
-if($gameVariables.value(350) != 0){
+//特殊ステート対応討伐カウント // tweak: commented because no data change
+/* if($gameVariables.value(350) != 0){
   for (var i = 0; i <= $gameVariables.value(350).length-1; i++) {
     for (var j = 1; j <= valueSubjugationPoint.length-1; j++) {//討伐数カウント
       if($gameVariables.value(350)[i] == valueSubjugationPoint[j]){
@@ -2587,9 +2587,9 @@ if($gameVariables.value(350) != 0){
       };
     };
   };
-};
-//パッシブステート対応ドロップPopEnemy1
-for (var i = 1; i <= 9; i++) {
+}; */
+//パッシブステート対応ドロップPopEnemy1  // tweak: commented because no data change
+/* for (var i = 1; i <= 9; i++) {
   if(value.meta['PopEnemy' + i]){
     var arr5 = value.meta['PopEnemy' + i].split(',');
     var arr6 = $dataEnemies[Number(arr5[0])].meta['Passive State'].split(',');
@@ -2601,59 +2601,60 @@ for (var i = 1; i <= 9; i++) {
       };
     };
   };
-};
+}; */
 arr4 = [];
 var start = 1; 
 var end = Number(arr2[Math.floor(Math.random() * arr2.length)]);
   for (var i = start; i <= end; i++) {
-    var value1 = Number(arr1[Math.floor(Math.random() * arr1.length)]);
-    if(value1 == 0){var value1 = 1};
-    var value8 = Number(arr3[Math.floor(Math.random() * arr3.length)]);
-    value2 += Math.round($dataEnemies[value8].exp * (1 + (value1 - 1) * value4) + (value5 * (value1 - 1)));
-    value3 += Math.round($dataEnemies[value8].gold * (1 + (value1 - 1) * value6) + (value7 * (value1 - 1)));
+    var intValue1 = Number(arr1[Math.floor(Math.random() * arr1.length)]);
+    if(intValue1 == 0){intValue1 = 1};
+	const intValue1minus1 = intValue1 - 1;
+	const enemy = $dataEnemies[Number(arr3[Math.floor(Math.random() * arr3.length)])];
+    value2 += Math.round(enemy.exp * (1 + intValue1minus1 * value4) + (value5 * intValue1minus1));
+    value3 += Math.round(enemy.gold * (1 + intValue1minus1 * value6) + (value7 * intValue1minus1));
     enemy_dropSelection(actor1);
-      drop_probabilityCalculation(value1);
+      drop_probabilityCalculation(intValue1);
         if(value13 >= 90){
           drop_enemyDropRate(0,arr4);//計算のみ。計算結果はarr4に蓄積。
           drop_genericDropRate(0,arr4);//valueDropItemsに格納
-            var value1 = `\\C[24]\x1bI[${$dataItems[valueDropItems].iconIndex}]${$dataItems[valueDropItems].name}\\C[0]を獲得した。\n`;
-            valueWordSet1 += `${value1}`;
-            $gameSystem.pushInfoLog(value1);
+            var message = `\\C[24]\x1bI[${$dataItems[valueDropItems].iconIndex}]${$dataItems[valueDropItems].name}\\C[0]を獲得した。\n`;
+            valueWordSet1 += `${message}`;
+            $gameSystem.pushInfoLog(message);
             //CommonPopupManager.showInfo({},`\\C[24]\x1bI[${$dataItems[valueDropItems].iconIndex}]${$dataItems[valueDropItems].name}\\C[0]を獲得した。`,null);
             $gameParty.gainItem($dataItems[valueDropItems], 1);
         };
 
   };
-var value1 = `\\C[2]BattleResult!\\C[0]\n経験値\\C[10]${value2}\\C[0]、\\C[14]${value3}\\C[0]\\Gを入手！ JPを1獲得した。`;
-$gameSystem.pushInfoLog(value1);
-valueWordSet2 = `${value1}\n`;
-//CommonPopupManager.showInfo({},value1,null);
+var battleResultMessage = `\\C[2]BattleResult!\\C[0]\n経験値\\C[10]${value2}\\C[0]、\\C[14]${value3}\\C[0]\\Gを入手！ JPを1獲得した。`;
+$gameSystem.pushInfoLog(battleResultMessage);
+valueWordSet2 = `${battleResultMessage}\n`;
+//CommonPopupManager.showInfo({},battleResultMessage,null);
 $gameParty.battleMembers().forEach(function(actor) {
   actor.changeExp(actor.currentExp()+value2, false);
   if(actor.subclass()){actor.gainExpSubclass(value2)};
 });
 $gameParty.gainGold(value3);
-var value1 = 0;
-var value2 = 0;
+var dropCount = 0;
+var defeatsCount = 0;
 for (var i = 0; i <= valueWordSet1.length-1; i++) {
   if(valueWordSet1.charAt(i) == `\n`){
-    value1 += 1;
+    dropCount += 1;
   };
 };
 for (var i = 0; i <= valueWordSet3.length-1; i++) {
   if(valueWordSet3.charAt(i) == `\n`){
-    value2 += 1;
+    defeatsCount += 1;
   };
 };
-if(value1 + value2 <= 6){
+if(dropCount + defeatsCount <= 6){
   $gameVariables.setValue(701,`${valueWordSet2}${valueWordSet1}${valueWordSet3}`);
 } else {
   $gameVariables.setValue(701,`${valueWordSet2}`);
-  if(value1 >= 1){
-    $gameVariables.setValue(701,$gameVariables.value(701) + `ドロップ(\\C[2]+${value1}\\C[0])\n`);
+  if(dropCount >= 1){
+    $gameVariables.setValue(701,$gameVariables.value(701) + `ドロップ(\\C[2]+${dropCount}\\C[0])\n`);
   };
-  if(value2 >= 1){
-    $gameVariables.setValue(701,$gameVariables.value(701) + `討伐カウント(\\C[2]+${value2}\\C[0])`);
+  if(defeatsCount >= 1){
+    $gameVariables.setValue(701,$gameVariables.value(701) + `討伐カウント(\\C[2]+${defeatsCount}\\C[0])`);
   };
 };
 
@@ -2798,43 +2799,46 @@ drop_probabilityCalculation(value11);
 };
 
 //汎用ドロップ設定
-drop_genericDropRate = function(value12,arr12){
+drop_genericDropRate = function(value12, arr12) {
+  const gameVariable240 = $gameVariables.value(240);
+  let value11 = 1;
 
-if($gameVariables.value(240) >= 1){
-  var value = $dataItems[$gameVariables.value(240)];
-  if(value.meta.GenericDropRate){
-    var arr11 = value.meta.GenericDropRate.split(',');//直下のエネミー簡易討伐と採取物の設定で計算式同一
-    var value11 = Number(arr11[Math.floor(Math.random() * arr11.length)]);
-  } else {
-    var value11 = 1;
-  };
-} else {
-  var value11 = 1;
-};
+  if (gameVariable240 >= 1) {
+    const value = $dataItems[gameVariable240];
+    if (value.meta.GenericDropRate) {
+      const arr11 = value.meta.GenericDropRate.split(',');
+      value11 = Number(arr11[Math.floor(Math.random() * arr11.length)]);
+    }
+  }
 
-  for (var i = 0; i <= valueItemDropRate1.length-1; i++) {
-    var value14 = valueItemDropRate1[i];
-    var value15 = 1;
-    if(value12 == 0){
-      var value13 = !$dataItems[value14].meta['NoBattleDrop'];
-    } else {
-      var value13 = $gameSwitches.value(2);//常にオンのスイッチ
-    };
-    if($dataItems[value14].meta['DropRate'] && value13){
-      var list = $dataItems[value14].meta['DropRate'].split(',');
-      list.forEach(function(id11) {
-        if(id11 == value11){
-          if($dataItems[value14].meta['DropLottery']){
-            var value15 = Number($dataItems[value14].meta['DropLottery']);
-          };
-            for (var j = 1; j <= value15; j++) {
-              arr12.push(value14);
-            };
-        };
-      }, this);
-  }};
-    valueDropItems = Number(arr12[Math.floor(Math.random() * arr12.length)]);
+  const valueItemDropRate1Length = valueItemDropRate1.length;
+  for (let i = 0; i < valueItemDropRate1Length; i++) {
+    const value14 = valueItemDropRate1[i];
+    let value15 = 1;
+    const value13 = (value12 === 0)
+      ? !$dataItems[value14].meta['NoBattleDrop']
+      : $gameSwitches.value(2);
 
+    const itemDropRate = $dataItems[value14].meta['DropRate'];
+    if (itemDropRate && value13) {
+      const list = itemDropRate.split(',');
+
+      for (let id11 of list) {
+        if (id11 != value11) continue;
+
+        const itemDropLottery = $dataItems[value14].meta['DropLottery'];
+        if (itemDropLottery) {
+          value15 = Number(itemDropLottery);
+        }
+
+        for (let j = 1; j <= value15; j++) {
+          arr12.push(value14);
+        }
+      }
+    }
+  }
+
+  valueDropItems = Number(arr12[Math.floor(Math.random() * arr12.length)]);
 };
 
 //汎用ドロップエネミー対象設定ダンジョンのみ。計算のみ計算結果はarr4に蓄積。簡易討伐時
