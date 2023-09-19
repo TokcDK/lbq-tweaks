@@ -2742,60 +2742,59 @@ if(valueDropItems == 0 ){
 
 //汎用財布ドロップ設定
 drop_walletItemBoxGet = function(value12,id12){
+  const value3 = valueFootpadSkillId;
+  const arr12 = [];
+  const actor = $gameActors.actor($gameVariables.value(11));
+  let value13 = 100;
+  drop_probabilityCalculation(value13);
 
-var value3 = valueFootpadSkillId;
-var arr12 = []; 
-var actor = $gameActors.actor($gameVariables.value(11));
-var value11 = 100;
-drop_probabilityCalculation(value11);
-  if(actor.isLearnedSkill(value3) && actor.skillMasteryLevel(value3) >= 1){
-    value13 += actor.skillMasteryLevel(value3) * 3;
-  };
-    if(value13 >= 90){
+  if (!actor.isLearnedSkill(value3) || actor.skillMasteryLevel(value3) < 1) {
+    return;
+  }
 
-      if($gameVariables.value(240) >= 1){
-        var value = $dataItems[$gameVariables.value(240)];
-        if(value.meta.GenericDropRate){
-          var arr11 = value.meta.GenericDropRate.split(',');//直下のエネミー簡易討伐と採取物の設定で計算式同一
-          var value11 = Number(arr11[Math.floor(Math.random() * arr11.length)]);
-        } else {
-          var value11 = 1;
-        };
-      } else {
-        var value11 = value12;
-      };
+  value13 += actor.skillMasteryLevel(value3) * 3;
 
-        if(id12 == 1){
-          for (var i = 1; i <= $dataItems.length-1; i++) {
-            if($dataItems[i].meta['walletIn']){
-              var list = $dataItems[i].meta['DropRate'].split(',');
-                list.forEach(function(id11) {
-                  if(id11 == value11){
-                    arr12.push(i);
-                  };
-                }, this);
-            };
-          };
-        } else {
-          for (var i = 1; i <= $dataItems.length-1; i++) {
-            if($dataItems[i].meta['ItemBag']){
-              var list = $dataItems[i].meta['DropRate'].split(',');
-                list.forEach(function(id11) {
-                  if(id11 == value11){
-                    arr12.push(i);
-                  };
-                }, this);
-            };
-          };
-        };
-        var value2 = Math.floor( Math.random() * 3) + 1;
-        for (var i = 1; i <= value2; i++) {
-          var value1 = Number(arr12[Math.floor(Math.random() * arr12.length)]);
-          CommonPopupManager.showInfo({},`\\C[24]\x1bI[${$dataItems[value1].iconIndex}]${$dataItems[value1].name}\\C[0]を獲得した。`,null);
-          $gameParty.gainItem($dataItems[value1], 1);
-        };
-    };
+  if (value13 < 90) {
+    return;
+  }
 
+  const gameVariable240 = $gameVariables.value(240);
+  let value11 = (gameVariable240 >= 1)
+    ? Number($dataItems[gameVariable240].meta.GenericDropRate.split(',')[Math.floor(Math.random() * arr11.length)]) || 1
+    : value12;
+
+  const listType = (id12 === 1) ? 'walletIn' : 'ItemBag';
+  const dataItemsLength = $dataItems.length;
+
+  for (let i = 1; i < dataItemsLength; i++) {
+	const item = $dataItems[i];
+    if (!item.meta[listType]) {
+      continue;
+    }
+
+    const list = item.meta.DropRate.split(',');
+
+    if (list.some(id11 => Number(id11) === value11)) {
+      arr12.push(i);
+    }
+  }
+
+  const arr12Length = arr12.length;
+  if (arr12Length === 0) {
+    return;
+  }
+
+  const numItemsToGain = Math.floor(Math.random() * 3) + 1;
+
+  for (let i = 1; i <= numItemsToGain; i++) {
+    const randomIndex = Math.floor(Math.random() * arr12Length);
+    const value1 = arr12[randomIndex];
+    const item = $dataItems[value1];
+    const itemInfo = `\\C[24]\x1bI[${item.iconIndex}]${item.name}\\C[0]を獲得した。`;
+
+    CommonPopupManager.showInfo({}, itemInfo, null);
+    $gameParty.gainItem(item, 1);
+  }
 };
 
 //汎用ドロップ設定
@@ -2842,33 +2841,53 @@ drop_genericDropRate = function(value12, arr12) {
 };
 
 //汎用ドロップエネミー対象設定ダンジョンのみ。計算のみ計算結果はarr4に蓄積。簡易討伐時
-drop_enemyDropRate = function(value12,arr4){
+function drop_enemyDropRate(value12, arr4) {
+  const value = $dataItems[$gameVariables.value(240)];
+  const arrdrop1 = value.meta['EnemyLV'].split(',');
+  const arrdrop3 = $gameVariables.value(220);
+  const value11 = Number(arrdrop1[Math.floor(Math.random() * arrdrop1.length)]);
+  const value18 = Number(arrdrop3[Math.floor(Math.random() * arrdrop3.length)]);
 
-  var value = $dataItems[$gameVariables.value(240)];
-    var arrdrop1 = value.meta['EnemyLV'].split(',');
-    var arrdrop3 = $gameVariables.value(220);
-    var value11 = Number(arrdrop1[Math.floor(Math.random() * arrdrop1.length)]);
-    var value18 = Number(arrdrop3[Math.floor(Math.random() * arrdrop3.length)]);
+  const itemsLength = $dataItems.length;
+  for (let i = 1; i < itemsLength; i++) {
+    const conditionalItemDrop = $dataEnemies[value18].meta['Conditional Item ' + i + ' Drop'];
+    if (conditionalItemDrop) {
+      const lotteryRarity = $dataItems[i].meta['LotteryRearity'];
+      if (lotteryRarity) {
+        let value20;
 
-    for (var i = 1; i <= $dataItems.length-1; i++) {
-            if($dataEnemies[value18].meta['Conditional Item ' + i + ' Drop']){
-              if($dataItems[i].meta['LotteryRearity']){
-                var value19 = Number($dataItems[i].meta['LotteryRearity']);
-                  if(value19 == 1){var value20 = 1};
-                  if(value19 == 2){var value20 = 1};
-                  if(value19 == 3){var value20 = 10};
-                  if(value19 == 4){var value20 = 20};
-                  if(value19 == 5){var value20 = 30};
-                  if(value19 == 6){var value20 = 30};
-                  if(value19 == 7){var value20 = 40};
-                  if(value19 == 8){var value20 = 40};
-                  if(value19 == 9){var value20 = 50};
-                  if(value19 == 10){var value20 = 50};
-                    if(value11 >= value20){
-                      arr4.push(i);
-     }}}};
+        switch (Number(lotteryRarity)) {
+          case 1:
+          case 2:
+            value20 = 1;
+            break;
+          case 3:
+            value20 = 10;
+            break;
+          case 4:
+            value20 = 20;
+            break;
+          case 5:
+          case 6:
+            value20 = 30;
+            break;
+          case 7:
+          case 8:
+            value20 = 40;
+            break;
+          case 9:
+          case 10:
+            value20 = 50;
+            break;
+        }
 
-};
+        if (value11 >= value20) {
+          arr4.push(i);
+        }
+      }
+    }
+  }
+}
 
 //ジョブステートエネミーorジョブ持ち追いはぎスクリプト
 //drop_JobStateWAget(1,10);//1武器2防具ダンジョン外の場合の想定レベル
