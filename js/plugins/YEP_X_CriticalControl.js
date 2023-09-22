@@ -268,23 +268,23 @@ DataManager.processCritNotetags1 = function(group) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<(?:CRITICAL RATE):[ ](\d+)([%％])>/i)) {
+      if (line.match(/<(?:CRITICAL RATE):\s*(\d+)([%％])>/i)) {
         var rate = parseFloat(RegExp.$1 * 0.01);
         obj.critRate = 'rate = ' + String(rate);
         obj.damage.critical = true;
-      } else if (line.match(/<(?:CRITICAL RATE):[ ](\d+).(\d+)>/i)) {
+      } else if (line.match(/<(?:CRITICAL RATE):\s*(\d+).(\d+)>/i)) {
         var rate = parseFloat(String(RegExp.$1) + '.' + String(RegExp.$2));
         obj.critRate = 'rate = ' + String(rate);
         obj.damage.critical = true;
-      } else if (line.match(/<(?:CRITICAL MULTIPLIER):[ ](\d+)([%％])>/i)) {
+      } else if (line.match(/<(?:CRITICAL MULTIPLIER):\s*(\d+)([%％])>/i)) {
         var rate = parseFloat(RegExp.$1 * 0.01);
         obj.critMult = 'value *= ' + String(rate) + ' + bonus;';
         obj.damage.critical = true;
-      } else if (line.match(/<(?:CRITICAL MULTIPLIER):[ ](\d+).(\d+)>/i)) {
+      } else if (line.match(/<(?:CRITICAL MULTIPLIER):\s*(\d+).(\d+)>/i)) {
         var rate = parseFloat(String(RegExp.$1) + '.' + String(RegExp.$2));
         obj.critMult = 'value *= ' + String(rate) + ' + bonus;';
         obj.damage.critical = true;
-      } else if (line.match(/<(?:FLAT CRITICAL):[ ](\d+)([%％])[ ](.*)>/i)) {
+      } else if (line.match(/<(?:FLAT CRITICAL):\s*(\d+)([%％])[ ](.*)>/i)) {
         var rate = parseFloat(RegExp.$1 * 0.01);
         var stat = String(RegExp.$3).toLowerCase();
         obj.flatCrit = 'value += ((baseDamage > 0) ? 1 : -1)';
@@ -335,18 +335,18 @@ DataManager.processCritNotetags2 = function(group) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<(?:CRITICAL MULTIPLIER):[ ]([\+\-]\d+)([%％])>/i)) {
+      if (line.match(/<(?:CRITICAL MULTIPLIER):\s*([\+\-]\d+)([%％])>/i)) {
         obj.critMultBonus = parseFloat(RegExp.$1 * 0.01);
-      } else if (line.match(/<(?:FLAT CRITICAL):[ ]([\+\-]\d+)>/i)) {
+      } else if (line.match(/<(?:FLAT CRITICAL):\s*([\+\-]\d+)>/i)) {
         obj.flatCritBonus = parseInt(RegExp.$1);
       } else if
-      (line.match(/<(?:PHYSICAL CRITICAL RATE):[ ]([\+\-]\d+)([%％])>/i)) {
+      (line.match(/<(?:PHYSICAL CRITICAL RATE):\s*([\+\-]\d+)([%％])>/i)) {
         obj.physicalCritRateBonus = parseFloat(RegExp.$1 * 0.01);
       } else if
-      (line.match(/<(?:MAGICAL CRITICAL RATE):[ ]([\+\-]\d+)([%％])>/i)) {
+      (line.match(/<(?:MAGICAL CRITICAL RATE):\s*([\+\-]\d+)([%％])>/i)) {
         obj.magicalCritRateBonus = parseFloat(RegExp.$1 * 0.01);
       } else if
-      (line.match(/<(?:CERTAIN HIT CRITICAL RATE):[ ]([\+\-]\d+)([%％])>/i)) {
+      (line.match(/<(?:CERTAIN HIT CRITICAL RATE):\s*([\+\-]\d+)([%％])>/i)) {
         obj.certainCritRateBonus = parseFloat(RegExp.$1 * 0.01);
       }
     }

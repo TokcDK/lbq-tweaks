@@ -896,7 +896,7 @@ DataManager.isDatabaseLoaded = function() {
 };
 
 DataManager.processDMGNotetags1 = function(group) {
-  var noteD1 = /<(?:DAMAGE CAP|HEAL CAP|HEALING CAP):[ ](\d+)>/i;
+  var noteD1 = /<(?:DAMAGE CAP|HEAL CAP|HEALING CAP):\s*(\d+)>/i;
   for (var n = 1; n < group.length; n++) {
 		var obj = group[n];
 		var notedata = obj.note.split(/[\r\n]+/);
@@ -929,8 +929,8 @@ DataManager.processDMGNotetags1 = function(group) {
 
 DataManager.processDMGNotetags2 = function(group) {
   var noteD1 = /<(?:BREAK DAMAGE CAP|BYPASS DAMAGE CAP)>/i;
-  var noteD2 = /<(?:DAMAGE CAP):[ ](\d+)>/i;
-  var noteD3 = /<(?:HEAL CAP|HEALING CAP):[ ](\d+)>/i;
+  var noteD2 = /<(?:DAMAGE CAP):\s*(\d+)>/i;
+  var noteD3 = /<(?:HEAL CAP|HEALING CAP):\s*(\d+)>/i;
   for (var n = 1; n < group.length; n++) {
 		var obj = group[n];
 		var notedata = obj.note.split(/[\r\n]+/);

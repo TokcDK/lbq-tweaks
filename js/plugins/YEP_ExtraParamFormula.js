@@ -427,32 +427,32 @@ DataManager.processXParamNotetags = function(group) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<(.*) PLUS:[ ]([\+\-]\d+)([%％])>/i)) {
+      if (line.match(/<(.*) PLUS:\s*([\+\-]\d+)([%％])>/i)) {
         var text = String(RegExp.$1).toUpperCase();
         var rate = parseFloat(RegExp.$2) * 0.01;
         var id = this.getXParamId(text);
         if (id !== null) obj.plusXParams[id] = rate;
-      } else if (line.match(/<(.*) PLUS:[ ]([\+\-]\d+).(\d+)>/i)) {
+      } else if (line.match(/<(.*) PLUS:\s*([\+\-]\d+).(\d+)>/i)) {
         var text = String(RegExp.$1).toUpperCase();
         var rate = parseFloat(String(RegExp.$2) + '.' + String(RegExp.$3));
         var id = this.getXParamId(text);
         if (id !== null) obj.plusXParams[id] = rate;
-      } else if (line.match(/<(.*) RATE:[ ](\d+)([%％])>/i)) {
+      } else if (line.match(/<(.*) RATE:\s*(\d+)([%％])>/i)) {
         var text = String(RegExp.$1).toUpperCase();
         var rate = parseFloat(RegExp.$2) * 0.01;
         var id = this.getXParamId(text);
         if (id !== null) obj.rateXParams[id] = rate;
-      } else if (line.match(/<(.*) RATE:[ ](\d+).(\d+)>/i)) {
+      } else if (line.match(/<(.*) RATE:\s*(\d+).(\d+)>/i)) {
         var text = String(RegExp.$1).toUpperCase();
         var rate = parseFloat(String(RegExp.$2) + '.' + String(RegExp.$3));
         var id = this.getXParamId(text);
         if (id !== null) obj.rateXParams[id] = rate;
-      } else if (line.match(/<(.*) FLAT:[ ]([\+\-]\d+)([%％])>/i)) {
+      } else if (line.match(/<(.*) FLAT:\s*([\+\-]\d+)([%％])>/i)) {
         var text = String(RegExp.$1).toUpperCase();
         var rate = parseFloat(RegExp.$2) * 0.01;
         var id = this.getXParamId(text);
         if (id !== null) obj.flatXParams[id] = rate;
-      } else if (line.match(/<(.*) FLAT:[ ]([\+\-]\d+).(\d+)>/i)) {
+      } else if (line.match(/<(.*) FLAT:\s*([\+\-]\d+).(\d+)>/i)) {
         var text = String(RegExp.$1).toUpperCase();
         var rate = parseFloat(String(RegExp.$2) + '.' + String(RegExp.$3));
         var id = this.getXParamId(text);

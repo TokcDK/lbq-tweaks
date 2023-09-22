@@ -293,7 +293,7 @@ DataManager.isDatabaseLoaded = function() {
 
 DataManager.processAPSNotetags1 = function(group, inheritArray) {
   var note1 = /<(?:PASSIVE STATE):[ ]*(\d+(?:\s*,\s*\d+)*)>/i;
-  var note2 = /<(?:PASSIVE STATE):[ ](\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
+  var note2 = /<(?:PASSIVE STATE):\s*(\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
   for (var n = 1; n < group.length; n++) {
     var obj = group[n];
     var notedata = obj.note.split(/[\r\n]+/);
@@ -318,11 +318,11 @@ DataManager.processAPSNotetags1 = function(group, inheritArray) {
 };
 
 DataManager.processAPSNotetags2 = function(group) {
-  var note1a = /<(?:PASSIVE CONDITION):[ ](.*)[ ](?:ABOVE)[ ](\d+)([%％])>/i;
-  var note1b = /<(?:PASSIVE CONDITION):[ ](.*)[ ](?:BELOW)[ ](\d+)([%％])>/i;
-  var note2a = /<(?:PASSIVE CONDITION):[ ](.*)[ ](?:ABOVE)[ ](\d+)>/i;
-  var note2b = /<(?:PASSIVE CONDITION):[ ](.*)[ ](?:BELOW)[ ](\d+)>/i;
-  var note3a = /<(?:PASSIVE CONDITION):[ ]SWITCH[ ](\d+)[ ](.*)>/i;
+  var note1a = /<(?:PASSIVE CONDITION):\s*(.*)[ ](?:ABOVE)[ ](\d+)([%％])>/i;
+  var note1b = /<(?:PASSIVE CONDITION):\s*(.*)[ ](?:BELOW)[ ](\d+)([%％])>/i;
+  var note2a = /<(?:PASSIVE CONDITION):\s*(.*)[ ](?:ABOVE)[ ](\d+)>/i;
+  var note2b = /<(?:PASSIVE CONDITION):\s*(.*)[ ](?:BELOW)[ ](\d+)>/i;
+  var note3a = /<(?:PASSIVE CONDITION):[ ]*SWITCH[ ](\d+)[ ](.*)>/i;
   var notez1 = /<(?:CUSTOM PASSIVE CONDITION)>/i;
   var notez2 = /<\/(?:CUSTOM PASSIVE CONDITION)>/i;
   for (var n = 1; n < group.length; n++) {

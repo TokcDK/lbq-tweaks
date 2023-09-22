@@ -725,7 +725,7 @@ DataManager.processPLGNotetags1 = function(group, isActor) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<(?:PARTY LIMIT):[ ](\d+)>/i)) {
+      if (line.match(/<(?:PARTY LIMIT):\s*(\d+)>/i)) {
         obj.partyLimitGaugeMax = String(RegExp.$1);
       }
     }
@@ -742,9 +742,9 @@ DataManager.processPLGNotetags2 = function(group) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<(?:PARTY LIMIT):[ ]([\+\-]\d+)>/i)) {
+      if (line.match(/<(?:PARTY LIMIT):\s*([\+\-]\d+)>/i)) {
         obj.partyLimitGaugePlus = parseInt(RegExp.$1);
-      } else if (line.match(/<(?:PARTY LIMIT COST):[ ](\d+)([%％])>/i)) {
+      } else if (line.match(/<(?:PARTY LIMIT COST):\s*(\d+)([%％])>/i)) {
         obj.partyLimitGaugeRate = parseFloat(RegExp.$1) * 0.01;
       }
     }
@@ -767,9 +767,9 @@ DataManager.processPLGNotetags3 = function(group) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<(?:PARTY LIMIT COST):[ ](\d+)>/i)) {
+      if (line.match(/<(?:PARTY LIMIT COST):\s*(\d+)>/i)) {
         obj.partyLimitCost = parseInt(RegExp.$1);
-      } else if (line.match(/<(?:PARTY LIMIT COST):[ ](\d+)([%％])>/i)) {
+      } else if (line.match(/<(?:PARTY LIMIT COST):\s*(\d+)([%％])>/i)) {
         obj.partyLimitCostPer = parseFloat(RegExp.$1) * 0.01;
       } else if (line.match(/<(?:CUSTOM PARTY LIMIT COST)>/i)) {
         evalMode = 'custom party limit cost';
@@ -777,9 +777,9 @@ DataManager.processPLGNotetags3 = function(group) {
         evalMode = 'none';
       } else if (evalMode === 'custom party limit cost') {
         obj.partyLimitCostEval = obj.partyLimitCostEval + line + '\n';
-      } else if (line.match(/<(?:ALLY PARTY LIMIT GAUGE):[ ]([\+\-]\d+)>/i)) {
+      } else if (line.match(/<(?:ALLY PARTY LIMIT GAUGE):\s*([\+\-]\d+)>/i)) {
         obj.partyLimitGainAlly = parseInt(RegExp.$1);
-      } else if (line.match(/<(?:FOE PARTY LIMIT GAUGE):[ ]([\+\-]\d+)>/i)) {
+      } else if (line.match(/<(?:FOE PARTY LIMIT GAUGE):\s*([\+\-]\d+)>/i)) {
         obj.partyLimitGainFoe = parseInt(RegExp.$1);
       } else if (line.match(/<(?:CUSTOM ALLY PARTY LIMIT GAUGE)>/i)) {
         evalMode = 'custom ally party limit gauge';

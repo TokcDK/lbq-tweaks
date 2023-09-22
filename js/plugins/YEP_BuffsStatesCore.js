@@ -810,15 +810,15 @@ DataManager.processBSCNotetags1 = function(group) {
         obj.showTurns = true;
       } else if (line.match(/<(?:HIDE TURNS)>/i)) {
         obj.showTurns = false;
-      } else if (line.match(/<(?:TURN ALIGNMENT|turn align):[ ](.*)>/i)) {
+      } else if (line.match(/<(?:TURN ALIGNMENT|turn align):\s*(.*)>/i)) {
         obj.turnAlign = String(RegExp.$1).toLowerCase();
-      } else if (line.match(/<(?:TURN FONT SIZE):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:TURN FONT SIZE):\s*(\d+)>/i)) {
         obj.turnFontSize = parseInt(RegExp.$1);
-      } else if (line.match(/<(?:TURN BUFFER X):[ ]([\+\-]\d+)>/i)) {
+      } else if (line.match(/<(?:TURN BUFFER X):\s*([\+\-]\d+)>/i)) {
         obj.turnBufferX = parseInt(RegExp.$1);
-      } else if (line.match(/<(?:TURN BUFFER Y):[ ]([\+\-]\d+)>/i)) {
+      } else if (line.match(/<(?:TURN BUFFER Y):\s*([\+\-]\d+)>/i)) {
         obj.turnBufferY = parseInt(RegExp.$1);
-      } else if (line.match(/<(?:TURN COLOR):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:TURN COLOR):\s*(\d+)>/i)) {
         obj.turnColor = parseInt(RegExp.$1);
       } else if (line.match(/<(?:REAPPLY IGNORE TURNS)>/i)) {
         obj.reapplyRules = 0;
@@ -876,15 +876,15 @@ DataManager.processBSCNotetags1 = function(group) {
       } else if (evalMode === 'custom state effect') {
         obj.customEffectEval[evalType] = obj.customEffectEval[evalType] +
           line + '\n';
-      } else if (line.match(/<COUNTER FONT SIZE:[ ](\d+)>/i)) {
+      } else if (line.match(/<COUNTER FONT SIZE:\s*(\d+)>/i)) {
         obj.stateCounterSettings['size'] = parseInt(RegExp.$1);
-      } else if (line.match(/<COUNTER[ ](?:ALIGNMENT|align):[ ](.*)>/i)) {
+      } else if (line.match(/<COUNTER[ ](?:ALIGNMENT|align):\s*(.*)>/i)) {
         obj.stateCounterSettings['align'] = String(RegExp.$1).toLowerCase();
-      } else if (line.match(/<COUNTER BUFFER X:[ ]([\+\-]\d+)>/i)) {
+      } else if (line.match(/<COUNTER BUFFER X:\s*([\+\-]\d+)>/i)) {
         obj.stateCounterSettings['bufferX'] = parseInt(RegExp.$1);
-      } else if (line.match(/<COUNTER BUFFER Y:[ ]([\+\-]\d+)>/i)) {
+      } else if (line.match(/<COUNTER BUFFER Y:\s*([\+\-]\d+)>/i)) {
         obj.stateCounterSettings['bufferY'] = parseInt(RegExp.$1);
-      } else if (line.match(/<COUNTER TEXT COLOR:[ ](\d+)>/i)) {
+      } else if (line.match(/<COUNTER TEXT COLOR:\s*(\d+)>/i)) {
         obj.stateCounterSettings['color'] = parseInt(RegExp.$1);
       }
     }
@@ -937,7 +937,7 @@ DataManager.processBSCNotetags2 = function(group) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<(?:MAX)[ ](.*)[ ](?:BUFF):[ ]([\+\-]\d+)>/i)) {
+      if (line.match(/<(?:MAX)[ ](.*)[ ](?:BUFF):\s*([\+\-]\d+)>/i)) {
         var paramId = 8;
         var stat = String(RegExp.$1).toUpperCase();
         var limit = parseInt(RegExp.$2);
@@ -959,7 +959,7 @@ DataManager.processBSCNotetags2 = function(group) {
           paramId = 7;
         }
         obj.maxBuff[paramId] = limit;
-      } else if (line.match(/<(?:MAX)[ ](.*)[ ](?:DEBUFF):[ ]([\+\-]\d+)>/i)) {
+      } else if (line.match(/<(?:MAX)[ ](.*)[ ](?:DEBUFF):\s*([\+\-]\d+)>/i)) {
         var paramId = 8;
         var stat = String(RegExp.$1).toUpperCase();
         var limit = parseInt(RegExp.$2);
@@ -1002,7 +1002,7 @@ DataManager.processBSCNotetags3 = function(group) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<(.*)[ ](?:BUFF TURNS):[ ]([\+\-]\d+)>/i)) {
+      if (line.match(/<(.*)[ ](?:BUFF TURNS):\s*([\+\-]\d+)>/i)) {
         var paramId = 8;
         var stat = String(RegExp.$1).toUpperCase();
         var value = parseInt(RegExp.$2);
@@ -1024,7 +1024,7 @@ DataManager.processBSCNotetags3 = function(group) {
           paramId = 7;
         }
         obj.modifyTurnBuff[paramId] = value;
-      } else if (line.match(/<(.*)[ ](?:DEBUFF TURNS):[ ]([\+\-]\d+)>/i)) {
+      } else if (line.match(/<(.*)[ ](?:DEBUFF TURNS):\s*([\+\-]\d+)>/i)) {
         var paramId = 8;
         var stat = String(RegExp.$1).toUpperCase();
         var value = parseInt(RegExp.$2);
@@ -1074,9 +1074,9 @@ DataManager.processBSCNotetags3 = function(group) {
         evalLine = '';
       } else if (evalMode === 'custom buff') {
         evalLine = evalLine + line + '\n';
-      } else if (line.match(/<STATE[ ](\d+)[ ]TURNS:[ ]([\+\-]\d+)>/i)) {
+      } else if (line.match(/<STATE[ ](\d+)[ ]TURNS:\s*([\+\-]\d+)>/i)) {
         obj.modifyTurnState[parseInt(RegExp.$1)] = parseInt(RegExp.$2);
-      } else if (line.match(/<STATE[ ](.*)[ ]TURNS:[ ]([\+\-]\d+)>/i)) {
+      } else if (line.match(/<STATE[ ](.*)[ ]TURNS:\s*([\+\-]\d+)>/i)) {
         var name = String(RegExp.$1).toUpperCase();
         var value = parseInt(RegExp.$2);
         var id = Yanfly.StateIdRef[name];

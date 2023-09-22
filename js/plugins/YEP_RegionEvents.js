@@ -1912,7 +1912,7 @@ DataManager.processRECNotetags = function() {
   $dataMap.regionCommonEvents = {};
   for (var i = 0; i < notedata.length; i++) {
     var line = notedata[i];
-    if (line.match(/<(?:REGION)[ ](\d+)[ ](?:EVENT):[ ](\d+)>/i)) {
+    if (line.match(/<(?:REGION)[ ](\d+)[ ](?:EVENT):\s*(\d+)>/i)) {
       $dataMap.regionCommonEvents[parseInt(RegExp.$1)] = parseInt(RegExp.$2);
     }
   }

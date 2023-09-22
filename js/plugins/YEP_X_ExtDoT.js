@@ -247,25 +247,25 @@ DataManager.processEDoTNotetags1 = function(group) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<(?:REGEN|DOT) ANIMATION:[ ](\d+)>/i)) {
+      if (line.match(/<(?:REGEN|DOT) ANIMATION:\s*(\d+)>/i)) {
         obj.dotAnimation = parseInt(RegExp.$1);
-      } else if (line.match(/<(?:REGEN|REGENERATE) FORMULA:[ ](.*)>/i)) {
+      } else if (line.match(/<(?:REGEN|REGENERATE) FORMULA:\s*(.*)>/i)) {
         var formula = String(RegExp.$1);
         obj.dotFormula = 'value = Math.max(0, ' + formula + ');\n';
         obj.dotFormula += 'healing = true;'
         if (obj.dotAnimation === 0) {
           obj.dotAnimation = Yanfly.Param.EDoTRegenAni;
         }
-      } else if (line.match(/<(?:DOT|DAMAGE OVER TIME) FORMULA:[ ](.*)>/i)) {
+      } else if (line.match(/<(?:DOT|DAMAGE OVER TIME) FORMULA:\s*(.*)>/i)) {
         var formula = String(RegExp.$1);
         obj.dotFormula = 'value = Math.max(0, ' + formula + ');\n';
         obj.dotFormula += 'healing = false;'
         if (obj.dotAnimation === 0) {
           obj.dotAnimation = Yanfly.Param.EDoTDamageAni;
         }
-      } else if (line.match(/<(?:REGEN|DOT) VARIANCE:[ ](\d+)([%％])>/i)) {
+      } else if (line.match(/<(?:REGEN|DOT) VARIANCE:\s*(\d+)([%％])>/i)) {
         obj.dotVariance = parseInt(RegExp.$1);
-      } else if (line.match(/<(?:REGEN|DOT) ELEMENT:[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:REGEN|DOT) ELEMENT:\s*(\d+)>/i)) {
         obj.dotElement = parseInt(RegExp.$1);
       } else if (line.match(/<(?:CUSTOM REGEN FORMULA)>/i)) {
         evalMode = 'custom dot formula';

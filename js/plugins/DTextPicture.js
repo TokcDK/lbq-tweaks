@@ -251,7 +251,9 @@
 
     var getUsingVariables = function(text) {
         var usingVariables = [];
-
+        
+        if (text === undefined || text === null) text = ''; // temp fix, text can be undefuned
+		
         text = text.replace(/\\/g, '\x1b');
         text = text.replace(/\x1b\x1b/g, '\\');
         text = text.replace(/\x1bV\[(\d+),\s*(\d+)]/gi, function() {

@@ -244,7 +244,7 @@ Yanfly.Aura.Types = [
 
 DataManager.processAuraNotetags1 = function(group) {
   var note1 = /<(.*)[ ](?:AURA|STATE AURA):[ ]*(\d+(?:\s*,\s*\d+)*)>/i;
-  var note2 = /<(.*)[ ](?:AURA|STATE AURA):[ ](\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
+  var note2 = /<(.*)[ ](?:AURA|STATE AURA):\s*(\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
   for (var n = 1; n < group.length; n++) {
     var obj = group[n];
     var notedata = obj.note.split(/[\r\n]+/);

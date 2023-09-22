@@ -194,7 +194,7 @@ Game_Actor.prototype.performLevelUpGrowthFromObject = function(object) {
   for (var i = 0; i < notedata.length; ++i) {
     var line = notedata[i];
     // Level Up Stat Growth
-    if (line.match(/<Level Up (.*) Growth:[ ](.*)>/i)) {
+    if (line.match(/<Level Up (.*) Growth:\s*(.*)>/i)) {
       var param = String(RegExp.$1).toUpperCase().trim();
       var value = Number(RegExp.$2);
       if (['MAXHP','HP','MHP'].contains(param)) {
@@ -219,7 +219,7 @@ Game_Actor.prototype.performLevelUpGrowthFromObject = function(object) {
       this.addParam(paramId, value);
 
     // Learn Skill
-    } else if (line.match(/<Level Up Learn Skill:[ ](.*)>/i)) {
+    } else if (line.match(/<Level Up Learn Skill:\s*(.*)>/i)) {
       var skillId = Number(RegExp.$1);
       this.learnSkill(skillId);
 
@@ -229,7 +229,7 @@ Game_Actor.prototype.performLevelUpGrowthFromObject = function(object) {
       for (var a = 0; a < array.length; ++a) {
         $gameSwitches.setValue(Number(array[a]), true);
       }
-    } else if (line.match(/<Level Up Switch On:[ ](\d+)[ ](?:THROUGH|to)[ ](\d+)>/i)) {
+    } else if (line.match(/<Level Up Switch On:\s*(\d+)[ ](?:THROUGH|to)[ ](\d+)>/i)) {
       var array = Yanfly.Util.getRange(Number(RegExp.$1), Number(RegExp.$2));
       for (var a = 0; a < array.length; ++a) {
         $gameSwitches.setValue(Number(array[a]), true);
@@ -241,7 +241,7 @@ Game_Actor.prototype.performLevelUpGrowthFromObject = function(object) {
       for (var a = 0; a < array.length; ++a) {
         $gameSwitches.setValue(Number(array[a]), false);
       }
-    } else if (line.match(/<Level Up Switch Off:[ ](\d+)[ ](?:THROUGH|to)[ ](\d+)>/i)) {
+    } else if (line.match(/<Level Up Switch Off:\s*(\d+)[ ](?:THROUGH|to)[ ](\d+)>/i)) {
       var array = Yanfly.Util.getRange(Number(RegExp.$1), Number(RegExp.$2));
       for (var a = 0; a < array.length; ++a) {
         $gameSwitches.setValue(Number(array[a]), false);

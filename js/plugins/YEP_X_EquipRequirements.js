@@ -408,19 +408,19 @@ DataManager.processEqReqNotetags1 = function(group) {
 DataManager.makeEquipRequirement = function(obj, line) {
   if (line.match(/UNIQUE ONLY/i)) {
     obj.equipRequirements['unique'] = true;
-  } else if (line.match(/SWITCH:[ ](\d+)/i)) {
+  } else if (line.match(/SWITCH:\s*(\d+)/i)) {
     obj.equipRequirements['switches'].push(parseInt(RegExp.$1));
-  } else if (line.match(/CLASS:[ ](\d+)/i)) {
+  } else if (line.match(/CLASS:\s*(\d+)/i)) {
     obj.equipRequirements['classes'].push(parseInt(RegExp.$1));
-  } else if (line.match(/CLASS:[ ](.*)/i)) {
+  } else if (line.match(/CLASS:\s*(.*)/i)) {
     var name = String(RegExp.$1).toUpperCase();
     if (Yanfly.ClassIdRef[name]) {
       var id = Yanfly.ClassIdRef[name];
       obj.equipRequirements['classes'].push(id);
     }
-  } else if (line.match(/SKILL:[ ](\d+)/i)) {
+  } else if (line.match(/SKILL:\s*(\d+)/i)) {
     obj.equipRequirements['skills'].push(parseInt(RegExp.$1));
-  } else if (line.match(/SKILL:[ ](.*)/i)) {
+  } else if (line.match(/SKILL:\s*(.*)/i)) {
     var name = String(RegExp.$1).toUpperCase();
     if (Yanfly.SkillIdRef[name]) {
       var id = Yanfly.SkillIdRef[name];

@@ -1812,7 +1812,7 @@ DataManager.isDatabaseLoaded = function() {
 };
 
 DataManager.processSVENotetags1 = function(group) {
-  var noteWeapon = /<(?:SIDEVIEW WEAPON):[ ](\d+),[ ](.*),[ ](\d+)>/i;
+  var noteWeapon = /<(?:SIDEVIEW WEAPON):\s*(\d+),[ ](.*),[ ](\d+)>/i;
   for (var n = 1; n < group.length; n++) {
     var obj = group[n];
     var notedata = obj.note.split(/[\r\n]+/);
@@ -1854,41 +1854,41 @@ DataManager.processSVENotetags1 = function(group) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-       if (line.match(/<(?:SCALE SPRITE):[ ](\d+)([%％])>/i)) {
+       if (line.match(/<(?:SCALE SPRITE):\s*(\d+)([%％])>/i)) {
         obj.spriteScaleX = parseFloat(RegExp.$1) * 0.01;
         obj.spriteScaleY = obj.spriteScaleX;
-      } else if (line.match(/<(?:SCALE SPRITE WIDTH):[ ](\d+)([%％])>/i)) {
+      } else if (line.match(/<(?:SCALE SPRITE WIDTH):\s*(\d+)([%％])>/i)) {
         obj.spriteScaleX = parseFloat(RegExp.$1) * 0.01;
-      } else if (line.match(/<(?:SCALE SPRITE HEIGHT):[ ](\d+)([%％])>/i)) {
+      } else if (line.match(/<(?:SCALE SPRITE HEIGHT):\s*(\d+)([%％])>/i)) {
         obj.spriteScaleY = parseFloat(RegExp.$1) * 0.01;
-      } else if (line.match(/<(?:SIDEVIEW BATTLER):[ ](.*)>/i)) {
+      } else if (line.match(/<(?:SIDEVIEW BATTLER):\s*(.*)>/i)) {
         obj.sideviewBattler.push(String(RegExp.$1));
         obj.sideviewBreathing = [2, 3].contains(Yanfly.Param.SVEBreathing);
-      } else if (line.match(/<(?:SIDEVIEW ATTACK MOTION):[ ](.*)>/i)) {
+      } else if (line.match(/<(?:SIDEVIEW ATTACK MOTION):\s*(.*)>/i)) {
         obj.sideviewAttackMotion = String(RegExp.$1).toLowerCase();
-      } else if (line.match(/<(?:SIDEVIEW IDLE MOTION):[ ](.*)>/i)) {
+      } else if (line.match(/<(?:SIDEVIEW IDLE MOTION):\s*(.*)>/i)) {
         obj.sideviewIdleMotion.push(String(RegExp.$1).toLowerCase());
-      } else if (line.match(/<(?:SIDEVIEW DAMAGE MOTION):[ ](.*)>/i)) {
+      } else if (line.match(/<(?:SIDEVIEW DAMAGE MOTION):\s*(.*)>/i)) {
         obj.sideviewDmgMotion = String(RegExp.$1).toLowerCase();
-      } else if (line.match(/<(?:SIDEVIEW EVADE MOTION):[ ](.*)>/i)) {
+      } else if (line.match(/<(?:SIDEVIEW EVADE MOTION):\s*(.*)>/i)) {
         obj.sideviewEvadeMotion = String(RegExp.$1).toLowerCase();
-      } else if (line.match(/<(?:SIDEVIEW ESCAPE MOTION):[ ](.*)>/i)) {
+      } else if (line.match(/<(?:SIDEVIEW ESCAPE MOTION):\s*(.*)>/i)) {
         obj.sideviewEscMotion = String(RegExp.$1).toLowerCase();
-      } else if (line.match(/<(?:SIDEVIEW GUARD MOTION):[ ](.*)>/i)) {
+      } else if (line.match(/<(?:SIDEVIEW GUARD MOTION):\s*(.*)>/i)) {
         obj.sideviewGuardMotion = String(RegExp.$1).toLowerCase();
-      } else if (line.match(/<(?:SIDEVIEW ABNORMAL MOTION):[ ](.*)>/i)) {
+      } else if (line.match(/<(?:SIDEVIEW ABNORMAL MOTION):\s*(.*)>/i)) {
         obj.sideviewAbnMotion = String(RegExp.$1).toLowerCase();
-      } else if (line.match(/<(?:SIDEVIEW SLEEP MOTION):[ ](.*)>/i)) {
+      } else if (line.match(/<(?:SIDEVIEW SLEEP MOTION):\s*(.*)>/i)) {
         obj.sideviewSleepMotion = String(RegExp.$1).toLowerCase();
-      } else if (line.match(/<(?:SIDEVIEW DYING MOTION):[ ](.*)>/i)) {
+      } else if (line.match(/<(?:SIDEVIEW DYING MOTION):\s*(.*)>/i)) {
         obj.sideviewDyingMotion = String(RegExp.$1).toLowerCase();
-      } else if (line.match(/<(?:SIDEVIEW DEAD MOTION):[ ](.*)>/i)) {
+      } else if (line.match(/<(?:SIDEVIEW DEAD MOTION):\s*(.*)>/i)) {
         obj.sideviewDeadMotion = String(RegExp.$1).toLowerCase();
-      } else if (line.match(/<(?:SIDEVIEW ANCHOR X):[ ](\d+)[.](\d+)>/i)) {
+      } else if (line.match(/<(?:SIDEVIEW ANCHOR X):\s*(\d+)[.](\d+)>/i)) {
         obj.sideviewAnchorX = eval(String(RegExp.$1) + '.' + String(RegExp.$2));
-      } else if (line.match(/<(?:SIDEVIEW ANCHOR Y):[ ](\d+)[.](\d+)>/i)) {
+      } else if (line.match(/<(?:SIDEVIEW ANCHOR Y):\s*(\d+)[.](\d+)>/i)) {
         obj.sideviewAnchorY = eval(String(RegExp.$1) + '.' + String(RegExp.$2));
-      } else if (line.match(/<(?:SIDEVIEW WEAPON):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:SIDEVIEW WEAPON):\s*(\d+)>/i)) {
         var weaponId = parseInt(RegExp.$1);
         var motionId = Yanfly.Param.SVEWeaponMotion[weaponId].toLowerCase();
         var aniId = Yanfly.Param.SVEWeaponAnimation[weaponId];
@@ -1900,9 +1900,9 @@ DataManager.processSVENotetags1 = function(group) {
         var aniId = parseInt(RegExp.$3);
         var index = obj.sideviewWeaponImage.length;
         obj.sideviewWeaponImage[index] = [weaponId, motionId, aniId];
-      } else if (line.match(/<(?:SIDEVIEW WIDTH):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:SIDEVIEW WIDTH):\s*(\d+)>/i)) {
         obj.sideviewWidth = parseInt(RegExp.$1);
-      } else if (line.match(/<(?:SIDEVIEW HEIGHT):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:SIDEVIEW HEIGHT):\s*(\d+)>/i)) {
         obj.sideviewHeight = parseInt(RegExp.$1);
       } else if (line.match(/<(?:SIDEVIEW COLLAPSE)>/i)) {
         obj.sideviewCollapse = true;
@@ -1912,20 +1912,20 @@ DataManager.processSVENotetags1 = function(group) {
         obj.sideviewShadowShow = true;
       } else if (line.match(/<(?:SIDEVIEW HIDE SHADOW)>/i)) {
         obj.sideviewShadowShow = false;
-      } else if (line.match(/<(?:SIDEVIEW SHADOW WIDTH):[ ](\d+)([%％])>/i)) {
+      } else if (line.match(/<(?:SIDEVIEW SHADOW WIDTH):\s*(\d+)([%％])>/i)) {
         obj.sideviewShadowScaleX = parseFloat(RegExp.$1 * 0.01);
-      } else if (line.match(/<(?:SIDEVIEW SHADOW HEIGHT):[ ](\d+)([%％])>/i)) {
+      } else if (line.match(/<(?:SIDEVIEW SHADOW HEIGHT):\s*(\d+)([%％])>/i)) {
         obj.sideviewShadowScaleY = parseFloat(RegExp.$1 * 0.01);
-      } else if (line.match(/<(?:SIDEVIEW FRAME SPEED):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:SIDEVIEW FRAME SPEED):\s*(\d+)>/i)) {
         obj.sideviewFrameSpeed = parseInt(RegExp.$1);
       } else if (line.match(/<(?:FLOATING|float)>/i)) {
         obj.sideviewFloating = true;
-      } else if (line.match(/<(?:FLOATING SPEED):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:FLOATING SPEED):\s*(\d+)>/i)) {
         obj.sideviewFloatSpeed = Math.max(1, parseInt(RegExp.$1));
-      } else if (line.match(/<(?:FLOATING RATE):[ ](\d+)[.](\d+)>/i)) {
+      } else if (line.match(/<(?:FLOATING RATE):\s*(\d+)[.](\d+)>/i)) {
         var rate = eval(String(RegExp.$1) + '.' + String(RegExp.$2));
         obj.sideviewFloatRate = rate;
-      } else if (line.match(/<(?:FLOATING HEIGHT):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:FLOATING HEIGHT):\s*(\d+)>/i)) {
         obj.sideviewFloatHeight = parseInt(RegExp.$1);
       } else if (line.match(/<(?:FLOATING DEATH|FLOAT DEATH)>/i)) {
         obj.sideviewFloatDeath = true;
@@ -1944,12 +1944,12 @@ DataManager.processSVENotetags1 = function(group) {
         obj.sideviewBreathing = true;
       } else if (line.match(/<(?:NO BREATHING)>/i)) {
         obj.sideviewBreathing = false;
-      } else if (line.match(/<(?:BREATHING SPEED):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:BREATHING SPEED):\s*(\d+)>/i)) {
         obj.sideviewBreathSpeed = Math.max(1, parseInt(RegExp.$1));
-      } else if (line.match(/<(?:BREATHING RATE X):[ ](\d+)[.](\d+)>/i)) {
+      } else if (line.match(/<(?:BREATHING RATE X):\s*(\d+)[.](\d+)>/i)) {
         var rate = eval(String(RegExp.$1) + '.' + String(RegExp.$2));
         obj.sideviewBreathXRate = rate;
-      } else if (line.match(/<(?:BREATHING RATE Y):[ ](\d+)[.](\d+)>/i)) {
+      } else if (line.match(/<(?:BREATHING RATE Y):\s*(\d+)[.](\d+)>/i)) {
         var rate = eval(String(RegExp.$1) + '.' + String(RegExp.$2));
         obj.sideviewBreathYRate = rate;
       } else if (line.match(/<(?:ENABLE HP LINK BREATHING)>/i)) {

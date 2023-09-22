@@ -597,32 +597,32 @@ DataManager.processBPCNotetags1 = function(group) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<(.*) PLUS:[ ]([\+\-]\d+)>/i)) {
+      if (line.match(/<(.*) PLUS:\s*([\+\-]\d+)>/i)) {
         var text = String(RegExp.$1).toUpperCase();
         var value = parseInt(RegExp.$2);
         var id = this.getParamId(text);
         if (id !== null) obj.plusParams[id] = value;
-      } else if (line.match(/<(.*) RATE:[ ](\d+)([%％])>/i)) {
+      } else if (line.match(/<(.*) RATE:\s*(\d+)([%％])>/i)) {
         var text = String(RegExp.$1).toUpperCase();
         var rate = parseFloat(RegExp.$2) * 0.01;
         var id = this.getParamId(text);
         if (id !== null) obj.rateParams[id] = rate;
-      } else if (line.match(/<(.*) RATE:[ ](\d+).(\d+)>/i)) {
+      } else if (line.match(/<(.*) RATE:\s*(\d+).(\d+)>/i)) {
         var text = String(RegExp.$1).toUpperCase();
         var rate = parseFloat(String(RegExp.$2) + '.' + String(RegExp.$3));
         var id = this.getParamId(text);
         if (id !== null) obj.rateParams[id] = rate;
-      } else if (line.match(/<(.*) FLAT:[ ]([\+\-]\d+)>/i)) {
+      } else if (line.match(/<(.*) FLAT:\s*([\+\-]\d+)>/i)) {
         var text = String(RegExp.$1).toUpperCase();
         var value = parseInt(RegExp.$2);
         var id = this.getParamId(text);
         if (id !== null) obj.flatParams[id] = value;
-      } else if (line.match(/<(.*) MAX:[ ](\d+)>/i)) {
+      } else if (line.match(/<(.*) MAX:\s*(\d+)>/i)) {
         var text = String(RegExp.$1).toUpperCase();
         var value = parseInt(RegExp.$2);
         var id = this.getParamId(text);
         if (id !== null) obj.maxParams[id] = value;
-      } else if (line.match(/<(.*) MIN:[ ](\d+)>/i)) {
+      } else if (line.match(/<(.*) MIN:\s*(\d+)>/i)) {
         var text = String(RegExp.$1).toUpperCase();
         var value = parseInt(RegExp.$2);
         var id = this.getParamId(text);

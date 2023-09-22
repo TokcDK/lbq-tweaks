@@ -1098,7 +1098,7 @@ DataManager.processRowNotetags1 = function(group) {
 
 DataManager.processRowNotetags2 = function(group) {
   var noteR1 = /<(?:ROW ONLY):[ ]*(\d+(?:\s*,\s*\d+)*)>/i;
-  var noteR2 = /<(?:ROW ONLY):[ ](\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
+  var noteR2 = /<(?:ROW ONLY):\s*(\d+)[ ](?:THROUGH|to)[ ](\d+)>/i;
   for (var n = 1; n < group.length; n++) {
     var obj = group[n];
     var notedata = obj.note.split(/[\r\n]+/);
@@ -1119,11 +1119,11 @@ DataManager.processRowNotetags2 = function(group) {
       } else if (line.match(noteR2)) {
         obj.rowOnly = Yanfly.Util.getRange(parseInt(RegExp.$1),
           parseInt(RegExp.$2));
-      } else if (line.match(/<(?:CHANGE TARGET ROW):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:CHANGE TARGET ROW):\s*(\d+)>/i)) {
         obj.changeTargetRow = parseInt(RegExp.$1);
-      } else if (line.match(/<(?:PUSH BACK TARGET ROW):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:PUSH BACK TARGET ROW):\s*(\d+)>/i)) {
         obj.alterTargetRow = parseInt(RegExp.$1);
-      } else if (line.match(/<(?:PULL FORWARD TARGET ROW):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:PULL FORWARD TARGET ROW):\s*(\d+)>/i)) {
         obj.alterTargetRow = parseInt(RegExp.$1) * -1;
       } else if (line.match(/<(?:CUSTOM TARGET ROW)>/i)) {
         evalMode = 'customTargetRow';
@@ -1131,11 +1131,11 @@ DataManager.processRowNotetags2 = function(group) {
         evalMode = 'none';
       } else if (evalMode === 'customTargetRow') {
         obj.targetRowEval = obj.targetRowEval + line + '\n';
-      } else if (line.match(/<(?:CHANGE USER ROW):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:CHANGE USER ROW):\s*(\d+)>/i)) {
         obj.changeUserRow = parseInt(RegExp.$1);
-      } else if (line.match(/<(?:PUSH BACK USER ROW):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:PUSH BACK USER ROW):\s*(\d+)>/i)) {
         obj.alterUserRow = parseInt(RegExp.$1);
-      } else if (line.match(/<(?:PULL FORWARD USER ROW):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:PULL FORWARD USER ROW):\s*(\d+)>/i)) {
         obj.alterUserRow = parseInt(RegExp.$1) * -1;
       } else if (line.match(/<(?:CUSTOM USER ROW)>/i)) {
         evalMode = 'customUserRow';

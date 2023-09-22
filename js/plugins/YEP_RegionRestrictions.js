@@ -187,18 +187,18 @@ DataManager.processRRNotetags = function() {
   if (!$dataMap.note) return;
 
   var note1a = /<(?:PLAYER RESTRICT REGION):[ ]*(\d+(?:\s*,\s*\d+)*)>/i;
-  var note1b = /<(?:PLAYER RESTRICT REGION):[ ](\d+)[ ](?:TO)[ ](\d+)>/i;
+  var note1b = /<(?:PLAYER RESTRICT REGION):\s*(\d+)[ ](?:TO)[ ](\d+)>/i;
   var note2a = /<(?:EVENT RESTRICT REGION):[ ]*(\d+(?:\s*,\s*\d+)*)>/i;
-  var note2b = /<(?:EVENT RESTRICT REGION):[ ](\d+)[ ](?:TO)[ ](\d+)>/i;
+  var note2b = /<(?:EVENT RESTRICT REGION):\s*(\d+)[ ](?:TO)[ ](\d+)>/i;
   var note3a = /<(?:ALL RESTRICT REGION):[ ]*(\d+(?:\s*,\s*\d+)*)>/i;
-  var note3b = /<(?:ALL RESTRICT REGION):[ ](\d+)[ ](?:TO)[ ](\d+)>/i;
+  var note3b = /<(?:ALL RESTRICT REGION):\s*(\d+)[ ](?:TO)[ ](\d+)>/i;
 
   var note4a = /<(?:PLAYER ALLOW REGION):[ ]*(\d+(?:\s*,\s*\d+)*)>/i;
-  var note4b = /<(?:PLAYER ALLOW REGION):[ ](\d+)[ ](?:TO)[ ](\d+)>/i;
+  var note4b = /<(?:PLAYER ALLOW REGION):\s*(\d+)[ ](?:TO)[ ](\d+)>/i;
   var note5a = /<(?:EVENT ALLOW REGION):[ ]*(\d+(?:\s*,\s*\d+)*)>/i;
-  var note5b = /<(?:EVENT ALLOW REGION):[ ](\d+)[ ](?:TO)[ ](\d+)>/i;
+  var note5b = /<(?:EVENT ALLOW REGION):\s*(\d+)[ ](?:TO)[ ](\d+)>/i;
   var note6a = /<(?:ALL ALLOW REGION):[ ]*(\d+(?:\s*,\s*\d+)*)>/i;
-  var note6b = /<(?:ALL ALLOW REGION):[ ](\d+)[ ](?:TO)[ ](\d+)>/i;
+  var note6b = /<(?:ALL ALLOW REGION):\s*(\d+)[ ](?:TO)[ ](\d+)>/i;
 
   var notedata = $dataMap.note.split(/[\r\n]+/);
 

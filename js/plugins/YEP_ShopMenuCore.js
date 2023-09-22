@@ -286,9 +286,9 @@ DataManager.processShopNotetags = function(group) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<(?:PRICE):[ ](\d+)>/i)) {
+      if (line.match(/<(?:PRICE):\s*(\d+)>/i)) {
         obj.price = parseInt(RegExp.$1);
-      } else if (line.match(/<(?:SELL PRICE|SELLING PRICE):[ ](\d+)>/i)) {
+      } else if (line.match(/<(?:SELL PRICE|SELLING PRICE):\s*(\d+)>/i)) {
         obj.sellPrice = parseInt(RegExp.$1);
       } else if (line.match(/<(?:CANNOT SELL)>/i)) {
         obj.cannotSell = true;

@@ -297,8 +297,8 @@ DataManager.isDatabaseLoaded = function() {
 };
 
 DataManager.processLSNotetags1 = function(group) {
-  var noteA1 = /<(.*)[ ]LIFE STEAL[ ](.*):[ ]([\+\-]\d+)([%％])>/i;
-  var noteA2 = /<(.*)[ ]LIFE STEAL[ ](.*):[ ]([\+\-]\d+)>/i;
+  var noteA1 = /<(.*)[ ]LIFE STEAL[ ](.*):\s*([\+\-]\d+)([%％])>/i;
+  var noteA2 = /<(.*)[ ]LIFE STEAL[ ](.*):\s*([\+\-]\d+)>/i;
   for (var n = 1; n < group.length; n++) {
     var obj = group[n];
     var notedata = obj.note.split(/[\r\n]+/);
@@ -420,12 +420,12 @@ DataManager.processLSNotetags2 = function(group) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<(.*)[ ]LIFE STEAL:[ ](\d+)([%％])>/i)) {
+      if (line.match(/<(.*)[ ]LIFE STEAL:\s*(\d+)([%％])>/i)) {
         var type = String(RegExp.$1).toLowerCase();
         var value = parseFloat(RegExp.$2) * 0.01;
         var key = type + 'Rate';
         obj.lifeSteal[key] = value;
-      } else if (line.match(/<(.*)[ ]LIFE STEAL:[ ](\d+)>/i)) {
+      } else if (line.match(/<(.*)[ ]LIFE STEAL:\s*(\d+)>/i)) {
         var type = String(RegExp.$1).toLowerCase();
         var value = parseInt(RegExp.$2);
         var key = type + 'Flat';

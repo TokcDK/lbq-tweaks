@@ -463,6 +463,7 @@ Window_Base.prototype.drawCharacter = function(characterName, characterIndex, x,
 };
 
 Window_Base.prototype.drawGauge = function(x, y, width, rate, color1, color2) {
+    if (Number.isNaN(rate)) rate = 0; // rate sometimes can be NaN in Yep_SkillMasteryLevels, add here in any case 
     var fillW = Math.floor(width * rate);
     var gaugeY = y + this.lineHeight() - 8;
     this.contents.fillRect(x, gaugeY, width, 6, this.gaugeBackColor());

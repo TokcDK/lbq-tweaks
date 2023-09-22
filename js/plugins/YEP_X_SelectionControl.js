@@ -702,7 +702,7 @@ DataManager.processSelectNotetags2 = function(group) {
 
     for (var i = 0; i < notedata.length; i++) {
       var line = notedata[i];
-      if (line.match(/<CANNOT SELECT:[ ](.*)>/i)) {
+      if (line.match(/<CANNOT SELECT:\s*(.*)>/i)) {
         var text = String(RegExp.$1).trim();
         obj.cannotSelect.push(text);
       }
@@ -1338,12 +1338,12 @@ Game_Action.prototype.meetSelectionCondition = function(line, user, target) {
       return this.selectConditionParam(user, target, param, code);
     }
     // Not State
-    if (line.match(/NOT STATE:[ ](.*)/i)) {
+    if (line.match(/NOT STATE:\s*(.*)/i)) {
       var text = String(RegExp.$1).toUpperCase().trim();
       return this.selectConditionNotState(target, text);
     }
     // State
-    if (line.match(/STATE:[ ](.*)/i)) {
+    if (line.match(/STATE:\s*(.*)/i)) {
       var text = String(RegExp.$1).toUpperCase().trim();
       return this.selectConditionState(target, text);
     }

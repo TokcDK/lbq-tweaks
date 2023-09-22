@@ -540,7 +540,7 @@ DataManager.processCoreAINotetags1 = function(group) {
   var note1 = /<(?:AI PRIORITY)>/i;
   var note2 = /<\/(?:AI PRIORITY)>/i;
   var note3 = /<(?:AI CONSIDER TAUNT|ai considers taunts)>/i;
-  var note4 = /<(?:AI LEVEL):[ ](\d+)>/i;
+  var note4 = /<(?:AI LEVEL):\s*(\d+)>/i;
   for (var n = 1; n < group.length; n++) {
 		var obj = group[n];
 		var notedata = obj.note.split(/[\r\n]+/);
@@ -835,22 +835,22 @@ AIManager.action = function() {
 };
 
 AIManager.isDecidedActionAI = function(line) {
-    if (line.match(/[ ]*(.*):[ ](?:SKILL)[ ](\d+),[ ](.*)/i)) {
+    if (line.match(/[ ]*(.*):\s*(?:SKILL)[ ](\d+),[ ](.*)/i)) {
       this._origCondition =  String(RegExp.$1);
       var condition = String(RegExp.$1);
       this._aiSkillId = parseInt(RegExp.$2);
       this._aiTarget = String(RegExp.$3);
-    } else if (line.match(/[ ]*(.*):[ ](?:SKILL)[ ](\d+)/i)) {
+    } else if (line.match(/[ ]*(.*):\s*(?:SKILL)[ ](\d+)/i)) {
       this._origCondition =  String(RegExp.$1);
       var condition = String(RegExp.$1);
       this._aiSkillId = parseInt(RegExp.$2);
       this._aiTarget = 'RANDOM';
-    } else if (line.match(/[ ]*(.*):[ ](.*),[ ](.*)/i)) {
+    } else if (line.match(/[ ]*(.*):\s*(.*),[ ](.*)/i)) {
       this._origCondition =  String(RegExp.$1);
       var condition = String(RegExp.$1);
       this._aiSkillId = Yanfly.SkillIdRef[String(RegExp.$2).toUpperCase()];
       this._aiTarget = String(RegExp.$3);
-    } else if (line.match(/[ ]*(.*):[ ](.*)/i)) {
+    } else if (line.match(/[ ]*(.*):\s*(.*)/i)) {
       this._origCondition =  String(RegExp.$1);
       var condition = String(RegExp.$1);
       this._aiSkillId = Yanfly.SkillIdRef[String(RegExp.$2).toUpperCase()];
@@ -868,13 +868,13 @@ AIManager.isDecidedActionAI = function(line) {
 AIManager.getPatternSkills = function(array, patterns) {
     for (var i = 0; i < patterns.length; ++i) {
       var line = patterns[i];
-      if (line.match(/[ ]*(.*):[ ](?:SKILL)[ ](\d+),[ ](.*)/i)) {
+      if (line.match(/[ ]*(.*):\s*(?:SKILL)[ ](\d+),[ ](.*)/i)) {
         var skillId = parseInt(RegExp.$2);
-      } else if (line.match(/[ ]*(.*):[ ](?:SKILL)[ ](\d+)/i)) {
+      } else if (line.match(/[ ]*(.*):\s*(?:SKILL)[ ](\d+)/i)) {
         var skillId = parseInt(RegExp.$2);
-      } else if (line.match(/[ ]*(.*):[ ](.*),[ ](.*)/i)) {
+      } else if (line.match(/[ ]*(.*):\s*(.*),[ ](.*)/i)) {
         var skillId = Yanfly.SkillIdRef[String(RegExp.$2).toUpperCase()];
-      } else if (line.match(/[ ]*(.*):[ ](.*)/i)) {
+      } else if (line.match(/[ ]*(.*):\s*(.*)/i)) {
         var skillId = Yanfly.SkillIdRef[String(RegExp.$2).toUpperCase()];
       } else {
         continue;
