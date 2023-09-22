@@ -3907,13 +3907,18 @@ if(b.actorId() == actor.actorId()){
   if(itemId == 430){//一括装着
      var arr1 = Array(actor.battleSkillsRaw().length).fill(0);
      var id1 = 0;
-     var id2 = actor.battleSkillsRaw().length-200;//10Ｇパッシブ
+     if(actor.isStateAffected(602)){
+       var id2 = actor.battleSkillsRaw().length-200;//10Ｇパッシブ
+     } else {
+       var id2 = actor.battleSkillsRaw().length-100;//10Ｇパッシブ
+     };
      var id3 = actor.battleSkillsRaw().length-100;//15Hパッシブ
-     actor.clearEquipBattleSkills();
+     var id4 = 0;
      for (var i = 1; i <= $dataSkills.length-1; i++) {
        if(!$dataSkills[i].name == '') {
          if($dataSkills[i].meta['Skill Tier']) {
            if(actor.isLearnedSkill(i) || actor.addedSkills().contains(i)){
+             id4 += 1;
              if($dataSkills[i].stypeId == 10){
                arr1[id2] = i;
                id2 += 1;
@@ -3927,14 +3932,21 @@ if(b.actorId() == actor.actorId()){
                };
              };
      }}}};
-     for (var i = 0; i <= arr1.length-1; i++) {
-       if(arr1[i] != 0){
-         if(actor.getEquipSkillTierCount(Number($dataSkills[arr1[i]].meta['Skill Tier'])) < actor.getEquipSkillTierMax(Number($dataSkills[arr1[i]].meta['Skill Tier']))){
-           actor.equipSkill(arr1[i], i);
+     if(id4 >= 1){
+       actor.clearEquipBattleSkills();
+       for (var i = 0; i <= arr1.length-1; i++) {
+         if(arr1[i] != 0){
+           if(actor.getEquipSkillTierCount(Number($dataSkills[arr1[i]].meta['Skill Tier'])) < actor.getEquipSkillTierMax(Number($dataSkills[arr1[i]].meta['Skill Tier']))){
+             if(i <= actor.battleSkillsRaw().length){  
+               actor.equipSkill(arr1[i], i);
+             };
+           };
          };
        };
+       TickerManager.show(`\\C[2]${actor.name()}\\C[0]は装備可能なスキルを全て装着しました。`);
+     } else {
+       TickerManager.show(`\\C[2]${actor.name()}\\C[0]は装備可能なスキルを保有していません。`);
      };
-    TickerManager.show(`\\C[2]${actor.name()}\\C[0]は装備可能なスキルを全て装着しました。`);
   };
 };
 

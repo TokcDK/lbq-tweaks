@@ -5729,17 +5729,23 @@ annihilationItem_bonus = function(){
 if($dataItems[$gameVariables.value(240)].meta['TchestType']){
   var arr1 = [];
   var arr2 = [];
-  arr1.push($dataItems[$gameVariables.value(240)].meta['TchestType'].split(','));
-  arr2.push($dataItems[$gameVariables.value(240)].meta['Tchest'].split(','));
+  //arr1.push($dataItems[$gameVariables.value(240)].meta['TchestType'].split(','));
+  //arr2.push($dataItems[$gameVariables.value(240)].meta['Tchest'].split(','));
+  arr1 = arr1.concat($dataItems[$gameVariables.value(240)].meta['TchestType'].split(','));
+  arr2 = arr2.concat($dataItems[$gameVariables.value(240)].meta['Tchest'].split(','));
   if($dataItems[$gameVariables.value(240)].meta['firstAnnihilationItem']){
     var arr3 = $dataItems[$gameVariables.value(240)].meta['firstAnnihilationItem'].split(',');
-    arr1.push(Number(arr3[0]));
-    arr2.push(Number(arr3[1]));
+    //arr1.push(Number(arr3[0]));
+    //arr2.push(Number(arr3[1]));
+    arr1 = arr1.concat(Number(arr3[0]));
+    arr2 = arr2.concat(Number(arr3[1]));
   };
   if($dataItems[$gameVariables.value(240)].meta['TchestOnly']){
     var arr4 = $dataItems[$gameVariables.value(240)].meta['TchestOnly'].split(',');
-    arr1.push(Number(arr4[3]));
-    arr2.push(Number(arr4[4]));
+    //arr1.push(Number(arr4[3]));
+    //arr2.push(Number(arr4[4]));
+    arr1 = arr1.concat(Number(arr4[3]));
+    arr2 = arr2.concat(Number(arr4[4]));
   };
   var value1 = arr2[Math.floor(Math.random() * arr2.length)];
   let index = arr2.findIndex(arr2 => arr2 == value1); 
