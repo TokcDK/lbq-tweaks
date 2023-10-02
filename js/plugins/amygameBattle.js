@@ -2681,38 +2681,49 @@ drop_probabilityCalculation = function(value11){
 drop_probabilityCalculation2 = function(user,id1){
 
 valueDropCount1 = 0;
-var id2 = id1 * 20;
-if(id2 == 0){var id2 = 999};//0はレベル制限しない汎用ドロップ
-if(id2 >= 51){var id2 = 999};//レアリティが6以上なら制限なし
-var value14 = true;//id2 > valueDropEnemyLevel;//高レベルでドロップ制限はなし
+
+let id2 = id1 * 20;
+if(id2 == 0){id2 = 999};//0はレベル制限しない汎用ドロップ
+else if(id2 >= 51){id2 = 999};//レアリティが6以上なら制限なし
+
 if(id1 >= 5){
-  if(id1 == 5){var id2 = 20};
-  if(id1 == 6){var id2 = 20};
-  if(id1 == 7){var id2 = 30};
-  if(id1 == 8){var id2 = 40};
-  if(id1 == 9){var id2 = 50};
-  if(id1 >= 10){var id2 = 50};
+  if(id1 < 7){id2 = 20}
+  else if(id1 == 7){id2 = 30}
+  else if(id1 == 8){id2 = 40}
+  if(id1 > 8){id2 = 50};
   var value15 = id2 < valueDropEnemyLevel;
 } else {
   var value15 = true;
 };
+
+var value14 = true;//id2 > valueDropEnemyLevel;//高レベルでドロップ制限はなし
 if(value14 && value15){
-  var value13 = Math.floor( Math.random() * 100) + 1;
-  if(id1 == 0){var value11 = 5};
-  if(id1 == 1){var value11 = 10};if(id1 == 2){var value11 = 9};if(id1 == 3){var value11 = 8};
-  if(id1 == 4){var value11 = 7};if(id1 == 5){var value11 = 6};if(id1 == 6){var value11 = 5};
-  if(id1 == 7){var value11 = 4};if(id1 == 8){var value11 = 3};if(id1 == 9){var value11 = 2};
-  if(id1 == 10){var value11 = 1};
+  let value11 = 5;
+  //if(id1 == 0){value11 = 5};
+  if(id1 == 1){value11 = 10}
+  else if(id1 == 2){value11 = 9}
+  else if(id1 == 3){value11 = 8}
+  else if(id1 == 4){value11 = 7}
+  else if(id1 == 5){value11 = 6}
+  else if(id1 == 6){value11 = 5}
+  else if(id1 == 7){value11 = 4}
+  else if(id1 == 8){value11 = 3}
+  else if(id1 == 9){value11 = 2}
+  else if(id1 == 10){value11 = 1};
+  
   var value12 = value11 / 3;
   value11 += value12 + (valueDropEnemyLevel / 10);
   if($gameTroop.turnCount() <= 1){value11 += value12 * 3};
   if($gameVariables.value(54) == 1){value11 += value12 * 5};//パーティが一人の場合確率アップ
-  if($gameVariables.value(516) >= 100){value11 += value12};
-  if($gameVariables.value(516) >= 300){value11 += value12};
-  if($gameVariables.value(516) >= 500){value11 += value12};
-  if($gameVariables.value(516) >= 1000){value11 += value12};
-  if($gameVariables.value(516) >= 1500){value11 += value12};
-  if($gameVariables.value(516) >= 2000){value11 += value12};
+  
+  const gameVariable516 = $gameVariables.value(516);
+  if(gameVariable516 >= 100){value11 += value12};
+  if(gameVariable516 >= 300){value11 += value12};
+  if(gameVariable516 >= 500){value11 += value12};
+  if(gameVariable516 >= 1000){value11 += value12};
+  if(gameVariable516 >= 1500){value11 += value12};
+  if(gameVariable516 >= 2000){value11 += value12};
+  
   if($gameParty.hasItem($dataItems[valueItemDropUpItem])){value11 += value12 * 3};
   if($gameParty.membersState(296)){value11 += value12 * 2};
   if($gameParty.membersState(297)){value11 += value12 * 2};
@@ -2722,6 +2733,8 @@ if(value14 && value15){
       value11 += value12 * user._stateCounter[186];
     };
   };
+  
+  let value13 = Math.floor( Math.random() * 100) + 1;
   if(value11 >= value13){valueDropCount1 += 1};
 };
 
