@@ -4292,25 +4292,30 @@ var value2 = ` `;
 //  value2 += `${user.name()}は\\C[16]\x1bSIN[${skillId}]\\C[0]を習得した！`;
 //  var value1 = 296;
 //}else{
-  if($dataSkills[skillId].meta["Max Mastery Level"]){
+let value1 = 0;
+const maxMasteryLevel = $dataSkills[skillId].meta["Max Mastery Level"];
+  if(maxMasteryLevel){
     if(user.skillMasteryLevel(skillId) < 1){
-      var value1 = 296;
+      value1 = 296;
     } else {
-      var value1 = 297;
+      value1 = 297;
     };
+	const userName = user.name();
     if(user.skillMasteryLevel(skillId) < 1){
-      value2 += `${user.name()}は\\C[16]\x1bSIN[${skillId}]\\C[0]を習得した！`;
+      value2 += `${userName}は\\C[16]\x1bSIN[${skillId}]\\C[0]を習得した！`;
     } else {
-      value2 += `${user.name()}の\\C[16]\x1bSIN[${skillId}]\\C[0]がランクアップ！`;
+      value2 += `${userName}の\\C[16]\x1bSIN[${skillId}]\\C[0]がランクアップ！`;
     };
     user.gainSkillMasteryLevel(skillId, +1);
-    value2 += ` [\\C[2]${user.skillMasteryLevel(skillId)}/${Number($dataSkills[skillId].meta['Max Mastery Level'])}\\C[0]]`;
-    if(user.skillMasteryLevel(skillId) >= Number($dataSkills[skillId].meta['Max Mastery Level'])){
+	const skillLevel = user.skillMasteryLevel(skillId);
+	const maxSkillLevel = Number(maxMasteryLevel);
+    value2 += ` [\\C[2]${skillLevel}/${maxSkillLevel}\\C[0]]`;
+    if(skillLevel >= maxSkillLevel){
       value2 += `\\C[10]<ランクマックス！>\\C[0]`;
     };
   } else {
-    value2 += `${user.name()}は\\C[16]\x1bSIN[${skillId}]\\C[0]を習得した！`;
-    var value1 = 296;
+    value2 += `${userName}は\\C[16]\x1bSIN[${skillId}]\\C[0]を習得した！`;
+    value1 = 296;
   };
 //};
 TickerManager.show(value2);
@@ -5526,11 +5531,11 @@ $gamePlayer.refresh();
 //ミニステでインフォＹ軸補正値変更info_SetY($gameVariables.value(200));
 info_SetY = function(id1){
 
-if(id1 == 1){valueInfoY = 0};
-if(id1 == 2){valueInfoY = -100};
-if(id1 == 3){valueInfoY = -100};
-if(id1 == 4){valueInfoY = -100};
-if(id1 == 5){valueInfoY = 0};
+if(id1 == 1){valueInfoY = 0}
+else if(id1 == 2){valueInfoY = -100}
+else if(id1 == 3){valueInfoY = -100}
+else if(id1 == 4){valueInfoY = -100}
+else if(id1 == 5){valueInfoY = 0};
 
 };
 
