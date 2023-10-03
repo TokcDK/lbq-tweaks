@@ -2772,8 +2772,10 @@ drop_walletItemBoxGet = function(value12,id12){
   }
 
   const gameVariable240 = $gameVariables.value(240);
+  const value = $dataItems[gameVariable240];
+  const arr11 = value.meta.GenericDropRate.split(',');
   let value11 = (gameVariable240 >= 1)
-    ? Number($dataItems[gameVariable240].meta.GenericDropRate.split(',')[Math.floor(Math.random() * arr11.length)]) || 1
+    ? Number(arr11[Math.floor(Math.random() * arr11.length)]) || 1
     : value12;
 
   const listType = (id12 === 1) ? 'walletIn' : 'ItemBag';
