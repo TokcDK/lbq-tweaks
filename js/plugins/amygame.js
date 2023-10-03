@@ -432,17 +432,17 @@ $gameVariables.setValue(22,array);
 Profession_CharaChange = function(id1,id2,id3,id4){
 
 if(!$gameSwitches.value(29)){
+  let actorName = '';
   if(id1 == 0){
     $gameVariables.value(380 + id2)[59] = `${id3}`;
-    var actorName = $gameActors.actor(id2).name();
+    actorName = $gameActors.actor(id2).name();
   } else {
     $gameVariables.value(353)[id2-300] = `${id3}`;//スタートリセットコモンで初期実行
-    var actorName = $dataWeapons[id2].name;
+    actorName = $dataWeapons[id2].name;
   };
   if(id4 == 0){
     $gameScreen.startAnimation(100, 150, 300, false);
-    var value1 = `　　\\C[1]${actorName}\\C[0]の役職名が\\C[2]${id3}\\C[0]に変更されました。`;
-    TickerManager.show(value1);
+    TickerManager.show(`　　\\C[1]${actorName}\\C[0]の役職名が\\C[2]${id3}\\C[0]に変更されました。`);
   };
 };
 
