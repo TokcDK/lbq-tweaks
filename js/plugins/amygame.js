@@ -454,21 +454,21 @@ Profession_basicReturn = function(id1){
 if(!$gameSwitches.value(29)){
   actor = $gameActors.actor(id1);
   const dataActor = $dataActors[id1];
-  var value1 = `${dataActor.meta['Profession']}`;
+  let value1 = `${dataActor.meta['Profession']}`;
   for(var j = 1; j <= 9; j++){
     if (dataActor.meta['Profession' + j]){
       var arr1 = dataActor.meta['Profession' + j].split(',');
       if(Number(arr1[1]) >= 1){
         if($gameSwitches.value(Number(arr1[1]))){
-          var value1 = `${arr1[0]}`;
+          value1 = `${arr1[0]}`;
       }};
       if(Number(arr1[2]) >= 1){
         if($gameVariables.value(Number(arr1[2])) >= Number(arr1[3])){
-          var value1 = `${arr1[0]}`;
+          value1 = `${arr1[0]}`;
       }};
       if(Number(arr1[4]) >= 1){
         if($gameParty.hasItem($dataItems[Number(arr1[4])],true)){
-          var value1 = `${arr1[0]}`;
+          value1 = `${arr1[0]}`;
       }};
     };
   };
