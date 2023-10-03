@@ -2683,7 +2683,7 @@ drop_probabilityCalculation2 = function(user,id1){
 valueDropCount1 = 0;
 
 let id2 = id1 * 20;
-if(id2 == 0){id2 = 999};//0はレベル制限しない汎用ドロップ
+if(id2 == 0){id2 = 999}//0はレベル制限しない汎用ドロップ
 else if(id2 >= 51){id2 = 999};//レアリティが6以上なら制限なし
 
 if(id1 >= 5){
