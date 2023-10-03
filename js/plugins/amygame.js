@@ -743,36 +743,43 @@ if($gameSwitches.value(Number($dataItems[id].meta.SwicthOnOffUse))){
 //主人公パッシブ獲得
 actor_skilllearn1 = function(id1){
 
-var value5 = 0;
-var value6 = 0;
-var actor = $gameActors.actor(id1);  
-for (var i = 0; i < valueHeroGetSkill.length; i++) {
-  if(value5 == 0){
-    if(!actor.isLearnedSkill(valueHeroGetSkill[i])){ 
-      if($dataSkills[valueHeroGetSkill[i]].meta['MCharacterSkillLearnSwith']){
-        var value3 = Number($dataSkills[valueHeroGetSkill[i]].meta['MCharacterSkillLearnSwith']);
-          if($gameSwitches.value(value3)){
-            var value5 = 1;
-            break;
-          };
+let value5 = 0;
+//var value6 = 0;
+const actor = $gameActors.actor(id1);  
+  const max = valueHeroGetSkill.length;
+  for (var i = 0; i < max; i++) {
+    if (value5 !== 0) break;
+    
+    const heroSkill = valueHeroGetSkill[i];
+    if (!actor.isLearnedSkill(heroSkill)) {
+      const dataSkill = $dataSkills[heroSkill];
+      const mCharacterSkillLearnSwith = dataSkill.meta['MCharacterSkillLearnSwith'];
+      if (mCharacterSkillLearnSwith) {
+        var value3 = Number(mCharacterSkillLearnSwith);
+        if ($gameSwitches.value(value3)) {
+          value5 = 1;
+          break;
+        };
       };
-      if($dataSkills[valueHeroGetSkill[i]].meta['MCharacterSkillLearnSkill']){
-        var value3 = Number($dataSkills[valueHeroGetSkill[i]].meta['MCharacterSkillLearnSkill']);
-          if(actor.isLearnedSkill(value3)){
-            var value5 = 1;
-            break;
-          };
+      const mCharacterSkillLearnSkill = dataSkill.meta['MCharacterSkillLearnSkill'];
+      if (mCharacterSkillLearnSkill) {
+        const value3 = Number(mCharacterSkillLearnSkill);
+        if (actor.isLearnedSkill(value3)) {
+          value5 = 1;
+          break;
+        };
       };
-      if($dataSkills[valueHeroGetSkill[i]].meta['MCharacterSkillLearnSRank']){
-        var value3 = Number($dataSkills[valueHeroGetSkill[i]].meta['MCharacterSkillLearnSRank'].split(',')[0]);
-        var value4 = Number($dataSkills[valueHeroGetSkill[i]].meta['MCharacterSkillLearnSRank'].split(',')[1]);
-          if(actor.skillMasteryLevel(value3) >= value4){
-            var value5 = 1;
-            break;
-          };
+      const mCharacterSkillLearnSRank = dataSkill.meta['MCharacterSkillLearnSRank'];
+      if (mCharacterSkillLearnSRank) {
+        const mCharacterSkillLearnSRankArray = mCharacterSkillLearnSRank.split(',');
+        const value3 = Number(mCharacterSkillLearnSRankArray[0]);
+        const value4 = Number(mCharacterSkillLearnSRankArray[1]);
+        if (actor.skillMasteryLevel(value3) >= value4) {
+          value5 = 1;
+          break;
+        };
       };
     };
-  };
 };
 if(value5 >= 1){
   if(!$gameSwitches.value(29)){
