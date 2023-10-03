@@ -5339,58 +5339,57 @@ var value3 = 260;
 };
 
 //コンフィグ時に全般情報表示
-config_display = function(){
-
+config_display = function() {
 var value2 = `\\V[58]日目<\\V[55]> \\V[141]\n`;
 var value1 = `\\C[16]Party Record\\C[0]\n`;
 value1 += `\\I[266]\\V[16]/\\V[13]\n`;
 value1 += `F.Seed   :\\V[57]\n`;
-value1 += `S.Scene  :${$gameVariables.value(321)[0]}/${$gameVariables.value(321)[1]}\n`;
-value1 += `H.Scene  :${$gameVariables.value(322)[0]}/${$gameVariables.value(322)[1]}\n`;
-value1 += `Title    :${$gameVariables.value(323)[0]}/${$gameVariables.value(323)[1]}\n`;
-value1 += `H.Title  :${$gameVariables.value(324)[0]}/${$gameVariables.value(324)[1]}\n`;
-value1 += `Quest    :${$gameVariables.value(325)[0]}/${$gameVariables.value(325)[1]}\n`;
+let cur = $gameVariables.value(321)[0];
+let max = $gameVariables.value(321)[1];
+value1 += `S.Scene  :${cur}/${max}\n`;
+cur = $gameVariables.value(322)[0];
+max = $gameVariables.value(322)[1];
+value1 += `H.Scene  :${cur}/${max}\n`;
+cur = $gameVariables.value(323)[0];
+max = $gameVariables.value(323)[1];
+value1 += `Title    :${cur}/${max}\n`;
+cur = $gameVariables.value(324)[0];
+max = $gameVariables.value(324)[1];
+value1 += `H.Title  :${cur}/${max}\n`;
+cur = $gameVariables.value(325)[0];
+max = $gameVariables.value(325)[1];
+value1 += `Quest    :${cur}/${max}\n`;
 value1 += `PartySize:\\V[54]\n`;
 value1 += `Battle   :\\V[46]\n`;
 value1 += `Victory  :\\V[47]\n`;
 value1 += `Defeat   :\\V[48]\n`;
-value1 += `Escape   :${$gameSystem.escapeCount()}\n`;
-value1 += `TotalKill:\\V[43]\n`;
-value1 += `                          `;
-var value3 = `\\C[16][発動中の称号効果]\\C[0]\n`
-for (var i = 0; i <= $gameVariables.value(289)-1; i++) {
-  if($gameVariables.value(288)[i] == 0){
-    value3 += `Empty\n`;
-  } else {
-    value3 += `\\C[2]${$dataItems[$gameVariables.value(288)[i]].name}\\C[0]\n`;
-}};
+cur = $gameSystem.escapeCount();
+value1 += `Escape   :${cur}\n`;
+value1 += `TotalKill:\\V[43]\n\n`;
+
+var value3 = `\\C[16][発動中の称号効果]\\C[0]\n`;
+const itemIndexesCount = $gameVariables.value(289);
+const ItemIndexes = $gameVariables.value(288);
+for (let i = 0; i < itemIndexesCount; i++) {
+	const itemIndex = ItemIndexes[i];
+	if (itemIndex == 0) {
+		value3 += `Empty\n`;
+	} else {
+		const itemName = $dataItems[itemIndex].name;
+		value3 += `\\C[2]${itemName}\\C[0]\n`;
+	}
+}
 
 WindowManager.show(1, 0, 0, 800, 68);
 WindowManager.drawText(1, `\\fs[25]${value2}`);
 WindowManager.show(2, 410, 68, 390, 520);
 WindowManager.drawText(2, value3);
-var id1 = 101;
+
+const id1 = 101;
 $gameScreen.setDTextPicture(value1, 25);
 $gameScreen.dWindowFrame = 'ON';
-$gameScreen.showPicture(id1,"",0,810,80,100,100,255,0);
+$gameScreen.showPicture(id1, "", 0, 810, 80, 100, 100, 255, 0);
 $gameMessage.setSelectPictureId(0, 101);
-
-//WindowManager.show(3, 800, 68, 480, 48 + ($gameVariables.value(289) * 48));
-//WindowManager.drawText(3, value3);
-/*:
-var id1 = 96;
-$gameScreen.setDTextPicture(value2, 25);
-$gameScreen.dWindowFrame = 'ON';
-$gameScreen.showPicture(id1,"",0,1280,10,100,100,255,0);
-$gameScreen.movePicture(id1,0,20,10,100,100,255,0,100);
-
-var id1 = 97;
-$gameScreen.setDTextPicture(value1, 25);
-$gameScreen.dWindowFrame = 'ON';
-$gameScreen.showPicture(id1,"",0,60,768,100,100,255,0);
-$gameScreen.movePicture(id1,0,20,70,100,100,255,0,100);
-*/
-
 };
 
 //会話時に実行
