@@ -148,7 +148,7 @@ for (var i = 1; i <= $dataSystem.switches.length-1; i++) {
 var value1 = 1;
 var value2 = 1;
 var value3 = 1;
-var value4 = 1;
+//var value4 = 1;
 var value5 = 1;
 var value6 = 1;
 for (var i = 1; i <= $dataWeapons.length-1; i++) {
@@ -158,92 +158,102 @@ for (var i = 1; i <= $dataWeapons.length-1; i++) {
     };
   };
 };
-for (var i = 1; i <= $dataItems.length-1; i++) {
-  if(!$dataItems[i].name == '') {
-    if($dataItems[i].meta['ItemNameAddSet']) {
-      var arr1 = $dataItems[i].meta['ItemNameAddSet'].split(',');
-      if(Number(arr1[0]) == 0){var valueItems = $dataItems[Number(arr1[1])].name};
-      if(Number(arr1[0]) == 1){var valueItems = $dataWeapons[Number(arr1[1])].name};
-      if(Number(arr1[0]) == 2){var valueItems = $dataArmors[Number(arr1[1])].name};
-      if(Number(arr1[0]) == 3){var valueItems = $dataStates[Number(arr1[1])].name};
-      if(Number(arr1[0]) == 4){var valueItems = $dataSkills[Number(arr1[1])].name};
-      if(Number(arr1[0]) == 5){var valueItems = $dataStates[Number(arr1[1])].name};
-      if(Number(arr1[0]) == 6){var valueItems = $dataSystem.switches[Number(arr1[1])]};
+
+const itemEICSwitch = item.meta['EICSwitch'];
+const itemEICSwitchNumber = Number(itemEICSwitch);
+const itemsCount = $dataItems.length;
+for (var i = 1; i < itemsCount; i++) {
+  let item = $dataItems[i];
+  if(item.name !== '') {
+    if(item.meta['ItemNameAddSet']) {
+      var arr1 = item.meta['ItemNameAddSet'].split(',');
+      const index = index;
+      if(index == 0){var valueItems = $dataItems[Number(arr1[1])].name}
+      else if(index == 1){var valueItems = $dataWeapons[Number(arr1[1])].name}
+      else if(index == 2){var valueItems = $dataArmors[Number(arr1[1])].name}
+      else if(index == 3){var valueItems = $dataStates[Number(arr1[1])].name}
+      else if(index == 4){var valueItems = $dataSkills[Number(arr1[1])].name}
+      else if(index == 5){var valueItems = $dataStates[Number(arr1[1])].name}
+      else if(index == 6){var valueItems = $dataSystem.switches[Number(arr1[1])]};
       if(Number(arr1[2]) == 0){
-        $dataItems[i].name = `${valueItems}${$dataItems[i].name}`;
+        item.name = `${valueItems}${item.name}`;
       } else {
-        $dataItems[i].name = `${$dataItems[i].name}${valueItems}`;
+        item.name = `${item.name}${valueItems}`;
       };
     };
-    if($dataItems[i].meta['annihilationTitle']) {
-      if(Number($dataItems[i].meta['annihilationTitle'].split(',')[0]) >= 20) {
-        $dataItems[i].name = `${$dataItems[Number($dataItems[i].meta['annihilationTitle'].split(',')[0])].name}を殲滅せし者`;
+    if(item.meta['annihilationTitle']) {
+      if(Number(item.meta['annihilationTitle'].split(',')[0]) >= 20) {
+        item.name = `${$dataItems[Number(item.meta['annihilationTitle'].split(',')[0])].name}を殲滅せし者`;
       };
     };
-    if($dataItems[i].meta['MapSwitch']) {
-      $dataItems[i].name = `${$dataSystem.switches[Number($dataItems[i].meta['MapSwitch'])]}`;
+    if(item.meta['MapSwitch']) {
+      item.name = `${$dataSystem.switches[Number(item.meta['MapSwitch'])]}`;
     };
-    if($dataItems[i].meta['EICSwitch']) {
-      if(Number($dataItems[i].meta['EICSwitch']) == 102) {
+    if (itemEICSwitch) {
+      if(itemEICSwitchNumber == 102) {
         if(i >= 401 && i <= 500){
-          $dataItems[i].name = $dataCommonEvents[i].name;
+          item.name = $dataCommonEvents[i].name;
         };
-        if($dataItems[i].meta['追加コモンID']) {
-          $dataItems[i].name = $dataCommonEvents[i].name;
+        if(item.meta['追加コモンID']) {
+          item.name = $dataCommonEvents[i].name;
         };
-        $dataItems[i].name = '[' + value1 + ']' + $dataItems[i].name;
+        item.name = '[' + value1 + ']' + item.name;
         value1 += 1;
-      };
-      if(Number($dataItems[i].meta['EICSwitch']) == 103) {
+      }
+      else if(itemEICSwitchNumber == 103) {
         if(i >= 501 && i <= 600){
-          $dataItems[i].name = $dataCommonEvents[i].name;
+          item.name = $dataCommonEvents[i].name;
         };
-        if($dataItems[i].meta['追加コモンID']) {
-          $dataItems[i].name = $dataCommonEvents[i].name;
+        if(item.meta['追加コモンID']) {
+          item.name = $dataCommonEvents[i].name;
         };
-        $dataItems[i].name = '[' + value2 + ']' + $dataItems[i].name;
+        item.name = '[' + value2 + ']' + item.name;
         value2 += 1;
-      };
-      if(Number($dataItems[i].meta['EICSwitch']) == 104 || Number($dataItems[i].meta['EICSwitch']) == 105) {//二つ名は説明の方に連番を付与する
-        $dataItems[i].description = '[' + value3 + ']' + $dataItems[i].description;
+      }
+      else if(itemEICSwitchNumber == 104 || itemEICSwitchNumber == 105) {//二つ名は説明の方に連番を付与する
+        item.description = '[' + value3 + ']' + item.description;
         value3 += 1;
-          if ($dataItems[i].meta['KojinTitle']) {
+          if (item.meta['KojinTitle']) {
             if($gameVariables.value(297)[i] >= 1){
-              $dataItems[i].description += `[達成者:${$gameActors.actor($gameVariables.value(297)[i]).name()}]`;
+              item.description += `[達成者:${$gameActors.actor($gameVariables.value(297)[i]).name()}]`;
             }
           };
-      };
-      if(Number($dataItems[i].meta['EICSwitch']) == 108) {
-        if($dataItems[i].meta['SGカテゴリ'] == '受注クエスト' || $dataItems[i].meta['SGカテゴリ'] == 'ＥＸ受注クエスト') {//特別クエスト使わない。クエスト801～を901に名前と解説とアイコンをコピーする
-          $dataItems[i].name = '[' + value5 + ']' + $dataItems[i].name;
-          $dataItems[i+100].iconIndex = $dataItems[i].iconIndex;
-          $dataItems[i+100].name = `${$dataItems[i].name}[了]`;
-          $dataItems[i+100].description = $dataItems[i].description;
+      }
+      else if(itemEICSwitchNumber == 108) {
+        const itemCategory = item.meta['SGカテゴリ'];
+        if(itemCategory == '受注クエスト' || itemCategory == 'ＥＸ受注クエスト') {//特別クエスト使わない。クエスト801～を901に名前と解説とアイコンをコピーする
+          item.name = '[' + value5 + ']' + item.name;
+          const item100 = $dataItems[i+100];
+          item100.iconIndex = item.iconIndex;
+          item100.name = `${item.name}[了]`;
+          item100.description = item.description;
           value5 += 1;
-        };
-        if($dataItems[i].meta['SGカテゴリ'] == 'デイリークエスト') {
-          $dataItems[i].name = '[' + value6 + ']' + $dataItems[i].name;
-          $dataItems[i+50].iconIndex = $dataItems[i].iconIndex;
-          $dataItems[i+50].name = `${$dataItems[i].name}[了]`;
-          $dataItems[i+50].description = $dataItems[i].description;
+        }
+        else if(itemCategory == 'デイリークエスト') {
+          item.name = '[' + value6 + ']' + item.name;
+          const item50 = $dataItems[i+50];
+          item50.iconIndex = item.iconIndex;
+          item50.name = `${item.name}[了]`;
+          item50.description = item.description;
           value6 += 1;
         };
       };
 }}};
 
 //不用なクエスト完了削除。辞典に反映させないため
-for (var i = 1; i <= $dataItems.length-1; i++) {
-  if(Number($dataItems[i].meta['EICSwitch']) == 108) {
-    if($dataItems[i].name == '') {
-      if(i >= 801 && i <= 900){
-        //const obj1 = $dataItems[2];
-        //$dataItems[i+100] = Object.assign({}, obj1);
-      };
-      if(i >= 1001 && i <= 1050){
-        //const obj1 = $dataItems[2];
-        //$dataItems[i+50] = Object.assign({}, obj1);
-      };
-}}};
+// for (var i = 1; i < itemsCount; i++) {
+//   const item = $dataItems[i];
+//   if (itemEICSwitchNumber == 108) {
+//     if(item.name == '') {
+//       if(i >= 801 && i <= 900){
+//         //const obj1 = $dataItems[2];
+//         //$dataItems[i+100] = Object.assign({}, obj1);
+//       }
+//       else if(i >= 1001 && i <= 1050){
+//         //const obj1 = $dataItems[2];
+//         //$dataItems[i+50] = Object.assign({}, obj1);
+//       };
+// }}};
 
 //ステート武器防具スキルに説明文追加。状態異常耐性付与の先に実行。反映させないため
 various_description(4);//ステートは最初
@@ -259,88 +269,57 @@ var arr2 = [];
 var start = 1;
 var end = $dataStates.length-1;
 for (var i = start; i <= end; i++) {
-  if($dataStates[i].meta['Category'] == ' StateNomal'){
+  const stateCategory = $dataStates[i].meta['Category'];
+  if (stateCategory == ' StateNomal'){
       arr1.push(i);
-  };
-  if($dataStates[i].meta['Category'] == ' StateabNomal'){
+  }
+  else if (stateCategory == ' StateabNomal'){
     arr2.push(i);
   };
 };
 for (var j = 1; j <= 4; j++) {
-  if(j == 1){valueItems = $dataStates};
-  if(j == 2){valueItems = $dataWeapons};
-  if(j == 3){valueItems = $dataArmors};
-  if(j == 4){valueItems = $dataClasses};
+  if(j == 1){valueItems = $dataStates}
+  else if(j == 2){valueItems = $dataWeapons}
+  else if(j == 3){valueItems = $dataArmors}
+  else if(j == 4){valueItems = $dataClasses};
+
   var start = 1;
-  if(j == 3){
-    var end = valueArmorsLength;
-  } else {
-    var end = valueItems.length-1;
-  };
+  const end = j == 3 ? valueArmorsLength : valueItems.length - 1;
   for (var i = start; i <= end; i++) {
-    if(valueItems[i].meta['StateabNomalResist']){
-      var list = arr1;
-      list.forEach(function(id) {
-        var value1 = Number(valueItems[i].meta['StateabNomalResist']);
-          if(value1 == 0){
-            valueItems[i].traits.push({code: 14, dataId: id, value: 1});
-          } else {
-            valueItems[i].traits.push({code: 13, dataId: id, value: 1 - (value1/100)});
-          };
+    const valueItem = valueItems[i];
+    if(valueItem.meta['StateabNomalResist']){
+      const list = arr1;
+      const value1 = Number(valueItem.meta['StateabNomalResist']);
+      const code = value1 == 0 ? 14 : 13;
+      const value = value1 == 0 ? 1 : 1 - (value1 / 100);
+      list.forEach(function (id) {
+        valueItem.traits.push({ code: code, dataId: id, value: value });
       }, this);
     };
-    if(valueItems[i].meta['StateSPabNomalResist']){
-      var list = arr2;
-      list.forEach(function(id) {
-        var value1 = Number(valueItems[i].meta['StateSPabNomalResist']);
-          if(value1 == 0){
-            valueItems[i].traits.push({code: 14, dataId: id, value: 1});
-          } else {
-            valueItems[i].traits.push({code: 13, dataId: id, value: 1 - (value1/100)});
-          };
+    if(valueItem.meta['StateSPabNomalResist']){
+      const list = arr2;
+      const value1 = Number(valueItem.meta['StateSPabNomalResist']);
+      const code = value1 == 0 ? 14 : 13;
+      const value = value1 == 0 ? 1 : 1 - (value1 / 100);
+      list.forEach(function (id) {
+        valueItem.traits.push({ code: code, dataId: id, value: value });
       }, this);
     };
-    if(valueItems[i].meta['elementRegist6']){
-      var value1 = Number(valueItems[i].meta['elementRegist6']);
-      if(value1 == 0){
-        valueItems[i].traits.push({code: 11, dataId: 3, value: 0});
-        valueItems[i].traits.push({code: 11, dataId: 4, value: 0});
-        valueItems[i].traits.push({code: 11, dataId: 5, value: 0});
-        valueItems[i].traits.push({code: 11, dataId: 6, value: 0});
-        valueItems[i].traits.push({code: 11, dataId: 7, value: 0});
-        valueItems[i].traits.push({code: 11, dataId: 8, value: 0});
-      } else {
-        valueItems[i].traits.push({code: 11, dataId: 3, value: 1 - (value1/100)});
-        valueItems[i].traits.push({code: 11, dataId: 4, value: 1 - (value1/100)});
-        valueItems[i].traits.push({code: 11, dataId: 5, value: 1 - (value1/100)});
-        valueItems[i].traits.push({code: 11, dataId: 6, value: 1 - (value1/100)});
-        valueItems[i].traits.push({code: 11, dataId: 7, value: 1 - (value1/100)});
-        valueItems[i].traits.push({code: 11, dataId: 8, value: 1 - (value1/100)});
-      };
+    if(valueItem.meta['elementRegist6']){
+      const value1 = Number(valueItem.meta['elementRegist6']);
+      const value = value1 == 0 ? 0 : 1 - (value1 / 100);
+      for (let dataId = 3; dataId <= 8; dataId++) {
+        valueItem.traits.push({ code: 11, dataId: dataId, value: value });
+      }
     };
-    if(valueItems[i].meta['elementRegist9']){
-      var value1 = Number(valueItems[i].meta['elementRegist9']);
-      if(value1 == 0){
-        valueItems[i].traits.push({code: 11, dataId: 3, value: 0});
-        valueItems[i].traits.push({code: 11, dataId: 4, value: 0});
-        valueItems[i].traits.push({code: 11, dataId: 5, value: 0});
-        valueItems[i].traits.push({code: 11, dataId: 6, value: 0});
-        valueItems[i].traits.push({code: 11, dataId: 7, value: 0});
-        valueItems[i].traits.push({code: 11, dataId: 8, value: 0});
-        valueItems[i].traits.push({code: 11, dataId: 9, value: 0});
-        valueItems[i].traits.push({code: 11, dataId: 16, value: 0});
-        valueItems[i].traits.push({code: 11, dataId: 17, value: 0});
-      } else {
-        valueItems[i].traits.push({code: 11, dataId: 3, value: 1 - (value1/100)});
-        valueItems[i].traits.push({code: 11, dataId: 4, value: 1 - (value1/100)});
-        valueItems[i].traits.push({code: 11, dataId: 5, value: 1 - (value1/100)});
-        valueItems[i].traits.push({code: 11, dataId: 6, value: 1 - (value1/100)});
-        valueItems[i].traits.push({code: 11, dataId: 7, value: 1 - (value1/100)});
-        valueItems[i].traits.push({code: 11, dataId: 8, value: 1 - (value1/100)});
-        valueItems[i].traits.push({code: 11, dataId: 9, value: 1 - (value1/100)});
-        valueItems[i].traits.push({code: 11, dataId: 16, value: 1 - (value1/100)});
-        valueItems[i].traits.push({code: 11, dataId: 17, value: 1 - (value1/100)});
-      };
+    if(valueItem.meta['elementRegist9']){
+      const value1 = Number(valueItem.meta['elementRegist9']);
+      const value = value1 == 0 ? 0 : 1 - (value1 / 100);
+      for (let dataId = 3; dataId <= 9; dataId++) {
+        valueItem.traits.push({ code: 11, dataId: dataId, value: value });
+      }
+      valueItem.traits.push({ code: 11, dataId: 16, value: value });
+      valueItem.traits.push({ code: 11, dataId: 17, value: value });
     };
   };
 };
@@ -350,11 +329,12 @@ enemy_troopPosition1();
 
 //ダンジョンユニーク採取品の解説文にマップ名追記
 for (var i = 1; i <= 9; i++) {
-  for (var j = 1; j <= $dataItems.length-1; j++) {
-    if($dataItems[j].meta['UniqueMaterial' + i]){
-      var arr1 = $dataItems[j].meta['UniqueMaterial' + i].split(',');
-      if($dataItems[j].meta['MapSwitch']){
-        $dataItems[Number(arr1[0])].description += ` \\C[2][${$dataSystem.switches[Number($dataItems[j].meta['MapSwitch'])]}で希少採取]\\C[0]`;
+  for (var j = 1; j < itemsCount; j++) {
+    const item = $dataItems[j];
+    if(item.meta['UniqueMaterial' + i]){
+      var arr1 = item.meta['UniqueMaterial' + i].split(',');
+      if(item.meta['MapSwitch']){
+        $dataItems[Number(arr1[0])].description += ` \\C[2][${$dataSystem.switches[Number(item.meta['MapSwitch'])]}で希少採取]\\C[0]`;
       };
     };
   };
@@ -373,16 +353,19 @@ for (var i = start; i <= end; i++) {
 };
 //特定場所スイッチ変更.マップ名表示処理も含める。コモン288で実行
 if($dataSystem.variables[61].match(/りしゃぶる/)){
-  if($dataWeapons[315].meta['FamilyName']){
-    $dataSystem.switches[279] = `喫茶 <${$dataWeapons[315].meta['FamilyName']}カフェ>`;
+  let familyName = $dataWeapons[315].meta['FamilyName'];
+  if (familyName){
+    $dataSystem.switches[279] = `喫茶 <${familyName}カフェ>`;
     valueMapNameSpecialStaging[200] = $dataSystem.switches[279];
   };
-  if($dataWeapons[311].meta['FamilyName']){
-    $dataSystem.switches[275] = `書店 <${$dataWeapons[311].meta['FamilyName']}古書店>`;
+  familyName = $dataWeapons[311].meta['FamilyName'];
+  if (familyName){
+    $dataSystem.switches[275] = `書店 <${familyName}古書店>`;
     valueMapNameSpecialStaging[95] = $dataSystem.switches[275];
   };
-  if($dataWeapons[316].meta['FamilyName']){
-    $dataSystem.switches[274] = `民家 <${$dataWeapons[316].meta['FamilyName']}家>`;
+  familyName = $dataWeapons[316].meta['FamilyName'];
+  if (familyName){
+    $dataSystem.switches[274] = `民家 <${familyName}家>`;
     valueMapNameSpecialStaging[25] = $dataSystem.switches[274];
   };
   valueMapNameSpecialStaging[146] = `${$dataSystem.switches[341]}-[B1F]`;
@@ -470,10 +453,11 @@ Profession_basicReturn = function(id1){
 
 if(!$gameSwitches.value(29)){
   actor = $gameActors.actor(id1);
-  var value1 = `${$dataActors[id1].meta['Profession']}`;
+  const dataActor = $dataActors[id1];
+  var value1 = `${dataActor.meta['Profession']}`;
   for(var j = 1; j <= 9; j++){
-    if($dataActors[id1].meta['Profession' + j]){
-      var arr1 = $dataActors[id1].meta['Profession' + j].split(',');
+    if (dataActor.meta['Profession' + j]){
+      var arr1 = dataActor.meta['Profession' + j].split(',');
       if(Number(arr1[1]) >= 1){
         if($gameSwitches.value(Number(arr1[1]))){
           var value1 = `${arr1[0]}`;
@@ -488,9 +472,11 @@ if(!$gameSwitches.value(29)){
       }};
     };
   };
-  if($gameVariables.value(380 + id1)[59] != value1){
+
+  const profession = $gameVariables.value(380 + id1)[59];
+  if (profession != value1){
     if(!$gameSwitches.value(380)){
-      var value2 = `　　\\N[${id1}]の役職名が\\C[1]<${$gameVariables.value(380 + id1)[59]}>\\C[0]から\\C[2]<${value1}>\\C[0]に変更されました。`;
+      var value2 = `　　\\N[${id1}]の役職名が\\C[1]<${profession}>\\C[0]から\\C[2]<${value1}>\\C[0]に変更されました。`;
       TickerManager.show(value2);
     };
     $gameVariables.value(380 + id1)[59] = value1;
@@ -3163,7 +3149,7 @@ if($gameParty.inBattle()){
     };
     for (var i = start; i <= end; i++) {
       var j = 0;
-      if(valueItems[i].meta['LotteryRearity']){
+      if(valueItem.meta['LotteryRearity']){
         if(Number(valueItems[i].meta['LotteryRearity']) == value7){
           j = 1;
       }};

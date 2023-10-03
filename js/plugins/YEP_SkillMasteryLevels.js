@@ -1147,7 +1147,11 @@ Window_Base.prototype.drawSkillMasteryGauge = function(skill, x, y, width) {
     width -= 1;
   }
   var rate = this._actor.skillMasteryRate(skill);
-  if (Number.isNaN(rate)) rate = 0; // rate sometimes can be NaN
+  const rateIsNaN = Number.isNaN(rate);
+  if(rateIsNaN){
+	  console.log("skill mastery rate of '" + skill.name + "' is NaN! Set to 0. Actor: " + this._actor._name)
+	  rate = 0; // rate sometimes can be NaN
+  }
   var fillW = Math.floor(width * rate);
   this.contents.gradientFillRect(x, gaugeY, fillW, gaugeH, color1, color2);
 };
