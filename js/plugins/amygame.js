@@ -159,15 +159,13 @@ for (var i = 1; i <= $dataWeapons.length-1; i++) {
   };
 };
 
-const itemEICSwitch = item.meta['EICSwitch'];
-const itemEICSwitchNumber = Number(itemEICSwitch);
 const itemsCount = $dataItems.length;
 for (var i = 1; i < itemsCount; i++) {
   let item = $dataItems[i];
   if(item.name !== '') {
     if(item.meta['ItemNameAddSet']) {
       var arr1 = item.meta['ItemNameAddSet'].split(',');
-      const index = index;
+      const index = Number(arr1[0]);
       if(index == 0){var valueItems = $dataItems[Number(arr1[1])].name}
       else if(index == 1){var valueItems = $dataWeapons[Number(arr1[1])].name}
       else if(index == 2){var valueItems = $dataArmors[Number(arr1[1])].name}
@@ -189,7 +187,9 @@ for (var i = 1; i < itemsCount; i++) {
     if(item.meta['MapSwitch']) {
       item.name = `${$dataSystem.switches[Number(item.meta['MapSwitch'])]}`;
     };
+    const itemEICSwitch = item.meta['EICSwitch'];
     if (itemEICSwitch) {
+      const itemEICSwitchNumber = Number(itemEICSwitch);
       if(itemEICSwitchNumber == 102) {
         if(i >= 401 && i <= 500){
           item.name = $dataCommonEvents[i].name;
