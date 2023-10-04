@@ -790,6 +790,7 @@ const actor = $gameActors.actor(id1);
 //複合スキル
 if(value5 == 0){//797見極め習得
   var id = valueIdentifySkillId;
+  console.log("valueIdentifySkillId 1:" + valueIdentifySkillId);
   if(!actor.isLearnedSkill(id)){ 
     let value2 = 766;
     const value3 = 764;
@@ -798,13 +799,14 @@ if(value5 == 0){//797見極め習得
       actor.learnSkill(id);
       $gameVariables.setValue(19,id);
     };
-  //};
-//};
-//if(value5 == 0){//799大量採取
-  //var id = valueIdentifySkillId;
-  //if(!actor.isLearnedSkill(id)){ 
+  };
+};
+if(value5 == 0){//799大量採取
+  var id = valueIdentifySkillId;
+  console.log("valueIdentifySkillId 2:" + valueIdentifySkillId);
+  if(!actor.isLearnedSkill(id)){ 
     value2 = 763;
-    //var value3 = 764;
+    var value3 = 764;
     value4 = 2;
     if(actor.skillMasteryLevel(value2) >= value4 && actor.skillMasteryLevel(value3) >= value4){
       actor.learnSkill(id);
@@ -4286,14 +4288,14 @@ var value2 = ` `;
 //  var value1 = 296;
 //}else{
 let value1 = 0;
-const maxMasteryLevel = $dataSkills[skillId].meta["Max Mastery Level"];
+  const maxMasteryLevel = $dataSkills[skillId].meta["Max Mastery Level"];
+  const userName = user.name();
   if(maxMasteryLevel){
     if(user.skillMasteryLevel(skillId) < 1){
       value1 = 296;
     } else {
       value1 = 297;
     };
-	const userName = user.name();
     if(user.skillMasteryLevel(skillId) < 1){
       value2 += `${userName}は\\C[16]\x1bSIN[${skillId}]\\C[0]を習得した！`;
     } else {
@@ -4334,8 +4336,8 @@ job_releaseUnlockEvent = function(id1,id2){
 var actor = $gameActors.actor($gameVariables.value(20));
 var value3 = 101;
 var value4 = 1;
-var value5 = $gameMap.event(1).screenX()*$gameScreen.zoomScale();
-var value6 = $gameMap.event(1).screenY()*$gameScreen.zoomScale();
+//var value5 = $gameMap.event(1).screenX()*$gameScreen.zoomScale();
+//var value6 = $gameMap.event(1).screenY()*$gameScreen.zoomScale();
 const id = 1; 
 const choiceParams = {
 text: `${actor.name()}→`,value: 0};
@@ -4453,36 +4455,39 @@ for (var j = id1; j <= id2; j++) {
 };
 
 //クラス毎ジョブ解放スクリプト。コスト支払い
-job_releaseCostEvent = function(value1){
+job_releaseCostEvent = function(classId){
 
-var value8 = Number($dataClasses[value1].meta['classRank']);
-  if(value8 == 1){var value10 = 3000};
-  if(value8 == 2){var value10 = 10000};
-  if(value8 == 3){var value10 = 100000};
-  if(value8 == 3){
-    var value3 = '21_ClassRelease2';
-  } else {
-    var value3 = '21_ClassRelease';
-  };
-  AudioManager.playMe({"name":value3,"volume":90,"pitch":100,"pan":0});
-  $gameParty.loseGold(value10);
-  var value2 = `所持金:-\\C[2]${value10}\\C[0]\\G`;
-  CommonPopupManager.showInfo({},value2,null);
+var classRankIndex = Number($dataClasses[classId].meta['classRank']);
 
-  if(value8 >= 1){
+  if(classRankIndex == 1){var goldValue = 3000}
+  else if(classRankIndex == 2){var goldValue = 10000}
+  else if (classRankIndex == 3) { var goldValue = 100000 };
+
+  var soundFileName = classRankIndex == 3 ? '21_ClassRelease2' : '21_ClassRelease';
+  AudioManager.playMe({"name":soundFileName,"volume":90,"pitch":100,"pan":0});
+
+  $gameParty.loseGold(goldValue);
+  var messageText = `所持金:-\\C[2]${goldValue}\\C[0]\\G`;
+  CommonPopupManager.showInfo({}, messageText, null);
+
+  let itemIndex = 0;
+  if(classRankIndex >= 1){
     for (var i = 1; i <= $dataItems.length-1; i++) {
-      if($dataItems[i].meta['class'+value8+'JobReleaseM']){
-      var value9 = i;
-      break;
+      if ($dataItems[i].meta['class' + classRankIndex + 'JobReleaseM']) {
+        itemIndex = i;
+        break;
   }}};
-  if(value9 >= 1){
-    $gameParty.loseItem($dataItems[value9], 3);
-    var value2 = `アイテム:-\\C[2]${$dataItems[value9].name}\\C[0]`;
-    CommonPopupManager.showInfo({},value2,null);
+
+  if(itemIndex >= 1){
+    const item = $dataItems[itemIndex];
+    $gameParty.loseItem(item, 3);
+
+    const messageText = `アイテム:-\\C[2]${item.name}\\C[0]`;
+    CommonPopupManager.showInfo({},messageText,null);
   };
 
 var actor = $gameActors.actor($gameVariables.value(20));
-actor.unlockClass(value1);
+actor.unlockClass(classId);
 $gameSwitches.setValue(424,true);//初めてジョブ解放したスイッチ
 
 };
