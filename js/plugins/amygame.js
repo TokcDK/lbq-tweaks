@@ -780,32 +780,32 @@ const actor = $gameActors.actor(id1);
         };
       };
     };
-};
-if(value5 >= 1){
-  if(!$gameSwitches.value(29)){
-    actor.learnSkill(valueHeroGetSkill[i]);
-  };
-  $gameVariables.setValue(19,valueHeroGetSkill[i]);
+    if (value5 >= 1) {
+      if (!$gameSwitches.value(29)) {
+        actor.learnSkill(valueHeroGetSkill[i]);
+      };
+      $gameVariables.setValue(19, valueHeroGetSkill[i]);
+    };
 };
 //複合スキル
 if(value5 == 0){//797見極め習得
   var id = valueIdentifySkillId;
   if(!actor.isLearnedSkill(id)){ 
-    var value2 = 766;
-    var value3 = 764;
-    var value4 = 3;
+    let value2 = 766;
+    const value3 = 764;
+    let value4 = 3;
     if(actor.isLearnedSkill(value2) && actor.skillMasteryLevel(value3) >= value4){
       actor.learnSkill(id);
       $gameVariables.setValue(19,id);
     };
-  };
-};
-if(value5 == 0){//799大量採取
-  var id = valueIdentifySkillId;
-  if(!actor.isLearnedSkill(id)){ 
-    var value2 = 763;
-    var value3 = 764;
-    var value4 = 2;
+  //};
+//};
+//if(value5 == 0){//799大量採取
+  //var id = valueIdentifySkillId;
+  //if(!actor.isLearnedSkill(id)){ 
+    value2 = 763;
+    //var value3 = 764;
+    value4 = 2;
     if(actor.skillMasteryLevel(value2) >= value4 && actor.skillMasteryLevel(value3) >= value4){
       actor.learnSkill(id);
       $gameVariables.setValue(19,id);
