@@ -910,27 +910,24 @@ if(b.actorId() == a.actorId()){
 };
 
 //ステートオンオフ
-skill_stateonoff = function(a,b,itemId,value1){
+skill_stateonoff = function(actorA, actorB, skillId, stateId){
 
-var value1 = Number($dataSkills[itemId].meta['SkillStateAddRemove']);
-if(b.actorId() == a.actorId()){
-  if($gameActors.actor(b._actorId).isStateAffected(value1)){
-    $gameActors.actor(b._actorId).removeState(value1);
-    if($gameParty.inBattle()){b.startAnimation(289, true, 0)};
-    if($dataSkills[itemId].meta['TachieChangeSet']){//たぶん使ってない
-      $gameActors.actor(b._actorId).addState(20);
-      $gameSwitches.setValue(96,true);
-    };
-    TickerManager.show(`\\C[16]${b.name()}\\C[0]の\\C[2]\x1bSIN[${itemId}]\\C[0]が解除された。`);
-  } else {
-    $gameActors.actor(b._actorId).addState(value1);
-    if($gameParty.inBattle()){b.startAnimation(282, true, 0)};
-    if($dataSkills[itemId].meta['TachieChangeSet']){
-      $gameActors.actor(b._actorId).addState(20);
-      $gameSwitches.setValue(96,true);
-    };
-    TickerManager.show(`\\C[16]${b.name()}\\C[0]に\\C[2]\x1bSIN[${itemId}]\\C[0]が付与された。`);
+const skill = $dataSkills[skillId];
+var stateId = Number(skill.meta['SkillStateAddRemove']);
+if(actorB.actorId() == actorA.actorId()){
+  const actor = $gameActors.actor(actorB._actorId);
+  const isStateAffected = actor.isStateAffected(stateId);
+  if (isStateAffected) actor.removeState(stateId);
+  const animationId = isStateAffected ? 289 : 282;
+  if ($gameParty.inBattle()) { actorB.startAnimation(animationId, true, 0) };
+  if (skill.meta['TachieChangeSet']) {//たぶん使ってない
+    actor.addState(20);
+    $gameSwitches.setValue(96, true);
   };
+  const actorName = `\\C[16]${actorB.name()}\\C[0]`;
+  const skillName = `\\C[2]\x1bSIN[${skillId}]\\C[0]`;
+  const message = isStateAffected ? `${actorName}の${skillName}が解除された。` : `${actorName}に${skillName}が付与された。`;
+  TickerManager.show(message);
 };
 
 };
