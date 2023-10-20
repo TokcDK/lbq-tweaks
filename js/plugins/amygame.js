@@ -840,16 +840,15 @@ for (var i = start; i <= end; i++) {
 //パーソナルスキルのonoffロード時
 skill_personalonoffload = function(itemId,value1){
 
-if(value1 == 0){valueItems = $dataSkills};
-if(value1 == 1){valueItems = $dataItems};
-if($gameSwitches.value(Number(valueItems[itemId].meta.SwicthOnOffUse))){
-  valueItems[itemId].name = valueItems[itemId].meta.SwicthOnName; 
-  if(!$gameSwitches.value(19)){$gameSwitches.setValue(Number(valueItems[itemId].meta.SwicthOnOffUse),true)};
-} else {
-  valueItems[itemId].name = valueItems[itemId].meta.SwicthOffName;
-  if(!$gameSwitches.value(19)){$gameSwitches.setValue(Number(valueItems[itemId].meta.SwicthOnOffUse),false)};
-};
+  if (value1 == 0) { valueItems = $dataSkills }
+  else if (value1 == 1) { valueItems = $dataItems };
 
+  const item = valueItems[itemId];
+  const itemMetaSwitchOnOffUseNum = item.meta.SwicthOnOffUse;
+  const isOn = $gameSwitches.value(itemMetaSwitchOnOffUseNum);
+
+  item.name = isOn ? item.meta.SwicthOnName : item.meta.SwicthOffName;
+  if (!$gameSwitches.value(19)) $gameSwitches.setValue(itemMetaSwitchOnOffUseNum, isOn);
 };
 
 //パーソナルスキルのonoff
