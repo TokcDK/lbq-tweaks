@@ -693,22 +693,18 @@ if(!$gameSwitches.value(209)){//全体マップ以外で表示10
     $gameScreen.dTextAlign = 0;
     $gameScreen.dWindowFrame = 'ON';
     $gameScreen.showPicture(50,"",0,1010,value10,80,80,250,0);
-      if($gameSwitches.value(211)){
+/*       if($gameSwitches.value(211)){
         
       } else {
         //$gameScreen.showPicture(50,"",0,10,10,80,80,250,0);
-      };
+      }; */
   } else {
     $gameScreen.dTextAlign = 1;
-    if($gameSwitches.value(201)){
-      var value5 = 760;
-      var value6 = "PictureBottan49d";
-    } else {
-      var value5 = 860;
-      var value6 = "PictureBottan49";
-    };
-    $gameScreen.showPicture(50,"",0,value5,10,100,100,255,0);
-    $gameScreen.showPicture(49,value6,0,0,-5,100,100,250,0);
+    const var201 = $gameSwitches.value(201);
+    const picId = var201 ? 760 : 860;
+    $gameScreen.showPicture(50, "", 0, picId, 10, 100, 100, 255, 0);
+    const picName = var201 ? "PictureBottan49d" : "PictureBottan49";
+    $gameScreen.showPicture(49,picName,0,0,-5,100,100,250,0);
   };
 };
 
@@ -717,26 +713,24 @@ if(!$gameSwitches.value(209)){//全体マップ以外で表示10
 //エリクシール設定コンティニュー
 continue_settei = function(id){
 
-if (!$gameParty.hasItem($dataItems[id])) {
-  $dataItems[id].name = $dataItems[id].meta.SwicthOffName;
-  $gameSwitches.setValue(Number($dataItems[id].meta.SwicthOnOffUse),false);
-};
-if($gameSwitches.value(Number($dataItems[id].meta.SwicthOnOffUse))){
-  $dataItems[id].name = $dataItems[id].meta.SwicthOnName; 
-  $gameSwitches.setValue(Number($dataItems[id].meta.SwicthOnOffUse),true);
+const item = $dataItems[id];
+const itemMetaSwitchOnOffUseNum = Number(item.meta.SwicthOnOffUse);
+if (!$gameParty.hasItem(item)) {
+  item.name = item.meta.SwicthOffName;
+  $gameSwitches.setValue(itemMetaSwitchOnOffUseNum,false);
+}
+else if($gameSwitches.value(itemMetaSwitchOnOffUseNum)){
+  item.name = item.meta.SwicthOnName; 
+  $gameSwitches.setValue(itemMetaSwitchOnOffUseNum,true);
 } else {
-  $dataItems[id].name = $dataItems[id].meta.SwicthOffName;
-  $gameSwitches.setValue(Number($dataItems[id].meta.SwicthOnOffUse),false);
+  item.name = item.meta.SwicthOffName;
+  $gameSwitches.setValue(itemMetaSwitchOnOffUseNum,false);
 };
-if($gameSwitches.value(Number($dataItems[id].meta.SwicthOnOffUse))){
-  $gameParty.members().forEach(function(actor) {
-    actor.addState(25);
-  });
-} else {
-  $gameParty.members().forEach(function(actor) {
-    actor.removeState(25);
-  });
-};
+
+const isOn = $gameSwitches.value(itemMetaSwitchOnOffUseNum);
+$gameParty.members().forEach(function (actor) {
+  if (isOn) actor.addState(25); else actor.removeState(25);
+});
 
 };
 
