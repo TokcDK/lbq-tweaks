@@ -286,7 +286,7 @@ for (var j = 1; j <= 4; j++) {
   var start = 1;
   const end = j == 3 ? valueArmorsLength : valueItems.length - 1;
   for (var i = start; i <= end; i++) {
-    const valueItem = valueItem;
+    const valueItem = valueItems[i];
     if(valueItem.meta['StateabNomalResist']){
       const list = arr1;
       const value1 = Number(valueItem.meta['StateabNomalResist']);
@@ -3158,7 +3158,7 @@ if($gameParty.inBattle()){
     };
     for (var i = start; i <= end; i++) {
       let j = 0;
-      const valueItem = valueItem;
+      const valueItem = valueItems[i];
       if(valueItem.meta['LotteryRearity']){
         if(Number(valueItem.meta['LotteryRearity']) == value7){
           j = 1;
@@ -3190,7 +3190,7 @@ if($gameParty.inBattle()){
       };
       for (var i = start; i <= end; i++) {
         let j = 0;
-        const valueItem = valueItem;
+        const valueItem = valueItems[i];
         if(valueItem.meta['LotteryRearity']){
           if (Number(valueItem.meta['LotteryRearity']) == value7){
             j = 1;
@@ -3217,55 +3217,49 @@ if($gameParty.inBattle()){
 //レアリティ一覧作成
 item_gachaitiran1 = function(id2){
 
-var value13 = 1;
-var value14 = 1;
+let choiceIndex = 1;
+let value14 = 1;
 
 for (var j = 0; j <= 2; j++) {
 
-if(j == 0){valueItems = $dataItems};
-if(j == 1){valueItems = $dataWeapons};
-if(j == 2){valueItems = $dataArmors};
-var start = 1;
-  if(valueItems == $dataArmors){
-    var end = valueArmorsLength;
-  } else {
-    var end = valueItems.length-1;
-  };
+  valueItems = j == 0 ? $dataItems : j == 1 ? $dataWeapons : $dataArmors; // 2=armors
+  const start = 1;
+  const end = valueItems == $dataArmors ? valueArmorsLength : valueItems.length - 1;
     for (var i = start; i <= end; i++) {
-      var value11 = 0;
-      const valueItem = valueItem;
+      let value11 = 0;
+      const valueItem = valueItems[i];
         if(valueItem.meta['LotteryRearity']){
           if(Number(valueItem.meta['LotteryRearity']) == id2){
             if(valueItem.meta['Max Item']){
               if(Number(valueItem.meta['Max Item']) == 1 && $gameParty.hasItem(valueItem)){
-                var value11 = 1;
+                value11 = 1;
             }};
             if(valueItem.meta['GatchaHasRange']){
               if(!$gameParty.hasItem(valueItem)){
-                var value11 = 1;
+                value11 = 1;
             }};
             if(valueItem.meta['GatchaOutOfRange']){
-              var value11 = 1;
+              value11 = 1;
             };
               if(value11 == 0){
-                var value12 = `\x1bI[${valueItem.iconIndex}]${valueItem.name}`;
-                var value15 = `${valueItem.description}`;
+                var descriptionText = `${valueItem.description}`;
                 item_priceinfo(j,i);
-                var value16 = `　　　　　　\\C[14]──詳細情報──\\C[0]　　　　　　　　\n${$gameVariables.value(801)}`;
                 const id = 1; 
+                var itemName = `\x1bI[${valueItem.iconIndex}]${valueItem.name}`;
                 const choiceParams = {
-                text: `${value12}`,
-                value: value13};
+                text: `${itemName}`,
+                value: choiceIndex};
                 $gameSystem.addCustomChoice(id, choiceParams);
-                $gameScreen.setDTextPicture(value15, 28);
+                $gameScreen.setDTextPicture(descriptionText, 28);
                 $gameScreen.dWindowFrame = 'ON';
                 $gameScreen.showPicture(value14 + 100,'',0,20,10,100,100,0,0);
-                $gameMessage.setSelectPictureId(value13, value14 + 100);
-                $gameScreen.setDTextPicture(value16, 28);
+                $gameMessage.setSelectPictureId(choiceIndex, value14 + 100);
+                var message = `　　　　　　\\C[14]──詳細情報──\\C[0]　　　　　　　　\n${$gameVariables.value(801)}`;
+                $gameScreen.setDTextPicture(message, 28);
                 $gameScreen.dWindowFrame = 'ON';
                 $gameScreen.showPicture(value14 + 100 + 1,'',0,640,110,100,100,0,0);
-                $gameMessage.setSelectPictureId(value13, value14 + 100 + 1);
-                value13 += 1;
+                $gameMessage.setSelectPictureId(choiceIndex, value14 + 100 + 1);
+                choiceIndex += 1;
                 value14 += 2;
     }}}};
 };
