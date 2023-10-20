@@ -715,21 +715,13 @@ continue_settei = function(id){
 
 const item = $dataItems[id];
 const itemMetaSwitchOnOffUseNum = Number(item.meta.SwicthOnOffUse);
-if (!$gameParty.hasItem(item)) {
-  item.name = item.meta.SwicthOffName;
-  $gameSwitches.setValue(itemMetaSwitchOnOffUseNum,false);
-}
-else if($gameSwitches.value(itemMetaSwitchOnOffUseNum)){
-  item.name = item.meta.SwicthOnName; 
-  $gameSwitches.setValue(itemMetaSwitchOnOffUseNum,true);
-} else {
-  item.name = item.meta.SwicthOffName;
-  $gameSwitches.setValue(itemMetaSwitchOnOffUseNum,false);
-};
-
 const isOn = $gameSwitches.value(itemMetaSwitchOnOffUseNum);
+const hasItemOn = $gameParty.hasItem(item) && isOn; 
+
+item.name = hasItemOn ? item.meta.SwicthOnName : item.meta.SwicthOffName;
+$gameSwitches.setValue(itemMetaSwitchOnOffUseNum, hasItemOn); // correct value based on the item in inventory
 $gameParty.members().forEach(function (actor) {
-  if (isOn) actor.addState(25); else actor.removeState(25);
+  if (hasItemOn) actor.addState(25); else actor.removeState(25);
 });
 
 };
