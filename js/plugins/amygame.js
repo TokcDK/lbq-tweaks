@@ -812,9 +812,11 @@ var actor = $gameActors.actor(id1);
 var start = 101;
 var end = 200;
 for (var i = start; i <= end; i++) {
-  if (!$dataSkills[i].name == '') {
-    if($dataSkills[i].meta['NormalAttackDerived']){
-      var arr1 = $dataSkills[i].meta['NormalAttackDerived'].split(',');
+  const skill = $dataSkills[i];
+  if (skill.name !== '') {
+    const skillMetaNormalAttackDerived = skill.meta['NormalAttackDerived'];
+    if(skillMetaNormalAttackDerived){
+      var arr1 = skillMetaNormalAttackDerived.split(',');
       var value1 = Number(arr1[1]);
       var value2 = Number(arr1[0]);
       if(!actor.isLearnedSkill(value1) && actor.skillMasteryLevel(i) >= value2 ){
