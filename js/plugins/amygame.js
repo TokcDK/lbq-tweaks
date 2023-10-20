@@ -286,7 +286,7 @@ for (var j = 1; j <= 4; j++) {
   var start = 1;
   const end = j == 3 ? valueArmorsLength : valueItems.length - 1;
   for (var i = start; i <= end; i++) {
-    const valueItem = valueItems[i];
+    const valueItem = valueItem;
     if(valueItem.meta['StateabNomalResist']){
       const list = arr1;
       const value1 = Number(valueItem.meta['StateabNomalResist']);
@@ -3157,20 +3157,21 @@ if($gameParty.inBattle()){
       var end = valueItems.length-1;
     };
     for (var i = start; i <= end; i++) {
-      var j = 0;
+      let j = 0;
+      const valueItem = valueItem;
       if(valueItem.meta['LotteryRearity']){
-        if(Number(valueItems[i].meta['LotteryRearity']) == value7){
+        if(Number(valueItem.meta['LotteryRearity']) == value7){
           j = 1;
       }};
-      if(valueItems[i].meta['GatchaHasRange']){
-        if(!$gameParty.hasItem(valueItems[i])){
+      if(valueItem.meta['GatchaHasRange']){
+        if(!$gameParty.hasItem(valueItem)){
           j = 0;
       }};
-      if(valueItems[i].meta['Max Item']){
-        if(Number(valueItems[i].meta['Max Item']) == 1 && $gameParty.hasItem(valueItems[i])){
+      if(valueItem.meta['Max Item']){
+        if(Number(valueItem.meta['Max Item']) == 1 && $gameParty.hasItem(valueItem)){
           j = 0;
       }};
-      if(valueItems[i].meta['GatchaOutOfRange']){
+      if(valueItem.meta['GatchaOutOfRange']){
         j = 0;
       };
       if(j == 1){
@@ -3188,16 +3189,17 @@ if($gameParty.inBattle()){
         var end = valueItems.length-1;
       };
       for (var i = start; i <= end; i++) {
-        var j = 0;
-        if(valueItems[i].meta['LotteryRearity']){
-          if(Number(valueItems[i].meta['LotteryRearity']) == value7){
+        let j = 0;
+        const valueItem = valueItem;
+        if(valueItem.meta['LotteryRearity']){
+          if (Number(valueItem.meta['LotteryRearity']) == value7){
             j = 1;
         }};
-        if(valueItems[i].meta['GatchaHasRange']){
-          if(!$gameParty.hasItem(valueItems[i])){
+        if (valueItem.meta['GatchaHasRange']){
+          if(!$gameParty.hasItem(valueItem)){
             j = 0;
         }};
-        if(valueItems[i].meta['GatchaOutOfRange']){
+        if(valueItem.meta['GatchaOutOfRange']){
           j = 0;
         };
         if(j == 1){
@@ -3231,22 +3233,23 @@ var start = 1;
   };
     for (var i = start; i <= end; i++) {
       var value11 = 0;
-        if(valueItems[i].meta['LotteryRearity']){
-          if(Number(valueItems[i].meta['LotteryRearity']) == id2){
-            if(valueItems[i].meta['Max Item']){
-              if(Number(valueItems[i].meta['Max Item']) == 1 && $gameParty.hasItem(valueItems[i])){
+      const valueItem = valueItem;
+        if(valueItem.meta['LotteryRearity']){
+          if(Number(valueItem.meta['LotteryRearity']) == id2){
+            if(valueItem.meta['Max Item']){
+              if(Number(valueItem.meta['Max Item']) == 1 && $gameParty.hasItem(valueItem)){
                 var value11 = 1;
             }};
-            if(valueItems[i].meta['GatchaHasRange']){
-              if(!$gameParty.hasItem(valueItems[i])){
+            if(valueItem.meta['GatchaHasRange']){
+              if(!$gameParty.hasItem(valueItem)){
                 var value11 = 1;
             }};
-            if(valueItems[i].meta['GatchaOutOfRange']){
+            if(valueItem.meta['GatchaOutOfRange']){
               var value11 = 1;
             };
               if(value11 == 0){
-                var value12 = `\x1bI[${valueItems[i].iconIndex}]${valueItems[i].name}`;
-                var value15 = `${valueItems[i].description}`;
+                var value12 = `\x1bI[${valueItem.iconIndex}]${valueItem.name}`;
+                var value15 = `${valueItem.description}`;
                 item_priceinfo(j,i);
                 var value16 = `　　　　　　\\C[14]──詳細情報──\\C[0]　　　　　　　　\n${$gameVariables.value(801)}`;
                 const id = 1; 
@@ -3688,19 +3691,19 @@ for (var j = 0; j <= 2; j++) {
   };
   for (var i = start; i <= end; i++) {
     if(id1 == 1){
-      var value1 = $gameParty.hasItem(valueItems[i],true);
+      var value1 = $gameParty.hasItem(valueItem,true);
     } else {
       var value1 = $gameVariables.value(316)[j][i];
     };
     if(value1){
       if(j == 0){
-        if(valueItems[i].meta['EICSwitch']){
-          if([101,106,109].some(function(id){return Number(valueItems[i].meta['EICSwitch']) == id})){
+        if(valueItem.meta['EICSwitch']){
+          if([101,106,109].some(function(id){return Number(valueItem.meta['EICSwitch']) == id})){
             if(id1 == 1){
-              $gameVariables.value(316)[j][i] += $gameParty.numItems(valueItems[i]);
-              $gameParty.loseItem(valueItems[i], $gameVariables.value(316)[j][i]);
+              $gameVariables.value(316)[j][i] += $gameParty.numItems(valueItem);
+              $gameParty.loseItem(valueItem, $gameVariables.value(316)[j][i]);
             } else {
-              $gameParty.gainItem(valueItems[i], $gameVariables.value(316)[j][i]);
+              $gameParty.gainItem(valueItem, $gameVariables.value(316)[j][i]);
               $gameVariables.value(316)[j][i] = 0;
             };
           };
@@ -3708,20 +3711,20 @@ for (var j = 0; j <= 2; j++) {
       };
       if(j == 1){
         if(id1 == 1){
-          $gameVariables.value(316)[j][i] += $gameParty.numItems(valueItems[i]);
-          $gameParty.loseItem(valueItems[i], $gameVariables.value(316)[j][i]);
+          $gameVariables.value(316)[j][i] += $gameParty.numItems(valueItem);
+          $gameParty.loseItem(valueItem, $gameVariables.value(316)[j][i]);
         } else {
-          $gameParty.gainItem(valueItems[i], $gameVariables.value(316)[j][i]);
+          $gameParty.gainItem(valueItem, $gameVariables.value(316)[j][i]);
           $gameVariables.value(316)[j][i] = 0;
         };
       };
       if(j == 2){
-        if(valueItems[i].meta['Not Independent item']){
+        if(valueItem.meta['Not Independent item']){
           if(id1 == 1){
-            $gameVariables.value(316)[j][i] += $gameParty.numItems(valueItems[i]);
-            $gameParty.loseItem(valueItems[i], $gameVariables.value(316)[j][i]);
+            $gameVariables.value(316)[j][i] += $gameParty.numItems(valueItem);
+            $gameParty.loseItem(valueItem, $gameVariables.value(316)[j][i]);
           } else {
-            $gameParty.gainItem(valueItems[i], $gameVariables.value(316)[j][i]);
+            $gameParty.gainItem(valueItem, $gameVariables.value(316)[j][i]);
             $gameVariables.value(316)[j][i] = 0;
           };
         };
