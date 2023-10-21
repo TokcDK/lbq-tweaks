@@ -2412,7 +2412,7 @@ if(enemy1 != 30){
     enemy.addState(475);//孤高
   };
 };
-/*://パッシブオーラで実行
+/*//パッシブオーラで実行
 if(enemy.isStateAffected(443)){//指揮官
   for (var j = 0; j <= $gameTroop.members().length-1; j++) {
     var enemy2 = $gameTroop.members()[j];
@@ -2885,7 +2885,7 @@ if(!$gameParty.inBattle()){
   };
 };
 if(valueClassState != 0){
-  var value11 = Number(valueClassState[0]);//使ってない＿？
+  //var value11 = Number(valueClassState[0]);//使ってない＿？
   var value14 = Math.round(valueEnemyLevel / 10);
   if(value14 == 0){var value14 = 1};
   if(value14 >= 11){var value14 = 10};
