@@ -142,13 +142,13 @@ for (var i = 421; i <= 439; i++) {
           var arr2 = [50,75,100,125,150,175,200];
           var arr3 = [-50,-40,-30,-20,-10,0,10,20];
           var arr4 = [80,85,90,95,100];
-          var arr7 = [-50,-60,-70,-80,-90,-100,-110,-120,-130,-140,-150,-160,-170,-180,-190,-200];
+          //var arr7 = [-50,-60,-70,-80,-90,-100,-110,-120,-130,-140,-150,-160,-170,-180,-190,-200];
           var value2 = arr2[Math.floor(Math.random() * arr2.length)];//x
           var value3 = arr3[Math.floor(Math.random() * arr3.length)];//y
           var value4 = arr4[Math.floor(Math.random() * arr4.length)];//wait
           var value5 = $gameTroop.getX(user.index() + 1);
           var value6 = $gameTroop.getY(user.index() + 1);
-          var value7 = arr7[Math.floor(Math.random() * arr7.length)];//jump
+          //var value7 = arr7[Math.floor(Math.random() * arr7.length)];//jump
           picture_motion1("smooth",[0]);
           //$gameScreen.setDTextPicture(value1, 32);//元から
           $gameScreen.showPicture(valueDropEnemyPicId,value1,1,value5,value6,100,100,255,0);
@@ -410,7 +410,7 @@ if(id2 == 2){}else{
     };
   };
 };
-/*:
+/*
 valueBattleAddAttack = 0;//<BattleAddAttackSet:50>未使用	
 var arr1 = valueBattleAddAttackSet;
 for (var i = 0; i <= arr1.length-1; i++) {
@@ -441,7 +441,7 @@ if($gameScreen.picture(50)){
   var value3 = $gameScreen.picture(50).y();
   var value4 = $gameScreen.picture(50).scaleX();
   var value5 = $gameScreen.picture(50).scaleY();
-  var value6 = $gameScreen.picture(50).opacity();
+  //var value6 = $gameScreen.picture(50).opacity();
   $gameScreen.movePicture(50,value1,value2,value3,value4,value5,0,0,40);
 };
 pic_eraseP(0,[51,52,53,54,55,56,57,58,86,87,88,89,90,91,92,93,98,99]);
@@ -501,10 +501,11 @@ $gameVariables.setValue(526,1);
 //valueAttackStates = valueAttackStates.concat(user.attackStates());
 valueAttackStates = user.attackStates();
 for (var i = 0; i <= 19; i++) {
-  if(valueItems[id1].effects[i]){
-    if(valueItems[id1].effects[i].code == 21){
-      if(valueItems[id1].effects[i].dataId >= 2){
-        valueAttackStates.push(valueItems[id1].effects[i].dataId);
+  const itemEffect = valueItems[id1].effects[i];
+  if (itemEffect){
+    if (itemEffect.code == 21){
+      if (itemEffect.dataId >= 2){
+        valueAttackStates.push(itemEffect.dataId);
       };
     };
   };
@@ -534,30 +535,15 @@ if(valueItems[id1].meta['Multiple Elements']){
   };
   var value1 = arr1[Math.floor(Math.random() * arr1.length)];
   if(value1 >= 1){
-    if(value1 == 1){$gameVariables.setValue(93,131);$gameVariables.setValue(331,[255,255,255,0])};//[255,0,0]
-    if(value1 == 2){$gameVariables.setValue(93,133);$gameVariables.setValue(331,[255,255,255,0])};
-    if(value1 == 3){$gameVariables.setValue(93,135);$gameVariables.setValue(331,[255,255,255,0])};
-    if(value1 == 4){$gameVariables.setValue(93,137);$gameVariables.setValue(331,[255,255,255,0])};
-    if(value1 == 5){$gameVariables.setValue(93,139);$gameVariables.setValue(331,[255,255,255,0])};
-    if(value1 == 6){$gameVariables.setValue(93,141);$gameVariables.setValue(331,[255,255,255,0])};
-    if(value1 == 7){$gameVariables.setValue(93,143);$gameVariables.setValue(331,[255,255,255,0])};
-    if(value1 == 8){$gameVariables.setValue(93,145);$gameVariables.setValue(331,[255,255,255,0])};
-    if(value1 == 9){$gameVariables.setValue(93,147);$gameVariables.setValue(331,[255,255,255,0])};
-    if(value1 == 10){$gameVariables.setValue(93,367);$gameVariables.setValue(331,[255,255,255,0])};
-    if(value1 == 15){$gameVariables.setValue(93,369);$gameVariables.setValue(331,[255,255,255,0])};
-    if(value1 == 16){$gameVariables.setValue(93,147);$gameVariables.setValue(331,[255,255,255,0])};
-    if(value1 == 17){$gameVariables.setValue(93,149);$gameVariables.setValue(331,[255,255,255,0])};
-    if(value1 == 21){$gameVariables.setValue(93,371);$gameVariables.setValue(331,[255,255,255,0])};
-    if(value1 == 22){$gameVariables.setValue(93,373);$gameVariables.setValue(331,[255,255,255,0])};
-    if(value1 == 23){$gameVariables.setValue(93,375);$gameVariables.setValue(331,[255,255,255,0])};
-    if(value1 == 24){$gameVariables.setValue(93,377);$gameVariables.setValue(331,[255,255,255,0])};
-    if(value1 == 25){$gameVariables.setValue(93,379);$gameVariables.setValue(331,[255,255,255,0])};
-    if(value1 == 26){$gameVariables.setValue(93,381);$gameVariables.setValue(331,[255,255,255,0])};
-    if(value1 == 27){$gameVariables.setValue(93,383);$gameVariables.setValue(331,[255,255,255,0])};
-    if(value1 == 28){$gameVariables.setValue(93,385);$gameVariables.setValue(331,[255,255,255,0])};
-    if(value1 == 29){$gameVariables.setValue(93,387);$gameVariables.setValue(331,[255,255,255,0])};
-    if(value1 == 30){$gameVariables.setValue(93,389);$gameVariables.setValue(331,[255,255,255,0])};
-    if(value1 == 34){$gameVariables.setValue(93,130);$gameVariables.setValue(331,[255,255,255,0])};
+    const arr = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 16, 17, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 34 ];
+    const arr1 = [ 131, 133, 135, 137, 139, 141, 143, 145, 147, 367, 369, 147, 149, 371, 373, 375, 377, 379, ,381, 383, 385, 387, 389, 130 ];
+    const max = arr.length;
+    for (let i = 0; i < max; i++){
+      if (value1 === arr[i]) { 
+        $gameVariables.setValue(93, arr1[i]); 
+        $gameVariables.setValue(331, [255, 255, 255, 0]); 
+      };
+    }
   };
 };
 
@@ -615,52 +601,40 @@ if(user.isActor() && $gameVariables.value(182) == 2){
       var value4 = Number($dataClasses[user.subclass().id].meta['classRank']);
       user.gainSkillMasteryUses(id1, value3 * value4);
 }}};
-if($gameParty.members().contains($gameActors.actor(1)) && $gameActors.actor(1).isStateAffected(662)){//リーシャのブレイブコマンド
-  if($gameVariables.value(182) == 5 && $gameActors.actor(1)._stateCounter[662][0] >= 0){
-    if($gameActors.actor(1)._stateCounter[662][0] <= 4){
-      $gameActors.actor(1)._stateCounter[662][0] += 1;
+  const actor1 = $gameActors.actor(1);
+if ($gameParty.members().contains(actor1) && actor1.isStateAffected(662)){//リーシャのブレイブコマンド
+  const actor1StateCounter662 = actor1._stateCounter[662];
+  const gameVar182 = $gameVariables.value(182);
+  for (let i = 0; i < 4; i++) {
+    if (gameVar182 == i + 5 && actor1StateCounter662[i] >= 0 && actor1StateCounter662[i] <= 4) {
+      actor1StateCounter662[i] += 1;
     };
-  };
-  if($gameVariables.value(182) == 6 && $gameActors.actor(1)._stateCounter[662][1] >= 0){
-    if($gameActors.actor(1)._stateCounter[662][1] <= 4){
-      $gameActors.actor(1)._stateCounter[662][1] += 1;
-    };
-  };
-  if($gameVariables.value(182) == 7 && $gameActors.actor(1)._stateCounter[662][2] >= 0){
-    if($gameActors.actor(1)._stateCounter[662][2] <= 4){
-      $gameActors.actor(1)._stateCounter[662][2] += 1;
-    };
-  };
-  if($gameVariables.value(182) == 8 && $gameActors.actor(1)._stateCounter[662][3] >= 0){
-    if($gameActors.actor(1)._stateCounter[662][3] <= 4){
-      $gameActors.actor(1)._stateCounter[662][3] += 1;
-    };
-  };
+  }
 };
-if($gameVariables.value(182) == 12){
+
+const gameVar182 = $gameVariables.value(182);
+if (gameVar182 == 12){
   $gameVariables.setValue(93,367);
-};
-if($gameVariables.value(182) == 13){
-  $gameVariables.setValue(93,369);
-};
-if($gameVariables.value(182) == 13){
-  $gameVariables.setValue(527,`\\C[18]＜${valueItems[id1].name}＞\\C[0]`);
-};
-if($gameVariables.value(182) == 11){
+}
+else if (gameVar182 == 13){
+  $gameVariables.setValue(93, 369);
+  $gameVariables.setValue(527, `\\C[18]＜${valueItems[id1].name}＞\\C[0]`);
+}
+else if (gameVar182 == 11){
   $gameVariables.setValue(527,`\\C[10]＜${valueItems[id1].name}＞\\C[0]`);
-};
-if($gameVariables.value(182) == 5){
+}
+else if (gameVar182 == 5){
   $gameVariables.setValue(527,`\\C[17]＜${valueItems[id1].name}＞\\C[0]`);
   $gameVariables.setValue(93,0);
-};
-if($gameVariables.value(182) == 6){
+}
+else if (gameVar182 == 6){
   $gameVariables.setValue(527,`\\C[10]＜${valueItems[id1].name}＞\\C[0]`);
-};
-if($gameVariables.value(182) == 7){
+}
+else if (gameVar182 == 7){
   $gameVariables.setValue(527,`\\C[9]＜${valueItems[id1].name}＞\\C[0]`);
   $gameVariables.setValue(93,0);
-};
-if($gameVariables.value(182) == 8){
+}
+else if (gameVar182 == 8){
   $gameVariables.setValue(527,`\\C[3]＜${valueItems[id1].name}＞\\C[0]`);
     if(valueItems[id1].damage.type == 2){
       $gameVariables.setValue(93,249);//MP回復の場合
@@ -668,6 +642,7 @@ if($gameVariables.value(182) == 8){
       $gameVariables.setValue(93,245);
     };
 };
+
 if(valueItems[id1].meta['SkillDamageAction']){
   $gameVariables.setValue(93,Number(valueItems[id1].meta['SkillDamageAction']));
 };
