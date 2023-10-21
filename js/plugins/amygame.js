@@ -2711,19 +2711,22 @@ if($gameSwitches.value(211)){
 //代入して全般ヒントとして作成
 hint1_zenpan = function(id1){
 
+var value1 = `　\n`;
+if(id1 == 102){value1 = `未発生挿話\n`}
+else if(id1 == 103){value1 = `未発生シーン\n`}
+else if(id1 == 104){value1 = `未回収タイトル\n`}
+else if(id1 == 105){value1 = `未回収Ｈタイトル\n`}
+else if(id1 == 108){value1 = `未発生クエスト\n`};
+eval("valueWordSet" + valueCountSet2 + " = value1");
+
 valueCountSet1 = 0;
 valueCountSet2 = 1;
-var value1 = `　\n`;
-if(id1 == 102){var value1 = `未発生挿話\n`};
-if(id1 == 103){var value1 = `未発生シーン\n`};
-if(id1 == 104){var value1 = `未回収タイトル\n`};
-if(id1 == 105){var value1 = `未回収Ｈタイトル\n`};
-if(id1 == 108){var value1 = `未発生クエスト\n`};
-eval("valueWordSet" + valueCountSet2 +" = value1");
-for (var i = 1; i <= $dataItems.length-1; i++) {
-  if($dataItems[i].meta['EICSwitch']){
-    if(Number($dataItems[i].meta['EICSwitch']) == id1 && !$gameParty.hasItem($dataItems[i])){
-      var value0 = `\\C[2]${$dataItems[i].name}\\C[0]\n${$dataItems[i].description}\n`;
+const max = $dataItems.length - 1;
+for (var i = 1; i < max; i++) {
+  const item = $dataItems[i];
+  if(item.meta['EICSwitch']){
+    if(Number(item.meta['EICSwitch']) == id1 && !$gameParty.hasItem(item)){
+      var value0 = `\\C[2]${item.name}\\C[0]\n${item.description}\n`;
       eval("valueWordSet" + valueCountSet2 +" += value0");
       valueCountSet1 += 1;
         if((valueCountSet1 %6) == 0){
@@ -2740,12 +2743,12 @@ for (var i = 1; i <= $dataItems.length-1; i++) {
 ensyutu_ikari = function(id,id2){
 
 var value1 = Math.floor( Math.random() * 3) + 6;
-var value2 = Math.floor( Math.random() * 41) + 80;
-var value3 = Math.floor( Math.random() * 41) + 150;
 $gameScreen.startShake(value1, value1, id);
+var value2 = Math.floor(Math.random() * 41) + 80;
 AudioManager.playSe({"name":id2,"volume":90,"pitch":value2,"pan":0});
 var arr1 = [255,255,255];
-if(id2 == 'Explosion2'){var arr1 = [255,50,50]};
+if (id2 == 'Explosion2') { var arr1 = [255, 50, 50] };
+var value3 = Math.floor(Math.random() * 41) + 150;
 $gameScreen.startFlash([arr1[0],arr1[1],arr1[2],value3], id);
 
 };
@@ -2753,33 +2756,31 @@ $gameScreen.startFlash([arr1[0],arr1[1],arr1[2],value3], id);
 //オブジェクト探知とトラップ視認実行
 search_object = function(){
 
-var value1 = $gameMap.events().length;
-if(value1 >= 50){
-  var value11 = 200;
-} else {
-  var value11 = 100;
-};
-for (var id = value11; id > 0; id--) {
-  if(!!$gameMap.event(id)) {
-  //if(!$gameSelfSwitches.value([$gameMap.mapId(), $gameMap.event(id), 'B'])){
-    if(!$gameSelfSwitches.value([$gameMap.mapId(), id, 'B'])){
-      if ($gameMap.event(id).event().meta['IconDisplay']){
-        var target = $gameMap.event(id);
-        if($gameSwitches.value(79)){
-          target.setIconOnEvent(Number($gameMap.event(id).event().meta['IconDisplay']));
-        } else {
-          target.clearIconOnEvent();
-      }};
-        if ($gameMap.event(id).event().meta['TrapDisplay']){
-          var target = $gameMap.event(id);
-          if($gameSwitches.value(135)){
-            target.setIconOnEvent(Number($gameMap.event(id).event().meta['TrapDisplay']));
+  const max = $gameMap.events().length >= 50 ? 200 : 100;
+  for (var id = max; id > 0; id--) {
+    const event = $gameMap.event(id);
+    if (!!event) {
+      //if(!$gameSelfSwitches.value([$gameMap.mapId(), event, 'B'])){
+      if (!$gameSelfSwitches.value([$gameMap.mapId(), id, 'B'])) {
+        if (event.event().meta['IconDisplay']) {
+          var target = event;
+          if ($gameSwitches.value(79)) {
+            target.setIconOnEvent(Number(event.event().meta['IconDisplay']));
           } else {
             target.clearIconOnEvent();
-        }};
-  }};
-};
-
+          }
+        };
+        if (event.event().meta['TrapDisplay']) {
+          var target = event;
+          if ($gameSwitches.value(135)) {
+            target.setIconOnEvent(Number(event.event().meta['TrapDisplay']));
+          } else {
+            target.clearIconOnEvent();
+          }
+        };
+      }
+    };
+  };
 };
 
 //タイトル入手
@@ -2809,10 +2810,11 @@ var arr5 = [7,0,0];//戦闘不能回数
       var arr8 = [0,0,0,0,0,0,0];//アクターID
       var arr9 = [0,0,0,0,0,0,0];//累計回数。
       var arr10 = [0,0,0,0,0,0,0];//累計トップ
-      for (var j = 1; j <= $dataSkills.length-1; j++) {
-        for (var value1 = 0; value1 <= arr6.length-1; value1++) {
-          if (!$dataSkills[j].name == '') {
-            if($dataSkills[j].stypeId == arr7[value1]){
+    for (var j = 1; j <= $dataSkills.length - 1; j++) {
+      const skill = $dataSkills[j];
+      for (var value1 = 0; value1 <= arr6.length-1; value1++) {
+          if (!skill.name == '') {
+            if (skill.stypeId == arr7[value1]){
               arr9[value1] += actor.getSkillUseCounter(j);
           }};
       }};
@@ -2835,80 +2837,87 @@ var arr5 = [7,0,0];//戦闘不能回数
   };
 
 for (var i = 1; i <= $dataItems.length-1; i++) {
-if($dataItems[i].meta['EICSwitch']){
-if(Number($dataItems[i].meta['EICSwitch']) == 104 || Number($dataItems[i].meta['EICSwitch']) == 105){
-  if (!$dataItems[i].name == '' && !$gameParty.hasItem($dataItems[i])) {
+  const item = $dataItems[i];
+if(item.meta['EICSwitch']){
+if(Number(item.meta['EICSwitch']) == 104 || Number(item.meta['EICSwitch']) == 105){
+  if (!item.name == '' && !$gameParty.hasItem(item)) {
     var value1 = 2;//スイッチID。最初にtrueにして成立しない場合は途中でfalse
     var value2 = 2;//変数id若しくは$gameVariables.value(380 + $gameVariables.value(2))の主人公Ｈ配列id
     var value3 = 0;//value2の値.
     var value4 = true;//
-    var value5 = 0;//汎用。必要な時に0から始める
+    //var value5 = 0;//汎用。必要な時に0から始める
     var value6 = 0;//個人記録のＭＶＰアクター
-    if($dataItems[i].meta['annihilationTitle']){
-      var value1 = 1;
+    if(item.meta['annihilationTitle']){
+      value1 = 1;
     };
-    if($dataItems[i].meta['titleGetSwitch']){
-      var value1 = Number($dataItems[i].meta['titleGetSwitch']);
+    if(item.meta['titleGetSwitch']){
+      value1 = Number(item.meta['titleGetSwitch']);
       //var value4 = $gameSwitches.value(value1);
     };
-    if($dataItems[i].meta['titleGetVariable']){
-      var value2 = Number($dataItems[i].meta['titleGetVariable'].split(',')[0]);
-      var value3 = Number($dataItems[i].meta['titleGetVariable'].split(',')[1]);
-      var value4 = $gameVariables.value(value2) >= value3;
+    if(item.meta['titleGetVariable']){
+      const arr = item.meta['titleGetVariable'].split(',');
+      value2 = Number(arr[0]);
+      value3 = Number(arr[1]);
+      value4 = $gameVariables.value(value2) >= value3;
     };
-    if($dataItems[i].meta['titleGetArray']){
-      var value2 = Number($dataItems[i].meta['titleGetArray'].split(',')[0]);
-      var value3 = Number($dataItems[i].meta['titleGetArray'].split(',')[2]);
-      var value4 = $gameVariables.value(value2)[Number($dataItems[i].meta['titleGetArray'].split(',')[1])] >= value3;
+    if (item.meta['titleGetArray']) {
+      const arr = item.meta['titleGetArray'].split(',');
+      value2 = Number(arr[0]);
+      value3 = Number(arr[2]);
+      value4 = $gameVariables.value(value2)[Number(item.meta['titleGetArray'].split(',')[1])] >= value3;
     };
-    if($dataItems[i].meta['titleGetItems']){
-      var value2 = Number($dataItems[i].meta['titleGetItems'].split(',')[0]);
-      var value3 = Number($dataItems[i].meta['titleGetItems'].split(',')[1]);
-      var value4 = $gameParty.numItems($dataItems[value2]) >= value3;
+    if (item.meta['titleGetItems']) {
+      const arr = item.meta['titleGetItems'].split(',');
+      value2 = Number(arr[0]);
+      value3 = Number(arr[1]);
+      value4 = $gameParty.numItems($dataItems[value2]) >= value3;
     };
-    if($dataItems[i].meta['HtitleGetArray']){//主人公のみ
-      var value2 = Number($dataItems[i].meta['HtitleGetArray'].split(',')[0]);
-      var value3 = Number($dataItems[i].meta['HtitleGetArray'].split(',')[1]);
-      var value4 = $gameVariables.value(380 + $gameVariables.value(2) )[value2] >= value3;      
+    if (item.meta['HtitleGetArray']) {//主人公のみ
+      const arr = item.meta['HtitleGetArray'].split(',');
+      value2 = Number(arr[0]);
+      value3 = Number(arr[1]);
+      value4 = $gameVariables.value(380 + $gameVariables.value(2) )[value2] >= value3;      
     };
-    if($dataItems[i].meta['titleGetSkillRank']){
+    if (item.meta['titleGetSkillRank']) {
+      const arr = item.meta['titleGetSkillRank'].split(',');
       for (var j = 0; j <= $gameParty.members().length-1; j++) {
-        var actor = $gameParty.members()[j];
-        var value2 = Number($dataItems[i].meta['titleGetSkillRank'].split(',')[0]);
-        var value3 = Number($dataItems[i].meta['titleGetSkillRank'].split(',')[1]);
-        var value4 = actor.skillMasteryLevel(value2) >= value3;
+        const actor = $gameParty.members()[j];
+        value2 = Number(arr[0]);
+        value3 = Number(arr[1]);
+        value4 = actor.skillMasteryLevel(value2) >= value3;
         if(value4){
-          var value6 = j;
+          value6 = j;
           break;
         };
       };
     };
-    if($dataItems[i].meta['titleGetAchievement']){
+    if(item.meta['titleGetAchievement']){
       var value1 = 1;//獲得実績メタがある場合は、最初に条件をfalseにする。
-      var arr1 = $dataItems[i].meta['titleGetAchievement'].split(',');
+      var arr1 = item.meta['titleGetAchievement'].split(',');
       //全員の場合
-      if(arr1[0] == arr11[0] && arr1[1] <= arr11[2]){var value1 = 2};
-      if(arr1[0] == arr12[0] && arr1[1] <= arr12[2]){var value1 = 2};
-      if(arr1[0] == arr13[0] && arr1[1] <= arr13[2]){var value1 = 2};
-      if(arr1[0] == arr14[0] && arr1[1] <= arr14[2]){var value1 = 2};
-      if(arr1[0] == arr15[0] && arr1[1] <= arr15[2]){var value1 = 2};
+      if(arr1[0] == arr11[0] && arr1[1] <= arr11[2]){value1 = 2};
+      if(arr1[0] == arr12[0] && arr1[1] <= arr12[2]){value1 = 2};
+      if(arr1[0] == arr13[0] && arr1[1] <= arr13[2]){value1 = 2};
+      if(arr1[0] == arr14[0] && arr1[1] <= arr14[2]){value1 = 2};
+      if(arr1[0] == arr15[0] && arr1[1] <= arr15[2]){value1 = 2};
       //パーティの中で一番高い
-      if(arr1[0] == arr2[0] && arr1[1] <= arr2[2]){var value1 = 2;var value6 = arr2[1]};
-      if(arr1[0] == arr3[0] && arr1[1] <= arr3[2]){var value1 = 2;var value6 = arr3[1]};
-      if(arr1[0] == arr4[0] && arr1[1] <= arr4[2]){var value1 = 2;var value6 = arr4[1]};
-      if(arr1[0] == arr5[0] && arr1[1] <= arr5[2]){var value1 = 2;var value6 = arr5[1]};
+      if(arr1[0] == arr2[0] && arr1[1] <= arr2[2]){value1 = 2; value6 = arr2[1]};
+      if(arr1[0] == arr3[0] && arr1[1] <= arr3[2]){value1 = 2; value6 = arr3[1]};
+      if(arr1[0] == arr4[0] && arr1[1] <= arr4[2]){ value1 = 2; value6 = arr4[1]};
+      if(arr1[0] == arr5[0] && arr1[1] <= arr5[2]){ value1 = 2; value6 = arr5[1]};
       //スキルタイプ毎の個人使用回数
-      for (var j = 0; j <= arr6.length-1; j++) {
-        if(arr1[0] == arr6[j] && arr1[1] <= arr10[j]){var value1 = 2;var value6 = arr8[j]};
+      const max = arr6.length;
+      for (var j = 0; j < max; j++) {
+        if(arr1[0] == arr6[j] && arr1[1] <= arr10[j]){ value1 = 2; value6 = arr8[j]};
       };
     };
     if($gameSwitches.value(value1) && value4){
       $gameVariables.setValue(19,i);
-      if($dataItems[i].meta['titleSenkaGet']){
+      if(item.meta['titleSenkaGet']){
         if(!$gameSwitches.value(29)){
-          $gameParty.gainItem($dataItems[10], Number($dataItems[i].meta['titleSenkaGet']));//アイテムID10は戦貨
+          $gameParty.gainItem($dataItems[10], Number(item.meta['titleSenkaGet']));//アイテムID10は戦貨
         };
-        valueWordSetEx = `\x1bIIN[10]${Number($dataItems[i].meta['titleSenkaGet'])}枚獲得！`;
+        valueWordSetEx = `\x1bIIN[10]${Number(item.meta['titleSenkaGet'])}枚獲得！`;
       };
       if(value6 >= 1){
         if(!$gameSwitches.value(29)){
@@ -2925,19 +2934,21 @@ if(Number($dataItems[i].meta['EICSwitch']) == 104 || Number($dataItems[i].meta['
 //戦闘マップ殲滅回数による称号獲得
 title_battleMapannihilation = function(){
 
+const gameVar257 = $gameVariables.value(257);
 for (var i = 1; i <= $dataItems.length-1; i++) {
-  if($dataItems[i].meta['annihilationTitle']){
-    if(!$gameParty.hasItem($dataItems[i],true)){
-      var arr1 = $dataItems[i].meta['annihilationTitle'].split(',');
+  const item = $dataItems[i];
+  if(item.meta['annihilationTitle']){
+    if(!$gameParty.hasItem(item,true)){
+      var arr1 = item.meta['annihilationTitle'].split(',');
       if(Number(arr1[0]) >= 20){
-        if($gameVariables.value(257)[Number(arr1[0])] >= 1){
+        if(gameVar257[Number(arr1[0])] >= 1){
           $gameVariables.setValue(19,i);
         };
       };
       if(Number(arr1[0]) == 1){
         var value1 = 0;
         for (var j = 1; j <= 100; j++) {
-          value1 += $gameVariables.value(257)[j];
+          value1 += gameVar257[j];
         };
         if(value1 >= Number(arr1[1])){
           $gameVariables.setValue(19,i);
@@ -2946,11 +2957,12 @@ for (var i = 1; i <= $dataItems.length-1; i++) {
       if(Number(arr1[0]) == 2){
         var value1 = 0;
         for (var j = 1; j <= 100; j++) {
-          if($dataItems[j].meta['OnSwitch']){
-            var arr2 = $dataItems[j].meta['OnSwitch'].split(',');
+          const itemJ = $dataItems[j];
+          if (itemJ.meta['OnSwitch']){
+            var arr2 = itemJ.meta['OnSwitch'].split(',');
             for (var id1 = 1; id1 <= arr2.length-1; id1++) {
               if(Number(arr2[id1]) == 207){
-                value1 += $gameVariables.value(257)[j];
+                value1 += gameVar257[j];
                 break;
               };
             };
@@ -2958,7 +2970,7 @@ for (var i = 1; i <= $dataItems.length-1; i++) {
         };
         if(value1 >= Number(arr1[1])){
           $gameVariables.setValue(19,i);
-          $gameParty.gainItem($dataItems[i], 1);
+          $gameParty.gainItem(item, 1);
         };
       };
     };
@@ -2973,10 +2985,10 @@ $gameVariables.setValue(19,0);
 //曜日変更と日数経過時の処理
 weeks_toggleOther = function(){
 
-var start = $gameVariables.value(73);
-var end = $gameVariables.value(74);
+let start = $gameVariables.value(73);
+let end = $gameVariables.value(74);
 for(var i = start; i <= end; i++){$gameVariables.value(i+380)[46] = 0};//直前のＨＣＧ
-var list = valueOneDayLimitItem;
+const list = valueOneDayLimitItem;
 list.forEach(function(id) {
   if($dataItems[id].meta.SkillCostToday){
     $gameParty.gainItem($dataItems[id], 1);
@@ -2984,25 +2996,28 @@ list.forEach(function(id) {
 }, this);
 $gameVariables.setValue(58,$gameVariables.value(58) + 1);//経過日数
 if($gameParty.loseGoldSum > $gameVariables.value(341)){
-  var value1 = $gameParty.loseGoldSum - $gameVariables.value(341);
-  $gameVariables.setValue(539,$gameVariables.value(539) + `本日消費\\G:\\C[2]${value1.toLocaleString()}\\C[0]\n`);
+  const goldCalc = $gameParty.loseGoldSum - $gameVariables.value(341);
+  const gold = `\\C[2]${goldCalc.toLocaleString()}\\C[0]\n`;
+  $gameVariables.setValue(539, $gameVariables.value(539) + `本日消費\\G:${gold}\n`);
   $gameVariables.setValue(540,$gameVariables.value(540) + 1);
 };
 if($gameParty.gainGoldSum > $gameVariables.value(342)){
-  var value1 = $gameParty.gainGoldSum - $gameVariables.value(342);
-  $gameVariables.setValue(539,$gameVariables.value(539) + `本日獲得\\G:\\C[2]${value1.toLocaleString()}\\C[0]\n`);
+  const goldCalc = $gameParty.gainGoldSum - $gameVariables.value(342);
+  const gold = `\\C[2]${goldCalc.toLocaleString()}\\C[0]\n`;
+  $gameVariables.setValue(539, $gameVariables.value(539) + `本日獲得\\G:${gold}\n`);
   $gameVariables.setValue(540,$gameVariables.value(540) + 1);
 };
 $gameVariables.setValue(341,$gameParty.loseGoldSum.toLocaleString());//一日の消費金額
 $gameVariables.setValue(342,$gameParty.gainGoldSum.toLocaleString());//一日の獲得金額
-var value2 = 0;
-var start = $gameVariables.value(75);
-var end = $gameVariables.value(76);
+let value2 = 0;
+start = $gameVariables.value(75);
+end = $gameVariables.value(76);
 for(var i = start; i <= end; i++){
   actor = $gameActors.actor(i);
   if(actor.currentExp() > $gameVariables.value(i+380)[65]){
-    var value1 = actor.currentExp() - $gameVariables.value(i+380)[65];
-    $gameVariables.setValue(539,$gameVariables.value(539) + `${actor.name()}本日獲得経験値:\\C[2]${value1.toLocaleString()}\\C[0]　`);
+    const expCalc = actor.currentExp() - $gameVariables.value(i+380)[65];
+    const exp = `\\C[2]${expCalc.toLocaleString()}\\C[0]　`
+    $gameVariables.setValue(539, $gameVariables.value(539) + `${actor.name()}本日獲得経験値:${exp}`);
     value2 += 1;
     if((value2 %2) == 0){
       $gameVariables.setValue(539,$gameVariables.value(539) + `\n`);
@@ -3017,42 +3032,20 @@ if(value2 == 1 || value2 == 3 || value2 == 5 || value2 == 7){
 };
 for(var i = 16; i <= 17; i++){$gameSwitches.setValue(i,false)};
 for(var i = 6; i <= 12; i++){$gameSwitches.setValue(i,false)};
-if($gameVariables.value(55) == "日"){
-  $gameVariables.setValue(55,"月");
-  $gameSwitches.setValue(6,true);
-  $gameSwitches.setValue(17,true);//平日
-} else {
-  if($gameVariables.value(55) == "月"){
-    $gameVariables.setValue(55,"火");
-    $gameSwitches.setValue(7,true);
-    $gameSwitches.setValue(17,true);//平日
-  } else {
-    if($gameVariables.value(55) == "火"){
-      $gameVariables.setValue(55,"水");
-      $gameSwitches.setValue(8,true);
-      $gameSwitches.setValue(17,true);//平日
-    } else {
-      if($gameVariables.value(55) == "水"){
-        $gameVariables.setValue(55,"木");
-        $gameSwitches.setValue(9,true);
-        $gameSwitches.setValue(17,true);//平日
-      } else {
-        if($gameVariables.value(55) == "木"){
-          $gameVariables.setValue(55,"金");
-          $gameSwitches.setValue(10,true);
-          $gameSwitches.setValue(17,true);//平日
-        } else {
-          if($gameVariables.value(55) == "金"){
-            $gameVariables.setValue(55,"土");
-            $gameSwitches.setValue(11,true);
-            $gameSwitches.setValue(16,true);//休日
-          } else {
-            if($gameVariables.value(55) == "土"){
-              $gameVariables.setValue(55,"日");
-              $gameSwitches.setValue(12,true);
-              $gameSwitches.setValue(16,true);//休日
-            };
-}}}}}};
+
+var daysOfWeek = ["日", "月", "火", "水", "木", "金", "土"];
+var currentDay = $gameVariables.value(55);
+
+const maxDaysInWeek = daysOfWeek.length;
+for (let i = 0; i < maxDaysInWeek; i++) {
+  if (currentDay === daysOfWeek[i]) {
+    const nextDay = daysOfWeek[(i + 1) % maxDaysInWeek]; // will be 0 (日) when will reach max (土) day
+    $gameVariables.setValue(55, nextDay);
+    $gameSwitches.setValue(i + 6, true);
+    $gameSwitches.setValue(i < 5 ? 17 : 16, true); // 16 for last 2 days (休日) and 17 for 1st 5 (平日)
+    break;
+  }
+}
 
 };
 
