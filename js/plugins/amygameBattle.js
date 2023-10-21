@@ -613,48 +613,46 @@ if ($gameParty.members().contains(actor1) && actor1.isStateAffected(662)){//リ�
 };
 
 const gameVar182 = $gameVariables.value(182);
+const valueItem = valueItems[id1];
+const valueItemName = valueItem.name; 
 if (gameVar182 == 12){
   $gameVariables.setValue(93,367);
 }
 else if (gameVar182 == 13){
   $gameVariables.setValue(93, 369);
-  $gameVariables.setValue(527, `\\C[18]＜${valueItems[id1].name}＞\\C[0]`);
+  $gameVariables.setValue(527, `\\C[18]＜${valueItemName}＞\\C[0]`);
 }
 else if (gameVar182 == 11){
-  $gameVariables.setValue(527,`\\C[10]＜${valueItems[id1].name}＞\\C[0]`);
+  $gameVariables.setValue(527, `\\C[10]＜${valueItemName}＞\\C[0]`);
 }
 else if (gameVar182 == 5){
-  $gameVariables.setValue(527,`\\C[17]＜${valueItems[id1].name}＞\\C[0]`);
-  $gameVariables.setValue(93,0);
+  $gameVariables.setValue(527, `\\C[17]＜${valueItemName}＞\\C[0]`);
+  $gameVariables.setValue(93, 0);
 }
 else if (gameVar182 == 6){
-  $gameVariables.setValue(527,`\\C[10]＜${valueItems[id1].name}＞\\C[0]`);
+  $gameVariables.setValue(527, `\\C[10]＜${valueItemName}＞\\C[0]`);
 }
 else if (gameVar182 == 7){
-  $gameVariables.setValue(527,`\\C[9]＜${valueItems[id1].name}＞\\C[0]`);
-  $gameVariables.setValue(93,0);
+  $gameVariables.setValue(527, `\\C[9]＜${valueItemName}＞\\C[0]`);
+  $gameVariables.setValue(93, 0);
 }
 else if (gameVar182 == 8){
-  $gameVariables.setValue(527,`\\C[3]＜${valueItems[id1].name}＞\\C[0]`);
-    if(valueItems[id1].damage.type == 2){
-      $gameVariables.setValue(93,249);//MP回復の場合
-    } else {
-      $gameVariables.setValue(93,245);
-    };
+  $gameVariables.setValue(527, `\\C[3]＜${valueItemName}＞\\C[0]`);
+  $gameVariables.setValue(93, valueItem.damage.type == 2 ? 249 : 245);//MP回復の場合
 };
 
-if(valueItems[id1].meta['SkillDamageAction']){
-  $gameVariables.setValue(93,Number(valueItems[id1].meta['SkillDamageAction']));
+if (valueItem.meta['SkillDamageAction']){
+  $gameVariables.setValue(93, Number(valueItem.meta['SkillDamageAction']));
 };
-if(valueItems[id1].meta['Instant']){
+if (valueItem.meta['Instant']){
   $gameSwitches.setValue(91,true);
 } else {
   $gameSwitches.setValue(91,false);
 };
-if(valueItems[id1].meta['Repeat']){
-  $gameVariables.setValue(526,Number(valueItems[id1].meta['Repeat']));
+if (valueItem.meta['Repeat']){
+  $gameVariables.setValue(526, Number(valueItem.meta['Repeat']));
 };
-if($gameVariables.value(182) == 2){
+if(gameVar182 == 2){
   var arr1 = valueNormalAttackHit;
   for (var i = 0; i <= arr1.length-1; i++) {
     if(user.isStateAffected(arr1[i])){
@@ -662,7 +660,7 @@ if($gameVariables.value(182) == 2){
     };
   };
 };
-if($gameVariables.value(182) == 2 || $gameVariables.value(182) == 6){
+if(gameVar182 == 2 || gameVar182 == 6){
   var arr1 = valueAttackAbilityHit;
   for (var i = 0; i <= arr1.length-1; i++) {
     if(user.isStateAffected(arr1[i])){
@@ -670,35 +668,31 @@ if($gameVariables.value(182) == 2 || $gameVariables.value(182) == 6){
     };
   };
 };
-/*:
-if([2,4,5,6].some(function(id){return valueItems[id1].scope == (id)})){
+/*
+if([2,4,5,6].some(function(id){return valueItem.scope == (id)})){
   $gameSwitches.setValue(463,true);
 };
-if($gameVariables.value(182) == 2 && user.isStateAffected(282)){//全体化
+if(gameVar182 == 2 && user.isStateAffected(282)){//全体化
   $gameSwitches.setValue(463,true);
 };
-if($gameVariables.value(182) == 2 && user.isStateAffected(283)){//ランダム化
+if(gameVar182 == 2 && user.isStateAffected(283)){//ランダム化
   $gameSwitches.setValue(463,true);
 };
 */
 };
 
 //属性耐性ダウン付与
-Element_DebuffRateA = function(target,value100){
+Element_DebuffRateA = function(target,stateId){
 
-if (target._stateCounter[value100] >= 0.001) {}else{
-  target.setStateCounter(value100, 0);
+if (target._stateCounter[stateId] < 0.001) {
+  target.setStateCounter(stateId, 0);
 };
-var value1 = 11;
-var value2 = Number($dataStates[value100].meta['ElementId']);
-var value3 = Number($dataStates[value100].meta['DebuffRate']);
-  if(target.isEnemy()){
-    var target1 = $dataStates[490 + target.index()];
-  } else {
-    var target1 = $dataStates[486 + target.index()];
-  };
-target1.traits.push({code: value1, dataId: value2, value: 1 + (value3 / 100)});
-target.addStateCounter(value100, +(value3 / 100));
+var code = 11;
+var stateElementId = Number($dataStates[stateId].meta['ElementId']);
+var stateDebuffRate = Number($dataStates[stateId].meta['DebuffRate']);
+const target1 = $dataStates[(target.isEnemy() ? 490 : 486) + target.index()];
+target1.traits.push({code: code, dataId: stateElementId, value: 1 + (stateDebuffRate / 100)});
+target.addStateCounter(stateId, +(stateDebuffRate / 100));
 
 };
 
@@ -706,14 +700,14 @@ target.addStateCounter(value100, +(value3 / 100));
 Element_DebuffRateR = function(target,value100){
 
 if (target._stateCounter[value100] >= 1) {
-var value1 = 11;
-var value2 = Number($dataStates[value100].meta['ElementId']);
+var code = 11;
+var dataId = Number($dataStates[value100].meta['ElementId']);
   if(target.isEnemy()){
     var target1 = $dataStates[490 + target.index()];
   } else {
     var target1 = $dataStates[486 + target.index()];
   };
-target1.traits.push({code: value1, dataId: value2, value: 1 - target.getStateCounter[value100]});
+target1.traits.push({code: code, dataId: dataId, value: 1 - target.getStateCounter[value100]});
 target.removeStateCounter(value100);
 };
 
@@ -723,19 +717,9 @@ target.removeStateCounter(value100);
 state_addEffect1 = function(user,target,value100,id1){
 
 if (!$gameTroop.isAllDead() && $gameParty.inBattle()) {
-  if(target.isStateAffected(289)){
-    var value10 = 0.2;
-  }else{
-    var value10 = 0.1;
-  };
-  if($dataStates[value100].meta['registUp']){
-    var value10 = Math.ceil(Number($dataStates[value100].meta['registUp']) / 100);
-  };
-  if(target.isEnemy()){
-    var target1 = $dataStates[490 + target.index()];
-  } else {
-    var target1 = $dataStates[486 + target.index()];
-  };
+  const value10 = $dataStates[value100].meta['registUp'] ? Math.ceil(Number($dataStates[value100].meta['registUp']) / 100) : target.isStateAffected(289) ? 0.2 : 0.1;
+  const target1 = $dataStates[(target.isEnemy() ? 490 : 486) + target.index()];
+
   var arr1 = [255,128,0,255,256];
   if($dataStates[value100].meta['Category']){
     if($dataStates[value100].meta['Category'] == ' StateabNomal' || $dataStates[value100].meta['Category'] == ' StateSPabNomal'){//耐性付与。強化は除外
@@ -749,7 +733,7 @@ if (!$gameTroop.isAllDead() && $gameParty.inBattle()) {
   for (var j = 0; j <= arr2.length-1; j++) {
     if(target.isStateAffected(arr2[j])){
       if(Number($dataStates[arr2[j]].meta['stateAddState'].split(',')[0]) == $gameVariables.value(182)){
-        for (var id1 = 1; id1 <= Number($dataStates[arr2[j]].meta['stateAddState'].split(',')[2]); id1++) {
+        for (let id1 = 1; id1 <= Number($dataStates[arr2[j]].meta['stateAddState'].split(',')[2]); id1++) {
           target.addState(Number($dataStates[arr2[j]].meta['stateAddState'].split(',')[1]));
         };
       };
@@ -759,31 +743,34 @@ if (!$gameTroop.isAllDead() && $gameParty.inBattle()) {
     target.startAnimation(id1, false, $gameVariables.value(279));
     $gameVariables.setValue(279,$gameVariables.value(279)+$gameVariables.value(280));
     //target.startMessagePopup(`\x1bI[${$dataStates[value100].iconIndex}]`, arr1);
-      target.startMessagePopup($dataStates[value100].name, arr1);
+    target.startMessagePopup($dataStates[value100].name, arr1);
   };
 };
 
 };
 
 //ステート解除時のアクション
-state_removeEffect1 = function(user,target,value100,id1){
+state_removeEffect1 = function(user,target,stateId,id1){
 
-user.removeStateCounter(value100);
+user.removeStateCounter(stateId);
 if (!$gameTroop.isAllDead() && $gameParty.inBattle()) {
   if(ConfigManager.battleAniSpeed >= 3){
-    var value1 = 0;
-    var value2 = ` `;
-    if($dataStates[value100].meta['Category']){
-      if($dataStates[value100].meta['Category'] == ' PowerUp'){
-        var value1 = 2;
+    let colorIndex = 0;
+    let s = ` `;
+    const state = $dataStates[stateId];
+    if (state.meta['Category']){
+      if (state.meta['Category'] == ' PowerUp'){
+        colorIndex = 2;
       } else {
-        var value1 = 1;
-        var value2 = `…`;
+        colorIndex = 1;
+        s = `…`;
       };
     }
     target.startAnimation(id1, false, $gameVariables.value(279));
     $gameVariables.setValue(279,$gameVariables.value(279)+$gameVariables.value(280));
-    BattleManager._logWindow.push(`addText`, `${target.name()}の\\C[${value1}]${$dataStates[value100].name}\\C[0]が解除された${value2}`);
+    const actorName = target.name();
+    const stateName = `\\C[${colorIndex}]${state.name}\\C[0]`;
+    BattleManager._logWindow.push(`addText`, `${actorName}の${stateName}が解除された${s}`);
 }};
 
 };
