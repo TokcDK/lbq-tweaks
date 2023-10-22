@@ -3060,11 +3060,11 @@ enemy_battleStartCry = function(user){
 if(!$gameSwitches.value(157)){
   var value5 = user._enemyId;
   if($dataEnemies[value5].meta['EnemyEntrySe']){
-    var value2 = $dataEnemies[value5].meta['EnemyEntrySe'].split(',')[0];
-    var value1 = Math.floor( Math.random() * 21) + Number($dataEnemies[value5].meta['EnemyEntrySe'].split(',')[1]);
-    var value3 = Math.floor( Math.random() * 11) + Number($dataEnemies[value5].meta['EnemyEntrySe'].split(',')[2]);
-    var value4 = Math.floor( Math.random() * -101);
-    AudioManager.playSe({"name":value2,"volume":value3,"pitch":value1,"pan":value4});
+    var name = $dataEnemies[value5].meta['EnemyEntrySe'].split(',')[0];
+    var pitch = Math.floor( Math.random() * 21) + Number($dataEnemies[value5].meta['EnemyEntrySe'].split(',')[1]);
+    var volume = Math.floor( Math.random() * 11) + Number($dataEnemies[value5].meta['EnemyEntrySe'].split(',')[2]);
+    var pan = Math.floor( Math.random() * -101);
+    AudioManager.playSe({"name":name,"volume":volume,"pitch":pitch,"pan":pan});
     $gameSwitches.setValue(157,true);
 }};
 
@@ -3106,38 +3106,40 @@ if($gameSwitches.value(141)){
   Number($dataSkills[id1].meta['DamageFormula2'].split(',')[1])) * 
   Number($dataSkills[id1].meta['DamageFormula2'].split(',')[2]),user.mdf/10);
   var value1 = damage;
-  var value5 = `基礎ダメージ値:\\C[10]${value1}\\C[0]`;
-  BattleManager._logWindow.push(`addText`, value5);
-  var arr1 = user.attackElements();
+  let text = `基礎ダメージ値:\\C[10]${value1}\\C[0]`;
+  BattleManager._logWindow.push(`addText`, text);
+  let arr1 = user.attackElements();
   if($dataSkills[id1].meta['Multiple Elements']){
     var arr2 = $dataSkills[id1].meta['Multiple Elements'].split(',');
-    var arr1 = arr1.concat(arr2);
+    arr1 = arr1.concat(arr2);
   };
   var value6 = $dataSkills[1].damage.elementId;
   if(value6 >= 1){
     arr1.push(value6);
   };
+
+  const prefix = `[属性] `
+  text = prefix;
   for (var i = 0; i <= arr1.length-1; i++) {
     var value2 = arr1[i];
-    var value3 = Math.round(valueAttackAmplifysActorId[user.actorId()][value2]);
-    var value3 = value3 + Math.round(user.elementAmplifyRate(value2)*100 + 100);
+    let value3 = Math.round(valueAttackAmplifysActorId[user.actorId()][value2]);
+    value3 = value3 + Math.round(user.elementAmplifyRate(value2)*100 + 100);
     var value4 = Math.round(target.elementRate(value2)*100);
-    var value5 = `[属性] `;
     amygame_elementIcon(value2);
     if(value3 != 100 || value4 != 100){
       if(valueElementIconArr[1] != 1 || valueElementIconArr[1] != 16){
-        value5 += `\x1bI[${valueElementIconArr[1]}]:${value3}-${value4} `;
+        text += `\x1bI[${valueElementIconArr[1]}]:${value3}-${value4} `;
     }};
   };
-  if(value5 != `[属性] `){
-    BattleManager._logWindow.push(`addText`, value5);
+  if (text != prefix){
+    BattleManager._logWindow.push(`addText`, text);
   };
   if(target.result().critical){
-    var value5 = `[会心発生！] 倍率${user.criticalMultiplierBonus()*100}%`;
-    BattleManager._logWindow.push(`addText`, value5);
+    text = `[会心発生！] 倍率${user.criticalMultiplierBonus()*100}%`;
+    BattleManager._logWindow.push(`addText`, text);
   };
-  var value5 = `[分散値] ${$dataSkills[id1].damage.variance}`;
-  BattleManager._logWindow.push(`addText`, value5);
+  text = `[分散値] ${$dataSkills[id1].damage.variance}`;
+  BattleManager._logWindow.push(`addText`, text);
 };
 
 };
@@ -3157,45 +3159,46 @@ if(a.tp >= 100){
   };
 };
 for (var i = 1; i <= 15; i++) {//$dataSkills[id].tpCost
-if($gameVariables.value(347)[i] != 0){
-  if($gameVariables.value(347)[i][0] == 0){//HPトリガー
-    if(a.hpRate() <= $gameVariables.value(347)[i][1] / 100){
-      if(899 != $gameVariables.value(347)[i][2]){
-        if(!$gameSwitches.value(470) && $dataSkills[$gameVariables.value(347)[i][2]].tpCost == 100){a.gainTp(100)};
-        if(a.meetsSkillConditions($dataSkills[$gameVariables.value(347)[i][2]])){
-          var value11 = $gameVariables.value(347)[i][2];
+const gameVar347i = $gameVariables.value(347)[i];
+if(gameVar347i != 0){
+  if(gameVar347i[0] == 0){//HPトリガー
+    if(a.hpRate() <= gameVar347i[1] / 100){
+      if(899 != gameVar347i[2]){
+        if(!$gameSwitches.value(470) && $dataSkills[gameVar347i[2]].tpCost == 100){a.gainTp(100)};
+        if(a.meetsSkillConditions($dataSkills[gameVar347i[2]])){
+          var value11 = gameVar347i[2];
           break;
         };
       };
-  }};
-  if($gameVariables.value(347)[i][0] == 1){//MPトリガー
-    if(a.mpRate() <= $gameVariables.value(347)[i][1] / 100){
-      if(!$gameSwitches.value(470) && $dataSkills[$gameVariables.value(347)[i][2]].tpCost == 100){a.gainTp(100)};
-      if(a.meetsSkillConditions($dataSkills[$gameVariables.value(347)[i][2]])){
-        var value11 = $gameVariables.value(347)[i][2];
+  }}
+  else if(gameVar347i[0] == 1){//MPトリガー
+    if(a.mpRate() <= gameVar347i[1] / 100){
+      if(!$gameSwitches.value(470) && $dataSkills[gameVar347i[2]].tpCost == 100){a.gainTp(100)};
+      if(a.meetsSkillConditions($dataSkills[gameVar347i[2]])){
+        var value11 = gameVar347i[2];
         break;
       };
-  }};
-  if($gameVariables.value(347)[i][0] == 2){//ターン
-    if(($gameVariables.value(263) % $gameVariables.value(347)[i][1]) == 0){
-      if(!$gameSwitches.value(470) && $dataSkills[$gameVariables.value(347)[i][2]].tpCost == 100){a.gainTp(100)};
-      if(a.meetsSkillConditions($dataSkills[$gameVariables.value(347)[i][2]])){
-          var value11 = $gameVariables.value(347)[i][2];
+  }}
+  else if(gameVar347i[0] == 2){//ターン
+    if(($gameVariables.value(263) % gameVar347i[1]) == 0){
+      if(!$gameSwitches.value(470) && $dataSkills[gameVar347i[2]].tpCost == 100){a.gainTp(100)};
+      if(a.meetsSkillConditions($dataSkills[gameVar347i[2]])){
+          var value11 = gameVar347i[2];
           break;
         };
-  }};
-  if($gameVariables.value(347)[i][0] == 3){//オーバードライブなどステートによる変化
-    if(a.isStateAffected($gameVariables.value(347)[i][1])){
-        if(!$gameSwitches.value(470) && $dataSkills[$gameVariables.value(347)[i][2]].tpCost == 100){a.gainTp(100)};
-        if(a.meetsSkillConditions($dataSkills[$gameVariables.value(347)[i][2]])){
-          var value11 = $gameVariables.value(347)[i][2];
+  }}
+  else if(gameVar347i[0] == 3){//オーバードライブなどステートによる変化
+    if(a.isStateAffected(gameVar347i[1])){
+        if(!$gameSwitches.value(470) && $dataSkills[gameVar347i[2]].tpCost == 100){a.gainTp(100)};
+        if(a.meetsSkillConditions($dataSkills[gameVar347i[2]])){
+          var value11 = gameVar347i[2];
           break;
         };
-　}};
-  if($gameVariables.value(347)[i][0] == 4){//ＨＰによる通常攻撃変化
-    if(a.hpRate() <= $gameVariables.value(347)[i][1] / 100){
-      if(a.meetsSkillConditions($dataSkills[$gameVariables.value(347)[i][2]])){
-        var value4 = $gameVariables.value(347)[i][2];
+　}}
+  else if(gameVar347i[0] == 4){//ＨＰによる通常攻撃変化
+    if(a.hpRate() <= gameVar347i[1] / 100){
+      if(a.meetsSkillConditions($dataSkills[gameVar347i[2]])){
+        var value4 = gameVar347i[2];
         break;
       };
 　}};
