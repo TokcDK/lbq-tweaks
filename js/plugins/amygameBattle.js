@@ -10,13 +10,15 @@
 enemy_dropSelection = function(user){
 
 if($gameSwitches.value(607) || $gameSwitches.value(608)){}else{
-  for (var i = 1; i <= valueSubjugationPoint.length-1; i++) {//討伐数カウント
+  for (let i = 1; i <= valueSubjugationPoint.length-1; i++) {//討伐数カウント
     if(user.isStateAffected(valueSubjugationPoint[i])){
       $gameVariables.value(52)[valueSubjugationPoint[i]] += 1;
       if(!$gameParty.inBattle()){
-        var value1 = `\x1bSIM[${valueSubjugationPoint[i]}]：討伐数\\C[10]+1\\C[0]\n`;
-        valueWordSet3 += `${value1}`;
-        $gameSystem.pushInfoLog(value1);
+        const name = `\x1bSIM[${valueSubjugationPoint[i]}]`;
+        const num = `\\C[10]+1\\C[0]`;
+        const messageText = `${name}：討伐数${num}\n`;
+        valueWordSet3 += `${messageText}`;
+        $gameSystem.pushInfoLog(messageText);
         //CommonPopupManager.showInfo({},value1,null);
       };
   }};
@@ -30,143 +32,164 @@ if(!$gameParty.inBattle()){
 } else {
   valueDropEnemyLevel = user.level;
 };
-var actor = $gameActors.actor($gameVariables.value(20));
-var arr1 = Array(51).fill(0);
-var j = 0;
-//if(user.isStateAffected(610) && $gameVariables.value(96) == 0){arr1[j] = [0,0,10];j += 1};
-//if(user.isStateAffected(610) && actor.isStateAffected(1)){arr1[j] = [0,0,10];j += 1};
-var value1 = 0;
-for (var i = 0; i < valueAddPowerCustomState.length; i++) {
-  if(user.isStateAffected(valueAddPowerCustomState[i])){
-    value1 += Number($dataStates[valueAddPowerCustomState[i]].meta['AddPowerCustom']);
-}};
-if(value1 >= 1){
-  for (var i = 0; i < value1.length; i++) {
-    arr1[j] = [6,0,153];j += 1;
+  const itemDropDataArray = [];
+  let stateAddPowerCustomCount = 0;
+  for (let i = 0; i < valueAddPowerCustomState.length; i++) {
+    if (user.isStateAffected(valueAddPowerCustomState[i])) {
+      stateAddPowerCustomCount += Number($dataStates[valueAddPowerCustomState[i]].meta['AddPowerCustom']);
+    }
   };
-};
-if(user.isStateAffected(51)){arr1[j] = [4,0,154];j += 1};
-if(user.isStateAffected(52)){arr1[j] = [4,0,155];j += 1};
-if(user.isStateAffected(53)){arr1[j] = [4,0,156];j += 1};
-if(user.isStateAffected(54)){arr1[j] = [4,0,157];j += 1};
-if(user.isStateAffected(55)){arr1[j] = [4,0,158];j += 1};
-if(user.isStateAffected(56)){arr1[j] = [4,0,159];j += 1};
-if(user.isStateAffected(610)){arr1[j] = [0,0,10];j += 1};
-if(user.isStateAffected(610)){arr1[j] = [1,0,196];j += 1};
-if(user.isStateAffected(610)){arr1[j] = [3,0,197];j += 1};
-if(user.isStateAffected(610)){arr1[j] = [5,0,198];j += 1};
-if(user.isStateAffected(610)){arr1[j] = [9,0,199];j += 1};
-if(user.isStateAffected(610)){arr1[j] = [6,0,190];j += 1};
-if(user.isStateAffected(610)){arr1[j] = [7,0,147];j += 1};
-if(user.isStateAffected(610)){arr1[j] = [10,0,148];j += 1};
-if(user.isStateAffected(610)){arr1[j] = [8,0,152];j += 1};
-if(user.isStateAffected(610)){arr1[j] = [8,0,153];j += 1};
-if(user.isStateAffected(451)){arr1[j] = [6,0,191];j += 1};
-if(user.isStateAffected(452)){arr1[j] = [7,0,192];j += 1};
-if(user.isStateAffected(453)){arr1[j] = [8,0,193];j += 1};
-if(user.isStateAffected(454)){arr1[j] = [10,0,194];j += 1};
-if(user.isStateAffected(451)){arr1[j] = [6,0,161];j += 1};
-if(user.isStateAffected(452)){arr1[j] = [6,0,162];j += 1};
-if(user.isStateAffected(451)){arr1[j] = [6,0,163];j += 1};
-if(user.isStateAffected(452)){arr1[j] = [6,0,164];j += 1};
-if(user.isStateAffected(441)){arr1[j] = [6,0,165];j += 1};
-if(user.isStateAffected(442)){arr1[j] = [6,0,165];j += 1};
-if(user.isStateAffected(443)){arr1[j] = [6,0,166];j += 1};
-if(user.isStateAffected(446)){arr1[j] = [6,0,167];j += 1};
-if(user.isStateAffected(455)){arr1[j] = [6,0,168];j += 1};
-if(user.isStateAffected(448)){arr1[j] = [10,0,169];j += 1};
-if(user.isStateAffected(453)){arr1[j] = [10,0,169];j += 1};
-if(user.isStateAffected(454)){arr1[j] = [10,0,169];j += 1};
-if(user.isStateAffected(610)){arr1[j] = [10,0,170];j += 1};
-if( [851,852,853,854,855,856,857,858,859,860,861,862,863,864,865,866,867,868,869,870,871,872,873,874,875,876,877,878,879,880].some(function(id){return user.isStateAffected(id)}) ){
-  arr1[j] = [6,0,170];j += 1;
-  arr1[j] = [6,2,id-780];j += 1;
-};
-if(user.isStateAffected(410)){
-  arr1[j] = [6,0,185];j += 1;
-  arr1[j] = [7,0,186];j += 1;
-  arr1[j] = [8,0,187];j += 1;
-  arr1[j] = [10,0,188];j += 1;
-  arr1[j] = [5,0,1115];j += 1;
-  arr1[j] = [8,0,1117];j += 1;
-  if(valueDropEnemyLevel >= 1 && valueDropEnemyLevel <= 20 ){
-    arr1[j] = [2,0,1118];j += 1;
-    arr1[j] = [3,0,1119];j += 1;
-    arr1[j] = [4,0,1120];j += 1;
-    arr1[j] = [5,0,1121];j += 1;
+  if (stateAddPowerCustomCount >= 1) {
+    for (let i = 0; i < stateAddPowerCustomCount.length; i++) {
+      itemDropDataArray.push([6, 0, 153]);
+    };
   };
-  if(valueDropEnemyLevel >= 11){
-    arr1[j] = [6,0,1122];j += 1;
-    arr1[j] = [7,0,1123];j += 1;
-    arr1[j] = [8,0,1124];j += 1;
-    arr1[j] = [10,0,1125];j += 1;
+  for (let i = 51; i <= 56; i++) {
+    if (user.isStateAffected(i)) itemDropDataArray.push([4, 0, i+103]);
   };
-};
-if(user.isStateAffected(440)){arr1[j] = [5,0,220];j += 1};//プライマル・アニマ
-if(user.isStateAffected(440)){arr1[j] = [8,0,240];j += 1};
-if(user.isStateAffected(461)){arr1[j] = [5,0,251];j += 1};//人型とうのドロップ
-if(user.isStateAffected(462)){arr1[j] = [5,0,252];j += 1};
-if(user.isStateAffected(463)){arr1[j] = [5,0,253];j += 1};
-if(user.isStateAffected(464)){arr1[j] = [5,0,254];j += 1};
-if(user.isStateAffected(465)){arr1[j] = [5,0,255];j += 1};
-if(user.isStateAffected(466)){arr1[j] = [5,0,256];j += 1};
-if(user.isStateAffected(467)){arr1[j] = [5,0,257];j += 1};
-if(user.isStateAffected(479)){arr1[j] = [6,0,270];j += 1};//特殊ステートドロップ
-if(user.isStateAffected(479)){arr1[j] = [5,0,269];j += 1};
-if(user.isStateAffected(465)){arr1[j] = [3,0,1287];j += 1};//魔物肉
-if(user.isStateAffected(465) && user.isStateAffected(454)){arr1[j] = [3,0,1289];j += 1};//神の肉,食材+神格
-if( [475].some(function(id){return user.isStateAffected(id)}) ){arr1[j] = [6,0,151];j += 1};
-for (var i = 421; i <= 439; i++) {
-  if(user.isStateAffected(i)){
-    if($dataStates[i].meta['RaceDropKind']){
-      var arr2 = $dataStates[i].meta['RaceDropKind'].split(',');
-      for (var id1 = 0; id1 <= arr2.length-1; id1++) {
-        if($dataItems[Number(arr2[id1])].meta['RaceDropRarity']){
-          arr1[j] = [Number($dataItems[Number(arr2[id1])].meta['RaceDropRarity']),0,Number(arr2[id1])];
-          j += 1;
+  if (user.isStateAffected(610)) { 
+    itemDropDataArray.push([0, 0, 10]);
+    itemDropDataArray.push([1, 0, 196]);
+    itemDropDataArray.push([3, 0, 197]);
+    itemDropDataArray.push([5, 0, 198]); 
+    itemDropDataArray.push([9, 0, 199]);
+    itemDropDataArray.push([6, 0, 190]);
+    itemDropDataArray.push([7, 0, 147]);
+    itemDropDataArray.push([10, 0, 148]);
+    itemDropDataArray.push([8, 0, 152]);
+    itemDropDataArray.push([8, 0, 153]); 
+    itemDropDataArray.push([10, 0, 170]);
+  };
+  if (user.isStateAffected(451)) { 
+    itemDropDataArray.push([6, 0, 191]);
+    itemDropDataArray.push([6, 0, 161]); 
+  };
+  if (user.isStateAffected(451)) { 
+    itemDropDataArray.push([6, 0, 163]); };
+  if (user.isStateAffected(452)) { 
+    itemDropDataArray.push([7, 0, 192]);
+    itemDropDataArray.push([6, 0, 162]);
+    itemDropDataArray.push([6, 0, 164]); };
+  if (user.isStateAffected(453)) { 
+    itemDropDataArray.push([8, 0, 193]);
+    itemDropDataArray.push([10, 0, 169]); 
+  };
+  if (user.isStateAffected(454)) { 
+    itemDropDataArray.push([10, 0, 194]);
+    itemDropDataArray.push([10, 0, 169]); 
+    if (user.isStateAffected(465)) itemDropDataArray.push([3, 0, 1289]); //神の肉,食材+神格
+  };
+  if (user.isStateAffected(441)) { itemDropDataArray.push([6, 0, 165]); };
+  if (user.isStateAffected(442)) { itemDropDataArray.push([6, 0, 165]); };
+  if (user.isStateAffected(443)) { itemDropDataArray.push([6, 0, 166]); };
+  if (user.isStateAffected(446)) { itemDropDataArray.push([6, 0, 167]); };
+  if (user.isStateAffected(455)) { itemDropDataArray.push([6, 0, 168]); };
+  if (user.isStateAffected(448)) { itemDropDataArray.push([10, 0, 169]); };
+  if ([851, 852, 853, 854, 855, 856, 857, 858, 859, 860, 861, 862, 863, 864, 865, 866, 867, 868, 869, 870, 871, 872, 873, 874, 875, 876, 877, 878, 879, 880].some(function (id) { return user.isStateAffected(id) })) {
+    itemDropDataArray.push([6, 0, 170]);
+    itemDropDataArray.push([6, 2, id - 780]);
+  };
+  if (user.isStateAffected(410)) {
+    itemDropDataArray.push([6, 0, 185]);
+    itemDropDataArray.push([7, 0, 186]);
+    itemDropDataArray.push([8, 0, 187]);
+    itemDropDataArray.push([10, 0, 188]);
+    itemDropDataArray.push([5, 0, 1115]);
+    itemDropDataArray.push([8, 0, 1117]);
+    if (valueDropEnemyLevel >= 1 && valueDropEnemyLevel <= 20) {
+      itemDropDataArray.push([2, 0, 1118]);
+      itemDropDataArray.push([3, 0, 1119]);
+      itemDropDataArray.push([4, 0, 1120]);
+      itemDropDataArray.push([5, 0, 1121]);
+    };
+    if (valueDropEnemyLevel >= 11) {
+      itemDropDataArray.push([6, 0, 1122]);
+      itemDropDataArray.push([7, 0, 1123]);
+      itemDropDataArray.push([8, 0, 1124]);
+      itemDropDataArray.push([10, 0, 1125]);
+    };
+  };
+  if (user.isStateAffected(440)) { 
+    itemDropDataArray.push([5, 0, 220]);//プライマル・アニマ
+    itemDropDataArray.push([8, 0, 240]); 
+  };
+  if (user.isStateAffected(461)) { itemDropDataArray.push([5, 0, 251]); };//人型とうのドロップ
+  if (user.isStateAffected(462)) { itemDropDataArray.push([5, 0, 252]); };
+  if (user.isStateAffected(463)) { itemDropDataArray.push([5, 0, 253]); };
+  if (user.isStateAffected(464)) { itemDropDataArray.push([5, 0, 254]); };
+  if (user.isStateAffected(465)) { 
+    itemDropDataArray.push([5, 0, 255]);
+    itemDropDataArray.push([3, 0, 1287]); //魔物肉
+  };
+  if (user.isStateAffected(466)) { itemDropDataArray.push([5, 0, 256]); };
+  if (user.isStateAffected(467)) { itemDropDataArray.push([5, 0, 257]); };
+  if (user.isStateAffected(479)) { 
+    itemDropDataArray.push([6, 0, 270]); //特殊ステートドロップ
+    itemDropDataArray.push([5, 0, 269]); 
+  };
+  
+  if (user.isStateAffected(475)) { itemDropDataArray.push([6, 0, 151]); };
+  for (var i = 421; i <= 439; i++) {
+    if (user.isStateAffected(i)) {
+      const stateRaceDropKind = $dataStates[i].meta['RaceDropKind'];
+      if (stateRaceDropKind) {
+        const stateRaceDropKinds = stateRaceDropKind.split(',');
+        for (let id1 = 0; id1 <= stateRaceDropKinds.length - 1; id1++) {
+          const stateRaceDropKindIndex = Number(stateRaceDropKinds[id1]);
+          const itemRaceDropRarity = $dataItems[stateRaceDropKindIndex].meta['RaceDropRarity'];
+          if (itemRaceDropRarity) {
+            itemDropDataArray.push([Number(itemRaceDropRarity), 0, stateRaceDropKindIndex]);
+          };
         };
       };
     };
   };
-};
-  for (var i = 0; i <= arr1.length-1; i++) {
-    if(arr1[i] != 0){
-      drop_probabilityCalculation2(user,Number(arr1[i][0]));
+  for (let i = 0; i <= itemDropDataArray.length-1; i++) {
+    const itemDropData = itemDropDataArray[i];
+    if(itemDropData){
+      drop_probabilityCalculation2(user,Number(itemDropData[0]));
       if(valueDropCount1 == 1){
-        if(Number(arr1[i][1]) == 0){valueItems = $dataItems;var value1 = 'ItemDrop_Items'};
-        if(Number(arr1[i][1]) == 1){valueItems = $dataWeapons;var value1 = 'ItemDrop_Weapons'};
-        if(Number(arr1[i][1]) == 2){valueItems = $dataArmors;var value1 = 'ItemDrop_Armors'};
+        const itemDropDataKindNum = Number(itemDropData[1]);
+        const itemsSourceKinds = [$dataItems, $dataWeapons, $dataArmors];
+        const itemsSourceKindPicNames = ['ItemDrop_Items', 'ItemDrop_Weapons', 'ItemDrop_Armors'];
+        valueItems = itemsSourceKinds[itemDropDataKindNum];
+        const picName = itemsSourceKindPicNames[itemDropDataKindNum];
+        const valueItem = valueItems[Number(itemDropData[2])];
         if($gameParty.inBattle()){
-          $gameTroop.addDropItem(valueItems[Number(arr1[i][2])]);
+          $gameTroop.addDropItem(valueItem);
           //var value1 = `\x1bI[${valueItems[Number(arr1[i][2])].iconIndex}]`;
-          var arr2 = [50,75,100,125,150,175,200];
-          var arr3 = [-50,-40,-30,-20,-10,0,10,20];
-          var arr4 = [80,85,90,95,100];
+          const stateRaceDropKinds = [50,75,100,125,150,175,200];
+          const arr3 = [-50,-40,-30,-20,-10,0,10,20];
+          const arr4 = [80,85,90,95,100];
           //var arr7 = [-50,-60,-70,-80,-90,-100,-110,-120,-130,-140,-150,-160,-170,-180,-190,-200];
-          var value2 = arr2[Math.floor(Math.random() * arr2.length)];//x
-          var value3 = arr3[Math.floor(Math.random() * arr3.length)];//y
-          var value4 = arr4[Math.floor(Math.random() * arr4.length)];//wait
-          var value5 = $gameTroop.getX(user.index() + 1);
-          var value6 = $gameTroop.getY(user.index() + 1);
+          const value2 = stateRaceDropKinds[Math.floor(Math.random() * stateRaceDropKinds.length)];//x
+          const value3 = arr3[Math.floor(Math.random() * arr3.length)];//y
+          const value4 = arr4[Math.floor(Math.random() * arr4.length)];//wait
+          const value5 = $gameTroop.getX(user.index() + 1);
+          const value6 = $gameTroop.getY(user.index() + 1);
           //var value7 = arr7[Math.floor(Math.random() * arr7.length)];//jump
           picture_motion1("smooth",[0]);
           //$gameScreen.setDTextPicture(value1, 32);//元から
-          $gameScreen.showPicture(valueDropEnemyPicId,value1,1,value5,value6,100,100,255,0);
+          $gameScreen.showPicture(valueDropEnemyPicId,picName,1,value5,value6,100,100,255,0);
           //curveFunctions.patternY = curveFunctions.getPattern('jump', [value7]);
           //curveFunctions.patternOpacity = curveFunctions.getPattern('jump', [200]);
           $gameScreen.movePicture(valueDropEnemyPicId,1,value5 + value2,value6 + value3,100,100,0,0,value4);
           valueDropEnemyPicId += 1;
         } else {
           if($gameSwitches.value(607) || $gameSwitches.value(608)){
-            $gameVariables.setValue(22,Number(arr1[i][1]));
-            $gameVariables.setValue(23,Number(arr1[i][2]));
+            $gameVariables.setValue(22, itemDropDataKindNum);
+            $gameVariables.setValue(23,Number(itemDropData[2]));
             item_getSkillLevel(valueFootpadSkillId,$gameVariables.value(22),$gameVariables.value(23));
           } else {
-            if(Number(arr1[i][2]) >= 1){
-              $gameParty.gainItem(valueItems[Number(arr1[i][2])], 1);
-              var value11 = `\x1bI[${valueItems[Number(arr1[i][2])].iconIndex}]\\C[2]${valueItems[Number(arr1[i][2])].name}\\C[0]を\\C[2]1\\C[0]個入手！\n`;
-              valueWordSet1 += `${value11}`;
-              $gameSystem.pushInfoLog(value11);
+            if(Number(itemDropData[2]) >= 1){
+              $gameParty.gainItem(valueItem, 1);
+              const itemIcon = `\x1bI[${valueItem.iconIndex}]`;
+              const itemName = `\\C[2]${valueItem.name}\\C[0]`; 
+              const item = `${itemIcon}${itemName}`; 
+              const num = `\\C[2]1\\C[0]`;       
+              const messageText = `${item}を${num}個入手！\n`;
+              valueWordSet1 += `${messageText}`;
+              $gameSystem.pushInfoLog(messageText);
               //CommonPopupManager.showInfo({},value11,null);
             };
           };
