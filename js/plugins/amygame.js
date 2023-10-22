@@ -847,8 +847,8 @@ skill_personalonoffload = function(itemId,value1){
   const itemMetaSwitchOnOffUseNum = item.meta.SwicthOnOffUse;
   const isOn = $gameSwitches.value(itemMetaSwitchOnOffUseNum);
 
-  item.name = isOn ? item.meta.SwicthOnName : item.meta.SwicthOffName;
-  if (!$gameSwitches.value(19)) $gameSwitches.setValue(itemMetaSwitchOnOffUseNum, isOn);
+  valueItems[itemId].name = isOn ? item.meta.SwicthOnName : item.meta.SwicthOffName;
+  if (!$gameSwitches.value(19)) $gameSwitches.setValue(itemMetaSwitchOnOffUseNum, isOn ? false : true);
 };
 
 //パーソナルスキルのonoff
@@ -862,10 +862,11 @@ skill_personalonoff = function(actorA,actorB,itemId,value1){
     const itemMetaSwitchOnOffUseNum = Number(item.meta.SwicthOnOffUse);
     const isOn = $gameSwitches.value(itemMetaSwitchOnOffUseNum);
 
-    item.name = isOn ? item.meta.SwicthOnName : item.meta.SwicthOffName;
-    $gameSwitches.setValue(itemMetaSwitchOnOffUseNum, isOn);
+    valueItems[itemId].name = isOn ? item.meta.SwicthOnName : item.meta.SwicthOffName;
+    $gameSwitches.setValue(itemMetaSwitchOnOffUseNum, isOn ? false : true);
     const s = value1 == 0 ? "S" : "I";
-    TickerManager.show(`<\\C[2]\x1b${s}IN[${itemId}]\\C[0]>に変更しました`);
+    const switchState = `\\C[2]\x1b${s}IN[${itemId}]\\C[0]`;
+    TickerManager.show(`<${switchState}>に変更しました`);
   };
 };
 
@@ -884,18 +885,24 @@ actor_personalskilllearn = function(a,b,itemId,id2,id1){
 var actor = $gameActors.actor($gameVariables.value(2));
 var value10 = "21_SkillLearn";
 if(b.actorId() == a.actorId()){
-  if(actor.isLearnedSkill(id1)){
+  if (actor.isLearnedSkill(id1)) {
+    const actorName = `\\C[16]${actor.name()}\\C[0]`;
+    const skillName = `\\C[2]\x1bSIN[${id1}]\\C[0]`;
     if(id2 == 2){
-      TickerManager.show(`\\C[16]${actor.name()}\\C[0]は既に\\C[2]\x1bSIN[${id1}]\\C[0]を習得済みのため効果は無かった。`);
+      TickerManager.show(`${actorName}は既に${skillName}を習得済みのため効果は無かった。`);
     };
     if(id2 == 1){
       if(actor.skillMasteryLevel(id1) >= Number($dataSkills[id1].meta['Max Mastery Level'])){
-        TickerManager.show(`\\C[16]${actor.name()}\\C[0]の\\C[2]\x1bSIN[${id1}]\\C[0]は最高ランクに到達しています…。`);
+        TickerManager.show(`${actorName}の${skillName}は最高ランクに到達しています…。`);
       } else {
         var value5 = 10 * $gameVariables.value(203);
-        actor.gainSkillMasteryUses(id1,value5);//変更熟練度
-        TickerManager.show(`\\C[16]${actor.name()}\\C[0]の\\C[2]\x1bSIN[${id1}]\\C[0]熟練度を\\C[3]${value5}\\C[0]獲得した！`);
-        TickerManager.show(`Rank:${actor.skillMasteryLevel(id1)} /熟練度\\C[2]${actor.skillMasteryUses(id1)}(${actor.skillMasteryUsageMax(id1)})\\C[0]`);
+        actor.gainSkillMasteryUses(id1, value5);//変更熟練度
+        const skillRank = `\\C[3]${value5}\\C[0]`;
+        TickerManager.show(`${actorName}の${skillName}熟練度を${skillRank}}獲得した！`);
+        const skillMasteryLevel = actor.skillMasteryLevel(id1);
+        const skillMasteryUses = `\\C[2]${actor.skillMasteryUses(id1)}`;
+        const skillMasteryUsageMax = `${actor.skillMasteryUsageMax(id1)}\\C[0]`;
+        TickerManager.show(`Rank:${skillMasteryLevel} /熟練度${skillMasteryUses}(${skillMasteryUsageMax})`);
         $gameParty.loseItem($dataItems[itemId], 1);
       };
     };
@@ -903,32 +910,34 @@ if(b.actorId() == a.actorId()){
     actor.learnSkill(id1);
     actor.setSkillMasteryLevel(id1, 1);
     AudioManager.playMe({"name":value10,"volume":60,"pitch":120,"pan":0});
-    TickerManager.show(`\\C[16]${actor.name()}\\C[0]は\\C[2]\x1bSIN[${id1}]\\C[0]を習得した！`);
+    const actorName = `\\C[16]${actor.name()}\\C[0]`;
+    const skillName = `\\C[2]\x1bSIN[${id1}]\\C[0]`;
+    TickerManager.show(`${actorName}は${skillName}を習得した！`);
     $gameParty.loseItem($dataItems[itemId], 1);
 }};
 
 };
 
 //ステートオンオフ
-skill_stateonoff = function(actorA, actorB, skillId, stateId){
+skill_stateonoff = function (actorA, actorB, skillId, stateId) {
 
-const skill = $dataSkills[skillId];
-var stateId = Number(skill.meta['SkillStateAddRemove']);
-if(actorB.actorId() == actorA.actorId()){
-  const actor = $gameActors.actor(actorB._actorId);
-  const isStateAffected = actor.isStateAffected(stateId);
-  if (isStateAffected) actor.removeState(stateId);
-  const animationId = isStateAffected ? 289 : 282;
-  if ($gameParty.inBattle()) { actorB.startAnimation(animationId, true, 0) };
-  if (skill.meta['TachieChangeSet']) {//たぶん使ってない
-    actor.addState(20);
-    $gameSwitches.setValue(96, true);
+  const skill = $dataSkills[skillId];
+  if (stateId === undefined) stateId = Number(skill.meta['SkillStateAddRemove']); // added check for undefined because was input property and same local variable reset
+  if (actorB.actorId() == actorA.actorId()) {
+    const actor = $gameActors.actor(actorB._actorId);
+    const isStateAffected = actor.isStateAffected(stateId);
+    if (isStateAffected) actor.removeState(stateId); else actor.addState(stateId);
+    const animationId = isStateAffected ? 289 : 282;
+    if ($gameParty.inBattle()) { actorB.startAnimation(animationId, true, 0) };
+    if (skill.meta['TachieChangeSet']) {//たぶん使ってない isStateAffected
+      actor.addState(20);
+      $gameSwitches.setValue(96, true);
+    };
+    const actorName = `\\C[16]${actorB.name()}\\C[0]`;
+    const skillName = `\\C[2]\x1bSIN[${skillId}]\\C[0]`;
+    const message = isStateAffected ? `${actorName}の${skillName}が解除された。` : `${actorName}に${skillName}が付与された。`;
+    TickerManager.show(message);
   };
-  const actorName = `\\C[16]${actorB.name()}\\C[0]`;
-  const skillName = `\\C[2]\x1bSIN[${skillId}]\\C[0]`;
-  const message = isStateAffected ? `${actorName}の${skillName}が解除された。` : `${actorName}に${skillName}が付与された。`;
-  TickerManager.show(message);
-};
 
 };
 
