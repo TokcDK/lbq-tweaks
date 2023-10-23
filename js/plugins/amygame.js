@@ -877,11 +877,8 @@ skill_personalonoffBase = function(itemId,valueItemsType){
 
 //パーソナルスキルの所持者不在時にスイッチ自動off
 skill_personalonoffAutoOff = function(itemId,value1){
-
-if(value1 == 0){valueItems = $dataSkills};
-if(value1 == 1){valueItems = $dataItems};
-$gameSwitches.setValue(Number(valueItems[itemId].meta.SwicthOnOffUse),false);
-
+  valueItems = value1 == 0 ? $dataSkills : $dataItems;
+  $gameSwitches.setValue(Number(valueItems[itemId].meta.SwicthOnOffUse), false);
 };
 
 //主人公がパーソナルスキルを道具で習得
