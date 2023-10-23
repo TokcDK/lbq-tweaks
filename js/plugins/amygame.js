@@ -841,41 +841,36 @@ for (var i = start; i <= end; i++) {
 skill_personalonoffload = function(itemId,valueItemsType){
   if (valueItemsType > 1) return;
 
-  const ret = skill_personalonoffBase(itemId, valueItemsType);
+  valueItems = valueItemsType == 0 ? $dataSkills : $dataItems;
 
-  if (!$gameSwitches.value(19) || $gameSwitches.value(ret[0]) !== ret[1]) $gameSwitches.setValue(ret[0], ret[1]);
+  const item = valueItems[itemId];
+  const skillSwitchId = Number(item.meta.SwicthOnOffUse);
+  const switchStateValue = !!$gameSwitches.value(skillSwitchId);
+
+  // set effect switch by skill name
+  // if (!$gameSwitches.value(19)) {
+  item.name = switchStateValue ? item.meta.SwicthOnName : item.meta.SwicthOffName;
+  $gameSwitches.setValue(skillSwitchId, switchStateValue);
 };
 
 //パーソナルスキルのonoff
 skill_personalonoff = function(actorA,actorB,itemId,valueItemsType){
-  console.log(`itemId:${itemId}|actorA:${actorA}|actorB:${actorB}|valueItemsType:${valueItemsType}`);
-
+  
   if (actorB.actorId() !== actorA.actorId()) return;
   if (valueItemsType > 1) return;
 
-  const ret = skill_personalonoffBase(itemId, valueItemsType);
-
-  console.log(`ret[0]:${ret[0]}|ret[1]:${ret[1]}`);
-
-  $gameSwitches.setValue(ret[0], ret[1]);
-
-  const s = valueItemsType == 0 ? "S" : "I";
-  const switchState = `\\C[2]\x1b${s}IN[${itemId}]\\C[0]`;
-  TickerManager.show(`<${switchState}>に変更しました`);
-};
-
-skill_personalonoffBase = function(itemId,valueItemsType){
-
-  if (valueItemsType == 0) { valueItems = $dataSkills }
-  else if (valueItemsType == 1) { valueItems = $dataItems };
-
   const item = valueItems[itemId];
-  const itemMetaSwitchOnOffUseNum = Number(item.meta.SwicthOnOffUse);
-  const isOn = $gameSwitches.value(itemMetaSwitchOnOffUseNum);
+  const skillSwitchId = Number(item.meta.SwicthOnOffUse);
+  const switchStateValue = !!$gameSwitches.value(skillSwitchId) ? false : true;
 
-  valueItems[itemId].name = isOn ? item.meta.SwicthOnName : item.meta.SwicthOffName;
+  // revers switch state
+  item.name = switchStateValue ? item.meta.SwicthOffName : item.meta.SwicthOnName;
+  $gameSwitches.setValue(skillSwitchId, switchStateValue);
 
-  return [itemMetaSwitchOnOffUseNum, isOn ? true : false]
+  // show new state name
+  const s = valueItemsType == 0 ? "S" : "I";
+  const switchStateName = `\\C[2]\x1b${s}IN[${itemId}]\\C[0]`;
+  TickerManager.show(`<${switchStateName}>に変更しました`);
 };
 
 //パーソナルスキルの所持者不在時にスイッチ自動off
