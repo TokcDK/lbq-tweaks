@@ -838,36 +838,41 @@ for (var i = start; i <= end; i++) {
 };
 
 //パーソナルスキルのonoffロード時
-skill_personalonoffload = function(itemId,value1){
+skill_personalonoffload = function(itemId,valueItemsType){
+  if (valueItemsType > 1) return;
 
-  if (value1 == 0) { valueItems = $dataSkills }
-  else if (value1 == 1) { valueItems = $dataItems };
+  const ret = skill_personalonoffBase(itemId, valueItemsType);
 
-  const item = valueItems[itemId];
-  const itemMetaSwitchOnOffUseNum = item.meta.SwicthOnOffUse;
-  const isOn = $gameSwitches.value(itemMetaSwitchOnOffUseNum);
-
-  valueItems[itemId].name = isOn ? item.meta.SwicthOnName : item.meta.SwicthOffName;
-  if (!$gameSwitches.value(19)) $gameSwitches.setValue(itemMetaSwitchOnOffUseNum, isOn ? false : true);
+  if (!$gameSwitches.value(19) || $gameSwitches.value(ret[0]) !== ret[1]) $gameSwitches.setValue(ret[0], ret[1]);
 };
 
 //パーソナルスキルのonoff
-skill_personalonoff = function(actorA,actorB,itemId,value1){
+skill_personalonoff = function(actorA,actorB,itemId,valueItemsType){
 
-  if (value1 == 0) { valueItems = $dataSkills }
-  else if (value1 == 1) { valueItems = $dataItems };
+  if (actorB.actorId() !== actorA.actorId()) return;
+  if (valueItemsType > 1) return;
 
-  if (actorB.actorId() == actorA.actorId()) {
-    const item = valueItems[itemId];
-    const itemMetaSwitchOnOffUseNum = Number(item.meta.SwicthOnOffUse);
-    const isOn = $gameSwitches.value(itemMetaSwitchOnOffUseNum);
+  const ret = skill_personalonoffBase(itemId, valueItemsType);
 
-    valueItems[itemId].name = isOn ? item.meta.SwicthOnName : item.meta.SwicthOffName;
-    $gameSwitches.setValue(itemMetaSwitchOnOffUseNum, isOn ? false : true);
-    const s = value1 == 0 ? "S" : "I";
-    const switchState = `\\C[2]\x1b${s}IN[${itemId}]\\C[0]`;
-    TickerManager.show(`<${switchState}>に変更しました`);
-  };
+  $gameSwitches.setValue(ret[0], ret[1]);
+
+  const s = valueItemsType == 0 ? "S" : "I";
+  const switchState = `\\C[2]\x1b${s}IN[${itemId}]\\C[0]`;
+  TickerManager.show(`<${switchState}>に変更しました`);
+};
+
+skill_personalonoffBase = function(itemId,valueItemsType){
+
+  if (valueItemsType == 0) { valueItems = $dataSkills }
+  else if (valueItemsType == 1) { valueItems = $dataItems };
+
+  const item = valueItems[itemId];
+  const itemMetaSwitchOnOffUseNum = Number(item.meta.SwicthOnOffUse);
+  const isOn = $gameSwitches.value(itemMetaSwitchOnOffUseNum);
+
+  item.name = isOn ? item.meta.SwicthOnName : item.meta.SwicthOffName;
+
+  return [itemMetaSwitchOnOffUseNum, isOn ? false : true]
 };
 
 //パーソナルスキルの所持者不在時にスイッチ自動off
