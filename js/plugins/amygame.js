@@ -872,7 +872,7 @@ skill_personalonoffBase = function(itemId,valueItemsType){
 
   item.name = isOn ? item.meta.SwicthOnName : item.meta.SwicthOffName;
 
-  return [itemMetaSwitchOnOffUseNum, isOn ? false : true]
+  return [itemMetaSwitchOnOffUseNum, isOn ? true : false]
 };
 
 //パーソナルスキルの所持者不在時にスイッチ自動off
