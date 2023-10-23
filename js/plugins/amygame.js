@@ -926,24 +926,25 @@ if(b.actorId() == a.actorId()){
 //ステートオンオフ
 skill_stateonoff = function (actorA, actorB, skillId, stateId) {
 
+  if (actorB.actorId() !== actorA.actorId()) return;
+
   const skill = $dataSkills[skillId];
   if (stateId === undefined) stateId = Number(skill.meta['SkillStateAddRemove']); // added check for undefined because was input property and same local variable reset
-  if (actorB.actorId() == actorA.actorId()) {
-    const actor = $gameActors.actor(actorB._actorId);
-    const isStateAffected = actor.isStateAffected(stateId);
-    if (isStateAffected) actor.removeState(stateId); else actor.addState(stateId);
-    const animationId = isStateAffected ? 289 : 282;
-    if ($gameParty.inBattle()) { actorB.startAnimation(animationId, true, 0) };
-    if (skill.meta['TachieChangeSet']) {//たぶん使ってない isStateAffected
-      actor.addState(20);
-      $gameSwitches.setValue(96, true);
-    };
-    const actorName = `\\C[16]${actorB.name()}\\C[0]`;
-    const skillName = `\\C[2]\x1bSIN[${skillId}]\\C[0]`;
-    const message = isStateAffected ? `${actorName}の${skillName}が解除された。` : `${actorName}に${skillName}が付与された。`;
-    TickerManager.show(message);
+  
+  const actor = $gameActors.actor(actorB._actorId);
+  const isStateAffected = actor.isStateAffected(stateId);
+  if (isStateAffected) actor.removeState(stateId); else actor.addState(stateId);
+  const animationId = isStateAffected ? 289 : 282;
+  if ($gameParty.inBattle()) { actorB.startAnimation(animationId, true, 0) };
+  if (skill.meta['TachieChangeSet']) {//たぶん使ってない isStateAffected
+    actor.addState(20);
+    $gameSwitches.setValue(96, true);
   };
 
+  const actorName = `\\C[16]${actorB.name()}\\C[0]`;
+  const skillName = `\\C[2]\x1bSIN[${skillId}]\\C[0]`;
+  const message = isStateAffected ? `${actorName}の${skillName}が解除された。` : `${actorName}に${skillName}が付与された。`;
+  TickerManager.show(message);
 };
 
 //スキルアイテム使用時に立ち絵が変化する場合。事前に$gameVariables.setValue(20,b.actorId());
@@ -967,23 +968,20 @@ if($dataActors[$gameVariables.value(20)].meta['Heroine']){
 };
 
 //スキルアイテム使用でのぶっかけ付与。
-bukkake_addSemen1 = function(a,b,itemId,id1){
+bukkake_addSemen1 = function(user,target,itemId,valueItemsType){
 
-var user = a;
-var target = b;
-if(id1 == 0){
-  var valueItems = $dataSkills;
-} else {
-  var valueItems = $dataItems;
-};
-if($dataActors[b.actorId()].meta['Heroine']){
-  b.addState(86);
-  $gameVariables.setValue(20,b.actorId());
+var valueItems = valueItemsType == 0 ? $dataSkills : $dataItems;
+const heroineName = target.name();
+if($dataActors[target.actorId()].meta['Heroine']){
+  target.addState(86);
+  $gameVariables.setValue(20,target.actorId());
   tachie_usedChange1();
-  TickerManager.show(target.name() + 'はぶっかけられた！');
-} else {
-  TickerManager.show(target.name() + 'は対象キャラでは無いため、効果が無かった…。');
-  if(id1 == 1){
+
+  TickerManager.show(heroineName + 'はぶっかけられた！');
+} else {  
+  TickerManager.show(heroineName + 'は対象キャラでは無いため、効果が無かった…。');
+
+  if(valueItemsType == 1){
     $gameParty.gainItem(valueItems[itemId], +1);
   };
 };
