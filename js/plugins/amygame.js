@@ -2931,12 +2931,14 @@ if(Number(item.meta['EICSwitch']) == 104 || Number(item.meta['EICSwitch']) == 10
         if(!$gameSwitches.value(29)){
           $gameParty.gainItem($dataItems[10], Number(item.meta['titleSenkaGet']));//アイテムID10は戦貨
         };
-        valueWordSetEx = `\x1bIIN[10]${Number(item.meta['titleSenkaGet'])}枚獲得！`;
+        const titleName = `\x1bIIN[10]${Number(item.meta['titleSenkaGet'])}`;
+        valueWordSetEx = `${titleName}枚獲得！`;
       };
       if(value6 >= 1){
         if(!$gameSwitches.value(29)){
           $gameVariables.value(297)[i] = value6;
-          valueWordSetEx = `\n[達成者:\\C[2]${$gameActors.actor($gameVariables.value(297)[i]).name()}\\C[0]]`;
+          const actorName = `\\C[2]${$gameActors.actor($gameVariables.value(297)[i]).name()}\\C[0]]`;
+          valueWordSetEx = `\n[達成者:${actorName}`;
         };
       };
       break;
