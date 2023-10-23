@@ -5879,4 +5879,31 @@ actor_custom_replace_guard1 = function(user) {
   return 2;
 };
 
+learn_show_eval_is_notlearned_added_contains = function (user, skillId) {
+  return !user.isLearnedSkill(skillId) && user.addedSkills().contains(skillId);
+};
+
+learn_show_eval_mastery_moreorequalof = function (user, skillId, minSkillMasteryLevel) {
+    return user.skillMasteryLevel(skillId) >= minSkillMasteryLevel;
+};
+
+learn_show_eval_notmax_or_islearned = function (user, skillId) {
+  if (user.skillMasteryLevel(skillId) >= Number($dataSkills[skillId].meta['Max Mastery Level'])) {
+    return false;
+  } else return user.isLearnedSkill(skillId);
+};
+
+learn_show_eval_is_notlearned_max_addedcontains_reqskill = function (user, skillId, reqSkillId) {
+  if (user.isLearnedSkill(skillId)) {
+    return false;
+  } else {
+    if (user.skillMasteryLevel(skillId) >= Number($dataSkills[skillId].meta['Max Mastery Level']) &&
+      user.addedSkills().contains(skillId) && user.isLearnedSkill(reqSkillId)) {
+      return true;
+    } else {
+      return false;
+    };
+  };
+};
+
 }());
