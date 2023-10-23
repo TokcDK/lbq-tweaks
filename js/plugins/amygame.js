@@ -848,11 +848,14 @@ skill_personalonoffload = function(itemId,valueItemsType){
 
 //パーソナルスキルのonoff
 skill_personalonoff = function(actorA,actorB,itemId,valueItemsType){
+  console.log(`itemId:${itemId}|actorA:${actorA}|actorB:${actorB}|valueItemsType:${valueItemsType}`);
 
   if (actorB.actorId() !== actorA.actorId()) return;
   if (valueItemsType > 1) return;
 
   const ret = skill_personalonoffBase(itemId, valueItemsType);
+
+  console.log(`ret[0]:${ret[0]}|ret[1]:${ret[1]}`);
 
   $gameSwitches.setValue(ret[0], ret[1]);
 
@@ -870,7 +873,7 @@ skill_personalonoffBase = function(itemId,valueItemsType){
   const itemMetaSwitchOnOffUseNum = Number(item.meta.SwicthOnOffUse);
   const isOn = $gameSwitches.value(itemMetaSwitchOnOffUseNum);
 
-  item.name = isOn ? item.meta.SwicthOnName : item.meta.SwicthOffName;
+  valueItems[itemId].name = isOn ? item.meta.SwicthOnName : item.meta.SwicthOffName;
 
   return [itemMetaSwitchOnOffUseNum, isOn ? true : false]
 };
