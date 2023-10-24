@@ -987,47 +987,39 @@ if($dataActors[target.actorId()].meta['Heroine']){
 };
 
 //スキルアイテム使用での精液回復。実際のステート回復は<Remove 1 State Category: StateSemen>で実施
-semen_reflesh1 = function(a,b,itemId,id1){
+semen_reflesh1 = function(a,target,itemId,id1){
 
-var user = a;
-var target = b;
-if(id1 == 0){
-  var valueItems = $dataSkills;
-} else {
-  var valueItems = $dataItems;
-};
-var value10 = 'StateSemen';
-var value9 = 0;
-if(valueItems[itemId].meta['SemenRemove']){
-  var end = Number(valueItems[itemId].meta['SemenRemove']);
-} else {
-  var end = 1;
-};
+let valueItems = id1 == 0 ? $dataSkills : $dataItems;
+const stateCategoryName = 'StateSemen';
+let semenCount = 0;
+
+const itemMetaSemenRemove = valueItems[itemId].meta['SemenRemove'];
+let end = itemMetaSemenRemove ? Number(itemMetaSemenRemove) : 1;
+
+const semenItem = $dataItems[120];
 for (var i = 1; i <= end; i++) {
-  if(target.isStateCategoryAffected(value10)){
-    target.removeStateCategory(value10, 1);
-    $gameParty.gainItem($dataItems[120], 1);//白濁瓶
-    value9 += 1;
+  if(target.isStateCategoryAffected(stateCategoryName)){
+    target.removeStateCategory(stateCategoryName, 1);
+    $gameParty.gainItem(semenItem, 1);//白濁瓶
+    semenCount += 1;
   };
 };
-if(value9 >= 1){
-  var value5 = target.name() + 'は白濁を洗浄した。(' + value9 + ')\\iin[120]を入手';
-} else {
-  var value5 = target.name() + 'には効果が無かった';
-};
+
+var messageText = target.name() + (semenCount >= 1 ? 'は白濁を洗浄した。(' + semenCount + ')\\iin[120]を入手' : 'には効果が無かった');
+
 if($gameParty.inBattle()){
-  BattleManager._logWindow.push(`addText`, value5);
+  BattleManager._logWindow.push(`addText`, messageText);
 } else {
-  TickerManager.show(value5);
+  TickerManager.show(messageText);
 };
-b.addState(71);
-var value5 = target.name() + 'は濡れてしまった';
+target.addState(71);
+messageText = target.name() + 'は濡れてしまった';
 if($gameParty.inBattle()){
-  BattleManager._logWindow.push(`addText`, value5);
+  BattleManager._logWindow.push(`addText`, messageText);
 } else {
-  TickerManager.show(value5);
+  TickerManager.show(messageText);
 };
-$gameVariables.setValue(20,b.actorId());
+$gameVariables.setValue(20,target.actorId());
 tachie_usedChange1();
 
 };
