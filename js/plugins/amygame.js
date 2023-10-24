@@ -879,8 +879,7 @@ skill_personalonoffAutoOff = function(itemId,value1){
 //主人公がパーソナルスキルを道具で習得
 actor_personalskilllearn = function(a,b,itemId,id2,id1){
 
-var actor = $gameActors.actor($gameVariables.value(2));
-var value10 = "21_SkillLearn";
+const actor = $gameActors.actor($gameVariables.value(2));
 if(b.actorId() == a.actorId()){
   if (actor.isLearnedSkill(id1)) {
     const actorName = `\\C[16]${actor.name()}\\C[0]`;
@@ -892,9 +891,9 @@ if(b.actorId() == a.actorId()){
       if(actor.skillMasteryLevel(id1) >= Number($dataSkills[id1].meta['Max Mastery Level'])){
         TickerManager.show(`${actorName}の${skillName}は最高ランクに到達しています…。`);
       } else {
-        var value5 = 10 * $gameVariables.value(203);
-        actor.gainSkillMasteryUses(id1, value5);//変更熟練度
-        const skillRank = `\\C[3]${value5}\\C[0]`;
+        const skillRankNum = 10 * $gameVariables.value(203);
+        actor.gainSkillMasteryUses(id1, skillRankNum);//変更熟練度
+        const skillRank = `\\C[3]${skillRankNum}\\C[0]`;
         TickerManager.show(`${actorName}の${skillName}熟練度を${skillRank}}獲得した！`);
         const skillMasteryLevel = actor.skillMasteryLevel(id1);
         const skillMasteryUses = `\\C[2]${actor.skillMasteryUses(id1)}`;
@@ -906,7 +905,7 @@ if(b.actorId() == a.actorId()){
   } else {
     actor.learnSkill(id1);
     actor.setSkillMasteryLevel(id1, 1);
-    AudioManager.playMe({"name":value10,"volume":60,"pitch":120,"pan":0});
+    AudioManager.playMe({ "name": "21_SkillLearn","volume":60,"pitch":120,"pan":0});
     const actorName = `\\C[16]${actor.name()}\\C[0]`;
     const skillName = `\\C[2]\x1bSIN[${id1}]\\C[0]`;
     TickerManager.show(`${actorName}は${skillName}を習得した！`);
