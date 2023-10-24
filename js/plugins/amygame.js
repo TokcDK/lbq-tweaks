@@ -987,7 +987,7 @@ if($dataActors[target.actorId()].meta['Heroine']){
 };
 
 //スキルアイテム使用での精液回復。実際のステート回復は<Remove 1 State Category: StateSemen>で実施
-semen_reflesh1 = function(a,target,itemId,id1){
+semen_reflesh1 = function(user,target,itemId,id1){
 
 let valueItems = id1 == 0 ? $dataSkills : $dataItems;
 const stateCategoryName = 'StateSemen';
@@ -1029,33 +1029,24 @@ showMessage = function (messageText) {
 }
 
 //スキルアイテム使用での衣装修復
-cloth_repair1 = function(a,b,itemId,id1){
+cloth_repair1 = function(user,target,itemId,id1){
 
-var user = a;
-var target = b;
-if(id1 == 0){
-  var valueItems = $dataSkills;
-} else {
-  var valueItems = $dataItems;
-};
+let valueItems = id1 == 0 ? $dataSkills : $dataItems;
 if(target.isStateAffected(23)){
-  if(id1 == 1){
-    $gameParty.gainItem(valueItems[id3], +1);
-  };
-  TickerManager.show('現在の' + target.name() + 'は衣装修復対象ではありません。');
+  if (id1 == 1) $gameParty.gainItem(valueItems[id3], +1);
+  showMessage('現在の' + target.name() + 'は衣装修復対象ではありません。');
 } else {
-  $gameVariables.setValue(20,b.actorId());
-  if($dataActors[$gameVariables.value(20)].meta['Heroine']){  
-    b.removeState(70);
-    $gameVariables.setValue(19,Number($dataActors[$gameVariables.value(20)].meta['MainCloth']));
+  $gameVariables.setValue(20,target.actorId());
+  const actor = $dataActors[$gameVariables.value(20)];
+  if (actor.meta['Heroine']){  
+    target.removeState(70);
+    $gameVariables.setValue(19, Number(actor.meta['MainCloth']));
     kisekae_tyokusetusitei($gameVariables.value(19),0);
     tachie_usedChange1();
-    TickerManager.show(target.name() + 'の衣装を修復しました。');
+    showMessage(target.name() + 'の衣装を修復しました。');
   } else {
-    if(id1 == 1){
-      $gameParty.gainItem(valueItems[itemId], +1);
-    };
-    TickerManager.show(target.name() + 'は衣装修復の対象ではありません。');
+    if (id1 == 1) $gameParty.gainItem(valueItems[itemId], +1);
+    showMessage(target.name() + 'は衣装修復の対象ではありません。');
   };
 };
 
