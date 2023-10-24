@@ -176,12 +176,8 @@ tachie_dousa = function(id1,id2,id3,id4,id5,id6,id7,id8,id9){
 
 //基本数値。常に経由する。
 
-$gameSwitches.setValue(97,true);
-  if(id5 == 0){
-    var value7 = 50;
-  } else {
-    var value7 = -50;
-  };
+  $gameSwitches.setValue(97, true);
+  let value7 = id5 == 0 ? 50 : -50;
   if($gameSwitches.value(127)){
     var value1 = 'easeOutBack';
     picture_motion1("smooth",[0]);
@@ -249,10 +245,10 @@ if(value1 == 0){
 //0会話用立ち絵変更表示。ピクチャを変更させて消去を見せないようにする。
 if(id1 == 0){//tachie_dousa(0,1,2,12,13,1205,60,0,0);
   if(id7 == 0){
-    var value7 = 60;
+    value7 = 60;
     var value8 = 30;
   } else {
-    var value7 = id7 + id7;
+    value7 = id7 + id7;
     var value8 = id7;
   };
   if($gameScreen.picture(id5)){
@@ -395,13 +391,13 @@ if(id1 == 3){
   if(tachieNum === -1) {}else{
     if($TKMvar.tachie.PicData.length <= tachieNum) {}else{
       if(!$TKMvar.tachie.PicData[tachieNum]["char"]) {}else{
-        var CharList = $TKMvar.tachie.CharList;
-        var MaxLayer = $TKMvar.tachie.MaxLayer;
-        var PicData = $TKMvar.tachie.PicData;
-        var pictureId = PicData[tachieNum]["picNum"];
-        var char = PicData[tachieNum]["char"];
+        var charList = $TKMvar.tachie.CharList;
+        //var MaxLayer = $TKMvar.tachie.MaxLayer;
+        var picData = $TKMvar.tachie.PicData;
+        var pictureId = picData[tachieNum]["picNum"];
+        var char = picData[tachieNum]["char"];
         var name = "TKMtachie_" + char + "_";
-        var partList = CharList[char];
+        //var partList = charList[char];
         var x = $TKMvar.tachie.PicData[tachieNum]["x"];
         var y = $TKMvar.tachie.PicData[tachieNum]["y"];
         $gameScreen.showPicture(pictureId, name, 0, x, y, 85, 85, 0, 0);
