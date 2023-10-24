@@ -513,16 +513,19 @@ kisekae_naibusyori1 = function(){
 //☆☆立ち絵設定。本体
 tachie_settei2 = function(){
 
-for(var i = 561; i <= 600; i++){$gameVariables.setValue(i,0)};
+for (var i = 561; i <= 600; i++) { $gameVariables.setValue(i, 0) };
 
-  //現在衣装を呼び出し
 const gameVar20 = $gameVariables.value(20);
-const gameVar20_440 = gameVar20 + 440;
+const gameVar20_440_id = gameVar20 + 440;
+const actorGameVar20 = $gameActors.actor(gameVar20);
+const gameVar20_440 = $gameVariables.value(gameVar20_440_id);
+
+//現在衣装を呼び出し
 for (let i = 1; i <= 40; i++) {
-  $gameVariables.setValue(i+460,gameVar20_440[i]);
+  $gameVariables.setValue(i + 460, gameVar20_440[i]);
 };
-  if($gameActors.actor(gameVar20).isStateAffected(602)){
-    if($gameActors.actor(gameVar20).isStateAffected(valueDollStateId)){
+  if (actorGameVar20.isStateAffected(602)){
+    if (actorGameVar20.isStateAffected(valueDollStateId)){
       for (let i = 1; i <= 40; i++) {
         $gameVariables.setValue(i+560,$gameVariables.value(i+460));
       };
@@ -533,9 +536,7 @@ for (let i = 1; i <= 40; i++) {
     } else {
       rosyutu_genkai();
       rosyutu_genzai();
-      if(!$gameActors.actor(gameVar20).isStateAffected(23)){
-        tachie_settei1();
-      };
+      if (!actorGameVar20.isStateAffected(23)) tachie_settei1();
     }
   };
 
@@ -548,18 +549,15 @@ for (var i = 1; i <= 40; i++) {
     $gameVariables.setValue(i + 460, gameVar_i560);
 }};
 
-const gameVar20_440_id = gameVar20 + 440;
-
 //衣装情報を更新
 for (var i = 1; i <= 40; i++) {
-  $gameVariables.value(gameVar20_440_id)[i] = $gameVariables.value(i+460);
-};
+  gameVar20_440[i] = $gameVariables.value(i + 460);
+}
 
 charagra_henkou1(gameVar20);
-if($gameActors.actor(gameVar20).isStateAffected(602)){
-  const gameVar20_440 = $gameVariables.value(gameVar20_440_id);
+if(actorGameVar20.isStateAffected(602)){
   valueLiningCloth[gameVar20] = gameVar20_440[2];
-  valueBackHairCloth[gameVar20] = $gameActors.actor(gameVar20).isStateAffected(23) ? 1 : gameVar20_440[4];
+  valueBackHairCloth[gameVar20] = actorGameVar20.isStateAffected(23) ? 1 : gameVar20_440[4];
   valueCoatCloth[gameVar20] = gameVar20_440[28];
   valueFrontHairCloth[gameVar20] = gameVar20_440[32];
   valueBustUpCloth[gameVar20] = gameVar20_440[41];
