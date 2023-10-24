@@ -848,9 +848,10 @@ skill_personalonoffload = function(itemId,valueItemsType){
   const switchStateValue = !!$gameSwitches.value(skillSwitchId);
 
   // set effect switch by skill name
-  // if (!$gameSwitches.value(19)) {
-  item.name = switchStateValue ? item.meta.SwicthOnName : item.meta.SwicthOffName;
-  $gameSwitches.setValue(skillSwitchId, switchStateValue);
+  //if (!$gameSwitches.value(19)) {
+    item.name = switchStateValue ? item.meta.SwicthOnName : item.meta.SwicthOffName;
+    $gameSwitches.setValue(skillSwitchId, switchStateValue);
+  //}
 };
 
 //パーソナルスキルのonoff
@@ -861,11 +862,11 @@ skill_personalonoff = function(actorA,actorB,itemId,valueItemsType){
 
   const item = valueItems[itemId];
   const skillSwitchId = Number(item.meta.SwicthOnOffUse);
-  const switchStateValue = !!$gameSwitches.value(skillSwitchId) ? false : true;
+  const switchStateValue = !!$gameSwitches.value(skillSwitchId);
 
   // revers switch state
   item.name = switchStateValue ? item.meta.SwicthOffName : item.meta.SwicthOnName;
-  $gameSwitches.setValue(skillSwitchId, switchStateValue);
+  $gameSwitches.setValue(skillSwitchId, !switchStateValue);
 
   // show new state name
   const s = valueItemsType == 0 ? "S" : "I";
