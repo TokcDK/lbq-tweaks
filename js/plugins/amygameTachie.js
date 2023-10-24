@@ -161,13 +161,11 @@ if($gameVariables.value(244) >= 1){
   clothes_hason2(id3,id5);
   if(id5 == 1){
     $gameScreen.startFlash([255,255,255,170], 20);
-    var value2 = "Collapse2";
-    AudioManager.playSe({"name":value2,"volume":50,"pitch":130,"pan":0});
+    AudioManager.playSe({ "name": "Collapse2","volume":50,"pitch":130,"pan":0});
     $gameScreen.shakePicture(id3, 3, 9, 0, 20);
   };
   if(id5 == 0){
-    var value2 = "Z_ClothesTakeOff";
-    AudioManager.playSe({"name":value2,"volume":150,"pitch":110,"pan":0});
+    AudioManager.playSe({ "name": "Z_ClothesTakeOff","volume":150,"pitch":110,"pan":0});
   };
 };
 
