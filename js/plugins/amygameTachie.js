@@ -469,11 +469,11 @@ tachie_settei2();
 kisekae_naibusyori1 = function(){
 
   const gameVar20 = $gameVariables.value(20);
-  const gameVar20_440 = $gameVariables.value(20) + 440;
+  const gameVar20_440 = gameVar20 + 440;
   const gameVar19 = $gameVariables.value(19);
   const item_gameVar19 = $dataItems[gameVar19];
   const clothTypeId460 = 460;
-  
+
   $gameVariables.value(gameVar20_440)[0] = 0;
   if(item_gameVar19.meta['TotalCloth']){
     $gameVariables.value(gameVar20_440)[41] = Number(item_gameVar19.meta['TotalCloth']);
@@ -517,6 +517,7 @@ for(var i = 561; i <= 600; i++){$gameVariables.setValue(i,0)};
 
   //現在衣装を呼び出し
 const gameVar20 = $gameVariables.value(20);
+const gameVar20_440 = gameVar20 + 440;
 for (let i = 1; i <= 40; i++) {
   $gameVariables.setValue(i+460,gameVar20_440[i]);
 };
