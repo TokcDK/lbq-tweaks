@@ -354,7 +354,7 @@ if($gameSwitches.value(141)){
         var value6 = 0;
       };
     };
-/*:
+/*
     if(valueBattleAddAttack >= 1){//<BattleAddAttackSet:50>未使用	
       var value1 = Math.round(value * valueBattleAddAttack / 100);
       target.gainHp(-value1);
