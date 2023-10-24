@@ -845,7 +845,7 @@ skill_personalonoffload = function(itemId,valueItemsType){
 
   const item = valueItems[itemId];
   const skillSwitchId = Number(item.meta.SwicthOnOffUse);
-  const switchStateValue = !!$gameSwitches.value(skillSwitchId);
+  const switchStateValue = $gameSwitches.value(skillSwitchId);
 
   // set effect switch by skill name
   //if (!$gameSwitches.value(19)) {
@@ -860,9 +860,11 @@ skill_personalonoff = function(actorA,actorB,itemId,valueItemsType){
   if (actorB.actorId() !== actorA.actorId()) return;
   if (valueItemsType > 1) return;
 
+  valueItems = valueItemsType == 0 ? $dataSkills : $dataItems;
+  
   const item = valueItems[itemId];
   const skillSwitchId = Number(item.meta.SwicthOnOffUse);
-  const switchStateValue = !!$gameSwitches.value(skillSwitchId);
+  const switchStateValue = $gameSwitches.value(skillSwitchId);
 
   // revers switch state
   item.name = switchStateValue ? item.meta.SwicthOffName : item.meta.SwicthOnName;
