@@ -569,9 +569,9 @@ if(actorGameVar20.isStateAffected(602)){
 //☆☆キャラグラ変更。
 charagra_henkou1 = function(id2){
 
-if(id2 >= 1){
-  if($gameActors.actor(id2).isStateAffected(602)){
-    var actor = $gameActors.actor(id2);
+  if (id2 >= 1) {
+  const actor = $gameActors.actor(id2);
+    if (actor.isStateAffected(602)){
     charagra_choice1(id2);
     isyou_senyouLisciaBlueOnly(id2); //りしゃぶるのみの処理
     actor.setCharacterImage(id2 + '_' + $gameVariables.value(21), $gameVariables.value(22));
