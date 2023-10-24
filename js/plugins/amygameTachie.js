@@ -518,13 +518,13 @@ tachie_settei2 = function(){
 
 for(var i = 561; i <= 600; i++){$gameVariables.setValue(i,0)};
 
-//現在衣装を呼び出し
-  var start = 1; var end = 40;
-  for (var i = start; i <= end; i++) {
-    $gameVariables.setValue(i+460,$gameVariables.value($gameVariables.value(20)+440)[i]);
+  //現在衣装を呼び出し
+const gameVar20 = $gameVariables.value(20);
+for (var i = 1; i <= 40; i++) {
+    $gameVariables.setValue(i+460,gameVar20_440[i]);
   };
-  if($gameActors.actor($gameVariables.value(20)).isStateAffected(602)){
-    if($gameActors.actor($gameVariables.value(20)).isStateAffected(valueDollStateId)){
+  if($gameActors.actor(gameVar20).isStateAffected(602)){
+    if($gameActors.actor(gameVar20).isStateAffected(valueDollStateId)){
       var start = 1; var end = 40;
       for (var i = start; i <= end; i++) {
         $gameVariables.setValue(i+560,$gameVariables.value(i+460));
@@ -536,7 +536,7 @@ for(var i = 561; i <= 600; i++){$gameVariables.setValue(i,0)};
     } else {
       rosyutu_genkai();
       rosyutu_genzai();
-      if(!$gameActors.actor($gameVariables.value(20)).isStateAffected(23)){
+      if(!$gameActors.actor(gameVar20).isStateAffected(23)){
         tachie_settei1();
       };
     }
@@ -545,30 +545,26 @@ for(var i = 561; i <= 600; i++){$gameVariables.setValue(i,0)};
 tachie_naibusyori2();
 
 //一時代入した仮情報を立ち絵指定後に反映
-var start = 1; var end = 40;
-for (var i = start; i <= end; i++) {
-  if($gameVariables.value(i+560) >= 1){
-    $gameVariables.setValue(i+460,$gameVariables.value(i+560));
+for (var i = 1; i <= 40; i++) {
+  const gameVar_i560 = $gameVariables.value(i + 560);
+  if (gameVar_i560 >= 1){
+    $gameVariables.setValue(i + 460, gameVar_i560);
 }};
 
 //衣装情報を更新
-var start = 1; var end = 40;
-for (var i = start; i <= end; i++) {
-  $gameVariables.value($gameVariables.value(20)+440)[i] = $gameVariables.value(i+460);
+for (var i = 1; i <= 40; i++) {
+  $gameVariables.value(gameVar20 +440)[i] = $gameVariables.value(i+460);
 };
 
-charagra_henkou1($gameVariables.value(20));
-if($gameActors.actor($gameVariables.value(20)).isStateAffected(602)){
-  valueLiningCloth[$gameVariables.value(20)] = $gameVariables.value($gameVariables.value(20)+440)[2];
-  if($gameActors.actor($gameVariables.value(20)).isStateAffected(23)){
-    valueBackHairCloth[$gameVariables.value(20)] = 1;//$gameVariables.value($gameVariables.value(20)+440)[4];
-  } else {
-    valueBackHairCloth[$gameVariables.value(20)] = $gameVariables.value($gameVariables.value(20)+440)[4];
-  };
-  valueCoatCloth[$gameVariables.value(20)] = $gameVariables.value($gameVariables.value(20)+440)[28];
-  valueFrontHairCloth[$gameVariables.value(20)] = $gameVariables.value($gameVariables.value(20)+440)[32];
-  valueBustUpCloth[$gameVariables.value(20)] = $gameVariables.value($gameVariables.value(20)+440)[41];
-  valueBustUpCloth2[$gameVariables.value(20)] = valueBustUpCloth[$gameVariables.value(20)];
+charagra_henkou1(gameVar20);
+if($gameActors.actor(gameVar20).isStateAffected(602)){
+  const gameVar20_440 = $gameVariables.value(gameVar20 + 440);
+  valueLiningCloth[gameVar20] = gameVar20_440[2];
+  valueBackHairCloth[gameVar20] = $gameActors.actor(gameVar20) ? 1 : gameVar20_440[4];
+  valueCoatCloth[gameVar20] = gameVar20_440[28];
+  valueFrontHairCloth[gameVar20] = gameVar20_440[32];
+  valueBustUpCloth[gameVar20] = gameVar20_440[41];
+  valueBustUpCloth2[gameVar20] = valueBustUpCloth[gameVar20];
 };
 
 };
