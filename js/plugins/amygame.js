@@ -599,14 +599,8 @@ time_settei = function(){
 
 scene_joukensettei(1);
 scene_joukensettei(2);
-if($gameVariables.value(504) >= 1){
-  var value2 = `\\I[383]`;
-} else {
-  if($gameVariables.value(505) >= 1){
-    var value2 = `\\I[382]`;
-  } else {
-    var value2 = `\\I[16]`;
-}};
+let value2 = $gameVariables.value(504) >= 1 ? `\\I[383]` : $gameVariables.value(505) >= 1 ? `\\I[382]`:`\\I[16]`;
+
 if($gameParty.inBattle()){
   if($gameSwitches.value(95)){
     value2 += `\\I[427]`;
@@ -640,14 +634,14 @@ if($gameSwitches.value(15)){
 }};
 if(!$gameSwitches.value(209)){//全体マップ以外で表示10
   if($gameParty.inBattle()){
-    var value10 = 680;
-    var value11 = 0;
-    var value1 = `${value2}:+\\V[290,3]\\I[75]:\\V[263]\n\\I[176]:\\V[190]/\\V[189]\\V[332]\\I[127]:${valueMaxEnemyLv}\n`;
-    for (var i = 0; i < $gameParty.battleMembers().length; i++) {
-      var actor = $gameParty.battleMembers()[i];
+    let value10 = 680;
+    let value11 = 0;
+    let value1 = `${value2}:+\\V[290,3]\\I[75]:\\V[263]\n\\I[176]:\\V[190]/\\V[189]\\V[332]\\I[127]:${valueMaxEnemyLv}\n`;
+    for (let i = 0; i < $gameParty.battleMembers().length; i++) {
+      const actor = $gameParty.battleMembers()[i];
       if(actor.isStateAffected(602)){
         if($gameVariables.value(actor.actorId() + 380)[2] >= 1){
-          if(value11 == 0){value1 += `\\I[376] `;var value11 = 1};
+          if(value11 == 0){value1 += `\\I[376] `; value11 = 1};
           if($dataActors[actor.actorId()].meta['IconGura']){
             value1 += `\x1bI[${Number($dataActors[actor.actorId()].meta['IconGura'])}]`;
           } else {
@@ -660,18 +654,18 @@ if(!$gameSwitches.value(209)){//全体マップ以外で表示10
     };
     if(value11 == 1){value1 += `\n`};
     if(!$gameSwitches.value(211)){
-    var arr1 = [];
-      for (var i = 0; i < $gameTroop.members().length; i++) {
-        var enemy = $gameTroop.members()[i];
-        var arr2 = enemy._states;
-        var arr1 = arr1.concat(arr2);
+    let arr1 = [];
+      for (let i = 0; i < $gameTroop.members().length; i++) {
+        const enemy = $gameTroop.members()[i];
+        const arr2 = enemy._states;
+        arr1 = arr1.concat(arr2);
       };
-      var arr3 = arr1.filter(function (x, i, self) {
+      const arr3 = arr1.filter(function (x, i, self) {
         return self.indexOf(x) === i;
       });
-      var j = 0;
+      let j = 0;
         for (var i = 0; i <= arr3.length-1; i++) {
-          var id1 = arr3[i];
+          const id1 = arr3[i];
             if($dataStates[id1].iconIndex >= 1 && !$dataStates[id1].name == ''){
               value1 += `\x1bI[${$dataStates[id1].iconIndex}]`;
               j += 1;
@@ -682,7 +676,7 @@ if(!$gameSwitches.value(209)){//全体マップ以外で表示10
         }};
     };
   } else {
-    var value1 = `${value2}:\\V[56,3]`;
+    let value1 = `${value2}:\\V[56,3]`;
     if(!$gameParty.inBattle() && $gameSwitches.value(201)){value1 += ` [\\C[10]\\V[335,2]\\C[0]/\\C[1]\\V[334,2]\\C[0]]`};
   };
   $gameScreen.setDTextPicture(value1, 25);
