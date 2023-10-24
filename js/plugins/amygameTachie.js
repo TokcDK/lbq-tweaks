@@ -468,51 +468,48 @@ tachie_settei2();
 //☆☆着せ替え内部処理一部
 kisekae_naibusyori1 = function(){
 
-$gameVariables.value($gameVariables.value(20)+440)[0] = 0;
-  if($dataItems[$gameVariables.value(19)].meta['TotalCloth']){
-    $gameVariables.value($gameVariables.value(20)+440)[41] = Number($dataItems[$gameVariables.value(19)].meta['TotalCloth']);
-    $gameVariables.value($gameVariables.value(20)+440)[0] = $gameVariables.value(19);
-//現在衣装を初期化
-    var start = 1; var end = 40;
-      for (var i = start; i <= end; i++) {
-        if(i == 4){
-        } else {
-          $gameVariables.setValue(i+460,0);
-      }};
-    if($dataItems[$gameVariables.value(19)].meta['subCategory'] == '全裸'){}else{
-      var value = 460;
-      var value3 = '通常'
-        for(var i=1101; i < $dataItems.length; i ++){
-          if($dataItems[i].meta['ClothType'] === value3){
-            if ($gameVariables.value(20) + 380 == Number($dataItems[i].meta['EICSwitch']) || $gameVariables.value(20) + 180 == Number($dataItems[i].meta['EICSwitch']) || 200 == Number($dataItems[i].meta['EICSwitch'])  || 400 == Number($dataItems[i].meta['EICSwitch'])) {
-              if($dataItems[i].meta['subCategory'] === $dataItems[$gameVariables.value(19)].meta['subCategory']){
-                var value1 = Number($dataItems[i].meta['ClothSwitch']);
-                var value2 = Number($dataItems[i].meta['ClothAllocationNumber']);
-                $gameVariables.setValue(value+value1,value2);
-        }}}};
-     var value = 460;
-     var value3 = $dataItems[$gameVariables.value(19)].meta['ClothType']
-       for(var i=1101; i < $dataItems.length; i ++){
-         if($dataItems[i].meta['ClothType'] === value3){
-           if ($gameVariables.value(20) + 380 == Number($dataItems[i].meta['EICSwitch']) || $gameVariables.value(20) + 180 == Number($dataItems[i].meta['EICSwitch']) || 200 == Number($dataItems[i].meta['EICSwitch'])  || 400 == Number($dataItems[i].meta['EICSwitch'])) {
-             if($dataItems[i].meta['subCategory'] === $dataItems[$gameVariables.value(19)].meta['subCategory']){
-               var value1 = Number($dataItems[i].meta['ClothSwitch']);
-               var value2 = Number($dataItems[i].meta['ClothAllocationNumber']);
-               $gameVariables.setValue(value+value1,value2);
-      }}}};
+  const gameVar20 = $gameVariables.value(20);
+  const gameVar20_440 = $gameVariables.value(20) + 440;
+  const gameVar19 = $gameVariables.value(19);
+  const item_gameVar19 = $dataItems[gameVar19];
+  const clothTypeId460 = 460;
+  
+  $gameVariables.value(gameVar20_440)[0] = 0;
+  if(item_gameVar19.meta['TotalCloth']){
+    $gameVariables.value(gameVar20_440)[41] = Number(item_gameVar19.meta['TotalCloth']);
+    $gameVariables.value(gameVar20_440)[0] = gameVar19;
+    //現在衣装を初期化
+    for (var i = 1; i <= 40; i++) if (i !== 4) $gameVariables.setValue(i + clothTypeId460, 0);
+
+    if(item_gameVar19.meta['subCategory'] !== '全裸'){
+      const gameVar20_380 = gameVar20 + 380;
+      for (let clothTypeName of ['通常', item_gameVar19.meta['ClothType']]) {
+        const max = $dataItems.length;
+        for (var i = 1101; i < max; i++) {
+          const item = $dataItems[i];
+          if (item.meta['ClothType'] !== clothTypeName) continue;
+          const itemEICSwitchNum = Number(item.meta['EICSwitch']);
+          if (gameVar20_380 == itemEICSwitchNum 
+            || gameVar20 + 180 == itemEICSwitchNum 
+            || 200 == itemEICSwitchNum 
+            || 400 == itemEICSwitchNum) {
+            if (item.meta['subCategory'] === item_gameVar19.meta['subCategory']) {
+              const value1 = Number(item.meta['ClothSwitch']);
+              const value2 = Number(item.meta['ClothAllocationNumber']);
+              $gameVariables.setValue(clothTypeId460 + value1, value2);
+            }
+          }
+        };
+      }
     };
   } else {
-  var value = 460;
-  var value1 = Number($dataItems[$gameVariables.value(19)].meta['ClothSwitch']);
-  var value2 = Number($dataItems[$gameVariables.value(19)].meta['ClothAllocationNumber']);
-    if($gameVariables.value(value+value1) == value2){
-      $gameVariables.setValue(value+value1,0);
-    } else {
-      $gameVariables.setValue(value+value1,value2);
-    };
+    const value1 = Number(item_gameVar19.meta['ClothSwitch']);
+    const value2 = Number(item_gameVar19.meta['ClothAllocationNumber']);
+    $gameVariables.setValue(clothTypeId460 + value1, $gameVariables.value(clothTypeId460 + value1) == value2 ? 0 : value2);
   };
 
 };
+
 //☆☆立ち絵設定。本体
 tachie_settei2 = function(){
 
