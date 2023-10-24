@@ -1,4 +1,4 @@
-﻿/*:
+﻿/*
 tachie_kaiwastart(false,false,3,1);
 //急ぎ,拡大,右人数,左人数
 
@@ -106,26 +106,20 @@ tachie_partDirectSet = function(id3,id2,id1){
 if(id2 == 1){
     if(id1 == 1){
       $gameScreen.startFlash([255,255,255,200], 120);
-      var value2 = "Up1";
-      AudioManager.playSe({"name":value2,"volume":90,"pitch":110,"pan":0});
-      var value1 = 'actor_particleLight';
-      $gameScreen._particle.particleSet(0,value1,'picture:' + id3,'def','screen');
+      AudioManager.playSe({ "name": "Up1","volume":90,"pitch":110,"pan":0});
+      $gameScreen._particle.particleSet(0, 'actor_particleLight','picture:' + id3,'def','screen');
     };
     if(id1 == 2){
       $gameScreen.startFlash([0,0,0,200], 120);
-      var value2 = "Down4";
-      AudioManager.playSe({"name":value2,"volume":90,"pitch":90,"pan":0});
-      var value1 = 'enemy_particleDark';
-      $gameScreen._particle.particleSet(0,value1,'picture:' + id3,'def','screen');
+      AudioManager.playSe({ "name": "Down4","volume":90,"pitch":90,"pan":0});
+      $gameScreen._particle.particleSet(0, 'enemy_particleDark','picture:' + id3,'def','screen');
     };
 } else {
     if(id1 == 1){
-      var value1 = 'actor_particleLight';
-      $gameScreen._particle.particleClear(value1);
+      $gameScreen._particle.particleClear('actor_particleLight');
     };
     if(id1 == 2){
-      var value1 = 'enemy_particleDark';
-      $gameScreen._particle.particleClear(value1);
+      $gameScreen._particle.particleClear('enemy_particleDark');
     };
 };
 
