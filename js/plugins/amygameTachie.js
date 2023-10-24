@@ -520,16 +520,15 @@ for(var i = 561; i <= 600; i++){$gameVariables.setValue(i,0)};
 
   //現在衣装を呼び出し
 const gameVar20 = $gameVariables.value(20);
-for (var i = 1; i <= 40; i++) {
-    $gameVariables.setValue(i+460,gameVar20_440[i]);
-  };
+for (let i = 1; i <= 40; i++) {
+  $gameVariables.setValue(i+460,gameVar20_440[i]);
+};
   if($gameActors.actor(gameVar20).isStateAffected(602)){
     if($gameActors.actor(gameVar20).isStateAffected(valueDollStateId)){
-      var start = 1; var end = 40;
-      for (var i = start; i <= end; i++) {
+      for (let i = 1; i <= 40; i++) {
         $gameVariables.setValue(i+560,$gameVariables.value(i+460));
       };
-      for (var i = start; i <= end; i++) {
+      for (let i = 1; i <= 40; i++) {
         $gameVariables.setValue(i+460,0);
       };
       $gameVariables.setValue(1+460,3);
@@ -551,14 +550,16 @@ for (var i = 1; i <= 40; i++) {
     $gameVariables.setValue(i + 460, gameVar_i560);
 }};
 
+const gameVar20_440_id = gameVar20 + 440;
+
 //衣装情報を更新
 for (var i = 1; i <= 40; i++) {
-  $gameVariables.value(gameVar20 +440)[i] = $gameVariables.value(i+460);
+  $gameVariables.value(gameVar20_440_id)[i] = $gameVariables.value(i+460);
 };
 
 charagra_henkou1(gameVar20);
 if($gameActors.actor(gameVar20).isStateAffected(602)){
-  const gameVar20_440 = $gameVariables.value(gameVar20 + 440);
+  const gameVar20_440 = $gameVariables.value(gameVar20_440_id);
   valueLiningCloth[gameVar20] = gameVar20_440[2];
   valueBackHairCloth[gameVar20] = $gameActors.actor(gameVar20) ? 1 : gameVar20_440[4];
   valueCoatCloth[gameVar20] = gameVar20_440[28];
