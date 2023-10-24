@@ -559,7 +559,7 @@ charagra_henkou1(gameVar20);
 if($gameActors.actor(gameVar20).isStateAffected(602)){
   const gameVar20_440 = $gameVariables.value(gameVar20_440_id);
   valueLiningCloth[gameVar20] = gameVar20_440[2];
-  valueBackHairCloth[gameVar20] = $gameActors.actor(gameVar20) ? 1 : gameVar20_440[4];
+  valueBackHairCloth[gameVar20] = $gameActors.actor(gameVar20).isStateAffected(23) ? 1 : gameVar20_440[4];
   valueCoatCloth[gameVar20] = gameVar20_440[28];
   valueFrontHairCloth[gameVar20] = gameVar20_440[32];
   valueBustUpCloth[gameVar20] = gameVar20_440[41];
