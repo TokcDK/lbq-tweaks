@@ -513,7 +513,7 @@ kisekae_naibusyori1 = function(){
 //☆☆立ち絵設定。本体
 tachie_settei2 = function(){
 
-for (var i = 561; i <= 600; i++) { $gameVariables.setValue(i, 0) };
+for (let i = 561; i <= 600; i++) { $gameVariables.setValue(i, 0) };
 
 const gameVar20 = $gameVariables.value(20);
 const gameVar20_440_id = gameVar20 + 440;
@@ -543,14 +543,14 @@ for (let i = 1; i <= 40; i++) {
 tachie_naibusyori2();
 
 //一時代入した仮情報を立ち絵指定後に反映
-for (var i = 1; i <= 40; i++) {
+for (let i = 1; i <= 40; i++) {
   const gameVar_i560 = $gameVariables.value(i + 560);
   if (gameVar_i560 >= 1){
     $gameVariables.setValue(i + 460, gameVar_i560);
 }};
 
 //衣装情報を更新
-for (var i = 1; i <= 40; i++) {
+for (let i = 1; i <= 40; i++) {
   gameVar20_440[i] = $gameVariables.value(i + 460);
 }
 
