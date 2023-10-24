@@ -1006,23 +1006,27 @@ for (var i = 1; i <= end; i++) {
 };
 
 var messageText = target.name() + (semenCount >= 1 ? 'は白濁を洗浄した。(' + semenCount + ')\\iin[120]を入手' : 'には効果が無かった');
-
-if($gameParty.inBattle()){
-  BattleManager._logWindow.push(`addText`, messageText);
-} else {
-  TickerManager.show(messageText);
-};
+showMessage(messageText);
 target.addState(71);
-messageText = target.name() + 'は濡れてしまった';
-if($gameParty.inBattle()){
-  BattleManager._logWindow.push(`addText`, messageText);
-} else {
-  TickerManager.show(messageText);
-};
+showMessage(target.name() + 'は濡れてしまった');
+
 $gameVariables.setValue(20,target.actorId());
 tachie_usedChange1();
 
 };
+
+/*:
+ * Show message text depend on where is party is in battle or not.
+ * @function
+ * @param {*} messageText
+*/
+showMessage = function (messageText) {
+  if ($gameParty.inBattle()) {
+    BattleManager._logWindow.push(`addText`, messageText);
+  } else {
+    TickerManager.show(messageText);
+  };
+}
 
 //スキルアイテム使用での衣装修復
 cloth_repair1 = function(a,b,itemId,id1){
