@@ -632,27 +632,28 @@ if($gameSwitches.value(15)){
   } else {
     value2 += `\\I[416]`;
 }};
+let messageText = '';
+let value10 = 680;
+let value11 = 0;
 if(!$gameSwitches.value(209)){//全体マップ以外で表示10
   if($gameParty.inBattle()){
-    let value10 = 680;
-    let value11 = 0;
-    let value1 = `${value2}:+\\V[290,3]\\I[75]:\\V[263]\n\\I[176]:\\V[190]/\\V[189]\\V[332]\\I[127]:${valueMaxEnemyLv}\n`;
+    messageText = `${value2}:+\\V[290,3]\\I[75]:\\V[263]\n\\I[176]:\\V[190]/\\V[189]\\V[332]\\I[127]:${valueMaxEnemyLv}\n`;
     for (let i = 0; i < $gameParty.battleMembers().length; i++) {
       const actor = $gameParty.battleMembers()[i];
       if(actor.isStateAffected(602)){
         if($gameVariables.value(actor.actorId() + 380)[2] >= 1){
-          if(value11 == 0){value1 += `\\I[376] `; value11 = 1};
+          if(value11 == 0){messageText += `\\I[376] `; value11 = 1};
           if($dataActors[actor.actorId()].meta['IconGura']){
-            value1 += `\x1bI[${Number($dataActors[actor.actorId()].meta['IconGura'])}]`;
+            messageText += `\x1bI[${Number($dataActors[actor.actorId()].meta['IconGura'])}]`;
           } else {
-            value1 += `${actor.name()}`;
+            messageText += `${actor.name()}`;
           };
-          value1 += `${$gameVariables.value(actor.actorId() + 380)[2]} `;
+          messageText += `${$gameVariables.value(actor.actorId() + 380)[2]} `;
           value10 -= 28;
         };
       };
     };
-    if(value11 == 1){value1 += `\n`};
+    if(value11 == 1){messageText += `\n`};
     if(!$gameSwitches.value(211)){
     let arr1 = [];
       for (let i = 0; i < $gameTroop.members().length; i++) {
@@ -667,19 +668,19 @@ if(!$gameSwitches.value(209)){//全体マップ以外で表示10
         for (var i = 0; i <= arr3.length-1; i++) {
           const id1 = arr3[i];
             if($dataStates[id1].iconIndex >= 1 && !$dataStates[id1].name == ''){
-              value1 += `\x1bI[${$dataStates[id1].iconIndex}]`;
+              messageText += `\x1bI[${$dataStates[id1].iconIndex}]`;
               j += 1;
                 if((j %9) == 0){
-                  value1 += `\n`;
+                  messageText += `\n`;
                   value10 -= 28;
                 };
         }};
     };
   } else {
-    let value1 = `${value2}:\\V[56,3]`;
-    if(!$gameParty.inBattle() && $gameSwitches.value(201)){value1 += ` [\\C[10]\\V[335,2]\\C[0]/\\C[1]\\V[334,2]\\C[0]]`};
+    messageText = `${value2}:\\V[56,3]`;
+    if(!$gameParty.inBattle() && $gameSwitches.value(201)){messageText += ` [\\C[10]\\V[335,2]\\C[0]/\\C[1]\\V[334,2]\\C[0]]`};
   };
-  $gameScreen.setDTextPicture(value1, 25);
+  $gameScreen.setDTextPicture(messageText, 25);
   if($gameSwitches.value(201) && !$gameParty.inBattle()){
     $gameScreen.dTextRealTime = 'ON';
   };
