@@ -27,11 +27,74 @@ if($gameSwitches.value(607) || $gameSwitches.value(608)){}else{
     $gameVariables.value(52)[2] += 1;//ヒューマン以外の魔物総合討伐数
   }
 };
-if(!$gameParty.inBattle()){
-  valueDropEnemyLevel = Math.ceil($gameActors.actor($gameVariables.value(11)).level / 2);
-} else {
-  valueDropEnemyLevel = user.level;
+
+  const itemDropDataArray = get_item_drop_data(user);
+  const itemDropDataArrayLength = itemDropDataArray.length;
+  const itemsSourceKinds = [$dataItems, $dataWeapons, $dataArmors];
+  const itemsSourceKindPicNames = ['ItemDrop_Items', 'ItemDrop_Weapons', 'ItemDrop_Armors'];
+  const stateRaceDropKinds = [50, 75, 100, 125, 150, 175, 200];
+  const arr3 = [-50, -40, -30, -20, -10, 0, 10, 20];
+  const arr3Length = arr3.length;
+  const arr4 = [80, 85, 90, 95, 100];
+  const arr4Length = arr4.length;
+  const userIndex = user.index() + 1;
+  const coordinateX = $gameTroop.getX(userIndex);
+  const coordinateY = $gameTroop.getY(userIndex);
+  const gameSwitch607 = $gameSwitches.value(607);
+  const gameSwitch608 = $gameSwitches.value(608);
+  for (let i = 0; i < itemDropDataArrayLength; i++) {
+    const itemDropData = itemDropDataArray[i];
+    if(itemDropData){
+      drop_probabilityCalculation2(user,Number(itemDropData[0]));
+      if(valueDropCount1 == 1){
+        const itemDropDataKindNum = Number(itemDropData[1]);
+        valueItems = itemsSourceKinds[itemDropDataKindNum];
+        const valueItem = valueItems[Number(itemDropData[2])];
+        const picName = itemsSourceKindPicNames[itemDropDataKindNum];
+        if($gameParty.inBattle()){
+          $gameTroop.addDropItem(valueItem);
+          //var value1 = `\x1bI[${valueItems[Number(arr1[i][2])].iconIndex}]`;
+          //var arr7 = [-50,-60,-70,-80,-90,-100,-110,-120,-130,-140,-150,-160,-170,-180,-190,-200];
+          const shiftX = stateRaceDropKinds[Math.floor(Math.random() * stateRaceDropKinds.length)];//x
+          const shiftY = arr3[Math.floor(Math.random() * arr3Length)];//y
+          const duration = arr4[Math.floor(Math.random() * arr4Length)];//wait
+          //var value7 = arr7[Math.floor(Math.random() * arr7.length)];//jump
+          picture_motion1("smooth",[0]);
+          //$gameScreen.setDTextPicture(value1, 32);//元から
+          $gameScreen.showPicture(valueDropEnemyPicId,picName,1,coordinateX,coordinateY,100,100,255,0);
+          //curveFunctions.patternY = curveFunctions.getPattern('jump', [value7]);
+          //curveFunctions.patternOpacity = curveFunctions.getPattern('jump', [200]);
+          $gameScreen.movePicture(valueDropEnemyPicId,1,coordinateX + shiftX,coordinateY + shiftY,100,100,0,0,duration);
+          valueDropEnemyPicId += 1;
+        } else {
+          if (gameSwitch607 || gameSwitch608){
+            $gameVariables.setValue(22, itemDropDataKindNum);
+            $gameVariables.setValue(23,Number(itemDropData[2]));
+            item_getSkillLevel(valueFootpadSkillId,$gameVariables.value(22),$gameVariables.value(23));
+          } else {
+            if(Number(itemDropData[2]) >= 1){
+              $gameParty.gainItem(valueItem, 1);
+              const itemIcon = `\x1bI[${valueItem.iconIndex}]`;
+              const itemName = `\\C[2]${valueItem.name}\\C[0]`; 
+              const item = `${itemIcon}${itemName}`; 
+              const num = `\\C[2]1\\C[0]`;       
+              const messageText = `${item}を${num}個入手！\n`;
+              valueWordSet1 += `${messageText}`;
+              $gameSystem.pushInfoLog(messageText);
+              //CommonPopupManager.showInfo({},value11,null);
+            };
+          };
+        };
+      };
+    };
+  };
+
 };
+
+get_item_drop_data = function (user){
+
+  valueDropEnemyLevel = $gameParty.inBattle() ? user.level : Math.ceil($gameActors.actor($gameVariables.value(11)).level / 2);
+
   const itemDropDataArray = [];
   let stateAddPowerCustomCount = 0;
   for (let i = 0; i < valueAddPowerCustomState.length; i++) {
@@ -45,38 +108,40 @@ if(!$gameParty.inBattle()){
     };
   };
   for (let i = 51; i <= 56; i++) {
-    if (user.isStateAffected(i)) itemDropDataArray.push([4, 0, i+103]);
+    if (user.isStateAffected(i)) itemDropDataArray.push([4, 0, i + 103]);
   };
-  if (user.isStateAffected(610)) { 
+  if (user.isStateAffected(610)) {
     itemDropDataArray.push([0, 0, 10]);
     itemDropDataArray.push([1, 0, 196]);
     itemDropDataArray.push([3, 0, 197]);
-    itemDropDataArray.push([5, 0, 198]); 
+    itemDropDataArray.push([5, 0, 198]);
     itemDropDataArray.push([9, 0, 199]);
     itemDropDataArray.push([6, 0, 190]);
     itemDropDataArray.push([7, 0, 147]);
     itemDropDataArray.push([10, 0, 148]);
     itemDropDataArray.push([8, 0, 152]);
-    itemDropDataArray.push([8, 0, 153]); 
+    itemDropDataArray.push([8, 0, 153]);
     itemDropDataArray.push([10, 0, 170]);
   };
-  if (user.isStateAffected(451)) { 
+  if (user.isStateAffected(451)) {
     itemDropDataArray.push([6, 0, 191]);
-    itemDropDataArray.push([6, 0, 161]); 
+    itemDropDataArray.push([6, 0, 161]);
   };
-  if (user.isStateAffected(451)) { 
-    itemDropDataArray.push([6, 0, 163]); };
-  if (user.isStateAffected(452)) { 
+  if (user.isStateAffected(451)) {
+    itemDropDataArray.push([6, 0, 163]);
+  };
+  if (user.isStateAffected(452)) {
     itemDropDataArray.push([7, 0, 192]);
     itemDropDataArray.push([6, 0, 162]);
-    itemDropDataArray.push([6, 0, 164]); };
-  if (user.isStateAffected(453)) { 
-    itemDropDataArray.push([8, 0, 193]);
-    itemDropDataArray.push([10, 0, 169]); 
+    itemDropDataArray.push([6, 0, 164]);
   };
-  if (user.isStateAffected(454)) { 
+  if (user.isStateAffected(453)) {
+    itemDropDataArray.push([8, 0, 193]);
+    itemDropDataArray.push([10, 0, 169]);
+  };
+  if (user.isStateAffected(454)) {
     itemDropDataArray.push([10, 0, 194]);
-    itemDropDataArray.push([10, 0, 169]); 
+    itemDropDataArray.push([10, 0, 169]);
     if (user.isStateAffected(465)) itemDropDataArray.push([3, 0, 1289]); //神の肉,食材+神格
   };
   if (user.isStateAffected(441)) { itemDropDataArray.push([6, 0, 165]); };
@@ -109,27 +174,27 @@ if(!$gameParty.inBattle()){
       itemDropDataArray.push([10, 0, 1125]);
     };
   };
-  if (user.isStateAffected(440)) { 
+  if (user.isStateAffected(440)) {
     itemDropDataArray.push([5, 0, 220]);//プライマル・アニマ
-    itemDropDataArray.push([8, 0, 240]); 
+    itemDropDataArray.push([8, 0, 240]);
   };
   if (user.isStateAffected(461)) { itemDropDataArray.push([5, 0, 251]); };//人型とうのドロップ
   if (user.isStateAffected(462)) { itemDropDataArray.push([5, 0, 252]); };
   if (user.isStateAffected(463)) { itemDropDataArray.push([5, 0, 253]); };
   if (user.isStateAffected(464)) { itemDropDataArray.push([5, 0, 254]); };
-  if (user.isStateAffected(465)) { 
+  if (user.isStateAffected(465)) {
     itemDropDataArray.push([5, 0, 255]);
     itemDropDataArray.push([3, 0, 1287]); //魔物肉
   };
   if (user.isStateAffected(466)) { itemDropDataArray.push([5, 0, 256]); };
   if (user.isStateAffected(467)) { itemDropDataArray.push([5, 0, 257]); };
-  if (user.isStateAffected(479)) { 
+  if (user.isStateAffected(479)) {
     itemDropDataArray.push([6, 0, 270]); //特殊ステートドロップ
-    itemDropDataArray.push([5, 0, 269]); 
+    itemDropDataArray.push([5, 0, 269]);
   };
-  
+
   if (user.isStateAffected(475)) { itemDropDataArray.push([6, 0, 151]); };
-  for (var i = 421; i <= 439; i++) {
+  for (let i = 421; i <= 439; i++) {
     if (user.isStateAffected(i)) {
       const stateRaceDropKind = $dataStates[i].meta['RaceDropKind'];
       if (stateRaceDropKind) {
@@ -144,61 +209,9 @@ if(!$gameParty.inBattle()){
       };
     };
   };
-  for (let i = 0; i <= itemDropDataArray.length-1; i++) {
-    const itemDropData = itemDropDataArray[i];
-    if(itemDropData){
-      drop_probabilityCalculation2(user,Number(itemDropData[0]));
-      if(valueDropCount1 == 1){
-        const itemDropDataKindNum = Number(itemDropData[1]);
-        const itemsSourceKinds = [$dataItems, $dataWeapons, $dataArmors];
-        const itemsSourceKindPicNames = ['ItemDrop_Items', 'ItemDrop_Weapons', 'ItemDrop_Armors'];
-        valueItems = itemsSourceKinds[itemDropDataKindNum];
-        const picName = itemsSourceKindPicNames[itemDropDataKindNum];
-        const valueItem = valueItems[Number(itemDropData[2])];
-        if($gameParty.inBattle()){
-          $gameTroop.addDropItem(valueItem);
-          //var value1 = `\x1bI[${valueItems[Number(arr1[i][2])].iconIndex}]`;
-          const stateRaceDropKinds = [50,75,100,125,150,175,200];
-          const arr3 = [-50,-40,-30,-20,-10,0,10,20];
-          const arr4 = [80,85,90,95,100];
-          //var arr7 = [-50,-60,-70,-80,-90,-100,-110,-120,-130,-140,-150,-160,-170,-180,-190,-200];
-          const value2 = stateRaceDropKinds[Math.floor(Math.random() * stateRaceDropKinds.length)];//x
-          const value3 = arr3[Math.floor(Math.random() * arr3.length)];//y
-          const value4 = arr4[Math.floor(Math.random() * arr4.length)];//wait
-          const value5 = $gameTroop.getX(user.index() + 1);
-          const value6 = $gameTroop.getY(user.index() + 1);
-          //var value7 = arr7[Math.floor(Math.random() * arr7.length)];//jump
-          picture_motion1("smooth",[0]);
-          //$gameScreen.setDTextPicture(value1, 32);//元から
-          $gameScreen.showPicture(valueDropEnemyPicId,picName,1,value5,value6,100,100,255,0);
-          //curveFunctions.patternY = curveFunctions.getPattern('jump', [value7]);
-          //curveFunctions.patternOpacity = curveFunctions.getPattern('jump', [200]);
-          $gameScreen.movePicture(valueDropEnemyPicId,1,value5 + value2,value6 + value3,100,100,0,0,value4);
-          valueDropEnemyPicId += 1;
-        } else {
-          if($gameSwitches.value(607) || $gameSwitches.value(608)){
-            $gameVariables.setValue(22, itemDropDataKindNum);
-            $gameVariables.setValue(23,Number(itemDropData[2]));
-            item_getSkillLevel(valueFootpadSkillId,$gameVariables.value(22),$gameVariables.value(23));
-          } else {
-            if(Number(itemDropData[2]) >= 1){
-              $gameParty.gainItem(valueItem, 1);
-              const itemIcon = `\x1bI[${valueItem.iconIndex}]`;
-              const itemName = `\\C[2]${valueItem.name}\\C[0]`; 
-              const item = `${itemIcon}${itemName}`; 
-              const num = `\\C[2]1\\C[0]`;       
-              const messageText = `${item}を${num}個入手！\n`;
-              valueWordSet1 += `${messageText}`;
-              $gameSystem.pushInfoLog(messageText);
-              //CommonPopupManager.showInfo({},value11,null);
-            };
-          };
-        };
-      };
-    };
-  };
 
-};
+  return itemDropDataArray;
+}
 
 allAnimeattack_move1 = function(){
 
