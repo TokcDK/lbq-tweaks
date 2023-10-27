@@ -2,7 +2,7 @@
 null,
 {"id":1,"expanded":false,"name":"001イベント発生用","order":2,"parentId":2,"scrollX":832,"scrollY":640},
 {"id":2,"expanded":true,"name":"002システムマップ","order":1,"parentId":0,"scrollX":832,"scrollY":640},
-{"id":3,"expanded":false,"name":"003テンプレ作成マップ","order":3,"parentId":2,"scrollX":866,"scrollY":597.3333333333334},
+{"id":3,"expanded":false,"name":"003テンプレ作成マップ","order":3,"parentId":2,"scrollX":373,"scrollY":291},
 {"id":4,"expanded":false,"name":"004個別セルフ変数","order":4,"parentId":2,"scrollX":537.3333333333334,"scrollY":387.55555555555554},
 {"id":5,"expanded":false,"name":"005タイトルマップ","order":5,"parentId":2,"scrollX":703.5555555555555,"scrollY":565.3333333333334},
 {"id":6,"expanded":true,"name":"006汎用Ｈイベントマップ","order":6,"parentId":2,"scrollX":725.4,"scrollY":522},

@@ -4,7 +4,7 @@
  * @help ゲーム専用に作成された初期読み込み用プラグイン
  */
 
-(function(){
+(function () {
 
 amygame_startUpArrangement = function(){
 
@@ -401,7 +401,7 @@ if($dataSystem.variables[61].match(/りしゃぶる/)){
   valueMapNameSpecialStaging[159] = `${$dataSystem.switches[351]}`;
 };
 
-};
+  };
 
 //ステート付与されているかどうか。名前21に全員の名前、変数21に人数、変数22にid
 actor_stateCheck = function(id1){
