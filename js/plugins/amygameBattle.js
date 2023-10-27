@@ -2924,62 +2924,70 @@ function drop_enemyDropRate(value12, arr4) {
 
 //ジョブステートエネミーorジョブ持ち追いはぎスクリプト
 //drop_JobStateWAget(1,10);//1武器2防具ダンジョン外の場合の想定レベル
-drop_JobStateWAget = function(id11,value10){
+drop_JobStateWAget = function (valueItemsType, value10) {
+  const DEFAULT_ENEMY_LEVEL = 30;
+  const LEVEL_DIVISOR = 10;
+  const MIN_REARITY = 1;
+  const MAX_REARITY = 10;
 
-var arr4 = [0];
-if(!$gameParty.inBattle()){
-  var valueClassState = 0;
-  if($gameMap.event(valueEnemyEventId).event().meta['classStateDrop']){
-    var valueClassState = $gameMap.event(valueEnemyEventId).event().meta['classStateDrop'].split(',');//<classStateDrop:1,7,13>
-    if($gameVariables.value(240) == 0){
-      var valueEnemyLevel = 30;//value10
-    } else {
-      var value = $dataItems[$gameVariables.value(240)];
-      var arr1 = value.meta['EnemyLV'].split(',');
-      var valueEnemyLevel = Number(arr1[Math.floor(Math.random() * arr1.length)]);
-    };
-  };
-};
-if(valueClassState != 0){
-  //var value11 = Number(valueClassState[0]);//使ってない＿？
-  var value14 = Math.round(valueEnemyLevel / 10);
-  if(value14 == 0){var value14 = 1};
-  if(value14 >= 11){var value14 = 10};
-    var start = 1;
-    if(id11 == 2){
-      var end = valueArmorsLength;
-      var valueItems = $dataArmors;
-      var value12 = Number(valueClassState[2]);
-    } else {
-      var end = $dataWeapons.length-1;
-      var valueItems = $dataWeapons;
-      var value12 = Number(valueClassState[1]);
-    };
-      for (var i = start; i <= end; i++) {
-        if(valueItems[i].meta['LotteryRearity']){
-          if(valueItems[i].meta['GatchaOutOfRange']){}else{
-            if(id11 == 2){
-              var valueTypeId = valueItems[i].atypeId
-            } else {
-              var valueTypeId = valueItems[i].wtypeId
-            };
-            if(value12 == valueTypeId && value14 >= Number(valueItems[i].meta['LotteryRearity'])){
-              arr4.push(i);
-            };
-      }}};
-//console.log(`arr4  ${arr4}`);
-        var value15 = Number(arr4[Math.floor(Math.random() * arr4.length)]);
-          if(value15 != 0){
-            if($gameParty.inBattle()){
-              $gameTroop.addDropItem(valueItems[value15]);
-            } else {
-              CommonPopupManager.showInfo({},`\\C[24]\x1bI[${valueItems[value15].iconIndex}]${valueItems[value15].name}\\C[0]を獲得した。`,null);
-              $gameParty.gainItem(valueItems[value15], 1);
-            };
-          };
-};
+  let arr4 = [0];
+  let valueClassState = 0;
+  let valueEnemyLevel;
 
-};
+  if (!$gameParty.inBattle()) {
+    if ($gameMap.event(valueEnemyEventId).event().meta['classStateDrop']) {
+      valueClassState = $gameMap.event(valueEnemyEventId).event().meta['classStateDrop'].split(',');
+
+      const gameVar240Value = $gameVariables.value(240);
+      if (gameVar240Value === 0) {
+        valueEnemyLevel = DEFAULT_ENEMY_LEVEL;
+      } else {
+        const arr1 = $dataItems[gameVar240Value].meta['EnemyLV'].split(',');
+        valueEnemyLevel = Number(arr1[Math.floor(Math.random() * arr1.length)]);
+      }
+    }
+  }
+
+  if (!valueClassState) return;
+
+  let lotteryRearity = Math.round(valueEnemyLevel / LEVEL_DIVISOR);
+  lotteryRearity = Math.max(MIN_REARITY, Math.min(lotteryRearity, MAX_REARITY));
+  let start = 1;
+  const isArmors = valueItemsType === 2;
+  let valueItems, end, vTypeId;
+
+  if (isArmors) {
+    valueItems = $dataArmors;
+    end = valueArmorsLength;
+    vTypeId = Number(valueClassState[2]);
+  } else {
+    valueItems = $dataWeapons;
+    end = $dataWeapons.length - 1;
+    vTypeId = Number(valueClassState[1]);
+  }
+
+  for (let i = start; i <= end; i++) {
+    const item = valueItems[i];
+    if (item.meta['LotteryRearity'] && !item.meta['GatchaOutOfRange']) {
+      const valueTypeId = isArmors ? item.atypeId : item.wtypeId;
+      if (vTypeId === valueTypeId && lotteryRearity >= Number(item.meta['LotteryRearity'])) {
+        arr4.push(i);
+      }
+    }
+  }
+
+  const dropItemId = arr4[Math.floor(Math.random() * arr4.length)];
+  if (dropItemId !== 0) {
+    if ($gameParty.inBattle()) {
+      $gameTroop.addDropItem(valueItems[dropItemId]);
+    } else {
+      const item = valueItems[dropItemId];
+      const itemName = `\\C[24]\x1bI[${item.iconIndex}]${item.name}\\C[0]`;
+      CommonPopupManager.showInfo({}, `${itemName}を獲得した。`, null);
+      $gameParty.gainItem(item, 1);
+    }
+  }
+}
 
 //追いはぎ時の確率と武器防具入手
 footpad_probabilityUp = function(id1){
