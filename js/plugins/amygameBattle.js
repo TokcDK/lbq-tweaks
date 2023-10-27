@@ -2713,7 +2713,7 @@ if (canDrop /*&& value14*/){
   else if(id1 == 9){dropMod1 = 2}
   else if(id1 == 10){dropMod1 = 1};
   
-  var dropMod2 = dropMod1 / 3;
+  let dropMod2 = dropMod1 / 3;
   dropMod1 += dropMod2 + (valueDropEnemyLevel / 10);
   if($gameTroop.turnCount() <= 1){dropMod1 += dropMod2 * 3};
   if($gameVariables.value(54) == 1){dropMod1 += dropMod2 * 5};//パーティが一人の場合確率アップ
@@ -2748,7 +2748,7 @@ if (canDrop /*&& value14*/){
 harvesting_itemSelect = function(){
 
 var arr4 = []; 
-var value1 = 0; 
+//var value1 = 0; 
 drop_genericDropRate(1,arr4);
 $gameVariables.setValue(23,valueDropItems);
 if(valueDropItems == 0 ){
@@ -2818,7 +2818,7 @@ drop_walletItemBoxGet = function(value12,id12){
 };
 
 //汎用ドロップ設定
-drop_genericDropRate = function(value12, arr12) {
+drop_genericDropRate = function(battleDrop, itemsToDrop) {
   const gameVariable240 = $gameVariables.value(240);
   let value11 = 1;
 
@@ -2831,33 +2831,37 @@ drop_genericDropRate = function(value12, arr12) {
   }
 
   const valueItemDropRate1Length = valueItemDropRate1.length;
+  const items = $dataItems;
+  const gameSwitch2State = $gameSwitches.value(2);
+  const isBattleIsTrue = battleDrop !== 0;
   for (let i = 0; i < valueItemDropRate1Length; i++) {
-    const value14 = valueItemDropRate1[i];
+    const dropItemI = valueItemDropRate1[i];
     let value15 = 1;
-    const value13 = (value12 === 0)
-      ? !$dataItems[value14].meta['NoBattleDrop']
-      : $gameSwitches.value(2);
+    
+    if (isBattleIsTrue && !gameSwitch2State) continue;
 
-    const itemDropRate = $dataItems[value14].meta['DropRate'];
-    if (itemDropRate && value13) {
-      const list = itemDropRate.split(',');
+    const item = items[dropItemI];
+    const itemDropRate = item.meta['DropRate'];
+    const isBattleDrop = isBattleIsTrue || !item.meta['NoBattleDrop'];
+    if (!isBattleDrop || !itemDropRate) continue;
 
-      for (let id11 of list) {
-        if (id11 != value11) continue;
+    const list = itemDropRate.split(',');
 
-        const itemDropLottery = $dataItems[value14].meta['DropLottery'];
-        if (itemDropLottery) {
-          value15 = Number(itemDropLottery);
-        }
+    for (let id11 of list) {
+      if (id11 != value11) continue;
 
-        for (let j = 1; j <= value15; j++) {
-          arr12.push(value14);
-        }
+      const itemDropLottery = item.meta['DropLottery'];
+      if (itemDropLottery) {
+        value15 = Number(itemDropLottery);
+      }
+
+      for (let j = 1; j <= value15; j++) {
+        itemsToDrop.push(dropItemI);
       }
     }
   }
 
-  valueDropItems = Number(arr12[Math.floor(Math.random() * arr12.length)]);
+  valueDropItems = Number(itemsToDrop[Math.floor(Math.random() * itemsToDrop.length)]);
 };
 
 //汎用ドロップエネミー対象設定ダンジョンのみ。計算のみ計算結果はarr4に蓄積。簡易討伐時
