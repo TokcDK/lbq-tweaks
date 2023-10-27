@@ -2562,20 +2562,18 @@ if(enemy.level >= valueMaxEnemyLv){
 //エネミー簡易討伐
 enemy_instantwin = function(){
 	
-var actor1 = $gameActors.actor(20);
-var value = $dataItems[$gameVariables.value(240)];
-var value2 = 0;
-var value3 = 0;
-var value4 = 0.5;//rate
-var value5 = 20;//flat
-var value6 = 0.6;
-var value7 = 10;
+const actor1 = $gameActors.actor(20);
+const item = $dataItems[$gameVariables.value(240)];
+let expCount = 0;
+let goldCount = 0;
+const rate = 0.5;//rate
+const flat = 20;//flat
+const rate1 = 0.6;
+const flat1 = 10;
 valueWordSet1 = ``;
 valueWordSet3 = ``;
-var arr1 = value.meta['EnemyLV'].split(',');
-var arr2 = value.meta['BattleEnemyPopC'].split(',');
-var arr3 = $gameVariables.value(220);
-actor1_setup1(value,arr1[Math.floor(Math.random() * arr1.length)]);
+const arrItemEnemyLV = item.meta['EnemyLV'].split(',');
+actor1_setup1(item,arrItemEnemyLV[Math.floor(Math.random() * arrItemEnemyLV.length)]);
 //特殊ステート対応討伐カウント // tweak: commented because no data change
 /* if($gameVariables.value(350) != 0){
   for (var i = 0; i <= $gameVariables.value(350).length-1; i++) {
@@ -2602,48 +2600,56 @@ actor1_setup1(value,arr1[Math.floor(Math.random() * arr1.length)]);
     };
   };
 }; */
+const gameVar220 = $gameVariables.value(220);
 const dropUpItem = $dataItems[valueItemDropUpItem];
+const arrItemBattleEnemyPopC = item.meta['BattleEnemyPopC'].split(',');
 arr4 = [];
 var start = 1; 
-var end = Number(arr2[Math.floor(Math.random() * arr2.length)]);
+var end = Number(arrItemBattleEnemyPopC[Math.floor(Math.random() * arrItemBattleEnemyPopC.length)]);
   for (var i = start; i <= end; i++) {
-    var intValue1 = Number(arr1[Math.floor(Math.random() * arr1.length)]);
+    var intValue1 = Number(arrItemEnemyLV[Math.floor(Math.random() * arrItemEnemyLV.length)]);
     if(intValue1 == 0){intValue1 = 1};
 	const intValue1minus1 = intValue1 - 1;
-	const enemy = $dataEnemies[Number(arr3[Math.floor(Math.random() * arr3.length)])];
-    value2 += Math.round(enemy.exp * (1 + intValue1minus1 * value4) + (value5 * intValue1minus1));
-    value3 += Math.round(enemy.gold * (1 + intValue1minus1 * value6) + (value7 * intValue1minus1));
+	const enemy = $dataEnemies[Number(gameVar220[Math.floor(Math.random() * gameVar220.length)])];
+    expCount += Math.round(enemy.exp * (1 + intValue1minus1 * rate) + (flat * intValue1minus1));
+    goldCount += Math.round(enemy.gold * (1 + intValue1minus1 * rate1) + (flat1 * intValue1minus1));
   
     enemy_dropSelection(actor1);
     drop_probabilityCalculation(intValue1, dropUpItem);
         if(value13 >= 90){
           drop_enemyDropRate(0,arr4);//計算のみ。計算結果はarr4に蓄積。
           drop_genericDropRate(0,arr4);//valueDropItemsに格納
-            var message = `\\C[24]\x1bI[${$dataItems[valueDropItems].iconIndex}]${$dataItems[valueDropItems].name}\\C[0]を獲得した。\n`;
-            valueWordSet1 += `${message}`;
-            $gameSystem.pushInfoLog(message);
-            //CommonPopupManager.showInfo({},`\\C[24]\x1bI[${$dataItems[valueDropItems].iconIndex}]${$dataItems[valueDropItems].name}\\C[0]を獲得した。`,null);
-            $gameParty.gainItem($dataItems[valueDropItems], 1);
+          const itemToDrop = $dataItems[valueDropItems];
+          const itemName = `\\C[24]\x1bI[${itemToDrop.iconIndex}]${itemToDrop.name}\\C[0]`;
+          const message = `${itemName}を獲得した。\n`;
+          valueWordSet1 += `${message}`;
+          $gameSystem.pushInfoLog(message);
+          //CommonPopupManager.showInfo({},`\\C[24]\x1bI[${$dataItems[valueDropItems].iconIndex}]${$dataItems[valueDropItems].name}\\C[0]を獲得した。`,null);
+          $gameParty.gainItem(itemToDrop, 1);
         };
 
   };
-var battleResultMessage = `\\C[2]BattleResult!\\C[0]\n経験値\\C[10]${value2}\\C[0]、\\C[14]${value3}\\C[0]\\Gを入手！ JPを1獲得した。`;
+
+const result = `\\C[2]BattleResult!\\C[0]`;
+const exp = `\\C[10]${expCount}\\C[0]`;
+const gold = `\\C[14]${goldCount}\\C[0]`;
+const battleResultMessage = `${result}}\n経験値${exp}、${gold}\\Gを入手！ JPを1獲得した。`;
 $gameSystem.pushInfoLog(battleResultMessage);
 valueWordSet2 = `${battleResultMessage}\n`;
 //CommonPopupManager.showInfo({},battleResultMessage,null);
 $gameParty.battleMembers().forEach(function(actor) {
-  actor.changeExp(actor.currentExp()+value2, false);
-  if(actor.subclass()){actor.gainExpSubclass(value2)};
+  actor.changeExp(actor.currentExp()+expCount, false);
+  if(actor.subclass()){actor.gainExpSubclass(expCount)};
 });
-$gameParty.gainGold(value3);
-var dropCount = 0;
-var defeatsCount = 0;
-for (var i = 0; i <= valueWordSet1.length-1; i++) {
+$gameParty.gainGold(goldCount);
+let dropCount = 0;
+let defeatsCount = 0;
+for (let i = 0; i <= valueWordSet1.length-1; i++) {
   if(valueWordSet1.charAt(i) == `\n`){
     dropCount += 1;
   };
 };
-for (var i = 0; i <= valueWordSet3.length-1; i++) {
+for (let i = 0; i <= valueWordSet3.length-1; i++) {
   if(valueWordSet3.charAt(i) == `\n`){
     defeatsCount += 1;
   };
@@ -2837,7 +2843,7 @@ drop_genericDropRate = function(battleDrop, itemsToDrop) {
   for (let i = 0; i < valueItemDropRate1Length; i++) {
     const dropItemI = valueItemDropRate1[i];
     let value15 = 1;
-    
+
     if (isBattleIsTrue && !gameSwitch2State) continue;
 
     const item = items[dropItemI];
