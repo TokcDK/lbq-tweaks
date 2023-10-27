@@ -2672,16 +2672,19 @@ if(dropCount + defeatsCount <= 6){
 drop_probabilityCalculation = function (value11, dropUpItem){
 
   value13 = Math.floor( Math.random() * 101);
-  value13 += Math.round(value11 / 10);
-    if($gameVariables.value(54) == 1){value13 += 5};//パーティが一人の場合確率アップ
-    if($gameVariables.value(516) >= 100){value13 += 1};
-    if($gameVariables.value(516) >= 300){value13 += 1};
-    if($gameVariables.value(516) >= 500){value13 += 1};
-    if($gameVariables.value(516) >= 1000){value13 += 1};
-    if ($gameParty.hasItem(dropUpItem)){value13 += 1};
-    if($gameParty.membersState(296)){value13 += 1};
-    if($gameParty.membersState(297)){value13 += 1};
-    if($gameParty.membersState(298)){value13 += 1};
+  value13 += Math.round(value11 / 10);  
+  if($gameVariables.value(54) == 1){value13 += 5};//パーティが一人の場合確率アップ
+
+  const gameVar516 = $gameVariables.value(516);
+  if (gameVar516 >= 1000) { value13 += 4 }
+  else if (gameVar516 >= 500) { value13 += 3 }
+  else if (gameVar516 >= 300) { value13 += 2 }
+  else if (gameVar516 >= 100){value13 += 1};
+  
+  if ($gameParty.hasItem(dropUpItem)){value13 += 1};
+  if($gameParty.membersState(296)){value13 += 1};
+  if($gameParty.membersState(297)){value13 += 1};
+  if($gameParty.membersState(298)){value13 += 1};
 };
 
 //ドロップするかどうかの確率計算2
