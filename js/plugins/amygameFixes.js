@@ -3,14 +3,14 @@
  * @author author
  *
  * @help
- * map003 EV003 add savegame_fixes() rom here.
+ * map003 EV003 add run_old_savegame_fixes() from here.
  */
 
 (function () {
   // functions need to run after saved game loaded
   /*:
   * @function
-  * @help 
+  * @help it ru after each saved game loaded
   */
   run_old_savegame_fixes = function () {
 
