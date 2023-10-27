@@ -42,10 +42,11 @@ if($gameSwitches.value(607) || $gameSwitches.value(608)){}else{
   const coordinateY = $gameTroop.getY(userIndex);
   const gameSwitch607 = $gameSwitches.value(607);
   const gameSwitch608 = $gameSwitches.value(608);
+  const dropUpItem = $dataItems[valueItemDropUpItem];
   for (let i = 0; i < itemDropDataArrayLength; i++) {
     const itemDropData = itemDropDataArray[i];
     if(itemDropData){
-      drop_probabilityCalculation2(user,Number(itemDropData[0]));
+      drop_probabilityCalculation2(user, Number(itemDropData[0]), dropUpItem);
       if(valueDropCount1 == 1){
         const itemDropDataKindNum = Number(itemDropData[1]);
         valueItems = itemsSourceKinds[itemDropDataKindNum];
@@ -2525,10 +2526,11 @@ for (var j = 0; j <= arr4.length-1; j++) {
   };
 };
 var value11 = enemy.level;
-var value14 = Math.floor( Math.random() * 4);
-if(value14 >= 1){
+var value14 = Math.floor(Math.random() * 4);
+const dropUpItem = $dataItems[valueItemDropUpItem];
+  if (value14 >= 1) {
   for (var j = 1; j <= value14; j++) {
-    drop_probabilityCalculation(value11);
+    value11 = drop_probabilityCalculation(value11, dropUpItem);
     if(value13 >= 90){
       var arr6 = [];
       drop_genericDropRate(0,arr6);
@@ -2537,7 +2539,7 @@ if(value14 >= 1){
   };
 };
 var value11 = enemy.level;
-drop_probabilityCalculation(value11);
+drop_probabilityCalculation(value11, dropUpItem);
 if(value13 >= 90){
   var value14 = 0;
   var list = valueClassStateA;
@@ -2600,6 +2602,7 @@ actor1_setup1(value,arr1[Math.floor(Math.random() * arr1.length)]);
     };
   };
 }; */
+const dropUpItem = $dataItems[valueItemDropUpItem];
 arr4 = [];
 var start = 1; 
 var end = Number(arr2[Math.floor(Math.random() * arr2.length)]);
@@ -2610,8 +2613,9 @@ var end = Number(arr2[Math.floor(Math.random() * arr2.length)]);
 	const enemy = $dataEnemies[Number(arr3[Math.floor(Math.random() * arr3.length)])];
     value2 += Math.round(enemy.exp * (1 + intValue1minus1 * value4) + (value5 * intValue1minus1));
     value3 += Math.round(enemy.gold * (1 + intValue1minus1 * value6) + (value7 * intValue1minus1));
+  
     enemy_dropSelection(actor1);
-      drop_probabilityCalculation(intValue1);
+    drop_probabilityCalculation(intValue1, dropUpItem);
         if(value13 >= 90){
           drop_enemyDropRate(0,arr4);//計算のみ。計算結果はarr4に蓄積。
           drop_genericDropRate(0,arr4);//valueDropItemsに格納
@@ -2659,7 +2663,7 @@ if(dropCount + defeatsCount <= 6){
 };
 
 //ドロップするかどうかの確率計算
-drop_probabilityCalculation = function(value11){
+drop_probabilityCalculation = function (value11, dropUpItem){
 
   value13 = Math.floor( Math.random() * 101);
   value13 += Math.round(value11 / 10);
@@ -2668,72 +2672,74 @@ drop_probabilityCalculation = function(value11){
     if($gameVariables.value(516) >= 300){value13 += 1};
     if($gameVariables.value(516) >= 500){value13 += 1};
     if($gameVariables.value(516) >= 1000){value13 += 1};
-    if($gameParty.hasItem($dataItems[valueItemDropUpItem])){value13 += 1};
+    if ($gameParty.hasItem(dropUpItem)){value13 += 1};
     if($gameParty.membersState(296)){value13 += 1};
     if($gameParty.membersState(297)){value13 += 1};
     if($gameParty.membersState(298)){value13 += 1};
-
 };
 
 //ドロップするかどうかの確率計算2
-drop_probabilityCalculation2 = function(user,id1){
+drop_probabilityCalculation2 = function (user, id1, dropUpItem){
 
 valueDropCount1 = 0;
 
-let id2 = id1 * 20;
-if(id2 == 0){id2 = 999}//0はレベル制限しない汎用ドロップ
-else if(id2 >= 51){id2 = 999};//レアリティが6以上なら制限なし
-
+let canDrop;
 if(id1 >= 5){
+  let id2 = id1 * 20;
+  if(id2 == 0){id2 = 999}//0はレベル制限しない汎用ドロップ
+  else if(id2 >= 51){id2 = 999};//レアリティが6以上なら制限なし
+
   if(id1 < 7){id2 = 20}
   else if(id1 == 7){id2 = 30}
   else if(id1 == 8){id2 = 40}
   if(id1 > 8){id2 = 50};
-  var value15 = id2 < valueDropEnemyLevel;
+  canDrop = id2 < valueDropEnemyLevel;
 } else {
-  var value15 = true;
+  canDrop = true;
 };
 
-var value14 = true;//id2 > valueDropEnemyLevel;//高レベルでドロップ制限はなし
-if(value14 && value15){
-  let value11 = 5;
+//var value14 = true;//id2 > valueDropEnemyLevel;//高レベルでドロップ制限はなし
+if (canDrop /*&& value14*/){
+  let dropMod1 = 5;
   //if(id1 == 0){value11 = 5};
-  if(id1 == 1){value11 = 10}
-  else if(id1 == 2){value11 = 9}
-  else if(id1 == 3){value11 = 8}
-  else if(id1 == 4){value11 = 7}
-  else if(id1 == 5){value11 = 6}
-  else if(id1 == 6){value11 = 5}
-  else if(id1 == 7){value11 = 4}
-  else if(id1 == 8){value11 = 3}
-  else if(id1 == 9){value11 = 2}
-  else if(id1 == 10){value11 = 1};
+  if(id1 == 1){dropMod1 = 10}
+  else if(id1 == 2){dropMod1 = 9}
+  else if(id1 == 3){dropMod1 = 8}
+  else if(id1 == 4){dropMod1 = 7}
+  else if(id1 == 5){dropMod1 = 6}
+  else if(id1 == 6){dropMod1 = 5}
+  else if(id1 == 7){dropMod1 = 4}
+  else if(id1 == 8){dropMod1 = 3}
+  else if(id1 == 9){dropMod1 = 2}
+  else if(id1 == 10){dropMod1 = 1};
   
-  var value12 = value11 / 3;
-  value11 += value12 + (valueDropEnemyLevel / 10);
-  if($gameTroop.turnCount() <= 1){value11 += value12 * 3};
-  if($gameVariables.value(54) == 1){value11 += value12 * 5};//パーティが一人の場合確率アップ
+  var dropMod2 = dropMod1 / 3;
+  dropMod1 += dropMod2 + (valueDropEnemyLevel / 10);
+  if($gameTroop.turnCount() <= 1){dropMod1 += dropMod2 * 3};
+  if($gameVariables.value(54) == 1){dropMod1 += dropMod2 * 5};//パーティが一人の場合確率アップ
   
   const gameVariable516 = $gameVariables.value(516);
-  if(gameVariable516 >= 100){value11 += value12};
-  if(gameVariable516 >= 300){value11 += value12};
-  if(gameVariable516 >= 500){value11 += value12};
-  if(gameVariable516 >= 1000){value11 += value12};
-  if(gameVariable516 >= 1500){value11 += value12};
-  if(gameVariable516 >= 2000){value11 += value12};
+  if(gameVariable516 >= 100){dropMod1 += dropMod2};
+  if(gameVariable516 >= 300){dropMod1 += dropMod2};
+  if(gameVariable516 >= 500){dropMod1 += dropMod2};
+  if(gameVariable516 >= 1000){dropMod1 += dropMod2};
+  if(gameVariable516 >= 1500){dropMod1 += dropMod2};
+  if(gameVariable516 >= 2000){dropMod1 += dropMod2};
   
-  if($gameParty.hasItem($dataItems[valueItemDropUpItem])){value11 += value12 * 3};
-  if($gameParty.membersState(296)){value11 += value12 * 2};
-  if($gameParty.membersState(297)){value11 += value12 * 2};
-  if($gameParty.membersState(298)){value11 += value12 * 2};
+  if($gameParty.hasItem(dropUpItem)){dropMod1 += dropMod2 * 3};
+  if($gameParty.membersState(296)){dropMod1 += dropMod2 * 2};
+  if($gameParty.membersState(297)){dropMod1 += dropMod2 * 2};
+  if($gameParty.membersState(298)){dropMod1 += dropMod2 * 2};
   if(user.isStateAffected(186)){
     if(user._stateCounter[186] >= 1){
-      value11 += value12 * user._stateCounter[186];
+      dropMod1 += dropMod2 * user._stateCounter[186];
     };
   };
   
-  let value13 = Math.floor( Math.random() * 100) + 1;
-  if(value11 >= value13){valueDropCount1 += 1};
+  const dropMod3 = Math.floor(Math.random() * 100) + 1;
+  if(dropMod1 >= dropMod3){valueDropCount1 += 1};
+
+  return valueDropCount1;
 };
 
 };
@@ -2757,7 +2763,8 @@ drop_walletItemBoxGet = function(value12,id12){
   const arr12 = [];
   const actor = $gameActors.actor($gameVariables.value(11));
   let value13 = 100;
-  drop_probabilityCalculation(value13);
+  const dropUpItem = $dataItems[valueItemDropUpItem];
+  drop_probabilityCalculation(value13, dropUpItem);
 
   if (!actor.isLearnedSkill(value3) || actor.skillMasteryLevel(value3) < 1) {
     return;
@@ -2973,15 +2980,15 @@ if($gameVariables.value(240) >= 1){
   var value1 = Number(arr1[Math.floor(Math.random() * arr1.length)]);
 } else {
   var value1 = value2;
-};
-drop_probabilityCalculation(value1);
+  };
+  const dropUpItem = $dataItems[valueItemDropUpItem];
+  drop_probabilityCalculation(value1, dropUpItem);
   if(actor.isLearnedSkill(value3) && actor.skillMasteryLevel(value3) >= 1){
     value13 += actor.skillMasteryLevel(value3) * 3;
   };
     if(value13 >= 90){
       drop_JobStateWAget(id1,value1);
     };
-
 };
 
 //アイテムボックス開封
