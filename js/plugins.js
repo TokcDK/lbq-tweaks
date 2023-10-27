@@ -425,5 +425,6 @@ var $plugins =
 {"name":"ShowMapRefresh","status":false,"description":"マップのリフレッシュ表示","parameters":{}},
 {"name":"Debug_ReportMemory","status":false,"description":"メモリ使用量を表示します。","parameters":{"Max Pixels In MPix":"50"}},
 {"name":"Debug_ThrottleImage","status":false,"description":"画像読み込みを遅くします","parameters":{"Delay":"2000"}},
-{"name":"------------------------","status":false,"description":"----------------------------------------------------------------------------------","parameters":{}}
+{"name":"------------------------","status":false,"description":"----------------------------------------------------------------------------------","parameters":{}},
+{"name":"AfterLoadScript","status":true,"description":"","parameters":{}}
 ];
