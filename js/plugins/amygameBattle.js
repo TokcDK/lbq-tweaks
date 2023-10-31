@@ -3135,28 +3135,17 @@ if(!$gameSwitches.value(157)){
 //ソロコンビ設定
 party_SoroCombiAddRemove = function(){
 
-if($gameParty.battleMembers().length == 1){
-  $gameParty.battleMembers().forEach(function(actor) {
-    actor.addState(203);
+const gamePartyBattleMembers = $gameParty.battleMembers();
+const gamePartyBattleMembersCount = gamePartyBattleMembers.length;
+const gamePartyMembers = $gameParty.members();
+for (let i = 1; i<3; i++){
+  const isEqualMembersCount = gamePartyBattleMembersCount == i;
+  const actors = isEqualMembersCount ? gamePartyBattleMembers : gamePartyMembers;
+  for (const actor of actors) {
+    if (isEqualMembersCount) actor.addState(i + 202); else actor.removeState(i + 202);
     actor.refresh();
-  });
-} else {
-  $gameParty.members().forEach(function(actor) {
-    actor.removeState(203);
-    actor.refresh();
-  });
-};
-if($gameParty.battleMembers().length == 2){
-  $gameParty.battleMembers().forEach(function(actor) {
-    actor.addState(204);
-    actor.refresh();
-  });
-} else {
-  $gameParty.members().forEach(function(actor) {
-    actor.removeState(204);
-    actor.refresh();
-  });
-};
+  }
+}
 
 };
 
