@@ -3152,16 +3152,18 @@ for (let i = 1; i<3; i++){
 //特殊なステートの時にダメージの計算式をバトルログに出力。
 attack_DamageFormula = function(user,target,id1){
 
+const skill = $dataSkills[id1];
 if($gameSwitches.value(141)){
-  Math.max($attack1(Number($dataSkills[id1].meta['DamageFormula2'].split(',')[0]),user,target,
-  Number($dataSkills[id1].meta['DamageFormula2'].split(',')[1])) * 
-  Number($dataSkills[id1].meta['DamageFormula2'].split(',')[2]),user.mdf/10);
+  const skillDamageFormulaData = skill.meta['DamageFormula2'].split(',');
+  damage = Math.max($attack1(Number(skillDamageFormulaData[0]),user,target,
+    Number(skillDamageFormulaData[1])) * 
+    Number(skillDamageFormulaData[2]),user.mdf/10);
   var value1 = damage;
   let text = `基礎ダメージ値:\\C[10]${value1}\\C[0]`;
   BattleManager._logWindow.push(`addText`, text);
   let arr1 = user.attackElements();
-  if($dataSkills[id1].meta['Multiple Elements']){
-    var arr2 = $dataSkills[id1].meta['Multiple Elements'].split(',');
+  if (skill.meta['Multiple Elements']){
+    var arr2 = skill.meta['Multiple Elements'].split(',');
     arr1 = arr1.concat(arr2);
   };
   var value6 = $dataSkills[1].damage.elementId;
@@ -3171,7 +3173,7 @@ if($gameSwitches.value(141)){
 
   const prefix = `[属性] `
   text = prefix;
-  for (var i = 0; i <= arr1.length-1; i++) {
+  for (var i = 0; i < arr1.length; i++) {
     var value2 = arr1[i];
     let value3 = Math.round(valueAttackAmplifysActorId[user.actorId()][value2]);
     value3 = value3 + Math.round(user.elementAmplifyRate(value2)*100 + 100);
