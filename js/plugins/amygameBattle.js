@@ -6,15 +6,25 @@
 
 //(function() {
 
+// enemy_dropSelection global vars (to not declare each time)
+var itemsSourceKindPicNames = ['ItemDrop_Items', 'ItemDrop_Weapons', 'ItemDrop_Armors'];
+var xShiftCoords = [50, 75, 100, 125, 150, 175, 200];
+var yShiftCoords = [-50, -40, -30, -20, -10, 0, 10, 20];
+var durations = [80, 85, 90, 95, 100];
 //エネミー戦闘不能時にドロップ計算
 enemy_dropSelection = function(user){
 
-if($gameSwitches.value(607) || $gameSwitches.value(608)){}else{
-  for (let i = 1; i <= valueSubjugationPoint.length-1; i++) {//討伐数カウント
-    if(user.isStateAffected(valueSubjugationPoint[i])){
-      $gameVariables.value(52)[valueSubjugationPoint[i]] += 1;
-      if(!$gameParty.inBattle()){
-        const name = `\x1bSIM[${valueSubjugationPoint[i]}]`;
+const gameSwitch607 = $gameSwitches.value(607);
+const gameSwitch608 = $gameSwitches.value(608);
+const isInBattle = $gameParty.inBattle();
+if (!gameSwitch607 && !gameSwitch608){
+  const gameVar52 = $gameVariables.value(52);
+  for (let i = 1; i < valueSubjugationPoint.length; i++) {//討伐数カウント
+    const stateId = valueSubjugationPoint[i];
+    if (user.isStateAffected(stateId)){
+      gameVar52[stateId] += 1;
+      if(!isInBattle){
+        const name = `\x1bSIM[${stateId}]`;
         const num = `\\C[10]+1\\C[0]`;
         const messageText = `${name}：討伐数${num}\n`;
         valueWordSet3 += `${messageText}`;
@@ -23,25 +33,19 @@ if($gameSwitches.value(607) || $gameSwitches.value(608)){}else{
       };
   }};
   if(!user.isStateAffected(436)){
-    $gameVariables.value(52)[1] += 1;//ヒューマン以外の魔物当日討伐数
-    $gameVariables.value(52)[2] += 1;//ヒューマン以外の魔物総合討伐数
+    gameVar52[1] += 1;//ヒューマン以外の魔物当日討伐数
+    gameVar52[2] += 1;//ヒューマン以外の魔物総合討伐数
   }
 };
 
   const itemDropDataArray = get_item_drop_data(user);
   const itemDropDataArrayLength = itemDropDataArray.length;
   const itemsSourceKinds = [$dataItems, $dataWeapons, $dataArmors];
-  const itemsSourceKindPicNames = ['ItemDrop_Items', 'ItemDrop_Weapons', 'ItemDrop_Armors'];
-  const stateRaceDropKinds = [50, 75, 100, 125, 150, 175, 200];
-  const arr3 = [-50, -40, -30, -20, -10, 0, 10, 20];
-  const arr3Length = arr3.length;
-  const arr4 = [80, 85, 90, 95, 100];
-  const arr4Length = arr4.length;
+  const yShiftCoordsLength = yShiftCoords.length;
+  const durationsLength = durations.length;
   const userIndex = user.index() + 1;
   const coordinateX = $gameTroop.getX(userIndex);
   const coordinateY = $gameTroop.getY(userIndex);
-  const gameSwitch607 = $gameSwitches.value(607);
-  const gameSwitch608 = $gameSwitches.value(608);
   const dropUpItem = $dataItems[valueItemDropUpItem];
   for (let i = 0; i < itemDropDataArrayLength; i++) {
     const itemDropData = itemDropDataArray[i];
@@ -52,13 +56,13 @@ if($gameSwitches.value(607) || $gameSwitches.value(608)){}else{
         valueItems = itemsSourceKinds[itemDropDataKindNum];
         const valueItem = valueItems[Number(itemDropData[2])];
         const picName = itemsSourceKindPicNames[itemDropDataKindNum];
-        if($gameParty.inBattle()){
+        if (isInBattle){
           $gameTroop.addDropItem(valueItem);
           //var value1 = `\x1bI[${valueItems[Number(arr1[i][2])].iconIndex}]`;
           //var arr7 = [-50,-60,-70,-80,-90,-100,-110,-120,-130,-140,-150,-160,-170,-180,-190,-200];
-          const shiftX = stateRaceDropKinds[Math.floor(Math.random() * stateRaceDropKinds.length)];//x
-          const shiftY = arr3[Math.floor(Math.random() * arr3Length)];//y
-          const duration = arr4[Math.floor(Math.random() * arr4Length)];//wait
+          const shiftX = xShiftCoords[Math.floor(Math.random() * xShiftCoords.length)];//x
+          const shiftY = yShiftCoords[Math.floor(Math.random() * yShiftCoordsLength)];//y
+          const duration = durations[Math.floor(Math.random() * durationsLength)];//wait
           //var value7 = arr7[Math.floor(Math.random() * arr7.length)];//jump
           picture_motion1("smooth",[0]);
           //$gameScreen.setDTextPicture(value1, 32);//元から
@@ -83,12 +87,12 @@ if($gameSwitches.value(607) || $gameSwitches.value(608)){}else{
               valueWordSet1 += `${messageText}`;
               $gameSystem.pushInfoLog(messageText);
               //CommonPopupManager.showInfo({},value11,null);
-            };
-          };
-        };
-      };
-    };
-  };
+            }
+          }
+        }
+      }
+    }
+  }
 
 };
 
