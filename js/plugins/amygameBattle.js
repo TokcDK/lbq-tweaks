@@ -3083,12 +3083,14 @@ actor_stateExpGoldRate = function(){
 enemy_battleStartCry = function(user){
 
 if(!$gameSwitches.value(157)){
-  var value5 = user._enemyId;
-  if($dataEnemies[value5].meta['EnemyEntrySe']){
-    var name = $dataEnemies[value5].meta['EnemyEntrySe'].split(',')[0];
-    var pitch = Math.floor( Math.random() * 21) + Number($dataEnemies[value5].meta['EnemyEntrySe'].split(',')[1]);
-    var volume = Math.floor( Math.random() * 11) + Number($dataEnemies[value5].meta['EnemyEntrySe'].split(',')[2]);
-    var pan = Math.floor( Math.random() * -101);
+  const enemyId = user._enemyId;
+  const enemyEntrySe = $dataEnemies[enemyId].meta['EnemyEntrySe'];
+  if (enemyEntrySe) {
+    const enemyEntrySeArr = enemyEntrySe.split(',');
+    const name = enemyEntrySeArr[0];
+    const pitch = Math.floor(Math.random() * 21) + Number(enemyEntrySeArr[1]);
+    const volume = Math.floor(Math.random() * 11) + Number(enemyEntrySeArr[2]);
+    const pan = Math.floor( Math.random() * -101);
     AudioManager.playSe({"name":name,"volume":volume,"pitch":pitch,"pan":pan});
     $gameSwitches.setValue(157,true);
 }};
