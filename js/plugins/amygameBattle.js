@@ -2642,7 +2642,7 @@ drop_probabilityCalculation = function (actorLevel, dropUpItem){
 //ドロップするかどうかの確率計算2
 drop_probabilityCalculation2 = function (user, id1, dropUpItem){
 
-valueDropCount1 = 0;
+var valueDropCount1 = 0;
 
 let canDrop;
 if(id1 >= 5){
