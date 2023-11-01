@@ -683,19 +683,15 @@ target.addStateCounter(stateId, +(stateDebuffRate / 100));
 
 //属性耐性ダウン解除
 Element_DebuffRateR = function(target,value100){
-
-if (target._stateCounter[value100] >= 1) {
-var code = 11;
-var dataId = Number($dataStates[value100].meta['ElementId']);
-  if(target.isEnemy()){
-    var target1 = $dataStates[490 + target.index()];
-  } else {
-    var target1 = $dataStates[486 + target.index()];
+  
+  if (target._stateCounter[value100] >= 1) {
+    const code = 11;
+    const dataId = Number($dataStates[value100].meta['ElementId']);
+    const dataStateId = target.isEnemy() ? 490 : 486;
+    const target1 = $dataStates[dataStateId + target.index()];
+    target1.traits.push({ code: code, dataId: dataId, value: 1 - target.getStateCounter[value100] });
+    target.removeStateCounter(value100);
   };
-target1.traits.push({code: code, dataId: dataId, value: 1 - target.getStateCounter[value100]});
-target.removeStateCounter(value100);
-};
-
 };
 
 //ステート付与時のアクション
