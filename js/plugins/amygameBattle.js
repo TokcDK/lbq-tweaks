@@ -3310,23 +3310,23 @@ if(id1 == 2){
 //エネミー仲間呼びスキル
 enemy_reinforcement = function(){
 
-var value1 = 0;
-var value2 = 0;
-var enemies = $gameTroop.members();
-for (var i = 0, size = enemies.length; i < size; i=i+1) {
+let value1 = false;
+let value2 = 0;
+const enemies = $gameTroop.members();
+for (let i = 0, size = enemies.length; i < size; i++) {
     if (!enemies[i].isAppeared()) {
         this.iterateEnemyIndex(i, function(enemy) {
             enemy.appear();
             $gameTroop.makeUniqueNames();
         });
-        var value1 = 1;
-        var value2 = i;
+        value1 = true;
+        value2 = i;
         break;
     }
 }
-if(value1 == 1){
-  var value3 = $gameTroop.members()[value2]._enemyId;
-  $gameVariables.setValue(21,$dataEnemies[value3].name);
+if(value1 == true){
+  const enemyId = $gameTroop.members()[value2]._enemyId;
+  $gameVariables.setValue(21,$dataEnemies[enemyId].name);
     if($gameVariables.value(240) >= 1){
       enemy_battleSetting($gameVariables.value(334));
     }; 
