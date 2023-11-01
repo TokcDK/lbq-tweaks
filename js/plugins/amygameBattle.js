@@ -3570,7 +3570,7 @@ if(id1 == 1){
   if($gameVariables.value(182) == 13){
     var value1 = 91;
   } else {
-    var action = BattleManager._action;
+    //var action = BattleManager._action;
     var value1 = BattleManager._action._item._itemId;
   };
     if($gameVariables.value(182) == 12){
@@ -3994,11 +3994,7 @@ state_addFormula1 = function(arr10){
 stateId4 = 0;
 if(arr10[2] != arr10[3]){
   var stateId3 = `\\C[2]${arr10[2].name()}\\C[0]が\\C[10]${$dataStates[arr10[0]].name}\\C[0]を付与した！　`;
-  if($gameParty.inBattle()){
-    BattleManager._logWindow.push(`addText`, stateId3);
-  } else {
-    CommonPopupManager.showInfo({},stateId3,null);
-  };
+  showMessage(stateId3);
 };
 if(!arr10[3].isStateResist(arr10[0])){
   var stateId1 = Math.floor((1.0 + (arr10[4] - arr10[5]) * 0.01) * arr10[1]);
@@ -4015,11 +4011,7 @@ if(stateId4 >= 1){
 } else {
   var stateId3 = `\\C[16]${arr10[3].name()}\\C[0]は\\C[10]${$dataStates[arr10[0]].name}\\C[0]を無効化した！（判定：\\C[4]${stateId2}\\C[0] > \\C[10]${stateId1}\\C[0]）`;
 };
-if($gameParty.inBattle()){
-  BattleManager._logWindow.push(`addText`, stateId3);
-} else {
-  CommonPopupManager.showInfo({},stateId3,null);
-};
+  showMessage(stateId3);
 
 };
 
