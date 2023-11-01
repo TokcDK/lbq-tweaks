@@ -2944,8 +2944,7 @@ drop_JobStateWAget = function (valueItemsType, value10) {
 //追いはぎ時の確率と武器防具入手
 footpad_probabilityUp = function(id1){
 
-var skillId = valueFootpadSkillId;//追剥スキルID
-var actor = $gameActors.actor($gameVariables.value(11));
+const actor = $gameActors.actor($gameVariables.value(11));
 let enemyDropChance = 10;
 if($gameVariables.value(240) >= 1){
   const item = $dataItems[$gameVariables.value(240)];
@@ -2954,6 +2953,7 @@ if($gameVariables.value(240) >= 1){
 };
   const dropUpItem = $dataItems[valueItemDropUpItem];
   let drop_probability = drop_probabilityCalculation(enemyDropChance, dropUpItem);
+  const skillId = valueFootpadSkillId;//追剥スキルID
   if(actor.isLearnedSkill(skillId) && actor.skillMasteryLevel(skillId) >= 1){
     drop_probability += actor.skillMasteryLevel(skillId) * 3;
   };
