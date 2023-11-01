@@ -2371,59 +2371,63 @@ popEnemy_setUp = function(value){
 //簡易戦闘報酬設定スクリプト  
 actor1_setup1 = function(value,id1){
 
-var actor1 = $gameActors.actor(20);
-actor1.addState(610);
-var arr1 = [];
-var arr2 = [];
-var value1 = 201;
-for (var j = 1; j <= 10; j++) {
+var actor20 = $gameActors.actor(20);
+actor20.addState(610);
+let arr2 = [];
+for (let j = 1; j <= 10; j++) {
   if(value.meta['PopEnemy' + j]){
     arr2.push(Number(value.meta['PopEnemy' + j].split(',')[0]));
   };
 };
-var value1 = arr2[Math.floor(Math.random() * arr2.length)];
-if($dataEnemies[value1].meta['Passive State']){
-  var arr2 = $dataEnemies[value1].meta['Passive State'].split(',');
-  for (var j1 = 0; j1 <= arr2.length-1; j1++) {
+let enemyId = arr2[Math.floor(Math.random() * arr2.length)];
+const arr1 = [];
+if($dataEnemies[enemyId].meta['Passive State']){
+  arr2 = $dataEnemies[enemyId].meta['Passive State'].split(',');
+  for (let j1 = 0; j1 < arr2.length; j1++) {
     arr1.push(Number(arr2[j1]));
   };
 };
 
 if(arr1 != 0){
-  for (var j = 0; j <= arr1.length-1; j++) {
-    actor1.addState(arr1[j]);
+  for (let j = 0; j < arr1.length; j++) {
+    actor20.addState(arr1[j]);
   };
 };
-if($gameVariables.value(345) != 0){
-  for (var i = 0; i <= $gameVariables.value(345)[1].length-1; i++) {
-    if($gameVariables.value(345)[1][i] >= 1){
-      actor1.addState($gameVariables.value(345)[1][i]);
+const gameVar345 = $gameVariables.value(345);
+if(gameVar345){
+  const gameVar345_1 = gameVar345[1];
+  for (let i = 0; i <= gameVar345_1.length-1; i++) {
+    if (gameVar345_1[i] >= 1){
+      actor20.addState(gameVar345_1[i]);
     };
   };
-  for (var i = 0; i <= $gameVariables.value(345)[2].length-1; i++) {
-    if($gameVariables.value(345)[2][i] >= 1){
-      actor1.addState($gameVariables.value(345)[2][i]);
+  const gameVar345_2 = gameVar345[2];
+  for (let i = 0; i <= gameVar345_2.length-1; i++) {
+    if (gameVar345_2[i] >= 1){
+      actor20.addState(gameVar345_2[i]);
     };
   };
 };
-if($gameVariables.value(350) != 0){
-  for (var i = 0; i <= $gameVariables.value(350).length-1; i++) {
-    if($gameVariables.value(350)[i] == 885){
-      var value1 = id1;
-      var value3 = 11;
-      if(value1 >= 30 && value1 <= 60){var value3 = 21};
-      if(value1 >= 61){var value3 = 31};
-      var value2 = Math.floor( Math.random() * value3) + 885;
-      actor1.addState(value2);
+const gameVar350 = $gameVariables.value(350);
+if(gameVar350){
+  for (let i = 0; i < gameVar350.length; i++) {
+    let stateId = gameVar350[i];
+    if (stateId == 885){
+      let stateIdMult = 11;
+      if (id1 >= 30 && id1 <= 60) stateIdMult = 21;
+      else if (id1 >= 61) stateIdMult = 31;
+
+      stateId = Math.floor( Math.random() * stateIdMult) + 885;
+      actor20.addState(stateId);
     } else {
-      actor1.addState($gameVariables.value(350)[i]);
+      actor20.addState(stateId);
     };
   };
 };
 if(value.meta['EnemyElement']){
-  var arr1 = value.meta['EnemyElement'].split(',');
-  var value1 = Number(arr1[Math.floor(Math.random() * arr1.length)]);
-  actor1.addState(value1);
+  const arr1 = value.meta['EnemyElement'].split(',');
+  const stateId = Number(arr1[Math.floor(Math.random() * arr1.length)]);
+  actor20.addState(stateId);
 };
 //console.log($gameActors.actor(20));
 
