@@ -2276,138 +2276,126 @@ if(id6 != 0){
 //エネミーに様々なセッティング
 enemy_battleSetting = function(id10){
 
-var enemy = $gameTroop.members()[id10];
-var enemy1 = enemy._enemyId;
-if($gameSwitches.value(426)){
-  var value = $dataEnemies[$gameTroop.members()[0]._enemyId];
-} else {
-  var value = $dataItems[$gameVariables.value(240)];
-};
-if(value.meta['EnemyLV']){
-  var array = value.meta['EnemyLV'].split(',');
-} else {
-  var array = [1,1];
-};
-if(value.meta['EnemyElement']){
-  var arr1 = value.meta['EnemyElement'].split(',');
-} else {
-  var arr1 = [0,0];
-};
-var value1 = Number(array[Math.floor(Math.random() * array.length)]);
+const gameTroopMembers = $gameTroop.members();
+const gameTroopMember = gameTroopMembers[id10];
+const enemyId = gameTroopMember._enemyId;
+const target = $gameSwitches.value(426) ? $dataEnemies[$gameTroop.members()[0]._enemyId] : $dataItems[$gameVariables.value(240)];
+const targetEnemyLV = target.meta['EnemyLV'];
+const targetEnemyLVDataArray = targetEnemyLV ? targetEnemyLV.split(',') : [1, 1];
+const targetEnemyElement = target.meta['EnemyElement'];
+const targetEnemyElementDataArray = targetEnemyElement ? targetEnemyElement.split(',') : [0,0];
+let level = Number(targetEnemyLVDataArray[Math.floor(Math.random() * targetEnemyLVDataArray.length)]);
 
-if(enemy1 == 30){
-  if(value.meta['BossLV']){
-    var value1 = Number(value.meta['BossLV']);
-  };
-  if(value1 >= 30){
-    enemy.addState(310);//属性の極み
-  };
+if(enemyId == 30){
+  const targetMetaBossLV = target.meta['BossLV'];
+  if (targetMetaBossLV) level = Number(targetMetaBossLV);
+  if (level >= 30) gameTroopMember.addState(310);//属性の極み
 };
-if(value1 >= 1){
-  if(enemy1 == 30){
-    if(valueBossAddLevel >= 1){
-      value1 += valueBossAddLevel;
-    };
+if(level >= 1){
+  if(enemyId == 30){
+    if (valueBossAddLevel >= 1) level += valueBossAddLevel;
+    level += $gameSwitches.value(426) ? $gameVariables.value(304)[valueBossEnemyId] * 10 : $gameVariables.value(305)[$gameVariables.value(240)] * 5;
     if($gameSwitches.value(426)){
-      value1 += $gameVariables.value(304)[valueBossEnemyId] * 10;
+      level += $gameVariables.value(304)[valueBossEnemyId] * 10;
     } else {
-      value1 += $gameVariables.value(305)[$gameVariables.value(240)] * 5;
+      level += $gameVariables.value(305)[$gameVariables.value(240)] * 5;
     };
   } else {
     if($gameVariables.value(232) >= 2){
-      var value2 = Math.floor( Math.random() * $gameVariables.value(232));
-      value1 += value2;
-      if(value1 >= 11){
-        var value2 = Math.floor( Math.random() * 101);
-        if(value1 >= value2){
-          value1 += 1;
+      const extraLevel = Math.floor( Math.random() * $gameVariables.value(232));
+      level += extraLevel;
+      if(level >= 11){
+        const randomLevel = Math.floor( Math.random() * 101);
+        if(level >= randomLevel){
+          level += 1;
         };
       };
     };
   };
-  if(valueEnemyAddLevel >= 1){
-    value1 += valueEnemyAddLevel;
-  };
-  if($gameVariables.value(240) >= 1){
-    value1 += $gameVariables.value(257)[$gameVariables.value(240)];
-  };
-  var value1 = Math.round(value1);
-  enemy.changeLevel(value1);
+  if (valueEnemyAddLevel >= 1) level += valueEnemyAddLevel;
+  const gameVar240 = $gameVariables.value(240);
+  if (gameVar240 >= 1) level += $gameVariables.value(257)[gameVar240];
+  level = Math.round(level);
+  gameTroopMember.changeLevel(level);
 };
-if(value.meta['EnemyLV']){
-  if(Number(value.meta['EnemyLV']) == 0){
-    var value1 = $gameActors.actor($gameVariables.value(2)).level;
-    enemy.changeLevel(value1);
+  if (targetEnemyLV){
+    if (Number(targetEnemyLV) == 0){
+      level = $gameActors.actor($gameVariables.value(2)).level;
+      gameTroopMember.changeLevel(level);
   };
 }
-if($gameVariables.value(350) != 0){
-  for (var i = 0; i <= $gameVariables.value(350).length-1; i++) {
-    if($gameVariables.value(350)[i] == 885){
-      var value3 = 11;
-      if(value1 >= 30 && value1 <= 60){var value3 = 21};
-      if(value1 >= 61){var value3 = 31};
-      var value2 = Math.floor( Math.random() * value3) + 885;
-      enemy.addState(value2);
+  const gameVar350 = $gameVariables.value(350);
+  if (gameVar350 != 0){
+    for (let i = 0; i <= gameVar350.length-1; i++) {
+      if (gameVar350[i] == 885){
+      let extraLevelMult = 11;
+      if (level >= 30 && level <= 60) { extraLevelMult = 21}
+      else if(level >= 61){extraLevelMult = 31}
+      const extraLevel = Math.floor( Math.random() * extraLevelMult) + 885;
+      gameTroopMember.addState(extraLevel);
     } else {
-      enemy.addState($gameVariables.value(350)[i]);
+      gameTroopMember.addState($gameVariables.value(350)[i]);
     };
   };
 };
-var value2 = Number(arr1[Math.floor(Math.random() * arr1.length)]);
-if(enemy1 == 30){
-  if(value.meta['BossElement']){
-    var value2 = Number(value.meta['BossElement'])
+let extraLevel = Number(targetEnemyElementDataArray[Math.floor(Math.random() * targetEnemyElementDataArray.length)]);
+if(enemyId == 30){
+  if(target.meta['BossElement']){
+    extraLevel = Number(target.meta['BossElement'])
   };
 };
-if(value2 == 0){}else{
-  if($dataEnemies[enemy1].meta['defaultState']){
-    if(Number($dataEnemies[enemy1].meta['defaultState']) != value2){
-      enemy.removeState(Number($dataEnemies[enemy1].meta['defaultState']));
+const enemy = $dataEnemies[enemyId];
+if(extraLevel != 0){
+  const enemyDefaultState = enemy.meta['defaultState'];
+  if (enemyDefaultState){
+    if (Number(enemyDefaultState) != extraLevel){
+      gameTroopMember.removeState(Number(enemyDefaultState));
     };
   }
-  enemy.addState(value2);
+  gameTroopMember.addState(extraLevel);
 };
-if(enemy1 <= 29){
-  var arr2 = $gameVariables.value(345)[enemy1-20];
-  for (var j = 0; j <= arr2.length-1; j++) {
-    enemy.addState(arr2[j]);
+if(enemyId <= 29){
+  const arr2 = $gameVariables.value(345)[enemyId-20];
+  for (let j = 0; j <= arr2.length-1; j++) {
+    gameTroopMember.addState(arr2[j]);
   };
 };
-if(enemy1 == 30 && $gameVariables.value(343) != 0){//ボスステート処理
-  var arr2 = $gameVariables.value(343);
-  for (var j = 0; j <= arr2.length-1; j++) {
-    enemy.addState(arr2[j]);
+if(enemyId == 30 && $gameVariables.value(343) != 0){//ボスステート処理
+  let arr2 = $gameVariables.value(343);
+  for (let j = 0; j <= arr2.length-1; j++) {
+    gameTroopMember.addState(arr2[j]);
   };
-  if(value.meta['BossDrop1']){
+  if(target.meta['BossDrop1']){
     for (var j = 1; j <= 9; j++) {
-      if(value.meta['BossDrop' + j]){
-        var arr2 = value.meta['BossDrop' + j].split(',');
-        if(Number(arr2[0]) == 0){valueItems = $dataItems};
-        if(Number(arr2[0]) == 1){valueItems = $dataWeapons};
-        if(Number(arr2[0]) == 2){valueItems = $dataArmors};
+      if(target.meta['BossDrop' + j]){
+        arr2 = target.meta['BossDrop' + j].split(',');
+        if(Number(arr2[0]) == 0){valueItems = $dataItems}
+        else if(Number(arr2[0]) == 1){valueItems = $dataWeapons}
+        else if(Number(arr2[0]) == 2){valueItems = $dataArmors}
+
         if(Number(arr2[2]) >= Math.floor( Math.random() * 101)){
           $gameTroop.addDropItem(valueItems[Number(arr2[1])]);
         };
   }}};      
 };
-if($dataEnemies[enemy1].meta['Man'] || $dataEnemies[enemy1].meta['Woman']){
-  if($dataEnemies[enemy1].meta['Man']){enemy.addState(459)};
-  if($dataEnemies[enemy1].meta['Woman']){enemy.addState(460)};
+  if (enemy.meta['Man'] || enemy.meta['Woman']){
+    if (enemy.meta['Man']){gameTroopMember.addState(459)};
+    if (enemy.meta['Woman']){gameTroopMember.addState(460)};
 } else {
-  if(!$dataEnemies[enemy1].meta['Nonsexual']){
+    if (!enemy.meta['Nonsexual']){
     if(!$gameSwitches.value(370) && Math.floor( Math.random() * 11) == 7){
-      enemy.addState(460);//雌
+      gameTroopMember.addState(460);//雌
     } else {
-      enemy.addState(459);//雄
+      gameTroopMember.addState(459);//雄
     };
   };
 };
-if(enemy.level >= 60 && !enemy.isStateAffected(436)){//人種以外
-  enemy.addState(406);//魔性心威
+if(gameTroopMember.level >= 60 && !gameTroopMember.isStateAffected(436)){//人種以外
+  gameTroopMember.addState(406);//魔性心威
 };
-if(enemy1 != 30){
-  if(enemy.level >= 40 && $gameTroop.aliveMembers().length == 1){
-    enemy.addState(475);//孤高
+if(enemyId != 30){
+  if(gameTroopMember.level >= 40 && $gameTroop.aliveMembers().length == 1){
+    gameTroopMember.addState(475);//孤高
   };
 };
 /*//パッシブオーラで実行
@@ -2440,58 +2428,61 @@ if(enemy.isStateAffected(448)){//王権
         enemy2.addState(450);//魔軍兵
 }}}};
 */
-if(enemy.isStateAffected(455)){//捕食者
-  enemy.appear();//非捕食者は常に出現させる。
-  for (var j = 0; j <= $gameTroop.members().length-1; j++) {
-    var enemy2 = $gameTroop.members()[j];
-    if(!enemy2.isStateAffected(455)){
-      if(enemy.level+10 >= enemy2.level){
-        enemy2.addState(456);//被捕食者
+if(gameTroopMember.isStateAffected(455)){//捕食者
+  gameTroopMember.appear();//非捕食者は常に出現させる。
+
+  for (let j = 0; j < $gameTroop.members().length; j++) {
+    const enemyJ = gameTroopMembers[j];
+    if(!enemyJ.isStateAffected(455)){
+      if(gameTroopMember.level+10 >= enemyJ.level){
+        enemyJ.addState(456);//被捕食者
       };
     };
   };
-  for (var j = 0; j <= $gameParty.battleMembers().length-1; j++) {
-    var actor = $gameParty.battleMembers()[j];
+  const gamePartyBattleMembers = $gameParty.battleMembers();
+  for (let j = 0; j < gamePartyBattleMembers.length; j++) {
+    const actor = gamePartyBattleMembers[j];
     if(!actor.isStateAffected(455)){
-      if(enemy.level+10 >= actor.level){
+      if(gameTroopMember.level+10 >= actor.level){
         actor.addState(456);//被捕食者
   }}};
 };
-if(enemy1 == 30 && $gameVariables.value(628) != 0){//ボス確定ドロップ
-  for (var j = 0; j <= $gameVariables.value(628).length-1; j++) {
-    if($gameVariables.value(628)[j] >= 1){
-      var value11 = $gameVariables.value(628)[j];
-      $gameTroop.addDropItem($dataItems[value11]);
+const gameVar628 = $gameVariables.value(628);
+  if (enemyId == 30 && gameVar628 != 0){//ボス確定ドロップ
+    for (let j = 0; j < gameVar628.length; j++) {
+      if (gameVar628[j] >= 1){
+        const itemId = gameVar628[j];
+        $gameTroop.addDropItem($dataItems[itemId]);
 }}};
-for (var j = 0; j <= valueStateGetItems.length-1; j++) {
-  if(enemy.isStateAffected(valueStateGetItems[j])){
-    var value11 = Number($dataStates[valueStateGetItems[j]].meta['SubjugationPointItem']);
-    $gameTroop.addDropItem($dataItems[value11]);
+for (let j = 0; j < valueStateGetItems.length; j++) {
+  if(gameTroopMember.isStateAffected(valueStateGetItems[j])){
+    const itemId = Number($dataStates[valueStateGetItems[j]].meta['SubjugationPointItem']);
+    $gameTroop.addDropItem($dataItems[itemId]);
 }};
-var value11 = 1;
-var arr4 = valueStateEnemyExpRate;
-for (var j = 0; j <= arr4.length-1; j++) {
-  if(enemy.isStateAffected(arr4[j]) && enemy.isAlive()){
+//var value11 = 1;
+let arr4 = valueStateEnemyExpRate;
+for (let j = 0; j < arr4.length; j++) {
+  if(gameTroopMember.isStateAffected(arr4[j]) && gameTroopMember.isAlive()){
     if($dataStates[arr4[j]].meta['EnemyExpRate']){
       valueTotalexp += Number($dataStates[arr4[j]].meta['EnemyExpRate']);
     };
   };
 };
-var value11 = 1;
-var arr4 = valueStateEnemyGoldRate;
-for (var j = 0; j <= arr4.length-1; j++) {
-  if(enemy.isStateAffected(arr4[j]) && enemy.isAlive()){
+//var value11 = 1;
+arr4 = valueStateEnemyGoldRate;
+for (let j = 0; j < arr4.length; j++) {
+  if(gameTroopMember.isStateAffected(arr4[j]) && gameTroopMember.isAlive()){
     if($dataStates[arr4[j]].meta['EnemyGoldRate']){
       valueTotalgold += Number($dataStates[arr4[j]].meta['EnemyGoldRate']);
     };
   };
 };
-var value11 = enemy.level;
 var value14 = Math.floor(Math.random() * 4);
 const dropUpItem = $dataItems[valueItemDropUpItem];
   if (value14 >= 1) {
-  for (var j = 1; j <= value14; j++) {
-    value11 = drop_probabilityCalculation(value11, dropUpItem);
+    let gameTroopMemberLevel = gameTroopMember.level;
+  for (let j = 1; j <= value14; j++) {
+    gameTroopMemberLevel = drop_probabilityCalculation(gameTroopMemberLevel, dropUpItem);
     if(value13 >= 90){
       var arr6 = [];
       drop_genericDropRate(0,arr6);
@@ -2499,23 +2490,23 @@ const dropUpItem = $dataItems[valueItemDropUpItem];
     };
   };
 };
-var value11 = enemy.level;
-drop_probabilityCalculation(value11, dropUpItem);
+var value11 = gameTroopMember.level;
+drop_probabilityCalculation(gameTroopMemberLevel, dropUpItem);
 if(value13 >= 90){
   var value14 = 0;
   var list = valueClassStateA;
   list.forEach(function(id11) {
-    if(enemy.isStateAffected(id11)){var value14 = id11};
+    if(gameTroopMember.isStateAffected(id11)){var value14 = id11};
   }, this);
   if(value14 >= 1){
     valueClassState = $dataStates[value14].meta['classStateDrop'].split(',');
-    valueEnemyLevel = enemy.level;
+    valueEnemyLevel = gameTroopMember.level;
     drop_JobStateWAget(1,10);
     drop_JobStateWAget(2,10);
   };
 };
-if(enemy.level >= valueMaxEnemyLv){
-  valueMaxEnemyLv = enemy.level;
+if(gameTroopMember.level >= valueMaxEnemyLv){
+  valueMaxEnemyLv = gameTroopMember.level;
 }
 
 };
@@ -2632,20 +2623,22 @@ if(dropCount + defeatsCount <= 6){
 //ドロップするかどうかの確率計算
 drop_probabilityCalculation = function (value11, dropUpItem){
 
-  value13 = Math.floor( Math.random() * 101);
-  value13 += Math.round(value11 / 10);  
-  if($gameVariables.value(54) == 1){value13 += 5};//パーティが一人の場合確率アップ
+  let drop_probability = Math.floor( Math.random() * 101);
+  drop_probability += Math.round(value11 / 10);  
+  if($gameVariables.value(54) == 1){drop_probability += 5};//パーティが一人の場合確率アップ
 
   const gameVar516 = $gameVariables.value(516);
-  if (gameVar516 >= 1000) { value13 += 4 }
-  else if (gameVar516 >= 500) { value13 += 3 }
-  else if (gameVar516 >= 300) { value13 += 2 }
-  else if (gameVar516 >= 100){value13 += 1};
+  if (gameVar516 >= 1000) { drop_probability += 4 }
+  else if (gameVar516 >= 500) { drop_probability += 3 }
+  else if (gameVar516 >= 300) { drop_probability += 2 }
+  else if (gameVar516 >= 100){drop_probability += 1};
   
-  if ($gameParty.hasItem(dropUpItem)){value13 += 1};
-  if($gameParty.membersState(296)){value13 += 1};
-  if($gameParty.membersState(297)){value13 += 1};
-  if($gameParty.membersState(298)){value13 += 1};
+  if ($gameParty.hasItem(dropUpItem)){drop_probability += 1};
+  if($gameParty.membersState(296)){drop_probability += 1};
+  if($gameParty.membersState(297)){drop_probability += 1};
+  if($gameParty.membersState(298)){drop_probability += 1};
+
+  return drop_probability;
 };
 
 //ドロップするかどうかの確率計算2
