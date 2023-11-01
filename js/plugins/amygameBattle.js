@@ -218,64 +218,19 @@ get_item_drop_data = function (user){
   return itemDropDataArray;
 }
 
-allAnimeattack_move1 = function(){
+allAnimeattack_move1 = function() { allAnimeattack_moveBase(false); };
 
-if(!$gameSwitches.value(464)){
-  if($gameVariables.value(182) == 11){
-    var value1 = 100;
-  } else {
-    var value1 = 350;
-  };
-  $gameTroop.move(1, value1, 0, 20);
-  $gameTroop.move(2, value1, 0, 20);
-  $gameTroop.move(3, value1, 0, 20);
-  $gameTroop.move(4, value1, 0, 20);
-  $gameTroop.move(5, value1, 0, 20);
-  $gameTroop.move(6, value1, 0, 20);
-  $gameTroop.move(7, value1, 0, 20);
-  $gameTroop.move(8, value1, 0, 20);
-} else {
-  if($gameVariables.value(182) == 11){
-    var value1 = -350;
-  } else {
-    var value1 = -200;
-  };
-  $gameParty.move(1, value1, 0, 20);
-  $gameParty.move(2, value1, 0, 20);
-  $gameParty.move(3, value1, 0, 20);
-  $gameParty.move(4, value1, 0, 20);
-};
+allAnimeattack_move2 = function() { allAnimeattack_moveBase(true); };
 
-};
+allAnimeattack_moveBase = function (isMove2) {
 
-allAnimeattack_move2 = function(){
-
-if(!$gameSwitches.value(464)){
-  if($gameVariables.value(182) == 11){
-    var value1 = -100;
-  } else {
-    var value1 = -350;
-  };
-  $gameTroop.move(1, value1, 0, 20);
-  $gameTroop.move(2, value1, 0, 20);
-  $gameTroop.move(3, value1, 0, 20);
-  $gameTroop.move(4, value1, 0, 20);
-  $gameTroop.move(5, value1, 0, 20);
-  $gameTroop.move(6, value1, 0, 20);
-  $gameTroop.move(7, value1, 0, 20);
-  $gameTroop.move(8, value1, 0, 20);
-} else {
-  if($gameVariables.value(182) == 11){
-    var value1 = 350;
-  } else {
-    var value1 = 200;
-  };
-  $gameParty.move(1, value1, 0, 20);
-  $gameParty.move(2, value1, 0, 20);
-  $gameParty.move(3, value1, 0, 20);
-  $gameParty.move(4, value1, 0, 20);
-};
-
+  const max = !$gameSwitches.value(464) ? 8 : 4;
+  const shift1 = max == 8 ? (isMove2 ? -100 : 100) : (isMove2 ? 350 : -350);
+  const shift2 = max == 8 ? (isMove2 ? -350 : 350) : (isMove2 ? 200 : -200);
+  const shift = $gameVariables.value(182) == 11 ? shift1 : shift2;
+  for (let i = 1; i <= max; i++){
+    $gameTroop.move(i, shift, 0, 20);
+  }
 };
 
 //ダメージ時に計算。（変更が多いため先頭に置く）value4はstateId。value2未使用
