@@ -399,8 +399,8 @@ if(id2 == 2){}else{
           valueAddPowerCustom += $gameVariables.value(287)[user.actorId()][10];
         };
       } else {
-        if($dataWeapons[user.equips()[0].id].meta['LotteryRearity']){
-          valueAddPowerCustom += Number($dataWeapons[user.equips()[0].id].meta['LotteryRearity']);
+        if($dataWeapons[user.equips()[0].id]LotteryRearity){
+          valueAddPowerCustom += Number($dataWeapons[user.equips()[0].id]LotteryRearity);
         };
       };
     } else {
@@ -2837,7 +2837,7 @@ function drop_enemyDropRate(value12, arr4) {
   for (let i = 1; i < itemsLength; i++) {
     const conditionalItemDrop = $dataEnemies[value18].meta['Conditional Item ' + i + ' Drop'];
     if (conditionalItemDrop) {
-      const lotteryRarity = $dataItems[i].meta['LotteryRearity'];
+      const lotteryRarity = $dataItems[i]LotteryRearity;
       if (lotteryRarity) {
         let value20;
 
@@ -2919,10 +2919,10 @@ drop_JobStateWAget = function (valueItemsType, value10) {
   }
 
   for (let i = start; i <= end; i++) {
-    const item = valueItems[i];
-    if (item.meta['LotteryRearity'] && !item.meta['GatchaOutOfRange']) {
+    const item = valueItem;
+    if (itemLotteryRearity && !item.meta['GatchaOutOfRange']) {
       const valueTypeId = isArmors ? item.atypeId : item.wtypeId;
-      if (vTypeId === valueTypeId && lotteryRearity >= Number(item.meta['LotteryRearity'])) {
+      if (vTypeId === valueTypeId && lotteryRearity >= Number(itemLotteryRearity)) {
         arr4.push(i);
       }
     }
@@ -2974,65 +2974,66 @@ $gameSwitches.setValue(115,true);
 $gameParty.loseItem($dataItems[itemId], 1);
 
 valueItemBoxOpen = `${$dataItems[itemId].name}の内訳（もう一度使用でウィンドウ閉じる）\n`;
-var value17 = 0;
-var value18 = 0;
-var value20 = !$dataItems[itemId].meta['SeiyokuItem'];
-var arr1 = [0,0,0,1,0,0,2,0];
+let value17 = 0;
+//var value18 = 0;
+let value20 = !$dataItems[itemId].meta['SeiyokuItem'];
+const itemTypeId = [0,0,0,1,0,0,2,0];
 
 
-var arr2 = $dataItems[itemId].meta['ItemBag'].split(',');
-var id2 = arr2[Math.floor(Math.random() * arr2.length)];
-  for (var id3 = 0; id3 <= id2; id3++) {
-    var id12 = arr1[Math.floor(Math.random() * arr1.length)];
-    if(id12 == 0){valueItems = $dataItems};
-    if(id12 == 1){valueItems = $dataWeapons};
-    if(id12 == 2){valueItems = $dataArmors};
+const arr2 = $dataItems[itemId].meta['ItemBag'].split(',');
+const id2 = arr2[Math.floor(Math.random() * arr2.length)];
+  for (let id3 = 0; id3 <= id2; id3++) {
+    const id12 = itemTypeId[Math.floor(Math.random() * itemTypeId.length)];
+    if(id12 == 0){valueItems = $dataItems}
+    else if(id12 == 1){valueItems = $dataWeapons}
+    else if(id12 == 2){valueItems = $dataArmors}
+
     if($dataItems[itemId].meta['HentaiBox']){
       valueItems = $dataItems;
-      var value20 = $dataItems[itemId].meta['SeiyokuItem'];
+      value20 = $dataItems[itemId].meta['SeiyokuItem'];
     };
-      if(valueItems == $dataArmors){
-        var end = valueArmorsLength;
-      } else {
-        var end = valueItems.length-1;
-      };
-      var arr12 = [0];
-        for (var i = 1; i <= end; i++) {
-          var value19 = 0;
-          if(valueItems[i].meta['GatchaOutOfRange']){
+      const end = valueItems == $dataArmors ? valueArmorsLength : valueItems.length - 1;
+      const arr12 = [0];
+        for (let i = 1; i <= end; i++) {
+          let value19 = 0;
+          valueItem = valueItems[i];
+          if (valueItem.meta['GatchaOutOfRange']){
             value19 += 1;
           };
-          if(valueItems[i].meta['Max Item']){
-            if(Number(valueItems[i].meta['Max Item']) == 1 && $gameParty.hasItem(valueItems[i])){
+          const valueItemMaxItem = valueItem.meta['Max Item'];
+          if (valueItemMaxItem){
+            if (Number(valueItemMaxItem) == 1 && $gameParty.hasItem(valueItem)){
             value19 += 1;
           }};
             if(value19 == 0){
               if($dataItems[itemId].meta['HentaiBox']){
-                var value20 = $dataItems[i].meta['SeiyokuItem'];
+                value20 = $dataItems[i].meta['SeiyokuItem'];
               };
-              if(valueItems[i].meta['LotteryRearity'] && value20){
-                var value11 = Number(valueItems[i].meta['LotteryRearity']);
-                  var list = $dataItems[itemId].meta['ItemBagRearity'].split(',');
-                  list.forEach(function(id11) {
-                    if(id11 == value11){
-                      for (var j = 10; j >= value11; j--) {
+              const valueItemLotteryRearity = valueItem.meta['LotteryRearity'];
+              if (valueItemLotteryRearity && value20){
+                const valueItemLotteryRearityNum = Number(valueItemLotteryRearity);
+                  const list = $dataItems[itemId].meta['ItemBagRearity'].split(',');
+                  for (const id11 of list) {
+                    if(id11 == valueItemLotteryRearityNum){
+                      for (let j = 10; j >= valueItemLotteryRearityNum; j--) {
                         arr12.push(i);
                       };
                     };
-                  }, this);
+                  }
               };
             };
         };
           valueDropItems = Number(arr12[Math.floor(Math.random() * arr12.length)]);
             if(valueDropItems >= 1){
-              var value16 = 1;
-              if(id12 == 0){
-                if(valueItems[valueDropItems].price <= 1000){var value16 = Math.floor( Math.random() * 6) + 1};
-                if(valueItems[valueDropItems].price <= 10000){var value16 = Math.floor( Math.random() * 3) + 1};
-                if(valueItems[valueDropItems].price == 0){var value16 = 1};
+              let value16 = 1;
+              const valueItem = valueItems[valueDropItems];
+              if (id12 == 0) {
+                if (valueItem.price == 0) { value16 = 1 }
+                else if (valueItem.price <= 1000){value16 = Math.floor( Math.random() * 6) + 1}
+                else if (valueItem.price <= 10000){value16 = Math.floor( Math.random() * 3) + 1}
               };
-              $gameParty.gainItem(valueItems[valueDropItems], value16);
-              valueItemBoxOpen += `[\x1bI[${valueItems[valueDropItems].iconIndex}]${valueItems[valueDropItems].name}×${value16}]`;
+              $gameParty.gainItem(valueItem, value16);
+              valueItemBoxOpen += `[\x1bI[${valueItem.iconIndex}]${valueItem.name}×${value16}]`;
               value17 += 1;
               if((value17 %3) == 0){valueItemBoxOpen += `\n`};
             };
