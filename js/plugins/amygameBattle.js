@@ -399,8 +399,8 @@ if(id2 == 2){}else{
           valueAddPowerCustom += $gameVariables.value(287)[user.actorId()][10];
         };
       } else {
-        if($dataWeapons[user.equips()[0].id]LotteryRearity){
-          valueAddPowerCustom += Number($dataWeapons[user.equips()[0].id]LotteryRearity);
+        if ($dataWeapons[user.equips()[0].id].meta['LotteryRearity']){
+          valueAddPowerCustom += Number($dataWeapons[user.equips()[0].id].meta['LotteryRearity']);
         };
       };
     } else {
@@ -2837,7 +2837,7 @@ function drop_enemyDropRate(value12, arr4) {
   for (let i = 1; i < itemsLength; i++) {
     const conditionalItemDrop = $dataEnemies[value18].meta['Conditional Item ' + i + ' Drop'];
     if (conditionalItemDrop) {
-      const lotteryRarity = $dataItems[i]LotteryRearity;
+      const lotteryRarity = $dataItems[i].meta['LotteryRearity'];
       if (lotteryRarity) {
         let value20;
 
@@ -2919,7 +2919,8 @@ drop_JobStateWAget = function (valueItemsType, value10) {
   }
 
   for (let i = start; i <= end; i++) {
-    const item = valueItem;
+    const item = valueItems[i];
+    const itemLotteryRearity = item.meta['LotteryRearity'];
     if (itemLotteryRearity && !item.meta['GatchaOutOfRange']) {
       const valueTypeId = isArmors ? item.atypeId : item.wtypeId;
       if (vTypeId === valueTypeId && lotteryRearity >= Number(itemLotteryRearity)) {
