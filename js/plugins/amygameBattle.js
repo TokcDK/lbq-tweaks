@@ -25,7 +25,7 @@ if (!gameSwitch607 && !gameSwitch608){
     
     gameVar52[stateId] += 1;
     if (isInBattle) continue;
-    
+
     const name = `\x1bSIM[${stateId}]`;
     const num = `\\C[10]+1\\C[0]`;
     const messageText = `${name}：討伐数${num}\n`;
@@ -42,6 +42,7 @@ if (!gameSwitch607 && !gameSwitch608){
   const itemDropDataArray = get_item_drop_data(user);
   const itemDropDataArrayLength = itemDropDataArray.length;
   const itemsSourceKinds = [$dataItems, $dataWeapons, $dataArmors];
+  const xShiftCoordsLength = xShiftCoords.length;
   const yShiftCoordsLength = yShiftCoords.length;
   const durationsLength = durations.length;
   const userIndex = user.index() + 1;
@@ -63,7 +64,7 @@ if (!gameSwitch607 && !gameSwitch608){
       $gameTroop.addDropItem(valueItem);
       //var value1 = `\x1bI[${valueItems[Number(arr1[i][2])].iconIndex}]`;
       //var arr7 = [-50,-60,-70,-80,-90,-100,-110,-120,-130,-140,-150,-160,-170,-180,-190,-200];
-      const shiftX = xShiftCoords[Math.floor(Math.random() * xShiftCoords.length)];//x
+      const shiftX = xShiftCoords[Math.floor(Math.random() * xShiftCoordsLength)];//x
       const shiftY = yShiftCoords[Math.floor(Math.random() * yShiftCoordsLength)];//y
       const duration = durations[Math.floor(Math.random() * durationsLength)];//wait
       //var value7 = arr7[Math.floor(Math.random() * arr7.length)];//jump
