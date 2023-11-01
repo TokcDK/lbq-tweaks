@@ -3060,21 +3060,23 @@ var id2 = arr2[Math.floor(Math.random() * arr2.length)];
 //アクターステートに応じて経験値Ｇレート設定
 actor_stateExpGoldRate = function(){
 
-for (var id = 0; id <= valueStatePartyExpRate.length-1; id++) {
-  if($gameParty.membersState(valueStatePartyExpRate[id])){
-    if($dataStates[valueStatePartyExpRate[id]].meta['PartyExpRate']){
-      valueTotalexp += Number($dataStates[valueStatePartyExpRate[id]].meta['PartyExpRate']);
+  const valueStatePartyRates = [valueStatePartyExpRate, valueStatePartyGoldRate];
+  const metaNames = ['PartyExpRate', 'PartyGoldRate'];
+  for (let i = 0; i < 2; i++) {
+    const isExp = i==0;
+    const valueStatePartyRate = valueStatePartyRates[i];
+    const metaName = metaNames[i];
+    for (var id = 0; id < valueStatePartyRate.length; id++) {
+      const rate = valueStatePartyRate[id];
+      if (!$gameParty.membersState(rate)) continue;     
+      const stateRate = $dataStates[rate].meta[metaName];
+      if (stateRate) {
+        // here is using isExp boolean because int value like valueTotalgold is not reference type and if set them to array it will be new int objects 
+        if (isExp) valueTotalexp += Number(stateRate); 
+        else valueTotalgold + Number(stateRate); 
+      };
     };
-  };
-};
-for (var id = 0; id <= valueStatePartyGoldRate.length-1; id++) {
-  if($gameParty.membersState(valueStatePartyGoldRate[id])){
-    if($dataStates[valueStatePartyGoldRate[id]].meta['PartyGoldRate']){
-      valueTotalexp += Number($dataStates[valueStatePartyGoldRate[id]].meta['PartyGoldRate']);
-    };
-  };
-};
-
+  }
 };
 
 //エネミー登場時にse
