@@ -1578,203 +1578,208 @@ spriteset.battlebackFadeIn(6, value4);
 //戦闘時一言集
 battle_wordset = function(id1){
 
-if(ConfigManager.battleAniSpeed >= 3){
+if(ConfigManager.battleAniSpeed < 3) return;
 
-var array0 = 0;
-var array1 = 0;
-var array2 = 0;
+let array0 = 0;
+let array1 = 0;
+let array2 = 0;
+let gameVar20 = $gameVariables.value(20);
+const gameTroopMembers = $gameTroop.members();
+const gameVar276 = $gameVariables.value(276);
 if(id1 == 1){
-  if($gameVariables.value(276) == 1){
+  if(gameVar276 == 1){
     if($gameSwitches.value(464)){
-      $gameVariables.setValue(20,$gameParty.battleMembers()[$gameVariables.value(20)].actorId());
+      $gameVariables.setValue(20,$gameParty.battleMembers()[gameVar20].actorId());
     } else {
-      var enemy1 = $gameTroop.members()[$gameVariables.value(20)];
-      var enemy2 = $dataEnemies[$gameTroop.members()[$gameVariables.value(20)].enemyId()];
+      //var enemy1 = gameTroopMembers[gameVar20]; // not using
+      //var enemy2 = $dataEnemies[gameTroopMembers[gameVar20].enemyId()]; // not using
       $gameVariables.setValue(20,$gameVariables.value(11));
     };
+    gameVar20 = $gameVariables.value(20);
   };
-};
+}
 
 $gameVariables.setValue(277,0);//二言目台詞用。現在未使用
-$gameVariables.setValue(53,$gameActors.actor($gameVariables.value(20)).nickname());
-$gameVariables.setValue(625,$gameVariables.value(380 + $gameVariables.value(20))[59]);
-var actor = $gameActors.actor($gameVariables.value(20));
-var actor2 = $gameActors.actor($gameVariables.value(20)).name();
-var enemy1 = $gameTroop.members()[$gameVariables.value(92)];
-var enemy2 = $dataEnemies[$gameTroop.members()[$gameVariables.value(92)].enemyId()];
-if($gameVariables.value(276) == 2){
+$gameVariables.setValue(53,$gameActors.actor(gameVar20).nickname());
+$gameVariables.setValue(625,$gameVariables.value(380 + gameVar20)[59]);
+
+const actor = $gameActors.actor(gameVar20);
+const actorName = actor.name();
+const actorGv20 = $dataActors[gameVar20];
+if(gameVar276 == 2){
 
   valueFaceSelect = 8;      
   if(actor.tp >= 100){
     valueFaceSelect = 48;
 
   };
-  var array2 = $dataActors[$gameVariables.value(20)].meta['BattleAttack'].split(',');
+  array2 = actorGv20.meta['BattleAttack'].split(',');
   if(actor.isStateAffected(61)){
-    var arr2 = [21,22,23,24];
-    var value2 = arr2[Math.floor(Math.random() * arr2.length)];
-    valueFaceSelect = value2;
+    const arr2 = [21,22,23,24];
+    valueFaceSelect = arr2[Math.floor(Math.random() * arr2.length)];
   };
   if(actor.isStateAffected(68)){
-    var arr1 = [17,18,19,20];
-    var value1 = arr1[Math.floor(Math.random() * arr1.length)];
-    valueFaceSelect = value1;
+    const arr1 = [17,18,19,20];
+    valueFaceSelect = arr1[Math.floor(Math.random() * arr1.length)];
   };
-  if($gameVariables.value(182) == 5){
-    //var array1 = $dataActors[$gameVariables.value(20)].meta['S-AbilityUse'].split(',');
-    var array2 = $dataActors[$gameVariables.value(20)].meta['S-AbilityUse'].split(',');
+  const gameVar182 = $gameVariables.value(182);
+  if(gameVar182 == 5){
+    //var array1 = actorGv20.meta['S-AbilityUse'].split(',');
+    array2 = actorGv20.meta['S-AbilityUse'].split(',');
     valueFaceSelect = 15;
-  };
-  if($gameVariables.value(182) == 6){
-    //var array1 = $dataActors[$gameVariables.value(20)].meta['A-AbilityUse'].split(',');
-    var array2 = $dataActors[$gameVariables.value(20)].meta['A-AbilityUse'].split(',');
+  }
+  else if(gameVar182 == 6){
+    //var array1 = actorGv20.meta['A-AbilityUse'].split(',');
+    array2 = actorGv20.meta['A-AbilityUse'].split(',');
     //フェイスは通常攻撃を流用
-  };
-  if($gameVariables.value(182) == 7){
-    //var array1 = $dataActors[$gameVariables.value(20)].meta['W-AbilityUse'].split(',');
-    var array2 = $dataActors[$gameVariables.value(20)].meta['W-AbilityUse'].split(',');
+  }
+  else if(gameVar182 == 7){
+    //var array1 = actorGv20.meta['W-AbilityUse'].split(',');
+    array2 = actorGv20.meta['W-AbilityUse'].split(',');
     valueFaceSelect = 13;
-  };
-  if($gameVariables.value(182) == 8){
-    //var array1 = $dataActors[$gameVariables.value(20)].meta['R-AbilityUse'].split(',');
-    var array2 = $dataActors[$gameVariables.value(20)].meta['R-AbilityUse'].split(',');
+  }
+  else if(gameVar182 == 8){
+    //var array1 = actorGv20.meta['R-AbilityUse'].split(',');
+    array2 = actorGv20.meta['R-AbilityUse'].split(',');
     valueFaceSelect = 6;
   };
 
-};
-
-if($gameVariables.value(276) == 1){
+}
+else if(gameVar276 == 1){
 
   valueFaceSelect = 9; 
-  var value1 = $gameVariables.value(514);
-  var value2 = actor.hpRate()*100;
-  var array1 = $dataActors[$gameVariables.value(20)].meta['BattleDamage'].split(',');
-  if(value1 == value2){
-    var array1 = $dataActors[$gameVariables.value(20)].meta['Battle0Damage'].split(',');
+  const value1 = $gameVariables.value(514);
+  const value2 = actor.hpRate()*100;
+  array1 = actorGv20.meta['BattleDamage'].split(',');
+  if (value1 - value2 >= 50) {
+    array1 = actorGv20.meta['BattleBigDamage'].split(',');
+    valueFaceSelect = 45;
+  }
+  else if (value1 - value2 <= 2) {
+    array1 = actorGv20.meta['BattleSmallDamage'].split(',');
+    valueFaceSelect = 4;
+  }
+  else if(value1 == value2){
+    array1 = actorGv20.meta['Battle0Damage'].split(',');
     valueFaceSelect = 6; 
-  };
-  if(value1 - value2 <= 2){
-    var array1 = $dataActors[$gameVariables.value(20)].meta['BattleSmallDamage'].split(',');
-    valueFaceSelect = 4; 
-  };
-  if(value1 - value2 >= 50){
-    var array1 = $dataActors[$gameVariables.value(20)].meta['BattleBigDamage'].split(',');
-    valueFaceSelect = 45; 
-  };
-
-};
-
-if($gameVariables.value(276) == 0){
+  }
+}
+else if(gameVar276 == 0){
   if($gameVariables.value(263) >= 3){ //ターン数 
-    var array0 = $dataActors[$gameVariables.value(20)].meta['BattleTurn2'].split(',');
-  };
+    array0 = actorGv20.meta['BattleTurn2'].split(',');
+  }
   if([34,35,36].some(function(id){return actor.isStateAffected(id)})){  //疲労時
-    var array0 = $dataActors[$gameVariables.value(20)].meta['BattleFatigue'].split(',');
-  };
+    array0 = actorGv20.meta['BattleFatigue'].split(',');
+  }
   if(actor.isStateAffected(37)){  //ブラック
-    var array0 = $dataActors[$gameVariables.value(20)].meta['BattleFatigueBlack'].split(',');
-    var array2 = $dataActors[$gameVariables.value(20)].meta['BattleFatigueBlackAttack'].split(',');
-    var array1 = $dataActors[$gameVariables.value(20)].meta['BattleFatigueBlackDamage'].split(',');
-  };
+    array0 = actorGv20.meta['BattleFatigueBlack'].split(',');
+    array2 = actorGv20.meta['BattleFatigueBlackAttack'].split(',');
+    array1 = actorGv20.meta['BattleFatigueBlackDamage'].split(',');
+  }
   if(actor.hpRate() <= 0.3){  //瀕死  
-    var array0 = $dataActors[$gameVariables.value(20)].meta['BattleDying'].split(',');
-  };
+    array0 = actorGv20.meta['BattleDying'].split(',');
+  }
   if($gameParty.battleMembers().length >= 2 && $gameParty.aliveMembers().length <= 1){  //最後の一人
-    var array0 = $dataActors[$gameVariables.value(20)].meta['BattleLastOne'].split(',');
-  };
+    array0 = actorGv20.meta['BattleLastOne'].split(',');
+  }
 
   if(actor.isStateAffected(61) && actor.isStateAffected(602)){  //発情
     if(actor.isLearnedSkill(65)){  
-      var array0 = $dataActors[$gameVariables.value(20)].meta['BattleSexualExcitementMax'].split(',');
-      var array2 = $dataActors[$gameVariables.value(20)].meta['BattleSexualExcitementMaxAttack'].split(',');//攻撃
-      var array1 = $dataActors[$gameVariables.value(20)].meta['BattleSexualExcitementMaxDamage'].split(',');//ダメージ
+      array0 = actorGv20.meta['BattleSexualExcitementMax'].split(',');
+      array2 = actorGv20.meta['BattleSexualExcitementMaxAttack'].split(',');//攻撃
+      array1 = actorGv20.meta['BattleSexualExcitementMaxDamage'].split(',');//ダメージ
     } else {
-      var array0 = $dataActors[$gameVariables.value(20)].meta['BattleSexualExcitement'].split(',');
-      var array2 = $dataActors[$gameVariables.value(20)].meta['BattleSexualExcitementAttack'].split(',');//攻撃
-      var array1 = $dataActors[$gameVariables.value(20)].meta['BattleSexualExcitementDamage'].split(',');//ダメージ
+      array0 = actorGv20.meta['BattleSexualExcitement'].split(',');
+      array2 = actorGv20.meta['BattleSexualExcitementAttack'].split(',');//攻撃
+      array1 = actorGv20.meta['BattleSexualExcitementDamage'].split(',');//ダメージ
     };
-  };
+  }
     if(actor.isStateAffected(63) && actor.isStateAffected(602)){
       if(actor.isLearnedSkill(65)){//拘束
-        var array0 = $dataActors[$gameVariables.value(20)].meta['BattleBindMax'].split(',');
+        array0 = actorGv20.meta['BattleBindMax'].split(',');
       } else {
-        var array0 = $dataActors[$gameVariables.value(20)].meta['BattleBind'].split(',');
+        array0 = actorGv20.meta['BattleBind'].split(',');
       };
     };
     if(actor.isStateAffected(68) && actor.isStateAffected(602)){    //激情
-      var array0 = $dataActors[$gameVariables.value(20)].meta['BattlePassion'].split(',');
+      array0 = actorGv20.meta['BattlePassion'].split(',');
     };
     if(actor.isStateAffected(64) && actor.isStateAffected(602)){    //放心
       if(actor.isLearnedSkill(65)){
-        var array0 = $dataActors[$gameVariables.value(20)].meta['BattleAbsentlyMax'].split(',');
+        array0 = actorGv20.meta['BattleAbsentlyMax'].split(',');
       } else {
-        var array0 = $dataActors[$gameVariables.value(20)].meta['BattleAbsently'].split(',');
+        array0 = actorGv20.meta['BattleAbsently'].split(',');
       };
     };
-};
+}
 
-var value2 = 0;
+let messageText = ``;
+const enemy1 = gameTroopMembers[$gameVariables.value(92)];
+const enemyName = enemy1.name();
 if(id1 == 0){
-  if(array0 != 0){
-    var value2 = actor2 + array0[Math.floor(Math.random() * array0.length)];
-  };
-};
-
-if(id1 == 1){
-  if($gameVariables.value(276) == 2){
-    if(array2 != 0){
-      var array = $dataActors[$gameVariables.value(20)].meta['BattleAttack2Conbo'].split(',');
-      var value1 = array[Math.floor(Math.random() * array.length)];
-      valueWordSet9 = `${actor.name()}の\\C[2]2連撃\\C[0]！ ${value1}`;
-      var array = $dataActors[$gameVariables.value(20)].meta['BattleAttack3Conbo'].split(',');
-      var value1 = array[Math.floor(Math.random() * array.length)];
-      valueWordSet10 = `${actor.name()}の\\C[2]3連撃\\C[0]！ ${value1}`;
-      var value2 = actor2 + array2[Math.floor(Math.random() * array2.length)];
+  if(array0){
+    messageText = actorName + array0[Math.floor(Math.random() * array0.length)];
+  }
+}
+else if(id1 == 1){
+  if(gameVar276 == 2){
+    if(array2){
+      let array = actorGv20.meta['BattleAttack2Conbo'].split(',');
+      let num = array[Math.floor(Math.random() * array.length)];
+      valueWordSet9 = `${actor.name()}の\\C[2]2連撃\\C[0]！ ${num}`;
+      array = actorGv20.meta['BattleAttack3Conbo'].split(',');
+      num = array[Math.floor(Math.random() * array.length)];
+      valueWordSet10 = `${actor.name()}の\\C[2]3連撃\\C[0]！ ${num}`;
+      messageText = actorName + array2[Math.floor(Math.random() * array2.length)];
       battle_bustUp(86,500,10,20);
     };
+  }
+  else if (gameVar276 == 1) {
+    const skillName = `\\C[3]＜${$dataSkills[$gameVariables.value(96)].name}＞\\C[0]`;
+    messageText = `${enemyName}の${skillName}！`;
+    valueWordSet9 = `${enemyName}の\\C[2]2連撃\\C[0]！`;
+    valueWordSet10 = `${enemyName}の\\C[2]3連撃\\C[0]！`;
   };
-  if($gameVariables.value(276) == 1){
-    var value2 = `${enemy1.name()}の\\C[3]＜${$dataSkills[$gameVariables.value(96)].name}＞\\C[0]！`;
-    valueWordSet9 = `${enemy1.name()}の\\C[2]2連撃\\C[0]！`;
-    valueWordSet10 = `${enemy1.name()}の\\C[2]3連撃\\C[0]！`;
-  };
-};
-if(id1 == 2){
-  if($gameVariables.value(276) == 2 && !$gameSwitches.value(464)){
+}
+else if(id1 == 2){
+  const gameVar464 = $gameSwitches.value(464);
+  if (gameVar276 == 2 && !gameVar464) {
+    const enemy2 = $dataEnemies[enemy1.enemyId()];
     if(enemy2.meta['EnemyDamageWord']){
-      var array = enemy2.meta['EnemyDamageWord'].split(',');
-      var value2 = `${enemy1.name()}${array[Math.floor(Math.random() * array.length)]}`;
+      const array = enemy2.meta['EnemyDamageWord'].split(',');
+      messageText = `${enemyName}${array[Math.floor(Math.random() * array.length)]}`;
     } else {
-      var value2 = `${enemy1.name()}は攻撃を受けた！`;
+      messageText = `${enemyName}は攻撃を受けた！`;
     };
-  };
-  if($gameVariables.value(276) == 1 || $gameSwitches.value(464)){
-    if(array1 != 0){
-      var value2 = actor2 + array1[Math.floor(Math.random() * array1.length)];   
-      battle_bustUp(86,500,10,40);
-    };
-  };
-  if($gameVariables.value(276) == 1 && !$gameSwitches.value(464)){
-    var value2 = `${enemy1.name()}は${$dataSkills[$gameVariables.value(96)].name}を受けた！`;//攻撃時だが使用不可
-  };
-};
+  }
+  else if (gameVar276 == 1) {
+    if (gameVar464) {
+      if (array1) {
+        messageText = actorName + array1[Math.floor(Math.random() * array1.length)];
+        battle_bustUp(86, 500, 10, 40);
+      }
+    }
+    else /*if (!gameVar464)*/ {
+      const skillName = `${$dataSkills[$gameVariables.value(96)].name}`
+      messageText = `${enemyName}は${skillName}を受けた！`;//攻撃時だが使用不可
+    }
+  }
+}
 
-if(value2 != 0){
-  BattleManager._logWindow.push(`addText`, value2);
-};
-if($gameVariables.value(277) != 0){
+if(messageText){
+  BattleManager._logWindow.push(`addText`, messageText);
+}
+if($gameVariables.value(277)){
   BattleManager._logWindow.push(`addText`, `\\V[277]`);
-};
+}
 
-if($gameVariables.value(276) == 2){
- // $gameTroop.members()[$gameVariables.value(92)].hpRate()*100;
-} else {
- // $gameActors.actor($gameVariables.value(20)).hpRate()*100;
-};
+//if(gameVar276 == 2){
+ // gameTroopMembers[$gameVariables.value(92)].hpRate()*100;
+//} else {
+ // $gameActors.actor(gameVar20).hpRate()*100;
+//};
 
-};
-
-};
+}
 
 //戦闘開始時に称号効果
 title_battleUp = function(actor){
