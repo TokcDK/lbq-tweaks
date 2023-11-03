@@ -3108,27 +3108,27 @@ if($gameSwitches.value(141)){
   damage = Math.max($attack1(Number(skillDamageFormulaData[0]),user,target,
     Number(skillDamageFormulaData[1])) * 
     Number(skillDamageFormulaData[2]),user.mdf/10);
-  var value1 = damage;
-  let text = `基礎ダメージ値:\\C[10]${value1}\\C[0]`;
+  const dmg = `\\C[10]${damage}\\C[0]`;
+  let text = `基礎ダメージ値:${dmg}`;
   BattleManager._logWindow.push(`addText`, text);
-  let arr1 = user.attackElements();
+  let userAttackElements = user.attackElements();
   if (skill.meta['Multiple Elements']){
-    var arr2 = skill.meta['Multiple Elements'].split(',');
-    arr1 = arr1.concat(arr2);
+    const skillMultipleElements = skill.meta['Multiple Elements'].split(',');
+    userAttackElements = userAttackElements.concat(skillMultipleElements);
   };
-  var value6 = $dataSkills[1].damage.elementId;
-  if(value6 >= 1){
-    arr1.push(value6);
+  const skillDamageElementId = $dataSkills[1].damage.elementId;
+  if(skillDamageElementId >= 1){
+    userAttackElements.push(skillDamageElementId);
   };
 
   const prefix = `[属性] `
   text = prefix;
-  for (var i = 0; i < arr1.length; i++) {
-    var value2 = arr1[i];
-    let value3 = Math.round(valueAttackAmplifysActorId[user.actorId()][value2]);
-    value3 = value3 + Math.round(user.elementAmplifyRate(value2)*100 + 100);
-    var value4 = Math.round(target.elementRate(value2)*100);
-    amygame_elementIcon(value2);
+  for (let i = 0; i < userAttackElements.length; i++) {
+    const userAttackElement = userAttackElements[i];
+    let value3 = Math.round(valueAttackAmplifysActorId[user.actorId()][userAttackElement]);
+    value3 = value3 + Math.round(user.elementAmplifyRate(userAttackElement)*100 + 100);
+    const value4 = Math.round(target.elementRate(userAttackElement)*100);
+    amygame_elementIcon(userAttackElement);
     if(value3 != 100 || value4 != 100){
       if(valueElementIconArr[1] != 1 || valueElementIconArr[1] != 16){
         text += `\x1bI[${valueElementIconArr[1]}]:${value3}-${value4} `;
@@ -3229,7 +3229,7 @@ for (let i = 1; i <= 15; i++) {//$dataSkills[id].tpCost
   if(value4 >= 1){
     value2 = value4;
   };
-  var value3 = value2;
+  const value3 = value2;
   let value1 = Math.floor( Math.random() * 11);
   if(a.isStateAffected(29) && $dataSkills[gameVar346[0]].meta['Select Conditions']){
     value1 += 2;//前衛アタック持ちが後衛の時にアビリティ使用確立アップ
