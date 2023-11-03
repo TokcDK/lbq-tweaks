@@ -3150,82 +3150,96 @@ if($gameSwitches.value(141)){
 //ボス行動パターン設定
 boss_actionPattarn1 = function(a){
 
-var value11 = 0;
-var value4 = 0;
+const gameVar346 = $gameVariables.value(346);
+
+let value11 = 0;
+let value4 = 0;
+let value2 = 0;
+
 if(a.tp >= 100){
   if(a.isStateAffected(416)){
-    var value2 = $gameVariables.value(346)[3];
+    value2 = gameVar346[3];
   } else {
-    if(a.meetsSkillConditions($dataSkills[$gameVariables.value(346)[2]])){
-      var value11 = $gameVariables.value(346)[2];
-    };
-  };
-};
-for (var i = 1; i <= 15; i++) {//$dataSkills[id].tpCost
-const gameVar347i = $gameVariables.value(347)[i];
-if(gameVar347i != 0){
-  if(gameVar347i[0] == 0){//HPトリガー
-    if(a.hpRate() <= gameVar347i[1] / 100){
-      if(899 != gameVar347i[2]){
-        if(!$gameSwitches.value(470) && $dataSkills[gameVar347i[2]].tpCost == 100){a.gainTp(100)};
-        if(a.meetsSkillConditions($dataSkills[gameVar347i[2]])){
-          var value11 = gameVar347i[2];
-          break;
-        };
-      };
-  }}
-  else if(gameVar347i[0] == 1){//MPトリガー
-    if(a.mpRate() <= gameVar347i[1] / 100){
-      if(!$gameSwitches.value(470) && $dataSkills[gameVar347i[2]].tpCost == 100){a.gainTp(100)};
-      if(a.meetsSkillConditions($dataSkills[gameVar347i[2]])){
-        var value11 = gameVar347i[2];
+    if(a.meetsSkillConditions($dataSkills[gameVar346[2]])){
+      value11 = gameVar346[2];
+    }
+  }
+}
+
+const gameVar470 = $gameSwitches.value(470);
+for (let i = 1; i <= 15; i++) {//$dataSkills[id].tpCost
+  const gameVar347i = $gameVariables.value(347)[i];
+  if(!gameVar347i) continue;
+
+  const typeId = gameVar347i[0];
+  const stateId = gameVar347i[1];
+  const skillId = gameVar347i[2];
+  const skill = $dataSkills[skillId];
+  if(typeId == 0){//HPトリガー
+    if (899 != skillId && a.hpRate() <= stateId / 100) {
+      if (!gameVar470 && skill.tpCost == 100) { a.gainTp(100) };
+      if (a.meetsSkillConditions(skill)) {
+        value11 = skillId;
         break;
       };
-  }}
-  else if(gameVar347i[0] == 2){//ターン
-    if(($gameVariables.value(263) % gameVar347i[1]) == 0){
-      if(!$gameSwitches.value(470) && $dataSkills[gameVar347i[2]].tpCost == 100){a.gainTp(100)};
-      if(a.meetsSkillConditions($dataSkills[gameVar347i[2]])){
-          var value11 = gameVar347i[2];
-          break;
-        };
-  }}
-  else if(gameVar347i[0] == 3){//オーバードライブなどステートによる変化
-    if(a.isStateAffected(gameVar347i[1])){
-        if(!$gameSwitches.value(470) && $dataSkills[gameVar347i[2]].tpCost == 100){a.gainTp(100)};
-        if(a.meetsSkillConditions($dataSkills[gameVar347i[2]])){
-          var value11 = gameVar347i[2];
-          break;
-        };
-　}}
-  else if(gameVar347i[0] == 4){//ＨＰによる通常攻撃変化
-    if(a.hpRate() <= gameVar347i[1] / 100){
-      if(a.meetsSkillConditions($dataSkills[gameVar347i[2]])){
-        var value4 = gameVar347i[2];
+    }
+  }
+  else if(typeId == 1){//MPトリガー
+    if(a.mpRate() <= stateId / 100){
+      if(!gameVar470 && skill.tpCost == 100){a.gainTp(100)};
+      if(a.meetsSkillConditions(skill)){
+        value11 = skillId;
         break;
       };
-　}};
-};
-};
-  var arr1 = [$gameVariables.value(346)[0],$gameVariables.value(346)[3],$gameVariables.value(346)[4],$gameVariables.value(346)[5],$gameVariables.value(346)[6]];
-  var value2 = arr1[Math.floor(Math.random() * arr1.length)];
+    }
+  }
+  else if(typeId == 2){//ターン
+    if(($gameVariables.value(263) % stateId) == 0){
+      if(!gameVar470 && skill.tpCost == 100){a.gainTp(100)};
+      if(a.meetsSkillConditions(skill)){
+          value11 = skillId;
+          break;
+        };
+    }
+  }
+  else if(typeId == 3){//オーバードライブなどステートによる変化
+    if(a.isStateAffected(stateId)){
+        if(!gameVar470 && skill.tpCost == 100){a.gainTp(100)};
+        if(a.meetsSkillConditions(skill)){
+          value11 = skillId;
+          break;
+        };
+    }
+  }
+  else if(typeId == 4){//ＨＰによる通常攻撃変化
+    if(a.hpRate() <= stateId / 100){
+      if(a.meetsSkillConditions(skill)){
+        value4 = skillId;
+        break;
+      };
+    }
+  }
+}
+
+  let arr1 = [gameVar346[0],gameVar346[3],gameVar346[4],gameVar346[5],gameVar346[6]];
+  value2 = arr1[Math.floor(Math.random() * arr1.length)];
   if(value2 == 0){
-    var value2 = $gameVariables.value(346)[0];
+    value2 = gameVar346[0];
   };
   if(value4 >= 1){
-    var value2 = value4;
+    value2 = value4;
   };
   var value3 = value2;
-  var value1 = Math.floor( Math.random() * 11);
-  if(a.isStateAffected(29) && $dataSkills[$gameVariables.value(346)[0]].meta['Select Conditions']){
+  let value1 = Math.floor( Math.random() * 11);
+  if(a.isStateAffected(29) && $dataSkills[gameVar346[0]].meta['Select Conditions']){
     value1 += 2;//前衛アタック持ちが後衛の時にアビリティ使用確立アップ
   };
-  if(value1 >= 5){
-    for (var i = 1; i <= 10; i++) {
-      var arr1 = [$gameVariables.value(346)[1],$gameVariables.value(346)[7],$gameVariables.value(346)[8],$gameVariables.value(346)[9]];
-      var value2 = arr1[Math.floor(Math.random() * arr1.length)];
+  if (value1 >= 5) {
+    arr1 = [gameVar346[1], gameVar346[7], gameVar346[8], gameVar346[9]];
+    for (let i = 1; i <= 10; i++) {
+      value2 = arr1[Math.floor(Math.random() * arr1.length)];
       if(value2 == 0){
-        var value2 = $gameVariables.value(346)[1];
+        value2 = gameVar346[1];
       };
       if(a.meetsSkillConditions($dataSkills[value2])){
         break;
@@ -3233,26 +3247,27 @@ if(gameVar347i != 0){
     };
   }
 
-  var value12 = value2;
+  let value12 = value2;
   if(value11 >= 1){
     if(!a.meetsSkillConditions($dataSkills[value11])){
-      var value11 = 0;
+      value11 = 0;
     };
   };
   if(!a.meetsSkillConditions($dataSkills[value12])){
-    var value12 = value3;
+    value12 = value3;
   };
   if( [101,111,121,131,141,151,161,171,181,191,901,911,921].some(function(id){return value12 == id}) ){
-    var value1 = Math.floor( Math.random() * 101);
+    value1 = Math.floor( Math.random() * 101);
     if(a.level >= 30 && value1 >= 51){value12 += 1};
-    var value1 = Math.floor( Math.random() * 101);
+    value1 = Math.floor( Math.random() * 101);
     if(a.level >= 50 && value1 >= 51){value12 += 1};
-    var value1 = Math.floor( Math.random() * 101);
+    value1 = Math.floor( Math.random() * 101);
     if(a.level >= 100 && value1 >= 51){value12 += 1};
   };
+
   valueBossAction = value11;
   valueBossActionNormal = value12;
-  if($gameSwitches.value(470)){
+  if(gameVar470){
     if(valueBossAction >= 1){   
       boss_actionPredict(valueBossAction,1);
     } else {
