@@ -921,8 +921,10 @@ skill_stateonoff = function (actorA, actorB, skillId, stateId) {
   if (actorB.actorId() !== actorA.actorId()) return;
 
   const skill = $dataSkills[skillId];
-  if (stateId === undefined) stateId = Number(skill.meta['SkillStateAddRemove']); // added check for undefined because was input property and same local variable reset
-  
+  if (stateId === undefined || stateId === null) {
+    console.log(`amygame/skill_stateonoff:stateId is ${stateId}! set from SkillStateAddRemove`);
+    stateId = Number(skill.meta['SkillStateAddRemove']); // added check for undefined because was input property and same local variable reset
+  }
   const actor = $gameActors.actor(actorB._actorId);
   const isStateAffected = actor.isStateAffected(stateId);
   if (isStateAffected) actor.removeState(stateId); else actor.addState(stateId);

@@ -3452,20 +3452,19 @@ if($gameTroop.aliveMembers().length >= 1 && target.isAlive()){
 //スキル名表示。id2はid1が2の場合のみ名前を入れておく
 skillWord_direction = function(id1,id2){
 
-var value3 = 384-310;
+let value3 = 384-310;
 if(id1 == 2){
   if($gameParty.inBattle()){
     if($gameSwitches.value(211)){
       $gameTemp._battler_bhp_temp[2] = true;
-    } else {
+    } //else {
       //$gameSystem.setTurnOrderDisplaySettings(false);
       //BattleManager.updateTurnOrderDisplayX();
-    };
+    //};
   };
-  var value1 = id2;
   $gameScreen.dWindowFrame = 'ON';
   $gameScreen.dTextAlign = 1;
-  $gameScreen.setDTextPicture(`${value1}`, 28);
+  $gameScreen.setDTextPicture(`${id2}`, 28);
   $gameScreen.showPicture(100,"",1,640+50,value3,100,100,0,0);
   $gameScreen.movePicture(100,1,640,value3,100,100,255,0,30);
 };
@@ -3478,31 +3477,30 @@ if(id1 == 0){
       //BattleManager.updateTurnOrderDisplayX();
     };
   };
-  var value1 = $gameVariables.value(527);
-  if($dataSkills[$gameVariables.value(96)].meta['rubi']){
-    var value2 = $dataSkills[$gameVariables.value(96)].meta['rubi'];
-    for (var i = 1; i <= 10; i++) {
-      if(value2.match(/ /)){
-        var value2 = value2.replace(' ','');
+  let skill96Ruby = $dataSkills[$gameVariables.value(96)].meta['rubi'];
+  if (skill96Ruby){
+    for (let i = 1; i <= 10; i++) {
+      if(skill96Ruby.match(/ /)){
+        skill96Ruby = skill96Ruby.replace(' ','');
       };
     };
     value3 += 40; 
-    $gameScreen.setDTextPicture(`${value2}`, 20);
+    $gameScreen.setDTextPicture(`${skill96Ruby}`, 20);
   };
   $gameScreen.dWindowFrame = 'ON';
   $gameScreen.dTextAlign = 1;
-  $gameScreen.setDTextPicture(`${value1}`, 28);
+  $gameScreen.setDTextPicture(`${$gameVariables.value(527)}`, 28);
   $gameScreen.showPicture(100,"",1,640+50,value3,100,100,0,0);
   $gameScreen.movePicture(100,1,640,value3,100,100,255,0,30);
 } else {
   if($gameParty.inBattle()){
     if($gameSwitches.value(211)){
       $gameTemp._battler_bhp_temp[2] = false;
-    } else {
+    } //else {
       //$gameSystem.setTurnOrderDisplaySettings(true);
-    };
+    //};
   };
-  if($gameScreen.picture(100)){$gameScreen.movePicture(100,1,640-50,value3,100,100,0,0,60)};
+  if($gameScreen.picture(100)) $gameScreen.movePicture(100,1,640-50,value3,100,100,0,0,60);
 };
 
 };
