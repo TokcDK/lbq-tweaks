@@ -1854,7 +1854,7 @@ Game_Interpreter.prototype.command355 = function() {
     script += this.currentCommand().parameters[0] + '\n';
   }
   try {
-    console.log("Script!!:\n" + script);
+    //console.log("Script eval start:\n" + script + "\n:Script eval end");
     eval(script);
   } catch (e) {
     Yanfly.Util.displayError(e, script, 'SCRIPT CALL ERROR');
