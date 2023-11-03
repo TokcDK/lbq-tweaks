@@ -2818,46 +2818,47 @@ drop_genericDropRate = function(battleDrop, itemsToDrop) {
 
 //汎用ドロップエネミー対象設定ダンジョンのみ。計算のみ計算結果はarr4に蓄積。簡易討伐時
 function drop_enemyDropRate(value12, arr4) {
-  const value = $dataItems[$gameVariables.value(240)];
-  const arrdrop1 = value.meta['EnemyLV'].split(',');
+
+  const item = $dataItems[$gameVariables.value(240)];
+  const itemEnemyLVdata = item.meta['EnemyLV'].split(',');
   const arrdrop3 = $gameVariables.value(220);
-  const value11 = Number(arrdrop1[Math.floor(Math.random() * arrdrop1.length)]);
-  const value18 = Number(arrdrop3[Math.floor(Math.random() * arrdrop3.length)]);
+  const itemEnemyLVdataSelectedIndex = Number(itemEnemyLVdata[Math.floor(Math.random() * itemEnemyLVdata.length)]);
+  const enemyIndex = Number(arrdrop3[Math.floor(Math.random() * arrdrop3.length)]);
 
   const itemsLength = $dataItems.length;
   for (let i = 1; i < itemsLength; i++) {
-    const conditionalItemDrop = $dataEnemies[value18].meta['Conditional Item ' + i + ' Drop'];
+    const conditionalItemDrop = $dataEnemies[enemyIndex].meta['Conditional Item ' + i + ' Drop'];
     if (conditionalItemDrop) {
       const lotteryRarity = $dataItems[i].meta['LotteryRearity'];
       if (lotteryRarity) {
-        let value20;
+        let rarityNum;
 
         switch (Number(lotteryRarity)) {
           case 1:
           case 2:
-            value20 = 1;
+            rarityNum = 1;
             break;
           case 3:
-            value20 = 10;
+            rarityNum = 10;
             break;
           case 4:
-            value20 = 20;
+            rarityNum = 20;
             break;
           case 5:
           case 6:
-            value20 = 30;
+            rarityNum = 30;
             break;
           case 7:
           case 8:
-            value20 = 40;
+            rarityNum = 40;
             break;
           case 9:
           case 10:
-            value20 = 50;
+            rarityNum = 50;
             break;
         }
 
-        if (value11 >= value20) {
+        if (itemEnemyLVdataSelectedIndex >= rarityNum) {
           arr4.push(i);
         }
       }
