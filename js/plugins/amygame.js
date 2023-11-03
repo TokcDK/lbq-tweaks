@@ -921,13 +921,13 @@ skill_stateonoff = function (actorA, actorB, skillId, stateId) {
   if (actorB.actorId() !== actorA.actorId()) return;
 
   const skill = $dataSkills[skillId];
-  if (stateId === undefined || stateId === null) {
-    console.log(`amygame/skill_stateonoff:stateId is ${stateId}! set from SkillStateAddRemove`);
+  if (stateId === undefined || stateId === null || $dataStates[stateId] === null) {
+    //console.log(`amygame/skill_stateonoff:stateId is ${stateId}! set from SkillStateAddRemove`);
     stateId = Number(skill.meta['SkillStateAddRemove']); // added check for undefined because was input property and same local variable reset
   }
   const actor = $gameActors.actor(actorB._actorId);
-  const isStateAffected = actor.isStateAffected(stateId);
-  if (isStateAffected) actor.removeState(stateId); else actor.addState(stateId);
+  const isStateAffected = $dataStates[stateId] !== null && actor.isStateAffected(stateId);
+  if (isStateAffected) actor.removeState(stateId); else if ($dataStates[stateId] !== null) actor.addState(stateId);
   const animationId = isStateAffected ? 289 : 282;
   if ($gameParty.inBattle()) { actorB.startAnimation(animationId, true, 0) };
   if (skill.meta['TachieChangeSet']) {//たぶん使ってない isStateAffected
