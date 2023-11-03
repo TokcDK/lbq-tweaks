@@ -942,7 +942,8 @@ skill_stateonoff = function (actorA, actorB, skillId, stateId) {
 //スキルアイテム使用時に立ち絵が変化する場合。事前に$gameVariables.setValue(20,b.actorId());
 tachie_usedChange1 = function(){
 
-if($dataActors[$gameVariables.value(20)].meta['Heroine']){
+if(!$dataActors[$gameVariables.value(20)].meta['Heroine']) return;
+
   if(!$gameSwitches.value(131) || !$gameParty.inBattle()){
     if($gameSwitches.value(42) && $gameVariables.value(3) == $gameVariables.value(20)){
       tachie_syoukyo1($gameVariables.value(300));
@@ -955,8 +956,6 @@ if($dataActors[$gameVariables.value(20)].meta['Heroine']){
   } else {
     tachie_settei2();
   };
-};
-
 };
 
 //スキルアイテム使用でのぶっかけ付与。
@@ -983,7 +982,7 @@ if($dataActors[target.actorId()].meta['Heroine']){
 //スキルアイテム使用での精液回復。実際のステート回復は<Remove 1 State Category: StateSemen>で実施
 semen_reflesh1 = function(user,target,itemId,id1){
 
-let valueItems = id1 == 0 ? $dataSkills : $dataItems;
+var valueItems = id1 == 0 ? $dataSkills : $dataItems;
 const stateCategoryName = 'StateSemen';
 let semenCount = 0;
 
@@ -991,7 +990,7 @@ const itemMetaSemenRemove = valueItems[itemId].meta['SemenRemove'];
 let end = itemMetaSemenRemove ? Number(itemMetaSemenRemove) : 1;
 
 const semenItem = $dataItems[120];
-for (var i = 1; i <= end; i++) {
+for (let i = 1; i <= end; i++) {
   if(target.isStateCategoryAffected(stateCategoryName)){
     target.removeStateCategory(stateCategoryName, 1);
     $gameParty.gainItem(semenItem, 1);//白濁瓶
@@ -999,7 +998,7 @@ for (var i = 1; i <= end; i++) {
   };
 };
 
-var messageText = target.name() + (semenCount >= 1 ? 'は白濁を洗浄した。(' + semenCount + ')\\iin[120]を入手' : 'には効果が無かった');
+const messageText = target.name() + (semenCount >= 1 ? 'は白濁を洗浄した。(' + semenCount + ')\\iin[120]を入手' : 'には効果が無かった');
 showMessage(messageText);
 target.addState(71);
 showMessage(target.name() + 'は濡れてしまった');
@@ -1086,9 +1085,9 @@ if(valueItems[itemId].meta['StateabNomalOnly']){
         TickerManager.show(value5);
       };
     };
-    if(id1 == 1){
+    //if(id1 == 1){
       //$gameParty.gainItem(valueItems[itemId], +1);
-    };
+    //};
     var value3 = 1;
   };
 };
@@ -1138,11 +1137,7 @@ if(value3 == 0){
       };
       b.removeStateCategory(value2, value4);
       var value5 = `${b.name()}の特殊状態異常を\\C[3]${value4}\\C[0]個回復した！`;
-      if($gameParty.inBattle()){
-        BattleManager._logWindow.push(`addText`, value5);
-      } else {
-        TickerManager.show(value5);
-      };
+      showMessage(value5);
     };
   };
 /*
@@ -1178,12 +1173,8 @@ for (var i = 0; i < valueDispelGuardState.length; i++) {
   if(b.isStateAffected(valueDispelGuardState[i])){
     var value1 = 1;
     var value5 = `${b.name()}のディスペル・ガード効果が発動！　強化消去を無効化した。`;
-    if($gameParty.inBattle()){
-      BattleManager._logWindow.push(`addText`, value5);
-      b.startAnimation(286, true, 0);
-    } else {
-      TickerManager.show(value5);
-    };
+    showMessage(value5);
+    if ($gameParty.inBattle()) b.startAnimation(286, true, 0);
     break;
   };
 };
@@ -1207,9 +1198,9 @@ if(value1 == 0){
         TickerManager.show(value5);
       };
     };
-    if(id1 == 1){
+    //if(id1 == 1){
       //$gameParty.gainItem(valueItems[itemId], +1);
-    };
+    //};
     var value3 = 1;
   };
   if(valueItems[itemId].meta['dispelCountPlus']){
