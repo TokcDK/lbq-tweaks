@@ -237,7 +237,7 @@ worldMap_eraseSelect = function(){
   for (let id = 50; id > 0; id--) {
     const eventData = $gameMap.event(id);
     if (!eventData) continue;
-    
+
     const event = eventData.event();
     if (!!event.meta['WorldNotErase']) continue;
 
@@ -611,13 +611,15 @@ if(!!$gameMap.event(valueBossCharaGura[0])) {
 
 };
 
+var map_npcRespawnNpcDirections = [2, 4, 6, 8];
 //NPC動的生成。0マップ最初。1任意タイミング
 map_npcRespawn = function(id2,id3){
 
-var value1 = 1;
-if(valueRegionMapArray[value1] >= 1){ 
+let value1 = 1;
+if(valueRegionMapArray[value1] < 1) return;
+
 if(id2 == 0){
-  var value1 = $gameVariables.value(241);
+  value1 = $gameVariables.value(241);
   if($gameSwitches.value(16)){
     value1 += Math.floor( Math.random() * 3) + 1;
   };
@@ -625,67 +627,64 @@ if(id2 == 0){
     value1 += Math.floor( Math.random() * 3);
   };
   if($gameSwitches.value(15)){
-    var value1 = Math.round($gameVariables.value(241) / 10);
+    value1 = Math.round($gameVariables.value(241) / 10);
   };
 } else {
-  var value1 = 1;
+  value1 = 1;
 };
 if(id2 == 0 && $gameVariables.value(235) > value1){
-  var value1 = 0;
+  value1 = 0;
 };
-var j = 0;
-if(!$gameVariables.value(202).some(function(id){return $gameMap.mapId() == id}) &&
-$gameSwitches.value(140) &&
-!$gameParty.inBattle() &&
-value1 >= 1){
-  for (var id1 = 1; id1 <= value1; id1++) {
+let j = 0;
+if(!$gameSwitches.value(140) ||
+$gameParty.inBattle() ||
+value1 < 1 ||
+$gameVariables.value(202).some(function (id) { return $gameMap.mapId() == id })) return;
+
+  for (let id1 = 1; id1 <= value1; id1++) {
+    let value11 = id3;
     if(id3 == 0){
       map_npcGraphicSet();
-      var value11 = [52,55][Math.floor(Math.random() * 2)];//テンプレ元イベントID
-    } else {
-      var value11 = id3;
-    };
-    var value2 = $gameVariables.value(33);//キャラグラ名
-    var value3 = $gameVariables.value(35);//キャラグラ番号
-    if(id2 == 0){
-      var value4 = 0;//初期透明度
-    } else {
-      var value4 = 255;
-    };
-    var value5 = $gameVariables.value(37);//移動速度
-    if(value11 == 52){//移動頻度。直線かランダムで変更。
-      var value6 = [3,4,5][Math.floor(Math.random() * 3)];
-    } else {
-      var value6 = $gameVariables.value(34);
-    };
-    var conditionMap         = {};
+      value11 = [52,55][Math.floor(Math.random() * 2)];//テンプレ元イベントID
+    }
+    const conditionMap         = {};
     conditionMap.passable    = 1;
     conditionMap.screen      = 0;
     conditionMap.collided    = 3;
     conditionMap.terrainTags = [0];
     conditionMap.regionIds   = [1];
     $gameMap.spawnEventRandom(value11, conditionMap, true);
-    var value7 = $gameMap.getLastSpawnEventId();
-    var event = $gameMap.event(value7);
+    const lastSpawnEventId = $gameMap.getLastSpawnEventId();
+    const charaEventToRespawn = $gameMap.event(lastSpawnEventId);
     if($gameSwitches.value(377)){
-      event._priorityType = 1;
+      charaEventToRespawn._priorityType = 1;
     };
+    
+    const charaName = $gameVariables.value(33);//キャラグラ名
+    const charaNum = $gameVariables.value(35);//キャラグラ番号
+    const charaCoords = $gameVariables.value(36);
     //$gameSelfSwitches.setValue([$gameMap.mapId(), value7, "D"], true);
-    event.setImage(value2+value3, Math.floor( Math.random() * $gameVariables.value(36)[1]) + $gameVariables.value(36)[0]);
+    charaEventToRespawn.setImage(charaName + charaNum, Math.floor(Math.random() * charaCoords[1]) + charaCoords[0]);
 
     //event.setPattern(value2);//0,1,2不要
-    var arr1 = [2,4,6,8];
-    event.setDirection(arr1[Math.floor(Math.random() * arr1.length)]);//2,4,6,8
-    event.setOpacity(value4);
-    event.setMoveSpeed(value5);
-    event.setMoveFrequency(value6);
+    charaEventToRespawn.setDirection(map_npcRespawnNpcDirections[Math.floor(Math.random() * map_npcRespawnNpcDirections.length)]);//2,4,6,8
+
+    const npcOpacity = id2 == 0 ? 0/*初期透明度*/ : 255;
+    charaEventToRespawn.setOpacity(npcOpacity);
+
+    const npcMoveSpeed = $gameVariables.value(37);//移動速度
+    charaEventToRespawn.setMoveSpeed(npcMoveSpeed);
+
+    const npcMoveFrequency = value11 == 52 ? //移動頻度。直線かランダムで変更。
+      [3, 4, 5][Math.floor(Math.random() * 3)]
+      : $gameVariables.value(34);
+    charaEventToRespawn.setMoveFrequency(npcMoveFrequency);
+
     $gameVariables.setValue(235,$gameVariables.value(235) + 1);
     j += [1,2,1,2,1,1,2][Math.floor(Math.random() * 7)];
-    if(id1 + j >= value1){
-      break;
-    };
-}};
-};
+
+    if (id1 + j >= value1) break;
+  }
 
 };
 
