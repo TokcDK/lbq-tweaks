@@ -659,7 +659,7 @@ $gameVariables.value(202).some(function (id) { return $gameMap.mapId() == id }))
     if($gameSwitches.value(377)){
       charaEventToRespawn._priorityType = 1;
     };
-    
+
     const charaName = $gameVariables.value(33);//キャラグラ名
     const charaNum = $gameVariables.value(35);//キャラグラ番号
     const charaCoords = $gameVariables.value(36);
@@ -691,88 +691,87 @@ $gameVariables.value(202).some(function (id) { return $gameMap.mapId() == id }))
 //エネミー動的生成。0通常。1エロ。map_enemyRespawn(0);
 map_enemyRespawn = function(id2){
 
-var value1 = 1;
-if(valueRegionMapArray[value1] >= 1){ 
+let value1 = 1;
+if(valueRegionMapArray[value1] < 1) return;
+
 //$gameVariables.value(334);//最大数
 //$gameVariables.value(335);//討伐数
   if($gameSwitches.value(655) && !$gameSwitches.value(216)  && $gameVariables.value(335) >= $gameVariables.value(334)){
     $gameVariables.setValue(335,0);
   };
-  if(id2 == 0){
-    var value10 = 16;//元イベントID
-    var value11 = 224;//最大出現数変数
-    var value12 = 222;//現在出現数変数
-  };
-  if(id2 == 1){
-    var value10 = 17;//元イベントID
-    var value11 = 227;//最大出現数変数
-    var value12 = 226;//現在出現数変数
-  };
-  var value1 = $gameVariables.value(value11);//
+  const originalEventId = id2 == 0 ? 16 : 17;//元イベントID
+  const maxOccurNum = id2 == 0 ? 224 : 227;//最大出現数変数
+  const appearance = id2 == 0 ? 222 : 226;//現在出現数変数
+
+  value1 = $gameVariables.value(maxOccurNum);//
   if($gameSwitches.value(15)){
     //var value1 = $gameVariables.value(value11) + Math.round($gameVariables.value(value11) / 5);
   };
-  value1 -= $gameVariables.value(value12);
-  if($gameVariables.value(value12) > $gameVariables.value(value11)){
-    var value1 = 0;
+  value1 -= $gameVariables.value(appearance);
+  if($gameVariables.value(appearance) > $gameVariables.value(maxOccurNum)){
+    value1 = 0;
   };
   //討伐数 + 現在出現数　＞　エネミー最大ポップ数20
-  if($gameVariables.value(335) + $gameVariables.value(value12) >= $gameVariables.value(334)){
-    var value1 = 0;
+  if($gameVariables.value(335) + $gameVariables.value(appearance) >= $gameVariables.value(334)){
+    value1 = 0;
   };
-  if($gameVariables.value(335) + $gameVariables.value(value12) >= $gameVariables.value(334)){
+  //if($gameVariables.value(335) + $gameVariables.value(value12) >= $gameVariables.value(334)){
     //var value1 = 0;
-  };
+  //};
   if(id2 == 1){
     if(!$gameSwitches.value($gameVariables.value(236))){
-      var value1 = 0;
+      value1 = 0;
     };
   };
-  var j = 0;//
-  if($gameVariables.value(202).some(function(id){return $gameMap.mapId() == id})){}else{
-    if($gameSwitches.value(140) && !$gameParty.inBattle() && value1 >= 1){
-      for (var id1 = 1; id1 <= value1; id1++) {
-        var conditionMap         = {};
+  //var j = 0;//
+  if (!$gameSwitches.value(140) ||
+    $gameParty.inBattle() ||
+    value1 < 1 ||
+    $gameVariables.value(202).some(function (id) { return $gameMap.mapId() == id })) return;
+
+      for (let id1 = 1; id1 <= value1; id1++) {
+        const conditionMap       = {};
         conditionMap.passable    = 1;
         conditionMap.screen      = 0;
         conditionMap.collided    = 3;
         conditionMap.terrainTags = [1];
-        conditionMap.regionIds   = [1];
-        $gameMap.spawnEventRandom(value10, conditionMap, true);
-        var event = $gameMap.event($gameMap.getLastSpawnEventId());
-        event.setImage($dataItems[$gameVariables.value(240)].meta.EnemyGraphic.split(',')[0], 
+        conditionMap.regionIds   = [1];        
+        $gameMap.spawnEventRandom(originalEventId, conditionMap, true);
+
+        const enemyEventToRespawn = $gameMap.event($gameMap.getLastSpawnEventId());
+        enemyEventToRespawn.setImage($dataItems[$gameVariables.value(240)].meta.EnemyGraphic.split(',')[0], 
         Number($dataItems[$gameVariables.value(240)].meta.EnemyGraphic.split(',')[1]));
-        event.setOpacity(255);//scale
-        if($dataItems[$gameVariables.value(240)].meta.BigEnemyGraphic){event.setScale(150, 150)};
-        var value15 = Math.floor( Math.random() * 4) + 1;
-        var value16 = Math.floor( Math.random() * 4) + 1;
+        enemyEventToRespawn.setOpacity(255);//scale
+        if($dataItems[$gameVariables.value(240)].meta.BigEnemyGraphic){enemyEventToRespawn.setScale(150, 150)};
+        let value15 = Math.floor( Math.random() * 4) + 1;
+        let value16 = Math.floor( Math.random() * 4) + 1;
         if($gameSwitches.value(363)){
-          var value15 = Math.floor( Math.random() * 3) + 3;
-          var value16 = Math.floor( Math.random() * 3) + 3;
+          value15 = Math.floor( Math.random() * 3) + 3;
+          value16 = Math.floor( Math.random() * 3) + 3;
         };
         if($gameSwitches.value(368)){
-          var value15 = Math.floor( Math.random() * 2) + 1;
-          var value16 = Math.floor( Math.random() * 2) + 1;
+          value15 = Math.floor( Math.random() * 2) + 1;
+          value16 = Math.floor( Math.random() * 2) + 1;
         };
-        event.setMoveSpeed(value15);
-        event.setMoveFrequency(value16);
+        enemyEventToRespawn.setMoveSpeed(value15);
+        enemyEventToRespawn.setMoveFrequency(value16);
         if($gameSwitches.value(360)){
-          event.setScale(150, 150);
+          enemyEventToRespawn.setScale(150, 150);
         };
         if(id2 == 1){
-          event.setTone(50, -100, 50);
+          enemyEventToRespawn.setTone(50, -100, 50);
         };
-        var value13 = 9;
-        var value14 = Math.floor( Math.random() * 11);
+        let value13 = 9;
+        const value14 = Math.floor( Math.random() * 11);
         if(value14 >= 9){
-          var value13 = 10;
+          value13 = 10;
         } 
         if(value14 <= 1){
-          var value13 = 11;
+          value13 = 11;
         } 
         if(id2 == 1 || $gameSwitches.value(493)){
-/*:
-          event.forceMoveRoute({
+/*
+          enemyEventToRespawn.forceMoveRoute({
           "list":[{"code":9},
           {"code":45,"parameters": ["this._chaseRange = 5;"]},
           {"code":45,"parameters": ["this._chaseSpeed = 4;"]},
@@ -784,26 +783,24 @@ if(valueRegionMapArray[value1] >= 1){
 */
         } else {
           if($gameSwitches.value(228)){
-            event.forceMoveRoute({
+            enemyEventToRespawn.forceMoveRoute({
             "list":[{"code":15, "parameters":[600]},
             {"code":0}],"repeat":true,"skippable":true});
           } else {
-            event.forceMoveRoute({
+            enemyEventToRespawn.forceMoveRoute({
             "list":[{"code":value13},
             {"code":0}],"repeat":true,"skippable":true});
           };
         };
         if($gameSwitches.value(207)){
           if(!$gameSwitches.value(236) || !$gameSwitches.value(155)){
-            event.requestAnimation(226);
+            enemyEventToRespawn.requestAnimation(226);
             //$gameScreen.startAnimation(640, 368, 226, false);
           };
         };
         $gameVariables.value(537).push($gameMap.getLastSpawnEventId());
-        $gameVariables.setValue(value12,$gameVariables.value(value12) + 1);
-  }}};
-};
-
+        $gameVariables.setValue(appearance,$gameVariables.value(appearance) + 1);
+      }
 };
 
 //動物動的生成設定
