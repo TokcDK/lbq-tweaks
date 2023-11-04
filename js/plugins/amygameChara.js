@@ -231,26 +231,29 @@ $gameVariables.setValue(36,[0,8]);//インデックス
 //全体マップで消去が必要な場合
 worldMap_eraseSelect = function(){
 
-var value11 = 50;
-for (var id = value11; id > 0; id--) {
-  if(!!$gameMap.event(id)) {
-    if (!$gameMap.event(id).event().meta['WorldNotErase']){
-      for (var j = 0; j <= $gameVariables.value(173).length-1; j++) {
-        if($gameVariables.value(135) == j){
-          var event = $gameMap.event(id).event();
-          if(event.meta['MQProgress']){
-            if(Number(event.meta['MQProgress']) == j){} else {
-              $gameSelfSwitches.setValue([$gameMap.mapId(), id, 'C'], true);
-            };
-          } else {
-            $gameSelfSwitches.setValue([$gameMap.mapId(), id, 'C'], true);
+  const gameVar135 = $gameVariables.value(135);
+  const max = $gameVariables.value(173).length;
+  const mapId = $gameMap.mapId();
+  for (let id = 50; id > 0; id--) {
+    const eventData = $gameMap.event(id);
+    if (!eventData) continue;
+    
+    const event = eventData.event();
+    if (!!event.meta['WorldNotErase']) continue;
+
+    for (let j = 0; j < max; j++) {
+      if (gameVar135 == j) {
+        const eventMQProgress = event.meta['MQProgress'];
+        if (eventMQProgress) {
+          if (Number(eventMQProgress) !== j) {
+            $gameSelfSwitches.setValue([mapId, id, 'C'], true);
           };
+        } else {
+          $gameSelfSwitches.setValue([mapId, id, 'C'], true);
         };
       };
     };
   };
-};
-
 };
 
 //マップNPC配置セット
