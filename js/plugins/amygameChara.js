@@ -739,6 +739,7 @@ if(valueRegionMapArray[value1] < 1) return;
         $gameMap.spawnEventRandom(originalEventId, conditionMap, true);
 
         const enemyEventToRespawn = $gameMap.event($gameMap.getLastSpawnEventId());
+        enemyEventToRespawn._trigger = 2; // spawned enemy will attack player, trigger set to event touch
         enemyEventToRespawn.setImage($dataItems[$gameVariables.value(240)].meta.EnemyGraphic.split(',')[0], 
         Number($dataItems[$gameVariables.value(240)].meta.EnemyGraphic.split(',')[1]));
         enemyEventToRespawn.setOpacity(255);//scale
