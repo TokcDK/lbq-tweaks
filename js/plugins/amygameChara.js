@@ -1114,14 +1114,15 @@ event_respawnSetAN = function (value1, value2, value3, value4, value5, id0, id1,
 //シーン時に道具イベント生成。0一時指定ID-生成済みID指定で生成省略,1ﾌｧｲﾙ名2ｲﾝﾃﾞｯｸｽ3方向4ﾊﾟﾀｰﾝ5x6y
 goodsEvent_respawn = function(value1,id1,id2,id3,id4,id5,id6){
 
+let eventId;
 if($gameVariables.value(292)[value1] == 0){
   $gameMap.spawnEvent(102, id5, id6, true);
-  var eventId = $gameMap.getLastSpawnEventId();
+  eventId = $gameMap.getLastSpawnEventId();
   $gameVariables.value(292)[value1] = eventId;
 } else {
-  var eventId = $gameVariables.value(292)[value1];
+  eventId = $gameVariables.value(292)[value1];
 };
-var event = $gameMap.event(eventId);
+const event = $gameMap.event(eventId);
 event.setDirectionFix(false);
 event.setImage(id1, id2);
 event.setDirection(id3);
