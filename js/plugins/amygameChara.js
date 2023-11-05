@@ -1067,7 +1067,7 @@ for (var id = start; id > 0; id--) {
 
 //シーン時にアクターイベント生成とＩＤ記憶
 event_respawnSetA = function(value1,value2,value3,value4,value5){
-  var actor = $gameActors.actor(value1);
+  const actor = $gameActors.actor(value1);
   event_respawnSetAN(value1, value2, value3, value4, value5, value1 + 20, actor.characterName(), actor.characterIndex(), 0);
 };
 
