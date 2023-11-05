@@ -925,103 +925,89 @@ if($gameSwitches.value(201)){
 //オブジェクト動的生成設定
 map_objectGraphicSet = function(){
 
-if(!$gameSwitches.value(124) || !$gameSwitches.value(238)){//イベント進行時と動的生成停止
+if($gameSwitches.value(124) && $gameSwitches.value(238)) return;//イベント進行時と動的生成停止
+
 if($gameVariables.value(238) >= 1){
   if($gameSwitches.value(202) && valueRegionMapArray[1] >= 1){
-    var arr1 = 0;
-    var arr2 = [19,[1],[1],1,0,3,[0],[1]];//小銭生成
-    var value1 = $gameVariables.value(238);
-    var array1 = [value1-2,value1-1,value1,value1+1];
-    var value2 = array1[Math.floor(Math.random() * array1.length)];
+    const arr2 = [19,[1],[1],1,0,3,[0],[1]];//小銭生成
+    const value1 = $gameVariables.value(238);
+    const array1 = [value1-2,value1-1,value1,value1+1];
+    let value2 = array1[Math.floor(Math.random() * array1.length)];
     if(value2 <= 0){value2 = 1};
-    map_otherGraphicSet(value2,arr1,arr2);
-  };
+    map_otherGraphicSet(value2,0,arr2);
+  }
   if($gameSwitches.value(201) && valueRegionMapArray[1] >= 1){
-    var arr1 = 0;
-    var arr2 = [18,[1],[1],1,0,3,[0],[1]];//小物生成
-    var value1 = $gameVariables.value(238);
-    var array1 = [value1-2,value1-1,value1,value1+1];
-    var value2 = array1[Math.floor(Math.random() * array1.length)];
+    const arr2 = [18,[1],[1],1,0,3,[0],[1]];//小物生成
+    const value1 = $gameVariables.value(238);
+    const array1 = [value1-2,value1-1,value1,value1+1];
+    let value2 = array1[Math.floor(Math.random() * array1.length)];
     if(value2 <= 0){value2 = 1};
-    map_otherGraphicSet(value2,arr1,arr2);
-  };
-};
+    map_otherGraphicSet(value2,0,arr2);
+  }
+}
+
 if($gameSwitches.value(201)){
   $gameVariables.setValue(536,[]);//宝箱生成Id配列
   if(valueRegionMapArray[1] >= 1){
-    var arr1 = 0;
-    var arr2 = [43,[1],[1],1,0,0,[0],[1]];//転送先
-    var value1 = 1;
-    map_otherGraphicSet(value1,arr1,arr2);
-  };
+    const arr2 = [43,[1],[1],1,0,0,[0],[1]];//転送先
+    map_otherGraphicSet(1,0,arr2);
+  }
   if($gameVariables.value(215)[$gameVariables.value(240)].length >= 1 && valueRegionMapArray[8] >= 1){
-    var value2 = Math.ceil($gameVariables.value(215)[$gameVariables.value(240)].length/$gameVariables.value(217));
-    if(value2 > valueRegionMapArray[8]){var value2 = valueRegionMapArray[8]};
-    var arr1 = 0;
-    var arr2 = [86,[1],[1],1,0,0,[0],[8]];
-    map_otherGraphicSet(value2,arr1,arr2);
+    let value2 = Math.ceil($gameVariables.value(215)[$gameVariables.value(240)].length/$gameVariables.value(217));
+    if(value2 > valueRegionMapArray[8]){value2 = valueRegionMapArray[8]};
+    const arr2 = [86,[1],[1],1,0,0,[0],[8]];
+    map_otherGraphicSet(value2,0,arr2);
     $gameVariables.value(536).push($gameMap.getLastSpawnEventId());
-  };
+  }
   if($gameSwitches.value(207) && $gameVariables.value(238) >= 3 && $gameVariables.value(270) >= 20 && valueRegionMapArray[1] >= 1){
-    var arr1 = 0;
-    var arr2 = [20,[1],[1],1,0,0,[0],[1]];//トラップ。エネミーレベル20以上
-    var value1 = $gameVariables.value(238);
-    var array1 = [value1-2,value1-1,value1,value1+1];
-    var value2 = array1[Math.floor(Math.random() * array1.length)];
+    const arr2 = [20,[1],[1],1,0,0,[0],[1]];//トラップ。エネミーレベル20以上
+    const value1 = $gameVariables.value(238);
+    const array1 = [value1-2,value1-1,value1,value1+1];
+    let value2 = array1[Math.floor(Math.random() * array1.length)];
     if(value2 <= 0){value2 = 1};
-    map_otherGraphicSet(value2,arr1,arr2);
-  };
-};
+    map_otherGraphicSet(value2,0,arr2);
+  }
+}
+
 if($gameVariables.value(260) >= 1 && valueRegionMapArray[1] >= 1){
-  var value2 = $gameVariables.value(260);
+  let value2 = $gameVariables.value(260);
   value2 += Math.round($gameVariables.value(238)/2);
   value2 += Math.floor( Math.random() * 4) + -2;
-    if(value2 >= 1){
-      for (var id10 = 1; id10 <= value2; id10++) {
-        var arr = [70,93,85,92,91,94,88,89,95,96];//亡骸
-        var value1 = arr[Math.floor(Math.random() * arr.length)];
-        var arr1 = 0;
-        var arr2 = [value1,[1],[1],1,0,0,[0],[1]];
-        map_otherGraphicSet(1,arr1,arr2);
-      };
-    };
-};
-for (var id10 = 1; id10 <= 10; id10++) {//固有素材。<CGPriority:1,1>
-  if($gameVariables.value(259)[id10] >= 1){
-    if(id10 == 1){var value1 = 78};
-    if(id10 == 2){var value1 = 42};
-    if(id10 == 3){var value1 = 5};
-    if(id10 == 4){var value1 = 103};
-    if(id10 == 5){var value1 = 104};
-    if(id10 == 6){var value1 = 105};
-    if(id10 == 7){var value1 = 126};
-    if(id10 == 8){var value1 = 127};
-    if(id10 == 9){var value1 = 128};
-    if(id10 == 10){var value1 = 129};
-    var value2 = Math.round($gameVariables.value(238));
-    value2 += Math.floor( Math.random() * 6) + 5;
-      if(value2 >= 1){
-        arr1 = 0;
-          if(id10 == 7){
-            if(valueRegionMapArray[3] >= 1){
-              var arr2 = [value1,[1],[1],1,0,3,[3],[3]];
-              var arr1 = 0;
-              map_otherGraphicSet(value2,arr1,arr2);
-            };
-          } else {
-            if(valueRegionMapArray[1] >= 1){
-              var arr1 = 0;
-              var arr2 = [value1,[1],[1],1,0,3,[0],[1]];
-              map_otherGraphicSet(value2,arr1,arr2);
-            };
-          };
+  if (value2 >= 1) {
+    const arr = [70, 93, 85, 92, 91, 94, 88, 89, 95, 96];//亡骸
+      for (let id10 = 1; id10 <= value2; id10++) {
+        const value1 = arr[Math.floor(Math.random() * arr.length)];
+        const arr2 = [value1,[1],[1],1,0,0,[0],[1]];
+        map_otherGraphicSet(1,0,arr2);
+      }
+  }
+}
 
-      };
-  };
-};
-};
+const gameVar259 = $gameVariables.value(259);
+const gameVar238= $gameVariables.value(238);
+const value1Arr = [78, 42, 5, 103, 104, 105, 126, 127, 128, 129];
+for (let id10 = 1; id10 <= 10; id10++) {//固有素材。<CGPriority:1,1>
+  if (gameVar259[id10] < 1) continue;
 
-};
+  let value2 = Math.round(gameVar238);
+  value2 += Math.floor(Math.random() * 6) + 5;
+  if (value2 < 1) continue;
+  
+  const value1 = value1Arr[id10];
+  if (id10 == 7) {
+    if (valueRegionMapArray[3] >= 1) {
+      const arr2 = [value1, [1], [1], 1, 0, 3, [3], [3]];
+      map_otherGraphicSet(value2, 0, arr2);
+    }
+  } else {
+    if (valueRegionMapArray[1] >= 1) {
+      const arr2 = [value1, [1], [1], 1, 0, 3, [0], [1]];
+      map_otherGraphicSet(value2, 0, arr2);
+    }
+  }
+}
+
+}
 
 //色々動的生成設定
 var map_otherGraphicSetEndNowArray = [1, 2, 1, 1, 1, 1, 1];
@@ -1043,7 +1029,7 @@ map_otherGraphicSet = function(id1,arr1,arr2){
     
     gameVar210SpawnEventIdsArray.push($gameMap.getLastSpawnEventId());
     const event = $gameMap.event($gameMap.getLastSpawnEventId());
-    if(arr1 != 0){
+    if(arr1){
       event.setImage(arr1[Math.floor(Math.random() * arr1.length)],Math.floor( Math.random() * 8) + 0);
     }
     event.setMoveSpeed(arr2[1][Math.floor(Math.random() * arr2[1].length)]);//1-6
