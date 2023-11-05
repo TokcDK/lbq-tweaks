@@ -1283,55 +1283,33 @@ event_doorOpenClose = function(id1,id2){
 //扉チップの開閉の際の効果音
 event_doorOpenCloseSe = function(id1,id2){
 
-if(id1 == 1){
-  if(!!$gameMap.event(id2)) {
-    var arr1 = ['Open1',90,100];
-    if($gameMap.event(id2).characterName() == '!$fsm_Door06'){
-      var arr1 = ['Z_clothesTakeOff',100,80];
-    };
-    if($gameMap.event(id2).characterName() == '!Door1' && $gameMap.event(id2).characterIndex() == 5){
-      var arr1 = ['Z_clothesTakeOff',100,80];
-    };
-    if($gameMap.event(id2).characterName() == '!Door1' && $gameMap.event(id2).characterIndex() == 6){
-      var arr1 = ['Door2',90,100];
-    };
-    if($gameMap.event(id2).characterName() == '!$SF_Gate1' || $gameMap.event(id2).characterName() == '!$SF_Gate3'){
-      var arr1 = ['Open3',90,100];
-    };
-    if($gameMap.event(id2).characterName() == '!$Gate1' || $gameMap.event(id2).characterName() == '!$Gate2'){
-      var arr1 = ['Open3',90,100];
-    };
-    if($gameMap.event(id2).characterName() == '!$SF_Gate2'){
-      var arr1 = ['door6AutoDoorHeavy',90,100];
-    };
-    AudioManager.playSe({"name":arr1[0],"volume":arr1[1],"pitch":arr1[2],"pan":0});
-  };
-};
-if(id1 == 2){
-  if(!!$gameMap.event(id2)) {
-    var arr1 = ['Close1',90,150];
-    if($gameMap.event(id2).characterName() == '!$fsm_Door06'){
-      var arr1 = ['Z_clothesTakeOff',100,80];
-    };
-    if($gameMap.event(id2).characterName() == '!Door1' && $gameMap.event(id2).characterIndex() == 5){
-      var arr1 = ['Z_clothesTakeOff',100,80];
-    };
-    if($gameMap.event(id2).characterName() == '!Door1' && $gameMap.event(id2).characterIndex() == 6){
-      var arr1 = ['Door2',90,150];
-    };
-    if($gameMap.event(id2).characterName() == '!$SF_Gate1' || $gameMap.event(id2).characterName() == '!$SF_Gate3'){
-      var arr1 = ['Close3',90,70];
-    };
-    if($gameMap.event(id2).characterName() == '!$Gate1' || $gameMap.event(id2).characterName() == '!$Gate2'){
-      var arr1 = ['Close3',90,70];
-    };
-    if($gameMap.event(id2).characterName() == '!$SF_Gate2'){
-      var arr1 = ['door6AutoDoorHeavy',90,150];
-    };
-    AudioManager.playSe({"name":arr1[0],"volume":arr1[1],"pitch":arr1[2],"pan":0});
-  };
-};
+  if (!!$gameMap.event(id2)) {
+    const is1 = id1 == 1;
+    const i1 = is1 ? 100 : 150;
+    const i2 = is1 ? 100 : 70;
+    const n = is1 ? 'Open' : 'Close';
 
+    let arr1 = [n + '1', 90, i1];
+    if ($gameMap.event(id2).characterName() == '!$fsm_Door06') {
+      arr1 = ['Z_clothesTakeOff', 100, 80];
+    }
+    else if ($gameMap.event(id2).characterName() == '!Door1' && $gameMap.event(id2).characterIndex() == 5) {
+      arr1 = ['Z_clothesTakeOff', 100, 80];
+    }
+    else if ($gameMap.event(id2).characterName() == '!Door1' && $gameMap.event(id2).characterIndex() == 6) {
+      arr1 = ['Door2', 90, i1];
+    }
+    else if ($gameMap.event(id2).characterName() == '!$SF_Gate1' || $gameMap.event(id2).characterName() == '!$SF_Gate3') {
+      arr1 = [n + '3', 90, i2];
+    }
+    else if ($gameMap.event(id2).characterName() == '!$Gate1' || $gameMap.event(id2).characterName() == '!$Gate2') {
+      arr1 = [n + '3', 90, i2];
+    }
+    else if ($gameMap.event(id2).characterName() == '!$SF_Gate2') {
+      arr1 = ['door6AutoDoorHeavy', 90, i1];
+    }
+    AudioManager.playSe({ "name": arr1[0], "volume": arr1[1], "pitch": arr1[2], "pan": 0 });
+  }
 };
 
 //そのマップのNPC死体任意位置作成。ランダムはコモン162
