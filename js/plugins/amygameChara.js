@@ -807,72 +807,73 @@ if(valueRegionMapArray[value1] < 1) return;
 //動物動的生成設定
 map_animalGraphicSet = function(id1){
 
-var arr1 = 0;
-var arr2 = 0;
-if(id1 == 0){
+  if (id1 !== 0) return;
+
+  let arr1 = 0;
+  let arr2 = 0;
+  const gameSwitch15 = $gameSwitches.value(15);
   if($gameSwitches.value(366)){//夜梟、飛行or待機
-    var value2 = Math.floor( Math.random() * 2);
-      if(value2 == 0){
+    const rnd0or1 = Math.floor( Math.random() * 2);
+      if(rnd0or1 == 0){
         if(valueRegionMapArray[1] >= 1){ 
-          var arr1 = ["ZanimalForestNightOwl1"];
-          var arr2 = [62,[3,4],[5],0,0,3,[0],[1]];
+          arr1 = ["ZanimalForestNightOwl1"];
+          arr2 = [62,[3,4],[5],0,0,3,[0],[1]];
         };
       } else {
         if(valueRegionMapArray[2] >= 1){
-          var arr1 = ["ZanimalForestNightOwl2"];
-          var arr2 = [63,[1],[1],0,0,3,[0],[2]];
+          arr1 = ["ZanimalForestNightOwl2"];
+          arr2 = [63,[1],[1],0,0,3,[0],[2]];
         };
       };
-      if($gameSwitches.value(15)){map_otherGraphicSet(id1,arr1,arr2)};
-  };
+      if(gameSwitch15){map_otherGraphicSet(id1,arr1,arr2)};
+  }
   if($gameSwitches.value(365) && valueRegionMapArray[3] >= 1){//水棲
-    var arr1 = ["ZannimalWatersideCrab1","ZannimalWatersideFrog2"];
-    var arr2 = [59,[3,4],[2,3],0,0,3,[3],[3]];
+    arr1 = ["ZannimalWatersideCrab1","ZannimalWatersideFrog2"];
+    arr2 = [59,[3,4],[2,3],0,0,3,[3],[3]];
     map_otherGraphicSet(id1,arr1,arr2);
-  };
+  }
   if($gameSwitches.value(364) && valueRegionMapArray[1] >= 1){//野生動物
-    var arr1 = ["ZanimalWildCow1","ZanimalWilddeer1","ZanimalWildMonkey1","ZanimalWildBoar1","ZanimalWildBigCat1","ZanimalWildGoat1","ZanimalWildBear1"];
-    var arr2 = [58,[3,4],[2,3,4],1,0,3,[0],[1]];
+    arr1 = ["ZanimalWildCow1","ZanimalWilddeer1","ZanimalWildMonkey1","ZanimalWildBoar1","ZanimalWildBigCat1","ZanimalWildGoat1","ZanimalWildBear1"];
+    arr2 = [58,[3,4],[2,3,4],1,0,3,[0],[1]];
     map_otherGraphicSet(id1,arr1,arr2);
-  };
+  }
   if(valueRegionMapArray[4] >= 1){//家畜動物
-    var arr1 = ["ZanimalLivestockPig1","ZanimalLivestockHorse1","ZanimalLivestockCow1","ZanimalLivestockCow2","ZanimalLivestockGoat1","ZanimalLivestockSheep1","ZanimalLivestockChicken1"];
-    var arr2 = [57,[3,4],[2,3,4],1,0,3,[0],[4]];
+    arr1 = ["ZanimalLivestockPig1","ZanimalLivestockHorse1","ZanimalLivestockCow1","ZanimalLivestockCow2","ZanimalLivestockGoat1","ZanimalLivestockSheep1","ZanimalLivestockChicken1"];
+    arr2 = [57,[3,4],[2,3,4],1,0,3,[0],[4]];
     map_otherGraphicSet(id1,arr1,arr2);
-  };
+  }
   if($gameSwitches.value(362) && valueRegionMapArray[3] >= 1){//魚
-    var arr1 = ["Zanimaltinyfish"];
-    var arr2 = [47,[3,4,5],[4,5],0,0,3,[3],[3]];
-    if(!$gameSwitches.value(15)){map_otherGraphicSet(id1,arr1,arr2)};
-  };
+    arr1 = ["Zanimaltinyfish"];
+    arr2 = [47,[3,4,5],[4,5],0,0,3,[3],[3]];
+    if(!gameSwitch15){map_otherGraphicSet(id1,arr1,arr2)};
+  }
   if($gameSwitches.value(202) && $gameSwitches.value(203) && $gameVariables.value(238) >= 2){//街中、町屋外、広さ一定
-    if($gameSwitches.value(15) && valueRegionMapArray[2] >= 1){//夜。伏せ動物
-      var arr1 = ["ZanimalNight"];
-      var arr2 = [56,[1,2],[1,2],0,0,3,[0],[2]];
-      map_otherGraphicSet(id1,arr1,arr2);
-    };
-    if(!$gameSwitches.value(15) && valueRegionMapArray[1] >= 1){//鳥
-      var arr1 = ["!flyingsmallbirds"];
-      var arr2 = [44,[3,4],[5],1,0,3,[0],[1]];
-      map_otherGraphicSet(id1,arr1,arr2);
-    };
-    if(!$gameSwitches.value(15)){
-      if(!$gameSwitches.value(361) && valueRegionMapArray[1] >= 1){//犬猫
-        var arr1 = ["ZanimalCat1","ZanimalCat2","ZanimalDog1","ZanimalDog2","ZanimalCat3"];
-        var arr2 = [45,[2,3,4],[2,3,4],1,0,3,[0],[1]];
-        map_otherGraphicSet(id1,arr1,arr2);
-      };
-    };
-    if(!$gameSwitches.value(15)){
-      if(!$gameSwitches.value(361) && valueRegionMapArray[1] >= 1){//蝶
-        var arr1 = ["ZanimalButterflys"];
-        var arr2 = [46,[2,3,4],[5],1,0,3,[0],[1]];
-        map_otherGraphicSet(id1,arr1,arr2);
-      };
-    };
-  };
-};
+    if (gameSwitch15) {
+      if (valueRegionMapArray[2] >= 1) {
+        //夜。伏せ動物
+        arr1 = ["ZanimalNight"];
+        arr2 = [56, [1, 2], [1, 2], 0, 0, 3, [0], [2]];
+        map_otherGraphicSet(id1, arr1, arr2);
+      }
+    } else if (valueRegionMapArray[1] >= 1) {
+      //鳥
+      arr1 = ["!flyingsmallbirds"];
+      arr2 = [44, [3, 4], [5], 1, 0, 3, [0], [1]];
+      map_otherGraphicSet(id1, arr1, arr2);
 
+      if (!$gameSwitches.value(361)) {
+        //犬猫
+        arr1 = ["ZanimalCat1", "ZanimalCat2", "ZanimalDog1", "ZanimalDog2", "ZanimalCat3"];
+        arr2 = [45, [2, 3, 4], [2, 3, 4], 1, 0, 3, [0], [1]];
+        map_otherGraphicSet(id1, arr1, arr2);
+
+        //蝶
+        arr1 = ["ZanimalButterflys"];
+        arr2 = [46, [2, 3, 4], [5], 1, 0, 3, [0], [1]];
+        map_otherGraphicSet(id1, arr1, arr2);
+      }
+    }    
+  }
 };
 
 //メモで指定したオブジェクト動的生成設定
