@@ -1069,51 +1069,45 @@ for (var id = value11; id > 0; id--) {
 
 //シーン時にアクターイベント生成とＩＤ記憶
 event_respawnSetA = function(value1,value2,value3,value4,value5){
-
-  var value6 = $gameMap.eventIdXy(value2, value3);
-  if(value6 >= 1){
-    if ($gameMap.event(value6).event().meta['Respawn']){}else{
-      $gameMap.eraseEvent(value6);
-    };
-  };
-  $gameMap.spawnEvent(value1 + 20, value2, value3, true);
-  var eventId = $gameMap.getLastSpawnEventId();
-  $gameVariables.value(292)[value1] = eventId;
-  var event = $gameMap.event($gameVariables.value(292)[value1]);
   var actor = $gameActors.actor(value1);
-  event.setImage(actor.characterName(), actor.characterIndex());
-  if([2,4,6,8].some(function(id3){return value5 == id3})){
-    event.setDirection(value5);
-  };
-  if(value4 == 1){
-    drowsepost.camera.zoom(1, 60, $gameVariables.value(292)[value1]);
-    $gameSystem._listenerEvent = $gameVariables.value(292)[value1];
-    //$gamePlayer.setTransparent(true);
-  };
-
+  event_respawnSetAN(value1, value2, value3, value4, value5, value1 + 20, actor.characterName(), actor.characterIndex(), 0);
 };
 
 //シーン時にＮＰＣイベント生成とＩＤ記憶event_respawnSetN(11,x,y,0,'People1',0);
 event_respawnSetN = function(value1,value2,value3,value4,id1,id2,value5){
+  event_respawnSetAN(value1, value2, value3, value4, value5, 40, id1, id2, 1);
+};
 
-  var value6 = $gameMap.eventIdXy(value2, value3);
-  if(value6 >= 1){
-    if ($gameMap.event(value6).event().meta['Respawn']){}else{
-      if ($gameMap.event(value6).isThrough()){}else{
+/*:
+ * Merged code of event_respawnSetA and event_respawnSetN
+ * @function
+ * @param {integer} an
+*/
+event_respawnSetAN = function (value1, value2, value3, value4, value5, id0, id1, id2, an) {
+
+  const value6 = $gameMap.eventIdXy(value2, value3);
+  if (value6 >= 1) {
+    const ev = $gameMap.event(value6);
+    if (!ev.event().meta['Respawn']) {
+      if (an === 0 || !ev.isThrough()) {
         $gameMap.eraseEvent(value6);
       };
     };
   };
-  $gameMap.spawnEvent(40, value2, value3, true);
-  var eventId = $gameMap.getLastSpawnEventId();
-  $gameVariables.value(292)[value1] = eventId;
-  var event = $gameMap.event($gameVariables.value(292)[value1]);
+
+  $gameMap.spawnEvent(id0, value2, value3, true);
+  const eventId = $gameMap.getLastSpawnEventId();
+  const gameVar292 = $gameVariables.value(292);
+  gameVar292[value1] = eventId;
+  const event = $gameMap.event(gameVar292[value1]);
   event.setImage(id1, id2);
-  if([2,4,6,8].some(function(id3){return value5 == id3})){
+  if ([2, 4, 6, 8].some(function (id3) { return value5 == id3 })) {
     event.setDirection(value5);
   };
-  if(value4 == 1){
-    drowsepost.camera.zoom(1, 60, $gameVariables.value(292)[value1]);
+  
+  if (value4 == 1) {
+    drowsepost.camera.zoom(1, 60, gameVar292[value1]);
+    if (an === 0) $gameSystem._listenerEvent = gameVar292[value1];
     //$gamePlayer.setTransparent(true);
   };
 
