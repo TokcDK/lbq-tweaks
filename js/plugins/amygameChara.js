@@ -1263,32 +1263,22 @@ for (var i = start; i <= end; i++) {
 //扉チップの開閉event_doorOpenClose(1,5);event_doorOpenClose(2,5);
 event_doorOpenClose = function(id1,id2){
 
-if(id1 == 1){
-  if(!!$gameMap.event(id2)) {
+  const is1 = id1 == 1;
+  if (!!$gameMap.event(id2)) {
+    const c1 = is1 ? 17 : 18;
+    const c2 = is1 ? 18 : 17;
+    const c3 = is1 ? 19 : 16;
     $gameMap.event(id2).forceMoveRoute({
-    "list":[
-    {"code":36},{"code":17},{"code":15, "parameters":[5]},
-    {"code":18},{"code":15, "parameters":[5]},
-    {"code":19},{"code":15, "parameters":[5]},
-    {"code":35},{"code":15, "parameters":[5]},
-    {"code":0}],"repeat":false,"skippable":false});
-    event_doorOpenCloseSe(id1,id2);
-  };
-};
-if(id1 == 2){
-  if(!!$gameMap.event(id2)) {
-    $gameMap.event(id2).forceMoveRoute({
-    "list":[
-    {"code":36},{"code":18},{"code":15, "parameters":[5]},
-    {"code":17},{"code":15, "parameters":[5]},
-    {"code":16},{"code":15, "parameters":[5]},
-    {"code":35},{"code":15, "parameters":[5]},
-    {"code":0}],"repeat":false,"skippable":false});
-    event_doorOpenCloseSe(id1,id2);
-  };
-};
-
-};
+      "list": [
+        { "code": 36 }, { "code": c1 }, { "code": 15, "parameters": [5] },
+        { "code": c2 }, { "code": 15, "parameters": [5] },
+        { "code": c3 }, { "code": 15, "parameters": [5] },
+        { "code": 35 }, { "code": 15, "parameters": [5] },
+        { "code": 0 }], "repeat": false, "skippable": false
+    });
+    event_doorOpenCloseSe(id1, id2);
+  }
+}
 
 //扉チップの開閉の際の効果音
 event_doorOpenCloseSe = function(id1,id2){
