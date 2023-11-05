@@ -1396,22 +1396,24 @@ valueanimalEventId = id1;
 //動物反応指定
 animal_ActionSelect = function(id1){
 
-var value1 = 0;
-if($gameMap.event(id1)._characterName.match(/Pig/)){var value1 = 1;var value2 = `ブヒっ`};
-if($gameMap.event(id1)._characterName.match(/Horse/)){AudioManager.playSe({"name":'Horse',"volume":70,"pitch":100,"pan":0})};
-if($gameMap.event(id1)._characterName.match(/Cow/)){AudioManager.playSe({"name":'Cow',"volume":70,"pitch":100,"pan":0})};
-if($gameMap.event(id1)._characterName.match(/Sheep/)){var value1 = 1;var value2 = `メェっ…`};
-if($gameMap.event(id1)._characterName.match(/Chicken/)){AudioManager.playSe({"name":'Chicken',"volume":70,"pitch":100,"pan":0})};
-if($gameMap.event(id1)._characterName.match(/Goat/)){var value1 = 1;var value2 = `メェ～～っ`};
-if($gameMap.event(id1)._characterName.match(/Monkey/)){var value1 = 1;var value2 = `ウキィっ！`};
-if($gameMap.event(id1)._characterName.match(/Bear/)){AudioManager.playSe({"name":'Monster6',"volume":70,"pitch":80,"pan":0})};
-if($gameMap.event(id1)._characterName.match(/Deer/)){var value1 = 1;var value2 = `ピィっ`};
-if($gameMap.event(id1)._characterName.match(/Boar/)){var value1 = 1;var value2 = `ブルルゥっ！`};
-if($gameMap.event(id1)._characterName.match(/BigCat/)){AudioManager.playSe({"name":'Monster1',"volume":70,"pitch":120,"pan":0})};
-if($gameMap.event(id1)._characterName.match(/Cow/)){AudioManager.playSe({"name":'Cow',"volume":70,"pitch":100,"pan":0})};
-if($gameMap.event(id1)._characterName.match(/Crab/)){var value1 = 1;var value2 = `カニィっ`};
-if($gameMap.event(id1)._characterName.match(/Frog/)){AudioManager.playSe({"name":'Frog',"volume":70,"pitch":100,"pan":0})};
-if($gameMap.event(id1)._characterName.match(/fish/)){};
+let value1 = 0;
+let value2 = ``;
+const eventCharaName = $gameMap.event(id1)._characterName;
+if(eventCharaName.match(/Pig/)){value1 = 1;value2 = `ブヒっ`}
+else if(eventCharaName.match(/Horse/)){AudioManager.playSe({"name":'Horse',"volume":70,"pitch":100,"pan":0})}
+else if(eventCharaName.match(/Cow/)){AudioManager.playSe({"name":'Cow',"volume":70,"pitch":100,"pan":0})}
+else if(eventCharaName.match(/Sheep/)){value1 = 1;value2 = `メェっ…`}
+else if(eventCharaName.match(/Chicken/)){AudioManager.playSe({"name":'Chicken',"volume":70,"pitch":100,"pan":0})}
+else if(eventCharaName.match(/Goat/)){value1 = 1;value2 = `メェ～～っ`}
+else if(eventCharaName.match(/Monkey/)){value1 = 1;value2 = `ウキィっ！`}
+else if(eventCharaName.match(/Bear/)){AudioManager.playSe({"name":'Monster6',"volume":70,"pitch":80,"pan":0})}
+else if(eventCharaName.match(/Deer/)){value1 = 1;value2 = `ピィっ`}
+else if(eventCharaName.match(/Boar/)){value1 = 1;value2 = `ブルルゥっ！`}
+else if(eventCharaName.match(/BigCat/)){AudioManager.playSe({"name":'Monster1',"volume":70,"pitch":120,"pan":0})}
+else if(eventCharaName.match(/Cow/)){AudioManager.playSe({"name":'Cow',"volume":70,"pitch":100,"pan":0})}
+else if(eventCharaName.match(/Crab/)){value1 = 1;value2 = `カニィっ`}
+else if(eventCharaName.match(/Frog/)){AudioManager.playSe({"name":'Frog',"volume":70,"pitch":100,"pan":0})}
+else if(eventCharaName.match(/fish/)){};
 
 if(value1 == 1){
   valueanimalEvent2Id = value2;
