@@ -1155,7 +1155,7 @@ const gameVar530 = $gameVariables.value(530);
 for (let i = start; i <= end; i++) {
   const isValid = gameVar530 !== i && $gameActors.actor(i).isLearnedSkill(18);
   if (!isValid) continue;
-  
+
   if (gameVar530 == 0) {
     const x = $gamePlayer.x;
     const y = $gamePlayer.y;
@@ -1192,29 +1192,37 @@ for (let i = start; i <= end; i++) {
 //パーティメンバーキャラチップを一括で同じ動作event_partyCharaMove(3,0); event_partyCharaMove(45,"UP: 10;");
 event_partyCharaMove = function(id1,id2){
 
-var start = 1;
-var end = 15;
-for (var i = start; i <= end; i++) {
-  if($gameVariables.value(292)[i] >= 1){
-    if(!!$gameMap.event($gameVariables.value(292)[i])) {
-      if ($gameMap.event($gameVariables.value(292)[i]).event().meta['Actor']){
-        if(id1 == 45){
-          $gameMap.event($gameVariables.value(292)[i]).forceMoveRoute({
-          "list":[
-          {"code":id1,"parameters":[id2]},
-          {"code":0}],"repeat":false,"skippable":true});
-        } else {
-          $gameMap.event($gameVariables.value(292)[i]).forceMoveRoute({
-          "list":[
-          {"code":id1,"parameters":[id2]},
-          {"code":0}],"repeat":false,"skippable":true});
-        };
-      };
-    };
-  };
-};
+for (let i = 1; i <= 15; i++) {
+  const eventId = $gameVariables.value(292)[i];
+  let isValid = eventId >= 1;
+  if (!isValid) continue;
 
-};
+  const event = $gameMap.event(eventId);
+  isValid = !!event && event.event().meta['Actor'];
+  if (!isValid) continue;
+
+  //WARN! both forceMoveRoute below is identical! useless condition id1 == 45 , typo?
+  event.forceMoveRoute({
+    "list": [
+      { "code": id1, "parameters": [id2] },
+      { "code": 0 }], "repeat": false, "skippable": true
+  });
+  // if (id1 == 45) {
+  //   event.forceMoveRoute({
+  //     "list": [
+  //       { "code": id1, "parameters": [id2] },
+  //       { "code": 0 }], "repeat": false, "skippable": true
+  //   });
+  // } else {
+  //   event.forceMoveRoute({
+  //     "list": [
+  //       { "code": id1, "parameters": [id2] },
+  //       { "code": 0 }], "repeat": false, "skippable": true
+  //   });
+  // }
+}
+
+}
 
 //メモタグ指定で一括で同じ動作event_NpcCharaMove(3,0,'Actor'); event_NpcCharaMove(45,"UP: 10;",'Actor');
 event_NpcCharaMove = function(id1,id2,value1){
