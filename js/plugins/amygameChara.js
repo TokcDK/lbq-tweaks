@@ -1147,47 +1147,47 @@ event_partyCharaEntry = function(){
 if($gameVariables.value(292) == 0){
   $gameVariables.setValue(292,Array(51).fill(0));
 };
-var arr1 = [[1,1],[1,-1],[1,2],[1,-2],[-1,1],[-1,-1],[-1,2],[-1,-2],[2,1],[2,-1],[2,2],[2,-2],[-2,1],[-2,-1],[-2,2],[-2,-2]];
-var start = $gameVariables.value(75);
-var end = $gameVariables.value(76);
-for (var i = start; i <= end; i++) {
-  if($gameActors.actor(i).isLearnedSkill(18)){
-    var value1 = i;
-    if($gameVariables.value(530) == 0){
-      if($gameVariables.value(530) == value1){}else{
-        var value2 = $gamePlayer.x;
-        var value3 = $gamePlayer.y;
-        var arr2 = arr1[Math.floor(Math.random() * arr1.length)];//ID
-        var index = arr1.findIndex(arr1 => arr1 == arr2); 
-        if(index >= 0){
+const gameVar292 = $gameVariables.value(292);
+const arr1 = [[1,1],[1,-1],[1,2],[1,-2],[-1,1],[-1,-1],[-1,2],[-1,-2],[2,1],[2,-1],[2,2],[2,-2],[-2,1],[-2,-1],[-2,2],[-2,-2]];
+const start = $gameVariables.value(75);
+const end = $gameVariables.value(76);
+const gameVar530 = $gameVariables.value(530);
+for (let i = start; i <= end; i++) {
+  const isValid = gameVar530 !== i && $gameActors.actor(i).isLearnedSkill(18);
+  if (!isValid) continue;
+  
+  if (gameVar530 == 0) {
+    const x = $gamePlayer.x;
+    const y = $gamePlayer.y;
+    const arr2 = arr1[Math.floor(Math.random() * arr1.length)];//ID
+    const index = arr1.findIndex(arr1 => arr1 == arr2);
+    if (index >= 0) {
+      arr1.splice(index, 1);
+    }
+    event_respawnSetA(i, x + arr2[0], y + arr2[1], 0, 0);
+  } else {
+    let value5 = 0;
+    for (let j = 0; j <= 10; j++) {
+      if (value5 == 0 && arr1 != []) {
+        const ev = $gameMap.event(gameVar292[gameVar530]);
+        const x = ev.x;
+        const y = ev.y;
+        const arr2 = arr1[Math.floor(Math.random() * arr1.length)];//ID
+        const index = arr1.findIndex(arr1 => arr1 == arr2);
+        if (index >= 0) {
           arr1.splice(index, 1);
         };
-        event_respawnSetA(value1,value2+arr2[0],value3+arr2[1],0,0);
-      };
-    }else{
-      if($gameVariables.value(530) == value1){}else{  
-        var value5 = 0;
-        for (var j = 0; j <= 10; j++) {
-          if(value5 == 0 && arr1 != []){
-            var value2 = $gameMap.event($gameVariables.value(292)[$gameVariables.value(530)]).x;
-            var value3 = $gameMap.event($gameVariables.value(292)[$gameVariables.value(530)]).y;
-            var arr2 = arr1[Math.floor(Math.random() * arr1.length)];//ID
-            var index = arr1.findIndex(arr1 => arr1 == arr2); 
-            if(index >= 0){
-              arr1.splice(index, 1);
-            };
-            var value4 = $gameMap.terrainTag(value2+arr2[0], value3+arr2[1]);
-            if(value4 == 1){
-              event_respawnSetA(value1,value2+arr2[0],value3+arr2[1],0,0);
-              value5 += 1;
-            };
-          };
-        };
-      };
-    };
-}};
+        const value4 = $gameMap.terrainTag(x + arr2[0], y + arr2[1]);
+        if (value4 == 1) {
+          event_respawnSetA(i, x + arr2[0], y + arr2[1], 0, 0);
+          value5 += 1;
+        }
+      }
+    }
+  }
+}
 
-};
+}
 
 //パーティメンバーキャラチップを一括で同じ動作event_partyCharaMove(3,0); event_partyCharaMove(45,"UP: 10;");
 event_partyCharaMove = function(id1,id2){
