@@ -1122,13 +1122,8 @@ if($gameVariables.value(292)[value1] == 0){
 } else {
   eventId = $gameVariables.value(292)[value1];
 };
-const event = $gameMap.event(eventId);
-event.setDirectionFix(false);
-event.setImage(id1, id2);
-event.setDirection(id3);
-event.setPattern(id4);
-event._originalPattern = id4;
-event.setDirectionFix(true);
+
+goodsEvent_imageChange(eventId, id1, id2, id3, id4);
 
 };
 
@@ -1136,7 +1131,7 @@ event.setDirectionFix(true);
 //goodsEvent_imageChange(this._eventId,'Goods7',5,8,1);
 goodsEvent_imageChange = function(eventId,id1,id2,id3,id4){
 
-var event = $gameMap.event(eventId);
+const event = $gameMap.event(eventId);
 event.setDirectionFix(false);
 event.setImage(id1, id2);
 event.setDirection(id3);
