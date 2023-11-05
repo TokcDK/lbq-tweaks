@@ -1054,17 +1054,14 @@ map_otherGraphicSet = function(id1,arr1,arr2){
 //マップイベント消去メモタグで指定
 map_eventErase = function(id1){
 
-var value1 = $gameMap.events().length;
-if(value1 >= 90){
-  var value11 = 200;
-} else {
-  var value11 = 100;
-};
-for (var id = value11; id > 0; id--) {
-  if(!!$gameMap.event(id)) {
-    if ($gameMap.event(id).event().meta[id1]){
-      $gameMap.eraseEvent(id);
-}}};
+const eventsCount = $gameMap.events().length;
+const start = eventsCount >= 90 ? 200 : 100;
+for (var id = start; id > 0; id--) {
+  const ev = $gameMap.event(id);
+  if (!!ev && ev.event().meta[id1]) {
+    $gameMap.eraseEvent(id);
+  }
+}
 
 };
 
