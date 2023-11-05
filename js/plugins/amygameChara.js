@@ -807,72 +807,73 @@ if(valueRegionMapArray[value1] < 1) return;
 //動物動的生成設定
 map_animalGraphicSet = function(id1){
 
-var arr1 = 0;
-var arr2 = 0;
-if(id1 == 0){
+  if (id1 !== 0) return;
+
+  let arr1 = 0;
+  let arr2 = 0;
+  const gameSwitch15 = $gameSwitches.value(15);
   if($gameSwitches.value(366)){//夜梟、飛行or待機
-    var value2 = Math.floor( Math.random() * 2);
-      if(value2 == 0){
+    const rnd0or1 = Math.floor( Math.random() * 2);
+      if(rnd0or1 == 0){
         if(valueRegionMapArray[1] >= 1){ 
-          var arr1 = ["ZanimalForestNightOwl1"];
-          var arr2 = [62,[3,4],[5],0,0,3,[0],[1]];
+          arr1 = ["ZanimalForestNightOwl1"];
+          arr2 = [62,[3,4],[5],0,0,3,[0],[1]];
         };
       } else {
         if(valueRegionMapArray[2] >= 1){
-          var arr1 = ["ZanimalForestNightOwl2"];
-          var arr2 = [63,[1],[1],0,0,3,[0],[2]];
+          arr1 = ["ZanimalForestNightOwl2"];
+          arr2 = [63,[1],[1],0,0,3,[0],[2]];
         };
       };
-      if($gameSwitches.value(15)){map_otherGraphicSet(id1,arr1,arr2)};
-  };
+      if(gameSwitch15){map_otherGraphicSet(id1,arr1,arr2)};
+  }
   if($gameSwitches.value(365) && valueRegionMapArray[3] >= 1){//水棲
-    var arr1 = ["ZannimalWatersideCrab1","ZannimalWatersideFrog2"];
-    var arr2 = [59,[3,4],[2,3],0,0,3,[3],[3]];
+    arr1 = ["ZannimalWatersideCrab1","ZannimalWatersideFrog2"];
+    arr2 = [59,[3,4],[2,3],0,0,3,[3],[3]];
     map_otherGraphicSet(id1,arr1,arr2);
-  };
+  }
   if($gameSwitches.value(364) && valueRegionMapArray[1] >= 1){//野生動物
-    var arr1 = ["ZanimalWildCow1","ZanimalWilddeer1","ZanimalWildMonkey1","ZanimalWildBoar1","ZanimalWildBigCat1","ZanimalWildGoat1","ZanimalWildBear1"];
-    var arr2 = [58,[3,4],[2,3,4],1,0,3,[0],[1]];
+    arr1 = ["ZanimalWildCow1","ZanimalWilddeer1","ZanimalWildMonkey1","ZanimalWildBoar1","ZanimalWildBigCat1","ZanimalWildGoat1","ZanimalWildBear1"];
+    arr2 = [58,[3,4],[2,3,4],1,0,3,[0],[1]];
     map_otherGraphicSet(id1,arr1,arr2);
-  };
+  }
   if(valueRegionMapArray[4] >= 1){//家畜動物
-    var arr1 = ["ZanimalLivestockPig1","ZanimalLivestockHorse1","ZanimalLivestockCow1","ZanimalLivestockCow2","ZanimalLivestockGoat1","ZanimalLivestockSheep1","ZanimalLivestockChicken1"];
-    var arr2 = [57,[3,4],[2,3,4],1,0,3,[0],[4]];
+    arr1 = ["ZanimalLivestockPig1","ZanimalLivestockHorse1","ZanimalLivestockCow1","ZanimalLivestockCow2","ZanimalLivestockGoat1","ZanimalLivestockSheep1","ZanimalLivestockChicken1"];
+    arr2 = [57,[3,4],[2,3,4],1,0,3,[0],[4]];
     map_otherGraphicSet(id1,arr1,arr2);
-  };
+  }
   if($gameSwitches.value(362) && valueRegionMapArray[3] >= 1){//魚
-    var arr1 = ["Zanimaltinyfish"];
-    var arr2 = [47,[3,4,5],[4,5],0,0,3,[3],[3]];
-    if(!$gameSwitches.value(15)){map_otherGraphicSet(id1,arr1,arr2)};
-  };
+    arr1 = ["Zanimaltinyfish"];
+    arr2 = [47,[3,4,5],[4,5],0,0,3,[3],[3]];
+    if(!gameSwitch15){map_otherGraphicSet(id1,arr1,arr2)};
+  }
   if($gameSwitches.value(202) && $gameSwitches.value(203) && $gameVariables.value(238) >= 2){//街中、町屋外、広さ一定
-    if($gameSwitches.value(15) && valueRegionMapArray[2] >= 1){//夜。伏せ動物
-      var arr1 = ["ZanimalNight"];
-      var arr2 = [56,[1,2],[1,2],0,0,3,[0],[2]];
-      map_otherGraphicSet(id1,arr1,arr2);
-    };
-    if(!$gameSwitches.value(15) && valueRegionMapArray[1] >= 1){//鳥
-      var arr1 = ["!flyingsmallbirds"];
-      var arr2 = [44,[3,4],[5],1,0,3,[0],[1]];
-      map_otherGraphicSet(id1,arr1,arr2);
-    };
-    if(!$gameSwitches.value(15)){
-      if(!$gameSwitches.value(361) && valueRegionMapArray[1] >= 1){//犬猫
-        var arr1 = ["ZanimalCat1","ZanimalCat2","ZanimalDog1","ZanimalDog2","ZanimalCat3"];
-        var arr2 = [45,[2,3,4],[2,3,4],1,0,3,[0],[1]];
-        map_otherGraphicSet(id1,arr1,arr2);
-      };
-    };
-    if(!$gameSwitches.value(15)){
-      if(!$gameSwitches.value(361) && valueRegionMapArray[1] >= 1){//蝶
-        var arr1 = ["ZanimalButterflys"];
-        var arr2 = [46,[2,3,4],[5],1,0,3,[0],[1]];
-        map_otherGraphicSet(id1,arr1,arr2);
-      };
-    };
-  };
-};
+    if (gameSwitch15) {
+      if (valueRegionMapArray[2] >= 1) {
+        //夜。伏せ動物
+        arr1 = ["ZanimalNight"];
+        arr2 = [56, [1, 2], [1, 2], 0, 0, 3, [0], [2]];
+        map_otherGraphicSet(id1, arr1, arr2);
+      }
+    } else if (valueRegionMapArray[1] >= 1) {
+      //鳥
+      arr1 = ["!flyingsmallbirds"];
+      arr2 = [44, [3, 4], [5], 1, 0, 3, [0], [1]];
+      map_otherGraphicSet(id1, arr1, arr2);
 
+      if (!$gameSwitches.value(361)) {
+        //犬猫
+        arr1 = ["ZanimalCat1", "ZanimalCat2", "ZanimalDog1", "ZanimalDog2", "ZanimalCat3"];
+        arr2 = [45, [2, 3, 4], [2, 3, 4], 1, 0, 3, [0], [1]];
+        map_otherGraphicSet(id1, arr1, arr2);
+
+        //蝶
+        arr1 = ["ZanimalButterflys"];
+        arr2 = [46, [2, 3, 4], [5], 1, 0, 3, [0], [1]];
+        map_otherGraphicSet(id1, arr1, arr2);
+      }
+    }    
+  }
 };
 
 //メモで指定したオブジェクト動的生成設定
@@ -924,202 +925,187 @@ if($gameSwitches.value(201)){
 //オブジェクト動的生成設定
 map_objectGraphicSet = function(){
 
-if(!$gameSwitches.value(124) || !$gameSwitches.value(238)){//イベント進行時と動的生成停止
+if($gameSwitches.value(124) && $gameSwitches.value(238)) return;//イベント進行時と動的生成停止
+
 if($gameVariables.value(238) >= 1){
   if($gameSwitches.value(202) && valueRegionMapArray[1] >= 1){
-    var arr1 = 0;
-    var arr2 = [19,[1],[1],1,0,3,[0],[1]];//小銭生成
-    var value1 = $gameVariables.value(238);
-    var array1 = [value1-2,value1-1,value1,value1+1];
-    var value2 = array1[Math.floor(Math.random() * array1.length)];
+    const arr1 = 0;
+    const arr2 = [19,[1],[1],1,0,3,[0],[1]];//小銭生成
+    const value1 = $gameVariables.value(238);
+    const array1 = [value1-2,value1-1,value1,value1+1];
+    let value2 = array1[Math.floor(Math.random() * array1.length)];
+    if(value2 <= 0){value2 = 1};
+    map_otherGraphicSet(value2, arr1,arr2);
+  }
+  if ($gameSwitches.value(201) && valueRegionMapArray[1] >= 1) {
+    const arr1 = 0;
+    const arr2 = [18,[1],[1],1,0,3,[0],[1]];//小物生成
+    const value1 = $gameVariables.value(238);
+    const array1 = [value1-2,value1-1,value1,value1+1];
+    let value2 = array1[Math.floor(Math.random() * array1.length)];
     if(value2 <= 0){value2 = 1};
     map_otherGraphicSet(value2,arr1,arr2);
-  };
-  if($gameSwitches.value(201) && valueRegionMapArray[1] >= 1){
-    var arr1 = 0;
-    var arr2 = [18,[1],[1],1,0,3,[0],[1]];//小物生成
-    var value1 = $gameVariables.value(238);
-    var array1 = [value1-2,value1-1,value1,value1+1];
-    var value2 = array1[Math.floor(Math.random() * array1.length)];
-    if(value2 <= 0){value2 = 1};
-    map_otherGraphicSet(value2,arr1,arr2);
-  };
-};
+  }
+}
+
 if($gameSwitches.value(201)){
   $gameVariables.setValue(536,[]);//宝箱生成Id配列
-  if(valueRegionMapArray[1] >= 1){
-    var arr1 = 0;
-    var arr2 = [43,[1],[1],1,0,0,[0],[1]];//転送先
-    var value1 = 1;
-    map_otherGraphicSet(value1,arr1,arr2);
-  };
+  if (valueRegionMapArray[1] >= 1) {
+    const arr1 = 0;
+    const arr2 = [43,[1],[1],1,0,0,[0],[1]];//転送先
+    map_otherGraphicSet(1,arr1,arr2);
+  }
   if($gameVariables.value(215)[$gameVariables.value(240)].length >= 1 && valueRegionMapArray[8] >= 1){
-    var value2 = Math.ceil($gameVariables.value(215)[$gameVariables.value(240)].length/$gameVariables.value(217));
-    if(value2 > valueRegionMapArray[8]){var value2 = valueRegionMapArray[8]};
-    var arr1 = 0;
-    var arr2 = [86,[1],[1],1,0,0,[0],[8]];
+    let value2 = Math.ceil($gameVariables.value(215)[$gameVariables.value(240)].length/$gameVariables.value(217));
+    if (value2 > valueRegionMapArray[8]) { value2 = valueRegionMapArray[8] };
+    const arr1 = 0;
+    const arr2 = [86,[1],[1],1,0,0,[0],[8]];
     map_otherGraphicSet(value2,arr1,arr2);
     $gameVariables.value(536).push($gameMap.getLastSpawnEventId());
-  };
+  }
   if($gameSwitches.value(207) && $gameVariables.value(238) >= 3 && $gameVariables.value(270) >= 20 && valueRegionMapArray[1] >= 1){
-    var arr1 = 0;
-    var arr2 = [20,[1],[1],1,0,0,[0],[1]];//トラップ。エネミーレベル20以上
-    var value1 = $gameVariables.value(238);
-    var array1 = [value1-2,value1-1,value1,value1+1];
-    var value2 = array1[Math.floor(Math.random() * array1.length)];
+    const arr2 = [20, [1], [1], 1, 0, 0, [0], [1]];//トラップ。エネミーレベル20以上
+    const arr1 = 0;
+    const value1 = $gameVariables.value(238);
+    const array1 = [value1-2,value1-1,value1,value1+1];
+    let value2 = array1[Math.floor(Math.random() * array1.length)];
     if(value2 <= 0){value2 = 1};
     map_otherGraphicSet(value2,arr1,arr2);
-  };
-};
+  }
+}
+
 if($gameVariables.value(260) >= 1 && valueRegionMapArray[1] >= 1){
-  var value2 = $gameVariables.value(260);
+  let value2 = $gameVariables.value(260);
   value2 += Math.round($gameVariables.value(238)/2);
   value2 += Math.floor( Math.random() * 4) + -2;
-    if(value2 >= 1){
-      for (var id10 = 1; id10 <= value2; id10++) {
-        var arr = [70,93,85,92,91,94,88,89,95,96];//亡骸
-        var value1 = arr[Math.floor(Math.random() * arr.length)];
-        var arr1 = 0;
-        var arr2 = [value1,[1],[1],1,0,0,[0],[1]];
+  if (value2 >= 1) {
+    const arr = [70, 93, 85, 92, 91, 94, 88, 89, 95, 96];//亡骸
+    for (let id10 = 1; id10 <= value2; id10++) {
+        const arr1 = 0;
+        const value1 = arr[Math.floor(Math.random() * arr.length)];
+        const arr2 = [value1,[1],[1],1,0,0,[0],[1]];
         map_otherGraphicSet(1,arr1,arr2);
-      };
-    };
-};
-for (var id10 = 1; id10 <= 10; id10++) {//固有素材。<CGPriority:1,1>
-  if($gameVariables.value(259)[id10] >= 1){
-    if(id10 == 1){var value1 = 78};
-    if(id10 == 2){var value1 = 42};
-    if(id10 == 3){var value1 = 5};
-    if(id10 == 4){var value1 = 103};
-    if(id10 == 5){var value1 = 104};
-    if(id10 == 6){var value1 = 105};
-    if(id10 == 7){var value1 = 126};
-    if(id10 == 8){var value1 = 127};
-    if(id10 == 9){var value1 = 128};
-    if(id10 == 10){var value1 = 129};
-    var value2 = Math.round($gameVariables.value(238));
-    value2 += Math.floor( Math.random() * 6) + 5;
-      if(value2 >= 1){
-        arr1 = 0;
-          if(id10 == 7){
-            if(valueRegionMapArray[3] >= 1){
-              var arr2 = [value1,[1],[1],1,0,3,[3],[3]];
-              var arr1 = 0;
-              map_otherGraphicSet(value2,arr1,arr2);
-            };
-          } else {
-            if(valueRegionMapArray[1] >= 1){
-              var arr1 = 0;
-              var arr2 = [value1,[1],[1],1,0,3,[0],[1]];
-              map_otherGraphicSet(value2,arr1,arr2);
-            };
-          };
+      }
+  }
+}
 
-      };
-  };
-};
-};
+const gameVar259 = $gameVariables.value(259);
+const gameVar238= $gameVariables.value(238);
+const value1Arr = [-1, 78, 42, 5, 103, 104, 105, 126, 127, 128, 129]; // -1 added for to not change id10 values
+for (let id10 = 1; id10 <= 10; id10++) {//固有素材。<CGPriority:1,1>
+  const isValid = gameVar259[id10] >= 1;
+  if (!isValid) continue; // 'gameVar259[id10] < 1' is not the same here for some reason :(
 
-};
+  let value2 = Math.round(gameVar238);
+  value2 += Math.floor(Math.random() * 6) + 5;
+  if (value2 < 1) continue;
+  
+  const value1 = value1Arr[id10];
+  if (id10 == 7) {
+    if (valueRegionMapArray[3] >= 1) {
+      const arr1 = 0;
+      const arr2 = [value1, [1], [1], 1, 0, 3, [3], [3]];
+      map_otherGraphicSet(value2, arr1, arr2);
+    }
+  } else {
+    if (valueRegionMapArray[1] >= 1) {
+      const arr1 = 0;
+      const arr2 = [value1, [1], [1], 1, 0, 3, [0], [1]];
+      map_otherGraphicSet(value2, arr1, arr2);
+    }
+  }
+}
+
+}
 
 //色々動的生成設定
+var map_otherGraphicSetEndNowArray = [1, 2, 1, 1, 1, 1, 1];
 map_otherGraphicSet = function(id1,arr1,arr2){
 
-if(arr2 != 0){
-  var j = 0;
-  if(id1 == 0){
-    var value1 = $gameVariables.value(238);
-  } else {
-    var value1 = id1;
-  };
-  for (var i = 1; i <= value1; i++) {
-    var conditionMap         = {};
+  if(arr2 === 0) return;
+
+  let j = 0;
+  const gameVar210SpawnEventIdsArray = $gameVariables.value(210);
+  const end = id1 == 0 ? $gameVariables.value(238) : id1;
+  for (let i = 1; i <= end; i++) {
+    const conditionMap         = {};
     conditionMap.passable    = arr2[3];
     conditionMap.screen      = arr2[4];
     conditionMap.collided    = arr2[5];
     conditionMap.terrainTags = arr2[6];
     conditionMap.regionIds   = arr2[7];
     $gameMap.spawnEventRandom(arr2[0], conditionMap, true);
-    $gameVariables.value(210).push($gameMap.getLastSpawnEventId());
-    var event = $gameMap.event($gameMap.getLastSpawnEventId());
-    if(arr1 != 0){
+    
+    gameVar210SpawnEventIdsArray.push($gameMap.getLastSpawnEventId());
+    const event = $gameMap.event($gameMap.getLastSpawnEventId());
+    if(arr1){
       event.setImage(arr1[Math.floor(Math.random() * arr1.length)],Math.floor( Math.random() * 8) + 0);
-    };
+    }
     event.setMoveSpeed(arr2[1][Math.floor(Math.random() * arr2[1].length)]);//1-6
     event.setMoveFrequency(arr2[2][Math.floor(Math.random() * arr2[2].length)]);//1-5
-    j += [1,2,1,1,1,1,1][Math.floor(Math.random() * 3)];
-    if(i + j >= value1){
+    
+    j += map_otherGraphicSetEndNowArray[Math.floor(Math.random() * 3)];
+    if(i + j >= end){
       break;
-    };
-  };
-};
-
-};
+    }
+  }
+}
 
 //マップイベント消去メモタグで指定
 map_eventErase = function(id1){
 
-var value1 = $gameMap.events().length;
-if(value1 >= 90){
-  var value11 = 200;
-} else {
-  var value11 = 100;
-};
-for (var id = value11; id > 0; id--) {
-  if(!!$gameMap.event(id)) {
-    if ($gameMap.event(id).event().meta[id1]){
-      $gameMap.eraseEvent(id);
-}}};
+const eventsCount = $gameMap.events().length;
+const start = eventsCount >= 90 ? 200 : 100;
+for (var id = start; id > 0; id--) {
+  const ev = $gameMap.event(id);
+  if (!!ev && ev.event().meta[id1]) {
+    $gameMap.eraseEvent(id);
+  }
+}
 
 };
 
 //シーン時にアクターイベント生成とＩＤ記憶
 event_respawnSetA = function(value1,value2,value3,value4,value5){
-
-  var value6 = $gameMap.eventIdXy(value2, value3);
-  if(value6 >= 1){
-    if ($gameMap.event(value6).event().meta['Respawn']){}else{
-      $gameMap.eraseEvent(value6);
-    };
-  };
-  $gameMap.spawnEvent(value1 + 20, value2, value3, true);
-  var eventId = $gameMap.getLastSpawnEventId();
-  $gameVariables.value(292)[value1] = eventId;
-  var event = $gameMap.event($gameVariables.value(292)[value1]);
-  var actor = $gameActors.actor(value1);
-  event.setImage(actor.characterName(), actor.characterIndex());
-  if([2,4,6,8].some(function(id3){return value5 == id3})){
-    event.setDirection(value5);
-  };
-  if(value4 == 1){
-    drowsepost.camera.zoom(1, 60, $gameVariables.value(292)[value1]);
-    $gameSystem._listenerEvent = $gameVariables.value(292)[value1];
-    //$gamePlayer.setTransparent(true);
-  };
-
+  const actor = $gameActors.actor(value1);
+  event_respawnSetAN(value1, value2, value3, value4, value5, value1 + 20, actor.characterName(), actor.characterIndex(), 0);
 };
 
 //シーン時にＮＰＣイベント生成とＩＤ記憶event_respawnSetN(11,x,y,0,'People1',0);
 event_respawnSetN = function(value1,value2,value3,value4,id1,id2,value5){
+  event_respawnSetAN(value1, value2, value3, value4, value5, 40, id1, id2, 1);
+};
 
-  var value6 = $gameMap.eventIdXy(value2, value3);
-  if(value6 >= 1){
-    if ($gameMap.event(value6).event().meta['Respawn']){}else{
-      if ($gameMap.event(value6).isThrough()){}else{
+/*:
+ * Merged code of event_respawnSetA and event_respawnSetN
+ * @function
+ * @param {integer} an
+*/
+event_respawnSetAN = function (value1, value2, value3, value4, value5, id0, id1, id2, an) {
+
+  const value6 = $gameMap.eventIdXy(value2, value3);
+  if (value6 >= 1) {
+    const ev = $gameMap.event(value6);
+    if (!ev.event().meta['Respawn']) {
+      if (an === 0 || !ev.isThrough()) {
         $gameMap.eraseEvent(value6);
       };
     };
   };
-  $gameMap.spawnEvent(40, value2, value3, true);
-  var eventId = $gameMap.getLastSpawnEventId();
-  $gameVariables.value(292)[value1] = eventId;
-  var event = $gameMap.event($gameVariables.value(292)[value1]);
+
+  $gameMap.spawnEvent(id0, value2, value3, true);
+  const eventId = $gameMap.getLastSpawnEventId();
+  const gameVar292 = $gameVariables.value(292);
+  gameVar292[value1] = eventId;
+  const event = $gameMap.event(gameVar292[value1]);
   event.setImage(id1, id2);
-  if([2,4,6,8].some(function(id3){return value5 == id3})){
+  if ([2, 4, 6, 8].some(function (id3) { return value5 == id3 })) {
     event.setDirection(value5);
   };
-  if(value4 == 1){
-    drowsepost.camera.zoom(1, 60, $gameVariables.value(292)[value1]);
+  
+  if (value4 == 1) {
+    drowsepost.camera.zoom(1, 60, gameVar292[value1]);
+    if (an === 0) $gameSystem._listenerEvent = gameVar292[value1];
     //$gamePlayer.setTransparent(true);
   };
 
@@ -1128,20 +1114,16 @@ event_respawnSetN = function(value1,value2,value3,value4,id1,id2,value5){
 //シーン時に道具イベント生成。0一時指定ID-生成済みID指定で生成省略,1ﾌｧｲﾙ名2ｲﾝﾃﾞｯｸｽ3方向4ﾊﾟﾀｰﾝ5x6y
 goodsEvent_respawn = function(value1,id1,id2,id3,id4,id5,id6){
 
+let eventId;
 if($gameVariables.value(292)[value1] == 0){
   $gameMap.spawnEvent(102, id5, id6, true);
-  var eventId = $gameMap.getLastSpawnEventId();
+  eventId = $gameMap.getLastSpawnEventId();
   $gameVariables.value(292)[value1] = eventId;
 } else {
-  var eventId = $gameVariables.value(292)[value1];
+  eventId = $gameVariables.value(292)[value1];
 };
-var event = $gameMap.event(eventId);
-event.setDirectionFix(false);
-event.setImage(id1, id2);
-event.setDirection(id3);
-event.setPattern(id4);
-event._originalPattern = id4;
-event.setDirectionFix(true);
+
+goodsEvent_imageChange(eventId, id1, id2, id3, id4);
 
 };
 
@@ -1149,7 +1131,7 @@ event.setDirectionFix(true);
 //goodsEvent_imageChange(this._eventId,'Goods7',5,8,1);
 goodsEvent_imageChange = function(eventId,id1,id2,id3,id4){
 
-var event = $gameMap.event(eventId);
+const event = $gameMap.event(eventId);
 event.setDirectionFix(false);
 event.setImage(id1, id2);
 event.setDirection(id3);
@@ -1165,119 +1147,104 @@ event_partyCharaEntry = function(){
 if($gameVariables.value(292) == 0){
   $gameVariables.setValue(292,Array(51).fill(0));
 };
-var arr1 = [[1,1],[1,-1],[1,2],[1,-2],[-1,1],[-1,-1],[-1,2],[-1,-2],[2,1],[2,-1],[2,2],[2,-2],[-2,1],[-2,-1],[-2,2],[-2,-2]];
-var start = $gameVariables.value(75);
-var end = $gameVariables.value(76);
-for (var i = start; i <= end; i++) {
-  if($gameActors.actor(i).isLearnedSkill(18)){
-    var value1 = i;
-    if($gameVariables.value(530) == 0){
-      if($gameVariables.value(530) == value1){}else{
-        var value2 = $gamePlayer.x;
-        var value3 = $gamePlayer.y;
-        var arr2 = arr1[Math.floor(Math.random() * arr1.length)];//ID
-        var index = arr1.findIndex(arr1 => arr1 == arr2); 
-        if(index >= 0){
+const gameVar292 = $gameVariables.value(292);
+const arr1 = [[1,1],[1,-1],[1,2],[1,-2],[-1,1],[-1,-1],[-1,2],[-1,-2],[2,1],[2,-1],[2,2],[2,-2],[-2,1],[-2,-1],[-2,2],[-2,-2]];
+const start = $gameVariables.value(75);
+const end = $gameVariables.value(76);
+const gameVar530 = $gameVariables.value(530);
+for (let i = start; i <= end; i++) {
+  const isValid = gameVar530 !== i && $gameActors.actor(i).isLearnedSkill(18);
+  if (!isValid) continue;
+
+  if (gameVar530 == 0) {
+    const x = $gamePlayer.x;
+    const y = $gamePlayer.y;
+    const arr2 = arr1[Math.floor(Math.random() * arr1.length)];//ID
+    const index = arr1.findIndex(arr1 => arr1 == arr2);
+    if (index >= 0) {
+      arr1.splice(index, 1);
+    }
+    event_respawnSetA(i, x + arr2[0], y + arr2[1], 0, 0);
+  } else {
+    let value5 = 0;
+    for (let j = 0; j <= 10; j++) {
+      if (value5 == 0 && arr1 != []) {
+        const ev = $gameMap.event(gameVar292[gameVar530]);
+        const x = ev.x;
+        const y = ev.y;
+        const arr2 = arr1[Math.floor(Math.random() * arr1.length)];//ID
+        const index = arr1.findIndex(arr1 => arr1 == arr2);
+        if (index >= 0) {
           arr1.splice(index, 1);
         };
-        event_respawnSetA(value1,value2+arr2[0],value3+arr2[1],0,0);
-      };
-    }else{
-      if($gameVariables.value(530) == value1){}else{  
-        var value5 = 0;
-        for (var j = 0; j <= 10; j++) {
-          if(value5 == 0 && arr1 != []){
-            var value2 = $gameMap.event($gameVariables.value(292)[$gameVariables.value(530)]).x;
-            var value3 = $gameMap.event($gameVariables.value(292)[$gameVariables.value(530)]).y;
-            var arr2 = arr1[Math.floor(Math.random() * arr1.length)];//ID
-            var index = arr1.findIndex(arr1 => arr1 == arr2); 
-            if(index >= 0){
-              arr1.splice(index, 1);
-            };
-            var value4 = $gameMap.terrainTag(value2+arr2[0], value3+arr2[1]);
-            if(value4 == 1){
-              event_respawnSetA(value1,value2+arr2[0],value3+arr2[1],0,0);
-              value5 += 1;
-            };
-          };
-        };
-      };
-    };
-}};
+        const value4 = $gameMap.terrainTag(x + arr2[0], y + arr2[1]);
+        if (value4 == 1) {
+          event_respawnSetA(i, x + arr2[0], y + arr2[1], 0, 0);
+          value5 += 1;
+        }
+      }
+    }
+  }
+}
 
-};
+}
 
 //パーティメンバーキャラチップを一括で同じ動作event_partyCharaMove(3,0); event_partyCharaMove(45,"UP: 10;");
 event_partyCharaMove = function(id1,id2){
 
-var start = 1;
-var end = 15;
-for (var i = start; i <= end; i++) {
-  if($gameVariables.value(292)[i] >= 1){
-    if(!!$gameMap.event($gameVariables.value(292)[i])) {
-      if ($gameMap.event($gameVariables.value(292)[i]).event().meta['Actor']){
-        if(id1 == 45){
-          $gameMap.event($gameVariables.value(292)[i]).forceMoveRoute({
-          "list":[
-          {"code":id1,"parameters":[id2]},
-          {"code":0}],"repeat":false,"skippable":true});
-        } else {
-          $gameMap.event($gameVariables.value(292)[i]).forceMoveRoute({
-          "list":[
-          {"code":id1,"parameters":[id2]},
-          {"code":0}],"repeat":false,"skippable":true});
-        };
-      };
-    };
-  };
-};
+for (let i = 1; i <= 15; i++) {
+  const eventId = $gameVariables.value(292)[i];
+  const isValid = eventId >= 1;
+  if (!isValid) continue;
 
-};
+  event_partyMoveEventForceMoveRoute(id1, id2, eventId, 'Actor');
+}
+
+}
 
 //メモタグ指定で一括で同じ動作event_NpcCharaMove(3,0,'Actor'); event_NpcCharaMove(45,"UP: 10;",'Actor');
 event_NpcCharaMove = function(id1,id2,value1){
 
-for (var id = 200; id > 0; id--) {
-  if(!!$gameMap.event(id)) {
-    if ($gameMap.event(id).event().meta[value1]){
-      var event = $gameMap.event(id);
-      if(id1 == 45){
-        $gameMap.event(id).forceMoveRoute({
-        "list":[
-        {"code":id1,"parameters":[id2]},
-        {"code":0}],"repeat":false,"skippable":true});
-      } else {
-        $gameMap.event(id).forceMoveRoute({
-        "list":[
-        {"code":id1,"parameters":[id2]},
-        {"code":0}],"repeat":false,"skippable":true});
-      };
-    };
+  for (var id = 200; id > 0; id--) {
+    event_partyMoveEventForceMoveRoute(id1, id2, id, value1);
   };
 };
 
-};
+// merged forceMoveRoute of event_partyCharaMove and event_NpcCharaMove and event_NpcCharaMoveId
+event_partyMoveEventForceMoveRoute = function (id1, id2, eventId, metaName) {
+
+  const event = $gameMap.event(eventId);
+  const isValid = !!event && (metaName === '' || event.event().meta[metaName]);
+  if (!isValid) return;
+
+  //WARN! both forceMoveRoute below is identical! useless condition id1 == 45 , typo?
+  event.forceMoveRoute({
+    "list": [
+      { "code": id1, "parameters": [id2] },
+      { "code": 0 }], "repeat": false, "skippable": true
+  });
+  // if (id1 == 45) {
+  //   event.forceMoveRoute({
+  //     "list": [
+  //       { "code": id1, "parameters": [id2] },
+  //       { "code": 0 }], "repeat": false, "skippable": true
+  //   });
+  // } else {
+  //   event.forceMoveRoute({
+  //     "list": [
+  //       { "code": id1, "parameters": [id2] },
+  //       { "code": 0 }], "repeat": false, "skippable": true
+  //   });
+  // }
+
+}
 
 //id指定でevent_NpcCharaMoveId(3,0,arr1); event_NpcCharaMoveId(45,"UP: 10;",arr1);
 event_NpcCharaMoveId = function(id1,id2,arr1){
 
-for (var id = 0; id < arr1.length; id++) {
-  if(!!$gameMap.event(arr1[id])) {
-    var event = $gameMap.event(arr1[id]);
-    if(id1 == 45){
-      $gameMap.event(arr1[id]).forceMoveRoute({
-      "list":[
-      {"code":id1,"parameters":[id2]},
-      {"code":0}],"repeat":false,"skippable":true});
-    } else {
-      $gameMap.event(arr1[id]).forceMoveRoute({
-      "list":[
-      {"code":id1,"parameters":[id2]},
-      {"code":0}],"repeat":false,"skippable":true});
-    };
+  for (var id = 0; id < arr1.length; id++) {
+    event_partyMoveEventForceMoveRoute(id1, id2, arr1[id], '');
   };
-};
-
 };
 
 //パーティメンバーを一括消去
@@ -1296,85 +1263,53 @@ for (var i = start; i <= end; i++) {
 //扉チップの開閉event_doorOpenClose(1,5);event_doorOpenClose(2,5);
 event_doorOpenClose = function(id1,id2){
 
-if(id1 == 1){
-  if(!!$gameMap.event(id2)) {
+  const is1 = id1 == 1;
+  if (!!$gameMap.event(id2)) {
+    const c1 = is1 ? 17 : 18;
+    const c2 = is1 ? 18 : 17;
+    const c3 = is1 ? 19 : 16;
     $gameMap.event(id2).forceMoveRoute({
-    "list":[
-    {"code":36},{"code":17},{"code":15, "parameters":[5]},
-    {"code":18},{"code":15, "parameters":[5]},
-    {"code":19},{"code":15, "parameters":[5]},
-    {"code":35},{"code":15, "parameters":[5]},
-    {"code":0}],"repeat":false,"skippable":false});
-    event_doorOpenCloseSe(id1,id2);
-  };
-};
-if(id1 == 2){
-  if(!!$gameMap.event(id2)) {
-    $gameMap.event(id2).forceMoveRoute({
-    "list":[
-    {"code":36},{"code":18},{"code":15, "parameters":[5]},
-    {"code":17},{"code":15, "parameters":[5]},
-    {"code":16},{"code":15, "parameters":[5]},
-    {"code":35},{"code":15, "parameters":[5]},
-    {"code":0}],"repeat":false,"skippable":false});
-    event_doorOpenCloseSe(id1,id2);
-  };
-};
-
-};
+      "list": [
+        { "code": 36 }, { "code": c1 }, { "code": 15, "parameters": [5] },
+        { "code": c2 }, { "code": 15, "parameters": [5] },
+        { "code": c3 }, { "code": 15, "parameters": [5] },
+        { "code": 35 }, { "code": 15, "parameters": [5] },
+        { "code": 0 }], "repeat": false, "skippable": false
+    });
+    event_doorOpenCloseSe(id1, id2);
+  }
+}
 
 //扉チップの開閉の際の効果音
 event_doorOpenCloseSe = function(id1,id2){
 
-if(id1 == 1){
-  if(!!$gameMap.event(id2)) {
-    var arr1 = ['Open1',90,100];
-    if($gameMap.event(id2).characterName() == '!$fsm_Door06'){
-      var arr1 = ['Z_clothesTakeOff',100,80];
-    };
-    if($gameMap.event(id2).characterName() == '!Door1' && $gameMap.event(id2).characterIndex() == 5){
-      var arr1 = ['Z_clothesTakeOff',100,80];
-    };
-    if($gameMap.event(id2).characterName() == '!Door1' && $gameMap.event(id2).characterIndex() == 6){
-      var arr1 = ['Door2',90,100];
-    };
-    if($gameMap.event(id2).characterName() == '!$SF_Gate1' || $gameMap.event(id2).characterName() == '!$SF_Gate3'){
-      var arr1 = ['Open3',90,100];
-    };
-    if($gameMap.event(id2).characterName() == '!$Gate1' || $gameMap.event(id2).characterName() == '!$Gate2'){
-      var arr1 = ['Open3',90,100];
-    };
-    if($gameMap.event(id2).characterName() == '!$SF_Gate2'){
-      var arr1 = ['door6AutoDoorHeavy',90,100];
-    };
-    AudioManager.playSe({"name":arr1[0],"volume":arr1[1],"pitch":arr1[2],"pan":0});
-  };
-};
-if(id1 == 2){
-  if(!!$gameMap.event(id2)) {
-    var arr1 = ['Close1',90,150];
-    if($gameMap.event(id2).characterName() == '!$fsm_Door06'){
-      var arr1 = ['Z_clothesTakeOff',100,80];
-    };
-    if($gameMap.event(id2).characterName() == '!Door1' && $gameMap.event(id2).characterIndex() == 5){
-      var arr1 = ['Z_clothesTakeOff',100,80];
-    };
-    if($gameMap.event(id2).characterName() == '!Door1' && $gameMap.event(id2).characterIndex() == 6){
-      var arr1 = ['Door2',90,150];
-    };
-    if($gameMap.event(id2).characterName() == '!$SF_Gate1' || $gameMap.event(id2).characterName() == '!$SF_Gate3'){
-      var arr1 = ['Close3',90,70];
-    };
-    if($gameMap.event(id2).characterName() == '!$Gate1' || $gameMap.event(id2).characterName() == '!$Gate2'){
-      var arr1 = ['Close3',90,70];
-    };
-    if($gameMap.event(id2).characterName() == '!$SF_Gate2'){
-      var arr1 = ['door6AutoDoorHeavy',90,150];
-    };
-    AudioManager.playSe({"name":arr1[0],"volume":arr1[1],"pitch":arr1[2],"pan":0});
-  };
-};
+  if (!!$gameMap.event(id2)) {
+    const is1 = id1 == 1;
+    const i1 = is1 ? 100 : 150;
+    const i2 = is1 ? 100 : 70;
+    const n = is1 ? 'Open' : 'Close';
 
+    let arr1 = [n + '1', 90, i1];
+    if ($gameMap.event(id2).characterName() == '!$fsm_Door06') {
+      arr1 = ['Z_clothesTakeOff', 100, 80];
+    }
+    else if ($gameMap.event(id2).characterName() == '!Door1' && $gameMap.event(id2).characterIndex() == 5) {
+      arr1 = ['Z_clothesTakeOff', 100, 80];
+    }
+    else if ($gameMap.event(id2).characterName() == '!Door1' && $gameMap.event(id2).characterIndex() == 6) {
+      arr1 = ['Door2', 90, i1];
+    }
+    else if ($gameMap.event(id2).characterName() == '!$SF_Gate1' || $gameMap.event(id2).characterName() == '!$SF_Gate3') {
+      arr1 = [n + '3', 90, i2];
+    }
+    else if ($gameMap.event(id2).characterName() == '!$Gate1' || $gameMap.event(id2).characterName() == '!$Gate2') {
+      arr1 = [n + '3', 90, i2];
+    }
+    else if ($gameMap.event(id2).characterName() == '!$SF_Gate2') {
+      arr1 = ['door6AutoDoorHeavy', 90, i1];
+    }
+    AudioManager.playSe({ "name": arr1[0], "volume": arr1[1], "pitch": arr1[2], "pan": 0 });
+  }
 };
 
 //そのマップのNPC死体任意位置作成。ランダムはコモン162
@@ -1434,24 +1369,24 @@ if(id1 == 1){
 //動物食材指定
 animal_IngredientsSelect = function(id1){
 
-var value1 = 1271;
-if($gameMap.event(id1)._characterName.match(/Pig/)){var value1 = 1272};
-if($gameMap.event(id1)._characterName.match(/Horse/)){var value1 = 1273};
-if($gameMap.event(id1)._characterName.match(/Cow/)){var value1 = 1274};
-if($gameMap.event(id1)._characterName.match(/Sheep/)){var value1 = 1275};
-if($gameMap.event(id1)._characterName.match(/Chicken/)){var value1 = 1276};
-if($gameMap.event(id1)._characterName.match(/Goat/)){var value1 = 1277};
-if($gameMap.event(id1)._characterName.match(/Monkey/)){var value1 = 1283};
-if($gameMap.event(id1)._characterName.match(/Bear/)){var value1 = 1278};
-if($gameMap.event(id1)._characterName.match(/Deer/)){var value1 = 1279};
-if($gameMap.event(id1)._characterName.match(/Boar/)){var value1 = 1280};
-if($gameMap.event(id1)._characterName.match(/BigCat/)){var value1 = 1283};
-if($gameMap.event(id1)._characterName.match(/Cow/)){var value1 = 1274};
-if($gameMap.event(id1)._characterName.match(/Crab/)){var value1 = 1281};
-if($gameMap.event(id1)._characterName.match(/Frog/)){var value1 = 1282};
-if($gameMap.event(id1)._characterName.match(/fish/)){var value1 = 1286};
-
-if($gameSwitches.value(258) && $gameMap.event(id1)._characterName.match(/Cow/)){var value1 = 1288};
+let value1 = 1271;
+const eventCharaName = $gameMap.event(id1)._characterName;
+if(eventCharaName.match(/Pig/)){value1 = 1272}
+else if(eventCharaName.match(/Horse/)){value1 = 1273}
+else if(eventCharaName.match(/Cow/)){value1 = 1274}
+else if(eventCharaName.match(/Sheep/)){value1 = 1275}
+else if(eventCharaName.match(/Chicken/)){value1 = 1276}
+else if(eventCharaName.match(/Goat/)){value1 = 1277}
+else if(eventCharaName.match(/Monkey/)){value1 = 1283}
+else if(eventCharaName.match(/Bear/)){value1 = 1278}
+else if(eventCharaName.match(/Deer/)){value1 = 1279}
+else if(eventCharaName.match(/Boar/)){value1 = 1280}
+else if(eventCharaName.match(/BigCat/)){value1 = 1283}
+else if(eventCharaName.match(/Cow/)){value1 = 1274}
+else if(eventCharaName.match(/Crab/)){value1 = 1281}
+else if(eventCharaName.match(/Frog/)){value1 = 1282}
+else if(eventCharaName.match(/fish/)){value1 = 1286}
+else if($gameSwitches.value(258) && eventCharaName.match(/Cow/)){value1 = 1288};
 
 valueDropItems = value1;
 valueanimalEventId = id1;
@@ -1461,22 +1396,24 @@ valueanimalEventId = id1;
 //動物反応指定
 animal_ActionSelect = function(id1){
 
-var value1 = 0;
-if($gameMap.event(id1)._characterName.match(/Pig/)){var value1 = 1;var value2 = `ブヒっ`};
-if($gameMap.event(id1)._characterName.match(/Horse/)){AudioManager.playSe({"name":'Horse',"volume":70,"pitch":100,"pan":0})};
-if($gameMap.event(id1)._characterName.match(/Cow/)){AudioManager.playSe({"name":'Cow',"volume":70,"pitch":100,"pan":0})};
-if($gameMap.event(id1)._characterName.match(/Sheep/)){var value1 = 1;var value2 = `メェっ…`};
-if($gameMap.event(id1)._characterName.match(/Chicken/)){AudioManager.playSe({"name":'Chicken',"volume":70,"pitch":100,"pan":0})};
-if($gameMap.event(id1)._characterName.match(/Goat/)){var value1 = 1;var value2 = `メェ～～っ`};
-if($gameMap.event(id1)._characterName.match(/Monkey/)){var value1 = 1;var value2 = `ウキィっ！`};
-if($gameMap.event(id1)._characterName.match(/Bear/)){AudioManager.playSe({"name":'Monster6',"volume":70,"pitch":80,"pan":0})};
-if($gameMap.event(id1)._characterName.match(/Deer/)){var value1 = 1;var value2 = `ピィっ`};
-if($gameMap.event(id1)._characterName.match(/Boar/)){var value1 = 1;var value2 = `ブルルゥっ！`};
-if($gameMap.event(id1)._characterName.match(/BigCat/)){AudioManager.playSe({"name":'Monster1',"volume":70,"pitch":120,"pan":0})};
-if($gameMap.event(id1)._characterName.match(/Cow/)){AudioManager.playSe({"name":'Cow',"volume":70,"pitch":100,"pan":0})};
-if($gameMap.event(id1)._characterName.match(/Crab/)){var value1 = 1;var value2 = `カニィっ`};
-if($gameMap.event(id1)._characterName.match(/Frog/)){AudioManager.playSe({"name":'Frog',"volume":70,"pitch":100,"pan":0})};
-if($gameMap.event(id1)._characterName.match(/fish/)){};
+let value1 = 0;
+let value2 = ``;
+const eventCharaName = $gameMap.event(id1)._characterName;
+if(eventCharaName.match(/Pig/)){value1 = 1;value2 = `ブヒっ`}
+else if(eventCharaName.match(/Horse/)){AudioManager.playSe({"name":'Horse',"volume":70,"pitch":100,"pan":0})}
+else if(eventCharaName.match(/Cow/)){AudioManager.playSe({"name":'Cow',"volume":70,"pitch":100,"pan":0})}
+else if(eventCharaName.match(/Sheep/)){value1 = 1;value2 = `メェっ…`}
+else if(eventCharaName.match(/Chicken/)){AudioManager.playSe({"name":'Chicken',"volume":70,"pitch":100,"pan":0})}
+else if(eventCharaName.match(/Goat/)){value1 = 1;value2 = `メェ～～っ`}
+else if(eventCharaName.match(/Monkey/)){value1 = 1;value2 = `ウキィっ！`}
+else if(eventCharaName.match(/Bear/)){AudioManager.playSe({"name":'Monster6',"volume":70,"pitch":80,"pan":0})}
+else if(eventCharaName.match(/Deer/)){value1 = 1;value2 = `ピィっ`}
+else if(eventCharaName.match(/Boar/)){value1 = 1;value2 = `ブルルゥっ！`}
+else if(eventCharaName.match(/BigCat/)){AudioManager.playSe({"name":'Monster1',"volume":70,"pitch":120,"pan":0})}
+else if(eventCharaName.match(/Cow/)){AudioManager.playSe({"name":'Cow',"volume":70,"pitch":100,"pan":0})}
+else if(eventCharaName.match(/Crab/)){value1 = 1;value2 = `カニィっ`}
+else if(eventCharaName.match(/Frog/)){AudioManager.playSe({"name":'Frog',"volume":70,"pitch":100,"pan":0})}
+else if(eventCharaName.match(/fish/)){};
 
 if(value1 == 1){
   valueanimalEvent2Id = value2;

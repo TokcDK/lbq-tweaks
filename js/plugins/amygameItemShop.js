@@ -417,35 +417,34 @@ if(value1 + value2 + value3 == 0){
 //拾得物スクリプト。item_getScript1(0,1);
 item_getScript1 = function(id11,id10){
 
-var value2 = id10;
-var actor = $gameActors.actor($gameVariables.value(2));
-var value4 = 0;//アイテム種別
-if($gameVariables.value(240) >= 1){
-  var value = $dataItems[$gameVariables.value(240)];
-} else {
-  var value = $dataWeapons[$gameVariables.value(230)];
-};
-var arr1 = value.meta['UniqueMaterial'+value2].split(',');
-var value1 = arr1[Math.floor(Math.random() * arr1.length)];
-if($gameSwitches.value(605)){
-  var value1 = Number(value.meta['UniqueMaterial'+value2].split(',')[0]);
-};
-if(id11 == 0){var value5 = valueHarvestingSkillId};
-if(id11 == 1){var value5 = valueMiningSkillId};
-item_getSkillLevel(value5,value4,value1);
+//var actor = $gameActors.actor($gameVariables.value(2));
+const item = $gameVariables.value(240) >= 1 ? 
+$dataItems[$gameVariables.value(240)] : 
+$dataWeapons[$gameVariables.value(230)];
+
+const itemUniqueMaterial = item.meta['UniqueMaterial' + id10];
+if (itemUniqueMaterial === undefined || itemUniqueMaterial === null) return;
+
+const itemUniqueMaterialArray = item.meta['UniqueMaterial' + id10].split(',');
+const value1 = $gameSwitches.value(605) ? 
+Number(itemUniqueMaterialArray[0]) :
+itemUniqueMaterialArray[Math.floor(Math.random() * itemUniqueMaterialArray.length)];
+
+const value5 = id11 == 0 ? valueHarvestingSkillId : valueMiningSkillId;
+item_getSkillLevel(value5,0,value1);
 
 };
 
 //熟練度上昇拾得物。スキルid、アイテム種別3お金0アイテム1武器2防具、金額orアイテムID,0でスキル熟練度のみアップ
-item_getSkillLevel = function(id1,id2,id3){
+item_getSkillLevel = function(id1,itemType,id3){
 
 var value3 = id1; 
 var value1 = `　`; 
 var value2 = `　`;
 var value11 = 0;
-if(id2 == 0){var item = $dataItems};
-if(id2 == 1){var item = $dataWeapons};
-if(id2 == 2){var item = $dataArmors};
+if(itemType == 0){var item = $dataItems};
+if(itemType == 1){var item = $dataWeapons};
+if(itemType == 2){var item = $dataArmors};
 var actor = $gameActors.actor($gameVariables.value(11)); 
 if(actor.skillMasteryLevel(value3) == Number($dataSkills[value3].meta['Max Mastery Level'])){}else{
   if(actor.isLearnedSkill(value3) && actor.skillMasteryLevel(value3) >= 0){
@@ -464,7 +463,7 @@ if(id3 == 10 || id3 == 141){
   };
 };
 if(id3 >= 1){
-  if(id2 == 3){
+  if(itemType == 3){
     var id3 = id3 * id4;
     $gameParty.gainGold(id3);
     var value2 = `\\C[3]小銭を拾った。（+\\C[10]${id3}\\C[0]\\G）`;
