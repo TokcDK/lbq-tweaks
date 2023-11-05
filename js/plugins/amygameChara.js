@@ -993,7 +993,8 @@ const gameVar259 = $gameVariables.value(259);
 const gameVar238= $gameVariables.value(238);
 const value1Arr = [-1, 78, 42, 5, 103, 104, 105, 126, 127, 128, 129]; // -1 added for to not change id10 values
 for (let id10 = 1; id10 <= 10; id10++) {//固有素材。<CGPriority:1,1>
-  if (gameVar259[id10] < 1) continue;
+  const isValid = gameVar259[id10] >= 1;
+  if (!isValid) continue; // 'gameVar259[id10] < 1' is not the same here for some reason :(
 
   let value2 = Math.round(gameVar238);
   value2 += Math.floor(Math.random() * 6) + 5;
