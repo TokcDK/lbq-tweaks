@@ -1369,24 +1369,24 @@ if(id1 == 1){
 //動物食材指定
 animal_IngredientsSelect = function(id1){
 
-var value1 = 1271;
-if($gameMap.event(id1)._characterName.match(/Pig/)){var value1 = 1272};
-if($gameMap.event(id1)._characterName.match(/Horse/)){var value1 = 1273};
-if($gameMap.event(id1)._characterName.match(/Cow/)){var value1 = 1274};
-if($gameMap.event(id1)._characterName.match(/Sheep/)){var value1 = 1275};
-if($gameMap.event(id1)._characterName.match(/Chicken/)){var value1 = 1276};
-if($gameMap.event(id1)._characterName.match(/Goat/)){var value1 = 1277};
-if($gameMap.event(id1)._characterName.match(/Monkey/)){var value1 = 1283};
-if($gameMap.event(id1)._characterName.match(/Bear/)){var value1 = 1278};
-if($gameMap.event(id1)._characterName.match(/Deer/)){var value1 = 1279};
-if($gameMap.event(id1)._characterName.match(/Boar/)){var value1 = 1280};
-if($gameMap.event(id1)._characterName.match(/BigCat/)){var value1 = 1283};
-if($gameMap.event(id1)._characterName.match(/Cow/)){var value1 = 1274};
-if($gameMap.event(id1)._characterName.match(/Crab/)){var value1 = 1281};
-if($gameMap.event(id1)._characterName.match(/Frog/)){var value1 = 1282};
-if($gameMap.event(id1)._characterName.match(/fish/)){var value1 = 1286};
-
-if($gameSwitches.value(258) && $gameMap.event(id1)._characterName.match(/Cow/)){var value1 = 1288};
+let value1 = 1271;
+const event = $gameMap.event(id1);
+if(event._characterName.match(/Pig/)){value1 = 1272}
+else if(event._characterName.match(/Horse/)){value1 = 1273}
+else if(event._characterName.match(/Cow/)){value1 = 1274}
+else if(event._characterName.match(/Sheep/)){value1 = 1275}
+else if(event._characterName.match(/Chicken/)){value1 = 1276}
+else if(event._characterName.match(/Goat/)){value1 = 1277}
+else if(event._characterName.match(/Monkey/)){value1 = 1283}
+else if(event._characterName.match(/Bear/)){value1 = 1278}
+else if(event._characterName.match(/Deer/)){value1 = 1279}
+else if(event._characterName.match(/Boar/)){value1 = 1280}
+else if(event._characterName.match(/BigCat/)){value1 = 1283}
+else if(event._characterName.match(/Cow/)){value1 = 1274}
+else if(event._characterName.match(/Crab/)){value1 = 1281}
+else if(event._characterName.match(/Frog/)){value1 = 1282}
+else if(event._characterName.match(/fish/)){value1 = 1286}
+else if($gameSwitches.value(258) && event._characterName.match(/Cow/)){value1 = 1288};
 
 valueDropItems = value1;
 valueanimalEventId = id1;
