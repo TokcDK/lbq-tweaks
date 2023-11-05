@@ -1024,38 +1024,37 @@ for (var id10 = 1; id10 <= 10; id10++) {//固有素材。<CGPriority:1,1>
 };
 
 //色々動的生成設定
+var map_otherGraphicSetEndNowArray = [1, 2, 1, 1, 1, 1, 1];
 map_otherGraphicSet = function(id1,arr1,arr2){
 
-if(arr2 != 0){
-  var j = 0;
-  if(id1 == 0){
-    var value1 = $gameVariables.value(238);
-  } else {
-    var value1 = id1;
-  };
-  for (var i = 1; i <= value1; i++) {
-    var conditionMap         = {};
+  if(arr2 === 0) return;
+
+  let j = 0;
+  const gameVar210SpawnEventIdsArray = $gameVariables.value(210);
+  const end = id1 == 0 ? $gameVariables.value(238) : id1;
+  for (let i = 1; i <= end; i++) {
+    const conditionMap         = {};
     conditionMap.passable    = arr2[3];
     conditionMap.screen      = arr2[4];
     conditionMap.collided    = arr2[5];
     conditionMap.terrainTags = arr2[6];
     conditionMap.regionIds   = arr2[7];
     $gameMap.spawnEventRandom(arr2[0], conditionMap, true);
-    $gameVariables.value(210).push($gameMap.getLastSpawnEventId());
-    var event = $gameMap.event($gameMap.getLastSpawnEventId());
+    
+    gameVar210SpawnEventIdsArray.push($gameMap.getLastSpawnEventId());
+    const event = $gameMap.event($gameMap.getLastSpawnEventId());
     if(arr1 != 0){
       event.setImage(arr1[Math.floor(Math.random() * arr1.length)],Math.floor( Math.random() * 8) + 0);
-    };
+    }
     event.setMoveSpeed(arr2[1][Math.floor(Math.random() * arr2[1].length)]);//1-6
     event.setMoveFrequency(arr2[2][Math.floor(Math.random() * arr2[2].length)]);//1-5
-    j += [1,2,1,1,1,1,1][Math.floor(Math.random() * 3)];
-    if(i + j >= value1){
+    
+    j += map_otherGraphicSetEndNowArray[Math.floor(Math.random() * 3)];
+    if(i + j >= end){
       break;
-    };
-  };
-};
-
-};
+    }
+  }
+}
 
 //マップイベント消去メモタグで指定
 map_eventErase = function(id1){
