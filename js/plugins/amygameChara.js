@@ -1194,12 +1194,28 @@ event_partyCharaMove = function(id1,id2){
 
 for (let i = 1; i <= 15; i++) {
   const eventId = $gameVariables.value(292)[i];
-  let isValid = eventId >= 1;
+  const isValid = eventId >= 1;
   if (!isValid) continue;
 
+  event_partyMoveEventForceMoveRoute(id1, id2, eventId, 'Actor');
+}
+
+}
+
+//メモタグ指定で一括で同じ動作event_NpcCharaMove(3,0,'Actor'); event_NpcCharaMove(45,"UP: 10;",'Actor');
+event_NpcCharaMove = function(id1,id2,value1){
+
+  for (var id = 200; id > 0; id--) {
+    event_partyMoveEventForceMoveRoute(id1, id2, id, value1);
+  };
+};
+
+// merged forceMoveRoute of event_partyCharaMove and event_NpcCharaMove and event_NpcCharaMoveId
+event_partyMoveEventForceMoveRoute = function (id1, id2, eventId, metaName) {
+
   const event = $gameMap.event(eventId);
-  isValid = !!event && event.event().meta['Actor'];
-  if (!isValid) continue;
+  const isValid = !!event && (metaName === '' || event.event().meta[metaName]);
+  if (!isValid) return;
 
   //WARN! both forceMoveRoute below is identical! useless condition id1 == 45 , typo?
   event.forceMoveRoute({
@@ -1220,54 +1236,15 @@ for (let i = 1; i <= 15; i++) {
   //       { "code": 0 }], "repeat": false, "skippable": true
   //   });
   // }
-}
 
 }
-
-//メモタグ指定で一括で同じ動作event_NpcCharaMove(3,0,'Actor'); event_NpcCharaMove(45,"UP: 10;",'Actor');
-event_NpcCharaMove = function(id1,id2,value1){
-
-for (var id = 200; id > 0; id--) {
-  if(!!$gameMap.event(id)) {
-    if ($gameMap.event(id).event().meta[value1]){
-      var event = $gameMap.event(id);
-      if(id1 == 45){
-        $gameMap.event(id).forceMoveRoute({
-        "list":[
-        {"code":id1,"parameters":[id2]},
-        {"code":0}],"repeat":false,"skippable":true});
-      } else {
-        $gameMap.event(id).forceMoveRoute({
-        "list":[
-        {"code":id1,"parameters":[id2]},
-        {"code":0}],"repeat":false,"skippable":true});
-      };
-    };
-  };
-};
-
-};
 
 //id指定でevent_NpcCharaMoveId(3,0,arr1); event_NpcCharaMoveId(45,"UP: 10;",arr1);
 event_NpcCharaMoveId = function(id1,id2,arr1){
 
-for (var id = 0; id < arr1.length; id++) {
-  if(!!$gameMap.event(arr1[id])) {
-    var event = $gameMap.event(arr1[id]);
-    if(id1 == 45){
-      $gameMap.event(arr1[id]).forceMoveRoute({
-      "list":[
-      {"code":id1,"parameters":[id2]},
-      {"code":0}],"repeat":false,"skippable":true});
-    } else {
-      $gameMap.event(arr1[id]).forceMoveRoute({
-      "list":[
-      {"code":id1,"parameters":[id2]},
-      {"code":0}],"repeat":false,"skippable":true});
-    };
+  for (var id = 0; id < arr1.length; id++) {
+    event_partyMoveEventForceMoveRoute(id1, id2, arr1[id], '');
   };
-};
-
 };
 
 //パーティメンバーを一括消去
