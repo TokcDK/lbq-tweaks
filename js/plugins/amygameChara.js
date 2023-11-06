@@ -257,343 +257,340 @@ worldMap_eraseSelect = function(){
 };
 
 //マップNPC配置セット
-map_npcPositionSet = function(){
+map_npcPositionSet = function () {
 
-$gameVariables.setValue(173,[]);
-var value1 = $gameMap.events().length;
-if(value1 >= 50){
-  var value11 = 200;
-} else {
-  var value11 = 100;
-};
-//for (var id2 = $gameMap.events().length; id2 > 0; id2--) {
-for (var id = value11; id > 0; id--) {
-  if(!!$gameMap.event(id)) {
-    if($gameSelfSwitches.value([$gameMap.mapId(), id, 'A']) && !$gameSwitches.value(209)){
-      if ($gameMap.event(id).event().meta['NoAClear']){}else{
-        $gameMap.eraseEvent(id);
+  $gameVariables.setValue(173, []);
+  const eventsCount = $gameMap.events().length;
+  const start = eventsCount >= 50 ? 200 : 100;
+  const mapId = $gameMap.mapId();
+  //for (var id2 = $gameMap.events().length; id2 > 0; id2--) {
+  for (let id = start; id > 0; id--) {
+    map_npcPositionSetEvent(id, mapId);
+  }
+}
+
+map_npcPositionSetEvent = function (id, mapId) {
+  const event = $gameMap.event(id);
+  if (!event) return;
+  const eventEvent = event.event();
+
+  if ($gameSelfSwitches.value([mapId, id, 'A']) && !$gameSwitches.value(209)) {
+    if (eventEvent.meta['NoAClear']) { } else {
+      $gameMap.eraseEvent(id);
+    }
+
+    return;
+  }
+
+  if (eventEvent.meta['MQProgress']) {
+    $gameVariables.value(173).push(Number(eventEvent.meta['MQProgress']));
+  }
+
+  if (eventEvent.meta['foodC']) {//decorationFood
+    let foodIndex = 1;
+    const value3 = Math.floor(Math.random() * 7) + 0;
+    event.setImage('food_' + foodIndex, value3);
+    let arr1 = [2, 4, 6, 8];
+    foodIndex = arr1[Math.floor(Math.random() * arr1.length)];
+    event.setDirection(foodIndex);//2,4,6,8
+    arr1 = [0, 1, 2];
+    foodIndex = arr1[Math.floor(Math.random() * arr1.length)];
+    event.setPattern(foodIndex);//0,1,2
+    event._originalPattern = foodIndex;
+    event.setDirectionFix(true);//向き固定
+  }
+  else if (eventEvent.meta['decorationFood']) {
+    const arr2 = [[1, 5, 8, 1], [1, 5, 8, 2], [1, 6, 8, 0], [1, 6, 8, 1], [2, 0, 2, 1], [2, 1, 2, 2], [2, 0, 6, 0], [2, 0, 6, 1]];
+    const arr1 = arr2[Math.floor(Math.random() * arr2.length)];
+    event.setDirectionFix(false);
+    event.setImage('food_' + arr1[0], arr1[1]);
+    event.setDirection(arr1[2]);
+    event.setPattern(arr1[3]);//0,1,2不要
+    event._originalPattern = arr1[3];
+    event.setDirectionFix(true);
+  }
+  else if (eventEvent.meta['Alcol']) {
+    const arr2 = [[0, 6, 0], [0, 6, 1], [0, 6, 2], [1, 4, 1], [1, 4, 2], [2, 4, 0], [2, 4, 1]];
+    const arr1 = arr2[Math.floor(Math.random() * arr2.length)];
+    event.setDirectionFix(false);
+    event.setImage('food_2', arr1[0]);
+    event.setDirection(arr1[1]);
+    event.setPattern(arr1[2]);//0,1,2不要
+    event._originalPattern = arr1[2];
+    event.setDirectionFix(true);
+  }
+  else if (eventEvent.meta['foodPlate']) {
+    const arr2 = [[2, 0, 8, 0], [2, 0, 8, 1], [2, 0, 8, 1], [2, 1, 8, 0], [2, 1, 8, 1], [2, 1, 8, 2], [2, 2, 8, 0], [2, 2, 8, 1]];
+    const arr1 = arr2[Math.floor(Math.random() * arr2.length)];
+    event.setDirectionFix(false);
+    event.setImage('food_' + arr1[0], arr1[1]);
+    event.setDirection(arr1[2]);
+    event.setPattern(arr1[3]);//0,1,2不要
+    event._originalPattern = arr1[3];
+    event.setDirectionFix(true);
+  }
+  else if (eventEvent.meta['NpcProstitute']) {
+    const value2 = 'npcNakidWoman';
+    const value3 = Math.floor(Math.random() * 3) + 1;
+    const value4 = Math.floor(Math.random() * 7) + 0;
+    event.setImage(value2 + value3, value4);
+  }
+  else if (eventEvent.meta['NpcProstituteGuest']) {
+    const value2 = 'npcFugou';
+    const value3 = 1;
+    const value4 = Math.floor(Math.random() * 4) + 4;
+    event.setImage(value2 + value3, value4);
+  }
+  else if (eventEvent.meta['StandNPC']) {
+    map_npcGraphicSet();
+    const value4 = $gameVariables.value(33);
+    const value2 = $gameVariables.value(35);
+    const value3 = Math.floor(Math.random() * $gameVariables.value(36)[1]) + $gameVariables.value(36)[0];
+    event.setImage(value4 + value2, value3);
+  }
+  else if (eventEvent.meta['BloodBody']) {
+    map_npcGraphicSet();
+    const value4 = $gameVariables.value(33);
+    const value2 = $gameVariables.value(35);
+    const value3 = Math.floor(Math.random() * $gameVariables.value(36)[1]) + $gameVariables.value(36)[0];
+    event.setImage(value4 + value2, value3);
+    const arr1 = [45, 135, -45, -135];
+    const value5 = arr1[Math.floor(Math.random() * arr1.length)];
+    event.setAngle(value5);
+    event.setDirection(8);
+    $gameMap.spawnEvent(99, event.x, event.y, true);//血痕
+    const value6 = $gameMap.getLastSpawnEventId();
+    if (value5 == 45) { value7 = 20; value8 = 20 };
+    if (value5 == 135) { value7 = 20; value8 = 40 };
+    if (value5 == -45) { value7 = -20; value8 = 20 };
+    if (value5 == -135) { value7 = -20; value8 = 40 };
+    $gameMap.event(value6)._spriteOffsetX += value7;//yep
+    $gameMap.event(value6)._spriteOffsetY += value8;
+  }
+
+  let value12 = 0;
+  if (event.characterName()) {//で画像なし状態のキャラ判定
+    if (eventEvent.meta['BossGura']) {
+      //let value13 = 0;
+      const arr1 = eventEvent.meta['BossGura'].split(',');
+      const arr2 = $dataEnemies[Number(arr1[1])].meta['BossGura'] ? $dataEnemies[Number(arr1[1])].meta['BossGura'].split(',') : [20, 30, 0.2];
+      valueBossCharaGura = [id, $dataEnemies[Number(arr1[1])].meta['BossEnemy'].split(',')[2], Number(arr2[0]), Number(arr2[1]), Number(arr2[2])];
+      boss_charaGuraCGSet(valueBossCharaGura);
+    }
+    if (eventEvent.meta['BossGura2']) {
+      //let value13 = 0;
+      const arr2 = eventEvent.meta['BossGura2'].split(',');
+      valueBossCharaGura = [id, arr2[0], Number(arr2[1]), Number(arr2[2]), Number(arr2[3])];
+      boss_charaGuraCGSet(valueBossCharaGura);
+      //event.setOpacity(255);
+    }
+    if (eventEvent.meta['Charalight']) {
+      const arr1 = eventEvent.meta['Charalight'].split(',');
+      eventEvent.moveLight(Number(arr1[0]), Number(arr1[1]), Number(arr1[2]), Number(arr1[3]));
+    }
+    if (eventEvent.meta['PerspectiveA']) {
+      let value13 = 0;
+      const arr1 = eventEvent.meta['PerspectiveA'].split(',');
+      for (let i = 0; i <= arr1.length - 1; i++) {
+        if (Number(arr1[i]) <= 0) { value13 = 1 } else {
+          if ($gameSwitches.value(Number(arr1[i]) + 440)) {
+            value13 = 1;
+          }
+        }
+      }
+      if (value13 == 0) { value12 = 1 };
+    }
+
+    if (eventEvent.meta['EvSceneSet']) {//<EvSceneSet:401,1,0>1で達成時に消去で2なら消去なし。0で♡1で笑-1でなし
+      let value13 = 0;
+      const arr1 = eventEvent.meta['EvSceneSet'].split(',');
+      const value1 = Number(arr1[0]);
+      let value2 = 0;//発生
+      let value3 = 0;//達成
+      let value4 = 'h';//イベアイコン
+      if (value1 >= 401 && value1 <= 500) { value2 = value1 + 800; value3 = value1 + 900 };
+      if (value1 >= 501 && value1 <= 600) { value2 = value1 + 500; value3 = value1 + 600 };
+      if ($dataItems[value1].meta['AddEventIncidenceSwi']) {
+        value2 = Number($dataItems[value1].meta['AddEventIncidenceSwi']);
       };
-    } else {
-      if ($gameMap.event(id).event().meta['MQProgress']){
-        var value1 = Number($gameMap.event(id).event().meta['MQProgress']);
-        $gameVariables.value(173).push(value1);
+      if ($dataItems[value1].meta['AddEventCompSwi']) {
+        value3 = Number($dataItems[value1].meta['AddEventCompSwi']);
       };
-      if ($gameMap.event(id).event().meta['foodC']){//decorationFood
-        var event = $gameMap.event(id);
-        var value2 = 1;
-        var value3 = Math.floor( Math.random() * 7) + 0;
-        event.setImage('food_'+value2, value3);
-        var arr1 = [2,4,6,8];
-        var value2 = arr1[Math.floor(Math.random() * arr1.length)];
-        event.setDirection(value2);//2,4,6,8
-        var arr1 = [0,1,2];
-        var value2 = arr1[Math.floor(Math.random() * arr1.length)];
-        event.setPattern(value2);//0,1,2
-        event._originalPattern = value2;
-        event.setDirectionFix(true);//向き固定
-      };
-      if ($gameMap.event(id).event().meta['decorationFood']){
-        var arr2 = [[1,5,8,1],[1,5,8,2],[1,6,8,0],[1,6,8,1],[2,0,2,1],[2,1,2,2],[2,0,6,0],[2,0,6,1]];
-        var arr1 = arr2[Math.floor(Math.random() * arr2.length)];
-        var event = $gameMap.event(id);
-        event.setDirectionFix(false);
-        event.setImage('food_' + arr1[0], arr1[1]);
-        event.setDirection(arr1[2]);
-        event.setPattern(arr1[3]);//0,1,2不要
-        event._originalPattern = arr1[3];
-        event.setDirectionFix(true);
-      };
-      if ($gameMap.event(id).event().meta['Alcol']){
-        var arr2 = [[0,6,0],[0,6,1],[0,6,2],[1,4,1],[1,4,2],[2,4,0],[2,4,1]];
-        var arr1 = arr2[Math.floor(Math.random() * arr2.length)];
-        var event = $gameMap.event(id);
-        event.setDirectionFix(false);
-        event.setImage('food_2', arr1[0]);
-        event.setDirection(arr1[1]);
-        event.setPattern(arr1[2]);//0,1,2不要
-        event._originalPattern = arr1[2];
-        event.setDirectionFix(true);
-      };
-      if ($gameMap.event(id).event().meta['foodPlate']){
-        var arr2 = [[2,0,8,0],[2,0,8,1],[2,0,8,1],[2,1,8,0],[2,1,8,1],[2,1,8,2],[2,2,8,0],[2,2,8,1]];
-        var arr1 = arr2[Math.floor(Math.random() * arr2.length)];
-        var event = $gameMap.event(id);
-        event.setDirectionFix(false);
-        event.setImage('food_' + arr1[0], arr1[1]);
-        event.setDirection(arr1[2]);
-        event.setPattern(arr1[3]);//0,1,2不要
-        event._originalPattern = arr1[3];
-        event.setDirectionFix(true);
-      };
-      if ($gameMap.event(id).event().meta['NpcProstitute']){
-        var event = $gameMap.event(id);
-        var value2 = 'npcNakidWoman';
-        var value3 = Math.floor( Math.random() * 3) + 1;
-        var value4 = Math.floor( Math.random() * 7) + 0;
-        event.setImage(value2+value3, value4);
-      };
-      if ($gameMap.event(id).event().meta['NpcProstituteGuest']){
-        var event = $gameMap.event(id);
-        var value2 = 'npcFugou';
-        var value3 = 1;
-        var value4 = Math.floor( Math.random() * 4) + 4;
-        event.setImage(value2+value3, value4);
-      };
-      if ($gameMap.event(id).event().meta['StandNPC']){
-        map_npcGraphicSet();
-        var event = $gameMap.event(id);
-        var value4 = $gameVariables.value(33);
-        var value2 = $gameVariables.value(35);
-        var value3 = Math.floor( Math.random() * $gameVariables.value(36)[1]) + $gameVariables.value(36)[0];
-        event.setImage(value4+value2, value3);
-      };
-      if ($gameMap.event(id).event().meta['BloodBody']){
-        map_npcGraphicSet();
-        var event = $gameMap.event(id);
-        var value4 = $gameVariables.value(33);
-        var value2 = $gameVariables.value(35);
-        var value3 = Math.floor( Math.random() * $gameVariables.value(36)[1]) + $gameVariables.value(36)[0];
-        event.setImage(value4+value2, value3);
-        var arr1 = [45,135,-45,-135];
-        var value5 = arr1[Math.floor(Math.random() * arr1.length)];
-        event.setAngle(value5);
-        event.setDirection(8);
-        $gameMap.spawnEvent(99, event.x, event.y, true);//血痕
-        var value6 = $gameMap.getLastSpawnEventId();
-        if(value5 == 45){var value7 = 20;var value8 = 20};
-        if(value5 == 135){var value7 = 20;var value8 = 40};
-        if(value5 == -45){var value7 = -20;var value8 = 20};
-        if(value5 == -135){var value7 = -20;var value8 = 40};
-        $gameMap.event(value6)._spriteOffsetX += value7;//yep
-        $gameMap.event(value6)._spriteOffsetY += value8;
-      };
-      var value12 = 0;
-if($gameMap.event(id).characterName() == 0){}else{//で画像なし状態のキャラ判定
-  if ($gameMap.event(id).event().meta['BossGura']){
-    var value13 = 0;
-    var arr1 = $gameMap.event(id).event().meta['BossGura'].split(',');
-    if($dataEnemies[Number(arr1[1])].meta['BossGura']){
-      var arr2 = $dataEnemies[Number(arr1[1])].meta['BossGura'].split(',');
-    } else {
-      var arr2 = [20,30,0.2];
-    };
-    valueBossCharaGura = [id,$dataEnemies[Number(arr1[1])].meta['BossEnemy'].split(',')[2],Number(arr2[0]),Number(arr2[1]),Number(arr2[2])];
-    boss_charaGuraCGSet(valueBossCharaGura);
-  };
-  if ($gameMap.event(id).event().meta['BossGura2']){
-    var value13 = 0;
-    var arr2 = $gameMap.event(id).event().meta['BossGura2'].split(',');
-    valueBossCharaGura = [id,arr2[0],Number(arr2[1]),Number(arr2[2]),Number(arr2[3])];
-    boss_charaGuraCGSet(valueBossCharaGura);
-    //$gameMap.event(id).setOpacity(255);
-  };
-  if ($gameMap.event(id).event().meta['Charalight']){
-    var event = $gameMap.event(id).event();
-    if(event){
-      var arr1 = event.meta['Charalight'].split(',');
-      $gameMap.event(id).moveLight(Number(arr1[0]), Number(arr1[1]), Number(arr1[2]), Number(arr1[3]));
-    };
-  };
-  if ($gameMap.event(id).event().meta['PerspectiveA']){
-    var value13 = 0;
-    var arr1 = $gameMap.event(id).event().meta['PerspectiveA'].split(',');
-      for (var i = 0; i <= arr1.length-1; i++) {
-        if(Number(arr1[i]) <= 0){var value13 = 1}else{
-          if($gameSwitches.value(Number(arr1[i]) + 440)){
-            var value13 = 1;
-      }}};
-      if(value13 == 0){var value12 = 1};
-  };
-  if ($gameMap.event(id).event().meta['EvSceneSet']){//<EvSceneSet:401,1,0>1で達成時に消去で2なら消去なし。0で♡1で笑-1でなし
-    var value13 = 0;
-    var arr1 = $gameMap.event(id).event().meta['EvSceneSet'].split(',');
-    var value1 = Number(arr1[0]);
-    var value2 = 0;//発生
-    var value3 = 0;//達成
-    var value4 = 'h';//イベアイコン
-    if(value1 >= 401 && value1 <= 500){var value2 = value1 + 800;var value3 = value1 + 900};
-    if(value1 >= 501 && value1 <= 600){var value2 = value1 + 500;var value3 = value1 + 600};
-    if($dataItems[value1].meta['AddEventIncidenceSwi']){
-      var value2 = Number($dataItems[value1].meta['AddEventIncidenceSwi']);
-    };
-    if($dataItems[value1].meta['AddEventCompSwi']){
-      var value3 = Number($dataItems[value1].meta['AddEventCompSwi']);
-    };
-    if(value2 <= 1){var value13 = 1};
-    if($gameSwitches.value(value2)){var value13 = 1};
-    if(Number(arr1[1]) == 1 && $gameSwitches.value(value3)){var value13 = 0};
-    if(value13 == 0){
-      var value12 = 1;
-    } else {
-      if(Number(arr1[2]) == 0){var value4 = 'h'};
-      if(Number(arr1[2]) == 1){var value4 = 'h1'};
-      if(Number(arr1[2]) == 2){var value4 = 't'};
-      if(Number(arr1[2]) == 3){var value4 = 'e'};
-      if(Number(arr1[2]) == -1){var value4 = 0};
-      if(value4 != 0){
-        var char = $gameMap.event(id);
-        char.setIndicators(value4,0,false,0,0,"",0,false,false,0,true,0,-10);
-        char._indData.ref = true;
-        char._indData.fontSize = 28;
-        char._indData.ref = true;
-        char._indData.animated = true;
-        char._indData.frames = [0,5,0,5]; 
-      };
-    };
-  };
-  if ($gameMap.event(id).event().meta['EvStartSw']){
-    var value13 = 0;
-    var arr1 = $gameMap.event(id).event().meta['EvStartSw'].split(',');
-      for (var i = 0; i <= arr1.length-1; i++) {
-        if(Number(arr1[i]) <= 1){var value13 = 1} else {
-          if($gameSwitches.value(Number(arr1[i]))){
-            var value13 = 1;
-      }}};
-      if(value13 == 0){var value12 = 1};
-  };
-  if ($gameMap.event(id).event().meta['EvEndSw']){
-    var arr1 = $gameMap.event(id).event().meta['EvEndSw'].split(',');
-      for (var i = 0; i <= arr1.length-1; i++) {
-        if(Number(arr1[i]) >= 1){
-          if($gameSwitches.value(Number(arr1[i]))){
-            var value12 = 1;
+      if (value2 <= 1) { value13 = 1 };
+      if ($gameSwitches.value(value2)) { value13 = 1 };
+      if (Number(arr1[1]) == 1 && $gameSwitches.value(value3)) { value13 = 0 };
+      if (value13 == 0) {
+        value12 = 1;
+      } else {
+        const arr2Num = Number(arr1[2]);
+        if (arr2Num == 0) { value4 = 'h' };
+        if (arr2Num == 1) { value4 = 'h1' };
+        if (arr2Num == 2) { value4 = 't' };
+        if (arr2Num == 3) { value4 = 'e' };
+        if (arr2Num == -1) { value4 = null };
+        if (value4) {
+          const char = event;
+          char.setIndicators(value4, 0, false, 0, 0, "", 0, false, false, 0, true, 0, -10);
+          char._indData.ref = true;
+          char._indData.fontSize = 28;
+          char._indData.ref = true;
+          char._indData.animated = true;
+          char._indData.frames = [0, 5, 0, 5];
+        }
+      }
+    }
+    if (eventEvent.meta['EvStartSw']) {
+      let value13 = 0;
+      const arr1 = eventEvent.meta['EvStartSw'].split(',');
+      for (let i = 0; i < arr1.length; i++) {
+        if (Number(arr1[i]) <= 1) { value13 = 1 } else {
+          if ($gameSwitches.value(Number(arr1[i]))) {
+            value13 = 1;
+          }
+        }
+      }
+      if (value13 == 0) { value12 = 1 };
+    }
+    if (eventEvent.meta['EvEndSw']) {
+      const arr1 = eventEvent.meta['EvEndSw'].split(',');
+      for (let i = 0; i < arr1.length; i++) {
+        if (Number(arr1[i]) >= 1) {
+          if ($gameSwitches.value(Number(arr1[i]))) {
+            value12 = 1;
             break;
-  }}}};
-  if ($gameMap.event(id).event().meta['EvStartCloth']){
-    var character = $gameMap.event(id);
-    var value1 = Number($gameMap.event(id).event().meta['EvStartCloth'].split(',')[0]);
-    var value2 = Number($gameMap.event(id).event().meta['EvStartCloth'].split(',')[1]);
-      if(value1 >= 1){
-        if($gameVariables.value(440 + value1)[41] == value2){}else{
-          var value12 = 1;
-        };
-  }};
-  if ($gameMap.event(id).event().meta['EvStartVal']){
-    var character = $gameMap.event(id);
-    var value1 = Number($gameMap.event(id).event().meta['EvStartVal'].split(',')[0]);
-    var value2 = Number($gameMap.event(id).event().meta['EvStartVal'].split(',')[1]);
-      if(value1 >= 1){
-        if($gameVariables.value(value1) >= value2){}else{
-          var value12 = 1;
-        };
-  }};
-  if ($gameMap.event(id).event().meta['EvEndVal']){
-    var character = $gameMap.event(id);
-    var value1 = Number($gameMap.event(id).event().meta['EvEndVal'].split(',')[0]);
-    var value2 = Number($gameMap.event(id).event().meta['EvEndVal'].split(',')[1]);
-      if(value1 >= 1){
-        if($gameVariables.value(value1) >= value2){
-          var value12 = 1;
-        };
-  }};
-  if ($gameMap.event(id).event().meta['EvEraseMain']){
-    var character = $gameMap.event(id);
-    var arr1 = $gameMap.event(id).event().meta['EvEraseMain'].split(',');
-    for (var i = 0; i <= arr1.length-1; i++) {
-      if(Number(arr1[i]) >= 1){
-        if($gameVariables.value(135) == Number(arr1[i])){
-          var value12 = 1;
-          break;
-        };
-  }}};
-  if ($gameMap.event(id).event().meta['EvESSOn']){
-    var character = $gameMap.event(id);
-    var arr1 = $gameMap.event(id).event().meta['EvESSOn'].split(',');
-    for (var i = 0; i <= arr1.length-1; i++) {
-      if(Number(arr1[i]) >= 501 && Number(arr1[i]) <= 600){
-        if( $gameSwitches.value(Number(arr1[i])+500) && !$gameSwitches.value(Number(arr1[i])+600) ){
-          var value12 = 1;
-          break;
-        };
+          }
+        }
+      }
+    }
+
+    if (eventEvent.meta['EvStartCloth']) {
+      //let character = event;
+      const eventEventEvStartClothArr = eventEvent.meta['EvStartCloth'].split(',');
+      const value1 = Number(eventEventEvStartClothArr[0]);
+      const value2 = Number(eventEventEvStartClothArr[1]);
+      if (value1 >= 1) {
+        if ($gameVariables.value(440 + value1)[41] == value2) { } else {
+          value12 = 1;
+        }
+      }
+    }
+    if (eventEvent.meta['EvStartVal']) {
+      //let character = event;
+      const eventEventEvStartValArr = eventEvent.meta['EvStartVal'].split(',');
+      const value1 = Number(eventEventEvStartValArr[0]);
+      const value2 = Number(eventEventEvStartValArr[1]);
+      if (value1 >= 1) {
+        if ($gameVariables.value(value1) >= value2) { } else {
+          value12 = 1;
+        }
+      }
+    }
+    if (eventEvent.meta['EvEndVal']) {
+      //let character = event;
+      const eventEventEvEndValArr = eventEvent.meta['EvEndVal'].split(',');
+      const value1 = Number(eventEventEvEndValArr[0]);
+      const value2 = Number(eventEventEvEndValArr[1]);
+      if (value1 >= 1) {
+        if ($gameVariables.value(value1) >= value2) {
+          value12 = 1;
+        }
+      }
+    }
+    if (eventEvent.meta['EvEraseMain']) {
+      //let character = event;
+      const arr1 = eventEvent.meta['EvEraseMain'].split(',');
+      for (let i = 0; i <= arr1.length - 1; i++) {
+        if (Number(arr1[i]) >= 1) {
+          if ($gameVariables.value(135) == Number(arr1[i])) {
+            value12 = 1;
+            break;
+          }
+        }
+      }
+    }
+    if (eventEvent.meta['EvESSOn']) {
+      //let character = event;
+      const arr1 = eventEvent.meta['EvESSOn'].split(',');
+      for (let i = 0; i <= arr1.length - 1; i++) {
+        const arr1iNum = Number(arr1[i]);
+        if (arr1iNum >= 501 && arr1iNum <= 600) {
+          if ($gameSwitches.value(arr1iNum + 500) && !$gameSwitches.value(arr1iNum + 600)) {
+            value12 = 1;
+            break;
+          }
+        }
+        else if (arr1iNum >= 401 && arr1iNum <= 500) {
+          if ($gameSwitches.value(arr1iNum + 800) && !$gameSwitches.value(arr1iNum + 900)) {
+            value12 = 1;
+            break;
+          }
+        }
+      }
+    }
+    if (eventEvent.meta['EvEraseItem']) {
+      //let character = event;
+      let arr1 = eventEvent.meta['EvEraseItem'].split(',');
+      for (let i = 0; i <= arr1.length - 1; i++) {
+        if (Number(arr1[i]) >= 1) {
+          if ($gameParty.hasItem($dataItems[Number(arr1[i])], true)) {
+            value12 = 1;
+          }
+        }
+      }
+    }
+    if (eventEvent.meta['QuestSet']) {//
+      //let character = event;
+      const value1 = eventEvent.meta['QuestSet'];
+      $gameSelfSwitches.setValue([mapId, id, 'B'], valueQuestArray5[value1 - 800] == 1);
+      $gameSelfSwitches.setValue([mapId, id, 'A'], $gameParty.hasItem($dataItems[Number(value1)], true));
+      //if($gameParty.hasItem($dataItems[Number(value1) + 100],true)){
+      //let value12 = 1;
+      //}
+    }
+
+    if (value12 == 1) { $gameMap.eraseEvent(id) }
+    else if (value12 == 0) {
+      if (eventEvent.meta['PSet']) {
+        const character = event;
+        const value1 = Number(eventEvent.meta['PSet'].split(',')[0]);
+        const value2 = Number(eventEvent.meta['PSet'].split(',')[1]);
+        character.locate(value1, value2);
+        //character.setDirection(4);
       };
-      if(Number(arr1[i]) >= 401 && Number(arr1[i]) <= 500){
-        if( $gameSwitches.value(Number(arr1[i])+800) && !$gameSwitches.value(Number(arr1[i])+900) ){
-          var value12 = 1;
-          break;
-        };
+      if (eventEvent.meta['Amassage']) {//<Amassage:901,おはよう\I[16]>
+        const arr = eventEvent.meta['Amassage'].split(',');
+        const value1 = Number(arr[0]);
+        const value2 = arr[1];
+        $gameVariables.setValue(value1, value2);
+        $gameMap.forceDisplayActiveMessage(id);
       };
-    };
-  };
-  if ($gameMap.event(id).event().meta['EvEraseItem']){
-    var character = $gameMap.event(id);
-    var arr1 = $gameMap.event(id).event().meta['EvEraseItem'].split(',');
-    for (var i = 0; i <= arr1.length-1; i++) {
-      if(Number(arr1[i]) >= 1){
-        if($gameParty.hasItem($dataItems[Number(arr1[i])],true)){
-          var value12 = 1;
-        };
-  }}};
-  if ($gameMap.event(id).event().meta['QuestSet']){//
-    var character = $gameMap.event(id);
-    var value1 = $gameMap.event(id).event().meta['QuestSet'];
-    if(valueQuestArray5[value1-800] == 1){
-      $gameSelfSwitches.setValue([$gameMap.mapId(), id, 'B'], true);
-    } else {
-      $gameSelfSwitches.setValue([$gameMap.mapId(), id, 'B'], false);
-    };
-    if($gameParty.hasItem($dataItems[Number(value1)],true)){
-      $gameSelfSwitches.setValue([$gameMap.mapId(), id, 'A'], true);
-    } else {
-      $gameSelfSwitches.setValue([$gameMap.mapId(), id, 'A'], false);
-    };
-    if($gameParty.hasItem($dataItems[Number(value1) + 100],true)){
-      //var value12 = 1;
-    };
-  };
-  if(value12 == 1){$gameMap.eraseEvent(id)};
-  if(value12 == 0){
-    if ($gameMap.event(id).event().meta['PSet']){
-      var character = $gameMap.event(id);
-      var value1 = Number($gameMap.event(id).event().meta['PSet'].split(',')[0]);
-      var value2 = Number($gameMap.event(id).event().meta['PSet'].split(',')[1]);
-      character.locate(value1, value2);
-      //character.setDirection(4);
-    };
-    if ($gameMap.event(id).event().meta['Amassage']){//<Amassage:901,おはよう\I[16]>
-      var value1 = Number($gameMap.event(id).event().meta['Amassage'].split(',')[0]);
-      var value2 = $gameMap.event(id).event().meta['Amassage'].split(',')[1];
-      $gameVariables.setValue(value1,value2);
-      $gameMap.forceDisplayActiveMessage(id);
-    };
-    if ($gameMap.event(id).event().meta['Hsw1']){//<Hsw1:2,1>
-      var list = [1,2,3,4,5,6,7,8,9];
-      list.forEach(function(id1) {
-        if ($gameMap.event(id).event().meta['Hsw'+id1]){
-          var value1 = Number($gameMap.event(id).event().meta['Hsw'+id1].split(',')[0]);
-          var value2 = Number($gameMap.event(id).event().meta['Hsw'+id1].split(',')[1]);
-          if($gameSwitches.value(value1) && !$gameSwitches.value(value2)){
-            var char = $gameMap.event(id);
-            char.setIndicators('h',0,false,0,0,"",0,false,false,0,true,0,-20);
+
+      //<Hsw1:2,1> , //<H1sw1:2,1>
+      const ids1 = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+      for (const num of ['', '1']) {
+        if (!eventEvent.meta['H' + num + 'sw1']) continue;
+
+        for (const id1 of ids1) {
+          const hswX = eventEvent.meta['H' + num + 'sw' + id1];
+          if (!hswX) continue;
+
+          const hswXArr = eventEvent.meta['H' + num + 'sw' + id1].split(',');
+          const value1 = Number(hswXArr[0]);
+          const value2 = Number(hswXArr[1]);
+          if ($gameSwitches.value(value1) && !$gameSwitches.value(value2)) {
+            const char = event;
+            char.setIndicators('h' + num, 0, false, 0, 0, "", 0, false, false, 0, true, 0, -20);
             char._indData.ref = true;
             char._indData.fontSize = 28;
             char._indData.ref = true;
             char._indData.animated = true;
-            char._indData.frames = [0,5,0,5]; 
-        }};
-      }, this);
-    };
-    if ($gameMap.event(id).event().meta['H1sw1']){//<H1sw1:2,1>
-      var list = [1,2,3,4,5,6,7,8,9];
-      list.forEach(function(id1) {
-        if ($gameMap.event(id).event().meta['H1sw'+id1]){
-          var value1 = Number($gameMap.event(id).event().meta['H1sw'+id1].split(',')[0]);
-          var value2 = Number($gameMap.event(id).event().meta['H1sw'+id1].split(',')[1]);
-            if($gameSwitches.value(value1) && !$gameSwitches.value(value2)){
-              var char = $gameMap.event(id);
-              char.setIndicators('h1',0,false,0,0,"",0,false,false,0,true,0,-20);
-              char._indData.ref = true;
-              char._indData.fontSize = 28;
-              char._indData.ref = true;
-              char._indData.animated = true;
-              char._indData.frames = [0,5,0,5]; 
-        }};
-      }, this);
-    };
-  };
-}}};
-
-};
-};
+            char._indData.frames = [0, 5, 0, 5];
+          }
+        }
+      }
+    }
+  }
+}
 
 //ボスマップのキャラグラをＣＧで設定
 boss_charaGuraCGSet = function(valueBossCharaGura){
@@ -1317,12 +1314,12 @@ people_bloodBodySet = function(value2,value3){
 
 map_npcGraphicSet();
 $gameMap.spawnEvent(74, value2, value3, true);
-var eventId = $gameMap.getLastSpawnEventId();
-var event = $gameMap.event(eventId);
-var arr1 = [6,7];
-var value1 = arr1[Math.floor(Math.random() * arr1.length)];
+const event = $gameMap.event($gameMap.getLastSpawnEventId());
+const arr1 = [6,7];
+const value1 = arr1[Math.floor(Math.random() * arr1.length)];
 event.setImage('Damage2', value1);
-var value4 = Math.floor( Math.random() * $gameVariables.value(36)[1]) + $gameVariables.value(36)[0];
+const gameVar36 = $gameVariables.value(36);
+const value4 = Math.floor(Math.random() * gameVar36[1]) + gameVar36[0];
 event.setImage($gameVariables.value(33)+$gameVariables.value(35), value4);
 event.setDirectionFix(false);
 event.setDirection(8);
@@ -1334,36 +1331,44 @@ $gameMap.spawnEvent(99, value2, value3, true);
 //イベントメモタグでまとめてセルフスイッチevent_togetherSelf(this._eventId,'B');
 event_togetherSelf = function(id1,id2){
 
-for (var id = 100; id > 0; id--) {
-  if(id != id1) {
-    if(!!$gameMap.event(id)) {
-      if ($gameMap.event(id).event().meta['CharaNameId']){
-        if (Number($gameMap.event(id1).event().meta['CharaNameId']) == Number($gameMap.event(id).event().meta['CharaNameId'])){
-          if([301,302,303,304,305,306,307,308,309,310].some(function(id3){return id == id3})){}else{
-            $gameSelfSwitches.setValue([$gameMap.mapId(), id, id2], true);
-          };
-}}}}};
-};
+  const arr = [301, 302, 303, 304, 305, 306, 307, 308, 309, 310];
+  const mapId = $gameMap.mapId();
+  for (var id = 100; id > 0; id--) {
+    if (id != id1) {
+      const ev = $gameMap.event(id);
+      if (!!ev) {
+        const evCharaNameId = ev.event().meta['CharaNameId'];
+        if (evCharaNameId) {
+          if (Number($gameMap.event(id1).event().meta['CharaNameId']) == Number(evCharaNameId)) {
+            if (arr.some(function (id3) { return id == id3 })) { } else {
+              $gameSelfSwitches.setValue([mapId, id, id2], true);
+            };
+          }
+        }
+      }
+    }
+  }
+}
 
 //ｲﾝｼﾞｹｰﾀｰ発生消去event_charaIndicators(1,this._eventId,'Arrow',0,-10,3,10);
 //0で0消去1ｱﾆﾒ発生,1ｲﾍﾞﾝﾄid,2ﾌｧｲﾙ名,3x4y,5枚数,6速度
 event_charaIndicators = function(id1,id2,id3,id4,id5,id6,id7){
 
-var char = $gameMap.event(id2);
+const char = $gameMap.event(id2);
 if(id1 == 0){
   char.clearIndicators();
   char._indData.ref = true;
-};
-if(id1 == 1){
+}
+else if(id1 == 1){
   char.setIndicators(id3,0,false,0,0,"",0,false,false,0,true,id4,id5);
   char._indData.ref = true;
   char._indData.fontSize = 28;
   char._indData.ref = true;
   char._indData.animated = true;
   char._indData.frames = [0,id6,0,id7]; 
-};
+}
 
-};
+}
 
 
 //動物食材指定

@@ -238,127 +238,138 @@ allAnimeattack_moveBase = function (isMove2) {
 //ダメージ時に計算。（変更が多いため先頭に置く）value4はstateId。value2未使用
 damage_keisan1 = function(user,target,action,value,value1,value2,value3,value99){
 
-if($gameSwitches.value(141)){
-  for (var i = 1; i <= $gameVariables.value(526); i++) {
-    if (action && value > 0 && valueSkillDamageType == 1) {
+if(!$gameSwitches.value(141)) return;
+
+  const gameVar536 = $gameVariables.value(526);
+  for (let i = 1; i <= gameVar536; i++) {
+    const isValid = action && value > 0 && valueSkillDamageType == 1;
+    if (!isValid) continue;
+
+    let arr1;
       if(i == 1){
         if(target.result().critical){
           if(user.isActor()){
             $gameVariables.value(380 + user.actorId())[68] += 1;
-          };
+          }
           if(target.hp <= 0 && valueCollapseAnime >= 1){}else{
             target.startAnimation(value1, true, 0);
-          };
-        };
+          }
+        }
         if(target.hp != 0 && valueTotalDamageCount2 == 0){
           battle_stateAnime1(target);
-        };
-      };
-      if(i == 1){
+        }
+
           if(target.isActor()){
             if(value >= target.mhp/2){
               state_addFormula1([41,25,user,target,user.mdf,target.luk]);//負傷ステート
             };
           };
           if(value >= target.mhp/10){
+            let valueTarget;
+            let value13
             if(target.isActor()){
-              var valueTarget = $gameParty;
-              var value13 = -24;
+              valueTarget = $gameParty;
+              value13 = -24;
             }else{
-              var valueTarget = $gameTroop;
-              var value13 = -100;
+              valueTarget = $gameTroop;
+              value13 = -100;
             };
-            var value10 = 'wave_' + target.index();
-            var value11 = valueTarget.getX(target.index()+1);
-            var value12 = valueTarget.getY(target.index()+1) + value13;
-            var value14 = 50;
-            var value15 = 30;
-            var value16 = 0.05;
+            const targetIndex = target.index();
+            let value10 = 'wave_' + targetIndex;
+            let value11 = valueTarget.getX(targetIndex +1);
+            let value12 = valueTarget.getY(targetIndex +1) + value13;
+            let value14 = 50;
+            let value15 = 30;
+            let value16 = 0.05;
             if(value >= target.mhp/10*3){
-              var value14 = 100;
-              var value15 = 40;
+              value14 = 100;
+              value15 = 40;
             };
             if(value >= target.mhp/2){
-              var value14 = 150;
-              var value15 = 50;
+              value14 = 150;
+              value15 = 50;
             };
             if(value >= target.mhp){
-              var value14 = 200;
-              var value16 = 0.06;
+              value14 = 200;
+              value16 = 0.06;
             };
             $gameMap.createFilter(value10,'shockwave',0,'screen');
             $gameMap.setFilter(value10,[value11,value12,-1,value15,value14,1]);
             $gameMap.setFilterAddiTime(value10,value16);
-      };
-      var value7 = 50;
-      var value8 = 10;
-      var value9 = 4;
+          }
+        let value7 = 50;
+        let value8 = 10;
+        let value9 = 4;
+        let value3 = 0;
         if(target.mhp/100 >= value){ 
-          var value3 = 130;
+          value3 = 130;
           value7 -= 50;
           value8 -= 5;
           value9 -= 3;
-        };
-        if(target.mhp <= value){ 
+        }
+        else if(target.mhp <= value){ 
           value3 += 1;
           value7 += 25;
           value8 += 5;
           value9 += 2;
-        };
-        if($gameVariables.value(526) >= 2){  
-          value8 += $gameVariables.value(526) * 3;
+        }
+
+        if (gameVar536 >= 2){  
+          value8 += gameVar536 * 3;
         };  
         if($gameVariables.value(331) == 0){
-          var arr1 = [200,0,0,value7];
+          arr1 = [200,0,0,value7];
         } else {
-          var arr1 = $gameVariables.value(331);
+          arr1 = $gameVariables.value(331);
           arr1[3] = value7;
         };
         $gameScreen.startFlash(arr1, value8);
         $gameScreen.startShake(1, value9, value8);
-  };
+    }
+    let value6 = 0;
     if(value3 >= 1){
       if(i >= 2){
-        var value5 = $dataAnimations[value3].frames.length;
-        var value10 = 4;
-        if($dataAnimations[value3].name.match(/!/)){var value10 = 1};
-        if($dataAnimations[value3].name.match(/&/)){var value10 = 2};
-        if($dataAnimations[value3].name.match(/$/)){var value10 = 3};
-        var value6 = Math.ceil((value5 * 4 / 5) * value10/4) * (i - 1);
+        const value5 = $dataAnimations[value3].frames.length;
+        let value10 = 4;
+        if($dataAnimations[value3].name.match(/!/)){value10 = 1}
+        else if($dataAnimations[value3].name.match(/&/)){value10 = 2}
+        else if($dataAnimations[value3].name.match(/$/)){value10 = 3};
+
+        value6 = Math.ceil((value5 * 4 / 5) * value10/4) * (i - 1);
       } else {
-        var value6 = 0;
-      };
-    };
+        value6 = 0;
+      }
+    }
 /*
     if(valueBattleAddAttack >= 1){//<BattleAddAttackSet:50>未使用	
-      var value1 = Math.round(value * valueBattleAddAttack / 100);
+      let value1 = Math.round(value * valueBattleAddAttack / 100);
       target.gainHp(-value1);
       target.startDamagePopup();
     };
 */
     if(i >= 2){
-      var value5 = Math.floor( Math.random() * 41) - 20;
-      var value5 = Math.round(value * value5 / 100);     
+      let value5 = Math.floor( Math.random() * 41) - 20;
+      value5 = Math.round(value * value5 / 100);     
       target.gainHp(-value-value5);
       target.startDamagePopup();
-    };
-    if(i == 2){
-      //if(target.hp <= 0 && valueCollapseAnime >= 1){}else{
+
+      if (i == 2) {
+        //if(target.hp <= 0 && valueCollapseAnime >= 1){}else{
         $gameScreen.startFlash(arr1, value8);
         $gameScreen.startShake(value9, value9, value8);
-      //};
-    };
+        //};
+      }
+    }
     if(value3 >= 1){
       //if(target.hp <= 0 && valueCollapseAnime >= 1){}else{
         target.startAnimation(value3, true, value6);
       //};
-    };
-  target.addStateCounter(value99, value);
-  valueTotalDamageCount += value;
-  valueTotalDamageCount2 += 1;
-}}};
-
-};
+    }
+    target.addStateCounter(value99, value);
+    valueTotalDamageCount += value;
+    valueTotalDamageCount2 += 1;
+  }
+}
 
 //スキルパワー加算計算skill_addPowerSet(user,$dataSkills,1,1);
 skill_addPowerSet = function(user,valueItems,id1,id2){
