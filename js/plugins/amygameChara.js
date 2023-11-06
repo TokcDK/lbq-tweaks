@@ -1334,16 +1334,24 @@ $gameMap.spawnEvent(99, value2, value3, true);
 //イベントメモタグでまとめてセルフスイッチevent_togetherSelf(this._eventId,'B');
 event_togetherSelf = function(id1,id2){
 
-for (var id = 100; id > 0; id--) {
-  if(id != id1) {
-    if(!!$gameMap.event(id)) {
-      if ($gameMap.event(id).event().meta['CharaNameId']){
-        if (Number($gameMap.event(id1).event().meta['CharaNameId']) == Number($gameMap.event(id).event().meta['CharaNameId'])){
-          if([301,302,303,304,305,306,307,308,309,310].some(function(id3){return id == id3})){}else{
-            $gameSelfSwitches.setValue([$gameMap.mapId(), id, id2], true);
-          };
-}}}}};
-};
+  const arr = [301, 302, 303, 304, 305, 306, 307, 308, 309, 310];
+  const mapId = $gameMap.mapId();
+  for (var id = 100; id > 0; id--) {
+    if (id != id1) {
+      const ev = $gameMap.event(id);
+      if (!!ev) {
+        const evCharaNameId = ev.event().meta['CharaNameId'];
+        if (evCharaNameId) {
+          if (Number($gameMap.event(id1).event().meta['CharaNameId']) == Number(evCharaNameId)) {
+            if (arr.some(function (id3) { return id == id3 })) { } else {
+              $gameSelfSwitches.setValue([mapId, id, id2], true);
+            };
+          }
+        }
+      }
+    }
+  }
+}
 
 //ｲﾝｼﾞｹｰﾀｰ発生消去event_charaIndicators(1,this._eventId,'Arrow',0,-10,3,10);
 //0で0消去1ｱﾆﾒ発生,1ｲﾍﾞﾝﾄid,2ﾌｧｲﾙ名,3x4y,5枚数,6速度
