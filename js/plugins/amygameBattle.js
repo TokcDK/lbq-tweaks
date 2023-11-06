@@ -3998,11 +3998,12 @@ battleStatus_showHide = function(id1){
   } else {
     if (on) BattleManager._statusWindow.show(); else BattleManager._statusWindow.hide();
   };
-
-  if(SceneManager._scene._bosshp_sprites === undefined){
-    console.log("SceneManager._scene._bosshp_sprites is undefined!");
+  if ($gameSwitches.value(211)){
+    if(SceneManager._scene._bosshp_sprites === undefined){
+      console.warn('SceneManager._scene._bosshp_sprites is undefined!');
+    }
+    else SceneManager._scene._bosshp_sprites.visible = on;
   }
-  else if ($gameSwitches.value(211)) SceneManager._scene._bosshp_sprites.visible = on;
 
 }
 
