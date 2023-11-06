@@ -245,6 +245,7 @@ if(!$gameSwitches.value(141)) return;
     const isValid = action && value > 0 && valueSkillDamageType == 1;
     if (!isValid) continue;
 
+    let arr1;
       if(i == 1){
         if(target.result().critical){
           if(user.isActor()){
@@ -316,7 +317,6 @@ if(!$gameSwitches.value(141)) return;
         if (gameVar536 >= 2){  
           value8 += gameVar536 * 3;
         };  
-        let arr1;
         if($gameVariables.value(331) == 0){
           arr1 = [200,0,0,value7];
         } else {
