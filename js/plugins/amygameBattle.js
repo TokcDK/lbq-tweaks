@@ -3911,76 +3911,77 @@ if(value2){
 };
 
 //装備スキルの操作
-skill_equipOperation = function(actor,b,itemId){
+skill_equipOperation = function(actor,actor2,itemId){
 
-if(b.actorId() == actor.actorId()){
+if(actor2.actorId() !== actor.actorId()) return;
+
+  const gameVar351Arr = $gameVariables.value(351);
+  const actorId = actor.actorId();
+  const actorName = `\\C[2]${actor.name()}\\C[0]`;
   if(itemId == 427){//記憶
-    var arr1 = actor.battleSkillsRaw();
-    $gameVariables.value(351)[actor.actorId()] = arr1.clone();
-    TickerManager.show(`\\C[2]${actor.name()}\\C[0]のスキル装備状態を記録しました`);
-  };
-  if(itemId == 428){//復元
-    if($gameVariables.value(351)[actor.actorId()] == 0){
+    const arr1 = actor.battleSkillsRaw();
+    gameVar351Arr[actorId] = arr1.clone();
+    TickerManager.show(`${actorName}のスキル装備状態を記録しました`);
+  }
+  else if(itemId == 428){//復元
+    if (gameVar351Arr[actorId] == 0){
       TickerManager.show(`\\C[2]${actor.name()}\\C[0]はスキル装備状態を記録していません`);
     } else {
       actor.clearEquipBattleSkills();
-      for (var i = 0; i <= $gameVariables.value(351)[actor.actorId()].length-1; i++) {
-        actor.equipSkill($gameVariables.value(351)[actor.actorId()][i], i);
+      for (let i = 0; i <= gameVar351Arr[actorId].length-1; i++) {
+        actor.equipSkill(gameVar351Arr[actorId][i], i);
       };
-      TickerManager.show(`\\C[2]${actor.name()}\\C[0]のスキル装備状態を復元しました`);
+      TickerManager.show(`${actorName}のスキル装備状態を復元しました`);
     };
-  };
-  if(itemId == 429){//一括解除
+  }
+  else if(itemId == 429){//一括解除
     actor.clearEquipBattleSkills();
-    TickerManager.show(`\\C[2]${actor.name()}\\C[0]のスキル装備状態を全て解除しました`);
-  };
-  if(itemId == 430){//一括装着
-     var arr1 = Array(actor.battleSkillsRaw().length).fill(0);
-     var id1 = 0;
-     if(actor.isStateAffected(602)){
-       var id2 = actor.battleSkillsRaw().length-200;//10Ｇパッシブ
-     } else {
-       var id2 = actor.battleSkillsRaw().length-100;//10Ｇパッシブ
-     };
-     var id3 = actor.battleSkillsRaw().length-100;//15Hパッシブ
-     var id4 = 0;
-     for (var i = 1; i <= $dataSkills.length-1; i++) {
-       if(!$dataSkills[i].name == '') {
-         if($dataSkills[i].meta['Skill Tier']) {
-           if(actor.isLearnedSkill(i) || actor.addedSkills().contains(i)){
-             id4 += 1;
-             if($dataSkills[i].stypeId == 10){
-               arr1[id2] = i;
-               id2 += 1;
-             } else {
-               if($dataSkills[i].stypeId == 15){
-                 arr1[id3] = i;
-                 id3 += 1;
-               } else {
-                 arr1[id1] = i;
-                 id1 += 1;
-               };
-             };
-     }}}};
-     if(id4 >= 1){
-       actor.clearEquipBattleSkills();
-       for (var i = 0; i <= arr1.length-1; i++) {
-         if(arr1[i] != 0){
-           if(actor.getEquipSkillTierCount(Number($dataSkills[arr1[i]].meta['Skill Tier'])) < actor.getEquipSkillTierMax(Number($dataSkills[arr1[i]].meta['Skill Tier']))){
-             if(i <= actor.battleSkillsRaw().length){  
-               actor.equipSkill(arr1[i], i);
-             };
-           };
-         };
-       };
-       TickerManager.show(`\\C[2]${actor.name()}\\C[0]は装備可能なスキルを全て装着しました。`);
-     } else {
-       TickerManager.show(`\\C[2]${actor.name()}\\C[0]は装備可能なスキルを保有していません。`);
-     };
-  };
-};
+    TickerManager.show(`${actorName}のスキル装備状態を全て解除しました`);
+  }
+  else if(itemId == 430){//一括装着
+    const skillIds = Array(actor.battleSkillsRaw().length).fill(0);
+    let id1 = 0;
+    let id2 = actor.battleSkillsRaw().length - actor.isStateAffected(602) ? 200 : 100;//10Ｇパッシブ
+    let id3 = actor.battleSkillsRaw().length-100;//15Hパッシブ
+    let id4 = 0;
+    for (let i = 1; i < $dataSkills.length; i++) {
+      const skill = $dataSkills[i];
+      if (skill.name === '') continue;
 
-};
+      const isValid = skill.meta['Skill Tier'] && (actor.isLearnedSkill(i) || actor.addedSkills().contains(i));
+      if (!isValid) continue;
+
+      id4 += 1;
+      if (skill.stypeId == 10) {
+        skillIds[id2] = i;
+        id2 += 1;
+      } else if (skill.stypeId == 15) {
+        skillIds[id3] = i;
+        id3 += 1;
+      } else {
+        skillIds[id1] = i;
+        id1 += 1;
+      }
+    }
+    if (id4 >= 1) {
+      actor.clearEquipBattleSkills();
+      for (let i = 0; i < skillIds.length; i++) {
+        const skillId = skillIds[i];
+        if (skillId) {
+          const skillTierId = Number($dataSkills[skillId].meta['Skill Tier']);
+          if (actor.getEquipSkillTierCount(skillTierId) < actor.getEquipSkillTierMax(skillTierId)) {
+            if (i <= actor.battleSkillsRaw().length) {
+              actor.equipSkill(skillIds[i], i);
+            }
+          }
+        }
+      }
+      TickerManager.show(`${actorName}は装備可能なスキルを全て装着しました。`);
+    } else {
+      TickerManager.show(`${actorName}は装備可能なスキルを保有していません。`);
+    }
+  }
+}
 
 //ステータス表示非表示
 battleStatus_showHide = function(id1){
