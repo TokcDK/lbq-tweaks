@@ -236,7 +236,7 @@ allAnimeattack_moveBase = function (isMove2) {
 }
 
 //ダメージ時に計算。（変更が多いため先頭に置く）value4はstateId。value2未使用
-damage_keisan1 = function(user,target,action,value,value1,value2,value3,value99){
+damage_keisan1 = function(user,target,action,value,value1,value2,animationId,stateId){
 
 if(!$gameSwitches.value(141)) return;
 
@@ -245,7 +245,21 @@ if(!$gameSwitches.value(141)) return;
     const isValid = action && value > 0 && valueSkillDamageType == 1;
     if (!isValid) continue;
 
-    let arr1;
+    let colorOpacity = 50;
+    let snakePower = 0;
+    let speed = 4;
+    let duration = 10;
+
+    let colorDataArray;  
+    if (!$gameVariables.value(331)) {
+      colorDataArray = [200, 0, 0, colorOpacity];
+      $gameVariables.setValue(331, colorDataArray);
+    } else {
+      colorDataArray = $gameVariables.value(331);
+      colorDataArray[3] = colorOpacity;
+    };  
+    colorDataArray[3] = colorOpacity;
+
       if(i == 1){
         if(target.result().critical){
           if(user.isActor()){
@@ -297,47 +311,39 @@ if(!$gameSwitches.value(141)) return;
             $gameMap.setFilter(value10,[value11,value12,-1,value15,value14,1]);
             $gameMap.setFilterAddiTime(value10,value16);
           }
-        let value7 = 50;
-        let value8 = 10;
-        let value9 = 4;
-        let value3 = 0;
+        duration = 10;
         if(target.mhp/100 >= value){ 
-          value3 = 130;
-          value7 -= 50;
-          value8 -= 5;
-          value9 -= 3;
+          snakePower = 130;
+          colorOpacity -= 50;
+          duration -= 5;
+          speed -= 3;
         }
         else if(target.mhp <= value){ 
-          value3 += 1;
-          value7 += 25;
-          value8 += 5;
-          value9 += 2;
+          snakePower += 1;
+          colorOpacity += 25;
+          duration += 5;
+          speed += 2;
         }
 
         if (gameVar536 >= 2){  
-          value8 += gameVar536 * 3;
+          duration += gameVar536 * 3;
         };  
-        if($gameVariables.value(331) == 0){
-          arr1 = [200,0,0,value7];
-        } else {
-          arr1 = $gameVariables.value(331);
-          arr1[3] = value7;
-        };
-        $gameScreen.startFlash(arr1, value8);
-        $gameScreen.startShake(1, value9, value8);
+        $gameScreen.startFlash(colorDataArray, duration);
+        $gameScreen.startShake(snakePower, speed, duration);
     }
-    let value6 = 0;
-    if(value3 >= 1){
+    let animDelay = 0;
+    if(animationId >= 1){
       if(i >= 2){
-        const value5 = $dataAnimations[value3].frames.length;
-        let value10 = 4;
-        if($dataAnimations[value3].name.match(/!/)){value10 = 1}
-        else if($dataAnimations[value3].name.match(/&/)){value10 = 2}
-        else if($dataAnimations[value3].name.match(/$/)){value10 = 3};
+        const animation = $dataAnimations[animationId];
+        const animFramesLength = animation.frames.length;
+        let animDelayMax = 4;
+        if (animation.name.match(/!/)){animDelayMax = 1}
+        else if (animation.name.match(/&/)){animDelayMax = 2}
+        else if (animation.name.match(/$/)){animDelayMax = 3};
 
-        value6 = Math.ceil((value5 * 4 / 5) * value10/4) * (i - 1);
+        animDelay = Math.ceil((animFramesLength * 4 / 5) * animDelayMax/4) * (i - 1);
       } else {
-        value6 = 0;
+        animDelay = 0;
       }
     }
 /*
@@ -355,17 +361,17 @@ if(!$gameSwitches.value(141)) return;
 
       if (i == 2) {
         //if(target.hp <= 0 && valueCollapseAnime >= 1){}else{
-        $gameScreen.startFlash(arr1, value8);
-        $gameScreen.startShake(value9, value9, value8);
+        $gameScreen.startFlash(colorDataArray, duration);
+        $gameScreen.startShake(snakePower, speed, duration);
         //};
       }
     }
-    if(value3 >= 1){
+    if(animationId >= 1){
       //if(target.hp <= 0 && valueCollapseAnime >= 1){}else{
-        target.startAnimation(value3, true, value6);
+        target.startAnimation(animationId, true, animDelay);
       //};
     }
-    target.addStateCounter(value99, value);
+    target.addStateCounter(stateId, value);
     valueTotalDamageCount += value;
     valueTotalDamageCount2 += 1;
   }
@@ -3911,97 +3917,95 @@ if(value2){
 };
 
 //装備スキルの操作
-skill_equipOperation = function(actor,b,itemId){
+skill_equipOperation = function(actor,actor2,itemId){
 
-if(b.actorId() == actor.actorId()){
+if(actor2.actorId() !== actor.actorId()) return;
+
+  const gameVar351Arr = $gameVariables.value(351);
+  const actorId = actor.actorId();
+  const actorName = `\\C[2]${actor.name()}\\C[0]`;
   if(itemId == 427){//記憶
-    var arr1 = actor.battleSkillsRaw();
-    $gameVariables.value(351)[actor.actorId()] = arr1.clone();
-    TickerManager.show(`\\C[2]${actor.name()}\\C[0]のスキル装備状態を記録しました`);
-  };
-  if(itemId == 428){//復元
-    if($gameVariables.value(351)[actor.actorId()] == 0){
+    const arr1 = actor.battleSkillsRaw();
+    gameVar351Arr[actorId] = arr1.clone();
+    TickerManager.show(`${actorName}のスキル装備状態を記録しました`);
+  }
+  else if(itemId == 428){//復元
+    if (gameVar351Arr[actorId] == 0){
       TickerManager.show(`\\C[2]${actor.name()}\\C[0]はスキル装備状態を記録していません`);
     } else {
       actor.clearEquipBattleSkills();
-      for (var i = 0; i <= $gameVariables.value(351)[actor.actorId()].length-1; i++) {
-        actor.equipSkill($gameVariables.value(351)[actor.actorId()][i], i);
+      for (let i = 0; i <= gameVar351Arr[actorId].length-1; i++) {
+        actor.equipSkill(gameVar351Arr[actorId][i], i);
       };
-      TickerManager.show(`\\C[2]${actor.name()}\\C[0]のスキル装備状態を復元しました`);
+      TickerManager.show(`${actorName}のスキル装備状態を復元しました`);
     };
-  };
-  if(itemId == 429){//一括解除
+  }
+  else if(itemId == 429){//一括解除
     actor.clearEquipBattleSkills();
-    TickerManager.show(`\\C[2]${actor.name()}\\C[0]のスキル装備状態を全て解除しました`);
-  };
-  if(itemId == 430){//一括装着
-     var arr1 = Array(actor.battleSkillsRaw().length).fill(0);
-     var id1 = 0;
-     if(actor.isStateAffected(602)){
-       var id2 = actor.battleSkillsRaw().length-200;//10Ｇパッシブ
-     } else {
-       var id2 = actor.battleSkillsRaw().length-100;//10Ｇパッシブ
-     };
-     var id3 = actor.battleSkillsRaw().length-100;//15Hパッシブ
-     var id4 = 0;
-     for (var i = 1; i <= $dataSkills.length-1; i++) {
-       if(!$dataSkills[i].name == '') {
-         if($dataSkills[i].meta['Skill Tier']) {
-           if(actor.isLearnedSkill(i) || actor.addedSkills().contains(i)){
-             id4 += 1;
-             if($dataSkills[i].stypeId == 10){
-               arr1[id2] = i;
-               id2 += 1;
-             } else {
-               if($dataSkills[i].stypeId == 15){
-                 arr1[id3] = i;
-                 id3 += 1;
-               } else {
-                 arr1[id1] = i;
-                 id1 += 1;
-               };
-             };
-     }}}};
-     if(id4 >= 1){
-       actor.clearEquipBattleSkills();
-       for (var i = 0; i <= arr1.length-1; i++) {
-         if(arr1[i] != 0){
-           if(actor.getEquipSkillTierCount(Number($dataSkills[arr1[i]].meta['Skill Tier'])) < actor.getEquipSkillTierMax(Number($dataSkills[arr1[i]].meta['Skill Tier']))){
-             if(i <= actor.battleSkillsRaw().length){  
-               actor.equipSkill(arr1[i], i);
-             };
-           };
-         };
-       };
-       TickerManager.show(`\\C[2]${actor.name()}\\C[0]は装備可能なスキルを全て装着しました。`);
-     } else {
-       TickerManager.show(`\\C[2]${actor.name()}\\C[0]は装備可能なスキルを保有していません。`);
-     };
-  };
-};
+    TickerManager.show(`${actorName}のスキル装備状態を全て解除しました`);
+  }
+  else if(itemId == 430){//一括装着
+    const skillIds = Array(actor.battleSkillsRaw().length).fill(0);
+    let id1 = 0;
+    let id2 = actor.battleSkillsRaw().length - actor.isStateAffected(602) ? 200 : 100;//10Ｇパッシブ
+    let id3 = actor.battleSkillsRaw().length-100;//15Hパッシブ
+    let id4 = 0;
+    for (let i = 1; i < $dataSkills.length; i++) {
+      const skill = $dataSkills[i];
+      if (skill.name === '') continue;
 
-};
+      const isValid = skill.meta['Skill Tier'] && (actor.isLearnedSkill(i) || actor.addedSkills().contains(i));
+      if (!isValid) continue;
+
+      id4 += 1;
+      if (skill.stypeId == 10) {
+        skillIds[id2] = i;
+        id2 += 1;
+      } else if (skill.stypeId == 15) {
+        skillIds[id3] = i;
+        id3 += 1;
+      } else {
+        skillIds[id1] = i;
+        id1 += 1;
+      }
+    }
+    if (id4 >= 1) {
+      actor.clearEquipBattleSkills();
+      for (let i = 0; i < skillIds.length; i++) {
+        const skillId = skillIds[i];
+        if (skillId) {
+          const skillTierId = Number($dataSkills[skillId].meta['Skill Tier']);
+          if (actor.getEquipSkillTierCount(skillTierId) < actor.getEquipSkillTierMax(skillTierId)) {
+            if (i <= actor.battleSkillsRaw().length) {
+              actor.equipSkill(skillIds[i], i);
+            }
+          }
+        }
+      }
+      TickerManager.show(`${actorName}は装備可能なスキルを全て装着しました。`);
+    } else {
+      TickerManager.show(`${actorName}は装備可能なスキルを保有していません。`);
+    }
+  }
+}
 
 //ステータス表示非表示
 battleStatus_showHide = function(id1){
 
-if(id1 == 0){
+  const on = id1 == 0;
   if (Imported.MOG_BattleHud) {
-    $gameSystem._bhud_visible = true;
+    $gameSystem._bhud_visible = on;
   } else {
-    BattleManager._statusWindow.show();
+    if (on) BattleManager._statusWindow.show(); else BattleManager._statusWindow.hide();
   };
-  if ($gameSwitches.value(211)) {SceneManager._scene._bosshp_sprites.visible = true};
-} else {
-  if (Imported.MOG_BattleHud) {
-    $gameSystem._bhud_visible = false;
-  } else {
-    BattleManager._statusWindow.hide();
-  };
-  if ($gameSwitches.value(211)) {SceneManager._scene._bosshp_sprites.visible = false};
-};
+  if ($gameSwitches.value(211)){
+    if(SceneManager._scene._bosshp_sprites === undefined){
+      console.warn('SceneManager._scene._bosshp_sprites is undefined!');
+    }
+    else SceneManager._scene._bosshp_sprites.visible = on;
+  }
 
-};
+}
 
 //確率でステート付与state_addFormula1([4,50,user,target,user.mdf,target.luk]);
 state_addFormula1 = function(arr10){
