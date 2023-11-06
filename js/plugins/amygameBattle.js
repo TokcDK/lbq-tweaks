@@ -236,7 +236,7 @@ allAnimeattack_moveBase = function (isMove2) {
 }
 
 //ダメージ時に計算。（変更が多いため先頭に置く）value4はstateId。value2未使用
-damage_keisan1 = function(user,target,action,value,value1,value2,value3,value99){
+damage_keisan1 = function(user,target,action,value,value1,value2,animationId,stateId){
 
 if(!$gameSwitches.value(141)) return;
 
@@ -245,7 +245,9 @@ if(!$gameSwitches.value(141)) return;
     const isValid = action && value > 0 && valueSkillDamageType == 1;
     if (!isValid) continue;
 
-    let arr1;
+    let colorDataArray;
+    let speed = 4;
+    let duration = 10;
       if(i == 1){
         if(target.result().critical){
           if(user.isActor()){
@@ -297,47 +299,47 @@ if(!$gameSwitches.value(141)) return;
             $gameMap.setFilter(value10,[value11,value12,-1,value15,value14,1]);
             $gameMap.setFilterAddiTime(value10,value16);
           }
-        let value7 = 50;
-        let value8 = 10;
-        let value9 = 4;
+        let colorOpacity = 50;
+        duration = 10;
         let value3 = 0;
         if(target.mhp/100 >= value){ 
           value3 = 130;
-          value7 -= 50;
-          value8 -= 5;
-          value9 -= 3;
+          colorOpacity -= 50;
+          duration -= 5;
+          speed -= 3;
         }
         else if(target.mhp <= value){ 
           value3 += 1;
-          value7 += 25;
-          value8 += 5;
-          value9 += 2;
+          colorOpacity += 25;
+          duration += 5;
+          speed += 2;
         }
 
         if (gameVar536 >= 2){  
-          value8 += gameVar536 * 3;
+          duration += gameVar536 * 3;
         };  
         if($gameVariables.value(331) == 0){
-          arr1 = [200,0,0,value7];
+          colorDataArray = [200,0,0,colorOpacity];
         } else {
-          arr1 = $gameVariables.value(331);
-          arr1[3] = value7;
+          colorDataArray = $gameVariables.value(331);
+          colorDataArray[3] = colorOpacity;
         };
-        $gameScreen.startFlash(arr1, value8);
-        $gameScreen.startShake(1, value9, value8);
+        $gameScreen.startFlash(colorDataArray, duration);
+        $gameScreen.startShake(1, speed, duration);
     }
-    let value6 = 0;
-    if(value3 >= 1){
+    let animDelay = 0;
+    if(animationId >= 1){
       if(i >= 2){
-        const value5 = $dataAnimations[value3].frames.length;
-        let value10 = 4;
-        if($dataAnimations[value3].name.match(/!/)){value10 = 1}
-        else if($dataAnimations[value3].name.match(/&/)){value10 = 2}
-        else if($dataAnimations[value3].name.match(/$/)){value10 = 3};
+        const animation = $dataAnimations[animationId];
+        const animFramesLength = animation.frames.length;
+        let animDelayMax = 4;
+        if (animation.name.match(/!/)){animDelayMax = 1}
+        else if (animation.name.match(/&/)){animDelayMax = 2}
+        else if (animation.name.match(/$/)){animDelayMax = 3};
 
-        value6 = Math.ceil((value5 * 4 / 5) * value10/4) * (i - 1);
+        animDelay = Math.ceil((animFramesLength * 4 / 5) * animDelayMax/4) * (i - 1);
       } else {
-        value6 = 0;
+        animDelay = 0;
       }
     }
 /*
@@ -355,17 +357,17 @@ if(!$gameSwitches.value(141)) return;
 
       if (i == 2) {
         //if(target.hp <= 0 && valueCollapseAnime >= 1){}else{
-        $gameScreen.startFlash(arr1, value8);
-        $gameScreen.startShake(value9, value9, value8);
+        $gameScreen.startFlash(colorDataArray, duration);
+        $gameScreen.startShake(1, speed, duration);
         //};
       }
     }
-    if(value3 >= 1){
+    if(animationId >= 1){
       //if(target.hp <= 0 && valueCollapseAnime >= 1){}else{
-        target.startAnimation(value3, true, value6);
+        target.startAnimation(animationId, true, animDelay);
       //};
     }
-    target.addStateCounter(value99, value);
+    target.addStateCounter(stateId, value);
     valueTotalDamageCount += value;
     valueTotalDamageCount2 += 1;
   }
