@@ -240,7 +240,6 @@ damage_keisan1 = function(user,target,action,value,value1,value2,value3,value99)
 
 if(!$gameSwitches.value(141)) return;
 
-  const userActorId = user.actorId();
   const gameVar536 = $gameVariables.value(526);
   for (let i = 1; i <= gameVar536; i++) {
     const isValid = action && value > 0 && valueSkillDamageType == 1;
@@ -249,7 +248,7 @@ if(!$gameSwitches.value(141)) return;
       if(i == 1){
         if(target.result().critical){
           if(user.isActor()){
-            $gameVariables.value(380 + userActorId)[68] += 1;
+            $gameVariables.value(380 + user.actorId())[68] += 1;
           }
           if(target.hp <= 0 && valueCollapseAnime >= 1){}else{
             target.startAnimation(value1, true, 0);
