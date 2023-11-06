@@ -3992,23 +3992,19 @@ if(actor2.actorId() !== actor.actorId()) return;
 //ステータス表示非表示
 battleStatus_showHide = function(id1){
 
-if(id1 == 0){
+  const on = id1 == 0;
   if (Imported.MOG_BattleHud) {
-    $gameSystem._bhud_visible = true;
+    $gameSystem._bhud_visible = on;
   } else {
-    BattleManager._statusWindow.show();
+    if (on) BattleManager._statusWindow.show(); else BattleManager._statusWindow.hide();
   };
-  if ($gameSwitches.value(211)) {SceneManager._scene._bosshp_sprites.visible = true};
-} else {
-  if (Imported.MOG_BattleHud) {
-    $gameSystem._bhud_visible = false;
-  } else {
-    BattleManager._statusWindow.hide();
-  };
-  if ($gameSwitches.value(211)) {SceneManager._scene._bosshp_sprites.visible = false};
-};
 
-};
+  if(SceneManager._scene._bosshp_sprites === undefined){
+    console.log("SceneManager._scene._bosshp_sprites is undefined!");
+  }
+  else if ($gameSwitches.value(211)) SceneManager._scene._bosshp_sprites.visible = on;
+
+}
 
 //確率でステート付与state_addFormula1([4,50,user,target,user.mdf,target.luk]);
 state_addFormula1 = function(arr10){
