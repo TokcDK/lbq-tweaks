@@ -1357,21 +1357,21 @@ event_togetherSelf = function(id1,id2){
 //0で0消去1ｱﾆﾒ発生,1ｲﾍﾞﾝﾄid,2ﾌｧｲﾙ名,3x4y,5枚数,6速度
 event_charaIndicators = function(id1,id2,id3,id4,id5,id6,id7){
 
-var char = $gameMap.event(id2);
+const char = $gameMap.event(id2);
 if(id1 == 0){
   char.clearIndicators();
   char._indData.ref = true;
-};
-if(id1 == 1){
+}
+else if(id1 == 1){
   char.setIndicators(id3,0,false,0,0,"",0,false,false,0,true,id4,id5);
   char._indData.ref = true;
   char._indData.fontSize = 28;
   char._indData.ref = true;
   char._indData.animated = true;
   char._indData.frames = [0,id6,0,id7]; 
-};
+}
 
-};
+}
 
 
 //動物食材指定
