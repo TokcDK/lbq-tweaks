@@ -1317,12 +1317,12 @@ people_bloodBodySet = function(value2,value3){
 
 map_npcGraphicSet();
 $gameMap.spawnEvent(74, value2, value3, true);
-var eventId = $gameMap.getLastSpawnEventId();
-var event = $gameMap.event(eventId);
-var arr1 = [6,7];
-var value1 = arr1[Math.floor(Math.random() * arr1.length)];
+const event = $gameMap.event($gameMap.getLastSpawnEventId());
+const arr1 = [6,7];
+const value1 = arr1[Math.floor(Math.random() * arr1.length)];
 event.setImage('Damage2', value1);
-var value4 = Math.floor( Math.random() * $gameVariables.value(36)[1]) + $gameVariables.value(36)[0];
+const gameVar36 = $gameVariables.value(36);
+const value4 = Math.floor(Math.random() * gameVar36[1]) + gameVar36[0];
 event.setImage($gameVariables.value(33)+$gameVariables.value(35), value4);
 event.setDirectionFix(false);
 event.setDirection(8);
