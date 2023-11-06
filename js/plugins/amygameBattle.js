@@ -245,9 +245,21 @@ if(!$gameSwitches.value(141)) return;
     const isValid = action && value > 0 && valueSkillDamageType == 1;
     if (!isValid) continue;
 
-    let colorDataArray;
+    let colorOpacity = 50;
+    let snakePower = 0;
     let speed = 4;
     let duration = 10;
+
+    let colorDataArray;  
+    if (!$gameVariables.value(331)) {
+      colorDataArray = [200, 0, 0, colorOpacity];
+      $gameVariables.setValue(331, colorDataArray);
+    } else {
+      colorDataArray = $gameVariables.value(331);
+      colorDataArray[3] = colorOpacity;
+    };  
+    colorDataArray[3] = colorOpacity;
+
       if(i == 1){
         if(target.result().critical){
           if(user.isActor()){
@@ -299,17 +311,15 @@ if(!$gameSwitches.value(141)) return;
             $gameMap.setFilter(value10,[value11,value12,-1,value15,value14,1]);
             $gameMap.setFilterAddiTime(value10,value16);
           }
-        let colorOpacity = 50;
         duration = 10;
-        let value3 = 0;
         if(target.mhp/100 >= value){ 
-          value3 = 130;
+          snakePower = 130;
           colorOpacity -= 50;
           duration -= 5;
           speed -= 3;
         }
         else if(target.mhp <= value){ 
-          value3 += 1;
+          snakePower += 1;
           colorOpacity += 25;
           duration += 5;
           speed += 2;
@@ -318,14 +328,8 @@ if(!$gameSwitches.value(141)) return;
         if (gameVar536 >= 2){  
           duration += gameVar536 * 3;
         };  
-        if($gameVariables.value(331) == 0){
-          colorDataArray = [200,0,0,colorOpacity];
-        } else {
-          colorDataArray = $gameVariables.value(331);
-          colorDataArray[3] = colorOpacity;
-        };
         $gameScreen.startFlash(colorDataArray, duration);
-        $gameScreen.startShake(1, speed, duration);
+        $gameScreen.startShake(snakePower, speed, duration);
     }
     let animDelay = 0;
     if(animationId >= 1){
@@ -358,7 +362,7 @@ if(!$gameSwitches.value(141)) return;
       if (i == 2) {
         //if(target.hp <= 0 && valueCollapseAnime >= 1){}else{
         $gameScreen.startFlash(colorDataArray, duration);
-        $gameScreen.startShake(1, speed, duration);
+        $gameScreen.startShake(snakePower, speed, duration);
         //};
       }
     }
