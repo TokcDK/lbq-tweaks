@@ -1102,37 +1102,45 @@ $gameVariables.setValue(22,value5);
 //挿話選択肢発生スクリプト
 scene_choiceSouwa = function(){
 
-$gameVariables.setValue(19,0);
-valueScriptArray1 = [];
-var start = 1201;
-var end = 1300;
-for (var i = start; i <= end; i++) {
-  if($gameSwitches.value(i) && !$gameParty.hasItem(i-800) && !$gameSwitches.value(i+100)){
-    if($dataItems[i-800].meta['singleSouwaIncidence']){}else{
-      //valueScriptArray1.push(i+300);
-valueScriptArray1.push(i-800);
-      $gameVariables.setValue(19,1);
-}}};
-for (var i = 1; i <= $dataItems.length-1; i++) {
-  if($dataItems[i].meta['AddEventIncidenceSwi']){
-    if(Number($dataItems[i].meta['EICSwitch']) == 102){
-      if($gameSwitches.value(Number($dataItems[i].meta['AddEventIncidenceSwi'])) && !$gameParty.hasItem(i) && 
-      !$gameSwitches.value(Number($dataItems[i].meta['AddEventCompSwi']))){
-        if($dataItems[i].meta['singleSouwaIncidence']){}else{
-          valueScriptArray1.push(Number($dataItems[i].meta['AddEventParallelSwi']));//未完成
-          $gameVariables.setValue(19,1);
-}}}}};
-if($gameVariables.value(19) >= 1){
-  for(var i = 0; i <= valueScriptArray1.length-1; i++){
-    var value1 = $dataItems[valueScriptArray1[i]].name
-    const id = 1; 
+  $gameVariables.setValue(19,0);
+  valueScriptArray1 = [];
+  let setVar19 = false;
+  for (let i = 1201; i <= 1300; i++) {
+    if (!$gameSwitches.value(i) || $gameParty.hasItem(i - 800)) continue;
+    if ($gameSwitches.value(i + 100)) continue;
+    if ($dataItems[i - 800].meta['singleSouwaIncidence']) continue;
+
+    //valueScriptArray1.push(i+300);
+    valueScriptArray1.push(i - 800);
+    setVar19 = true;
+  }
+  for (let i = 1; i < $dataItems.length; i++) {
+    const item = $dataItems[i];
+    if (!item.meta['AddEventIncidenceSwi'] || Number(item.meta['EICSwitch']) !== 102) continue; 
+    if (!$gameSwitches.value(Number(item.meta['AddEventIncidenceSwi']))) continue;
+    if ($gameParty.hasItem(i)) continue;
+    if ($gameSwitches.value(Number(item.meta['AddEventCompSwi']))) continue;
+    if (item.meta['singleSouwaIncidence']) continue;
+
+    valueScriptArray1.push(Number(item.meta['AddEventParallelSwi']));//未完成
+    setVar19 = true;
+  }
+
+  if (!setVar19) return;
+  
+  $gameVariables.setValue(19, 1);
+  for (let i = 0; i <= valueScriptArray1.length - 1; i++) {
+    const itemId = valueScriptArray1[i];
+    const itemName = $dataItems[itemId].name
     const choiceParams = {
-    text: `${value1}`,
-    value: valueScriptArray1[i]};
-    $gameSystem.addCustomChoice(id, choiceParams);
-  };
-};
-/*:
+      text: `${itemName}`,
+      value: itemId
+    };
+
+    //const id = 1;
+    $gameSystem.addCustomChoice(1, choiceParams);
+  }
+/*
 if($gameVariables.value(19) >= 1){
   for(var i = 0; i <= valueScriptArray1.length-1; i++){
     var value1 = `？？？`;
@@ -1150,7 +1158,7 @@ if($gameVariables.value(19) >= 1){
 };
 */
 
-};
+}
 
 //オールナビスクリプト
 scene_allNavigation = function(){
