@@ -1037,7 +1037,7 @@ if(id2 == 0){
   valueNpcGuraTemporarilySave[4] = $gamePlayer._realY;
   valueNpcGuraTemporarilySave[5] = $gamePlayer.direction();
   if(!!$gameMap.event(id1)) {
-    var event = $gameMap.event(id1);
+    const event = $gameMap.event(id1);
     valueNpcGuraTemporarilySave[6] = event.characterName();
     valueNpcGuraTemporarilySave[7] = event.characterIndex();
     valueNpcGuraTemporarilySave[8] = event._realX;
@@ -1046,20 +1046,20 @@ if(id2 == 0){
     valueNpcGuraTemporarilySave[11] = event.pattern();
   };
   $gameVariables.setValue(292,Array(21).fill(0));
-  for (var i = 13; i <= 15; i++) {
+  for (let i = 13; i <= 15; i++) {
     if($gameSwitches.value(i)){$gameVariables.setValue(320,i)};
   };
-};
-if(id2 == 1){
+}
+else if(id2 == 1){
   if($gameVariables.value(320) >= 1){
-    for (var i = 13; i <= 15; i++) {$gameSwitches.setValue(i,false)};
+    for (let i = 13; i <= 15; i++) {$gameSwitches.setValue(i,false)};
     $gameSwitches.setValue($gameVariables.value(320),true);
   };
   $gameVariables.setValue(320,0);
   $gameVariables.setValue(292,Array(21).fill(0));
-};
+}
 
-};
+}
 
 //段階シーンを選択肢で表示
 scene_choiceDecision = function(arr1,value6){//scene_choiceDecision([503,502,501],161);
