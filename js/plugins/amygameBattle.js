@@ -4062,17 +4062,17 @@ if(valueTotalDamageCount2 >= 2){
 //ステート付与攻撃時にアニメ
 battle_stateAnime1 = function(target){
 
-if(valueAttackStates.length >= 1){
-  var value1 = 0;
-  for (var i = 0; i <= valueAttackStates.length-1; i++) {
-    if(valueAttackStates[i] >= 1 && valueStateAnimeArr[valueAttackStates[i]] >= 1){
-      target.startAnimation(valueStateAnimeArr[valueAttackStates[i]], true, value1);
-      value1 += 1;
-    };
-  };
-};
-
-};
+  if (valueAttackStates.length > 0) {
+    let value1 = 0;
+    for (let i = 0; i < valueAttackStates.length; i++) {
+      const valueAttackState = valueAttackStates[i];
+      if (valueAttackState >= 1 && valueStateAnimeArr[valueAttackState] >= 1) {
+        target.startAnimation(valueStateAnimeArr[valueAttackState], true, value1);
+        value1 += 1;
+      }
+    }
+  }
+}
 
 //パーティレベルを一時記憶/呼び出し
 party_levelSaveLoad = function(id1){
