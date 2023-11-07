@@ -1127,7 +1127,7 @@ scene_choiceSouwa = function(){
   }
 
   if (!setVar19) return;
-  
+
   $gameVariables.setValue(19, 1);
   for (let i = 0; i <= valueScriptArray1.length - 1; i++) {
     const itemId = valueScriptArray1[i];
@@ -1164,32 +1164,37 @@ if($gameVariables.value(19) >= 1){
 scene_allNavigation = function(){
 
 valueScriptArray1 = [];
-var value2 = 103;
-var value4 = 101;
-if($gameVariables.value(19) == 1){var value2 = 102};
-for (var i = 1; i <= $dataItems.length-1; i++) {
-  if($dataItems[i].meta['EICSwitch']){
-    if(Number($dataItems[i].meta['EICSwitch']) == value2){
+let itemEICSwitchId = 103;
+if($gameVariables.value(19) == 1) itemEICSwitchId = 102;
+
+for (let i = 1; i < $dataItems.length; i++) {
+  const item = $dataItems[i];
+  if (item.meta['EICSwitch']){
+    if (Number(item.meta['EICSwitch']) == itemEICSwitchId){
       valueScriptArray1.push(i);
-    };
-  };
-};
-if(valueScriptArray1.length >= 1){
-  for(var i = 0; i <= valueScriptArray1.length-1; i++){
-    var value1 = $dataItems[valueScriptArray1[i]].name;
-    const id = 1; 
+    }
+  }
+}
+if (valueScriptArray1.length > 0) {
+  let picId = 101;
+  for(var i = 0; i < valueScriptArray1.length; i++){
+    const itemId = valueScriptArray1[i];
+    const itemName = $dataItems[itemId].name;
     const choiceParams = {
-    text: `${value1}`,
+    text: `${itemName}`,
     value: 0};
-    $gameSystem.addCustomChoice(id, choiceParams);
-    var value3 = `${$dataItems[valueScriptArray1[i]].description}`;
-    $gameScreen.setDTextPicture(value3, 28);
+
+    //const id = 1; 
+    $gameSystem.addCustomChoice(1, choiceParams);
+
+    var descriptionText = `${$dataItems[itemId].description}`;
+    $gameScreen.setDTextPicture(descriptionText, 28);
     $gameScreen.dWindowFrame = 'ON';
-    $gameScreen.showPicture(value4,'',0,10,606,100,100,0,0);
-    $gameMessage.setSelectPictureId(i, value4);
-    value4 += 1;
-  };
-};
+    $gameScreen.showPicture(picId,'',0,10,606,100,100,0,0);
+    $gameMessage.setSelectPictureId(i, picId);
+    picId += 1;
+  }
+}
 
 
 };
