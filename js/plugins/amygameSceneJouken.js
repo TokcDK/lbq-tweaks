@@ -10,6 +10,8 @@ scene_joukenNakami = function(id1,i,value23,value24,value25,value26){
 
 if ($dataItems[i].name.length === 0) return;
 
+console.warn(`Debug. Run scene_joukenNakami`)
+
 let dataItem = $dataItems[i];
 let actor = $gameActors.actor($gameVariables.value(2));
 let value1 = `発生条件:`;
@@ -811,13 +813,15 @@ scene_joukensettei = function(id1){
 
 $gameVariables.setValue(195, 0);//表示時の個数を入れる事でコモンイベントのウィンド数を抑制
 
-for(var i = 621; i <= 624; i++){$gameVariables.setValue(i, 0)};
+for(let i = 621; i <= 624; i++){$gameVariables.setValue(i, 0)};
 
-for (var i = 0; i < $gameParty.battleMembers().length; i++) { //621-624のみ表記を変更。`${n-620}番目:${$gameActors.actor(n).name()}`
-  var value1 = $gameParty.battleMembers()[i].actorId();
-  $gameVariables.setValue(621 + i, value1);
+const battlers = $gameParty.battleMembers();
+const battlersCount = battlers.length;
+for (let i = 0; i < battlersCount; i++) { //621-624のみ表記を変更。`${n-620}番目:${$gameActors.actor(n).name()}`
+  let battlerId = battlers[i].actorId();
+  $gameVariables.setValue(621 + i, battlerId);
 };
-$gameVariables.setValue(54, $gameParty.battleMembers().length);//パーティ人数。1の時は[単独行動]表記
+$gameVariables.setValue(54, battlersCount);//パーティ人数。1の時は[単独行動]表記
 
 valueCountSet1 = 0;
 valueCountSet2 = 1;
@@ -827,63 +831,72 @@ value10 = 0;//そのマップで発生するシーン数
 //value15 = 1;//変数800+value15で表示するための変数
 j = 0;//配列を番号順に居れるため
 
+let start, end, value23, value24, value25, value26;
 if(id1 == 1){
   $gameSwitches.setValue(479,false);
   $gameSwitches.setValue(367,false);
-  var start = 401;
-  var end = 500;
-  var value23 = 800;
-  var value24 = 900;
-  var value25 = 517;//成立数変数
-  var value26 = 518;//未成立数変数
+  start = 401;
+  end = 500;
+  value23 = 800;
+  value24 = 900;
+  value25 = 517;//成立数変数
+  value26 = 518;//未成立数変数
   $gameVariables.setValue(517, 0);
   $gameVariables.setValue(518, 0);
-};
-if(id1 == 2){
+}
+else if(id1 == 2){
   $gameSwitches.setValue(480,false);
   $gameSwitches.setValue(369,false);
-  var start = 501;
-  var end = 600;
-  var value23 = 500;
-  var value24 = 600;
-  var value25 = 504;//成立数変数
-  var value26 = 505;//未成立数変数
+  start = 501;
+  end = 600;
+  value23 = 500;
+  value24 = 600;
+  value25 = 504;//成立数変数
+  value26 = 505;//未成立数変数
   $gameVariables.setValue(504, 0);
   $gameVariables.setValue(505, 0);
-};
-for (var i = start; i <= end; i++) {
-  scene_joukenNakami(id1,i,value23,value24,value25,value26);
-};
-
-if(id1 == 1){
-  var value25 = 517;//成立数変数
-  var value26 = 518;//未成立数変数
-  var arrAdd = valueSouwasceneAddId;
-};
-if(id1 == 2){
-  var value25 = 504;//成立数変数
-  var value26 = 505;//未成立数変数
-  var arrAdd = valueHsceneAddId;
 }
+else {
+  console.warn(`id1 is ${id1}! must be 1 or 2!`);
+}
+
+for (let i = start; i <= end; i++) {
+  scene_joukenNakami(id1,i,value23,value24,value25,value26);
+}
+
+let arrAdd;
+if(id1 == 1){
+  value25 = 517;//成立数変数
+  value26 = 518;//未成立数変数
+  arrAdd = valueSouwasceneAddId;
+}
+else if(id1 == 2){
+  value25 = 504;//成立数変数
+  value26 = 505;//未成立数変数
+  arrAdd = valueHsceneAddId;
+}
+else{
+  console.warn(`id1 is ${id1}! must be 1 or 2!`);
+}
+
 //アイテムID<HsceneItem><SouwaItem>
-var list = arrAdd;
-list.forEach(function(i) {
-  var value = $dataItems[i];
-  var value23 = Number(value.meta['AddEventIncidenceSwi']);//発生スイッチ。リセットなしの1601-1700の間に実行。
-  var value24 = Number(value.meta['AddEventCompSwi']);//達成スイッチ
-  var value33 = Number(value.meta['AddAddEventCommonId']);//コモID。並列スイッチも逆算して代入。スクリプト内では使わない
-  var value34 = Number(value.meta['AddEventParallelSwi']);//並列スイッチ
-  scene_joukenNakami(id1,i,value23,value24,value25,value26,value33,value34);
-}, this);
+for (const id of arrAdd) {
+  const item = $dataItems[id];
+  const addEventIncidenceSwiNum = Number(item.meta['AddEventIncidenceSwi']);//発生スイッチ。リセットなしの1601-1700の間に実行。
+  const addEventCompSwiNum = Number(item.meta['AddEventCompSwi']);//達成スイッチ
+  const addAddEventCommonIdNum = Number(item.meta['AddAddEventCommonId']);//コモID。並列スイッチも逆算して代入。スクリプト内では使わない
+  const addEventParallelSwiNum = Number(item.meta['AddEventParallelSwi']);//並列スイッチ
+  scene_joukenNakami(id1,id,addEventIncidenceSwiNum,addEventCompSwiNum,value25,value26,addAddEventCommonIdNum,addEventParallelSwiNum);
+}
 
 $gameVariables.setValue(195,valueCountSet1);//表示時の個数を入れる事でコモンイベントのウィンド数を抑制
 
 if($gameVariables.value(517) >= 1){
   $gameSwitches.setValue(367,true);//挿話ナヴィ発生スイッチ
-};
+}
 if($gameVariables.value(504) >= 1){
   $gameSwitches.setValue(369,true);//シーンナヴィ発生スイッチ
-};
+}
 
 
 }
