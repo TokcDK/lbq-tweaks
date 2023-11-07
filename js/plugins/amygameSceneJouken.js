@@ -10,7 +10,7 @@ scene_joukenNakami = function(id1,i,value23,value24,value25,value26){
 
 if ($dataItems[i].name.length === 0) return;
 
-console.warn(`Debug. Run scene_joukenNakami`)
+//console.warn(`Debug. Run scene_joukenNakami`)
 
 let dataItem = $dataItems[i];
 let actor = $gameActors.actor($gameVariables.value(2));
@@ -732,7 +732,7 @@ if(value12 >= 1 && value31 == 0){
 
   value10 += 1;
   let value14 = `${valueSceneName1}\n${valueSceneDescription1}\n`;
-  let value15 = 1; //WARN not using?
+/*   let value15 = 1; //WARN not using? temp commented
   if (value10 >= 81) { value15 = 10 }
   else if (value10 >= 71) { value15 = 9 }
   else if (value10 >= 61) { value15 = 8 }
@@ -740,7 +740,7 @@ if(value12 >= 1 && value31 == 0){
   else if (value10 >= 41) { value15 = 6 }
   else if (value10 >= 31) { value15 = 4 }
   else if (value10 >= 21) { value15 = 3 }
-  else if (value10 >= 11) { value15 = 2 }
+  else if (value10 >= 11) { value15 = 2 } */
     if(value3 == value4){
       var value0 = `${value14}`;
       eval("valueWordSet" + valueCountSet2 +" += value0");
