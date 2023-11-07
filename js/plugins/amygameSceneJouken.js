@@ -8,13 +8,12 @@
 
 scene_joukenNakami_clean_prefixes = function (text){
 
-  text = text.replace("[daysReset]", "");
-  text = text.replace("[NoReset]", "");
-  text = text.replace("[夜自動]", "");
-  text = text.replace("[シーン達成]", "");
-  text = text.replace("[挿話達成]", "");
-
-  return text;
+  return text
+  .replace("[daysReset]", "")
+  .replace("[NoReset]", "")
+  .replace("[夜自動]", "")
+  .replace("[シーン達成]", "")
+  .replace("[挿話達成]", "");
 }
 
 //中身スクリプト
