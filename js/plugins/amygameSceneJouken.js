@@ -66,9 +66,9 @@ if(dataItem.meta['EventSetBattle']){
 
 //場所による条件設定value11
 if(dataItem.meta['EventSetMap']){
-  let value11 = Number(dataItem.meta['EventSetMap']);
-  if(value11 == 0){
-    value11 = 2;//EventSetMapが0の場合の代替スイッチ。変更の可能性あり？？？
+  let itemEventSetMapNum = Number(dataItem.meta['EventSetMap']);
+  if(itemEventSetMapNum == 0){
+    itemEventSetMapNum = 2;//EventSetMapが0の場合の代替スイッチ。変更の可能性あり？？？
     showMapName = `[何処でも]`;
     messageText += showMapName;
   } else {
@@ -122,22 +122,22 @@ if(lineCount >= lineBreakCount){messageText += `\n`;lineCount = 0};
 
 //視点が誰か441
 if(dataItem.meta['EventSetPerspective']){
-  let value6 = Number(dataItem.meta['EventSetPerspective']); 
-    if(value6 >= 1){
+  const itemEventSetPerspectiveNum = Number(dataItem.meta['EventSetPerspective']); 
+    if(itemEventSetPerspectiveNum >= 1){
       conditionCount += 1;
-      if(value6 == $gameVariables.value(2)){}else{
-        messageText += `[${$gameActors.actor(value6).name()}視点`;
+      if(itemEventSetPerspectiveNum == $gameVariables.value(2)){}else{
+        messageText += `[${$gameActors.actor(itemEventSetPerspectiveNum).name()}視点`;
         lineCount += 1;
       }
     }
-    if($gameSwitches.value(value6+440)){
+    if($gameSwitches.value(itemEventSetPerspectiveNum+440)){
       unmetConditionCount += 1;
       metConditionCount += 1;
-      if(value6 == $gameVariables.value(2)){}else{messageText += onStatusString};
+      if(itemEventSetPerspectiveNum == $gameVariables.value(2)){}else{messageText += onStatusString};
     } else {
       unmetConditionCount += 1;
-      if(value6 == $gameVariables.value(2)){}else{messageText += offStatusString};
-      if(!$gameActors.actor(value6).isLearnedSkill(407)){
+      if(itemEventSetPerspectiveNum == $gameVariables.value(2)){}else{messageText += offStatusString};
+      if(!$gameActors.actor(itemEventSetPerspectiveNum).isLearnedSkill(407)){
         eventSceneMissing = 0;
         //value41 += `[要:未加入キャラ]`;
         actorNotJoined = 1;
@@ -149,7 +149,7 @@ if(lineCount >= lineBreakCount){messageText += `\n`;lineCount = 0};
   // merged code of 2 code blocks EventSetSwi and EventNotSetSwi
   event_set_swi = function (metaName, num1, prefix, isSet) {
     if (dataItem.meta[metaName]) {
-      let arr = dataItem.meta[metaName].split(',');
+      const arr = dataItem.meta[metaName].split(',');
       for (let id = 0; id < arr.length; id++) {
         if (arr[id] == 0) {
           arr[id] = num1;
@@ -184,7 +184,7 @@ if(lineCount >= lineBreakCount){messageText += `\n`;lineCount = 0};
 
 //アクターが存在するか
 if(dataItem.meta['EventSetActor']){
-let arr = dataItem.meta['EventSetActor'].split(',');
+  const arr = dataItem.meta['EventSetActor'].split(',');
   for (let id = 0; id <= arr.length-1; id++) {
     if(Number(arr[id]) == 0){
       arr[id] = $gameVariables.value(11);//誰でもいいアクター
@@ -213,7 +213,7 @@ if(lineCount >= lineBreakCount){messageText += `\n`;lineCount = 0};
 
 //アイテムが存在するか
 if(dataItem.meta['ItemSetScene']){
-let arr = dataItem.meta['ItemSetScene'].split(',');
+  const arr = dataItem.meta['ItemSetScene'].split(',');
   for (let id = 0; id <= arr.length-1; id++) {
     if(!arr[id]) continue;
 
@@ -273,7 +273,7 @@ if(lineCount >= lineBreakCount){messageText += `\n`;lineCount = 0};
 //スキルランクが条件
 for (let id = 1; id < 10; id++) {
   if(dataItem.meta['EventSetSkillRank'+id]){
-    let arr = dataItem.meta['EventSetSkillRank'+id].split(',');
+    const arr = dataItem.meta['EventSetSkillRank'+id].split(',');
     if(!arr[1]){arr[1] = 18};
     if(!arr[0]){
       arr[0] = $gameVariables.value(2);//基準となるアクター
@@ -308,7 +308,7 @@ if(lineCount >= lineBreakCount){messageText += `\n`;lineCount = 0};
 //スキルが条件
 for (let id = 1; id < 10; id++) {
   if(dataItem.meta['EventSetSkill'+id]){
-    let arr = dataItem.meta['EventSetSkill'+id].split(',');
+    const arr = dataItem.meta['EventSetSkill'+id].split(',');
     if(!arr[1]){arr[1] = 18};
     if(!arr[0]){
       arr[0] = $gameVariables.value(2);//基準となるアクター
@@ -375,7 +375,7 @@ if(lineCount >= lineBreakCount){messageText += `\n`;lineCount = 0};
 //ステート付与が条件
 for (let id = 1; id < 10; id++) {
   if(dataItem.meta['EventSetState'+id]){
-    let arr = dataItem.meta['EventSetState'+id].split(',');
+    const arr = dataItem.meta['EventSetState'+id].split(',');
     if (arr[0] == 0) { arr[0] = $gameVariables.value(2) };
     const actorId = Number(arr[0]);
     const skillId = Number(arr[1]);
@@ -402,7 +402,7 @@ if(lineCount >= lineBreakCount){messageText += `\n`;lineCount = 0};
 //ジョブが条件
 for (let id = 1; id < 10; id++) {
   if(dataItem.meta['EventSetJob'+id]){
-    let arr = dataItem.meta['EventSetJob'+id].split(',');
+    const arr = dataItem.meta['EventSetJob'+id].split(',');
     if (arr[0] == 0) { arr[0] = $gameVariables.value(2) };
     const actorId = Number(arr[0]);
     const skillId = Number(arr[1]);
@@ -434,7 +434,7 @@ if(lineCount >= lineBreakCount){messageText += `\n`;lineCount = 0};
 //討伐数が条件
 for (let id = 1; id < 10; id++) {
   if(dataItem.meta['EventSetSubjugation'+id]){
-    let arr = dataItem.meta['EventSetSubjugation' + id].split(',');
+    const arr = dataItem.meta['EventSetSubjugation' + id].split(',');
     const actorId = Number(arr[0]);
     const skillId = Number(arr[1]);
     messageText += `[\\C[2]\x1bSIM[${actorId}]\\C[0]:\\C[10]${$gameVariables.value(52)[actorId]}\\C[0]/${skillId}`;
@@ -475,7 +475,7 @@ if(dataItem.meta['EventSetMoney']){
 
 for (let id = 1; id < 10; id++) {
   if(dataItem.meta['EventSetHexpArr' + id]){
-    let arr = dataItem.meta['EventSetHexpArr' + id].split(',');
+    const arr = dataItem.meta['EventSetHexpArr' + id].split(',');
     const actorId = Number(arr[0]);
     const skillId = Number(arr[1]);
     const rankNum = Number(arr[2]);
@@ -503,7 +503,7 @@ if(lineCount >= lineBreakCount){messageText += `\n`;lineCount = 0};
 
 for (let id = 1; id < 10; id++) {
   if(dataItem.meta['EventSetClothArr' + id]){
-    let arr = dataItem.meta['EventSetClothArr' + id].split(',');
+    const arr = dataItem.meta['EventSetClothArr' + id].split(',');
     const actorId = Number(arr[0]);
     const skillId = Number(arr[1]);
     const rankNum = Number(arr[2]);
@@ -543,7 +543,7 @@ if(lineCount >= lineBreakCount){messageText += `\n`;lineCount = 0};
 
 //EventSetMainRoot
 if(dataItem.meta['EventSetMainRoot']){
-  let arr = dataItem.meta['EventSetMainRoot'].split(',');
+  const arr = dataItem.meta['EventSetMainRoot'].split(',');
   const actorId = Number(arr[0]);
   const skillId = Number(arr[1]);
   if(arr[1] != 0){
@@ -576,7 +576,7 @@ if(dataItem.meta['EventSetMainRoot']){
 //変数条件
 for (let id = 1; id < 10; id++) {
   if(dataItem.meta['EventSetVal' + id]){
-    let arr = dataItem.meta['EventSetVal' + id].split(',');
+    const arr = dataItem.meta['EventSetVal' + id].split(',');
     const actorId = Number(arr[0]);
     const skillId = Number(arr[1]);
     if(arr[0] == 0){
@@ -611,7 +611,7 @@ if(lineCount >= lineBreakCount){messageText += `\n`;lineCount = 0};
 //アイテム数
 for (let id = 1; id < 10; id++) {
   if(dataItem.meta['EventSetItem' + id]){
-    let arr = dataItem.meta['EventSetItem' + id].split(',');
+    const arr = dataItem.meta['EventSetItem' + id].split(',');
     const actorId = Number(arr[0]);
     const skillId = Number(arr[1]);
     if(arr[0] == 0){
