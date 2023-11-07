@@ -8,181 +8,172 @@
 //中身スクリプト
 scene_joukenNakami = function(id1,i,value23,value24,value25,value26){
 
-if($dataItems[i].name == ''){}else{
+if ($dataItems[i].name.length === 0) return;
 
-var value = $dataItems[i];
-var actor = $gameActors.actor($gameVariables.value(2));
-var value1 = `発生条件:`;
-var value2 = 0;//条件成立回数。使わない？
-var value3 = 0;//発生条件。未成立でも加算
-var value4 = 0;//発生条件。成立で加算
-var value5 = ``;
-var value6 = 0;//条件用
-var value7 = 0;//一時代入用
-var value12  = 0;//1でマップ発生シーン
-var value13 = 1;//0でEventSetSceneが存在しないかメインクエスト進行が足りないかアクターが存在しない
-var value14 = `　`;//発生シーン表示の一時代入
-var value16 = 0;//EventSetSceneが存在しない場合に1
-var value17 = 0;//メインクエスト進行が足りない場合に1
-var value31 = 0;//実行不可の場合に1
-var value40 = 0;//戦闘中か否か
-var value41 = 0;//メインクエスト進行度代入用
-var value42 = 4;//改行指定数
-var value43 = 0;//行数カウント
-var value44 = 0;//？？？表記の時にマップ名表示
-var value45 = 0;//アクターが加入していない
-var valueCountDefeadSwitche1 = 0;//全滅スイッチ判定
+let dataItem = $dataItems[i];
+let actor = $gameActors.actor($gameVariables.value(2));
+let value1 = `発生条件:`;
+let value2 = 0;//条件成立回数。使わない？
+let value3 = 0;//発生条件。未成立でも加算
+let value4 = 0;//発生条件。成立で加算
+let value5 = ``;
+let value6 = 0;//条件用
+let value7 = 0;//一時代入用
+let value12  = 0;//1でマップ発生シーン
+let value13 = 1;//0でEventSetSceneが存在しないかメインクエスト進行が足りないかアクターが存在しない
+let value14 = `　`;//発生シーン表示の一時代入
+let value16 = 0;//EventSetSceneが存在しない場合に1
+let value17 = 0;//メインクエスト進行が足りない場合に1
+let value31 = 0;//実行不可の場合に1
+let value40 = 0;//戦闘中か否か
+let value41 = 0;//メインクエスト進行度代入用
+let value42 = 4;//改行指定数
+let value43 = 0;//行数カウント
+let value44 = 0;//？？？表記の時にマップ名表示
+let value45 = 0;//アクターが加入していない
+let valueCountDefeadSwitche1 = 0;//全滅スイッチ判定
+
+const onStatusString = `\\C[14]〇\\C[0]]`;
+const offStatusString = `\\C[12]×\\C[0]]`;
 
 //行数超過する場合にここでid毎に対応
-//if(i == 401){var value42 = 4};
+//if(i == 401){let value42 = 4};
 
-if(value.meta['EventSetBattle']){
-  var value40 = Number(value.meta['EventSetBattle']); 
+if(dataItem.meta['EventSetBattle']){
+    value40 = Number(dataItem.meta['EventSetBattle']); 
     if(value40 == 1){
       value2 += 1;
       value5 += `[戦闘]`;
       value12 += 1;//1でマップ発生シーン
       value3 += 1;
       value4 += 1;
-    };
-};
+    }
+}
+
 //場所による条件設定value11
-if(value.meta['EventSetMap']){
-  var value11 = Number(value.meta['EventSetMap']);
+if(dataItem.meta['EventSetMap']){
+  let value11 = Number(dataItem.meta['EventSetMap']);
   if(value11 == 0){
     value11 = 2;//EventSetMapが0の場合の代替スイッチ。変更の可能性あり？？？
     value5 += `[何処でも]`;
-    var value44 = `[何処でも]`;
+    value44 = `[何処でも]`;
   } else {
     value2 += 1;
-    value5 += `[${$dataSystem.switches[Number(value.meta['EventSetMap'])]}]`;
-    var value44 = `[${$dataSystem.switches[Number(value.meta['EventSetMap'])]}]`;
-  };
+    value5 += `[${$dataSystem.switches[Number(dataItem.meta['EventSetMap'])]}]`;
+    value44 = `[${$dataSystem.switches[Number(dataItem.meta['EventSetMap'])]}]`;
+  }
   value43 += 1;
-  if($gameSwitches.value(Number(value.meta['EventSetMap']))){
+  if($gameSwitches.value(Number(dataItem.meta['EventSetMap']))){
     value12 += 1;//1でマップ発生シーン
     value3 += 1;
     value4 += 1;
   } else {
     value3 += 1;
-  };
+  }
   if($gameSwitches.value(433)){
     value12 += 1;//ヒント提示のために場所での区分けを無くしている。
-  };
-};
+  }
+}
+
 //自動起動かどうか
-if(value.meta['AutoStart']){
-  if(Number(value.meta['AutoStart']) == 1){
+if(dataItem.meta['AutoStart']){
+  if(Number(dataItem.meta['AutoStart']) == 1){
     value5 += `[自動発生]`;
     value43 += 1;
-  };
-  if(Number(value.meta['AutoStart']) == 2){
+  }
+  if(Number(dataItem.meta['AutoStart']) == 2){
     value5 += `[朝自動発生]`;
     value43 += 1;
-  };
-  if(Number(value.meta['AutoStart']) == 3){
+  }
+  if(Number(dataItem.meta['AutoStart']) == 3){
     value5 += `[宿泊時に自動発生]`;
     value43 += 1;
-  };
-};
+  }
+}
+
 //メインクエスト中に発生
-if(value.meta['EventSetOccurrenceMain']){
-  if(Number(value.meta['EventSetOccurrenceMain']) >= 1){
-    value5 += `[メイン[${value.meta['EventSetOccurrenceMain']}]進行中に発生]`;
+if(dataItem.meta['EventSetOccurrenceMain']){
+  if(Number(dataItem.meta['EventSetOccurrenceMain']) >= 1){
+    value5 += `[メイン[${dataItem.meta['EventSetOccurrenceMain']}]進行中に発生]`;
     value43 += 1;
-  };
-};
-if(value.meta['NoteWord']){
-  value5 += `[${value.meta['NoteWord']}]`;
+  }
+}
+if(dataItem.meta['NoteWord']){
+  value5 += `[${dataItem.meta['NoteWord']}]`;
   value43 += 1;
-};
-if(value43 >= value42){value5 += `\n`;var value43 = 0};
+}
+if(value43 >= value42){value5 += `\n`;value43 = 0};
+
 //視点が誰か441
-if(value.meta['EventSetPerspective']){
-  var value6 = Number(value.meta['EventSetPerspective']); 
+if(dataItem.meta['EventSetPerspective']){
+  let value6 = Number(dataItem.meta['EventSetPerspective']); 
     if(value6 >= 1){
       value2 += 1;
       if(value6 == $gameVariables.value(2)){}else{
         value5 += `[${$gameActors.actor(value6).name()}視点`;
         value43 += 1;
-      };
-    };
+      }
+    }
     if($gameSwitches.value(value6+440)){
       value3 += 1;
       value4 += 1;
-      if(value6 == $gameVariables.value(2)){}else{value5 += `\\C[14]〇\\C[0]]`};
+      if(value6 == $gameVariables.value(2)){}else{value5 += onStatusString};
     } else {
       value3 += 1;
-      if(value6 == $gameVariables.value(2)){}else{value5 += `\\C[12]×\\C[0]]`};
+      if(value6 == $gameVariables.value(2)){}else{value5 += offStatusString};
       if(!$gameActors.actor(value6).isLearnedSkill(407)){
-        var value13 = 0;
+        value13 = 0;
         //value41 += `[要:未加入キャラ]`;
-        var value45 = 1;
-      };
-    };
-};
-if(value43 >= value42){value5 += `\n`;var value43 = 0};
-//スイッチ条件
-if(value.meta['EventSetSwi']){
-  var arr = value.meta['EventSetSwi'].split(',');
-    for (var id = 0; id <= arr.length-1; id++) {
-      if(arr[id] == 0){
-        arr[id] = 2;
-      }else{
-        value2 += 1;
-        var value7 = $dataSystem.switches[Number(arr[id])];
-        var value7 = value7.replace("[daysReset]", "");
-        var value7 = value7.replace("[NoReset]", "");
-        var value7 = value7.replace("[夜自動]", "");
-        var value7 = value7.replace("[シーン達成]", "");
-        var value7 = value7.replace("[挿話達成]", "");
-        value5 += `[${value7}`;
-        value43 += 1;
-      };
-      if($gameSwitches.value(Number(arr[id]))){
-        if(Number(arr[id]) == 83){//全滅スイッチ
-          var valueCountDefeadSwitche1 = i;
-        };
-        value3 += 1;
-        value4 += 1;
-        value5 += `\\C[14]〇\\C[0]]`;
-      } else {
-        value3 += 1;
-        value5 += `\\C[12]×\\C[0]]`;
-      };
-}};
-if(value43 >= value42){value5 += `\n`;var value43 = 0};
-//スイッチoff条件。記述はスイッチを使うつど
-if(value.meta['EventNotSetSwi']){
-  var arr = value.meta['EventNotSetSwi'].split(',');
-    for (var id = 0; id <= arr.length-1; id++) {
-      if(arr[id] == 0){
-        arr[id] = 1;
-      }else{
-        value2 += 1;
-        var value7 = $dataSystem.switches[Number(arr[id])];
-        var value7 = value7.replace("[daysReset]", "");
-        var value7 = value7.replace("[NoReset]", "");
-        var value7 = value7.replace("[夜自動]", "");
-        var value7 = value7.replace("[シーン達成]", "");
-        var value7 = value7.replace("[挿話達成]", "");
-        value5 += `[不可:${value7}`;
-        value43 += 1;
-      };
-      if(!$gameSwitches.value(Number(arr[id]))){
-        value3 += 1;
-        value4 += 1;
-        value5 += `\\C[14]〇\\C[0]]`;
-      } else {
-        value3 += 1;
-        value5 += `\\C[12]×\\C[0]]`;
-      };
-}};
-if(value43 >= value42){value5 += `\n`;var value43 = 0};
+        value45 = 1;
+      }
+    }
+}
+if(value43 >= value42){value5 += `\n`;value43 = 0};
+
+  // merged code of 2 code blocks EventSetSwi and EventNotSetSwi
+  event_set_swi = function (metaName, num1, prefix, isSet) {
+    if (dataItem.meta[metaName]) {
+      let arr = dataItem.meta[metaName].split(',');
+      for (let id = 0; id < arr.length; id++) {
+        if (arr[id] == 0) {
+          arr[id] = num1;
+        } else {
+          value2 += 1;
+          value7 = $dataSystem.switches[Number(arr[id])];
+          value7 = value7.replace("[daysReset]", "");
+          value7 = value7.replace("[NoReset]", "");
+          value7 = value7.replace("[夜自動]", "");
+          value7 = value7.replace("[シーン達成]", "");
+          value7 = value7.replace("[挿話達成]", "");
+          value5 += `[${prefix}${value7}`;
+          value43 += 1;
+        }
+        const switchId = Number(arr[id]);
+        const isSwitch = $gameSwitches.value(switchId);
+        if ((isSet && isSwitch) || (!isSet && !isSwitch)) {
+          if (isSet && switchId == 83) {//全滅スイッチ
+            valueCountDefeadSwitche1 = i;
+          };
+          value3 += 1;
+          value4 += 1;
+          value5 += onStatusString;
+        } else {
+          value3 += 1;
+          value5 += offStatusString;
+        }
+      }
+    }
+    if (value43 >= value42) { value5 += `\n`; value43 = 0; }
+  }
+
+  for (const swiData of [['EventSetSwi', 2, ``, true]/*スイッチ条件*/, ['EventNotSetSwi', 1, `不可:`, false]/*スイッチoff条件。記述はスイッチを使うつど*/]){
+    event_set_swi(swiData[0], swiData[1], swiData[2], swiData[3]);
+  }
+
 //アクターが存在するか
-if(value.meta['EventSetActor']){
-var arr = value.meta['EventSetActor'].split(',');
-  for (var id = 0; id <= arr.length-1; id++) {
+if(dataItem.meta['EventSetActor']){
+let arr = dataItem.meta['EventSetActor'].split(',');
+  for (let id = 0; id <= arr.length-1; id++) {
     if(Number(arr[id]) == 0){
       arr[id] = $gameVariables.value(11);//誰でもいいアクター
     } else {
@@ -190,26 +181,28 @@ var arr = value.meta['EventSetActor'].split(',');
       value5 += `[${$gameActors.actor(Number(arr[id])).name()}]`;
       value43 += 1;
     };
-    var value6 = $gameActors.actor(Number(arr[id])).isLearnedSkill(18) && !$gameActors.actor(Number(arr[id])).isStateAffected(valueDollStateId);
+    value6 = $gameActors.actor(Number(arr[id])).isLearnedSkill(18) && !$gameActors.actor(Number(arr[id])).isStateAffected(valueDollStateId);
     if(value6){
       value3 += 1;
       value4 += 1;
-      value5 += `\\C[14]〇\\C[0]]`;
+      value5 += onStatusString;
     } else {
       value3 += 1;
-      value5 += `\\C[12]×\\C[0]]`;
+      value5 += offStatusString;
       if(!$gameActors.actor(Number(arr[id])).isLearnedSkill(407)){
-        var value13 = 0;
+        value13 = 0;
         //value41 += `[要:未加入キャラ]`;
-        var value45 = 1;
-      };
-    };
-}};
-if(value43 >= value42){value5 += `\n`;var value43 = 0};
+        value45 = 1;
+      }
+    }
+  }
+}
+if(value43 >= value42){value5 += `\n`;value43 = 0};
+
 //アイテムが存在するか
-if(value.meta['ItemSetScene']){
-var arr = value.meta['ItemSetScene'].split(',');
-  for (var id = 0; id <= arr.length-1; id++) {
+if(dataItem.meta['ItemSetScene']){
+let arr = dataItem.meta['ItemSetScene'].split(',');
+  for (let id = 0; id <= arr.length-1; id++) {
     if(arr[id] != 0){
       value2 += 1;
       if($dataItems[Number(arr[id])].meta['EICSwitch']){
@@ -236,39 +229,39 @@ var arr = value.meta['ItemSetScene'].split(',');
       };
       value5 += `\x1bIIN[${Number(arr[id])}]`;
       value43 += 1;
-      var value7 = $gameParty.hasItem($dataItems[Number(arr[id])]);
+      value7 = $gameParty.hasItem($dataItems[Number(arr[id])]);
       if($dataItems[Number(arr[id])].meta['EICSwitch']){
         if(Number($dataItems[Number(arr[id])].meta['EICSwitch']) == 103){
-          var value7 = $gameSwitches.value(Number(arr[id]) + 600);
+          value7 = $gameSwitches.value(Number(arr[id]) + 600);
         };
         if(Number($dataItems[Number(arr[id])].meta['EICSwitch']) == 102){
-          var value7 = $gameSwitches.value(Number(arr[id]) + 900);
+          value7 = $gameSwitches.value(Number(arr[id]) + 900);
         };
       };
       if(value7){
         value3 += 1;
         value4 += 1;
-        value5 += `\\C[14]〇\\C[0]]`;
+        value5 += onStatusString;
       } else {
         value3 += 1;
-        value5 += `\\C[12]×\\C[0]]`;
-        var value13 = 0;
-        var value16 = 1;
+        value5 += offStatusString;
+        value13 = 0;
+        value16 = 1;
       };
     };
 }};
-if(value43 >= value42){value5 += `\n`;var value43 = 0};
+if(value43 >= value42){value5 += `\n`;value43 = 0};
+
 //スキルランクが条件
-var list = [1,2,3,4,5,6,7,8,9];
-list.forEach(function(id) {
-  if(value.meta['EventSetSkillRank'+id]){
-    var arr = value.meta['EventSetSkillRank'+id].split(',');
-    var actor = $gameActors.actor($gameVariables.value(2));
+for (let id = 1; id < 10; id++) {
+  if(dataItem.meta['EventSetSkillRank'+id]){
+    let arr = dataItem.meta['EventSetSkillRank'+id].split(',');
+    actor = $gameActors.actor($gameVariables.value(2));
     if(arr[1] == 0){arr[1] = 18};
     if(arr[0] == 0){
       arr[0] = $gameVariables.value(2);//基準となるアクター
-    };
-    var actor = $gameActors.actor(Number(arr[0]));
+    }
+    actor = $gameActors.actor(Number(arr[0]));
     value2 += 1;
     if(!$gameSwitches.value(435) && !actor.isLearnedSkill(Number(arr[1]))){
       value5 += `[${$gameActors.actor(Number(arr[0])).name()}が特定スキルランク${Number(arr[2])}↑]`;
@@ -278,30 +271,30 @@ list.forEach(function(id) {
       } else {
         value5 += `[${$gameActors.actor(Number(arr[0])).name()}が${$dataSkills[Number(arr[1])].name}:Rank${Number(arr[2])}↑`;
       };
-    };
+    }
     value43 += 1;
     if(actor.isLearnedSkill(Number(arr[1])) && actor.skillMasteryLevel(Number(arr[1])) >= Number(arr[2]) ){
       value3 += 1;
       value4 += 1;
-      value5 += `\\C[14]〇\\C[0]]`;
+      value5 += onStatusString;
     } else {
       value3 += 1;
-      value5 += `\\C[12]×\\C[0]]`;
-    };
-  };
-}, this);
-if(value43 >= value42){value5 += `\n`;var value43 = 0};
+      value5 += offStatusString;
+    }
+  }
+}
+if(value43 >= value42){value5 += `\n`;value43 = 0};
+
 //スキルが条件
-var list = [1,2,3,4,5,6,7,8,9];
-list.forEach(function(id) {
-  if(value.meta['EventSetSkill'+id]){
-    var arr = value.meta['EventSetSkill'+id].split(',');
-    var actor = $gameActors.actor($gameVariables.value(2));
+for (let id = 1; id < 10; id++) {
+  if(dataItem.meta['EventSetSkill'+id]){
+    let arr = dataItem.meta['EventSetSkill'+id].split(',');
+    actor = $gameActors.actor($gameVariables.value(2));
     if(arr[1] == 0){arr[1] = 18};
     if(arr[0] == 0){
       arr[0] = $gameVariables.value(2);//基準となるアクター
-    };
-    var actor = $gameActors.actor(Number(arr[0]));
+    }
+    actor = $gameActors.actor(Number(arr[0]));
     value2 += 1;
     if(!$gameSwitches.value(435) && !actor.isLearnedSkill(Number(arr[1]))){
       value5 += `[${$gameActors.actor(Number(arr[0])).name()}が特定スキル習得`;
@@ -310,28 +303,28 @@ list.forEach(function(id) {
         value5 += `[${$dataSkills[Number(arr[1])].name}習得`;
       } else {
         value5 += `[${$gameActors.actor(Number(arr[0])).name()}が${$dataSkills[Number(arr[1])].name}習得`;
-      };
-    };
+      }
+    }
     value43 += 1;
     if(actor.isLearnedSkill(Number(arr[1]))){
       value3 += 1;
       value4 += 1;
-      value5 += `\\C[14]〇\\C[0]]`;
+      value5 += onStatusString;
     } else {
       value3 += 1;
-      value5 += `\\C[12]×\\C[0]]`;
-    };
-  };
-}, this);
-if(value43 >= value42){value5 += `\n`;var value43 = 0};
+      value5 += offStatusString;
+    }
+  }
+}
+if(value43 >= value42){value5 += `\n`;value43 = 0};
+
 //スキル装着が条件
-var list = [1,2,3,4,5,6,7,8,9];
-list.forEach(function(id) {
-  if(value.meta['EventSetSkillEquip'+id]){
-    var arr = value.meta['EventSetSkillEquip'+id].split(',');
-    var actor = $gameActors.actor(arr[0]);
+for (let id = 1; id < 10; id++) {
+  if(dataItem.meta['EventSetSkillEquip'+id]){
+    let arr = dataItem.meta['EventSetSkillEquip'+id].split(',');
+    actor = $gameActors.actor(arr[0]);
     if(arr[0] == 0){arr[0] = $gameVariables.value(2)};
-    var actor = $gameActors.actor(Number(arr[0]));
+    actor = $gameActors.actor(Number(arr[0]));
     value2 += 1;
     if(!$gameSwitches.value(435) && !actor.isLearnedSkill(Number(arr[1]))){
       value5 += `[${$gameActors.actor(Number(arr[0])).name()}が特定スキル装着`;
@@ -340,180 +333,182 @@ list.forEach(function(id) {
         value5 += `[${$dataSkills[Number(arr[1])].name}装着`;
       } else {
         value5 += `[${$gameActors.actor(Number(arr[0])).name()}が${$dataSkills[Number(arr[1])].name}装着`;
-      };
-    };
+      }
+    }
     value43 += 1;
     if(actor.battleSkillsRaw().includes(Number(arr[1]))){
       value3 += 1;
       value4 += 1;
-      value5 += `\\C[14]〇\\C[0]]`;
+      value5 += onStatusString;
     } else {
       value3 += 1;
-      value5 += `\\C[12]×\\C[0]]`;
-    };
-  };
-}, this);
-if(value43 >= value42){value5 += `\n`;var value43 = 0};
+      value5 += offStatusString;
+    }
+  }
+}
+if(value43 >= value42){value5 += `\n`;value43 = 0};
+
 //ステート付与が条件
-var list = [1,2,3,4,5,6,7,8,9];
-list.forEach(function(id) {
-  if(value.meta['EventSetState'+id]){
-    var arr = value.meta['EventSetState'+id].split(',');
-    var actor = $gameActors.actor(arr[0]);
+for (let id = 1; id < 10; id++) {
+  if(dataItem.meta['EventSetState'+id]){
+    let arr = dataItem.meta['EventSetState'+id].split(',');
+    actor = $gameActors.actor(arr[0]);
     if(arr[0] == 0){arr[0] = $gameVariables.value(2)};
-    var actor = $gameActors.actor(Number(arr[0]));
+    actor = $gameActors.actor(Number(arr[0]));
     value2 += 1;
     if(arr[0] == $gameVariables.value(2)){
       value5 += `State:[\x1bSIM[${Number(arr[1])}]`;
     } else {
       value5 += `[${$gameActors.actor(Number(arr[0])).name()}がステート:\x1bSIM[${Number(arr[1])}]`;
-    };
+    }
     value43 += 1;
     if(actor.isStateAffected(Number(arr[1]))){
       value3 += 1;
       value4 += 1;
-      value5 += `\\C[14]〇\\C[0]]`;
+      value5 += onStatusString;
     } else {
       value3 += 1;
-      value5 += `\\C[12]×\\C[0]]`;
-    };
-  };
-}, this);
-if(value43 >= value42){value5 += `\n`;var value43 = 0};
+      value5 += offStatusString;
+    }
+  }
+}
+if(value43 >= value42){value5 += `\n`;value43 = 0};
+
 //ジョブが条件
-var list = [1,2,3,4,5,6,7,8,9];
-list.forEach(function(id) {
-  if(value.meta['EventSetJob'+id]){
-    var arr = value.meta['EventSetJob'+id].split(',');
-    var actor = $gameActors.actor(arr[0]);
+for (let id = 1; id < 10; id++) {
+  if(dataItem.meta['EventSetJob'+id]){
+    let arr = dataItem.meta['EventSetJob'+id].split(',');
+    actor = $gameActors.actor(arr[0]);
     if(arr[0] == 0){arr[0] = $gameVariables.value(2)};
-    var actor = $gameActors.actor(Number(arr[0]));
+    actor = $gameActors.actor(Number(arr[0]));
     value2 += 1;
-    var value6 = 18; 
+    value6 = 18; 
     if(!$gameSwitches.value(435) && !actor._unlockedClasses.contains(Number(arr[1]))){
       value5 += `[${$gameActors.actor(Number(arr[0])).name()}が特定ジョブ`;
     } else {
       value5 += `[${$gameActors.actor(Number(arr[0])).name()}がジョブ:\x1bJ[${Number(arr[1])}]`;
-    };
+    }
     value43 += 1;
     if(actor.subclass()){
       if(actor._subclassId == Number(arr[1])){
         value3 += 1;
         value4 += 1;
-        value5 += `\\C[14]〇\\C[0]]`;
+        value5 += onStatusString;
       } else {
         value3 += 1;
-        value5 += `\\C[12]×\\C[0]]`;
-      };
+        value5 += offStatusString;
+      }
     } else {
       value3 += 1;
-    };
-  };
-}, this);
-if(value43 >= value42){value5 += `\n`;var value43 = 0};
+    }
+  }
+}
+if(value43 >= value42){value5 += `\n`;value43 = 0};
+
 //討伐数が条件
-var list = [1,2,3,4,5,6,7,8,9];
-list.forEach(function(id) {
-  if(value.meta['EventSetSubjugation'+id]){
-    var arr = value.meta['EventSetSubjugation'+id].split(',');
+for (let id = 1; id < 10; id++) {
+  if(dataItem.meta['EventSetSubjugation'+id]){
+    let arr = dataItem.meta['EventSetSubjugation'+id].split(',');
     value5 += `[\\C[2]\x1bSIM[${Number(arr[0])}]\\C[0]:\\C[10]${$gameVariables.value(52)[Number(arr[0])]}\\C[0]/${Number(arr[1])}`;
     value43 += 1;
     if($gameVariables.value(52)[Number(arr[0])] >= Number(arr[1])){
       value3 += 1;
       value4 += 1;
-      value5 += `\\C[14]〇\\C[0]]`;
+      value5 += onStatusString;
     } else {
       value3 += 1;
-      value5 += `\\C[12]×\\C[0]]`;
-    };
-  };
-}, this);
-if(value43 >= value42){value5 += `\n`;var value43 = 0};
-if(value.meta['RegistrationC1']){
+      value5 += offStatusString;
+    }
+  }
+}
+if(value43 >= value42){value5 += `\n`;value43 = 0};
+if(dataItem.meta['RegistrationC1']){
   value5 += `[条件付き選択肢を選ぶ事で回想登録]`;
   value43 += 1;
-};
+}
+
 //EventSetMoney
-if(value.meta['EventSetMoney']){
-  var value7 = Number(value.meta['EventSetMoney']);
+if(dataItem.meta['EventSetMoney']){
+  let value7 = Number(dataItem.meta['EventSetMoney']);
   if(value7 != 0){
     value2 += 1;
     value5 += `[${value7}\\G`;
     if($gameParty.gold() >= value7){
       value3 += 1;
       value4 += 1;
-      value5 += `\\C[14]〇\\C[0]]`;
+      value5 += onStatusString;
     } else {
       value3 += 1;
-      value5 += `\\C[12]×\\C[0]]`;
-    };
-  };
-};
-//if(value43 >= value42){value5 += `\n`;var value43 = 0};
-var list = [1,2,3,4,5,6,7,8,9];
-list.forEach(function(id) {
-  if(value.meta['EventSetHexpArr' + id]){
-    var arr = value.meta['EventSetHexpArr' + id].split(',');
-    var actor = $gameActors.actor(Number(arr[0]));
+      value5 += offStatusString;
+    }
+  }
+}
+//if(value43 >= value42){value5 += `\n`;value43 = 0};
+
+for (let id = 1; id < 10; id++) {
+  if(dataItem.meta['EventSetHexpArr' + id]){
+    let arr = dataItem.meta['EventSetHexpArr' + id].split(',');
+    actor = $gameActors.actor(Number(arr[0]));
     value2 += 1;
     if(Number(arr[1]) == 4){//露出度
-      var value7 = $gameVariables.value(Number(arr[0]) + 380)[Number(arr[1])] <= Number(arr[2])
+      value7 = $gameVariables.value(Number(arr[0]) + 380)[Number(arr[1])] <= Number(arr[2])
       value5 += `[\\C[27]${actor.name()}\\C[0]${$dataSystem.variables[Number(arr[1]) + 400]}${Number(arr[2])}以下`;
     } else {
-      var value7 = $gameVariables.value(Number(arr[0]) + 380)[Number(arr[1])] >= Number(arr[2])
+      value7 = $gameVariables.value(Number(arr[0]) + 380)[Number(arr[1])] >= Number(arr[2])
       value5 += `[\\C[27]${actor.name()}\\C[0]${$dataSystem.variables[Number(arr[1]) + 400]}${Number(arr[2])}以上`;
     };
     value43 += 1;
     if(value7){
       value3 += 1;
       value4 += 1;
-      value5 += `\\C[14]〇\\C[0]]`;
+      value5 += onStatusString;
     } else {
       value3 += 1;
-      value5 += `\\C[12]×\\C[0]]`;
-    };
-  };
-}, this);
-if(value43 >= value42){value5 += `\n`;var value43 = 0};
-var list = [1,2,3,4,5,6,7,8,9];
-list.forEach(function(id) {
-  if(value.meta['EventSetClothArr' + id]){
-    var arr = value.meta['EventSetClothArr' + id].split(',');
-    var actor = $gameActors.actor(Number(arr[0]));
+      value5 += offStatusString;
+    }
+  }
+}
+if(value43 >= value42){value5 += `\n`;value43 = 0};
+
+for (let id = 1; id < 10; id++) {
+  if(dataItem.meta['EventSetClothArr' + id]){
+    let arr = dataItem.meta['EventSetClothArr' + id].split(',');
+    let actor = $gameActors.actor(Number(arr[0]));
     value2 += 1;
     if(Number(arr[1]) == 41){
-      for (var j = 1; j <= $dataItems.length-1; j++) {
+      for (let j = 1; j <= $dataItems.length-1; j++) {
         if($dataItems[j].meta['TotalCloth']){
           if(Number($dataItems[j].meta['TotalCloth']) == Number(arr[2])){
             if(Number($dataItems[j].meta['EICSwitch']) == 380+Number(arr[0])){
               value5 += `[${actor.name()}が${$dataItems[j].name}着用`;
               break;
-            };
-          };
-        };
-      };
+            }
+          }
+        }
+      }
     } else {
       if(Number(arr[1]) == 0){
         value5 += `[${actor.name()}が${$dataItems[Number(arr[2])].name}着用`;
       } else {
         value5 += `[${actor.name()}の${$dataSystem.switches[Number(arr[1])+460]}に特定衣装`;
       };
-    };
+    }
     value43 += 2;
     if($gameVariables.value(Number(arr[0]) + 440)[Number(arr[1])] == Number(arr[2])){
       value3 += 1;
       value4 += 1;
-      value5 += `\\C[14]〇\\C[0]]`;
+      value5 += onStatusString;
     } else {
       value3 += 1;
-      value5 += `\\C[12]×\\C[0]]`;
-    };
-  };
-}, this);
-if(value43 >= value42){value5 += `\n`;var value43 = 0};
+      value5 += offStatusString;
+    }
+  }
+}
+if(value43 >= value42){value5 += `\n`;value43 = 0};
+
 //EventSetMainRoot
-if(value.meta['EventSetMainRoot']){
-var arr = value.meta['EventSetMainRoot'].split(',');
+if(dataItem.meta['EventSetMainRoot']){
+let arr = dataItem.meta['EventSetMainRoot'].split(',');
   if(arr[1] != 0){
     if(arr[0] == 0){
       arr[0] = 135;
@@ -525,26 +520,26 @@ var arr = value.meta['EventSetMainRoot'].split(',');
         value5 += `[メイン進行[${Number(arr[1])}]↑`;
       };
       value43 += 1;
-    };
+    }
       if($gameVariables.value(Number(arr[0])) >= Number(arr[1])){
         value3 += 1;
         value4 += 1;
-        value5 += `\\C[14]〇\\C[0]]`;
+        value5 += onStatusString;
       } else {
         value3 += 1;
-        value5 += `\\C[12]×\\C[0]]`;
-        var value13 = 0;
-        var value17 = 1;
+        value5 += offStatusString;
+        value13 = 0;
+        value17 = 1;
         //value41 += `[メイン進行${Number(arr[1])}↑]`;
-      };
-  };
-};
-//if(value43 >= value42){value5 += `\n`;var value43 = 0};
+      }
+  }
+}
+//if(value43 >= value42){value5 += `\n`;let value43 = 0};
+
 //変数条件
-var list = [1,2,3,4,5,6,7,8,9];
-list.forEach(function(id) {
-  if(value.meta['EventSetVal' + id]){
-    var arr = value.meta['EventSetVal' + id].split(',');
+for (let id = 1; id < 10; id++) {
+  if(dataItem.meta['EventSetVal' + id]){
+    let arr = dataItem.meta['EventSetVal' + id].split(',');
     if(arr[0] == 0){
       arr[0] = 2;
     } else {
@@ -555,33 +550,33 @@ list.forEach(function(id) {
         if(621 <= Number(arr[0]) &&  Number(arr[0]) <= 624){//621からパーティ一人目のアクターID
           value5 += `[${Number(arr[0])-620}番目:${$gameActors.actor(Number(arr[1])).name()}`;
         } else {
-          var value7 = $dataSystem.variables[Number(arr[0])];
-          var value7 = value7.replace("[daysReset]", "");
-          var value7 = value7.replace("[NoReset]", "");
-          var value7 = value7.replace("[夜自動]", "");
-          var value7 = value7.replace("[シーン達成]", "");
-          var value7 = value7.replace("[挿話達成]", "");
+          value7 = $dataSystem.variables[Number(arr[0])];
+          value7 = value7.replace("[daysReset]", "");
+          value7 = value7.replace("[NoReset]", "");
+          value7 = value7.replace("[夜自動]", "");
+          value7 = value7.replace("[シーン達成]", "");
+          value7 = value7.replace("[挿話達成]", "");
           value5 += `[${value7}:${Number(arr[1])}↑`;
-        };
-      };
-    };
+        }
+      }
+    }
     value43 += 1;
     if($gameVariables.value(Number(arr[0])) >= Number(arr[1])){
       value3 += 1;
       value4 += 1;
-      value5 += `\\C[14]〇\\C[0]]`;
+      value5 += onStatusString;
     } else {
       value3 += 1;
-      value5 += `\\C[12]×\\C[0]]`;
-    };
-  };
-}, this);
-if(value43 >= value42){value5 += `\n`;var value43 = 0};
+      value5 += offStatusString;
+    }
+  }
+}
+if(value43 >= value42){value5 += `\n`;value43 = 0};
+
 //アイテム数
-var list = [1,2,3,4,5,6,7,8,9];
-list.forEach(function(id) {
-  if(value.meta['EventSetItem' + id]){
-    var arr = value.meta['EventSetItem' + id].split(',');
+for (let id = 1; id < 10; id++) {
+  if(dataItem.meta['EventSetItem' + id]){
+    let arr = dataItem.meta['EventSetItem' + id].split(',');
     if(arr[0] == 0){
       arr[0] = 11;
     } else {
@@ -592,84 +587,89 @@ list.forEach(function(id) {
     if($gameParty.numItems($dataItems[Number(arr[0])]) >= Number(arr[1])){  
       value3 += 1; 
       value4 += 1;
-      value5 += `\\C[14]〇\\C[0]]`;
+      value5 += onStatusString;
     } else {
       value3 += 1;
-      value5 += `\\C[12]×\\C[0]]`;
-    };
-  };
-}, this);
-if(value43 >= value42){value5 += `\n`;var value43 = 0};
+      value5 += offStatusString;
+    }
+  }
+}
+if(value43 >= value42){value5 += `\n`;value43 = 0};
+
 //アクターが存在するか
-if(value.meta['EventEraseActor']){
-  var arr = value.meta['EventEraseActor'].split(',');
-  var value7 = ` `;
-  for (var id = 0; id <= arr.length-1; id++) {
+if(dataItem.meta['EventEraseActor']){
+  const arr = dataItem.meta['EventEraseActor'].split(',');
+  value7 = ` `;
+  for (let id = 0; id <= arr.length-1; id++) {
     if(Number(arr[id]) == 0){
       arr[id] = 20;//存在しないアクター
     } else {
       if($gameActors.actor(Number(arr[id])).isLearnedSkill(407)){
-        var value7 = `${$gameActors.actor(Number(arr[id])).name()}`;
+        value7 = `${$gameActors.actor(Number(arr[id])).name()}`;
       } else {
-        var value7 = `？？？`;
+        value7 = `？？？`;
       };
       value2 += 1;
     };
-    var value6 = $gameActors.actor(Number(arr[id])).isLearnedSkill(18) && !$gameActors.actor(Number(arr[id])).isStateAffected(valueDollStateId);
+    value6 = $gameActors.actor(Number(arr[id])).isLearnedSkill(18) && !$gameActors.actor(Number(arr[id])).isStateAffected(valueDollStateId);
     if(arr[id] != 20){
       if(value6){
         value31 = 1;
         value5 += `[＜${value7}＞が仲間のため発生不可]`;
       } else {
         value5 += `[＜${value7}＞が仲間の場合に発生不可]`;;
-      };
+      }
       value43 += 1;
-    };
-}};
-if(value43 >= value42){value5 += `\n`;var value43 = 0};
-if(value.meta['EventEraseSwi']){
-  var value6 = Number(value.meta['EventEraseSwi']); 
+    }
+  }
+}
+if(value43 >= value42){value5 += `\n`;value43 = 0};
+
+if(dataItem.meta['EventEraseSwi']){
+  value6 = Number(dataItem.meta['EventEraseSwi']); 
   if(value6 >= 1){
-    var value7 = $dataSystem.switches[value6];
-    var value7 = value7.replace("[daysReset]", "");
-    var value7 = value7.replace("[NoReset]", "");
-    var value7 = value7.replace("[夜自動]", "");
-    var value7 = value7.replace("[シーン達成]", "");
-    var value7 = value7.replace("[挿話達成]", "");
+    value7 = $dataSystem.switches[value6];
+    value7 = value7.replace("[daysReset]", "");
+    value7 = value7.replace("[NoReset]", "");
+    value7 = value7.replace("[夜自動]", "");
+    value7 = value7.replace("[シーン達成]", "");
+    value7 = value7.replace("[挿話達成]", "");
     if($gameSwitches.value(value6)){
       value31 = 1;
       value5 += `[${value7}につき発生不可]`;
     } else {
       value5 += `[${value7}で発生不可]`;
-    };
+    }
     value43 += 1;
-  };
-};
-if(value43 >= value42){value5 += `\n`;var value43 = 0};
-if(value.meta['EventEraseMain']){
-  var arr1 = Number(value.meta['EventEraseMain'].split(',')[0]); 
-  var arr2 = Number(value.meta['EventEraseMain'].split(',')[1]); 
+  }
+}
+if(value43 >= value42){value5 += `\n`;value43 = 0};
+
+if(dataItem.meta['EventEraseMain']){
+  const arr1 = Number(dataItem.meta['EventEraseMain'].split(',')[0]); 
+  const arr2 = Number(dataItem.meta['EventEraseMain'].split(',')[1]); 
   if(arr2 >= 1){
     if( $gameVariables.value(arr1) > arr2 ){
       value31 = 1;
       value5 += `[メインクエスト進行につき発生不可]`;
     } else {
       value5 += `[メインクエスト進行＜${arr2}＞で発生不可]`;
-    };
+    }
     value43 += 1;
-  };
-};
-if(value43 >= value42){value5 += `\n`;var value43 = 0};
-if(value.meta['EventEraseVal']){
-  var arr1 = Number(value.meta['EventEraseVal'].split(',')[0]); 
-  var arr2 = Number(value.meta['EventEraseVal'].split(',')[1]); 
+  }
+}
+if(value43 >= value42){value5 += `\n`;value43 = 0};
+
+if(dataItem.meta['EventEraseVal']){
+  const arr1 = Number(dataItem.meta['EventEraseVal'].split(',')[0]); 
+  const arr2 = Number(dataItem.meta['EventEraseVal'].split(',')[1]); 
   if(arr1 >= 1){
-    var value7 = $dataSystem.variables[arr1];
-    var value7 = value7.replace("[daysReset]", "");
-    var value7 = value7.replace("[NoReset]", "");
-    var value7 = value7.replace("[夜自動]", "");
-    var value7 = value7.replace("[シーン達成]", "");
-    var value7 = value7.replace("[挿話達成]", "");
+    value7 = $dataSystem.variables[arr1];
+    value7 = value7.replace("[daysReset]", "");
+    value7 = value7.replace("[NoReset]", "");
+    value7 = value7.replace("[夜自動]", "");
+    value7 = value7.replace("[シーン達成]", "");
+    value7 = value7.replace("[挿話達成]", "");
     if($gameVariables.value(arr1) > arr2){
       value31 = 1;
       value5 += `[${value7}一定につき発生不可]`;
@@ -677,40 +677,40 @@ if(value.meta['EventEraseVal']){
       value5 += `[${value7}一定で発生不可]`;
     };
     value43 += 1;
-  };
-};
+  }
+}
 
 value1 += `${value5}`;
-if(value.meta['NoAddDescription']){}else{
+if(dataItem.meta['NoAddDescription']){}else{
   $dataItems[i].description = `${value1}`;
-};
+}
 j += 1;
-var valueSceneName1 = `${$dataItems[i].name}`;
-var valueSceneDescription1 = `${$dataItems[i].description}`;
+valueSceneName1 = `${$dataItems[i].name}`;
+let valueSceneDescription1 = `${$dataItems[i].description}`;
 if(value3 != value4){
-  var valueSceneName1 = `？？？`;
-};
+  valueSceneName1 = `？？？`;
+}
 if(value16 >= 1 || value17 >= 1 || value13 == 0){
-  var valueSceneDescription1 = `？？？？？？？？？？？？\n`;
+  valueSceneDescription1 = `？？？？？？？？？？？？\n`;
   if(value44 != 0){
     valueSceneDescription1 += `${value44}`;
-  };
-};
+  }
+}
 if(value16 >= 1){
   valueSceneDescription1 += `[要:前提シーン] `;
-};
+}
 if(value17 >= 1){
   valueSceneDescription1 += `[要:メインクエスト一定進行] `;
-};
+}
 if(value45 >= 1){
   valueSceneDescription1 += `[要:未加入キャラ] `;
-};
+}
 if(value41 != 0){
   if($gameVariables.value(356)[value11] != 0 || value11 == 2){
     valueSceneDescription1 += `${value41}`;
   } else {
     valueSceneDescription1 += `[未到達マップ]`;
-  };
+  }
 } else {
 
 if($gameSwitches.value(value24 + i)){// || $gameSwitches.value(435) && !$gameParty.hasItem($dataItems[i])
@@ -723,22 +723,22 @@ if(value12 >= 1 && value31 == 0){
   if(value12 >= 1){
     if(id1 ==1){$gameSwitches.setValue(479,true)};
     if(id1 ==2){$gameSwitches.setValue(480,true)};
-  };
+  }
   if(value40 == 1 && $gameParty.inBattle()){
     BattleManager._logWindow.push(`addText`, value1);
-  };
+  }
 
   value10 += 1;
-  var value14 = `${valueSceneName1}\n${valueSceneDescription1}\n`;
-    var value15 = 1;
-    if(value10 >= 11){var value15 = 2};
-    if(value10 >= 21){var value15 = 3};
-    if(value10 >= 31){var value15 = 4};
-    if(value10 >= 41){var value15 = 6};
-    if(value10 >= 51){var value15 = 7};
-    if(value10 >= 61){var value15 = 8};
-    if(value10 >= 71){var value15 = 9};
-    if(value10 >= 81){var value15 = 10};
+  let value14 = `${valueSceneName1}\n${valueSceneDescription1}\n`;
+  let value15 = 1; //WARN not using?
+  if (value10 >= 81) { value15 = 10 }
+  else if (value10 >= 71) { value15 = 9 }
+  else if (value10 >= 61) { value15 = 8 }
+  else if (value10 >= 51) { value15 = 7 }
+  else if (value10 >= 41) { value15 = 6 }
+  else if (value10 >= 31) { value15 = 4 }
+  else if (value10 >= 21) { value15 = 3 }
+  else if (value10 >= 11) { value15 = 2 }
     if(value3 == value4){
       var value0 = `${value14}`;
       eval("valueWordSet" + valueCountSet2 +" += value0");
@@ -751,12 +751,12 @@ if(value12 >= 1 && value31 == 0){
         if(valueCountDefeadSwitche1 >= 1){
           valueCountDefeadSwitche2 = i;
         };
-        if(value.meta['AutoStart']){//自動起動かどうか
-          if(Number(value.meta['AutoStart']) == 1 && $gameSwitches.value(477)){//マップ最初並列イベコモン時にオンオフ自動
+        if(dataItem.meta['AutoStart']){//自動起動かどうか
+          if(Number(dataItem.meta['AutoStart']) == 1 && $gameSwitches.value(477)){//マップ最初並列イベコモン時にオンオフ自動
             $gameSwitches.setValue(474,true);
             valueCountDefeadSwitche2 = i;
           };
-          if(Number(value.meta['AutoStart']) == 2 && $gameSwitches.value(472)){//朝並列スイッチ
+          if(Number(dataItem.meta['AutoStart']) == 2 && $gameSwitches.value(472)){//朝並列スイッチ
             $gameSwitches.setValue(474,true);
             valueCountDefeadSwitche2 = i;
           };
@@ -789,7 +789,6 @@ if(value12 >= 1 && value31 == 0){
      };
 
 } else {
-
       var value0 = `\\C[1]${value14}\\C[0]`;
       eval("valueWordSet" + valueCountSet2 +" += value0");
       valueCountSet1 += 1;
@@ -797,16 +796,14 @@ if(value12 >= 1 && value31 == 0){
           valueCountSet2 += 1;
           eval("valueWordSet" + valueCountSet2 +" = value46");
         };
-  if(!value.meta['RepeatScene']){
+  if(!dataItem.meta['RepeatScene']){
     $gameSwitches.setValue(i+value23,false);//発生用スイッチ
-  };
-}};
+  }
+}
+}
+}
 
-};
-
-};//１回分ここで終わり
-
-};
+}
 
 //回想挿話発生条件式。回想scene_jouken(2);。挿話scene_jouken(1);
 //☆☆☆条件追加。<EventSetVal1:0,0>
@@ -867,7 +864,7 @@ if(id1 == 2){
   var value25 = 504;//成立数変数
   var value26 = 505;//未成立数変数
   var arrAdd = valueHsceneAddId;
-};
+}
 //アイテムID<HsceneItem><SouwaItem>
 var list = arrAdd;
 list.forEach(function(i) {
@@ -889,7 +886,7 @@ if($gameVariables.value(504) >= 1){
 };
 
 
-};
+}
 
 //☆☆☆条件追加。<EventSetVal1:0,0>
 scene_commonIdRec = function(value1){
