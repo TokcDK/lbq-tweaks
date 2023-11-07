@@ -18,7 +18,7 @@ let value1 = `発生条件:`;
 let value2 = 0;//条件成立回数。使わない？
 let value3 = 0;//発生条件。未成立でも加算
 let value4 = 0;//発生条件。成立で加算
-let value5 = ``;
+let messageText = ``;
 let value6 = 0;//条件用
 let value7 = 0;//一時代入用
 let value12  = 0;//1でマップ発生シーン
@@ -45,7 +45,7 @@ if(dataItem.meta['EventSetBattle']){
     value40 = Number(dataItem.meta['EventSetBattle']); 
     if(value40 == 1){
       value2 += 1;
-      value5 += `[戦闘]`;
+      messageText += `[戦闘]`;
       value12 += 1;//1でマップ発生シーン
       value3 += 1;
       value4 += 1;
@@ -57,12 +57,13 @@ if(dataItem.meta['EventSetMap']){
   let value11 = Number(dataItem.meta['EventSetMap']);
   if(value11 == 0){
     value11 = 2;//EventSetMapが0の場合の代替スイッチ。変更の可能性あり？？？
-    value5 += `[何処でも]`;
     value44 = `[何処でも]`;
+    messageText += value44;
   } else {
     value2 += 1;
-    value5 += `[${$dataSystem.switches[Number(dataItem.meta['EventSetMap'])]}]`;
-    value44 = `[${$dataSystem.switches[Number(dataItem.meta['EventSetMap'])]}]`;
+    const itemMetaEventSetMapNum = $dataSystem.switches[Number(dataItem.meta['EventSetMap'])];
+    messageText += `[${itemMetaEventSetMapNum}]`;
+    value44 = `[${itemMetaEventSetMapNum}]`;
   }
   value43 += 1;
   if($gameSwitches.value(Number(dataItem.meta['EventSetMap']))){
@@ -80,15 +81,15 @@ if(dataItem.meta['EventSetMap']){
 //自動起動かどうか
 if(dataItem.meta['AutoStart']){
   if(Number(dataItem.meta['AutoStart']) == 1){
-    value5 += `[自動発生]`;
+    messageText += `[自動発生]`;
     value43 += 1;
   }
   if(Number(dataItem.meta['AutoStart']) == 2){
-    value5 += `[朝自動発生]`;
+    messageText += `[朝自動発生]`;
     value43 += 1;
   }
   if(Number(dataItem.meta['AutoStart']) == 3){
-    value5 += `[宿泊時に自動発生]`;
+    messageText += `[宿泊時に自動発生]`;
     value43 += 1;
   }
 }
@@ -96,15 +97,15 @@ if(dataItem.meta['AutoStart']){
 //メインクエスト中に発生
 if(dataItem.meta['EventSetOccurrenceMain']){
   if(Number(dataItem.meta['EventSetOccurrenceMain']) >= 1){
-    value5 += `[メイン[${dataItem.meta['EventSetOccurrenceMain']}]進行中に発生]`;
+    messageText += `[メイン[${dataItem.meta['EventSetOccurrenceMain']}]進行中に発生]`;
     value43 += 1;
   }
 }
 if(dataItem.meta['NoteWord']){
-  value5 += `[${dataItem.meta['NoteWord']}]`;
+  messageText += `[${dataItem.meta['NoteWord']}]`;
   value43 += 1;
 }
-if(value43 >= value42){value5 += `\n`;value43 = 0};
+if(value43 >= value42){messageText += `\n`;value43 = 0};
 
 //視点が誰か441
 if(dataItem.meta['EventSetPerspective']){
@@ -112,17 +113,17 @@ if(dataItem.meta['EventSetPerspective']){
     if(value6 >= 1){
       value2 += 1;
       if(value6 == $gameVariables.value(2)){}else{
-        value5 += `[${$gameActors.actor(value6).name()}視点`;
+        messageText += `[${$gameActors.actor(value6).name()}視点`;
         value43 += 1;
       }
     }
     if($gameSwitches.value(value6+440)){
       value3 += 1;
       value4 += 1;
-      if(value6 == $gameVariables.value(2)){}else{value5 += onStatusString};
+      if(value6 == $gameVariables.value(2)){}else{messageText += onStatusString};
     } else {
       value3 += 1;
-      if(value6 == $gameVariables.value(2)){}else{value5 += offStatusString};
+      if(value6 == $gameVariables.value(2)){}else{messageText += offStatusString};
       if(!$gameActors.actor(value6).isLearnedSkill(407)){
         value13 = 0;
         //value41 += `[要:未加入キャラ]`;
@@ -130,7 +131,7 @@ if(dataItem.meta['EventSetPerspective']){
       }
     }
 }
-if(value43 >= value42){value5 += `\n`;value43 = 0};
+if(value43 >= value42){messageText += `\n`;value43 = 0};
 
   // merged code of 2 code blocks EventSetSwi and EventNotSetSwi
   event_set_swi = function (metaName, num1, prefix, isSet) {
@@ -147,7 +148,7 @@ if(value43 >= value42){value5 += `\n`;value43 = 0};
           value7 = value7.replace("[夜自動]", "");
           value7 = value7.replace("[シーン達成]", "");
           value7 = value7.replace("[挿話達成]", "");
-          value5 += `[${prefix}${value7}`;
+          messageText += `[${prefix}${value7}`;
           value43 += 1;
         }
         const switchId = Number(arr[id]);
@@ -158,14 +159,14 @@ if(value43 >= value42){value5 += `\n`;value43 = 0};
           };
           value3 += 1;
           value4 += 1;
-          value5 += onStatusString;
+          messageText += onStatusString;
         } else {
           value3 += 1;
-          value5 += offStatusString;
+          messageText += offStatusString;
         }
       }
     }
-    if (value43 >= value42) { value5 += `\n`; value43 = 0; }
+    if (value43 >= value42) { messageText += `\n`; value43 = 0; }
   }
 
   for (const swiData of [['EventSetSwi', 2, ``, true]/*スイッチ条件*/, ['EventNotSetSwi', 1, `不可:`, false]/*スイッチoff条件。記述はスイッチを使うつど*/]){
@@ -180,17 +181,17 @@ let arr = dataItem.meta['EventSetActor'].split(',');
       arr[id] = $gameVariables.value(11);//誰でもいいアクター
     } else {
       value2 += 1;
-      value5 += `[${$gameActors.actor(Number(arr[id])).name()}]`;
+      messageText += `[${$gameActors.actor(Number(arr[id])).name()}]`;
       value43 += 1;
     };
     value6 = $gameActors.actor(Number(arr[id])).isLearnedSkill(18) && !$gameActors.actor(Number(arr[id])).isStateAffected(valueDollStateId);
     if(value6){
       value3 += 1;
       value4 += 1;
-      value5 += onStatusString;
+      messageText += onStatusString;
     } else {
       value3 += 1;
-      value5 += offStatusString;
+      messageText += offStatusString;
       if(!$gameActors.actor(Number(arr[id])).isLearnedSkill(407)){
         value13 = 0;
         //value41 += `[要:未加入キャラ]`;
@@ -199,233 +200,250 @@ let arr = dataItem.meta['EventSetActor'].split(',');
     }
   }
 }
-if(value43 >= value42){value5 += `\n`;value43 = 0};
+if(value43 >= value42){messageText += `\n`;value43 = 0};
 
 //アイテムが存在するか
 if(dataItem.meta['ItemSetScene']){
 let arr = dataItem.meta['ItemSetScene'].split(',');
   for (let id = 0; id <= arr.length-1; id++) {
-    if(arr[id] != 0){
-      value2 += 1;
-      if($dataItems[Number(arr[id])].meta['EICSwitch']){
-        if(Number($dataItems[Number(arr[id])].meta['EICSwitch']) == 102){
-          value5 += `[挿話集:`;
-        };
-        if(Number($dataItems[Number(arr[id])].meta['EICSwitch']) == 103){
-          value5 += `[シーン:`;
-        };
-        if(Number($dataItems[Number(arr[id])].meta['EICSwitch']) == 104){
-          value5 += `[タイトル:`;
-        };
-        if(Number($dataItems[Number(arr[id])].meta['EICSwitch']) == 105){
-          value5 += `[H'タイトル:`;
-        };
+    if(!arr[id]) continue;
+
+    value2 += 1;
+    const arrIdNum = Number(arr[id]);
+      const item = $dataItems[arrIdNum];
+      const itemMetaEICSwitch = item.meta['EICSwitch'];
+      if (itemMetaEICSwitch){
+        const itemMetaEICSwitchNum = Number(itemMetaEICSwitch);
+        if (itemMetaEICSwitchNum == 102){
+          messageText += `[挿話集:`;
+        }
+        else if (itemMetaEICSwitchNum == 103){
+          messageText += `[シーン:`;
+        }
+        else if (itemMetaEICSwitchNum == 104){
+          messageText += `[タイトル:`;
+        }
+        else if (itemMetaEICSwitchNum == 105){
+          messageText += `[H'タイトル:`;
+        }
       } else {
-        if($dataItems[Number(arr[id])].meta['SG種別']){
-          if(Number($dataItems[Number(arr[id])].meta['SG種別']) == 1){
-            value5 += `[クエスト達成:`;
+        if(item.meta['SG種別']){
+          if(Number(item.meta['SG種別']) == 1){
+            messageText += `[クエスト達成:`;
           };
         } else {
-          value5 += `[`;
+          messageText += `[`;
         };
       };
-      value5 += `\x1bIIN[${Number(arr[id])}]`;
+      messageText += `\x1bIIN[${arrIdNum}]`;
       value43 += 1;
-      value7 = $gameParty.hasItem($dataItems[Number(arr[id])]);
-      if($dataItems[Number(arr[id])].meta['EICSwitch']){
-        if(Number($dataItems[Number(arr[id])].meta['EICSwitch']) == 103){
-          value7 = $gameSwitches.value(Number(arr[id]) + 600);
-        };
-        if(Number($dataItems[Number(arr[id])].meta['EICSwitch']) == 102){
-          value7 = $gameSwitches.value(Number(arr[id]) + 900);
-        };
-      };
+      value7 = $gameParty.hasItem(item);
+      if (itemMetaEICSwitch) {
+        const itemMetaEICSwitchNum = Number(itemMetaEICSwitch);
+        if (itemMetaEICSwitchNum == 103){
+          value7 = $gameSwitches.value(arrIdNum + 600);
+        }
+        else if (itemMetaEICSwitchNum == 102){
+          value7 = $gameSwitches.value(arrIdNum + 900);
+        }
+      }
       if(value7){
         value3 += 1;
         value4 += 1;
-        value5 += onStatusString;
+        messageText += onStatusString;
       } else {
         value3 += 1;
-        value5 += offStatusString;
+        messageText += offStatusString;
         value13 = 0;
         value16 = 1;
-      };
-    };
-}};
-if(value43 >= value42){value5 += `\n`;value43 = 0};
+      }
+  }
+}
+if(value43 >= value42){messageText += `\n`;value43 = 0};
 
 //スキルランクが条件
 for (let id = 1; id < 10; id++) {
   if(dataItem.meta['EventSetSkillRank'+id]){
     let arr = dataItem.meta['EventSetSkillRank'+id].split(',');
-    actor = $gameActors.actor($gameVariables.value(2));
-    if(arr[1] == 0){arr[1] = 18};
-    if(arr[0] == 0){
+    if(!arr[1]){arr[1] = 18};
+    if(!arr[0]){
       arr[0] = $gameVariables.value(2);//基準となるアクター
     }
     actor = $gameActors.actor(Number(arr[0]));
+    const skillId = Number(arr[1]);
+    const rankNum = Number(arr[2]);
     value2 += 1;
-    if(!$gameSwitches.value(435) && !actor.isLearnedSkill(Number(arr[1]))){
-      value5 += `[${$gameActors.actor(Number(arr[0])).name()}が特定スキルランク${Number(arr[2])}↑]`;
+    if (!$gameSwitches.value(435) && !actor.isLearnedSkill(skillId)){
+      messageText += `[${actor.name()}が特定スキルランク${rankNum}↑]`;
     } else {
+      const skill = $dataSkills[skillId];
       if(arr[0] == $gameVariables.value(2)){
-        value5 += `[${$dataSkills[Number(arr[1])].name}:Rank${Number(arr[2])}↑`;
+        messageText += `[${skill.name}:Rank${rankNum}↑`;
       } else {
-        value5 += `[${$gameActors.actor(Number(arr[0])).name()}が${$dataSkills[Number(arr[1])].name}:Rank${Number(arr[2])}↑`;
+        messageText += `[${actor.name()}が${skill.name}:Rank${rankNum}↑`;
       };
     }
     value43 += 1;
-    if(actor.isLearnedSkill(Number(arr[1])) && actor.skillMasteryLevel(Number(arr[1])) >= Number(arr[2]) ){
+    if (actor.isLearnedSkill(skillId) && actor.skillMasteryLevel(skillId) >= rankNum ){
       value3 += 1;
       value4 += 1;
-      value5 += onStatusString;
+      messageText += onStatusString;
     } else {
       value3 += 1;
-      value5 += offStatusString;
+      messageText += offStatusString;
     }
   }
 }
-if(value43 >= value42){value5 += `\n`;value43 = 0};
+if(value43 >= value42){messageText += `\n`;value43 = 0};
 
 //スキルが条件
 for (let id = 1; id < 10; id++) {
   if(dataItem.meta['EventSetSkill'+id]){
     let arr = dataItem.meta['EventSetSkill'+id].split(',');
-    actor = $gameActors.actor($gameVariables.value(2));
-    if(arr[1] == 0){arr[1] = 18};
-    if(arr[0] == 0){
+    if(!arr[1]){arr[1] = 18};
+    if(!arr[0]){
       arr[0] = $gameVariables.value(2);//基準となるアクター
     }
     actor = $gameActors.actor(Number(arr[0]));
+    const skillId = Number(arr[1]);
     value2 += 1;
-    if(!$gameSwitches.value(435) && !actor.isLearnedSkill(Number(arr[1]))){
-      value5 += `[${$gameActors.actor(Number(arr[0])).name()}が特定スキル習得`;
+    if (!$gameSwitches.value(435) && !actor.isLearnedSkill(skillId)){
+      messageText += `[${actor.name()}が特定スキル習得`;
     } else {
+      const skill = $dataSkills[skillId];
       if(arr[0] == $gameVariables.value(2)){
-        value5 += `[${$dataSkills[Number(arr[1])].name}習得`;
+        messageText += `[${skill.name}習得`;
       } else {
-        value5 += `[${$gameActors.actor(Number(arr[0])).name()}が${$dataSkills[Number(arr[1])].name}習得`;
+        messageText += `[${actor.name()}が${skill.name}習得`;
       }
     }
     value43 += 1;
-    if(actor.isLearnedSkill(Number(arr[1]))){
+    if (actor.isLearnedSkill(skillId)){
       value3 += 1;
       value4 += 1;
-      value5 += onStatusString;
+      messageText += onStatusString;
     } else {
       value3 += 1;
-      value5 += offStatusString;
+      messageText += offStatusString;
     }
   }
 }
-if(value43 >= value42){value5 += `\n`;value43 = 0};
+if(value43 >= value42){messageText += `\n`;value43 = 0};
 
 //スキル装着が条件
 for (let id = 1; id < 10; id++) {
   if(dataItem.meta['EventSetSkillEquip'+id]){
-    let arr = dataItem.meta['EventSetSkillEquip'+id].split(',');
+    const arr = dataItem.meta['EventSetSkillEquip' + id].split(',');
     actor = $gameActors.actor(arr[0]);
-    if(arr[0] == 0){arr[0] = $gameVariables.value(2)};
-    actor = $gameActors.actor(Number(arr[0]));
+    if (arr[0] == 0) { arr[0] = $gameVariables.value(2) };
+    const actorId = Number(arr[0]);
+    const skillId = Number(arr[1]);
+    actor = $gameActors.actor(actorId);
     value2 += 1;
-    if(!$gameSwitches.value(435) && !actor.isLearnedSkill(Number(arr[1]))){
-      value5 += `[${$gameActors.actor(Number(arr[0])).name()}が特定スキル装着`;
+    if(!$gameSwitches.value(435) && !actor.isLearnedSkill(skillId)){
+      messageText += `[${actor.name()}が特定スキル装着`;
     } else {
+      const skill = $dataSkills[skillId];
       if(arr[0] == $gameVariables.value(2)){
-        value5 += `[${$dataSkills[Number(arr[1])].name}装着`;
+        messageText += `[${skill.name}装着`;
       } else {
-        value5 += `[${$gameActors.actor(Number(arr[0])).name()}が${$dataSkills[Number(arr[1])].name}装着`;
+        messageText += `[${actor.name()}が${skill.name}装着`;
       }
     }
     value43 += 1;
-    if(actor.battleSkillsRaw().includes(Number(arr[1]))){
+    if(actor.battleSkillsRaw().includes(skillId)){
       value3 += 1;
       value4 += 1;
-      value5 += onStatusString;
+      messageText += onStatusString;
     } else {
       value3 += 1;
-      value5 += offStatusString;
+      messageText += offStatusString;
     }
   }
 }
-if(value43 >= value42){value5 += `\n`;value43 = 0};
+if(value43 >= value42){messageText += `\n`;value43 = 0};
 
 //ステート付与が条件
 for (let id = 1; id < 10; id++) {
   if(dataItem.meta['EventSetState'+id]){
     let arr = dataItem.meta['EventSetState'+id].split(',');
     actor = $gameActors.actor(arr[0]);
-    if(arr[0] == 0){arr[0] = $gameVariables.value(2)};
-    actor = $gameActors.actor(Number(arr[0]));
+    if (arr[0] == 0) { arr[0] = $gameVariables.value(2) };
+    const actorId = Number(arr[0]);
+    const skillId = Number(arr[1]);
+    actor = $gameActors.actor(actorId);
     value2 += 1;
     if(arr[0] == $gameVariables.value(2)){
-      value5 += `State:[\x1bSIM[${Number(arr[1])}]`;
+      messageText += `State:[\x1bSIM[${skillId}]`;
     } else {
-      value5 += `[${$gameActors.actor(Number(arr[0])).name()}がステート:\x1bSIM[${Number(arr[1])}]`;
+      messageText += `[${actor.name()}がステート:\x1bSIM[${skillId}]`;
     }
     value43 += 1;
-    if(actor.isStateAffected(Number(arr[1]))){
+    if(actor.isStateAffected(skillId)){
       value3 += 1;
       value4 += 1;
-      value5 += onStatusString;
+      messageText += onStatusString;
     } else {
       value3 += 1;
-      value5 += offStatusString;
+      messageText += offStatusString;
     }
   }
 }
-if(value43 >= value42){value5 += `\n`;value43 = 0};
+if(value43 >= value42){messageText += `\n`;value43 = 0};
 
 //ジョブが条件
 for (let id = 1; id < 10; id++) {
   if(dataItem.meta['EventSetJob'+id]){
     let arr = dataItem.meta['EventSetJob'+id].split(',');
-    actor = $gameActors.actor(arr[0]);
-    if(arr[0] == 0){arr[0] = $gameVariables.value(2)};
-    actor = $gameActors.actor(Number(arr[0]));
+    if (arr[0] == 0) { arr[0] = $gameVariables.value(2) };
+    const actorId = Number(arr[0]);
+    const skillId = Number(arr[1]);
+    actor = $gameActors.actor(actorId);
     value2 += 1;
     value6 = 18; 
-    if(!$gameSwitches.value(435) && !actor._unlockedClasses.contains(Number(arr[1]))){
-      value5 += `[${$gameActors.actor(Number(arr[0])).name()}が特定ジョブ`;
+    if(!$gameSwitches.value(435) && !actor._unlockedClasses.contains(skillId)){
+      messageText += `[${actor.name()}が特定ジョブ`;
     } else {
-      value5 += `[${$gameActors.actor(Number(arr[0])).name()}がジョブ:\x1bJ[${Number(arr[1])}]`;
+      messageText += `[${actor.name()}がジョブ:\x1bJ[${skillId}]`;
     }
     value43 += 1;
     if(actor.subclass()){
-      if(actor._subclassId == Number(arr[1])){
+      if(actor._subclassId == skillId){
         value3 += 1;
         value4 += 1;
-        value5 += onStatusString;
+        messageText += onStatusString;
       } else {
         value3 += 1;
-        value5 += offStatusString;
+        messageText += offStatusString;
       }
     } else {
       value3 += 1;
     }
   }
 }
-if(value43 >= value42){value5 += `\n`;value43 = 0};
+if(value43 >= value42){messageText += `\n`;value43 = 0};
 
 //討伐数が条件
 for (let id = 1; id < 10; id++) {
   if(dataItem.meta['EventSetSubjugation'+id]){
-    let arr = dataItem.meta['EventSetSubjugation'+id].split(',');
-    value5 += `[\\C[2]\x1bSIM[${Number(arr[0])}]\\C[0]:\\C[10]${$gameVariables.value(52)[Number(arr[0])]}\\C[0]/${Number(arr[1])}`;
+    let arr = dataItem.meta['EventSetSubjugation' + id].split(',');
+    const actorId = Number(arr[0]);
+    const skillId = Number(arr[1]);
+    messageText += `[\\C[2]\x1bSIM[${actorId}]\\C[0]:\\C[10]${$gameVariables.value(52)[actorId]}\\C[0]/${skillId}`;
     value43 += 1;
-    if($gameVariables.value(52)[Number(arr[0])] >= Number(arr[1])){
+    if($gameVariables.value(52)[actorId] >= skillId){
       value3 += 1;
       value4 += 1;
-      value5 += onStatusString;
+      messageText += onStatusString;
     } else {
       value3 += 1;
-      value5 += offStatusString;
+      messageText += offStatusString;
     }
   }
 }
-if(value43 >= value42){value5 += `\n`;value43 = 0};
+if(value43 >= value42){messageText += `\n`;value43 = 0};
 if(dataItem.meta['RegistrationC1']){
-  value5 += `[条件付き選択肢を選ぶ事で回想登録]`;
+  messageText += `[条件付き選択肢を選ぶ事で回想登録]`;
   value43 += 1;
 }
 
@@ -434,14 +452,14 @@ if(dataItem.meta['EventSetMoney']){
   let value7 = Number(dataItem.meta['EventSetMoney']);
   if(value7 != 0){
     value2 += 1;
-    value5 += `[${value7}\\G`;
+    messageText += `[${value7}\\G`;
     if($gameParty.gold() >= value7){
       value3 += 1;
       value4 += 1;
-      value5 += onStatusString;
+      messageText += onStatusString;
     } else {
       value3 += 1;
-      value5 += offStatusString;
+      messageText += offStatusString;
     }
   }
 }
@@ -450,89 +468,98 @@ if(dataItem.meta['EventSetMoney']){
 for (let id = 1; id < 10; id++) {
   if(dataItem.meta['EventSetHexpArr' + id]){
     let arr = dataItem.meta['EventSetHexpArr' + id].split(',');
-    actor = $gameActors.actor(Number(arr[0]));
+    const actorId = Number(arr[0]);
+    const skillId = Number(arr[1]);
+    const rankNum = Number(arr[2]);
+    actor = $gameActors.actor(actorId);
     value2 += 1;
-    if(Number(arr[1]) == 4){//露出度
-      value7 = $gameVariables.value(Number(arr[0]) + 380)[Number(arr[1])] <= Number(arr[2])
-      value5 += `[\\C[27]${actor.name()}\\C[0]${$dataSystem.variables[Number(arr[1]) + 400]}${Number(arr[2])}以下`;
+    if(skillId == 4){//露出度
+      value7 = $gameVariables.value(actorId + 380)[skillId] <= rankNum
+      messageText += `[\\C[27]${actor.name()}\\C[0]${$dataSystem.variables[skillId + 400]}${rankNum}以下`;
     } else {
-      value7 = $gameVariables.value(Number(arr[0]) + 380)[Number(arr[1])] >= Number(arr[2])
-      value5 += `[\\C[27]${actor.name()}\\C[0]${$dataSystem.variables[Number(arr[1]) + 400]}${Number(arr[2])}以上`;
+      value7 = $gameVariables.value(actorId + 380)[skillId] >= rankNum
+      messageText += `[\\C[27]${actor.name()}\\C[0]${$dataSystem.variables[skillId + 400]}${rankNum}以上`;
     };
     value43 += 1;
     if(value7){
       value3 += 1;
       value4 += 1;
-      value5 += onStatusString;
+      messageText += onStatusString;
     } else {
       value3 += 1;
-      value5 += offStatusString;
+      messageText += offStatusString;
     }
   }
 }
-if(value43 >= value42){value5 += `\n`;value43 = 0};
+if(value43 >= value42){messageText += `\n`;value43 = 0};
 
 for (let id = 1; id < 10; id++) {
   if(dataItem.meta['EventSetClothArr' + id]){
     let arr = dataItem.meta['EventSetClothArr' + id].split(',');
-    let actor = $gameActors.actor(Number(arr[0]));
+    const actorId = Number(arr[0]);
+    const skillId = Number(arr[1]);
+    const rankNum = Number(arr[2]);
+    let actor = $gameActors.actor(actorId);
     value2 += 1;
-    if(Number(arr[1]) == 41){
+    if(skillId == 41){
       for (let j = 1; j <= $dataItems.length-1; j++) {
-        if($dataItems[j].meta['TotalCloth']){
-          if(Number($dataItems[j].meta['TotalCloth']) == Number(arr[2])){
-            if(Number($dataItems[j].meta['EICSwitch']) == 380+Number(arr[0])){
-              value5 += `[${actor.name()}が${$dataItems[j].name}着用`;
+        const item = $dataItems[j];
+        if (item.meta['TotalCloth']){
+          if (Number(item.meta['TotalCloth']) == rankNum){
+            if (Number(item.meta['EICSwitch']) == 380+actorId){
+              messageText += `[${actor.name()}が${item.name}着用`;
               break;
             }
           }
         }
       }
     } else {
-      if(Number(arr[1]) == 0){
-        value5 += `[${actor.name()}が${$dataItems[Number(arr[2])].name}着用`;
+      if(skillId == 0){
+        messageText += `[${actor.name()}が${$dataItems[rankNum].name}着用`;
       } else {
-        value5 += `[${actor.name()}の${$dataSystem.switches[Number(arr[1])+460]}に特定衣装`;
+        messageText += `[${actor.name()}の${$dataSystem.switches[skillId+460]}に特定衣装`;
       };
     }
     value43 += 2;
-    if($gameVariables.value(Number(arr[0]) + 440)[Number(arr[1])] == Number(arr[2])){
+    if($gameVariables.value(actorId + 440)[skillId] == rankNum){
       value3 += 1;
       value4 += 1;
-      value5 += onStatusString;
+      messageText += onStatusString;
     } else {
       value3 += 1;
-      value5 += offStatusString;
+      messageText += offStatusString;
     }
   }
 }
-if(value43 >= value42){value5 += `\n`;value43 = 0};
+if(value43 >= value42){messageText += `\n`;value43 = 0};
 
 //EventSetMainRoot
 if(dataItem.meta['EventSetMainRoot']){
-let arr = dataItem.meta['EventSetMainRoot'].split(',');
+  let arr = dataItem.meta['EventSetMainRoot'].split(',');
+  const actorId = Number(arr[0]);
+  const skillId = Number(arr[1]);
   if(arr[1] != 0){
     if(arr[0] == 0){
       arr[0] = 135;
     } else {
       value2 += 1;
-      if(Number(arr[1]) == 49){
-        value5 += `[メインクエスト完了後`;
+      if(skillId == 49){
+        messageText += `[メインクエスト完了後`;
       } else {
-        value5 += `[メイン進行[${Number(arr[1])}]↑`;
+        messageText += `[メイン進行[${skillId}]↑`;
       };
       value43 += 1;
     }
-      if($gameVariables.value(Number(arr[0])) >= Number(arr[1])){
+      if($gameVariables.value(actorId) >= skillId){
         value3 += 1;
         value4 += 1;
-        value5 += onStatusString;
+        messageText += onStatusString;
       } else {
         value3 += 1;
-        value5 += offStatusString;
+        messageText += offStatusString;
         value13 = 0;
         value17 = 1;
-        //value41 += `[メイン進行${Number(arr[1])}↑]`;
+        //value41 += `[メイン進行${skillId}↑]`;
       }
   }
 }
@@ -542,61 +569,65 @@ let arr = dataItem.meta['EventSetMainRoot'].split(',');
 for (let id = 1; id < 10; id++) {
   if(dataItem.meta['EventSetVal' + id]){
     let arr = dataItem.meta['EventSetVal' + id].split(',');
+    const actorId = Number(arr[0]);
+    const skillId = Number(arr[1]);
     if(arr[0] == 0){
       arr[0] = 2;
     } else {
       value2 += 1;
-      if(54 == Number(arr[0]) || 1 == Number(arr[1])){
-        value5 += `[単独行動`;
+      if(54 == actorId || 1 == skillId){
+        messageText += `[単独行動`;
       } else {
-        if(621 <= Number(arr[0]) &&  Number(arr[0]) <= 624){//621からパーティ一人目のアクターID
-          value5 += `[${Number(arr[0])-620}番目:${$gameActors.actor(Number(arr[1])).name()}`;
+        if(621 <= actorId &&  actorId <= 624){//621からパーティ一人目のアクターID
+          messageText += `[${actorId-620}番目:${$gameActors.actor(skillId).name()}`;
         } else {
-          value7 = $dataSystem.variables[Number(arr[0])];
+          value7 = $dataSystem.variables[actorId];
           value7 = value7.replace("[daysReset]", "");
           value7 = value7.replace("[NoReset]", "");
           value7 = value7.replace("[夜自動]", "");
           value7 = value7.replace("[シーン達成]", "");
           value7 = value7.replace("[挿話達成]", "");
-          value5 += `[${value7}:${Number(arr[1])}↑`;
+          messageText += `[${value7}:${skillId}↑`;
         }
       }
     }
     value43 += 1;
-    if($gameVariables.value(Number(arr[0])) >= Number(arr[1])){
+    if($gameVariables.value(actorId) >= skillId){
       value3 += 1;
       value4 += 1;
-      value5 += onStatusString;
+      messageText += onStatusString;
     } else {
       value3 += 1;
-      value5 += offStatusString;
+      messageText += offStatusString;
     }
   }
 }
-if(value43 >= value42){value5 += `\n`;value43 = 0};
+if(value43 >= value42){messageText += `\n`;value43 = 0};
 
 //アイテム数
 for (let id = 1; id < 10; id++) {
   if(dataItem.meta['EventSetItem' + id]){
     let arr = dataItem.meta['EventSetItem' + id].split(',');
+    const actorId = Number(arr[0]);
+    const skillId = Number(arr[1]);
     if(arr[0] == 0){
       arr[0] = 11;
     } else {
       value2 += 1;
     };
     value43 += 1;
-      value5 += `\x1bIIN[${Number(arr[0])}:\\C[2]${Number(arr[1])}\\C[0]]`;
-    if($gameParty.numItems($dataItems[Number(arr[0])]) >= Number(arr[1])){  
+      messageText += `\x1bIIN[${actorId}:\\C[2]${skillId}\\C[0]]`;
+    if($gameParty.numItems($dataItems[actorId]) >= skillId){  
       value3 += 1; 
       value4 += 1;
-      value5 += onStatusString;
+      messageText += onStatusString;
     } else {
       value3 += 1;
-      value5 += offStatusString;
+      messageText += offStatusString;
     }
   }
 }
-if(value43 >= value42){value5 += `\n`;value43 = 0};
+if(value43 >= value42){messageText += `\n`;value43 = 0};
 
 //アクターが存在するか
 if(dataItem.meta['EventEraseActor']){
@@ -617,15 +648,15 @@ if(dataItem.meta['EventEraseActor']){
     if(arr[id] != 20){
       if(value6){
         value31 = 1;
-        value5 += `[＜${value7}＞が仲間のため発生不可]`;
+        messageText += `[＜${value7}＞が仲間のため発生不可]`;
       } else {
-        value5 += `[＜${value7}＞が仲間の場合に発生不可]`;;
+        messageText += `[＜${value7}＞が仲間の場合に発生不可]`;;
       }
       value43 += 1;
     }
   }
 }
-if(value43 >= value42){value5 += `\n`;value43 = 0};
+if(value43 >= value42){messageText += `\n`;value43 = 0};
 
 if(dataItem.meta['EventEraseSwi']){
   value6 = Number(dataItem.meta['EventEraseSwi']); 
@@ -638,14 +669,14 @@ if(dataItem.meta['EventEraseSwi']){
     value7 = value7.replace("[挿話達成]", "");
     if($gameSwitches.value(value6)){
       value31 = 1;
-      value5 += `[${value7}につき発生不可]`;
+      messageText += `[${value7}につき発生不可]`;
     } else {
-      value5 += `[${value7}で発生不可]`;
+      messageText += `[${value7}で発生不可]`;
     }
     value43 += 1;
   }
 }
-if(value43 >= value42){value5 += `\n`;value43 = 0};
+if(value43 >= value42){messageText += `\n`;value43 = 0};
 
 if(dataItem.meta['EventEraseMain']){
   const arr1 = Number(dataItem.meta['EventEraseMain'].split(',')[0]); 
@@ -653,14 +684,14 @@ if(dataItem.meta['EventEraseMain']){
   if(arr2 >= 1){
     if( $gameVariables.value(arr1) > arr2 ){
       value31 = 1;
-      value5 += `[メインクエスト進行につき発生不可]`;
+      messageText += `[メインクエスト進行につき発生不可]`;
     } else {
-      value5 += `[メインクエスト進行＜${arr2}＞で発生不可]`;
+      messageText += `[メインクエスト進行＜${arr2}＞で発生不可]`;
     }
     value43 += 1;
   }
 }
-if(value43 >= value42){value5 += `\n`;value43 = 0};
+if(value43 >= value42){messageText += `\n`;value43 = 0};
 
 if(dataItem.meta['EventEraseVal']){
   const arr1 = Number(dataItem.meta['EventEraseVal'].split(',')[0]); 
@@ -674,15 +705,15 @@ if(dataItem.meta['EventEraseVal']){
     value7 = value7.replace("[挿話達成]", "");
     if($gameVariables.value(arr1) > arr2){
       value31 = 1;
-      value5 += `[${value7}一定につき発生不可]`;
+      messageText += `[${value7}一定につき発生不可]`;
     } else {
-      value5 += `[${value7}一定で発生不可]`;
+      messageText += `[${value7}一定で発生不可]`;
     };
     value43 += 1;
   }
 }
 
-value1 += `${value5}`;
+value1 += `${messageText}`;
 if(dataItem.meta['NoAddDescription']){}else{
   $dataItems[i].description = `${value1}`;
 }
