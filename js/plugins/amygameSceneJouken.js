@@ -13,7 +13,7 @@ if ($dataItems[i].name.length === 0) return;
 //console.warn(`Debug. Run scene_joukenNakami`)
 
 let dataItem = $dataItems[i];
-let actor = $gameActors.actor($gameVariables.value(2));
+//let actor = $gameActors.actor($gameVariables.value(2));
 let conditionPrefixText = `発生条件:`;
 let conditionCount = 0;//条件成立回数。使わない？
 let unmetConditionCount = 0;//発生条件。未成立でも加算
@@ -35,8 +35,8 @@ let showMapName = 0;//？？？表記の時にマップ名表示
 let actorNotJoined = 0;//アクターが加入していない
 let valueCountDefeatSwitch1 = 0;//全滅スイッチ判定
 
-const onStatusString = `\\C[14]〇\\C[0]]`;
-const offStatusString = `\\C[12]×\\C[0]]`;
+const onStatusString = `\\C[14]〇\\C[0]`;
+const offStatusString = `\\C[12]×\\C[0]`;
 
 //行数超過する場合にここでid毎に対応
 //if(i == 401){let value42 = 4};
@@ -80,15 +80,16 @@ if(dataItem.meta['EventSetMap']){
 
 //自動起動かどうか
 if(dataItem.meta['AutoStart']){
-  if(Number(dataItem.meta['AutoStart']) == 1){
+  const dataItemAutoStartNum = Number(dataItem.meta['AutoStart']);
+  if (dataItemAutoStartNum == 1){
     messageText += `[自動発生]`;
     lineCount += 1;
   }
-  if(Number(dataItem.meta['AutoStart']) == 2){
+  else if (dataItemAutoStartNum == 2){
     messageText += `[朝自動発生]`;
     lineCount += 1;
   }
-  if(Number(dataItem.meta['AutoStart']) == 3){
+  else if (dataItemAutoStartNum == 3){
     messageText += `[宿泊時に自動発生]`;
     lineCount += 1;
   }
@@ -269,7 +270,7 @@ for (let id = 1; id < 10; id++) {
     if(!arr[0]){
       arr[0] = $gameVariables.value(2);//基準となるアクター
     }
-    actor = $gameActors.actor(Number(arr[0]));
+    const actor = $gameActors.actor(Number(arr[0]));
     const skillId = Number(arr[1]);
     const rankNum = Number(arr[2]);
     conditionCount += 1;
@@ -304,8 +305,9 @@ for (let id = 1; id < 10; id++) {
     if(!arr[0]){
       arr[0] = $gameVariables.value(2);//基準となるアクター
     }
-    actor = $gameActors.actor(Number(arr[0]));
+    const actorId = Number(arr[0]);
     const skillId = Number(arr[1]);
+    const actor = $gameActors.actor(actorId);
     conditionCount += 1;
     if (!$gameSwitches.value(435) && !actor.isLearnedSkill(skillId)){
       messageText += `[${actor.name()}が特定スキル習得`;
@@ -334,11 +336,10 @@ if(lineCount >= lineBreakCount){messageText += `\n`;lineCount = 0};
 for (let id = 1; id < 10; id++) {
   if(dataItem.meta['EventSetSkillEquip'+id]){
     const arr = dataItem.meta['EventSetSkillEquip' + id].split(',');
-    actor = $gameActors.actor(arr[0]);
     if (arr[0] == 0) { arr[0] = $gameVariables.value(2) };
     const actorId = Number(arr[0]);
     const skillId = Number(arr[1]);
-    actor = $gameActors.actor(actorId);
+    const actor = $gameActors.actor(actorId);
     conditionCount += 1;
     if(!$gameSwitches.value(435) && !actor.isLearnedSkill(skillId)){
       messageText += `[${actor.name()}が特定スキル装着`;
@@ -367,11 +368,10 @@ if(lineCount >= lineBreakCount){messageText += `\n`;lineCount = 0};
 for (let id = 1; id < 10; id++) {
   if(dataItem.meta['EventSetState'+id]){
     let arr = dataItem.meta['EventSetState'+id].split(',');
-    actor = $gameActors.actor(arr[0]);
     if (arr[0] == 0) { arr[0] = $gameVariables.value(2) };
     const actorId = Number(arr[0]);
     const skillId = Number(arr[1]);
-    actor = $gameActors.actor(actorId);
+    const actor = $gameActors.actor(actorId);
     conditionCount += 1;
     if(arr[0] == $gameVariables.value(2)){
       messageText += `State:[\x1bSIM[${skillId}]`;
@@ -398,7 +398,7 @@ for (let id = 1; id < 10; id++) {
     if (arr[0] == 0) { arr[0] = $gameVariables.value(2) };
     const actorId = Number(arr[0]);
     const skillId = Number(arr[1]);
-    actor = $gameActors.actor(actorId);
+    const actor = $gameActors.actor(actorId);
     conditionCount += 1;
     requirement = 18; 
     if(!$gameSwitches.value(435) && !actor._unlockedClasses.contains(skillId)){
@@ -471,7 +471,7 @@ for (let id = 1; id < 10; id++) {
     const actorId = Number(arr[0]);
     const skillId = Number(arr[1]);
     const rankNum = Number(arr[2]);
-    actor = $gameActors.actor(actorId);
+    const actor = $gameActors.actor(actorId);
     conditionCount += 1;
     if(skillId == 4){//露出度
       textSubst = $gameVariables.value(actorId + 380)[skillId] <= rankNum
@@ -499,7 +499,7 @@ for (let id = 1; id < 10; id++) {
     const actorId = Number(arr[0]);
     const skillId = Number(arr[1]);
     const rankNum = Number(arr[2]);
-    let actor = $gameActors.actor(actorId);
+    const actor = $gameActors.actor(actorId);
     conditionCount += 1;
     if(skillId == 41){
       for (let j = 1; j <= $dataItems.length-1; j++) {
