@@ -5,6 +5,18 @@
  */
 
 //(function(){
+
+scene_joukenNakami_clean_prefixes = function (text){
+
+  text = text.replace("[daysReset]", "");
+  text = text.replace("[NoReset]", "");
+  text = text.replace("[夜自動]", "");
+  text = text.replace("[シーン達成]", "");
+  text = text.replace("[挿話達成]", "");
+
+  return text;
+}
+
 //中身スクリプト
 scene_joukenNakami = function(id1,i,value23,value24,value25,value26){
 
@@ -144,11 +156,7 @@ if(lineCount >= lineBreakCount){messageText += `\n`;lineCount = 0};
         } else {
           conditionCount += 1;
           textSubst = $dataSystem.switches[Number(arr[id])];
-          textSubst = textSubst.replace("[daysReset]", "");
-          textSubst = textSubst.replace("[NoReset]", "");
-          textSubst = textSubst.replace("[夜自動]", "");
-          textSubst = textSubst.replace("[シーン達成]", "");
-          textSubst = textSubst.replace("[挿話達成]", "");
+          textSubst = scene_joukenNakami_clean_prefixes(textSubst);
           messageText += `[${prefix}${textSubst}`;
           lineCount += 1;
         }
@@ -582,11 +590,7 @@ for (let id = 1; id < 10; id++) {
           messageText += `[${actorId-620}番目:${$gameActors.actor(skillId).name()}`;
         } else {
           textSubst = $dataSystem.variables[actorId];
-          textSubst = textSubst.replace("[daysReset]", "");
-          textSubst = textSubst.replace("[NoReset]", "");
-          textSubst = textSubst.replace("[夜自動]", "");
-          textSubst = textSubst.replace("[シーン達成]", "");
-          textSubst = textSubst.replace("[挿話達成]", "");
+          textSubst = scene_joukenNakami_clean_prefixes(textSubst);
           messageText += `[${textSubst}:${skillId}↑`;
         }
       }
@@ -662,11 +666,7 @@ if(dataItem.meta['EventEraseSwi']){
   requirement = Number(dataItem.meta['EventEraseSwi']); 
   if(requirement >= 1){
     textSubst = $dataSystem.switches[requirement];
-    textSubst = textSubst.replace("[daysReset]", "");
-    textSubst = textSubst.replace("[NoReset]", "");
-    textSubst = textSubst.replace("[夜自動]", "");
-    textSubst = textSubst.replace("[シーン達成]", "");
-    textSubst = textSubst.replace("[挿話達成]", "");
+    textSubst = scene_joukenNakami_clean_prefixes(textSubst);
     if($gameSwitches.value(requirement)){
       cannotExecute = 1;
       messageText += `[${textSubst}につき発生不可]`;
@@ -698,11 +698,7 @@ if(dataItem.meta['EventEraseVal']){
   const arr2 = Number(dataItem.meta['EventEraseVal'].split(',')[1]); 
   if(arr1 >= 1){
     textSubst = $dataSystem.variables[arr1];
-    textSubst = textSubst.replace("[daysReset]", "");
-    textSubst = textSubst.replace("[NoReset]", "");
-    textSubst = textSubst.replace("[夜自動]", "");
-    textSubst = textSubst.replace("[シーン達成]", "");
-    textSubst = textSubst.replace("[挿話達成]", "");
+    textSubst = scene_joukenNakami_clean_prefixes(textSubst);
     if($gameVariables.value(arr1) > arr2){
       cannotExecute = 1;
       messageText += `[${textSubst}一定につき発生不可]`;
