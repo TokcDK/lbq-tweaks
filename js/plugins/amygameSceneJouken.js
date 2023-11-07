@@ -1065,32 +1065,35 @@ else if(id2 == 1){
 scene_choiceDecision = function(arr1,value6){//scene_choiceDecision([503,502,501],161);
 
 $gameSwitches.setValue(value6,false);
-var value2 = 0;
-var value5 = ` `;
-var list = arr1;
-list.forEach(function(value1) {
+let value2 = 0;
+let value5 = ` `;
+for (const value1 of arr1) {
+  let value4 = 0; // hope it will be set
+  let value3 = 0; // hope it will be set
   if(value1 >= 401 && value1 <= 500){
-    var value3 = value1+800;
-    var value4 = value1+900;
-  };
-  if(value1 >= 501 && value1 <= 600){
-    var value3 = value1+500;
-    var value4 = value1+600;
-  };
+    value3 = value1+800;
+    value4 = value1+900;
+  }
+  else if(value1 >= 501 && value1 <= 600){
+    value3 = value1+500;
+    value4 = value1+600;
+  }
   if($dataItems[value1].meta['AddEventIncidenceSwi']){
-    var value3 = Number($dataItems[value1].meta['AddEventIncidenceSwi']);
-  };
+    value3 = Number($dataItems[value1].meta['AddEventIncidenceSwi']);
+  }
   if($dataItems[value1].meta['AddEventCompSwi']){
-    var value4 = Number($dataItems[value1].meta['AddEventCompSwi']);
-  };
+    value4 = Number($dataItems[value1].meta['AddEventCompSwi']);
+  }
+  if (!value4 || !value3) console.warn(`One of value3 or value4 was not set! Code can work incorrect! value3:${value3},value4:${value4}`);
+
   if(!$gameSwitches.value(value4)){
-    var value5 = `\x1bIIN[${value1}]\n${$dataItems[value1].description}`;
-  };
+    value5 = `\x1bIIN[${value1}]\n${$dataItems[value1].description}`;
+  }
   if($gameSwitches.value(value3) && !$gameSwitches.value(value4)){
     $gameSwitches.setValue(value6,true);
-    var value2 = value1;
-  };
-}, this);
+    value2 = value1;
+  }
+}
 valueCountSet1 = value2;
 $gameVariables.setValue(22,value5);
 
