@@ -427,5 +427,6 @@ var $plugins =
 {"name":"Debug_ThrottleImage","status":false,"description":"画像読み込みを遅くします","parameters":{"Delay":"2000"}},
 {"name":"------------------------","status":false,"description":"----------------------------------------------------------------------------------","parameters":{}},
 {"name":"amygameFixes","status":true,"description":"","parameters":{}},
+{"name":"KODERA_optimization","status":true,"description":"1.0.3 Speed up core RPG Maker engine","parameters":{}},
 {"name":"Irina_PerformanceUpgrade","status":true,"description":"<PerformanceUpgrade> for RPG Maker MV version 1.6.2.","parameters":{"":"","AnimationHue":"true","BlurMenuBackground":"true","BlurIntensity":"0.5","CacheTextColors":"true","EnemyHue":"true","PixiContainerFlush":"true","SkipUnnecessarySnapshots":"true"}}
 ];
