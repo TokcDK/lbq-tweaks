@@ -966,7 +966,6 @@ var event_pararelStartingCEventIdsArray = [119, 125, 429, 481];
 //並列イベントスイッチオン。id1が0でﾒｲﾝ1でｼｰﾝ挿話,event_pararelStarting(1,501,this._eventId);
 event_pararelStarting = function(id1,id2,id3){
 
-let isFound = false;
 valueCountDefeadSwitche2 = 0;//全滅スイッチオン時に成立判定
   //本体では0に出来ないためここでやっている
 const array = $gameMap._commonEvents.filter(function (event) {
@@ -974,17 +973,19 @@ const array = $gameMap._commonEvents.filter(function (event) {
 }).map(function (event) {
   return event.event().id;
 });
+
+let isFound = false;
 for (let i = 0; i < array.length; i++) {
-  const arrayI = array[i];
-  if (arrayI < 2) continue;
-  const cEventSwitchId = $dataCommonEvents[arrayI].switchId;
+  const eventId = array[i];
+  if (eventId < 2) continue;
+  const cEventSwitchId = $dataCommonEvents[eventId].switchId;
   if (!cEventSwitchId) continue;  
   if (event_pararelStartingCEventIdsArray.some(function (id) { return id == cEventSwitchId })) continue;
   
   isFound = true;
   break;
 }
-if (isFound) {
+if (!isFound) {
   valueParallelEventId = id3;
   if (id1 == 0 || (id2 >= 401 && id2 <= 600)) {
     $gameSwitches.setValue($dataCommonEvents[id2].switchId, true);
