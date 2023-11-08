@@ -928,26 +928,23 @@ if($gameVariables.value(504) >= 1){
 }
 
 //☆☆☆条件追加。<EventSetVal1:0,0>
-scene_commonIdRec = function(value1){
+scene_commonIdRec = function(itemId){
 
-if($dataItems[value1].meta['AddAddEventCommonId']) {
-  var value2 = Number($dataItems[value1].meta['AddAddEventCommonId']);
-} else {
-  var value2 = value1;
-};
-if(value2 >= 2){
-  event_pararelStarting(1,value1,1)
-} else {
-  if($gameSwitches.value(29)){
-    TickerManager.show('無効なIDが選択されました。ホームに帰還します。');
-    for(var i = 101; i <= 110; i++){$gameSwitches.setValue(i,false)};
-    set_playerPosition2(168);
+  const itemAddAddEventCommonId = $dataItems[itemId].meta['AddAddEventCommonId'];
+  let addAddEventCommonId = itemAddAddEventCommonId ? Number(itemAddAddEventCommonId) : itemId;
+
+  if (addAddEventCommonId >= 2) {
+    event_pararelStarting(1, itemId, 1)
   } else {
-    TickerManager.show('無効なIDが選択されました。処理を中断します。');
-  };
-};
-
-};
+    if ($gameSwitches.value(29)) {
+      TickerManager.show('無効なIDが選択されました。ホームに帰還します。');
+      for (let i = 101; i <= 110; i++) $gameSwitches.setValue(i, false);
+      set_playerPosition2(168);
+    } else {
+      TickerManager.show('無効なIDが選択されました。処理を中断します。');
+    }
+  }
+}
 
 //イベントから挿話シーン発生event_pararelSet(this._eventId,0,1,8);
 event_pararelSet = function(id1,id2,id3,id4){
