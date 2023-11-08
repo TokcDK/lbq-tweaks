@@ -976,10 +976,11 @@ const array = $gameMap._commonEvents.filter(function (event) {
 }).map(function (event) {
   return event.event().id;
 });
-for (let i = 0; i <= array.length - 1; i++) {
+for (let i = 0; i < array.length; i++) {
   const arrayI = array[i];
-  if (arrayI < 2 || !$dataCommonEvents[arrayI].switchId) continue;
+  if (arrayI < 2) continue;
   const cEventSwitchId = $dataCommonEvents[arrayI].switchId;
+  if (!cEventSwitchId) continue;  
   if (event_pararelStartingCEventIdsArray.some(function (id) { return id == cEventSwitchId })) continue;
   
   isFound = true;
