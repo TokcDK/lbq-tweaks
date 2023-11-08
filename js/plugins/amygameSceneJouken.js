@@ -994,8 +994,9 @@ if (isFound) {
     if (id2 >= 401 && id2 <= 600) {
       $gameSwitches.setValue($dataCommonEvents[id2].switchId, true);
     } else {
-      if ($dataItems[id2].meta['AddEventParallelSwi']) {
-        $gameSwitches.setValue($dataCommonEvents[Number($dataItems[id2].meta['AddEventParallelSwi'])].switchId, true);
+      const itemAddEventParallelSwi = $dataItems[id2].meta['AddEventParallelSwi'];
+      if (itemAddEventParallelSwi) {
+        $gameSwitches.setValue($dataCommonEvents[Number(itemAddEventParallelSwi)].switchId, true);
       }
     }
   }
