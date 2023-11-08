@@ -17,13 +17,13 @@ scene_joukenNakami_clean_prefixes = function (text){
 }
 
 //中身スクリプト
-scene_joukenNakami = function(id1,i,value23,value24,value25,value26){
+scene_joukenNakami = function(id1,itemIndex,value23,value24,value25,value26){
 
-if (!$dataItems[i].name) return;
+const dataItem = $dataItems[itemIndex];
+if (!dataItem.name) return;
 
 //console.warn(`Debug. Run scene_joukenNakami`)
 
-let dataItem = $dataItems[i];
 //let actor = $gameActors.actor($gameVariables.value(2));
 let conditionPrefixText = `発生条件:`;
 let conditionCount = 0;//条件成立回数。使わない？
@@ -169,7 +169,7 @@ if(lineCount >= lineBreakCount){messageText += `\n`;lineCount = 0};
         const isSwitch = $gameSwitches.value(switchId);
         if ((isSet && isSwitch) || (!isSet && !isSwitch)) {
           if (isSet && switchId == 83) {//全滅スイッチ
-            valueCountDefeadSwitche1 = i;
+            valueCountDefeadSwitche1 = itemIndex;
           };
           unmetConditionCount += 1;
           metConditionCount += 1;
@@ -738,11 +738,11 @@ dataItemMeta = dataItem.meta['EventEraseVal'];
 
 conditionPrefixText += `${messageText}`;
 if (dataItem.meta['NoAddDescription']) {}else{
-  $dataItems[i].description = `${conditionPrefixText}`;
+  dataItem.description = `${conditionPrefixText}`;
 }
 j += 1;
-valueSceneName1 = `${$dataItems[i].name}`;
-let valueSceneDescription1 = `${$dataItems[i].description}`;
+valueSceneName1 = `${dataItem.name}`;
+let valueSceneDescription1 = `${dataItem.description}`;
 if(unmetConditionCount != metConditionCount){
   valueSceneName1 = `？？？`;
 }
@@ -769,7 +769,7 @@ if(mainQuestProgress != 0){
   }
 } else {
 
-if($gameSwitches.value(value24 + i)){// || $gameSwitches.value(435) && !$gameParty.hasItem($dataItems[i])
+if($gameSwitches.value(value24 + itemIndex)){// || $gameSwitches.value(435) && !$gameParty.hasItem($dataItems[i])
   value10 += 1;
 
 } else {
@@ -803,19 +803,19 @@ if(marGenScene1 >= 1 && cannotExecute == 0){
           valueCountSet2 += 1;
           eval("valueWordSet" + valueCountSet2 +" = value46");
         };
-      $gameSwitches.setValue(i+value23,true);//発生用スイッチ
+      $gameSwitches.setValue(itemIndex+value23,true);//発生用スイッチ
         if(valueCountDefeadSwitche1 >= 1){
-          valueCountDefeadSwitche2 = i;
+          valueCountDefeadSwitche2 = itemIndex;
         };
         dataItemMeta = dataItem.meta['AutoStart'];
         if(dataItemMeta) {//自動起動かどうか
           if (Number(dataItemMeta) == 1 && $gameSwitches.value(477)){//マップ最初並列イベコモン時にオンオフ自動
             $gameSwitches.setValue(474,true);
-            valueCountDefeadSwitche2 = i;
+            valueCountDefeadSwitche2 = itemIndex;
           };
           if (Number(dataItemMeta) == 2 && $gameSwitches.value(472)){//朝並列スイッチ
             $gameSwitches.setValue(474,true);
-            valueCountDefeadSwitche2 = i;
+            valueCountDefeadSwitche2 = itemIndex;
           };
         };
           if($gameParty.inBattle()){
@@ -833,7 +833,7 @@ if(marGenScene1 >= 1 && cannotExecute == 0){
           valueCountSet2 += 1;
           eval("valueWordSet" + valueCountSet2 +" = value46");
         };
-      $gameSwitches.setValue(i+value23,false);//発生用スイッチ
+      $gameSwitches.setValue(itemIndex+value23,false);//発生用スイッチ
 
         if($gameParty.inBattle()){
           if(inBattle ==1){
@@ -854,7 +854,7 @@ if(marGenScene1 >= 1 && cannotExecute == 0){
           eval("valueWordSet" + valueCountSet2 +" = value46");
         };
   if(!dataItem.meta['RepeatScene']){
-    $gameSwitches.setValue(i+value23,false);//発生用スイッチ
+    $gameSwitches.setValue(itemIndex+value23,false);//発生用スイッチ
   }
 }
 }
