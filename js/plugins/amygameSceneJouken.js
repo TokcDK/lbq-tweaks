@@ -19,7 +19,7 @@ scene_joukenNakami_clean_prefixes = function (text){
 //中身スクリプト
 scene_joukenNakami = function(id1,i,value23,value24,value25,value26){
 
-if ($dataItems[i].name.length === 0) return;
+if (!$dataItems[i].name) return;
 
 //console.warn(`Debug. Run scene_joukenNakami`)
 
