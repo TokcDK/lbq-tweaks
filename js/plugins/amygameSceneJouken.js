@@ -952,9 +952,7 @@ event_pararelSet = function(id1,id2,id3,id4){
 event_charaPreset(id1);
 event_charaRoot(id1);
 const event = $gameMap.event(id1);
-const event_realX = event._realX;
-const event_realY = event._realY;
-$gameVariables.setValue(161,[$gameMap.mapId(),event_realX+id2,event_realY+id3]);
+$gameVariables.setValue(161, [$gameMap.mapId(), event._realX + id2, event._realY + id3]);
 set_playerPosition2(161);
 if(id4 >= 1){$gamePlayer.setDirection(id4)};
   if (event.event().meta['EvSceneSet']){
@@ -988,16 +986,12 @@ for (let i = 0; i < array.length; i++) {
 }
 if (isFound) {
   valueParallelEventId = id3;
-  if (id1 == 0) {
-    $gameSwitches.setValue(cEvent.switchId, true);
+  if (id1 == 0 || (id2 >= 401 && id2 <= 600)) {
+    $gameSwitches.setValue($dataCommonEvents[id2].switchId, true);
   } else {
-    if (id2 >= 401 && id2 <= 600) {
-      $gameSwitches.setValue($dataCommonEvents[id2].switchId, true);
-    } else {
-      const itemAddEventParallelSwi = $dataItems[id2].meta['AddEventParallelSwi'];
-      if (itemAddEventParallelSwi) {
-        $gameSwitches.setValue($dataCommonEvents[Number(itemAddEventParallelSwi)].switchId, true);
-      }
+    const itemAddEventParallelSwi = $dataItems[id2].meta['AddEventParallelSwi'];
+    if (itemAddEventParallelSwi) {
+      $gameSwitches.setValue($dataCommonEvents[Number(itemAddEventParallelSwi)].switchId, true);
     }
   }
 }
