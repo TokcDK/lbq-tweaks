@@ -1004,28 +1004,30 @@ if (isFound) {
 }
 
 if(!$gameSwitches.value(29)){
-  $gameVariables.value(163)[id2] = [0,0,0,0,0,0,0,0,0,0,0,0];
-  $gameVariables.value(163)[id2][0] = $gameMap.mapId();
-  $gameVariables.value(163)[id2][1] = $gamePlayer.characterName();
-  $gameVariables.value(163)[id2][2] = $gamePlayer.characterIndex();
-  $gameVariables.value(163)[id2][3] = $gamePlayer._realX;
-  $gameVariables.value(163)[id2][4] = $gamePlayer._realY;
-  $gameVariables.value(163)[id2][5] = $gamePlayer.direction();
-  if(id3 != 0) {
+  const gameVar163 = $gameVariables.value(163);
+  gameVar163[id2] = [0,0,0,0,0,0,0,0,0,0,0,0];
+  const gameVar163Id2 = gameVar163[id2];
+  gameVar163Id2[0] = $gameMap.mapId();
+  gameVar163Id2[1] = $gamePlayer.characterName();
+  gameVar163Id2[2] = $gamePlayer.characterIndex();
+  gameVar163Id2[3] = $gamePlayer._realX;
+  gameVar163Id2[4] = $gamePlayer._realY;
+  gameVar163Id2[5] = $gamePlayer.direction();
+  if(id3) {
     if(!!$gameMap.event(id3)) {
-      var event = $gameMap.event(id3);
-      $gameVariables.value(163)[id2][6] = event.characterName();
-      $gameVariables.value(163)[id2][7] = event.characterIndex();
-      $gameVariables.value(163)[id2][8] = event._realX;
-      $gameVariables.value(163)[id2][9] = event._realY;
-      $gameVariables.value(163)[id2][10] = event.direction();
-      $gameVariables.value(163)[id2][11] = event.pattern();
+      const event = $gameMap.event(id3);
+      gameVar163Id2[6] = event.characterName();
+      gameVar163Id2[7] = event.characterIndex();
+      gameVar163Id2[8] = event._realX;
+      gameVar163Id2[9] = event._realY;
+      gameVar163Id2[10] = event.direction();
+      gameVar163Id2[11] = event.pattern();
     }
   }
 }
 $gameVariables.setValue(171,[$gameMap.mapId(),$gamePlayer._realX,$gamePlayer._realY]);
 
-};
+}
 
 //一時的にキャラグラ記憶ともろもろ設定,id2が0でスタート。1で終了
 Npc_TemporarilySave = function(id1,id2){
