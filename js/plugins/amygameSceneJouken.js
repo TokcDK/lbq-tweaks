@@ -44,7 +44,7 @@ let lineBreakCount = 4;//改行指定数
 let lineCount = 0;//行数カウント
 let showMapName = 0;//？？？表記の時にマップ名表示
 let actorNotJoined = 0;//アクターが加入していない
-let valueCountDefeatSwitch1 = 0;//全滅スイッチ判定
+var valueCountDefeadSwitche1 = 0;//全滅スイッチ判定
 
 const onStatusString = `\\C[14]〇\\C[0]`;
 const offStatusString = `\\C[12]×\\C[0]`;
@@ -163,7 +163,7 @@ if(lineCount >= lineBreakCount){messageText += `\n`;lineCount = 0};
         const isSwitch = $gameSwitches.value(switchId);
         if ((isSet && isSwitch) || (!isSet && !isSwitch)) {
           if (isSet && switchId == 83) {//全滅スイッチ
-            valueCountDefeatSwitch1 = i;
+            valueCountDefeadSwitche1 = i;
           };
           unmetConditionCount += 1;
           metConditionCount += 1;
@@ -776,7 +776,7 @@ if(marGenScene1 >= 1 && cannotExecute == 0){
           eval("valueWordSet" + valueCountSet2 +" = value46");
         };
       $gameSwitches.setValue(i+value23,true);//発生用スイッチ
-        if(valueCountDefeatSwitch1 >= 1){
+        if(valueCountDefeadSwitche1 >= 1){
           valueCountDefeadSwitche2 = i;
         };
         if(dataItem.meta['AutoStart']){//自動起動かどうか
@@ -968,38 +968,40 @@ if ($gameMap.event(id1).event().meta['EvSceneSet']){
 
 };
 
+var event_pararelStartingCEventIdsArray = [119, 125, 429, 481];
 //並列イベントスイッチオン。id1が0でﾒｲﾝ1でｼｰﾝ挿話,event_pararelStarting(1,501,this._eventId);
 event_pararelStarting = function(id1,id2,id3){
 
-var value1 = 0;
+let isFound = false;
 valueCountDefeadSwitche2 = 0;//全滅スイッチオン時に成立判定
-//本体では0に出来ないためここでやっている
-var array = $gameMap._commonEvents.filter(function (event) {
-    return event.isActive();
+  //本体では0に出来ないためここでやっている
+const array = $gameMap._commonEvents.filter(function (event) {
+  return event.isActive();
 }).map(function (event) {
-    return event.event().id;
+  return event.event().id;
 });
-for (var i = 0; i <= array.length-1; i++) {
-  if(array[i] >= 2){
-    if($dataCommonEvents[array[i]].switchId){
-      if([119,125,429,481].some(function(id){return id == $dataCommonEvents[array[i]].switchId})){}else{
-        var value1 = 1;
-        break;
-}}}};
-if(value1 == 0){
+for (let i = 0; i <= array.length - 1; i++) {
+  const arrayI = array[i];
+  if (arrayI < 2 || !$dataCommonEvents[arrayI].switchId) continue;
+  if (event_pararelStartingCEventIdsArray.some(function (id) { return id == $dataCommonEvents[arrayI].switchId })) continue;
+  
+  isFound = true;
+  break;
+}
+if (isFound) {
   valueParallelEventId = id3;
-    if(id1 == 0){
-      $gameSwitches.setValue($dataCommonEvents[id2].switchId,true);
+  if (id1 == 0) {
+    $gameSwitches.setValue($dataCommonEvents[id2].switchId, true);
+  } else {
+    if (id2 >= 401 && id2 <= 600) {
+      $gameSwitches.setValue($dataCommonEvents[id2].switchId, true);
     } else {
-      if(id2 >= 401 && id2 <= 600){
-        $gameSwitches.setValue($dataCommonEvents[id2].switchId,true);
-      } else {
-        if($dataItems[id2].meta['AddEventParallelSwi']){
-          $gameSwitches.setValue($dataCommonEvents[Number($dataItems[id2].meta['AddEventParallelSwi'])].switchId,true);
-        };
-      };
-    };
-};
+      if ($dataItems[id2].meta['AddEventParallelSwi']) {
+        $gameSwitches.setValue($dataCommonEvents[Number($dataItems[id2].meta['AddEventParallelSwi'])].switchId, true);
+      }
+    }
+  }
+}
 
 if(!$gameSwitches.value(29)){
   $gameVariables.value(163)[id2] = [0,0,0,0,0,0,0,0,0,0,0,0];
@@ -1018,9 +1020,9 @@ if(!$gameSwitches.value(29)){
       $gameVariables.value(163)[id2][9] = event._realY;
       $gameVariables.value(163)[id2][10] = event.direction();
       $gameVariables.value(163)[id2][11] = event.pattern();
-    };
-  };
-};
+    }
+  }
+}
 $gameVariables.setValue(171,[$gameMap.mapId(),$gamePlayer._realX,$gamePlayer._realY]);
 
 };
