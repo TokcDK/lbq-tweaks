@@ -753,7 +753,7 @@ Bitmap._reuseImages = [];
 
 Bitmap.prototype._createCanvas = function(width, height){
     this.__canvas = this.__canvas || document.createElement('canvas');
-    this.__context = this.__canvas.getContext('2d');
+    this.__context = this.__canvas.getContext('2d', { willReadFrequently: true });
 
     this.__canvas.width = Math.max(width || 0, 1);
     this.__canvas.height = Math.max(height || 0, 1);
@@ -1477,7 +1477,7 @@ Bitmap.prototype.blur = function() {
         var canvas = this._canvas;
         var context = this._context;
         var tempCanvas = document.createElement('canvas');
-        var tempContext = tempCanvas.getContext('2d');
+        var tempContext = tempCanvas.getContext('2d', { willReadFrequently: true });
         tempCanvas.width = w + 2;
         tempCanvas.height = h + 2;
         tempContext.drawImage(canvas, 0, 0, w, h, 1, 1, w, h);
@@ -2098,7 +2098,7 @@ Graphics.isFontLoaded = function(name) {
         if (!this._hiddenCanvas) {
             this._hiddenCanvas = document.createElement('canvas');
         }
-        var context = this._hiddenCanvas.getContext('2d');
+        var context = this._hiddenCanvas.getContext('2d', { willReadFrequently: true });
         var text = 'abcdefghijklmnopqrstuvwxyz';
         var width1, width2;
         context.font = '40px ' + name + ', sans-serif';
@@ -2406,7 +2406,7 @@ Graphics._testCanvasBlendModes = function() {
     canvas = document.createElement('canvas');
     canvas.width = 1;
     canvas.height = 1;
-    context = canvas.getContext('2d');
+    context = canvas.getContext('2d', { willReadFrequently: true });
     context.globalCompositeOperation = 'source-over';
     context.fillStyle = 'white';
     context.fillRect(0, 0, 1, 1);
