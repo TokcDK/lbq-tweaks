@@ -954,19 +954,18 @@ event_pararelSet = function(id1,id2,id3,id4){
 
 event_charaPreset(id1);
 event_charaRoot(id1);
-var event = $gameMap.event(id1);
-var value2 = event._realX
-var value3 = event._realY
-$gameVariables.setValue(161,[$gameMap.mapId(),value2+id2,value3+id3]);
+const event = $gameMap.event(id1);
+const event_realX = event._realX;
+const event_realY = event._realY;
+$gameVariables.setValue(161,[$gameMap.mapId(),event_realX+id2,event_realY+id3]);
 set_playerPosition2(161);
 if(id4 >= 1){$gamePlayer.setDirection(id4)};
-if ($gameMap.event(id1).event().meta['EvSceneSet']){
-  var arr1 = $gameMap.event(id1).event().meta['EvSceneSet'].split(',');
-  var value1 = Number(arr1[0]);
+  if (event.event().meta['EvSceneSet']){
+  const value1 = Number(event.event().meta['EvSceneSet'].split(',')[0]);
   event_pararelStarting(1,value1,id1);
-};
+}
 
-};
+}
 
 var event_pararelStartingCEventIdsArray = [119, 125, 429, 481];
 //並列イベントスイッチオン。id1が0でﾒｲﾝ1でｼｰﾝ挿話,event_pararelStarting(1,501,this._eventId);
