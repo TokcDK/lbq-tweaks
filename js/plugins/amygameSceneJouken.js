@@ -983,7 +983,8 @@ const array = $gameMap._commonEvents.filter(function (event) {
 for (let i = 0; i <= array.length - 1; i++) {
   const arrayI = array[i];
   if (arrayI < 2 || !$dataCommonEvents[arrayI].switchId) continue;
-  if (event_pararelStartingCEventIdsArray.some(function (id) { return id == $dataCommonEvents[arrayI].switchId })) continue;
+  const cEventSwitchId = $dataCommonEvents[arrayI].switchId;
+  if (event_pararelStartingCEventIdsArray.some(function (id) { return id == cEventSwitchId })) continue;
   
   isFound = true;
   break;
@@ -991,7 +992,7 @@ for (let i = 0; i <= array.length - 1; i++) {
 if (isFound) {
   valueParallelEventId = id3;
   if (id1 == 0) {
-    $gameSwitches.setValue($dataCommonEvents[id2].switchId, true);
+    $gameSwitches.setValue(cEvent.switchId, true);
   } else {
     if (id2 >= 401 && id2 <= 600) {
       $gameSwitches.setValue($dataCommonEvents[id2].switchId, true);
