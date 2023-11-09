@@ -38,29 +38,30 @@ event_charaDirectionPoint = function(event,id1){
 
 valueDirectionPointX = event._realX;
 valueDirectionPointY = event._realY;
+const eventDirection = event.direction();
 if(id1 == 2){
-  if(event.direction() == 2){valueDirectionPointY += 1};
-  if(event.direction() == 4){valueDirectionPointX -= 1};
-  if(event.direction() == 6){valueDirectionPointX += 1};
-  if(event.direction() == 8){valueDirectionPointY -= 1};
-};
-if(id1 == 8){
-  if(event.direction() == 2){valueDirectionPointY -= 1};
-  if(event.direction() == 4){valueDirectionPointX += 1};
-  if(event.direction() == 6){valueDirectionPointX -= 1};
-  if(event.direction() == 8){valueDirectionPointY += 1};
-};
-if(id1 == 4){
-  if(event.direction() == 2){valueDirectionPointX += 1};
-  if(event.direction() == 4){valueDirectionPointY += 1};
-  if(event.direction() == 6){valueDirectionPointY -= 1};
-  if(event.direction() == 8){valueDirectionPointX -= 1};
-};
-if(id1 == 6){
-  if(event.direction() == 2){valueDirectionPointX -= 1};
-  if(event.direction() == 4){valueDirectionPointY -= 1};
-  if(event.direction() == 6){valueDirectionPointY += 1};
-  if(event.direction() == 8){valueDirectionPointX += 1};
+  if(eventDirection == 2){valueDirectionPointY += 1}
+  else if(eventDirection == 4){valueDirectionPointX -= 1}
+  else if(eventDirection == 6){valueDirectionPointX += 1}
+  else if(eventDirection == 8){valueDirectionPointY -= 1};
+}
+else if(id1 == 8){
+  if(eventDirection == 2){valueDirectionPointY -= 1}
+  else if(eventDirection == 4){valueDirectionPointX += 1}
+  else if(eventDirection == 6){valueDirectionPointX -= 1}
+  else if(eventDirection == 8){valueDirectionPointY += 1};
+}
+else if(id1 == 4){
+  if(eventDirection == 2){valueDirectionPointX += 1}
+  else if(eventDirection == 4){valueDirectionPointY += 1}
+  else if(eventDirection == 6){valueDirectionPointY -= 1}
+  else if(eventDirection == 8){valueDirectionPointX -= 1};
+}
+else if(id1 == 6){
+  if(eventDirection == 2){valueDirectionPointX -= 1}
+  else if(eventDirection == 4){valueDirectionPointY -= 1}
+  else if(eventDirection == 6){valueDirectionPointY += 1}
+  else if(eventDirection == 8){valueDirectionPointX += 1};
 };
 
 };
