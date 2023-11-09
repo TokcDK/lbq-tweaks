@@ -13,6 +13,8 @@ How to:
 
 After update you can now use F12 to open DevTools where in console you can see all internal game messages, warnings and errors. Please report about any error messages to the game dev.
 
+extra:After run game with newest NWJS there is possible to get profile error if start game with older nwjs. The error can be removed by run "!fix-nwjs-profile-error-clean-nwjs-cache!.bat" file.
+
 
 ----------
 NWJSの更新を新しいバージョンにすると、ゲームのパフォーマンスが顕著に向上し、ハードウェアとの動作が改善されます。
@@ -32,3 +34,5 @@ NWJSの更新を新しいバージョンにすると、ゲームのパフォー�
 
 
 アップデート後、"F12" キーを使用してDevToolsを開くことができ、コンソールですべての内部ゲームメッセージ、警告、エラーを表示できます。エラーメッセージがある場合は、ゲーム開発者に報告してください。
+
+extra:最新のNWJSでゲームを実行した後、古いnwjsでゲームを起動するとプロファイルエラーが発生する可能性があります。このエラーは、"!fix-nwjs-profile-error-clean-nwjs-cache!.bat"ファイルを実行することで解消されます。
