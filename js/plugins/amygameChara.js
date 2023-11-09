@@ -68,24 +68,22 @@ if(id1 == 6){
 //マップイベントのリセット
 map_reset1 = function(){
 
-$gameSystem.savePrefabEventCondition($gameMap.mapId());
-for (var id = $gameMap.events().length; id > 0; id--) {
-  if(!!$gameMap.event(id)) {
-    if ($gameMap.event(id).event().meta['Respawn']){
-      $gameMap.eraseEvent(id);
-}}};
+const mapID = $gameMap.mapId();
+$gameSystem.savePrefabEventCondition(mapID);
 $gameSwitches.setValue(140,false);
 $gameSwitches.setValue(156,false);
-for (var id = $gameMap.events().length; id > 0; id--) {
-  if(!!$gameMap.event(id)) {
-    //  var mapID = this._mapId;
-    var mapID = $gameMap.mapId();
+for (let id = $gameMap.events().length; id > 0; id--) {
+  if (!$gameMap.event(id)) continue;
+
+  if ($gameMap.event(id).event().meta['Respawn']) {
+    $gameMap.eraseEvent(id);
+  } else {
     $gameSelfSwitches.setValue([mapID, id, "C"], false);
     $gameSelfSwitches.setValue([mapID, id, "D"], false);
-  };
-};
+  }
+}
 
-};
+}
 
 //主観イベントの現在位置にプレイヤーを設置してシーン終了event_PlayerArrangement($gameVariables.value(530));
 event_PlayerArrangement = function(value1){
