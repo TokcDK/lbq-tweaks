@@ -436,50 +436,56 @@ item_getSkillLevel(value5,0,value1);
 };
 
 //熟練度上昇拾得物。スキルid、アイテム種別3お金0アイテム1武器2防具、金額orアイテムID,0でスキル熟練度のみアップ
-item_getSkillLevel = function(id1,itemType,id3){
+item_getSkillLevel = function(skillId,itemType,id3){
 
-var value3 = id1; 
-var value1 = `　`; 
-var value2 = `　`;
-var value11 = 0;
-if(itemType == 0){var item = $dataItems};
-if(itemType == 1){var item = $dataWeapons};
-if(itemType == 2){var item = $dataArmors};
-var actor = $gameActors.actor($gameVariables.value(11)); 
-if(actor.skillMasteryLevel(value3) == Number($dataSkills[value3].meta['Max Mastery Level'])){}else{
-  if(actor.isLearnedSkill(value3) && actor.skillMasteryLevel(value3) >= 0){
-    var value11 = actor.skillMasteryLevel(value3);
-    actor.gainSkillMasteryUses(value3, $gameVariables.value(203)); //変更熟練度
-    var value12 = `${$dataSkills[value3].name}`;
-    var value12 = value12.replace("＜ON＞", "");
-    var value12 = value12.replace("＜OFF＞", "");
-    var value1 = `\\C[1]＜${value12}＞\\C[0]熟練度\\C[10]\\V[203]\\C[0]獲得！`;
-}};
-var id4 = actor.skillMasteryLevel(value3);
-if(id4 == 0){var id4 = 1};
-if(id3 == 10 || id3 == 141){
+let value1 = `　`; 
+let skillLevel = 0;
+const actor = $gameActors.actor($gameVariables.value(11)); 
+
+const isLearnedSkill = actor.isLearnedSkill(skillId);
+const skillMasteryLevel = isLearnedSkill ? actor.skillMasteryLevel(skillId) : 0;
+if (skillMasteryLevel == Number($dataSkills[skillId].meta['Max Mastery Level'])){}else{
+  if (isLearnedSkill && skillMasteryLevel >= 0){
+    skillLevel = skillMasteryLevel;
+    actor.gainSkillMasteryUses(skillId, $gameVariables.value(203)); //変更熟練度
+    let value12 = `${$dataSkills[skillId].name}`;
+    value12 = value12.replace("＜ON＞", "");
+    value12 = value12.replace("＜OFF＞", "");
+    value1 = `\\C[1]＜${value12}＞\\C[0]熟練度\\C[10]\\V[203]\\C[0]獲得！`;
+  }
+}
+
+let id4 = skillMasteryLevel;
+if(id4 == 0){id4 = 1}
+else if(id3 == 10 || id3 == 141){
   if(actor.isLearnedSkill(799)){
-    var id4 = id4 * 10;
+    id4 = id4 * 10;
   };
 };
+
+let value2 = `　`;
 if(id3 >= 1){
+  let item;
+  if(itemType == 0){item = $dataItems};
+  if(itemType == 1){item = $dataWeapons};
+  if(itemType == 2){item = $dataArmors};
   if(itemType == 3){
-    var id3 = id3 * id4;
+    id3 = id3 * id4;
     $gameParty.gainGold(id3);
-    var value2 = `\\C[3]小銭を拾った。（+\\C[10]${id3}\\C[0]\\G）`;
+    value2 = `\\C[3]小銭を拾った。（+\\C[10]${id3}\\C[0]\\G）`;
   } else {
     $gameParty.gainItem(item[id3],id4);
-    var value2 = `\\C[3]\x1bI[${item[id3].iconIndex}]${item[id3].name}\\C[0]を\\C[10]${id4}\\C[0]個入手した。`;
+    value2 = `\\C[3]\x1bI[${item[id3].iconIndex}]${item[id3].name}\\C[0]を\\C[10]${id4}\\C[0]個入手した。`;
   };
 };
 CommonPopupManager.showInfo({},value2 + value1,null);
-if(actor.isLearnedSkill(value3)){
-  valueScriptArray1 = [$gameVariables.value(11),value11,value3];
+if(isLearnedSkill){
+  valueScriptArray1 = [$gameVariables.value(11),skillLevel,skillId];
 } else {
   valueScriptArray1 = [$gameVariables.value(11),0,0];
-};
+}
 
-};
+}
 
 //熟練度上昇拾得物。後半
 item_getSkillLevel2 = function(){
