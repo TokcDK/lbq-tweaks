@@ -90,23 +90,23 @@ for (var id = $gameMap.events().length; id > 0; id--) {
 //主観イベントの現在位置にプレイヤーを設置してシーン終了event_PlayerArrangement($gameVariables.value(530));
 event_PlayerArrangement = function(value1){
 
-var value2 = $gameVariables.value(292)[value1];
-if(!!$gameMap.event(value2)) {
-  var event = $gameMap.event(value2);
+const eventId = $gameVariables.value(292)[value1];
+if(!!$gameMap.event(eventId)) {
+  const event = $gameMap.event(eventId);
   if($gameSwitches.value(29)){
     $gameVariables.setValue(171,0);
   } else {
     event_charaDirectionPoint(event,0);
     $gamePlayer.setDirection(event.direction());
-    var arr1 = [$gameMap.mapId(),valueDirectionPointX,valueDirectionPointY];
+    const arr1 = [$gameMap.mapId(),valueDirectionPointX,valueDirectionPointY];
     $gameVariables.setValue(171,arr1);
-  };
+  }
 } else {
   $gameVariables.setValue(171,0);
-};
+}
 $gameVariables.setValue(528,100);
 
-};
+}
 
 event_charaZanzou = function(id1,id2){
 
