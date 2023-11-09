@@ -480,49 +480,53 @@ if(actor.isLearnedSkill(value3)){
 };
 
 };
+
 //熟練度上昇拾得物。後半
 item_getSkillLevel2 = function(){
 
-var actor = $gameActors.actor(valueScriptArray1[0]);
-var value11 = valueScriptArray1[1];
-var value3 = valueScriptArray1[2];
-if(value3 >= 1){
-  if(actor.isLearnedSkill(value3) && actor.skillMasteryLevel(value3) >= 0){
-    if(6 == Number($dataSkills[value3].meta['Max Mastery Level'])){
-      if(actor.skillMasteryLevel(value3) <= 1){var value4 = `\\C[4][E]\\C[0]`};
-      if(actor.skillMasteryLevel(value3) == 2){var value4 = `\\C[12][D]\\C[0]`};
-      if(actor.skillMasteryLevel(value3) == 3){var value4 = `\\C[5][C]\\C[0]`};
-      if(actor.skillMasteryLevel(value3) == 4){var value4 = `\\C[13][B]\\C[0]`};
-      if(actor.skillMasteryLevel(value3) == 5){var value4 = `\\C[27][A]\\C[0]`};
-      if(actor.skillMasteryLevel(value3) == 6){var value4 = `\\C[30][S]\\C[0]`};
-    } else {
-      if(actor.skillMasteryLevel(value3) <= 1){var value4 = `\\C[4][D]\\C[0]`};
-      if(actor.skillMasteryLevel(value3) == 2){var value4 = `\\C[12][C]\\C[0]`};
-      if(actor.skillMasteryLevel(value3) == 3){var value4 = `\\C[5][B]\\C[0]`};
-      if(actor.skillMasteryLevel(value3) == 4){var value4 = `\\C[13][A]\\C[0]`};
-      if(actor.skillMasteryLevel(value3) == 5){var value4 = `\\C[27][S]\\C[0]`};
-    //if(actor.skillMasteryLevel(value3) == 6){var value4 = `\\C[30][S]\\C[0]`};
-    };
-    var value1 = `${$dataSkills[value3].name + value4}　Uses:\\C[2]${actor.skillMasteryUses(value3)}\\C[0]／${actor.skillMasteryUsageMax(value3)}`;
-    if(actor.skillMasteryLevel(value3) == Number($dataSkills[value3].meta['Max Mastery Level'])){
-      var value1 = `${$dataSkills[value3].name + value4} \\C[10]Complete!\\C[0]`;
-    };
-    CommonPopupManager.showInfo({},value1,null);
-  };
-  if(value11 >= 1 && actor.skillMasteryLevel(value3) > value11){
-    $gameSwitches.setValue(133,true);
-    var value12 = `${$dataSkills[value3].name}`;
-    var value12 = value12.replace("＜ON＞", "");
-    var value12 = value12.replace("＜OFF＞", "");
-    if(actor.skillMasteryLevel(value3) == Number($dataSkills[value3].meta['Max Mastery Level'])){
-      valueWordSet1 = `${actor.name()}の\\C[1]＜${value12}＞\\C[0]がカンストした！`;
-    } else {
-      valueWordSet1 = `${actor.name()}の\\C[1]＜${value12}＞\\C[0]が${value4}にランクアップ！`;
-    };
-  };
-};
+  const skillId = valueScriptArray1[2];
+  if (skillId < 1) return;
 
-};
+  const actor = $gameActors.actor(valueScriptArray1[0]);
+  const skill = $dataSkills[skillId];
+  const skillMasteryLevel = actor.skillMasteryLevel(skillId);
+  if(actor.isLearnedSkill(skillId) && skillMasteryLevel >= 0){
+    let maxSkillMasteryLevel = Number(skill.meta['Max Mastery Level']);
+    const skillRarity = get_skill_rarity(skillMasteryLevel, maxSkillMasteryLevel);
+    const skillRarityName = `${skill.name + skillRarity}`;
+    const skillUses = `\\C[2]${actor.skillMasteryUses(skillId)}\\C[0]`;
+    const skillUsageMax = `\\C[2]${actor.skillMasteryUsageMax(skillId)}\\C[0]`;
+    let infoMessageText = `${skillRarityName}　Uses:${skillUses}／${skillUsageMax}`;
+    if (skillMasteryLevel == maxSkillMasteryLevel){
+      infoMessageText = `${skillRarityName} \\C[10]Complete!\\C[0]`;
+    };
+    CommonPopupManager.showInfo({},infoMessageText,null);
+  };
+
+  const lastSkillMasteryLevel = valueScriptArray1[1];
+  if (lastSkillMasteryLevel >= 1 && skillMasteryLevel > lastSkillMasteryLevel){
+    $gameSwitches.setValue(133,true);
+    let skillName = `${skill.name}`;
+    skillName = skillName.replace("＜ON＞", "");
+    skillName = skillName.replace("＜OFF＞", "");
+    skillName = `\\C[1]＜${skillName}＞\\C[0]`;
+    if (skillMasteryLevel == maxSkillMasteryLevel){
+      valueWordSet1 = `${actor.name()}の${skillName}がカンストした！`;
+    } else {
+      valueWordSet1 = `${actor.name()}の${skillName}が${skillRarity}にランクアップ！`;
+    }
+  }
+}
+
+const skillMasteryLevelRarityMarks = [`\\C[4][E]\\C[0]`, `\\C[4][E]\\C[0]`, `\\C[12][D]\\C[0]`, `\\C[5][C]\\C[0]`, `\\C[13][B]\\C[0]`, `\\C[27][A]\\C[0]`, `\\C[30][S]\\C[0]`];
+get_skill_rarity = function(){
+
+  let skillRarityIndex = skillMasteryLevel;
+  if (maxSkillMasteryLevel < 6) skillRarityIndex++;
+  if (skillRarityIndex >= skillMasteryLevelRarityMarks.length) return skillMasteryLevelRarityMarks.length - 1;
+
+  return skillMasteryLevelRarityMarks[skillRarityIndex];
+}
 
 //アイテム使用で熟練度アップ
 item_skilljukurenndoup = function(id1){
