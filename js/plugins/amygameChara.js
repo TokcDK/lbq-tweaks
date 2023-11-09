@@ -9,25 +9,33 @@
 //☆☆キャラチップに一言台詞chara_oneWord(valueSerialPictureId,this._eventId,25,60,arr1,arr2,arr3);
 chara_oneWord = function(id1,id2,id3,id4,arr1,arr2,arr3,id6){
 
-if(id4 >= 100){
-  picture_motion1("smooth",[0]);
-} else {
-  picture_motion1("smooth",[0]);
-};
-var value3 = arr1[Math.floor(Math.random() * arr1.length)];
-var value4 = arr2[Math.floor(Math.random() * arr2.length)];
-var value5 = arr3[Math.floor(Math.random() * arr3.length)];
+//WARN: both are identical!
+// if(id4 >= 100){
+//   picture_motion1("smooth",[0]);
+// } else {
+//   picture_motion1("smooth",[0]);
+// };
+picture_motion1("smooth", [0]);
+
+const value5 = arr3[Math.floor(Math.random() * arr3.length)];
 $gameScreen.setDTextPicture(value5, id3);
 $gameScreen.dWindowFrame = 'ON';
 if(id6 == 0){}else{$gameScreen.setDtextFont(id6)};
 $gameScreen.dTextAlign = 1;
+
+let value1;
+let value2;
 if(!!$gameMap.event(id2)) {
-  var value1 = $gameMap.event(id2).screenX()*$gameScreen.zoomScale();
-  var value2 = ($gameMap.event(id2).screenY() - 70) *$gameScreen.zoomScale();
+  const ev = $gameMap.event(id2);
+  value1 = ev.screenX() * $gameScreen.zoomScale();
+  value2 = (ev.screenY() - 70) * $gameScreen.zoomScale();
 } else {
-  var value1 = 640;
-  var value2 = 384;
+  value1 = 640;
+  value2 = 384;
 };
+
+const value3 = arr1[Math.floor(Math.random() * arr1.length)];
+const value4 = arr2[Math.floor(Math.random() * arr2.length)];
 $gameScreen.showPicture(id1,"",1,value1+value3,value2+value4,50,50,255,0);
 $gameScreen.movePicture(id1,1,value1+value3,value2+value4,150,150,0,0,id4);
 
