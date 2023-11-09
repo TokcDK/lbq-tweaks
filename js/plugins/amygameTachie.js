@@ -65,11 +65,12 @@ this.pluginCommand("P_CALL_CE", args);
 tachie_clothReflect = function(id1){
 
 if(!$gameSwitches.value(29)){
-  var start = 0; var end = 42;
-  for (var i = start; i <= end; i++) {
-    $gameVariables.value(id1+540)[i] = $gameVariables.value(id1+440)[i];
-  };
-};
+  const arr = $gameVariables.value(id1 + 540);
+  const arr1 = $gameVariables.value(id1 + 440);
+  for (var i = 0; i <= 42; i++) {
+    arr[i] = arr1[i];
+  }
+}
 
 };
 
