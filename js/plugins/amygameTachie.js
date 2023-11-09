@@ -91,13 +91,9 @@ if($gameScreen.picture(picId)){
 //衣装状態でスイッチオンオフ.<EvStartCloth:1,1>と併用
 tachie_switchOnOff = function(id){
 
-if(id == 1){
-  if($gameVariables.value(440 + id)[20] == 0){
-    $gameSwitches.setValue(601,true);
-  } else {
-    $gameSwitches.setValue(601,false);
-  };
-};
+if (id == 1) {
+  $gameSwitches.setValue(601, $gameVariables.value(440 + id)[20] == 0);
+}
 
 };
 
