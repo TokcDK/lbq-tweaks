@@ -523,7 +523,7 @@ get_skill_rarity = function(){
 
   let skillRarityIndex = skillMasteryLevel;
   if (maxSkillMasteryLevel < 6) skillRarityIndex++;
-  if (skillRarityIndex >= skillMasteryLevelRarityMarks.length) return skillMasteryLevelRarityMarks.length - 1;
+  if (skillRarityIndex >= skillMasteryLevelRarityMarks.length) skillRarityIndex = skillMasteryLevelRarityMarks.length - 1;
 
   return skillMasteryLevelRarityMarks[skillRarityIndex];
 }
