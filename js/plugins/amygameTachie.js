@@ -74,16 +74,17 @@ if(!$gameSwitches.value(29)){
 };
 
 //立ち絵ムーブ。
-picTachie_move1 = function(id1,id2,id3,id4,id5,id6,id7){
+picTachie_move1 = function(picId,id2,id3,id4,id5,id6,id7){
 
-if($gameScreen.picture(id1)){
-  var value1 = $gameScreen.picture(id1).x() + id2;
-  var value2 = $gameScreen.picture(id1).y() + id3;
-  var value3 = $gameScreen.picture(id1).scaleX() + id4;
-  var value4 = $gameScreen.picture(id1).scaleY() + id5;
-  var value5 = $gameScreen.picture(id1).origin();
-  $gameScreen.movePicture(id1,value5,value1,value2,value3,value4,id6,0,id7);
-};
+if($gameScreen.picture(picId)){
+  const gameScreenPicture = gameScreen.picture(picId);
+  const x = gameScreenPicture.x() + id2;
+  const y = gameScreenPicture.y() + id3;
+  const scaleX = gameScreenPicture.scaleX() + id4;
+  const scaleY = gameScreenPicture.scaleY() + id5;
+  const origin = gameScreenPicture.origin();
+  $gameScreen.movePicture(picId,origin,x,y,scaleX,scaleY,id6,0,id7);
+}
 
 };
 
