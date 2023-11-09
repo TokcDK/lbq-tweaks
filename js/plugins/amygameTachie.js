@@ -142,8 +142,7 @@ $gameSwitches.setValue(126,id2)//拡大true通常false
 $gameVariables.setValue(152,id4);//右登場人数
 $gameVariables.setValue(153,id3);//左登場人数
 $gameSwitches.setValue(5,false);//スキップon。手前のコモンでスイッチonにしているため
-var value2 = 'ScreenBlackOut';
-$gameScreen.showPicture(5,value2,1,640,384,100,100,25,0);
+$gameScreen.showPicture(5,'ScreenBlackOut',1,640,384,100,100,25,0);
 picture_fade1(5,"fadeIn",valueWipeImg,60,5);
 
 
