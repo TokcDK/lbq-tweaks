@@ -1451,24 +1451,28 @@ if($dataItems[$gameVariables.value(244)].meta['ClothSwitch']  && id2 == 1){
 //着せ替え時統合衣装他処理
 clothes_change1 = function(){
 
+const id = 1;
+const value1 = 380 + $gameVariables.value(20); 
+const value2 = 400;
+const itemsCount = $dataItems.length;
+
 valueRandomSet = Array(101).fill(0);
-var value4 = 1;
-var value1 = 380 + $gameVariables.value(20); 
-var value2 = 400;
-var j = 1;
-for(var i = 1; i < $dataItems.length; i ++){
-  if($gameParty.hasItem($dataItems[i])){
-    var value3 = Number($dataItems[i].meta['EICSwitch']);
+
+let j = 1;
+for(let i = 1; i < itemsCount; i ++){
+  const item = $dataItems[i];
+  if ($gameParty.hasItem(item)){
+    const value3 = Number(item.meta['EICSwitch']);
       if(value3 == value1 || value3 == value2 ){
-        const id = value4; const choiceParams = {
-        text: $dataItems[i].name,
+        const choiceParams = {
+        text: item.name,
         value: i};
         $gameSystem.addCustomChoice(id, choiceParams);
         valueRandomSet[j] = i;
         j ++;
-      };
-  };
-};
+      }
+  }
+}
 
 };
 
