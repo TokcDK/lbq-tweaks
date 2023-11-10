@@ -971,15 +971,15 @@ if(value5 == 1){
 //if(tachieNum === -1) break;
 //if($TKMvar.tachie.PicData.length <= tachieNum) break;
 //if(!$TKMvar.tachie.PicData[tachieNum]["char"]) break;
-  var CharList = $TKMvar.tachie.CharList;
-  var MaxLayer = $TKMvar.tachie.MaxLayer;
+  //var CharList = $TKMvar.tachie.CharList;
+  //var MaxLayer = $TKMvar.tachie.MaxLayer;
   var PicData = $TKMvar.tachie.PicData;
   var pictureId = PicData[tachieNum]["picNum"];
   var char = PicData[tachieNum]["char"];
   var name = "TKMtachie_" + char + "_";
-  var partList = CharList[char];
-  var x = $TKMvar.tachie.PicData[tachieNum]["x"];
-  var y = $TKMvar.tachie.PicData[tachieNum]["y"];
+  //var partList = CharList[char];
+  //var x = $TKMvar.tachie.PicData[tachieNum]["x"];
+  //var y = $TKMvar.tachie.PicData[tachieNum]["y"];
 //if($gameActors.actor($gameVariables.value(112)).isStateAffected(23)){
 //if($gameVariables.value($gameVariables.value(112)+440)[0] >= 1){
 //if($dataItems[$gameVariables.value($gameVariables.value(112)+440)[0]].meta['Scale100'] ){
