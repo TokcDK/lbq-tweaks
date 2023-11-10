@@ -1507,14 +1507,19 @@ for(var i=1; i < $dataItems.length; i ++){
 //衣装取得
 clothes_get = function(id,value1,value2){
 
-$gameVariables.setValue(20,id);
-for(var i1=1301; i1 < $dataItems.length; i1 ++){
-  if ($gameVariables.value(20) + 380 == Number($dataItems[i1].meta['EICSwitch']) || $gameVariables.value(20) + 180 == Number($dataItems[i1].meta['EICSwitch']) || 200 == Number($dataItems[i1].meta['EICSwitch'])  || 400 == Number($dataItems[i1].meta['EICSwitch'])) {
-    if($dataItems[i1].meta['subCategory'] == value1 && $dataItems[i1].meta['ClothType'] == value2){
-    $gameParty.gainItem($dataItems[i1], 1);
-  }};
-  };
-};
+  $gameVariables.setValue(20,id); // replaced $gameVariables.value(20) below by id, get id is much faster than get variable value
+  const items = $dataItems;
+  const itemsCount = items.length;
+  for(let i1=1301; i1 < itemsCount; i1 ++){
+    const item = items[i1];
+    const itemEICSwitchNum = Number(item.meta['EICSwitch']);
+    if (id + 380 == itemEICSwitchNum || id + 180 == itemEICSwitchNum || 200 == itemEICSwitchNum || 400 == itemEICSwitchNum) {
+      if (item.meta['subCategory'] == value1 && item.meta['ClothType'] == value2) {
+        $gameParty.gainItem(item, 1);
+      }
+    }
+  }
+}
 
 get_and_cofig_girls_standing_pic = function () {
   const battlers = $gameParty.battleMembers();
