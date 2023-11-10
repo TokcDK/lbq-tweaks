@@ -1047,6 +1047,8 @@ if($gameSwitches.value(30)){
 
 };
 
+const getRandomElement = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
 //☆☆立ち絵設定
 tachie_settei1 = function(){
 
@@ -1096,12 +1098,10 @@ if(actor.isStateAffected(86) || actor.isStateAffected(699)){//ぶっかけ
   $gameVariables.setValue(value1+40,2);
 };
 //☆☆表情差分↓☆☆
-//let value11 = 1;
-const arr = [1,1,1,1,1,2,5,6,15];//基本表情
-let value11 = arr[Math.floor(Math.random() * arr.length)]; //WARN:many code executing and value11 re:set many times when for good need to split all by 'else' condition to not run other code when run one time
+//let value11 = 1;//基本表情
+let value11 = getRandomElement([1,1,1,1,1,2,5,6,15]); //WARN:many code executing and value11 re:set many times when for good need to split all by 'else' condition to not run other code when run one time
 if($gameSwitches.value(201) || $gameSwitches.value(239)){
-  const arr = [4,4,4,4,5,4,4,4,4,8];
-  value11 = arr[Math.floor(Math.random() * arr.length)];
+  value11 = getRandomElement([4, 4, 4, 4, 5, 4, 4, 4, 4, 8]);
 };
 if($gameSwitches.value(30)){
    value11 = 4;
@@ -1126,18 +1126,17 @@ const n207 = $gameVariables.value(207);
     if($gameSwitches.value(206)){
       } else {
       if (nActorId380[4] < nActorId380[5]){
-          const arr = [17,18,19,20,21,22,23,24];
-          value11 = arr[Math.floor(Math.random() * arr.length)];
+        value11 = getRandomElement([17, 18, 19, 20, 21, 22, 23, 24]);
           $gameSwitches.setValue(100,true);
         };
       if (nActorId380[4] <= 49){
         if (nActorId380[1] >= 500 && actor.skillMasteryLevel(55) >= 4){
-              const arr = [29,30,31,32,37,38,39,40];
-              value11 = arr[Math.floor(Math.random() * arr.length)];
-            };
+          value11 = getRandomElement([29, 30, 31, 32, 37, 38, 39, 40]);
+        }
           $gameSwitches.setValue(100,true);
-        };
-}};
+      }
+    }
+  }
   if([61,65,84,85,86].some(function(id){return actor.isStateAffected(id)})){//発情、自慰、精液
     // let value5 = 50; 
     // let value6 = 9; 
@@ -1146,20 +1145,15 @@ const n207 = $gameVariables.value(207);
     // let value4 = 3;
     const nActorId380_1 = nActorId380[1];
     if (nActorId380_1 >= 900) {
-        const arr = [29,30,31,32,37,38,39,40,41,42,43,44];
-        value11 = arr[Math.floor(Math.random() * arr.length)];
+      value11 = getRandomElement([29, 30, 31, 32, 37, 38, 39, 40, 41, 42, 43, 44]);
     } else if (nActorId380_1 >= 700) {
-        const arr = [25, 26, 27, 28, 29, 30, 31, 32];
-        value11 = arr[Math.floor(Math.random() * arr.length)];
+      value11 = getRandomElement([25, 26, 27, 28, 29, 30, 31, 32]);
     } else if (nActorId380_1 >= 500) {
-        const arr = [21, 22, 23, 24, 25, 26, 27, 28];
-        value11 = arr[Math.floor(Math.random() * arr.length)];
+      value11 = getRandomElement([21, 22, 23, 24, 25, 26, 27, 28]);
     } else if (nActorId380_1 >= 300) {
-      const arr = [17, 18, 19, 20, 21, 22, 23, 24];
-      value11 = arr[Math.floor(Math.random() * arr.length)];
+      value11 = getRandomElement([17, 18, 19, 20, 21, 22, 23, 24]);
     } else {
-      const arr = [17, 18, 19, 20];
-      value11 = arr[Math.floor(Math.random() * arr.length)];
+      value11 = getRandomElement([17, 18, 19, 20]);
     }
   //$gameSwitches.setValue(100,true);
   }
@@ -1170,11 +1164,9 @@ const n207 = $gameVariables.value(207);
     //let value3 = 5; 
     //let value4 = 3;
       if(actor.skillMasteryLevel(value5) >= value2) {
-        const arr = [37,38,39,40,41,42,43,44];
-        value11 = arr[Math.floor(Math.random() * arr.length)];
+        value11 = getRandomElement([37, 38, 39, 40, 41, 42, 43, 44]);
       }else{
-        const arr = [17,18,19,20];
-        value11 = arr[Math.floor(Math.random() * arr.length)];
+        value11 = getRandomElement([17, 18, 19, 20]);
       };
   };
   if(!$gameSwitches.value(143) && actor.isStateAffected(83) || actor.isStateAffected(696)){//妊娠でボテ腹
@@ -1183,22 +1175,20 @@ const n207 = $gameVariables.value(207);
     let value2 = 7; 
     //let value3 = 5; 
     //let value4 = 3;
-      if(actor.skillMasteryLevel(value5) >= value2) {
-        }else{
-        const arr = [21,22,23,24,25,26,27,28];
-        value11 = arr[Math.floor(Math.random() * arr.length)];
-      };
-  };
+      if(actor.skillMasteryLevel(value5) < value2) {
+        value11 = getRandomElement([21,22,23,24,25,26,27,28]);
+      }
+  }
   if(!$gameSwitches.value(143) && actor.isStateAffected(68)){//激情
     $gameSwitches.setValue(100,true);
-  };
+  }
   if(!$gameSwitches.value(143) && $gameSwitches.value(30) && actor.tp >= 100){
     if($gameSwitches.value(100)){
       value11 = 48;
     }else{
       value11 = 47;
-    };
-  };
+    }
+  }
   if(actor.isStateAffected(693)){
     $gameSwitches.setValue(100,false);
   };
@@ -1219,8 +1209,7 @@ const n207 = $gameVariables.value(207);
   };
   for (const id1 of valueTachieChangeState) {
     if(actor.isStateAffected(id1)){
-      const arr2 = $dataStates[id1].meta['FaceChange'].split(',');
-      value11 = arr2[Math.floor(Math.random() * arr2.length)];
+      value11 = getRandomElement($dataStates[id1].meta['FaceChange'].split(','));
     }
   };
 
