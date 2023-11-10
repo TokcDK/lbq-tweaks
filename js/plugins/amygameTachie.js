@@ -1049,53 +1049,53 @@ if($gameSwitches.value(30)){
 
 const getRandomElement = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
+const tachie_settei_base_id = 460;
 //☆☆立ち絵設定
 tachie_settei1 = function(){
 
-var value1 = 460;
 const actorId = $gameVariables.value(20);
 const actor = $gameActors.actor(actorId);
 
 //☆☆立ち絵内部処理前変数割当↓☆☆
 for(const id of [1,2,3,5,6,8,9,10,12,13,15,16,19,24,26,30,34,37,38,39,40]) {
-  $gameVariables.setValue(value1+id,0);
+  $gameVariables.setValue(tachie_settei_base_id+id,0);
 };
-if ($gameVariables.value(value1 + 4) == 0) {
-  $gameVariables.setValue(value1 + 4, 1)
+if ($gameVariables.value(tachie_settei_base_id + 4) == 0) {
+  $gameVariables.setValue(tachie_settei_base_id + 4, 1)
 }
 for (const id of [5,9,10,15,31,33]) {
-  $gameVariables.setValue(value1+id,1)
+  $gameVariables.setValue(tachie_settei_base_id+id,1)
 };
 if(actor.isStateAffected(61) || actor.isStateAffected(694)){//発情で愛液
-  $gameVariables.setValue(value1+8,2);
+  $gameVariables.setValue(tachie_settei_base_id+8,2);
 };
 if(actor.isStateAffected(63)){//拘束で腕と男
-  $gameVariables.setValue(value1+9,3);
-  $gameVariables.setValue(value1+15,3);
-  $gameVariables.setValue(value1+17,0);
-  $gameVariables.setValue(value1+24,0);
-  $gameVariables.setValue(value1+26,0);
-  $gameVariables.setValue(value1+1,1);
-  $gameVariables.setValue(value1+38,1);
+  $gameVariables.setValue(tachie_settei_base_id+9,3);
+  $gameVariables.setValue(tachie_settei_base_id+15,3);
+  $gameVariables.setValue(tachie_settei_base_id+17,0);
+  $gameVariables.setValue(tachie_settei_base_id+24,0);
+  $gameVariables.setValue(tachie_settei_base_id+26,0);
+  $gameVariables.setValue(tachie_settei_base_id+1,1);
+  $gameVariables.setValue(tachie_settei_base_id+38,1);
 };
 if(actor.isStateAffected(71) || actor.isStateAffected(695)){//濡れた状態で汗
   $gameSwitches.setValue(100,true);
 };
 if(actor.isStateAffected(83) || actor.isStateAffected(696)){//妊娠でボテ腹
-  $gameVariables.setValue(value1+12,1);
-  if($gameVariables.value(value1+14) == 1 &&  actor.isStateAffected(83)){//臍ピアス妊娠有無で変化
-    $gameVariables.setValue(value1+14,2);
+  $gameVariables.setValue(tachie_settei_base_id+12,1);
+  if($gameVariables.value(tachie_settei_base_id+14) == 1 &&  actor.isStateAffected(83)){//臍ピアス妊娠有無で変化
+    $gameVariables.setValue(tachie_settei_base_id+14,2);
   };
   //$gameVariables.setValue(value1+28,1);//衣装状態の変化も追加//露出によって設定する
 };
 if(actor.isStateAffected(84) || actor.isStateAffected(697)){//膣内射精
-  $gameVariables.setValue(value1+8,1);
+  $gameVariables.setValue(tachie_settei_base_id+8,1);
 };
 if(actor.isStateAffected(85) || actor.isStateAffected(698)){//顔射精
-  $gameVariables.setValue(value1+40,1);
+  $gameVariables.setValue(tachie_settei_base_id+40,1);
 };
 if(actor.isStateAffected(86) || actor.isStateAffected(699)){//ぶっかけ
-  $gameVariables.setValue(value1+40,2);
+  $gameVariables.setValue(tachie_settei_base_id+40,2);
 };
 //☆☆表情差分↓☆☆
 //let value11 = 1;//基本表情
@@ -1115,9 +1115,7 @@ if($gameSwitches.value(30)){
 const nActorId380 = $gameVariables.value(actorId + 380);
 const nActorId400 = $gameVariables.value(actorId + 400);
 if(actor.isStateAffected(70)){//下で露出状態による差分変化を行う為に実行。
-  const value2 = nActorId400[0];
-  const value5 = nActorId380[4];
-    if(value2 >= 1 && value5 <= 9){
+  if (nActorId400[0] >= 1 && nActorId380[4] <= 9){
       nActorId400[0] = 0;
 }};
 const n207 = $gameVariables.value(207);
@@ -1199,9 +1197,9 @@ const n207 = $gameVariables.value(207);
     let value3 = 5; 
     //let value4 = 3;
     if(actor.skillMasteryLevel(value5) >= value3) {
-      $gameVariables.setValue(value1+13,2);
+      $gameVariables.setValue(tachie_settei_base_id+13,2);
     } else {
-      $gameVariables.setValue(value1+13,1);
+      $gameVariables.setValue(tachie_settei_base_id+13,1);
     };
   };
   if($gameSwitches.value(97)){
@@ -1214,23 +1212,23 @@ const n207 = $gameVariables.value(207);
   };
 
   $gameSwitches.setValue(100,false);
-  $gameVariables.setValue(value1+33,value11);
+  $gameVariables.setValue(tachie_settei_base_id+33,value11);
 
 //☆☆共通パーツ前段↓☆☆
 if(actor.isStateAffected(22) || actor.isLearnedSkill(66)){}else{//右腕乳房露出時
-  if($gameVariables.value(value1+21) == 0 && $gameVariables.value(value1+23) <= 3 &&
-  $gameVariables.value(value1+25) == 0 && $gameVariables.value(value1+11) == 0){
-    $gameVariables.setValue(value1+9,4);
+  if($gameVariables.value(tachie_settei_base_id+21) == 0 && $gameVariables.value(tachie_settei_base_id+23) <= 3 &&
+  $gameVariables.value(tachie_settei_base_id+25) == 0 && $gameVariables.value(tachie_settei_base_id+11) == 0){
+    $gameVariables.setValue(tachie_settei_base_id+9,4);
   };
-  if($gameVariables.value(value1+20) == 0 && $gameVariables.value(value1+22) == 0){//左腕股間露出時
-    $gameVariables.setValue(value1+15,4);
+  if($gameVariables.value(tachie_settei_base_id+20) == 0 && $gameVariables.value(tachie_settei_base_id+22) == 0){//左腕股間露出時
+    $gameVariables.setValue(tachie_settei_base_id+15,4);
   };
 };
 //発情＆性欲高い＆戦闘以外＆露出高いで腕グラビアポーズ
 if(actor.isStateAffected(61) || actor.isStateAffected(694)){
   if (actor.isLearnedSkill(66) && !$gameSwitches.value(30) && $gameVariables.value(actorId + 380)[4] <= 9){
-    $gameVariables.setValue(value1+15,0);
-    $gameVariables.setValue(value1+9,2);
+    $gameVariables.setValue(tachie_settei_base_id+15,0);
+    $gameVariables.setValue(tachie_settei_base_id+9,2);
   };
 };
 
@@ -1238,61 +1236,61 @@ if(actor.isStateAffected(61) || actor.isStateAffected(694)){
 kobetu_isyousettei();
 
 //☆☆共通パーツ後段↓☆☆
-if($gameVariables.value(value1+9) == 4){//右腕乳房隠し時に乳房消去。注意。アムエスでは乳房差分変化なしなので処理変更
-  $gameVariables.setValue(value1+10,0);
+if($gameVariables.value(tachie_settei_base_id+9) == 4){//右腕乳房隠し時に乳房消去。注意。アムエスでは乳房差分変化なしなので処理変更
+  $gameVariables.setValue(tachie_settei_base_id+10,0);
 };
-if($gameVariables.value(value1+19) >= 1  && $gameVariables.value(value1+23) == 0){//服下影服なしなら消去
-  $gameVariables.setValue(value1+19,0);
+if($gameVariables.value(tachie_settei_base_id+19) >= 1  && $gameVariables.value(tachie_settei_base_id+23) == 0){//服下影服なしなら消去
+  $gameVariables.setValue(tachie_settei_base_id+19,0);
 };
-if($gameVariables.value(value1+20) == 11){//奴隷ボンテージ。注意。アムエスではボンテージなしなので処理変更
-  $gameVariables.setValue(value1+10,1);
-  $gameVariables.setValue(value1+9,1);
-  $gameVariables.setValue(value1+15,1);
-  $gameVariables.setValue(value1+24,0);
-  $gameVariables.setValue(value1+26,0);
+if($gameVariables.value(tachie_settei_base_id+20) == 11){//奴隷ボンテージ。注意。アムエスではボンテージなしなので処理変更
+  $gameVariables.setValue(tachie_settei_base_id+10,1);
+  $gameVariables.setValue(tachie_settei_base_id+9,1);
+  $gameVariables.setValue(tachie_settei_base_id+15,1);
+  $gameVariables.setValue(tachie_settei_base_id+24,0);
+  $gameVariables.setValue(tachie_settei_base_id+26,0);
 };
-if($gameVariables.value(value1+10) == 0 && $gameVariables.value(value1+11) == 1){//乳首ピアス乳房非表示時に隠す
-  $gameVariables.setValue(value1+111,$gameVariables.value(value1+11));
-  $gameVariables.setValue(value1+11,0);
+if($gameVariables.value(tachie_settei_base_id+10) == 0 && $gameVariables.value(tachie_settei_base_id+11) == 1){//乳首ピアス乳房非表示時に隠す
+  $gameVariables.setValue(tachie_settei_base_id+111,$gameVariables.value(tachie_settei_base_id+11));
+  $gameVariables.setValue(tachie_settei_base_id+11,0);
 };
-if($gameVariables.value(value1+9) == 4){//右腕乳房露出時腕カバー消去
-  $gameVariables.setValue(value1+117,$gameVariables.value(value1+17));
-  $gameVariables.setValue(value1+17,0);
+if($gameVariables.value(tachie_settei_base_id+9) == 4){//右腕乳房露出時腕カバー消去
+  $gameVariables.setValue(tachie_settei_base_id+117,$gameVariables.value(tachie_settei_base_id+17));
+  $gameVariables.setValue(tachie_settei_base_id+17,0);
 };
-if($gameVariables.value(value1+15) == 4){//左腕股間露出時腕カバー消去
-  $gameVariables.setValue(value1+126,$gameVariables.value(value1+26));
-  $gameVariables.setValue(value1+26,0);
+if($gameVariables.value(tachie_settei_base_id+15) == 4){//左腕股間露出時腕カバー消去
+  $gameVariables.setValue(tachie_settei_base_id+126,$gameVariables.value(tachie_settei_base_id+26));
+  $gameVariables.setValue(tachie_settei_base_id+26,0);
 };
 if(actor.isStateAffected(83)){//妊娠でボテ腹
   for (const id of [16, 17, 19, 20, 21, 22, 23, 24, 25, 26, 28]) {
-    $gameVariables.setValue(value1+id+100,$gameVariables.value(value1+id));
-    $gameVariables.setValue(value1+id,0);
+    $gameVariables.setValue(tachie_settei_base_id+id+100,$gameVariables.value(tachie_settei_base_id+id));
+    $gameVariables.setValue(tachie_settei_base_id+id,0);
   }
-  $gameVariables.setValue(value1+9,1);
-  $gameVariables.setValue(value1+10,1);
-  $gameVariables.setValue(value1+15,1);
-  $gameVariables.setValue(value1+12,2);
+  $gameVariables.setValue(tachie_settei_base_id+9,1);
+  $gameVariables.setValue(tachie_settei_base_id+10,1);
+  $gameVariables.setValue(tachie_settei_base_id+15,1);
+  $gameVariables.setValue(tachie_settei_base_id+12,2);
     //if($gameVariables.value(404) >= 5){
     if($gameVariables.value(380+actorId)[4] >= 5){
-      $gameVariables.setValue(value1+28,1);
-      $gameVariables.setValue(value1+12,1);
+      $gameVariables.setValue(tachie_settei_base_id+28,1);
+      $gameVariables.setValue(tachie_settei_base_id+12,1);
     };
-  if($gameVariables.value(value1+14) == 1){//臍ピアス時に変化
-    $gameVariables.setValue(value1+114,$gameVariables.value(value1+14));
-    $gameVariables.setValue(value1+14,2);
+  if($gameVariables.value(tachie_settei_base_id+14) == 1){//臍ピアス時に変化
+    $gameVariables.setValue(tachie_settei_base_id+114,$gameVariables.value(tachie_settei_base_id+14));
+    $gameVariables.setValue(tachie_settei_base_id+14,2);
   };
 };
   if (actor.isStateAffected(83)) {//ぶっかけ腕の状態で変化
-    if ([2, 3, 4].some(function (id) { return $gameVariables.value(value1 + 9) == (id) })) {
-      if ($gameVariables.value(value1 + 40) == 2) {
-        $gameVariables.setValue(value1 + 40, 3);
+    if ([2, 3, 4].some(function (id) { return $gameVariables.value(tachie_settei_base_id + 9) == (id) })) {
+      if ($gameVariables.value(tachie_settei_base_id + 40) == 2) {
+        $gameVariables.setValue(tachie_settei_base_id + 40, 3);
       }
     }
 }
 for (const id1 of valueTachieChangeStateTemporary) {
   if(actor.isStateAffected(id1)){//ステートによってパーツに変化を促す一時ステート・その立ち絵会話期間のみ
     const arr = $dataStates[id1].meta['TachieChangeStateTemporary'].split(',');
-    const n = value1 + Number(arr[0]);
+    const n = tachie_settei_base_id + Number(arr[0]);
     $gameVariables.setValue(n,$gameVariables.value(n));
     $gameVariables.setValue(n,Number(arr[1]));
   };
