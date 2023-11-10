@@ -356,15 +356,19 @@ kantei_ikkatu = function(a,b,itemId){
 
 $gameSwitches.setValue(69,true);
 $gameSwitches.setValue(114,true);
-var start = 1;var end = $dataItems.length-1;
-for (var i = start; i <= end; i++) {
-  if($dataItems[i].meta['下級鑑定品'] || $dataItems[i].meta['中級鑑定品'] || $dataItems[i].meta['上級鑑定品']){
-    if($gameParty.hasItem($dataItems[i])){
+const len = $dataItems.length;
+for (let i = 1; i < len; i++) {
+  const item = $dataItems[i];
+  if(item.meta['下級鑑定品'] || item.meta['中級鑑定品'] || item.meta['上級鑑定品']){
+    if($gameParty.hasItem(item)){
       $gameVariables.setValue(19,i);
       kantei_nakami();
-      if($gameParty.hasItem($dataItems[i])){
+      if($gameParty.hasItem(item)){
         i -= 1;
-}}}};
+      }
+    }
+  }
+}
 $gameSwitches.setValue(114,false);
 $gameSwitches.setValue(69,false);
 
