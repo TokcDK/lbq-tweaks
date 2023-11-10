@@ -1051,22 +1051,19 @@ if($gameSwitches.value(30)){
 tachie_settei1 = function(){
 
 var value1 = 460;
-var actor = $gameActors.actor($gameVariables.value(20));
+const actorId = $gameVariables.value(20);
+const actor = $gameActors.actor(actorId);
 
 //☆☆立ち絵内部処理前変数割当↓☆☆
-var list = [1,2,3,5,6,8,9,10,12,13,15,16,19,24,26,30,34,37,38,39,40];
-list.forEach(function(id) {
+for(const id of [1,2,3,5,6,8,9,10,12,13,15,16,19,24,26,30,34,37,38,39,40]) {
   $gameVariables.setValue(value1+id,0);
-}, this);
-var list = [4];
-list.forEach(function(id) {
-  if($gameVariables.value(value1+id) == 0){
-    $gameVariables.setValue(value1+id,1)
-}}, this);
-var list = [5,9,10,15,31,33];
-list.forEach(function(id) {
+};
+if ($gameVariables.value(value1 + 4) == 0) {
+  $gameVariables.setValue(value1 + 4, 1)
+}
+for (const id of [5,9,10,15,31,33]) {
   $gameVariables.setValue(value1+id,1)
-}, this);
+};
 if(actor.isStateAffected(61) || actor.isStateAffected(694)){//発情で愛液
   $gameVariables.setValue(value1+8,2);
 };
@@ -1099,86 +1096,97 @@ if(actor.isStateAffected(86) || actor.isStateAffected(699)){//ぶっかけ
   $gameVariables.setValue(value1+40,2);
 };
 //☆☆表情差分↓☆☆
-var value11 = 1;
-var arr = [1,1,1,1,1,2,5,6,15];//基本表情
-var value11 = arr[Math.floor(Math.random() * arr.length)];
+//let value11 = 1;
+const arr = [1,1,1,1,1,2,5,6,15];//基本表情
+let value11 = arr[Math.floor(Math.random() * arr.length)]; //WARN:many code executing and value11 re:set many times when for good need to split all by 'else' condition to not run other code when run one time
 if($gameSwitches.value(201) || $gameSwitches.value(239)){
-  var arr = [4,4,4,4,5,4,4,4,4,8];
-  var value11 = arr[Math.floor(Math.random() * arr.length)];
+  const arr = [4,4,4,4,5,4,4,4,4,8];
+  value11 = arr[Math.floor(Math.random() * arr.length)];
 };
 if($gameSwitches.value(30)){
-  var value11 = 4;
+   value11 = 4;
     if($gameVariables.value(276) == 1){
-      var value11 = 9;//被ダメージ表情変化
+      value11 = 9;//被ダメージ表情変化
     };
     if($gameVariables.value(276) == 2){
-      var value11 = 8;//与ダメージ表情変化
+      value11 = 8;//与ダメージ表情変化
     };
 };
+const nActorId380 = $gameVariables.value(actorId + 380);
+const nActorId400 = $gameVariables.value(actorId + 400);
 if(actor.isStateAffected(70)){//下で露出状態による差分変化を行う為に実行。
-  var value2 = $gameVariables.value($gameVariables.value(20)+440)[0];
-  var value5 = $gameVariables.value($gameVariables.value(20)+380)[4];
+  const value2 = nActorId400[0];
+  const value5 = nActorId380[4];
     if(value2 >= 1 && value5 <= 9){
-      $gameVariables.value($gameVariables.value(20)+440)[0] = 0;
+      nActorId400[0] = 0;
 }};
-if($gameVariables.value(207) == 101 || $gameVariables.value(207) >= 1 && $gameVariables.value(207) ==　$gameVariables.value($gameVariables.value(20)+440)[41]){
+const n207 = $gameVariables.value(207);
+  if (n207 == 101 || n207 >= 1 && n207 == nActorId400[41]){
   } else {
     if($gameSwitches.value(206)){
       } else {
-        if($gameVariables.value($gameVariables.value(20)+380)[4] < $gameVariables.value($gameVariables.value(20)+380)[5]){
-          var arr = [17,18,19,20,21,22,23,24];
-          var value11 = arr[Math.floor(Math.random() * arr.length)];
+      if (nActorId380[4] < nActorId380[5]){
+          const arr = [17,18,19,20,21,22,23,24];
+          value11 = arr[Math.floor(Math.random() * arr.length)];
           $gameSwitches.setValue(100,true);
         };
-        if($gameVariables.value($gameVariables.value(20)+380)[4] <= 49){
-          var value2 = $gameVariables.value($gameVariables.value(20)+380)[1];
-          var value3 = actor.skillMasteryLevel(55);;
-            if(value2 >= 500 && value3 >= 4){
-              var arr = [29,30,31,32,37,38,39,40];
-              var value11 = arr[Math.floor(Math.random() * arr.length)];
+      if (nActorId380[4] <= 49){
+        if (nActorId380[1] >= 500 && actor.skillMasteryLevel(55) >= 4){
+              const arr = [29,30,31,32,37,38,39,40];
+              value11 = arr[Math.floor(Math.random() * arr.length)];
             };
           $gameSwitches.setValue(100,true);
         };
 }};
   if([61,65,84,85,86].some(function(id){return actor.isStateAffected(id)})){//発情、自慰、精液
-    var value5 = 50; var value6 = 9; var value2 = 7; var value3 = 5; var value4 = 3;
-      if($gameVariables.value($gameVariables.value(20)+380)[1] >= 900) {
-        var arr = [29,30,31,32,37,38,39,40,41,42,43,44];
-        var value11 = arr[Math.floor(Math.random() * arr.length)];
-      }else {
-        if($gameVariables.value($gameVariables.value(20)+380)[1] >= 700) {
-          var arr = [25,26,27,28,29,30,31,32];
-          var value11 = arr[Math.floor(Math.random() * arr.length)];
-        }else {
-          if($gameVariables.value($gameVariables.value(20)+380)[1] >= 500) {
-            var arr = [21,22,23,24,25,26,27,28];
-            var value11 = arr[Math.floor(Math.random() * arr.length)];
-          }else {
-            if($gameVariables.value($gameVariables.value(20)+380)[1] >= 300) {
-              var arr = [17,18,19,20,21,22,23,24];
-              var value11 = arr[Math.floor(Math.random() * arr.length)];
-            }else{ 
-              var arr = [17,18,19,20];
-              var value11 = arr[Math.floor(Math.random() * arr.length)];
-    }}}};
+    // let value5 = 50; 
+    // let value6 = 9; 
+    // let value2 = 7; 
+    // let value3 = 5; 
+    // let value4 = 3;
+    const nActorId380_1 = nActorId380[1];
+    if (nActorId380_1 >= 900) {
+        const arr = [29,30,31,32,37,38,39,40,41,42,43,44];
+        value11 = arr[Math.floor(Math.random() * arr.length)];
+    } else if (nActorId380_1 >= 700) {
+        const arr = [25, 26, 27, 28, 29, 30, 31, 32];
+        value11 = arr[Math.floor(Math.random() * arr.length)];
+    } else if (nActorId380_1 >= 500) {
+        const arr = [21, 22, 23, 24, 25, 26, 27, 28];
+        value11 = arr[Math.floor(Math.random() * arr.length)];
+    } else if (nActorId380_1 >= 300) {
+      const arr = [17, 18, 19, 20, 21, 22, 23, 24];
+      value11 = arr[Math.floor(Math.random() * arr.length)];
+    } else {
+      const arr = [17, 18, 19, 20];
+      value11 = arr[Math.floor(Math.random() * arr.length)];
+    }
   //$gameSwitches.setValue(100,true);
-  };
+  }
   if(actor.isStateAffected(63)){//拘束で腕と男
-    var value5 = 50; var value6 = 9; var value2 = 7; var value3 = 5; var value4 = 3;
+    let value5 = 50; 
+    //let value6 = 9; 
+    let value2 = 7; 
+    //let value3 = 5; 
+    //let value4 = 3;
       if(actor.skillMasteryLevel(value5) >= value2) {
-        var arr = [37,38,39,40,41,42,43,44];
-        var value11 = arr[Math.floor(Math.random() * arr.length)];
+        const arr = [37,38,39,40,41,42,43,44];
+        value11 = arr[Math.floor(Math.random() * arr.length)];
       }else{
-        var arr = [17,18,19,20];
-        var value11 = arr[Math.floor(Math.random() * arr.length)];
+        const arr = [17,18,19,20];
+        value11 = arr[Math.floor(Math.random() * arr.length)];
       };
   };
   if(!$gameSwitches.value(143) && actor.isStateAffected(83) || actor.isStateAffected(696)){//妊娠でボテ腹
-    var value5 = 50; var value6 = 9; var value2 = 7; var value3 = 5; var value4 = 3;
+    let value5 = 50; 
+    //let value6 = 9; 
+    let value2 = 7; 
+    //let value3 = 5; 
+    //let value4 = 3;
       if(actor.skillMasteryLevel(value5) >= value2) {
         }else{
-        var arr = [21,22,23,24,25,26,27,28];
-        var value11 = arr[Math.floor(Math.random() * arr.length)];
+        const arr = [21,22,23,24,25,26,27,28];
+        value11 = arr[Math.floor(Math.random() * arr.length)];
       };
   };
   if(!$gameSwitches.value(143) && actor.isStateAffected(68)){//激情
@@ -1186,16 +1194,20 @@ if($gameVariables.value(207) == 101 || $gameVariables.value(207) >= 1 && $gameVa
   };
   if(!$gameSwitches.value(143) && $gameSwitches.value(30) && actor.tp >= 100){
     if($gameSwitches.value(100)){
-      var value11 = 48;
+      value11 = 48;
     }else{
-      var value11 = 47;
+      value11 = 47;
     };
   };
   if(actor.isStateAffected(693)){
     $gameSwitches.setValue(100,false);
   };
   if($gameSwitches.value(100)){//発汗
-    var value5 = 50; var value6 = 9; var value2 = 7; var value3 = 5; var value4 = 3;
+    let value5 = 50; 
+    //let value6 = 9; 
+    //let value2 = 7; 
+    let value3 = 5; 
+    //let value4 = 3;
     if(actor.skillMasteryLevel(value5) >= value3) {
       $gameVariables.setValue(value1+13,2);
     } else {
@@ -1203,14 +1215,15 @@ if($gameVariables.value(207) == 101 || $gameVariables.value(207) >= 1 && $gameVa
     };
   };
   if($gameSwitches.value(97)){
-    var value11 = $gameVariables.value(151);//立ち絵会話時
+    value11 = $gameVariables.value(151);//立ち絵会話時
   };
-  var list = valueTachieChangeState;
-  list.forEach(function(id1) {
+  for (const id1 of valueTachieChangeState) {
     if(actor.isStateAffected(id1)){
-      var arr2 = $dataStates[id1].meta['FaceChange'].split(',');
-      var value11 = arr2[Math.floor(Math.random() * arr2.length)];
-  }}, this);
+      const arr2 = $dataStates[id1].meta['FaceChange'].split(',');
+      value11 = arr2[Math.floor(Math.random() * arr2.length)];
+    }
+  };
+
   $gameSwitches.setValue(100,false);
   $gameVariables.setValue(value1+33,value11);
 
@@ -1225,9 +1238,8 @@ if(actor.isStateAffected(22) || actor.isLearnedSkill(66)){}else{//右腕乳房�
   };
 };
 //発情＆性欲高い＆戦闘以外＆露出高いで腕グラビアポーズ
-var value5 = $gameVariables.value($gameVariables.value(20)+380)[4];
 if(actor.isStateAffected(61) || actor.isStateAffected(694)){
-  if(actor.isLearnedSkill(66) && !$gameSwitches.value(30) && value5 <= 9){
+  if (actor.isLearnedSkill(66) && !$gameSwitches.value(30) && $gameVariables.value(actorId + 380)[4] <= 9){
     $gameVariables.setValue(value1+15,0);
     $gameVariables.setValue(value1+9,2);
   };
@@ -1263,17 +1275,16 @@ if($gameVariables.value(value1+15) == 4){//左腕股間露出時腕カバー消�
   $gameVariables.setValue(value1+26,0);
 };
 if(actor.isStateAffected(83)){//妊娠でボテ腹
-  var list = [16,17,19,20,21,22,23,24,25,26,28];
-  list.forEach(function(id) {
+  for (const id of [16, 17, 19, 20, 21, 22, 23, 24, 25, 26, 28]) {
     $gameVariables.setValue(value1+id+100,$gameVariables.value(value1+id));
     $gameVariables.setValue(value1+id,0);
-  }, this);
+  }
   $gameVariables.setValue(value1+9,1);
   $gameVariables.setValue(value1+10,1);
   $gameVariables.setValue(value1+15,1);
   $gameVariables.setValue(value1+12,2);
     //if($gameVariables.value(404) >= 5){
-    if($gameVariables.value(380+$gameVariables.value(20))[4] >= 5){
+    if($gameVariables.value(380+actorId)[4] >= 5){
       $gameVariables.setValue(value1+28,1);
       $gameVariables.setValue(value1+12,1);
     };
@@ -1289,7 +1300,6 @@ if(actor.isStateAffected(83)){//妊娠でボテ腹
       }
     }
 }
-var list = valueTachieChangeStateTemporary;
 for (const id1 of valueTachieChangeStateTemporary) {
   if(actor.isStateAffected(id1)){//ステートによってパーツに変化を促す一時ステート・その立ち絵会話期間のみ
     const arr = $dataStates[id1].meta['TachieChangeStateTemporary'].split(',');
