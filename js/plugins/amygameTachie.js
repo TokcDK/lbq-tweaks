@@ -1513,9 +1513,20 @@ for(var i1=1301; i1 < $dataItems.length; i1 ++){
     if($dataItems[i1].meta['subCategory'] == value1 && $dataItems[i1].meta['ClothType'] == value2){
     $gameParty.gainItem($dataItems[i1], 1);
   }};
+  };
 };
 
-};
+get_and_cofig_girls_standing_pic = function () {
+  const battlers = $gameParty.battleMembers();
+  const battlersCount = battlers.length;
+  for (let i = 0; i < battlersCount; i++) {
+    const actor = battlers[i];
+    if (actor.isStateAffected(602)) { // 女のみ, girls only
+      $gameVariables.setValue(20, actor.actorId());
+      tachie_settei2();
+    }
+  }
+}
 
 //}());
 
