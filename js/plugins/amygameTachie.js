@@ -1475,32 +1475,36 @@ for(var i = 1; i < $dataItems.length; i ++){
 //着せ替え時単品目処理
 clothes_change2 = function(){
 
-$gameScreen.showPicture(100,'/img/tachies/actor' + $gameVariables.value(20) + '_5_99',1,1200,550,20,20,200,0);
+const id = 2;
+const actorId = $gameVariables.value(20);
+const value1 = 380 + actorId; 
+const value2 = 400;
+const itemsCount = $dataItems.length;
+const item19 = $dataItems[$gameVariables.value(19)];
+
+$gameScreen.showPicture(100,'/img/tachies/actor' + actorId + '_5_99',1,1200,550,20,20,200,0);
 valueRandomSet = Array(201).fill(0);
-var j = 1;
-var value4 = 2;
-var value1 = 380 + $gameVariables.value(20); 
-var value2 = 400;
-for(var i=1; i < $dataItems.length; i ++){
-  if($gameParty.hasItem($dataItems[i]) && 
-  $dataItems[$gameVariables.value(19)].meta['subCategory'] == $dataItems[i].meta['subCategory'] ){
-    var value3 = Number($dataItems[i].meta['EICSwitch']);
-      if(value3 == value1 || value3 == value2 || value3 == value1-200 || value3 == value2-200){
-        const id = value4; const choiceParams = {
-        text: $dataItems[i].name,
-        value: i};
+
+let j = 1;
+for(let i=1; i < itemsCount; i ++){
+  const item = $dataItems[i];
+  if ($gameParty.hasItem(item) && 
+    item19.meta['subCategory'] == item.meta['subCategory'] ){
+    const itemEICSwitchNum = Number(item.meta['EICSwitch']);
+      if(itemEICSwitchNum == value1 || itemEICSwitchNum == value2 || itemEICSwitchNum == value1-200 || itemEICSwitchNum == value2-200){
+        const choiceParams = { text: item.name, value: i };
         $gameSystem.addCustomChoice(id, choiceParams);
-        if(!$dataItems[i].meta['TotalCloth']){
-          if(Number($dataItems[i].meta['ClothAllocationNumber']) >= 1){
-            $gameScreen.showPicture(j + 100,"/img/tachies/" + 'actor' + $gameVariables.value(20) + '_' + Number($dataItems[i].meta['ClothSwitch']) + '_' + Number($dataItems[i].meta['ClothAllocationNumber']),1,1200,550,20,20,0,0);
+        if(!item.meta['TotalCloth']){
+          if(Number(item.meta['ClothAllocationNumber']) >= 1){
+            $gameScreen.showPicture(j + 100, "/img/tachies/" + 'actor' + actorId + '_' + Number(item.meta['ClothSwitch']) + '_' + Number(item.meta['ClothAllocationNumber']),1,1200,550,20,20,0,0);
             $gameMessage.setSelectPictureId(j-1, j+100);
           };
         };
         valueRandomSet[j] = i;
-        j ++;
-      };
-  };
-};
+        j++;
+      }
+  }
+}
 
 };
 
