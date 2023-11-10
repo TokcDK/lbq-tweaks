@@ -525,7 +525,7 @@ item_getSkillLevel2 = function(){
 }
 
 const skillMasteryLevelRarityMarks = [`\\C[4][E]\\C[0]`, `\\C[4][E]\\C[0]`, `\\C[12][D]\\C[0]`, `\\C[5][C]\\C[0]`, `\\C[13][B]\\C[0]`, `\\C[27][A]\\C[0]`, `\\C[30][S]\\C[0]`];
-get_skill_rarity = function(){
+get_skill_rarity = function (skillMasteryLevel, maxSkillMasteryLevel){
 
   let skillRarityIndex = skillMasteryLevel;
   if (maxSkillMasteryLevel < 6) skillRarityIndex++;
