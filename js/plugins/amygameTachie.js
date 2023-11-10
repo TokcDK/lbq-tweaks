@@ -1303,44 +1303,47 @@ list.forEach(function(id1) {
 //破損時第一段階
 clothes_hason1 = function(array,id1){
 
-if(id1 >= 1){
-  var start = 1; var end = 40;
-  for (var i = start; i <= end; i++) {
-    $gameVariables.setValue(i+460,$gameVariables.value($gameVariables.value(20)+440)[i]);
+  const gameVar20 = $gameVariables.value(20);
+  if (id1 >= 1) {
+    for (let i = 1; i <= 40; i++) {
+      $gameVariables.setValue(i + 460, $gameVariables.value(gameVar20 + 440)[i]);
+    };
   };
-};
-$gameVariables.setValue(243,0);
-$gameVariables.setValue(244,0);
-var value1 = array[Math.floor(Math.random() * array.length)];
-if(value1 == 1){} else {
-  if($gameVariables.value(460+value1) >= 1){
-    for(var i=1205; i < $dataItems.length; i ++){
-      if(value1 == Number($dataItems[i].meta['ClothSwitch']) &&
-      $gameVariables.value(value1+460) == Number($dataItems[i].meta['ClothAllocationNumber'])){
-        if(Number($dataItems[i].meta['EICSwitch']) == 200 ||
-        $gameVariables.value(20) == Number($dataItems[i].meta['EICSwitch']) -180 || 
-        $gameVariables.value(20) == Number($dataItems[i].meta['EICSwitch']) -380) {
-          $gameVariables.setValue(243,$dataItems[i].name);
-          $gameVariables.setValue(244,i);
-          $gameSwitches.setValue(143,true);
-            if($dataItems[i].meta['ClothBreakage']){
-              if(Number($dataItems[i].meta['ClothBreakage']) == $gameVariables.value(460+value1)){} else {
-                $gameVariables.setValue(460+value1,Number($dataItems[i].meta['ClothBreakage']));
-              };
-            } else {
-              $gameVariables.setValue(460+value1,0);
-            };
-            if(id1 >= 1){
-              $gameVariables.setValue(460+value1,0);
-            };
-            //衣装情報を更新
-            var start = 1; var end = 40;
-            for (var i = start; i <= end; i++) {
-              $gameVariables.value($gameVariables.value(20)+440)[i] = $gameVariables.value(i+460)
-            };
-            break;
-}}}}};
+  $gameVariables.setValue(243, 0);
+  $gameVariables.setValue(244, 0);
+  const value1 = array[Math.floor(Math.random() * array.length)];
+  if (value1 == 1) return;
+  if ($gameVariables.value(460 + value1) < 1) return;
 
+  const itemCount = $dataItems.length;
+  for (let i = 1205; i < itemCount; i++) {
+    const item = $dataItems[i];
+    if (value1 != Number(item.meta['ClothSwitch'])) continue;
+    if ($gameVariables.value(value1 + 460) != Number(item.meta['ClothAllocationNumber'])) continue;
+
+    const itemEICSwitchNum = Number(item.meta['EICSwitch']);
+    if (itemEICSwitchNum != 200 && gameVar20 != itemEICSwitchNum - 180 && gameVar20 != itemEICSwitchNum - 380) continue;
+
+    $gameVariables.setValue(243, item.name);
+    $gameVariables.setValue(244, i);
+    $gameSwitches.setValue(143, true);
+    if (item.meta['ClothBreakage']) {
+      const itemClothBreakageNum = Number(item.meta['ClothBreakage']);
+      if (itemClothBreakageNum != $gameVariables.value(460 + value1)) {
+        $gameVariables.setValue(460 + value1, itemClothBreakageNum);
+      }
+    } else {
+      $gameVariables.setValue(460 + value1, 0);
+    }
+    if (id1 >= 1) {
+      $gameVariables.setValue(460 + value1, 0);
+    }
+    //衣装情報を更新
+    for (let i = 1; i <= 40; i++) {
+      $gameVariables.value(gameVar20 + 440)[i] = $gameVariables.value(i + 460)
+    };
+    break;
+  }
 };
 
 //破損時切れ端ColorHue用
