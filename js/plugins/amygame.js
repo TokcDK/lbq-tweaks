@@ -5793,4 +5793,15 @@ commonEvents_setVar474_by_var135_mapId = function (var135val, mapId, event_parar
   };
 };
 
+commonEvents_setVar474_by_var135_mapId_1 = function (var135val, mapId, switchId, event_pararelStarting_param2) {
+  if ($gameVariables.value(135) == var135val) {
+    if ($gameMap.mapId() == mapId) {
+      if ($gameSwitches.value(switchId)) {//ｶﾞｰﾃﾞｨｱﾝ勝利
+        event_pararelStarting(0, event_pararelStarting_param2, 0);
+        $gameSwitches.setValue(474, true);
+      }
+    }
+  }
+}
+
 }());
