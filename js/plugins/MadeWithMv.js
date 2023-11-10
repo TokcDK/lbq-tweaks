@@ -1,3 +1,8 @@
+/*
+ * Version
+ * 1.0.1 2020/05/10 ロゴ表示時に効果音を演奏する機能を追加
+ */
+
 /*:
  * NOTE: Images are stored in the img/system folder.
  *
@@ -49,9 +54,16 @@
  * Default: 160
  * @default 160
  *
+ * @param Sound Effect
+ * @desc ロゴ表示時に効果音を演奏します。
+ * @default
+ * @type file
+ * @require 1
+ * @dir audio/se
+ *
  */
-/*:ja
- * メモ: イメージはimg／systemフォルダ内に保存されます。
+ /*:ja
+* メモ: イメージはimg／systemフォルダ内に保存されます。
  *
  * @plugindesc メイン画面へ進む前に、"Made with MV"のスプラッシュ画面もしくはカスタマイズされたスプラッシュ画面を表示します。
  * @author Dan "Liquidize" Deptula
@@ -101,7 +113,15 @@
  * デフォルト: 160
  * @default 160
  *
+ * @param Sound Effect
+ * @desc ロゴ表示時に効果音を演奏します。
+ * @default
+ * @type file
+ * @require 1
+ * @dir audio/se
+ *
  */
+
 var Liquidize = Liquidize || {};
 Liquidize.MadeWithMV = {};
 Liquidize.MadeWithMV.Parameters = PluginManager.parameters('MadeWithMv');
@@ -113,16 +133,7 @@ Liquidize.MadeWithMV.CustomImage = String(Liquidize.MadeWithMV.Parameters["Custo
 Liquidize.MadeWithMV.FadeOutTime = Number(Liquidize.MadeWithMV.Parameters["Fade Out Time"]) || 120;
 Liquidize.MadeWithMV.FadeInTime = Number(Liquidize.MadeWithMV.Parameters["Fade In Time"]) || 120;
 Liquidize.MadeWithMV.WaitTime = Number(Liquidize.MadeWithMV.Parameters["Wait Time"]) || 160;
-
-
-//-----------------------------------------------------------------------------
-// Scene_Splash
-//
-// This is a constructor, implementation is done in the inner scope.
-
-function Scene_Splash() {
-    this.initialize.apply(this, arguments);
-}
+Liquidize.MadeWithMV.Se = String(Liquidize.MadeWithMV.Parameters["Sound Effect"]);
 
 (function() {
 
@@ -130,31 +141,34 @@ function Scene_Splash() {
     // Scene_Boot
     //
     // The scene class for dealing with the game boot.
-    
     var _Scene_Boot_loadSystemImages = Scene_Boot.prototype.loadSystemImages;
     Scene_Boot.prototype.loadSystemImages = function() {
         _Scene_Boot_loadSystemImages.call(this);
         if (Liquidize.MadeWithMV.ShowMV) {
             ImageManager.loadSystem(Liquidize.MadeWithMV.MVImage);
         }
-        if (Liquidize.MadeWithMV.ShowCustom) {
+       if (Liquidize.MadeWithMV.ShowCustom) {
             ImageManager.loadSystem(Liquidize.MadeWithMV.CustomImage);
         }
     };
 
     var _Scene_Boot_start = Scene_Boot.prototype.start;
     Scene_Boot.prototype.start = function() {
-        if ((Liquidize.MadeWithMV.ShowMV || Liquidize.MadeWithMV.ShowCustom) && !DataManager.isBattleTest() && !DataManager.isEventTest()) {
-            SceneManager.goto(Scene_Splash);
-        } else {
-            _Scene_Boot_start.call(this);
-        }
+       if ((Liquidize.MadeWithMV.ShowMV || Liquidize.MadeWithMV.ShowCustom) && !DataManager.isBattleTest() && !DataManager.isEventTest()) {
+           SceneManager.goto(Scene_Splash);
+       } else {
+           _Scene_Boot_start.call(this);
+       }
     };
 
     //-----------------------------------------------------------------------------
     // Scene_Splash
     //
     // The scene class for dealing with the splash screens.
+
+    function Scene_Splash() {
+        this.initialize.apply(this, arguments);
+    }
 
     Scene_Splash.prototype = Object.create(Scene_Base.prototype);
     Scene_Splash.prototype.constructor = Scene_Splash;
@@ -185,12 +199,17 @@ function Scene_Splash() {
         if (this._customSplash != null) {
             this.centerSprite(this._customSplash);
         }
+        var seName = Liquidize.MadeWithMV.Se;
+        if (seName) {
+            var se = {name:seName, volume: 90, pitch:100, pan:0};
+            AudioManager.playSe(se);
+        }
     };
 
     Scene_Splash.prototype.update = function() {
         if (Liquidize.MadeWithMV.ShowMV) {
             if (!this._mvFadeIn) {
-                this.startFadeIn(Liquidize.MadeWithMV.FadeInTime, false);
+                this.startFadeIn(Liquidize.MadeWithMV.FadeInTime,false);
                 this._mvFadeIn = true;
             } else {
                 if (this._mvWaitTime > 0 && this._mvFadeOut == false) {
@@ -198,7 +217,7 @@ function Scene_Splash() {
                 } else {
                     if (this._mvFadeOut == false) {
                         this._mvFadeOut = true;
-                        this.startFadeOut(Liquidize.MadeWithMV.FadeOutTime, false);
+                        this.startFadeOut(Liquidize.MadeWithMV.FadeOutTime,false);
                     }
                 }
             }
@@ -264,7 +283,7 @@ function Scene_Splash() {
             this._customSplash.opacity = 0;
             this.addChild(this._customSplash);
         }
-    };
+     };
 
     Scene_Splash.prototype.centerSprite = function(sprite) {
         sprite.x = Graphics.width / 2;

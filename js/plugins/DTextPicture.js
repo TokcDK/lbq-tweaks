@@ -6,6 +6,8 @@
 // http://opensource.org/licenses/mit-license.php
 // ----------------------------------------------------------------------------
 // Version
+// 1.20.5 2023/06/01 フォント変更機能に「フォントロードプラグイン」が必要な旨の注意書きを追加
+// 1.20.4 2022/06/28 ウィンドウカーソルの矩形指定表示が指定したパラメータ通りに表示されていなかった問題を修正
 // 1.20.3 2021/04/29 プラグインコマンドでフォントサイズの指定に制御文字が使えなくなっていた問題を修正
 // 1.20.2 2021/02/09 NRP_EvalPluginCommand.jsと併用したとき、D_TEXTの制御文字を変換対象外にするよう修正
 // 1.20.1 2021/02/08 色調変更したピクチャを消去し、同一の番号で動的文字列ピクチャを作成したとき文字列ピクチャが表示されない場合がある問題を修正
@@ -162,6 +164,9 @@
  *  D_TEXT_SETTING FONT [フォント名] : 描画で使用するフォントを指定した名称に変更
  *  例：D_TEXT_SETTING FONT ＭＳ Ｐ明朝
  *
+ * フォント変更機能を安全に利用するためには、別途公開している
+ * 「フォントロードプラグイン」が必要です。
+ *
  * これらの設定はD_TEXTと同様、ピクチャを表示する前に行ってください。
  *
  * 対応制御文字一覧（イベントコマンド「文章の表示」と同一です）
@@ -251,9 +256,7 @@
 
     var getUsingVariables = function(text) {
         var usingVariables = [];
-        
-        if (text === undefined || text === null) text = ''; // temp fix, text can be undefuned
-		
+
         text = text.replace(/\\/g, '\x1b');
         text = text.replace(/\x1b\x1b/g, '\\');
         text = text.replace(/\x1bV\[(\d+),\s*(\d+)]/gi, function() {
@@ -376,10 +379,10 @@
                 var windowRect = null;
                 if (getArgBoolean(args[1])) {
                     windowRect = {
-                        x     : getArgNumber(args[3] || '', 0),
-                        y     : getArgNumber(args[4] || '', 0),
-                        width : getArgNumber(args[5] || '', 0),
-                        height: getArgNumber(args[6] || '', 0)
+                        x     : getArgNumber(args[2] || '', 0),
+                        y     : getArgNumber(args[3] || '', 0),
+                        width : getArgNumber(args[4] || '', 0),
+                        height: getArgNumber(args[5] || '', 0)
                     };
                 }
                 $gameScreen.setDTextWindowCursor(getArgNumber(args[0], 0), windowRect);
@@ -659,8 +662,8 @@
         var rect = picture.getWindowCursor();
         if (rect) {
             var width  = rect.width || this._frameWindow.contentsWidth();
-            var height = rect.width || this._frameWindow.contentsHeight();
-            this._frameWindow.setCursorRect(0, 0, width, height);
+            var height = rect.height || this._frameWindow.contentsHeight();
+            this._frameWindow.setCursorRect(rect.x || 0, rect.y || 0, width, height);
             this._frameWindow.active = picture.getWindowCursorActive();
         } else {
             this._frameWindow.setCursorRect(0, 0, 0, 0);

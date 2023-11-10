@@ -6,6 +6,10 @@
 // http://opensource.org/licenses/mit-license.php
 // ----------------------------------------------------------------------------
 // Version
+// 2.16.3 2023/05/14 フキダシ表示直後に通常ウィンドウに戻してメッセージ表示すると正常に表示されない場合がある問題を修正
+// 2.16.2 2023/03/02 フキダシウィンドウ表示時に特定条件下で空のフキダシが表示される問題を修正
+// 2.16.1 2023/01/10 MessagePosition.jsと組み合わせたとき、相手のプラグインで指定した幅と高さより大きなフキダシが正しく文章表示できない問題を修正
+// 2.16.0 2022/12/08 フキダシウィンドウプラグインの横幅に拘わらず、左側の座標を固定する機能を追加
 // 2.15.2 2022/09/03 テール画像を未指定にしたときに、ポーズサインをテールとして使う機能が有効化されない問題を修正
 // 2.15.1 2022/08/26 2.15.0の修正で、パラメータが未指定だとテール画像を変更しても反映されない問題を修正
 // 2.15.0 2022/08/26 テール画像を変更できるプラグインコマンドを追加
@@ -397,6 +401,12 @@
  * @min -2000
  * @max 2000
  *
+ * @param FixedLeftX
+ * @text 固定左X座標
+ * @desc 指定した場合フキダシウィンドウの横幅に拘わらず、ウィンドウの左端が固定されます。
+ * @default 0
+ * @type number
+ *
  * @help メッセージウィンドウを指定したキャラクターの頭上にフキダシで
  * 表示するよう変更します。
  *
@@ -645,6 +655,7 @@
     var paramUpperLimitY         = getParamNumber(['upperLimitY']);
     var paramTailImage           = getParamString(['tailImage']);
     var paramTailImageAdjustY    = getParamNumber(['tailImageAdjustY']);
+    var paramFixedLeftX          = getParamNumber(['FixedLeftX']);
 
     //=============================================================================
     // Game_Interpreter
@@ -1128,8 +1139,12 @@
 
     Window_Base.prototype.setPopupBasePosition = function() {
         var pos = $gameSystem.getPopupAdjustPosition();
-        this.x  = this.getPopupBaseX() - this.width / 2 + (pos ? pos[0] : 0);
+        this.x  = this.getPopupBaseX() - this.findPopupLeftX() + (pos ? pos[0] : 0);
         this.y  = this.getPopupBaseY() - this.height - this.getHeightForPopup() + (pos ? pos[1] : 0);
+    };
+
+    Window_Base.prototype.findPopupLeftX = function() {
+        return paramFixedLeftX || this.width / 2;
     };
 
     Window_Base.prototype.setPopupShakePosition = function() {
@@ -1165,7 +1180,7 @@
             this.adjustPopupPositionY();
         }
         var adjustResultX = this.adjustPopupPositionX();
-        var tailX         = this._width / 2 + adjustResultX;
+        var tailX         = this.findPopupLeftX() + adjustResultX;
         if (!this.isUsePauseSignTextEnd()) {
             this._windowPauseSignSprite.x = tailX
         }
@@ -1250,6 +1265,14 @@
         this.height  = this.windowHeight();
         this.loadWindowskin();
         this.setPauseSignToNormal();
+    };
+
+    var _Window_Message_needsNewPage = Window_Message.prototype.needsNewPage;
+    Window_Message.prototype.needsNewPage = function(textState) {
+        if (this.isPopup()) {
+            return false;
+        }
+        return _Window_Message_needsNewPage.apply(this, arguments);
     };
 
     var _Window_Base_makeFontBigger      = Window_Base.prototype.makeFontBigger;
@@ -1471,8 +1494,13 @@
         if (this.getPopupTargetCharacter()) {
             this.processVirtual();
         } else {
+            var width = this.width;
+            var height = this.height;
             this.width  = this.windowWidth();
             this.height = this.windowHeight();
+            if (this.width !== width || this.height !== height) {
+                this.createContents();
+            }
             this.setPauseSignToNormal();
         }
         this.updatePlacement();
@@ -1515,8 +1543,13 @@
         } else if (paramNoUseTail) {
             height += 8;
         }
+        const prevWidth = this.width;
+        const prevHeight = this.height;
         this.width  = Math.max(width, this.getMinimumWidth());
         this.height = Math.max(height, this.getMinimumHeight());
+        if (this.width !== prevWidth || this.height !== prevHeight) {
+            this.createContents();
+        }
         this.resetFontSettings();
     };
 

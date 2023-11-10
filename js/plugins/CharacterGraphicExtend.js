@@ -6,6 +6,8 @@
 // http://opensource.org/licenses/mit-license.php
 // ----------------------------------------------------------------------------
 // Version
+// 1.15.0 2022/10/25 いくつかの表示拡張スクリプトをプレイヤーに実行すると連動してフォロワーにも適用される機能を追加
+// 1.14.0 2021/02/22 色調変更でグレースケールを扱えるよう機能を追加
 // 1.13.1 2021/08/19 ParallaxLayerMap.jsと併用したとき、先方のプラグインで指定した合成方法が無効になる競合を修正
 // 1.13.0 2021/07/12 敵キャラやピクチャを表示する際、色相を指定できる機能を追加
 // 1.12.0 2021/05/18 プライオリティ設定に「-1」(下層タイルの背後で遠景の手前)を設定できるようにしました
@@ -55,6 +57,11 @@
  *
  * @param イベント消去無効
  * @desc エンカウント発生時にイベントを一瞬消去するエフェクトを無効にします。
+ * @default false
+ * @type boolean
+ *
+ * @param フォロワー連動
+ * @desc プレイヤーに対して表示拡張スクリプトを実行するとフォロワーにも適用されます。
  * @default false
  * @type boolean
  *
@@ -178,10 +185,11 @@
  *
  * 例：<CG絶対座標:1,16,-16> or <CGAbsolute:1,16,-16>
  *
- * <CG色調:（ページ数）,（R値）,（G値）（B値）>
+ * <CG色調:（ページ数）,（R値）,（G値）,（B値）,（グレースケール）>
  * 指定したページが有効になった場合の色調(-255～255)を設定します。
+ * グレースケールは省略可能で、省略すると0になります。
  *
- * 例：<CG色調:1,-255,0,255> or <CGTone:1,-255,0,255>
+ * 例：<CG色調:1,-255,0,255,0> or <CGTone:1,-255,0,255,0>
  *
  * <CG不透明度:（ページ数）,（合成方法）>
  * 指定したページが有効になった場合のグラフィックの不透明度を設定します。
@@ -209,8 +217,8 @@
  * 例：this.shiftPosition(24, 24);
  *
  * ・色調の設定
- * this.setTone(（R値）,（G値）（B値）);
- * 例：this.setTone(255, -255, -255);
+ * this.setTone(（R値）,（G値）,（B値）, （グレースケール）);
+ * 例：this.setTone(255, -255, -255, 0);
  *
  * ・画像の変更
  * this.changeImage(（新しいファイル名）, （インデックス）);
@@ -260,6 +268,9 @@
     var getArgNumber = function(arg, min, max) {
         if (arguments.length < 2) min = -Infinity;
         if (arguments.length < 3) max = Infinity;
+        if (!arg) {
+            return 0;
+        }
         return (parseInt(convertEscapeCharacters(arg), 10) || 0).clamp(min, max);
     };
 
@@ -289,6 +300,7 @@
     // パラメータの取得とバリデーション
     //=============================================================================
     var paramEventHideInvalid = getParamBoolean(['EventHideInvalid', 'イベント消去無効']);
+    var paramLinkFollower = getParamBoolean(['LinkFollower', 'フォロワー連動']);
 
     //=============================================================================
     // Game_CharacterBase
@@ -394,6 +406,16 @@
         this._scaleY = y;
     };
 
+    var _Game_Player_setScale = Game_Player.prototype.setScale
+    Game_Player.prototype.setScale = function(x, y) {
+        _Game_Player_setScale.apply(this, arguments);
+        if (paramLinkFollower) {
+            this.followers().forEach(function (follower) {
+                follower.setScale(x, y);
+            });
+        }
+    };
+
     Game_CharacterBase.prototype.originX = function() {
         return this._originX;
     };
@@ -424,8 +446,18 @@
         return this._tone;
     };
 
-    Game_CharacterBase.prototype.setTone = function(r, g, b) {
-        this._tone = [r, g, b];
+    Game_CharacterBase.prototype.setTone = function(r, g, b, gray) {
+        this._tone = [r, g, b, gray || 0];
+    };
+
+    var _Game_Player_setTone = Game_Player.prototype.setTone;
+    Game_Player.prototype.setTone = function(r, g, b, gray) {
+        _Game_Player_setTone.apply(this, arguments);
+        if (paramLinkFollower) {
+            this.followers().forEach(function (follower) {
+                follower.setTone(r, g, b, gray);
+            });
+        }
     };
 
     Game_CharacterBase.prototype.angle = function() {
@@ -436,9 +468,29 @@
         this._angle = angle;
     };
 
+    var _Game_Player_setAngle = Game_Player.prototype.setAngle;
+    Game_Player.prototype.setAngle = function(angle) {
+        _Game_Player_setAngle.apply(this, arguments);
+        if (paramLinkFollower) {
+            this.followers().forEach(function (follower) {
+                follower.setAngle(angle);
+            });
+        }
+    };
+
     Game_CharacterBase.prototype.shiftPosition = function(x, y) {
         this._additionalX = x;
         this._additionalY = y;
+    };
+
+    var _Game_Player_shiftPosition = Game_Player.prototype.shiftPosition;
+    Game_Player.prototype.shiftPosition = function(x, y) {
+        _Game_Player_shiftPosition.apply(this, arguments);
+        if (paramLinkFollower) {
+            this.followers().forEach(function (follower) {
+                follower.shiftPosition(x, y);
+            });
+        }
     };
 
     Game_CharacterBase.prototype.tileBlockWidth = function() {
@@ -589,7 +641,8 @@
         }
         cgParams = this.getMetaCg(['色調', 'Tone']);
         if (cgParams) {
-            this.setTone(getArgNumber(cgParams[1]), getArgNumber(cgParams[2]), getArgNumber(cgParams[3]));
+            this.setTone(getArgNumber(cgParams[1]), getArgNumber(cgParams[2]),
+                getArgNumber(cgParams[3]), getArgNumber(cgParams[4]));
         }
         cgParams = this.getMetaCg(['不透明度', 'Opacity']);
         if (cgParams) {
