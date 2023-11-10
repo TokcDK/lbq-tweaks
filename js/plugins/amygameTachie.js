@@ -1282,21 +1282,22 @@ if(actor.isStateAffected(83)){//妊娠でボテ腹
     $gameVariables.setValue(value1+14,2);
   };
 };
-if(actor.isStateAffected(83)){//ぶっかけ腕の状態で変化
-  if([2,3,4].some(function(id){return $gameVariables.value(value1+9) == (id)})){
-    if($gameVariables.value(value1+40) == 2){
-      $gameVariables.setValue(value1+40,3);
-  }};
-};
+  if (actor.isStateAffected(83)) {//ぶっかけ腕の状態で変化
+    if ([2, 3, 4].some(function (id) { return $gameVariables.value(value1 + 9) == (id) })) {
+      if ($gameVariables.value(value1 + 40) == 2) {
+        $gameVariables.setValue(value1 + 40, 3);
+      }
+    }
+}
 var list = valueTachieChangeStateTemporary;
-list.forEach(function(id1) {
+for (const id1 of valueTachieChangeStateTemporary) {
   if(actor.isStateAffected(id1)){//ステートによってパーツに変化を促す一時ステート・その立ち絵会話期間のみ
-    var arr1 = $dataStates[id1].meta['TachieChangeStateTemporary'].split(',');
-    $gameVariables.setValue(value1 + Number(arr1[0]),$gameVariables.value(value1+Number(arr1[0])));
-    $gameVariables.setValue(value1+Number(arr1[0]),Number(arr1[1]));
+    const arr = $dataStates[id1].meta['TachieChangeStateTemporary'].split(',');
+    const n = value1 + Number(arr[0]);
+    $gameVariables.setValue(n,$gameVariables.value(n));
+    $gameVariables.setValue(n,Number(arr[1]));
   };
-}, this);
-
+}
 
 };
 
