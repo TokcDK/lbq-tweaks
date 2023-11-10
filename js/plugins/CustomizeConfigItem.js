@@ -1,11 +1,16 @@
 //=============================================================================
 // CustomizeConfigItem.js
 // ----------------------------------------------------------------------------
-// Copyright (c) 2015 Triacontane
+// (C) 2015 Triacontane
 // This software is released under the MIT License.
 // http://opensource.org/licenses/mit-license.php
 // ----------------------------------------------------------------------------
 // Version
+// 2.4.0 2023/02/16 スクリプトで現在の設定値を取得できるよう修正
+// 2.3.0 2021/12/21 項目に余白を設定できる機能を追加
+// 2.2.1 2021/08/05 セーブがある状態で隠し項目を追加した時に上手く動作しない問題を修正(by柊菜緒さま)
+// 2.2.0 2021/03/09 スクリプトが指定されているときに項目決定すると決定SEを演奏するよう修正
+// 2.1.2 2020/10/13 Mano_InputConfig.jsと併用したとき、項目を末尾以外に追加すると表示不整合が発生する競合を修正
 // 2.1.0 2017/12/15 追加項目のデフォルト項目を含めた並び順を自由に設定できる機能を追加
 //                  項目名称を日本語化
 // 2.0.1 2017/10/15 2.0.0の修正によりスイッチ項目を有効にしたときにゲーム開始するとエラーになる問題を修正
@@ -159,6 +164,12 @@
  * @value meVolume
  * @option SE 音量
  * @value seVolume
+ *
+ * @param PaddingTop
+ * @text 余白
+ * @desc 項目の上の余白ピクセル数です。項目の間隔を開けたいときに指定します。
+ * @default 0
+ * @type number
  */
 /*~struct~BooleanData:
  * @param Name
@@ -208,6 +219,12 @@
  * @value meVolume
  * @option SE 音量
  * @value seVolume
+ *
+ * @param PaddingTop
+ * @text 余白
+ * @desc 項目の上の余白ピクセル数です。項目の間隔を開けたいときに指定します。
+ * @default 0
+ * @type number
  */
 /*~struct~StringData:
  * @param Name
@@ -263,6 +280,12 @@
  * @value meVolume
  * @option SE 音量
  * @value seVolume
+ *
+ * @param PaddingTop
+ * @text 余白
+ * @desc 項目の上の余白ピクセル数です。項目の間隔を開けたいときに指定します。
+ * @default 0
+ * @type number
  */
 /*~struct~VolumeData:
  * @param Name
@@ -290,7 +313,7 @@
  *
  * @param Script
  * @text スクリプト
- * @desc 項目を決定したときに実行されるスクリプトです。
+ * @desc 項目を決定したときに実行されるスクリプトです。変数[value]で現在の選択値が参照できます。
  * @default
  *
  * @param AddPosition
@@ -312,6 +335,12 @@
  * @value meVolume
  * @option SE 音量
  * @value seVolume
+ *
+ * @param PaddingTop
+ * @text 余白
+ * @desc 項目の上の余白ピクセル数です。項目の間隔を開けたいときに指定します。
+ * @default 0
+ * @type number
  */
 
 (function() {
@@ -481,6 +510,7 @@
         data.initValue = getArgNumber(optionItem.DefaultValue);
         data.variable  = getArgNumber(optionItem.VariableID, 0);
         data.addPotion = optionItem.AddPosition;
+        data.padding   = getArgNumber(optionItem.PaddingTop);
         return data;
     };
 
@@ -510,7 +540,11 @@
             } else {
                 this[symbol] = this.readOther(config, symbol, item);
             }
-            this.hiddenInfo[symbol] = (config.hiddenInfo ? config.hiddenInfo[symbol] : item.hidden);
+            if (config.hiddenInfo) {
+                this.hiddenInfo[symbol] = (typeof config.hiddenInfo[symbol] === 'boolean' ? config.hiddenInfo[symbol] : item.hidden);
+            } else {
+                this.hiddenInfo[symbol] = item.hidden;
+            }
         }.bind(this));
     };
 
@@ -619,6 +653,19 @@
         localOptionWindowIndex = 0;
     };
 
+    var _Window_Options_itemRect = Window_Options.prototype.itemRect;
+    Window_Options.prototype.itemRect = function(index) {
+        var rect = _Window_Options_itemRect.apply(this, arguments);
+        rect.y += this.findAdditionalHeight(index);
+        return rect;
+    };
+
+    Window_Options.prototype.findAdditionalHeight = function(index) {
+        return this._list.reduce(function(prev, item, itemIndex) {
+            return prev + (itemIndex <= index && item.ext ? item.ext : 0);
+        }, 0);
+    };
+
     var _Window_Options_makeCommandList      = Window_Options.prototype.makeCommandList;
     Window_Options.prototype.makeCommandList = function() {
         _Window_Options_makeCommandList.apply(this, arguments);
@@ -628,7 +675,7 @@
     Window_Options.prototype.addCustomOptions = function() {
         iterate(this._customParams, function(key, item) {
             if (!ConfigManager.hiddenInfo[key]) {
-                this.addCommand(item.name, key);
+                this.addCommand(item.name, key, undefined, item.padding);
                 if (item.addPotion) {
                     this.shiftCustomOptions(item.addPotion);
                 }
@@ -645,7 +692,17 @@
         }
         var targetIndex = this._list.indexOf(targetCommand);
         var newCommand = this._list.pop();
+        this.addIndexForManoInputConfig(targetIndex);
         this._list.splice(targetIndex, 0, newCommand);
+    };
+
+    Window_Options.prototype.addIndexForManoInputConfig = function(index) {
+        if (this._gamepadOptionIndex > index) {
+            this._gamepadOptionIndex += 1;
+        }
+        if (this._keyboardConfigIndex > index) {
+            this._keyboardConfigIndex += 1;
+        }
     };
 
     var _Window_Options_statusText      = Window_Options.prototype.statusText;
@@ -690,11 +747,13 @@
     var _Window_Options_cursorRight      = Window_Options.prototype.cursorRight;
     Window_Options.prototype.cursorRight = function(wrap) {
         if (!this._shiftValue(1, false)) _Window_Options_cursorRight.apply(this, arguments);
+        this.execScript();
     };
 
     var _Window_Options_cursorLeft      = Window_Options.prototype.cursorLeft;
     Window_Options.prototype.cursorLeft = function(wrap) {
         if (!this._shiftValue(-1, false)) _Window_Options_cursorLeft.apply(this, arguments);
+        this.execScript();
     };
 
     Window_Options.prototype._shiftValue = function(sign, loopFlg) {
@@ -717,7 +776,11 @@
         var symbol = this.commandSymbol(this.index());
         if (!this.isCustomSymbol(symbol)) return;
         var script = this._customParams[symbol].script;
-        if (script) eval(script);
+        var value = this.getConfigValue(symbol);
+        if (script) {
+            eval(script);
+            SoundManager.playOk();
+        }
         localOptionWindowIndex = this.index();
     };
 
@@ -738,7 +801,8 @@
     };
 
     Window_Options.prototype.windowHeight = function() {
-        return this.fittingHeight(Math.min(this.numVisibleRows(), 14));
+        var height = this.fittingHeight(Math.min(this.numVisibleRows(), 14));
+        return height + this.findAdditionalHeight(this.maxItems());
     };
 })();
 
