@@ -262,8 +262,9 @@ Game_Map.prototype.updateEvents = function() {
 //   if($gameMap.event(eventId)) $gameMap.event(eventId).refresh();
 //};
 
+const arr1_15 = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15];
 Window_SkillType.prototype.updateHelp = function() {
-  var itemdata = $dataWeapons[[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15][this.currentExt() - 1]]; //アイテムIDのデータを拾って
+  const itemdata = $dataWeapons[arr1_15[this.currentExt() - 1]]; //アイテムIDのデータを拾って
   this._helpWindow.setItem(itemdata) //ヘルプウィンドウに表示させる
 };
 
