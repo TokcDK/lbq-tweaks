@@ -610,20 +610,39 @@ for (const id of valueHstaSuppression) {
 };
 
 //☆☆限界露出値計算
+const rosyutu_genkai_id1 = 400
+const rosyutu_genkai_id2 = 55;
 rosyutu_genkai = function(){
 
-var actor = $gameActors.actor($gameVariables.value(20));
-var value1 = 400
-var value2 = 55;
-$gameVariables.setValue(value1+5,100);
-if(actor.skillMasteryLevel(value2) == 1){$gameVariables.setValue(value1+5,90)};
-if(actor.skillMasteryLevel(value2) == 2){$gameVariables.setValue(value1+5,70)};
-if(actor.skillMasteryLevel(value2) == 3){$gameVariables.setValue(value1+5,50)};
-if(actor.skillMasteryLevel(value2) == 4){$gameVariables.setValue(value1+5,30)};
-if(actor.skillMasteryLevel(value2) == 5){$gameVariables.setValue(value1+5,10)};
-if(actor.skillMasteryLevel(value2) == 6){$gameVariables.setValue(value1+5,0)};
-$gameVariables.value($gameVariables.value(20)+380)[5] = $gameVariables.value(value1+5);
-$gameVariables.setValue(value1+5,0);
+  const gameVar20 = $gameVariables.value(20);
+  const actor = $gameActors.actor(gameVar20);
+  const id = rosyutu_genkai_id1 + 5;
+  $gameVariables.setValue(id,100);
+  const actorSkillLevel = actor.skillMasteryLevel(rosyutu_genkai_id2);
+  switch (actorSkillLevel) {
+    case 1:
+      $gameVariables.setValue(id, 90);
+      break;
+    case 2:
+      $gameVariables.setValue(id, 70);
+      break;
+    case 3:
+      $gameVariables.setValue(id, 50);
+      break;
+    case 4:
+      $gameVariables.setValue(id, 30);
+      break;
+    case 5:
+      $gameVariables.setValue(id, 10);
+      break;
+    case 6:
+      $gameVariables.setValue(id, 0);
+      break;
+    default:
+      break;
+  }
+  $gameVariables.value(gameVar20 +380)[5] = $gameVariables.value(id);
+  $gameVariables.setValue(id,0);
 
 seiyoku_jougenn();
 
