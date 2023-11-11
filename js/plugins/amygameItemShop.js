@@ -9,118 +9,155 @@
 //アイテム入手後に実行
 itemGet_afterProcess = function(){
 
-if(!$gameSwitches.value(29)){
-  $gameVariables.setValue(289,4);//タイトル設定可能数
-  $gameVariables.setValue(295,0);//Hタイトル設定可能数
-  $gameVariables.setValue(13,5);//満腹度上限
+  if ($gameSwitches.value(29)) return;
+
+  $gameVariables.setValue(289, 4);//タイトル設定可能数
+  $gameVariables.setValue(295, 0);//Hタイトル設定可能数
+  $gameVariables.setValue(13, 5);//満腹度上限
+
   title_EffectConfi();
   actors_unlockedClassHit();
+
   var value3 = 0;
   valueQuestArrayEX = Array(201).fill(0);
-  for (var i = 1; i <= $dataItems.length-1; i++) {
-    if(!$dataItems[i].name == '') {
-      if($dataItems[i].meta['EICSwitch']) {
-        if(Number($dataItems[i].meta['EICSwitch']) == 108) {
-          if($gameParty.hasItem($dataItems[i])){
-            if(i <= 900){var j = i-800}else{var j = i-900};
-              if(valueQuestArray6[j] == 0){//達成していたら表示しない
-                valueQuestArrayEX[j] = valueQuestArray2[j];
-  }}}}}}; 
-  if($gameVariables.value(203) >= 2){
-    if($gameParty.hasItem($dataItems[52])){
-      $gameVariables.setValue(203,2);
+  const itemsLen = $dataItems.length;
+
+  for (let i = 1; i < itemsLen; i++) {
+    const item = $dataItems[i];
+
+    if (item.name === '') continue;
+
+    const itemEICSwitch = item.meta['EICSwitch'];
+    if (!itemEICSwitch || Number(itemEICSwitch) !== 108) continue;
+    
+    if (!$gameParty.hasItem(item)) continue;
+
+    const j = (i <= 900) ? i - 800 : i - 900;
+
+    if (valueQuestArray6[j] === 0) {
+      valueQuestArrayEX[j] = valueQuestArray2[j];
+    }
+  }
+
+  if ($gameVariables.value(203) >= 2) {
+    if ($gameParty.hasItem($dataItems[52])) {
+      $gameVariables.setValue(203, 2);
     } else {
-      $gameVariables.setValue(203,1);
+      $gameVariables.setValue(203, 1);
     };
   };
+  
   var value1 = 0;
   var list = valueCasinoMedalItem;
-  list.forEach(function(id) {
+  list.forEach(function (id) {
     if ($gameParty.hasItem($dataItems[id])) {
       value1 += Number($dataItems[id].meta['MedalRate']) * $gameParty.numItems($dataItems[id]);
       $gameParty.gainItem($dataItems[id], -9999);
     };
   }, this);
-  if(value1 >= 1){
-    $gameVariables.setValue(69,$gameVariables.value(69) + value1);
+  if (value1 >= 1) {
+    $gameVariables.setValue(69, $gameVariables.value(69) + value1);
   };
+
   quest_settei(1);
   quest_settei(2);
   time_settei();
-  if($gameVariables.value(200) == 3){//マップステータス表示1非表示2簡易ステ3簡易Ｈステ4収集アイテム5ミニマップ
+
+  if ($gameVariables.value(200) == 3) {//マップステータス表示1非表示2簡易ステ3簡易Ｈステ4収集アイテム5ミニマップ
     actor_miniHstatusList1(283);
   };
-  if($gameVariables.value(200) == 4){
+  if ($gameVariables.value(200) == 4) {
     item_collectList1(284);
   };
-  for (var i = 1; i <= 200; i++) {
-    if(valueQuestArrayEX[i] != 0){
-      if(valueQuestArrayEX[i] != valueQuestArray2[i]){
-        if(i <= 100){var j = i+800}else{var j = i+900};
-        var value1 = `\x1bIIN[${j}]`;
-        CommonPopupManager.showInfo({},value1,null);
-        var arr1 = valueQuestArrayEX[i].split("\n");
-        var arr2 = valueQuestArray2[i].split("\n");
-        for (var id1 = 0; id1 <= arr1.length-1; id1++) {
-          if(arr1[id1] != arr2[id1]){
-            CommonPopupManager.showInfo({},arr2[id1],null);
-            if(valueQuestArray6[i] == 1){
-              var value1 = `\x1bIIN[${j}]:[\\C[10]条件達成\\C[0]]`;
-              CommonPopupManager.showInfo({},value1,null);
-              if(!$gameParty.inBattle()){
-                //$gamePlayer.requestAnimation(204);
-                if(i >= 101){
-                  var value1 = 'cracker_min_r';
-                } else {
-                  var value1 = 'cracker_min_l';
-                };
-                $gameScreen._particle.particlePlay(0,value1,'player','def','above');
-                //AudioManager.playSe({"name":'Z11_ItemDrop',"volume":25,"pitch":110,"pan":0});
-  }}}}}}};
-  if($gameSwitches.value(129)){
-    var value23 = 'デイリークエスト'
-    for (var i = 1; i <= $dataItems.length-1; i++) {
-      if(!$dataItems[i].name == '') {
-        if($dataItems[i].meta['EICSwitch']) {
-          if(Number($dataItems[i].meta['EICSwitch']) == 108) {
-            if($dataItems[i].meta['SGカテゴリ'] == value23) {
-              if($gameParty.hasItem($dataItems[i])){
-                if(valueQuestArray6[i-900] == 1){
-                  $gameSwitches.setValue(518,true);
-                  quest_housyuu(i,2);
-                  $gameSwitches.setValue(518,false);
-    }}}}}}};
-  };
+
+  const isInBattle = $gameParty.inBattle();
+  for (let i = 1; i <= 200; i++) {
+    const exValue = valueQuestArrayEX[i];
+    const value2 = valueQuestArray2[i];
+
+    if (exValue !== 0 && exValue !== value2) {
+      const j = (i <= 100) ? i + 800 : i + 900;
+      let value1 = `\x1bIIN[${j}]`;
+
+      CommonPopupManager.showInfo({}, value1, null);
+
+      const arr1 = exValue.split("\n");
+      const arr2 = value2.split("\n");
+
+      for (let id1 = 0, len = arr1.length; id1 < len; id1++) {
+        if (arr1[id1] === arr2[id1]) continue;
+
+        CommonPopupManager.showInfo({}, arr2[id1], null);
+
+        if (valueQuestArray6[i] !== 1) continue;
+
+        value1 = `\x1bIIN[${j}]:[\\C[10]条件達成\\C[0]]`;
+        CommonPopupManager.showInfo({}, value1, null);
+
+        if (!isInBattle) {
+          const value3 = (i >= 101) ? 'cracker_min_r' : 'cracker_min_l';
+          $gameScreen._particle.particlePlay(0, value3, 'player', 'def', 'above');
+          // AudioManager.playSe({"name":'Z11_ItemDrop',"volume":25,"pitch":110,"pan":0});
+        }
+      }
+    }
+  }
+
+  if ($gameSwitches.value(129)) {
+    var value23 = 'デイリークエスト';
+    var dataItemsLength = $dataItems.length;
+
+    for (var i = 1; i <= dataItemsLength - 1; i++) {
+      var currentItem = $dataItems[i];
+
+      if (
+        currentItem.name === '' ||
+        Number(currentItem.meta['EICSwitch']) !== 108 ||
+        currentItem.meta['SGカテゴリ'] !== value23 ||
+        !$gameParty.hasItem(currentItem) ||
+        valueQuestArray6[i - 900] !== 1
+      ) {
+        continue;
+      }
+
+      $gameSwitches.setValue(518, true);
+      quest_housyuu(i, 2);
+      $gameSwitches.setValue(518, false);
+    }
+  }
+
   for (var i = 1; i <= valueArmorsLength; i++) {
-    if($dataArmors[i].etypeId == 6){
-      if($dataArmors[i].meta['ItemPicture']){
-        if($gameParty.hasItem($dataArmors[i],true)){
+    if ($dataArmors[i].etypeId == 6) {
+      if ($dataArmors[i].meta['ItemPicture']) {
+        if ($gameParty.hasItem($dataArmors[i], true)) {
           var value4 = $gameParty.numItems($dataArmors[i]);
-          if($gameParty.membersEqArmor(i)){value4 += 1};
-          if(value4 >= 2){
+          if ($gameParty.membersEqArmor(i)) { value4 += 1 };
+          if (value4 >= 2) {
             var value2 = $gameVariables.value(352)[i - valueSeisyoujuuStartId];
-            $gameVariables.value(352)[i - valueSeisyoujuuStartId] += value4-1;
-            $gameParty.loseItem($dataArmors[i], value4-1);
+            $gameVariables.value(352)[i - valueSeisyoujuuStartId] += value4 - 1;
+            $gameParty.loseItem($dataArmors[i], value4 - 1);
             seisyoujuu_addParams(i);
             var value1 = "Magic2";
-            AudioManager.playSe({"name":value1,"volume":100,"pitch":130,"pan":0});
+            AudioManager.playSe({ "name": value1, "volume": 100, "pitch": 130, "pan": 0 });
             var value1 = `charge_c`;
-            $gameScreen._particle.particlePlay(0,value1,'player','def','above');
-            $gameScreen._particle.particleUpdate([value1,'emitterLifetime',1]);
-            $gameScreen._particle.particleExceed(value1,0.5);
-            var value1 = `\\C[2]\x1bAIN[${i}]\\C[0] [強化値:${value2}\\C[10]+${value4-1}\\C[0]]<パラメータアップ！>`;
-            CommonPopupManager.showInfo({},value1,null);
+            $gameScreen._particle.particlePlay(0, value1, 'player', 'def', 'above');
+            $gameScreen._particle.particleUpdate([value1, 'emitterLifetime', 1]);
+            $gameScreen._particle.particleExceed(value1, 0.5);
+            var value1 = `\\C[2]\x1bAIN[${i}]\\C[0] [強化値:${value2}\\C[10]+${value4 - 1}\\C[0]]<パラメータアップ！>`;
+            CommonPopupManager.showInfo({}, value1, null);
             var value3 = 1;
-  }}}}};
-  if(value3 == 1){
+          }
+        }
+      }
+    }
+  };
+  if (value3 == 1) {
     for (var i = 0; i < $gameParty.members().length; i++) {
       var actor = $gameParty.battleMembers()[i];
       actor.refresh();
     };
   };
-$gameSwitches.setValue(380,false);
-};
-
+  $gameSwitches.setValue(380, false);
 };
 
 //アイテムのHPMPポーション効果
