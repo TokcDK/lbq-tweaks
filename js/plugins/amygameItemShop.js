@@ -18,7 +18,6 @@ itemGet_afterProcess = function(){
   title_EffectConfi();
   actors_unlockedClassHit();
 
-  var value3 = 0;
   valueQuestArrayEX = Array(201).fill(0);
   const itemsLen = $dataItems.length;
 
@@ -104,11 +103,11 @@ itemGet_afterProcess = function(){
   }
 
   if ($gameSwitches.value(129)) {
-    var value23 = 'デイリークエスト';
-    var dataItemsLength = $dataItems.length;
+    const value23 = 'デイリークエスト';
+    const dataItemsLength = $dataItems.length;
 
-    for (var i = 1; i <= dataItemsLength - 1; i++) {
-      var currentItem = $dataItems[i];
+    for (let i = 1; i <= dataItemsLength - 1; i++) {
+      const currentItem = $dataItems[i];
 
       if (
         currentItem.name === '' ||
@@ -117,6 +116,7 @@ itemGet_afterProcess = function(){
         !$gameParty.hasItem(currentItem) ||
         valueQuestArray6[i - 900] !== 1
       ) {
+        // Skip to the next iteration if any condition fails
         continue;
       }
 
@@ -126,37 +126,53 @@ itemGet_afterProcess = function(){
     }
   }
 
-  for (var i = 1; i <= valueArmorsLength; i++) {
-    if ($dataArmors[i].etypeId == 6) {
-      if ($dataArmors[i].meta['ItemPicture']) {
-        if ($gameParty.hasItem($dataArmors[i], true)) {
-          var value4 = $gameParty.numItems($dataArmors[i]);
-          if ($gameParty.membersEqArmor(i)) { value4 += 1 };
-          if (value4 >= 2) {
-            var value2 = $gameVariables.value(352)[i - valueSeisyoujuuStartId];
-            $gameVariables.value(352)[i - valueSeisyoujuuStartId] += value4 - 1;
-            $gameParty.loseItem($dataArmors[i], value4 - 1);
-            seisyoujuu_addParams(i);
-            var value1 = "Magic2";
-            AudioManager.playSe({ "name": value1, "volume": 100, "pitch": 130, "pan": 0 });
-            var value1 = `charge_c`;
-            $gameScreen._particle.particlePlay(0, value1, 'player', 'def', 'above');
-            $gameScreen._particle.particleUpdate([value1, 'emitterLifetime', 1]);
-            $gameScreen._particle.particleExceed(value1, 0.5);
-            var value1 = `\\C[2]\x1bAIN[${i}]\\C[0] [強化値:${value2}\\C[10]+${value4 - 1}\\C[0]]<パラメータアップ！>`;
-            CommonPopupManager.showInfo({}, value1, null);
-            var value3 = 1;
-          }
-        }
-      }
+  let hasParameterIncrease = false;
+  const variable352Values = $gameVariables.value(352);
+  for (let armorIndex = 1, armorLength = valueArmorsLength; armorIndex <= armorLength; armorIndex++) {
+    const currentArmor = $dataArmors[armorIndex];
+
+    if (!(currentArmor.etypeId === 6 && currentArmor.meta['ItemPicture'] && $gameParty.hasItem(currentArmor, true))) {
+      continue;
     }
-  };
-  if (value3 == 1) {
-    for (var i = 0; i < $gameParty.members().length; i++) {
-      var actor = $gameParty.battleMembers()[i];
+
+    let itemCount = $gameParty.numItems(currentArmor);
+
+    if ($gameParty.membersEqArmor(armorIndex)) {
+      itemCount += 1;
+    }
+
+    if (itemCount < 2) {
+      continue;
+    }
+
+    itemCount = itemCount - 1;
+    const initialParamValue = variable352Values[armorIndex - valueSeisyoujuuStartId];
+    variable352Values[armorIndex - valueSeisyoujuuStartId] += itemCount;
+    $gameParty.loseItem(currentArmor, itemCount);
+    seisyoujuu_addParams(armorIndex);
+
+    AudioManager.playSe({ "name": "Magic2", "volume": 100, "pitch": 130, "pan": 0 });
+
+    const seName = `charge_c`;
+    $gameScreen._particle.particlePlay(0, seName, 'player', 'def', 'above');
+    $gameScreen._particle.particleUpdate([seName, 'emitterLifetime', 1]);
+    $gameScreen._particle.particleExceed(seName, 0.5);
+
+    const armorName = `\\C[2]\x1bAIN[${armorIndex}]\\C[0]`
+    const itemCnt = `\\C[10]+${itemCount}\\C[0]`;
+    const popupMessage = `${armorName} [強化値:${initialParamValue}${itemCnt}]<パラメータアップ！>`;
+    CommonPopupManager.showInfo({}, popupMessage, null);
+
+    hasParameterIncrease = true;
+  }
+  if (hasParameterIncrease) {
+    const len = $gameParty.members().length;
+    for (let actorIndex = 0; actorIndex < len; actorIndex++) {
+      const actor = $gameParty.battleMembers()[actorIndex];
       actor.refresh();
-    };
-  };
+    }
+  }
+
   $gameSwitches.setValue(380, false);
 };
 
