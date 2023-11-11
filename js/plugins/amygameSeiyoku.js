@@ -587,21 +587,25 @@ if($gameSwitches.value(130)){
 //☆☆性欲度上限計算。露出計算時とＨプロフ表示時に一緒にやっておく
 seiyoku_jougenn = function(){
 
-var value1 = 0;
-$gameVariables.value($gameVariables.value(20)+380)[value1] = 0;
-var actor = $gameActors.actor($gameVariables.value(20));
-var list = valueHstaSuppression;
-list.forEach(function(id) {
-  if( actor.isLearnedSkill(id) && !actor.isLearnedSkill(Number($dataSkills[id].meta['Hide if Learned Skill']))){
-    var arr1 = $dataSkills[id].meta['HstaSuppression'].split(',');
-    if(Number(arr1[0]) == 0 || Number(arr1[0]) == 401){
-      var value2 = Number(arr1[1]) * 100;
-        if($gameVariables.value($gameVariables.value(20)+380)[value1] == 0 || value2 <= $gameVariables.value($gameVariables.value(20)+380)[value1]){
-          $gameVariables.value($gameVariables.value(20)+380)[value1] = value2-1;
-        };
-    };
-  };
-}, this);
+const gameVar20 = $gameVariables.value(20);
+const gameVar20_300 = gameVar20 + 380;
+const gameVar_20_300Array = $gameVariables.value(gameVar20_300);
+gameVar_20_300Array[0] = 0;
+const actor = $gameActors.actor(gameVar20);
+for (const id of valueHstaSuppression) {
+  if(!actor.isLearnedSkill(id)) continue;
+  const skill = $dataSkills[id];
+  if (actor.isLearnedSkill(Number(skill.meta['Hide if Learned Skill']))) continue;
+
+  const arr1 = skill.meta['HstaSuppression'].split(',');
+  const arr1_0n = Number(arr1[0]);
+  if (arr1_0n == 0 || arr1_0n == 401) {
+    const value2 = Number(arr1[1]) * 100;
+    if (gameVar_20_300Array[0] == 0 || value2 <= gameVar_20_300Array[0]) {
+      gameVar_20_300Array[0] = value2 - 1;
+    }
+  }
+}
 
 };
 
