@@ -649,28 +649,45 @@ seiyoku_jougenn();
 };
 
 //☆☆現在露出度計上
+const rosyutu_genzai_ids = [
+  461, 462, 463, 464, 465, 466, 467, 468, 469, 470,
+  471, 472, 473, 474, 475, 476, 477, 478, 479, 480,
+  481, 482, 483, 484, 485, 486, 487, 488, 489, 490,
+  491, 492, 493, 494, 495, 496, 497, 498, 499, 500];
 rosyutu_genzai = function(){
 
-$gameVariables.setValue(404,0);
-var list = [
-461,462,463,464,465,466,467,468,469,470,
-471,472,473,474,475,476,477,478,479,480,
-481,482,483,484,485,486,487,488,489,490,
-491,492,493,494,495,496,497,498,499,500];
-list.forEach(function(id) {
-  for(var i=1201; i < $dataItems.length; i ++){
-    if(!$dataItems[i].meta['TotalCloth']){
-      if ($gameVariables.value(20) + 180 == Number($dataItems[i].meta['EICSwitch']) ||
-      $gameVariables.value(20) + 380 == Number($dataItems[i].meta['EICSwitch']) ||
-      200 == Number($dataItems[i].meta['EICSwitch']) ){
-        if(id == Number($dataItems[i].meta['ClothSwitch']) + 460 &&
-        $gameVariables.value(id) == Number($dataItems[i].meta['ClothAllocationNumber'])) {
-            $gameVariables.setValue(404,$gameVariables.value(404)+Number($dataItems[i].meta['ClothUncoverCount']));
-  }}}};
-}, this);
-$gameVariables.value($gameVariables.value(20)+380)[4] = $gameVariables.value(404);
-$gameVariables.setValue(404,0);
+  $gameVariables.setValue(404, 0);
+  const gameVar20 = $gameVariables.value(20);
+  const gameVar20_180 = gameVar20 + 180;
+  const gameVar20_380 = gameVar20 + 380;
+  const itemsLen = $dataItems.length;
+  for (var i = 1201; i < itemsLen; i++) {
+    const item = $dataItems[i];
+    if (item.meta['TotalCloth']) continue;
 
+    const itemMetaEICSwitchNum = Number(item.meta['EICSwitch']);
+    const itemMetaClothSwitchNum_460 = Number(item.meta['ClothSwitch']) + 460;
+    const itemMetaClothAllocationNumberNum = Number(item.meta['ClothAllocationNumber']);
+    const itemMetaClothUncoverCountNum = Number(item.meta['ClothUncoverCount']);
+    for (const id of rosyutu_genzai_ids) {
+      switch (itemMetaEICSwitchNum) {
+        case gameVar20_180:
+        case gameVar20_380:
+        case 200:
+          break;
+        default:
+          continue;
+      }
+
+      if (id !== itemMetaClothSwitchNum_460 
+        || $gameVariables.value(id) !== itemMetaClothAllocationNumberNum) continue;
+
+      $gameVariables.setValue(404, $gameVariables.value(404) + itemMetaClothUncoverCountNum);
+    }
+  }
+
+  $gameVariables.value(gameVar20_380)[4] = $gameVariables.value(404);
+  $gameVariables.setValue(404, 0);
 };
 
 //受精するかどうかの計算
