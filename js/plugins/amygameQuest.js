@@ -101,9 +101,10 @@ quest_settei = function (id5) {
 
 quest_settei_get_valueItems = function(arr, i){
 
-  if (arr[1] == 0) { valueQuestArray1[Number(arr[0])] = [1, i]; return $dataItems; } //0だと通常状態と区別ができない
-  else if (arr[1] == 1) { valueQuestArray1[Number(arr[0]) + 2000] = [2, i]; return $dataWeapons; }
-  else if (arr[1] == 2) { valueQuestArray1[Number(arr[0]) + 3000] = [3, i]; return $dataArmors; }
+  const itemsType = arr[1];
+  if (itemsType == 0) { valueQuestArray1[arr[0]] = [1, i]; return $dataItems; } //0だと通常状態と区別ができない
+  else if (itemsType == 1) { valueQuestArray1[arr[0] + 2000] = [2, i]; return $dataWeapons; }
+  else if (itemsType == 2) { valueQuestArray1[arr[0] + 3000] = [3, i]; return $dataArmors; }
   else {
     console.error(`quest_settei_get_valueItems: arr[1] is not 0,1,2!`);
     return null;
@@ -775,7 +776,6 @@ quest_settei_item = function (item, id6) {
 
 
   //一つ分の処理終了
-
 }
 
 //クエスト報酬設定
