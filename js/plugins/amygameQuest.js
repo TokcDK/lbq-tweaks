@@ -7,68 +7,77 @@
 //(function(){
 
 //クエスト報酬設定。クエストで変数21-23は報酬で使っているので使用不可。
-quest_housyuukeisan = function(id1){
+quest_housyuukeisan = function (id1) {
+  //WARN: valueCountSet1 and valueCountSet2 is not changing here! Some init values?
+  var valueCountSet1 = 0;
+  var valueCountSet2 = 0;
+  
+  let valueCountSet3 = `\n\\C[16]●追加報酬\\C[0]\n`;
+  let id2 = Number(valueQuestRankD[1]);
+  let id3 = Number(valueQuestRankD[2]);
+  const itemData = $dataItems[id1];
+  const id4 = itemData.iconIndex;
 
-valueCountSet1 = 0;
-valueCountSet2 = 0;
-valueCountSet3 = `\n\\C[16]●追加報酬\\C[0]\n`;
-var id2 = Number(valueQuestRankD[1]);
-var id3 = Number(valueQuestRankD[2]);
-var id4 = $dataItems[id1].iconIndex;
-if(id4 == 422){//C
-  var id2 = Number(valueQuestRankC[1]);
-  var id3 = Number(valueQuestRankC[2]);
-};
-if(id4 == 426){//EX,C報酬
-  var id2 = Number(valueQuestRankC[1]);
-  var id3 = Number(valueQuestRankC[2]);
-};
-if(id4 == 423){//B
-  var id2 = Number(valueQuestRankB[1]);
-  var id3 = Number(valueQuestRankB[2]);
-};
-if(id4 == 424){//A
-  var id2 = Number(valueQuestRankA[1]);
-  var id3 = Number(valueQuestRankA[2]);
-};
-if(id4 == 425){//S
-  var id2 = Number(valueQuestRankS[1]);
-  var id3 = Number(valueQuestRankS[2]);
-};
-valueCountSet1 += id2;
-valueCountSet2 += id3;
-var j = 0;
-for (var i1 = 1; i1 <= 9; i1++) {
-  if($dataItems[id1].meta['QuestSpcialPrice'+i1]){
-    var arr1 = $dataItems[id1].meta['QuestSpcialPrice'+i1].split(',');
-    if(Number(arr1[0]) == 0){
-      if($gameSwitches.value(518)){$gameParty.gainItem($dataItems[Number(arr1[1])], Number(arr1[2]))};
-      valueCountSet3 += `[\x1bIIN[${Number(arr1[1])}]+${Number(arr1[2])}] `;
-      j += 1;if((j %3) == 0){valueCountSet3 += `\n`};
-    };
-    if(Number(arr1[0]) == 1){
-      if($gameSwitches.value(518)){$gameParty.gainItem($dataWeapons[Number(arr1[1])], Number(arr1[2]))};
-      valueCountSet3 += `[\x1bWIN[${Number(arr1[1])}]+${Number(arr1[2])}] `;
-      j += 1;if((j %3) == 0){valueCountSet3 += `\n`};
-    };
-    if(Number(arr1[0]) == 2){
-      if($gameSwitches.value(518)){$gameParty.gainItem($dataArmors[Number(arr1[1])], Number(arr1[2]))};
-      valueCountSet3 += `[\x1bAIN[${Number(arr1[1])}]+${Number(arr1[2])}] `;
-      j += 1;if((j %3) == 0){valueCountSet3 += `\n`};
-    };
-    if(Number(arr1[0]) == 3){
-      if($gameSwitches.value(518)){$gameParty.gainGold(Number(arr1[2]))};
+  switch (id4) {
+    case 422: // C
+    case 426: // EX,C報酬
+      id2 = Number(valueQuestRankC[1]);
+      id3 = Number(valueQuestRankC[2]);
+      break;
+    case 423: // B
+      id2 = Number(valueQuestRankB[1]);
+      id3 = Number(valueQuestRankB[2]);
+      break;
+    case 424: // A
+      id2 = Number(valueQuestRankA[1]);
+      id3 = Number(valueQuestRankA[2]);
+      break;
+    case 425: // S
+      id2 = Number(valueQuestRankS[1]);
+      id3 = Number(valueQuestRankS[2]);
+      break;
+  }
+
+  let j = 0;
+  for (const i1 in itemData.meta) {
+    if (!itemData.meta.hasOwnProperty(i1) || !i1.startsWith('QuestSpcialPrice')) continue;
+
+    const arr1 = itemData.meta[i1].split(',');
+    const itemType = Number(arr1[0]);
+
+    let item;
+    switch (itemType) {
+      case 0:
+        item = $dataItems[Number(arr1[1])];
+        break;
+      case 1:
+        item = $dataWeapons[Number(arr1[1])];
+        break;
+      case 2:
+        item = $dataArmors[Number(arr1[1])];
+        break;
+      case 4:
+        item = $dataItems[10];
+        break;
+      default:
+        continue;
+    }
+
+    if ($gameSwitches.value(518)) {
+      $gameParty.gainItem(item, Number(arr1[2]));
+    }
+
+    if (itemType === 3) {
       valueCountSet3 += `[\\C[2]${Number(arr1[2])}\\C[0]\\G] `;
-      j += 1;if((j %3) == 0){valueCountSet3 += `\n`};
-    };
-    if(Number(arr1[0]) == 4){
-      if($gameSwitches.value(518)){$gameParty.gainItem($dataItems[10], Number(arr1[2]))};
-      valueCountSet3 += `[${$dataItems[10].name}:\\C[2]+${Number(arr1[2])}\\C[0]] `;
-      j += 1;if((j %3) == 0){valueCountSet3 += `\n`};
-    };
-  };
-};
+    } else {
+      valueCountSet3 += `[${item.name}:\\C[2]+${Number(arr1[2])}\\C[0]] `;
+    }
 
+    j += 1;
+    if (j % 3 === 0) {
+      valueCountSet3 += `\n`;
+    }
+  }
 };
 
 //クエストの解説、発生、達成の設定value12までで10が未使用value8
