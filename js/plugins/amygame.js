@@ -5701,7 +5701,7 @@ if($dataItems[$gameVariables.value(240)].meta['TchestType']){
   };
   var value1 = arr2[Math.floor(Math.random() * arr2.length)];
   let index = arr2.findIndex(arr2 => arr2 == value1); 
-  const valueItems = get_valueItems_iwa(Number(arr1[index]));
+  const valueItems = get_valueItems_iwa(arr1[index]);
   $gameParty.gainItem(valueItems[Number(arr2[index])], 1);
   valueWordSet1 = `全滅ボーナスとして\\C[24]\x1bI[${valueItems[Number(arr2[index])].iconIndex}]${valueItems[Number(arr2[index])].name}\\C[0]を入手した！`;
   if($dataItems[$gameVariables.value(240)].meta['TchestRere']){
@@ -5805,7 +5805,7 @@ scene_joukenNakami_clean_prefixes = function (text){
 }
 
 get_valueItems_iwa = function(id){
-  switch (id) {
+  switch (Number(id)) {
     case 0:
       return $dataItems;
     case 1:
@@ -5819,7 +5819,7 @@ get_valueItems_iwa = function(id){
 }
 
 get_valueItems_sis = function (id) {
-  switch (id) {
+  switch (Number(id)) {
     case 0:
       return $dataSkills;
     case 1:

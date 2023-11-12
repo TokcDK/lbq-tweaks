@@ -108,18 +108,6 @@ quest_settei = function (id5) {
 
 }
 
-quest_settei_get_valueItems_iwa = function(arr, i){
-
-  const itemsType = arr[1];
-  if (itemsType == 0) { valueQuestArray1[arr[0]] = [1, i]; return $dataItems; } //0だと通常状態と区別ができない
-  else if (itemsType == 1) { valueQuestArray1[arr[0] + 2000] = [2, i]; return $dataWeapons; }
-  else if (itemsType == 2) { valueQuestArray1[arr[0] + 3000] = [3, i]; return $dataArmors; }
-  else {
-    console.error(`quest_settei_get_valueItems_iwa: arr[1] is not 0,1,2!`);
-    return null;
-  }
-}
-
 quest_settei_item = function (item, id6) {
 
   if (!item.name) return;
