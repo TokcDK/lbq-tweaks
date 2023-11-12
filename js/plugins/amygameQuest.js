@@ -788,81 +788,112 @@ quest_settei_item = function (item, id6) {
 }
 
 //クエスト報酬設定
-quest_housyuu = function(value21,value22){
+quest_housyuu = function (questId, completionType) {
+  const baseItemId = questId >= 1001 ? 900 : 800;
+  const questRewardItem = questId >= 1001 ? $dataItems[questId + 50] : $dataItems[questId + 100];
+  const questItem = $dataItems[questId];
+  const questCategory = questItem.meta['SGカテゴリ'];
 
-if(value21 >= 1001){
-var id6 = 900;
-var value2 = $dataItems[value21+50];
-} else {
-var id6 = 800;
-var value2 = $dataItems[value21+100];
-};
-var value1 = $dataItems[value21];
+  const switch518Enabled = $gameSwitches.value(518);
+  const completionTypeIs2 = completionType == 2;
 
-var value3 = ``;
-if(valueQuestArray6[value21-id6] == 1){
-//if(true){
-  //アイテム数を納品による達成条件
-  var list = [1,2,3,4,5,6,7,8,9];
-  list.forEach(function(id) {
-    if(value1.meta['QuestCompDelivery'+id]){
-      var arr = value1.meta['QuestCompDelivery'+id].split(',');
-      if( arr[0] == 0 ){ arr[0] = 5 };
-      if(arr[1] == 0){var valueItems = $dataItems};
-      if(arr[1] == 1){var valueItems = $dataWeapons};
-      if(arr[1] == 2){var valueItems = $dataArmors};
-      if(arr[0] == 5){}else{
-        if($gameSwitches.value(518)){$gameParty.loseItem(valueItems[Number(arr[0])], Number(arr[2]))};
-        value3 += `\\C[2]${valueItems[Number(arr[0])].name}\\C[0]を\\C[1]${Number(arr[2])}\\C[0]個納品しました。\n`;
-        if(value22 == 2){CommonPopupManager.showInfo({},value3,null)};
-      };
-    };
-  }, this);
-  if(value1.meta['QuestCompMoney']){
-    var arr = Number(value1.meta['QuestCompMoney']);
-    if($gameSwitches.value(518)){$gameParty.loseGold(arr)};
-    value3 += `\\C[2]${arr}\\C[0]\\Gを納めました。\n`;
-    if(value22 == 2){CommonPopupManager.showInfo({},value3,null)};
-  };
-  quest_housyuukeisan(value21);
-  if($gameSwitches.value(518)){
-    if(valueCountSet1 >= 1){$gameParty.gainGold(valueCountSet1)};
-    if(valueCountSet2 >= 1){$gameParty.gainItem($dataItems[10], valueCountSet2)};//戦貨
-    $gameParty.loseItem(value1, 1);
-    $gameParty.gainItem(value2, 1);
-  };
-  value3 += `クエスト\\C[2]${value1.name}\\C[0]を達成した！＜報酬:`;
-  WindowManager.drawText(0, `クエスト\\C[2]${value1.name}\\C[0]を達成報告した。`);
-  if(valueCountSet1 >= 1){value3 += `\\C[14]${valueCountSet1}\\C[0]\\G `};
-  if(valueCountSet2 >= 1){value3 += `\\C[14]${valueCountSet2}\\C[0]${$dataItems[10].name} `};
-  value3 += `＞\n`;
-  if(value22 == 2){CommonPopupManager.showInfo({},value3,null)};
-  if(valueCountSet3 != ` `){
-    value3 += `${valueCountSet3}\n`
-    if(value22 == 2){CommonPopupManager.showInfo({},value3,null)};
-  };
-  $gameSwitches.setValue(380,true);
-  if($gameSwitches.value(518)){
-    if($dataItems[value21].meta['SGカテゴリ']){
-      if($dataItems[value21].meta['SGカテゴリ'] == '受注クエスト' || $dataItems[value21].meta['SGカテゴリ'] == 'ＥＸ受注クエスト'){
-        $gameVariables.setValue(50,$gameVariables.value(50) + 1);
-      } else {
-        $gameVariables.setValue(150,$gameVariables.value(150) + 1);
-      };
-    };
-  };
-  if(value22 == 1){
-    $gameScreen.setDTextPicture(value3, 28);
+  let completionMessage = ``;
+  if (valueQuestArray6[questId - baseItemId] !== 1) {
+    completionMessage = `クエスト\\C[2]${questItem.name}\\C[0]は達成条件を満たしていない…。`;
+
+    WindowManager.drawText(0, completionMessage);
+    return;
+  }
+
+  for (let deliveryId = 1; deliveryId < 10; deliveryId++) {
+    if (!questItem.meta['QuestCompDelivery' + deliveryId]) continue;
+
+    let deliveryArr = questItem.meta['QuestCompDelivery' + deliveryId].split(',');
+    if (deliveryArr[0] == 0) {
+      deliveryArr[0] = 5;
+    }
+
+    const deliveryItemCategory = get_valueItems(deliveryArr[1]);
+
+    if (deliveryArr[0] == 5) continue;
+
+    const deliveryItem = deliveryItemCategory[Number(deliveryArr[0])];
+    if (switch518Enabled) {
+      $gameParty.loseItem(deliveryItem, Number(deliveryArr[2]));
+    }
+    const itemName = `\\C[2]${deliveryItem.name}\\C[0]`;
+    const itemCount = `\\C[1]${Number(deliveryArr[2])}\\C[0]`;
+    completionMessage += `${itemName}を${itemCount}個納品しました。\n`;
+    if (completionTypeIs2) {
+      CommonPopupManager.showInfo({}, completionMessage, null);
+    }
+  }
+
+  if (questItem.meta['QuestCompMoney']) {
+    let moneyAmount = Number(questItem.meta['QuestCompMoney']);
+    if (switch518Enabled) {
+      $gameParty.loseGold(moneyAmount);
+    }
+    completionMessage += `\\C[2]${moneyAmount}\\C[0]\\Gを納めました。\n`;
+    if (completionTypeIs2) {
+      CommonPopupManager.showInfo({}, completionMessage, null);
+    }
+  }
+
+  quest_housyuukeisan(questId);
+
+  if (switch518Enabled) {
+    if (rewardGoldAmount >= 1) {
+      $gameParty.gainGold(rewardGoldAmount);
+    }
+    if (rewardItemAmount >= 1) {
+      $gameParty.gainItem($dataItems[10], rewardItemAmount); //戦貨
+    }
+    $gameParty.loseItem(questItem, 1);
+    $gameParty.gainItem(questRewardItem, 1);
+  }
+
+  completionMessage += `クエスト\\C[2]${questItem.name}\\C[0]を達成した！＜報酬:`;
+
+  WindowManager.drawText(0, `クエスト\\C[2]${questItem.name}\\C[0]を達成報告した。`);
+
+  if (rewardGoldAmount >= 1) {
+    completionMessage += `\\C[14]${rewardGoldAmount}\\C[0]\\G `;
+  }
+  if (rewardItemAmount >= 1) {
+    completionMessage += `\\C[14]${rewardItemAmount}\\C[0]${$dataItems[10].name} `;
+  }
+
+  completionMessage += `＞\n`;
+
+  if (completionTypeIs2) {
+    CommonPopupManager.showInfo({}, completionMessage, null);
+  }
+
+  if (additionalCompletionText !== ` `) {
+    completionMessage += `${additionalCompletionText}\n`;
+
+    if (completionTypeIs2) {
+      CommonPopupManager.showInfo({}, completionMessage, null);
+    }
+  }
+
+  $gameSwitches.setValue(380, true);
+
+  if (switch518Enabled && questCategory) {
+    if (questCategory == '受注クエスト' || questCategory == 'ＥＸ受注クエスト') {
+      $gameVariables.setValue(50, $gameVariables.value(50) + 1);
+    } else {
+      $gameVariables.setValue(150, $gameVariables.value(150) + 1);
+    }
+  }
+
+  if (!completionTypeIs2 && completionType == 1) {
+    $gameScreen.setDTextPicture(completionMessage, 28);
     $gameScreen.dWindowFrame = 'ON';
-    $gameScreen.showPicture(102,'',1,640-50,384,100,100,0,0);
-    $gameScreen.movePicture(102,1,640,384,100,100,255,0,60);
-  };
-} else {
-  var value3 = `クエスト\\C[2]${value1.name}\\C[0]は達成条件を満たしていない…。`;
-  //TickerManager.show(value3);
-  WindowManager.drawText(0, value3);
-};
-
+    $gameScreen.showPicture(102, '', 1, 640 - 50, 384, 100, 100, 0, 0);
+    $gameScreen.movePicture(102, 1, 640, 384, 100, 100, 255, 0, 60);
+  }
 };
 
 //クエスト達成報告準備
