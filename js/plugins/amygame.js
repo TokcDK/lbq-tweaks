@@ -5813,7 +5813,7 @@ get_valueItems_iwa = function(id){
     case 2:
       return $dataArmors;
     default:
-      console.error(`get_valueItems_iwa: id is not 0,1,2!`);
+      console.error(`get_valueItems_iwa: id(${id}}) is not 0,1,2!`);
       return null;
   }
 }
@@ -5827,7 +5827,7 @@ get_valueItems_sis = function (id) {
     case 2:
       return $dataStates;
     default:
-      console.error(`get_valueItems_sis: id is not 0,1,2!`);
+      console.error(`get_valueItems_sis: id(${id}}) is not 0,1,2!`);
       return null;
   }
 }
