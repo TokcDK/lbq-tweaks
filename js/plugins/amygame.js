@@ -5814,13 +5814,13 @@ scene_joukenNakami_clean_prefixes = function (text){
   .replace("[挿話達成]", "");
 }
 
-get_valueItems = function(i){
+get_valueItems_iwa = function(i){
 
   if (i == 0) { return $dataItems; } //0だと通常状態と区別ができない
   else if (i == 1) { return $dataWeapons; }
   else if (i == 2) { return $dataArmors; }
   else {
-    console.error(`get_valueItems: arr[1] is not 0,1,2!`);
+    console.error(`get_valueItems_iwa: arr[1] is not 0,1,2!`);
     return null;
   }
 }

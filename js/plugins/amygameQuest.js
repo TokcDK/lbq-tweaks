@@ -108,14 +108,14 @@ quest_settei = function (id5) {
 
 }
 
-quest_settei_get_valueItems = function(arr, i){
+quest_settei_get_valueItems_iwa = function(arr, i){
 
   const itemsType = arr[1];
   if (itemsType == 0) { valueQuestArray1[arr[0]] = [1, i]; return $dataItems; } //0だと通常状態と区別ができない
   else if (itemsType == 1) { valueQuestArray1[arr[0] + 2000] = [2, i]; return $dataWeapons; }
   else if (itemsType == 2) { valueQuestArray1[arr[0] + 3000] = [3, i]; return $dataArmors; }
   else {
-    console.error(`quest_settei_get_valueItems: arr[1] is not 0,1,2!`);
+    console.error(`quest_settei_get_valueItems_iwa: arr[1] is not 0,1,2!`);
     return null;
   }
 }
@@ -395,7 +395,7 @@ quest_settei_item = function (item, id6) {
   //アイテムによる発生条件Number(arr[0])
   if (item.meta['QuestSetItem']) {
     let arr = item.meta['QuestSetItem'].split(',');
-    const valueItems = get_valueItems((arr[0]));
+    const valueItems = get_valueItems_iwa((arr[0]));
     if ((arr[1]) === 0) arr[1] = 5;
     if ((arr[1]) !== 5) { questSetMessageText += `【${valueItems[(arr[1])].name}所持` };
 
@@ -539,7 +539,7 @@ quest_settei_item = function (item, id6) {
     for (let id = 1; id < 10; id++) {
       if (item.meta[metaName + id]) {
         const arr = item.meta[metaName + id].split(',');
-        const valueItems = quest_settei_get_valueItems(arr, i);
+        const valueItems = quest_settei_get_valueItems_iwa(arr, i);
         if (arr[0] == 0) arr[0] = 5;
         const itemId = arr[0];
         if (itemId != 5) {
@@ -813,7 +813,7 @@ quest_housyuu = function (questId, completionType) {
       deliveryArr[0] = 5;
     }
 
-    const deliveryItemCategory = get_valueItems(deliveryArr[1]);
+    const deliveryItemCategory = get_valueItems_iwa(deliveryArr[1]);
 
     if (deliveryArr[0] == 5) continue;
 
