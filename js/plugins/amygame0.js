@@ -280,14 +280,8 @@ Scene_Skill.prototype.createSkillTypeWindow = function() {
     this._skillTypeWindow.updateHelp; //実際に処理に加える
 };
 
-let GAME_VAR_83 = null;
-let GAME_VAR_83_IS_SET = false;
 Game_CharacterBase.prototype.realMoveSpeed = function() {
-  if (!GAME_VAR_83_IS_SET) {
-    GAME_VAR_83_IS_SET = true;
-    GAME_VAR_83 = $gameVariables.value(83); // set var83 on first use
-  }
-  return this._moveSpeed + (this.isDashing() ? GAME_VAR_83 : 0);
+  return this._moveSpeed + (this.isDashing() ? $gameVariables.value(83) : 0);
 };
 
 //Window_BattleStatus.prototype.initialize = function() {
