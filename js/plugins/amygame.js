@@ -5804,4 +5804,25 @@ commonEvents_setVar474_by_var135_mapId_1 = function (var135val, mapId, switchId,
   }
 }
 
+scene_joukenNakami_clean_prefixes = function (text){
+
+  return text
+  .replace("[daysReset]", "")
+  .replace("[NoReset]", "")
+  .replace("[夜自動]", "")
+  .replace("[シーン達成]", "")
+  .replace("[挿話達成]", "");
+}
+
+get_valueItems = function(i){
+
+  if (i == 0) { return $dataItems; } //0だと通常状態と区別ができない
+  else if (i == 1) { return $dataWeapons; }
+  else if (i == 2) { return $dataArmors; }
+  else {
+    console.error(`get_valueItems: arr[1] is not 0,1,2!`);
+    return null;
+  }
+}
+
 }());

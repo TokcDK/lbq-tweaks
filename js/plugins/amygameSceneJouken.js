@@ -6,16 +6,6 @@
 
 //(function(){
 
-scene_joukenNakami_clean_prefixes = function (text){
-
-  return text
-  .replace("[daysReset]", "")
-  .replace("[NoReset]", "")
-  .replace("[夜自動]", "")
-  .replace("[シーン達成]", "")
-  .replace("[挿話達成]", "");
-}
-
 //中身スクリプト
 scene_joukenNakami = function(id1,itemIndex,value23,value24,value25,value26){
 
