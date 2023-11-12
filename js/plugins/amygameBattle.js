@@ -1799,106 +1799,126 @@ if($gameVariables.value(277)){
 }
 
 //戦闘開始時に称号効果
-title_battleUp = function(actor){
+title_battleUp = function (actor) {
+  let titleCount = 0;
+  const titleEffects = [];
 
-var value11 = 0;
-var arr2 = [];
-  if(!$gameVariables.value(288) == 0){
-    var valueItems = $dataItems;
-    for (var id1 = 0; id1 <= $gameVariables.value(288).length-1; id1++) {
-      if($gameVariables.value(288)[id1] == 0){}else{
-        var valueItems = $dataItems[$gameVariables.value(288)[id1]];
-        if(valueItems.meta['titleEffect1']) {
-          var arr1 = valueItems.meta['titleEffect1'].split(',');
-          var value1 = Number(arr1[2]);
-               if($gameSwitches.value(375)){
-                 var value10 = `\\C[6]【称号効果】\\C[0]\\C[2]${valueItems.name}\\C[0]:`;
-                 value11 += 1;
-                   if(Number(arr1[0]) == 0){
-                     value10 += TextManager.param(Number(arr1[1]));
-                     value10 += `\\C[10]${Number(arr1[2]) * 100}%\\C[0]UP!`;
-                   };
-                   if(Number(arr1[0]) == 1){
-                     value10 += FTKR.CSS.cssStatus.xparam[Number(arr1[1])];
-                     value10 += `\\C[10]${Number(arr1[2])*100}%\\C[0]UP!`;
-                   };
-                   if(Number(arr1[0]) == 2){
-                     value10 += FTKR.CSS.cssStatus.sparam[Number(arr1[1])];
-                     value10 += `\\C[10]${Number(arr1[2])*100}%\\C[0]UP!`;
-                   };
-                   if(Number(arr1[0]) == 3){
-                     value10 += `${$dataSystem.elements[Number(arr1[1])]}威力`;
-                       if(Number(arr1[2]) >= 0){
-                         value10 += `\\C[10]${Number(arr1[2])}%UP!\\C[0]`;
-                       } else {
-                         value10 += `\\C[1]${Number(arr1[2])}%DOWN!\\C[0]`;
-                       };
-                   };
-                   if(Number(arr1[0]) == 4){
-                     value10 += `${$dataSystem.elements[Number(arr1[1])]}`;
-                     if( [10,11,12,15,20,38,39,40,41].some(function(id1){return id1 == Number(arr1[1])}) ){
-                       if(Number(arr1[1]) == 11){
-                         var value2 = `10`;
-                       } else { 
-                         var value2 = `100`;        
-                       };
-                       if(value1 >= 0){
-                         value10 += `\\C[10]${Number(arr1[2])*value2}%\\C[0]UP!`;
-                       } else { 
-                         value10 += `\\C[1]${Number(arr1[2])*value2}%\\C[0]DOWN!`;        
-                       };
-                     } else {
-                       value10 += `耐性`;
-                       if(Number(arr1[1]) == 11){
-                         var value2 = `10`;
-                       } else { 
-                         var value2 = `100`;        
-                       };
-                       if(value1 <= 0){
-                         var value1 = value1 - value1 - value1;
-                         value10 += `\\C[1]${Number(arr1[2])*value2}%\\C[0]DOWN!`;
-                       } else { 
-                         value10 += `\\C[10]${Number(arr1[2])*value2}%\\C[0]UP!`;        
-                       };
-                     };
-                   };
-                   arr2.push(value10);
-                   break;
-                 } else {
-                   if(Number(arr1[0]) == 0){
-                     actor.actor().traits.push({code: 21, dataId: Number(arr1[1]), value: 1 + value1});
-                   };
-                   if(Number(arr1[0]) == 1){
-                     actor.actor().traits.push({code: 22, dataId: Number(arr1[1]), value: value1});
-                   };
-                   if(Number(arr1[0]) == 2){
-                     actor.actor().traits.push({code: 23, dataId: Number(arr1[1]), value: 1 + value1});
-                   };
-                   if(Number(arr1[0]) == 3){valueAttackAmplifysActorId[actor.actorId()][Number(arr1[1])] += Number(arr1[2])};
-                   if(Number(arr1[0]) == 4){
-                     actor.actor().traits.push({code: 11, dataId: Number(arr1[1]), value: 1 + value1});
-                   };
-               };
-           //};
-      }};
-    };
-if($gameSwitches.value(375) && value11 >= 1){
-  if($gameParty.inBattle()){
-    for (var i = 0; i < $gameParty.battleMembers().length; i++) {
-      var user = $gameParty.battleMembers()[i];
-      var value1 = user.index() + 1;
-      $gameScreen._particle.particlePlay(0,'aura_bp','attachParty:' + value1,'def','above');
-    };
-  };
-  for (var i = 0; i <= arr2.length-1; i++) {
+  const variable288Length = $gameVariables.value(288).length;
+
+  if (variable288Length === 0) {
+    return;
+  }
+
+  let currentItem = $dataItems;
+
+  for (let itemId = 0; itemId < variable288Length; itemId++) {
+    const currentItemId = $gameVariables.value(288)[itemId];
+
+    if (currentItemId === 0) {
+      continue;
+    }
+
+    currentItem = $dataItems[currentItemId];
+
+    if (!currentItem.meta['titleEffect1']) {
+      continue;
+    }
+
+    const effectParams = currentItem.meta['titleEffect1'].split(',');
+    const effectValue = Number(effectParams[2]);
+
+    if (!$gameSwitches.value(375)) {
+      // Handle conditions when the switch is not active
+      switch (Number(effectParams[0])) {
+        case 0:
+          actor.actor().traits.push({ code: 21, dataId: Number(effectParams[1]), value: 1 + effectValue });
+          break;
+        case 1:
+          actor.actor().traits.push({ code: 22, dataId: Number(effectParams[1]), value: effectValue });
+          break;
+        case 2:
+          actor.actor().traits.push({ code: 23, dataId: Number(effectParams[1]), value: 1 + effectValue });
+          break;
+        case 3:
+          valueAttackAmplifysActorId[actor.actorId()][Number(effectParams[1])] += Number(effectParams[2]);
+          break;
+        case 4:
+          actor.actor().traits.push({ code: 11, dataId: Number(effectParams[1]), value: 1 + effectValue });
+          break;
+        default:
+          break;
+      }
+    } else {
+      // Handle conditions when the switch is active
+      let titleEffectText = `\\C[6]【称号効果】\\C[0]\\C[2]${currentItem.name}\\C[0]:`;
+      titleCount += 1;
+
+      switch (Number(effectParams[0])) {
+        case 0:
+          titleEffectText += TextManager.param(Number(effectParams[1]));
+          titleEffectText += `\\C[10]${Number(effectParams[2]) * 100}%\\C[0]UP!`;
+          break;
+        case 1:
+          titleEffectText += FTKR.CSS.cssStatus.xparam[Number(effectParams[1])];
+          titleEffectText += `\\C[10]${Number(effectParams[2]) * 100}%\\C[0]UP!`;
+          break;
+        case 2:
+          titleEffectText += FTKR.CSS.cssStatus.sparam[Number(effectParams[1])];
+          titleEffectText += `\\C[10]${Number(effectParams[2]) * 100}%\\C[0]UP!`;
+          break;
+        case 3:
+          titleEffectText += `${$dataSystem.elements[Number(effectParams[1])]}威力`;
+          if (Number(effectParams[2]) >= 0) {
+            titleEffectText += `\\C[10]${Number(effectParams[2])}%UP!\\C[0]`;
+          } else {
+            titleEffectText += `\\C[1]${Number(effectParams[2])}%DOWN!\\C[0]`;
+          }
+          break;
+        case 4:
+          titleEffectText += `${$dataSystem.elements[Number(effectParams[1])]}`;
+
+          if ([10, 11, 12, 15, 20, 38, 39, 40, 41].some(id => id === Number(effectParams[1]))) {
+            const resistValue = (Number(effectParams[1]) === 11) ? 10 : 100;
+            if (effectValue >= 0) {
+              titleEffectText += `\\C[10]${Number(effectParams[2]) * resistValue}%\\C[0]UP!`;
+            } else {
+              titleEffectText += `\\C[1]${Number(effectParams[2]) * resistValue}%\\C[0]DOWN!`;
+            }
+          } else {
+            titleEffectText += '耐性';
+            const resistValue = (Number(effectParams[1]) === 11) ? 10 : 100;
+            if (effectValue <= 0) {
+              effectValue = -effectValue;
+              titleEffectText += `\\C[1]${Number(effectParams[2]) * resistValue}%\\C[0]DOWN!`;
+            } else {
+              titleEffectText += `\\C[10]${Number(effectParams[2]) * resistValue}%\\C[0]UP!`;
+            }
+          }
+          break;
+        default:
+          break;
+      }
+
+      titleEffects.push(titleEffectText);
+      break;
+    }
+  }
+
+  if (!$gameSwitches.value(375) || titleCount < 1) return;
+  if ($gameParty.inBattle()) {
+    for (let i = 0, len = $gameParty.battleMembers().length; i < len; i++) {
+      const user = $gameParty.battleMembers()[i];
+      const partyIndex = user.index() + 1;
+      $gameScreen._particle.particlePlay(0, 'aura_bp', `attachParty:${partyIndex}`, 'def', 'above');
+    }
+  }
+  for (let i = 0, len = titleEffects.length; i < len; i++) {
     valueGetInfoPointX = 900;
-    CommonPopupManager.showInfo({},arr2[i],null);
-    BattleManager._logWindow.push(`addText`, arr2[i]);
-  };
-  valueGetInfoPointX = 0;
-};
-};
+    CommonPopupManager.showInfo({}, titleEffects[i], null);
+    BattleManager._logWindow.push(addText, titleEffects[i]);
+  }
 
+  valueGetInfoPointX = 0;
 };
 
 //パッシブ付与
