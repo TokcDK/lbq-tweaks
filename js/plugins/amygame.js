@@ -1050,9 +1050,7 @@ if(target.isStateAffected(23)){
 abNomal_Clear = function(a,b,itemId,id1){
 
 var value3 = 0;
-  if(id1 == 0){var valueItems = $dataSkills};
-  if(id1 == 1){var valueItems = $dataItems};
-  if(id1 == 2){var valueItems = $dataStates};
+var valueItems = get_valueItems_sis(id1);
 if(valueItems[itemId].meta['abNomalClearCount']){
   var value1 = Number(valueItems[itemId].meta['abNomalClearCount']);
 } else {
@@ -1180,9 +1178,7 @@ for (var i = 0; i < valueDispelGuardState.length; i++) {
 };
 if(value1 == 0){
   var value3 = 0;
-  if(id1 == 0){var valueItems = $dataSkills};
-  if(id1 == 1){var valueItems = $dataItems};
-  if(id1 == 2){var valueItems = $dataStates};
+  var valueItems = get_valueItems_sis(id1);
   if(valueItems[itemId].meta['dispelCount']){
     var value1 = Number(valueItems[itemId].meta['dispelCount']);
   } else {
@@ -3075,13 +3071,15 @@ if(valueGachaId >= 1){
 //id13がall。10まで。value1としてid決定
 gacha_naiyou = function(id12,id13){
 
-var value6 = Math.floor( Math.random() * 11);
-if(value6 == 0){valueItems = $dataWeapons};
-if(value6 == 1){valueItems = $dataArmors};
-if(value6 >= 2){valueItems = $dataItems};
-if(id12 == 0){valueItems = $dataItems};
-if(id12 == 1){valueItems = $dataWeapons};
-if(id12 == 2){valueItems = $dataArmors};
+if (id12 && id12 > -1 && id12 < 3) {
+  valueItems = get_valueItems_iwa(id12);
+}
+else {
+  let value6 = Math.floor(Math.random() * 11);
+  if (value6 > 2) value6 = 2;
+  valueItems = get_valueItems_iwa(id12);
+}
+
 if(id13 >= 1){
   var value7 = id13;
 } else {
@@ -3234,10 +3232,8 @@ var arr3 = $gameVariables.value(215)[$gameVariables.value(240)];
 var arr4 = $gameVariables.value(216)[$gameVariables.value(240)];
 if(arr3 != 0){
   var value2 = arr3[Math.floor(Math.random() * arr3.length)];
-  let index = arr3.findIndex(arr3 => arr3 == value2); 
-  if(arr4[index] == 0){var valueItems = $dataItems}; 
-  if(arr4[index] == 1){var valueItems = $dataWeapons}; 
-  if(arr4[index] == 2){var valueItems = $dataArmors};
+  let index = arr3.findIndex(arr3 => arr3 == value2);
+  var valueItems = get_valueItems_iwa(arr4[index]);
   if($dataItems[$gameVariables.value(240)].meta['TchestRere']){
     if( value2 == Number($dataItems[$gameVariables.value(240)].meta['TchestRere']) ){
       $gameSwitches.setValue(439,true);
@@ -3635,9 +3631,7 @@ if(id1 == 1){
   };
 };
 for (var j = 0; j <= 2; j++) {
-  if(j == 0){valueItems = $dataItems};
-  if(j == 1){valueItems = $dataWeapons};
-  if(j == 2){valueItems = $dataArmors};
+  var valueItems = get_valueItems_iwa(j);
   var start = 1;
   if(j == 2){
     var end = valueArmorsLength;
@@ -4902,9 +4896,7 @@ get_loopChoiceDisplay1 = function(id1,id2,id3){
 //get_loopChoiceDisplay1(2,0,2);//一括売却
 //get_loopChoiceDisplay1(3,0,2);//一括売却
 
-if(id2 == 0){var valueItems = $dataItems};
-if(id2 == 1){var valueItems = $dataWeapons};
-if(id2 == 2){var valueItems = $dataArmors};
+var valueItems = get_valueItems_iwa(id2);
 //picture_motion1("linear",[0]);
 $gameVariables.setValue(177,id3);
 if(id1 == 1){//クエスト掲示
@@ -5709,9 +5701,7 @@ if($dataItems[$gameVariables.value(240)].meta['TchestType']){
   };
   var value1 = arr2[Math.floor(Math.random() * arr2.length)];
   let index = arr2.findIndex(arr2 => arr2 == value1); 
-  if(Number(arr1[index]) == 0){var valueItems = $dataItems}; 
-  if(Number(arr1[index]) == 1){var valueItems = $dataWeapons}; 
-  if(Number(arr1[index]) == 2){var valueItems = $dataArmors};
+  const valueItems = get_valueItems_iwa(Number(arr1[index]));
   $gameParty.gainItem(valueItems[Number(arr2[index])], 1);
   valueWordSet1 = `全滅ボーナスとして\\C[24]\x1bI[${valueItems[Number(arr2[index])].iconIndex}]${valueItems[Number(arr2[index])].name}\\C[0]を入手した！`;
   if($dataItems[$gameVariables.value(240)].meta['TchestRere']){
@@ -5814,14 +5804,31 @@ scene_joukenNakami_clean_prefixes = function (text){
   .replace("[挿話達成]", "");
 }
 
-get_valueItems_iwa = function(i){
+get_valueItems_iwa = function(id){
+  switch (id) {
+    case 0:
+      return $dataItems;
+    case 1:
+      return $dataWeapons;
+    case 2:
+      return $dataArmors;
+    default:
+      console.error(`get_valueItems_iwa: id is not 0,1,2!`);
+      return null;
+  }
+}
 
-  if (i == 0) { return $dataItems; } //0だと通常状態と区別ができない
-  else if (i == 1) { return $dataWeapons; }
-  else if (i == 2) { return $dataArmors; }
-  else {
-    console.error(`get_valueItems_iwa: arr[1] is not 0,1,2!`);
-    return null;
+get_valueItems_sis = function (id) {
+  switch (id) {
+    case 0:
+      return $dataSkills;
+    case 1:
+      return $dataItems;
+    case 2:
+      return $dataStates;
+    default:
+      console.error(`get_valueItems_sis: id is not 0,1,2!`);
+      return null;
   }
 }
 
