@@ -243,7 +243,7 @@ quest_settei_item = function (item, id6) {
   }
 
   //変数による発生条件Number(arr[0])
-  for (let id = 0, len = arr.length; id < len; id++) {
+  for (let id = 1; id < 10; id++) {
     if (item.meta['QuestSetVal' + id]) {
       const arr = item.meta['QuestSetVal' + id].split(',').map(Number);
       if ((arr[0]) == 0) { arr[0] = 2 };
@@ -263,7 +263,7 @@ quest_settei_item = function (item, id6) {
   }
 
   //性欲度等による発生条件
-  for (let id = 0, len = arr.length; id < len; id++) {
+  for (let id = 1; id < 10; id++) {
     if (item.meta['QuestSetHexpArr' + id]) {
       const arr = item.meta['QuestSetHexpArr' + id].split(',').map(Number);
       actor = $gameActors.actor((arr[0]));
@@ -501,7 +501,7 @@ quest_settei_item = function (item, id6) {
   if (needNewLine) { questSetMessageText += `\n` };
 
   //討伐数による達成条件Number(arr[0])
-  for (let id = 0, len = arr.length; id < len; id++) {
+  for (let id = 1; id < 10; id++) {
     if (item.meta['QuestCompSubjugation' + id]) {
       let arr = item.meta['QuestCompSubjugation' + id].split(',').map(Number);
       if (arr[0] <= 5) {
@@ -526,7 +526,7 @@ quest_settei_item = function (item, id6) {
   }
 
   quest_settei_QuestComp1 = function (metaName, messageOn, messageOff) {
-    for (let id = 0, len = arr.length; id < len; id++) {
+    for (let id = 1; id < 10; id++) {
       if (item.meta[metaName + id]) {
         const arr = item.meta[metaName + id].split(',');
         const valueItems = quest_settei_get_valueItems(arr, i);
@@ -556,7 +556,7 @@ quest_settei_item = function (item, id6) {
   }
 
   //変数による達成条件Number(arr[0])
-  for (let id = 0, len = arr.length; id < len; id++) {
+  for (let id = 1; id < 10; id++) {
     if (item.meta['QuestCompVal' + id]) {
       const arr = item.meta['QuestCompVal' + id].split(',').map(Number);
       if (arr[0] == 0) { arr[0] = 2 };
@@ -575,7 +575,7 @@ quest_settei_item = function (item, id6) {
     };
   }
   //変数配列による達成条件Number(arr[0])
-  for (let id = 0, len = arr.length; id < len; id++) {
+  for (let id = 1; id < 10; id++) {
     if (item.meta['QuestCompArray' + id]) {
       const arr = item.meta['QuestCompArray' + id].split(',').map(Number);
       if ((arr[0]) == 0) { arr[0] = 2 };
@@ -593,7 +593,7 @@ quest_settei_item = function (item, id6) {
     };
   }
   //スキル習得による達成条件
-  for (let id = 0, len = arr.length; id < len; id++) {
+  for (let id = 1; id < 10; id++) {
     if (item.meta['QuestCompSkill' + id]) {
       actor = $gameActors.actor($gameVariables.value(2));
       const arr = item.meta['QuestCompSkill' + id].split(',').map(Number);
@@ -619,7 +619,7 @@ quest_settei_item = function (item, id6) {
     };
   }
   //スキル装着による達成条件
-  for (let id = 0, len = arr.length; id < len; id++) {
+  for (let id = 1; id < 10; id++) {
     if (item.meta['QuestCompSkillEquip' + id]) {
       actor = $gameActors.actor($gameVariables.value(2));
       const arr = item.meta['QuestCompSkillEquip' + id].split(',').map(Number);
@@ -645,7 +645,7 @@ quest_settei_item = function (item, id6) {
     };
   }
   //スキルランクによる達成条件
-  for (let id = 0, len = arr.length; id < len; id++) {
+  for (let id = 1; id < 10; id++) {
     if (item.meta['QuestCompSkillRank' + id]) {
       actor = $gameActors.actor($gameVariables.value(2));
       const arr = item.meta['QuestCompSkillRank' + id].split(',').map(Number);
@@ -671,7 +671,7 @@ quest_settei_item = function (item, id6) {
     };
   }
   //ステート付与による達成条件
-  for (let id = 0, len = arr.length; id < len; id++) {
+  for (let id = 1; id < 10; id++) {
     if (item.meta['QuestCompState' + id]) {
       actor = $gameActors.actor($gameVariables.value(2));
       const arr = item.meta['QuestCompState' + id].split(',').map(Number);
