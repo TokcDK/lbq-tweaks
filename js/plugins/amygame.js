@@ -3079,12 +3079,13 @@ else {
   valueItems = get_valueItems_iwa(valueItemsTypeRnd > 1 ? 2 : valueItemsTypeRnd);
 }
 
-if(id13 >= 1){
-  var value7 = id13;
-} else {
-  var arr = [1,2,3,4,5,6,7,8,9,10];
-    for (var i = 1; i <= 50; i++) {
+let value7 = id13;
+if(id13 < 1) {
+  let arr = [1,2,3,4,5,6,7,8,9,10];
+    for (let i = 1; i <= 50; i++) {
       arr.push(1);
+      if (i > 45) continue;
+
       if(i <= 45){arr.push(2)};
       if(i <= 40){arr.push(3)};
       if(i <= 35){arr.push(4)};
@@ -3093,76 +3094,51 @@ if(id13 >= 1){
       if(i <= 7){arr.push(7)};
       if(i <= 5){arr.push(8)};
       if(i <= 3){arr.push(9)};
-    };
-    var value7 = arr[Math.floor(Math.random() * arr.length)];
+    }
+    value7 = arr[Math.floor(Math.random() * arr.length)];
     //ガチャ称号取得でＵＲ，ＬＲ解放
     if(!$gameParty.hasItem($dataItems[657],true) && value7 >= 9){
-      var value7 = 8;
+      value7 = 8;
     };
     if(!$gameParty.hasItem($dataItems[656],true) && value7 >= 8){
-      var value7 = 7;
+      value7 = 7;
     };
 };
 if($gameParty.inBattle()){
   var value1 = 71;//仮指定。ポーションのみ
 } else {
-  var value1 = 0;
-  var array = [0];
-  var start = 1;
-    if(valueItems == $dataArmors){
-      var end = valueArmorsLength;
-    } else {
-      var end = valueItems.length-1;
-    };
-    for (var i = start; i <= end; i++) {
-      let j = 0;
+  let array = [0];
+  const end = valueItems == $dataArmors ? valueArmorsLength : valueItems.length - 1;
+  for (let i = 1; i <= end; i++) {
       const valueItem = valueItems[i];
-      if(valueItem.meta['LotteryRearity']){
-        if(Number(valueItem.meta['LotteryRearity']) == value7){
-          j = 1;
-      }};
-      if(valueItem.meta['GatchaHasRange']){
-        if(!$gameParty.hasItem(valueItem)){
-          j = 0;
-      }};
-      if(valueItem.meta['Max Item']){
-        if(Number(valueItem.meta['Max Item']) == 1 && $gameParty.hasItem(valueItem)){
-          j = 0;
-      }};
-      if(valueItem.meta['GatchaOutOfRange']){
-        j = 0;
-      };
-      if(j == 1){
-        array.push(i);
-      };
+      if (valueItem.meta['GatchaOutOfRange']) continue;
+      if ($gameParty.hasItem(valueItem)) {
+        const maxItem = valueItem.meta['Max Item'];
+        if (maxItem && Number(maxItem) == 1) continue;
+      }
+      else if (valueItem.meta['GatchaHasRange']) continue;
+
+      const lotteryRearity = valueItem.meta['LotteryRearity'];
+      if (!lotteryRearity) continue;
+      if (Number(lotteryRearity) !== value7) continue;
+
+      array.push(i);
     };
   var value1 = array[Math.floor(Math.random() * array.length)];
   if(value1 == 0){ //レアリティ1でmax1アイテムを作らない。
-    var array = [];
-    var value7 = 1;
-    var start = 1;
-      if(valueItems == $dataArmors){
-        var end = valueArmorsLength;
-      } else {
-        var end = valueItems.length-1;
-      };
-      for (var i = start; i <= end; i++) {
-        let j = 0;
+    array = [];
+    value7 = 1;
+      for (let i = 1; i <= end; i++) {
         const valueItem = valueItems[i];
-        if(valueItem.meta['LotteryRearity']){
-          if (Number(valueItem.meta['LotteryRearity']) == value7){
-            j = 1;
-        }};
-        if (valueItem.meta['GatchaHasRange']){
-          if(!$gameParty.hasItem(valueItem)){
-            j = 0;
-        }};
-        if(valueItem.meta['GatchaOutOfRange']){
-          j = 0;
-        };
-        if(j == 1){
-          array.push(i);
-        };
+        if (valueItem.meta['GatchaOutOfRange']) continue;
+        if (valueItem.meta['GatchaHasRange'] 
+        && !$gameParty.hasItem(valueItem)) continue;
+
+        const lotteryRearity = valueItem.meta['LotteryRearity'];
+        if (!lotteryRearity) continue;
+        if (Number(lotteryRearity) !== value7) continue;
+
+        array.push(i);
       };
     valueGachaId = array[Math.floor(Math.random() * array.length)];
   } else {
