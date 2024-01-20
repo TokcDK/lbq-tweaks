@@ -5806,15 +5806,12 @@ scene_joukenNakami_clean_prefixes = function (text){
 
 get_valueItems_iwa = function(id){
   switch (Number(id)) {
-    case 0:
-      return $dataItems;
     case 1:
       return $dataWeapons;
     case 2:
       return $dataArmors;
     default:
-      console.error(`get_valueItems_iwa: id(${id}}) is not 0,1,2!`);
-      return null;
+      return $dataItems;
   }
 }
 
