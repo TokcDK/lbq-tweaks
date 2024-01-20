@@ -1,11 +1,11 @@
 //=============================================================================
 // KMS_Minimap.js
-//  last update: 2019/01/01
+//  last update: 2020/04/21
 //=============================================================================
 
 /*:
  * @plugindesc
- * [v0.2.0] Display minimap.
+ * [v0.2.0a] Display minimap.
  *
  * @author TOMY (Kamesoft)
  *
@@ -63,7 +63,7 @@
 
 /*:ja
  * @plugindesc
- * [v0.2.0] 画面上にミニマップを表示します。
+ * [v0.2.0a] 画面上にミニマップを表示します。
  *
  * @author TOMY (Kamesoft)
  *
@@ -758,17 +758,6 @@ Sprite_Minimap.prototype.createObjectSprites = function()
     }, this);
 };
 
-Sprite_Minimap.prototype.addObjectSprites = function(obj)
-{
-    var sprite = new Sprite_MinimapIcon();
-    sprite.setObject(obj);
-    if (this._objectSprites.length > 0) {
-        sprite._blinkDuration = this._objectSprites[0]._blinkDuration;
-    }
-    this._objectSprites.push(sprite);
-    this.addChild(sprite);
-};
-
 /**
  * 現在位置スプライトの作成
  */
@@ -1186,7 +1175,7 @@ Sprite_Minimap.prototype.drawMapForeground = function(bitmap)
     {
         for (var x = this._drawRange.begin.x; x < this._drawRange.end.x; x++)
         {
-            this.drawMapForegroundGrid(bitmap, x, y);
+            this.drawMapForegroundGrid(bitmap, Math.floor(x), Math.floor(y));
         }
     }
 };

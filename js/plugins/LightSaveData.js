@@ -195,7 +195,7 @@
         for (var i = 0; i < this._data.length; i++) {
             if (!$gameParty.isValidActors(i) && this._data[i] && !paramExceptionActorIds.contains(i)) {
                 delete this._data[i];
-                //変更。コンソール表示なしif ($gameTemp.isPlaytest()) console.log('Actor[%1] Deleted!!'.format(i));
+                if ($gameTemp.isPlaytest()) console.log('Actor[%1] Deleted!!'.format(i));
             }
         }
     };

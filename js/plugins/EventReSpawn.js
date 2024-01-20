@@ -6,6 +6,9 @@
 // http://opensource.org/licenses/mit-license.php
 // ----------------------------------------------------------------------------
 // Version
+// 1.12.2 2021/11/23 セルフスイッチを維持しない設定のときはテンプレートイベントのセルフ変数も消去するよう変更
+// 1.12.1 2021/10/05 1.2.0の機能でイベントを配置したとき、イベント画像が2つ重なって表示されてしまう問題を修正
+// 1.12.0 2021/09/16 リージョンを配置するだけでマップイベントやテンプレートイベントのコピーを自動配置できる機能を追加
 // 1.11.5 2020/12/28 利用するプラグインによってイベント生成時にちらつく現象が発生しないよう修正
 // 1.11.4 2020/09/19 MOG_EventIndicators.jsと併用したとき、動的生成イベントにインジケータが表示されるよう修正
 // 1.11.3 2020/03/01 MOG_EventText.jsと併用したとき、動的生成イベントにイベントテキストが表示されるよう修正
@@ -164,6 +167,11 @@
  * パラメータ「確定出力方式スイッチ」に対するスイッチがONになっているとこちらのモードで
  * 出力します。
  *
+ * さらに、マップにリージョンを配置するだけでイベントやテンプレートイベントを
+ * 配置できます。コピー元イベントのメモ欄にタグを記述してください。
+ * ・リージョン[1]を配置したマスにイベントのコピーを配置
+ * <CP:1>
+ *
  * 利用規約：
  *  作者に無断で改変、再配布が可能で、利用形態（商用、18禁利用等）
  *  についても制限はありません。
@@ -238,6 +246,10 @@ function Game_PrefabEvent() {
         イベント     : 2,
         both     : 3,
         両方       : 3,
+    };
+
+    var getMetaValue = function(object, name) {
+        return object.meta.hasOwnProperty(name) ? convertEscapeCharacters(object.meta[name]) : null;
     };
 
     var convertEscapeCharacters = function(text) {
@@ -390,6 +402,50 @@ function Game_PrefabEvent() {
         }
         _Game_Map_setupEvents.apply(this, arguments);
         this._eventIdSequence = this._events.length || 1;
+        this.setupInitialSpawnEvents();
+    };
+
+    Game_Map.prototype.setupInitialSpawnEvents = function() {
+        var spawnMap = this.createSpawnMap();
+        if (spawnMap.size <= 0) {
+            return;
+        }
+        for (let x = 0; x <= this.width(); x++) {
+            for (let y = 0; y <= this.height(); y++) {
+                const regionId = this.regionId(x, y);
+                if (spawnMap.has(regionId)) {
+                    const spawn = spawnMap.get(regionId);
+                    this.spawnEvent(spawn.id, x, y, spawn.template);
+                    this._events[this._lastSpawnEventId].setSpritePrepared();
+                }
+            }
+        }
+    };
+
+    Game_Map.prototype.createSpawnMap = function() {
+        var spawnMap = new Map();
+        this._events.forEach(event => {
+            if (event.hasTemplate && event.hasTemplate()) {
+                return;
+            }
+            this.appendSpawnMap(event.event(), spawnMap,false);
+        });
+        if (typeof $dataTemplateEvents !== "undefined") {
+            $dataTemplateEvents.forEach(template => {
+                this.appendSpawnMap(template, spawnMap,true);
+            });
+        }
+        return spawnMap;
+    };
+
+    Game_Map.prototype.appendSpawnMap = function(event, spawnMap, isTemplate) {
+        if (!event) {
+            return;
+        }
+        const regionId = parseInt(getMetaValue(event, 'CP'));
+        if (regionId) {
+            spawnMap.set(regionId, {id:event.id, template:isTemplate});
+        }
     };
 
     Game_Map.prototype.spawnEvent = function(originalEventId, x, y, isTemplate) {
@@ -640,10 +696,26 @@ function Game_PrefabEvent() {
             var key = [this._mapId, this._eventId, swCode];
             $gameSelfSwitches.setValue(key, undefined);
         }.bind(this));
+        if (this._selfVariableIndexList) {
+            this._selfVariableIndexList.forEach(index => {
+                this.controlSelfVariable(index, 0, 0, false);
+            });
+        }
     };
 
     Game_PrefabEvent.prototype.getOriginalEventId = function() {
         return this._originalEventId;
+    };
+
+    const _Game_PrefabEvent_controlSelfVariable = Game_PrefabEvent.prototype.controlSelfVariable;
+    Game_PrefabEvent.prototype.controlSelfVariable = function(index, type, operand, formulaFlg) {
+        if (!this._selfVariableIndexList) {
+            this._selfVariableIndexList = [];
+        }
+        if (this._selfVariableIndexList.indexOf(index)) {
+            this._selfVariableIndexList.push(index);
+        }
+        _Game_PrefabEvent_controlSelfVariable.apply(this, arguments);
     };
 
     Game_Event.prototype.getOriginalEventId = function() {

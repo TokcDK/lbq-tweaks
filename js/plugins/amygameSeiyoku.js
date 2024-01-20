@@ -587,67 +587,107 @@ if($gameSwitches.value(130)){
 //☆☆性欲度上限計算。露出計算時とＨプロフ表示時に一緒にやっておく
 seiyoku_jougenn = function(){
 
-var value1 = 0;
-$gameVariables.value($gameVariables.value(20)+380)[value1] = 0;
-var actor = $gameActors.actor($gameVariables.value(20));
-var list = valueHstaSuppression;
-list.forEach(function(id) {
-  if( actor.isLearnedSkill(id) && !actor.isLearnedSkill(Number($dataSkills[id].meta['Hide if Learned Skill']))){
-    var arr1 = $dataSkills[id].meta['HstaSuppression'].split(',');
-    if(Number(arr1[0]) == 0 || Number(arr1[0]) == 401){
-      var value2 = Number(arr1[1]) * 100;
-        if($gameVariables.value($gameVariables.value(20)+380)[value1] == 0 || value2 <= $gameVariables.value($gameVariables.value(20)+380)[value1]){
-          $gameVariables.value($gameVariables.value(20)+380)[value1] = value2-1;
-        };
-    };
-  };
-}, this);
+const gameVar20 = $gameVariables.value(20);
+const gameVar20_300 = gameVar20 + 380;
+const gameVar_20_300Array = $gameVariables.value(gameVar20_300);
+gameVar_20_300Array[0] = 0;
+const actor = $gameActors.actor(gameVar20);
+for (const id of valueHstaSuppression) {
+  if(!actor.isLearnedSkill(id)) continue;
+  const skill = $dataSkills[id];
+  if (actor.isLearnedSkill(Number(skill.meta['Hide if Learned Skill']))) continue;
+
+  const arr1 = skill.meta['HstaSuppression'].split(',');
+  const arr1_0n = Number(arr1[0]);
+  if (arr1_0n == 0 || arr1_0n == 401) {
+    const value2 = Number(arr1[1]) * 100;
+    if (gameVar_20_300Array[0] == 0 || value2 <= gameVar_20_300Array[0]) {
+      gameVar_20_300Array[0] = value2 - 1;
+    }
+  }
+}
 
 };
 
 //☆☆限界露出値計算
+const rosyutu_genkai_id1 = 400
+const rosyutu_genkai_id2 = 55;
 rosyutu_genkai = function(){
 
-var actor = $gameActors.actor($gameVariables.value(20));
-var value1 = 400
-var value2 = 55;
-$gameVariables.setValue(value1+5,100);
-if(actor.skillMasteryLevel(value2) == 1){$gameVariables.setValue(value1+5,90)};
-if(actor.skillMasteryLevel(value2) == 2){$gameVariables.setValue(value1+5,70)};
-if(actor.skillMasteryLevel(value2) == 3){$gameVariables.setValue(value1+5,50)};
-if(actor.skillMasteryLevel(value2) == 4){$gameVariables.setValue(value1+5,30)};
-if(actor.skillMasteryLevel(value2) == 5){$gameVariables.setValue(value1+5,10)};
-if(actor.skillMasteryLevel(value2) == 6){$gameVariables.setValue(value1+5,0)};
-$gameVariables.value($gameVariables.value(20)+380)[5] = $gameVariables.value(value1+5);
-$gameVariables.setValue(value1+5,0);
+  const gameVar20 = $gameVariables.value(20);
+  const actor = $gameActors.actor(gameVar20);
+  const id = rosyutu_genkai_id1 + 5;
+  $gameVariables.setValue(id,100);
+  const actorSkillLevel = actor.skillMasteryLevel(rosyutu_genkai_id2);
+  switch (actorSkillLevel) {
+    case 1:
+      $gameVariables.setValue(id, 90);
+      break;
+    case 2:
+      $gameVariables.setValue(id, 70);
+      break;
+    case 3:
+      $gameVariables.setValue(id, 50);
+      break;
+    case 4:
+      $gameVariables.setValue(id, 30);
+      break;
+    case 5:
+      $gameVariables.setValue(id, 10);
+      break;
+    case 6:
+      $gameVariables.setValue(id, 0);
+      break;
+    default:
+      break;
+  }
+  $gameVariables.value(gameVar20 +380)[5] = $gameVariables.value(id);
+  $gameVariables.setValue(id,0);
 
 seiyoku_jougenn();
 
 };
 
 //☆☆現在露出度計上
+const rosyutu_genzai_ids = [
+  461, 462, 463, 464, 465, 466, 467, 468, 469, 470,
+  471, 472, 473, 474, 475, 476, 477, 478, 479, 480,
+  481, 482, 483, 484, 485, 486, 487, 488, 489, 490,
+  491, 492, 493, 494, 495, 496, 497, 498, 499, 500];
 rosyutu_genzai = function(){
 
-$gameVariables.setValue(404,0);
-var list = [
-461,462,463,464,465,466,467,468,469,470,
-471,472,473,474,475,476,477,478,479,480,
-481,482,483,484,485,486,487,488,489,490,
-491,492,493,494,495,496,497,498,499,500];
-list.forEach(function(id) {
-  for(var i=1201; i < $dataItems.length; i ++){
-    if(!$dataItems[i].meta['TotalCloth']){
-      if ($gameVariables.value(20) + 180 == Number($dataItems[i].meta['EICSwitch']) ||
-      $gameVariables.value(20) + 380 == Number($dataItems[i].meta['EICSwitch']) ||
-      200 == Number($dataItems[i].meta['EICSwitch']) ){
-        if(id == Number($dataItems[i].meta['ClothSwitch']) + 460 &&
-        $gameVariables.value(id) == Number($dataItems[i].meta['ClothAllocationNumber'])) {
-            $gameVariables.setValue(404,$gameVariables.value(404)+Number($dataItems[i].meta['ClothUncoverCount']));
-  }}}};
-}, this);
-$gameVariables.value($gameVariables.value(20)+380)[4] = $gameVariables.value(404);
-$gameVariables.setValue(404,0);
+  $gameVariables.setValue(404, 0);
+  const gameVar20 = $gameVariables.value(20);
+  const gameVar20_180 = gameVar20 + 180;
+  const gameVar20_380 = gameVar20 + 380;
+  const itemsLen = $dataItems.length;
+  for (var i = 1201; i < itemsLen; i++) {
+    const item = $dataItems[i];
+    if (item.meta['TotalCloth']) continue;
 
+    const itemMetaEICSwitchNum = Number(item.meta['EICSwitch']);
+    const itemMetaClothSwitchNum_460 = Number(item.meta['ClothSwitch']) + 460;
+    const itemMetaClothAllocationNumberNum = Number(item.meta['ClothAllocationNumber']);
+    const itemMetaClothUncoverCountNum = Number(item.meta['ClothUncoverCount']);
+    for (const id of rosyutu_genzai_ids) {
+      switch (itemMetaEICSwitchNum) {
+        case gameVar20_180:
+        case gameVar20_380:
+        case 200:
+          break;
+        default:
+          continue;
+      }
+
+      if (id !== itemMetaClothSwitchNum_460 
+        || $gameVariables.value(id) !== itemMetaClothAllocationNumberNum) continue;
+
+      $gameVariables.setValue(404, $gameVariables.value(404) + itemMetaClothUncoverCountNum);
+    }
+  }
+
+  $gameVariables.value(gameVar20_380)[4] = $gameVariables.value(404);
+  $gameVariables.setValue(404, 0);
 };
 
 //受精するかどうかの計算

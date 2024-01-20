@@ -124,10 +124,6 @@
         this._opacity = value;
     };
 
-    //失敗Game_Picture.prototype.setX = function(value) {
-    //    this._x = value;
-    //};
-
     var _Window_ChoiceList_update      = Window_ChoiceList.prototype.update;
     Window_ChoiceList.prototype.update = function() {
         _Window_ChoiceList_update.apply(this, arguments);
@@ -142,23 +138,7 @@
             if (!picture) {
                 return;
             }
-            //変更。追加。透明からのスライドさせるため
-            if($gameSwitches.value(471)){
-　　　　　　  //失敗。移動させると延々と移動するvar valueX = $gameScreen.picture(data.pictureId).x();
-　　　　　　  //var valueY = $gameScreen.picture(data.pictureId).y();
-              if(data.index === this.findMessageIndex()){
-                $gameScreen.movePicture(data.pictureId,1,640+500,384,100,100,255,0,20);
-              } else {
-                $gameScreen.movePicture(data.pictureId,1,640+1000,384,100,100,0,0,20);
-              };
-            } else {
             picture.setOpacity(data.index === this.findMessageIndex() ? 255 : 0);
-              if(data.index === this.findMessageIndex()){
-                $gameScreen.movePicture(data.pictureId,picture.origin(),picture.x(),picture.y(),picture.scaleX(),picture.scaleY(),255,picture.blendMode(),10);
-              } else {
-                $gameScreen.movePicture(data.pictureId,picture.origin(),picture.x(),picture.y(),picture.scaleX(),picture.scaleY(),0,picture.blendMode(),10);
-              };
-            };
         }, this);
     };
 

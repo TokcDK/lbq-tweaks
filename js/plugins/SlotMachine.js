@@ -152,14 +152,14 @@ var expectation = 0.5;
 //You can set the odds.
 var odds = [];
 odds.push([]);
-odds[0].push(3); //000
-odds[0].push(4); //111
+odds[0].push(1); //000
+odds[0].push(2); //111
 odds[0].push(5); //222
 odds[0].push(10); //333
 odds[0].push(20); //444
 odds[0].push(100); //555
 odds.push([]);
-odds[1].push(5); //0000
+odds[1].push(2); //0000
 odds[1].push(10); //1111
 odds[1].push(20); //2222
 odds[1].push(100); //3333
@@ -212,12 +212,6 @@ Game_Interpreter.prototype.pluginCommand = function (command, args) {
                         break;
                     case "2":
                         scale = 100;
-                        break;
-                    case "3":
-                        scale = 1000;
-                        break;
-                    case "4":
-                        scale = 10000;
                         break;
                     default :
                         scale = 1;
@@ -637,8 +631,8 @@ Scene_SlotMachine.prototype.createReplayCommand = function () {
     this._replayCommandWindow.setHandler('no', this.cancelCommand.bind(this));
     this._replayCommandWindow.setHandler('cancel', this.cancelCommand.bind(this));
     this.addWindow(this._replayCommandWindow);
-    this._replayCommandWindow.x = 0;//Graphics.boxWidth - this._replayCommandWindow.width;//変更0
-    this._replayCommandWindow.y = this._helpWindow.y - this._replayCommandWindow.height + 20;//変更+20
+    this._replayCommandWindow.x = Graphics.boxWidth - this._replayCommandWindow.width;
+    this._replayCommandWindow.y = this._helpWindow.y - this._replayCommandWindow.height;
 };
 
 Scene_SlotMachine.prototype.createReels = function () {
@@ -1252,7 +1246,7 @@ Window_SlotMachine.prototype.createContents = function() {
     Window_Base.prototype.createContents.call(this);
 
     this.coinContents = new Bitmap(this.contents.measureTextWidth("99999999"), this.lineHeight());
-    this.betContents = new Bitmap(this.contents.measureTextWidth("99999999"), this.lineHeight());//変更999
+    this.betContents = new Bitmap(this.contents.measureTextWidth("999"), this.lineHeight());
 };
 
 /**
@@ -1298,7 +1292,7 @@ Window_SlotMachine.prototype.refreshCoin = function() {
 
 Window_SlotMachine.prototype.refreshBet = function() {
     this.betContents.clear();
-    this.drawBetText(this._bet, 0, 0, this.contents.measureTextWidth("99999999"), "right");//変更999
+    this.drawBetText(this._bet, 0, 0, this.contents.measureTextWidth("999"), "right");
 };
 
 
@@ -1369,7 +1363,7 @@ Window_SlotCommand.prototype.makeCommandList = function () {
 };
 
 Window_SlotCommand.prototype.windowWidth = function () {
-    return 816;//Graphics.boxWidth;//変更
+    return Graphics.boxWidth;
 };
 
 Window_SlotCommand.prototype.maxCols = function () {

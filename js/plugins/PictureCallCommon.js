@@ -6,6 +6,9 @@
 // http://opensource.org/licenses/mit-license.php
 // ----------------------------------------------------------------------------
 // Version
+// 1.14.5 2023/02/20 ピクチャの紐付けがされていない状態でもマウスオーバー判定が裏で動作してしまう問題を修正
+// 1.14.4 2021/08/22 「並列処理として実行」のパラメータが戦闘画面には適用されない問題を修正
+// 1.14.3 2021/05/01 紐付け解除の際の設定値を変更
 // 1.14.2 2020/06/05 ヘルプのキーバインドにpagedownとpageupを追加
 // 1.14.1 2020/05/16 ヘルプのコマンド部分の紛らわしい記述を修正
 // 1.14.0 2020/05/13 指定したスイッチがONのときのみ「タッチ操作抑制」を有効にできる設定を追加
@@ -592,6 +595,16 @@
     //  ピクチャがタッチされたときのコモンイベント呼び出し処理を追加定義します。
     //=============================================================================
     Game_Troop.prototype.setupPictureCommonEvent = Game_Map.prototype.setupPictureCommonEvent;
+    Game_Troop.prototype.setupPictureParallelCommonEvent = Game_Map.prototype.setupPictureParallelCommonEvent;
+    Game_Troop.prototype.updatePictureCommonEvents = Game_Map.prototype.updatePictureCommonEvents;
+
+    Game_Troop.prototype.updateAllPictureCommonEvent = function() {
+        this.setupPictureCommonEvent();
+        this.setupPictureParallelCommonEvent();
+        if (this._pictureCommonEvents && this._pictureCommonEvents.length > 0) {
+            this.updatePictureCommonEvents();
+        }
+    };
 
     Game_Troop.prototype.isExistPictureCommon = function() {
         return this._interpreter.isSetupFromPicture();
@@ -635,7 +648,7 @@
     };
 
     Game_Screen.prototype.setPictureRemoveCommon = function(pictureId) {
-        this._pictureCidArray[this.realPictureId(pictureId)] = [];
+        this._pictureCidArray[this.realPictureId(pictureId)] = null;
     };
 
     Game_Screen.prototype.setPictureStroke = function(pictureId, variableNum, transparent) {
@@ -764,7 +777,7 @@
     var _Scene_Battle_update      = Scene_Battle.prototype.update;
     Scene_Battle.prototype.update = function() {
         this.updateTouchPictures();
-        $gameTroop.setupPictureCommonEvent();
+        $gameTroop.updateAllPictureCommonEvent();
         _Scene_Battle_update.apply(this, arguments);
     };
 
@@ -845,15 +858,21 @@
     };
 
     Sprite_Picture.prototype.updateMouseMove = function() {
+        var commandIds = $gameScreen.getPictureCid(this._pictureId);
+        if (!commandIds) {
+            this._outMouse   = false;
+            this._wasOnMouse = false;
+            return;
+        }
         if (this.isIncludePointer()) {
             if (!this._wasOnMouse) {
                 this._onMouse    = true;
                 this._wasOnMouse = true;
             }
         } else if (this._wasOnMouse) {
-                this._outMouse   = true;
-                this._wasOnMouse = false;
-            }
+            this._outMouse   = true;
+            this._wasOnMouse = false;
+        }
     };
 
     Sprite_Picture.prototype.isIncludePointer = function() {

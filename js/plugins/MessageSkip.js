@@ -6,6 +6,7 @@
 // http://opensource.org/licenses/mit-license.php
 // ----------------------------------------------------------------------------
 // Version
+// 1.17.0 2022/06/19 スキップモードのときは同時にイベントのFastForwardも有効になるよう仕様変更
 // 1.16.1 2021/08/29 スキップ中はウィンドウ背景が変わってもウィンドウを閉じないよう修正
 // 1.16.0 2021/06/15 ピクチャによるクリックは押し続けスキップの対象外とするよう仕様変更
 // 1.15.1 2021/06/01 1.15.0でループボイスを再生するとオートモードで文章が送られなくなる問題を修正
@@ -583,6 +584,15 @@ function Sprite_Frame() {
         return ($gameMap.isMapInterpreterOf(this) || !$gameMap.isEventRunning()) && this._depth === 0;
     };
 
+    var _Scene_Map_isFastForward = Scene_Map.prototype.isFastForward;
+    Scene_Map.prototype.isFastForward = function() {
+        const result = _Scene_Map_isFastForward.apply(this, arguments);
+        if (!result && $gameMap.isEventRunning() && !SceneManager.isSceneChanging()) {
+            return $gameMessage.skipFlg();
+        }
+        return result;
+    };
+
     //=============================================================================
     // Game_Map
     //  指定されたインタプリタがマップイベントかどうかを返します。
@@ -705,17 +715,15 @@ function Sprite_Frame() {
     };
 
     Window_Message.prototype.updateSkipButtonPlacement = function() {
-        var x = this.getRelativeButtonX(paramSkipPictureX-$gameVariables.value(311));//変更。
+        var x = this.getRelativeButtonX(paramSkipPictureX);
         var y = this.getRelativeButtonY(paramSkipPictureY);
-        if($gameMessage.positionType() === 1) x += 1000;//変更
-        this._skipButton.move(x+valueAutoSkipPicX, y);//変更。valueAutoSkipPicX追加
+        this._skipButton.move(x, y);
     };
 
     Window_Message.prototype.updateAutoButtonPlacement = function() {
-        var x = this.getRelativeButtonX(paramAutoPictureX-$gameVariables.value(311));//変更。
+        var x = this.getRelativeButtonX(paramAutoPictureX);
         var y = this.getRelativeButtonY(paramAutoPictureY);
-        if($gameMessage.positionType() === 1) x += 1000;//変更
-        this._autoButton.move(x+valueAutoSkipPicX, y);//変更。valueAutoSkipPicX追加
+        this._autoButton.move(x, y);
     };
 
     Window_Message.prototype.updateSwitchButtonPlacement = function() {

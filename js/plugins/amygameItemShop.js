@@ -9,118 +9,171 @@
 //アイテム入手後に実行
 itemGet_afterProcess = function(){
 
-if(!$gameSwitches.value(29)){
-  $gameVariables.setValue(289,4);//タイトル設定可能数
-  $gameVariables.setValue(295,0);//Hタイトル設定可能数
-  $gameVariables.setValue(13,5);//満腹度上限
+  if ($gameSwitches.value(29)) return;
+
+  $gameVariables.setValue(289, 4);//タイトル設定可能数
+  $gameVariables.setValue(295, 0);//Hタイトル設定可能数
+  $gameVariables.setValue(13, 5);//満腹度上限
+
   title_EffectConfi();
   actors_unlockedClassHit();
-  var value3 = 0;
+
   valueQuestArrayEX = Array(201).fill(0);
-  for (var i = 1; i <= $dataItems.length-1; i++) {
-    if(!$dataItems[i].name == '') {
-      if($dataItems[i].meta['EICSwitch']) {
-        if(Number($dataItems[i].meta['EICSwitch']) == 108) {
-          if($gameParty.hasItem($dataItems[i])){
-            if(i <= 900){var j = i-800}else{var j = i-900};
-              if(valueQuestArray6[j] == 0){//達成していたら表示しない
-                valueQuestArrayEX[j] = valueQuestArray2[j];
-  }}}}}}; 
-  if($gameVariables.value(203) >= 2){
-    if($gameParty.hasItem($dataItems[52])){
-      $gameVariables.setValue(203,2);
+  const itemsLen = $dataItems.length;
+
+  for (let i = 1; i < itemsLen; i++) {
+    const item = $dataItems[i];
+
+    if (item.name === '') continue;
+
+    const itemEICSwitch = item.meta['EICSwitch'];
+    if (!itemEICSwitch || Number(itemEICSwitch) !== 108) continue;
+    
+    if (!$gameParty.hasItem(item)) continue;
+
+    const j = (i <= 900) ? i - 800 : i - 900;
+
+    if (valueQuestArray6[j] === 0) {
+      valueQuestArrayEX[j] = valueQuestArray2[j];
+    }
+  }
+
+  if ($gameVariables.value(203) >= 2) {
+    if ($gameParty.hasItem($dataItems[52])) {
+      $gameVariables.setValue(203, 2);
     } else {
-      $gameVariables.setValue(203,1);
+      $gameVariables.setValue(203, 1);
     };
   };
+  
   var value1 = 0;
   var list = valueCasinoMedalItem;
-  list.forEach(function(id) {
+  list.forEach(function (id) {
     if ($gameParty.hasItem($dataItems[id])) {
       value1 += Number($dataItems[id].meta['MedalRate']) * $gameParty.numItems($dataItems[id]);
       $gameParty.gainItem($dataItems[id], -9999);
     };
   }, this);
-  if(value1 >= 1){
-    $gameVariables.setValue(69,$gameVariables.value(69) + value1);
+  if (value1 >= 1) {
+    $gameVariables.setValue(69, $gameVariables.value(69) + value1);
   };
+
   quest_settei(1);
   quest_settei(2);
   time_settei();
-  if($gameVariables.value(200) == 3){//マップステータス表示1非表示2簡易ステ3簡易Ｈステ4収集アイテム5ミニマップ
+
+  if ($gameVariables.value(200) == 3) {//マップステータス表示1非表示2簡易ステ3簡易Ｈステ4収集アイテム5ミニマップ
     actor_miniHstatusList1(283);
   };
-  if($gameVariables.value(200) == 4){
+  if ($gameVariables.value(200) == 4) {
     item_collectList1(284);
   };
-  for (var i = 1; i <= 200; i++) {
-    if(valueQuestArrayEX[i] != 0){
-      if(valueQuestArrayEX[i] != valueQuestArray2[i]){
-        if(i <= 100){var j = i+800}else{var j = i+900};
-        var value1 = `\x1bIIN[${j}]`;
-        CommonPopupManager.showInfo({},value1,null);
-        var arr1 = valueQuestArrayEX[i].split("\n");
-        var arr2 = valueQuestArray2[i].split("\n");
-        for (var id1 = 0; id1 <= arr1.length-1; id1++) {
-          if(arr1[id1] != arr2[id1]){
-            CommonPopupManager.showInfo({},arr2[id1],null);
-            if(valueQuestArray6[i] == 1){
-              var value1 = `\x1bIIN[${j}]:[\\C[10]条件達成\\C[0]]`;
-              CommonPopupManager.showInfo({},value1,null);
-              if(!$gameParty.inBattle()){
-                //$gamePlayer.requestAnimation(204);
-                if(i >= 101){
-                  var value1 = 'cracker_min_r';
-                } else {
-                  var value1 = 'cracker_min_l';
-                };
-                $gameScreen._particle.particlePlay(0,value1,'player','def','above');
-                //AudioManager.playSe({"name":'Z11_ItemDrop',"volume":25,"pitch":110,"pan":0});
-  }}}}}}};
-  if($gameSwitches.value(129)){
-    var value23 = 'デイリークエスト'
-    for (var i = 1; i <= $dataItems.length-1; i++) {
-      if(!$dataItems[i].name == '') {
-        if($dataItems[i].meta['EICSwitch']) {
-          if(Number($dataItems[i].meta['EICSwitch']) == 108) {
-            if($dataItems[i].meta['SGカテゴリ'] == value23) {
-              if($gameParty.hasItem($dataItems[i])){
-                if(valueQuestArray6[i-900] == 1){
-                  $gameSwitches.setValue(518,true);
-                  quest_housyuu(i,2);
-                  $gameSwitches.setValue(518,false);
-    }}}}}}};
-  };
-  for (var i = 1; i <= valueArmorsLength; i++) {
-    if($dataArmors[i].etypeId == 6){
-      if($dataArmors[i].meta['ItemPicture']){
-        if($gameParty.hasItem($dataArmors[i],true)){
-          var value4 = $gameParty.numItems($dataArmors[i]);
-          if($gameParty.membersEqArmor(i)){value4 += 1};
-          if(value4 >= 2){
-            var value2 = $gameVariables.value(352)[i - valueSeisyoujuuStartId];
-            $gameVariables.value(352)[i - valueSeisyoujuuStartId] += value4-1;
-            $gameParty.loseItem($dataArmors[i], value4-1);
-            seisyoujuu_addParams(i);
-            var value1 = "Magic2";
-            AudioManager.playSe({"name":value1,"volume":100,"pitch":130,"pan":0});
-            var value1 = `charge_c`;
-            $gameScreen._particle.particlePlay(0,value1,'player','def','above');
-            $gameScreen._particle.particleUpdate([value1,'emitterLifetime',1]);
-            $gameScreen._particle.particleExceed(value1,0.5);
-            var value1 = `\\C[2]\x1bAIN[${i}]\\C[0] [強化値:${value2}\\C[10]+${value4-1}\\C[0]]<パラメータアップ！>`;
-            CommonPopupManager.showInfo({},value1,null);
-            var value3 = 1;
-  }}}}};
-  if(value3 == 1){
-    for (var i = 0; i < $gameParty.members().length; i++) {
-      var actor = $gameParty.battleMembers()[i];
-      actor.refresh();
-    };
-  };
-$gameSwitches.setValue(380,false);
-};
 
+  const isInBattle = $gameParty.inBattle();
+  for (let i = 1; i <= 200; i++) {
+    const exValue = valueQuestArrayEX[i];
+    const value2 = valueQuestArray2[i];
+
+    if (exValue !== 0 && exValue !== value2) {
+      const j = (i <= 100) ? i + 800 : i + 900;
+      let value1 = `\x1bIIN[${j}]`;
+
+      CommonPopupManager.showInfo({}, value1, null);
+
+      const arr1 = exValue.split("\n");
+      const arr2 = value2.split("\n");
+
+      for (let id1 = 0, len = arr1.length; id1 < len; id1++) {
+        if (arr1[id1] === arr2[id1]) continue;
+
+        CommonPopupManager.showInfo({}, arr2[id1], null);
+
+        if (valueQuestArray6[i] !== 1) continue;
+
+        value1 = `\x1bIIN[${j}]:[\\C[10]条件達成\\C[0]]`;
+        CommonPopupManager.showInfo({}, value1, null);
+
+        if (!isInBattle) {
+          const value3 = (i >= 101) ? 'cracker_min_r' : 'cracker_min_l';
+          $gameScreen._particle.particlePlay(0, value3, 'player', 'def', 'above');
+          // AudioManager.playSe({"name":'Z11_ItemDrop',"volume":25,"pitch":110,"pan":0});
+        }
+      }
+    }
+  }
+
+  if ($gameSwitches.value(129)) {
+    const value23 = 'デイリークエスト';
+    const dataItemsLength = $dataItems.length;
+
+    for (let i = 1; i <= dataItemsLength - 1; i++) {
+      const currentItem = $dataItems[i];
+
+      if (
+        currentItem.name === '' ||
+        Number(currentItem.meta['EICSwitch']) !== 108 ||
+        currentItem.meta['SGカテゴリ'] !== value23 ||
+        !$gameParty.hasItem(currentItem) ||
+        valueQuestArray6[i - 900] !== 1
+      ) {
+        // Skip to the next iteration if any condition fails
+        continue;
+      }
+
+      $gameSwitches.setValue(518, true);
+      quest_housyuu(i, 2);
+      $gameSwitches.setValue(518, false);
+    }
+  }
+
+  let hasParameterIncrease = false;
+  const variable352Values = $gameVariables.value(352);
+  for (let armorIndex = 1, armorLength = valueArmorsLength; armorIndex <= armorLength; armorIndex++) {
+    const currentArmor = $dataArmors[armorIndex];
+
+    if (!(currentArmor.etypeId === 6 && currentArmor.meta['ItemPicture'] && $gameParty.hasItem(currentArmor, true))) {
+      continue;
+    }
+
+    let itemCount = $gameParty.numItems(currentArmor);
+
+    if ($gameParty.membersEqArmor(armorIndex)) {
+      itemCount += 1;
+    }
+
+    if (itemCount < 2) {
+      continue;
+    }
+
+    itemCount = itemCount - 1;
+    const initialParamValue = variable352Values[armorIndex - valueSeisyoujuuStartId];
+    variable352Values[armorIndex - valueSeisyoujuuStartId] += itemCount;
+    $gameParty.loseItem(currentArmor, itemCount);
+    seisyoujuu_addParams(armorIndex);
+
+    AudioManager.playSe({ "name": "Magic2", "volume": 100, "pitch": 130, "pan": 0 });
+
+    const seName = `charge_c`;
+    $gameScreen._particle.particlePlay(0, seName, 'player', 'def', 'above');
+    $gameScreen._particle.particleUpdate([seName, 'emitterLifetime', 1]);
+    $gameScreen._particle.particleExceed(seName, 0.5);
+
+    const armorName = `\\C[2]\x1bAIN[${armorIndex}]\\C[0]`
+    const itemCnt = `\\C[10]+${itemCount}\\C[0]`;
+    const popupMessage = `${armorName} [強化値:${initialParamValue}${itemCnt}]<パラメータアップ！>`;
+    CommonPopupManager.showInfo({}, popupMessage, null);
+
+    hasParameterIncrease = true;
+  }
+  if (hasParameterIncrease) {
+    const len = $gameParty.members().length;
+    for (let actorIndex = 0; actorIndex < len; actorIndex++) {
+      const actor = $gameParty.battleMembers()[actorIndex];
+      actor.refresh();
+    }
+  }
+
+  $gameSwitches.setValue(380, false);
 };
 
 //アイテムのHPMPポーション効果
@@ -356,15 +409,19 @@ kantei_ikkatu = function(a,b,itemId){
 
 $gameSwitches.setValue(69,true);
 $gameSwitches.setValue(114,true);
-var start = 1;var end = $dataItems.length-1;
-for (var i = start; i <= end; i++) {
-  if($dataItems[i].meta['下級鑑定品'] || $dataItems[i].meta['中級鑑定品'] || $dataItems[i].meta['上級鑑定品']){
-    if($gameParty.hasItem($dataItems[i])){
+const len = $dataItems.length;
+for (let i = 1; i < len; i++) {
+  const item = $dataItems[i];
+  if(item.meta['下級鑑定品'] || item.meta['中級鑑定品'] || item.meta['上級鑑定品']){
+    if($gameParty.hasItem(item)){
       $gameVariables.setValue(19,i);
       kantei_nakami();
-      if($gameParty.hasItem($dataItems[i])){
+      if($gameParty.hasItem(item)){
         i -= 1;
-}}}};
+      }
+    }
+  }
+}
 $gameSwitches.setValue(114,false);
 $gameSwitches.setValue(69,false);
 
@@ -436,93 +493,103 @@ item_getSkillLevel(value5,0,value1);
 };
 
 //熟練度上昇拾得物。スキルid、アイテム種別3お金0アイテム1武器2防具、金額orアイテムID,0でスキル熟練度のみアップ
-item_getSkillLevel = function(id1,itemType,id3){
+item_getSkillLevel = function(skillId,itemType,id3){
 
-var value3 = id1; 
-var value1 = `　`; 
-var value2 = `　`;
-var value11 = 0;
-if(itemType == 0){var item = $dataItems};
-if(itemType == 1){var item = $dataWeapons};
-if(itemType == 2){var item = $dataArmors};
-var actor = $gameActors.actor($gameVariables.value(11)); 
-if(actor.skillMasteryLevel(value3) == Number($dataSkills[value3].meta['Max Mastery Level'])){}else{
-  if(actor.isLearnedSkill(value3) && actor.skillMasteryLevel(value3) >= 0){
-    var value11 = actor.skillMasteryLevel(value3);
-    actor.gainSkillMasteryUses(value3, $gameVariables.value(203)); //変更熟練度
-    var value12 = `${$dataSkills[value3].name}`;
-    var value12 = value12.replace("＜ON＞", "");
-    var value12 = value12.replace("＜OFF＞", "");
-    var value1 = `\\C[1]＜${value12}＞\\C[0]熟練度\\C[10]\\V[203]\\C[0]獲得！`;
-}};
-var id4 = actor.skillMasteryLevel(value3);
-if(id4 == 0){var id4 = 1};
-if(id3 == 10 || id3 == 141){
+let value1 = `　`; 
+let skillLevel = 0;
+const actor = $gameActors.actor($gameVariables.value(11)); 
+
+const isLearnedSkill = actor.isLearnedSkill(skillId);
+const skillMasteryLevel = isLearnedSkill ? actor.skillMasteryLevel(skillId) : 0;
+if (skillMasteryLevel == Number($dataSkills[skillId].meta['Max Mastery Level'])){}else{
+  if (isLearnedSkill && skillMasteryLevel >= 0){
+    skillLevel = skillMasteryLevel;
+    actor.gainSkillMasteryUses(skillId, $gameVariables.value(203)); //変更熟練度
+    let value12 = `${$dataSkills[skillId].name}`;
+    value12 = value12.replace("＜ON＞", "");
+    value12 = value12.replace("＜OFF＞", "");
+    value1 = `\\C[1]＜${value12}＞\\C[0]熟練度\\C[10]\\V[203]\\C[0]獲得！`;
+  }
+}
+
+let id4 = skillMasteryLevel;
+if(id4 == 0){id4 = 1}
+else if(id3 == 10 || id3 == 141){
   if(actor.isLearnedSkill(799)){
-    var id4 = id4 * 10;
+    id4 = id4 * 10;
   };
 };
+
+let value2 = `　`;
 if(id3 >= 1){
+  let item;
+  if(itemType == 0){item = $dataItems};
+  if(itemType == 1){item = $dataWeapons};
+  if(itemType == 2){item = $dataArmors};
   if(itemType == 3){
-    var id3 = id3 * id4;
+    id3 = id3 * id4;
     $gameParty.gainGold(id3);
-    var value2 = `\\C[3]小銭を拾った。（+\\C[10]${id3}\\C[0]\\G）`;
+    value2 = `\\C[3]小銭を拾った。（+\\C[10]${id3}\\C[0]\\G）`;
   } else {
     $gameParty.gainItem(item[id3],id4);
-    var value2 = `\\C[3]\x1bI[${item[id3].iconIndex}]${item[id3].name}\\C[0]を\\C[10]${id4}\\C[0]個入手した。`;
+    value2 = `\\C[3]\x1bI[${item[id3].iconIndex}]${item[id3].name}\\C[0]を\\C[10]${id4}\\C[0]個入手した。`;
   };
 };
 CommonPopupManager.showInfo({},value2 + value1,null);
-if(actor.isLearnedSkill(value3)){
-  valueScriptArray1 = [$gameVariables.value(11),value11,value3];
+if(isLearnedSkill){
+  valueScriptArray1 = [$gameVariables.value(11),skillLevel,skillId];
 } else {
   valueScriptArray1 = [$gameVariables.value(11),0,0];
-};
+}
 
-};
+}
+
 //熟練度上昇拾得物。後半
 item_getSkillLevel2 = function(){
 
-var actor = $gameActors.actor(valueScriptArray1[0]);
-var value11 = valueScriptArray1[1];
-var value3 = valueScriptArray1[2];
-if(value3 >= 1){
-  if(actor.isLearnedSkill(value3) && actor.skillMasteryLevel(value3) >= 0){
-    if(6 == Number($dataSkills[value3].meta['Max Mastery Level'])){
-      if(actor.skillMasteryLevel(value3) <= 1){var value4 = `\\C[4][E]\\C[0]`};
-      if(actor.skillMasteryLevel(value3) == 2){var value4 = `\\C[12][D]\\C[0]`};
-      if(actor.skillMasteryLevel(value3) == 3){var value4 = `\\C[5][C]\\C[0]`};
-      if(actor.skillMasteryLevel(value3) == 4){var value4 = `\\C[13][B]\\C[0]`};
-      if(actor.skillMasteryLevel(value3) == 5){var value4 = `\\C[27][A]\\C[0]`};
-      if(actor.skillMasteryLevel(value3) == 6){var value4 = `\\C[30][S]\\C[0]`};
-    } else {
-      if(actor.skillMasteryLevel(value3) <= 1){var value4 = `\\C[4][D]\\C[0]`};
-      if(actor.skillMasteryLevel(value3) == 2){var value4 = `\\C[12][C]\\C[0]`};
-      if(actor.skillMasteryLevel(value3) == 3){var value4 = `\\C[5][B]\\C[0]`};
-      if(actor.skillMasteryLevel(value3) == 4){var value4 = `\\C[13][A]\\C[0]`};
-      if(actor.skillMasteryLevel(value3) == 5){var value4 = `\\C[27][S]\\C[0]`};
-    //if(actor.skillMasteryLevel(value3) == 6){var value4 = `\\C[30][S]\\C[0]`};
-    };
-    var value1 = `${$dataSkills[value3].name + value4}　Uses:\\C[2]${actor.skillMasteryUses(value3)}\\C[0]／${actor.skillMasteryUsageMax(value3)}`;
-    if(actor.skillMasteryLevel(value3) == Number($dataSkills[value3].meta['Max Mastery Level'])){
-      var value1 = `${$dataSkills[value3].name + value4} \\C[10]Complete!\\C[0]`;
-    };
-    CommonPopupManager.showInfo({},value1,null);
-  };
-  if(value11 >= 1 && actor.skillMasteryLevel(value3) > value11){
-    $gameSwitches.setValue(133,true);
-    var value12 = `${$dataSkills[value3].name}`;
-    var value12 = value12.replace("＜ON＞", "");
-    var value12 = value12.replace("＜OFF＞", "");
-    if(actor.skillMasteryLevel(value3) == Number($dataSkills[value3].meta['Max Mastery Level'])){
-      valueWordSet1 = `${actor.name()}の\\C[1]＜${value12}＞\\C[0]がカンストした！`;
-    } else {
-      valueWordSet1 = `${actor.name()}の\\C[1]＜${value12}＞\\C[0]が${value4}にランクアップ！`;
-    };
-  };
-};
+  const skillId = valueScriptArray1[2];
+  if (skillId < 1) return;
 
-};
+  const actor = $gameActors.actor(valueScriptArray1[0]);
+  const skill = $dataSkills[skillId];
+  const skillMasteryLevel = actor.skillMasteryLevel(skillId);
+  if(actor.isLearnedSkill(skillId) && skillMasteryLevel >= 0){
+    let maxSkillMasteryLevel = Number(skill.meta['Max Mastery Level']);
+    const skillRarity = get_skill_rarity(skillMasteryLevel, maxSkillMasteryLevel);
+    const skillRarityName = `${skill.name + skillRarity}`;
+    const skillUses = `\\C[2]${actor.skillMasteryUses(skillId)}\\C[0]`;
+    const skillUsageMax = `\\C[2]${actor.skillMasteryUsageMax(skillId)}\\C[0]`;
+    let infoMessageText = `${skillRarityName}　Uses:${skillUses}／${skillUsageMax}`;
+    if (skillMasteryLevel == maxSkillMasteryLevel){
+      infoMessageText = `${skillRarityName} \\C[10]Complete!\\C[0]`;
+    };
+    CommonPopupManager.showInfo({},infoMessageText,null);
+  };
+
+  const lastSkillMasteryLevel = valueScriptArray1[1];
+  if (lastSkillMasteryLevel >= 1 && skillMasteryLevel > lastSkillMasteryLevel){
+    $gameSwitches.setValue(133,true);
+    let skillName = `${skill.name}`;
+    skillName = skillName.replace("＜ON＞", "");
+    skillName = skillName.replace("＜OFF＞", "");
+    skillName = `\\C[1]＜${skillName}＞\\C[0]`;
+    if (skillMasteryLevel == maxSkillMasteryLevel){
+      valueWordSet1 = `${actor.name()}の${skillName}がカンストした！`;
+    } else {
+      valueWordSet1 = `${actor.name()}の${skillName}が${skillRarity}にランクアップ！`;
+    }
+  }
+}
+
+const skillMasteryLevelRarityMarks = [`\\C[4][E]\\C[0]`, `\\C[4][E]\\C[0]`, `\\C[12][D]\\C[0]`, `\\C[5][C]\\C[0]`, `\\C[13][B]\\C[0]`, `\\C[27][A]\\C[0]`, `\\C[30][S]\\C[0]`];
+get_skill_rarity = function (skillMasteryLevel, maxSkillMasteryLevel){
+
+  let skillRarityIndex = skillMasteryLevel;
+  if (maxSkillMasteryLevel < 6) skillRarityIndex++;
+  if (skillRarityIndex >= skillMasteryLevelRarityMarks.length) skillRarityIndex = skillMasteryLevelRarityMarks.length - 1;
+
+  return skillMasteryLevelRarityMarks[skillRarityIndex];
+}
 
 //アイテム使用で熟練度アップ
 item_skilljukurenndoup = function(id1){

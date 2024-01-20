@@ -262,8 +262,9 @@ Game_Map.prototype.updateEvents = function() {
 //   if($gameMap.event(eventId)) $gameMap.event(eventId).refresh();
 //};
 
+const ARRAY_1to15 = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15];
 Window_SkillType.prototype.updateHelp = function() {
-  var itemdata = $dataWeapons[[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15][this.currentExt() - 1]]; //アイテムIDのデータを拾って
+  const itemdata = $dataWeapons[ARRAY_1to15[this.currentExt() - 1]]; //アイテムIDのデータを拾って
   this._helpWindow.setItem(itemdata) //ヘルプウィンドウに表示させる
 };
 
@@ -304,15 +305,14 @@ Game_Unit.prototype.luklity = function() {
     return sum / members.length;
 };
 
-  const SWITCH_ID = 111;
-  const SWITCH_ID2 = 400;
-
   const _Window_EventItem_start = Window_EventItem.prototype.start;
   Window_EventItem.prototype.start = function () {
     this.initializeWidth();
     _Window_EventItem_start.call(this);
   };
 
+  const SWITCH_ID = 111;
+  const SWITCH_ID2 = 400;
   Window_EventItem.prototype.initializeWidth = function () {
     if (this.isDefaultSize() && $gameSwitches.value(SWITCH_ID)) {
       this.width = this.defaultWidth()/2-$gameVariables.value(338);
