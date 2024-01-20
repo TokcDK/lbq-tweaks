@@ -3154,7 +3154,7 @@ item_gachaitiran1 = function(id2){
 let choiceIndex = 1;
 let value14 = 1;
 
-const gameVar801 = $gameVariables.value(801)
+const info = $gameVariables.value(801)
 for (var j = 0; j <= 2; j++) {
 
   valueItems = j == 0 ? $dataItems : j == 1 ? $dataWeapons : $dataArmors; // 2=armors
@@ -3195,7 +3195,7 @@ for (var j = 0; j <= 2; j++) {
       $gameScreen.dWindowFrame = 'ON';
       $gameScreen.showPicture(value14 + 100, '', 0, 20, 10, 100, 100, 0, 0);
       $gameMessage.setSelectPictureId(choiceIndex, value14 + 100);
-      const message = `　　　　　　\\C[14]──詳細情報──\\C[0]　　　　　　　　\n${gameVar801}`;
+      const message = `　　　　　　\\C[14]──詳細情報──\\C[0]　　　　　　　　\n${info}`;
       $gameScreen.setDTextPicture(message, 28);
       $gameScreen.dWindowFrame = 'ON';
       $gameScreen.showPicture(value14 + 100 + 1, '', 0, 640, 110, 100, 100, 0, 0);
