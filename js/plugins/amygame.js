@@ -3154,6 +3154,7 @@ item_gachaitiran1 = function(id2){
 let choiceIndex = 1;
 let value14 = 1;
 
+const gameVar801 = $gameVariables.value(801)
 for (var j = 0; j <= 2; j++) {
 
   valueItems = j == 0 ? $dataItems : j == 1 ? $dataWeapons : $dataArmors; // 2=armors
@@ -3162,40 +3163,46 @@ for (var j = 0; j <= 2; j++) {
     for (var i = start; i <= end; i++) {
       let value11 = 0;
       const valueItem = valueItems[i];
-        if(valueItem.meta['LotteryRearity']){
-          if(Number(valueItem.meta['LotteryRearity']) == id2){
-            if(valueItem.meta['Max Item']){
-              if(Number(valueItem.meta['Max Item']) == 1 && $gameParty.hasItem(valueItem)){
-                value11 = 1;
-            }};
-            if(valueItem.meta['GatchaHasRange']){
-              if(!$gameParty.hasItem(valueItem)){
-                value11 = 1;
-            }};
-            if(valueItem.meta['GatchaOutOfRange']){
-              value11 = 1;
-            };
-              if(value11 == 0){
-                var descriptionText = `${valueItem.description}`;
-                item_priceinfo(j,i);
-                const id = 1; 
-                var itemName = `\x1bI[${valueItem.iconIndex}]${valueItem.name}`;
-                const choiceParams = {
-                text: `${itemName}`,
-                value: choiceIndex};
-                $gameSystem.addCustomChoice(id, choiceParams);
-                $gameScreen.setDTextPicture(descriptionText, 28);
-                $gameScreen.dWindowFrame = 'ON';
-                $gameScreen.showPicture(value14 + 100,'',0,20,10,100,100,0,0);
-                $gameMessage.setSelectPictureId(choiceIndex, value14 + 100);
-                var message = `　　　　　　\\C[14]──詳細情報──\\C[0]　　　　　　　　\n${$gameVariables.value(801)}`;
-                $gameScreen.setDTextPicture(message, 28);
-                $gameScreen.dWindowFrame = 'ON';
-                $gameScreen.showPicture(value14 + 100 + 1,'',0,640,110,100,100,0,0);
-                $gameMessage.setSelectPictureId(choiceIndex, value14 + 100 + 1);
-                choiceIndex += 1;
-                value14 += 2;
-    }}}};
+      if(!valueItem.meta['LotteryRearity']) continue;
+
+      if (Number(valueItem.meta['LotteryRearity']) !== id2) continue;
+
+      if (valueItem.meta['Max Item']) {
+        if (Number(valueItem.meta['Max Item']) == 1 && $gameParty.hasItem(valueItem)) {
+          value11 = 1;
+        }
+      };
+      if (valueItem.meta['GatchaHasRange']) {
+        if (!$gameParty.hasItem(valueItem)) {
+          value11 = 1;
+        }
+      };
+      if (valueItem.meta['GatchaOutOfRange']) {
+        value11 = 1;
+      };
+      if (value11 !== 0) continue;
+
+      const descriptionText = `${valueItem.description}`;
+      item_priceinfo(j, i);
+      const id = 1;
+      const itemName = `\x1bI[${valueItem.iconIndex}]${valueItem.name}`;
+      const choiceParams = {
+        text: `${itemName}`,
+        value: choiceIndex
+      };
+      $gameSystem.addCustomChoice(id, choiceParams);
+      $gameScreen.setDTextPicture(descriptionText, 28);
+      $gameScreen.dWindowFrame = 'ON';
+      $gameScreen.showPicture(value14 + 100, '', 0, 20, 10, 100, 100, 0, 0);
+      $gameMessage.setSelectPictureId(choiceIndex, value14 + 100);
+      const message = `　　　　　　\\C[14]──詳細情報──\\C[0]　　　　　　　　\n${gameVar801}`;
+      $gameScreen.setDTextPicture(message, 28);
+      $gameScreen.dWindowFrame = 'ON';
+      $gameScreen.showPicture(value14 + 100 + 1, '', 0, 640, 110, 100, 100, 0, 0);
+      $gameMessage.setSelectPictureId(choiceIndex, value14 + 100 + 1);
+      choiceIndex += 1;
+      value14 += 2;
+    }
 };
 
 };
