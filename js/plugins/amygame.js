@@ -3069,15 +3069,14 @@ if(valueGachaId >= 1){
 
 //アイテム武器防具抽選スクリプト。id12アイテム1武器2防具3all
 //id13がall。10まで。value1としてid決定
-gacha_naiyou = function(id12,id13){
+gacha_naiyou = function(valueItemsType,id13){
 
-if (id12 && id12 > -1 && id12 < 3) {
-  valueItems = get_valueItems_iwa(id12);
+if (valueItemsType && valueItemsType > -1 && valueItemsType < 3) {
+  valueItems = get_valueItems_iwa(valueItemsType);
 }
 else {
-  let value6 = Math.floor(Math.random() * 11);
-  if (value6 > 2) value6 = 2;
-  valueItems = get_valueItems_iwa(id12);
+  const valueItemsTypeRnd = Math.floor(Math.random() * 11);
+  valueItems = get_valueItems_iwa(valueItemsTypeRnd > 1 ? 2 : valueItemsTypeRnd);
 }
 
 if(id13 >= 1){
