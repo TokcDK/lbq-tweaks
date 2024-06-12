@@ -5022,149 +5022,165 @@ if($gameVariables.value(183)[value1] == 0){
 //リセット時に実行
 reset_exe1 = function(){
 
-for (var i = 401; i <= $dataSystem.switches.length-1; i++) {
-  var value1 = $dataSystem.switches[i];
+const gameSwitches = $gameSwitches;
+const gameVariables = $gameVariables;
+const gameParty = $gameParty;
+const gameActors = $gameActors;
+
+const dataSystem = $dataSystem;
+const dataSystemSwitches = dataSystem.switches;
+const dataSystemVariables = $dataSystem.variables;
+const dataSystemSwitchesCount = dataSystemSwitches.length;
+const dataSystemVariablesCount = dataSystemVariables.length;
+const dataSkills = $dataSkills;
+const dataSkillsCount = dataSkills.length;
+const dataItems = $dataItems;
+const dataItemsCount = dataItems.length;
+const dataWeapons = $dataWeapons;
+const dataWeaponsCount = dataWeapons.length;
+const dataArmors = $dataArmors;
+//const dataArmorsCount = dataArmors.length;
+const dataStates = $dataStates;
+const dataStatesCount = dataStates.length;
+
+for (let i = 401; i < dataSystemSwitchesCount; i++) {
+  const value1 = dataSystemSwitches[i];
   if( value1.match(/NoReset/) || value1.match(/QReset/) || value1.match(/OReset/) || value1.match(/SReset/) ){}else{
-    $gameSwitches.setValue(i,false);
+    gameSwitches.setValue(i,false);
 }};
-for (var i = 501; i <= $dataSystem.variables.length-1; i++) {
-  var value1 = $dataSystem.variables[i];
+for (let i = 501; i < dataSystemVariablesCount; i++) {
+  const value1 = dataSystemVariables[i];
   if( value1.match(/NoReset/) || value1.match(/QReset/) || value1.match(/OReset/) || value1.match(/SReset/) ){}else{
-    $gameVariables.setValue(i,0);
+    gameVariables.setValue(i,0);
 }};
-if($gameVariables.value(183)[1] == 0){
-  for (var i = 1; i <= $dataSystem.switches.length-1; i++) {
-    if($dataSystem.switches[i].match(/シーン達成/) || $dataSystem.switches[i].match(/SReset/)){
-      $gameSwitches.setValue(i,false);
+if(gameVariables.value(183)[1] == 0){
+  for (let i = 1; i < dataSystemSwitchesCount; i++) {
+    if(dataSystemSwitches[i].match(/シーン達成/) || dataSystemSwitches[i].match(/SReset/)){
+      gameSwitches.setValue(i,false);
   }};
-  for (var i = 1; i <= $dataSystem.variables.length-1; i++) {
-    if($dataSystem.variables[i].match(/シーン達成/) || $dataSystem.variables[i].match(/SReset/)){
-      $gameVariables.setValue(i,0);
+  for (let i = 1; i < dataSystemVariablesCount; i++) {
+    if(dataSystemVariables[i].match(/シーン達成/) || dataSystemVariables[i].match(/SReset/)){
+      gameVariables.setValue(i,0);
   }};
-  for (var i = 1; i <= $dataSkills.length-1; i++) {
-    if($dataSkills[i].meta['SceneFactorClearReset']){
-      for (var j = $gameVariables.value(75); j <= $gameVariables.value(76); j++) {
-        var actor = $gameActors.actor(j);
+  for (let i = 1; i < dataSkillsCount; i++) {
+    if(dataSkills[i].meta['SceneFactorClearReset']){
+      for (let j = gameVariables.value(75); j <= gameVariables.value(76); j++) {
+        const actor = gameActors.actor(j);
         if(actor.isLearnedSkill(i)){
-          if($dataSkills[i].meta['Max Mastery Level']){
+          if(dataSkills[i].meta['Max Mastery Level']){
             actor.setSkillMasteryLevel(i, 0);
           };
           actor.forgetSkill(i);
   }}}};
-  for (var i = 1; i <= $dataStates.length-1; i++) {
-    if($dataSkills[i].meta['SceneFactorClearReset']){
-      for (var j = $gameVariables.value(75); j <= $gameVariables.value(76); j++) {
-        var actor = $gameActors.actor(j);
+  for (let i = 1; i < dataStatesCount; i++) {
+    if(dataSkills[i].meta['SceneFactorClearReset']){
+      for (let j = gameVariables.value(75); j <= gameVariables.value(76); j++) {
+        const actor = gameActors.actor(j);
         if(actor.isStateAffected(i)){
           actor.removeState(i);
   }}}};
-  for (var i = 1; i <= $dataItems.length-1; i++) {
-    if($dataItems[i].meta['DungeonInformation']){
-      $gameParty.gainItem($dataItems[i], -9999);
+  for (let i = 1; i <= dataItems.length-1; i++) {
+    if(dataItems[i].meta['DungeonInformation']){
+      gameParty.gainItem(dataItems[i], -9999);
     };
-    if($dataItems[i].meta['SceneFactorClearReset']){
-      $gameParty.gainItem($dataItems[i], -9999);
-    };
-  };
-  const dataWeaponsCount = $dataWeapons.length;
-  for (var i = 1; i < dataWeaponsCount; i++) {
-    if($dataWeapons[i].meta['SceneFactorClearReset']){
-      $gameParty.gainItem($dataWeapons[i], -9999);
+    if(dataItems[i].meta['SceneFactorClearReset']){
+      gameParty.gainItem(dataItems[i], -9999);
     };
   };
-  for (var i = 1; i <= valueArmorsLength; i++) {
-    if($dataArmors[i].meta['SceneFactorClearReset']){
-      $gameParty.gainItem($dataArmors[i], -9999);
+  for (let i = 1; i < dataWeaponsCount; i++) {
+    if(dataWeapons[i].meta['SceneFactorClearReset']){
+      gameParty.gainItem(dataWeapons[i], -9999);
+    };
+  };
+  for (let i = 1; i <= valueArmorsLength; i++) {
+    if(dataArmors[i].meta['SceneFactorClearReset']){
+      gameParty.gainItem(dataArmors[i], -9999);
   }};
 };
-const dataSystemSwitchesCount = $dataSystem.switches.length;
-const dataSystemVariablesCount = $dataSystem.variables.length;
-if($gameVariables.value(183)[2] == 0){
-  for (var i = 1; i < dataSystemSwitchesCount; i++) {
-    if($dataSystem.switches[i].match(/挿話達成/) || $dataSystem.switches[i].match(/OReset/)){
-      $gameSwitches.setValue(i,false);
+if(gameVariables.value(183)[2] == 0){
+  for (let i = 1; i < dataSystemSwitchesCount; i++) {
+    if(dataSystemSwitches[i].match(/挿話達成/) || dataSystemSwitches[i].match(/OReset/)){
+      gameSwitches.setValue(i,false);
   }};
-  for (var i = 1; i < dataSystemVariablesCount; i++) {
-    if($dataSystem.variables[i].match(/挿話達成/) || $dataSystem.variables[i].match(/OReset/)){
-      $gameVariables.setValue(i,0);
+  for (let i = 1; i < dataSystemVariablesCount; i++) {
+    if(dataSystemVariables[i].match(/挿話達成/) || dataSystemVariables[i].match(/OReset/)){
+      gameVariables.setValue(i,0);
   }};
 };
-const dataItemsCount = $dataItems.length;
-if($gameVariables.value(183)[3] == 0){
-  for (var i = 1; i < dataItemsCount; i++) {
-    if($dataItems[i].meta['EICSwitch']){
-      if(Number($dataItems[i].meta['EICSwitch']) == 103){
-        $gameParty.gainItem($dataItems[i], -1);
+if(gameVariables.value(183)[3] == 0){
+  for (let i = 1; i < dataItemsCount; i++) {
+    if(dataItems[i].meta['EICSwitch']){
+      if(Number(dataItems[i].meta['EICSwitch']) == 103){
+        gameParty.gainItem(dataItems[i], -1);
 }}}};
-if($gameVariables.value(183)[4] == 0){
-  for (var i = 1; i < dataItemsCount; i++) {
-    if($dataItems[i].meta['EICSwitch']){
-      if(Number($dataItems[i].meta['EICSwitch']) == 102){
-        $gameParty.gainItem($dataItems[i], -1);
+if(gameVariables.value(183)[4] == 0){
+  for (let i = 1; i < dataItemsCount; i++) {
+    if(dataItems[i].meta['EICSwitch']){
+      if(Number(dataItems[i].meta['EICSwitch']) == 102){
+        gameParty.gainItem(dataItems[i], -1);
 }}}};
-if($gameVariables.value(183)[5] == 0){
-  for (var i = 1; i < dataItemsCount; i++) {
-    if($dataItems[i].meta['SG種別']){
-      if(Number($dataItems[i].meta['SG種別']) == 1){
-        $gameParty.gainItem($dataItems[i], -1);
+if(gameVariables.value(183)[5] == 0){
+  for (let i = 1; i < dataItemsCount; i++) {
+    if(dataItems[i].meta['SG種別']){
+      if(Number(dataItems[i].meta['SG種別']) == 1){
+        gameParty.gainItem(dataItems[i], -1);
   }}};
-  for (var i = 1; i < dataSystemSwitchesCount; i++) {
-    if($dataSystem.switches[i].match(/QReset/)){
-      $gameSwitches.setValue(i,false);
+  for (let i = 1; i < dataSystemSwitchesCount; i++) {
+    if(dataSystemSwitches[i].match(/QReset/)){
+      gameSwitches.setValue(i,false);
   }};
-  for (var i = 1; i < dataSystemVariablesCount; i++) {
-    if($dataSystem.variables[i].match(/QReset/)){
-      $gameVariables.setValue(i,0);
+  for (let i = 1; i < dataSystemVariablesCount; i++) {
+    if(dataSystemVariables[i].match(/QReset/)){
+      gameVariables.setValue(i,0);
   }};
 };
-if($gameVariables.value(183)[6] == 0){
-  $gameVariables.setValue(52,Array(1001).fill(0));
+if(gameVariables.value(183)[6] == 0){
+  gameVariables.setValue(52,Array(1001).fill(0));
 };
-if($gameVariables.value(183)[7] == 0){
-  for (var i = 1; i < dataItemsCount; i++) {
-    if($dataItems[i].meta['BattleMapInformation']){
-      $gameParty.gainItem($dataItems[i], -9999);
+if(gameVariables.value(183)[7] == 0){
+  for (let i = 1; i < dataItemsCount; i++) {
+    if(dataItems[i].meta['BattleMapInformation']){
+      gameParty.gainItem(dataItems[i], -9999);
 }}};
-const var75 = $gameVariables.value(75);
-const var76 = $gameVariables.value(76);
-if($gameVariables.value(183)[8] == 0){
-  $gameParty.clearRecord();
-  for (var j = var75; j <= var76; j++) {
-    var actor = $gameActors.actor(j);
-    actor.clearBattleRecord();
+const var75 = gameVariables.value(75);
+const var76 = gameVariables.value(76);
+if(gameVariables.value(183)[8] == 0){
+  gameParty.clearRecord();
+  for (let j = var75; j <= var76; j++) {
+    gameActors.actor(j).clearBattleRecord();
   };
 };
 //<EventFactorClearReset>
-for (var i = 1; i <= $dataSkills.length-1; i++) {
-  if($dataSkills[i].meta['EventFactorClearReset']){
-    for (var j = var75; j <= var76; j++) {
-      var actor = $gameActors.actor(j);
+for (let i = 1; i < dataSkillsCount; i++) {
+  if(dataSkills[i].meta['EventFactorClearReset']){
+    for (let j = var75; j <= var76; j++) {
+      const actor = gameActors.actor(j);
       if(actor.isLearnedSkill(i)){
-        if($dataSkills[i].meta['Max Mastery Level']){
+        if(dataSkills[i].meta['Max Mastery Level']){
           actor.setSkillMasteryLevel(i, 0);
         };
         actor.forgetSkill(i);
       };
 }}};
-for (var i = 1; i <= $dataStates.length-1; i++) {
-  if($dataStates[i].meta['EventFactorClearReset']){
-    for (var j = var75; j <= var76; j++) {
-      var actor = $gameActors.actor(j);
+for (let i = 1; i < dataStatesCount; i++) {
+  if(dataStates[i].meta['EventFactorClearReset']){
+    for (let j = var75; j <= var76; j++) {
+      const actor = gameActors.actor(j);
       if(actor.isStateAffected(i)){
         actor.removeState(i);
       };
 }}};
-for (var i = 1; i <= $dataItems.length-1; i++) {
-  if($dataItems[i].meta['EventFactorClearReset']){
-    $gameParty.gainItem($dataItems[i], -9999);
+for (let i = 1; i < dataItemsCount; i++) {
+  if(dataItems[i].meta['EventFactorClearReset']){
+    gameParty.gainItem(dataItems[i], -9999);
 }};
-for (var i = 1; i <= $dataWeapons.length-1; i++) {
-  if($dataWeapons[i].meta['EventFactorClearReset']){
-    $gameParty.gainItem($dataWeapons[i], -9999);
+for (let i = 1; i < dataWeaponsCount; i++) {
+  if(dataWeapons[i].meta['EventFactorClearReset']){
+    gameParty.gainItem(dataWeapons[i], -9999);
 }};
-for (var i = 1; i <= valueArmorsLength; i++) {
-  if($dataArmors[i].meta['EventFactorClearReset']){
-    $gameParty.gainItem($dataArmors[i], -9999);
+for (let i = 1; i <= valueArmorsLength; i++) {
+  if(dataArmors[i].meta['EventFactorClearReset']){
+    gameParty.gainItem(dataArmors[i], -9999);
 }};
 
 };
