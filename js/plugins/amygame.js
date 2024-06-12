@@ -5066,7 +5066,8 @@ if($gameVariables.value(183)[1] == 0){
       $gameParty.gainItem($dataItems[i], -9999);
     };
   };
-  for (var i = 1; i <= $dataWeapons.length-1; i++) {
+  const dataWeaponsCount = $dataWeapons.length;
+  for (var i = 1; i < dataWeaponsCount; i++) {
     if($dataWeapons[i].meta['SceneFactorClearReset']){
       $gameParty.gainItem($dataWeapons[i], -9999);
     };
@@ -5076,39 +5077,42 @@ if($gameVariables.value(183)[1] == 0){
       $gameParty.gainItem($dataArmors[i], -9999);
   }};
 };
+const dataSystemSwitchesCount = $dataSystem.switches.length;
+const dataSystemVariablesCount = $dataSystem.variables.length;
 if($gameVariables.value(183)[2] == 0){
-  for (var i = 1; i <= $dataSystem.switches.length-1; i++) {
+  for (var i = 1; i < dataSystemSwitchesCount; i++) {
     if($dataSystem.switches[i].match(/挿話達成/) || $dataSystem.switches[i].match(/OReset/)){
       $gameSwitches.setValue(i,false);
   }};
-  for (var i = 1; i <= $dataSystem.variables.length-1; i++) {
+  for (var i = 1; i < dataSystemVariablesCount; i++) {
     if($dataSystem.variables[i].match(/挿話達成/) || $dataSystem.variables[i].match(/OReset/)){
       $gameVariables.setValue(i,0);
   }};
 };
+const dataItemsCount = $dataItems.length;
 if($gameVariables.value(183)[3] == 0){
-  for (var i = 1; i <= $dataItems.length-1; i++) {
+  for (var i = 1; i < dataItemsCount; i++) {
     if($dataItems[i].meta['EICSwitch']){
       if(Number($dataItems[i].meta['EICSwitch']) == 103){
         $gameParty.gainItem($dataItems[i], -1);
 }}}};
 if($gameVariables.value(183)[4] == 0){
-  for (var i = 1; i <= $dataItems.length-1; i++) {
+  for (var i = 1; i < dataItemsCount; i++) {
     if($dataItems[i].meta['EICSwitch']){
       if(Number($dataItems[i].meta['EICSwitch']) == 102){
         $gameParty.gainItem($dataItems[i], -1);
 }}}};
 if($gameVariables.value(183)[5] == 0){
-  for (var i = 1; i <= $dataItems.length-1; i++) {
+  for (var i = 1; i < dataItemsCount; i++) {
     if($dataItems[i].meta['SG種別']){
       if(Number($dataItems[i].meta['SG種別']) == 1){
         $gameParty.gainItem($dataItems[i], -1);
   }}};
-  for (var i = 1; i <= $dataSystem.switches.length-1; i++) {
+  for (var i = 1; i < dataSystemSwitchesCount; i++) {
     if($dataSystem.switches[i].match(/QReset/)){
       $gameSwitches.setValue(i,false);
   }};
-  for (var i = 1; i <= $dataSystem.variables.length-1; i++) {
+  for (var i = 1; i < dataSystemVariablesCount; i++) {
     if($dataSystem.variables[i].match(/QReset/)){
       $gameVariables.setValue(i,0);
   }};
@@ -5117,13 +5121,15 @@ if($gameVariables.value(183)[6] == 0){
   $gameVariables.setValue(52,Array(1001).fill(0));
 };
 if($gameVariables.value(183)[7] == 0){
-  for (var i = 1; i <= $dataItems.length-1; i++) {
+  for (var i = 1; i < dataItemsCount; i++) {
     if($dataItems[i].meta['BattleMapInformation']){
       $gameParty.gainItem($dataItems[i], -9999);
 }}};
+const var75 = $gameVariables.value(75);
+const var76 = $gameVariables.value(76);
 if($gameVariables.value(183)[8] == 0){
   $gameParty.clearRecord();
-  for (var j = $gameVariables.value(75); j <= $gameVariables.value(76); j++) {
+  for (var j = var75; j <= var76; j++) {
     var actor = $gameActors.actor(j);
     actor.clearBattleRecord();
   };
@@ -5131,7 +5137,7 @@ if($gameVariables.value(183)[8] == 0){
 //<EventFactorClearReset>
 for (var i = 1; i <= $dataSkills.length-1; i++) {
   if($dataSkills[i].meta['EventFactorClearReset']){
-    for (var j = $gameVariables.value(75); j <= $gameVariables.value(76); j++) {
+    for (var j = var75; j <= var76; j++) {
       var actor = $gameActors.actor(j);
       if(actor.isLearnedSkill(i)){
         if($dataSkills[i].meta['Max Mastery Level']){
@@ -5142,7 +5148,7 @@ for (var i = 1; i <= $dataSkills.length-1; i++) {
 }}};
 for (var i = 1; i <= $dataStates.length-1; i++) {
   if($dataStates[i].meta['EventFactorClearReset']){
-    for (var j = $gameVariables.value(75); j <= $gameVariables.value(76); j++) {
+    for (var j = var75; j <= var76; j++) {
       var actor = $gameActors.actor(j);
       if(actor.isStateAffected(i)){
         actor.removeState(i);
@@ -5220,48 +5226,54 @@ WindowManager.show(1, 10, 100, 250, 668);
 WindowManager.drawText(1, value1);
 var value2 = 2;
 var value3 = 260;
-  for (var i = 0; i <= $gameParty.members().length-1; i++) {
+const dataSkillsCount = $dataSkills.length;
+const gamePartyMembersCount = $gameParty.members().length;
+const partyMembers = $gameParty.members();
+  for (var i = 0; i < gamePartyMembersCount; i++) {
     if(i == 4) break;
+	const valueBattleRecord_i = "valueBattleRecord_" + i;
     eval("valueBattleRecord_" + i + " = Array(21).fill(-1)");
-    var actor = $gameParty.members()[i];
-    eval("valueBattleRecord_" + i)[0] = `\\C[1]${actor.name()}\\C[0]\n`;
-    eval("valueBattleRecord_" + i)[1] = actor.getAllKillEnemyCounter();
-    eval("valueBattleRecord_" + i)[2] = actor.attackDamageMax;
-    eval("valueBattleRecord_" + i)[3] = actor.attackDamageSum;
-    eval("valueBattleRecord_" + i)[4] = $gameVariables.value(380 + actor.actorId())[68];
-    eval("valueBattleRecord_" + i)[5] = $gameVariables.value(380 + actor.actorId())[67] / 2;
-    eval("valueBattleRecord_" + i)[6] = actor.acceptDamageMax;
-    eval("valueBattleRecord_" + i)[7] = actor.acceptDamageSum;
-    eval("valueBattleRecord_" + i)[8] = actor.deadCounter;
-    eval("valueBattleRecord_" + i)[10] = `────`
-    for (var j = 11; j <= 17; j++) {eval("valueBattleRecord_" + i)[j] = 0};
-      for (var j = 1; j <= $dataSkills.length-1; j++) {
+    var actor = partyMembers[i];
+	const evalValueBattleRecord_i = eval("valueBattleRecord_" + i);
+    evalValueBattleRecord_i[0] = `\\C[1]${actor.name()}\\C[0]\n`;
+    evalValueBattleRecord_i[1] = actor.getAllKillEnemyCounter();
+    evalValueBattleRecord_i[2] = actor.attackDamageMax;
+    evalValueBattleRecord_i[3] = actor.attackDamageSum;
+    evalValueBattleRecord_i[4] = $gameVariables.value(380 + actor.actorId())[68];
+    evalValueBattleRecord_i[5] = $gameVariables.value(380 + actor.actorId())[67] / 2;
+    evalValueBattleRecord_i[6] = actor.acceptDamageMax;
+    evalValueBattleRecord_i[7] = actor.acceptDamageSum;
+    evalValueBattleRecord_i[8] = actor.deadCounter;
+    evalValueBattleRecord_i[10] = `────`
+    for (var j = 11; j <= 17; j++) {evalValueBattleRecord_i[j] = 0};
+      for (var j = 1; j < dataSkillsCount; j++) {
         if (!$dataSkills[j].name == '') {
-          if($dataSkills[j].stypeId == 2){eval("valueBattleRecord_" + i)[11] += actor.getSkillUseCounter(j)};
-          if($dataSkills[j].stypeId == 5){eval("valueBattleRecord_" + i)[12] += actor.getSkillUseCounter(j)};
-          if($dataSkills[j].stypeId == 6){eval("valueBattleRecord_" + i)[13] += actor.getSkillUseCounter(j)};
-          if($dataSkills[j].stypeId == 7){eval("valueBattleRecord_" + i)[14] += actor.getSkillUseCounter(j)};
-          if($dataSkills[j].stypeId == 8){eval("valueBattleRecord_" + i)[15] += actor.getSkillUseCounter(j)};
-          if($dataSkills[j].stypeId == 12){eval("valueBattleRecord_" + i)[16] += actor.getSkillUseCounter(j)};
-          if($dataSkills[j].stypeId == 13){eval("valueBattleRecord_" + i)[17] += actor.getSkillUseCounter(j)};
+		  const skillStypeId = $dataSkills[j].stypeId; 
+          if(skillStypeId == 2){evalValueBattleRecord_i[11] += actor.getSkillUseCounter(j)};
+          if(skillStypeId == 5){evalValueBattleRecord_i[12] += actor.getSkillUseCounter(j)};
+          if(skillStypeId == 6){evalValueBattleRecord_i[13] += actor.getSkillUseCounter(j)};
+          if(skillStypeId == 7){evalValueBattleRecord_i[14] += actor.getSkillUseCounter(j)};
+          if(skillStypeId == 8){evalValueBattleRecord_i[15] += actor.getSkillUseCounter(j)};
+          if(skillStypeId == 12){evalValueBattleRecord_i[16] += actor.getSkillUseCounter(j)};
+          if(skillStypeId == 13){evalValueBattleRecord_i[17] += actor.getSkillUseCounter(j)};
         };
       };
       for (var j = 1; j <= 20; j++) {
-        if(eval("valueBattleRecord_" + i)[j] != -1){
+        if(evalValueBattleRecord_i[j] != -1){
 　　  　 if(j >= 1 && j <= 8){
-           if(eval("valueBattleRecord_" + i)[j] >= 1 && eval("valueBattleRecord_" + i)[j] >= valueBattleRecordMVP[j]){
-             eval("valueBattleRecord_" + i)[0] += `\\I[676]\\C[2]`;
+           if(evalValueBattleRecord_i[j] >= 1 && evalValueBattleRecord_i[j] >= valueBattleRecordMVP[j]){
+             evalValueBattleRecord_i[0] += `\\I[676]\\C[2]`;
            };
          };
-          if(eval("valueBattleRecord_" + i)[j] >= 1000000000){
-            eval("valueBattleRecord_" + i)[0] += `\\fs[22]${eval("valueBattleRecord_" + i)[j].toLocaleString()}\\C[0]\\fs[28]\n`;
+          if(evalValueBattleRecord_i[j] >= 1000000000){
+            evalValueBattleRecord_i[0] += `\\fs[22]${evalValueBattleRecord_i[j].toLocaleString()}\\C[0]\\fs[28]\n`;
           } else {
-            eval("valueBattleRecord_" + i)[0] += `${eval("valueBattleRecord_" + i)[j].toLocaleString()}\\C[0]\n`;
+            evalValueBattleRecord_i[0] += `${evalValueBattleRecord_i[j].toLocaleString()}\\C[0]\n`;
           };
         };
       };
     WindowManager.show(value2, value3, 100, 250, 668);
-    WindowManager.drawText(value2, eval("valueBattleRecord_" + i)[0]);
+    WindowManager.drawText(value2, evalValueBattleRecord_i[0]);
     WindowManager.show(value2+1, value3+10+30, 20, 170, 80);
     WindowManager.drawPicture(value2+1, "/img/battlehud/Face_" + actor.actorId());
     value2 += 2;
