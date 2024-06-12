@@ -86,7 +86,8 @@ $gameVariables.setValue(215,Array(101).fill(0));
 $gameVariables.setValue(216,Array(101).fill(0));
 //ダンジョンワープ魔方陣指定
 $gameVariables.setValue(211,Array(101).fill(0));
-for(var i = 0; i <= 100; i++){$gameVariables.value(211)[i] = [0,0,0,0,0,0,0,0,0,0,0]};
+let defaultArray = Array(11).fill(0);
+for(var i = 0; i <= 100; i++){$gameVariables.value(211)[i] = [...defaultArray]};
 //監禁時にアクターの記憶配列。２次配列で記憶させる。0レアリティ1-10装備
 $gameVariables.setValue(333,Array(21).fill(0));
 //収集アイテム表示用配列
@@ -102,7 +103,8 @@ $gameVariables.setValue(160,Array(11).fill(0));
 //$gameVariables.setValue(287,Array(21).fill(0));
 var start = 0; 
 var end = 21; 
-for (var i = start; i <= end; i++) {$gameVariables.value(287)[i] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]};
+defaultArray = Array(11).fill(21);
+for (var i = start; i <= end; i++) {$gameVariables.value(287)[i] = [...defaultArray]};
 //マスターノート入手用配列↓21まで。1から始める//計20.
 $gameVariables.setValue(249,Array(20).fill(0));
 //訓練人形事前設定配列
