@@ -4110,54 +4110,52 @@ if(id1 == 2){
     $gameSwitches.setValue(value2,true);
   };
 } else {
+let actorIndex1;
+let actorIndexShift;
 if(id1 == 0){
-  var value3 = valueHeroineCoice.length-1;
-  var value4 = 0;
-  var value6 = +1;
+  actorIndex1 = valueHeroineCoice.length-1;
+  //var value4 = 0;
+  actorIndexShift = 1;
 } else {
-  var value3 = 0;
-  var value4 = valueHeroineCoice.length-1;
-  var value6 = -1;
+  actorIndex1 = 0;
+  //var value4 = valueHeroineCoice.length-1;
+  actorIndexShift = -1;
 };
-for (var i = 0; i <= valueHeroineCoice.length-1; i++) {
-  var value1 = valueHeroineCoice[i];
-    if(value1 == $gameVariables.value(value2)){
-      if(value1 == valueHeroineCoice[value3]){
+
+const trySetActorIndex = (index) => {
+	const actorIndex = valueHeroineCoice[index];
+	const actor = $gameActors.actor(actorIndex);
+	if(is_girl(actor)){
+	  $gameVariables.setValue(value2,actorIndex);
+	  return true;
+	};
+	return false;
+}
+
+  const len = valueHeroineCoice.length;
+  for (let i = 0; i < len; i++) {
+    const value1 = valueHeroineCoice[i];
+    if(value1 !== $gameVariables.value(value2)) continue;
+      if(value1 == valueHeroineCoice[actorIndex1]){
         if(id1 == 0){
-		  const len = valueHeroineCoice.length;
-          for (var j = 0; j < len; j++) {
-			const actorIndex = valueHeroineCoice[j];
-			const actor = $gameActors.actor(actorIndex);
-            if(is_girl(actor)){
-			  //$gameParty.members()[j].actorId()
-              $gameVariables.setValue(value2,actorIndex);
-              break;
-            };
-          };
+          for (var j = 0; j < len; j++) if(trySetActorIndex(j)) break;
           break;
-        };
-        if(id1 == 1){
+        }
+        else if(id1 == 1){
 		  const maxIndex = valueHeroineCoice.length-1;
-          for (var j = maxIndex; j >= 0 ; j--) {
-			const actorIndex = valueHeroineCoice[j];
-			const actor = $gameActors.actor(actorIndex);
-            if(is_girl(actor)){
-              $gameVariables.setValue(value2,actorIndex);
-              break;
-            };
-          };
+          for (var j = maxIndex; j >= 0 ; j--) if(trySetActorIndex(j)) break;
           break;
-        };
+        }
       } else {
-		const actorIndex = $gameActors.actor(valueHeroineCoice[i]).index() + value6;
+		const actorIndex = $gameActors.actor(valueHeroineCoice[i]).index() + actorIndexShift;
 		const actor = $gameParty.members()[actorIndex];
         if(is_girl(actor)){
           $gameVariables.setValue(value2,actor.actorId());
           break;
-        };
-      };
-}};
-};
+        }
+      }
+  }
+}
 
 };
 
