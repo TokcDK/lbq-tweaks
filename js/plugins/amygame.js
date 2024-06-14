@@ -3821,25 +3821,29 @@ if(valueItems.meta['BGM']){
 //サブクエなどのイベント開始と終了時スクリプト
 otherScene_StartEnd = function(id1,id2){
 
+const gameVariables = $gameVariables;
+const gameSwitches = $gameSwitches;
+const isInBattle = isInBattle;
+const gamePlayer = $gamePlayer;
 if(id1 == 1){
-  if($gameVariables.value(528) == 0){
-    $gamePlayer.setTransparent(true);
-    $gameVariables.setValue(292,Array(21).fill(0));
-    if(!$gameParty.inBattle()){$gameTemp.stopMapPlayerMovement()};
-    if(!$gameParty.inBattle()){$gamePlayer.setStealthMode(true)};
-    //$gameSwitches.setValue(71,true);//ﾌﾟﾚｲﾔ移動禁止
-    $gameSwitches.setValue(124,true);//イベント進行時onoff
-    $gameSwitches.setValue(468,true);//ﾏｯﾌﾟﾌｪｰﾄﾞと他イベント進行禁止
-    $gameSwitches.setValue(467,true);//NPC消滅スイッチon
-    if($gameVariables.value(320) == 0){
+  if(gameVariables.value(528) == 0){
+    gamePlayer.setTransparent(true);
+    gameVariables.setValue(292,Array(21).fill(0));
+    if(!isInBattle){$gameTemp.stopMapPlayerMovement()};
+    if(!isInBattle){gamePlayer.setStealthMode(true)};
+    //gameSwitches.setValue(71,true);//ﾌﾟﾚｲﾔ移動禁止
+    gameSwitches.setValue(124,true);//イベント進行時onoff
+    gameSwitches.setValue(468,true);//ﾏｯﾌﾟﾌｪｰﾄﾞと他イベント進行禁止
+    gameSwitches.setValue(467,true);//NPC消滅スイッチon
+    if(gameVariables.value(320) == 0){
       if(valueWeatherSceneSet != 0){
         for (var i = 13; i <= 15; i++) {
-          if($gameSwitches.value(i)){
-            $gameSwitches.setValue(i,false);
-            $gameVariables.setValue(320,i);
+          if(gameSwitches.value(i)){
+            gameSwitches.setValue(i,false);
+            gameVariables.setValue(320,i);
           };
         };
-        $gameSwitches.setValue(valueWeatherSceneSet,true);
+        gameSwitches.setValue(valueWeatherSceneSet,true);
       };
     };
     var array = $gameMap._commonEvents.filter(function (event) {
@@ -3847,54 +3851,60 @@ if(id1 == 1){
     }).map(function (event) {
         return event.event().id;
     });
-    for (var i = 0; i <= array.length-1; i++) {
+	const dataCommonEvents = $dataCommonEvents;
+	const eventsCount = array.length;
+    for (var i = 0; i < eventsCount; i++) {
+      const eventId = array[i];
       if(array[i] >= 2){
-        if($dataCommonEvents[array[i]].switchId){
-          $gameVariables.setValue(529,$dataCommonEvents[array[i]].switchId);
-    }}};
-    if($gameVariables.value(529) == 0){
-      var value1 = $gameVariables.value(201);
-      $gameVariables.setValue(529,$dataCommonEvents[value1].switchId);
+        if(dataCommonEvents[eventId].switchId){
+          gameVariables.setValue(529,dataCommonEvents[eventId].switchId);
+		}
+	  }
+	}
+    if(gameVariables.value(529) == 0){
+      gameVariables.setValue(529,dataCommonEvents[gameVariables.value(201)].switchId);
     };
   };
-};
-if(id1 == 0){
-  if($gameVariables.value(528) >= 101){
-    for (var i = 0; i <= $gameVariables.value(292).length-1; i++) {
-      if($gameVariables.value(292)[i] >= 1){
-        if(!!$gameMap.event($gameVariables.value(292)[i])) {
-          if(!$gameParty.inBattle()){$gameMap.eraseEvent($gameVariables.value(292)[i])};
+}
+else if(id1 == 0){
+  if(gameVariables.value(528) >= 101){
+	const max = gameVariables.value(292).length;
+	const gameMap = $gameMap;
+    for (var i = 0; i < max; i++) {
+      if(gameVariables.value(292)[i] >= 1){
+        if(!!gameMap.event(gameVariables.value(292)[i])) {
+          if(!isInBattle){gameMap.eraseEvent(gameVariables.value(292)[i])};
         };
       };
     };
-    if($gameVariables.value(320) >= 1){
+    if(gameVariables.value(320) >= 1){
       for (var i = 13; i <= 15; i++) {
-        $gameSwitches.setValue(i,false);
+        gameSwitches.setValue(i,false);
       };
-      $gameSwitches.setValue($gameVariables.value(320),true);
+      gameSwitches.setValue(gameVariables.value(320),true);
     };
-    $gameVariables.setValue(320,0);
-    $gameVariables.setValue(292,Array(21).fill(0));
-    if(!$gameParty.inBattle()){$gamePlayer.setStealthMode(false)};
-    if(!$gameParty.inBattle()){
-      $gamePlayer.setThrough(false);
+    gameVariables.setValue(320,0);
+    gameVariables.setValue(292,Array(21).fill(0));
+    if(!isInBattle){gamePlayer.setStealthMode(false)};
+    if(!isInBattle){
+      gamePlayer.setThrough(false);
       $gameTemp.allowMapPlayerMovement();
     };
-    //$gameSwitches.setValue(71,false);//ﾌﾟﾚｲﾔ移動禁止
-    $gameSwitches.setValue(124,false);//イベント進行時onoff
-    $gameSwitches.setValue(467,false);//NPC消滅スイッチoff。
-    $gameSwitches.setValue(506,false);//通行人消滅スイッチoff。任意
-    $gameSwitches.setValue(473,false);//天候反映なし。任意
-    $gameSwitches.setValue(468,false);//ﾏｯﾌﾟﾌｪｰﾄﾞと他イベント進行禁止
-    $gameSwitches.setValue(180,true);//自動実行トリガー
-    if(!$gameParty.inBattle()){
-      drowsepost.camera.zoom(1, 60, $gamePlayer);
-      $gamePlayer.setTransparent(false);
+    //gameSwitches.setValue(71,false);//ﾌﾟﾚｲﾔ移動禁止
+    gameSwitches.setValue(124,false);//イベント進行時onoff
+    gameSwitches.setValue(467,false);//NPC消滅スイッチoff。
+    gameSwitches.setValue(506,false);//通行人消滅スイッチoff。任意
+    gameSwitches.setValue(473,false);//天候反映なし。任意
+    gameSwitches.setValue(468,false);//ﾏｯﾌﾟﾌｪｰﾄﾞと他イベント進行禁止
+    gameSwitches.setValue(180,true);//自動実行トリガー
+    if(!isInBattle){
+      drowsepost.camera.zoom(1, 60, gamePlayer);
+      gamePlayer.setTransparent(false);
     };
     itemGet_afterProcess();
     fade_wipeDirect(1);
-    if($gameVariables.value(529) >= 2){
-      $gameSwitches.setValue($gameVariables.value(529),false);
+    if(gameVariables.value(529) >= 2){
+      gameSwitches.setValue(gameVariables.value(529),false);
     };
   };
 };
