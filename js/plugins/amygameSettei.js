@@ -496,6 +496,13 @@ amygame_elementIcon = function(valueElementIcon){
 
 })();
 
+pushArray = function(metaValue, targetArray){
+  if (metaValue) targetArray.push(...metaValue.split(','));
+}
+processMeta = function(condition, targetArray){
+  if (meta) targetArray.push(i);
+}
+	
 amygame_originalVal = function(){
 
 $gameScreen._tone_temp = 0;
@@ -506,7 +513,7 @@ item_addSynthesisHelp();
 const gameVariables = $gameVariables;
 gameVariables.setValue(202,[]);
 const dataMap = $dataMap;
-const dataMapLength = $dataMap.length; 
+const dataMapLength = dataMap.length; 
 for (let i = 1; i < dataMapLength; i++) {
   if(dataMap[i].meta['EventRespawnBan']){
     gameVariables.value(202).push(i);
@@ -561,20 +568,8 @@ for (let i = 1; i < dataSkillsCount; i++) {
   if(meta['HSkillLearn']){valueGetHskillLearn.push(i)};
   if(meta['PassiveElementP']){valuePassiveElementP.push(i)};
   if(meta['AddPowerCustom']){valueAddPowerCustomSkill.push(i)};
-  if(meta['Equip State']){
-    const arr1 = meta['Equip State'].split(',');
-	const len = arr1.length;
-    for (let j = 0; j < len; j++) {
-      valueEquipPassiveSkill.push(arr1[j]);
-    };
-  };
-  if(meta['Passive State']){
-    const arr1 = meta['Passive State'].split(',');
-	const len = arr1.length;
-    for (let j = 0; j < len; j++) {
-      valueEquipPassiveSkill.push(arr1[j]);
-    };
-  };
+  pushArray(meta['Equip State'], valueEquipPassiveSkill);
+  pushArray(meta['Passive State'], valueEquipPassiveSkill);
 };
 const dataItems = $dataItems;
 const dataItemsCount = dataItems.length;
@@ -596,39 +591,43 @@ for (let i = 1; i < dataWeaponsCount; i++) {
   const meta = dataWeapons[i].meta;
   if(meta['TownInformation']){valueJouhouTown.push(i)};
   if(meta['AddPowerCustom']){valueAddPowerCustomWeapon.push(i)};
-  if(meta['Equip State']){
-    const arr1 = meta['Equip State'].split(',');
-	const len = arr1.length;
-    for (let j = 0; j < len; j++) {
-      valueEquipPassiveWeapon.push(arr1[j]);
-    };
-  };
-  if(meta['Passive State']){
-    const arr1 = meta['Passive State'].split(',');
-	const len = arr1.length;
-    for (let j = 0; j < len; j++) {
-      valueEquipPassiveWeapon.push(arr1[j]);
-    };
-  };
+  pushArray(meta['Equip State'], valueEquipPassiveWeapon);
+  // if(meta['Equip State']){
+    // const arr1 = meta['Equip State'].split(',');
+	// const len = arr1.length;
+    // for (let j = 0; j < len; j++) {
+      // valueEquipPassiveWeapon.push(arr1[j]);
+    // };
+  // };
+  pushArray(meta['Passive State'], valueEquipPassiveWeapon);
+  // if(meta['Passive State']){
+    // const arr1 = meta['Passive State'].split(',');
+	// const len = arr1.length;
+    // for (let j = 0; j < len; j++) {
+      // valueEquipPassiveWeapon.push(arr1[j]);
+    // };
+  // };
 };
 const dataArmors = $dataArmors;
 for (let i = 1; i <= valueArmorsLength; i++) {
   const meta = dataArmors[i].meta;
   if(meta['AddPowerCustom']){valueAddPowerCustomArmor.push(i)};
-  if(meta['Equip State']){
-    const arr1 = meta['Equip State'].split(',');
-	const len = arr1.length;
-    for (let j = 0; j < len; j++) {
-      valueEquipPassiveArmor.push(arr1[j]);
-    };
-  };
-  if(meta['Passive State']){
-    const arr1 = meta['Passive State'].split(',');
-	const len = arr1.length;
-    for (let j = 0; j < len; j++) {
-      valueEquipPassiveArmor.push(arr1[j]);
-    };
-  };
+  pushArray(meta['Equip State'], valueEquipPassiveArmor);
+  pushArray(meta['Passive State'], valueEquipPassiveArmor);
+  // if(meta['Equip State']){
+    // const arr1 = meta['Equip State'].split(',');
+	// const len = arr1.length;
+    // for (let j = 0; j < len; j++) {
+      // valueEquipPassiveArmor.push(arr1[j]);
+    // };
+  // };
+  // if(meta['Passive State']){
+    // const arr1 = meta['Passive State'].split(',');
+	// const len = arr1.length;
+    // for (let j = 0; j < len; j++) {
+      // valueEquipPassiveArmor.push(arr1[j]);
+    // };
+  // };
 };
 
 };
