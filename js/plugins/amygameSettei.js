@@ -499,8 +499,8 @@ amygame_elementIcon = function(valueElementIcon){
 pushArray = function(metaValue, targetArray){
   if (metaValue) targetArray.push(...metaValue.split(','));
 }
-processMeta = function(condition, targetArray){
-  if (meta) targetArray.push(i);
+pushValid = function(condition, targetArray, i){
+  if (condition) targetArray.push(i);
 }
 	
 amygame_originalVal = function(){
@@ -523,51 +523,51 @@ const dataStates = $dataStates;
 const dataStatesCount = dataStates.length;
 for (let i = 1; i < dataStatesCount; i++) {
   const meta = dataStates[i].meta;
-  if(meta['HstateDisplaySet']){valueHstateDisplay.push(i)};
-  if(meta['BattleEndCoutaClearState']){valueStateBattleClear.push(i)};
-  if(meta['PartyGoldRate']){valueStatePartyGoldRate.push(i)};
-  if(meta['PartyExpRate']){valueStatePartyExpRate.push(i)};
-  if(meta['NameCondiAddState']){valueEnemyAddState.push(i)};//グラネームと同一のpush先
-  if(meta['GraphicNameCondiAddState']){valueEnemyAddState.push(i)};
-  if(meta['EnemyGoldRate']){valueStateEnemyGoldRate.push(i)};
-  if(meta['EnemyExpRate']){valueStateEnemyExpRate.push(i)};
-  if(meta['SubjugationPointItem']){valueStateGetItems.push(i)};
-  if(meta['HexpReflectionSkill']){valueHStatesUp3.push(i)};
-  if(meta['TachieChange']){valueTachieChangeState.push(i)};
-  if(meta['FaceChange']){valueFaceChangeState.push(i)};
-  if(meta['UniqueDrop']){valueEnemyDropAdd1.push(i)};
-  if(meta['classStateDrop']){valueClassStateA.push(i)};
-  if(meta['AddPowerCustom']){valueAddPowerCustomState.push(i)};
-  if(meta['TachieChangeStateTemporary']){valueTachieChangeStateTemporary.push(i)};
-  if(meta['stateAddState']){valueStateAddState.push(i)};
-  if(meta['SubjugationPoint']){valueSubjugationPoint.push(i)};
-  if(meta['CertainlyTriple']){valueCertainlyTriple.push(i)};
-  if(meta['CertainlyDouble']){valueCertainlyDouble.push(i)};
-  if(meta['NormalAttackHit']){valueNormalAttackHit.push(i)};
-  if(meta['AttackAbilityHit']){valueAttackAbilityHit.push(i)};
-  if(meta['BattleAddAttackSet']){valueBattleAddAttackSet.push(i)};//未使用
-  if(meta['DispelGuard']){valueDispelGuardState.push(i)};
+  pushValid(meta['HstateDisplaySet'], valueHstateDisplay, i);
+  pushValid(meta['BattleEndCoutaClearState'], valueStateBattleClear, i);
+  pushValid(meta['PartyGoldRate'], valueStatePartyGoldRate, i);
+  pushValid(meta['PartyExpRate'], valueStatePartyExpRate, i);
+  pushValid(meta['NameCondiAddState'], valueEnemyAddState, i);//グラネームと同一のpush先
+  pushValid(meta['GraphicNameCondiAddState'], valueEnemyAddState, i);
+  pushValid(meta['EnemyGoldRate'], valueStateEnemyGoldRate, i);
+  pushValid(meta['EnemyExpRate'], valueStateEnemyExpRate, i);
+  pushValid(meta['SubjugationPointItem'], valueStateGetItems, i);
+  pushValid(meta['HexpReflectionSkill'], valueHStatesUp3, i);
+  pushValid(meta['TachieChange'], valueTachieChangeState, i);
+  pushValid(meta['FaceChange'], valueFaceChangeState, i);
+  pushValid(meta['UniqueDrop'], valueEnemyDropAdd1, i);
+  pushValid(meta['classStateDrop'], valueClassStateA, i);
+  pushValid(meta['AddPowerCustom'], valueAddPowerCustomState, i);
+  pushValid(meta['TachieChangeStateTemporary'], valueTachieChangeStateTemporary, i);
+  pushValid(meta['stateAddState'], valueStateAddState, i);
+  pushValid(meta['SubjugationPoint'], valueSubjugationPoint, i);
+  pushValid(meta['CertainlyTriple'], valueCertainlyTriple, i);
+  pushValid(meta['CertainlyDouble'], valueCertainlyDouble, i);
+  pushValid(meta['NormalAttackHit'], valueNormalAttackHit, i);
+  pushValid(meta['AttackAbilityHit'], valueAttackAbilityHit, i);
+  pushValid(meta['BattleAddAttackSet'], valueBattleAddAttackSet, i);//未使用
+  pushValid(meta['DispelGuard'], valueDispelGuardState, i);
 
 };
 const dataSkills = $dataSkills;
 const dataSkillsCount = dataSkills.length;
 for (let i = 1; i < dataSkillsCount; i++) {
   const meta = dataSkills[i].meta;
-  if(meta['SwicthOnOffUse'] && meta['MCharacterLearn']){valuePersonalSkill.push(i)};
-  if(meta['SkillChangeName']){valueChangeSkill.push(i)};
-  if(meta['ValSkillChangeName']){valueVariablesChangeSkill.push(i)};
-  if(meta['MCharacterSkillLearnSwith']){valueHeroGetSkill.push(i)};
-  if(meta['StyleSizeChange']){valuePhysiquUp.push(i)};
-  if(meta['PassiveCondi']){valuePassiveAdd.push(i)};
-  if(meta['PassivePlusEffect']){valuePassivePlussSkill.push(i)};
-  if(meta['PassivePlusTrait']){valuePassivePlussSkill2.push(i)};
-  if(meta['HstaSuppression']){valueHstaSuppression.push(i)};
-  if(meta['HexpReflectionSkill']){valueHStatesUp1.push(i)};
-  if(meta['MCharacterSkillLearnSkill']){valueHeroGetSkill.push(i)};
-  if(meta['MCharacterSkillLearnSRank']){valueHeroGetSkill.push(i)};
-  if(meta['HSkillLearn']){valueGetHskillLearn.push(i)};
-  if(meta['PassiveElementP']){valuePassiveElementP.push(i)};
-  if(meta['AddPowerCustom']){valueAddPowerCustomSkill.push(i)};
+  pushValid(meta['SwicthOnOffUse'] && meta['MCharacterLearn'], valuePersonalSkill, i);
+  pushValid(meta['SkillChangeName'], valueChangeSkill, i);
+  pushValid(meta['ValSkillChangeName'], valueVariablesChangeSkill, i);
+  pushValid(meta['MCharacterSkillLearnSwith'], valueHeroGetSkill, i);
+  pushValid(meta['StyleSizeChange'], valuePhysiquUp, i);
+  pushValid(meta['PassiveCondi'], valuePassiveAdd, i);
+  pushValid(meta['PassivePlusEffect'], valuePassivePlussSkill, i);
+  pushValid(meta['PassivePlusTrait'], valuePassivePlussSkill2, i);
+  pushValid(meta['HstaSuppression'], valueHstaSuppression, i);
+  pushValid(meta['HexpReflectionSkill'], valueHStatesUp1, i);
+  pushValid(meta['MCharacterSkillLearnSkill'], valueHeroGetSkill, i);
+  pushValid(meta['MCharacterSkillLearnSRank'], valueHeroGetSkill, i);
+  pushValid(meta['HSkillLearn'], valueGetHskillLearn, i);
+  pushValid(meta['PassiveElementP'], valuePassiveElementP, i);
+  pushValid(meta['AddPowerCustom'], valueAddPowerCustomSkill, i);
   pushArray(meta['Equip State'], valueEquipPassiveSkill);
   pushArray(meta['Passive State'], valueEquipPassiveSkill);
 };
@@ -575,59 +575,31 @@ const dataItems = $dataItems;
 const dataItemsCount = dataItems.length;
 for (let i = 1; i < dataItemsCount; i++) {
   const meta = dataItems[i].meta;
-  if(meta['SkillCostToday']){valueOneDayLimitItem.push(i)};
-  if(meta['HexpReflectionSkill']){valueHStatesUp2.push(i)};
-  if(meta['BattleMapInformation']){valueJouhouBattleMap.push(i)};
-  if(meta['DropRate']){valueItemDropRate1.push(i)};
-  if(meta['SouwaItem']){valueSouwasceneAddId.push(i)};
-  if(meta['HsceneItem']){valueHsceneAddId.push(i)};
-  if(dataItems[i].iconIndex == 234){valueTitleSetItemsNoSetEffect.push(i)};
-  if(meta['MedalRate']){valueCasinoMedalItem.push(i)};
-  if(meta['SwicthOnOffUse']){valuePersonalItem.push(i)};
+  pushValid(meta['SkillCostToday'], valueOneDayLimitItem, i);
+  pushValid(meta['HexpReflectionSkill'], valueHStatesUp2, i);
+  pushValid(meta['BattleMapInformation'], valueJouhouBattleMap, i);
+  pushValid(meta['DropRate'], valueItemDropRate1, i);
+  pushValid(meta['SouwaItem'], valueSouwasceneAddId, i);
+  pushValid(meta['HsceneItem'], valueHsceneAddId, i);
+  pushValid(dataItems[i].iconIndex == 234, valueTitleSetItemsNoSetEffect, i);
+  pushValid(meta['MedalRate'], valueCasinoMedalItem, i);
+  pushValid(meta['SwicthOnOffUse'], valuePersonalItem, i);
 };
 const dataWeapons = $dataWeapons;
 const dataWeaponsCount = dataWeapons.length;
 for (let i = 1; i < dataWeaponsCount; i++) {
   const meta = dataWeapons[i].meta;
-  if(meta['TownInformation']){valueJouhouTown.push(i)};
-  if(meta['AddPowerCustom']){valueAddPowerCustomWeapon.push(i)};
+  pushValid(meta['TownInformation'], valueJouhouTown, i);
+  pushValid(meta['AddPowerCustom'], valueAddPowerCustomWeapon, i);
   pushArray(meta['Equip State'], valueEquipPassiveWeapon);
-  // if(meta['Equip State']){
-    // const arr1 = meta['Equip State'].split(',');
-	// const len = arr1.length;
-    // for (let j = 0; j < len; j++) {
-      // valueEquipPassiveWeapon.push(arr1[j]);
-    // };
-  // };
   pushArray(meta['Passive State'], valueEquipPassiveWeapon);
-  // if(meta['Passive State']){
-    // const arr1 = meta['Passive State'].split(',');
-	// const len = arr1.length;
-    // for (let j = 0; j < len; j++) {
-      // valueEquipPassiveWeapon.push(arr1[j]);
-    // };
-  // };
 };
 const dataArmors = $dataArmors;
 for (let i = 1; i <= valueArmorsLength; i++) {
   const meta = dataArmors[i].meta;
-  if(meta['AddPowerCustom']){valueAddPowerCustomArmor.push(i)};
+  pushValid(meta['AddPowerCustom'], valueAddPowerCustomArmor, i);
   pushArray(meta['Equip State'], valueEquipPassiveArmor);
   pushArray(meta['Passive State'], valueEquipPassiveArmor);
-  // if(meta['Equip State']){
-    // const arr1 = meta['Equip State'].split(',');
-	// const len = arr1.length;
-    // for (let j = 0; j < len; j++) {
-      // valueEquipPassiveArmor.push(arr1[j]);
-    // };
-  // };
-  // if(meta['Passive State']){
-    // const arr1 = meta['Passive State'].split(',');
-	// const len = arr1.length;
-    // for (let j = 0; j < len; j++) {
-      // valueEquipPassiveArmor.push(arr1[j]);
-    // };
-  // };
 };
 
 };
