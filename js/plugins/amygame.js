@@ -4070,25 +4070,26 @@ if(value1 == 0){
 //隊列順で次の表示者を決定formation_orderSelect(20,0);
 formation_orderSelect = function(value2,id1){
 
+const partyMembers = $gameParty.members();
+const maxPartyMembersIndex = $gameParty.members().length-1;
+
+let partyMemberIndex1;
+let partyMemberIndex2;
 if(id1 == 0){
-  var value3 = $gameParty.members().length-1;
-  var value4 = 0;
+  partyMemberIndex1 = maxPartyMembersIndex;
+  partyMemberIndex2 = 0;
 } else {
-  var value3 = 0;
-  var value4 = $gameParty.members().length-1;
+  partyMemberIndex1 = 0;
+  partyMemberIndex2 = maxPartyMembersIndex;
 };
-for (var i = 0; i <= $gameParty.members().length-1; i++) {
-  var value1 = $gameParty.members()[i].actorId();
-    if(value1 == $gameVariables.value(value2)){
-      if(i == value3){
-        $gameVariables.setValue(value2,$gameParty.members()[value4].actorId());
+
+for (let i = 0; i <= maxPartyMembersIndex; i++) {
+    if(partyMembers[i].actorId() == $gameVariables.value(value2)){
+      if(i == partyMemberIndex1){
+        $gameVariables.setValue(value2,partyMembers[partyMemberIndex2].actorId());
       } else {
-        if(id1 == 0){
-          var value5 = i + 1;
-        } else {
-          var value5 = i - 1;
-        };
-        $gameVariables.setValue(value2,$gameParty.members()[value5].actorId());
+		let index = i + (id1 == 0 ? 1 : -1);
+        $gameVariables.setValue(value2,partyMembers[index].actorId());
       };
       break;
 }};
