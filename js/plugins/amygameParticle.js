@@ -694,7 +694,7 @@ if(id1 == 9){//仲間加入
   $gameScreen.setDTextPicture(value1, value2);
   var value1 = 100;
   $gameScreen.showPicture(value1,"",1,640,384,100,100,0,0);
-  if($gameActors.actor($gameVariables.value(20)).isStateAffected(602)){
+  if(is_girl($gameActors.actor($gameVariables.value(20)))){
     $gameScreen.movePicture(value1,1,640-200,384,100,100,255,0,30);
   } else {
     $gameScreen.movePicture(value1,1,640-50,384,100,100,255,0,30);

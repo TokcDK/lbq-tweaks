@@ -645,7 +645,7 @@ if(!$gameSwitches.value(209)){//全体マップ以外で表示10
     messageText = `${value2}:+\\V[290,3]\\I[75]:\\V[263]\n\\I[176]:\\V[190]/\\V[189]\\V[332]\\I[127]:${valueMaxEnemyLv}\n`;
     for (let i = 0; i < $gameParty.battleMembers().length; i++) {
       const actor = $gameParty.battleMembers()[i];
-      if(actor.isStateAffected(602)){
+      if(is_girl(actor)){
         if($gameVariables.value(actor.actorId() + 380)[2] >= 1){
           if(value11 == 0){messageText += `\\I[376] `; value11 = 1};
           if($dataActors[actor.actorId()].meta['IconGura']){
@@ -3261,7 +3261,7 @@ for (var i = start; i <= end; i++) {
   const id = 1; 
   const choiceParams = {text: actor.name(),value: id4};
   $gameSystem.addCustomChoice(id, choiceParams);
-  if(actor.isStateAffected(602)){
+  if(is_girl(actor)){
     valueFaceSelect = 6;
     var value1 = Math.floor( Math.random() * 8);
     if(value1 == 0){valueFaceSelect = 1};//通常
@@ -4101,7 +4101,7 @@ formation_orderSelectH = function(value2,id1){
 if(id1 == 2){
   valueHeroineCoice = [];
     for (var i = 0; i <= $gameParty.members().length-1; i++) {
-      if($gameParty.members()[i].isStateAffected(602)){
+      if(is_girl($gameParty.members()[i])){
         valueHeroineCoice.push($gameParty.members()[i].actorId());
       };
     };
@@ -4123,27 +4123,35 @@ for (var i = 0; i <= valueHeroineCoice.length-1; i++) {
     if(value1 == $gameVariables.value(value2)){
       if(value1 == valueHeroineCoice[value3]){
         if(id1 == 0){
-          for (var j = 0; j <= valueHeroineCoice.length-1; j++) {
-            if($gameActors.actor(valueHeroineCoice[j]).isStateAffected(602)){  $gameParty.members()[j].actorId()
-              $gameVariables.setValue(value2,valueHeroineCoice[j]);
+		  const len = valueHeroineCoice.length;
+          for (var j = 0; j < len; j++) {
+			const actorIndex = valueHeroineCoice[j];
+			const actor = $gameActors.actor(actorIndex);
+            if(is_girl(actor)){
+			  //$gameParty.members()[j].actorId()
+              $gameVariables.setValue(value2,actorIndex);
               break;
             };
           };
           break;
         };
         if(id1 == 1){
-          for (var j = valueHeroineCoice.length-1; j >= 0 ; j--) {
-            if($gameActors.actor(valueHeroineCoice[j]).isStateAffected(602)){
-              $gameVariables.setValue(value2,valueHeroineCoice[j]);
+		  const maxIndex = valueHeroineCoice.length-1;
+          for (var j = maxIndex; j >= 0 ; j--) {
+			const actorIndex = valueHeroineCoice[j];
+			const actor = $gameActors.actor(actorIndex);
+            if(is_girl(actor)){
+              $gameVariables.setValue(value2,actorIndex);
               break;
             };
           };
           break;
         };
       } else {
-        if($gameParty.members()[$gameActors.actor(valueHeroineCoice[i]).index() + value6].isStateAffected(602)){
-          var value5 = $gameActors.actor(valueHeroineCoice[i]).index() + value6;
-          $gameVariables.setValue(value2,$gameParty.members()[value5].actorId());
+		const actorIndex = $gameActors.actor(valueHeroineCoice[i]).index() + value6;
+		const actor = $gameParty.members()[actorIndex];
+        if(is_girl(actor)){
+          $gameVariables.setValue(value2,actor.actorId());
           break;
         };
       };
@@ -4628,7 +4636,7 @@ trap_starting1 = function(id2,id1){
   if(id2 == 2){
     if(valueCountSet2 == 1){
       var actor = $gameParty.members()[0];
-      if(actor.isStateAffected(602)){
+      if(is_girl(actor)){
         actor.addState(62);
         if(actor.isStateAffected(62)){
           $gamePlayer.requestAnimation(624);
@@ -5563,7 +5571,7 @@ town_escape = function(){
 
 $gameVariables.setValue(520,Array(21).fill(0));
 for (var i = 0; i < $gameParty.members().length; i++) {
-  if($gameParty.members()[i].isStateAffected(602)){
+  if(is_girl($gameParty.members()[i])){
     var value1 = $gameParty.members()[i].actorId();
     if($gameVariables.value(230) >= 1){
       if($dataWeapons[$gameVariables.value(230)].meta['PermissionCloth']){
@@ -5852,6 +5860,10 @@ get_valueItems_sis = function (id) {
       console.error(`get_valueItems_sis: id(${id}}) is not 0,1,2!`);
       return null;
   }
+}
+
+is_girl = function (actor) {
+  return actor.isStateAffected(602);
 }
 
 }());

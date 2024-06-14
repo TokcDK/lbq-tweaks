@@ -541,7 +541,7 @@ const gameVar20_440 = $gameVariables.value(gameVar20_440_id);
 for (let i = 1; i <= 40; i++) {
   $gameVariables.setValue(i + 460, gameVar20_440[i]);
 };
-  if (actorGameVar20.isStateAffected(602)){
+  if (is_girl(actorGameVar20)){
     if (actorGameVar20.isStateAffected(valueDollStateId)){
       for (let i = 1; i <= 40; i++) {
         $gameVariables.setValue(i+560,$gameVariables.value(i+460));
@@ -572,7 +572,7 @@ for (let i = 1; i <= 40; i++) {
 }
 
 charagra_henkou1(gameVar20);
-if(actorGameVar20.isStateAffected(602)){
+if(is_girl(actorGameVar20)){
   valueLiningCloth[gameVar20] = gameVar20_440[2];
   valueBackHairCloth[gameVar20] = actorGameVar20.isStateAffected(23) ? 1 : gameVar20_440[4];
   valueCoatCloth[gameVar20] = gameVar20_440[28];
@@ -588,7 +588,7 @@ charagra_henkou1 = function(id2){
 
   if (id2 >= 1) {
   const actor = $gameActors.actor(id2);
-    if (actor.isStateAffected(602)){
+    if (is_girl(actor)){
     charagra_choice1(id2);
     isyou_senyouLisciaBlueOnly(id2); //りしゃぶるのみの処理
     actor.setCharacterImage(id2 + '_' + $gameVariables.value(21), $gameVariables.value(22));
@@ -1015,7 +1015,7 @@ picture_motion1("smooth",[0]);
 $gameScreen.showPicture(pictureId, name, 1, 
 $gameVariables.value(101), $gameVariables.value(102), 
 $gameVariables.value(103), $gameVariables.value(104), $gameVariables.value(149), 0);
-if($gameActors.actor($gameVariables.value(112)).isStateAffected(602) && !$gameSwitches.value(150)){
+if(is_girl($gameActors.actor($gameVariables.value(112))) && !$gameSwitches.value(150)){
   $gameScreen.showPicture(7, "/img/tachies/" + 'actor' + $gameVariables.value(112) + '_1_3', 1, 
   $gameVariables.value(101)+value31, $gameVariables.value(102)+value32, 
   $gameVariables.value(103), $gameVariables.value(104), value33, 1);
@@ -1542,7 +1542,7 @@ get_and_cofig_girls_standing_pic = function () {
   const battlersCount = battlers.length;
   for (let i = 0; i < battlersCount; i++) {
     const actor = battlers[i];
-    if (actor.isStateAffected(602)) { // 女のみ, girls only
+    if (is_girl(actor)) { // 女のみ, girls only
       $gameVariables.setValue(20, actor.actorId());
       tachie_settei2();
     }
