@@ -122,125 +122,136 @@ gameVariables.setValue(501,Array(101).fill(0));
 amygame_startUp = function(){
 
 let start = 1;
-let end = $dataWeapons.length-1;
-for (let i = start; i <= end; i++) {
+let end = $dataWeapons.length;
+for (let i = start; i < end; i++) {
   if($dataWeapons[i].name == '') {
     $dataWeapons[i].name = i;
 }};
 
 //操作用などの名称を変更
 //var start = 1;
-end = $dataStates.length-1;
-for (let i = start; i <= end; i++) {
-  if ($dataStates[i].meta['起動時名前改変']) {
-    $dataStates[i].name = $dataStates[i].meta['起動時名前改変'];
+end = $dataStates.length;
+for (let i = start; i < end; i++) {
+  const state = $dataStates[i];
+  if (state.meta['起動時名前改変']) {
+    state.name = state.meta['起動時名前改変'];
 }};
 
 const gameVariables = $gameVariables;
 
 //視点スイッチにアクター名付与
-var list = gameVariables.value(248);
+const switches = $dataSystem.switches;
+const switchesLen = switches.length;
+const list = gameVariables.value(248);
 list.forEach(function(id) {
-  var actor = $gameActors.actor([id]);
-  $dataSystem.switches[440+id] = `${actor.name()}視点`;
+  const actorName = $gameActors.actor(id).name();
+  switches[440+id] = `${actorName}視点`;
 }, this);
-for (let i = 1; i <= $dataSystem.switches.length-1; i++) {
-  if($dataSystem.switches[i].match(/Battle/)){
-    $dataSystem.switches[i] = $dataSystem.switches[i].replace("[Battle]", "")
-}};
+for (let i = 1; i < switchesLen; i++) {
+  if(switches[i].match(/Battle/)){
+    switches[i] = switches[i].replace("[Battle]", "")
+  }
+};
 
 //各アイテムに連番を付与
-var value1 = 1;
-var value2 = 1;
-var value3 = 1;
+let itemPrefix = 1;
+let itemPrefix2 = 1;
+let value3 = 1;
 //var value4 = 1;
-var value5 = 1;
-var value6 = 1;
-for (let i = 1; i <= $dataWeapons.length-1; i++) {
-  if(!$dataWeapons[i].name == '') {
-    if($dataWeapons[i].meta['MapSwitch']) {
-      $dataWeapons[i].name = `${$dataSystem.switches[Number($dataWeapons[i].meta['MapSwitch'])]}`;
+let x100 = 1;
+let x50 = 1;
+
+const weaponsLen = $dataWeapons.length;
+for (let i = 1; i < weaponsLen; i++) {
+  const weapon = $dataWeapons[i];
+  if(!weapon.name == '') {
+	const weaponMapSwitch = weapon.meta['MapSwitch'];
+    if(weaponMapSwitch) {
+      weapon.name = `${switches[Number(weaponMapSwitch)]}`;
     };
   };
 };
 
+const copyItem = (item, itemIndex, x) => {
+	item.name = '[' + itemIndex + ']' + item.name;
+	
+	const itemX = $dataItems[i+x];
+	itemX.iconIndex = item.iconIndex;
+	itemX.name = `${item.name}[了]`;
+	itemX.description = item.description;
+};
+const setItemName = (item, itemIndex, i, x) => {
+	if(item.meta['追加コモンID'] || (i >= (401 + x) && i <= (500 + x))){
+		item.name = $dataCommonEvents[i].name;
+	}
+	else {
+		item.name = '[' + itemIndex + ']' + item.name;
+	}
+};
+
 const itemsCount = $dataItems.length;
+const achieverIndexes = gameVariables.value(297);
 for (let i = 1; i < itemsCount; i++) {
   let item = $dataItems[i];
   if(item.name !== '') {
-    if(item.meta['ItemNameAddSet']) {
-      var arr1 = item.meta['ItemNameAddSet'].split(',');
+	const itemMeta = item.meta;
+    if(itemMeta['ItemNameAddSet']) {
+      const arr1 = itemMeta['ItemNameAddSet'].split(',');
       const index = Number(arr1[0]);
-      if(index == 0){var valueItems = $dataItems[Number(arr1[1])].name}
-      else if(index == 1){var valueItems = $dataWeapons[Number(arr1[1])].name}
-      else if(index == 2){var valueItems = $dataArmors[Number(arr1[1])].name}
-      else if(index == 3){var valueItems = $dataStates[Number(arr1[1])].name}
-      else if(index == 4){var valueItems = $dataSkills[Number(arr1[1])].name}
-      else if(index == 5){var valueItems = $dataStates[Number(arr1[1])].name}
-      else if(index == 6){var valueItems = $dataSystem.switches[Number(arr1[1])]};
+	  const Index1 = Number(arr1[1]);
+	  let valueItems;
+      if(index == 0){valueItems = $dataItems[Index1].name}
+      else if(index == 1){valueItems = $dataWeapons[Index1].name}
+      else if(index == 2){valueItems = $dataArmors[Index1].name}
+      else if(index == 3){valueItems = $dataStates[Index1].name}
+      else if(index == 4){valueItems = $dataSkills[Index1].name}
+      else if(index == 5){valueItems = $dataStates[Index1].name}
+      else if(index == 6){valueItems = switches[Index1]};
       if(Number(arr1[2]) == 0){
         item.name = `${valueItems}${item.name}`;
       } else {
         item.name = `${item.name}${valueItems}`;
       };
     };
-    if(item.meta['annihilationTitle']) {
-      if(Number(item.meta['annihilationTitle'].split(',')[0]) >= 20) {
-        item.name = `${$dataItems[Number(item.meta['annihilationTitle'].split(',')[0])].name}を殲滅せし者`;
+    if(itemMeta['annihilationTitle']) {
+      if(Number(itemMeta['annihilationTitle'].split(',')[0]) >= 20) {
+        item.name = `${$dataItems[Number(itemMeta['annihilationTitle'].split(',')[0])].name}を殲滅せし者`;
       };
     };
-    if(item.meta['MapSwitch']) {
-      item.name = `${$dataSystem.switches[Number(item.meta['MapSwitch'])]}`;
+    if(itemMeta['MapSwitch']) {
+      item.name = `${switches[Number(itemMeta['MapSwitch'])]}`;
     };
-    const itemEICSwitch = item.meta['EICSwitch'];
+    const itemEICSwitch = itemMeta['EICSwitch'];
     if (itemEICSwitch) {
       const itemEICSwitchNumber = Number(itemEICSwitch);
       if(itemEICSwitchNumber == 102) {
-        if(i >= 401 && i <= 500){
-          item.name = $dataCommonEvents[i].name;
-        };
-        if(item.meta['追加コモンID']) {
-          item.name = $dataCommonEvents[i].name;
-        };
-        item.name = '[' + value1 + ']' + item.name;
-        value1 += 1;
+		setItemName(item, itemPrefix, i, 0);
+        itemPrefix += 1;
       }
       else if(itemEICSwitchNumber == 103) {
-        if(i >= 501 && i <= 600){
-          item.name = $dataCommonEvents[i].name;
-        };
-        if(item.meta['追加コモンID']) {
-          item.name = $dataCommonEvents[i].name;
-        };
-        item.name = '[' + value2 + ']' + item.name;
-        value2 += 1;
+		setItemName(item, itemPrefix2, i, 100);
+        itemPrefix2 += 1;
       }
       else if(itemEICSwitchNumber == 104 || itemEICSwitchNumber == 105) {//二つ名は説明の方に連番を付与する
         item.description = '[' + value3 + ']' + item.description;
         value3 += 1;
-          if (item.meta['KojinTitle']) {
-            if(gameVariables.value(297)[i] >= 1){
-              item.description += `[達成者:${$gameActors.actor(gameVariables.value(297)[i]).name()}]`;
+          if (itemMeta['KojinTitle']) {
+			const achieverIndex = achieverIndexes[i];
+            if(achieverIndex >= 1){
+			  const achieverName = $gameActors.actor(achieverIndex).name();
+              item.description += `[達成者:${achieverName}]`;
             }
           };
       }
       else if(itemEICSwitchNumber == 108) {
-        const itemCategory = item.meta['SGカテゴリ'];
+        const itemCategory = itemMeta['SGカテゴリ'];
         if(itemCategory == '受注クエスト' || itemCategory == 'ＥＸ受注クエスト') {//特別クエスト使わない。クエスト801～を901に名前と解説とアイコンをコピーする
-          item.name = '[' + value5 + ']' + item.name;
-          const item100 = $dataItems[i+100];
-          item100.iconIndex = item.iconIndex;
-          item100.name = `${item.name}[了]`;
-          item100.description = item.description;
-          value5 += 1;
+          copyItem(item, x100, 100);
+		  x100 += 1;
         }
         else if(itemCategory == 'デイリークエスト') {
-          item.name = '[' + value6 + ']' + item.name;
-          const item50 = $dataItems[i+50];
-          item50.iconIndex = item.iconIndex;
-          item50.name = `${item.name}[了]`;
-          item50.description = item.description;
-          value6 += 1;
+	      copyItem(item, x50, 50);
+		  x50 += 1;
         };
       };
 }}};
@@ -269,11 +280,11 @@ various_description(5);
 various_description(0);
 
 //状態異常耐性の特徴をステート武器防具クラスに付与
-var arr1 = [];
-var arr2 = [];
+const arr1 = [];
+const arr2 = [];
 //var start = 1;
-end = $dataStates.length-1;
-for (let i = start; i <= end; i++) {
+end = $dataStates.length;
+for (let i = start; i < end; i++) {
   const stateCategory = $dataStates[i].meta['Category'];
   if (stateCategory == ' StateNomal'){
       arr1.push(i);
@@ -336,10 +347,12 @@ enemy_troopPosition1();
 for (let i = 1; i <= 9; i++) {
   for (let j = 1; j < itemsCount; j++) {
     const item = $dataItems[j];
-    if(item.meta['UniqueMaterial' + i]){
-      var arr1 = item.meta['UniqueMaterial' + i].split(',');
-      if(item.meta['MapSwitch']){
-        $dataItems[Number(arr1[0])].description += ` \\C[2][${$dataSystem.switches[Number(item.meta['MapSwitch'])]}で希少採取]\\C[0]`;
+	const itemMeta = item.meta;
+    if(itemMeta['UniqueMaterial' + i]){
+      const uniqueMaterials = itemMeta['UniqueMaterial' + i].split(',');
+      if(itemMeta['MapSwitch']){
+		const material = switches[Number(itemMeta['MapSwitch'])];
+        $dataItems[Number(uniqueMaterials[0])].description += ` \\C[2][${material}で希少採取]\\C[0]`;
       };
     };
   };
@@ -360,50 +373,61 @@ for (let i = start; i <= end; i++) {
 if($dataSystem.variables[61].match(/りしゃぶる/)){
   let familyName = $dataWeapons[315].meta['FamilyName'];
   if (familyName){
-    $dataSystem.switches[279] = `喫茶 <${familyName}カフェ>`;
-    valueMapNameSpecialStaging[200] = $dataSystem.switches[279];
+    switches[279] = `喫茶 <${familyName}カフェ>`;
+    valueMapNameSpecialStaging[200] = switches[279];
   };
   familyName = $dataWeapons[311].meta['FamilyName'];
   if (familyName){
-    $dataSystem.switches[275] = `書店 <${familyName}古書店>`;
-    valueMapNameSpecialStaging[95] = $dataSystem.switches[275];
+    switches[275] = `書店 <${familyName}古書店>`;
+    valueMapNameSpecialStaging[95] = switches[275];
   };
   familyName = $dataWeapons[316].meta['FamilyName'];
   if (familyName){
-    $dataSystem.switches[274] = `民家 <${familyName}家>`;
-    valueMapNameSpecialStaging[25] = $dataSystem.switches[274];
+    switches[274] = `民家 <${familyName}家>`;
+    valueMapNameSpecialStaging[25] = switches[274];
   };
-  valueMapNameSpecialStaging[146] = `${$dataSystem.switches[341]}-[B1F]`;
-  valueMapNameSpecialStaging[147] = `${$dataSystem.switches[341]}-[B2F]`;
-  valueMapNameSpecialStaging[148] = `${$dataSystem.switches[341]}-[B3F]`;
-  valueMapNameSpecialStaging[149] = `${$dataSystem.switches[341]}-[B4F]`;
-  valueMapNameSpecialStaging[150] = `${$dataSystem.switches[341]}-[B5F]`;
-  valueMapNameSpecialStaging[152] = `${$dataSystem.switches[342]}-[B6F]`;
-  valueMapNameSpecialStaging[153] = `${$dataSystem.switches[342]}-[B7F]`;
-  valueMapNameSpecialStaging[154] = `${$dataSystem.switches[342]}-[B8F]`;
-  valueMapNameSpecialStaging[155] = `${$dataSystem.switches[342]}-[B9F]`;
-  valueMapNameSpecialStaging[156] = `${$dataSystem.switches[342]}-[B10F]`;
-  valueMapNameSpecialStaging[172] = `${$dataSystem.switches[343]}-[B11F]`;
-  valueMapNameSpecialStaging[173] = `${$dataSystem.switches[343]}-[B12F]`;
-  valueMapNameSpecialStaging[174] = `${$dataSystem.switches[343]}-[B13F]`;
-  valueMapNameSpecialStaging[175] = `${$dataSystem.switches[343]}-[B14F]`;
-  valueMapNameSpecialStaging[176] = `${$dataSystem.switches[343]}-[B15F]`;
-  valueMapNameSpecialStaging[164] = `${$dataSystem.switches[344]}-[B16F]`;
-  valueMapNameSpecialStaging[188] = `${$dataSystem.switches[344]}-[B17F]`;
-  valueMapNameSpecialStaging[168] = `${$dataSystem.switches[344]}-[B18F]`;
-  valueMapNameSpecialStaging[75] = `${$dataSystem.switches[344]}-[B19F]`;
-  valueMapNameSpecialStaging[92] = `${$dataSystem.switches[344]}-[B20F]`;
-  valueMapNameSpecialStaging[177] = `${$dataSystem.switches[345]}-[B21F]`;
-  valueMapNameSpecialStaging[178] = `${$dataSystem.switches[345]}-[B22F]`;
-  valueMapNameSpecialStaging[179] = `${$dataSystem.switches[345]}-[B23F]`;
-  valueMapNameSpecialStaging[180] = `${$dataSystem.switches[345]}-[B24F]`;
-  valueMapNameSpecialStaging[181] = `${$dataSystem.switches[345]}-[B25F]`;
-  valueMapNameSpecialStaging[161] = `${$dataSystem.switches[346]}`;
-  valueMapNameSpecialStaging[162] = `${$dataSystem.switches[347]}`;
-  valueMapNameSpecialStaging[211] = `${$dataSystem.switches[348]}`;
-  valueMapNameSpecialStaging[160] = `${$dataSystem.switches[349]}`;
-  valueMapNameSpecialStaging[163] = `${$dataSystem.switches[350]}`;
-  valueMapNameSpecialStaging[159] = `${$dataSystem.switches[351]}`;
+  
+  const switch341 = switches[341];
+  valueMapNameSpecialStaging[146] = `${switch341}-[B1F]`;
+  valueMapNameSpecialStaging[147] = `${switch341}-[B2F]`;
+  valueMapNameSpecialStaging[148] = `${switch341}-[B3F]`;
+  valueMapNameSpecialStaging[149] = `${switch341}-[B4F]`;
+  valueMapNameSpecialStaging[150] = `${switch341}-[B5F]`;
+  
+  const switch342 = switches[342];
+  valueMapNameSpecialStaging[152] = `${switch342}-[B6F]`;
+  valueMapNameSpecialStaging[153] = `${switch342}-[B7F]`;
+  valueMapNameSpecialStaging[154] = `${switch342}-[B8F]`;
+  valueMapNameSpecialStaging[155] = `${switch342}-[B9F]`;
+  valueMapNameSpecialStaging[156] = `${switch342}-[B10F]`;
+  
+  const switch343 = switches[343];
+  valueMapNameSpecialStaging[172] = `${switch343}-[B11F]`;
+  valueMapNameSpecialStaging[173] = `${switch343}-[B12F]`;
+  valueMapNameSpecialStaging[174] = `${switch343}-[B13F]`;
+  valueMapNameSpecialStaging[175] = `${switch343}-[B14F]`;
+  valueMapNameSpecialStaging[176] = `${switch343}-[B15F]`;
+  
+  const switch344 = switches[344];
+  valueMapNameSpecialStaging[164] = `${switch344}-[B16F]`;
+  valueMapNameSpecialStaging[188] = `${switch344}-[B17F]`;
+  valueMapNameSpecialStaging[168] = `${switch344}-[B18F]`;
+  valueMapNameSpecialStaging[75] = `${switch344}-[B19F]`;
+  valueMapNameSpecialStaging[92] = `${switch344}-[B20F]`;
+  
+  const switch345 = switches[345];
+  valueMapNameSpecialStaging[177] = `${switch345}-[B21F]`;
+  valueMapNameSpecialStaging[178] = `${switch345}-[B22F]`;
+  valueMapNameSpecialStaging[179] = `${switch345}-[B23F]`;
+  valueMapNameSpecialStaging[180] = `${switch345}-[B24F]`;
+  valueMapNameSpecialStaging[181] = `${switch345}-[B25F]`;
+  
+  valueMapNameSpecialStaging[161] = `${switches[346]}`;
+  valueMapNameSpecialStaging[162] = `${switches[347]}`;
+  valueMapNameSpecialStaging[211] = `${switches[348]}`;
+  valueMapNameSpecialStaging[160] = `${switches[349]}`;
+  valueMapNameSpecialStaging[163] = `${switches[350]}`;
+  valueMapNameSpecialStaging[159] = `${switches[351]}`;
 };
 
   };
