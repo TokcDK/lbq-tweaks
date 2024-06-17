@@ -199,14 +199,30 @@ for (let i = 1; i < itemsCount; i++) {
       const arr1 = itemMeta['ItemNameAddSet'].split(',');
       const index = Number(arr1[0]);
 	  const Index1 = Number(arr1[1]);
-	  let valueItems;
-      if(index == 0){valueItems = $dataItems[Index1].name}
-      else if(index == 1){valueItems = $dataWeapons[Index1].name}
-      else if(index == 2){valueItems = $dataArmors[Index1].name}
-      else if(index == 3){valueItems = $dataStates[Index1].name}
-      else if(index == 4){valueItems = $dataSkills[Index1].name}
-      else if(index == 5){valueItems = $dataStates[Index1].name}
-      else if(index == 6){valueItems = switches[Index1]};
+	  let valueItems;	  
+	  switch (index) {
+		  case 0: 
+			valueItems = $dataItems[Index1].name;
+			break;
+		  case 1:
+		    valueItems = $dataWeapons[Index1].name;
+			break;
+		  case 2:
+			valueItems = $dataArmors[Index1].name;
+			break;
+		  case 3:
+			valueItems = $dataStates[Index1].name;
+			break;
+		  case 4:
+			valueItems = $dataSkills[Index1].name;
+			break;
+		  case 5:
+			valueItems = $dataStates[Index1].name;
+			break;
+		  case 6:
+			valueItems = switches[Index1];
+			break;
+	  }
       if(Number(arr1[2]) == 0){
         item.name = `${valueItems}${item.name}`;
       } else {
@@ -294,15 +310,27 @@ for (let i = start; i < end; i++) {
   };
 };
 for (let j = 1; j <= 4; j++) {
-  if(j == 1){valueItems = $dataStates}
-  else if(j == 2){valueItems = $dataWeapons}
-  else if(j == 3){valueItems = $dataArmors}
-  else if(j == 4){valueItems = $dataClasses};
+  switch (j) {
+	  case 1:
+		valueItems = $dataStates;
+		break;
+	  case 2: 
+		valueItems = $dataWeapons;
+		break;
+	  case 3: 
+		valueItems = $dataArmors;
+		break;
+	  case 4: 
+		valueItems = $dataClasses;
+		break;
+  }
 
   //var start = 1;
-  end = j == 3 ? valueArmorsLength : valueItems.length - 1;
-  for (let i = start; i <= end; i++) {
+  end = valueItems.length;
+  for (let i = start; i < end; i++) {
     const valueItem = valueItems[i];
+	if(!valueItem) continue; // armors(possibly other) have undefined values in list
+	
     if(valueItem.meta['StateabNomalResist']){
       const list = arr1;
       const value1 = Number(valueItem.meta['StateabNomalResist']);
@@ -3137,9 +3165,11 @@ if($gameParty.inBattle()){
   var value1 = 71;//仮指定。ポーションのみ
 } else {
   let array = [0];
-  const end = valueItems == $dataArmors ? valueArmorsLength : valueItems.length - 1;
-  for (let i = 1; i <= end; i++) {
+  const end = valueItems.length;
+  for (let i = 1; i < end; i++) {
       const valueItem = valueItems[i];
+      if (!valueItem) continue;	  
+	  
       if (valueItem.meta['GatchaOutOfRange']) continue;
       if ($gameParty.hasItem(valueItem)) {
         const maxItem = valueItem.meta['Max Item'];
@@ -3188,10 +3218,11 @@ for (var j = 0; j <= 2; j++) {
 
   valueItems = j == 0 ? $dataItems : j == 1 ? $dataWeapons : $dataArmors; // 2=armors
   const start = 1;
-  const end = valueItems == $dataArmors ? valueArmorsLength : valueItems.length - 1;
-    for (var i = start; i <= end; i++) {
+  const end = valueItems.length;
+    for (var i = start; i < end; i++) {
       let value11 = 0;
       const valueItem = valueItems[i];
+      if (!valueItem) continue;
       if(!valueItem.meta['LotteryRearity']) continue;
 
       if (Number(valueItem.meta['LotteryRearity']) !== id2) continue;
