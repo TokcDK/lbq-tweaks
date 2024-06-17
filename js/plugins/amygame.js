@@ -309,6 +309,18 @@ for (let i = start; i < end; i++) {
     arr2.push(i);
   };
 };
+
+const pushItemTrait = (valueItem, meta, list) => {
+  if(!meta) return;
+  
+  const res = Number(meta);
+  const code = res == 0 ? 14 : 13;
+  const value = res == 0 ? 1 : 1 - (res / 100);
+  list.forEach(function (id) {
+	valueItem.traits.push({ code: code, dataId: id, value: value });
+  }, this);
+}
+
 for (let j = 1; j <= 4; j++) {
   switch (j) {
 	  case 1:
@@ -324,40 +336,26 @@ for (let j = 1; j <= 4; j++) {
 		valueItems = $dataClasses;
 		break;
   }
-
+  
   //var start = 1;
   end = valueItems.length;
   for (let i = start; i < end; i++) {
     const valueItem = valueItems[i];
 	if(!valueItem) continue; // armors(possibly other) have undefined values in list
 	
-    if(valueItem.meta['StateabNomalResist']){
-      const list = arr1;
-      const value1 = Number(valueItem.meta['StateabNomalResist']);
-      const code = value1 == 0 ? 14 : 13;
-      const value = value1 == 0 ? 1 : 1 - (value1 / 100);
-      list.forEach(function (id) {
-        valueItem.traits.push({ code: code, dataId: id, value: value });
-      }, this);
-    };
-    if(valueItem.meta['StateSPabNomalResist']){
-      const list = arr2;
-      const value1 = Number(valueItem.meta['StateSPabNomalResist']);
-      const code = value1 == 0 ? 14 : 13;
-      const value = value1 == 0 ? 1 : 1 - (value1 / 100);
-      list.forEach(function (id) {
-        valueItem.traits.push({ code: code, dataId: id, value: value });
-      }, this);
-    };
-    if(valueItem.meta['elementRegist6']){
-      const value1 = Number(valueItem.meta['elementRegist6']);
+	const valueItemMeta = valueItem.meta;
+	
+	pushItemTrait(valueItem, valueItemMeta['StateabNomalResist'], arr1);
+	pushItemTrait(valueItem, valueItemMeta['StateSPabNomalResist'], arr2);	
+    if(valueItemMeta['elementRegist6']){
+      const value1 = Number(valueItemMeta['elementRegist6']);
       const value = value1 == 0 ? 0 : 1 - (value1 / 100);
       for (let dataId = 3; dataId <= 8; dataId++) {
         valueItem.traits.push({ code: 11, dataId: dataId, value: value });
       }
     };
-    if(valueItem.meta['elementRegist9']){
-      const value1 = Number(valueItem.meta['elementRegist9']);
+    if(valueItemMeta['elementRegist9']){
+      const value1 = Number(valueItemMeta['elementRegist9']);
       const value = value1 == 0 ? 0 : 1 - (value1 / 100);
       for (let dataId = 3; dataId <= 9; dataId++) {
         valueItem.traits.push({ code: 11, dataId: dataId, value: value });
