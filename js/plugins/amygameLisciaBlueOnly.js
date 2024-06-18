@@ -1793,7 +1793,7 @@ if(id100 == 1){//リーシャ登場。戦闘シーン
   valuePic1 = 51;
   valueScenePic = 'ZX_Main000_';
  switch (id101) {
-  case: 1 {
+  case 1: {
     $gameScreen.showPicture(valuePic1,'ScreenBlackOut',1,640,384,100,100,0,0);
     pic_1(1,valuePic1+2,valueScenePic+'01',6,100,255,120,1280,768,0,0);
     $gameScreen.showPicture(valuePic1+3,'ScreenBlackOut',1,640,384,100,100,0,0);
@@ -1805,7 +1805,7 @@ if(id100 == 1){//リーシャ登場。戦闘シーン
     tachie_bless(valuePic1+4,1);
 	break;
   }
-  case: 2 {
+  case 2: {
     adv_partDirectSet(3);
     pic_move1(valuePic1+3,0,0,100,100,200,10);
     pic_move1(valuePic1+4,0,0,100,100,200,10);
@@ -1814,15 +1814,15 @@ if(id100 == 1){//リーシャ登場。戦闘シーン
     }
 	break;
   }
-  case: 3 {
+  case 3: {
     const value1 = $gameScreen.picture(valuePic1+4).y();
     pic_move1(valuePic1+4,0,(384 + (1390-768)/2)-value1,100,100,255,600);
   }
-  case: 4 { 
+  case 4: { 
 	parallax_scroll(valuePic1+5,'ScreenConcentratedLineWidthBackGraund',0,20,20,0,255); 
 	break; 
   }
-  case: 5 {
+  case 5: {
     pic_move1(valuePic1+10,0,0,100,100,255,60);
     const value1 = $gameScreen.picture(valuePic1+12).x();
     pic_move1(valuePic1+12,(640 + (1500-1280) / 2) - value1,0,100,100,255,40);
@@ -1830,8 +1830,8 @@ if(id100 == 1){//リーシャ登場。戦闘シーン
     filter_direct(10,10,10,20);
 	break;
   }
-  case: 6 { pic_move1(valuePic1+12,-200,0,100,100,0,40); break; }
-  case: 7 { //地面黒塗りと残像作成
+  case 6: { pic_move1(valuePic1+12,-200,0,100,100,0,40); break; }
+  case 7: { //地面黒塗りと残像作成
     $gameMap.spawnEvent(146, 25, 35, true);
     $gameVariables.value(292)[13] = $gameMap.getLastSpawnEventId();
     let eventId = $gameVariables.value(292)[13];
