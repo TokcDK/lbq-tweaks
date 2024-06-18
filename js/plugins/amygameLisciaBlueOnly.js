@@ -1792,7 +1792,8 @@ id100 = id100 - 300;
 if(id100 == 1){//リーシャ登場。戦闘シーン
   valuePic1 = 51;
   valueScenePic = 'ZX_Main000_';
-  if(id101 == 1){
+ switch (id101) {
+  case: 1 {
     $gameScreen.showPicture(valuePic1,'ScreenBlackOut',1,640,384,100,100,0,0);
     pic_1(1,valuePic1+2,valueScenePic+'01',6,100,255,120,1280,768,0,0);
     $gameScreen.showPicture(valuePic1+3,'ScreenBlackOut',1,640,384,100,100,0,0);
@@ -1802,60 +1803,68 @@ if(id100 == 1){//リーシャ登場。戦闘シーン
     $gameScreen.showPicture(valuePic1+12,valueScenePic+'03',1,(640 - (1500-1280) / 2)-1000,384,500,500,0,0);
     $gameScreen.movePicture(valuePic1,1,640,384,100,100,200,0,60);
     tachie_bless(valuePic1+4,1);
-  };
-  if(id101 == 2){
+	break;
+  }
+  case: 2 {
     adv_partDirectSet(3);
     pic_move1(valuePic1+3,0,0,100,100,200,10);
     pic_move1(valuePic1+4,0,0,100,100,200,10);
     if($gameScreen.picture(valuePic1+4)){
       $gameScreen.picture(valuePic1+4).startAnimationFrame(1, true, [1,1,1,2]);
-    };
-  };
-  if(id101 == 3){
-    var value1 = $gameScreen.picture(valuePic1+4).y();
+    }
+	break;
+  }
+  case: 3 {
+    const value1 = $gameScreen.picture(valuePic1+4).y();
     pic_move1(valuePic1+4,0,(384 + (1390-768)/2)-value1,100,100,255,600);
-  };
-  if(id101 == 4){ parallax_scroll(valuePic1+5,'ScreenConcentratedLineWidthBackGraund',0,20,20,0,255) };
-  if(id101 == 5){
+  }
+  case: 4 { 
+	parallax_scroll(valuePic1+5,'ScreenConcentratedLineWidthBackGraund',0,20,20,0,255); 
+	break; 
+  }
+  case: 5 {
     pic_move1(valuePic1+10,0,0,100,100,255,60);
-    var value1 = $gameScreen.picture(valuePic1+12).x();
+    const value1 = $gameScreen.picture(valuePic1+12).x();
     pic_move1(valuePic1+12,(640 + (1500-1280) / 2) - value1,0,100,100,255,40);
     //パララックスで4と残像で1
     filter_direct(10,10,10,20);
-  };
-  if(id101 == 6){ pic_move1(valuePic1+12,-200,0,100,100,0,40) };
-  if(id101 == 7){ //地面黒塗りと残像作成
+	break;
+  }
+  case: 6 { pic_move1(valuePic1+12,-200,0,100,100,0,40); break; }
+  case: 7 { //地面黒塗りと残像作成
     $gameMap.spawnEvent(146, 25, 35, true);
     $gameVariables.value(292)[13] = $gameMap.getLastSpawnEventId();
-    var eventId = $gameVariables.value(292)[13];
-    var event = $gameMap.event(eventId);
+    let eventId = $gameVariables.value(292)[13];
+    const event = $gameMap.event(eventId);
     event.setOpacity(200);
-    var eventId = $gameVariables.value(292)[$gameVariables.value(530)];
-    var value1 = 'monster_c';
+    eventId = $gameVariables.value(292)[$gameVariables.value(530)];
+    let value1 = 'monster_c';
     $gameScreen._particle.particleSet('attach:event:'+eventId,value1+'-'+eventId,'this',value1);
     $gameScreen._particle.particleUpdate([value1,'color','#007dff','#66b1ff']);
-    var value1 = 'monster_c'+'-'+eventId;
+    value1 = 'monster_c'+'-'+eventId;
     $gameScreen._particle.particleClear(value1);
-  };
-};
+	break;
+  }
+ }
+}
 // if(id100 == 1){
   // if(id101 == 1){
 
-  // };
+  // }
   // if(id101 == 2){
 
-  // };
-// };
+  // }
+// }
 // if(id100 == 1){
   // if(id101 == 1){
 
-  // };
+  // }
   // if(id101 == 2){
 
-  // };
-// };
+  // }
+// }
 
-};
+}
 
 get_id100_if_zero = function(id100, x){
 	if(id100 > 0) return id100;
