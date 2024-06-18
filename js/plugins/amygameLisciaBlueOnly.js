@@ -1915,12 +1915,13 @@ if(id100 == 31){//秩序の酒場に不良団員npc2人と酒とつまみを生�
 //作品オリジナルのピクチャシーンやキャラグラ移動等処理。401-600以外は直接コモンid入力
 original_scene = function(id100,id101){ //original_scene(0,1);//テストの際は変数535にid入力
 
-if(id100 == 0 && $gameVariables.value(535) >= 1){
-  if($gameVariables.value(535) >= 501 && $gameVariables.value(535) <= 600){
-    id100 = $gameVariables.value(535) - 500;
-  };
-};
-if(id100 == 11){//Ｈな診察
+const var535 = $gameVariables.value(535);
+if(id100 == 0 && var535 >= 1){
+  if(var535 >= 501 && var535 <= 600){
+    id100 = var535 - 500;
+  }
+}
+else if(id100 == 11){//Ｈな診察
   if(id101 == 1){
     backGraund_menuMapSelect(2,0,0,0);
     valuePic1 = 51;
@@ -1940,182 +1941,185 @@ if(id100 == 11){//Ｈな診察
     pic_move1(valuePic1+11,0,0,100,100,255,90);
     tachie_bless(valuePic1+2,1);
     valuePicWait2 = 60;
-  };
-  if(id101 == 2){ pic_move1(valuePic1+12,0,-200,100,100,255,180);valuePicWait2 = 120; };
-  if(id101 == 3){ pic_move1(valuePic1+2,0,50,100,100,255,180);valuePicWait2 = 60; };
-  if(id101 == 4){ $gameScreen.startAnimation(520, 680, 179, false) };
-  if(id101 == 5){ var value1 = valuePic1+12;if($gameScreen.picture(value1)){$gameScreen.picture(value1).addCellCount()} };
-  if(id101 == 6){
-    var value1 = valuePic1+2;
-    if($gameScreen.picture(value1)){$gameScreen.picture(value1).addCellCount()};
+  }
+  else if(id101 == 2){ pic_move1(valuePic1+12,0,-200,100,100,255,180);valuePicWait2 = 120; }
+  else if(id101 == 3){ pic_move1(valuePic1+2,0,50,100,100,255,180);valuePicWait2 = 60; }
+  else if(id101 == 4){ $gameScreen.startAnimation(520, 680, 179, false) }
+  else if(id101 == 5){ 
+	const picId = valuePic1+12;
+	if($gameScreen.picture(picId)){
+		$gameScreen.picture(picId).addCellCount()} 
+	}
+  else if(id101 == 6){
+    const picId = valuePic1+2;
+    if($gameScreen.picture(picId)){$gameScreen.picture(picId).addCellCount()}
     pic_move1(valuePic1+11,0,0,100,100,0,60);
     pic_move1(valuePic1+12,0,0,100,100,0,60);
     pic_move1(valuePic1+1,0,0,100,100,200,120);
-    var value3 = 'Hscene005';
-    picture_fade1(valuePic1+1,"fadeIn",value3,120,5);
-  };
-  if(id101 == 7){
+    picture_fade1(valuePic1+1,"fadeIn",'Hscene005',120,5);
+  }
+  else if(id101 == 7){
     pic_move1(valuePic1+13,0,0,100,100,255,120);
     pic_move1(valuePic1+15,0,-50,100,100,255,120);
     valuePicWait2 = 120;
-  };
-  if(id101 == 8){
+  }
+  else if(id101 == 8){
     pic_setArray1 = [1,valuePic1+13,0,384+(1732/2)-(768/2)+100,5,1200];
     pic_setArray2 = [1,0,0,0,0,0];
     valueParallelPicSe1 = [0,0,0];
     valueParallelPicSe2 = [0,0,0];
     hcg_piston(valuePic1+13,8,1,2);
     $gameSwitches.setValue(429,true);
-    var value1 = valuePic1+15;
-    if($gameScreen.picture(value1)){$gameScreen.picture(value1).addCellCount()};
+    const picId = valuePic1+15;
+    if($gameScreen.picture(picId)){$gameScreen.picture(picId).addCellCount()}
     valuePicWait2 = 60;
-  };
-  if(id101 == 9){
+  }
+  else if(id101 == 9){
     $gameSwitches.setValue(429,false);
     valueParallelPicSe1 = [0,0,0];
     valueParallelPicSe2 = [0,0,0];
     pic_setArray(0,0,0,0,0,0);
     picture_motion1("smooth",[0]);
-  };
-  if(id101 == 10){
+  }
+  else if(id101 == 10){
     pic_move1(valuePic1,0,0,200,200,255,60);
     pic_move1(valuePic1+1,0,0,100,100,0,60);
     pic_move1(valuePic1+13,0,0,100,100,0,60);
     pic_move1(valuePic1+15,0,0,100,100,0,60);
     valuePicWait2 = 60;
-  };
-  if(id101 == 11){ 
+  }
+  else if(id101 == 11){ 
     pic_move1(valuePic1,0,0,100,100,255,60);
-    var value1 = valuePic1+2;if($gameScreen.picture(value1)){$gameScreen.picture(value1).addCellCount()};
+    const picId = valuePic1+2;
+	if($gameScreen.picture(picId)){
+		$gameScreen.picture(picId).addCellCount()
+	}
     pic_move1(valuePic1+11,0,0,100,100,255,60);
     pic_move1(valuePic1+12,0,0,100,100,255,60);
-  };
-  if(id101 == 12){ pic_move1(valuePic1+12,0,+200,100,100,255,180);valuePicWait2 = 120; };
-  if(id101 == 90){//2と3の間に仕様
+  }
+  else if(id101 == 12){ pic_move1(valuePic1+12,0,+200,100,100,255,180);valuePicWait2 = 120; }
+  else if(id101 == 90){//2と3の間に仕様
     pic_move1(valuePic1,0,0,25,25,150,60);
     pic_move1(valuePic1+11,0,0,25,25,150,60);
     pic_move1(valuePic1+11,0,0,25,25,150,60);
     valuePicWait2 = 60;
-  };
-  if(id101 == 91){//2と3の間に仕様
+  }
+  else if(id101 == 91){//2と3の間に仕様
     pic_move1(valuePic1,0,0,100,100,255,60);
     pic_move1(valuePic1+11,0,0,100,100,255,60);
     pic_move1(valuePic1+11,0,0,100,100,255,60);
-  };
-};
+  }
+}
 // if(id100 == 1){
   // if(id101 == 1){
 
-  // };
+  // }
   // if(id101 == 2){
 
-  // };
-// };
+  // }
+// }
 // if(id100 == 1){
   // if(id101 == 1){
 
-  // };
+  // }
   // if(id101 == 2){
 
-  // };
-// };
-if(id100 == 100){//モニカマッサージ,id1とid2。
+  // }
+// }
+else if(id100 == 100){//モニカマッサージ,id1とid2。
   valuePic1 = 51;
   if(id101 == 1){
     AudioManager.playBgs({"name":"21_HandyMassager1","volume":50,"pitch":100,"pan":0});
-    var value2 = 'XevS101_00back';
-    pic_1(0,valuePic1,value2,0,100,255,60,1280,768,-256,0);
-    var value2 = 'XevS101_00back2';
-    pic_1(0,valuePic1+1,value2,0,100,255,60,1280,768,-256,0);
-    var value2 = 'XevS101_01';
-    pic_1(0,valuePic1+2,value2,0,100,255,60,1280,768,-256,0);
-    var value2 = 'XevS101_01face1';
-    pic_1(0,valuePic1+6,value2,0,100,255,60,1280,768,-256,0);
-    var value2 = 'XevS101_01_100';
-    picture_anime1(valuePic1+7,value2,5,1,"連番",15,3,true,[2,3,4,5]);
+    let picName = 'XevS101_00back';
+    pic_1(0,valuePic1,picName,0,100,255,60,1280,768,-256,0);
+    picName = 'XevS101_00back2';
+    pic_1(0,valuePic1+1,picName,0,100,255,60,1280,768,-256,0);
+    picName = 'XevS101_01';
+    pic_1(0,valuePic1+2,picName,0,100,255,60,1280,768,-256,0);
+    picName = 'XevS101_01face1';
+    pic_1(0,valuePic1+6,picName,0,100,255,60,1280,768,-256,0);
+    picName = 'XevS101_01_100';
+    picture_anime1(valuePic1+7,picName,5,1,"連番",15,3,true,[2,3,4,5]);
     $gameScreen.picture(valuePic1+7)._x = 640-128;
     $gameScreen.movePicture(valuePic1+7,1,640-128,384,100,100,200,0,60);
-    picture_anime1(valuePic1+8,value2,5,1,"連番",20,3,true,[4,5,2,3]);
+    picture_anime1(valuePic1+8,picName,5,1,"連番",20,3,true,[4,5,2,3]);
     $gameScreen.picture(valuePic1+8)._x = 640-128;
     $gameScreen.movePicture(valuePic1+8,1,640-128,384,100,100,100,0,60);
-    for (var i = valuePic1+1; i <= valuePic1+8; i++) { hcg_piston(i,5,1,2) };
-  };
-  if(id101 == 2){//ピストンしている時に表情変化させる場合、身体も更新する。振動が同期しないため
+    for (let i = valuePic1+1; i <= valuePic1+8; i++) { hcg_piston(i,5,1,2) }
+  }
+  else if(id101 == 2){//ピストンしている時に表情変化させる場合、身体も更新する。振動が同期しないため
     AudioManager.playBgs({"name":"21_HandyMassager1","volume":60,"pitch":120,"pan":0});
-    var value2 = 'XevS101_01';
-    pic_1(2,valuePic1+2,value2,0,100,255,1,1280,768,-256,0);
-    var value2 = 'XevS101_01face2';
-    pic_1(2,valuePic1+6,value2,0,100,255,1,1280,768,-256,0);
-    var value2 = 'XevS101_02_100';
-    picture_anime1(valuePic1+7,value2,5,1,"連番",5,3,true,[0,2,3,4,5]);
+    let picName = 'XevS101_01';
+    pic_1(2,valuePic1+2,picName,0,100,255,1,1280,768,-256,0);
+    picName = 'XevS101_01face2';
+    pic_1(2,valuePic1+6,picName,0,100,255,1,1280,768,-256,0);
+    picName = 'XevS101_02_100';
+    picture_anime1(valuePic1+7,picName,5,1,"連番",5,3,true,[0,2,3,4,5]);
     $gameScreen.picture(valuePic1+7)._x = 640-128;
     $gameScreen.movePicture(valuePic1+7,1,640-128,384,100,100,200,0,60);
-    picture_anime1(valuePic1+8,value2,5,1,"連番",10,3,true,[0,4,5,2,3]);
+    picture_anime1(valuePic1+8,picName,5,1,"連番",10,3,true,[0,4,5,2,3]);
     $gameScreen.picture(valuePic1+8)._x = 640-128;
     $gameScreen.movePicture(valuePic1+8,1,640-128,384,100,100,100,0,60);
-    for (var i = valuePic1+1; i <= valuePic1+8; i++) { hcg_piston(i,5,3,2) };
-  };
-  if(id101 == 3){
+    for (let i = valuePic1+1; i <= valuePic1+8; i++) { hcg_piston(i,5,3,2) }
+  }
+  else if(id101 == 3){
     pic_eraseP(2,[valuePic1+2]);
-    var value2 = 'XevS101_02';
-    pic_1(2,valuePic1+3,value2,0,100,255,1,1280,768,-256,0);
-    var value2 = 'XevS101_01face3';
-    pic_1(2,valuePic1+6,value2,0,100,255,1,1280,768,-256,0);
-    var value2 = 'XevS101_03_100';
-    picture_anime1(valuePic1+9,value2,4,1,"連番",5,3,true,[3,1,5,1]);
+    let picName = 'XevS101_02';
+    pic_1(2,valuePic1+3,picName,0,100,255,1,1280,768,-256,0);
+    picName = 'XevS101_01face3';
+    pic_1(2,valuePic1+6,picName,0,100,255,1,1280,768,-256,0);
+    picName = 'XevS101_03_100';
+    picture_anime1(valuePic1+9,picName,4,1,"連番",5,3,true,[3,1,5,1]);
     $gameScreen.picture(valuePic1+9)._x = 640-128;
     $gameScreen.movePicture(valuePic1+9,1,640-128,384,100,100,255,0,10);
-    picture_anime1(valuePic1+10,value2,4,1,"連番",5,3,true,[1,2,1,4]);
+    picture_anime1(valuePic1+10,picName,4,1,"連番",5,3,true,[1,2,1,4]);
     $gameScreen.picture(valuePic1+10)._x = 640-128;
     $gameScreen.movePicture(valuePic1+10,1,640-128,384,100,100,255,0,10);
-    for (var i = valuePic1+1; i <= valuePic1+8; i++) { hcg_piston(i,5,3,2) };
-    for (var i = valuePic1+9; i <= valuePic1+10; i++) { hcg_piston(i,5,3,1) };
-  };
-  if(id101 == 4){//id3が+50,-250,-500,+50,id4が200,300
-    for (var i = valuePic1; i <= valuePic1+10; i++) {
+    for (let i = valuePic1+1; i <= valuePic1+8; i++) { hcg_piston(i,5,3,2) }
+    for (let i = valuePic1+9; i <= valuePic1+10; i++) { hcg_piston(i,5,3,1) }
+  }
+  else if(id101 == 4){//id3が+50,-250,-500,+50,id4が200,300
+    for (let i = valuePic1; i <= valuePic1+10; i++) {
       if($gameScreen.picture(i)){
-        var value3 = $gameScreen.picture(i).opacity();
-        $gameScreen.movePicture(i,1,640,384+id3,id4,id4,value3,0,120);
-      };
-    };
-  };
-  if(id101 == 5){
-    var value2 = 'XevS101_04back';
-    pic_1(0,valuePic1,value2,0,100,255,120,1280,768,0,0);
-    var value2 = 'XevS101_04';
-    pic_1(0,valuePic1+1,value2,0,100,255,120,1280,768,0,0);
+        const picOpacity = $gameScreen.picture(i).opacity();
+        $gameScreen.movePicture(i,1,640,384+id3,id4,id4,picOpacity,0,120);
+      }
+    }
+  }
+  else if(id101 == 5){
+    pic_1(0,valuePic1,'XevS101_04back',0,100,255,120,1280,768,0,0);
+    pic_1(0,valuePic1+1,'XevS101_04',0,100,255,120,1280,768,0,0);
     hcg_piston(valuePic1+1,5,1,2);
-  };
-  if(id101 == 6){
-    var arr1 = [];
-    for (var i = valuePic1; i <= valuePic1+11; i++) {
+  }
+  else if(id101 == 6){
+    const arr1 = [];
+    for (let i = valuePic1; i <= valuePic1+11; i++) {
       arr1.push(i);
-    };
+    }
     pic_eraseP(0,arr1);
-  };
-  if(id101 == 7){
+  }
+  else if(id101 == 7){
     AudioManager.fadeOutBgs(10);
-    for (var i = valuePic1; i <= valuePic1+10; i++) {
+    for (let i = valuePic1; i <= valuePic1+10; i++) {
       if($gameScreen.picture(i)){
         pic_move1(i,0,0,300,300,0,120);
-      };
-    };
-  };
-  if(id101 == 8){
+      }
+    }
+  }
+  else if(id101 == 8){
     AudioManager.playBgs({"name":"21_HandyMassager1","volume":60,"pitch":120,"pan":0});
-    for (var i = valuePic1; i <= valuePic1+10; i++) {
+    for (let i = valuePic1; i <= valuePic1+10; i++) {
       if($gameScreen.picture(i)){
         pic_move1(i,0,0,300,300,255,60);
-      };
-    };
-  };
-  if(id101 == 9){
-    var value2 = 'XevS101_05';
-    pic_1(0,valuePic1+2,value2,2,100,255,60,1280,768,0,0);
+      }
+    }
+  }
+  else if(id101 == 9){
+    pic_1(0,valuePic1+2,'XevS101_05',2,100,255,60,1280,768,0,0);
     hcg_piston(valuePic1+2,5,1,2);
-  };
-};
+  }
+}
 
-};
+}
 
 //}());
