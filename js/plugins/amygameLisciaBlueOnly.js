@@ -15,21 +15,8 @@ class BookTipBase {
         throw new Error("getValue2 method should be implemented");
     }
 
-    playSound() {
-        AudioManager.playSe({"name": seName(), "volume": 100, "pitch": 100, "pan": 0});
-    }
-
     var172value() {
         throw new Error("getValue2 method should be implemented");
-    }
-
-    setGameVariable172() {
-        $gameVariables.setValue(172, var172value());
-    }
-
-    setValueTalkSet() {
-		const value3 = [0,1,640,384,100,100,255];
-		valueTalkSet = [this.getValue1(),this.getValue2(),value3];
     }
 
     getValue1() {
@@ -38,6 +25,19 @@ class BookTipBase {
 
     getValue2() {
         throw new Error("getValue2 method should be implemented");
+    }
+
+    playSound() {
+        AudioManager.playSe({"name": this.seName(), "volume": 100, "pitch": 100, "pan": 0});
+    }
+
+    setGameVariable() {
+        $gameVariables.setValue(172, this.var172value());
+    }
+
+    setValueTalkSet() {
+		const value3 = [0,1,640,384,100,100,255];
+		valueTalkSet = [this.getValue1(),this.getValue2(),value3];
     }
 
     execute() {
