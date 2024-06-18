@@ -1860,36 +1860,42 @@ if(id100 == 1){//リーシャ登場。戦闘シーン
 //作品オリジナルのピクチャ挿話やキャラグラ移動等処理。401-600以外は直接コモンid入力
 original_souwa = function(id100,id101){
 
-if(id100 == 0 && $gameVariables.value(535) >= 1){
-  if($gameVariables.value(535) >= 401 && $gameVariables.value(535) <= 500){
-    id100 = $gameVariables.value(535) - 400;
-  };
-};
+const var535 = $gameVariables.value(535);
+if(id100 == 0 && var535 >= 1){
+  if(var535 >= 401 && var535 <= 500){
+    id100 = var535 - 400;
+  }
+}
+
 if(id100 == 31){//秩序の酒場に不良団員npc2人と酒とつまみを生成。id11-15まで使用
   if(id101 == 1){
-    var value1 = 11;
+    let value1 = 11;
     event_respawnSetN(value1,16,15,0,'npcOrder2',0);
-    var event = $gameMap.event($gameVariables.value(292)[value1]);
+    let event = $gameMap.event($gameVariables.value(292)[value1]);
     event.setDirection(4);
-    var value1 = 12;
+	
+    value1 = 12;
     event_respawnSetN(value1,13,15,0,'npcOrder2',3);
-    var event = $gameMap.event($gameVariables.value(292)[value1]);
+    event = $gameMap.event($gameVariables.value(292)[value1]);
     event.setDirection(6);
-    var value1 = 13;
+	
+    value1 = 13;
     goodsEvent_respawn(value1,'food_2',1,4,2,15,15);
-    var event = $gameMap.event($gameVariables.value(292)[value1]);
+    event = $gameMap.event($gameVariables.value(292)[value1]);
     event._spriteOffsetX = 25;
     event._spriteOffsetY = 10;
     event._priorityType = 2;
-    var value1 = 14;
+	
+    value1 = 14;
     goodsEvent_respawn(value1,'food_2',3,6,0,14,15);
-    var event = $gameMap.event($gameVariables.value(292)[value1]);
+    event = $gameMap.event($gameVariables.value(292)[value1]);
     event._spriteOffsetX = -25;
     event._spriteOffsetY = 10;
     event._priorityType = 2;
-    var value1 = 15;
+	
+    value1 = 15;
     goodsEvent_respawn(value1,'food_1',0,4,0,15,15);
-    var event = $gameMap.event($gameVariables.value(292)[value1]);
+    event = $gameMap.event($gameVariables.value(292)[value1]);
     event._spriteOffsetX = -24;
   };
 };
@@ -1921,7 +1927,8 @@ if(id100 == 0 && var535 >= 1){
     id100 = var535 - 500;
   }
 }
-else if(id100 == 11){//Ｈな診察
+
+if(id100 == 11){//Ｈな診察
   if(id101 == 1){
     backGraund_menuMapSelect(2,0,0,0);
     valuePic1 = 51;
