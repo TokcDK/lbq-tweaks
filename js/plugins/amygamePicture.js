@@ -554,7 +554,7 @@ if(id12 == 0){
       }
       case 6: {//イベントＣＧ
         valueTachieBless6 = arr1;
-        UTSU.PictureBreath6.on([id11[, valueTachieBless6[2]);
+        UTSU.PictureBreath6.on([id11], valueTachieBless6[2]);
 		break;
       }
       case 5: {//イベントＣＧ
