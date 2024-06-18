@@ -1188,45 +1188,55 @@ if(value1 >= 1){$gameSwitches.setValue(380,true)};
 seisyoujuu_select2 = function(id1){
 
 if(id1 == 0){
-  for (var i = 100; i <= 205; i++) {$gameScreen.erasePicture(i)};
-};
-if(id1 == 1){
-  valueItems = $dataArmors;
-  var value0 = 0;
-  var value1 = 101;
-  var value2 = 'ScreenBlackOut';
-  var value3 = 0;
-  var value4 = `\\I[508]星晶石入手率＜${valueCountSet4}/${valueCountSet3}＞`;
-  const id = 1; 
+  for (let i = 100; i <= 205; i++) {$gameScreen.erasePicture(i)};
+}
+else if(id1 == 1){
+  //valueItems = $dataArmors;
+  //const value0 = 0;
+  let value1 = 101;
+  //const value2 = 'ScreenBlackOut';
+  let value3 = 0;
+  const txt = `\\I[508]星晶石入手率＜${valueCountSet4}/${valueCountSet3}＞`;
   const choiceParams = {
-  text: value4,
-  value: 0};
+	  text: txt,
+	  value: 0
+  };
+  let id = 1; 
   $gameSystem.addCustomChoice(id, choiceParams);
   value3 += 1;
   valueItems = $dataArmors;
-  for (var i = 1; i <= valueArmorsLength; i++) {
-    if(valueItems[i].etypeId == 6){
-      if(valueItems[i].meta['ItemPicture']){
-        if($gameParty.hasItem(valueItems[i],true)){
-          const id = 1; 
+  for (let i = 1; i <= valueArmorsLength; i++) {
+	const item = valueItems[i];
+    if(item.etypeId == 6){
+	  const itemMeta = item.meta;
+	  const itemPictureData = itemMeta['itemPictureData'];
+      if(itemPictureData){
+        if($gameParty.hasItem(item,true)){
+          id = 1; 
           const choiceParams = {
-          text: `${valueItems[i].name}:<${$gameVariables.value(352)[i - valueSeisyoujuuStartId]}>`,
-          value: i};
+			  text: `${item.name}:<${$gameVariables.value(352)[i - valueSeisyoujuuStartId]}>`,
+			  value: i
+		  };
           $gameSystem.addCustomChoice(id, choiceParams);
-          var value2 = `/img/sv_enemies/Summon_${valueItems[i].meta['ItemPicture'].split(',')[0]}`;
-          var value5 = Number(valueItems[i].meta['ItemPicture'].split(',')[1]);
-          if(value5 >= 0){
-            var value6 = 50;
-            var value7 = 0;
+		  const itemPictureDataArr = itemPictureData.split(',');
+          const value5 = Number(itemPictureDataArr[1]);
+          
+          let value6;
+          let value7;
+		  if(value5 >= 0){
+            value6 = 50;
+            value7 = 0;
           } else {
-            var value6 = 100;
-            var value7 = 200;
+            value6 = 100;
+            value7 = 200;
           };
+		  
+          const value2 = `/img/sv_enemies/Summon_${itemPictureDataArr[0]}`;
           $gameScreen.showPicture(value1,value2,1,640 + 200,384 + value5 - 150 + value7,value6,value6,0,0);
           $gameMessage.setSelectPictureId(value3, value1);
-          if(valueItems[i].meta['summonDescription']){
-            var value4 = valueItems[i].meta['summonDescription'];
-            $gameScreen.setDTextPicture(value4, 28);
+          if(itemMeta['summonDescription']){
+            const summonDescription = itemMeta['summonDescription'];
+            $gameScreen.setDTextPicture(summonDescription, 28);
             $gameScreen.dWindowFrame = 'ON';
             $gameScreen.showPicture(value1+1,'',0,10,606,100,100,0,0);
             $gameMessage.setSelectPictureId(value3, value1+1);
