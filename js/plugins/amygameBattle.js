@@ -1612,7 +1612,7 @@ if(id1 == 1){
       //var enemy2 = $dataEnemies[gameTroopMembers[actorId].enemyId()]; // not using
       $gameVariables.setValue(20,$gameVariables.value(11));
     };
-    //actorId = $gameVariables.value(20);
+    actorId = $gameVariables.value(20);
   };
 }
 
