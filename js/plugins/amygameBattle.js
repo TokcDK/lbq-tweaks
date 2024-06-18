@@ -1013,18 +1013,18 @@ if(is_girl($gameActors.actor($gameVariables.value(20)))){
 tachie_aura = function(){
 
 if($gameParty.inBattle() && $gameActors.actor($gameVariables.value(20)).tp >= 100 && is_girl($gameActors.actor($gameVariables.value(20)))){
-var value1 = Number($dataActors[$gameVariables.value(20)].meta['tachiePicId']);
+const value1 = Number($dataActors[$gameVariables.value(20)].meta['tachiePicId']);
 if($gameScreen.picture(value1)){
-var value2 = $gameVariables.value(105);
-var value3 = $gameVariables.value(106);
-var value4 = $gameVariables.value(107);
-var value5 = $gameVariables.value(108);
+const value2 = $gameVariables.value(105);
+const value3 = $gameVariables.value(106);
+const value4 = $gameVariables.value(107);
+const value5 = $gameVariables.value(108);
 //var value2 = $gameScreen.picture(value1)._x;
 //var value3 = $gameScreen.picture(value1)._y;
 //var value4 = $gameScreen.picture(value1)._scaleX;
 //var value5 = $gameScreen.picture(value1)._scaleY;
-var value6 = value1-20;
-var value7 = 0;
+const value6 = value1-20;
+const value7 = 0;
 
 //if($gameVariables.value(276) == 2){
 //var value7 = -50;
