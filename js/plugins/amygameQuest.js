@@ -129,7 +129,7 @@ quest_settei = function (id5) {
 
 quest_settei_item = function (item, id6) {
 
-  if (!item.name) return;
+  if (!item || !item.name) return;
 
   let actor = $gameActors.actor($gameVariables.value(2));
 
@@ -140,12 +140,14 @@ quest_settei_item = function (item, id6) {
   let questCompMessageText = `\\C[16]●達成条件\\C[0]\n`;
   let questCompParsed = 0;//達成条件
   let questCompOn = 0;//達成条件
+  
+  const itemMeta = item.meta;
 
   //発生条件
 
   //冒険者ランクで発生
-  if (item.meta['QuestSetRank']) {
-    const itemQuestSetRankId = Number(item.meta['QuestSetRank']);
+  if (itemMeta['QuestSetRank']) {
+    const itemQuestSetRankId = Number(itemMeta['QuestSetRank']);
     if (itemQuestSetRankId >= 1) {
       //let value14 = valueQuestRankD[0];let arr1 = [valueQuestRankD[1],valueQuestRankD[2]];
       //if(value13 == 1){let value14 = valueQuestRankC[0];let arr1 = [valueQuestRankC[1],valueQuestRankC[2]]};
@@ -171,8 +173,8 @@ quest_settei_item = function (item, id6) {
   };
 
   //視点が誰か441
-  if (item.meta['QuestSetPerspective']) {
-    const itemQuestSetPerspective = Number(item.meta['QuestSetPerspective']);
+  if (itemMeta['QuestSetPerspective']) {
+    const itemQuestSetPerspective = Number(itemMeta['QuestSetPerspective']);
     if (itemQuestSetPerspective >= 1) {
       if (itemQuestSetPerspective != $gameVariables.value(2)) {
         questSetMessageText += `[${$gameActors.actor(itemQuestSetPerspective).name()}視点]\n`;
@@ -184,14 +186,14 @@ quest_settei_item = function (item, id6) {
     questSetParsed += 1;
   };
 
-  if (item.meta['NoteWord']) {
-    questSetMessageText += `[${item.meta['NoteWord']}]`;
+  if (itemMeta['NoteWord']) {
+    questSetMessageText += `[${itemMeta['NoteWord']}]`;
   };
 
   //アクターが存在するか
   let needNewLine = false;
-  if (item.meta['QuestSetActor']) {
-    let arr = item.meta['QuestSetActor'].split(',').map(Number);
+  if (itemMeta['QuestSetActor']) {
+    let arr = itemMeta['QuestSetActor'].split(',').map(Number);
     for (let id = 0, len = arr.length; id < len; id++) {
       if ((arr[id]) === 0) {
         arr[id] = $gameVariables.value(2);//誰でもいいアクター
@@ -215,8 +217,8 @@ quest_settei_item = function (item, id6) {
   if (needNewLine) { questSetMessageText += `\n` };
 
   //マップ発生条件Number(value2)
-  if (item.meta['QuestSetMap']) {
-    let value2 = Number(item.meta['QuestSetMap']);
+  if (itemMeta['QuestSetMap']) {
+    let value2 = Number(itemMeta['QuestSetMap']);
     if (value2 == 0) { value2 = 2 };
     //amygameDescription.jsで実行。if(value2 == 2){}else{value.description += `【場所:${$dataSystem.switches[value2]}】`};
     if ($gameSwitches.value(value2)) {
@@ -227,8 +229,8 @@ quest_settei_item = function (item, id6) {
   }
 
   //スイッチ発生条件Number(value2)
-  if (item.meta['QuestSetSwi']) {
-    let value2 = Number(item.meta['QuestSetSwi']);
+  if (itemMeta['QuestSetSwi']) {
+    let value2 = Number(itemMeta['QuestSetSwi']);
     if (value2 == 0) { value2 = 2 };
     if (value2 !== 2) {
       const value13 = scene_joukenNakami_clean_prefixes($dataSystem.switches[value2]);
@@ -245,8 +247,8 @@ quest_settei_item = function (item, id6) {
   }
 
   //メインクエスト進行度発生条件Number(arr[0])
-  if (item.meta['QuestSetMainRoot']) {
-    let arr = item.meta['QuestSetMainRoot'].split(',').map(Number);
+  if (itemMeta['QuestSetMainRoot']) {
+    let arr = itemMeta['QuestSetMainRoot'].split(',').map(Number);
     if ((arr[0]) == 0) { arr[0] = 135 };
     if ((arr[1]) == 0) { } else { questSetMessageText += `【メインクエスト進行[${(arr[1])}]以上` };
     if ($gameVariables.value((arr[0])) >= (arr[1])) {
@@ -261,8 +263,8 @@ quest_settei_item = function (item, id6) {
 
   //変数による発生条件Number(arr[0])
   for (let id = 1; id < 10; id++) {
-    if (item.meta['QuestSetVal' + id]) {
-      const arr = item.meta['QuestSetVal' + id].split(',').map(Number);
+    if (itemMeta['QuestSetVal' + id]) {
+      const arr = itemMeta['QuestSetVal' + id].split(',').map(Number);
       if ((arr[0]) == 0) { arr[0] = 2 };
       if (arr[0] == 2) { } else {
         const value13 = scene_joukenNakami_clean_prefixes($dataSystem.variables[(arr[0])]);
@@ -281,8 +283,8 @@ quest_settei_item = function (item, id6) {
 
   //性欲度等による発生条件
   for (let id = 1; id < 10; id++) {
-    if (item.meta['QuestSetHexpArr' + id]) {
-      const arr = item.meta['QuestSetHexpArr' + id].split(',').map(Number);
+    if (itemMeta['QuestSetHexpArr' + id]) {
+      const arr = itemMeta['QuestSetHexpArr' + id].split(',').map(Number);
       actor = $gameActors.actor((arr[0]));
       let value13;
       if ((arr[1]) == 4) {//露出度
@@ -303,9 +305,9 @@ quest_settei_item = function (item, id6) {
     };
   }
   //スキルによる発生条件Number(arr[0])
-  if (item.meta['QuestSetSkill']) {
+  if (itemMeta['QuestSetSkill']) {
     actor = $gameActors.actor($gameVariables.value(2));
-    const arr = item.meta['QuestSetSkill'].split(',').map(Number);
+    const arr = itemMeta['QuestSetSkill'].split(',').map(Number);
     if ((arr[0]) >= 1) {
       actor = $gameActors.actor((arr[0]));
     };
@@ -328,8 +330,8 @@ quest_settei_item = function (item, id6) {
   };
   //actor.battleSkillsRaw().includes(Number(arr[1]))
   //スキル装着による発生条件Number(arr[0])
-  if (item.meta['QuestSetSkillEquip']) {
-    const arr = item.meta['QuestSetSkillEquip'].split(',').map(Number);
+  if (itemMeta['QuestSetSkillEquip']) {
+    const arr = itemMeta['QuestSetSkillEquip'].split(',').map(Number);
     if ((arr[0]) === 0) {
       arr[0] = $gameVariables.value(2);
     };
@@ -352,9 +354,9 @@ quest_settei_item = function (item, id6) {
     questSetParsed += 1;
   };
   //スキルランクによる発生条件Number(arr[0])
-  if (item.meta['QuestSetSkillRank']) {
+  if (itemMeta['QuestSetSkillRank']) {
     actor = $gameActors.actor($gameVariables.value(2));
-    const arr = item.meta['QuestSetSkillRank'].split(',').map(Number);
+    const arr = itemMeta['QuestSetSkillRank'].split(',').map(Number);
     if ((arr[0]) >= 1) {
       actor = $gameActors.actor((arr[0]));
     };
@@ -376,8 +378,8 @@ quest_settei_item = function (item, id6) {
     questSetParsed += 1;
   };
   //ステート付与による発生条件Number(arr[0])actor.isStateAffected(61)
-  if (item.meta['QuestSetState']) {
-    let arr = item.meta['QuestSetState'].split(',').map(Number);
+  if (itemMeta['QuestSetState']) {
+    let arr = itemMeta['QuestSetState'].split(',').map(Number);
     if ((arr[0]) == 0) {
       arr[0] = $gameVariables.value(2);
     };
@@ -400,8 +402,8 @@ quest_settei_item = function (item, id6) {
     questSetParsed += 1;
   };
   //アイテムによる発生条件Number(arr[0])
-  if (item.meta['QuestSetItem']) {
-    let arr = item.meta['QuestSetItem'].split(',');
+  if (itemMeta['QuestSetItem']) {
+    let arr = itemMeta['QuestSetItem'].split(',');
     const valueItems = get_valueItems_iwa((arr[0]));
     if ((arr[1]) === 0) arr[1] = 5;
     if ((arr[1]) !== 5) { questSetMessageText += `【${valueItems[(arr[1])].name}所持` };
@@ -417,8 +419,8 @@ quest_settei_item = function (item, id6) {
   };
   //討伐数による発生条件Number(arr[0])
   const gameVar52Array = $gameVariables.value(52);
-  if (item.meta['QuestSetSubjugation']) {
-    let arr = item.meta['QuestSetSubjugation'].split(',').map(Number);
+  if (itemMeta['QuestSetSubjugation']) {
+    let arr = itemMeta['QuestSetSubjugation'].split(',').map(Number);
     if ((arr[0]) == 0) { arr[0] = 421 };
     if (arr[0] >= 3) {
       questSetMessageText += `【\x1bSIM[${(arr[0])}]\\C[10]${(arr[1])}\\C[0]体討伐`;
@@ -440,8 +442,8 @@ quest_settei_item = function (item, id6) {
     questSetParsed += 1;
   };
   //アイテム所持による発生条件Number(arr[0])SG種別
-  if (item.meta['QuestSetItemArr']) {
-    let arr = item.meta['QuestSetItemArr'].split(',').map(Number);
+  if (itemMeta['QuestSetItemArr']) {
+    let arr = itemMeta['QuestSetItemArr'].split(',').map(Number);
     for (let id = 0, len = arr.length; id < len; id++) {
       if ((arr[id]) == 0) { arr[id] = 5 };
       const itemId = arr[id];
@@ -477,8 +479,8 @@ quest_settei_item = function (item, id6) {
   //ここから達成条件
 
   //視点が誰か441
-  if (item.meta['QuestCompPerspective']) {
-    let value13 = Number(item.meta['QuestCompPerspective']);
+  if (itemMeta['QuestCompPerspective']) {
+    let value13 = Number(itemMeta['QuestCompPerspective']);
     if (value13 >= 1) {
       if (value13 != $gameVariables.value(2)) {
         questCompMessageText += `[${$gameActors.actor(value13).name()}視点`;
@@ -495,8 +497,8 @@ quest_settei_item = function (item, id6) {
   };
   //アクターが存在するか
   needNewLine = false;
-  if (item.meta['QuestCompActor']) {
-    let arr = item.meta['QuestCompActor'].split(',');
+  if (itemMeta['QuestCompActor']) {
+    let arr = itemMeta['QuestCompActor'].split(',');
     for (let id = 0, len = arr.length; id < len; id++) {
       if ((arr[id]) == 0) {
         arr[id] = $gameVariables.value(2);//誰でもいいアクター
@@ -519,8 +521,8 @@ quest_settei_item = function (item, id6) {
 
   //討伐数による達成条件Number(arr[0])
   for (let id = 1; id < 10; id++) {
-    if (item.meta['QuestCompSubjugation' + id]) {
-      let arr = item.meta['QuestCompSubjugation' + id].split(',').map(Number);
+    if (itemMeta['QuestCompSubjugation' + id]) {
+      let arr = itemMeta['QuestCompSubjugation' + id].split(',').map(Number);
       if (arr[0] <= 5) {
         if (arr[0] == 1) {
           questCompMessageText += `【\\C[2]当日魔物討伐数\\C[0]:${gameVar52Array[(arr[0])]}/${(arr[1])}`;
@@ -544,8 +546,8 @@ quest_settei_item = function (item, id6) {
 
   quest_settei_QuestComp1 = function (metaName, messageOn, messageOff) {
     for (let id = 1; id < 10; id++) {
-      if (item.meta[metaName + id]) {
-        const arr = item.meta[metaName + id].split(',');
+      if (itemMeta[metaName + id]) {
+        const arr = itemMeta[metaName + id].split(',');
         const valueItems = quest_settei_get_valueItems_iwa(arr, i);
         if (arr[0] == 0) arr[0] = 5;
         const itemId = arr[0];
@@ -574,8 +576,8 @@ quest_settei_item = function (item, id6) {
 
   //変数による達成条件Number(arr[0])
   for (let id = 1; id < 10; id++) {
-    if (item.meta['QuestCompVal' + id]) {
-      const arr = item.meta['QuestCompVal' + id].split(',').map(Number);
+    if (itemMeta['QuestCompVal' + id]) {
+      const arr = itemMeta['QuestCompVal' + id].split(',').map(Number);
       if (arr[0] == 0) { arr[0] = 2 };
       if (arr[0] != 2) {
         const value13 = scene_joukenNakami_clean_prefixes($dataSystem.variables[(arr[0])]);
@@ -593,8 +595,8 @@ quest_settei_item = function (item, id6) {
   }
   //変数配列による達成条件Number(arr[0])
   for (let id = 1; id < 10; id++) {
-    if (item.meta['QuestCompArray' + id]) {
-      const arr = item.meta['QuestCompArray' + id].split(',').map(Number);
+    if (itemMeta['QuestCompArray' + id]) {
+      const arr = itemMeta['QuestCompArray' + id].split(',').map(Number);
       if ((arr[0]) == 0) { arr[0] = 2 };
       if (arr[0] == 2) { } else {
         questCompMessageText += `【\\C[2]${$dataSystem.variables[(arr[0])]}\\C[0]:${$gameVariables.value((arr[0]))[(arr[1])]}/${(arr[2])}`;
@@ -611,9 +613,9 @@ quest_settei_item = function (item, id6) {
   }
   //スキル習得による達成条件
   for (let id = 1; id < 10; id++) {
-    if (item.meta['QuestCompSkill' + id]) {
+    if (itemMeta['QuestCompSkill' + id]) {
       actor = $gameActors.actor($gameVariables.value(2));
-      const arr = item.meta['QuestCompSkill' + id].split(',').map(Number);
+      const arr = itemMeta['QuestCompSkill' + id].split(',').map(Number);
       if ((arr[0]) >= 1) {
         actor = $gameActors.actor((arr[0]));
       };
@@ -637,9 +639,9 @@ quest_settei_item = function (item, id6) {
   }
   //スキル装着による達成条件
   for (let id = 1; id < 10; id++) {
-    if (item.meta['QuestCompSkillEquip' + id]) {
+    if (itemMeta['QuestCompSkillEquip' + id]) {
       actor = $gameActors.actor($gameVariables.value(2));
-      const arr = item.meta['QuestCompSkillEquip' + id].split(',').map(Number);
+      const arr = itemMeta['QuestCompSkillEquip' + id].split(',').map(Number);
       if ((arr[0]) >= 1) {
         actor = $gameActors.actor((arr[0]));
       };
@@ -663,9 +665,9 @@ quest_settei_item = function (item, id6) {
   }
   //スキルランクによる達成条件
   for (let id = 1; id < 10; id++) {
-    if (item.meta['QuestCompSkillRank' + id]) {
+    if (itemMeta['QuestCompSkillRank' + id]) {
       actor = $gameActors.actor($gameVariables.value(2));
-      const arr = item.meta['QuestCompSkillRank' + id].split(',').map(Number);
+      const arr = itemMeta['QuestCompSkillRank' + id].split(',').map(Number);
       if ((arr[0]) >= 1) {
         actor = $gameActors.actor(Number(arr[0]));
       };
@@ -689,9 +691,9 @@ quest_settei_item = function (item, id6) {
   }
   //ステート付与による達成条件
   for (let id = 1; id < 10; id++) {
-    if (item.meta['QuestCompState' + id]) {
+    if (itemMeta['QuestCompState' + id]) {
       actor = $gameActors.actor($gameVariables.value(2));
-      const arr = item.meta['QuestCompState' + id].split(',').map(Number);
+      const arr = itemMeta['QuestCompState' + id].split(',').map(Number);
       const actorId = (arr[0]);
       if (actorId >= 1) {
         actor = $gameActors.actor(actorId);
@@ -715,8 +717,8 @@ quest_settei_item = function (item, id6) {
     };
   }
   //スイッチ達成条件Number(value8)
-  if (item.meta['QuestCompSwi']) {
-    let switchId = Number(item.meta['QuestCompSwi']);
+  if (itemMeta['QuestCompSwi']) {
+    let switchId = Number(itemMeta['QuestCompSwi']);
     if (switchId === 0) { switchId = 2 };
     if (switchId !== 2) {
       const value13 = scene_joukenNakami_clean_prefixes($dataSystem.switches[switchId]);
@@ -736,13 +738,13 @@ quest_settei_item = function (item, id6) {
   if (questSetMessageText == `\\C[16]●発生条件\\C[0]\n`) { questSetMessageText += `【なし】\n` };
   valueQuestArray7[i - id6] = questSetMessageText;
   valueQuestArray4[i - id6] = `${$dataItems[i].description}\n`;
-  if (item.meta['QuestSupplement']) {
-    let value9 = item.meta['QuestSupplement'];
+  if (itemMeta['QuestSupplement']) {
+    let value9 = itemMeta['QuestSupplement'];
     valueQuestArray4[i - id6] += `${value9}`;
   };
   //寄付金
-  if (item.meta['QuestCompMoney']) {
-    const value13 = Number(item.meta['QuestCompMoney']);
+  if (itemMeta['QuestCompMoney']) {
+    const value13 = Number(itemMeta['QuestCompMoney']);
     if (value13 >= 1) {
       if (value13 !== 0) {
         questCompMessageText += `【\\C[2]${value13}\\G`;
