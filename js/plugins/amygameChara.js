@@ -1013,14 +1013,16 @@ for (let id10 = 1; id10 <= 10; id10++) {//固有素材。<CGPriority:1,1>
 }
 
 //色々動的生成設定
-var map_otherGraphicSetEndNowArray = [1, 2, 1, 1, 1, 1, 1];
+const map_otherGraphicSetEndNowArray = [1, 2, 1, 1, 1, 1, 1];
+const map_otherGraphicSetEndNowArrayLen = map_otherGraphicSetEndNowArray.length;
 map_otherGraphicSet = function(id1,arr1,arr2){
 
-  if(arr2 === 0) return;
+  if(!arr2 || arr2.length == 0) return;
 
   let j = 0;
   const gameVar210SpawnEventIdsArray = $gameVariables.value(210);
   const end = id1 == 0 ? $gameVariables.value(238) : id1;
+  const gameMap = $gameMap;
   for (let i = 1; i <= end; i++) {
     const conditionMap         = {};
     conditionMap.passable    = arr2[3];
@@ -1028,17 +1030,18 @@ map_otherGraphicSet = function(id1,arr1,arr2){
     conditionMap.collided    = arr2[5];
     conditionMap.terrainTags = arr2[6];
     conditionMap.regionIds   = arr2[7];
-    $gameMap.spawnEventRandom(arr2[0], conditionMap, true);
+    gameMap.spawnEventRandom(arr2[0], conditionMap, true);
     
-    gameVar210SpawnEventIdsArray.push($gameMap.getLastSpawnEventId());
-    const event = $gameMap.event($gameMap.getLastSpawnEventId());
+	const lastSpawnEventId = gameMap.getLastSpawnEventId();
+    gameVar210SpawnEventIdsArray.push(lastSpawnEventId);
+    const event = gameMap.event(lastSpawnEventId);
     if(arr1){
       event.setImage(arr1[Math.floor(Math.random() * arr1.length)],Math.floor( Math.random() * 8) + 0);
     }
     event.setMoveSpeed(arr2[1][Math.floor(Math.random() * arr2[1].length)]);//1-6
     event.setMoveFrequency(arr2[2][Math.floor(Math.random() * arr2[2].length)]);//1-5
     
-    j += map_otherGraphicSetEndNowArray[Math.floor(Math.random() * 3)];
+    j += map_otherGraphicSetEndNowArray[Math.floor(Math.random() * map_otherGraphicSetEndNowArrayLen)];
     if(i + j >= end){
       break;
     }
