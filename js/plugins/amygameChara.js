@@ -98,8 +98,8 @@ for (let id = $gameMap.events().length; id > 0; id--) {
 event_PlayerArrangement = function(value1){
 
 const eventId = $gameVariables.value(292)[value1];
-if(!!$gameMap.event(eventId)) {
-  const event = $gameMap.event(eventId);
+const event = $gameMap.event(eventId);
+if(!!event) {
   if($gameSwitches.value(29)){
     $gameVariables.setValue(171,0);
   } else {
