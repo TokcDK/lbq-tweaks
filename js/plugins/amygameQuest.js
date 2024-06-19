@@ -4,7 +4,7 @@
  * @help ゲーム専用に作成された初期読み込み用プラグイン
  */
 
-//(function(){
+(function(){
 
 //クエスト報酬設定。クエストで変数21-23は報酬で使っているので使用不可。
 quest_housyuukeisan = function (id1) {
@@ -121,7 +121,7 @@ quest_settei = function (id5) {
     return;
   }
 
-  for (var i = start; i <= end; i++) {
+  for (let i = start; i <= end; i++) {
     quest_settei_item($dataItems[i], id6);
   }
 
@@ -1092,4 +1092,4 @@ if(!$gameSwitches.value(380)){
 
 };
 
-//}());
+}());
