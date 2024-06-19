@@ -878,29 +878,24 @@ value10 = 0;//そのマップで発生するシーン数
 j = 0;//配列を番号順に居れるため
 
 let start, end, value23, value24, value25, value26;
+const setValuesById = (varId1, varId2, s, e, v23, v24, v25, v26, varId3, varId4) => {
+  $gameSwitches.setValue(varId1,false);
+  $gameSwitches.setValue(varId2,false);
+  start = s;
+  end = e;
+  value23 = v23;
+  value24 = v24;
+  value25 = v25;//成立数変数
+  value26 = v26;//未成立数変数
+  $gameVariables.setValue(varId3, 0);
+  $gameVariables.setValue(varId4, 0);
+}
+
 if(id1 == 1){
-  $gameSwitches.setValue(479,false);
-  $gameSwitches.setValue(367,false);
-  start = 401;
-  end = 500;
-  value23 = 800;
-  value24 = 900;
-  value25 = 517;//成立数変数
-  value26 = 518;//未成立数変数
-  $gameVariables.setValue(517, 0);
-  $gameVariables.setValue(518, 0);
+  setValuesById(479, 367, 401, 500, 800,900, 517, 518, 517, 518);
 }
 else if(id1 == 2){
-  $gameSwitches.setValue(480,false);
-  $gameSwitches.setValue(369,false);
-  start = 501;
-  end = 600;
-  value23 = 500;
-  value24 = 600;
-  value25 = 504;//成立数変数
-  value26 = 505;//未成立数変数
-  $gameVariables.setValue(504, 0);
-  $gameVariables.setValue(505, 0);
+  setValuesById(480, 369, 501, 600, 500,600, 504, 505, 504, 505);
 }
 else {
   console.warn(`id1 is ${id1}! must be 1 or 2!`);
@@ -910,16 +905,17 @@ for (let i = start; i <= end; i++) {
   scene_joukenNakami(id1,i,value23,value24,value25,value26);
 }
 
+const setValuesById1 = (v25, v26, arrVal) => {
+  value25 = v25;//成立数変数
+  value26 = v26;//未成立数変数
+  arrAdd = arrVal;
+}
 let arrAdd;
 if(id1 == 1){
-  value25 = 517;//成立数変数
-  value26 = 518;//未成立数変数
-  arrAdd = valueSouwasceneAddId;
+  setValuesById1(517, 518, valueSouwasceneAddId);
 }
 else if(id1 == 2){
-  value25 = 504;//成立数変数
-  value26 = 505;//未成立数変数
-  arrAdd = valueHsceneAddId;
+  setValuesById1(504, 505, valueHsceneAddId);
 }
 else{
   console.warn(`id1 is ${id1}! must be 1 or 2!`);
@@ -928,10 +924,11 @@ else{
 //アイテムID<HsceneItem><SouwaItem>
 for (const id of arrAdd) {
   const item = $dataItems[id];
-  const addEventIncidenceSwiNum = Number(item.meta['AddEventIncidenceSwi']);//発生スイッチ。リセットなしの1601-1700の間に実行。
-  const addEventCompSwiNum = Number(item.meta['AddEventCompSwi']);//達成スイッチ
-  const addAddEventCommonIdNum = Number(item.meta['AddAddEventCommonId']);//コモID。並列スイッチも逆算して代入。スクリプト内では使わない
-  const addEventParallelSwiNum = Number(item.meta['AddEventParallelSwi']);//並列スイッチ
+  const itemMeta = item.meta;
+  const addEventIncidenceSwiNum = Number(itemMeta['AddEventIncidenceSwi']);//発生スイッチ。リセットなしの1601-1700の間に実行。
+  const addEventCompSwiNum = Number(itemMeta['AddEventCompSwi']);//達成スイッチ
+  const addAddEventCommonIdNum = Number(itemMeta['AddAddEventCommonId']);//コモID。並列スイッチも逆算して代入。スクリプト内では使わない
+  const addEventParallelSwiNum = Number(itemMeta['AddEventParallelSwi']);//並列スイッチ
   scene_joukenNakami(id1,id,addEventIncidenceSwiNum,addEventCompSwiNum,value25,value26,addAddEventCommonIdNum,addEventParallelSwiNum);
 }
 
