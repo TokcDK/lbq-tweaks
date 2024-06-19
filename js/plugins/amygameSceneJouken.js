@@ -145,7 +145,8 @@ if(lineCount >= lineBreakCount){messageText += `\n`;lineCount = 0};
   event_set_swi = function (metaName, num1, prefix, isSet) {
     if (dataItem.meta[metaName]) {
       const arr = dataItem.meta[metaName].split(',');
-      for (let id = 0; id < arr.length; id++) {
+	  const arrLen = arr.length;
+      for (let id = 0; id < arrLen; id++) {
         if (arr[id] == 0) {
           arr[id] = num1;
         } else {
