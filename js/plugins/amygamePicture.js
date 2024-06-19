@@ -586,83 +586,125 @@ if(id12 == 0){
 //CGでピストン表現hcg_piston(value1,7,1,1);
 hcg_piston = function(id11,id12,id13,id14){
 
-if(id12 == 1){//右横
-  if(id13 == 1){var array = [-1,3,100, 0.015, 0.001]}
-  if(id13 == 2){var array = [-1,3,60, 0.020, 0.001]}
-  if(id13 == 3){var array = [-1,3,40, 0.025, 0.001]}
+if($gameSwitches.value(43)) return; //高演出カット
+
+let array;
+switch(id12){
+case 1: {//右横
+ switch(id13){
+  case 1: { array = [-1,3,100, 0.015, 0.001]; break; }
+  case 2: { array = [-1,3,60, 0.020, 0.001]; break; }
+  case 3: { array = [-1,3,40, 0.025, 0.001]; break; }
+ }
+ break;
 }
-if(id12 == 2){//左横
-  if(id13 == 1){var array = [-1,3,100, -0.015, 0.001]}
-  if(id13 == 2){var array = [-1,3,60, -0.020, 0.001]}
-  if(id13 == 3){var array = [-1,3,40, -0.025, 0.001]}
+case 2: {//左横
+ switch(id13){
+  case 1: { array = [-1,3,100, -0.015, 0.001]; break; }
+  case 2: { array = [-1,3,60, -0.020, 0.001]; break; }
+  case 3: { array = [-1,3,40, -0.025, 0.001]; break; }
+ }
+ break;
 }
-if(id12 == 3){//左斜め
-  if(id13 == 1){var array = [1,1,100, 0.015, 0.015]}
-  if(id13 == 2){var array = [1,1,50, 0.02, 0.02]}
-  if(id13 == 3){var array = [1,1,20, 0.03, 0.03]}
+case 3: {//左斜め
+ switch(id13){
+  case 1: { array = [1,1,100, 0.015, 0.015]; break; }
+  case 2: { array = [1,1,50, 0.02, 0.02]; break; }
+  case 3: { array = [1,1,20, 0.03, 0.03]; break; }
+ }
+ break;
 }
-if(id12 == 4){//右斜め
-  if(id13 == 1){var array = [-1,1,100, 0.015, 0.015]}
-  if(id13 == 2){var array = [-1,1,50, 0.02, 0.02]}
-  if(id13 == 3){var array = [-1,1,20, 0.03, 0.03]}
+case 4: {//右斜め
+ switch(id13){
+  case 1: { array = [-1,1,100, 0.015, 0.015]; break; }
+  case 2: { array = [-1,1,50, 0.02, 0.02]; break; }
+  case 3: { array = [-1,1,20, 0.03, 0.03]; break; }
+ }
+ break;
 }
-if(id12 == 5){//正面
-  if(id13 == 1){var array = [100,100,100, 0.005, 0.004]}
-  if(id13 == 2){var array = [150,150,50, 0.005, 0.004]}
-  if(id13 == 3){var array = [200,200,20, 0.020, 0.015]}
+case 5: {//正面
+ switch(id13){
+  case 1: { array = [100,100,100, 0.005, 0.004]; break; }
+  case 2: { array = [150,150,50, 0.005, 0.004]; break; }
+  case 3: { array = [200,200,20, 0.020, 0.015]; break; }
+ }
+ break;
 }
-if(id12 == 6){//正面痙攣（事後）
-  if(id13 == 1){var array = [100,100,200, 0.003, 0.002]}
-  if(id13 == 2){var array = [100,100,100, 0.003, 0.002]}
-  if(id13 == 3){var array = [100,100,20, 0.003, 0.002]}
+case 6: {//正面痙攣（事後）
+ switch(id13){
+  case 1: { array = [100,100,200, 0.003, 0.002]; break; }
+  case 2: { array = [100,100,100, 0.003, 0.002]; break; }
+  case 3: { array = [100,100,20, 0.003, 0.002]; break; }
+ }
+ break;
 }
-if(id12 == 7){//縦
-  //if(id13 == 1){var array = [100,100,100, 0.015, 0.04]}
-  if(id13 == 1){var array = [100,100,100, 0.015, 0.02]}
-  if(id13 == 2){var array = [100,100,50, 0.015, 0.04]}
-  if(id13 == 3){var array = [100,100,20, 0.015, 0.05]}
+case 7: {//縦
+ switch(id13){
+  //case 1: { array = [100,100,100, 0.015, 0.04]; break; }
+  case 1: { array = [100,100,100, 0.015, 0.02]; break; }
+  case 2: { array = [100,100,50, 0.015, 0.04]; break; }
+  case 3: { array = [100,100,20, 0.015, 0.05]; break; }
+ }
+ break;
 }
-if(id12 == 8){//横左右に身動ぎ
-  if(id13 == 1){var array = [100,100,150, 0.01, 0.005]}
-  if(id13 == 2){var array = [100,100,100, 0.02, 0.015]}
-  if(id13 == 3){var array = [100,100,50, 0.03, 0.020]}
+case 8: {//横左右に身動ぎ
+ switch(id13){
+  case 1: { array = [100,100,150, 0.01, 0.005]; break; }
+  case 2: { array = [100,100,100, 0.02, 0.015]; break; }
+  case 3: { array = [100,100,50, 0.03, 0.020]; break; }
+ }
+ break;
 }
-if(id12 == 9){//プロフィール乳揺れ正面
-  if(id13 == 1){var array = [100,100,150, 0.015, 0.03]}
-  if(id13 == 2){var array = [100,100,50, 0.020, 0.04]}
-  if(id13 == 3){var array = [100,100,20, 0.025, 0.05]}
+case 9: {//プロフィール乳揺れ正面
+ switch(id13){
+  case 1: { array = [100,100,150, 0.015, 0.03]; break; }
+  case 2: { array = [100,100,50, 0.020, 0.04]; break; }
+  case 3: { array = [100,100,20, 0.025, 0.05]; break; }
+ }
+ break;
 }
-if(id12 == 10){//顔グラ乳揺れ正面
-  if(id13 == 1){var array = [100,100,150, 0.010, 0.02]}
-  if(id13 == 2){var array = [100,100,100, 0.020, 0.04]}
-  if(id13 == 3){var array = [100,100,50, 0.025, 0.05]}
+case 10: {//顔グラ乳揺れ正面
+ switch(id13){
+  case 1: { array = [100,100,150, 0.010, 0.02]; break; }
+  case 2: { array = [100,100,100, 0.020, 0.04]; break; }
+  case 3: { array = [100,100,50, 0.025, 0.05]; break; }
+ }
+ break;
 }
-if(!$gameSwitches.value(43)){//高演出カット
-  if(id14 == 1){//立ち絵用orイベCG用
+};
+
+switch(id14){
+  case 1: {//立ち絵用orイベCG用
     valueTachieBless = array;
     UTSU.PictureBreath.on([id11], valueTachieBless[2]);
+	break;
   }
-  if(id14 == 2){//イベCG用
+  case 2: {//イベCG用
     valueTachieBless2 = array;
     UTSU.PictureBreath2.on([id11], valueTachieBless2[2]);
+	break;
   }
-  if(id14 == 3){//顔グラ身体
+  case 3: {//顔グラ身体
     valueTachieBless3 = array;
     UTSU.PictureBreath3.on([id11], valueTachieBless3[2]);
+	break;
   }
-  if(id14 == 4){//顔グラ乳揺れ
+  case 4: {//顔グラ乳揺れ
     valueTachieBless4 = array;
     UTSU.PictureBreath4.on([id11], valueTachieBless4[2]);
+	break;
   }
-  if(id14 == 5){//イベントＣＧ
+  case 5: {//イベントＣＧ
     valueTachieBless5 = array;
     UTSU.PictureBreath5.on([id11], valueTachieBless5[2]);
+	break;
   }
-  if(id14 == 6){//イベントＣＧ
+  case 6: {//イベントＣＧ
     valueTachieBless6 = array;
     UTSU.PictureBreath6.on([id11], valueTachieBless6[2]);
+	break;
   }
-}
+};
 
 }
 
