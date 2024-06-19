@@ -18,23 +18,23 @@ quest_housyuukeisan = function (id1) {
   const itemData = $dataItems[id1];
   const id4 = itemData.iconIndex;
 
+  const set_Id2_id3(arr) => {
+	  id2 = Number(arr[1]);
+	  id3 = Number(arr[2]);
+  }
   switch (id4) {
     case 422: // C
     case 426: // EX,C報酬
-      id2 = Number(valueQuestRankC[1]);
-      id3 = Number(valueQuestRankC[2]);
+	  set_Id2_id3(valueQuestRankC);
       break;
     case 423: // B
-      id2 = Number(valueQuestRankB[1]);
-      id3 = Number(valueQuestRankB[2]);
+	  set_Id2_id3(valueQuestRankB);
       break;
     case 424: // A
-      id2 = Number(valueQuestRankA[1]);
-      id3 = Number(valueQuestRankA[2]);
+	  set_Id2_id3(valueQuestRankA);
       break;
     case 425: // S
-      id2 = Number(valueQuestRankS[1]);
-      id3 = Number(valueQuestRankS[2]);
+	  set_Id2_id3(valueQuestRankS);
       break;
   }
 
