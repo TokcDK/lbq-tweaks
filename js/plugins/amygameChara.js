@@ -1013,8 +1013,8 @@ for (let id10 = 1; id10 <= 10; id10++) {//固有素材。<CGPriority:1,1>
 }
 
 //色々動的生成設定
-const map_otherGraphicSetEndNowArray = [1, 2, 1, 1, 1, 1, 1];
-const map_otherGraphicSetEndNowArrayLen = map_otherGraphicSetEndNowArray.length;
+//const map_otherGraphicSetEndNowArray = [1, 2, 1, 1, 1, 1, 1];
+//const map_otherGraphicSetEndNowArrayLen = map_otherGraphicSetEndNowArray.length;
 map_otherGraphicSet = function(id1,arr1,arr2){
 
   if(!arr2 || arr2.length == 0) return;
@@ -1041,8 +1041,9 @@ map_otherGraphicSet = function(id1,arr1,arr2){
     event.setMoveSpeed(arr2[1][Math.floor(Math.random() * arr2[1].length)]);//1-6
     event.setMoveFrequency(arr2[2][Math.floor(Math.random() * arr2[2].length)]);//1-5
     
-    j += map_otherGraphicSetEndNowArray[Math.floor(Math.random() * map_otherGraphicSetEndNowArrayLen)];
-    if(i + j >= end){
+    //j += map_otherGraphicSetEndNowArray[Math.floor(Math.random() * map_otherGraphicSetEndNowArrayLen)];
+    j += Math.random() < 0.14 ? 2 : 1; // 14% 1 of 7
+	if(i + j >= end){
       break;
     }
   }
