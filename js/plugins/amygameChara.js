@@ -98,8 +98,8 @@ for (let id = $gameMap.events().length; id > 0; id--) {
 event_PlayerArrangement = function(value1){
 
 const eventId = $gameVariables.value(292)[value1];
-if(!!$gameMap.event(eventId)) {
-  const event = $gameMap.event(eventId);
+const event = $gameMap.event(eventId);
+if(!!event) {
   if($gameSwitches.value(29)){
     $gameVariables.setValue(171,0);
   } else {
@@ -932,49 +932,40 @@ map_objectGraphicSet = function(){
 if($gameSwitches.value(124) && $gameSwitches.value(238)) return;//イベント進行時と動的生成停止
 
 if($gameVariables.value(238) >= 1){
-  if($gameSwitches.value(202) && valueRegionMapArray[1] >= 1){
-    const arr1 = 0;
-    const arr2 = [19,[1],[1],1,0,3,[0],[1]];//小銭生成
-    const value1 = $gameVariables.value(238);
-    const array1 = [value1-2,value1-1,value1,value1+1];
-    let value2 = array1[Math.floor(Math.random() * array1.length)];
-    if(value2 <= 0){value2 = 1};
-    map_otherGraphicSet(value2, arr1,arr2);
-  }
-  if ($gameSwitches.value(201) && valueRegionMapArray[1] >= 1) {
-    const arr1 = 0;
-    const arr2 = [18,[1],[1],1,0,3,[0],[1]];//小物生成
-    const value1 = $gameVariables.value(238);
-    const array1 = [value1-2,value1-1,value1,value1+1];
-    let value2 = array1[Math.floor(Math.random() * array1.length)];
-    if(value2 <= 0){value2 = 1};
-    map_otherGraphicSet(value2,arr1,arr2);
+  if(valueRegionMapArray[1] > 0){
+	  for(const n of [0, 1]){
+		if(!$gameSwitches.value(201+n)) continue;
+		
+		const arr2 = [18+n,[1],[1],1,0,3,[0],[1]];//小銭生成
+		const var238 = $gameVariables.value(238);
+		const array1 = [var238-2, var238-1, var238, var238+1];
+		let value2 = array1[Math.floor(Math.random() * array1.length)];
+		if(value2 < 1) value2 = 1 ;
+		map_otherGraphicSet(value2, 0, arr2);
+	  }
   }
 }
 
 if($gameSwitches.value(201)){
   $gameVariables.setValue(536,[]);//宝箱生成Id配列
   if (valueRegionMapArray[1] >= 1) {
-    const arr1 = 0;
     const arr2 = [43,[1],[1],1,0,0,[0],[1]];//転送先
-    map_otherGraphicSet(1,arr1,arr2);
+    map_otherGraphicSet(1,0,arr2);
   }
   if($gameVariables.value(215)[$gameVariables.value(240)].length >= 1 && valueRegionMapArray[8] >= 1){
     let value2 = Math.ceil($gameVariables.value(215)[$gameVariables.value(240)].length/$gameVariables.value(217));
     if (value2 > valueRegionMapArray[8]) { value2 = valueRegionMapArray[8] };
-    const arr1 = 0;
     const arr2 = [86,[1],[1],1,0,0,[0],[8]];
-    map_otherGraphicSet(value2,arr1,arr2);
+    map_otherGraphicSet(value2,0,arr2);
     $gameVariables.value(536).push($gameMap.getLastSpawnEventId());
   }
   if($gameSwitches.value(207) && $gameVariables.value(238) >= 3 && $gameVariables.value(270) >= 20 && valueRegionMapArray[1] >= 1){
     const arr2 = [20, [1], [1], 1, 0, 0, [0], [1]];//トラップ。エネミーレベル20以上
-    const arr1 = 0;
     const value1 = $gameVariables.value(238);
     const array1 = [value1-2,value1-1,value1,value1+1];
     let value2 = array1[Math.floor(Math.random() * array1.length)];
     if(value2 <= 0){value2 = 1};
-    map_otherGraphicSet(value2,arr1,arr2);
+    map_otherGraphicSet(value2,0,arr2);
   }
 }
 
@@ -985,10 +976,9 @@ if($gameVariables.value(260) >= 1 && valueRegionMapArray[1] >= 1){
   if (value2 >= 1) {
     const arr = [70, 93, 85, 92, 91, 94, 88, 89, 95, 96];//亡骸
     for (let id10 = 1; id10 <= value2; id10++) {
-        const arr1 = 0;
         const value1 = arr[Math.floor(Math.random() * arr.length)];
         const arr2 = [value1,[1],[1],1,0,0,[0],[1]];
-        map_otherGraphicSet(1,arr1,arr2);
+        map_otherGraphicSet(1,0,arr2);
       }
   }
 }
@@ -1023,14 +1013,16 @@ for (let id10 = 1; id10 <= 10; id10++) {//固有素材。<CGPriority:1,1>
 }
 
 //色々動的生成設定
-var map_otherGraphicSetEndNowArray = [1, 2, 1, 1, 1, 1, 1];
+//const map_otherGraphicSetEndNowArray = [1, 2, 1, 1, 1, 1, 1];
+//const map_otherGraphicSetEndNowArrayLen = map_otherGraphicSetEndNowArray.length;
 map_otherGraphicSet = function(id1,arr1,arr2){
 
-  if(arr2 === 0) return;
+  if(!arr2 || arr2.length == 0) return;
 
   let j = 0;
   const gameVar210SpawnEventIdsArray = $gameVariables.value(210);
   const end = id1 == 0 ? $gameVariables.value(238) : id1;
+  const gameMap = $gameMap;
   for (let i = 1; i <= end; i++) {
     const conditionMap         = {};
     conditionMap.passable    = arr2[3];
@@ -1038,18 +1030,20 @@ map_otherGraphicSet = function(id1,arr1,arr2){
     conditionMap.collided    = arr2[5];
     conditionMap.terrainTags = arr2[6];
     conditionMap.regionIds   = arr2[7];
-    $gameMap.spawnEventRandom(arr2[0], conditionMap, true);
+    gameMap.spawnEventRandom(arr2[0], conditionMap, true);
     
-    gameVar210SpawnEventIdsArray.push($gameMap.getLastSpawnEventId());
-    const event = $gameMap.event($gameMap.getLastSpawnEventId());
+	const lastSpawnEventId = gameMap.getLastSpawnEventId();
+    gameVar210SpawnEventIdsArray.push(lastSpawnEventId);
+    const event = gameMap.event(lastSpawnEventId);
     if(arr1){
       event.setImage(arr1[Math.floor(Math.random() * arr1.length)],Math.floor( Math.random() * 8) + 0);
     }
     event.setMoveSpeed(arr2[1][Math.floor(Math.random() * arr2[1].length)]);//1-6
     event.setMoveFrequency(arr2[2][Math.floor(Math.random() * arr2[2].length)]);//1-5
     
-    j += map_otherGraphicSetEndNowArray[Math.floor(Math.random() * 3)];
-    if(i + j >= end){
+    //j += map_otherGraphicSetEndNowArray[Math.floor(Math.random() * map_otherGraphicSetEndNowArrayLen)];
+    j += Math.random() < 0.14 ? 2 : 1; // 14% 1 of 7
+	if(i + j >= end){
       break;
     }
   }

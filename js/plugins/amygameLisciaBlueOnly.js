@@ -5,20 +5,787 @@
  */
 
 //(function(){
+	
+// TIPS using in original_text function>
+class BookTipBase {
+    constructor() {
+    }
+	
+    seName() {
+        throw new Error("getValue2 method should be implemented");
+    }
+
+    var172value() {
+        throw new Error("getValue2 method should be implemented");
+    }
+
+    getValue1() {
+        throw new Error("getValue1 method should be implemented");
+    }
+
+    getValue2() {
+        throw new Error("getValue2 method should be implemented");
+    }
+
+    playSound() {
+        AudioManager.playSe({"name": this.seName(), "volume": 100, "pitch": 100, "pan": 0});
+    }
+
+    setGameVariable() {
+        $gameVariables.setValue(172, this.var172value());
+    }
+
+    setValueTalkSet() {
+		const value3 = [0,1,640,384,100,100,255];
+		valueTalkSet = [this.getValue1(),this.getValue2(),value3];
+    }
+
+    execute() {
+        this.playSound();
+        this.setGameVariable();
+        this.setValueTalkSet();
+    }
+}
+class Tip1 extends BookTipBase {//
+    seName() {
+        return "Book2";
+    }
+
+    var172value() {
+        return 2;
+    }
+    getValue1() {
+        return `朽ちた星晶獣の権能復元計画`;
+    }
+    getValue2() {
+        return 
+`\\swi[247]の協力者から持ち込まれた情報を元に
+策定されたプロジェクト。
+\\swi[221]に嘗て存在したとされる、
+とある星晶獣の細胞が提供された事によって
+本計画は採用された。
+
+協力者は\\swi[247]で要職に就いている事もあり、
+国内での施設建造、実験体調達をスムーズに行えている。
+但し、研究施設については機器の調達・整備等の面から
+別島に移設する事が検討されている──。
+
+
+『朽ちた星晶獣の権能復元計画書』より抜粋`;
+    }
+};
+class Tip2 extends BookTipBase {//<淫統薬>インデュ・アビス
+    seName() {
+        return "Book2";
+    }
+
+    var172value() {
+        return 2;
+    }
+    getValue1() {
+        return `${$dataWeapons[452].name}─その１─`;
+    }
+    getValue2() {
+        return 
+`コルブラント島でその断片を確保した星晶獣、
+その一部他を用いて精製された、民意扇動を目的とした薬物。
+
+彼の星晶獣が所有していた「支配」の権能は、
+民衆管理の手法としては非常に有用ではあるが、
+広範囲に作用する性質が原因なのか、
+断片でしか無いためダウングレードしているのか、
+意志力の強い者へは作用し辛い事が確認されている。
+少なくとも、国元で治験名目で実験した所、
+英雄と呼ばれる位階に居る者達には
+明確な効力を発揮する事が無かったのは、
+決して座視できぬ問題であった。
+
+その２に続く──`;
+    }
+};
+class Tip3 extends BookTipBase {//<淫統薬>インデュ・アビス
+    seName() {
+        return "Book2";
+    }
+
+    var172value() {
+        return 2;
+    }
+    getValue1() {
+        return `${$dataWeapons[452].name}─その３─`;
+    }
+    getValue2() {
+        return 
+`
+現在は行方不明者が発生しても騒ぎになり難い、
+空域内でも有数の観光島で実地検証を行っている。
+この検証で、投薬対象によっては
+廃人化してしまう事が判明したのは、
+非常に有意義な結果だったと言えるだろう。
+また、この廃人化した対象の体液は、
+インデュ・アビス精製の際に必要な接受体として
+使える事も確認されている。
+
+『〇〇〇〇帝国研究開発部の業務月報』より抜粋`;
+    }
+};
+class Tip4 extends BookTipBase {//<試薬品>インデュルゲンス・リキッド
+    seName() {
+        return "Book2";
+    }
+
+    var172value() {
+        return 2;
+    }
+    getValue1() {
+        return `${$dataWeapons[453].name}`;
+    }
+    getValue2() {
+        return 
+`開発された\\wn[452]の試作品。
+正式採用となった薬品と比較すると、
+必要な摂取量などが問題となり開発中止となった。
+しかし、効能についてはより大元となる星晶獣の
+権能に近いものがあるのが特徴。
+
+\\swi[247]宰相を通じて、同派閥貴族達に
+生産された一部が流出されている事が判明している。
+
+『〇〇〇〇帝国研究開発部の業務日報』より抜粋`;
+    }
+};
+class Tip5 extends BookTipBase {//<淫紋>アビス・クレスト使用ずみ
+    seName() {
+        return "Book2";
+    }
+
+    var172value() {
+        return 2;
+    }
+    getValue1() {
+        return `${$dataWeapons[454].name}`;
+    }
+    getValue2() {
+        return 
+`触手型魔物である「\\wn[455]」が使う、
+対象を苗床化する\\wn[456]を元に、
+人間用に改変された紋章の一つ。
+
+対象女性の性的官能を自在に操る効果を持つ紋章を刻む。
+主に性奴隷などに用いられる為、
+習得者は専らアンダーグラウンドの住人である。
+紋章を刻まれた対象は、産まれ持ち育んだ価値観が
+歪められる程の快楽を得るという…。
+余談だが、原型となる\\wn[456]と
+比べると、その効果は幾分かマイルドになっているらしい。
+これは、\\wn[456]の効果が凡そ人には
+受け入れられない程のものであり、
+「商品」として仕立てる事も出来ぬほど強力であるかららしい──。
+
+民明書房刊『魔術大家の独り言』より抜粋`;
+    }
+};
+class Tip6 extends BookTipBase {//<淫統光>HMD型インデュ・アビス.使用ずみ
+    seName() {
+        return "Chime2";
+    }
+
+    var172value() {
+        return 2;
+    }
+    getValue1() {
+        return `${$dataWeapons[457].name}`;
+    }
+    getValue2() {
+        return 
+`服薬が必要な\\wn[452]に対して、
+光学的なアプローチを用いた試作魔導開発品。
+網膜に淫統作用を持った光を照射する事で、
+脳に直接効果を与える事が可能。
+
+国土に配備した照射機で齎される、
+「光」を照らすだけで民を支配する事を目標としているが、
+現状では専用のヘッドマウントディスプレイを用いる必要がある。
+
+現在はまだ試験中であり、実験レポートが求められている。
+
+『エルステ帝国研究開発部の成果発表レポート』より抜粋`;
+    }
+};
+class Tip7 extends BookTipBase {//<アビス・クレスト>と<インデュ・アビス>使用ずみ
+    seName() {
+        return "Chime2";
+    }
+
+    var172value() {
+        return 2;
+    }
+    getValue1() {
+        return `${$dataWeapons[458].name}`;
+    }
+    getValue2() {
+        return 
+`両者には根幹技術に措いて同様の手法が用いられている
+（正確には\\wn[454]の術式を
+\\wn[452]が流用している）為、
+ある程度の知識がある者ならば、
+互いの術式から干渉する事が可能。
+
+作中では\\set[7]によって、
+空賊が仕込んだ\\wn[454]に\\N[7]が干渉し、
+鎮静化されていた淫統光の効果をＨＭＤを用いずに
+再活性化させた。
+
+『飛び出せ！ よく解る＜りしゃぶる＞大図鑑！！』より抜粋`;
+    }
+};
+class Tip8 extends BookTipBase {//使用済み
+    seName() {
+        return "Book2";
+    }
+
+    var172value() {
+        return 2;
+    }
+    getValue1() {
+        return `${$dataWeapons[80].name}`;
+    }
+    getValue2() {
+        return 
+`数年前よりコルブラント島に出没するようになった空賊団。
+高機能な騎空挺と練度の高い団員を擁しており、
+島内での被害が相次いでいる。
+王国による掃討作戦が幾度となく行われたが、
+その全てで失敗している。
+軍部に内通者の存在が疑われているが、現在調査中につき真偽は不明。
+
+王国宰相の諜報網を駆使した結果、
+空賊団の一部が\\in[23]に姿を現している事が判明。
+彼らを幾人か捕らえ、本拠地の場所を確定したい。
+
+王国所属の騎士団へは報を入れず、
+お招きした<秩序の騎空団>諸氏に対応を願いたい。
+
+『秩序の騎空団への状況報告書』より抜粋`;
+    }
+};
+class Tip11 extends BookTipBase {//<星晶獣>インペリウム・グノーシス。使用ずみ
+    seName() {
+        return "Book2";
+    }
+
+    var172value() {
+        return 2;
+    }
+    getValue1() {
+        return `${$dataWeapons[451].name}`;
+    }
+    getValue2() {
+        return 
+`コルブラント島で存在を確認された星晶獣。
+その権能は、認識改変による「支配」。
+現在、浮島を統治しているネルガド王家始祖は、
+この権能を用いて自身の王権を確立させたと思われる。
+それからも、細々とした形ではあるが
+国家運営上の問題点をこの権能を用いて解決していた事が、
+協力者の証言により確認されている。
+
+しかし、凡そ百年前にインペリウム・グノーシスは姿を消し、
+現在の王家は自力での統治を行っている事も
+前述の協力者より証言されている。
+百年前に何があったかは不明。
+優先度は低いが継続的な調査が求められる。
+
+『〇〇〇〇帝国研究開発部の業務年報』より抜粋`;
+    }
+};
+class Tip12 extends BookTipBase {//<星晶獣>インペリウム・グノーシス
+    seName() {
+        return "Chime2";
+    }
+
+    var172value() {
+        return 3;
+    }
+    getValue1() {
+        return `${$dataWeapons[451].name}─その２─`;
+    }
+    getValue2() {
+        return 
+`既にその存在は朽ち果て、遺骸は大森林の地下深くに埋没している。
+残滓や断片が卑小化された権能を発揮する事もあるが、
+大元には朧げな意識しか存在していない。
+
+朽ちた原因は、代々のネルガド王家による権能の過剰使用。
+これにより王家はその地位を盤石なものにしていたが、
+その寄る辺を喪った結果、
+何一つ決断/判断をする事が出来ない
+無能な王族が蔓延する事となった。
+
+現在は、遺跡でのみ存在を保っている。。
+己が<支配>の届かぬ『天』を超える者の到来を望みながら…。
+`;
+    }
+};
+class Tip13 extends BookTipBase {//「インペルの神水」使用済み
+    seName() {
+        return "Chime2";
+    }
+
+    var172value() {
+        return 2;
+    }
+    getValue1() {
+        return `${$dataItems[1162].name} またの名を「${$dataWeapons[460].name}」`;
+    }
+    getValue2() {
+        return 
+`中央森林で汲み取れる湧き水。
+高級志向の飲食店などで使われている。
+…それとは別に、\\swi[247]でも一部の高位貴族にしか
+伝わっていない使用法がある。
+コルブラント島でしか取れぬ霊薬を調合に用いる事で、
+服用者を一種の催眠状態に陥らせる事が出来る
+特殊な飲料水を生成する事が可能なのである。
+
+当然のように国法で生成を禁じられているが、
+裏で用いられる事例が度々散見されている。
+特に、島外からの余所者などに──。
+
+一説には、とある星晶獣の体液が混ざっているとも
+云われている。
+
+`;
+    }
+};
+class Tip14 extends BookTipBase {//支配の結石使用済み
+    seName() {
+        return "Chime2";
+    }
+
+    var172value() {
+        return 2;
+    }
+    getValue1() {
+        return `${$dataItems[1163].name}`;
+    }
+    getValue2() {
+        return 
+`ジャックモンド伯爵家に伝わる希少な鉱石。
+とある不思議な効力があるとされている。
+現在では、後継を選ぶための試練に使われている。
+
+その効果は、「\\swi[247]の貴族血統に発現する、
+状態異常支配系アビリティの超強化」。
+その強化具合は、＜Ｎ(ノーヴィス)＞として産まれた
+貧弱な子供が使う状態異常アビリティが、
+＜ＳＲ＞として産まれ磨き上げられた一流騎空士の
+耐性をブチ抜くほど。
+
+一説には、とある星晶獣の肉片が変じた姿なのでは、と
+云われている。
+
+`;
+    }
+};
+class Tip15 extends BookTipBase {//クサンについて。ラストバトル時に使用,入手ずみ
+    seName() {
+        return "Chime2";
+    }
+
+    var172value() {
+        return 3;
+    }
+    getValue1() {
+        return `${$gameActors.actor(7).name()}=コルド＝${$dataActors[7].meta['SecondName'].split(',')[1]}`;
+    }
+    getValue2() {
+        return 
+`\\swi[247]元宰相。
+その目的は、嘗て王国統治を支えた星晶獣の権能復元。
+現在に置いても、湧き水や結石という形でその神秘は
+利用する事が可能だが、それらは所詮は残滓に過ぎない。
+彼が求めたのは、「秩序を護る者を秩序を穢す者」へと
+変える事も可能なほどの強力な支配能力である。
+その為に\\wn[75]と繋がり、彼の国の特殊な魔導具を
+用いての再現を目論んだ。
+空賊を経由して拉致した\\swi[247]民を
+人体実験の生贄に用いて………。
+
+当の昔に喪われた異形。
+その力に頼り切る体制から脱却できぬ国の宰相は、
+禁忌へと手を染めた。頼りにならぬ愚王や佞臣達に代わり、
+己が覇権を握り祖国を導かんが為に──。
+
+`;
+    }
+};
+class Tip16 extends BookTipBase {//クサンについて2。使用ずみ
+    seName() {
+        return "Chime2";
+    }
+
+    var172value() {
+        return 2;
+    }
+  //var value1 = `\\set[7]─その２─`;
+    getValue1() {
+        return `${$gameActors.actor(7).name()}=コルド＝${$dataActors[7].meta['SecondName'].split(',')[1]}─その２─`;
+    }
+    getValue2() {
+        return 
+`未だ復権という野心にその身を焦がす\\swi[247]元宰相。
+
+…その可能性が、既に潰えている事を自覚せぬままに。
+何故ならば、\\swi[247]は\\wn[359]王主導の元、
+急速に\\N[7]を過去の人物へと押しやっているのだから…。
+歴史の潮流に取り残された元宰相に、
+これを覆す手段はもはや存在しないのである…。
+
+元来の、一国を牛耳るまでに至った\\N[7]ならば、
+自ずと悟っていたであろう現実。
+けれど、今の彼が理解することは未来永劫、有り得ない。
+星晶獣との疑似的な融合や地位の失墜により、
+精神に重篤な瑕疵の出来た今。
+在りし日の栄光に心を寄せる事でしか
+心を保てないのが、今の\\set[7]なのだから──。
+
+`;
+    }
+};
+class Tip17 extends BookTipBase {//騎士団長,入手ずみ
+    seName() {
+        return "Chime2";
+    }
+
+    var172value() {
+        return 3;
+    }
+    getValue1() {
+        return `${$dataWeapons[351].name}=${$dataWeapons[351].meta['FamilyName']}`;
+    }
+    getValue2() {
+        return 
+`\\swi[247]騎士団長。
+王国最強の騎士にして、軍事に措ける最高責任者。
+政治からは自覚的に距離を取るようにしていた。
+
+比較的早い時期から、\\afn[7]宰相の暗躍に気付いていた。
+何とか掣肘すべく動いていたが、政治的な影響力の差もあり
+逆に騎士団の要職を宰相派とでもいうべき貴族達に
+挿げ替えられ、身動きが取れなくなっていた。
+そんな時に\\wn[78]による干渉を知り、
+これを奇貨とすべく水面下で行動していた。
+最終的に\\N[1]達の手によって討たれる事で、
+一連の事件に幕を引く事となる。
+
+──王国最強の騎士は、最後まで忠義にその身を捧げた。
+愛する祖国の為、そして無二の友の為に…。
+
+`;
+    }
+};
+class Tip18 extends BookTipBase {//国王。使用ずみ
+    seName() {
+        return "Chime2";
+    }
+
+    var172value() {
+        return 2;
+    }
+    getValue1() {
+        return `${$dataWeapons[359].name}=${$dataWeapons[359].meta['FamilyName']}`;
+    }
+    getValue2() {
+        return 
+`\\swi[247]国王。自他共に認める無能な王。
+それは彼自身の責というよりも、星晶獣の権能という
+便利な力に縋る事を辞められなかった歴代王家そのものに
+責があるといえよう。
+
+一連の事件の後、崩壊へと傾き続ける王国にあって、
+『唯一の友の死』、そして、『己がやるしかない状況』
+に直面する事で、無能から凡夫程度へと成長を成し遂げる。
+結果、\\swi[247]は辛うじて破綻を免れた、という。
+
+──歴史に語られる無為無能の王。
+然れど、死期を悟った友が去り際に願った『王国の安寧』。
+その大願の為に残りの生涯を賭した王でもあった。
+`;
+    }
+};
+class Tip19 extends BookTipBase {//<淫触薬>アビス・リキッド、使用ずみ
+    seName() {
+        return "Book2";
+    }
+
+    var172value() {
+        return 2;
+    }
+    getValue1() {
+        return `${$dataWeapons[459].name}`;
+    }
+    getValue2() {
+        return 
+`\\wn[452]を元にして作成された派生薬の一つ。
+触手型魔物である「\\wn[455]」の体液を用いる事で、
+元の薬品とは別の形で、
+しかし更に強力な強制力を持たせる事に成功している。
+雌性体専用薬。
+
+対象の性的官能を暴力的なまでに引き上げ、
+異性からの支配を受け入れやすくする。
+代償として思考が鈍くなってしまう為、
+性的用途以外には使えない。
+\\wn[454]が定着する事で本来の効果を発揮する。
+
+\\wn[459]以外にも様々な派生形薬品が作られており、
+それらは\\swi[223]の観光客相手に売り捌かれたらしい…。
+`;
+    }
+};
+class Tip20 extends BookTipBase {//エネミー全滅ボーナス、使用ずみ
+    seName() {
+        return "Book2";
+    }
+
+    var172value() {
+        return 2;
+    }
+    getValue1() {
+        return `エネミー全滅ボーナス`;
+    }
+    getValue2() {
+        return 
+`マップ上のシンボルエネミーを全滅させる事で、
+初回殲滅特典としてレアなアイテムが入手できます。
+２回目以降は、そのマップの
+「初回殲滅特典」「白銀宝箱」「通常宝箱」の中から
+ランダムで抽選されたアイテムが入手できます。
+
+エネミーの全滅判定（カウント）は、
+そのダンジョン（フィールド）から
+出るか日数経過させる事でリセットされます。
+
+また、エネミーを全滅させると、全滅させた回数分だけ
+エネミーのレベルが上昇します。
+（全滅回数３回でエネミーレベル＋３）
+`;
+    }
+};
+class Tip21 extends BookTipBase {//ダンジョンとフィールドの違い。使用ずみ
+    seName() {
+        return "Book2";
+    }
+
+    var172value() {
+        return 2;
+    }
+    getValue1() {
+        return `ダンジョンとフィールド`;
+    }
+    getValue2() {
+        return 
+`作中に措いて、『ダンジョン』と『フィールド』は
+扱いが異なる。
+ダンジョンでは倒したエネミーは自然消滅し上限まで
+リポップするが、フィールドではしない。
+エネミーＬＶが20以上のダンジョンでは「トラップ」が
+設置されるが、フィールドではない。
+
+一部のクエストでも、扱いを別にされている。
+
+`;
+    }
+};
+class Tip22 extends BookTipBase {//食事について。使用済み
+    seName() {
+        return "Book2";
+    }
+
+    var172value() {
+        return 2;
+    }
+    getValue1() {
+        return `食事アイテムについて`;
+    }
+    getValue2() {
+        return 
+`「Food」に分類される食事アイテムは、
+使用する事で食べる事ができ、
+その食事毎に設定されたバフを受ける事が出来ます。
+
+一度の食事で「満腹度」が1上昇し、
+「満腹度上限」に達するまで食事が行えます。
+満腹度は昼夜変更時にリセットされます。
+同時にバフも消去されます。
+
+※ 「食材」と「食事」アイテムは別物です。
+`;
+    }
+};
+class Tip23 extends BookTipBase {//<淫統薬>インデュ・アビス
+    seName() {
+        return "Book2";
+    }
+
+    var172value() {
+        return 2;
+    }
+    getValue1() {
+        return `${$dataWeapons[452].name}─その２─`;
+    }
+    getValue2() {
+        return 
+`これを解消する為の研究は主に、
+「特定対象に特化した支配機能」を主軸としている。
+主に、「対象の欲求に根差した支配」となる。
+認識改変による０からの支配では無く、
+支配を受け入れざるを得ない土壌を用意する形式と言える。
+
+この研究で最も効力を示している成果物が、
+\\wn[452]である。
+とある触手型魔物の体液と化合させて精製されるこの薬品は、
+対象の性的欲求を過剰に誘発させ、
+肉欲を対象の最上位価値基準に置く事で
+他者からの支配を受け入れさせる物である。
+
+その３に続く──`;
+    }
+};
+class Tip24 extends BookTipBase {//ディヴィジョン・ベルセルク
+    seName() {
+        return "Book2";
+    }
+
+    var172value() {
+        return 3;
+    }
+    getValue1() {
+        return `ベルセルク──過去──`;
+    }
+    getValue2() {
+        return 
+`覇空戦争時代に猛威を振るった狂戦士達。
+理性を払底させる事を代償に強大な力を振るう。
+その性質上、「味方殺し」すら許容されるような、
+凄惨極まる戦場で活躍した。
+
+一説には星の民による人種改良によって
+産み出された半人工的な存在と云われている。
+
+戦後、己らの凶暴性を忌んだ彼らは外界との関わりを断ち、
+人の手の入っていない浮島を選んで一族纏めて移住した。
+
+──もう二度と、と。
+それだけを想い選んで…。
+`;
+    }
+};
+class Tip25 extends BookTipBase {//ディヴィジョン・ベルセルク
+    seName() {
+        return "Book2";
+    }
+
+    var172value() {
+        return 3;
+    }
+    getValue1() {
+        return `ベルセルク──現在──`;
+    }
+    getValue2() {
+        return 
+`──現代に措いて。
+様々な書物から、その一族の存在を掴んだ帝国研究所。
+早速サンプルの確保に動いたが、正規軍を動かすには
+時期が悪く、流れの空賊に『回収』を依頼する。
+しかし、その空賊達は情報だけを利用し略奪を実行。
+結果、集落は全滅。
+彼らが望んだ「伝説のベルセルク」の血統も途絶えた…。
+
+──一人の少年を除いて。
+
+その生き残りも、面倒な騎空団に拾われた事で回収も半ば
+断念されていたが………。
+何故か追放された為、軍を動かし確保に赴く事となった──。
+`;
+    }
+};
+class Tip26 extends BookTipBase {//ディヴィジョン・ベルセルク
+    seName() {
+        return "Book2";
+    }
+
+    var172value() {
+        return 3;
+    }
+    getValue1() {
+        return `ディヴィジョン・ベルセルク`;
+    }
+    getValue2() {
+        return 
+`本来は、血族であろうとも器では無い\N[5]が、
+寿命を代償に狂戦士化した姿。
+本来のベルセルクと比べ弱体化、或いは超ピーキーな
+改変が行われている。
+
+然れど、元がノーヴィスの少年である事を考えれば、
+その伸び幅は破格のものと言える。
+
+──理性を剥奪されて得た力に、どれ程の意味があるのか。
+その答えを出すべき少年は………。
+`;
+    }
+};
+class Tip27 extends BookTipBase {//ライフスト－ム
+    seName() {
+        return "Book2";
+    }
+
+    var172value() {
+        return 3;
+    }
+    getValue1() {
+        return `生命奔流体機構<ライフストーム・イグジット>`;
+    }
+    getValue2() {
+        return 
+`生体兵器として産み出された狂戦士の血統に
+遺伝子レベルで組み込まれた疑似思考群体。
+平時は対象の無意識領域にて沈黙を保っているが、
+狂戦士化(殺戮)による精神の不安定化などの時に
+保有者のメンタルケアを自動実行する機能を持つ。
+また、保有者の生命維持を最優先事項とし、
+その為の生体改造/改竄技術と権限を保持している。
+
+機構を持ちながらも覚醒する事無く虐殺された
+\\N[5]の集落の住人は、「暴力への絶対的禁忌」を
+父祖に洗脳レベルで躾けられていた為、
+機構が干渉を行える余地が無かったのである。
+
+──歳若い\\N[5]を除いて。
+`;
+    }
+};
+// < TIPS
+	
 
 htext_word = function(id1){
-
-if(id1 == 3){
-  valueHtextWord = ['「アッ\\I[12]\\I[12]\\I[12]」','「ンッ\\I[12]」','「ンン…\\I[12]」','「ンクっ…\\I[12]」','「ァンっ…\\I[12]」','「ヒィンっ…\\I[12]」','「アヒィっ…\\I[12]」'];
-};
-if(id1 == 2){
-  valueHtextWord =  ['「………ァっ」','「いや…」','「ンン──……」','「ンクっ…」','「ァンっ…」'];
-};
-if(id1 == 1){
-  valueHtextWord = ['「イヤ…ッ」','「ヤメ…」','「ァァ………」','「助けッ──」','「ァ──」'];
-};
-
-};
+	switch(id1) {
+		case 3: {
+		  valueHtextWord = ['「アッ\\I[12]\\I[12]\\I[12]」','「ンッ\\I[12]」','「ンン…\\I[12]」','「ンクっ…\\I[12]」','「ァンっ…\\I[12]」','「ヒィンっ…\\I[12]」','「アヒィっ…\\I[12]」'];
+		  break;
+		}
+		case 2: {
+		  valueHtextWord =  ['「………ァっ」','「いや…」','「ンン──……」','「ンクっ…」','「ァンっ…」'];
+		  break;
+		}
+		case 1: {
+		  valueHtextWord = ['「イヤ…ッ」','「ヤメ…」','「ァァ………」','「助けッ──」','「ァ──」'];
+		  break;
+		}
+	}
+}
 
 gabWord_exeScriptNoFace = function(arrNpcGab1){
 
@@ -170,7 +937,7 @@ if($gameSwitches.value(301)){//ジュエルリゾート
 if($gameSwitches.value(321) && $gameSwitches.value(203)){//犯罪都市屋外
 
 };
-if($gameParty.battleMembers()[0].isStateAffected(602)){//先頭キャラ女か。露出状態での発言
+if(is_girl($gameParty.battleMembers()[0])){//先頭キャラ女か。露出状態での発言
   rosyutu_wordChoiceNPC($gameParty.battleMembers()[0].actorId());
 };
 
@@ -424,45 +1191,55 @@ if(value1 >= 1){$gameSwitches.setValue(380,true)};
 seisyoujuu_select2 = function(id1){
 
 if(id1 == 0){
-  for (var i = 100; i <= 205; i++) {$gameScreen.erasePicture(i)};
-};
-if(id1 == 1){
-  valueItems = $dataArmors;
-  var value0 = 0;
-  var value1 = 101;
-  var value2 = 'ScreenBlackOut';
-  var value3 = 0;
-  var value4 = `\\I[508]星晶石入手率＜${valueCountSet4}/${valueCountSet3}＞`;
-  const id = 1; 
+  for (let i = 100; i <= 205; i++) {$gameScreen.erasePicture(i)};
+}
+else if(id1 == 1){
+  //valueItems = $dataArmors;
+  //const value0 = 0;
+  let value1 = 101;
+  //const value2 = 'ScreenBlackOut';
+  let value3 = 0;
+  const txt = `\\I[508]星晶石入手率＜${valueCountSet4}/${valueCountSet3}＞`;
   const choiceParams = {
-  text: value4,
-  value: 0};
+	  text: txt,
+	  value: 0
+  };
+  let id = 1; 
   $gameSystem.addCustomChoice(id, choiceParams);
   value3 += 1;
   valueItems = $dataArmors;
-  for (var i = 1; i <= valueArmorsLength; i++) {
-    if(valueItems[i].etypeId == 6){
-      if(valueItems[i].meta['ItemPicture']){
-        if($gameParty.hasItem(valueItems[i],true)){
-          const id = 1; 
+  for (let i = 1; i <= valueArmorsLength; i++) {
+	const item = valueItems[i];
+    if(item.etypeId == 6){
+	  const itemMeta = item.meta;
+	  const itemPictureData = itemMeta['itemPictureData'];
+      if(itemPictureData){
+        if($gameParty.hasItem(item,true)){
+          id = 1; 
           const choiceParams = {
-          text: `${valueItems[i].name}:<${$gameVariables.value(352)[i - valueSeisyoujuuStartId]}>`,
-          value: i};
+			  text: `${item.name}:<${$gameVariables.value(352)[i - valueSeisyoujuuStartId]}>`,
+			  value: i
+		  };
           $gameSystem.addCustomChoice(id, choiceParams);
-          var value2 = `/img/sv_enemies/Summon_${valueItems[i].meta['ItemPicture'].split(',')[0]}`;
-          var value5 = Number(valueItems[i].meta['ItemPicture'].split(',')[1]);
-          if(value5 >= 0){
-            var value6 = 50;
-            var value7 = 0;
+		  const itemPictureDataArr = itemPictureData.split(',');
+          const value5 = Number(itemPictureDataArr[1]);
+          
+          let value6;
+          let value7;
+		  if(value5 >= 0){
+            value6 = 50;
+            value7 = 0;
           } else {
-            var value6 = 100;
-            var value7 = 200;
+            value6 = 100;
+            value7 = 200;
           };
+		  
+          const value2 = `/img/sv_enemies/Summon_${itemPictureDataArr[0]}`;
           $gameScreen.showPicture(value1,value2,1,640 + 200,384 + value5 - 150 + value7,value6,value6,0,0);
           $gameMessage.setSelectPictureId(value3, value1);
-          if(valueItems[i].meta['summonDescription']){
-            var value4 = valueItems[i].meta['summonDescription'];
-            $gameScreen.setDTextPicture(value4, 28);
+          if(itemMeta['summonDescription']){
+            const summonDescription = itemMeta['summonDescription'];
+            $gameScreen.setDTextPicture(summonDescription, 28);
             $gameScreen.dWindowFrame = 'ON';
             $gameScreen.showPicture(value1+1,'',0,10,606,100,100,0,0);
             $gameMessage.setSelectPictureId(value3, value1+1);
@@ -476,32 +1253,41 @@ if(id1 == 1){
 
 kobetu_isyouSetOther = function(){
 
-$gameVariables.setValue(20,3);
-$gameVariables.value($gameVariables.value(20)+440)[5] = 1;
+const gameVariables = $gameVariables;
+
+gameVariables.setValue(20,3);
+gameVariables.value(443)[5] = 1; // 443 = gameVariables.value(20)+440
 tachie_settei2();
-$gameVariables.setValue(20,4);
-$gameVariables.value($gameVariables.value(20)+440)[5] = 1;
+
+gameVariables.setValue(20,4);
+gameVariables.value(444)[5] = 1;
 tachie_settei2();
-$gameVariables.setValue(20,5);
-$gameVariables.value($gameVariables.value(20)+440)[5] = 1;//身体
-$gameVariables.value($gameVariables.value(20)+440)[7] = 1;//ペニス
-$gameVariables.value($gameVariables.value(20)+440)[23] = 1;//衣装
-$gameVariables.value($gameVariables.value(20)+440)[33] = 1;//表情
-$gameVariables.value($gameVariables.value(20)+440)[37] = 1;//髪型
+
+gameVariables.setValue(20,5);
+let array = gameVariables.value(445);
+array[5] = 1;//身体
+array[7] = 1;//ペニス
+array[23] = 1;//衣装
+array[33] = 1;//表情
+array[37] = 1;//髪型
 tachie_settei2();
-$gameVariables.setValue(20,6);
-$gameVariables.value($gameVariables.value(20)+440)[5] = 1;
-$gameVariables.value($gameVariables.value(20)+440)[7] = 1;
-$gameVariables.value($gameVariables.value(20)+440)[23] = 1;
-$gameVariables.value($gameVariables.value(20)+440)[33] = 1;
-$gameVariables.value($gameVariables.value(20)+440)[37] = 0;
+
+gameVariables.setValue(20,6);
+array = gameVariables.value(446);
+array[5] = 1;
+array[7] = 1;
+array[23] = 1;
+array[33] = 1;
+array[37] = 0;
 tachie_settei2();
-$gameVariables.setValue(20,7);
-$gameVariables.value($gameVariables.value(20)+440)[5] = 1;
-$gameVariables.value($gameVariables.value(20)+440)[7] = 1;
-$gameVariables.value($gameVariables.value(20)+440)[23] = 1;
-$gameVariables.value($gameVariables.value(20)+440)[33] = 1;
-$gameVariables.value($gameVariables.value(20)+440)[37] = 0;
+
+gameVariables.setValue(20,7);
+array = gameVariables.value(447);
+array[5] = 1;
+array[7] = 1;
+array[23] = 1;
+array[33] = 1;
+array[37] = 0;
 tachie_settei2();
 
 };
@@ -1195,584 +1981,93 @@ $gameVariables.setValue(21,0);
 
 //作品オリジナルのテキスト作成
 original_text = function(id100,id101){
-
-if(id100 == 1){//サイジョー家のウソペディア
-  var value1 = "Chime2";
-  AudioManager.playSe({"name":value1,"volume":100,"pitch":100,"pan":0});
-  $gameVariables.setValue(172,10);
-  var value1 = 
-`・Usopedia:${$dataWeapons[317].meta['Profession']}
-覇空戦争時代より続く医師の名門一族、\\NFN[317]家。
-何よりも患者の命を救う事を真摯に求める、高邁な精神の癒し手達。
-彼らに救われた生命は、全空に渡って存在する。
-一族の者達は各地で敬われており、
-表敬の際には民衆が群れを成すという──。
-
-──\\wn[317]=\\NFN[317]は、そんな医師一家の傍流の出であるが、
-一族に伝わる高潔さも医療技術も一切持ち合わせていない。
-勤務態度は不真面目そのものであり、診察も適当極まる。
-裏社会との繋がりも噂されており、黒い噂が絶えない男である。
-空立の医療施設に勤めていられるのは、
-一族への忖度が１０割である、とは当院の院長の言だとか。
-
-故に彼は蔑みと軽視を込めてこう呼ばれている。
-${$dataWeapons[317].meta['Profession1']}、と…。
-
-民明書房刊『華麗なる一族、\\NFN[317]の光と闇』より抜粋`;
-  valueTalkSet = [25,value1,id101];
-};
-if(id100 == 2){//ＰＣ代用品説明
-  var value1 = "Chime2";
-  AudioManager.playSe({"name":value1,"volume":100,"pitch":100,"pan":0});
-  $gameVariables.setValue(172,10);
-  var value1 = 
-`・Usopedia:魔導電算機について
-来訪者(コラボ勢)の一人が所持していたＰＣ(パーソナルコンピューター)を元に、
-エルステ帝国が開発した電算処理ユニット。
-性能としては、元となったＰＣの遥か劣化品に当たる。
-しかし、簡単な計算や同機同士の通信機能など、
-その利便性は計り知れない。
-
-現在は大量生産こそ実現していないが、
-少数だが現品の生産は行われており、
-その一部は帝国外の好事家達にも流れているとか。
-
-帝国開発局では、現行品の大量生産と共に、
-高性能化や小型化などの研究に着手している──。
-
-ファ空新聞『時代を変える発明品！？　噂の魔導電算機に迫る！』特集一面より抜粋`;
-  valueTalkSet = [25,value1,id101];
-};
-
-};
-
-//作品オリジナルのtipsテキスト作成//15行まで
-original_tips = function(id100){
-
-if(id100 == 1){//
-  var value1 = "Book2";
-  AudioManager.playSe({"name":value1,"volume":100,"pitch":100,"pan":0});
-  $gameVariables.setValue(172,2);
-  var value1 = `朽ちた星晶獣の権能復元計画`;
-  var value2 = 
-`\\swi[247]の協力者から持ち込まれた情報を元に
-策定されたプロジェクト。
-\\swi[221]に嘗て存在したとされる、
-とある星晶獣の細胞が提供された事によって
-本計画は採用された。
-
-協力者は\\swi[247]で要職に就いている事もあり、
-国内での施設建造、実験体調達をスムーズに行えている。
-但し、研究施設については機器の調達・整備等の面から
-別島に移設する事が検討されている──。
-
-
-『朽ちた星晶獣の権能復元計画書』より抜粋`;
-};
-if(id100 == 2){//<淫統薬>インデュ・アビス
-  var value1 = "Book2";
-  AudioManager.playSe({"name":value1,"volume":100,"pitch":100,"pan":0});
-  $gameVariables.setValue(172,2);
-  var value1 = `${$dataWeapons[452].name}─その１─`;
-  var value2 = 
-`コルブラント島でその断片を確保した星晶獣、
-その一部他を用いて精製された、民意扇動を目的とした薬物。
-
-彼の星晶獣が所有していた「支配」の権能は、
-民衆管理の手法としては非常に有用ではあるが、
-広範囲に作用する性質が原因なのか、
-断片でしか無いためダウングレードしているのか、
-意志力の強い者へは作用し辛い事が確認されている。
-少なくとも、国元で治験名目で実験した所、
-英雄と呼ばれる位階に居る者達には
-明確な効力を発揮する事が無かったのは、
-決して座視できぬ問題であった。
-
-その２に続く──`;
-};
-if(id100 == 3){//<淫統薬>インデュ・アビス
-  var value1 = "Book2";
-  AudioManager.playSe({"name":value1,"volume":100,"pitch":100,"pan":0});
-  $gameVariables.setValue(172,2);
-  var value1 = `${$dataWeapons[452].name}─その３─`;
-  var value2 = 
-`
-現在は行方不明者が発生しても騒ぎになり難い、
-空域内でも有数の観光島で実地検証を行っている。
-この検証で、投薬対象によっては
-廃人化してしまう事が判明したのは、
-非常に有意義な結果だったと言えるだろう。
-また、この廃人化した対象の体液は、
-インデュ・アビス精製の際に必要な接受体として
-使える事も確認されている。
-
-『〇〇〇〇帝国研究開発部の業務月報』より抜粋`;
-};
-if(id100 == 4){//<試薬品>インデュルゲンス・リキッド
-  var value1 = "Book2";
-  AudioManager.playSe({"name":value1,"volume":100,"pitch":100,"pan":0});
-  $gameVariables.setValue(172,2);
-  var value1 = `${$dataWeapons[453].name}`;
-  var value2 = 
-`開発された\\wn[452]の試作品。
-正式採用となった薬品と比較すると、
-必要な摂取量などが問題となり開発中止となった。
-しかし、効能についてはより大元となる星晶獣の
-権能に近いものがあるのが特徴。
-
-\\swi[247]宰相を通じて、同派閥貴族達に
-生産された一部が流出されている事が判明している。
-
-『〇〇〇〇帝国研究開発部の業務日報』より抜粋`;
-};
-if(id100 == 5){//<淫紋>アビス・クレスト使用ずみ
-  var value1 = "Book2";
-  AudioManager.playSe({"name":value1,"volume":100,"pitch":100,"pan":0});
-  $gameVariables.setValue(172,2);
-  var value1 = `${$dataWeapons[454].name}`;
-  var value2 = 
-`触手型魔物である「\\wn[455]」が使う、
-対象を苗床化する\\wn[456]を元に、
-人間用に改変された紋章の一つ。
-
-対象女性の性的官能を自在に操る効果を持つ紋章を刻む。
-主に性奴隷などに用いられる為、
-習得者は専らアンダーグラウンドの住人である。
-紋章を刻まれた対象は、産まれ持ち育んだ価値観が
-歪められる程の快楽を得るという…。
-余談だが、原型となる\\wn[456]と
-比べると、その効果は幾分かマイルドになっているらしい。
-これは、\\wn[456]の効果が凡そ人には
-受け入れられない程のものであり、
-「商品」として仕立てる事も出来ぬほど強力であるかららしい──。
-
-民明書房刊『魔術大家の独り言』より抜粋`;
-};
-if(id100 == 6){//<淫統光>HMD型インデュ・アビス.使用ずみ
-  var value1 = "Chime2";
-  AudioManager.playSe({"name":value1,"volume":100,"pitch":100,"pan":0});
-  $gameVariables.setValue(172,2);
-  var value1 = `${$dataWeapons[457].name}`;
-  var value2 = 
-`服薬が必要な\\wn[452]に対して、
-光学的なアプローチを用いた試作魔導開発品。
-網膜に淫統作用を持った光を照射する事で、
-脳に直接効果を与える事が可能。
-
-国土に配備した照射機で齎される、
-「光」を照らすだけで民を支配する事を目標としているが、
-現状では専用のヘッドマウントディスプレイを用いる必要がある。
-
-現在はまだ試験中であり、実験レポートが求められている。
-
-『エルステ帝国研究開発部の成果発表レポート』より抜粋`;
-};
-if(id100 == 7){//<アビス・クレスト>と<インデュ・アビス>使用ずみ
-  var value1 = "Chime2";
-  AudioManager.playSe({"name":value1,"volume":100,"pitch":100,"pan":0});
-  $gameVariables.setValue(172,2);
-  var value1 = `${$dataWeapons[458].name}`;
-  var value2 = 
-`両者には根幹技術に措いて同様の手法が用いられている
-（正確には\\wn[454]の術式を
-\\wn[452]が流用している）為、
-ある程度の知識がある者ならば、
-互いの術式から干渉する事が可能。
-
-作中では\\set[7]によって、
-空賊が仕込んだ\\wn[454]に\\N[7]が干渉し、
-鎮静化されていた淫統光の効果をＨＭＤを用いずに
-再活性化させた。
-
-『飛び出せ！ よく解る＜りしゃぶる＞大図鑑！！』より抜粋`;
-};
-if(id100 == 8){//使用済み
-  var value1 = "Book2";
-  AudioManager.playSe({"name":value1,"volume":100,"pitch":100,"pan":0});
-  $gameVariables.setValue(172,2);
-  var value1 = `${$dataWeapons[80].name}`;
-  var value2 = 
-`数年前よりコルブラント島に出没するようになった空賊団。
-高機能な騎空挺と練度の高い団員を擁しており、
-島内での被害が相次いでいる。
-王国による掃討作戦が幾度となく行われたが、
-その全てで失敗している。
-軍部に内通者の存在が疑われているが、現在調査中につき真偽は不明。
-
-王国宰相の諜報網を駆使した結果、
-空賊団の一部が\\in[23]に姿を現している事が判明。
-彼らを幾人か捕らえ、本拠地の場所を確定したい。
-
-王国所属の騎士団へは報を入れず、
-お招きした<秩序の騎空団>諸氏に対応を願いたい。
-
-『秩序の騎空団への状況報告書』より抜粋`;
-};
-if(id100 == 11){//<星晶獣>インペリウム・グノーシス。使用ずみ
-  var value1 = "Book2";
-  AudioManager.playSe({"name":value1,"volume":100,"pitch":100,"pan":0});
-  $gameVariables.setValue(172,2);
-  var value1 = `${$dataWeapons[451].name}`;
-  var value2 = 
-`コルブラント島で存在を確認された星晶獣。
-その権能は、認識改変による「支配」。
-現在、浮島を統治しているネルガド王家始祖は、
-この権能を用いて自身の王権を確立させたと思われる。
-それからも、細々とした形ではあるが
-国家運営上の問題点をこの権能を用いて解決していた事が、
-協力者の証言により確認されている。
-
-しかし、凡そ百年前にインペリウム・グノーシスは姿を消し、
-現在の王家は自力での統治を行っている事も
-前述の協力者より証言されている。
-百年前に何があったかは不明。
-優先度は低いが継続的な調査が求められる。
-
-『〇〇〇〇帝国研究開発部の業務年報』より抜粋`;
-};
-if(id100 == 12){//<星晶獣>インペリウム・グノーシス
-  var value1 = "Chime2";
-  AudioManager.playSe({"name":value1,"volume":100,"pitch":100,"pan":0});
-  $gameVariables.setValue(172,3);
-  var value1 = `${$dataWeapons[451].name}─その２─`;
-  var value2 = 
-`既にその存在は朽ち果て、遺骸は大森林の地下深くに埋没している。
-残滓や断片が卑小化された権能を発揮する事もあるが、
-大元には朧げな意識しか存在していない。
-
-朽ちた原因は、代々のネルガド王家による権能の過剰使用。
-これにより王家はその地位を盤石なものにしていたが、
-その寄る辺を喪った結果、
-何一つ決断/判断をする事が出来ない
-無能な王族が蔓延する事となった。
-
-現在は、遺跡でのみ存在を保っている。。
-己が<支配>の届かぬ『天』を超える者の到来を望みながら…。
-`;
-};
-if(id100 == 13){//「インペルの神水」使用済み
-  var value1 = "Chime2";
-  AudioManager.playSe({"name":value1,"volume":100,"pitch":100,"pan":0});
-  $gameVariables.setValue(172,2);
-  var value1 = `${$dataItems[1162].name} またの名を「${$dataWeapons[460].name}」`;
-  var value2 = 
-`中央森林で汲み取れる湧き水。
-高級志向の飲食店などで使われている。
-…それとは別に、\\swi[247]でも一部の高位貴族にしか
-伝わっていない使用法がある。
-コルブラント島でしか取れぬ霊薬を調合に用いる事で、
-服用者を一種の催眠状態に陥らせる事が出来る
-特殊な飲料水を生成する事が可能なのである。
-
-当然のように国法で生成を禁じられているが、
-裏で用いられる事例が度々散見されている。
-特に、島外からの余所者などに──。
-
-一説には、とある星晶獣の体液が混ざっているとも
-云われている。
-
-`;
-};
-if(id100 == 14){//支配の結石使用済み
-  var value1 = "Chime2";
-  AudioManager.playSe({"name":value1,"volume":100,"pitch":100,"pan":0});
-  $gameVariables.setValue(172,2);
-  var value1 = `${$dataItems[1163].name}`;
-  var value2 = 
-`ジャックモンド伯爵家に伝わる希少な鉱石。
-とある不思議な効力があるとされている。
-現在では、後継を選ぶための試練に使われている。
-
-その効果は、「\\swi[247]の貴族血統に発現する、
-状態異常支配系アビリティの超強化」。
-その強化具合は、＜Ｎ(ノーヴィス)＞として産まれた
-貧弱な子供が使う状態異常アビリティが、
-＜ＳＲ＞として産まれ磨き上げられた一流騎空士の
-耐性をブチ抜くほど。
-
-一説には、とある星晶獣の肉片が変じた姿なのでは、と
-云われている。
-
-`;
-};
-if(id100 == 15){//クサンについて。ラストバトル時に使用,入手ずみ
-  var value1 = "Chime2";
-  AudioManager.playSe({"name":value1,"volume":100,"pitch":100,"pan":0});
-  $gameVariables.setValue(172,3);
-  var value1 = `${$gameActors.actor(7).name()}=コルド＝${$dataActors[7].meta['SecondName'].split(',')[1]}`;
-  var value2 = 
-`\\swi[247]元宰相。
-その目的は、嘗て王国統治を支えた星晶獣の権能復元。
-現在に置いても、湧き水や結石という形でその神秘は
-利用する事が可能だが、それらは所詮は残滓に過ぎない。
-彼が求めたのは、「秩序を護る者を秩序を穢す者」へと
-変える事も可能なほどの強力な支配能力である。
-その為に\\wn[75]と繋がり、彼の国の特殊な魔導具を
-用いての再現を目論んだ。
-空賊を経由して拉致した\\swi[247]民を
-人体実験の生贄に用いて………。
-
-当の昔に喪われた異形。
-その力に頼り切る体制から脱却できぬ国の宰相は、
-禁忌へと手を染めた。頼りにならぬ愚王や佞臣達に代わり、
-己が覇権を握り祖国を導かんが為に──。
-
-`;
-};
-if(id100 == 16){//クサンについて2。使用ずみ
-  var value1 = "Chime2";
-  AudioManager.playSe({"name":value1,"volume":100,"pitch":100,"pan":0});
-  $gameVariables.setValue(172,2);
-  //var value1 = `\\set[7]─その２─`;
-  var value1 = `${$gameActors.actor(7).name()}=コルド＝${$dataActors[7].meta['SecondName'].split(',')[1]}─その２─`;
-  var value2 = 
-`未だ復権という野心にその身を焦がす\\swi[247]元宰相。
-
-…その可能性が、既に潰えている事を自覚せぬままに。
-何故ならば、\\swi[247]は\\wn[359]王主導の元、
-急速に\\N[7]を過去の人物へと押しやっているのだから…。
-歴史の潮流に取り残された元宰相に、
-これを覆す手段はもはや存在しないのである…。
-
-元来の、一国を牛耳るまでに至った\\N[7]ならば、
-自ずと悟っていたであろう現実。
-けれど、今の彼が理解することは未来永劫、有り得ない。
-星晶獣との疑似的な融合や地位の失墜により、
-精神に重篤な瑕疵の出来た今。
-在りし日の栄光に心を寄せる事でしか
-心を保てないのが、今の\\set[7]なのだから──。
-
-`;
-};
-if(id100 == 17){//騎士団長,入手ずみ
-  var value1 = "Chime2";
-  AudioManager.playSe({"name":value1,"volume":100,"pitch":100,"pan":0});
-  $gameVariables.setValue(172,3);//172を3で入手表示のみ
-  var value1 = `${$dataWeapons[351].name}=${$dataWeapons[351].meta['FamilyName']}`;
-  var value2 = 
-`\\swi[247]騎士団長。
-王国最強の騎士にして、軍事に措ける最高責任者。
-政治からは自覚的に距離を取るようにしていた。
-
-比較的早い時期から、\\afn[7]宰相の暗躍に気付いていた。
-何とか掣肘すべく動いていたが、政治的な影響力の差もあり
-逆に騎士団の要職を宰相派とでもいうべき貴族達に
-挿げ替えられ、身動きが取れなくなっていた。
-そんな時に\\wn[78]による干渉を知り、
-これを奇貨とすべく水面下で行動していた。
-最終的に\\N[1]達の手によって討たれる事で、
-一連の事件に幕を引く事となる。
-
-──王国最強の騎士は、最後まで忠義にその身を捧げた。
-愛する祖国の為、そして無二の友の為に…。
-
-`;
-};
-if(id100 == 18){//国王。使用ずみ
-  var value1 = "Chime2";
-  AudioManager.playSe({"name":value1,"volume":100,"pitch":100,"pan":0});
-  $gameVariables.setValue(172,2);
-  var value1 = `${$dataWeapons[359].name}=${$dataWeapons[359].meta['FamilyName']}`;
-  var value2 = 
-`\\swi[247]国王。自他共に認める無能な王。
-それは彼自身の責というよりも、星晶獣の権能という
-便利な力に縋る事を辞められなかった歴代王家そのものに
-責があるといえよう。
-
-一連の事件の後、崩壊へと傾き続ける王国にあって、
-『唯一の友の死』、そして、『己がやるしかない状況』
-に直面する事で、無能から凡夫程度へと成長を成し遂げる。
-結果、\\swi[247]は辛うじて破綻を免れた、という。
-
-──歴史に語られる無為無能の王。
-然れど、死期を悟った友が去り際に願った『王国の安寧』。
-その大願の為に残りの生涯を賭した王でもあった。
-`;
-};
-if(id100 == 19){//<淫触薬>アビス・リキッド、使用ずみ
-  var value1 = "Book2";
-  AudioManager.playSe({"name":value1,"volume":100,"pitch":100,"pan":0});
-  $gameVariables.setValue(172,2);
-  var value1 = `${$dataWeapons[459].name}`;
-  var value2 = 
-`\\wn[452]を元にして作成された派生薬の一つ。
-触手型魔物である「\\wn[455]」の体液を用いる事で、
-元の薬品とは別の形で、
-しかし更に強力な強制力を持たせる事に成功している。
-雌性体専用薬。
-
-対象の性的官能を暴力的なまでに引き上げ、
-異性からの支配を受け入れやすくする。
-代償として思考が鈍くなってしまう為、
-性的用途以外には使えない。
-\\wn[454]が定着する事で本来の効果を発揮する。
-
-\\wn[459]以外にも様々な派生形薬品が作られており、
-それらは\\swi[223]の観光客相手に売り捌かれたらしい…。
-`;
-};
-if(id100 == 20){//エネミー全滅ボーナス、使用ずみ
-  var value1 = "Book2";
-  AudioManager.playSe({"name":value1,"volume":100,"pitch":100,"pan":0});
-  $gameVariables.setValue(172,2);
-  var value1 = `エネミー全滅ボーナス`;
-  var value2 = 
-`マップ上のシンボルエネミーを全滅させる事で、
-初回殲滅特典としてレアなアイテムが入手できます。
-２回目以降は、そのマップの
-「初回殲滅特典」「白銀宝箱」「通常宝箱」の中から
-ランダムで抽選されたアイテムが入手できます。
-
-エネミーの全滅判定（カウント）は、
-そのダンジョン（フィールド）から
-出るか日数経過させる事でリセットされます。
-
-また、エネミーを全滅させると、全滅させた回数分だけ
-エネミーのレベルが上昇します。
-（全滅回数３回でエネミーレベル＋３）
-`;
-};
-if(id100 == 21){//ダンジョンとフィールドの違い。使用ずみ
-  var value1 = "Book2";
-  AudioManager.playSe({"name":value1,"volume":100,"pitch":100,"pan":0});
-  $gameVariables.setValue(172,2);
-  var value1 = `ダンジョンとフィールド`;
-  var value2 = 
-`作中に措いて、『ダンジョン』と『フィールド』は
-扱いが異なる。
-ダンジョンでは倒したエネミーは自然消滅し上限まで
-リポップするが、フィールドではしない。
-エネミーＬＶが20以上のダンジョンでは「トラップ」が
-設置されるが、フィールドではない。
-
-一部のクエストでも、扱いを別にされている。
-
-`;
-};
-if(id100 == 22){//食事について。使用済み
-  var value1 = "Book2";
-  AudioManager.playSe({"name":value1,"volume":100,"pitch":100,"pan":0});
-  $gameVariables.setValue(172,2);
-  var value1 = `食事アイテムについて`;
-  var value2 = 
-`「Food」に分類される食事アイテムは、
-使用する事で食べる事ができ、
-その食事毎に設定されたバフを受ける事が出来ます。
-
-一度の食事で「満腹度」が1上昇し、
-「満腹度上限」に達するまで食事が行えます。
-満腹度は昼夜変更時にリセットされます。
-同時にバフも消去されます。
-
-※ 「食材」と「食事」アイテムは別物です。
-`;
-};
-if(id100 == 23){//<淫統薬>インデュ・アビス
-  var value1 = "Book2";
-  AudioManager.playSe({"name":value1,"volume":100,"pitch":100,"pan":0});
-  $gameVariables.setValue(172,2);
-  var value1 = `${$dataWeapons[452].name}─その２─`;
-  var value2 = 
-`これを解消する為の研究は主に、
-「特定対象に特化した支配機能」を主軸としている。
-主に、「対象の欲求に根差した支配」となる。
-認識改変による０からの支配では無く、
-支配を受け入れざるを得ない土壌を用意する形式と言える。
-
-この研究で最も効力を示している成果物が、
-\\wn[452]である。
-とある触手型魔物の体液と化合させて精製されるこの薬品は、
-対象の性的欲求を過剰に誘発させ、
-肉欲を対象の最上位価値基準に置く事で
-他者からの支配を受け入れさせる物である。
-
-その３に続く──`;
-};
-if(id100 == 24){//ディヴィジョン・ベルセルク
-  var value1 = "Book2";
-  AudioManager.playSe({"name":value1,"volume":100,"pitch":100,"pan":0});
-  $gameVariables.setValue(172,3);
-  var value1 = `ベルセルク──過去──`;
-  var value2 = 
-`覇空戦争時代に猛威を振るった狂戦士達。
-理性を払底させる事を代償に強大な力を振るう。
-その性質上、「味方殺し」すら許容されるような、
-凄惨極まる戦場で活躍した。
-
-一説には星の民による人種改良によって
-産み出された半人工的な存在と云われている。
-
-戦後、己らの凶暴性を忌んだ彼らは外界との関わりを断ち、
-人の手の入っていない浮島を選んで一族纏めて移住した。
-
-──もう二度と、と。
-それだけを想い選んで…。
-`;
-};
-if(id100 == 25){//ディヴィジョン・ベルセルク
-  var value1 = "Book2";
-  AudioManager.playSe({"name":value1,"volume":100,"pitch":100,"pan":0});
-  $gameVariables.setValue(172,3);
-  var value1 = `ベルセルク──現在──`;
-  var value2 = 
-`──現代に措いて。
-様々な書物から、その一族の存在を掴んだ帝国研究所。
-早速サンプルの確保に動いたが、正規軍を動かすには
-時期が悪く、流れの空賊に『回収』を依頼する。
-しかし、その空賊達は情報だけを利用し略奪を実行。
-結果、集落は全滅。
-彼らが望んだ「伝説のベルセルク」の血統も途絶えた…。
-
-──一人の少年を除いて。
-
-その生き残りも、面倒な騎空団に拾われた事で回収も半ば
-断念されていたが………。
-何故か追放された為、軍を動かし確保に赴く事となった──。
-`;
-};
-if(id100 == 26){//ディヴィジョン・ベルセルク
-  var value1 = "Book2";
-  AudioManager.playSe({"name":value1,"volume":100,"pitch":100,"pan":0});
-  $gameVariables.setValue(172,3);
-  var value1 = `ディヴィジョン・ベルセルク`;
-  var value2 = 
-`本来は、血族であろうとも器では無い\N[5]が、
-寿命を代償に狂戦士化した姿。
-本来のベルセルクと比べ弱体化、或いは超ピーキーな
-改変が行われている。
-
-然れど、元がノーヴィスの少年である事を考えれば、
-その伸び幅は破格のものと言える。
-
-──理性を剥奪されて得た力に、どれ程の意味があるのか。
-その答えを出すべき少年は………。
-`;
-};
-if(id100 == 27){//ライフスト－ム
-  var value1 = "Book2";
-  AudioManager.playSe({"name":value1,"volume":100,"pitch":100,"pan":0});
-  $gameVariables.setValue(172,3);
-  var value1 = `生命奔流体機構<ライフストーム・イグジット>`;
-  var value2 = 
-`生体兵器として産み出された狂戦士の血統に
-遺伝子レベルで組み込まれた疑似思考群体。
-平時は対象の無意識領域にて沈黙を保っているが、
-狂戦士化(殺戮)による精神の不安定化などの時に
-保有者のメンタルケアを自動実行する機能を持つ。
-また、保有者の生命維持を最優先事項とし、
-その為の生体改造/改竄技術と権限を保持している。
-
-機構を持ちながらも覚醒する事無く虐殺された
-\\N[5]の集落の住人は、「暴力への絶対的禁忌」を
-父祖に洗脳レベルで躾けられていた為、
-機構が干渉を行える余地が無かったのである。
-
-──歳若い\\N[5]を除いて。
-`;
-};
-
-var value3 = [0,1,640,384,100,100,255];
-valueTalkSet = [value1,value2,value3];
+	
+let tip;
+switch(id100){
+	case 1:
+		tip = new Tip1();
+		break;
+	case 2:
+		tip = new Tip2();
+		break;
+	case 3:
+		tip = new Tip3();
+		break;
+	case 4:
+		tip = new Tip4();
+		break;
+	case 5:
+		tip = new Tip5();
+		break;
+	case 6:
+		tip = new Tip6();
+		break;
+	case 7:
+		tip = new Tip7();
+		break;
+	case 8:
+		tip = new Tip8();
+		break;
+	case 9:
+		tip = new Tip9();
+		break;
+	case 10:
+		tip = new Tip10();
+		break;
+	case 11:
+		tip = new Tip11();
+		break;
+	case 12:
+		tip = new Tip12();
+		break;
+	case 13:
+		tip = new Tip13();
+		break;
+	case 14:
+		tip = new Tip14();
+		break;
+	case 15:
+		tip = new Tip15();
+		break;
+	case 16:
+		tip = new Tip16();
+		break;
+	case 17:
+		tip = new Tip17();
+		break;
+	case 18:
+		tip = new Tip18();
+		break;
+	case 19:
+		tip = new Tip19();
+		break;
+	case 20:
+		tip = new Tip20();
+		break;
+	case 21:
+		tip = new Tip21();
+		break;
+	case 22:
+		tip = new Tip22();
+		break;
+	case 23:
+		tip = new Tip23();
+		break;
+	case 24:
+		tip = new Tip24();
+		break;
+	case 25:
+		tip = new Tip25();
+		break;
+	case 26:
+		tip = new Tip26();
+		break;
+	case 27:
+		tip = new Tip27();
+		break;
+}
+
+tip.execute();
 
 };
 
@@ -1783,7 +2078,8 @@ id100 = id100 - 300;
 if(id100 == 1){//リーシャ登場。戦闘シーン
   valuePic1 = 51;
   valueScenePic = 'ZX_Main000_';
-  if(id101 == 1){
+ switch (id101) {
+  case 1: {
     $gameScreen.showPicture(valuePic1,'ScreenBlackOut',1,640,384,100,100,0,0);
     pic_1(1,valuePic1+2,valueScenePic+'01',6,100,255,120,1280,768,0,0);
     $gameScreen.showPicture(valuePic1+3,'ScreenBlackOut',1,640,384,100,100,0,0);
@@ -1793,124 +2089,141 @@ if(id100 == 1){//リーシャ登場。戦闘シーン
     $gameScreen.showPicture(valuePic1+12,valueScenePic+'03',1,(640 - (1500-1280) / 2)-1000,384,500,500,0,0);
     $gameScreen.movePicture(valuePic1,1,640,384,100,100,200,0,60);
     tachie_bless(valuePic1+4,1);
-  };
-  if(id101 == 2){
+	break;
+  }
+  case 2: {
     adv_partDirectSet(3);
     pic_move1(valuePic1+3,0,0,100,100,200,10);
     pic_move1(valuePic1+4,0,0,100,100,200,10);
     if($gameScreen.picture(valuePic1+4)){
       $gameScreen.picture(valuePic1+4).startAnimationFrame(1, true, [1,1,1,2]);
-    };
-  };
-  if(id101 == 3){
-    var value1 = $gameScreen.picture(valuePic1+4).y();
+    }
+	break;
+  }
+  case 3: {
+    const value1 = $gameScreen.picture(valuePic1+4).y();
     pic_move1(valuePic1+4,0,(384 + (1390-768)/2)-value1,100,100,255,600);
-  };
-  if(id101 == 4){ parallax_scroll(valuePic1+5,'ScreenConcentratedLineWidthBackGraund',0,20,20,0,255) };
-  if(id101 == 5){
+  }
+  case 4: { 
+	parallax_scroll(valuePic1+5,'ScreenConcentratedLineWidthBackGraund',0,20,20,0,255); 
+	break; 
+  }
+  case 5: {
     pic_move1(valuePic1+10,0,0,100,100,255,60);
-    var value1 = $gameScreen.picture(valuePic1+12).x();
+    const value1 = $gameScreen.picture(valuePic1+12).x();
     pic_move1(valuePic1+12,(640 + (1500-1280) / 2) - value1,0,100,100,255,40);
     //パララックスで4と残像で1
     filter_direct(10,10,10,20);
-  };
-  if(id101 == 6){ pic_move1(valuePic1+12,-200,0,100,100,0,40) };
-  if(id101 == 7){ //地面黒塗りと残像作成
+	break;
+  }
+  case 6: { pic_move1(valuePic1+12,-200,0,100,100,0,40); break; }
+  case 7: { //地面黒塗りと残像作成
     $gameMap.spawnEvent(146, 25, 35, true);
     $gameVariables.value(292)[13] = $gameMap.getLastSpawnEventId();
-    var eventId = $gameVariables.value(292)[13];
-    var event = $gameMap.event(eventId);
+    let eventId = $gameVariables.value(292)[13];
+    const event = $gameMap.event(eventId);
     event.setOpacity(200);
-    var eventId = $gameVariables.value(292)[$gameVariables.value(530)];
-    var value1 = 'monster_c';
+    eventId = $gameVariables.value(292)[$gameVariables.value(530)];
+    let value1 = 'monster_c';
     $gameScreen._particle.particleSet('attach:event:'+eventId,value1+'-'+eventId,'this',value1);
     $gameScreen._particle.particleUpdate([value1,'color','#007dff','#66b1ff']);
-    var value1 = 'monster_c'+'-'+eventId;
+    value1 = 'monster_c'+'-'+eventId;
     $gameScreen._particle.particleClear(value1);
-  };
-};
-if(id100 == 1){
-  if(id101 == 1){
+	break;
+  }
+ }
+}
+// if(id100 == 1){
+  // if(id101 == 1){
 
-  };
-  if(id101 == 2){
+  // }
+  // if(id101 == 2){
 
-  };
-};
-if(id100 == 1){
-  if(id101 == 1){
+  // }
+// }
+// if(id100 == 1){
+  // if(id101 == 1){
 
-  };
-  if(id101 == 2){
+  // }
+  // if(id101 == 2){
 
-  };
-};
+  // }
+// }
 
-};
+}
+
+get_id100_if_zero = function(id100, x){
+	if(id100 > 0) return id100;
+	
+	const var535 = $gameVariables.value(535);
+	if(var535 >= x + 1 && var535 <= x + 100){
+		return var535 - x;
+	}
+	
+	return id100;
+}
 
 //作品オリジナルのピクチャ挿話やキャラグラ移動等処理。401-600以外は直接コモンid入力
 original_souwa = function(id100,id101){
 
-if(id100 == 0 && $gameVariables.value(535) >= 1){
-  if($gameVariables.value(535) >= 401 && $gameVariables.value(535) <= 500){
-    id100 = $gameVariables.value(535) - 400;
-  };
-};
+id100 = get_id100_if_zero(id100, 400);
+
 if(id100 == 31){//秩序の酒場に不良団員npc2人と酒とつまみを生成。id11-15まで使用
   if(id101 == 1){
-    var value1 = 11;
+    let value1 = 11;
     event_respawnSetN(value1,16,15,0,'npcOrder2',0);
-    var event = $gameMap.event($gameVariables.value(292)[value1]);
+    let event = $gameMap.event($gameVariables.value(292)[value1]);
     event.setDirection(4);
-    var value1 = 12;
+	
+    value1 = 12;
     event_respawnSetN(value1,13,15,0,'npcOrder2',3);
-    var event = $gameMap.event($gameVariables.value(292)[value1]);
+    event = $gameMap.event($gameVariables.value(292)[value1]);
     event.setDirection(6);
-    var value1 = 13;
+	
+    value1 = 13;
     goodsEvent_respawn(value1,'food_2',1,4,2,15,15);
-    var event = $gameMap.event($gameVariables.value(292)[value1]);
+    event = $gameMap.event($gameVariables.value(292)[value1]);
     event._spriteOffsetX = 25;
     event._spriteOffsetY = 10;
     event._priorityType = 2;
-    var value1 = 14;
+	
+    value1 = 14;
     goodsEvent_respawn(value1,'food_2',3,6,0,14,15);
-    var event = $gameMap.event($gameVariables.value(292)[value1]);
+    event = $gameMap.event($gameVariables.value(292)[value1]);
     event._spriteOffsetX = -25;
     event._spriteOffsetY = 10;
     event._priorityType = 2;
-    var value1 = 15;
+	
+    value1 = 15;
     goodsEvent_respawn(value1,'food_1',0,4,0,15,15);
-    var event = $gameMap.event($gameVariables.value(292)[value1]);
+    event = $gameMap.event($gameVariables.value(292)[value1]);
     event._spriteOffsetX = -24;
   };
 };
-if(id100 == 1){
-  if(id101 == 1){
+// if(id100 == 1){
+  // if(id101 == 1){
 
-  };
-  if(id101 == 2){
+  // };
+  // if(id101 == 2){
 
-  };
-};
-if(id100 == 1){
-  if(id101 == 1){
+  // };
+// };
+// if(id100 == 1){
+  // if(id101 == 1){
 
-  };
-  if(id101 == 2){
+  // };
+  // if(id101 == 2){
 
-  };
-};
+  // };
+// };
 
 };
 
 //作品オリジナルのピクチャシーンやキャラグラ移動等処理。401-600以外は直接コモンid入力
 original_scene = function(id100,id101){ //original_scene(0,1);//テストの際は変数535にid入力
 
-if(id100 == 0 && $gameVariables.value(535) >= 1){
-  if($gameVariables.value(535) >= 501 && $gameVariables.value(535) <= 600){
-    id100 = $gameVariables.value(535) - 500;
-  };
-};
+id100 = get_id100_if_zero(id100, 500);
+
 if(id100 == 11){//Ｈな診察
   if(id101 == 1){
     backGraund_menuMapSelect(2,0,0,0);
@@ -1931,182 +2244,185 @@ if(id100 == 11){//Ｈな診察
     pic_move1(valuePic1+11,0,0,100,100,255,90);
     tachie_bless(valuePic1+2,1);
     valuePicWait2 = 60;
-  };
-  if(id101 == 2){ pic_move1(valuePic1+12,0,-200,100,100,255,180);valuePicWait2 = 120; };
-  if(id101 == 3){ pic_move1(valuePic1+2,0,50,100,100,255,180);valuePicWait2 = 60; };
-  if(id101 == 4){ $gameScreen.startAnimation(520, 680, 179, false) };
-  if(id101 == 5){ var value1 = valuePic1+12;if($gameScreen.picture(value1)){$gameScreen.picture(value1).addCellCount()} };
-  if(id101 == 6){
-    var value1 = valuePic1+2;
-    if($gameScreen.picture(value1)){$gameScreen.picture(value1).addCellCount()};
+  }
+  else if(id101 == 2){ pic_move1(valuePic1+12,0,-200,100,100,255,180);valuePicWait2 = 120; }
+  else if(id101 == 3){ pic_move1(valuePic1+2,0,50,100,100,255,180);valuePicWait2 = 60; }
+  else if(id101 == 4){ $gameScreen.startAnimation(520, 680, 179, false) }
+  else if(id101 == 5){ 
+	const picId = valuePic1+12;
+	if($gameScreen.picture(picId)){
+		$gameScreen.picture(picId).addCellCount()} 
+	}
+  else if(id101 == 6){
+    const picId = valuePic1+2;
+    if($gameScreen.picture(picId)){$gameScreen.picture(picId).addCellCount()}
     pic_move1(valuePic1+11,0,0,100,100,0,60);
     pic_move1(valuePic1+12,0,0,100,100,0,60);
     pic_move1(valuePic1+1,0,0,100,100,200,120);
-    var value3 = 'Hscene005';
-    picture_fade1(valuePic1+1,"fadeIn",value3,120,5);
-  };
-  if(id101 == 7){
+    picture_fade1(valuePic1+1,"fadeIn",'Hscene005',120,5);
+  }
+  else if(id101 == 7){
     pic_move1(valuePic1+13,0,0,100,100,255,120);
     pic_move1(valuePic1+15,0,-50,100,100,255,120);
     valuePicWait2 = 120;
-  };
-  if(id101 == 8){
+  }
+  else if(id101 == 8){
     pic_setArray1 = [1,valuePic1+13,0,384+(1732/2)-(768/2)+100,5,1200];
     pic_setArray2 = [1,0,0,0,0,0];
     valueParallelPicSe1 = [0,0,0];
     valueParallelPicSe2 = [0,0,0];
     hcg_piston(valuePic1+13,8,1,2);
     $gameSwitches.setValue(429,true);
-    var value1 = valuePic1+15;
-    if($gameScreen.picture(value1)){$gameScreen.picture(value1).addCellCount()};
+    const picId = valuePic1+15;
+    if($gameScreen.picture(picId)){$gameScreen.picture(picId).addCellCount()}
     valuePicWait2 = 60;
-  };
-  if(id101 == 9){
+  }
+  else if(id101 == 9){
     $gameSwitches.setValue(429,false);
     valueParallelPicSe1 = [0,0,0];
     valueParallelPicSe2 = [0,0,0];
     pic_setArray(0,0,0,0,0,0);
     picture_motion1("smooth",[0]);
-  };
-  if(id101 == 10){
+  }
+  else if(id101 == 10){
     pic_move1(valuePic1,0,0,200,200,255,60);
     pic_move1(valuePic1+1,0,0,100,100,0,60);
     pic_move1(valuePic1+13,0,0,100,100,0,60);
     pic_move1(valuePic1+15,0,0,100,100,0,60);
     valuePicWait2 = 60;
-  };
-  if(id101 == 11){ 
+  }
+  else if(id101 == 11){ 
     pic_move1(valuePic1,0,0,100,100,255,60);
-    var value1 = valuePic1+2;if($gameScreen.picture(value1)){$gameScreen.picture(value1).addCellCount()};
+    const picId = valuePic1+2;
+	if($gameScreen.picture(picId)){
+		$gameScreen.picture(picId).addCellCount()
+	}
     pic_move1(valuePic1+11,0,0,100,100,255,60);
     pic_move1(valuePic1+12,0,0,100,100,255,60);
-  };
-  if(id101 == 12){ pic_move1(valuePic1+12,0,+200,100,100,255,180);valuePicWait2 = 120; };
-  if(id101 == 90){//2と3の間に仕様
+  }
+  else if(id101 == 12){ pic_move1(valuePic1+12,0,+200,100,100,255,180);valuePicWait2 = 120; }
+  else if(id101 == 90){//2と3の間に仕様
     pic_move1(valuePic1,0,0,25,25,150,60);
     pic_move1(valuePic1+11,0,0,25,25,150,60);
     pic_move1(valuePic1+11,0,0,25,25,150,60);
     valuePicWait2 = 60;
-  };
-  if(id101 == 91){//2と3の間に仕様
+  }
+  else if(id101 == 91){//2と3の間に仕様
     pic_move1(valuePic1,0,0,100,100,255,60);
     pic_move1(valuePic1+11,0,0,100,100,255,60);
     pic_move1(valuePic1+11,0,0,100,100,255,60);
-  };
-};
-if(id100 == 1){
-  if(id101 == 1){
+  }
+}
+// if(id100 == 1){
+  // if(id101 == 1){
 
-  };
-  if(id101 == 2){
+  // }
+  // if(id101 == 2){
 
-  };
-};
-if(id100 == 1){
-  if(id101 == 1){
+  // }
+// }
+// if(id100 == 1){
+  // if(id101 == 1){
 
-  };
-  if(id101 == 2){
+  // }
+  // if(id101 == 2){
 
-  };
-};
-if(id100 == 100){//モニカマッサージ,id1とid2。
+  // }
+// }
+else if(id100 == 100){//モニカマッサージ,id1とid2。
   valuePic1 = 51;
   if(id101 == 1){
     AudioManager.playBgs({"name":"21_HandyMassager1","volume":50,"pitch":100,"pan":0});
-    var value2 = 'XevS101_00back';
-    pic_1(0,valuePic1,value2,0,100,255,60,1280,768,-256,0);
-    var value2 = 'XevS101_00back2';
-    pic_1(0,valuePic1+1,value2,0,100,255,60,1280,768,-256,0);
-    var value2 = 'XevS101_01';
-    pic_1(0,valuePic1+2,value2,0,100,255,60,1280,768,-256,0);
-    var value2 = 'XevS101_01face1';
-    pic_1(0,valuePic1+6,value2,0,100,255,60,1280,768,-256,0);
-    var value2 = 'XevS101_01_100';
-    picture_anime1(valuePic1+7,value2,5,1,"連番",15,3,true,[2,3,4,5]);
+    let picName = 'XevS101_00back';
+    pic_1(0,valuePic1,picName,0,100,255,60,1280,768,-256,0);
+    picName = 'XevS101_00back2';
+    pic_1(0,valuePic1+1,picName,0,100,255,60,1280,768,-256,0);
+    picName = 'XevS101_01';
+    pic_1(0,valuePic1+2,picName,0,100,255,60,1280,768,-256,0);
+    picName = 'XevS101_01face1';
+    pic_1(0,valuePic1+6,picName,0,100,255,60,1280,768,-256,0);
+    picName = 'XevS101_01_100';
+    picture_anime1(valuePic1+7,picName,5,1,"連番",15,3,true,[2,3,4,5]);
     $gameScreen.picture(valuePic1+7)._x = 640-128;
     $gameScreen.movePicture(valuePic1+7,1,640-128,384,100,100,200,0,60);
-    picture_anime1(valuePic1+8,value2,5,1,"連番",20,3,true,[4,5,2,3]);
+    picture_anime1(valuePic1+8,picName,5,1,"連番",20,3,true,[4,5,2,3]);
     $gameScreen.picture(valuePic1+8)._x = 640-128;
     $gameScreen.movePicture(valuePic1+8,1,640-128,384,100,100,100,0,60);
-    for (var i = valuePic1+1; i <= valuePic1+8; i++) { hcg_piston(i,5,1,2) };
-  };
-  if(id101 == 2){//ピストンしている時に表情変化させる場合、身体も更新する。振動が同期しないため
+    for (let i = valuePic1+1; i <= valuePic1+8; i++) { hcg_piston(i,5,1,2) }
+  }
+  else if(id101 == 2){//ピストンしている時に表情変化させる場合、身体も更新する。振動が同期しないため
     AudioManager.playBgs({"name":"21_HandyMassager1","volume":60,"pitch":120,"pan":0});
-    var value2 = 'XevS101_01';
-    pic_1(2,valuePic1+2,value2,0,100,255,1,1280,768,-256,0);
-    var value2 = 'XevS101_01face2';
-    pic_1(2,valuePic1+6,value2,0,100,255,1,1280,768,-256,0);
-    var value2 = 'XevS101_02_100';
-    picture_anime1(valuePic1+7,value2,5,1,"連番",5,3,true,[0,2,3,4,5]);
+    let picName = 'XevS101_01';
+    pic_1(2,valuePic1+2,picName,0,100,255,1,1280,768,-256,0);
+    picName = 'XevS101_01face2';
+    pic_1(2,valuePic1+6,picName,0,100,255,1,1280,768,-256,0);
+    picName = 'XevS101_02_100';
+    picture_anime1(valuePic1+7,picName,5,1,"連番",5,3,true,[0,2,3,4,5]);
     $gameScreen.picture(valuePic1+7)._x = 640-128;
     $gameScreen.movePicture(valuePic1+7,1,640-128,384,100,100,200,0,60);
-    picture_anime1(valuePic1+8,value2,5,1,"連番",10,3,true,[0,4,5,2,3]);
+    picture_anime1(valuePic1+8,picName,5,1,"連番",10,3,true,[0,4,5,2,3]);
     $gameScreen.picture(valuePic1+8)._x = 640-128;
     $gameScreen.movePicture(valuePic1+8,1,640-128,384,100,100,100,0,60);
-    for (var i = valuePic1+1; i <= valuePic1+8; i++) { hcg_piston(i,5,3,2) };
-  };
-  if(id101 == 3){
+    for (let i = valuePic1+1; i <= valuePic1+8; i++) { hcg_piston(i,5,3,2) }
+  }
+  else if(id101 == 3){
     pic_eraseP(2,[valuePic1+2]);
-    var value2 = 'XevS101_02';
-    pic_1(2,valuePic1+3,value2,0,100,255,1,1280,768,-256,0);
-    var value2 = 'XevS101_01face3';
-    pic_1(2,valuePic1+6,value2,0,100,255,1,1280,768,-256,0);
-    var value2 = 'XevS101_03_100';
-    picture_anime1(valuePic1+9,value2,4,1,"連番",5,3,true,[3,1,5,1]);
+    let picName = 'XevS101_02';
+    pic_1(2,valuePic1+3,picName,0,100,255,1,1280,768,-256,0);
+    picName = 'XevS101_01face3';
+    pic_1(2,valuePic1+6,picName,0,100,255,1,1280,768,-256,0);
+    picName = 'XevS101_03_100';
+    picture_anime1(valuePic1+9,picName,4,1,"連番",5,3,true,[3,1,5,1]);
     $gameScreen.picture(valuePic1+9)._x = 640-128;
     $gameScreen.movePicture(valuePic1+9,1,640-128,384,100,100,255,0,10);
-    picture_anime1(valuePic1+10,value2,4,1,"連番",5,3,true,[1,2,1,4]);
+    picture_anime1(valuePic1+10,picName,4,1,"連番",5,3,true,[1,2,1,4]);
     $gameScreen.picture(valuePic1+10)._x = 640-128;
     $gameScreen.movePicture(valuePic1+10,1,640-128,384,100,100,255,0,10);
-    for (var i = valuePic1+1; i <= valuePic1+8; i++) { hcg_piston(i,5,3,2) };
-    for (var i = valuePic1+9; i <= valuePic1+10; i++) { hcg_piston(i,5,3,1) };
-  };
-  if(id101 == 4){//id3が+50,-250,-500,+50,id4が200,300
-    for (var i = valuePic1; i <= valuePic1+10; i++) {
+    for (let i = valuePic1+1; i <= valuePic1+8; i++) { hcg_piston(i,5,3,2) }
+    for (let i = valuePic1+9; i <= valuePic1+10; i++) { hcg_piston(i,5,3,1) }
+  }
+  else if(id101 == 4){//id3が+50,-250,-500,+50,id4が200,300
+    for (let i = valuePic1; i <= valuePic1+10; i++) {
       if($gameScreen.picture(i)){
-        var value3 = $gameScreen.picture(i).opacity();
-        $gameScreen.movePicture(i,1,640,384+id3,id4,id4,value3,0,120);
-      };
-    };
-  };
-  if(id101 == 5){
-    var value2 = 'XevS101_04back';
-    pic_1(0,valuePic1,value2,0,100,255,120,1280,768,0,0);
-    var value2 = 'XevS101_04';
-    pic_1(0,valuePic1+1,value2,0,100,255,120,1280,768,0,0);
+        const picOpacity = $gameScreen.picture(i).opacity();
+        $gameScreen.movePicture(i,1,640,384+id3,id4,id4,picOpacity,0,120);
+      }
+    }
+  }
+  else if(id101 == 5){
+    pic_1(0,valuePic1,'XevS101_04back',0,100,255,120,1280,768,0,0);
+    pic_1(0,valuePic1+1,'XevS101_04',0,100,255,120,1280,768,0,0);
     hcg_piston(valuePic1+1,5,1,2);
-  };
-  if(id101 == 6){
-    var arr1 = [];
-    for (var i = valuePic1; i <= valuePic1+11; i++) {
+  }
+  else if(id101 == 6){
+    const arr1 = [];
+    for (let i = valuePic1; i <= valuePic1+11; i++) {
       arr1.push(i);
-    };
+    }
     pic_eraseP(0,arr1);
-  };
-  if(id101 == 7){
+  }
+  else if(id101 == 7){
     AudioManager.fadeOutBgs(10);
-    for (var i = valuePic1; i <= valuePic1+10; i++) {
+    for (let i = valuePic1; i <= valuePic1+10; i++) {
       if($gameScreen.picture(i)){
         pic_move1(i,0,0,300,300,0,120);
-      };
-    };
-  };
-  if(id101 == 8){
+      }
+    }
+  }
+  else if(id101 == 8){
     AudioManager.playBgs({"name":"21_HandyMassager1","volume":60,"pitch":120,"pan":0});
-    for (var i = valuePic1; i <= valuePic1+10; i++) {
+    for (let i = valuePic1; i <= valuePic1+10; i++) {
       if($gameScreen.picture(i)){
         pic_move1(i,0,0,300,300,255,60);
-      };
-    };
-  };
-  if(id101 == 9){
-    var value2 = 'XevS101_05';
-    pic_1(0,valuePic1+2,value2,2,100,255,60,1280,768,0,0);
+      }
+    }
+  }
+  else if(id101 == 9){
+    pic_1(0,valuePic1+2,'XevS101_05',2,100,255,60,1280,768,0,0);
     hcg_piston(valuePic1+2,5,1,2);
-  };
-};
+  }
+}
 
-};
+}
 
 //}());

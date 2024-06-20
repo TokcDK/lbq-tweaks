@@ -10,13 +10,13 @@
 scene_joukenNakami = function(id1,itemIndex,value23,value24,value25,value26){
 
 const dataItem = $dataItems[itemIndex];
-if (!dataItem.name) return;
+if (!dataItem || !dataItem.name) return;
 
 //console.warn(`Debug. Run scene_joukenNakami`)
 
 //let actor = $gameActors.actor($gameVariables.value(2));
 let conditionPrefixText = `発生条件:`;
-let conditionCount = 0;//条件成立回数。使わない？
+//let conditionCount = 0;//条件成立回数。使わない？
 let unmetConditionCount = 0;//発生条件。未成立でも加算
 let metConditionCount = 0;//発生条件。成立で加算
 let messageText = ``;
@@ -46,7 +46,7 @@ let dataItemMeta = dataItem.meta['EventSetBattle'];
 if(dataItemMeta) {
   inBattle = Number(dataItemMeta); 
     if(inBattle == 1){
-      conditionCount += 1;
+      //conditionCount += 1;
       messageText += `[戦闘]`;
       marGenScene1 += 1;//1でマップ発生シーン
       unmetConditionCount += 1;
@@ -63,7 +63,7 @@ if(dataItemMeta) {
     showMapName = `[何処でも]`;
     messageText += showMapName;
   } else {
-    conditionCount += 1;
+    //conditionCount += 1;
     const itemMetaEventSetMapNum = $dataSystem.switches[Number(dataItem.meta['EventSetMap'])];
     messageText += `[${itemMetaEventSetMapNum}]`;
     showMapName = `[${itemMetaEventSetMapNum}]`;
@@ -119,7 +119,7 @@ dataItemMeta = dataItem.meta['EventSetPerspective'];
 if(dataItemMeta) {
   const itemEventSetPerspectiveNum = Number(dataItemMeta); 
     if(itemEventSetPerspectiveNum >= 1){
-      conditionCount += 1;
+      //conditionCount += 1;
       if(itemEventSetPerspectiveNum == $gameVariables.value(2)){}else{
         messageText += `[${$gameActors.actor(itemEventSetPerspectiveNum).name()}視点`;
         lineCount += 1;
@@ -145,11 +145,12 @@ if(lineCount >= lineBreakCount){messageText += `\n`;lineCount = 0};
   event_set_swi = function (metaName, num1, prefix, isSet) {
     if (dataItem.meta[metaName]) {
       const arr = dataItem.meta[metaName].split(',');
-      for (let id = 0; id < arr.length; id++) {
+	  const arrLen = arr.length;
+      for (let id = 0; id < arrLen; id++) {
         if (arr[id] == 0) {
           arr[id] = num1;
         } else {
-          conditionCount += 1;
+          ////conditionCount += 1;
           textSubst = $dataSystem.switches[Number(arr[id])];
           textSubst = scene_joukenNakami_clean_prefixes(textSubst);
           messageText += `[${prefix}${textSubst}`;
@@ -185,7 +186,7 @@ if(dataItemMeta) {
     if(Number(arr[id]) == 0){
       arr[id] = $gameVariables.value(11);//誰でもいいアクター
     } else {
-      conditionCount += 1;
+      //conditionCount += 1;
       messageText += `[${$gameActors.actor(Number(arr[id])).name()}]`;
       lineCount += 1;
     };
@@ -214,7 +215,7 @@ if(dataItemMeta) {
   for (let id = 0; id <= arr.length-1; id++) {
     if(!arr[id]) continue;
 
-    conditionCount += 1;
+    //conditionCount += 1;
     const arrIdNum = Number(arr[id]);
       const item = $dataItems[arrIdNum];
       const itemMetaEICSwitch = item.meta['EICSwitch'];
@@ -279,7 +280,7 @@ for (let id = 1; id < 10; id++) {
     const actor = $gameActors.actor(Number(arr[0]));
     const skillId = Number(arr[1]);
     const rankNum = Number(arr[2]);
-    conditionCount += 1;
+    //conditionCount += 1;
     if (!$gameSwitches.value(435) && !actor.isLearnedSkill(skillId)){
       messageText += `[${actor.name()}が特定スキルランク${rankNum}↑]`;
     } else {
@@ -315,7 +316,7 @@ for (let id = 1; id < 10; id++) {
     const actorId = Number(arr[0]);
     const skillId = Number(arr[1]);
     const actor = $gameActors.actor(actorId);
-    conditionCount += 1;
+    //conditionCount += 1;
     if (!$gameSwitches.value(435) && !actor.isLearnedSkill(skillId)){
       messageText += `[${actor.name()}が特定スキル習得`;
     } else {
@@ -348,7 +349,7 @@ for (let id = 1; id < 10; id++) {
     const actorId = Number(arr[0]);
     const skillId = Number(arr[1]);
     const actor = $gameActors.actor(actorId);
-    conditionCount += 1;
+    //conditionCount += 1;
     if(!$gameSwitches.value(435) && !actor.isLearnedSkill(skillId)){
       messageText += `[${actor.name()}が特定スキル装着`;
     } else {
@@ -381,7 +382,7 @@ for (let id = 1; id < 10; id++) {
     const actorId = Number(arr[0]);
     const skillId = Number(arr[1]);
     const actor = $gameActors.actor(actorId);
-    conditionCount += 1;
+    //conditionCount += 1;
     if(arr[0] == $gameVariables.value(2)){
       messageText += `State:[\x1bSIM[${skillId}]`;
     } else {
@@ -409,7 +410,7 @@ for (let id = 1; id < 10; id++) {
     const actorId = Number(arr[0]);
     const skillId = Number(arr[1]);
     const actor = $gameActors.actor(actorId);
-    conditionCount += 1;
+    //conditionCount += 1;
     requirement = 18; 
     if(!$gameSwitches.value(435) && !actor._unlockedClasses.contains(skillId)){
       messageText += `[${actor.name()}が特定ジョブ`;
@@ -464,7 +465,7 @@ dataItemMeta = dataItem.meta['EventSetMoney'];
 if(dataItemMeta) {
   const gold = Number(dataItemMeta);
   if(gold != 0){
-    conditionCount += 1;
+    //conditionCount += 1;
     messageText += `[${gold}\\G`;
     if($gameParty.gold() >= gold){
       unmetConditionCount += 1;
@@ -486,7 +487,7 @@ for (let id = 1; id < 10; id++) {
     const skillId = Number(arr[1]);
     const rankNum = Number(arr[2]);
     const actor = $gameActors.actor(actorId);
-    conditionCount += 1;
+    //conditionCount += 1;
     const skillName = $dataSystem.variables[skillId + 400];
     if(skillId == 4){//露出度
       textSubst = $gameVariables.value(actorId + 380)[skillId] <= rankNum
@@ -516,7 +517,7 @@ for (let id = 1; id < 10; id++) {
     const skillId = Number(arr[1]);
     const rankNum = Number(arr[2]);
     const actor = $gameActors.actor(actorId);
-    conditionCount += 1;
+    //conditionCount += 1;
     if(skillId == 41){
       for (let j = 1; j <= $dataItems.length-1; j++) {
         const item = $dataItems[j];
@@ -559,7 +560,7 @@ if (dataItemMeta){
     if(arr[0] == 0){
       arr[0] = 135;
     } else {
-      conditionCount += 1;
+      //conditionCount += 1;
       if(skillId == 49){
         messageText += `[メインクエスト完了後`;
       } else {
@@ -592,7 +593,7 @@ for (let id = 1; id < 10; id++) {
     if(arr[0] == 0){
       arr[0] = 2;
     } else {
-      conditionCount += 1;
+      //conditionCount += 1;
       if(54 == actorId || 1 == skillId){
         messageText += `[単独行動`;
       } else {
@@ -628,7 +629,7 @@ for (let id = 1; id < 10; id++) {
     if(arr[0] == 0){
       arr[0] = 11;
     } else {
-      conditionCount += 1;
+      //conditionCount += 1;
     };
     lineCount += 1;
       messageText += `\x1bIIN[${actorId}:\\C[2]${skillId}\\C[0]]`;
@@ -658,7 +659,7 @@ if(dataItemMeta) {
       } else {
         textSubst = `？？？`;
       };
-      conditionCount += 1;
+      //conditionCount += 1;
     };
     requirement = $gameActors.actor(Number(arr[id])).isLearnedSkill(18) && !$gameActors.actor(Number(arr[id])).isStateAffected(valueDollStateId);
     if(arr[id] != 20){
@@ -877,29 +878,24 @@ value10 = 0;//そのマップで発生するシーン数
 j = 0;//配列を番号順に居れるため
 
 let start, end, value23, value24, value25, value26;
+const setValuesById = (varId1, varId2, s, e, v23, v24, v25, v26, varId3, varId4) => {
+  $gameSwitches.setValue(varId1,false);
+  $gameSwitches.setValue(varId2,false);
+  start = s;
+  end = e;
+  value23 = v23;
+  value24 = v24;
+  value25 = v25;//成立数変数
+  value26 = v26;//未成立数変数
+  $gameVariables.setValue(varId3, 0);
+  $gameVariables.setValue(varId4, 0);
+}
+
 if(id1 == 1){
-  $gameSwitches.setValue(479,false);
-  $gameSwitches.setValue(367,false);
-  start = 401;
-  end = 500;
-  value23 = 800;
-  value24 = 900;
-  value25 = 517;//成立数変数
-  value26 = 518;//未成立数変数
-  $gameVariables.setValue(517, 0);
-  $gameVariables.setValue(518, 0);
+  setValuesById(479, 367, 401, 500, 800,900, 517, 518, 517, 518);
 }
 else if(id1 == 2){
-  $gameSwitches.setValue(480,false);
-  $gameSwitches.setValue(369,false);
-  start = 501;
-  end = 600;
-  value23 = 500;
-  value24 = 600;
-  value25 = 504;//成立数変数
-  value26 = 505;//未成立数変数
-  $gameVariables.setValue(504, 0);
-  $gameVariables.setValue(505, 0);
+  setValuesById(480, 369, 501, 600, 500,600, 504, 505, 504, 505);
 }
 else {
   console.warn(`id1 is ${id1}! must be 1 or 2!`);
@@ -909,16 +905,17 @@ for (let i = start; i <= end; i++) {
   scene_joukenNakami(id1,i,value23,value24,value25,value26);
 }
 
+const setValuesById1 = (v25, v26, arrVal) => {
+  value25 = v25;//成立数変数
+  value26 = v26;//未成立数変数
+  arrAdd = arrVal;
+}
 let arrAdd;
 if(id1 == 1){
-  value25 = 517;//成立数変数
-  value26 = 518;//未成立数変数
-  arrAdd = valueSouwasceneAddId;
+  setValuesById1(517, 518, valueSouwasceneAddId);
 }
 else if(id1 == 2){
-  value25 = 504;//成立数変数
-  value26 = 505;//未成立数変数
-  arrAdd = valueHsceneAddId;
+  setValuesById1(504, 505, valueHsceneAddId);
 }
 else{
   console.warn(`id1 is ${id1}! must be 1 or 2!`);
@@ -927,10 +924,11 @@ else{
 //アイテムID<HsceneItem><SouwaItem>
 for (const id of arrAdd) {
   const item = $dataItems[id];
-  const addEventIncidenceSwiNum = Number(item.meta['AddEventIncidenceSwi']);//発生スイッチ。リセットなしの1601-1700の間に実行。
-  const addEventCompSwiNum = Number(item.meta['AddEventCompSwi']);//達成スイッチ
-  const addAddEventCommonIdNum = Number(item.meta['AddAddEventCommonId']);//コモID。並列スイッチも逆算して代入。スクリプト内では使わない
-  const addEventParallelSwiNum = Number(item.meta['AddEventParallelSwi']);//並列スイッチ
+  const itemMeta = item.meta;
+  const addEventIncidenceSwiNum = Number(itemMeta['AddEventIncidenceSwi']);//発生スイッチ。リセットなしの1601-1700の間に実行。
+  const addEventCompSwiNum = Number(itemMeta['AddEventCompSwi']);//達成スイッチ
+  const addAddEventCommonIdNum = Number(itemMeta['AddAddEventCommonId']);//コモID。並列スイッチも逆算して代入。スクリプト内では使わない
+  const addEventParallelSwiNum = Number(itemMeta['AddEventParallelSwi']);//並列スイッチ
   scene_joukenNakami(id1,id,addEventIncidenceSwiNum,addEventCompSwiNum,value25,value26,addAddEventCommonIdNum,addEventParallelSwiNum);
 }
 

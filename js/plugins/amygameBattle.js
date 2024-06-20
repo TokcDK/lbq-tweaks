@@ -879,7 +879,7 @@ if(valueChainMemberCount >= 2){
 //攻撃防御時バストアップ表示$gameVariables.setValue(20,1); $gameVariables.setValue(520, [1,7]); 520→valueFaceSelect = 1;
 battle_bustUp = function(id1,id2,id3,id4){
 
-if($gameActors.actor($gameVariables.value(20)).isStateAffected(602)){
+if(is_girl($gameActors.actor($gameVariables.value(20)))){
   var value7 = 100;
   var value8 = 0;
   if($gameSwitches.value(471)){  
@@ -1012,19 +1012,19 @@ if($gameActors.actor($gameVariables.value(20)).isStateAffected(602)){
 //オーラ表現
 tachie_aura = function(){
 
-if($gameParty.inBattle() && $gameActors.actor($gameVariables.value(20)).tp >= 100 && $gameActors.actor($gameVariables.value(20)).isStateAffected(602)){
-var value1 = Number($dataActors[$gameVariables.value(20)].meta['tachiePicId']);
+if($gameParty.inBattle() && $gameActors.actor($gameVariables.value(20)).tp >= 100 && is_girl($gameActors.actor($gameVariables.value(20)))){
+const value1 = Number($dataActors[$gameVariables.value(20)].meta['tachiePicId']);
 if($gameScreen.picture(value1)){
-var value2 = $gameVariables.value(105);
-var value3 = $gameVariables.value(106);
-var value4 = $gameVariables.value(107);
-var value5 = $gameVariables.value(108);
+const value2 = $gameVariables.value(105);
+const value3 = $gameVariables.value(106);
+const value4 = $gameVariables.value(107);
+const value5 = $gameVariables.value(108);
 //var value2 = $gameScreen.picture(value1)._x;
 //var value3 = $gameScreen.picture(value1)._y;
 //var value4 = $gameScreen.picture(value1)._scaleX;
 //var value5 = $gameScreen.picture(value1)._scaleY;
-var value6 = value1-20;
-var value7 = 0;
+const value6 = value1-20;
+const value7 = 0;
 
 //if($gameVariables.value(276) == 2){
 //var value7 = -50;
@@ -1600,29 +1600,29 @@ if(ConfigManager.battleAniSpeed < 3) return;
 let array0 = 0;
 let array1 = 0;
 let array2 = 0;
-let gameVar20 = $gameVariables.value(20);
+let actorId = $gameVariables.value(20);
 const gameTroopMembers = $gameTroop.members();
 const gameVar276 = $gameVariables.value(276);
 if(id1 == 1){
   if(gameVar276 == 1){
     if($gameSwitches.value(464)){
-      $gameVariables.setValue(20,$gameParty.battleMembers()[gameVar20].actorId());
+      $gameVariables.setValue(20,$gameParty.battleMembers()[actorId].actorId());
     } else {
-      //var enemy1 = gameTroopMembers[gameVar20]; // not using
-      //var enemy2 = $dataEnemies[gameTroopMembers[gameVar20].enemyId()]; // not using
+      //var enemy1 = gameTroopMembers[actorId]; // not using
+      //var enemy2 = $dataEnemies[gameTroopMembers[actorId].enemyId()]; // not using
       $gameVariables.setValue(20,$gameVariables.value(11));
     };
-    gameVar20 = $gameVariables.value(20);
+    actorId = $gameVariables.value(20);
   };
 }
 
 $gameVariables.setValue(277,0);//二言目台詞用。現在未使用
-$gameVariables.setValue(53,$gameActors.actor(gameVar20).nickname());
-$gameVariables.setValue(625,$gameVariables.value(380 + gameVar20)[59]);
+$gameVariables.setValue(53,$gameActors.actor(actorId).nickname());
+$gameVariables.setValue(625,$gameVariables.value(380 + actorId)[59]);
 
-const actor = $gameActors.actor(gameVar20);
+const actor = $gameActors.actor(actorId);
 const actorName = actor.name();
-const actorGv20 = $dataActors[gameVar20];
+const actorMeta = $dataActors[actorId].meta;
 if(gameVar276 == 2){
 
   valueFaceSelect = 8;      
@@ -1630,7 +1630,7 @@ if(gameVar276 == 2){
     valueFaceSelect = 48;
 
   };
-  array2 = actorGv20.meta['BattleAttack'].split(',');
+  array2 = actorMeta['BattleAttack'].split(',');
   if(actor.isStateAffected(61)){
     const arr2 = [21,22,23,24];
     valueFaceSelect = arr2[Math.floor(Math.random() * arr2.length)];
@@ -1641,23 +1641,23 @@ if(gameVar276 == 2){
   };
   const gameVar182 = $gameVariables.value(182);
   if(gameVar182 == 5){
-    //var array1 = actorGv20.meta['S-AbilityUse'].split(',');
-    array2 = actorGv20.meta['S-AbilityUse'].split(',');
+    //var array1 = actorMeta['S-AbilityUse'].split(',');
+    array2 = actorMeta['S-AbilityUse'].split(',');
     valueFaceSelect = 15;
   }
   else if(gameVar182 == 6){
-    //var array1 = actorGv20.meta['A-AbilityUse'].split(',');
-    array2 = actorGv20.meta['A-AbilityUse'].split(',');
+    //var array1 = actorMeta['A-AbilityUse'].split(',');
+    array2 = actorMeta['A-AbilityUse'].split(',');
     //フェイスは通常攻撃を流用
   }
   else if(gameVar182 == 7){
-    //var array1 = actorGv20.meta['W-AbilityUse'].split(',');
-    array2 = actorGv20.meta['W-AbilityUse'].split(',');
+    //var array1 = actorMeta['W-AbilityUse'].split(',');
+    array2 = actorMeta['W-AbilityUse'].split(',');
     valueFaceSelect = 13;
   }
   else if(gameVar182 == 8){
-    //var array1 = actorGv20.meta['R-AbilityUse'].split(',');
-    array2 = actorGv20.meta['R-AbilityUse'].split(',');
+    //var array1 = actorMeta['R-AbilityUse'].split(',');
+    array2 = actorMeta['R-AbilityUse'].split(',');
     valueFaceSelect = 6;
   };
 
@@ -1667,65 +1667,65 @@ else if(gameVar276 == 1){
   valueFaceSelect = 9; 
   const value1 = $gameVariables.value(514);
   const value2 = actor.hpRate()*100;
-  array1 = actorGv20.meta['BattleDamage'].split(',');
+  array1 = actorMeta['BattleDamage'].split(',');
   if (value1 - value2 >= 50) {
-    array1 = actorGv20.meta['BattleBigDamage'].split(',');
+    array1 = actorMeta['BattleBigDamage'].split(',');
     valueFaceSelect = 45;
   }
   else if (value1 - value2 <= 2) {
-    array1 = actorGv20.meta['BattleSmallDamage'].split(',');
+    array1 = actorMeta['BattleSmallDamage'].split(',');
     valueFaceSelect = 4;
   }
   else if(value1 == value2){
-    array1 = actorGv20.meta['Battle0Damage'].split(',');
+    array1 = actorMeta['Battle0Damage'].split(',');
     valueFaceSelect = 6; 
   }
 }
 else if(gameVar276 == 0){
   if($gameVariables.value(263) >= 3){ //ターン数 
-    array0 = actorGv20.meta['BattleTurn2'].split(',');
+    array0 = actorMeta['BattleTurn2'].split(',');
   }
   if([34,35,36].some(function(id){return actor.isStateAffected(id)})){  //疲労時
-    array0 = actorGv20.meta['BattleFatigue'].split(',');
+    array0 = actorMeta['BattleFatigue'].split(',');
   }
   if(actor.isStateAffected(37)){  //ブラック
-    array0 = actorGv20.meta['BattleFatigueBlack'].split(',');
-    array2 = actorGv20.meta['BattleFatigueBlackAttack'].split(',');
-    array1 = actorGv20.meta['BattleFatigueBlackDamage'].split(',');
+    array0 = actorMeta['BattleFatigueBlack'].split(',');
+    array2 = actorMeta['BattleFatigueBlackAttack'].split(',');
+    array1 = actorMeta['BattleFatigueBlackDamage'].split(',');
   }
   if(actor.hpRate() <= 0.3){  //瀕死  
-    array0 = actorGv20.meta['BattleDying'].split(',');
+    array0 = actorMeta['BattleDying'].split(',');
   }
   if($gameParty.battleMembers().length >= 2 && $gameParty.aliveMembers().length <= 1){  //最後の一人
-    array0 = actorGv20.meta['BattleLastOne'].split(',');
+    array0 = actorMeta['BattleLastOne'].split(',');
   }
 
-  if(actor.isStateAffected(61) && actor.isStateAffected(602)){  //発情
+  if(actor.isStateAffected(61) && is_girl(actor)){  //発情
     if(actor.isLearnedSkill(65)){  
-      array0 = actorGv20.meta['BattleSexualExcitementMax'].split(',');
-      array2 = actorGv20.meta['BattleSexualExcitementMaxAttack'].split(',');//攻撃
-      array1 = actorGv20.meta['BattleSexualExcitementMaxDamage'].split(',');//ダメージ
+      array0 = actorMeta['BattleSexualExcitementMax'].split(',');
+      array2 = actorMeta['BattleSexualExcitementMaxAttack'].split(',');//攻撃
+      array1 = actorMeta['BattleSexualExcitementMaxDamage'].split(',');//ダメージ
     } else {
-      array0 = actorGv20.meta['BattleSexualExcitement'].split(',');
-      array2 = actorGv20.meta['BattleSexualExcitementAttack'].split(',');//攻撃
-      array1 = actorGv20.meta['BattleSexualExcitementDamage'].split(',');//ダメージ
+      array0 = actorMeta['BattleSexualExcitement'].split(',');
+      array2 = actorMeta['BattleSexualExcitementAttack'].split(',');//攻撃
+      array1 = actorMeta['BattleSexualExcitementDamage'].split(',');//ダメージ
     };
   }
-    if(actor.isStateAffected(63) && actor.isStateAffected(602)){
+    if(actor.isStateAffected(63) && is_girl(actor)){
       if(actor.isLearnedSkill(65)){//拘束
-        array0 = actorGv20.meta['BattleBindMax'].split(',');
+        array0 = actorMeta['BattleBindMax'].split(',');
       } else {
-        array0 = actorGv20.meta['BattleBind'].split(',');
+        array0 = actorMeta['BattleBind'].split(',');
       };
     };
-    if(actor.isStateAffected(68) && actor.isStateAffected(602)){    //激情
-      array0 = actorGv20.meta['BattlePassion'].split(',');
+    if(actor.isStateAffected(68) && is_girl(actor)){    //激情
+      array0 = actorMeta['BattlePassion'].split(',');
     };
-    if(actor.isStateAffected(64) && actor.isStateAffected(602)){    //放心
+    if(actor.isStateAffected(64) && is_girl(actor)){    //放心
       if(actor.isLearnedSkill(65)){
-        array0 = actorGv20.meta['BattleAbsentlyMax'].split(',');
+        array0 = actorMeta['BattleAbsentlyMax'].split(',');
       } else {
-        array0 = actorGv20.meta['BattleAbsently'].split(',');
+        array0 = actorMeta['BattleAbsently'].split(',');
       };
     };
 }
@@ -1741,10 +1741,10 @@ if(id1 == 0){
 else if(id1 == 1){
   if(gameVar276 == 2){
     if(array2){
-      let array = actorGv20.meta['BattleAttack2Conbo'].split(',');
+      let array = actorMeta['BattleAttack2Conbo'].split(',');
       let num = array[Math.floor(Math.random() * array.length)];
       valueWordSet9 = `${actor.name()}の\\C[2]2連撃\\C[0]！ ${num}`;
-      array = actorGv20.meta['BattleAttack3Conbo'].split(',');
+      array = actorMeta['BattleAttack3Conbo'].split(',');
       num = array[Math.floor(Math.random() * array.length)];
       valueWordSet10 = `${actor.name()}の\\C[2]3連撃\\C[0]！ ${num}`;
       messageText = actorName + array2[Math.floor(Math.random() * array2.length)];
@@ -1793,7 +1793,7 @@ if($gameVariables.value(277)){
 //if(gameVar276 == 2){
  // gameTroopMembers[$gameVariables.value(92)].hpRate()*100;
 //} else {
- // $gameActors.actor(gameVar20).hpRate()*100;
+ // $gameActors.actor(actorId).hpRate()*100;
 //};
 
 }
@@ -3954,7 +3954,7 @@ if(actor2.actorId() !== actor.actorId()) return;
   else if(itemId == 430){//一括装着
     const skillIds = Array(actor.battleSkillsRaw().length).fill(0);
     let id1 = 0;
-    let id2 = actor.battleSkillsRaw().length - actor.isStateAffected(602) ? 200 : 100;//10Ｇパッシブ
+    let id2 = actor.battleSkillsRaw().length - is_girl(actor) ? 200 : 100;//10Ｇパッシブ
     let id3 = actor.battleSkillsRaw().length-100;//15Hパッシブ
     let id4 = 0;
     for (let i = 1; i < $dataSkills.length; i++) {
