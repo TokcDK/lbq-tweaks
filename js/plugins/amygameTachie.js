@@ -829,220 +829,249 @@ $gameSwitches.setValue(31,true);
 //$gameVariables.setValue(300,0);
 };
 
+// using in tachie_hyouji1
+hasAnyId = function(array, inputId){
+	return array.some(function(id) {return inputId == id});
+}
+
 //☆☆立ち絵表示
+const hatIds = [4,31,32,35,    36];
+const coatCollarIds = [28,            29];
+const nippleIds = [               11];
+const armsIds = [17,21,23,24,25,26];
+const underwearIds = [7,14,20,       22];
+const shoesIds = [18,            27];
 tachie_hyouji1 = function(id3){
 
-$gameVariables.setValue(112,id3);
-$gameVariables.setValue(300,Number($dataActors[$gameVariables.value(112)].meta['tachiePicId']));
-var value5 = 1;
-var actor = $gameActors.actor($gameVariables.value(112));
-var list = valueTachieChangeState;
+const vars = $gameVariables;
+vars.setValue(112,id3);
+vars.setValue(300,Number($dataActors[vars.value(112)].meta['tachiePicId']));
+let value5 = 1;
+const actor = $gameActors.actor(vars.value(112));
+const isLearnedSkill65 = actor.isLearnedSkill(65);
+const isLearnedSkill69 = actor.isLearnedSkill(69);
+let list = valueTachieChangeState;
 list.forEach(function(id1) {
   if(actor.isStateAffected(id1)){
     value5 += 1;
-    var value2 = Math.floor( Math.random() * 51) + 384;
-    var value3 = Math.floor( Math.random() * 61) + 40;
-    var value4 = 1;
-    if(actor.isLearnedSkill(65)){value4 += 1};
-    if(actor.isLearnedSkill(69)){value4 += 1};
-    var value6 = 1024;
-    if($dataStates[id1].meta['TachieXline']){
-      value6 += Number($dataStates[id1].meta['TachieXline']);
+    const value2 = Math.floor( Math.random() * 51) + 384;
+    const value3 = Math.floor( Math.random() * 61) + 40;
+    let value4 = 1;
+    if(isLearnedSkill65){value4 = 2};
+    if(isLearnedSkill69){value4 = 3};
+	
+    let value6 = 1024;
+	const stateMeta = $dataStates[id1].meta;
+    if(stateMeta['TachieXline']){
+      value6 += Number(stateMeta['TachieXline']);
     };
-    if($dataStates[id1].meta['TachieActorSpecify']){
-      var name = $dataStates[id1].meta['TachieSet'] + $gameVariables.value(112) + '_' +  value4;
-    } else {
-      var name = $dataStates[id1].meta['TachieSet'];
-    };
-    $gameScreen.showPicture($gameVariables.value(300), name, 1, value6, value2, 100, 100, 150, 0);
-    if($gameScreen.picture($gameVariables.value(300))){
-      $gameScreen.movePicture($gameVariables.value(300),1,value6,384,100,100,255,0,value3);
+	
+	let name = stateMeta['TachieSet']
+    if(stateMeta['TachieActorSpecify']){
+      name += vars.value(112) + '_' +  value4;
+    }
+	
+	const picId = vars.value(300);
+    $gameScreen.showPicture(picId, name, 1, value6, value2, 100, 100, 150, 0);
+    if($gameScreen.picture(picId)){
+      $gameScreen.movePicture(picId,1,value6,384,100,100,255,0,value3);
     };
   };
 }, this);
-if(value5 == 1){
+
+if(value5 != 1) return;
+
   $gameSwitches.setValue(31,false);
-  $gameVariables.setValue(113,$gameVariables.value(120)*9);
-  $gameVariables.setValue(105,1130);//x座標
-  $gameVariables.setValue(106,$gameVariables.value(113));//y座標60-700
-  $gameVariables.setValue(107,$gameVariables.value(120));//x拡大率
-  $gameVariables.setValue(108,$gameVariables.value(120));//y拡大率
-  $gameVariables.setValue(109,255);//透過率
-  $gameVariables.setValue(110,40);//ウェイト
-  $gameVariables.setValue(101,$gameVariables.value(105) +100);
-  $gameVariables.setValue(102,$gameVariables.value(106));
-  $gameVariables.setValue(103,$gameVariables.value(107));
-  $gameVariables.setValue(104,$gameVariables.value(108));
-  $gameVariables.setValue(149,0);//表示最初の透明度
-  var value32 = 0;//残像y軸。途中で数字を入れるためこれだけ先に実行
+  const var120value = vars.value(120);
+  const var113value = var120value*9;
+  vars.setValue(113,var113value);
+  const var105value = 1130;
+  vars.setValue(105,var105value);//x座標
+  vars.setValue(106,var113value);//y座標60-700
+  vars.setValue(107,var120value);//x拡大率
+  vars.setValue(108,var120value);//y拡大率
+  vars.setValue(102,var113value);
+  vars.setValue(103,var120value);
+  vars.setValue(104,var120value);
+  vars.setValue(109,255);//透過率
+  vars.setValue(110,40);//ウェイト
+  vars.setValue(101,var105value +100);
+  vars.setValue(149,0);//表示最初の透明度
+let value32 = 0;//残像y軸。途中で数字を入れるためこれだけ先に実行
   if($gameSwitches.value(130)){
-    $gameVariables.setValue(105,1030);//x座標
+    vars.setValue(105,1030);//x座標
   };
   if($gameSwitches.value(200)){
-    $gameVariables.setValue(105,780);//x座標
+	const var105Value = 780;
+    vars.setValue(105,var105Value);//x座標
       if($gameSwitches.value(150)){
-        var value1 = 40;
-        $gameVariables.setValue(103,value1);//x拡大率
-        $gameVariables.setValue(104,value1);//y拡大率
-        $gameVariables.setValue(107,value1);//x拡大率
-        $gameVariables.setValue(108,value1);//y拡大率
-        $gameVariables.setValue(106,$gameVariables.value(107)*9);
-        $gameVariables.setValue(102,$gameVariables.value(107)*9);
-        $gameVariables.setValue(105,$gameVariables.value(105) -100);
-        $gameVariables.setValue(106,$gameVariables.value(106) +50);
-        $gameVariables.setValue(102,$gameVariables.value(102) +50);
-        $gameVariables.setValue(110,20);//ウェイト
+        let value1 = 40;
+        vars.setValue(103,value1);//x拡大率
+        vars.setValue(104,value1);//y拡大率
+        vars.setValue(107,value1);//x拡大率
+        vars.setValue(108,value1);//y拡大率
+        vars.setValue(106,value1*9 +50);
+        vars.setValue(102,value1*9 +50);
+        vars.setValue(105,var105Value -100);
+        vars.setValue(110,20);//ウェイト
       } else {
-        var value1 = 100;
-        $gameVariables.setValue(107,value1);//拡大率
-        $gameVariables.setValue(108,value1);//拡大率
-        $gameVariables.setValue(103,value1);//拡大率
-        $gameVariables.setValue(104,value1);//拡大率
-        $gameVariables.setValue(105,$gameVariables.value(105) -50);
-        $gameVariables.setValue(106,$gameVariables.value(107)*9);
-        $gameVariables.setValue(102,$gameVariables.value(107)*9);
+        let value1 = 100;
+        vars.setValue(107,value1);//拡大率
+        vars.setValue(108,value1);//拡大率
+        vars.setValue(103,value1);//拡大率
+        vars.setValue(104,value1);//拡大率
+        vars.setValue(105,var105Value -50);
+        vars.setValue(106,value1*9);
+        vars.setValue(102,value1*9);
       };
-      $gameVariables.setValue(101,$gameVariables.value(105) -50);
+      vars.setValue(101,vars.value(105) -50);
   };
   if($gameSwitches.value(200)){
-    if($gameVariables.value(19) >= 1){
-      if(!$dataItems[$gameVariables.value(19)].meta['TotalCloth']){    
-        $gameVariables.setValue(101,$gameVariables.value(105));
+    if(vars.value(19) >= 1){
+      if(!$dataItems[vars.value(19)].meta['TotalCloth']){    
+        vars.setValue(101,vars.value(105));
       };
     };
-    //$gameVariables.setValue(110,60);
-    if($gameVariables.value(19) == 0){
-      $gameVariables.setValue(101,$gameVariables.value(105) +50);
-      $gameVariables.setValue(102,$gameVariables.value(106));
+    //vars.setValue(110,60);
+    if(vars.value(19) == 0){
+      vars.setValue(101,vars.value(105) +50);
+      vars.setValue(102,vars.value(106));
     } else {
       if(!$gameSwitches.value(150)){
-        $gameVariables.setValue(106,$gameVariables.value(106)-Number($dataActors[$gameVariables.value(112)].meta['TachiePoseYposition']));
-          if($dataItems[$gameVariables.value(19)].meta['ClothSwitch']){
-            var value1 = Number($dataItems[$gameVariables.value(19)].meta['ClothSwitch']);
+        vars.setValue(106,vars.value(106)-Number($dataActors[vars.value(112)].meta['TachiePoseYposition']));
+          if($dataItems[vars.value(19)].meta['ClothSwitch']){
+            let value1 = Number($dataItems[vars.value(19)].meta['ClothSwitch']);
           } else {
-            var value1 = 0;
+            let value1 = 0;
           };
-        var value2 = 0;
-        if([4,31,32,35,    36].some(function(id){return value1 == id})){value2 = 100};//帽子
-        if([28,            29].some(function(id){return value1 == id})){value2 = -100};//コート、首輪
-        if([               11].some(function(id){return value1 == id})){value2 = -200};//乳首
-        if([17,21,23,24,25,26].some(function(id){return value1 == id})){value2 = -300};//腕
-        if([7,14,20,       22].some(function(id){return value1 == id})){value2 = -500};//服下
-        if([18,            27].some(function(id){return value1 == id})){value2 = -1000};//靴
-        if(value2 >= 1){var value32 = -200};
-        if(value2 <= -1){var value32 = 200};
-        $gameVariables.setValue(106,$gameVariables.value(106) + value2);
-        if(!$gameVariables.value(111) == 0){$gameVariables.setValue(102,$gameVariables.value(111))};
-        if(!$gameVariables.value(111) == 0){$gameVariables.setValue(110,60)};
-        $gameVariables.setValue(111,$gameVariables.value(106));
-      } else {
-      };
-    };
+        let value2 = 0;      
+		
+        if(hasAnyId(shoesIds, value1)) {value2 = -1000}//靴
+        else if(hasAnyId(underwearIds, value1)) {value2 = -500}//服下
+        else if(hasAnyId(armsIds, value1)) {value2 = -300}//腕
+        else if(hasAnyId(nippleIds, value1)) {value2 = -200}//乳首
+        else if(hasAnyId(coatCollarIds, value1)) {value2 = -100}//コート、首輪
+		else if(hasAnyId(hatIds, value1)) { value2 = 100 }//帽子
+		
+        
+		if(value2 >= 1){value32 = -200};
+        if(value2 <= -1){value32 = 200};
+        vars.setValue(106,vars.value(106) + value2);
+        if(!vars.value(111) == 0){vars.setValue(102,vars.value(111))};
+        if(!vars.value(111) == 0){vars.setValue(110,60)};
+        vars.setValue(111,vars.value(106));
+      }
+    }
   } else {
-    $gameVariables.setValue(106,$gameVariables.value(106)-Number($dataActors[$gameVariables.value(112)].meta['TachiePoseYposition']));
-    $gameVariables.setValue(102,$gameVariables.value(106));
+    vars.setValue(106,vars.value(106)-Number($dataActors[vars.value(112)].meta['TachiePoseYposition']));
+    vars.setValue(102,vars.value(106));
   };
   if($gameSwitches.value(30)){
-    $gameVariables.setValue(101,$gameVariables.value(105) + 100);//x軸始点
-    $gameVariables.setValue(110,30);//ウェイト。※変化なし
-    if($gameVariables.value(263) >= 2){
-      $gameVariables.setValue(101,$gameVariables.value(105) -100);//x軸始点
-      $gameVariables.setValue(110,20);//ウェイト。※変化なし
+    vars.setValue(101,vars.value(105) + 100);//x軸始点
+    vars.setValue(110,30);//ウェイト。※変化なし
+    if(vars.value(263) >= 2){
+      vars.setValue(101,vars.value(105) -100);//x軸始点
+      vars.setValue(110,20);//ウェイト。※変化なし
     };
       if($gameSwitches.value(143)){
-        $gameVariables.setValue(101,$gameVariables.value(105) -50);//x軸始点
-        $gameVariables.setValue(110,20);//ウェイト。※変化なし
+        vars.setValue(101,vars.value(105) -50);//x軸始点
+        vars.setValue(110,20);//ウェイト。※変化なし
       };
-      //$gameVariables.setValue(105,1180)//x座標
-      //$gameVariables.setValue(105,$gameVariables.value(105)-50);//x座標
-      //$gameVariables.setValue(101,$gameVariables.value(105) +50)
-      //$gameVariables.setValue(106,$gameVariables.value(113));//y座標60-700
-      //$gameVariables.setValue(107,$gameVariables.value(120));//x拡大率
-      //$gameVariables.setValue(108,$gameVariables.value(120));//y拡大率
-      //$gameVariables.setValue(109,255);//透過率
-      //$gameVariables.setValue(110,30);//ウェイト
-      //$gameVariables.setValue(102,$gameVariables.value(106));
-      //$gameVariables.setValue(103,$gameVariables.value(107));
-      //$gameVariables.setValue(104,$gameVariables.value(108));
-      $gameVariables.setValue(149,50);//表示最初の透明度
+      //vars.setValue(105,1180)//x座標
+      //vars.setValue(105,vars.value(105)-50);//x座標
+      //vars.setValue(101,vars.value(105) +50)
+      //vars.setValue(106,vars.value(113));//y座標60-700
+      //vars.setValue(107,vars.value(120));//x拡大率
+      //vars.setValue(108,vars.value(120));//y拡大率
+      //vars.setValue(109,255);//透過率
+      //vars.setValue(110,30);//ウェイト
+      //vars.setValue(102,vars.value(106));
+      //vars.setValue(103,vars.value(107));
+      //vars.setValue(104,vars.value(108));
+      vars.setValue(149,50);//表示最初の透明度
   };
-  var tachieNum = parseInt($gameVariables.value(300), 10) || 0; // 立ち絵1か2か、それとも…
+  let tachieNum = parseInt(vars.value(300), 10) || 0; // 立ち絵1か2か、それとも…
   tachieNum--; // データ上は0から
 //if(tachieNum === -1) break;
 //if($TKMvar.tachie.PicData.length <= tachieNum) break;
 //if(!$TKMvar.tachie.PicData[tachieNum]["char"]) break;
-  //var CharList = $TKMvar.tachie.CharList;
-  //var MaxLayer = $TKMvar.tachie.MaxLayer;
-  var PicData = $TKMvar.tachie.PicData;
-  var pictureId = PicData[tachieNum]["picNum"];
-  var char = PicData[tachieNum]["char"];
-  var name = "TKMtachie_" + char + "_";
-  //var partList = CharList[char];
-  //var x = $TKMvar.tachie.PicData[tachieNum]["x"];
-  //var y = $TKMvar.tachie.PicData[tachieNum]["y"];
-//if($gameActors.actor($gameVariables.value(112)).isStateAffected(23)){
-//if($gameVariables.value($gameVariables.value(112)+440)[0] >= 1){
-//if($dataItems[$gameVariables.value($gameVariables.value(112)+440)[0]].meta['Scale100'] ){
-//$gameVariables.setValue(103,100);
-//$gameVariables.setValue(104,100);
-//$gameVariables.setValue(107,100);
-//$gameVariables.setValue(108,100);
-//$gameVariables.setValue(101,1024);
-//$gameVariables.setValue(102,284);
-//$gameVariables.setValue(105,1024);
-//$gameVariables.setValue(106,384);
+  //let CharList = $TKMvar.tachie.CharList;
+  //let MaxLayer = $TKMvar.tachie.MaxLayer;
+  let PicData = $TKMvar.tachie.PicData;
+  let pictureId = PicData[tachieNum]["picNum"];
+  let chr = PicData[tachieNum]["char"];
+  let name = "TKMtachie_" + chr + "_";
+  //let partList = CharList[chr];
+  //let x = $TKMvar.tachie.PicData[tachieNum]["x"];
+  //let y = $TKMvar.tachie.PicData[tachieNum]["y"];
+//if($gameActors.actor(vars.value(112)).isStateAffected(23)){
+//if(vars.value(vars.value(112)+440)[0] >= 1){
+//if($dataItems[vars.value(vars.value(112)+440)[0]].meta['Scale100'] ){
+//vars.setValue(103,100);
+//vars.setValue(104,100);
+//vars.setValue(107,100);
+//vars.setValue(108,100);
+//vars.setValue(101,1024);
+//vars.setValue(102,284);
+//vars.setValue(105,1024);
+//vars.setValue(106,384);
 //}}};
-//var value1 = 'easeInOutCubic';
-if($gameVariables.value(101) >= $gameVariables.value(105)){
-  var value31 = 200;
+//let value1 = 'easeInOutCubic';
+
+let value31;
+if(vars.value(101) >= vars.value(105)){
+  value31 = 200;
 } else {
-  var value31 = -200;
+  value31 = -200;
 };
-if($gameSwitches.value(30)){
-  //var value1 = 'easeInQuad';
-  var value33 = 50;
+let value33;
+if($gameSwitches.value(30) || $gameSwitches.value(200)){
+  //let value1 = 'easeInQuad';
+  value33 = 50;
 } else {
-  if($gameSwitches.value(200)){
-    //var value1 = 'easeOutQuad';
-    var value33 = 50;
+/*   if($gameSwitches.value(200)){
+    //let value1 = 'easeOutQuad';
+    value33 = 50;
   } else {
-    //var value1 = 'easeInQuad';
-    //var value1 = 'easeOutQuad';
-    var value33 = 100;
-  };
+    //let value1 = 'easeInQuad';
+    //let value1 = 'easeOutQuad';
+    value33 = 100;
+  }; */
+  value33 = 100;
 };
+
 picture_motion1("smooth",[0]);
 $gameScreen.showPicture(pictureId, name, 1, 
-$gameVariables.value(101), $gameVariables.value(102), 
-$gameVariables.value(103), $gameVariables.value(104), $gameVariables.value(149), 0);
-if(is_girl($gameActors.actor($gameVariables.value(112))) && !$gameSwitches.value(150)){
-  $gameScreen.showPicture(7, "/img/tachies/" + 'actor' + $gameVariables.value(112) + '_1_3', 1, 
-  $gameVariables.value(101)+value31, $gameVariables.value(102)+value32, 
-  $gameVariables.value(103), $gameVariables.value(104), value33, 1);
+vars.value(101), vars.value(102), 
+vars.value(103), vars.value(104), vars.value(149), 0);
+if(is_girl($gameActors.actor(vars.value(112))) && !$gameSwitches.value(150)){
+  $gameScreen.showPicture(7, "/img/tachies/" + 'actor' + vars.value(112) + '_1_3', 1, 
+  vars.value(101)+value31, vars.value(102)+value32, 
+  vars.value(103), vars.value(104), value33, 1);
 };
-var value1 = pictureId;
+let value1 = pictureId;
 if($gameScreen.picture(value1)){
   $gameScreen.movePicture(value1,1,
-  $gameVariables.value(105),
-  $gameVariables.value(106),
-  $gameVariables.value(107),
-  $gameVariables.value(108),
-  $gameVariables.value(109),
-  0,$gameVariables.value(110));
+  vars.value(105),
+  vars.value(106),
+  vars.value(107),
+  vars.value(108),
+  vars.value(109),
+  0,vars.value(110));
 };
 if($gameScreen.picture(7)){
   $gameScreen.movePicture(7,1,
-  $gameVariables.value(105),
-  $gameVariables.value(106),
-  $gameVariables.value(107),
-  $gameVariables.value(108),
-  0,1,$gameVariables.value(110) + 20);
+  vars.value(105),
+  vars.value(106),
+  vars.value(107),
+  vars.value(108),
+  0,1,vars.value(110) + 20);
 };
-$gameVariables.setValue(20,$gameVariables.value(112));
+vars.setValue(20,vars.value(112));
+
 tachie_bless(value1,1);
 if($gameSwitches.value(30)){
   tachie_aura();
-};
 };
 
 };
