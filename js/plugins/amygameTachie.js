@@ -634,27 +634,31 @@ if(actor.isStateAffected(23)){
       $gameVariables.setValue(i+460,[i]);
     };
     let array = Array(21).fill(0);//21
-	const itemsCount = $dataItems.length;
+	  const itemsCount = $dataItems.length;
     for (let id = 461;id<=500;id++){
       for(let i=1331; i < itemsCount; i ++){
         const itemMeta = $dataItems[i].meta;
-        if(!itemMeta['TotalCloth']){
-          const itemEICSwitchNum = Number(itemMeta['EICSwitch']);
-          if (id1 + 180 == itemEICSwitchNum ||
-          id1 + 380 == itemEICSwitchNum ||
-          200 == itemEICSwitchNum ){
-            if(id == Number(itemMeta['ClothSwitch']) + 460 &&
-            $gameVariables.value(id) == Number(itemMeta['ClothAllocationNumber'])) {
-              //if(itemMeta['SingleCloth']){}else{
-              array[Number(itemMeta['subCategory'])] += Number(itemMeta['ClothUncoverCount']);//露出度で加算
-              break;
-            };
+        if(itemMeta['TotalCloth']) continue;
+        
+        const itemEICSwitchNum = Number(itemMeta['EICSwitch']);
+        let isBreak = false;
+        switch(itemEICSwitchNum) {
+          case 200:
+          case id1 + 180:
+          case id1 + 380: {
+            if(id == Number(itemMeta['ClothSwitch']) + 460) break;
+            if($gameVariables.value(id) != Number(itemMeta['ClothAllocationNumber'])) break;
+
+            //if(itemMeta['SingleCloth']){}else{
+            array[Number(itemMeta['subCategory'])] += Number(itemMeta['ClothUncoverCount']);//露出度で加算
+            isBreak = true;
           }
-	    }
-	  }
+        }
+        if (isBreak) break;
+      }
     }
     const max = array.reduce(function(a,b){  
-    return Math.max(a,b);
+      return Math.max(a,b);
     });
     let index = array.findIndex(array => array === max); 
     if(index >= 0){
@@ -663,27 +667,27 @@ if(actor.isStateAffected(23)){
           const itemMeta = $dataItems[i].meta;
           if (!itemMeta['TotalCloth']) continue;
 		  
-            const itemEICSwitchNum = Number(itemMeta['EICSwitch']);
-            if (id1 + 380 == itemEICSwitchNum ||
-              400 == itemEICSwitchNum ){
-                if(index == Number(itemMeta['subCategory'])){
-                  $gameVariables.setValue(21,Number(itemMeta['CharaChip1']));
-                  $gameVariables.setValue(22,Number(itemMeta['CharaChip2']));
-                  $gameVariables.setValue(23,Number(itemMeta['CharaChipsv']));
-                  $gameVariables.value(id1+440)[0] = i;
-                  $gameVariables.value(id1+440)[41] = Number(itemMeta['TotalCloth']);
-                  break;
-			    }
-			}
-		}
-	}
+          const itemEICSwitchNum = Number(itemMeta['EICSwitch']);
+          let isBreak = false;
+          switch(itemEICSwitchNum) {
+            case 400:
+            case id1 + 380: {
+              if(index != Number(itemMeta['subCategory'])) break;
+              
+              set_charachip_graphics(itemMeta);
+
+              $gameVariables.value(id1+440)[0] = i;
+              $gameVariables.value(id1+440)[41] = Number(itemMeta['TotalCloth']);
+              isBreak = true;
+            }
+          }
+          if (isBreak) break;
+		    }
+	  }
   }
   
   if(value1 >= 1){
-    const item1Meta = $dataItems[value1].meta;
-    $gameVariables.setValue(21, Number(item1Meta['CharaChip1']));
-    $gameVariables.setValue(22, Number(item1Meta['CharaChip2']));
-    $gameVariables.setValue(23, Number(item1Meta['CharaChipsv']));
+    set_charachip_graphics($dataItems[value1].meta);
   }
 };
 tachie_switchOnOff();
