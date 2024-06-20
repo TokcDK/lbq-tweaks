@@ -122,12 +122,12 @@ quest_settei = function (id5) {
   }
 
   for (let i = start; i <= end; i++) {
-    quest_settei_item($dataItems[i], id6);
+    quest_settei_item($dataItems[i], id6, i);
   }
 
 }
 
-quest_settei_item = function (item, id6) {
+quest_settei_item = function (item, id6, i) {
 
   if (!item || !item.name) return;
 
