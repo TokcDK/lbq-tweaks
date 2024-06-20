@@ -600,6 +600,13 @@ charagra_henkou1 = function(id2){
 
 };
 
+// for charagra_choice1
+set_charachip_graphics = function(itemMeta){
+	$gameVariables.setValue(21, Number(itemMeta['CharaChip1']));//1102は全裸指定
+	$gameVariables.setValue(22, Number(itemMeta['CharaChip2']));
+	$gameVariables.setValue(23, Number(itemMeta['CharaChipsv']));
+}
+
 //☆☆キャラチップ決定用計算
 charagra_choice1 = function(id1){
 
@@ -607,33 +614,31 @@ const actor = $gameActors.actor(id1);
 
 if(actor.isStateAffected(23)){
   const itemMeta = $dataItems[$gameVariables.value(id1 + 440)[0]].meta;
-  $gameVariables.setValue(21, Number(itemMeta['CharaChip1']));
-  $gameVariables.setValue(22, Number(itemMeta['CharaChip2']));
-  $gameVariables.setValue(23, Number(itemMeta['CharaChipsv']));
+  set_charachip_graphics(itemMeta);
+  
 } else {
   const value5 = $gameVariables.value(id1+380)[4];
   let value1 = $gameVariables.value(id1+440)[0];//0アイテムID
   //var value2 = $gameVariables.value(id1+440)[41];//41会話グラ用指定ID
-  const itemMeta = $dataItems[zenravalueId].meta;
-  $gameVariables.setValue(21, Number(itemMeta['CharaChip1']));//1102は全裸指定
-  $gameVariables.setValue(22, Number(itemMeta['CharaChip2']));
-  $gameVariables.setValue(23, Number(itemMeta['CharaChipsv']));
-  const gameVarid1440 = $gameVariables.value(id1 + 440);
+  set_charachip_graphics($dataItems[value1].meta);
+  
   if(value5 <= 9){
-    gameVarid1440[0] = 0;
-    gameVarid1440[41] = 1;
+    const charachipDataArr = $gameVariables.value(id1 + 440);
+    charachipDataArr[0] = 0;
+    charachipDataArr[41] = 1;
     value1 = 0;
   };
   if(value1 == 0 && value5 >= 26){
   //現在衣装を呼び出し
-    for (var i = 1; i <= 40; i++) {
+    for (let i = 1; i <= 40; i++) {
       $gameVariables.setValue(i+460,[i]);
     };
-    let array = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];//21
+    let array = Array(21).fill(0);//21
+	const itemsCount = $dataItems.length;
     for (let id = 461;id<=500;id++){
-      for(let i=1331; i < $dataItems.length; i ++){
-        if(!$dataItems[i].meta['TotalCloth']){
-          const itemMeta = $dataItems[i].meta;
+      for(let i=1331; i < itemsCount; i ++){
+        const itemMeta = $dataItems[i].meta;
+        if(!itemMeta['TotalCloth']){
           const itemEICSwitchNum = Number(itemMeta['EICSwitch']);
           if (id1 + 180 == itemEICSwitchNum ||
           id1 + 380 == itemEICSwitchNum ||
@@ -644,36 +649,42 @@ if(actor.isStateAffected(23)){
               array[Number(itemMeta['subCategory'])] += Number(itemMeta['ClothUncoverCount']);//露出度で加算
               break;
             };
-       }}};
-    };
+          }
+	    }
+	  }
+    }
     const max = array.reduce(function(a,b){  
     return Math.max(a,b);
     });
     let index = array.findIndex(array => array === max); 
     if(index >= 0){
-      if(index == 0){}else{
-        for (let i = 1331; i < $dataItems.length; i++) {
-          const item = $dataItems[i];
-          if (item.meta['TotalCloth']) {
-            const itemEICSwitchNum = Number(item.meta['EICSwitch']);
+		const itemsCount = $dataItems.length;
+        for (let i = 1331; i < itemsCount; i++) {
+          const itemMeta = $dataItems[i].meta;
+          if (!itemMeta['TotalCloth']) continue;
+		  
+            const itemEICSwitchNum = Number(itemMeta['EICSwitch']);
             if (id1 + 380 == itemEICSwitchNum ||
               400 == itemEICSwitchNum ){
-                if(index == Number(item.meta['subCategory'])){
-                  $gameVariables.setValue(21,Number(item.meta['CharaChip1']));
-                  $gameVariables.setValue(22,Number(item.meta['CharaChip2']));
-                  $gameVariables.setValue(23,Number(item.meta['CharaChipsv']));
+                if(index == Number(itemMeta['subCategory'])){
+                  $gameVariables.setValue(21,Number(itemMeta['CharaChip1']));
+                  $gameVariables.setValue(22,Number(itemMeta['CharaChip2']));
+                  $gameVariables.setValue(23,Number(itemMeta['CharaChipsv']));
                   $gameVariables.value(id1+440)[0] = i;
-                  $gameVariables.value(id1+440)[41] = Number(item.meta['TotalCloth']);
+                  $gameVariables.value(id1+440)[41] = Number(itemMeta['TotalCloth']);
                   break;
-     }}}}}};
-
-  };
+			    }
+			}
+		}
+	}
+  }
+  
   if(value1 >= 1){
     const item1Meta = $dataItems[value1].meta;
     $gameVariables.setValue(21, Number(item1Meta['CharaChip1']));
     $gameVariables.setValue(22, Number(item1Meta['CharaChip2']));
     $gameVariables.setValue(23, Number(item1Meta['CharaChipsv']));
-  };
+  }
 };
 tachie_switchOnOff();
 
