@@ -620,7 +620,7 @@ if(actor.isStateAffected(23)){
   const value5 = $gameVariables.value(id1+380)[4];
   let value1 = $gameVariables.value(id1+440)[0];//0アイテムID
   //var value2 = $gameVariables.value(id1+440)[41];//41会話グラ用指定ID
-  set_charachip_graphics($dataItems[value1].meta);
+  set_charachip_graphics($dataItems[zenravalueId].meta);
   
   if(value5 <= 9){
     const charachipDataArr = $gameVariables.value(id1 + 440);
