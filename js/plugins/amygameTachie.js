@@ -845,24 +845,36 @@ $gameSwitches.setValue(31,true);
 };
 
 // using in tachie_hyouji1
-hasAnyId = function(array, inputId){
-	return array.some(function(id) {return inputId == id});
-}
-
-//☆☆立ち絵表示
 const hatIds = [4,31,32,35,    36];
 const coatCollarIds = [28,            29];
 const nippleIds = [               11];
 const armsIds = [17,21,23,24,25,26];
 const underwearIds = [7,14,20,       22];
 const shoesIds = [18,            27];
+hasAnyId = function(array, inputId){
+	return array.some(function(id) {return inputId == id});
+}
+tachie_hyouji1GetSlotMod = function(value1){		
+	if(hasAnyId(shoesIds, value1)) {return -1000}//靴
+	else if(hasAnyId(underwearIds, value1)) {return -500}//服下
+	else if(hasAnyId(armsIds, value1)) {return -300}//腕
+	else if(hasAnyId(nippleIds, value1)) {return -200}//乳首
+	else if(hasAnyId(coatCollarIds, value1)) {return -100}//コート、首輪
+	else if(hasAnyId(hatIds, value1)) { return 100 }//帽子
+	
+	return 0;
+}
+
+//☆☆立ち絵表示
 tachie_hyouji1 = function(id3){
 
 const vars = $gameVariables;
 vars.setValue(112,id3);
-vars.setValue(300,Number($dataActors[vars.value(112)].meta['tachiePicId']));
+const actorId = vars.value(112);
+const actorMeta = $dataActors[actorId].meta;
+vars.setValue(300,Number(actorMeta['tachiePicId']));
 let value5 = 1;
-const actor = $gameActors.actor(vars.value(112));
+const actor = $gameActors.actor(actorId);
 const isLearnedSkill65 = actor.isLearnedSkill(65);
 const isLearnedSkill69 = actor.isLearnedSkill(69);
 let list = valueTachieChangeState;
@@ -883,7 +895,7 @@ list.forEach(function(id1) {
 	
 	let name = stateMeta['TachieSet']
     if(stateMeta['TachieActorSpecify']){
-      name += vars.value(112) + '_' +  value4;
+      name += actorId + '_' +  value4;
     }
 	
 	const picId = vars.value(300);
@@ -942,31 +954,23 @@ let value32 = 0;//残像y軸。途中で数字を入れるためこれだけ先�
       vars.setValue(101,vars.value(105) -50);
   };
   if($gameSwitches.value(200)){
-    if(vars.value(19) >= 1){
-      if(!$dataItems[vars.value(19)].meta['TotalCloth']){    
+	const itemId = vars.value(19);
+    if(itemId >= 1){
+      if(!$dataItems[itemId].meta['TotalCloth']){    
         vars.setValue(101,vars.value(105));
-      };
-    };
+      }
+    }
     //vars.setValue(110,60);
-    if(vars.value(19) == 0){
+    else if(itemId == 0){
       vars.setValue(101,vars.value(105) +50);
       vars.setValue(102,vars.value(106));
     } else {
       if(!$gameSwitches.value(150)){
-        vars.setValue(106,vars.value(106)-Number($dataActors[vars.value(112)].meta['TachiePoseYposition']));
-          if($dataItems[vars.value(19)].meta['ClothSwitch']){
-            let value1 = Number($dataItems[vars.value(19)].meta['ClothSwitch']);
-          } else {
-            let value1 = 0;
-          };
-        let value2 = 0;      
+        vars.setValue(106,vars.value(106)-Number(actorMeta['TachiePoseYposition']));
 		
-        if(hasAnyId(shoesIds, value1)) {value2 = -1000}//靴
-        else if(hasAnyId(underwearIds, value1)) {value2 = -500}//服下
-        else if(hasAnyId(armsIds, value1)) {value2 = -300}//腕
-        else if(hasAnyId(nippleIds, value1)) {value2 = -200}//乳首
-        else if(hasAnyId(coatCollarIds, value1)) {value2 = -100}//コート、首輪
-		else if(hasAnyId(hatIds, value1)) { value2 = 100 }//帽子
+		const itemClothSwitch = $dataItems[itemId].meta['ClothSwitch'];
+        const value1 = itemClothSwitch ? Number(itemClothSwitch): 0;
+        const value2 = tachie_hyouji1GetSlotMod(value1);
 		
         
 		if(value2 >= 1){value32 = -200};
@@ -978,18 +982,19 @@ let value32 = 0;//残像y軸。途中で数字を入れるためこれだけ先�
       }
     }
   } else {
-    vars.setValue(106,vars.value(106)-Number($dataActors[vars.value(112)].meta['TachiePoseYposition']));
+    vars.setValue(106,vars.value(106)-Number(actorMeta['TachiePoseYposition']));
     vars.setValue(102,vars.value(106));
   };
   if($gameSwitches.value(30)){
-    vars.setValue(101,vars.value(105) + 100);//x軸始点
+	const var105 = vars.value(105);
+    vars.setValue(101,var105 + 100);//x軸始点
     vars.setValue(110,30);//ウェイト。※変化なし
     if(vars.value(263) >= 2){
-      vars.setValue(101,vars.value(105) -100);//x軸始点
+      vars.setValue(101,var105 -100);//x軸始点
       vars.setValue(110,20);//ウェイト。※変化なし
     };
       if($gameSwitches.value(143)){
-        vars.setValue(101,vars.value(105) -50);//x軸始点
+        vars.setValue(101,var105 -50);//x軸始点
         vars.setValue(110,20);//ウェイト。※変化なし
       };
       //vars.setValue(105,1180)//x座標
@@ -1012,10 +1017,10 @@ let value32 = 0;//残像y軸。途中で数字を入れるためこれだけ先�
 //if(!$TKMvar.tachie.PicData[tachieNum]["char"]) break;
   //let CharList = $TKMvar.tachie.CharList;
   //let MaxLayer = $TKMvar.tachie.MaxLayer;
-  let PicData = $TKMvar.tachie.PicData;
-  let pictureId = PicData[tachieNum]["picNum"];
-  let chr = PicData[tachieNum]["char"];
-  let name = "TKMtachie_" + chr + "_";
+const picData = $TKMvar.tachie.PicData;
+const pictureId = picData[tachieNum]["picNum"];
+const chr = picData[tachieNum]["char"];
+const picName = "TKMtachie_" + chr + "_";
   //let partList = CharList[chr];
   //let x = $TKMvar.tachie.PicData[tachieNum]["x"];
   //let y = $TKMvar.tachie.PicData[tachieNum]["y"];
@@ -1033,68 +1038,52 @@ let value32 = 0;//残像y軸。途中で数字を入れるためこれだけ先�
 //}}};
 //let value1 = 'easeInOutCubic';
 
-let value31;
-if(vars.value(101) >= vars.value(105)){
-  value31 = 200;
-} else {
-  value31 = -200;
-};
-let value33;
-if($gameSwitches.value(30) || $gameSwitches.value(200)){
-  //let value1 = 'easeInQuad';
-  value33 = 50;
-} else {
-/*   if($gameSwitches.value(200)){
-    //let value1 = 'easeOutQuad';
-    value33 = 50;
-  } else {
-    //let value1 = 'easeInQuad';
-    //let value1 = 'easeOutQuad';
-    value33 = 100;
-  }; */
-  value33 = 100;
-};
+const value31 = vars.value(101) >= vars.value(105) ? 200 : -200;
+const value33 = $gameSwitches.value(30) || $gameSwitches.value(200) ? 50 : 100;
 
 picture_motion1("smooth",[0]);
-$gameScreen.showPicture(pictureId, name, 1, 
+$gameScreen.showPicture(pictureId, picName, 1, 
 vars.value(101), vars.value(102), 
 vars.value(103), vars.value(104), vars.value(149), 0);
-if(is_girl($gameActors.actor(vars.value(112))) && !$gameSwitches.value(150)){
-  $gameScreen.showPicture(7, "/img/tachies/" + 'actor' + vars.value(112) + '_1_3', 1, 
+if(is_girl($gameActors.actor(actorId)) && !$gameSwitches.value(150)){
+  $gameScreen.showPicture(7, "/img/tachies/" + 'actor' + actorId + '_1_3', 1, 
   vars.value(101)+value31, vars.value(102)+value32, 
   vars.value(103), vars.value(104), value33, 1);
 };
-let value1 = pictureId;
-if($gameScreen.picture(value1)){
-  $gameScreen.movePicture(value1,1,
-  vars.value(105),
-  vars.value(106),
-  vars.value(107),
-  vars.value(108),
-  vars.value(109),
-  0,vars.value(110));
-};
-if($gameScreen.picture(7)){
-  $gameScreen.movePicture(7,1,
-  vars.value(105),
-  vars.value(106),
-  vars.value(107),
-  vars.value(108),
-  0,1,vars.value(110) + 20);
-};
-vars.setValue(20,vars.value(112));
 
-tachie_bless(value1,1);
+const pictureIdDataList = [
+	[pictureId, vars.value(109), 0, 0],
+	[7, 0, 1, 20]
+];
+for(const pictureIdData of pictureIdDataList){
+	if($gameScreen.picture(pictureIdData[0])){
+	  $gameScreen.movePicture(
+		  pictureIdData[0],
+		  1,
+		  vars.value(105),
+		  vars.value(106),
+		  vars.value(107),
+		  vars.value(108),
+		  pictureIdData[1],
+		  pictureIdData[2],
+		  vars.value(110) + pictureIdData[3]
+	  );
+	}
+}
+
+vars.setValue(20,actorId);
+
+tachie_bless(pictureId,1);
+
 if($gameSwitches.value(30)){
   tachie_aura();
-};
+}
 
-};
+}
 
-const getRandomElement = (arr) => arr[Math.floor(Math.random() * arr.length)];
-
-const tachie_settei_base_id = 460;
 //☆☆立ち絵設定
+const getRandomElement = (arr) => arr[Math.floor(Math.random() * arr.length)];
+const tachie_settei_base_id = 460;
 tachie_settei1 = function(){
 
 const actorId = $gameVariables.value(20);
