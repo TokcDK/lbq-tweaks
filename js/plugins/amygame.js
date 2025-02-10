@@ -3577,68 +3577,83 @@ if(id2 == 0){
 
 //監禁、奴隷化時にレアリティと装備を記憶。レアリティダウンを実行するかはid3が1で実行
 reality_setRelegation = function(id2,id1,id3){
+  const actor = $gameActors.actor(id1);
+  const stateData93 = $dataStates[93];
+  const classData1 = $dataClasses[1];
+  let equipData = $gameVariables.value(333)[id1];
+  const actorName = actor.name();
+  const stateName = stateData93.name;
+  const stateIcon = stateData93.iconIndex;
+  const baseClassName = classData1.name;
 
-var actor = $gameActors.actor(id1);
-if(id2 == 0){
-    for (var i = 0; i < 10; i++) {
-      if($gameVariables.value(333)[id1][i] >= 1){
-        actor.changeEquipById(i+1, $gameVariables.value(333)[id1][i]);
-        $gameVariables.value(333)[id1][i] = 0;
-      };
-    };
-    var value1 = `${actor.name()}は装備を取り戻した！`;
-    CommonPopupManager.showInfo({},value1,null);
-  if(actor.isStateAffected(93) && $gameVariables.value(333)[id1][11] >= 1){
-    for (var i = 401; i <= 406; i++) {actor.forgetSkill(i)};
-    actor.learnSkill($gameVariables.value(333)[id1][11]);
-    reality_setUp(id1);
-    actor.removeState(93);
-    var value1 = `${actor.name()}の\x1bI[${$dataStates[93].iconIndex}]${$dataStates[93].name}が解除された！`;
-    CommonPopupManager.showInfo({},value1,null);
-    actor.changeExp($gameVariables.value(333)[id1][12] + actor.currentExp(), false);
-    if($gameVariables.value(333)[id1][13] >= 1){
-      actor.changeSubclass($gameVariables.value(333)[id1][13]);
-      var value1 = `${actor.name()}のサブジョブが\\C[14]${$dataClasses[1].name}\\C[0]に戻った！`;
-      CommonPopupManager.showInfo({},value1,null);
-    };
-    $gameVariables.value(333)[id1][11] = 0;
-    $gameVariables.value(333)[id1][12] = 0;
-    $gameVariables.value(333)[id1][13] = 0;
-  };
-};
-if(id2 == 1){
-  $gameVariables.value(333)[id1] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0];//[13]まで。0-10装備11レアリティスキル12経験値13ｻﾌﾞｼﾞｮﾌﾞ
-  var value1 = 401;
-  for (var i = 401; i <= 406; i++) {
-    if(actor.isLearnedSkill(i)){
-      var value1 = i;
-  }};
-  $gameVariables.value(333)[id1][11] = value1;
-  var equips = actor.equips();
-    for (var i = 0; i < equips.length; i++) {
-      if(equips[i]){
-        $gameVariables.value(333)[id1][i] = equips[i].id;
-        actor.changeEquipById(i+1, 0);
-      };
-    };
-    var value1 = `${actor.name()}は装備を奪われた…`;
-    CommonPopupManager.showInfo({},value1,null);
-    if(id3 == 1 && !actor.isStateAffected(93)){
-      $gameVariables.value(333)[id1][12] = actor.currentExp();
-      for (var i = 401; i <= 406; i++) {actor.forgetSkill(i)};
+  if (id2 === 0) {
+    for (let i = 0; i < 10; i++) {
+      if (equipData[i] >= 1) {
+        actor.changeEquipById(i + 1, equipData[i]);
+        equipData[i] = 0;
+      }
+    }
+    const recoverMessage = `${actorName}は装備を取り戻した！`;
+    CommonPopupManager.showInfo({}, recoverMessage, null);
+
+    if (actor.isStateAffected(93) && equipData[11] >= 1) {
+      for (let i = 401; i <= 406; i++) {
+        actor.forgetSkill(i);
+      }
+      actor.learnSkill(equipData[11]);
+      reality_setUp(id1);
+      actor.removeState(93);
+      const stateRemoveMessage = `${actorName}の\x1bI[${stateIcon}]${stateName}が解除された！`;
+      CommonPopupManager.showInfo({}, stateRemoveMessage, null);
+      actor.changeExp(equipData[12] + actor.currentExp(), false);
+      if (equipData[13] >= 1) {
+        actor.changeSubclass(equipData[13]);
+        const subclassMessage = `${actorName}のサブジョブが\\C[14]${baseClassName}\\C[0]に戻った！`;
+        CommonPopupManager.showInfo({}, subclassMessage, null);
+      }
+      equipData[11] = 0;
+      equipData[12] = 0;
+      equipData[13] = 0;
+    }
+  } else if (id2 === 1) {
+    $gameVariables.value(333)[id1] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; // 0-10: 装備, 11: レアリティスキル, 12: 経験値, 13: サブジョブ
+    equipData = $gameVariables.value(333)[id1];
+    let learnedSkill = 401;
+    for (let i = 401; i <= 406; i++) {
+      if (actor.isLearnedSkill(i)) {
+        learnedSkill = i;
+      }
+    }
+    equipData[11] = learnedSkill;
+
+    const equips = actor.equips();
+    for (let i = 0; i < equips.length; i++) {
+      if (equips[i]) {
+        equipData[i] = equips[i].id;
+        actor.changeEquipById(i + 1, 0);
+      }
+    }
+    const stealMessage = `${actorName}は装備を奪われた…`;
+    CommonPopupManager.showInfo({}, stealMessage, null);
+
+    if (id3 === 1 && !actor.isStateAffected(93)) {
+      equipData[12] = actor.currentExp();
+      for (let i = 401; i <= 406; i++) {
+        actor.forgetSkill(i);
+      }
       actor.learnSkill(406);
       reality_setUp(id1);
       actor.addState(93);
-      var value1 = `${actor.name()}は\x1bI[${$dataStates[93].iconIndex}]${$dataStates[93].name}を受けた…`;
-      CommonPopupManager.showInfo({},value1,null);
-      $gameVariables.value(333)[id1][13] = actor._subclassId;
+      const stateApplyMessage = `${actorName}は\x1bI[${stateIcon}]${stateName}を受けた…`;
+      CommonPopupManager.showInfo({}, stateApplyMessage, null);
+      equipData[13] = actor._subclassId;
       actor.changeSubclass(42);
-      var value1 = `${actor.name()}のサブジョブが\\C[27]${$dataClasses[actor._subclassId].name}\\C[0]になった…`;
-      CommonPopupManager.showInfo({},value1,null);
-    };
-};
-
-};
+      const dataClass = $dataClasses[actor._subclassId];
+      const subclassAppliedMessage = `${actorName}のサブジョブが\\C[27]${dataClass.name}\\C[0]になった…`;
+      CommonPopupManager.showInfo({}, subclassAppliedMessage, null);
+    }
+  }
+}
 
 //換金時にアイテム没収/解放時に放出スクリプト.1で実行 2で解除
 item_confinementScript = function(id1){
