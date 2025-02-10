@@ -86,11 +86,7 @@ Sprite_Damage.prototype.initialize = function() {
     this._duration = 90;
     this._flashColor = [0, 0, 0, 0];
     this._flashDuration = 0;
-  if($gameSwitches.value(211)){
-      this._damageBitmap = ImageManager.loadSystem('Damage2');
-  } else {
-      this._damageBitmap = ImageManager.loadSystem('Damage');
-  };
+    this._damageBitmap = ImageManager.loadSystem($gameSwitches.value(211) ? 'Damage2' : 'Damage');
 };
 
 //rpg_scenes
