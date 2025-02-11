@@ -5942,5 +5942,13 @@ is_girl = function (actor) {
       cEv.switchId = switchIdOffset + i;
     }
   }
+  
+  initializeVersionSettings = function () {
+    //$gameSwitches.setValue(4,true)//体験版on
+    $gameSwitches.setValue(4, false)//製品版on
+    //$gameSwitches.setValue(53,true)//デバッグon
+    //$gameSwitches.setValue(53,false)//デバッグoff
+    $gameVariables.setValue(61, 'りしゃぶるVer1.49')
+  }
 
 }());
