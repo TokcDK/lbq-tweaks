@@ -5951,4 +5951,32 @@ is_girl = function (actor) {
     $gameVariables.setValue(61, 'りしゃぶるVer1.49')
   }
 
+  setNPCInfo = function (gameVarId, metaKey, substitutionCallback) {
+    // Initialize the game variable array with 101 zeroes.
+    $gameVariables.setValue(gameVarId, Array(101).fill(0));
+
+    // Loop over the weapons indices 301–400.
+    for (let i = 301; i <= 400; i++) {
+      // Only process if the weapon has a non‐empty name.
+      const weapon = $dataWeapons[i];
+      if (weapon.name !== '') {
+        // If there is a substitution actor id, use the provided callback.
+        if (weapon.meta['SubstitutionActorId']) {
+          const value1 = Number(weapon.meta['SubstitutionActorId']);
+          $gameVariables.value(gameVarId)[i - 300] = substitutionCallback(value1);
+        }
+        // If the override meta value exists, it takes precedence.
+        if (weapon.meta[metaKey]) {
+          $gameVariables.value(gameVarId)[i - 300] = weapon.meta[metaKey];
+        }
+      }
+    }
+  }
+  SetNPCFamilyName = function () {
+    setNPCInfo(354, 'FamilyName', function (actorId) { return $dataWeapons[actorId + 200].name; });
+  }
+  SetNPCProfession = function () {
+    setNPCInfo(353, 'Profession', function (actorId) { return $gameVariables.value(actorId + 380)[59]; });
+  }
+
 }());
