@@ -230,18 +230,6 @@ tachie_dousa = function (
           moveDuration = duration;
         }
 
-        getPicProps = function(id) {
-          const pic = $gameScreen.picture(id);
-          return pic ? {
-            origin: pic.origin(),
-            x: pic.x(),
-            y: pic.y(),
-            scaleX: pic.scaleX(),
-            scaleY: pic.scaleY(),
-            opacity: pic.opacity()
-          } : null; 
-        }
-
         let picProps = getPicProps(sourcePicId) || {};
         if (valueTacieSet[0] >= 1) {
           picProps = { ...valueTacieSet };
@@ -357,6 +345,18 @@ tachie_dousa = function (
       const actor = $gameActors.actor($gameVariables.value(20));
       event?.setImage(actor.characterName(), actor.characterIndex());
     }
+  }
+
+  getPicProps = function (id) {
+    const pic = $gameScreen.picture(id);
+    return pic ? {
+      origin: pic.origin(),
+      x: pic.x(),
+      y: pic.y(),
+      scaleX: pic.scaleX(),
+      scaleY: pic.scaleY(),
+      opacity: pic.opacity()
+    } : null;
   }
 };
 
