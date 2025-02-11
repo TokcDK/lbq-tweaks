@@ -5931,6 +5931,16 @@ get_valueItems_sis = function (id) {
 
 is_girl = function (actor) {
   return actor.isStateAffected(602);
-}
+  }
+
+  // CommonEvents
+  configureCommonEvents = function (start, end, switchIdOffset) {
+    for (let i = start; i <= end; i++) {
+      const cEv = $dataCommonEvents[i];
+      cEv.trigger = 2;
+      if ($dataItems[i].meta['AutoEvent']) cEv.trigger = 1;
+      cEv.switchId = switchIdOffset + i;
+    }
+  }
 
 }());
