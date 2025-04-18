@@ -5978,5 +5978,17 @@ is_girl = function (actor) {
   SetNPCProfession = function () {
     setNPCInfo(353, 'Profession', function (actorId) { return $gameVariables.value(actorId + 380)[59]; });
   }
+  setItemSGType2GlossaryText123 = function () {
+    var start = 1;
+    var end = $dataItems.length - 1;
+    for (var i = start; i <= end; i++) {
+      let itemMeta = $dataItems[i].meta['SG種別'];
+      if (itemMeta && Number(itemMeta) === 2) {
+        scene_Glossarytext1(i, 218);
+        scene_Glossarytext2(i, 213);
+        scene_Glossarytext3(i, 219);
+      }
+    };
+  }
 
 }());
