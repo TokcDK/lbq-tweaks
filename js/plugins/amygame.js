@@ -1960,6 +1960,7 @@ jouhou_map = function() {
   }, this);
 
   let foundMapSwitch = 0;
+  const conditionalMapSwitches = gameVariables.value(356);
   // Check for conditional map switches based on variables
   for (let i = 9; i > 0; i--) {
     if (dataMap.meta['ChangeMapVal' + i]) {
@@ -1967,9 +1968,10 @@ jouhou_map = function() {
       if (dataMap.meta['MapSwiCVal' + i] && gameVariables.value(varId) >= varValue) {
         const switchIds = dataMap.meta['MapSwiCVal' + i].split(',').map(Number);
         for (let j = 0; j < switchIds.length; j++) {
-          if (switchIds[j] !== 0) {
-            gameSwitches.setValue(switchIds[j], true);
-            if (gameVariables.value(356)[switchIds[j]] != 0) gameVariables.value(356)[switchIds[j]] = 1;
+          const switchId = switchIds[j];
+          if (switchId !== 0) {
+            gameSwitches.setValue(switchId, true);
+            if (conditionalMapSwitches[switchId] != 0) conditionalMapSwitches[switchId] = 1;
           }
         }
         foundMapSwitch = 1;
@@ -1985,9 +1987,10 @@ jouhou_map = function() {
         if (dataMap.meta['MapSwiCSwi' + i] && gameSwitches.value(switchId)) {
           const switchIds = dataMap.meta['MapSwiCSwi' + i].split(',').map(Number);
           for (let j = 0; j < switchIds.length; j++) {
-            if (switchIds[j] !== 0) {
-              gameSwitches.setValue(switchIds[j], true);
-              if (gameVariables.value(356)[switchIds[j]] != 0) gameVariables.value(356)[switchIds[j]] = 1;
+            const switchId = switchIds[j];
+            if (switchId !== 0) {
+              gameSwitches.setValue(switchId, true);
+              if (conditionalMapSwitches[switchId] != 0) conditionalMapSwitches[switchId] = 1;
             }
           }
           foundMapSwitch = 1;
@@ -2001,8 +2004,9 @@ jouhou_map = function() {
     if (dataMap.meta['MapSwi']) {
       const switchIds = dataMap.meta['MapSwi'].split(',').map(Number);
       for (let i = 0; i < switchIds.length; i++) {
-        if (switchIds[i] !== 0) {
-          gameSwitches.setValue(switchIds[i], true);
+        const switchId = switchIds[i];
+        if (switchId !== 0) {
+          gameSwitches.setValue(switchId, true);
         }
       }
     }
