@@ -6001,10 +6001,29 @@ is_girl = function (actor) {
         const partyMember = partyMembers[j];
         if (partyMember.getStateCounter(i) != undefined) {
           gameSwitches.setValue(160, true);
-          break;
+          return;
         }
       }
     };
+  }
+  
+  setPartyMembersStateSwitch160v2 = function () {
+    const partyMembers = $gameParty.members();
+    const gameSwitches = $gameSwitches;
+    const stateIds = $gameVariables.value(214);
+
+    for (let i = 0; i < stateIds.length; i++) {
+      const stateId = stateIds[i];
+      if (!$gameParty.membersState(stateId)) continue;
+
+      for (let j = 0; j < partyMembers.length; j++) {
+        const actor = partyMembers[j];
+        if (actor.isStateAffected(stateId) && actor.getStateCounter(stateId) !== undefined) {
+          gameSwitches.setValue(160, true);
+          return; // Early exit for performance
+        }
+      }
+    }
   }
 
 }());
