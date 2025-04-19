@@ -2019,8 +2019,10 @@ jouhou_map = function() {
 
   // Map meta extraction
   let outInFloorType = 0, outInFloorValue = 0;
-  if (dataMap.meta['OutIn_Froor']) outInFloorType = Number(dataMap.meta['OutIn_Froor'].split(',')[0]);
-  if (dataMap.meta['OutIn_Froor']) outInFloorValue = Number(dataMap.meta['OutIn_Froor'].split(',')[1]);
+  if (dataMap.meta['OutIn_Froor']){
+    outInFloorType = Number(dataMap.meta['OutIn_Froor'].split(',')[0]);
+    outInFloorValue = Number(dataMap.meta['OutIn_Froor'].split(',')[1]);
+  }
   let homeType = 0, animalType = 0;
   const mapHeight = dataMap.height;
   const mapWidth = dataMap.width;
