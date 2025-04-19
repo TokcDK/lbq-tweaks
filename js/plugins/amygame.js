@@ -2217,11 +2217,22 @@ jouhou_map = function() {
   parallaxesSound_switchChange(1);
 
   // Map BG/BattleBG override from map meta
+  // Merge BG/BattleBG override checks for efficiency
   if (gameSwitches.value(15)) {
     if (dataMap.meta['BGchangeN']) {
       mapInfo = dataMap;
       bgKey = 'BGchangeN';
       battleBg1 = 1;
+    }
+    if (dataMap.meta['BattleBGChange1N']) {
+      mapInfo = dataMap;
+      battleBgName = mapInfo.meta['BattleBGChange1N'].split(',')[0];
+      battleBg2 = 1;
+    }
+    if (dataMap.meta['BattleBGChange2N']) {
+      mapInfo = dataMap;
+      battleBgKey = mapInfo.meta['BattleBGChange2N'].split(',')[0];
+      battleBg2 = 1;
     }
   } else {
     if (dataMap.meta['BGchange']) {
@@ -2229,27 +2240,11 @@ jouhou_map = function() {
       bgKey = 'BGchange';
       battleBg1 = 1;
     }
-  }
-  if (gameSwitches.value(15)) {
-    if (dataMap.meta['BattleBGChange1N']) {
-      mapInfo = dataMap;
-      battleBgName = mapInfo.meta['BattleBGChange1N'].split(',')[0];
-      battleBg2 = 1;
-    }
-  } else {
     if (dataMap.meta['BattleBGChange1']) {
       mapInfo = dataMap;
       battleBgName = mapInfo.meta['BattleBGChange1'].split(',')[0];
       battleBg2 = 1;
     }
-  }
-  if (gameSwitches.value(15)) {
-    if (dataMap.meta['BattleBGChange2N']) {
-      mapInfo = dataMap;
-      battleBgKey = mapInfo.meta['BattleBGChange2N'].split(',')[0];
-      battleBg2 = 1;
-    }
-  } else {
     if (dataMap.meta['BattleBGChange2']) {
       mapInfo = dataMap;
       battleBgKey = mapInfo.meta['BattleBGChange2'].split(',')[0];
