@@ -1946,358 +1946,355 @@ $gameVariables.value(id2)[id] = value;
 };
 
 //マップ情報を代入
-jouhou_map = function(){
+jouhou_map = function() {
 
-for (var i = 201; i <= 377; i++) {$gameSwitches.setValue(i,false)};
-var list = [37,81,82,197,207,222,224,226,227,232,230,235,236,240,241,251,256,260,266,329,507,508];//329汎用戦闘トループ以外を指定する場合
-list.forEach(function(id) {
-  $gameVariables.setValue(id,0);
-}, this);
-var value9 = 0;
-for (var i = 9; i > 0; i--) {
-  if($dataMap.meta['ChangeMapVal'+i]){
-    if($dataMap.meta['MapSwiCVal'+i] && $gameVariables.value(Number($dataMap.meta['ChangeMapVal'+i].split(',')[0])) >= Number($dataMap.meta['ChangeMapVal'+i].split(',')[1])){
-      var arr1 = $dataMap.meta['MapSwiCVal'+i].split(',');
-      for (var j = 0; j <= arr1.length-1; j++) {
-        if(Number($dataMap.meta['MapSwiCVal'+i].split(',')[j]) == 0){}else{
-          $gameSwitches.setValue(Number(arr1[j]),true);
-          if($gameVariables.value(356)[Number(arr1[j])] != 0){$gameVariables.value(356)[Number(arr1[j])] = 1};
-        };
-      };
-      var value9 = 1;
-      break;
-    };
-  };
-};
-if(value9 == 0){
-  for (var i = 9; i > 0; i--) {
-    if($dataMap.meta['ChangeMapSwi'+i]){
-      if($dataMap.meta['MapSwiCSwi'+i] && $gameSwitches.value(Number($dataMap.meta['ChangeMapSwi'+i]))){
-        var arr1 = $dataMap.meta['MapSwiCSwi'+i].split(',');
-        for (var j = 0; j <= arr1.length-1; j++) {
-          if(Number($dataMap.meta['MapSwiCSwi'+i].split(',')[j]) == 0){}else{
-            $gameSwitches.setValue(Number(arr1[j]),true);
-          if($gameVariables.value(356)[Number(arr1[j])] != 0){$gameVariables.value(356)[Number(arr1[j])] = 1};
-          };
-        };
-        var value9 = 1;
-        break;
-      };
-    };
-  };
-};
-if(value9 == 0){
-  if($dataMap.meta['MapSwi']){
-    var arr1 = $dataMap.meta['MapSwi'].split(',');
-    for (var i = 0; i <= arr1.length-1; i++) {
-      if(Number($dataMap.meta['MapSwi'].split(',')[i]) == 0){}else{
-        $gameSwitches.setValue(Number(arr1[i]),true);
-}}}};
-if($dataMap.meta['OutIn_Froor']){var value6 = Number($dataMap.meta['OutIn_Froor'].split(',')[0])};
-if($dataMap.meta['OutIn_Froor']){var value7 = Number($dataMap.meta['OutIn_Froor'].split(',')[1])};
-if($dataMap.meta['NPC']){
-  var value9 = Number($dataMap.meta['NPC']);
-} else {
-  var value9 = 0;
-};
-if($dataMap.meta['Home']){
-  var value10 = Number($dataMap.meta['Home']);
-} else {
-  var value10 = 0;
-};
-var value11 = $dataMap.height;
-var value12 = $dataMap.width;
-if($dataMap.meta['Animal']){
-  var value13 = Number($dataMap.meta['Animal']);
-} else {
-  var value13 = 0;
-};
-if(value6 >= 1){
-  $gameSwitches.setValue(203,true);
-} else {
-  $gameSwitches.setValue(204,true);
-};
-if(value7 >= 1){$gameVariables.setValue(232,value7)};
-if(value9 >= 1){$gameVariables.setValue(241,value9)};
-if(value10 == 1){$gameSwitches.setValue(206,true)};
-if(value10 == 2){$gameSwitches.setValue(231,true)};
-$gameVariables.setValue(238,(value11 + value12) / 20);
-if(value13 >= 1){$gameSwitches.setValue(208,true)};
-
-var list = valueJouhouTown;//街weapon
-list.forEach(function(id) {
-  if($gameSwitches.value(Number($dataWeapons[id].meta['MapSwitch']))){
-    $gameVariables.setValue(230,id);
-    $gameSwitches.setValue(202,true);
-  };
-}, this);
-var list = valueJouhouBattleMap;//戦闘マップitems
-list.forEach(function(id) {
-  if($gameSwitches.value(Number($dataItems[id].meta['MapSwitch']))){
-    $gameVariables.setValue(240,id);
-    $gameSwitches.setValue(201,true);
-  };
-}, this);
-
-var value = $dataMap;
-if($gameVariables.value(230) >= 1){
-  var value = $dataWeapons[$gameVariables.value(230)];
-  if($gameVariables.value(230) == $gameVariables.value(237)[1] && $gameVariables.value(237)[0] == 1){
-    $gameSwitches.setValue(216,true);
-  } else {
-    $gameVariables.setValue(237,[1,$gameVariables.value(230)]);
-    $gameSwitches.setValue(216,false);
-  };
-};
-if($gameVariables.value(240) >= 1){
-  var value = $dataItems[$gameVariables.value(240)];
-  if($gameVariables.value(240) == $gameVariables.value(237)[1] && $gameVariables.value(237)[0] == 2){
-    $gameSwitches.setValue(216,true);
-  } else {
-    $gameVariables.setValue(237,[2,$gameVariables.value(240)]);
-    $gameSwitches.setValue(216,false);
-  };
-};
-
-if(value.meta['StartSe']){
-  if(!$gameSwitches.value(15)){
-    var arr1 = value.meta['StartSe'].split(',');
-    AudioManager.playSe({"name":arr1[0],"volume":Number(arr1[1]),"pitch":Number(arr1[2]),"pan":0});
-  };
-};
-if(value.meta['StartSeN']){
-  if($gameSwitches.value(15)){
-    var arr1 = value.meta['StartSeN'].split(',');
-    AudioManager.playSe({"name":arr1[0],"volume":Number(arr1[1]),"pitch":Number(arr1[2]),"pan":0});
-  };
-};
-$gameVariables.setValue(350,[]);
-if(value.meta['EnemySpecialState']){
-  var arr1 = value.meta['EnemySpecialState'].split(',');
-  for (var i = 0; i <= arr1.length-1; i++) {
-    if(Number(arr1[i]) >= 1){
-      $gameVariables.value(350).push(Number(arr1[i]));
-    };
-  };
-};
-if(value.meta['getWaterItem']){
-  $gameVariables.setValue(266,Number(value.meta['getWaterItem']));
-};
-if(value.meta['weatherSetP']){
-  $gameVariables.setValue(256,Number(value.meta['weatherSetP']));
-};
-if(value.meta['weatherSetPN']){
-  $gameVariables.setValue(251,Number(value.meta['weatherSetPN']));
-};
-if($dataMap.meta['weatherSetPN']){
-  $gameVariables.setValue(251,Number($dataMap.meta['weatherSetPN']));
-};
-if(value.meta['EscapeMapID']){
-  $gameVariables.value(204)[0] = Number(value.meta['EscapeMapID'].split(',')[0]);
-  $gameVariables.value(204)[1] = Number(value.meta['EscapeMapID'].split(',')[1]);
-  $gameVariables.value(204)[2] = Number(value.meta['EscapeMapID'].split(',')[2]);
-};
-if(value.meta['MapCount']){$gameVariables.setValue(217,Number(value.meta['MapCount']))};
-if(value.meta['MapEnemyMaxPop']){$gameVariables.setValue(334,Number(value.meta['MapEnemyMaxPop']))};
-if(value.meta['MapEnemyPopC']){$gameVariables.setValue(224,Number(value.meta['MapEnemyPopC']))};
-if(value.meta['MapEnemyPopCH']){$gameVariables.setValue(227,Number(value.meta['MapEnemyPopCH']))};
-if(value.meta['HEnemyPopSwi']){$gameVariables.setValue(236,Number(value.meta['HEnemyPopSwi']))};
-if(value.meta['DeadBody']){$gameVariables.setValue(260,Number(value.meta['DeadBody']))};
-if(value.meta['EnemyLV']){$gameVariables.setValue(270,Number(value.meta['EnemyLV'].split(',')[0]))};
-if(value.meta['OnSwitch']){
-  var arr1 = value.meta['OnSwitch'].split(',');
-  var list = arr1;
-  list.forEach(function(id) {
-    if(id >= 1){
-      $gameSwitches.setValue(id,true);
-    };
+  for (let i = 201; i <= 377; i++) $gameSwitches.setValue(i, false);
+  const list1 = [37,81,82,197,207,222,224,226,227,232,230,235,236,240,241,251,256,260,266,329,507,508];//329汎用戦闘トループ以外を指定する場合
+  list1.forEach(function(id) {
+    $gameVariables.setValue(id, 0);
   }, this);
-};
-$gameVariables.setValue(259,[0,0,0,0,0,0,0,0,0,0]);//ユニークアイテム9枠設定
-var list = [1,2,3,4,5,6,7,8,9];
-list.forEach(function(id) {
-  if(value.meta['BG'+id]){
-    Galv.CACHE.load('parallaxes',value.meta['BG'+id].split(',')[0]);
-  };
-  if(value.meta['BGN'+id]){
-    Galv.CACHE.load('parallaxes',value.meta['BG'+id].split(',')[0]);
-  };
-  if(value.meta['UniqueMaterial'+id]){
-    $gameVariables.value(259)[id] = Number(value.meta['UniqueMaterial'+id].split(',')[0]);
-  };
-}, this);
-if(value.meta['PopEnemy1'] || value.meta['PopEnemy9']){
-  popEnemy_setUp(value);
-  enemy_troopPush();
-  henemy_troopPush();
-};
-if(value.meta['BossEnemy']){
-  boss_setup1(1,0);
-};
-if(value.meta['MoveMapID']){
-  $gameVariables.value(204)[0] = Number(value.meta['MoveMapID'].split(',')[0]);
-  $gameVariables.value(204)[1] = Number(value.meta['MoveMapID'].split(',')[1]);
-  $gameVariables.value(204)[2] = Number(value.meta['MoveMapID'].split(',')[2]);
-};
-if(value.meta['PermissionCloth']){
-  $gameVariables.setValue(207,Number(value.meta['PermissionCloth']));
-};
-if($dataMap.meta['PermissionCloth']){
-  $gameVariables.setValue(207,Number($dataMap.meta['PermissionCloth']));
-};
-var value1 = 0;var value2 = 0;var value3 = 0;var value4 = 0;var value5 = 0;
-if($gameSwitches.value(15)){
-  var value3 = 'StarlitSkyBattle';
-} else {
-  var value3 = 'BlueSkyBattle';
-};
-if($gameVariables.value(230) >= 1){
-  if($gameSwitches.value(203)){
-    if($gameSwitches.value(15)){
-      var value1 = 'BG_outN'; var value2 = 'TownOutdoorN';
-    } else {
-      var value1 = 'BG_out'; var value2 = 'TownOutdoor';
-  }};
-  if($gameSwitches.value(204)){
-    if($gameSwitches.value(15)){
-      var value1 = 'BG_inN'; var value2 = 'TownIndoorN';
-    } else {
-      var value1 = 'BG_in'; var value2 = 'TownIndoor';
-  }};
-  if(value2 == 0){}else{
-    $gameMap.changeBattleback(value3, value2);
-  };
-};
-if($gameVariables.value(240) >= 1){
-  if(value.meta['BG2']){var value1 = 'BG2'; var value2 = 'BG2'};;
-  if(value.meta['BG1']){var value3 = 'BG1'};
-  if($gameSwitches.value(15)){
-    if(value.meta['BGN2']){var value1 = 'BGN2'; var value2 = 'BGN2'};
-    if(value.meta['BGN1']){var value3 = 'BGN1'};
-  };
-  if(value2 == 0){}else{
-    $gameMap.changeBattleback(value.meta[value3].split(',')[0], value.meta[value2].split(',')[0]);
-  };
-};
-if(value1 == 0){}else{
-  $gameVariables.setValue(508,value.meta[value1].split(',')[0]);
-  $gameVariables.setValue(81,Number(value.meta[value1].split(',')[1]));
-  $gameVariables.setValue(82,Number(value.meta[value1].split(',')[2]));
-};
-parallaxesSound_switchChange(1);
-if($gameSwitches.value(15)){
-  if($dataMap.meta['BGchangeN']){
-    var value = $dataMap;
-    var value1 = 'BGchangeN';
-    var value4 = 1;
-  };
-} else {
-  if($dataMap.meta['BGchange']){
-    var value = $dataMap;
-    var value1 = 'BGchange';
-    var value4 = 1;
-  };
-};
-if($gameSwitches.value(15)){
-  if($dataMap.meta['BattleBGChange1N']){
-    var value = $dataMap;
-    var value3 = value.meta['BattleBGChange1N'].split(',')[0];
-    var value5 = 1;
-  };
-} else {
-  if($dataMap.meta['BattleBGChange1']){
-    var value = $dataMap;
-    var value3 = value.meta['BattleBGChange1'].split(',')[0];
-    var value5 = 1;
-  };
-};
-if($gameSwitches.value(15)){
-  if($dataMap.meta['BattleBGChange2N']){
-    var value = $dataMap;
-    var value2 = value.meta['BattleBGChange2N'].split(',')[0];
-    var value5 = 1;
-  };
-} else {
-  if($dataMap.meta['BattleBGChange2']){
-    var value = $dataMap;
-    var value2 = value.meta['BattleBGChange2'].split(',')[0];
-    var value5 = 1;
-  };
-};
-if(value4 >= 1){
-  $gameVariables.setValue(508,value.meta[value1].split(',')[0]);
-  $gameVariables.setValue(81,Number(value.meta[value1].split(',')[1]));
-  $gameVariables.setValue(82,Number(value.meta[value1].split(',')[2]));
-};
-if(value5 >= 1){
-  $gameMap.changeBattleback(value3, value2);
-};
-if($gameVariables.value(508) != 0){
-  if($dataMap.meta['ParallaxSet']){
-    if($gameVariables.value(81) != 0){var value6 = true}else{var value6 = false};
-    if($gameVariables.value(82) != 0){var value7 = true}else{var value7 = false};
-    $gameMap.changeParallax($gameVariables.value(508),value6,value7,$gameVariables.value(81),$gameVariables.value(82));
-  };
-};
-if($gameSwitches.value(15)){
-  var value5 = 'BGSN';
-} else {
-  var value5 = 'BGS';
-};
-if($gameVariables.value(240) >= 1){
-  var value = $dataItems[$gameVariables.value(240)];
-};
-if($gameVariables.value(230) >= 1){
-  var value = $dataWeapons[$gameVariables.value(230)];
-};
-if($dataMap.meta[value5]){var value = $dataMap};
-if(value.meta[value5]){
-  var value1 = value.meta[value5].split(',')[0];
-  var value2 = Number(value.meta[value5].split(',')[1]);
-  var value3 = Number(value.meta[value5].split(',')[2]);
-  var value4 = Number(value.meta[value5].split(',')[3]);
-  if(value1 != valueMapBGS[0]){
-    valueMapBGS = [value1,value2,value3,value4];
-    AudioManager.playBgs({name:valueMapBGS[0],volume:valueMapBGS[1],pitch:valueMapBGS[2],pan:valueMapBGS[3]});
-  };
-} else {
-  AudioManager.fadeOutBgs(1);
-  valueMapBGS = [0,0,0,0];
-};
-if($gameSwitches.value(15)){
-  var value5 = 'BGMN';
-} else {
-  var value5 = 'BGM';
-};
-if($gameVariables.value(240) >= 1){
-  var value = $dataItems[$gameVariables.value(240)];
-};
-if($gameVariables.value(230) >= 1){
-  var value = $dataWeapons[$gameVariables.value(230)];
-};
-if($dataMap.meta[value5]){var value = $dataMap};
-if(value.meta[value5]){
-  var value1 = value.meta[value5].split(',')[0];
-  var value2 = Number(value.meta[value5].split(',')[1]);
-  var value3 = Number(value.meta[value5].split(',')[2]);
-  var value4 = Number(value.meta[value5].split(',')[3]);
-  valueMapBGM = [value1,value2,value3,value4];
-  parallaxesSound_switchChange(2);
-  if(!$gameSwitches.value(124)){
-    if(value1 == 'NoMusic'){
-      AudioManager.fadeOutBgm(10);
-    } else {
-      if(AudioManager.saveBgm() == value1){}else{
-        AudioManager.playBgm({name:valueMapBGM[0],volume:valueMapBGM[1],pitch:valueMapBGM[2],pan:valueMapBGM[3]});
-      };
-    };
+
+  let value9 = 0;
+  for (let i = 9; i > 0; i--) {
+    if ($dataMap.meta['ChangeMapVal' + i]) {
+      if ($dataMap.meta['MapSwiCVal' + i] && $gameVariables.value(Number($dataMap.meta['ChangeMapVal' + i].split(',')[0])) >= Number($dataMap.meta['ChangeMapVal' + i].split(',')[1])) {
+        const arr1 = $dataMap.meta['MapSwiCVal' + i].split(',');
+        for (let j = 0; j <= arr1.length - 1; j++) {
+          if (Number($dataMap.meta['MapSwiCVal' + i].split(',')[j]) == 0) {} else {
+            $gameSwitches.setValue(Number(arr1[j]), true);
+            if ($gameVariables.value(356)[Number(arr1[j])] != 0) $gameVariables.value(356)[Number(arr1[j])] = 1;
+          }
+        }
+        value9 = 1;
+        break;
+      }
+    }
+  }
+  if (value9 == 0) {
+    for (let i = 9; i > 0; i--) {
+      if ($dataMap.meta['ChangeMapSwi' + i]) {
+        if ($dataMap.meta['MapSwiCSwi' + i] && $gameSwitches.value(Number($dataMap.meta['ChangeMapSwi' + i]))) {
+          const arr1 = $dataMap.meta['MapSwiCSwi' + i].split(',');
+          for (let j = 0; j <= arr1.length - 1; j++) {
+            if (Number($dataMap.meta['MapSwiCSwi' + i].split(',')[j]) == 0) {} else {
+              $gameSwitches.setValue(Number(arr1[j]), true);
+              if ($gameVariables.value(356)[Number(arr1[j])] != 0) $gameVariables.value(356)[Number(arr1[j])] = 1;
+            }
+          }
+          value9 = 1;
+          break;
+        }
+      }
+    }
+  }
+  if (value9 == 0) {
+    if ($dataMap.meta['MapSwi']) {
+      const arr1 = $dataMap.meta['MapSwi'].split(',');
+      for (let i = 0; i <= arr1.length - 1; i++) {
+        if (Number($dataMap.meta['MapSwi'].split(',')[i]) == 0) {} else {
+          $gameSwitches.setValue(Number(arr1[i]), true);
+        }
+      }
+    }
+  }
+  let value6 = 0, value7 = 0;
+  if ($dataMap.meta['OutIn_Froor']) value6 = Number($dataMap.meta['OutIn_Froor'].split(',')[0]);
+  if ($dataMap.meta['OutIn_Froor']) value7 = Number($dataMap.meta['OutIn_Froor'].split(',')[1]);
+  let value10 = 0, value13 = 0;
+  let value11 = $dataMap.height;
+  let value12 = $dataMap.width;
+  let value9_npc = 0;
+  if ($dataMap.meta['NPC']) value9_npc = Number($dataMap.meta['NPC']);
+  if ($dataMap.meta['Home']) value10 = Number($dataMap.meta['Home']);
+  if ($dataMap.meta['Animal']) value13 = Number($dataMap.meta['Animal']);
+  if (value6 >= 1) {
+    $gameSwitches.setValue(203, true);
   } else {
-    AudioManager.fadeOutBgm(3);
-    //AudioManager.stopBgm();
-  };
-} else {
-  AudioManager.stopBgm();
-};
+    $gameSwitches.setValue(204, true);
+  }
+  if (value7 >= 1) $gameVariables.setValue(232, value7);
+  if (value9_npc >= 1) $gameVariables.setValue(241, value9_npc);
+  if (value10 == 1) $gameSwitches.setValue(206, true);
+  if (value10 == 2) $gameSwitches.setValue(231, true);
+  $gameVariables.setValue(238, (value11 + value12) / 20);
+  if (value13 >= 1) $gameSwitches.setValue(208, true);
+
+  const list2 = valueJouhouTown;//街weapon
+  list2.forEach(function(id) {
+    if ($gameSwitches.value(Number($dataWeapons[id].meta['MapSwitch']))) {
+      $gameVariables.setValue(230, id);
+      $gameSwitches.setValue(202, true);
+    }
+  }, this);
+  const list3 = valueJouhouBattleMap;//戦闘マップitems
+  list3.forEach(function(id) {
+    if ($gameSwitches.value(Number($dataItems[id].meta['MapSwitch']))) {
+      $gameVariables.setValue(240, id);
+      $gameSwitches.setValue(201, true);
+    }
+  }, this);
+
+  let value = $dataMap;
+  if ($gameVariables.value(230) >= 1) {
+    value = $dataWeapons[$gameVariables.value(230)];
+    if ($gameVariables.value(230) == $gameVariables.value(237)[1] && $gameVariables.value(237)[0] == 1) {
+      $gameSwitches.setValue(216, true);
+    } else {
+      $gameVariables.setValue(237, [1, $gameVariables.value(230)]);
+      $gameSwitches.setValue(216, false);
+    }
+  }
+  if ($gameVariables.value(240) >= 1) {
+    value = $dataItems[$gameVariables.value(240)];
+    if ($gameVariables.value(240) == $gameVariables.value(237)[1] && $gameVariables.value(237)[0] == 2) {
+      $gameSwitches.setValue(216, true);
+    } else {
+      $gameVariables.setValue(237, [2, $gameVariables.value(240)]);
+      $gameSwitches.setValue(216, false);
+    }
+  }
+
+  if (value.meta['StartSe']) {
+    if (!$gameSwitches.value(15)) {
+      const arr1 = value.meta['StartSe'].split(',');
+      AudioManager.playSe({ "name": arr1[0], "volume": Number(arr1[1]), "pitch": Number(arr1[2]), "pan": 0 });
+    }
+  }
+  if (value.meta['StartSeN']) {
+    if ($gameSwitches.value(15)) {
+      const arr1 = value.meta['StartSeN'].split(',');
+      AudioManager.playSe({ "name": arr1[0], "volume": Number(arr1[1]), "pitch": Number(arr1[2]), "pan": 0 });
+    }
+  }
+  $gameVariables.setValue(350, []);
+  if (value.meta['EnemySpecialState']) {
+    const arr1 = value.meta['EnemySpecialState'].split(',');
+    for (let i = 0; i <= arr1.length - 1; i++) {
+      if (Number(arr1[i]) >= 1) {
+        $gameVariables.value(350).push(Number(arr1[i]));
+      }
+    }
+  }
+  if (value.meta['getWaterItem']) {
+    $gameVariables.setValue(266, Number(value.meta['getWaterItem']));
+  }
+  if (value.meta['weatherSetP']) {
+    $gameVariables.setValue(256, Number(value.meta['weatherSetP']));
+  }
+  if (value.meta['weatherSetPN']) {
+    $gameVariables.setValue(251, Number(value.meta['weatherSetPN']));
+  }
+  if ($dataMap.meta['weatherSetPN']) {
+    $gameVariables.setValue(251, Number($dataMap.meta['weatherSetPN']));
+  }
+  if (value.meta['EscapeMapID']) {
+    $gameVariables.value(204)[0] = Number(value.meta['EscapeMapID'].split(',')[0]);
+    $gameVariables.value(204)[1] = Number(value.meta['EscapeMapID'].split(',')[1]);
+    $gameVariables.value(204)[2] = Number(value.meta['EscapeMapID'].split(',')[2]);
+  }
+  if (value.meta['MapCount']) $gameVariables.setValue(217, Number(value.meta['MapCount']));
+  if (value.meta['MapEnemyMaxPop']) $gameVariables.setValue(334, Number(value.meta['MapEnemyMaxPop']));
+  if (value.meta['MapEnemyPopC']) $gameVariables.setValue(224, Number(value.meta['MapEnemyPopC']));
+  if (value.meta['MapEnemyPopCH']) $gameVariables.setValue(227, Number(value.meta['MapEnemyPopCH']));
+  if (value.meta['HEnemyPopSwi']) $gameVariables.setValue(236, Number(value.meta['HEnemyPopSwi']));
+  if (value.meta['DeadBody']) $gameVariables.setValue(260, Number(value.meta['DeadBody']));
+  if (value.meta['EnemyLV']) $gameVariables.setValue(270, Number(value.meta['EnemyLV'].split(',')[0]));
+  if (value.meta['OnSwitch']) {
+    const arr1 = value.meta['OnSwitch'].split(',');
+    arr1.forEach(function(id) {
+      if (id >= 1) {
+        $gameSwitches.setValue(id, true);
+      }
+    }, this);
+  }
+  $gameVariables.setValue(259, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);//ユニークアイテム9枠設定
+  const list4 = [1,2,3,4,5,6,7,8,9];
+  list4.forEach(function(id) {
+    if (value.meta['BG' + id]) {
+      Galv.CACHE.load('parallaxes', value.meta['BG' + id].split(',')[0]);
+    }
+    if (value.meta['BGN' + id]) {
+      Galv.CACHE.load('parallaxes', value.meta['BG' + id].split(',')[0]);
+    }
+    if (value.meta['UniqueMaterial' + id]) {
+      $gameVariables.value(259)[id] = Number(value.meta['UniqueMaterial' + id].split(',')[0]);
+    }
+  }, this);
+  if (value.meta['PopEnemy1'] || value.meta['PopEnemy9']) {
+    popEnemy_setUp(value);
+    enemy_troopPush();
+    henemy_troopPush();
+  }
+  if (value.meta['BossEnemy']) {
+    boss_setup1(1, 0);
+  }
+  if (value.meta['MoveMapID']) {
+    $gameVariables.value(204)[0] = Number(value.meta['MoveMapID'].split(',')[0]);
+    $gameVariables.value(204)[1] = Number(value.meta['MoveMapID'].split(',')[1]);
+    $gameVariables.value(204)[2] = Number(value.meta['MoveMapID'].split(',')[2]);
+  }
+  if (value.meta['PermissionCloth']) {
+    $gameVariables.setValue(207, Number(value.meta['PermissionCloth']));
+  }
+  if ($dataMap.meta['PermissionCloth']) {
+    $gameVariables.setValue(207, Number($dataMap.meta['PermissionCloth']));
+  }
+  let value1 = 0, value2 = 0, value3 = 0, value4 = 0, value5 = 0;
+  if ($gameSwitches.value(15)) {
+    value3 = 'StarlitSkyBattle';
+  } else {
+    value3 = 'BlueSkyBattle';
+  }
+  if ($gameVariables.value(230) >= 1) {
+    if ($gameSwitches.value(203)) {
+      if ($gameSwitches.value(15)) {
+        value1 = 'BG_outN'; value2 = 'TownOutdoorN';
+      } else {
+        value1 = 'BG_out'; value2 = 'TownOutdoor';
+      }
+    }
+    if ($gameSwitches.value(204)) {
+      if ($gameSwitches.value(15)) {
+        value1 = 'BG_inN'; value2 = 'TownIndoorN';
+      } else {
+        value1 = 'BG_in'; value2 = 'TownIndoor';
+      }
+    }
+    if (value2 != 0) {
+      $gameMap.changeBattleback(value3, value2);
+    }
+  }
+  if ($gameVariables.value(240) >= 1) {
+    if (value.meta['BG2']) { value1 = 'BG2'; value2 = 'BG2'; }
+    if (value.meta['BG1']) { value3 = 'BG1'; }
+    if ($gameSwitches.value(15)) {
+      if (value.meta['BGN2']) { value1 = 'BGN2'; value2 = 'BGN2'; }
+      if (value.meta['BGN1']) { value3 = 'BGN1'; }
+    }
+    if (value2 != 0) {
+      $gameMap.changeBattleback(value.meta[value3].split(',')[0], value.meta[value2].split(',')[0]);
+    }
+  }
+  if (value1 != 0) {
+    $gameVariables.setValue(508, value.meta[value1].split(',')[0]);
+    $gameVariables.setValue(81, Number(value.meta[value1].split(',')[1]));
+    $gameVariables.setValue(82, Number(value.meta[value1].split(',')[2]));
+  }
+  parallaxesSound_switchChange(1);
+  if ($gameSwitches.value(15)) {
+    if ($dataMap.meta['BGchangeN']) {
+      value = $dataMap;
+      value1 = 'BGchangeN';
+      value4 = 1;
+    }
+  } else {
+    if ($dataMap.meta['BGchange']) {
+      value = $dataMap;
+      value1 = 'BGchange';
+      value4 = 1;
+    }
+  }
+  if ($gameSwitches.value(15)) {
+    if ($dataMap.meta['BattleBGChange1N']) {
+      value = $dataMap;
+      value3 = value.meta['BattleBGChange1N'].split(',')[0];
+      value5 = 1;
+    }
+  } else {
+    if ($dataMap.meta['BattleBGChange1']) {
+      value = $dataMap;
+      value3 = value.meta['BattleBGChange1'].split(',')[0];
+      value5 = 1;
+    }
+  }
+  if ($gameSwitches.value(15)) {
+    if ($dataMap.meta['BattleBGChange2N']) {
+      value = $dataMap;
+      value2 = value.meta['BattleBGChange2N'].split(',')[0];
+      value5 = 1;
+    }
+  } else {
+    if ($dataMap.meta['BattleBGChange2']) {
+      value = $dataMap;
+      value2 = value.meta['BattleBGChange2'].split(',')[0];
+      value5 = 1;
+    }
+  }
+  if (value4 >= 1) {
+    $gameVariables.setValue(508, value.meta[value1].split(',')[0]);
+    $gameVariables.setValue(81, Number(value.meta[value1].split(',')[1]));
+    $gameVariables.setValue(82, Number(value.meta[value1].split(',')[2]));
+  }
+  if (value5 >= 1) {
+    $gameMap.changeBattleback(value3, value2);
+  }
+  if ($gameVariables.value(508) != 0) {
+    if ($dataMap.meta['ParallaxSet']) {
+      let value6 = false, value7 = false;
+      if ($gameVariables.value(81) != 0) value6 = true;
+      if ($gameVariables.value(82) != 0) value7 = true;
+      $gameMap.changeParallax($gameVariables.value(508), value6, value7, $gameVariables.value(81), $gameVariables.value(82));
+    }
+  }
+  if ($gameSwitches.value(15)) {
+    value5 = 'BGSN';
+  } else {
+    value5 = 'BGS';
+  }
+  if ($gameVariables.value(240) >= 1) {
+    value = $dataItems[$gameVariables.value(240)];
+  }
+  if ($gameVariables.value(230) >= 1) {
+    value = $dataWeapons[$gameVariables.value(230)];
+  }
+  if ($dataMap.meta[value5]) value = $dataMap;
+  if (value.meta[value5]) {
+    const value1bgs = value.meta[value5].split(',')[0];
+    const value2bgs = Number(value.meta[value5].split(',')[1]);
+    const value3bgs = Number(value.meta[value5].split(',')[2]);
+    const value4bgs = Number(value.meta[value5].split(',')[3]);
+    if (value1bgs != valueMapBGS[0]) {
+      valueMapBGS = [value1bgs, value2bgs, value3bgs, value4bgs];
+      AudioManager.playBgs({ name: valueMapBGS[0], volume: valueMapBGS[1], pitch: valueMapBGS[2], pan: valueMapBGS[3] });
+    }
+  } else {
+    AudioManager.fadeOutBgs(1);
+    valueMapBGS = [0, 0, 0, 0];
+  }
+  if ($gameSwitches.value(15)) {
+    value5 = 'BGMN';
+  } else {
+    value5 = 'BGM';
+  }
+  if ($gameVariables.value(240) >= 1) {
+    value = $dataItems[$gameVariables.value(240)];
+  }
+  if ($gameVariables.value(230) >= 1) {
+    value = $dataWeapons[$gameVariables.value(230)];
+  }
+  if ($dataMap.meta[value5]) value = $dataMap;
+  if (value.meta[value5]) {
+    const value1bgm = value.meta[value5].split(',')[0];
+    const value2bgm = Number(value.meta[value5].split(',')[1]);
+    const value3bgm = Number(value.meta[value5].split(',')[2]);
+    const value4bgm = Number(value.meta[value5].split(',')[3]);
+    valueMapBGM = [value1bgm, value2bgm, value3bgm, value4bgm];
+    parallaxesSound_switchChange(2);
+    if (!$gameSwitches.value(124)) {
+      if (value1bgm == 'NoMusic') {
+        AudioManager.fadeOutBgm(10);
+      } else {
+        if (AudioManager.saveBgm() == value1bgm) {} else {
+          AudioManager.playBgm({ name: valueMapBGM[0], volume: valueMapBGM[1], pitch: valueMapBGM[2], pan: valueMapBGM[3] });
+        }
+      }
+    } else {
+      AudioManager.fadeOutBgm(3);
+      //AudioManager.stopBgm();
+    }
+  } else {
+    AudioManager.stopBgm();
+  }
 
 };
 
