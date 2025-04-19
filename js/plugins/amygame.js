@@ -5990,5 +5990,21 @@ is_girl = function (actor) {
       }
     };
   }
+  
+  setPartyMembersStateSwitch160 = function () {
+    const statesCount = $dataStates.length;
+    const partyMembers = $gameParty.members();
+    const partyMembersCount = partyMembers.length;
+    const gameSwitches = $gameSwitches;
+    for (let i = 1; i < statesCount; i++) {
+      for (let j = 0; j < partyMembersCount; j++) {
+        const partyMember = partyMembers[j];
+        if (partyMember.getStateCounter(i) != undefined) {
+          gameSwitches.setValue(160, true);
+          break;
+        }
+      }
+    };
+  }
 
 }());
