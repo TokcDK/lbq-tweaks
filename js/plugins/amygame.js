@@ -1961,31 +1961,14 @@ jouhou_map = function() {
 
   let foundMapSwitch = 0;
   const conditionalMapSwitches = gameVariables.value(356);
-  // Check for conditional map switches based on variables
-  for (let i = 9; i > 0; i--) {
-    if (dataMap.meta['ChangeMapVal' + i]) {
-      const [varId, varValue] = dataMap.meta['ChangeMapVal' + i].split(',').map(Number);
-      if (dataMap.meta['MapSwiCVal' + i] && gameVariables.value(varId) >= varValue) {
-        const switchIds = dataMap.meta['MapSwiCVal' + i].split(',').map(Number);
-        for (let j = 0; j < switchIds.length; j++) {
-          const switchId = switchIds[j];
-          if (switchId !== 0) {
-            gameSwitches.setValue(switchId, true);
-            if (conditionalMapSwitches[switchId] != 0) conditionalMapSwitches[switchId] = 1;
-          }
-        }
-        foundMapSwitch = 1;
-        break;
-      }
-    }
-  }
-  // Check for conditional map switches based on switches
-  if (foundMapSwitch == 0) {
+
+  // Helper to check and set conditional map switches
+  function checkConditionalMapSwitch(metaKey, metaSwitchKey, checkFn) {
     for (let i = 9; i > 0; i--) {
-      if (dataMap.meta['ChangeMapSwi' + i]) {
-        const switchId = Number(dataMap.meta['ChangeMapSwi' + i]);
-        if (dataMap.meta['MapSwiCSwi' + i] && gameSwitches.value(switchId)) {
-          const switchIds = dataMap.meta['MapSwiCSwi' + i].split(',').map(Number);
+      if (dataMap.meta[metaKey + i]) {
+        const keyValue = dataMap.meta[metaKey + i];
+        if (dataMap.meta[metaSwitchKey + i] && checkFn(keyValue, i)) {
+          const switchIds = dataMap.meta[metaSwitchKey + i].split(',').map(Number);
           for (let j = 0; j < switchIds.length; j++) {
             const switchId = switchIds[j];
             if (switchId !== 0) {
@@ -1998,6 +1981,28 @@ jouhou_map = function() {
         }
       }
     }
+  }
+
+  // Check for conditional map switches based on variables
+  checkConditionalMapSwitch(
+    'ChangeMapVal',
+    'MapSwiCVal',
+    (keyValue, i) => {
+      const [varId, varValue] = keyValue.split(',').map(Number);
+      return gameVariables.value(varId) >= varValue;
+    }
+  );
+
+  // Check for conditional map switches based on switches
+  if (foundMapSwitch == 0) {
+    checkConditionalMapSwitch(
+      'ChangeMapSwi',
+      'MapSwiCSwi',
+      (keyValue, i) => {
+        const switchId = Number(keyValue);
+        return gameSwitches.value(switchId);
+      }
+    );
   }
   // Set default map switches if no conditions matched
   if (foundMapSwitch == 0) {
