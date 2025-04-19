@@ -1945,13 +1945,13 @@ $gameVariables.value(id2)[id] = value;
 
 };
 
-//マップ情報を代入
+  //マップ情報を代入
+const jouhouMapResetVariableIds = [37, 81, 82, 197, 207, 222, 224, 226, 227, 232, 230, 235, 236, 240, 241, 251, 256, 260, 266, 329, 507, 508];
 jouhou_map = function() {
 
   // Reset map-related switches and variables
   for (let i = 201; i <= 377; i++) $gameSwitches.setValue(i, false);
-  const resetVariableIds = [37,81,82,197,207,222,224,226,227,232,230,235,236,240,241,251,256,260,266,329,507,508];
-  resetVariableIds.forEach(function(varId) {
+  jouhouMapResetVariableIds.forEach(function(varId) {
     $gameVariables.setValue(varId, 0);
   }, this);
 
