@@ -2093,11 +2093,13 @@ jouhou_map = function() {
 
   // Set up enemy special states and other map variables
   gameVariables.setValue(350, []);
+  const specialStates = gameVariables.value(350);
   if (mapInfo.meta['EnemySpecialState']) {
     const specialStateIds = mapInfo.meta['EnemySpecialState'].split(',').map(Number);
     for (let i = 0; i < specialStateIds.length; i++) {
-      if (specialStateIds[i] >= 1) {
-        gameVariables.value(350).push(specialStateIds[i]);
+      const specialStateId = specialStateIds[i];
+      if (specialStateId >= 1) {
+        specialStates.push(specialStateId);
       }
     }
   }
