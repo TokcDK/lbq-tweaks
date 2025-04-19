@@ -2209,15 +2209,14 @@ jouhou_map = function() {
       gameMap.changeBattleback(mapInfo.meta[battleBgName].split(',')[0], mapInfo.meta[battleBgKey].split(',')[0]);
     }
   }
-  if (bgKey != 0) {
-    gameVariables.setValue(508, mapInfo.meta[bgKey].split(',')[0]);
-    gameVariables.setValue(81, Number(mapInfo.meta[bgKey].split(',')[1]));
-    gameVariables.setValue(82, Number(mapInfo.meta[bgKey].split(',')[2]));
+
+  if (bgKey) {
+    setBgVariables(gameVariables, mapInfo, bgKey);
   }
+
   parallaxesSound_switchChange(1);
 
   // Map BG/BattleBG override from map meta
-  // Merge BG/BattleBG override checks for efficiency
   if (gameSwitches.value(15)) {
     if (dataMap.meta['BGchangeN']) {
       mapInfo = dataMap;
@@ -2252,9 +2251,7 @@ jouhou_map = function() {
     }
   }
   if (battleBg1 >= 1) {
-    gameVariables.setValue(508, mapInfo.meta[bgKey].split(',')[0]);
-    gameVariables.setValue(81, Number(mapInfo.meta[bgKey].split(',')[1]));
-    gameVariables.setValue(82, Number(mapInfo.meta[bgKey].split(',')[2]));
+    setBgVariables(gameVariables, mapInfo, bgKey);
   }
   if (battleBg2 >= 1) {
     gameMap.changeBattleback(battleBgName, battleBgKey);
@@ -2320,6 +2317,16 @@ jouhou_map = function() {
   }
 
 };
+
+// Helper function to set BG variables from meta
+setBgVariables = function (gameVariables, mapInfo, bgKey) {
+  if (mapInfo.meta[bgKey]) {
+    const bgMeta = mapInfo.meta[bgKey].split(',');
+    gameVariables.setValue(508, bgMeta[0]);
+    gameVariables.setValue(81, Number(bgMeta[1]));
+    gameVariables.setValue(82, Number(bgMeta[2]));
+  }
+}
 
 //スイッチに応じて遠景と音楽設定スクリプト
 parallaxesSound_switchChange = function(id1){
