@@ -1702,11 +1702,13 @@ scene_Glossarytext1 = function(itemId, variableId) {
   } else {
     glossaryText += `　　\\C[16]属性：\\C[0]`;
     for (let i = 0; i <= enemyElementArray.length - 1; i++) {
-      glossaryText += `【\\C[13]${dataStates[Number(itemMeta['EnemyElement'].split(',')[i])].name}\\C[0]】　`;
+      const item = dataStates[Number(itemMeta['EnemyElement'].split(',')[i])].name;
+      glossaryText += `【\\C[13]${item}\\C[0]】　`;
     }
   }
   if (gameVariables.value(257)[itemId] >= 1) {
-    glossaryText += `\\C[16]殲滅回数：\\C[0]\\C[10]${gameVariables.value(257)[itemId]}\\C[0]　\n`;
+    const item = gameVariables.value(257)[itemId];
+    glossaryText += `\\C[16]殲滅回数：\\C[0]\\C[10]${item}\\C[0]　\n`;
   } else {
     glossaryText += `\n`;
   }
@@ -1714,14 +1716,16 @@ scene_Glossarytext1 = function(itemId, variableId) {
     if (gameVariables.value(257)[itemId] >= 1) {
       const firstAnnihilationItemArray = itemMeta['firstAnnihilationItem'].split(',');
       const rewardItems = Number(firstAnnihilationItemArray[0]) === 0 ? dataItems : Number(firstAnnihilationItemArray[0]) === 1 ? $dataWeapons : $dataArmors;
-      glossaryText += `\\C[16]初回殲滅報酬：\\C[0]\\C[10]${rewardItems[Number(firstAnnihilationItemArray[1])].name}\\C[0]　\n`;
+      const item = rewardItems[Number(firstAnnihilationItemArray[1])].name;
+      glossaryText += `\\C[16]初回殲滅報酬：\\C[0]\\C[10]${item}\\C[0]　\n`;
     }
   }
   if (itemMeta['TchestOnly']) {
     if (gameVariables.value(212)[itemId] >= 1) {
       const treasureChestArray = itemMeta['TchestOnly'].split(',');
       const treasureItems = Number(treasureChestArray[3]) === 0 ? dataItems : Number(treasureChestArray[3]) === 1 ? $dataWeapons : $dataArmors;
-      glossaryText += `\\C[16]白箱：\\C[0]\\C[10]${treasureItems[Number(treasureChestArray[4])].name}\\C[0]　\n`;
+      const item = treasureItems[Number(treasureChestArray[4])].name;
+      glossaryText += `\\C[16]白箱：\\C[0]\\C[10]${item}\\C[0]　\n`;
     }
   }
 
@@ -1733,7 +1737,8 @@ scene_Glossarytext1 = function(itemId, variableId) {
       glossaryText += `\\C[16]・希少採取素材\\C[0]`;
       let materialCount = 0;
       if (uniqueMaterialArray[0] >= 1) {
-        glossaryText += `【\\C[3]${dataItems[Number(uniqueMaterialArray[0])].name}\\C[0]】`;
+        const item = dataItems[Number(uniqueMaterialArray[0])].name;
+        glossaryText += `【\\C[3]${item}\\C[0]】`;
         materialCount += 1;
       }
       if ((materialCount % 3) === 0) {
@@ -1819,8 +1824,9 @@ scene_Glossarytext1 = function(itemId, variableId) {
         const nameConditionArray = dataStates[stateId].meta['NameCondiAddState'].split(',');
         for (let i = 0; i <= nameConditionArray.length - 1; i++) {
           if (enemy.name.match(nameConditionArray[i])) {
-            if (!glossaryText.match(dataStates[stateId].name)) {
-              glossaryText += `【\\C[14]${dataStates[stateId].name}\\C[0]】`;
+            const stateName = dataStates[stateId].name;
+            if (!glossaryText.match(stateName)) {
+              glossaryText += `【\\C[14]${stateName}\\C[0]】`;
               conditionStateCount += 1;
               if ((conditionStateCount % 3) === 0) {  
                 glossaryText += `\n`;
@@ -1833,8 +1839,9 @@ scene_Glossarytext1 = function(itemId, variableId) {
         const graphicConditionArray = dataStates[stateId].meta['GraphicNameCondiAddState'].split(',');
         for (let i = 0; i <= graphicConditionArray.length - 1; i++) {
           if (enemy.battlerName.match(graphicConditionArray[i])) {
-            if (!glossaryText.match(dataStates[stateId].name)) {
-              glossaryText += `【\\C[14]${dataStates[stateId].name}\\C[0]】`;
+            const stateName = dataStates[stateId].name;
+            if (!glossaryText.match(stateName)) {
+              glossaryText += `【\\C[14]${stateName}\\C[0]】`;
               conditionStateCount += 1;
               if ((conditionStateCount % 3) === 0) {  
                 glossaryText += `\n`;
