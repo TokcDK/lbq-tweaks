@@ -1685,25 +1685,20 @@ scene_Glossarytext1 = function(itemId, variableId) {
   const minEnemyLevel = Math.min(...enemyLevelRange);
   
   // Check if it's a dungeon map
-  let isDungeonMap = 0;
-  if (itemMeta['OnSwitch']) {
-    const onSwitchArray = itemMeta['OnSwitch'].split(',');
-    isDungeonMap = onSwitchArray.some(id => Number(id) === 207) ? 1 : 0;
-  }
+  let isDungeonMap = itemMeta['OnSwitch'] && itemMeta['OnSwitch'].split(',').map(Number).includes(207);
   
   // Build header text
-  let glossaryText = isDungeonMap === 1 ? 
-    `\\C[16]＜ダンジョンマップ情報＞\\C[0]\n` : 
-    `\\C[16]＜フィールドマップ情報＞\\C[0]\n`;
+  const locationType = isDungeonMap ? 'ダンジョン' : 'フィールド';
+  let glossaryText = `\\C[16]＜${locationType}マップ情報＞\\C[0]\n`;
     
   glossaryText += `${itemData.description}\n`;
   glossaryText += `\\C[16]エネミーLV：\\C[0]\\C[10]${minEnemyLevel}\\C[0]～\\C[10]${maxEnemyLevel}\\C[0]　`;
   
   // Add element info
+  glossaryText += `　　\\C[16]属性：\\C[0]`;
   if (Number(itemMeta['EnemyElement']) === 0) {
-    glossaryText += `　　\\C[16]属性：\\C[0]？？？`;
+    glossaryText += `？？？`;
   } else {
-    glossaryText += `　　\\C[16]属性：\\C[0]`;
     enemyElementArray.forEach(elem => {
       const item = dataStates[Number(elem)].name;
       glossaryText += `【\\C[13]${item}\\C[0]】　`;
