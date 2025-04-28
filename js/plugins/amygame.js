@@ -1951,7 +1951,6 @@ jouhou_map = function() {
   console.warn("jouhou_map execute start");
   const gameVariables = $gameVariables;
   const gameSwitches = $gameSwitches;
-  const gameMap = $gameMap;
   const dataMap = $dataMap;
 
   // Reset map-related switches and variables
@@ -2005,7 +2004,7 @@ jouhou_map = function() {
   setupMapEnemiesAndBoss(mapInfo);
 
   // Set up battlebacks and parallax
-  setupMapBattlebacksAndParallax(mapInfo, dataMap, gameVariables, gameSwitches, gameMap);
+  setupMapBattlebacksAndParallax(mapInfo, dataMap, gameVariables, gameSwitches, $gameMap);
 
   // Configure BGS and BGM
   setupMapBackgroundAudio(mapInfo, dataMap, gameVariables, gameSwitches);
