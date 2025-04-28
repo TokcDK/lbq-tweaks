@@ -1670,6 +1670,7 @@ for (var i = start; i <= end; i++) {
 
 //図鑑のテキスト代入
 scene_Glossarytext1 = function(id,id2){
+// debug info: executed 27 times on save game loaded
 
 var arr1 = $dataItems[id].meta['EnemyLV'].split(',');
 if($dataItems[id].meta['EnemyElement']){
