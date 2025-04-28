@@ -1977,40 +1977,45 @@ scene_Glossarytext2 = function(itemId, variableId) {
 };
 
 //図鑑のテキスト代入ボス特殊行動
-scene_Glossarytext3 = function(id, id2) {
-  let value1 = 0;
-  let value = `\\C[16]＜ボス特殊行動一覧＞\\C[0]\n`;
-  if ($gameVariables.value(305)[id] >= 1) {
-    for (let i = 1; i <= 15; i++) {
-      if ($dataItems[id].meta['BossSpecialAction' + i]) {
-        const arr1 = $dataItems[id].meta['BossSpecialAction' + i].split(',');
-        value1 += 1;
-        if (Number(arr1[0]) === 0) {
-          value += `<\\C[2]HP${Number(arr1[1])}%\\C[0]以下で発動>\n`;
+scene_Glossarytext3 = function(itemId, variableId) {
+  let specialActionCount = 0;
+  let glossaryText = `\\C[16]＜ボス特殊行動一覧＞\\C[0]\n`;
+  
+  if ($gameVariables.value(305)[itemId] >= 1) {
+    for (let actionIndex = 1; actionIndex <= 15; actionIndex++) {
+      if ($dataItems[itemId].meta['BossSpecialAction' + actionIndex]) {
+        const actionData = $dataItems[itemId].meta['BossSpecialAction' + actionIndex].split(',');
+        specialActionCount += 1;
+
+        const triggerType = Number(actionData[0]);
+        const triggerValue = Number(actionData[1]);
+        const skillId = Number(actionData[2]);
+
+        if (triggerType === 0) {
+          glossaryText += `<\\C[2]HP${triggerValue}%\\C[0]以下で発動>\n`;
+        } else if (triggerType === 1) {
+          glossaryText += `<\\C[2]MP${triggerValue}%\\C[0]以下で発動>\n`;
+        } else if (triggerType === 2) {
+          glossaryText += `<\\C[2]${triggerValue}%\\C[0]ターン毎に発動>\n`;
+        } else if (triggerType === 3) {
+          glossaryText += `<\\C[2]オーバードライブ\\C[0]時に発動>\n`;
+        } else if (triggerType === 9) {
+          glossaryText += `<\\C[2]HP${triggerValue}%\\C[0]以下で発動>\n`;
         }
-        if (Number(arr1[0]) === 1) {
-          value += `<\\C[2]MP${Number(arr1[1])}%\\C[0]以下で発動>\n`;
-        }
-        if (Number(arr1[0]) === 2) {
-          value += `<\\C[2]${Number(arr1[1])}%\\C[0]ターン毎に発動>\n`;
-        }
-        if (Number(arr1[0]) === 3) {
-          value += `<\\C[2]オーバードライブ\\C[0]時に発動>\n`;
-        }
-        if (Number(arr1[0]) === 9) {
-          value += `<\\C[2]HP${Number(arr1[1])}%\\C[0]以下で発動>\n`;
-        }
-        value += `\\C[10]\x1bSIN[${Number(arr1[2])}]\\C[0]\n`;
-        value += `${$dataSkills[Number(arr1[2])].description}\n`;
+
+        glossaryText += `\\C[10]\x1bSIN[${skillId}]\\C[0]\n`;
+        glossaryText += `${$dataSkills[skillId].description}\n`;
       }
     }
-    if (value1 === 0) {
-      value += `なし`;
+
+    if (specialActionCount === 0) {
+      glossaryText += `なし`;
     }
   } else {
-    value += `情報なし。討伐後に情報更新。`;
+    glossaryText += `情報なし。討伐後に情報更新。`;
   }
-  $gameVariables.value(id2)[id] = value;
+
+  $gameVariables.value(variableId)[itemId] = glossaryText;
 };
 
   //マップ情報を代入
