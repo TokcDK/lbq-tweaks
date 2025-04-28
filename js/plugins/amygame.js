@@ -504,40 +504,59 @@ if(!$gameSwitches.value(29)){
 };
 
 //役職名を基本に戻す
-Profession_basicReturn = function(id1){
+Profession_basicReturn = function(actorId) {
+  if($gameSwitches.value(29)) return; // Exit early if switch 29 is on
+  
+  const actor = $gameActors.actor(actorId);
+  const dataActor = $dataActors[actorId];
+  let defaultProfession = `${dataActor.meta['Profession']}`;
+  let newProfession = defaultProfession;
+  
+  // Check all possible profession alternatives (up to 9)
+  for(let i = 1; i <= 9; i++) {
+    const professionMetaKey = 'Profession' + i;
+    
+    if (!dataActor.meta[professionMetaKey]) continue;
+    
+    const professionData = dataActor.meta[professionMetaKey].split(',');
+    const professionName = professionData[0];
+    const switchId = Number(professionData[1]);
+    const variableId = Number(professionData[2]);
+    const requiredValue = Number(professionData[3]);
+    const requiredItemId = Number(professionData[4]);
+    
+    // Check switch condition
+    if(switchId >= 1 && $gameSwitches.value(switchId)) {
+      newProfession = professionName;
+      continue;
+    }
+    
+    // Check variable threshold condition
+    if(variableId >= 1 && $gameVariables.value(variableId) >= requiredValue) {
+      newProfession = professionName;
+      continue;
+    }
+    
+    // Check item possession condition
+    if(requiredItemId >= 1 && $gameParty.hasItem($dataItems[requiredItemId], true)) {
+      newProfession = professionName;
+      continue;
+    }
+  }
 
-if(!$gameSwitches.value(29)){
-  actor = $gameActors.actor(id1);
-  const dataActor = $dataActors[id1];
-  let value1 = `${dataActor.meta['Profession']}`;
-  for(var j = 1; j <= 9; j++){
-    if (dataActor.meta['Profession' + j]){
-      var arr1 = dataActor.meta['Profession' + j].split(',');
-      if(Number(arr1[1]) >= 1){
-        if($gameSwitches.value(Number(arr1[1]))){
-          value1 = `${arr1[0]}`;
-      }};
-      if(Number(arr1[2]) >= 1){
-        if($gameVariables.value(Number(arr1[2])) >= Number(arr1[3])){
-          value1 = `${arr1[0]}`;
-      }};
-      if(Number(arr1[4]) >= 1){
-        if($gameParty.hasItem($dataItems[Number(arr1[4])],true)){
-          value1 = `${arr1[0]}`;
-      }};
-    };
-  };
-
-  const profession = $gameVariables.value(380 + id1)[59];
-  if (profession != value1){
-    if(!$gameSwitches.value(380)){
-      var value2 = `　　\\N[${id1}]の役職名が\\C[1]<${profession}>\\C[0]から\\C[2]<${value1}>\\C[0]に変更されました。`;
-      TickerManager.show(value2);
-    };
-    $gameVariables.value(380 + id1)[59] = value1;
-  };
-};
-
+  const currentProfession = $gameVariables.value(380 + actorId)[59];
+  
+  // Only update if profession has changed
+  if (currentProfession !== newProfession) {
+    if(!$gameSwitches.value(380)) {
+      const actorName = `\\N[${actorId}]`;
+      const professionChangeMessage = 
+        `　　${actorName}の役職名が\\C[1]<${currentProfession}>\\C[0]から\\C[2]<${newProfession}>\\C[0]に変更されました。`;
+      TickerManager.show(professionChangeMessage);
+    }
+    
+    $gameVariables.value(380 + actorId)[59] = newProfession;
+  }
 };
 
 message_popup2 = function(value1,value2,value3,id1) {
