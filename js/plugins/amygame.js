@@ -1788,30 +1788,32 @@ scene_Glossarytext1 = function(itemId, variableId) {
   for (let i = enemyStartIndex; i <= enemyEndIndex; i++) {
     if (itemMeta['PopEnemy' + i]) {
       const enemyData = itemMeta['PopEnemy' + i];
-      const baseEnemy = dataEnemies[Number(enemyData.split(',')[0])];
+      const enemySkills = enemyData.split(',');
+      const baseEnemy = dataEnemies[Number(enemySkills[0])];
       dataEnemies[i + 20] = Object.assign({}, baseEnemy);
       const clonedEnemy = dataEnemies[i + 20];
-      clonedEnemy.name = enemyData.split(',')[1];
-      clonedEnemy.battlerName = enemyData.split(',')[2];
-      clonedEnemy.battlerHue = Number(enemyData.split(',')[3]);
+      clonedEnemy.name = enemySkills[1];
+      clonedEnemy.battlerName = enemySkills[2];
+      clonedEnemy.battlerHue = Number(enemySkills[3]);
       const actions = clonedEnemy.actions;
-      actions[0].skillId = Number(enemyData.split(',')[4]);
-      actions[1].skillId = Number(enemyData.split(',')[5]);
-      actions[2].skillId = Number(enemyData.split(',')[6]);
-      actions[3].skillId = Number(enemyData.split(',')[7]);
+      actions[0].skillId = Number(enemySkills[4]);
+      actions[1].skillId = Number(enemySkills[5]);
+      actions[2].skillId = Number(enemySkills[6]);
+      actions[3].skillId = Number(enemySkills[7]);
       stateCount += 1;
     } else {
       const baseEnemy = dataEnemies[18];
       dataEnemies[i + 20] = Object.assign({}, baseEnemy);
       const clonedEnemy = dataEnemies[i + 20];
-      clonedEnemy.name = enemyData.split(',')[1];
-      clonedEnemy.battlerName = enemyData.split(',')[2];
-      clonedEnemy.battlerHue = Number(enemyData.split(',')[3]);
+      const enemySkills = enemyData.split(',');
+      clonedEnemy.name = enemySkills[1];
+      clonedEnemy.battlerName = enemySkills[2];
+      clonedEnemy.battlerHue = Number(enemySkills[3]);
       const actions = clonedEnemy.actions;
-      actions[0].skillId = Number(enemyData.split(',')[4]);
-      actions[1].skillId = Number(enemyData.split(',')[5]);
-      actions[2].skillId = Number(enemyData.split(',')[6]);
-      actions[3].skillId = Number(enemyData.split(',')[7]);
+      actions[0].skillId = Number(enemySkills[4]);
+      actions[1].skillId = Number(enemySkills[5]);
+      actions[2].skillId = Number(enemySkills[6]);
+      actions[3].skillId = Number(enemySkills[7]);
       stateCount += 1;
     }
   }
