@@ -1672,9 +1672,11 @@ for (var i = start; i <= end; i++) {
 scene_Glossarytext1 = function(itemId, variableId) {
 // debug info: executed 27 times on save game loaded
 
-const enemyLevelArray = $dataItems[itemId].meta['EnemyLV'].split(',');
-let enemyElementArray = $dataItems[itemId].meta['EnemyElement'] ? $dataItems[itemId].meta['EnemyElement'].split(',') : [0];
-const enemyLevelRange = $dataItems[itemId].meta['EnemyLV'].split(',');
+const itemData = $dataItems[itemId];
+const itemMeta = itemData.meta; // Cache itemData.meta
+const enemyLevelArray = itemMeta['EnemyLV'].split(',');
+const enemyElementArray = itemMeta['EnemyElement'] ? itemMeta['EnemyElement'].split(',') : [0];
+const enemyLevelRange = itemMeta['EnemyLV'].split(',');
 const maxEnemyLevel = enemyLevelRange.reduce(function(a, b) {  
   return Math.max(a, b);
 });
@@ -1682,8 +1684,8 @@ const minEnemyLevel = enemyLevelRange.reduce(function(a, b) {
   return Math.min(a, b);
 });
 let isDungeonMap = 0;
-if ($dataItems[itemId].meta['OnSwitch']) {
-  const onSwitchArray = $dataItems[itemId].meta['OnSwitch'].split(',');
+if (itemMeta['OnSwitch']) {
+  const onSwitchArray = itemMeta['OnSwitch'].split(',');
   for (let i = 0; i <= onSwitchArray.length - 1; i++) {
     if (Number(onSwitchArray[i]) === 207) {
       isDungeonMap = 1;
@@ -1691,14 +1693,14 @@ if ($dataItems[itemId].meta['OnSwitch']) {
   }
 }
 let glossaryText = isDungeonMap === 1 ? `\\C[16]＜ダンジョンマップ情報＞\\C[0]\n` : `\\C[16]＜フィールドマップ情報＞\\C[0]\n`;
-glossaryText += `${$dataItems[itemId].description}\n`;
+glossaryText += `${itemData.description}\n`;
 glossaryText += `\\C[16]エネミーLV：\\C[0]\\C[10]${minEnemyLevel}\\C[0]～\\C[10]${maxEnemyLevel}\\C[0]　`;
-if (Number($dataItems[itemId].meta['EnemyElement']) === 0) {
+if (Number(itemMeta['EnemyElement']) === 0) {
   glossaryText += `　　\\C[16]属性：\\C[0]？？？`;
 } else {
   glossaryText += `　　\\C[16]属性：\\C[0]`;
   for (let i = 0; i <= enemyElementArray.length - 1; i++) {
-    glossaryText += `【\\C[13]${$dataStates[Number($dataItems[itemId].meta['EnemyElement'].split(',')[i])].name}\\C[0]】　`;
+    glossaryText += `【\\C[13]${$dataStates[Number(itemMeta['EnemyElement'].split(',')[i])].name}\\C[0]】　`;
   }
 }
 if ($gameVariables.value(257)[itemId] >= 1) {
@@ -1706,16 +1708,16 @@ if ($gameVariables.value(257)[itemId] >= 1) {
 } else {
   glossaryText += `\n`;
 }
-if ($dataItems[itemId].meta['firstAnnihilationItem']) {
+if (itemMeta['firstAnnihilationItem']) {
   if ($gameVariables.value(257)[itemId] >= 1) {
-    const firstAnnihilationItemArray = $dataItems[itemId].meta['firstAnnihilationItem'].split(',');
+    const firstAnnihilationItemArray = itemMeta['firstAnnihilationItem'].split(',');
     const rewardItems = Number(firstAnnihilationItemArray[0]) === 0 ? $dataItems : Number(firstAnnihilationItemArray[0]) === 1 ? $dataWeapons : $dataArmors;
     glossaryText += `\\C[16]初回殲滅報酬：\\C[0]\\C[10]${rewardItems[Number(firstAnnihilationItemArray[1])].name}\\C[0]　\n`;
   }
 }
-if ($dataItems[itemId].meta['TchestOnly']) {
+if (itemMeta['TchestOnly']) {
   if ($gameVariables.value(212)[itemId] >= 1) {
-    const treasureChestArray = $dataItems[itemId].meta['TchestOnly'].split(',');
+    const treasureChestArray = itemMeta['TchestOnly'].split(',');
     const treasureItems = Number(treasureChestArray[3]) === 0 ? $dataItems : Number(treasureChestArray[3]) === 1 ? $dataWeapons : $dataArmors;
     glossaryText += `\\C[16]白箱：\\C[0]\\C[10]${treasureItems[Number(treasureChestArray[4])].name}\\C[0]　\n`;
   }
@@ -1723,8 +1725,8 @@ if ($dataItems[itemId].meta['TchestOnly']) {
 
 const uniqueMaterialList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 uniqueMaterialList.forEach(function(materialIndex) {
-  if ($dataItems[itemId].meta['UniqueMaterial' + materialIndex]) {
-    const uniqueMaterialArray = $dataItems[itemId].meta['UniqueMaterial' + materialIndex].split(',');
+  if (itemMeta['UniqueMaterial' + materialIndex]) {
+    const uniqueMaterialArray = itemMeta['UniqueMaterial' + materialIndex].split(',');
     glossaryText += `\n`;
     glossaryText += `\\C[16]・希少採取素材\\C[0]`;
     let materialCount = 0;
@@ -1744,8 +1746,8 @@ let enemyCount = 0;
 const enemyStartIndex = 1;
 const enemyEndIndex = 8;
 for (let i = enemyStartIndex; i <= enemyEndIndex; i++) {
-  if ($dataItems[itemId].meta['PopEnemy' + i]) {
-    glossaryText += `【\\C[2]${$dataItems[itemId].meta['PopEnemy' + i].split(',')[1]}\\C[0]】`;
+  if (itemMeta['PopEnemy' + i]) {
+    glossaryText += `【\\C[2]${itemMeta['PopEnemy' + i].split(',')[1]}\\C[0]】`;
     enemyCount += 1;
     if ((i % 2) === 0) {
       glossaryText += `\n`;
@@ -1755,8 +1757,8 @@ for (let i = enemyStartIndex; i <= enemyEndIndex; i++) {
 glossaryText += `\n`;
 
 for (let i = enemyStartIndex; i <= enemyEndIndex; i++) {
-  if ($dataItems[itemId].meta['PopEnemy' + i]) {
-    const enemyData = $dataItems[itemId].meta['PopEnemy' + i].split(',')[0];
+  if (itemMeta['PopEnemy' + i]) {
+    const enemyData = itemMeta['PopEnemy' + i].split(',')[0];
     const passiveStateArray = $dataEnemies[Number(enemyData)].meta['Passive State'].split(',');
     for (let j = 0; j <= passiveStateArray.length - 1; j++) {
       if (!glossaryText.match($dataStates[passiveStateArray[j]].name)) {
@@ -1765,8 +1767,8 @@ for (let i = enemyStartIndex; i <= enemyEndIndex; i++) {
     }
   }
 }
-if ($dataItems[itemId].meta['EnemySpecialState']) {
-  const specialStateArray = $dataItems[itemId].meta['EnemySpecialState'].split(',');
+if (itemMeta['EnemySpecialState']) {
+  const specialStateArray = itemMeta['EnemySpecialState'].split(',');
   for (let i = 0; i <= specialStateArray.length - 1; i++) {
     if (Number(specialStateArray[i]) >= 1) {
       glossaryText += `${$dataStates[Number(specialStateArray[i])].description}\n`;
@@ -1775,8 +1777,8 @@ if ($dataItems[itemId].meta['EnemySpecialState']) {
 }
 let stateCount = 0;
 for (let i = enemyStartIndex; i <= enemyEndIndex; i++) {
-  if ($dataItems[itemId].meta['PopEnemy' + i]) {
-    const enemyData = $dataItems[itemId].meta['PopEnemy' + i];
+  if (itemMeta['PopEnemy' + i]) {
+    const enemyData = itemMeta['PopEnemy' + i];
     const baseEnemy = $dataEnemies[Number(enemyData.split(',')[0])];
     $dataEnemies[i + 20] = Object.assign({}, baseEnemy);
     const clonedEnemy = $dataEnemies[i + 20];
