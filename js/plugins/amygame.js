@@ -2020,8 +2020,9 @@ jouhou_map = function() {
   // Map meta extraction
   let outInFloorType = 0, outInFloorValue = 0;
   if (dataMap.meta['OutIn_Froor']){
-    outInFloorType = Number(dataMap.meta['OutIn_Froor'].split(',')[0]);
-    outInFloorValue = Number(dataMap.meta['OutIn_Froor'].split(',')[1]);
+    const outInFloorMap = dataMap.meta['OutIn_Froor'].split(',');
+    outInFloorType = Number(outInFloorMap[0]);
+    outInFloorValue = Number(outInFloorMap[1]);
   }
   let homeType = 0, animalType = 0;
   const mapHeight = dataMap.height;
