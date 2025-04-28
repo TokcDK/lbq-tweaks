@@ -2303,7 +2303,7 @@ setupUniqueMaterials = function(mapInfo, gameVariables) {
   // Initialize unique material slots array
   gameVariables.setValue(259, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
   
-  const mapInfoMeta = mapInfo.meta;
+  const mapInfoMeta = mapInfoMeta;
   // Process unique materials and backgrounds
   for (let idx = 1; idx <= 9; idx++) {
     // Preload background images
@@ -2366,39 +2366,37 @@ setupMapBattlebacksAndParallax = function(mapInfo, dataMap, gameVariables, gameS
     }
     
     // Set battleback if a key was determined
-    if (battleBgKey !== 0) {
+    if (battleBgKey) {
       gameMap.changeBattleback(battleBgName, battleBgKey);
     }
   }
+
+  const mapInfoMeta = mapInfo.meta;
   
   // Handle battle map backgrounds
   if (gameVariables.value(240) >= 1) {
     // Determine background keys
-    if (mapInfo.meta['BG2']) { 
+    if (mapInfoMeta['BG2']) { 
       bgKey = 'BG2';
       battleBgKey = 'BG2';
     }
-    
-    if (mapInfo.meta['BG1']) {
+    if (mapInfoMeta['BG1']) {
       battleBgName = 'BG1';
     }
-    
     // Night versions
     if (gameSwitches.value(15)) {
-      if (mapInfo.meta['BGN2']) {
+      if (mapInfoMeta['BGN2']) {
         bgKey = 'BGN2';
         battleBgKey = 'BGN2';
       }
-      
-      if (mapInfo.meta['BGN1']) {
+      if (mapInfoMeta['BGN1']) {
         battleBgName = 'BGN1';
       }
     }
-    
     // Set battleback if keys are available
-    if (battleBgKey !== 0) {
-      const bg1 = mapInfo.meta[battleBgName].split(',')[0];
-      const bg2 = mapInfo.meta[battleBgKey].split(',')[0];
+    if (battleBgKey) {
+      const bg1 = mapInfoMeta[battleBgName].split(',')[0];
+      const bg2 = mapInfoMeta[battleBgKey].split(',')[0];
       gameMap.changeBattleback(bg1, bg2);
     }
   }
@@ -2410,62 +2408,56 @@ setupMapBattlebacksAndParallax = function(mapInfo, dataMap, gameVariables, gameS
   
   // Apply parallax settings changes
   parallaxesSound_switchChange(1);
-  
+
+  const dataMapMeta = dataMap.meta;
+
   // Override backgrounds from map metadata if specified
   if (gameSwitches.value(15)) {
-    // Night settings
-    if (dataMap.meta['BGchangeN']) {
+    if (dataMapMeta['BGchangeN']) {
       mapInfo = dataMap;
       bgKey = 'BGchangeN';
       battleBg1 = 1;
     }
-    
-    if (dataMap.meta['BattleBGChange1N']) {
+    if (dataMapMeta['BattleBGChange1N']) {
       mapInfo = dataMap;
-      battleBgName = mapInfo.meta['BattleBGChange1N'].split(',')[0];
+      battleBgName = dataMapMeta['BattleBGChange1N'].split(',')[0];
       battleBg2 = 1;
     }
-    
-    if (dataMap.meta['BattleBGChange2N']) {
+    if (dataMapMeta['BattleBGChange2N']) {
       mapInfo = dataMap;
-      battleBgKey = mapInfo.meta['BattleBGChange2N'].split(',')[0];
+      battleBgKey = dataMapMeta['BattleBGChange2N'].split(',')[0];
       battleBg2 = 1;
     }
   } else {
-    // Day settings
-    if (dataMap.meta['BGchange']) {
+    if (dataMapMeta['BGchange']) {
       mapInfo = dataMap;
       bgKey = 'BGchange';
       battleBg1 = 1;
     }
-    
-    if (dataMap.meta['BattleBGChange1']) {
+    if (dataMapMeta['BattleBGChange1']) {
       mapInfo = dataMap;
-      battleBgName = mapInfo.meta['BattleBGChange1'].split(',')[0];
+      battleBgName = dataMapMeta['BattleBGChange1'].split(',')[0];
       battleBg2 = 1;
     }
-    
-    if (dataMap.meta['BattleBGChange2']) {
+    if (dataMapMeta['BattleBGChange2']) {
       mapInfo = dataMap;
-      battleBgKey = mapInfo.meta['BattleBGChange2'].split(',')[0];
+      battleBgKey = dataMapMeta['BattleBGChange2'].split(',')[0];
       battleBg2 = 1;
     }
   }
   
   // Apply override background settings
-  if (battleBg1 >= 1) {
+  if (battleBg1) {
     setBgVariables(gameVariables, mapInfo, bgKey);
   }
-  
-  if (battleBg2 >= 1) {
+  if (battleBg2) {
     gameMap.changeBattleback(battleBgName, battleBgKey);
   }
   
   // Set up parallax if defined
-  if (gameVariables.value(508) !== 0 && dataMap.meta['ParallaxSet']) {
+  if (gameVariables.value(508) !== 0 && dataMapMeta['ParallaxSet']) {
     const parallaxScrollX = gameVariables.value(81) !== 0;
     const parallaxScrollY = gameVariables.value(82) !== 0;
-    
     gameMap.changeParallax(
       gameVariables.value(508),
       parallaxScrollX,
