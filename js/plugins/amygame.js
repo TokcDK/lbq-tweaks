@@ -1965,7 +1965,7 @@ jouhou_map = function() {
 
   // Process conditional map switches
   const conditionalMapSwitches = gameVariables.value(356);
-  let foundMapSwitch = processConditionalMapSwitches(dataMap, gameSwitches, gameVariables, conditionalMapSwitches);
+  let foundMapSwitch = processMapConditionalSwitches(dataMap, gameSwitches, gameVariables, conditionalMapSwitches);
   
   // Apply default map switches if no conditions matched
   if (foundMapSwitch === 0 && dataMap.meta['MapSwi']) {
@@ -1990,10 +1990,10 @@ jouhou_map = function() {
   let mapInfo = determineMapInfoSource(dataMap, gameVariables, gameSwitches);
 
   // Play start sound effect
-  playStartSoundEffect(mapInfo, gameSwitches);
+  mapPlayStartSoundEffect(mapInfo, gameSwitches);
 
   // Set up enemy states and map variables
-  setupEnemyAndMapVariables(mapInfo, gameVariables);
+  setupMapEnemyVariables(mapInfo, gameVariables);
 
   // Set up escape and move positions
   setupMapPositions(mapInfo, gameVariables);
@@ -2002,20 +2002,20 @@ jouhou_map = function() {
   setupUniqueMaterials(mapInfo, gameVariables);
 
   // Configure enemy and boss setup
-  setupEnemiesAndBoss(mapInfo);
+  setupMapEnemiesAndBoss(mapInfo);
 
   // Set up battlebacks and parallax
-  setupBattlebacksAndParallax(mapInfo, dataMap, gameVariables, gameSwitches, gameMap);
+  setupMapBattlebacksAndParallax(mapInfo, dataMap, gameVariables, gameSwitches, gameMap);
 
   // Configure BGS and BGM
-  setupBackgroundAudio(mapInfo, dataMap, gameVariables, gameSwitches);
+  setupMapBackgroundAudio(mapInfo, dataMap, gameVariables, gameSwitches);
 
   console.warn("jouhou_map execute finished");
 };
 
 // Helper Functions
 
-processConditionalMapSwitches = function(dataMap, gameSwitches, gameVariables, conditionalMapSwitches) {
+processMapConditionalSwitches = function(dataMap, gameSwitches, gameVariables, conditionalMapSwitches) {
   let foundMapSwitch = 0;
   
   // Check variable-based conditional switches
@@ -2028,7 +2028,7 @@ processConditionalMapSwitches = function(dataMap, gameSwitches, gameVariables, c
     const [varId, varValue] = dataMap.meta[varKey].split(',').map(Number);
     if (gameVariables.value(varId) < varValue) continue;
     
-    activateConditionalSwitches(dataMap.meta[switchKey], gameSwitches, conditionalMapSwitches);
+    mapActivateConditionalSwitches(dataMap.meta[switchKey], gameSwitches, conditionalMapSwitches);
     foundMapSwitch = 1;
     break;
   }
@@ -2044,7 +2044,7 @@ processConditionalMapSwitches = function(dataMap, gameSwitches, gameVariables, c
       const condSwitchId = Number(dataMap.meta[switchCondKey]);
       if (!gameSwitches.value(condSwitchId)) continue;
       
-      activateConditionalSwitches(dataMap.meta[targetSwitchKey], gameSwitches, conditionalMapSwitches);
+      mapActivateConditionalSwitches(dataMap.meta[targetSwitchKey], gameSwitches, conditionalMapSwitches);
       foundMapSwitch = 1;
       break;
     }
@@ -2053,7 +2053,7 @@ processConditionalMapSwitches = function(dataMap, gameSwitches, gameVariables, c
   return foundMapSwitch;
 };
 
-activateConditionalSwitches = function(switchIdString, gameSwitches, conditionalMapSwitches) {
+mapActivateConditionalSwitches = function(switchIdString, gameSwitches, conditionalMapSwitches) {
   const switchIds = switchIdString.split(',').map(Number);
   
   switchIds.forEach(switchId => {
@@ -2176,7 +2176,7 @@ determineMapInfoSource = function(dataMap, gameVariables, gameSwitches) {
   return mapInfo;
 };
 
-playStartSoundEffect = function(mapInfo, gameSwitches) {
+mapPlayStartSoundEffect = function(mapInfo, gameSwitches) {
   const seKey = gameSwitches.value(15) ? 'StartSeN' : 'StartSe';
   
   if (!mapInfo.meta[seKey]) return;
@@ -2190,7 +2190,7 @@ playStartSoundEffect = function(mapInfo, gameSwitches) {
   });
 };
 
-setupEnemyAndMapVariables = function(mapInfo, gameVariables) {
+setupMapEnemyVariables = function(mapInfo, gameVariables) {
   // Initialize special state array
   gameVariables.setValue(350, []);
   const specialStates = gameVariables.value(350);
@@ -2311,7 +2311,7 @@ setupUniqueMaterials = function(mapInfo, gameVariables) {
   }
 };
 
-setupEnemiesAndBoss = function(mapInfo) {
+setupMapEnemiesAndBoss = function(mapInfo) {
   // Setup enemies if defined
   if (mapInfo.meta['PopEnemy1'] || mapInfo.meta['PopEnemy9']) {
     popEnemy_setUp(mapInfo);
@@ -2325,7 +2325,7 @@ setupEnemiesAndBoss = function(mapInfo) {
   }
 };
 
-setupBattlebacksAndParallax = function(mapInfo, dataMap, gameVariables, gameSwitches, gameMap) {
+setupMapBattlebacksAndParallax = function(mapInfo, dataMap, gameVariables, gameSwitches, gameMap) {
   // Initialize background related variables
   let bgKey = 0;
   let battleBgKey = 0;
@@ -2464,7 +2464,7 @@ setupBattlebacksAndParallax = function(mapInfo, dataMap, gameVariables, gameSwit
   }
 };
 
-setupBackgroundAudio = function(mapInfo, dataMap, gameVariables, gameSwitches) {
+setupMapBackgroundAudio = function(mapInfo, dataMap, gameVariables, gameSwitches) {
   // Set up BGS (background sound)
   const bgsKey = gameSwitches.value(15) ? 'BGSN' : 'BGS';
   let currentMapInfo = determineAudioMapInfoSource(mapInfo, dataMap, gameVariables, bgsKey);
