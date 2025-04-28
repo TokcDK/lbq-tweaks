@@ -1768,8 +1768,9 @@ scene_Glossarytext1 = function(itemId, variableId) {
       const enemyData = itemMeta['PopEnemy' + i].split(',')[0];
       const passiveStateArray = dataEnemies[Number(enemyData)].meta['Passive State'].split(',');
       for (let j = 0; j <= passiveStateArray.length - 1; j++) {
-        if (!glossaryText.match(dataStates[passiveStateArray[j]].name)) {
-          glossaryText += `${dataStates[Number(passiveStateArray[j])].description}\n`;
+        const state = dataStates[Number(passiveStateArray[j])].name;
+        if (!glossaryText.match(state.name)) {
+          glossaryText += `${state.description}\n`;
         }
       }
     }
@@ -1777,8 +1778,9 @@ scene_Glossarytext1 = function(itemId, variableId) {
   if (itemMeta['EnemySpecialState']) {
     const specialStateArray = itemMeta['EnemySpecialState'].split(',');
     for (let i = 0; i <= specialStateArray.length - 1; i++) {
-      if (Number(specialStateArray[i]) >= 1) {
-        glossaryText += `${dataStates[Number(specialStateArray[i])].description}\n`;
+      const stateId = Number(specialStateArray[i]);
+      if (stateId >= 1) {
+        glossaryText += `${dataStates[stateId].description}\n`;
       }
     }
   }
