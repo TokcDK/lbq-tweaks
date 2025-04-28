@@ -1994,16 +1994,22 @@ scene_Glossarytext3 = function(itemId, variableId) {
         const triggerValue = Number(actionData[1]);
         const skillId = Number(actionData[2]);
 
-        if (triggerType === 0) {
-          glossaryText.push(`<\\C[2]HP${triggerValue}%\\C[0]以下で発動>\n`);
-        } else if (triggerType === 1) {
-          glossaryText.push(`<\\C[2]MP${triggerValue}%\\C[0]以下で発動>\n`);
-        } else if (triggerType === 2) {
-          glossaryText.push(`<\\C[2]${triggerValue}%\\C[0]ターン毎に発動>\n`);
-        } else if (triggerType === 3) {
-          glossaryText.push(`<\\C[2]オーバードライブ\\C[0]時に発動>\n`);
-        } else if (triggerType === 9) {
-          glossaryText.push(`<\\C[2]HP${triggerValue}%\\C[0]以下で発動>\n`);
+        switch (triggerType) {
+          case 0:
+            glossaryText.push(`<\\C[2]HP${triggerValue}%\\C[0]以下で発動>\n`);
+            break;
+          case 1:
+            glossaryText.push(`<\\C[2]MP${triggerValue}%\\C[0]以下で発動>\n`);
+            break;
+          case 2:
+            glossaryText.push(`<\\C[2]${triggerValue}%\\C[0]ターン毎に発動>\n`);
+            break;
+          case 3:
+            glossaryText.push(`<\\C[2]オーバードライブ\\C[0]時に発動>\n`);
+            break;
+          case 9:
+            glossaryText.push(`<\\C[2]HP${triggerValue}%\\C[0]以下で発動>\n`);
+            break;
         }
 
         glossaryText.push(`\\C[10]\x1bSIN[${skillId}]\\C[0]\n`);
