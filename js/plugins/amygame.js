@@ -1670,182 +1670,184 @@ for (var i = start; i <= end; i++) {
 
 //図鑑のテキスト代入
 scene_Glossarytext1 = function(itemId, variableId) {
-// debug info: executed 27 times on save game loaded
+  const gameVariables = $gameVariables;
+  const dataItems = $dataItems;
+  const dataStates = $dataStates;
+  const dataEnemies = $dataEnemies;
 
-const itemData = $dataItems[itemId];
-const itemMeta = itemData.meta; // Cache itemData.meta
-const enemyLevelArray = itemMeta['EnemyLV'].split(',');
-const enemyElementArray = itemMeta['EnemyElement'] ? itemMeta['EnemyElement'].split(',') : [0];
-const enemyLevelRange = itemMeta['EnemyLV'].split(',');
-const maxEnemyLevel = enemyLevelRange.reduce(function(a, b) {  
-  return Math.max(a, b);
-});
-const minEnemyLevel = enemyLevelRange.reduce(function(a, b) {  
-  return Math.min(a, b);
-});
-let isDungeonMap = 0;
-if (itemMeta['OnSwitch']) {
-  const onSwitchArray = itemMeta['OnSwitch'].split(',');
-  for (let i = 0; i <= onSwitchArray.length - 1; i++) {
-    if (Number(onSwitchArray[i]) === 207) {
-      isDungeonMap = 1;
+  const itemData = dataItems[itemId];
+  const itemMeta = itemData.meta; // Cache itemData.meta
+  const enemyLevelArray = itemMeta['EnemyLV'].split(',');
+  const enemyElementArray = itemMeta['EnemyElement'] ? itemMeta['EnemyElement'].split(',') : [0];
+  const enemyLevelRange = itemMeta['EnemyLV'].split(',');
+  const maxEnemyLevel = enemyLevelRange.reduce(function(a, b) {  
+    return Math.max(a, b);
+  });
+  const minEnemyLevel = enemyLevelRange.reduce(function(a, b) {  
+    return Math.min(a, b);
+  });
+  let isDungeonMap = 0;
+  if (itemMeta['OnSwitch']) {
+    const onSwitchArray = itemMeta['OnSwitch'].split(',');
+    for (let i = 0; i <= onSwitchArray.length - 1; i++) {
+      if (Number(onSwitchArray[i]) === 207) {
+        isDungeonMap = 1;
+      }
     }
   }
-}
-let glossaryText = isDungeonMap === 1 ? `\\C[16]＜ダンジョンマップ情報＞\\C[0]\n` : `\\C[16]＜フィールドマップ情報＞\\C[0]\n`;
-glossaryText += `${itemData.description}\n`;
-glossaryText += `\\C[16]エネミーLV：\\C[0]\\C[10]${minEnemyLevel}\\C[0]～\\C[10]${maxEnemyLevel}\\C[0]　`;
-if (Number(itemMeta['EnemyElement']) === 0) {
-  glossaryText += `　　\\C[16]属性：\\C[0]？？？`;
-} else {
-  glossaryText += `　　\\C[16]属性：\\C[0]`;
-  for (let i = 0; i <= enemyElementArray.length - 1; i++) {
-    glossaryText += `【\\C[13]${$dataStates[Number(itemMeta['EnemyElement'].split(',')[i])].name}\\C[0]】　`;
+  let glossaryText = isDungeonMap === 1 ? `\\C[16]＜ダンジョンマップ情報＞\\C[0]\n` : `\\C[16]＜フィールドマップ情報＞\\C[0]\n`;
+  glossaryText += `${itemData.description}\n`;
+  glossaryText += `\\C[16]エネミーLV：\\C[0]\\C[10]${minEnemyLevel}\\C[0]～\\C[10]${maxEnemyLevel}\\C[0]　`;
+  if (Number(itemMeta['EnemyElement']) === 0) {
+    glossaryText += `　　\\C[16]属性：\\C[0]？？？`;
+  } else {
+    glossaryText += `　　\\C[16]属性：\\C[0]`;
+    for (let i = 0; i <= enemyElementArray.length - 1; i++) {
+      glossaryText += `【\\C[13]${dataStates[Number(itemMeta['EnemyElement'].split(',')[i])].name}\\C[0]】　`;
+    }
   }
-}
-if ($gameVariables.value(257)[itemId] >= 1) {
-  glossaryText += `\\C[16]殲滅回数：\\C[0]\\C[10]${$gameVariables.value(257)[itemId]}\\C[0]　\n`;
-} else {
-  glossaryText += `\n`;
-}
-if (itemMeta['firstAnnihilationItem']) {
-  if ($gameVariables.value(257)[itemId] >= 1) {
-    const firstAnnihilationItemArray = itemMeta['firstAnnihilationItem'].split(',');
-    const rewardItems = Number(firstAnnihilationItemArray[0]) === 0 ? $dataItems : Number(firstAnnihilationItemArray[0]) === 1 ? $dataWeapons : $dataArmors;
-    glossaryText += `\\C[16]初回殲滅報酬：\\C[0]\\C[10]${rewardItems[Number(firstAnnihilationItemArray[1])].name}\\C[0]　\n`;
-  }
-}
-if (itemMeta['TchestOnly']) {
-  if ($gameVariables.value(212)[itemId] >= 1) {
-    const treasureChestArray = itemMeta['TchestOnly'].split(',');
-    const treasureItems = Number(treasureChestArray[3]) === 0 ? $dataItems : Number(treasureChestArray[3]) === 1 ? $dataWeapons : $dataArmors;
-    glossaryText += `\\C[16]白箱：\\C[0]\\C[10]${treasureItems[Number(treasureChestArray[4])].name}\\C[0]　\n`;
-  }
-}
-
-const uniqueMaterialList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-uniqueMaterialList.forEach(function(materialIndex) {
-  if (itemMeta['UniqueMaterial' + materialIndex]) {
-    const uniqueMaterialArray = itemMeta['UniqueMaterial' + materialIndex].split(',');
+  if (gameVariables.value(257)[itemId] >= 1) {
+    glossaryText += `\\C[16]殲滅回数：\\C[0]\\C[10]${gameVariables.value(257)[itemId]}\\C[0]　\n`;
+  } else {
     glossaryText += `\n`;
-    glossaryText += `\\C[16]・希少採取素材\\C[0]`;
-    let materialCount = 0;
-    if (uniqueMaterialArray[0] >= 1) {
-      glossaryText += `【\\C[3]${$dataItems[Number(uniqueMaterialArray[0])].name}\\C[0]】`;
-      materialCount += 1;
+  }
+  if (itemMeta['firstAnnihilationItem']) {
+    if (gameVariables.value(257)[itemId] >= 1) {
+      const firstAnnihilationItemArray = itemMeta['firstAnnihilationItem'].split(',');
+      const rewardItems = Number(firstAnnihilationItemArray[0]) === 0 ? dataItems : Number(firstAnnihilationItemArray[0]) === 1 ? $dataWeapons : $dataArmors;
+      glossaryText += `\\C[16]初回殲滅報酬：\\C[0]\\C[10]${rewardItems[Number(firstAnnihilationItemArray[1])].name}\\C[0]　\n`;
     }
-    if ((materialCount % 3) === 0) {
+  }
+  if (itemMeta['TchestOnly']) {
+    if (gameVariables.value(212)[itemId] >= 1) {
+      const treasureChestArray = itemMeta['TchestOnly'].split(',');
+      const treasureItems = Number(treasureChestArray[3]) === 0 ? dataItems : Number(treasureChestArray[3]) === 1 ? $dataWeapons : $dataArmors;
+      glossaryText += `\\C[16]白箱：\\C[0]\\C[10]${treasureItems[Number(treasureChestArray[4])].name}\\C[0]　\n`;
+    }
+  }
+
+  const uniqueMaterialList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  uniqueMaterialList.forEach(function(materialIndex) {
+    if (itemMeta['UniqueMaterial' + materialIndex]) {
+      const uniqueMaterialArray = itemMeta['UniqueMaterial' + materialIndex].split(',');
       glossaryText += `\n`;
-    }
-  }
-}, this);
-glossaryText += `\n`;
-
-glossaryText += `\\C[16]・出現エネミー\\C[0]\n`;
-let enemyCount = 0;
-const enemyStartIndex = 1;
-const enemyEndIndex = 8;
-for (let i = enemyStartIndex; i <= enemyEndIndex; i++) {
-  if (itemMeta['PopEnemy' + i]) {
-    glossaryText += `【\\C[2]${itemMeta['PopEnemy' + i].split(',')[1]}\\C[0]】`;
-    enemyCount += 1;
-    if ((i % 2) === 0) {
-      glossaryText += `\n`;
-    }
-  }
-}
-glossaryText += `\n`;
-
-for (let i = enemyStartIndex; i <= enemyEndIndex; i++) {
-  if (itemMeta['PopEnemy' + i]) {
-    const enemyData = itemMeta['PopEnemy' + i].split(',')[0];
-    const passiveStateArray = $dataEnemies[Number(enemyData)].meta['Passive State'].split(',');
-    for (let j = 0; j <= passiveStateArray.length - 1; j++) {
-      if (!glossaryText.match($dataStates[passiveStateArray[j]].name)) {
-        glossaryText += `${$dataStates[Number(passiveStateArray[j])].description}\n`;
+      glossaryText += `\\C[16]・希少採取素材\\C[0]`;
+      let materialCount = 0;
+      if (uniqueMaterialArray[0] >= 1) {
+        glossaryText += `【\\C[3]${dataItems[Number(uniqueMaterialArray[0])].name}\\C[0]】`;
+        materialCount += 1;
       }
-    }
-  }
-}
-if (itemMeta['EnemySpecialState']) {
-  const specialStateArray = itemMeta['EnemySpecialState'].split(',');
-  for (let i = 0; i <= specialStateArray.length - 1; i++) {
-    if (Number(specialStateArray[i]) >= 1) {
-      glossaryText += `${$dataStates[Number(specialStateArray[i])].description}\n`;
-    }
-  }
-}
-let stateCount = 0;
-for (let i = enemyStartIndex; i <= enemyEndIndex; i++) {
-  if (itemMeta['PopEnemy' + i]) {
-    const enemyData = itemMeta['PopEnemy' + i];
-    const baseEnemy = $dataEnemies[Number(enemyData.split(',')[0])];
-    $dataEnemies[i + 20] = Object.assign({}, baseEnemy);
-    const clonedEnemy = $dataEnemies[i + 20];
-    clonedEnemy.name = enemyData.split(',')[1];
-    clonedEnemy.battlerName = enemyData.split(',')[2];
-    clonedEnemy.battlerHue = Number(enemyData.split(',')[3]);
-    const actions = clonedEnemy.actions;
-    actions[0].skillId = Number(enemyData.split(',')[4]);
-    actions[1].skillId = Number(enemyData.split(',')[5]);
-    actions[2].skillId = Number(enemyData.split(',')[6]);
-    actions[3].skillId = Number(enemyData.split(',')[7]);
-    stateCount += 1;
-    } else {
-    const baseEnemy = $dataEnemies[18];
-    $dataEnemies[i + 20] = Object.assign({}, baseEnemy);
-    const clonedEnemy = $dataEnemies[i + 20];
-    clonedEnemy.name = enemyData.split(',')[1];
-    clonedEnemy.battlerName = enemyData.split(',')[2];
-    clonedEnemy.battlerHue = Number(enemyData.split(',')[3]);
-    const actions = clonedEnemy.actions;
-    actions[0].skillId = Number(enemyData.split(',')[4]);
-    actions[1].skillId = Number(enemyData.split(',')[5]);
-    actions[2].skillId = Number(enemyData.split(',')[6]);
-    actions[3].skillId = Number(enemyData.split(',')[7]);
-    stateCount += 1;
-  }
-}
-glossaryText += `\n`;
-
-let conditionStateCount = 0;
-for (let enemyId = 21; enemyId <= 21 + stateCount; enemyId++) {
-  const enemy = $dataEnemies[enemyId];
-  const conditionalStateList = valueEnemyAddState;
-  conditionalStateList.forEach(function(stateId) {
-    if ($dataStates[stateId].meta['NameCondiAddState']) {
-      const nameConditionArray = $dataStates[stateId].meta['NameCondiAddState'].split(',');
-      for (let i = 0; i <= nameConditionArray.length - 1; i++) {
-        if (enemy.name.match(nameConditionArray[i])) {
-          if (!glossaryText.match($dataStates[stateId].name)) {
-            glossaryText += `【\\C[14]${$dataStates[stateId].name}\\C[0]】`;
-            conditionStateCount += 1;
-            if ((conditionStateCount % 3) === 0) {  
-              glossaryText += `\n`;
-            }            
-          }
-        }
-      }
-    }
-    if ($dataStates[stateId].meta['GraphicNameCondiAddState']) {
-      const graphicConditionArray = $dataStates[stateId].meta['GraphicNameCondiAddState'].split(',');
-      for (let i = 0; i <= graphicConditionArray.length - 1; i++) {
-        if (enemy.battlerName.match(graphicConditionArray[i])) {
-          if (!glossaryText.match($dataStates[stateId].name)) {
-            glossaryText += `【\\C[14]${$dataStates[stateId].name}\\C[0]】`;
-            conditionStateCount += 1;
-            if ((conditionStateCount % 3) === 0) {  
-              glossaryText += `\n`;
-            }   
-          }
-        }
+      if ((materialCount % 3) === 0) {
+        glossaryText += `\n`;
       }
     }
   }, this);
-}
+  glossaryText += `\n`;
 
-$gameVariables.value(variableId)[itemId] = glossaryText;
+  glossaryText += `\\C[16]・出現エネミー\\C[0]\n`;
+  let enemyCount = 0;
+  const enemyStartIndex = 1;
+  const enemyEndIndex = 8;
+  for (let i = enemyStartIndex; i <= enemyEndIndex; i++) {
+    if (itemMeta['PopEnemy' + i]) {
+      glossaryText += `【\\C[2]${itemMeta['PopEnemy' + i].split(',')[1]}\\C[0]】`;
+      enemyCount += 1;
+      if ((i % 2) === 0) {
+        glossaryText += `\n`;
+      }
+    }
+  }
+  glossaryText += `\n`;
 
+  for (let i = enemyStartIndex; i <= enemyEndIndex; i++) {
+    if (itemMeta['PopEnemy' + i]) {
+      const enemyData = itemMeta['PopEnemy' + i].split(',')[0];
+      const passiveStateArray = dataEnemies[Number(enemyData)].meta['Passive State'].split(',');
+      for (let j = 0; j <= passiveStateArray.length - 1; j++) {
+        if (!glossaryText.match(dataStates[passiveStateArray[j]].name)) {
+          glossaryText += `${dataStates[Number(passiveStateArray[j])].description}\n`;
+        }
+      }
+    }
+  }
+  if (itemMeta['EnemySpecialState']) {
+    const specialStateArray = itemMeta['EnemySpecialState'].split(',');
+    for (let i = 0; i <= specialStateArray.length - 1; i++) {
+      if (Number(specialStateArray[i]) >= 1) {
+        glossaryText += `${dataStates[Number(specialStateArray[i])].description}\n`;
+      }
+    }
+  }
+  let stateCount = 0;
+  for (let i = enemyStartIndex; i <= enemyEndIndex; i++) {
+    if (itemMeta['PopEnemy' + i]) {
+      const enemyData = itemMeta['PopEnemy' + i];
+      const baseEnemy = dataEnemies[Number(enemyData.split(',')[0])];
+      dataEnemies[i + 20] = Object.assign({}, baseEnemy);
+      const clonedEnemy = dataEnemies[i + 20];
+      clonedEnemy.name = enemyData.split(',')[1];
+      clonedEnemy.battlerName = enemyData.split(',')[2];
+      clonedEnemy.battlerHue = Number(enemyData.split(',')[3]);
+      const actions = clonedEnemy.actions;
+      actions[0].skillId = Number(enemyData.split(',')[4]);
+      actions[1].skillId = Number(enemyData.split(',')[5]);
+      actions[2].skillId = Number(enemyData.split(',')[6]);
+      actions[3].skillId = Number(enemyData.split(',')[7]);
+      stateCount += 1;
+    } else {
+      const baseEnemy = dataEnemies[18];
+      dataEnemies[i + 20] = Object.assign({}, baseEnemy);
+      const clonedEnemy = dataEnemies[i + 20];
+      clonedEnemy.name = enemyData.split(',')[1];
+      clonedEnemy.battlerName = enemyData.split(',')[2];
+      clonedEnemy.battlerHue = Number(enemyData.split(',')[3]);
+      const actions = clonedEnemy.actions;
+      actions[0].skillId = Number(enemyData.split(',')[4]);
+      actions[1].skillId = Number(enemyData.split(',')[5]);
+      actions[2].skillId = Number(enemyData.split(',')[6]);
+      actions[3].skillId = Number(enemyData.split(',')[7]);
+      stateCount += 1;
+    }
+  }
+  glossaryText += `\n`;
+
+  let conditionStateCount = 0;
+  for (let enemyId = 21; enemyId <= 21 + stateCount; enemyId++) {
+    const enemy = dataEnemies[enemyId];
+    const conditionalStateList = valueEnemyAddState;
+    conditionalStateList.forEach(function(stateId) {
+      if (dataStates[stateId].meta['NameCondiAddState']) {
+        const nameConditionArray = dataStates[stateId].meta['NameCondiAddState'].split(',');
+        for (let i = 0; i <= nameConditionArray.length - 1; i++) {
+          if (enemy.name.match(nameConditionArray[i])) {
+            if (!glossaryText.match(dataStates[stateId].name)) {
+              glossaryText += `【\\C[14]${dataStates[stateId].name}\\C[0]】`;
+              conditionStateCount += 1;
+              if ((conditionStateCount % 3) === 0) {  
+                glossaryText += `\n`;
+              }            
+            }
+          }
+        }
+      }
+      if (dataStates[stateId].meta['GraphicNameCondiAddState']) {
+        const graphicConditionArray = dataStates[stateId].meta['GraphicNameCondiAddState'].split(',');
+        for (let i = 0; i <= graphicConditionArray.length - 1; i++) {
+          if (enemy.battlerName.match(graphicConditionArray[i])) {
+            if (!glossaryText.match(dataStates[stateId].name)) {
+              glossaryText += `【\\C[14]${dataStates[stateId].name}\\C[0]】`;
+              conditionStateCount += 1;
+              if ((conditionStateCount % 3) === 0) {  
+                glossaryText += `\n`;
+              }   
+            }
+          }
+        }
+      }
+    }, this);
+  }
+
+  gameVariables.value(variableId)[itemId] = glossaryText;
 };
 
 //図鑑のテキスト代入ボス分$gameVariables.value(305)[id]
