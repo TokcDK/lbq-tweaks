@@ -1677,7 +1677,6 @@ scene_Glossarytext1 = function(itemId, variableId) {
 
   const itemData = dataItems[itemId];
   const itemMeta = itemData.meta; // Cache itemData.meta
-  const enemyLevelArray = itemMeta['EnemyLV'].split(',');
   const enemyElementArray = itemMeta['EnemyElement'] ? itemMeta['EnemyElement'].split(',') : [0];
   const enemyLevelRange = itemMeta['EnemyLV'].split(',');
   const maxEnemyLevel = enemyLevelRange.reduce(function(a, b) {  
