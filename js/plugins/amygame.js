@@ -1980,13 +1980,14 @@ scene_Glossarytext2 = function(itemId, variableId) {
 scene_Glossarytext3 = function(itemId, variableId) {
   let specialActionCount = 0;
   const glossaryText = [];
+  const itemData = $dataItems[itemId];
 
   glossaryText.push(`\\C[16]＜ボス特殊行動一覧＞\\C[0]\n`);
 
   if ($gameVariables.value(305)[itemId] >= 1) {
     for (let actionIndex = 1; actionIndex <= 15; actionIndex++) {
-      if ($dataItems[itemId].meta['BossSpecialAction' + actionIndex]) {
-        const actionData = $dataItems[itemId].meta['BossSpecialAction' + actionIndex].split(',');
+      if (itemData.meta['BossSpecialAction' + actionIndex]) {
+        const actionData = itemData.meta['BossSpecialAction' + actionIndex].split(',');
         specialActionCount += 1;
 
         const triggerType = Number(actionData[0]);
