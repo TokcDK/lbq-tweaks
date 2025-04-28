@@ -1978,54 +1978,62 @@ scene_Glossarytext2 = function(itemId, variableId) {
 
 //図鑑のテキスト代入ボス特殊行動
 scene_Glossarytext3 = function(itemId, variableId) {
-  let specialActionCount = 0;
   const glossaryText = [];
   const itemData = $dataItems[itemId];
+  let specialActionCount = 0;
 
   glossaryText.push(`\\C[16]＜ボス特殊行動一覧＞\\C[0]\n`);
 
-  if ($gameVariables.value(305)[itemId] >= 1) {
-    for (let actionIndex = 1; actionIndex <= 15; actionIndex++) {
-      if (itemData.meta['BossSpecialAction' + actionIndex]) {
-        const actionData = itemData.meta['BossSpecialAction' + actionIndex].split(',');
-        specialActionCount += 1;
-
-        const triggerType = Number(actionData[0]);
-        const triggerValue = Number(actionData[1]);
-        const skillId = Number(actionData[2]);
-
-        switch (triggerType) {
-          case 0:
-            glossaryText.push(`<\\C[2]HP${triggerValue}%\\C[0]以下で発動>\n`);
-            break;
-          case 1:
-            glossaryText.push(`<\\C[2]MP${triggerValue}%\\C[0]以下で発動>\n`);
-            break;
-          case 2:
-            glossaryText.push(`<\\C[2]${triggerValue}%\\C[0]ターン毎に発動>\n`);
-            break;
-          case 3:
-            glossaryText.push(`<\\C[2]オーバードライブ\\C[0]時に発動>\n`);
-            break;
-          case 9:
-            glossaryText.push(`<\\C[2]HP${triggerValue}%\\C[0]以下で発動>\n`);
-            break;
-        }
-
-        glossaryText.push(`\\C[10]\x1bSIN[${skillId}]\\C[0]\n`);
-        glossaryText.push(`${$dataSkills[skillId].description}\n`);
-      }
-    }
-
-    if (specialActionCount === 0) {
-      glossaryText.push(`なし`);
-    }
-  } else {
+  // If boss hasn't been defeated yet, show placeholder text
+  if ($gameVariables.value(305)[itemId] < 1) {
     glossaryText.push(`情報なし。討伐後に情報更新。`);
+    $gameVariables.value(variableId)[itemId] = glossaryText.join('');
+    return;
+  }
+
+  // Process all possible special actions
+  for (let actionIndex = 1; actionIndex <= 15; actionIndex++) {
+    const metaKey = 'BossSpecialAction' + actionIndex;
+    if (!itemData.meta[metaKey]) continue;
+    
+    specialActionCount++;
+    const actionData = itemData.meta[metaKey].split(',');
+    const triggerType = Number(actionData[0]);
+    const triggerValue = Number(actionData[1]);
+    const skillId = Number(actionData[2]);
+
+    // Add trigger condition text
+    glossaryText.push(getTriggerText(triggerType, triggerValue));
+    
+    // Add skill information
+    glossaryText.push(`\\C[10]\x1bSIN[${skillId}]\\C[0]\n`);
+    glossaryText.push(`${$dataSkills[skillId].description}\n`);
+  }
+
+  // If no special actions found
+  if (specialActionCount === 0) {
+    glossaryText.push(`なし`);
   }
 
   $gameVariables.value(variableId)[itemId] = glossaryText.join('');
 };
+
+// Helper function to get trigger text based on type and value
+function getTriggerText(triggerType, triggerValue) {
+  switch (triggerType) {
+    case 0:
+    case 9:
+      return `<\\C[2]HP${triggerValue}%\\C[0]以下で発動>\n`;
+    case 1:
+      return `<\\C[2]MP${triggerValue}%\\C[0]以下で発動>\n`;
+    case 2:
+      return `<\\C[2]${triggerValue}%\\C[0]ターン毎に発動>\n`;
+    case 3:
+      return `<\\C[2]オーバードライブ\\C[0]時に発動>\n`;
+    default:
+      return `<\\C[2]特殊条件\\C[0]で発動>\n`;
+  }
+}
 
   //マップ情報を代入
 const jouhouMapResetVariableIds = [37, 81, 82, 197, 207, 222, 224, 226, 227, 232, 230, 235, 236, 240, 241, 251, 256, 260, 266, 329, 507, 508];
