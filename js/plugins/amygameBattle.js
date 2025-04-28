@@ -2388,7 +2388,7 @@ if(enemyId == 30 && $gameVariables.value(343) != 0){//ボスステート処理
     for (var j = 1; j <= 9; j++) {
       if(target.meta['BossDrop' + j]){
         arr2 = target.meta['BossDrop' + j].split(',');
-        valueItems = get_value_items_iwa(Number(arr2[0]));
+        valueItems = get_valueItems_iwa(Number(arr2[0]));
 
         if(Number(arr2[2]) >= Math.floor( Math.random() * 101)){
           $gameTroop.addDropItem(valueItems[Number(arr2[1])]);
@@ -3003,7 +3003,7 @@ const arr2 = $dataItems[itemId].meta['ItemBag'].split(',');
 const id2 = arr2[Math.floor(Math.random() * arr2.length)];
   for (let id3 = 0; id3 <= id2; id3++) {
     const id12 = itemTypeId[Math.floor(Math.random() * itemTypeId.length)];
-    valueItems = get_value_items_iwa(id12);
+    valueItems = get_valueItems_iwa(id12);
 
     if($dataItems[itemId].meta['HentaiBox']){
       valueItems = $dataItems;
