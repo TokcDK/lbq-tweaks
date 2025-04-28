@@ -508,17 +508,18 @@ Profession_basicReturn = function(actorId) {
   if($gameSwitches.value(29)) return; // Exit early if switch 29 is on
   
   const actor = $gameActors.actor(actorId);
-  const dataActor = $dataActors[actorId];
-  let defaultProfession = `${dataActor.meta['Profession']}`;
+  if (!actor) actor = $dataActors[actorId]; // extra resetup from database actor if saved game actor is not exists
+  //const actor = $dataActors[actorId]; // was set by default
+  let defaultProfession = `${actor.meta['Profession']}`;
   let newProfession = defaultProfession;
   
   // Check all possible profession alternatives (up to 9)
   for(let i = 1; i <= 9; i++) {
     const professionMetaKey = 'Profession' + i;
     
-    if (!dataActor.meta[professionMetaKey]) continue;
+    if (!actor.meta[professionMetaKey]) continue;
     
-    const professionData = dataActor.meta[professionMetaKey].split(',');
+    const professionData = actor.meta[professionMetaKey].split(',');
     const professionName = professionData[0];
     const switchId = Number(professionData[1]);
     const variableId = Number(professionData[2]);
