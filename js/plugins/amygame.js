@@ -1669,130 +1669,117 @@ for (var i = start; i <= end; i++) {
 }
 
 //図鑑のテキスト代入
-scene_Glossarytext1 = function(id,id2){
+scene_Glossarytext1 = function(id, id2) {
 // debug info: executed 27 times on save game loaded
 
-var arr1 = $dataItems[id].meta['EnemyLV'].split(',');
-if($dataItems[id].meta['EnemyElement']){
-  var arr14 = $dataItems[id].meta['EnemyElement'].split(',');
-} else {
-  var arr14 = [0];
-};
-var array = $dataItems[id].meta['EnemyLV'].split(',');
-var max = array.reduce(function(a,b){  
-  return Math.max(a,b);
+const arr1 = $dataItems[id].meta['EnemyLV'].split(',');
+let arr14 = $dataItems[id].meta['EnemyElement'] ? $dataItems[id].meta['EnemyElement'].split(',') : [0];
+const array = $dataItems[id].meta['EnemyLV'].split(',');
+const max = array.reduce(function(a, b) {  
+  return Math.max(a, b);
 });
-var min = array.reduce(function(a,b){  
-  return Math.min(a,b);
+const min = array.reduce(function(a, b) {  
+  return Math.min(a, b);
 });
-var value1 = 0;
-if($dataItems[id].meta['OnSwitch']){
-  var arr2 = $dataItems[id].meta['OnSwitch'].split(',');
-  for (var i = 0; i <= arr2.length-1; i++) {
-    if(Number(arr2[i]) == 207){
-      var value1 = 1;
-    };
-  };
-};
-if(value1 == 1){
-  var value = `\\C[16]＜ダンジョンマップ情報＞\\C[0]\n`;
-} else {
-  var value = `\\C[16]＜フィールドマップ情報＞\\C[0]\n`;
-};
+let value1 = 0;
+if ($dataItems[id].meta['OnSwitch']) {
+  const arr2 = $dataItems[id].meta['OnSwitch'].split(',');
+  for (let i = 0; i <= arr2.length - 1; i++) {
+    if (Number(arr2[i]) === 207) {
+      value1 = 1;
+    }
+  }
+}
+let value = value1 === 1 ? `\\C[16]＜ダンジョンマップ情報＞\\C[0]\n` : `\\C[16]＜フィールドマップ情報＞\\C[0]\n`;
 value += `${$dataItems[id].description}\n`;
 value += `\\C[16]エネミーLV：\\C[0]\\C[10]${min}\\C[0]～\\C[10]${max}\\C[0]　`;
-if(Number($dataItems[id].meta['EnemyElement']) == 0){
+if (Number($dataItems[id].meta['EnemyElement']) === 0) {
   value += `　　\\C[16]属性：\\C[0]？？？`;
 } else {
-  value += `　　\\C[16]属性：\\C[0]`
-  for (var i = 0; i <= arr14.length-1; i++) {
+  value += `　　\\C[16]属性：\\C[0]`;
+  for (let i = 0; i <= arr14.length - 1; i++) {
     value += `【\\C[13]${$dataStates[Number($dataItems[id].meta['EnemyElement'].split(',')[i])].name}\\C[0]】　`;
-  };
-};
-if($gameVariables.value(257)[id] >= 1){
+  }
+}
+if ($gameVariables.value(257)[id] >= 1) {
   value += `\\C[16]殲滅回数：\\C[0]\\C[10]${$gameVariables.value(257)[id]}\\C[0]　\n`;
 } else {
   value += `\n`;
-};
-if($dataItems[id].meta['firstAnnihilationItem']){
-  if($gameVariables.value(257)[id] >= 1){
-    var arr12 = $dataItems[id].meta['firstAnnihilationItem'].split(',');
-    if(Number(arr12[0]) == 0){var valueItems2 = $dataItems};
-    if(Number(arr12[0]) == 1){var valueItems2 = $dataWeapons};
-    if(Number(arr12[0]) == 2){var valueItems2 = $dataArmors};
+}
+if ($dataItems[id].meta['firstAnnihilationItem']) {
+  if ($gameVariables.value(257)[id] >= 1) {
+    const arr12 = $dataItems[id].meta['firstAnnihilationItem'].split(',');
+    const valueItems2 = Number(arr12[0]) === 0 ? $dataItems : Number(arr12[0]) === 1 ? $dataWeapons : $dataArmors;
     value += `\\C[16]初回殲滅報酬：\\C[0]\\C[10]${valueItems2[Number(arr12[1])].name}\\C[0]　\n`;
-  };
-};
-if($dataItems[id].meta['TchestOnly']){
-  if($gameVariables.value(212)[id] >= 1){
-    var arr12 = $dataItems[id].meta['TchestOnly'].split(',');
-    if(Number(arr12[3]) == 0){var valueItems2 = $dataItems};
-    if(Number(arr12[3]) == 1){var valueItems2 = $dataWeapons};
-    if(Number(arr12[3]) == 2){var valueItems2 = $dataArmors};
+  }
+}
+if ($dataItems[id].meta['TchestOnly']) {
+  if ($gameVariables.value(212)[id] >= 1) {
+    const arr12 = $dataItems[id].meta['TchestOnly'].split(',');
+    const valueItems2 = Number(arr12[3]) === 0 ? $dataItems : Number(arr12[3]) === 1 ? $dataWeapons : $dataArmors;
     value += `\\C[16]白箱：\\C[0]\\C[10]${valueItems2[Number(arr12[4])].name}\\C[0]　\n`;
-  };
-};
+  }
+}
 
-var list = [1,2,3,4,5,6,7,8,9,10];
+const list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 list.forEach(function(id5) {
-  if($dataItems[id].meta['UniqueMaterial' + id5]){
-    var arr12 = $dataItems[id].meta['UniqueMaterial' + id5].split(',');
+  if ($dataItems[id].meta['UniqueMaterial' + id5]) {
+    const arr12 = $dataItems[id].meta['UniqueMaterial' + id5].split(',');
     value += `\n`;
     value += `\\C[16]・希少採取素材\\C[0]`;
-    var j = 0;
-    if(arr12[0] >= 1){
+    let j = 0;
+    if (arr12[0] >= 1) {
       value += `【\\C[3]${$dataItems[Number(arr12[0])].name}\\C[0]】`;
       j += 1;
-    };
-    if((j %3) == 0){
+    }
+    if ((j % 3) === 0) {
       value += `\n`;
-    };
-  };
+    }
+  }
 }, this);
 value += `\n`;
 
 value += `\\C[16]・出現エネミー\\C[0]\n`;
-var k = 0;
-var start = 1;
-var end = 8;
-for (var i = start; i <= end; i++) {
-  if($dataItems[id].meta['PopEnemy' + i]){
+let k = 0;
+const start = 1;
+const end = 8;
+for (let i = start; i <= end; i++) {
+  if ($dataItems[id].meta['PopEnemy' + i]) {
     value += `【\\C[2]${$dataItems[id].meta['PopEnemy' + i].split(',')[1]}\\C[0]】`;
     k += 1;
-    if((i %2) == 0){
+    if ((i % 2) === 0) {
       value += `\n`;
-    };
-  };
-};
+    }
+  }
+}
 value += `\n`;
 
-var start = 1; 
-var end = 8; 
-for (var i = start; i <= end; i++) {
-  if($dataItems[id].meta['PopEnemy' + i]){
-    var value2 = $dataItems[id].meta['PopEnemy' + i].split(',')[0];
-    var arr1 = $dataEnemies[Number(value2)].meta['Passive State'].split(',');
-    for (var j = 0; j <= arr1.length-1; j++) {
-      if(value.match($dataStates[arr1[j]].name)){}else{
+for (let i = start; i <= end; i++) {
+  if ($dataItems[id].meta['PopEnemy' + i]) {
+    const value2 = $dataItems[id].meta['PopEnemy' + i].split(',')[0];
+    const arr1 = $dataEnemies[Number(value2)].meta['Passive State'].split(',');
+    for (let j = 0; j <= arr1.length - 1; j++) {
+      if (!value.match($dataStates[arr1[j]].name)) {
         value += `${$dataStates[Number(arr1[j])].description}\n`;
-}}}};
-if($dataItems[id].meta['EnemySpecialState']){
-  var arr1 = $dataItems[id].meta['EnemySpecialState'].split(',');
-  for (var i = 0; i <= arr1.length-1; i++) {
-    if(Number(arr1[i]) >= 1){
+      }
+    }
+  }
+}
+if ($dataItems[id].meta['EnemySpecialState']) {
+  const arr1 = $dataItems[id].meta['EnemySpecialState'].split(',');
+  for (let i = 0; i <= arr1.length - 1; i++) {
+    if (Number(arr1[i]) >= 1) {
       value += `${$dataStates[Number(arr1[i])].description}\n`;
-    };
-  };
-};
-var start = 1; 
-var end = 8; 
-var j = 0;
-for (var i = start; i <= end; i++) {
-  if($dataItems[id].meta['PopEnemy' + i]){
-    var value2 = $dataItems[id].meta['PopEnemy' + i];
+    }
+  }
+}
+let j = 0;
+for (let i = start; i <= end; i++) {
+  if ($dataItems[id].meta['PopEnemy' + i]) {
+    const value2 = $dataItems[id].meta['PopEnemy' + i];
     const obj1 = $dataEnemies[Number(value2.split(',')[0])];
-    $dataEnemies[i+20] = Object.assign({}, obj1);
-    var value3 = $dataEnemies[i+20];
+    $dataEnemies[i + 20] = Object.assign({}, obj1);
+    const value3 = $dataEnemies[i + 20];
     value3.name = value2.split(',')[1];
     value3.battlerName = value2.split(',')[2];
     value3.battlerHue = Number(value2.split(',')[3]);
@@ -1803,8 +1790,8 @@ for (var i = start; i <= end; i++) {
     j += 1;
   } else {
     const obj1 = $dataEnemies[18];
-    $dataEnemies[i+20] = Object.assign({}, obj1);
-    var value3 = $dataEnemies[i+20];
+    $dataEnemies[i + 20] = Object.assign({}, obj1);
+    const value3 = $dataEnemies[i + 20];
     value3.name = value2.split(',')[1];
     value3.battlerName = value2.split(',')[2];
     value3.battlerHue = Number(value2.split(',')[3]);
@@ -1813,39 +1800,45 @@ for (var i = start; i <= end; i++) {
     value3.actions[0].skillId = Number(value2.split(',')[6]);
     value3.actions[0].skillId = Number(value2.split(',')[7]);
     j += 1;
-  };
-};
+  }
+}
 value += `\n`;
 
-var value2 = 0;
-for (var id4 = 21; id4 <= 21+j; id4++) {
-  var enemy = $dataEnemies[id4];
-  var list = valueEnemyAddState;
+let value2 = 0;
+for (let id4 = 21; id4 <= 21 + j; id4++) {
+  const enemy = $dataEnemies[id4];
+  const list = valueEnemyAddState;
   list.forEach(function(id3) {
-    if($dataStates[id3].meta['NameCondiAddState']){
-      var arr1 = $dataStates[id3].meta['NameCondiAddState'].split(',');
-        for (var i = 0; i <= arr1.length-1; i++) {
-          if (enemy.name.match(arr1[i])) {
-            if(value.match($dataStates[id3].name)){}else{
-              value += `【\\C[14]${$dataStates[id3].name}\\C[0]】`;
-              value2 += 1;
-              if((value2 %3) == 0){  
-                value += `\n`;
-              };            
-    }}}};
-    if($dataStates[id3].meta['GraphicNameCondiAddState']){
-      var arr2 = $dataStates[id3].meta['GraphicNameCondiAddState'].split(',');
-        for (var i = 0; i <= arr2.length-1; i++) {
-          if (enemy.battlerName.match(arr2[i])) {
-            if(value.match($dataStates[id3].name)){}else{
-              value += `【\\C[14]${$dataStates[id3].name}\\C[0]】`;
-              value2 += 1;
-              if((value2 %3) == 0){  
-                value += `\n`;
-              };   
-    }}}};
+    if ($dataStates[id3].meta['NameCondiAddState']) {
+      const arr1 = $dataStates[id3].meta['NameCondiAddState'].split(',');
+      for (let i = 0; i <= arr1.length - 1; i++) {
+        if (enemy.name.match(arr1[i])) {
+          if (!value.match($dataStates[id3].name)) {
+            value += `【\\C[14]${$dataStates[id3].name}\\C[0]】`;
+            value2 += 1;
+            if ((value2 % 3) === 0) {  
+              value += `\n`;
+            }            
+          }
+        }
+      }
+    }
+    if ($dataStates[id3].meta['GraphicNameCondiAddState']) {
+      const arr2 = $dataStates[id3].meta['GraphicNameCondiAddState'].split(',');
+      for (let i = 0; i <= arr2.length - 1; i++) {
+        if (enemy.battlerName.match(arr2[i])) {
+          if (!value.match($dataStates[id3].name)) {
+            value += `【\\C[14]${$dataStates[id3].name}\\C[0]】`;
+            value2 += 1;
+            if ((value2 % 3) === 0) {  
+              value += `\n`;
+            }   
+          }
+        }
+      }
+    }
   }, this);
-};
+}
 
 $gameVariables.value(id2)[id] = value;
 
