@@ -18,7 +18,7 @@ quest_housyuukeisan = function (id1) {
   const itemData = $dataItems[id1];
   const id4 = itemData.iconIndex;
 
-  const set_Id2_id3(arr) => {
+  const set_Id2_id3 = (arr) => {
 	  id2 = Number(arr[1]);
 	  id3 = Number(arr[2]);
   }
