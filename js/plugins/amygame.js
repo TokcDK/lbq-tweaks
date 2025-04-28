@@ -1676,189 +1676,221 @@ scene_Glossarytext1 = function(itemId, variableId) {
   const dataEnemies = $dataEnemies;
 
   const itemData = dataItems[itemId];
-  const itemMeta = itemData.meta; // Cache itemData.meta
+  const itemMeta = itemData.meta;
+  
+  // Handle enemy element and level data
   const enemyElementArray = itemMeta['EnemyElement'] ? itemMeta['EnemyElement'].split(',') : [0];
-  const enemyLevelRange = itemMeta['EnemyLV'].split(',');
-  const maxEnemyLevel = enemyLevelRange.reduce(function(a, b) {  
-    return Math.max(a, b);
-  });
-  const minEnemyLevel = enemyLevelRange.reduce(function(a, b) {  
-    return Math.min(a, b);
-  });
+  const enemyLevelRange = itemMeta['EnemyLV'] ? itemMeta['EnemyLV'].split(',') : [0];
+  const maxEnemyLevel = Math.max(...enemyLevelRange);
+  const minEnemyLevel = Math.min(...enemyLevelRange);
+  
+  // Check if it's a dungeon map
   let isDungeonMap = 0;
   if (itemMeta['OnSwitch']) {
     const onSwitchArray = itemMeta['OnSwitch'].split(',');
-    for (let i = 0; i <= onSwitchArray.length - 1; i++) {
-      if (Number(onSwitchArray[i]) === 207) {
-        isDungeonMap = 1;
-      }
-    }
+    isDungeonMap = onSwitchArray.some(id => Number(id) === 207) ? 1 : 0;
   }
-  let glossaryText = isDungeonMap === 1 ? `\\C[16]＜ダンジョンマップ情報＞\\C[0]\n` : `\\C[16]＜フィールドマップ情報＞\\C[0]\n`;
+  
+  // Build header text
+  let glossaryText = isDungeonMap === 1 ? 
+    `\\C[16]＜ダンジョンマップ情報＞\\C[0]\n` : 
+    `\\C[16]＜フィールドマップ情報＞\\C[0]\n`;
+    
   glossaryText += `${itemData.description}\n`;
   glossaryText += `\\C[16]エネミーLV：\\C[0]\\C[10]${minEnemyLevel}\\C[0]～\\C[10]${maxEnemyLevel}\\C[0]　`;
+  
+  // Add element info
   if (Number(itemMeta['EnemyElement']) === 0) {
     glossaryText += `　　\\C[16]属性：\\C[0]？？？`;
   } else {
     glossaryText += `　　\\C[16]属性：\\C[0]`;
-    for (let i = 0; i <= enemyElementArray.length - 1; i++) {
-      const item = dataStates[Number(itemMeta['EnemyElement'].split(',')[i])].name;
+    enemyElementArray.forEach(elem => {
+      const item = dataStates[Number(elem)].name;
       glossaryText += `【\\C[13]${item}\\C[0]】　`;
-    }
+    });
   }
+  
+  // Add annihilation count
   if (gameVariables.value(257)[itemId] >= 1) {
-    const item = gameVariables.value(257)[itemId];
-    glossaryText += `\\C[16]殲滅回数：\\C[0]\\C[10]${item}\\C[0]　\n`;
+    glossaryText += `\\C[16]殲滅回数：\\C[0]\\C[10]${gameVariables.value(257)[itemId]}\\C[0]　\n`;
   } else {
     glossaryText += `\n`;
   }
-  if (itemMeta['firstAnnihilationItem']) {
-    if (gameVariables.value(257)[itemId] >= 1) {
-      const firstAnnihilationItemArray = itemMeta['firstAnnihilationItem'].split(',');
-      const rewardItems = Number(firstAnnihilationItemArray[0]) === 0 ? dataItems : Number(firstAnnihilationItemArray[0]) === 1 ? $dataWeapons : $dataArmors;
-      const item = rewardItems[Number(firstAnnihilationItemArray[1])].name;
-      glossaryText += `\\C[16]初回殲滅報酬：\\C[0]\\C[10]${item}\\C[0]　\n`;
-    }
+  
+  // Add first annihilation reward
+  if (itemMeta['firstAnnihilationItem'] && gameVariables.value(257)[itemId] >= 1) {
+    const firstAnnihilationItemArray = itemMeta['firstAnnihilationItem'].split(',');
+    const itemType = Number(firstAnnihilationItemArray[0]);
+    const rewardItems = itemType === 0 ? dataItems : itemType === 1 ? $dataWeapons : $dataArmors;
+    const item = rewardItems[Number(firstAnnihilationItemArray[1])].name;
+    glossaryText += `\\C[16]初回殲滅報酬：\\C[0]\\C[10]${item}\\C[0]　\n`;
   }
-  if (itemMeta['TchestOnly']) {
-    if (gameVariables.value(212)[itemId] >= 1) {
-      const treasureChestArray = itemMeta['TchestOnly'].split(',');
-      const treasureItems = Number(treasureChestArray[3]) === 0 ? dataItems : Number(treasureChestArray[3]) === 1 ? $dataWeapons : $dataArmors;
-      const item = treasureItems[Number(treasureChestArray[4])].name;
-      glossaryText += `\\C[16]白箱：\\C[0]\\C[10]${item}\\C[0]　\n`;
-    }
+  
+  // Add treasure chest info
+  if (itemMeta['TchestOnly'] && gameVariables.value(212)[itemId] >= 1) {
+    const treasureChestArray = itemMeta['TchestOnly'].split(',');
+    const itemType = Number(treasureChestArray[3]);
+    const treasureItems = itemType === 0 ? dataItems : itemType === 1 ? $dataWeapons : $dataArmors;
+    const item = treasureItems[Number(treasureChestArray[4])].name;
+    glossaryText += `\\C[16]白箱：\\C[0]\\C[10]${item}\\C[0]　\n`;
   }
 
-  const uniqueMaterialList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-  uniqueMaterialList.forEach(function(materialIndex) {
-    if (itemMeta['UniqueMaterial' + materialIndex]) {
-      const uniqueMaterialArray = itemMeta['UniqueMaterial' + materialIndex].split(',');
-      glossaryText += `\n`;
-      glossaryText += `\\C[16]・希少採取素材\\C[0]`;
-      let materialCount = 0;
-      if (uniqueMaterialArray[0] >= 1) {
-        const item = dataItems[Number(uniqueMaterialArray[0])].name;
-        glossaryText += `【\\C[3]${item}\\C[0]】`;
-        materialCount += 1;
-      }
-      if ((materialCount % 3) === 0) {
-        glossaryText += `\n`;
-      }
-    }
-  }, this);
-  glossaryText += `\n`;
+  // Add unique materials
+  glossaryText += addUniqueMaterials(itemMeta, dataItems);
 
+  // Add enemy information
   glossaryText += `\\C[16]・出現エネミー\\C[0]\n`;
   let enemyCount = 0;
-  const enemyStartIndex = 1;
-  const enemyEndIndex = 8;
-  for (let i = enemyStartIndex; i <= enemyEndIndex; i++) {
-    if (itemMeta['PopEnemy' + i]) {
-      glossaryText += `【\\C[2]${itemMeta['PopEnemy' + i].split(',')[1]}\\C[0]】`;
-      enemyCount += 1;
-      if ((i % 2) === 0) {
-        glossaryText += `\n`;
-      }
+  const enemyPopArray = [];
+  
+  // Collect enemy info
+  for (let i = 1; i <= 8; i++) {
+    if (!itemMeta['PopEnemy' + i]) continue;
+    
+    const enemyInfo = itemMeta['PopEnemy' + i].split(',');
+    enemyPopArray.push(enemyInfo);
+    
+    glossaryText += `【\\C[2]${enemyInfo[1]}\\C[0]】`;
+    enemyCount += 1;
+    if ((i % 2) === 0) {
+      glossaryText += `\n`;
     }
   }
   glossaryText += `\n`;
 
-  for (let i = enemyStartIndex; i <= enemyEndIndex; i++) {
-    if (itemMeta['PopEnemy' + i]) {
-      const enemyData = itemMeta['PopEnemy' + i].split(',')[0];
-      const passiveStateArray = dataEnemies[Number(enemyData)].meta['Passive State'].split(',');
-      for (let j = 0; j <= passiveStateArray.length - 1; j++) {
-        const state = dataStates[Number(passiveStateArray[j])].name;
-        if (!glossaryText.match(state.name)) {
-          glossaryText += `${state.description}\n`;
-        }
-      }
-    }
-  }
-  if (itemMeta['EnemySpecialState']) {
-    const specialStateArray = itemMeta['EnemySpecialState'].split(',');
-    for (let i = 0; i <= specialStateArray.length - 1; i++) {
-      const stateId = Number(specialStateArray[i]);
-      if (stateId >= 1) {
-        glossaryText += `${dataStates[stateId].description}\n`;
-      }
-    }
-  }
-  let stateCount = 0;
-  for (let i = enemyStartIndex; i <= enemyEndIndex; i++) {
-    if (itemMeta['PopEnemy' + i]) {
-      const enemyData = itemMeta['PopEnemy' + i];
-      const enemySkills = enemyData.split(',');
-      const baseEnemy = dataEnemies[Number(enemySkills[0])];
-      dataEnemies[i + 20] = Object.assign({}, baseEnemy);
-      const clonedEnemy = dataEnemies[i + 20];
-      clonedEnemy.name = enemySkills[1];
-      clonedEnemy.battlerName = enemySkills[2];
-      clonedEnemy.battlerHue = Number(enemySkills[3]);
-      const actions = clonedEnemy.actions;
-      actions[0].skillId = Number(enemySkills[4]);
-      actions[1].skillId = Number(enemySkills[5]);
-      actions[2].skillId = Number(enemySkills[6]);
-      actions[3].skillId = Number(enemySkills[7]);
-      stateCount += 1;
-    } else {
-      const baseEnemy = dataEnemies[18];
-      dataEnemies[i + 20] = Object.assign({}, baseEnemy);
-      const clonedEnemy = dataEnemies[i + 20];
-      const enemySkills = enemyData.split(',');
-      clonedEnemy.name = enemySkills[1];
-      clonedEnemy.battlerName = enemySkills[2];
-      clonedEnemy.battlerHue = Number(enemySkills[3]);
-      const actions = clonedEnemy.actions;
-      actions[0].skillId = Number(enemySkills[4]);
-      actions[1].skillId = Number(enemySkills[5]);
-      actions[2].skillId = Number(enemySkills[6]);
-      actions[3].skillId = Number(enemySkills[7]);
-      stateCount += 1;
-    }
-  }
-  glossaryText += `\n`;
+  // Process enemy data
+  glossaryText += processEnemyData(enemyPopArray, dataEnemies, dataStates, itemMeta);
 
-  let conditionStateCount = 0;
-  for (let enemyId = 21; enemyId <= 21 + stateCount; enemyId++) {
-    const enemy = dataEnemies[enemyId];
-    const conditionalStateList = valueEnemyAddState;
-    conditionalStateList.forEach(function(stateId) {
-      if (dataStates[stateId].meta['NameCondiAddState']) {
-        const nameConditionArray = dataStates[stateId].meta['NameCondiAddState'].split(',');
-        for (let i = 0; i <= nameConditionArray.length - 1; i++) {
-          if (enemy.name.match(nameConditionArray[i])) {
-            const stateName = dataStates[stateId].name;
-            if (!glossaryText.match(stateName)) {
-              glossaryText += `【\\C[14]${stateName}\\C[0]】`;
-              conditionStateCount += 1;
-              if ((conditionStateCount % 3) === 0) {  
-                glossaryText += `\n`;
-              }            
-            }
-          }
-        }
-      }
-      if (dataStates[stateId].meta['GraphicNameCondiAddState']) {
-        const graphicConditionArray = dataStates[stateId].meta['GraphicNameCondiAddState'].split(',');
-        for (let i = 0; i <= graphicConditionArray.length - 1; i++) {
-          if (enemy.battlerName.match(graphicConditionArray[i])) {
-            const stateName = dataStates[stateId].name;
-            if (!glossaryText.match(stateName)) {
-              glossaryText += `【\\C[14]${stateName}\\C[0]】`;
-              conditionStateCount += 1;
-              if ((conditionStateCount % 3) === 0) {  
-                glossaryText += `\n`;
-              }   
-            }
-          }
-        }
-      }
-    }, this);
-  }
-
+  // Store result in variable
   gameVariables.value(variableId)[itemId] = glossaryText;
 };
+
+// Helper function to process unique materials
+function addUniqueMaterials(itemMeta, dataItems) {
+  let materialText = '';
+  let materialCount = 0;
+  
+  for (let i = 1; i <= 10; i++) {
+    if (!itemMeta['UniqueMaterial' + i]) continue;
+    
+    if (materialCount === 0) {
+      materialText += `\n\\C[16]・希少採取素材\\C[0]`;
+    }
+    
+    const uniqueMaterialArray = itemMeta['UniqueMaterial' + i].split(',');
+    if (uniqueMaterialArray[0] >= 1) {
+      const item = dataItems[Number(uniqueMaterialArray[0])].name;
+      materialText += `【\\C[3]${item}\\C[0]】`;
+      materialCount += 1;
+      
+      if ((materialCount % 3) === 0) {
+        materialText += `\n`;
+      }
+    }
+  }
+  
+  return materialText + `\n`;
+}
+
+// Helper function to process enemy data
+function processEnemyData(enemyPopArray, dataEnemies, dataStates, itemMeta) {
+  let processedText = '';
+  let stateCount = 0;
+  const processedStateNames = new Set();
+  
+  // Clone enemies and extract state info
+  enemyPopArray.forEach((enemyInfo, index) => {
+    const enemyId = Number(enemyInfo[0]);
+    const baseEnemy = dataEnemies[enemyId];
+    
+    // Clone enemy for processing
+    dataEnemies[index + 21] = Object.assign({}, baseEnemy);
+    const clonedEnemy = dataEnemies[index + 21];
+    clonedEnemy.name = enemyInfo[1];
+    clonedEnemy.battlerName = enemyInfo[2];
+    clonedEnemy.battlerHue = Number(enemyInfo[3]);
+    
+    // Set skills
+    const actions = clonedEnemy.actions;
+    actions[0].skillId = Number(enemyInfo[4]);
+    actions[1].skillId = Number(enemyInfo[5]);
+    actions[2].skillId = Number(enemyInfo[6]);
+    actions[3].skillId = Number(enemyInfo[7]);
+    
+    // Process passive states
+    if (baseEnemy.meta['Passive State']) {
+      const passiveStateArray = baseEnemy.meta['Passive State'].split(',');
+      passiveStateArray.forEach(stateId => {
+        const stateIdNum = Number(stateId);
+        const state = dataStates[stateIdNum];
+        if (!processedStateNames.has(state.name)) {
+          processedText += `${state.description}\n`;
+          processedStateNames.add(state.name);
+        }
+      });
+    }
+    
+    stateCount += 1;
+  });
+  
+  // Process enemy special states
+  if (itemMeta['EnemySpecialState']) {
+    const specialStateArray = itemMeta['EnemySpecialState'].split(',');
+    specialStateArray.forEach(stateId => {
+      const stateIdNum = Number(stateId);
+      if (stateIdNum >= 1) {
+        processedText += `${dataStates[stateIdNum].description}\n`;
+      }
+    });
+  }
+  
+  // Process conditional states
+  processedText += `\n`;
+  let conditionStateCount = 0;
+  
+  for (let enemyId = 21; enemyId <= 21 + stateCount; enemyId++) {
+    const enemy = dataEnemies[enemyId];
+    if (!enemy) continue;
+    
+    valueEnemyAddState.forEach(stateId => {
+      const state = dataStates[stateId];
+      
+      // Check name-based conditions
+      if (state.meta['NameCondiAddState']) {
+        const nameConditions = state.meta['NameCondiAddState'].split(',');
+        const nameMatch = nameConditions.some(cond => enemy.name.match(cond));
+        
+        if (nameMatch && !processedStateNames.has(state.name)) {
+          processedText += `【\\C[14]${state.name}\\C[0]】`;
+          processedStateNames.add(state.name);
+          conditionStateCount += 1;
+          
+          if ((conditionStateCount % 3) === 0) {
+            processedText += `\n`;
+          }
+        }
+      }
+      
+      // Check graphic-based conditions
+      if (state.meta['GraphicNameCondiAddState']) {
+        const graphicConditions = state.meta['GraphicNameCondiAddState'].split(',');
+        const graphicMatch = graphicConditions.some(cond => enemy.battlerName.match(cond));
+        
+        if (graphicMatch && !processedStateNames.has(state.name)) {
+          processedText += `【\\C[14]${state.name}\\C[0]】`;
+          processedStateNames.add(state.name);
+          conditionStateCount += 1;
+          
+          if ((conditionStateCount % 3) === 0) {
+            processedText += `\n`;
+          }
+        }
+      }
+    });
+  }
+  
+  return processedText;
+}
 
 //図鑑のテキスト代入ボス分$gameVariables.value(305)[id]
 scene_Glossarytext2 = function(id,id2){
