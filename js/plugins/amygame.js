@@ -1785,22 +1785,24 @@ for (let i = enemyStartIndex; i <= enemyEndIndex; i++) {
     clonedEnemy.name = enemyData.split(',')[1];
     clonedEnemy.battlerName = enemyData.split(',')[2];
     clonedEnemy.battlerHue = Number(enemyData.split(',')[3]);
-    clonedEnemy.actions[0].skillId = Number(enemyData.split(',')[4]);
-    clonedEnemy.actions[0].skillId = Number(enemyData.split(',')[5]);
-    clonedEnemy.actions[0].skillId = Number(enemyData.split(',')[6]);
-    clonedEnemy.actions[0].skillId = Number(enemyData.split(',')[7]);
+    const actions = clonedEnemy.actions;
+    actions[0].skillId = Number(enemyData.split(',')[4]);
+    actions[1].skillId = Number(enemyData.split(',')[5]);
+    actions[2].skillId = Number(enemyData.split(',')[6]);
+    actions[3].skillId = Number(enemyData.split(',')[7]);
     stateCount += 1;
-  } else {
+    } else {
     const baseEnemy = $dataEnemies[18];
     $dataEnemies[i + 20] = Object.assign({}, baseEnemy);
     const clonedEnemy = $dataEnemies[i + 20];
     clonedEnemy.name = enemyData.split(',')[1];
     clonedEnemy.battlerName = enemyData.split(',')[2];
     clonedEnemy.battlerHue = Number(enemyData.split(',')[3]);
-    clonedEnemy.actions[0].skillId = Number(enemyData.split(',')[4]);
-    clonedEnemy.actions[0].skillId = Number(enemyData.split(',')[5]);
-    clonedEnemy.actions[0].skillId = Number(enemyData.split(',')[6]);
-    clonedEnemy.actions[0].skillId = Number(enemyData.split(',')[7]);
+    const actions = clonedEnemy.actions;
+    actions[0].skillId = Number(enemyData.split(',')[4]);
+    actions[1].skillId = Number(enemyData.split(',')[5]);
+    actions[2].skillId = Number(enemyData.split(',')[6]);
+    actions[3].skillId = Number(enemyData.split(',')[7]);
     stateCount += 1;
   }
 }
