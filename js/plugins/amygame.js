@@ -2303,7 +2303,7 @@ setupUniqueMaterials = function(mapInfo, gameVariables) {
   // Initialize unique material slots array
   gameVariables.setValue(259, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
   
-  const mapInfoMeta = mapInfoMeta;
+  const mapInfoMeta = mapInfo.meta;
   // Process unique materials and backgrounds
   for (let idx = 1; idx <= 9; idx++) {
     // Preload background images
