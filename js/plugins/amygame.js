@@ -2016,18 +2016,19 @@ jouhou_map = function() {
 
 processMapConditionalSwitches = function(dataMap, gameSwitches, gameVariables, conditionalMapSwitches) {
   let foundMapSwitch = 0;
+  const dataMapMeta = dataMap.meta;
   
   // Check variable-based conditional switches
   for (let i = 9; i > 0; i--) {
     const varKey = 'ChangeMapVal' + i;
     const switchKey = 'MapSwiCVal' + i;
     
-    if (!dataMap.meta[varKey] || !dataMap.meta[switchKey]) continue;
+    if (!dataMapMeta[varKey] || !dataMapMeta[switchKey]) continue;
     
-    const [varId, varValue] = dataMap.meta[varKey].split(',').map(Number);
+    const [varId, varValue] = dataMapMeta[varKey].split(',').map(Number);
     if (gameVariables.value(varId) < varValue) continue;
     
-    mapActivateConditionalSwitches(dataMap.meta[switchKey], gameSwitches, conditionalMapSwitches);
+    mapActivateConditionalSwitches(dataMapMeta[switchKey], gameSwitches, conditionalMapSwitches);
     foundMapSwitch = 1;
     break;
   }
@@ -2038,12 +2039,12 @@ processMapConditionalSwitches = function(dataMap, gameSwitches, gameVariables, c
       const switchCondKey = 'ChangeMapSwi' + i;
       const targetSwitchKey = 'MapSwiCSwi' + i;
       
-      if (!dataMap.meta[switchCondKey] || !dataMap.meta[targetSwitchKey]) continue;
+      if (!dataMapMeta[switchCondKey] || !dataMapMeta[targetSwitchKey]) continue;
       
-      const condSwitchId = Number(dataMap.meta[switchCondKey]);
+      const condSwitchId = Number(dataMapMeta[switchCondKey]);
       if (!gameSwitches.value(condSwitchId)) continue;
       
-      mapActivateConditionalSwitches(dataMap.meta[targetSwitchKey], gameSwitches, conditionalMapSwitches);
+      mapActivateConditionalSwitches(dataMapMeta[targetSwitchKey], gameSwitches, conditionalMapSwitches);
       foundMapSwitch = 1;
       break;
     }
@@ -2067,7 +2068,7 @@ mapActivateConditionalSwitches = function(switchIdString, gameSwitches, conditio
 };
 
 extractMapMetadata = function(dataMap) {
-  const meta = {
+  const mapMeta = {
     outInFloorType: 0,
     outInFloorValue: 0,
     homeType: 0,
@@ -2076,18 +2077,20 @@ extractMapMetadata = function(dataMap) {
     mapHeight: dataMap.height,
     mapWidth: dataMap.width
   };
+
+  const dataMapMeta = dataMap.meta;
   
-  if (dataMap.meta['OutIn_Froor']) {
-    const [type, value] = dataMap.meta['OutIn_Froor'].split(',').map(Number);
-    meta.outInFloorType = type;
-    meta.outInFloorValue = value;
+  if (dataMapMeta['OutIn_Froor']) {
+    const [type, value] = dataMapMeta['OutIn_Froor'].split(',').map(Number);
+    mapMeta.outInFloorType = type;
+    mapMeta.outInFloorValue = value;
   }
   
-  if (dataMap.meta['NPC']) meta.npcType = Number(dataMap.meta['NPC']);
-  if (dataMap.meta['Home']) meta.homeType = Number(dataMap.meta['Home']);
-  if (dataMap.meta['Animal']) meta.animalType = Number(dataMap.meta['Animal']);
+  if (dataMapMeta['NPC']) mapMeta.npcType = Number(dataMapMeta['NPC']);
+  if (dataMapMeta['Home']) mapMeta.homeType = Number(dataMapMeta['Home']);
+  if (dataMapMeta['Animal']) mapMeta.animalType = Number(dataMapMeta['Animal']);
   
-  return meta;
+  return mapMeta;
 };
 
 setMapTypeSwitches = function(mapMeta, gameSwitches, gameVariables) {
@@ -2121,8 +2124,9 @@ setMapTypeSwitches = function(mapMeta, gameSwitches, gameVariables) {
 
 setMapLocationInfo = function(gameSwitches, gameVariables) {
   // Check town locations
+  const dataWeapons = $dataWeapons;
   valueJouhouTown.forEach(weaponId => {
-    const switchId = Number($dataWeapons[weaponId].meta['MapSwitch']);
+    const switchId = Number(dataWeapons[weaponId].meta['MapSwitch']);
     if (gameSwitches.value(switchId)) {
       gameVariables.setValue(230, weaponId);
       gameSwitches.setValue(202, true);
@@ -2130,8 +2134,9 @@ setMapLocationInfo = function(gameSwitches, gameVariables) {
   });
   
   // Check battle map locations
+  const dataItems = $dataItems;
   valueJouhouBattleMap.forEach(itemId => {
-    const switchId = Number($dataItems[itemId].meta['MapSwitch']);
+    const switchId = Number(dataItems[itemId].meta['MapSwitch']);
     if (gameSwitches.value(switchId)) {
       gameVariables.setValue(240, itemId);
       gameSwitches.setValue(201, true);
@@ -2190,13 +2195,16 @@ mapPlayStartSoundEffect = function(mapInfo, gameSwitches) {
 };
 
 setupMapEnemyVariables = function(mapInfo, gameVariables) {
+  // Cache map meta data
+  const mapInfoMeta = mapInfo.meta;
+  
   // Initialize special state array
   gameVariables.setValue(350, []);
   const specialStates = gameVariables.value(350);
   
   // Add enemy special states if available
-  if (mapInfo.meta['EnemySpecialState']) {
-    const stateIds = mapInfo.meta['EnemySpecialState'].split(',').map(Number);
+  if (mapInfoMeta['EnemySpecialState']) {
+    const stateIds = mapInfoMeta['EnemySpecialState'].split(',').map(Number);
     stateIds.forEach(stateId => {
       if (stateId >= 1) {
         specialStates.push(stateId);
@@ -2205,57 +2213,58 @@ setupMapEnemyVariables = function(mapInfo, gameVariables) {
   }
   
   // Set various map-specific variables
-  if (mapInfo.meta['getWaterItem']) {
-    gameVariables.setValue(266, Number(mapInfo.meta['getWaterItem']));
+  if (mapInfoMeta['getWaterItem']) {
+    gameVariables.setValue(266, Number(mapInfoMeta['getWaterItem']));
   }
   
-  if (mapInfo.meta['weatherSetP']) {
-    gameVariables.setValue(256, Number(mapInfo.meta['weatherSetP']));
+  if (mapInfoMeta['weatherSetP']) {
+    gameVariables.setValue(256, Number(mapInfoMeta['weatherSetP']));
   }
   
   const weatherKey = 'weatherSetPN';
-  if (mapInfo.meta[weatherKey]) {
-    gameVariables.setValue(251, Number(mapInfo.meta[weatherKey]));
+  if (mapInfoMeta[weatherKey]) {
+    gameVariables.setValue(251, Number(mapInfoMeta[weatherKey]));
   } else if ($dataMap.meta[weatherKey]) {
     gameVariables.setValue(251, Number($dataMap.meta[weatherKey]));
   }
   
   // Set mob related variables
-  if (mapInfo.meta['MapCount']) {
-    gameVariables.setValue(217, Number(mapInfo.meta['MapCount']));
+  if (mapInfoMeta['MapCount']) {
+    gameVariables.setValue(217, Number(mapInfoMeta['MapCount']));
   }
   
-  if (mapInfo.meta['MapEnemyMaxPop']) {
-    gameVariables.setValue(334, Number(mapInfo.meta['MapEnemyMaxPop']));
+  if (mapInfoMeta['MapEnemyMaxPop']) {
+    gameVariables.setValue(334, Number(mapInfoMeta['MapEnemyMaxPop']));
   }
   
-  if (mapInfo.meta['MapEnemyPopC']) {
-    gameVariables.setValue(224, Number(mapInfo.meta['MapEnemyPopC']));
+  if (mapInfoMeta['MapEnemyPopC']) {
+    gameVariables.setValue(224, Number(mapInfoMeta['MapEnemyPopC']));
   }
   
-  if (mapInfo.meta['MapEnemyPopCH']) {
-    gameVariables.setValue(227, Number(mapInfo.meta['MapEnemyPopCH']));
+  if (mapInfoMeta['MapEnemyPopCH']) {
+    gameVariables.setValue(227, Number(mapInfoMeta['MapEnemyPopCH']));
   }
   
-  if (mapInfo.meta['HEnemyPopSwi']) {
-    gameVariables.setValue(236, Number(mapInfo.meta['HEnemyPopSwi']));
+  if (mapInfoMeta['HEnemyPopSwi']) {
+    gameVariables.setValue(236, Number(mapInfoMeta['HEnemyPopSwi']));
   }
   
-  if (mapInfo.meta['DeadBody']) {
-    gameVariables.setValue(260, Number(mapInfo.meta['DeadBody']));
+  if (mapInfoMeta['DeadBody']) {
+    gameVariables.setValue(260, Number(mapInfoMeta['DeadBody']));
   }
   
   // Set enemy level variable
-  if (mapInfo.meta['EnemyLV']) {
-    gameVariables.setValue(270, Number(mapInfo.meta['EnemyLV'].split(',')[0]));
+  if (mapInfoMeta['EnemyLV']) {
+    gameVariables.setValue(270, Number(mapInfoMeta['EnemyLV'].split(',')[0]));
   }
   
   // Set switches from OnSwitch metadata
-  if (mapInfo.meta['OnSwitch']) {
-    const switchIds = mapInfo.meta['OnSwitch'].split(',').map(Number);
+  const gameSwitches = $gameSwitches;
+  if (mapInfoMeta['OnSwitch']) {
+    const switchIds = mapInfoMeta['OnSwitch'].split(',').map(Number);
     switchIds.forEach(switchId => {
       if (switchId >= 1) {
-        $gameSwitches.setValue(switchId, true);
+        gameSwitches.setValue(switchId, true);
       }
     });
   }
