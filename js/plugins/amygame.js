@@ -1979,8 +1979,10 @@ scene_Glossarytext2 = function(itemId, variableId) {
 //図鑑のテキスト代入ボス特殊行動
 scene_Glossarytext3 = function(itemId, variableId) {
   let specialActionCount = 0;
-  let glossaryText = `\\C[16]＜ボス特殊行動一覧＞\\C[0]\n`;
-  
+  const glossaryText = [];
+
+  glossaryText.push(`\\C[16]＜ボス特殊行動一覧＞\\C[0]\n`);
+
   if ($gameVariables.value(305)[itemId] >= 1) {
     for (let actionIndex = 1; actionIndex <= 15; actionIndex++) {
       if ($dataItems[itemId].meta['BossSpecialAction' + actionIndex]) {
@@ -1992,30 +1994,30 @@ scene_Glossarytext3 = function(itemId, variableId) {
         const skillId = Number(actionData[2]);
 
         if (triggerType === 0) {
-          glossaryText += `<\\C[2]HP${triggerValue}%\\C[0]以下で発動>\n`;
+          glossaryText.push(`<\\C[2]HP${triggerValue}%\\C[0]以下で発動>\n`);
         } else if (triggerType === 1) {
-          glossaryText += `<\\C[2]MP${triggerValue}%\\C[0]以下で発動>\n`;
+          glossaryText.push(`<\\C[2]MP${triggerValue}%\\C[0]以下で発動>\n`);
         } else if (triggerType === 2) {
-          glossaryText += `<\\C[2]${triggerValue}%\\C[0]ターン毎に発動>\n`;
+          glossaryText.push(`<\\C[2]${triggerValue}%\\C[0]ターン毎に発動>\n`);
         } else if (triggerType === 3) {
-          glossaryText += `<\\C[2]オーバードライブ\\C[0]時に発動>\n`;
+          glossaryText.push(`<\\C[2]オーバードライブ\\C[0]時に発動>\n`);
         } else if (triggerType === 9) {
-          glossaryText += `<\\C[2]HP${triggerValue}%\\C[0]以下で発動>\n`;
+          glossaryText.push(`<\\C[2]HP${triggerValue}%\\C[0]以下で発動>\n`);
         }
 
-        glossaryText += `\\C[10]\x1bSIN[${skillId}]\\C[0]\n`;
-        glossaryText += `${$dataSkills[skillId].description}\n`;
+        glossaryText.push(`\\C[10]\x1bSIN[${skillId}]\\C[0]\n`);
+        glossaryText.push(`${$dataSkills[skillId].description}\n`);
       }
     }
 
     if (specialActionCount === 0) {
-      glossaryText += `なし`;
+      glossaryText.push(`なし`);
     }
   } else {
-    glossaryText += `情報なし。討伐後に情報更新。`;
+    glossaryText.push(`情報なし。討伐後に情報更新。`);
   }
 
-  $gameVariables.value(variableId)[itemId] = glossaryText;
+  $gameVariables.value(variableId)[itemId] = glossaryText.join('');
 };
 
   //マップ情報を代入
