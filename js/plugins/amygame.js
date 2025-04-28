@@ -1890,62 +1890,90 @@ function Glossarytext1ProcessEnemyData(enemyPopArray, dataEnemies, dataStates, i
 }
 
 //図鑑のテキスト代入ボス分$gameVariables.value(305)[id]
-scene_Glossarytext2 = function(id,id2){
+scene_Glossarytext2 = function(itemId, variableId) {
+  const itemData = $dataItems[itemId];
+  const glossaryText = [`\\C[16]＜ボス情報＞\\C[0]\n`];
 
-var value = `\\C[16]＜ボス情報＞\\C[0]\n`;
-if($dataItems[id].meta['BossEnemy']){
-  var arr = $dataItems[id].meta['BossEnemy'].split(',');
-  if($gameVariables.value(305)[id] >= 1){
-    value += `\\C[16]名前：\\C[0]${arr[1]}　ＬＶ：${Number($dataItems[id].meta['BossLV'])}　`;
-    if($gameVariables.value(305)[id] >= 1){
-      value += `\\C[16]討伐回数：\\C[0]\\C[10]${$gameVariables.value(305)[id]}\\C[0] \n`;
+  if (itemData.meta['BossEnemy']) {
+    const bossInfo = itemData.meta['BossEnemy'].split(',');
+    const bossName = bossInfo[1];
+    const bossDefeated = $gameVariables.value(305)[itemId] >= 1;
+
+    if (bossDefeated) {
+      const bossLevel = Number(itemData.meta['BossLV']);
+      const defeatedCount = $gameVariables.value(305)[itemId];
+
+      glossaryText.push(`\\C[16]名前：\\C[0]${bossName}　ＬＶ：${bossLevel}　`);
+      glossaryText.push(`\\C[16]討伐回数：\\C[0]\\C[10]${defeatedCount}\\C[0] \n`);
+
+      const normalAttackId = Number(bossInfo[4]);
+      const normalAttackSkill = $dataSkills[normalAttackId];
+      glossaryText.push(`\\C[16]通常攻撃\\C[0]\\I[${normalAttackSkill.iconIndex}]${normalAttackSkill.name} `);
+
+      if (itemData.meta['BossAddAttack']) {
+        const additionalAttacks = itemData.meta['BossAddAttack'].split(',');
+
+        for (let i = 0; i < additionalAttacks.length; i++) {
+          const skillId = Number(additionalAttacks[i]);
+          const attackSkill = $dataSkills[skillId];
+          glossaryText.push(`\\I[${attackSkill.iconIndex}]${attackSkill.name} `);
+        }
+      }
+
+      glossaryText.push(`\n`);
+
+      const abilityId = Number(bossInfo[5]);
+      const abilitySkill = $dataSkills[abilityId];
+      glossaryText.push(`\\C[16]アビリティ\\C[0]\\I[${abilitySkill.iconIndex}]${abilitySkill.name}\n`);
+
+      let abilityDescription = abilitySkill.description;
+      abilityDescription = abilityDescription.replace("[\\C[2]戦闘中1回\\C[0]]", "");
+      glossaryText.push(`${abilityDescription}\n`);
+
+      if (itemData.meta['BossAddSkill']) {
+        const additionalSkills = itemData.meta['BossAddSkill'].split(',');
+
+        for (let i = 0; i < additionalSkills.length; i++) {
+          const skillId = Number(additionalSkills[i]);
+          const skill = $dataSkills[skillId];
+          glossaryText.push(`\\I[${skill.iconIndex}]${skill.name}\n`);
+        }
+      }
+
+      const ultimateId = Number(bossInfo[6]);
+      const ultimateSkill = $dataSkills[ultimateId];
+      glossaryText.push(`\\C[16]奥義\\C[0]\\I[${ultimateSkill.iconIndex}]${ultimateSkill.name}\n`);
+
+      let ultimateDescription = ultimateSkill.description;
+      ultimateDescription = ultimateDescription.replace("[\\C[2]戦闘中1回\\C[0]]", "");
+      glossaryText.push(`${ultimateDescription}\n`);
+
+      if (itemData.meta['BossStateInformation']) {
+        glossaryText.push(`\n`);
+        const stateInfos = itemData.meta['BossStateInformation'].split(',');
+
+        const primaryStateId = Number(stateInfos[0]);
+        if (!isNaN(primaryStateId)) {
+          glossaryText.push(`${$dataStates[primaryStateId].description}\n`);
+        }
+
+        for (let i = 1; i < stateInfos.length; i++) {
+          if (stateInfos[i]) {
+            const stateId = Number(stateInfos[i]);
+            if (!isNaN(stateId) && stateId !== 0) {
+              glossaryText.push(`${$dataStates[stateId].description}\n`);
+            }
+          }
+        }
+      }
     } else {
-      value += `\n`;
-    };
-    value += `\\C[16]通常攻撃\\C[0]\x1bI[${$dataSkills[Number(arr[4])].iconIndex}]${$dataSkills[Number(arr[4])].name} `;
-    if($dataItems[id].meta['BossAddAttack']){
-      var value1 = Number($dataItems[id].meta['BossAddAttack'].split(',')[0]);
-      var value2 = Number($dataItems[id].meta['BossAddAttack'].split(',')[1]);
-      var value3 = Number($dataItems[id].meta['BossAddAttack'].split(',')[2]);
-      value += `\x1bI[${$dataSkills[value1].iconIndex}]${$dataSkills[value1].name} `;
-      value += `\x1bI[${$dataSkills[value2].iconIndex}]${$dataSkills[value2].name} `;
-      value += `\x1bI[${$dataSkills[value3].iconIndex}]${$dataSkills[value3].name} `;
-    };
-    value += `\n`;
-    value += `\\C[16]アビリティ\\C[0]\x1bI[${$dataSkills[Number(arr[5])].iconIndex}]${$dataSkills[Number(arr[5])].name}\n`;
-    var value1 = `${$dataSkills[Number(arr[5])].description}`;
-    //var value1 = value1.replace("\\C[2]<装着:\\I[87]Main>\\C[0]", "");
-    var value1 = value1.replace("[\\C[2]戦闘中1回\\C[0]]", "");
-    value += `${value1}\n`;
-    if($dataItems[id].meta['BossAddSkill']){
-      var value1 = Number($dataItems[id].meta['BossAddSkill'].split(',')[0]);
-      var value2 = Number($dataItems[id].meta['BossAddSkill'].split(',')[1]);
-      var value3 = Number($dataItems[id].meta['BossAddSkill'].split(',')[2]);
-      value += `\x1bI[${$dataSkills[value1].iconIndex}]${$dataSkills[value1].name}\n`;
-      value += `\x1bI[${$dataSkills[value2].iconIndex}]${$dataSkills[value2].name}\n`;
-      value += `\x1bI[${$dataSkills[value3].iconIndex}]${$dataSkills[value3].name}\n`;
-    };
-    value += `\\C[16]奥義\\C[0]\x1bI[${$dataSkills[Number(arr[6])].iconIndex}]${$dataSkills[Number(arr[6])].name}\n`;
-    var value1 = `${$dataSkills[Number(arr[6])].description}`;
-    //var value1 = value1.replace("\\C[2]<装着:\\I[87]Main>\\C[0]", "");
-    var value1 = value1.replace("[\\C[2]戦闘中1回\\C[0]]", "");
-    value += `${value1}\n`;
-    if($dataItems[id].meta['BossStateInformation']){
-      value += `\n`;
-      value += `${$dataStates[Number($dataItems[id].meta['BossStateInformation'].split(',')[0])].description}\n`;
-      for (var i = 1; i <= 8; i++) {
-        if($dataItems[id].meta['BossStateInformation'].split(',')[i]){
-          if(Number($dataItems[id].meta['BossStateInformation'].split(',')[i]) != 0){
-            value += `${$dataStates[Number($dataItems[id].meta['BossStateInformation'].split(',')[i])].description}\n`;
-    }}}};
+      glossaryText.push(`情報なし。討伐後に情報更新。`);
+    }
   } else {
-    value += `情報なし。討伐後に情報更新。`;
-  };
-} else {
-  value += `※ ボス不在。`;
-};
-$gameVariables.value(id2)[id] = value;
+    glossaryText.push(`※ ボス不在。`);
+  }
 
+  $gameVariables.value(variableId)[itemId] = glossaryText.join('');
 };
 
 //図鑑のテキスト代入ボス特殊行動
