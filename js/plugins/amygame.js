@@ -1948,7 +1948,8 @@ $gameVariables.value(id2)[id] = value;
   //マップ情報を代入
 const jouhouMapResetVariableIds = [37, 81, 82, 197, 207, 222, 224, 226, 227, 232, 230, 235, 236, 240, 241, 251, 256, 260, 266, 329, 507, 508];
 jouhou_map = function() {
-  console.warn("jouhou_map execute start");
+  // Run on every map loading
+
   const gameVariables = $gameVariables;
   const gameSwitches = $gameSwitches;
   const dataMap = $dataMap;
@@ -1964,7 +1965,7 @@ jouhou_map = function() {
 
   // Process conditional map switches
   const conditionalMapSwitches = gameVariables.value(356);
-  let foundMapSwitch = processMapConditionalSwitches(dataMap, gameSwitches, gameVariables, conditionalMapSwitches);
+  const foundMapSwitch = processMapConditionalSwitches(dataMap, gameSwitches, gameVariables, conditionalMapSwitches);
   
   // Apply default map switches if no conditions matched
   if (foundMapSwitch === 0 && dataMap.meta['MapSwi']) {
@@ -1986,7 +1987,7 @@ jouhou_map = function() {
   setMapLocationInfo(gameSwitches, gameVariables);
 
   // Determine current map info source
-  let mapInfo = determineMapInfoSource(dataMap, gameVariables, gameSwitches);
+  const mapInfo = determineMapInfoSource(dataMap, gameVariables, gameSwitches);
 
   // Play start sound effect
   mapPlayStartSoundEffect(mapInfo, gameSwitches);
@@ -2008,8 +2009,6 @@ jouhou_map = function() {
 
   // Configure BGS and BGM
   setupMapBackgroundAudio(mapInfo, dataMap, gameVariables, gameSwitches);
-
-  console.warn("jouhou_map execute finished");
 };
 
 // Helper Functions
