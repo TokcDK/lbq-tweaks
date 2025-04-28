@@ -2303,20 +2303,21 @@ setupUniqueMaterials = function(mapInfo, gameVariables) {
   // Initialize unique material slots array
   gameVariables.setValue(259, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
   
+  const mapInfoMeta = mapInfo.meta;
   // Process unique materials and backgrounds
   for (let idx = 1; idx <= 9; idx++) {
     // Preload background images
-    if (mapInfo.meta['BG' + idx]) {
-      Galv.CACHE.load('parallaxes', mapInfo.meta['BG' + idx].split(',')[0]);
+    if (mapInfoMeta['BG' + idx]) {
+      Galv.CACHE.load('parallaxes', mapInfoMeta['BG' + idx].split(',')[0]);
     }
     
-    if (mapInfo.meta['BGN' + idx]) {
-      Galv.CACHE.load('parallaxes', mapInfo.meta['BGN' + idx].split(',')[0]);
+    if (mapInfoMeta['BGN' + idx]) {
+      Galv.CACHE.load('parallaxes', mapInfoMeta['BGN' + idx].split(',')[0]);
     }
     
     // Set unique material IDs
-    if (mapInfo.meta['UniqueMaterial' + idx]) {
-      const materialId = Number(mapInfo.meta['UniqueMaterial' + idx].split(',')[0]);
+    if (mapInfoMeta['UniqueMaterial' + idx]) {
+      const materialId = Number(mapInfoMeta['UniqueMaterial' + idx].split(',')[0]);
       gameVariables.value(259)[idx] = materialId;
     }
   }
