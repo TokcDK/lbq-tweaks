@@ -1948,377 +1948,594 @@ $gameVariables.value(id2)[id] = value;
   //マップ情報を代入
 const jouhouMapResetVariableIds = [37, 81, 82, 197, 207, 222, 224, 226, 227, 232, 230, 235, 236, 240, 241, 251, 256, 260, 266, 329, 507, 508];
 jouhou_map = function() {
+  console.warn("jouhou_map execute start");
   const gameVariables = $gameVariables;
   const gameSwitches = $gameSwitches;
   const gameMap = $gameMap;
   const dataMap = $dataMap;
 
   // Reset map-related switches and variables
-  for (let i = 201; i <= 377; i++) gameSwitches.setValue(i, false);
-  jouhouMapResetVariableIds.forEach(function(varId) {
+  for (let i = 201; i <= 377; i++) {
+    gameSwitches.setValue(i, false);
+  }
+  
+  jouhouMapResetVariableIds.forEach(varId => {
     gameVariables.setValue(varId, 0);
-  }, this);
+  });
 
-  let foundMapSwitch = 0;
+  // Process conditional map switches
   const conditionalMapSwitches = gameVariables.value(356);
+  let foundMapSwitch = processConditionalMapSwitches(dataMap, gameSwitches, gameVariables, conditionalMapSwitches);
+  
+  // Apply default map switches if no conditions matched
+  if (foundMapSwitch === 0 && dataMap.meta['MapSwi']) {
+    const switchIds = dataMap.meta['MapSwi'].split(',').map(Number);
+    switchIds.forEach(switchId => {
+      if (switchId !== 0) {
+        gameSwitches.setValue(switchId, true);
+      }
+    });
+  }
 
-  // Helper to check and set conditional map switches
-  function checkConditionalMapSwitch(metaKey, metaSwitchKey, checkFn) {
+  // Extract map metadata
+  const mapMeta = extractMapMetadata(dataMap);
+  
+  // Set basic map type switches
+  setMapTypeSwitches(mapMeta, gameSwitches, gameVariables);
+
+  // Set town and battle map info
+  setMapLocationInfo(gameSwitches, gameVariables);
+
+  // Determine current map info source
+  let mapInfo = determineMapInfoSource(dataMap, gameVariables, gameSwitches);
+
+  // Play start sound effect
+  playStartSoundEffect(mapInfo, gameSwitches);
+
+  // Set up enemy states and map variables
+  setupEnemyAndMapVariables(mapInfo, gameVariables);
+
+  // Set up escape and move positions
+  setupMapPositions(mapInfo, gameVariables);
+
+  // Process unique material slots
+  setupUniqueMaterials(mapInfo, gameVariables);
+
+  // Configure enemy and boss setup
+  setupEnemiesAndBoss(mapInfo);
+
+  // Set up battlebacks and parallax
+  setupBattlebacksAndParallax(mapInfo, dataMap, gameVariables, gameSwitches, gameMap);
+
+  // Configure BGS and BGM
+  setupBackgroundAudio(mapInfo, dataMap, gameVariables, gameSwitches);
+
+  console.warn("jouhou_map execute finished");
+};
+
+// Helper Functions
+
+processConditionalMapSwitches = function(dataMap, gameSwitches, gameVariables, conditionalMapSwitches) {
+  let foundMapSwitch = 0;
+  
+  // Check variable-based conditional switches
+  for (let i = 9; i > 0; i--) {
+    const varKey = 'ChangeMapVal' + i;
+    const switchKey = 'MapSwiCVal' + i;
+    
+    if (!dataMap.meta[varKey] || !dataMap.meta[switchKey]) continue;
+    
+    const [varId, varValue] = dataMap.meta[varKey].split(',').map(Number);
+    if (gameVariables.value(varId) < varValue) continue;
+    
+    activateConditionalSwitches(dataMap.meta[switchKey], gameSwitches, conditionalMapSwitches);
+    foundMapSwitch = 1;
+    break;
+  }
+  
+  // Check switch-based conditional switches if no variable conditions matched
+  if (foundMapSwitch === 0) {
     for (let i = 9; i > 0; i--) {
-      if (dataMap.meta[metaKey + i]) {
-        const keyValue = dataMap.meta[metaKey + i];
-        if (dataMap.meta[metaSwitchKey + i] && checkFn(keyValue, i)) {
-          const switchIds = dataMap.meta[metaSwitchKey + i].split(',').map(Number);
-          for (let j = 0; j < switchIds.length; j++) {
-            const switchId = switchIds[j];
-            if (switchId !== 0) {
-              gameSwitches.setValue(switchId, true);
-              if (conditionalMapSwitches[switchId] != 0) conditionalMapSwitches[switchId] = 1;
-            }
-          }
-          foundMapSwitch = 1;
-          break;
-        }
-      }
+      const switchCondKey = 'ChangeMapSwi' + i;
+      const targetSwitchKey = 'MapSwiCSwi' + i;
+      
+      if (!dataMap.meta[switchCondKey] || !dataMap.meta[targetSwitchKey]) continue;
+      
+      const condSwitchId = Number(dataMap.meta[switchCondKey]);
+      if (!gameSwitches.value(condSwitchId)) continue;
+      
+      activateConditionalSwitches(dataMap.meta[targetSwitchKey], gameSwitches, conditionalMapSwitches);
+      foundMapSwitch = 1;
+      break;
     }
   }
+  
+  return foundMapSwitch;
+};
 
-  // Check for conditional map switches based on variables
-  checkConditionalMapSwitch(
-    'ChangeMapVal',
-    'MapSwiCVal',
-    (keyValue, i) => {
-      const [varId, varValue] = keyValue.split(',').map(Number);
-      return gameVariables.value(varId) >= varValue;
+activateConditionalSwitches = function(switchIdString, gameSwitches, conditionalMapSwitches) {
+  const switchIds = switchIdString.split(',').map(Number);
+  
+  switchIds.forEach(switchId => {
+    if (switchId === 0) return;
+    
+    gameSwitches.setValue(switchId, true);
+    
+    if (conditionalMapSwitches[switchId] !== 0) {
+      conditionalMapSwitches[switchId] = 1;
     }
-  );
+  });
+};
 
-  // Check for conditional map switches based on switches
-  if (foundMapSwitch == 0) {
-    checkConditionalMapSwitch(
-      'ChangeMapSwi',
-      'MapSwiCSwi',
-      (keyValue, i) => {
-        const switchId = Number(keyValue);
-        return gameSwitches.value(switchId);
-      }
-    );
+extractMapMetadata = function(dataMap) {
+  const meta = {
+    outInFloorType: 0,
+    outInFloorValue: 0,
+    homeType: 0,
+    animalType: 0,
+    npcType: 0,
+    mapHeight: dataMap.height,
+    mapWidth: dataMap.width
+  };
+  
+  if (dataMap.meta['OutIn_Froor']) {
+    const [type, value] = dataMap.meta['OutIn_Froor'].split(',').map(Number);
+    meta.outInFloorType = type;
+    meta.outInFloorValue = value;
   }
-  // Set default map switches if no conditions matched
-  if (foundMapSwitch == 0) {
-    if (dataMap.meta['MapSwi']) {
-      const switchIds = dataMap.meta['MapSwi'].split(',').map(Number);
-      for (let i = 0; i < switchIds.length; i++) {
-        const switchId = switchIds[i];
-        if (switchId !== 0) {
-          gameSwitches.setValue(switchId, true);
-        }
-      }
-    }
-  }
+  
+  if (dataMap.meta['NPC']) meta.npcType = Number(dataMap.meta['NPC']);
+  if (dataMap.meta['Home']) meta.homeType = Number(dataMap.meta['Home']);
+  if (dataMap.meta['Animal']) meta.animalType = Number(dataMap.meta['Animal']);
+  
+  return meta;
+};
 
-  // Map meta extraction
-  let outInFloorType = 0, outInFloorValue = 0;
-  if (dataMap.meta['OutIn_Froor']){
-    const outInFloorMap = dataMap.meta['OutIn_Froor'].split(',');
-    outInFloorType = Number(outInFloorMap[0]);
-    outInFloorValue = Number(outInFloorMap[1]);
-  }
-  let homeType = 0, animalType = 0;
-  const mapHeight = dataMap.height;
-  const mapWidth = dataMap.width;
-  let npcType = 0;
-  if (dataMap.meta['NPC']) npcType = Number(dataMap.meta['NPC']);
-  if (dataMap.meta['Home']) homeType = Number(dataMap.meta['Home']);
-  if (dataMap.meta['Animal']) animalType = Number(dataMap.meta['Animal']);
-
-  // Set switches/variables based on map meta
-  if (outInFloorType >= 1) {
+setMapTypeSwitches = function(mapMeta, gameSwitches, gameVariables) {
+  // Set indoor/outdoor switch
+  if (mapMeta.outInFloorType >= 1) {
     gameSwitches.setValue(203, true);
   } else {
     gameSwitches.setValue(204, true);
   }
-  if (outInFloorValue >= 1) gameVariables.setValue(232, outInFloorValue);
-  if (npcType >= 1) gameVariables.setValue(241, npcType);
-  if (homeType == 1) gameSwitches.setValue(206, true);
-  if (homeType == 2) gameSwitches.setValue(231, true);
-  gameVariables.setValue(238, (mapHeight + mapWidth) / 20);
-  if (animalType >= 1) gameSwitches.setValue(208, true);
+  
+  // Set floor value if available
+  if (mapMeta.outInFloorValue >= 1) {
+    gameVariables.setValue(232, mapMeta.outInFloorValue);
+  }
+  
+  // Set NPC type if available
+  if (mapMeta.npcType >= 1) {
+    gameVariables.setValue(241, mapMeta.npcType);
+  }
+  
+  // Set home switches if applicable
+  if (mapMeta.homeType === 1) gameSwitches.setValue(206, true);
+  if (mapMeta.homeType === 2) gameSwitches.setValue(231, true);
+  
+  // Calculate map size variable
+  gameVariables.setValue(238, (mapMeta.mapHeight + mapMeta.mapWidth) / 20);
+  
+  // Set animal switch if applicable
+  if (mapMeta.animalType >= 1) gameSwitches.setValue(208, true);
+};
 
-  // Set town and battle map info
-  const townWeaponIds = valueJouhouTown;
-  townWeaponIds.forEach(function(weaponId) {
-    if (gameSwitches.value(Number($dataWeapons[weaponId].meta['MapSwitch']))) {
+setMapLocationInfo = function(gameSwitches, gameVariables) {
+  // Check town locations
+  valueJouhouTown.forEach(weaponId => {
+    const switchId = Number($dataWeapons[weaponId].meta['MapSwitch']);
+    if (gameSwitches.value(switchId)) {
       gameVariables.setValue(230, weaponId);
       gameSwitches.setValue(202, true);
     }
-  }, this);
-  const battleMapItemIds = valueJouhouBattleMap;
-  battleMapItemIds.forEach(function(itemId) {
-    if (gameSwitches.value(Number($dataItems[itemId].meta['MapSwitch']))) {
+  });
+  
+  // Check battle map locations
+  valueJouhouBattleMap.forEach(itemId => {
+    const switchId = Number($dataItems[itemId].meta['MapSwitch']);
+    if (gameSwitches.value(switchId)) {
       gameVariables.setValue(240, itemId);
       gameSwitches.setValue(201, true);
     }
-  }, this);
+  });
+};
 
-  // Determine current map info source (map, town, or battle map)
+determineMapInfoSource = function(dataMap, gameVariables, gameSwitches) {
   let mapInfo = dataMap;
+  
+  // Town map info
   if (gameVariables.value(230) >= 1) {
-    mapInfo = $dataWeapons[gameVariables.value(230)];
-    if (gameVariables.value(230) == gameVariables.value(237)[1] && gameVariables.value(237)[0] == 1) {
+    const townId = gameVariables.value(230);
+    mapInfo = $dataWeapons[townId];
+    
+    // Check if this is a repeated visit to the same town
+    const visitMemory = gameVariables.value(237);
+    if (townId === visitMemory[1] && visitMemory[0] === 1) {
       gameSwitches.setValue(216, true);
     } else {
-      gameVariables.setValue(237, [1, gameVariables.value(230)]);
+      gameVariables.setValue(237, [1, townId]);
       gameSwitches.setValue(216, false);
     }
   }
+  
+  // Battle map info
   if (gameVariables.value(240) >= 1) {
-    mapInfo = $dataItems[gameVariables.value(240)];
-    if (gameVariables.value(240) == gameVariables.value(237)[1] && gameVariables.value(237)[0] == 2) {
+    const battleMapId = gameVariables.value(240);
+    mapInfo = $dataItems[battleMapId];
+    
+    // Check if this is a repeated visit to the same battle map
+    const visitMemory = gameVariables.value(237);
+    if (battleMapId === visitMemory[1] && visitMemory[0] === 2) {
       gameSwitches.setValue(216, true);
     } else {
-      gameVariables.setValue(237, [2, gameVariables.value(240)]);
+      gameVariables.setValue(237, [2, battleMapId]);
       gameSwitches.setValue(216, false);
     }
   }
+  
+  return mapInfo;
+};
 
-  // Play start SE if defined
-  if (mapInfo.meta['StartSe'] && !gameSwitches.value(15)) {
-    const [seName, seVolume, sePitch] = mapInfo.meta['StartSe'].split(',');
-    AudioManager.playSe({ "name": seName, "volume": Number(seVolume), "pitch": Number(sePitch), "pan": 0 });
-  }
-  if (mapInfo.meta['StartSeN'] && gameSwitches.value(15)) {
-    const [seName, seVolume, sePitch] = mapInfo.meta['StartSeN'].split(',');
-    AudioManager.playSe({ "name": seName, "volume": Number(seVolume), "pitch": Number(sePitch), "pan": 0 });
-  }
+playStartSoundEffect = function(mapInfo, gameSwitches) {
+  const seKey = gameSwitches.value(15) ? 'StartSeN' : 'StartSe';
+  
+  if (!mapInfo.meta[seKey]) return;
+  
+  const [seName, seVolume, sePitch] = mapInfo.meta[seKey].split(',');
+  AudioManager.playSe({
+    name: seName,
+    volume: Number(seVolume),
+    pitch: Number(sePitch),
+    pan: 0
+  });
+};
 
-  // Set up enemy special states and other map variables
+setupEnemyAndMapVariables = function(mapInfo, gameVariables) {
+  // Initialize special state array
   gameVariables.setValue(350, []);
   const specialStates = gameVariables.value(350);
+  
+  // Add enemy special states if available
   if (mapInfo.meta['EnemySpecialState']) {
-    const specialStateIds = mapInfo.meta['EnemySpecialState'].split(',').map(Number);
-    for (let i = 0; i < specialStateIds.length; i++) {
-      const specialStateId = specialStateIds[i];
-      if (specialStateId >= 1) {
-        specialStates.push(specialStateId);
+    const stateIds = mapInfo.meta['EnemySpecialState'].split(',').map(Number);
+    stateIds.forEach(stateId => {
+      if (stateId >= 1) {
+        specialStates.push(stateId);
       }
-    }
+    });
   }
+  
+  // Set various map-specific variables
   if (mapInfo.meta['getWaterItem']) {
     gameVariables.setValue(266, Number(mapInfo.meta['getWaterItem']));
   }
+  
   if (mapInfo.meta['weatherSetP']) {
     gameVariables.setValue(256, Number(mapInfo.meta['weatherSetP']));
   }
-  if (mapInfo.meta['weatherSetPN']) {
-    gameVariables.setValue(251, Number(mapInfo.meta['weatherSetPN']));
+  
+  const weatherKey = 'weatherSetPN';
+  if (mapInfo.meta[weatherKey]) {
+    gameVariables.setValue(251, Number(mapInfo.meta[weatherKey]));
+  } else if ($dataMap.meta[weatherKey]) {
+    gameVariables.setValue(251, Number($dataMap.meta[weatherKey]));
   }
-  if (dataMap.meta['weatherSetPN']) {
-    gameVariables.setValue(251, Number(dataMap.meta['weatherSetPN']));
+  
+  // Set mob related variables
+  if (mapInfo.meta['MapCount']) {
+    gameVariables.setValue(217, Number(mapInfo.meta['MapCount']));
   }
-  if (mapInfo.meta['EscapeMapID']) {
-    const [escapeMapId, escapeX, escapeY] = mapInfo.meta['EscapeMapID'].split(',').map(Number);
-    gameVariables.value(204)[0] = escapeMapId;
-    gameVariables.value(204)[1] = escapeX;
-    gameVariables.value(204)[2] = escapeY;
+  
+  if (mapInfo.meta['MapEnemyMaxPop']) {
+    gameVariables.setValue(334, Number(mapInfo.meta['MapEnemyMaxPop']));
   }
-  if (mapInfo.meta['MapCount']) gameVariables.setValue(217, Number(mapInfo.meta['MapCount']));
-  if (mapInfo.meta['MapEnemyMaxPop']) gameVariables.setValue(334, Number(mapInfo.meta['MapEnemyMaxPop']));
-  if (mapInfo.meta['MapEnemyPopC']) gameVariables.setValue(224, Number(mapInfo.meta['MapEnemyPopC']));
-  if (mapInfo.meta['MapEnemyPopCH']) gameVariables.setValue(227, Number(mapInfo.meta['MapEnemyPopCH']));
-  if (mapInfo.meta['HEnemyPopSwi']) gameVariables.setValue(236, Number(mapInfo.meta['HEnemyPopSwi']));
-  if (mapInfo.meta['DeadBody']) gameVariables.setValue(260, Number(mapInfo.meta['DeadBody']));
-  if (mapInfo.meta['EnemyLV']) gameVariables.setValue(270, Number(mapInfo.meta['EnemyLV'].split(',')[0]));
+  
+  if (mapInfo.meta['MapEnemyPopC']) {
+    gameVariables.setValue(224, Number(mapInfo.meta['MapEnemyPopC']));
+  }
+  
+  if (mapInfo.meta['MapEnemyPopCH']) {
+    gameVariables.setValue(227, Number(mapInfo.meta['MapEnemyPopCH']));
+  }
+  
+  if (mapInfo.meta['HEnemyPopSwi']) {
+    gameVariables.setValue(236, Number(mapInfo.meta['HEnemyPopSwi']));
+  }
+  
+  if (mapInfo.meta['DeadBody']) {
+    gameVariables.setValue(260, Number(mapInfo.meta['DeadBody']));
+  }
+  
+  // Set enemy level variable
+  if (mapInfo.meta['EnemyLV']) {
+    gameVariables.setValue(270, Number(mapInfo.meta['EnemyLV'].split(',')[0]));
+  }
+  
+  // Set switches from OnSwitch metadata
   if (mapInfo.meta['OnSwitch']) {
-    const onSwitchIds = mapInfo.meta['OnSwitch'].split(',').map(Number);
-    onSwitchIds.forEach(function(switchId) {
+    const switchIds = mapInfo.meta['OnSwitch'].split(',').map(Number);
+    switchIds.forEach(switchId => {
       if (switchId >= 1) {
-        gameSwitches.setValue(switchId, true);
+        $gameSwitches.setValue(switchId, true);
       }
-    }, this);
+    });
   }
+};
 
-  // Unique item slots
+setupMapPositions = function(mapInfo, gameVariables) {
+  // Set escape position
+  if (mapInfo.meta['EscapeMapID']) {
+    const [mapId, x, y] = mapInfo.meta['EscapeMapID'].split(',').map(Number);
+    gameVariables.value(204)[0] = mapId;
+    gameVariables.value(204)[1] = x;
+    gameVariables.value(204)[2] = y;
+  }
+  
+  // Set move position
+  if (mapInfo.meta['MoveMapID']) {
+    const [mapId, x, y] = mapInfo.meta['MoveMapID'].split(',').map(Number);
+    gameVariables.value(204)[0] = mapId;
+    gameVariables.value(204)[1] = x;
+    gameVariables.value(204)[2] = y;
+  }
+  
+  // Set permission cloth
+  const clothKey = 'PermissionCloth';
+  if (mapInfo.meta[clothKey]) {
+    gameVariables.setValue(207, Number(mapInfo.meta[clothKey]));
+  } else if ($dataMap.meta[clothKey]) {
+    gameVariables.setValue(207, Number($dataMap.meta[clothKey]));
+  }
+};
+
+setupUniqueMaterials = function(mapInfo, gameVariables) {
+  // Initialize unique material slots array
   gameVariables.setValue(259, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-  const uniqueMaterialIndexes = [1,2,3,4,5,6,7,8,9];
-  uniqueMaterialIndexes.forEach(function(idx) {
+  
+  // Process unique materials and backgrounds
+  for (let idx = 1; idx <= 9; idx++) {
+    // Preload background images
     if (mapInfo.meta['BG' + idx]) {
       Galv.CACHE.load('parallaxes', mapInfo.meta['BG' + idx].split(',')[0]);
     }
+    
     if (mapInfo.meta['BGN' + idx]) {
-      Galv.CACHE.load('parallaxes', mapInfo.meta['BG' + idx].split(',')[0]);
+      Galv.CACHE.load('parallaxes', mapInfo.meta['BGN' + idx].split(',')[0]);
     }
+    
+    // Set unique material IDs
     if (mapInfo.meta['UniqueMaterial' + idx]) {
-      gameVariables.value(259)[idx] = Number(mapInfo.meta['UniqueMaterial' + idx].split(',')[0]);
+      const materialId = Number(mapInfo.meta['UniqueMaterial' + idx].split(',')[0]);
+      gameVariables.value(259)[idx] = materialId;
     }
-  }, this);
+  }
+};
 
-  // Enemy and boss setup
+setupEnemiesAndBoss = function(mapInfo) {
+  // Setup enemies if defined
   if (mapInfo.meta['PopEnemy1'] || mapInfo.meta['PopEnemy9']) {
     popEnemy_setUp(mapInfo);
     enemy_troopPush();
     henemy_troopPush();
   }
+  
+  // Setup boss if defined
   if (mapInfo.meta['BossEnemy']) {
     boss_setup1(1, 0);
   }
-  if (mapInfo.meta['MoveMapID']) {
-    const [moveMapId, moveX, moveY] = mapInfo.meta['MoveMapID'].split(',').map(Number);
-    gameVariables.value(204)[0] = moveMapId;
-    gameVariables.value(204)[1] = moveX;
-    gameVariables.value(204)[2] = moveY;
-  }
-  if (mapInfo.meta['PermissionCloth']) {
-    gameVariables.setValue(207, Number(mapInfo.meta['PermissionCloth']));
-  }
-  if (dataMap.meta['PermissionCloth']) {
-    gameVariables.setValue(207, Number(dataMap.meta['PermissionCloth']));
-  }
+};
 
-  // Battleback and parallax setup
-  let bgKey = 0, battleBgKey = 0, battleBgName = 0, battleBg1 = 0, battleBg2 = 0;
-  if (gameSwitches.value(15)) {
-    battleBgName = 'StarlitSkyBattle';
-  } else {
-    battleBgName = 'BlueSkyBattle';
-  }
+setupBattlebacksAndParallax = function(mapInfo, dataMap, gameVariables, gameSwitches, gameMap) {
+  // Initialize background related variables
+  let bgKey = 0;
+  let battleBgKey = 0;
+  let battleBgName = gameSwitches.value(15) ? 'StarlitSkyBattle' : 'BlueSkyBattle';
+  let battleBg1 = 0;
+  let battleBg2 = 0;
+  
+  // Determine background keys based on environment
   if (gameVariables.value(230) >= 1) {
     if (gameSwitches.value(203)) {
       if (gameSwitches.value(15)) {
-        bgKey = 'BG_outN'; battleBgKey = 'TownOutdoorN';
+        bgKey = 'BG_outN';
+        battleBgKey = 'TownOutdoorN';
       } else {
-        bgKey = 'BG_out'; battleBgKey = 'TownOutdoor';
+        bgKey = 'BG_out';
+        battleBgKey = 'TownOutdoor';
       }
-    }
-    if (gameSwitches.value(204)) {
+    } else if (gameSwitches.value(204)) {
       if (gameSwitches.value(15)) {
-        bgKey = 'BG_inN'; battleBgKey = 'TownIndoorN';
+        bgKey = 'BG_inN';
+        battleBgKey = 'TownIndoorN';
       } else {
-        bgKey = 'BG_in'; battleBgKey = 'TownIndoor';
+        bgKey = 'BG_in';
+        battleBgKey = 'TownIndoor';
       }
     }
-    if (battleBgKey != 0) {
+    
+    // Set battleback if a key was determined
+    if (battleBgKey !== 0) {
       gameMap.changeBattleback(battleBgName, battleBgKey);
     }
   }
+  
+  // Handle battle map backgrounds
   if (gameVariables.value(240) >= 1) {
-    if (mapInfo.meta['BG2']) { bgKey = 'BG2'; battleBgKey = 'BG2'; }
-    if (mapInfo.meta['BG1']) { battleBgName = 'BG1'; }
-    if (gameSwitches.value(15)) {
-      if (mapInfo.meta['BGN2']) { bgKey = 'BGN2'; battleBgKey = 'BGN2'; }
-      if (mapInfo.meta['BGN1']) { battleBgName = 'BGN1'; }
+    // Determine background keys
+    if (mapInfo.meta['BG2']) { 
+      bgKey = 'BG2';
+      battleBgKey = 'BG2';
     }
-    if (battleBgKey != 0) {
-      gameMap.changeBattleback(mapInfo.meta[battleBgName].split(',')[0], mapInfo.meta[battleBgKey].split(',')[0]);
+    
+    if (mapInfo.meta['BG1']) {
+      battleBgName = 'BG1';
+    }
+    
+    // Night versions
+    if (gameSwitches.value(15)) {
+      if (mapInfo.meta['BGN2']) {
+        bgKey = 'BGN2';
+        battleBgKey = 'BGN2';
+      }
+      
+      if (mapInfo.meta['BGN1']) {
+        battleBgName = 'BGN1';
+      }
+    }
+    
+    // Set battleback if keys are available
+    if (battleBgKey !== 0) {
+      const bg1 = mapInfo.meta[battleBgName].split(',')[0];
+      const bg2 = mapInfo.meta[battleBgKey].split(',')[0];
+      gameMap.changeBattleback(bg1, bg2);
     }
   }
-
+  
+  // Set background variables if a key was determined
   if (bgKey) {
     setBgVariables(gameVariables, mapInfo, bgKey);
   }
-
+  
+  // Apply parallax settings changes
   parallaxesSound_switchChange(1);
-
-  // Map BG/BattleBG override from map meta
+  
+  // Override backgrounds from map metadata if specified
   if (gameSwitches.value(15)) {
+    // Night settings
     if (dataMap.meta['BGchangeN']) {
       mapInfo = dataMap;
       bgKey = 'BGchangeN';
       battleBg1 = 1;
     }
+    
     if (dataMap.meta['BattleBGChange1N']) {
       mapInfo = dataMap;
       battleBgName = mapInfo.meta['BattleBGChange1N'].split(',')[0];
       battleBg2 = 1;
     }
+    
     if (dataMap.meta['BattleBGChange2N']) {
       mapInfo = dataMap;
       battleBgKey = mapInfo.meta['BattleBGChange2N'].split(',')[0];
       battleBg2 = 1;
     }
   } else {
+    // Day settings
     if (dataMap.meta['BGchange']) {
       mapInfo = dataMap;
       bgKey = 'BGchange';
       battleBg1 = 1;
     }
+    
     if (dataMap.meta['BattleBGChange1']) {
       mapInfo = dataMap;
       battleBgName = mapInfo.meta['BattleBGChange1'].split(',')[0];
       battleBg2 = 1;
     }
+    
     if (dataMap.meta['BattleBGChange2']) {
       mapInfo = dataMap;
       battleBgKey = mapInfo.meta['BattleBGChange2'].split(',')[0];
       battleBg2 = 1;
     }
   }
+  
+  // Apply override background settings
   if (battleBg1 >= 1) {
     setBgVariables(gameVariables, mapInfo, bgKey);
   }
+  
   if (battleBg2 >= 1) {
     gameMap.changeBattleback(battleBgName, battleBgKey);
   }
-  if (gameVariables.value(508) != 0) {
-    if (dataMap.meta['ParallaxSet']) {
-      let parallaxScrollX = false, parallaxScrollY = false;
-      if (gameVariables.value(81) != 0) parallaxScrollX = true;
-      if (gameVariables.value(82) != 0) parallaxScrollY = true;
-      gameMap.changeParallax(gameVariables.value(508), parallaxScrollX, parallaxScrollY, gameVariables.value(81), gameVariables.value(82));
-    }
+  
+  // Set up parallax if defined
+  if (gameVariables.value(508) !== 0 && dataMap.meta['ParallaxSet']) {
+    const parallaxScrollX = gameVariables.value(81) !== 0;
+    const parallaxScrollY = gameVariables.value(82) !== 0;
+    
+    gameMap.changeParallax(
+      gameVariables.value(508),
+      parallaxScrollX,
+      parallaxScrollY,
+      gameVariables.value(81),
+      gameVariables.value(82)
+    );
   }
+};
 
-  // BGS setup
-  let bgsKey = gameSwitches.value(15) ? 'BGSN' : 'BGS';
-  if (gameVariables.value(240) >= 1) {
-    mapInfo = $dataItems[gameVariables.value(240)];
-  }
-  if (gameVariables.value(230) >= 1) {
-    mapInfo = $dataWeapons[gameVariables.value(230)];
-  }
-  if (dataMap.meta[bgsKey]) mapInfo = dataMap;
-  if (mapInfo.meta[bgsKey]) {
-    const [bgsName, bgsVolume, bgsPitch, bgsPan] = mapInfo.meta[bgsKey].split(',');
-    if (bgsName != valueMapBGS[0]) {
+setupBackgroundAudio = function(mapInfo, dataMap, gameVariables, gameSwitches) {
+  // Set up BGS (background sound)
+  const bgsKey = gameSwitches.value(15) ? 'BGSN' : 'BGS';
+  let currentMapInfo = determineAudioMapInfoSource(mapInfo, dataMap, gameVariables, bgsKey);
+  
+  if (currentMapInfo.meta[bgsKey]) {
+    const [bgsName, bgsVolume, bgsPitch, bgsPan] = currentMapInfo.meta[bgsKey].split(',');
+    
+    if (bgsName !== valueMapBGS[0]) {
       valueMapBGS = [bgsName, Number(bgsVolume), Number(bgsPitch), Number(bgsPan)];
-      AudioManager.playBgs({ name: valueMapBGS[0], volume: valueMapBGS[1], pitch: valueMapBGS[2], pan: valueMapBGS[3] });
+      
+      AudioManager.playBgs({
+        name: valueMapBGS[0],
+        volume: valueMapBGS[1],
+        pitch: valueMapBGS[2],
+        pan: valueMapBGS[3]
+      });
     }
   } else {
     AudioManager.fadeOutBgs(1);
     valueMapBGS = [0, 0, 0, 0];
   }
-
-  // BGM setup
-  let bgmKey = gameSwitches.value(15) ? 'BGMN' : 'BGM';
-  if (gameVariables.value(240) >= 1) {
-    mapInfo = $dataItems[gameVariables.value(240)];
-  }
-  if (gameVariables.value(230) >= 1) {
-    mapInfo = $dataWeapons[gameVariables.value(230)];
-  }
-  if (dataMap.meta[bgmKey]) mapInfo = dataMap;
-  if (mapInfo.meta[bgmKey]) {
-    const [bgmName, bgmVolume, bgmPitch, bgmPan] = mapInfo.meta[bgmKey].split(',');
+  
+  // Set up BGM (background music)
+  const bgmKey = gameSwitches.value(15) ? 'BGMN' : 'BGM';
+  currentMapInfo = determineAudioMapInfoSource(mapInfo, dataMap, gameVariables, bgmKey);
+  
+  if (currentMapInfo.meta[bgmKey]) {
+    const [bgmName, bgmVolume, bgmPitch, bgmPan] = currentMapInfo.meta[bgmKey].split(',');
     valueMapBGM = [bgmName, Number(bgmVolume), Number(bgmPitch), Number(bgmPan)];
+    
     parallaxesSound_switchChange(2);
+    
     if (!gameSwitches.value(124)) {
-      if (bgmName == 'NoMusic') {
+      if (bgmName === 'NoMusic') {
         AudioManager.fadeOutBgm(10);
-      } else {
-        if (AudioManager.saveBgm() == bgmName) {
-          // Already playing
-        } else {
-          AudioManager.playBgm({ name: valueMapBGM[0], volume: valueMapBGM[1], pitch: valueMapBGM[2], pan: valueMapBGM[3] });
-        }
+      } else if (AudioManager.saveBgm() !== bgmName) {
+        AudioManager.playBgm({
+          name: valueMapBGM[0],
+          volume: valueMapBGM[1],
+          pitch: valueMapBGM[2],
+          pan: valueMapBGM[3]
+        });
       }
     } else {
       AudioManager.fadeOutBgm(3);
-      //AudioManager.stopBgm();
     }
   } else {
     AudioManager.stopBgm();
   }
+};
 
+determineAudioMapInfoSource = function(mapInfo, dataMap, gameVariables, metaKey) {
+  // Reset to base map info
+  let currentMapInfo = mapInfo;
+  
+  // Check if battle map info should be used
+  if (gameVariables.value(240) >= 1) {
+    currentMapInfo = $dataItems[gameVariables.value(240)];
+  }
+  
+  // Check if town map info should be used
+  if (gameVariables.value(230) >= 1) {
+    currentMapInfo = $dataWeapons[gameVariables.value(230)];
+  }
+  
+  // If data map has the key, use that (highest priority)
+  if (dataMap.meta[metaKey]) {
+    currentMapInfo = dataMap;
+  }
+  
+  return currentMapInfo;
 };
 
 // Helper function to set BG variables from meta
