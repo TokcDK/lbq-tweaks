@@ -2271,26 +2271,29 @@ setupMapEnemyVariables = function(mapInfo, gameVariables) {
 };
 
 setupMapPositions = function(mapInfo, gameVariables) {
+  const mapInfoMeta = mapInfo.meta;
+  const positions = gameVariables.value(204);
+  
   // Set escape position
-  if (mapInfo.meta['EscapeMapID']) {
-    const [mapId, x, y] = mapInfo.meta['EscapeMapID'].split(',').map(Number);
-    gameVariables.value(204)[0] = mapId;
-    gameVariables.value(204)[1] = x;
-    gameVariables.value(204)[2] = y;
+  if (mapInfoMeta['EscapeMapID']) {
+    const [mapId, x, y] = mapInfoMeta['EscapeMapID'].split(',').map(Number);
+    positions[0] = mapId;
+    positions[1] = x;
+    positions[2] = y;
   }
   
   // Set move position
-  if (mapInfo.meta['MoveMapID']) {
-    const [mapId, x, y] = mapInfo.meta['MoveMapID'].split(',').map(Number);
-    gameVariables.value(204)[0] = mapId;
-    gameVariables.value(204)[1] = x;
-    gameVariables.value(204)[2] = y;
+  if (mapInfoMeta['MoveMapID']) {
+    const [mapId, x, y] = mapInfoMeta['MoveMapID'].split(',').map(Number);
+    positions[0] = mapId;
+    positions[1] = x;
+    positions[2] = y;
   }
   
   // Set permission cloth
   const clothKey = 'PermissionCloth';
-  if (mapInfo.meta[clothKey]) {
-    gameVariables.setValue(207, Number(mapInfo.meta[clothKey]));
+  if (mapInfoMeta[clothKey]) {
+    gameVariables.setValue(207, Number(mapInfoMeta[clothKey]));
   } else if ($dataMap.meta[clothKey]) {
     gameVariables.setValue(207, Number($dataMap.meta[clothKey]));
   }
