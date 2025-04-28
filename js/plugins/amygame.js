@@ -1711,14 +1711,15 @@ scene_Glossarytext1 = function(itemId, variableId) {
   }
   
   // Add annihilation count
-  if (gameVariables.value(257)[itemId] >= 1) {
-    glossaryText += `\\C[16]殲滅回数：\\C[0]\\C[10]${gameVariables.value(257)[itemId]}\\C[0]　\n`;
+  const annCount = gameVariables.value(257)[itemId];
+  if (annCount >= 1) {
+    glossaryText += `\\C[16]殲滅回数：\\C[0]\\C[10]${annCount}\\C[0]　\n`;
   } else {
     glossaryText += `\n`;
   }
   
   // Add first annihilation reward
-  if (itemMeta['firstAnnihilationItem'] && gameVariables.value(257)[itemId] >= 1) {
+  if (itemMeta['firstAnnihilationItem'] && annCount >= 1) {
     const firstAnnihilationItemArray = itemMeta['firstAnnihilationItem'].split(',');
     const itemType = Number(firstAnnihilationItemArray[0]);
     const rewardItems = itemType === 0 ? dataItems : itemType === 1 ? $dataWeapons : $dataArmors;
@@ -1736,7 +1737,7 @@ scene_Glossarytext1 = function(itemId, variableId) {
   }
 
   // Add unique materials
-  glossaryText += addUniqueMaterials(itemMeta, dataItems);
+  glossaryText +=  Glossarytext1AddUniqueMaterials(itemMeta, dataItems);
 
   // Add enemy information
   glossaryText += `\\C[16]・出現エネミー\\C[0]\n`;
@@ -1759,14 +1760,14 @@ scene_Glossarytext1 = function(itemId, variableId) {
   glossaryText += `\n`;
 
   // Process enemy data
-  glossaryText += processEnemyData(enemyPopArray, dataEnemies, dataStates, itemMeta);
+  glossaryText += Glossarytext1ProcessEnemyData(enemyPopArray, dataEnemies, dataStates, itemMeta);
 
   // Store result in variable
   gameVariables.value(variableId)[itemId] = glossaryText;
 };
 
 // Helper function to process unique materials
-function addUniqueMaterials(itemMeta, dataItems) {
+function  Glossarytext1AddUniqueMaterials(itemMeta, dataItems) {
   let materialText = '';
   let materialCount = 0;
   
@@ -1793,7 +1794,7 @@ function addUniqueMaterials(itemMeta, dataItems) {
 }
 
 // Helper function to process enemy data
-function processEnemyData(enemyPopArray, dataEnemies, dataStates, itemMeta) {
+function Glossarytext1ProcessEnemyData(enemyPopArray, dataEnemies, dataStates, itemMeta) {
   let processedText = '';
   let stateCount = 0;
   const processedStateNames = new Set();
