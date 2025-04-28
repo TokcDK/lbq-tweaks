@@ -2372,7 +2372,7 @@ setupMapBattlebacksAndParallax = function(mapInfo, dataMap, gameVariables, gameS
   }
 
   const mapInfoMeta = mapInfo.meta;
-  
+
   // Handle battle map backgrounds
   if (gameVariables.value(240) >= 1) {
     // Determine background keys
@@ -2403,7 +2403,7 @@ setupMapBattlebacksAndParallax = function(mapInfo, dataMap, gameVariables, gameS
   
   // Set background variables if a key was determined
   if (bgKey) {
-    setBgVariables(gameVariables, mapInfo, bgKey);
+    setMapBgVariables(gameVariables, mapInfo, bgKey);
   }
   
   // Apply parallax settings changes
@@ -2448,7 +2448,7 @@ setupMapBattlebacksAndParallax = function(mapInfo, dataMap, gameVariables, gameS
   
   // Apply override background settings
   if (battleBg1) {
-    setBgVariables(gameVariables, mapInfo, bgKey);
+    setMapBgVariables(gameVariables, mapInfo, bgKey);
   }
   if (battleBg2) {
     gameMap.changeBattleback(battleBgName, battleBgKey);
@@ -2543,7 +2543,7 @@ determineAudioMapInfoSource = function(mapInfo, dataMap, gameVariables, metaKey)
 };
 
 // Helper function to set BG variables from meta
-setBgVariables = function (gameVariables, mapInfo, bgKey) {
+setMapBgVariables = function (gameVariables, mapInfo, bgKey) {
   if (mapInfo.meta[bgKey]) {
     const bgMeta = mapInfo.meta[bgKey].split(',');
     gameVariables.setValue(508, bgMeta[0]);
