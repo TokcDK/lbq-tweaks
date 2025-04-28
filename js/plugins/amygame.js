@@ -1677,120 +1677,121 @@ scene_Glossarytext1 = function(itemId, variableId) {
 
   const itemData = dataItems[itemId];
   const itemMeta = itemData.meta;
-  
+
   // Handle enemy element and level data
   const enemyElementArray = itemMeta['EnemyElement'] ? itemMeta['EnemyElement'].split(',') : [0];
   const enemyLevelRange = itemMeta['EnemyLV'] ? itemMeta['EnemyLV'].split(',') : [0];
   const maxEnemyLevel = Math.max(...enemyLevelRange);
   const minEnemyLevel = Math.min(...enemyLevelRange);
-  
+
   // Check if it's a dungeon map
   let isDungeonMap = itemMeta['OnSwitch'] && itemMeta['OnSwitch'].split(',').map(Number).includes(207);
-  
+
   // Build header text
   const locationType = isDungeonMap ? 'ダンジョン' : 'フィールド';
-  let glossaryText = `\\C[16]＜${locationType}マップ情報＞\\C[0]\n`;
-    
-  glossaryText += `${itemData.description}\n`;
-  glossaryText += `\\C[16]エネミーLV：\\C[0]\\C[10]${minEnemyLevel}\\C[0]～\\C[10]${maxEnemyLevel}\\C[0]　`;
+  const glossaryText = [];
   
+  glossaryText.push(`\\C[16]＜${locationType}マップ情報＞\\C[0]\n`);
+  glossaryText.push(`${itemData.description}\n`);
+  glossaryText.push(`\\C[16]エネミーLV：\\C[0]\\C[10]${minEnemyLevel}\\C[0]～\\C[10]${maxEnemyLevel}\\C[0]　`);
+
   // Add element info
-  glossaryText += `　　\\C[16]属性：\\C[0]`;
+  glossaryText.push(`　　\\C[16]属性：\\C[0]`);
   if (Number(itemMeta['EnemyElement']) === 0) {
-    glossaryText += `？？？`;
+    glossaryText.push(`？？？`);
   } else {
     enemyElementArray.forEach(elem => {
       const item = dataStates[Number(elem)].name;
-      glossaryText += `【\\C[13]${item}\\C[0]】　`;
+      glossaryText.push(`【\\C[13]${item}\\C[0]】　`);
     });
   }
-  
+
   // Add annihilation count
   const annCount = gameVariables.value(257)[itemId];
   if (annCount >= 1) {
-    glossaryText += `\\C[16]殲滅回数：\\C[0]\\C[10]${annCount}\\C[0]　\n`;
+    glossaryText.push(`\\C[16]殲滅回数：\\C[0]\\C[10]${annCount}\\C[0]　\n`);
   } else {
-    glossaryText += `\n`;
+    glossaryText.push(`\n`);
   }
-  
+
   // Add first annihilation reward
   if (itemMeta['firstAnnihilationItem'] && annCount >= 1) {
     const firstAnnihilationItemArray = itemMeta['firstAnnihilationItem'].split(',');
     const itemType = Number(firstAnnihilationItemArray[0]);
     const rewardItems = itemType === 0 ? dataItems : itemType === 1 ? $dataWeapons : $dataArmors;
     const item = rewardItems[Number(firstAnnihilationItemArray[1])].name;
-    glossaryText += `\\C[16]初回殲滅報酬：\\C[0]\\C[10]${item}\\C[0]　\n`;
+    glossaryText.push(`\\C[16]初回殲滅報酬：\\C[0]\\C[10]${item}\\C[0]　\n`);
   }
-  
+
   // Add treasure chest info
   if (itemMeta['TchestOnly'] && gameVariables.value(212)[itemId] >= 1) {
     const treasureChestArray = itemMeta['TchestOnly'].split(',');
     const itemType = Number(treasureChestArray[3]);
     const treasureItems = itemType === 0 ? dataItems : itemType === 1 ? $dataWeapons : $dataArmors;
     const item = treasureItems[Number(treasureChestArray[4])].name;
-    glossaryText += `\\C[16]白箱：\\C[0]\\C[10]${item}\\C[0]　\n`;
+    glossaryText.push(`\\C[16]白箱：\\C[0]\\C[10]${item}\\C[0]　\n`);
   }
 
   // Add unique materials
-  glossaryText +=  Glossarytext1AddUniqueMaterials(itemMeta, dataItems);
+  glossaryText.push(Glossarytext1AddUniqueMaterials(itemMeta, dataItems));
 
   // Add enemy information
-  glossaryText += `\\C[16]・出現エネミー\\C[0]\n`;
+  glossaryText.push(`\\C[16]・出現エネミー\\C[0]\n`);
   let enemyCount = 0;
   const enemyPopArray = [];
-  
+
   // Collect enemy info
   for (let i = 1; i <= 8; i++) {
     if (!itemMeta['PopEnemy' + i]) continue;
-    
+
     const enemyInfo = itemMeta['PopEnemy' + i].split(',');
     enemyPopArray.push(enemyInfo);
-    
-    glossaryText += `【\\C[2]${enemyInfo[1]}\\C[0]】`;
+
+    glossaryText.push(`【\\C[2]${enemyInfo[1]}\\C[0]】`);
     enemyCount += 1;
     if ((i % 2) === 0) {
-      glossaryText += `\n`;
+      glossaryText.push(`\n`);
     }
   }
-  glossaryText += `\n`;
+  glossaryText.push(`\n`);
 
   // Process enemy data
-  glossaryText += Glossarytext1ProcessEnemyData(enemyPopArray, dataEnemies, dataStates, itemMeta);
+  glossaryText.push(Glossarytext1ProcessEnemyData(enemyPopArray, dataEnemies, dataStates, itemMeta));
 
   // Store result in variable
-  gameVariables.value(variableId)[itemId] = glossaryText;
+  gameVariables.value(variableId)[itemId] = glossaryText.join('');
 };
 
 // Helper function to process unique materials
-function  Glossarytext1AddUniqueMaterials(itemMeta, dataItems) {
-  let materialText = '';
+function Glossarytext1AddUniqueMaterials(itemMeta, dataItems) {
+  const materialTextArray = [];
   let materialCount = 0;
-  
+
   for (let i = 1; i <= 10; i++) {
     if (!itemMeta['UniqueMaterial' + i]) continue;
-    
+
     if (materialCount === 0) {
-      materialText += `\n\\C[16]・希少採取素材\\C[0]`;
+      materialTextArray.push(`\n\\C[16]・希少採取素材\\C[0]`);
     }
-    
+
     const uniqueMaterialArray = itemMeta['UniqueMaterial' + i].split(',');
     if (uniqueMaterialArray[0] >= 1) {
       const item = dataItems[Number(uniqueMaterialArray[0])].name;
-      materialText += `【\\C[3]${item}\\C[0]】`;
+      materialTextArray.push(`【\\C[3]${item}\\C[0]】`);
       materialCount += 1;
-      
+
       if ((materialCount % 3) === 0) {
-        materialText += `\n`;
+        materialTextArray.push(`\n`);
       }
     }
   }
-  
-  return materialText + `\n`;
+
+  return materialTextArray.join('') + `\n`;
 }
 
 // Helper function to process enemy data
 function Glossarytext1ProcessEnemyData(enemyPopArray, dataEnemies, dataStates, itemMeta) {
-  let processedText = '';
+  const processedText = [];
   let stateCount = 0;
   const processedStateNames = new Set();
   
@@ -1820,7 +1821,7 @@ function Glossarytext1ProcessEnemyData(enemyPopArray, dataEnemies, dataStates, i
         const stateIdNum = Number(stateId);
         const state = dataStates[stateIdNum];
         if (!processedStateNames.has(state.name)) {
-          processedText += `${state.description}\n`;
+          processedText.push(`${state.description}\n`);
           processedStateNames.add(state.name);
         }
       });
@@ -1835,13 +1836,13 @@ function Glossarytext1ProcessEnemyData(enemyPopArray, dataEnemies, dataStates, i
     specialStateArray.forEach(stateId => {
       const stateIdNum = Number(stateId);
       if (stateIdNum >= 1) {
-        processedText += `${dataStates[stateIdNum].description}\n`;
+        processedText.push(`${dataStates[stateIdNum].description}\n`);
       }
     });
   }
   
   // Process conditional states
-  processedText += `\n`;
+  processedText.push(`\n`);
   let conditionStateCount = 0;
   
   for (let enemyId = 21; enemyId <= 21 + stateCount; enemyId++) {
@@ -1857,12 +1858,12 @@ function Glossarytext1ProcessEnemyData(enemyPopArray, dataEnemies, dataStates, i
         const nameMatch = nameConditions.some(cond => enemy.name.match(cond));
         
         if (nameMatch && !processedStateNames.has(state.name)) {
-          processedText += `【\\C[14]${state.name}\\C[0]】`;
+          processedText.push(`【\\C[14]${state.name}\\C[0]】`);
           processedStateNames.add(state.name);
           conditionStateCount += 1;
           
           if ((conditionStateCount % 3) === 0) {
-            processedText += `\n`;
+            processedText.push(`\n`);
           }
         }
       }
@@ -1873,19 +1874,19 @@ function Glossarytext1ProcessEnemyData(enemyPopArray, dataEnemies, dataStates, i
         const graphicMatch = graphicConditions.some(cond => enemy.battlerName.match(cond));
         
         if (graphicMatch && !processedStateNames.has(state.name)) {
-          processedText += `【\\C[14]${state.name}\\C[0]】`;
+          processedText.push(`【\\C[14]${state.name}\\C[0]】`);
           processedStateNames.add(state.name);
           conditionStateCount += 1;
           
           if ((conditionStateCount % 3) === 0) {
-            processedText += `\n`;
+            processedText.push(`\n`);
           }
         }
       }
     });
   }
   
-  return processedText;
+  return processedText.join('');
 }
 
 //図鑑のテキスト代入ボス分$gameVariables.value(305)[id]
