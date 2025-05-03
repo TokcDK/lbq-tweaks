@@ -6385,5 +6385,17 @@ is_girl = function (actor) {
       }
     }
   }
+  
+  setupDateTime = function () {
+    const timeget = new Date();
+    const year = timeget.getFullYear();
+    const month = timeget.getMonth() + 1;
+    const day = timeget.getDay();//
+    //var date = timeget.getDate();
+    const hour = timeget.getHours();
+    const min = timeget.getMinutes();
+    const sec = timeget.getSeconds();
+    $gameVariables.setValue(67, year + '/' + month + '/' + day + ' T' + hour + ':' + min + ':' + sec);
+  }
 
 }());
