@@ -6397,5 +6397,23 @@ is_girl = function (actor) {
     const sec = timeget.getSeconds();
     $gameVariables.setValue(67, year + '/' + month + '/' + day + ' T' + hour + ':' + min + ':' + sec);
   }
+  
+  showMapName = function () {
+    const displayName = $gameMap.displayName();
+    if (displayName) {
+      let name;
+      const id = $gameMap.mapId();
+      if (valueMapNameSpecialStaging[id] == 0) {
+        name = displayName;
+      } else {
+        name = valueMapNameSpecialStaging[id];
+        $dataMap.displayName = name;
+      };
+      
+      const num = $gameSwitches.value(201) ? 10 : 3;
+      const infoMessage = `～～\\C[${num}]${name}\\C[0]～～`;
+      CommonPopupManager.showInfo({}, infoMessage, null);
+    };
+  }
 
 }());
