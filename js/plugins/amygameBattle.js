@@ -2151,119 +2151,129 @@ if ($gameSwitches.value(375) && value11 >= 1) {
 
 //戦闘中に変動するステート特徴設定<traitBase1:21,0,1.5>traitBattle_changeSetting(user,stateId,0);
 //ステート耐性。id3が0で基本特殊,1で基本,2で特殊でそれぞれ指定
-traitBattle_changeSetting = function(user, id1, id6) {
+traitBattle_changeSetting = function(user, stateId, multiplier) {
   
-  if (id6 != 0) {
-  const valueItems = $dataStates[id1];
-  valueItems.traits = [];
-  let value2 = 0;
+  if (multiplier != 0) {
+  const stateData = $dataStates[stateId];
+  stateData.traits = [];
+  let traitCount = 0;
+
   for (let i = 1; i <= 9; i++) {
-    if (valueItems.meta['traitBase' + i]) {
-    const id2 = Number(valueItems.meta['traitBase' + i].split(',')[0]);
-    const id3 = Number(valueItems.meta['traitBase' + i].split(',')[1]);
-    const id4 = Math.round(Number(valueItems.meta['traitBase' + i].split(',')[2]) * id6);
-    let value1 = `:`;
-    let value4 = id4;
-    if (id4 <= -0.01) {
-      value4 = id4 - id4 - id4;
+    if (stateData.meta['traitBase' + i]) {
+    const traitCode = Number(stateData.meta['traitBase' + i].split(',')[0]);
+    const traitDataId = Number(stateData.meta['traitBase' + i].split(',')[1]);
+    const traitValue = Math.round(Number(stateData.meta['traitBase' + i].split(',')[2]) * multiplier);
+    let description = `:`;
+    let absoluteTraitValue = traitValue;
+
+    if (traitValue <= -0.01) {
+      absoluteTraitValue = Math.abs(traitValue);
     }
-    if (id2 == 11) {
-      valueItems.traits.push({ code: id2, dataId: id3, value: 1 + id4 });
-      if ([10, 11, 12, 15, 20, 38, 39, 40, 41].some(function(id5) { return id5 == id3 })) {
-      let value3 = id4 >= 0.01 ? `\\C[2]+` : `\\C[1]-`;
-      if (id3 == 11) {
-        value1 += `\\C[16][${$dataSystem.elements[id3]}${value3}${value4 * 10}%]\\C[0]`;
+
+    if (traitCode == 11) {
+      stateData.traits.push({ code: traitCode, dataId: traitDataId, value: 1 + traitValue });
+      if ([10, 11, 12, 15, 20, 38, 39, 40, 41].some(function(elementId) { return elementId == traitDataId })) {
+      let modifier = traitValue >= 0.01 ? `\\C[2]+` : `\\C[1]-`;
+      if (traitDataId == 11) {
+        description += `\\C[16][${$dataSystem.elements[traitDataId]}${modifier}${absoluteTraitValue * 10}%]\\C[0]`;
       } else {
-        value1 += `\\C[16][${$dataSystem.elements[id3]}${value3}${value4 * 100}%]\\C[0]`;
+        description += `\\C[16][${$dataSystem.elements[traitDataId]}${modifier}${absoluteTraitValue * 100}%]\\C[0]`;
       }
       } else {
-      let value3 = id4 >= 0.01 ? `\\C[1]-` : `\\C[2]+`;
-      value1 += `\\C[16][${$dataSystem.elements[id3]}${value3}${(value) * 100}%耐性]\\C[0]`;
+      let modifier = traitValue >= 0.01 ? `\\C[1]-` : `\\C[2]+`;
+      description += `\\C[16][${$dataSystem.elements[traitDataId]}${modifier}${absoluteTraitValue * 100}%耐性]\\C[0]`;
       }
     }
-    if (id2 == 13) {
-      let value3 = id4 >= 0.01 ? `\\C[1]-` : `\\C[2]+`;
+
+    if (traitCode == 13) {
+      let modifier = traitValue >= 0.01 ? `\\C[1]-` : `\\C[2]+`;
       for (let j = 1; j <= $dataStates.length - 1; j++) {
-      if (id3 == 0 || id3 == 1) {
+      if (traitDataId == 0 || traitDataId == 1) {
         if ($dataStates[j].meta[' StateabNomal']) {
-        valueItems.traits.push({ code: id2, dataId: j, value: 1 + id4 });
+        stateData.traits.push({ code: traitCode, dataId: j, value: 1 + traitValue });
         }
       }
-      if (id3 == 0 || id3 == 2) {
+      if (traitDataId == 0 || traitDataId == 2) {
         if ($dataStates[j].meta[' StateSPabNomal']) {
-        valueItems.traits.push({ code: id2, dataId: j, value: 1 + id4 });
+        stateData.traits.push({ code: traitCode, dataId: j, value: 1 + traitValue });
         }
       }
-      if (id3 == 0) {
+      if (traitDataId == 0) {
         if ($dataStates[j].meta[' StateUnique']) {
-        valueItems.traits.push({ code: id2, dataId: j, value: 1 + id4 });
+        stateData.traits.push({ code: traitCode, dataId: j, value: 1 + traitValue });
         }
       }
       }
-      if (id3 == 0) { value1 += `\\C[16][基本特殊固有状態異常耐性${value3}${value4 * 100}]\\C[0]`; }
-      if (id3 == 1) { value1 += `\\C[16][基本状態異常耐性${value3}${value4 * 100}]\\C[0]`; }
-      if (id3 == 2) { value1 += `\\C[16][特殊状態異常耐性${value3}${value4 * 100}]\\C[0]`; }
+      if (traitDataId == 0) { description += `\\C[16][基本特殊固有状態異常耐性${modifier}${absoluteTraitValue * 100}]\\C[0]`; }
+      if (traitDataId == 1) { description += `\\C[16][基本状態異常耐性${modifier}${absoluteTraitValue * 100}]\\C[0]`; }
+      if (traitDataId == 2) { description += `\\C[16][特殊状態異常耐性${modifier}${absoluteTraitValue * 100}]\\C[0]`; }
     }
-    if (id2 == 14) {
+
+    if (traitCode == 14) {
       for (let j = 1; j <= $dataStates.length - 1; j++) {
-      if (id3 == 0 || id3 == 1) {
+      if (traitDataId == 0 || traitDataId == 1) {
         if ($dataStates[j].meta[' StateabNomal']) {
-        valueItems.traits.push({ code: id2, dataId: j, value: 0.1 });
+        stateData.traits.push({ code: traitCode, dataId: j, value: 0.1 });
         }
       }
-      if (id3 == 0 || id3 == 2) {
+      if (traitDataId == 0 || traitDataId == 2) {
         if ($dataStates[j].meta[' StateSPabNomal']) {
-        valueItems.traits.push({ code: id2, dataId: j, value: 0.1 });
+        stateData.traits.push({ code: traitCode, dataId: j, value: 0.1 });
         }
       }
-      if (id3 == 0) {
+      if (traitDataId == 0) {
         if ($dataStates[j].meta[' StateUnique']) {
-        valueItems.traits.push({ code: id2, dataId: j, value: 0.1 });
+        stateData.traits.push({ code: traitCode, dataId: j, value: 0.1 });
         }
       }
       }
-      if (id3 == 0) { value1 += `\\C[16][基本特殊固有状態異常無効]\\C[0]`; }
-      if (id3 == 1) { value1 += `\\C[16][基本状態異常耐性無効]\\C[0]`; }
-      if (id3 == 2) { value1 += `\\C[16][特殊状態異常耐性無効]\\C[0]`; }
+      if (traitDataId == 0) { description += `\\C[16][基本特殊固有状態異常無効]\\C[0]`; }
+      if (traitDataId == 1) { description += `\\C[16][基本状態異常耐性無効]\\C[0]`; }
+      if (traitDataId == 2) { description += `\\C[16][特殊状態異常耐性無効]\\C[0]`; }
     }
-    if (id2 == 21) {
-      let value3 = id4 >= 0.01 ? `\\C[2]+` : `\\C[1]-`;
-      valueItems.traits.push({ code: id2, dataId: id3, value: 1 + id4 });
-      value1 += `\\C[16][${TextManager.param(id3)}${value3}${value4 * 100}%]\\C[0]`;
+
+    if (traitCode == 21) {
+      let modifier = traitValue >= 0.01 ? `\\C[2]+` : `\\C[1]-`;
+      stateData.traits.push({ code: traitCode, dataId: traitDataId, value: 1 + traitValue });
+      description += `\\C[16][${TextManager.param(traitDataId)}${modifier}${absoluteTraitValue * 100}%]\\C[0]`;
     }
-    if (id2 == 22) {
-      let value3 = id4 >= 0.01 ? `\\C[2]+` : `\\C[1]-`;
-      valueItems.traits.push({ code: id2, dataId: id3, value: id4 });
-      value1 += `\\C[16][${FTKR.CSS.cssStatus.xparam[id3]}${value3}${value4 * 100}%]\\C[0]`;
+
+    if (traitCode == 22) {
+      let modifier = traitValue >= 0.01 ? `\\C[2]+` : `\\C[1]-`;
+      stateData.traits.push({ code: traitCode, dataId: traitDataId, value: traitValue });
+      description += `\\C[16][${FTKR.CSS.cssStatus.xparam[traitDataId]}${modifier}${absoluteTraitValue * 100}%]\\C[0]`;
     }
-    if (id2 == 23) {
-      let value3 = id4 >= 0.01 ? `\\C[2]+` : `\\C[1]-`;
-      valueItems.traits.push({ code: id2, dataId: id3, value: 1 + id4 });
-      value1 += `\\C[16][${FTKR.CSS.cssStatus.sparam[id3]}${value3}${value4 * 100}%]\\C[0]`;
+
+    if (traitCode == 23) {
+      let modifier = traitValue >= 0.01 ? `\\C[2]+` : `\\C[1]-`;
+      stateData.traits.push({ code: traitCode, dataId: traitDataId, value: 1 + traitValue });
+      description += `\\C[16][${FTKR.CSS.cssStatus.sparam[traitDataId]}${modifier}${absoluteTraitValue * 100}%]\\C[0]`;
     }
-    value2 += 1;
-    if (value2 >= 3) { value1 += `\n`; }
+
+    traitCount += 1;
+    if (traitCount >= 3) { description += `\n`; }
     }
   }
-  if (valueItems.meta['Help Description']) {
-    if (valueItems.meta['DescriptionWord']) {
-    value1 = `[${valueItems.meta['DescriptionWord']}]${value1}`;
+
+  if (stateData.meta['Help Description']) {
+    if (stateData.meta['DescriptionWord']) {
+    description = `[${stateData.meta['DescriptionWord']}]${description}`;
     }
-    if (valueItems.meta['Category']) {
-    if (valueItems.meta['Category'] == ' InvalidDispel') {
-      value1 += `[${$dataStates[201].description}]`;
+    if (stateData.meta['Category']) {
+    if (stateData.meta['Category'] == ' InvalidDispel') {
+      description += `[${$dataStates[201].description}]`;
     }
-    if (valueItems.meta['Category'] == ' PowerUp') {
-      value1 += `[${$dataStates[202].description}]`;
+    if (stateData.meta['Category'] == ' PowerUp') {
+      description += `[${$dataStates[202].description}]`;
     }
-    if (valueItems.meta['Category'] == ' StateSPabNomal') {
-      value1 += `[${$dataStates[30].description}]`;
+    if (stateData.meta['Category'] == ' StateSPabNomal') {
+      description += `[${$dataStates[30].description}]`;
     }
-    if (valueItems.meta['Category'] == ' StateUnique') {
-      value1 += `[${$dataStates[40].description}]`;
+    if (stateData.meta['Category'] == ' StateUnique') {
+      description += `[${$dataStates[40].description}]`;
     }
     }
-    valueItems.description = value1;
+    stateData.description = description;
   }
   user.refresh();
   }
