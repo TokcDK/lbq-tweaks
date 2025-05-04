@@ -6419,69 +6419,80 @@ is_girl = function (actor) {
   evStateCleanFromActors = function (actorInitId, actorEndId, stateId) {
     for (let actorId = actorInitId; actorId <= actorEndId; actorId++) {
       $gameActors.actor(actorId).removeState(stateId);
-    };
-  }
-  
+    }
+  };
+
   //#region cev 296
   ev296RemoveTempState = function (valueTachieChangeStateTemporary, parentList) {
     const stateIds = valueTachieChangeStateTemporary;
     const start = $gameVariables.value(75);
     const end = $gameVariables.value(76);
-
-    stateIds.forEach(function (id1) {
-      evStateCleanFromActors(start, end, id1);
-    }, this);
-
-    const actorIds = $gameVariables.value(247);
-    const members = $gameParty.members();
     const gameVariables = $gameVariables;
+    const members = $gameParty.members();
 
-    actorIds.forEach(function (id) {
+    // Remove temporary states from all actors
+    stateIds.forEach(stateId => {
+      evStateCleanFromActors(start, end, stateId);
+    });
+
+    // Restore outfit settings for party members
+    const actorIds = gameVariables.value(247);
+    actorIds.forEach(id => {
       const actor = $gameActors.actor(id);
       
-      if (members.contains(actor)) {
-        for (let i = 0; i <= 42; i++) {
-          gameVariables.value(id + 440)[i] = gameVariables.value(id + 540)[i]
-        };
-
-        gameVariables.setValue(20, id);
-        tachie_settei2();
+      if (!members.contains(actor)) return;
+      
+      // Restore outfit variables
+      for (let i = 0; i <= 42; i++) {
+        gameVariables.value(id + 440)[i] = gameVariables.value(id + 540)[i];
       }
-    }, this);
 
-    //立ち絵コモン終了し忘れている場合のため
+      // Update character appearance
+      gameVariables.setValue(20, id);
+      tachie_settei2();
+    });
+
+    // Ensure standing picture common event is properly terminated
     parentList.setupChild($dataCommonEvents[19].list, 0);
-  }
-
+  };
   //#endregion
-  
+
   //#region cev23
   ev23StateReleaseOverTime = function (parent) {
     const start = $gameVariables.value(75);
     const end = $gameVariables.value(76);
+    const gameVariables = $gameVariables;
 
-    const statesMaxId = $dataStates.length - 1;
-    for (let stateId = 1; stateId <= statesMaxId; stateId++) {
+    // Process each state that has the timeRemove flag
+    for (let stateId = 1; stateId < $dataStates.length; stateId++) {
       const state = $dataStates[stateId];
-      if (state.meta['timeRemove']) {
-        if ($gameParty.membersState(stateId)) {
-          parent.sVal(539, $gameVariables.value(539) + `${state.name}が解除された。\n`);
-          parent.sVal(540, $gameVariables.value(540) + 1);
-        };
-        evStateCleanFromActors(start, end, stateId);
-      };
-    };
-  }
+      if (!state.meta['timeRemove']) continue;
+      
+      // If any party member has this state, log its removal
+      if ($gameParty.membersState(stateId)) {
+        parent.sVal(539, gameVariables.value(539) + `${state.name}が解除された。\n`);
+        parent.sVal(540, gameVariables.value(540) + 1);
+      }
+      
+      // Remove the state from all actors
+      evStateCleanFromActors(start, end, stateId);
+    }
+  };
 
   ev23DecreaseTPby30 = function (parent) {
     const actorIds = $gameVariables.value(248);
-    actorIds.forEach(function (actorId) {
+    const gameVariables = $gameVariables;
+    
+    // Reduce TP for each party member
+    actorIds.forEach(actorId => {
       $gameActors.actor(actorId).gainTp(-30);
-    }, parent);
+    });
 
-    parent.sVal(539, $gameVariables.value(539) + `パーティメンバーのTP-30\n`);
-    parent.sVal(540, $gameVariables.value(540) + 1);
-  }
+    // Log the TP reduction
+    parent.sVal(539, gameVariables.value(539) + `パーティメンバーのTP-30\n`);
+    parent.sVal(540, gameVariables.value(540) + 1);
+  };
+  //#endregion
 
   ev23MorningDayEveningNightSwitch = function (parent) {
     // First reset all time switches
