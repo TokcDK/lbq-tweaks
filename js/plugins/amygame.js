@@ -6484,29 +6484,28 @@ is_girl = function (actor) {
   }
 
   ev23MorningDayEveningNightSwitch = function (parent) {
+    // First reset all time switches
+    for (let i = 13; i <= 15; i++) {
+      $gameSwitches.setValue(i, false);
+    }
+    
+    // Determine the next time of day
+    let nextTimeOfDay;
     if ($gameSwitches.value(15)) {
-      for (let i = 13; i <= 15; i++) { $gameSwitches.setValue(i, false) };
-      $gameSwitches.setValue(13, true);
-    } else {
-      if ($gameSwitches.value(14)) {
-        for (let i = 13; i <= 15; i++) { $gameSwitches.setValue(i, false) };
-        $gameSwitches.setValue(15, true);
-      } else {
-        for (let i = 13; i <= 15; i++) { $gameSwitches.setValue(i, false) };
-        $gameSwitches.setValue(14, true);
-      }
-    };
-
-    if ($gameSwitches.value(15)) {
+      nextTimeOfDay = 13; // Morning (after Night)
       parent.sVal(539, $gameVariables.value(539) + `夜になりました。\n`);
       parent.sVal(540, $gameVariables.value(540) + 1);
+    } else if ($gameSwitches.value(14)) {
+      nextTimeOfDay = 15; // Night (after Day)
+      parent.sVal(539, $gameVariables.value(539) + `昼になりました。\n`);
+      parent.sVal(540, $gameVariables.value(540) + 1);
     } else {
-      if ($gameSwitches.value(14)) {
-        parent.sVal(539, $gameVariables.value(539) + `昼になりました。\n`);
-        parent.sVal(540, $gameVariables.value(540) + 1);
-      };
-    };
-  }
+      nextTimeOfDay = 14; // Day (after Morning)
+    }
+    
+    // Set the next time of day
+    $gameSwitches.setValue(nextTimeOfDay, true);
+  };
 
   ev23zsumaho = function () {
     WindowManager.show(1, 0, 100, 1024, (120 + $gameVariables.value(540) * 60));
