@@ -6207,90 +6207,90 @@ if(id1 == 1){
 //enemy_drop = function(user,enemy){
 //};
 
-learn_show_eval_is_notlearned_added_contains = function (user, skillId) {
-  return !user.isLearnedSkill(skillId) && user.addedSkills().contains(skillId);
-};
+  learn_show_eval_is_notlearned_added_contains = function (user, skillId) {
+    return !user.isLearnedSkill(skillId) && user.addedSkills().contains(skillId);
+  };
 
-learn_show_eval_mastery_moreorequalof = function (user, skillId, minSkillMasteryLevel) {
+  learn_show_eval_mastery_moreorequalof = function (user, skillId, minSkillMasteryLevel) {
     return user.skillMasteryLevel(skillId) >= minSkillMasteryLevel;
-};
+  };
 
-learn_show_eval_notmax_or_islearned = function (user, skillId) {
-  if (user.skillMasteryLevel(skillId) >= Number($dataSkills[skillId].meta['Max Mastery Level'])) {
-    return false;
-  } else return user.isLearnedSkill(skillId);
-};
-
-learn_show_eval_is_notlearned_max_addedcontains_reqskill = function (user, skillId, reqSkillId) {
-  if (user.isLearnedSkill(skillId)) {
-    return false;
-  } else {
-    if (user.skillMasteryLevel(skillId) >= Number($dataSkills[skillId].meta['Max Mastery Level']) &&
-      user.addedSkills().contains(skillId) && user.isLearnedSkill(reqSkillId)) {
-      return true;
-    } else {
+  learn_show_eval_notmax_or_islearned = function (user, skillId) {
+    if (user.skillMasteryLevel(skillId) >= Number($dataSkills[skillId].meta['Max Mastery Level'])) {
       return false;
+    } else return user.isLearnedSkill(skillId);
+  };
+
+  learn_show_eval_is_notlearned_max_addedcontains_reqskill = function (user, skillId, reqSkillId) {
+    if (user.isLearnedSkill(skillId)) {
+      return false;
+    } else {
+      if (user.skillMasteryLevel(skillId) >= Number($dataSkills[skillId].meta['Max Mastery Level']) &&
+        user.addedSkills().contains(skillId) && user.isLearnedSkill(reqSkillId)) {
+        return true;
+      } else {
+        return false;
+      };
     };
   };
-};
 
-commonEvents_setVar474_by_var135_mapId = function (var135val, mapId, event_pararelStarting_param2) {
-  if ($gameVariables.value(135) == var135val) {
-    if ($gameMap.mapId() == mapId) {
+  commonEvents_setVar474_by_var135_mapId = function (var135val, mapId, event_pararelStarting_param2) {
+    if ($gameVariables.value(135) == var135val) {
+      if ($gameMap.mapId() == mapId) {
         event_pararelStarting(0, event_pararelStarting_param2, 0);
         $gameSwitches.setValue(474, true);
+      };
     };
   };
-};
 
-commonEvents_setVar474_by_var135_mapId_1 = function (var135val, mapId, switchId, event_pararelStarting_param2) {
-  if ($gameVariables.value(135) == var135val) {
-    if ($gameMap.mapId() == mapId) {
-      if ($gameSwitches.value(switchId)) {//ｶﾞｰﾃﾞｨｱﾝ勝利
-        event_pararelStarting(0, event_pararelStarting_param2, 0);
-        $gameSwitches.setValue(474, true);
+  commonEvents_setVar474_by_var135_mapId_1 = function (var135val, mapId, switchId, event_pararelStarting_param2) {
+    if ($gameVariables.value(135) == var135val) {
+      if ($gameMap.mapId() == mapId) {
+        if ($gameSwitches.value(switchId)) {//ｶﾞｰﾃﾞｨｱﾝ勝利
+          event_pararelStarting(0, event_pararelStarting_param2, 0);
+          $gameSwitches.setValue(474, true);
+        }
       }
     }
   }
-}
 
-scene_joukenNakami_clean_prefixes = function (text){
+  scene_joukenNakami_clean_prefixes = function (text) {
 
-  return text
-  .replace("[daysReset]", "")
-  .replace("[NoReset]", "")
-  .replace("[夜自動]", "")
-  .replace("[シーン達成]", "")
-  .replace("[挿話達成]", "");
-}
-
-get_valueItems_iwa = function(id){
-  switch (Number(id)) {
-    case 1:
-      return $dataWeapons;
-    case 2:
-      return $dataArmors;
-    default:
-      return $dataItems;
+    return text
+      .replace("[daysReset]", "")
+      .replace("[NoReset]", "")
+      .replace("[夜自動]", "")
+      .replace("[シーン達成]", "")
+      .replace("[挿話達成]", "");
   }
-}
 
-get_valueItems_sis = function (id) {
-  switch (Number(id)) {
-    case 0:
-      return $dataSkills;
-    case 1:
-      return $dataItems;
-    case 2:
-      return $dataStates;
-    default:
-      console.error(`get_valueItems_sis: id(${id}}) is not 0,1,2!`);
-      return null;
+  get_valueItems_iwa = function (id) {
+    switch (Number(id)) {
+      case 1:
+        return $dataWeapons;
+      case 2:
+        return $dataArmors;
+      default:
+        return $dataItems;
+    }
   }
-}
 
-is_girl = function (actor) {
-  return actor.isStateAffected(602);
+  get_valueItems_sis = function (id) {
+    switch (Number(id)) {
+      case 0:
+        return $dataSkills;
+      case 1:
+        return $dataItems;
+      case 2:
+        return $dataStates;
+      default:
+        console.error(`get_valueItems_sis: id(${id}}) is not 0,1,2!`);
+        return null;
+    }
+  }
+
+  is_girl = function (actor) {
+    return actor.isStateAffected(602);
   }
 
   // CommonEvents
