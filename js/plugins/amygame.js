@@ -6468,6 +6468,14 @@ is_girl = function (actor) {
     };
   }
 
+  ev23DecreaseTPby30 = function (parent) {
+    const actorIds = $gameVariables.value(248);
+    actorIds.forEach(function (actorId) {
+      $gameActors.actor(actorId).gainTp(-30);
+    }, parent);
 
+    parent.sVal(539, $gameVariables.value(539) + `パーティメンバーのTP-30\n`);
+    parent.sVal(540, $gameVariables.value(540) + 1);
+  }
 
 }());
