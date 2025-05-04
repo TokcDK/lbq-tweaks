@@ -1117,62 +1117,67 @@ scene_choiceDecision = function (arr1, value6) {//scene_choiceDecision([503,502,
 //挿話選択肢発生スクリプト
 scene_choiceSouwa = function () {
 
+  // Reset the Souwa choice flag
   $gameVariables.setValue(19, 0);
   valueScriptArray1 = [];
-  let setVar19 = false;
-  for (let i = 1201; i <= 1300; i++) {
-    if (!$gameSwitches.value(i) || $gameParty.hasItem(i - 800)) continue;
-    if ($gameSwitches.value(i + 100)) continue;
-    if ($dataItems[i - 800].meta['singleSouwaIncidence']) continue;
+  let hasSouwaChoices = false;
 
-    //valueScriptArray1.push(i+300);
-    valueScriptArray1.push(i - 800);
-    setVar19 = true;
-  }
-  for (let i = 1; i < $dataItems.length; i++) {
-    const item = $dataItems[i];
-    if (!item.meta['AddEventIncidenceSwi'] || Number(item.meta['EICSwitch']) !== 102) continue;
-    if (!$gameSwitches.value(Number(item.meta['AddEventIncidenceSwi']))) continue;
-    if ($gameParty.hasItem(i)) continue;
-    if ($gameSwitches.value(Number(item.meta['AddEventCompSwi']))) continue;
-    if (item.meta['singleSouwaIncidence']) continue;
+  // Check souwa choices from switch range 1201-1300
+  for (let switchId = 1201; switchId <= 1300; switchId++) {
+    const itemId = switchId - 800;
+    if (!$gameSwitches.value(switchId) || $gameParty.hasItem(itemId)) continue;
+    if ($gameSwitches.value(switchId + 100)) continue;
+    if ($dataItems[itemId].meta['singleSouwaIncidence']) continue;
 
-    valueScriptArray1.push(Number(item.meta['AddEventParallelSwi']));//未完成
-    setVar19 = true;
+    valueScriptArray1.push(itemId);
+    hasSouwaChoices = true;
   }
 
-  if (!setVar19) return;
+  // Check souwa choices from data items
+  for (let itemId = 1; itemId < $dataItems.length; itemId++) {
+    const currentItem = $dataItems[itemId];
+    if (!currentItem.meta['AddEventIncidenceSwi'] || Number(currentItem.meta['EICSwitch']) !== 102) continue;
+    if (!$gameSwitches.value(Number(currentItem.meta['AddEventIncidenceSwi']))) continue;
+    if ($gameParty.hasItem(itemId)) continue;
+    if ($gameSwitches.value(Number(currentItem.meta['AddEventCompSwi']))) continue;
+    if (currentItem.meta['singleSouwaIncidence']) continue;
 
+    valueScriptArray1.push(Number(currentItem.meta['AddEventParallelSwi']));
+    hasSouwaChoices = true;
+  }
+
+  if (!hasSouwaChoices) return;
+
+  // Activate the Souwa event flag
   $gameVariables.setValue(19, 1);
-  for (let i = 0; i <= valueScriptArray1.length - 1; i++) {
-    const itemId = valueScriptArray1[i];
-    const itemName = $dataItems[itemId].name
+  for (let index = 0; index < valueScriptArray1.length; index++) {
+    const chosenItemId = valueScriptArray1[index];
+    const chosenItemName = $dataItems[chosenItemId].name;
     const choiceParams = {
-      text: `${itemName}`,
-      value: itemId
+      text: `${chosenItemName}`,
+      value: chosenItemId
     };
 
-    //const id = 1;
     $gameSystem.addCustomChoice(1, choiceParams);
   }
-  /*
-  if($gameVariables.value(19) >= 1){
-    for(var i = 0; i <= valueScriptArray1.length-1; i++){
-      var value1 = `？？？`;
-      for (var j = 1; j <= $dataCommonEvents.length-1; j++) {
-        if($dataCommonEvents[j].switchId == valueScriptArray1[i]){
-          var value1 = $dataCommonEvents[j].name
-          const id = 1; 
-          const choiceParams = {
-          text: `${value1}`,
-          value: valueScriptArray1[i]};
-          $gameSystem.addCustomChoice(id, choiceParams);
-        };
-      };
-    };
-  };
-  */
 
+  /*
+  if ($gameVariables.value(19) >= 1) {
+    for (var index = 0; index < valueScriptArray1.length; index++) {
+      var commonEventChoiceName = `？？？`;
+      for (var commonEventId = 1; commonEventId < $dataCommonEvents.length; commonEventId++) {
+        if ($dataCommonEvents[commonEventId].switchId == valueScriptArray1[index]) {
+          commonEventChoiceName = $dataCommonEvents[commonEventId].name;
+          const choiceParams = {
+            text: `${commonEventChoiceName}`,
+            value: valueScriptArray1[index]
+          };
+          $gameSystem.addCustomChoice(1, choiceParams);
+        }
+      }
+    }
+  }
+  */
 }
 
 //オールナビスクリプト
