@@ -547,7 +547,7 @@ charagra_henkou1 = function(actorId) {
   // Set character and battler images
   const characterImageId = actorId + '_' + $gameVariables.value(21);
   const characterImageIndex = $gameVariables.value(22);
-  const battlerImageId = $gameVariables.value(23);
+  const battlerImageId = actorId + '_' + $gameVariables.value(23);
   
   actor.setCharacterImage(characterImageId, characterImageIndex);
   actor.setBattlerImage(battlerImageId);
