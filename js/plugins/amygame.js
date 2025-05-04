@@ -6417,30 +6417,30 @@ is_girl = function (actor) {
   }
 
   evStateCleanFromActors = function (actorInitId, actorEndId, stateId) {
-    for (var actorId = actorInitId; actorId <= actorEndId; actorId++) {
+    for (let actorId = actorInitId; actorId <= actorEndId; actorId++) {
       $gameActors.actor(actorId).removeState(stateId);
     };
   }
   
   //#region cev 296
   ev296RemoveTempState = function (valueTachieChangeStateTemporary, parentList) {
-    var stateIds = valueTachieChangeStateTemporary;
-    var start = $gameVariables.value(75);
-    var end = $gameVariables.value(76);
+    const stateIds = valueTachieChangeStateTemporary;
+    const start = $gameVariables.value(75);
+    const end = $gameVariables.value(76);
 
     stateIds.forEach(function (id1) {
       evStateCleanFromActors(start, end, id1);
     }, this);
 
-    var actorIds = $gameVariables.value(247);
+    const actorIds = $gameVariables.value(247);
     const members = $gameParty.members();
     const gameVariables = $gameVariables;
 
     actorIds.forEach(function (id) {
-      var actor = $gameActors.actor(id);
+      const actor = $gameActors.actor(id);
       
       if (members.contains(actor)) {
-        for (var i = 0; i <= 42; i++) {
+        for (let i = 0; i <= 42; i++) {
           gameVariables.value(id + 440)[i] = gameVariables.value(id + 540)[i]
         };
 
@@ -6461,7 +6461,7 @@ is_girl = function (actor) {
     const end = $gameVariables.value(76);
 
     const statesMaxId = $dataStates.length - 1;
-    for (var stateId = 1; stateId <= statesMaxId; stateId++) {
+    for (let stateId = 1; stateId <= statesMaxId; stateId++) {
       const state = $dataStates[stateId];
       if (state.meta['timeRemove']) {
         if ($gameParty.membersState(stateId)) {
@@ -6485,14 +6485,14 @@ is_girl = function (actor) {
 
   ev23MorningDayEveningNightSwitch = function (parent) {
     if ($gameSwitches.value(15)) {
-      for (var i = 13; i <= 15; i++) { $gameSwitches.setValue(i, false) };
+      for (let i = 13; i <= 15; i++) { $gameSwitches.setValue(i, false) };
       $gameSwitches.setValue(13, true);
     } else {
       if ($gameSwitches.value(14)) {
-        for (var i = 13; i <= 15; i++) { $gameSwitches.setValue(i, false) };
+        for (let i = 13; i <= 15; i++) { $gameSwitches.setValue(i, false) };
         $gameSwitches.setValue(15, true);
       } else {
-        for (var i = 13; i <= 15; i++) { $gameSwitches.setValue(i, false) };
+        for (let i = 13; i <= 15; i++) { $gameSwitches.setValue(i, false) };
         $gameSwitches.setValue(14, true);
       }
     };
@@ -6513,8 +6513,8 @@ is_girl = function (actor) {
   }
 
   ev23showElapsedMessage = function () {
-    var dayNum = $gameVariables.value(58);
-    var weekNum = $gameVariables.value(55);
+    const dayNum = $gameVariables.value(58);
+    const weekNum = $gameVariables.value(55);
     TickerManager.show(`──${dayNum}日目(${weekNum}曜日)経過──`);
   }
   //#endregion
