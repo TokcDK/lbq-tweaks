@@ -6508,4 +6508,10 @@ is_girl = function (actor) {
     WindowManager.show(1, 0, 100, 1024, (120 + $gameVariables.value(540) * 60));
   }
 
+  ev23showElapsedMessage = function () {
+    var dayNum = $gameVariables.value(58);
+    var weekNum = $gameVariables.value(55);
+    TickerManager.show(`──${dayNum}日目(${weekNum}曜日)経過──`);
+  }
+
 }());
