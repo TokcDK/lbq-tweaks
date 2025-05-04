@@ -6297,10 +6297,10 @@ if(id1 == 1){
 
     const inBattleSwitch = $gameSwitches.value(30);
     if ($gameParty.inBattle() == inBattleSwitch){
-      console.warn("isInBattle: $gameParty.inBattle() == inBattleSwitch is true!");
+      console.warn(`isInBattle: inBattleSwitch is ${inBattleSwitch} and is equal to $gameParty.inBattle()!`);
     }
     else{
-      console.warn("isInBattle: $gameParty.inBattle() == inBattleSwitch is false!");
+      console.warn(`isInBattle: inBattleSwitch is ${inBattleSwitch} and is NOT equal to $gameParty.inBattle()!`);
     }
 
     return inBattleSwitch; // in battle game switch, for some reason using instead of $gameParty.inBattle();
