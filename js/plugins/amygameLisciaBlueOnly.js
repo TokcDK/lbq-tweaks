@@ -1317,7 +1317,7 @@ if([1,4].some(function(id){return $gameVariables.value(value1+22) == (id)}) ){
   $gameVariables.setValue(value1+16,1);
 };
 
-if($gameSwitches.value(97) || $gameSwitches.value(30)){}else{ //立ち絵会話時と戦闘時にランダム表情変化を禁止する。
+if($gameSwitches.value(97) || isInBattle()){}else{ //立ち絵会話時と戦闘時にランダム表情変化を禁止する。
 //平常時、確率でドヤ顔
   if([1,2,5,6,15].some(function(id){return $gameVariables.value(value1+33) == (id)})){
     var arr = [1,1,1,1,2,1,1,1];

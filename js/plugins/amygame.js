@@ -6295,14 +6295,15 @@ if(id1 == 1){
 
   isInBattle = function () {
 
-    if($gameParty.inBattle() == $gameSwitches.value(30)){
-      console.warn("isInBattle: $gameParty.inBattle() == $gameSwitches.value(30) is true!");
+    const inBattleSwitch = $gameSwitches.value(30);
+    if ($gameParty.inBattle() == inBattleSwitch){
+      console.warn("isInBattle: $gameParty.inBattle() == inBattleSwitch is true!");
     }
     else{
-      console.warn("isInBattle: $gameParty.inBattle() == $gameSwitches.value(30) is false!");
+      console.warn("isInBattle: $gameParty.inBattle() == inBattleSwitch is false!");
     }
 
-    return $gameSwitches.value(30); // in battle game switch, for some reason using instead of $gameParty.inBattle();
+    return inBattleSwitch; // in battle game switch, for some reason using instead of $gameParty.inBattle();
   }
 
   // CommonEvents
