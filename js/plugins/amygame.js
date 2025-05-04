@@ -6446,18 +6446,19 @@ is_girl = function (actor) {
     parentList.setupChild($dataCommonEvents[19].list, 0);
   }
   
-  ev23StateReleaseOverTime = function () {
+  ev23StateReleaseOverTime = function (parent) {
     const start = $gameVariables.value(75);
     const end = $gameVariables.value(76);
 
-    for (var i = 1; i <= $dataStates.length - 1; i++) {
-      const state = $dataStates[i];
+    const statesMaxId = $dataStates.length - 1;
+    for (var stateId = 1; stateId <= statesMaxId; stateId++) {
+      const state = $dataStates[stateId];
       if (state.meta['timeRemove']) {
-        if ($gameParty.membersState(i)) {
-          this.sVal(539, $gameVariables.value(539) + `${state.name}が解除された。\n`);
-          this.sVal(540, $gameVariables.value(540) + 1);
+        if ($gameParty.membersState(stateId)) {
+          parent.sVal(539, $gameVariables.value(539) + `${state.name}が解除された。\n`);
+          parent.sVal(540, $gameVariables.value(540) + 1);
         };
-        evStateCleanFromActors(start, end, i);
+        evStateCleanFromActors(start, end, stateId);
       };
     };
   }
