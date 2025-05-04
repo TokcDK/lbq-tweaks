@@ -529,23 +529,32 @@ tachie_settei2 = function() {
 
 //☆☆キャラグラ変更。
 charagra_henkou1 = function(actorId) {
+  // Return early if actorId is invalid
+  if (actorId < 1) return;
 
-  if (actorId >= 1) {
-    const actor = $gameActors.actor(actorId);
-    if (is_girl(actor)) {
-      charagra_choice1(actorId);
-      isyou_senyouLisciaBlueOnly(actorId); // Special processing for Liscia Blue only
-      const characterImageId = actorId + '_' + $gameVariables.value(21);
-      const characterImageIndex = $gameVariables.value(22);
-      const battlerImageId = $gameVariables.value(23);
-
-      actor.setCharacterImage(characterImageId, characterImageIndex);
-      actor.setBattlerImage(battlerImageId);
-
-      if (!$gameSwitches.value(30)) {
-        $gameSwitches.setValue(148, true);
-      }
-    }
+  // Get actor reference
+  const actor = $gameActors.actor(actorId);
+  
+  // Return early if actor isn't female
+  if (!is_girl(actor)) return;
+  
+  // Process character graphics change
+  charagra_choice1(actorId);
+  
+  // Apply special processing for Liscia Blue
+  isyou_senyouLisciaBlueOnly(actorId);
+  
+  // Set character and battler images
+  const characterImageId = actorId + '_' + $gameVariables.value(21);
+  const characterImageIndex = $gameVariables.value(22);
+  const battlerImageId = $gameVariables.value(23);
+  
+  actor.setCharacterImage(characterImageId, characterImageIndex);
+  actor.setBattlerImage(battlerImageId);
+  
+  // Set switch if not in battle
+  if (!$gameSwitches.value(30)) {
+    $gameSwitches.setValue(148, true);
   }
 };
 
