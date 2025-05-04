@@ -6479,4 +6479,33 @@ is_girl = function (actor) {
     parent.sVal(540, $gameVariables.value(540) + 1);
   }
 
+  ev23MorningDayEveningNightSwitch = function (parent) {
+    if ($gameSwitches.value(15)) {
+      for (var i = 13; i <= 15; i++) { $gameSwitches.setValue(i, false) };
+      $gameSwitches.setValue(13, true);
+    } else {
+      if ($gameSwitches.value(14)) {
+        for (var i = 13; i <= 15; i++) { $gameSwitches.setValue(i, false) };
+        $gameSwitches.setValue(15, true);
+      } else {
+        for (var i = 13; i <= 15; i++) { $gameSwitches.setValue(i, false) };
+        $gameSwitches.setValue(14, true);
+      }
+    };
+
+    if ($gameSwitches.value(15)) {
+      parent.sVal(539, $gameVariables.value(539) + `夜になりました。\n`);
+      parent.sVal(540, $gameVariables.value(540) + 1);
+    } else {
+      if ($gameSwitches.value(14)) {
+        parent.sVal(539, $gameVariables.value(539) + `昼になりました。\n`);
+        parent.sVal(540, $gameVariables.value(540) + 1);
+      };
+    };
+  }
+
+  ev23zsumaho = function () {
+    WindowManager.show(1, 0, 100, 1024, (120 + $gameVariables.value(540) * 60));
+  }
+
 }());
