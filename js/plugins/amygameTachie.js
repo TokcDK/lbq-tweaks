@@ -456,55 +456,59 @@ kisekae_naibusyori1 = function(){
 //☆☆立ち絵設定。本体
 tachie_settei2 = function(){
 
-for (let i = 561; i <= 600; i++) { $gameVariables.setValue(i, 0) };
-
-const gameVar20 = $gameVariables.value(20);
-const gameVar20_440_id = gameVar20 + 440;
-const actorGameVar20 = $gameActors.actor(gameVar20);
-const gameVar20_440 = $gameVariables.value(gameVar20_440_id);
-
-//現在衣装を呼び出し
-for (let i = 1; i <= 40; i++) {
-  $gameVariables.setValue(i + 460, gameVar20_440[i]);
+for (let variableIndex = 561; variableIndex <= 600; variableIndex++) { 
+  $gameVariables.setValue(variableIndex, 0); 
 };
-  if (is_girl(actorGameVar20)){
-    if (actorGameVar20.isStateAffected(valueDollStateId)){
-      for (let i = 1; i <= 40; i++) {
-        $gameVariables.setValue(i+560,$gameVariables.value(i+460));
-      };
-      for (let i = 1; i <= 40; i++) {
-        $gameVariables.setValue(i+460,0);
-      };
-      $gameVariables.setValue(1+460,3);
-    } else {
-      rosyutu_genkai();
-      rosyutu_genzai();
-      if (!actorGameVar20.isStateAffected(23)) tachie_settei1();
-    }
-  };
+
+const actorId = $gameVariables.value(20);
+const actorClothingDataId = actorId + 440;
+const actor = $gameActors.actor(actorId);
+const actorClothingData = $gameVariables.value(actorClothingDataId);
+
+// Load current clothing data
+for (let clothingIndex = 1; clothingIndex <= 40; clothingIndex++) {
+  $gameVariables.setValue(clothingIndex + 460, actorClothingData[clothingIndex]);
+};
+
+if (is_girl(actor)) {
+  if (actor.isStateAffected(valueDollStateId)) {
+    for (let clothingIndex = 1; clothingIndex <= 40; clothingIndex++) {
+      $gameVariables.setValue(clothingIndex + 560, $gameVariables.value(clothingIndex + 460));
+    };
+    for (let clothingIndex = 1; clothingIndex <= 40; clothingIndex++) {
+      $gameVariables.setValue(clothingIndex + 460, 0);
+    };
+    $gameVariables.setValue(1 + 460, 3);
+  } else {
+    rosyutu_genkai();
+    rosyutu_genzai();
+    if (!actor.isStateAffected(23)) tachie_settei1();
+  }
+};
 
 tachie_naibusyori2();
 
-//一時代入した仮情報を立ち絵指定後に反映
-for (let i = 1; i <= 40; i++) {
-  const gameVar_i560 = $gameVariables.value(i + 560);
-  if (gameVar_i560 >= 1){
-    $gameVariables.setValue(i + 460, gameVar_i560);
-}};
+// Apply temporary clothing data after setting the standing picture
+for (let clothingIndex = 1; clothingIndex <= 40; clothingIndex++) {
+  const temporaryClothingData = $gameVariables.value(clothingIndex + 560);
+  if (temporaryClothingData >= 1) {
+    $gameVariables.setValue(clothingIndex + 460, temporaryClothingData);
+  }
+};
 
-//衣装情報を更新
-for (let i = 1; i <= 40; i++) {
-  gameVar20_440[i] = $gameVariables.value(i + 460);
+// Update clothing data
+for (let clothingIndex = 1; clothingIndex <= 40; clothingIndex++) {
+  actorClothingData[clothingIndex] = $gameVariables.value(clothingIndex + 460);
 }
 
-charagra_henkou1(gameVar20);
-if(is_girl(actorGameVar20)){
-  valueLiningCloth[gameVar20] = gameVar20_440[2];
-  valueBackHairCloth[gameVar20] = actorGameVar20.isStateAffected(23) ? 1 : gameVar20_440[4];
-  valueCoatCloth[gameVar20] = gameVar20_440[28];
-  valueFrontHairCloth[gameVar20] = gameVar20_440[32];
-  valueBustUpCloth[gameVar20] = gameVar20_440[41];
-  valueBustUpCloth2[gameVar20] = valueBustUpCloth[gameVar20];
+charagra_henkou1(actorId);
+if (is_girl(actor)) {
+  valueLiningCloth[actorId] = actorClothingData[2];
+  valueBackHairCloth[actorId] = actor.isStateAffected(23) ? 1 : actorClothingData[4];
+  valueCoatCloth[actorId] = actorClothingData[28];
+  valueFrontHairCloth[actorId] = actorClothingData[32];
+  valueBustUpCloth[actorId] = actorClothingData[41];
+  valueBustUpCloth2[actorId] = valueBustUpCloth[actorId];
 };
 
 };
