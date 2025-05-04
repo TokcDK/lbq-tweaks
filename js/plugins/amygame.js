@@ -6293,6 +6293,18 @@ if(id1 == 1){
     return actor.isStateAffected(602);
   }
 
+  isInBattle = function () {
+
+    if($gameParty.inBattle() == $gameSwitches.value(30)){
+      console.warn("isInBattle: $gameParty.inBattle() == $gameSwitches.value(30) is true!");
+    }
+    else{
+      console.warn("isInBattle: $gameParty.inBattle() == $gameSwitches.value(30) is false!");
+    }
+
+    return $gameSwitches.value(30); // in battle game switch, for some reason using instead of $gameParty.inBattle();
+  }
+
   // CommonEvents
   configureCommonEvents = function (start, end, switchIdOffset) {
     for (let i = start; i <= end; i++) {
