@@ -454,63 +454,77 @@ kisekae_naibusyori1 = function(){
 };
 
 //☆☆立ち絵設定。本体
-tachie_settei2 = function(){
-
-for (let variableIndex = 561; variableIndex <= 600; variableIndex++) { 
-  $gameVariables.setValue(variableIndex, 0); 
-};
-
-const actorId = $gameVariables.value(20);
-const actorClothingDataId = actorId + 440;
-const actor = $gameActors.actor(actorId);
-const actorClothingData = $gameVariables.value(actorClothingDataId);
-
-// Load current clothing data
-for (let clothingIndex = 1; clothingIndex <= 40; clothingIndex++) {
-  $gameVariables.setValue(clothingIndex + 460, actorClothingData[clothingIndex]);
-};
-
-if (is_girl(actor)) {
-  if (actor.isStateAffected(valueDollStateId)) {
-    for (let clothingIndex = 1; clothingIndex <= 40; clothingIndex++) {
-      $gameVariables.setValue(clothingIndex + 560, $gameVariables.value(clothingIndex + 460));
-    };
-    for (let clothingIndex = 1; clothingIndex <= 40; clothingIndex++) {
-      $gameVariables.setValue(clothingIndex + 460, 0);
-    };
-    $gameVariables.setValue(1 + 460, 3);
-  } else {
-    rosyutu_genkai();
-    rosyutu_genzai();
-    if (!actor.isStateAffected(23)) tachie_settei1();
+tachie_settei2 = function() {
+  // Reset temporary clothing variables (561-600)
+  for (let variableIndex = 561; variableIndex <= 600; variableIndex++) { 
+    $gameVariables.setValue(variableIndex, 0); 
   }
-};
 
-tachie_naibusyori2();
+  // Get actor information and data
+  const actorId = $gameVariables.value(20);
+  const actorClothingDataId = actorId + 440;
+  const actor = $gameActors.actor(actorId);
+  const actorClothingData = $gameVariables.value(actorClothingDataId);
 
-// Apply temporary clothing data after setting the standing picture
-for (let clothingIndex = 1; clothingIndex <= 40; clothingIndex++) {
-  const temporaryClothingData = $gameVariables.value(clothingIndex + 560);
-  if (temporaryClothingData >= 1) {
-    $gameVariables.setValue(clothingIndex + 460, temporaryClothingData);
+  // Load current clothing data from actor to working variables (461-500)
+  for (let clothingIndex = 1; clothingIndex <= 40; clothingIndex++) {
+    $gameVariables.setValue(clothingIndex + 460, actorClothingData[clothingIndex]);
   }
-};
 
-// Update clothing data
-for (let clothingIndex = 1; clothingIndex <= 40; clothingIndex++) {
-  actorClothingData[clothingIndex] = $gameVariables.value(clothingIndex + 460);
-}
+  // Only process further for female characters
+  if (is_girl(actor)) {
+    // Handle doll state - store current clothing in temp variables and clear current
+    if (actor.isStateAffected(valueDollStateId)) {
+      // Save clothing to temporary storage (561-600)
+      for (let clothingIndex = 1; clothingIndex <= 40; clothingIndex++) {
+        $gameVariables.setValue(clothingIndex + 560, $gameVariables.value(clothingIndex + 460));
+      }
+      
+      // Clear current clothing except setting body to type 3
+      for (let clothingIndex = 1; clothingIndex <= 40; clothingIndex++) {
+        $gameVariables.setValue(clothingIndex + 460, 0);
+      }
+      $gameVariables.setValue(1 + 460, 3); // Set body type
+    }    
+    else { // Normal character processing
+      rosyutu_genkai(); // Calculate exposure limits
+      rosyutu_genzai(); // Calculate current exposure
+      
+      // Apply custom pose/expression settings if not in specified state
+      if (!actor.isStateAffected(23)) {
+        tachie_settei1();
+      }
+    }
+  }
 
-charagra_henkou1(actorId);
-if (is_girl(actor)) {
-  valueLiningCloth[actorId] = actorClothingData[2];
-  valueBackHairCloth[actorId] = actor.isStateAffected(23) ? 1 : actorClothingData[4];
-  valueCoatCloth[actorId] = actorClothingData[28];
-  valueFrontHairCloth[actorId] = actorClothingData[32];
-  valueBustUpCloth[actorId] = actorClothingData[41];
-  valueBustUpCloth2[actorId] = valueBustUpCloth[actorId];
-};
+  // Process internal tachie display data
+  tachie_naibusyori2();
 
+  // Restore any temporary clothing that was saved
+  for (let clothingIndex = 1; clothingIndex <= 40; clothingIndex++) {
+    const temporaryClothingData = $gameVariables.value(clothingIndex + 560);
+    if (temporaryClothingData >= 1) {
+      $gameVariables.setValue(clothingIndex + 460, temporaryClothingData);
+    }
+  }
+
+  // Update actor's clothing data from working variables
+  for (let clothingIndex = 1; clothingIndex <= 40; clothingIndex++) {
+    actorClothingData[clothingIndex] = $gameVariables.value(clothingIndex + 460);
+  }
+
+  // Update character graphics
+  charagra_henkou1(actorId);
+  
+  // Update clothing-related global values for female characters
+  if (is_girl(actor)) {
+    valueLiningCloth[actorId] = actorClothingData[2];
+    valueBackHairCloth[actorId] = actor.isStateAffected(23) ? 1 : actorClothingData[4];
+    valueCoatCloth[actorId] = actorClothingData[28];
+    valueFrontHairCloth[actorId] = actorClothingData[32];
+    valueBustUpCloth[actorId] = actorClothingData[41];
+    valueBustUpCloth2[actorId] = valueBustUpCloth[actorId];
+  }
 };
 
 //☆☆キャラグラ変更。
