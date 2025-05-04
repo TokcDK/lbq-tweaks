@@ -6415,7 +6415,14 @@ is_girl = function (actor) {
       CommonPopupManager.showInfo({}, infoMessage, null);
     };
   }
+
+  evStateCleanFromActors = function (actorInitId, actorEndId, stateId) {
+    for (var actorId = actorInitId; actorId <= actorEndId; actorId++) {
+      $gameActors.actor(actorId).removeState(stateId);
+    };
+  }
   
+  //#region cev 296
   ev296RemoveTempState = function (valueTachieChangeStateTemporary, parentList) {
     var stateIds = valueTachieChangeStateTemporary;
     var start = $gameVariables.value(75);
@@ -6445,7 +6452,10 @@ is_girl = function (actor) {
     //立ち絵コモン終了し忘れている場合のため
     parentList.setupChild($dataCommonEvents[19].list, 0);
   }
+
+  //#endregion
   
+  //#region cev23
   ev23StateReleaseOverTime = function (parent) {
     const start = $gameVariables.value(75);
     const end = $gameVariables.value(76);
@@ -6460,12 +6470,6 @@ is_girl = function (actor) {
         };
         evStateCleanFromActors(start, end, stateId);
       };
-    };
-  }
-
-  evStateCleanFromActors = function (actorInitId, actorEndId, stateId) {
-    for (var actorId = actorInitId; actorId <= actorEndId; actorId++) {
-      $gameActors.actor(actorId).removeState(stateId);
     };
   }
 
@@ -6513,5 +6517,6 @@ is_girl = function (actor) {
     var weekNum = $gameVariables.value(55);
     TickerManager.show(`──${dayNum}日目(${weekNum}曜日)経過──`);
   }
+  //#endregion
 
 }());
