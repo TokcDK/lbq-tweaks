@@ -6422,9 +6422,7 @@ is_girl = function (actor) {
     var end = $gameVariables.value(76);
 
     stateIds.forEach(function (id1) {
-      for (var i = start; i <= end; i++) {
-        $gameActors.actor(i).removeState(id1);
-      };
+      evStateCleanFromActors(start, end, id1);
     }, this);
 
     var actorIds = $gameVariables.value(247);
@@ -6447,5 +6445,29 @@ is_girl = function (actor) {
     //立ち絵コモン終了し忘れている場合のため
     parentList.setupChild($dataCommonEvents[19].list, 0);
   }
+  
+  ev23StateReleaseOverTime = function () {
+    const start = $gameVariables.value(75);
+    const end = $gameVariables.value(76);
+
+    for (var i = 1; i <= $dataStates.length - 1; i++) {
+      const state = $dataStates[i];
+      if (state.meta['timeRemove']) {
+        if ($gameParty.membersState(i)) {
+          this.sVal(539, $gameVariables.value(539) + `${state.name}が解除された。\n`);
+          this.sVal(540, $gameVariables.value(540) + 1);
+        };
+        evStateCleanFromActors(start, end, i);
+      };
+    };
+  }
+
+  evStateCleanFromActors = function (actorInitId, actorEndId, stateId) {
+    for (var actorId = actorInitId; actorId <= actorEndId; actorId++) {
+      $gameActors.actor(actorId).removeState(stateId);
+    };
+  }
+
+
 
 }());
