@@ -6417,24 +6417,29 @@ is_girl = function (actor) {
   }
   
   ev296RemoveTempState = function (valueTachieChangeStateTemporary, parentList) {
-    var list = valueTachieChangeStateTemporary;
-    list.forEach(function (id1) {
-      var start = $gameVariables.value(75);
-      var end = $gameVariables.value(76);
+    var stateIds = valueTachieChangeStateTemporary;
+    var start = $gameVariables.value(75);
+    var end = $gameVariables.value(76);
+
+    stateIds.forEach(function (id1) {
       for (var i = start; i <= end; i++) {
         $gameActors.actor(i).removeState(id1);
       };
     }, this);
 
-    var list = $gameVariables.value(247);
-    list.forEach(function (id) {
+    var actorIds = $gameVariables.value(247);
+    const members = $gameParty.members();
+    const gameVariables = $gameVariables;
+
+    actorIds.forEach(function (id) {
       var actor = $gameActors.actor(id);
-      if ($gameParty.members().contains(actor)) {
-        var start = 0; var end = 42;
-        for (var i = start; i <= end; i++) {
-          $gameVariables.value(id + 440)[i] = $gameVariables.value(id + 540)[i]
+      
+      if (members.contains(actor)) {
+        for (var i = 0; i <= 42; i++) {
+          gameVariables.value(id + 440)[i] = gameVariables.value(id + 540)[i]
         };
-        $gameVariables.setValue(20, id);
+
+        gameVariables.setValue(20, id);
         tachie_settei2();
       }
     }, this);
