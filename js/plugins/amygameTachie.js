@@ -528,20 +528,25 @@ tachie_settei2 = function() {
 };
 
 //☆☆キャラグラ変更。
-charagra_henkou1 = function(id2){
+charagra_henkou1 = function(actorId) {
 
-  if (id2 >= 1) {
-  const actor = $gameActors.actor(id2);
-    if (is_girl(actor)){
-    charagra_choice1(id2);
-    isyou_senyouLisciaBlueOnly(id2); //りしゃぶるのみの処理
-    actor.setCharacterImage(id2 + '_' + $gameVariables.value(21), $gameVariables.value(22));
-    actor.setBattlerImage(id2 + '_' + $gameVariables.value(23));
-      if(!$gameSwitches.value(30)){
-        $gameSwitches.setValue(148,true);
-      };
-}};
+  if (actorId >= 1) {
+    const actor = $gameActors.actor(actorId);
+    if (is_girl(actor)) {
+      charagra_choice1(actorId);
+      isyou_senyouLisciaBlueOnly(actorId); // Special processing for Liscia Blue only
+      const characterImageId = actorId + '_' + $gameVariables.value(21);
+      const characterImageIndex = $gameVariables.value(22);
+      const battlerImageId = $gameVariables.value(23);
 
+      actor.setCharacterImage(characterImageId, characterImageIndex);
+      actor.setBattlerImage(battlerImageId);
+
+      if (!$gameSwitches.value(30)) {
+        $gameSwitches.setValue(148, true);
+      }
+    }
+  }
 };
 
 // for charagra_choice1
