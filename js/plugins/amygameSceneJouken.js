@@ -1114,45 +1114,118 @@ scene_choiceDecision = function (arr1, value6) {//scene_choiceDecision([503,502,
 
 };
 
+//#region scene_choiceSouwa
 //挿話選択肢発生スクリプト
 scene_choiceSouwa = function () {
-
   // Reset the Souwa choice flag
   $gameVariables.setValue(19, 0);
-  valueScriptArray1 = [];
-  let hasSouwaChoices = false;
-
-  // Check souwa choices from switch range 1201-1300
-  for (let switchId = 1201; switchId <= 1300; switchId++) {
-    const itemId = switchId - 800;
-    if (!$gameSwitches.value(switchId) || $gameParty.hasItem(itemId)) continue;
-    if ($gameSwitches.value(switchId + 100)) continue;
-    if ($dataItems[itemId].meta['singleSouwaIncidence']) continue;
-
-    valueScriptArray1.push(itemId);
-    hasSouwaChoices = true;
-  }
-
-  // Check souwa choices from data items
-  for (let itemId = 1; itemId < $dataItems.length; itemId++) {
-    const currentItem = $dataItems[itemId];
-    if (!currentItem.meta['AddEventIncidenceSwi'] || Number(currentItem.meta['EICSwitch']) !== 102) continue;
-    if (!$gameSwitches.value(Number(currentItem.meta['AddEventIncidenceSwi']))) continue;
-    if ($gameParty.hasItem(itemId)) continue;
-    if ($gameSwitches.value(Number(currentItem.meta['AddEventCompSwi']))) continue;
-    if (currentItem.meta['singleSouwaIncidence']) continue;
-
-    valueScriptArray1.push(Number(currentItem.meta['AddEventParallelSwi']));
-    hasSouwaChoices = true;
-  }
-
-  if (!hasSouwaChoices) return;
-
+  
+  // Get available Souwa choices
+  const availableSouwaChoices = getAvailableSouwaChoices();
+  
+  if (availableSouwaChoices.length === 0) return;
+  
   // Activate the Souwa event flag
   $gameVariables.setValue(19, 1);
-  for (let index = 0; index < valueScriptArray1.length; index++) {
-    const chosenItemId = valueScriptArray1[index];
+  
+  // Add choices to the game system
+  addSouwaChoicesToGameSystem(availableSouwaChoices);
+}
+
+/**
+ * Get all available Souwa choices from both switch ranges and data items
+ * @returns {Array} Array of available Souwa item IDs
+ */
+function getAvailableSouwaChoices() {
+  
+  // Collect choices from both sources
+  const switchBasedChoices = getSwitchBasedSouwaChoices();
+  const metaBasedChoices = getMetaBasedSouwaChoices();
+  
+  // using global variable valueScriptArray1 looking here redundant but we set it anyway because it using in other places
+  // using global variables may break(many things) encapsulation and make the code less maintainable
+  valueScriptArray1 = [...switchBasedChoices, ...metaBasedChoices];
+
+  return valueScriptArray1;
+}
+
+/**
+ * Get Souwa choices from switch range 1201-1300
+ * @returns {Array} Array of available Souwa item IDs from switches
+ */
+function getSwitchBasedSouwaChoices() {
+  const choices = [];
+  
+  for (let switchId = 1201; switchId <= 1300; switchId++) {
+    const itemId = switchId - 800;
+    
+    if (!isSwitchBasedSouwaAvailable(switchId, itemId)) continue;
+    
+    choices.push(itemId);
+  }
+  
+  return choices;
+}
+
+/**
+ * Check if a switch-based Souwa choice is available
+ * @param {Number} switchId - The switch ID to check
+ * @param {Number} itemId - The corresponding item ID
+ * @returns {Boolean} Whether the Souwa choice is available
+ */
+function isSwitchBasedSouwaAvailable(switchId, itemId) {
+  if (!$gameSwitches.value(switchId)) return false;
+  if ($gameParty.hasItem(itemId)) return false;
+  if ($gameSwitches.value(switchId + 100)) return false;
+  if ($dataItems[itemId].meta['singleSouwaIncidence']) return false;
+  
+  return true;
+}
+
+/**
+ * Get Souwa choices from data items with relevant metadata
+ * @returns {Array} Array of available Souwa item IDs from metadata
+ */
+function getMetaBasedSouwaChoices() {
+  const choices = [];
+  
+  for (let itemId = 1; itemId < $dataItems.length; itemId++) {
+    const currentItem = $dataItems[itemId];
+    
+    if (!isMetaBasedSouwaAvailable(currentItem, itemId)) continue;
+    
+    choices.push(Number(currentItem.meta['AddEventParallelSwi']));
+  }
+  
+  return choices;
+}
+
+/**
+ * Check if a meta-based Souwa choice is available
+ * @param {Object} item - The item object to check
+ * @param {Number} itemId - The item ID
+ * @returns {Boolean} Whether the Souwa choice is available
+ */
+function isMetaBasedSouwaAvailable(item, itemId) {
+  if (!item.meta['AddEventIncidenceSwi']) return false;
+  if (Number(item.meta['EICSwitch']) !== 102) return false;
+  if (!$gameSwitches.value(Number(item.meta['AddEventIncidenceSwi']))) return false;
+  if ($gameParty.hasItem(itemId)) return false;
+  if ($gameSwitches.value(Number(item.meta['AddEventCompSwi']))) return false;
+  if (item.meta['singleSouwaIncidence']) return false;
+  
+  return true;
+}
+
+/**
+ * Add Souwa choices to the game system
+ * @param {Array} choices - Array of Souwa item IDs to add as choices
+ */
+function addSouwaChoicesToGameSystem(choices) {
+  for (let index = 0; index < choices.length; index++) {
+    const chosenItemId = choices[index];
     const chosenItemName = $dataItems[chosenItemId].name;
+    
     const choiceParams = {
       text: `${chosenItemName}`,
       value: chosenItemId
@@ -1160,25 +1233,9 @@ scene_choiceSouwa = function () {
 
     $gameSystem.addCustomChoice(1, choiceParams);
   }
-
-  /*
-  if ($gameVariables.value(19) >= 1) {
-    for (var index = 0; index < valueScriptArray1.length; index++) {
-      var commonEventChoiceName = `？？？`;
-      for (var commonEventId = 1; commonEventId < $dataCommonEvents.length; commonEventId++) {
-        if ($dataCommonEvents[commonEventId].switchId == valueScriptArray1[index]) {
-          commonEventChoiceName = $dataCommonEvents[commonEventId].name;
-          const choiceParams = {
-            text: `${commonEventChoiceName}`,
-            value: valueScriptArray1[index]
-          };
-          $gameSystem.addCustomChoice(1, choiceParams);
-        }
-      }
-    }
-  }
-  */
 }
+
+//#endregion
 
 //オールナビスクリプト
 scene_allNavigation = function () {
