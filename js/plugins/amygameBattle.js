@@ -437,12 +437,13 @@ for (var i = 0; i <= arr1.length-1; i++) {
 
 };
 
-
+//攻撃時に連撃計算とスキルID代入
 const ak1PicIdsToErase = [51, 52, 53, 54, 55, 56, 57, 58, 86, 87, 88, 89, 90, 91, 92, 93, 98, 99];
 const ak1ElementIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 16, 17, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 34];
 const ak1ElementDisplayValues = [131, 133, 135, 137, 139, 141, 143, 145, 147, 367, 369, 147, 149, 371, 373, 375, 377, 379, 381, 383, 385, 387, 389, 130];
 const ak1DamageFlashDesignationData = [255, 255, 255, 0];
-//攻撃時に連撃計算とスキルID代入
+// uses globals like valueCertainlyDouble, valueCertainlyTriple, valueNormalAttackHit, and valueAttackAbilityHit without explicit declaration
+// 
 attack_keisan1 = function (user, skillId, sourceTypeId) {
   // Initialize attack variables and clean up UI
   ak1InitializeAttackVariables(user, skillId, sourceTypeId);
