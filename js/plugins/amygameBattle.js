@@ -2133,8 +2133,9 @@ if (user.isLearnedSkill(61)) {
       value10 += 10;
     }
   }
-  user.actor().traits.push({ code: 13, dataId: 62, value: 1 + value10 });
-  user.actor().traits.push({ code: 13, dataId: 63, value: 1 + value10 });
+  const actorTraits = user.actor().traits;
+  actorTraits.push({ code: 13, dataId: 62, value: 1 + value10 });
+  actorTraits.push({ code: 13, dataId: 63, value: 1 + value10 });
 }
 
 if ($gameSwitches.value(375) && value11 >= 1) {
