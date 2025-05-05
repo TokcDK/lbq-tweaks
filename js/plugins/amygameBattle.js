@@ -664,18 +664,18 @@ function ak1ConfigureElementDamageVisualization(currentItem) {
 function ak1ConfigureElementFlashEffect(user) {
   const candidateElements = [0];
   const testIds = [3, 4, 5, 6, 7, 8, 9];
-  
+
   for (let i = 0; i < attackElementsList.length; i++) {
     const attackElement = attackElementsList[i];
     const elementId = Number(attackElement);
-    
-    if (i == 35) { specialDispelCount += 1; }
-    
+
+    if (i == 35) { valueSkillSpecialDispel35 += 1; }
+
     if (testIds.includes(elementId) && user.elementAmplifyRate(elementId) >= 0.5) {
       candidateElements.push(attackElement);
     }
   }
-  
+
   if (candidateElements.length > 0) {
     const maxCandidateElement = Math.max(...candidateElements);
     ak1SetDamageFlashConfiguration(maxCandidateElement);
