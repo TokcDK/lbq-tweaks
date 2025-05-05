@@ -6370,23 +6370,6 @@ if(id1 == 1){
       }
     };
   }
-
-  setPartyMembersStateSwitch160v2_o3 = function () {
-    const partyMembers = $gameParty.members();
-    const stateIds = $gameVariables.value(214);
-
-    // Use the Array.some() method for early exit and potential JIT optimizations
-    const hasAffectedState = stateIds.some(stateId =>
-      $gameParty.membersState(stateId) &&
-      partyMembers.some(actor =>
-        actor.isStateAffected(stateId) && actor.getStateCounter(stateId) !== undefined
-      )
-    );
-
-    if (hasAffectedState) {
-      $gameSwitches.setValue(160, true);
-    }
-  }
   
   setPartyMembersStateSwitch160v2 = function () {
     const stateIds = $gameVariables.value(214);
