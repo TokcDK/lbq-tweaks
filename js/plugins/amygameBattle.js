@@ -712,20 +712,20 @@ Element_DebuffRateR = function(target,value100){
 };
 
 //ステート付与時のアクション
-state_addEffect1 = function(user,target,value100,id1){
+state_addEffect1 = function(user,target,stateId,id1){
 
 if (!$gameTroop.isAllDead() && $gameParty.inBattle()) {
-  const value10 = $dataStates[value100].meta['registUp'] ? Math.ceil(Number($dataStates[value100].meta['registUp']) / 100) : target.isStateAffected(289) ? 0.2 : 0.1;
+  const value10 = $dataStates[stateId].meta['registUp'] ? Math.ceil(Number($dataStates[stateId].meta['registUp']) / 100) : target.isStateAffected(289) ? 0.2 : 0.1;
   const target1 = $dataStates[(target.isEnemy() ? 490 : 486) + target.index()];
 
   let arr1 = [255,128,0,255,256];
-  if($dataStates[value100].meta['Category']){
-    if($dataStates[value100].meta['Category'] == ' StateabNomal' || $dataStates[value100].meta['Category'] == ' StateSPabNomal'){//耐性付与。強化は除外
-      target1.traits.push({code: 13, dataId: value100, value: 1 - value10});
+  if($dataStates[stateId].meta['Category']){
+    if($dataStates[stateId].meta['Category'] == ' StateabNomal' || $dataStates[stateId].meta['Category'] == ' StateSPabNomal'){//耐性付与。強化は除外
+      target1.traits.push({code: 13, dataId: stateId, value: 1 - value10});
       arr1 = [255,0,187,189,256];
     };
   } else {
-    target1.traits.push({code: 13, dataId: value100, value: 1 - value10});
+    target1.traits.push({code: 13, dataId: stateId, value: 1 - value10});
   }
   const arr2 = valueStateAddState; //<stateAddState:5,201,2>//反応するｽｷﾙﾀｲﾌﾟ,追加ｽﾃｰﾄ,追加回数
   const gameVar182 = $gameVariables.value(182);
@@ -744,7 +744,7 @@ if (!$gameTroop.isAllDead() && $gameParty.inBattle()) {
     target.startAnimation(id1, false, $gameVariables.value(279));
     $gameVariables.setValue(279,$gameVariables.value(279)+$gameVariables.value(280));
     //target.startMessagePopup(`\x1bI[${$dataStates[value100].iconIndex}]`, arr1);
-    target.startMessagePopup($dataStates[value100].name, arr1);
+    target.startMessagePopup($dataStates[stateId].name, arr1);
   }
 };
 
