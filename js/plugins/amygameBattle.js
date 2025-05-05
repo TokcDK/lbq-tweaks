@@ -526,14 +526,22 @@ function ak1SetupSkillProperties(user, skillId, sourceTypeId) {
 function ak1CalculateMultiAttackCount(user) {
   multiAttackCount = 1;
   const elementAttackRate = user.elementRate(11) * 10;
+  
+  // Use a single random calculation to determine both checks
   const randomValue1 = Math.floor(Math.random() * 101);
-  const randomValue2 = randomValue1 + Math.floor(Math.random() * 101);
   
-  // Check elemental attack rate for additional attacks
-  if (elementAttackRate >= randomValue1) { multiAttackCount += 1; }
-  if (elementAttackRate >= randomValue2) { multiAttackCount += 2; }
+  // Only calculate the second random value if the first check passes
+  if (elementAttackRate >= randomValue1) {
+    multiAttackCount += 1;
+    
+    // Calculate second random value only if needed
+    const randomValue2 = randomValue1 + Math.floor(Math.random() * 101);
+    if (elementAttackRate >= randomValue2) {
+      multiAttackCount += 2;
+    }
+  }
   
-  // Check for state-based guaranteed multi-attacks
+  // Apply guaranteed multi-attacks from states
   ak1ApplyGuaranteedMultiAttacks(user);
 }
 
