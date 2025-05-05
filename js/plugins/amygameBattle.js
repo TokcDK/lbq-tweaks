@@ -578,21 +578,35 @@ attack_keisan1 = function (user, skillId, sourceTypeId) {
     const attackElement = attackElementsList[i];
     const elementId = Number(attackElement);
     if (i == 35) { specialDispelCount += 1; }
-    if (testIds.some(function (testId) { return elementId == testId; })) {
-      if (user.elementAmplifyRate(Number(attackElementsList[i])) >= 0.5) {
-        candidateElements.push(attackElementsList[i]);
-      }
+    if (testIds.includes(elementId) && user.elementAmplifyRate(elementId) >= 0.5) {
+      candidateElements.push(attackElement);
     }
   }
   if (candidateElements.length > 0) {
     const maxCandidateElement = Math.max(...candidateElements);
-    if (maxCandidateElement == 3) { $gameVariables.setValue(331, [255, 102, 119, 0]); }
-    else if (maxCandidateElement == 4) { $gameVariables.setValue(331, [119, 255, 119, 0]); }
-    else if (maxCandidateElement == 5) { $gameVariables.setValue(331, [255, 187, 119, 0]); }
-    else if (maxCandidateElement == 6) { $gameVariables.setValue(331, [85, 153, 255, 0]); }
-    else if (maxCandidateElement == 7) { $gameVariables.setValue(331, [255, 255, 119, 0]); }
-    else if (maxCandidateElement == 8) { $gameVariables.setValue(331, [68, 0, 68, 0]); }
-    else if (maxCandidateElement == 9) { $gameVariables.setValue(331, [255, 255, 255, 0]); }
+    switch (maxCandidateElement) {
+      case 3:
+        $gameVariables.setValue(331, [255, 102, 119, 0]);
+        break;
+      case 4:
+        $gameVariables.setValue(331, [119, 255, 119, 0]);
+        break;
+      case 5:
+        $gameVariables.setValue(331, [255, 187, 119, 0]);
+        break;
+      case 6:
+        $gameVariables.setValue(331, [85, 153, 255, 0]);
+        break;
+      case 7:
+        $gameVariables.setValue(331, [255, 255, 119, 0]);
+        break;
+      case 8:
+        $gameVariables.setValue(331, [68, 0, 68, 0]);
+        break;
+      case 9:
+        $gameVariables.setValue(331, [255, 255, 255, 0]);
+        break;
+    }
   }
 
   $gameVariables.setValue(349, currentItem.meta['moveReaction'] ? Number(currentItem.meta['moveReaction']) : 0);
@@ -625,24 +639,34 @@ attack_keisan1 = function (user, skillId, sourceTypeId) {
 
   const currentGameVar182 = $gameVariables.value(182);
   const currentItemName = currentItem.name;
-  if (currentGameVar182 == 12) {
-    $gameVariables.setValue(93, 367);
-  } else if (currentGameVar182 == 13) {
-    $gameVariables.setValue(93, 369);
-    $gameVariables.setValue(527, `\\C[18]＜${currentItemName}＞\\C[0]`);
-  } else if (currentGameVar182 == 11) {
-    $gameVariables.setValue(527, `\\C[10]＜${currentItemName}＞\\C[0]`);
-  } else if (currentGameVar182 == 5) {
-    $gameVariables.setValue(527, `\\C[17]＜${currentItemName}＞\\C[0]`);
-    $gameVariables.setValue(93, 0);
-  } else if (currentGameVar182 == 6) {
-    $gameVariables.setValue(527, `\\C[10]＜${currentItemName}＞\\C[0]`);
-  } else if (currentGameVar182 == 7) {
-    $gameVariables.setValue(527, `\\C[9]＜${currentItemName}＞\\C[0]`);
-    $gameVariables.setValue(93, 0);
-  } else if (currentGameVar182 == 8) {
-    $gameVariables.setValue(527, `\\C[3]＜${currentItemName}＞\\C[0]`);
-    $gameVariables.setValue(93, currentItem.damage.type == 2 ? 249 : 245); // For MP recovery case.
+  switch (currentGameVar182) {
+    case 12:
+      $gameVariables.setValue(93, 367);
+      break;
+    case 13:
+      $gameVariables.setValue(93, 369);
+      $gameVariables.setValue(527, `\\C[18]＜${currentItemName}＞\\C[0]`);
+      break;
+    case 11:
+      $gameVariables.setValue(527, `\\C[10]＜${currentItemName}＞\\C[0]`);
+      break;
+    case 5:
+      $gameVariables.setValue(527, `\\C[17]＜${currentItemName}＞\\C[0]`);
+      $gameVariables.setValue(93, 0);
+      break;
+    case 6:
+      $gameVariables.setValue(527, `\\C[10]＜${currentItemName}＞\\C[0]`);
+      break;
+    case 7:
+      $gameVariables.setValue(527, `\\C[9]＜${currentItemName}＞\\C[0]`);
+      $gameVariables.setValue(93, 0);
+      break;
+    case 8:
+      $gameVariables.setValue(527, `\\C[3]＜${currentItemName}＞\\C[0]`);
+      $gameVariables.setValue(93, currentItem.damage.type == 2 ? 249 : 245);
+      break;
+    default:
+      break;
   }
 
   if (currentItem.meta['SkillDamageAction']) {
@@ -657,15 +681,6 @@ attack_keisan1 = function (user, skillId, sourceTypeId) {
     $gameVariables.setValue(526, Number(currentItem.meta['Repeat']));
   }
 
-  // Function to apply additional damage based on attack state.
-  apply_value_attack_hit = function (stateArray, stateMetaName) {
-    for (let i = 0; i < stateArray.length; i++) {
-      const stateId = stateArray[i];
-      if (user.isStateAffected(stateId)) {
-        $gameVariables.setValue(526, $gameVariables.value(526) + Number($dataStates[stateId].meta[stateMetaName]));
-      }
-    }
-  }
   if (currentGameVar182 == 2) {
     apply_value_attack_hit(valueNormalAttackHit, 'NormalAttackHit');
   }
@@ -673,6 +688,16 @@ attack_keisan1 = function (user, skillId, sourceTypeId) {
     apply_value_attack_hit(valueAttackAbilityHit, 'AttackAbilityHit');
   }
 };
+
+// Function to apply additional damage based on attack state.
+apply_value_attack_hit = function (user, stateArray, stateMetaName) {
+  for (let i = 0; i < stateArray.length; i++) {
+    const stateId = stateArray[i];
+    if (user.isStateAffected(stateId)) {
+      $gameVariables.setValue(526, $gameVariables.value(526) + Number($dataStates[stateId].meta[stateMetaName]));
+    }
+  }
+}
 
 //属性耐性ダウン付与
 Element_DebuffRateA = function(target,stateId){
