@@ -700,7 +700,7 @@ function ak1ProcessSkillSpecialSettings(user, skillId) {
 
 // Process skill mastery progression and brave command effects
 function ak1ProcessSkillMasteryAndBraveCommand(user, skillId) {
-  const currentItem = sourceItems[skillId];
+  //const currentItem = sourceItems[skillId];
   const abilityUsageDistinction = $gameVariables.value(182);
   
   // Handle skill mastery progression
