@@ -751,7 +751,7 @@ if (!$gameTroop.isAllDead() && $gameParty.inBattle()) {
 };
 
 //ステート解除時のアクション
-state_removeEffect1 = function(user,target,stateId,id1){
+state_removeEffect1 = function(user,target,stateId,animationId){
 
 user.removeStateCounter(stateId);
 if (!$gameTroop.isAllDead() && $gameParty.inBattle()) {
@@ -767,7 +767,7 @@ if (!$gameTroop.isAllDead() && $gameParty.inBattle()) {
         s = `…`;
       };
     }
-    target.startAnimation(id1, false, $gameVariables.value(279));
+    target.startAnimation(animationId, false, $gameVariables.value(279));
     $gameVariables.setValue(279,$gameVariables.value(279)+$gameVariables.value(280));
     const actorName = target.name();
     const stateName = `\\C[${colorIndex}]${state.name}\\C[0]`;
@@ -4202,32 +4202,31 @@ if (id2._stateCounter[id3] >= 1) {
 };
 
 //state_removebuffdebuff(1,2,user,target,stateId,271);
-state_removebuffdebuff = function(id5,id6,id1,id2,id3,id4){
+state_removebuffdebuff = function(id,buffId,user,target,stateId,animationId){
 
-var value1 = id6;
-if($gameTroop.isAllDead() || id2._buffs[value1] < 1){} else {
-  id2.removeState(id3);
-  id2.removeBuff(value1);
+if($gameTroop.isAllDead() || target._buffs[buffId] < 1){} else {
+  target.removeState(stateId);
+  target.removeBuff(buffId);
   //BattleManager._logWindow.push(`addText`, id2.name() + `の`+$dataStates[id3].name+`が解除された`);
-  state_removeEffect1(id1,id2,id3,id4);
+  state_removeEffect1(user,target,stateId,animationId);
 };
 
 };
 
 //state_turnEndbuffdebuff(1,2,user,target,stateId,271);
-state_turnEndbuffdebuff = function(id5,id6,id1,id2,id3,id4){
+state_turnEndbuffdebuff = function(mode,buffId,user,target,stateId,animationId){
 
-id1.removeStateCounter(id3);
-var value1 = id6;
-if(id5 == 1){
-  var value2 = id2._buffs[value1] < 0;
+user.removeStateCounter(stateId);
+let removeEffect
+if(mode == 1){
+  removeEffect = target._buffs[buffId] < 0;
 } else {
-  var value2 = id2._buffs[value1] > 0;
+  removeEffect = target._buffs[buffId] > 0;
 };
-if(value2){
-  id2.removeState(id3);
+if(removeEffect){
+  target.removeState(stateId);
   //id2.removeBuff(value1);
-  state_removeEffect1(id1,id2,id3,id4);
+  state_removeEffect1(user,target,stateId,animationId);
 };
 
 };
