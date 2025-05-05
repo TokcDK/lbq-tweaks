@@ -6181,25 +6181,25 @@ if($dataItems[$gameVariables.value(240)].meta['TchestType']){
 };
 
 //文字ピクチャを座標指定して表示しっぱなしpictureText_SetUp(1,100,`ジュク…っ\\I[12]`,28,640,384,180,'eromangasimaji')
-pictureText_SetUp = function(id1,value1,value2,value3,value4,value5,value6,value7){
+pictureText_SetUp = function(setupType, pictureId, displayText, textSetting, posX, posY, moveDuration, fontName) {
 
-if(id1 == 1){
-  curveFunctions.patternScaleX = curveFunctions.getPattern('jump', [100]);
-  curveFunctions.patternScaleY = curveFunctions.getPattern('jump', [100]);
-  if(value7 != 0){
-    $gameScreen.setDtextFont(value7);
+  if (setupType == 1) {
+    curveFunctions.patternScaleX = curveFunctions.getPattern('jump', [100]);
+    curveFunctions.patternScaleY = curveFunctions.getPattern('jump', [100]);
+    if (fontName != 0) {
+      $gameScreen.setDtextFont(fontName);
+    };
+    $gameScreen.dTextAlign = 0;
+    $gameScreen.dWindowFrame = 'ON';
+    $gameScreen.dTextRealTime = 'ON';
+    $gameScreen.setDTextPicture(displayText, textSetting);
+    $gameScreen.showPicture(pictureId, '', 1, posX, posY, 0, 0, 0, 0);
+    $gameScreen.movePicture(pictureId, 1, posX, posY, 100, 100, 255, 0, moveDuration);
+  } else {
+    $gameScreen.setDtextFont('ＭＳ Ｐ明朝');
+    picture_motion1("smooth", [0]);
+    pic_eraseP(0, [pictureId]);
   };
-  $gameScreen.dTextAlign = 0;
-  $gameScreen.dWindowFrame = 'ON';
-  $gameScreen.dTextRealTime = 'ON';
-  $gameScreen.setDTextPicture(value2, value3);
-  $gameScreen.showPicture(value1,'',1,value4,value5,0,0,0,0);
-  $gameScreen.movePicture(value1,1,value4,value5,100,100,255,0,value6);
-} else {
-  $gameScreen.setDtextFont('ＭＳ Ｐ明朝');
-  picture_motion1("smooth",[0]);
-  pic_eraseP(0,[value1]);
-};
 
 };
 
