@@ -6361,9 +6361,8 @@ if(id1 == 1){
       * feature should be prevented from use. When the switch is active(true), the scene glossary is disabled.
   *
   * @function isSceneGlossaryDisabled
-  * @returns { boolean } Returns true if the scene glossary is disabled, false otherwise.
   */
-  setPartyMembersStateSwitch160 = function () {
+  isSceneGlossaryDisabled = function () {
     const statesCount = $dataStates.length;
     const partyMembers = $gameParty.members();
     const partyMembersCount = partyMembers.length;
@@ -6381,7 +6380,7 @@ if(id1 == 1){
     gameSwitches.setValue(160, false);
   }
   
-  setPartyMembersStateSwitch160v2 = function () {
+  isSceneGlossaryDisabledv2 = function () {
     const stateIds = $gameVariables.value(214);
     if (!stateIds || !stateIds.length) return;
     
