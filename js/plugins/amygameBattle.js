@@ -2396,7 +2396,7 @@ function tbcsAddStateTraits(code, dataId, value, isImmunity) {
       stateData.traits.push({
         code: code,
         dataId: j,
-        value: isImmunity ? 0.1 : 1 + value
+        value: isImmunity ? 0 : 1 + value  // Changed from 0.1 to 0 for immunity
       });
     }
   }
