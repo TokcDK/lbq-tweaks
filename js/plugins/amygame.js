@@ -6234,19 +6234,18 @@ if(id1 == 1){
     };
   };
 
-  commonEvents_setVar474_by_var135_mapId = function (var135val, mapId, event_pararelStarting_param2) {
-    if ($gameVariables.value(135) == var135val) {
-      if ($gameMap.mapId() == mapId) {
-        event_pararelStarting(0, event_pararelStarting_param2, 0);
-        $gameSwitches.setValue(474, true);
-      };
-    };
+  commonEvents_setVar474_by_var135_mapId = function (questProgress, mapId, event_pararelStarting_param2) {
+    commonEvents_setVar474_by_var135_mapId_Base(questProgress, mapId, event_pararelStarting_param2, true, -1)
   };
 
-  commonEvents_setVar474_by_var135_mapId_1 = function (var135val, mapId, switchId, event_pararelStarting_param2) {
-    if ($gameVariables.value(135) == var135val) {
+  commonEvents_setVar474_by_var135_mapId_1 = function (questProgress, mapId, switchId, event_pararelStarting_param2) {
+    commonEvents_setVar474_by_var135_mapId_Base(questProgress, mapId, event_pararelStarting_param2, false, switchId)
+  }
+
+  commonEvents_setVar474_by_var135_mapId_Base = function (questProgress, mapId, event_pararelStarting_param2, dontCheckGuadWin, switchId) {
+    if ($gameVariables.value(135) == questProgress) {
       if ($gameMap.mapId() == mapId) {
-        if ($gameSwitches.value(switchId)) {//ｶﾞｰﾃﾞｨｱﾝ勝利
+        if (dontCheckGuadWin || $gameSwitches.value(switchId)) {//ｶﾞｰﾃﾞｨｱﾝ勝利
           event_pararelStarting(0, event_pararelStarting_param2, 0);
           $gameSwitches.setValue(474, true);
         }
@@ -6321,7 +6320,7 @@ if(id1 == 1){
 
     const npcDatas = $gameVariables.value(gameVarId);
     const dataWeapons= $dataWeapons;
-    
+
     // Loop over the weapons indices 301–400.
     for (let i = 301; i <= 400; i++) {
       // Only process if the weapon has a non‐empty name.
