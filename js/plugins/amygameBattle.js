@@ -3549,8 +3549,7 @@ if($gameSwitches.value(141)){
   BattleManager._logWindow.push(`addText`, text);
   let userAttackElements = user.attackElements();
   if (skill.meta['Multiple Elements']){
-    const skillMultipleElements = skill.meta['Multiple Elements'].split(',');
-    userAttackElements = userAttackElements.concat(skillMultipleElements);
+    userAttackElements.push(...skill.meta['Multiple Elements'].split(','));
   };
   const skillDamageElementId = $dataSkills[1].damage.elementId;
   if(skillDamageElementId >= 1){
