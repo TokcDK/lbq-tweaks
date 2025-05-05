@@ -444,15 +444,56 @@ const ak1ElementDisplayValues = [131, 133, 135, 137, 139, 141, 143, 145, 147, 36
 const ak1DamageFlashDesignationData = [255, 255, 255, 0];
 //攻撃時に連撃計算とスキルID代入
 attack_keisan1 = function (user, skillId, sourceTypeId) {
+  // Initialize attack variables and clean up UI
+  initializeAttackVariables(user, skillId, sourceTypeId);
+  cleanupPreviousAttackUI();
+  
+  // Set up the skill and its properties
+  setupSkillProperties(user, skillId, sourceTypeId);
+  
+  // Calculate multi-attack count
+  calculateMultiAttackCount(user);
+  
+  // Configure animation settings
+  configureAnimationSettings(skillId);
+  
+  // Set up attack states and elements
+  setupAttackStatesAndElements(user, skillId);
+  
+  // Handle damage visualization and special effects
+  configureDamageVisualization(user, skillId);
+  
+  // Process skill-specific movement and projectile settings
+  processSkillSpecialSettings(user, skillId);
+  
+  // Handle mastery progression and brave command
+  processSkillMasteryAndBraveCommand(user, skillId);
+  
+  // Apply final skill customization
+  applyFinalSkillCustomization(user, skillId);
+};
 
-  // Determine the source data based on source type (2: items, otherwise skills)
+// Initialize attack variables and set source
+function initializeAttackVariables(user, skillId, sourceTypeId) {
   sourceItems = sourceTypeId == 2 ? $dataItems : $dataSkills;
   valueSkillSpecialDispel35 = 0;
   totalDamageCountDuringAction = 0;
   valueDropEnemyPicId = 101;
   valueMetalKiller = 0;
   tachie_syoukyo1($gameVariables.value(300));
+  
+  $gameVariables.setValue(91, user);
+  $gameVariables.setValue(96, skillId);
+  $gameVariables.setValue(279, 10); // Initialize delay for state-apply animation
+  $gameSwitches.setValue(141, true); // Indicates an attack from a skill/item
+  
+  valueAttackCount = 0;
+  valueTotalDamageCount = 0; // Total damage variable for this action
+  $gameVariables.setValue(331, []); // Array for damage flash configuration
+}
 
+// Clean up UI from previous attacks
+function cleanupPreviousAttackUI() {
   const pictureData = $gameScreen.picture(50);
   if (pictureData) {
     const picOrigin = pictureData.origin();
@@ -460,36 +501,44 @@ attack_keisan1 = function (user, skillId, sourceTypeId) {
     const picY = pictureData.y();
     const picScaleX = pictureData.scaleX();
     const picScaleY = pictureData.scaleY();
-    //var picOpacity = pictureData.opacity();
     $gameScreen.movePicture(50, picOrigin, picX, picY, picScaleX, picScaleY, 0, 0, 40);
   }
+  
   pic_eraseP(0, ak1PicIdsToErase);
-
+  
   const pictureId = 96;
   if ($gameScreen.picture(pictureId)) {
     $gameScreen.movePicture(pictureId, 0, 450, 480, 100, 100, 0, 0, 120);
   }
+}
 
+// Set up skill properties and basic settings
+function setupSkillProperties(user, skillId, sourceTypeId) {
   skill_addPowerSet(user, sourceItems, skillId, sourceTypeId);
   const currentItem = sourceItems[skillId];
-
+  
   $gameVariables.setValue(182, currentItem.stypeId);
-  $gameSwitches.setValue(141, true); // Indicates an attack from a skill/item. Damage script will later switch off.
-  $gameVariables.setValue(279, 10);   // Initialize delay for state-apply animation.
-  $gameVariables.setValue(91, user);
-  $gameVariables.setValue(96, skillId);
   valueSkillDamageType = currentItem.damage.type;
-  valueAttackCount = 0;
-  valueTotalDamageCount = 0; // Total damage variable for this action.
-  $gameVariables.setValue(331, []); // Array for damage flash configuration.
+}
 
+// Calculate how many attacks will be performed
+function calculateMultiAttackCount(user) {
   multiAttackCount = 1;
   const elementAttackRate = user.elementRate(11) * 10;
   const randomValue1 = Math.floor(Math.random() * 101);
   const randomValue2 = randomValue1 + Math.floor(Math.random() * 101);
+  
+  // Check elemental attack rate for additional attacks
   if (elementAttackRate >= randomValue1) { multiAttackCount += 1; }
   if (elementAttackRate >= randomValue2) { multiAttackCount += 2; }
+  
+  // Check for state-based guaranteed multi-attacks
+  applyGuaranteedMultiAttacks(user);
+}
 
+// Apply guaranteed double and triple attacks from states
+function applyGuaranteedMultiAttacks(user) {
+  // Check for guaranteed double attack
   if (multiAttackCount <= 1) {
     const certainlyDoubleCount = valueCertainlyDouble.length;
     for (let i = 0; i < certainlyDoubleCount; i++) {
@@ -499,6 +548,8 @@ attack_keisan1 = function (user, skillId, sourceTypeId) {
       }
     }
   }
+  
+  // Check for guaranteed triple attack
   if (multiAttackCount <= 2) {
     const certainlyTripleCount = valueCertainlyTriple.length;
     for (let i = 0; i < certainlyTripleCount; i++) {
@@ -508,10 +559,15 @@ attack_keisan1 = function (user, skillId, sourceTypeId) {
       }
     }
   }
+}
 
+// Configure animation settings for the skill
+function configureAnimationSettings(skillId) {
+  const currentItem = sourceItems[skillId];
   $gameVariables.setValue(181, currentItem.animationId);
   const animation = $dataAnimations[currentItem.animationId];
   const frameCount = animation.frames.length;
+  
   if (currentItem.stypeId == 12) {
     $gameVariables.setValue(97, frameCount);
   } else {
@@ -521,11 +577,13 @@ attack_keisan1 = function (user, skillId, sourceTypeId) {
     if (animation.name.match(/$/)) { animationModifier = 3; }
     $gameVariables.setValue(97, Math.ceil((frameCount * 4 / 5) * animationModifier / 4));
   }
+}
 
-  $gameVariables.setValue(93, 131);
-  $gameVariables.setValue(526, 1);
-
-  // Get attack states from the user and add skill effect states if applicable.
+// Set up attack states and elements
+function setupAttackStatesAndElements(user, skillId) {
+  const currentItem = sourceItems[skillId];
+  
+  // Get attack states and add skill effect states
   valueAttackStates = user.attackStates();
   for (let i = 0; i <= 19; i++) {
     const effect = currentItem.effects[i];
@@ -533,7 +591,8 @@ attack_keisan1 = function (user, skillId, sourceTypeId) {
       valueAttackStates.push(effect.dataId);
     }
   }
-
+  
+  // Handle level fluctuation
   if (user.isStateAffected(410)) {
     if (currentItem.meta['LevelFluctuation']) {
       valueLevelFluctuation = Number(currentItem.meta['LevelFluctuation']);
@@ -541,102 +600,177 @@ attack_keisan1 = function (user, skillId, sourceTypeId) {
       valueLevelFluctuation = 0;
     }
   }
+  
+  // Set up attack elements
+  setupAttackElements(user, currentItem);
+}
 
-  // Set up attack elements.
+// Set up attack elements from skill and user properties
+function setupAttackElements(user, currentItem) {
   attackElementsList = [];
+  
+  // Add elements from skill metadata
   if (currentItem.meta['Multiple Elements']) {
     attackElementsList = currentItem.meta['Multiple Elements'].split(',');
   }
+  
+  // Add element from damage settings
   if (currentItem.damage.elementId >= 1) {
     attackElementsList = attackElementsList.concat(currentItem.damage.elementId);
   }
+  
+  // Add user's innate attack elements
   attackElementsList = attackElementsList.concat(user.attackElements());
+}
 
-  // Change damage depiction based on weapon type, selecting a random element from Multiple Elements.
-  if (currentItem.meta['Multiple Elements']) {
-    const multipleElements = currentItem.meta['Multiple Elements'].split(',');
-    if (currentItem.damage.elementId >= 1) {
-      multipleElements.push(currentItem.damage.elementId);
-    }
-    const randomIndex = Math.floor(Math.random() * multipleElements.length);
-    const selectedElementId = multipleElements[randomIndex];
-    if (selectedElementId >= 1) {
-      const elementIdsCount = ak1ElementIds.length;
-      for (let i = 0; i < elementIdsCount; i++) {
-        if (selectedElementId === ak1ElementIds[i]) {
-          $gameVariables.setValue(93, ak1ElementDisplayValues[i]);
-          $gameVariables.setValue(331, ak1DamageFlashDesignationData);
-        }
+// Configure damage visualization based on elements and skill properties
+function configureDamageVisualization(user, skillId) {
+  const currentItem = sourceItems[skillId];
+  $gameVariables.setValue(93, 131); // Default damage visualization
+  $gameVariables.setValue(526, 1); // Default hit count
+  
+  // Set damage visualization based on elements
+  configureElementDamageVisualization(currentItem);
+  
+  // Configure special flash effect based on elements
+  configureElementFlashEffect(user);
+}
+
+// Configure damage visualization based on elements in the skill
+function configureElementDamageVisualization(currentItem) {
+  if (!currentItem.meta['Multiple Elements']) return;
+  
+  const multipleElements = currentItem.meta['Multiple Elements'].split(',');
+  if (currentItem.damage.elementId >= 1) {
+    multipleElements.push(currentItem.damage.elementId);
+  }
+  
+  const randomIndex = Math.floor(Math.random() * multipleElements.length);
+  const selectedElementId = multipleElements[randomIndex];
+  
+  if (selectedElementId >= 1) {
+    const elementIdsCount = ak1ElementIds.length;
+    for (let i = 0; i < elementIdsCount; i++) {
+      if (selectedElementId == ak1ElementIds[i]) {
+        $gameVariables.setValue(93, ak1ElementDisplayValues[i]);
+        $gameVariables.setValue(331, ak1DamageFlashDesignationData);
       }
     }
   }
+}
 
-  // Determine candidate elements for special flash effect.
+// Configure flash effect based on the user's elemental affinities
+function configureElementFlashEffect(user) {
   const candidateElements = [0];
   const testIds = [3, 4, 5, 6, 7, 8, 9];
+  
   for (let i = 0; i < attackElementsList.length; i++) {
     const attackElement = attackElementsList[i];
     const elementId = Number(attackElement);
+    
     if (i == 35) { specialDispelCount += 1; }
+    
     if (testIds.includes(elementId) && user.elementAmplifyRate(elementId) >= 0.5) {
       candidateElements.push(attackElement);
     }
   }
+  
   if (candidateElements.length > 0) {
     const maxCandidateElement = Math.max(...candidateElements);
     ak1SetDamageFlashConfiguration(maxCandidateElement);
   }
+}
 
+// Process skill-specific movement and projectile settings
+function processSkillSpecialSettings(user, skillId) {
+  const currentItem = sourceItems[skillId];
+  
   $gameVariables.setValue(349, currentItem.meta['moveReaction'] ? Number(currentItem.meta['moveReaction']) : 0);
   $gameSwitches.setValue(462, !currentItem.meta['ProjectileSkill']);
+  
   if (user.isEnemy()) {
     if (!$dataEnemies[user.enemyId()].meta[`Sideview Battler`]) {
       $gameSwitches.setValue(462, false);
     }
   }
+}
 
-  if (user.isActor() && $gameVariables.value(182) == 2) {
-    if (user.subclass() && user.equips()[0]) {
-      if (elementAttackRate >= 1) {
-        const classRankNum = Number($dataClasses[user.subclass().id].meta['classRank']);
-        user.gainSkillMasteryUses(skillId, elementAttackRate * classRankNum);
-      }
+// Process skill mastery progression and brave command effects
+function processSkillMasteryAndBraveCommand(user, skillId) {
+  const currentItem = sourceItems[skillId];
+  const abilityUsageDistinction = $gameVariables.value(182);
+  
+  // Handle skill mastery progression
+  if (user.isActor() && abilityUsageDistinction == 2) {
+    processSkillMasteryProgression(user, skillId);
+  }
+  
+  // Handle brave command state
+  processBraveCommandState(abilityUsageDistinction);
+}
+
+// Process skill mastery progression for subclasses
+function processSkillMasteryProgression(user, skillId) {
+  if (user.subclass() && user.equips()[0]) {
+    const elementAttackRate = user.elementRate(11) * 10;
+    if (elementAttackRate >= 1) {
+      const classRankNum = Number($dataClasses[user.subclass().id].meta['classRank']);
+      user.gainSkillMasteryUses(skillId, elementAttackRate * classRankNum);
     }
   }
+}
 
+// Process brave command state updates for Lisha (actor 1)
+function processBraveCommandState(abilityUsageDistinction) {
   const actor1 = $gameActors.actor(1);
-  const abilityUsageDistinction = $gameVariables.value(182);
-  if ($gameParty.members().contains(actor1) && actor1.isStateAffected(662)) { // リーシャのブレイブコマンド
+  
+  if ($gameParty.members().contains(actor1) && actor1.isStateAffected(662)) {
     const stateCounter = actor1._stateCounter[662];
+    
     for (let i = 0; i < 4; i++) {
       if (abilityUsageDistinction == i + 5 && stateCounter[i] >= 0 && stateCounter[i] <= 4) {
         stateCounter[i] += 1;
       }
     }
   }
+}
 
+// Apply final skill customization based on metadata and skill type
+function applyFinalSkillCustomization(user, skillId) {
+  const currentItem = sourceItems[skillId];
   const currentItemName = currentItem.name;
+  const abilityUsageDistinction = $gameVariables.value(182);
+  
+  // Update UI variables based on ability type
   ak1UpdateVariablesBasedOnGameVar(abilityUsageDistinction, currentItemName, currentItem);
-
+  
+  // Apply skill-specific damage visualization
   if (currentItem.meta['SkillDamageAction']) {
     $gameVariables.setValue(93, Number(currentItem.meta['SkillDamageAction']));
   }
-  if (currentItem.meta['Instant']) {
-    $gameSwitches.setValue(91, true);
-  } else {
-    $gameSwitches.setValue(91, false);
-  }
+  
+  // Apply instant effect flag
+  $gameSwitches.setValue(91, !!currentItem.meta['Instant']);
+  
+  // Apply repeat count
   if (currentItem.meta['Repeat']) {
     $gameVariables.setValue(526, Number(currentItem.meta['Repeat']));
   }
+  
+  // Apply hit count buffs based on skill type and states
+  applyHitCountBuffs(user, abilityUsageDistinction);
+}
 
+// Apply additional hits based on states and ability type
+function applyHitCountBuffs(user, abilityUsageDistinction) {
   if (abilityUsageDistinction == 2) {
     ak1ApplyValueAttackHit(user, valueNormalAttackHit, 'NormalAttackHit');
   }
+  
   if (abilityUsageDistinction == 2 || abilityUsageDistinction == 6) {
     ak1ApplyValueAttackHit(user, valueAttackAbilityHit, 'AttackAbilityHit');
   }
-};
+}
 
 /**
  * Updates game variables based on the current value of game variable 182 (ability usage distinction).
