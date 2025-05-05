@@ -6136,48 +6136,45 @@ if(id2 >= 20){
 };
 
 //２回目以降殲滅時にボーナス
-annihilationItem_bonus = function(){
-
-if($dataItems[$gameVariables.value(240)].meta['TchestType']){
-  var arr1 = [];
-  var arr2 = [];
-  //arr1.push($dataItems[$gameVariables.value(240)].meta['TchestType'].split(','));
-  //arr2.push($dataItems[$gameVariables.value(240)].meta['Tchest'].split(','));
-  arr1 = arr1.concat($dataItems[$gameVariables.value(240)].meta['TchestType'].split(','));
-  arr2 = arr2.concat($dataItems[$gameVariables.value(240)].meta['Tchest'].split(','));
-  if($dataItems[$gameVariables.value(240)].meta['firstAnnihilationItem']){
-    var arr3 = $dataItems[$gameVariables.value(240)].meta['firstAnnihilationItem'].split(',');
-    //arr1.push(Number(arr3[0]));
-    //arr2.push(Number(arr3[1]));
-    arr1 = arr1.concat(Number(arr3[0]));
-    arr2 = arr2.concat(Number(arr3[1]));
-  };
-  if($dataItems[$gameVariables.value(240)].meta['TchestOnly']){
-    var arr4 = $dataItems[$gameVariables.value(240)].meta['TchestOnly'].split(',');
-    //arr1.push(Number(arr4[3]));
-    //arr2.push(Number(arr4[4]));
-    arr1 = arr1.concat(Number(arr4[3]));
-    arr2 = arr2.concat(Number(arr4[4]));
-  };
-  var value1 = arr2[Math.floor(Math.random() * arr2.length)];
-  let index = arr2.findIndex(arr2 => arr2 == value1); 
-  const valueItems = get_valueItems_iwa(arr1[index]);
-  $gameParty.gainItem(valueItems[Number(arr2[index])], 1);
-  valueWordSet1 = `全滅ボーナスとして\\C[24]\x1bI[${valueItems[Number(arr2[index])].iconIndex}]${valueItems[Number(arr2[index])].name}\\C[0]を入手した！`;
-  if($dataItems[$gameVariables.value(240)].meta['TchestRere']){
-    if( Number(arr2[index]) == Number($dataItems[$gameVariables.value(240)].meta['TchestRere']) ){
-      $gameSwitches.setValue(439,true);
-  }};
-  if($dataItems[$gameVariables.value(240)].meta['firstAnnihilationItem']){
-    if( Number(arr2[index]) == Number(arr3[1]) ){
-      $gameSwitches.setValue(439,true);
-  }};
-  if($dataItems[$gameVariables.value(240)].meta['TchestOnly']){
-    if( Number(arr2[index]) == Number(arr4[4]) ){
-      $gameSwitches.setValue(439,true);
-  }};
-};
-
+annihilationItem_bonus = function() {
+  if ($dataItems[$gameVariables.value(240)].meta['TchestType']) {
+    let chestTypeIds = [];
+    let chestItemIndices = [];
+    chestTypeIds = chestTypeIds.concat($dataItems[$gameVariables.value(240)].meta['TchestType'].split(','));
+    chestItemIndices = chestItemIndices.concat($dataItems[$gameVariables.value(240)].meta['Tchest'].split(','));
+    let firstAnnihilationPair;
+    if ($dataItems[$gameVariables.value(240)].meta['firstAnnihilationItem']) {
+      firstAnnihilationPair = $dataItems[$gameVariables.value(240)].meta['firstAnnihilationItem'].split(',');
+      chestTypeIds = chestTypeIds.concat(Number(firstAnnihilationPair[0]));
+      chestItemIndices = chestItemIndices.concat(Number(firstAnnihilationPair[1]));
+    }
+    let chestOnlyBonusPair;
+    if ($dataItems[$gameVariables.value(240)].meta['TchestOnly']) {
+      chestOnlyBonusPair = $dataItems[$gameVariables.value(240)].meta['TchestOnly'].split(',');
+      chestTypeIds = chestTypeIds.concat(Number(chestOnlyBonusPair[3]));
+      chestItemIndices = chestItemIndices.concat(Number(chestOnlyBonusPair[4]));
+    }
+    const randomChestItemValue = chestItemIndices[Math.floor(Math.random() * chestItemIndices.length)];
+    let selectedArrayIndex = chestItemIndices.findIndex(item => item == randomChestItemValue);
+    const itemArray = get_valueItems_iwa(chestTypeIds[selectedArrayIndex]);
+    $gameParty.gainItem(itemArray[Number(chestItemIndices[selectedArrayIndex])], 1);
+    valueWordSet1 = `全滅ボーナスとして\\C[24]\x1bI[${itemArray[Number(chestItemIndices[selectedArrayIndex])].iconIndex}]${itemArray[Number(chestItemIndices[selectedArrayIndex])].name}\\C[0]を入手した！`;
+    if ($dataItems[$gameVariables.value(240)].meta['TchestRere']) {
+      if (Number(chestItemIndices[selectedArrayIndex]) == Number($dataItems[$gameVariables.value(240)].meta['TchestRere'])) {
+        $gameSwitches.setValue(439, true);
+      }
+    }
+    if ($dataItems[$gameVariables.value(240)].meta['firstAnnihilationItem']) {
+      if (Number(chestItemIndices[selectedArrayIndex]) == Number(firstAnnihilationPair[1])) {
+        $gameSwitches.setValue(439, true);
+      }
+    }
+    if ($dataItems[$gameVariables.value(240)].meta['TchestOnly']) {
+      if (Number(chestItemIndices[selectedArrayIndex]) == Number(chestOnlyBonusPair[4])) {
+        $gameSwitches.setValue(439, true);
+      }
+    }
+  }
 };
 
 //文字ピクチャを座標指定して表示しっぱなしpictureText_SetUp(1,100,`ジュク…っ\\I[12]`,28,640,384,180,'eromangasimaji')
