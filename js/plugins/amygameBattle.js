@@ -3890,108 +3890,210 @@ if(id1 == 8){
 //石召喚演出ピクチャsummon_directPicture1(1);
 summon_directPicture1 = function(effectMode) {
   picture_motion1("smooth", [0]);
-  // picture_motion1("linear",[0]);
-  const particle = $gameScreen._particle;
+  
   const pictureId = 101;
-  if (effectMode === 0) {
-    AudioManager.playSe({ "name": 'Ice7', "volume": 100, "pitch": 150, "pan": 0 });
-    $gameScreen.startFlash([255, 255, 255, 170], 20);
-
-    // Use distinct names for the string constants so they are not overwritten later.
-    const particleGroupOne = 'summon_Direct1';
-    const particleGroupTwo = 'summon_Direct2';
-    particle.particleClear(particleGroupOne);
-    particle.particleClear(particleGroupTwo);
-
-    const picOrigin = $gameScreen.picture(pictureId).origin();
-    const picX = $gameScreen.picture(pictureId).x();
-    // Overwrite variables instead of re-declaring; these now represent picture properties.
-    let picY = $gameScreen.picture(pictureId).y();
-    let picScaleX = $gameScreen.picture(pictureId).scaleX();
-    const picScaleY = $gameScreen.picture(pictureId).scaleY();
-    //$gameScreen.picture(pictureId).opacity(); // not used
-    $gameScreen.movePicture(pictureId, picOrigin, picX, picY, picScaleX, picScaleY + 100, 0, 0, 60);
-    picture_fade1(pictureId, "fadeOut", 'Hscene005', 60, 5);
-    UTSU.PictureBreath.off([pictureId]);
-    $gameScreen.erasePicture(pictureId + 1);
-  }
-  if (effectMode === 1) {
-    valueWordSet10 = ($gameParty.inBattle() ? 'battlePicture:' : 'picture:') + pictureId;
-    AudioManager.playSe({ "name": 'Z_Summoning', "volume": 50, "pitch": 120, "pan": 0 });
-    const damageFlashDesignationData = $gameVariables.value(331);
-    if (damageFlashDesignationData !== 0) {
-      $gameScreen.startFlash([
-        damageFlashDesignationData[0],
-        damageFlashDesignationData[1],
-        damageFlashDesignationData[2],
-        170
-      ], 20);
-    } else {
-      $gameScreen.startFlash([255, 255, 255, 170], 20);
-    }
-    const picSizeArr = $dataSkills[$gameVariables.value(96)].meta['picSize'].split(',');
-    const picturePath = "/img/sv_enemies/Summon_" + Number(picSizeArr[0]);
-    const photoOffset = Number(picSizeArr[1]);
-    let offsetX = photoOffset; // reassignable if needed
-    const yOffset = Number(picSizeArr[2]);
-    let offsetY = yOffset;
-    $gameScreen.showPicture(pictureId, picturePath, 1, 640 + 450 + offsetX, 384 + offsetY, -100, 100, 210, 0);
-    // $gameScreen.movePicture(pictureId,1,640+500+offsetX,384+offsetY,-100,100,210,0,40);
-    picture_fade1(pictureId, "fadeIn", '162', 60, 5);
-    tachie_bless(pictureId);
-    const particleGroupOne = 'summon_Direct1';
-    particle.particleSet(0, particleGroupOne, valueWordSet10, 'def', 'screen');
-    const particleGroupTwo = 'summon_Direct2';
-    particle.particleSet(0, particleGroupTwo, valueWordSet10, 'def', 'screen');
-    const particleSize = Number(picSizeArr[3]);
-    const rectX = -particleSize / 2 - 50;
-    const rectWidth = particleSize + 100;
-    const particleDetail = Number(picSizeArr[4]);
-    const particlesWaveCountA = Math.round(particleDetail / 10);
-    const particlesWaveCountB = Math.round(particleDetail / 5);
-    particle.particleUpdate([particleGroupOne, 'rect', rectX, particlesWaveCountB, rectWidth, 0]);
-    particle.particleUpdate([particleGroupTwo, 'rect', rectX, particlesWaveCountA, rectWidth, 0]);
-    if ($dataSkills[$gameVariables.value(96)].meta['Multiple Elements']) {
-      const multipleElementsArr = $dataSkills[$gameVariables.value(96)].meta['Multiple Elements'].split(',');
-      for (let index = 0; index < multipleElementsArr.length; index++) {
-        const elementValue = Number(multipleElementsArr[index]);
-        const elementColorHex = getElementColorHex(elementValue);
-        if (elementColorHex !== 0) {
-          particle.particleUpdate([particleGroupOne, 'color', String(elementColorHex), '#ffffff']);
-          particle.particleUpdate([particleGroupOne, 'colorMode', '1']);
-          particle.particleUpdate([particleGroupTwo, 'color', String(elementColorHex), '#ffffff']);
-          particle.particleUpdate([particleGroupTwo, 'colorMode', '1']);
-          break;
-        }
-      }
-    }
-    const waveParticles = 2;
-    particle.particleUpdate([particleGroupOne, 'particlesPerWave', String(waveParticles)]);
-    particle.particleUpdate([particleGroupTwo, 'particlesPerWave', String(waveParticles)]);
-    particle.particleExceed(particleGroupOne, 1.5);
-    particle.particleExceed(particleGroupTwo, 1.5);
-  }
-  else if (effectMode === 2) {
-    const picX2 = $gameScreen.picture(pictureId).x();
-    const picY2 = $gameScreen.picture(pictureId).y();
-    $gameScreen.startAnimation(picX2, picY2, 301, false);
-    const displayText = `\x1bSIN[${$gameVariables.value(96)}]`;
-    if ($dataSkills[$gameVariables.value(96)].meta['rubi']) {
-      let rubiText = $dataSkills[$gameVariables.value(96)].meta['rubi'];
-      for (let j = 1; j <= 10; j++) {
-        if (rubiText.match(/ /)) {
-          rubiText = rubiText.replace(' ', '');
-        }
-      }
-      $gameScreen.setDTextPicture(`${rubiText}`, 20);
-    }
-    $gameScreen.dWindowFrame = 'ON';
-    $gameScreen.dTextAlign = 1;
-    $gameScreen.setDTextPicture(`${displayText}`, 28);
-    $gameScreen.showPicture(pictureId + 1, "", 1, picX2, 384 - 250, 100, 100, 0, 0);
-    $gameScreen.movePicture(pictureId + 1, 1, picX2, 384 - 350, 100, 100, 255, 0, 30);
+  
+  switch (effectMode) {
+    case 0:
+      sdp1HandleSummonFadeOut(pictureId);
+      break;
+    case 1:
+      sdp1HandleSummonAppearance(pictureId);
+      break;
+    case 2:
+      sdp1HandleSummonSkillDisplay(pictureId);
+      break;
   }
 };
+
+// Handles the fade out effect of a summon
+function sdp1HandleSummonFadeOut(pictureId) {
+  sdp1PlaySummonFadeOutEffect();
+  
+  // Clear any existing particles
+  sdp1ClearSummonParticles();
+  
+  // Move and fade out the picture
+  sdp1AnimateSummonPictureFadeOut(pictureId);
+}
+
+// Plays sound and flash effects for fade out
+function sdp1PlaySummonFadeOutEffect() {
+  AudioManager.playSe({ "name": 'Ice7', "volume": 100, "pitch": 150, "pan": 0 });
+  $gameScreen.startFlash([255, 255, 255, 170], 20);
+}
+
+// Clears particle effects used in summon animations
+function sdp1ClearSummonParticles() {
+  const particle = $gameScreen._particle;
+  particle.particleClear('summon_Direct1');
+  particle.particleClear('summon_Direct2');
+}
+
+// Animates the summon picture fading out
+function sdp1AnimateSummonPictureFadeOut(pictureId) {
+  const picOrigin = $gameScreen.picture(pictureId).origin();
+  const picX = $gameScreen.picture(pictureId).x();
+  const picY = $gameScreen.picture(pictureId).y();
+  const picScaleX = $gameScreen.picture(pictureId).scaleX();
+  const picScaleY = $gameScreen.picture(pictureId).scaleY();
+  
+  $gameScreen.movePicture(pictureId, picOrigin, picX, picY, picScaleX, picScaleY + 100, 0, 0, 60);
+  picture_fade1(pictureId, "fadeOut", 'Hscene005', 60, 5);
+  UTSU.PictureBreath.off([pictureId]);
+  $gameScreen.erasePicture(pictureId + 1);
+}
+
+// Handles the appearance of a summon with particles and visual effects
+function sdp1HandleSummonAppearance(pictureId) {
+  const currentSkill = $dataSkills[$gameVariables.value(96)];
+  
+  // Set picture reference for particle effects
+  valueWordSet10 = ($gameParty.inBattle() ? 'battlePicture:' : 'picture:') + pictureId;
+  
+  // Play effects and show the summon picture
+  sdp1PlaySummonAppearanceEffects();
+  sdp1ShowSummonPicture(pictureId, currentSkill);
+  
+  // Configure and apply particle effects
+  sdp1ConfigureSummonParticles(currentSkill);
+}
+
+// Plays sound and visual effects for summon appearance
+function sdp1PlaySummonAppearanceEffects() {
+  AudioManager.playSe({ "name": 'Z_Summoning', "volume": 50, "pitch": 120, "pan": 0 });
+  
+  // Apply flash effect based on available data or default to white
+  const damageFlashData = $gameVariables.value(331);
+  if (damageFlashData !== 0) {
+    $gameScreen.startFlash([
+      damageFlashData[0],
+      damageFlashData[1],
+      damageFlashData[2],
+      170
+    ], 20);
+  } else {
+    $gameScreen.startFlash([255, 255, 255, 170], 20);
+  }
+}
+
+// Shows the summon picture with appropriate positioning and animation
+function sdp1ShowSummonPicture(pictureId, skill) {
+  const picSizeArr = skill.meta['picSize'].split(',');
+  const picturePath = "/img/sv_enemies/Summon_" + Number(picSizeArr[0]);
+  const offsetX = Number(picSizeArr[1]);
+  const offsetY = Number(picSizeArr[2]);
+  
+  $gameScreen.showPicture(pictureId, picturePath, 1, 640 + 450 + offsetX, 384 + offsetY, -100, 100, 210, 0);
+  picture_fade1(pictureId, "fadeIn", '162', 60, 5);
+  tachie_bless(pictureId);
+}
+
+// Configures particle effects for the summon based on skill properties
+function sdp1ConfigureSummonParticles(skill) {
+  const particle = $gameScreen._particle;
+  const picSizeArr = skill.meta['picSize'].split(',');
+  
+  // Set up basic particle groups
+  sdp1SetupSummonParticleGroups(particle);
+  
+  // Configure particle size and area
+  const particleSize = Number(picSizeArr[3]);
+  const particleDetail = Number(picSizeArr[4]);
+  sdp1ConfigureSummonParticleProperties(particle, particleSize, particleDetail);
+  
+  // Apply element-based coloring if available
+  sdp1ApplySummonElementColors(particle, skill);
+}
+
+// Sets up the base particle groups for summon effects
+function sdp1SetupSummonParticleGroups(particle) {
+  particle.particleSet(0, 'summon_Direct1', valueWordSet10, 'def', 'screen');
+  particle.particleSet(0, 'summon_Direct2', valueWordSet10, 'def', 'screen');
+}
+
+// Configures detailed properties of summon particles
+function sdp1ConfigureSummonParticleProperties(particle, particleSize, particleDetail) {
+  const rectX = -particleSize / 2 - 50;
+  const rectWidth = particleSize + 100;
+  const particlesWaveCountA = Math.round(particleDetail / 10);
+  const particlesWaveCountB = Math.round(particleDetail / 5);
+  
+  particle.particleUpdate(['summon_Direct1', 'rect', rectX, particlesWaveCountB, rectWidth, 0]);
+  particle.particleUpdate(['summon_Direct2', 'rect', rectX, particlesWaveCountA, rectWidth, 0]);
+  
+  const waveParticles = 2;
+  particle.particleUpdate(['summon_Direct1', 'particlesPerWave', String(waveParticles)]);
+  particle.particleUpdate(['summon_Direct2', 'particlesPerWave', String(waveParticles)]);
+  
+  particle.particleExceed('summon_Direct1', 1.5);
+  particle.particleExceed('summon_Direct2', 1.5);
+}
+
+// Applies element-specific colors to summon particles
+function sdp1ApplySummonElementColors(particle, skill) {
+  if (!skill.meta['Multiple Elements']) return;
+  
+  const multipleElementsArr = skill.meta['Multiple Elements'].split(',');
+  
+  for (let index = 0; index < multipleElementsArr.length; index++) {
+    const elementValue = Number(multipleElementsArr[index]);
+    const elementColorHex = getElementColorHex(elementValue);
+    
+    if (elementColorHex !== 0) {
+      particle.particleUpdate(['summon_Direct1', 'color', String(elementColorHex), '#ffffff']);
+      particle.particleUpdate(['summon_Direct1', 'colorMode', '1']);
+      particle.particleUpdate(['summon_Direct2', 'color', String(elementColorHex), '#ffffff']);
+      particle.particleUpdate(['summon_Direct2', 'colorMode', '1']);
+      break;
+    }
+  }
+}
+
+// Handles displaying the skill name for a summon
+function sdp1HandleSummonSkillDisplay(pictureId) {
+  const picX2 = $gameScreen.picture(pictureId).x();
+  const picY2 = $gameScreen.picture(pictureId).y();
+  
+  // Play animation at the picture's position
+  $gameScreen.startAnimation(picX2, picY2, 301, false);
+  
+  // Display skill name with optional ruby text
+  sdp1DisplaySummonSkillName(pictureId, picX2);
+}
+
+// Displays the skill name with optional ruby text above it
+function sdp1DisplaySummonSkillName(pictureId, xPosition) {
+  const currentSkill = $dataSkills[$gameVariables.value(96)];
+  const displayText = `\x1bSIN[${$gameVariables.value(96)}]`;
+  
+  // Set up optional ruby text if available
+  sdp1SetupSummonRubyText(currentSkill);
+  
+  // Configure and display the skill name
+  $gameScreen.dWindowFrame = 'ON';
+  $gameScreen.dTextAlign = 1;
+  $gameScreen.setDTextPicture(`${displayText}`, 28);
+  
+  // Position and animate the text display
+  $gameScreen.showPicture(pictureId + 1, "", 1, xPosition, 384 - 250, 100, 100, 0, 0);
+  $gameScreen.movePicture(pictureId + 1, 1, xPosition, 384 - 350, 100, 100, 255, 0, 30);
+}
+
+// Prepares ruby text for a skill if available
+function sdp1SetupSummonRubyText(skill) {
+  if (!skill.meta['rubi']) return;
+  
+  let rubiText = skill.meta['rubi'];
+  // Remove spaces from ruby text
+  for (let j = 1; j <= 10; j++) {
+    if (rubiText.match(/ /)) {
+      rubiText = rubiText.replace(' ', '');
+    }
+  }
+  
+  $gameScreen.setDTextPicture(`${rubiText}`, 20);
+}
 
 getElementColorHex = function (elementValue) {
   switch (elementValue) {
