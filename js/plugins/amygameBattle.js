@@ -709,13 +709,35 @@ function ak1ProcessSkillMasteryAndBraveCommand(user, skillId) {
   ak1ProcessBraveCommandState(abilityUsageDistinction);
 }
 
+// Define the subclass-to-weapon mastery mapping
+const ak1SubclassWeaponMastery = {
+  97: { weaponTypes: [1, 7], value: 1 },
+  107: { weaponTypes: [1, 6], value: 1 },
+  108: { weaponTypes: [4, 6], value: 1 },
+  101: { weaponTypes: [4, 5], value: 1 },
+  115: { weaponTypes: [2, 8], value: 1 },
+  96: { weaponTypes: [1, 2], value: 1 },
+  106: { weaponTypes: [5, 7], value: 1 },
+  120: { weaponTypes: [3, 9], value: 1 },
+  102: { weaponTypes: [8, 9], value: 1 },
+  199: { weaponTypes: [2, 10], value: 1 },
+  43: { weaponTypes: [7], value: 2 }, // Note: Original has redundant condition; simplified here
+};
+
 // Process skill mastery progression for subclasses
 function ak1ProcessSkillMasteryProgression(user, skillId) {
-  if (user.subclass() && user.equips()[0]) {
-    const elementAttackRate = user.elementRate(11) * 10;
-    if (elementAttackRate >= 1) {
-      const classRankNum = Number($dataClasses[user.subclass().id].meta['classRank']);
-      user.gainSkillMasteryUses(skillId, elementAttackRate * classRankNum);
+  if (user.isActor() && $gameVariables.value(182) == 2) {
+    const subclass = user.subclass();
+    if (subclass && user.equips()[0]) {
+      const subclassIcon = Number($dataClasses[subclass.id].meta['Icon']);
+      const weaponType = Number($dataWeapons[user.equips()[0].id].wtypeId);
+
+      if (ak1SubclassWeaponMastery[subclassIcon] &&
+        ak1SubclassWeaponMastery[subclassIcon].weaponTypes.includes(weaponType)) {
+        const value3 = ak1SubclassWeaponMastery[subclassIcon].value;
+        const classRankNum = Number($dataClasses[subclass.id].meta['classRank']);
+        user.gainSkillMasteryUses(skillId, value3 * classRankNum);
+      }
     }
   }
 }
