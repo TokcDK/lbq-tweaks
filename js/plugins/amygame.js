@@ -6137,47 +6137,102 @@ if(id2 >= 20){
 
 //２回目以降殲滅時にボーナス
 annihilationItem_bonus = function() {
-  // Cache $gameVariables.value(240) as chestId and its meta for reuse
   const chestId = Number($gameVariables.value(240));
   const chestMeta = $dataItems[chestId].meta;
-  if (chestMeta['TchestType']) {
-    let chestTypeIds = [];
-    let chestItemIndices = [];
-    chestTypeIds.push(...chestMeta['TchestType'].split(','));
-    chestItemIndices.push(...chestMeta['Tchest'].split(','));
-    let firstAnnihilationPair;
-    if (chestMeta['firstAnnihilationItem']) {
-      firstAnnihilationPair = chestMeta['firstAnnihilationItem'].split(',');
-      chestTypeIds.push(Number(firstAnnihilationPair[0]));
-      chestItemIndices.push(Number(firstAnnihilationPair[1]));
+  
+  if (!chestMeta['TchestType']) return;
+  
+  const chestOptions = collectChestOptions(chestMeta);
+  const selectedOption = selectRandomChestOption(chestOptions);
+  
+  if (!selectedOption) return;
+  
+  const itemData = getItemAndAwardToPlayer(selectedOption);
+  
+  // displayBonusMessage
+  valueWordSet1 = `全滅ボーナスとして\\C[24]\x1bI[${itemData.iconIndex}]${itemData.name}\\C[0]を入手した！`;
+  
+  checkForRareItemFlags(chestMeta, selectedOption.itemIndex);
+};
+
+// Collects all possible chest reward options from the chest metadata
+collectChestOptions = function(chestMeta) {
+  const options = [];
+  
+  // Add standard chest items
+  if (chestMeta['TchestType'] && chestMeta['Tchest']) {
+    const types = chestMeta['TchestType'].split(',');
+    const indices = chestMeta['Tchest'].split(',');
+    
+    for (let i = 0; i < types.length; i++) {
+      options.push({
+        type: Number(types[i]),
+        itemIndex: Number(indices[i])
+      });
     }
-    let chestOnlyBonusPair;
-    if (chestMeta['TchestOnly']) {
-      chestOnlyBonusPair = chestMeta['TchestOnly'].split(',');
-      chestTypeIds.push(Number(chestOnlyBonusPair[3]));
-      chestItemIndices.push(Number(chestOnlyBonusPair[4]));
+  }
+  
+  // Add first annihilation item if present
+  if (chestMeta['firstAnnihilationItem']) {
+    const [type, index] = chestMeta['firstAnnihilationItem'].split(',');
+    options.push({
+      type: Number(type),
+      itemIndex: Number(index)
+    });
+  }
+  
+  // Add chest-only bonus item if present
+  if (chestMeta['TchestOnly']) {
+    const [,,,type, index] = chestMeta['TchestOnly'].split(',');
+    options.push({
+      type: Number(type),
+      itemIndex: Number(index)
+    });
+  }
+  
+  return options;
+};
+
+// Selects a random option from the available chest options
+selectRandomChestOption = function(options) {
+  if (options.length === 0) return null;
+  return options[Math.floor(Math.random() * options.length)];
+};
+
+// Retrieves the item based on type and index, then gives it to the player
+getItemAndAwardToPlayer = function(option) {
+  const itemArray = get_valueItems_iwa(option.type);
+  const item = itemArray[option.itemIndex];
+  
+  $gameParty.gainItem(item, 1);
+  
+  return {
+    item: item,
+    iconIndex: item.iconIndex,
+    name: item.name
+  };
+};
+
+// Checks if the selected item is a rare item and sets appropriate flags
+checkForRareItemFlags = function(chestMeta, selectedItemIndex) {
+  // Check standard rare item flag
+  if (chestMeta['TchestRere'] && selectedItemIndex == Number(chestMeta['TchestRere'])) {
+    $gameSwitches.setValue(439, true);
+  }
+  
+  // Check first annihilation rare item flag
+  if (chestMeta['firstAnnihilationItem']) {
+    const firstAnnihilationIndex = Number(chestMeta['firstAnnihilationItem'].split(',')[1]);
+    if (selectedItemIndex == firstAnnihilationIndex) {
+      $gameSwitches.setValue(439, true);
     }
-    const randomChestItemValue = chestItemIndices[Math.floor(Math.random() * chestItemIndices.length)];
-    let selectedArrayIndex = chestItemIndices.findIndex(item => item == randomChestItemValue);
-    // Cache the converted chest item index value
-    const selectedChestItem = Number(chestItemIndices[selectedArrayIndex]);
-    const itemArray = get_valueItems_iwa(chestTypeIds[selectedArrayIndex]);
-    $gameParty.gainItem(itemArray[selectedChestItem], 1);
-    valueWordSet1 = `全滅ボーナスとして\\C[24]\x1bI[${itemArray[selectedChestItem].iconIndex}]${itemArray[selectedChestItem].name}\\C[0]を入手した！`;
-    if (chestMeta['TchestRere']) {
-      if (selectedChestItem == Number(chestMeta['TchestRere'])) {
-        $gameSwitches.setValue(439, true);
-      }
-    }
-    if (chestMeta['firstAnnihilationItem']) {
-      if (selectedChestItem == Number(firstAnnihilationPair[1])) {
-        $gameSwitches.setValue(439, true);
-      }
-    }
-    if (chestMeta['TchestOnly']) {
-      if (selectedChestItem == Number(chestOnlyBonusPair[4])) {
-        $gameSwitches.setValue(439, true);
-      }
+  }
+  
+  // Check chest-only rare item flag
+  if (chestMeta['TchestOnly']) {
+    const chestOnlyIndex = Number(chestMeta['TchestOnly'].split(',')[4]);
+    if (selectedItemIndex == chestOnlyIndex) {
+      $gameSwitches.setValue(439, true);
     }
   }
 };
