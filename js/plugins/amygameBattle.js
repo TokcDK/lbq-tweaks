@@ -3908,24 +3908,21 @@ summon_directPicture1 = function(effectMode) {
     let picY = $gameScreen.picture(pictureId).y();
     let picScaleX = $gameScreen.picture(pictureId).scaleX();
     const picScaleY = $gameScreen.picture(pictureId).scaleY();
-    const picOpacity = $gameScreen.picture(pictureId).opacity();
+    //const picOpacity = $gameScreen.picture(pictureId).opacity();
     $gameScreen.movePicture(pictureId, picOrigin, picX, picY, picScaleX, picScaleY + 100, 0, 0, 60);
     picture_fade1(pictureId, "fadeOut", 'Hscene005', 60, 5);
     UTSU.PictureBreath.off([pictureId]);
     $gameScreen.erasePicture(pictureId + 1);
   }
   if (effectMode === 1) {
-    if ($gameParty.inBattle()) {
-      valueWordSet10 = 'battlePicture:' + pictureId;
-    } else {
-      valueWordSet10 = 'picture:' + pictureId;
-    }
+    valueWordSet10 = ($gameParty.inBattle() ? 'battlePicture:' : 'picture:') + pictureId;
     AudioManager.playSe({ "name": 'Z_Summoning', "volume": 50, "pitch": 120, "pan": 0 });
-    if ($gameVariables.value(331) !== 0) {
+    const damageFlashDesignationData = $gameVariables.value(331);
+    if (damageFlashDesignationData !== 0) {
       $gameScreen.startFlash([
-        $gameVariables.value(331)[0],
-        $gameVariables.value(331)[1],
-        $gameVariables.value(331)[2],
+        damageFlashDesignationData[0],
+        damageFlashDesignationData[1],
+        damageFlashDesignationData[2],
         170
       ], 20);
     } else {
@@ -3957,20 +3954,7 @@ summon_directPicture1 = function(effectMode) {
       const multipleElementsArr = $dataSkills[$gameVariables.value(96)].meta['Multiple Elements'].split(',');
       for (let index = 0; index < multipleElementsArr.length; index++) {
         const elementValue = Number(multipleElementsArr[index]);
-        let elementColorHex = 0;
-        if (elementValue === 3) {
-          elementColorHex = '#ff0000';
-        } else if (elementValue === 4) {
-          elementColorHex = '#1eff00';
-        } else if (elementValue === 5) {
-          elementColorHex = '#ff9500';
-        } else if (elementValue === 6) {
-          elementColorHex = '#00d0ff';
-        } else if (elementValue === 7) {
-          elementColorHex = '#ffffff';
-        } else if (elementValue === 8) {
-          elementColorHex = '#461260';
-        }
+        const elementColorHex = getElementColorHex(elementValue);
         if (elementColorHex !== 0) {
           $gameScreen._particle.particleUpdate([particleGroupOne, 'color', String(elementColorHex), '#ffffff']);
           $gameScreen._particle.particleUpdate([particleGroupOne, 'colorMode', '1']);
@@ -3986,7 +3970,7 @@ summon_directPicture1 = function(effectMode) {
     $gameScreen._particle.particleExceed(particleGroupOne, 1.5);
     $gameScreen._particle.particleExceed(particleGroupTwo, 1.5);
   }
-  if (effectMode === 2) {
+  else if (effectMode === 2) {
     const picX2 = $gameScreen.picture(pictureId).x();
     const picY2 = $gameScreen.picture(pictureId).y();
     $gameScreen.startAnimation(picX2, picY2, 301, false);
@@ -4007,6 +3991,25 @@ summon_directPicture1 = function(effectMode) {
     $gameScreen.movePicture(pictureId + 1, 1, picX2, 384 - 350, 100, 100, 255, 0, 30);
   }
 };
+
+getElementColorHex = function (elementValue) {
+  switch (elementValue) {
+    case 3:
+      return '#ff0000';
+    case 4:
+      return '#1eff00';
+    case 5:
+      return '#ff9500';
+    case 6:
+      return '#00d0ff';
+    case 7:
+      return '#ffffff';
+    case 8:
+      return '#461260';
+    default:
+      return 0;
+  }
+}
 
 enemy_preSetup1 = function (eventId) {
 
