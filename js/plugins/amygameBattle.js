@@ -665,7 +665,8 @@ const testIds = new Set([3, 4, 5, 6, 7, 8, 9]);
 function ak1ConfigureElementFlashEffect(user) {
   const candidateElements = [0];
 
-  for (let i = 0; i < attackElementsList.length; i++) {
+  const len = attackElementsList.length;
+  for (let i = 0; i < len; i++) {
     if (i == 35) { valueSkillSpecialDispel35 += 1; }
 
     const attackElement = attackElementsList[i];
