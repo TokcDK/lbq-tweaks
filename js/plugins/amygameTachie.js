@@ -455,10 +455,6 @@ kisekae_naibusyori1 = function(){
 
 //☆☆立ち絵設定。本体
 tachie_settei2 = function() {
-  // Reset temporary clothing variables (561-600)
-  for (let variableIndex = 561; variableIndex <= 600; variableIndex++) { 
-    $gameVariables.setValue(variableIndex, 0); 
-  }
 
   // Get actor information and data
   const actorId = $gameVariables.value(20);
@@ -466,7 +462,18 @@ tachie_settei2 = function() {
   const actorClothingDataId = actorId + 440;
   const actor = $gameActors.actor(actorId);
   console.debug(`Actor name: ${actor.name()}`);
+
+  if(!$gameParty.battleMembers().includes(actor)){
+    console.debug("Actor not in battle party! Skip..");
+    return;
+  }
+
   const actorClothingData = $gameVariables.value(actorClothingDataId);
+  
+  // Reset temporary clothing variables (561-600)
+  for (let variableIndex = 561; variableIndex <= 600; variableIndex++) { 
+    $gameVariables.setValue(variableIndex, 0); 
+  }
 
   // Load current clothing data from actor to working variables (461-500)
   for (let clothingIndex = 1; clothingIndex <= 40; clothingIndex++) {
