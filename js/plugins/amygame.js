@@ -6319,19 +6319,23 @@ if(id1 == 1){
     // Initialize the game variable array with 101 zeroes.
     $gameVariables.setValue(gameVarId, Array(101).fill(0));
 
+    const npcDatas = $gameVariables.value(gameVarId);
+    const dataWeapons= $dataWeapons;
+    
     // Loop over the weapons indices 301–400.
     for (let i = 301; i <= 400; i++) {
       // Only process if the weapon has a non‐empty name.
-      const weapon = $dataWeapons[i];
+      const weapon = dataWeapons[i];
       if (weapon.name !== '') {
+        const meta = weapon.meta;
         // If there is a substitution actor id, use the provided callback.
-        if (weapon.meta['SubstitutionActorId']) {
-          const value1 = Number(weapon.meta['SubstitutionActorId']);
-          $gameVariables.value(gameVarId)[i - 300] = substitutionCallback(value1);
+        if (meta['SubstitutionActorId']) {
+          const actorId = Number(meta['SubstitutionActorId']);
+          npcDatas[i - 300] = substitutionCallback(actorId);
         }
         // If the override meta value exists, it takes precedence.
-        if (weapon.meta[metaKey]) {
-          $gameVariables.value(gameVarId)[i - 300] = weapon.meta[metaKey];
+        if (meta[metaKey]) {
+          npcDatas[i - 300] = meta[metaKey];
         }
       }
     }
