@@ -6216,9 +6216,8 @@ if(id1 == 1){
   };
 
   learn_show_eval_notmax_or_islearned = function (user, skillId) {
-    if (user.skillMasteryLevel(skillId) >= Number($dataSkills[skillId].meta['Max Mastery Level'])) {
-      return false;
-    } else return user.isLearnedSkill(skillId);
+    return user.skillMasteryLevel(skillId) < Number($dataSkills[skillId].meta['Max Mastery Level']) 
+    && user.isLearnedSkill(skillId);
   };
 
   learn_show_eval_is_notlearned_max_addedcontains_reqskill = function (user, skillId, reqSkillId) {
