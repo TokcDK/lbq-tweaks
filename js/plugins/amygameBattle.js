@@ -3994,40 +3994,41 @@ if(id1 == 2){
 
 };
 
-enemy_preSetup1 = function(id1){
+enemy_preSetup1 = function(id1) {
 
-if($gameSwitches.value(370)){
-  var arr1 = ['21_Battle3',45,110,0];
-} else {
-  var arr1 = ['21_Battle1',45,100,0];
-};
-$gameSystem.setBattleBgm({"name":arr1[0],"volume":arr1[1],"pitch":arr1[2],"pan":arr1[3]});
-BattleManager._forceAdvantage = 'Neutral';
-//$gameSwitches.setValue(30,true); // now using isInBattle() with check of party in battle
-if($gameVariables.value(329) == 0){
-  if($gameSwitches.value(41) || $gameSwitches.value(99)){
-    battle_simpleSubjugation(id1);
-    if($gameSwitches.value(98)){
-      valueVictoryResult = 0;
-      $gameSwitches.setValue(98,false);
-    };
-  };
-  if($gamePlayer.isFacingAway($gameMap.event(id1)) && $gameMap.event(id1).isPositionBackOf($gamePlayer)){
-    BattleManager._forceAdvantage = 'Player';
-  };
-  if($gameMap.event(id1).isFacingAway($gamePlayer) && $gamePlayer.isPositionBackOf($gameMap.event(id1))){
-    BattleManager._forceAdvantage = 'Enemy';
-  };
-  if($gameSwitches.value(370)){
-    valueCountSet1 = 10;
+  let arr1;
+  if ($gameSwitches.value(370)) {
+    arr1 = ['21_Battle3', 45, 110, 0];
   } else {
-    valueCountSet1 = Math.floor( Math.random() * 9) + 11;
-  };
-  valueCountSet2 = true;
-} else {
-  valueCountSet1 = $gameVariables.value(329);//直前に入れる戦闘グループ名
-  valueCountSet2 = false;
-};
+    arr1 = ['21_Battle1', 45, 100, 0];
+  }
+  $gameSystem.setBattleBgm({ "name": arr1[0], "volume": arr1[1], "pitch": arr1[2], "pan": arr1[3] });
+  BattleManager._forceAdvantage = 'Neutral';
+
+  if ($gameVariables.value(329) == 0) {
+    if ($gameSwitches.value(41) || $gameSwitches.value(99)) {
+      battle_simpleSubjugation(id1);
+      if ($gameSwitches.value(98)) {
+        valueVictoryResult = 0;
+        $gameSwitches.setValue(98, false);
+      }
+    }
+    if ($gamePlayer.isFacingAway($gameMap.event(id1)) && $gameMap.event(id1).isPositionBackOf($gamePlayer)) {
+      BattleManager._forceAdvantage = 'Player';
+    }
+    if ($gameMap.event(id1).isFacingAway($gamePlayer) && $gamePlayer.isPositionBackOf($gameMap.event(id1))) {
+      BattleManager._forceAdvantage = 'Enemy';
+    }
+    if ($gameSwitches.value(370)) {
+      valueCountSet1 = 10;
+    } else {
+      valueCountSet1 = Math.floor(Math.random() * 9) + 11;
+    }
+    valueCountSet2 = true;
+  } else {
+    valueCountSet1 = $gameVariables.value(329); //直前に入れる戦闘グループ名
+    valueCountSet2 = false;
+  }
 
 };
 
