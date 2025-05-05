@@ -459,7 +459,6 @@ tachie_settei2 = function() {
   // Get actor information and data
   const actorId = $gameVariables.value(20);
   console.debug(`Actor ID: ${actorId}`);
-  const actorClothingDataId = actorId + 440;
   const actor = $gameActors.actor(actorId);
   console.debug(`Actor name: ${actor.name()}`);
 
@@ -468,8 +467,9 @@ tachie_settei2 = function() {
     return;
   }
 
+  const actorClothingDataId = actorId + 440;
   const actorClothingData = $gameVariables.value(actorClothingDataId);
-  
+
   // Reset temporary clothing variables (561-600)
   for (let variableIndex = 561; variableIndex <= 600; variableIndex++) { 
     $gameVariables.setValue(variableIndex, 0); 
