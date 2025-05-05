@@ -6137,40 +6137,45 @@ if(id2 >= 20){
 
 //２回目以降殲滅時にボーナス
 annihilationItem_bonus = function() {
-  if ($dataItems[$gameVariables.value(240)].meta['TchestType']) {
+  // Cache $gameVariables.value(240) as chestId and its meta for reuse
+  const chestId = Number($gameVariables.value(240));
+  const chestMeta = $dataItems[chestId].meta;
+  if (chestMeta['TchestType']) {
     let chestTypeIds = [];
     let chestItemIndices = [];
-    chestTypeIds = chestTypeIds.concat($dataItems[$gameVariables.value(240)].meta['TchestType'].split(','));
-    chestItemIndices = chestItemIndices.concat($dataItems[$gameVariables.value(240)].meta['Tchest'].split(','));
+    chestTypeIds = chestTypeIds.concat(chestMeta['TchestType'].split(','));
+    chestItemIndices = chestItemIndices.concat(chestMeta['Tchest'].split(','));
     let firstAnnihilationPair;
-    if ($dataItems[$gameVariables.value(240)].meta['firstAnnihilationItem']) {
-      firstAnnihilationPair = $dataItems[$gameVariables.value(240)].meta['firstAnnihilationItem'].split(',');
+    if (chestMeta['firstAnnihilationItem']) {
+      firstAnnihilationPair = chestMeta['firstAnnihilationItem'].split(',');
       chestTypeIds = chestTypeIds.concat(Number(firstAnnihilationPair[0]));
       chestItemIndices = chestItemIndices.concat(Number(firstAnnihilationPair[1]));
     }
     let chestOnlyBonusPair;
-    if ($dataItems[$gameVariables.value(240)].meta['TchestOnly']) {
-      chestOnlyBonusPair = $dataItems[$gameVariables.value(240)].meta['TchestOnly'].split(',');
+    if (chestMeta['TchestOnly']) {
+      chestOnlyBonusPair = chestMeta['TchestOnly'].split(',');
       chestTypeIds = chestTypeIds.concat(Number(chestOnlyBonusPair[3]));
       chestItemIndices = chestItemIndices.concat(Number(chestOnlyBonusPair[4]));
     }
     const randomChestItemValue = chestItemIndices[Math.floor(Math.random() * chestItemIndices.length)];
     let selectedArrayIndex = chestItemIndices.findIndex(item => item == randomChestItemValue);
+    // Cache the converted chest item index value
+    const selectedChestItem = Number(chestItemIndices[selectedArrayIndex]);
     const itemArray = get_valueItems_iwa(chestTypeIds[selectedArrayIndex]);
-    $gameParty.gainItem(itemArray[Number(chestItemIndices[selectedArrayIndex])], 1);
-    valueWordSet1 = `全滅ボーナスとして\\C[24]\x1bI[${itemArray[Number(chestItemIndices[selectedArrayIndex])].iconIndex}]${itemArray[Number(chestItemIndices[selectedArrayIndex])].name}\\C[0]を入手した！`;
-    if ($dataItems[$gameVariables.value(240)].meta['TchestRere']) {
-      if (Number(chestItemIndices[selectedArrayIndex]) == Number($dataItems[$gameVariables.value(240)].meta['TchestRere'])) {
+    $gameParty.gainItem(itemArray[selectedChestItem], 1);
+    valueWordSet1 = `全滅ボーナスとして\\C[24]\x1bI[${itemArray[selectedChestItem].iconIndex}]${itemArray[selectedChestItem].name}\\C[0]を入手した！`;
+    if (chestMeta['TchestRere']) {
+      if (selectedChestItem == Number(chestMeta['TchestRere'])) {
         $gameSwitches.setValue(439, true);
       }
     }
-    if ($dataItems[$gameVariables.value(240)].meta['firstAnnihilationItem']) {
-      if (Number(chestItemIndices[selectedArrayIndex]) == Number(firstAnnihilationPair[1])) {
+    if (chestMeta['firstAnnihilationItem']) {
+      if (selectedChestItem == Number(firstAnnihilationPair[1])) {
         $gameSwitches.setValue(439, true);
       }
     }
-    if ($dataItems[$gameVariables.value(240)].meta['TchestOnly']) {
-      if (Number(chestItemIndices[selectedArrayIndex]) == Number(chestOnlyBonusPair[4])) {
+    if (chestMeta['TchestOnly']) {
+      if (selectedChestItem == Number(chestOnlyBonusPair[4])) {
         $gameSwitches.setValue(439, true);
       }
     }
