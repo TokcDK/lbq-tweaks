@@ -2584,7 +2584,7 @@ if(enemyId == 30 && $gameVariables.value(343) != 0){//ボスステート処理
     if (enemy.meta['Woman']){gameTroopMember.addState(460)};
 } else {
     if (!enemy.meta['Nonsexual']){
-    if(!$gameSwitches.value(370) && Math.floor( Math.random() * 11) == 7){
+    if(!isHEnemyOrNonAuto() && Math.floor( Math.random() * 11) == 7){
       gameTroopMember.addState(460);//雌
     } else {
       gameTroopMember.addState(459);//雄
@@ -3994,10 +3994,10 @@ if(id1 == 2){
 
 };
 
-enemy_preSetup1 = function(eventId) {
+enemy_preSetup1 = function (eventId) {
 
   let battleBgmSettings;
-  if ($gameSwitches.value(370)) {
+  if (isHEnemyOrNonAuto()) {
     battleBgmSettings = ['21_Battle3', 45, 110, 0];
   } else {
     battleBgmSettings = ['21_Battle1', 45, 100, 0];

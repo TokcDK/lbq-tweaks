@@ -6289,6 +6289,10 @@ if(id1 == 1){
     }
   }
 
+  isHEnemyOrNonAuto = function () {
+    return $gameSwitches.value(370);
+  }
+
   is_girl = function (actor) {
     return actor.isStateAffected(602);
   }
