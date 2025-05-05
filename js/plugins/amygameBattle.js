@@ -445,36 +445,36 @@ const ak1DamageFlashDesignationData = [255, 255, 255, 0];
 //攻撃時に連撃計算とスキルID代入
 attack_keisan1 = function (user, skillId, sourceTypeId) {
   // Initialize attack variables and clean up UI
-  initializeAttackVariables(user, skillId, sourceTypeId);
-  cleanupPreviousAttackUI();
+  ak1InitializeAttackVariables(user, skillId, sourceTypeId);
+  ak1CleanupPreviousAttackUI();
   
   // Set up the skill and its properties
-  setupSkillProperties(user, skillId, sourceTypeId);
+  ak1SetupSkillProperties(user, skillId, sourceTypeId);
   
   // Calculate multi-attack count
-  calculateMultiAttackCount(user);
+  ak1CalculateMultiAttackCount(user);
   
   // Configure animation settings
-  configureAnimationSettings(skillId);
+  ak1ConfigureAnimationSettings(skillId);
   
   // Set up attack states and elements
-  setupAttackStatesAndElements(user, skillId);
+  ak1SetupAttackStatesAndElements(user, skillId);
   
   // Handle damage visualization and special effects
-  configureDamageVisualization(user, skillId);
+  ak1ConfigureDamageVisualization(user, skillId);
   
   // Process skill-specific movement and projectile settings
-  processSkillSpecialSettings(user, skillId);
+  ak1ProcessSkillSpecialSettings(user, skillId);
   
   // Handle mastery progression and brave command
-  processSkillMasteryAndBraveCommand(user, skillId);
+  ak1ProcessSkillMasteryAndBraveCommand(user, skillId);
   
   // Apply final skill customization
-  applyFinalSkillCustomization(user, skillId);
+  ak1ApplyFinalSkillCustomization(user, skillId);
 };
 
 // Initialize attack variables and set source
-function initializeAttackVariables(user, skillId, sourceTypeId) {
+function ak1InitializeAttackVariables(user, skillId, sourceTypeId) {
   sourceItems = sourceTypeId == 2 ? $dataItems : $dataSkills;
   valueSkillSpecialDispel35 = 0;
   totalDamageCountDuringAction = 0;
@@ -493,7 +493,7 @@ function initializeAttackVariables(user, skillId, sourceTypeId) {
 }
 
 // Clean up UI from previous attacks
-function cleanupPreviousAttackUI() {
+function ak1CleanupPreviousAttackUI() {
   const pictureData = $gameScreen.picture(50);
   if (pictureData) {
     const picOrigin = pictureData.origin();
@@ -513,7 +513,7 @@ function cleanupPreviousAttackUI() {
 }
 
 // Set up skill properties and basic settings
-function setupSkillProperties(user, skillId, sourceTypeId) {
+function ak1SetupSkillProperties(user, skillId, sourceTypeId) {
   skill_addPowerSet(user, sourceItems, skillId, sourceTypeId);
   const currentItem = sourceItems[skillId];
   
@@ -522,7 +522,7 @@ function setupSkillProperties(user, skillId, sourceTypeId) {
 }
 
 // Calculate how many attacks will be performed
-function calculateMultiAttackCount(user) {
+function ak1CalculateMultiAttackCount(user) {
   multiAttackCount = 1;
   const elementAttackRate = user.elementRate(11) * 10;
   const randomValue1 = Math.floor(Math.random() * 101);
@@ -533,11 +533,11 @@ function calculateMultiAttackCount(user) {
   if (elementAttackRate >= randomValue2) { multiAttackCount += 2; }
   
   // Check for state-based guaranteed multi-attacks
-  applyGuaranteedMultiAttacks(user);
+  ak1ApplyGuaranteedMultiAttacks(user);
 }
 
 // Apply guaranteed double and triple attacks from states
-function applyGuaranteedMultiAttacks(user) {
+function ak1ApplyGuaranteedMultiAttacks(user) {
   // Check for guaranteed double attack
   if (multiAttackCount <= 1) {
     const certainlyDoubleCount = valueCertainlyDouble.length;
@@ -562,7 +562,7 @@ function applyGuaranteedMultiAttacks(user) {
 }
 
 // Configure animation settings for the skill
-function configureAnimationSettings(skillId) {
+function ak1ConfigureAnimationSettings(skillId) {
   const currentItem = sourceItems[skillId];
   $gameVariables.setValue(181, currentItem.animationId);
   const animation = $dataAnimations[currentItem.animationId];
@@ -580,7 +580,7 @@ function configureAnimationSettings(skillId) {
 }
 
 // Set up attack states and elements
-function setupAttackStatesAndElements(user, skillId) {
+function ak1SetupAttackStatesAndElements(user, skillId) {
   const currentItem = sourceItems[skillId];
   
   // Get attack states and add skill effect states
@@ -602,11 +602,11 @@ function setupAttackStatesAndElements(user, skillId) {
   }
   
   // Set up attack elements
-  setupAttackElements(user, currentItem);
+  ak1SetupAttackElements(user, currentItem);
 }
 
 // Set up attack elements from skill and user properties
-function setupAttackElements(user, currentItem) {
+function ak1SetupAttackElements(user, currentItem) {
   attackElementsList = [];
   
   // Add elements from skill metadata
@@ -624,20 +624,20 @@ function setupAttackElements(user, currentItem) {
 }
 
 // Configure damage visualization based on elements and skill properties
-function configureDamageVisualization(user, skillId) {
+function ak1ConfigureDamageVisualization(user, skillId) {
   const currentItem = sourceItems[skillId];
   $gameVariables.setValue(93, 131); // Default damage visualization
   $gameVariables.setValue(526, 1); // Default hit count
   
   // Set damage visualization based on elements
-  configureElementDamageVisualization(currentItem);
+  ak1ConfigureElementDamageVisualization(currentItem);
   
   // Configure special flash effect based on elements
-  configureElementFlashEffect(user);
+  ak1ConfigureElementFlashEffect(user);
 }
 
 // Configure damage visualization based on elements in the skill
-function configureElementDamageVisualization(currentItem) {
+function ak1ConfigureElementDamageVisualization(currentItem) {
   if (!currentItem.meta['Multiple Elements']) return;
   
   const multipleElements = currentItem.meta['Multiple Elements'].split(',');
@@ -660,7 +660,7 @@ function configureElementDamageVisualization(currentItem) {
 }
 
 // Configure flash effect based on the user's elemental affinities
-function configureElementFlashEffect(user) {
+function ak1ConfigureElementFlashEffect(user) {
   const candidateElements = [0];
   const testIds = [3, 4, 5, 6, 7, 8, 9];
   
@@ -682,7 +682,7 @@ function configureElementFlashEffect(user) {
 }
 
 // Process skill-specific movement and projectile settings
-function processSkillSpecialSettings(user, skillId) {
+function ak1ProcessSkillSpecialSettings(user, skillId) {
   const currentItem = sourceItems[skillId];
   
   $gameVariables.setValue(349, currentItem.meta['moveReaction'] ? Number(currentItem.meta['moveReaction']) : 0);
@@ -696,21 +696,21 @@ function processSkillSpecialSettings(user, skillId) {
 }
 
 // Process skill mastery progression and brave command effects
-function processSkillMasteryAndBraveCommand(user, skillId) {
+function ak1ProcessSkillMasteryAndBraveCommand(user, skillId) {
   const currentItem = sourceItems[skillId];
   const abilityUsageDistinction = $gameVariables.value(182);
   
   // Handle skill mastery progression
   if (user.isActor() && abilityUsageDistinction == 2) {
-    processSkillMasteryProgression(user, skillId);
+    ak1ProcessSkillMasteryProgression(user, skillId);
   }
   
   // Handle brave command state
-  processBraveCommandState(abilityUsageDistinction);
+  ak1ProcessBraveCommandState(abilityUsageDistinction);
 }
 
 // Process skill mastery progression for subclasses
-function processSkillMasteryProgression(user, skillId) {
+function ak1ProcessSkillMasteryProgression(user, skillId) {
   if (user.subclass() && user.equips()[0]) {
     const elementAttackRate = user.elementRate(11) * 10;
     if (elementAttackRate >= 1) {
@@ -721,7 +721,7 @@ function processSkillMasteryProgression(user, skillId) {
 }
 
 // Process brave command state updates for Lisha (actor 1)
-function processBraveCommandState(abilityUsageDistinction) {
+function ak1ProcessBraveCommandState(abilityUsageDistinction) {
   const actor1 = $gameActors.actor(1);
   
   if ($gameParty.members().contains(actor1) && actor1.isStateAffected(662)) {
@@ -736,7 +736,7 @@ function processBraveCommandState(abilityUsageDistinction) {
 }
 
 // Apply final skill customization based on metadata and skill type
-function applyFinalSkillCustomization(user, skillId) {
+function ak1ApplyFinalSkillCustomization(user, skillId) {
   const currentItem = sourceItems[skillId];
   const currentItemName = currentItem.name;
   const abilityUsageDistinction = $gameVariables.value(182);
@@ -758,11 +758,11 @@ function applyFinalSkillCustomization(user, skillId) {
   }
   
   // Apply hit count buffs based on skill type and states
-  applyHitCountBuffs(user, abilityUsageDistinction);
+  ak1ApplyHitCountBuffs(user, abilityUsageDistinction);
 }
 
 // Apply additional hits based on states and ability type
-function applyHitCountBuffs(user, abilityUsageDistinction) {
+function ak1ApplyHitCountBuffs(user, abilityUsageDistinction) {
   if (abilityUsageDistinction == 2) {
     ak1ApplyValueAttackHit(user, valueNormalAttackHit, 'NormalAttackHit');
   }
