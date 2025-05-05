@@ -540,23 +540,22 @@ function ak1CalculateMultiAttackCount(user) {
 // Apply guaranteed double and triple attacks from states
 function ak1ApplyGuaranteedMultiAttacks(user) {
   // Check for guaranteed double attack
-  if (multiAttackCount <= 1) {
-    const certainlyDoubleCount = valueCertainlyDouble.length;
-    for (let i = 0; i < certainlyDoubleCount; i++) {
-      if (user.isStateAffected(valueCertainlyDouble[i])) {
-        multiAttackCount += 1;
-        break;
-      }
-    }
-  }
-  
-  // Check for guaranteed triple attack
-  if (multiAttackCount <= 2) {
-    const certainlyTripleCount = valueCertainlyTriple.length;
-    for (let i = 0; i < certainlyTripleCount; i++) {
-      if (user.isStateAffected(valueCertainlyTriple[i])) {
-        multiAttackCount += 2;
-        break;
+  // Define constant arrays with state IDs and corresponding attack counts to add
+  const multiAttackStates = [
+    { states: valueCertainlyDouble, addCount: 1, maxAttacks: 2 },
+    { states: valueCertainlyTriple, addCount: 2, maxAttacks: 3 }
+  ];
+
+  // Loop through each multi-attack type only once
+  for (const attackType of multiAttackStates) {
+    // Skip if we've already reached or exceeded the maximum attacks for this type
+    if (multiAttackCount >= attackType.maxAttacks) continue;
+    
+    // Check if user has any of the states that grant this multi-attack
+    for (let i = 0; i < attackType.states.length; i++) {
+      if (user.isStateAffected(attackType.states[i])) {
+        multiAttackCount += attackType.addCount;
+        break; // Stop checking once we find a matching state
       }
     }
   }
