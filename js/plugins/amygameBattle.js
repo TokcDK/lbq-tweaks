@@ -584,29 +584,7 @@ attack_keisan1 = function (user, skillId, sourceTypeId) {
   }
   if (candidateElements.length > 0) {
     const maxCandidateElement = Math.max(...candidateElements);
-    switch (maxCandidateElement) {
-      case 3:
-        $gameVariables.setValue(331, [255, 102, 119, 0]);
-        break;
-      case 4:
-        $gameVariables.setValue(331, [119, 255, 119, 0]);
-        break;
-      case 5:
-        $gameVariables.setValue(331, [255, 187, 119, 0]);
-        break;
-      case 6:
-        $gameVariables.setValue(331, [85, 153, 255, 0]);
-        break;
-      case 7:
-        $gameVariables.setValue(331, [255, 255, 119, 0]);
-        break;
-      case 8:
-        $gameVariables.setValue(331, [68, 0, 68, 0]);
-        break;
-      case 9:
-        $gameVariables.setValue(331, [255, 255, 255, 0]);
-        break;
-    }
+    ak1SetDamageFlashConfiguration(maxCandidateElement);
   }
 
   $gameVariables.setValue(349, currentItem.meta['moveReaction'] ? Number(currentItem.meta['moveReaction']) : 0);
@@ -688,6 +666,34 @@ attack_keisan1 = function (user, skillId, sourceTypeId) {
     ak1ApplyValueAttackHit(user, valueAttackAbilityHit, 'AttackAbilityHit');
   }
 };
+
+function ak1SetDamageFlashConfiguration(candidateElement) {
+  switch (candidateElement) {
+    case 3:
+      $gameVariables.setValue(331, [255, 102, 119, 0]);
+      break;
+    case 4:
+      $gameVariables.setValue(331, [119, 255, 119, 0]);
+      break;
+    case 5:
+      $gameVariables.setValue(331, [255, 187, 119, 0]);
+      break;
+    case 6:
+      $gameVariables.setValue(331, [85, 153, 255, 0]);
+      break;
+    case 7:
+      $gameVariables.setValue(331, [255, 255, 119, 0]);
+      break;
+    case 8:
+      $gameVariables.setValue(331, [68, 0, 68, 0]);
+      break;
+    case 9:
+      $gameVariables.setValue(331, [255, 255, 255, 0]);
+      break;
+    default:
+      break;
+  }
+}
 
 // Function to apply additional damage based on attack state.
 ak1ApplyValueAttackHit = function (user, stateArray, stateMetaName) {
