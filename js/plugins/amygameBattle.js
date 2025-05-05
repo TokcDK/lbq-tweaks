@@ -1922,244 +1922,244 @@ title_battleUp = function (actor) {
 };
 
 //パッシブ付与
-passive_addCondition = function(user) {
-  
-if(!$gameSwitches.value(375)){
-  valueAttackAmplifysActorId[user.actorId()] = Array(100).fill(0);
-  user.actor().traits = [];
-  //user.clearParamPlus();//戦闘中の一時強化にのみ使う
-  //user.clearXParamPlus();
-  //user.clearSParamPlus();
-};
-  
-let passiveLogCount = 0;
-let passiveSkillArray = [];
-const passiveLogMessages = [`\\C[10]${user.name()}\\C[0]発動G-Passive`];
-let passiveSkillList = valuePassiveAdd;
+passive_addCondition = function (user) {
 
-const handlePassiveCondition = (skillId, conditionType, conditionValue) => {
-  switch (conditionType) {
-    case 1:
-      if (user.battleSkillsRaw().includes(skillId)) {
-        passiveSkillArray.push(skillId);
+  if (!$gameSwitches.value(375)) {
+    valueAttackAmplifysActorId[user.actorId()] = Array(100).fill(0);
+    user.actor().traits = [];
+    //user.clearParamPlus();//戦闘中の一時強化にのみ使う
+    //user.clearXParamPlus();
+    //user.clearSParamPlus();
+  };
+
+  let passiveLogCount = 0;
+  let passiveSkillArray = [];
+  const passiveLogMessages = [`\\C[10]${user.name()}\\C[0]発動G-Passive`];
+  let passiveSkillList = valuePassiveAdd;
+
+  const handlePassiveCondition = (skillId, conditionType, conditionValue) => {
+    switch (conditionType) {
+      case 1:
+        if (user.battleSkillsRaw().includes(skillId)) {
+          passiveSkillArray.push(skillId);
+        }
+        break;
+      case 2:
+        if (user.isWtypeEquipped(conditionValue)) {
+          passiveSkillArray.push(skillId);
+        }
+        break;
+      case 3:
+        if (user.isStateAffected(conditionValue)) {
+          passiveSkillArray.push(skillId);
+        }
+        break;
+    }
+  };
+
+  passiveSkillList.forEach(function (skillId) {
+    const skill = $dataSkills[skillId];
+    const skillMeta = skill.meta;
+    const skillCondition = skillMeta['PassiveCondi'].split(',');
+    const hideSkillId = Number(skillMeta['Hide if Learned Skill']);
+    const maxMasteryLevel = Number(skillMeta['Max Mastery Level']);
+
+    if (skillMeta['Max Mastery Level']) {
+      if (user.skillMasteryLevel(skillId) >= 1 && user.battleSkillsRaw().includes(skillId) && !user.isLearnedSkill(hideSkillId)) {
+        handlePassiveCondition(skillId, Number(skillCondition[0]), Number(skillCondition[1]));
+      } else {
+        for (let masteryLevel = 0; masteryLevel <= maxMasteryLevel - 1; masteryLevel++) {
+          user.removeState(Number(skillCondition[2]) + masteryLevel);
+        }
       }
-      break;
-    case 2:
-      if (user.isWtypeEquipped(conditionValue)) {
-        passiveSkillArray.push(skillId);
+    } else {
+      if (!user.isLearnedSkill(hideSkillId) && user.battleSkillsRaw().includes(skillId)) {
+        handlePassiveCondition(skillId, Number(skillCondition[0]), Number(skillCondition[1]));
+      } else {
+        user.removeState(Number(skillCondition[2]));
       }
-      break;
-    case 3:
-      if (user.isStateAffected(conditionValue)) {
-        passiveSkillArray.push(skillId);
-      }
-      break;
-  }
-};
-
-passiveSkillList.forEach(function(skillId) {
-  const skill = $dataSkills[skillId];
-  const skillMeta = skill.meta;
-  const skillCondition = skillMeta['PassiveCondi'].split(',');
-  const hideSkillId = Number(skillMeta['Hide if Learned Skill']);
-  const maxMasteryLevel = Number(skillMeta['Max Mastery Level']);
-
-  if (skillMeta['Max Mastery Level']) {
-  if (user.skillMasteryLevel(skillId) >= 1 && user.battleSkillsRaw().includes(skillId) && !user.isLearnedSkill(hideSkillId)) {
-    handlePassiveCondition(skillId, Number(skillCondition[0]), Number(skillCondition[1]));
-  } else {
-    for (let masteryLevel = 0; masteryLevel <= maxMasteryLevel - 1; masteryLevel++) {
-    user.removeState(Number(skillCondition[2]) + masteryLevel);
     }
-  }
-  } else {
-  if (!user.isLearnedSkill(hideSkillId) && user.battleSkillsRaw().includes(skillId)) {
-    handlePassiveCondition(skillId, Number(skillCondition[0]), Number(skillCondition[1]));
-  } else {
-    user.removeState(Number(skillCondition[2]));
-  }
-  }
-}, this);
-
-if (passiveSkillArray.length > 0) {
-  passiveSkillList = passiveSkillArray;
-  passiveSkillList.forEach(function(skillId) {
-  const skill = $dataSkills[skillId];
-  const skillMeta = skill.meta;
-  if (skillMeta['Max Mastery Level']) {
-    if ($gameSwitches.value(375)) {
-    let passiveLogMessage = `\\C[2]${skill.name}\\C[0]:`;
-    passiveLogCount += 1;
-    if (skillMeta['PassiveLogDisplay']) {
-      passiveLogMessage += `${skillMeta['PassiveLogDisplay'].split(',')[0]}\\C[10]${Number(skillMeta['PassiveLogDisplay'].split(',')[1]) * user.skillMasteryLevel(skillId)}%\\C[0]UP!`;
-    } else {
-      passiveLogMessage += `発動中`;
-    }
-    passiveLogMessages.push(passiveLogMessage);
-    } else {
-    user.addState(Number(skillMeta['PassiveCondi'].split(',')[2]) + user.skillMasteryLevel(skillId) - 1);
-    }
-  } else {
-    if ($gameSwitches.value(375)) {
-    let passiveLogMessage = `\\C[2]${skill.name}\\C[0]:`;
-    passiveLogCount += 1;
-    if (skillMeta['PassiveLogDisplay']) {
-      passiveLogMessage += `\\C[10]${skillMeta['PassiveLogDisplay'].split(',')[0]}\\C[0]!`;
-    } else {
-      passiveLogMessage += `発動中`;
-    }
-    passiveLogMessages.push(passiveLogMessage);
-    } else {
-    user.addState(Number(skillMeta['PassiveCondi'].split(',')[2]));
-    }
-  }
   }, this);
-}
 
-const handleTraitAddition = (skillId, traitValue, traitParams) => {
-  const skill = $dataSkills[skillId];
-  if ($gameSwitches.value(375)) {
-  let passiveLogMessage = `\\C[2]${skill.name}\\C[0]:`;
-  passiveLogCount += 1;
-  switch (Number(traitParams[0])) {
-    case 0:
-      passiveLogMessage += TextManager.param(Number(traitParams[1]));
-      passiveLogMessage += `\\C[10]${traitValue * 100}%\\C[0]UP!`;
-      break;
-    case 1:
-      passiveLogMessage += FTKR.CSS.cssStatus.xparam[Number(traitParams[1])];
-      passiveLogMessage += `\\C[10]${traitValue * 100}%\\C[0]UP!`;
-      break;
-    case 2:
-      passiveLogMessage += FTKR.CSS.cssStatus.sparam[Number(traitParams[1])];
-      passiveLogMessage += `\\C[10]${traitValue * 100}%\\C[0]UP!`;
-      break;
+  if (passiveSkillArray.length > 0) {
+    passiveSkillList = passiveSkillArray;
+    passiveSkillList.forEach(function (skillId) {
+      const skill = $dataSkills[skillId];
+      const skillMeta = skill.meta;
+      if (skillMeta['Max Mastery Level']) {
+        if ($gameSwitches.value(375)) {
+          let passiveLogMessage = `\\C[2]${skill.name}\\C[0]:`;
+          passiveLogCount += 1;
+          if (skillMeta['PassiveLogDisplay']) {
+            passiveLogMessage += `${skillMeta['PassiveLogDisplay'].split(',')[0]}\\C[10]${Number(skillMeta['PassiveLogDisplay'].split(',')[1]) * user.skillMasteryLevel(skillId)}%\\C[0]UP!`;
+          } else {
+            passiveLogMessage += `発動中`;
+          }
+          passiveLogMessages.push(passiveLogMessage);
+        } else {
+          user.addState(Number(skillMeta['PassiveCondi'].split(',')[2]) + user.skillMasteryLevel(skillId) - 1);
+        }
+      } else {
+        if ($gameSwitches.value(375)) {
+          let passiveLogMessage = `\\C[2]${skill.name}\\C[0]:`;
+          passiveLogCount += 1;
+          if (skillMeta['PassiveLogDisplay']) {
+            passiveLogMessage += `\\C[10]${skillMeta['PassiveLogDisplay'].split(',')[0]}\\C[0]!`;
+          } else {
+            passiveLogMessage += `発動中`;
+          }
+          passiveLogMessages.push(passiveLogMessage);
+        } else {
+          user.addState(Number(skillMeta['PassiveCondi'].split(',')[2]));
+        }
+      }
+    }, this);
   }
-  passiveLogMessages.push(passiveLogMessage);
-  } else {
-  switch (Number(traitParams[0])) {
-    case 0:
-      user.actor().traits.push({ code: 21, dataId: Number(traitParams[1]), value: 1 + traitValue });
-      break;
-    case 1:
-      user.actor().traits.push({ code: 22, dataId: Number(traitParams[1]), value: traitValue });
-      break;
-    case 2:
-      user.actor().traits.push({ code: 23, dataId: Number(traitParams[1]), value: 1 + traitValue });
-      break;
-  }
-  }
-};
 
-passiveSkillList = valuePassivePlussSkill;
-passiveSkillList.forEach(function(skillId) {
-  if (user.battleSkillsRaw().includes(skillId)) {
-  const skill = $dataSkills[skillId];
-  const skillMeta = skill.meta;
-  const traitParams = skillMeta['PassivePlusEffect'].split(',');
-  let traitValue = Number(traitParams[2]);
-  if (skillMeta['Max Mastery Level']) {
-    traitValue *= user.skillMasteryLevel(skillId);
-  }
-  handleTraitAddition(skillId, traitValue, traitParams);
-  }
-}, this);
-
-passiveSkillList = valuePassivePlussSkill2;
-passiveSkillList.forEach(function(skillId) {
-  const skill = $dataSkills[skillId];
-  const skillMeta = skill.meta;
-  if (user.isLearnedSkill(skillId) && user.battleSkillsRaw().includes(skillId) && !user.isLearnedSkill(Number(skillMeta['Hide if Learned Skill']))) {
-  const traitParams = skillMeta['PassivePlusTrait'].split(',');
-  let traitValue = Number(traitParams[2]);
-  if (skillMeta['Max Mastery Level']) {
-    traitValue *= user.skillMasteryLevel(skillId);
-  }
-  if (Number(traitParams[0]) == 11) {
+  const handleTraitAddition = (skillId, traitValue, traitParams) => {
+    const skill = $dataSkills[skillId];
     if ($gameSwitches.value(375)) {
-    let passiveLogMessage = `\\C[2]${skill.name}\\C[0]:`;
-    passiveLogCount += 1;
-    passiveLogMessage += `${$dataSystem.elements[Number(traitParams[1])]}`;
-    const elementMultiplier = [10, 11, 12, 15, 20, 38, 39, 40, 41].includes(Number(traitParams[1])) ? (Number(traitParams[1]) == 11 ? 10 : 100) : 100;
-    if (traitValue >= 0) {
-      passiveLogMessage += `\\C[10]${traitValue * elementMultiplier}%\\C[0]UP!`;
+      let passiveLogMessage = `\\C[2]${skill.name}\\C[0]:`;
+      passiveLogCount += 1;
+      switch (Number(traitParams[0])) {
+        case 0:
+          passiveLogMessage += TextManager.param(Number(traitParams[1]));
+          passiveLogMessage += `\\C[10]${traitValue * 100}%\\C[0]UP!`;
+          break;
+        case 1:
+          passiveLogMessage += FTKR.CSS.cssStatus.xparam[Number(traitParams[1])];
+          passiveLogMessage += `\\C[10]${traitValue * 100}%\\C[0]UP!`;
+          break;
+        case 2:
+          passiveLogMessage += FTKR.CSS.cssStatus.sparam[Number(traitParams[1])];
+          passiveLogMessage += `\\C[10]${traitValue * 100}%\\C[0]UP!`;
+          break;
+      }
+      passiveLogMessages.push(passiveLogMessage);
     } else {
-      passiveLogMessage += `\\C[1]${traitValue * elementMultiplier}%\\C[0]DOWN!`;
+      switch (Number(traitParams[0])) {
+        case 0:
+          user.actor().traits.push({ code: 21, dataId: Number(traitParams[1]), value: 1 + traitValue });
+          break;
+        case 1:
+          user.actor().traits.push({ code: 22, dataId: Number(traitParams[1]), value: traitValue });
+          break;
+        case 2:
+          user.actor().traits.push({ code: 23, dataId: Number(traitParams[1]), value: 1 + traitValue });
+          break;
+      }
     }
-    passiveLogMessages.push(passiveLogMessage);
-    } else {
-    user.actor().traits.push({ code: Number(traitParams[0]), dataId: Number(traitParams[1]), value: 1 + traitValue });
+  };
+
+  passiveSkillList = valuePassivePlussSkill;
+  passiveSkillList.forEach(function (skillId) {
+    if (user.battleSkillsRaw().includes(skillId)) {
+      const skill = $dataSkills[skillId];
+      const skillMeta = skill.meta;
+      const traitParams = skillMeta['PassivePlusEffect'].split(',');
+      let traitValue = Number(traitParams[2]);
+      if (skillMeta['Max Mastery Level']) {
+        traitValue *= user.skillMasteryLevel(skillId);
+      }
+      handleTraitAddition(skillId, traitValue, traitParams);
     }
-  }
-  }
-}, this);
+  }, this);
 
-passiveSkillList = valuePassiveElementP;
-passiveSkillList.forEach(function(skillId) {
-  const skill = $dataSkills[skillId];
-  const skillMeta = skill.meta;
-  if (user.isLearnedSkill(skillId) && user.battleSkillsRaw().includes(skillId) && !user.isLearnedSkill(Number(skillMeta['Hide if Learned Skill']))) {
-  const elementParams = skillMeta['PassiveElementP'].split(',');
-  let elementValue = Number(elementParams[1]);
-  if (skillMeta['Max Mastery Level']) {
-    elementValue *= user.skillMasteryLevel(skillId);
-  }
-  if ($gameSwitches.value(375)) {
-    let passiveLogMessage = `\\C[2]${skill.name}\\C[0]:`;
-    passiveLogCount += 1;
-    passiveLogMessage += `${$dataSystem.elements[Number(elementParams[0])]}威力`;
-    const updown = elementValue >= 1 ? `UP` : `DOWN`;
-    passiveLogMessage += `\\C[10]${elementValue}%${updown}!\\C[0]`;
-    passiveLogMessages.push(passiveLogMessage);
-  } else {
-    valueAttackAmplifysActorId[user.actorId()][Number(elementParams[0])] += elementValue;
-  }
-  }
-}, this);
+  passiveSkillList = valuePassivePlussSkill2;
+  passiveSkillList.forEach(function (skillId) {
+    const skill = $dataSkills[skillId];
+    const skillMeta = skill.meta;
+    if (user.isLearnedSkill(skillId) && user.battleSkillsRaw().includes(skillId) && !user.isLearnedSkill(Number(skillMeta['Hide if Learned Skill']))) {
+      const traitParams = skillMeta['PassivePlusTrait'].split(',');
+      let traitValue = Number(traitParams[2]);
+      if (skillMeta['Max Mastery Level']) {
+        traitValue *= user.skillMasteryLevel(skillId);
+      }
+      if (Number(traitParams[0]) == 11) {
+        if ($gameSwitches.value(375)) {
+          let passiveLogMessage = `\\C[2]${skill.name}\\C[0]:`;
+          passiveLogCount += 1;
+          passiveLogMessage += `${$dataSystem.elements[Number(traitParams[1])]}`;
+          const elementMultiplier = [10, 11, 12, 15, 20, 38, 39, 40, 41].includes(Number(traitParams[1])) ? (Number(traitParams[1]) == 11 ? 10 : 100) : 100;
+          if (traitValue >= 0) {
+            passiveLogMessage += `\\C[10]${traitValue * elementMultiplier}%\\C[0]UP!`;
+          } else {
+            passiveLogMessage += `\\C[1]${traitValue * elementMultiplier}%\\C[0]DOWN!`;
+          }
+          passiveLogMessages.push(passiveLogMessage);
+        } else {
+          user.actor().traits.push({ code: Number(traitParams[0]), dataId: Number(traitParams[1]), value: 1 + traitValue });
+        }
+      }
+    }
+  }, this);
 
-passiveSkillList = valueAddPowerCustomSkill;
-passiveSkillList.forEach(function(skillId) {
-  const skill = $dataSkills[skillId];
-  const skillMeta = skill.meta;
-  if (user.isLearnedSkill(skillId) && user.battleSkillsRaw().includes(skillId) && !user.isLearnedSkill(Number(skillMeta['Hide if Learned Skill']))) {
-  let powerValue = Number(skillMeta['AddPowerCustom']);
-  if (skillMeta['Max Mastery Level']) {
-    powerValue += user.skillMasteryLevel(skillId);
-  }
-  if ($gameSwitches.value(375)) {
-    let passiveLogMessage = `\\C[2]${skill.name}\\C[0]:`;
-    passiveLogCount += 1;
-    passiveLogMessage += `\\I[666]`;
-    const updown = powerValue >= 1 ? `+` : `-`;
-    passiveLogMessage += `\\C[10]${updown}${powerValue}!\\C[0]`;
-    passiveLogMessages.push(passiveLogMessage);
-  }
-  }
-}, this);
+  passiveSkillList = valuePassiveElementP;
+  passiveSkillList.forEach(function (skillId) {
+    const skill = $dataSkills[skillId];
+    const skillMeta = skill.meta;
+    if (user.isLearnedSkill(skillId) && user.battleSkillsRaw().includes(skillId) && !user.isLearnedSkill(Number(skillMeta['Hide if Learned Skill']))) {
+      const elementParams = skillMeta['PassiveElementP'].split(',');
+      let elementValue = Number(elementParams[1]);
+      if (skillMeta['Max Mastery Level']) {
+        elementValue *= user.skillMasteryLevel(skillId);
+      }
+      if ($gameSwitches.value(375)) {
+        let passiveLogMessage = `\\C[2]${skill.name}\\C[0]:`;
+        passiveLogCount += 1;
+        passiveLogMessage += `${$dataSystem.elements[Number(elementParams[0])]}威力`;
+        const updown = elementValue >= 1 ? `UP` : `DOWN`;
+        passiveLogMessage += `\\C[10]${elementValue}%${updown}!\\C[0]`;
+        passiveLogMessages.push(passiveLogMessage);
+      } else {
+        valueAttackAmplifysActorId[user.actorId()][Number(elementParams[0])] += elementValue;
+      }
+    }
+  }, this);
 
-//破損率等
-if (user.isLearnedSkill(61)) {
-  let damageRate = 10;
-  for (let skillId = 62; skillId <= 70; skillId++) {
-  if (user.isLearnedSkill(skillId)) {
-    damageRate += 10;
-  }
-  }
-  const actorTraits = user.actor().traits;
-  actorTraits.push({ code: 13, dataId: 62, value: 1 + damageRate });
-  actorTraits.push({ code: 13, dataId: 63, value: 1 + damageRate });
-}
+  passiveSkillList = valueAddPowerCustomSkill;
+  passiveSkillList.forEach(function (skillId) {
+    const skill = $dataSkills[skillId];
+    const skillMeta = skill.meta;
+    if (user.isLearnedSkill(skillId) && user.battleSkillsRaw().includes(skillId) && !user.isLearnedSkill(Number(skillMeta['Hide if Learned Skill']))) {
+      let powerValue = Number(skillMeta['AddPowerCustom']);
+      if (skillMeta['Max Mastery Level']) {
+        powerValue += user.skillMasteryLevel(skillId);
+      }
+      if ($gameSwitches.value(375)) {
+        let passiveLogMessage = `\\C[2]${skill.name}\\C[0]:`;
+        passiveLogCount += 1;
+        passiveLogMessage += `\\I[666]`;
+        const updown = powerValue >= 1 ? `+` : `-`;
+        passiveLogMessage += `\\C[10]${updown}${powerValue}!\\C[0]`;
+        passiveLogMessages.push(passiveLogMessage);
+      }
+    }
+  }, this);
 
-if ($gameSwitches.value(375) && passiveLogCount >= 1) {
-  const logMessagesLength = passiveLogMessages.length;
-  for (let logIndex = 0; logIndex < logMessagesLength; logIndex++) {
-  //BattleManager._logWindow.push(`addText`, passiveLogMessages[logIndex]);
-  valueGetInfoPointX = 900;
-  CommonPopupManager.showInfo({}, passiveLogMessages[logIndex], null);
-  //user.startMessagePopup(passiveLogMessages[logIndex], arr3);
+  //破損率等
+  if (user.isLearnedSkill(61)) {
+    let damageRate = 10;
+    for (let skillId = 62; skillId <= 70; skillId++) {
+      if (user.isLearnedSkill(skillId)) {
+        damageRate += 10;
+      }
+    }
+    const actorTraits = user.actor().traits;
+    actorTraits.push({ code: 13, dataId: 62, value: 1 + damageRate });
+    actorTraits.push({ code: 13, dataId: 63, value: 1 + damageRate });
   }
-  valueGetInfoPointX = 0;
-}
+
+  if ($gameSwitches.value(375) && passiveLogCount >= 1) {
+    const logMessagesLength = passiveLogMessages.length;
+    for (let logIndex = 0; logIndex < logMessagesLength; logIndex++) {
+      //BattleManager._logWindow.push(`addText`, passiveLogMessages[logIndex]);
+      valueGetInfoPointX = 900;
+      CommonPopupManager.showInfo({}, passiveLogMessages[logIndex], null);
+      //user.startMessagePopup(passiveLogMessages[logIndex], arr3);
+    }
+    valueGetInfoPointX = 0;
+  }
 };
 
 //戦闘中に変動するステート特徴設定<traitBase1:21,0,1.5>traitBattle_changeSetting(user,stateId,0);
