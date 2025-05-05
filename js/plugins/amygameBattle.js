@@ -2064,46 +2064,55 @@ function processPlusTraitSkills(user, skillList, metaKey) {
   const isDisplayMode = $gameSwitches.value(375);
   const passiveLogMessages = [];
   let passiveLogCount = 0;
-  
+
   skillList.forEach(function (skillId) {
     const skill = $dataSkills[skillId];
     const skillMeta = skill.meta;
     const hideSkillId = Number(skillMeta['Hide if Learned Skill'] || 0);
-    
+
     const isSkillEquipped = user.battleSkillsRaw().includes(skillId);
-    const isSkillValid = metaKey === 'PassivePlusEffect' || 
-                         (user.isLearnedSkill(skillId) && !user.isLearnedSkill(hideSkillId));
-    
+    const isSkillValid = metaKey === 'PassivePlusEffect' ||
+      (user.isLearnedSkill(skillId) && !user.isLearnedSkill(hideSkillId));
+
     if (isSkillEquipped && isSkillValid) {
       const traitParams = skillMeta[metaKey].split(',');
       let traitValue = Number(traitParams[2]);
-      
+
       if (skillMeta['Max Mastery Level']) {
         traitValue *= user.skillMasteryLevel(skillId);
       }
-      
-      applyTraitEffect(user, skill, traitParams, traitValue, isDisplayMode, passiveLogMessages, passiveLogCount);
+
+      applyTraitEffect(user, skill, traitParams, traitValue, isDisplayMode, passiveLogMessages, passiveLogCount, metaKey);
     }
   });
-  
+
   displayPassiveMessages(user, passiveLogMessages, passiveLogCount);
 }
 
-function applyTraitEffect(user, skill, traitParams, traitValue, isDisplayMode, passiveLogMessages, passiveLogCount) {
-  const traitCode = Number(traitParams[0]);
+function applyTraitEffect(user, skill, traitParams, traitValue, isDisplayMode, passiveLogMessages, passiveLogCount, metaKey) {
+  const paramType = Number(traitParams[0]);
+  let actualTraitCode;
+
+  // Map trait code based on metaKey
+  if (metaKey === 'PassivePlusEffect') {
+    actualTraitCode = [21, 22, 23][paramType]; // Map 0->21, 1->22, 2->23
+  } else {
+    actualTraitCode = paramType; // For 'PassivePlusTrait', use the raw trait code (e.g., 11)
+  }
+
   const dataId = Number(traitParams[1]);
-  
+
   if (isDisplayMode) {
-    let message = buildTraitMessage(skill.name, traitCode, dataId, traitValue);
+    let message = buildTraitMessage(skill.name, metaKey, traitParams, traitValue);
     if (message) {
       passiveLogCount += 1;
       passiveLogMessages.push(message);
     }
   } else {
-    if (traitCode === 11) {
-      user.actor().traits.push({ code: traitCode, dataId: dataId, value: 1 + traitValue });
-    } else if ([21, 22, 23].includes(traitCode)) {
-      applyStatTrait(user, traitCode, dataId, traitValue);
+    if (actualTraitCode === 11) {
+      user.actor().traits.push({ code: actualTraitCode, dataId: dataId, value: 1 + traitValue });
+    } else if ([21, 22, 23].includes(actualTraitCode)) {
+      applyStatTrait(user, actualTraitCode, dataId, traitValue);
     }
   }
 }
@@ -2120,38 +2129,39 @@ function applyStatTrait(user, traitCode, dataId, traitValue) {
   }
 }
 
-function buildTraitMessage(skillName, traitCode, dataId, traitValue) {
+function buildTraitMessage(skillName, metaKey, traitParams, traitValue) {
   let message = `\\C[2]${skillName}\\C[0]:`;
-  
-  switch (traitCode) {
-    case 0:
-    case 21:
+  const type = Number(traitParams[0]);
+  const dataId = Number(traitParams[1]);
+
+  if (metaKey === 'PassivePlusEffect') {
+    if (type === 0) {
       message += TextManager.param(dataId);
-      message += `\\C[10]${traitValue * 100}%\\C[0]UP!`;
-      break;
-    case 1:
-    case 22:
+    } else if (type === 1) {
       message += FTKR.CSS.cssStatus.xparam[dataId];
-      message += `\\C[10]${traitValue * 100}%\\C[0]UP!`;
-      break;
-    case 2:
-    case 23:
+    } else if (type === 2) {
       message += FTKR.CSS.cssStatus.sparam[dataId];
-      message += `\\C[10]${traitValue * 100}%\\C[0]UP!`;
-      break;
-    case 11:
-      message += `${$dataSystem.elements[dataId]}`;
-      const elementMultiplier = [10, 11, 12, 15, 20, 38, 39, 40, 41].includes(dataId) ? (dataId == 11 ? 10 : 100) : 100;
+    }
+    message += `\\C[10]${traitValue * 100}%\\C[0]UP!`;
+  } else if (metaKey === 'PassivePlusTrait' && type === 11) {
+    message += `${$dataSystem.elements[dataId]}`;
+    const isSpecialElement = [10, 11, 12, 15, 20, 38, 39, 40, 41].includes(dataId);
+    const multiplier = isSpecialElement ? (dataId == 11 ? 10 : 100) : 100;
+    if (isSpecialElement) {
       if (traitValue >= 0) {
-        message += `\\C[10]${traitValue * elementMultiplier}%\\C[0]UP!`;
+        message += `\\C[10]${traitValue * multiplier}%\\C[0]UP!`;
       } else {
-        message += `\\C[1]${traitValue * elementMultiplier}%\\C[0]DOWN!`;
+        message += `\\C[1]${traitValue * multiplier}%\\C[0]DOWN!`;
       }
-      break;
-    default:
-      return null;
+    } else {
+      let resistanceValue = traitValue;
+      let color = traitValue <= 0 ? '\\C[1]' : '\\C[10]';
+      if (traitValue > 0) resistanceValue = -traitValue;
+      message += `耐性${color}${resistanceValue * 100}%\\C[0]`;
+    }
+  } else {
+    return null;
   }
-  
   return message;
 }
 
