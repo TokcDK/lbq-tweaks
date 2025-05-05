@@ -2268,10 +2268,19 @@ function tbcsAddStateTraits(code, dataId, value, isImmunity) {
 
 // Helper to check if state trait should be added
 function tbcsShouldAddStateTrait(dataId, stateId) {
-  if ((dataId == 0 || dataId == 1) && $dataStates[stateId].meta[' StateabNomal']) return true;
-  if ((dataId == 0 || dataId == 2) && $dataStates[stateId].meta[' StateSPabNomal']) return true;
-  if (dataId == 0 && $dataStates[stateId].meta[' StateUnique']) return true;
-  return false;
+  switch (dataId) {
+    case 0:
+      const meta = $dataStates[stateId].meta;
+      return meta[' StateabNomal'] || 
+             meta[' StateSPabNomal'] || 
+             meta[' StateUnique'];
+    case 1:
+      return $dataStates[stateId].meta[' StateabNomal'];
+    case 2:
+      return $dataStates[stateId].meta[' StateSPabNomal'];
+    default:
+      return false;
+  }
 }
 
 // Process parameter trait
@@ -2314,17 +2323,21 @@ function tbcsFinalizeDescription() {
 function tbcsAddCategoryDescription() {
   const category = stateData.meta['Category'];
 
-  if (category == ' InvalidDispel') {
-    description += `[${$dataStates[201].description}]`;
-  } else if (category == ' PowerUp') {
-    description += `[${$dataStates[202].description}]`;
-  } else if (category == ' StateSPabNomal') {
-    description += `[${$dataStates[30].description}]`;
-  } else if (category == ' StateUnique') {
-    description += `[${$dataStates[40].description}]`;
+  switch (category) {
+    case ' InvalidDispel':
+      description += `[${$dataStates[201].description}]`;
+      break;
+    case ' PowerUp':
+      description += `[${$dataStates[202].description}]`;
+      break;
+    case ' StateSPabNomal':
+      description += `[${$dataStates[30].description}]`;
+      break;
+    case ' StateUnique':
+      description += `[${$dataStates[40].description}]`;
+      break;
   }
 }
-
 //#endregion
 
 //エネミーに様々なセッティング
