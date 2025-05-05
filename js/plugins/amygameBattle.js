@@ -4003,7 +4003,7 @@ if($gameSwitches.value(370)){
 };
 $gameSystem.setBattleBgm({"name":arr1[0],"volume":arr1[1],"pitch":arr1[2],"pan":arr1[3]});
 BattleManager._forceAdvantage = 'Neutral';
-$gameSwitches.setValue(30,true);
+//$gameSwitches.setValue(30,true); // now using isInBattle() with check of party in battle
 if($gameVariables.value(329) == 0){
   if($gameSwitches.value(41) || $gameSwitches.value(99)){
     battle_simpleSubjugation(id1);

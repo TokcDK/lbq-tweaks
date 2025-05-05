@@ -6295,15 +6295,9 @@ if(id1 == 1){
 
   isInBattle = function () {
 
-    const inBattleSwitch = $gameSwitches.value(30);
-    if ($gameParty.inBattle() == inBattleSwitch){
-      console.warn(`isInBattle: inBattleSwitch is ${inBattleSwitch} and is equal to $gameParty.inBattle()!`);
-    }
-    else{
-      console.warn(`isInBattle: inBattleSwitch is ${inBattleSwitch} and is NOT equal to $gameParty.inBattle()!`);
-    }
-
-    return inBattleSwitch; // in battle game switch, for some reason using instead of $gameParty.inBattle();
+    // in battle game switch, for some reason was using $gameSwitches.value(30) instead of $gameParty.inBattle();
+    // but added debug messages approved that the $gameParty.inBattle() is alwaysequals to $gameSwitches.value(30) value
+    return $gameParty.inBattle(); 
   }
 
   // CommonEvents
