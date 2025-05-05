@@ -3994,29 +3994,29 @@ if(id1 == 2){
 
 };
 
-enemy_preSetup1 = function(id1) {
+enemy_preSetup1 = function(eventId) {
 
-  let arr1;
+  let battleBgmSettings;
   if ($gameSwitches.value(370)) {
-    arr1 = ['21_Battle3', 45, 110, 0];
+    battleBgmSettings = ['21_Battle3', 45, 110, 0];
   } else {
-    arr1 = ['21_Battle1', 45, 100, 0];
+    battleBgmSettings = ['21_Battle1', 45, 100, 0];
   }
-  $gameSystem.setBattleBgm({ "name": arr1[0], "volume": arr1[1], "pitch": arr1[2], "pan": arr1[3] });
+  $gameSystem.setBattleBgm({ "name": battleBgmSettings[0], "volume": battleBgmSettings[1], "pitch": battleBgmSettings[2], "pan": battleBgmSettings[3] });
   BattleManager._forceAdvantage = 'Neutral';
 
   if ($gameVariables.value(329) == 0) {
     if ($gameSwitches.value(41) || $gameSwitches.value(99)) {
-      battle_simpleSubjugation(id1);
+      battle_simpleSubjugation(eventId);
       if ($gameSwitches.value(98)) {
         valueVictoryResult = 0;
         $gameSwitches.setValue(98, false);
       }
     }
-    if ($gamePlayer.isFacingAway($gameMap.event(id1)) && $gameMap.event(id1).isPositionBackOf($gamePlayer)) {
+    if ($gamePlayer.isFacingAway($gameMap.event(eventId)) && $gameMap.event(eventId).isPositionBackOf($gamePlayer)) {
       BattleManager._forceAdvantage = 'Player';
     }
-    if ($gameMap.event(id1).isFacingAway($gamePlayer) && $gamePlayer.isPositionBackOf($gameMap.event(id1))) {
+    if ($gameMap.event(eventId).isFacingAway($gamePlayer) && $gamePlayer.isPositionBackOf($gameMap.event(eventId))) {
       BattleManager._forceAdvantage = 'Enemy';
     }
     if ($gameSwitches.value(370)) {
