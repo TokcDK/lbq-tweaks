@@ -1938,14 +1938,22 @@ const passiveLogMessages = [`\\C[10]${user.name()}\\C[0]発動G-Passive`];
 let passiveSkillList = valuePassiveAdd;
 
 const handlePassiveCondition = (skillId, conditionType, conditionValue) => {
-  if (conditionType == 1 && user.battleSkillsRaw().includes(skillId)) {
-  passiveSkillArray.push(skillId);
-  }
-  if (conditionType == 2 && user.isWtypeEquipped(conditionValue)) {
-  passiveSkillArray.push(skillId);
-  }
-  if (conditionType == 3 && user.isStateAffected(conditionValue)) {
-  passiveSkillArray.push(skillId);
+  switch (conditionType) {
+    case 1:
+      if (user.battleSkillsRaw().includes(skillId)) {
+        passiveSkillArray.push(skillId);
+      }
+      break;
+    case 2:
+      if (user.isWtypeEquipped(conditionValue)) {
+        passiveSkillArray.push(skillId);
+      }
+      break;
+    case 3:
+      if (user.isStateAffected(conditionValue)) {
+        passiveSkillArray.push(skillId);
+      }
+      break;
   }
 };
 
@@ -2013,28 +2021,32 @@ const handleTraitAddition = (skillId, traitValue, traitParams) => {
   if ($gameSwitches.value(375)) {
   let passiveLogMessage = `\\C[2]${skill.name}\\C[0]:`;
   passiveLogCount += 1;
-  if (Number(traitParams[0]) == 0) {
-    passiveLogMessage += TextManager.param(Number(traitParams[1]));
-    passiveLogMessage += `\\C[10]${traitValue * 100}%\\C[0]UP!`;
-  }
-  if (Number(traitParams[0]) == 1) {
-    passiveLogMessage += FTKR.CSS.cssStatus.xparam[Number(traitParams[1])];
-    passiveLogMessage += `\\C[10]${traitValue * 100}%\\C[0]UP!`;
-  }
-  if (Number(traitParams[0]) == 2) {
-    passiveLogMessage += FTKR.CSS.cssStatus.sparam[Number(traitParams[1])];
-    passiveLogMessage += `\\C[10]${traitValue * 100}%\\C[0]UP!`;
+  switch (Number(traitParams[0])) {
+    case 0:
+      passiveLogMessage += TextManager.param(Number(traitParams[1]));
+      passiveLogMessage += `\\C[10]${traitValue * 100}%\\C[0]UP!`;
+      break;
+    case 1:
+      passiveLogMessage += FTKR.CSS.cssStatus.xparam[Number(traitParams[1])];
+      passiveLogMessage += `\\C[10]${traitValue * 100}%\\C[0]UP!`;
+      break;
+    case 2:
+      passiveLogMessage += FTKR.CSS.cssStatus.sparam[Number(traitParams[1])];
+      passiveLogMessage += `\\C[10]${traitValue * 100}%\\C[0]UP!`;
+      break;
   }
   passiveLogMessages.push(passiveLogMessage);
   } else {
-  if (Number(traitParams[0]) == 0) {
-    user.actor().traits.push({ code: 21, dataId: Number(traitParams[1]), value: 1 + traitValue });
-  }
-  if (Number(traitParams[0]) == 1) {
-    user.actor().traits.push({ code: 22, dataId: Number(traitParams[1]), value: traitValue });
-  }
-  if (Number(traitParams[0]) == 2) {
-    user.actor().traits.push({ code: 23, dataId: Number(traitParams[1]), value: 1 + traitValue });
+  switch (Number(traitParams[0])) {
+    case 0:
+      user.actor().traits.push({ code: 21, dataId: Number(traitParams[1]), value: 1 + traitValue });
+      break;
+    case 1:
+      user.actor().traits.push({ code: 22, dataId: Number(traitParams[1]), value: traitValue });
+      break;
+    case 2:
+      user.actor().traits.push({ code: 23, dataId: Number(traitParams[1]), value: 1 + traitValue });
+      break;
   }
   }
 };
