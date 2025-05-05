@@ -3996,13 +3996,14 @@ if(id1 == 2){
 
 enemy_preSetup1 = function (eventId) {
 
-  let battleBgmSettings;
-  if (isHEnemyOrNonAuto()) {
-    battleBgmSettings = ['21_Battle3', 45, 110, 0];
-  } else {
-    battleBgmSettings = ['21_Battle1', 45, 100, 0];
-  }
-  $gameSystem.setBattleBgm({ "name": battleBgmSettings[0], "volume": battleBgmSettings[1], "pitch": battleBgmSettings[2], "pan": battleBgmSettings[3] });
+  let battleBgmSettings = isHEnemyOrNonAuto() 
+                          ? ['21_Battle3', 45, 110, 0] 
+                          : ['21_Battle1', 45, 100, 0];
+  $gameSystem.setBattleBgm({ "name": battleBgmSettings[0],
+                             "volume": battleBgmSettings[1],
+                             "pitch": battleBgmSettings[2],
+                             "pan": battleBgmSettings[3] 
+                           });
   BattleManager._forceAdvantage = 'Neutral';
 
   if ($gameVariables.value(329) == 0) {
@@ -4019,11 +4020,7 @@ enemy_preSetup1 = function (eventId) {
     if ($gameMap.event(eventId).isFacingAway($gamePlayer) && $gamePlayer.isPositionBackOf($gameMap.event(eventId))) {
       BattleManager._forceAdvantage = 'Enemy';
     }
-    if ($gameSwitches.value(370)) {
-      valueCountSet1 = 10;
-    } else {
-      valueCountSet1 = Math.floor(Math.random() * 9) + 11;
-    }
+    valueCountSet1 = isHEnemyOrNonAuto() ? 10 : Math.floor(Math.random() * 9) + 11;
     valueCountSet2 = true;
   } else {
     valueCountSet1 = $gameVariables.value(329); //直前に入れる戦闘グループ名
