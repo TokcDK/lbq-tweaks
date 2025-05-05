@@ -661,17 +661,18 @@ function ak1ConfigureElementDamageVisualization(currentItem) {
 }
 
 // Configure flash effect based on the user's elemental affinities
+const testIds = new Set([3, 4, 5, 6, 7, 8, 9]);
 function ak1ConfigureElementFlashEffect(user) {
   const candidateElements = [0];
   const testIds = [3, 4, 5, 6, 7, 8, 9];
 
   for (let i = 0; i < attackElementsList.length; i++) {
-    const attackElement = attackElementsList[i];
-    const elementId = Number(attackElement);
-
     if (i == 35) { valueSkillSpecialDispel35 += 1; }
 
-    if (testIds.includes(elementId) && user.elementAmplifyRate(elementId) >= 0.5) {
+    const attackElement = attackElementsList[i];
+    const elementId = Number(attackElement);
+    
+    if (testIds.has(elementId) && user.elementAmplifyRate(elementId) >= 0.5) {
       candidateElements.push(attackElement);
     }
   }
