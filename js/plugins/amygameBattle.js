@@ -2222,10 +2222,17 @@ function tbcsProcessStateResistanceTrait(code, dataId, value, absoluteValue) {
   tbcsAddStateTraits(code, dataId, value);
 
   // Return description based on dataId
-  if (dataId == 0) return `:\\C[16][基本特殊固有状態異常耐性${modifier}${absoluteValue * 100}]\\C[0]`;
-  if (dataId == 1) return `:\\C[16][基本状態異常耐性${modifier}${absoluteValue * 100}]\\C[0]`;
-  if (dataId == 2) return `:\\C[16][特殊状態異常耐性${modifier}${absoluteValue * 100}]\\C[0]`;
-  return '';
+  const percent = absoluteValue * 100;
+  switch (dataId) {
+    case 0:
+      return `:\\C[16][基本特殊固有状態異常耐性${modifier}${percent}]\\C[0]`;
+    case 1:
+      return `:\\C[16][基本状態異常耐性${modifier}${percent}]\\C[0]`;
+    case 2:
+      return `:\\C[16][特殊状態異常耐性${modifier}${percent}]\\C[0]`;
+    default:
+      return '';
+  }
 }
 
 // Process state immunity trait
@@ -2234,10 +2241,16 @@ function tbcsProcessStateImmunityTrait(code, dataId) {
   tbcsAddStateTraits(code, dataId, 0, true);
 
   // Return description based on dataId
-  if (dataId == 0) return `:\\C[16][基本特殊固有状態異常無効]\\C[0]`;
-  if (dataId == 1) return `:\\C[16][基本状態異常耐性無効]\\C[0]`;
-  if (dataId == 2) return `:\\C[16][特殊状態異常耐性無効]\\C[0]`;
-  return '';
+  switch (dataId) {
+    case 0:
+      return `:\\C[16][基本特殊固有状態異常無効]\\C[0]`;
+    case 1:
+      return `:\\C[16][基本状態異常耐性無効]\\C[0]`;
+    case 2:
+      return `:\\C[16][特殊状態異常耐性無効]\\C[0]`;
+    default:
+      return '';
+  }
 }
 
 // Helper to add state traits
