@@ -462,8 +462,10 @@ tachie_settei2 = function() {
 
   // Get actor information and data
   const actorId = $gameVariables.value(20);
+  console.debug(`Actor ID: ${actorId}`);
   const actorClothingDataId = actorId + 440;
   const actor = $gameActors.actor(actorId);
+  console.debug(`Actor name: ${actor.name()}`);
   const actorClothingData = $gameVariables.value(actorClothingDataId);
 
   // Load current clothing data from actor to working variables (461-500)
@@ -473,8 +475,10 @@ tachie_settei2 = function() {
 
   // Only process further for female characters
   if (isGirl(actor)) {
+    console.debug("Is girl!");
     // Handle doll state - store current clothing in temp variables and clear current
     if (actor.isStateAffected(valueDollStateId)) {
+      console.debug("Is doll state!");
       // Save clothing to temporary storage (561-600)
       for (let clothingIndex = 1; clothingIndex <= 40; clothingIndex++) {
         $gameVariables.setValue(clothingIndex + 560, $gameVariables.value(clothingIndex + 460));
@@ -492,6 +496,7 @@ tachie_settei2 = function() {
       
       // Apply custom pose/expression settings if not in specified state
       if (!actor.isStateAffected(23)) {
+        console.debug("Not in state 23 (Forced costume setting)!");
         tachie_settei1();
       }
     }
