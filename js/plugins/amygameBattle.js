@@ -437,6 +437,11 @@ for (var i = 0; i <= arr1.length-1; i++) {
 
 };
 
+
+const ak1PicIdsToErase = [51, 52, 53, 54, 55, 56, 57, 58, 86, 87, 88, 89, 90, 91, 92, 93, 98, 99];
+const ak1ElementIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 16, 17, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 34];
+const ak1ElementDisplayValues = [131, 133, 135, 137, 139, 141, 143, 145, 147, 367, 369, 147, 149, 371, 373, 375, 377, 379, 381, 383, 385, 387, 389, 130];
+const ak1DamageFlashDesignationData = [255, 255, 255, 0];
 //攻撃時に連撃計算とスキルID代入
 attack_keisan1 = function (user, skillId, sourceTypeId) {
 
@@ -448,16 +453,17 @@ attack_keisan1 = function (user, skillId, sourceTypeId) {
   valueMetalKiller = 0;
   tachie_syoukyo1($gameVariables.value(300));
 
-  if ($gameScreen.picture(50)) {
-    const picOrigin = $gameScreen.picture(50).origin();
-    const picX = $gameScreen.picture(50).x();
-    const picY = $gameScreen.picture(50).y();
-    const picScaleX = $gameScreen.picture(50).scaleX();
-    const picScaleY = $gameScreen.picture(50).scaleY();
-    //var picOpacity = $gameScreen.picture(50).opacity();
+  const pictureData = $gameScreen.picture(50);
+  if (pictureData) {
+    const picOrigin = pictureData.origin();
+    const picX = pictureData.x();
+    const picY = pictureData.y();
+    const picScaleX = pictureData.scaleX();
+    const picScaleY = pictureData.scaleY();
+    //var picOpacity = pictureData.opacity();
     $gameScreen.movePicture(50, picOrigin, picX, picY, picScaleX, picScaleY, 0, 0, 40);
   }
-  pic_eraseP(0, [51, 52, 53, 54, 55, 56, 57, 58, 86, 87, 88, 89, 90, 91, 92, 93, 98, 99]);
+  pic_eraseP(0, ak1PicIdsToErase);
 
   const pictureId = 96;
   if ($gameScreen.picture(pictureId)) {
@@ -555,13 +561,11 @@ attack_keisan1 = function (user, skillId, sourceTypeId) {
     const randomIndex = Math.floor(Math.random() * multipleElements.length);
     const selectedElementId = multipleElements[randomIndex];
     if (selectedElementId >= 1) {
-      const elementIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 16, 17, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 34];
-      const elementDisplayValues = [131, 133, 135, 137, 139, 141, 143, 145, 147, 367, 369, 147, 149, 371, 373, 375, 377, 379, 381, 383, 385, 387, 389, 130];
-      const elementIdsCount = elementIds.length;
+      const elementIdsCount = ak1ElementIds.length;
       for (let i = 0; i < elementIdsCount; i++) {
-        if (selectedElementId === elementIds[i]) {
-          $gameVariables.setValue(93, elementDisplayValues[i]);
-          $gameVariables.setValue(331, [255, 255, 255, 0]);
+        if (selectedElementId === ak1ElementIds[i]) {
+          $gameVariables.setValue(93, ak1ElementDisplayValues[i]);
+          $gameVariables.setValue(331, ak1DamageFlashDesignationData);
         }
       }
     }
@@ -569,9 +573,12 @@ attack_keisan1 = function (user, skillId, sourceTypeId) {
 
   // Determine candidate elements for special flash effect.
   const candidateElements = [0];
+  const testIds = [3, 4, 5, 6, 7, 8, 9];
   for (let i = 0; i < attackElementsList.length; i++) {
+    const attackElement = attackElementsList[i];
+    const elementId = Number(attackElement);
     if (i == 35) { specialDispelCount += 1; }
-    if ([3, 4, 5, 6, 7, 8, 9].some(function (testId) { return Number(attackElementsList[i]) == testId; })) {
+    if (testIds.some(function (testId) { return elementId == testId; })) {
       if (user.elementAmplifyRate(Number(attackElementsList[i])) >= 0.5) {
         candidateElements.push(attackElementsList[i]);
       }
