@@ -438,249 +438,233 @@ for (var i = 0; i <= arr1.length-1; i++) {
 };
 
 //攻撃時に連撃計算とスキルID代入
-attack_keisan1 = function(user,id1,id2){
+attack_keisan1 = function (user, skillId, sourceTypeId) {
 
-valueItems = id2 == 2 ? $dataItems : $dataSkills;
-valueSkillSpecialDispel35 = 0;
-valueTotalDamageCount2 = 0;
-valueDropEnemyPicId = 101;
-valueMetalKiller = 0;
-tachie_syoukyo1($gameVariables.value(300));
-if($gameScreen.picture(50)){
-  const origin = $gameScreen.picture(50).origin();
-  const x = $gameScreen.picture(50).x();
-  const y = $gameScreen.picture(50).y();
-  const scaleX = $gameScreen.picture(50).scaleX();
-  const scaleY = $gameScreen.picture(50).scaleY();
-  //var value6 = $gameScreen.picture(50).opacity();
-  $gameScreen.movePicture(50,origin,x,y,scaleX,scaleY,0,0,40);
-};
-pic_eraseP(0,[51,52,53,54,55,56,57,58,86,87,88,89,90,91,92,93,98,99]);
-const picId = 96;
-  if ($gameScreen.picture(picId)){
-    $gameScreen.movePicture(picId,0,450,480,100,100,0,0,120);
-};
-skill_addPowerSet(user,valueItems,id1,id2);
-const valueItem = valueItems[id1];
-$gameVariables.setValue(182, valueItem.stypeId);
-$gameSwitches.setValue(141,true);//スキルアイテムでの攻撃か否か。ダメージスクリプトでoff
-$gameVariables.setValue(279,10);//ステート付与アニメのディレイを初期化
-$gameVariables.setValue(91,user);
-$gameVariables.setValue(96,id1);
-valueSkillDamageType = valueItem.damage.type;
-valueAttackCount = 0;
-valueTotalDamageCount = 0;//その行動時のトータルダメージ変数
-$gameVariables.setValue(331,[]);//ダメージフラッシュ指定配列
-valueMultiAttackCount = 1;
-const elementRate = user.elementRate(11)*10;
-const rnd1 = Math.floor( Math.random() * 101);
-const rnd2 = rnd1 + Math.floor( Math.random() * 101);
-if(elementRate >= rnd1){valueMultiAttackCount += 1};
-if(elementRate >= rnd2){valueMultiAttackCount += 2};
-if(valueMultiAttackCount <= 1){
-  const max = valueCertainlyDouble.length;
-  for (let i = 0; i < max; i++) {
-    if (user.isStateAffected(valueCertainlyDouble[i])){
-      valueMultiAttackCount += 1
-      break;
-    };
-  };
-};
-if(valueMultiAttackCount <= 2){
-  var max = valueCertainlyTriple.length;
-  for (let i = 0; i < max; i++) {
-    if (user.isStateAffected(valueCertainlyTriple[i])){
-      valueMultiAttackCount += 2
-      break;
-    };
-  };
-};
-$gameVariables.setValue(181, valueItem.animationId);
-const animation = $dataAnimations[valueItem.animationId];
-const value4 = animation.frames.length;
-if (valueItem.stypeId == 12){
-  $gameVariables.setValue(97,value4);
-} else {
-  let value10 = 4;
-  if (animation.name.match(/!/)) { value10 = 1 };
-  if (animation.name.match(/&/)) { value10 = 2 };
-  if (animation.name.match(/$/)) { value10 = 3 };
-  $gameVariables.setValue(97,Math.ceil((value4 * 4 / 5) * value10/4));
-};
-$gameVariables.setValue(93,131);
-$gameVariables.setValue(526,1);
+  // Determine the source data based on source type (2: items, otherwise skills)
+  sourceItems = sourceTypeId == 2 ? $dataItems : $dataSkills;
+  valueSkillSpecialDispel35 = 0;
+  totalDamageCountDuringAction = 0;
+  valueDropEnemyPicId = 101;
+  valueMetalKiller = 0;
+  tachie_syoukyo1($gameVariables.value(300));
 
-//valueAttackStates = [];
-//valueAttackStates = valueAttackStates.concat(user.attackStates());
-valueAttackStates = user.attackStates();
-for (let i = 0; i <= 19; i++) {
-  const itemEffect = valueItem.effects[i];
-  if (itemEffect && itemEffect.code == 21 && itemEffect.dataId >= 2) {
-    valueAttackStates.push(itemEffect.dataId);
+  if ($gameScreen.picture(50)) {
+    const picOrigin = $gameScreen.picture(50).origin();
+    const picX = $gameScreen.picture(50).x();
+    const picY = $gameScreen.picture(50).y();
+    const picScaleX = $gameScreen.picture(50).scaleX();
+    const picScaleY = $gameScreen.picture(50).scaleY();
+    //var picOpacity = $gameScreen.picture(50).opacity();
+    $gameScreen.movePicture(50, picOrigin, picX, picY, picScaleX, picScaleY, 0, 0, 40);
   }
-}
-if(user.isStateAffected(410)){
-  if(valueItem.meta['LevelFluctuation']){
-    valueLevelFluctuation = Number(valueItem.meta['LevelFluctuation']);
+  pic_eraseP(0, [51, 52, 53, 54, 55, 56, 57, 58, 86, 87, 88, 89, 90, 91, 92, 93, 98, 99]);
+
+  const pictureId = 96;
+  if ($gameScreen.picture(pictureId)) {
+    $gameScreen.movePicture(pictureId, 0, 450, 480, 100, 100, 0, 0, 120);
+  }
+
+  skill_addPowerSet(user, sourceItems, skillId, sourceTypeId);
+  const currentItem = sourceItems[skillId];
+
+  $gameVariables.setValue(182, currentItem.stypeId);
+  $gameSwitches.setValue(141, true); // Indicates an attack from a skill/item. Damage script will later switch off.
+  $gameVariables.setValue(279, 10);   // Initialize delay for state-apply animation.
+  $gameVariables.setValue(91, user);
+  $gameVariables.setValue(96, skillId);
+  valueSkillDamageType = currentItem.damage.type;
+  valueAttackCount = 0;
+  valueTotalDamageCount = 0; // Total damage variable for this action.
+  $gameVariables.setValue(331, []); // Array for damage flash configuration.
+
+  multiAttackCount = 1;
+  const elementAttackRate = user.elementRate(11) * 10;
+  const randomValue1 = Math.floor(Math.random() * 101);
+  const randomValue2 = randomValue1 + Math.floor(Math.random() * 101);
+  if (elementAttackRate >= randomValue1) { multiAttackCount += 1; }
+  if (elementAttackRate >= randomValue2) { multiAttackCount += 2; }
+
+  if (multiAttackCount <= 1) {
+    const certainlyDoubleCount = valueCertainlyDouble.length;
+    for (let i = 0; i < certainlyDoubleCount; i++) {
+      if (user.isStateAffected(valueCertainlyDouble[i])) {
+        multiAttackCount += 1;
+        break;
+      }
+    }
+  }
+  if (multiAttackCount <= 2) {
+    const certainlyTripleCount = valueCertainlyTriple.length;
+    for (let i = 0; i < certainlyTripleCount; i++) {
+      if (user.isStateAffected(valueCertainlyTriple[i])) {
+        multiAttackCount += 2;
+        break;
+      }
+    }
+  }
+
+  $gameVariables.setValue(181, currentItem.animationId);
+  const animation = $dataAnimations[currentItem.animationId];
+  const frameCount = animation.frames.length;
+  if (currentItem.stypeId == 12) {
+    $gameVariables.setValue(97, frameCount);
   } else {
-    valueLevelFluctuation = 0;
-  };
-};
-valueAttackElements = [];
-if (valueItem.meta['Multiple Elements']){
-  valueAttackElements = valueItem.meta['Multiple Elements'].split(',');
-};
-if (valueItem.damage.elementId >= 1){
-  valueAttackElements = valueAttackElements.concat(valueItem.damage.elementId);
-};
-valueAttackElements = valueAttackElements.concat(user.attackElements());
-//武器種によるダメージ描写を変更させる。
-if (valueItem.meta['Multiple Elements']){
-  const multipleElements = valueItem.meta['Multiple Elements'].split(',');
-  if (valueItem.damage.elementId >= 1){
-    multipleElements.push(valueItem.damage.elementId);
-  };
-  const elementId = multipleElements[Math.floor(Math.random() * multipleElements.length)];
-  if(elementId >= 1){
-    const ids = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 16, 17, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 34 ];
-    const values = [ 131, 133, 135, 137, 139, 141, 143, 145, 147, 367, 369, 147, 149, 371, 373, 375, 377, 379, ,381, 383, 385, 387, 389, 130 ];
-    const max = ids.length;
-    for (let i = 0; i < max; i++){
-      if (elementId === ids[i]) { 
-        $gameVariables.setValue(93, values[i]); 
-        $gameVariables.setValue(331, [255, 255, 255, 0]); 
-      };
-    }
-  };
-};
+    let animationModifier = 4;
+    if (animation.name.match(/!/)) { animationModifier = 1; }
+    if (animation.name.match(/&/)) { animationModifier = 2; }
+    if (animation.name.match(/$/)) { animationModifier = 3; }
+    $gameVariables.setValue(97, Math.ceil((frameCount * 4 / 5) * animationModifier / 4));
+  }
 
-const arr2 = [0];//所持７属性の中で威力50%以上で最も高いものでフラッシュ
-const arr1 = valueAttackElements;
-  for (let i = 0; i < arr1.length; i++) {
-    if(i == 35){valueSkillSpecialDispel35 += 1};
-    if( [3,4,5,6,7,8,9].some(function(id){return Number(arr1[i]) == id}) ){
-      if( user.elementAmplifyRate(Number(arr1[i])) >= 0.5 ){
-        arr2.push(arr1[i]);
-  }}};
-  if(arr2 !== 0){
-    const value1 = Math.max(...arr2);
-    if(value1 == 3){$gameVariables.setValue(331,[255,102,119,0])}
-    else if(value1 == 4){$gameVariables.setValue(331,[119,255,119,0])}
-    else if(value1 == 5){$gameVariables.setValue(331,[255,187,119,0])}
-    else if(value1 == 6){$gameVariables.setValue(331,[85,153,255,0])}
-    else if(value1 == 7){$gameVariables.setValue(331,[255,255,119,0])}
-    else if(value1 == 8){$gameVariables.setValue(331,[68,0,68,0])}
-    else if(value1 == 9){$gameVariables.setValue(331,[255,255,255,0])};
-  };
+  $gameVariables.setValue(93, 131);
+  $gameVariables.setValue(526, 1);
 
-$gameVariables.setValue(349, valueItem.meta['moveReaction'] ? Number(valueItem.meta['moveReaction']) : 0)
-$gameSwitches.setValue(462, !valueItem.meta['ProjectileSkill']);
-if(user.isEnemy()){
-  if(!$dataEnemies[user.enemyId()].meta[`Sideview Battler`]){
-    $gameSwitches.setValue(462,false);
-}};
-
-if(user.isActor() && $gameVariables.value(182) == 2){
-  if(user.subclass() && user.equips()[0]){
-    // not using value3!
-/*     const classIconId = Number($dataClasses[user.subclass().id].meta['Icon']);
-    const wtypeIdNum = Number($dataWeapons[user.equips()[0].id].wtypeId);
-    let value3 = 0;
-    if(classIconId == 97 && wtypeIdNum == 1 || wtypeIdNum == 7){value3 = 1}
-    else if(classIconId == 107 && wtypeIdNum == 1 || wtypeIdNum == 6){value3 = 1}
-    else if(classIconId == 108 && wtypeIdNum == 4 || wtypeIdNum == 6){value3 = 1}
-    else if(classIconId == 101 && wtypeIdNum == 4 || wtypeIdNum == 5){value3 = 1}
-    else if(classIconId == 115 && wtypeIdNum == 2 || wtypeIdNum == 8){value3 = 1}
-    else if(classIconId == 96 && wtypeIdNum == 1 || wtypeIdNum == 2){value3 = 1}
-    else if(classIconId == 106 && wtypeIdNum == 5 || wtypeIdNum == 7){value3 = 1}
-    else if(classIconId == 120 && wtypeIdNum == 3 || wtypeIdNum == 9){value3 = 1}
-    else if(classIconId == 102 && wtypeIdNum == 8 || wtypeIdNum == 9){value3 = 1}
-    else if(classIconId == 199 && wtypeIdNum == 2 || wtypeIdNum == 10){value3 = 1}
-    else if(classIconId == 43 && wtypeIdNum == 7 || wtypeIdNum == 7){value3 = 2} */
-
-    if(elementRate >= 1){
-      const classRankNum = Number($dataClasses[user.subclass().id].meta['classRank']);
-      user.gainSkillMasteryUses(id1, elementRate * classRankNum);
+  // Get attack states from the user and add skill effect states if applicable.
+  valueAttackStates = user.attackStates();
+  for (let i = 0; i <= 19; i++) {
+    const effect = currentItem.effects[i];
+    if (effect && effect.code == 21 && effect.dataId >= 2) {
+      valueAttackStates.push(effect.dataId);
     }
   }
-}
 
-const actor1 = $gameActors.actor(1);
-if ($gameParty.members().contains(actor1) && actor1.isStateAffected(662)){//リーシャのブレイブコマンド
-  const actor1StateCounter662 = actor1._stateCounter[662];
-  const gameVar182 = $gameVariables.value(182);
-  for (let i = 0; i < 4; i++) {
-    if (gameVar182 == i + 5 && actor1StateCounter662[i] >= 0 && actor1StateCounter662[i] <= 4) {
-      actor1StateCounter662[i] += 1;
-    };
+  if (user.isStateAffected(410)) {
+    if (currentItem.meta['LevelFluctuation']) {
+      valueLevelFluctuation = Number(currentItem.meta['LevelFluctuation']);
+    } else {
+      valueLevelFluctuation = 0;
+    }
   }
-};
 
-const gameVar182 = $gameVariables.value(182);
-const valueItemName = valueItem.name; 
-if (gameVar182 == 12){
-  $gameVariables.setValue(93,367);
-}
-else if (gameVar182 == 13){
-  $gameVariables.setValue(93, 369);
-  $gameVariables.setValue(527, `\\C[18]＜${valueItemName}＞\\C[0]`);
-}
-else if (gameVar182 == 11){
-  $gameVariables.setValue(527, `\\C[10]＜${valueItemName}＞\\C[0]`);
-}
-else if (gameVar182 == 5){
-  $gameVariables.setValue(527, `\\C[17]＜${valueItemName}＞\\C[0]`);
-  $gameVariables.setValue(93, 0);
-}
-else if (gameVar182 == 6){
-  $gameVariables.setValue(527, `\\C[10]＜${valueItemName}＞\\C[0]`);
-}
-else if (gameVar182 == 7){
-  $gameVariables.setValue(527, `\\C[9]＜${valueItemName}＞\\C[0]`);
-  $gameVariables.setValue(93, 0);
-}
-else if (gameVar182 == 8){
-  $gameVariables.setValue(527, `\\C[3]＜${valueItemName}＞\\C[0]`);
-  $gameVariables.setValue(93, valueItem.damage.type == 2 ? 249 : 245);//MP回復の場合
-};
+  // Set up attack elements.
+  attackElementsList = [];
+  if (currentItem.meta['Multiple Elements']) {
+    attackElementsList = currentItem.meta['Multiple Elements'].split(',');
+  }
+  if (currentItem.damage.elementId >= 1) {
+    attackElementsList = attackElementsList.concat(currentItem.damage.elementId);
+  }
+  attackElementsList = attackElementsList.concat(user.attackElements());
 
-if (valueItem.meta['SkillDamageAction']){
-  $gameVariables.setValue(93, Number(valueItem.meta['SkillDamageAction']));
-};
-if (valueItem.meta['Instant']){
-  $gameSwitches.setValue(91,true);
-} else {
-  $gameSwitches.setValue(91,false);
-};
-if (valueItem.meta['Repeat']){
-  $gameVariables.setValue(526, Number(valueItem.meta['Repeat']));
-};
+  // Change damage depiction based on weapon type, selecting a random element from Multiple Elements.
+  if (currentItem.meta['Multiple Elements']) {
+    const multipleElements = currentItem.meta['Multiple Elements'].split(',');
+    if (currentItem.damage.elementId >= 1) {
+      multipleElements.push(currentItem.damage.elementId);
+    }
+    const randomIndex = Math.floor(Math.random() * multipleElements.length);
+    const selectedElementId = multipleElements[randomIndex];
+    if (selectedElementId >= 1) {
+      const elementIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 16, 17, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 34];
+      const elementDisplayValues = [131, 133, 135, 137, 139, 141, 143, 145, 147, 367, 369, 147, 149, 371, 373, 375, 377, 379, 381, 383, 385, 387, 389, 130];
+      const elementIdsCount = elementIds.length;
+      for (let i = 0; i < elementIdsCount; i++) {
+        if (selectedElementId === elementIds[i]) {
+          $gameVariables.setValue(93, elementDisplayValues[i]);
+          $gameVariables.setValue(331, [255, 255, 255, 0]);
+        }
+      }
+    }
+  }
 
-  apply_value_attack_hit = function (arr1, stateName) {
-    for (let i = 0; i < arr1.length; i++) {
-      const stateId = arr1[i];
+  // Determine candidate elements for special flash effect.
+  const candidateElements = [0];
+  for (let i = 0; i < attackElementsList.length; i++) {
+    if (i == 35) { specialDispelCount += 1; }
+    if ([3, 4, 5, 6, 7, 8, 9].some(function (testId) { return Number(attackElementsList[i]) == testId; })) {
+      if (user.elementAmplifyRate(Number(attackElementsList[i])) >= 0.5) {
+        candidateElements.push(attackElementsList[i]);
+      }
+    }
+  }
+  if (candidateElements.length > 0) {
+    const maxCandidateElement = Math.max(...candidateElements);
+    if (maxCandidateElement == 3) { $gameVariables.setValue(331, [255, 102, 119, 0]); }
+    else if (maxCandidateElement == 4) { $gameVariables.setValue(331, [119, 255, 119, 0]); }
+    else if (maxCandidateElement == 5) { $gameVariables.setValue(331, [255, 187, 119, 0]); }
+    else if (maxCandidateElement == 6) { $gameVariables.setValue(331, [85, 153, 255, 0]); }
+    else if (maxCandidateElement == 7) { $gameVariables.setValue(331, [255, 255, 119, 0]); }
+    else if (maxCandidateElement == 8) { $gameVariables.setValue(331, [68, 0, 68, 0]); }
+    else if (maxCandidateElement == 9) { $gameVariables.setValue(331, [255, 255, 255, 0]); }
+  }
+
+  $gameVariables.setValue(349, currentItem.meta['moveReaction'] ? Number(currentItem.meta['moveReaction']) : 0);
+  $gameSwitches.setValue(462, !currentItem.meta['ProjectileSkill']);
+  if (user.isEnemy()) {
+    if (!$dataEnemies[user.enemyId()].meta[`Sideview Battler`]) {
+      $gameSwitches.setValue(462, false);
+    }
+  }
+
+  if (user.isActor() && $gameVariables.value(182) == 2) {
+    if (user.subclass() && user.equips()[0]) {
+      if (elementAttackRate >= 1) {
+        const classRankNum = Number($dataClasses[user.subclass().id].meta['classRank']);
+        user.gainSkillMasteryUses(skillId, elementAttackRate * classRankNum);
+      }
+    }
+  }
+
+  const actor1 = $gameActors.actor(1);
+  if ($gameParty.members().contains(actor1) && actor1.isStateAffected(662)) { // リーシャのブレイブコマンド
+    const actor1StateCounter662 = actor1._stateCounter[662];
+    const currentGameVar182 = $gameVariables.value(182);
+    for (let i = 0; i < 4; i++) {
+      if (currentGameVar182 == i + 5 && actor1StateCounter662[i] >= 0 && actor1StateCounter662[i] <= 4) {
+        actor1StateCounter662[i] += 1;
+      }
+    }
+  }
+
+  const currentGameVar182 = $gameVariables.value(182);
+  const currentItemName = currentItem.name;
+  if (currentGameVar182 == 12) {
+    $gameVariables.setValue(93, 367);
+  } else if (currentGameVar182 == 13) {
+    $gameVariables.setValue(93, 369);
+    $gameVariables.setValue(527, `\\C[18]＜${currentItemName}＞\\C[0]`);
+  } else if (currentGameVar182 == 11) {
+    $gameVariables.setValue(527, `\\C[10]＜${currentItemName}＞\\C[0]`);
+  } else if (currentGameVar182 == 5) {
+    $gameVariables.setValue(527, `\\C[17]＜${currentItemName}＞\\C[0]`);
+    $gameVariables.setValue(93, 0);
+  } else if (currentGameVar182 == 6) {
+    $gameVariables.setValue(527, `\\C[10]＜${currentItemName}＞\\C[0]`);
+  } else if (currentGameVar182 == 7) {
+    $gameVariables.setValue(527, `\\C[9]＜${currentItemName}＞\\C[0]`);
+    $gameVariables.setValue(93, 0);
+  } else if (currentGameVar182 == 8) {
+    $gameVariables.setValue(527, `\\C[3]＜${currentItemName}＞\\C[0]`);
+    $gameVariables.setValue(93, currentItem.damage.type == 2 ? 249 : 245); // For MP recovery case.
+  }
+
+  if (currentItem.meta['SkillDamageAction']) {
+    $gameVariables.setValue(93, Number(currentItem.meta['SkillDamageAction']));
+  }
+  if (currentItem.meta['Instant']) {
+    $gameSwitches.setValue(91, true);
+  } else {
+    $gameSwitches.setValue(91, false);
+  }
+  if (currentItem.meta['Repeat']) {
+    $gameVariables.setValue(526, Number(currentItem.meta['Repeat']));
+  }
+
+  // Function to apply additional damage based on attack state.
+  apply_value_attack_hit = function (stateArray, stateMetaName) {
+    for (let i = 0; i < stateArray.length; i++) {
+      const stateId = stateArray[i];
       if (user.isStateAffected(stateId)) {
-        $gameVariables.setValue(526, $gameVariables.value(526) + Number($dataStates[stateId].meta[stateName]));
-      };
-    };
+        $gameVariables.setValue(526, $gameVariables.value(526) + Number($dataStates[stateId].meta[stateMetaName]));
+      }
+    }
   }
-if(gameVar182 == 2){
-  apply_value_attack_hit(valueNormalAttackHit, 'NormalAttackHit');
-};
-if (gameVar182 == 2 || gameVar182 == 6) {
-  apply_value_attack_hit(valueAttackAbilityHit, 'AttackAbilityHit');
-};
-/*
-if([2,4,5,6].some(function(id){return valueItem.scope == (id)})){
-  $gameSwitches.setValue(463,true);
-};
-if(gameVar182 == 2 && user.isStateAffected(282)){//全体化
-  $gameSwitches.setValue(463,true);
-};
-if(gameVar182 == 2 && user.isStateAffected(283)){//ランダム化
-  $gameSwitches.setValue(463,true);
-};
-*/
+  if (currentGameVar182 == 2) {
+    apply_value_attack_hit(valueNormalAttackHit, 'NormalAttackHit');
+  }
+  if (currentGameVar182 == 2 || currentGameVar182 == 6) {
+    apply_value_attack_hit(valueAttackAbilityHit, 'AttackAbilityHit');
+  }
 };
 
 //属性耐性ダウン付与
@@ -699,15 +683,15 @@ target.addStateCounter(stateId, +(stateDebuffRate / 100));
 };
 
 //属性耐性ダウン解除
-Element_DebuffRateR = function(target,value100){
+Element_DebuffRateR = function(target,stateId){
 
-  if (target._stateCounter[value100] >= 1) {
+  if (target._stateCounter[stateId] >= 1) {
     const code = 11;
-    const dataId = Number($dataStates[value100].meta['ElementId']);
+    const dataId = Number($dataStates[stateId].meta['ElementId']);
     const dataStateId = target.isEnemy() ? 490 : 486;
     const target1 = $dataStates[dataStateId + target.index()];
-    target1.traits.push({ code: code, dataId: dataId, value: 1 - target.getStateCounter[value100] });
-    target.removeStateCounter(value100);
+    target1.traits.push({ code: code, dataId: dataId, value: 1 - target.getStateCounter[stateId] });
+    target.removeStateCounter(stateId);
   };
 };
 
