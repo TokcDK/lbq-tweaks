@@ -617,6 +617,29 @@ attack_keisan1 = function (user, skillId, sourceTypeId) {
 
   const currentGameVar182 = $gameVariables.value(182);
   const currentItemName = currentItem.name;
+  ak1UpdateVariablesBasedOnGameVar(currentGameVar182, currentItemName, currentItem);
+
+  if (currentItem.meta['SkillDamageAction']) {
+    $gameVariables.setValue(93, Number(currentItem.meta['SkillDamageAction']));
+  }
+  if (currentItem.meta['Instant']) {
+    $gameSwitches.setValue(91, true);
+  } else {
+    $gameSwitches.setValue(91, false);
+  }
+  if (currentItem.meta['Repeat']) {
+    $gameVariables.setValue(526, Number(currentItem.meta['Repeat']));
+  }
+
+  if (currentGameVar182 == 2) {
+    ak1ApplyValueAttackHit(user, valueNormalAttackHit, 'NormalAttackHit');
+  }
+  if (currentGameVar182 == 2 || currentGameVar182 == 6) {
+    ak1ApplyValueAttackHit(user, valueAttackAbilityHit, 'AttackAbilityHit');
+  }
+};
+
+function ak1UpdateVariablesBasedOnGameVar(currentGameVar182, currentItemName, currentItem) {
   switch (currentGameVar182) {
     case 12:
       $gameVariables.setValue(93, 367);
@@ -646,26 +669,7 @@ attack_keisan1 = function (user, skillId, sourceTypeId) {
     default:
       break;
   }
-
-  if (currentItem.meta['SkillDamageAction']) {
-    $gameVariables.setValue(93, Number(currentItem.meta['SkillDamageAction']));
-  }
-  if (currentItem.meta['Instant']) {
-    $gameSwitches.setValue(91, true);
-  } else {
-    $gameSwitches.setValue(91, false);
-  }
-  if (currentItem.meta['Repeat']) {
-    $gameVariables.setValue(526, Number(currentItem.meta['Repeat']));
-  }
-
-  if (currentGameVar182 == 2) {
-    ak1ApplyValueAttackHit(user, valueNormalAttackHit, 'NormalAttackHit');
-  }
-  if (currentGameVar182 == 2 || currentGameVar182 == 6) {
-    ak1ApplyValueAttackHit(user, valueAttackAbilityHit, 'AttackAbilityHit');
-  }
-};
+}
 
 function ak1SetDamageFlashConfiguration(candidateElement) {
   switch (candidateElement) {
