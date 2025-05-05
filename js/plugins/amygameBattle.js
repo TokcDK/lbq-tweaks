@@ -2151,134 +2151,168 @@ if ($gameSwitches.value(375) && value11 >= 1) {
 
 //戦闘中に変動するステート特徴設定<traitBase1:21,0,1.5>traitBattle_changeSetting(user,stateId,0);
 //ステート耐性。id3が0で基本特殊,1で基本,2で特殊でそれぞれ指定
+//#region traitBattle_changeSetting
 traitBattle_changeSetting = function(user, stateId, multiplier) {
+  if (multiplier == 0) return;
   
-  if (multiplier != 0) {
   const stateData = $dataStates[stateId];
   stateData.traits = [];
+  let description = '';
   let traitCount = 0;
-
+  
+  // Process all trait bases
   for (let i = 1; i <= 9; i++) {
     if (stateData.meta['traitBase' + i]) {
-    const traitCode = Number(stateData.meta['traitBase' + i].split(',')[0]);
-    const traitDataId = Number(stateData.meta['traitBase' + i].split(',')[1]);
-    const traitValue = Math.round(Number(stateData.meta['traitBase' + i].split(',')[2]) * multiplier);
-    let description = `:`;
-    let absoluteTraitValue = traitValue;
-
-    if (traitValue <= -0.01) {
-      absoluteTraitValue = Math.abs(traitValue);
-    }
-
-    if (traitCode == 11) {
-      stateData.traits.push({ code: traitCode, dataId: traitDataId, value: 1 + traitValue });
-      if ([10, 11, 12, 15, 20, 38, 39, 40, 41].some(function(elementId) { return elementId == traitDataId })) {
-      let modifier = traitValue >= 0.01 ? `\\C[2]+` : `\\C[1]-`;
-      if (traitDataId == 11) {
-        description += `\\C[16][${$dataSystem.elements[traitDataId]}${modifier}${absoluteTraitValue * 10}%]\\C[0]`;
-      } else {
-        description += `\\C[16][${$dataSystem.elements[traitDataId]}${modifier}${absoluteTraitValue * 100}%]\\C[0]`;
+      const traitParts = stateData.meta['traitBase' + i].split(',');
+      const traitCode = Number(traitParts[0]);
+      const traitDataId = Number(traitParts[1]);
+      const traitValue = Math.round(Number(traitParts[2]) * multiplier);
+      const absoluteValue = Math.abs(traitValue);
+      
+      // Process trait based on its code and add to description
+      const traitDescription = tbcsProcessTraitByCode(traitCode, traitDataId, traitValue, absoluteValue);
+      
+      description += traitDescription;
+      traitCount++;
+      if (traitCount >= 3) {
+        description += '\n';
+        traitCount = 0;
       }
-      } else {
-      let modifier = traitValue >= 0.01 ? `\\C[1]-` : `\\C[2]+`;
-      description += `\\C[16][${$dataSystem.elements[traitDataId]}${modifier}${absoluteTraitValue * 100}%耐性]\\C[0]`;
-      }
-    }
-
-    if (traitCode == 13) {
-      let modifier = traitValue >= 0.01 ? `\\C[1]-` : `\\C[2]+`;
-      for (let j = 1; j <= $dataStates.length - 1; j++) {
-      if (traitDataId == 0 || traitDataId == 1) {
-        if ($dataStates[j].meta[' StateabNomal']) {
-        stateData.traits.push({ code: traitCode, dataId: j, value: 1 + traitValue });
-        }
-      }
-      if (traitDataId == 0 || traitDataId == 2) {
-        if ($dataStates[j].meta[' StateSPabNomal']) {
-        stateData.traits.push({ code: traitCode, dataId: j, value: 1 + traitValue });
-        }
-      }
-      if (traitDataId == 0) {
-        if ($dataStates[j].meta[' StateUnique']) {
-        stateData.traits.push({ code: traitCode, dataId: j, value: 1 + traitValue });
-        }
-      }
-      }
-      if (traitDataId == 0) { description += `\\C[16][基本特殊固有状態異常耐性${modifier}${absoluteTraitValue * 100}]\\C[0]`; }
-      if (traitDataId == 1) { description += `\\C[16][基本状態異常耐性${modifier}${absoluteTraitValue * 100}]\\C[0]`; }
-      if (traitDataId == 2) { description += `\\C[16][特殊状態異常耐性${modifier}${absoluteTraitValue * 100}]\\C[0]`; }
-    }
-
-    if (traitCode == 14) {
-      for (let j = 1; j <= $dataStates.length - 1; j++) {
-      if (traitDataId == 0 || traitDataId == 1) {
-        if ($dataStates[j].meta[' StateabNomal']) {
-        stateData.traits.push({ code: traitCode, dataId: j, value: 0.1 });
-        }
-      }
-      if (traitDataId == 0 || traitDataId == 2) {
-        if ($dataStates[j].meta[' StateSPabNomal']) {
-        stateData.traits.push({ code: traitCode, dataId: j, value: 0.1 });
-        }
-      }
-      if (traitDataId == 0) {
-        if ($dataStates[j].meta[' StateUnique']) {
-        stateData.traits.push({ code: traitCode, dataId: j, value: 0.1 });
-        }
-      }
-      }
-      if (traitDataId == 0) { description += `\\C[16][基本特殊固有状態異常無効]\\C[0]`; }
-      if (traitDataId == 1) { description += `\\C[16][基本状態異常耐性無効]\\C[0]`; }
-      if (traitDataId == 2) { description += `\\C[16][特殊状態異常耐性無効]\\C[0]`; }
-    }
-
-    if (traitCode == 21) {
-      let modifier = traitValue >= 0.01 ? `\\C[2]+` : `\\C[1]-`;
-      stateData.traits.push({ code: traitCode, dataId: traitDataId, value: 1 + traitValue });
-      description += `\\C[16][${TextManager.param(traitDataId)}${modifier}${absoluteTraitValue * 100}%]\\C[0]`;
-    }
-
-    if (traitCode == 22) {
-      let modifier = traitValue >= 0.01 ? `\\C[2]+` : `\\C[1]-`;
-      stateData.traits.push({ code: traitCode, dataId: traitDataId, value: traitValue });
-      description += `\\C[16][${FTKR.CSS.cssStatus.xparam[traitDataId]}${modifier}${absoluteTraitValue * 100}%]\\C[0]`;
-    }
-
-    if (traitCode == 23) {
-      let modifier = traitValue >= 0.01 ? `\\C[2]+` : `\\C[1]-`;
-      stateData.traits.push({ code: traitCode, dataId: traitDataId, value: 1 + traitValue });
-      description += `\\C[16][${FTKR.CSS.cssStatus.sparam[traitDataId]}${modifier}${absoluteTraitValue * 100}%]\\C[0]`;
-    }
-
-    traitCount += 1;
-    if (traitCount >= 3) { description += `\n`; }
     }
   }
+  
+  // Finalize description with category info if available
+  tbcsFinalizeDescription();
+  
+  user.refresh();
+};
 
+// Helper function to process trait based on code
+function tbcsProcessTraitByCode(code, dataId, value, absoluteValue) {
+  switch (code) {
+    case 11: return tbcsProcessElementTrait(code, dataId, value, absoluteValue);
+    case 13: return tbcsProcessStateResistanceTrait(code, dataId, value, absoluteValue);
+    case 14: return tbcsProcessStateImmunityTrait(code, dataId);
+    case 21: return tbcsProcessParameterTrait(code, dataId, value, absoluteValue);
+    case 22: return tbcsProcessExParameterTrait(code, dataId, value, absoluteValue);
+    case 23: return tbcsProcessSpParameterTrait(code, dataId, value, absoluteValue);
+    default: return '';
+  }
+}
+
+// Process element trait
+function tbcsProcessElementTrait(code, dataId, value, absoluteValue) {
+  stateData.traits.push({ code: code, dataId: dataId, value: 1 + value });
+
+  if ([10, 11, 12, 15, 20, 38, 39, 40, 41].some(function (id) { return id == dataId })) {
+    const modifier = value >= 0.01 ? `\\C[2]+` : `\\C[1]-`;
+    const percentage = dataId == 11 ? absoluteValue * 10 : absoluteValue * 100;
+    return `:\\C[16][${$dataSystem.elements[dataId]}${modifier}${percentage}%]\\C[0]`;
+  } else {
+    const modifier = value >= 0.01 ? `\\C[1]-` : `\\C[2]+`;
+    return `:\\C[16][${$dataSystem.elements[dataId]}${modifier}${absoluteValue * 100}%耐性]\\C[0]`;
+  }
+}
+
+// Process state resistance trait
+function tbcsProcessStateResistanceTrait(code, dataId, value, absoluteValue) {
+  const modifier = value >= 0.01 ? `\\C[1]-` : `\\C[2]+`;
+
+  // Add state resistance traits for matching states
+  tbcsAddStateTraits(code, dataId, value);
+
+  // Return description based on dataId
+  if (dataId == 0) return `:\\C[16][基本特殊固有状態異常耐性${modifier}${absoluteValue * 100}]\\C[0]`;
+  if (dataId == 1) return `:\\C[16][基本状態異常耐性${modifier}${absoluteValue * 100}]\\C[0]`;
+  if (dataId == 2) return `:\\C[16][特殊状態異常耐性${modifier}${absoluteValue * 100}]\\C[0]`;
+  return '';
+}
+
+// Process state immunity trait
+function tbcsProcessStateImmunityTrait(code, dataId) {
+  // Add state immunity traits for matching states
+  tbcsAddStateTraits(code, dataId, 0, true);
+
+  // Return description based on dataId
+  if (dataId == 0) return `:\\C[16][基本特殊固有状態異常無効]\\C[0]`;
+  if (dataId == 1) return `:\\C[16][基本状態異常耐性無効]\\C[0]`;
+  if (dataId == 2) return `:\\C[16][特殊状態異常耐性無効]\\C[0]`;
+  return '';
+}
+
+// Helper to add state traits
+function tbcsAddStateTraits(code, dataId, value, isImmunity) {
+  for (let j = 1; j <= $dataStates.length - 1; j++) {
+    if (tbcsShouldAddStateTrait(dataId, j)) {
+      stateData.traits.push({
+        code: code,
+        dataId: j,
+        value: isImmunity ? 0.1 : 1 + value
+      });
+    }
+  }
+}
+
+// Helper to check if state trait should be added
+function tbcsShouldAddStateTrait(dataId, stateId) {
+  if ((dataId == 0 || dataId == 1) && $dataStates[stateId].meta[' StateabNomal']) return true;
+  if ((dataId == 0 || dataId == 2) && $dataStates[stateId].meta[' StateSPabNomal']) return true;
+  if (dataId == 0 && $dataStates[stateId].meta[' StateUnique']) return true;
+  return false;
+}
+
+// Process parameter trait
+function tbcsProcessParameterTrait(code, dataId, value, absoluteValue) {
+  const modifier = value >= 0.01 ? `\\C[2]+` : `\\C[1]-`;
+  stateData.traits.push({ code: code, dataId: dataId, value: 1 + value });
+  return `:\\C[16][${TextManager.param(dataId)}${modifier}${absoluteValue * 100}%]\\C[0]`;
+}
+
+// Process ex-parameter trait
+function tbcsProcessExParameterTrait(code, dataId, value, absoluteValue) {
+  const modifier = value >= 0.01 ? `\\C[2]+` : `\\C[1]-`;
+  stateData.traits.push({ code: code, dataId: dataId, value: value });
+  return `:\\C[16][${FTKR.CSS.cssStatus.xparam[dataId]}${modifier}${absoluteValue * 100}%]\\C[0]`;
+}
+
+// Process sp-parameter trait
+function tbcsProcessSpParameterTrait(code, dataId, value, absoluteValue) {
+  const modifier = value >= 0.01 ? `\\C[2]+` : `\\C[1]-`;
+  stateData.traits.push({ code: code, dataId: dataId, value: 1 + value });
+  return `:\\C[16][${FTKR.CSS.cssStatus.sparam[dataId]}${modifier}${absoluteValue * 100}%]\\C[0]`;
+}
+
+// Helper to finalize description
+function tbcsFinalizeDescription() {
   if (stateData.meta['Help Description']) {
     if (stateData.meta['DescriptionWord']) {
-    description = `[${stateData.meta['DescriptionWord']}]${description}`;
+      description = `[${stateData.meta['DescriptionWord']}]${description}`;
     }
+
     if (stateData.meta['Category']) {
-    if (stateData.meta['Category'] == ' InvalidDispel') {
-      description += `[${$dataStates[201].description}]`;
+      tbcsAddCategoryDescription();
     }
-    if (stateData.meta['Category'] == ' PowerUp') {
-      description += `[${$dataStates[202].description}]`;
-    }
-    if (stateData.meta['Category'] == ' StateSPabNomal') {
-      description += `[${$dataStates[30].description}]`;
-    }
-    if (stateData.meta['Category'] == ' StateUnique') {
-      description += `[${$dataStates[40].description}]`;
-    }
-    }
+
     stateData.description = description;
   }
-  user.refresh();
-  }
+}
 
-};
+// Add category description if needed
+function tbcsAddCategoryDescription() {
+  const category = stateData.meta['Category'];
+
+  if (category == ' InvalidDispel') {
+    description += `[${$dataStates[201].description}]`;
+  } else if (category == ' PowerUp') {
+    description += `[${$dataStates[202].description}]`;
+  } else if (category == ' StateSPabNomal') {
+    description += `[${$dataStates[30].description}]`;
+  } else if (category == ' StateUnique') {
+    description += `[${$dataStates[40].description}]`;
+  }
+}
+
+//#endregion
 
 //エネミーに様々なセッティング
 enemy_battleSetting = function(id10){
