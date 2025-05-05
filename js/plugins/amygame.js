@@ -715,7 +715,7 @@ if(!$gameSwitches.value(209)){//全体マップ以外で表示10
     messageText = `${value2}:+\\V[290,3]\\I[75]:\\V[263]\n\\I[176]:\\V[190]/\\V[189]\\V[332]\\I[127]:${valueMaxEnemyLv}\n`;
     for (let i = 0; i < $gameParty.battleMembers().length; i++) {
       const actor = $gameParty.battleMembers()[i];
-      if(is_girl(actor)){
+      if(isGirl(actor)){
         if($gameVariables.value(actor.actorId() + 380)[2] >= 1){
           if(value11 == 0){messageText += `\\I[376] `; value11 = 1};
           if($dataActors[actor.actorId()].meta['IconGura']){
@@ -3674,7 +3674,7 @@ for (var i = start; i <= end; i++) {
   const id = 1; 
   const choiceParams = {text: actor.name(),value: id4};
   $gameSystem.addCustomChoice(id, choiceParams);
-  if(is_girl(actor)){
+  if(isGirl(actor)){
     valueFaceSelect = 6;
     var value1 = Math.floor( Math.random() * 8);
     if(value1 == 0){valueFaceSelect = 1};//通常
@@ -4530,7 +4530,7 @@ formation_orderSelectH = function(value2,id1){
 if(id1 == 2){
   valueHeroineCoice = [];
     for (var i = 0; i <= $gameParty.members().length-1; i++) {
-      if(is_girl($gameParty.members()[i])){
+      if(isGirl($gameParty.members()[i])){
         valueHeroineCoice.push($gameParty.members()[i].actorId());
       };
     };
@@ -4553,7 +4553,7 @@ if(id1 == 0){
 const trySetActorIndex = (index) => {
 	const actorIndex = valueHeroineCoice[index];
 	const actor = $gameActors.actor(actorIndex);
-	if(is_girl(actor)){
+	if(isGirl(actor)){
 	  $gameVariables.setValue(value2,actorIndex);
 	  return true;
 	};
@@ -4577,7 +4577,7 @@ const trySetActorIndex = (index) => {
       } else {
 		const actorIndex = $gameActors.actor(valueHeroineCoice[i]).index() + actorIndexShift;
 		const actor = $gameParty.members()[actorIndex];
-        if(is_girl(actor)){
+        if(isGirl(actor)){
           $gameVariables.setValue(value2,actor.actorId());
           break;
         }
@@ -5063,7 +5063,7 @@ trap_starting1 = function(id2,id1){
   if(id2 == 2){
     if(valueCountSet2 == 1){
       var actor = $gameParty.members()[0];
-      if(is_girl(actor)){
+      if(isGirl(actor)){
         actor.addState(62);
         if(actor.isStateAffected(62)){
           $gamePlayer.requestAnimation(624);
@@ -5998,7 +5998,7 @@ town_escape = function(){
 
 $gameVariables.setValue(520,Array(21).fill(0));
 for (var i = 0; i < $gameParty.members().length; i++) {
-  if(is_girl($gameParty.members()[i])){
+  if(isGirl($gameParty.members()[i])){
     var value1 = $gameParty.members()[i].actorId();
     if($gameVariables.value(230) >= 1){
       if($dataWeapons[$gameVariables.value(230)].meta['PermissionCloth']){
@@ -6293,7 +6293,7 @@ if(id1 == 1){
     return $gameSwitches.value(370);
   }
 
-  is_girl = function (actor) {
+  isGirl = function (actor) {
     return actor.isStateAffected(602);
   }
 

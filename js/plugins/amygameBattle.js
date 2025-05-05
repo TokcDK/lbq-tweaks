@@ -1107,7 +1107,7 @@ if(valueChainMemberCount >= 2){
 //攻撃防御時バストアップ表示$gameVariables.setValue(20,1); $gameVariables.setValue(520, [1,7]); 520→valueFaceSelect = 1;
 battle_bustUp = function(id1,id2,id3,id4){
 
-if(is_girl($gameActors.actor($gameVariables.value(20)))){
+if(isGirl($gameActors.actor($gameVariables.value(20)))){
   var value7 = 100;
   var value8 = 0;
   if($gameSwitches.value(471)){  
@@ -1240,7 +1240,7 @@ if(is_girl($gameActors.actor($gameVariables.value(20)))){
 //オーラ表現
 tachie_aura = function(){
 
-if($gameParty.inBattle() && $gameActors.actor($gameVariables.value(20)).tp >= 100 && is_girl($gameActors.actor($gameVariables.value(20)))){
+if($gameParty.inBattle() && $gameActors.actor($gameVariables.value(20)).tp >= 100 && isGirl($gameActors.actor($gameVariables.value(20)))){
 const value1 = Number($dataActors[$gameVariables.value(20)].meta['tachiePicId']);
 if($gameScreen.picture(value1)){
 const value2 = $gameVariables.value(105);
@@ -1928,7 +1928,7 @@ else if(gameVar276 == 0){
     array0 = actorMeta['BattleLastOne'].split(',');
   }
 
-  if(actor.isStateAffected(61) && is_girl(actor)){  //発情
+  if(actor.isStateAffected(61) && isGirl(actor)){  //発情
     if(actor.isLearnedSkill(65)){  
       array0 = actorMeta['BattleSexualExcitementMax'].split(',');
       array2 = actorMeta['BattleSexualExcitementMaxAttack'].split(',');//攻撃
@@ -1939,17 +1939,17 @@ else if(gameVar276 == 0){
       array1 = actorMeta['BattleSexualExcitementDamage'].split(',');//ダメージ
     };
   }
-    if(actor.isStateAffected(63) && is_girl(actor)){
+    if(actor.isStateAffected(63) && isGirl(actor)){
       if(actor.isLearnedSkill(65)){//拘束
         array0 = actorMeta['BattleBindMax'].split(',');
       } else {
         array0 = actorMeta['BattleBind'].split(',');
       };
     };
-    if(actor.isStateAffected(68) && is_girl(actor)){    //激情
+    if(actor.isStateAffected(68) && isGirl(actor)){    //激情
       array0 = actorMeta['BattlePassion'].split(',');
     };
-    if(actor.isStateAffected(64) && is_girl(actor)){    //放心
+    if(actor.isStateAffected(64) && isGirl(actor)){    //放心
       if(actor.isLearnedSkill(65)){
         array0 = actorMeta['BattleAbsentlyMax'].split(',');
       } else {
@@ -4489,7 +4489,7 @@ if(actor2.actorId() !== actor.actorId()) return;
   else if(itemId == 430){//一括装着
     const skillIds = Array(actor.battleSkillsRaw().length).fill(0);
     let id1 = 0;
-    let id2 = actor.battleSkillsRaw().length - is_girl(actor) ? 200 : 100;//10Ｇパッシブ
+    let id2 = actor.battleSkillsRaw().length - isGirl(actor) ? 200 : 100;//10Ｇパッシブ
     let id3 = actor.battleSkillsRaw().length-100;//15Hパッシブ
     let id4 = 0;
     for (let i = 1; i < $dataSkills.length; i++) {

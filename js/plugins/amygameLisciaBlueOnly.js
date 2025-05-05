@@ -937,7 +937,7 @@ if($gameSwitches.value(301)){//ジュエルリゾート
 if($gameSwitches.value(321) && $gameSwitches.value(203)){//犯罪都市屋外
 
 };
-if(is_girl($gameParty.battleMembers()[0])){//先頭キャラ女か。露出状態での発言
+if(isGirl($gameParty.battleMembers()[0])){//先頭キャラ女か。露出状態での発言
   rosyutu_wordChoiceNPC($gameParty.battleMembers()[0].actorId());
 };
 

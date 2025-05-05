@@ -26,7 +26,7 @@ weeks_toggleOtherH = function(){
 
 //61は当日Ｈ回数、62は当日Ｈ回数10以上の時に記録。64は性欲499以上でＨ回数0の連続日数
 for(var i = 1; i <= 20; i++){
-  if(is_girl($gameActors.actor(i))){
+  if(isGirl($gameActors.actor(i))){
     var actor = $gameActors.actor(i);
     if($gameVariables.value(i+380)[61] >= 10){
       $gameVariables.value(i+380)[62] += 1;//1日Ｈ回数１０回以上
@@ -476,7 +476,7 @@ if(actor.isLearnedSkill(72)){
 };
 var value2 = `\\fs[24]\\C[1]${actor.nickname()}\\C[0]\n`;
 value2 += `\x1bSET[${actor.actorId()}]\n`;
-if(is_girl($gameActors.actor($gameVariables.value(20)))){
+if(isGirl($gameActors.actor($gameVariables.value(20)))){
   if(value[0] == 0){var value3 = ` `}else{var value3 = `<${value[0]}>`};
   value2 += `\\C[27]${$dataSystem.variables[id1+1]}\\C[0]${value[1]}${value3}${eval("valueWordSet" + 1)}`;
   value2 += `\\C[27]${$dataSystem.variables[id1+2]}\\C[0]${value[2]}${eval("valueWordSet" + 2)}\n`;
@@ -735,7 +735,7 @@ list.forEach(function(id) {
 //☆☆Ｈステのうち、身長等
 hstates_heights = function(id,id2){
 
-if(is_girl($gameActors.actor(id))){
+if(isGirl($gameActors.actor(id))){
   var actor = $dataActors[id];
   var actor1 = $gameActors.actor(id);
   if(actor1.elementRate(37) >= 1.1){
@@ -1083,7 +1083,7 @@ if($gameSwitches.value(115)){
   $gameSwitches.setValue(115,false)
   WindowManager.hide(1);
 } else {
-  if(is_girl($gameActors.actor(b.actorId()))){
+  if(isGirl($gameActors.actor(b.actorId()))){
     $gameSwitches.setValue(115,true)
     var actor = $gameActors.actor(b.actorId());    
     var value = `${actor.name()}の未収得\\C[27]<H-Passive>\\C[0]\n`
@@ -1628,7 +1628,7 @@ if($dataActors[id2.actorId()].meta['Heroine']){
   } else {
     var value2 = 18;
   };
-  if(!is_girl($gameActors.actor($gameVariables.value(20)))){
+  if(!isGirl($gameActors.actor($gameVariables.value(20)))){
     var value2 = 61;
   };
   if($gameActors.actor($gameVariables.value(20)).isLearnedSkill(value2)){
@@ -1953,7 +1953,7 @@ if($gameActors.actor($gameVariables.value(20)).isStateAffected(83)){
 //☆☆Hプロフィール表示時立ち絵
 actor_hStatesTachie = function(id1){
 
-if(!is_girl($gameActors.actor($gameVariables.value(20)))){
+if(!isGirl($gameActors.actor($gameVariables.value(20)))){
   tachie_hyouji1($gameVariables.value(20));
 } else {
   var value1 = 111;

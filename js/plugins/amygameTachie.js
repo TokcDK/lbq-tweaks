@@ -472,7 +472,7 @@ tachie_settei2 = function() {
   }
 
   // Only process further for female characters
-  if (is_girl(actor)) {
+  if (isGirl(actor)) {
     // Handle doll state - store current clothing in temp variables and clear current
     if (actor.isStateAffected(valueDollStateId)) {
       // Save clothing to temporary storage (561-600)
@@ -517,7 +517,7 @@ tachie_settei2 = function() {
   charagra_henkou1(actorId);
   
   // Update clothing-related global values for female characters
-  if (is_girl(actor)) {
+  if (isGirl(actor)) {
     valueLiningCloth[actorId] = actorClothingData[2];
     valueBackHairCloth[actorId] = actor.isStateAffected(23) ? 1 : actorClothingData[4];
     valueCoatCloth[actorId] = actorClothingData[28];
@@ -536,7 +536,7 @@ charagra_henkou1 = function(actorId) {
   const actor = $gameActors.actor(actorId);
   
   // Return early if actor isn't female
-  if (!is_girl(actor)) return;
+  if (!isGirl(actor)) return;
   
   // Process character graphics change
   charagra_choice1(actorId);
@@ -1003,7 +1003,7 @@ picture_motion1("smooth",[0]);
 $gameScreen.showPicture(pictureId, picName, 1, 
 vars.value(101), vars.value(102), 
 vars.value(103), vars.value(104), vars.value(149), 0);
-if(is_girl($gameActors.actor(actorId)) && !$gameSwitches.value(150)){
+if(isGirl($gameActors.actor(actorId)) && !$gameSwitches.value(150)){
   $gameScreen.showPicture(7, "/img/tachies/" + 'actor' + actorId + '_1_3', 1, 
   vars.value(101)+value31, vars.value(102)+value32, 
   vars.value(103), vars.value(104), value33, 1);
@@ -1533,7 +1533,7 @@ get_and_cofig_girls_standing_pic = function () {
   const battlersCount = battlers.length;
   for (let i = 0; i < battlersCount; i++) {
     const actor = battlers[i];
-    if (is_girl(actor)) { // 女のみ, girls only
+    if (isGirl(actor)) { // 女のみ, girls only
       $gameVariables.setValue(20, actor.actorId());
       tachie_settei2();
     }

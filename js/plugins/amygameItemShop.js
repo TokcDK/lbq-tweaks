@@ -1110,7 +1110,7 @@ var start = 0;var end = 3;
 for (var i = start; i <= end; i++) {
   if($gameParty.battleMembers()[i]){
     var value2 = $gameParty.battleMembers()[i].actorId()
-    if(is_girl($gameActors.actor(value2))){
+    if(isGirl($gameActors.actor(value2))){
       value4 += 1;
       var actor = $gameActors.actor(value2);
       if($dataActors[value2].meta['IconGura']){
