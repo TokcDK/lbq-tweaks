@@ -3888,37 +3888,37 @@ if(id1 == 8){
 };
 
 //石召喚演出ピクチャsummon_directPicture1(1);
-summon_directPicture1 = function(id1) {
+summon_directPicture1 = function(effectMode) {
   picture_motion1("smooth", [0]);
   // picture_motion1("linear",[0]);
-  const value1 = 101;
-  if (id1 === 0) {
+  const pictureId = 101;
+  if (effectMode === 0) {
     AudioManager.playSe({ "name": 'Ice7', "volume": 100, "pitch": 150, "pan": 0 });
     $gameScreen.startFlash([255, 255, 255, 170], 20);
 
     // Use distinct names for the string constants so they are not overwritten later.
-    const summonDirectStr1 = 'summon_Direct1';
-    const summonDirectStr2 = 'summon_Direct2';
-    $gameScreen._particle.particleClear(summonDirectStr1);
-    $gameScreen._particle.particleClear(summonDirectStr2);
+    const particleGroupOne = 'summon_Direct1';
+    const particleGroupTwo = 'summon_Direct2';
+    $gameScreen._particle.particleClear(particleGroupOne);
+    $gameScreen._particle.particleClear(particleGroupTwo);
 
-    const origin = $gameScreen.picture(value1).origin();
-    const picX = $gameScreen.picture(value1).x();
+    const picOrigin = $gameScreen.picture(pictureId).origin();
+    const picX = $gameScreen.picture(pictureId).x();
     // Overwrite variables instead of re-declaring; these now represent picture properties.
-    let picY = $gameScreen.picture(value1).y();
-    let picScaleX = $gameScreen.picture(value1).scaleX();
-    const picScaleY = $gameScreen.picture(value1).scaleY();
-    const picOpacity = $gameScreen.picture(value1).opacity();
-    $gameScreen.movePicture(value1, origin, picX, picY, picScaleX, picScaleY + 100, 0, 0, 60);
-    picture_fade1(value1, "fadeOut", 'Hscene005', 60, 5);
-    UTSU.PictureBreath.off([value1]);
-    $gameScreen.erasePicture(value1 + 1);
+    let picY = $gameScreen.picture(pictureId).y();
+    let picScaleX = $gameScreen.picture(pictureId).scaleX();
+    const picScaleY = $gameScreen.picture(pictureId).scaleY();
+    const picOpacity = $gameScreen.picture(pictureId).opacity();
+    $gameScreen.movePicture(pictureId, picOrigin, picX, picY, picScaleX, picScaleY + 100, 0, 0, 60);
+    picture_fade1(pictureId, "fadeOut", 'Hscene005', 60, 5);
+    UTSU.PictureBreath.off([pictureId]);
+    $gameScreen.erasePicture(pictureId + 1);
   }
-  if (id1 === 1) {
+  if (effectMode === 1) {
     if ($gameParty.inBattle()) {
-      valueWordSet10 = 'battlePicture:' + value1;
+      valueWordSet10 = 'battlePicture:' + pictureId;
     } else {
-      valueWordSet10 = 'picture:' + value1;
+      valueWordSet10 = 'picture:' + pictureId;
     }
     AudioManager.playSe({ "name": 'Z_Summoning', "volume": 50, "pitch": 120, "pan": 0 });
     if ($gameVariables.value(331) !== 0) {
@@ -3935,65 +3935,65 @@ summon_directPicture1 = function(id1) {
     const picturePath = "/img/sv_enemies/Summon_" + Number(picSizeArr[0]);
     const photoOffset = Number(picSizeArr[1]);
     let offsetX = photoOffset; // reassignable if needed
-    const scaleValue = Number(picSizeArr[2]);
-    let offsetY = scaleValue;
-    $gameScreen.showPicture(value1, picturePath, 1, 640 + 450 + offsetX, 384 + offsetY, -100, 100, 210, 0);
-    // $gameScreen.movePicture(value1,1,640+500+offsetX,384+offsetY,-100,100,210,0,40);
-    picture_fade1(value1, "fadeIn", '162', 60, 5);
-    tachie_bless(value1);
-    const particleSet1 = 'summon_Direct1';
-    $gameScreen._particle.particleSet(0, particleSet1, valueWordSet10, 'def', 'screen');
-    const particleSet2 = 'summon_Direct2';
-    $gameScreen._particle.particleSet(0, particleSet2, valueWordSet10, 'def', 'screen');
+    const yOffset = Number(picSizeArr[2]);
+    let offsetY = yOffset;
+    $gameScreen.showPicture(pictureId, picturePath, 1, 640 + 450 + offsetX, 384 + offsetY, -100, 100, 210, 0);
+    // $gameScreen.movePicture(pictureId,1,640+500+offsetX,384+offsetY,-100,100,210,0,40);
+    picture_fade1(pictureId, "fadeIn", '162', 60, 5);
+    tachie_bless(pictureId);
+    const particleGroupOne = 'summon_Direct1';
+    $gameScreen._particle.particleSet(0, particleGroupOne, valueWordSet10, 'def', 'screen');
+    const particleGroupTwo = 'summon_Direct2';
+    $gameScreen._particle.particleSet(0, particleGroupTwo, valueWordSet10, 'def', 'screen');
     const particleSize = Number(picSizeArr[3]);
     const rectX = -particleSize / 2 - 50;
     const rectWidth = particleSize + 100;
     const particleDetail = Number(picSizeArr[4]);
-    const particlesPerWaveA = Math.round(particleDetail / 10);
-    const particlesPerWaveB = Math.round(particleDetail / 5);
-    $gameScreen._particle.particleUpdate([particleSet1, 'rect', rectX, particlesPerWaveB, rectWidth, 0]);
-    $gameScreen._particle.particleUpdate([particleSet2, 'rect', rectX, particlesPerWaveA, rectWidth, 0]);
+    const particlesWaveCountA = Math.round(particleDetail / 10);
+    const particlesWaveCountB = Math.round(particleDetail / 5);
+    $gameScreen._particle.particleUpdate([particleGroupOne, 'rect', rectX, particlesWaveCountB, rectWidth, 0]);
+    $gameScreen._particle.particleUpdate([particleGroupTwo, 'rect', rectX, particlesWaveCountA, rectWidth, 0]);
     if ($dataSkills[$gameVariables.value(96)].meta['Multiple Elements']) {
       const multipleElementsArr = $dataSkills[$gameVariables.value(96)].meta['Multiple Elements'].split(',');
-      for (let i = 0; i < multipleElementsArr.length; i++) {
-        const element = Number(multipleElementsArr[i]);
-        let colorHex = 0;
-        if (element === 3) {
-          colorHex = '#ff0000';
-        } else if (element === 4) {
-          colorHex = '#1eff00';
-        } else if (element === 5) {
-          colorHex = '#ff9500';
-        } else if (element === 6) {
-          colorHex = '#00d0ff';
-        } else if (element === 7) {
-          colorHex = '#ffffff';
-        } else if (element === 8) {
-          colorHex = '#461260';
+      for (let index = 0; index < multipleElementsArr.length; index++) {
+        const elementValue = Number(multipleElementsArr[index]);
+        let elementColorHex = 0;
+        if (elementValue === 3) {
+          elementColorHex = '#ff0000';
+        } else if (elementValue === 4) {
+          elementColorHex = '#1eff00';
+        } else if (elementValue === 5) {
+          elementColorHex = '#ff9500';
+        } else if (elementValue === 6) {
+          elementColorHex = '#00d0ff';
+        } else if (elementValue === 7) {
+          elementColorHex = '#ffffff';
+        } else if (elementValue === 8) {
+          elementColorHex = '#461260';
         }
-        if (colorHex !== 0) {
-          $gameScreen._particle.particleUpdate([particleSet1, 'color', String(colorHex), '#ffffff']);
-          $gameScreen._particle.particleUpdate([particleSet1, 'colorMode', '1']);
-          $gameScreen._particle.particleUpdate([particleSet2, 'color', String(colorHex), '#ffffff']);
-          $gameScreen._particle.particleUpdate([particleSet2, 'colorMode', '1']);
+        if (elementColorHex !== 0) {
+          $gameScreen._particle.particleUpdate([particleGroupOne, 'color', String(elementColorHex), '#ffffff']);
+          $gameScreen._particle.particleUpdate([particleGroupOne, 'colorMode', '1']);
+          $gameScreen._particle.particleUpdate([particleGroupTwo, 'color', String(elementColorHex), '#ffffff']);
+          $gameScreen._particle.particleUpdate([particleGroupTwo, 'colorMode', '1']);
           break;
         }
       }
     }
-    const particlesPerWave = 2;
-    $gameScreen._particle.particleUpdate([particleSet1, 'particlesPerWave', String(particlesPerWave)]);
-    $gameScreen._particle.particleUpdate([particleSet2, 'particlesPerWave', String(particlesPerWave)]);
-    $gameScreen._particle.particleExceed(particleSet1, 1.5);
-    $gameScreen._particle.particleExceed(particleSet2, 1.5);
+    const waveParticles = 2;
+    $gameScreen._particle.particleUpdate([particleGroupOne, 'particlesPerWave', String(waveParticles)]);
+    $gameScreen._particle.particleUpdate([particleGroupTwo, 'particlesPerWave', String(waveParticles)]);
+    $gameScreen._particle.particleExceed(particleGroupOne, 1.5);
+    $gameScreen._particle.particleExceed(particleGroupTwo, 1.5);
   }
-  if (id1 === 2) {
-    const picX2 = $gameScreen.picture(value1).x();
-    const picY2 = $gameScreen.picture(value1).y();
+  if (effectMode === 2) {
+    const picX2 = $gameScreen.picture(pictureId).x();
+    const picY2 = $gameScreen.picture(pictureId).y();
     $gameScreen.startAnimation(picX2, picY2, 301, false);
-    const dText = `\x1bSIN[${$gameVariables.value(96)}]`;
+    const displayText = `\x1bSIN[${$gameVariables.value(96)}]`;
     if ($dataSkills[$gameVariables.value(96)].meta['rubi']) {
       let rubiText = $dataSkills[$gameVariables.value(96)].meta['rubi'];
-      for (let i = 1; i <= 10; i++) {
+      for (let j = 1; j <= 10; j++) {
         if (rubiText.match(/ /)) {
           rubiText = rubiText.replace(' ', '');
         }
@@ -4002,9 +4002,9 @@ summon_directPicture1 = function(id1) {
     }
     $gameScreen.dWindowFrame = 'ON';
     $gameScreen.dTextAlign = 1;
-    $gameScreen.setDTextPicture(`${dText}`, 28);
-    $gameScreen.showPicture(value1 + 1, "", 1, picX2, 384 - 250, 100, 100, 0, 0);
-    $gameScreen.movePicture(value1 + 1, 1, picX2, 384 - 350, 100, 100, 255, 0, 30);
+    $gameScreen.setDTextPicture(`${displayText}`, 28);
+    $gameScreen.showPicture(pictureId + 1, "", 1, picX2, 384 - 250, 100, 100, 0, 0);
+    $gameScreen.movePicture(pictureId + 1, 1, picX2, 384 - 350, 100, 100, 255, 0, 30);
   }
 };
 
