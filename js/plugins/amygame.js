@@ -6369,6 +6369,8 @@ if(id1 == 1){
         }
       }
     };
+
+    gameSwitches.setValue(160, false);
   }
   
   setPartyMembersStateSwitch160v2 = function () {
