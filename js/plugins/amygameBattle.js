@@ -3888,110 +3888,124 @@ if(id1 == 8){
 };
 
 //石召喚演出ピクチャsummon_directPicture1(1);
-summon_directPicture1 = function(id1){
+summon_directPicture1 = function(id1) {
+  picture_motion1("smooth", [0]);
+  // picture_motion1("linear",[0]);
+  const value1 = 101;
+  if (id1 === 0) {
+    AudioManager.playSe({ "name": 'Ice7', "volume": 100, "pitch": 150, "pan": 0 });
+    $gameScreen.startFlash([255, 255, 255, 170], 20);
 
-picture_motion1("smooth",[0]);
-//picture_motion1("linear",[0]);
-var value1 = 101;
-if(id1 == 0){
-  AudioManager.playSe({"name":'Ice7',"volume":100,"pitch":150,"pan":0});
-  $gameScreen.startFlash([255,255,255,170], 20);
-  var value3 = 'summon_Direct1';
-  var value4 = 'summon_Direct2';
-  $gameScreen._particle.particleClear(value3);
-  $gameScreen._particle.particleClear(value4);
-  var value7 = $gameScreen.picture(value1).origin();
-  var value2 = $gameScreen.picture(value1).x();
-  var value3 = $gameScreen.picture(value1).y();
-  var value4 = $gameScreen.picture(value1).scaleX();
-  var value5 = $gameScreen.picture(value1).scaleY();
-  var value6 = $gameScreen.picture(value1).opacity();
-  $gameScreen.movePicture(value1,value7,value2,value3,value4,value5+100,0,0,60);
-  picture_fade1(value1,"fadeOut",'Hscene005',60,5);
-  UTSU.PictureBreath.off([value1]);
-  $gameScreen.erasePicture(value1+1);
-};
-if(id1 == 1){
-  if($gameParty.inBattle()){
-    valueWordSet10 = 'battlePicture:' + value1;
-  } else {
-    valueWordSet10 = 'picture:' + value1;
-  };
-  AudioManager.playSe({"name":'Z_Summoning',"volume":50,"pitch":120,"pan":0});
-  if($gameVariables.value(331) != 0){
-    $gameScreen.startFlash([$gameVariables.value(331)[0],$gameVariables.value(331)[1],$gameVariables.value(331)[2],170], 20);
-  } else {
-    $gameScreen.startFlash([255,255,255,170], 20);
-  };
-  var arr1 = $dataSkills[$gameVariables.value(96)].meta['picSize'].split(',');
-  var value2 = "/img/sv_enemies/Summon_" + Number(arr1[0]);
-  var value11 = Number(arr1[1]);
-  var value5 = value11;
-  var value14 = Number(arr1[2]);
-  var value6 = value14;
-  $gameScreen.showPicture(value1,value2,1,640+450+value5,384+value6,-100,100,210,0);
-  //$gameScreen.movePicture(value1,1,640+500+value5,384+value6,-100,100,210,0,40);
-  picture_fade1(value1,"fadeIn",'162',60,5);
-  tachie_bless(value1);
-  var value3 = 'summon_Direct1';
-  $gameScreen._particle.particleSet(0,value3,valueWordSet10,'def','screen');
-  var value4 = 'summon_Direct2';
-  $gameScreen._particle.particleSet(0,value4,valueWordSet10,'def','screen');
-  var value11 = Number(arr1[3]);
-  var value12 = -value11 / 2 - 50;
-  var value13 = value11 + 100;
-  var value14 = Number(arr1[4]);
-  var value15 = Math.round(value14 / 10);
-  var value16 = Math.round(value14 / 5);
-  $gameScreen._particle.particleUpdate([value3,'rect',value12,value16,value13,0]);
-  $gameScreen._particle.particleUpdate([value4,'rect',value12,value15,value13,0]);
-if($dataSkills[$gameVariables.value(96)].meta['Multiple Elements']){
-  var arr1 = $dataSkills[$gameVariables.value(96)].meta['Multiple Elements'].split(',');
-  for (var i = 0; i <= arr1.length-1; i++) {
-    var value11 = Number(arr1[i]);
-    var value12 = 0;
-    if(value11 == 3){var value12 = '#ff0000'};
-    if(value11 == 4){var value12 = '#1eff00'};
-    if(value11 == 5){var value12 = '#ff9500'};
-    if(value11 == 6){var value12 = '#00d0ff'};
-    if(value11 == 7){var value12 = '#ffffff'};
-    if(value11 == 8){var value12 = '#461260'};
-      if(value12 != 0){
-        $gameScreen._particle.particleUpdate([value3,'color',String(value12),'#ffffff']);
-        $gameScreen._particle.particleUpdate([value3,'colorMode','1']);
-        $gameScreen._particle.particleUpdate([value4,'color',String(value12),'#ffffff']);
-        $gameScreen._particle.particleUpdate([value4,'colorMode','1']);
-        break;
-      };
-  };
-};
-var value11 = 2;
-$gameScreen._particle.particleUpdate([value3,'particlesPerWave',String(value11)]);
-$gameScreen._particle.particleUpdate([value4,'particlesPerWave',String(value11)]);
-$gameScreen._particle.particleExceed(value3,1.5);
-$gameScreen._particle.particleExceed(value4,1.5);
-};
-if(id1 == 2){
-  var value2 = $gameScreen.picture(value1).x();
-  var value3 = $gameScreen.picture(value1).y();
-  $gameScreen.startAnimation(value2, value3, 301, false);
-  var value11 = `\x1bSIN[${$gameVariables.value(96)}]`;
-  if($dataSkills[$gameVariables.value(96)].meta['rubi']){
-    var value12 = $dataSkills[$gameVariables.value(96)].meta['rubi'];
-    for (var i = 1; i <= 10; i++) {
-      if(value12.match(/ /)){
-        var value12 = value12.replace(' ','');
-      };
-    };
-    $gameScreen.setDTextPicture(`${value12}`, 20);
-  };
-  $gameScreen.dWindowFrame = 'ON';
-  $gameScreen.dTextAlign = 1;
-  $gameScreen.setDTextPicture(`${value11}`, 28);
-  $gameScreen.showPicture(value1+1,"",1,value2,384-250,100,100,0,0);
-  $gameScreen.movePicture(value1+1,1,value2,384-350,100,100,255,0,30);
-};
+    // Use distinct names for the string constants so they are not overwritten later.
+    const summonDirectStr1 = 'summon_Direct1';
+    const summonDirectStr2 = 'summon_Direct2';
+    $gameScreen._particle.particleClear(summonDirectStr1);
+    $gameScreen._particle.particleClear(summonDirectStr2);
 
+    const origin = $gameScreen.picture(value1).origin();
+    const picX = $gameScreen.picture(value1).x();
+    // Overwrite variables instead of re-declaring; these now represent picture properties.
+    let picY = $gameScreen.picture(value1).y();
+    let picScaleX = $gameScreen.picture(value1).scaleX();
+    const picScaleY = $gameScreen.picture(value1).scaleY();
+    const picOpacity = $gameScreen.picture(value1).opacity();
+    $gameScreen.movePicture(value1, origin, picX, picY, picScaleX, picScaleY + 100, 0, 0, 60);
+    picture_fade1(value1, "fadeOut", 'Hscene005', 60, 5);
+    UTSU.PictureBreath.off([value1]);
+    $gameScreen.erasePicture(value1 + 1);
+  }
+  if (id1 === 1) {
+    if ($gameParty.inBattle()) {
+      valueWordSet10 = 'battlePicture:' + value1;
+    } else {
+      valueWordSet10 = 'picture:' + value1;
+    }
+    AudioManager.playSe({ "name": 'Z_Summoning', "volume": 50, "pitch": 120, "pan": 0 });
+    if ($gameVariables.value(331) !== 0) {
+      $gameScreen.startFlash([
+        $gameVariables.value(331)[0],
+        $gameVariables.value(331)[1],
+        $gameVariables.value(331)[2],
+        170
+      ], 20);
+    } else {
+      $gameScreen.startFlash([255, 255, 255, 170], 20);
+    }
+    const picSizeArr = $dataSkills[$gameVariables.value(96)].meta['picSize'].split(',');
+    const picturePath = "/img/sv_enemies/Summon_" + Number(picSizeArr[0]);
+    const photoOffset = Number(picSizeArr[1]);
+    let offsetX = photoOffset; // reassignable if needed
+    const scaleValue = Number(picSizeArr[2]);
+    let offsetY = scaleValue;
+    $gameScreen.showPicture(value1, picturePath, 1, 640 + 450 + offsetX, 384 + offsetY, -100, 100, 210, 0);
+    // $gameScreen.movePicture(value1,1,640+500+offsetX,384+offsetY,-100,100,210,0,40);
+    picture_fade1(value1, "fadeIn", '162', 60, 5);
+    tachie_bless(value1);
+    const particleSet1 = 'summon_Direct1';
+    $gameScreen._particle.particleSet(0, particleSet1, valueWordSet10, 'def', 'screen');
+    const particleSet2 = 'summon_Direct2';
+    $gameScreen._particle.particleSet(0, particleSet2, valueWordSet10, 'def', 'screen');
+    const particleSize = Number(picSizeArr[3]);
+    const rectX = -particleSize / 2 - 50;
+    const rectWidth = particleSize + 100;
+    const particleDetail = Number(picSizeArr[4]);
+    const particlesPerWaveA = Math.round(particleDetail / 10);
+    const particlesPerWaveB = Math.round(particleDetail / 5);
+    $gameScreen._particle.particleUpdate([particleSet1, 'rect', rectX, particlesPerWaveB, rectWidth, 0]);
+    $gameScreen._particle.particleUpdate([particleSet2, 'rect', rectX, particlesPerWaveA, rectWidth, 0]);
+    if ($dataSkills[$gameVariables.value(96)].meta['Multiple Elements']) {
+      const multipleElementsArr = $dataSkills[$gameVariables.value(96)].meta['Multiple Elements'].split(',');
+      for (let i = 0; i < multipleElementsArr.length; i++) {
+        const element = Number(multipleElementsArr[i]);
+        let colorHex = 0;
+        if (element === 3) {
+          colorHex = '#ff0000';
+        } else if (element === 4) {
+          colorHex = '#1eff00';
+        } else if (element === 5) {
+          colorHex = '#ff9500';
+        } else if (element === 6) {
+          colorHex = '#00d0ff';
+        } else if (element === 7) {
+          colorHex = '#ffffff';
+        } else if (element === 8) {
+          colorHex = '#461260';
+        }
+        if (colorHex !== 0) {
+          $gameScreen._particle.particleUpdate([particleSet1, 'color', String(colorHex), '#ffffff']);
+          $gameScreen._particle.particleUpdate([particleSet1, 'colorMode', '1']);
+          $gameScreen._particle.particleUpdate([particleSet2, 'color', String(colorHex), '#ffffff']);
+          $gameScreen._particle.particleUpdate([particleSet2, 'colorMode', '1']);
+          break;
+        }
+      }
+    }
+    const particlesPerWave = 2;
+    $gameScreen._particle.particleUpdate([particleSet1, 'particlesPerWave', String(particlesPerWave)]);
+    $gameScreen._particle.particleUpdate([particleSet2, 'particlesPerWave', String(particlesPerWave)]);
+    $gameScreen._particle.particleExceed(particleSet1, 1.5);
+    $gameScreen._particle.particleExceed(particleSet2, 1.5);
+  }
+  if (id1 === 2) {
+    const picX2 = $gameScreen.picture(value1).x();
+    const picY2 = $gameScreen.picture(value1).y();
+    $gameScreen.startAnimation(picX2, picY2, 301, false);
+    const dText = `\x1bSIN[${$gameVariables.value(96)}]`;
+    if ($dataSkills[$gameVariables.value(96)].meta['rubi']) {
+      let rubiText = $dataSkills[$gameVariables.value(96)].meta['rubi'];
+      for (let i = 1; i <= 10; i++) {
+        if (rubiText.match(/ /)) {
+          rubiText = rubiText.replace(' ', '');
+        }
+      }
+      $gameScreen.setDTextPicture(`${rubiText}`, 20);
+    }
+    $gameScreen.dWindowFrame = 'ON';
+    $gameScreen.dTextAlign = 1;
+    $gameScreen.setDTextPicture(`${dText}`, 28);
+    $gameScreen.showPicture(value1 + 1, "", 1, picX2, 384 - 250, 100, 100, 0, 0);
+    $gameScreen.movePicture(value1 + 1, 1, picX2, 384 - 350, 100, 100, 255, 0, 30);
+  }
 };
 
 enemy_preSetup1 = function (eventId) {
