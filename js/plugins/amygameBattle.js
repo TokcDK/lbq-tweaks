@@ -682,15 +682,15 @@ attack_keisan1 = function (user, skillId, sourceTypeId) {
   }
 
   if (currentGameVar182 == 2) {
-    apply_value_attack_hit(valueNormalAttackHit, 'NormalAttackHit');
+    ak1ApplyValueAttackHit(user, valueNormalAttackHit, 'NormalAttackHit');
   }
   if (currentGameVar182 == 2 || currentGameVar182 == 6) {
-    apply_value_attack_hit(valueAttackAbilityHit, 'AttackAbilityHit');
+    ak1ApplyValueAttackHit(user, valueAttackAbilityHit, 'AttackAbilityHit');
   }
 };
 
 // Function to apply additional damage based on attack state.
-apply_value_attack_hit = function (user, stateArray, stateMetaName) {
+ak1ApplyValueAttackHit = function (user, stateArray, stateMetaName) {
   for (let i = 0; i < stateArray.length; i++) {
     const stateId = stateArray[i];
     if (user.isStateAffected(stateId)) {
