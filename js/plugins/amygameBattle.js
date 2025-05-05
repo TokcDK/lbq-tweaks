@@ -1922,6 +1922,7 @@ title_battleUp = function (actor) {
 };
 
 //パッシブ付与
+//#region passive_addCondition
 passive_addCondition = function (user) {
 
   if (!$gameSwitches.value(375)) {
@@ -1937,26 +1938,6 @@ passive_addCondition = function (user) {
   const passiveLogMessages = [`\\C[10]${user.name()}\\C[0]発動G-Passive`];
   let passiveSkillList = valuePassiveAdd;
 
-  const handlePassiveCondition = (skillId, conditionType, conditionValue) => {
-    switch (conditionType) {
-      case 1:
-        if (user.battleSkillsRaw().includes(skillId)) {
-          passiveSkillArray.push(skillId);
-        }
-        break;
-      case 2:
-        if (user.isWtypeEquipped(conditionValue)) {
-          passiveSkillArray.push(skillId);
-        }
-        break;
-      case 3:
-        if (user.isStateAffected(conditionValue)) {
-          passiveSkillArray.push(skillId);
-        }
-        break;
-    }
-  };
-
   passiveSkillList.forEach(function (skillId) {
     const skill = $dataSkills[skillId];
     const skillMeta = skill.meta;
@@ -1966,7 +1947,7 @@ passive_addCondition = function (user) {
 
     if (skillMeta['Max Mastery Level']) {
       if (user.skillMasteryLevel(skillId) >= 1 && user.battleSkillsRaw().includes(skillId) && !user.isLearnedSkill(hideSkillId)) {
-        handlePassiveCondition(skillId, Number(skillCondition[0]), Number(skillCondition[1]));
+        pacondHandlePassiveCondition(user, passiveSkillArray, skillId, Number(skillCondition[0]), Number(skillCondition[1]));
       } else {
         for (let masteryLevel = 0; masteryLevel <= maxMasteryLevel - 1; masteryLevel++) {
           user.removeState(Number(skillCondition[2]) + masteryLevel);
@@ -1974,7 +1955,7 @@ passive_addCondition = function (user) {
       }
     } else {
       if (!user.isLearnedSkill(hideSkillId) && user.battleSkillsRaw().includes(skillId)) {
-        handlePassiveCondition(skillId, Number(skillCondition[0]), Number(skillCondition[1]));
+        pacondHandlePassiveCondition(user, passiveSkillArray, skillId, Number(skillCondition[0]), Number(skillCondition[1]));
       } else {
         user.removeState(Number(skillCondition[2]));
       }
@@ -2161,6 +2142,27 @@ passive_addCondition = function (user) {
     valueGetInfoPointX = 0;
   }
 };
+
+pacondHandlePassiveCondition = function (user, passiveSkillArray, skillId, conditionType, conditionValue) {
+  switch (conditionType) {
+    case 1:
+      if (user.battleSkillsRaw().includes(skillId)) {
+        passiveSkillArray.push(skillId);
+      }
+      break;
+    case 2:
+      if (user.isWtypeEquipped(conditionValue)) {
+        passiveSkillArray.push(skillId);
+      }
+      break;
+    case 3:
+      if (user.isStateAffected(conditionValue)) {
+        passiveSkillArray.push(skillId);
+      }
+      break;
+  }
+};
+//#endregion
 
 //戦闘中に変動するステート特徴設定<traitBase1:21,0,1.5>traitBattle_changeSetting(user,stateId,0);
 //ステート耐性。id3が0で基本特殊,1で基本,2で特殊でそれぞれ指定
