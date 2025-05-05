@@ -612,16 +612,16 @@ function ak1SetupAttackElements(user, currentItem) {
   
   // Add elements from skill metadata
   if (currentItem.meta['Multiple Elements']) {
-    attackElementsList = currentItem.meta['Multiple Elements'].split(',');
+    attackElementsList.push(...currentItem.meta['Multiple Elements'].split(','));
   }
   
   // Add element from damage settings
   if (currentItem.damage.elementId >= 1) {
-    attackElementsList = attackElementsList.concat(currentItem.damage.elementId);
+    attackElementsList.push(currentItem.damage.elementId);
   }
   
   // Add user's innate attack elements
-  attackElementsList = attackElementsList.concat(user.attackElements());
+  attackElementsList.push(...user.attackElements());
 }
 
 // Configure damage visualization based on elements and skill properties
