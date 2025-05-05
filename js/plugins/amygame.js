@@ -6222,16 +6222,10 @@ if(id1 == 1){
   };
 
   learn_show_eval_is_notlearned_max_addedcontains_reqskill = function (user, skillId, reqSkillId) {
-    if (user.isLearnedSkill(skillId)) {
-      return false;
-    } else {
-      if (user.skillMasteryLevel(skillId) >= Number($dataSkills[skillId].meta['Max Mastery Level']) &&
-        user.addedSkills().contains(skillId) && user.isLearnedSkill(reqSkillId)) {
-        return true;
-      } else {
-        return false;
-      };
-    };
+    return !user.isLearnedSkill(skillId) &&
+      user.skillMasteryLevel(skillId) >= Number($dataSkills[skillId].meta['Max Mastery Level']) &&
+      user.addedSkills().contains(skillId) &&
+      user.isLearnedSkill(reqSkillId);
   };
 
   commonEvents_setVar474_by_var135_mapId = function (questProgress, mapId, event_pararelStarting_param2) {
