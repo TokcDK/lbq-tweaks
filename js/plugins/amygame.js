@@ -6354,7 +6354,15 @@ if(id1 == 1){
       }
     };
   }
-  
+
+  /* Checks if the scene glossary functionality is disabled.
+  *
+  * This function uses switch 160("シーングローサリー使用不可スイッチ") to determine if the scene glossary
+      * feature should be prevented from use. When the switch is active(true), the scene glossary is disabled.
+  *
+  * @function isSceneGlossaryDisabled
+  * @returns { boolean } Returns true if the scene glossary is disabled, false otherwise.
+  */
   setPartyMembersStateSwitch160 = function () {
     const statesCount = $dataStates.length;
     const partyMembers = $gameParty.members();
