@@ -6372,15 +6372,18 @@ if(id1 == 1){
   }
   
   setPartyMembersStateSwitch160v2 = function () {
-    const partyMembers = $gameParty.members();
+    const gameParty = $gameParty;
+    const partyMembers = gameParty.members();
+    const partyMembersCount = partyMembers.length;
     const gameSwitches = $gameSwitches;
     const stateIds = $gameVariables.value(214);
+    const stateIdsCount = stateIds.length;
 
-    for (let i = 0; i < stateIds.length; i++) {
+    for (let i = 0; i < stateIdsCount; i++) {
       const stateId = stateIds[i];
-      if (!$gameParty.membersState(stateId)) continue;
+      if (!gameParty.membersState(stateId)) continue;
 
-      for (let j = 0; j < partyMembers.length; j++) {
+      for (let j = 0; j < partyMembersCount; j++) {
         const actor = partyMembers[j];
         if (actor.isStateAffected(stateId) && actor.getStateCounter(stateId) !== undefined) {
           gameSwitches.setValue(160, true);
