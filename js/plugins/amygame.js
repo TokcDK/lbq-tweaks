@@ -6370,27 +6370,51 @@ if(id1 == 1){
       }
     };
   }
+
+  setPartyMembersStateSwitch160v2_o3 = function () {
+    const partyMembers = $gameParty.members();
+    const stateIds = $gameVariables.value(214);
+
+    // Use the Array.some() method for early exit and potential JIT optimizations
+    const hasAffectedState = stateIds.some(stateId =>
+      $gameParty.membersState(stateId) &&
+      partyMembers.some(actor =>
+        actor.isStateAffected(stateId) && actor.getStateCounter(stateId) !== undefined
+      )
+    );
+
+    if (hasAffectedState) {
+      $gameSwitches.setValue(160, true);
+    }
+  }
   
   setPartyMembersStateSwitch160v2 = function () {
+    const stateIds = $gameVariables.value(214);
+    if (!stateIds || !stateIds.length) return;
+    
+    const gameSwitches = $gameSwitches;
     const gameParty = $gameParty;
     const partyMembers = gameParty.members();
-    const partyMembersCount = partyMembers.length;
-    const gameSwitches = $gameSwitches;
-    const stateIds = $gameVariables.value(214);
-    const stateIdsCount = stateIds.length;
-
-    for (let i = 0; i < stateIdsCount; i++) {
+    
+    const partyMinIndex = partyMembers.length - 1;
+    
+    // Process in reverse order for potentially earlier exit
+    for (let i = stateIds.length - 1; i >= 0; i--) {
       const stateId = stateIds[i];
       if (!gameParty.membersState(stateId)) continue;
-
-      for (let j = 0; j < partyMembersCount; j++) {
+      
+      for (let j = partyMinIndex; j >= 0; j--) {
         const actor = partyMembers[j];
+        
         if (actor.isStateAffected(stateId) && actor.getStateCounter(stateId) !== undefined) {
           gameSwitches.setValue(160, true);
-          return; // Early exit for performance
+          return;
         }
       }
     }
+    
+    // If we get here, no matches were found
+    gameSwitches.setValue(160, false);
   }
   
   setupDateTime = function () {
