@@ -4095,20 +4095,27 @@ function sdp1SetupSummonRubyText(skill) {
   $gameScreen.setDTextPicture(`${rubiText}`, 20);
 }
 
+const COLOR_RED     = '#ff0000';
+const COLOR_LIME    = '#1eff00';
+const COLOR_ORANGE  = '#ff9500';
+const COLOR_SKYBLUE = '#00d0ff';
+const COLOR_WHITE   = '#ffffff';
+const COLOR_PURPLE  = '#461260';
+
 getElementColorHex = function (elementValue) {
   switch (elementValue) {
     case 3:
-      return '#ff0000';
+      return COLOR_RED;
     case 4:
-      return '#1eff00';
+      return COLOR_LIME;
     case 5:
-      return '#ff9500';
+      return COLOR_ORANGE;
     case 6:
-      return '#00d0ff';
+      return COLOR_SKYBLUE;
     case 7:
-      return '#ffffff';
+      return COLOR_WHITE;
     case 8:
-      return '#461260';
+      return COLOR_PURPLE;
     default:
       return 0;
   }
