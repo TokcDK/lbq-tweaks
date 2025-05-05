@@ -847,6 +847,17 @@ function ak1UpdateVariablesBasedOnGameVar(abilityUsageDistinction, itemName, ite
   }
 }
 
+// Flash effect colors for different elements [R, G, B, Alpha]
+// Element ID to flash color mapping for damage visualization
+const elementFlashColors = {
+  3: [255, 102, 119, 0], // Fire element - Red flash
+  4: [119, 255, 119, 0], // Earth element - Green flash
+  5: [255, 187, 119, 0], // Wind element - Orange flash
+  6: [85, 153, 255, 0],  // Water element - Blue flash
+  7: [255, 255, 119, 0], // Light element - Yellow flash
+  8: [68, 0, 68, 0],     // Dark element - Purple flash
+  9: [255, 255, 255, 0]  // Neutral element - White flash
+};
 /**
  * Sets the damage flash effect color based on the elemental property.
  * This creates visual feedback when damage of specific elements is dealt.
@@ -854,39 +865,11 @@ function ak1UpdateVariablesBasedOnGameVar(abilityUsageDistinction, itemName, ite
  * @param {number} elementId - The ID of the element to set flash effect for
  */
 function ak1SetDamageFlashConfiguration(elementId) {
-  // Flash effect colors for different elements [R, G, B, Alpha]
-  switch (elementId) {
-    case 3: // Fire element
-      $gameVariables.setValue(331, [255, 102, 119, 0]); // Red flash
-      break;
-      
-    case 4: // Earth element
-      $gameVariables.setValue(331, [119, 255, 119, 0]); // Green flash
-      break;
-      
-    case 5: // Wind element
-      $gameVariables.setValue(331, [255, 187, 119, 0]); // Orange flash
-      break;
-      
-    case 6: // Water element
-      $gameVariables.setValue(331, [85, 153, 255, 0]); // Blue flash
-      break;
-      
-    case 7: // Light element
-      $gameVariables.setValue(331, [255, 255, 119, 0]); // Yellow flash
-      break;
-      
-    case 8: // Dark element
-      $gameVariables.setValue(331, [68, 0, 68, 0]); // Purple flash
-      break;
-      
-    case 9: // Neutral element
-      $gameVariables.setValue(331, [255, 255, 255, 0]); // White flash
-      break;
-      
-    default:
-      // No specific flash effect for other elements
-      break;
+  
+  // Set flash effect based on element ID if available in the mapping
+  const flashColors = elementFlashColors[elementId];
+  if (flashColors) {
+    $gameVariables.setValue(331, flashColors);
   }
 }
 
