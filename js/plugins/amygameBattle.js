@@ -687,8 +687,9 @@ function ak1ConfigureElementFlashEffect(user) {
 function ak1ProcessSkillSpecialSettings(user, skillId) {
   const currentItem = sourceItems[skillId];
   
-  $gameVariables.setValue(349, currentItem.meta['moveReaction'] ? Number(currentItem.meta['moveReaction']) : 0);
-  $gameSwitches.setValue(462, !currentItem.meta['ProjectileSkill']);
+  const meta = currentItem.meta;
+  $gameVariables.setValue(349, meta['moveReaction'] ? Number(meta['moveReaction']) : 0);
+  $gameSwitches.setValue(462, !meta['ProjectileSkill']);
   
   if (user.isEnemy()) {
     if (!$dataEnemies[user.enemyId()].meta[`Sideview Battler`]) {
