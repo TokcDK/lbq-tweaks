@@ -638,74 +638,124 @@ attack_keisan1 = function (user, skillId, sourceTypeId) {
   }
 };
 
-function ak1UpdateVariablesBasedOnGameVar(currentGameVar182, currentItemName, currentItem) {
-  switch (currentGameVar182) {
-    case 12:
-      $gameVariables.setValue(93, 367);
+/**
+ * Updates game variables based on the current value of game variable 182 (ability usage distinction).
+ * This controls text colors and visual representations of different skill types.
+ * 
+ * @param {number} abilityUsageDistinction - The type of ability (from $gameVariables.value(182))
+ * @param {string} itemName - The name of the current item/skill
+ * @param {object} item - The current item/skill data object
+ */
+function ak1UpdateVariablesBasedOnGameVar(abilityUsageDistinction, itemName, item) {
+  // Set colored name display and damage representation based on ability type
+  switch (abilityUsageDistinction) {
+    case 12: // Ougi/Limit Break
+      $gameVariables.setValue(93, 367); // Specific damage visualization
       break;
-    case 13:
-      $gameVariables.setValue(93, 369);
-      $gameVariables.setValue(527, `\\C[18]＜${currentItemName}＞\\C[0]`);
+      
+    case 13: // Chain Attack
+      $gameVariables.setValue(93, 369); // Specific damage visualization
+      $gameVariables.setValue(527, `\\C[18]＜${itemName}＞\\C[0]`); // Blue colored name
       break;
-    case 11:
-      $gameVariables.setValue(527, `\\C[10]＜${currentItemName}＞\\C[0]`);
+      
+    case 11: // Unknown type
+      $gameVariables.setValue(527, `\\C[10]＜${itemName}＞\\C[0]`); // Yellow colored name
       break;
-    case 5:
-      $gameVariables.setValue(527, `\\C[17]＜${currentItemName}＞\\C[0]`);
-      $gameVariables.setValue(93, 0);
+      
+    case 5: // S-Ability (Special Ability)
+      $gameVariables.setValue(527, `\\C[17]＜${itemName}＞\\C[0]`); // Purple colored name
+      $gameVariables.setValue(93, 0); // Reset damage visualization
       break;
-    case 6:
-      $gameVariables.setValue(527, `\\C[10]＜${currentItemName}＞\\C[0]`);
+      
+    case 6: // A-Ability (Active Ability)
+      $gameVariables.setValue(527, `\\C[10]＜${itemName}＞\\C[0]`); // Yellow colored name
       break;
-    case 7:
-      $gameVariables.setValue(527, `\\C[9]＜${currentItemName}＞\\C[0]`);
-      $gameVariables.setValue(93, 0);
+      
+    case 7: // W-Ability (Weapon Ability)
+      $gameVariables.setValue(527, `\\C[9]＜${itemName}＞\\C[0]`); // Light blue colored name
+      $gameVariables.setValue(93, 0); // Reset damage visualization
       break;
-    case 8:
-      $gameVariables.setValue(527, `\\C[3]＜${currentItemName}＞\\C[0]`);
-      $gameVariables.setValue(93, currentItem.damage.type == 2 ? 249 : 245);
+      
+    case 8: // R-Ability (Recovery Ability)
+      $gameVariables.setValue(527, `\\C[3]＜${itemName}＞\\C[0]`); // Green colored name
+      // Set visualization based on damage type (heal or damage)
+      $gameVariables.setValue(93, item.damage.type == 2 ? 249 : 245);
       break;
+      
     default:
+      // No specific handling for other types
       break;
   }
 }
 
-function ak1SetDamageFlashConfiguration(candidateElement) {
-  switch (candidateElement) {
-    case 3:
-      $gameVariables.setValue(331, [255, 102, 119, 0]);
+/**
+ * Sets the damage flash effect color based on the elemental property.
+ * This creates visual feedback when damage of specific elements is dealt.
+ * 
+ * @param {number} elementId - The ID of the element to set flash effect for
+ */
+function ak1SetDamageFlashConfiguration(elementId) {
+  // Flash effect colors for different elements [R, G, B, Alpha]
+  switch (elementId) {
+    case 3: // Fire element
+      $gameVariables.setValue(331, [255, 102, 119, 0]); // Red flash
       break;
-    case 4:
-      $gameVariables.setValue(331, [119, 255, 119, 0]);
+      
+    case 4: // Earth element
+      $gameVariables.setValue(331, [119, 255, 119, 0]); // Green flash
       break;
-    case 5:
-      $gameVariables.setValue(331, [255, 187, 119, 0]);
+      
+    case 5: // Wind element
+      $gameVariables.setValue(331, [255, 187, 119, 0]); // Orange flash
       break;
-    case 6:
-      $gameVariables.setValue(331, [85, 153, 255, 0]);
+      
+    case 6: // Water element
+      $gameVariables.setValue(331, [85, 153, 255, 0]); // Blue flash
       break;
-    case 7:
-      $gameVariables.setValue(331, [255, 255, 119, 0]);
+      
+    case 7: // Light element
+      $gameVariables.setValue(331, [255, 255, 119, 0]); // Yellow flash
       break;
-    case 8:
-      $gameVariables.setValue(331, [68, 0, 68, 0]);
+      
+    case 8: // Dark element
+      $gameVariables.setValue(331, [68, 0, 68, 0]); // Purple flash
       break;
-    case 9:
-      $gameVariables.setValue(331, [255, 255, 255, 0]);
+      
+    case 9: // Neutral element
+      $gameVariables.setValue(331, [255, 255, 255, 0]); // White flash
       break;
+      
     default:
+      // No specific flash effect for other elements
       break;
   }
 }
 
-// Function to apply additional damage based on attack state.
+/**
+ * Applies additional damage multipliers based on user's active states.
+ * This allows state-based attack bonuses to affect combat.
+ * 
+ * @param {object} user - The battler using the skill/attack
+ * @param {Array} stateArray - Array of state IDs to check
+ * @param {string} stateMetaName - Metadata property to read from states
+ */
 ak1ApplyValueAttackHit = function (user, stateArray, stateMetaName) {
+  // Current hit count stored in game variable 526
+  let currentHitCount = $gameVariables.value(526);
+  
+  // Check each potential state that could affect hit count
   for (let i = 0; i < stateArray.length; i++) {
     const stateId = stateArray[i];
+    
+    // If user has this state, add its hit bonus
     if (user.isStateAffected(stateId)) {
-      $gameVariables.setValue(526, $gameVariables.value(526) + Number($dataStates[stateId].meta[stateMetaName]));
+      const additionalHits = Number($dataStates[stateId].meta[stateMetaName]);
+      currentHitCount += additionalHits;
     }
   }
+  
+  // Update the game variable with new hit count
+  $gameVariables.setValue(526, currentHitCount);
 }
 
 //属性耐性ダウン付与
