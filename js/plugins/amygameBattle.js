@@ -605,19 +605,18 @@ attack_keisan1 = function (user, skillId, sourceTypeId) {
   }
 
   const actor1 = $gameActors.actor(1);
+  const abilityUsageDistinction = $gameVariables.value(182);
   if ($gameParty.members().contains(actor1) && actor1.isStateAffected(662)) { // リーシャのブレイブコマンド
-    const actor1StateCounter662 = actor1._stateCounter[662];
-    const currentGameVar182 = $gameVariables.value(182);
+    const stateCounter = actor1._stateCounter[662];
     for (let i = 0; i < 4; i++) {
-      if (currentGameVar182 == i + 5 && actor1StateCounter662[i] >= 0 && actor1StateCounter662[i] <= 4) {
-        actor1StateCounter662[i] += 1;
+      if (abilityUsageDistinction == i + 5 && stateCounter[i] >= 0 && stateCounter[i] <= 4) {
+        stateCounter[i] += 1;
       }
     }
   }
 
-  const currentGameVar182 = $gameVariables.value(182);
   const currentItemName = currentItem.name;
-  ak1UpdateVariablesBasedOnGameVar(currentGameVar182, currentItemName, currentItem);
+  ak1UpdateVariablesBasedOnGameVar(abilityUsageDistinction, currentItemName, currentItem);
 
   if (currentItem.meta['SkillDamageAction']) {
     $gameVariables.setValue(93, Number(currentItem.meta['SkillDamageAction']));
@@ -631,10 +630,10 @@ attack_keisan1 = function (user, skillId, sourceTypeId) {
     $gameVariables.setValue(526, Number(currentItem.meta['Repeat']));
   }
 
-  if (currentGameVar182 == 2) {
+  if (abilityUsageDistinction == 2) {
     ak1ApplyValueAttackHit(user, valueNormalAttackHit, 'NormalAttackHit');
   }
-  if (currentGameVar182 == 2 || currentGameVar182 == 6) {
+  if (abilityUsageDistinction == 2 || abilityUsageDistinction == 6) {
     ak1ApplyValueAttackHit(user, valueAttackAbilityHit, 'AttackAbilityHit');
   }
 };
