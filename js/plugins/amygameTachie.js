@@ -553,7 +553,7 @@ charagra_henkou1 = function(actorId) {
   actor.setBattlerImage(battlerImageId);
   
   // Set switch if not in battle
-  if (!isInBattle()) {
+  if (!$gameParty.inBattle()) {
     $gameSwitches.setValue(148, true);
   }
 };
@@ -943,7 +943,7 @@ let value32 = 0;//残像y軸。途中で数字を入れるためこれだけ先�
     vars.setValue(106,vars.value(106)-Number(actorMeta['TachiePoseYposition']));
     vars.setValue(102,vars.value(106));
   };
-  if(isInBattle()){
+  if($gameParty.inBattle()){
 	const var105 = vars.value(105);
     vars.setValue(101,var105 + 100);//x軸始点
     vars.setValue(110,30);//ウェイト。※変化なし
@@ -997,7 +997,7 @@ const picName = "TKMtachie_" + chr + "_";
 //let value1 = 'easeInOutCubic';
 
 const value31 = vars.value(101) >= vars.value(105) ? 200 : -200;
-const value33 = isInBattle() || $gameSwitches.value(200) ? 50 : 100;
+const value33 = $gameParty.inBattle() || $gameSwitches.value(200) ? 50 : 100;
 
 picture_motion1("smooth",[0]);
 $gameScreen.showPicture(pictureId, picName, 1, 
@@ -1033,7 +1033,7 @@ vars.setValue(20,actorId);
 
 tachie_bless(pictureId,1);
 
-if(isInBattle()){
+if($gameParty.inBattle()){
   tachie_aura();
 }
 
@@ -1094,7 +1094,7 @@ let value11 = getRandomElement([1,1,1,1,1,2,5,6,15]); //WARN:many code executing
 if($gameSwitches.value(201) || $gameSwitches.value(239)){
   value11 = getRandomElement([4, 4, 4, 4, 5, 4, 4, 4, 4, 8]);
 };
-if(isInBattle()){
+if($gameParty.inBattle()){
    value11 = 4;
     if($gameVariables.value(276) == 1){
       value11 = 9;//被ダメージ表情変化
@@ -1171,7 +1171,7 @@ const n207 = $gameVariables.value(207);
   if(!$gameSwitches.value(143) && actor.isStateAffected(68)){//激情
     $gameSwitches.setValue(100,true);
   }
-  if(!$gameSwitches.value(143) && isInBattle() && actor.tp >= 100){
+  if(!$gameSwitches.value(143) && $gameParty.inBattle() && actor.tp >= 100){
     if($gameSwitches.value(100)){
       value11 = 48;
     }else{
@@ -1217,7 +1217,7 @@ if(actor.isStateAffected(22) || actor.isLearnedSkill(66)){}else{//右腕乳房�
 };
 //発情＆性欲高い＆戦闘以外＆露出高いで腕グラビアポーズ
 if(actor.isStateAffected(61) || actor.isStateAffected(694)){
-  if (actor.isLearnedSkill(66) && !isInBattle() && $gameVariables.value(actorId + 380)[4] <= 9){
+  if (actor.isLearnedSkill(66) && !$gameParty.inBattle() && $gameVariables.value(actorId + 380)[4] <= 9){
     $gameVariables.setValue(tachie_settei_base_id+15,0);
     $gameVariables.setValue(tachie_settei_base_id+9,2);
   };

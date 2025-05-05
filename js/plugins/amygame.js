@@ -6297,13 +6297,6 @@ if(id1 == 1){
     return actor.isStateAffected(602);
   }
 
-  isInBattle = function () {
-
-    // in battle game switch, for some reason was using $gameSwitches.value(30) instead of $gameParty.inBattle();
-    // but added debug messages approved that the $gameParty.inBattle() is alwaysequals to $gameSwitches.value(30) value
-    return $gameParty.inBattle(); 
-  }
-
   // CommonEvents
   configureCommonEvents = function (start, end, switchIdOffset) {
     for (let i = start; i <= end; i++) {
