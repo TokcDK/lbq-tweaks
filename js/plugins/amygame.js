@@ -6143,19 +6143,19 @@ annihilationItem_bonus = function() {
   if (chestMeta['TchestType']) {
     let chestTypeIds = [];
     let chestItemIndices = [];
-    chestTypeIds = chestTypeIds.concat(chestMeta['TchestType'].split(','));
-    chestItemIndices = chestItemIndices.concat(chestMeta['Tchest'].split(','));
+    chestTypeIds.push(...chestMeta['TchestType'].split(','));
+    chestItemIndices.push(...chestMeta['Tchest'].split(','));
     let firstAnnihilationPair;
     if (chestMeta['firstAnnihilationItem']) {
       firstAnnihilationPair = chestMeta['firstAnnihilationItem'].split(',');
-      chestTypeIds = chestTypeIds.concat(Number(firstAnnihilationPair[0]));
-      chestItemIndices = chestItemIndices.concat(Number(firstAnnihilationPair[1]));
+      chestTypeIds.push(Number(firstAnnihilationPair[0]));
+      chestItemIndices.push(Number(firstAnnihilationPair[1]));
     }
     let chestOnlyBonusPair;
     if (chestMeta['TchestOnly']) {
       chestOnlyBonusPair = chestMeta['TchestOnly'].split(',');
-      chestTypeIds = chestTypeIds.concat(Number(chestOnlyBonusPair[3]));
-      chestItemIndices = chestItemIndices.concat(Number(chestOnlyBonusPair[4]));
+      chestTypeIds.push(Number(chestOnlyBonusPair[3]));
+      chestItemIndices.push(Number(chestOnlyBonusPair[4]));
     }
     const randomChestItemValue = chestItemIndices[Math.floor(Math.random() * chestItemIndices.length)];
     let selectedArrayIndex = chestItemIndices.findIndex(item => item == randomChestItemValue);
