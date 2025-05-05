@@ -3891,6 +3891,7 @@ if(id1 == 8){
 summon_directPicture1 = function(effectMode) {
   picture_motion1("smooth", [0]);
   // picture_motion1("linear",[0]);
+  const particle = $gameScreen._particle;
   const pictureId = 101;
   if (effectMode === 0) {
     AudioManager.playSe({ "name": 'Ice7', "volume": 100, "pitch": 150, "pan": 0 });
@@ -3899,8 +3900,8 @@ summon_directPicture1 = function(effectMode) {
     // Use distinct names for the string constants so they are not overwritten later.
     const particleGroupOne = 'summon_Direct1';
     const particleGroupTwo = 'summon_Direct2';
-    $gameScreen._particle.particleClear(particleGroupOne);
-    $gameScreen._particle.particleClear(particleGroupTwo);
+    particle.particleClear(particleGroupOne);
+    particle.particleClear(particleGroupTwo);
 
     const picOrigin = $gameScreen.picture(pictureId).origin();
     const picX = $gameScreen.picture(pictureId).x();
@@ -3908,7 +3909,7 @@ summon_directPicture1 = function(effectMode) {
     let picY = $gameScreen.picture(pictureId).y();
     let picScaleX = $gameScreen.picture(pictureId).scaleX();
     const picScaleY = $gameScreen.picture(pictureId).scaleY();
-    //const picOpacity = $gameScreen.picture(pictureId).opacity();
+    //$gameScreen.picture(pictureId).opacity(); // not used
     $gameScreen.movePicture(pictureId, picOrigin, picX, picY, picScaleX, picScaleY + 100, 0, 0, 60);
     picture_fade1(pictureId, "fadeOut", 'Hscene005', 60, 5);
     UTSU.PictureBreath.off([pictureId]);
@@ -3939,36 +3940,36 @@ summon_directPicture1 = function(effectMode) {
     picture_fade1(pictureId, "fadeIn", '162', 60, 5);
     tachie_bless(pictureId);
     const particleGroupOne = 'summon_Direct1';
-    $gameScreen._particle.particleSet(0, particleGroupOne, valueWordSet10, 'def', 'screen');
+    particle.particleSet(0, particleGroupOne, valueWordSet10, 'def', 'screen');
     const particleGroupTwo = 'summon_Direct2';
-    $gameScreen._particle.particleSet(0, particleGroupTwo, valueWordSet10, 'def', 'screen');
+    particle.particleSet(0, particleGroupTwo, valueWordSet10, 'def', 'screen');
     const particleSize = Number(picSizeArr[3]);
     const rectX = -particleSize / 2 - 50;
     const rectWidth = particleSize + 100;
     const particleDetail = Number(picSizeArr[4]);
     const particlesWaveCountA = Math.round(particleDetail / 10);
     const particlesWaveCountB = Math.round(particleDetail / 5);
-    $gameScreen._particle.particleUpdate([particleGroupOne, 'rect', rectX, particlesWaveCountB, rectWidth, 0]);
-    $gameScreen._particle.particleUpdate([particleGroupTwo, 'rect', rectX, particlesWaveCountA, rectWidth, 0]);
+    particle.particleUpdate([particleGroupOne, 'rect', rectX, particlesWaveCountB, rectWidth, 0]);
+    particle.particleUpdate([particleGroupTwo, 'rect', rectX, particlesWaveCountA, rectWidth, 0]);
     if ($dataSkills[$gameVariables.value(96)].meta['Multiple Elements']) {
       const multipleElementsArr = $dataSkills[$gameVariables.value(96)].meta['Multiple Elements'].split(',');
       for (let index = 0; index < multipleElementsArr.length; index++) {
         const elementValue = Number(multipleElementsArr[index]);
         const elementColorHex = getElementColorHex(elementValue);
         if (elementColorHex !== 0) {
-          $gameScreen._particle.particleUpdate([particleGroupOne, 'color', String(elementColorHex), '#ffffff']);
-          $gameScreen._particle.particleUpdate([particleGroupOne, 'colorMode', '1']);
-          $gameScreen._particle.particleUpdate([particleGroupTwo, 'color', String(elementColorHex), '#ffffff']);
-          $gameScreen._particle.particleUpdate([particleGroupTwo, 'colorMode', '1']);
+          particle.particleUpdate([particleGroupOne, 'color', String(elementColorHex), '#ffffff']);
+          particle.particleUpdate([particleGroupOne, 'colorMode', '1']);
+          particle.particleUpdate([particleGroupTwo, 'color', String(elementColorHex), '#ffffff']);
+          particle.particleUpdate([particleGroupTwo, 'colorMode', '1']);
           break;
         }
       }
     }
     const waveParticles = 2;
-    $gameScreen._particle.particleUpdate([particleGroupOne, 'particlesPerWave', String(waveParticles)]);
-    $gameScreen._particle.particleUpdate([particleGroupTwo, 'particlesPerWave', String(waveParticles)]);
-    $gameScreen._particle.particleExceed(particleGroupOne, 1.5);
-    $gameScreen._particle.particleExceed(particleGroupTwo, 1.5);
+    particle.particleUpdate([particleGroupOne, 'particlesPerWave', String(waveParticles)]);
+    particle.particleUpdate([particleGroupTwo, 'particlesPerWave', String(waveParticles)]);
+    particle.particleExceed(particleGroupOne, 1.5);
+    particle.particleExceed(particleGroupTwo, 1.5);
   }
   else if (effectMode === 2) {
     const picX2 = $gameScreen.picture(pictureId).x();
