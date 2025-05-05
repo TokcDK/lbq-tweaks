@@ -573,9 +573,13 @@ function ak1ConfigureAnimationSettings(skillId) {
     $gameVariables.setValue(97, frameCount);
   } else {
     let animationModifier = 4;
-    if (animation.name.match(/!/)) { animationModifier = 1; }
-    if (animation.name.match(/&/)) { animationModifier = 2; }
-    if (animation.name.match(/$/)) { animationModifier = 3; }
+    
+    if (animation.name) {
+      const name = animation.name;
+      if (name.includes('!')) animationModifier = 1;
+      else if (name.includes('&')) animationModifier = 2;
+      else if (name.includes('$')) animationModifier = 3;
+    }
     $gameVariables.setValue(97, Math.ceil((frameCount * 4 / 5) * animationModifier / 4));
   }
 }
