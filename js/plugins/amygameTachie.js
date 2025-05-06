@@ -674,20 +674,12 @@ tachie_naibusyori2 = function(){
     $gameVariables.setValue(117, Number($dataActors[$gameVariables.value(20)].meta['tachiePicId']));
   }
   if ($gameSwitches.value(20)) {
-    const start = 1, end = 40;
-    for (let j = start; j <= end; j++) {
-      if ($gameVariables.value(j + 460) >= 0) {
-        const args = new Array(String($gameVariables.value(118)), String(j), String($gameVariables.value(j + 460)));
-        tachie_naibusyori1(args);
-      }
-    }
+    runTachieLoop(1, 40, j => $gameVariables.value(j + 460), j => $gameVariables.value(j + 460) >= 0);
     let tachieNum = parseInt($gameVariables.value(117), 10) || 0; // 立ち絵1か2か、それとも…
     tachieNum--; // データ上は0から
-    //console.log(tachieNum);
     if (tachieNum !== -1) {
       if ($TKMvar.tachie.PicData.length > tachieNum) {
         $gameScreen.erasePicture($TKMvar.tachie.PicData[tachieNum]["picNum"]);
-        // $TKMvar.tachie.PicData[tachieNum]["char"] = "";
       }
     }
     const charName = $gameVariables.value(118);
@@ -701,17 +693,9 @@ tachie_naibusyori2 = function(){
   }
   if ($gameActors.actor($gameVariables.value(20)).isStateAffected(19)) {
     tachie_clear($gameVariables.value(117));
-    const start = 1, end = 40;
-    for (let j = start; j <= end; j++) {
-      const args = new Array(String($gameVariables.value(118)), String(j), "0");
-      tachie_naibusyori1(args);
-    }
+    runTachieLoop(1, 40, () => "0");
   } else {
-    const start = 1, end = 40;
-    for (let j = start; j <= end; j++) {
-      const args = new Array(String($gameVariables.value(118)), String(j), String($gameVariables.value(j + 460)));
-      tachie_naibusyori1(args);
-    }
+    runTachieLoop(1, 40, j => $gameVariables.value(j + 460));
   }
   {
     const args = new Array(String($gameVariables.value(117)), String($gameVariables.value(118)));
@@ -720,28 +704,13 @@ tachie_naibusyori2 = function(){
     if (tachieNum !== -1) {
       // 取得
       const CharList = $TKMvar.tachie.CharList;
-      //const MaxLayer = $TKMvar.tachie.MaxLayer;
       const PicData = $TKMvar.tachie.PicData;
-      if ($TKMvar.tachie.PicData[tachieNum]["char"] !== args[1]) { // キャラが同じなら変更する必要ない
+      if ($TKMvar.tachie.PicData[tachieNum]["char"] !== args[1]) {// キャラが同じなら変更する必要ない
         if (args[1] in CharList) {
           if (PicData.length > tachieNum) {
             PicData[tachieNum]["char"] = args[1];
             PicData[tachieNum]["bitmap"] = null;
             PicData[tachieNum]["bitmap"] = [];
-            // preload bitmap
-            /*
-            var partList= $TKMvar.tachie.CharList[args[1]];
-            for(var i = 0; i < $TKMvar.tachie.MaxLayer; i++) {
-              if(partList[i] === 0) {
-                $TKMvar.tachie.PicData[tachieNum]["bitmap"][i] = null;
-                continue;
-              }
-              else {
-                $TKMvar.tachie.PicData[tachieNum]["bitmap"][i] = ImageManager.loadPicture("/img/tachies/" + args[1] + "_" + $TKMvar.tachie.partsNameArr[i] + "_" + partList[i], 0);
-              }
-            }
-            */
-            //const partList = $TKMvar.tachie.CharList[args[1]];
             $TKMvar.tachie.preloadBitmap(tachieNum);
           }
         }
@@ -754,13 +723,10 @@ tachie_naibusyori2 = function(){
     if (tachieNum !== -1) {
       if ($TKMvar.tachie.PicData.length > tachieNum) {
         if ($TKMvar.tachie.PicData[tachieNum]["char"]) {
-          //const CharList = $TKMvar.tachie.CharList;
-          //const MaxLayer = $TKMvar.tachie.MaxLayer;
           const PicData = $TKMvar.tachie.PicData;
           const pictureId = PicData[tachieNum]["picNum"];
           const char = PicData[tachieNum]["char"];
           const name = "TKMtachie_" + char + "_";
-          //const partList = CharList[char];
           const x = $TKMvar.tachie.PicData[tachieNum]["x"];
           const y = $TKMvar.tachie.PicData[tachieNum]["y"];
           $gameScreen.showPicture(pictureId, name, 0, x, y, 85, 85, 0, 0);
@@ -769,6 +735,20 @@ tachie_naibusyori2 = function(){
     }
   }
 };
+
+// Helper function to execute tachie_naibusyori1 in a loop, from tachie_naibusyori2
+function runTachieLoop(start, end, getThirdArg, condition = () => true) {
+  for (let j = start; j <= end; j++) {
+    if (condition(j)) {
+      const args = [
+        String($gameVariables.value(118)),
+        String(j),
+        String(getThirdArg(j))
+      ];
+      tachie_naibusyori1(args);
+    }
+  }
+}
 
 //☆☆立ち絵内部処理CP一つずつ
 tachie_naibusyori1 = function(args){
