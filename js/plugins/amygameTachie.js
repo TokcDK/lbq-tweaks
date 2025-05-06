@@ -720,7 +720,7 @@ tachie_naibusyori2 = function(){
     if (tachieNum !== -1) {
       // 取得
       const CharList = $TKMvar.tachie.CharList;
-      const MaxLayer = $TKMvar.tachie.MaxLayer;
+      //const MaxLayer = $TKMvar.tachie.MaxLayer;
       const PicData = $TKMvar.tachie.PicData;
       if ($TKMvar.tachie.PicData[tachieNum]["char"] !== args[1]) { // キャラが同じなら変更する必要ない
         if (args[1] in CharList) {
@@ -741,7 +741,7 @@ tachie_naibusyori2 = function(){
               }
             }
             */
-            const partList = $TKMvar.tachie.CharList[args[1]];
+            //const partList = $TKMvar.tachie.CharList[args[1]];
             $TKMvar.tachie.preloadBitmap(tachieNum);
           }
         }
@@ -754,13 +754,13 @@ tachie_naibusyori2 = function(){
     if (tachieNum !== -1) {
       if ($TKMvar.tachie.PicData.length > tachieNum) {
         if ($TKMvar.tachie.PicData[tachieNum]["char"]) {
-          const CharList = $TKMvar.tachie.CharList;
-          const MaxLayer = $TKMvar.tachie.MaxLayer;
+          //const CharList = $TKMvar.tachie.CharList;
+          //const MaxLayer = $TKMvar.tachie.MaxLayer;
           const PicData = $TKMvar.tachie.PicData;
           const pictureId = PicData[tachieNum]["picNum"];
           const char = PicData[tachieNum]["char"];
           const name = "TKMtachie_" + char + "_";
-          const partList = CharList[char];
+          //const partList = CharList[char];
           const x = $TKMvar.tachie.PicData[tachieNum]["x"];
           const y = $TKMvar.tachie.PicData[tachieNum]["y"];
           $gameScreen.showPicture(pictureId, name, 0, x, y, 85, 85, 0, 0);
