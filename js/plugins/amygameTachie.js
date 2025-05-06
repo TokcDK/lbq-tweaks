@@ -833,32 +833,39 @@ tachie_hyouji1 = function (actorId) {
 
   $gameVariables.setValue(112, actorId);
   $gameVariables.setValue(300, Number($dataActors[actorId].meta['tachiePicId']));
+
   let stateEffectCount = 1;
   const actor = $gameActors.actor(actorId);
   const stateChangeList = valueTachieChangeState;
-  stateChangeList.forEach(function (stateId) {
-    if (actor.isStateAffected(stateId)) {
-      stateEffectCount += 1;
-      const randomYPosition = Math.floor(Math.random() * 51) + 384;
-      const randomMoveDuration = Math.floor(Math.random() * 61) + 40;
-      let skillModifier = 1;
-      if (actor.isLearnedSkill(65)) { skillModifier ++; }
-      if (actor.isLearnedSkill(69)) { skillModifier ++; }
-      let baseXPosition = 1024;
-      if ($dataStates[stateId].meta['TachieXline']) {
-        baseXPosition += Number($dataStates[stateId].meta['TachieXline']);
-      }
-      const pictureName = $dataStates[stateId].meta['TachieSet'] + (
-        $dataStates[stateId].meta['TachieActorSpecify']
-        ? actorId + '_' + skillModifier
-        : ""
-      );
-      $gameScreen.showPicture($gameVariables.value(300), pictureName, 1, baseXPosition, randomYPosition, 100, 100, 150, 0);
-      if ($gameScreen.picture($gameVariables.value(300))) {
-        $gameScreen.movePicture($gameVariables.value(300), 1, baseXPosition, 384, 100, 100, 255, 0, randomMoveDuration);
-      }
+
+  const actorLearnedSkill65 = actor.isLearnedSkill(65);
+  const actorLearnedSkill69 = actor.isLearnedSkill(69);
+  for (let i = 0, len = stateChangeList.length; i < len; i++) {
+    const stateId = stateChangeList[i];
+    if (!actor.isStateAffected(stateId)) continue;
+
+    stateEffectCount++;
+
+    const randomYPosition = Math.floor(Math.random() * 51) + 384;
+    const randomMoveDuration = Math.floor(Math.random() * 61) + 40;
+    let skillModifier = 1;
+
+    if (actorLearnedSkill65) skillModifier++;
+    if (actorLearnedSkill69) skillModifier++;
+    let baseXPosition = 1024;
+
+    if ($dataStates[stateId].meta['TachieXline']) {
+      baseXPosition += Number($dataStates[stateId].meta['TachieXline']);
     }
-  }, this);
+
+    const pictureName = $dataStates[stateId].meta['TachieSet'] +
+      ($dataStates[stateId].meta['TachieActorSpecify'] ? actorId + '_' + skillModifier : "");
+    $gameScreen.showPicture($gameVariables.value(300), pictureName, 1, baseXPosition, randomYPosition, 100, 100, 150, 0);
+    
+    if ($gameScreen.picture($gameVariables.value(300))) {
+      $gameScreen.movePicture($gameVariables.value(300), 1, baseXPosition, 384, 100, 100, 255, 0, randomMoveDuration);
+    }
+  }
   
   if (stateEffectCount !== 1) {
     return;
