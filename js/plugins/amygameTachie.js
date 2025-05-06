@@ -832,7 +832,9 @@ tachie_syoukyo1 = function (id2) {
 tachie_hyouji1 = function (actorId) {
 
   $gameVariables.setValue(112, actorId);
-  $gameVariables.setValue(300, Number($dataActors[actorId].meta['tachiePicId']));
+  // Cache the tachie picture ID from the actor data
+  const tachiePicId = Number($dataActors[actorId].meta['tachiePicId']);
+  $gameVariables.setValue(300, tachiePicId);
 
   let stateEffectCount = 1;
   const actor = $gameActors.actor(actorId);
@@ -860,23 +862,23 @@ tachie_hyouji1 = function (actorId) {
 
     const pictureName = $dataStates[stateId].meta['TachieSet'] +
       ($dataStates[stateId].meta['TachieActorSpecify'] ? actorId + '_' + skillModifier : "");
-    $gameScreen.showPicture($gameVariables.value(300), pictureName, 1, baseXPosition, randomYPosition, 100, 100, 150, 0);
-    
-    if ($gameScreen.picture($gameVariables.value(300))) {
-      $gameScreen.movePicture($gameVariables.value(300), 1, baseXPosition, 384, 100, 100, 255, 0, randomMoveDuration);
+    $gameScreen.showPicture(tachiePicId, pictureName, 1, baseXPosition, randomYPosition, 100, 100, 150, 0);
+
+    if ($gameScreen.picture(tachiePicId)) {
+      $gameScreen.movePicture(tachiePicId, 1, baseXPosition, 384, 100, 100, 255, 0, randomMoveDuration);
     }
   }
-  
+
   if (stateEffectCount !== 1) {
     return;
   }
 
-  $gameSwitches.setValue(31, false);
-  $gameVariables.setValue(113, $gameVariables.value(120) * 9);
+  const standingPictureMag = $gameVariables.value(120);
+  $gameVariables.setValue(113, standingPictureMag * 9);
   $gameVariables.setValue(105, 1130); // x座標
   $gameVariables.setValue(106, $gameVariables.value(113)); // y座標60-700
-  $gameVariables.setValue(107, $gameVariables.value(120)); // x拡大率
-  $gameVariables.setValue(108, $gameVariables.value(120)); // y拡大率
+  $gameVariables.setValue(107, standingPictureMag); // x拡大率
+  $gameVariables.setValue(108, standingPictureMag); // y拡大率
   $gameVariables.setValue(109, 255); // 透過率
   $gameVariables.setValue(110, 40); // ウェイト
   $gameVariables.setValue(101, $gameVariables.value(105) + 100);
@@ -902,7 +904,7 @@ tachie_hyouji1 = function (actorId) {
       $gameVariables.setValue(105, $gameVariables.value(105) - 100);
       $gameVariables.setValue(106, $gameVariables.value(106) + 50);
       $gameVariables.setValue(102, $gameVariables.value(102) + 50);
-      $gameVariables.setValue(110, 20); // ウェイト
+      $gameVariables.setValue(110, 20);
     } else {
       const scaleValue = 100;
       $gameVariables.setValue(107, scaleValue); // 拡大率
@@ -931,7 +933,6 @@ tachie_hyouji1 = function (actorId) {
           ? Number($dataItems[$gameVariables.value(19)].meta['ClothSwitch'])
           : 0;
 
-        // Use the function to set the offsetAdjustment variable.
         const offsetAdjustment = getOffsetAdjustment(clothSwitchId);
         if (offsetAdjustment >= 1) { afterimageYOffset = -200; }
         if (offsetAdjustment <= -1) { afterimageYOffset = 200; }
@@ -1003,7 +1004,6 @@ tachie_hyouji1 = function (actorId) {
   if ($gameSwitches.value(30)) {
     tachie_aura();
   }
-
 };
 
 // Hat IDs: return 100
