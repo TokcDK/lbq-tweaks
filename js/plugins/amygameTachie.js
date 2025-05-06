@@ -789,7 +789,6 @@ tachie_naibusyori1 = function(args) {
   for (let i = 0; i < picCount; i++) {
     if (picData[i].char !== characterName) continue;
     
-    // Cache the current picData element in a local variable
     const pic = picData[i];
     
     // Initialize bitmap array if needed
