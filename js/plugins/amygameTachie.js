@@ -859,140 +859,143 @@ tachie_hyouji1 = function (actorId) {
       }
     }
   }, this);
-  if (stateEffectCount == 1) {
-    $gameSwitches.setValue(31, false);
-    $gameVariables.setValue(113, $gameVariables.value(120) * 9);
-    $gameVariables.setValue(105, 1130); // x座標
-    $gameVariables.setValue(106, $gameVariables.value(113)); // y座標60-700
-    $gameVariables.setValue(107, $gameVariables.value(120)); // x拡大率
-    $gameVariables.setValue(108, $gameVariables.value(120)); // y拡大率
-    $gameVariables.setValue(109, 255); // 透過率
-    $gameVariables.setValue(110, 40); // ウェイト
-    $gameVariables.setValue(101, $gameVariables.value(105) + 100);
-    $gameVariables.setValue(102, $gameVariables.value(106));
-    $gameVariables.setValue(103, $gameVariables.value(107));
-    $gameVariables.setValue(104, $gameVariables.value(108));
-    $gameVariables.setValue(149, 0); // 表示最初の透明度
-    let afterimageYOffset = 0; // 残像y軸。途中で数字を入れるためこれだけ先に実行
-    if ($gameSwitches.value(130)) {
-      $gameVariables.setValue(105, 1030); // x座標
-    }
-    if ($gameSwitches.value(200)) {
-      $gameVariables.setValue(105, 780); // x座標
-      if ($gameSwitches.value(150)) {
-        const scaleValue = 40;
-        $gameVariables.setValue(103, scaleValue); // x拡大率
-        $gameVariables.setValue(104, scaleValue); // y拡大率
-        $gameVariables.setValue(107, scaleValue); // x拡大率
-        $gameVariables.setValue(108, scaleValue); // y拡大率
-        $gameVariables.setValue(106, scaleValue * 9);
-        $gameVariables.setValue(102, scaleValue * 9);
-        $gameVariables.setValue(105, $gameVariables.value(105) - 100);
-        $gameVariables.setValue(106, $gameVariables.value(106) + 50);
-        $gameVariables.setValue(102, $gameVariables.value(102) + 50);
-        $gameVariables.setValue(110, 20); // ウェイト
-      } else {
-        const scaleValue = 100;
-        $gameVariables.setValue(107, scaleValue); // 拡大率
-        $gameVariables.setValue(108, scaleValue); // 拡大率
-        $gameVariables.setValue(103, scaleValue); // 拡大率
-        $gameVariables.setValue(104, scaleValue); // 拡大率
-        $gameVariables.setValue(105, $gameVariables.value(105) - 50);
-        $gameVariables.setValue(106, scaleValue * 9);
-        $gameVariables.setValue(102, scaleValue * 9);
-      }
-      $gameVariables.setValue(101, $gameVariables.value(105) - 50);
-    }
-    if ($gameSwitches.value(200)) {
-      if ($gameVariables.value(19) >= 1) {
-        if (!$dataItems[$gameVariables.value(19)].meta['TotalCloth']) {
-          $gameVariables.setValue(101, $gameVariables.value(105));
-        }
-      }
-      if ($gameVariables.value(19) == 0) {
-        $gameVariables.setValue(101, $gameVariables.value(105) + 50);
-        $gameVariables.setValue(102, $gameVariables.value(106));
-      } else {
-        if (!$gameSwitches.value(150)) {
-          $gameVariables.setValue(106, $gameVariables.value(106) - Number($dataActors[actorId].meta['TachiePoseYposition']));
-          const clothSwitchId = $dataItems[$gameVariables.value(19)].meta['ClothSwitch']
-            ? Number($dataItems[$gameVariables.value(19)].meta['ClothSwitch'])
-            : 0;
+  
+  if (stateEffectCount !== 1) {
+    return;
+  }
 
-          // Use the function to set the offsetAdjustment variable.
-          const offsetAdjustment = getOffsetAdjustment(clothSwitchId);
-          if (offsetAdjustment >= 1) { afterimageYOffset = -200; }
-          if (offsetAdjustment <= -1) { afterimageYOffset = 200; }
-          $gameVariables.setValue(106, $gameVariables.value(106) + offsetAdjustment);
-          if (!$gameVariables.value(111) == 0) { $gameVariables.setValue(102, $gameVariables.value(111)); }
-          if (!$gameVariables.value(111) == 0) { $gameVariables.setValue(110, 60); }
-          $gameVariables.setValue(111, $gameVariables.value(106));
-        } else {
-          // do nothing
-        }
-      }
+  $gameSwitches.setValue(31, false);
+  $gameVariables.setValue(113, $gameVariables.value(120) * 9);
+  $gameVariables.setValue(105, 1130); // x座標
+  $gameVariables.setValue(106, $gameVariables.value(113)); // y座標60-700
+  $gameVariables.setValue(107, $gameVariables.value(120)); // x拡大率
+  $gameVariables.setValue(108, $gameVariables.value(120)); // y拡大率
+  $gameVariables.setValue(109, 255); // 透過率
+  $gameVariables.setValue(110, 40); // ウェイト
+  $gameVariables.setValue(101, $gameVariables.value(105) + 100);
+  $gameVariables.setValue(102, $gameVariables.value(106));
+  $gameVariables.setValue(103, $gameVariables.value(107));
+  $gameVariables.setValue(104, $gameVariables.value(108));
+  $gameVariables.setValue(149, 0); // 表示最初の透明度
+  let afterimageYOffset = 0; // 残像y軸。途中で数字を入れるためこれだけ先に実行
+  if ($gameSwitches.value(130)) {
+    $gameVariables.setValue(105, 1030); // x座標
+  }
+  if ($gameSwitches.value(200)) {
+    $gameVariables.setValue(105, 780); // x座標
+    if ($gameSwitches.value(150)) {
+      const scaleValue = 40;
+      $gameVariables.setValue(103, scaleValue); // x拡大率
+      $gameVariables.setValue(104, scaleValue); // y拡大率
+      $gameVariables.setValue(107, scaleValue); // x拡大率
+      $gameVariables.setValue(108, scaleValue); // y拡大率
+      $gameVariables.setValue(106, scaleValue * 9);
+      $gameVariables.setValue(102, scaleValue * 9);
+      $gameVariables.setValue(105, $gameVariables.value(105) - 100);
+      $gameVariables.setValue(106, $gameVariables.value(106) + 50);
+      $gameVariables.setValue(102, $gameVariables.value(102) + 50);
+      $gameVariables.setValue(110, 20); // ウェイト
     } else {
-      $gameVariables.setValue(106, $gameVariables.value(106) - Number($dataActors[$gameVariables.value(112)].meta['TachiePoseYposition']));
+      const scaleValue = 100;
+      $gameVariables.setValue(107, scaleValue); // 拡大率
+      $gameVariables.setValue(108, scaleValue); // 拡大率
+      $gameVariables.setValue(103, scaleValue); // 拡大率
+      $gameVariables.setValue(104, scaleValue); // 拡大率
+      $gameVariables.setValue(105, $gameVariables.value(105) - 50);
+      $gameVariables.setValue(106, scaleValue * 9);
+      $gameVariables.setValue(102, scaleValue * 9);
+    }
+    $gameVariables.setValue(101, $gameVariables.value(105) - 50);
+  }
+  if ($gameSwitches.value(200)) {
+    if ($gameVariables.value(19) >= 1) {
+      if (!$dataItems[$gameVariables.value(19)].meta['TotalCloth']) {
+        $gameVariables.setValue(101, $gameVariables.value(105));
+      }
+    }
+    if ($gameVariables.value(19) == 0) {
+      $gameVariables.setValue(101, $gameVariables.value(105) + 50);
       $gameVariables.setValue(102, $gameVariables.value(106));
-    }
-    if ($gameSwitches.value(30)) {
-      $gameVariables.setValue(101, $gameVariables.value(105) + 100); // x軸始点
-      $gameVariables.setValue(110, 30); // ウェイト。※変化なし
-      if ($gameVariables.value(263) >= 2) {
-        $gameVariables.setValue(101, $gameVariables.value(105) - 100); // x軸始点
-        $gameVariables.setValue(110, 20); // ウェイト。※変化なし
+    } else {
+      if (!$gameSwitches.value(150)) {
+        $gameVariables.setValue(106, $gameVariables.value(106) - Number($dataActors[actorId].meta['TachiePoseYposition']));
+        const clothSwitchId = $dataItems[$gameVariables.value(19)].meta['ClothSwitch']
+          ? Number($dataItems[$gameVariables.value(19)].meta['ClothSwitch'])
+          : 0;
+
+        // Use the function to set the offsetAdjustment variable.
+        const offsetAdjustment = getOffsetAdjustment(clothSwitchId);
+        if (offsetAdjustment >= 1) { afterimageYOffset = -200; }
+        if (offsetAdjustment <= -1) { afterimageYOffset = 200; }
+        $gameVariables.setValue(106, $gameVariables.value(106) + offsetAdjustment);
+        if (!$gameVariables.value(111) == 0) { $gameVariables.setValue(102, $gameVariables.value(111)); }
+        if (!$gameVariables.value(111) == 0) { $gameVariables.setValue(110, 60); }
+        $gameVariables.setValue(111, $gameVariables.value(106));
+      } else {
+        // do nothing
       }
-      if ($gameSwitches.value(143)) {
-        $gameVariables.setValue(101, $gameVariables.value(105) - 50); // x軸始点
-        $gameVariables.setValue(110, 20); // ウェイト。※変化なし
-      }
-      $gameVariables.setValue(149, 50); // 表示最初の透明度
     }
-    let tachieIndex = parseInt($gameVariables.value(300), 10) || 0; // 立ち絵1か2か、それとも…
-    tachieIndex--; // データ上は0から
-    const CharList = $TKMvar.tachie.CharList;
-    //const MaxLayer = $TKMvar.tachie.MaxLayer;
-    const PicData = $TKMvar.tachie.PicData;
-    const pictureId = PicData[tachieIndex]["picNum"];
-    const characterName = PicData[tachieIndex]["char"];
-    const nameStr = "TKMtachie_" + characterName + "_";
-    //const partList = CharList[characterName];
-    //const picX = $TKMvar.tachie.PicData[tachieIndex]["x"];
-    //const picY = $TKMvar.tachie.PicData[tachieIndex]["y"];
-    const horizontalOffset = $gameVariables.value(101) >= $gameVariables.value(105) ? 200 : -200;
-    const effectOverlayOpacity = $gameSwitches.value(30) || $gameSwitches.value(200) ? 50 : 100;
-    picture_motion1("smooth", [0]);
-    $gameScreen.showPicture(pictureId, nameStr, 1,
-      $gameVariables.value(101), $gameVariables.value(102),
-      $gameVariables.value(103), $gameVariables.value(104), $gameVariables.value(149), 0);
-    if ($gameActors.actor(actorId).isStateAffected(602) && !$gameSwitches.value(150)) {
-      $gameScreen.showPicture(7, "/img/tachies/" + 'actor' + actorId + '_1_3', 1,
-        $gameVariables.value(101) + horizontalOffset, $gameVariables.value(102) + afterimageYOffset,
-        $gameVariables.value(103), $gameVariables.value(104), effectOverlayOpacity, 1);
+  } else {
+    $gameVariables.setValue(106, $gameVariables.value(106) - Number($dataActors[$gameVariables.value(112)].meta['TachiePoseYposition']));
+    $gameVariables.setValue(102, $gameVariables.value(106));
+  }
+  if ($gameSwitches.value(30)) {
+    $gameVariables.setValue(101, $gameVariables.value(105) + 100); // x軸始点
+    $gameVariables.setValue(110, 30); // ウェイト。※変化なし
+    if ($gameVariables.value(263) >= 2) {
+      $gameVariables.setValue(101, $gameVariables.value(105) - 100); // x軸始点
+      $gameVariables.setValue(110, 20); // ウェイト。※変化なし
     }
-    const basePictureId = pictureId;
-    if ($gameScreen.picture(basePictureId)) {
-      $gameScreen.movePicture(basePictureId, 1,
-        $gameVariables.value(105),
-        $gameVariables.value(106),
-        $gameVariables.value(107),
-        $gameVariables.value(108),
-        $gameVariables.value(109),
-        0, $gameVariables.value(110));
+    if ($gameSwitches.value(143)) {
+      $gameVariables.setValue(101, $gameVariables.value(105) - 50); // x軸始点
+      $gameVariables.setValue(110, 20); // ウェイト。※変化なし
     }
-    if ($gameScreen.picture(7)) {
-      $gameScreen.movePicture(7, 1,
-        $gameVariables.value(105),
-        $gameVariables.value(106),
-        $gameVariables.value(107),
-        $gameVariables.value(108),
-        0, 1, $gameVariables.value(110) + 20);
-    }
-    $gameVariables.setValue(20, actorId);
-    tachie_bless(basePictureId, 1);
-    if ($gameSwitches.value(30)) {
-      tachie_aura();
-    }
+    $gameVariables.setValue(149, 50); // 表示最初の透明度
+  }
+  let tachieIndex = parseInt($gameVariables.value(300), 10) || 0; // 立ち絵1か2か、それとも…
+  tachieIndex--; // データ上は0から
+  const CharList = $TKMvar.tachie.CharList;
+  //const MaxLayer = $TKMvar.tachie.MaxLayer;
+  const PicData = $TKMvar.tachie.PicData;
+  const pictureId = PicData[tachieIndex]["picNum"];
+  const characterName = PicData[tachieIndex]["char"];
+  const nameStr = "TKMtachie_" + characterName + "_";
+  //const partList = CharList[characterName];
+  //const picX = $TKMvar.tachie.PicData[tachieIndex]["x"];
+  //const picY = $TKMvar.tachie.PicData[tachieIndex]["y"];
+  const horizontalOffset = $gameVariables.value(101) >= $gameVariables.value(105) ? 200 : -200;
+  const effectOverlayOpacity = $gameSwitches.value(30) || $gameSwitches.value(200) ? 50 : 100;
+  picture_motion1("smooth", [0]);
+  $gameScreen.showPicture(pictureId, nameStr, 1,
+    $gameVariables.value(101), $gameVariables.value(102),
+    $gameVariables.value(103), $gameVariables.value(104), $gameVariables.value(149), 0);
+  if ($gameActors.actor(actorId).isStateAffected(602) && !$gameSwitches.value(150)) {
+    $gameScreen.showPicture(7, "/img/tachies/" + 'actor' + actorId + '_1_3', 1,
+      $gameVariables.value(101) + horizontalOffset, $gameVariables.value(102) + afterimageYOffset,
+      $gameVariables.value(103), $gameVariables.value(104), effectOverlayOpacity, 1);
+  }
+  const basePictureId = pictureId;
+  if ($gameScreen.picture(basePictureId)) {
+    $gameScreen.movePicture(basePictureId, 1,
+      $gameVariables.value(105),
+      $gameVariables.value(106),
+      $gameVariables.value(107),
+      $gameVariables.value(108),
+      $gameVariables.value(109),
+      0, $gameVariables.value(110));
+  }
+  if ($gameScreen.picture(7)) {
+    $gameScreen.movePicture(7, 1,
+      $gameVariables.value(105),
+      $gameVariables.value(106),
+      $gameVariables.value(107),
+      $gameVariables.value(108),
+      0, 1, $gameVariables.value(110) + 20);
+  }
+  $gameVariables.setValue(20, actorId);
+  tachie_bless(basePictureId, 1);
+  if ($gameSwitches.value(30)) {
+    tachie_aura();
   }
 
 };
