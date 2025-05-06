@@ -885,8 +885,8 @@ tachie_hyouji1 = function (actorId) {
         $gameVariables.setValue(104, scaleValue); // y拡大率
         $gameVariables.setValue(107, scaleValue); // x拡大率
         $gameVariables.setValue(108, scaleValue); // y拡大率
-        $gameVariables.setValue(106, $gameVariables.value(107) * 9);
-        $gameVariables.setValue(102, $gameVariables.value(107) * 9);
+        $gameVariables.setValue(106, scaleValue * 9);
+        $gameVariables.setValue(102, scaleValue * 9);
         $gameVariables.setValue(105, $gameVariables.value(105) - 100);
         $gameVariables.setValue(106, $gameVariables.value(106) + 50);
         $gameVariables.setValue(102, $gameVariables.value(102) + 50);
@@ -898,8 +898,8 @@ tachie_hyouji1 = function (actorId) {
         $gameVariables.setValue(103, scaleValue); // 拡大率
         $gameVariables.setValue(104, scaleValue); // 拡大率
         $gameVariables.setValue(105, $gameVariables.value(105) - 50);
-        $gameVariables.setValue(106, $gameVariables.value(107) * 9);
-        $gameVariables.setValue(102, $gameVariables.value(107) * 9);
+        $gameVariables.setValue(106, scaleValue * 9);
+        $gameVariables.setValue(102, scaleValue * 9);
       }
       $gameVariables.setValue(101, $gameVariables.value(105) - 50);
     }
