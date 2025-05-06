@@ -667,96 +667,107 @@ tachie_switchOnOff();
 //☆☆立ち絵内部処理。本体
 tachie_naibusyori2 = function(){
 
-$gameVariables.setValue(118,'actor' + $gameVariables.value(20));//戦闘用立ち絵がある場合はここを改修
-if($gameSwitches.value(90)){
-  $gameVariables.setValue(117,$gameVariables.value(300));
-} else {
-  $gameVariables.setValue(117,Number($dataActors[$gameVariables.value(20)].meta['tachiePicId']));
-};
-if($gameSwitches.value(20)){
-  var start = 1; var end = 40;
-  for (var j = start; j <= end; j++) {
-    if ($gameVariables.value(j+460) >= 0){
-      var args = new Array(String($gameVariables.value(118)),String(j),String($gameVariables.value(j+460)));
+  $gameVariables.setValue(118, 'actor' + $gameVariables.value(20)); //戦闘用立ち絵がある場合はここを改修
+  if ($gameSwitches.value(90)) {
+    $gameVariables.setValue(117, $gameVariables.value(300));
+  } else {
+    $gameVariables.setValue(117, Number($dataActors[$gameVariables.value(20)].meta['tachiePicId']));
+  }
+  if ($gameSwitches.value(20)) {
+    const start = 1, end = 40;
+    for (let j = start; j <= end; j++) {
+      if ($gameVariables.value(j + 460) >= 0) {
+        const args = new Array(String($gameVariables.value(118)), String(j), String($gameVariables.value(j + 460)));
+        tachie_naibusyori1(args);
+      }
+    }
+    let tachieNum = parseInt($gameVariables.value(117), 10) || 0; // 立ち絵1か2か、それとも…
+    tachieNum--; // データ上は0から
+    //console.log(tachieNum);
+    if (tachieNum !== -1) {
+      if ($TKMvar.tachie.PicData.length > tachieNum) {
+        $gameScreen.erasePicture($TKMvar.tachie.PicData[tachieNum]["picNum"]);
+        // $TKMvar.tachie.PicData[tachieNum]["char"] = "";
+      }
+    }
+    const charName = $gameVariables.value(118);
+    // 取得
+    const CharList = $TKMvar.tachie.CharList;
+    const MaxLayer = $TKMvar.tachie.MaxLayer;
+    CharList[charName] = []; // 新しいキャラのパーツ番号の配列を作る
+    for (let i = 0; i < MaxLayer; i++) {
+      CharList[charName][i] = 0; // すべてのパーツのデフォルト値は0
+    }
+  }
+  if ($gameActors.actor($gameVariables.value(20)).isStateAffected(19)) {
+    tachie_clear($gameVariables.value(117));
+    const start = 1, end = 40;
+    for (let j = start; j <= end; j++) {
+      const args = new Array(String($gameVariables.value(118)), String(j), "0");
       tachie_naibusyori1(args);
-  }};
-  var tachieNum = parseInt($gameVariables.value(117), 10) || 0; // 立ち絵1か2か、それとも…
-  tachieNum--; // データ上は0から
-  //console.log(tachieNum);
-  if(tachieNum === -1) {}else{
-    if($TKMvar.tachie.PicData.length <= tachieNum) {}else{
-      $gameScreen.erasePicture($TKMvar.tachie.PicData[tachieNum]["picNum"]);
-      // $TKMvar.tachie.PicData[tachieNum]["char"] = "";
-  }};
-  var charName = $gameVariables.value(118);
-  // 取得
-  var CharList = $TKMvar.tachie.CharList;
-  var MaxLayer = $TKMvar.tachie.MaxLayer;
-  CharList[charName] = []; // 新しいキャラのパーツ番号の配列を作る
-  for(var i = 0; i < MaxLayer; i++) {
-    CharList[charName][i] = 0; // すべてのパーツのデフォルト値は0
-  };
-};
-if($gameActors.actor($gameVariables.value(20)).isStateAffected(19)){
-  tachie_clear($gameVariables.value(117));
-  var start = 1; var end = 40;
-  for (var j = start; j <= end; j++) {
-    var args = new Array(String($gameVariables.value(118)),String(j),"0");
-    tachie_naibusyori1(args);
-  };
-} else {
-  var start = 1; var end = 40;
-  for (var j = start; j <= end; j++) {
-    var args = new Array(String($gameVariables.value(118)),String(j),String($gameVariables.value(j+460)));
-    tachie_naibusyori1(args);
-  };
-};
-var args = new Array(String($gameVariables.value(117)),String($gameVariables.value(118)));
-var tachieNum = parseInt(args[0], 10) || 0; // 立ち絵1か2か、それとも…
-tachieNum--; // データ上は0から
-if(tachieNum === -1) {}else{
-  // 取得
-  var CharList = $TKMvar.tachie.CharList;
-  var MaxLayer = $TKMvar.tachie.MaxLayer;
-  var PicData = $TKMvar.tachie.PicData;
-  if($TKMvar.tachie.PicData[tachieNum]["char"] === args[1]) {}else{ // キャラが同じなら変更する必要ない
-    if( args[1] in CharList ) {
-      if(PicData.length > tachieNum) {
-        PicData[tachieNum]["char"] = args[1];
-        PicData[tachieNum]["bitmap"] = null;
-        PicData[tachieNum]["bitmap"] = [];
-        // preload bitmap
-/*
-var partList= $TKMvar.tachie.CharList[args[1]];
-for(var i = 0; i < $TKMvar.tachie.MaxLayer; i++) {
-if(partList[i] === 0) {
-$TKMvar.tachie.PicData[tachieNum]["bitmap"][i] = null;
-continue;
-}
-else {
-$TKMvar.tachie.PicData[tachieNum]["bitmap"][i] = ImageManager.loadPicture("/img/tachies/" + args[1] + "_" + $TKMvar.tachie.partsNameArr[i] + "_" + partList[i], 0);
-}
-}*/
-$TKMvar.tachie.preloadBitmap(tachieNum);
-}};
-}};
-var tachieNum = parseInt($gameVariables.value(117), 10) || 0; // 立ち絵1か2か、それとも…
-tachieNum--; // データ上は0から
-if(tachieNum === -1) {}else{
-  if($TKMvar.tachie.PicData.length <= tachieNum) {}else{
-    if(!$TKMvar.tachie.PicData[tachieNum]["char"]) {}else{
-      var CharList = $TKMvar.tachie.CharList;
-      var MaxLayer = $TKMvar.tachie.MaxLayer;
-      var PicData = $TKMvar.tachie.PicData;
-      var pictureId = PicData[tachieNum]["picNum"];
-      var char = PicData[tachieNum]["char"];
-      var name = "TKMtachie_" + char + "_";
-      var partList = CharList[char];
-      var x = $TKMvar.tachie.PicData[tachieNum]["x"];
-      var y = $TKMvar.tachie.PicData[tachieNum]["y"];
-      $gameScreen.showPicture(pictureId, name, 0, x, y, 85, 85, 0, 0);
-}}};
-
+    }
+  } else {
+    const start = 1, end = 40;
+    for (let j = start; j <= end; j++) {
+      const args = new Array(String($gameVariables.value(118)), String(j), String($gameVariables.value(j + 460)));
+      tachie_naibusyori1(args);
+    }
+  }
+  {
+    const args = new Array(String($gameVariables.value(117)), String($gameVariables.value(118)));
+    let tachieNum = parseInt(args[0], 10) || 0; // 立ち絵1か2か、それとも…
+    tachieNum--; // データ上は0から
+    if (tachieNum !== -1) {
+      // 取得
+      const CharList = $TKMvar.tachie.CharList;
+      const MaxLayer = $TKMvar.tachie.MaxLayer;
+      const PicData = $TKMvar.tachie.PicData;
+      if ($TKMvar.tachie.PicData[tachieNum]["char"] !== args[1]) { // キャラが同じなら変更する必要ない
+        if (args[1] in CharList) {
+          if (PicData.length > tachieNum) {
+            PicData[tachieNum]["char"] = args[1];
+            PicData[tachieNum]["bitmap"] = null;
+            PicData[tachieNum]["bitmap"] = [];
+            // preload bitmap
+            /*
+            var partList= $TKMvar.tachie.CharList[args[1]];
+            for(var i = 0; i < $TKMvar.tachie.MaxLayer; i++) {
+              if(partList[i] === 0) {
+                $TKMvar.tachie.PicData[tachieNum]["bitmap"][i] = null;
+                continue;
+              }
+              else {
+                $TKMvar.tachie.PicData[tachieNum]["bitmap"][i] = ImageManager.loadPicture("/img/tachies/" + args[1] + "_" + $TKMvar.tachie.partsNameArr[i] + "_" + partList[i], 0);
+              }
+            }
+            */
+            const partList = $TKMvar.tachie.CharList[args[1]];
+            $TKMvar.tachie.preloadBitmap(tachieNum);
+          }
+        }
+      }
+    }
+  }
+  {
+    let tachieNum = parseInt($gameVariables.value(117), 10) || 0; // 立ち絵1か2か、それとも…
+    tachieNum--; // データ上は0から
+    if (tachieNum !== -1) {
+      if ($TKMvar.tachie.PicData.length > tachieNum) {
+        if ($TKMvar.tachie.PicData[tachieNum]["char"]) {
+          const CharList = $TKMvar.tachie.CharList;
+          const MaxLayer = $TKMvar.tachie.MaxLayer;
+          const PicData = $TKMvar.tachie.PicData;
+          const pictureId = PicData[tachieNum]["picNum"];
+          const char = PicData[tachieNum]["char"];
+          const name = "TKMtachie_" + char + "_";
+          const partList = CharList[char];
+          const x = $TKMvar.tachie.PicData[tachieNum]["x"];
+          const y = $TKMvar.tachie.PicData[tachieNum]["y"];
+          $gameScreen.showPicture(pictureId, name, 0, x, y, 85, 85, 0, 0);
+        }
+      }
+    }
+  }
 };
 
 //☆☆立ち絵内部処理CP一つずつ
