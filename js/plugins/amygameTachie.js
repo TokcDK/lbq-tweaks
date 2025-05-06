@@ -665,73 +665,70 @@ tachie_switchOnOff();
 };
 
 //☆☆立ち絵内部処理。本体
-tachie_naibusyori2 = function(){
-
-  $gameVariables.setValue(118, 'actor' + $gameVariables.value(20)); //戦闘用立ち絵がある場合はここを改修
-  if ($gameSwitches.value(90)) {
-    $gameVariables.setValue(117, $gameVariables.value(300));
-  } else {
-    $gameVariables.setValue(117, Number($dataActors[$gameVariables.value(20)].meta['tachiePicId']));
-  }
+tachie_naibusyori2 = function() {
+  // Cache frequently used variables
+  const actorId = $gameVariables.value(20);
+  const actorCharName = 'actor' + actorId;
+  
+  // Set character name for standing image
+  $gameVariables.setValue(118, actorCharName);
+  
+  // Determine the picture ID to use
+  const picId = $gameSwitches.value(90) 
+    ? $gameVariables.value(300) 
+    : Number($dataActors[actorId].meta['tachiePicId']);
+  $gameVariables.setValue(117, picId);
+  
+  // Calculate the zero-based tachie number
+  const tachieIndex = Math.max(-1, picId - 1);
+  
+  // Get references to avoid repeated lookups
+  const tachieData = $TKMvar.tachie;
+  const charList = tachieData.CharList;
+  const picData = tachieData.PicData;
+  
+  // Initialize character parts if switch 20 is ON
   if ($gameSwitches.value(20)) {
+    // Process each clothing part
     runTachieLoop(1, 40, j => $gameVariables.value(j + 460), j => $gameVariables.value(j + 460) >= 0);
-    let tachieNum = parseInt($gameVariables.value(117), 10) || 0; // 立ち絵1か2か、それとも…
-    tachieNum--; // データ上は0から
-    if (tachieNum !== -1) {
-      if ($TKMvar.tachie.PicData.length > tachieNum) {
-        $gameScreen.erasePicture($TKMvar.tachie.PicData[tachieNum]["picNum"]);
-      }
+    
+    // Clear previous picture if it exists
+    if (tachieIndex !== -1 && tachieIndex < picData.length) {
+      $gameScreen.erasePicture(picData[tachieIndex].picNum);
     }
-    const charName = $gameVariables.value(118);
-    // 取得
-    const CharList = $TKMvar.tachie.CharList;
-    const MaxLayer = $TKMvar.tachie.MaxLayer;
-    CharList[charName] = []; // 新しいキャラのパーツ番号の配列を作る
-    for (let i = 0; i < MaxLayer; i++) {
-      CharList[charName][i] = 0; // すべてのパーツのデフォルト値は0
-    }
+    
+    // Initialize character parts array
+    charList[actorCharName] = Array(tachieData.MaxLayer).fill(0);
   }
-  if ($gameActors.actor($gameVariables.value(20)).isStateAffected(19)) {
-    tachie_clear($gameVariables.value(117));
+  
+  // Handle state 19 (clear standing picture)
+  if ($gameActors.actor(actorId).isStateAffected(19)) {
+    tachie_clear(picId);
     runTachieLoop(1, 40, () => "0");
   } else {
+    // Normal case: apply clothing parts
     runTachieLoop(1, 40, j => $gameVariables.value(j + 460));
   }
-  {
-    const args = new Array(String($gameVariables.value(117)), String($gameVariables.value(118)));
-    let tachieNum = parseInt(args[0], 10) || 0; // 立ち絵1か2か、それとも…
-    tachieNum--; // データ上は0から
-    if (tachieNum !== -1) {
-      // 取得
-      const CharList = $TKMvar.tachie.CharList;
-      const PicData = $TKMvar.tachie.PicData;
-      if ($TKMvar.tachie.PicData[tachieNum]["char"] !== args[1]) {// キャラが同じなら変更する必要ない
-        if (args[1] in CharList) {
-          if (PicData.length > tachieNum) {
-            PicData[tachieNum]["char"] = args[1];
-            PicData[tachieNum]["bitmap"] = null;
-            PicData[tachieNum]["bitmap"] = [];
-            $TKMvar.tachie.preloadBitmap(tachieNum);
-          }
-        }
-      }
+  
+  // Check if we need to change the character's standing image
+  if (tachieIndex !== -1) {
+    // Update character data if different from current
+    const currentChar = tachieIndex < picData.length ? picData[tachieIndex].char : null;
+    
+    if (currentChar !== actorCharName && actorCharName in charList && tachieIndex < picData.length) {
+      picData[tachieIndex].char = actorCharName;
+      picData[tachieIndex].bitmap = [];
+      tachieData.preloadBitmap(tachieIndex);
     }
-  }
-  {
-    let tachieNum = parseInt($gameVariables.value(117), 10) || 0; // 立ち絵1か2か、それとも…
-    tachieNum--; // データ上は0から
-    if (tachieNum !== -1) {
-      if ($TKMvar.tachie.PicData.length > tachieNum) {
-        if ($TKMvar.tachie.PicData[tachieNum]["char"]) {
-          const PicData = $TKMvar.tachie.PicData;
-          const pictureId = PicData[tachieNum]["picNum"];
-          const char = PicData[tachieNum]["char"];
-          const name = "TKMtachie_" + char + "_";
-          const x = $TKMvar.tachie.PicData[tachieNum]["x"];
-          const y = $TKMvar.tachie.PicData[tachieNum]["y"];
-          $gameScreen.showPicture(pictureId, name, 0, x, y, 85, 85, 0, 0);
-        }
-      }
+    
+    // Show the standing picture if it exists
+    if (tachieIndex < picData.length && picData[tachieIndex].char) {
+      const pictureId = picData[tachieIndex].picNum;
+      const name = "TKMtachie_" + picData[tachieIndex].char + "_";
+      const x = picData[tachieIndex].x;
+      const y = picData[tachieIndex].y;
+      
+      $gameScreen.showPicture(pictureId, name, 0, x, y, 85, 85, 0, 0);
     }
   }
 };
