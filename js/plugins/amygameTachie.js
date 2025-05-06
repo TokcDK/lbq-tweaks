@@ -748,47 +748,62 @@ function runTachieLoop(start, end, getThirdArg, condition = () => true) {
 }
 
 //☆☆立ち絵内部処理CP一つずつ
-tachie_naibusyori1 = function(args){
-  if (!(args[0] in $TKMvar.tachie.CharList)) {
-    // そんなキャラ名が登録されなかったら無視する
-  } else {
-    const CharList = $TKMvar.tachie.CharList;
-    const MaxLayer = $TKMvar.tachie.MaxLayer;
-    const PicData = $TKMvar.tachie.PicData;
-    // パーツの名前に対応するレイヤーを探す
-    let layerNum = -1;
-    for (let i = 0; i < MaxLayer; i++) {
-      if ($TKMvar.tachie.partsNameArr[i] === args[1]) {
-        layerNum = i;
-        break;
-      }
+/**
+ * Handles internal processing for character parts in the tachie (standing image) system.
+ * Updates a specific part of a character's standing image and manages its bitmap resources.
+ * @param {Array} args - [characterName, partName, partNumber]
+ */
+tachie_naibusyori1 = function(args) {
+  // Extract parameters for clarity
+  const characterName = args[0];
+  const partName = args[1];
+  const partNumber = parseInt(args[2], 10) || 0;
+  
+  // Early exit if character doesn't exist
+  if (!(characterName in $TKMvar.tachie.CharList)) {
+    return;
+  }
+  
+  // Cache frequently accessed objects
+  const tachie = $TKMvar.tachie;
+  const charList = tachie.CharList;
+  const partsNameArr = tachie.partsNameArr;
+  const picData = tachie.PicData;
+  
+  // Find the layer corresponding to this part name
+  const layerNum = partsNameArr.indexOf(partName);
+  if (layerNum === -1) {
+    return; // Part name not found in layers
+  }
+  
+  // Skip if the part is already set to the requested number
+  if (charList[characterName][layerNum] === partNumber) {
+    return;
+  }
+  
+  // Update the character part in the list
+  charList[characterName][layerNum] = partNumber;
+  
+  // Update the bitmap cache for each picture using this character
+  for (let i = 0; i < picData.length; i++) {
+    if (picData[i].char !== characterName) continue;
+    
+    // Initialize bitmap array if needed
+    if (!picData[i].bitmap) {
+      tachie.preloadBitmap(i);
     }
-    if (layerNum === -1) {
-      // そんなレイヤー名がなかったら無視する
+    
+    // Set or clear the bitmap
+    if (partNumber === 0) {
+      picData[i].bitmap[layerNum] = null;
     } else {
-      const partNum = parseInt(args[2], 10) || 0;
-      if (CharList[args[0]][layerNum] === partNum) {
-        // パーツが同じなら変更する必要ない
-      } else {
-        CharList[args[0]][layerNum] = partNum;
-   
-        // ついでにそのパーツのbitmapをキャッシュしよう
-        for (let i = 0; i < PicData.length; i++) {
-          if (PicData[i]["char"] == args[0]) {
-            // bitmap [] の存在確認
-            if (!PicData[i]["bitmap"]) $TKMvar.tachie.preloadBitmap(i);
-            if (partNum === 0) {
-              PicData[i]["bitmap"][layerNum] = null;
-            } else {
-              PicData[i]["bitmap"][layerNum] =
-                ImageManager.loadPicture("/img/tachies/" + args[0] + "_" + $TKMvar.tachie.partsNameArr[layerNum] + "_" + partNum, 0);
-            }
-            if (partNum >= 1) {
-              Galv.CACHE.load('tachies', args[0] + "_" + $TKMvar.tachie.partsNameArr[layerNum] + "_" + partNum);
-            }
-          }
-        }
-      }
+      const imagePath = characterName + "_" + partsNameArr[layerNum] + "_" + partNumber;
+      
+      // Load the image into bitmap cache
+      picData[i].bitmap[layerNum] = ImageManager.loadPicture("/img/tachies/" + imagePath, 0);
+      
+      // Pre-cache in Galv's cache system
+      Galv.CACHE.load('tachies', imagePath);
     }
   }
 };
