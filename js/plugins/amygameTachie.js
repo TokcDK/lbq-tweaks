@@ -940,13 +940,9 @@ tachie_hyouji1 = function (actorId) {
           let clothSwitchId = $dataItems[$gameVariables.value(19)].meta['ClothSwitch']
             ? Number($dataItems[$gameVariables.value(19)].meta['ClothSwitch'])
             : 0;
-          let offsetAdjustment = 0;
-          if ([4, 31, 32, 35, 36].some(function (id) { return clothSwitchId == id; })) { offsetAdjustment = 100; } // 帽子
-          if ([28, 29].some(function (id) { return clothSwitchId == id; })) { offsetAdjustment = -100; } // コート、首輪
-          if ([11].some(function (id) { return clothSwitchId == id; })) { offsetAdjustment = -200; } // 乳首
-          if ([17, 21, 23, 24, 25, 26].some(function (id) { return clothSwitchId == id; })) { offsetAdjustment = -300; } // 腕
-          if ([7, 14, 20, 22].some(function (id) { return clothSwitchId == id; })) { offsetAdjustment = -500; } // 服下
-          if ([18, 27].some(function (id) { return clothSwitchId == id; })) { offsetAdjustment = -1000; } // 靴
+
+          // Use the function to set the offsetAdjustment variable.
+          let offsetAdjustment = getOffsetAdjustment(clothSwitchId);
           if (offsetAdjustment >= 1) { afterimageYOffset = -200; }
           if (offsetAdjustment <= -1) { afterimageYOffset = 200; }
           $gameVariables.setValue(106, $gameVariables.value(106) + offsetAdjustment);
@@ -1036,6 +1032,29 @@ tachie_hyouji1 = function (actorId) {
   }
 
 };
+
+// Hat IDs: return 100
+const hatSlotsSet = new Set([4, 31, 32, 35, 36]);
+// Coat/Collar IDs: return -100
+const coatSlotsSet = new Set([28, 29]);
+// Nipple IDs: return -200
+const nippleSlotsSet = new Set([11]);
+// Arm IDs: return -300
+const armsSlotsSet = new Set([17, 21, 23, 24, 25, 26]);
+// Underwear IDs (lower clothing): return -500
+const underwearSlotsSet = new Set([7, 14, 20, 22]);
+// Shoe IDs: return -1000
+const shoesSlotsSet = new Set([18, 27]);
+function getOffsetAdjustment(clothSwitchId) {
+
+  if (hatSlotsSet.has(clothSwitchId)) return 100;
+  if (coatSlotsSet.has(clothSwitchId)) return -100;
+  if (nippleSlotsSet.has(clothSwitchId)) return -200;
+  if (armsSlotsSet.has(clothSwitchId)) return -300;
+  if (underwearSlotsSet.has(clothSwitchId)) return -500;
+  if (shoesSlotsSet.has(clothSwitchId)) return -1000;
+  return 0;
+}
 
 //☆☆立ち絵設定
 const getRandomElement = (arr) => arr[Math.floor(Math.random() * arr.length)];
