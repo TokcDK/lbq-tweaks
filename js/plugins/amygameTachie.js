@@ -850,12 +850,12 @@ tachie_hyouji1GetSlotMod = function(value1){
 }
 
 //☆☆立ち絵表示
-tachie_hyouji1 = function (id3) {
+tachie_hyouji1 = function (actorId) {
 
-  $gameVariables.setValue(112, id3);
-  $gameVariables.setValue(300, Number($dataActors[$gameVariables.value(112)].meta['tachiePicId']));
+  $gameVariables.setValue(112, actorId);
+  $gameVariables.setValue(300, Number($dataActors[actorId].meta['tachiePicId']));
   let value5 = 1;
-  const actor = $gameActors.actor($gameVariables.value(112));
+  const actor = $gameActors.actor(actorId);
   const list = valueTachieChangeState;
   list.forEach(function (id1) {
     if (actor.isStateAffected(id1)) {
@@ -871,7 +871,7 @@ tachie_hyouji1 = function (id3) {
       }
       let name;
       if ($dataStates[id1].meta['TachieActorSpecify']) {
-        name = $dataStates[id1].meta['TachieSet'] + $gameVariables.value(112) + '_' + value4;
+        name = $dataStates[id1].meta['TachieSet'] + actorId + '_' + value4;
       } else {
         name = $dataStates[id1].meta['TachieSet'];
       }
@@ -936,7 +936,7 @@ tachie_hyouji1 = function (id3) {
         $gameVariables.setValue(102, $gameVariables.value(106));
       } else {
         if (!$gameSwitches.value(150)) {
-          $gameVariables.setValue(106, $gameVariables.value(106) - Number($dataActors[$gameVariables.value(112)].meta['TachiePoseYposition']));
+          $gameVariables.setValue(106, $gameVariables.value(106) - Number($dataActors[actorId].meta['TachiePoseYposition']));
           let value1 = $dataItems[$gameVariables.value(19)].meta['ClothSwitch']
             ? Number($dataItems[$gameVariables.value(19)].meta['ClothSwitch'])
             : 0;
@@ -1005,8 +1005,8 @@ tachie_hyouji1 = function (id3) {
     $gameScreen.showPicture(pictureId, nameStr, 1,
       $gameVariables.value(101), $gameVariables.value(102),
       $gameVariables.value(103), $gameVariables.value(104), $gameVariables.value(149), 0);
-    if ($gameActors.actor($gameVariables.value(112)).isStateAffected(602) && !$gameSwitches.value(150)) {
-      $gameScreen.showPicture(7, "/img/tachies/" + 'actor' + $gameVariables.value(112) + '_1_3', 1,
+    if ($gameActors.actor(actorId).isStateAffected(602) && !$gameSwitches.value(150)) {
+      $gameScreen.showPicture(7, "/img/tachies/" + 'actor' + actorId + '_1_3', 1,
         $gameVariables.value(101) + value31, $gameVariables.value(102) + value32,
         $gameVariables.value(103), $gameVariables.value(104), value33, 1);
     }
@@ -1028,7 +1028,7 @@ tachie_hyouji1 = function (id3) {
         $gameVariables.value(108),
         0, 1, $gameVariables.value(110) + 20);
     }
-    $gameVariables.setValue(20, $gameVariables.value(112));
+    $gameVariables.setValue(20, actorId);
     tachie_bless(value1, 1);
     if ($gameSwitches.value(30)) {
       tachie_aura();
