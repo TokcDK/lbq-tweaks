@@ -788,7 +788,7 @@ tachie_naibusyori1 = function(args) {
   const picCount = picData.length;
   for (let i = 0; i < picCount; i++) {
     if (picData[i].char !== characterName) continue;
-    
+
     const pic = picData[i];
     
     // Initialize bitmap array if needed
@@ -812,21 +812,20 @@ tachie_naibusyori1 = function(args) {
 };
 
 //☆☆立ち絵消去
-tachie_syoukyo1 = function(id2){
+tachie_syoukyo1 = function (id2) {
 
-if($gameScreen.picture(id2)){
-  pic_eraseP(0,[id2]);
-};
-if($gameScreen.picture(7)){
-  UTSU.PictureBreath.off([7]);
-  $gameScreen.erasePicture(7);
-};
-if($gameScreen.picture(45)){
-  UTSU.PictureBreath.off([45]);
-  $gameScreen.erasePicture(45);
-};
-$gameSwitches.setValue(31,true);
-//$gameVariables.setValue(300,0);
+  if ($gameScreen.picture(id2)) {
+    pic_eraseP(0, [id2]);
+  };
+  if ($gameScreen.picture(7)) {
+    UTSU.PictureBreath.off([7]);
+    $gameScreen.erasePicture(7);
+  };
+  if ($gameScreen.picture(45)) {
+    UTSU.PictureBreath.off([45]);
+    $gameScreen.erasePicture(45);
+  };
+  $gameSwitches.setValue(31, true);
 };
 
 // using in tachie_hyouji1
