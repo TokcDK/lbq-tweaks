@@ -749,39 +749,48 @@ function runTachieLoop(start, end, getThirdArg, condition = () => true) {
 
 //☆☆立ち絵内部処理CP一つずつ
 tachie_naibusyori1 = function(args){
-if( !(args[0] in $TKMvar.tachie.CharList) ) {}else{ // そんなキャラ名が登録されなかったら無視する
-  var CharList = $TKMvar.tachie.CharList;
-  var MaxLayer = $TKMvar.tachie.MaxLayer;
-  var PicData = $TKMvar.tachie.PicData;
-// パーツの名前に対応するレイヤーを探す
-  var layerNum = -1;
-    for(var i = 0; i < MaxLayer; i++) {
-      if($TKMvar.tachie.partsNameArr[i] === args[1]) {
-        layerNum = i; 
-      break;
-      };
-    };
-  if(layerNum === -1)  {}else{  // そんなレイヤー名がなかったら無視する
-
-    var partNum = parseInt(args[2], 10) || 0;
-      if(CharList[args[0]][layerNum] === partNum) {}else{ // パーツが同じなら変更する必要ない
+  if (!(args[0] in $TKMvar.tachie.CharList)) {
+    // そんなキャラ名が登録されなかったら無視する
+  } else {
+    const CharList = $TKMvar.tachie.CharList;
+    const MaxLayer = $TKMvar.tachie.MaxLayer;
+    const PicData = $TKMvar.tachie.PicData;
+    // パーツの名前に対応するレイヤーを探す
+    let layerNum = -1;
+    for (let i = 0; i < MaxLayer; i++) {
+      if ($TKMvar.tachie.partsNameArr[i] === args[1]) {
+        layerNum = i;
+        break;
+      }
+    }
+    if (layerNum === -1) {
+      // そんなレイヤー名がなかったら無視する
+    } else {
+      const partNum = parseInt(args[2], 10) || 0;
+      if (CharList[args[0]][layerNum] === partNum) {
+        // パーツが同じなら変更する必要ない
+      } else {
         CharList[args[0]][layerNum] = partNum;
    
-// ついでにそのパーツのbitmapをキャッシュしよう
-        for(var i = 0; i < PicData.length; i++) {
-          if(PicData[i]["char"] == args[0]) {
-// bitmap [] の存在確認
-          if(!PicData[i]["bitmap"]) $TKMvar.tachie.preloadBitmap(i);
-            if(partNum === 0) PicData[i]["bitmap"][layerNum] = null;
-              else PicData[i]["bitmap"][layerNum] = 
+        // ついでにそのパーツのbitmapをキャッシュしよう
+        for (let i = 0; i < PicData.length; i++) {
+          if (PicData[i]["char"] == args[0]) {
+            // bitmap [] の存在確認
+            if (!PicData[i]["bitmap"]) $TKMvar.tachie.preloadBitmap(i);
+            if (partNum === 0) {
+              PicData[i]["bitmap"][layerNum] = null;
+            } else {
+              PicData[i]["bitmap"][layerNum] =
                 ImageManager.loadPicture("/img/tachies/" + args[0] + "_" + $TKMvar.tachie.partsNameArr[layerNum] + "_" + partNum, 0);
-                  if(partNum >= 1){
-                    Galv.CACHE.load('tachies',args[0] + "_" + $TKMvar.tachie.partsNameArr[layerNum] + "_" + partNum);
-                  };
-            };
-          };
-}}};
-
+            }
+            if (partNum >= 1) {
+              Galv.CACHE.load('tachies', args[0] + "_" + $TKMvar.tachie.partsNameArr[layerNum] + "_" + partNum);
+            }
+          }
+        }
+      }
+    }
+  }
 };
 
 //☆☆立ち絵消去
