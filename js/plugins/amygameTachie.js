@@ -828,27 +828,6 @@ tachie_syoukyo1 = function (id2) {
   $gameSwitches.setValue(31, true);
 };
 
-// using in tachie_hyouji1
-const hatIds = [4,31,32,35,    36];
-const coatCollarIds = [28,            29];
-const nippleIds = [               11];
-const armsIds = [17,21,23,24,25,26];
-const underwearIds = [7,14,20,       22];
-const shoesIds = [18,            27];
-hasAnyId = function(array, inputId){
-	return array.some(function(id) {return inputId == id});
-}
-tachie_hyouji1GetSlotMod = function(value1){		
-	if(hasAnyId(shoesIds, value1)) {return -1000}//靴
-	else if(hasAnyId(underwearIds, value1)) {return -500}//服下
-	else if(hasAnyId(armsIds, value1)) {return -300}//腕
-	else if(hasAnyId(nippleIds, value1)) {return -200}//乳首
-	else if(hasAnyId(coatCollarIds, value1)) {return -100}//コート、首輪
-	else if(hasAnyId(hatIds, value1)) { return 100 }//帽子
-	
-	return 0;
-}
-
 //☆☆立ち絵表示
 tachie_hyouji1 = function (actorId) {
 
