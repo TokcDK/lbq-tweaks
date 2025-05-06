@@ -785,24 +785,28 @@ tachie_naibusyori1 = function(args) {
   charList[characterName][layerNum] = partNumber;
   
   // Update the bitmap cache for each picture using this character
-  for (let i = 0; i < picData.length; i++) {
+  const picCount = picData.length;
+  for (let i = 0; i < picCount; i++) {
     if (picData[i].char !== characterName) continue;
     
+    // Cache the current picData element in a local variable
+    const pic = picData[i];
+    
     // Initialize bitmap array if needed
-    if (!picData[i].bitmap) {
+    if (!pic.bitmap) {
       tachie.preloadBitmap(i);
     }
     
-    // Set or clear the bitmap
+    // Set or clear the bitmap for the specified layer
     if (partNumber === 0) {
-      picData[i].bitmap[layerNum] = null;
+      pic.bitmap[layerNum] = null;
     } else {
       const imagePath = characterName + "_" + partsNameArr[layerNum] + "_" + partNumber;
       
-      // Load the image into bitmap cache
-      picData[i].bitmap[layerNum] = ImageManager.loadPicture("/img/tachies/" + imagePath, 0);
+      // Load the image into the bitmap cache
+      pic.bitmap[layerNum] = ImageManager.loadPicture("/img/tachies/" + imagePath, 0);
       
-      // Pre-cache in Galv's cache system
+      // Pre-cache using Galv's cache system
       Galv.CACHE.load('tachies', imagePath);
     }
   }
