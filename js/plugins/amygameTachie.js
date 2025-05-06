@@ -884,6 +884,7 @@ tachie_hyouji1 = function (actorId) {
   $gameVariables.setValue(103, $gameVariables.value(107));
   $gameVariables.setValue(104, $gameVariables.value(108));
   $gameVariables.setValue(149, 0); // 表示最初の透明度
+
   let afterimageYOffset = 0; // 残像y軸。途中で数字を入れるためこれだけ先に実行
   if ($gameSwitches.value(130)) {
     $gameVariables.setValue(105, 1030); // x座標
@@ -938,8 +939,6 @@ tachie_hyouji1 = function (actorId) {
         if (!$gameVariables.value(111) == 0) { $gameVariables.setValue(102, $gameVariables.value(111)); }
         if (!$gameVariables.value(111) == 0) { $gameVariables.setValue(110, 60); }
         $gameVariables.setValue(111, $gameVariables.value(106));
-      } else {
-        // do nothing
       }
     }
   } else {
@@ -961,7 +960,7 @@ tachie_hyouji1 = function (actorId) {
   }
   let tachieIndex = parseInt($gameVariables.value(300), 10) || 0; // 立ち絵1か2か、それとも…
   tachieIndex--; // データ上は0から
-  const CharList = $TKMvar.tachie.CharList;
+  //const CharList = $TKMvar.tachie.CharList;
   //const MaxLayer = $TKMvar.tachie.MaxLayer;
   const PicData = $TKMvar.tachie.PicData;
   const pictureId = PicData[tachieIndex]["picNum"];
