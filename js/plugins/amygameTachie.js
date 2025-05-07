@@ -460,10 +460,10 @@ tachie_settei2 = function() {
   // Get actor information and data
   const actorId = $gameVariables.value(20);
   console.debug(`tachie_settei2: Actor ID: ${actorId}`);
-  const actor = $gameActors.actor(actorId);
-  console.debug(`tachie_settei2: Actor name: ${actor.name()}`);
+  const gameActor = $gameActors.actor(actorId);
+  console.debug(`tachie_settei2: Actor name: ${gameActor.name()}`);
 
-  if(!$gameParty.battleMembers().includes(actor)){
+  if(!$gameParty.battleMembers().includes(gameActor)){
     console.debug("tachie_settei2: Actor not in battle party! Skip..");
     return;
   }
@@ -485,11 +485,11 @@ tachie_settei2 = function() {
 
   // Only process further for female characters
   console.debug("tachie_settei2: Only process further for female characters");
-  if (isGirl(actor)) {
+  if (isGirl(gameActor)) {
     console.debug("tachie_settei2: Actor is female, processing female-specific logic");
 
     // Handle doll state - store current clothing in temp variables and clear current
-    if (actor.isStateAffected(valueDollStateId)) {
+    if (gameActor.isStateAffected(valueDollStateId)) {
       console.debug("tachie_settei2: Actor is in doll state, saving clothing to temporary storage and clearing current clothing");
       
       // Save clothing to temporary storage (561-600)
@@ -512,7 +512,7 @@ tachie_settei2 = function() {
       console.debug("tachie_settei2: Calculated current exposure");
       
       // Apply custom pose/expression settings if not in specified state
-      if (!actor.isStateAffected(23)) {
+      if (!gameActor.isStateAffected(23)) {
         console.debug("tachie_settei2: Actor not affected by state 23 (Forced costume setting), applying tachie_settei1");
         tachie_settei1();
       } else {
@@ -525,7 +525,7 @@ tachie_settei2 = function() {
 
   // Process internal tachie display data
   console.debug("tachie_settei2: Processing internal tachie display data with tachie_naibusyori2");
-  tachie_naibusyori2(actor);
+  tachie_naibusyori2(gameActor);
 
   // Restore any temporary clothing that was saved
   console.debug("tachie_settei2: Restoring temporary clothing values from storage (561-600) if present");
@@ -547,10 +547,10 @@ tachie_settei2 = function() {
   charagra_henkou1(actorId);
   
   // Update clothing-related global values for female characters
-  if (isGirl(actor)) {
+  if (isGirl(gameActor)) {
     console.debug("tachie_settei2: Updating global clothing variables for female actor");
     valueLiningCloth[actorId] = actorClothingData[2];
-    valueBackHairCloth[actorId] = actor.isStateAffected(23) ? 1 : actorClothingData[4];
+    valueBackHairCloth[actorId] = gameActor.isStateAffected(23) ? 1 : actorClothingData[4];
     valueCoatCloth[actorId] = actorClothingData[28];
     valueFrontHairCloth[actorId] = actorClothingData[32];
     valueBustUpCloth[actorId] = actorClothingData[41];
