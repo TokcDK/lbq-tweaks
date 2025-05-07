@@ -230,7 +230,7 @@ Scene_Equip.prototype.onItemOk = function() {
 };
 
   DataManager.makeSavefileInfo = function () {
-    var info = {};
+    const info = {};
     info.globalId = this._globalId;
     info.title = $dataSystem.gameTitle;
     info.characters = $gameParty.charactersForSavefile();
