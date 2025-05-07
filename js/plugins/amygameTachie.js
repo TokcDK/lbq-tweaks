@@ -1029,6 +1029,7 @@ function getOffsetAdjustment(clothSwitchId) {
   return 0;
 }
 
+//#region tachie_settei1 constants
 //☆☆立ち絵設定
 const standingPictureSlotOffsetsTo0 = [1, 2, 3, 5, 6, 8, 9, 10, 12, 13, 15, 16, 19, 24, 26, 30, 34, 37, 38, 39, 40];
 const standingPictureSlotOffsetsTo1 = [5, 9, 10, 15, 31, 33];
@@ -1060,6 +1061,7 @@ const pregnancyFaceOptionsLen = PREGNANCY_FACE_OPTIONS.length;
 const TACHIE_SETTEI1_BASE_VAR_ID = 460; // Common base ID for variables
 const PREGNANCY_PART_IDS = [16, 17, 19, 20, 21, 22, 23, 24, 25, 26, 28];
 const BUKKAKE_FACE_EXPRESSIONS = [2, 3, 4];
+//#endregion
 tachie_settei1 = function () {
   const actor = $gameActors.actor($gameVariables.value(20));
 
