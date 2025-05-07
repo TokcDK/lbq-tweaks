@@ -133,28 +133,30 @@ Scene_Status.prototype.nextPageOpenok = function() {
     this._statusWindow.activate();
 };
 
-//rpg_scenes.js
-Scene_Battle.prototype.startActorCommandSelection = function() {
-if(!Input.isRepeated("ok")){
-  if(ConfigManager.battleAniSpeed >= 3){
-    if(!$gameSwitches.value(131)){ //立ち絵禁止のスイッチで条件分岐
-      tachie_syoukyo1($gameVariables.value(300));
-      $gameVariables.setValue(20,BattleManager.actor().actorId());
-        if($gameVariables.value(263) >= 2){
-          tachie_settei3(BattleManager.actor());
-        };
-        tachie_hyouji2(BattleManager.actor());
-}}};
+  //rpg_scenes.js
+  Scene_Battle.prototype.startActorCommandSelection = function () {
+    if (!Input.isRepeated("ok")) {
+      if (ConfigManager.battleAniSpeed >= 3) {
+        if (!$gameSwitches.value(131)) { //立ち絵禁止のスイッチで条件分岐
+          tachie_syoukyo1($gameVariables.value(300));
+          $gameVariables.setValue(20, BattleManager.actor().actorId());
+          if ($gameVariables.value(263) >= 2) {
+            tachie_settei3(BattleManager.actor());
+          };
+          tachie_hyouji2(BattleManager.actor());
+        }
+      }
+    };
     this._statusWindow.select(BattleManager.actor().index());
     this._partyCommandWindow.close();
     this._actorCommandWindow.setup(BattleManager.actor());
-if (Imported.MOG_BattleHud) {
-  if (!this._hudField) {
-    this.createHudField()
-    this.createBattleHudSB();
+    if (Imported.MOG_BattleHud) {
+      if (!this._hudField) {
+        this.createHudField()
+        this.createBattleHudSB();
+      };
+    };
   };
-};
-};
 
   //rpg_managers.js
   BattleManager.selectNextCommand = function() {
