@@ -6640,4 +6640,40 @@ pictureText_SetUp = function(setupType, pictureId, displayText, textSetting, pos
     }
   }
 
+  func_160_1 = function () {
+    if (!$gameParty.inBattle()) {
+      $gameVariables.setValue(20, $gameVariables.value(3));
+      tachie_settei2();
+    };
+  }
+
+  func_121_2 = function () {
+    const gamePartyBattleMembers = $gameParty.battleMembers();
+    for (let i = 0, max = gamePartyBattleMembers.length-1; i <= max; i++) {
+      const actor = gamePartyBattleMembers[i];
+      if (isGirl(actor)) {
+        $gameVariables.setValue(20, actor.actorId());
+        tachie_settei3(actor);
+      }
+    };
+  }
+
+  func_19_3 = function () {
+    const gamePartyMembers = $gameParty.members();
+    const gameVariables = $gameVariables;
+    const gameActors = $gameActors;
+    const actorIds = gameVariables.value(247);
+    for (var i = 0, len = actorIds.length; i < len; i++) {
+      const actorId = actorIds[i];
+      const actor = gameActors.actor(actorId);
+      if (gamePartyMembers.contains(actor)) {
+        for (let i = 0; i <= 42; i++) {
+          gameVariables.value(actorId + 440)[i] = gameVariables.value(actorId + 540)[i];
+        }
+        gameVariables.setValue(20, actorId);
+        tachie_settei3(actor);
+      }
+    }
+  }
+
 }());
