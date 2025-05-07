@@ -307,18 +307,19 @@ Game_Unit.prototype.luklity = function() {
     _Window_EventItem_start.call(this);
   };
 
-  const SWITCH_ID = 111;
-  const SWITCH_ID2 = 400;
-  Window_EventItem.prototype.initializeWidth = function () {
-    if (this.isDefaultSize() && $gameSwitches.value(SWITCH_ID)) {
-      this.width = this.defaultWidth()/2-$gameVariables.value(338);
-    } else if (!this.isDefaultSize() && !$gameSwitches.value(SWITCH_ID)) {
+  Window_EventItem.prototype.initializeWidth = function() {
+    const isDefaultWidth = this.isDefaultSize();
+    const switchOn = $gameSwitches.value(111);
+    
+    if (isDefaultWidth && switchOn) {
+      this.width = this.defaultWidth() / 2 - $gameVariables.value(338);
+    } else if (!isDefaultWidth && !switchOn) {
       this.width = this.defaultWidth();
     }
   };
 
   Window_EventItem.prototype.maxCols = function () {
-    return $gameSwitches.value(SWITCH_ID2) ? 1 : 2;
+    return $gameSwitches.value(400) ? 1 : 2;
   };
 
   Window_EventItem.prototype.defaultWidth = function () {
