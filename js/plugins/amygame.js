@@ -1105,16 +1105,16 @@ if(target.isStateAffected(23)){
   showMessage('現在の' + target.name() + 'は衣装修復対象ではありません。');
 } else {
   $gameVariables.setValue(20,target.actorId());
-  const actor = $dataActors[$gameVariables.value(20)];
-  if (actor.meta['Heroine']){  
-    target.removeState(70);
+  const actor = target; //$dataActors[$gameVariables.value(20)];
+  if (actor.actor().meta['Heroine']){  
+    actor.removeState(70);
     $gameVariables.setValue(19, Number(actor.meta['MainCloth']));
     kisekae_tyokusetusitei($gameVariables.value(19),0);
-    tachie_usedChange1();
-    showMessage(target.name() + 'の衣装を修復しました。');
+    tachie_usedChange1(actor);
+    showMessage(actor.name() + 'の衣装を修復しました。');
   } else {
     if (id1 == 1) $gameParty.gainItem(valueItems[itemId], +1);
-    showMessage(target.name() + 'は衣装修復の対象ではありません。');
+    showMessage(actor.name() + 'は衣装修復の対象ではありません。');
   };
 };
 
