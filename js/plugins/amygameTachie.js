@@ -1064,51 +1064,51 @@ tachie_settei1 = function () {
   const actor = $gameActors.actor($gameVariables.value(20));
 
   //☆☆立ち絵内部処理前変数割当↓☆☆
-  tachieSettei1PreSetup(actor);
+  preSetupTachieSettei1(actor);
 
   // ☆☆表情差分↓☆☆
   // Determine the face expression for the character
-  const expressionResult = determineFaceExpression(actor, $gameVariables, $gameSwitches);
+  const expressionResult = determineFaceExpressionTachieSettei1(actor, $gameVariables, $gameSwitches);
   $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 33, expressionResult);
 
   //☆☆共通パーツ前段↓☆☆
-  setModestPose();
+  setModestPoseTachieSettei1();
 
   // 発情＆性欲高い＆戦闘以外＆露出高いで腕グラビアポーズ
-  applyGlamourPoseForArousal();
+  applyGlamourPoseForArousalTachieSettei1();
 
   //☆☆個別衣装設定↓☆☆
   kobetu_isyousettei();
 
   //☆☆共通パーツ後段↓☆☆
-  tachieSettei1ApplyCommonPostProcessing();  
+  applyCommonPostProcessingTachieSettei1();
 };
 
 //#region apply common processing
-function tachieSettei1ApplyCommonPostProcessing() {
+function applyCommonPostProcessingTachieSettei1() {
   // Get actor reference for state-related checks
   const actor = $gameActors.actor($gameVariables.value(20));
 
   // Apply adjustments for different body parts and states
-  tachieSettei1HideBreastsWhenCovered();
-  tachieSettei1HideClothingShadowWhenNoClothes();
-  applyBondageEffects();
-  handleNipplePiercingVisibility();
-  handleArmCoverVisibility();
-  handlePregnancyState(actor);
-  handleFacialFluidEffects(actor);
-  applyTemporaryStateEffects(actor);
+  hideBreastsWhenCoveredTachieSettei1();
+  hideClothingShadowWhenNoClothesTachieSettei1();
+  applyBondageEffectsTachieSettei1();
+  handleNipplePiercingVisibilityTachieSettei1();
+  handleArmCoverVisibilityTachieSettei1();
+  handlePregnancyStateTachieSettei1(actor);
+  handleFacialFluidEffectsTachieSettei1(actor);
+  applyTemporaryStateEffectsTachieSettei1(actor);
 }
 
 // Hide breasts when covered by right arm
-function tachieSettei1HideBreastsWhenCovered() {
+function hideBreastsWhenCoveredTachieSettei1() {
   if ($gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 9) === 4) {
     $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 10, 0);
   }
 }
 
 // Hide clothing shadow when no clothes are present
-function tachieSettei1HideClothingShadowWhenNoClothes() {
+function hideClothingShadowWhenNoClothesTachieSettei1() {
   if ($gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 19) >= 1 &&
     $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 23) === 0) {
     $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 19, 0);
@@ -1116,7 +1116,7 @@ function tachieSettei1HideClothingShadowWhenNoClothes() {
 }
 
 // Apply special effects for bondage outfit
-function applyBondageEffects() {
+function applyBondageEffectsTachieSettei1() {
   if ($gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 20) === 11) {
     $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 10, 1);
     $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 9, 1);
@@ -1127,7 +1127,7 @@ function applyBondageEffects() {
 }
 
 // Handle nipple piercing visibility based on breast visibility
-function handleNipplePiercingVisibility() {
+function handleNipplePiercingVisibilityTachieSettei1() {
   if ($gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 10) === 0 &&
     $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 11) === 1) {
     $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 111, $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 11));
@@ -1136,7 +1136,7 @@ function handleNipplePiercingVisibility() {
 }
 
 // Handle arm cover visibility based on arm position
-function handleArmCoverVisibility() {
+function handleArmCoverVisibilityTachieSettei1() {
   // Handle right arm cover
   if ($gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 9) === 4) {
     $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 117, $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 17));
@@ -1151,24 +1151,24 @@ function handleArmCoverVisibility() {
 }
 
 // Handle pregnancy state and visual changes
-function handlePregnancyState(actor) {
+function handlePregnancyStateTachieSettei1(actor) {
   if (!actor.isStateAffected(83)) return;
 
   // Save and reset body part states for pregnancy mode
-  saveAndResetBodyPartsForPregnancy();
+  saveAndResetBodyPartsForPregnancyTachieSettei1();
 
   // Set specific pose for pregnancy
-  setPregnancyPose();
+  setPregnancyPoseTachieSettei1();
 
   // Handle clothing adjustments for pregnancy
-  handlePregnancyClothing();
+  handlePregnancyClothingTachieSettei1();
 
   // Handle navel piercing during pregnancy
-  handleNavelPiercingDuringPregnancy();
+  handleNavelPiercingDuringPregnancyTachieSettei1();
 }
 
 // Save and hide body parts that should be adjusted during pregnancy
-function saveAndResetBodyPartsForPregnancy() {
+function saveAndResetBodyPartsForPregnancyTachieSettei1() {
   for (const partId of PREGNANCY_PART_IDS) {
     $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + partId + 100,
       $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + partId));
@@ -1177,7 +1177,7 @@ function saveAndResetBodyPartsForPregnancy() {
 }
 
 // Set the pose for pregnancy
-function setPregnancyPose() {
+function setPregnancyPoseTachieSettei1() {
   $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 9, 1);  // Right arm
   $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 10, 1); // Breasts
   $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 15, 1); // Left arm
@@ -1185,7 +1185,7 @@ function setPregnancyPose() {
 }
 
 // Handle clothing adjustment based on exposure during pregnancy
-function handlePregnancyClothing() {
+function handlePregnancyClothingTachieSettei1() {
   const actorId = $gameVariables.value(20);
   if ($gameVariables.value(380 + actorId)[4] >= 5) {
     $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 28, 1); // Apply coat
@@ -1194,7 +1194,7 @@ function handlePregnancyClothing() {
 }
 
 // Handle navel piercing appearance during pregnancy
-function handleNavelPiercingDuringPregnancy() {
+function handleNavelPiercingDuringPregnancyTachieSettei1() {
   if ($gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 14) === 1) {
     $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 114,
       $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 14));
@@ -1203,7 +1203,7 @@ function handleNavelPiercingDuringPregnancy() {
 }
 
 // Handle facial fluid effects based on arm position
-function handleFacialFluidEffects(actor) {
+function handleFacialFluidEffectsTachieSettei1(actor) {
   if (!actor.isStateAffected(83)) return;
 
   // Check if arm position is in one of the states that affects fluid appearance
@@ -1218,7 +1218,7 @@ function handleFacialFluidEffects(actor) {
 }
 
 // Apply temporary state effects from state metadata
-function applyTemporaryStateEffects(actor) {
+function applyTemporaryStateEffectsTachieSettei1(actor) {
   for (const tempStateId of valueTachieChangeStateTemporary) {
     if (!actor.isStateAffected(tempStateId)) continue;
 
@@ -1237,7 +1237,7 @@ function applyTemporaryStateEffects(actor) {
 
 //#region tachie_settei1 set modest pose
 // Apply special arm pose for aroused characters with high exposure
-function applyGlamourPoseForArousal() {
+function applyGlamourPoseForArousalTachieSettei1() {
   const actor = $gameActors.actor($gameVariables.value(20));
   const isAroused = actor.isStateAffected(61) || actor.isStateAffected(694);
   const hasConfidenceSkill = actor.isLearnedSkill(66);
@@ -1251,23 +1251,20 @@ function applyGlamourPoseForArousal() {
     $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 9, 2);  // Right arm
   }
 }
-//#endregion
 
-//#region tachie_settei1 set modest pose
-
-function shouldCoverBreasts() {
+function shouldCoverBreastsTachieSettei1() {
   return $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 21) === 0 &&
     $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 23) <= 3 &&
     $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 25) === 0 &&
     $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 11) === 0;
 }
 
-function shouldCoverLowerBody() {
+function shouldCoverLowerBodyTachieSettei1() {
   return $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 20) === 0 &&
     $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 22) === 0;
 }
 
-function setModestPose() {
+function setModestPoseTachieSettei1() {
   // Apply modest pose for characters not in special states
   if (actor.isStateAffected(22) || actor.isLearnedSkill(66)) {
     // Skip pose adjustment for characters with special states or skills
@@ -1276,12 +1273,12 @@ function setModestPose() {
   }
 
   // Set right arm to cover breasts (pose 4)
-  if (shouldCoverBreasts()) {
+  if (shouldCoverBreastsTachieSettei1()) {
     $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 9, 4);
   }
 
   // Set left arm to cover lower body (pose 4)
-  if (shouldCoverLowerBody()) {
+  if (shouldCoverLowerBodyTachieSettei1()) {
     $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 15, 4);
   }
 }
@@ -1289,68 +1286,68 @@ function setModestPose() {
 
 //#region tachie_settei1 pre slots setup
 
-function tachieSettei1PreSetup(actor) {
+function preSetupTachieSettei1(actor) {
   // Reset specific slots to 0
-  resetStandingPictureSlots();
+  resetStandingPictureSlotsTachieSettei1();
 
   // Ensure hair has a default value
-  ensureDefaultHairValue();
+  ensureDefaultHairValueTachieSettei1();
 
   // Set specific slots to 1
-  setDefaultSlotValues();
+  setDefaultSlotValuesTachieSettei1();
 
   // Apply state-based visual effects to the character's standing image
-  applyStateBasedVisualEffects(actor);
+  applyStateBasedVisualEffectsTachieSettei1(actor);
 }
 
 // Helper function to reset specific slots to 0
-function resetStandingPictureSlots() {
+function resetStandingPictureSlotsTachieSettei1() {
   standingPictureSlotOffsetsTo0.forEach(function (offset) {
     $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + offset, 0);
   });
 }
 
 // Helper function to ensure hair has a default value
-function ensureDefaultHairValue() {
+function ensureDefaultHairValueTachieSettei1() {
   if ($gameVariables.value(464) === 0) { // 460 + 4 (hair)
     $gameVariables.setValue(464, 1);
   }
 }
 
 // Helper function to set specific slots to 1
-function setDefaultSlotValues() {
+function setDefaultSlotValuesTachieSettei1() {
   standingPictureSlotOffsetsTo1.forEach(function (offset) {
     $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + offset, 1);
   });
 }
 
 // Apply visual effects based on the actor's states
-function applyStateBasedVisualEffects(actor) {
+function applyStateBasedVisualEffectsTachieSettei1(actor) {
   // Arousal/liquid related states
-  applyArousalVisualEffects(actor);
+  applyArousalVisualEffectsTachieSettei1(actor);
 
   // Restraint related states
-  applyRestraintVisualEffects(actor);
+  applyRestraintVisualEffectsTachieSettei1(actor);
 
   // Sweat/wetness related states
-  applySweatVisualEffects(actor);
+  applySweatVisualEffectsTachieSettei1(actor);
 
   // Pregnancy related states
-  applyPregnancyVisualEffects(actor);
+  applyPregnancyVisualEffectsTachieSettei1(actor);
 
   // Sexual fluids related states
-  applySexualFluidsVisualEffects(actor);
+  applySexualFluidsVisualEffectsTachieSettei1(actor);
 }
 
 // Apply arousal-related visual effects
-function applyArousalVisualEffects(actor) {
+function applyArousalVisualEffectsTachieSettei1(actor) {
   if (actor.isStateAffected(61) || actor.isStateAffected(694)) { // 発情で愛液 (Arousal and love juice)
     $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 8, 2);
   }
 }
 
 // Apply restraint-related visual effects
-function applyRestraintVisualEffects(actor) {
+function applyRestraintVisualEffectsTachieSettei1(actor) {
   if (actor.isStateAffected(63)) { // 拘束で腕と男 (Restraint affecting arms and male)
     $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 9, 3);     // Right arm
     $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 15, 3);    // Left arm
@@ -1363,14 +1360,14 @@ function applyRestraintVisualEffects(actor) {
 }
 
 // Apply sweat/wetness-related visual effects
-function applySweatVisualEffects(actor) {
+function applySweatVisualEffectsTachieSettei1(actor) {
   if (actor.isStateAffected(71) || actor.isStateAffected(695)) { // 濡れた状態で汗 (Wet state with sweat)
     $gameSwitches.setValue(100, true);
   }
 }
 
 // Apply pregnancy-related visual effects
-function applyPregnancyVisualEffects(actor) {
+function applyPregnancyVisualEffectsTachieSettei1(actor) {
   if (actor.isStateAffected(83) || actor.isStateAffected(696)) { // 妊娠でボテ腹 (Pregnancy with pregnant belly)
     $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 12, 1);
 
@@ -1382,7 +1379,7 @@ function applyPregnancyVisualEffects(actor) {
 }
 
 // Apply sexual fluids-related visual effects
-function applySexualFluidsVisualEffects(actor) {
+function applySexualFluidsVisualEffectsTachieSettei1(actor) {
   if (actor.isStateAffected(84) || actor.isStateAffected(697)) { // 膣内射精 (Vaginal ejaculation)
     $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 8, 1);
   }
@@ -1397,17 +1394,17 @@ function applySexualFluidsVisualEffects(actor) {
 }
 //#endregion
 
-//#region tachie_settei1 experssion setup
+//#region tachie_settei1 expression setup
 
 // Main function to determine face expression based on priority
-function determineFaceExpression(actor, $gameVariables, $gameSwitches) {
+function determineFaceExpressionTachieSettei1(actor, $gameVariables, $gameSwitches) {
   // Check for highest priority states first
   if ($gameSwitches.value(97)) {
     return $gameVariables.value(151); // Use predefined expression from conversation
   }
 
   // Check for special state effects that override other expressions
-  const stateBasedExpression = getStateBasedExpression(actor, $gameVariables, $gameSwitches);
+  const stateBasedExpression = getStateBasedExpressionTachieSettei1(actor, $gameVariables, $gameSwitches);
   if (stateBasedExpression !== null) {
     return stateBasedExpression;
   }
@@ -1418,23 +1415,23 @@ function determineFaceExpression(actor, $gameVariables, $gameSwitches) {
   }
 
   // Check for arousal/emotional states
-  const emotionalExpression = getEmotionalExpression(actor, $gameVariables, $gameSwitches);
+  const emotionalExpression = getEmotionalExpressionTachieSettei1(actor, $gameVariables, $gameSwitches);
   if (emotionalExpression !== null) {
     return emotionalExpression;
   }
 
   // Check clothing and exposure related expressions
-  const exposureExpression = getExposureBasedExpression(actor, $gameVariables, $gameSwitches);
+  const exposureExpression = getExposureBasedExpressionTachieSettei1(actor, $gameVariables, $gameSwitches);
   if (exposureExpression !== null) {
     return exposureExpression;
   }
 
   // Default expressions based on situation
-  return getDefaultExpression($gameVariables, $gameSwitches);
+  return getDefaultExpressionTachieSettei1($gameVariables, $gameSwitches);
 }
 
 // Function to get expression based on special states
-function getStateBasedExpression(actor, $gameVariables, $gameSwitches) {
+function getStateBasedExpressionTachieSettei1(actor, $gameVariables, $gameSwitches) {
   // Check for special state effects first (highest priority)
   for (const stateId of valueTachieChangeState) {
     if (actor.isStateAffected(stateId) && $dataStates[stateId].meta['FaceChange']) {
@@ -1465,13 +1462,13 @@ function getStateBasedExpression(actor, $gameVariables, $gameSwitches) {
   }
 
   // Handle sweating effect
-  handleSweatEffect(actor, $gameVariables, $gameSwitches);
+  handleSweatEffectTachieSettei1(actor, $gameVariables, $gameSwitches);
 
   return null;
 }
 
 // Function to get expression based on emotional arousal
-function getEmotionalExpression(actor, $gameVariables, $gameSwitches) {
+function getEmotionalExpressionTachieSettei1(actor, $gameVariables, $gameSwitches) {
   // Check for states related to arousal, etc.
   if (EFFECT_STATE_IDS.some(stateId => actor.isStateAffected(stateId))) {
     const intensity = $gameVariables.value($gameVariables.value(20) + 380)[1];
@@ -1493,8 +1490,8 @@ function getEmotionalExpression(actor, $gameVariables, $gameSwitches) {
 }
 
 // Function to handle exposure-based expressions
-function getExposureBasedExpression(actor, $gameVariables, $gameSwitches) {
-  handleExposureState(actor, $gameVariables);
+function getExposureBasedExpressionTachieSettei1(actor, $gameVariables, $gameSwitches) {
+  handleExposureStateTachieSettei1(actor, $gameVariables);
 
   // Skip if special condition
   if ($gameVariables.value(207) === 101 ||
@@ -1527,7 +1524,7 @@ function getExposureBasedExpression(actor, $gameVariables, $gameSwitches) {
 }
 
 // Function to get default expressions based on situation
-function getDefaultExpression($gameVariables, $gameSwitches) {
+function getDefaultExpressionTachieSettei1($gameVariables, $gameSwitches) {
   if ($gameSwitches.value(30)) { // In battle
     return damageFaceExpressionsMap[$gameVariables.value(276)] || 4;
   } else if ($gameSwitches.value(201) || $gameSwitches.value(239)) { // Excited
@@ -1538,7 +1535,7 @@ function getDefaultExpression($gameVariables, $gameSwitches) {
 }
 
 // Helper function to handle exposure state
-function handleExposureState(actor, $gameVariables) {
+function handleExposureStateTachieSettei1(actor, $gameVariables) {
   if (actor.isStateAffected(70)) {
     const currentClothesId = $gameVariables.value($gameVariables.value(20) + 440)[0];
     const exposureValue = $gameVariables.value($gameVariables.value(20) + 380)[4];
@@ -1549,7 +1546,7 @@ function handleExposureState(actor, $gameVariables) {
 }
 
 // Helper function to handle sweat effect
-function handleSweatEffect(actor, $gameVariables, $gameSwitches) {
+function handleSweatEffectTachieSettei1(actor, $gameVariables, $gameSwitches) {
   if (actor.isStateAffected(693)) {
     $gameSwitches.setValue(100, false);
   }
