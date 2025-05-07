@@ -461,7 +461,7 @@ tachie_settei2 = function() {
   const actorId = $gameVariables.value(20);
   console.debug(`tachie_settei2: Actor ID: ${actorId}`);
   const actor = $gameActors.actor(actorId);
-  console.debug(`tachie_settei2: Actor name: ${actor.name()}`);
+  console.debug(`tachie_settei2: Actor name: ${actor.name}`);
 
   if(!$gameParty.battleMembers().includes(actor)){
     console.debug("tachie_settei2: Actor not in battle party! Skip..");
