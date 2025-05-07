@@ -1030,29 +1030,27 @@ function getOffsetAdjustment(clothSwitchId) {
 }
 
 //☆☆立ち絵設定
+const standingPictureSlotOffsetsTo0 = [1, 2, 3, 5, 6, 8, 9, 10, 12, 13, 15, 16, 19, 24, 26, 30, 34, 37, 38, 39, 40];
+const standingPictureSlotOffsetsTo1 = [5, 9, 10, 15, 31, 33];
+const baseFaceExpressions = [1, 1, 1, 1, 1, 2, 5, 6, 15]; // 基本表情
+const excitedFaceExpressions = [4, 4, 4, 4, 5, 4, 4, 4, 4, 8]; // 興奮表情
 tachie_settei1 = function () {
   const baseVarId = 460;
   const actor = $gameActors.actor($gameVariables.value(20));
 
   //☆☆立ち絵内部処理前変数割当↓☆☆
+  // offsets for the variables to be set
   {
-    const resetIds = [1, 2, 3, 5, 6, 8, 9, 10, 12, 13, 15, 16, 19, 24, 26, 30, 34, 37, 38, 39, 40];
-    resetIds.forEach(function (id) {
-      $gameVariables.setValue(baseVarId + id, 0);
+    standingPictureSlotOffsetsTo0.forEach(function (offset) {
+      $gameVariables.setValue(baseVarId + offset, 0);
     }, this);
   }
-  {
-    const defaultOneIds = [4];
-    defaultOneIds.forEach(function (id) {
-      if ($gameVariables.value(baseVarId + id) === 0) {
-        $gameVariables.setValue(baseVarId + id, 1);
-      }
-    }, this);
+  if ($gameVariables.value(464) === 0) { // 460 + 4
+    $gameVariables.setValue(464, 1);
   }
   {
-    const oneIds = [5, 9, 10, 15, 31, 33];
-    oneIds.forEach(function (id) {
-      $gameVariables.setValue(baseVarId + id, 1);
+    standingPictureSlotOffsetsTo1.forEach(function (offset) {
+      $gameVariables.setValue(baseVarId + offset, 1);
     }, this);
   }
 
@@ -1090,12 +1088,10 @@ tachie_settei1 = function () {
   // ☆☆表情差分↓☆☆
   let randomFaceVariation = 1;
   {
-    const baseFaceArr = [1, 1, 1, 1, 1, 2, 5, 6, 15]; // 基本表情
-    randomFaceVariation = baseFaceArr[Math.floor(Math.random() * baseFaceArr.length)];
+    randomFaceVariation = baseFaceExpressions[Math.floor(Math.random() * baseFaceExpressions.length)];
   }
   if ($gameSwitches.value(201) || $gameSwitches.value(239)) {
-    const excitedFaceArr = [4, 4, 4, 4, 5, 4, 4, 4, 4, 8];
-    randomFaceVariation = excitedFaceArr[Math.floor(Math.random() * excitedFaceArr.length)];
+    randomFaceVariation = excitedFaceExpressions[Math.floor(Math.random() * excitedFaceExpressions.length)];
   }
   if ($gameSwitches.value(30)) {
     let tempFace = 4;
@@ -1107,6 +1103,7 @@ tachie_settei1 = function () {
     }
     randomFaceVariation = tempFace;
   }
+
   if (actor.isStateAffected(70)) { // 下で露出状態による差分変化を行う為に実行。
     const currentClothesId = $gameVariables.value($gameVariables.value(20) + 440)[0];
     const exposureValue = $gameVariables.value($gameVariables.value(20) + 380)[4];
