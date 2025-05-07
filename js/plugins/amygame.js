@@ -1024,7 +1024,7 @@ tachie_usedChange1 = function(gameActor){
       tachie_syoukyo1($gameVariables.value(300));
       tachie_settei3(gameActor);
       $gameVariables.setValue(20,$gameVariables.value(3));
-      tachie_hyouji1(gameActor.actorId());
+      tachie_hyouji2(gameActor);
     } else {
       tachie_settei3(gameActor);
     };
