@@ -365,20 +365,21 @@ Sprite_Actor.prototype.updateMotionCount = function() {
     }
 };
 
-var alias2 = Sprite_Weapon.prototype.updatePattern
-Sprite_Weapon.prototype.updatePattern = function() {
-    if (this.parent.hasOwnProperty("_maxPattern") && this._pattern === this.parent._maxPattern) {return}
-   alias2.call(this);
-};
-
-var alias = Sprite_Actor.prototype.refreshMotion
-Sprite_Actor.prototype.refreshMotion = function() {
-    var actor = this._actor;
-    if (actor) {
-        if (this.hasOwnProperty("_maxPattern") && this._pattern === this._maxPattern) {return}
+  const updatePatternAlias = Sprite_Weapon.prototype.updatePattern
+  Sprite_Weapon.prototype.updatePattern = function () {
+    if (this.parent._maxPattern && this._pattern === this.parent._maxPattern) {
+      return;
     }
-    alias.call(this)
-}
+    updatePatternAlias.call(this);
+  };
+
+  const refreshMotionAlias = Sprite_Actor.prototype.refreshMotion
+  Sprite_Actor.prototype.refreshMotion = function () {
+    if (this._actor && this._maxPattern && this._pattern === this._maxPattern) {
+      return;
+    }
+    refreshMotionAlias.call(this)
+  }
 
 Sprite_Actor.prototype.setMaxFrame = function(num) {
     this._maxPattern = num;
