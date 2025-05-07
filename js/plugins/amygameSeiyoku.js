@@ -1951,11 +1951,6 @@ if($gameActors.actor($gameVariables.value(20)).isStateAffected(83)){
 };
 
 //☆☆Hプロフィール表示時立ち絵
-const fadeDurationsMap = {
-  2: 60,
-  3: 50,
-  4: 40
-};
 const HSTATES_BACKGROUND = "HstatesBackGround1";
 const HSTATES_FRAME = "HstatesFrame";
 const HSTATES_ACTOR_BUST_WHITE = "HstatesActorBustWhite";
@@ -1965,7 +1960,12 @@ const HSTATES_BG_SHINE1 = "hStates_bgShine1";
 const HSTATES_BODY_SHINE1 = "hStates_bodyShine1";
 const HSTATES_BACKGROUND_VAR = "HstatesBackGround"; // Used with variable suffix
 const HSTATES_ACTOR_FACE_PREFIX = "HstatesActorFace";
-
+const CACHED_ANIMATION_FRAMES = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 2, 1, 4, 5, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
+const fadeDurationsMap = {
+  2: 60,
+  3: 50,
+  4: 40
+};
 actor_hStatesTachie = function (mode) {
 
   const actorId = $gameVariables.value(20);
@@ -1991,8 +1991,7 @@ actor_hStatesTachie = function (mode) {
       let actorBustName = HSTATES_ACTOR_BUST_PREFIX + actorId;
       $gameScreen.setPicturesAnimation(5, 1, "横", 3);
       $gameScreen.showPicture(basePicId + 7, actorBustName, 1, 1024, 384, 100, 100, 255, 0);
-      $gameScreen.picture(basePicId + 7).startAnimationFrame(3, true,
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 2, 1, 4, 5, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+      $gameScreen.picture(basePicId + 7).startAnimationFrame(3, true, CACHED_ANIMATION_FRAMES);
       
       let headVariant;
       if ($gameVariables.value(actorId + 440)[32] == 2) {
