@@ -1969,7 +1969,7 @@ const fadeDurationsMap = {
 actor_hStatesTachie = function (mode) {
 
   const actorId = $gameVariables.value(20);
-  const gameActor = $gameActors.actor(actorId); // bad using global dinamic!
+  const gameActor = $gameActors.actor(actorId); // bad using global dinamic! but the function was called from common event
   if (!isGirl(gameActor)) {
     tachie_hyouji2(gameActor);
   } else {
@@ -2092,7 +2092,7 @@ actor_hStatesTachie = function (mode) {
         $gameScreen.movePicture(basePicId + 12, 1, 1024, 384, 100, 100, 150, 3, 180);
       }
       $gameScreen.movePicture(basePicId + 11, 1, 1024, 384, 100, 100, 0, 0, 60);
-      for (let pictureId = basePicId + 6; pictureId <= basePicId + 9; pictureId++) {
+      for (let pictureId = basePicId + 6, max = basePicId + 9; pictureId <= max; pictureId++) {
         if ($gameScreen.picture(pictureId)) {
           tachie_bless(pictureId, 0);
         }
@@ -2100,10 +2100,8 @@ actor_hStatesTachie = function (mode) {
       if ($gameScreen.picture(basePicId + 7)) {
         hcg_piston(basePicId + 7, 9, 1, 2);
       }
-
     }
   }
-
 };
 
 function setActorStateBasedOnSkillsHStatesTachie(actor) {
