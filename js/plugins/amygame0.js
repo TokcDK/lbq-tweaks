@@ -301,10 +301,10 @@ Game_Unit.prototype.luklity = function() {
     return sum / members.length;
 };
 
-  const _Window_EventItem_start = Window_EventItem.prototype.start;
+  const windowEventItemStart = Window_EventItem.prototype.start;
   Window_EventItem.prototype.start = function () {
     this.initializeWidth();
-    _Window_EventItem_start.call(this);
+    windowEventItemStart.call(this);
   };
 
   Window_EventItem.prototype.initializeWidth = function() {
