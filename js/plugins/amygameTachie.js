@@ -1033,7 +1033,13 @@ function getOffsetAdjustment(clothSwitchId) {
 const standingPictureSlotOffsetsTo0 = [1, 2, 3, 5, 6, 8, 9, 10, 12, 13, 15, 16, 19, 24, 26, 30, 34, 37, 38, 39, 40];
 const standingPictureSlotOffsetsTo1 = [5, 9, 10, 15, 31, 33];
 const baseFaceExpressions = [1, 1, 1, 1, 1, 2, 5, 6, 15]; // 基本表情
+const baseFaceExpressionsLength = baseFaceExpressions.length;
 const excitedFaceExpressions = [4, 4, 4, 4, 5, 4, 4, 4, 4, 8]; // 興奮表情
+const excitedFaceExpressionsLength = excitedFaceExpressions.length;
+const damageFaceExpressionsMap = {
+  1: 9, // 被ダメージ表情変化
+  2: 8  // 与ダメージ表情変化
+};
 tachie_settei1 = function () {
   const baseVarId = 460;
   const actor = $gameActors.actor($gameVariables.value(20));
@@ -1087,21 +1093,15 @@ tachie_settei1 = function () {
 
   // ☆☆表情差分↓☆☆
   let randomFaceVariation = 1;
-  {
-    randomFaceVariation = baseFaceExpressions[Math.floor(Math.random() * baseFaceExpressions.length)];
+  if ($gameSwitches.value(30)) { // is in battle
+    // Default expression is 4 (neutral)
+    randomFaceVariation = damageFaceExpressionsMap[$gameVariables.value(276)] || 4; 
   }
-  if ($gameSwitches.value(201) || $gameSwitches.value(239)) {
-    randomFaceVariation = excitedFaceExpressions[Math.floor(Math.random() * excitedFaceExpressions.length)];
+  else if ($gameSwitches.value(201) || $gameSwitches.value(239)) { // excited
+    randomFaceVariation = excitedFaceExpressions[Math.floor(Math.random() * excitedFaceExpressionsLength)];
   }
-  if ($gameSwitches.value(30)) {
-    let tempFace = 4;
-    if ($gameVariables.value(276) === 1) {
-      tempFace = 9; // 被ダメージ表情変化
-    }
-    if ($gameVariables.value(276) === 2) {
-      tempFace = 8; // 与ダメージ表情変化
-    }
-    randomFaceVariation = tempFace;
+  else { // normal
+    randomFaceVariation = baseFaceExpressions[Math.floor(Math.random() * baseFaceExpressionsLength)];
   }
 
   if (actor.isStateAffected(70)) { // 下で露出状態による差分変化を行う為に実行。
