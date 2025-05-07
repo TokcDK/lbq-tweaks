@@ -6640,16 +6640,16 @@ pictureText_SetUp = function(setupType, pictureId, displayText, textSetting, pos
     }
   }
 
-  func_160_1 = function () {
+  updateDefaultPortraitOutsideBattle = function () {
     if (!$gameParty.inBattle()) {
       $gameVariables.setValue(20, $gameVariables.value(3));
       tachie_settei2();
     };
   }
 
-  func_121_2 = function () {
+  updateBattleGirlsPortrait = function () {
     const gamePartyBattleMembers = $gameParty.battleMembers();
-    for (let i = 0, max = gamePartyBattleMembers.length-1; i <= max; i++) {
+    for (let i = 0, max = gamePartyBattleMembers.length - 1; i <= max; i++) {
       const actor = gamePartyBattleMembers[i];
       if (isGirl(actor)) {
         $gameVariables.setValue(20, actor.actorId());
@@ -6658,7 +6658,7 @@ pictureText_SetUp = function(setupType, pictureId, displayText, textSetting, pos
     };
   }
 
-  func_19_3 = function () {
+  syncAndUpdateActorPortrait = function () {
     const gamePartyMembers = $gameParty.members();
     const gameVariables = $gameVariables;
     const gameActors = $gameActors;
