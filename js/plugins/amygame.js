@@ -6712,7 +6712,6 @@ pictureText_SetUp = function(setupType, pictureId, displayText, textSetting, pos
 
   /**
    * Sets NPC information based on substitution actor or direct metadata.
-   * This function merges the old func_9_2 and func_9_4 functions.
    * @param {*} parent - The parent object (for sVal method access)
    * @param {number} gameVarId - Target game variable ID to store data (353 for Profession, 354 for FamilyName)
    * @param {string} metaKey - The metadata key to look for ('Profession' or 'FamilyName')
