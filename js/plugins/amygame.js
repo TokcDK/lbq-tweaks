@@ -6604,6 +6604,140 @@ pictureText_SetUp = function(setupType, pictureId, displayText, textSetting, pos
     const weekNum = $gameVariables.value(55);
     TickerManager.show(`──${dayNum}日目(${weekNum}曜日)経過──`);
   }
-  //#endregion
+
+  resetChildEventAppearance = function () {
+    const eventIds = $gameVariables.value(292);
+    for (let eventId = 11; eventId <= 13; eventId++) {
+      const eventId = eventIds[eventId]; // this._eventId
+      if ($gameMap.event(eventId)) {
+        const mapEvent = $gameMap.event(eventId);
+        mapEvent.setStepAnime(false);
+        mapEvent.setWalkAnime(false);
+        mapEvent.setDirection(2);
+        mapEvent.resetPattern();
+        mapEvent._originalPattern = 1;
+        mapEvent.setAngle(45);
+        mapEvent._spriteOffsetX = -12;
+        mapEvent._spriteOffsetY = -12;
+        mapEvent._kageM.clear();
+        mapEvent.setFace(6, true, true); // For child events: mapEvent.setFace(6, true, true, 0, 6, 0, 6);
+      }
+    }
+  }
+
+  prepareDarknessTransition = function() {
+    $gameMap.darknessOpacity = 200;
+    const eventId = $gameVariables.value(292)[5]; // this._eventId
+    if ($gameMap.event(eventId)) {
+      const mapEvent = $gameMap.event(eventId);
+      mapEvent.setStepAnime(true);
+      mapEvent.setWalkAnime(true);
+      mapEvent.setAngle(0);
+      mapEvent._spriteOffsetX = 0;
+      mapEvent._spriteOffsetY = 0;
+      mapEvent._kageM = new Game_KageMaster(mapEvent);
+      mapEvent.removeFace();
+      mapEvent.setOpacity(0);
+    }
+  }
+
+  updateDefaultPortraitOutsideBattle = function () {
+    if (!$gameParty.inBattle()) {
+      $gameVariables.setValue(20, $gameVariables.value(3));
+      tachie_settei2();
+    };
+  }
+
+  updateBattleGirlsPortrait = function () {
+    const gamePartyBattleMembers = $gameParty.battleMembers();
+    for (let i = 0, max = gamePartyBattleMembers.length - 1; i <= max; i++) {
+      const actor = gamePartyBattleMembers[i];
+      if (isGirl(actor)) {
+        $gameVariables.setValue(20, actor.actorId());
+        tachie_settei3(actor);
+      }
+    };
+  }
+
+  syncAndUpdateActorPortrait = function () {
+    const gamePartyMembers = $gameParty.members();
+    const gameVariables = $gameVariables;
+    const gameActors = $gameActors;
+    const actorIds = gameVariables.value(247);
+    for (var i = 0, len = actorIds.length; i < len; i++) {
+      const actorId = actorIds[i];
+      const actor = gameActors.actor(actorId);
+      if (gamePartyMembers.contains(actor)) {
+        for (let i = 0; i <= 42; i++) {
+          gameVariables.value(actorId + 440)[i] = gameVariables.value(actorId + 540)[i];
+        }
+        gameVariables.setValue(20, actorId);
+        tachie_settei3(actor);
+      }
+    }
+  }
+
+  clearTemporaryActorState = function (parent) {
+    const actorIds = $gameVariables.value(248);
+    actorIds.forEach(function (actorId) {
+      $gameActors.actor(actorId).removeState(39);
+      $gameVariables.value(380 + actorId)[58] = 0;
+    }, parent);
+  }
+
+  updateNPCWeaponNamesFromVariables = function (parent) {
+    const actorIds = $gameVariables.value(248);
+    actorIds.forEach(function (actorId) {
+      $dataWeapons[actorId + 200].name = $gameVariables.value(actorId + 380)[50];
+    }, parent);
+  }
+
+  setNPCFamilyNames = function(parent) {
+    setNPCInformation(
+      parent, 
+      354, 
+      'FamilyName',
+      function(actorId) { return $dataWeapons[actorId + 200].name; }
+    );
+  };
+
+//#region setNPCInformation
+  setNPCProfessions = function(parent) {
+    setNPCInformation(
+      parent, 
+      353, 
+      'Profession',
+      function(actorId) { return $gameVariables.value(actorId + 380)[59]; }
+    );
+  };
+
+  /**
+   * Sets NPC information based on substitution actor or direct metadata.
+   * @param {*} parent - The parent object (for sVal method access)
+   * @param {number} gameVarId - Target game variable ID to store data (353 for Profession, 354 for FamilyName)
+   * @param {string} metaKey - The metadata key to look for ('Profession' or 'FamilyName')
+   * @param {Function} substitutionCallback - Function that returns value for substitution actors
+   */
+  setNPCInformation = function (parent, gameVarId, metaKey, substitutionCallback) {
+    // Initialize the array with 101 zeroes
+    parent.sVal(gameVarId, Array(101).fill(0));
+
+    // Process all NPC weapon entries (301-400)
+    for (let weaponIndex = 301; weaponIndex <= 400; weaponIndex++) {
+      const weapon = $dataWeapons[weaponIndex];
+      if (weapon.name !== '') {
+        // If there is a substitution actor id, use the provided callback
+        if (weapon.meta['SubstitutionActorId']) {
+          const substitutionActorId = Number(weapon.meta['SubstitutionActorId']);
+          $gameVariables.value(gameVarId)[weaponIndex - 300] = substitutionCallback(substitutionActorId);
+        }
+        // If the metadata key exists, it takes precedence
+        if (weapon.meta[metaKey]) {
+          $gameVariables.value(gameVarId)[weaponIndex - 300] = weapon.meta[metaKey];
+        }
+      }
+    }
+  };
+//#endregion
 
 }());
