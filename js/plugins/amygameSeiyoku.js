@@ -1961,12 +1961,26 @@ actor_hStatesTachie = function (mode) {
     const basePicId = 111;
     if (mode == 1) {
       $gameVariables.setValue(192, 1);
-      $gameVariables.setValue(191, 1);
-      if (gameActor.isLearnedSkill(62)) { $gameVariables.setValue(191, 2); };//反抗
-      if (gameActor.isLearnedSkill(64)) { $gameVariables.setValue(191, 3); };//自失
-      if (gameActor.isLearnedSkill(66)) { $gameVariables.setValue(191, 4); };//卑猥
-      if (gameActor.isLearnedSkill(68)) { $gameVariables.setValue(191, 5); $gameVariables.setValue(192, 2); };//通常目光
-      if (gameActor.isLearnedSkill(70)) { $gameVariables.setValue(191, 6); };//あへ
+      switch (true) {
+        case gameActor.isLearnedSkill(70):
+          $gameVariables.setValue(191, 6); // あへ
+          break;
+        case gameActor.isLearnedSkill(68):
+          $gameVariables.setValue(191, 5); // 通常目光
+          $gameVariables.setValue(192, 2);
+          break;
+        case gameActor.isLearnedSkill(66):
+          $gameVariables.setValue(191, 4); // 卑猥
+          break;
+        case gameActor.isLearnedSkill(64):
+          $gameVariables.setValue(191, 3); // 自失
+          break;
+        case gameActor.isLearnedSkill(62):
+          $gameVariables.setValue(191, 2); // 反抗
+          break;
+        default:
+          $gameVariables.setValue(191, 1);
+      }
 
       //$gameVariables.setValue(192,2);//デバッグ用
       //$gameVariables.setValue(191,3);
