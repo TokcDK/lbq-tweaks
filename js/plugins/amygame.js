@@ -1015,21 +1015,21 @@ skill_stateonoff = function (actorA, actorB, skillId, stateId) {
 };
 
 //スキルアイテム使用時に立ち絵が変化する場合。事前に$gameVariables.setValue(20,b.actorId());
-tachie_usedChange1 = function(){
+tachie_usedChange1 = function(gameActor){
 
-if(!$dataActors[$gameVariables.value(20)].meta['Heroine']) return;
+  if (!gameActor.actor().meta['Heroine']) return;
 
   if(!$gameSwitches.value(131) || !$gameParty.inBattle()){
     if($gameSwitches.value(42) && $gameVariables.value(3) == $gameVariables.value(20)){
       tachie_syoukyo1($gameVariables.value(300));
-      tachie_settei2();
+      tachie_settei3(gameActor);
       $gameVariables.setValue(20,$gameVariables.value(3));
-      tachie_hyouji1($gameVariables.value(20));
+      tachie_hyouji1(gameActor.actorId());
     } else {
-      tachie_settei2();
+      tachie_settei3(gameActor);
     };
   } else {
-    tachie_settei2();
+    tachie_settei3(gameActor);
   };
 };
 
@@ -1041,7 +1041,7 @@ const heroineName = target.name();
 if($dataActors[target.actorId()].meta['Heroine']){
   target.addState(86);
   $gameVariables.setValue(20,target.actorId());
-  tachie_usedChange1();
+  tachie_usedChange1(target);
 
   TickerManager.show(heroineName + 'はぶっかけられた！');
 } else {  
@@ -1079,7 +1079,7 @@ target.addState(71);
 showMessage(target.name() + 'は濡れてしまった');
 
 $gameVariables.setValue(20,target.actorId());
-tachie_usedChange1();
+tachie_usedChange1(target);
 
 };
 
