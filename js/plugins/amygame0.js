@@ -58,26 +58,42 @@
   Window_Message.prototype.windowWidth = function () {
     return Graphics.boxWidth - $gameVariables.value(311) - valueGraphicsWidth;
   };
-  Window_Message.prototype.updatePlacement = function () {
-    this._positionType = $gameMessage.positionType();
-    this.y = this._positionType * (Graphics.boxHeight - this.height) / 2;
-    this._goldWindow.y = this.y > 0 ? 0 : Graphics.boxHeight - this._goldWindow.height;
-    this.x = 0;//記述追加
+  Window_Message.prototype.updatePlacement = function() {
+    
+    // Set position type and calculate y position once
+    const positionType = $gameMessage.positionType();
+    this._positionType = positionType;
+    this.y = positionType * (Graphics.boxHeight - this.height) / 2;
+    
+    // Update gold window position
+    this._goldWindow.y = this.y > 0 ? 0 : Graphics.boxHeight - this._goldWindow.height;    
+    
+    // Use early returns for better performance
     if ($gameVariables.value(313) >= 1) {
       this.x = $gameVariables.value(313);
-    } else {  //$gameScreen.picture(92) || 
-      if ($gameSwitches.value(358)) { } else {
-        if ($gameScreen.brightness() == 0) {
-          this.x = 128;
-        } else {
-          if ($gameMessage.faceName() != '' || $gameScreen.picture(6) || $gameScreen.picture(70)) {
-            this.x = 0;
-          } else {
-            this.x = 128;
-          };
-        };
-      };
-    };
+      return;
+    }
+    else {
+      // Default x position
+      this.x = 0;
+    }
+    
+    // Skip processing if switch 358 is ON
+    if ($gameSwitches.value(358)) {
+      return;
+    }
+
+    const gameScreen = $gameScreen;
+    // Set x based on screen brightness
+    if (gameScreen.brightness() === 0) {
+      this.x = 128;
+      return;
+    }
+    
+    // Final condition check with cached face name
+    this.x = ($gameMessage.faceName() !== '' || 
+             gameScreen.picture(6) || 
+             gameScreen.picture(70)) ? 0 : 128;
   };
 
   //rpg_sprites.js
