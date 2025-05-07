@@ -1979,60 +1979,77 @@ actor_hStatesTachie = function (mode) {
   } else {
     const basePicId = 111;
     if (mode == 1) {
-      setActorStateBasedOnSkillsHStatesTachie(gameActor);
-
-      $gameScreen.showPicture(basePicId + 4, HSTATES_BACKGROUND, 1, 1024, 384, 100, 100, 255, 0);
-      $gameScreen.showPicture(basePicId + 6, HSTATES_ACTOR_BUST_PREFIX + actorId + "_" + $gameVariables.value(192), 1, 1024, 400, 100, 100, 0, 0);
-      $gameScreen.showPicture(basePicId + 9, HSTATES_ACTOR_FACE_PREFIX + actorId, 1, 1024, 384, 100, 100, 0, 0);
-      //let defaultHue = '#00d0ff';
-      if (gameActor.actor().meta['tachieHue2']) {
-        defaultHue = gameActor.actor().meta['tachieHue2'];
-      }
-      $gameScreen.showPicture(basePicId + 10, HSTATES_ACTOR_BUST_WHITE, 1, 1024, 384, 0, 0, 0, 0);
-      $gameScreen.showPicture(basePicId + 11, HSTATES_FRAME, 1, 1024, 384, 100, 100, 255, 0);
-      $gameScreen.showPicture(basePicId + 5, HSTATES_FRAME, 1, 1024, 384, 100, 100, 255, 0);
-
-      let actorBustName = HSTATES_ACTOR_BUST_PREFIX + actorId;
-      $gameScreen.setPicturesAnimation(5, 1, "横", 3);
-      $gameScreen.showPicture(basePicId + 7, actorBustName, 1, 1024, 384, 100, 100, 255, 0);
-      $gameScreen.picture(basePicId + 7).startAnimationFrame(3, true, CACHED_ANIMATION_FRAMES);
-      
-      let headVariant;
-      if ($gameVariables.value(actorId + 440)[32] == 2) {
-        headVariant = 1;
-      } else {
-        headVariant = 2;
-      }
-
-      $gameScreen.showPicture(basePicId + 8, HSTATES_ACTOR_HEAD_PREFIX + actorId + "_" + headVariant, 1, 1024, 368, 100, 100, 0, 0);
-
-      $gameScreen.movePicture(basePicId + 6, 1, 1024, 400, 100, 100, 255, 0, 10);
-      $gameScreen.movePicture(basePicId + 7, 1, 1024, 384, 100, 100, 255, 0, 10);
-      $gameScreen.movePicture(basePicId + 8, 1, 1024, 368, 100, 100, 255, 0, 10);
-      $gameScreen.movePicture(basePicId + 9, 1, 1024, 384, 100, 100, 255, 0, 10);
-      $gameScreen.movePicture(basePicId + 10, 1, 1024, 384, 100, 100, 200, 0, 30);
-      for (let pictureId = basePicId + 6; pictureId <= basePicId + 9; pictureId++) {
-        if ($gameScreen.picture(pictureId)) {
-          tachie_bless(pictureId, 0);
-        }
-      }
-      let actorHue = '#00d0ff';
-      if (gameActor.actor().meta['tachieHue2']) {
-        actorHue = gameActor.actor().meta['tachieHue2'];
-      }
-      $gameScreen._particle.particleSet(0, HSTATES_BG_SHINE1, 'picture:116', 'def', 'above'); //55
-      $gameScreen._particle.particleSet(0, HSTATES_BODY_SHINE1, 'picture:118', 'def', 'above'); //58
-      $gameScreen._particle.particleUpdate([HSTATES_BODY_SHINE1, 'pos', 0, 20]);
-      $gameScreen._particle.particleUpdate([HSTATES_BODY_SHINE1, 'color', actorHue, actorHue + '@0.5', actorHue]);
-      //scale1-15 alfa1-0 speed1-1 #eb00ff
-
+      setupActorHStatesTachieMode1(basePicId, actorId, gameActor);
     } else {
-      updateActorHStatesTachie(basePicId, actorId);
+      updateActorHStatesTachieMode2(basePicId, actorId);
     }
   }
 };
+function setupActorHStatesTachieMode1(basePicId, actorId, gameActor) {
+  setActorStateBasedOnSkillsHStatesTachie(gameActor);
+  setupHStatesPictures(basePicId, actorId);
+  setupAnimatedActorBust(basePicId, actorId);
+  setupActorHead(basePicId, actorId);
+  animatePictures(basePicId);
+  setupParticleEffects(basePicId, gameActor);
+}
 
-function updateActorHStatesTachie(basePicId, actorId) {
+function setupHStatesPictures(basePicId, actorId) {
+  $gameScreen.showPicture(basePicId + 4, HSTATES_BACKGROUND, 1, 1024, 384, 100, 100, 255, 0);
+  $gameScreen.showPicture(basePicId + 6, HSTATES_ACTOR_BUST_PREFIX + actorId + "_" + $gameVariables.value(192), 1, 1024, 400, 100, 100, 0, 0);
+  $gameScreen.showPicture(basePicId + 9, HSTATES_ACTOR_FACE_PREFIX + actorId, 1, 1024, 384, 100, 100, 0, 0);
+  //let defaultHue = '#00d0ff';
+  $gameScreen.showPicture(basePicId + 10, HSTATES_ACTOR_BUST_WHITE, 1, 1024, 384, 0, 0, 0, 0);
+  $gameScreen.showPicture(basePicId + 11, HSTATES_FRAME, 1, 1024, 384, 100, 100, 255, 0);
+  $gameScreen.showPicture(basePicId + 5, HSTATES_FRAME, 1, 1024, 384, 100, 100, 255, 0);
+}
+
+function setupAnimatedActorBust(basePicId, actorId) {
+  let actorBustName = HSTATES_ACTOR_BUST_PREFIX + actorId;
+  $gameScreen.setPicturesAnimation(5, 1, "横", 3);
+  $gameScreen.showPicture(basePicId + 7, actorBustName, 1, 1024, 384, 100, 100, 255, 0);
+  $gameScreen.picture(basePicId + 7).startAnimationFrame(3, true, CACHED_ANIMATION_FRAMES);
+}
+
+function setupActorHead(basePicId, actorId) {
+  let headVariant;
+  if ($gameVariables.value(actorId + 440)[32] == 2) {
+    headVariant = 1;
+  } else {
+    headVariant = 2;
+  }
+
+  $gameScreen.showPicture(basePicId + 8, HSTATES_ACTOR_HEAD_PREFIX + actorId + "_" + headVariant, 1, 1024, 368, 100, 100, 0, 0);
+}
+
+function animatePictures(basePicId) {
+  $gameScreen.movePicture(basePicId + 6, 1, 1024, 400, 100, 100, 255, 0, 10);
+  $gameScreen.movePicture(basePicId + 7, 1, 1024, 384, 100, 100, 255, 0, 10);
+  $gameScreen.movePicture(basePicId + 8, 1, 1024, 368, 100, 100, 255, 0, 10);
+  $gameScreen.movePicture(basePicId + 9, 1, 1024, 384, 100, 100, 255, 0, 10);
+  $gameScreen.movePicture(basePicId + 10, 1, 1024, 384, 100, 100, 200, 0, 30);
+
+  for (let pictureId = basePicId + 6; pictureId <= basePicId + 9; pictureId++) {
+    if ($gameScreen.picture(pictureId)) {
+      tachie_bless(pictureId, 0);
+    }
+  }
+}
+
+function setupParticleEffects(basePicId, gameActor) {
+  let actorHue = '#00d0ff';
+  if (gameActor.actor().meta['tachieHue2']) {
+    actorHue = gameActor.actor().meta['tachieHue2'];
+  }
+
+  $gameScreen._particle.particleSet(0, HSTATES_BG_SHINE1, 'picture:116', 'def', 'above'); //55
+  $gameScreen._particle.particleSet(0, HSTATES_BODY_SHINE1, 'picture:118', 'def', 'above'); //58
+  $gameScreen._particle.particleUpdate([HSTATES_BODY_SHINE1, 'pos', 0, 20]);
+  $gameScreen._particle.particleUpdate([HSTATES_BODY_SHINE1, 'color', actorHue, actorHue + '@0.5', actorHue]);
+  //scale1-15 alfa1-0 speed1-1 #eb00ff
+}
+
+function updateActorHStatesTachieMode2(basePicId, actorId) {
   const hStageSexualDesireMod = $gameVariables.value(191);
 
   //パーティクルの変化設定
