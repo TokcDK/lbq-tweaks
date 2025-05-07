@@ -1966,6 +1966,10 @@ const fadeDurationsMap = {
   3: 50,
   4: 40
 };
+const faceVariantMap = {
+  1: "a",
+  5: "b"
+};
 actor_hStatesTachie = function (mode) {
 
   const actorId = $gameVariables.value(20);
@@ -2085,9 +2089,7 @@ actor_hStatesTachie = function (mode) {
       $gameScreen.picture(basePicId + 9).startAnimationFrame(1, false, [1]);
 
       if (hStageSexualDesireMod == 1 || hStageSexualDesireMod == 5) {
-        let faceVariantSuffix;
-        if (hStageSexualDesireMod == 1) { faceVariantSuffix = "a"; }
-        if (hStageSexualDesireMod == 5) { faceVariantSuffix = "b"; }
+        let faceVariantSuffix = faceVariantMap[hStageSexualDesireMod];
         $gameScreen.showPicture(basePicId + 12, HSTATES_ACTOR_FACE_PREFIX + actorId + faceVariantSuffix, 1, 1024, 384, 100, 100, 0, 3);
         $gameScreen.movePicture(basePicId + 12, 1, 1024, 384, 100, 100, 150, 3, 180);
       }
