@@ -246,12 +246,23 @@ DataManager.makeSavefileInfo = function() {
 　　};
 
 Game_Map.prototype.updateEvents = function() {
-   this.events().forEach(function(event) {
-       if(event.isNearThePlayer()) event.update();
-   });
-   this._commonEvents.forEach(function(event) {
-       event.update();
-   });
+  const events = this.events();
+  const len = events.length;
+  // Use direct indexing instead of forEach for better performance
+  for (let i = 0; i < len; i++) {
+    const event = events[i];
+    // Only update events that are near the player
+    if (event.isNearThePlayer()) {
+      event.update();
+    }
+  }
+  
+  // Common events always update regardless of position
+  const commonEvents = this._commonEvents;
+  const commonLen = commonEvents.length;
+  for (let j = 0; j < commonLen; j++) {
+    commonEvents[j].update();
+  }
 };
 
 //Game_SelfSwitches.prototype.onChange = function(eventId) {
