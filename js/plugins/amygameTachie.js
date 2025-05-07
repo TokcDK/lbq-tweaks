@@ -882,10 +882,10 @@ tachie_naibusyori1 = function(args) {
 };
 
 //☆☆立ち絵消去
-tachie_syoukyo1 = function (id2) {
+tachie_syoukyo1 = function (tachiePicId) {
 
-  if ($gameScreen.picture(id2)) {
-    pic_eraseP(0, [id2]);
+  if ($gameScreen.picture(tachiePicId)) {
+    pic_eraseP(0, [tachiePicId]);
   };
   if ($gameScreen.picture(7)) {
     UTSU.PictureBreath.off([7]);
