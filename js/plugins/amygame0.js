@@ -13,32 +13,33 @@
   };
 
   //rpg_windows.js
-  Window_ChoiceList.prototype.updatePlacement = function () {
-    var positionType = $gameMessage.choicePositionType();
-    var messageY = this._messageWindow.y;
+  Window_ChoiceList.prototype.updatePlacement = function() {    
+    // Set dimensions once
     this.width = this.windowWidth();
     this.height = this.windowHeight();
-    switch (positionType) {
-      case 0:
-        this.x = 0;
-        break;
-      case 1:
-        this.x = (Graphics.boxWidth - this.width) / 2;
-        break;
-      case 2:
-        this.x = Graphics.boxWidth - this.width;
-        break;
-    }
-    if (messageY >= Graphics.boxHeight / 2) {
-      if ($gameSwitches.value(520)) {
-        this.y = messageY - this.height - 50;
-      } else {
-        this.y = messageY - this.height;
-      };
+    
+    // Set x position based on positionType with direct assignment
+    const positionType = $gameMessage.choicePositionType();
+    if (positionType === 0) {
+      this.x = 0;
+    } else if (positionType === 1) {
+      this.x = (Graphics.boxWidth - this.width) / 2;
     } else {
-      this.y = messageY + this._messageWindow.height;
+      this.x = Graphics.boxWidth - this.width;
+    }
+    
+    // Calculate y position
+    const messageWindow = this._messageWindow;
+    const messageY = messageWindow.y;
+    const isLowerHalf = messageY >= Graphics.boxHeight / 2;
+    if (isLowerHalf) {
+      // Cache switch value to avoid multiple lookups
+      this.y = messageY - this.height - ($gameSwitches.value(520) ? 50 : 0);
+    } else {
+      this.y = messageY + messageWindow.height;
     }
   };
+
   Window_Base.prototype.actorName = function (n) {
     var actor = n >= 1 ? $gameActors.actor(n) : null;
     return actor ? '\x1bC[23]' + actor.name() + '\x1bC[0]' : '';
