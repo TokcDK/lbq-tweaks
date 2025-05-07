@@ -6676,7 +6676,7 @@ pictureText_SetUp = function(setupType, pictureId, displayText, textSetting, pos
     }
   }
 
-  func_9_1 = function (parent) {
+  clearTemporaryActorState = function (parent) {
     const actorIds = $gameVariables.value(248);
     actorIds.forEach(function (actorId) {
       $gameActors.actor(actorId).removeState(39);
@@ -6684,8 +6684,7 @@ pictureText_SetUp = function(setupType, pictureId, displayText, textSetting, pos
     }, parent);
   }
 
-  // Original func_9_2: Use with appropriate parameters to set family names
-  func_9_2 = function(parent) {
+  setNPCFamilyNames = function(parent) {
     setNPCInformation(
       parent, 
       354, 
@@ -6694,8 +6693,7 @@ pictureText_SetUp = function(setupType, pictureId, displayText, textSetting, pos
     );
   };
 
-  // Original func_9_4: Use with appropriate parameters to set professions
-  func_9_4 = function(parent) {
+  setNPCProfessions = function(parent) {
     setNPCInformation(
       parent, 
       353, 
@@ -6704,7 +6702,7 @@ pictureText_SetUp = function(setupType, pictureId, displayText, textSetting, pos
     );
   };
 
-  func_9_3 = function (parent) {
+  updateNPCWeaponNamesFromVariables = function (parent) {
     const actorIds = $gameVariables.value(248);
     actorIds.forEach(function (actorId) {
       $dataWeapons[actorId + 200].name = $gameVariables.value(actorId + 380)[50];
