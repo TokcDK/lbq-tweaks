@@ -2027,84 +2027,87 @@ actor_hStatesTachie = function (mode) {
       //scale1-15 alfa1-0 speed1-1 #eb00ff
 
     } else {
-
-      //パーティクルの変化設定
-      //Animate フレーム設定がシビアなので使えない
-      //if(actor.isLearnedSkill(62)){$gameVariables.setValue(191,2)};//反抗
-      //if(actor.isLearnedSkill(64)){$gameVariables.setValue(191,3)};//自失
-      //if(actor.isLearnedSkill(66)){$gameVariables.setValue(191,4)};//卑猥
-      //if(actor.isLearnedSkill(68)){$gameVariables.setValue(191,5);$gameVariables.setValue(192,2)};//通常目光
-      //if(actor.isLearnedSkill(70)){$gameVariables.setValue(191,6)};//あへ
-
-      const hStageSexualDesireMod = $gameVariables.value(191);
-
-      if (hStageSexualDesireMod >= 1) {
-        const alphaStart = '0.7';
-        const alphaEnd = '0.3';
-        $gameScreen._particle.particleUpdate([HSTATES_BODY_SHINE1, 'alpha', alphaStart, alphaEnd + '@0.5', '0']);
-      }
-      if (hStageSexualDesireMod >= 2) {
-        $gameScreen.movePicture(basePicId + 10, 1, 1024, 384, 100, 100, 150, 0, 60);
-        const speedStart = '0.5';
-        const speedEnd = '0.5';
-        $gameScreen._particle.particleUpdate([HSTATES_BODY_SHINE1, 'speed', speedStart, speedEnd + '@0.5', speedEnd]);
-      }
-      if (hStageSexualDesireMod >= 3) {
-        $gameScreen.movePicture(basePicId + 10, 1, 1024, 384, 100, 100, 50, 0, 60);
-        const scaleStart = '10';
-        const scaleEnd = '6';
-        $gameScreen._particle.particleUpdate([HSTATES_BODY_SHINE1, 'scale', scaleStart, scaleEnd + '@0.5', scaleEnd]);
-        $gameScreen._particle.particleUpdate([HSTATES_BODY_SHINE1, 'color', '#eb00ff', '#eb00ff@0.1', '#ffffff']);
-      }
-      if (hStageSexualDesireMod >= 4) {
-        $gameScreen._particle.particleUpdate([HSTATES_BODY_SHINE1, 'emitterLifetime', '1']);
-      }
-      if (hStageSexualDesireMod >= 4) {
-        $gameScreen.movePicture(basePicId + 10, 1, 1024, 384, 100, 100, 0, 0, 60);
-        $gameScreen._particle.particleClear(HSTATES_BG_SHINE1);
-        $gameScreen._particle.particleSet(0, 'hStates_bgShine2', 'picture:57', 'def', 'blow');
-      }
-
-      //デバック用
-      //$gameScreen.movePicture(value1+10,1,1024,384,100,100,0,0,60);
-      //$gameScreen._particle.particleUpdate(['hStates_bodyShine1','emitterLifetime','1']);
-
-      if (hStageSexualDesireMod >= 2) {
-        const fadeDuration = hStageSexualDesireMod >= 5 ? 30 : fadeDurationsMap[hStageSexualDesireMod] || 0;
-        $gameScreen.showPicture(basePicId + 13, HSTATES_BACKGROUND_VAR + hStageSexualDesireMod, 1, 1024, 384, 100, 100, 255, 0);
-        picture_fade1(basePicId + 13, "fadeOut", "HscenePose054", fadeDuration, 5);
-      }
-
-      if (hStageSexualDesireMod >= 2) {
-        $gameScreen.showPicture(basePicId + 3, HSTATES_BACKGROUND_VAR + hStageSexualDesireMod, 1, 1024, 384, 100, 100, 0, 0);
-        $gameScreen.movePicture(basePicId + 4, 1, 1024, 384, 100, 100, 0, 0, 120);
-        $gameScreen.movePicture(basePicId + 3, 1, 1024, 384, 100, 100, 255, 0, 120);
-      }
-
-      bless_erase();
-
-      let facePictureId = HSTATES_ACTOR_FACE_PREFIX + actorId + "_" + hStageSexualDesireMod;
-      $gameScreen.setPicturesAnimation(5, 1, "横", 5);
-      $gameScreen.showPicture(basePicId + 9, facePictureId, 1, 1024, 384, 100, 100, 255, 0);
-      $gameScreen.picture(basePicId + 9).startAnimationFrame(1, false, [1]);
-
-      if (hStageSexualDesireMod == 1 || hStageSexualDesireMod == 5) {
-        let faceVariantSuffix = faceVariantMap[hStageSexualDesireMod];
-        $gameScreen.showPicture(basePicId + 12, HSTATES_ACTOR_FACE_PREFIX + actorId + faceVariantSuffix, 1, 1024, 384, 100, 100, 0, 3);
-        $gameScreen.movePicture(basePicId + 12, 1, 1024, 384, 100, 100, 150, 3, 180);
-      }
-      $gameScreen.movePicture(basePicId + 11, 1, 1024, 384, 100, 100, 0, 0, 60);
-      for (let pictureId = basePicId + 6, max = basePicId + 9; pictureId <= max; pictureId++) {
-        if ($gameScreen.picture(pictureId)) {
-          tachie_bless(pictureId, 0);
-        }
-      }
-      if ($gameScreen.picture(basePicId + 7)) {
-        hcg_piston(basePicId + 7, 9, 1, 2);
-      }
+      updateActorHStatesTachie(basePicId, actorId);
     }
   }
 };
+
+function updateActorHStatesTachie(basePicId, actorId) {
+  const hStageSexualDesireMod = $gameVariables.value(191);
+
+  //パーティクルの変化設定
+  //Animate フレーム設定がシビアなので使えない
+  //if(actor.isLearnedSkill(62)){$gameVariables.setValue(191,2)};//反抗
+  //if(actor.isLearnedSkill(64)){$gameVariables.setValue(191,3)};//自失
+  //if(actor.isLearnedSkill(66)){$gameVariables.setValue(191,4)};//卑猥
+  //if(actor.isLearnedSkill(68)){$gameVariables.setValue(191,5);$gameVariables.setValue(192,2)};//通常目光
+  //if(actor.isLearnedSkill(70)){$gameVariables.setValue(191,6)};//あへ
+
+  if (hStageSexualDesireMod >= 1) {
+    const alphaStart = '0.7';
+    const alphaEnd = '0.3';
+    $gameScreen._particle.particleUpdate([HSTATES_BODY_SHINE1, 'alpha', alphaStart, alphaEnd + '@0.5', '0']);
+  }
+  if (hStageSexualDesireMod >= 2) {
+    $gameScreen.movePicture(basePicId + 10, 1, 1024, 384, 100, 100, 150, 0, 60);
+    const speedStart = '0.5';
+    const speedEnd = '0.5';
+    $gameScreen._particle.particleUpdate([HSTATES_BODY_SHINE1, 'speed', speedStart, speedEnd + '@0.5', speedEnd]);
+  }
+  if (hStageSexualDesireMod >= 3) {
+    $gameScreen.movePicture(basePicId + 10, 1, 1024, 384, 100, 100, 50, 0, 60);
+    const scaleStart = '10';
+    const scaleEnd = '6';
+    $gameScreen._particle.particleUpdate([HSTATES_BODY_SHINE1, 'scale', scaleStart, scaleEnd + '@0.5', scaleEnd]);
+    $gameScreen._particle.particleUpdate([HSTATES_BODY_SHINE1, 'color', '#eb00ff', '#eb00ff@0.1', '#ffffff']);
+  }
+  if (hStageSexualDesireMod >= 4) {
+    $gameScreen._particle.particleUpdate([HSTATES_BODY_SHINE1, 'emitterLifetime', '1']);
+  }
+  if (hStageSexualDesireMod >= 4) {
+    $gameScreen.movePicture(basePicId + 10, 1, 1024, 384, 100, 100, 0, 0, 60);
+    $gameScreen._particle.particleClear(HSTATES_BG_SHINE1);
+    $gameScreen._particle.particleSet(0, 'hStates_bgShine2', 'picture:57', 'def', 'blow');
+  }
+
+  //デバック用
+  //$gameScreen.movePicture(value1+10,1,1024,384,100,100,0,0,60);
+  //$gameScreen._particle.particleUpdate(['hStates_bodyShine1','emitterLifetime','1']);
+
+  if (hStageSexualDesireMod >= 2) {
+    const fadeDuration = hStageSexualDesireMod >= 5 ? 30 : fadeDurationsMap[hStageSexualDesireMod] || 0;
+    $gameScreen.showPicture(basePicId + 13, HSTATES_BACKGROUND_VAR + hStageSexualDesireMod, 1, 1024, 384, 100, 100, 255, 0);
+    picture_fade1(basePicId + 13, "fadeOut", "HscenePose054", fadeDuration, 5);
+  }
+
+  if (hStageSexualDesireMod >= 2) {
+    $gameScreen.showPicture(basePicId + 3, HSTATES_BACKGROUND_VAR + hStageSexualDesireMod, 1, 1024, 384, 100, 100, 0, 0);
+    $gameScreen.movePicture(basePicId + 4, 1, 1024, 384, 100, 100, 0, 0, 120);
+    $gameScreen.movePicture(basePicId + 3, 1, 1024, 384, 100, 100, 255, 0, 120);
+  }
+
+  bless_erase();
+
+  let facePictureId = HSTATES_ACTOR_FACE_PREFIX + actorId + "_" + hStageSexualDesireMod;
+  $gameScreen.setPicturesAnimation(5, 1, "横", 5);
+  $gameScreen.showPicture(basePicId + 9, facePictureId, 1, 1024, 384, 100, 100, 255, 0);
+  $gameScreen.picture(basePicId + 9).startAnimationFrame(1, false, [1]);
+
+  if (hStageSexualDesireMod == 1 || hStageSexualDesireMod == 5) {
+    let faceVariantSuffix = faceVariantMap[hStageSexualDesireMod];
+    $gameScreen.showPicture(basePicId + 12, HSTATES_ACTOR_FACE_PREFIX + actorId + faceVariantSuffix, 1, 1024, 384, 100, 100, 0, 3);
+    $gameScreen.movePicture(basePicId + 12, 1, 1024, 384, 100, 100, 150, 3, 180);
+  }
+  $gameScreen.movePicture(basePicId + 11, 1, 1024, 384, 100, 100, 0, 0, 60);
+  for (let pictureId = basePicId + 6, max = basePicId + 9; pictureId <= max; pictureId++) {
+    if ($gameScreen.picture(pictureId)) {
+      tachie_bless(pictureId, 0);
+    }
+  }
+  if ($gameScreen.picture(basePicId + 7)) {
+    hcg_piston(basePicId + 7, 9, 1, 2);
+  }
+}
 
 function setActorStateBasedOnSkillsHStatesTachie(actor) {
   $gameVariables.setValue(192, 1);
