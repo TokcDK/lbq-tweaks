@@ -1015,7 +1015,7 @@ tachie_hyouji2 = function (gameActor) {
       }
     }
   } else {
-    $gameVariables.setValue(106, $gameVariables.value(106) - Number(gameActor.meta['TachiePoseYposition']));
+    $gameVariables.setValue(106, $gameVariables.value(106) - Number(gameActor.actor().meta['TachiePoseYposition']));
     $gameVariables.setValue(102, $gameVariables.value(106));
   }
   if ($gameSwitches.value(30)) {
