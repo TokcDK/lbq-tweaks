@@ -350,20 +350,29 @@ BattleManager.makeRewards = function() {
     this._rewards.items = $gameTroop.makeDropItems();
 };
 
-//モーション制御
-Sprite_Actor.prototype.updateMotionCount = function() {
-    if (this._motion && ++this._motionCount >= this.motionSpeed()) {
-        if (this.hasOwnProperty("_maxPattern") && this._pattern === this._maxPattern) {this.refreshMotion(); return}
-        if (this._motion.loop) {
-            this._pattern = (this._pattern + 1) % 4;
-        } else if (this._pattern < 2) {
-            this._pattern++;
-        } else {
-            this.refreshMotion();
-        }
-        this._motionCount = 0;
+  //モーション制御
+  Sprite_Actor.prototype.updateMotionCount = function() {
+    if (!this._motion) return;
+    
+    if (++this._motionCount >= this.motionSpeed()) {
+      this._motionCount = 0;
+      
+      // Check for max pattern limit first
+      if (this._maxPattern !== undefined && this._pattern === this._maxPattern) {
+        this.refreshMotion();
+        return;
+      }
+      
+      // Handle pattern updates with minimal branching
+      if (this._motion.loop) {
+        this._pattern = (this._pattern + 1) % 4;
+      } else if (this._pattern < 2) {
+        this._pattern++;
+      } else {
+        this.refreshMotion();
+      }
     }
-};
+  };
 
   const updatePatternAlias = Sprite_Weapon.prototype.updatePattern
   Sprite_Weapon.prototype.updatePattern = function () {
