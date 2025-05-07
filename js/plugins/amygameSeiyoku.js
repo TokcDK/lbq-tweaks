@@ -1975,8 +1975,8 @@ actor_hStatesTachie = function (mode) {
       $gameScreen.showPicture(basePicId + 6, "HstatesActorBody" + actorId + "_" + $gameVariables.value(192), 1, 1024, 400, 100, 100, 0, 0);
       $gameScreen.showPicture(basePicId + 9, "HstatesActorFace" + actorId, 1, 1024, 384, 100, 100, 0, 0);
       let defaultHue = '#00d0ff';
-      if ($dataActors[actorId].meta['tachieHue2']) {
-        defaultHue = $dataActors[actorId].meta['tachieHue2'];
+      if (gameActor.actor().meta['tachieHue2']) {
+        defaultHue = gameActor.actor().meta['tachieHue2'];
       }
       $gameScreen.showPicture(basePicId + 10, "HstatesActorBustWhite", 1, 1024, 384, 0, 0, 0, 0);
       $gameScreen.showPicture(basePicId + 11, "HstatesFrame", 1, 1024, 384, 100, 100, 255, 0);
@@ -2008,8 +2008,8 @@ actor_hStatesTachie = function (mode) {
         }
       }
       let actorHue = '#00d0ff';
-      if ($dataActors[actorId].meta['tachieHue2']) {
-        actorHue = $dataActors[actorId].meta['tachieHue2'];
+      if (gameActor.actor().meta['tachieHue2']) {
+        actorHue = gameActor.actor().meta['tachieHue2'];
       }
       $gameScreen._particle.particleSet(0, 'hStates_bgShine1', 'picture:116', 'def', 'above'); //55
       $gameScreen._particle.particleSet(0, 'hStates_bodyShine1', 'picture:118', 'def', 'above'); //58
