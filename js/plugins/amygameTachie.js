@@ -1058,6 +1058,8 @@ const simpleFaceOptionsLen = SIMPLE_FACE_OPTIONS.length;
 const restrainedFaceOptionsLen = RESTRAINED_FACE_OPTIONS.length;
 const pregnancyFaceOptionsLen = PREGNANCY_FACE_OPTIONS.length;
 const TACHIE_SETTEI1_BASE_VAR_ID = 460; // Common base ID for variables
+const PREGNANCY_PART_IDS = [16, 17, 19, 20, 21, 22, 23, 24, 25, 26, 28];
+const BUKKAKE_FACE_EXPRESSIONS = [2, 3, 4];
 tachie_settei1 = function () {
   const actor = $gameActors.actor($gameVariables.value(20));
 
@@ -1079,65 +1081,159 @@ tachie_settei1 = function () {
   kobetu_isyousettei();
 
   //☆☆共通パーツ後段↓☆☆
-  if ($gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 9) === 4) { // 右腕乳房隠し時に乳房消去。注意。アムエスでは乳房差分変化なしなので処理変更
+  tachieSettei1ApplyCommonPostProcessing();  
+};
+
+//#region apply common processing
+function tachieSettei1ApplyCommonPostProcessing() {
+  // Get actor reference for state-related checks
+  const actor = $gameActors.actor($gameVariables.value(20));
+
+  // Apply adjustments for different body parts and states
+  tachieSettei1HideBreastsWhenCovered();
+  tachieSettei1HideClothingShadowWhenNoClothes();
+  applyBondageEffects();
+  handleNipplePiercingVisibility();
+  handleArmCoverVisibility();
+  handlePregnancyState(actor);
+  handleFacialFluidEffects(actor);
+  applyTemporaryStateEffects(actor);
+}
+
+// Hide breasts when covered by right arm
+function tachieSettei1HideBreastsWhenCovered() {
+  if ($gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 9) === 4) {
     $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 10, 0);
   }
-  if ($gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 19) >= 1 && $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 23) === 0) { // 服下影服なしなら消去
+}
+
+// Hide clothing shadow when no clothes are present
+function tachieSettei1HideClothingShadowWhenNoClothes() {
+  if ($gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 19) >= 1 &&
+    $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 23) === 0) {
     $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 19, 0);
   }
-  if ($gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 20) === 11) { // 奴隷ボンテージ。注意。アムエスではボンテージなしなので処理変更
+}
+
+// Apply special effects for bondage outfit
+function applyBondageEffects() {
+  if ($gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 20) === 11) {
     $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 10, 1);
     $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 9, 1);
     $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 15, 1);
     $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 24, 0);
     $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 26, 0);
   }
-  if ($gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 10) === 0 && $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 11) === 1) { // 乳首ピアス乳房非表示時に隠す
+}
+
+// Handle nipple piercing visibility based on breast visibility
+function handleNipplePiercingVisibility() {
+  if ($gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 10) === 0 &&
+    $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 11) === 1) {
     $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 111, $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 11));
     $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 11, 0);
   }
-  if ($gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 9) === 4) { // 右腕乳房露出時腕カバー消去
+}
+
+// Handle arm cover visibility based on arm position
+function handleArmCoverVisibility() {
+  // Handle right arm cover
+  if ($gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 9) === 4) {
     $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 117, $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 17));
     $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 17, 0);
   }
-  if ($gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 15) === 4) { // 左腕股間露出時腕カバー消去
+
+  // Handle left arm cover
+  if ($gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 15) === 4) {
     $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 126, $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 26));
     $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 26, 0);
   }
-  if (actor.isStateAffected(83)) { // 妊娠でボテ腹
-    for (const partId of [16, 17, 19, 20, 21, 22, 23, 24, 25, 26, 28]) {
-      $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + partId + 100, $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + partId));
-      $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + partId, 0);
-    }
-    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 9, 1);
-    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 10, 1);
-    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 15, 1);
-    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 12, 2);
-    if ($gameVariables.value(380 + actorId)[4] >= 5) {
-      $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 28, 1);
-      $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 12, 1);
-    }
-    if ($gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 14) === 1) { // 臍ピアス時に変化
-      $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 114, $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 14));
-      $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 14, 2);
-    }
+}
+
+// Handle pregnancy state and visual changes
+function handlePregnancyState(actor) {
+  if (!actor.isStateAffected(83)) return;
+
+  // Save and reset body part states for pregnancy mode
+  saveAndResetBodyPartsForPregnancy();
+
+  // Set specific pose for pregnancy
+  setPregnancyPose();
+
+  // Handle clothing adjustments for pregnancy
+  handlePregnancyClothing();
+
+  // Handle navel piercing during pregnancy
+  handleNavelPiercingDuringPregnancy();
+}
+
+// Save and hide body parts that should be adjusted during pregnancy
+function saveAndResetBodyPartsForPregnancy() {
+  for (const partId of PREGNANCY_PART_IDS) {
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + partId + 100,
+      $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + partId));
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + partId, 0);
   }
-  if (actor.isStateAffected(83)) { // ぶっかけ腕の状態で変化
-    if ([2, 3, 4].some(function (stateFace) { return $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 9) === stateFace; })) {
-      if ($gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 40) === 2) {
-        $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 40, 3);
-      }
-    }
+}
+
+// Set the pose for pregnancy
+function setPregnancyPose() {
+  $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 9, 1);  // Right arm
+  $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 10, 1); // Breasts
+  $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 15, 1); // Left arm
+  $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 12, 2); // Default pregnant belly
+}
+
+// Handle clothing adjustment based on exposure during pregnancy
+function handlePregnancyClothing() {
+  const actorId = $gameVariables.value(20);
+  if ($gameVariables.value(380 + actorId)[4] >= 5) {
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 28, 1); // Apply coat
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 12, 1); // Change belly appearance
   }
+}
+
+// Handle navel piercing appearance during pregnancy
+function handleNavelPiercingDuringPregnancy() {
+  if ($gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 14) === 1) {
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 114,
+      $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 14));
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 14, 2); // Change to pregnancy-specific piercing
+  }
+}
+
+// Handle facial fluid effects based on arm position
+function handleFacialFluidEffects(actor) {
+  if (!actor.isStateAffected(83)) return;
+
+  // Check if arm position is in one of the states that affects fluid appearance
+  const isArmInEffectingPosition = BUKKAKE_FACE_EXPRESSIONS.some(function (stateFace) {
+    return $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 9) === stateFace;
+  });
+
+  // Update fluid appearance if needed
+  if (isArmInEffectingPosition && $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 40) === 2) {
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 40, 3);
+  }
+}
+
+// Apply temporary state effects from state metadata
+function applyTemporaryStateEffects(actor) {
   for (const tempStateId of valueTachieChangeStateTemporary) {
-    if (actor.isStateAffected(tempStateId)) { // ステートによってパーツに変化を促す一時ステート・その立ち絵会話期間のみ
-      const tachieChangeTempArr = $dataStates[tempStateId].meta['TachieChangeStateTemporary'].split(',');
-      const targetVariableId = TACHIE_SETTEI1_BASE_VAR_ID + Number(tachieChangeTempArr[0]);
-      $gameVariables.setValue(targetVariableId, $gameVariables.value(targetVariableId));
-      $gameVariables.setValue(targetVariableId, Number(tachieChangeTempArr[1]));
-    }
+    if (!actor.isStateAffected(tempStateId)) continue;
+
+    // Parse state metadata to get part ID and new value
+    const tachieChangeTempArr = $dataStates[tempStateId].meta['TachieChangeStateTemporary'].split(',');
+    const targetPartId = Number(tachieChangeTempArr[0]);
+    const newPartValue = Number(tachieChangeTempArr[1]);
+
+    // Apply the change to the target part
+    const targetVariableId = TACHIE_SETTEI1_BASE_VAR_ID + targetPartId;
+    $gameVariables.setValue(targetVariableId, $gameVariables.value(targetVariableId)); // Store original value
+    $gameVariables.setValue(targetVariableId, newPartValue); // Set new value
   }
-};
+}
+//#endregion
 
 //#region tachie_settei1 set modest pose
 // Apply special arm pose for aroused characters with high exposure
