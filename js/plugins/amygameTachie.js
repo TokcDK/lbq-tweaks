@@ -668,8 +668,10 @@ tachie_switchOnOff();
 tachie_naibusyori2 = function() {
   // Cache frequently used variables
   const actorId = $gameVariables.value(20);
+  console.debug(`tachie_naibusyori2: Retrieved actorId = ${actorId}`);
   const actorCharName = 'actor' + actorId;
-  
+  console.debug(`tachie_naibusyori2: actorCharName set to ${actorCharName}`);
+
   // Set character name for standing image
   $gameVariables.setValue(118, actorCharName);
   
@@ -677,10 +679,12 @@ tachie_naibusyori2 = function() {
   const picId = $gameSwitches.value(90) 
     ? $gameVariables.value(300) 
     : Number($dataActors[actorId].meta['tachiePicId']);
+  console.debug(`tachie_naibusyori2: picId determined as ${picId}`);
   $gameVariables.setValue(117, picId);
   
   // Calculate the zero-based tachie number
   const tachieIndex = Math.max(-1, picId - 1);
+  console.debug(`tachie_naibusyori2: tachieIndex calculated as ${tachieIndex}`);
   
   // Get references to avoid repeated lookups
   const tachieData = $TKMvar.tachie;
@@ -689,33 +693,61 @@ tachie_naibusyori2 = function() {
   
   // Initialize character parts if switch 20 is ON
   if ($gameSwitches.value(20)) {
+    console.debug("tachie_naibusyori2: Switch 20 is ON! Initializing character parts.");
+    // Log current clothing variable values before initialization
+    for (let j = 1; j <= 40; j++) {
+      console.debug(`Before runTachieLoop - Variable ${j + 460}: ${$gameVariables.value(j + 460)}`);
+    }
     // Process each clothing part
-    runTachieLoop(1, 40, j => $gameVariables.value(j + 460), j => $gameVariables.value(j + 460) >= 0);
+    runTachieLoop(1, 40, j => {
+      const val = $gameVariables.value(j + 460);
+      console.debug(`runTachieLoop: For part ${j}, value = ${val}`);
+      return val;
+    }, j => {
+      const condition = $gameVariables.value(j + 460) >= 0;
+      console.debug(`runTachieLoop: Condition for part ${j} is ${condition}`);
+      return condition;
+    });
     
     // Clear previous picture if it exists
     if (tachieIndex !== -1 && tachieIndex < picData.length) {
+      console.debug(`tachie_naibusyori2: Erasing previous picture with picNum ${picData[tachieIndex].picNum}`);
       $gameScreen.erasePicture(picData[tachieIndex].picNum);
+    } else {
+      console.debug("tachie_naibusyori2: tachieIndex out of bounds, cannot erase previous picture.");
     }
     
     // Initialize character parts array
     charList[actorCharName] = Array(tachieData.MaxLayer).fill(0);
+    console.debug(`tachie_naibusyori2: Initialized charList for ${actorCharName} with ${tachieData.MaxLayer} layers.`);
   }
   
   // Handle state 19 (clear standing picture)
   if ($gameActors.actor(actorId).isStateAffected(19)) {
+    console.debug(`tachie_naibusyori2: Actor ${actorId} is in state 19. Clearing standing picture.`);
     tachie_clear(picId);
-    runTachieLoop(1, 40, () => "0");
+    runTachieLoop(1, 40, () => {
+      console.debug("runTachieLoop: Clearing clothing part, returning '0'");
+      return "0";
+    });
   } else {
+    console.debug(`tachie_naibusyori2: Normal case for actor ${actorId}. Applying clothing parts.`);
     // Normal case: apply clothing parts
-    runTachieLoop(1, 40, j => $gameVariables.value(j + 460));
+    runTachieLoop(1, 40, j => {
+      const currVal = $gameVariables.value(j + 460);
+      console.debug(`runTachieLoop: For part ${j}, current value = ${currVal}`);
+      return currVal;
+    });
   }
   
   // Check if we need to change the character's standing image
   if (tachieIndex !== -1) {
     // Update character data if different from current
     const currentChar = tachieIndex < picData.length ? picData[tachieIndex].char : null;
+    console.debug(`tachie_naibusyori2: currentChar = ${currentChar}, desired = ${actorCharName}`);
     
     if (currentChar !== actorCharName && actorCharName in charList && tachieIndex < picData.length) {
+      console.debug(`tachie_naibusyori2: Updating picData at index ${tachieIndex} with new char ${actorCharName}`);
       picData[tachieIndex].char = actorCharName;
       picData[tachieIndex].bitmap = [];
       tachieData.preloadBitmap(tachieIndex);
@@ -727,9 +759,13 @@ tachie_naibusyori2 = function() {
       const name = "TKMtachie_" + picData[tachieIndex].char + "_";
       const x = picData[tachieIndex].x;
       const y = picData[tachieIndex].y;
-      
+      console.debug(`tachie_naibusyori2: Showing picture with picNum ${pictureId}, name ${name}, at (${x}, ${y})`);
       $gameScreen.showPicture(pictureId, name, 0, x, y, 85, 85, 0, 0);
+    } else {
+      console.debug("tachie_naibusyori2: Picture data not found or character not set.");
     }
+  } else {
+    console.debug("tachie_naibusyori2: tachieIndex is -1, skipping standing picture display.");
   }
 };
 
