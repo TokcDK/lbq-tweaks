@@ -291,11 +291,11 @@ Game_CharacterBase.prototype.realMoveSpeed = function() {
 //};
 
 Game_Unit.prototype.luklity = function() {
-    var members = this.members();
+    const members = this.members();
     if (members.length === 0) {
         return 1;
     }
-    var sum = members.reduce(function(r, member) {
+    const sum = members.reduce(function(r, member) {
         return r + member.luk;
     }, 0);
     return sum / members.length;
