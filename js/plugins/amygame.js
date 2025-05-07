@@ -6684,6 +6684,13 @@ pictureText_SetUp = function(setupType, pictureId, displayText, textSetting, pos
     }, parent);
   }
 
+  updateNPCWeaponNamesFromVariables = function (parent) {
+    const actorIds = $gameVariables.value(248);
+    actorIds.forEach(function (actorId) {
+      $dataWeapons[actorId + 200].name = $gameVariables.value(actorId + 380)[50];
+    }, parent);
+  }
+
   setNPCFamilyNames = function(parent) {
     setNPCInformation(
       parent, 
@@ -6693,6 +6700,7 @@ pictureText_SetUp = function(setupType, pictureId, displayText, textSetting, pos
     );
   };
 
+//#region setNPCInformation
   setNPCProfessions = function(parent) {
     setNPCInformation(
       parent, 
@@ -6701,13 +6709,6 @@ pictureText_SetUp = function(setupType, pictureId, displayText, textSetting, pos
       function(actorId) { return $gameVariables.value(actorId + 380)[59]; }
     );
   };
-
-  updateNPCWeaponNamesFromVariables = function (parent) {
-    const actorIds = $gameVariables.value(248);
-    actorIds.forEach(function (actorId) {
-      $dataWeapons[actorId + 200].name = $gameVariables.value(actorId + 380)[50];
-    }, parent);
-  }
 
   /**
    * Sets NPC information based on substitution actor or direct metadata.
@@ -6737,5 +6738,6 @@ pictureText_SetUp = function(setupType, pictureId, displayText, textSetting, pos
       }
     }
   };
+//#endregion
 
 }());
