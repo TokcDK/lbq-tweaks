@@ -1953,7 +1953,8 @@ if($gameActors.actor($gameVariables.value(20)).isStateAffected(83)){
 //☆☆Hプロフィール表示時立ち絵
 actor_hStatesTachie = function (mode) {
 
-  const gameActor = $gameActors.actor($gameVariables.value(20)); // bad using global dinamic!
+  const actorId = $gameVariables.value(20);
+  const gameActor = $gameActors.actor(actorId); // bad using global dinamic!
   if (!isGirl(gameActor)) {
     tachie_hyouji2(gameActor);
   } else {
@@ -1971,30 +1972,30 @@ actor_hStatesTachie = function (mode) {
       //$gameVariables.setValue(191,3);
 
       $gameScreen.showPicture(basePicId + 4, "HstatesBackGround1", 1, 1024, 384, 100, 100, 255, 0);
-      $gameScreen.showPicture(basePicId + 6, "HstatesActorBody" + $gameVariables.value(20) + "_" + $gameVariables.value(192), 1, 1024, 400, 100, 100, 0, 0);
-      $gameScreen.showPicture(basePicId + 9, "HstatesActorFace" + $gameVariables.value(20), 1, 1024, 384, 100, 100, 0, 0);
+      $gameScreen.showPicture(basePicId + 6, "HstatesActorBody" + actorId + "_" + $gameVariables.value(192), 1, 1024, 400, 100, 100, 0, 0);
+      $gameScreen.showPicture(basePicId + 9, "HstatesActorFace" + actorId, 1, 1024, 384, 100, 100, 0, 0);
       let defaultHue = '#00d0ff';
-      if ($dataActors[$gameVariables.value(20)].meta['tachieHue2']) {
-        defaultHue = $dataActors[$gameVariables.value(20)].meta['tachieHue2'];
+      if ($dataActors[actorId].meta['tachieHue2']) {
+        defaultHue = $dataActors[actorId].meta['tachieHue2'];
       }
       $gameScreen.showPicture(basePicId + 10, "HstatesActorBustWhite", 1, 1024, 384, 0, 0, 0, 0);
       $gameScreen.showPicture(basePicId + 11, "HstatesFrame", 1, 1024, 384, 100, 100, 255, 0);
       $gameScreen.showPicture(basePicId + 5, "HstatesFrame", 1, 1024, 384, 100, 100, 255, 0);
 
-      let actorBustName = "HstatesActorBust" + $gameVariables.value(20);
+      let actorBustName = "HstatesActorBust" + actorId;
       $gameScreen.setPicturesAnimation(5, 1, "横", 3);
       $gameScreen.showPicture(basePicId + 7, actorBustName, 1, 1024, 384, 100, 100, 255, 0);
       $gameScreen.picture(basePicId + 7).startAnimationFrame(3, true,
         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 2, 1, 4, 5, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
       
       let headVariant;
-      if ($gameVariables.value($gameVariables.value(20) + 440)[32] == 2) {
+      if ($gameVariables.value(actorId + 440)[32] == 2) {
         headVariant = 1;
       } else {
         headVariant = 2;
       }
 
-      $gameScreen.showPicture(basePicId + 8, "HstatesActorHead" + $gameVariables.value(20) + "_" + headVariant, 1, 1024, 368, 100, 100, 0, 0);
+      $gameScreen.showPicture(basePicId + 8, "HstatesActorHead" + actorId + "_" + headVariant, 1, 1024, 368, 100, 100, 0, 0);
 
       $gameScreen.movePicture(basePicId + 6, 1, 1024, 400, 100, 100, 255, 0, 10);
       $gameScreen.movePicture(basePicId + 7, 1, 1024, 384, 100, 100, 255, 0, 10);
@@ -2007,8 +2008,8 @@ actor_hStatesTachie = function (mode) {
         }
       }
       let actorHue = '#00d0ff';
-      if ($dataActors[$gameVariables.value(20)].meta['tachieHue2']) {
-        actorHue = $dataActors[$gameVariables.value(20)].meta['tachieHue2'];
+      if ($dataActors[actorId].meta['tachieHue2']) {
+        actorHue = $dataActors[actorId].meta['tachieHue2'];
       }
       $gameScreen._particle.particleSet(0, 'hStates_bgShine1', 'picture:116', 'def', 'above'); //55
       $gameScreen._particle.particleSet(0, 'hStates_bodyShine1', 'picture:118', 'def', 'above'); //58
@@ -2076,7 +2077,7 @@ actor_hStatesTachie = function (mode) {
 
       bless_erase();
 
-      let facePictureId = "HstatesActorFace" + $gameVariables.value(20) + "_" + $gameVariables.value(191);
+      let facePictureId = "HstatesActorFace" + actorId + "_" + $gameVariables.value(191);
       $gameScreen.setPicturesAnimation(5, 1, "横", 5);
       $gameScreen.showPicture(basePicId + 9, facePictureId, 1, 1024, 384, 100, 100, 255, 0);
       $gameScreen.picture(basePicId + 9).startAnimationFrame(1, false, [1]);
@@ -2085,7 +2086,7 @@ actor_hStatesTachie = function (mode) {
         let faceVariantSuffix;
         if ($gameVariables.value(191) == 1) { faceVariantSuffix = "a"; }
         if ($gameVariables.value(191) == 5) { faceVariantSuffix = "b"; }
-        $gameScreen.showPicture(basePicId + 12, "HstatesActorFace" + $gameVariables.value(20) + faceVariantSuffix, 1, 1024, 384, 100, 100, 0, 3);
+        $gameScreen.showPicture(basePicId + 12, "HstatesActorFace" + actorId + faceVariantSuffix, 1, 1024, 384, 100, 100, 0, 3);
         $gameScreen.movePicture(basePicId + 12, 1, 1024, 384, 100, 100, 150, 3, 180);
       }
       $gameScreen.movePicture(basePicId + 11, 1, 1024, 384, 100, 100, 0, 0, 60);
