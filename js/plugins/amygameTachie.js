@@ -237,7 +237,7 @@ tachie_dousa = function (
         }
 
         if (mode >= 1) {
-          param6 >= 1 ? kisekae_tyokusetusitei(param6, expressionId) : tachie_settei2();
+          param6 >= 1 ? kisekae_tyokusetusitei(param6, expressionId) : tachie_settei3(actor);
           const pic = $gameScreen.picture(targetPicId);
           if (pic) Object.assign(pic, picProps);
         } else {
@@ -305,7 +305,7 @@ tachie_dousa = function (
           valueTacieSet = [pic.origin(), pic.x(), pic.y(), pic.scaleX(), pic.scaleY(), pic.opacity()];
         }
 
-        duration >= 1 ? kisekae_tyokusetusitei(duration, param8) : tachie_settei2();
+        duration >= 1 ? kisekae_tyokusetusitei(duration, param8) : tachie_settei3(actor);
         updateEventImage();
       },
 
@@ -363,6 +363,7 @@ tachie_dousa = function (
 //☆☆着せ替え直接指定
 kisekae_tyokusetusitei = function(id1,id2){
 
+const actor = $gameActors.actor($gameVariables.value(20));
 $gameVariables.setValue(19,id1);
 if(!$gameParty.hasItem($dataItems[id1])){
   $gameParty.gainItem($dataItems[id1], 1);
@@ -393,9 +394,9 @@ if($dataItems[$gameVariables.value(19)].meta['ClothSpecify']){
       if(id2 >= 1){
         $gameVariables.setValue(493,id2);
       };
-      $gameActors.actor($gameVariables.value(20)).addState(23);
+  actor.addState(23);
 } else {
-  $gameActors.actor($gameVariables.value(20)).removeState(23);
+  actor.removeState(23);
   kisekae_naibusyori1();
 };
 
@@ -404,7 +405,7 @@ var start = 1; var end = 40;
   for (var i = start; i <= end; i++) {
     $gameVariables.value($gameVariables.value(20)+440)[i] = $gameVariables.value(i+460);
   }
-tachie_settei2();
+tachie_settei3(actor);
 
 };
 
@@ -1886,7 +1887,7 @@ get_and_cofig_girls_standing_pic = function () {
     const actor = battlers[i];
     if (isGirl(actor)) { // 女のみ, girls only
       $gameVariables.setValue(20, actor.actorId());
-      tachie_settei2();
+      tachie_settei3(actor);
     }
   }
 }
