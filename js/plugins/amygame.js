@@ -6603,6 +6603,41 @@ pictureText_SetUp = function(setupType, pictureId, displayText, textSetting, pos
     const weekNum = $gameVariables.value(55);
     TickerManager.show(`──${dayNum}日目(${weekNum}曜日)経過──`);
   }
-  //#endregion
+
+  resetChildEventAppearance = function () {
+    const eventIds = $gameVariables.value(292);
+    for (let eventId = 11; eventId <= 13; eventId++) {
+      const eventId = eventIds[eventId]; // this._eventId
+      if ($gameMap.event(eventId)) {
+        const mapEvent = $gameMap.event(eventId);
+        mapEvent.setStepAnime(false);
+        mapEvent.setWalkAnime(false);
+        mapEvent.setDirection(2);
+        mapEvent.resetPattern();
+        mapEvent._originalPattern = 1;
+        mapEvent.setAngle(45);
+        mapEvent._spriteOffsetX = -12;
+        mapEvent._spriteOffsetY = -12;
+        mapEvent._kageM.clear();
+        mapEvent.setFace(6, true, true); // For child events: mapEvent.setFace(6, true, true, 0, 6, 0, 6);
+      }
+    }
+  }
+
+  prepareDarknessTransition = function() {
+    $gameMap.darknessOpacity = 200;
+    const eventId = $gameVariables.value(292)[5]; // this._eventId
+    if ($gameMap.event(eventId)) {
+      const mapEvent = $gameMap.event(eventId);
+      mapEvent.setStepAnime(true);
+      mapEvent.setWalkAnime(true);
+      mapEvent.setAngle(0);
+      mapEvent._spriteOffsetX = 0;
+      mapEvent._spriteOffsetY = 0;
+      mapEvent._kageM = new Game_KageMaster(mapEvent);
+      mapEvent.removeFace();
+      mapEvent.setOpacity(0);
+    }
+  }
 
 }());
