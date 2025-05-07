@@ -1074,7 +1074,7 @@ tachie_settei1 = function () {
   $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 33, expressionResult);
 
   //☆☆共通パーツ前段↓☆☆
-  setModestPoseTachieSettei1();
+  setModestPoseTachieSettei1(actor);
 
   // 発情＆性欲高い＆戦闘以外＆露出高いで腕グラビアポーズ
   applyGlamourPoseForArousalTachieSettei1();
@@ -1266,7 +1266,7 @@ function shouldCoverLowerBodyTachieSettei1() {
     $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 22) === 0;
 }
 
-function setModestPoseTachieSettei1() {
+function setModestPoseTachieSettei1(actor) {
   // Apply modest pose for characters not in special states
   if (actor.isStateAffected(22) || actor.isLearnedSkill(66)) {
     // Skip pose adjustment for characters with special states or skills
