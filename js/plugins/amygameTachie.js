@@ -525,7 +525,7 @@ tachie_settei2 = function() {
 
   // Process internal tachie display data
   console.debug("tachie_settei2: Processing internal tachie display data with tachie_naibusyori2");
-  tachie_naibusyori2();
+  tachie_naibusyori2(actor);
 
   // Restore any temporary clothing that was saved
   console.debug("tachie_settei2: Restoring temporary clothing values from storage (561-600) if present");
