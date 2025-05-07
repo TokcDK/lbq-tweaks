@@ -1097,26 +1097,26 @@ showMessage = function (messageText) {
 }
 
 //スキルアイテム使用での衣装修復
-cloth_repair1 = function(user,target,itemId,id1){
+cloth_repair1 = function(user, target, itemId, itemsToReturn) {
 
-let valueItems = id1 == 0 ? $dataSkills : $dataItems;
-if(target.isStateAffected(23)){
-  if (id1 == 1) $gameParty.gainItem(valueItems[id3], +1);
-  showMessage('現在の' + target.name() + 'は衣装修復対象ではありません。');
-} else {
-  $gameVariables.setValue(20,target.actorId());
-  const actor = target; //$dataActors[$gameVariables.value(20)];
-  if (actor.actor().meta['Heroine']){  
-    actor.removeState(70);
-    $gameVariables.setValue(19, Number(actor.meta['MainCloth']));
-    kisekae_tyokusetusitei($gameVariables.value(19),0);
-    tachie_usedChange1(actor);
-    showMessage(actor.name() + 'の衣装を修復しました。');
+  const itemsSource = itemsToReturn == 0 ? $dataSkills : $dataItems;
+  if (target.isStateAffected(23)) {
+    if (itemsToReturn == 1) $gameParty.gainItem(itemsSource[itemId], +1);
+    showMessage('現在の' + target.name() + 'は衣装修復対象ではありません。');
   } else {
-    if (id1 == 1) $gameParty.gainItem(valueItems[itemId], +1);
-    showMessage(actor.name() + 'は衣装修復の対象ではありません。');
-  };
-};
+    $gameVariables.setValue(20, target.actorId());
+    //const target = target; //const actor = $dataActors[$gameVariables.value(20)];
+    if (target.actor().meta['Heroine']) {  
+      target.removeState(70);
+      $gameVariables.setValue(19, Number(target.meta['MainCloth']));
+      kisekae_tyokusetusitei($gameVariables.value(19), 0);
+      tachie_usedChange1(target);
+      showMessage(target.name() + 'の衣装を修復しました。');
+    } else {
+      if (itemsToReturn == 1) $gameParty.gainItem(itemsSource[itemId], +1);
+      showMessage(target.name() + 'は衣装修復の対象ではありません。');
+    }
+  }
 
 };
 
