@@ -2034,28 +2034,28 @@ actor_hStatesTachie = function (mode) {
 
       const hStageSexualDesireMod = $gameVariables.value(191);
 
-      if ($gameVariables.value(191) >= 1) {
+      if (hStageSexualDesireMod >= 1) {
         const alphaStart = '0.7';
         const alphaEnd = '0.3';
         $gameScreen._particle.particleUpdate([HSTATES_BODY_SHINE1, 'alpha', alphaStart, alphaEnd + '@0.5', '0']);
       }
-      if ($gameVariables.value(191) >= 2) {
+      if (hStageSexualDesireMod >= 2) {
         $gameScreen.movePicture(basePicId + 10, 1, 1024, 384, 100, 100, 150, 0, 60);
         const speedStart = '0.5';
         const speedEnd = '0.5';
         $gameScreen._particle.particleUpdate([HSTATES_BODY_SHINE1, 'speed', speedStart, speedEnd + '@0.5', speedEnd]);
       }
-      if ($gameVariables.value(191) >= 3) {
+      if (hStageSexualDesireMod >= 3) {
         $gameScreen.movePicture(basePicId + 10, 1, 1024, 384, 100, 100, 50, 0, 60);
         const scaleStart = '10';
         const scaleEnd = '6';
         $gameScreen._particle.particleUpdate([HSTATES_BODY_SHINE1, 'scale', scaleStart, scaleEnd + '@0.5', scaleEnd]);
         $gameScreen._particle.particleUpdate([HSTATES_BODY_SHINE1, 'color', '#eb00ff', '#eb00ff@0.1', '#ffffff']);
       }
-      if ($gameVariables.value(191) >= 4) {
+      if (hStageSexualDesireMod >= 4) {
         $gameScreen._particle.particleUpdate([HSTATES_BODY_SHINE1, 'emitterLifetime', '1']);
       }
-      if ($gameVariables.value(191) >= 4) {
+      if (hStageSexualDesireMod >= 4) {
         $gameScreen.movePicture(basePicId + 10, 1, 1024, 384, 100, 100, 0, 0, 60);
         $gameScreen._particle.particleClear(HSTATES_BG_SHINE1);
         $gameScreen._particle.particleSet(0, 'hStates_bgShine2', 'picture:57', 'def', 'blow');
@@ -2065,29 +2065,29 @@ actor_hStatesTachie = function (mode) {
       //$gameScreen.movePicture(value1+10,1,1024,384,100,100,0,0,60);
       //$gameScreen._particle.particleUpdate(['hStates_bodyShine1','emitterLifetime','1']);
 
-      if ($gameVariables.value(191) >= 2) {
+      if (hStageSexualDesireMod >= 2) {
         const fadeDuration = hStageSexualDesireMod >= 5 ? 30 : fadeDurationsMap[hStageSexualDesireMod] || 0;
-        $gameScreen.showPicture(basePicId + 13, HSTATES_BACKGROUND_VAR + $gameVariables.value(191), 1, 1024, 384, 100, 100, 255, 0);
+        $gameScreen.showPicture(basePicId + 13, HSTATES_BACKGROUND_VAR + hStageSexualDesireMod, 1, 1024, 384, 100, 100, 255, 0);
         picture_fade1(basePicId + 13, "fadeOut", "HscenePose054", fadeDuration, 5);
       }
 
-      if ($gameVariables.value(191) >= 2) {
-        $gameScreen.showPicture(basePicId + 3, HSTATES_BACKGROUND_VAR + $gameVariables.value(191), 1, 1024, 384, 100, 100, 0, 0);
+      if (hStageSexualDesireMod >= 2) {
+        $gameScreen.showPicture(basePicId + 3, HSTATES_BACKGROUND_VAR + hStageSexualDesireMod, 1, 1024, 384, 100, 100, 0, 0);
         $gameScreen.movePicture(basePicId + 4, 1, 1024, 384, 100, 100, 0, 0, 120);
         $gameScreen.movePicture(basePicId + 3, 1, 1024, 384, 100, 100, 255, 0, 120);
       }
 
       bless_erase();
 
-      let facePictureId = HSTATES_ACTOR_FACE_PREFIX + actorId + "_" + $gameVariables.value(191);
+      let facePictureId = HSTATES_ACTOR_FACE_PREFIX + actorId + "_" + hStageSexualDesireMod;
       $gameScreen.setPicturesAnimation(5, 1, "横", 5);
       $gameScreen.showPicture(basePicId + 9, facePictureId, 1, 1024, 384, 100, 100, 255, 0);
       $gameScreen.picture(basePicId + 9).startAnimationFrame(1, false, [1]);
 
-      if ($gameVariables.value(191) == 1 || $gameVariables.value(191) == 5) {
+      if (hStageSexualDesireMod == 1 || hStageSexualDesireMod == 5) {
         let faceVariantSuffix;
-        if ($gameVariables.value(191) == 1) { faceVariantSuffix = "a"; }
-        if ($gameVariables.value(191) == 5) { faceVariantSuffix = "b"; }
+        if (hStageSexualDesireMod == 1) { faceVariantSuffix = "a"; }
+        if (hStageSexualDesireMod == 5) { faceVariantSuffix = "b"; }
         $gameScreen.showPicture(basePicId + 12, HSTATES_ACTOR_FACE_PREFIX + actorId + faceVariantSuffix, 1, 1024, 384, 100, 100, 0, 3);
         $gameScreen.movePicture(basePicId + 12, 1, 1024, 384, 100, 100, 150, 3, 180);
       }
