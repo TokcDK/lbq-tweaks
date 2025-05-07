@@ -1073,13 +1073,7 @@ tachie_settei1 = function () {
   setModestPose();
 
   // 発情＆性欲高い＆戦闘以外＆露出高いで腕グラビアポーズ
-  const currentExposure = $gameVariables.value($gameVariables.value(20) + 380)[4];
-  if (actor.isStateAffected(61) || actor.isStateAffected(694)) {
-    if (actor.isLearnedSkill(66) && !$gameSwitches.value(30) && currentExposure <= 9) {
-      $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 15, 0);
-      $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 9, 2);
-    }
-  }
+  applyGlamourPoseForArousal();
 
   //☆☆個別衣装設定↓☆☆
   kobetu_isyousettei();
@@ -1144,6 +1138,24 @@ tachie_settei1 = function () {
     }
   }
 };
+
+//#region tachie_settei1 set modest pose
+// Apply special arm pose for aroused characters with high exposure
+function applyGlamourPoseForArousal() {
+  const actor = $gameActors.actor($gameVariables.value(20));
+  const isAroused = actor.isStateAffected(61) || actor.isStateAffected(694);
+  const hasConfidenceSkill = actor.isLearnedSkill(66);
+  const notInBattle = !$gameSwitches.value(30);
+  const currentExposure = $gameVariables.value($gameVariables.value(20) + 380)[4];
+  const hasHighExposure = currentExposure <= 9;
+
+  if (isAroused && hasConfidenceSkill && notInBattle && hasHighExposure) {
+    // Apply glamour pose: left arm relaxed (0), right arm in pose 2
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 15, 0); // Left arm
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 9, 2);  // Right arm
+  }
+}
+//#endregion
 
 //#region tachie_settei1 set modest pose
 
