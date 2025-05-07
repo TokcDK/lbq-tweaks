@@ -1954,19 +1954,18 @@ if($gameActors.actor($gameVariables.value(20)).isStateAffected(83)){
 actor_hStatesTachie = function(id1){
 
 const gameActor = $gameActors.actor($gameVariables.value(20)); // bad using global dinamic!
-if(!isGirl()){
+if(!isGirl(gameActor)){
   tachie_hyouji2(gameActor);
 } else {
   var value1 = 111;
   if(id1 == 1){
-    var actor = $gameActors.actor($gameVariables.value(20));
     $gameVariables.setValue(192,1);
     $gameVariables.setValue(191,1);
-    if(actor.isLearnedSkill(62)){$gameVariables.setValue(191,2)};//反抗
-    if(actor.isLearnedSkill(64)){$gameVariables.setValue(191,3)};//自失
-    if(actor.isLearnedSkill(66)){$gameVariables.setValue(191,4)};//卑猥
-    if(actor.isLearnedSkill(68)){$gameVariables.setValue(191,5);$gameVariables.setValue(192,2)};//通常目光
-    if(actor.isLearnedSkill(70)){$gameVariables.setValue(191,6)};//あへ
+    if(gameActor.isLearnedSkill(62)){$gameVariables.setValue(191,2)};//反抗
+    if(gameActor.isLearnedSkill(64)){$gameVariables.setValue(191,3)};//自失
+    if(gameActor.isLearnedSkill(66)){$gameVariables.setValue(191,4)};//卑猥
+    if(gameActor.isLearnedSkill(68)){$gameVariables.setValue(191,5);$gameVariables.setValue(192,2)};//通常目光
+    if(gameActor.isLearnedSkill(70)){$gameVariables.setValue(191,6)};//あへ
     //$gameVariables.setValue(192,2);//デバッグ用
     //$gameVariables.setValue(191,3);
     
