@@ -1992,7 +1992,7 @@ function setupActorHStatesTachieMode1(basePicId, actorId, gameActor) {
   setupAnimatedActorBust(basePicId, actorId);
   setupActorHead(basePicId, actorId);
   animatePictures(basePicId);
-  setupParticleEffects(basePicId, gameActor);
+  setupParticleEffects(gameActor.actor().meta);
 }
 
 function setupHStatesPictures(basePicId, actorId) {
@@ -2037,10 +2037,10 @@ function animatePictures(basePicId) {
   }
 }
 
-function setupParticleEffects(basePicId, gameActor) {
+function setupParticleEffects(gameActorMeta) {
   let actorHue = '#00d0ff';
-  if (gameActor.actor().meta['tachieHue2']) {
-    actorHue = gameActor.actor().meta['tachieHue2'];
+  if (gameActorMeta['tachieHue2']) {
+    actorHue = gameActorMeta['tachieHue2'];
   }
 
   $gameScreen._particle.particleSet(0, HSTATES_BG_SHINE1, 'picture:116', 'def', 'above'); //55
