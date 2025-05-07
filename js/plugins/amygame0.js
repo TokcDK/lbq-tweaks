@@ -156,24 +156,58 @@ if (Imported.MOG_BattleHud) {
 };
 };
 
-//rpg_managers.js
-BattleManager.selectNextCommand = function() {
-    do {
-        if (!this.actor() || !this.actor().selectNextCommand()) {
-            this.changeActor(this._actorIndex + 1, 'waiting');
-            if (this._actorIndex >= $gameParty.size()) {
-if(!$gameSwitches.value(131)){ //立ち絵禁止のスイッチで条件分岐
-  tachie_syoukyo1($gameVariables.value(300));
-};
-if($gameScreen.picture(50)){$gameScreen.erasePicture(50)};//時刻表示を消去
-var scene = SceneManager._scene;
-if (scene._gabWindow) scene.clearGabWindow();
-                this.startTurn();
-                break;
-            }
+  //rpg_managers.js
+  BattleManager.selectNextCommand = function() {
+    // Use direct access for frequently accessed variables
+    const party = $gameParty;
+    const switches = $gameSwitches;
+    const gameScreen = $gameScreen;
+    const actorId = $gameVariables.value(300);    
+    const currentActor = this.actor();
+    
+    // Continue looping until we find an actor who can input or start a turn
+    while (true) {
+      // Check if we have a valid actor and if they have another command to select
+      if (currentActor && currentActor.selectNextCommand()) {
+        // Found a command for the current actor, exit the loop
+        break;
+      }
+      
+      // Move to the next actor
+      this.changeActor(this._actorIndex + 1, 'waiting');
+      
+      // Check if we've gone through all actors
+      if (this._actorIndex >= party.size()) {
+        // Clean up before starting turn
+        if (!switches.value(131)) { // Avoid function call if not needed
+          tachie_syoukyo1(actorId);
         }
-    } while (!this.actor().canInput());
-};
+        
+        // Clear picture 50 (time display) if it exists
+        if (gameScreen.picture(50)) {
+          gameScreen.erasePicture(50);
+        }
+        
+        // Clear gab window if it exists
+        const scene = SceneManager._scene;
+        if (scene._gabWindow) {
+          scene.clearGabWindow();
+        }
+        
+        // Start the turn and exit the loop
+        this.startTurn();
+        return;
+      }
+
+      currentActor = this.actor(); // set right before 1st use
+      // If current actor can input, we're ready to break out of the loop
+      if (currentActor.canInput()) {
+        break;
+      }
+      
+      // Otherwise, continue looping to find next actor who can input
+    }
+  };
 
 /*:
 BattleManager.checkAbort = function() {
@@ -185,7 +219,7 @@ BattleManager.checkAbort = function() {
     return false;
 };
 Game_Actor.prototype.changeEquipById = function(etypeId, itemId) {
-    var slotId = etypeId - 1;
+    const slotId = etypeId - 1;
     if (this.equipSlots()[slotId] === 1) {
         this.changeEquip(slotId, $dataWeapons[itemId]);
     } else {
