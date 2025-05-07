@@ -141,9 +141,9 @@ if(!Input.isRepeated("ok")){
       tachie_syoukyo1($gameVariables.value(300));
       $gameVariables.setValue(20,BattleManager.actor().actorId());
         if($gameVariables.value(263) >= 2){
-          tachie_settei2();
+          tachie_settei3(BattleManager.actor());
         };
-        tachie_hyouji1($gameVariables.value(20));
+        tachie_hyouji2(BattleManager.actor());
 }}};
     this._statusWindow.select(BattleManager.actor().index());
     this._partyCommandWindow.close();
