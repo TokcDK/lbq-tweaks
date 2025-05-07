@@ -317,13 +317,9 @@ Game_Unit.prototype.luklity = function() {
     }
   };
 
-Window_EventItem.prototype.maxCols = function() {
-    if($gameSwitches.value(SWITCH_ID2)){
-      return 1;
-} else {
-      return 2;
-};
-};
+  Window_EventItem.prototype.maxCols = function () {
+    return $gameSwitches.value(SWITCH_ID2) ? 1 : 2;
+  };
 
   Window_EventItem.prototype.defaultWidth = function () {
     return Graphics.boxWidth;
@@ -336,7 +332,7 @@ Window_EventItem.prototype.maxCols = function() {
 /*:
 //負荷が掛かり過ぎるため没
 // Common Event
-var Game_Interpreter_command117 = Game_Interpreter.prototype.command117;
+const game_Interpreter_command117 = Game_Interpreter.prototype.command117;
 Game_Interpreter.prototype.command117 = function() {
     $gameVariables.setValue(201, this._params[0]); // 変数番号201番にコモンイベントIDを記録する。
     return Game_Interpreter_command117.call(this);
