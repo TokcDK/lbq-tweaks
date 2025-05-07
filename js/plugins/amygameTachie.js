@@ -1062,20 +1062,12 @@ tachie_settei1 = function () {
   const actor = $gameActors.actor($gameVariables.value(20));
 
   //☆☆立ち絵内部処理前変数割当↓☆☆
-  // offsets for the variables to be set
-  {
-    standingPictureSlotOffsetsTo0.forEach(function (offset) {
-      $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + offset, 0);
-    }, this);
-  }
-  if ($gameVariables.value(464) === 0) { // 460 + 4
-    $gameVariables.setValue(464, 1);
-  }
-  {
-    standingPictureSlotOffsetsTo1.forEach(function (offset) {
-      $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + offset, 1);
-    }, this);
-  }
+  // Reset selected standing picture slots to 0
+  resetStandingPictureSlots();  
+  // Set default hair value if not already set
+  ensureDefaultHairValue();  
+  // Set selected standing picture slots to 1
+  setDefaultSlotValues();
 
   if (actor.isStateAffected(61) || actor.isStateAffected(694)) { // 発情で愛液
     $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 8, 2);
@@ -1198,6 +1190,30 @@ tachie_settei1 = function () {
     }
   }
 };
+
+//#region tachie_settei1 pre slots setup
+
+// Helper function to reset specific slots to 0
+function resetStandingPictureSlots() {
+  standingPictureSlotOffsetsTo0.forEach(function (offset) {
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + offset, 0);
+  });
+}
+
+// Helper function to ensure hair has a default value
+function ensureDefaultHairValue() {
+  if ($gameVariables.value(464) === 0) { // 460 + 4 (hair)
+    $gameVariables.setValue(464, 1);
+  }
+}
+
+// Helper function to set specific slots to 1
+function setDefaultSlotValues() {
+  standingPictureSlotOffsetsTo1.forEach(function (offset) {
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + offset, 1);
+  });
+}
+//#endregion
 
 //#region tachie_settei1 experssion setup
 
