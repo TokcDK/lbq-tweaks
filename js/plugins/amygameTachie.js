@@ -692,14 +692,21 @@ tachie_naibusyori2 = function() {
   console.debug(`tachie_naibusyori2: Retrieved actorId = ${actorId}`);
   const actorCharName = 'actor' + actorId;
   console.debug(`tachie_naibusyori2: actorCharName set to ${actorCharName}`);
+  const actor = $dataActors[actorId];
+  console.debug(`tachie_naibusyori2: actor.name= ${actor.name}`);
 
   // Set character name for standing image
   $gameVariables.setValue(118, actorCharName);
   
   // Determine the picture ID to use
+  const isSwitch90On = $gameSwitches.value(90); // 立ち絵会話時自動on
+  const actorPicId = $gameVariables.value(300); // 立ち絵表示時ﾋﾟｸﾁｬ指定ID
   const picId = $gameSwitches.value(90) 
-    ? $gameVariables.value(300) 
-    : Number($dataActors[actorId].meta['tachiePicId']);
+    ? actorPicId 
+    : Number(actor.meta['tachiePicId']);
+  console.debug(`tachie_naibusyori2: isSwitch90On determined as ${isSwitch90On}`);
+  console.debug(`tachie_naibusyori2: actorPicId determined as ${actorPicId}`);
+  console.debug(`tachie_naibusyori2: actor.meta['tachiePicId'] determined as ${actor.meta['tachiePicId']}`);
   console.debug(`tachie_naibusyori2: picId determined as ${picId}`);
   $gameVariables.setValue(117, picId);
   
