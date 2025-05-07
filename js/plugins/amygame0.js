@@ -229,21 +229,21 @@ Scene_Equip.prototype.onItemOk = function() {
     this._statusWindow.refresh();
 };
 
-DataManager.makeSavefileInfo = function() {
-　　var info = {};
-　　info.globalId = this._globalId;
-　　info.title = $dataSystem.gameTitle;
-　　info.characters = $gameParty.charactersForSavefile();
-　　info.faces = $gameParty.facesForSavefile();
-　　info.playtime = $gameSystem.playtimeText();
-　　info.timestamp = Date.now();
-　　info.saveString = $gameVariables.value(87);
-　　return info;
-};
+  DataManager.makeSavefileInfo = function () {
+    var info = {};
+    info.globalId = this._globalId;
+    info.title = $dataSystem.gameTitle;
+    info.characters = $gameParty.charactersForSavefile();
+    info.faces = $gameParty.facesForSavefile();
+    info.playtime = $gameSystem.playtimeText();
+    info.timestamp = Date.now();
+    info.saveString = $gameVariables.value(87);
+    return info;
+  };
 
-　　Window_SavefileList.prototype.drawGameTitle = function(info, x, y, width) {
-　　　　this.drawText(info.saveString, x, y, width);
-　　};
+  Window_SavefileList.prototype.drawGameTitle = function (info, x, y, width) {
+    this.drawText(info.saveString, x, y, width);
+  };
 
 Game_Map.prototype.updateEvents = function() {
   const events = this.events();
