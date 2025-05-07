@@ -1070,17 +1070,7 @@ tachie_settei1 = function () {
   $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 33, expressionResult);
 
   //☆☆共通パーツ前段↓☆☆
-  if (actor.isStateAffected(22) || actor.isLearnedSkill(66)) {
-    // do nothing
-  } else {
-    if ($gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 21) === 0 && $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 23) <= 3 &&
-        $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 25) === 0 && $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 11) === 0) {
-      $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 9, 4);
-    }
-    if ($gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 20) === 0 && $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 22) === 0) {
-      $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 15, 4);
-    }
-  }
+  setModestPose();
 
   // 発情＆性欲高い＆戦闘以外＆露出高いで腕グラビアポーズ
   const currentExposure = $gameVariables.value($gameVariables.value(20) + 380)[4];
@@ -1154,6 +1144,40 @@ tachie_settei1 = function () {
     }
   }
 };
+
+//#region tachie_settei1 set modest pose
+
+function shouldCoverBreasts() {
+  return $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 21) === 0 &&
+    $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 23) <= 3 &&
+    $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 25) === 0 &&
+    $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 11) === 0;
+}
+
+function shouldCoverLowerBody() {
+  return $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 20) === 0 &&
+    $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 22) === 0;
+}
+
+function setModestPose() {
+  // Apply modest pose for characters not in special states
+  if (actor.isStateAffected(22) || actor.isLearnedSkill(66)) {
+    // Skip pose adjustment for characters with special states or skills
+    // (State 22 or Skill 66 overrides the default modest pose)
+    return;
+  }
+
+  // Set right arm to cover breasts (pose 4)
+  if (shouldCoverBreasts()) {
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 9, 4);
+  }
+
+  // Set left arm to cover lower body (pose 4)
+  if (shouldCoverLowerBody()) {
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 15, 4);
+  }
+}
+//#endregion
 
 //#region tachie_settei1 pre slots setup
 
