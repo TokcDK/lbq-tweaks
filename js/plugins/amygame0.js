@@ -388,17 +388,27 @@ Sprite_Actor.prototype.removeMaxFrame = function() {
     delete this._maxPattern
 }
 
-Sprite_Actor.prototype.setFrame = function(motion,num) {
-    if (motion === "attack") {this._actor.performAttack()} else {this._actor.requestMotion(motion)}
-   if (motion === "attack" && this.hasOwnProperty("_weaponSprite")) {
-       var wpn = this._weaponSprite;
-       wpn._pattern = num - 1;
-       wpn._motionCount = 0;
-       wpn.updatePattern();
-   }
-   this._pattern = num;
-   this._motionCount = 0;
-   this.setMaxFrame(num)
+Sprite_Actor.prototype.setFrame = function(motion, num) {
+  // Use direct comparison instead of loose equality
+  if (motion === "attack") {
+    this._actor.performAttack();
+    
+    // if (this.hasOwnProperty("_weaponSprite")) but in optimized we check wpn which will be undefined if the property is not exist
+    // Only access weaponSprite if attack motion and optimize property check
+    const wpn = this._weaponSprite;
+    if (wpn) {
+      wpn._pattern = num - 1;
+      wpn._motionCount = 0;
+      wpn.updatePattern();
+    }
+  } else {
+    this._actor.requestMotion(motion);
+  }
+  
+  // Set these properties unconditionally to avoid duplicate assignments
+  this._pattern = num;
+  this._motionCount = 0;
+  this.setMaxFrame(num);
 }
 
 })()
