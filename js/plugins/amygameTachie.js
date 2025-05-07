@@ -1062,7 +1062,7 @@ tachie_settei1 = function () {
   const actor = $gameActors.actor($gameVariables.value(20));
 
   //☆☆立ち絵内部処理前変数割当↓☆☆
-  tachieSettei1PreSetup();
+  tachieSettei1PreSetup(actor);
 
   // ☆☆表情差分↓☆☆
   // Determine the face expression for the character
@@ -1157,7 +1157,7 @@ tachie_settei1 = function () {
 
 //#region tachie_settei1 pre slots setup
 
-function tachieSettei1PreSetup() {
+function tachieSettei1PreSetup(actor) {
   // Reset specific slots to 0
   resetStandingPictureSlots();
 
@@ -1167,36 +1167,8 @@ function tachieSettei1PreSetup() {
   // Set specific slots to 1
   setDefaultSlotValues();
 
-  if (actor.isStateAffected(61) || actor.isStateAffected(694)) { // 発情で愛液
-    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 8, 2);
-  }
-  if (actor.isStateAffected(63)) { // 拘束で腕と男
-    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 9, 3);
-    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 15, 3);
-    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 17, 0);
-    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 24, 0);
-    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 26, 0);
-    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 1, 1);
-    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 38, 1);
-  }
-  if (actor.isStateAffected(71) || actor.isStateAffected(695)) { // 濡れた状態で汗
-    $gameSwitches.setValue(100, true);
-  }
-  if (actor.isStateAffected(83) || actor.isStateAffected(696)) { // 妊娠でボテ腹
-    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 12, 1);
-    if ($gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 14) === 1 && actor.isStateAffected(83)) { // 臍ピアス妊娠有無で変化
-      $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 14, 2);
-    }
-  }
-  if (actor.isStateAffected(84) || actor.isStateAffected(697)) { // 膣内射精
-    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 8, 1);
-  }
-  if (actor.isStateAffected(85) || actor.isStateAffected(698)) { // 顔射精
-    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 40, 1);
-  }
-  if (actor.isStateAffected(86) || actor.isStateAffected(699)) { // ぶっかけ
-    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 40, 2);
-  }
+  // Apply state-based visual effects to the character's standing image
+  applyStateBasedVisualEffects(actor);
 }
 
 // Helper function to reset specific slots to 0
@@ -1218,6 +1190,78 @@ function setDefaultSlotValues() {
   standingPictureSlotOffsetsTo1.forEach(function (offset) {
     $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + offset, 1);
   });
+}
+
+// Apply visual effects based on the actor's states
+function applyStateBasedVisualEffects(actor) {
+  // Arousal/liquid related states
+  applyArousalVisualEffects(actor);
+
+  // Restraint related states
+  applyRestraintVisualEffects(actor);
+
+  // Sweat/wetness related states
+  applySweatVisualEffects(actor);
+
+  // Pregnancy related states
+  applyPregnancyVisualEffects(actor);
+
+  // Sexual fluids related states
+  applySexualFluidsVisualEffects(actor);
+}
+
+// Apply arousal-related visual effects
+function applyArousalVisualEffects(actor) {
+  if (actor.isStateAffected(61) || actor.isStateAffected(694)) { // 発情で愛液 (Arousal and love juice)
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 8, 2);
+  }
+}
+
+// Apply restraint-related visual effects
+function applyRestraintVisualEffects(actor) {
+  if (actor.isStateAffected(63)) { // 拘束で腕と男 (Restraint affecting arms and male)
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 9, 3);     // Right arm
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 15, 3);    // Left arm
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 17, 0);    // Right arm cover
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 24, 0);    // Leg position
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 26, 0);    // Left arm cover
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 1, 1);     // Body state
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 38, 1);    // Male presence
+  }
+}
+
+// Apply sweat/wetness-related visual effects
+function applySweatVisualEffects(actor) {
+  if (actor.isStateAffected(71) || actor.isStateAffected(695)) { // 濡れた状態で汗 (Wet state with sweat)
+    $gameSwitches.setValue(100, true);
+  }
+}
+
+// Apply pregnancy-related visual effects
+function applyPregnancyVisualEffects(actor) {
+  if (actor.isStateAffected(83) || actor.isStateAffected(696)) { // 妊娠でボテ腹 (Pregnancy with pregnant belly)
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 12, 1);
+
+    // Change navel piercing appearance during pregnancy
+    if ($gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 14) === 1 && actor.isStateAffected(83)) { // 臍ピアス妊娠有無で変化
+      $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 14, 2);
+    }
+  }
+}
+
+// Apply sexual fluids-related visual effects
+function applySexualFluidsVisualEffects(actor) {
+  if (actor.isStateAffected(84) || actor.isStateAffected(697)) { // 膣内射精 (Vaginal ejaculation)
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 8, 1);
+  }
+
+  if (actor.isStateAffected(85) || actor.isStateAffected(698)) { // 顔射精 (Facial ejaculation)
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 40, 1);
+  }
+
+  if (actor.isStateAffected(86) || actor.isStateAffected(699)) { // ぶっかけ (Bukkake/covered in fluids)
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 40, 2);
+  }
 }
 //#endregion
 
