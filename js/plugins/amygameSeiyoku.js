@@ -1951,6 +1951,11 @@ if($gameActors.actor($gameVariables.value(20)).isStateAffected(83)){
 };
 
 //☆☆Hプロフィール表示時立ち絵
+const fadeDurationsMap = {
+  2: 60,
+  3: 50,
+  4: 40
+};
 actor_hStatesTachie = function (mode) {
 
   const actorId = $gameVariables.value(20);
@@ -1965,7 +1970,7 @@ actor_hStatesTachie = function (mode) {
       $gameScreen.showPicture(basePicId + 4, "HstatesBackGround1", 1, 1024, 384, 100, 100, 255, 0);
       $gameScreen.showPicture(basePicId + 6, "HstatesActorBody" + actorId + "_" + $gameVariables.value(192), 1, 1024, 400, 100, 100, 0, 0);
       $gameScreen.showPicture(basePicId + 9, "HstatesActorFace" + actorId, 1, 1024, 384, 100, 100, 0, 0);
-      let defaultHue = '#00d0ff';
+      //let defaultHue = '#00d0ff';
       if (gameActor.actor().meta['tachieHue2']) {
         defaultHue = gameActor.actor().meta['tachieHue2'];
       }
@@ -2018,6 +2023,8 @@ actor_hStatesTachie = function (mode) {
       //if(actor.isLearnedSkill(68)){$gameVariables.setValue(191,5);$gameVariables.setValue(192,2)};//通常目光
       //if(actor.isLearnedSkill(70)){$gameVariables.setValue(191,6)};//あへ
 
+      const hStageSexualDesireMod = $gameVariables.value(191);
+
       if ($gameVariables.value(191) >= 1) {
         const alphaStart = '0.7';
         const alphaEnd = '0.3';
@@ -2051,11 +2058,7 @@ actor_hStatesTachie = function (mode) {
 
       if ($gameVariables.value(191) >= 2) {
         const fadeImageName = "HscenePose054";
-        let fadeDuration;
-        if ($gameVariables.value(191) == 2) { fadeDuration = 60; }
-        if ($gameVariables.value(191) == 3) { fadeDuration = 50; }
-        if ($gameVariables.value(191) == 4) { fadeDuration = 40; }
-        if ($gameVariables.value(191) >= 5) { fadeDuration = 30; }
+        const fadeDuration = hStageSexualDesireMod >= 5 ? 30 : fadeDurationsMap[hStageSexualDesireMod] || 0;
         $gameScreen.showPicture(basePicId + 13, "HstatesBackGround" + $gameVariables.value(191), 1, 1024, 384, 100, 100, 255, 0);
         picture_fade1(basePicId + 13, "fadeOut", fadeImageName, fadeDuration, 5);
       }
