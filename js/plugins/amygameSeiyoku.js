@@ -1953,8 +1953,9 @@ if($gameActors.actor($gameVariables.value(20)).isStateAffected(83)){
 //☆☆Hプロフィール表示時立ち絵
 actor_hStatesTachie = function(id1){
 
-if(!isGirl($gameActors.actor($gameVariables.value(20)))){
-  tachie_hyouji1($gameVariables.value(20));
+const gameActor = $gameActors.actor($gameVariables.value(20)); // bad using global dinamic!
+if(!isGirl()){
+  tachie_hyouji2(gameActor);
 } else {
   var value1 = 111;
   if(id1 == 1){
