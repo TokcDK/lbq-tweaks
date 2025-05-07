@@ -699,14 +699,15 @@ tachie_naibusyori2 = function (gameActor) {
   $gameVariables.setValue(118, actorCharName);
   
   // Determine the picture ID to use
-  const isSwitch90On = $gameSwitches.value(90); // 立ち絵会話時自動on
-  const actorPicId = $gameVariables.value(300); // 立ち絵表示時ﾋﾟｸﾁｬ指定ID
-  const picId = isSwitch90On 
-    ? actorPicId 
-    : Number(dataActor.meta['tachiePicId']);
-  console.debug(`tachie_naibusyori2: isSwitch90On determined as ${isSwitch90On}`);
-  console.debug(`tachie_naibusyori2: actorPicId determined as ${actorPicId}`);
-  console.debug(`tachie_naibusyori2: dataActor.meta['tachiePicId'] determined as ${dataActor.meta['tachiePicId']}`);
+  //const isSwitch90On = $gameSwitches.value(90); // 立ち絵会話時自動on
+  //const actorPicId = $gameVariables.value(300); // 立ち絵表示時ﾋﾟｸﾁｬ指定ID
+  // const picId = isSwitch90On 
+  //   ? actorPicId 
+  //   : Number(dataActor.meta['tachiePicId']);
+  const picId = Number(dataActor.meta['tachiePicId']); // after input gameActor added we get picId only from dataActor
+  //console.debug(`tachie_naibusyori2: isSwitch90On determined as ${isSwitch90On}`);
+  //console.debug(`tachie_naibusyori2: actorPicId determined as ${actorPicId}`);
+  //console.debug(`tachie_naibusyori2: dataActor.meta['tachiePicId'] determined as ${dataActor.meta['tachiePicId']}`);
   console.debug(`tachie_naibusyori2: picId determined as ${picId}`);
   $gameVariables.setValue(117, picId);
   
