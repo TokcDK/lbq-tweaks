@@ -1000,7 +1000,7 @@ tachie_hyouji2 = function (gameActor) {
       $gameVariables.setValue(102, $gameVariables.value(106));
     } else {
       if (!$gameSwitches.value(150)) {
-        $gameVariables.setValue(106, $gameVariables.value(106) - Number(gameActor.meta['TachiePoseYposition']));
+        $gameVariables.setValue(106, $gameVariables.value(106) - Number(gameActor.actor().meta['TachiePoseYposition']));
         const clothSwitchId = $dataItems[$gameVariables.value(19)].meta['ClothSwitch']
           ? Number($dataItems[$gameVariables.value(19)].meta['ClothSwitch'])
           : 0;
