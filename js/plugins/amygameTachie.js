@@ -455,16 +455,16 @@ kisekae_naibusyori1 = function(){
 
 //☆☆立ち絵設定。本体
 tachie_settei2 = function() {
-  console.debug("Entering tachie_settei2");
+  console.debug("tachie_settei2: Entering tachie_settei2");
 
   // Get actor information and data
   const actorId = $gameVariables.value(20);
-  console.debug(`Actor ID: ${actorId}`);
+  console.debug(`tachie_settei2: Actor ID: ${actorId}`);
   const actor = $gameActors.actor(actorId);
-  console.debug(`Actor name: ${actor.name()}`);
+  console.debug(`tachie_settei2: Actor name: ${actor.name()}`);
 
   if(!$gameParty.battleMembers().includes(actor)){
-    console.debug("Actor not in battle party! Skip..");
+    console.debug("tachie_settei2: Actor not in battle party! Skip..");
     return;
   }
 
@@ -472,24 +472,25 @@ tachie_settei2 = function() {
   const actorClothingData = $gameVariables.value(actorClothingDataId);
 
   // Reset temporary clothing variables (561-600)
-  console.debug("Resetting temporary clothing variables (561-600)");
+  console.debug("tachie_settei2: Resetting temporary clothing variables (561-600)");
   for (let variableIndex = 561; variableIndex <= 600; variableIndex++) { 
     $gameVariables.setValue(variableIndex, 0); 
   }
 
   // Load current clothing data from actor to working variables (461-500)
-  console.debug("Loading current clothing data from actor");
+  console.debug("tachie_settei2: Loading current clothing data from actor");
   for (let clothingIndex = 1; clothingIndex <= 40; clothingIndex++) {
     $gameVariables.setValue(clothingIndex + 460, actorClothingData[clothingIndex]);
   }
 
   // Only process further for female characters
+  console.debug("tachie_settei2: Only process further for female characters");
   if (isGirl(actor)) {
-    console.debug("Actor is female, processing female-specific logic");
+    console.debug("tachie_settei2: Actor is female, processing female-specific logic");
 
     // Handle doll state - store current clothing in temp variables and clear current
     if (actor.isStateAffected(valueDollStateId)) {
-      console.debug("Actor is in doll state, saving clothing to temporary storage and clearing current clothing");
+      console.debug("tachie_settei2: Actor is in doll state, saving clothing to temporary storage and clearing current clothing");
       
       // Save clothing to temporary storage (561-600)
       for (let clothingIndex = 1; clothingIndex <= 40; clothingIndex++) {
@@ -501,33 +502,33 @@ tachie_settei2 = function() {
         $gameVariables.setValue(clothingIndex + 460, 0);
       }
       $gameVariables.setValue(1 + 460, 3); // Set body type
-      console.debug("Doll state processing complete: Clothing cleared and body type set");
+      console.debug("tachie_settei2: Doll state processing complete: Clothing cleared and body type set");
     }    
     else { // Normal character processing
-      console.debug("Actor is not in doll state, processing normal female character");
+      console.debug("tachie_settei2: Actor is not in doll state, processing normal female character");
       rosyutu_genkai(); // Calculate exposure limits
-      console.debug("Calculated exposure limits");
+      console.debug("tachie_settei2: Calculated exposure limits");
       rosyutu_genzai(); // Calculate current exposure
-      console.debug("Calculated current exposure");
+      console.debug("tachie_settei2: Calculated current exposure");
       
       // Apply custom pose/expression settings if not in specified state
       if (!actor.isStateAffected(23)) {
-        console.debug("Actor not affected by state 23 (Forced costume setting), applying tachie_settei1");
+        console.debug("tachie_settei2: Actor not affected by state 23 (Forced costume setting), applying tachie_settei1");
         tachie_settei1();
       } else {
-        console.debug("Actor is affected by state 23, skipping custom pose/expression settings");
+        console.debug("tachie_settei2: Actor is affected by state 23, skipping custom pose/expression settings");
       }
     }
   } else {
-    console.debug("Actor is not female, skipping female-specific clothing processing");
+    console.debug("tachie_settei2: Actor is not female, skipping female-specific clothing processing");
   }
 
   // Process internal tachie display data
-  console.debug("Processing internal tachie display data with tachie_naibusyori2");
+  console.debug("tachie_settei2: Processing internal tachie display data with tachie_naibusyori2");
   tachie_naibusyori2();
 
   // Restore any temporary clothing that was saved
-  console.debug("Restoring temporary clothing values from storage (561-600) if present");
+  console.debug("tachie_settei2: Restoring temporary clothing values from storage (561-600) if present");
   for (let clothingIndex = 1; clothingIndex <= 40; clothingIndex++) {
     const temporaryClothingData = $gameVariables.value(clothingIndex + 560);
     if (temporaryClothingData >= 1) {
@@ -536,18 +537,18 @@ tachie_settei2 = function() {
   }
 
   // Update actor's clothing data from working variables
-  console.debug("Updating actor's clothing data from working variables (461-500)");
+  console.debug("tachie_settei2: Updating actor's clothing data from working variables (461-500)");
   for (let clothingIndex = 1; clothingIndex <= 40; clothingIndex++) {
     actorClothingData[clothingIndex] = $gameVariables.value(clothingIndex + 460);
   }
 
   // Update character graphics
-  console.debug("Updating character graphics via charagra_henkou1");
+  console.debug("tachie_settei2: Updating character graphics via charagra_henkou1");
   charagra_henkou1(actorId);
   
   // Update clothing-related global values for female characters
   if (isGirl(actor)) {
-    console.debug("Updating global clothing variables for female actor");
+    console.debug("tachie_settei2: Updating global clothing variables for female actor");
     valueLiningCloth[actorId] = actorClothingData[2];
     valueBackHairCloth[actorId] = actor.isStateAffected(23) ? 1 : actorClothingData[4];
     valueCoatCloth[actorId] = actorClothingData[28];
@@ -556,7 +557,7 @@ tachie_settei2 = function() {
     valueBustUpCloth2[actorId] = valueBustUpCloth[actorId];
   }
 
-  console.debug("tachie_settei2 completed successfully");
+  console.debug("tachie_settei2: tachie_settei2 completed successfully");
 };
 
 //☆☆キャラグラ変更。
