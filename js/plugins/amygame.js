@@ -6690,10 +6690,10 @@ pictureText_SetUp = function(setupType, pictureId, displayText, textSetting, pos
       if (!$dataWeapons[weaponIndex].name == '') {
         if ($dataWeapons[weaponIndex].meta['SubstitutionActorId']) {
           const substitutionActorId = Number($dataWeapons[weaponIndex].meta['SubstitutionActorId']);
-          $gameVariables.value(354)[weaponIndex - 300] = `${$dataWeapons[substitutionActorId + 200].name}`;
+          $gameVariables.value(354)[weaponIndex - 300] = $dataWeapons[substitutionActorId + 200].name;
         };
         if ($dataWeapons[weaponIndex].meta['FamilyName']) {
-          $gameVariables.value(354)[weaponIndex - 300] = `${$dataWeapons[weaponIndex].meta['FamilyName']}`;
+          $gameVariables.value(354)[weaponIndex - 300] = $dataWeapons[weaponIndex].meta['FamilyName'];
         };
       };
     };
