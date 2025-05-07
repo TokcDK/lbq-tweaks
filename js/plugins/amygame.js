@@ -6677,48 +6677,48 @@ pictureText_SetUp = function(setupType, pictureId, displayText, textSetting, pos
   }
 
   func_9_1 = function (parent) {
-    var list = $gameVariables.value(248);
-    list.forEach(function (id) {
-      $gameActors.actor(id).removeState(39);
-      $gameVariables.value(380 + id)[58] = 0;
+    const actorIds = $gameVariables.value(248);
+    actorIds.forEach(function (actorId) {
+      $gameActors.actor(actorId).removeState(39);
+      $gameVariables.value(380 + actorId)[58] = 0;
     }, parent);
   }
 
   func_9_2 = function (parent) {
     parent.sVal(354, Array(101).fill(0));
-    for (var i = 301; i <= 400; i++) {
-      if (!$dataWeapons[i].name == '') {
-        if ($dataWeapons[i].meta['SubstitutionActorId']) {
-          var value1 = Number($dataWeapons[i].meta['SubstitutionActorId']);
-          $gameVariables.value(354)[i - 300] = `${$dataWeapons[value1 + 200].name}`;
+    for (let weaponIndex = 301; weaponIndex <= 400; weaponIndex++) {
+      if (!$dataWeapons[weaponIndex].name == '') {
+        if ($dataWeapons[weaponIndex].meta['SubstitutionActorId']) {
+          const substitutionActorId = Number($dataWeapons[weaponIndex].meta['SubstitutionActorId']);
+          $gameVariables.value(354)[weaponIndex - 300] = `${$dataWeapons[substitutionActorId + 200].name}`;
         };
-        if ($dataWeapons[i].meta['FamilyName']) {
-          $gameVariables.value(354)[i - 300] = `${$dataWeapons[i].meta['FamilyName']}`;
+        if ($dataWeapons[weaponIndex].meta['FamilyName']) {
+          $gameVariables.value(354)[weaponIndex - 300] = `${$dataWeapons[weaponIndex].meta['FamilyName']}`;
         };
       };
     };
   }
 
-  func_9_3 = function (parent) {
-    var list = $gameVariables.value(248);
-    list.forEach(function (id) {
-      $dataWeapons[id + 200].name = $gameVariables.value(id + 380)[50];
-    }, parent);
-  }
-
   func_9_4 = function (parent) {
     parent.sVal(353, Array(101).fill(0));
-    for (var i = 301; i <= 400; i++) {
-      if (!$dataWeapons[i].name == '') {
-        if ($dataWeapons[i].meta['SubstitutionActorId']) {
-          var value1 = Number($dataWeapons[i].meta['SubstitutionActorId']);
-          $gameVariables.value(353)[i - 300] = $gameVariables.value(380 + value1)[59];
+    for (let weaponIndex = 301; weaponIndex <= 400; weaponIndex++) {
+      if (!$dataWeapons[weaponIndex].name == '') {
+        if ($dataWeapons[weaponIndex].meta['SubstitutionActorId']) {
+          const substitutionActorId = Number($dataWeapons[weaponIndex].meta['SubstitutionActorId']);
+          $gameVariables.value(353)[i - 300] = $gameVariables.value(380 + substitutionActorId)[59];
         };
         if ($dataWeapons[i].meta['Profession']) {
           $gameVariables.value(353)[i - 300] = $dataWeapons[i].meta['Profession'];
         };
       };
     };
+  }
+
+  func_9_3 = function (parent) {
+    const actorIds = $gameVariables.value(248);
+    actorIds.forEach(function (actorId) {
+      $dataWeapons[actorId + 200].name = $gameVariables.value(actorId + 380)[50];
+    }, parent);
   }
 
 }());
