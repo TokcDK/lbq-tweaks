@@ -686,13 +686,13 @@ tachie_switchOnOff();
 };
 
 //☆☆立ち絵内部処理。本体
-tachie_naibusyori2 = function() {
+tachie_naibusyori2 = function (actor) {
   // Cache frequently used variables
-  const actorId = $gameVariables.value(20);
+  const actorId = actor.actorId;// $gameVariables.value(20);
   console.debug(`tachie_naibusyori2: Retrieved actorId = ${actorId}`);
   const actorCharName = 'actor' + actorId;
   console.debug(`tachie_naibusyori2: actorCharName set to ${actorCharName}`);
-  const actor = $dataActors[actorId];
+  //const actor = $dataActors[actorId];
   console.debug(`tachie_naibusyori2: actor.name= ${actor.name}`);
 
   // Set character name for standing image
@@ -701,7 +701,7 @@ tachie_naibusyori2 = function() {
   // Determine the picture ID to use
   const isSwitch90On = $gameSwitches.value(90); // 立ち絵会話時自動on
   const actorPicId = $gameVariables.value(300); // 立ち絵表示時ﾋﾟｸﾁｬ指定ID
-  const picId = $gameSwitches.value(90) 
+  const picId = isSwitch90On 
     ? actorPicId 
     : Number(actor.meta['tachiePicId']);
   console.debug(`tachie_naibusyori2: isSwitch90On determined as ${isSwitch90On}`);
