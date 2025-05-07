@@ -1957,7 +1957,7 @@ actor_hStatesTachie = function (mode) {
   if (!isGirl(gameActor)) {
     tachie_hyouji2(gameActor);
   } else {
-    const value1 = 111;
+    const basePicId = 111;
     if (mode == 1) {
       $gameVariables.setValue(192, 1);
       $gameVariables.setValue(191, 1);
@@ -1966,53 +1966,54 @@ actor_hStatesTachie = function (mode) {
       if (gameActor.isLearnedSkill(66)) { $gameVariables.setValue(191, 4); };//卑猥
       if (gameActor.isLearnedSkill(68)) { $gameVariables.setValue(191, 5); $gameVariables.setValue(192, 2); };//通常目光
       if (gameActor.isLearnedSkill(70)) { $gameVariables.setValue(191, 6); };//あへ
+
       //$gameVariables.setValue(192,2);//デバッグ用
       //$gameVariables.setValue(191,3);
 
-      $gameScreen.showPicture(value1 + 4, "HstatesBackGround1", 1, 1024, 384, 100, 100, 255, 0);
-      $gameScreen.showPicture(value1 + 6, "HstatesActorBody" + $gameVariables.value(20) + "_" + $gameVariables.value(192), 1, 1024, 400, 100, 100, 0, 0);
-      $gameScreen.showPicture(value1 + 9, "HstatesActorFace" + $gameVariables.value(20), 1, 1024, 384, 100, 100, 0, 0);
-      let value2 = '#00d0ff';
+      $gameScreen.showPicture(basePicId + 4, "HstatesBackGround1", 1, 1024, 384, 100, 100, 255, 0);
+      $gameScreen.showPicture(basePicId + 6, "HstatesActorBody" + $gameVariables.value(20) + "_" + $gameVariables.value(192), 1, 1024, 400, 100, 100, 0, 0);
+      $gameScreen.showPicture(basePicId + 9, "HstatesActorFace" + $gameVariables.value(20), 1, 1024, 384, 100, 100, 0, 0);
+      let defaultHue = '#00d0ff';
       if ($dataActors[$gameVariables.value(20)].meta['tachieHue2']) {
-        value2 = $dataActors[$gameVariables.value(20)].meta['tachieHue2'];
-      };
-      //$gameScreen.showPicture_hue(value1+10,"HstatesActorBustWhite",value2,1,1024,384,0,0,0,0);
-      $gameScreen.showPicture(value1 + 10, "HstatesActorBustWhite", 1, 1024, 384, 0, 0, 0, 0);
-      $gameScreen.showPicture(value1 + 11, "HstatesFrame", 1, 1024, 384, 100, 100, 255, 0);
-      $gameScreen.showPicture(value1 + 5, "HstatesFrame", 1, 1024, 384, 100, 100, 255, 0);
+        defaultHue = $dataActors[$gameVariables.value(20)].meta['tachieHue2'];
+      }
+      $gameScreen.showPicture(basePicId + 10, "HstatesActorBustWhite", 1, 1024, 384, 0, 0, 0, 0);
+      $gameScreen.showPicture(basePicId + 11, "HstatesFrame", 1, 1024, 384, 100, 100, 255, 0);
+      $gameScreen.showPicture(basePicId + 5, "HstatesFrame", 1, 1024, 384, 100, 100, 255, 0);
 
-      value2 = "HstatesActorBust" + $gameVariables.value(20);
+      let actorBustName = "HstatesActorBust" + $gameVariables.value(20);
       $gameScreen.setPicturesAnimation(5, 1, "横", 3);
-      $gameScreen.showPicture(value1 + 7, value2, 1, 1024, 384, 100, 100, 255, 0);
-      $gameScreen.picture(value1 + 7).startAnimationFrame(3, true,
+      $gameScreen.showPicture(basePicId + 7, actorBustName, 1, 1024, 384, 100, 100, 255, 0);
+      $gameScreen.picture(basePicId + 7).startAnimationFrame(3, true,
         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 2, 1, 4, 5, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
       
+      let headVariant;
       if ($gameVariables.value($gameVariables.value(20) + 440)[32] == 2) {
-        value2 = 1;
+        headVariant = 1;
       } else {
-        value2 = 2;
-      };
+        headVariant = 2;
+      }
 
-      $gameScreen.showPicture(value1 + 8, "HstatesActorHead" + $gameVariables.value(20) + "_" + value2, 1, 1024, 368, 100, 100, 0, 0);
+      $gameScreen.showPicture(basePicId + 8, "HstatesActorHead" + $gameVariables.value(20) + "_" + headVariant, 1, 1024, 368, 100, 100, 0, 0);
 
-      $gameScreen.movePicture(value1 + 6, 1, 1024, 400, 100, 100, 255, 0, 10);
-      $gameScreen.movePicture(value1 + 7, 1, 1024, 384, 100, 100, 255, 0, 10);
-      $gameScreen.movePicture(value1 + 8, 1, 1024, 368, 100, 100, 255, 0, 10);
-      $gameScreen.movePicture(value1 + 9, 1, 1024, 384, 100, 100, 255, 0, 10);
-      $gameScreen.movePicture(value1 + 10, 1, 1024, 384, 100, 100, 200, 0, 30);
-      for (let i = value1 + 6; i <= value1 + 9; i++) {
-        if ($gameScreen.picture(i)) {
-          tachie_bless(i, 0);
+      $gameScreen.movePicture(basePicId + 6, 1, 1024, 400, 100, 100, 255, 0, 10);
+      $gameScreen.movePicture(basePicId + 7, 1, 1024, 384, 100, 100, 255, 0, 10);
+      $gameScreen.movePicture(basePicId + 8, 1, 1024, 368, 100, 100, 255, 0, 10);
+      $gameScreen.movePicture(basePicId + 9, 1, 1024, 384, 100, 100, 255, 0, 10);
+      $gameScreen.movePicture(basePicId + 10, 1, 1024, 384, 100, 100, 200, 0, 30);
+      for (let pictureId = basePicId + 6; pictureId <= basePicId + 9; pictureId++) {
+        if ($gameScreen.picture(pictureId)) {
+          tachie_bless(pictureId, 0);
         }
-      };
-      value2 = '#00d0ff';
+      }
+      let actorHue = '#00d0ff';
       if ($dataActors[$gameVariables.value(20)].meta['tachieHue2']) {
-        value2 = $dataActors[$gameVariables.value(20)].meta['tachieHue2'];
-      };
-      $gameScreen._particle.particleSet(0, 'hStates_bgShine1', 'picture:116', 'def', 'above');//55
-      $gameScreen._particle.particleSet(0, 'hStates_bodyShine1', 'picture:118', 'def', 'above');//58
+        actorHue = $dataActors[$gameVariables.value(20)].meta['tachieHue2'];
+      }
+      $gameScreen._particle.particleSet(0, 'hStates_bgShine1', 'picture:116', 'def', 'above'); //55
+      $gameScreen._particle.particleSet(0, 'hStates_bodyShine1', 'picture:118', 'def', 'above'); //58
       $gameScreen._particle.particleUpdate(['hStates_bodyShine1', 'pos', 0, 20]);
-      $gameScreen._particle.particleUpdate(['hStates_bodyShine1', 'color', value2, value2 + '@0.5', value2]);
+      $gameScreen._particle.particleUpdate(['hStates_bodyShine1', 'color', actorHue, actorHue + '@0.5', actorHue]);
       //scale1-15 alfa1-0 speed1-1 #eb00ff
 
     } else {
@@ -2026,78 +2027,79 @@ actor_hStatesTachie = function (mode) {
       //if(actor.isLearnedSkill(70)){$gameVariables.setValue(191,6)};//あへ
 
       if ($gameVariables.value(191) >= 1) {
-        const value2 = '0.7';
-        const value3 = '0.3';
-        $gameScreen._particle.particleUpdate(['hStates_bodyShine1', 'alpha', value2, value3 + '@0.5', '0']);
-      };
+        const alphaStart = '0.7';
+        const alphaEnd = '0.3';
+        $gameScreen._particle.particleUpdate(['hStates_bodyShine1', 'alpha', alphaStart, alphaEnd + '@0.5', '0']);
+      }
       if ($gameVariables.value(191) >= 2) {
-        $gameScreen.movePicture(value1 + 10, 1, 1024, 384, 100, 100, 150, 0, 60);
-        const value6 = '0.5';
-        const value7 = '0.5';
-        $gameScreen._particle.particleUpdate(['hStates_bodyShine1', 'speed', value6, value7 + '@0.5', value7]);
-      };
+        $gameScreen.movePicture(basePicId + 10, 1, 1024, 384, 100, 100, 150, 0, 60);
+        const speedStart = '0.5';
+        const speedEnd = '0.5';
+        $gameScreen._particle.particleUpdate(['hStates_bodyShine1', 'speed', speedStart, speedEnd + '@0.5', speedEnd]);
+      }
       if ($gameVariables.value(191) >= 3) {
-        $gameScreen.movePicture(value1 + 10, 1, 1024, 384, 100, 100, 50, 0, 60);
-        const value4 = '10';
-        const value5 = '6';
-        $gameScreen._particle.particleUpdate(['hStates_bodyShine1', 'scale', value4, value5 + '@0.5', value5]);
+        $gameScreen.movePicture(basePicId + 10, 1, 1024, 384, 100, 100, 50, 0, 60);
+        const scaleStart = '10';
+        const scaleEnd = '6';
+        $gameScreen._particle.particleUpdate(['hStates_bodyShine1', 'scale', scaleStart, scaleEnd + '@0.5', scaleEnd]);
         $gameScreen._particle.particleUpdate(['hStates_bodyShine1', 'color', '#eb00ff', '#eb00ff@0.1', '#ffffff']);
-      };
+      }
       if ($gameVariables.value(191) >= 4) {
         $gameScreen._particle.particleUpdate(['hStates_bodyShine1', 'emitterLifetime', '1']);
-      };
+      }
       if ($gameVariables.value(191) >= 4) {
-        $gameScreen.movePicture(value1 + 10, 1, 1024, 384, 100, 100, 0, 0, 60);
+        $gameScreen.movePicture(basePicId + 10, 1, 1024, 384, 100, 100, 0, 0, 60);
         $gameScreen._particle.particleClear('hStates_bgShine1');
         $gameScreen._particle.particleSet(0, 'hStates_bgShine2', 'picture:57', 'def', 'blow');
-      };
+      }
 
       //デバック用
       //$gameScreen.movePicture(value1+10,1,1024,384,100,100,0,0,60);
       //$gameScreen._particle.particleUpdate(['hStates_bodyShine1','emitterLifetime','1']);
 
       if ($gameVariables.value(191) >= 2) {
-        $gameScreen.showPicture(value1 + 13, "HstatesBackGround" + $gameVariables.value(191), 1, 1024, 384, 100, 100, 255, 0);
-        const value2 = "HscenePose054";
-        let value3;
-        if ($gameVariables.value(191) == 2) { value3 = 60; }
-        if ($gameVariables.value(191) == 3) { value3 = 50; }
-        if ($gameVariables.value(191) == 4) { value3 = 40; }
-        if ($gameVariables.value(191) >= 5) { value3 = 30; }
-        picture_fade1(value1 + 13, "fadeOut", value2, value3, 5);
-      };
+        const fadeImageName = "HscenePose054";
+        let fadeDuration;
+        if ($gameVariables.value(191) == 2) { fadeDuration = 60; }
+        if ($gameVariables.value(191) == 3) { fadeDuration = 50; }
+        if ($gameVariables.value(191) == 4) { fadeDuration = 40; }
+        if ($gameVariables.value(191) >= 5) { fadeDuration = 30; }
+        $gameScreen.showPicture(basePicId + 13, "HstatesBackGround" + $gameVariables.value(191), 1, 1024, 384, 100, 100, 255, 0);
+        picture_fade1(basePicId + 13, "fadeOut", fadeImageName, fadeDuration, 5);
+      }
 
       if ($gameVariables.value(191) >= 2) {
-        $gameScreen.showPicture(value1 + 3, "HstatesBackGround" + $gameVariables.value(191), 1, 1024, 384, 100, 100, 0, 0);
-        $gameScreen.movePicture(value1 + 4, 1, 1024, 384, 100, 100, 0, 0, 120);
-        $gameScreen.movePicture(value1 + 3, 1, 1024, 384, 100, 100, 255, 0, 120);
-      };
+        $gameScreen.showPicture(basePicId + 3, "HstatesBackGround" + $gameVariables.value(191), 1, 1024, 384, 100, 100, 0, 0);
+        $gameScreen.movePicture(basePicId + 4, 1, 1024, 384, 100, 100, 0, 0, 120);
+        $gameScreen.movePicture(basePicId + 3, 1, 1024, 384, 100, 100, 255, 0, 120);
+      }
 
       bless_erase();
 
-      let value2 = "HstatesActorFace" + $gameVariables.value(20) + "_" + $gameVariables.value(191);
+      let facePictureId = "HstatesActorFace" + $gameVariables.value(20) + "_" + $gameVariables.value(191);
       $gameScreen.setPicturesAnimation(5, 1, "横", 5);
-      $gameScreen.showPicture(value1 + 9, value2, 1, 1024, 384, 100, 100, 255, 0);
-      $gameScreen.picture(value1 + 9).startAnimationFrame(1, false, [1]);
+      $gameScreen.showPicture(basePicId + 9, facePictureId, 1, 1024, 384, 100, 100, 255, 0);
+      $gameScreen.picture(basePicId + 9).startAnimationFrame(1, false, [1]);
 
       if ($gameVariables.value(191) == 1 || $gameVariables.value(191) == 5) {
-        if ($gameVariables.value(191) == 1) { value2 = "a"; }
-        if ($gameVariables.value(191) == 5) { value2 = "b"; }
-        $gameScreen.showPicture(value1 + 12, "HstatesActorFace" + $gameVariables.value(20) + value2, 1, 1024, 384, 100, 100, 0, 3);
-        $gameScreen.movePicture(value1 + 12, 1, 1024, 384, 100, 100, 150, 3, 180);
-      };
-      $gameScreen.movePicture(value1 + 11, 1, 1024, 384, 100, 100, 0, 0, 60);
-      for (let i = value1 + 6; i <= value1 + 9; i++) {
-        if ($gameScreen.picture(i)) {
-          tachie_bless(i, 0);
+        let faceVariantSuffix;
+        if ($gameVariables.value(191) == 1) { faceVariantSuffix = "a"; }
+        if ($gameVariables.value(191) == 5) { faceVariantSuffix = "b"; }
+        $gameScreen.showPicture(basePicId + 12, "HstatesActorFace" + $gameVariables.value(20) + faceVariantSuffix, 1, 1024, 384, 100, 100, 0, 3);
+        $gameScreen.movePicture(basePicId + 12, 1, 1024, 384, 100, 100, 150, 3, 180);
+      }
+      $gameScreen.movePicture(basePicId + 11, 1, 1024, 384, 100, 100, 0, 0, 60);
+      for (let pictureId = basePicId + 6; pictureId <= basePicId + 9; pictureId++) {
+        if ($gameScreen.picture(pictureId)) {
+          tachie_bless(pictureId, 0);
         }
-      };
-      if ($gameScreen.picture(value1 + 7)) {
-        hcg_piston(value1 + 7, 9, 1, 2);
-      };
+      }
+      if ($gameScreen.picture(basePicId + 7)) {
+        hcg_piston(basePicId + 7, 9, 1, 2);
+      }
 
-    };
-  };
+    }
+  }
 
 };
 
