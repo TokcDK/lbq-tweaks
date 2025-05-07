@@ -900,10 +900,12 @@ tachie_syoukyo1 = function (id2) {
 
 //☆☆立ち絵表示
 tachie_hyouji1 = function (actorId) {
-
-  $gameVariables.setValue(112, actorId);
-  // Cache the tachie picture ID from the actor data
   const gameActor = $gameActors.actor(actorId);
+  tachie_hyoujiGameActor(gameActor);
+}
+tachie_hyouji2 = function (gameActor) {
+
+  $gameVariables.setValue(112, gameActor.actorId());
   const tachiePicId = Number(gameActor.actor().meta['tachiePicId']);
   $gameVariables.setValue(300, tachiePicId);
 
