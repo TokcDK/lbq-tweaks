@@ -461,7 +461,7 @@ tachie_settei2 = function() {
   const actorId = $gameVariables.value(20);
   console.debug(`tachie_settei2: Actor ID: ${actorId}`);
   const actor = $gameActors.actor(actorId);
-  console.debug(`tachie_settei2: Actor name: ${actor.name}`);
+  console.debug(`tachie_settei2: Actor name: ${actor.name()}`);
 
   if(!$gameParty.battleMembers().includes(actor)){
     console.debug("tachie_settei2: Actor not in battle party! Skip..");
@@ -686,14 +686,14 @@ tachie_switchOnOff();
 };
 
 //☆☆立ち絵内部処理。本体
-tachie_naibusyori2 = function (actor) {
+tachie_naibusyori2 = function (gameActor) {
   // Cache frequently used variables
-  const actorId = actor.actorId;// $gameVariables.value(20);
+  const actorId = gameActor.actorId();// $gameVariables.value(20);
   console.debug(`tachie_naibusyori2: Retrieved actorId = ${actorId}`);
   const actorCharName = 'actor' + actorId;
   console.debug(`tachie_naibusyori2: actorCharName set to ${actorCharName}`);
-  //const actor = $dataActors[actorId];
-  console.debug(`tachie_naibusyori2: actor.name= ${actor.name()}`);
+  const dataActor = gameActor.actor(); // $dataActors[actorId];
+  console.debug(`tachie_naibusyori2: actor.name= ${dataActor.name}`);
 
   // Set character name for standing image
   $gameVariables.setValue(118, actorCharName);
@@ -703,10 +703,10 @@ tachie_naibusyori2 = function (actor) {
   const actorPicId = $gameVariables.value(300); // 立ち絵表示時ﾋﾟｸﾁｬ指定ID
   const picId = isSwitch90On 
     ? actorPicId 
-    : Number(actor.meta['tachiePicId']);
+    : Number(dataActor.meta['tachiePicId']);
   console.debug(`tachie_naibusyori2: isSwitch90On determined as ${isSwitch90On}`);
   console.debug(`tachie_naibusyori2: actorPicId determined as ${actorPicId}`);
-  console.debug(`tachie_naibusyori2: actor.meta['tachiePicId'] determined as ${actor.meta['tachiePicId']}`);
+  console.debug(`tachie_naibusyori2: dataActor.meta['tachiePicId'] determined as ${dataActor.meta['tachiePicId']}`);
   console.debug(`tachie_naibusyori2: picId determined as ${picId}`);
   $gameVariables.setValue(117, picId);
   
