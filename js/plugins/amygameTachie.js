@@ -903,18 +903,18 @@ tachie_hyouji1 = function (actorId) {
 
   $gameVariables.setValue(112, actorId);
   // Cache the tachie picture ID from the actor data
-  const tachiePicId = Number($dataActors[actorId].meta['tachiePicId']);
+  const gameActor = $gameActors.actor(actorId);
+  const tachiePicId = Number(gameActor.actor().meta['tachiePicId']);
   $gameVariables.setValue(300, tachiePicId);
 
   let stateEffectCount = 1;
-  const actor = $gameActors.actor(actorId);
   const stateChangeList = valueTachieChangeState;
 
-  const actorLearnedSkill65 = actor.isLearnedSkill(65);
-  const actorLearnedSkill69 = actor.isLearnedSkill(69);
+  const actorLearnedSkill65 = gameActor.isLearnedSkill(65);
+  const actorLearnedSkill69 = gameActor.isLearnedSkill(69);
   for (let i = 0, len = stateChangeList.length; i < len; i++) {
     const stateId = stateChangeList[i];
-    if (!actor.isStateAffected(stateId)) continue;
+    if (!gameActor.isStateAffected(stateId)) continue;
 
     stateEffectCount++;
 
@@ -998,7 +998,7 @@ tachie_hyouji1 = function (actorId) {
       $gameVariables.setValue(102, $gameVariables.value(106));
     } else {
       if (!$gameSwitches.value(150)) {
-        $gameVariables.setValue(106, $gameVariables.value(106) - Number($dataActors[actorId].meta['TachiePoseYposition']));
+        $gameVariables.setValue(106, $gameVariables.value(106) - Number(gameActor.meta['TachiePoseYposition']));
         const clothSwitchId = $dataItems[$gameVariables.value(19)].meta['ClothSwitch']
           ? Number($dataItems[$gameVariables.value(19)].meta['ClothSwitch'])
           : 0;
@@ -1013,7 +1013,7 @@ tachie_hyouji1 = function (actorId) {
       }
     }
   } else {
-    $gameVariables.setValue(106, $gameVariables.value(106) - Number($dataActors[$gameVariables.value(112)].meta['TachiePoseYposition']));
+    $gameVariables.setValue(106, $gameVariables.value(106) - Number(gameActor.meta['TachiePoseYposition']));
     $gameVariables.setValue(102, $gameVariables.value(106));
   }
   if ($gameSwitches.value(30)) {
