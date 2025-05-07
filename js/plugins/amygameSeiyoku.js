@@ -1951,15 +1951,16 @@ if($gameActors.actor($gameVariables.value(20)).isStateAffected(83)){
 };
 
 //☆☆Hプロフィール表示時立ち絵
-const HSTATES_BACKGROUND = "HstatesBackGround1";
+const HSTATES_BACKGROUND1 = "HstatesBackGround1";
 const HSTATES_FRAME = "HstatesFrame";
 const HSTATES_ACTOR_BUST_WHITE = "HstatesActorBustWhite";
-const HSTATES_ACTOR_BUST_PREFIX = "HstatesActorBust";
-const HSTATES_ACTOR_HEAD_PREFIX = "HstatesActorHead";
+const HSTATES_ACTOR_BODY = "HstatesActorBody";
+const HSTATES_ACTOR_BUST = "HstatesActorBust";
+const HSTATES_ACTOR_HEAD = "HstatesActorHead";
 const HSTATES_BG_SHINE1 = "hStates_bgShine1";
 const HSTATES_BODY_SHINE1 = "hStates_bodyShine1";
-const HSTATES_BACKGROUND_VAR = "HstatesBackGround"; // Used with variable suffix
-const HSTATES_ACTOR_FACE_PREFIX = "HstatesActorFace";
+const HSTATES_BACKGROUND = "HstatesBackGround"; // Used with variable suffix
+const HSTATES_ACTOR_FACE = "HstatesActorFace";
 const CACHED_ANIMATION_FRAMES = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 2, 1, 4, 5, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
 const fadeDurationsMap = {
   2: 60,
@@ -1995,9 +1996,9 @@ function setupActorHStatesTachieMode1(basePicId, actorId, gameActor) {
 }
 
 function setupHStatesPictures(basePicId, actorId) {
-  $gameScreen.showPicture(basePicId + 4, HSTATES_BACKGROUND, 1, 1024, 384, 100, 100, 255, 0);
-  $gameScreen.showPicture(basePicId + 6, HSTATES_ACTOR_BUST_PREFIX + actorId + "_" + $gameVariables.value(192), 1, 1024, 400, 100, 100, 0, 0);
-  $gameScreen.showPicture(basePicId + 9, HSTATES_ACTOR_FACE_PREFIX + actorId, 1, 1024, 384, 100, 100, 0, 0);
+  $gameScreen.showPicture(basePicId + 4, HSTATES_BACKGROUND1, 1, 1024, 384, 100, 100, 255, 0);
+  $gameScreen.showPicture(basePicId + 6, HSTATES_ACTOR_BODY + actorId + "_" + $gameVariables.value(192), 1, 1024, 400, 100, 100, 0, 0);
+  $gameScreen.showPicture(basePicId + 9, HSTATES_ACTOR_FACE + actorId, 1, 1024, 384, 100, 100, 0, 0);
   //let defaultHue = '#00d0ff';
   $gameScreen.showPicture(basePicId + 10, HSTATES_ACTOR_BUST_WHITE, 1, 1024, 384, 0, 0, 0, 0);
   $gameScreen.showPicture(basePicId + 11, HSTATES_FRAME, 1, 1024, 384, 100, 100, 255, 0);
@@ -2005,7 +2006,7 @@ function setupHStatesPictures(basePicId, actorId) {
 }
 
 function setupAnimatedActorBust(basePicId, actorId) {
-  let actorBustName = HSTATES_ACTOR_BUST_PREFIX + actorId;
+  let actorBustName = HSTATES_ACTOR_BUST + actorId;
   $gameScreen.setPicturesAnimation(5, 1, "横", 3);
   $gameScreen.showPicture(basePicId + 7, actorBustName, 1, 1024, 384, 100, 100, 255, 0);
   $gameScreen.picture(basePicId + 7).startAnimationFrame(3, true, CACHED_ANIMATION_FRAMES);
@@ -2019,7 +2020,7 @@ function setupActorHead(basePicId, actorId) {
     headVariant = 2;
   }
 
-  $gameScreen.showPicture(basePicId + 8, HSTATES_ACTOR_HEAD_PREFIX + actorId + "_" + headVariant, 1, 1024, 368, 100, 100, 0, 0);
+  $gameScreen.showPicture(basePicId + 8, HSTATES_ACTOR_HEAD + actorId + "_" + headVariant, 1, 1024, 368, 100, 100, 0, 0);
 }
 
 function animatePictures(basePicId) {
@@ -2093,26 +2094,26 @@ function updateActorHStatesTachieMode2(basePicId, actorId) {
 
   if (hStageSexualDesireMod >= 2) {
     const fadeDuration = hStageSexualDesireMod >= 5 ? 30 : fadeDurationsMap[hStageSexualDesireMod] || 0;
-    $gameScreen.showPicture(basePicId + 13, HSTATES_BACKGROUND_VAR + hStageSexualDesireMod, 1, 1024, 384, 100, 100, 255, 0);
+    $gameScreen.showPicture(basePicId + 13, HSTATES_BACKGROUND + hStageSexualDesireMod, 1, 1024, 384, 100, 100, 255, 0);
     picture_fade1(basePicId + 13, "fadeOut", "HscenePose054", fadeDuration, 5);
   }
 
   if (hStageSexualDesireMod >= 2) {
-    $gameScreen.showPicture(basePicId + 3, HSTATES_BACKGROUND_VAR + hStageSexualDesireMod, 1, 1024, 384, 100, 100, 0, 0);
+    $gameScreen.showPicture(basePicId + 3, HSTATES_BACKGROUND + hStageSexualDesireMod, 1, 1024, 384, 100, 100, 0, 0);
     $gameScreen.movePicture(basePicId + 4, 1, 1024, 384, 100, 100, 0, 0, 120);
     $gameScreen.movePicture(basePicId + 3, 1, 1024, 384, 100, 100, 255, 0, 120);
   }
 
   bless_erase();
 
-  let facePictureId = HSTATES_ACTOR_FACE_PREFIX + actorId + "_" + hStageSexualDesireMod;
+  let facePictureId = HSTATES_ACTOR_FACE + actorId + "_" + hStageSexualDesireMod;
   $gameScreen.setPicturesAnimation(5, 1, "横", 5);
   $gameScreen.showPicture(basePicId + 9, facePictureId, 1, 1024, 384, 100, 100, 255, 0);
   $gameScreen.picture(basePicId + 9).startAnimationFrame(1, false, [1]);
 
   if (hStageSexualDesireMod == 1 || hStageSexualDesireMod == 5) {
     let faceVariantSuffix = faceVariantMap[hStageSexualDesireMod];
-    $gameScreen.showPicture(basePicId + 12, HSTATES_ACTOR_FACE_PREFIX + actorId + faceVariantSuffix, 1, 1024, 384, 100, 100, 0, 3);
+    $gameScreen.showPicture(basePicId + 12, HSTATES_ACTOR_FACE + actorId + faceVariantSuffix, 1, 1024, 384, 100, 100, 0, 3);
     $gameScreen.movePicture(basePicId + 12, 1, 1024, 384, 100, 100, 150, 3, 180);
   }
   $gameScreen.movePicture(basePicId + 11, 1, 1024, 384, 100, 100, 0, 0, 60);
