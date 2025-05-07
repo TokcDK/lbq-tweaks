@@ -712,8 +712,8 @@ Window_InBattleStateList.prototype.setBattler = function(battler) {
     if(!$gameSwitches.value(131)){ //立ち絵禁止のスイッチで条件分岐
       tachie_syoukyo1($gameVariables.value(300));
       $gameVariables.setValue(20,this._battler.actorId());
-      tachie_settei2();
-      tachie_hyouji1($gameVariables.value(20));
+      tachie_settei3(_battler);
+      tachie_hyouji2(_battler);
     };
   };
 };
