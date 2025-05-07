@@ -693,7 +693,7 @@ tachie_naibusyori2 = function (actor) {
   const actorCharName = 'actor' + actorId;
   console.debug(`tachie_naibusyori2: actorCharName set to ${actorCharName}`);
   //const actor = $dataActors[actorId];
-  console.debug(`tachie_naibusyori2: actor.name= ${actor.name}`);
+  console.debug(`tachie_naibusyori2: actor.name= ${actor.name()}`);
 
   // Set character name for standing image
   $gameVariables.setValue(118, actorCharName);
