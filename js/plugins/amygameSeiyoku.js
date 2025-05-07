@@ -1951,46 +1951,46 @@ if($gameActors.actor($gameVariables.value(20)).isStateAffected(83)){
 };
 
 //☆☆Hプロフィール表示時立ち絵
-actor_hStatesTachie = function (id1) {
+actor_hStatesTachie = function (mode) {
 
   const gameActor = $gameActors.actor($gameVariables.value(20)); // bad using global dinamic!
   if (!isGirl(gameActor)) {
     tachie_hyouji2(gameActor);
   } else {
-    var value1 = 111;
-    if (id1 == 1) {
+    const value1 = 111;
+    if (mode == 1) {
       $gameVariables.setValue(192, 1);
       $gameVariables.setValue(191, 1);
-      if (gameActor.isLearnedSkill(62)) { $gameVariables.setValue(191, 2) };//反抗
-      if (gameActor.isLearnedSkill(64)) { $gameVariables.setValue(191, 3) };//自失
-      if (gameActor.isLearnedSkill(66)) { $gameVariables.setValue(191, 4) };//卑猥
-      if (gameActor.isLearnedSkill(68)) { $gameVariables.setValue(191, 5); $gameVariables.setValue(192, 2) };//通常目光
-      if (gameActor.isLearnedSkill(70)) { $gameVariables.setValue(191, 6) };//あへ
+      if (gameActor.isLearnedSkill(62)) { $gameVariables.setValue(191, 2); };//反抗
+      if (gameActor.isLearnedSkill(64)) { $gameVariables.setValue(191, 3); };//自失
+      if (gameActor.isLearnedSkill(66)) { $gameVariables.setValue(191, 4); };//卑猥
+      if (gameActor.isLearnedSkill(68)) { $gameVariables.setValue(191, 5); $gameVariables.setValue(192, 2); };//通常目光
+      if (gameActor.isLearnedSkill(70)) { $gameVariables.setValue(191, 6); };//あへ
       //$gameVariables.setValue(192,2);//デバッグ用
       //$gameVariables.setValue(191,3);
 
       $gameScreen.showPicture(value1 + 4, "HstatesBackGround1", 1, 1024, 384, 100, 100, 255, 0);
       $gameScreen.showPicture(value1 + 6, "HstatesActorBody" + $gameVariables.value(20) + "_" + $gameVariables.value(192), 1, 1024, 400, 100, 100, 0, 0);
       $gameScreen.showPicture(value1 + 9, "HstatesActorFace" + $gameVariables.value(20), 1, 1024, 384, 100, 100, 0, 0);
-      var value2 = '#00d0ff';
+      let value2 = '#00d0ff';
       if ($dataActors[$gameVariables.value(20)].meta['tachieHue2']) {
-        var value2 = $dataActors[$gameVariables.value(20)].meta['tachieHue2'];
+        value2 = $dataActors[$gameVariables.value(20)].meta['tachieHue2'];
       };
       //$gameScreen.showPicture_hue(value1+10,"HstatesActorBustWhite",value2,1,1024,384,0,0,0,0);
       $gameScreen.showPicture(value1 + 10, "HstatesActorBustWhite", 1, 1024, 384, 0, 0, 0, 0);
       $gameScreen.showPicture(value1 + 11, "HstatesFrame", 1, 1024, 384, 100, 100, 255, 0);
       $gameScreen.showPicture(value1 + 5, "HstatesFrame", 1, 1024, 384, 100, 100, 255, 0);
 
-      var value2 = "HstatesActorBust" + $gameVariables.value(20);
+      value2 = "HstatesActorBust" + $gameVariables.value(20);
       $gameScreen.setPicturesAnimation(5, 1, "横", 3);
       $gameScreen.showPicture(value1 + 7, value2, 1, 1024, 384, 100, 100, 255, 0);
       $gameScreen.picture(value1 + 7).startAnimationFrame(3, true,
         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 2, 1, 4, 5, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
-
+      
       if ($gameVariables.value($gameVariables.value(20) + 440)[32] == 2) {
-        var value2 = 1;
+        value2 = 1;
       } else {
-        var value2 = 2;
+        value2 = 2;
       };
 
       $gameScreen.showPicture(value1 + 8, "HstatesActorHead" + $gameVariables.value(20) + "_" + value2, 1, 1024, 368, 100, 100, 0, 0);
@@ -2000,14 +2000,14 @@ actor_hStatesTachie = function (id1) {
       $gameScreen.movePicture(value1 + 8, 1, 1024, 368, 100, 100, 255, 0, 10);
       $gameScreen.movePicture(value1 + 9, 1, 1024, 384, 100, 100, 255, 0, 10);
       $gameScreen.movePicture(value1 + 10, 1, 1024, 384, 100, 100, 200, 0, 30);
-      for (var i = value1 + 6; i <= value1 + 9; i++) {
+      for (let i = value1 + 6; i <= value1 + 9; i++) {
         if ($gameScreen.picture(i)) {
           tachie_bless(i, 0);
         }
       };
-      var value2 = '#00d0ff';
+      value2 = '#00d0ff';
       if ($dataActors[$gameVariables.value(20)].meta['tachieHue2']) {
-        var value2 = $dataActors[$gameVariables.value(20)].meta['tachieHue2'];
+        value2 = $dataActors[$gameVariables.value(20)].meta['tachieHue2'];
       };
       $gameScreen._particle.particleSet(0, 'hStates_bgShine1', 'picture:116', 'def', 'above');//55
       $gameScreen._particle.particleSet(0, 'hStates_bodyShine1', 'picture:118', 'def', 'above');//58
@@ -2026,20 +2026,20 @@ actor_hStatesTachie = function (id1) {
       //if(actor.isLearnedSkill(70)){$gameVariables.setValue(191,6)};//あへ
 
       if ($gameVariables.value(191) >= 1) {
-        var value2 = '0.7';
-        var value3 = '0.3';
+        const value2 = '0.7';
+        const value3 = '0.3';
         $gameScreen._particle.particleUpdate(['hStates_bodyShine1', 'alpha', value2, value3 + '@0.5', '0']);
       };
       if ($gameVariables.value(191) >= 2) {
         $gameScreen.movePicture(value1 + 10, 1, 1024, 384, 100, 100, 150, 0, 60);
-        var value6 = '0.5';
-        var value7 = '0.5';
+        const value6 = '0.5';
+        const value7 = '0.5';
         $gameScreen._particle.particleUpdate(['hStates_bodyShine1', 'speed', value6, value7 + '@0.5', value7]);
       };
       if ($gameVariables.value(191) >= 3) {
         $gameScreen.movePicture(value1 + 10, 1, 1024, 384, 100, 100, 50, 0, 60);
-        var value4 = '10';
-        var value5 = '6';
+        const value4 = '10';
+        const value5 = '6';
         $gameScreen._particle.particleUpdate(['hStates_bodyShine1', 'scale', value4, value5 + '@0.5', value5]);
         $gameScreen._particle.particleUpdate(['hStates_bodyShine1', 'color', '#eb00ff', '#eb00ff@0.1', '#ffffff']);
       };
@@ -2058,11 +2058,12 @@ actor_hStatesTachie = function (id1) {
 
       if ($gameVariables.value(191) >= 2) {
         $gameScreen.showPicture(value1 + 13, "HstatesBackGround" + $gameVariables.value(191), 1, 1024, 384, 100, 100, 255, 0);
-        var value2 = "HscenePose054";
-        if ($gameVariables.value(191) == 2) { var value3 = 60 };
-        if ($gameVariables.value(191) == 3) { var value3 = 50 };
-        if ($gameVariables.value(191) == 4) { var value3 = 40 };
-        if ($gameVariables.value(191) >= 5) { var value3 = 30 };
+        const value2 = "HscenePose054";
+        let value3;
+        if ($gameVariables.value(191) == 2) { value3 = 60; }
+        if ($gameVariables.value(191) == 3) { value3 = 50; }
+        if ($gameVariables.value(191) == 4) { value3 = 40; }
+        if ($gameVariables.value(191) >= 5) { value3 = 30; }
         picture_fade1(value1 + 13, "fadeOut", value2, value3, 5);
       };
 
@@ -2074,20 +2075,19 @@ actor_hStatesTachie = function (id1) {
 
       bless_erase();
 
-      var value2 = "HstatesActorFace" + $gameVariables.value(20) + "_" + $gameVariables.value(191);
+      let value2 = "HstatesActorFace" + $gameVariables.value(20) + "_" + $gameVariables.value(191);
       $gameScreen.setPicturesAnimation(5, 1, "横", 5);
       $gameScreen.showPicture(value1 + 9, value2, 1, 1024, 384, 100, 100, 255, 0);
       $gameScreen.picture(value1 + 9).startAnimationFrame(1, false, [1]);
 
       if ($gameVariables.value(191) == 1 || $gameVariables.value(191) == 5) {
-        if ($gameVariables.value(191) == 1) { var value2 = "a" };
-        if ($gameVariables.value(191) == 5) { var value2 = "b" };
+        if ($gameVariables.value(191) == 1) { value2 = "a"; }
+        if ($gameVariables.value(191) == 5) { value2 = "b"; }
         $gameScreen.showPicture(value1 + 12, "HstatesActorFace" + $gameVariables.value(20) + value2, 1, 1024, 384, 100, 100, 0, 3);
         $gameScreen.movePicture(value1 + 12, 1, 1024, 384, 100, 100, 150, 3, 180);
       };
       $gameScreen.movePicture(value1 + 11, 1, 1024, 384, 100, 100, 0, 0, 60);
-      //$gameVariables.setValue(305,150);//独自変数に切り替えている
-      for (var i = value1 + 6; i <= value1 + 9; i++) {
+      for (let i = value1 + 6; i <= value1 + 9; i++) {
         if ($gameScreen.picture(i)) {
           tachie_bless(i, 0);
         }
