@@ -1057,15 +1057,15 @@ const lowFaceOptionsLen = LOW_FACE_OPTIONS.length;
 const simpleFaceOptionsLen = SIMPLE_FACE_OPTIONS.length;
 const restrainedFaceOptionsLen = RESTRAINED_FACE_OPTIONS.length;
 const pregnancyFaceOptionsLen = PREGNANCY_FACE_OPTIONS.length;
+const TACHIE_SETTEI1_BASE_VAR_ID = 460; // Common base ID for variables
 tachie_settei1 = function () {
-  const baseVarId = 460;
   const actor = $gameActors.actor($gameVariables.value(20));
 
   //☆☆立ち絵内部処理前変数割当↓☆☆
   // offsets for the variables to be set
   {
     standingPictureSlotOffsetsTo0.forEach(function (offset) {
-      $gameVariables.setValue(baseVarId + offset, 0);
+      $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + offset, 0);
     }, this);
   }
   if ($gameVariables.value(464) === 0) { // 460 + 4
@@ -1073,152 +1073,56 @@ tachie_settei1 = function () {
   }
   {
     standingPictureSlotOffsetsTo1.forEach(function (offset) {
-      $gameVariables.setValue(baseVarId + offset, 1);
+      $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + offset, 1);
     }, this);
   }
 
   if (actor.isStateAffected(61) || actor.isStateAffected(694)) { // 発情で愛液
-    $gameVariables.setValue(baseVarId + 8, 2);
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 8, 2);
   }
   if (actor.isStateAffected(63)) { // 拘束で腕と男
-    $gameVariables.setValue(baseVarId + 9, 3);
-    $gameVariables.setValue(baseVarId + 15, 3);
-    $gameVariables.setValue(baseVarId + 17, 0);
-    $gameVariables.setValue(baseVarId + 24, 0);
-    $gameVariables.setValue(baseVarId + 26, 0);
-    $gameVariables.setValue(baseVarId + 1, 1);
-    $gameVariables.setValue(baseVarId + 38, 1);
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 9, 3);
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 15, 3);
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 17, 0);
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 24, 0);
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 26, 0);
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 1, 1);
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 38, 1);
   }
   if (actor.isStateAffected(71) || actor.isStateAffected(695)) { // 濡れた状態で汗
     $gameSwitches.setValue(100, true);
   }
   if (actor.isStateAffected(83) || actor.isStateAffected(696)) { // 妊娠でボテ腹
-    $gameVariables.setValue(baseVarId + 12, 1);
-    if ($gameVariables.value(baseVarId + 14) === 1 && actor.isStateAffected(83)) { // 臍ピアス妊娠有無で変化
-      $gameVariables.setValue(baseVarId + 14, 2);
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 12, 1);
+    if ($gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 14) === 1 && actor.isStateAffected(83)) { // 臍ピアス妊娠有無で変化
+      $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 14, 2);
     }
   }
   if (actor.isStateAffected(84) || actor.isStateAffected(697)) { // 膣内射精
-    $gameVariables.setValue(baseVarId + 8, 1);
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 8, 1);
   }
   if (actor.isStateAffected(85) || actor.isStateAffected(698)) { // 顔射精
-    $gameVariables.setValue(baseVarId + 40, 1);
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 40, 1);
   }
   if (actor.isStateAffected(86) || actor.isStateAffected(699)) { // ぶっかけ
-    $gameVariables.setValue(baseVarId + 40, 2);
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 40, 2);
   }
 
   // ☆☆表情差分↓☆☆
-  let randomFaceVariation = 1;
-  if ($gameSwitches.value(30)) { // is in battle
-    // Default expression is 4 (neutral)
-    randomFaceVariation = damageFaceExpressionsMap[$gameVariables.value(276)] || 4; 
-  }
-  else if ($gameSwitches.value(201) || $gameSwitches.value(239)) { // excited
-    randomFaceVariation = excitedFaceExpressions[Math.floor(Math.random() * excitedFaceExpressionsLength)];
-  }
-  else { // normal
-    randomFaceVariation = baseFaceExpressions[Math.floor(Math.random() * baseFaceExpressionsLength)];
-  }
-  if (actor.isStateAffected(70)) { // 下で露出状態による差分変化を行う為に実行。
-    const currentClothesId = $gameVariables.value($gameVariables.value(20) + 440)[0];
-    const exposureValue = $gameVariables.value($gameVariables.value(20) + 380)[4];
-    if (currentClothesId >= 1 && exposureValue <= 9) {
-      $gameVariables.value($gameVariables.value(20) + 440)[0] = 0;
-    }
-  }
-  if ($gameVariables.value(207) === 101 || ($gameVariables.value(207) >= 1 && $gameVariables.value(207) === $gameVariables.value($gameVariables.value(20) + 440)[41])) {
-    // do nothing
-  } else {
-    if (!$gameSwitches.value(206)) {
-      if ($gameVariables.value($gameVariables.value(20) + 380)[4] < $gameVariables.value($gameVariables.value(20) + 380)[5]) {
-        randomFaceVariation = LOW_FACE_OPTIONS[Math.floor(Math.random() * lowFaceOptionsLen)];
-        $gameSwitches.setValue(100, true);
-      }
-      if ($gameVariables.value($gameVariables.value(20) + 380)[4] <= 49) {
-        const tempClothesValue = $gameVariables.value($gameVariables.value(20) + 380)[1];
-        const masteryLevel = actor.skillMasteryLevel(55);
-        if (tempClothesValue >= 500 && masteryLevel >= 4) {
-          randomFaceVariation = HIGHER_FACE_OPTIONS[Math.floor(Math.random() * higherFaceOptionLen)];
-        }
-        $gameSwitches.setValue(100, true);
-      }
-    }
-  }
-  if (EFFECT_STATE_IDS.some(stateId => actor.isStateAffected(stateId))) { // 発情、自慰、精液
-    const intensity = $gameVariables.value($gameVariables.value(20) + 380)[1];
-
-    if (intensity >= 900) {
-      randomFaceVariation = HIGHEST_FACE_OPTIONS[Math.floor(Math.random() * highestFaceOptionLen)];
-    } else if (intensity >= 700) {
-      randomFaceVariation = MODERATE_FACE_OPTIONS[Math.floor(Math.random() * moderateFaceOptionsLen)];
-    } else if (intensity >= 500) {
-      randomFaceVariation = MILD_FACE_OPTIONS[Math.floor(Math.random() * mildFaceOptionsLen)];
-    } else if (intensity >= 300) {
-      randomFaceVariation = LOW_FACE_OPTIONS[Math.floor(Math.random() * lowFaceOptionsLen)];
-    } else {
-      randomFaceVariation = SIMPLE_FACE_OPTIONS[Math.floor(Math.random() * simpleFaceOptionsLen)];
-    }
-  }
-  if (actor.isStateAffected(63)) { // 拘束で腕と男
-    const constantVal50 = 50, constantVal7 = 7;
-    if (actor.skillMasteryLevel(constantVal50) >= constantVal7) {
-      randomFaceVariation = RESTRAINED_FACE_OPTIONS[Math.floor(Math.random() * restrainedFaceOptionsLen)];
-    } else {
-      randomFaceVariation = SIMPLE_FACE_OPTIONS[Math.floor(Math.random() * simpleFaceOptionsLen)];
-    }
-  }
-  if ((!$gameSwitches.value(143) && actor.isStateAffected(83)) || actor.isStateAffected(696)) { // 妊娠でボテ腹
-    const constantVal50 = 50, constantVal7 = 7;
-    if (actor.skillMasteryLevel(constantVal50) >= constantVal7) {
-      // do nothing
-    } else {
-      randomFaceVariation = PREGNANCY_FACE_OPTIONS[Math.floor(Math.random() * pregnancyFaceOptionsLen)];
-    }
-  }
-  if (!$gameSwitches.value(143) && $gameSwitches.value(30) && actor.tp >= 100) {
-    if ($gameSwitches.value(100)) {
-      randomFaceVariation = 48;
-    } else {
-      randomFaceVariation = 47;
-    }
-  }
-  if (actor.isStateAffected(693)) {
-    $gameSwitches.setValue(100, false);
-  }
-  if ($gameSwitches.value(100)) { // 発汗
-    const constantVal50 = 50, constantVal5 = 5;
-    if (actor.skillMasteryLevel(constantVal50) >= constantVal5) {
-      $gameVariables.setValue(baseVarId + 13, 2);
-    } else {
-      $gameVariables.setValue(baseVarId + 13, 1);
-    }
-  }
-  if ($gameSwitches.value(97)) {
-    randomFaceVariation = $gameVariables.value(151); // 立ち絵会話時
-  }
-  {
-    const stateChangeArr = valueTachieChangeState;
-    stateChangeArr.forEach(function (stateId) {
-      if (actor.isStateAffected(stateId)) {
-        const faceChangeArr = $dataStates[stateId].meta['FaceChange'].split(',');
-        randomFaceVariation = faceChangeArr[Math.floor(Math.random() * faceChangeArr.length)];
-      }
-    }, this);
-  }
-  $gameSwitches.setValue(100, false);
-  $gameVariables.setValue(baseVarId + 33, randomFaceVariation);
+  // Determine the face expression for the character
+  const expressionResult = determineFaceExpression(actor, $gameVariables, $gameSwitches);
+  $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 33, expressionResult);
 
   //☆☆共通パーツ前段↓☆☆
   if (actor.isStateAffected(22) || actor.isLearnedSkill(66)) {
     // do nothing
   } else {
-    if ($gameVariables.value(baseVarId + 21) === 0 && $gameVariables.value(baseVarId + 23) <= 3 &&
-        $gameVariables.value(baseVarId + 25) === 0 && $gameVariables.value(baseVarId + 11) === 0) {
-      $gameVariables.setValue(baseVarId + 9, 4);
+    if ($gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 21) === 0 && $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 23) <= 3 &&
+        $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 25) === 0 && $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 11) === 0) {
+      $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 9, 4);
     }
-    if ($gameVariables.value(baseVarId + 20) === 0 && $gameVariables.value(baseVarId + 22) === 0) {
-      $gameVariables.setValue(baseVarId + 15, 4);
+    if ($gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 20) === 0 && $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 22) === 0) {
+      $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 15, 4);
     }
   }
 
@@ -1226,8 +1130,8 @@ tachie_settei1 = function () {
   const currentExposure = $gameVariables.value($gameVariables.value(20) + 380)[4];
   if (actor.isStateAffected(61) || actor.isStateAffected(694)) {
     if (actor.isLearnedSkill(66) && !$gameSwitches.value(30) && currentExposure <= 9) {
-      $gameVariables.setValue(baseVarId + 15, 0);
-      $gameVariables.setValue(baseVarId + 9, 2);
+      $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 15, 0);
+      $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 9, 2);
     }
   }
 
@@ -1235,65 +1139,236 @@ tachie_settei1 = function () {
   kobetu_isyousettei();
 
   //☆☆共通パーツ後段↓☆☆
-  if ($gameVariables.value(tachieSettei1BaseId + 9) === 4) { // 右腕乳房隠し時に乳房消去。注意。アムエスでは乳房差分変化なしなので処理変更
-    $gameVariables.setValue(tachieSettei1BaseId + 10, 0);
+  if ($gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 9) === 4) { // 右腕乳房隠し時に乳房消去。注意。アムエスでは乳房差分変化なしなので処理変更
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 10, 0);
   }
-  if ($gameVariables.value(tachieSettei1BaseId + 19) >= 1 && $gameVariables.value(tachieSettei1BaseId + 23) === 0) { // 服下影服なしなら消去
-    $gameVariables.setValue(tachieSettei1BaseId + 19, 0);
+  if ($gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 19) >= 1 && $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 23) === 0) { // 服下影服なしなら消去
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 19, 0);
   }
-  if ($gameVariables.value(tachieSettei1BaseId + 20) === 11) { // 奴隷ボンテージ。注意。アムエスではボンテージなしなので処理変更
-    $gameVariables.setValue(tachieSettei1BaseId + 10, 1);
-    $gameVariables.setValue(tachieSettei1BaseId + 9, 1);
-    $gameVariables.setValue(tachieSettei1BaseId + 15, 1);
-    $gameVariables.setValue(tachieSettei1BaseId + 24, 0);
-    $gameVariables.setValue(tachieSettei1BaseId + 26, 0);
+  if ($gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 20) === 11) { // 奴隷ボンテージ。注意。アムエスではボンテージなしなので処理変更
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 10, 1);
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 9, 1);
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 15, 1);
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 24, 0);
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 26, 0);
   }
-  if ($gameVariables.value(tachieSettei1BaseId + 10) === 0 && $gameVariables.value(tachieSettei1BaseId + 11) === 1) { // 乳首ピアス乳房非表示時に隠す
-    $gameVariables.setValue(tachieSettei1BaseId + 111, $gameVariables.value(tachieSettei1BaseId + 11));
-    $gameVariables.setValue(tachieSettei1BaseId + 11, 0);
+  if ($gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 10) === 0 && $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 11) === 1) { // 乳首ピアス乳房非表示時に隠す
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 111, $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 11));
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 11, 0);
   }
-  if ($gameVariables.value(tachieSettei1BaseId + 9) === 4) { // 右腕乳房露出時腕カバー消去
-    $gameVariables.setValue(tachieSettei1BaseId + 117, $gameVariables.value(tachieSettei1BaseId + 17));
-    $gameVariables.setValue(tachieSettei1BaseId + 17, 0);
+  if ($gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 9) === 4) { // 右腕乳房露出時腕カバー消去
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 117, $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 17));
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 17, 0);
   }
-  if ($gameVariables.value(tachieSettei1BaseId + 15) === 4) { // 左腕股間露出時腕カバー消去
-    $gameVariables.setValue(tachieSettei1BaseId + 126, $gameVariables.value(tachieSettei1BaseId + 26));
-    $gameVariables.setValue(tachieSettei1BaseId + 26, 0);
+  if ($gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 15) === 4) { // 左腕股間露出時腕カバー消去
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 126, $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 26));
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 26, 0);
   }
   if (actor.isStateAffected(83)) { // 妊娠でボテ腹
     for (const partId of [16, 17, 19, 20, 21, 22, 23, 24, 25, 26, 28]) {
-      $gameVariables.setValue(tachieSettei1BaseId + partId + 100, $gameVariables.value(tachieSettei1BaseId + partId));
-      $gameVariables.setValue(tachieSettei1BaseId + partId, 0);
+      $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + partId + 100, $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + partId));
+      $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + partId, 0);
     }
-    $gameVariables.setValue(tachieSettei1BaseId + 9, 1);
-    $gameVariables.setValue(tachieSettei1BaseId + 10, 1);
-    $gameVariables.setValue(tachieSettei1BaseId + 15, 1);
-    $gameVariables.setValue(tachieSettei1BaseId + 12, 2);
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 9, 1);
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 10, 1);
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 15, 1);
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 12, 2);
     if ($gameVariables.value(380 + actorId)[4] >= 5) {
-      $gameVariables.setValue(tachieSettei1BaseId + 28, 1);
-      $gameVariables.setValue(tachieSettei1BaseId + 12, 1);
+      $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 28, 1);
+      $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 12, 1);
     }
-    if ($gameVariables.value(tachieSettei1BaseId + 14) === 1) { // 臍ピアス時に変化
-      $gameVariables.setValue(tachieSettei1BaseId + 114, $gameVariables.value(tachieSettei1BaseId + 14));
-      $gameVariables.setValue(tachieSettei1BaseId + 14, 2);
+    if ($gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 14) === 1) { // 臍ピアス時に変化
+      $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 114, $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 14));
+      $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 14, 2);
     }
   }
   if (actor.isStateAffected(83)) { // ぶっかけ腕の状態で変化
-    if ([2, 3, 4].some(function (stateFace) { return $gameVariables.value(tachieSettei1BaseId + 9) === stateFace; })) {
-      if ($gameVariables.value(tachieSettei1BaseId + 40) === 2) {
-        $gameVariables.setValue(tachieSettei1BaseId + 40, 3);
+    if ([2, 3, 4].some(function (stateFace) { return $gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 9) === stateFace; })) {
+      if ($gameVariables.value(TACHIE_SETTEI1_BASE_VAR_ID + 40) === 2) {
+        $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 40, 3);
       }
     }
   }
   for (const tempStateId of valueTachieChangeStateTemporary) {
     if (actor.isStateAffected(tempStateId)) { // ステートによってパーツに変化を促す一時ステート・その立ち絵会話期間のみ
       const tachieChangeTempArr = $dataStates[tempStateId].meta['TachieChangeStateTemporary'].split(',');
-      const targetVariableId = tachieSettei1BaseId + Number(tachieChangeTempArr[0]);
+      const targetVariableId = TACHIE_SETTEI1_BASE_VAR_ID + Number(tachieChangeTempArr[0]);
       $gameVariables.setValue(targetVariableId, $gameVariables.value(targetVariableId));
       $gameVariables.setValue(targetVariableId, Number(tachieChangeTempArr[1]));
     }
   }
 };
+
+//#region tachie_settei1 experssion setup
+
+// Main function to determine face expression based on priority
+function determineFaceExpression(actor, $gameVariables, $gameSwitches) {
+  // Check for highest priority states first
+  if ($gameSwitches.value(97)) {
+    return $gameVariables.value(151); // Use predefined expression from conversation
+  }
+
+  // Check for special state effects that override other expressions
+  const stateBasedExpression = getStateBasedExpression(actor, $gameVariables, $gameSwitches);
+  if (stateBasedExpression !== null) {
+    return stateBasedExpression;
+  }
+
+  // Check battle-specific conditions
+  if ($gameSwitches.value(30) && actor.tp >= 100) {
+    return $gameSwitches.value(100) ? 48 : 47;
+  }
+
+  // Check for arousal/emotional states
+  const emotionalExpression = getEmotionalExpression(actor, $gameVariables, $gameSwitches);
+  if (emotionalExpression !== null) {
+    return emotionalExpression;
+  }
+
+  // Check clothing and exposure related expressions
+  const exposureExpression = getExposureBasedExpression(actor, $gameVariables, $gameSwitches);
+  if (exposureExpression !== null) {
+    return exposureExpression;
+  }
+
+  // Default expressions based on situation
+  return getDefaultExpression($gameVariables, $gameSwitches);
+}
+
+// Function to get expression based on special states
+function getStateBasedExpression(actor, $gameVariables, $gameSwitches) {
+  // Check for special state effects first (highest priority)
+  for (const stateId of valueTachieChangeState) {
+    if (actor.isStateAffected(stateId) && $dataStates[stateId].meta['FaceChange']) {
+      const faceChangeArr = $dataStates[stateId].meta['FaceChange'].split(',');
+      return Number(faceChangeArr[Math.floor(Math.random() * faceChangeArr.length)]);
+    }
+  }
+
+  // Check for restraint state
+  if (actor.isStateAffected(63)) {
+    const constantVal50 = 50, constantVal7 = 7;
+    if (actor.skillMasteryLevel(constantVal50) >= constantVal7) {
+      return RESTRAINED_FACE_OPTIONS[Math.floor(Math.random() * RESTRAINED_FACE_OPTIONS.length)];
+    } else {
+      return SIMPLE_FACE_OPTIONS[Math.floor(Math.random() * SIMPLE_FACE_OPTIONS.length)];
+    }
+  }
+
+  // Check for pregnancy state
+  if ((!$gameSwitches.value(143) && actor.isStateAffected(83)) || actor.isStateAffected(696)) {
+    const constantVal50 = 50, constantVal7 = 7;
+    if (actor.skillMasteryLevel(constantVal50) >= constantVal7) {
+      // Do nothing, return null to continue checks
+      return null;
+    } else {
+      return PREGNANCY_FACE_OPTIONS[Math.floor(Math.random() * PREGNANCY_FACE_OPTIONS.length)];
+    }
+  }
+
+  // Handle sweating effect
+  handleSweatEffect(actor, $gameVariables, $gameSwitches);
+
+  return null;
+}
+
+// Function to get expression based on emotional arousal
+function getEmotionalExpression(actor, $gameVariables, $gameSwitches) {
+  // Check for states related to arousal, etc.
+  if (EFFECT_STATE_IDS.some(stateId => actor.isStateAffected(stateId))) {
+    const intensity = $gameVariables.value($gameVariables.value(20) + 380)[1];
+
+    if (intensity >= 900) {
+      return HIGHEST_FACE_OPTIONS[Math.floor(Math.random() * HIGHEST_FACE_OPTIONS.length)];
+    } else if (intensity >= 700) {
+      return MODERATE_FACE_OPTIONS[Math.floor(Math.random() * MODERATE_FACE_OPTIONS.length)];
+    } else if (intensity >= 500) {
+      return MILD_FACE_OPTIONS[Math.floor(Math.random() * MILD_FACE_OPTIONS.length)];
+    } else if (intensity >= 300) {
+      return LOW_FACE_OPTIONS[Math.floor(Math.random() * LOW_FACE_OPTIONS.length)];
+    } else {
+      return SIMPLE_FACE_OPTIONS[Math.floor(Math.random() * SIMPLE_FACE_OPTIONS.length)];
+    }
+  }
+
+  return null;
+}
+
+// Function to handle exposure-based expressions
+function getExposureBasedExpression(actor, $gameVariables, $gameSwitches) {
+  handleExposureState(actor, $gameVariables);
+
+  // Skip if special condition
+  if ($gameVariables.value(207) === 101 ||
+    ($gameVariables.value(207) >= 1 &&
+      $gameVariables.value(207) === $gameVariables.value($gameVariables.value(20) + 440)[41])) {
+    return null;
+  }
+
+  if (!$gameSwitches.value(206)) {
+    // Check exposure level against tolerance
+    if ($gameVariables.value($gameVariables.value(20) + 380)[4] <
+      $gameVariables.value($gameVariables.value(20) + 380)[5]) {
+      $gameSwitches.setValue(100, true);
+      return LOW_FACE_OPTIONS[Math.floor(Math.random() * LOW_FACE_OPTIONS.length)];
+    }
+
+    // Check for low clothing value
+    if ($gameVariables.value($gameVariables.value(20) + 380)[4] <= 49) {
+      const tempClothesValue = $gameVariables.value($gameVariables.value(20) + 380)[1];
+      const masteryLevel = actor.skillMasteryLevel(55);
+
+      $gameSwitches.setValue(100, true);
+      if (tempClothesValue >= 500 && masteryLevel >= 4) {
+        return HIGHER_FACE_OPTIONS[Math.floor(Math.random() * HIGHER_FACE_OPTIONS.length)];
+      }
+    }
+  }
+
+  return null;
+}
+
+// Function to get default expressions based on situation
+function getDefaultExpression($gameVariables, $gameSwitches) {
+  if ($gameSwitches.value(30)) { // In battle
+    return damageFaceExpressionsMap[$gameVariables.value(276)] || 4;
+  } else if ($gameSwitches.value(201) || $gameSwitches.value(239)) { // Excited
+    return excitedFaceExpressions[Math.floor(Math.random() * excitedFaceExpressions.length)];
+  } else { // Normal
+    return baseFaceExpressions[Math.floor(Math.random() * baseFaceExpressions.length)];
+  }
+}
+
+// Helper function to handle exposure state
+function handleExposureState(actor, $gameVariables) {
+  if (actor.isStateAffected(70)) {
+    const currentClothesId = $gameVariables.value($gameVariables.value(20) + 440)[0];
+    const exposureValue = $gameVariables.value($gameVariables.value(20) + 380)[4];
+    if (currentClothesId >= 1 && exposureValue <= 9) {
+      $gameVariables.value($gameVariables.value(20) + 440)[0] = 0;
+    }
+  }
+}
+
+// Helper function to handle sweat effect
+function handleSweatEffect(actor, $gameVariables, $gameSwitches) {
+  if (actor.isStateAffected(693)) {
+    $gameSwitches.setValue(100, false);
+  }
+
+  if ($gameSwitches.value(100)) {
+    const constantVal50 = 50, constantVal5 = 5;
+    if (actor.skillMasteryLevel(constantVal50) >= constantVal5) {
+      $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 13, 2);
+    } else {
+      $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 13, 1);
+    }
+  }
+
+  // Reset switch after processing
+  $gameSwitches.setValue(100, false);
+}
+//#endregion
 
 //破損時第一段階
 clothes_hason1 = function(array,id1){
