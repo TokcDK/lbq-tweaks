@@ -6684,35 +6684,25 @@ pictureText_SetUp = function(setupType, pictureId, displayText, textSetting, pos
     }, parent);
   }
 
-  func_9_2 = function (parent) {
-    parent.sVal(354, Array(101).fill(0));
-    for (let weaponIndex = 301; weaponIndex <= 400; weaponIndex++) {
-      if (!$dataWeapons[weaponIndex].name == '') {
-        if ($dataWeapons[weaponIndex].meta['SubstitutionActorId']) {
-          const substitutionActorId = Number($dataWeapons[weaponIndex].meta['SubstitutionActorId']);
-          $gameVariables.value(354)[weaponIndex - 300] = $dataWeapons[substitutionActorId + 200].name;
-        };
-        if ($dataWeapons[weaponIndex].meta['FamilyName']) {
-          $gameVariables.value(354)[weaponIndex - 300] = $dataWeapons[weaponIndex].meta['FamilyName'];
-        };
-      };
-    };
-  }
+  // Original func_9_2: Use with appropriate parameters to set family names
+  func_9_2 = function(parent) {
+    setNPCInformation(
+      parent, 
+      354, 
+      'FamilyName',
+      function(actorId) { return $dataWeapons[actorId + 200].name; }
+    );
+  };
 
-  func_9_4 = function (parent) {
-    parent.sVal(353, Array(101).fill(0));
-    for (let weaponIndex = 301; weaponIndex <= 400; weaponIndex++) {
-      if (!$dataWeapons[weaponIndex].name == '') {
-        if ($dataWeapons[weaponIndex].meta['SubstitutionActorId']) {
-          const substitutionActorId = Number($dataWeapons[weaponIndex].meta['SubstitutionActorId']);
-          $gameVariables.value(353)[i - 300] = $gameVariables.value(380 + substitutionActorId)[59];
-        };
-        if ($dataWeapons[i].meta['Profession']) {
-          $gameVariables.value(353)[i - 300] = $dataWeapons[i].meta['Profession'];
-        };
-      };
-    };
-  }
+  // Original func_9_4: Use with appropriate parameters to set professions
+  func_9_4 = function(parent) {
+    setNPCInformation(
+      parent, 
+      353, 
+      'Profession',
+      function(actorId) { return $gameVariables.value(actorId + 380)[59]; }
+    );
+  };
 
   func_9_3 = function (parent) {
     const actorIds = $gameVariables.value(248);
@@ -6720,5 +6710,34 @@ pictureText_SetUp = function(setupType, pictureId, displayText, textSetting, pos
       $dataWeapons[actorId + 200].name = $gameVariables.value(actorId + 380)[50];
     }, parent);
   }
+
+  /**
+   * Sets NPC information based on substitution actor or direct metadata.
+   * This function merges the old func_9_2 and func_9_4 functions.
+   * @param {*} parent - The parent object (for sVal method access)
+   * @param {number} gameVarId - Target game variable ID to store data (353 for Profession, 354 for FamilyName)
+   * @param {string} metaKey - The metadata key to look for ('Profession' or 'FamilyName')
+   * @param {Function} substitutionCallback - Function that returns value for substitution actors
+   */
+  setNPCInformation = function (parent, gameVarId, metaKey, substitutionCallback) {
+    // Initialize the array with 101 zeroes
+    parent.sVal(gameVarId, Array(101).fill(0));
+
+    // Process all NPC weapon entries (301-400)
+    for (let weaponIndex = 301; weaponIndex <= 400; weaponIndex++) {
+      const weapon = $dataWeapons[weaponIndex];
+      if (weapon.name !== '') {
+        // If there is a substitution actor id, use the provided callback
+        if (weapon.meta['SubstitutionActorId']) {
+          const substitutionActorId = Number(weapon.meta['SubstitutionActorId']);
+          $gameVariables.value(gameVarId)[weaponIndex - 300] = substitutionCallback(substitutionActorId);
+        }
+        // If the metadata key exists, it takes precedence
+        if (weapon.meta[metaKey]) {
+          $gameVariables.value(gameVarId)[weaponIndex - 300] = weapon.meta[metaKey];
+        }
+      }
+    }
+  };
 
 }());
