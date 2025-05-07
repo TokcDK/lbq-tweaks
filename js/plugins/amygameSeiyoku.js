@@ -1960,30 +1960,7 @@ actor_hStatesTachie = function (mode) {
   } else {
     const basePicId = 111;
     if (mode == 1) {
-      $gameVariables.setValue(192, 1);
-      switch (true) {
-        case gameActor.isLearnedSkill(70):
-          $gameVariables.setValue(191, 6); // あへ
-          break;
-        case gameActor.isLearnedSkill(68):
-          $gameVariables.setValue(191, 5); // 通常目光
-          $gameVariables.setValue(192, 2);
-          break;
-        case gameActor.isLearnedSkill(66):
-          $gameVariables.setValue(191, 4); // 卑猥
-          break;
-        case gameActor.isLearnedSkill(64):
-          $gameVariables.setValue(191, 3); // 自失
-          break;
-        case gameActor.isLearnedSkill(62):
-          $gameVariables.setValue(191, 2); // 反抗
-          break;
-        default:
-          $gameVariables.setValue(191, 1);
-      }
-
-      //$gameVariables.setValue(192,2);//デバッグ用
-      //$gameVariables.setValue(191,3);
+      setActorStateBasedOnSkillsHStatesTachie(gameActor);
 
       $gameScreen.showPicture(basePicId + 4, "HstatesBackGround1", 1, 1024, 384, 100, 100, 255, 0);
       $gameScreen.showPicture(basePicId + 6, "HstatesActorBody" + actorId + "_" + $gameVariables.value(192), 1, 1024, 400, 100, 100, 0, 0);
@@ -2117,6 +2094,34 @@ actor_hStatesTachie = function (mode) {
   }
 
 };
+
+function setActorStateBasedOnSkillsHStatesTachie(actor) {
+  $gameVariables.setValue(192, 1);
+  
+  switch (true) {
+    case actor.isLearnedSkill(70):
+      $gameVariables.setValue(191, 6); // あへ
+      break;
+    case actor.isLearnedSkill(68):
+      $gameVariables.setValue(191, 5); // 通常目光
+      $gameVariables.setValue(192, 2);
+      break;
+    case actor.isLearnedSkill(66):
+      $gameVariables.setValue(191, 4); // 卑猥
+      break;
+    case actor.isLearnedSkill(64):
+      $gameVariables.setValue(191, 3); // 自失
+      break;
+    case actor.isLearnedSkill(62):
+      $gameVariables.setValue(191, 2); // 反抗
+      break;
+    default:
+      $gameVariables.setValue(191, 1);
+  }
+
+  //$gameVariables.setValue(192,2);//デバッグ用
+  //$gameVariables.setValue(191,3);
+}
 
 //☆☆性欲度情報をリセット
 seiyoku_parameterReset = function(id1){
