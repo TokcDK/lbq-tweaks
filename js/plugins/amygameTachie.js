@@ -905,7 +905,8 @@ tachie_hyouji1 = function (actorId) {
 }
 tachie_hyouji2 = function (gameActor) {
 
-  $gameVariables.setValue(112, gameActor.actorId());
+  const actorId = gameActor.actorId();
+  $gameVariables.setValue(112, actorId);
   const tachiePicId = Number(gameActor.actor().meta['tachiePicId']);
   $gameVariables.setValue(300, tachiePicId);
 
