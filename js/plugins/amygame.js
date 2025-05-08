@@ -3669,20 +3669,20 @@ var start = 0;
 var end = $gameParty.members().length-1;
 for (var i = start; i <= end; i++) {
   if(i >= 1){id2 += 1};
-  const actor = $gameParty.members()[i];
-  var actorId = actor.actorId();
+  const gameActor = $gameParty.members()[i];
+  var actorId = gameActor.actorId();
   $gameVariables.setValue(20, actorId);
   const id = 1; 
-  const choiceParams = {text: actor.name(),value: actorId};
+  const choiceParams = {text: gameActor.name(),value: actorId};
   $gameSystem.addCustomChoice(id, choiceParams);
-  if(isGirl(actor)){
+  if(isGirl(gameActor)){
     valueFaceSelect = 6;
     var value1 = Math.floor( Math.random() * 8);
     if(value1 == 0){valueFaceSelect = 1};//通常
     if(value1 == 1){valueFaceSelect = 2};//笑顔
     if(value1 == 2){valueFaceSelect = 5};//真顔
     if(value1 == 3){valueFaceSelect = 15};//目を瞑る
-    if(actor.isLearnedSkill(66)){
+    if(gameActor.isLearnedSkill(66)){
       if(value1 == 4){valueFaceSelect = 40};//頬染め
       if(value1 == 5){valueFaceSelect = 39};//頬染めウィンク
       if(value1 == 6){valueFaceSelect = 38};//頬染め挑発的
