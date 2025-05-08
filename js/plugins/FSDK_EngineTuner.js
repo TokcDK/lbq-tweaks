@@ -265,7 +265,7 @@ Sprite.prototype._renderWebGL = function (renderer) {
 Bitmap.prototype.drawText = function(text, x, y, maxWidth, lineHeight, align) {
     // Skip processing if text is empty or undefined
     if (!text) return;
-    
+
     // Use drawSmallText for small font sizes
     if (this.fontSize < Bitmap.minFontSize) {
         this.drawSmallText(text, x, y, maxWidth, lineHeight, align);
@@ -274,6 +274,9 @@ Bitmap.prototype.drawText = function(text, x, y, maxWidth, lineHeight, align) {
     
     // Set default max width if not specified
     maxWidth = maxWidth || 0xffffffff;
+
+    // Set default line height if not specified
+    align = align || 'left';
     
     // Calculate text position
     var tx = x;
@@ -286,8 +289,6 @@ Bitmap.prototype.drawText = function(text, x, y, maxWidth, lineHeight, align) {
         tx += maxWidth / 2;
     } else if (align === 'right') {
         tx += maxWidth;
-    } else {
-        align = 'left'; // Default alignment
     }
     
     // Draw text efficiently with minimal context changes
