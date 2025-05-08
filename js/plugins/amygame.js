@@ -3669,11 +3669,11 @@ var start = 0;
 var end = $gameParty.members().length-1;
 for (var i = start; i <= end; i++) {
   if(i >= 1){id2 += 1};
-  $gameVariables.setValue(20,$gameParty.members()[i].actorId());
-  var actor = $gameActors.actor($gameVariables.value(20));
-  var id4 = $gameParty.members()[i].actorId();
+  const actor = $gameParty.members()[i];
+  var actorId = actor.actorId();
+  $gameVariables.setValue(20, actorId);
   const id = 1; 
-  const choiceParams = {text: actor.name(),value: id4};
+  const choiceParams = {text: actor.name(),value: actorId};
   $gameSystem.addCustomChoice(id, choiceParams);
   if(isGirl(actor)){
     valueFaceSelect = 6;
