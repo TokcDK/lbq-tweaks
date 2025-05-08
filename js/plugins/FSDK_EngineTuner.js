@@ -275,11 +275,17 @@ Bitmap.prototype.drawText = function (text, x, y, maxWidth, lineHeight, align) {
         var context = this._context;
         var alpha = context.globalAlpha;
         maxWidth = maxWidth || 0xffffffff;
-        if (align === 'center') {
-            tx += maxWidth / 2;
-        }
-        if (align === 'right') {
-            tx += maxWidth;
+        switch (align) {
+            case 'center':
+                tx += maxWidth / 2;
+                break;
+            case 'right':
+                tx += maxWidth;
+                break;
+            case 'left':
+                break;
+            default:
+                align = 'left'; // asdf default is left
         }
         context.save();
         context.font = this._makeFontNameText();
