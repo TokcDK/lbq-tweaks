@@ -6285,19 +6285,20 @@ pictureText_SetUp = function(setupType, pictureId, displayText, textSetting, pos
       user.isLearnedSkill(reqSkillId);
   };
 
-  commonEvents_setVar474_by_var135_mapId = function (questProgress, mapId, event_pararelStarting_param2) {
-    commonEvents_setVar474_by_var135_mapId_Base(questProgress, mapId, event_pararelStarting_param2, true, -1)
+  triggerParallelEventIfQuestAndMapMatch0 = function (questProgress, mapId, event_pararelStarting_param2) {
+    triggerParallelEventIfQuestAndMapMatch(questProgress, mapId, event_pararelStarting_param2, true, -1)
   };
 
-  commonEvents_setVar474_by_var135_mapId_1 = function (questProgress, mapId, switchId, event_pararelStarting_param2) {
-    commonEvents_setVar474_by_var135_mapId_Base(questProgress, mapId, event_pararelStarting_param2, false, switchId)
+  triggerParallelEventIfQuestAndMapMatch1 = function (questProgress, mapId, switchId, event_pararelStarting_param2) {
+    triggerParallelEventIfQuestAndMapMatch(questProgress, mapId, event_pararelStarting_param2, false, switchId)
   }
 
-  commonEvents_setVar474_by_var135_mapId_Base = function (questProgress, mapId, event_pararelStarting_param2, dontCheckGuadWin, switchId) {
+  // Renamed from triggerParallelEventIfQuestAndMapMatch
+  triggerParallelEventIfQuestAndMapMatch = function (questProgress, mapId, eventParallelParam, skipGuardCheck, switchId) {
     if ($gameVariables.value(135) == questProgress) {
       if ($gameMap.mapId() == mapId) {
-        if (dontCheckGuadWin || $gameSwitches.value(switchId)) {//ｶﾞｰﾃﾞｨｱﾝ勝利
-          event_pararelStarting(0, event_pararelStarting_param2, 0);
+        if (skipGuardCheck || $gameSwitches.value(switchId)) { // Guard win condition check
+          event_pararelStarting(0, eventParallelParam, 0);
           $gameSwitches.setValue(474, true);
         }
       }
