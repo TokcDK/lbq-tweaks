@@ -1020,7 +1020,7 @@ tachie_usedChange1 = function(gameActor){
   if (!gameActor.actor().meta['Heroine']) return;
 
   if(!$gameSwitches.value(131) || !$gameParty.inBattle()){
-    if($gameSwitches.value(42) && $gameVariables.value(3) == $gameVariables.value(20)){
+    if($gameSwitches.value(42) && $gameVariables.value(3) == gameActor.actorId()){
       const tachiePicId = gameActor.actor().meta['TachiePicId'];
       tachie_syoukyo1(tachiePicId); // $gameVariables.value(300);
       tachie_settei3(gameActor);
