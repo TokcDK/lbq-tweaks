@@ -1257,11 +1257,11 @@ const gameVariables = $gameVariables;
 
 gameVariables.setValue(20,3);
 gameVariables.value(443)[5] = 1; // 443 = gameVariables.value(20)+440
-tachie_settei2();
+tachie_settei3($gameActors.actor(3));
 
 gameVariables.setValue(20,4);
 gameVariables.value(444)[5] = 1;
-tachie_settei2();
+tachie_settei3($gameActors.actor(4));
 
 gameVariables.setValue(20,5);
 let array = gameVariables.value(445);
@@ -1270,7 +1270,7 @@ array[7] = 1;//ペニス
 array[23] = 1;//衣装
 array[33] = 1;//表情
 array[37] = 1;//髪型
-tachie_settei2();
+tachie_settei3($gameActors.actor(5));
 
 gameVariables.setValue(20,6);
 array = gameVariables.value(446);
@@ -1279,7 +1279,7 @@ array[7] = 1;
 array[23] = 1;
 array[33] = 1;
 array[37] = 0;
-tachie_settei2();
+tachie_settei3($gameActors.actor(6));
 
 gameVariables.setValue(20,7);
 array = gameVariables.value(447);
@@ -1288,7 +1288,7 @@ array[7] = 1;
 array[23] = 1;
 array[33] = 1;
 array[37] = 0;
-tachie_settei2();
+tachie_settei3($gameActors.actor(7));
 
 };
 
