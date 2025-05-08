@@ -1157,13 +1157,13 @@ tachie_settei1 = function () {
   kobetu_isyousettei1(actor);
 
   //☆☆共通パーツ後段↓☆☆
-  applyCommonPostProcessingTachieSettei1();
+  applyCommonPostProcessingTachieSettei1(actor);
 };
 
 //#region apply common processing
-function applyCommonPostProcessingTachieSettei1() {
+function applyCommonPostProcessingTachieSettei1(actor) {
   // Get actor reference for state-related checks
-  const actor = $gameActors.actor($gameVariables.value(20));
+  //const actor = $gameActors.actor($gameVariables.value(20));
 
   // Apply adjustments for different body parts and states
   hideBreastsWhenCoveredTachieSettei1();
