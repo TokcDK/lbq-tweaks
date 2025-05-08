@@ -1154,7 +1154,7 @@ tachie_settei1 = function () {
   applyGlamourPoseForArousalTachieSettei1();
 
   //☆☆個別衣装設定↓☆☆
-  kobetu_isyousettei();
+  kobetu_isyousettei1(actor);
 
   //☆☆共通パーツ後段↓☆☆
   applyCommonPostProcessingTachieSettei1();
