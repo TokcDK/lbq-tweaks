@@ -153,32 +153,51 @@
   //rpg_scenes.js
   Scene_Battle.prototype.startActorCommandSelection = function () {
     const actor = BattleManager.actor();
+    console.debug("startActorCommandSelection called. Actor:", actor);
 
     // Only perform tachie operations if needed (improved conditionals)
     if (!Input.isRepeated("ok") && ConfigManager.battleAniSpeed >= 3 && !$gameSwitches.value(131)) {
+      console.debug("Tachie operations condition met:",
+                    "Input isRepeated('ok'):", Input.isRepeated("ok"),
+                    "BattleAniSpeed:", ConfigManager.battleAniSpeed,
+                    "Switch 131:", $gameSwitches.value(131));
 
       // Remove tachie
       tachie_syoukyo1($gameVariables.value(300));
+      console.debug("tachie_syoukyo1 invoked with variable 300:",
+        $gameVariables.value(300));
+      console.debug("tachie_syoukyo1 actor.actor().meta['tachiePicId']:",
+        actor.actor().meta['tachiePicId']);
 
       // Set variable directly with actor ID
       $gameVariables.setValue(20, actor.actorId());
+      console.debug("Game variable 20 set to actor ID:", actor.actorId());
 
       // Only call tachie_settei3 if necessary
       if ($gameVariables.value(263) >= 2) {
+        console.debug("tachie_settei3 condition met with variable 263:",
+                      $gameVariables.value(263));
         tachie_settei3(actor);
       }
 
       // Show tachie using cached actor
       tachie_hyouji2(actor);
+      console.debug("tachie_hyouji2 invoked for actor:", actor);
+    } else {
+      console.debug("Tachie operations skipped.");
     }
 
     // Cache the current actor for status window
     this._statusWindow.select(actor.index());
+    console.debug("Status window actor selected with index:", actor.index());
     this._partyCommandWindow.close();
+    console.debug("Party command window closed.");
     this._actorCommandWindow.setup(actor);
+    console.debug("Actor command window set up for actor:", actor);
 
     // Check Imported.MOG_BattleHud with direct property access
     if (Imported.MOG_BattleHud && !this._hudField) {
+      console.debug("MOG_BattleHud detected and HUD field is missing. Creating HUD field.");
       this.createHudField();
       this.createBattleHudSB();
     }
