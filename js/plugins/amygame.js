@@ -6344,8 +6344,8 @@ pictureText_SetUp = function(setupType, pictureId, displayText, textSetting, pos
     return $gameSwitches.value(370);
   }
 
-  isGirl = function (actor) {
-    return actor.isStateAffected(602);
+  isGirl = function (gameActor) {
+    return gameActor.isStateAffected(602);
   }
 
   // CommonEvents
