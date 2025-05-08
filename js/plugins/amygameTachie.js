@@ -522,7 +522,7 @@ tachie_settei3 = function(gameActor) {
       // Apply custom pose/expression settings if not in specified state
       if (!gameActor.isStateAffected(23)) {
         console.debug("tachie_settei3: Actor not affected by state 23 (Forced costume setting), applying tachie_settei1");
-        tachie_settei1();
+        tachie_settei1(gameActor);
       } else {
         console.debug("tachie_settei3: Actor is affected by state 23, skipping custom pose/expression settings");
       }
@@ -1136,28 +1136,28 @@ const TACHIE_SETTEI1_BASE_VAR_ID = 460; // Common base ID for variables
 const PREGNANCY_PART_IDS = [16, 17, 19, 20, 21, 22, 23, 24, 25, 26, 28];
 const BUKKAKE_FACE_EXPRESSIONS = [2, 3, 4];
 //#endregion
-tachie_settei1 = function () {
-  const actor = $gameActors.actor($gameVariables.value(20));
+tachie_settei1 = function (gameActor) {
+  //const gameActor = $gameActors.actor($gameVariables.value(20));
 
   //☆☆立ち絵内部処理前変数割当↓☆☆
-  preSetupTachieSettei1(actor);
+  preSetupTachieSettei1(gameActor);
 
   // ☆☆表情差分↓☆☆
   // Determine the face expression for the character
-  const expressionResult = determineFaceExpressionTachieSettei1(actor, $gameVariables, $gameSwitches);
+  const expressionResult = determineFaceExpressionTachieSettei1(gameActor, $gameVariables, $gameSwitches);
   $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 33, expressionResult);
 
   //☆☆共通パーツ前段↓☆☆
-  setModestPoseTachieSettei1(actor);
+  setModestPoseTachieSettei1(gameActor);
 
   // 発情＆性欲高い＆戦闘以外＆露出高いで腕グラビアポーズ
   applyGlamourPoseForArousalTachieSettei1();
 
   //☆☆個別衣装設定↓☆☆
-  kobetu_isyousettei1(actor);
+  kobetu_isyousettei1(gameActor);
 
   //☆☆共通パーツ後段↓☆☆
-  applyCommonPostProcessingTachieSettei1(actor);
+  applyCommonPostProcessingTachieSettei1(gameActor);
 };
 
 //#region apply common processing
