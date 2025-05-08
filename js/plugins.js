@@ -5,6 +5,7 @@ var $plugins =
 {"name":"KODERA_optimization","status":true,"description":"1.0.3 Speed up core RPG Maker engine","parameters":{}},
 {"name":"SA_CoreSpeedImprovement","status":true,"description":"v18.1 SA Core Speed Improvement (Define at the top)","parameters":{"Enable CWC-cache":"false","Minimum CWC-cache holding count":"15","Logging level":"0"}},
 {"name":"Irina_PerformanceUpgrade","status":true,"description":"<PerformanceUpgrade> for RPG Maker MV version 1.6.2.","parameters":{"":"","AnimationHue":"true","BlurMenuBackground":"true","BlurIntensity":"0.5","CacheTextColors":"true","EnemyHue":"true","PixiContainerFlush":"true","SkipUnnecessarySnapshots":"true"}},
+{"name":"FSDK_EngineTuner","status":true,"description":"R1.02||Provides fixes in features that may be less utilized.","parameters":{"engine":"","renderingMode":"auto","visuals":"","removeVideoCheckOnTouch":"false","removeBackgroundBlurOnMenus":"false","gameplay":"","dontInitFollowers":"false"}},
 {"name":"SA_AnotherRouteSearch","status":false,"description":"v20.1 SA Another route search","parameters":{"Stop if unreachable dest":"true","Stop if unreachable route":"true","Max search count":"2000","Logging level":"0"}},
 {"name":"Community_Basic","status":true,"description":"基本的なパラメーターを設定するプラグインです。","parameters":{"cacheLimit":"50","screenWidth":"0","screenHeight":"0","changeWindowWidthTo":"","changeWindowHeightTo":"","renderingMode":"auto","alwaysDash":"on"}},
 {"name":"TRP_ParticleList","status":true,"description":"","parameters":{}},
