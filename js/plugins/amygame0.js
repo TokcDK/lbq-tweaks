@@ -156,13 +156,12 @@
 
     // Only perform tachie operations if needed (improved conditionals)
     if (!Input.isRepeated("ok") && ConfigManager.battleAniSpeed >= 3 && !$gameSwitches.value(131)) {
-      const actorId = actor.actorId();
 
       // Remove tachie
       tachie_syoukyo1($gameVariables.value(300));
 
       // Set variable directly with actor ID
-      $gameVariables.setValue(20, actorId);
+      $gameVariables.setValue(20, actor.actorId());
 
       // Only call tachie_settei3 if necessary
       if ($gameVariables.value(263) >= 2) {
