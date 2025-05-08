@@ -262,42 +262,50 @@ Sprite.prototype._renderWebGL = function (renderer) {
  * @param {String} align The alignment of the text
  */
 
-Bitmap.prototype.drawText = function (text, x, y, maxWidth, lineHeight, align) {
-    // Note: Firefox has a bug with textBaseline: Bug 737852
-    //       So we use 'alphabetic' here.
-    if (text !== undefined) {
-        if (this.fontSize < Bitmap.minFontSize) {
-            this.drawSmallText(text, x, y, maxWidth, lineHeight, align);
-            return;
-        }
-        var tx = x;
-        var ty = y + lineHeight - Math.round((lineHeight - this.fontSize * 0.7) / 2);
-        var context = this._context;
-        var alpha = context.globalAlpha;
-        maxWidth = maxWidth || 0xffffffff;
-        switch (align) {
-            case 'center':
-                tx += maxWidth / 2;
-                break;
-            case 'right':
-                tx += maxWidth;
-                break;
-            case 'left':
-                break;
-            default:
-                align = 'left'; // asdf default is left
-        }
-        context.save();
-        context.font = this._makeFontNameText();
-        context.textAlign = align;
-        context.textBaseline = 'alphabetic';
-        context.globalAlpha = 1;
-        this._drawTextOutline(text, tx, ty, maxWidth);
-        context.globalAlpha = alpha;
-        this._drawTextBody(text, tx, ty, maxWidth);
-        context.restore();
-        this._setDirty();
+Bitmap.prototype.drawText = function(text, x, y, maxWidth, lineHeight, align) {
+    // Skip processing if text is empty or undefined
+    if (!text) return;
+    
+    // Use drawSmallText for small font sizes
+    if (this.fontSize < Bitmap.minFontSize) {
+        this.drawSmallText(text, x, y, maxWidth, lineHeight, align);
+        return;
     }
+    
+    // Set default max width if not specified
+    maxWidth = maxWidth || 0xffffffff;
+    
+    // Calculate text position
+    var tx = x;
+    var ty = y + lineHeight - Math.round((lineHeight - this.fontSize * 0.7) / 2);
+    var context = this._context;
+    var alpha = context.globalAlpha;
+    
+    // Handle text alignment
+    if (align === 'center') {
+        tx += maxWidth / 2;
+    } else if (align === 'right') {
+        tx += maxWidth;
+    } else {
+        align = 'left'; // Default alignment
+    }
+    
+    // Draw text efficiently with minimal context changes
+    context.save();
+    context.font = this._makeFontNameText();
+    context.textAlign = align;
+    context.textBaseline = 'alphabetic'; // Used instead of 'middle' due to Firefox bug 737852
+    
+    // Draw outline with full opacity
+    context.globalAlpha = 1;
+    this._drawTextOutline(text, tx, ty, maxWidth);
+    
+    // Restore original alpha for the text body
+    context.globalAlpha = alpha;
+    this._drawTextBody(text, tx, ty, maxWidth);
+    
+    context.restore();
+    this._setDirty();
 };
 
 Bitmap.prototype.drawSmallText = function (text, x, y, maxWidth, lineHeight, align) {
