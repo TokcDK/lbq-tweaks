@@ -1292,11 +1292,15 @@ tachie_settei3($gameActors.actor(7));
 
 };
 
-kobetu_isyousettei = function(){
+kobetu_isyousettei = function () {
+  kobetu_isyousettei1($gameActors.actor($gameVariables.value(20)));
+}
+
+kobetu_isyousettei1 = function(actor){
 
 var value1 = 460;
 $gameVariables.setValue(value1+5,1);
-var actor = $gameActors.actor($gameVariables.value(20));
+//var actor = $gameActors.actor($gameVariables.value(20));
 
 if($gameVariables.value(20) == 1){
 
