@@ -193,7 +193,7 @@
     const switches = $gameSwitches;
     const gameScreen = $gameScreen;
     const actorId = $gameVariables.value(300);
-    const currentActor = this.actor();
+    let currentActor = this.actor();
 
     // Continue looping until we find an actor who can input or start a turn
     while (true) {
