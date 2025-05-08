@@ -7,7 +7,7 @@ How to:
 	
 2. Backup you game files as always to be able to restore if something will be broken
 3. Extract files from downloaded "nwjs-sdk-v0.82.0-win-##.zip" to your game folder
-4. To fix run error open "package.json" file in notepad and add {} between quotes into line `"name": "",` to look like this `"name": "{}",`
+4. To fix run error open "package.json" file in notepad and add "rmmv-game" between quotes into line `"name": "",` to look like this `"name": "rmmv-game",`
 5. Run game using "nw.exe" or remove "game.exe" and rename "nw.exe" to "game.exe" and run as always
 
 
@@ -28,7 +28,7 @@ NWJSの更新を新しいバージョンにすると、ゲームのパフォー�
 
 3.ダウンロードした "nwjs-sdk-v0.82.0-win-##.zip" からファイルをゲームフォルダに抽出してください。
 
-4. 問題を修正するには、メモ帳で "package.json" ファイルを開き、ダブルクォートの間に {} を追加して、次のように "name": "{}" に見えるようにしてください。
+4. 問題を修正するには、メモ帳で "package.json" ファイルを開き、ダブルクォートの間に "rmmv-game" を追加して、次のように "name": "rmmv-game" に見えるようにしてください。
 
 5.ゲームを "nw.exe" を使用して実行するか、"game.exe" を削除して "nw.exe" の名前を "game.exe" に変更して通常通りに実行してください。
 
