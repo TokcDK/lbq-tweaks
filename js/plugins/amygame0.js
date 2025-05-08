@@ -152,27 +152,37 @@
 
   //rpg_scenes.js
   Scene_Battle.prototype.startActorCommandSelection = function () {
-    if (!Input.isRepeated("ok")) {
-      if (ConfigManager.battleAniSpeed >= 3) {
-        if (!$gameSwitches.value(131)) { //立ち絵禁止のスイッチで条件分岐
-          tachie_syoukyo1($gameVariables.value(300));
-          $gameVariables.setValue(20, BattleManager.actor().actorId());
-          if ($gameVariables.value(263) >= 2) {
-            tachie_settei3(BattleManager.actor());
-          };
-          tachie_hyouji2(BattleManager.actor());
-        }
+    const actor = BattleManager.actor();
+
+    // Only perform tachie operations if needed (improved conditionals)
+    if (!Input.isRepeated("ok") && ConfigManager.battleAniSpeed >= 3 && !$gameSwitches.value(131)) {
+      const actorId = actor.actorId();
+
+      // Remove tachie
+      tachie_syoukyo1($gameVariables.value(300));
+
+      // Set variable directly with actor ID
+      $gameVariables.setValue(20, actorId);
+
+      // Only call tachie_settei3 if necessary
+      if ($gameVariables.value(263) >= 2) {
+        tachie_settei3(actor);
       }
-    };
-    this._statusWindow.select(BattleManager.actor().index());
+
+      // Show tachie using cached actor
+      tachie_hyouji2(actor);
+    }
+
+    // Cache the current actor for status window
+    this._statusWindow.select(actor.index());
     this._partyCommandWindow.close();
-    this._actorCommandWindow.setup(BattleManager.actor());
-    if (Imported.MOG_BattleHud) {
-      if (!this._hudField) {
-        this.createHudField()
-        this.createBattleHudSB();
-      };
-    };
+    this._actorCommandWindow.setup(actor);
+
+    // Check Imported.MOG_BattleHud with direct property access
+    if (Imported.MOG_BattleHud && !this._hudField) {
+      this.createHudField();
+      this.createBattleHudSB();
+    }
   };
 
   //rpg_managers.js
