@@ -287,7 +287,7 @@ kantei_nakami = function(){
 $gameParty.loseItem($dataItems[$gameVariables.value(19)], 1);
 if($dataItems[$gameVariables.value(19)].meta['鑑定']){
   var arr = $dataItems[$gameVariables.value(19)].meta['鑑定'].split(',');
-  var value2 = arr[Math.floor(Math.random() * arr.length)];
+  var value2 = arr[getRandomIndex(arr.length)];
 };
 if($dataItems[$gameVariables.value(19)].meta['鑑定道具']){var item = $dataItems};
 if($dataItems[$gameVariables.value(19)].meta['鑑定武器']){var item = $dataWeapons};
@@ -311,7 +311,7 @@ if(item == $dataWeapons && $dataItems[$gameVariables.value(19)].meta['鑑定カ�
           arr1.push(i);
     }}};
   }, this);
-  var value2 = arr1[Math.floor(Math.random() * arr1.length)];
+  var value2 = arr1[getRandomIndex(arr1.length)];
 };
 if(item == $dataArmors && $dataItems[$gameVariables.value(19)].meta['鑑定カテゴリ']){
   var arr1 = [];
@@ -324,7 +324,7 @@ if(item == $dataArmors && $dataItems[$gameVariables.value(19)].meta['鑑定カ�
           arr1.push(i);
     }}};
   }, this);
-  var value2 = arr1[Math.floor(Math.random() * arr1.length)];
+  var value2 = arr1[getRandomIndex(arr1.length)];
 };
 if(item == $dataItems && $dataItems[$gameVariables.value(19)].meta['鑑定カテゴリ']){
   var arr1 = [];
@@ -337,7 +337,7 @@ if(item == $dataItems && $dataItems[$gameVariables.value(19)].meta['鑑定カテ
           arr1.push(i);
     }}};
   }, this);
-  var value2 = arr1[Math.floor(Math.random() * arr1.length)];
+  var value2 = arr1[getRandomIndex(arr1.length)];
 };
 if($dataItems[$gameVariables.value(19)].meta['鑑定レアリティ版']){
   var arr1 = [];
@@ -350,7 +350,7 @@ if($dataItems[$gameVariables.value(19)].meta['鑑定レアリティ版']){
       }};
     };
   }, this);
-  var value2 = arr1[Math.floor(Math.random() * arr1.length)];
+  var value2 = arr1[getRandomIndex(arr1.length)];
 };
 $gameParty.gainItem(item[value2], 1);
 //一括鑑定時で条件分岐
@@ -485,7 +485,7 @@ if (itemUniqueMaterial === undefined || itemUniqueMaterial === null) return;
 const itemUniqueMaterialArray = item.meta['UniqueMaterial' + id10].split(',');
 const value1 = $gameSwitches.value(605) ? 
 Number(itemUniqueMaterialArray[0]) :
-itemUniqueMaterialArray[Math.floor(Math.random() * itemUniqueMaterialArray.length)];
+itemUniqueMaterialArray[getRandomIndex(itemUniqueMaterialArray.length)];
 
 const value5 = id11 == 0 ? valueHarvestingSkillId : valueMiningSkillId;
 item_getSkillLevel(value5,0,value1);
@@ -1757,7 +1757,7 @@ if(id3 == 2){
   AudioManager.playSe({"name":'ZH_Sexy',"volume":40,"pitch":130,"pan":0});
   $gameScreen.startFlash([255,119,255,200], 60);
   var arr1 = [1,2];
-  var value5 = arr1[Math.floor(Math.random() * arr1.length)];
+  var value5 = arr1[getRandomIndex(arr1.length)];
   if(value5 == 1){
     var value1 = 55;
     var value2 = 'ScreenBlackOut';

@@ -2788,7 +2788,7 @@ Sprite_Animation.prototype.updateSvePosition = function() {
 Yanfly.Util = Yanfly.Util || {};
 
 Yanfly.Util.getRandomElement = function(array) {
-    var value = array[Math.floor(Math.random() * array.length)];
+    var value = array[getRandomIndex(array.length)];
     return value;
 };
 

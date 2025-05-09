@@ -1441,7 +1441,7 @@ Game_Battler.prototype.initRowFormation = function() {
     } else if (this.isEnemy()) {
       var rows = this.enemy().defaultRow;
     }
-    this._row = rows[Math.floor(Math.random() * rows.length)];;
+    this._row = rows[getRandomIndex(rows.length)];;
     this._row = this._row.clamp(1, Yanfly.Param.RowMaximum);
     this._rowStatesRaw = undefined;
 };

@@ -64,10 +64,10 @@ if (!gameSwitch607 && !gameSwitch608){
       $gameTroop.addDropItem(valueItem);
       //var value1 = `\x1bI[${valueItems[Number(arr1[i][2])].iconIndex}]`;
       //var arr7 = [-50,-60,-70,-80,-90,-100,-110,-120,-130,-140,-150,-160,-170,-180,-190,-200];
-      const shiftX = xShiftCoords[Math.floor(Math.random() * xShiftCoordsLength)];//x
-      const shiftY = yShiftCoords[Math.floor(Math.random() * yShiftCoordsLength)];//y
-      const duration = durations[Math.floor(Math.random() * durationsLength)];//wait
-      //var value7 = arr7[Math.floor(Math.random() * arr7.length)];//jump
+      const shiftX = xShiftCoords[getRandomIndex(xShiftCoordsLength)];//x
+      const shiftY = yShiftCoords[getRandomIndex(yShiftCoordsLength)];//y
+      const duration = durations[getRandomIndex(durationsLength)];//wait
+      //var value7 = arr7[getRandomIndex(arr7.length)];//jump
       picture_motion1("smooth", [0]);
       //$gameScreen.setDTextPicture(value1, 32);//元から
       $gameScreen.showPicture(valueDropEnemyPicId, picName, 1, coordinateX, coordinateY, 100, 100, 255, 0);
@@ -657,7 +657,7 @@ function ak1ConfigureElementDamageVisualization(currentItem) {
     multipleElements.push(currentItem.damage.elementId);
   }
   
-  const randomIndex = Math.floor(Math.random() * multipleElements.length);
+  const randomIndex = getRandomIndex(multipleElements.length);
   const selectedElementId = multipleElements[randomIndex];
   
   if (selectedElementId >= 1) {
@@ -1301,7 +1301,7 @@ for (var i = 0; i < $gameParty.battleMembers().length; i++) {
     var value1 = actor.index();
     $gameParty.members()[value1].startAnimation(351, false, 0);
     var array = $dataActors[$gameParty.battleMembers()[i].actorId()].meta['BindRemove'].split(','); 
-    $gameVariables.setValue(525, array[Math.floor(Math.random() * array.length)]);
+    $gameVariables.setValue(525, array[getRandomIndex(array.length)]);
     var value2 = actor.name() + 'は' + $gameActors.actor(id).name() + 'の拘束を解きに掛かった！'; 
     BattleManager._logWindow.push(`addText`, value2);
     $gameActors.actor(id).removeState(63);
@@ -1325,7 +1325,7 @@ for (var i = 0; i < $gameParty.battleMembers().length; i++) {
     var value1 = Number($dataActors[id].meta['BindRemoveSuccessFace'].split(',')[0]);
     var value2 = Number($dataActors[id].meta['BindRemoveSuccessFace'].split(',')[1]);
     var array = $dataActors[id].meta['BindRemoveSuccess'].split(','); 
-    $gameVariables.setValue(525, array[Math.floor(Math.random() * array.length)]);
+    $gameVariables.setValue(525, array[getRandomIndex(array.length)]);
     var value3 = $gameActors.actor(id).name() + 'は拘束から助け出された！'; 
     BattleManager._logWindow.push(`addText`, value3);
     $gameActors.actor(id).removeState(69);
@@ -1677,9 +1677,9 @@ if($gameVariables.value(240) >= 1){
 };
 if(value10 != 0){
 var arr = value.meta[value10].split(',');
-var value1 = arr1[Math.floor(Math.random() * arr1.length)];
+var value1 = arr1[getRandomIndex(arr1.length)];
 var value2 = Math.floor( Math.random() * 56) + 200;
-var value3 = arr1[Math.floor(Math.random() * arr1.length)];
+var value3 = arr1[getRandomIndex(arr1.length)];
 var value4 = 120;
 var spriteset = SceneManager._scene._spriteset;
 if(Number(arr[1]) == 0){}else{
@@ -1705,9 +1705,9 @@ var value10 = 0;
 if(value10 != 0){
 if(value.meta[value10]){
 var arr = value.meta[value10].split(',');
-var value1 = arr1[Math.floor(Math.random() * arr1.length)];
+var value1 = arr1[getRandomIndex(arr1.length)];
 var value2 = Math.floor( Math.random() * 101) + 100;
-var value3 = arr1[Math.floor(Math.random() * arr1.length)];
+var value3 = arr1[getRandomIndex(arr1.length)];
 var bitmap = ImageManager.loadBitmap("img/parallaxes/",arr[0],Number(arr[4]),true);
 spriteset.addNewBattleback(3, bitmap, 0, value4);
 if(Number(arr[1]) == 0){}else{
@@ -1735,9 +1735,9 @@ var value10 = 0;
 if(value10 != 0){
 if(value.meta[value10]){
 var arr = value.meta[value10].split(',');
-var value1 = arr1[Math.floor(Math.random() * arr1.length)];
+var value1 = arr1[getRandomIndex(arr1.length)];
 var value2 = Math.floor( Math.random() * 101) + 100;
-var value3 = arr1[Math.floor(Math.random() * arr1.length)];
+var value3 = arr1[getRandomIndex(arr1.length)];
 var bitmap = ImageManager.loadBitmap("img/parallaxes/",arr[0],Number(arr[4]),true);
 spriteset.addNewBattleback(4, bitmap, 0, value4);
 if(Number(arr[1]) == 0){}else{
@@ -1765,9 +1765,9 @@ var value10 = 0;
 if(value10 != 0){
 if(value.meta[value10]){
 var arr = value.meta[value10].split(',');
-var value1 = arr1[Math.floor(Math.random() * arr1.length)];
+var value1 = arr1[getRandomIndex(arr1.length)];
 var value2 = Math.floor( Math.random() * 101) + 100;
-var value3 = arr1[Math.floor(Math.random() * arr1.length)];
+var value3 = arr1[getRandomIndex(arr1.length)];
 var bitmap = ImageManager.loadBitmap("img/parallaxes/",arr[0],Number(arr[4]),true);
 spriteset.addNewBattleback(5, bitmap, 0, value4);
 if(Number(arr[1]) == 0){}else{
@@ -1795,9 +1795,9 @@ var value10 = 0;
 if(value10 != 0){
 if(value.meta[value10]){
 var arr = value.meta[value10].split(',');
-var value1 = arr1[Math.floor(Math.random() * arr1.length)];
+var value1 = arr1[getRandomIndex(arr1.length)];
 var value2 = Math.floor( Math.random() * 101) + 100;
-var value3 = arr1[Math.floor(Math.random() * arr1.length)];
+var value3 = arr1[getRandomIndex(arr1.length)];
 var bitmap = ImageManager.loadBitmap("img/parallaxes/",arr[0],Number(arr[4]),true);
 spriteset.addNewBattleback(6, bitmap, 0, value4);
 if(Number(arr[1]) == 0){}else{
@@ -1861,11 +1861,11 @@ if(gameVar276 == 2){
   array2 = actorMeta['BattleAttack'].split(',');
   if(actor.isStateAffected(61)){
     const arr2 = [21,22,23,24];
-    valueFaceSelect = arr2[Math.floor(Math.random() * arr2.length)];
+    valueFaceSelect = arr2[getRandomIndex(arr2.length)];
   };
   if(actor.isStateAffected(68)){
     const arr1 = [17,18,19,20];
-    valueFaceSelect = arr1[Math.floor(Math.random() * arr1.length)];
+    valueFaceSelect = arr1[getRandomIndex(arr1.length)];
   };
   const gameVar182 = $gameVariables.value(182);
   if(gameVar182 == 5){
@@ -1963,19 +1963,19 @@ const enemy1 = gameTroopMembers[$gameVariables.value(92)];
 const enemyName = enemy1.name();
 if(id1 == 0){
   if(array0){
-    messageText = actorName + array0[Math.floor(Math.random() * array0.length)];
+    messageText = actorName + array0[getRandomIndex(array0.length)];
   }
 }
 else if(id1 == 1){
   if(gameVar276 == 2){
     if(array2){
       let array = actorMeta['BattleAttack2Conbo'].split(',');
-      let num = array[Math.floor(Math.random() * array.length)];
+      let num = array[getRandomIndex(array.length)];
       valueWordSet9 = `${actor.name()}の\\C[2]2連撃\\C[0]！ ${num}`;
       array = actorMeta['BattleAttack3Conbo'].split(',');
-      num = array[Math.floor(Math.random() * array.length)];
+      num = array[getRandomIndex(array.length)];
       valueWordSet10 = `${actor.name()}の\\C[2]3連撃\\C[0]！ ${num}`;
-      messageText = actorName + array2[Math.floor(Math.random() * array2.length)];
+      messageText = actorName + array2[getRandomIndex(array2.length)];
       battle_bustUp(86,500,10,20);
     };
   }
@@ -1992,7 +1992,7 @@ else if(id1 == 2){
     const enemy2 = $dataEnemies[enemy1.enemyId()];
     if(enemy2.meta['EnemyDamageWord']){
       const array = enemy2.meta['EnemyDamageWord'].split(',');
-      messageText = `${enemyName}${array[Math.floor(Math.random() * array.length)]}`;
+      messageText = `${enemyName}${array[getRandomIndex(array.length)]}`;
     } else {
       messageText = `${enemyName}は攻撃を受けた！`;
     };
@@ -2000,7 +2000,7 @@ else if(id1 == 2){
   else if (gameVar276 == 1) {
     if (gameVar464) {
       if (array1) {
-        messageText = actorName + array1[Math.floor(Math.random() * array1.length)];
+        messageText = actorName + array1[getRandomIndex(array1.length)];
         battle_bustUp(86, 500, 10, 40);
       }
     }
@@ -2715,7 +2715,7 @@ const targetEnemyLV = target.meta['EnemyLV'];
 const targetEnemyLVDataArray = targetEnemyLV ? targetEnemyLV.split(',') : [1, 1];
 const targetEnemyElement = target.meta['EnemyElement'];
 const targetEnemyElementDataArray = targetEnemyElement ? targetEnemyElement.split(',') : [0,0];
-let level = Number(targetEnemyLVDataArray[Math.floor(Math.random() * targetEnemyLVDataArray.length)]);
+let level = Number(targetEnemyLVDataArray[getRandomIndex(targetEnemyLVDataArray.length)]);
 
 if(enemyId == 30){
   const targetMetaBossLV = target.meta['BossLV'];
@@ -2762,14 +2762,14 @@ if(level >= 1){
       let extraLevelMult = 11;
       if (level >= 30 && level <= 60) { extraLevelMult = 21}
       else if(level >= 61){extraLevelMult = 31}
-      const extraLevel = Math.floor( Math.random() * extraLevelMult) + 885;
+      const extraLevel = getRandomIndex(extraLevelMult) + 885;
       gameTroopMember.addState(extraLevel);
     } else {
       gameTroopMember.addState($gameVariables.value(350)[i]);
     };
   };
 };
-let extraLevel = Number(targetEnemyElementDataArray[Math.floor(Math.random() * targetEnemyElementDataArray.length)]);
+let extraLevel = Number(targetEnemyElementDataArray[getRandomIndex(targetEnemyElementDataArray.length)]);
 if(enemyId == 30){
   if(target.meta['BossElement']){
     extraLevel = Number(target.meta['BossElement'])
@@ -2952,7 +2952,7 @@ const flat1 = 10;
 valueWordSet1 = ``;
 valueWordSet3 = ``;
 const arrItemEnemyLV = item240.meta['EnemyLV'].split(',');
-actor1_setup1(item240,arrItemEnemyLV[Math.floor(Math.random() * arrItemEnemyLV.length)]);
+actor1_setup1(item240,arrItemEnemyLV[getRandomIndex(arrItemEnemyLV.length)]);
 //特殊ステート対応討伐カウント // tweak: commented because no data change
 /* if($gameVariables.value(350) != 0){
   for (var i = 0; i <= $gameVariables.value(350).length-1; i++) {
@@ -2983,12 +2983,12 @@ const gameVar220 = $gameVariables.value(220);
 const dropUpItem = $dataItems[valueItemDropUpItem];
 const arrItemBattleEnemyPopC = item240.meta['BattleEnemyPopC'].split(',');
 arr4 = [];
-const end = Number(arrItemBattleEnemyPopC[Math.floor(Math.random() * arrItemBattleEnemyPopC.length)]);
+const end = Number(arrItemBattleEnemyPopC[getRandomIndex(arrItemBattleEnemyPopC.length)]);
 for (var i = 1; i <= end; i++) {
-  let intValue1 = Number(arrItemEnemyLV[Math.floor(Math.random() * arrItemEnemyLV.length)]);
+  let intValue1 = Number(arrItemEnemyLV[getRandomIndex(arrItemEnemyLV.length)]);
   if(intValue1 == 0){intValue1 = 1};
 	const intValue1minus1 = intValue1 - 1;
-	const enemy = $dataEnemies[Number(gameVar220[Math.floor(Math.random() * gameVar220.length)])];
+	const enemy = $dataEnemies[Number(gameVar220[getRandomIndex(gameVar220.length)])];
     expCount += Math.round(enemy.exp * (1 + intValue1minus1 * rate) + (flat * intValue1minus1));
     goldCount += Math.round(enemy.gold * (1 + intValue1minus1 * rate1) + (flat1 * intValue1minus1));
   
@@ -3170,7 +3170,7 @@ drop_walletItemBoxGet = function(value12,id12){
   const value = $dataItems[gameVariable240];
   const arr11 = value.meta.GenericDropRate.split(',');
   let value11 = (gameVariable240 >= 1)
-    ? Number(arr11[Math.floor(Math.random() * arr11.length)]) || 1
+    ? Number(arr11[getRandomIndex(arr11.length)]) || 1
     : value12;
 
   const listType = (id12 === 1) ? 'walletIn' : 'ItemBag';
@@ -3197,7 +3197,7 @@ drop_walletItemBoxGet = function(value12,id12){
   const numItemsToGain = Math.floor(Math.random() * 3) + 1;
 
   for (let i = 1; i <= numItemsToGain; i++) {
-    const randomIndex = Math.floor(Math.random() * arr12Length);
+    const randomIndex = getRandomIndex(arr12Length);
     const value1 = arr12[randomIndex];
     const item = $dataItems[value1];
     const itemInfo = `\\C[24]\x1bI[${item.iconIndex}]${item.name}\\C[0]を獲得した。`;
@@ -3216,7 +3216,7 @@ drop_genericDropRate = function(battleDrop, itemsToDrop) {
     const value = $dataItems[gameVariable240];
     if (value.meta.GenericDropRate) {
       const arr11 = value.meta.GenericDropRate.split(',');
-      value11 = Number(arr11[Math.floor(Math.random() * arr11.length)]);
+      value11 = Number(arr11[getRandomIndex(arr11.length)]);
     }
   }
 
@@ -3251,7 +3251,7 @@ drop_genericDropRate = function(battleDrop, itemsToDrop) {
     }
   }
 
-  valueDropItems = Number(itemsToDrop[Math.floor(Math.random() * itemsToDrop.length)]);
+  valueDropItems = Number(itemsToDrop[getRandomIndex(itemsToDrop.length)]);
 };
 
 //汎用ドロップエネミー対象設定ダンジョンのみ。計算のみ計算結果はarr4に蓄積。簡易討伐時
@@ -3260,8 +3260,8 @@ function drop_enemyDropRate(value12, arr4) {
   const item = $dataItems[$gameVariables.value(240)];
   const itemEnemyLVdata = item.meta['EnemyLV'].split(',');
   const arrdrop3 = $gameVariables.value(220);
-  const itemEnemyLVdataSelectedIndex = Number(itemEnemyLVdata[Math.floor(Math.random() * itemEnemyLVdata.length)]);
-  const enemyIndex = Number(arrdrop3[Math.floor(Math.random() * arrdrop3.length)]);
+  const itemEnemyLVdataSelectedIndex = Number(itemEnemyLVdata[getRandomIndex(itemEnemyLVdata.length)]);
+  const enemyIndex = Number(arrdrop3[getRandomIndex(arrdrop3.length)]);
 
   const itemsLength = $dataItems.length;
   for (let i = 1; i < itemsLength; i++) {
@@ -3325,7 +3325,7 @@ drop_JobStateWAget = function (valueItemsType, value10) {
         valueEnemyLevel = DEFAULT_ENEMY_LEVEL;
       } else {
         const arr1 = $dataItems[gameVar240Value].meta['EnemyLV'].split(',');
-        valueEnemyLevel = Number(arr1[Math.floor(Math.random() * arr1.length)]);
+        valueEnemyLevel = Number(arr1[getRandomIndex(arr1.length)]);
       }
     }
   }
@@ -3359,7 +3359,7 @@ drop_JobStateWAget = function (valueItemsType, value10) {
     }
   }
 
-  const dropItemId = arr4[Math.floor(Math.random() * arr4.length)];
+  const dropItemId = arr4[getRandomIndex(arr4.length)];
   if (dropItemId !== 0) {
     if ($gameParty.inBattle()) {
       $gameTroop.addDropItem(valueItems[dropItemId]);
@@ -3380,7 +3380,7 @@ let enemyDropChance = 10;
 if($gameVariables.value(240) >= 1){
   const item = $dataItems[$gameVariables.value(240)];
   const itemEnemyLVData = item.meta['EnemyLV'].split(',');
-  enemyDropChance = Number(itemEnemyLVData[Math.floor(Math.random() * itemEnemyLVData.length)]);
+  enemyDropChance = Number(itemEnemyLVData[getRandomIndex(itemEnemyLVData.length)]);
 };
   const dropUpItem = $dataItems[valueItemDropUpItem];
   let drop_probability = drop_probabilityCalculation(enemyDropChance, dropUpItem);
@@ -3412,9 +3412,9 @@ const itemTypeId = [0,0,0,1,0,0,2,0];
 
 
 const arr2 = $dataItems[itemId].meta['ItemBag'].split(',');
-const id2 = arr2[Math.floor(Math.random() * arr2.length)];
+const id2 = arr2[getRandomIndex(arr2.length)];
   for (let id3 = 0; id3 <= id2; id3++) {
-    const id12 = itemTypeId[Math.floor(Math.random() * itemTypeId.length)];
+    const id12 = itemTypeId[getRandomIndex(itemTypeId.length)];
     valueItems = getItemEquipmentSource(id12);
 
     if($dataItems[itemId].meta['HentaiBox']){
@@ -3452,7 +3452,7 @@ const id2 = arr2[Math.floor(Math.random() * arr2.length)];
               };
             };
         };
-          valueDropItems = Number(arr12[Math.floor(Math.random() * arr12.length)]);
+          valueDropItems = Number(arr12[getRandomIndex(arr12.length)]);
             if(valueDropItems >= 1){
               let value16 = 1;
               const valueItem = valueItems[valueDropItems];
@@ -3657,7 +3657,7 @@ for (let i = 1; i <= 15; i++) {//$dataSkills[id].tpCost
 }
 
   let arr1 = [gameVar346[0],gameVar346[3],gameVar346[4],gameVar346[5],gameVar346[6]];
-  value2 = arr1[Math.floor(Math.random() * arr1.length)];
+  value2 = arr1[getRandomIndex(arr1.length)];
   if(value2 == 0){
     value2 = gameVar346[0];
   };
@@ -3672,7 +3672,7 @@ for (let i = 1; i <= 15; i++) {//$dataSkills[id].tpCost
   if (value1 >= 5) {
     arr1 = [gameVar346[1], gameVar346[7], gameVar346[8], gameVar346[9]];
     for (let i = 1; i <= 10; i++) {
-      value2 = arr1[Math.floor(Math.random() * arr1.length)];
+      value2 = arr1[getRandomIndex(arr1.length)];
       if(value2 == 0){
         value2 = gameVar346[1];
       };
@@ -4037,7 +4037,7 @@ if(id1 == 1){
     if(value6 >= 1){
       if($dataActors[id2].meta['OugiUse']){
         var arr2 = $dataActors[id2].meta['OugiUse'].split(',');
-        var arr3 = arr2[Math.floor(Math.random() * arr2.length)];
+        var arr3 = arr2[getRandomIndex(arr2.length)];
         var arrNpcGab1 = [];
         arrNpcGab1.push([`${actor.name()}${arr3}`,0,0]);
         gabWord_exeScriptNoFace(arrNpcGab1);

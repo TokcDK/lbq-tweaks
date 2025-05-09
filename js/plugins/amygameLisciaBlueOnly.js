@@ -790,7 +790,7 @@ htext_word = function(id1){
 gabWord_exeScriptNoFace = function(arrNpcGab1){
 
 var arrNpcGab2 = [];
-var arrNpcGab2 = arrNpcGab1[Math.floor(Math.random() * arrNpcGab1.length)];
+var arrNpcGab2 = arrNpcGab1[getRandomIndex(arrNpcGab1.length)];
 if(arrNpcGab1 != 0){
   var scene = SceneManager._scene;
   var gabData = [arrNpcGab2[0],'',0,0,'',0];
@@ -803,7 +803,7 @@ if(arrNpcGab1 != 0){
 gabWord_exeScript = function(arrNpcGab1){
 
 var arrNpcGab2 = [];
-var arrNpcGab2 = arrNpcGab1[Math.floor(Math.random() * arrNpcGab1.length)];
+var arrNpcGab2 = arrNpcGab1[getRandomIndex(arrNpcGab1.length)];
 if(arrNpcGab1 != 0){
   var scene = SceneManager._scene;
   var gabData = [arrNpcGab2[0],'face',arrNpcGab2[1],Number(arrNpcGab2[2]),'',0];
@@ -819,7 +819,7 @@ gabWord_setBattle = function(){
 var arrNpcGab1 = [];
 var value4 = 0;
 var value3 = $gameParty.battleMembers().length;
-var value2 = Math.floor( Math.random() * value3);
+var value2 = getRandomIndex(value3);
 var value1 = $gameParty.battleMembers()[value2].actorId();
 $gameVariables.setValue(53,$gameActors.actor(value1).nickname());
 $gameVariables.setValue(625,$gameVariables.value(380 + value1)[59]);
@@ -1014,7 +1014,7 @@ if(id1 == 1){
     var arr1 = [`「こんな破廉恥な恰好、秩序として受け入れられません！！」`,3,3];arr2.push(arr1);
   };
 };
-var array1 = arr2[Math.floor(Math.random() * arr2.length)];
+var array1 = arr2[getRandomIndex(arr2.length)];
 $gameVariables.setValue(21,array1);
 
 };
@@ -1325,7 +1325,7 @@ if($gameSwitches.value(97) || $gameParty.inBattle()){}else{ //立ち絵会話時
 //平常時、確率でドヤ顔
   if([1,2,5,6,15].some(function(id){return $gameVariables.value(value1+33) == (id)})){
     var arr = [1,1,1,1,2,1,1,1];
-    var value2 = arr[Math.floor(Math.random() * arr.length)];
+    var value2 = arr[getRandomIndex(arr.length)];
     if(value2 == 2){
       $gameVariables.setValue(value1+33,53);
   }};
@@ -1739,7 +1739,7 @@ if($gameSwitches.value(202) && $gameSwitches.value(204)){
   var value4 = Math.floor( Math.random() * 3) + 1;
   var value5 = Math.floor( Math.random() * 2) + 0;
   var value6 = 5;
-  var arr1 = [8,8,8,11,8,8];var value7 = arr1[Math.floor(Math.random() * arr1.length)];
+  var arr1 = [8,8,8,11,8,8];var value7 = arr1[getRandomIndex(arr1.length)];
 } else {
   var value3 = 2;
   var value4 = Math.floor( Math.random() * 2) + 2;
@@ -1760,7 +1760,7 @@ if(actor.isStateAffected(67)){
 if($gameSwitches.value(465)){
   var value5 = Math.floor( Math.random() * 2) + 0;
   var value6 = 5;
-  var arr1 = [8,8,8,11,8,8];var value7 = arr1[Math.floor(Math.random() * arr1.length)];
+  var arr1 = [8,8,8,11,8,8];var value7 = arr1[getRandomIndex(arr1.length)];
 };
 var value2 = 'Zev_WakingUp1_' + value3;
 $gameScreen.showPicture(valuePic1,value2,1,640+384+128,384+50,100,100,0,0);
@@ -1832,7 +1832,7 @@ if(value26 >= 1){array.push("Zev_StaySleep6-" + value26)};
 var value10 = 1;
 var value11 = Math.floor( Math.random() * 2);//ピクチャ表示時に中央1か左上0か
 var value9 = Math.floor( Math.random() * 3) + 1;
-if(value9 >= 2){var value10 = Math.floor( Math.random() * value9) + 1};
+if(value9 >= 2){var value10 = getRandomIndex(value9) + 1};
 var value5 = 1600;var value6 = 1200;
 var value7 = 1280;var value8 = 768;
 var value13 = Math.floor( Math.random() * 2);

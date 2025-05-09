@@ -53,7 +53,7 @@ if($dataActors[$gameVariables.value(20)].meta['SexualZettyouLow']){
   //if($gameActors.actor($gameVariables.value(20)).isLearnedSkill(62)){var value3 = 'Middle';var value4 = 2};
   //if($gameActors.actor($gameVariables.value(20)).isLearnedSkill(65)){var value3 = 'Hi';var value4 = 3};
   var arr1 = $dataActors[$gameVariables.value(20)].meta['SexualZettyou' + value3].split(',');
-  var value1 = arr1[Math.floor(Math.random() * arr1.length)];
+  var value1 = arr1[getRandomIndex(arr1.length)];
   var value2 = `${actor.name()}`;
   $gameVariables.setValue(21,`\\nw[${value2}]${value1}`);
   var value1 = 'Zev_BattleEcstasy'+$gameVariables.value(20)+'_'+value4;
@@ -200,7 +200,7 @@ h_exp1ex = function(id){
 
 for (var i = 1; i <= id; i++) {
   var arr1 = [6,6,6,6,7,8,8];
-  var value1 = arr1[Math.floor(Math.random() * arr1.length)];
+  var value1 = arr1[getRandomIndex(arr1.length)];
   $gameVariables.setValue(400+value1,$gameVariables.value(400+value1) + 1 );
 };
 
@@ -1376,7 +1376,7 @@ var value3 = 0;
 if(value1 >= 1 && $gameVariables.value(value2) == 0){
   for (var i = 1; i <= value1; i++) {
     var arr = [1,0,1,0,1,1]
-    var value4 = arr[Math.floor(Math.random() * arr.length)];
+    var value4 = arr[getRandomIndex(arr.length)];
     if(value4 == 1){
       value3 += 1;
     };
@@ -1398,7 +1398,7 @@ var value3 = 0;
 if(value1 >= 1 && $gameVariables.value(value2) == 0){
   for (var i = 1; i <= value1; i++) {
     var arr = [1,0,1,0,1,1]
-    var value4 = arr[Math.floor(Math.random() * arr.length)];
+    var value4 = arr[getRandomIndex(arr.length)];
     if(value4 == 1){
       value3 += 1;
     };
@@ -1420,7 +1420,7 @@ var value3 = 0;
 if(value1 >= 1 && $gameVariables.value(value2) == 0){
   for (var i = 1; i <= value1; i++) {
     var arr = [1,0,1,0,1,1]
-    var value4 = arr[Math.floor(Math.random() * arr.length)];
+    var value4 = arr[getRandomIndex(arr.length)];
     if(value4 == 1){
       value3 += 1;
     };
@@ -1508,7 +1508,7 @@ if($gameVariables.value(402) >= 100){
     var value1 = $gameVariables.value(406);
     value1 += $gameVariables.value(407);
     value1 += $gameVariables.value(408);
-    var value2 = Math.floor( Math.random() * value1);
+    var value2 = getRandomIndex(value1);
     $gameVariables.setValue(414, $gameVariables.value(414)+value1);
   };
 };
@@ -1837,12 +1837,12 @@ if($gameSwitches.value(119)){
 };
 //if(arr91 == 0){}else{array9.push(arr91)};
 if(arr91 == 0){}else{array9 = array9.concat(arr91)};
-var value92 = array9[Math.floor(Math.random() * array9.length)];
+var value92 = array9[getRandomIndex(array9.length)];
 if($gameVariables.value(299) == 0){
   $gameVariables.setValue(299,[121,122,123,124,125,126,127,128,129,130]);
 };
 var array92 = $gameVariables.value(299);
-var value93 = array92[Math.floor(Math.random() * array92.length)];//ID
+var value93 = array92[getRandomIndex(array92.length)];//ID
 let index = array92.findIndex(array92 => array92 === value93); 
 if(index >= 0){
   array92.splice(index, 1);
@@ -1856,17 +1856,17 @@ if(id94 == 1){
   var array91 = [100,200,300,400,0,-100,-200,-300,-400];
   var array92 = [100,150,200,0,-100,-200,-300,-350];
 };
-var value94 = array91[Math.floor(Math.random() * array91.length)];//x
-var value95 = array92[Math.floor(Math.random() * array92.length)];//y
+var value94 = array91[getRandomIndex(array91.length)];//x
+var value95 = array92[getRandomIndex(array92.length)];//y
 if(id95 == 0){
   var array94 = [80,90,100,110,120];//wait
-  var value96 = array94[Math.floor(Math.random() * array94.length)];
+  var value96 = array94[getRandomIndex(array94.length)];
 } else {
   var array94 = [100,110,120,130,140,150,160];
-  var value96 = array94[Math.floor(Math.random() * array94.length)];
+  var value96 = array94[getRandomIndex(array94.length)];
 };
 var array93 = [28,29,30,31,32,33,34,35,36];
-var value97 = array93[Math.floor(Math.random() * array93.length)];
+var value97 = array93[getRandomIndex(array93.length)];
 $gameScreen.setDTextPicture(`${value92}`, value97);
 $gameScreen.dWindowFrame = 'ON';
 if(id96 == 0){}else{$gameScreen.setDtextFont(id96)};
@@ -1876,7 +1876,7 @@ if(id95 == 0){
   $gameScreen.movePicture(value93,1,value98 + value94,value99 + value95,100,100,0,0,value96);
 } else {
   var array95 = [50,60,70,80,90,100,110,120,130,140,150,-50,-60,-70,-80,-90,-100,-110,-120,-130,-140,-150];
-  var value10 = array95[Math.floor(Math.random() * array95.length)];
+  var value10 = array95[getRandomIndex(array95.length)];
   $gameScreen.showPicture(value93,"",1,value98 + value94 + value10,value99 + value95,100,100,255,0);
   $gameScreen.movePicture(value93,1,value98 + value94,value99 + value95,100,100,0,0,value96);
 };
@@ -1894,7 +1894,7 @@ if(id4 >= 100){
 var arr2 = [-50,0,50,-100,100];
 var value3 = Math.floor( Math.random() * 201) - 100;
 var value4 = Math.floor( Math.random() * 201) - 100;
-var value5 = arr1[Math.floor(Math.random() * arr1.length)];
+var value5 = arr1[getRandomIndex(arr1.length)];
 $gameScreen.setDTextPicture(value5, id4);
 $gameScreen.dWindowFrame = 'ON';
 if(id6 == 0){}else{$gameScreen.setDtextFont(id6)};
@@ -1933,7 +1933,7 @@ if($gameActors.actor($gameVariables.value(20)).isStateAffected(83)){
           if(array2[i] >= 1){
             array.push(i);
         }};
-          var value1 = array[Math.floor(Math.random() * array.length)];
+          var value1 = array[getRandomIndex(array.length)];
           if(value1 == 0){var value1 = 102};
           $gameVariables.value($gameVariables.value(20)+360)[value1+100] += 1;
           if($gameVariables.value($gameVariables.value(20)+380)[49] == 0){
@@ -2356,7 +2356,7 @@ if(id1 == 1){//ピストン弱
       value4 += 1;
       if(id3 == 1){var arr1 = [1,2,3]};
     };
-    var value5 = arr1[Math.floor(Math.random() * arr1.length)];
+    var value5 = arr1[getRandomIndex(arr1.length)];
     var value1 = "51_pattern" + id4 + "_" + value4 + "_" + value5;
     var value2 = Math.floor( Math.random() * 21) + 100;
     var value3 = Math.floor( Math.random() * 21) + 100;
@@ -2379,7 +2379,7 @@ if(id1 == 2){//ピストン強
       value4 += 1;
       if(id3 == 1){var arr1 = [1,2,3]};
     };
-    var value5 = arr1[Math.floor(Math.random() * arr1.length)];
+    var value5 = arr1[getRandomIndex(arr1.length)];
     var value1 = "51_pattern" + id4 + "_" + value4 + "_" + value5;
     var value2 = Math.floor( Math.random() * 21) + 70;
     var value3 = Math.floor( Math.random() * 21) + 110;
@@ -2408,7 +2408,7 @@ if(id1 == 3){//愛液
       value4 += 1;
       if(id3 == 1){var arr1 = [1,2]};
     };
-    var value5 = arr1[Math.floor(Math.random() * arr1.length)];
+    var value5 = arr1[getRandomIndex(arr1.length)];
     var value1 = "51_pattern" + id4 + "_" + value4 + "_" + value5;
     var value2 = Math.floor( Math.random() * 21) + 70;
     var value3 = Math.floor( Math.random() * 21) + 100;
@@ -2437,7 +2437,7 @@ if(id1 == 4){//キス
       value4 += 1;
       if(id3 == 1){var arr1 = [1,2,3,4,5,6]};
     };
-    var value5 = arr1[Math.floor(Math.random() * arr1.length)];
+    var value5 = arr1[getRandomIndex(arr1.length)];
     var value1 = "51_pattern" + id4 + "_" + value4 + "_" + value5;
     var value2 = Math.floor( Math.random() * 21) + 70;
     var value3 = Math.floor( Math.random() * 31) + 90;
@@ -2466,7 +2466,7 @@ if(id1 == 5){//フェラ
       value4 += 1;
       if(id3 == 1){var arr1 = [1,2,3,4,5,6,7,8,9,10]};
     };
-    var value5 = arr1[Math.floor(Math.random() * arr1.length)];
+    var value5 = arr1[getRandomIndex(arr1.length)];
     var value1 = "51_pattern" + id4 + "_" + value4 + "_" + value5;
     var value2 = Math.floor( Math.random() * 21) + 70;
     var value3 = Math.floor( Math.random() * 31) + 90;
@@ -2489,7 +2489,7 @@ if(id1 == 6){//揉み
       value4 += 1;
       if(id3 == 1){var arr1 = [1,2]};
     };
-    var value5 = arr1[Math.floor(Math.random() * arr1.length)];
+    var value5 = arr1[getRandomIndex(arr1.length)];
     var value1 = "51_pattern" + id4 + "_" + value4 + "_" + value5;
     var value2 = Math.floor( Math.random() * 21) + 70;
     var value3 = Math.floor( Math.random() * 21) + 100;
@@ -2512,7 +2512,7 @@ if(id1 == 7){//機械振動
       value4 += 1;
       if(id3 == 1){var arr1 = [1,2]};
     };
-    var value5 = arr1[Math.floor(Math.random() * arr1.length)];
+    var value5 = arr1[getRandomIndex(arr1.length)];
     var value1 = "51_pattern" + id4 + "_" + value4 + "_" + value5;
     var value2 = Math.floor( Math.random() * 21) + 70;
     var value3 = Math.floor( Math.random() * 21) + 100;
@@ -2535,7 +2535,7 @@ if(id1 == 8){//機械振動激しく
       value4 += 1;
       if(id3 == 1){var arr1 = [1,2]};
     };
-    var value5 = arr1[Math.floor(Math.random() * arr1.length)];
+    var value5 = arr1[getRandomIndex(arr1.length)];
     var value1 = "51_pattern" + id4 + "_" + value4 + "_" + value5;
     var value2 = Math.floor( Math.random() * 21) + 70;
     var value3 = Math.floor( Math.random() * 21) + 100;
@@ -2551,7 +2551,7 @@ if(id1 == 11){//挿入
     $gameScreen.startFlash([255,119,255,value1], value2);
     $gameScreen.startShake(value3, value3, value2);
     var array = ['Z_zamen1','Z_zamen2'];
-    var value1 = array[Math.floor(Math.random() * array.length)];
+    var value1 = array[getRandomIndex(array.length)];
     var value2 = Math.floor( Math.random() * 21) + 100;
     var value3 = Math.floor( Math.random() * 41) + 80;
     AudioManager.playSe({"name":value1,"volume":value2,"pitch":value3,"pan":0});
@@ -2561,12 +2561,12 @@ if(id1 == 11){//挿入
     var value2 = Math.floor( Math.random() * 21) + 50;
     $gameScreen.startFlash([255,119,255,value1], value2);
     var array = ['Z_zamen1','Z_zamen2'];
-    var value1 = array[Math.floor(Math.random() * array.length)];
+    var value1 = array[getRandomIndex(array.length)];
     var value2 = Math.floor( Math.random() * 21) + 100;
     var value3 = Math.floor( Math.random() * 41) + 80;
     AudioManager.playSe({"name":value1,"volume":value2,"pitch":value3,"pan":0});
     var array = ['Z_Insert'];
-    var value1 = array[Math.floor(Math.random() * array.length)];
+    var value1 = array[getRandomIndex(array.length)];
     var value2 = Math.floor( Math.random() * 21) + 150;
     var value3 = Math.floor( Math.random() * 41) + 80;
     AudioManager.playSe({"name":value1,"volume":value2,"pitch":value3,"pan":0});
@@ -2588,7 +2588,7 @@ if(id1 == 12){//射精.pic_move1(88,0,0,400,400,0,90);ピクチャ拡大消去
     $gameScreen.startFlash([255,119,255,value1], value2);
     $gameScreen.startShake(value3, value3, value2);
     var array = ['Z_zamen'];
-    var value1 = array[Math.floor(Math.random() * array.length)];
+    var value1 = array[getRandomIndex(array.length)];
     var value2 = Math.floor( Math.random() * 21) + 100;
     var value3 = Math.floor( Math.random() * 51) + 100;
     AudioManager.playSe({"name":value1,"volume":value2,"pitch":value3,"pan":0});
@@ -2598,12 +2598,12 @@ if(id1 == 12){//射精.pic_move1(88,0,0,400,400,0,90);ピクチャ拡大消去
     var value2 = Math.floor( Math.random() * 21) + 50;
     $gameScreen.startFlash([255,119,255,value1], value2);
     var array = ['Z_zamen1','Z_zamen2'];
-    var value1 = array[Math.floor(Math.random() * array.length)];
+    var value1 = array[getRandomIndex(array.length)];
     var value2 = Math.floor( Math.random() * 21) + 100;
     var value3 = Math.floor( Math.random() * 41) + 80;
     AudioManager.playSe({"name":value1,"volume":value2,"pitch":value3,"pan":0});
     var array = ['Z_zamen1','Z_zamen2'];
-    var value1 = array[Math.floor(Math.random() * array.length)];
+    var value1 = array[getRandomIndex(array.length)];
     var value2 = Math.floor( Math.random() * 21) + 100;
     var value3 = Math.floor( Math.random() * 41) + 80;
     AudioManager.playSe({"name":value1,"volume":value2,"pitch":value3,"pan":0});
@@ -2625,7 +2625,7 @@ if(id1 == 13){//射精以外で終了.
     $gameScreen.startFlash([255,119,255,value1], value2);
     $gameScreen.startShake(value3, value3, value2);
     var array = ['Z_zamen1','Z_zamen2'];
-    var value1 = array[Math.floor(Math.random() * array.length)];
+    var value1 = array[getRandomIndex(array.length)];
     var value2 = Math.floor( Math.random() * 21) + 100;
     var value3 = Math.floor( Math.random() * 41) + 80;
     AudioManager.playSe({"name":value1,"volume":value2,"pitch":value3,"pan":0});
@@ -2635,12 +2635,12 @@ if(id1 == 13){//射精以外で終了.
     var value2 = Math.floor( Math.random() * 21) + 50;
     $gameScreen.startFlash([255,119,255,value1], value2);
     var array = ['Z_zamen1','Z_zamen2'];
-    var value1 = array[Math.floor(Math.random() * array.length)];
+    var value1 = array[getRandomIndex(array.length)];
     var value2 = Math.floor( Math.random() * 21) + 100;
     var value3 = Math.floor( Math.random() * 41) + 80;
     AudioManager.playSe({"name":value1,"volume":value2,"pitch":value3,"pan":0});
     var array = ['Z_zamen1','Z_zamen2'];
-    var value1 = array[Math.floor(Math.random() * array.length)];
+    var value1 = array[getRandomIndex(array.length)];
     var value2 = Math.floor( Math.random() * 21) + 100;
     var value3 = Math.floor( Math.random() * 41) + 80;
     AudioManager.playSe({"name":value1,"volume":value2,"pitch":value3,"pan":0});
@@ -2698,7 +2698,7 @@ if(id1 == 1){//感じる
   $gameScreen._particle.particleUpdate([value1,'alpha','0.4','0']);
   //$gameScreen._particle.particleExceed(value1,1);
   var array = ['Z_HeartBeatDarty'];
-  var value1 = array[Math.floor(Math.random() * array.length)];
+  var value1 = array[getRandomIndex(array.length)];
   var value2 = Math.floor( Math.random() * 21) + 100;
   var value3 = Math.floor( Math.random() * 41) + 60;
   AudioManager.playSe({"name":value1,"volume":value2,"pitch":value3,"pan":0});
@@ -2711,7 +2711,7 @@ if(id1 == 2){//激しく感じる
   $gameScreen._particle.particleUpdate([value1,'scale','10','40']);
   //$gameScreen._particle.particleExceed(value1,0.8);
   var array = ['Z_HeartBeatDarty'];
-  var value1 = array[Math.floor(Math.random() * array.length)];
+  var value1 = array[getRandomIndex(array.length)];
   var value2 = Math.floor( Math.random() * 21) + 100;
   var value3 = Math.floor( Math.random() * 41) + 40;
   AudioManager.playSe({"name":value1,"volume":value2,"pitch":value3,"pan":0});
@@ -2751,7 +2751,7 @@ if(id1 == 4){//軽く感じる
   $gameScreen._particle.particleUpdate([value1,'alpha','0.3','0']);
   //$gameScreen._particle.particleExceed(value1,1.5);
   var array = ['Z_HeartBeatDarty'];
-  var value1 = array[Math.floor(Math.random() * array.length)];
+  var value1 = array[getRandomIndex(array.length)];
   var value2 = Math.floor( Math.random() * 21) + 100;
   var value3 = Math.floor( Math.random() * 41) + 80;
   AudioManager.playSe({"name":value1,"volume":value2,"pitch":value3,"pan":0});
@@ -2763,7 +2763,7 @@ if(id1 == 5){//乳見せ
   $gameScreen._particle.particleUpdate([value1,'alpha','0.2','0']);
   //$gameScreen._particle.particleExceed(value1,1.5);
   var array = ['ZH_Knead1','ZH_Knead1','ZH_Knead1'];
-  var value1 = array[Math.floor(Math.random() * array.length)];
+  var value1 = array[getRandomIndex(array.length)];
   var value2 = Math.floor( Math.random() * 21) + 100;
   var value3 = Math.floor( Math.random() * 41) + 80;
   AudioManager.playSe({"name":value1,"volume":value2,"pitch":value3,"pan":0});

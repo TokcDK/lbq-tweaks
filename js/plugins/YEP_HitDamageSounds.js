@@ -815,7 +815,7 @@ SoundManager.playActorHitDamageSound = function() {
   var battler = $gameTemp.getHitDamageBattler();
   var sounds = this.getBattlerArmorSounds(battler);
   if (sounds.length > 0) {
-    var sound = sounds[Math.floor(Math.random() * sounds.length)];
+    var sound = sounds[getRandomIndex(sounds.length)];
     AudioManager.playStaticSe(sound);
     if (!Yanfly.Param.HitDamageSoundsOnly) {
       Yanfly.HDS.SoundManager_playEnemyDamage.call(this);

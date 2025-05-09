@@ -1618,7 +1618,7 @@
 
   function calculateEnemyCountToSpawnEnemyTroopPush(troopMeta) {
     const battleEnemyPopOptions = troopMeta['BattleEnemyPopC'].split(',');
-    let enemyCountToSpawn = Number(battleEnemyPopOptions[Math.floor(Math.random() * battleEnemyPopOptions.length)]);
+    let enemyCountToSpawn = Number(battleEnemyPopOptions[getRandomIndex(battleEnemyPopOptions.length)]);
     if ($gameVariables.value(232) >= 2) {
       let additionalSpawnOffset = Math.floor(Math.random() * $gameVariables.value(232));
       enemyCountToSpawn += additionalSpawnOffset;
@@ -1634,7 +1634,7 @@
   }
 
   function resolveEnemySpawnIdEnemyTroopPush(spawnPool, spawnPoolLength, tracker) {
-    let enemySpawnId = Number(spawnPool[Math.floor(Math.random() * spawnPoolLength)]); // 出現エネミースポーン
+    let enemySpawnId = Number(spawnPool[getRandomIndex(spawnPoolLength)]); // 出現エネミースポーン
     if (enemySpawnId === 27 && tracker.hasSpawned27 === true) { enemySpawnId = 21; }
     if (enemySpawnId === 27) { tracker.hasSpawned27 = true; } // id27を１体だけにする
     if (enemySpawnId === 28 && tracker.hasSpawned28 === true) { enemySpawnId = 22; }
@@ -1655,12 +1655,12 @@
     if (spawnIndex == 8) { spawnX = 100; spawnY = 500; }
 
     if (spawnIndex >= 2 && spawnIndex <= 6) {
-      spawnX += Number(xOffsetOptions[Math.floor(Math.random() * xOffsetOptions.length)]);
+      spawnX += Number(xOffsetOptions[getRandomIndex(xOffsetOptions.length)]);
     }
     if (spawnIndex == 2 || spawnIndex == 4 || spawnIndex == 6 || spawnIndex == 8) {
-      spawnY += Number(yNegativeOffsetOptions[Math.floor(Math.random() * yNegativeOffsetOptions.length)]);
+      spawnY += Number(yNegativeOffsetOptions[getRandomIndex(yNegativeOffsetOptions.length)]);
     } else {
-      spawnY += Number(yPositiveOffsetOptions[Math.floor(Math.random() * yPositiveOffsetOptions.length)]);
+      spawnY += Number(yPositiveOffsetOptions[getRandomIndex(yPositiveOffsetOptions.length)]);
     }
     if (enemyCountToSpawn == 2) {
       if (spawnIndex == 2) { spawnX -= 200; }
@@ -1697,10 +1697,10 @@
 
     // add enemies to enemy troop
     const battleEnemyPopHOptions = troopMeta['BattleEnemyPopCH'].split(',');
-    const enemyCountToSpawn = Number(battleEnemyPopHOptions[Math.floor(Math.random() * battleEnemyPopHOptions.length)]);
+    const enemyCountToSpawn = Number(battleEnemyPopHOptions[getRandomIndex(battleEnemyPopHOptions.length)]);
     for (let spawnIndex = 1; spawnIndex <= enemyCountToSpawn; spawnIndex++) {
       // get enemy data
-      let enemySpawnId = Number(spawnPoolH[Math.floor(Math.random() * spawnPoolHLength)]); //出現エネミースポーン
+      let enemySpawnId = Number(spawnPoolH[getRandomIndex(spawnPoolHLength)]); //出現エネミースポーン
       let isHidden = (spawnIndex >= enemyCountToSpawn) ? true : false;
       const { spawnX, spawnY } = getSpawnCoordinatesHEnemyTroopPush(spawnIndex, enemyCountToSpawn, xOffsetOptions, yNegativeOffsetOptions, yPositiveOffsetOptions);
       
@@ -1723,13 +1723,13 @@
     if (spawnIndex == 8) { spawnX = 100; spawnY = 500; }
 
     if (spawnIndex >= 2 && spawnIndex <= 6) {
-      spawnX = spawnX + Number(xOffsetOptions[Math.floor(Math.random() * xOffsetOptions.length)]);
+      spawnX = spawnX + Number(xOffsetOptions[getRandomIndex(xOffsetOptions.length)]);
     }
 
     if (spawnIndex == 2 || spawnIndex == 4 || spawnIndex == 6 || spawnIndex == 8) {
-      spawnY = spawnY + Number(yNegativeOffsetOptions[Math.floor(Math.random() * yNegativeOffsetOptions.length)]);
+      spawnY = spawnY + Number(yNegativeOffsetOptions[getRandomIndex(yNegativeOffsetOptions.length)]);
     } else {
-      spawnY = spawnY + Number(yPositiveOffsetOptions[Math.floor(Math.random() * yPositiveOffsetOptions.length)]);
+      spawnY = spawnY + Number(yPositiveOffsetOptions[getRandomIndex(yPositiveOffsetOptions.length)]);
     }
 
     if (enemyCountToSpawn == 2) {
@@ -2896,7 +2896,7 @@
         arr2.push(Number(value.meta['PopEnemy' + j].split(',')[0]));
       };
     };
-    let enemyId = arr2[Math.floor(Math.random() * arr2.length)];
+    let enemyId = arr2[getRandomIndex(arr2.length)];
     const arr1 = [];
     if ($dataEnemies[enemyId].meta['Passive State']) {
       arr2 = $dataEnemies[enemyId].meta['Passive State'].split(',');
@@ -2934,7 +2934,7 @@
           if (id1 >= 30 && id1 <= 60) stateIdMult = 21;
           else if (id1 >= 61) stateIdMult = 31;
 
-          stateId = Math.floor(Math.random() * stateIdMult) + 885;
+          stateId = getRandomIndex(stateIdMult) + 885;
           actor20.addState(stateId);
         } else {
           actor20.addState(stateId);
@@ -2943,7 +2943,7 @@
     };
     if (value.meta['EnemyElement']) {
       const arr1 = value.meta['EnemyElement'].split(',');
-      const stateId = Number(arr1[Math.floor(Math.random() * arr1.length)]);
+      const stateId = Number(arr1[getRandomIndex(arr1.length)]);
       actor20.addState(stateId);
     };
     //console.log($gameActors.actor(20));
@@ -3115,12 +3115,12 @@
           var arr3 = [50, 100, 150, 200, -50, -100, -150];//前衛x
           var arr5 = [-50, 0, 50, 100, 150, 200, 250];//y
           for (var i = 1; i <= 7; i++) {
-            var value2 = arr3[Math.floor(Math.random() * arr3.length)];
+            var value2 = arr3[getRandomIndex(arr3.length)];
             var index = arr3.findIndex(arr3 => arr3 == value2);
             if (index >= 0) {
               arr3.splice(index, 1);
             };
-            var value4 = arr5[Math.floor(Math.random() * arr5.length)];
+            var value4 = arr5[getRandomIndex(arr5.length)];
             var index = arr5.findIndex(arr5 => arr5 == value4);
             if (index >= 0) {
               arr5.splice(index, 1);
@@ -3138,16 +3138,16 @@
             var arr2 = value.meta['EnemyEntourage' + i].split(',');
             var value1 = Number(arr2[0]);
             if (Number(arr2[1]) == 0) {
-              var value2 = arr3[Math.floor(Math.random() * arr3.length)];
+              var value2 = arr3[getRandomIndex(arr3.length)];
               var index = arr3.findIndex(arr3 => arr3 == value2);
               if (index >= 0) { arr3.splice(index, 1) };
             };
             if (Number(arr2[1]) == 1) {
-              var value2 = arr4[Math.floor(Math.random() * arr4.length)];
+              var value2 = arr4[getRandomIndex(arr4.length)];
               var index = arr4.findIndex(arr4 => arr4 == value2);
               if (index >= 0) { arr4.splice(index, 1) };
             };
-            var value4 = arr5[Math.floor(Math.random() * arr5.length)];
+            var value4 = arr5[getRandomIndex(arr5.length)];
             var index = arr5.findIndex(arr5 => arr5 == value4);
             if (index >= 0) { arr5.splice(index, 1) };
             if (Number(arr2[2]) == 1) { var value5 = true } else { var value5 = false };
@@ -3628,7 +3628,7 @@
 
         addRarityCheckValues(rarityArray, i);
       }
-      chosenRarity = rarityArray[Math.floor(Math.random() * rarityArray.length)];
+      chosenRarity = rarityArray[getRandomIndex(rarityArray.length)];
       //ガチャ称号取得でＵＲ，ＬＲ解放
       if (!$gameParty.hasItem($dataItems[657], true) && chosenRarity >= 9) {
         chosenRarity = 8;
@@ -3661,7 +3661,7 @@
 
         eligibleItemIndices.push(i);
       }
-      selectedItemIndex = eligibleItemIndices[Math.floor(Math.random() * eligibleItemIndices.length)];
+      selectedItemIndex = eligibleItemIndices[getRandomIndex(eligibleItemIndices.length)];
       if (selectedItemIndex === 0) { //レアリティ1でmax1アイテムを作らない。
         eligibleItemIndices = [];
         chosenRarity = 1;
@@ -3677,7 +3677,7 @@
 
           eligibleItemIndices.push(i);
         };
-        valueGachaId = eligibleItemIndices[Math.floor(Math.random() * eligibleItemIndices.length)];
+        valueGachaId = eligibleItemIndices[getRandomIndex(eligibleItemIndices.length)];
         return;
       }
     };
@@ -3769,7 +3769,7 @@
     var arr3 = $gameVariables.value(215)[$gameVariables.value(240)];
     var arr4 = $gameVariables.value(216)[$gameVariables.value(240)];
     if (arr3 != 0) {
-      var value2 = arr3[Math.floor(Math.random() * arr3.length)];
+      var value2 = arr3[getRandomIndex(arr3.length)];
       let index = arr3.findIndex(arr3 => arr3 == value2);
       var valueItems = getItemEquipmentSource(arr4[index]);
       if ($dataItems[$gameVariables.value(240)].meta['TchestRere']) {
@@ -3852,7 +3852,7 @@
         var value1 = Number(arr1[0]);
         //var arr2 = [value1-5,value1-4,value1-3,value1-2,value1-2,value1,value1+1,value1+2,value1+3,value1+4,value1+5];
         var arr2 = [value1 - 10, value1 - 5, value1, value1 + 5, value1 + 10];
-        var value2 = arr2[Math.floor(Math.random() * arr2.length)];
+        var value2 = arr2[getRandomIndex(arr2.length)];
         $dataEnemies[i].params[0] = value2;
         for (var j = 1; j <= 7; j++) {
           var value3 = Number(arr1[1]);
@@ -5127,7 +5127,7 @@
       } else {
         var arr1 = ['Town048', 'Town084', 'Town092', 'Town129', 'Town131', 'Town225', 'Town309', 'Town310', 'Town001', 'Town013', 'Town014', 'Town032', 'Town033', 'Town039', 'Town041', 'Town046'];
       };
-      var value1 = arr1[Math.floor(Math.random() * arr1.length)];
+      var value1 = arr1[getRandomIndex(arr1.length)];
     };
     if (id1 == 2) {
       var value1 = 'Town129';
@@ -5255,9 +5255,9 @@
           var value4 = Math.floor(Math.random() * 900) + 101;
           if ($gameVariables.value(240) >= 1) {
             var arr1 = $dataItems[$gameVariables.value(240)].meta['EnemyLV'].split(',');
-            var value3 = arr1[Math.floor(Math.random() * arr1.length)] * 10;
+            var value3 = arr1[getRandomIndex(arr1.length)] * 10;
             var value3 = Math.floor(Math.random() * (value3 * 10)) + (value3 + 1);
-            var value4 = arr1[Math.floor(Math.random() * arr1.length)] * 10;
+            var value4 = arr1[getRandomIndex(arr1.length)] * 10;
             var value4 = Math.floor(Math.random() * (value4 * 10)) + (value4 + 1);
           };
           if (value3 > value2) {
@@ -5283,9 +5283,9 @@
           var value4 = Math.floor(Math.random() * 900) + 101;
           if ($gameVariables.value(240) >= 1) {
             var arr1 = $dataItems[$gameVariables.value(240)].meta['EnemyLV'].split(',');
-            var value3 = arr1[Math.floor(Math.random() * arr1.length)] * 10;
+            var value3 = arr1[getRandomIndex(arr1.length)] * 10;
             var value3 = Math.floor(Math.random() * (value3 * 10)) + (value3 + 1);
-            var value4 = arr1[Math.floor(Math.random() * arr1.length)] * 1;
+            var value4 = arr1[getRandomIndex(arr1.length)] * 1;
             var value4 = Math.floor(Math.random() * (value4 * 10)) + (value4 + 1);
           };
           if (value3 > value2) {
@@ -5311,7 +5311,7 @@
           var value4 = Math.floor(Math.random() * 90) + 11;
           if ($gameVariables.value(240) >= 1) {
             var arr1 = $dataItems[$gameVariables.value(240)].meta['EnemyLV'].split(',');
-            var value3 = arr1[Math.floor(Math.random() * arr1.length)] * 10;
+            var value3 = arr1[getRandomIndex(arr1.length)] * 10;
             var value3 = Math.floor(Math.random() * (value3 * 10)) + (value3 + 1);
           };
           if (value3 > value2) {
@@ -6295,9 +6295,9 @@
 
     $gameVariables.setValue(id3, `\\AT[${id1}]`);
     for (var i = 1; i <= id2; i++) {
-      var value1 = arr1[Math.floor(Math.random() * arr1.length)];
-      var value2 = arr2[Math.floor(Math.random() * arr2.length)];
-      var value3 = arr3[Math.floor(Math.random() * arr3.length)];
+      var value1 = arr1[getRandomIndex(arr1.length)];
+      var value2 = arr2[getRandomIndex(arr2.length)];
+      var value3 = arr3[getRandomIndex(arr3.length)];
       if (value2 == ` `) {
         var value4 = Math.floor(Math.random() * 11);
         var value4 = -value4;
@@ -6305,7 +6305,7 @@
         if (value2 == `\\C[27]♥\\C[0]` || value2 == `\\C[27]♡\\C[0]`) {
           var value4 = Math.floor(Math.random() * 6);
         } else {
-          var value4 = arr4[Math.floor(Math.random() * arr4.length)];
+          var value4 = arr4[getRandomIndex(arr4.length)];
           if (value3 >= 40) {
             value4 += Math.ceil(value3 / 4);
           };
@@ -6317,9 +6317,9 @@
     if (id2 >= 20) {
       $gameVariables.setValue(id3, $gameVariables.value(id3) + `\n`);
       for (var i = 1; i <= id2; i++) {
-        var value1 = arr1[Math.floor(Math.random() * arr1.length)];
-        var value2 = arr2[Math.floor(Math.random() * arr2.length)];
-        var value3 = arr3[Math.floor(Math.random() * arr3.length)];
+        var value1 = arr1[getRandomIndex(arr1.length)];
+        var value2 = arr2[getRandomIndex(arr2.length)];
+        var value3 = arr3[getRandomIndex(arr3.length)];
         if (value2 == ` `) {
           var value4 = Math.floor(Math.random() * 11);
           var value4 = -value4;
@@ -6327,7 +6327,7 @@
           if (value2 == `\\C[27]♥\\C[0]` || value2 == `\\C[27]♡\\C[0]`) {
             var value4 = Math.floor(Math.random() * 6);
           } else {
-            var value4 = arr4[Math.floor(Math.random() * arr4.length)];
+            var value4 = arr4[getRandomIndex(arr4.length)];
             if (value3 >= 40) {
               value4 += Math.ceil(value3 / 4);
             };
@@ -6403,7 +6403,7 @@
   // Selects a random option from the available chest options
   selectRandomChestOption = function (options) {
     if (options.length === 0) return null;
-    return options[Math.floor(Math.random() * options.length)];
+    return options[getRandomIndex(options.length)];
   };
 
   // Retrieves the item based on type and index, then gives it to the player
@@ -6546,7 +6546,11 @@
     }
   }
 
-  getPreviousTachiePicId() = function () {
+  getRandomIndex = function (length) {
+    return Math.floor(Math.random() * length);
+  }
+
+  getPreviousTachiePicId = function () {
     return $gameVariables.value(300);
   }
 

@@ -493,19 +493,19 @@ Game_Action.prototype.getTauntTarget = function(targets) {
 		if (this.isPhysical() && unit.physicalTauntMembers().length > 0) {
 			if (!unit.physicalTauntMembers().contains(target)) {
 				var group = unit.physicalTauntMembers();
-				target = group[Math.floor(Math.random()*group.length)];
+				target = group[getRandomIndex(group.length)];
 				targets = [target];
 			}
 		} else if (this.isMagical() && unit.magicalTauntMembers().length > 0) {
 			if (!unit.magicalTauntMembers().contains(target)) {
 				var group = unit.magicalTauntMembers();
-				target = group[Math.floor(Math.random()*group.length)];
+				target = group[getRandomIndex(group.length)];
 				targets = [target];
 			}
 		} else if (this.isCertainHit() && unit.certainTauntMembers().length > 0) {
 			if (!unit.certainTauntMembers().contains(target)) {
 				var group = unit.certainTauntMembers();
-				target = group[Math.floor(Math.random()*group.length)];
+				target = group[getRandomIndex(group.length)];
 				targets = [target];
 			}
 		}

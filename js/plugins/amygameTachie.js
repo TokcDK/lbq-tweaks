@@ -1512,7 +1512,7 @@ function getStateBasedExpressionTachieSettei1(gameActor, $gameVariables, $gameSw
   for (const stateId of valueTachieChangeState) {
     if (gameActor.isStateAffected(stateId) && $dataStates[stateId].meta['FaceChange']) {
       const faceChangeArr = $dataStates[stateId].meta['FaceChange'].split(',');
-      return Number(faceChangeArr[Math.floor(Math.random() * faceChangeArr.length)]);
+      return Number(faceChangeArr[getRandomIndex(faceChangeArr.length)]);
     }
   }
 
@@ -1520,9 +1520,9 @@ function getStateBasedExpressionTachieSettei1(gameActor, $gameVariables, $gameSw
   if (gameActor.isStateAffected(63)) {
     const constantVal50 = 50, constantVal7 = 7;
     if (gameActor.skillMasteryLevel(constantVal50) >= constantVal7) {
-      return RESTRAINED_FACE_OPTIONS[Math.floor(Math.random() * RESTRAINED_FACE_OPTIONS.length)];
+      return RESTRAINED_FACE_OPTIONS[getRandomIndex(RESTRAINED_FACE_OPTIONS.length)];
     } else {
-      return SIMPLE_FACE_OPTIONS[Math.floor(Math.random() * SIMPLE_FACE_OPTIONS.length)];
+      return SIMPLE_FACE_OPTIONS[getRandomIndex(SIMPLE_FACE_OPTIONS.length)];
     }
   }
 
@@ -1533,7 +1533,7 @@ function getStateBasedExpressionTachieSettei1(gameActor, $gameVariables, $gameSw
       // Do nothing, return null to continue checks
       return null;
     } else {
-      return PREGNANCY_FACE_OPTIONS[Math.floor(Math.random() * PREGNANCY_FACE_OPTIONS.length)];
+      return PREGNANCY_FACE_OPTIONS[getRandomIndex(PREGNANCY_FACE_OPTIONS.length)];
     }
   }
 
@@ -1550,15 +1550,15 @@ function getEmotionalExpressionTachieSettei1(gameActor, $gameVariables, $gameSwi
     const intensity = $gameVariables.value($gameVariables.value(20) + 380)[1];
 
     if (intensity >= 900) {
-      return HIGHEST_FACE_OPTIONS[Math.floor(Math.random() * HIGHEST_FACE_OPTIONS.length)];
+      return HIGHEST_FACE_OPTIONS[getRandomIndex(HIGHEST_FACE_OPTIONS.length)];
     } else if (intensity >= 700) {
-      return MODERATE_FACE_OPTIONS[Math.floor(Math.random() * MODERATE_FACE_OPTIONS.length)];
+      return MODERATE_FACE_OPTIONS[getRandomIndex(MODERATE_FACE_OPTIONS.length)];
     } else if (intensity >= 500) {
-      return MILD_FACE_OPTIONS[Math.floor(Math.random() * MILD_FACE_OPTIONS.length)];
+      return MILD_FACE_OPTIONS[getRandomIndex(MILD_FACE_OPTIONS.length)];
     } else if (intensity >= 300) {
-      return LOW_FACE_OPTIONS[Math.floor(Math.random() * LOW_FACE_OPTIONS.length)];
+      return LOW_FACE_OPTIONS[getRandomIndex(LOW_FACE_OPTIONS.length)];
     } else {
-      return SIMPLE_FACE_OPTIONS[Math.floor(Math.random() * SIMPLE_FACE_OPTIONS.length)];
+      return SIMPLE_FACE_OPTIONS[getRandomIndex(SIMPLE_FACE_OPTIONS.length)];
     }
   }
 
@@ -1581,7 +1581,7 @@ function getExposureBasedExpressionTachieSettei1(gameActor, $gameVariables, $gam
     if ($gameVariables.value($gameVariables.value(20) + 380)[4] <
       $gameVariables.value($gameVariables.value(20) + 380)[5]) {
       $gameSwitches.setValue(100, true);
-      return LOW_FACE_OPTIONS[Math.floor(Math.random() * LOW_FACE_OPTIONS.length)];
+      return LOW_FACE_OPTIONS[getRandomIndex(LOW_FACE_OPTIONS.length)];
     }
 
     // Check for low clothing value
@@ -1591,7 +1591,7 @@ function getExposureBasedExpressionTachieSettei1(gameActor, $gameVariables, $gam
 
       $gameSwitches.setValue(100, true);
       if (tempClothesValue >= 500 && masteryLevel >= 4) {
-        return HIGHER_FACE_OPTIONS[Math.floor(Math.random() * HIGHER_FACE_OPTIONS.length)];
+        return HIGHER_FACE_OPTIONS[getRandomIndex(HIGHER_FACE_OPTIONS.length)];
       }
     }
   }
@@ -1604,9 +1604,9 @@ function getDefaultExpressionTachieSettei1($gameVariables, $gameSwitches) {
   if ($gameSwitches.value(30)) { // In battle
     return damageFaceExpressionsMap[$gameVariables.value(276)] || 4;
   } else if ($gameSwitches.value(201) || $gameSwitches.value(239)) { // Excited
-    return excitedFaceExpressions[Math.floor(Math.random() * excitedFaceExpressions.length)];
+    return excitedFaceExpressions[getRandomIndex(excitedFaceExpressions.length)];
   } else { // Normal
-    return baseFaceExpressions[Math.floor(Math.random() * baseFaceExpressions.length)];
+    return baseFaceExpressions[getRandomIndex(baseFaceExpressions.length)];
   }
 }
 
@@ -1652,7 +1652,7 @@ clothes_hason1 = function(array,id1){
   };
   $gameVariables.setValue(243, 0);
   $gameVariables.setValue(244, 0);
-  const value1 = array[Math.floor(Math.random() * array.length)];
+  const value1 = array[getRandomIndex(array.length)];
   if (value1 == 1) return;
   if ($gameVariables.value(460 + value1) < 1) return;
 

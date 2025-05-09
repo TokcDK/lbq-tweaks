@@ -17,7 +17,7 @@ chara_oneWord = function(id1,id2,id3,id4,arr1,arr2,arr3,id6){
 // };
 picture_motion1("smooth", [0]);
 
-const value5 = arr3[Math.floor(Math.random() * arr3.length)];
+const value5 = arr3[getRandomIndex(arr3.length)];
 $gameScreen.setDTextPicture(value5, id3);
 $gameScreen.dWindowFrame = 'ON';
 if(id6 == 0){}else{$gameScreen.setDtextFont(id6)};
@@ -34,8 +34,8 @@ if(!!$gameMap.event(id2)) {
   value2 = 384;
 };
 
-const value3 = arr1[Math.floor(Math.random() * arr1.length)];
-const value4 = arr2[Math.floor(Math.random() * arr2.length)];
+const value3 = arr1[getRandomIndex(arr1.length)];
+const value4 = arr2[getRandomIndex(arr2.length)];
 $gameScreen.showPicture(id1,"",1,value1+value3,value2+value4,50,50,255,0);
 $gameScreen.movePicture(id1,1,value1+value3,value2+value4,150,150,0,0,id4);
 
@@ -178,7 +178,7 @@ $gameVariables.setValue(36,[0,8]);//インデックス
   };
   if($gameSwitches.value(242)){//城
     var arr = [1,2];
-    var value5 = arr[Math.floor(Math.random() * arr.length)]
+    var value5 = arr[getRandomIndex(arr.length)]
       if(value5 == 1){
         $gameVariables.setValue(33,'npcCastle');
         $gameVariables.setValue(35,Math.floor( Math.random() * 2) + 1);
@@ -298,17 +298,17 @@ map_npcPositionSetEvent = function (id, mapId) {
     const value3 = Math.floor(Math.random() * 7) + 0;
     event.setImage('food_' + foodIndex, value3);
     let arr1 = [2, 4, 6, 8];
-    foodIndex = arr1[Math.floor(Math.random() * arr1.length)];
+    foodIndex = arr1[getRandomIndex(arr1.length)];
     event.setDirection(foodIndex);//2,4,6,8
     arr1 = [0, 1, 2];
-    foodIndex = arr1[Math.floor(Math.random() * arr1.length)];
+    foodIndex = arr1[getRandomIndex(arr1.length)];
     event.setPattern(foodIndex);//0,1,2
     event._originalPattern = foodIndex;
     event.setDirectionFix(true);//向き固定
   }
   else if (eventEvent.meta['decorationFood']) {
     const arr2 = [[1, 5, 8, 1], [1, 5, 8, 2], [1, 6, 8, 0], [1, 6, 8, 1], [2, 0, 2, 1], [2, 1, 2, 2], [2, 0, 6, 0], [2, 0, 6, 1]];
-    const arr1 = arr2[Math.floor(Math.random() * arr2.length)];
+    const arr1 = arr2[getRandomIndex(arr2.length)];
     event.setDirectionFix(false);
     event.setImage('food_' + arr1[0], arr1[1]);
     event.setDirection(arr1[2]);
@@ -318,7 +318,7 @@ map_npcPositionSetEvent = function (id, mapId) {
   }
   else if (eventEvent.meta['Alcol']) {
     const arr2 = [[0, 6, 0], [0, 6, 1], [0, 6, 2], [1, 4, 1], [1, 4, 2], [2, 4, 0], [2, 4, 1]];
-    const arr1 = arr2[Math.floor(Math.random() * arr2.length)];
+    const arr1 = arr2[getRandomIndex(arr2.length)];
     event.setDirectionFix(false);
     event.setImage('food_2', arr1[0]);
     event.setDirection(arr1[1]);
@@ -328,7 +328,7 @@ map_npcPositionSetEvent = function (id, mapId) {
   }
   else if (eventEvent.meta['foodPlate']) {
     const arr2 = [[2, 0, 8, 0], [2, 0, 8, 1], [2, 0, 8, 1], [2, 1, 8, 0], [2, 1, 8, 1], [2, 1, 8, 2], [2, 2, 8, 0], [2, 2, 8, 1]];
-    const arr1 = arr2[Math.floor(Math.random() * arr2.length)];
+    const arr1 = arr2[getRandomIndex(arr2.length)];
     event.setDirectionFix(false);
     event.setImage('food_' + arr1[0], arr1[1]);
     event.setDirection(arr1[2]);
@@ -362,7 +362,7 @@ map_npcPositionSetEvent = function (id, mapId) {
     const value3 = Math.floor(Math.random() * $gameVariables.value(36)[1]) + $gameVariables.value(36)[0];
     event.setImage(value4 + value2, value3);
     const arr1 = [45, 135, -45, -135];
-    const value5 = arr1[Math.floor(Math.random() * arr1.length)];
+    const value5 = arr1[getRandomIndex(arr1.length)];
     event.setAngle(value5);
     event.setDirection(8);
     $gameMap.spawnEvent(99, event.x, event.y, true);//血痕
@@ -671,7 +671,7 @@ $gameVariables.value(202).some(function (id) { return $gameMap.mapId() == id }))
     charaEventToRespawn.setImage(charaName + charaNum, Math.floor(Math.random() * charaCoords[1]) + charaCoords[0]);
 
     //event.setPattern(value2);//0,1,2不要
-    charaEventToRespawn.setDirection(map_npcRespawnNpcDirections[Math.floor(Math.random() * map_npcRespawnNpcDirections.length)]);//2,4,6,8
+    charaEventToRespawn.setDirection(map_npcRespawnNpcDirections[getRandomIndex(map_npcRespawnNpcDirections.length)]);//2,4,6,8
 
     const npcOpacity = id2 == 0 ? 0/*初期透明度*/ : 255;
     charaEventToRespawn.setOpacity(npcOpacity);
@@ -939,7 +939,7 @@ if($gameVariables.value(238) >= 1){
 		const arr2 = [18+n,[1],[1],1,0,3,[0],[1]];//小銭生成
 		const var238 = $gameVariables.value(238);
 		const array1 = [var238-2, var238-1, var238, var238+1];
-		let value2 = array1[Math.floor(Math.random() * array1.length)];
+		let value2 = array1[getRandomIndex(array1.length)];
 		if(value2 < 1) value2 = 1 ;
 		map_otherGraphicSet(value2, 0, arr2);
 	  }
@@ -963,7 +963,7 @@ if($gameSwitches.value(201)){
     const arr2 = [20, [1], [1], 1, 0, 0, [0], [1]];//トラップ。エネミーレベル20以上
     const value1 = $gameVariables.value(238);
     const array1 = [value1-2,value1-1,value1,value1+1];
-    let value2 = array1[Math.floor(Math.random() * array1.length)];
+    let value2 = array1[getRandomIndex(array1.length)];
     if(value2 <= 0){value2 = 1};
     map_otherGraphicSet(value2,0,arr2);
   }
@@ -976,7 +976,7 @@ if($gameVariables.value(260) >= 1 && valueRegionMapArray[1] >= 1){
   if (value2 >= 1) {
     const arr = [70, 93, 85, 92, 91, 94, 88, 89, 95, 96];//亡骸
     for (let id10 = 1; id10 <= value2; id10++) {
-        const value1 = arr[Math.floor(Math.random() * arr.length)];
+        const value1 = arr[getRandomIndex(arr.length)];
         const arr2 = [value1,[1],[1],1,0,0,[0],[1]];
         map_otherGraphicSet(1,0,arr2);
       }
@@ -1036,12 +1036,12 @@ map_otherGraphicSet = function(id1,arr1,arr2){
     gameVar210SpawnEventIdsArray.push(lastSpawnEventId);
     const event = gameMap.event(lastSpawnEventId);
     if(arr1){
-      event.setImage(arr1[Math.floor(Math.random() * arr1.length)],Math.floor( Math.random() * 8) + 0);
+      event.setImage(arr1[getRandomIndex(arr1.length)],Math.floor( Math.random() * 8) + 0);
     }
     event.setMoveSpeed(arr2[1][Math.floor(Math.random() * arr2[1].length)]);//1-6
     event.setMoveFrequency(arr2[2][Math.floor(Math.random() * arr2[2].length)]);//1-5
     
-    //j += map_otherGraphicSetEndNowArray[Math.floor(Math.random() * map_otherGraphicSetEndNowArrayLen)];
+    //j += map_otherGraphicSetEndNowArray[getRandomIndex(map_otherGraphicSetEndNowArrayLen)];
     j += Math.random() < 0.14 ? 2 : 1; // 14% 1 of 7
 	if(i + j >= end){
       break;
@@ -1157,7 +1157,7 @@ for (let i = start; i <= end; i++) {
   if (gameVar530 == 0) {
     const x = $gamePlayer.x;
     const y = $gamePlayer.y;
-    const arr2 = arr1[Math.floor(Math.random() * arr1.length)];//ID
+    const arr2 = arr1[getRandomIndex(arr1.length)];//ID
     const index = arr1.findIndex(arr1 => arr1 == arr2);
     if (index >= 0) {
       arr1.splice(index, 1);
@@ -1170,7 +1170,7 @@ for (let i = start; i <= end; i++) {
         const ev = $gameMap.event(gameVar292[gameVar530]);
         const x = ev.x;
         const y = ev.y;
-        const arr2 = arr1[Math.floor(Math.random() * arr1.length)];//ID
+        const arr2 = arr1[getRandomIndex(arr1.length)];//ID
         const index = arr1.findIndex(arr1 => arr1 == arr2);
         if (index >= 0) {
           arr1.splice(index, 1);
@@ -1317,7 +1317,7 @@ map_npcGraphicSet();
 $gameMap.spawnEvent(74, value2, value3, true);
 const event = $gameMap.event($gameMap.getLastSpawnEventId());
 const arr1 = [6,7];
-const value1 = arr1[Math.floor(Math.random() * arr1.length)];
+const value1 = arr1[getRandomIndex(arr1.length)];
 event.setImage('Damage2', value1);
 const gameVar36 = $gameVariables.value(36);
 const value4 = Math.floor(Math.random() * gameVar36[1]) + gameVar36[0];

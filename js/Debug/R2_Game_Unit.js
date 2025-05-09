@@ -77,7 +77,7 @@ Game_Unit.prototype.randomDeadTarget = function() {
     if (members.length === 0) {
         return null;
     }
-    return members[Math.floor(Math.random() * members.length)];
+    return members[getRandomIndex(members.length)];
 };
 
 Game_Unit.prototype.smoothTarget = function(index) {
