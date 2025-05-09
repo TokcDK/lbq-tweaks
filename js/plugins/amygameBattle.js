@@ -4720,35 +4720,43 @@ const attackIdsMapAcraSub = {
   9: 181,
   10: 191
 };
-actor_custom_replace_attack_sub = function (user) {
+actor_custom_replace_attack_sub = function(user) {
+  // Early return if no weapon equipped
   const firstEquippedItemId = user._equips[0]._itemId;
   if (firstEquippedItemId < 1) {
     return 1;
-  };
-
+  }
+  
+  // Get the weapon data once
+  const firstWeapon = $dataWeapons[firstEquippedItemId];
+  
+  // Check for special attack override from weapon metadata
+  const specialAttackMeta = firstWeapon.meta['SpecialAttack'];
+  if (specialAttackMeta) {
+    const specialAttackId = Number(specialAttackMeta);
+    if (specialAttackId >= 1) {
+      return specialAttackId;
+    }
+  }
+  
+  // Find base attack ID from equipped weapon type
   let attackId = 1;
-  for (const typeKey in attackIdsMapAcraSub) {
-    if (user.isWtypeEquipped(Number(typeKey))) {
-      attackId = attackIdsMapAcraSub[typeKey];
+  for (let typeId = 1; typeId <= 10; typeId++) {
+    if (user.isWtypeEquipped(typeId)) {
+      attackId = attackIdsMapAcraSub[typeId] || 1;
       break;
     }
   }
-
-  if (user.isStateAffected(283)) { attackId += 6 }
-  if (user.isStateAffected(282)) { attackId += 5 }
-  if (user.isLearnedSkill(attackId + 4)) { attackId += 4 }
-  if (user.isLearnedSkill(attackId + 3)) { attackId += 3 }
-  if (user.isLearnedSkill(attackId + 2)) { attackId += 2 }
-  if (user.isLearnedSkill(attackId + 1)) { attackId += 1 };
-
-  const firstWeapon = $dataWeapons[firstEquippedItemId];
-  const specialAttackMeta = firstWeapon.meta['SpecialAttack'];
-  if (specialAttackMeta) {
-    if (Number(specialAttackMeta) >= 1) {
-      attackId = Number(specialAttackMeta);
-    };
-  };
-
+  
+  // Apply state and skill modifiers
+  // Using addition instead of multiple increments for better performance
+  attackId += (user.isStateAffected(283) ? 6 : 0) +
+              (user.isStateAffected(282) ? 5 : 0) +
+              (user.isLearnedSkill(attackId + 4) ? 4 : 0) +
+              (user.isLearnedSkill(attackId + 3) ? 3 : 0) +
+              (user.isLearnedSkill(attackId + 2) ? 2 : 0) +
+              (user.isLearnedSkill(attackId + 1) ? 1 : 0);
+              
   return attackId;
 };
 
