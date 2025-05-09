@@ -1570,21 +1570,11 @@
       enemyCountToSpawn = calculateEnemyCountToSpawnEnemyTroopPush(troopMeta);
 
       // get enemy spawn pool
-      let spawnPool = $gameVariables.value(220);
-      if ($gameVariables.value(242) != 0) {
-        for (let index = 0; index <= $gameVariables.value(242).length - 1; index++) {
-          let chanceRoll = Math.floor(Math.random() * 101);
-          chanceRoll -= spawnChanceOffset;
-          if ($gameParty.membersState(304)) { chanceRoll += 10; }
-          if ($gameParty.membersState(305)) { chanceRoll += 10; }
-          if ($gameParty.membersState(306)) { chanceRoll += 10; }
-          if (chanceRoll >= 80) {
-            spawnPool = spawnPool.concat($gameVariables.value(242));
-            spawnChanceOffset += 10;
-          }
-        }
-      }
+      const spawnResult = calculateSpawnPoolEnemyTroopPush(spawnChanceOffset);
+      let spawnPool = spawnResult.pool;
+      spawnChanceOffset = spawnResult.spawnChanceOffset;
 
+      // add enemies to enemy troop
       const spawnPoolLength = spawnPool.length;
       const spawnTracker = { hasSpawned27: false, hasSpawned28: false };
       for (let spawnIndex = 1; spawnIndex <= enemyCountToSpawn; spawnIndex++) {  
@@ -1606,7 +1596,26 @@
     }
     $gameSwitches.setValue(357, true);
   };
-  
+
+  function calculateSpawnPoolEnemyTroopPush(spawnChanceOffset) {
+    let pool = $gameVariables.value(220);
+    const specialPool = $gameVariables.value(242);
+    if (specialPool != 0) {
+      for (let index = 0; index < specialPool.length; index++) {
+        let chanceRoll = Math.floor(Math.random() * 101);
+        chanceRoll -= spawnChanceOffset;
+        if ($gameParty.membersState(304)) { chanceRoll += 10; }
+        if ($gameParty.membersState(305)) { chanceRoll += 10; }
+        if ($gameParty.membersState(306)) { chanceRoll += 10; }
+        if (chanceRoll >= 80) {
+          pool = pool.concat(specialPool);
+          spawnChanceOffset += 10;
+        }
+      }
+    }
+    return { pool, spawnChanceOffset };
+  }
+
   function calculateEnemyCountToSpawnEnemyTroopPush(troopMeta) {
     const battleEnemyPopOptions = troopMeta['BattleEnemyPopC'].split(',');
     let enemyCountToSpawn = Number(battleEnemyPopOptions[Math.floor(Math.random() * battleEnemyPopOptions.length)]);
@@ -1678,16 +1687,17 @@
 
     if ($gameVariables.value(228) === 0) return; // have empty H enemy's pool
 
-    const spawnPoolH = $gameVariables.value(228);
-    const spawnPoolHLength = spawnPoolH.length;
     const troopId = 10; //グループIDを指定
     const enemyTroopH = $dataTroops[troopId];
     const troopMeta = $dataItems[$gameVariables.value(240)].meta;
     enemyTroopH.name = troopMeta['TroopNameH'];
     enemyTroopH.members = []; //グループのメンバーを空に
+    const spawnPoolH = $gameVariables.value(228);
+    const spawnPoolHLength = spawnPoolH.length;
+
+    // add enemies to enemy troop
     const battleEnemyPopHOptions = troopMeta['BattleEnemyPopCH'].split(',');
     const enemyCountToSpawn = Number(battleEnemyPopHOptions[Math.floor(Math.random() * battleEnemyPopHOptions.length)]);
-    
     for (let spawnIndex = 1; spawnIndex <= enemyCountToSpawn; spawnIndex++) {
       // get enemy data
       let enemySpawnId = Number(spawnPoolH[Math.floor(Math.random() * spawnPoolHLength)]); //出現エネミースポーン
