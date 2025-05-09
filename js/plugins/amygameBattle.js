@@ -354,7 +354,7 @@ if(!$gameSwitches.value(141)) return;
     };
 */
     if(i >= 2){
-      let value5 = Math.floor( Math.random() * 41) - 20;
+      let value5 = getRandomIndex(41) - 20;
       value5 = Math.round(value * value5 / 100);     
       target.gainHp(-value-value5);
       target.startDamagePopup();
@@ -528,14 +528,14 @@ function ak1CalculateMultiAttackCount(user) {
   const elementAttackRate = user.elementRate(11) * 10;
   
   // Use a single random calculation to determine both checks
-  const randomValue1 = Math.floor(Math.random() * 101);
+  const randomValue1 = getRandomIndex(101);
   
   // Only calculate the second random value if the first check passes
   if (elementAttackRate >= randomValue1) {
     multiAttackCount += 1;
     
     // Calculate second random value only if needed
-    const randomValue2 = randomValue1 + Math.floor(Math.random() * 101);
+    const randomValue2 = randomValue1 + getRandomIndex(101);
     if (elementAttackRate >= randomValue2) {
       multiAttackCount += 2;
     }
@@ -1557,7 +1557,7 @@ enemywin_treasurebox1 = function(id1){
 
 $gameVariables.value(160)[4] = 0;
 $gameVariables.value(160)[7] = 0;
-var value1 = Math.floor( Math.random() * 101);
+var value1 = getRandomIndex(101);
 var value2 = 0;
 var value3 = 0;
 if($gameVariables.value(270) >= 1){
@@ -1603,8 +1603,8 @@ var value1 = $gameMap.event(id1).x;
 var value2 = $gameMap.event(id1).y;
 var value3 = $gamePlayer.x;//プレイヤー座標
 var value4 = $gamePlayer.y;
-var value6 = [-2,-1,0,1,2][Math.floor(Math.random() * 5)];
-var value7 = [-2,-1,0,1,2][Math.floor(Math.random() * 5)];
+var value6 = [-2,-1,0,1,2][getRandomIndex(5)];
+var value7 = [-2,-1,0,1,2][getRandomIndex(5)];
 value1 += value6;
 value2 += value7;
 value0 = $gameMap.eventIdXy(value1, value2);
@@ -1678,7 +1678,7 @@ if($gameVariables.value(240) >= 1){
 if(value10 != 0){
 var arr = value.meta[value10].split(',');
 var value1 = arr1[getRandomIndex(arr1.length)];
-var value2 = Math.floor( Math.random() * 56) + 200;
+var value2 = getRandomIndex(56) + 200;
 var value3 = arr1[getRandomIndex(arr1.length)];
 var value4 = 120;
 var spriteset = SceneManager._scene._spriteset;
@@ -1706,7 +1706,7 @@ if(value10 != 0){
 if(value.meta[value10]){
 var arr = value.meta[value10].split(',');
 var value1 = arr1[getRandomIndex(arr1.length)];
-var value2 = Math.floor( Math.random() * 101) + 100;
+var value2 = getRandomIndex(101) + 100;
 var value3 = arr1[getRandomIndex(arr1.length)];
 var bitmap = ImageManager.loadBitmap("img/parallaxes/",arr[0],Number(arr[4]),true);
 spriteset.addNewBattleback(3, bitmap, 0, value4);
@@ -1736,7 +1736,7 @@ if(value10 != 0){
 if(value.meta[value10]){
 var arr = value.meta[value10].split(',');
 var value1 = arr1[getRandomIndex(arr1.length)];
-var value2 = Math.floor( Math.random() * 101) + 100;
+var value2 = getRandomIndex(101) + 100;
 var value3 = arr1[getRandomIndex(arr1.length)];
 var bitmap = ImageManager.loadBitmap("img/parallaxes/",arr[0],Number(arr[4]),true);
 spriteset.addNewBattleback(4, bitmap, 0, value4);
@@ -1766,7 +1766,7 @@ if(value10 != 0){
 if(value.meta[value10]){
 var arr = value.meta[value10].split(',');
 var value1 = arr1[getRandomIndex(arr1.length)];
-var value2 = Math.floor( Math.random() * 101) + 100;
+var value2 = getRandomIndex(101) + 100;
 var value3 = arr1[getRandomIndex(arr1.length)];
 var bitmap = ImageManager.loadBitmap("img/parallaxes/",arr[0],Number(arr[4]),true);
 spriteset.addNewBattleback(5, bitmap, 0, value4);
@@ -1796,7 +1796,7 @@ if(value10 != 0){
 if(value.meta[value10]){
 var arr = value.meta[value10].split(',');
 var value1 = arr1[getRandomIndex(arr1.length)];
-var value2 = Math.floor( Math.random() * 101) + 100;
+var value2 = getRandomIndex(101) + 100;
 var value3 = arr1[getRandomIndex(arr1.length)];
 var bitmap = ImageManager.loadBitmap("img/parallaxes/",arr[0],Number(arr[4]),true);
 spriteset.addNewBattleback(6, bitmap, 0, value4);
@@ -2736,7 +2736,7 @@ if(level >= 1){
       const extraLevel = Math.floor( Math.random() * $gameVariables.value(232));
       level += extraLevel;
       if(level >= 11){
-        const randomLevel = Math.floor( Math.random() * 101);
+        const randomLevel = getRandomIndex(101);
         if(level >= randomLevel){
           level += 1;
         };
@@ -2802,7 +2802,7 @@ if(enemyId == 30 && $gameVariables.value(343) != 0){//ボスステート処理
         arr2 = target.meta['BossDrop' + j].split(',');
         valueItems = getItemEquipmentSource(Number(arr2[0]));
 
-        if(Number(arr2[2]) >= Math.floor( Math.random() * 101)){
+        if(Number(arr2[2]) >= getRandomIndex(101)){
           $gameTroop.addDropItem(valueItems[Number(arr2[1])]);
         };
   }}};      
@@ -2812,7 +2812,7 @@ if(enemyId == 30 && $gameVariables.value(343) != 0){//ボスステート処理
     if (enemy.meta['Woman']){gameTroopMember.addState(460)};
 } else {
     if (!enemy.meta['Nonsexual']){
-    if(!isHEnemyOrNonAuto() && Math.floor( Math.random() * 11) == 7){
+    if(!isHEnemyOrNonAuto() && getRandomIndex(11) == 7){
       gameTroopMember.addState(460);//雌
     } else {
       gameTroopMember.addState(459);//雄
@@ -2907,7 +2907,7 @@ for (let j = 0; j < arr4.length; j++) {
   };
 };
 const dropUpItem = $dataItems[valueItemDropUpItem];
-const dropCount = Math.floor(Math.random() * 4);
+const dropCount = getRandomIndex(4);
 if (dropCount >= 1) {
   let gameTroopMemberLevel = gameTroopMember.level;
   for (let j = 1; j <= dropCount; j++) {
@@ -3050,7 +3050,7 @@ if(dropCount + defeatsCount <= 6){
 //ドロップするかどうかの確率計算
 drop_probabilityCalculation = function (actorLevel, dropUpItem){
 
-  let drop_probability = Math.floor( Math.random() * 101);
+  let drop_probability = getRandomIndex(101);
   drop_probability += Math.round(actorLevel / 10);  
   if($gameVariables.value(54) == 1){drop_probability += 5};//パーティが一人の場合確率アップ
 
@@ -3126,7 +3126,7 @@ if (canDrop /*&& value14*/){
     };
   };
   
-  const dropMod3 = Math.floor(Math.random() * 100) + 1;
+  const dropMod3 = getRandomIndex(100) + 1;
   if(dropMod1 >= dropMod3){valueDropCount1 += 1};
 
   return valueDropCount1;
@@ -3194,7 +3194,7 @@ drop_walletItemBoxGet = function(value12,id12){
     return;
   }
 
-  const numItemsToGain = Math.floor(Math.random() * 3) + 1;
+  const numItemsToGain = getRandomIndex(3) + 1;
 
   for (let i = 1; i <= numItemsToGain; i++) {
     const randomIndex = getRandomIndex(arr12Length);
@@ -3458,8 +3458,8 @@ const id2 = arr2[getRandomIndex(arr2.length)];
               const valueItem = valueItems[valueDropItems];
               if (id12 == 0) {
                 if (valueItem.price == 0) { value16 = 1 }
-                else if (valueItem.price <= 1000){value16 = Math.floor( Math.random() * 6) + 1}
-                else if (valueItem.price <= 10000){value16 = Math.floor( Math.random() * 3) + 1}
+                else if (valueItem.price <= 1000){value16 = getRandomIndex(6) + 1}
+                else if (valueItem.price <= 10000){value16 = getRandomIndex(3) + 1}
               };
               $gameParty.gainItem(valueItem, value16);
               valueItemBoxOpen += `[\x1bI[${valueItem.iconIndex}]${valueItem.name}×${value16}]`;
@@ -3509,8 +3509,8 @@ if(!$gameSwitches.value(157)){
   if (enemyEntrySe) {
     const enemyEntrySeArr = enemyEntrySe.split(',');
     const name = enemyEntrySeArr[0];
-    const pitch = Math.floor(Math.random() * 21) + Number(enemyEntrySeArr[1]);
-    const volume = Math.floor(Math.random() * 11) + Number(enemyEntrySeArr[2]);
+    const pitch = getRandomIndex(21) + Number(enemyEntrySeArr[1]);
+    const volume = getRandomIndex(11) + Number(enemyEntrySeArr[2]);
     const pan = Math.floor( Math.random() * -101);
     AudioManager.playSe({"name":name,"volume":volume,"pitch":pitch,"pan":pan});
     $gameSwitches.setValue(157,true);
@@ -3665,7 +3665,7 @@ for (let i = 1; i <= 15; i++) {//$dataSkills[id].tpCost
     value2 = value4;
   };
   const value3 = value2;
-  let value1 = Math.floor( Math.random() * 11);
+  let value1 = getRandomIndex(11);
   if(a.isStateAffected(29) && $dataSkills[gameVar346[0]].meta['Select Conditions']){
     value1 += 2;//前衛アタック持ちが後衛の時にアビリティ使用確立アップ
   };
@@ -3692,11 +3692,11 @@ for (let i = 1; i <= 15; i++) {//$dataSkills[id].tpCost
     value12 = value3;
   };
   if( [101,111,121,131,141,151,161,171,181,191,901,911,921].some(function(id){return value12 == id}) ){
-    value1 = Math.floor( Math.random() * 101);
+    value1 = getRandomIndex(101);
     if(a.level >= 30 && value1 >= 51){value12 += 1};
-    value1 = Math.floor( Math.random() * 101);
+    value1 = getRandomIndex(101);
     if(a.level >= 50 && value1 >= 51){value12 += 1};
-    value1 = Math.floor( Math.random() * 101);
+    value1 = getRandomIndex(101);
     if(a.level >= 100 && value1 >= 51){value12 += 1};
   };
 
@@ -4374,7 +4374,7 @@ enemy_preSetup1 = function (eventId) {
     if ($gameMap.event(eventId).isFacingAway($gamePlayer) && $gamePlayer.isPositionBackOf($gameMap.event(eventId))) {
       BattleManager._forceAdvantage = 'Enemy';
     }
-    valueCountSet1 = isHEnemyOrNonAuto() ? 10 : Math.floor(Math.random() * 9) + 11;
+    valueCountSet1 = isHEnemyOrNonAuto() ? 10 : getRandomIndex(9) + 11;
     valueCountSet2 = true;
   } else {
     valueCountSet1 = $gameVariables.value(329); //直前に入れる戦闘グループ名
@@ -4411,7 +4411,7 @@ if($gameSwitches.value(201)){
 state_addbuffdebuff = function(id5,id6,id1,id2,id3,id4){
 
 var value1 = id6;
-var turns = Math.floor( Math.random() * 3) + 3;
+var turns = getRandomIndex(3) + 3;
 if(id5 == 1){
   id2.addBuff(value1, turns);
 } else {

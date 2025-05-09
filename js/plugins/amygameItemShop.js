@@ -1791,7 +1791,7 @@ if(id3 == 2){
 };
 if(id3 == 3){
   var value2 = actor.skillMasteryLevel(valueBusinessSkillId) * 10;
-  var value3 = Math.floor( Math.random() * 101) + value2 + valueRandomSet;
+  var value3 = getRandomIndex(101) + value2 + valueRandomSet;
   if($gameMap.event(id1).event().meta['NoDiscount']){
     var value6 = 1000;
   } else {
@@ -1800,7 +1800,7 @@ if(id3 == 3){
   var value4 = `成功計算式：\\C[2]${value3}\\C[0] >= \\C[1]${value6}\\C[0] \n`;
   $gameVariables.setValue(21,$gameVariables.value(21)+value4);
     if(value3 >= value6){
-      var value5 = Math.floor( Math.random() * 11) + (actor.skillMasteryLevel(valueBusinessSkillId) * 5) + valueRandomSet;
+      var value5 = getRandomIndex(11) + (actor.skillMasteryLevel(valueBusinessSkillId) * 5) + valueRandomSet;
       $gameSelfSwitches.setVariableValue([$gameMap.mapId(), id1, 10], value5);
       valueCountSet3 = 1;
     };
@@ -2001,7 +2001,7 @@ for (var y = $gamePlayer.y-value4; y <= $gamePlayer.y+value4; y++) {
              y >= $gamePlayer.y+1 && event.direction() == 8 ||
              x <= $gamePlayer.x-1 && event.direction() == 6 ||
              x >= $gamePlayer.x+1 && event.direction() == 4 ){
-               var value5 = Math.floor( Math.random() * 101);
+               var value5 = getRandomIndex(101);
                var value6 = 0;
                //
                if(actor.isLearnedSkill(value10)){

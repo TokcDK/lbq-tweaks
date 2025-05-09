@@ -935,7 +935,7 @@ Sprite_BossHP.prototype.updateFlowAnimation = function() {
 Sprite_BossHP.prototype.update_shake_effect = function() {
     if (this._hp_data[7] <= 0) {return;};
 	this._hp_data[7] -= 1;
-	this.y = -3 + this._hp_data[10] + Math.floor(Math.random() * 6);
+	this.y = -3 + this._hp_data[10] + getRandomIndex(6);
 	if (this._hp_data[7] <= 0) {this.y = this._hp_data[10]};
 };
 

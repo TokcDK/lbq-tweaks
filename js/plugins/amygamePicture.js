@@ -68,7 +68,7 @@ if(id7 >= 61 && id4 <= 3){
 var value4 = 0;
 var value5 = 0;
 if(id4 == 3){
-  var value6 = Math.floor( Math.random() * 3);
+  var value6 = getRandomIndex(3);
   var value3 = 1
   if(value6 == 0){var value4 = 50}
   if(value6 == 1){var value4 = -50}
@@ -147,7 +147,7 @@ if($gameScreen.picture(id1)){
   valuePicArr1[8] = id2;//x
   valuePicArr1[9] = id3;//y
   valuePicArr1[10] = id6;//ウェイト
-  valuePicArr1[12] = Math.floor( Math.random() * 51) + 100;//残像の-透明度
+  valuePicArr1[12] = getRandomIndex(51) + 100;//残像の-透明度
   valuePicArr1[13] = id4;//scale
   $gameScreen.showPicture_hue(valuePicArr1[0]-1,valuePicArr1[11],283,valuePicArr1[1],valuePicArr1[2],valuePicArr1[3],
   valuePicArr1[4],valuePicArr1[5],valuePicArr1[6]-valuePicArr1[12],0);
@@ -168,17 +168,17 @@ var valuePicVal1 = 0;
 var valuePicVal2 = 0;
 if(id1 == valueParallelPic1 || id1 == valueParallelPic2 || id1 == valueParallelPic3 || id1 == valueParallelPic4){
   if($gameScreen.picture(id1)){
-    if(valuePicArr1[8] >= 1){var valuePicVal1 = valuePicArr1[8] - Math.floor( Math.random() * 5)}
-    if(valuePicArr1[8] <= -1){var valuePicVal1 = valuePicArr1[8] + Math.floor( Math.random() * 5)}
-    if(valuePicArr1[9] >= 1){var valuePicVal2 = valuePicArr1[9] - Math.floor( Math.random() * 5)}
-    if(valuePicArr1[9] <= -1){var valuePicVal2 = valuePicArr1[9] + Math.floor( Math.random() * 5)}
-    if(valuePicArr1[8] == 0){var valuePicVal1 = Math.floor( Math.random() * 7) - 3}
-    if(valuePicArr1[9] == 0){var valuePicVal2 = Math.floor( Math.random() * 7) - 3}
+    if(valuePicArr1[8] >= 1){var valuePicVal1 = valuePicArr1[8] - getRandomIndex(5)}
+    if(valuePicArr1[8] <= -1){var valuePicVal1 = valuePicArr1[8] + getRandomIndex(5)}
+    if(valuePicArr1[9] >= 1){var valuePicVal2 = valuePicArr1[9] - getRandomIndex(5)}
+    if(valuePicArr1[9] <= -1){var valuePicVal2 = valuePicArr1[9] + getRandomIndex(5)}
+    if(valuePicArr1[8] == 0){var valuePicVal1 = getRandomIndex(7) - 3}
+    if(valuePicArr1[9] == 0){var valuePicVal2 = getRandomIndex(7) - 3}
     //curveFunctions.patternX = curveFunctions.getPattern('jump', [valuePicVal1]);
     //curveFunctions.patternY = curveFunctions.getPattern('jump', [valuePicVal2]);
     if(valuePicArr1[13] == 0){
-      var valuePicVal3 = Math.floor( Math.random() * 3);
-      var valuePicVal4 = Math.floor( Math.random() * 3);
+      var valuePicVal3 = getRandomIndex(3);
+      var valuePicVal4 = getRandomIndex(3);
     } else {
       var valuePicVal3 = valuePicArr1[13];
       var valuePicVal4 = valuePicArr1[13];
@@ -189,10 +189,10 @@ if(id1 == valueParallelPic1 || id1 == valueParallelPic2 || id1 == valueParallelP
     curveFunctions.patternY = curveFunctions.getPattern('spline', arr1);
     curveFunctions.patternScaleX = curveFunctions.getPattern('jump', [valuePicVal3]);
     curveFunctions.patternScaleY = curveFunctions.getPattern('jump', [valuePicVal4]);
-    valuePicWait += valuePicArr1[10] - Math.floor( Math.random() * 5);
+    valuePicWait += valuePicArr1[10] - getRandomIndex(5);
     $gameScreen.movePicture(valuePicArr1[0],valuePicArr1[1],valuePicArr1[2],valuePicArr1[3],
     valuePicArr1[4],valuePicArr1[5],valuePicArr1[6],valuePicArr1[7],valuePicWait);
-    var valuePicVal4 = Math.floor( Math.random() * 4) + 1;
+    var valuePicVal4 = getRandomIndex(4) + 1;
     var valuePicVal5 = valuePicWait - valuePicVal4;
     if(valuePicVal5 <= 1){var valuePicVal5 = 2}
     if(id1 == valueParallelPic1){
@@ -363,8 +363,8 @@ pic_eraseP = function(id1,array){
 
 picture_motion1("smooth",[0]);
 if(id1 == 1){
-  var value11 = Math.floor( Math.random() * 21) + 40;
-  var value12 = Math.floor( Math.random() * 4);
+  var value11 = getRandomIndex(21) + 40;
+  var value12 = getRandomIndex(4);
   var value13 = 0;
   var value14 = 0;
   if(value12 == 0){var value13 = 50}
@@ -841,10 +841,10 @@ if($gameScreen.picture(id1)){
   if(!!$gameMap.event(1)) {
     $gameMap.event(1).forceMoveRoute({
     "list":[
-      {"code":45,"parameters": ["if($gameScreen.picture(valueCharaWaitCountarray1[1])){$gameScreen.movePicture(valueCharaWaitCountarray1[1],1,valueCharaWaitCountarray1[2],valueCharaWaitCountarray1[3],valueCharaWaitCountarray1[4],valueCharaWaitCountarray1[5],valueCharaWaitCountarray1[6],valueCharaWaitCountarray1[7],valueCharaWaitCountarray1[8] + (Math.floor( Math.random() * 11) - 5))}"]},
-      {"code":15, "parameters":[valueCharaWaitCountarray1[8] + (Math.floor( Math.random() * 11) - 5)]},
-      {"code":45,"parameters": ["if($gameScreen.picture(valueCharaWaitCountarray1[1])){$gameScreen.movePicture(valueCharaWaitCountarray1[1],1,valueCharaWaitCountarray2[2] + (Math.floor( Math.random() * 3) - 2),valueCharaWaitCountarray2[3] + (Math.floor( Math.random() * 3) - 2),valueCharaWaitCountarray2[4] + (Math.floor( Math.random() * 3) - 2),valueCharaWaitCountarray2[5] + (Math.floor( Math.random() * 3) - 2),valueCharaWaitCountarray2[6],valueCharaWaitCountarray2[7],valueCharaWaitCountarray1[8] + (Math.floor( Math.random() * 11) - 5))}"]},
-      {"code":15, "parameters":[valueCharaWaitCountarray1[8] + (Math.floor( Math.random() * 11) - 5)]},
+      {"code":45,"parameters": ["if($gameScreen.picture(valueCharaWaitCountarray1[1])){$gameScreen.movePicture(valueCharaWaitCountarray1[1],1,valueCharaWaitCountarray1[2],valueCharaWaitCountarray1[3],valueCharaWaitCountarray1[4],valueCharaWaitCountarray1[5],valueCharaWaitCountarray1[6],valueCharaWaitCountarray1[7],valueCharaWaitCountarray1[8] + (getRandomIndex(11) - 5))}"]},
+      {"code":15, "parameters":[valueCharaWaitCountarray1[8] + (getRandomIndex(11) - 5)]},
+      {"code":45,"parameters": ["if($gameScreen.picture(valueCharaWaitCountarray1[1])){$gameScreen.movePicture(valueCharaWaitCountarray1[1],1,valueCharaWaitCountarray2[2] + (getRandomIndex(3) - 2),valueCharaWaitCountarray2[3] + (getRandomIndex(3) - 2),valueCharaWaitCountarray2[4] + (getRandomIndex(3) - 2),valueCharaWaitCountarray2[5] + (getRandomIndex(3) - 2),valueCharaWaitCountarray2[6],valueCharaWaitCountarray2[7],valueCharaWaitCountarray1[8] + (getRandomIndex(11) - 5))}"]},
+      {"code":15, "parameters":[valueCharaWaitCountarray1[8] + (getRandomIndex(11) - 5)]},
     {"code":0}],"repeat":true,"skippable":true});
   }
 }

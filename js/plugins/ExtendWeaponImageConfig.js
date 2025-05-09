@@ -158,11 +158,11 @@ Game_Actor.prototype.performAttack = function() {
     var attackMotion = $dataSystem.attackMotions[wtypeId];
     var rand = 0;
 
-   // console.log( Math.floor( Math.random() * 2 ) );
+   // console.log( getRandomIndex(2) );
 
     if(wtypeId !== 0){
         if( wtypeId2 !== 0 ){
-            this.inputNote( weapons[Math.floor( Math.random()*2 )] );
+            this.inputNote( weapons[getRandomIndex(2)] );
         } else{
             this.inputNote(weapons[0]);
         }

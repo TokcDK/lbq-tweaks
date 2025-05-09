@@ -699,7 +699,7 @@ if(!actor.isStateAffected(83) && actor.isLearnedSkill(65)){
   if($gameVariables.value(400 + value1) >= 1){
     var value2 = $gameVariables.value($gameVariables.value(20)+380)[3];
     if(value2 >= 1){
-      var value3 = Math.floor( Math.random() * 101);
+      var value3 = getRandomIndex(101);
       if(value2 >= value3 || actor.battleSkillsRaw().includes(873) || actor.isStateAffected(75)){
         if(actor.battleSkillsRaw().includes(874) || actor.isStateAffected(76)){
           var value5 = `${actor.name()}は\\C[27]${$dataSkills[874].name}\\C[0]の効果により受精を退けた。`;
@@ -1515,12 +1515,12 @@ if($gameVariables.value(402) >= 100){
 //性感開発度に応じて絶頂時に潮吹きと失禁回数+
 if(actor.skillMasteryLevel(54) >= 3){
   if($gameVariables.value(414) >= 1){
-    var value1 = Math.floor( Math.random() * 101);
+    var value1 = getRandomIndex(101);
     var value1 = value1 + (actor.skillMasteryLevel(54) * 10);
     if(value1 >= 80){
       $gameVariables.setValue(425, $gameVariables.value(425)+1);
     };
-    var value1 = Math.floor( Math.random() * 101);
+    var value1 = getRandomIndex(101);
     var value1 = value1 + (actor.skillMasteryLevel(54) * 10);
     if(value1 >= 110){
       $gameVariables.setValue(424, $gameVariables.value(424)+1);
@@ -1558,15 +1558,15 @@ var start = 1; var end = 30;
   if(!actor.battleSkillsRaw().includes(867)){
     if(!$gameParty.inBattle() && $gameVariables.value(414) >= 1){//絶頂で発情鎮静。戦闘中はコモン113で行う
       var value1 = 0;
-      if(actor.isLearnedSkill(61)){value1 += Math.floor( Math.random() * 1)};
-      if(actor.isLearnedSkill(62)){value1 += Math.floor( Math.random() * 2)};
-      if(actor.isLearnedSkill(63)){value1 += Math.floor( Math.random() * 3)};
-      if(actor.isLearnedSkill(64)){value1 += Math.floor( Math.random() * 4)};
-      if(actor.isLearnedSkill(65)){value1 += Math.floor( Math.random() * 5)};
-      if(actor.isLearnedSkill(66)){value1 += Math.floor( Math.random() * 6)};
-      if(actor.isLearnedSkill(67)){value1 += Math.floor( Math.random() * 6)};
-      if(actor.isLearnedSkill(68)){value1 += Math.floor( Math.random() * 6)};
-      if(actor.isLearnedSkill(69)){value1 += Math.floor( Math.random() * 6)};
+      if(actor.isLearnedSkill(61)){value1 += getRandomIndex(1)};
+      if(actor.isLearnedSkill(62)){value1 += getRandomIndex(2)};
+      if(actor.isLearnedSkill(63)){value1 += getRandomIndex(3)};
+      if(actor.isLearnedSkill(64)){value1 += getRandomIndex(4)};
+      if(actor.isLearnedSkill(65)){value1 += getRandomIndex(5)};
+      if(actor.isLearnedSkill(66)){value1 += getRandomIndex(6)};
+      if(actor.isLearnedSkill(67)){value1 += getRandomIndex(6)};
+      if(actor.isLearnedSkill(68)){value1 += getRandomIndex(6)};
+      if(actor.isLearnedSkill(69)){value1 += getRandomIndex(6)};
       $gameVariables.value($gameVariables.value(20)+380)[2] = value1;
     };
   };
@@ -1672,9 +1672,9 @@ var list = $gameVariables.value(247);
 list.forEach(function(id) {
   var actor = $gameActors.actor(id);
   if(actor.isLearnedSkill(value1)){
-    $gameVariables.value(id+380)[3] = Math.floor( Math.random() * 11);
+    $gameVariables.value(id+380)[3] = getRandomIndex(11);
     if(actor.battleSkillsRaw().includes(870)){
-      $gameVariables.value(id+380)[3] += Math.floor( Math.random() * 51);
+      $gameVariables.value(id+380)[3] += getRandomIndex(51);
     };
   } else {
     $gameVariables.value(id+380)[3] = 0;
@@ -1892,8 +1892,8 @@ if(id4 >= 100){
   picture_motion1("linear",[0]);
 };
 var arr2 = [-50,0,50,-100,100];
-var value3 = Math.floor( Math.random() * 201) - 100;
-var value4 = Math.floor( Math.random() * 201) - 100;
+var value3 = getRandomIndex(201) - 100;
+var value4 = getRandomIndex(201) - 100;
 var value5 = arr1[getRandomIndex(arr1.length)];
 $gameScreen.setDTextPicture(value5, id4);
 $gameScreen.dWindowFrame = 'ON';
@@ -1913,7 +1913,7 @@ $gameVariables.setValue(20,id1);
 if($gameActors.actor($gameVariables.value(20)).isStateAffected(83)){
   var actor = $gameActors.actor($gameVariables.value(20));
   //actor.addStateCounter(83, +10);
-  var value1 = Math.floor( Math.random() * 101);
+  var value1 = getRandomIndex(101);
     if(true){
       actor.removeState(83);
       actor.removeStateCounter(83);
@@ -2252,7 +2252,7 @@ if (actor._stateCounter[value1] >= 1) {
 var value2 = $gameVariables.value($gameVariables.value(20)+380)[4];
 var value3 = $gameVariables.value($gameVariables.value(20)+380)[1];
 var value4 = Math.ceil((value3+1) / 10);//0の場合の対策で+1
-var value5 = Math.floor( Math.random() * 101);
+var value5 = getRandomIndex(101);
 value4 += actor._stateCounter[value1];
 if(value4 >= value5){
   $gameSwitches.setValue(437,true);
@@ -2334,8 +2334,8 @@ if(id1 == 0){
   for (var i = 0; i <= arr1.length-1; i++) {
     $gameScreen._particle.particleClear(arr1[i]);
   };
-  var value1 = Math.floor( Math.random() * 41) + 180;
-  var value2 = Math.floor( Math.random() * 21) + 40;
+  var value1 = getRandomIndex(41) + 180;
+  var value2 = getRandomIndex(21) + 40;
   $gameScreen.startFlash([255,119,255,value1], value2);
   var value1 = 'hScene_Direct1';
   $gameScreen._particle.particleSet(0,value1,'screen','def','screen');
@@ -2344,8 +2344,8 @@ if(id1 == 1){//ピストン弱
   $gameVariables.setValue(194,$gameVariables.value(194)+1);
   $gameSystem.setBgsLine($gameVariables.value(194));
   var value1 = "21_Piston1";
-  var value2 = Math.floor( Math.random() * 21) + 90;
-  var value3 = Math.floor( Math.random() * 31) + 90;
+  var value2 = getRandomIndex(21) + 90;
+  var value3 = getRandomIndex(31) + 90;
   AudioManager.playBgs({"name":value1,"volume":value2,"pitch":value3,"pan":0});
   if(id4 >= 1 && id2 <= 9){
     $gameSystem.setBgsLine(10 + $gameVariables.value(20));
@@ -2358,8 +2358,8 @@ if(id1 == 1){//ピストン弱
     };
     var value5 = arr1[getRandomIndex(arr1.length)];
     var value1 = "51_pattern" + id4 + "_" + value4 + "_" + value5;
-    var value2 = Math.floor( Math.random() * 21) + 100;
-    var value3 = Math.floor( Math.random() * 21) + 100;
+    var value2 = getRandomIndex(21) + 100;
+    var value3 = getRandomIndex(21) + 100;
     AudioManager.playBgs({"name":value1,"volume":value2,"pitch":value3,"pan":0});
   };
 };
@@ -2367,8 +2367,8 @@ if(id1 == 2){//ピストン強
   $gameVariables.setValue(194,$gameVariables.value(194)+1);
   $gameSystem.setBgsLine($gameVariables.value(194));
   var value1 = "21_Piston1";
-  var value2 = Math.floor( Math.random() * 21) + 90;
-  var value3 = Math.floor( Math.random() * 31) + 120;
+  var value2 = getRandomIndex(21) + 90;
+  var value3 = getRandomIndex(31) + 120;
   AudioManager.playBgs({"name":value1,"volume":value2,"pitch":value3,"pan":0});
   if(id4 >= 1 && id2 <= 9){
     $gameSystem.setBgsLine(10 + $gameVariables.value(20));
@@ -2381,8 +2381,8 @@ if(id1 == 2){//ピストン強
     };
     var value5 = arr1[getRandomIndex(arr1.length)];
     var value1 = "51_pattern" + id4 + "_" + value4 + "_" + value5;
-    var value2 = Math.floor( Math.random() * 21) + 70;
-    var value3 = Math.floor( Math.random() * 21) + 110;
+    var value2 = getRandomIndex(21) + 70;
+    var value3 = getRandomIndex(21) + 110;
     AudioManager.playBgs({"name":value1,"volume":value2,"pitch":value3,"pan":0});
   };
 };
@@ -2390,14 +2390,14 @@ if(id1 == 3){//愛液
   $gameVariables.setValue(194,$gameVariables.value(194)+1);
   $gameSystem.setBgsLine($gameVariables.value(194));
   var value1 = "21_LoveJuice";
-  var value2 = Math.floor( Math.random() * 31) + 80;
-  var value3 = Math.floor( Math.random() * 41) + 80;
+  var value2 = getRandomIndex(31) + 80;
+  var value3 = getRandomIndex(41) + 80;
   AudioManager.playBgs({"name":value1,"volume":value2,"pitch":value3,"pan":0});
   $gameVariables.setValue(194,$gameVariables.value(194)+1);
   $gameSystem.setBgsLine($gameVariables.value(194));
   var value1 = "21_LoveJuice";
-  var value2 = Math.floor( Math.random() * 31) + 80;
-  var value3 = Math.floor( Math.random() * 41) + 50;
+  var value2 = getRandomIndex(31) + 80;
+  var value3 = getRandomIndex(41) + 50;
   AudioManager.playBgs({"name":value1,"volume":value2,"pitch":value3,"pan":0});
   if(id4 >= 1 && id2 <= 9){
     $gameSystem.setBgsLine(10 + $gameVariables.value(20));
@@ -2410,8 +2410,8 @@ if(id1 == 3){//愛液
     };
     var value5 = arr1[getRandomIndex(arr1.length)];
     var value1 = "51_pattern" + id4 + "_" + value4 + "_" + value5;
-    var value2 = Math.floor( Math.random() * 21) + 70;
-    var value3 = Math.floor( Math.random() * 21) + 100;
+    var value2 = getRandomIndex(21) + 70;
+    var value3 = getRandomIndex(21) + 100;
     AudioManager.playBgs({"name":value1,"volume":value2,"pitch":value3,"pan":0});
   };
 };
@@ -2419,14 +2419,14 @@ if(id1 == 4){//キス
   $gameVariables.setValue(194,$gameVariables.value(194)+1);
   $gameSystem.setBgsLine($gameVariables.value(194));
   var value1 = "21_LoveJuice";
-  var value2 = Math.floor( Math.random() * 31) + 80;
-  var value3 = Math.floor( Math.random() * 41) + 80;
+  var value2 = getRandomIndex(31) + 80;
+  var value3 = getRandomIndex(41) + 80;
   AudioManager.playBgs({"name":value1,"volume":value2,"pitch":value3,"pan":0});
   $gameVariables.setValue(194,$gameVariables.value(194)+1);
   $gameSystem.setBgsLine($gameVariables.value(194));
   var value1 = "21_LoveJuice";
-  var value2 = Math.floor( Math.random() * 31) + 80;
-  var value3 = Math.floor( Math.random() * 41) + 50;
+  var value2 = getRandomIndex(31) + 80;
+  var value3 = getRandomIndex(41) + 50;
   AudioManager.playBgs({"name":value1,"volume":value2,"pitch":value3,"pan":0});
   if(id4 >= 1 && id2 <= 9){
     $gameSystem.setBgsLine(10 + $gameVariables.value(20));
@@ -2439,8 +2439,8 @@ if(id1 == 4){//キス
     };
     var value5 = arr1[getRandomIndex(arr1.length)];
     var value1 = "51_pattern" + id4 + "_" + value4 + "_" + value5;
-    var value2 = Math.floor( Math.random() * 21) + 70;
-    var value3 = Math.floor( Math.random() * 31) + 90;
+    var value2 = getRandomIndex(21) + 70;
+    var value3 = getRandomIndex(31) + 90;
     AudioManager.playBgs({"name":value1,"volume":value2,"pitch":value3,"pan":0});
   };
 };
@@ -2448,14 +2448,14 @@ if(id1 == 5){//フェラ
   $gameVariables.setValue(194,$gameVariables.value(194)+1);
   $gameSystem.setBgsLine($gameVariables.value(194));
   var value1 = "21_LoveJuice";
-  var value2 = Math.floor( Math.random() * 31) + 80;
-  var value3 = Math.floor( Math.random() * 41) + 80;
+  var value2 = getRandomIndex(31) + 80;
+  var value3 = getRandomIndex(41) + 80;
   AudioManager.playBgs({"name":value1,"volume":value2,"pitch":value3,"pan":0});
   $gameVariables.setValue(194,$gameVariables.value(194)+1);
   $gameSystem.setBgsLine($gameVariables.value(194));
   var value1 = "21_LoveJuice";
-  var value2 = Math.floor( Math.random() * 31) + 80;
-  var value3 = Math.floor( Math.random() * 41) + 50;
+  var value2 = getRandomIndex(31) + 80;
+  var value3 = getRandomIndex(41) + 50;
   AudioManager.playBgs({"name":value1,"volume":value2,"pitch":value3,"pan":0});
   if(id4 >= 1){
     $gameSystem.setBgsLine(10 + $gameVariables.value(20));
@@ -2468,8 +2468,8 @@ if(id1 == 5){//フェラ
     };
     var value5 = arr1[getRandomIndex(arr1.length)];
     var value1 = "51_pattern" + id4 + "_" + value4 + "_" + value5;
-    var value2 = Math.floor( Math.random() * 21) + 70;
-    var value3 = Math.floor( Math.random() * 31) + 90;
+    var value2 = getRandomIndex(21) + 70;
+    var value3 = getRandomIndex(31) + 90;
     AudioManager.playBgs({"name":value1,"volume":value2,"pitch":value3,"pan":0});
   };
 };
@@ -2477,8 +2477,8 @@ if(id1 == 6){//揉み
   $gameVariables.setValue(194,$gameVariables.value(194)+1);
   $gameSystem.setBgsLine($gameVariables.value(194));
   var value1 = "21_BustKnead";
-  var value2 = Math.floor( Math.random() * 11) + 10;
-  var value3 = Math.floor( Math.random() * 41) + 80;
+  var value2 = getRandomIndex(11) + 10;
+  var value3 = getRandomIndex(41) + 80;
   AudioManager.playBgs({"name":value1,"volume":value2,"pitch":value3,"pan":0});
   if(id4 >= 1 && id2 <= 9){
     $gameSystem.setBgsLine(10 + $gameVariables.value(20));
@@ -2491,8 +2491,8 @@ if(id1 == 6){//揉み
     };
     var value5 = arr1[getRandomIndex(arr1.length)];
     var value1 = "51_pattern" + id4 + "_" + value4 + "_" + value5;
-    var value2 = Math.floor( Math.random() * 21) + 70;
-    var value3 = Math.floor( Math.random() * 21) + 100;
+    var value2 = getRandomIndex(21) + 70;
+    var value3 = getRandomIndex(21) + 100;
     AudioManager.playBgs({"name":value1,"volume":value2,"pitch":value3,"pan":0});
   };
 };
@@ -2500,8 +2500,8 @@ if(id1 == 7){//機械振動
   $gameVariables.setValue(194,$gameVariables.value(194)+1);
   $gameSystem.setBgsLine($gameVariables.value(194));
   var value1 = "21_HandyMassager2";
-  var value2 = Math.floor( Math.random() * 21) + 50;
-  var value3 = Math.floor( Math.random() * 21) + 80;
+  var value2 = getRandomIndex(21) + 50;
+  var value3 = getRandomIndex(21) + 80;
   AudioManager.playBgs({"name":value1,"volume":value2,"pitch":value3,"pan":0});
   if(id4 >= 1 && id2 <= 9){
     $gameSystem.setBgsLine(10 + $gameVariables.value(20));
@@ -2514,8 +2514,8 @@ if(id1 == 7){//機械振動
     };
     var value5 = arr1[getRandomIndex(arr1.length)];
     var value1 = "51_pattern" + id4 + "_" + value4 + "_" + value5;
-    var value2 = Math.floor( Math.random() * 21) + 70;
-    var value3 = Math.floor( Math.random() * 21) + 100;
+    var value2 = getRandomIndex(21) + 70;
+    var value3 = getRandomIndex(21) + 100;
     AudioManager.playBgs({"name":value1,"volume":value2,"pitch":value3,"pan":0});
   };
 };
@@ -2523,8 +2523,8 @@ if(id1 == 8){//機械振動激しく
   $gameVariables.setValue(194,$gameVariables.value(194)+1);
   $gameSystem.setBgsLine($gameVariables.value(194));
   var value1 = "21_HandyMassager2";
-  var value2 = Math.floor( Math.random() * 21) + 60;
-  var value3 = Math.floor( Math.random() * 31) + 100;
+  var value2 = getRandomIndex(21) + 60;
+  var value3 = getRandomIndex(31) + 100;
   AudioManager.playBgs({"name":value1,"volume":value2,"pitch":value3,"pan":0});
   if(id4 >= 1 && id2 <= 9){
     $gameSystem.setBgsLine(10 + $gameVariables.value(20));
@@ -2537,44 +2537,44 @@ if(id1 == 8){//機械振動激しく
     };
     var value5 = arr1[getRandomIndex(arr1.length)];
     var value1 = "51_pattern" + id4 + "_" + value4 + "_" + value5;
-    var value2 = Math.floor( Math.random() * 21) + 70;
-    var value3 = Math.floor( Math.random() * 21) + 100;
+    var value2 = getRandomIndex(21) + 70;
+    var value3 = getRandomIndex(21) + 100;
     AudioManager.playBgs({"name":value1,"volume":value2,"pitch":value3,"pan":0});
   };
 };
 if(id1 == 11){//挿入
   adv_partDirectPlay(7);
   if(valueSexWait == 0){
-    var value1 = Math.floor( Math.random() * 41) + 160;
-    var value2 = Math.floor( Math.random() * 21) + 50;
-    var value3 = Math.floor( Math.random() * 5) + 6;
+    var value1 = getRandomIndex(41) + 160;
+    var value2 = getRandomIndex(21) + 50;
+    var value3 = getRandomIndex(5) + 6;
     $gameScreen.startFlash([255,119,255,value1], value2);
     $gameScreen.startShake(value3, value3, value2);
     var array = ['Z_zamen1','Z_zamen2'];
     var value1 = array[getRandomIndex(array.length)];
-    var value2 = Math.floor( Math.random() * 21) + 100;
-    var value3 = Math.floor( Math.random() * 41) + 80;
+    var value2 = getRandomIndex(21) + 100;
+    var value3 = getRandomIndex(41) + 80;
     AudioManager.playSe({"name":value1,"volume":value2,"pitch":value3,"pan":0});
   };
   if(valueSexWait >= 1){
-    var value1 = Math.floor( Math.random() * 41) + 160;
-    var value2 = Math.floor( Math.random() * 21) + 50;
+    var value1 = getRandomIndex(41) + 160;
+    var value2 = getRandomIndex(21) + 50;
     $gameScreen.startFlash([255,119,255,value1], value2);
     var array = ['Z_zamen1','Z_zamen2'];
     var value1 = array[getRandomIndex(array.length)];
-    var value2 = Math.floor( Math.random() * 21) + 100;
-    var value3 = Math.floor( Math.random() * 41) + 80;
+    var value2 = getRandomIndex(21) + 100;
+    var value3 = getRandomIndex(41) + 80;
     AudioManager.playSe({"name":value1,"volume":value2,"pitch":value3,"pan":0});
     var array = ['Z_Insert'];
     var value1 = array[getRandomIndex(array.length)];
-    var value2 = Math.floor( Math.random() * 21) + 150;
-    var value3 = Math.floor( Math.random() * 41) + 80;
+    var value2 = getRandomIndex(21) + 150;
+    var value3 = getRandomIndex(41) + 80;
     AudioManager.playSe({"name":value1,"volume":value2,"pitch":value3,"pan":0});
   };
   if(valueSexWait >= 1){
     valueSexWait = 0;
   } else {
-    valueSexWait = Math.floor( Math.random() * 21) + 20;
+    valueSexWait = getRandomIndex(21) + 20;
   };
 };
 if(id1 == 12){//射精.pic_move1(88,0,0,400,400,0,90);ピクチャ拡大消去
@@ -2582,36 +2582,36 @@ if(id1 == 12){//射精.pic_move1(88,0,0,400,400,0,90);ピクチャ拡大消去
   adv_partDirectSet(0);
   sex_direction(0);//集中線終了
   if(valueSexWait == 0){
-    var value1 = Math.floor( Math.random() * 41) + 160;
-    var value2 = Math.floor( Math.random() * 21) + 50;
-    var value3 = Math.floor( Math.random() * 5) + 6;
+    var value1 = getRandomIndex(41) + 160;
+    var value2 = getRandomIndex(21) + 50;
+    var value3 = getRandomIndex(5) + 6;
     $gameScreen.startFlash([255,119,255,value1], value2);
     $gameScreen.startShake(value3, value3, value2);
     var array = ['Z_zamen'];
     var value1 = array[getRandomIndex(array.length)];
-    var value2 = Math.floor( Math.random() * 21) + 100;
-    var value3 = Math.floor( Math.random() * 51) + 100;
+    var value2 = getRandomIndex(21) + 100;
+    var value3 = getRandomIndex(51) + 100;
     AudioManager.playSe({"name":value1,"volume":value2,"pitch":value3,"pan":0});
   };
   if(valueSexWait >= 1){
-    var value1 = Math.floor( Math.random() * 41) + 160;
-    var value2 = Math.floor( Math.random() * 21) + 50;
+    var value1 = getRandomIndex(41) + 160;
+    var value2 = getRandomIndex(21) + 50;
     $gameScreen.startFlash([255,119,255,value1], value2);
     var array = ['Z_zamen1','Z_zamen2'];
     var value1 = array[getRandomIndex(array.length)];
-    var value2 = Math.floor( Math.random() * 21) + 100;
-    var value3 = Math.floor( Math.random() * 41) + 80;
+    var value2 = getRandomIndex(21) + 100;
+    var value3 = getRandomIndex(41) + 80;
     AudioManager.playSe({"name":value1,"volume":value2,"pitch":value3,"pan":0});
     var array = ['Z_zamen1','Z_zamen2'];
     var value1 = array[getRandomIndex(array.length)];
-    var value2 = Math.floor( Math.random() * 21) + 100;
-    var value3 = Math.floor( Math.random() * 41) + 80;
+    var value2 = getRandomIndex(21) + 100;
+    var value3 = getRandomIndex(41) + 80;
     AudioManager.playSe({"name":value1,"volume":value2,"pitch":value3,"pan":0});
   };
   if(valueSexWait >= 1){
     valueSexWait = 0;
   } else {
-    valueSexWait = Math.floor( Math.random() * 11) + 20;
+    valueSexWait = getRandomIndex(11) + 20;
   };
 };
 if(id1 == 13){//射精以外で終了.
@@ -2619,36 +2619,36 @@ if(id1 == 13){//射精以外で終了.
   adv_partDirectSet(0);
   sex_direction(0);//集中線終了
   if(valueSexWait == 0){
-    var value1 = Math.floor( Math.random() * 41) + 160;
-    var value2 = Math.floor( Math.random() * 21) + 50;
-    var value3 = Math.floor( Math.random() * 5) + 6;
+    var value1 = getRandomIndex(41) + 160;
+    var value2 = getRandomIndex(21) + 50;
+    var value3 = getRandomIndex(5) + 6;
     $gameScreen.startFlash([255,119,255,value1], value2);
     $gameScreen.startShake(value3, value3, value2);
     var array = ['Z_zamen1','Z_zamen2'];
     var value1 = array[getRandomIndex(array.length)];
-    var value2 = Math.floor( Math.random() * 21) + 100;
-    var value3 = Math.floor( Math.random() * 41) + 80;
+    var value2 = getRandomIndex(21) + 100;
+    var value3 = getRandomIndex(41) + 80;
     AudioManager.playSe({"name":value1,"volume":value2,"pitch":value3,"pan":0});
   };
   if(valueSexWait >= 1){
-    var value1 = Math.floor( Math.random() * 41) + 160;
-    var value2 = Math.floor( Math.random() * 21) + 50;
+    var value1 = getRandomIndex(41) + 160;
+    var value2 = getRandomIndex(21) + 50;
     $gameScreen.startFlash([255,119,255,value1], value2);
     var array = ['Z_zamen1','Z_zamen2'];
     var value1 = array[getRandomIndex(array.length)];
-    var value2 = Math.floor( Math.random() * 21) + 100;
-    var value3 = Math.floor( Math.random() * 41) + 80;
+    var value2 = getRandomIndex(21) + 100;
+    var value3 = getRandomIndex(41) + 80;
     AudioManager.playSe({"name":value1,"volume":value2,"pitch":value3,"pan":0});
     var array = ['Z_zamen1','Z_zamen2'];
     var value1 = array[getRandomIndex(array.length)];
-    var value2 = Math.floor( Math.random() * 21) + 100;
-    var value3 = Math.floor( Math.random() * 41) + 80;
+    var value2 = getRandomIndex(21) + 100;
+    var value3 = getRandomIndex(41) + 80;
     AudioManager.playSe({"name":value1,"volume":value2,"pitch":value3,"pan":0});
   };
   if(valueSexWait >= 1){
     valueSexWait = 0;
   } else {
-    valueSexWait = Math.floor( Math.random() * 11) + 20;
+    valueSexWait = getRandomIndex(11) + 20;
   };
 };
 if(id1 == 51){//写真撮影
@@ -2699,8 +2699,8 @@ if(id1 == 1){//感じる
   //$gameScreen._particle.particleExceed(value1,1);
   var array = ['Z_HeartBeatDarty'];
   var value1 = array[getRandomIndex(array.length)];
-  var value2 = Math.floor( Math.random() * 21) + 100;
-  var value3 = Math.floor( Math.random() * 41) + 60;
+  var value2 = getRandomIndex(21) + 100;
+  var value3 = getRandomIndex(41) + 60;
   AudioManager.playSe({"name":value1,"volume":value2,"pitch":value3,"pan":0});
   filter_direct(9,640-128,368,40);
 };
@@ -2712,8 +2712,8 @@ if(id1 == 2){//激しく感じる
   //$gameScreen._particle.particleExceed(value1,0.8);
   var array = ['Z_HeartBeatDarty'];
   var value1 = array[getRandomIndex(array.length)];
-  var value2 = Math.floor( Math.random() * 21) + 100;
-  var value3 = Math.floor( Math.random() * 41) + 40;
+  var value2 = getRandomIndex(21) + 100;
+  var value3 = getRandomIndex(41) + 40;
   AudioManager.playSe({"name":value1,"volume":value2,"pitch":value3,"pan":0});
   filter_direct(9,640-128,368,60);
 };
@@ -2752,8 +2752,8 @@ if(id1 == 4){//軽く感じる
   //$gameScreen._particle.particleExceed(value1,1.5);
   var array = ['Z_HeartBeatDarty'];
   var value1 = array[getRandomIndex(array.length)];
-  var value2 = Math.floor( Math.random() * 21) + 100;
-  var value3 = Math.floor( Math.random() * 41) + 80;
+  var value2 = getRandomIndex(21) + 100;
+  var value3 = getRandomIndex(41) + 80;
   AudioManager.playSe({"name":value1,"volume":value2,"pitch":value3,"pan":0});
   filter_direct(9,640-128,368,30);
 };
@@ -2764,8 +2764,8 @@ if(id1 == 5){//乳見せ
   //$gameScreen._particle.particleExceed(value1,1.5);
   var array = ['ZH_Knead1','ZH_Knead1','ZH_Knead1'];
   var value1 = array[getRandomIndex(array.length)];
-  var value2 = Math.floor( Math.random() * 21) + 100;
-  var value3 = Math.floor( Math.random() * 41) + 80;
+  var value2 = getRandomIndex(21) + 100;
+  var value3 = getRandomIndex(41) + 80;
   AudioManager.playSe({"name":value1,"volume":value2,"pitch":value3,"pan":0});
   $gameScreen.startFlash([255,119,255,200], 60)
 };

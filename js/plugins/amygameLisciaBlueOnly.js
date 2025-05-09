@@ -1736,13 +1736,13 @@ valuePic1 = 71;
 var actor = $gameActors.actor($gameVariables.value(2));
 if($gameSwitches.value(202) && $gameSwitches.value(204)){
   var value3 = 1;
-  var value4 = Math.floor( Math.random() * 3) + 1;
-  var value5 = Math.floor( Math.random() * 2) + 0;
+  var value4 = getRandomIndex(3) + 1;
+  var value5 = getRandomIndex(2) + 0;
   var value6 = 5;
   var arr1 = [8,8,8,11,8,8];var value7 = arr1[getRandomIndex(arr1.length)];
 } else {
   var value3 = 2;
-  var value4 = Math.floor( Math.random() * 2) + 2;
+  var value4 = getRandomIndex(2) + 2;
   var value5 = 2;
   var value6 = 5;
   var value7 = 9;
@@ -1758,7 +1758,7 @@ if(actor.isStateAffected(67)){
   var value7 = 10;
 };
 if($gameSwitches.value(465)){
-  var value5 = Math.floor( Math.random() * 2) + 0;
+  var value5 = getRandomIndex(2) + 0;
   var value6 = 5;
   var arr1 = [8,8,8,11,8,8];var value7 = arr1[getRandomIndex(arr1.length)];
 };
@@ -1805,7 +1805,7 @@ if(actor.isLearnedSkill(66)){
 if(value22 >= 1){array.push("Zev_StaySleep2-" + value22)};
 var value23 = 0;
 if(value14 >= 49){
-  var value15 = Math.floor( Math.random() * 4);
+  var value15 = getRandomIndex(4);
   if(value15 >= 2){var value23 = 1};
   if(value15 == 1){var value23 = 2};
   if(value15 == 0){var value23 = 3};
@@ -1813,7 +1813,7 @@ if(value14 >= 49){
 if(value23 >= 1){array.push("Zev_StaySleep3-" + value23)};
 var value24 = 1;
 if(actor.isStateAffected(67)){var value24 = 2};
-var value16 = Math.floor( Math.random() * 10);
+var value16 = getRandomIndex(10);
 if(actor.isLearnedSkill(66)){value16 += 1};
 if(actor.isLearnedSkill(67)){value16 += 1};
 if(actor.isLearnedSkill(68)){value16 += 1};
@@ -1821,7 +1821,7 @@ if(actor.isLearnedSkill(69)){value16 += 1};
 if(actor.isLearnedSkill(70)){value16 += 1};
 if(value16 >= 8){var value24 = 0};
 if(value24 >= 1){array.push("Zev_StaySleep4-" + value24)};
-var value25 = Math.floor( Math.random() * 3);
+var value25 = getRandomIndex(3);
 if(value22 >= 4){var value25 = 0};
 if(value25 >= 1){array.push("Zev_StaySleep5-" + value25)};
 
@@ -1830,12 +1830,12 @@ if(value22 >= 4){var value26 = 1};//value22の判定を利用
 if(value26 >= 1){array.push("Zev_StaySleep6-" + value26)};
 
 var value10 = 1;
-var value11 = Math.floor( Math.random() * 2);//ピクチャ表示時に中央1か左上0か
-var value9 = Math.floor( Math.random() * 3) + 1;
+var value11 = getRandomIndex(2);//ピクチャ表示時に中央1か左上0か
+var value9 = getRandomIndex(3) + 1;
 if(value9 >= 2){var value10 = getRandomIndex(value9) + 1};
 var value5 = 1600;var value6 = 1200;
 var value7 = 1280;var value8 = 768;
-var value13 = Math.floor( Math.random() * 2);
+var value13 = getRandomIndex(2);
 if(value13 >= 1){
   var value1 = value7/2+(value5*value10-value7)/2;//x始点。+で左
   var value2 = value8/2-(value6*value10-value8)/2;//y始点。-で下
@@ -1854,7 +1854,7 @@ for (var id = 0; id <= array.length-1; id++) {
   id1 += 1;
 };
 var value19 = 100;
-var value18 = Math.floor( Math.random() * 2);
+var value18 = getRandomIndex(2);
 if(value18 >= 1){
   var value3 = value7/2;
   var value4 = value8/2;

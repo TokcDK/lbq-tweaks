@@ -1602,7 +1602,7 @@
     const specialPool = $gameVariables.value(242);
     if (specialPool != 0) {
       for (let index = 0; index < specialPool.length; index++) {
-        let chanceRoll = Math.floor(Math.random() * 101);
+        let chanceRoll = getRandomIndex(101);
         chanceRoll -= spawnChanceOffset;
         if ($gameParty.membersState(304)) { chanceRoll += 10; }
         if ($gameParty.membersState(305)) { chanceRoll += 10; }
@@ -1623,7 +1623,7 @@
       let additionalSpawnOffset = Math.floor(Math.random() * $gameVariables.value(232));
       enemyCountToSpawn += additionalSpawnOffset;
       if ($gameVariables.value(270) >= 11) {
-        let bonusChance = Math.floor(Math.random() * 101);
+        let bonusChance = getRandomIndex(101);
         if ($gameVariables.value(270) >= bonusChance) {
           enemyCountToSpawn += 1;
         }
@@ -3210,11 +3210,11 @@
       //獲得戦果
       if (enemy.isStateAffected(410)) {//ボスステートで戦果
         var value12 = 10;
-        var value11 = Math.floor(Math.random() * 10) + 1;
-        if (enemy.isStateAffected(411)) { value11 += Math.floor(Math.random() * 10) + 1 };
-        if (enemy.isStateAffected(412)) { value11 += Math.floor(Math.random() * 20) + 10 };
-        if (enemy.isStateAffected(413)) { value11 += Math.floor(Math.random() * 30) + 20 };
-        if (enemy.isStateAffected(414)) { value11 += Math.floor(Math.random() * 100) + 1 };
+        var value11 = getRandomIndex(10) + 1;
+        if (enemy.isStateAffected(411)) { value11 += getRandomIndex(10) + 1 };
+        if (enemy.isStateAffected(412)) { value11 += getRandomIndex(20) + 10 };
+        if (enemy.isStateAffected(413)) { value11 += getRandomIndex(30) + 20 };
+        if (enemy.isStateAffected(414)) { value11 += getRandomIndex(100) + 1 };
         for (var j = 0; j <= value11; j++) {
           $gameTroop.addDropItem($dataItems[value12]);
         };
@@ -3257,13 +3257,13 @@
   //怒りのツッコミ演出
   ensyutu_ikari = function (id, id2) {
 
-    var value1 = Math.floor(Math.random() * 3) + 6;
+    var value1 = getRandomIndex(3) + 6;
     $gameScreen.startShake(value1, value1, id);
-    var value2 = Math.floor(Math.random() * 41) + 80;
+    var value2 = getRandomIndex(41) + 80;
     AudioManager.playSe({ "name": id2, "volume": 90, "pitch": value2, "pan": 0 });
     var arr1 = [255, 255, 255];
     if (id2 == 'Explosion2') { var arr1 = [255, 50, 50] };
-    var value3 = Math.floor(Math.random() * 41) + 150;
+    var value3 = getRandomIndex(41) + 150;
     $gameScreen.startFlash([arr1[0], arr1[1], arr1[2], value3], id);
 
   };
@@ -3615,7 +3615,7 @@
       valueItems = getItemEquipmentSource(valueItemsType);
     }
     else {
-      const randomValueItemsType = Math.floor(Math.random() * 11);
+      const randomValueItemsType = getRandomIndex(11);
       valueItems = getItemEquipmentSource(randomValueItemsType > 1 ? 2 : randomValueItemsType);
     }
 
@@ -3815,7 +3815,7 @@
       $gameSystem.addCustomChoice(id, choiceParams);
       if (isGirl(gameActor)) {
         valueFaceSelect = 6;
-        var value1 = Math.floor(Math.random() * 8);
+        var value1 = getRandomIndex(8);
         if (value1 == 0) { valueFaceSelect = 1 };//通常
         if (value1 == 1) { valueFaceSelect = 2 };//笑顔
         if (value1 == 2) { valueFaceSelect = 5 };//真顔
@@ -3856,12 +3856,12 @@
         $dataEnemies[i].params[0] = value2;
         for (var j = 1; j <= 7; j++) {
           var value3 = Number(arr1[1]);
-          var value4 = Math.floor(Math.random() * 5) + (value3 - 3);
-          //var value4 = value3;//Math.floor( Math.random() * 5) + (value3 - 3);
+          var value4 = getRandomIndex(5) + (value3 - 3);
+          //var value4 = value3;//getRandomIndex(5) + (value3 - 3);
           $dataEnemies[i].params[j] = value4;
         };
         $dataEnemies[i].exp = Math.round(value2 / 10);
-        var value5 = Math.floor(Math.random() * 4) + 8;
+        var value5 = getRandomIndex(4) + 8;
         $dataEnemies[i].gold = Math.round(value2 / value5);
       };
     };
@@ -5199,7 +5199,7 @@
 
     var event = $gameMap.event(id1);
     if (id2 == 1) {
-      valueCountSet1 = Math.floor(Math.random() * 13);
+      valueCountSet1 = getRandomIndex(13);
       //valueCountSet1 = 13;//テスト用
       if (valueCountSet1 <= 1) { valueCountSet2 = 1 };
       if (valueCountSet1 == 2) { valueCountSet2 = 4 };//毒
@@ -5251,8 +5251,8 @@
           var actor = $gameParty.members()[i];
           //agi,luk,actor.xparam(0)*100。Math.round((actor.agi * 2 + actor.luk /10) * (actor.xparam(0)*100))
           var value2 = Math.round((actor.agi * 2 + actor.luk / 10) * (actor.xparam(0)));
-          var value3 = Math.floor(Math.random() * 900) + 101;
-          var value4 = Math.floor(Math.random() * 900) + 101;
+          var value3 = getRandomIndex(900) + 101;
+          var value4 = getRandomIndex(900) + 101;
           if ($gameVariables.value(240) >= 1) {
             var arr1 = $dataItems[$gameVariables.value(240)].meta['EnemyLV'].split(',');
             var value3 = arr1[getRandomIndex(arr1.length)] * 10;
@@ -5279,8 +5279,8 @@
         for (var i = 0; i <= $gameParty.members().length - 1; i++) {
           var actor = $gameParty.members()[i];
           var value2 = Math.round((actor.mat * 2 + actor.luk / 10) * (actor.xparam(0)));
-          var value3 = Math.floor(Math.random() * 900) + 101;
-          var value4 = Math.floor(Math.random() * 900) + 101;
+          var value3 = getRandomIndex(900) + 101;
+          var value4 = getRandomIndex(900) + 101;
           if ($gameVariables.value(240) >= 1) {
             var arr1 = $dataItems[$gameVariables.value(240)].meta['EnemyLV'].split(',');
             var value3 = arr1[getRandomIndex(arr1.length)] * 10;
@@ -5307,8 +5307,8 @@
         for (var i = 0; i <= $gameParty.members().length - 1; i++) {
           var actor = $gameParty.members()[i];
           var value2 = Math.round((actor.mdf * 2 + actor.luk / 10) * (actor.xparam(0)));
-          var value3 = Math.floor(Math.random() * 900) + 101;
-          var value4 = Math.floor(Math.random() * 90) + 11;
+          var value3 = getRandomIndex(900) + 101;
+          var value4 = getRandomIndex(90) + 11;
           if ($gameVariables.value(240) >= 1) {
             var arr1 = $dataItems[$gameVariables.value(240)].meta['EnemyLV'].split(',');
             var value3 = arr1[getRandomIndex(arr1.length)] * 10;
@@ -6299,11 +6299,11 @@
       var value2 = arr2[getRandomIndex(arr2.length)];
       var value3 = arr3[getRandomIndex(arr3.length)];
       if (value2 == ` `) {
-        var value4 = Math.floor(Math.random() * 11);
+        var value4 = getRandomIndex(11);
         var value4 = -value4;
       } else {
         if (value2 == `\\C[27]♥\\C[0]` || value2 == `\\C[27]♡\\C[0]`) {
-          var value4 = Math.floor(Math.random() * 6);
+          var value4 = getRandomIndex(6);
         } else {
           var value4 = arr4[getRandomIndex(arr4.length)];
           if (value3 >= 40) {
@@ -6321,11 +6321,11 @@
         var value2 = arr2[getRandomIndex(arr2.length)];
         var value3 = arr3[getRandomIndex(arr3.length)];
         if (value2 == ` `) {
-          var value4 = Math.floor(Math.random() * 11);
+          var value4 = getRandomIndex(11);
           var value4 = -value4;
         } else {
           if (value2 == `\\C[27]♥\\C[0]` || value2 == `\\C[27]♡\\C[0]`) {
-            var value4 = Math.floor(Math.random() * 6);
+            var value4 = getRandomIndex(6);
           } else {
             var value4 = arr4[getRandomIndex(arr4.length)];
             if (value3 >= 40) {
@@ -6547,7 +6547,7 @@
   }
 
   getRandomIndex = function (length) {
-    return Math.floor(Math.random() * length);
+    return getRandomIndex(length);
   }
 
   getPreviousTachiePicId = function () {

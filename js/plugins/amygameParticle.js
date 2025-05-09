@@ -59,7 +59,7 @@ valueWeather = Array(51).fill(0);
 var arr1 = [0.1,0.15,0.20,0.25,0.30];//暗闇の視界制限
 var value2 =  arr1[getRandomIndex(arr1.length)];
 valueWeather[1] = value2;
-var value2 =  Math.floor( Math.random() * 6) + 1;
+var value2 =  getRandomIndex(6) + 1;
 valueWeather[2] = value2;
 var arr1 = [0.3,0.4,0.5];//六色ネオン
 var value2 =  arr1[getRandomIndex(arr1.length)];
@@ -67,16 +67,16 @@ valueWeather[3] = value2;
 var arr1 = [0.02,0.03,0.04,0.05,0.06];//薄いフォグ
 var value2 =  arr1[getRandomIndex(arr1.length)];
 valueWeather[4] = value2;
-var value2 =  Math.floor( Math.random() * 6) + 5;
+var value2 =  getRandomIndex(6) + 5;
 valueWeather[5] = value2;
-var value2 =  Math.floor( Math.random() * 51) + 50;
+var value2 =  getRandomIndex(51) + 50;
 valueWeather[6] = value2;
 var arr1 = [0.05,0.06,0.07,0.08,0.09];//モヤの影
 var value2 =  arr1[getRandomIndex(arr1.length)];
 valueWeather[7] = value2;//透明
-var value2 =  Math.floor( Math.random() * 51) + 50;
+var value2 =  getRandomIndex(51) + 50;
 valueWeather[8] = value2;//速度
-var value2 =  Math.floor( Math.random() * 6) + 5;
+var value2 =  getRandomIndex(6) + 5;
 valueWeather[9] = value2;//スケール
 var arr1 = [-500,0,600];//全体マップ
 var value2 =  arr1[getRandomIndex(arr1.length)];
@@ -84,14 +84,14 @@ valueWeather[10] = value2;
 var arr1 = [0.25,0.30,0.35,0.40];
 var value2 =  arr1[getRandomIndex(arr1.length)];
 valueWeather[11] = value2;
-var value2 =  Math.floor( Math.random() * 5) + 6;
+var value2 =  getRandomIndex(5) + 6;
 valueWeather[12] = value2;
-var value2 =  Math.floor( Math.random() * 26) + 25;//天候:雲
+var value2 =  getRandomIndex(26) + 25;//天候:雲
 valueWeather[13] = value2;
 var arr1 = [0.30,0.31,0.32,0.33,0.35,0.35,0.36,0.37,0.38,0.39,0.40,0.45];//雲透明
 var value2 =  arr1[getRandomIndex(arr1.length)];
 valueWeather[14] = value2;
-var value2 =  Math.floor( Math.random() * 76) + 25;//雲の影
+var value2 =  getRandomIndex(76) + 25;//雲の影
 valueWeather[15] = value2;//速度
 var arr1 = [0.10,0.15,0.20,0.25,0.30,0.35,0.40];
 var value2 =  arr1[getRandomIndex(arr1.length)];
@@ -99,11 +99,11 @@ valueWeather[16] = value2;//透明度
 var arr1 = [0.1,0.11,0.12,0.13,0.14,0.15];//木漏れ日[weather]
 var value2 =  arr1[getRandomIndex(arr1.length)];
 valueWeather[17] = value2;
-var value2 =  Math.floor( Math.random() * 8) + 7;
-var value3 =  Math.floor( Math.random() * 10) + 15;
+var value2 =  getRandomIndex(8) + 7;
+var value3 =  getRandomIndex(10) + 15;
 valueWeather[18] = value2;
 valueWeather[19] = value3;
-var value2 =  Math.floor( Math.random() * 5) + 0;
+var value2 =  getRandomIndex(5) + 0;
 valueWeather[20] = value2;
 var arr1 = [-500,0,600];//太陽光のフレア
 var value2 =  arr1[getRandomIndex(arr1.length)];
@@ -111,38 +111,38 @@ valueWeather[21] = value2;
 var arr1 = [0.5,0.6,0.7,0.8,0.9,1.0];
 var value2 =  arr1[getRandomIndex(arr1.length)];
 valueWeather[22] = value2;
-var value2 =  Math.floor( Math.random() * 3) + 4;
+var value2 =  getRandomIndex(3) + 4;
 valueWeather[23] = value2;
 var arr1 = [0.05,0.06,0.07];//淡いライトリーク。夜の街。
 var value2 =  arr1[getRandomIndex(arr1.length)];
 valueWeather[24] = value2;
-var value2 =  Math.floor( Math.random() * 41) + 10;
+var value2 =  getRandomIndex(41) + 10;
 valueWeather[25] = value2;
 var arr1 = [0.06,0.07,0.08,0.09,0.05];//青&緑のライトリーク
 var value2 =  arr1[getRandomIndex(arr1.length)];
 valueWeather[26] = value2;
-var value2 =  Math.floor( Math.random() * 5) + 1;
+var value2 =  getRandomIndex(5) + 1;
 valueWeather[27] = value2;
 var arr1 = [0.08,0.09,0.10,0.11,0.12];//fog_battle_front
 var value2 =  arr1[getRandomIndex(arr1.length)];
 valueWeather[28] = value2;
-var value2 =  Math.floor( Math.random() * 71) + 30;
+var value2 =  getRandomIndex(71) + 30;
 valueWeather[29] = value2;
-var value2 =  Math.floor( Math.random() * 81) + 20;
+var value2 =  getRandomIndex(81) + 20;
 valueWeather[30] = value2;//particle_w2
 valueWeather[31] = value2;
 valueWeather[32] = value2;
 valueWeather[33] = value2;
 
-var value2 =  Math.floor( Math.random() * 51) + 150;
+var value2 =  getRandomIndex(51) + 150;
 valueWeather[46] = value2;
-var value2 =  Math.floor( Math.random() * 51) + 100;//ダンジョン暗さ
+var value2 =  getRandomIndex(51) + 100;//ダンジョン暗さ
 valueWeather[47] = value2;
-var value2 = [1,2,3,4,5,6][Math.floor(Math.random() * 6)];//空夜パターン
+var value2 = [1,2,3,4,5,6][getRandomIndex(6)];//空夜パターン
 valueWeather[48] = value2;
-var value2 = [1,2,3,4,5,6,7,8,9,10][Math.floor(Math.random() * 10)];//空パターン
+var value2 = [1,2,3,4,5,6,7,8,9,10][getRandomIndex(10)];//空パターン
 valueWeather[49] = value2;
-var value2 = [-1,-2,-3,-4,-5][Math.floor(Math.random() * 5)];//xスクロール
+var value2 = [-1,-2,-3,-4,-5][getRandomIndex(5)];//xスクロール
 valueWeather[50] = value2;
 
 };
@@ -934,7 +934,7 @@ if(id1 == 18){//汎用演出顔グラなし。valueWordSet0に文章入れてお
 };
 if(id1 == 19){//汎用2行まで演出顔グラなしH。valueWordSet0に文章入れておく。
   //hSkill_rankUpWordDirect(1,1,671,1);で使用
-  var value1 = Math.floor( Math.random() * 51) + 100;
+  var value1 = getRandomIndex(51) + 100;
   AudioManager.playSe({"name":'ZH_SexyVoice',"volume":50,"pitch":value1,"pan":0});
   $gameScreen.startFlash([255,119,255,200], 60);
     if($gameScreen._tone_temp == 0){
@@ -984,7 +984,7 @@ if(id1 == 20){//睡眠誘導光
   $gameScreen._particle.particleUpdate([value1,'frequency',String(value2)]);
   $gameScreen.startFlash([255,119,255,200], 60);
   var value2 = "Saint2";
-  var value3 = Math.floor( Math.random() * 26) + 50;;
+  var value3 = getRandomIndex(26) + 50;;
   AudioManager.playSe({"name":value2,"volume":90,"pitch":value3,"pan":0});
 };
 if(id1 == 21){//眠気の兆候
@@ -1007,7 +1007,7 @@ if(id1 == 21){//眠気の兆候
   $gameScreen._particle.particleUpdate([value1,'blendMode','0']);
   $gameScreen.startFlash([85,200,255,200], 60);
   var value2 = "Saint1";
-  var value3 = Math.floor( Math.random() * 26) + 50;;
+  var value3 = getRandomIndex(26) + 50;;
   AudioManager.playSe({"name":value2,"volume":90,"pitch":value3,"pan":0});
 };
 if(id1 == 22){
@@ -1157,12 +1157,12 @@ if(id1 == 2){
   if(value3 >= 0.04){
     $gameMap.setFilter(value10,[value1,value2,-1,200,300,1]);
     var arr1 = ['ZH_sticky2',100,100];
-    var value4 = Math.floor( Math.random() * 26) + Number(arr1[2]);
+    var value4 = getRandomIndex(26) + Number(arr1[2]);
     $gameScreen.startShake(7, 7, 60);
   } else {
     $gameMap.setFilter(value10,[value1,value2,-1,30,160,1]);
     var arr1 = ['Saint1',75,50];
-    var value4 = Math.floor( Math.random() * 26) + Number(arr1[2]);
+    var value4 = getRandomIndex(26) + Number(arr1[2]);
   };
   AudioManager.playSe({"name":arr1[0],"volume":Number(arr1[1]),"pitch":value4,"pan":0});
   $gameMap.setFilterAddiTime(value10,value3);
@@ -1215,9 +1215,9 @@ if(id1 == 9){
 };
 if(id1 == 10){
   var value10 = 'glitch1';
-  var value4 = 2;//Math.floor( Math.random() * 11) + 5;
-  if(value1 == 1000){var value5 = Math.floor( Math.random() * 360)}else{var value5 = value1};
-  if(value2 == 1000){var value6 = Math.floor( Math.random() * 11)}else{var value6 = value2};
+  var value4 = 2;//getRandomIndex(11) + 5;
+  if(value1 == 1000){var value5 = getRandomIndex(360)}else{var value5 = value1};
+  if(value2 == 1000){var value6 = getRandomIndex(11)}else{var value6 = value2};
   $gameMap.createFilter(value10,'glitch',0,'screen');
   //$gameMap.setFilter(value10,[value4,100,value5,value6,0]);
   $gameMap.moveFilterQueue(value10,[value4,100,value5,value6,0],value3);

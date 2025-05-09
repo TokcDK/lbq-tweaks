@@ -922,8 +922,8 @@ tachie_hyouji2 = function (gameActor) {
 
     stateEffectCount++;
 
-    const randomYPosition = Math.floor(Math.random() * 51) + 384;
-    const randomMoveDuration = Math.floor(Math.random() * 61) + 40;
+    const randomYPosition = getRandomIndex(51) + 384;
+    const randomMoveDuration = getRandomIndex(61) + 40;
     let skillModifier = 1;
 
     if (actorLearnedSkill65) skillModifier++;
