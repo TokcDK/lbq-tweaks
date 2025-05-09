@@ -3521,11 +3521,11 @@
   gacha_naiyou = function (valueItemsType, rarity) {
 
     if (valueItemsType && valueItemsType > -1 && valueItemsType < 3) {
-      valueItems = get_valueItems_iwa(valueItemsType);
+      valueItems = getItemEquipmentSource(valueItemsType);
     }
     else {
       const randomValueItemsType = Math.floor(Math.random() * 11);
-      valueItems = get_valueItems_iwa(randomValueItemsType > 1 ? 2 : randomValueItemsType);
+      valueItems = getItemEquipmentSource(randomValueItemsType > 1 ? 2 : randomValueItemsType);
     }
 
     let chosenRarity = rarity;
@@ -3680,7 +3680,7 @@
     if (arr3 != 0) {
       var value2 = arr3[Math.floor(Math.random() * arr3.length)];
       let index = arr3.findIndex(arr3 => arr3 == value2);
-      var valueItems = get_valueItems_iwa(arr4[index]);
+      var valueItems = getItemEquipmentSource(arr4[index]);
       if ($dataItems[$gameVariables.value(240)].meta['TchestRere']) {
         if (value2 == Number($dataItems[$gameVariables.value(240)].meta['TchestRere'])) {
           $gameSwitches.setValue(439, true);
@@ -4095,7 +4095,7 @@
       };
     };
     for (var j = 0; j <= 2; j++) {
-      var valueItems = get_valueItems_iwa(j);
+      var valueItems = getItemEquipmentSource(j);
       var start = 1;
       if (j == 2) {
         var end = valueArmorsLength;
@@ -5394,7 +5394,7 @@
     //get_loopChoiceDisplay1(2,0,2);//一括売却
     //get_loopChoiceDisplay1(3,0,2);//一括売却
 
-    var valueItems = get_valueItems_iwa(id2);
+    var valueItems = getItemEquipmentSource(id2);
     //picture_motion1("linear",[0]);
     $gameVariables.setValue(177, id3);
     if (id1 == 1) {//クエスト掲示
@@ -6317,7 +6317,7 @@
 
   // Retrieves the item based on type and index, then gives it to the player
   getItemAndAwardToPlayer = function (option) {
-    const itemArray = get_valueItems_iwa(option.type);
+    const itemArray = getItemEquipmentSource(option.type);
     const item = itemArray[option.itemIndex];
 
     $gameParty.gainItem(item, 1);
@@ -6430,7 +6430,7 @@
       .replace("[挿話達成]", "");
   }
 
-  get_valueItems_iwa = function (id) {
+  getItemEquipmentSource = function (id) {
     switch (Number(id)) {
       case 1:
         return $dataWeapons;
