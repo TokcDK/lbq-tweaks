@@ -1486,56 +1486,43 @@
 
   //スキル複数選択肢1スキル用
   skill_sentaku = function (skillId, unusedValue) {
-
+    // Cache meta for performance.
+    const meta = $dataSkills[skillId].meta;
+    const varId = Number(meta.VariableChangeUse);
+    
     if (!$gameSwitches.value(19)) {
-      if ($gameVariables.value(Number($dataSkills[skillId].meta.VariableChangeUse)) == 1) {
-        $gameVariables.setValue(Number($dataSkills[skillId].meta.VariableChangeUse), 2);
-      } else {
-        if ($gameVariables.value(Number($dataSkills[skillId].meta.VariableChangeUse)) == 2) {
-          $gameVariables.setValue(Number($dataSkills[skillId].meta.VariableChangeUse), 3);
+      if ($gameVariables.value(varId) == 1) {
+        $gameVariables.setValue(varId, 2);
+      } else if ($gameVariables.value(varId) == 2) {
+        $gameVariables.setValue(varId, 3);
+      } else if ($gameVariables.value(varId) == 3) {
+        if (meta.ValChangeName4) {
+          $gameVariables.setValue(varId, 4);
         } else {
-          if ($gameVariables.value(Number($dataSkills[skillId].meta.VariableChangeUse)) == 3) {
-            if ($dataSkills[skillId].meta.ValChangeName4) {
-              $gameVariables.setValue(Number($dataSkills[skillId].meta.VariableChangeUse), 4);
-            } else {
-              $gameVariables.setValue(Number($dataSkills[skillId].meta.VariableChangeUse), 1);
-            };
-          } else {
-            if ($gameVariables.value(Number($dataSkills[skillId].meta.VariableChangeUse)) == 4) {
-              if ($dataSkills[skillId].meta.ValChangeName5) {
-                $gameVariables.setValue(Number($dataSkills[skillId].meta.VariableChangeUse), 5);
-              } else {
-                $gameVariables.setValue(Number($dataSkills[skillId].meta.VariableChangeUse), 1);
-              };
-            } else {
-              if ($gameVariables.value(Number($dataSkills[skillId].meta.VariableChangeUse)) == 5) {
-                $gameVariables.setValue(Number($dataSkills[skillId].meta.VariableChangeUse), 1);
-              };
-            }
-          }
+          $gameVariables.setValue(varId, 1);
         }
-      }
-    };
-    if ($gameVariables.value(Number($dataSkills[skillId].meta.VariableChangeUse)) == 1) {
-      $dataSkills[skillId].name = $dataSkills[skillId].meta.ValChangeName1;
-    } else {
-      if ($gameVariables.value(Number($dataSkills[skillId].meta.VariableChangeUse)) == 2) {
-        $dataSkills[skillId].name = $dataSkills[skillId].meta.ValChangeName2;
-      } else {
-        if ($gameVariables.value(Number($dataSkills[skillId].meta.VariableChangeUse)) == 3) {
-          $dataSkills[skillId].name = $dataSkills[skillId].meta.ValChangeName3;
+      } else if ($gameVariables.value(varId) == 4) {
+        if (meta.ValChangeName5) {
+          $gameVariables.setValue(varId, 5);
         } else {
-          if ($gameVariables.value(Number($dataSkills[skillId].meta.VariableChangeUse)) == 4) {
-            $dataSkills[skillId].name = $dataSkills[skillId].meta.ValChangeName4;
-          } else {
-            if ($gameVariables.value(Number($dataSkills[skillId].meta.VariableChangeUse)) == 5) {
-              $dataSkills[skillId].name = $dataSkills[skillId].meta.ValChangeName5;
-            };
-          }
+          $gameVariables.setValue(varId, 1);
         }
+      } else if ($gameVariables.value(varId) == 5) {
+        $gameVariables.setValue(varId, 1);
       }
-    };
-
+    }
+    
+    if ($gameVariables.value(varId) == 1) {
+      $dataSkills[skillId].name = meta.ValChangeName1;
+    } else if ($gameVariables.value(varId) == 2) {
+      $dataSkills[skillId].name = meta.ValChangeName2;
+    } else if ($gameVariables.value(varId) == 3) {
+      $dataSkills[skillId].name = meta.ValChangeName3;
+    } else if ($gameVariables.value(varId) == 4) {
+      $dataSkills[skillId].name = meta.ValChangeName4;
+    } else if ($gameVariables.value(varId) == 5) {
+      $dataSkills[skillId].name = meta.ValChangeName5;
+    }
   };
 
   //苗字取得
