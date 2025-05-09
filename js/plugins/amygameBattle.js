@@ -4610,27 +4610,37 @@ state_addFormula1 = function (arr10) {
 };
 
 //トータルダメージ表示
-battle_totalDamage = function () {
+const DEFAULT_PICTURE_ID_BATTLE_TOTAL_DAMAGE = 96;
+const DEFAULT_PICTURE_X_BATTLE_TOTAL_DAMAGE = 400;
+const DEFAULT_PICTURE_Y_BATTLE_TOTAL_DAMAGE = 480;
+battle_totalDamage = function() {
+  // Early exit if we don't have multiple hits
+  if (valueTotalDamageCount2 < 2) return;
 
-  if (valueTotalDamageCount2 >= 2) {
-    const pictureId = 96;
-    const totalDamageCount = valueTotalDamageCount;
-    const formattedDamageCount = totalDamageCount.toLocaleString();
-    let dTextFontSize = 50;
-    const pictureX = 400;
-    const pictureY = 480;
-    if (valueTotalDamageCount <= 9999) { dTextFontSize = 45; }
-    if (valueTotalDamageCount >= 100000) { dTextFontSize = 55; }
-    $gameScreen.setDtextFont('ＭＳ Ｐ明朝');
-    if ($gameVariables.value(276) == 2) {
-      $gameScreen.setDTextPicture(`\\f[b]\\oc[22]\\f[i]Total${valueTotalDamageCount2}Hit,\\C[10]${formattedDamageCount}\\C[17]Damage!\\C[0]`, dTextFontSize);
-    } else {
-      $gameScreen.setDTextPicture(`\\f[b]\\oc[2]\\f[i]Total${valueTotalDamageCount2}Hit,\\C[10]${formattedDamageCount}\\C[17]Damage!\\C[0]`, dTextFontSize);
-    }
-    $gameScreen.showPicture(pictureId, "", 0, pictureX - 50, pictureY, 100, 100, 100, 0);
-    $gameScreen.movePicture(pictureId, 0, pictureX, pictureY, 100, 100, 255, 0, 20);
-  }
-
+  const totalDamageCount = valueTotalDamageCount;
+  const totalHits = valueTotalDamageCount2;
+  
+  // Format large numbers with commas
+  const formattedDamageCount = totalDamageCount.toLocaleString();
+  
+  // Determine font size based on damage amount - calculate only once
+  const dTextFontSize = totalDamageCount < 10000 ? 45 : 
+                        totalDamageCount >= 100000 ? 55 : 50;
+    
+  // Configure text settings
+  $gameScreen.setDtextFont('ＭＳ Ｐ明朝');
+  
+  // Use a template literal for the text string - more efficient than concatenation
+  // Choose color based on current state - avoid branching with conditional operator
+  const outlineColor = $gameVariables.value(276) === 2 ? '22' : '2';
+  const displayText = `\\f[b]\\oc[${outlineColor}]\\f[i]Total${totalHits}Hit,\\C[10]${formattedDamageCount}\\C[17]Damage!\\C[0]`;
+  
+  // Set the text once
+  $gameScreen.setDTextPicture(displayText, dTextFontSize);
+  
+  // Display and move the picture
+  $gameScreen.showPicture(DEFAULT_PICTURE_ID_BATTLE_TOTAL_DAMAGE, "", 0, DEFAULT_PICTURE_X_BATTLE_TOTAL_DAMAGE - 50, DEFAULT_PICTURE_Y_BATTLE_TOTAL_DAMAGE, 100, 100, 100, 0);
+  $gameScreen.movePicture(DEFAULT_PICTURE_ID_BATTLE_TOTAL_DAMAGE, 0, DEFAULT_PICTURE_X_BATTLE_TOTAL_DAMAGE, DEFAULT_PICTURE_Y_BATTLE_TOTAL_DAMAGE, 100, 100, 255, 0, 20);
 };
 
 //ステート付与攻撃時にアニメ
