@@ -1489,39 +1489,57 @@
     // Cache meta for performance.
     const meta = $dataSkills[skillId].meta;
     const varId = Number(meta.VariableChangeUse);
+    const currentValue = $gameVariables.value(varId);
     
     if (!$gameSwitches.value(19)) {
-      if ($gameVariables.value(varId) == 1) {
-        $gameVariables.setValue(varId, 2);
-      } else if ($gameVariables.value(varId) == 2) {
-        $gameVariables.setValue(varId, 3);
-      } else if ($gameVariables.value(varId) == 3) {
-        if (meta.ValChangeName4) {
-          $gameVariables.setValue(varId, 4);
-        } else {
+      switch (currentValue) {
+        case 1:
+          $gameVariables.setValue(varId, 2);
+          break;
+        case 2:
+          $gameVariables.setValue(varId, 3);
+          break;
+        case 3:
+          if (meta.ValChangeName4) {
+            $gameVariables.setValue(varId, 4);
+          } else {
+            $gameVariables.setValue(varId, 1);
+          }
+          break;
+        case 4:
+          if (meta.ValChangeName5) {
+            $gameVariables.setValue(varId, 5);
+          } else {
+            $gameVariables.setValue(varId, 1);
+          }
+          break;
+        case 5:
           $gameVariables.setValue(varId, 1);
-        }
-      } else if ($gameVariables.value(varId) == 4) {
-        if (meta.ValChangeName5) {
-          $gameVariables.setValue(varId, 5);
-        } else {
-          $gameVariables.setValue(varId, 1);
-        }
-      } else if ($gameVariables.value(varId) == 5) {
-        $gameVariables.setValue(varId, 1);
+          break;
+        default:
+          break;
       }
     }
     
-    if ($gameVariables.value(varId) == 1) {
-      $dataSkills[skillId].name = meta.ValChangeName1;
-    } else if ($gameVariables.value(varId) == 2) {
-      $dataSkills[skillId].name = meta.ValChangeName2;
-    } else if ($gameVariables.value(varId) == 3) {
-      $dataSkills[skillId].name = meta.ValChangeName3;
-    } else if ($gameVariables.value(varId) == 4) {
-      $dataSkills[skillId].name = meta.ValChangeName4;
-    } else if ($gameVariables.value(varId) == 5) {
-      $dataSkills[skillId].name = meta.ValChangeName5;
+    const newValue = $gameVariables.value(varId);
+    switch (newValue) {
+      case 1:
+        $dataSkills[skillId].name = meta.ValChangeName1;
+        break;
+      case 2:
+        $dataSkills[skillId].name = meta.ValChangeName2;
+        break;
+      case 3:
+        $dataSkills[skillId].name = meta.ValChangeName3;
+        break;
+      case 4:
+        $dataSkills[skillId].name = meta.ValChangeName4;
+        break;
+      case 5:
+        $dataSkills[skillId].name = meta.ValChangeName5;
+        break;
+      default:
+        break;
     }
   };
 
