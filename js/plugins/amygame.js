@@ -1551,6 +1551,9 @@
     $gameSystem.setWindowTone(tone);
   };
 
+  const xOffsetOptions = [-30, -20, -10, 0, 10, 20, 30];
+  const yNegativeOffsetOptions = [-30, -25, -20, -10, -5, 0];
+  const yPositiveOffsetOptions = [30, 25, 20, 10, 5, 0];
   //エネミーグループ設定$gameVariables.value(270)//$gameVariables.value(232)
   enemy_troopPush = function () {
 
@@ -1598,43 +1601,15 @@
           if (enemySpawnId == 28 && hasSpawnedId28 == 1) { enemySpawnId = 22; }
           if (enemySpawnId == 28) { hasSpawnedId28 = 1; };//id28を１体だけにする
           let isHidden = (spawnIndex >= enemyCountToSpawn && enemyCountToSpawn != 1) ? true : false; //ラスト一人を隠している。エネミー一人の時は除外
-          let spawnX, spawnY;
-          if (spawnIndex == 1) { spawnX = 450; spawnY = 350; }
-          if (enemyCountToSpawn == 1) { spawnX = 350; spawnY = 420; }
-          if (spawnIndex == 2) { spawnX = 400; spawnY = 500; }
-          if (spawnIndex == 3) { spawnX = 350; spawnY = 350; }
-          if (spawnIndex == 4) { spawnX = 300; spawnY = 500; }
-          if (spawnIndex == 5) { spawnX = 250; spawnY = 350; }
-          if (spawnIndex == 6) { spawnX = 200; spawnY = 500; }
-          if (spawnIndex == 7) { spawnX = 150; spawnY = 350; }
-          if (spawnIndex == 8) { spawnX = 100; spawnY = 500; }
-          if (spawnIndex >= 2 && spawnIndex <= 6) {
-            spawnX = spawnX + Number(xOffsetOptions[Math.floor(Math.random() * xOffsetOptions.length)]);
-          }
-          if (spawnIndex == 2 || spawnIndex == 4 || spawnIndex == 6 || spawnIndex == 8) {
-            spawnY = spawnY + Number(yNegativeOffsetOptions[Math.floor(Math.random() * yNegativeOffsetOptions.length)]);
-          } else {
-            spawnY = spawnY + Number(yPositiveOffsetOptions[Math.floor(Math.random() * yPositiveOffsetOptions.length)]);
-          }
-          if (enemyCountToSpawn == 2) {
-            if (spawnIndex == 2) { spawnX = spawnX - 200; }
-          }
-          if (enemyCountToSpawn == 3) {
-            if (spawnIndex == 2) { spawnX = spawnX - 100; }
-            if (spawnIndex == 3) { spawnX = spawnX - 100; }
-          }
-          if (enemyCountToSpawn == 4) {
-            if (spawnIndex == 2) { spawnX = spawnX - 100; }
-            if (spawnIndex == 3) { spawnX = spawnX - 100; }
-            if (spawnIndex == 4) { spawnX = spawnX - 200; }
-          }
-          if (enemyCountToSpawn == 5) {
-            //if(spawnIndex == 2){spawnX = spawnX - 100};
-            if (spawnIndex == 3) { spawnX = spawnX - 100; spawnY = spawnY + 50; }
-            if (spawnIndex == 4) { spawnX = spawnX - 200; }
-            if (spawnIndex == 5) { spawnX = spawnX - 100; }
-          }
-          spawnY = spawnY - 80; //戦闘背景に併せてy軸を変更
+          
+          const { spawnX, spawnY } = getSpawnCoordinatesEnemyTroopPush(
+            spawnIndex,
+            enemyCountToSpawn,
+            xOffsetOptions,
+            yNegativeOffsetOptions,
+            yPositiveOffsetOptions
+          );
+
           const enemy = { enemyId: enemySpawnId, x: spawnX, y: spawnY, hidden: isHidden }; //追加するエネミーの設定(ID1、座標(100,100)、表示有)
           enemyTroop.members.push(enemy); //設定したエネミーをグループに追加
         }
@@ -1643,9 +1618,47 @@
     $gameSwitches.setValue(357, true);
   };
 
-  const xOffsetOptions = [-30, -20, -10, 0, 10, 20, 30];
-  const yNegativeOffsetOptions = [-30, -25, -20, -10, -5, 0];
-  const yPositiveOffsetOptions = [30, 25, 20, 10, 5, 0];
+  function getSpawnCoordinatesEnemyTroopPush(spawnIndex, enemyCountToSpawn, xOffsetOptions, yNegativeOffsetOptions, yPositiveOffsetOptions) {
+    let spawnX, spawnY;
+    if (spawnIndex == 1) { spawnX = 450; spawnY = 350; }
+    if (enemyCountToSpawn == 1) { spawnX = 350; spawnY = 420; }
+    if (spawnIndex == 2) { spawnX = 400; spawnY = 500; }
+    if (spawnIndex == 3) { spawnX = 350; spawnY = 350; }
+    if (spawnIndex == 4) { spawnX = 300; spawnY = 500; }
+    if (spawnIndex == 5) { spawnX = 250; spawnY = 350; }
+    if (spawnIndex == 6) { spawnX = 200; spawnY = 500; }
+    if (spawnIndex == 7) { spawnX = 150; spawnY = 350; }
+    if (spawnIndex == 8) { spawnX = 100; spawnY = 500; }
+
+    if (spawnIndex >= 2 && spawnIndex <= 6) {
+      spawnX += Number(xOffsetOptions[Math.floor(Math.random() * xOffsetOptions.length)]);
+    }
+    if (spawnIndex == 2 || spawnIndex == 4 || spawnIndex == 6 || spawnIndex == 8) {
+      spawnY += Number(yNegativeOffsetOptions[Math.floor(Math.random() * yNegativeOffsetOptions.length)]);
+    } else {
+      spawnY += Number(yPositiveOffsetOptions[Math.floor(Math.random() * yPositiveOffsetOptions.length)]);
+    }
+    if (enemyCountToSpawn == 2) {
+      if (spawnIndex == 2) { spawnX -= 200; }
+    }
+    if (enemyCountToSpawn == 3) {
+      if (spawnIndex == 2) { spawnX -= 100; }
+      if (spawnIndex == 3) { spawnX -= 100; }
+    }
+    if (enemyCountToSpawn == 4) {
+      if (spawnIndex == 2) { spawnX -= 100; }
+      if (spawnIndex == 3) { spawnX -= 100; }
+      if (spawnIndex == 4) { spawnX -= 200; }
+    }
+    if (enemyCountToSpawn == 5) {
+      if (spawnIndex == 3) { spawnX -= 100; spawnY += 50; }
+      if (spawnIndex == 4) { spawnX -= 200; }
+      if (spawnIndex == 5) { spawnX -= 100; }
+    }
+    spawnY -= 80; // Adjust according to battle background
+    return { spawnX, spawnY };
+  }
+
   henemy_troopPush = function () {
 
     if ($gameVariables.value(228) != 0) {
@@ -1660,46 +1673,57 @@
       for (let spawnIndex = 1; spawnIndex <= enemyCountToSpawn; spawnIndex++) {
         let enemySpawnId = Number(spawnPool[Math.floor(Math.random() * spawnPoolLength)]); //出現エネミースポーン
         let isHidden = (spawnIndex >= enemyCountToSpawn) ? true : false;
-        let spawnX, spawnY;
-        if (spawnIndex == 1) { spawnX = 450; spawnY = 350; }
-        if (enemyCountToSpawn == 1) { spawnX = 350; spawnY = 420; }
-        if (spawnIndex == 2) { spawnX = 400; spawnY = 500; }
-        if (spawnIndex == 3) { spawnX = 350; spawnY = 350; }
-        if (spawnIndex == 4) { spawnX = 300; spawnY = 500; }
-        if (spawnIndex == 5) { spawnX = 250; spawnY = 350; }
-        if (spawnIndex == 6) { spawnX = 200; spawnY = 500; }
-        if (spawnIndex == 7) { spawnX = 150; spawnY = 350; }
-        if (spawnIndex == 8) { spawnX = 100; spawnY = 500; }
-        if (spawnIndex >= 2 && spawnIndex <= 6) {
-          spawnX = spawnX + Number(xOffsetOptions[Math.floor(Math.random() * xOffsetOptions.length)]);
-        }
-        if (spawnIndex == 2 || spawnIndex == 4 || spawnIndex == 6 || spawnIndex == 8) {
-          spawnY = spawnY + Number(yNegativeOffsetOptions[Math.floor(Math.random() * yNegativeOffsetOptions.length)]);
-        } else {
-          spawnY = spawnY + Number(yPositiveOffsetOptions[Math.floor(Math.random() * yPositiveOffsetOptions.length)]);
-        }
-        if (enemyCountToSpawn == 2) {
-          if (spawnIndex == 2) { spawnX = spawnX - 200; }
-        }
-        if (enemyCountToSpawn == 3) {
-          if (spawnIndex == 2) { spawnX = spawnX - 100; }
-          if (spawnIndex == 3) { spawnX = spawnX - 100; }
-        }
-        if (enemyCountToSpawn == 4) {
-          if (spawnIndex == 2) { spawnX = spawnX - 100; }
-          if (spawnIndex == 3) { spawnX = spawnX - 100; }
-          if (spawnIndex == 4) { spawnX = spawnX - 200; }
-        }
-        if (enemyCountToSpawn == 5) {
-          if (spawnIndex == 3) { spawnX = spawnX - 100; spawnY = spawnY + 50; }
-          if (spawnIndex == 4) { spawnX = spawnX - 200; }
-          if (spawnIndex == 5) { spawnX = spawnX - 100; }
-        }
+
+        // In the henemy_troopPush function replace the inline spawning logic with:
+        const { spawnX, spawnY } = getSpawnCoordinatesHEnemyTroopPush(spawnIndex, enemyCountToSpawn, xOffsetOptions, yNegativeOffsetOptions, yPositiveOffsetOptions);
         const enemy = { enemyId: enemySpawnId, x: spawnX, y: spawnY, hidden: isHidden }; //追加するエネミーの設定(ID1、座標(100,100)、表示有)
         enemyTroop.members.push(enemy); //設定したエネミーをグループに追加
       }
     }
   };
+
+  function getSpawnCoordinatesHEnemyTroopPush(spawnIndex, enemyCountToSpawn, xOffsetOptions, yNegativeOffsetOptions, yPositiveOffsetOptions) {
+    let spawnX, spawnY;
+    if (spawnIndex == 1) { spawnX = 450; spawnY = 350; }
+    if (enemyCountToSpawn == 1) { spawnX = 350; spawnY = 420; }
+    if (spawnIndex == 2) { spawnX = 400; spawnY = 500; }
+    if (spawnIndex == 3) { spawnX = 350; spawnY = 350; }
+    if (spawnIndex == 4) { spawnX = 300; spawnY = 500; }
+    if (spawnIndex == 5) { spawnX = 250; spawnY = 350; }
+    if (spawnIndex == 6) { spawnX = 200; spawnY = 500; }
+    if (spawnIndex == 7) { spawnX = 150; spawnY = 350; }
+    if (spawnIndex == 8) { spawnX = 100; spawnY = 500; }
+
+    if (spawnIndex >= 2 && spawnIndex <= 6) {
+      spawnX = spawnX + Number(xOffsetOptions[Math.floor(Math.random() * xOffsetOptions.length)]);
+    }
+
+    if (spawnIndex == 2 || spawnIndex == 4 || spawnIndex == 6 || spawnIndex == 8) {
+      spawnY = spawnY + Number(yNegativeOffsetOptions[Math.floor(Math.random() * yNegativeOffsetOptions.length)]);
+    } else {
+      spawnY = spawnY + Number(yPositiveOffsetOptions[Math.floor(Math.random() * yPositiveOffsetOptions.length)]);
+    }
+
+    if (enemyCountToSpawn == 2) {
+      if (spawnIndex == 2) { spawnX = spawnX - 200; }
+    }
+    if (enemyCountToSpawn == 3) {
+      if (spawnIndex == 2) { spawnX = spawnX - 100; }
+      if (spawnIndex == 3) { spawnX = spawnX - 100; }
+    }
+    if (enemyCountToSpawn == 4) {
+      if (spawnIndex == 2) { spawnX = spawnX - 100; }
+      if (spawnIndex == 3) { spawnX = spawnX - 100; }
+      if (spawnIndex == 4) { spawnX = spawnX - 200; }
+    }
+    if (enemyCountToSpawn == 5) {
+      if (spawnIndex == 3) { spawnX = spawnX - 100; spawnY = spawnY + 50; }
+      if (spawnIndex == 4) { spawnX = spawnX - 200; }
+      if (spawnIndex == 5) { spawnX = spawnX - 100; }
+    }
+
+    return { spawnX, spawnY };
+  }
 
   //エネミーグループ配置設定。bosssetup時に実行
   enemy_troopPosition1 = function () {
