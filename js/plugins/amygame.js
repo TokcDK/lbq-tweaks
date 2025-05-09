@@ -1559,64 +1559,71 @@
 
     let spawnChanceOffset = 0;
     for (let troopId = 11; troopId <= 20; troopId++) {
-      let hasSpawnedId27 = 0;
-      let hasSpawnedId28 = 0;
-      if ($gameVariables.value(220) != 0) {
-        let spawnPool = $gameVariables.value(220);
-        const enemyTroop = $dataTroops[troopId];
-        enemyTroop.name = $dataItems[$gameVariables.value(240)].meta['TroopName'];
-        enemyTroop.members = []; //グループのメンバーを空に
-        const battleEnemyPopOptions = $dataItems[$gameVariables.value(240)].meta['BattleEnemyPopC'].split(',');
-        let enemyCountToSpawn = Number(battleEnemyPopOptions[Math.floor(Math.random() * battleEnemyPopOptions.length)]);
-        if ($gameVariables.value(232) >= 2) {
-          let additionalSpawnOffset = Math.floor(Math.random() * $gameVariables.value(232));
-          enemyCountToSpawn += additionalSpawnOffset;
-          if ($gameVariables.value(270) >= 11) {
-            let bonusChance = Math.floor(Math.random() * 101);
-            if ($gameVariables.value(270) >= bonusChance) {
-              enemyCountToSpawn += 1;
-            }
-          }
-        }
-        if ($gameVariables.value(242) != 0) {
-          for (let index = 0; index <= $gameVariables.value(242).length - 1; index++) {
-            let chanceRoll = Math.floor(Math.random() * 101);
-            chanceRoll -= spawnChanceOffset;
-            if ($gameParty.membersState(304)) { chanceRoll += 10; }
-            if ($gameParty.membersState(305)) { chanceRoll += 10; }
-            if ($gameParty.membersState(306)) { chanceRoll += 10; }
-            if (chanceRoll >= 80) {
-              spawnPool = spawnPool.concat($gameVariables.value(242));
-              spawnChanceOffset += 10;
-            }
-          }
-        }
-        if (enemyCountToSpawn >= 9) { enemyCountToSpawn = 8; }
-        //var enemyCountToSpawn = Math.max(...battleEnemyPopOptions);
-        const spawnPoolLength = spawnPool.length;
-        for (let spawnIndex = 1; spawnIndex <= enemyCountToSpawn; spawnIndex++) {
-          let enemySpawnId = Number(spawnPool[Math.floor(Math.random() * spawnPoolLength)]); //出現エネミースポーン
-          if (enemySpawnId == 27 && hasSpawnedId27 == 1) { enemySpawnId = 21; }
-          if (enemySpawnId == 27) { hasSpawnedId27 = 1; };//id27を１体だけにする
-          if (enemySpawnId == 28 && hasSpawnedId28 == 1) { enemySpawnId = 22; }
-          if (enemySpawnId == 28) { hasSpawnedId28 = 1; };//id28を１体だけにする
-          let isHidden = (spawnIndex >= enemyCountToSpawn && enemyCountToSpawn != 1) ? true : false; //ラスト一人を隠している。エネミー一人の時は除外
-          
-          const { spawnX, spawnY } = getSpawnCoordinatesEnemyTroopPush(
-            spawnIndex,
-            enemyCountToSpawn,
-            xOffsetOptions,
-            yNegativeOffsetOptions,
-            yPositiveOffsetOptions
-          );
+      if ($gameVariables.value(220) === 0) continue;
 
-          const enemy = { enemyId: enemySpawnId, x: spawnX, y: spawnY, hidden: isHidden }; //追加するエネミーの設定(ID1、座標(100,100)、表示有)
-          enemyTroop.members.push(enemy); //設定したエネミーをグループに追加
+      let spawnPool = $gameVariables.value(220);
+      const enemyTroop = $dataTroops[troopId];
+      enemyTroop.name = $dataItems[$gameVariables.value(240)].meta['TroopName'];
+      enemyTroop.members = []; //グループのメンバーを空に
+      const battleEnemyPopOptions = $dataItems[$gameVariables.value(240)].meta['BattleEnemyPopC'].split(',');
+      
+      let enemyCountToSpawn = Number(battleEnemyPopOptions[Math.floor(Math.random() * battleEnemyPopOptions.length)]);
+      if ($gameVariables.value(232) >= 2) {
+        let additionalSpawnOffset = Math.floor(Math.random() * $gameVariables.value(232));
+        enemyCountToSpawn += additionalSpawnOffset;
+        if ($gameVariables.value(270) >= 11) {
+          let bonusChance = Math.floor(Math.random() * 101);
+          if ($gameVariables.value(270) >= bonusChance) {
+            enemyCountToSpawn += 1;
+          }
         }
+      }
+      if ($gameVariables.value(242) != 0) {
+        for (let index = 0; index <= $gameVariables.value(242).length - 1; index++) {
+          let chanceRoll = Math.floor(Math.random() * 101);
+          chanceRoll -= spawnChanceOffset;
+          if ($gameParty.membersState(304)) { chanceRoll += 10; }
+          if ($gameParty.membersState(305)) { chanceRoll += 10; }
+          if ($gameParty.membersState(306)) { chanceRoll += 10; }
+          if (chanceRoll >= 80) {
+            spawnPool = spawnPool.concat($gameVariables.value(242));
+            spawnChanceOffset += 10;
+          }
+        }
+      }
+      if (enemyCountToSpawn >= 9) { enemyCountToSpawn = 8; }
+
+      //var enemyCountToSpawn = Math.max(...battleEnemyPopOptions);
+      const spawnPoolLength = spawnPool.length;
+      const spawnTracker = { hasSpawned27: false, hasSpawned28: false };
+      for (let spawnIndex = 1; spawnIndex <= enemyCountToSpawn; spawnIndex++) {  
+        // get enemy data      
+        const enemySpawnId = resolveEnemySpawnIdEnemyTroopPush(spawnPool, spawnPoolLength, spawnTracker);
+        const { spawnX, spawnY } = getSpawnCoordinatesEnemyTroopPush(
+          spawnIndex,
+          enemyCountToSpawn,
+          xOffsetOptions,
+          yNegativeOffsetOptions,
+          yPositiveOffsetOptions
+        );
+        let isHidden = (spawnIndex >= enemyCountToSpawn && enemyCountToSpawn != 1) ? true : false; //ラスト一人を隠している。エネミー一人の時は除外
+
+        // add enemy
+        const enemy = { enemyId: enemySpawnId, x: spawnX, y: spawnY, hidden: isHidden }; //追加するエネミーの設定(ID1、座標(100,100)、表示有)
+        enemyTroop.members.push(enemy); //設定したエネミーをグループに追加
       }
     }
     $gameSwitches.setValue(357, true);
   };
+
+  function resolveEnemySpawnIdEnemyTroopPush(spawnPool, spawnPoolLength, tracker) {
+    let enemySpawnId = Number(spawnPool[Math.floor(Math.random() * spawnPoolLength)]); // 出現エネミースポーン
+    if (enemySpawnId === 27 && tracker.hasSpawned27 === true) { enemySpawnId = 21; }
+    if (enemySpawnId === 27) { tracker.hasSpawned27 = true; } // id27を１体だけにする
+    if (enemySpawnId === 28 && tracker.hasSpawned28 === true) { enemySpawnId = 22; }
+    if (enemySpawnId === 28) { tracker.hasSpawned28 = true; } // id28を１体だけにする
+    return enemySpawnId;
+  }
 
   function getSpawnCoordinatesEnemyTroopPush(spawnIndex, enemyCountToSpawn, xOffsetOptions, yNegativeOffsetOptions, yPositiveOffsetOptions) {
     let spawnX, spawnY;
@@ -1661,24 +1668,26 @@
 
   henemy_troopPush = function () {
 
-    if ($gameVariables.value(228) != 0) {
-      const spawnPool = $gameVariables.value(228);
-      const spawnPoolLength = spawnPool.length;
-      const troopId = 10; //グループIDを指定
-      const enemyTroop = $dataTroops[troopId];
-      enemyTroop.name = $dataItems[$gameVariables.value(240)].meta['TroopNameH'];
-      enemyTroop.members = []; //グループのメンバーを空に
-      const battleEnemyPopHOptions = $dataItems[$gameVariables.value(240)].meta['BattleEnemyPopCH'].split(',');
-      let enemyCountToSpawn = Number(battleEnemyPopHOptions[Math.floor(Math.random() * battleEnemyPopHOptions.length)]);
-      for (let spawnIndex = 1; spawnIndex <= enemyCountToSpawn; spawnIndex++) {
-        let enemySpawnId = Number(spawnPool[Math.floor(Math.random() * spawnPoolLength)]); //出現エネミースポーン
-        let isHidden = (spawnIndex >= enemyCountToSpawn) ? true : false;
+    if ($gameVariables.value(228) === 0) return;
 
-        // In the henemy_troopPush function replace the inline spawning logic with:
-        const { spawnX, spawnY } = getSpawnCoordinatesHEnemyTroopPush(spawnIndex, enemyCountToSpawn, xOffsetOptions, yNegativeOffsetOptions, yPositiveOffsetOptions);
-        const enemy = { enemyId: enemySpawnId, x: spawnX, y: spawnY, hidden: isHidden }; //追加するエネミーの設定(ID1、座標(100,100)、表示有)
-        enemyTroop.members.push(enemy); //設定したエネミーをグループに追加
-      }
+    const spawnPoolH = $gameVariables.value(228);
+    const spawnPoolHLength = spawnPoolH.length;
+    const troopId = 10; //グループIDを指定
+    const enemyTroopH = $dataTroops[troopId];
+    enemyTroopH.name = $dataItems[$gameVariables.value(240)].meta['TroopNameH'];
+    enemyTroopH.members = []; //グループのメンバーを空に
+    const battleEnemyPopHOptions = $dataItems[$gameVariables.value(240)].meta['BattleEnemyPopCH'].split(',');
+    const enemyCountToSpawn = Number(battleEnemyPopHOptions[Math.floor(Math.random() * battleEnemyPopHOptions.length)]);
+    
+    for (let spawnIndex = 1; spawnIndex <= enemyCountToSpawn; spawnIndex++) {
+      // get enemy data
+      let enemySpawnId = Number(spawnPoolH[Math.floor(Math.random() * spawnPoolHLength)]); //出現エネミースポーン
+      let isHidden = (spawnIndex >= enemyCountToSpawn) ? true : false;
+      const { spawnX, spawnY } = getSpawnCoordinatesHEnemyTroopPush(spawnIndex, enemyCountToSpawn, xOffsetOptions, yNegativeOffsetOptions, yPositiveOffsetOptions);
+      
+      // add enemy
+      const enemy = { enemyId: enemySpawnId, x: spawnX, y: spawnY, hidden: isHidden }; //追加するエネミーの設定(ID1、座標(100,100)、表示有)
+      enemyTroopH.members.push(enemy); //設定したエネミーをグループに追加
     }
   };
 
