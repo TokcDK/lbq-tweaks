@@ -1362,66 +1362,102 @@
   };
   //スキルアイテム使用での二つ名変更//0スキル1アイテムskillItem_titles(a,b,this.item().id,0);
   skillItem_titles = function (sourceActor, targetActor, itemId, ItemType) {
-    if (targetActor.actorId() == sourceActor.actorId()) {
+    // Only process if target is same as source actor
+    if (targetActor.actorId() !== sourceActor.actorId()) return;
 
-      const itemsData = ItemType == 0 ? $dataSkills : $dataItems;
-      const itemData = itemsData[itemId];
-      const itemMeta = itemData.meta;
-      let soundEffectParams = ["Z11_NickNameChange", 50, 110, 0]; // se settings
-      if (itemMeta['Menu Category']) {
-        if (itemMeta['Menu Category'] === " H'sTitle") { 
-          soundEffectParams = ["Z_Suspicious", 50, 150, 0]; 
-        }
-      }
-      if (ItemType === 0) {
-        if (itemData.stypeId === 15) { 
-          soundEffectParams = ["Z_Suspicious", 50, 150, 0]; 
-        }
-      }
+    const itemsData = ItemType == 0 ? $dataSkills : $dataItems;
+    const itemData = itemsData[itemId];
 
-      let skillRankLabel = ``; // Rank label
-      if (itemMeta['RankUpPoint']) {
-        if (Number(itemMeta['Max Mastery Level']) === 6) {
-          skillRankLabel = masteryLevel6Map[targetActor.skillMasteryLevel(itemId)] || skillRankLabel;
-        }
-        if (Number(itemMeta['Max Mastery Level']) === 5) {
-          if (Number(itemMeta['RankUpPoint']) >= 100) {
-            skillRankLabel = masteryLevel5R100Map[targetActor.skillMasteryLevel(itemId)] || skillRankLabel;
-          } else {
-            skillRankLabel = masteryLevel5Map[targetActor.skillMasteryLevel(itemId)] || skillRankLabel;
-          }
-        }
-        if (Number(itemMeta['Max Mastery Level']) === 10) {
-          const rankUpPoint = Number(itemMeta['RankUpPoint']);
-          const level = targetActor.skillMasteryLevel(itemId);
-          skillRankLabel = (rankUpPoint >= 100 ? masteryLevel10R100Map[level] : masteryLevel10Map[level]) || skillRankLabel;
-        }
-      }
-      
-      // Special pattern for the libido-related skill
-      if (ItemType === 0 && itemId === 50) {
-        const libidoValue = $gameVariables.value(targetActor.actorId() + 380)[1];
-        skillRankLabel = getLibidoRankLabel(libidoValue);
-      }
-      
-      const actorName = targetActor.name();
-      const nickname = $dataActors[targetActor._actorId].nickname;
-      if (ItemType === 1 && itemId === 600) { // Default title setting item; currently unused
-        $gameActors.actor(targetActor._actorId).setNickname(`${nickname}`);
-        TickerManager.show(`${actorName}の二つ名が${nickname}になった！`);
-        AudioManager.playSe({ "name": soundEffectParams[0], "volume": Number(soundEffectParams[1]), "pitch": Number(soundEffectParams[2]), "pan": Number(soundEffectParams[3]) });
-      } else {
-        const newTitle = itemData.name + skillRankLabel;
-        $gameActors.actor(targetActor._actorId).setNickname(`＜${newTitle}＞`);
-        TickerManager.show(`${actorName}の二つ名が＜${newTitle}＞になった！`);
-        AudioManager.playSe({ "name": soundEffectParams[0], "volume": Number(soundEffectParams[1]), "pitch": Number(soundEffectParams[2]), "pan": Number(soundEffectParams[3]) });
-      }
-    }
+    // Get appropriate sound effect parameters based on item type
+    const soundEffectParams = getSoundEffectParamsSkillItemTitles(itemData, ItemType);
+
+    // Get rank label based on item mastery level
+    const skillRankLabel = getSkillRankLabelSkillItemTitles(targetActor, itemData, itemId, ItemType);
+
+    // Update actor's title and display notification
+    updateActorTitleSkillItemTitles(targetActor, itemData, skillRankLabel, soundEffectParams, ItemType, itemId);
   };
+
+  // Determine appropriate sound effect based on item type and category
+  function getSoundEffectParamsSkillItemTitles(itemData, ItemType) {
+    // Default sound effect for title changes
+    let soundEffectParams = ["Z11_NickNameChange", 50, 110, 0];
+
+    const itemMeta = itemData.meta;
+
+    // Check Menu Category for H titles
+    if (itemMeta['Menu Category'] && itemMeta['Menu Category'] === " H'sTitle") {
+      soundEffectParams = ["Z_Suspicious", 50, 150, 0];
+    }
+
+    // Check skill type for special skills (type 15)
+    if (ItemType === 0 && itemData.stypeId === 15) {
+      soundEffectParams = ["Z_Suspicious", 50, 150, 0];
+    }
+
+    return soundEffectParams;
+  }
+
+  // Determine rank label based on skill mastery level and configuration
+  function getSkillRankLabelSkillItemTitles(actor, itemData, itemId, ItemType) {
+    // Special case for libido-related skill (ID 50)
+    if (ItemType === 0 && itemId === 50) {
+      const libidoValue = $gameVariables.value(actor.actorId() + 380)[1];
+      return getLibidoRankLabelSkillItemTitles(libidoValue);
+    }
+
+    const itemMeta = itemData.meta;
+    if (!itemMeta['RankUpPoint']) return '';
+
+    const masteryLevel = actor.skillMasteryLevel(itemId);
+    const maxMasteryLevel = Number(itemMeta['Max Mastery Level']);
+    const rankUpPoint = Number(itemMeta['RankUpPoint']);
+
+    // Select appropriate rank label based on max mastery level and rank up point
+    switch (maxMasteryLevel) {
+      case 6:
+        return masteryLevel6Map[masteryLevel] || '';
+      case 5:
+        return (rankUpPoint >= 100 ?
+          masteryLevel5R100Map[masteryLevel] :
+          masteryLevel5Map[masteryLevel]) || '';
+      case 10:
+        return (rankUpPoint >= 100 ?
+          masteryLevel10R100Map[masteryLevel] :
+          masteryLevel10Map[masteryLevel]) || '';
+      default:
+        return '';
+    }
+  }
+
+  // Update actor's title and display notification to player
+  function updateActorTitleSkillItemTitles(actor, itemData, skillRankLabel, soundEffectParams, ItemType, itemId) {
+    const actorName = actor.name();
+    const nickname = $dataActors[actor._actorId].nickname;
+
+    // Handle special case for default title item (ID 600)
+    if (ItemType === 1 && itemId === 600) {
+      $gameActors.actor(actor._actorId).setNickname(`${nickname}`);
+      TickerManager.show(`${actorName}の二つ名が${nickname}になった！`);
+    } else {
+      // Regular title update with rank label
+      const newTitle = itemData.name + skillRankLabel;
+      $gameActors.actor(actor._actorId).setNickname(`＜${newTitle}＞`);
+      TickerManager.show(`${actorName}の二つ名が＜${newTitle}＞になった！`);
+    }
+
+    // Play sound effect
+    AudioManager.playSe({
+      "name": soundEffectParams[0],
+      "volume": Number(soundEffectParams[1]),
+      "pitch": Number(soundEffectParams[2]),
+      "pan": Number(soundEffectParams[3])
+    });
+  }
 
   // Special pattern for the libido-related skill
   // Helper function to determine rank label for libido level
-  function getLibidoRankLabel(libidoValue) {
+  function getLibidoRankLabelSkillItemTitles(libidoValue) {
     if (libidoValue > 900) return '[SSS]';
     if (libidoValue > 800) return '[SS]';
     if (libidoValue > 600) return '[A]';
