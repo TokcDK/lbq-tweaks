@@ -487,8 +487,12 @@ Game_Actor.prototype.initJp = function() {
 };
 
 Game_Actor.prototype.setJp = function(value, classId) {
+    if(!value) return; // asdf, dont think the re is reason to set 0 jp points
+
     value = parseInt(value);
-    if (value === NaN) value = 0;
+    if (!value) return; // asdf, was not parsed to int
+    
+    //if (value === NaN) value = 0;
     classId = classId || this.currentClass().id;
 		if (!this._jp) this._jp = {};
     if (!this._jp[classId]) this._jp[classId] = 0;
