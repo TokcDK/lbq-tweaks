@@ -4582,46 +4582,45 @@ battleStatus_showHide = function (id1) {
 }
 
 //確率でステート付与state_addFormula1([4,50,user,target,user.mdf,target.luk]);
-state_addFormula1 = function (params) {
-  // Cache parameters for easier access
-  const stateId    = params[0]; // e.g., 4
-  const baseChance = params[1]; // e.g., 50
-  const user       = params[2];
-  const target     = params[3];
-  const userMDF    = params[4];
-  const targetLUK  = params[5];
-
-  // Cache the state data
-  const state = $dataStates[stateId];
-
-  let stateAppliedCount = 0;
-  let message;
-  let activationChance;
-  let resistanceRoll;
-
+state_addFormula1 = function(params) {
+  // Extract parameters (destructuring for readability)
+  const [stateId, baseChance, user, target, userMDF, targetLUK] = params;
+  
+  // Cache state data
+  const stateData = $dataStates[stateId];
+  
+  // Skip processing if target is immune
+  const targetName = `\\C[16]${target.name()}\\C[0]`;
+  const stateName = `\\C[10]${stateData.name}\\C[0]`;
+  if (target.isStateResist(stateId)) {
+    showMessage(`${targetName}は${stateName}を無効化した！。（\\C[10]完全耐性\\C[0]）`);
+    return;
+  }
+  
+  // Show initial message only when user isn't targeting self
+  const userName = `\\C[2]${user.name()}\\C[0]`;
   if (user !== target) {
-    message = `\\C[2]${user.name()}\\C[0]が\\C[10]${state.name}\\C[0]を付与した！　`;
-    showMessage(message);
+    showMessage(`${userName}が${stateName}を付与した！　`);
   }
-
-  if (!target.isStateResist(stateId)) {
-    activationChance = Math.floor((1.0 + (userMDF - targetLUK) * 0.01) * baseChance);
-    resistanceRoll = Math.floor(Math.random() * target.stateRate(stateId) * 100);
-    if (activationChance > resistanceRoll) {
-      target.addState(stateId);
-      stateAppliedCount += 1;
-    }
-  } else {
-    message = `\\C[16]${target.name()}\\C[0]は\\C[10]${state.name}\\C[0]を無効化した！。（\\C[10]完全耐性\\C[0]）`;
+  
+  // Calculate once for both conditionals
+  const activationChance = Math.floor((1.0 + (userMDF - targetLUK) * 0.01) * baseChance);
+  const resistanceRoll = Math.floor(Math.random() * target.stateRate(stateId) * 100);
+  const isStateApplied = activationChance > resistanceRoll;
+  
+  // Apply state if check passed
+  if (isStateApplied) {
+    target.addState(stateId);
   }
-
-  if (stateAppliedCount >= 1) {
-    message = `\\C[16]${target.name()}\\C[0]は\\C[10]${state.name}\\C[0]を付与された…。（判定：\\C[4]${resistanceRoll}\\C[0] > \\C[10]${activationChance}\\C[0]）`;
-  } else {
-    message = `\\C[16]${target.name()}\\C[0]は\\C[10]${state.name}\\C[0]を無効化した！（判定：\\C[4]${resistanceRoll}\\C[0] > \\C[10]${activationChance}\\C[0]）`;
-  }
-
-  showMessage(message);
+  
+  // Show appropriate result message
+  const resultMessage = isStateApplied
+    ? `${targetName}は${stateName}を付与された…。`
+    : `${targetName}は${stateName}を無効化した！`;
+  
+  const resist = `\\C[4]${resistanceRoll}\\C[0]`;
+  const chance = `\\C[10]${activationChance}\\C[0]`;
+  showMessage(`${resultMessage}（判定：${resist} > ${chance}）`);
 };
 
 //トータルダメージ表示
