@@ -1138,7 +1138,7 @@
   abNomal_Clear = function (a, b, itemId, id1) {
 
     var value3 = 0;
-    var valueItems = get_valueItems_sis(id1);
+    var valueItems = getItemsSourceSkillsItemsStates(id1);
     if (valueItems[itemId].meta['abNomalClearCount']) {
       var value1 = Number(valueItems[itemId].meta['abNomalClearCount']);
     } else {
@@ -1266,7 +1266,7 @@
     };
     if (value1 == 0) {
       var value3 = 0;
-      var valueItems = get_valueItems_sis(id1);
+      var valueItems = getItemsSourceSkillsItemsStates(id1);
       if (valueItems[itemId].meta['dispelCount']) {
         var value1 = Number(valueItems[itemId].meta['dispelCount']);
       } else {
@@ -6441,7 +6441,7 @@
     }
   }
 
-  get_valueItems_sis = function (id) {
+  getItemsSourceSkillsItemsStates = function (id) {
     switch (Number(id)) {
       case 0:
         return $dataSkills;
@@ -6450,7 +6450,7 @@
       case 2:
         return $dataStates;
       default:
-        console.error(`get_valueItems_sis: id(${id}}) is not 0,1,2!`);
+        console.error(`getItemsSourceSkillsItemsStates: id(${id}}) is not 0,1,2!`);
         return null;
     }
   }
