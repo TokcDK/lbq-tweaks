@@ -3518,6 +3518,16 @@
   //アイテム武器防具抽選スクリプト。id12アイテム1武器2防具3all
   //id13がall。10まで。value1としてid決定
   const DEFAULT_RARITY_LIST = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  const rarityChecks = [
+    { threshold: 45, value: 2 },
+    { threshold: 40, value: 3 },
+    { threshold: 35, value: 4 },
+    { threshold: 30, value: 5 },
+    { threshold: 9, value: 6 },
+    { threshold: 7, value: 7 },
+    { threshold: 5, value: 8 },
+    { threshold: 3, value: 9 },
+  ];
   gacha_naiyou = function (valueItemsType, rarity) {
 
     if (valueItemsType && valueItemsType > -1 && valueItemsType < 3) {
@@ -3535,14 +3545,11 @@
         rarityArray.push(1);
         if (i > 45) continue;
 
-        if (i <= 45) { rarityArray.push(2); }
-        if (i <= 40) { rarityArray.push(3); }
-        if (i <= 35) { rarityArray.push(4); }
-        if (i <= 30) { rarityArray.push(5); }
-        if (i <= 9) { rarityArray.push(6); }
-        if (i <= 7) { rarityArray.push(7); }
-        if (i <= 5) { rarityArray.push(8); }
-        if (i <= 3) { rarityArray.push(9); }
+        rarityChecks.forEach(check => {
+          if (i <= check.threshold) {
+            rarityArray.push(check.value);
+          }
+        });
       }
       chosenRarity = rarityArray[Math.floor(Math.random() * rarityArray.length)];
       //ガチャ称号取得でＵＲ，ＬＲ解放
