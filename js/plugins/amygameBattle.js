@@ -4583,38 +4583,45 @@ battleStatus_showHide = function (id1) {
 
 //確率でステート付与state_addFormula1([4,50,user,target,user.mdf,target.luk]);
 state_addFormula1 = function (params) {
+  // Cache parameters for easier access
+  const stateId    = params[0]; // e.g., 4
+  const baseChance = params[1]; // e.g., 50
+  const user       = params[2];
+  const target     = params[3];
+  const userMDF    = params[4];
+  const targetLUK  = params[5];
 
-  // params[0] = state ID (e.g., 4);
-  // params[1] = base chance (e.g., 50);
-  // params[2] = user;
-  // params[3] = target;
-  // params[4] = user.mdf;
-  // params[5] = target.luk;
+  // Cache the state data
+  const state = $dataStates[stateId];
+
   let stateAppliedCount = 0;
   let message;
   let activationChance;
   let resistanceRoll;
-  if (params[2] != params[3]) {
-    message = `\\C[2]${params[2].name()}\\C[0]が\\C[10]${$dataStates[params[0]].name}\\C[0]を付与した！　`;
-    showMessage(message);
-  };
-  if (!params[3].isStateResist(params[0])) {
-    activationChance = Math.floor((1.0 + (params[4] - params[5]) * 0.01) * params[1]);
-    resistanceRoll = Math.floor(Math.random() * params[3].stateRate(params[0]) * 100);
-    if (activationChance > resistanceRoll) {
-      params[3].addState(params[0]);
-      stateAppliedCount += 1;
-    };
-  } else {
-    message = `\\C[16]${params[3].name()}\\C[0]は\\C[10]${$dataStates[params[0]].name}\\C[0]を無効化した！。（\\C[10]完全耐性\\C[0]）`;
-  };
-  if (stateAppliedCount >= 1) {
-    message = `\\C[16]${params[3].name()}\\C[0]は\\C[10]${$dataStates[params[0]].name}\\C[0]を付与された…。（判定：\\C[4]${resistanceRoll}\\C[0] > \\C[10]${activationChance}\\C[0]）`;
-  } else {
-    message = `\\C[16]${params[3].name()}\\C[0]は\\C[10]${$dataStates[params[0]].name}\\C[0]を無効化した！（判定：\\C[4]${resistanceRoll}\\C[0] > \\C[10]${activationChance}\\C[0]）`;
-  };
-  showMessage(message);
 
+  if (user !== target) {
+    message = `\\C[2]${user.name()}\\C[0]が\\C[10]${state.name}\\C[0]を付与した！　`;
+    showMessage(message);
+  }
+
+  if (!target.isStateResist(stateId)) {
+    activationChance = Math.floor((1.0 + (userMDF - targetLUK) * 0.01) * baseChance);
+    resistanceRoll = Math.floor(Math.random() * target.stateRate(stateId) * 100);
+    if (activationChance > resistanceRoll) {
+      target.addState(stateId);
+      stateAppliedCount += 1;
+    }
+  } else {
+    message = `\\C[16]${target.name()}\\C[0]は\\C[10]${state.name}\\C[0]を無効化した！。（\\C[10]完全耐性\\C[0]）`;
+  }
+
+  if (stateAppliedCount >= 1) {
+    message = `\\C[16]${target.name()}\\C[0]は\\C[10]${state.name}\\C[0]を付与された…。（判定：\\C[4]${resistanceRoll}\\C[0] > \\C[10]${activationChance}\\C[0]）`;
+  } else {
+    message = `\\C[16]${target.name()}\\C[0]は\\C[10]${state.name}\\C[0]を無効化した！（判定：\\C[4]${resistanceRoll}\\C[0] > \\C[10]${activationChance}\\C[0]）`;
+  }
+
+  showMessage(message);
 };
 
 //トータルダメージ表示
