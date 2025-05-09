@@ -1487,35 +1487,33 @@
   //スキル複数選択肢1スキル用
   skill_sentaku = function (skillId, unusedValue) {
     // Cache meta for performance.
-    const meta = $dataSkills[skillId].meta;
+    const skill = $dataSkills[skillId];
+    const meta = skill.meta;
     const varId = Number(meta.VariableChangeUse);
-    const currentValue = $gameVariables.value(varId);
 
     if (!$gameSwitches.value(19)) {
-      $gameVariables.setValue(varId, getVariableValueSkillSentaku(currentValue, meta));
+      $gameVariables.setValue(varId, getVariableValueSkillSentaku($gameVariables.value(varId), meta));
     }
-    
-    const newValue = $gameVariables.value(varId);
-    switch (newValue) {
-      case 1:
-        $dataSkills[skillId].name = meta.ValChangeName1;
-        break;
-      case 2:
-        $dataSkills[skillId].name = meta.ValChangeName2;
-        break;
-      case 3:
-        $dataSkills[skillId].name = meta.ValChangeName3;
-        break;
-      case 4:
-        $dataSkills[skillId].name = meta.ValChangeName4;
-        break;
-      case 5:
-        $dataSkills[skillId].name = meta.ValChangeName5;
-        break;
-      default:
-        break;
-    }
+
+    skill.name = getUpdatedSkillNameSkillSentaku($gameVariables.value(varId), meta, skill.name);
   };
+
+  function getUpdatedSkillNameSkillSentaku(val, meta, def) {
+    switch (val) {
+      case 1:
+        return meta.ValChangeName1;
+      case 2:
+        return meta.ValChangeName2;
+      case 3:
+        return meta.ValChangeName3;
+      case 4:
+        return meta.ValChangeName4;
+      case 5:
+        return meta.ValChangeName5;
+      default:
+        return def;
+    }
+  }
 
   function getVariableValueSkillSentaku(currentValue, meta) {
     switch (currentValue) {
