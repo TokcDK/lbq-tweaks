@@ -1390,19 +1390,11 @@
           skillRankLabel = (rankUpPoint >= 100 ? masteryLevel10R100Map[level] : masteryLevel10Map[level]0 || skillRankLabel;
         }
       }
+
       // Special pattern for the libido-related skill
       if (ItemType == 0 && itemId == 50) {
         const libidoValue = $gameVariables.value(targetActor.actorId() + 380)[1];
-        if (libidoValue <= 100) { skillRankLabel = `[圏外]`; }
-        if (libidoValue <= 200 && libidoValue >= 101) { skillRankLabel = `[圏外]`; }
-        if (libidoValue <= 300 && libidoValue >= 201) { skillRankLabel = `[E]`; }
-        if (libidoValue <= 400 && libidoValue >= 301) { skillRankLabel = `[D]`; }
-        if (libidoValue <= 500 && libidoValue >= 401) { skillRankLabel = `[C]`; }
-        if (libidoValue <= 600 && libidoValue >= 501) { skillRankLabel = `[B]`; }
-        if (libidoValue <= 700 && libidoValue >= 601) { skillRankLabel = `[A]`; }
-        if (libidoValue <= 800 && libidoValue >= 701) { skillRankLabel = `[S]`; }
-        if (libidoValue <= 900 && libidoValue >= 801) { skillRankLabel = `[SS]`; }
-        if (libidoValue >= 901) { skillRankLabel = `[SSS]`; }
+        skillRankLabel = getLibidoRankLabel(libidoValue);
       }
       const actorName = targetActor.name();
       const nickname = $dataActors[targetActor._actorId].nickname;
@@ -1420,7 +1412,18 @@
 
   };
 
-
+  // Special pattern for the libido-related skill
+  // Helper function to determine rank label for libido level
+  function getLibidoRankLabel(libidoValue) {
+    if (libidoValue > 900) return '[SSS]';
+    if (libidoValue > 800) return '[SS]';
+    if (libidoValue > 600) return '[A]';
+    if (libidoValue > 500) return '[B]';
+    if (libidoValue > 400) return '[C]';
+    if (libidoValue > 300) return '[D]';
+    if (libidoValue > 200) return '[E]';
+    return '[圏外]'; // Default for values 200 and below
+  }
 
   //コモンイベントでスクリプト実行前に代入
   common_script1 = function (id1, id2, id3, id4, id5, id6, id7, id8, id9, id10) {
