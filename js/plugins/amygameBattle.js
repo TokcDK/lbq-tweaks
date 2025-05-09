@@ -4582,30 +4582,38 @@ battleStatus_showHide = function (id1) {
 }
 
 //確率でステート付与state_addFormula1([4,50,user,target,user.mdf,target.luk]);
-state_addFormula1 = function (arr10) {
+state_addFormula1 = function (params) {
 
-  //arr10[0] = 4;arr10[1] = 50;arr10[2] = user;arr10[3] = target;arr10[4] = user.mdf;arr10[5] = target.luk;
-  stateId4 = 0;
-  if (arr10[2] != arr10[3]) {
-    var stateId3 = `\\C[2]${arr10[2].name()}\\C[0]が\\C[10]${$dataStates[arr10[0]].name}\\C[0]を付与した！　`;
-    showMessage(stateId3);
+  // params[0] = state ID (e.g., 4);
+  // params[1] = base chance (e.g., 50);
+  // params[2] = user;
+  // params[3] = target;
+  // params[4] = user.mdf;
+  // params[5] = target.luk;
+  let stateAppliedCount = 0;
+  let message;
+  let activationChance;
+  let resistanceRoll;
+  if (params[2] != params[3]) {
+    message = `\\C[2]${params[2].name()}\\C[0]が\\C[10]${$dataStates[params[0]].name}\\C[0]を付与した！　`;
+    showMessage(message);
   };
-  if (!arr10[3].isStateResist(arr10[0])) {
-    var stateId1 = Math.floor((1.0 + (arr10[4] - arr10[5]) * 0.01) * arr10[1]);
-    var stateId2 = Math.floor(Math.random() * arr10[3].stateRate(arr10[0]) * 100);
-    if (stateId1 > stateId2) {
-      arr10[3].addState(arr10[0]);
-      stateId4 += 1;
+  if (!params[3].isStateResist(params[0])) {
+    activationChance = Math.floor((1.0 + (params[4] - params[5]) * 0.01) * params[1]);
+    resistanceRoll = Math.floor(Math.random() * params[3].stateRate(params[0]) * 100);
+    if (activationChance > resistanceRoll) {
+      params[3].addState(params[0]);
+      stateAppliedCount += 1;
     };
   } else {
-    var stateId3 = `\\C[16]${arr10[3].name()}\\C[0]は\\C[10]${$dataStates[arr10[0]].name}\\C[0]を無効化した！。（\\C[10]完全耐性\\C[0]）`;
+    message = `\\C[16]${params[3].name()}\\C[0]は\\C[10]${$dataStates[params[0]].name}\\C[0]を無効化した！。（\\C[10]完全耐性\\C[0]）`;
   };
-  if (stateId4 >= 1) {
-    var stateId3 = `\\C[16]${arr10[3].name()}\\C[0]は\\C[10]${$dataStates[arr10[0]].name}\\C[0]を付与された…。（判定：\\C[4]${stateId2}\\C[0] > \\C[10]${stateId1}\\C[0]）`;
+  if (stateAppliedCount >= 1) {
+    message = `\\C[16]${params[3].name()}\\C[0]は\\C[10]${$dataStates[params[0]].name}\\C[0]を付与された…。（判定：\\C[4]${resistanceRoll}\\C[0] > \\C[10]${activationChance}\\C[0]）`;
   } else {
-    var stateId3 = `\\C[16]${arr10[3].name()}\\C[0]は\\C[10]${$dataStates[arr10[0]].name}\\C[0]を無効化した！（判定：\\C[4]${stateId2}\\C[0] > \\C[10]${stateId1}\\C[0]）`;
+    message = `\\C[16]${params[3].name()}\\C[0]は\\C[10]${$dataStates[params[0]].name}\\C[0]を無効化した！（判定：\\C[4]${resistanceRoll}\\C[0] > \\C[10]${activationChance}\\C[0]）`;
   };
-  showMessage(stateId3);
+  showMessage(message);
 
 };
 
