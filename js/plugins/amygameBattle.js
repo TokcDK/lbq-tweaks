@@ -940,41 +940,45 @@ Element_DebuffRateR = function(target,stateId){
 };
 
 //ステート付与時のアクション
-state_addEffect1 = function(user,target,stateId,id1){
+const defaultPopupColorArray = [255, 128, 0, 255, 256];
+const alternativePopupColorArray = [255, 0, 187, 189, 256];
+state_addEffect1 = function (user, target, stateId, animationId) {
 
-if (!$gameTroop.isAllDead() && $gameParty.inBattle()) {
-  const value10 = $dataStates[stateId].meta['registUp'] ? Math.ceil(Number($dataStates[stateId].meta['registUp']) / 100) : target.isStateAffected(289) ? 0.2 : 0.1;
-  const target1 = $dataStates[(target.isEnemy() ? 490 : 486) + target.index()];
-
-  let arr1 = [255,128,0,255,256];
-  if($dataStates[stateId].meta['Category']){
-    if($dataStates[stateId].meta['Category'] == ' StateabNomal' || $dataStates[stateId].meta['Category'] == ' StateSPabNomal'){//耐性付与。強化は除外
-      target1.traits.push({code: 13, dataId: stateId, value: 1 - value10});
-      arr1 = [255,0,187,189,256];
-    };
-  } else {
-    target1.traits.push({code: 13, dataId: stateId, value: 1 - value10});
-  }
-  const arr2 = valueStateAddState; //<stateAddState:5,201,2>//反応するｽｷﾙﾀｲﾌﾟ,追加ｽﾃｰﾄ,追加回数
-  const gameVar182 = $gameVariables.value(182);
-  for (let j = 0; j < arr2.length; j++) {
-    const stateId = arr2[j];
-    if (target.isStateAffected(stateId)){
-      const stateAddStateArray = $dataStates[stateId].meta['stateAddState'].split(',');
-      if (Number(stateAddStateArray[0]) == gameVar182){
-        for (let id1 = 1; id1 <= Number(stateAddStateArray[2]); id1++) {
-          target.addState(Number(stateAddStateArray[1]));
+  if (!$gameTroop.isAllDead() && $gameParty.inBattle()) {
+    const stateData = $dataStates[stateId];
+    const stateMeta = stateData.meta;
+    let resistanceFactor;
+    resistanceFactor = target.isStateAffected(289) ? 0.2 : 0.1;
+    if (stateMeta['registUp']) {
+      resistanceFactor = Math.ceil(Number(stateMeta['registUp']) / 100);
+    }
+    const stateObject = target.isEnemy() ? $dataStates[490 + target.index()] : $dataStates[486 + target.index()];
+    let popupColorArray = defaultPopupColorArray;
+    if (stateMeta['Category']) {
+      if (stateMeta['Category'] === ' StateabNomal' || stateMeta['Category'] === ' StateSPabNomal') { //耐性付与。強化は除外
+        stateObject.traits.push({ code: 13, dataId: stateId, value: 1 - resistanceFactor });
+        popupColorArray = alternativePopupColorArray;
+      }
+    } else {
+      stateObject.traits.push({ code: 13, dataId: stateId, value: 1 - resistanceFactor });
+    }
+    const additionalStateConfig = valueStateAddState; //<stateAddState:5,201,2>//反応するｽｷﾙﾀｲﾌﾟ,追加ｽﾃｰﾄ,追加回数
+    for (let configIndex = 0; configIndex <= additionalStateConfig.length - 1; configIndex++) {
+      if (target.isStateAffected(additionalStateConfig[configIndex])) {
+        const configStateMeta = $dataStates[additionalStateConfig[configIndex]].meta;
+        if (Number(configStateMeta['stateAddState'].split(',')[0]) === $gameVariables.value(182)) {
+          for (let repIndex = 1; repIndex <= Number(configStateMeta['stateAddState'].split(',')[2]); repIndex++) {
+            target.addState(Number(configStateMeta['stateAddState'].split(',')[1]));
+          }
         }
       }
     }
+    if (ConfigManager.battleAniSpeed >= 3) {
+      target.startAnimation(animationId, false, $gameVariables.value(279));
+      $gameVariables.setValue(279, $gameVariables.value(279) + $gameVariables.value(280));
+      target.startMessagePopup(stateData.name, popupColorArray);
+    }
   }
-  if(ConfigManager.battleAniSpeed >= 3){
-    target.startAnimation(id1, false, $gameVariables.value(279));
-    $gameVariables.setValue(279,$gameVariables.value(279)+$gameVariables.value(280));
-    //target.startMessagePopup(`\x1bI[${$dataStates[value100].iconIndex}]`, arr1);
-    target.startMessagePopup($dataStates[stateId].name, arr1);
-  }
-};
 
 };
 
