@@ -4703,17 +4703,9 @@ party_levelSaveLoad = function (id1) {
 
 actor_custom_replace_attack = function (user, id1, id2) {
   const userStateAffected64 = user.isStateAffected(64);
-  if (userStateAffected64 || user.isStateAffected(63)) {
-    if (userStateAffected64 || user.isLearnedSkill(66)) {
-      return id1;
-    } else {
-      return id2;
-    };
-  } else {
-    return actor_custom_replace_attack_sub(user);
-  };
-
-  return 1;
+  return (userStateAffected64 || user.isStateAffected(63))
+    ? (userStateAffected64 || user.isLearnedSkill(66) ? id1 : id2)
+    : actor_custom_replace_attack_sub(user);
 };
 
 actor_custom_replace_attack_sub = function (user) {
