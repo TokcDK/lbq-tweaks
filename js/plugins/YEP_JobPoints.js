@@ -516,8 +516,12 @@ Game_Actor.prototype.jpRate = function() {
 };
 
 Game_Actor.prototype.gainJp = function(value, classId) {
+    if (!value) return; // asdf, dont think the re is reason to add 0 jp points
+
     value = parseInt(value);
-    if (value === NaN) value = 0;
+    if (!value) return; // asdf, was not parsed to int
+
+    //if (value === NaN) value = 0;
 		classId = classId || this.currentClass().id;
 		value = Math.floor(value * this.jpRate());
 		if ($gameParty.inBattle()) {
