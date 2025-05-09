@@ -1387,7 +1387,7 @@
         if (Number(itemsData[itemId].meta['Max Mastery Level']) === 10) {
           const rankUpPoint = Number(itemsData[itemId].meta['RankUpPoint']);
           const level = targetActor.skillMasteryLevel(itemId);
-          skillRankLabel = (rankUpPoint >= 100 ? masteryLevel10R100Map[level] : masteryLevel10Map[level]0 || skillRankLabel;
+          skillRankLabel = (rankUpPoint >= 100 ? masteryLevel10R100Map[level] : masteryLevel10Map[level] || skillRankLabel;
         }
       }
 
