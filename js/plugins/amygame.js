@@ -6547,7 +6547,7 @@
   }
 
   getRandomIndex = function (length) {
-    return getRandomIndex(length);
+    return Math.floor(Math.random() * length);
   }
 
   getPreviousTachiePicId = function () {
