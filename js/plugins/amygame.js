@@ -3517,6 +3517,7 @@
 
   //アイテム武器防具抽選スクリプト。id12アイテム1武器2防具3all
   //id13がall。10まで。value1としてid決定
+  const DEFAULT_RARITY_LIST = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   gacha_naiyou = function (valueItemsType, rarity) {
 
     if (valueItemsType && valueItemsType > -1 && valueItemsType < 3) {
@@ -3529,7 +3530,7 @@
 
     let chosenRarity = rarity;
     if (rarity < 1) {
-      let rarityArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+      let rarityArray = DEFAULT_RARITY_LIST;
       for (let i = 1; i <= 50; i++) {
         rarityArray.push(1);
         if (i > 45) continue;
@@ -3552,8 +3553,10 @@
         chosenRarity = 7;
       };
     };
+
+    let selectedItemIndex;
     if ($gameParty.inBattle()) {
-      const battlePotionId = 71; //仮指定。ポーションのみ
+      selectedItemIndex = 71; //仮指定。ポーションのみ
     } else {
       let eligibleItemIndices = [0];
       const itemsLength = valueItems.length;
@@ -3574,7 +3577,7 @@
 
         eligibleItemIndices.push(i);
       }
-      const selectedItemIndex = eligibleItemIndices[Math.floor(Math.random() * eligibleItemIndices.length)];
+      selectedItemIndex = eligibleItemIndices[Math.floor(Math.random() * eligibleItemIndices.length)];
       if (selectedItemIndex == 0) { //レアリティ1でmax1アイテムを作らない。
         eligibleItemIndices = [];
         chosenRarity = 1;
@@ -3591,11 +3594,11 @@
           eligibleItemIndices.push(i);
         };
         valueGachaId = eligibleItemIndices[Math.floor(Math.random() * eligibleItemIndices.length)];
-      } else {
-        valueGachaId = selectedItemIndex;
-      };
+        return;
+      }
     };
 
+    valueGachaId = selectedItemIndex;
   };
 
   //レアリティ一覧作成
