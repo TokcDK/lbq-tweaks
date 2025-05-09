@@ -4708,38 +4708,48 @@ actor_custom_replace_attack = function (user, id1, id2) {
     : actor_custom_replace_attack_sub(user);
 };
 
+const attackIdsMapAcraSub = {
+  1: 101,
+  2: 111,
+  3: 121,
+  4: 131,
+  5: 141,
+  6: 151,
+  7: 161,
+  8: 171,
+  9: 181,
+  10: 191
+};
 actor_custom_replace_attack_sub = function (user) {
-  let id = 1;
-  const userEquips0ItemId = user._equips[0]._itemId;
-  if (userEquips0ItemId >= 1) {
-    if (user.isWtypeEquipped(1)) { id = 101 }
-    else if (user.isWtypeEquipped(2)) { id = 111 }
-    else if (user.isWtypeEquipped(3)) { id = 121 }
-    else if (user.isWtypeEquipped(4)) { id = 131 }
-    else if (user.isWtypeEquipped(5)) { id = 141 }
-    else if (user.isWtypeEquipped(6)) { id = 151 }
-    else if (user.isWtypeEquipped(7)) { id = 161 }
-    else if (user.isWtypeEquipped(8)) { id = 171 }
-    else if (user.isWtypeEquipped(9)) { id = 181 }
-    else if (user.isWtypeEquipped(10)) { id = 191 };
+  const firstEquippedItemId = user._equips[0]._itemId;
+  if (firstEquippedItemId < 1) {
+    return 1;
+  };
 
-    if (user.isStateAffected(283)) { id += 6 }
-    if (user.isStateAffected(282)) { id += 5 }
-    if (user.isLearnedSkill(id + 4)) { id += 4 }
-    if (user.isLearnedSkill(id + 3)) { id += 3 }
-    if (user.isLearnedSkill(id + 2)) { id += 2 }
-    if (user.isLearnedSkill(id + 1)) { id += 1 };
+  let attackId = 1;
+  for (const typeKey in attackIdsMapAcraSub) {
+    if (user.isWtypeEquipped(Number(typeKey))) {
+      attackId = attackIdsMapAcraSub[typeKey];
+      break;
+    }
+  }
 
-    const weapon0 = $dataWeapons[userEquips0ItemId];
-    const weapon0MetaSpecialAttack = weapon0.meta['SpecialAttack'];
-    if (weapon0MetaSpecialAttack) {
-      if (Number(weapon0MetaSpecialAttack) >= 1) {
-        id = Number(weapon0MetaSpecialAttack);
-      };
+  if (user.isStateAffected(283)) { attackId += 6 }
+  if (user.isStateAffected(282)) { attackId += 5 }
+  if (user.isLearnedSkill(attackId + 4)) { attackId += 4 }
+  if (user.isLearnedSkill(attackId + 3)) { attackId += 3 }
+  if (user.isLearnedSkill(attackId + 2)) { attackId += 2 }
+  if (user.isLearnedSkill(attackId + 1)) { attackId += 1 };
+
+  const firstWeapon = $dataWeapons[firstEquippedItemId];
+  const specialAttackMeta = firstWeapon.meta['SpecialAttack'];
+  if (specialAttackMeta) {
+    if (Number(specialAttackMeta) >= 1) {
+      attackId = Number(specialAttackMeta);
     };
   };
 
-  return id;
+  return attackId;
 };
 
 actor_custom_replace_guard = function (user) {
