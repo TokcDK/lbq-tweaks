@@ -163,9 +163,9 @@
                     "Switch 131:", $gameSwitches.value(131));
 
       // Remove tachie
-      tachie_syoukyo1($gameVariables.value(300));
+      tachie_syoukyo1(getPreviousTachiePicId);
       console.debug("tachie_syoukyo1 invoked with variable 300:",
-        $gameVariables.value(300));
+        getPreviousTachiePicId);
       console.debug("tachie_syoukyo1 actor.actor().meta['tachiePicId']:",
         actor.actor().meta['tachiePicId']);
 
@@ -208,7 +208,7 @@
     const party = $gameParty;
     const switches = $gameSwitches;
     const gameScreen = $gameScreen;
-    const actorId = $gameVariables.value(300);
+    const actorId = getPreviousTachiePicId;
 
     while (true) {
       const currentActor = this.actor();

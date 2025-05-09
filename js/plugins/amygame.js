@@ -1034,7 +1034,7 @@
     if (!$gameSwitches.value(131) || !$gameParty.inBattle()) {
       if ($gameSwitches.value(42) && $gameVariables.value(3) == gameActor.actorId()) {
         const tachiePicId = gameActor.actor().meta['TachiePicId'];
-        tachie_syoukyo1(tachiePicId); // $gameVariables.value(300);
+        tachie_syoukyo1(tachiePicId); // getPreviousTachiePicId;
         tachie_settei3(gameActor);
         $gameVariables.setValue(20, $gameVariables.value(3));
         tachie_hyouji2(gameActor);
@@ -6453,6 +6453,10 @@
         console.error(`getItemsSourceSkillsItemsStates: id(${id}}) is not 0,1,2!`);
         return null;
     }
+  }
+
+  getPreviousTachiePicId = function () {
+    return $gameVariables.value(300);
   }
 
   isHEnemyOrNonAuto = function () {
