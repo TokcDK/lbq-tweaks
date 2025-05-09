@@ -1607,9 +1607,6 @@
           if (spawnIndex == 6) { spawnX = 200; spawnY = 500; }
           if (spawnIndex == 7) { spawnX = 150; spawnY = 350; }
           if (spawnIndex == 8) { spawnX = 100; spawnY = 500; }
-          const xOffsetOptions = [-30, -20, -10, 0, 10, 20, 30];
-          const yNegativeOffsetOptions = [-30, -25, -20, -10, -5, 0];
-          const yPositiveOffsetOptions = [30, 25, 20, 10, 5, 0];
           if (spawnIndex >= 2 && spawnIndex <= 6) {
             spawnX = spawnX + Number(xOffsetOptions[Math.floor(Math.random() * xOffsetOptions.length)]);
           }
@@ -1645,6 +1642,9 @@
     $gameSwitches.setValue(357, true);
   };
 
+  const xOffsetOptions = [-30, -20, -10, 0, 10, 20, 30];
+  const yNegativeOffsetOptions = [-30, -25, -20, -10, -5, 0];
+  const yPositiveOffsetOptions = [30, 25, 20, 10, 5, 0];
   henemy_troopPush = function () {
 
     if ($gameVariables.value(228) != 0) {
@@ -1667,9 +1667,6 @@
         if (spawnIndex == 6) { spawnX = 200; spawnY = 500; }
         if (spawnIndex == 7) { spawnX = 150; spawnY = 350; }
         if (spawnIndex == 8) { spawnX = 100; spawnY = 500; }
-        const xOffsetOptions = [-30, -20, -10, 0, 10, 20, 30];
-        const yNegativeOffsetOptions = [-30, -25, -20, -10, -5, 0];
-        const yPositiveOffsetOptions = [30, 25, 20, 10, 5, 0];
         if (spawnIndex >= 2 && spawnIndex <= 6) {
           spawnX = spawnX + Number(xOffsetOptions[Math.floor(Math.random() * xOffsetOptions.length)]);
         }
