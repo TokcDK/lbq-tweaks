@@ -6151,7 +6151,9 @@ annihilationItem_bonus = function() {
   const itemData = getItemAndAwardToPlayer(selectedOption);
   
   // displayBonusMessage
-  valueWordSet1 = `全滅ボーナスとして\\C[24]\x1bI[${itemData.iconIndex}]${itemData.name}\\C[0]を入手した！`;
+
+  const item = `\\C[24]\x1bI[${itemData.iconIndex}]${itemData.name}\\C[0]`;
+  valueWordSet1 = `全滅ボーナスとして${item}を入手した！`;
   
   checkForRareItemFlags(chestMeta, selectedOption.itemIndex);
 };
