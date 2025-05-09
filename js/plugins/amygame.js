@@ -1490,35 +1490,9 @@
     const meta = $dataSkills[skillId].meta;
     const varId = Number(meta.VariableChangeUse);
     const currentValue = $gameVariables.value(varId);
-    
+
     if (!$gameSwitches.value(19)) {
-      switch (currentValue) {
-        case 1:
-          $gameVariables.setValue(varId, 2);
-          break;
-        case 2:
-          $gameVariables.setValue(varId, 3);
-          break;
-        case 3:
-          if (meta.ValChangeName4) {
-            $gameVariables.setValue(varId, 4);
-          } else {
-            $gameVariables.setValue(varId, 1);
-          }
-          break;
-        case 4:
-          if (meta.ValChangeName5) {
-            $gameVariables.setValue(varId, 5);
-          } else {
-            $gameVariables.setValue(varId, 1);
-          }
-          break;
-        case 5:
-          $gameVariables.setValue(varId, 1);
-          break;
-        default:
-          break;
-      }
+      $gameVariables.setValue(varId, getVariableValueSkillSentaku(currentValue, meta));
     }
     
     const newValue = $gameVariables.value(varId);
@@ -1543,11 +1517,26 @@
     }
   };
 
+  function getVariableValueSkillSentaku(currentValue, meta) {
+    switch (currentValue) {
+      case 1:
+        return 2;
+      case 2:
+        return 3;
+      case 3:
+        return meta.ValChangeName4 ? 4 : 1;
+      case 4:
+        return meta.ValChangeName5 ? 5 : 1;
+      case 5:
+        return 1;
+      default:
+        return currentValue;
+    }
+  }
+
   //苗字取得
   family_name = function (id1, id2) {
-
     $gameVariables.setValue(id2, $gameVariables.value(id1 + 380)[50]);
-
   };
 
   //ウィンドウカラー変更
