@@ -571,17 +571,19 @@ Yanfly.JP.Game_Actor_levelUp = Game_Actor.prototype.levelUp;
 Game_Actor.prototype.levelUp = function() {
     Yanfly.JP.Game_Actor_levelUp.call(this);
     if (this._preventJpLevelUpGain) return;
-    var user = this;
-    var target = this;
-    var a = this;
-    var b = this;
-    var level = this.level;
-    var code = Yanfly.Param.JpPerLevel;
+    //var user = this;
+    //var target = this;
+    //var a = this;
+    //var b = this;
+    //var level = this.level;
+    const code = Yanfly.Param.JpPerLevel;
+    let value;
     try {
-      var value = eval(code)
+      value = eval(code)
     } catch (e) {
-      var value = 0;
+      value = 0;
       Yanfly.Util.displayError(e, code, 'LEVEL UP JP FORMULA ERROR');
+      return;
     }
 		this.gainJp(value, this.currentClass().id);
 };
