@@ -1323,6 +1323,28 @@
 
   };
 
+  const masteryLevel6Map = {
+    1: `[E]`,
+    2: `[D]`,
+    3: `[C]`,
+    4: `[B]`,
+    5: `[A]`,
+    6: `[S]`
+  };
+  const masteryLevel5R100Map = {
+    1: `[D]`,
+    2: `[C]`,
+    3: `[B]`,
+    4: `[A]`,
+    5: `[S]`
+  };
+  const masteryLevel5Map = {
+    1: '[E]',
+    2: '[D]',
+    3: '[C]',
+    4: '[B]',
+    5: '[A]'
+  };
   //スキルアイテム使用での二つ名変更//0スキル1アイテムskillItem_titles(a,b,this.item().id,0);
   skillItem_titles = function (sourceActor, targetActor, itemId, ItemType) {
 
@@ -1338,26 +1360,13 @@
       }
       if (itemsData[itemId].meta['RankUpPoint']) {
         if (Number(itemsData[itemId].meta['Max Mastery Level']) == 6) {
-          if (targetActor.skillMasteryLevel(itemId) == 1) { skillRankLabel = `[E]`; }
-          if (targetActor.skillMasteryLevel(itemId) == 2) { skillRankLabel = `[D]`; }
-          if (targetActor.skillMasteryLevel(itemId) == 3) { skillRankLabel = `[C]`; }
-          if (targetActor.skillMasteryLevel(itemId) == 4) { skillRankLabel = `[B]`; }
-          if (targetActor.skillMasteryLevel(itemId) == 5) { skillRankLabel = `[A]`; }
-          if (targetActor.skillMasteryLevel(itemId) == 6) { skillRankLabel = `[S]`; }
+          skillRankLabel = masteryLevel6Map[targetActor.skillMasteryLevel(itemId)] || skillRankLabel;
         }
         if (Number(itemsData[itemId].meta['Max Mastery Level']) == 5) {
           if (Number(itemsData[itemId].meta['RankUpPoint']) >= 100) {
-            if (targetActor.skillMasteryLevel(itemId) == 1) { skillRankLabel = `[D]`; }
-            if (targetActor.skillMasteryLevel(itemId) == 2) { skillRankLabel = `[C]`; }
-            if (targetActor.skillMasteryLevel(itemId) == 3) { skillRankLabel = `[B]`; }
-            if (targetActor.skillMasteryLevel(itemId) == 4) { skillRankLabel = `[A]`; }
-            if (targetActor.skillMasteryLevel(itemId) == 5) { skillRankLabel = `[S]`; }
+            skillRankLabel = masteryLevel5R100Map[targetActor.skillMasteryLevel(itemId)] || skillRankLabel;
           } else {
-            if (targetActor.skillMasteryLevel(itemId) == 1) { skillRankLabel = `[E]`; }
-            if (targetActor.skillMasteryLevel(itemId) == 2) { skillRankLabel = `[D]`; }
-            if (targetActor.skillMasteryLevel(itemId) == 3) { skillRankLabel = `[C]`; }
-            if (targetActor.skillMasteryLevel(itemId) == 4) { skillRankLabel = `[B]`; }
-            if (targetActor.skillMasteryLevel(itemId) == 5) { skillRankLabel = `[A]`; }
+            skillRankLabel = masteryLevel5Map[targetActor.skillMasteryLevel(itemId)] || skillRankLabel;
           }
         }
         if (Number(itemsData[itemId].meta['Max Mastery Level']) == 10) {
