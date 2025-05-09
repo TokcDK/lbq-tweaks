@@ -710,7 +710,7 @@ Window_InBattleStateList.prototype.setBattler = function(battler) {
   valueStatusSet1 = 0;
   if(this._battler.isActor()){//変更。追加
     if(!$gameSwitches.value(131)){ //立ち絵禁止のスイッチで条件分岐
-      tachie_syoukyo1(getPreviousTachiePicId);
+      tachie_syoukyo1(getPreviousTachiePicId());
       $gameVariables.setValue(20,this._battler.actorId());
       tachie_settei3(_battler);
       tachie_hyouji2(_battler);

@@ -525,7 +525,7 @@ for(var i = 1; i <= 250; i++){
 
 }
 
-//息継ぎ設定getPreviousTachiePicId
+//息継ぎ設定getPreviousTachiePicId()
 //[0]息遣いx軸[1]y軸,立ち絵x100y100[2]頻度,平時250戦時150[3]拡縮度x,立ち絵0.005[4]拡縮度y,立ち絵0.004
 tachie_bless = function(id11,id12){
 

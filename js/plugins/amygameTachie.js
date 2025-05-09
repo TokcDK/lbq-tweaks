@@ -40,14 +40,14 @@ this.wait(60);
 フェードアウト
 var actor = $gameActors.actor($gameVariables.value(20));
 actor.addState(23);
-tachie_syoukyo1(getPreviousTachiePicId);
+tachie_syoukyo1(getPreviousTachiePicId());
 //$gameVariables.setValue(20,1);
 kisekae_tyokusetusitei(1324,23);
-tachie_syoukyo1(getPreviousTachiePicId);
+tachie_syoukyo1(getPreviousTachiePicId());
 this.wait(60);//ここでスクリプト切る
 $gameSwitches.setValue(42,true);
 tachie_hyouji1($gameVariables.value(20));
-var args = new Array(String(getPreviousTachiePicId),'71','2','ON')
+var args = new Array(String(getPreviousTachiePicId()),'71','2','ON')
 this.pluginCommand("P_CALL_CE", args);
 フェードイン
 
@@ -706,7 +706,7 @@ tachie_naibusyori2 = function (gameActor) {
   
   // Determine the picture ID to use
   //const isSwitch90On = $gameSwitches.value(90); // 立ち絵会話時自動on
-  //const actorPicId = getPreviousTachiePicId; // 立ち絵表示時ﾋﾟｸﾁｬ指定ID
+  //const actorPicId = getPreviousTachiePicId(); // 立ち絵表示時ﾋﾟｸﾁｬ指定ID
   // const picId = isSwitch90On 
   //   ? actorPicId 
   //   : Number(dataActor.meta['tachiePicId']);
@@ -1033,7 +1033,7 @@ tachie_hyouji2 = function (gameActor) {
     }
     $gameVariables.setValue(149, 50); // 表示最初の透明度
   }
-  let tachieIndex = parseInt(getPreviousTachiePicId, 10) || 0; // 立ち絵1か2か、それとも…
+  let tachieIndex = parseInt(getPreviousTachiePicId(), 10) || 0; // 立ち絵1か2か、それとも…
   tachieIndex--; // データ上は0から
   //const CharList = $TKMvar.tachie.CharList;
   //const MaxLayer = $TKMvar.tachie.MaxLayer;

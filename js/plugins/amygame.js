@@ -1034,7 +1034,7 @@
     if (!$gameSwitches.value(131) || !$gameParty.inBattle()) {
       if ($gameSwitches.value(42) && $gameVariables.value(3) == gameActor.actorId()) {
         const tachiePicId = gameActor.actor().meta['TachiePicId'];
-        tachie_syoukyo1(tachiePicId); // getPreviousTachiePicId;
+        tachie_syoukyo1(tachiePicId); // getPreviousTachiePicId();
         tachie_settei3(gameActor);
         $gameVariables.setValue(20, $gameVariables.value(3));
         tachie_hyouji2(gameActor);
@@ -6455,7 +6455,7 @@
     }
   }
 
-  getPreviousTachiePicId = function () {
+  getPreviousTachiePicId() = function () {
     return $gameVariables.value(300);
   }
 

@@ -481,7 +481,7 @@ function ak1InitializeAttackVariables(user, skillId, sourceTypeId) {
   totalDamageCountDuringAction = 0;
   valueDropEnemyPicId = 101;
   valueMetalKiller = 0;
-  tachie_syoukyo1(getPreviousTachiePicId);
+  tachie_syoukyo1(getPreviousTachiePicId());
   
   $gameVariables.setValue(91, user);
   $gameVariables.setValue(96, skillId);
