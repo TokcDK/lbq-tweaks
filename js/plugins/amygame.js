@@ -3517,82 +3517,82 @@
 
   //アイテム武器防具抽選スクリプト。id12アイテム1武器2防具3all
   //id13がall。10まで。value1としてid決定
-  gacha_naiyou = function (valueItemsType, id13) {
+  gacha_naiyou = function (valueItemsType, rarity) {
 
     if (valueItemsType && valueItemsType > -1 && valueItemsType < 3) {
       valueItems = get_valueItems_iwa(valueItemsType);
     }
     else {
-      const valueItemsTypeRnd = Math.floor(Math.random() * 11);
-      valueItems = get_valueItems_iwa(valueItemsTypeRnd > 1 ? 2 : valueItemsTypeRnd);
+      const randomValueItemsType = Math.floor(Math.random() * 11);
+      valueItems = get_valueItems_iwa(randomValueItemsType > 1 ? 2 : randomValueItemsType);
     }
 
-    let value7 = id13;
-    if (id13 < 1) {
-      let arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    let chosenRarity = rarity;
+    if (rarity < 1) {
+      let rarityArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
       for (let i = 1; i <= 50; i++) {
-        arr.push(1);
+        rarityArray.push(1);
         if (i > 45) continue;
 
-        if (i <= 45) { arr.push(2) };
-        if (i <= 40) { arr.push(3) };
-        if (i <= 35) { arr.push(4) };
-        if (i <= 30) { arr.push(5) };
-        if (i <= 9) { arr.push(6) };
-        if (i <= 7) { arr.push(7) };
-        if (i <= 5) { arr.push(8) };
-        if (i <= 3) { arr.push(9) };
+        if (i <= 45) { rarityArray.push(2); }
+        if (i <= 40) { rarityArray.push(3); }
+        if (i <= 35) { rarityArray.push(4); }
+        if (i <= 30) { rarityArray.push(5); }
+        if (i <= 9) { rarityArray.push(6); }
+        if (i <= 7) { rarityArray.push(7); }
+        if (i <= 5) { rarityArray.push(8); }
+        if (i <= 3) { rarityArray.push(9); }
       }
-      value7 = arr[Math.floor(Math.random() * arr.length)];
+      chosenRarity = rarityArray[Math.floor(Math.random() * rarityArray.length)];
       //ガチャ称号取得でＵＲ，ＬＲ解放
-      if (!$gameParty.hasItem($dataItems[657], true) && value7 >= 9) {
-        value7 = 8;
+      if (!$gameParty.hasItem($dataItems[657], true) && chosenRarity >= 9) {
+        chosenRarity = 8;
       };
-      if (!$gameParty.hasItem($dataItems[656], true) && value7 >= 8) {
-        value7 = 7;
+      if (!$gameParty.hasItem($dataItems[656], true) && chosenRarity >= 8) {
+        chosenRarity = 7;
       };
     };
     if ($gameParty.inBattle()) {
-      var value1 = 71;//仮指定。ポーションのみ
+      const battlePotionId = 71; //仮指定。ポーションのみ
     } else {
-      let array = [0];
-      const end = valueItems.length;
-      for (let i = 1; i < end; i++) {
-        const valueItem = valueItems[i];
-        if (!valueItem) continue;
+      let eligibleItemIndices = [0];
+      const itemsLength = valueItems.length;
+      for (let i = 1; i < itemsLength; i++) {
+        const currentItem = valueItems[i];
+        if (!currentItem) continue;
 
-        if (valueItem.meta['GatchaOutOfRange']) continue;
-        if ($gameParty.hasItem(valueItem)) {
-          const maxItem = valueItem.meta['Max Item'];
-          if (maxItem && Number(maxItem) == 1) continue;
+        if (currentItem.meta['GatchaOutOfRange']) continue;
+        if ($gameParty.hasItem(currentItem)) {
+          const maxItemLimit = currentItem.meta['Max Item'];
+          if (maxItemLimit && Number(maxItemLimit) == 1) continue;
         }
-        else if (valueItem.meta['GatchaHasRange']) continue;
+        else if (currentItem.meta['GatchaHasRange']) continue;
 
-        const lotteryRearity = valueItem.meta['LotteryRearity'];
+        const lotteryRearity = currentItem.meta['LotteryRearity'];
         if (!lotteryRearity) continue;
-        if (Number(lotteryRearity) !== value7) continue;
+        if (Number(lotteryRearity) !== chosenRarity) continue;
 
-        array.push(i);
-      };
-      var value1 = array[Math.floor(Math.random() * array.length)];
-      if (value1 == 0) { //レアリティ1でmax1アイテムを作らない。
-        array = [];
-        value7 = 1;
-        for (let i = 1; i <= end; i++) {
-          const valueItem = valueItems[i];
-          if (valueItem.meta['GatchaOutOfRange']) continue;
-          if (valueItem.meta['GatchaHasRange']
-            && !$gameParty.hasItem(valueItem)) continue;
+        eligibleItemIndices.push(i);
+      }
+      const selectedItemIndex = eligibleItemIndices[Math.floor(Math.random() * eligibleItemIndices.length)];
+      if (selectedItemIndex == 0) { //レアリティ1でmax1アイテムを作らない。
+        eligibleItemIndices = [];
+        chosenRarity = 1;
+        for (let i = 1; i <= itemsLength; i++) {
+          const currentItem = valueItems[i];
+          if (currentItem.meta['GatchaOutOfRange']) continue;
+          if (currentItem.meta['GatchaHasRange']
+            && !$gameParty.hasItem(currentItem)) continue;
 
-          const lotteryRearity = valueItem.meta['LotteryRearity'];
+          const lotteryRearity = currentItem.meta['LotteryRearity'];
           if (!lotteryRearity) continue;
-          if (Number(lotteryRearity) !== value7) continue;
+          if (Number(lotteryRearity) !== chosenRarity) continue;
 
-          array.push(i);
+          eligibleItemIndices.push(i);
         };
-        valueGachaId = array[Math.floor(Math.random() * array.length)];
+        valueGachaId = eligibleItemIndices[Math.floor(Math.random() * eligibleItemIndices.length)];
       } else {
-        valueGachaId = value1;
+        valueGachaId = selectedItemIndex;
       };
     };
 
