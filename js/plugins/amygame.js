@@ -1538,24 +1538,17 @@
   };
 
   //ウィンドウカラー変更
+  const windowColor1Map = {
+    0: [0, 0, 0],                // Default
+    1: [170, 0, 170],            // H関係
+    2: [-34, 153, 68],           // 一人称視点
+    3: [170, 170, 0],            // その他（白と黄の間？）
+    4: [-255, 170, 34]           // その他（薄水色）
+  };
   window_color1 = function (id1) {
-
-    if (id1 == 0) {
-      $gameSystem.setWindowTone([0, 0, 0]);
-    };
-    if (id1 == 1) {
-      $gameSystem.setWindowTone([170, 0, 170]);//H関係
-    };
-    if (id1 == 2) {
-      $gameSystem.setWindowTone([-34, 153, 68]);//一人称視点
-    };
-    if (id1 == 3) {
-      $gameSystem.setWindowTone([170, 170, 0]);//その他（白と黄の間？）
-    };
-    if (id1 == 4) {
-      $gameSystem.setWindowTone([-255, 170, 34]);//その他（薄水色）
-    };
-
+    
+    const tone = windowColor1Map[id1] || [0, 0, 0]; // Default to [0, 0, 0] if id1 is not in the map
+    $gameSystem.setWindowTone(tone);
   };
 
   //エネミーグループ設定$gameVariables.value(270)//$gameVariables.value(232)
