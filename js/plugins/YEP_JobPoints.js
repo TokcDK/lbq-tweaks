@@ -593,10 +593,10 @@ Game_Actor.prototype.levelUp = function() {
 //=============================================================================
 
 Game_Enemy.prototype.jp = function() {
-    var user = this;
-    var target = this;
-    var a = this;
-    var b = this;
+    //svar user = this;
+    //var target = this;
+    //var a = this;
+    //var b = this;
     var code = this.enemy().jp;
     try {
       return eval(code);
