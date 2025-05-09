@@ -543,12 +543,16 @@ Game_Actor.prototype.isSublcassEarnJp = function() {
 Game_Actor.prototype.gainJpSubclass = function(value) {
     var classId = this.subclass().id;
     value = Math.round(value * Yanfly.Param.SubclassJp);
+    if(!value) return; // nothing to get for subclass
+
     this.setJp(this.jp(classId) + value, classId);
 };
 
-Game_Actor.prototype.loseJp = function(value, classId) {
-		classId = classId || this.currentClass().id;
-		this.setJp(this.jp(classId) - value, classId);
+Game_Actor.prototype.loseJp = function (value, classId) {
+  if (!value) return; // nothing to lose
+
+  classId = classId || this.currentClass().id;
+  this.setJp(this.jp(classId) - value, classId);
 };
 
 Game_Actor.prototype.battleJp = function() {
