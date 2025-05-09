@@ -1556,11 +1556,11 @@
   const yPositiveOffsetOptions = [30, 25, 20, 10, 5, 0];
   //エネミーグループ設定$gameVariables.value(270)//$gameVariables.value(232)
   enemy_troopPush = function () {
+    
+    if ($gameVariables.value(220) === 0) return; // have empty common enemy's pool
 
     let spawnChanceOffset = 0;
     for (let troopId = 11; troopId <= 20; troopId++) {
-      if ($gameVariables.value(220) === 0) continue;
-
       const enemyTroop = $dataTroops[troopId];
       const troopMeta = $dataItems[$gameVariables.value(240)].meta;
       enemyTroop.name = troopMeta['TroopName'];
@@ -1671,15 +1671,16 @@
 
   henemy_troopPush = function () {
 
-    if ($gameVariables.value(228) === 0) return;
+    if ($gameVariables.value(228) === 0) return; // have empty H enemy's pool
 
     const spawnPoolH = $gameVariables.value(228);
     const spawnPoolHLength = spawnPoolH.length;
     const troopId = 10; //グループIDを指定
     const enemyTroopH = $dataTroops[troopId];
-    enemyTroopH.name = $dataItems[$gameVariables.value(240)].meta['TroopNameH'];
+    const troopMeta = $dataItems[$gameVariables.value(240)].meta;
+    enemyTroopH.name = troopMeta['TroopNameH'];
     enemyTroopH.members = []; //グループのメンバーを空に
-    const battleEnemyPopHOptions = $dataItems[$gameVariables.value(240)].meta['BattleEnemyPopCH'].split(',');
+    const battleEnemyPopHOptions = troopMeta['BattleEnemyPopCH'].split(',');
     const enemyCountToSpawn = Number(battleEnemyPopHOptions[Math.floor(Math.random() * battleEnemyPopHOptions.length)]);
     
     for (let spawnIndex = 1; spawnIndex <= enemyCountToSpawn; spawnIndex++) {
