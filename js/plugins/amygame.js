@@ -1485,51 +1485,51 @@
   };
 
   //スキル複数選択肢1スキル用
-  skill_sentaku = function (id, value1) {
+  skill_sentaku = function (skillId, unusedValue) {
 
     if (!$gameSwitches.value(19)) {
-      if ($gameVariables.value(Number($dataSkills[id].meta.VariableChangeUse)) == 1) {
-        $gameVariables.setValue(Number($dataSkills[id].meta.VariableChangeUse), 2);
+      if ($gameVariables.value(Number($dataSkills[skillId].meta.VariableChangeUse)) == 1) {
+        $gameVariables.setValue(Number($dataSkills[skillId].meta.VariableChangeUse), 2);
       } else {
-        if ($gameVariables.value(Number($dataSkills[id].meta.VariableChangeUse)) == 2) {
-          $gameVariables.setValue(Number($dataSkills[id].meta.VariableChangeUse), 3);
+        if ($gameVariables.value(Number($dataSkills[skillId].meta.VariableChangeUse)) == 2) {
+          $gameVariables.setValue(Number($dataSkills[skillId].meta.VariableChangeUse), 3);
         } else {
-          if ($gameVariables.value(Number($dataSkills[id].meta.VariableChangeUse)) == 3) {
-            if ($dataSkills[id].meta.ValChangeName4) {
-              $gameVariables.setValue(Number($dataSkills[id].meta.VariableChangeUse), 4);
+          if ($gameVariables.value(Number($dataSkills[skillId].meta.VariableChangeUse)) == 3) {
+            if ($dataSkills[skillId].meta.ValChangeName4) {
+              $gameVariables.setValue(Number($dataSkills[skillId].meta.VariableChangeUse), 4);
             } else {
-              $gameVariables.setValue(Number($dataSkills[id].meta.VariableChangeUse), 1);
+              $gameVariables.setValue(Number($dataSkills[skillId].meta.VariableChangeUse), 1);
             };
           } else {
-            if ($gameVariables.value(Number($dataSkills[id].meta.VariableChangeUse)) == 4) {
-              if ($dataSkills[id].meta.ValChangeName5) {
-                $gameVariables.setValue(Number($dataSkills[id].meta.VariableChangeUse), 5);
+            if ($gameVariables.value(Number($dataSkills[skillId].meta.VariableChangeUse)) == 4) {
+              if ($dataSkills[skillId].meta.ValChangeName5) {
+                $gameVariables.setValue(Number($dataSkills[skillId].meta.VariableChangeUse), 5);
               } else {
-                $gameVariables.setValue(Number($dataSkills[id].meta.VariableChangeUse), 1);
+                $gameVariables.setValue(Number($dataSkills[skillId].meta.VariableChangeUse), 1);
               };
             } else {
-              if ($gameVariables.value(Number($dataSkills[id].meta.VariableChangeUse)) == 5) {
-                $gameVariables.setValue(Number($dataSkills[id].meta.VariableChangeUse), 1);
+              if ($gameVariables.value(Number($dataSkills[skillId].meta.VariableChangeUse)) == 5) {
+                $gameVariables.setValue(Number($dataSkills[skillId].meta.VariableChangeUse), 1);
               };
             }
           }
         }
       }
     };
-    if ($gameVariables.value(Number($dataSkills[id].meta.VariableChangeUse)) == 1) {
-      $dataSkills[id].name = $dataSkills[id].meta.ValChangeName1;
+    if ($gameVariables.value(Number($dataSkills[skillId].meta.VariableChangeUse)) == 1) {
+      $dataSkills[skillId].name = $dataSkills[skillId].meta.ValChangeName1;
     } else {
-      if ($gameVariables.value(Number($dataSkills[id].meta.VariableChangeUse)) == 2) {
-        $dataSkills[id].name = $dataSkills[id].meta.ValChangeName2;
+      if ($gameVariables.value(Number($dataSkills[skillId].meta.VariableChangeUse)) == 2) {
+        $dataSkills[skillId].name = $dataSkills[skillId].meta.ValChangeName2;
       } else {
-        if ($gameVariables.value(Number($dataSkills[id].meta.VariableChangeUse)) == 3) {
-          $dataSkills[id].name = $dataSkills[id].meta.ValChangeName3;
+        if ($gameVariables.value(Number($dataSkills[skillId].meta.VariableChangeUse)) == 3) {
+          $dataSkills[skillId].name = $dataSkills[skillId].meta.ValChangeName3;
         } else {
-          if ($gameVariables.value(Number($dataSkills[id].meta.VariableChangeUse)) == 4) {
-            $dataSkills[id].name = $dataSkills[id].meta.ValChangeName4;
+          if ($gameVariables.value(Number($dataSkills[skillId].meta.VariableChangeUse)) == 4) {
+            $dataSkills[skillId].name = $dataSkills[skillId].meta.ValChangeName4;
           } else {
-            if ($gameVariables.value(Number($dataSkills[id].meta.VariableChangeUse)) == 5) {
-              $dataSkills[id].name = $dataSkills[id].meta.ValChangeName5;
+            if ($gameVariables.value(Number($dataSkills[skillId].meta.VariableChangeUse)) == 5) {
+              $dataSkills[skillId].name = $dataSkills[skillId].meta.ValChangeName5;
             };
           }
         }
