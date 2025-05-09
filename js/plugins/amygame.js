@@ -1561,12 +1561,13 @@
     for (let troopId = 11; troopId <= 20; troopId++) {
       if ($gameVariables.value(220) === 0) continue;
 
-      let spawnPool = $gameVariables.value(220);
       const enemyTroop = $dataTroops[troopId];
-      enemyTroop.name = $dataItems[$gameVariables.value(240)].meta['TroopName'];
+      const troopMeta = $dataItems[$gameVariables.value(240)].meta;
+      enemyTroop.name = troopMeta['TroopName'];
       enemyTroop.members = []; //グループのメンバーを空に
-      const battleEnemyPopOptions = $dataItems[$gameVariables.value(240)].meta['BattleEnemyPopC'].split(',');
       
+      // get enemy count to spawn
+      const battleEnemyPopOptions = troopMeta['BattleEnemyPopC'].split(',');
       let enemyCountToSpawn = Number(battleEnemyPopOptions[Math.floor(Math.random() * battleEnemyPopOptions.length)]);
       if ($gameVariables.value(232) >= 2) {
         let additionalSpawnOffset = Math.floor(Math.random() * $gameVariables.value(232));
@@ -1578,6 +1579,10 @@
           }
         }
       }
+      if (enemyCountToSpawn >= 9) { enemyCountToSpawn = 8; }
+
+      // get enemy spawn pool
+      let spawnPool = $gameVariables.value(220);
       if ($gameVariables.value(242) != 0) {
         for (let index = 0; index <= $gameVariables.value(242).length - 1; index++) {
           let chanceRoll = Math.floor(Math.random() * 101);
@@ -1591,9 +1596,7 @@
           }
         }
       }
-      if (enemyCountToSpawn >= 9) { enemyCountToSpawn = 8; }
 
-      //var enemyCountToSpawn = Math.max(...battleEnemyPopOptions);
       const spawnPoolLength = spawnPool.length;
       const spawnTracker = { hasSpawned27: false, hasSpawned28: false };
       for (let spawnIndex = 1; spawnIndex <= enemyCountToSpawn; spawnIndex++) {  
