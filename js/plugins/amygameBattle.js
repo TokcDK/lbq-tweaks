@@ -4613,23 +4613,23 @@ state_addFormula1 = function (arr10) {
 battle_totalDamage = function () {
 
   if (valueTotalDamageCount2 >= 2) {
-    var value1 = 96;
-    var value2 = valueTotalDamageCount;
-    var value3 = value2.toLocaleString();
-    var value4 = 50;
-    var value5 = 400;
-    var value6 = 480;
-    if (valueTotalDamageCount <= 9999) { var value4 = 45 };
-    if (valueTotalDamageCount >= 100000) { var value4 = 55 };
+    const pictureId = 96;
+    const totalDamageCount = valueTotalDamageCount;
+    const formattedDamageCount = totalDamageCount.toLocaleString();
+    let dTextFontSize = 50;
+    const pictureX = 400;
+    const pictureY = 480;
+    if (valueTotalDamageCount <= 9999) { dTextFontSize = 45; }
+    if (valueTotalDamageCount >= 100000) { dTextFontSize = 55; }
     $gameScreen.setDtextFont('ＭＳ Ｐ明朝');
     if ($gameVariables.value(276) == 2) {
-      $gameScreen.setDTextPicture(`\\f[b]\\oc[22]\\f[i]Total${valueTotalDamageCount2}Hit,\\C[10]${value3}\\C[17]Damage!\\C[0]`, value4);
+      $gameScreen.setDTextPicture(`\\f[b]\\oc[22]\\f[i]Total${valueTotalDamageCount2}Hit,\\C[10]${formattedDamageCount}\\C[17]Damage!\\C[0]`, dTextFontSize);
     } else {
-      $gameScreen.setDTextPicture(`\\f[b]\\oc[2]\\f[i]Total${valueTotalDamageCount2}Hit,\\C[10]${value3}\\C[17]Damage!\\C[0]`, value4);
-    };
-    $gameScreen.showPicture(value1, "", 0, value5 - 50, value6, 100, 100, 100, 0);
-    $gameScreen.movePicture(value1, 0, value5, value6, 100, 100, 255, 0, 20);
-  };
+      $gameScreen.setDTextPicture(`\\f[b]\\oc[2]\\f[i]Total${valueTotalDamageCount2}Hit,\\C[10]${formattedDamageCount}\\C[17]Damage!\\C[0]`, dTextFontSize);
+    }
+    $gameScreen.showPicture(pictureId, "", 0, pictureX - 50, pictureY, 100, 100, 100, 0);
+    $gameScreen.movePicture(pictureId, 0, pictureX, pictureY, 100, 100, 255, 0, 20);
+  }
 
 };
 
