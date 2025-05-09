@@ -1323,14 +1323,6 @@
 
   };
 
-  const masteryLevel6Map = {
-    1: `[E]`,
-    2: `[D]`,
-    3: `[C]`,
-    4: `[B]`,
-    5: `[A]`,
-    6: `[S]`
-  };
   const masteryLevel5R100Map = {
     1: `[D]`,
     2: `[C]`,
@@ -1344,6 +1336,29 @@
     3: '[C]',
     4: '[B]',
     5: '[A]'
+  };
+  const masteryLevel6Map = {
+    1: `[E]`,
+    2: `[D]`,
+    3: `[C]`,
+    4: `[B]`,
+    5: `[A]`,
+    6: `[S]`
+  };
+  const masteryLevel10R100Map =
+  {
+    1: '[D]', 2: '[D]',
+    3: '[C]', 4: '[C]',
+    5: '[B]', 6: '[B]',
+    7: '[A]', 8: '[A]',
+    9: '[S]', 10: '[S]'
+  };
+  const masteryLevel10Map = {
+    1: '[E]', 2: '[E]',
+    3: '[D]', 4: '[D]',
+    5: '[C]', 6: '[C]',
+    7: '[B]', 8: '[B]',
+    9: '[A]', 10: '[A]'
   };
   //スキルアイテム使用での二つ名変更//0スキル1アイテムskillItem_titles(a,b,this.item().id,0);
   skillItem_titles = function (sourceActor, targetActor, itemId, ItemType) {
@@ -1369,20 +1384,10 @@
             skillRankLabel = masteryLevel5Map[targetActor.skillMasteryLevel(itemId)] || skillRankLabel;
           }
         }
-        if (Number(itemsData[itemId].meta['Max Mastery Level']) == 10) {
-          if (Number(itemsData[itemId].meta['RankUpPoint']) >= 100) {
-            if (targetActor.skillMasteryLevel(itemId) == 1 || targetActor.skillMasteryLevel(itemId) == 2) { skillRankLabel = `[D]`; }
-            if (targetActor.skillMasteryLevel(itemId) == 3 || targetActor.skillMasteryLevel(itemId) == 4) { skillRankLabel = `[C]`; }
-            if (targetActor.skillMasteryLevel(itemId) == 5 || targetActor.skillMasteryLevel(itemId) == 6) { skillRankLabel = `[B]`; }
-            if (targetActor.skillMasteryLevel(itemId) == 7 || targetActor.skillMasteryLevel(itemId) == 8) { skillRankLabel = `[A]`; }
-            if (targetActor.skillMasteryLevel(itemId) == 9 || targetActor.skillMasteryLevel(itemId) == 10) { skillRankLabel = `[S]`; }
-          } else {
-            if (targetActor.skillMasteryLevel(itemId) == 1 || targetActor.skillMasteryLevel(itemId) == 2) { skillRankLabel = `[E]`; }
-            if (targetActor.skillMasteryLevel(itemId) == 3 || targetActor.skillMasteryLevel(itemId) == 4) { skillRankLabel = `[D]`; }
-            if (targetActor.skillMasteryLevel(itemId) == 5 || targetActor.skillMasteryLevel(itemId) == 6) { skillRankLabel = `[C]`; }
-            if (targetActor.skillMasteryLevel(itemId) == 7 || targetActor.skillMasteryLevel(itemId) == 8) { skillRankLabel = `[B]`; }
-            if (targetActor.skillMasteryLevel(itemId) == 9 || targetActor.skillMasteryLevel(itemId) == 10) { skillRankLabel = `[A]`; }
-          }
+        if (Number(itemsData[itemId].meta['Max Mastery Level']) === 10) {
+          const rankUpPoint = Number(itemsData[itemId].meta['RankUpPoint']);
+          const level = targetActor.skillMasteryLevel(itemId);
+          skillRankLabel = (rankUpPoint >= 100 ? masteryLevel10R100Map[level] : masteryLevel10Map[level]0 || skillRankLabel;
         }
       }
       // Special pattern for the libido-related skill
