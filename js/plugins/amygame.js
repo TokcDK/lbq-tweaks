@@ -1324,83 +1324,83 @@
   };
 
   //スキルアイテム使用での二つ名変更//0スキル1アイテムskillItem_titles(a,b,this.item().id,0);
-  skillItem_titles = function (sourceActor, targetActor, itemId, id1) {
+  skillItem_titles = function (sourceActor, targetActor, itemId, ItemType) {
 
     if (targetActor.actorId() == sourceActor.actorId()) {
-      const valueItems = id1 == 0 ? $dataSkills : $dataItems;
-      let arr1 = ["Z11_NickNameChange", 50, 110, 0]; //se
-      let value1 = ``; //ランク
-      if (valueItems[itemId].meta['Menu Category']) {
-        if (valueItems[itemId].meta['Menu Category'] == " H'sTitle") { arr1 = ["Z_Suspicious", 50, 150, 0]; }
+      const itemsData = ItemType == 0 ? $dataSkills : $dataItems;
+      let soundEffectParams = ["Z11_NickNameChange", 50, 110, 0]; // se settings
+      let skillRankLabel = ``; // Rank label
+      if (itemsData[itemId].meta['Menu Category']) {
+        if (itemsData[itemId].meta['Menu Category'] == " H'sTitle") { soundEffectParams = ["Z_Suspicious", 50, 150, 0]; }
       }
-      if (id1 == 0) {
-        if (valueItems[itemId].stypeId == 15) { arr1 = ["Z_Suspicious", 50, 150, 0]; }
+      if (ItemType == 0) {
+        if (itemsData[itemId].stypeId == 15) { soundEffectParams = ["Z_Suspicious", 50, 150, 0]; }
       }
-      if (valueItems[itemId].meta['RankUpPoint']) {
-        if (Number(valueItems[itemId].meta['Max Mastery Level']) == 6) {
-          if (targetActor.skillMasteryLevel(itemId) == 1) { value1 = `[E]`; }
-          if (targetActor.skillMasteryLevel(itemId) == 2) { value1 = `[D]`; }
-          if (targetActor.skillMasteryLevel(itemId) == 3) { value1 = `[C]`; }
-          if (targetActor.skillMasteryLevel(itemId) == 4) { value1 = `[B]`; }
-          if (targetActor.skillMasteryLevel(itemId) == 5) { value1 = `[A]`; }
-          if (targetActor.skillMasteryLevel(itemId) == 6) { value1 = `[S]`; }
+      if (itemsData[itemId].meta['RankUpPoint']) {
+        if (Number(itemsData[itemId].meta['Max Mastery Level']) == 6) {
+          if (targetActor.skillMasteryLevel(itemId) == 1) { skillRankLabel = `[E]`; }
+          if (targetActor.skillMasteryLevel(itemId) == 2) { skillRankLabel = `[D]`; }
+          if (targetActor.skillMasteryLevel(itemId) == 3) { skillRankLabel = `[C]`; }
+          if (targetActor.skillMasteryLevel(itemId) == 4) { skillRankLabel = `[B]`; }
+          if (targetActor.skillMasteryLevel(itemId) == 5) { skillRankLabel = `[A]`; }
+          if (targetActor.skillMasteryLevel(itemId) == 6) { skillRankLabel = `[S]`; }
         }
-        if (Number(valueItems[itemId].meta['Max Mastery Level']) == 5) {
-          if (Number(valueItems[itemId].meta['RankUpPoint']) >= 100) {
-            if (targetActor.skillMasteryLevel(itemId) == 1) { value1 = `[D]`; }
-            if (targetActor.skillMasteryLevel(itemId) == 2) { value1 = `[C]`; }
-            if (targetActor.skillMasteryLevel(itemId) == 3) { value1 = `[B]`; }
-            if (targetActor.skillMasteryLevel(itemId) == 4) { value1 = `[A]`; }
-            if (targetActor.skillMasteryLevel(itemId) == 5) { value1 = `[S]`; }
+        if (Number(itemsData[itemId].meta['Max Mastery Level']) == 5) {
+          if (Number(itemsData[itemId].meta['RankUpPoint']) >= 100) {
+            if (targetActor.skillMasteryLevel(itemId) == 1) { skillRankLabel = `[D]`; }
+            if (targetActor.skillMasteryLevel(itemId) == 2) { skillRankLabel = `[C]`; }
+            if (targetActor.skillMasteryLevel(itemId) == 3) { skillRankLabel = `[B]`; }
+            if (targetActor.skillMasteryLevel(itemId) == 4) { skillRankLabel = `[A]`; }
+            if (targetActor.skillMasteryLevel(itemId) == 5) { skillRankLabel = `[S]`; }
           } else {
-            if (targetActor.skillMasteryLevel(itemId) == 1) { value1 = `[E]`; }
-            if (targetActor.skillMasteryLevel(itemId) == 2) { value1 = `[D]`; }
-            if (targetActor.skillMasteryLevel(itemId) == 3) { value1 = `[C]`; }
-            if (targetActor.skillMasteryLevel(itemId) == 4) { value1 = `[B]`; }
-            if (targetActor.skillMasteryLevel(itemId) == 5) { value1 = `[A]`; }
+            if (targetActor.skillMasteryLevel(itemId) == 1) { skillRankLabel = `[E]`; }
+            if (targetActor.skillMasteryLevel(itemId) == 2) { skillRankLabel = `[D]`; }
+            if (targetActor.skillMasteryLevel(itemId) == 3) { skillRankLabel = `[C]`; }
+            if (targetActor.skillMasteryLevel(itemId) == 4) { skillRankLabel = `[B]`; }
+            if (targetActor.skillMasteryLevel(itemId) == 5) { skillRankLabel = `[A]`; }
           }
         }
-        if (Number(valueItems[itemId].meta['Max Mastery Level']) == 10) {
-          if (Number(valueItems[itemId].meta['RankUpPoint']) >= 100) {
-            if (targetActor.skillMasteryLevel(itemId) == 1 || targetActor.skillMasteryLevel(itemId) == 2) { value1 = `[D]`; }
-            if (targetActor.skillMasteryLevel(itemId) == 3 || targetActor.skillMasteryLevel(itemId) == 4) { value1 = `[C]`; }
-            if (targetActor.skillMasteryLevel(itemId) == 5 || targetActor.skillMasteryLevel(itemId) == 6) { value1 = `[B]`; }
-            if (targetActor.skillMasteryLevel(itemId) == 7 || targetActor.skillMasteryLevel(itemId) == 8) { value1 = `[A]`; }
-            if (targetActor.skillMasteryLevel(itemId) == 9 || targetActor.skillMasteryLevel(itemId) == 10) { value1 = `[S]`; }
+        if (Number(itemsData[itemId].meta['Max Mastery Level']) == 10) {
+          if (Number(itemsData[itemId].meta['RankUpPoint']) >= 100) {
+            if (targetActor.skillMasteryLevel(itemId) == 1 || targetActor.skillMasteryLevel(itemId) == 2) { skillRankLabel = `[D]`; }
+            if (targetActor.skillMasteryLevel(itemId) == 3 || targetActor.skillMasteryLevel(itemId) == 4) { skillRankLabel = `[C]`; }
+            if (targetActor.skillMasteryLevel(itemId) == 5 || targetActor.skillMasteryLevel(itemId) == 6) { skillRankLabel = `[B]`; }
+            if (targetActor.skillMasteryLevel(itemId) == 7 || targetActor.skillMasteryLevel(itemId) == 8) { skillRankLabel = `[A]`; }
+            if (targetActor.skillMasteryLevel(itemId) == 9 || targetActor.skillMasteryLevel(itemId) == 10) { skillRankLabel = `[S]`; }
           } else {
-            if (targetActor.skillMasteryLevel(itemId) == 1 || targetActor.skillMasteryLevel(itemId) == 2) { value1 = `[E]`; }
-            if (targetActor.skillMasteryLevel(itemId) == 3 || targetActor.skillMasteryLevel(itemId) == 4) { value1 = `[D]`; }
-            if (targetActor.skillMasteryLevel(itemId) == 5 || targetActor.skillMasteryLevel(itemId) == 6) { value1 = `[C]`; }
-            if (targetActor.skillMasteryLevel(itemId) == 7 || targetActor.skillMasteryLevel(itemId) == 8) { value1 = `[B]`; }
-            if (targetActor.skillMasteryLevel(itemId) == 9 || targetActor.skillMasteryLevel(itemId) == 10) { value1 = `[A]`; }
+            if (targetActor.skillMasteryLevel(itemId) == 1 || targetActor.skillMasteryLevel(itemId) == 2) { skillRankLabel = `[E]`; }
+            if (targetActor.skillMasteryLevel(itemId) == 3 || targetActor.skillMasteryLevel(itemId) == 4) { skillRankLabel = `[D]`; }
+            if (targetActor.skillMasteryLevel(itemId) == 5 || targetActor.skillMasteryLevel(itemId) == 6) { skillRankLabel = `[C]`; }
+            if (targetActor.skillMasteryLevel(itemId) == 7 || targetActor.skillMasteryLevel(itemId) == 8) { skillRankLabel = `[B]`; }
+            if (targetActor.skillMasteryLevel(itemId) == 9 || targetActor.skillMasteryLevel(itemId) == 10) { skillRankLabel = `[A]`; }
           }
         }
       }
-      //性欲度スキルのみの特殊パターン
-      if (id1 == 0 && itemId == 50) {
-        const value2 = $gameVariables.value(targetActor.actorId() + 380)[1];
-        if (value2 <= 100) { value1 = `[圏外]`; }
-        if (value2 <= 200 && value2 >= 101) { value1 = `[圏外]`; }
-        if (value2 <= 300 && value2 >= 201) { value1 = `[E]`; }
-        if (value2 <= 400 && value2 >= 301) { value1 = `[D]`; }
-        if (value2 <= 500 && value2 >= 401) { value1 = `[C]`; }
-        if (value2 <= 600 && value2 >= 501) { value1 = `[B]`; }
-        if (value2 <= 700 && value2 >= 601) { value1 = `[A]`; }
-        if (value2 <= 800 && value2 >= 701) { value1 = `[S]`; }
-        if (value2 <= 900 && value2 >= 801) { value1 = `[SS]`; }
-        if (value2 >= 901) { value1 = `[SSS]`; }
+      // Special pattern for the libido-related skill
+      if (ItemType == 0 && itemId == 50) {
+        const libidoValue = $gameVariables.value(targetActor.actorId() + 380)[1];
+        if (libidoValue <= 100) { skillRankLabel = `[圏外]`; }
+        if (libidoValue <= 200 && libidoValue >= 101) { skillRankLabel = `[圏外]`; }
+        if (libidoValue <= 300 && libidoValue >= 201) { skillRankLabel = `[E]`; }
+        if (libidoValue <= 400 && libidoValue >= 301) { skillRankLabel = `[D]`; }
+        if (libidoValue <= 500 && libidoValue >= 401) { skillRankLabel = `[C]`; }
+        if (libidoValue <= 600 && libidoValue >= 501) { skillRankLabel = `[B]`; }
+        if (libidoValue <= 700 && libidoValue >= 601) { skillRankLabel = `[A]`; }
+        if (libidoValue <= 800 && libidoValue >= 701) { skillRankLabel = `[S]`; }
+        if (libidoValue <= 900 && libidoValue >= 801) { skillRankLabel = `[SS]`; }
+        if (libidoValue >= 901) { skillRankLabel = `[SSS]`; }
       }
-      const actor = targetActor.name();
+      const actorName = targetActor.name();
       const nickname = $dataActors[targetActor._actorId].nickname;
-      if (id1 == 1 && itemId == 600) { //タイトルデフォルト設定アイテム。現状は不採用
+      if (ItemType == 1 && itemId == 600) { // Default title setting item; currently unused
         $gameActors.actor(targetActor._actorId).setNickname(`${nickname}`);
-        TickerManager.show(`${actor}の二つ名が${nickname}になった！`);
-        AudioManager.playSe({ "name": arr1[0], "volume": Number(arr1[1]), "pitch": Number(arr1[2]), "pan": Number(arr1[3]) });
+        TickerManager.show(`${actorName}の二つ名が${nickname}になった！`);
+        AudioManager.playSe({ "name": soundEffectParams[0], "volume": Number(soundEffectParams[1]), "pitch": Number(soundEffectParams[2]), "pan": Number(soundEffectParams[3]) });
       } else {
-        const item = valueItems[itemId].name + value1;
-        $gameActors.actor(targetActor._actorId).setNickname(`＜${item}＞`);
-        TickerManager.show(`${actor}の二つ名が＜${item}＞になった！`);
-        AudioManager.playSe({ "name": arr1[0], "volume": Number(arr1[1]), "pitch": Number(arr1[2]), "pan": Number(arr1[3]) });
+        const newTitle = itemsData[itemId].name + skillRankLabel;
+        $gameActors.actor(targetActor._actorId).setNickname(`＜${newTitle}＞`);
+        TickerManager.show(`${actorName}の二つ名が＜${newTitle}＞になった！`);
+        AudioManager.playSe({ "name": soundEffectParams[0], "volume": Number(soundEffectParams[1]), "pitch": Number(soundEffectParams[2]), "pan": Number(soundEffectParams[3]) });
       }
     }
 
