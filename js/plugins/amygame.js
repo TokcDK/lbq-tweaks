@@ -1394,13 +1394,16 @@
         if (value2 <= 900 && value2 >= 801) { var value1 = `[SS]` };
         if (value2 >= 901) { var value1 = `[SSS]` };
       };
+      const actor = b.name();
+      const nickname = $dataActors[b._actorId].nickname;
       if (id1 == 1 && itemId == 600) {//タイトルデフォルト設定アイテム。現状は不採用
-        $gameActors.actor(b._actorId).setNickname(`${$dataActors[b._actorId].nickname}`);
-        TickerManager.show(`${b.name()}の二つ名が${$dataActors[b._actorId].nickname}になった！`);
+        $gameActors.actor(b._actorId).setNickname(`${nickname}`);
+        TickerManager.show(`${actor}の二つ名が${nickname}になった！`);
         AudioManager.playSe({ "name": arr1[0], "volume": Number(arr1[1]), "pitch": Number(arr1[2]), "pan": Number(arr1[3]) });
       } else {
         $gameActors.actor(b._actorId).setNickname(`＜${valueItems[itemId].name + value1}＞`);
-        TickerManager.show(`${b.name()}の二つ名が＜${valueItems[itemId].name + value1}＞になった！`);
+        const item = valueItems[itemId].name + value1;
+        TickerManager.show(`${actor}の二つ名が＜${item}＞になった！`);
         AudioManager.playSe({ "name": arr1[0], "volume": Number(arr1[1]), "pitch": Number(arr1[2]), "pan": Number(arr1[3]) });
       };
     };
