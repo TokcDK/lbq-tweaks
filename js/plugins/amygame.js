@@ -1567,19 +1567,7 @@
       enemyTroop.members = []; //グループのメンバーを空に
       
       // get enemy count to spawn
-      const battleEnemyPopOptions = troopMeta['BattleEnemyPopC'].split(',');
-      let enemyCountToSpawn = Number(battleEnemyPopOptions[Math.floor(Math.random() * battleEnemyPopOptions.length)]);
-      if ($gameVariables.value(232) >= 2) {
-        let additionalSpawnOffset = Math.floor(Math.random() * $gameVariables.value(232));
-        enemyCountToSpawn += additionalSpawnOffset;
-        if ($gameVariables.value(270) >= 11) {
-          let bonusChance = Math.floor(Math.random() * 101);
-          if ($gameVariables.value(270) >= bonusChance) {
-            enemyCountToSpawn += 1;
-          }
-        }
-      }
-      if (enemyCountToSpawn >= 9) { enemyCountToSpawn = 8; }
+      enemyCountToSpawn = calculateEnemyCountToSpawnEnemyTroopPush(troopMeta);
 
       // get enemy spawn pool
       let spawnPool = $gameVariables.value(220);
@@ -1618,6 +1606,23 @@
     }
     $gameSwitches.setValue(357, true);
   };
+  
+  function calculateEnemyCountToSpawnEnemyTroopPush(troopMeta) {
+    const battleEnemyPopOptions = troopMeta['BattleEnemyPopC'].split(',');
+    let enemyCountToSpawn = Number(battleEnemyPopOptions[Math.floor(Math.random() * battleEnemyPopOptions.length)]);
+    if ($gameVariables.value(232) >= 2) {
+      let additionalSpawnOffset = Math.floor(Math.random() * $gameVariables.value(232));
+      enemyCountToSpawn += additionalSpawnOffset;
+      if ($gameVariables.value(270) >= 11) {
+        let bonusChance = Math.floor(Math.random() * 101);
+        if ($gameVariables.value(270) >= bonusChance) {
+          enemyCountToSpawn += 1;
+        }
+      }
+    }
+    if (enemyCountToSpawn >= 9) { enemyCountToSpawn = 8; }
+    return enemyCountToSpawn;
+  }
 
   function resolveEnemySpawnIdEnemyTroopPush(spawnPool, spawnPoolLength, tracker) {
     let enemySpawnId = Number(spawnPool[Math.floor(Math.random() * spawnPoolLength)]); // 出現エネミースポーン
