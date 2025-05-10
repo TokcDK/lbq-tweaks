@@ -58,8 +58,7 @@ class Tip1 extends BookTipBase {//
         return `朽ちた星晶獣の権能復元計画`;
     }
     bookDescription() {
-        return 
-`\\swi[247]の協力者から持ち込まれた情報を元に
+        return `\\swi[247]の協力者から持ち込まれた情報を元に
 策定されたプロジェクト。
 \\swi[221]に嘗て存在したとされる、
 とある星晶獣の細胞が提供された事によって
@@ -86,8 +85,7 @@ class Tip2 extends BookTipBase {//<淫統薬>インデュ・アビス
         return `${$dataWeapons[452].name}─その１─`;
     }
     bookDescription() {
-        return 
-`コルブラント島でその断片を確保した星晶獣、
+        return `コルブラント島でその断片を確保した星晶獣、
 その一部他を用いて精製された、民意扇動を目的とした薬物。
 
 彼の星晶獣が所有していた「支配」の権能は、
@@ -115,8 +113,7 @@ class Tip3 extends BookTipBase {//<淫統薬>インデュ・アビス
         return `${$dataWeapons[452].name}─その３─`;
     }
     bookDescription() {
-        return 
-`
+        return `
 現在は行方不明者が発生しても騒ぎになり難い、
 空域内でも有数の観光島で実地検証を行っている。
 この検証で、投薬対象によっては
@@ -141,8 +138,7 @@ class Tip4 extends BookTipBase {//<試薬品>インデュルゲンス・リキ�
         return `${$dataWeapons[453].name}`;
     }
     bookDescription() {
-        return 
-`開発された\\wn[452]の試作品。
+        return `開発された\\wn[452]の試作品。
 正式採用となった薬品と比較すると、
 必要な摂取量などが問題となり開発中止となった。
 しかし、効能についてはより大元となる星晶獣の
@@ -166,8 +162,7 @@ class Tip5 extends BookTipBase {//<淫紋>アビス・クレスト使用ずみ
         return `${$dataWeapons[454].name}`;
     }
     bookDescription() {
-        return 
-`触手型魔物である「\\wn[455]」が使う、
+        return `触手型魔物である「\\wn[455]」が使う、
 対象を苗床化する\\wn[456]を元に、
 人間用に改変された紋章の一つ。
 
@@ -197,8 +192,7 @@ class Tip6 extends BookTipBase {//<淫統光>HMD型インデュ・アビス.使�
         return `${$dataWeapons[457].name}`;
     }
     bookDescription() {
-        return 
-`服薬が必要な\\wn[452]に対して、
+        return `服薬が必要な\\wn[452]に対して、
 光学的なアプローチを用いた試作魔導開発品。
 網膜に淫統作用を持った光を照射する事で、
 脳に直接効果を与える事が可能。
@@ -224,8 +218,7 @@ class Tip7 extends BookTipBase {//<アビス・クレスト>と<インデュ・�
         return `${$dataWeapons[458].name}`;
     }
     bookDescription() {
-        return 
-`両者には根幹技術に措いて同様の手法が用いられている
+        return `両者には根幹技術に措いて同様の手法が用いられている
 （正確には\\wn[454]の術式を
 \\wn[452]が流用している）為、
 ある程度の知識がある者ならば、
@@ -251,8 +244,7 @@ class Tip8 extends BookTipBase {//使用済み
         return `${$dataWeapons[80].name}`;
     }
     bookDescription() {
-        return 
-`数年前よりコルブラント島に出没するようになった空賊団。
+        return `数年前よりコルブラント島に出没するようになった空賊団。
 高機能な騎空挺と練度の高い団員を擁しており、
 島内での被害が相次いでいる。
 王国による掃討作戦が幾度となく行われたが、
@@ -281,8 +273,7 @@ class Tip11 extends BookTipBase {//<星晶獣>インペリウム・グノーシ�
         return `${$dataWeapons[451].name}`;
     }
     bookDescription() {
-        return 
-`コルブラント島で存在を確認された星晶獣。
+        return `コルブラント島で存在を確認された星晶獣。
 その権能は、認識改変による「支配」。
 現在、浮島を統治しているネルガド王家始祖は、
 この権能を用いて自身の王権を確立させたと思われる。
@@ -311,8 +302,7 @@ class Tip12 extends BookTipBase {//<星晶獣>インペリウム・グノーシ�
         return `${$dataWeapons[451].name}─その２─`;
     }
     bookDescription() {
-        return 
-`既にその存在は朽ち果て、遺骸は大森林の地下深くに埋没している。
+        return `既にその存在は朽ち果て、遺骸は大森林の地下深くに埋没している。
 残滓や断片が卑小化された権能を発揮する事もあるが、
 大元には朧げな意識しか存在していない。
 
@@ -339,8 +329,7 @@ class Tip13 extends BookTipBase {//「インペルの神水」使用済み
         return `${$dataItems[1162].name} またの名を「${$dataWeapons[460].name}」`;
     }
     bookDescription() {
-        return 
-`中央森林で汲み取れる湧き水。
+        return `中央森林で汲み取れる湧き水。
 高級志向の飲食店などで使われている。
 …それとは別に、\\swi[247]でも一部の高位貴族にしか
 伝わっていない使用法がある。
@@ -370,8 +359,7 @@ class Tip14 extends BookTipBase {//支配の結石使用済み
         return `${$dataItems[1163].name}`;
     }
     bookDescription() {
-        return 
-`ジャックモンド伯爵家に伝わる希少な鉱石。
+        return `ジャックモンド伯爵家に伝わる希少な鉱石。
 とある不思議な効力があるとされている。
 現在では、後継を選ぶための試練に使われている。
 
@@ -400,8 +388,7 @@ class Tip15 extends BookTipBase {//クサンについて。ラストバトル時
         return `${$gameActors.actor(7).name()}=コルド＝${$dataActors[7].meta['SecondName'].split(',')[1]}`;
     }
     bookDescription() {
-        return 
-`\\swi[247]元宰相。
+        return `\\swi[247]元宰相。
 その目的は、嘗て王国統治を支えた星晶獣の権能復元。
 現在に置いても、湧き水や結石という形でその神秘は
 利用する事が可能だが、それらは所詮は残滓に過ぎない。
@@ -433,8 +420,7 @@ class Tip16 extends BookTipBase {//クサンについて2。使用ずみ
         return `${$gameActors.actor(7).name()}=コルド＝${$dataActors[7].meta['SecondName'].split(',')[1]}─その２─`;
     }
     bookDescription() {
-        return 
-`未だ復権という野心にその身を焦がす\\swi[247]元宰相。
+        return `未だ復権という野心にその身を焦がす\\swi[247]元宰相。
 
 …その可能性が、既に潰えている事を自覚せぬままに。
 何故ならば、\\swi[247]は\\wn[359]王主導の元、
@@ -465,8 +451,7 @@ class Tip17 extends BookTipBase {//騎士団長,入手ずみ
         return `${$dataWeapons[351].name}=${$dataWeapons[351].meta['FamilyName']}`;
     }
     bookDescription() {
-        return 
-`\\swi[247]騎士団長。
+        return `\\swi[247]騎士団長。
 王国最強の騎士にして、軍事に措ける最高責任者。
 政治からは自覚的に距離を取るようにしていた。
 
@@ -497,8 +482,7 @@ class Tip18 extends BookTipBase {//国王。使用ずみ
         return `${$dataWeapons[359].name}=${$dataWeapons[359].meta['FamilyName']}`;
     }
     bookDescription() {
-        return 
-`\\swi[247]国王。自他共に認める無能な王。
+        return `\\swi[247]国王。自他共に認める無能な王。
 それは彼自身の責というよりも、星晶獣の権能という
 便利な力に縋る事を辞められなかった歴代王家そのものに
 責があるといえよう。
@@ -526,8 +510,7 @@ class Tip19 extends BookTipBase {//<淫触薬>アビス・リキッド、使用�
         return `${$dataWeapons[459].name}`;
     }
     bookDescription() {
-        return 
-`\\wn[452]を元にして作成された派生薬の一つ。
+        return `\\wn[452]を元にして作成された派生薬の一つ。
 触手型魔物である「\\wn[455]」の体液を用いる事で、
 元の薬品とは別の形で、
 しかし更に強力な強制力を持たせる事に成功している。
@@ -556,8 +539,7 @@ class Tip20 extends BookTipBase {//エネミー全滅ボーナス、使用ずみ
         return `エネミー全滅ボーナス`;
     }
     bookDescription() {
-        return 
-`マップ上のシンボルエネミーを全滅させる事で、
+      return `マップ上のシンボルエネミーを全滅させる事で、
 初回殲滅特典としてレアなアイテムが入手できます。
 ２回目以降は、そのマップの
 「初回殲滅特典」「白銀宝箱」「通常宝箱」の中から
@@ -571,6 +553,7 @@ class Tip20 extends BookTipBase {//エネミー全滅ボーナス、使用ずみ
 エネミーのレベルが上昇します。
 （全滅回数３回でエネミーレベル＋３）
 `;
+
     }
 };
 class Tip21 extends BookTipBase {//ダンジョンとフィールドの違い。使用ずみ
@@ -585,8 +568,7 @@ class Tip21 extends BookTipBase {//ダンジョンとフィールドの違い。
         return `ダンジョンとフィールド`;
     }
     bookDescription() {
-        return 
-`作中に措いて、『ダンジョン』と『フィールド』は
+        return `作中に措いて、『ダンジョン』と『フィールド』は
 扱いが異なる。
 ダンジョンでは倒したエネミーは自然消滅し上限まで
 リポップするが、フィールドではしない。
@@ -610,8 +592,7 @@ class Tip22 extends BookTipBase {//食事について。使用済み
         return `食事アイテムについて`;
     }
     bookDescription() {
-        return 
-`「Food」に分類される食事アイテムは、
+        return `「Food」に分類される食事アイテムは、
 使用する事で食べる事ができ、
 その食事毎に設定されたバフを受ける事が出来ます。
 
@@ -636,8 +617,7 @@ class Tip23 extends BookTipBase {//<淫統薬>インデュ・アビス
         return `${$dataWeapons[452].name}─その２─`;
     }
     bookDescription() {
-        return 
-`これを解消する為の研究は主に、
+        return `これを解消する為の研究は主に、
 「特定対象に特化した支配機能」を主軸としている。
 主に、「対象の欲求に根差した支配」となる。
 認識改変による０からの支配では無く、
@@ -665,8 +645,7 @@ class Tip24 extends BookTipBase {//ディヴィジョン・ベルセルク
         return `ベルセルク──過去──`;
     }
     bookDescription() {
-        return 
-`覇空戦争時代に猛威を振るった狂戦士達。
+        return `覇空戦争時代に猛威を振るった狂戦士達。
 理性を払底させる事を代償に強大な力を振るう。
 その性質上、「味方殺し」すら許容されるような、
 凄惨極まる戦場で活躍した。
@@ -694,8 +673,7 @@ class Tip25 extends BookTipBase {//ディヴィジョン・ベルセルク
         return `ベルセルク──現在──`;
     }
     bookDescription() {
-        return 
-`──現代に措いて。
+        return `──現代に措いて。
 様々な書物から、その一族の存在を掴んだ帝国研究所。
 早速サンプルの確保に動いたが、正規軍を動かすには
 時期が悪く、流れの空賊に『回収』を依頼する。
@@ -723,8 +701,7 @@ class Tip26 extends BookTipBase {//ディヴィジョン・ベルセルク
         return `ディヴィジョン・ベルセルク`;
     }
     bookDescription() {
-        return 
-`本来は、血族であろうとも器では無い\N[5]が、
+        return `本来は、血族であろうとも器では無い\N[5]が、
 寿命を代償に狂戦士化した姿。
 本来のベルセルクと比べ弱体化、或いは超ピーキーな
 改変が行われている。
@@ -749,8 +726,7 @@ class Tip27 extends BookTipBase {//ライフスト－ム
         return `生命奔流体機構<ライフストーム・イグジット>`;
     }
     bookDescription() {
-        return 
-`生体兵器として産み出された狂戦士の血統に
+        return `生体兵器として産み出された狂戦士の血統に
 遺伝子レベルで組み込まれた疑似思考群体。
 平時は対象の無意識領域にて沈黙を保っているが、
 狂戦士化(殺戮)による精神の不安定化などの時に
