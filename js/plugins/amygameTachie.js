@@ -191,16 +191,20 @@ tachie_dousa = function (actionType, actorParameter, expressionCode, targetPicId
   initialXOffset = sourcePicId == 0 ? 50 : -50;
 
   // Set easing function and fade duration based on switch 127 (which may indicate a special mode)
-  let easingFunction, fadeDuration;
-  if ($gameSwitches.value(127)) {
-    easingFunction = 'easeOutBack';
+  function getEasingAndFadeValuesTachieDousa() {
+    let easingFunction, fadeDuration;
     picture_motion1("smooth", [0]);
-    fadeDuration = 40;
-  } else {
-    easingFunction = 'easeInOutQuad';
-    picture_motion1("smooth", [0]);
-    fadeDuration = 60;
+    if ($gameSwitches.value(127)) {
+      easingFunction = 'easeOutBack';
+      fadeDuration = 40;
+    } else {
+      easingFunction = 'easeInOutQuad';
+      fadeDuration = 60;
+    }
+    return ( easingFunction, fadeDuration );
   }
+
+  ( easingFunction, fadeDuration ) = getEasingAndFadeValuesTachieDousa();
 
   ( picY, picScaleX, picScaleY ) = calculateScaleAndPositionTachieDousa(actorParameter, targetPicId, expressionCode);
 
@@ -215,120 +219,129 @@ tachie_dousa = function (actionType, actorParameter, expressionCode, targetPicId
 
   // If not in doll state, proceed with action-specific processing
   if (dollStateFlag == 0) {
-    // --------- Action Type 0: Conversation picture change and costume update ----------
-    if (actionType == 0) {
-      // Determine move durations based on costume change flag
-      let primaryMoveDuration, fadeDelayDuration;
-      if (changeCostumeId == 0) {
-        primaryMoveDuration = 60;
-        fadeDelayDuration = 30;
-      } else {
-        primaryMoveDuration = changeCostumeId + changeCostumeId;
-        fadeDelayDuration = changeCostumeId;
-      }
-      // Cache source picture values for smooth transition
-      let sourcePic = $gameScreen.picture(sourcePicId);
-      if (sourcePic) {
-        let originalOrigin = sourcePic.origin();
-        let originalX = sourcePic.x();
-        let originalY = sourcePic.y();
-        let originalScaleX = sourcePic.scaleX();
-        let originalScaleY = sourcePic.scaleY();
-        let originalOpacity = sourcePic.opacity();
-        // If temporary values were set by previous operations, use them instead
-        if (valueTacieSet[0] >= 1) {
-          originalOrigin = valueTacieSet[0];
-          originalX = valueTacieSet[1];
-          originalY = valueTacieSet[2];
-          originalScaleX = valueTacieSet[3];
-          originalScaleY = valueTacieSet[4];
-          originalOpacity = valueTacieSet[5];
-          valueTacieSet = [0, 0, 0, 0, 0, 0];
-        }
-        // For numeric actorParameter, perform costume change or setup routine
-        if (actorParameter >= 1) {
-          if (showCostumeId >= 1) {
-            kisekae_tyokusetusitei(showCostumeId, expressionCode);
-          } else {
-            tachie_settei2();
-          }
-
-          const targetPic = $gameScreen.picture(targetPicId);
-          targetPic._origin = originalOrigin;
-          targetPic._x = originalX;
-          targetPic._y = originalY;
-          targetPic._scaleX = originalScaleX;
-          targetPic._scaleY = originalScaleY;
-          targetPic._opacity = 0;
-        } else {
-          // Otherwise, erase target picture and then show a new picture
-          if (targetPic) {
-            $gameScreen.erasePicture(targetPicId);
-          }
-          console.debug("tachie_dousa: New picture path: " + "/img/tachies/" + actorParameter);
-          $gameScreen.showPicture(
-            targetPicId,
-            "/img/tachies/" + actorParameter,// here was crash because of missing file
-            originalOrigin,
-            originalX,
-            originalY,
-            originalScaleX,
-            originalScaleY,
-            0,
-            0
-          );
-        }
-        // Process costume change animation if the parameter is set
-        if (changeCostumeParam >= 1) {
-          if (targetPicId >= originalScaleY) {
-            $gameScreen.movePicture(targetPicId, originalOrigin, originalX, originalY, originalScaleX, originalScaleY, originalOpacity, 0, fadeDelayDuration);
-            picture_fade1(targetPicId, "fadeIn", 'Hpicture2', fadeDelayDuration, 5);
-            $gameScreen.movePicture(sourcePicId, originalOrigin, originalX, originalY, originalScaleX, originalScaleY, 0, 0, primaryMoveDuration);
-          } else {
-            $gameScreen.movePicture(targetPicId, originalOrigin, originalX, originalY, originalScaleX, originalScaleY, originalOpacity, 0, fadeDelayDuration);
-            picture_fade1(sourcePicId, "fadeOut", 'Hpicture2', primaryMoveDuration, 5);
-          }
-        } else {
-          // Default movement and fade for costume change
-          $gameScreen.movePicture(targetPicId, originalOrigin, originalX, originalY, originalScaleX, originalScaleY, originalOpacity, 0, fadeDelayDuration);
-          $gameScreen.movePicture(sourcePicId, originalOrigin, originalX, originalY, originalScaleX, originalScaleY, 0, 0, primaryMoveDuration);
-        }
-        // Additional blessing effect if switch 126 is enabled
-        if ($gameSwitches.value(126)) {
-          tachie_bless(targetPicId, 0);
-        }
-        // Update event graphics if variable 292 holds a valid event ID for the actor
-        if ($gameVariables.value(292) != 0) {
-          if ($gameVariables.value(292)[$gameVariables.value(20)] >= 1) {
-            const event = $gameMap.event($gameVariables.value(292)[$gameVariables.value(20)]);
-            const actor = $gameActors.actor($gameVariables.value(20));
-            event.setImage(actor.characterName(), actor.characterIndex());
-          }
-        }
-      }
-    }
-
     switch (actionType) {
+      case 0:
+        // --------- Action Type 0: Conversation picture change and costume update ----------
+        processCostumeChangeAnimationAtype0TachieDousa(actorParameter, showCostumeId, changeCostumeId, changeCostumeParam, targetPicId, sourcePicId, expressionCode);
       case 1:
-      // --------- Action Type 1: Standard picture display with position easing ----------
-      animatePictureAtype1TachieDousa(targetPicId, actorParameter, sourcePicId, showCostumeId, easingFunction, picY, picScaleX, picScaleY, fadeDuration);
-      break;
+        // --------- Action Type 1: Standard picture display with position easing ----------
+        animatePictureAtype1TachieDousa(targetPicId, actorParameter, sourcePicId, showCostumeId, easingFunction, picY, picScaleX, picScaleY, fadeDuration);
+        break;
       case 2:
-      // --------- Action Type 2: Costume changing with caching target picture attributes ----------
-      processCostumeChangeAtype2TachieDousa(targetPicId, changeCostumeId, changeCostumeParam);
-      break;
+        // --------- Action Type 2: Costume changing with caching target picture attributes ----------
+        processCostumeChangeAtype2TachieDousa(targetPicId, changeCostumeId, changeCostumeParam);
+        break;
       case 3:
-      // --------- Action Type 3: Refreshing standing picture from tachie data ----------
-      updateStandingPictureAtype3TachieDousa(targetPicId, targetPic);
-      break;
+        // --------- Action Type 3: Refreshing standing picture from tachie data ----------
+        updateStandingPictureAtype3TachieDousa(targetPicId, targetPic);
+        break;
       default:
-      break;
+        break;
     }
   }
 
   // Reset the temporary switch flag to indicate processing is complete
   $gameSwitches.setValue(97, false);
 };
+
+function processCostumeChangeAnimationAtype0TachieDousa(actorParameter, showCostumeId, changeCostumeId, changeCostumeParam, targetPicId, sourcePicId, expressionCode) {
+  // Determine move durations based on costume change flag
+  let primaryMoveDuration, fadeDelayDuration;
+  if (changeCostumeId === 0) {
+    primaryMoveDuration = 60;
+    fadeDelayDuration = 30;
+  } else {
+    primaryMoveDuration = changeCostumeId + changeCostumeId;
+    fadeDelayDuration = changeCostumeId;
+  }
+
+  // Cache source picture values for smooth transition
+  let sourcePic = $gameScreen.picture(sourcePicId);
+  if (sourcePic) {
+    let originalOrigin = sourcePic.origin();
+    let originalX = sourcePic.x();
+    let originalY = sourcePic.y();
+    let originalScaleX = sourcePic.scaleX();
+    let originalScaleY = sourcePic.scaleY();
+    let originalOpacity = sourcePic.opacity();
+
+    // If temporary values were set by previous operations, use them instead
+    if (valueTacieSet[0] >= 1) {
+      originalOrigin = valueTacieSet[0];
+      originalX = valueTacieSet[1];
+      originalY = valueTacieSet[2];
+      originalScaleX = valueTacieSet[3];
+      originalScaleY = valueTacieSet[4];
+      originalOpacity = valueTacieSet[5];
+      valueTacieSet = [0, 0, 0, 0, 0, 0];
+    }
+
+    // For numeric actorParameter, perform costume change or setup routine
+    if (actorParameter >= 1) {
+      if (showCostumeId >= 1) {
+        kisekae_tyokusetusitei(showCostumeId, expressionCode);
+      } else {
+        tachie_settei2();
+      }
+
+      const targetPic = $gameScreen.picture(targetPicId);
+      targetPic._origin = originalOrigin;
+      targetPic._x = originalX;
+      targetPic._y = originalY;
+      targetPic._scaleX = originalScaleX;
+      targetPic._scaleY = originalScaleY;
+      targetPic._opacity = 0;
+    } else {
+      // Otherwise, erase target picture and then show a new picture
+      let targetPic = $gameScreen.picture(targetPicId);
+      if (targetPic) {
+        $gameScreen.erasePicture(targetPicId);
+      }
+      console.debug("tachie_dousa: New picture path: " + "/img/tachies/" + actorParameter);
+      $gameScreen.showPicture(
+        targetPicId,
+        "/img/tachies/" + actorParameter,
+        originalOrigin,
+        originalX,
+        originalY,
+        originalScaleX,
+        originalScaleY,
+        0,
+        0
+      );
+    }
+
+    // Process costume change animation if the parameter is set
+    if (changeCostumeParam >= 1) {
+      if (targetPicId >= originalScaleY) {
+        $gameScreen.movePicture(targetPicId, originalOrigin, originalX, originalY, originalScaleX, originalScaleY, originalOpacity, 0, fadeDelayDuration);
+        picture_fade1(targetPicId, "fadeIn", 'Hpicture2', fadeDelayDuration, 5);
+        $gameScreen.movePicture(sourcePicId, originalOrigin, originalX, originalY, originalScaleX, originalScaleY, 0, 0, primaryMoveDuration);
+      } else {
+        $gameScreen.movePicture(targetPicId, originalOrigin, originalX, originalY, originalScaleX, originalScaleY, originalOpacity, 0, fadeDelayDuration);
+        picture_fade1(sourcePicId, "fadeOut", 'Hpicture2', primaryMoveDuration, 5);
+      }
+    } else {
+      // Default movement and fade for costume change
+      $gameScreen.movePicture(targetPicId, originalOrigin, originalX, originalY, originalScaleX, originalScaleY, originalOpacity, 0, fadeDelayDuration);
+      $gameScreen.movePicture(sourcePicId, originalOrigin, originalX, originalY, originalScaleX, originalScaleY, 0, 0, primaryMoveDuration);
+    }
+
+    // Additional blessing effect if switch 126 is enabled
+    if ($gameSwitches.value(126)) {
+      tachie_bless(targetPicId, 0);
+    }
+
+    // Update event graphics if variable 292 holds a valid event ID for the actor
+    if ($gameVariables.value(292) !== 0) {
+      if ($gameVariables.value(292)[$gameVariables.value(20)] >= 1) {
+        const event = $gameMap.event($gameVariables.value(292)[$gameVariables.value(20)]);
+        const actor = $gameActors.actor($gameVariables.value(20));
+        event.setImage(actor.characterName(), actor.characterIndex());
+      }
+    }
+  }
+}
 
 function calculateScaleAndPositionTachieDousa(actorParameter, targetPicId, expressionCode) {
   const isScaled = $gameSwitches.value(126);
@@ -362,7 +375,7 @@ function calculateScaleAndPositionTachieDousa(actorParameter, targetPicId, expre
     }
   }
 
-  return { picY, picScaleX, picScaleY };
+  return (picY, picScaleX, picScaleY);
 }
 
 function animatePictureAtype1TachieDousa(targetPicId, actorParameter, sourcePicId, showCostumeId, easingFunction, picY, picScaleX, picScaleY, fadeDuration) {
