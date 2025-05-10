@@ -4039,7 +4039,7 @@ cutin_preparation = function (cutinCategory, actorId) {
   // Modified switch block using the helper functions with "CutinPreparation" suffix
   switch (cutinCategory) {
     case 1:
-      handleCutinCategory1CutinPreparation(actor);
+      handleCutinCategory1CutinPreparation(actorId);
       break;
     case 2:
       handleCutinCategory2CutinPreparation();
@@ -4051,7 +4051,7 @@ cutin_preparation = function (cutinCategory, actorId) {
       handleCutinCategory4CutinPreparation();
       break;
     case 5:
-      handleCutinCategory5CutinPreparation(actor, actorId);
+      handleCutinCategory5CutinPreparation(actorId);
       break;
     case 6:
       handleCutinCategory6CutinPreparation();
@@ -4068,8 +4068,8 @@ cutin_preparation = function (cutinCategory, actorId) {
   }
 };
 
-function handleCutinCategory1CutinPreparation(actor) {
-  const actorId = actor.actorId();
+function handleCutinCategory1CutinPreparation(actorId) {
+  const actor = $gameActors.actor(actorId);
   let cutinType = 0;
   let skillId;
   const abilityUsageDistinction = $gameVariables.value(182);
@@ -4158,7 +4158,7 @@ function handleCutinCategory4CutinPreparation() {
   valueCutInSet1 = [partyChainCutinLabel, partyChainBurstCg, 180, 5, 5, 25, 40];
 }
 
-function handleCutinCategory5CutinPreparation(actor, actorId) {
+function handleCutinCategory5CutinPreparation(actorId) {
   $gameSwitches.setValue(428, true);
   const actorConversationCg = 'CutInCG_Actor' + actorId + '_' + $gameVariables.value(21);
   let conversationLabel;
