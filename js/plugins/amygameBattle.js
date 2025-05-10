@@ -4035,79 +4035,35 @@ cutin_preparation = function (cutinCategory, actorId) {
       //valueCutInSet1 = ["カットインエネミースキル", cgAssetName, 0, 4.5, 4.5, 25, 40];
     //};
   //};
+
+  // Modified switch block using the helper functions with "CutinPreparation" suffix
   switch (cutinCategory) {
     case 1:
       handleCutinCategory1CutinPreparation(actor);
       break;
-    case 2: {
-      const partyFirstStrikeCg = 'CutInCG_PartyFirstStrike';
-      const chainLabel = 'チェイン';
-      const partyCutinActorLabel = 'カットインアクター' + chainLabel;
-      valueCutInSet1 = [partyCutinActorLabel, partyFirstStrikeCg, 180, 1.3, 1.3, 25, 20];
+    case 2:
+      handleCutinCategory2CutinPreparation();
       break;
-    }
-    case 3: {
-      const enemySurpriseCg = 'CutInCG_EnemySurprise';
-      const enemyCutinLabel = 'カットインエネミー演出色々';
-      valueCutInSet1 = [enemyCutinLabel, enemySurpriseCg, 0, 2, 2, 25, 40];
+    case 3:
+      handleCutinCategory3CutinPreparation();
       break;
-    }
-    case 4: {
-      const partyChainBurstCg = 'CutInCG_PartyChainBurst';
-      const chainLabelForBurst = 'チェイン';
-      const partyChainCutinLabel = 'カットインアクター' + chainLabelForBurst;
-      valueCutInSet1 = [partyChainCutinLabel, partyChainBurstCg, 180, 5, 5, 25, 40];
+    case 4:
+      handleCutinCategory4CutinPreparation();
       break;
-    }
-    case 5: {
-      $gameSwitches.setValue(428, true);
-      const actorConversationCg = 'CutInCG_Actor' + actorId + '_' + $gameVariables.value(21);
-      let conversationLabel;
-      if ($gameVariables.value(21) >= 11) {
-        conversationLabel = '会話';
-      }
-      const actorConversationCutinLabel = 'カットインアクター' + conversationLabel;
-      valueCutInSet1 = [actorConversationCutinLabel, actorConversationCg, -90, 2.5, 2.5, 25, 60];
+    case 5:
+      handleCutinCategory5CutinPreparation(actor, actorId);
       break;
-    }
-    case 6: {
-      const enemyEntryCg = 'CutInCG_EnemyEntry' + valueCountSet1;
-      valueCutInSet1 = ["カットインエネミー登場", enemyEntryCg, 180, 1.2, 1.2, 25, 40];
+    case 6:
+      handleCutinCategory6CutinPreparation();
       break;
-    }
-    case 7: {
-      let gachaRank = 'N';
-      const rankId = $gameVariables.value(23);
-      switch (rankId) {
-        case 6:
-          gachaRank = 'R';
-          break;
-        case 7:
-          gachaRank = 'SR';
-          break;
-        case 8:
-          gachaRank = 'SSR';
-          break;
-        case 9:
-          gachaRank = 'UR';
-          break;
-        default:
-          if (rankId >= 10) {
-            gachaRank = 'LR';
-          }
-      }
-      const cutinGachaCg = 'GachaDirect' + gachaRank;
-      valueCutInSet1 = ["ガチャ演出", cutinGachaCg, 270, 2, 1.5, 25, 60];
+    case 7:
+      handleCutinCategory7CutinPreparation();
       break;
-    }
-    case 8: {
-      const enemyAwakenCg = 'CutInCG_EnemyAwaken';
-      const enemySkillCutinLabel = 'カットインエネミースキル';
-      valueCutInSet1 = [enemySkillCutinLabel, enemyAwakenCg, 0, 2, 2, 25, 40];
+    case 8:
+      handleCutinCategory8CutinPreparation();
       break;
-    }
     default:
-      // Optional: Default behavior if needed.
+      // Optional: Default behavior
       break;
   }
 };
@@ -4183,6 +4139,78 @@ function handleCutinCategory1CutinPreparation(actor) {
       ];
     }
   }
+}
+
+function handleCutinCategory1CutinPreparation(actor) {
+  // Already existing function call
+  handleCutinCategory1CutinPreparation(actor);
+}
+
+function handleCutinCategory2CutinPreparation() {
+  const partyFirstStrikeCg = 'CutInCG_PartyFirstStrike';
+  const chainLabel = 'チェイン';
+  const partyCutinActorLabel = 'カットインアクター' + chainLabel;
+  valueCutInSet1 = [partyCutinActorLabel, partyFirstStrikeCg, 180, 1.3, 1.3, 25, 20];
+}
+
+function handleCutinCategory3CutinPreparation() {
+  const enemySurpriseCg = 'CutInCG_EnemySurprise';
+  const enemyCutinLabel = 'カットインエネミー演出色々';
+  valueCutInSet1 = [enemyCutinLabel, enemySurpriseCg, 0, 2, 2, 25, 40];
+}
+
+function handleCutinCategory4CutinPreparation() {
+  const partyChainBurstCg = 'CutInCG_PartyChainBurst';
+  const chainLabelForBurst = 'チェイン';
+  const partyChainCutinLabel = 'カットインアクター' + chainLabelForBurst;
+  valueCutInSet1 = [partyChainCutinLabel, partyChainBurstCg, 180, 5, 5, 25, 40];
+}
+
+function handleCutinCategory5CutinPreparation(actor, actorId) {
+  $gameSwitches.setValue(428, true);
+  const actorConversationCg = 'CutInCG_Actor' + actorId + '_' + $gameVariables.value(21);
+  let conversationLabel;
+  if ($gameVariables.value(21) >= 11) {
+    conversationLabel = '会話';
+  }
+  const actorConversationCutinLabel = 'カットインアクター' + conversationLabel;
+  valueCutInSet1 = [actorConversationCutinLabel, actorConversationCg, -90, 2.5, 2.5, 25, 60];
+}
+
+function handleCutinCategory6CutinPreparation() {
+  const enemyEntryCg = 'CutInCG_EnemyEntry' + valueCountSet1;
+  valueCutInSet1 = ["カットインエネミー登場", enemyEntryCg, 180, 1.2, 1.2, 25, 40];
+}
+
+function handleCutinCategory7CutinPreparation() {
+  let gachaRank = 'N';
+  const rankId = $gameVariables.value(23);
+  switch (rankId) {
+    case 6:
+      gachaRank = 'R';
+      break;
+    case 7:
+      gachaRank = 'SR';
+      break;
+    case 8:
+      gachaRank = 'SSR';
+      break;
+    case 9:
+      gachaRank = 'UR';
+      break;
+    default:
+      if (rankId >= 10) {
+        gachaRank = 'LR';
+      }
+  }
+  const cutinGachaCg = 'GachaDirect' + gachaRank;
+  valueCutInSet1 = ["ガチャ演出", cutinGachaCg, 270, 2, 1.5, 25, 60];
+}
+
+function handleCutinCategory8CutinPreparation() {
+  const enemyAwakenCg = 'CutInCG_EnemyAwaken';
+  const enemySkillCutinLabel = 'カットインエネミースキル';
+  valueCutInSet1 = [enemySkillCutinLabel, enemyAwakenCg, 0, 2, 2, 25, 40];
 }
 
 //石召喚演出ピクチャsummon_directPicture1(1);
