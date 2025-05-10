@@ -191,31 +191,12 @@ tachie_dousa = function (actionType, actorParameter, expressionCode, targetPicId
   initialXOffset = sourcePicId == 0 ? 50 : -50;
 
   // Set easing function and fade duration based on switch 127 (which may indicate a special mode)
-  function getEasingAndFadeValuesTachieDousa() {
-    let easingFunction, fadeDuration;
-    picture_motion1("smooth", [0]);
-    if ($gameSwitches.value(127)) {
-      easingFunction = 'easeOutBack';
-      fadeDuration = 40;
-    } else {
-      easingFunction = 'easeInOutQuad';
-      fadeDuration = 60;
-    }
-    return ( easingFunction, fadeDuration );
-  }
-
   ( easingFunction, fadeDuration ) = getEasingAndFadeValuesTachieDousa();
 
   ( picY, picScaleX, picScaleY ) = calculateScaleAndPositionTachieDousa(actorParameter, targetPicId, expressionCode);
 
-  // Check if the actor is in a doll state for certain action types (1,3,4,5)
-  let dollStateFlag = 0;
-  if (actionItemIdsTachieDousa.some(function (actionItem) { return actionType == actionItem; })) {
-    const actor = $gameActors.actor($gameVariables.value(20));
-    if (actor.isStateAffected(valueDollStateId)) {
-      dollStateFlag = 1;
-    }
-  }
+  // Replace the original selection placeholder code with:
+  const dollStateFlag = checkDollStateTachieDousa(actionType, valueDollStateId);
 
   // If not in doll state, proceed with action-specific processing
   if (dollStateFlag == 0) {
@@ -243,6 +224,31 @@ tachie_dousa = function (actionType, actorParameter, expressionCode, targetPicId
   // Reset the temporary switch flag to indicate processing is complete
   $gameSwitches.setValue(97, false);
 };
+
+function checkDollStateTachieDousa(actionType, dollStateId) {
+  // Check if the actor is in a doll state for certain action types (1,3,4,5)
+  let flag = 0;
+  if (actionItemIdsTachieDousa.some(function (actionItem) { return actionType === actionItem; })) {
+    const actor = $gameActors.actor($gameVariables.value(20));
+    if (actor.isStateAffected(dollStateId)) {
+      flag = 1;
+    }
+  }
+  return flag;
+}
+
+function getEasingAndFadeValuesTachieDousa() {
+  let easingFunction, fadeDuration;
+  picture_motion1("smooth", [0]);
+  if ($gameSwitches.value(127)) {
+    easingFunction = 'easeOutBack';
+    fadeDuration = 40;
+  } else {
+    easingFunction = 'easeInOutQuad';
+    fadeDuration = 60;
+  }
+  return (easingFunction, fadeDuration);
+}
 
 function processCostumeChangeAnimationAtype0TachieDousa(actorParameter, showCostumeId, changeCostumeId, changeCostumeParam, targetPicId, sourcePicId, expressionCode) {
   // Determine move durations based on costume change flag
@@ -300,7 +306,7 @@ function processCostumeChangeAnimationAtype0TachieDousa(actorParameter, showCost
       console.debug("tachie_dousa: New picture path: " + "/img/tachies/" + actorParameter);
       $gameScreen.showPicture(
         targetPicId,
-        "/img/tachies/" + actorParameter,
+        "/img/tachies/" + actorParameter, // warn: was crash because of missing image path setup here!
         originalOrigin,
         originalX,
         originalY,
