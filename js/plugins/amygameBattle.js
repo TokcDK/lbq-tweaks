@@ -4081,7 +4081,7 @@ function handleCutinCategory1CutinPreparation(actorId) {
   // Cache references and values to reduce property lookups
   const actor = $gameActors.actor(actorId);
   const abilityUsageDistinction = $gameVariables.value(182);
-  const actorData = $dataActors[actorId];
+  const dataActor = actor.actor();
   
   // Initialize with defaults
   let cutinType = 0;
@@ -4107,7 +4107,7 @@ function handleCutinCategory1CutinPreparation(actorId) {
   }
   
   // Display character dialogue if available
-  const ougiUseMeta = actorData.meta['OugiUse'];
+  const ougiUseMeta = dataActor.meta['OugiUse'];
   if (ougiUseMeta) {
     const ougiUseOptions = ougiUseMeta.split(',');
     const selectedOption = ougiUseOptions[getRandomIndex(ougiUseOptions.length)];
@@ -4115,7 +4115,7 @@ function handleCutinCategory1CutinPreparation(actorId) {
   }
   
   // Apply heroine-specific modifications
-  if (actorData.meta['Heroine']) {
+  if (dataActor.meta['Heroine']) {
     const heroineExposure = $gameVariables.value(actorId + 380)[4];
     
     // Adjust cutinType based on exposure level
