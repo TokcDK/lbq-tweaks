@@ -174,103 +174,103 @@ tachie_dousa = function (id1, id2, id3, id4, id5, id6, id7, id8, id9) {
   //基本数値。常に経由する。
 
   $gameSwitches.setValue(97, true);
-  let value7;
+  let initialXOffset;
   if (id5 == 0) {
-    value7 = 50;
+    initialXOffset = 50;
   } else {
-    value7 = -50;
+    initialXOffset = -50;
   }
-  let value1, value6;
+  let easingFunction, fadeDuration;
   if ($gameSwitches.value(127)) {
-    value1 = 'easeOutBack';
+    easingFunction = 'easeOutBack';
     picture_motion1("smooth", [0]);
-    value6 = 40;
+    fadeDuration = 40;
   } else {
-    value1 = 'easeInOutQuad';
+    easingFunction = 'easeInOutQuad';
     picture_motion1("smooth", [0]);
-    value6 = 60;
+    fadeDuration = 60;
   }
-  let value2, value3, value4;
+  let picY, picScaleX, picScaleY;
   if (id2 >= 1 || id2 == 0) {
     $gameVariables.setValue(20, id2);
     $gameVariables.setValue(300, id4);
     $gameVariables.setValue(151, id3);//表情代入
     if ($gameSwitches.value(126)) {
-      value3 = 70; //this.sVal(149,100);
-      value4 = 70; //this.sVal(150,100);//拡縮x,拡縮y
-      value2 = 650; //this.sVal(157,900);//y座標
+      picScaleX = 70; //this.sVal(149,100);
+      picScaleY = 70; //this.sVal(150,100);//拡縮x,拡縮y
+      picY = 650; //this.sVal(157,900);//y座標
     } else {
-      value3 = 50; //this.sVal(149,50);
-      value4 = 50; //this.sVal(150,50);//拡縮x,拡縮y
-      value2 = 550; //this.sVal(157,600);//y座標
+      picScaleX = 50; //this.sVal(149,50);
+      picScaleY = 50; //this.sVal(150,50);//拡縮x,拡縮y
+      picY = 550; //this.sVal(157,600);//y座標
     }
   } else {
     if ($gameSwitches.value(126)) {
-      value3 = 200; //this.sVal(149,200);//拡縮x,拡縮y
-      value4 = 200; //this.sVal(150,200);
-      value2 = 700; //this.sVal(157,700);//y座標
+      picScaleX = 200; //this.sVal(149,200);//拡縮x,拡縮y
+      picScaleY = 200; //this.sVal(150,200);
+      picY = 700; //this.sVal(157,700);//y座標
     } else {
-      value3 = 100; //this.sVal(149,100);//拡縮x,拡縮y
-      value4 = 100; //this.sVal(150,100);
-      value2 = 400; //this.sVal(157,450);//y座標384
+      picScaleX = 100; //this.sVal(149,100);//拡縮x,拡縮y
+      picScaleY = 100; //this.sVal(150,100);
+      picY = 400; //this.sVal(157,450);//y座標384
     }
     if (id2.match(/SS/)) {
       if ($gameSwitches.value(126)) {
-        value3 = 70; //this.sVal(149,100);
-        value4 = 70; //this.sVal(150,100);//拡縮x,拡縮y
-        value2 = 700; //this.sVal(157,900);//y座標
+        picScaleX = 70; //this.sVal(149,100);
+        picScaleY = 70; //this.sVal(150,100);//拡縮x,拡縮y
+        picY = 700; //this.sVal(157,900);//y座標
       } else {
-        value3 = 50; //this.sVal(149,50);
-        value4 = 50; //this.sVal(150,50);//拡縮x,拡縮y
-        value2 = 550; //this.sVal(157,600);//y座標
+        picScaleX = 50; //this.sVal(149,50);
+        picScaleY = 50; //this.sVal(150,50);//拡縮x,拡縮y
+        picY = 550; //this.sVal(157,600);//y座標
       }
     }
     if (id2.match(/Upper/)) {
-      value2 = 384; //this.sVal(157,450);//y座標
+      picY = 384; //this.sVal(157,450);//y座標
     }
     if (id2.match(/Scale/)) {
-      value3 = 100;
-      value2 = 384; //this.sVal(157,450);//y座標
+      picScaleX = 100;
+      picY = 384; //this.sVal(157,450);//y座標
     }
     if (id2.match(/State/)) {
-      value3 = 100; //this.sVal(149,100);//拡縮x,拡縮y
-      value4 = 100; //this.sVal(150,100);
-      value2 = 384; //this.sVal(157,450);
+      picScaleX = 100; //this.sVal(149,100);//拡縮x,拡縮y
+      picScaleY = 100; //this.sVal(150,100);
+      picY = 384; //this.sVal(157,450);
     }
   }
-  value1 = 0;
-  if ([1, 3, 4, 5].some(function (id) { return id1 == id })) {
+  let dollStateFlag = 0;
+  if ([1, 3, 4, 5].some(function (item) { return id1 == item; })) {
     const actor = $gameActors.actor($gameVariables.value(20));
     if (actor.isStateAffected(valueDollStateId)) {
-      value1 = 1;
+      dollStateFlag = 1;
     }
   }
-  if (value1 == 0) {
+  if (dollStateFlag == 0) {
     //0会話用立ち絵変更表示。ピクチャを変更させて消去を見せないようにする。
     if (id1 == 0) { //tachie_dousa(0,1,2,12,13,1205,60,0,0);
       {
-        let value7, value8;
+        let primaryMoveDuration, fadeDelayDuration;
         if (id7 == 0) {
-          value7 = 60;
-          value8 = 30;
+          primaryMoveDuration = 60;
+          fadeDelayDuration = 30;
         } else {
-          value7 = id7 + id7;
-          value8 = id7;
+          primaryMoveDuration = id7 + id7;
+          fadeDelayDuration = id7;
         }
         if ($gameScreen.picture(id5)) {
-          let innerValue1 = $gameScreen.picture(id5).origin();
-          let innerValue2 = $gameScreen.picture(id5).x();
-          let innerValue3 = $gameScreen.picture(id5).y();
-          let innerValue4 = $gameScreen.picture(id5).scaleX();
-          let innerValue5 = $gameScreen.picture(id5).scaleY();
-          let innerValue6 = $gameScreen.picture(id5).opacity();
+          let originalOrigin = $gameScreen.picture(id5).origin();
+          let originalX = $gameScreen.picture(id5).x();
+          let originalY = $gameScreen.picture(id5).y();
+          let originalScaleX = $gameScreen.picture(id5).scaleX();
+          let originalScaleY = $gameScreen.picture(id5).scaleY();
+          let originalOpacity = $gameScreen.picture(id5).opacity();
           if (valueTacieSet[0] >= 1) {
-            innerValue1 = valueTacieSet[0];
-            innerValue2 = valueTacieSet[1];
-            innerValue3 = valueTacieSet[2];
-            innerValue4 = valueTacieSet[3];
-            innerValue5 = valueTacieSet[4];
-            innerValue6 = valueTacieSet[5];
+            originalOrigin = valueTacieSet[0];
+            originalX = valueTacieSet[1];
+            originalY = valueTacieSet[2];
+            originalScaleX = valueTacieSet[3];
+            originalScaleY = valueTacieSet[4];
+            originalOpacity = valueTacieSet[5];
             valueTacieSet = [0, 0, 0, 0, 0, 0];
           }
           if (id2 >= 1) {
@@ -280,31 +280,31 @@ tachie_dousa = function (id1, id2, id3, id4, id5, id6, id7, id8, id9) {
               //$gameVariables.setValue(151,id3);//表情代入
               tachie_settei2();
             }
-            $gameScreen.picture(id4)._origin = innerValue1;
-            $gameScreen.picture(id4)._x = innerValue2;
-            $gameScreen.picture(id4)._y = innerValue3;
-            $gameScreen.picture(id4)._scaleX = innerValue4;
-            $gameScreen.picture(id4)._scaleY = innerValue5;
-            $gameScreen.picture(id4)._opacity = 0; //innerValue6;
+            $gameScreen.picture(id4)._origin = originalOrigin;
+            $gameScreen.picture(id4)._x = originalX;
+            $gameScreen.picture(id4)._y = originalY;
+            $gameScreen.picture(id4)._scaleX = originalScaleX;
+            $gameScreen.picture(id4)._scaleY = originalScaleY;
+            $gameScreen.picture(id4)._opacity = 0; //originalOpacity;
           } else {
             if ($gameScreen.picture(id4)) {
               $gameScreen.erasePicture(id4);
             }
-            $gameScreen.showPicture(id4, "/img/tachies/" + id2, innerValue1, innerValue2, innerValue3, innerValue4, innerValue5, 0, 0);
+            $gameScreen.showPicture(id4, "/img/tachies/" + id2, originalOrigin, originalX, originalY, originalScaleX, originalScaleY, 0, 0);
           }
           if (id8 >= 1) {
-            if (id4 >= innerValue5) {
-              $gameScreen.movePicture(id4, innerValue1, innerValue2, innerValue3, innerValue4, innerValue5, innerValue6, 0, value8);
-              picture_fade1(id4, "fadeIn", 'Hpicture2', value8, 5);
-              $gameScreen.movePicture(id5, innerValue1, innerValue2, innerValue3, innerValue4, innerValue5, 0, 0, value7);
-              //picture_fade1(id5,"fadeOut",'Hpicture3',value7,5);
+            if (id4 >= originalScaleY) {
+              $gameScreen.movePicture(id4, originalOrigin, originalX, originalY, originalScaleX, originalScaleY, originalOpacity, 0, fadeDelayDuration);
+              picture_fade1(id4, "fadeIn", 'Hpicture2', fadeDelayDuration, 5);
+              $gameScreen.movePicture(id5, originalOrigin, originalX, originalY, originalScaleX, originalScaleY, 0, 0, primaryMoveDuration);
+              //picture_fade1(id5,"fadeOut",'Hpicture3',primaryMoveDuration,5);
             } else {
-              $gameScreen.movePicture(id4, innerValue1, innerValue2, innerValue3, innerValue4, innerValue5, innerValue6, 0, value8);
-              picture_fade1(id5, "fadeOut", 'Hpicture2', value7, 5);
+              $gameScreen.movePicture(id4, originalOrigin, originalX, originalY, originalScaleX, originalScaleY, originalOpacity, 0, fadeDelayDuration);
+              picture_fade1(id5, "fadeOut", 'Hpicture2', primaryMoveDuration, 5);
             }
           } else {
-            $gameScreen.movePicture(id4, innerValue1, innerValue2, innerValue3, innerValue4, innerValue5, innerValue6, 0, value8);
-            $gameScreen.movePicture(id5, innerValue1, innerValue2, innerValue3, innerValue4, innerValue5, 0, 0, value7);
+            $gameScreen.movePicture(id4, originalOrigin, originalX, originalY, originalScaleX, originalScaleY, originalOpacity, 0, fadeDelayDuration);
+            $gameScreen.movePicture(id5, originalOrigin, originalX, originalY, originalScaleX, originalScaleY, 0, 0, primaryMoveDuration);
           }
           if ($gameSwitches.value(126)) {
             tachie_bless(id4, 0);
@@ -322,43 +322,44 @@ tachie_dousa = function (id1, id2, id3, id4, id5, id6, id7, id8, id9) {
     //1会話用立ち絵表示。変数164と165は会話立ち絵開始コモンで0にしている。
     if (id1 == 1) {
       {
-        let value5 = id6; //this.sVal(160,$gameVariables.value(159));//透明度代入
+        let initialOpacity = id6; //this.sVal(160,$gameVariables.value(159));//透明度代入
         if (id2 >= 1) {
           tachie_settei2();
         } else {
-          $gameScreen.showPicture(id4, "/img/tachies/" + id2, 1, value1, value2, value3, value4, 0, 0);
+          $gameScreen.showPicture(id4, "/img/tachies/" + id2, 1, easingFunction, picY, picScaleX, picScaleY, 0, 0);
         }
         $gameScreen.picture(id4)._origin = 1;
-        $gameScreen.picture(id4)._y = value2;
-        $gameScreen.picture(id4)._scaleY = value4;
+        $gameScreen.picture(id4)._y = picY;
+        $gameScreen.picture(id4)._scaleY = picScaleY;
         $gameScreen.picture(id4)._opacity = 0;
+        let targetXPos;
         if (id5 == 1) {
-          value1 = 300; //this.sVal(155,800);//this.sVal(156,300);//最初右x,左x
+          targetXPos = 300; //this.sVal(155,800);//this.sVal(156,300);//最初右x,左x
         } else {
-          value1 = 100; //this.sVal(155,900);//this.sVal(156,200);//最初右x,左x
+          targetXPos = 100; //this.sVal(155,900);//this.sVal(156,200);//最初右x,左x
         }
         if (id5 == 0) {
-          value1 = 640;
-          $gameScreen.picture(id4)._x = value1 + 50;
+          targetXPos = 640;
+          $gameScreen.picture(id4)._x = targetXPos + 50;
         }
         if (id5 == 1) {
           if ($gameVariables.value(152) == 0) {
-            value1 = 1024 + 100;
+            targetXPos = 1024 + 100;
           } else {
-            value1 = 1280 - value1 + $gameVariables.value(164) - ($gameVariables.value(152) * 80);
+            targetXPos = 1280 - targetXPos + $gameVariables.value(164) - ($gameVariables.value(152) * 80);
           }
-          if ($gameSwitches.value(126)) { value1 = value1 + 50; }
-          $gameScreen.picture(id4)._x = value1 + 100;
+          if ($gameSwitches.value(126)) { targetXPos = targetXPos + 50; }
+          $gameScreen.picture(id4)._x = targetXPos + 100;
           $gameVariables.setValue(164, $gameVariables.value(164) + 150);
         }
         if (id5 == 2) {
-          value1 = value1 + $gameVariables.value(165) + ($gameVariables.value(153) * 80);
-          $gameScreen.picture(id4)._x = value1 - 100;
-          value3 = value3 - value3 - value3;
+          targetXPos = targetXPos + $gameVariables.value(165) + ($gameVariables.value(153) * 80);
+          $gameScreen.picture(id4)._x = targetXPos - 100;
+          picScaleX = picScaleX - picScaleX - picScaleX;
           $gameVariables.setValue(165, $gameVariables.value(165) - 150);
         }
-        $gameScreen.picture(id4)._scaleX = value3;
-        $gameScreen.movePicture(id4, 1, value1, value2, value3, value4, value5, 0, value6);
+        $gameScreen.picture(id4)._scaleX = picScaleX;
+        $gameScreen.movePicture(id4, 1, targetXPos, picY, picScaleX, picScaleY, initialOpacity, 0, fadeDuration);
         if ($gameSwitches.value(126)) {
           tachie_bless(id4, 0);
         }
@@ -366,7 +367,7 @@ tachie_dousa = function (id1, id2, id3, id4, id5, id6, id7, id8, id9) {
     }
     //着せ替えと表情変化内部処理。フェードアウトインはイベントコマンドで行う。
     if (id1 == 2) {
-      //AudioManager.playSe({"name":"Z_ClothesTakeOff","volume":150,"pitch":50,"pan":value7});
+      //AudioManager.playSe({"name":"Z_ClothesTakeOff","volume":150,"pitch":50,"pan":initialXOffset});
       if ($gameScreen.picture(id4)) {
         valueTacieSet = [$gameScreen.picture(id4).origin(), $gameScreen.picture(id4).x(), $gameScreen.picture(id4).y(),
         $gameScreen.picture(id4).scaleX(), $gameScreen.picture(id4).scaleY(), $gameScreen.picture(id4).opacity()];
@@ -395,20 +396,20 @@ tachie_dousa = function (id1, id2, id3, id4, id5, id6, id7, id8, id9) {
     }
     //3立ち絵再表示スクリプト。
     if (id1 == 3) {
-      let tachieNum = parseInt(id4, 10) || 0; // 立ち絵1か2か、それとも…
-      tachieNum--; // データ上は0から
-      if (tachieNum === -1) { } else {
-        if ($TKMvar.tachie.PicData.length <= tachieNum) { } else {
-          if (!$TKMvar.tachie.PicData[tachieNum]["char"]) { } else {
+      let standPicIndex = parseInt(id4, 10) || 0; // 立ち絵1か2か、それとも…
+      standPicIndex--; // データ上は0から
+      if (standPicIndex === -1) { } else {
+        if ($TKMvar.tachie.PicData.length <= standPicIndex) { } else {
+          if (!$TKMvar.tachie.PicData[standPicIndex]["char"]) { } else {
             const CharList = $TKMvar.tachie.CharList;
             const MaxLayer = $TKMvar.tachie.MaxLayer;
             const PicData = $TKMvar.tachie.PicData;
-            const pictureId = PicData[tachieNum]["picNum"];
-            const char = PicData[tachieNum]["char"];
+            const pictureId = PicData[standPicIndex]["picNum"];
+            const char = PicData[standPicIndex]["char"];
             const name = "TKMtachie_" + char + "_";
             const partList = CharList[char];
-            const x = $TKMvar.tachie.PicData[tachieNum]["x"];
-            const y = $TKMvar.tachie.PicData[tachieNum]["y"];
+            const x = $TKMvar.tachie.PicData[standPicIndex]["x"];
+            const y = $TKMvar.tachie.PicData[standPicIndex]["y"];
             $gameScreen.showPicture(pictureId, name, 0, x, y, 85, 85, 0, 0);
           }
         }
@@ -419,7 +420,7 @@ tachie_dousa = function (id1, id2, id3, id4, id5, id6, id7, id8, id9) {
       $gameScreen.picture(id4)._scaleX = valueTacieSet[3];
       $gameScreen.picture(id4)._scaleY = valueTacieSet[4];
       $gameScreen.picture(id4)._opacity = valueTacieSet[5];
-      //$gameScreen.movePicture(id4,1,value1,value2,value3,value4,value5, 0,10);
+      // $gameScreen.movePicture(id4,1,easingFunction,picY,picScaleX,picScaleY, 0,10);
       pic_set(id4, 1, 255, 10);
       valueTacieSet = [0, 0, 0, 0, 0, 0];
     }
