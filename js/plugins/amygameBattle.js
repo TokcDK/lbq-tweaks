@@ -4138,11 +4138,6 @@ function handleCutinCategory1CutinPreparation(actor) {
   }
 }
 
-function handleCutinCategory1CutinPreparation(actor) {
-  // Already existing function call
-  handleCutinCategory1CutinPreparation(actor);
-}
-
 function handleCutinCategory2CutinPreparation() {
   const partyFirstStrikeCg = 'CutInCG_PartyFirstStrike';
   const chainLabel = 'チェイン';
