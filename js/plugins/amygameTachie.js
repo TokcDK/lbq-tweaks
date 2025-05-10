@@ -169,6 +169,19 @@ if($gameVariables.value(244) >= 1){
 };
 
 //☆☆立ち絵会話動作用
+const scaleConfigGeneral1TachieDousaMap = {
+  true: { scale: 70, y: 650 },
+  false: { scale: 50, y: 550 }
+};
+const scaleConfigGeneral2TachieDousaMap = {
+  true: { scale: 200, y: 700 },
+  false: { scale: 100, y: 400 }
+};
+const scaleConfigSSTachieDousaMap = {
+  true: { scale: 70, y: 700 },
+  false: { scale: 50, y: 550 }
+};
+const actionItemIdsTachieDousa = [1, 3, 4, 5];
 tachie_dousa = function (actionType, actorParameter, expressionCode, targetPicId, sourcePicId, showCostumeId, changeCostumeId, changeCostumeParam, unusedParam) {
 
   // Set a temporary switch flag to indicate processing is underway
@@ -190,42 +203,30 @@ tachie_dousa = function (actionType, actorParameter, expressionCode, targetPicId
   }
 
   // Initialize variables for picture Y-position and scale based on actor parameters and switches
+  const isScaled = $gameSwitches.value(126);
   let picY, picScaleX, picScaleY;
   if (actorParameter >= 1 || actorParameter == 0) {
     // When actorParameter is a number or zero:
     $gameVariables.setValue(20, actorParameter);
     $gameVariables.setValue(300, targetPicId);
     $gameVariables.setValue(151, expressionCode); // Set expression code (i.e. facial expression)
-    if ($gameSwitches.value(126)) {
-      picScaleX = 70;
-      picScaleY = 70;
-      picY = 650;
-    } else {
-      picScaleX = 50;
-      picScaleY = 50;
-      picY = 550;
-    }
+
+    const { scale, y } = scaleConfigGeneral1TachieDousaMap[isScaled];
+    picScaleX = scale;
+    picScaleY = scale;
+    picY = y;
   } else {
     // When actorParameter is not numeric: using text pattern matching
-    if ($gameSwitches.value(126)) {
-      picScaleX = 200;
-      picScaleY = 200;
-      picY = 700;
-    } else {
-      picScaleX = 100;
-      picScaleY = 100;
-      picY = 400;
-    }
+    const { scale, y } = scaleConfigGeneral2TachieDousaMap[isScaled];
+    picScaleX = scale;
+    picScaleY = scale;
+    picY = y;
+
     if (actorParameter.match(/SS/)) {
-      if ($gameSwitches.value(126)) {
-        picScaleX = 70;
-        picScaleY = 70;
-        picY = 700;
-      } else {
-        picScaleX = 50;
-        picScaleY = 50;
-        picY = 550;
-      }
+      const { scale, y } = scaleConfigSSTachieDousaMap[isScaled];
+      picScaleX = scale;
+      picScaleY = scale;
+      picY = y;
     }
     if (actorParameter.match(/Upper/)) {
       picY = 384;
@@ -243,7 +244,7 @@ tachie_dousa = function (actionType, actorParameter, expressionCode, targetPicId
 
   // Check if the actor is in a doll state for certain action types (1,3,4,5)
   let dollStateFlag = 0;
-  if ([1, 3, 4, 5].some(function (actionItem) { return actionType == actionItem; })) {
+  if (actionItemIdsTachieDousa.some(function (actionItem) { return actionType == actionItem; })) {
     const actor = $gameActors.actor($gameVariables.value(20));
     if (actor.isStateAffected(valueDollStateId)) {
       dollStateFlag = 1;
