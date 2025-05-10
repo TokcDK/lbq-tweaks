@@ -4021,9 +4021,9 @@ cutin_preparation = function (cutinCategory, actorId) {
   //スキル90
   //チェイン180
   //会話-90
-  if (actorId >= 1) {
-    const actor = $gameActors.actor(actorId);
-  };
+  //if (actorId >= 1) {
+  //  const actor = $gameActors.actor(actorId);
+  //};
   //if (cutinCategory == 0) {
     //const action = BattleManager._action;
     //const itemId = BattleManager._action._item._itemId;
