@@ -4036,69 +4036,11 @@ cutin_preparation = function (cutinCategory, actorId) {
       //valueCutInSet1 = ["カットインエネミースキル", cgAssetName, 0, 4.5, 4.5, 25, 40];
     //};
   //};
+  // New helper function for cutinCategory == 1
+
+  // Modified selection code that calls the new function
   if (cutinCategory == 1) {
-    let cutinType = 0;
-    let skillId;
-    if ($gameVariables.value(182) == 13) {
-      cutinType = 4;
-      skillId = 91;
-    } else {
-      if ($gameVariables.value(182) == 12) {
-        cutinType = 1;
-      };
-      //const action = BattleManager._action;
-      skillId = BattleManager._action._item._itemId;
-    };
-    if ($dataSkills[skillId].meta["CutInSkillSet"]) {
-      if ($gameVariables.value(182) == 12) {
-        cutinType = 2;
-      };
-      //if([5,6,7,8].some(function(id){return $gameVariables.value(182) == (id)})){$gameVariables.setValue(21,2)};
-    };
-    
-    if (cutinType == 2) {
-      if ($dataSkills[$gameVariables.value(96)].meta['HiQualityBurst']) {
-        skillId = "21_BattleOugiBest";
-        AudioManager.playBgm({ "name": skillId, "volume": 50, "pitch": 110, "pan": 0 });
-      } else {
-        skillId = "21_BattleOugi";
-        AudioManager.playBgm({ "name": skillId, "volume": 50, "pitch": 110, "pan": 0 });
-      };
-    };
-    if (cutinType >= 1) {
-      if ($dataActors[actorId].meta['OugiUse']) {
-        const ougiUseOptions = $dataActors[actorId].meta['OugiUse'].split(',');
-        const selectedOugiOption = ougiUseOptions[getRandomIndex(ougiUseOptions.length)];
-        const npcGabArray = [];
-        npcGabArray.push([`${actor.name()}${selectedOugiOption}`, 0, 0]);
-        gabWord_exeScriptNoFace(npcGabArray);
-      };
-      if ($dataActors[actorId].meta['Heroine']) {
-        let heroineExposure = $gameVariables.value(actorId + 380)[4]; //露出度による変更
-        if (cutinType == 2 && heroineExposure <= 5) {
-          cutinType = 3;
-        };
-        if (cutinType == 4 && heroineExposure <= 5) {
-          cutinType = 5;
-        };
-        let actorCutinSettings, cutinTypeName;
-        if (cutinType == 1) {
-          actorCutinSettings = [0, 4.5, 4.5, 25, 20];
-          cutinTypeName = '奥義';
-        };
-        if (cutinType == 2 || cutinType == 3) {
-          actorCutinSettings = [90, 1.3, 1.3, 35, 60];
-          cutinTypeName = 'スキル';
-        };
-        if (cutinType == 4 || cutinType == 5) {
-          actorCutinSettings = [180, 6, 2, 25, 20];
-          cutinTypeName = 'チェイン';
-        };
-        const actorCgAsset = 'CutInCG_Actor' + actorId + '_' + cutinType;
-        const actorCutinLabel = 'カットインアクター' + cutinTypeName;
-        valueCutInSet1 = [actorCutinLabel, actorCgAsset, actorCutinSettings[0], actorCutinSettings[1], actorCutinSettings[2], actorCutinSettings[3], actorCutinSettings[4]];
-      };
-    };
+    handleCutinCategory1CutinPreparation(actor);
   };
   if (cutinCategory == 2) {
     const partyFirstStrikeCg = 'CutInCG_PartyFirstStrike';
@@ -4148,6 +4090,79 @@ cutin_preparation = function (cutinCategory, actorId) {
   };
 
 };
+
+function handleCutinCategory1CutinPreparation(actor) {
+  const actorId = actor.actorId();
+  let cutinType = 0;
+  let skillId;
+  if ($gameVariables.value(182) == 13) {
+    cutinType = 4;
+    skillId = 91;
+  } else {
+    if ($gameVariables.value(182) == 12) {
+      cutinType = 1;
+    }
+    // Using the current action item id
+    skillId = BattleManager._action._item._itemId;
+  }
+  if ($dataSkills[skillId].meta["CutInSkillSet"]) {
+    if ($gameVariables.value(182) == 12) {
+      cutinType = 2;
+    }
+  }
+
+  if (cutinType == 2) {
+    if ($dataSkills[$gameVariables.value(96)].meta['HiQualityBurst']) {
+      skillId = "21_BattleOugiBest";
+      AudioManager.playBgm({ "name": skillId, "volume": 50, "pitch": 110, "pan": 0 });
+    } else {
+      skillId = "21_BattleOugi";
+      AudioManager.playBgm({ "name": skillId, "volume": 50, "pitch": 110, "pan": 0 });
+    }
+  }
+  if (cutinType >= 1) {
+    if ($dataActors[actorId].meta['OugiUse']) {
+      const ougiUseOptions = $dataActors[actorId].meta['OugiUse'].split(',');
+      const selectedOugiOption = ougiUseOptions[getRandomIndex(ougiUseOptions.length)];
+      const npcGabArray = [];
+      npcGabArray.push([`${actor.name()}${selectedOugiOption}`, 0, 0]);
+      gabWord_exeScriptNoFace(npcGabArray);
+    }
+    if ($dataActors[actorId].meta['Heroine']) {
+      let heroineExposure = $gameVariables.value(actorId + 380)[4]; //露出度による変更
+      if (cutinType == 2 && heroineExposure <= 5) {
+        cutinType = 3;
+      }
+      if (cutinType == 4 && heroineExposure <= 5) {
+        cutinType = 5;
+      }
+      let actorCutinSettings, cutinTypeName;
+      if (cutinType == 1) {
+        actorCutinSettings = [0, 4.5, 4.5, 25, 20];
+        cutinTypeName = '奥義';
+      }
+      if (cutinType == 2 || cutinType == 3) {
+        actorCutinSettings = [90, 1.3, 1.3, 35, 60];
+        cutinTypeName = 'スキル';
+      }
+      if (cutinType == 4 || cutinType == 5) {
+        actorCutinSettings = [180, 6, 2, 25, 20];
+        cutinTypeName = 'チェイン';
+      }
+      const actorCgAsset = 'CutInCG_Actor' + actorId + '_' + cutinType;
+      const actorCutinLabel = 'カットインアクター' + cutinTypeName;
+      valueCutInSet1 = [
+        actorCutinLabel,
+        actorCgAsset,
+        actorCutinSettings[0],
+        actorCutinSettings[1],
+        actorCutinSettings[2],
+        actorCutinSettings[3],
+        actorCutinSettings[4]
+      ];
+    }
+  }
+}
 
 //石召喚演出ピクチャsummon_directPicture1(1);
 summon_directPicture1 = function (effectMode) {
