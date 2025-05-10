@@ -4040,16 +4040,14 @@ cutin_preparation = function (cutinCategory, actorId) {
     let cutinType = 0;
     let skillId;
     if ($gameVariables.value(182) == 13) {
+      cutinType = 4;
       skillId = 91;
     } else {
+      if ($gameVariables.value(182) == 12) {
+        cutinType = 1;
+      };
       //const action = BattleManager._action;
       skillId = BattleManager._action._item._itemId;
-    };
-    if ($gameVariables.value(182) == 12) {
-      cutinType = 1;
-    };
-    if ($gameVariables.value(182) == 13) {
-      cutinType = 4;
     };
     if ($dataSkills[skillId].meta["CutInSkillSet"]) {
       if ($gameVariables.value(182) == 12) {
@@ -4057,6 +4055,7 @@ cutin_preparation = function (cutinCategory, actorId) {
       };
       //if([5,6,7,8].some(function(id){return $gameVariables.value(182) == (id)})){$gameVariables.setValue(21,2)};
     };
+    
     if (cutinType == 2) {
       if ($dataSkills[$gameVariables.value(96)].meta['HiQualityBurst']) {
         skillId = "21_BattleOugiBest";
