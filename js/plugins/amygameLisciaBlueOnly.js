@@ -19,11 +19,11 @@ class BookTipBase {
         throw new Error("getValue2 method should be implemented");
     }
 
-    getValue1() {
+    bookTitle() {
         throw new Error("getValue1 method should be implemented");
     }
 
-    getValue2() {
+    bookDescription() {
         throw new Error("getValue2 method should be implemented");
     }
 
@@ -37,7 +37,7 @@ class BookTipBase {
 
     setValueTalkSet() {
       const value3 = [0,1,640,384,100,100,255];
-      valueTalkSet = [this.getValue1(),this.getValue2(),value3];
+      valueTalkSet = [this.bookTitle(),this.bookDescription(),value3];
     }
 
     execute() {
@@ -54,10 +54,10 @@ class Tip1 extends BookTipBase {//
     var172value() {
         return 2;
     }
-    getValue1() {
+    bookTitle() {
         return `朽ちた星晶獣の権能復元計画`;
     }
-    getValue2() {
+    bookDescription() {
         return 
 `\\swi[247]の協力者から持ち込まれた情報を元に
 策定されたプロジェクト。
@@ -82,10 +82,10 @@ class Tip2 extends BookTipBase {//<淫統薬>インデュ・アビス
     var172value() {
         return 2;
     }
-    getValue1() {
+    bookTitle() {
         return `${$dataWeapons[452].name}─その１─`;
     }
-    getValue2() {
+    bookDescription() {
         return 
 `コルブラント島でその断片を確保した星晶獣、
 その一部他を用いて精製された、民意扇動を目的とした薬物。
@@ -111,10 +111,10 @@ class Tip3 extends BookTipBase {//<淫統薬>インデュ・アビス
     var172value() {
         return 2;
     }
-    getValue1() {
+    bookTitle() {
         return `${$dataWeapons[452].name}─その３─`;
     }
-    getValue2() {
+    bookDescription() {
         return 
 `
 現在は行方不明者が発生しても騒ぎになり難い、
@@ -137,10 +137,10 @@ class Tip4 extends BookTipBase {//<試薬品>インデュルゲンス・リキ�
     var172value() {
         return 2;
     }
-    getValue1() {
+    bookTitle() {
         return `${$dataWeapons[453].name}`;
     }
-    getValue2() {
+    bookDescription() {
         return 
 `開発された\\wn[452]の試作品。
 正式採用となった薬品と比較すると、
@@ -162,10 +162,10 @@ class Tip5 extends BookTipBase {//<淫紋>アビス・クレスト使用ずみ
     var172value() {
         return 2;
     }
-    getValue1() {
+    bookTitle() {
         return `${$dataWeapons[454].name}`;
     }
-    getValue2() {
+    bookDescription() {
         return 
 `触手型魔物である「\\wn[455]」が使う、
 対象を苗床化する\\wn[456]を元に、
@@ -193,10 +193,10 @@ class Tip6 extends BookTipBase {//<淫統光>HMD型インデュ・アビス.使�
     var172value() {
         return 2;
     }
-    getValue1() {
+    bookTitle() {
         return `${$dataWeapons[457].name}`;
     }
-    getValue2() {
+    bookDescription() {
         return 
 `服薬が必要な\\wn[452]に対して、
 光学的なアプローチを用いた試作魔導開発品。
@@ -220,10 +220,10 @@ class Tip7 extends BookTipBase {//<アビス・クレスト>と<インデュ・�
     var172value() {
         return 2;
     }
-    getValue1() {
+    bookTitle() {
         return `${$dataWeapons[458].name}`;
     }
-    getValue2() {
+    bookDescription() {
         return 
 `両者には根幹技術に措いて同様の手法が用いられている
 （正確には\\wn[454]の術式を
@@ -247,10 +247,10 @@ class Tip8 extends BookTipBase {//使用済み
     var172value() {
         return 2;
     }
-    getValue1() {
+    bookTitle() {
         return `${$dataWeapons[80].name}`;
     }
-    getValue2() {
+    bookDescription() {
         return 
 `数年前よりコルブラント島に出没するようになった空賊団。
 高機能な騎空挺と練度の高い団員を擁しており、
@@ -277,10 +277,10 @@ class Tip11 extends BookTipBase {//<星晶獣>インペリウム・グノーシ�
     var172value() {
         return 2;
     }
-    getValue1() {
+    bookTitle() {
         return `${$dataWeapons[451].name}`;
     }
-    getValue2() {
+    bookDescription() {
         return 
 `コルブラント島で存在を確認された星晶獣。
 その権能は、認識改変による「支配」。
@@ -307,10 +307,10 @@ class Tip12 extends BookTipBase {//<星晶獣>インペリウム・グノーシ�
     var172value() {
         return 3;
     }
-    getValue1() {
+    bookTitle() {
         return `${$dataWeapons[451].name}─その２─`;
     }
-    getValue2() {
+    bookDescription() {
         return 
 `既にその存在は朽ち果て、遺骸は大森林の地下深くに埋没している。
 残滓や断片が卑小化された権能を発揮する事もあるが、
@@ -335,10 +335,10 @@ class Tip13 extends BookTipBase {//「インペルの神水」使用済み
     var172value() {
         return 2;
     }
-    getValue1() {
+    bookTitle() {
         return `${$dataItems[1162].name} またの名を「${$dataWeapons[460].name}」`;
     }
-    getValue2() {
+    bookDescription() {
         return 
 `中央森林で汲み取れる湧き水。
 高級志向の飲食店などで使われている。
@@ -366,10 +366,10 @@ class Tip14 extends BookTipBase {//支配の結石使用済み
     var172value() {
         return 2;
     }
-    getValue1() {
+    bookTitle() {
         return `${$dataItems[1163].name}`;
     }
-    getValue2() {
+    bookDescription() {
         return 
 `ジャックモンド伯爵家に伝わる希少な鉱石。
 とある不思議な効力があるとされている。
@@ -396,10 +396,10 @@ class Tip15 extends BookTipBase {//クサンについて。ラストバトル時
     var172value() {
         return 3;
     }
-    getValue1() {
+    bookTitle() {
         return `${$gameActors.actor(7).name()}=コルド＝${$dataActors[7].meta['SecondName'].split(',')[1]}`;
     }
-    getValue2() {
+    bookDescription() {
         return 
 `\\swi[247]元宰相。
 その目的は、嘗て王国統治を支えた星晶獣の権能復元。
@@ -429,10 +429,10 @@ class Tip16 extends BookTipBase {//クサンについて2。使用ずみ
         return 2;
     }
   //var value1 = `\\set[7]─その２─`;
-    getValue1() {
+    bookTitle() {
         return `${$gameActors.actor(7).name()}=コルド＝${$dataActors[7].meta['SecondName'].split(',')[1]}─その２─`;
     }
-    getValue2() {
+    bookDescription() {
         return 
 `未だ復権という野心にその身を焦がす\\swi[247]元宰相。
 
@@ -461,10 +461,10 @@ class Tip17 extends BookTipBase {//騎士団長,入手ずみ
     var172value() {
         return 3;
     }
-    getValue1() {
+    bookTitle() {
         return `${$dataWeapons[351].name}=${$dataWeapons[351].meta['FamilyName']}`;
     }
-    getValue2() {
+    bookDescription() {
         return 
 `\\swi[247]騎士団長。
 王国最強の騎士にして、軍事に措ける最高責任者。
@@ -493,10 +493,10 @@ class Tip18 extends BookTipBase {//国王。使用ずみ
     var172value() {
         return 2;
     }
-    getValue1() {
+    bookTitle() {
         return `${$dataWeapons[359].name}=${$dataWeapons[359].meta['FamilyName']}`;
     }
-    getValue2() {
+    bookDescription() {
         return 
 `\\swi[247]国王。自他共に認める無能な王。
 それは彼自身の責というよりも、星晶獣の権能という
@@ -522,10 +522,10 @@ class Tip19 extends BookTipBase {//<淫触薬>アビス・リキッド、使用�
     var172value() {
         return 2;
     }
-    getValue1() {
+    bookTitle() {
         return `${$dataWeapons[459].name}`;
     }
-    getValue2() {
+    bookDescription() {
         return 
 `\\wn[452]を元にして作成された派生薬の一つ。
 触手型魔物である「\\wn[455]」の体液を用いる事で、
@@ -552,10 +552,10 @@ class Tip20 extends BookTipBase {//エネミー全滅ボーナス、使用ずみ
     var172value() {
         return 2;
     }
-    getValue1() {
+    bookTitle() {
         return `エネミー全滅ボーナス`;
     }
-    getValue2() {
+    bookDescription() {
         return 
 `マップ上のシンボルエネミーを全滅させる事で、
 初回殲滅特典としてレアなアイテムが入手できます。
@@ -581,10 +581,10 @@ class Tip21 extends BookTipBase {//ダンジョンとフィールドの違い。
     var172value() {
         return 2;
     }
-    getValue1() {
+    bookTitle() {
         return `ダンジョンとフィールド`;
     }
-    getValue2() {
+    bookDescription() {
         return 
 `作中に措いて、『ダンジョン』と『フィールド』は
 扱いが異なる。
@@ -606,10 +606,10 @@ class Tip22 extends BookTipBase {//食事について。使用済み
     var172value() {
         return 2;
     }
-    getValue1() {
+    bookTitle() {
         return `食事アイテムについて`;
     }
-    getValue2() {
+    bookDescription() {
         return 
 `「Food」に分類される食事アイテムは、
 使用する事で食べる事ができ、
@@ -632,10 +632,10 @@ class Tip23 extends BookTipBase {//<淫統薬>インデュ・アビス
     var172value() {
         return 2;
     }
-    getValue1() {
+    bookTitle() {
         return `${$dataWeapons[452].name}─その２─`;
     }
-    getValue2() {
+    bookDescription() {
         return 
 `これを解消する為の研究は主に、
 「特定対象に特化した支配機能」を主軸としている。
@@ -661,10 +661,10 @@ class Tip24 extends BookTipBase {//ディヴィジョン・ベルセルク
     var172value() {
         return 3;
     }
-    getValue1() {
+    bookTitle() {
         return `ベルセルク──過去──`;
     }
-    getValue2() {
+    bookDescription() {
         return 
 `覇空戦争時代に猛威を振るった狂戦士達。
 理性を払底させる事を代償に強大な力を振るう。
@@ -690,10 +690,10 @@ class Tip25 extends BookTipBase {//ディヴィジョン・ベルセルク
     var172value() {
         return 3;
     }
-    getValue1() {
+    bookTitle() {
         return `ベルセルク──現在──`;
     }
-    getValue2() {
+    bookDescription() {
         return 
 `──現代に措いて。
 様々な書物から、その一族の存在を掴んだ帝国研究所。
@@ -719,10 +719,10 @@ class Tip26 extends BookTipBase {//ディヴィジョン・ベルセルク
     var172value() {
         return 3;
     }
-    getValue1() {
+    bookTitle() {
         return `ディヴィジョン・ベルセルク`;
     }
-    getValue2() {
+    bookDescription() {
         return 
 `本来は、血族であろうとも器では無い\N[5]が、
 寿命を代償に狂戦士化した姿。
@@ -745,10 +745,10 @@ class Tip27 extends BookTipBase {//ライフスト－ム
     var172value() {
         return 3;
     }
-    getValue1() {
+    bookTitle() {
         return `生命奔流体機構<ライフストーム・イグジット>`;
     }
-    getValue2() {
+    bookDescription() {
         return 
 `生体兵器として産み出された狂戦士の血統に
 遺伝子レベルで組み込まれた疑似思考群体。
@@ -801,17 +801,25 @@ const originalTipsMap = {
 
 //#region original_text
 
-class OriginalText1 extends BookTipBase {
-  seName() {
-    return "Chime2";
-  }
-
+class OriginalTextBase extends BookTipBase {
   var172value() {
     return 10;
   }
 
+  execute(bookData) {
+    this.playSound();
+    $gameVariables.setValue(172, this.var172value());
+    valueTalkSet = [25, this.bookDescription(), bookData];
+  }
+}
+
+class OriginalText1 extends OriginalTextBase {
+  seName() {
+    return "Chime2";
+  }
+
   // Return the text for id100==1 using id101 if needed
-  getValue1() {
+  bookDescription() {
     return `・Usopedia:${$dataWeapons[317].meta['Profession']}
 覇空戦争時代より続く医師の名門一族、\\NFN[317]家。
 何よりも患者の命を救う事を真摯に求める、高邁な精神の癒し手達。
@@ -831,25 +839,15 @@ ${$dataWeapons[317].meta['Profession1']}、と…。
 
 民明書房刊『華麗なる一族、\\NFN[317]の光と闇』より抜粋`;
   }
-
-  execute(bookId) {
-    this.playSound();
-    $gameVariables.setValue(172, this.var172value());
-    valueTalkSet = [25, this.getValue1(), bookId];
-  }
 }
 
-class OriginalText2 extends BookTipBase {
+class OriginalText2 extends OriginalTextBase {
   seName() {
     return "Chime2";
   }
 
-  var172value() {
-    return 10;
-  }
-
   // Return the text for id100==2 using id101 if needed
-  getValue1() {
+  bookDescription() {
     return `・Usopedia:魔導電算機について
 来訪者(コラボ勢)の一人が所持していたＰＣ(パーソナルコンピューター)を元に、
 エルステ帝国が開発した電算処理ユニット。
@@ -865,12 +863,6 @@ class OriginalText2 extends BookTipBase {
 高性能化や小型化などの研究に着手している──。
 
 ファ空新聞『時代を変える発明品！？　噂の魔導電算機に迫る！』特集一面より抜粋`;
-  }
-
-  execute(bookData) {
-    this.playSound();
-    $gameVariables.setValue(172, this.var172value());
-    valueTalkSet = [25, this.getValue1(), bookData];
   }
 }
 //#endregion
@@ -2110,7 +2102,6 @@ original_tips = function (bookId){
   }
 
   tip.execute();
-
 };
 
 //作品オリジナルのメインシーンピクチャやキャラグラ移動等処理。全てid直接入力
