@@ -202,45 +202,7 @@ tachie_dousa = function (actionType, actorParameter, expressionCode, targetPicId
     fadeDuration = 60;
   }
 
-  // Initialize variables for picture Y-position and scale based on actor parameters and switches
-  const isScaled = $gameSwitches.value(126);
-  let picY, picScaleX, picScaleY;
-  if (actorParameter >= 1 || actorParameter == 0) {
-    // When actorParameter is a number or zero:
-    $gameVariables.setValue(20, actorParameter);
-    $gameVariables.setValue(300, targetPicId);
-    $gameVariables.setValue(151, expressionCode); // Set expression code (i.e. facial expression)
-
-    const { scale, y } = scaleConfigGeneral1TachieDousaMap[isScaled];
-    picScaleX = scale;
-    picScaleY = scale;
-    picY = y;
-  } else {
-    // When actorParameter is not numeric: using text pattern matching
-    const { scale, y } = scaleConfigGeneral2TachieDousaMap[isScaled];
-    picScaleX = scale;
-    picScaleY = scale;
-    picY = y;
-
-    if (actorParameter.match(/SS/)) {
-      const { scale, y } = scaleConfigSSTachieDousaMap[isScaled];
-      picScaleX = scale;
-      picScaleY = scale;
-      picY = y;
-    }
-    if (actorParameter.match(/Upper/)) {
-      picY = 384;
-    }
-    if (actorParameter.match(/Scale/)) {
-      picScaleX = 100;
-      picY = 384;
-    }
-    if (actorParameter.match(/State/)) {
-      picScaleX = 100;
-      picScaleY = 100;
-      picY = 384;
-    }
-  }
+  ( picY, picScaleX, picScaleY ) = calculateScaleAndPositionTachieDousa(actorParameter, targetPicId, expressionCode);
 
   // Check if the actor is in a doll state for certain action types (1,3,4,5)
   let dollStateFlag = 0;
@@ -367,6 +329,41 @@ tachie_dousa = function (actionType, actorParameter, expressionCode, targetPicId
   // Reset the temporary switch flag to indicate processing is complete
   $gameSwitches.setValue(97, false);
 };
+
+function calculateScaleAndPositionTachieDousa(actorParameter, targetPicId, expressionCode) {
+  const isScaled = $gameSwitches.value(126);
+  let picY, picScaleX, picScaleY;
+
+  // Check if actorParameter is numeric (including 0)
+  if (typeof actorParameter === 'number' || (!isNaN(actorParameter) && actorParameter !== null)) {
+    $gameVariables.setValue(20, actorParameter);
+    $gameVariables.setValue(300, targetPicId);
+    $gameVariables.setValue(151, expressionCode); // Set expression code
+    
+    // Use general configuration for numeric actorParameter
+    ({ scale: picScaleY = picScaleX, y: picY } = scaleConfigGeneral1TachieDousaMap[isScaled]);
+  } else {
+    // Use textual configuration if actorParameter is not numeric
+    ({ scale: picScaleY = picScaleX, y: picY } = scaleConfigGeneral2TachieDousaMap[isScaled]);
+
+    if (actorParameter.match(/SS/)) {
+      ({ scale: picScaleY = picScaleX, y: picY } = scaleConfigSSTachieDousaMap[isScaled]);
+    }
+    if (actorParameter.match(/Upper/)) {
+      picY = 384;
+    }
+    if (actorParameter.match(/Scale/)) {
+      picScaleX = 100;
+      picY = 384;
+    }
+    if (actorParameter.match(/State/)) {
+      picScaleY = picScaleX = 100;
+      picY = 384;
+    }
+  }
+
+  return { picY, picScaleX, picScaleY };
+}
 
 function animatePictureAtype1TachieDousa(targetPicId, actorParameter, sourcePicId, showCostumeId, easingFunction, picY, picScaleX, picScaleY, fadeDuration) {
   // Retrieve the target picture object
