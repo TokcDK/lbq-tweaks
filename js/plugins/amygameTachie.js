@@ -346,133 +346,148 @@ tachie_dousa = function (actionType, actorParameter, expressionCode, targetPicId
       }
     }
 
-    // --------- Action Type 1: Standard picture display with position easing ----------
     if (actionType == 1) {
-      // Set initial opacity based on costume show parameter
-      let initialOpacity = showCostumeId;
-      if (actorParameter >= 1) {
-        tachie_settei2();
-      } else {
-        // Show a new picture using actorParameter as image name
-        $gameScreen.showPicture(targetPicId, "/img/tachies/" + actorParameter, 1, easingFunction, picY, picScaleX, picScaleY, 0, 0);
-      }
-      // Cache target picture attributes for consistency
-      targetPic._origin = 1;
-      targetPic._y = picY;
-      targetPic._scaleY = picScaleY;
-      targetPic._opacity = 0;
-      let targetXPos;
-      // Set X position based on sourcePicId value
-      if (sourcePicId == 1) {
-        targetXPos = 300;
-      } else {
-        targetXPos = 100;
-      }
-      // Adjust X position when sourcePicId equals 0
-      if (sourcePicId == 0) {
-        targetXPos = 640;
-        targetPic._x = targetXPos + 50;
-      }
-      // Further adjust targetXPos when sourcePicId equals 1 using additional variable adjustments
-      if (sourcePicId == 1) {
-        if ($gameVariables.value(152) == 0) {
-          targetXPos = 1024 + 100;
-        } else {
-          targetXPos = 1280 - targetXPos + $gameVariables.value(164) - ($gameVariables.value(152) * 80);
-        }
-        if ($gameSwitches.value(126)) { targetXPos = targetXPos + 50; }
-        targetPic._x = targetXPos + 100;
-        $gameVariables.setValue(164, $gameVariables.value(164) + 150);
-      }
-      // Additional X coordinate adjustment when sourcePicId equals 2 and scale correction
-      if (sourcePicId == 2) {
-        targetXPos = targetXPos + $gameVariables.value(165) + ($gameVariables.value(153) * 80);
-        targetPic._x = targetXPos - 100;
-        picScaleX = picScaleX - picScaleX - picScaleX;
-        $gameVariables.setValue(165, $gameVariables.value(165) - 150);
-      }
-      targetPic._scaleX = picScaleX;
-      // Animate moving the picture into position using the calculated parameters
-      $gameScreen.movePicture(targetPicId, 1, targetXPos, picY, picScaleX, picScaleY, initialOpacity, 0, fadeDuration);
-      if ($gameSwitches.value(126)) {
-        tachie_bless(targetPicId, 0);
-      }
+      // --------- Action Type 1: Standard picture display with position easing ----------
+      animatePictureAtype1TachieDousa(targetPicId, actorParameter, sourcePicId, showCostumeId, easingFunction, picY, picScaleX, picScaleY, fadeDuration);
     }
 
-    // --------- Action Type 2: Costume changing with caching target picture attributes ----------
     if (actionType == 2) {
-      // Cache targetPic attributes for reuse in the costume change
-      if (targetPic) {
-        valueTacieSet = [
-          targetPic.origin(),
-          targetPic.x(),
-          targetPic.y(),
-          targetPic.scaleX(),
-          targetPic.scaleY(),
-          targetPic.opacity()
-        ];
-      }
-      // Execute costume change routine either by direct specification or default settings
-      if (changeCostumeId >= 1) {
-        kisekae_tyokusetusitei(changeCostumeId, changeCostumeParam);
-      } else {
-        tachie_settei2();
-      }
-      // Update event image if applicable
-      if ($gameVariables.value(292) != 0) {
-        if ($gameVariables.value(292)[$gameVariables.value(20)] >= 1) {
-          const event = $gameMap.event($gameVariables.value(292)[$gameVariables.value(20)]);
-          const actor = $gameActors.actor($gameVariables.value(20));
-          event.setImage(actor.characterName(), actor.characterIndex());
-        }
-      }
-      // Restore cached picture attributes back to the target picture
-      targetPic._origin = valueTacieSet[0];
-      targetPic._x = valueTacieSet[1];
-      targetPic._y = valueTacieSet[2];
-      targetPic._scaleX = valueTacieSet[3];
-      targetPic._scaleY = valueTacieSet[4];
-      targetPic._opacity = valueTacieSet[5];
+      // --------- Action Type 2: Costume changing with caching target picture attributes ----------
+      processCostumeChangeAtype2TachieDousa(targetPicId, changeCostumeId, changeCostumeParam);
     }
-
-    // --------- Action Type 3: Refreshing standing picture from tachie data ----------
-    if (actionType == 3) {
-      // Calculate index for tachie picture data (adjusting from 1-indexed to zero-indexed)
-      let standPicIndex = parseInt(targetPicId, 10) || 0;
-      standPicIndex--;
-      if (standPicIndex !== -1) {
-        // If tachie data exists for this index, update the picture using tachie metadata
-        if ($TKMvar.tachie.PicData.length > standPicIndex) {
-          if ($TKMvar.tachie.PicData[standPicIndex]["char"]) {
-            // Retrieve tachie data values for picture number and character info
-            const PicData = $TKMvar.tachie.PicData;
-            const pictureId = PicData[standPicIndex]["picNum"];
-            const char = PicData[standPicIndex]["char"];
-            const name = "TKMtachie_" + char + "_";
-            const x = PicData[standPicIndex]["x"];
-            const y = PicData[standPicIndex]["y"];
-            // Show the standing picture with updated attributes
-            $gameScreen.showPicture(pictureId, name, 0, x, y, 85, 85, 0, 0);
-          }
-        }
-      }
-      // Restore target picture properties from cached values
-      targetPic._origin = valueTacieSet[0];
-      targetPic._x = valueTacieSet[1];
-      targetPic._y = valueTacieSet[2];
-      targetPic._scaleX = valueTacieSet[3];
-      targetPic._scaleY = valueTacieSet[4];
-      targetPic._opacity = valueTacieSet[5];
-      // Finalize picture settings with a set function (likely updating fade and opacity)
-      pic_set(targetPicId, 1, 255, 10);
-      // Clear cached temporary values
-      valueTacieSet = [0, 0, 0, 0, 0, 0];
+    else if (actionType == 3) {
+      // --------- Action Type 3: Refreshing standing picture from tachie data ----------
+      updateStandingPictureAtype3TachieDousa(targetPicId, targetPic);
     }
   }
 
   // Reset the temporary switch flag to indicate processing is complete
   $gameSwitches.setValue(97, false);
 };
+
+function animatePictureAtype1TachieDousa(targetPicId, actorParameter, sourcePicId, showCostumeId, easingFunction, picY, picScaleX, picScaleY, fadeDuration) {
+  // Retrieve the target picture object
+
+  // Set initial opacity based on costume show parameter
+  let initialOpacity = showCostumeId;
+  if (actorParameter >= 1) {
+    tachie_settei2();
+  } else {
+    // Show a new picture using actorParameter as image name
+    $gameScreen.showPicture(targetPicId, "/img/tachies/" + actorParameter, 1, easingFunction, picY, picScaleX, picScaleY, 0, 0);
+  }
+
+  // Cache target picture attributes for consistency
+  const targetPic = $gameScreen.picture(targetPicId);
+  targetPic._origin = 1;
+  targetPic._y = picY;
+  targetPic._scaleY = picScaleY;
+  targetPic._opacity = 0;
+
+  let targetXPos = (sourcePicId === 1) ? 300 : 100;
+
+  // Adjust based on sourcePicId values
+  if (sourcePicId === 0) {
+    targetXPos = 640;
+    targetPic._x = targetXPos + 50;
+  }
+  if (sourcePicId === 1) {
+    if ($gameVariables.value(152) === 0) {
+      targetXPos = 1024 + 100;
+    } else {
+      targetXPos = 1280 - targetXPos + $gameVariables.value(164) - ($gameVariables.value(152) * 80);
+    }
+    if ($gameSwitches.value(126)) {
+      targetXPos += 50;
+    }
+    targetPic._x = targetXPos + 100;
+    $gameVariables.setValue(164, $gameVariables.value(164) + 150);
+  }
+  if (sourcePicId === 2) {
+    targetXPos = targetXPos + $gameVariables.value(165) + ($gameVariables.value(153) * 80);
+    targetPic._x = targetXPos - 100;
+    // picScaleX = picScaleX - picScaleX - picScaleX equals negative picScaleX
+    picScaleX = -picScaleX;
+    $gameVariables.setValue(165, $gameVariables.value(165) - 150);
+  }
+  targetPic._scaleX = picScaleX;
+
+  // Animate moving the picture into position using the calculated parameters
+  $gameScreen.movePicture(targetPicId, 1, targetXPos, picY, picScaleX, picScaleY, initialOpacity, 0, fadeDuration);
+
+  if ($gameSwitches.value(126)) {
+    tachie_bless(targetPicId, 0);
+  }
+}
+function processCostumeChangeAtype2TachieDousa(targetPicId, changeCostumeId, changeCostumeParam) {
+  // Cache targetPic attributes for reuse in the costume change
+  const targetPic = $gameScreen.picture(targetPicId);
+  const cachedAttributes = [
+    targetPic.origin(),
+    targetPic.x(),
+    targetPic.y(),
+    targetPic.scaleX(),
+    targetPic.scaleY(),
+    targetPic.opacity()
+  ];
+
+  // Execute costume change routine either by direct specification or default settings
+  if (changeCostumeId >= 1) {
+    kisekae_tyokusetusitei(changeCostumeId, changeCostumeParam);
+  } else {
+    tachie_settei2();
+  }
+
+  // Update event image if applicable
+  if ($gameVariables.value(292) != 0) {
+    if ($gameVariables.value(292)[$gameVariables.value(20)] >= 1) {
+      const event = $gameMap.event($gameVariables.value(292)[$gameVariables.value(20)]);
+      const actor = $gameActors.actor($gameVariables.value(20));
+      event.setImage(actor.characterName(), actor.characterIndex());
+    }
+  }
+
+  // Restore cached picture attributes back to the target picture
+  targetPic._origin = cachedAttributes[0];
+  targetPic._x = cachedAttributes[1];
+  targetPic._y = cachedAttributes[2];
+  targetPic._scaleX = cachedAttributes[3];
+  targetPic._scaleY = cachedAttributes[4];
+  targetPic._opacity = cachedAttributes[5];
+}
+
+function updateStandingPictureAtype3TachieDousa(targetPicId) {
+  // Calculate index for tachie picture data (adjusting from 1-indexed to zero-indexed)
+  let standPicIndex = parseInt(targetPicId, 10) || 0;
+  standPicIndex--;
+  if (standPicIndex !== -1) {
+    // If tachie data exists for this index, update the picture using tachie metadata
+    if ($TKMvar.tachie.PicData.length > standPicIndex) {
+      if ($TKMvar.tachie.PicData[standPicIndex]["char"]) {
+        const PicData = $TKMvar.tachie.PicData;
+        const pictureId = PicData[standPicIndex]["picNum"];
+        const char = PicData[standPicIndex]["char"];
+        const name = "TKMtachie_" + char + "_";
+        const x = PicData[standPicIndex]["x"];
+        const y = PicData[standPicIndex]["y"];
+        // Show the standing picture with updated attributes
+        $gameScreen.showPicture(pictureId, name, 0, x, y, 85, 85, 0, 0);
+      }
+    }
+  }
+  // Restore target picture properties from cached values
+  const targetPic = $gameScreen.picture(targetPicId);
+  targetPic._origin = valueTacieSet[0];
+  targetPic._x = valueTacieSet[1];
+  targetPic._y = valueTacieSet[2];
+  targetPic._scaleX = valueTacieSet[3];
+  targetPic._scaleY = valueTacieSet[4];
+  targetPic._opacity = valueTacieSet[5];
+  // Finalize picture settings with a set function (likely updating fade and opacity)
+  pic_set(targetPicId, 1, 255, 10);
+  // Clear cached temporary values
+  valueTacieSet = [0, 0, 0, 0, 0, 0];
+}
 
 //☆☆着せ替え直接指定
 kisekae_tyokusetusitei = function(id1,id2){
