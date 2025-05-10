@@ -306,7 +306,7 @@ tachie_dousa = function (actionType, actorParameter, expressionCode, targetPicId
           console.debug("tachie_dousa: New picture path: " + "/img/tachies/" + actorParameter);
           $gameScreen.showPicture(
             targetPicId,
-            "/img/tachies/" + actorParameter,
+            "/img/tachies/" + actorParameter,// here was crash because of missing file
             originalOrigin,
             originalX,
             originalY,
