@@ -4022,124 +4022,129 @@ cutin_preparation = function (id1, id2) {
   //チェイン180
   //会話-90
   if (id2 >= 1) {
-    var actor = $gameActors.actor(id2);
+    const actor = $gameActors.actor(id2);
   };
   if (id1 == 0) {
-    var action = BattleManager._action;
-    var value1 = BattleManager._action._item._itemId;
+    const action = BattleManager._action;
+    const value1 = BattleManager._action._item._itemId;
     if ($dataSkills[value1].meta["CutInSkillSet"]) {
-      //var value3 = $gameTroop.members()[$gameVariables.value(92)]._enemyId;
+      //const value3 = $gameTroop.members()[$gameVariables.value(92)]._enemyId;
       if ($dataEnemies[value3].meta[`Passive State`]) {
-        //var value1 = Number($dataEnemies[value3].meta[`Passive State`]) - 420;
+        //const value1 = Number($dataEnemies[value3].meta[`Passive State`]) - 420;
       };
-      //var value4 = 'CutInCG_EnemyEntry' + value1; 
+      //const value4 = 'CutInCG_EnemyEntry' + value1; 
       //valueCutInSet1 = ["カットインエネミースキル",value4,0,4.5,4.5,25,40];
     };
   };
   if (id1 == 1) {
-    var value6 = 0;
+    let value6 = 0;
+    let value1;
     if ($gameVariables.value(182) == 13) {
-      var value1 = 91;
+      value1 = 91;
     } else {
-      //var action = BattleManager._action;
-      var value1 = BattleManager._action._item._itemId;
+      //const action = BattleManager._action;
+      value1 = BattleManager._action._item._itemId;
     };
     if ($gameVariables.value(182) == 12) {
-      var value6 = 1;
+      value6 = 1;
     };
     if ($gameVariables.value(182) == 13) {
-      var value6 = 4;
+      value6 = 4;
     };
     if ($dataSkills[value1].meta["CutInSkillSet"]) {
       if ($gameVariables.value(182) == 12) {
-        var value6 = 2;
+        value6 = 2;
       };
       //if([5,6,7,8].some(function(id){return $gameVariables.value(182) == (id)})){$gameVariables.setValue(21,2)};
     };
     if (value6 == 2) {
       if ($dataSkills[$gameVariables.value(96)].meta['HiQualityBurst']) {
-        var value1 = "21_BattleOugiBest";
+        value1 = "21_BattleOugiBest";
         AudioManager.playBgm({ "name": value1, "volume": 50, "pitch": 110, "pan": 0 });
       } else {
-        var value1 = "21_BattleOugi";
+        value1 = "21_BattleOugi";
         AudioManager.playBgm({ "name": value1, "volume": 50, "pitch": 110, "pan": 0 });
       };
     };
     if (value6 >= 1) {
       if ($dataActors[id2].meta['OugiUse']) {
-        var arr2 = $dataActors[id2].meta['OugiUse'].split(',');
-        var arr3 = arr2[getRandomIndex(arr2.length)];
-        var arrNpcGab1 = [];
+        const arr2 = $dataActors[id2].meta['OugiUse'].split(',');
+        const arr3 = arr2[getRandomIndex(arr2.length)];
+        const arrNpcGab1 = [];
         arrNpcGab1.push([`${actor.name()}${arr3}`, 0, 0]);
         gabWord_exeScriptNoFace(arrNpcGab1);
       };
       if ($dataActors[id2].meta['Heroine']) {
-        var value1 = $gameVariables.value(id2 + 380)[4];//露出度による変更
+        let value1 = $gameVariables.value(id2 + 380)[4]; //露出度による変更
         if (value6 == 2 && value1 <= 5) {
-          var value6 = 3;
+          value6 = 3;
         };
         if (value6 == 4 && value1 <= 5) {
-          var value6 = 5;
+          value6 = 5;
         };
+        let arr1, value5;
         if (value6 == 1) {
-          var arr1 = [0, 4.5, 4.5, 25, 20];
-          var value5 = '奥義'
+          arr1 = [0, 4.5, 4.5, 25, 20];
+          value5 = '奥義';
         };
         if (value6 == 2 || value6 == 3) {
-          var arr1 = [90, 1.3, 1.3, 35, 60];
-          var value5 = 'スキル'
+          arr1 = [90, 1.3, 1.3, 35, 60];
+          value5 = 'スキル';
         };
         if (value6 == 4 || value6 == 5) {
-          var arr1 = [180, 6, 2, 25, 20];
-          var value5 = 'チェイン'
+          arr1 = [180, 6, 2, 25, 20];
+          value5 = 'チェイン';
         };
-        var value4 = 'CutInCG_Actor' + id2 + '_' + value6;
-        var value3 = 'カットインアクター' + value5;
+        const value4 = 'CutInCG_Actor' + id2 + '_' + value6;
+        const value3 = 'カットインアクター' + value5;
         valueCutInSet1 = [value3, value4, arr1[0], arr1[1], arr1[2], arr1[3], arr1[4]];
       };
     };
   };
   if (id1 == 2) {
-    var value3 = 'CutInCG_PartyFirstStrike';
-    var value1 = 'チェイン';
-    var value2 = 'カットインアクター' + value1;
+    const value3 = 'CutInCG_PartyFirstStrike';
+    const value1 = 'チェイン';
+    const value2 = 'カットインアクター' + value1;
     valueCutInSet1 = [value2, value3, 180, 1.3, 1.3, 25, 20];
   };
   if (id1 == 3) {
-    var value3 = 'CutInCG_EnemySurprise';
-    var value2 = 'カットインエネミー演出色々';
+    const value3 = 'CutInCG_EnemySurprise';
+    const value2 = 'カットインエネミー演出色々';
     valueCutInSet1 = [value2, value3, 0, 2, 2, 25, 40];
   };
   if (id1 == 4) {
-    var value3 = 'CutInCG_PartyChainBurst';
-    var value1 = 'チェイン'
-    var value2 = 'カットインアクター' + value1;
+    const value3 = 'CutInCG_PartyChainBurst';
+    const value1 = 'チェイン';
+    const value2 = 'カットインアクター' + value1;
     valueCutInSet1 = [value2, value3, 180, 5, 5, 25, 40];
   };
   if (id1 == 5) {
     $gameSwitches.setValue(428, true);
-    var value3 = 'CutInCG_Actor' + id2 + '_' + $gameVariables.value(21);
-    if ($gameVariables.value(21) >= 11) { var value1 = '会話' };
-    var value2 = 'カットインアクター' + value1;
+    const value3 = 'CutInCG_Actor' + id2 + '_' + $gameVariables.value(21);
+    let value1;
+    if ($gameVariables.value(21) >= 11) { 
+      value1 = '会話';
+    }
+    const value2 = 'カットインアクター' + value1;
     valueCutInSet1 = [value2, value3, -90, 2.5, 2.5, 25, 60];
   };
   if (id1 == 6) {
-    var value4 = 'CutInCG_EnemyEntry' + valueCountSet1; //valueCountSet1はバトルコモンで数字を入れている
+    const value4 = 'CutInCG_EnemyEntry' + valueCountSet1; //valueCountSet1はバトルコモンで数字を入れている
     valueCutInSet1 = ["カットインエネミー登場", value4, 180, 1.2, 1.2, 25, 40];
   };
   if (id1 == 7) {
-    var value1 = 'N'
-    if ($gameVariables.value(23) == 6) { var value1 = 'R' };
-    if ($gameVariables.value(23) == 7) { var value1 = 'SR' };
-    if ($gameVariables.value(23) == 8) { var value1 = 'SSR' };
-    if ($gameVariables.value(23) == 9) { var value1 = 'UR' };
-    if ($gameVariables.value(23) >= 10) { var value1 = 'LR' };
-    var value4 = 'GachaDirect' + value1;
+    let value1 = 'N';
+    if ($gameVariables.value(23) == 6) { value1 = 'R'; };
+    if ($gameVariables.value(23) == 7) { value1 = 'SR'; };
+    if ($gameVariables.value(23) == 8) { value1 = 'SSR'; };
+    if ($gameVariables.value(23) == 9) { value1 = 'UR'; };
+    if ($gameVariables.value(23) >= 10) { value1 = 'LR'; };
+    const value4 = 'GachaDirect' + value1;
     valueCutInSet1 = ["ガチャ演出", value4, 270, 2, 1.5, 25, 60];
   };
   if (id1 == 8) {
-    var value3 = 'CutInCG_EnemyAwaken';
-    var value2 = 'カットインエネミースキル';
+    const value3 = 'CutInCG_EnemyAwaken';
+    const value2 = 'カットインエネミースキル';
     valueCutInSet1 = [value2, value3, 0, 2, 2, 25, 40];
   };
 
