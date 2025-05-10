@@ -4068,71 +4068,77 @@ cutin_preparation = function (cutinCategory, actorId) {
   }
 };
 
+const cutinSettingsV2V3 = { angle: 90, scaleX: 1.3, scaleY: 1.3, opacity: 35, duration: 60, name: 'スキル' };
+const cutinSettingsV4V5 = { angle: 180, scaleX: 1.3, scaleY: 1.3, opacity: 35, duration: 60, name: 'チェイン' };
+const cutinSettingsMap = {
+  1: { angle: 0, scaleX: 4.5, scaleY: 4.5, opacity: 25, duration: 20, name: '奥義' },
+  2: cutinSettingsV2V3,
+  3: cutinSettingsV2V3,
+  4: cutinSettingsV4V5,
+  5: cutinSettingsV4V5
+};
 function handleCutinCategory1CutinPreparation(actorId) {
+  // Cache references and values to reduce property lookups
   const actor = $gameActors.actor(actorId);
-  let cutinType = 0;
-  let skillId;
   const abilityUsageDistinction = $gameVariables.value(182);
+  const actorData = $dataActors[actorId];
   
-  if (abilityUsageDistinction == 13) {
+  // Initialize with defaults
+  let cutinType = 0;
+  let skillId = BattleManager._action._item._itemId;
+  
+  // Determine cutin type based on ability type - use early returns where possible
+  if (abilityUsageDistinction === 13) {
     cutinType = 4;
     skillId = 91;
-  } else {
-    if (abilityUsageDistinction == 12) {
-      cutinType = $dataSkills[skillId].meta["CutInSkillSet"] ? 2 : 1;
-    }
-    // Using the current action item id
-    skillId = BattleManager._action._item._itemId;
+  } else if (abilityUsageDistinction === 12) {
+    // Check skill metadata for cutin type
+    cutinType = $dataSkills[skillId].meta["CutInSkillSet"] ? 2 : 1;
   }
-
-  if (cutinType == 2) {
-    if ($dataSkills[$gameVariables.value(96)].meta['HiQualityBurst']) {
-      skillId = "21_BattleOugiBest";
-      AudioManager.playBgm({ "name": skillId, "volume": 50, "pitch": 110, "pan": 0 });
-    } else {
-      skillId = "21_BattleOugi";
-      AudioManager.playBgm({ "name": skillId, "volume": 50, "pitch": 110, "pan": 0 });
-    }
+  
+  // Exit early if no cutin needed
+  if (cutinType < 1) return;
+  
+  // Play background music for special cutin types
+  if (cutinType === 2) {
+    const bgmName = $dataSkills[$gameVariables.value(96)].meta['HiQualityBurst'] ? 
+                    "21_BattleOugiBest" : "21_BattleOugi";
+    AudioManager.playBgm({ name: bgmName, volume: 50, pitch: 110, pan: 0 });
   }
-  if (cutinType >= 1) {
-    if ($dataActors[actorId].meta['OugiUse']) {
-      const ougiUseOptions = $dataActors[actorId].meta['OugiUse'].split(',');
-      const selectedOugiOption = ougiUseOptions[getRandomIndex(ougiUseOptions.length)];
-      const npcGabArray = [];
-      npcGabArray.push([`${actor.name()}${selectedOugiOption}`, 0, 0]);
-      gabWord_exeScriptNoFace(npcGabArray);
+  
+  // Display character dialogue if available
+  const ougiUseMeta = actorData.meta['OugiUse'];
+  if (ougiUseMeta) {
+    const ougiUseOptions = ougiUseMeta.split(',');
+    const selectedOption = ougiUseOptions[getRandomIndex(ougiUseOptions.length)];
+    gabWord_exeScriptNoFace([[`${actor.name()}${selectedOption}`, 0, 0]]);
+  }
+  
+  // Apply heroine-specific modifications
+  if (actorData.meta['Heroine']) {
+    const heroineExposure = $gameVariables.value(actorId + 380)[4];
+    
+    // Adjust cutinType based on exposure level
+    if (heroineExposure <= 5) {
+      if (cutinType === 2) cutinType = 3;
+      else if (cutinType === 4) cutinType = 5;
     }
-    if ($dataActors[actorId].meta['Heroine']) {
-      let heroineExposure = $gameVariables.value(actorId + 380)[4]; // 露出度による変更
-      if (cutinType == 2 && heroineExposure <= 5) {
-        cutinType = 3;
-      }
-      if (cutinType == 4 && heroineExposure <= 5) {
-        cutinType = 5;
-      }
-      let actorCutinSettings, cutinTypeName;
-      if (cutinType == 1) {
-        actorCutinSettings = [0, 4.5, 4.5, 25, 20];
-        cutinTypeName = '奥義';
-      }
-      if (cutinType == 2 || cutinType == 3) {
-        actorCutinSettings = [90, 1.3, 1.3, 35, 60];
-        cutinTypeName = 'スキル';
-      }
-      if (cutinType == 4 || cutinType == 5) {
-        actorCutinSettings = [180, 6, 2, 25, 20];
-        cutinTypeName = 'チェイン';
-      }
+    
+    // Define cutin settings based on type - use lookup table for better performance
+    const cutinSettings = cutinSettingsMap[cutinType];    
+    if (cutinSettings) {
       const actorCgAsset = 'CutInCG_Actor' + actorId + '_' + cutinType;
-      const actorCutinLabel = 'カットインアクター' + cutinTypeName;
+      const actorCutinLabel = 'カットインアクター' + cutinSettings.name;
+      
+      // Set the global cutin parameters in a single operation
       valueCutInSet1 = [
         actorCutinLabel,
         actorCgAsset,
-        actorCutinSettings[0],
-        actorCutinSettings[1],
-        actorCutinSettings[2],
-        actorCutinSettings[3],
-        actorCutinSettings[4]
+        cutinSettings.angle,
+        cutinSettings.scaleX,
+        cutinSettings.scaleY,
+        cutinSettings.opacity,
+        cutinSettings.duration
       ];
     }
   }
