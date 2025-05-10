@@ -191,9 +191,9 @@ tachie_dousa = function (actionType, actorParameter, expressionCode, targetPicId
   initialXOffset = sourcePicId == 0 ? 50 : -50;
 
   // Set easing function and fade duration based on switch 127 (which may indicate a special mode)
-  ( easingFunction, fadeDuration ) = getEasingAndFadeValuesTachieDousa();
+  ({ easingFunction, fadeDuration } = getEasingAndFadeValuesTachieDousa());
 
-  ( picY, picScaleX, picScaleY ) = calculateScaleAndPositionTachieDousa(actorParameter, targetPicId, expressionCode);
+  ({ picY, picScaleX, picScaleY } = calculateScaleAndPositionTachieDousa(actorParameter, targetPicId, expressionCode));
 
   // Replace the original selection placeholder code with:
   const dollStateFlag = checkDollStateTachieDousa(actionType, valueDollStateId);
