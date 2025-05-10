@@ -4085,16 +4085,32 @@ function handleCutinCategory1CutinPreparation(actorId) {
   
   // Initialize with defaults
   let cutinType = 0;
-  let skillId = BattleManager._action._item._itemId;
+  let skillId;
   
-  // Determine cutin type based on ability type - use early returns where possible
-  if (abilityUsageDistinction === 13) {
-    cutinType = 4;
+  // Determine skill ID and cutin type based on ability usage distinction
+  if (abilityUsageDistinction == 13) {
     skillId = 91;
-  } else if (abilityUsageDistinction === 12) {
-    // Check skill metadata for cutin type
-    cutinType = $dataSkills[skillId].meta["CutInSkillSet"] ? 2 : 1;
+    cutinType = 4;
+  } else {
+    skillId = BattleManager._action._item._itemId;
   }
+
+  if (abilityUsageDistinction == 12) {
+    // Check for special cutin settings in skill metadata
+    const skill = $dataSkills[skillId];
+    if (skill && skill.meta["CutInSkillSet"]) {
+      cutinType = 2;
+    }
+    else {
+      cutinType = 1;
+    }
+  }
+  //else{
+    //if (skill && skill.meta["CutInSkillSet"] && [5, 6, 7, 8].some(function(id) { return abilityUsageDistinction == id; })) {
+    //  $gameVariables.setValue(21, 2);
+    //}
+  //}
+  
   
   // Exit early if no cutin needed
   if (cutinType < 1) return;
