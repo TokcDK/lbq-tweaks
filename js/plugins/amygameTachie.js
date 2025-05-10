@@ -171,9 +171,6 @@ if($gameVariables.value(244) >= 1){
 //☆☆立ち絵会話動作用
 tachie_dousa = function (actionType, actorParameter, expressionCode, targetPicId, sourcePicId, showCostumeId, changeCostumeId, changeCostumeParam, unusedParam) {
 
-  // Get the target picture object from the screen
-  const targetPic = $gameScreen.picture(targetPicId);
-
   // Set a temporary switch flag to indicate processing is underway
   $gameSwitches.setValue(97, true);
 
@@ -292,7 +289,8 @@ tachie_dousa = function (actionType, actorParameter, expressionCode, targetPicId
           } else {
             tachie_settei2();
           }
-          // Copy cached values to target picture
+
+          const targetPic = $gameScreen.picture(targetPicId);
           targetPic._origin = originalOrigin;
           targetPic._x = originalX;
           targetPic._y = originalY;
@@ -350,8 +348,7 @@ tachie_dousa = function (actionType, actorParameter, expressionCode, targetPicId
       // --------- Action Type 1: Standard picture display with position easing ----------
       animatePictureAtype1TachieDousa(targetPicId, actorParameter, sourcePicId, showCostumeId, easingFunction, picY, picScaleX, picScaleY, fadeDuration);
     }
-
-    if (actionType == 2) {
+    else if (actionType == 2) {
       // --------- Action Type 2: Costume changing with caching target picture attributes ----------
       processCostumeChangeAtype2TachieDousa(targetPicId, changeCostumeId, changeCostumeParam);
     }
