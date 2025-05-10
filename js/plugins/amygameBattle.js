@@ -4024,18 +4024,18 @@ cutin_preparation = function (id1, id2) {
   if (id2 >= 1) {
     const actor = $gameActors.actor(id2);
   };
-  if (id1 == 0) {
-    const action = BattleManager._action;
-    const value1 = BattleManager._action._item._itemId;
-    if ($dataSkills[value1].meta["CutInSkillSet"]) {
+  //if (id1 == 0) {
+    //const action = BattleManager._action;
+    //const value1 = BattleManager._action._item._itemId;
+    //if ($dataSkills[value1].meta["CutInSkillSet"]) {
       //const value3 = $gameTroop.members()[$gameVariables.value(92)]._enemyId;
-      if ($dataEnemies[value3].meta[`Passive State`]) {
+      //if ($dataEnemies[value3].meta[`Passive State`]) {
         //const value1 = Number($dataEnemies[value3].meta[`Passive State`]) - 420;
-      };
+      //};
       //const value4 = 'CutInCG_EnemyEntry' + value1; 
       //valueCutInSet1 = ["カットインエネミースキル",value4,0,4.5,4.5,25,40];
-    };
-  };
+    //};
+  //};
   if (id1 == 1) {
     let value6 = 0;
     let value1;
