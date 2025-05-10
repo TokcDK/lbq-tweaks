@@ -5,8 +5,8 @@
  */
 
 //(function(){
-	
-// TIPS using in original_text function>
+
+//#region original_tips
 class BookTipBase {
     constructor() {
     }
@@ -36,8 +36,8 @@ class BookTipBase {
     }
 
     setValueTalkSet() {
-		const value3 = [0,1,640,384,100,100,255];
-		valueTalkSet = [this.getValue1(),this.getValue2(),value3];
+      const value3 = [0,1,640,384,100,100,255];
+      valueTalkSet = [this.getValue1(),this.getValue2(),value3];
     }
 
     execute() {
@@ -767,7 +767,113 @@ class Tip27 extends BookTipBase {//ライフスト－ム
 `;
     }
 };
-// < TIPS
+
+const originalTipsMap = {
+  1: Tip1,
+  2: Tip2,
+  3: Tip3,
+  4: Tip4,
+  5: Tip5,
+  6: Tip6,
+  7: Tip7,
+  8: Tip8,
+  9: Tip9,
+  10: Tip10,
+  11: Tip11,
+  12: Tip12,
+  13: Tip13,
+  14: Tip14,
+  15: Tip15,
+  16: Tip16,
+  17: Tip17,
+  18: Tip18,
+  19: Tip19,
+  20: Tip20,
+  21: Tip21,
+  22: Tip22,
+  23: Tip23,
+  24: Tip24,
+  25: Tip25,
+  26: Tip26,
+  27: Tip27
+};
+//#endregion
+
+//#region original_text
+
+class OriginalText1 extends BookTipBase {
+  seName() {
+    return "Chime2";
+  }
+
+  var172value() {
+    return 10;
+  }
+
+  // Return the text for id100==1 using id101 if needed
+  getValue1() {
+    return `・Usopedia:${$dataWeapons[317].meta['Profession']}
+覇空戦争時代より続く医師の名門一族、\\NFN[317]家。
+何よりも患者の命を救う事を真摯に求める、高邁な精神の癒し手達。
+彼らに救われた生命は、全空に渡って存在する。
+一族の者達は各地で敬われており、
+表敬の際には民衆が群れを成すという──。
+
+──\\wn[317]=\\NFN[317]は、そんな医師一家の傍流の出であるが、
+一族に伝わる高潔さも医療技術も一切持ち合わせていない。
+勤務態度は不真面目そのものであり、診察も適当極まる。
+裏社会との繋がりも噂されており、黒い噂が絶えない男である。
+空立の医療施設に勤めていられるのは、
+一族への忖度が１０割である、とは当院の院長の言だとか。
+
+故に彼は蔑みと軽視を込めてこう呼ばれている。
+${$dataWeapons[317].meta['Profession1']}、と…。
+
+民明書房刊『華麗なる一族、\\NFN[317]の光と闇』より抜粋`;
+  }
+
+  execute(bookId) {
+    this.playSound();
+    $gameVariables.setValue(172, this.var172value());
+    valueTalkSet = [25, this.getValue1(), bookId];
+  }
+}
+
+class OriginalText2 extends BookTipBase {
+  seName() {
+    return "Chime2";
+  }
+
+  var172value() {
+    return 10;
+  }
+
+  // Return the text for id100==2 using id101 if needed
+  getValue1() {
+    return `・Usopedia:魔導電算機について
+来訪者(コラボ勢)の一人が所持していたＰＣ(パーソナルコンピューター)を元に、
+エルステ帝国が開発した電算処理ユニット。
+性能としては、元となったＰＣの遥か劣化品に当たる。
+しかし、簡単な計算や同機同士の通信機能など、
+その利便性は計り知れない。
+
+現在は大量生産こそ実現していないが、
+少数だが現品の生産は行われており、
+その一部は帝国外の好事家達にも流れているとか。
+
+帝国開発局では、現行品の大量生産と共に、
+高性能化や小型化などの研究に着手している──。
+
+ファ空新聞『時代を変える発明品！？　噂の魔導電算機に迫る！』特集一面より抜粋`;
+  }
+
+  execute(bookData) {
+    this.playSound();
+    $gameVariables.setValue(172, this.var172value());
+    valueTalkSet = [25, this.getValue1(), bookData];
+  }
+}
+//#endregion
 	
 
 htext_word = function(id1){
@@ -1984,94 +2090,26 @@ $gameVariables.setValue(21,0);
 };
 
 //作品オリジナルのテキスト作成
-original_text = function(id100,id101){
-	
-let tip;
-switch(id100){
-	case 1:
-		tip = new Tip1();
-		break;
-	case 2:
-		tip = new Tip2();
-		break;
-	case 3:
-		tip = new Tip3();
-		break;
-	case 4:
-		tip = new Tip4();
-		break;
-	case 5:
-		tip = new Tip5();
-		break;
-	case 6:
-		tip = new Tip6();
-		break;
-	case 7:
-		tip = new Tip7();
-		break;
-	case 8:
-		tip = new Tip8();
-		break;
-	case 9:
-		tip = new Tip9();
-		break;
-	case 10:
-		tip = new Tip10();
-		break;
-	case 11:
-		tip = new Tip11();
-		break;
-	case 12:
-		tip = new Tip12();
-		break;
-	case 13:
-		tip = new Tip13();
-		break;
-	case 14:
-		tip = new Tip14();
-		break;
-	case 15:
-		tip = new Tip15();
-		break;
-	case 16:
-		tip = new Tip16();
-		break;
-	case 17:
-		tip = new Tip17();
-		break;
-	case 18:
-		tip = new Tip18();
-		break;
-	case 19:
-		tip = new Tip19();
-		break;
-	case 20:
-		tip = new Tip20();
-		break;
-	case 21:
-		tip = new Tip21();
-		break;
-	case 22:
-		tip = new Tip22();
-		break;
-	case 23:
-		tip = new Tip23();
-		break;
-	case 24:
-		tip = new Tip24();
-		break;
-	case 25:
-		tip = new Tip25();
-		break;
-	case 26:
-		tip = new Tip26();
-		break;
-	case 27:
-		tip = new Tip27();
-		break;
-}
+original_text = function(bookId, id101) {
+  let tipInstance;
+  if (bookId === 1) {
+    tipInstance = new OriginalText1();
+  } else if (bookId === 2) {
+    tipInstance = new OriginalText2();
+  }
+  if(tipInstance) {
+    tipInstance.execute(id101);
+  }
+};
 
-tip.execute();
+//作品オリジナルのtipsテキスト作成//15行まで
+original_tips = function (bookId){
+  let TipClass = originalTipsMap[bookId];
+  if (TipClass) {
+    tip = new TipClass();
+  }
+
+  tip.execute();
 
 };
 
