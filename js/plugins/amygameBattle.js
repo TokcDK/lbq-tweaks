@@ -4079,15 +4079,10 @@ function handleCutinCategory1CutinPreparation(actor) {
     skillId = 91;
   } else {
     if (abilityUsageDistinction == 12) {
-      cutinType = 1;
+      cutinType = $dataSkills[skillId].meta["CutInSkillSet"] ? 2 : 1;
     }
     // Using the current action item id
     skillId = BattleManager._action._item._itemId;
-  }
-  if ($dataSkills[skillId].meta["CutInSkillSet"]) {
-    if (abilityUsageDistinction == 12) {
-      cutinType = 2;
-    }
   }
 
   if (cutinType == 2) {
