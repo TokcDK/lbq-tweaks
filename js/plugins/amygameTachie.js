@@ -178,11 +178,7 @@ tachie_dousa = function (actionType, actorParameter, expressionCode, targetPicId
   $gameSwitches.setValue(97, true);
 
   // Determine initial X offset based on the source picture ID
-  if (sourcePicId == 0) {
-    initialXOffset = 50;
-  } else {
-    initialXOffset = -50;
-  }
+  initialXOffset = sourcePicId == 0 ? 50 : -50;
 
   // Set easing function and fade duration based on switch 127 (which may indicate a special mode)
   let easingFunction, fadeDuration;
