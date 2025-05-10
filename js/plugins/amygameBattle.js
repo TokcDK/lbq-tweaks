@@ -4015,137 +4015,137 @@ ougiWord_direction = function (id1) {
 };
 
 //カットイン事前設定用
-cutin_preparation = function (id1, id2) {
+cutin_preparation = function (cutinCategory, actorId) {
 
   //奥義0,角度
   //スキル90
   //チェイン180
   //会話-90
-  if (id2 >= 1) {
-    const actor = $gameActors.actor(id2);
+  if (actorId >= 1) {
+    const actor = $gameActors.actor(actorId);
   };
-  //if (id1 == 0) {
+  //if (cutinCategory == 0) {
     //const action = BattleManager._action;
-    //const value1 = BattleManager._action._item._itemId;
-    //if ($dataSkills[value1].meta["CutInSkillSet"]) {
-      //const value3 = $gameTroop.members()[$gameVariables.value(92)]._enemyId;
-      //if ($dataEnemies[value3].meta[`Passive State`]) {
-        //const value1 = Number($dataEnemies[value3].meta[`Passive State`]) - 420;
+    //const itemId = BattleManager._action._item._itemId;
+    //if ($dataSkills[itemId].meta["CutInSkillSet"]) {
+      //const enemyId = $gameTroop.members()[$gameVariables.value(92)]._enemyId;
+      //if ($dataEnemies[enemyId].meta[`Passive State`]) {
+        //const passiveStateId = Number($dataEnemies[enemyId].meta[`Passive State`]) - 420;
       //};
-      //const value4 = 'CutInCG_EnemyEntry' + value1; 
-      //valueCutInSet1 = ["カットインエネミースキル",value4,0,4.5,4.5,25,40];
+      //const cgAssetName = 'CutInCG_EnemyEntry' + passiveStateId; 
+      //valueCutInSet1 = ["カットインエネミースキル", cgAssetName, 0, 4.5, 4.5, 25, 40];
     //};
   //};
-  if (id1 == 1) {
-    let value6 = 0;
-    let value1;
+  if (cutinCategory == 1) {
+    let cutinType = 0;
+    let skillId;
     if ($gameVariables.value(182) == 13) {
-      value1 = 91;
+      skillId = 91;
     } else {
       //const action = BattleManager._action;
-      value1 = BattleManager._action._item._itemId;
+      skillId = BattleManager._action._item._itemId;
     };
     if ($gameVariables.value(182) == 12) {
-      value6 = 1;
+      cutinType = 1;
     };
     if ($gameVariables.value(182) == 13) {
-      value6 = 4;
+      cutinType = 4;
     };
-    if ($dataSkills[value1].meta["CutInSkillSet"]) {
+    if ($dataSkills[skillId].meta["CutInSkillSet"]) {
       if ($gameVariables.value(182) == 12) {
-        value6 = 2;
+        cutinType = 2;
       };
       //if([5,6,7,8].some(function(id){return $gameVariables.value(182) == (id)})){$gameVariables.setValue(21,2)};
     };
-    if (value6 == 2) {
+    if (cutinType == 2) {
       if ($dataSkills[$gameVariables.value(96)].meta['HiQualityBurst']) {
-        value1 = "21_BattleOugiBest";
-        AudioManager.playBgm({ "name": value1, "volume": 50, "pitch": 110, "pan": 0 });
+        skillId = "21_BattleOugiBest";
+        AudioManager.playBgm({ "name": skillId, "volume": 50, "pitch": 110, "pan": 0 });
       } else {
-        value1 = "21_BattleOugi";
-        AudioManager.playBgm({ "name": value1, "volume": 50, "pitch": 110, "pan": 0 });
+        skillId = "21_BattleOugi";
+        AudioManager.playBgm({ "name": skillId, "volume": 50, "pitch": 110, "pan": 0 });
       };
     };
-    if (value6 >= 1) {
-      if ($dataActors[id2].meta['OugiUse']) {
-        const arr2 = $dataActors[id2].meta['OugiUse'].split(',');
-        const arr3 = arr2[getRandomIndex(arr2.length)];
-        const arrNpcGab1 = [];
-        arrNpcGab1.push([`${actor.name()}${arr3}`, 0, 0]);
-        gabWord_exeScriptNoFace(arrNpcGab1);
+    if (cutinType >= 1) {
+      if ($dataActors[actorId].meta['OugiUse']) {
+        const ougiUseOptions = $dataActors[actorId].meta['OugiUse'].split(',');
+        const selectedOugiOption = ougiUseOptions[getRandomIndex(ougiUseOptions.length)];
+        const npcGabArray = [];
+        npcGabArray.push([`${actor.name()}${selectedOugiOption}`, 0, 0]);
+        gabWord_exeScriptNoFace(npcGabArray);
       };
-      if ($dataActors[id2].meta['Heroine']) {
-        let value1 = $gameVariables.value(id2 + 380)[4]; //露出度による変更
-        if (value6 == 2 && value1 <= 5) {
-          value6 = 3;
+      if ($dataActors[actorId].meta['Heroine']) {
+        let heroineExposure = $gameVariables.value(actorId + 380)[4]; //露出度による変更
+        if (cutinType == 2 && heroineExposure <= 5) {
+          cutinType = 3;
         };
-        if (value6 == 4 && value1 <= 5) {
-          value6 = 5;
+        if (cutinType == 4 && heroineExposure <= 5) {
+          cutinType = 5;
         };
-        let arr1, value5;
-        if (value6 == 1) {
-          arr1 = [0, 4.5, 4.5, 25, 20];
-          value5 = '奥義';
+        let actorCutinSettings, cutinTypeName;
+        if (cutinType == 1) {
+          actorCutinSettings = [0, 4.5, 4.5, 25, 20];
+          cutinTypeName = '奥義';
         };
-        if (value6 == 2 || value6 == 3) {
-          arr1 = [90, 1.3, 1.3, 35, 60];
-          value5 = 'スキル';
+        if (cutinType == 2 || cutinType == 3) {
+          actorCutinSettings = [90, 1.3, 1.3, 35, 60];
+          cutinTypeName = 'スキル';
         };
-        if (value6 == 4 || value6 == 5) {
-          arr1 = [180, 6, 2, 25, 20];
-          value5 = 'チェイン';
+        if (cutinType == 4 || cutinType == 5) {
+          actorCutinSettings = [180, 6, 2, 25, 20];
+          cutinTypeName = 'チェイン';
         };
-        const value4 = 'CutInCG_Actor' + id2 + '_' + value6;
-        const value3 = 'カットインアクター' + value5;
-        valueCutInSet1 = [value3, value4, arr1[0], arr1[1], arr1[2], arr1[3], arr1[4]];
+        const actorCgAsset = 'CutInCG_Actor' + actorId + '_' + cutinType;
+        const actorCutinLabel = 'カットインアクター' + cutinTypeName;
+        valueCutInSet1 = [actorCutinLabel, actorCgAsset, actorCutinSettings[0], actorCutinSettings[1], actorCutinSettings[2], actorCutinSettings[3], actorCutinSettings[4]];
       };
     };
   };
-  if (id1 == 2) {
-    const value3 = 'CutInCG_PartyFirstStrike';
-    const value1 = 'チェイン';
-    const value2 = 'カットインアクター' + value1;
-    valueCutInSet1 = [value2, value3, 180, 1.3, 1.3, 25, 20];
+  if (cutinCategory == 2) {
+    const partyFirstStrikeCg = 'CutInCG_PartyFirstStrike';
+    const chainLabel = 'チェイン';
+    const partyCutinActorLabel = 'カットインアクター' + chainLabel;
+    valueCutInSet1 = [partyCutinActorLabel, partyFirstStrikeCg, 180, 1.3, 1.3, 25, 20];
   };
-  if (id1 == 3) {
-    const value3 = 'CutInCG_EnemySurprise';
-    const value2 = 'カットインエネミー演出色々';
-    valueCutInSet1 = [value2, value3, 0, 2, 2, 25, 40];
+  if (cutinCategory == 3) {
+    const enemySurpriseCg = 'CutInCG_EnemySurprise';
+    const enemyCutinLabel = 'カットインエネミー演出色々';
+    valueCutInSet1 = [enemyCutinLabel, enemySurpriseCg, 0, 2, 2, 25, 40];
   };
-  if (id1 == 4) {
-    const value3 = 'CutInCG_PartyChainBurst';
-    const value1 = 'チェイン';
-    const value2 = 'カットインアクター' + value1;
-    valueCutInSet1 = [value2, value3, 180, 5, 5, 25, 40];
+  if (cutinCategory == 4) {
+    const partyChainBurstCg = 'CutInCG_PartyChainBurst';
+    const chainLabelForBurst = 'チェイン';
+    const partyChainCutinLabel = 'カットインアクター' + chainLabelForBurst;
+    valueCutInSet1 = [partyChainCutinLabel, partyChainBurstCg, 180, 5, 5, 25, 40];
   };
-  if (id1 == 5) {
+  if (cutinCategory == 5) {
     $gameSwitches.setValue(428, true);
-    const value3 = 'CutInCG_Actor' + id2 + '_' + $gameVariables.value(21);
-    let value1;
+    const actorConversationCg = 'CutInCG_Actor' + actorId + '_' + $gameVariables.value(21);
+    let conversationLabel;
     if ($gameVariables.value(21) >= 11) { 
-      value1 = '会話';
+      conversationLabel = '会話';
     }
-    const value2 = 'カットインアクター' + value1;
-    valueCutInSet1 = [value2, value3, -90, 2.5, 2.5, 25, 60];
+    const actorConversationCutinLabel = 'カットインアクター' + conversationLabel;
+    valueCutInSet1 = [actorConversationCutinLabel, actorConversationCg, -90, 2.5, 2.5, 25, 60];
   };
-  if (id1 == 6) {
-    const value4 = 'CutInCG_EnemyEntry' + valueCountSet1; //valueCountSet1はバトルコモンで数字を入れている
-    valueCutInSet1 = ["カットインエネミー登場", value4, 180, 1.2, 1.2, 25, 40];
+  if (cutinCategory == 6) {
+    const enemyEntryCg = 'CutInCG_EnemyEntry' + valueCountSet1; //valueCountSet1はバトルコモンで数字を入れている
+    valueCutInSet1 = ["カットインエネミー登場", enemyEntryCg, 180, 1.2, 1.2, 25, 40];
   };
-  if (id1 == 7) {
-    let value1 = 'N';
-    if ($gameVariables.value(23) == 6) { value1 = 'R'; };
-    if ($gameVariables.value(23) == 7) { value1 = 'SR'; };
-    if ($gameVariables.value(23) == 8) { value1 = 'SSR'; };
-    if ($gameVariables.value(23) == 9) { value1 = 'UR'; };
-    if ($gameVariables.value(23) >= 10) { value1 = 'LR'; };
-    const value4 = 'GachaDirect' + value1;
-    valueCutInSet1 = ["ガチャ演出", value4, 270, 2, 1.5, 25, 60];
+  if (cutinCategory == 7) {
+    let gachaRank = 'N';
+    if ($gameVariables.value(23) == 6) { gachaRank = 'R'; };
+    if ($gameVariables.value(23) == 7) { gachaRank = 'SR'; };
+    if ($gameVariables.value(23) == 8) { gachaRank = 'SSR'; };
+    if ($gameVariables.value(23) == 9) { gachaRank = 'UR'; };
+    if ($gameVariables.value(23) >= 10) { gachaRank = 'LR'; };
+    const cutinGachaCg = 'GachaDirect' + gachaRank;
+    valueCutInSet1 = ["ガチャ演出", cutinGachaCg, 270, 2, 1.5, 25, 60];
   };
-  if (id1 == 8) {
-    const value3 = 'CutInCG_EnemyAwaken';
-    const value2 = 'カットインエネミースキル';
-    valueCutInSet1 = [value2, value3, 0, 2, 2, 25, 40];
+  if (cutinCategory == 8) {
+    const enemyAwakenCg = 'CutInCG_EnemyAwaken';
+    const enemySkillCutinLabel = 'カットインエネミースキル';
+    valueCutInSet1 = [enemySkillCutinLabel, enemyAwakenCg, 0, 2, 2, 25, 40];
   };
 
 };
