@@ -4072,18 +4072,20 @@ function handleCutinCategory1CutinPreparation(actor) {
   const actorId = actor.actorId();
   let cutinType = 0;
   let skillId;
-  if ($gameVariables.value(182) == 13) {
+  const abilityUsageDistinction = $gameVariables.value(182);
+  
+  if (abilityUsageDistinction == 13) {
     cutinType = 4;
     skillId = 91;
   } else {
-    if ($gameVariables.value(182) == 12) {
+    if (abilityUsageDistinction == 12) {
       cutinType = 1;
     }
     // Using the current action item id
     skillId = BattleManager._action._item._itemId;
   }
   if ($dataSkills[skillId].meta["CutInSkillSet"]) {
-    if ($gameVariables.value(182) == 12) {
+    if (abilityUsageDistinction == 12) {
       cutinType = 2;
     }
   }
@@ -4106,7 +4108,7 @@ function handleCutinCategory1CutinPreparation(actor) {
       gabWord_exeScriptNoFace(npcGabArray);
     }
     if ($dataActors[actorId].meta['Heroine']) {
-      let heroineExposure = $gameVariables.value(actorId + 380)[4]; //露出度による変更
+      let heroineExposure = $gameVariables.value(actorId + 380)[4]; // 露出度による変更
       if (cutinType == 2 && heroineExposure <= 5) {
         cutinType = 3;
       }
