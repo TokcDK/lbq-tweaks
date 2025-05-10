@@ -814,13 +814,17 @@ class OriginalTextBase extends BookTipBase {
 }
 
 class OriginalText1 extends OriginalTextBase {
+  _weapon = $dataWeapons[317];
+  _job = this._weapon.meta['Profession'];
+  _subJob = this._weapon.meta['Profession1'];
+
   seName() {
     return "Chime2";
   }
 
   // Return the text for id100==1 using id101 if needed
   bookDescription() {
-    return `・Usopedia:${$dataWeapons[317].meta['Profession']}
+    return `・Usopedia:${this._job}
 覇空戦争時代より続く医師の名門一族、\\NFN[317]家。
 何よりも患者の命を救う事を真摯に求める、高邁な精神の癒し手達。
 彼らに救われた生命は、全空に渡って存在する。
@@ -835,7 +839,7 @@ class OriginalText1 extends OriginalTextBase {
 一族への忖度が１０割である、とは当院の院長の言だとか。
 
 故に彼は蔑みと軽視を込めてこう呼ばれている。
-${$dataWeapons[317].meta['Profession1']}、と…。
+${this._subJob}、と…。
 
 民明書房刊『華麗なる一族、\\NFN[317]の光と闇』より抜粋`;
   }
