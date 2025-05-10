@@ -777,8 +777,6 @@ const originalTipsMap = {
   6: Tip6,
   7: Tip7,
   8: Tip8,
-  9: Tip9,
-  10: Tip10,
   11: Tip11,
   12: Tip12,
   13: Tip13,
