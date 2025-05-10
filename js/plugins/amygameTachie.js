@@ -173,8 +173,10 @@ tachie_dousa = function (actionType, actorParameter, expressionCode, targetPicId
 
   //基本数値。常に経由する。
 
+  const targetPic = $gameScreen.picture(targetPicId);
+
   $gameSwitches.setValue(97, true);
-  let initialXOffset;
+  //let initialXOffset;
   if (sourcePicId == 0) {
     initialXOffset = 50;
   } else {
@@ -196,46 +198,46 @@ tachie_dousa = function (actionType, actorParameter, expressionCode, targetPicId
     $gameVariables.setValue(300, targetPicId);
     $gameVariables.setValue(151, expressionCode); //表情代入
     if ($gameSwitches.value(126)) {
-      picScaleX = 70; //this.sVal(149,100);
-      picScaleY = 70; //this.sVal(150,100);//拡縮x,拡縮y
-      picY = 650; //this.sVal(157,900);//y座標
+      picScaleX = 70;
+      picScaleY = 70;
+      picY = 650;
     } else {
-      picScaleX = 50; //this.sVal(149,50);
-      picScaleY = 50; //this.sVal(150,50);//拡縮x,拡縮y
-      picY = 550; //this.sVal(157,600);//y座標
+      picScaleX = 50;
+      picScaleY = 50;
+      picY = 550;
     }
   } else {
     if ($gameSwitches.value(126)) {
-      picScaleX = 200; //this.sVal(149,200);//拡縮x,拡縮y
-      picScaleY = 200; //this.sVal(150,200);
-      picY = 700; //this.sVal(157,700);//y座標
+      picScaleX = 200;
+      picScaleY = 200;
+      picY = 700;
     } else {
-      picScaleX = 100; //this.sVal(149,100);//拡縮x,拡縮y
-      picScaleY = 100; //this.sVal(150,100);
-      picY = 400; //this.sVal(157,450);//y座標384
+      picScaleX = 100;
+      picScaleY = 100;
+      picY = 400;
     }
     if (actorParameter.match(/SS/)) {
       if ($gameSwitches.value(126)) {
-        picScaleX = 70; //this.sVal(149,100);
-        picScaleY = 70; //this.sVal(150,100);//拡縮x,拡縮y
-        picY = 700; //this.sVal(157,900);//y座標
+        picScaleX = 70;
+        picScaleY = 70;
+        picY = 700;
       } else {
-        picScaleX = 50; //this.sVal(149,50);
-        picScaleY = 50; //this.sVal(150,50);//拡縮x,拡縮y
-        picY = 550; //this.sVal(157,600);//y座標
+        picScaleX = 50;
+        picScaleY = 50;
+        picY = 550;
       }
     }
     if (actorParameter.match(/Upper/)) {
-      picY = 384; //this.sVal(157,450);//y座標
+      picY = 384;
     }
     if (actorParameter.match(/Scale/)) {
       picScaleX = 100;
-      picY = 384; //this.sVal(157,450);//y座標
+      picY = 384;
     }
     if (actorParameter.match(/State/)) {
-      picScaleX = 100; //this.sVal(149,100);//拡縮x,拡縮y
-      picScaleY = 100; //this.sVal(150,100);
-      picY = 384; //this.sVal(157,450);
+      picScaleX = 100;
+      picScaleY = 100;
+      picY = 384;
     }
   }
   let dollStateFlag = 0;
@@ -246,6 +248,7 @@ tachie_dousa = function (actionType, actorParameter, expressionCode, targetPicId
     }
   }
   if (dollStateFlag == 0) {
+    // Cache target picture to avoid repeated lookups
     //0会話用立ち絵変更表示。ピクチャを変更させて消去を見せないようにする。
     if (actionType == 0) { //tachie_dousa(0,1,2,12,13,1205,60,0,0);
       {
@@ -257,13 +260,15 @@ tachie_dousa = function (actionType, actorParameter, expressionCode, targetPicId
           primaryMoveDuration = changeCostumeId + changeCostumeId;
           fadeDelayDuration = changeCostumeId;
         }
-        if ($gameScreen.picture(sourcePicId)) {
-          let originalOrigin = $gameScreen.picture(sourcePicId).origin();
-          let originalX = $gameScreen.picture(sourcePicId).x();
-          let originalY = $gameScreen.picture(sourcePicId).y();
-          let originalScaleX = $gameScreen.picture(sourcePicId).scaleX();
-          let originalScaleY = $gameScreen.picture(sourcePicId).scaleY();
-          let originalOpacity = $gameScreen.picture(sourcePicId).opacity();
+        // Cache the source picture
+        let sourcePic = $gameScreen.picture(sourcePicId);
+        if (sourcePic) {
+          let originalOrigin = sourcePic.origin();
+          let originalX = sourcePic.x();
+          let originalY = sourcePic.y();
+          let originalScaleX = sourcePic.scaleX();
+          let originalScaleY = sourcePic.scaleY();
+          let originalOpacity = sourcePic.opacity();
           if (valueTacieSet[0] >= 1) {
             originalOrigin = valueTacieSet[0];
             originalX = valueTacieSet[1];
@@ -275,29 +280,37 @@ tachie_dousa = function (actionType, actorParameter, expressionCode, targetPicId
           }
           if (actorParameter >= 1) {
             if (showCostumeId >= 1) {
-              kisekae_tyokusetusitei(showCostumeId, expressionCode); //立ち絵設定含んでいる1309,1328
+              kisekae_tyokusetusitei(showCostumeId, expressionCode);
             } else {
-              //$gameVariables.setValue(151, expressionCode);//表情代入
               tachie_settei2();
             }
-            $gameScreen.picture(targetPicId)._origin = originalOrigin;
-            $gameScreen.picture(targetPicId)._x = originalX;
-            $gameScreen.picture(targetPicId)._y = originalY;
-            $gameScreen.picture(targetPicId)._scaleX = originalScaleX;
-            $gameScreen.picture(targetPicId)._scaleY = originalScaleY;
-            $gameScreen.picture(targetPicId)._opacity = 0; //originalOpacity;
+            targetPic._origin = originalOrigin;
+            targetPic._x = originalX;
+            targetPic._y = originalY;
+            targetPic._scaleX = originalScaleX;
+            targetPic._scaleY = originalScaleY;
+            targetPic._opacity = 0;
           } else {
-            if ($gameScreen.picture(targetPicId)) {
+            if (targetPic) {
               $gameScreen.erasePicture(targetPicId);
             }
-            $gameScreen.showPicture(targetPicId, "/img/tachies/" + actorParameter, originalOrigin, originalX, originalY, originalScaleX, originalScaleY, 0, 0);
+            $gameScreen.showPicture(
+              targetPicId,
+              "/img/tachies/" + actorParameter,
+              originalOrigin,
+              originalX,
+              originalY,
+              originalScaleX,
+              originalScaleY,
+              0,
+              0
+            );
           }
           if (changeCostumeParam >= 1) {
             if (targetPicId >= originalScaleY) {
               $gameScreen.movePicture(targetPicId, originalOrigin, originalX, originalY, originalScaleX, originalScaleY, originalOpacity, 0, fadeDelayDuration);
               picture_fade1(targetPicId, "fadeIn", 'Hpicture2', fadeDelayDuration, 5);
               $gameScreen.movePicture(sourcePicId, originalOrigin, originalX, originalY, originalScaleX, originalScaleY, 0, 0, primaryMoveDuration);
-              //picture_fade1(sourcePicId,"fadeOut",'Hpicture3',primaryMoveDuration,5);
             } else {
               $gameScreen.movePicture(targetPicId, originalOrigin, originalX, originalY, originalScaleX, originalScaleY, originalOpacity, 0, fadeDelayDuration);
               picture_fade1(sourcePicId, "fadeOut", 'Hpicture2', primaryMoveDuration, 5);
@@ -319,28 +332,28 @@ tachie_dousa = function (actionType, actorParameter, expressionCode, targetPicId
         }
       }
     }
-    //1会話用立ち絵表示。変数164と165は会話立ち絵開始コモンで0にしている。
     if (actionType == 1) {
       {
-        let initialOpacity = showCostumeId; //this.sVal(160,$gameVariables.value(159));//透明度代入
+        let initialOpacity = showCostumeId;
         if (actorParameter >= 1) {
           tachie_settei2();
         } else {
           $gameScreen.showPicture(targetPicId, "/img/tachies/" + actorParameter, 1, easingFunction, picY, picScaleX, picScaleY, 0, 0);
         }
-        $gameScreen.picture(targetPicId)._origin = 1;
-        $gameScreen.picture(targetPicId)._y = picY;
-        $gameScreen.picture(targetPicId)._scaleY = picScaleY;
-        $gameScreen.picture(targetPicId)._opacity = 0;
+        // Cache target picture here as well
+        targetPic._origin = 1;
+        targetPic._y = picY;
+        targetPic._scaleY = picScaleY;
+        targetPic._opacity = 0;
         let targetXPos;
         if (sourcePicId == 1) {
-          targetXPos = 300; //this.sVal(155,800);//this.sVal(156,300);//最初右x,左x
+          targetXPos = 300;
         } else {
-          targetXPos = 100; //this.sVal(155,900);//this.sVal(156,200);//最初右x,左x
+          targetXPos = 100;
         }
         if (sourcePicId == 0) {
           targetXPos = 640;
-          $gameScreen.picture(targetPicId)._x = targetXPos + 50;
+          targetPic._x = targetXPos + 50;
         }
         if (sourcePicId == 1) {
           if ($gameVariables.value(152) == 0) {
@@ -349,84 +362,81 @@ tachie_dousa = function (actionType, actorParameter, expressionCode, targetPicId
             targetXPos = 1280 - targetXPos + $gameVariables.value(164) - ($gameVariables.value(152) * 80);
           }
           if ($gameSwitches.value(126)) { targetXPos = targetXPos + 50; }
-          $gameScreen.picture(targetPicId)._x = targetXPos + 100;
+          targetPic._x = targetXPos + 100;
           $gameVariables.setValue(164, $gameVariables.value(164) + 150);
         }
         if (sourcePicId == 2) {
           targetXPos = targetXPos + $gameVariables.value(165) + ($gameVariables.value(153) * 80);
-          $gameScreen.picture(targetPicId)._x = targetXPos - 100;
+          targetPic._x = targetXPos - 100;
           picScaleX = picScaleX - picScaleX - picScaleX;
           $gameVariables.setValue(165, $gameVariables.value(165) - 150);
         }
-        $gameScreen.picture(targetPicId)._scaleX = picScaleX;
+        targetPic._scaleX = picScaleX;
         $gameScreen.movePicture(targetPicId, 1, targetXPos, picY, picScaleX, picScaleY, initialOpacity, 0, fadeDuration);
         if ($gameSwitches.value(126)) {
           tachie_bless(targetPicId, 0);
         }
       }
     }
-    //着せ替えと表情変化内部処理。フェードアウトインはイベントコマンドで行う。
     if (actionType == 2) {
-      //AudioManager.playSe({"name":"Z_ClothesTakeOff","volume":150,"pitch":50,"pan":initialXOffset});
-      if ($gameScreen.picture(targetPicId)) {
-        valueTacieSet = [$gameScreen.picture(targetPicId).origin(), $gameScreen.picture(targetPicId).x(), $gameScreen.picture(targetPicId).y(),
-        $gameScreen.picture(targetPicId).scaleX(), $gameScreen.picture(targetPicId).scaleY(), $gameScreen.picture(targetPicId).opacity()];
+      // Cache targetPic for reuse
+      if (targetPic) {
+      valueTacieSet = [
+        targetPic.origin(),
+        targetPic.x(),
+        targetPic.y(),
+        targetPic.scaleX(),
+        targetPic.scaleY(),
+        targetPic.opacity()
+      ];
       }
       if (changeCostumeId >= 1) {
-        kisekae_tyokusetusitei(changeCostumeId, changeCostumeParam); //立ち絵設定含んでいる
+      kisekae_tyokusetusitei(changeCostumeId, changeCostumeParam);
       } else {
-        tachie_settei2();
+      tachie_settei2();
       }
       if ($gameVariables.value(292) != 0) {
-        if ($gameVariables.value(292)[$gameVariables.value(20)] >= 1) {
-          const event = $gameMap.event($gameVariables.value(292)[$gameVariables.value(20)]);
-          const actor = $gameActors.actor($gameVariables.value(20));
-          event.setImage(actor.characterName(), actor.characterIndex());
-        }
+      if ($gameVariables.value(292)[$gameVariables.value(20)] >= 1) {
+        const event = $gameMap.event($gameVariables.value(292)[$gameVariables.value(20)]);
+        const actor = $gameActors.actor($gameVariables.value(20));
+        event.setImage(actor.characterName(), actor.characterIndex());
       }
-      //$gameScreen.picture(targetPicId)._opacity = 255;
-      //$gameScreen.erasePicture(targetPicId);
-      //原因不明だがピクチャが初期化されるため、その対応↓
-      $gameScreen.picture(targetPicId)._origin = valueTacieSet[0];
-      $gameScreen.picture(targetPicId)._x = valueTacieSet[1];
-      $gameScreen.picture(targetPicId)._y = valueTacieSet[2];
-      $gameScreen.picture(targetPicId)._scaleX = valueTacieSet[3];
-      $gameScreen.picture(targetPicId)._scaleY = valueTacieSet[4];
-      $gameScreen.picture(targetPicId)._opacity = valueTacieSet[5];
+      }
+      targetPic._origin = valueTacieSet[0];
+      targetPic._x = valueTacieSet[1];
+      targetPic._y = valueTacieSet[2];
+      targetPic._scaleX = valueTacieSet[3];
+      targetPic._scaleY = valueTacieSet[4];
+      targetPic._opacity = valueTacieSet[5];
     }
-    //3立ち絵再表示スクリプト。
     if (actionType == 3) {
-      let standPicIndex = parseInt(targetPicId, 10) || 0; // 立ち絵1か2か、それとも…
-      standPicIndex--; // データ上は0から
-      if (standPicIndex === -1) { } else {
-        if ($TKMvar.tachie.PicData.length <= standPicIndex) { } else {
-          if (!$TKMvar.tachie.PicData[standPicIndex]["char"]) { } else {
-            const CharList = $TKMvar.tachie.CharList;
-            const MaxLayer = $TKMvar.tachie.MaxLayer;
-            const PicData = $TKMvar.tachie.PicData;
-            const pictureId = PicData[standPicIndex]["picNum"];
-            const char = PicData[standPicIndex]["char"];
-            const name = "TKMtachie_" + char + "_";
-            const partList = CharList[char];
-            const x = $TKMvar.tachie.PicData[standPicIndex]["x"];
-            const y = $TKMvar.tachie.PicData[standPicIndex]["y"];
-            $gameScreen.showPicture(pictureId, name, 0, x, y, 85, 85, 0, 0);
-          }
+      let standPicIndex = parseInt(targetPicId, 10) || 0;
+      standPicIndex--;
+      if (standPicIndex !== -1) {
+      if ($TKMvar.tachie.PicData.length > standPicIndex) {
+        if ($TKMvar.tachie.PicData[standPicIndex]["char"]) {
+        //const CharList = $TKMvar.tachie.CharList;
+        const PicData = $TKMvar.tachie.PicData;
+        const pictureId = PicData[standPicIndex]["picNum"];
+        const char = PicData[standPicIndex]["char"];
+        const name = "TKMtachie_" + char + "_";
+        const x = PicData[standPicIndex]["x"];
+        const y = PicData[standPicIndex]["y"];
+        $gameScreen.showPicture(pictureId, name, 0, x, y, 85, 85, 0, 0);
         }
       }
-      $gameScreen.picture(targetPicId)._origin = valueTacieSet[0];
-      $gameScreen.picture(targetPicId)._x = valueTacieSet[1];
-      $gameScreen.picture(targetPicId)._y = valueTacieSet[2];
-      $gameScreen.picture(targetPicId)._scaleX = valueTacieSet[3];
-      $gameScreen.picture(targetPicId)._scaleY = valueTacieSet[4];
-      $gameScreen.picture(targetPicId)._opacity = valueTacieSet[5];
-      // $gameScreen.movePicture(targetPicId,1,easingFunction,picY,picScaleX,picScaleY, 0,10);
+      }
+      targetPic._origin = valueTacieSet[0];
+      targetPic._x = valueTacieSet[1];
+      targetPic._y = valueTacieSet[2];
+      targetPic._scaleX = valueTacieSet[3];
+      targetPic._scaleY = valueTacieSet[4];
+      targetPic._opacity = valueTacieSet[5];
       pic_set(targetPicId, 1, 255, 10);
       valueTacieSet = [0, 0, 0, 0, 0, 0];
     }
-  } //actionTypeの条件分岐
+  }
   $gameSwitches.setValue(97, false);
-
 };
 
 //☆☆着せ替え直接指定
