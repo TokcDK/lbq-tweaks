@@ -303,6 +303,7 @@ tachie_dousa = function (actionType, actorParameter, expressionCode, targetPicId
           if (targetPic) {
             $gameScreen.erasePicture(targetPicId);
           }
+          console.debug("tachie_dousa: New picture path: " + "/img/tachies/" + actorParameter);
           $gameScreen.showPicture(
             targetPicId,
             "/img/tachies/" + actorParameter,
@@ -345,17 +346,21 @@ tachie_dousa = function (actionType, actorParameter, expressionCode, targetPicId
       }
     }
 
-    if (actionType == 1) {
+    switch (actionType) {
+      case 1:
       // --------- Action Type 1: Standard picture display with position easing ----------
       animatePictureAtype1TachieDousa(targetPicId, actorParameter, sourcePicId, showCostumeId, easingFunction, picY, picScaleX, picScaleY, fadeDuration);
-    }
-    else if (actionType == 2) {
+      break;
+      case 2:
       // --------- Action Type 2: Costume changing with caching target picture attributes ----------
       processCostumeChangeAtype2TachieDousa(targetPicId, changeCostumeId, changeCostumeParam);
-    }
-    else if (actionType == 3) {
+      break;
+      case 3:
       // --------- Action Type 3: Refreshing standing picture from tachie data ----------
       updateStandingPictureAtype3TachieDousa(targetPicId, targetPic);
+      break;
+      default:
+      break;
     }
   }
 
