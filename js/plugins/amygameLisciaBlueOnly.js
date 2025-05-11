@@ -2266,10 +2266,12 @@ original_scene = function (idScene, idStep) { //original_scene(0,1);//テスト�
 
   idScene = adjustSceneIdOriginalScene(idScene);
 
+  valuePic1 = 51;
+
   if (idScene === 11) { //Ｈな診察
     switch (idStep) {
       case 1: {
-        valuePicWait2 = idScene11handleCase1OriginalScene();
+        valuePicWait2 = idScene11handleCase1OriginalScene(valuePic1);
         break;
       }
       case 2: {
@@ -2329,7 +2331,6 @@ original_scene = function (idScene, idStep) { //original_scene(0,1);//テスト�
     }
   }
   else if (idScene === 100) { //モニカマッサージ,id1とid2。
-    valuePic1 = 51;
 
     switch (idStep) {
       case 1: {
@@ -2373,11 +2374,10 @@ original_scene = function (idScene, idStep) { //original_scene(0,1);//テスト�
     }
   };
 };
-function idScene11handleCase1OriginalScene() {
+function idScene11handleCase1OriginalScene(valuePic1) {
   // Case 1:
   // Setup background, dark clouds, animations and initial picture movements
   backGraund_menuMapSelect(2, 0, 0, 0);
-  let valuePic1 = 51;
   let valueScenePic = 'XevS011_';
   $gameScreen.showPicture(valuePic1, valueScenePic + '00', 1, 640 - 128, 384, 100, 100, 0, 0);
   $gameScreen.showPicture(valuePic1 + 1, 'ScreenDarkCloudsH', 1, 640 - 256, 384, 100, 100, 0, 0);
