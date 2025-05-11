@@ -2264,11 +2264,8 @@ original_souwa = function (id100, id101) {
 //作品オリジナルのピクチャシーンやキャラグラ移動等処理。401-600以外は直接コモンid入力
 original_scene = function (idScene, idStep) { //original_scene(0,1);//テストの際は変数535にid入力
 
-  if (idScene === 0 && $gameVariables.value(535) >= 1) {
-    if ($gameVariables.value(535) >= 501 && $gameVariables.value(535) <= 600) {
-      idScene = $gameVariables.value(535) - 500;
-    };
-  };
+  idScene = adjustSceneIdOriginalScene(idScene);
+
   if (idScene === 11) { //Ｈな診察
     switch (idStep) {
       case 1: {
@@ -2392,8 +2389,8 @@ original_scene = function (idScene, idStep) { //original_scene(0,1);//テスト�
       default:
         break;
     }
-  };
-  if (idScene === 100) { //モニカマッサージ,id1とid2。
+  }
+  else if (idScene === 100) { //モニカマッサージ,id1とid2。
     valuePic1 = 51;
     switch (idStep) {
       case 1: {
@@ -2513,5 +2510,15 @@ original_scene = function (idScene, idStep) { //original_scene(0,1);//テスト�
     }
   };
 };
+
+function adjustSceneIdOriginalScene(idScene) {
+  const var535 = $gameVariables.value(535);
+  if (idScene === 0 && var535 >= 1) {
+    if (var535 >= 501 && var535 <= 600) {
+      idScene = var535 - 500;
+    }
+  }
+  return idScene;
+}
 
 //}());
