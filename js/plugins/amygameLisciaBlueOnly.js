@@ -2392,117 +2392,42 @@ original_scene = function (idScene, idStep) { //original_scene(0,1);//テスト�
   }
   else if (idScene === 100) { //モニカマッサージ,id1とid2。
     valuePic1 = 51;
+
     switch (idStep) {
       case 1: {
-        AudioManager.playBgs({ "name": "21_HandyMassager1", "volume": 50, "pitch": 100, "pan": 0 });
-        let bgImage = 'XevS101_00back';
-        pic_1(0, valuePic1, bgImage, 0, 100, 255, 60, 1280, 768, -256, 0);
-        bgImage = 'XevS101_00back2';
-        pic_1(0, valuePic1 + 1, bgImage, 0, 100, 255, 60, 1280, 768, -256, 0);
-        bgImage = 'XevS101_01';
-        pic_1(0, valuePic1 + 2, bgImage, 0, 100, 255, 60, 1280, 768, -256, 0);
-        bgImage = 'XevS101_01face1';
-        pic_1(0, valuePic1 + 6, bgImage, 0, 100, 255, 60, 1280, 768, -256, 0);
-        bgImage = 'XevS101_01_100';
-        picture_anime1(valuePic1 + 7, bgImage, 5, 1, "連番", 15, 3, true, [2, 3, 4, 5]);
-        $gameScreen.picture(valuePic1 + 7)._x = 640 - 128;
-        $gameScreen.movePicture(valuePic1 + 7, 1, 640 - 128, 384, 100, 100, 200, 0, 60);
-        picture_anime1(valuePic1 + 8, bgImage, 5, 1, "連番", 20, 3, true, [4, 5, 2, 3]);
-        $gameScreen.picture(valuePic1 + 8)._x = 640 - 128;
-        $gameScreen.movePicture(valuePic1 + 8, 1, 640 - 128, 384, 100, 100, 100, 0, 60);
-        for (let pictureIndex = valuePic1 + 1; pictureIndex <= valuePic1 + 8; pictureIndex++) { 
-          hcg_piston(pictureIndex, 5, 1, 2); 
-        };
+        handleOriginalSceneCase1OriginalScene(valuePic1);
         break;
       }
       case 2: {
-        //ピストンしている時に表情変化させる場合、身体も更新する。振動が同期しないため
-        AudioManager.playBgs({ "name": "21_HandyMassager1", "volume": 60, "pitch": 120, "pan": 0 });
-        let bgAniImage = 'XevS101_01';
-        pic_1(2, valuePic1 + 2, bgAniImage, 0, 100, 255, 1, 1280, 768, -256, 0);
-        bgAniImage = 'XevS101_01face2';
-        pic_1(2, valuePic1 + 6, bgAniImage, 0, 100, 255, 1, 1280, 768, -256, 0);
-        bgAniImage = 'XevS101_02_100';
-        picture_anime1(valuePic1 + 7, bgAniImage, 5, 1, "連番", 5, 3, true, [0, 2, 3, 4, 5]);
-        $gameScreen.picture(valuePic1 + 7)._x = 640 - 128;
-        $gameScreen.movePicture(valuePic1 + 7, 1, 640 - 128, 384, 100, 100, 200, 0, 60);
-        picture_anime1(valuePic1 + 8, bgAniImage, 5, 1, "連番", 10, 3, true, [0, 4, 5, 2, 3]);
-        $gameScreen.picture(valuePic1 + 8)._x = 640 - 128;
-        $gameScreen.movePicture(valuePic1 + 8, 1, 640 - 128, 384, 100, 100, 100, 0, 60);
-        for (let pictureIndex = valuePic1 + 1; pictureIndex <= valuePic1 + 8; pictureIndex++) { 
-          hcg_piston(pictureIndex, 5, 3, 2); 
-        };
+        handleOriginalSceneCase2OriginalScene(valuePic1);
         break;
       }
       case 3: {
-        pic_eraseP(2, [valuePic1 + 2]);
-        let bgAniImage = 'XevS101_02';
-        pic_1(2, valuePic1 + 3, bgAniImage, 0, 100, 255, 1, 1280, 768, -256, 0);
-        bgAniImage = 'XevS101_01face3';
-        pic_1(2, valuePic1 + 6, bgAniImage, 0, 100, 255, 1, 1280, 768, -256, 0);
-        bgAniImage = 'XevS101_03_100';
-        picture_anime1(valuePic1 + 9, bgAniImage, 4, 1, "連番", 5, 3, true, [3, 1, 5, 1]);
-        $gameScreen.picture(valuePic1 + 9)._x = 640 - 128;
-        $gameScreen.movePicture(valuePic1 + 9, 1, 640 - 128, 384, 100, 100, 255, 0, 10);
-        picture_anime1(valuePic1 + 10, bgAniImage, 4, 1, "連番", 5, 3, true, [1, 2, 1, 4]);
-        $gameScreen.picture(valuePic1 + 10)._x = 640 - 128;
-        $gameScreen.movePicture(valuePic1 + 10, 1, 640 - 128, 384, 100, 100, 255, 0, 10);
-        for (let pictureIndex = valuePic1 + 1; pictureIndex <= valuePic1 + 8; pictureIndex++) { 
-          hcg_piston(pictureIndex, 5, 3, 2); 
-        };
-        for (let pictureIndex = valuePic1 + 9; pictureIndex <= valuePic1 + 10; pictureIndex++) { 
-          hcg_piston(pictureIndex, 5, 3, 1); 
-        };
+        handleOriginalSceneCase3OriginalScene(valuePic1);
         break;
       }
       case 4: {
-        //id3が+50,-250,-500,+50,id4が200,300
-        for (let pictureIndex = valuePic1; pictureIndex <= valuePic1 + 10; pictureIndex++) {
-          if ($gameScreen.picture(pictureIndex)) {
-            const currentOpacity = $gameScreen.picture(pictureIndex).opacity();
-            $gameScreen.movePicture(pictureIndex, 1, 640, 384 + id3, id4, id4, currentOpacity, 0, 120);
-          };
-        };
+        handleOriginalSceneCase4OriginalScene(valuePic1, id3, id4);// id3,id4 undefined here
         break;
       }
       case 5: {
-        let bgAniImage = 'XevS101_04back';
-        pic_1(0, valuePic1, bgAniImage, 0, 100, 255, 120, 1280, 768, 0, 0);
-        bgAniImage = 'XevS101_04';
-        pic_1(0, valuePic1 + 1, bgAniImage, 0, 100, 255, 120, 1280, 768, 0, 0);
-        hcg_piston(valuePic1 + 1, 5, 1, 2);
+        handleOriginalSceneCase5OriginalScene(valuePic1);
         break;
       }
       case 6: {
-        const pictureIdsToErase = [];
-        for (let picEraseIndex = valuePic1; picEraseIndex <= valuePic1 + 11; picEraseIndex++) {
-          pictureIdsToErase.push(picEraseIndex);
-        };
-        pic_eraseP(0, pictureIdsToErase);
+        handleOriginalSceneCase6OriginalScene(valuePic1);
         break;
       }
       case 7: {
-        AudioManager.fadeOutBgs(10);
-        for (let pictureIndex = valuePic1; pictureIndex <= valuePic1 + 10; pictureIndex++) {
-          if ($gameScreen.picture(pictureIndex)) {
-            pic_move1(pictureIndex, 0, 0, 300, 300, 0, 120);
-          };
-        };
+        handleOriginalSceneCase7OriginalScene(valuePic1);
         break;
       }
       case 8: {
-        AudioManager.playBgs({ "name": "21_HandyMassager1", "volume": 60, "pitch": 120, "pan": 0 });
-        for (let pictureIndex = valuePic1; pictureIndex <= valuePic1 + 10; pictureIndex++) {
-          if ($gameScreen.picture(pictureIndex)) {
-            pic_move1(pictureIndex, 0, 0, 300, 300, 255, 60);
-          };
-        };
+        handleOriginalSceneCase8OriginalScene(valuePic1);
         break;
       }
       case 9: {
-        let aniImage = 'XevS101_05';
-        pic_1(0, valuePic1 + 2, aniImage, 2, 100, 255, 60, 1280, 768, 0, 0);
-        hcg_piston(valuePic1 + 2, 5, 1, 2);
+        handleOriginalSceneCase9OriginalScene(valuePic1);
         break;
       }
       default:
@@ -2510,6 +2435,125 @@ original_scene = function (idScene, idStep) { //original_scene(0,1);//テスト�
     }
   };
 };
+
+function handleOriginalSceneCase1OriginalScene(valuePic1) {
+  // Case 1: Initial background and face animation setup
+  AudioManager.playBgs({ "name": "21_HandyMassager1", "volume": 50, "pitch": 100, "pan": 0 });
+  let bgImage = 'XevS101_00back';
+  pic_1(0, valuePic1, bgImage, 0, 100, 255, 60, 1280, 768, -256, 0);
+  bgImage = 'XevS101_00back2';
+  pic_1(0, valuePic1 + 1, bgImage, 0, 100, 255, 60, 1280, 768, -256, 0);
+  bgImage = 'XevS101_01';
+  pic_1(0, valuePic1 + 2, bgImage, 0, 100, 255, 60, 1280, 768, -256, 0);
+  bgImage = 'XevS101_01face1';
+  pic_1(0, valuePic1 + 6, bgImage, 0, 100, 255, 60, 1280, 768, -256, 0);
+  bgImage = 'XevS101_01_100';
+  picture_anime1(valuePic1 + 7, bgImage, 5, 1, "連番", 15, 3, true, [2, 3, 4, 5]);
+  $gameScreen.picture(valuePic1 + 7)._x = 640 - 128;
+  $gameScreen.movePicture(valuePic1 + 7, 1, 640 - 128, 384, 100, 100, 200, 0, 60);
+  picture_anime1(valuePic1 + 8, bgImage, 5, 1, "連番", 20, 3, true, [4, 5, 2, 3]);
+  $gameScreen.picture(valuePic1 + 8)._x = 640 - 128;
+  $gameScreen.movePicture(valuePic1 + 8, 1, 640 - 128, 384, 100, 100, 100, 0, 60);
+  for (let pictureIndex = valuePic1 + 1; pictureIndex <= valuePic1 + 8; pictureIndex++) {
+    hcg_piston(pictureIndex, 5, 1, 2);
+  }
+}
+
+function handleOriginalSceneCase2OriginalScene(valuePic1) {
+  // Case 2: Update expression and body vibration (piston) when already vibrating
+  AudioManager.playBgs({ "name": "21_HandyMassager1", "volume": 60, "pitch": 120, "pan": 0 });
+  let bgAniImage = 'XevS101_01';
+  pic_1(2, valuePic1 + 2, bgAniImage, 0, 100, 255, 1, 1280, 768, -256, 0);
+  bgAniImage = 'XevS101_01face2';
+  pic_1(2, valuePic1 + 6, bgAniImage, 0, 100, 255, 1, 1280, 768, -256, 0);
+  bgAniImage = 'XevS101_02_100';
+  picture_anime1(valuePic1 + 7, bgAniImage, 5, 1, "連番", 5, 3, true, [0, 2, 3, 4, 5]);
+  $gameScreen.picture(valuePic1 + 7)._x = 640 - 128;
+  $gameScreen.movePicture(valuePic1 + 7, 1, 640 - 128, 384, 100, 100, 200, 0, 60);
+  picture_anime1(valuePic1 + 8, bgAniImage, 5, 1, "連番", 10, 3, true, [0, 4, 5, 2, 3]);
+  $gameScreen.picture(valuePic1 + 8)._x = 640 - 128;
+  $gameScreen.movePicture(valuePic1 + 8, 1, 640 - 128, 384, 100, 100, 100, 0, 60);
+  for (let pictureIndex = valuePic1 + 1; pictureIndex <= valuePic1 + 8; pictureIndex++) {
+    hcg_piston(pictureIndex, 5, 3, 2);
+  }
+}
+
+function handleOriginalSceneCase3OriginalScene(valuePic1) {
+  // Case 3: Erase part, update face, and add new animations with different piston parameters
+  pic_eraseP(2, [valuePic1 + 2]);
+  let bgAniImage = 'XevS101_02';
+  pic_1(2, valuePic1 + 3, bgAniImage, 0, 100, 255, 1, 1280, 768, -256, 0);
+  bgAniImage = 'XevS101_01face3';
+  pic_1(2, valuePic1 + 6, bgAniImage, 0, 100, 255, 1, 1280, 768, -256, 0);
+  bgAniImage = 'XevS101_03_100';
+  picture_anime1(valuePic1 + 9, bgAniImage, 4, 1, "連番", 5, 3, true, [3, 1, 5, 1]);
+  $gameScreen.picture(valuePic1 + 9)._x = 640 - 128;
+  $gameScreen.movePicture(valuePic1 + 9, 1, 640 - 128, 384, 100, 100, 255, 0, 10);
+  picture_anime1(valuePic1 + 10, bgAniImage, 4, 1, "連番", 5, 3, true, [1, 2, 1, 4]);
+  $gameScreen.picture(valuePic1 + 10)._x = 640 - 128;
+  $gameScreen.movePicture(valuePic1 + 10, 1, 640 - 128, 384, 100, 100, 255, 0, 10);
+  for (let pictureIndex = valuePic1 + 1; pictureIndex <= valuePic1 + 8; pictureIndex++) {
+    hcg_piston(pictureIndex, 5, 3, 2);
+  }
+  for (let pictureIndex = valuePic1 + 9; pictureIndex <= valuePic1 + 10; pictureIndex++) {
+    hcg_piston(pictureIndex, 5, 3, 1);
+  }
+}
+
+function handleOriginalSceneCase4OriginalScene(valuePic1, id3, id4) {
+  // Case 4: Move all pictures with dynamic parameters (id3 and id4)
+  for (let pictureIndex = valuePic1; pictureIndex <= valuePic1 + 10; pictureIndex++) {
+    if ($gameScreen.picture(pictureIndex)) {
+      const currentOpacity = $gameScreen.picture(pictureIndex).opacity();
+      $gameScreen.movePicture(pictureIndex, 1, 640, 384 + id3, id4, id4, currentOpacity, 0, 120);
+    }
+  }
+}
+
+function handleOriginalSceneCase5OriginalScene(valuePic1) {
+  // Case 5: Display new background with piston effect
+  let bgAniImage = 'XevS101_04back';
+  pic_1(0, valuePic1, bgAniImage, 0, 100, 255, 120, 1280, 768, 0, 0);
+  bgAniImage = 'XevS101_04';
+  pic_1(0, valuePic1 + 1, bgAniImage, 0, 100, 255, 120, 1280, 768, 0, 0);
+  hcg_piston(valuePic1 + 1, 5, 1, 2);
+}
+
+function handleOriginalSceneCase6OriginalScene(valuePic1) {
+  // Case 6: Erase a set of pictures
+  const pictureIdsToErase = [];
+  for (let picEraseIndex = valuePic1; picEraseIndex <= valuePic1 + 11; picEraseIndex++) {
+    pictureIdsToErase.push(picEraseIndex);
+  }
+  pic_eraseP(0, pictureIdsToErase);
+}
+
+function handleOriginalSceneCase7OriginalScene(valuePic1) {
+  // Case 7: Fade out background sounds and animate picture scale to zero
+  AudioManager.fadeOutBgs(10);
+  for (let pictureIndex = valuePic1; pictureIndex <= valuePic1 + 10; pictureIndex++) {
+    if ($gameScreen.picture(pictureIndex)) {
+      pic_move1(pictureIndex, 0, 0, 300, 300, 0, 120);
+    }
+  }
+}
+
+function handleOriginalSceneCase8OriginalScene(valuePic1) {
+  // Case 8: Bring back background sound and scale pictures back in
+  AudioManager.playBgs({ "name": "21_HandyMassager1", "volume": 60, "pitch": 120, "pan": 0 });
+  for (let pictureIndex = valuePic1; pictureIndex <= valuePic1 + 10; pictureIndex++) {
+    if ($gameScreen.picture(pictureIndex)) {
+      pic_move1(pictureIndex, 0, 0, 300, 300, 255, 60);
+    }
+  }
+}
+
+function handleOriginalSceneCase9OriginalScene(valuePic1) {
+  // Case 9: Update animation and reapply piston effect on a specific picture
+  let aniImage = 'XevS101_05';
+  pic_1(0, valuePic1 + 2, aniImage, 2, 100, 255, 60, 1280, 768, 0, 0);
+  hcg_piston(valuePic1 + 2, 5, 1, 2);
+}
 
 function adjustSceneIdOriginalScene(idScene) {
   const var535 = $gameVariables.value(535);
