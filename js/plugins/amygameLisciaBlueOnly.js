@@ -2266,115 +2266,130 @@ original_scene = function (idScene, idStep) { //original_scene(0,1);//テスト�
 
   idScene = adjustSceneIdOriginalScene(idScene);
 
+  switch(idScene) {
+    case 11: //Ｈな診察
+      hMedicalExamination(idStep);
+      break;
+    case 100: //モニカマッサージ,id1とid2。
+      monicaMassage(idStep);
+      break;
+    default:
+      break;
+  }
+};
+
+function hMedicalExamination(idStep) {
   valuePic1 = 51;
 
-  if (idScene === 11) { //Ｈな診察
-    switch (idStep) {
-      case 1: {
-        valuePicWait2 = idScene11handleCase1OriginalScene(valuePic1);
-        break;
-      }
-      case 2: {
-        valuePicWait2 = idScene11handleCase2OriginalScene(valuePic1); // Assuming valuePic1 remains 51 from case 1
-        break;
-      }
-      case 3: {
-        valuePicWait2 = idScene11handleCase3OriginalScene(valuePic1);
-        break;
-      }
-      case 4: {
-        idScene11handleCase4OriginalScene();
-        break;
-      }
-      case 5: {
-        idScene11handleCase5OriginalScene(valuePic1);
-        break;
-      }
-      case 6: {
-        idScene11handleCase6OriginalScene(valuePic1);
-        break;
-      }
-      case 7: {
-        valuePicWait2 = idScene11handleCase7OriginalScene(valuePic1);
-        break;
-      }
-      case 8: {
-        valuePicWait2 = idScene11handleCase8OriginalScene(valuePic1);
-        break;
-      }
-      case 9: {
-        idScene11handleCase9OriginalScene();
-        break;
-      }
-      case 10: {
-        valuePicWait2 = idScene11handleCase10OriginalScene(valuePic1);
-        break;
-      }
-      case 11: {
-        idScene11handleCase11OriginalScene(valuePic1);
-        break;
-      }
-      case 12: {
-        valuePicWait2 = idScene11handleCase12OriginalScene(valuePic1);
-        break;
-      }
-      case 90: {
-        valuePicWait2 = idScene11handleCase90OriginalScene(valuePic1);
-        break;
-      }
-      case 91: {
-        idScene11handleCase91OriginalScene(valuePic1);
-        break;
-      }
-      default:
-        break;
+  switch (idStep) {
+    case 1: {
+      valuePicWait2 = hMedicalExaminationStep1OriginalScene(valuePic1);
+      break;
     }
+    case 2: {
+      valuePicWait2 = hMedicalExaminationStep2OriginalScene(valuePic1); // Assuming valuePic1 remains 51 from case 1
+      break;
+    }
+    case 3: {
+      valuePicWait2 = hMedicalExaminationStep3OriginalScene(valuePic1);
+      break;
+    }
+    case 4: {
+      hMedicalExaminationStep4OriginalScene();
+      break;
+    }
+    case 5: {
+      hMedicalExaminationStep5OriginalScene(valuePic1);
+      break;
+    }
+    case 6: {
+      hMedicalExaminationStep6OriginalScene(valuePic1);
+      break;
+    }
+    case 7: {
+      valuePicWait2 = idScene11handleCase7OriginalScene(valuePic1);
+      break;
+    }
+    case 8: {
+      valuePicWait2 = hMedicalExaminationStep8OriginalScene(valuePic1);
+      break;
+    }
+    case 9: {
+      hMedicalExaminationStep9OriginalScene();
+      break;
+    }
+    case 10: {
+      valuePicWait2 = hMedicalExaminationStep10OriginalScene(valuePic1);
+      break;
+    }
+    case 11: {
+      hMedicalExaminationStep11OriginalScene(valuePic1);
+      break;
+    }
+    case 12: {
+      valuePicWait2 = hMedicalExaminationStep12OriginalScene(valuePic1);
+      break;
+    }
+    case 90: {
+      valuePicWait2 = hMedicalExaminationStep90OriginalScene(valuePic1);
+      break;
+    }
+    case 91: {
+      hMedicalExaminationStep91OriginalScene(valuePic1);
+      break;
+    }
+    default:
+      break;
   }
-  else if (idScene === 100) { //モニカマッサージ,id1とid2。
+}
 
-    switch (idStep) {
-      case 1: {
-        idScene100handleOriginalSceneCase1OriginalScene(valuePic1);
-        break;
-      }
-      case 2: {
-        idScene100handleOriginalSceneCase2OriginalScene(valuePic1);
-        break;
-      }
-      case 3: {
-        idScene100handleOriginalSceneCase3OriginalScene(valuePic1);
-        break;
-      }
-      case 4: {
-        idScene100handleOriginalSceneCase4OriginalScene(valuePic1, 50, 200);
-        break;
-      }
-      case 5: {
-        idScene100handleOriginalSceneCase5OriginalScene(valuePic1);
-        break;
-      }
-      case 6: {
-        idScene100handleOriginalSceneCase6OriginalScene(valuePic1);
-        break;
-      }
-      case 7: {
-        idScene100handleOriginalSceneCase7OriginalScene(valuePic1);
-        break;
-      }
-      case 8: {
-        idScene100handleOriginalSceneCase8OriginalScene(valuePic1);
-        break;
-      }
-      case 9: {
-        idScene100handleOriginalSceneCase9OriginalScene(valuePic1);
-        break;
-      }
-      default:
-        break;
+function monicaMassage(idStep) {
+  valuePic1 = 51;
+
+  switch (idStep) {
+    case 1: {
+      monicaMassageStep1OriginalScene(valuePic1);
+      break;
     }
-  };
-};
-function idScene11handleCase1OriginalScene(valuePic1) {
+    case 2: {
+      monicaMassageStep2OriginalScene(valuePic1);
+      break;
+    }
+    case 3: {
+      monicaMassageStep3OriginalScene(valuePic1);
+      break;
+    }
+    case 4: {
+      monicaMassageStep4OriginalScene(valuePic1, 50, 200);
+      break;
+    }
+    case 5: {
+      monicaMassageStep5OriginalScene(valuePic1);
+      break;
+    }
+    case 6: {
+      monicaMassageStep6OriginalScene(valuePic1);
+      break;
+    }
+    case 7: {
+      monicaMassageStep7OriginalScene(valuePic1);
+      break;
+    }
+    case 8: {
+      monicaMassageStep8OriginalScene(valuePic1);
+      break;
+    }
+    case 9: {
+      monicaMassageStep9OriginalScene(valuePic1);
+      break;
+    }
+    default:
+      break;
+  }
+}
+
+
+function hMedicalExaminationStep1OriginalScene(valuePic1) {
   // Case 1:
   // Setup background, dark clouds, animations and initial picture movements
   backGraund_menuMapSelect(2, 0, 0, 0);
@@ -2396,27 +2411,27 @@ function idScene11handleCase1OriginalScene(valuePic1) {
   return 60; // valuePicWait2
 }
 
-function idScene11handleCase2OriginalScene(valuePic1) {
+function hMedicalExaminationStep2OriginalScene(valuePic1) {
   // Case 2:
   // Move picture (id = valuePic1+12) upward then wait
   pic_move1(valuePic1 + 12, 0, -200, 100, 100, 255, 180);
   return 120;
 }
 
-function idScene11handleCase3OriginalScene(valuePic1) {
+function hMedicalExaminationStep3OriginalScene(valuePic1) {
   // Case 3:
   // Move picture (id = valuePic1+2) downward and set wait time
   pic_move1(valuePic1 + 2, 0, 50, 100, 100, 255, 180);
   return 60;
 }
 
-function idScene11handleCase4OriginalScene() {
+function hMedicalExaminationStep4OriginalScene() {
   // Case 4:
   // Start an animation (e.g., explosion/flash effect)
   $gameScreen.startAnimation(520, 680, 179, false);
 }
 
-function idScene11handleCase5OriginalScene(valuePic1) {
+function hMedicalExaminationStep5OriginalScene(valuePic1) {
   // Case 5:
   // Increase the cell count of picture id = valuePic1+12 if available
   const pictureIdToAddCell = valuePic1 + 12;
@@ -2425,7 +2440,7 @@ function idScene11handleCase5OriginalScene(valuePic1) {
   }
 }
 
-function idScene11handleCase6OriginalScene(valuePic1) {
+function hMedicalExaminationStep6OriginalScene(valuePic1) {
   // Case 6:
   // Increase cell count for picture id = valuePic1+2 and perform move animations and fade.
   const pictureIdForCellIncrease = valuePic1 + 2;
@@ -2447,7 +2462,7 @@ function idScene11handleCase7OriginalScene(valuePic1) {
   return 120;
 }
 
-function idScene11handleCase8OriginalScene(valuePic1) {
+function hMedicalExaminationStep8OriginalScene(valuePic1) {
   // Case 8:
   // Set arrays for picture properties, trigger piston effect and add cell count to extra picture.
   pic_setArray1 = [1, valuePic1 + 13, 0, 384 + (1732 / 2) - (768 / 2) + 100, 5, 1200];
@@ -2463,7 +2478,7 @@ function idScene11handleCase8OriginalScene(valuePic1) {
   return 60;
 }
 
-function idScene11handleCase9OriginalScene() {
+function hMedicalExaminationStep9OriginalScene() {
   // Case 9:
   // Reset switch and arrays and apply smooth motion
   $gameSwitches.setValue(429, false);
@@ -2473,7 +2488,7 @@ function idScene11handleCase9OriginalScene() {
   picture_motion1("smooth", [0]);
 }
 
-function idScene11handleCase10OriginalScene(valuePic1) {
+function hMedicalExaminationStep10OriginalScene(valuePic1) {
   // Case 10:
   // Move several pictures back to original state
   pic_move1(valuePic1, 0, 0, 200, 200, 255, 60);
@@ -2483,7 +2498,7 @@ function idScene11handleCase10OriginalScene(valuePic1) {
   return 60;
 }
 
-function idScene11handleCase11OriginalScene(valuePic1) {
+function hMedicalExaminationStep11OriginalScene(valuePic1) {
   // Case 11:
   // Add cell count to picture valuePic1+2 and adjust movements for id+11 and id+12
   pic_move1(valuePic1, 0, 0, 100, 100, 255, 60);
@@ -2495,14 +2510,14 @@ function idScene11handleCase11OriginalScene(valuePic1) {
   pic_move1(valuePic1 + 12, 0, 0, 100, 100, 255, 60);
 }
 
-function idScene11handleCase12OriginalScene(valuePic1) {
+function hMedicalExaminationStep12OriginalScene(valuePic1) {
   // Case 12:
   // Move picture (id = valuePic1+12) downwards and set wait timer
   pic_move1(valuePic1 + 12, 0, +200, 100, 100, 255, 180);
   return 120;
 }
 
-function idScene11handleCase90OriginalScene(valuePic1) {
+function hMedicalExaminationStep90OriginalScene(valuePic1) {
   // Case 90: //2と3の間に仕様
   // Specialized movement between cases 2 and 3
   pic_move1(valuePic1, 0, 0, 25, 25, 150, 60);
@@ -2511,7 +2526,7 @@ function idScene11handleCase90OriginalScene(valuePic1) {
   return 60;
 }
 
-function idScene11handleCase91OriginalScene(valuePic1) {
+function hMedicalExaminationStep91OriginalScene(valuePic1) {
   // Case 91: //2と3の間に仕様
   // Revert movement adjustments for pictures
   pic_move1(valuePic1, 0, 0, 100, 100, 255, 60);
@@ -2519,7 +2534,7 @@ function idScene11handleCase91OriginalScene(valuePic1) {
   pic_move1(valuePic1 + 11, 0, 0, 100, 100, 255, 60);
 }
 
-function idScene100handleOriginalSceneCase1OriginalScene(valuePic1) {
+function monicaMassageStep1OriginalScene(valuePic1) {
   // Case 1: Initial background and face animation setup
   AudioManager.playBgs({ "name": "21_HandyMassager1", "volume": 50, "pitch": 100, "pan": 0 });
   let bgImage = 'XevS101_00back';
@@ -2542,7 +2557,7 @@ function idScene100handleOriginalSceneCase1OriginalScene(valuePic1) {
   }
 }
 
-function idScene100handleOriginalSceneCase2OriginalScene(valuePic1) {
+function monicaMassageStep2OriginalScene(valuePic1) {
   // Case 2: Update expression and body vibration (piston) when already vibrating
   AudioManager.playBgs({ "name": "21_HandyMassager1", "volume": 60, "pitch": 120, "pan": 0 });
   let bgAniImage = 'XevS101_01';
@@ -2561,7 +2576,7 @@ function idScene100handleOriginalSceneCase2OriginalScene(valuePic1) {
   }
 }
 
-function idScene100handleOriginalSceneCase3OriginalScene(valuePic1) {
+function monicaMassageStep3OriginalScene(valuePic1) {
   // Case 3: Erase part, update face, and add new animations with different piston parameters
   pic_eraseP(2, [valuePic1 + 2]);
   let bgAniImage = 'XevS101_02';
@@ -2583,7 +2598,7 @@ function idScene100handleOriginalSceneCase3OriginalScene(valuePic1) {
   }
 }
 
-function idScene100handleOriginalSceneCase4OriginalScene(valuePic1, id3, id4) {// id3,id4 undefined here because did not set in parent function
+function monicaMassageStep4OriginalScene(valuePic1, id3, id4) {// id3,id4 undefined here because did not set in parent function
   // Case 4: Move all pictures with dynamic parameters (id3 and id4)
   for (let pictureIndex = valuePic1; pictureIndex <= valuePic1 + 10; pictureIndex++) {
     if ($gameScreen.picture(pictureIndex)) {
@@ -2593,7 +2608,7 @@ function idScene100handleOriginalSceneCase4OriginalScene(valuePic1, id3, id4) {/
   }
 }
 
-function idScene100handleOriginalSceneCase5OriginalScene(valuePic1) {
+function monicaMassageStep5OriginalScene(valuePic1) {
   // Case 5: Display new background with piston effect
   let bgAniImage = 'XevS101_04back';
   pic_1(0, valuePic1, bgAniImage, 0, 100, 255, 120, 1280, 768, 0, 0);
@@ -2602,7 +2617,7 @@ function idScene100handleOriginalSceneCase5OriginalScene(valuePic1) {
   hcg_piston(valuePic1 + 1, 5, 1, 2);
 }
 
-function idScene100handleOriginalSceneCase6OriginalScene(valuePic1) {
+function monicaMassageStep6OriginalScene(valuePic1) {
   // Case 6: Erase a set of pictures
   const pictureIdsToErase = [];
   for (let picEraseIndex = valuePic1; picEraseIndex <= valuePic1 + 11; picEraseIndex++) {
@@ -2611,7 +2626,7 @@ function idScene100handleOriginalSceneCase6OriginalScene(valuePic1) {
   pic_eraseP(0, pictureIdsToErase);
 }
 
-function idScene100handleOriginalSceneCase7OriginalScene(valuePic1) {
+function monicaMassageStep7OriginalScene(valuePic1) {
   // Case 7: Fade out background sounds and animate picture scale to zero
   AudioManager.fadeOutBgs(10);
   for (let pictureIndex = valuePic1; pictureIndex <= valuePic1 + 10; pictureIndex++) {
@@ -2621,7 +2636,7 @@ function idScene100handleOriginalSceneCase7OriginalScene(valuePic1) {
   }
 }
 
-function idScene100handleOriginalSceneCase8OriginalScene(valuePic1) {
+function monicaMassageStep8OriginalScene(valuePic1) {
   // Case 8: Bring back background sound and scale pictures back in
   AudioManager.playBgs({ "name": "21_HandyMassager1", "volume": 60, "pitch": 120, "pan": 0 });
   for (let pictureIndex = valuePic1; pictureIndex <= valuePic1 + 10; pictureIndex++) {
@@ -2631,7 +2646,7 @@ function idScene100handleOriginalSceneCase8OriginalScene(valuePic1) {
   }
 }
 
-function idScene100handleOriginalSceneCase9OriginalScene(valuePic1) {
+function monicaMassageStep9OriginalScene(valuePic1) {
   // Case 9: Update animation and reapply piston effect on a specific picture
   let aniImage = 'XevS101_05';
   pic_1(0, valuePic1 + 2, aniImage, 2, 100, 255, 60, 1280, 768, 0, 0);
