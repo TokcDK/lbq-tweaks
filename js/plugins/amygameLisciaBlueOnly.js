@@ -2269,111 +2269,129 @@ original_scene = function (idScene, idStep) { //original_scene(0,1);//テスト�
       idScene = $gameVariables.value(535) - 500;
     };
   };
-  if (idScene === 11) {//Ｈな診察
-    if (idStep === 1) {
-      backGraund_menuMapSelect(2, 0, 0, 0);
-      valuePic1 = 51;
-      valueScenePic = 'XevS011_';
-      $gameScreen.showPicture(valuePic1, valueScenePic + '00', 1, 640 - 128, 384, 100, 100, 0, 0);
-      $gameScreen.showPicture(valuePic1 + 1, 'ScreenDarkCloudsH', 1, 640 - 256, 384, 100, 100, 0, 0);
-      $gameScreen.setPicturesAnimation(6, 30, "連番", 60);
-      $gameScreen.showPicture(valuePic1 + 2, valueScenePic + '02_00', 1, 640 - 128, 384 - 50, 100, 100, 0, 0);
-      $gameScreen.showPicture(valuePic1 + 11, valueScenePic + '11', 1, 640 - 128, 384, 100, 100, 0, 0);
-      $gameScreen.setPicturesAnimation(5, 30, "連番", 60);
-      $gameScreen.showPicture(valuePic1 + 12, valueScenePic + '12_00', 1, 640 - 128, 384 + 200, 100, 100, 0, 0);
-      $gameScreen.setPicturesAnimation(2, 15, "連番", 30);
-      $gameScreen.showPicture(valuePic1 + 13, valueScenePic + '13_00', 1, 640 - 128, 384 - (1732 / 2) + (768 / 2) + 100, 100, 100, 0, 0);
-      $gameScreen.setPicturesAnimation(2, 30, "連番", 60);
-      $gameScreen.showPicture(valuePic1 + 15, valueScenePic + '14_00', 1, 640 - 128, 384 + 50, 100, 100, 0, 0);
-      pic_move1(valuePic1, 0, 0, 100, 100, 255, 90);
-      pic_move1(valuePic1 + 11, 0, 0, 100, 100, 255, 90);
-      tachie_bless(valuePic1 + 2, 1);
-      valuePicWait2 = 60;
-    };
-    if (idStep === 2) { 
-      pic_move1(valuePic1 + 12, 0, -200, 100, 100, 255, 180); 
-      valuePicWait2 = 120; 
-    };
-    if (idStep === 3) { 
-      pic_move1(valuePic1 + 2, 0, 50, 100, 100, 255, 180); 
-      valuePicWait2 = 60; 
-    };
-    if (idStep === 4) { 
-      $gameScreen.startAnimation(520, 680, 179, false) 
-    };
-    if (idStep === 5) { 
-      const pictureIdToAddCell = valuePic1 + 12;
-      if ($gameScreen.picture(pictureIdToAddCell)) { 
-        $gameScreen.picture(pictureIdToAddCell).addCellCount() 
+  if (idScene === 11) { //Ｈな診察
+    switch (idStep) {
+      case 1: {
+        backGraund_menuMapSelect(2, 0, 0, 0);
+        valuePic1 = 51;
+        valueScenePic = 'XevS011_';
+        $gameScreen.showPicture(valuePic1, valueScenePic + '00', 1, 640 - 128, 384, 100, 100, 0, 0);
+        $gameScreen.showPicture(valuePic1 + 1, 'ScreenDarkCloudsH', 1, 640 - 256, 384, 100, 100, 0, 0);
+        $gameScreen.setPicturesAnimation(6, 30, "連番", 60);
+        $gameScreen.showPicture(valuePic1 + 2, valueScenePic + '02_00', 1, 640 - 128, 384 - 50, 100, 100, 0, 0);
+        $gameScreen.showPicture(valuePic1 + 11, valueScenePic + '11', 1, 640 - 128, 384, 100, 100, 0, 0);
+        $gameScreen.setPicturesAnimation(5, 30, "連番", 60);
+        $gameScreen.showPicture(valuePic1 + 12, valueScenePic + '12_00', 1, 640 - 128, 384 + 200, 100, 100, 0, 0);
+        $gameScreen.setPicturesAnimation(2, 15, "連番", 30);
+        $gameScreen.showPicture(valuePic1 + 13, valueScenePic + '13_00', 1, 640 - 128, 384 - (1732 / 2) + (768 / 2) + 100, 100, 100, 0, 0);
+        $gameScreen.setPicturesAnimation(2, 30, "連番", 60);
+        $gameScreen.showPicture(valuePic1 + 15, valueScenePic + '14_00', 1, 640 - 128, 384 + 50, 100, 100, 0, 0);
+        pic_move1(valuePic1, 0, 0, 100, 100, 255, 90);
+        pic_move1(valuePic1 + 11, 0, 0, 100, 100, 255, 90);
+        tachie_bless(valuePic1 + 2, 1);
+        valuePicWait2 = 60;
+        break;
       }
-    };
-    if (idStep === 6) {
-      const pictureIdForCellIncrease = valuePic1 + 2;
-      if ($gameScreen.picture(pictureIdForCellIncrease)) { 
-        $gameScreen.picture(pictureIdForCellIncrease).addCellCount() 
-      };
-      pic_move1(valuePic1 + 11, 0, 0, 100, 100, 0, 60);
-      pic_move1(valuePic1 + 12, 0, 0, 100, 100, 0, 60);
-      pic_move1(valuePic1 + 1, 0, 0, 100, 100, 200, 120);
-      const fadeAnimationName = 'Hscene005';
-      picture_fade1(valuePic1 + 1, "fadeIn", fadeAnimationName, 120, 5);
-    };
-    if (idStep === 7) {
-      pic_move1(valuePic1 + 13, 0, 0, 100, 100, 255, 120);
-      pic_move1(valuePic1 + 15, 0, -50, 100, 100, 255, 120);
-      valuePicWait2 = 120;
-    };
-    if (idStep === 8) {
-      pic_setArray1 = [1, valuePic1 + 13, 0, 384 + (1732 / 2) - (768 / 2) + 100, 5, 1200];
-      pic_setArray2 = [1, 0, 0, 0, 0, 0];
-      valueParallelPicSe1 = [0, 0, 0];
-      valueParallelPicSe2 = [0, 0, 0];
-      hcg_piston(valuePic1 + 13, 8, 1, 2);
-      $gameSwitches.setValue(429, true);
-      const extraPictureId = valuePic1 + 15;
-      if ($gameScreen.picture(extraPictureId)) { 
-        $gameScreen.picture(extraPictureId).addCellCount() 
-      };
-      valuePicWait2 = 60;
-    };
-    if (idStep === 9) {
-      $gameSwitches.setValue(429, false);
-      valueParallelPicSe1 = [0, 0, 0];
-      valueParallelPicSe2 = [0, 0, 0];
-      pic_setArray(0, 0, 0, 0, 0, 0);
-      picture_motion1("smooth", [0]);
-    };
-    if (idStep === 10) {
-      pic_move1(valuePic1, 0, 0, 200, 200, 255, 60);
-      pic_move1(valuePic1 + 1, 0, 0, 100, 100, 0, 60);
-      pic_move1(valuePic1 + 13, 0, 0, 100, 100, 0, 60);
-      pic_move1(valuePic1 + 15, 0, 0, 100, 100, 0, 60);
-      valuePicWait2 = 60;
-    };
-    if (idStep === 11) {
-      pic_move1(valuePic1, 0, 0, 100, 100, 255, 60);
-      const altPictureIdForCellIncrease = valuePic1 + 2;
-      if ($gameScreen.picture(altPictureIdForCellIncrease)) { 
-        $gameScreen.picture(altPictureIdForCellIncrease).addCellCount() 
-      };
-      pic_move1(valuePic1 + 11, 0, 0, 100, 100, 255, 60);
-      pic_move1(valuePic1 + 12, 0, 0, 100, 100, 255, 60);
-    };
-    if (idStep === 12) { 
-      pic_move1(valuePic1 + 12, 0, +200, 100, 100, 255, 180); 
-      valuePicWait2 = 120; 
-    };
-    if (idStep === 90) {//2と3の間に仕様
-      pic_move1(valuePic1, 0, 0, 25, 25, 150, 60);
-      pic_move1(valuePic1 + 11, 0, 0, 25, 25, 150, 60);
-      pic_move1(valuePic1 + 11, 0, 0, 25, 25, 150, 60);
-      valuePicWait2 = 60;
-    };
-    if (idStep === 91) {//2と3の間に仕様
-      pic_move1(valuePic1, 0, 0, 100, 100, 255, 60);
-      pic_move1(valuePic1 + 11, 0, 0, 100, 100, 255, 60);
-      pic_move1(valuePic1 + 11, 0, 0, 100, 100, 255, 60);
-    };
+      case 2: {
+        pic_move1(valuePic1 + 12, 0, -200, 100, 100, 255, 180);
+        valuePicWait2 = 120;
+        break;
+      }
+      case 3: {
+        pic_move1(valuePic1 + 2, 0, 50, 100, 100, 255, 180);
+        valuePicWait2 = 60;
+        break;
+      }
+      case 4: {
+        $gameScreen.startAnimation(520, 680, 179, false);
+        break;
+      }
+      case 5: {
+        const pictureIdToAddCell = valuePic1 + 12;
+        if ($gameScreen.picture(pictureIdToAddCell)) {
+          $gameScreen.picture(pictureIdToAddCell).addCellCount();
+        }
+        break;
+      }
+      case 6: {
+        const pictureIdForCellIncrease = valuePic1 + 2;
+        if ($gameScreen.picture(pictureIdForCellIncrease)) {
+          $gameScreen.picture(pictureIdForCellIncrease).addCellCount();
+        }
+        pic_move1(valuePic1 + 11, 0, 0, 100, 100, 0, 60);
+        pic_move1(valuePic1 + 12, 0, 0, 100, 100, 0, 60);
+        pic_move1(valuePic1 + 1, 0, 0, 100, 100, 200, 120);
+        const fadeAnimationName = 'Hscene005';
+        picture_fade1(valuePic1 + 1, "fadeIn", fadeAnimationName, 120, 5);
+        break;
+      }
+      case 7: {
+        pic_move1(valuePic1 + 13, 0, 0, 100, 100, 255, 120);
+        pic_move1(valuePic1 + 15, 0, -50, 100, 100, 255, 120);
+        valuePicWait2 = 120;
+        break;
+      }
+      case 8: {
+        pic_setArray1 = [1, valuePic1 + 13, 0, 384 + (1732 / 2) - (768 / 2) + 100, 5, 1200];
+        pic_setArray2 = [1, 0, 0, 0, 0, 0];
+        valueParallelPicSe1 = [0, 0, 0];
+        valueParallelPicSe2 = [0, 0, 0];
+        hcg_piston(valuePic1 + 13, 8, 1, 2);
+        $gameSwitches.setValue(429, true);
+        const extraPictureId = valuePic1 + 15;
+        if ($gameScreen.picture(extraPictureId)) {
+          $gameScreen.picture(extraPictureId).addCellCount();
+        }
+        valuePicWait2 = 60;
+        break;
+      }
+      case 9: {
+        $gameSwitches.setValue(429, false);
+        valueParallelPicSe1 = [0, 0, 0];
+        valueParallelPicSe2 = [0, 0, 0];
+        pic_setArray(0, 0, 0, 0, 0, 0);
+        picture_motion1("smooth", [0]);
+        break;
+      }
+      case 10: {
+        pic_move1(valuePic1, 0, 0, 200, 200, 255, 60);
+        pic_move1(valuePic1 + 1, 0, 0, 100, 100, 0, 60);
+        pic_move1(valuePic1 + 13, 0, 0, 100, 100, 0, 60);
+        pic_move1(valuePic1 + 15, 0, 0, 100, 100, 0, 60);
+        valuePicWait2 = 60;
+        break;
+      }
+      case 11: {
+        pic_move1(valuePic1, 0, 0, 100, 100, 255, 60);
+        const altPictureIdForCellIncrease = valuePic1 + 2;
+        if ($gameScreen.picture(altPictureIdForCellIncrease)) {
+          $gameScreen.picture(altPictureIdForCellIncrease).addCellCount();
+        }
+        pic_move1(valuePic1 + 11, 0, 0, 100, 100, 255, 60);
+        pic_move1(valuePic1 + 12, 0, 0, 100, 100, 255, 60);
+        break;
+      }
+      case 12: {
+        pic_move1(valuePic1 + 12, 0, +200, 100, 100, 255, 180);
+        valuePicWait2 = 120;
+        break;
+      }
+      case 90: {//2と3の間に仕様
+        pic_move1(valuePic1, 0, 0, 25, 25, 150, 60);
+        pic_move1(valuePic1 + 11, 0, 0, 25, 25, 150, 60);
+        pic_move1(valuePic1 + 11, 0, 0, 25, 25, 150, 60);
+        valuePicWait2 = 60;
+        break;
+      }
+      case 91: {//2と3の間に仕様
+        pic_move1(valuePic1, 0, 0, 100, 100, 255, 60);
+        pic_move1(valuePic1 + 11, 0, 0, 100, 100, 255, 60);
+        pic_move1(valuePic1 + 11, 0, 0, 100, 100, 255, 60);
+        break;
+      }
+      default:
+        break;
+    }
   };
   if (idScene === 1) {
     if (idStep === 1) {
