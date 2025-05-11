@@ -2262,15 +2262,15 @@ original_souwa = function (id100, id101) {
 };
 
 //作品オリジナルのピクチャシーンやキャラグラ移動等処理。401-600以外は直接コモンid入力
-original_scene = function (id100, id101) { //original_scene(0,1);//テストの際は変数535にid入力
+original_scene = function (idScene, idStep) { //original_scene(0,1);//テストの際は変数535にid入力
 
-  if (id100 == 0 && $gameVariables.value(535) >= 1) {
+  if (idScene === 0 && $gameVariables.value(535) >= 1) {
     if ($gameVariables.value(535) >= 501 && $gameVariables.value(535) <= 600) {
-      id100 = $gameVariables.value(535) - 500;
+      idScene = $gameVariables.value(535) - 500;
     };
   };
-  if (id100 == 11) {//Ｈな診察
-    if (id101 == 1) {
+  if (idScene === 11) {//Ｈな診察
+    if (idStep === 1) {
       backGraund_menuMapSelect(2, 0, 0, 0);
       valuePic1 = 51;
       valueScenePic = 'XevS011_';
@@ -2290,181 +2290,208 @@ original_scene = function (id100, id101) { //original_scene(0,1);//テストの�
       tachie_bless(valuePic1 + 2, 1);
       valuePicWait2 = 60;
     };
-    if (id101 == 2) { pic_move1(valuePic1 + 12, 0, -200, 100, 100, 255, 180); valuePicWait2 = 120; };
-    if (id101 == 3) { pic_move1(valuePic1 + 2, 0, 50, 100, 100, 255, 180); valuePicWait2 = 60; };
-    if (id101 == 4) { $gameScreen.startAnimation(520, 680, 179, false) };
-    if (id101 == 5) { 
-      const value1 = valuePic1 + 12;
-      if ($gameScreen.picture(value1)) { $gameScreen.picture(value1).addCellCount() }
+    if (idStep === 2) { 
+      pic_move1(valuePic1 + 12, 0, -200, 100, 100, 255, 180); 
+      valuePicWait2 = 120; 
     };
-    if (id101 == 6) {
-      const value1 = valuePic1 + 2;
-      if ($gameScreen.picture(value1)) { $gameScreen.picture(value1).addCellCount() };
+    if (idStep === 3) { 
+      pic_move1(valuePic1 + 2, 0, 50, 100, 100, 255, 180); 
+      valuePicWait2 = 60; 
+    };
+    if (idStep === 4) { 
+      $gameScreen.startAnimation(520, 680, 179, false) 
+    };
+    if (idStep === 5) { 
+      const pictureIdToAddCell = valuePic1 + 12;
+      if ($gameScreen.picture(pictureIdToAddCell)) { 
+        $gameScreen.picture(pictureIdToAddCell).addCellCount() 
+      }
+    };
+    if (idStep === 6) {
+      const pictureIdForCellIncrease = valuePic1 + 2;
+      if ($gameScreen.picture(pictureIdForCellIncrease)) { 
+        $gameScreen.picture(pictureIdForCellIncrease).addCellCount() 
+      };
       pic_move1(valuePic1 + 11, 0, 0, 100, 100, 0, 60);
       pic_move1(valuePic1 + 12, 0, 0, 100, 100, 0, 60);
       pic_move1(valuePic1 + 1, 0, 0, 100, 100, 200, 120);
-      const value3 = 'Hscene005';
-      picture_fade1(valuePic1 + 1, "fadeIn", value3, 120, 5);
+      const fadeAnimationName = 'Hscene005';
+      picture_fade1(valuePic1 + 1, "fadeIn", fadeAnimationName, 120, 5);
     };
-    if (id101 == 7) {
+    if (idStep === 7) {
       pic_move1(valuePic1 + 13, 0, 0, 100, 100, 255, 120);
       pic_move1(valuePic1 + 15, 0, -50, 100, 100, 255, 120);
       valuePicWait2 = 120;
     };
-    if (id101 == 8) {
+    if (idStep === 8) {
       pic_setArray1 = [1, valuePic1 + 13, 0, 384 + (1732 / 2) - (768 / 2) + 100, 5, 1200];
       pic_setArray2 = [1, 0, 0, 0, 0, 0];
       valueParallelPicSe1 = [0, 0, 0];
       valueParallelPicSe2 = [0, 0, 0];
       hcg_piston(valuePic1 + 13, 8, 1, 2);
       $gameSwitches.setValue(429, true);
-      const value1 = valuePic1 + 15;
-      if ($gameScreen.picture(value1)) { $gameScreen.picture(value1).addCellCount() };
+      const extraPictureId = valuePic1 + 15;
+      if ($gameScreen.picture(extraPictureId)) { 
+        $gameScreen.picture(extraPictureId).addCellCount() 
+      };
       valuePicWait2 = 60;
     };
-    if (id101 == 9) {
+    if (idStep === 9) {
       $gameSwitches.setValue(429, false);
       valueParallelPicSe1 = [0, 0, 0];
       valueParallelPicSe2 = [0, 0, 0];
       pic_setArray(0, 0, 0, 0, 0, 0);
       picture_motion1("smooth", [0]);
     };
-    if (id101 == 10) {
+    if (idStep === 10) {
       pic_move1(valuePic1, 0, 0, 200, 200, 255, 60);
       pic_move1(valuePic1 + 1, 0, 0, 100, 100, 0, 60);
       pic_move1(valuePic1 + 13, 0, 0, 100, 100, 0, 60);
       pic_move1(valuePic1 + 15, 0, 0, 100, 100, 0, 60);
       valuePicWait2 = 60;
     };
-    if (id101 == 11) {
+    if (idStep === 11) {
       pic_move1(valuePic1, 0, 0, 100, 100, 255, 60);
-      const value1 = valuePic1 + 2;
-      if ($gameScreen.picture(value1)) { $gameScreen.picture(value1).addCellCount() };
+      const altPictureIdForCellIncrease = valuePic1 + 2;
+      if ($gameScreen.picture(altPictureIdForCellIncrease)) { 
+        $gameScreen.picture(altPictureIdForCellIncrease).addCellCount() 
+      };
       pic_move1(valuePic1 + 11, 0, 0, 100, 100, 255, 60);
       pic_move1(valuePic1 + 12, 0, 0, 100, 100, 255, 60);
     };
-    if (id101 == 12) { pic_move1(valuePic1 + 12, 0, +200, 100, 100, 255, 180); valuePicWait2 = 120; };
-    if (id101 == 90) {//2と3の間に仕様
+    if (idStep === 12) { 
+      pic_move1(valuePic1 + 12, 0, +200, 100, 100, 255, 180); 
+      valuePicWait2 = 120; 
+    };
+    if (idStep === 90) {//2と3の間に仕様
       pic_move1(valuePic1, 0, 0, 25, 25, 150, 60);
       pic_move1(valuePic1 + 11, 0, 0, 25, 25, 150, 60);
       pic_move1(valuePic1 + 11, 0, 0, 25, 25, 150, 60);
       valuePicWait2 = 60;
     };
-    if (id101 == 91) {//2と3の間に仕様
+    if (idStep === 91) {//2と3の間に仕様
       pic_move1(valuePic1, 0, 0, 100, 100, 255, 60);
       pic_move1(valuePic1 + 11, 0, 0, 100, 100, 255, 60);
       pic_move1(valuePic1 + 11, 0, 0, 100, 100, 255, 60);
     };
   };
-  if (id100 == 1) {
-    if (id101 == 1) {
+  if (idScene === 1) {
+    if (idStep === 1) {
 
     };
-    if (id101 == 2) {
-
-    };
-  };
-  if (id100 == 1) {
-    if (id101 == 1) {
-
-    };
-    if (id101 == 2) {
+    if (idStep === 2) {
 
     };
   };
-  if (id100 == 100) {//モニカマッサージ,id1とid2。
+  if (idScene === 1) {
+    if (idStep === 1) {
+
+    };
+    if (idStep === 2) {
+
+    };
+  };
+  if (idScene === 100) {//モニカマッサージ,id1とid2。
     valuePic1 = 51;
-    if (id101 == 1) {
+    if (idStep === 1) {
       AudioManager.playBgs({ "name": "21_HandyMassager1", "volume": 50, "pitch": 100, "pan": 0 });
-      let value2 = 'XevS101_00back';
-      pic_1(0, valuePic1, value2, 0, 100, 255, 60, 1280, 768, -256, 0);
-      value2 = 'XevS101_00back2';
-      pic_1(0, valuePic1 + 1, value2, 0, 100, 255, 60, 1280, 768, -256, 0);
-      value2 = 'XevS101_01';
-      pic_1(0, valuePic1 + 2, value2, 0, 100, 255, 60, 1280, 768, -256, 0);
-      value2 = 'XevS101_01face1';
-      pic_1(0, valuePic1 + 6, value2, 0, 100, 255, 60, 1280, 768, -256, 0);
-      value2 = 'XevS101_01_100';
-      picture_anime1(valuePic1 + 7, value2, 5, 1, "連番", 15, 3, true, [2, 3, 4, 5]);
+      let bgImage = 'XevS101_00back';
+      pic_1(0, valuePic1, bgImage, 0, 100, 255, 60, 1280, 768, -256, 0);
+      bgImage = 'XevS101_00back2';
+      pic_1(0, valuePic1 + 1, bgImage, 0, 100, 255, 60, 1280, 768, -256, 0);
+      bgImage = 'XevS101_01';
+      pic_1(0, valuePic1 + 2, bgImage, 0, 100, 255, 60, 1280, 768, -256, 0);
+      bgImage = 'XevS101_01face1';
+      pic_1(0, valuePic1 + 6, bgImage, 0, 100, 255, 60, 1280, 768, -256, 0);
+      bgImage = 'XevS101_01_100';
+      picture_anime1(valuePic1 + 7, bgImage, 5, 1, "連番", 15, 3, true, [2, 3, 4, 5]);
       $gameScreen.picture(valuePic1 + 7)._x = 640 - 128;
       $gameScreen.movePicture(valuePic1 + 7, 1, 640 - 128, 384, 100, 100, 200, 0, 60);
-      picture_anime1(valuePic1 + 8, value2, 5, 1, "連番", 20, 3, true, [4, 5, 2, 3]);
+      picture_anime1(valuePic1 + 8, bgImage, 5, 1, "連番", 20, 3, true, [4, 5, 2, 3]);
       $gameScreen.picture(valuePic1 + 8)._x = 640 - 128;
       $gameScreen.movePicture(valuePic1 + 8, 1, 640 - 128, 384, 100, 100, 100, 0, 60);
-      for (let i = valuePic1 + 1; i <= valuePic1 + 8; i++) { hcg_piston(i, 5, 1, 2) };
+      for (let pictureIndex = valuePic1 + 1; pictureIndex <= valuePic1 + 8; pictureIndex++) { 
+        hcg_piston(pictureIndex, 5, 1, 2) 
+      };
     };
-    if (id101 == 2) {//ピストンしている時に表情変化させる場合、身体も更新する。振動が同期しないため
+    if (idStep === 2) {//ピストンしている時に表情変化させる場合、身体も更新する。振動が同期しないため
       AudioManager.playBgs({ "name": "21_HandyMassager1", "volume": 60, "pitch": 120, "pan": 0 });
-      let value2 = 'XevS101_01';
-      pic_1(2, valuePic1 + 2, value2, 0, 100, 255, 1, 1280, 768, -256, 0);
-      value2 = 'XevS101_01face2';
-      pic_1(2, valuePic1 + 6, value2, 0, 100, 255, 1, 1280, 768, -256, 0);
-      value2 = 'XevS101_02_100';
-      picture_anime1(valuePic1 + 7, value2, 5, 1, "連番", 5, 3, true, [0, 2, 3, 4, 5]);
+      let bgAniImage = 'XevS101_01';
+      pic_1(2, valuePic1 + 2, bgAniImage, 0, 100, 255, 1, 1280, 768, -256, 0);
+      bgAniImage = 'XevS101_01face2';
+      pic_1(2, valuePic1 + 6, bgAniImage, 0, 100, 255, 1, 1280, 768, -256, 0);
+      bgAniImage = 'XevS101_02_100';
+      picture_anime1(valuePic1 + 7, bgAniImage, 5, 1, "連番", 5, 3, true, [0, 2, 3, 4, 5]);
       $gameScreen.picture(valuePic1 + 7)._x = 640 - 128;
       $gameScreen.movePicture(valuePic1 + 7, 1, 640 - 128, 384, 100, 100, 200, 0, 60);
-      picture_anime1(valuePic1 + 8, value2, 5, 1, "連番", 10, 3, true, [0, 4, 5, 2, 3]);
+      picture_anime1(valuePic1 + 8, bgAniImage, 5, 1, "連番", 10, 3, true, [0, 4, 5, 2, 3]);
       $gameScreen.picture(valuePic1 + 8)._x = 640 - 128;
       $gameScreen.movePicture(valuePic1 + 8, 1, 640 - 128, 384, 100, 100, 100, 0, 60);
-      for (let i = valuePic1 + 1; i <= valuePic1 + 8; i++) { hcg_piston(i, 5, 3, 2) };
+      for (let pictureIndex = valuePic1 + 1; pictureIndex <= valuePic1 + 8; pictureIndex++) { 
+        hcg_piston(pictureIndex, 5, 3, 2) 
+      };
     };
-    if (id101 == 3) {
+    if (idStep === 3) {
       pic_eraseP(2, [valuePic1 + 2]);
-      let value2 = 'XevS101_02';
-      pic_1(2, valuePic1 + 3, value2, 0, 100, 255, 1, 1280, 768, -256, 0);
-      value2 = 'XevS101_01face3';
-      pic_1(2, valuePic1 + 6, value2, 0, 100, 255, 1, 1280, 768, -256, 0);
-      value2 = 'XevS101_03_100';
-      picture_anime1(valuePic1 + 9, value2, 4, 1, "連番", 5, 3, true, [3, 1, 5, 1]);
+      let bgAniImage = 'XevS101_02';
+      pic_1(2, valuePic1 + 3, bgAniImage, 0, 100, 255, 1, 1280, 768, -256, 0);
+      bgAniImage = 'XevS101_01face3';
+      pic_1(2, valuePic1 + 6, bgAniImage, 0, 100, 255, 1, 1280, 768, -256, 0);
+      bgAniImage = 'XevS101_03_100';
+      picture_anime1(valuePic1 + 9, bgAniImage, 4, 1, "連番", 5, 3, true, [3, 1, 5, 1]);
       $gameScreen.picture(valuePic1 + 9)._x = 640 - 128;
       $gameScreen.movePicture(valuePic1 + 9, 1, 640 - 128, 384, 100, 100, 255, 0, 10);
-      picture_anime1(valuePic1 + 10, value2, 4, 1, "連番", 5, 3, true, [1, 2, 1, 4]);
+      picture_anime1(valuePic1 + 10, bgAniImage, 4, 1, "連番", 5, 3, true, [1, 2, 1, 4]);
       $gameScreen.picture(valuePic1 + 10)._x = 640 - 128;
       $gameScreen.movePicture(valuePic1 + 10, 1, 640 - 128, 384, 100, 100, 255, 0, 10);
-      for (let i = valuePic1 + 1; i <= valuePic1 + 8; i++) { hcg_piston(i, 5, 3, 2) };
-      for (let i = valuePic1 + 9; i <= valuePic1 + 10; i++) { hcg_piston(i, 5, 3, 1) };
+      for (let pictureIndex = valuePic1 + 1; pictureIndex <= valuePic1 + 8; pictureIndex++) { 
+        hcg_piston(pictureIndex, 5, 3, 2) 
+      };
+      for (let pictureIndex = valuePic1 + 9; pictureIndex <= valuePic1 + 10; pictureIndex++) { 
+        hcg_piston(pictureIndex, 5, 3, 1) 
+      };
     };
-    if (id101 == 4) {//id3が+50,-250,-500,+50,id4が200,300
-      for (let i = valuePic1; i <= valuePic1 + 10; i++) {
-        if ($gameScreen.picture(i)) {
-          const value3 = $gameScreen.picture(i).opacity();
-          $gameScreen.movePicture(i, 1, 640, 384 + id3, id4, id4, value3, 0, 120);
+    if (idStep === 4) {//id3が+50,-250,-500,+50,id4が200,300
+      for (let pictureIndex = valuePic1; pictureIndex <= valuePic1 + 10; pictureIndex++) {
+        if ($gameScreen.picture(pictureIndex)) {
+          const currentOpacity = $gameScreen.picture(pictureIndex).opacity();
+          $gameScreen.movePicture(pictureIndex, 1, 640, 384 + id3, id4, id4, currentOpacity, 0, 120);
         };
       };
     };
-    if (id101 == 5) {
-      let value2 = 'XevS101_04back';
-      pic_1(0, valuePic1, value2, 0, 100, 255, 120, 1280, 768, 0, 0);
-      value2 = 'XevS101_04';
-      pic_1(0, valuePic1 + 1, value2, 0, 100, 255, 120, 1280, 768, 0, 0);
+    if (idStep === 5) {
+      let bgAniImage = 'XevS101_04back';
+      pic_1(0, valuePic1, bgAniImage, 0, 100, 255, 120, 1280, 768, 0, 0);
+      bgAniImage = 'XevS101_04';
+      pic_1(0, valuePic1 + 1, bgAniImage, 0, 100, 255, 120, 1280, 768, 0, 0);
       hcg_piston(valuePic1 + 1, 5, 1, 2);
     };
-    if (id101 == 6) {
-      const arr1 = [];
-      for (let i = valuePic1; i <= valuePic1 + 11; i++) {
-        arr1.push(i);
+    if (idStep === 6) {
+      const pictureIdsToErase = [];
+      for (let picEraseIndex = valuePic1; picEraseIndex <= valuePic1 + 11; picEraseIndex++) {
+        pictureIdsToErase.push(picEraseIndex);
       };
-      pic_eraseP(0, arr1);
+      pic_eraseP(0, pictureIdsToErase);
     };
-    if (id101 == 7) {
+    if (idStep === 7) {
       AudioManager.fadeOutBgs(10);
-      for (let i = valuePic1; i <= valuePic1 + 10; i++) {
-        if ($gameScreen.picture(i)) {
-          pic_move1(i, 0, 0, 300, 300, 0, 120);
+      for (let pictureIndex = valuePic1; pictureIndex <= valuePic1 + 10; pictureIndex++) {
+        if ($gameScreen.picture(pictureIndex)) {
+          pic_move1(pictureIndex, 0, 0, 300, 300, 0, 120);
         };
       };
     };
-    if (id101 == 8) {
+    if (idStep === 8) {
       AudioManager.playBgs({ "name": "21_HandyMassager1", "volume": 60, "pitch": 120, "pan": 0 });
-      for (let i = valuePic1; i <= valuePic1 + 10; i++) {
-        if ($gameScreen.picture(i)) {
-          pic_move1(i, 0, 0, 300, 300, 255, 60);
+      for (let pictureIndex = valuePic1; pictureIndex <= valuePic1 + 10; pictureIndex++) {
+        if ($gameScreen.picture(pictureIndex)) {
+          pic_move1(pictureIndex, 0, 0, 300, 300, 255, 60);
         };
       };
     };
-    if (id101 == 9) {
-      let value2 = 'XevS101_05';
-      pic_1(0, valuePic1 + 2, value2, 2, 100, 255, 60, 1280, 768, 0, 0);
+    if (idStep === 9) {
+      let aniImage = 'XevS101_05';
+      pic_1(0, valuePic1 + 2, aniImage, 2, 100, 255, 60, 1280, 768, 0, 0);
       hcg_piston(valuePic1 + 2, 5, 1, 2);
     };
   };
