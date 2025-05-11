@@ -2419,6 +2419,7 @@ original_scene = function (idScene, idStep) { //original_scene(0,1);//テスト�
         break;
       }
       case 2: {
+        //ピストンしている時に表情変化させる場合、身体も更新する。振動が同期しないため
         AudioManager.playBgs({ "name": "21_HandyMassager1", "volume": 60, "pitch": 120, "pan": 0 });
         let bgAniImage = 'XevS101_01';
         pic_1(2, valuePic1 + 2, bgAniImage, 0, 100, 255, 1, 1280, 768, -256, 0);
@@ -2458,6 +2459,7 @@ original_scene = function (idScene, idStep) { //original_scene(0,1);//テスト�
         break;
       }
       case 4: {
+        //id3が+50,-250,-500,+50,id4が200,300
         for (let pictureIndex = valuePic1; pictureIndex <= valuePic1 + 10; pictureIndex++) {
           if ($gameScreen.picture(pictureIndex)) {
             const currentOpacity = $gameScreen.picture(pictureIndex).opacity();
