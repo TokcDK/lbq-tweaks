@@ -2346,7 +2346,7 @@ original_scene = function (idScene, idStep) { //original_scene(0,1);//テスト�
         break;
       }
       case 4: {
-        idScene100handleOriginalSceneCase4OriginalScene(valuePic1, id3, id4);// id3,id4 undefined here
+        idScene100handleOriginalSceneCase4OriginalScene(valuePic1, 50, 200);
         break;
       }
       case 5: {
@@ -2583,7 +2583,7 @@ function idScene100handleOriginalSceneCase3OriginalScene(valuePic1) {
   }
 }
 
-function idScene100handleOriginalSceneCase4OriginalScene(valuePic1, id3, id4) {
+function idScene100handleOriginalSceneCase4OriginalScene(valuePic1, id3, id4) {// id3,id4 undefined here because did not set in parent function
   // Case 4: Move all pictures with dynamic parameters (id3 and id4)
   for (let pictureIndex = valuePic1; pictureIndex <= valuePic1 + 10; pictureIndex++) {
     if ($gameScreen.picture(pictureIndex)) {
