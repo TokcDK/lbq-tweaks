@@ -306,7 +306,7 @@ function processCostumeChangeAnimationAtype0TachieDousa(actorParameter, showCost
       console.debug("tachie_dousa: New picture path: " + "/img/tachies/" + actorParameter);
       $gameScreen.showPicture(
         targetPicId,
-        "/img/tachies/" + actorParameter, // warn: was crash because of missing image path setup here!
+        "/img/tachies/" + actorParameter, // asdf, warn: was crash because of missing image path setup here!
         originalOrigin,
         originalX,
         originalY,
