@@ -2269,121 +2269,59 @@ original_scene = function (idScene, idStep) { //original_scene(0,1);//テスト�
   if (idScene === 11) { //Ｈな診察
     switch (idStep) {
       case 1: {
-        backGraund_menuMapSelect(2, 0, 0, 0);
-        valuePic1 = 51;
-        valueScenePic = 'XevS011_';
-        $gameScreen.showPicture(valuePic1, valueScenePic + '00', 1, 640 - 128, 384, 100, 100, 0, 0);
-        $gameScreen.showPicture(valuePic1 + 1, 'ScreenDarkCloudsH', 1, 640 - 256, 384, 100, 100, 0, 0);
-        $gameScreen.setPicturesAnimation(6, 30, "連番", 60);
-        $gameScreen.showPicture(valuePic1 + 2, valueScenePic + '02_00', 1, 640 - 128, 384 - 50, 100, 100, 0, 0);
-        $gameScreen.showPicture(valuePic1 + 11, valueScenePic + '11', 1, 640 - 128, 384, 100, 100, 0, 0);
-        $gameScreen.setPicturesAnimation(5, 30, "連番", 60);
-        $gameScreen.showPicture(valuePic1 + 12, valueScenePic + '12_00', 1, 640 - 128, 384 + 200, 100, 100, 0, 0);
-        $gameScreen.setPicturesAnimation(2, 15, "連番", 30);
-        $gameScreen.showPicture(valuePic1 + 13, valueScenePic + '13_00', 1, 640 - 128, 384 - (1732 / 2) + (768 / 2) + 100, 100, 100, 0, 0);
-        $gameScreen.setPicturesAnimation(2, 30, "連番", 60);
-        $gameScreen.showPicture(valuePic1 + 15, valueScenePic + '14_00', 1, 640 - 128, 384 + 50, 100, 100, 0, 0);
-        pic_move1(valuePic1, 0, 0, 100, 100, 255, 90);
-        pic_move1(valuePic1 + 11, 0, 0, 100, 100, 255, 90);
-        tachie_bless(valuePic1 + 2, 1);
-        valuePicWait2 = 60;
+        valuePicWait2 = idScene11handleCase1OriginalScene();
         break;
       }
       case 2: {
-        pic_move1(valuePic1 + 12, 0, -200, 100, 100, 255, 180);
-        valuePicWait2 = 120;
+        valuePicWait2 = idScene11handleCase2OriginalScene(valuePic1); // Assuming valuePic1 remains 51 from case 1
         break;
       }
       case 3: {
-        pic_move1(valuePic1 + 2, 0, 50, 100, 100, 255, 180);
-        valuePicWait2 = 60;
+        valuePicWait2 = idScene11handleCase3OriginalScene(valuePic1);
         break;
       }
       case 4: {
-        $gameScreen.startAnimation(520, 680, 179, false);
+        idScene11handleCase4OriginalScene();
         break;
       }
       case 5: {
-        const pictureIdToAddCell = valuePic1 + 12;
-        if ($gameScreen.picture(pictureIdToAddCell)) {
-          $gameScreen.picture(pictureIdToAddCell).addCellCount();
-        }
+        idScene11handleCase5OriginalScene(valuePic1);
         break;
       }
       case 6: {
-        const pictureIdForCellIncrease = valuePic1 + 2;
-        if ($gameScreen.picture(pictureIdForCellIncrease)) {
-          $gameScreen.picture(pictureIdForCellIncrease).addCellCount();
-        }
-        pic_move1(valuePic1 + 11, 0, 0, 100, 100, 0, 60);
-        pic_move1(valuePic1 + 12, 0, 0, 100, 100, 0, 60);
-        pic_move1(valuePic1 + 1, 0, 0, 100, 100, 200, 120);
-        const fadeAnimationName = 'Hscene005';
-        picture_fade1(valuePic1 + 1, "fadeIn", fadeAnimationName, 120, 5);
+        idScene11handleCase6OriginalScene(valuePic1);
         break;
       }
       case 7: {
-        pic_move1(valuePic1 + 13, 0, 0, 100, 100, 255, 120);
-        pic_move1(valuePic1 + 15, 0, -50, 100, 100, 255, 120);
-        valuePicWait2 = 120;
+        valuePicWait2 = idScene11handleCase7OriginalScene(valuePic1);
         break;
       }
       case 8: {
-        pic_setArray1 = [1, valuePic1 + 13, 0, 384 + (1732 / 2) - (768 / 2) + 100, 5, 1200];
-        pic_setArray2 = [1, 0, 0, 0, 0, 0];
-        valueParallelPicSe1 = [0, 0, 0];
-        valueParallelPicSe2 = [0, 0, 0];
-        hcg_piston(valuePic1 + 13, 8, 1, 2);
-        $gameSwitches.setValue(429, true);
-        const extraPictureId = valuePic1 + 15;
-        if ($gameScreen.picture(extraPictureId)) {
-          $gameScreen.picture(extraPictureId).addCellCount();
-        }
-        valuePicWait2 = 60;
+        valuePicWait2 = idScene11handleCase8OriginalScene(valuePic1);
         break;
       }
       case 9: {
-        $gameSwitches.setValue(429, false);
-        valueParallelPicSe1 = [0, 0, 0];
-        valueParallelPicSe2 = [0, 0, 0];
-        pic_setArray(0, 0, 0, 0, 0, 0);
-        picture_motion1("smooth", [0]);
+        idScene11handleCase9OriginalScene();
         break;
       }
       case 10: {
-        pic_move1(valuePic1, 0, 0, 200, 200, 255, 60);
-        pic_move1(valuePic1 + 1, 0, 0, 100, 100, 0, 60);
-        pic_move1(valuePic1 + 13, 0, 0, 100, 100, 0, 60);
-        pic_move1(valuePic1 + 15, 0, 0, 100, 100, 0, 60);
-        valuePicWait2 = 60;
+        valuePicWait2 = idScene11handleCase10OriginalScene(valuePic1);
         break;
       }
       case 11: {
-        pic_move1(valuePic1, 0, 0, 100, 100, 255, 60);
-        const altPictureIdForCellIncrease = valuePic1 + 2;
-        if ($gameScreen.picture(altPictureIdForCellIncrease)) {
-          $gameScreen.picture(altPictureIdForCellIncrease).addCellCount();
-        }
-        pic_move1(valuePic1 + 11, 0, 0, 100, 100, 255, 60);
-        pic_move1(valuePic1 + 12, 0, 0, 100, 100, 255, 60);
+        idScene11handleCase11OriginalScene(valuePic1);
         break;
       }
       case 12: {
-        pic_move1(valuePic1 + 12, 0, +200, 100, 100, 255, 180);
-        valuePicWait2 = 120;
+        valuePicWait2 = idScene11handleCase12OriginalScene(valuePic1);
         break;
       }
-      case 90: { //2と3の間に仕様
-        pic_move1(valuePic1, 0, 0, 25, 25, 150, 60);
-        pic_move1(valuePic1 + 11, 0, 0, 25, 25, 150, 60);
-        pic_move1(valuePic1 + 11, 0, 0, 25, 25, 150, 60);
-        valuePicWait2 = 60;
+      case 90: {
+        valuePicWait2 = idScene11handleCase90OriginalScene(valuePic1);
         break;
       }
-      case 91: { //2と3の間に仕様
-        pic_move1(valuePic1, 0, 0, 100, 100, 255, 60);
-        pic_move1(valuePic1 + 11, 0, 0, 100, 100, 255, 60);
-        pic_move1(valuePic1 + 11, 0, 0, 100, 100, 255, 60);
+      case 91: {
+        idScene11handleCase91OriginalScene(valuePic1);
         break;
       }
       default:
@@ -2395,39 +2333,39 @@ original_scene = function (idScene, idStep) { //original_scene(0,1);//テスト�
 
     switch (idStep) {
       case 1: {
-        handleOriginalSceneCase1OriginalScene(valuePic1);
+        idScene100handleOriginalSceneCase1OriginalScene(valuePic1);
         break;
       }
       case 2: {
-        handleOriginalSceneCase2OriginalScene(valuePic1);
+        idScene100handleOriginalSceneCase2OriginalScene(valuePic1);
         break;
       }
       case 3: {
-        handleOriginalSceneCase3OriginalScene(valuePic1);
+        idScene100handleOriginalSceneCase3OriginalScene(valuePic1);
         break;
       }
       case 4: {
-        handleOriginalSceneCase4OriginalScene(valuePic1, id3, id4);// id3,id4 undefined here
+        idScene100handleOriginalSceneCase4OriginalScene(valuePic1, id3, id4);// id3,id4 undefined here
         break;
       }
       case 5: {
-        handleOriginalSceneCase5OriginalScene(valuePic1);
+        idScene100handleOriginalSceneCase5OriginalScene(valuePic1);
         break;
       }
       case 6: {
-        handleOriginalSceneCase6OriginalScene(valuePic1);
+        idScene100handleOriginalSceneCase6OriginalScene(valuePic1);
         break;
       }
       case 7: {
-        handleOriginalSceneCase7OriginalScene(valuePic1);
+        idScene100handleOriginalSceneCase7OriginalScene(valuePic1);
         break;
       }
       case 8: {
-        handleOriginalSceneCase8OriginalScene(valuePic1);
+        idScene100handleOriginalSceneCase8OriginalScene(valuePic1);
         break;
       }
       case 9: {
-        handleOriginalSceneCase9OriginalScene(valuePic1);
+        idScene100handleOriginalSceneCase9OriginalScene(valuePic1);
         break;
       }
       default:
@@ -2435,8 +2373,153 @@ original_scene = function (idScene, idStep) { //original_scene(0,1);//テスト�
     }
   };
 };
+function idScene11handleCase1OriginalScene() {
+  // Case 1:
+  // Setup background, dark clouds, animations and initial picture movements
+  backGraund_menuMapSelect(2, 0, 0, 0);
+  let valuePic1 = 51;
+  let valueScenePic = 'XevS011_';
+  $gameScreen.showPicture(valuePic1, valueScenePic + '00', 1, 640 - 128, 384, 100, 100, 0, 0);
+  $gameScreen.showPicture(valuePic1 + 1, 'ScreenDarkCloudsH', 1, 640 - 256, 384, 100, 100, 0, 0);
+  $gameScreen.setPicturesAnimation(6, 30, "連番", 60);
+  $gameScreen.showPicture(valuePic1 + 2, valueScenePic + '02_00', 1, 640 - 128, 384 - 50, 100, 100, 0, 0);
+  $gameScreen.showPicture(valuePic1 + 11, valueScenePic + '11', 1, 640 - 128, 384, 100, 100, 0, 0);
+  $gameScreen.setPicturesAnimation(5, 30, "連番", 60);
+  $gameScreen.showPicture(valuePic1 + 12, valueScenePic + '12_00', 1, 640 - 128, 384 + 200, 100, 100, 0, 0);
+  $gameScreen.setPicturesAnimation(2, 15, "連番", 30);
+  $gameScreen.showPicture(valuePic1 + 13, valueScenePic + '13_00', 1, 640 - 128, 384 - (1732 / 2) + (768 / 2) + 100, 100, 100, 0, 0);
+  $gameScreen.setPicturesAnimation(2, 30, "連番", 60);
+  $gameScreen.showPicture(valuePic1 + 15, valueScenePic + '14_00', 1, 640 - 128, 384 + 50, 100, 100, 0, 0);
+  pic_move1(valuePic1, 0, 0, 100, 100, 255, 90);
+  pic_move1(valuePic1 + 11, 0, 0, 100, 100, 255, 90);
+  tachie_bless(valuePic1 + 2, 1);
+  return 60; // valuePicWait2
+}
 
-function handleOriginalSceneCase1OriginalScene(valuePic1) {
+function idScene11handleCase2OriginalScene(valuePic1) {
+  // Case 2:
+  // Move picture (id = valuePic1+12) upward then wait
+  pic_move1(valuePic1 + 12, 0, -200, 100, 100, 255, 180);
+  return 120;
+}
+
+function idScene11handleCase3OriginalScene(valuePic1) {
+  // Case 3:
+  // Move picture (id = valuePic1+2) downward and set wait time
+  pic_move1(valuePic1 + 2, 0, 50, 100, 100, 255, 180);
+  return 60;
+}
+
+function idScene11handleCase4OriginalScene() {
+  // Case 4:
+  // Start an animation (e.g., explosion/flash effect)
+  $gameScreen.startAnimation(520, 680, 179, false);
+}
+
+function idScene11handleCase5OriginalScene(valuePic1) {
+  // Case 5:
+  // Increase the cell count of picture id = valuePic1+12 if available
+  const pictureIdToAddCell = valuePic1 + 12;
+  if ($gameScreen.picture(pictureIdToAddCell)) {
+    $gameScreen.picture(pictureIdToAddCell).addCellCount();
+  }
+}
+
+function idScene11handleCase6OriginalScene(valuePic1) {
+  // Case 6:
+  // Increase cell count for picture id = valuePic1+2 and perform move animations and fade.
+  const pictureIdForCellIncrease = valuePic1 + 2;
+  if ($gameScreen.picture(pictureIdForCellIncrease)) {
+    $gameScreen.picture(pictureIdForCellIncrease).addCellCount();
+  }
+  pic_move1(valuePic1 + 11, 0, 0, 100, 100, 0, 60);
+  pic_move1(valuePic1 + 12, 0, 0, 100, 100, 0, 60);
+  pic_move1(valuePic1 + 1, 0, 0, 100, 100, 200, 120);
+  const fadeAnimationName = 'Hscene005';
+  picture_fade1(valuePic1 + 1, "fadeIn", fadeAnimationName, 120, 5);
+}
+
+function idScene11handleCase7OriginalScene(valuePic1) {
+  // Case 7:
+  // Move pictures for id = valuePic1+13 and valuePic1+15 and set a wait timer.
+  pic_move1(valuePic1 + 13, 0, 0, 100, 100, 255, 120);
+  pic_move1(valuePic1 + 15, 0, -50, 100, 100, 255, 120);
+  return 120;
+}
+
+function idScene11handleCase8OriginalScene(valuePic1) {
+  // Case 8:
+  // Set arrays for picture properties, trigger piston effect and add cell count to extra picture.
+  pic_setArray1 = [1, valuePic1 + 13, 0, 384 + (1732 / 2) - (768 / 2) + 100, 5, 1200];
+  pic_setArray2 = [1, 0, 0, 0, 0, 0];
+  valueParallelPicSe1 = [0, 0, 0];
+  valueParallelPicSe2 = [0, 0, 0];
+  hcg_piston(valuePic1 + 13, 8, 1, 2);
+  $gameSwitches.setValue(429, true);
+  const extraPictureId = valuePic1 + 15;
+  if ($gameScreen.picture(extraPictureId)) {
+    $gameScreen.picture(extraPictureId).addCellCount();
+  }
+  return 60;
+}
+
+function idScene11handleCase9OriginalScene() {
+  // Case 9:
+  // Reset switch and arrays and apply smooth motion
+  $gameSwitches.setValue(429, false);
+  valueParallelPicSe1 = [0, 0, 0];
+  valueParallelPicSe2 = [0, 0, 0];
+  pic_setArray(0, 0, 0, 0, 0, 0);
+  picture_motion1("smooth", [0]);
+}
+
+function idScene11handleCase10OriginalScene(valuePic1) {
+  // Case 10:
+  // Move several pictures back to original state
+  pic_move1(valuePic1, 0, 0, 200, 200, 255, 60);
+  pic_move1(valuePic1 + 1, 0, 0, 100, 100, 0, 60);
+  pic_move1(valuePic1 + 13, 0, 0, 100, 100, 0, 60);
+  pic_move1(valuePic1 + 15, 0, 0, 100, 100, 0, 60);
+  return 60;
+}
+
+function idScene11handleCase11OriginalScene(valuePic1) {
+  // Case 11:
+  // Add cell count to picture valuePic1+2 and adjust movements for id+11 and id+12
+  pic_move1(valuePic1, 0, 0, 100, 100, 255, 60);
+  const altPictureIdForCellIncrease = valuePic1 + 2;
+  if ($gameScreen.picture(altPictureIdForCellIncrease)) {
+    $gameScreen.picture(altPictureIdForCellIncrease).addCellCount();
+  }
+  pic_move1(valuePic1 + 11, 0, 0, 100, 100, 255, 60);
+  pic_move1(valuePic1 + 12, 0, 0, 100, 100, 255, 60);
+}
+
+function idScene11handleCase12OriginalScene(valuePic1) {
+  // Case 12:
+  // Move picture (id = valuePic1+12) downwards and set wait timer
+  pic_move1(valuePic1 + 12, 0, +200, 100, 100, 255, 180);
+  return 120;
+}
+
+function idScene11handleCase90OriginalScene(valuePic1) {
+  // Case 90: //2と3の間に仕様
+  // Specialized movement between cases 2 and 3
+  pic_move1(valuePic1, 0, 0, 25, 25, 150, 60);
+  pic_move1(valuePic1 + 11, 0, 0, 25, 25, 150, 60);
+  pic_move1(valuePic1 + 11, 0, 0, 25, 25, 150, 60);
+  return 60;
+}
+
+function idScene11handleCase91OriginalScene(valuePic1) {
+  // Case 91: //2と3の間に仕様
+  // Revert movement adjustments for pictures
+  pic_move1(valuePic1, 0, 0, 100, 100, 255, 60);
+  pic_move1(valuePic1 + 11, 0, 0, 100, 100, 255, 60);
+  pic_move1(valuePic1 + 11, 0, 0, 100, 100, 255, 60);
+}
+
+function idScene100handleOriginalSceneCase1OriginalScene(valuePic1) {
   // Case 1: Initial background and face animation setup
   AudioManager.playBgs({ "name": "21_HandyMassager1", "volume": 50, "pitch": 100, "pan": 0 });
   let bgImage = 'XevS101_00back';
@@ -2459,7 +2542,7 @@ function handleOriginalSceneCase1OriginalScene(valuePic1) {
   }
 }
 
-function handleOriginalSceneCase2OriginalScene(valuePic1) {
+function idScene100handleOriginalSceneCase2OriginalScene(valuePic1) {
   // Case 2: Update expression and body vibration (piston) when already vibrating
   AudioManager.playBgs({ "name": "21_HandyMassager1", "volume": 60, "pitch": 120, "pan": 0 });
   let bgAniImage = 'XevS101_01';
@@ -2478,7 +2561,7 @@ function handleOriginalSceneCase2OriginalScene(valuePic1) {
   }
 }
 
-function handleOriginalSceneCase3OriginalScene(valuePic1) {
+function idScene100handleOriginalSceneCase3OriginalScene(valuePic1) {
   // Case 3: Erase part, update face, and add new animations with different piston parameters
   pic_eraseP(2, [valuePic1 + 2]);
   let bgAniImage = 'XevS101_02';
@@ -2500,7 +2583,7 @@ function handleOriginalSceneCase3OriginalScene(valuePic1) {
   }
 }
 
-function handleOriginalSceneCase4OriginalScene(valuePic1, id3, id4) {
+function idScene100handleOriginalSceneCase4OriginalScene(valuePic1, id3, id4) {
   // Case 4: Move all pictures with dynamic parameters (id3 and id4)
   for (let pictureIndex = valuePic1; pictureIndex <= valuePic1 + 10; pictureIndex++) {
     if ($gameScreen.picture(pictureIndex)) {
@@ -2510,7 +2593,7 @@ function handleOriginalSceneCase4OriginalScene(valuePic1, id3, id4) {
   }
 }
 
-function handleOriginalSceneCase5OriginalScene(valuePic1) {
+function idScene100handleOriginalSceneCase5OriginalScene(valuePic1) {
   // Case 5: Display new background with piston effect
   let bgAniImage = 'XevS101_04back';
   pic_1(0, valuePic1, bgAniImage, 0, 100, 255, 120, 1280, 768, 0, 0);
@@ -2519,7 +2602,7 @@ function handleOriginalSceneCase5OriginalScene(valuePic1) {
   hcg_piston(valuePic1 + 1, 5, 1, 2);
 }
 
-function handleOriginalSceneCase6OriginalScene(valuePic1) {
+function idScene100handleOriginalSceneCase6OriginalScene(valuePic1) {
   // Case 6: Erase a set of pictures
   const pictureIdsToErase = [];
   for (let picEraseIndex = valuePic1; picEraseIndex <= valuePic1 + 11; picEraseIndex++) {
@@ -2528,7 +2611,7 @@ function handleOriginalSceneCase6OriginalScene(valuePic1) {
   pic_eraseP(0, pictureIdsToErase);
 }
 
-function handleOriginalSceneCase7OriginalScene(valuePic1) {
+function idScene100handleOriginalSceneCase7OriginalScene(valuePic1) {
   // Case 7: Fade out background sounds and animate picture scale to zero
   AudioManager.fadeOutBgs(10);
   for (let pictureIndex = valuePic1; pictureIndex <= valuePic1 + 10; pictureIndex++) {
@@ -2538,7 +2621,7 @@ function handleOriginalSceneCase7OriginalScene(valuePic1) {
   }
 }
 
-function handleOriginalSceneCase8OriginalScene(valuePic1) {
+function idScene100handleOriginalSceneCase8OriginalScene(valuePic1) {
   // Case 8: Bring back background sound and scale pictures back in
   AudioManager.playBgs({ "name": "21_HandyMassager1", "volume": 60, "pitch": 120, "pan": 0 });
   for (let pictureIndex = valuePic1; pictureIndex <= valuePic1 + 10; pictureIndex++) {
@@ -2548,7 +2631,7 @@ function handleOriginalSceneCase8OriginalScene(valuePic1) {
   }
 }
 
-function handleOriginalSceneCase9OriginalScene(valuePic1) {
+function idScene100handleOriginalSceneCase9OriginalScene(valuePic1) {
   // Case 9: Update animation and reapply piston effect on a specific picture
   let aniImage = 'XevS101_05';
   pic_1(0, valuePic1 + 2, aniImage, 2, 100, 255, 60, 1280, 768, 0, 0);
