@@ -1476,7 +1476,7 @@ function buildStatsTextPart1BattleXsarStatas(user) {
   statsTextPart1 += formatStatLine(638, "物理ﾀﾞﾒｶｯﾄ率", calcSParamBattleXsarStatas(user, 6));
   statsTextPart1 += formatStatLine(639, "魔法ﾀﾞﾒｶｯﾄ率", calcSParamBattleXsarStatas(user, 7));
   statsTextPart1 += formatStatLine(656, "経験獲得率　", calcSParamBattleXsarStatas(user, 9));
-  statsTextPart1 += formatStatLine(624, "ﾎﾟｰｼｮﾝ耐性率", $gameVariables.value(380 + $gameVariables.value(20))[58]);
+  statsTextPart1 += formatStatLine(624, "ﾎﾟｰｼｮﾝ耐性率", $gameVariables.value(380 + user.actorId())[58]);
   statsTextPart1 += formatStatLine(683, "通常異常耐性", calcStateRate(user, 15));
   statsTextPart1 += formatStatLine(684, "特殊異常耐性", calcStateRate(user, 30));
   
@@ -1597,9 +1597,9 @@ function buildHeaderTextBattleXsarStatas(user, IsEnemy) {
       additionalInfo = `\\C[16]BuffLimit:\\C[0]${user.maxBuffLimit(2)} \\C[16]D.cap:\\C[0]${user.maximumDamage()} \\C[16]H.cap:\\C[0]${user.maximumHealing() - user.maximumHealing() - user.maximumHealing()}`;
     } else {
       const headerJP = "役職:";
-      additionalInfo = `${headerJP}${$gameVariables.value(380 + $gameVariables.value(20))[59]}`;
+      additionalInfo = `${headerJP}${$gameVariables.value(380 + user.actorId())[59]}`;
     }
-    headerText = `${classInfo}${user.nickname()}\\set[${$gameVariables.value(20)}]\n${additionalInfo}`;
+    headerText = `${classInfo}${user.nickname()}\\set[${user.actorId()}]\n${additionalInfo}`;
   } else {
     headerText = `${user.name()}`;
   }
