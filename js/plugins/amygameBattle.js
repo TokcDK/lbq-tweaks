@@ -1457,34 +1457,22 @@ battle_xsarStatas = function (battlerActorId) {
     if (valueAddPowerCustom >= 1) {
       statsTextPart3.push(`\\C[16]\\I[666]スキル威力率:\\C[0]+${valueAddPowerCustom}\n`);
     }
-    statsTextPart3.push(`\\C[16]\\I[31]奥義威力率　:\\C[0]${calcElementAmplify(user, 10, true)}%\n`);
-    statsTextPart3.push(`\\C[16]\\I[673]ｱﾋﾞﾘﾃｨ威力率:\\C[0]${calcElementAmplify(user, 20, true)}%\n`);
-    statsTextPart3.push(`\\C[16]\\I[78]会心威力率　:\\C[0]${calcCritMultBonus(user)}%\n`);
-    statsTextPart3.push(`\\C[16]\\I[480]剣威力率　　:\\C[0]${calcElementAmplify(user, 21, true)}%\n`);
-    statsTextPart3.push(`\\C[16]\\I[481]短剣威力率　:\\C[0]${calcElementAmplify(user, 22, true)}%\n`);
-    statsTextPart3.push(`\\C[16]\\I[482]刀威力率　　:\\C[0]${calcElementAmplify(user, 23, true)}%\n`);
-    statsTextPart3.push(`\\C[16]\\I[483]杖威力率　　:\\C[0]${calcElementAmplify(user, 24, true)}%\n`);
-    statsTextPart3.push(`\\C[16]\\I[484]拳威力率　　:\\C[0]${calcElementAmplify(user, 25, true)}%\n`);
-    statsTextPart3.push(`\\C[16]\\I[485]槍威力率　　:\\C[0]${calcElementAmplify(user, 26, true)}%\n`);
-    statsTextPart3.push(`\\C[16]\\I[486]斧威力率　　:\\C[0]${calcElementAmplify(user, 27, true)}%\n`);
-    statsTextPart3.push(`\\C[16]\\I[487]銃威力率　　:\\C[0]${calcElementAmplify(user, 28, true)}%\n`);
-    statsTextPart3.push(`\\C[16]\\I[488]弓威力率　　:\\C[0]${calcElementAmplify(user, 29, true)}%\n`);
-    statsTextPart3.push(`\\C[16]\\I[489]楽器威力率　:\\C[0]${calcElementAmplify(user, 30, true)}%\n`);
-  } else {
-    statsTextPart3.push(`\\C[16]\\I[31]奥義威力率　:\\C[0]${calcElementAmplify(user, 10, false)}%\n`);
-    statsTextPart3.push(`\\C[16]\\I[673]ｱﾋﾞﾘﾃｨ威力率:\\C[0]${calcElementAmplify(user, 20, false)}%\n`);
-    statsTextPart3.push(`\\C[16]\\I[78]会心威力率　:\\C[0]${calcCritMultBonus(user)}%\n`);
-    statsTextPart3.push(`\\C[16]\\I[480]剣威力率　　:\\C[0]${calcElementAmplify(user, 21, false)}%\n`);
-    statsTextPart3.push(`\\C[16]\\I[481]短剣威力率　:\\C[0]${calcElementAmplify(user, 22, false)}%\n`);
-    statsTextPart3.push(`\\C[16]\\I[482]刀威力率　　:\\C[0]${calcElementAmplify(user, 23, false)}%\n`);
-    statsTextPart3.push(`\\C[16]\\I[483]杖威力率　　:\\C[0]${calcElementAmplify(user, 24, false)}%\n`);
-    statsTextPart3.push(`\\C[16]\\I[484]拳威力率　　:\\C[0]${calcElementAmplify(user, 25, false)}%\n`);
-    statsTextPart3.push(`\\C[16]\\I[485]槍威力率　　:\\C[0]${calcElementAmplify(user, 26, false)}%\n`);
-    statsTextPart3.push(`\\C[16]\\I[486]斧威力率　　:\\C[0]${calcElementAmplify(user, 27, false)}%\n`);
-    statsTextPart3.push(`\\C[16]\\I[487]銃威力率　　:\\C[0]${calcElementAmplify(user, 28, false)}%\n`);
-    statsTextPart3.push(`\\C[16]\\I[488]弓威力率　　:\\C[0]${calcElementAmplify(user, 29, false)}%\n`);
-    statsTextPart3.push(`\\C[16]\\I[489]楽器威力率　:\\C[0]${calcElementAmplify(user, 30, false)}%\n`);
   }
+
+  statsTextPart3.push(`\\C[16]\\I[31]奥義威力率　:\\C[0]${calcElementAmplify(user, 10, isExtraActor)}%\n`);
+  statsTextPart3.push(`\\C[16]\\I[673]ｱﾋﾞﾘﾃｨ威力率:\\C[0]${calcElementAmplify(user, 20, isExtraActor)}%\n`);
+  statsTextPart3.push(`\\C[16]\\I[78]会心威力率　:\\C[0]${calcCritMultBonus(user)}%\n`);
+  statsTextPart3.push(`\\C[16]\\I[480]剣威力率　　:\\C[0]${calcElementAmplify(user, 21, isExtraActor)}%\n`);
+  statsTextPart3.push(`\\C[16]\\I[481]短剣威力率　:\\C[0]${calcElementAmplify(user, 22, isExtraActor)}%\n`);
+  statsTextPart3.push(`\\C[16]\\I[482]刀威力率　　:\\C[0]${calcElementAmplify(user, 23, isExtraActor)}%\n`);
+  statsTextPart3.push(`\\C[16]\\I[483]杖威力率　　:\\C[0]${calcElementAmplify(user, 24, isExtraActor)}%\n`);
+  statsTextPart3.push(`\\C[16]\\I[484]拳威力率　　:\\C[0]${calcElementAmplify(user, 25, isExtraActor)}%\n`);
+  statsTextPart3.push(`\\C[16]\\I[485]槍威力率　　:\\C[0]${calcElementAmplify(user, 26, isExtraActor)}%\n`);
+  statsTextPart3.push(`\\C[16]\\I[486]斧威力率　　:\\C[0]${calcElementAmplify(user, 27, isExtraActor)}%\n`);
+  statsTextPart3.push(`\\C[16]\\I[487]銃威力率　　:\\C[0]${calcElementAmplify(user, 28, isExtraActor)}%\n`);
+  statsTextPart3.push(`\\C[16]\\I[488]弓威力率　　:\\C[0]${calcElementAmplify(user, 29, isExtraActor)}%\n`);
+  statsTextPart3.push(`\\C[16]\\I[489]楽器威力率　:\\C[0]${calcElementAmplify(user, 30, isExtraActor)}%\n`);
+  
   //神聖邪悪耐性率表示 (if needed)
   if (false) {
     if (user.elementAmplifyRate(16) * 100 >= 110) { statsTextPart3.push(`\\C[16]\\I[172]威力率:\\C[0]${Math.floor(user.elementAmplifyRate(16) * 100)}%\n`); }
