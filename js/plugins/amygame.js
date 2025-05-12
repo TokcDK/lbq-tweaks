@@ -3826,7 +3826,7 @@
           if (value1 == 6) { valueFaceSelect = 38 };//頬染め挑発的
           if (value1 == 7) { valueFaceSelect = 41 };//頬染め目にハート
         };
-        battle_bustUp(id3, 0, 0, 10);
+        battle_bustUp1(gameActor,id3, 0, 0, 10);
         for (var j = 0; j <= 7; j++) {
           if ($gameScreen.picture(id3 + j)) {
             $gameMessage.setSelectPictureId(id2, id3 + j);
