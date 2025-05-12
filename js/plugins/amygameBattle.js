@@ -1402,7 +1402,9 @@ battle_xsarStatas = function (battlerActorId) {
   }
 
   const isExtraActor = battlerActorId >= 20;
-  const user = battlerActorId === 20 ? $gameActors.actor($gameVariables.value(20)) : $gameTroop.members()[battlerActorId];
+  const user = battlerActorId === 20
+              ? $gameActors.actor(battlerActorId) 
+              : $gameTroop.members()[battlerActorId];
 
   let statsTextPart1 = [];
   statsTextPart1.push(`\\C[2]詳細能力値[1]\\C[0]\n`);
@@ -1472,7 +1474,7 @@ battle_xsarStatas = function (battlerActorId) {
   statsTextPart3.push(`\\C[16]\\I[487]銃威力率　　:\\C[0]${calcElementAmplify(user, 28, isExtraActor)}%\n`);
   statsTextPart3.push(`\\C[16]\\I[488]弓威力率　　:\\C[0]${calcElementAmplify(user, 29, isExtraActor)}%\n`);
   statsTextPart3.push(`\\C[16]\\I[489]楽器威力率　:\\C[0]${calcElementAmplify(user, 30, isExtraActor)}%\n`);
-  
+
   //神聖邪悪耐性率表示 (if needed)
   if (false) {
     if (user.elementAmplifyRate(16) * 100 >= 110) { statsTextPart3.push(`\\C[16]\\I[172]威力率:\\C[0]${Math.floor(user.elementAmplifyRate(16) * 100)}%\n`); }
