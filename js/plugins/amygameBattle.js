@@ -1324,30 +1324,37 @@ actor_kousokukaijo2 = function (id) {
 };
 
 //パーティメンバーが居る時に拘束解除時の反応。
-actor_kousokukaijo3 = function (id) {
+actor_kousokukaijo3 = function (actorId) {
 
-  for (var i = 0; i < $gameParty.battleMembers().length; i++) {
-    var actor = $gameParty.battleMembers()[i];
-    if (actor.isStateAffected(89)) {
-      actor.removeState(89);
-      if ($dataSystem.optSideView) {
-        var value1 = $gameVariables.value(92) + 1;
-        $gameTroop.set(value1, $gameVariables.value(703)[0], $gameVariables.value(703)[1], 30);
-        var value2 = i + 1;
-        $gameParty.set(value2, $gameVariables.value(705)[0], $gameVariables.value(705)[1], 30);
-      };
-      var value1 = Number($dataActors[id].meta['BindRemoveSuccessFace'].split(',')[0]);
-      var value2 = Number($dataActors[id].meta['BindRemoveSuccessFace'].split(',')[1]);
-      var array = $dataActors[id].meta['BindRemoveSuccess'].split(',');
-      $gameVariables.setValue(525, array[getRandomIndex(array.length)]);
-      var value3 = $gameActors.actor(id).name() + 'は拘束から助け出された！';
-      BattleManager._logWindow.push(`addText`, value3);
-      $gameActors.actor(id).removeState(69);
-      $gameMessage.newPage();
-      $gameMessage.setFaceImage(id + 'Actor' + value1, value2);
-      $gameMessage.add(`\\V[525]`);
-      $gameVariables.setValue(703, 0);
+  const battleMembers = $gameParty.battleMembers();
+  const enemyMovementData = $gameVariables.value(703);
+  const actor = $gameActors.actor(actorId);
+  const meta = actor.actor().meta;
+  for (let battleMemberIndex = 0; battleMemberIndex < battleMembers.length; battleMemberIndex++) {
+    const partyMember = battleMembers[battleMemberIndex];
+    if (!partyMember.isStateAffected(89)) {
+      continue;
     }
+    
+    partyMember.removeState(89);
+    if ($dataSystem.optSideView) {
+      const troopMemberIndex = $gameVariables.value(92) + 1;
+      $gameTroop.set(troopMemberIndex, enemyMovementData[0], enemyMovementData[1], 30);
+      const partyMemberIndex = battleMemberIndex + 1;
+      $gameParty.set(partyMemberIndex, enemyMovementData[0], enemyMovementData[1], 30);
+    };
+    const bindRemoveSuccessFaceData = meta['BindRemoveSuccessFace'].split(',');
+    const faceImageCode = Number(bindRemoveSuccessFaceData[0]);
+    const faceImageFrame = Number(bindRemoveSuccessFaceData[1]);
+    const bindRemoveSuccessMessages = meta['BindRemoveSuccess'].split(',');
+    $gameVariables.setValue(525, bindRemoveSuccessMessages[getRandomIndex(bindRemoveSuccessMessages.length)]);
+    const successLogMessage = `${actor.name()}は拘束から助け出された！`;
+    BattleManager._logWindow.push(`addText`, successLogMessage);
+    actor.removeState(69);
+    $gameMessage.newPage();
+    $gameMessage.setFaceImage(actorId + 'Actor' + faceImageCode, faceImageFrame);
+    $gameMessage.add(`\\V[525]`);
+    $gameVariables.setValue(703, 0);
   };
 
 };
