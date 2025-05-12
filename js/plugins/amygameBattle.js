@@ -1306,18 +1306,18 @@ actor_kousokukaijo1 = function (id) {
 };
 
 //パーティメンバーが居る時に拘束解除。
-actor_kousokukaijo2 = function (id) {
+actor_kousokukaijo2 = function (boundActorId) {
 
-  for (var i = 0; i < $gameParty.battleMembers().length; i++) {
-    var actor = $gameParty.battleMembers()[i];
-    if (actor.isStateAffected(89)) {
-      var value1 = actor.index();
-      $gameParty.members()[value1].startAnimation(351, false, 0);
-      var array = $dataActors[$gameParty.battleMembers()[i].actorId()].meta['BindRemove'].split(',');
-      $gameVariables.setValue(525, array[getRandomIndex(array.length)]);
-      var value2 = actor.name() + 'は' + $gameActors.actor(id).name() + 'の拘束を解きに掛かった！';
-      BattleManager._logWindow.push(`addText`, value2);
-      $gameActors.actor(id).removeState(63);
+  for (let memberIndex = 0; memberIndex < $gameParty.battleMembers().length; memberIndex++) {
+    const partyMember = $gameParty.battleMembers()[memberIndex];
+    if (partyMember.isStateAffected(89)) {
+      const partyMemberIndex = partyMember.index();
+      $gameParty.members()[partyMemberIndex].startAnimation(351, false, 0);
+      const bindRemoveMessages = $dataActors[$gameParty.battleMembers()[memberIndex].actorId()].meta['BindRemove'].split(',');
+      $gameVariables.setValue(525, bindRemoveMessages[getRandomIndex(bindRemoveMessages.length)]);
+      const logMessage = partyMember.name() + 'は' + $gameActors.actor(boundActorId).name() + 'の拘束を解きに掛かった！';
+      BattleManager._logWindow.push(`addText`, logMessage);
+      $gameActors.actor(boundActorId).removeState(63);
     }
   };
 
