@@ -1536,6 +1536,7 @@ function buildStatsTextPart4BattleXsarStatas(user, isEnemy) {
   statsTextPart4 += `\\C[2]詳細能力値[4]\\C[0]\n`;
   const start = 1;
   const end = $dataStates.length - 1;
+  const resistanceJP = "耐性率";
   for (let i = start; i <= end; i++) {
     const stateMeta = $dataStates[i].meta;
     if (stateMeta['Category']) {
@@ -1548,7 +1549,7 @@ function buildStatsTextPart4BattleXsarStatas(user, isEnemy) {
                 (stateMeta['Category'] === ' StateSPabNomal' && user.stateRate(i) === user.stateRate(30))) {
               // Do nothing when equal to default state rate.
             } else {
-              statsTextPart4 += `\x1bI[${$dataStates[i].iconIndex}]${$dataStates[i].name}耐性率:${Math.floor(user.stateRate(i) * 100)}%\n`;
+              statsTextPart4 += `\x1bI[${$dataStates[i].iconIndex}]${$dataStates[i].name}${resistanceJP}:${calcStateRate(user, i)}%\n`;
             }
           }
         }
@@ -1560,7 +1561,7 @@ function buildStatsTextPart4BattleXsarStatas(user, isEnemy) {
     elementList.forEach(function (elementId) {
       if (user.elementAmplifyRate(elementId) !== 0) {
         amygame_elementIcon(elementId);
-        statsTextPart4 += `\\C[16]\x1bI[${valueElementIconArr[0]}]特攻率:\\C[0]${calcElementAmplifyBattleXsarStatas(user, elementId, false)}%\n`;
+        statsTextPart4 += `\\C[16]\x1bI[${valueElementIconArr[0]}]${resistanceJP}:\\C[0]${calcElementAmplifyBattleXsarStatas(user, elementId, false)}%\n`;
       }
     });
   } else {
@@ -1571,11 +1572,8 @@ function buildStatsTextPart4BattleXsarStatas(user, isEnemy) {
         if (user.elementRate(i) !== 1) {
           amygame_elementIcon(i);
           let resistanceText;
-          if (valueElementIconArr[0] === 1) {
-            resistanceText = `\\C[16]${$dataSystem.elements[i]}耐性率\\C[0]:`;
-          } else {
-            resistanceText = `\\C[16]\x1bI[${valueElementIconArr[3]}]耐性率\\C[0]:`;
-          }
+          const icon = valueElementIconArr[0] === 1 ? `${$dataSystem.elements[i]}` : `\x1bI[${valueElementIconArr[3]}]`;
+          resistanceText = `\\C[16]${icon}${resistanceJP}\\C[0]:`;
           statsTextPart4 += `${resistanceText}${calcElementRateBattleXsarStatas(user, i)}%\n`;
         }
       }
@@ -1597,7 +1595,8 @@ function buildHeaderTextBattleXsarStatas(user, IsEnemy) {
     if ($gameParty.inBattle()) {
       additionalInfo = `\\C[16]BuffLimit:\\C[0]${user.maxBuffLimit(2)} \\C[16]D.cap:\\C[0]${user.maximumDamage()} \\C[16]H.cap:\\C[0]${user.maximumHealing() - user.maximumHealing() - user.maximumHealing()}`;
     } else {
-      additionalInfo = `役職:${$gameVariables.value(380 + $gameVariables.value(20))[59]}`;
+      const headerJP = "役職:";
+      additionalInfo = `${headerJP}${$gameVariables.value(380 + $gameVariables.value(20))[59]}`;
     }
     headerText = `${classInfo}${user.nickname()}\\set[${$gameVariables.value(20)}]\n${additionalInfo}`;
   } else {
