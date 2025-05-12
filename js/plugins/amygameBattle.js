@@ -1250,40 +1250,52 @@ battle_bustUp = function (id1, id2, id3, id4) {
 
 //オーラ表現
 tachie_aura = function () {
+  // Early exits for most common cases to avoid unnecessary processing
+  if (!$gameParty.inBattle()) return;
 
-  if ($gameParty.inBattle() && $gameActors.actor($gameVariables.value(20)).tp >= 100 && isGirl($gameActors.actor($gameVariables.value(20)))) {
-    const tachiePictureId = Number($dataActors[$gameVariables.value(20)].meta['tachiePicId']);
-    if ($gameScreen.picture(tachiePictureId)) {
-      const baseX = $gameVariables.value(105);
-      const baseY = $gameVariables.value(106);
-      const scaleX = $gameVariables.value(107);
-      const scaleY = $gameVariables.value(108);
-      //var baseX = $gameScreen.picture(tachiePictureId)._x;
-      //var baseY = $gameScreen.picture(tachiePictureId)._y;
-      //var scaleX = $gameScreen.picture(tachiePictureId)._scaleX;
-      //var scaleY = $gameScreen.picture(tachiePictureId)._scaleY;
-      const pictureIdOffset = tachiePictureId - 20;
-      const xOffset = 0;
+  const actorId = $gameVariables.value(20);
+  const actor = $gameActors.actor(actorId);
+  
+  // Combine conditions for better performance
+  if (actor.tp < 100 || !isGirl(actor)) return;
 
-      //if($gameVariables.value(276) == 2){
-      //var xOffset = -50;
-      //} else {
-      //if($gameVariables.value(276) == 1){
-      //var xOffset = +200;
-      //} else {
-      //var xOffset = 0;
-      //}};
+  // Cache actor data to avoid repeated lookups
+  const actorData = $dataActors[actorId];
+  const tachiePictureId = Number(actorData.meta['tachiePicId']);
+  
+  // Check if the picture exists before proceeding
+  if (!$gameScreen.picture(tachiePictureId)) return;
 
-      if ($gameVariables.value(276) >= 1) {
-        $gameScreen.showPicture(45, "/img/tachies/" + 'actor' + pictureIdOffset + '_45_1', 1, baseX + xOffset, baseY, scaleX, scaleY, 255, 1);
-      } else {
-        $gameScreen.showPicture(45, "/img/tachies/" + 'actor' + pictureIdOffset + '_45_1', 1, baseX + xOffset, baseY, 0, 0, 0, 1);
-        $gameScreen.movePicture(45, 1, baseX + xOffset, baseY, scaleX, scaleY, 255, 1, 60);
-      };
-
-    }
-  };
-
+  // Get all required variables at once to minimize variable lookups
+  const baseX = $gameVariables.value(105);
+  const baseY = $gameVariables.value(106);
+  const scaleX = $gameVariables.value(107);
+  const scaleY = $gameVariables.value(108);
+  const pictureIdOffset = tachiePictureId - 20;
+  
+  // Create image path once
+  const imagePath = "/img/tachies/actor" + pictureIdOffset + '_45_1';
+  
+  // Determine if animation is needed based on gameVariable state
+  const isAnimationNeeded = $gameVariables.value(276) < 1;
+  
+  // Show picture with conditional parameters for better performance
+  $gameScreen.showPicture(
+    45,                          // Picture ID
+    imagePath,                   // Image path
+    1,                           // Origin
+    baseX,                       // X position
+    baseY,                       // Y position
+    isAnimationNeeded ? 0 : scaleX,  // Scale X
+    isAnimationNeeded ? 0 : scaleY,  // Scale Y
+    isAnimationNeeded ? 0 : 255,     // Opacity
+    1                            // Blend mode
+  );
+  
+  // Only perform animation if needed
+  if (isAnimationNeeded) {
+    $gameScreen.movePicture(45, 1, baseX, baseY, scaleX, scaleY, 255, 1, 60);
+  }
 };
 
 //パーティメンバーが居る時に拘束解除。
