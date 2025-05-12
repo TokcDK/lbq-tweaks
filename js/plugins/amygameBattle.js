@@ -1492,18 +1492,18 @@ battle_xsarStatas = function (battlerActorId) {
   const start = 1;
   const end = $dataStates.length - 1;
   for (let i = start; i <= end; i++) {
-    if ($dataStates[i].meta['Category']) {
-      if ($dataStates[i].meta['Category'] === ' StateabNomal' || $dataStates[i].meta['Category'] === ' StateSPabNomal') {
+    const stateMeta = $dataStates[i].meta;
+    if (stateMeta['Category']) {
+      if (stateMeta['Category'] === ' StateabNomal' || stateMeta['Category'] === ' StateSPabNomal') {
         if (user.isStateResist(i)) {
           statsTextPart4.push(`\x1bI[${$dataStates[i].iconIndex}]${$dataStates[i].name}:\\C[2][無効化]\\C[0]\n`);
         } else {
           if (user.stateRate(i) !== 1.0) {
-            if ($dataStates[i].meta['Category'] === ' StateabNomal' && user.stateRate(i) === user.stateRate(15)) {
+            if ((stateMeta['Category'] === ' StateabNomal' && user.stateRate(i) === user.stateRate(15)) ||
+                (stateMeta['Category'] === ' StateSPabNomal' && user.stateRate(i) === user.stateRate(30))) {
+              // Do nothing when equal to default state rate.
             } else {
-              if ($dataStates[i].meta['Category'] === ' StateSPabNomal' && user.stateRate(i) === user.stateRate(30)) {
-              } else {
-                statsTextPart4.push(`\x1bI[${$dataStates[i].iconIndex}]${$dataStates[i].name}耐性率:${Math.floor(user.stateRate(i) * 100)}%\n`);
-              }
+              statsTextPart4.push(`\x1bI[${$dataStates[i].iconIndex}]${$dataStates[i].name}耐性率:${Math.floor(user.stateRate(i) * 100)}%\n`);
             }
           }
         }
@@ -1520,7 +1520,7 @@ battle_xsarStatas = function (battlerActorId) {
       }
     });
   } else {
-    for (let i = 1; i <= $dataSystem.elements.length - 1; i++) {
+    for (let i = 1, end = $dataSystem.elements.length - 1; i <= end; i++) {
       if (elemIdsBattleXsarStatas.some(function (elem) { return elem === i; })) {
       } else {
         if (user.elementRate(i) !== 1) {
