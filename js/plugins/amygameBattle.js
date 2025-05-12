@@ -1119,7 +1119,6 @@ chain_skill = function () {
 battle_bustUp = function (basePictureId, baseMoveX, baseMoveY, baseDurationOffset) {
 
   const actorId = $gameVariables.value(20);
-  
   if (!isGirl($gameActors.actor(actorId))) {
     return;
   };
@@ -1168,79 +1167,12 @@ battle_bustUp = function (basePictureId, baseMoveX, baseMoveY, baseDurationOffse
   const moveOffsetY = baseMoveY;
   const extraMoveDuration = baseDurationOffset;
   for (let i = 0; i <= 7; i++) {
-    let showPictureFlag = 1;
+    let showPictureFlag = false;
     let faceImageName = actorFaceBaseName;
-    switch(i) {
-      case 0:
-        if (valueLiningCloth[actorId] >= 1) {
-          faceImageName = actorId + 'Actor' + "Lining" + valueLiningCloth[actorId];
-        } else {
-          showPictureFlag = 0;
-        }
-        break;
-      case 1:
-        if (valueBackHairCloth[actorId] >= 1) {
-          faceImageName = actorId + 'Actor' + "BackHair" + valueBackHairCloth[actorId];
-        } else {
-          showPictureFlag = 0;
-        }
-        break;
-      case 2:
-        if (valueBustUpCloth[actorId] >= 0) {
-          faceImageName = actorId + 'Actor' + "Cloth" + valueBustUpCloth[actorId];
-        } else {
-          showPictureFlag = 0;
-        }
-        break;
-      case 3:
-        if (valueBustUpCloth2[actorId] >= 0) {
-          faceImageName = actorId + 'Actor' + "BustUp" + valueBustUpCloth2[actorId];
-        } else {
-          showPictureFlag = 0;
-        }
-        break;
-      case 4:
-        if (valueCoatCloth[actorId] >= 1) {
-          faceImageName = actorId + 'Actor' + "Coat" + valueCoatCloth[actorId];
-        } else {
-          showPictureFlag = 0;
-        }
-        break;
-      case 5:
-        faceImageName = actorId + 'Actor_' + valueFaceSelect;
-        break;
-      case 6: {
-        const actor = $gameActors.actor(actorId);
-        if (actor.isStateAffected(781) || actor.isStateAffected(783)) {
-          if (actor.isStateAffected(781)) {
-            faceImageName = actorId + 'Actor' + "CloudyEye1";
-          }
-          if (actor.isStateAffected(783)) {
-            faceImageName = actorId + 'Actor' + "CloudyEye2";
-          }
-          if (actor.isStateAffected(785)) {
-            faceImageName = actorId + 'Actor' + "CloudyEye4";
-          }
-        } else {
-          showPictureFlag = 0;
-        }
-        break;
-      }
-      case 7: {
-        const actor = $gameActors.actor(actorId);
-        if (actor.isStateAffected(784)) {
-          faceImageName = actorId + 'Actor' + "CloudyEye3";
-        } else {
-          if (valueFrontHairCloth[actorId] >= 0) {
-            faceImageName = actorId + 'Actor' + "FrontHair" + valueFrontHairCloth[actorId];
-          } else {
-            showPictureFlag = 0;
-          }
-        }
-        break;
-      }
-    }
-    if (showPictureFlag == 1) {
+
+    ({faceImageName, showPictureFlag} = getFaceImageNameBattleBustUp(actorId, i));
+
+    if (showPictureFlag === true) {
       $gameScreen.showPicture(basePictureId + i, "/img/talkface/" + faceImageName, 1, 640 + horizontalAdjustment, 384 + verticalShift + moveOffsetY, pictureScale, pictureScale, 0, 0);
       if (!$gameSwitches.value(471)) {
         $gameScreen.movePicture(basePictureId + i, 1, 640 + moveOffsetX, 384 + moveOffsetY, 100, 100, 255, 0, extraMoveDuration + 10);
@@ -1273,6 +1205,82 @@ battle_bustUp = function (basePictureId, baseMoveX, baseMoveY, baseDurationOffse
   }
 
 };
+
+function getFaceImageNameBattleBustUp(actorId, i) {
+  let faceImageName = "";
+  let showPictureFlag = true;
+  switch (i) {
+    case 0:
+      if (valueLiningCloth[actorId] >= 1) {
+        faceImageName = actorId + 'Actor' + "Lining" + valueLiningCloth[actorId];
+      } else {
+        showPictureFlag = false;
+      }
+      break;
+    case 1:
+      if (valueBackHairCloth[actorId] >= 1) {
+        faceImageName = actorId + 'Actor' + "BackHair" + valueBackHairCloth[actorId];
+      } else {
+        showPictureFlag = false;
+      }
+      break;
+    case 2:
+      if (valueBustUpCloth[actorId] >= 0) {
+        faceImageName = actorId + 'Actor' + "Cloth" + valueBustUpCloth[actorId];
+      } else {
+        showPictureFlag = false;
+      }
+      break;
+    case 3:
+      if (valueBustUpCloth2[actorId] >= 0) {
+        faceImageName = actorId + 'Actor' + "BustUp" + valueBustUpCloth2[actorId];
+      } else {
+        showPictureFlag = false;
+      }
+      break;
+    case 4:
+      if (valueCoatCloth[actorId] >= 1) {
+        faceImageName = actorId + 'Actor' + "Coat" + valueCoatCloth[actorId];
+      } else {
+        showPictureFlag = false;
+      }
+      break;
+    case 5:
+      faceImageName = actorId + 'Actor_' + valueFaceSelect;
+      break;
+    case 6: {
+      const actor = $gameActors.actor(actorId);
+      if (actor.isStateAffected(781) || actor.isStateAffected(783)) {
+        if (actor.isStateAffected(781)) {
+          faceImageName = actorId + 'Actor' + "CloudyEye1";
+        }
+        if (actor.isStateAffected(783)) {
+          faceImageName = actorId + 'Actor' + "CloudyEye2";
+        }
+        if (actor.isStateAffected(785)) {
+          faceImageName = actorId + 'Actor' + "CloudyEye4";
+        }
+      } else {
+        showPictureFlag = false;
+      }
+      break;
+    }
+    case 7: {
+      const actor = $gameActors.actor(actorId);
+      if (actor.isStateAffected(784)) {
+        faceImageName = actorId + 'Actor' + "CloudyEye3";
+      } else {
+        if (valueFrontHairCloth[actorId] >= 0) {
+          faceImageName = actorId + 'Actor' + "FrontHair" + valueFrontHairCloth[actorId];
+        } else {
+          showPictureFlag = false;
+        }
+      }
+      break;
+    }
+  }
+  return { faceImageName, showPictureFlag };
+}
 
 //オーラ表現
 tachie_aura = function () {
