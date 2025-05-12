@@ -1542,7 +1542,8 @@ function buildStatsTextPart4BattleXsarStatas(user, isEnemy) {
     if (stateMeta['Category']) {
       if (stateMeta['Category'] === ' StateabNomal' || stateMeta['Category'] === ' StateSPabNomal') {
         if (user.isStateResist(i)) {
-          statsTextPart4 += `\x1bI[${$dataStates[i].iconIndex}]${$dataStates[i].name}:\\C[2][無効化]\\C[0]\n`;
+          const nullifyJP = "無効化";
+          statsTextPart4 += `\x1bI[${$dataStates[i].iconIndex}]${$dataStates[i].name}:\\C[2][${nullifyJP}]\\C[0]\n`;
         } else {
           if (user.stateRate(i) !== 1.0) {
             if ((stateMeta['Category'] === ' StateabNomal' && user.stateRate(i) === user.stateRate(15)) ||
