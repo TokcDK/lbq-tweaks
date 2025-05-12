@@ -1353,23 +1353,27 @@ actor_kousokukaijo3 = function (id) {
 };
 
 //アビリティ後にＣＧ消去
-skill_after1 = function (user, id1) {
+const skillAfter1picEraseIds = [51, 52, 53, 54, 55, 56, 57, 86, 87, 88, 89, 90, 91, 92, 93, 98, 99];
+skill_after1 = function (user, skillId) {
 
-  if (valueAttackCount == 0) {
-    pic_eraseP(0, [51, 52, 53, 54, 55, 56, 57, 86, 87, 88, 89, 90, 91, 92, 93, 98, 99]);
-    if ($gameSwitches.value(91)) {
-      if ($gameScreen.picture(50)) {
-        var value1 = $gameScreen.picture(50).origin();
-        var value2 = $gameScreen.picture(50).x();
-        var value3 = $gameScreen.picture(50).y();
-        var value4 = $gameScreen.picture(50).scaleX();
-        var value5 = $gameScreen.picture(50).scaleY();
-        var value6 = $gameScreen.picture(50).opacity();
-        $gameScreen.movePicture(50, value1, value2, value3, value4, value5, 250, 0, 60);
-      };
-    };
-    valueAttackCount = 1;
+  if (valueAttackCount !== 0) {
+    return;
   };
+
+  pic_eraseP(0, skillAfter1picEraseIds);
+  if ($gameSwitches.value(91)) {
+    const picture50 = $gameScreen.picture(50);
+    if (picture50) {
+      const origin = picture50.origin();
+      const xPosition = picture50.x();
+      const yPosition = picture50.y();
+      const scaleX = picture50.scaleX();
+      const scaleY = picture50.scaleY();
+      const currentOpacity = picture50.opacity();
+      $gameScreen.movePicture(50, origin, xPosition, yPosition, scaleX, scaleY, 250, 0, 60);
+    }
+  };
+  valueAttackCount = 1;
 
 };
 
