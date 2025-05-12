@@ -1340,39 +1340,65 @@ actor_kousokukaijo2 = function (boundActorId) {
 };
 
 //パーティメンバーが居る時に拘束解除時の反応。
-actor_kousokukaijo3 = function (actorId) {
-
+actor_kousokukaijo3 = function(actorId) {
+  // Cache frequently used data and perform early exit if no rescue state found
   const battleMembers = $gameParty.battleMembers();
-  const enemyMovementData = $gameVariables.value(703);
-  const actor = $gameActors.actor(actorId);
-  const meta = actor.actor().meta;
-  for (let battleMemberIndex = 0; battleMemberIndex < battleMembers.length; battleMemberIndex++) {
-    const partyMember = battleMembers[battleMemberIndex];
-    if (!partyMember.isStateAffected(89)) {
-      continue;
+  let rescuingMemberIndex = -1;
+  
+  // Find the first party member with state 89 (rescue state)
+  for (let i = 0; i < battleMembers.length; i++) {
+    if (battleMembers[i].isStateAffected(89)) {
+      rescuingMemberIndex = i;
+      break;
     }
-
-    partyMember.removeState(89);
-    if ($dataSystem.optSideView) {
+  }
+  
+  // Early exit if no rescuing member found
+  if (rescuingMemberIndex === -1) return;
+  
+  // Get rescuing party member and bound actor
+  const partyMember = battleMembers[rescuingMemberIndex];
+  const actor = $gameActors.actor(actorId);
+  const actorData = actor.actor();
+  
+  // Handle state changes
+  partyMember.removeState(89);
+  actor.removeState(69);
+  
+  // Handle positioning in side view battles
+  if ($dataSystem.optSideView) {
+    const enemyMovementData = $gameVariables.value(703);
+    if (enemyMovementData) {
       const troopMemberIndex = $gameVariables.value(92) + 1;
+      const partyMemberIndex = rescuingMemberIndex + 1;
+      
       $gameTroop.set(troopMemberIndex, enemyMovementData[0], enemyMovementData[1], 30);
-      const partyMemberIndex = battleMemberIndex + 1;
       $gameParty.set(partyMemberIndex, enemyMovementData[0], enemyMovementData[1], 30);
-    };
-    const bindRemoveSuccessFaceData = meta['BindRemoveSuccessFace'].split(',');
-    const faceImageCode = Number(bindRemoveSuccessFaceData[0]);
-    const faceImageFrame = Number(bindRemoveSuccessFaceData[1]);
-    const bindRemoveSuccessMessages = meta['BindRemoveSuccess'].split(',');
-    $gameVariables.setValue(525, bindRemoveSuccessMessages[getRandomIndex(bindRemoveSuccessMessages.length)]);
-    const successLogMessage = `${actor.name()}は拘束から助け出された！`;
-    BattleManager._logWindow.push(`addText`, successLogMessage);
-    actor.removeState(69);
-    $gameMessage.newPage();
-    $gameMessage.setFaceImage(actorId + 'Actor' + faceImageCode, faceImageFrame);
-    $gameMessage.add(`\\V[525]`);
-    $gameVariables.setValue(703, 0);
-  };
-
+    }
+  }
+  
+  // Handle success messages and face display
+  const meta = actorData.meta;
+  const bindRemoveSuccessFaceData = meta['BindRemoveSuccessFace'].split(',');
+  const faceImageCode = Number(bindRemoveSuccessFaceData[0]);
+  const faceImageFrame = Number(bindRemoveSuccessFaceData[1]);
+  
+  // Get a random success message
+  const bindRemoveSuccessMessages = meta['BindRemoveSuccess'].split(',');
+  const randomMessageIndex = getRandomIndex(bindRemoveSuccessMessages.length);
+  const successMessage = bindRemoveSuccessMessages[randomMessageIndex];
+  
+  // Set variables and display messages
+  $gameVariables.setValue(525, successMessage);
+  BattleManager._logWindow.push('addText', `${actor.name()}は拘束から助け出された！`);
+  
+  // Show face and message
+  $gameMessage.newPage();
+  $gameMessage.setFaceImage(`${actorId}Actor${faceImageCode}`, faceImageFrame);
+  $gameMessage.add('\\V[525]');
+  
+  // Reset movement data
+  $gameVariables.setValue(703, 0);
 };
 
 //アビリティ後にＣＧ消去
