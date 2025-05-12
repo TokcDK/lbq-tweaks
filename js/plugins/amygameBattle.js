@@ -1116,148 +1116,148 @@ chain_skill = function () {
 };
 
 //攻撃防御時バストアップ表示$gameVariables.setValue(20,1); $gameVariables.setValue(520, [1,7]); 520→valueFaceSelect = 1;
-battle_bustUp = function (id1, id2, id3, id4) {
+battle_bustUp = function (basePictureId, baseMoveX, baseMoveY, baseDurationOffset) {
 
   if (!isGirl($gameActors.actor($gameVariables.value(20)))) {
     return;
   };
 
-  let value7 = 100;
-  let value8 = 0;
+  let pictureScale = 100;
+  let verticalShift = 0;
   if ($gameSwitches.value(471)) {
     picture_motion1("linear", [0]);
-    value7 = 100;
-    value8 = 0;
+    pictureScale = 100;
+    verticalShift = 0;
   } else {
     picture_motion1("smooth", [0]);
-    value7 = 100;
-    value8 = 0;
+    pictureScale = 100;
+    verticalShift = 0;
     if ($gameVariables.value(276) == 2) {
       curveFunctions.patternScaleX = curveFunctions.getPattern('wave', [20, 0.5]);
       curveFunctions.patternScaleY = curveFunctions.getPattern('wave', [20, 0.5]);
       curveFunctions.patternX = curveFunctions.getPattern('jump', [-100]);
       curveFunctions.patternY = curveFunctions.getPattern('jump', [-10]);
-      value7 = 100;
-      value8 = 50;
+      pictureScale = 100;
+      verticalShift = 50;
     }
     if ($gameVariables.value(276) == 1) {
       curveFunctions.patternScaleX = curveFunctions.getPattern('damped', [5, -0.3, 5, 0, 1]);
       curveFunctions.patternScaleY = curveFunctions.getPattern('damped', [5, -0.3, 5, 0, 1]);
       curveFunctions.patternX = curveFunctions.getPattern('jump', [100]);
-      value7 = 100;
-      value8 = 0;
+      pictureScale = 100;
+      verticalShift = 0;
     }
   }
-  let value1 = $gameVariables.value(20) + 'Actor_' + valueFaceSelect;
-  let value2;
+  let actorFaceBaseName = $gameVariables.value(20) + 'Actor_' + valueFaceSelect;
+  let horizontalAdjustment;
   if ($gameVariables.value(276) == 2) {
-    value2 = 800;
+    horizontalAdjustment = 800;
   }
   if ($gameVariables.value(276) == 1) {
-    value2 = 300;
+    horizontalAdjustment = 300;
   }
   if ($gameSwitches.value(436)) {
-    value2 = $gameMessage._IZSTPicMoveParam[0] - 640;
+    horizontalAdjustment = $gameMessage._IZSTPicMoveParam[0] - 640;
   }
   if ($gameSwitches.value(471)) {
-    value2 = 300;
+    horizontalAdjustment = 300;
   }
-  const value4 = id2;
-  const value5 = id3;
-  const value6 = id4;
+  const moveOffsetX = baseMoveX;
+  const moveOffsetY = baseMoveY;
+  const extraMoveDuration = baseDurationOffset;
   for (let i = 0; i <= 7; i++) {
-    let value10 = 1;
-    let localValue1 = value1;
+    let showPictureFlag = 1;
+    let faceImageName = actorFaceBaseName;
     if (i == 0) {
       if (valueLiningCloth[$gameVariables.value(20)] >= 1) {
-        localValue1 = $gameVariables.value(20) + 'Actor' + "Lining" + valueLiningCloth[$gameVariables.value(20)];
+        faceImageName = $gameVariables.value(20) + 'Actor' + "Lining" + valueLiningCloth[$gameVariables.value(20)];
       } else {
-        value10 = 0;
+        showPictureFlag = 0;
       }
     }
     if (i == 1) {
       if (valueBackHairCloth[$gameVariables.value(20)] >= 1) {
-        localValue1 = $gameVariables.value(20) + 'Actor' + "BackHair" + valueBackHairCloth[$gameVariables.value(20)];
+        faceImageName = $gameVariables.value(20) + 'Actor' + "BackHair" + valueBackHairCloth[$gameVariables.value(20)];
       } else {
-        value10 = 0;
+        showPictureFlag = 0;
       }
     }
     if (i == 2) {
       if (valueBustUpCloth[$gameVariables.value(20)] >= 0) {
-        localValue1 = $gameVariables.value(20) + 'Actor' + "Cloth" + valueBustUpCloth[$gameVariables.value(20)];
+        faceImageName = $gameVariables.value(20) + 'Actor' + "Cloth" + valueBustUpCloth[$gameVariables.value(20)];
       } else {
-        value10 = 0;
+        showPictureFlag = 0;
       }
     }
     if (i == 3) {
       if (valueBustUpCloth2[$gameVariables.value(20)] >= 0) {
-        localValue1 = $gameVariables.value(20) + 'Actor' + "BustUp" + valueBustUpCloth2[$gameVariables.value(20)];
+        faceImageName = $gameVariables.value(20) + 'Actor' + "BustUp" + valueBustUpCloth2[$gameVariables.value(20)];
       } else {
-        value10 = 0;
+        showPictureFlag = 0;
       }
     }
     if (i == 4) {
       if (valueCoatCloth[$gameVariables.value(20)] >= 1) {
-        localValue1 = $gameVariables.value(20) + 'Actor' + "Coat" + valueCoatCloth[$gameVariables.value(20)];
+        faceImageName = $gameVariables.value(20) + 'Actor' + "Coat" + valueCoatCloth[$gameVariables.value(20)];
       } else {
-        value10 = 0;
+        showPictureFlag = 0;
       }
     }
     if (i == 5) {
-      localValue1 = $gameVariables.value(20) + 'Actor_' + valueFaceSelect;
+      faceImageName = $gameVariables.value(20) + 'Actor_' + valueFaceSelect;
     }
     if (i == 6) {
       const actor = $gameActors.actor($gameVariables.value(20));
       if (actor.isStateAffected(781) || actor.isStateAffected(783)) {
         if (actor.isStateAffected(781)) {
-          localValue1 = $gameVariables.value(20) + 'Actor' + "CloudyEye1";
+          faceImageName = $gameVariables.value(20) + 'Actor' + "CloudyEye1";
         }
         if (actor.isStateAffected(783)) {
-          localValue1 = $gameVariables.value(20) + 'Actor' + "CloudyEye2";
+          faceImageName = $gameVariables.value(20) + 'Actor' + "CloudyEye2";
         }
         if (actor.isStateAffected(785)) {
-          localValue1 = $gameVariables.value(20) + 'Actor' + "CloudyEye4";
+          faceImageName = $gameVariables.value(20) + 'Actor' + "CloudyEye4";
         }
       } else {
-        value10 = 0;
+        showPictureFlag = 0;
       }
     }
     if (i == 7) {
       const actor = $gameActors.actor($gameVariables.value(20));
       if (actor.isStateAffected(784)) {
-        localValue1 = $gameVariables.value(20) + 'Actor' + "CloudyEye3";
+        faceImageName = $gameVariables.value(20) + 'Actor' + "CloudyEye3";
       } else {
         if (valueFrontHairCloth[$gameVariables.value(20)] >= 0) {
-          localValue1 = $gameVariables.value(20) + 'Actor' + "FrontHair" + valueFrontHairCloth[$gameVariables.value(20)];
+          faceImageName = $gameVariables.value(20) + 'Actor' + "FrontHair" + valueFrontHairCloth[$gameVariables.value(20)];
         } else {
-          value10 = 0;
+          showPictureFlag = 0;
         }
       }
     }
-    if (value10 == 1) {
-      $gameScreen.showPicture(id1 + i, "/img/talkface/" + localValue1, 1, 640 + value2, 384 + value8 + value5, value7, value7, 0, 0);
+    if (showPictureFlag == 1) {
+      $gameScreen.showPicture(basePictureId + i, "/img/talkface/" + faceImageName, 1, 640 + horizontalAdjustment, 384 + verticalShift + moveOffsetY, pictureScale, pictureScale, 0, 0);
       if (!$gameSwitches.value(471)) {
-        $gameScreen.movePicture(id1 + i, 1, 640 + value4, 384 + value5, 100, 100, 255, 0, value6 + 10);
+        $gameScreen.movePicture(basePictureId + i, 1, 640 + moveOffsetX, 384 + moveOffsetY, 100, 100, 255, 0, extraMoveDuration + 10);
       }
       if (i == 3) {
         if ($gameParty.inBattle()) {
-          hcg_piston(id1 + i, 10, 2, 4);
+          hcg_piston(basePictureId + i, 10, 2, 4);
         } else {
-          hcg_piston(id1 + i, 10, 1, 4);
+          hcg_piston(basePictureId + i, 10, 1, 4);
         }
       } else {
-        tachie_bless(id1 + i, 3);
+        tachie_bless(basePictureId + i, 3);
       }
     }
   }
   if (!$gameSwitches.value(471)) {
     if ($gameActors.actor($gameVariables.value(20)).isStateAffected(782)) {
       if ($gameScreen.picture(99)) {
-        let valueHypnosisCount = $gameActors.actor($gameVariables.value(20)).getStateCounter(782); //60,40,20
-        let valueHypnosisName = $gameVariables.value(20) + 'Actor' + "HypnosisEye_0";
-        $gameScreen.setPicturesAnimation(2, 10, "連番", valueHypnosisCount);
-        $gameScreen.showPicture(99, "/img/talkface/" + valueHypnosisName, 1, 640 + value2, 384 + value8 + value5, value7, value7, 0, 0);
-        $gameScreen.movePicture(99, 1, 640 + value4, 384 + value5, 100, 100, 255, 0, value6 + 10);
+        let hypnosisCount = $gameActors.actor($gameVariables.value(20)).getStateCounter(782); //60,40,20
+        let hypnosisImageName = $gameVariables.value(20) + 'Actor' + "HypnosisEye_0";
+        $gameScreen.setPicturesAnimation(2, 10, "連番", hypnosisCount);
+        $gameScreen.showPicture(99, "/img/talkface/" + hypnosisImageName, 1, 640 + horizontalAdjustment, 384 + verticalShift + moveOffsetY, pictureScale, pictureScale, 0, 0);
+        $gameScreen.movePicture(99, 1, 640 + moveOffsetX, 384 + moveOffsetY, 100, 100, 255, 0, extraMoveDuration + 10);
         $gameScreen.picture(99).startAnimationFrame(3, true, [1, 1, 1, 2]);
       }
     }
