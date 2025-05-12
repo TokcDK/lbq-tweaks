@@ -1153,7 +1153,7 @@ battle_bustUp = function (basePictureId, baseMoveX, baseMoveY, baseDurationOffse
   if ($gameVariables.value(276) == 2) {
     horizontalAdjustment = 800;
   }
-  if ($gameVariables.value(276) == 1) {
+  else if ($gameVariables.value(276) == 1) {
     horizontalAdjustment = 300;
   }
   if ($gameSwitches.value(436)) {
@@ -1168,70 +1168,74 @@ battle_bustUp = function (basePictureId, baseMoveX, baseMoveY, baseDurationOffse
   for (let i = 0; i <= 7; i++) {
     let showPictureFlag = 1;
     let faceImageName = actorFaceBaseName;
-    if (i == 0) {
-      if (valueLiningCloth[$gameVariables.value(20)] >= 1) {
-        faceImageName = $gameVariables.value(20) + 'Actor' + "Lining" + valueLiningCloth[$gameVariables.value(20)];
-      } else {
-        showPictureFlag = 0;
-      }
-    }
-    if (i == 1) {
-      if (valueBackHairCloth[$gameVariables.value(20)] >= 1) {
-        faceImageName = $gameVariables.value(20) + 'Actor' + "BackHair" + valueBackHairCloth[$gameVariables.value(20)];
-      } else {
-        showPictureFlag = 0;
-      }
-    }
-    if (i == 2) {
-      if (valueBustUpCloth[$gameVariables.value(20)] >= 0) {
-        faceImageName = $gameVariables.value(20) + 'Actor' + "Cloth" + valueBustUpCloth[$gameVariables.value(20)];
-      } else {
-        showPictureFlag = 0;
-      }
-    }
-    if (i == 3) {
-      if (valueBustUpCloth2[$gameVariables.value(20)] >= 0) {
-        faceImageName = $gameVariables.value(20) + 'Actor' + "BustUp" + valueBustUpCloth2[$gameVariables.value(20)];
-      } else {
-        showPictureFlag = 0;
-      }
-    }
-    if (i == 4) {
-      if (valueCoatCloth[$gameVariables.value(20)] >= 1) {
-        faceImageName = $gameVariables.value(20) + 'Actor' + "Coat" + valueCoatCloth[$gameVariables.value(20)];
-      } else {
-        showPictureFlag = 0;
-      }
-    }
-    if (i == 5) {
-      faceImageName = $gameVariables.value(20) + 'Actor_' + valueFaceSelect;
-    }
-    if (i == 6) {
-      const actor = $gameActors.actor($gameVariables.value(20));
-      if (actor.isStateAffected(781) || actor.isStateAffected(783)) {
-        if (actor.isStateAffected(781)) {
-          faceImageName = $gameVariables.value(20) + 'Actor' + "CloudyEye1";
-        }
-        if (actor.isStateAffected(783)) {
-          faceImageName = $gameVariables.value(20) + 'Actor' + "CloudyEye2";
-        }
-        if (actor.isStateAffected(785)) {
-          faceImageName = $gameVariables.value(20) + 'Actor' + "CloudyEye4";
-        }
-      } else {
-        showPictureFlag = 0;
-      }
-    }
-    if (i == 7) {
-      const actor = $gameActors.actor($gameVariables.value(20));
-      if (actor.isStateAffected(784)) {
-        faceImageName = $gameVariables.value(20) + 'Actor' + "CloudyEye3";
-      } else {
-        if (valueFrontHairCloth[$gameVariables.value(20)] >= 0) {
-          faceImageName = $gameVariables.value(20) + 'Actor' + "FrontHair" + valueFrontHairCloth[$gameVariables.value(20)];
+    switch(i) {
+      case 0:
+        if (valueLiningCloth[$gameVariables.value(20)] >= 1) {
+          faceImageName = $gameVariables.value(20) + 'Actor' + "Lining" + valueLiningCloth[$gameVariables.value(20)];
         } else {
           showPictureFlag = 0;
         }
+        break;
+      case 1:
+        if (valueBackHairCloth[$gameVariables.value(20)] >= 1) {
+          faceImageName = $gameVariables.value(20) + 'Actor' + "BackHair" + valueBackHairCloth[$gameVariables.value(20)];
+        } else {
+          showPictureFlag = 0;
+        }
+        break;
+      case 2:
+        if (valueBustUpCloth[$gameVariables.value(20)] >= 0) {
+          faceImageName = $gameVariables.value(20) + 'Actor' + "Cloth" + valueBustUpCloth[$gameVariables.value(20)];
+        } else {
+          showPictureFlag = 0;
+        }
+        break;
+      case 3:
+        if (valueBustUpCloth2[$gameVariables.value(20)] >= 0) {
+          faceImageName = $gameVariables.value(20) + 'Actor' + "BustUp" + valueBustUpCloth2[$gameVariables.value(20)];
+        } else {
+          showPictureFlag = 0;
+        }
+        break;
+      case 4:
+        if (valueCoatCloth[$gameVariables.value(20)] >= 1) {
+          faceImageName = $gameVariables.value(20) + 'Actor' + "Coat" + valueCoatCloth[$gameVariables.value(20)];
+        } else {
+          showPictureFlag = 0;
+        }
+        break;
+      case 5:
+        faceImageName = $gameVariables.value(20) + 'Actor_' + valueFaceSelect;
+        break;
+      case 6: {
+        const actor = $gameActors.actor($gameVariables.value(20));
+        if (actor.isStateAffected(781) || actor.isStateAffected(783)) {
+          if (actor.isStateAffected(781)) {
+            faceImageName = $gameVariables.value(20) + 'Actor' + "CloudyEye1";
+          }
+          if (actor.isStateAffected(783)) {
+            faceImageName = $gameVariables.value(20) + 'Actor' + "CloudyEye2";
+          }
+          if (actor.isStateAffected(785)) {
+            faceImageName = $gameVariables.value(20) + 'Actor' + "CloudyEye4";
+          }
+        } else {
+          showPictureFlag = 0;
+        }
+        break;
+      }
+      case 7: {
+        const actor = $gameActors.actor($gameVariables.value(20));
+        if (actor.isStateAffected(784)) {
+          faceImageName = $gameVariables.value(20) + 'Actor' + "CloudyEye3";
+        } else {
+          if (valueFrontHairCloth[$gameVariables.value(20)] >= 0) {
+            faceImageName = $gameVariables.value(20) + 'Actor' + "FrontHair" + valueFrontHairCloth[$gameVariables.value(20)];
+          } else {
+            showPictureFlag = 0;
+          }
+        }
+        break;
       }
     }
     if (showPictureFlag == 1) {
