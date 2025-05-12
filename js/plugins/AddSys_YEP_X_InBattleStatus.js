@@ -106,7 +106,7 @@
                         SceneManager._scene._helpWindow.hide();
                         SceneManager._scene._inBattleStatusWindow.hide();
                         SceneManager._scene._inBattleStateList.hide();
-                        battle_xsarStatas(this._battler.index());
+                        battle_xsarStatas1(this._battler, true);
                         valueStatusSet1 = 1;
                       };
                     }else{
@@ -114,7 +114,7 @@
                       SceneManager._scene._inBattleStatusWindow.hide();
                       SceneManager._scene._inBattleStateList.hide();
                       $gameVariables.setValue(20,this._battler.actorId());
-                      battle_xsarStatas(20);
+                      battle_xsarStatas1(this._battler, false);
                       valueStatusSet1 = 1;
                     };
                   } else {

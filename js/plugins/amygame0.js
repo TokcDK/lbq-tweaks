@@ -141,7 +141,7 @@
     if (valueStatusSet1 == 0) {
       var actor = this.actor();
       $gameVariables.setValue(20, actor.actorId());
-      battle_xsarStatas(20);
+      battle_xsarStatas1(actor, false);
       valueStatusSet1 = 1;
     } else {
       WindowManager.hideAll();
