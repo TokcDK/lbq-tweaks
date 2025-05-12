@@ -1288,26 +1288,44 @@ tachie_aura = function () {
 
 //パーティメンバーが居る時に拘束解除。
 actor_kousokukaijo1 = function (boundActorId) {
-
-  for (let memberIndex = 0; memberIndex < $gameParty.battleMembers().length; memberIndex++) {
-    const battleMember = $gameParty.battleMembers()[memberIndex];
-    const currentActorId = battleMember.actorId();
-    if (currentActorId == boundActorId || battleMember.isStateAffected(61) || battleMember.isStateAffected(63) || battleMember.isStateAffected(64) || battleMember.battleSkillsRaw().contains(80)) { } else {
-      $gameActors.actor(currentActorId).addState(89);
-      const partyPosition = memberIndex + 1;
-      if ($dataSystem.optSideView) {
-        $gameVariables.setValue(705, [$gameParty.getX(partyPosition), $gameParty.getY(partyPosition)]);
-        $gameParty.set(partyPosition, $gameVariables.value(704)[0] + 50, $gameVariables.value(704)[1], 20);
-      };
-      break;
+  const battleMembers = $gameParty.battleMembers();
+  
+  // Loop through battle members to find someone who can rescue
+  for (let i = 0; i < battleMembers.length; i++) {
+    const member = battleMembers[i];
+    
+    // Skip if this member is the bound actor or has incapacitating states, or has skill 80
+    if (member.actorId() === boundActorId || 
+        member.isStateAffected(61) || 
+        member.isStateAffected(63) || 
+        member.isStateAffected(64) || 
+        member.battleSkillsRaw().contains(80)) {
+      continue;
     }
-  };
-
+    
+    // Found a member who can help - set rescue state
+    member.addState(89);
+    
+    // Handle side view positioning if needed
+    if ($dataSystem.optSideView) {
+      const partyPosition = i + 1;
+      const currentPosition = [$gameParty.getX(partyPosition), $gameParty.getY(partyPosition)];
+      
+      // Save current position for later restoration
+      $gameVariables.setValue(705, currentPosition);
+      
+      // Move to the bound character's position with offset
+      const targetPositionData = $gameVariables.value(704);
+      $gameParty.set(partyPosition, targetPositionData[0] + 50, targetPositionData[1], 20);
+    }
+    
+    // We only need one rescuer, so exit after finding one
+    break;
+  }
 };
 
 //パーティメンバーが居る時に拘束解除。
 actor_kousokukaijo2 = function (boundActorId) {
-  // Cache the battle members array to avoid repeated function calls
   const battleMembers = $gameParty.battleMembers();
   const boundActor = $gameActors.actor(boundActorId);
   
