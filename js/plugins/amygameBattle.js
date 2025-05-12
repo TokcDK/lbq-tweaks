@@ -1449,41 +1449,37 @@ function calcCritMultBonusBattleXsarStatas(user) {
 function calcStateRate(user, index) {
   return Math.floor(user.stateRate(index) * 100);
 }
+
 function calcElementAmplifyBattleXsarStatas(user, index, includeBonus) {
   let base = Math.floor(user.elementAmplifyRate(index) * 100);
   return includeBonus ? base + valueAttackAmplifysActorId[user.actorId()][index] : base;
 }
 
-function buildStatsTextPart1BattleXsarStatas(user) {
-  let statsTextPart1 = "";
-  statsTextPart1 += `\\C[2]詳細能力値[1]\\C[0]\n`;
-  statsTextPart1 += `\\C[16]\\I[636]連撃率　  　:\\C[0]${"n"}%\n`;
-  statsTextPart1 += `\\C[16]\\I[637]回復率　　  :\\C[0]${calcElementRateBattleXsarStatas(user, 12)}%\n`;
-  statsTextPart1 += `\\C[16]\\I[630]命中率　　　:\\C[0]${calcXParamBattleXsarStatas(user, 0)}%\n`;
-  statsTextPart1 += `\\C[16]\\I[632]回避率　　　:\\C[0]${calcXParamBattleXsarStatas(user, 1)}%\n`;
-  statsTextPart1 += `\\C[16]\\I[631]会心率　　　:\\C[0]${calcXParamBattleXsarStatas(user, 2)}%\n`;
-  //txt += `会心回避率:${user.xparam(3)*100}%\n`;
-  //txt += `魔法回避率:${user.xparam(4)*100}%\n`;
-  //txt += `魔法反射率:${user.xparam(5)*100}%\n`;
-  //txt += `反撃率:${user.xparam(6)*100}%\n`;
-  statsTextPart1 += `\\C[16]\\I[640]HP再生率　　:\\C[0]${calcXParamBattleXsarStatas(user, 7)}%\n`;
-  statsTextPart1 += `\\C[16]\\I[641]MP再生率　　:\\C[0]${calcXParamBattleXsarStatas(user, 8)}%\n`;
-  statsTextPart1 += `\\C[16]\\I[642]TP再生率　　:\\C[0]${calcXParamBattleXsarStatas(user, 9)}%\n`;
-  statsTextPart1 += `\\C[16]\\I[633]狙われ率　　:\\C[0]${calcSParamBattleXsarStatas(user, 0)}%\n`;
-  //txt += `防御効果率:${user.sparam(1)*100}%\n`;
-  //txt += `回復効果率:${user.sparam(2)*100}%\n`;
-  //txt += `薬の効果:${user.sparam(3)*100}%\n`;
-  statsTextPart1 += `\\C[16]\\I[634]MP消費率　　:\\C[0]${calcSParamBattleXsarStatas(user, 4)}%\n`;
-  statsTextPart1 += `\\C[16]\\I[635]TPﾁｬｰｼﾞ率　 :\\C[0]${calcSParamBattleXsarStatas(user, 5)}%\n`;
-  statsTextPart1 += `\\C[16]\\I[638]物理ﾀﾞﾒｶｯﾄ率:\\C[0]${calcSParamBattleXsarStatas(user, 6)}%\n`;
-  statsTextPart1 += `\\C[16]\\I[639]魔法ﾀﾞﾒｶｯﾄ率:\\C[0]${calcSParamBattleXsarStatas(user, 7)}%\n`;
-  //txt += `床ダメージ率:${user.sparam(8)*100}%\n`;
-  statsTextPart1 += `\\C[16]\\I[656]経験獲得率　:\\C[0]${calcSParamBattleXsarStatas(user, 9)}%\n`;
-  {
-    statsTextPart1 += `\\C[16]\\I[624]ﾎﾟｰｼｮﾝ耐性率:\\C[0]${$gameVariables.value(380 + $gameVariables.value(20))[58]}%\n`;
-    statsTextPart1 += `\\C[16]\\I[683]通常異常耐性:\\C[0]${calcStateRate(user, 15)}%\n`;
-    statsTextPart1 += `\\C[16]\\I[684]特殊異常耐性:\\C[0]${calcStateRate(user, 30) }%\n`;
-  }
+function buildStatsTextPart1BattleXsarStatas(user) {  
+  // Define the header
+  const headerText = "詳細能力値";
+  let statsTextPart1 = `\\C[2]${headerText}[1]\\C[0]\n`;
+  
+  // Add each stat line using the helper function
+  // Note: The "n" value for 連撃率 (Chain Rate) appears to be a placeholder - should be replaced with actual calculation
+  statsTextPart1 += formatStatLine(636, "連撃率　  　", "n");
+  statsTextPart1 += formatStatLine(637, "回復率　　  ", calcElementRateBattleXsarStatas(user, 12));
+  statsTextPart1 += formatStatLine(630, "命中率　　　", calcXParamBattleXsarStatas(user, 0));
+  statsTextPart1 += formatStatLine(632, "回避率　　　", calcXParamBattleXsarStatas(user, 1));
+  statsTextPart1 += formatStatLine(631, "会心率　　　", calcXParamBattleXsarStatas(user, 2));
+  statsTextPart1 += formatStatLine(640, "HP再生率　　", calcXParamBattleXsarStatas(user, 7));
+  statsTextPart1 += formatStatLine(641, "MP再生率　　", calcXParamBattleXsarStatas(user, 8));
+  statsTextPart1 += formatStatLine(642, "TP再生率　　", calcXParamBattleXsarStatas(user, 9));
+  statsTextPart1 += formatStatLine(633, "狙われ率　　", calcSParamBattleXsarStatas(user, 0));
+  statsTextPart1 += formatStatLine(634, "MP消費率　　", calcSParamBattleXsarStatas(user, 4));
+  statsTextPart1 += formatStatLine(635, "TPﾁｬｰｼﾞ率　 ", calcSParamBattleXsarStatas(user, 5));
+  statsTextPart1 += formatStatLine(638, "物理ﾀﾞﾒｶｯﾄ率", calcSParamBattleXsarStatas(user, 6));
+  statsTextPart1 += formatStatLine(639, "魔法ﾀﾞﾒｶｯﾄ率", calcSParamBattleXsarStatas(user, 7));
+  statsTextPart1 += formatStatLine(656, "経験獲得率　", calcSParamBattleXsarStatas(user, 9));
+  statsTextPart1 += formatStatLine(624, "ﾎﾟｰｼｮﾝ耐性率", $gameVariables.value(380 + $gameVariables.value(20))[58]);
+  statsTextPart1 += formatStatLine(683, "通常異常耐性", calcStateRate(user, 15));
+  statsTextPart1 += formatStatLine(684, "特殊異常耐性", calcStateRate(user, 30));
+  
   return statsTextPart1;
 }
 
@@ -1504,6 +1500,10 @@ function buildStatsTextPart2BattleXsarStatas(user, isEnemy) {
   return statsTextPart2;
 }
 
+const formatStatLine = (iconId, labelText, value) => {
+  return `\\C[16]\\I[${iconId}]${labelText}:\\C[0]${value}%\n`;
+};
+
 function buildStatsTextPart3BattleXsarStatas(user, isEnemy) {
   let statsTextPart3 = "";
   statsTextPart3 += `\\C[2]詳細能力値[3]\\C[0]\n`;
@@ -1513,19 +1513,19 @@ function buildStatsTextPart3BattleXsarStatas(user, isEnemy) {
       statsTextPart3 += `\\C[16]\\I[666]スキル威力率:\\C[0]+${valueAddPowerCustom}\n`;
     }
   }
-  statsTextPart3 += `\\C[16]\\I[31]奥義威力率　:\\C[0]${calcElementAmplifyBattleXsarStatas(user, 10, isEnemy)}%\n`;
-  statsTextPart3 += `\\C[16]\\I[673]ｱﾋﾞﾘﾃｨ威力率:\\C[0]${calcElementAmplifyBattleXsarStatas(user, 20, isEnemy)}%\n`;
-  statsTextPart3 += `\\C[16]\\I[78]会心威力率　:\\C[0]${calcCritMultBonusBattleXsarStatas(user)}%\n`;
-  statsTextPart3 += `\\C[16]\\I[480]剣威力率　　:\\C[0]${calcElementAmplifyBattleXsarStatas(user, 21, isEnemy)}%\n`;
-  statsTextPart3 += `\\C[16]\\I[481]短剣威力率　:\\C[0]${calcElementAmplifyBattleXsarStatas(user, 22, isEnemy)}%\n`;
-  statsTextPart3 += `\\C[16]\\I[482]刀威力率　　:\\C[0]${calcElementAmplifyBattleXsarStatas(user, 23, isEnemy)}%\n`;
-  statsTextPart3 += `\\C[16]\\I[483]杖威力率　　:\\C[0]${calcElementAmplifyBattleXsarStatas(user, 24, isEnemy)}%\n`;
-  statsTextPart3 += `\\C[16]\\I[484]拳威力率　　:\\C[0]${calcElementAmplifyBattleXsarStatas(user, 25, isEnemy)}%\n`;
-  statsTextPart3 += `\\C[16]\\I[485]槍威力率　　:\\C[0]${calcElementAmplifyBattleXsarStatas(user, 26, isEnemy)}%\n`;
-  statsTextPart3 += `\\C[16]\\I[486]斧威力率　　:\\C[0]${calcElementAmplifyBattleXsarStatas(user, 27, isEnemy)}%\n`;
-  statsTextPart3 += `\\C[16]\\I[487]銃威力率　　:\\C[0]${calcElementAmplifyBattleXsarStatas(user, 28, isEnemy)}%\n`;
-  statsTextPart3 += `\\C[16]\\I[488]弓威力率　　:\\C[0]${calcElementAmplifyBattleXsarStatas(user, 29, isEnemy)}%\n`;
-  statsTextPart3 += `\\C[16]\\I[489]楽器威力率　:\\C[0]${calcElementAmplifyBattleXsarStatas(user, 30, isEnemy)}%\n`;
+  statsTextPart3 += formatStatLine(31, "奥義威力率　", calcElementAmplifyBattleXsarStatas(user, 10, isEnemy));
+  statsTextPart3 += formatStatLine(673, "ｱﾋﾞﾘﾃｨ威力率", calcElementAmplifyBattleXsarStatas(user, 20, isEnemy));
+  statsTextPart3 += formatStatLine(78, "会心威力率　", calcCritMultBonusBattleXsarStatas(user));
+  statsTextPart3 += formatStatLine(480, "剣威力率　　", calcElementAmplifyBattleXsarStatas(user, 21, isEnemy));
+  statsTextPart3 += formatStatLine(481, "短剣威力率　", calcElementAmplifyBattleXsarStatas(user, 22, isEnemy));
+  statsTextPart3 += formatStatLine(482, "刀威力率　　", calcElementAmplifyBattleXsarStatas(user, 23, isEnemy));
+  statsTextPart3 += formatStatLine(483, "杖威力率　　", calcElementAmplifyBattleXsarStatas(user, 24, isEnemy));
+  statsTextPart3 += formatStatLine(484, "拳威力率　　", calcElementAmplifyBattleXsarStatas(user, 25, isEnemy));
+  statsTextPart3 += formatStatLine(485, "槍威力率　　", calcElementAmplifyBattleXsarStatas(user, 26, isEnemy));
+  statsTextPart3 += formatStatLine(486, "斧威力率　　", calcElementAmplifyBattleXsarStatas(user, 27, isEnemy));
+  statsTextPart3 += formatStatLine(487, "銃威力率　　", calcElementAmplifyBattleXsarStatas(user, 28, isEnemy));
+  statsTextPart3 += formatStatLine(488, "弓威力率　　", calcElementAmplifyBattleXsarStatas(user, 29, isEnemy));
+  statsTextPart3 += formatStatLine(489, "楽器威力率　", calcElementAmplifyBattleXsarStatas(user, 30, isEnemy));
   // 神聖邪悪耐性率表示 (if needed)
   // if (false) { ... }
   return statsTextPart3;
