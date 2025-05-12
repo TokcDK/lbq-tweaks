@@ -35,6 +35,11 @@
     430, // skill equip all
   ];
 
+  //???there is call of it somewhere but cant find it by function name
+  run_old_savegame_fixes = function () {
+    runOldSavegameFixes();
+  }
+
   // functions need to run after saved game loaded
   /*:
   * @function
