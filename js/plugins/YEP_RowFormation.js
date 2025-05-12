@@ -2600,6 +2600,10 @@ Spriteset_Battle.prototype.createBackground = function() {
     Yanfly.Row.Spriteset_Battle_createBackground.call(this);
     if (Yanfly.Row.SavedBackgroundBitmap) {
       var spr = this._backgroundSprite;
+      if (!spr || !spr.bitmap){
+        console.error('Background sprite not found.', { _backgroundSprite: this._backgroundSprite });
+        return;
+      }
       spr.bitmap = Yanfly.Row.SavedBackgroundBitmap;
       Yanfly.Row.SavedBackgroundBitmap = undefined;
     }
