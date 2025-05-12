@@ -1117,12 +1117,48 @@ chain_skill = function () {
 
 //攻撃防御時バストアップ表示$gameVariables.setValue(20,1); $gameVariables.setValue(520, [1,7]); 520→valueFaceSelect = 1;
 battle_bustUp = function (basePictureId, baseMoveX, baseMoveY, baseDurationOffset) {
-
+  // Get the acting actor's ID from the game variables
   const actorId = $gameVariables.value(20);
   if (!isGirl($gameActors.actor(actorId))) {
     return;
   };
 
+  // Setup picture motion and compute picture scale & vertical shift
+  const { pictureScale, verticalShift } = setupScaleAndShiftBattleBustUpBattleBustUp();
+
+  // Calculate horizontal adjustment based on battle state and switches
+  const horizontalShift = calculateHorizontalAdjustmentBattleBustUpBattleBustUp();
+
+  const moveOffsetX = baseMoveX;
+  const moveOffsetY = baseMoveY;
+  const extraMoveDuration = baseDurationOffset;
+  const actorFaceBaseName = actorId + 'Actor_' + valueFaceSelect;
+
+  // Loop through each face image part (from 0 to 7)
+  for (let i = 0; i <= 7; i++) {
+    processFaceImageBattleBustUpBattleBustUp(
+      basePictureId, actorId, actorFaceBaseName, i,
+      horizontalShift, verticalShift,
+      moveOffsetX, moveOffsetY, pictureScale, extraMoveDuration
+    );
+  }
+
+  // Process hypnosis effect if actor is affected by hypnosis state (782)
+  processHypnosisEffectBattleBustUpBattleBustUp(
+    basePictureId, actorId,
+    horizontalShift, verticalShift,
+    moveOffsetX, moveOffsetY, pictureScale, extraMoveDuration
+  );
+
+  if ($gameVariables.value(276) > 0) {
+    picture_motion1("smooth", [0]);
+  }
+};
+
+//---------------------------------------------------------------------
+// Setup scale and vertical shift based on the current battle conditions.
+//---------------------------------------------------------------------
+function setupScaleAndShiftBattleBustUpBattleBustUp() {
   let pictureScale = 100;
   let verticalShift = 0;
   if ($gameSwitches.value(471)) {
@@ -1141,7 +1177,7 @@ battle_bustUp = function (basePictureId, baseMoveX, baseMoveY, baseDurationOffse
       pictureScale = 100;
       verticalShift = 50;
     }
-    if ($gameVariables.value(276) == 1) {
+    else if ($gameVariables.value(276) == 1) {
       curveFunctions.patternScaleX = curveFunctions.getPattern('damped', [5, -0.3, 5, 0, 1]);
       curveFunctions.patternScaleY = curveFunctions.getPattern('damped', [5, -0.3, 5, 0, 1]);
       curveFunctions.patternX = curveFunctions.getPattern('jump', [100]);
@@ -1149,12 +1185,17 @@ battle_bustUp = function (basePictureId, baseMoveX, baseMoveY, baseDurationOffse
       verticalShift = 0;
     }
   }
-  let actorFaceBaseName = actorId + 'Actor_' + valueFaceSelect;
+  return { pictureScale: pictureScale, verticalShift: verticalShift };
+}
+
+//---------------------------------------------------------------------
+// Calculate horizontal adjustment based on battle variables and switches.
+//---------------------------------------------------------------------
+function calculateHorizontalAdjustmentBattleBustUpBattleBustUp() {
   let horizontalAdjustment;
   if ($gameVariables.value(276) == 2) {
     horizontalAdjustment = 800;
-  }
-  else if ($gameVariables.value(276) == 1) {
+  } else if ($gameVariables.value(276) == 1) {
     horizontalAdjustment = 300;
   }
   if ($gameSwitches.value(436)) {
@@ -1163,48 +1204,92 @@ battle_bustUp = function (basePictureId, baseMoveX, baseMoveY, baseDurationOffse
   if ($gameSwitches.value(471)) {
     horizontalAdjustment = 300;
   }
-  const moveOffsetX = baseMoveX;
-  const moveOffsetY = baseMoveY;
-  const extraMoveDuration = baseDurationOffset;
-  for (let i = 0; i <= 7; i++) {
-    let showPictureFlag = false;
-    let faceImageName = actorFaceBaseName;
+  return horizontalAdjustment;
+}
 
-    ({faceImageName, showPictureFlag} = getFaceImageNameBattleBustUp(actorId, i));
+//---------------------------------------------------------------------
+// Process and display each face image based on its index.
+//---------------------------------------------------------------------
+function processFaceImageBattleBustUpBattleBustUp(basePictureId, actorId, faceImageName, index, horizontalShift, verticalShift, moveOffsetX, moveOffsetY, pictureScale, extraMoveDuration) {
+  let showPictureFlag = false;
 
-    if (showPictureFlag === true) {
-      $gameScreen.showPicture(basePictureId + i, "/img/talkface/" + faceImageName, 1, 640 + horizontalAdjustment, 384 + verticalShift + moveOffsetY, pictureScale, pictureScale, 0, 0);
-      if (!$gameSwitches.value(471)) {
-        $gameScreen.movePicture(basePictureId + i, 1, 640 + moveOffsetX, 384 + moveOffsetY, 100, 100, 255, 0, extraMoveDuration + 10);
-      }
-      if (i == 3) {
-        if ($gameParty.inBattle()) {
-          hcg_piston(basePictureId + i, 10, 2, 4);
-        } else {
-          hcg_piston(basePictureId + i, 10, 1, 4);
-        }
+  // Get the proper face image name and flag for display
+  ({ faceImageName, showPictureFlag } = getFaceImageNameBattleBustUp(actorId, index));
+
+  if (showPictureFlag === true) {
+    $gameScreen.showPicture(
+      basePictureId + index,
+      "/img/talkface/" + faceImageName,
+      1,
+      640 + horizontalShift,
+      384 + verticalShift + moveOffsetY,
+      pictureScale,
+      pictureScale,
+      0,
+      0
+    );
+    if (!$gameSwitches.value(471)) {
+      $gameScreen.movePicture(
+        basePictureId + index,
+        1,
+        640 + moveOffsetX,
+        384 + moveOffsetY,
+        100,
+        100,
+        255,
+        0,
+        extraMoveDuration + 10
+      );
+    }
+    if (index == 3) {
+      if ($gameParty.inBattle()) {
+        hcg_piston(basePictureId + index, 10, 2, 4);
       } else {
-        tachie_bless(basePictureId + i, 3);
+        hcg_piston(basePictureId + index, 10, 1, 4);
       }
+    } else {
+      tachie_bless(basePictureId + index, 3);
     }
   }
+}
+
+//---------------------------------------------------------------------
+// Process the hypnosis effect for the actor if state 782 is active.
+//---------------------------------------------------------------------
+function processHypnosisEffectBattleBustUpBattleBustUp(basePictureId, actorId, horizontalAdjustment, verticalShift, moveOffsetX, moveOffsetY, pictureScale, extraMoveDuration) {
   if (!$gameSwitches.value(471)) {
     if ($gameActors.actor(actorId).isStateAffected(782)) {
       if ($gameScreen.picture(99)) {
-        let hypnosisCount = $gameActors.actor(actorId).getStateCounter(782); //60,40,20
+        let hypnosisCount = $gameActors.actor(actorId).getStateCounter(782); // e.g., 60,40,20
         let hypnosisImageName = actorId + 'Actor' + "HypnosisEye_0";
         $gameScreen.setPicturesAnimation(2, 10, "連番", hypnosisCount);
-        $gameScreen.showPicture(99, "/img/talkface/" + hypnosisImageName, 1, 640 + horizontalAdjustment, 384 + verticalShift + moveOffsetY, pictureScale, pictureScale, 0, 0);
-        $gameScreen.movePicture(99, 1, 640 + moveOffsetX, 384 + moveOffsetY, 100, 100, 255, 0, extraMoveDuration + 10);
+        $gameScreen.showPicture(
+          99,
+          "/img/talkface/" + hypnosisImageName,
+          1,
+          640 + horizontalAdjustment,
+          384 + verticalShift + moveOffsetY,
+          pictureScale,
+          pictureScale,
+          0,
+          0
+        );
+        $gameScreen.movePicture(
+          99,
+          1,
+          640 + moveOffsetX,
+          384 + moveOffsetY,
+          100,
+          100,
+          255,
+          0,
+          extraMoveDuration + 10
+        );
         $gameScreen.picture(99).startAnimationFrame(3, true, [1, 1, 1, 2]);
       }
     }
   }
-  if ($gameVariables.value(276) >= 1) {
-    picture_motion1("smooth", [0]);
-  }
-
-};
+}
 
 function getFaceImageNameBattleBustUp(actorId, i) {
   let faceImageName = "";
