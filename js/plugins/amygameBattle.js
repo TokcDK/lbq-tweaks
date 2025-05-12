@@ -1335,7 +1335,7 @@ actor_kousokukaijo3 = function (actorId) {
     if (!partyMember.isStateAffected(89)) {
       continue;
     }
-    
+
     partyMember.removeState(89);
     if ($dataSystem.optSideView) {
       const troopMemberIndex = $gameVariables.value(92) + 1;
@@ -1376,7 +1376,7 @@ skill_after1 = function (user, skillId) {
       const yPosition = picture50.y();
       const scaleX = picture50.scaleX();
       const scaleY = picture50.scaleY();
-      const currentOpacity = picture50.opacity();
+      //const currentOpacity = picture50.opacity();
       $gameScreen.movePicture(50, origin, xPosition, yPosition, scaleX, scaleY, 250, 0, 60);
     }
   };
