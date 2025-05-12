@@ -1393,7 +1393,7 @@ battle_xsarStatas = function (battlerActorId) {
   function calcElementRate(user, index) {
     return Math.floor(user.elementRate(index) * 100);
   }
-  function calcCritMultBonus(user, index) {
+  function calcCritMultBonus(user) {
     return user.criticalMultiplierBonus() * 100;
   }
   function calcElementAmplify(user, index, includeBonus) {
@@ -1401,6 +1401,7 @@ battle_xsarStatas = function (battlerActorId) {
     return includeBonus ? base + valueAttackAmplifysActorId[$gameVariables.value(20)][index] : base;
   }
 
+  const isActor = battlerActorId >= 20;
   const user = battlerActorId === 20 ? $gameActors.actor($gameVariables.value(20)) : $gameTroop.members()[battlerActorId];
 
   let statsTextPart1 = [];
@@ -1439,12 +1440,7 @@ battle_xsarStatas = function (battlerActorId) {
   statsTextPart2.push(`\\C[2]詳細能力値[2]\\C[0]\n`);
   for (let i = 1; i <= 9; i++) {
     amygame_elementIcon(i);
-    let elementAmplifyValue;
-    if (battlerActorId >= 20) {
-      elementAmplifyValue = calcElementAmplify(user, i, true);
-    } else {
-      elementAmplifyValue = calcElementAmplify(user, i, false);
-    }
+    const elementAmplifyValue = calcElementAmplify(user, i, isActor);
     let amplifyLabel = (i === 1 || i === 2) ? `威力率　` : `属性威力率`;
     statsTextPart2.push(`\\C[16]\x1bI[${valueElementIconArr[1]}]${$dataSystem.elements[i]}${amplifyLabel}:\\C[0]${elementAmplifyValue}%\n`);
   }
@@ -1456,14 +1452,14 @@ battle_xsarStatas = function (battlerActorId) {
 
   let statsTextPart3 = [];
   statsTextPart3.push(`\\C[2]詳細能力値[3]\\C[0]\n`);
-  if (battlerActorId >= 20) {
+  if (isActor) {
     skill_addPowerSet(user, $dataSkills, 1, 1);
     if (valueAddPowerCustom >= 1) {
       statsTextPart3.push(`\\C[16]\\I[666]スキル威力率:\\C[0]+${valueAddPowerCustom}\n`);
     }
     statsTextPart3.push(`\\C[16]\\I[31]奥義威力率　:\\C[0]${calcElementAmplify(user, 10, true)}%\n`);
     statsTextPart3.push(`\\C[16]\\I[673]ｱﾋﾞﾘﾃｨ威力率:\\C[0]${calcElementAmplify(user, 20, true)}%\n`);
-    statsTextPart3.push(`\\C[16]\\I[78]会心威力率　:\\C[0]${calcCritMultBonus()}%\n`);
+    statsTextPart3.push(`\\C[16]\\I[78]会心威力率　:\\C[0]${calcCritMultBonus(user)}%\n`);
     statsTextPart3.push(`\\C[16]\\I[480]剣威力率　　:\\C[0]${calcElementAmplify(user, 21, true)}%\n`);
     statsTextPart3.push(`\\C[16]\\I[481]短剣威力率　:\\C[0]${calcElementAmplify(user, 22, true)}%\n`);
     statsTextPart3.push(`\\C[16]\\I[482]刀威力率　　:\\C[0]${calcElementAmplify(user, 23, true)}%\n`);
@@ -1477,7 +1473,7 @@ battle_xsarStatas = function (battlerActorId) {
   } else {
     statsTextPart3.push(`\\C[16]\\I[31]奥義威力率　:\\C[0]${calcElementAmplify(user, 10, false)}%\n`);
     statsTextPart3.push(`\\C[16]\\I[673]ｱﾋﾞﾘﾃｨ威力率:\\C[0]${calcElementAmplify(user, 20, false)}%\n`);
-    statsTextPart3.push(`\\C[16]\\I[78]会心威力率　:\\C[0]${calcCritMultBonus()}%\n`);
+    statsTextPart3.push(`\\C[16]\\I[78]会心威力率　:\\C[0]${calcCritMultBonus(user)}%\n`);
     statsTextPart3.push(`\\C[16]\\I[480]剣威力率　　:\\C[0]${calcElementAmplify(user, 21, false)}%\n`);
     statsTextPart3.push(`\\C[16]\\I[481]短剣威力率　:\\C[0]${calcElementAmplify(user, 22, false)}%\n`);
     statsTextPart3.push(`\\C[16]\\I[482]刀威力率　　:\\C[0]${calcElementAmplify(user, 23, false)}%\n`);
@@ -1528,7 +1524,7 @@ battle_xsarStatas = function (battlerActorId) {
     }
   }
 
-  if (battlerActorId >= 20) {
+  if (isActor) {
     const elementList = attackElementIdsBattleXsarStatas;
     elementList.forEach(function (elementId) {
       if (user.elementAmplifyRate(elementId) !== 0) {
