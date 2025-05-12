@@ -1387,7 +1387,7 @@ battle_xsarStatas = function (battlerActorId) {
   // Determine if the actor is extra and set user reference
   const isExtraActor = battlerActorId >= 20;
   const user = (battlerActorId === 20)
-    ? $gameActors.actor(battlerActorId)
+    ? $gameActors.actor($gameVariables.value(20))
     : $gameTroop.members()[battlerActorId];
 
   // Build text parts from separated logic functions
