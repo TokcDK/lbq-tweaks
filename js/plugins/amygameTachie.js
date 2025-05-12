@@ -191,9 +191,9 @@ tachie_dousa = function (actionType, actorParameter, expressionCode, targetPicId
   initialXOffset = sourcePicId == 0 ? 50 : -50;
 
   // Set easing function and fade duration based on switch 127 (which may indicate a special mode)
-  ({ easingFunction, fadeDuration } = getEasingAndFadeValuesTachieDousa());
+  const { easingFunction, fadeDuration } = getEasingAndFadeValuesTachieDousa();
 
-  ({ picY, picScaleX, picScaleY } = calculateScaleAndPositionTachieDousa(actorParameter, targetPicId, expressionCode));
+  const { picY, picScaleX, picScaleY } = calculateScaleAndPositionTachieDousa(actorParameter, targetPicId, expressionCode);
 
   // Replace the original selection placeholder code with:
   const dollStateFlag = checkDollStateTachieDousa(actionType, valueDollStateId);
@@ -247,7 +247,7 @@ function getEasingAndFadeValuesTachieDousa() {
     easingFunction = 'easeInOutQuad';
     fadeDuration = 60;
   }
-  return (easingFunction, fadeDuration);
+  return { easingFunction, fadeDuration };
 }
 
 function processCostumeChangeAnimationAtype0TachieDousa(actorParameter, showCostumeId, changeCostumeId, changeCostumeParam, targetPicId, sourcePicId, expressionCode) {
@@ -381,7 +381,7 @@ function calculateScaleAndPositionTachieDousa(actorParameter, targetPicId, expre
     }
   }
 
-  return (picY, picScaleX, picScaleY);
+  return {picY, picScaleX, picScaleY};
 }
 
 function animatePictureAtype1TachieDousa(targetPicId, actorParameter, sourcePicId, showCostumeId, easingFunction, picY, picScaleX, picScaleY, fadeDuration) {
