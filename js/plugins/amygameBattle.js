@@ -1252,33 +1252,33 @@ battle_bustUp = function (id1, id2, id3, id4) {
 tachie_aura = function () {
 
   if ($gameParty.inBattle() && $gameActors.actor($gameVariables.value(20)).tp >= 100 && isGirl($gameActors.actor($gameVariables.value(20)))) {
-    const value1 = Number($dataActors[$gameVariables.value(20)].meta['tachiePicId']);
-    if ($gameScreen.picture(value1)) {
-      const value2 = $gameVariables.value(105);
-      const value3 = $gameVariables.value(106);
-      const value4 = $gameVariables.value(107);
-      const value5 = $gameVariables.value(108);
-      //var value2 = $gameScreen.picture(value1)._x;
-      //var value3 = $gameScreen.picture(value1)._y;
-      //var value4 = $gameScreen.picture(value1)._scaleX;
-      //var value5 = $gameScreen.picture(value1)._scaleY;
-      const value6 = value1 - 20;
-      const value7 = 0;
+    const tachiePictureId = Number($dataActors[$gameVariables.value(20)].meta['tachiePicId']);
+    if ($gameScreen.picture(tachiePictureId)) {
+      const baseX = $gameVariables.value(105);
+      const baseY = $gameVariables.value(106);
+      const scaleX = $gameVariables.value(107);
+      const scaleY = $gameVariables.value(108);
+      //var baseX = $gameScreen.picture(tachiePictureId)._x;
+      //var baseY = $gameScreen.picture(tachiePictureId)._y;
+      //var scaleX = $gameScreen.picture(tachiePictureId)._scaleX;
+      //var scaleY = $gameScreen.picture(tachiePictureId)._scaleY;
+      const pictureIdOffset = tachiePictureId - 20;
+      const xOffset = 0;
 
       //if($gameVariables.value(276) == 2){
-      //var value7 = -50;
+      //var xOffset = -50;
       //} else {
       //if($gameVariables.value(276) == 1){
-      //var value7 = +200;
+      //var xOffset = +200;
       //} else {
-      //var value7 = 0;
+      //var xOffset = 0;
       //}};
 
       if ($gameVariables.value(276) >= 1) {
-        $gameScreen.showPicture(45, "/img/tachies/" + 'actor' + value6 + '_45_1', 1, value2 + value7, value3, value4, value5, 255, 1);
+        $gameScreen.showPicture(45, "/img/tachies/" + 'actor' + pictureIdOffset + '_45_1', 1, baseX + xOffset, baseY, scaleX, scaleY, 255, 1);
       } else {
-        $gameScreen.showPicture(45, "/img/tachies/" + 'actor' + value6 + '_45_1', 1, value2 + value7, value3, 0, 0, 0, 1);
-        $gameScreen.movePicture(45, 1, value2 + value7, value3, value4, value5, 255, 1, 60);
+        $gameScreen.showPicture(45, "/img/tachies/" + 'actor' + pictureIdOffset + '_45_1', 1, baseX + xOffset, baseY, 0, 0, 0, 1);
+        $gameScreen.movePicture(45, 1, baseX + xOffset, baseY, scaleX, scaleY, 255, 1, 60);
       };
 
     }
