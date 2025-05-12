@@ -1287,17 +1287,17 @@ tachie_aura = function () {
 };
 
 //パーティメンバーが居る時に拘束解除。
-actor_kousokukaijo1 = function (id) {
+actor_kousokukaijo1 = function (boundActorId) {
 
-  for (var i = 0; i < $gameParty.battleMembers().length; i++) {
-    var actor = $gameParty.battleMembers()[i];
-    var value1 = $gameParty.battleMembers()[i].actorId();
-    if (value1 == id || actor.isStateAffected(61) || actor.isStateAffected(63) || actor.isStateAffected(64) || actor.battleSkillsRaw().contains(80)) { } else {
-      $gameActors.actor(value1).addState(89);
-      var value2 = i + 1;
+  for (let memberIndex = 0; memberIndex < $gameParty.battleMembers().length; memberIndex++) {
+    const battleMember = $gameParty.battleMembers()[memberIndex];
+    const currentActorId = battleMember.actorId();
+    if (currentActorId == boundActorId || battleMember.isStateAffected(61) || battleMember.isStateAffected(63) || battleMember.isStateAffected(64) || battleMember.battleSkillsRaw().contains(80)) { } else {
+      $gameActors.actor(currentActorId).addState(89);
+      const partyPosition = memberIndex + 1;
       if ($dataSystem.optSideView) {
-        $gameVariables.setValue(705, [$gameParty.getX(value2), $gameParty.getY(value2)]);
-        $gameParty.set(value2, $gameVariables.value(704)[0] + 50, $gameVariables.value(704)[1], 20);
+        $gameVariables.setValue(705, [$gameParty.getX(partyPosition), $gameParty.getY(partyPosition)]);
+        $gameParty.set(partyPosition, $gameVariables.value(704)[0] + 50, $gameVariables.value(704)[1], 20);
       };
       break;
     }
