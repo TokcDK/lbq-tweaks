@@ -1381,131 +1381,131 @@ overkill_count = function () {
 };
 
 //戦闘時に各種特別能力値表示。縦に18
-battle_xsarStatas = function (id1) {
-  const user = id1 === 20 ? $gameActors.actor($gameVariables.value(20)) : $gameTroop.members()[id1];
+battle_xsarStatas = function (battlerIdentifier) {
+  const user = battlerIdentifier === 20 ? $gameActors.actor($gameVariables.value(20)) : $gameTroop.members()[battlerIdentifier];
 
-  let value1 = `\\C[2]詳細能力値[1]\\C[0]\n`;
-  value1 += `\\C[16]\\I[636]連撃率　  　:\\C[0]${n}%\n`;
-  value1 += `\\C[16]\\I[637]回復率　　  :\\C[0]${Math.floor(user.elementRate(12) * 100)}%\n`;
-  value1 += `\\C[16]\\I[630]命中率　　　:\\C[0]${Math.floor(user.xparam(0) * 100)}%\n`;
-  value1 += `\\C[16]\\I[632]回避率　　　:\\C[0]${Math.floor(user.xparam(1) * 100)}%\n`;
-  value1 += `\\C[16]\\I[631]会心率　　　:\\C[0]${Math.floor(user.xparam(2) * 100)}%\n`;
-  //value1 += `会心回避率:${user.xparam(3)*100}%\n`;
-  //value1 += `魔法回避率:${user.xparam(4)*100}%\n`;
-  //value1 += `魔法反射率:${user.xparam(5)*100}%\n`;
-  //value1 += `反撃率:${user.xparam(6)*100}%\n`;
-  value1 += `\\C[16]\\I[640]HP再生率　　:\\C[0]${Math.floor(user.xparam(7) * 100)}%\n`;
-  value1 += `\\C[16]\\I[641]MP再生率　　:\\C[0]${Math.floor(user.xparam(8) * 100)}%\n`;
-  value1 += `\\C[16]\\I[642]TP再生率　　:\\C[0]${Math.floor(user.xparam(9) * 100)}%\n`;
-  value1 += `\\C[16]\\I[633]狙われ率　　:\\C[0]${Math.floor(user.sparam(0) * 100)}%\n`;
-  //value1 += `防御効果率:${user.sparam(1)*100}%\n`;
-  //value1 += `回復効果率:${user.sparam(2)*100}%\n`;
-  //value1 += `薬の効果:${user.sparam(3)*100}%\n`;
-  value1 += `\\C[16]\\I[634]MP消費率　　:\\C[0]${Math.floor(user.sparam(4) * 100)}%\n`;
-  value1 += `\\C[16]\\I[635]TPﾁｬｰｼﾞ率　 :\\C[0]${Math.floor(user.sparam(5) * 100)}%\n`;
-  value1 += `\\C[16]\\I[638]物理ﾀﾞﾒｶｯﾄ率:\\C[0]${Math.floor(user.sparam(6) * 100)}%\n`;
-  value1 += `\\C[16]\\I[639]魔法ﾀﾞﾒｶｯﾄ率:\\C[0]${Math.floor(user.sparam(7) * 100)}%\n`;
-  //value1 += `床ダメージ率:${user.sparam(8)*100}%\n`;
-  value1 += `\\C[16]\\I[656]経験獲得率　:\\C[0]${Math.floor(user.sparam(9) * 100)}%\n`;
+  let statsTextPart1 = `\\C[2]詳細能力値[1]\\C[0]\n`;
+  statsTextPart1 += `\\C[16]\\I[636]連撃率　  　:\\C[0]${n}%\n`;
+  statsTextPart1 += `\\C[16]\\I[637]回復率　　  :\\C[0]${Math.floor(user.elementRate(12) * 100)}%\n`;
+  statsTextPart1 += `\\C[16]\\I[630]命中率　　　:\\C[0]${Math.floor(user.xparam(0) * 100)}%\n`;
+  statsTextPart1 += `\\C[16]\\I[632]回避率　　　:\\C[0]${Math.floor(user.xparam(1) * 100)}%\n`;
+  statsTextPart1 += `\\C[16]\\I[631]会心率　　　:\\C[0]${Math.floor(user.xparam(2) * 100)}%\n`;
+  //statsTextPart1 += `会心回避率:${user.xparam(3)*100}%\n`;
+  //statsTextPart1 += `魔法回避率:${user.xparam(4)*100}%\n`;
+  //statsTextPart1 += `魔法反射率:${user.xparam(5)*100}%\n`;
+  //statsTextPart1 += `反撃率:${user.xparam(6)*100}%\n`;
+  statsTextPart1 += `\\C[16]\\I[640]HP再生率　　:\\C[0]${Math.floor(user.xparam(7) * 100)}%\n`;
+  statsTextPart1 += `\\C[16]\\I[641]MP再生率　　:\\C[0]${Math.floor(user.xparam(8) * 100)}%\n`;
+  statsTextPart1 += `\\C[16]\\I[642]TP再生率　　:\\C[0]${Math.floor(user.xparam(9) * 100)}%\n`;
+  statsTextPart1 += `\\C[16]\\I[633]狙われ率　　:\\C[0]${Math.floor(user.sparam(0) * 100)}%\n`;
+  //statsTextPart1 += `防御効果率:${user.sparam(1)*100}%\n`;
+  //statsTextPart1 += `回復効果率:${user.sparam(2)*100}%\n`;
+  //statsTextPart1 += `薬の効果:${user.sparam(3)*100}%\n`;
+  statsTextPart1 += `\\C[16]\\I[634]MP消費率　　:\\C[0]${Math.floor(user.sparam(4) * 100)}%\n`;
+  statsTextPart1 += `\\C[16]\\I[635]TPﾁｬｰｼﾞ率　 :\\C[0]${Math.floor(user.sparam(5) * 100)}%\n`;
+  statsTextPart1 += `\\C[16]\\I[638]物理ﾀﾞﾒｶｯﾄ率:\\C[0]${Math.floor(user.sparam(6) * 100)}%\n`;
+  statsTextPart1 += `\\C[16]\\I[639]魔法ﾀﾞﾒｶｯﾄ率:\\C[0]${Math.floor(user.sparam(7) * 100)}%\n`;
+  //statsTextPart1 += `床ダメージ率:${user.sparam(8)*100}%\n`;
+  statsTextPart1 += `\\C[16]\\I[656]経験獲得率　:\\C[0]${Math.floor(user.sparam(9) * 100)}%\n`;
   {
-    let value5 = '???', value6 = '???';
-    value5 = Math.floor(user.stateRate(15) * 100);
-    value6 = Math.floor(user.stateRate(30) * 100);
-    value1 += `\\C[16]\\I[624]ﾎﾟｰｼｮﾝ耐性率:\\C[0]${$gameVariables.value(380 + $gameVariables.value(20))[58]}%\n`;
-    value1 += `\\C[16]\\I[683]通常異常耐性:\\C[0]${value5}%\n`;
-    value1 += `\\C[16]\\I[684]特殊異常耐性:\\C[0]${value6}%\n`;
+    let stateRate15Percent = '???', stateRate30Percent = '???';
+    stateRate15Percent = Math.floor(user.stateRate(15) * 100);
+    stateRate30Percent = Math.floor(user.stateRate(30) * 100);
+    statsTextPart1 += `\\C[16]\\I[624]ﾎﾟｰｼｮﾝ耐性率:\\C[0]${$gameVariables.value(380 + $gameVariables.value(20))[58]}%\n`;
+    statsTextPart1 += `\\C[16]\\I[683]通常異常耐性:\\C[0]${stateRate15Percent}%\n`;
+    statsTextPart1 += `\\C[16]\\I[684]特殊異常耐性:\\C[0]${stateRate30Percent}%\n`;
   }
 
-  let value2 = `\\C[2]詳細能力値[2]\\C[0]\n`;
+  let statsTextPart2 = `\\C[2]詳細能力値[2]\\C[0]\n`;
   for (let i = 1; i <= 9; i++) {
     amygame_elementIcon(i);
-    let value5;
-    if (id1 >= 20) {
-      value5 = Math.floor(user.elementAmplifyRate(i) * 100) + valueAttackAmplifysActorId[$gameVariables.value(20)][i];
+    let elementAmplifyValue;
+    if (battlerIdentifier >= 20) {
+      elementAmplifyValue = Math.floor(user.elementAmplifyRate(i) * 100) + valueAttackAmplifysActorId[$gameVariables.value(20)][i];
     } else {
-      value5 = Math.floor(user.elementAmplifyRate(i) * 100);
+      elementAmplifyValue = Math.floor(user.elementAmplifyRate(i) * 100);
     }
-    let value6;
+    let amplifyLabel;
     if (i === 1 || i === 2) {
-      value6 = `威力率　`;
+      amplifyLabel = `威力率　`;
     } else {
-      value6 = `属性威力率`;
+      amplifyLabel = `属性威力率`;
     }
-    value2 += `\\C[16]\x1bI[${valueElementIconArr[1]}]${$dataSystem.elements[i]}${value6}:\\C[0]${value5}%\n`;
+    statsTextPart2 += `\\C[16]\x1bI[${valueElementIconArr[1]}]${$dataSystem.elements[i]}${amplifyLabel}:\\C[0]${elementAmplifyValue}%\n`;
   }
   for (let i = 1; i <= 9; i++) {
     amygame_elementIcon(i);
-    let value6;
+    let resistanceLabel;
     if (i === 1 || i === 2) {
-      value6 = `耐性率　`;
+      resistanceLabel = `耐性率　`;
     } else {
-      value6 = `属性耐性率`;
+      resistanceLabel = `属性耐性率`;
     }
-    value2 += `\\C[16]\x1bI[${valueElementIconArr[1]}]${$dataSystem.elements[i]}${value6}:\\C[0]${Math.floor(user.elementRate(i) * 100)}%\n`;
+    statsTextPart2 += `\\C[16]\x1bI[${valueElementIconArr[1]}]${$dataSystem.elements[i]}${resistanceLabel}:\\C[0]${Math.floor(user.elementRate(i) * 100)}%\n`;
   }
 
-  let value3 = `\\C[2]詳細能力値[3]\\C[0]\n`;
-  if (id1 >= 20) {
+  let statsTextPart3 = `\\C[2]詳細能力値[3]\\C[0]\n`;
+  if (battlerIdentifier >= 20) {
     skill_addPowerSet(user, $dataSkills, 1, 1);
     if (valueAddPowerCustom >= 1) {
-      value3 += `\\C[16]\\I[666]スキル威力率:\\C[0]+${valueAddPowerCustom}\n`;
+      statsTextPart3 += `\\C[16]\\I[666]スキル威力率:\\C[0]+${valueAddPowerCustom}\n`;
     }
-    value3 += `\\C[16]\\I[31]奥義威力率　:\\C[0]${Math.floor(user.elementAmplifyRate(10) * 100) + valueAttackAmplifysActorId[$gameVariables.value(20)][10]}%\n`;
-    value3 += `\\C[16]\\I[673]ｱﾋﾞﾘﾃｨ威力率:\\C[0]${Math.floor(user.elementAmplifyRate(20) * 100) + valueAttackAmplifysActorId[$gameVariables.value(20)][20]}%\n`;
-    value3 += `\\C[16]\\I[78]会心威力率　:\\C[0]${Math.floor(user.criticalMultiplierBonus() * 100)}%\n`;
-    value3 += `\\C[16]\\I[480]剣威力率　　:\\C[0]${Math.floor(user.elementAmplifyRate(21) * 100) + valueAttackAmplifysActorId[$gameVariables.value(20)][21]}%\n`;
-    value3 += `\\C[16]\\I[481]短剣威力率　:\\C[0]${Math.floor(user.elementAmplifyRate(22) * 100) + valueAttackAmplifysActorId[$gameVariables.value(20)][22]}%\n`;
-    value3 += `\\C[16]\\I[482]刀威力率　　:\\C[0]${Math.floor(user.elementAmplifyRate(23) * 100) + valueAttackAmplifysActorId[$gameVariables.value(20)][23]}%\n`;
-    value3 += `\\C[16]\\I[483]杖威力率　　:\\C[0]${Math.floor(user.elementAmplifyRate(24) * 100) + valueAttackAmplifysActorId[$gameVariables.value(20)][24]}%\n`;
-    value3 += `\\C[16]\\I[484]拳威力率　　:\\C[0]${Math.floor(user.elementAmplifyRate(25) * 100) + valueAttackAmplifysActorId[$gameVariables.value(20)][25]}%\n`;
-    value3 += `\\C[16]\\I[485]槍威力率　　:\\C[0]${Math.floor(user.elementAmplifyRate(26) * 100) + valueAttackAmplifysActorId[$gameVariables.value(20)][26]}%\n`;
-    value3 += `\\C[16]\\I[486]斧威力率　　:\\C[0]${Math.floor(user.elementAmplifyRate(27) * 100) + valueAttackAmplifysActorId[$gameVariables.value(20)][27]}%\n`;
-    value3 += `\\C[16]\\I[487]銃威力率　　:\\C[0]${Math.floor(user.elementAmplifyRate(28) * 100) + valueAttackAmplifysActorId[$gameVariables.value(20)][28]}%\n`;
-    value3 += `\\C[16]\\I[488]弓威力率　　:\\C[0]${Math.floor(user.elementAmplifyRate(29) * 100) + valueAttackAmplifysActorId[$gameVariables.value(20)][29]}%\n`;
-    value3 += `\\C[16]\\I[489]楽器威力率　:\\C[0]${Math.floor(user.elementAmplifyRate(30) * 100) + valueAttackAmplifysActorId[$gameVariables.value(20)][30]}%\n`;
+    statsTextPart3 += `\\C[16]\\I[31]奥義威力率　:\\C[0]${Math.floor(user.elementAmplifyRate(10) * 100) + valueAttackAmplifysActorId[$gameVariables.value(20)][10]}%\n`;
+    statsTextPart3 += `\\C[16]\\I[673]ｱﾋﾞﾘﾃｨ威力率:\\C[0]${Math.floor(user.elementAmplifyRate(20) * 100) + valueAttackAmplifysActorId[$gameVariables.value(20)][20]}%\n`;
+    statsTextPart3 += `\\C[16]\\I[78]会心威力率　:\\C[0]${Math.floor(user.criticalMultiplierBonus() * 100)}%\n`;
+    statsTextPart3 += `\\C[16]\\I[480]剣威力率　　:\\C[0]${Math.floor(user.elementAmplifyRate(21) * 100) + valueAttackAmplifysActorId[$gameVariables.value(20)][21]}%\n`;
+    statsTextPart3 += `\\C[16]\\I[481]短剣威力率　:\\C[0]${Math.floor(user.elementAmplifyRate(22) * 100) + valueAttackAmplifysActorId[$gameVariables.value(20)][22]}%\n`;
+    statsTextPart3 += `\\C[16]\\I[482]刀威力率　　:\\C[0]${Math.floor(user.elementAmplifyRate(23) * 100) + valueAttackAmplifysActorId[$gameVariables.value(20)][23]}%\n`;
+    statsTextPart3 += `\\C[16]\\I[483]杖威力率　　:\\C[0]${Math.floor(user.elementAmplifyRate(24) * 100) + valueAttackAmplifysActorId[$gameVariables.value(20)][24]}%\n`;
+    statsTextPart3 += `\\C[16]\\I[484]拳威力率　　:\\C[0]${Math.floor(user.elementAmplifyRate(25) * 100) + valueAttackAmplifysActorId[$gameVariables.value(20)][25]}%\n`;
+    statsTextPart3 += `\\C[16]\\I[485]槍威力率　　:\\C[0]${Math.floor(user.elementAmplifyRate(26) * 100) + valueAttackAmplifysActorId[$gameVariables.value(20)][26]}%\n`;
+    statsTextPart3 += `\\C[16]\\I[486]斧威力率　　:\\C[0]${Math.floor(user.elementAmplifyRate(27) * 100) + valueAttackAmplifysActorId[$gameVariables.value(20)][27]}%\n`;
+    statsTextPart3 += `\\C[16]\\I[487]銃威力率　　:\\C[0]${Math.floor(user.elementAmplifyRate(28) * 100) + valueAttackAmplifysActorId[$gameVariables.value(20)][28]}%\n`;
+    statsTextPart3 += `\\C[16]\\I[488]弓威力率　　:\\C[0]${Math.floor(user.elementAmplifyRate(29) * 100) + valueAttackAmplifysActorId[$gameVariables.value(20)][29]}%\n`;
+    statsTextPart3 += `\\C[16]\\I[489]楽器威力率　:\\C[0]${Math.floor(user.elementAmplifyRate(30) * 100) + valueAttackAmplifysActorId[$gameVariables.value(20)][30]}%\n`;
   } else {
-    value3 += `\\C[16]\\I[31]奥義威力率　:\\C[0]${Math.floor(user.elementAmplifyRate(10) * 100)}%\n`;
-    value3 += `\\C[16]\\I[673]ｱﾋﾞﾘﾃｨ威力率:\\C[0]${Math.floor(user.elementAmplifyRate(20) * 100)}%\n`;
-    value3 += `\\C[16]\\I[78]会心威力率　:\\C[0]${Math.floor(user.criticalMultiplierBonus() * 100)}%\n`;
-    value3 += `\\C[16]\\I[480]剣威力率　　:\\C[0]${Math.floor(user.elementAmplifyRate(21) * 100)}%\n`;
-    value3 += `\\C[16]\\I[481]短剣威力率　:\\C[0]${Math.floor(user.elementAmplifyRate(22) * 100)}%\n`;
-    value3 += `\\C[16]\\I[482]刀威力率　　:\\C[0]${Math.floor(user.elementAmplifyRate(23) * 100)}%\n`;
-    value3 += `\\C[16]\\I[483]杖威力率　　:\\C[0]${Math.floor(user.elementAmplifyRate(24) * 100)}%\n`;
-    value3 += `\\C[16]\\I[484]拳威力率　　:\\C[0]${Math.floor(user.elementAmplifyRate(25) * 100)}%\n`;
-    value3 += `\\C[16]\\I[485]槍威力率　　:\\C[0]${Math.floor(user.elementAmplifyRate(26) * 100)}%\n`;
-    value3 += `\\C[16]\\I[486]斧威力率　　:\\C[0]${Math.floor(user.elementAmplifyRate(27) * 100)}%\n`;
-    value3 += `\\C[16]\\I[487]銃威力率　　:\\C[0]${Math.floor(user.elementAmplifyRate(28) * 100)}%\n`;
-    value3 += `\\C[16]\\I[488]弓威力率　　:\\C[0]${Math.floor(user.elementAmplifyRate(29) * 100)}%\n`;
-    value3 += `\\C[16]\\I[489]楽器威力率　:\\C[0]${Math.floor(user.elementAmplifyRate(30) * 100)}%\n`;
+    statsTextPart3 += `\\C[16]\\I[31]奥義威力率　:\\C[0]${Math.floor(user.elementAmplifyRate(10) * 100)}%\n`;
+    statsTextPart3 += `\\C[16]\\I[673]ｱﾋﾞﾘﾃｨ威力率:\\C[0]${Math.floor(user.elementAmplifyRate(20) * 100)}%\n`;
+    statsTextPart3 += `\\C[16]\\I[78]会心威力率　:\\C[0]${Math.floor(user.criticalMultiplierBonus() * 100)}%\n`;
+    statsTextPart3 += `\\C[16]\\I[480]剣威力率　　:\\C[0]${Math.floor(user.elementAmplifyRate(21) * 100)}%\n`;
+    statsTextPart3 += `\\C[16]\\I[481]短剣威力率　:\\C[0]${Math.floor(user.elementAmplifyRate(22) * 100)}%\n`;
+    statsTextPart3 += `\\C[16]\\I[482]刀威力率　　:\\C[0]${Math.floor(user.elementAmplifyRate(23) * 100)}%\n`;
+    statsTextPart3 += `\\C[16]\\I[483]杖威力率　　:\\C[0]${Math.floor(user.elementAmplifyRate(24) * 100)}%\n`;
+    statsTextPart3 += `\\C[16]\\I[484]拳威力率　　:\\C[0]${Math.floor(user.elementAmplifyRate(25) * 100)}%\n`;
+    statsTextPart3 += `\\C[16]\\I[485]槍威力率　　:\\C[0]${Math.floor(user.elementAmplifyRate(26) * 100)}%\n`;
+    statsTextPart3 += `\\C[16]\\I[486]斧威力率　　:\\C[0]${Math.floor(user.elementAmplifyRate(27) * 100)}%\n`;
+    statsTextPart3 += `\\C[16]\\I[487]銃威力率　　:\\C[0]${Math.floor(user.elementAmplifyRate(28) * 100)}%\n`;
+    statsTextPart3 += `\\C[16]\\I[488]弓威力率　　:\\C[0]${Math.floor(user.elementAmplifyRate(29) * 100)}%\n`;
+    statsTextPart3 += `\\C[16]\\I[489]楽器威力率　:\\C[0]${Math.floor(user.elementAmplifyRate(30) * 100)}%\n`;
   }
   if (false) { //神聖邪悪耐性率表示
-    if (user.elementAmplifyRate(16) * 100 >= 110) { value3 += `\\C[16]\\I[172]威力率:\\C[0]${Math.floor(user.elementAmplifyRate(16) * 100)}%\n`; }
-    if (user.elementAmplifyRate(17) * 100 >= 110) { value3 += `\\C[16]\\I[173]威力率:\\C[0]${Math.floor(user.elementAmplifyRate(17) * 100)}%\n`; }
-    if (user.elementRate(16) * 100 >= 110) { value3 += `\\C[16]\\I[172]耐性率:\\C[0]${Math.floor(user.elementRate(16) * 100)}%\n`; }
-    if (user.elementRate(17) * 100 >= 110) { value3 += `\\C[16]\\I[173]耐性率:\\C[0]${Math.floor(user.elementRate(17) * 100)}%\n`; }
+    if (user.elementAmplifyRate(16) * 100 >= 110) { statsTextPart3 += `\\C[16]\\I[172]威力率:\\C[0]${Math.floor(user.elementAmplifyRate(16) * 100)}%\n`; }
+    if (user.elementAmplifyRate(17) * 100 >= 110) { statsTextPart3 += `\\C[16]\\I[173]威力率:\\C[0]${Math.floor(user.elementAmplifyRate(17) * 100)}%\n`; }
+    if (user.elementRate(16) * 100 >= 110) { statsTextPart3 += `\\C[16]\\I[172]耐性率:\\C[0]${Math.floor(user.elementRate(16) * 100)}%\n`; }
+    if (user.elementRate(17) * 100 >= 110) { statsTextPart3 += `\\C[16]\\I[173]耐性率:\\C[0]${Math.floor(user.elementRate(17) * 100)}%\n`; }
   }
   WindowManager.show(1, 0, 105, 300, 663);
   WindowManager.show(2, 300, 105, 300, 663);
   WindowManager.show(3, 600, 105, 300, 663);
-  WindowManager.drawText(1, `\\fs[25]${value1}`);
-  WindowManager.drawText(2, `\\fs[25]${value2}`);
-  WindowManager.drawText(3, `\\fs[25]${value3}`);
+  WindowManager.drawText(1, `\\fs[25]${statsTextPart1}`);
+  WindowManager.drawText(2, `\\fs[25]${statsTextPart2}`);
+  WindowManager.drawText(3, `\\fs[25]${statsTextPart3}`);
 
-  let value4 = `\\C[2]詳細能力値[4]\\C[0]\n`;
+  let statsTextPart4 = `\\C[2]詳細能力値[4]\\C[0]\n`;
   const start = 1;
   const end = $dataStates.length - 1;
   for (let i = start; i <= end; i++) {
     if ($dataStates[i].meta['Category']) {
       if ($dataStates[i].meta['Category'] === ' StateabNomal' || $dataStates[i].meta['Category'] === ' StateSPabNomal') {
         if (user.isStateResist(i)) {
-          value4 += `\x1bI[${$dataStates[i].iconIndex}]${$dataStates[i].name}:\\C[2][無効化]\\C[0]\n`;
+          statsTextPart4 += `\x1bI[${$dataStates[i].iconIndex}]${$dataStates[i].name}:\\C[2][無効化]\\C[0]\n`;
         } else {
           if (user.stateRate(i) !== 1.0) {
             if ($dataStates[i].meta['Category'] === ' StateabNomal' && user.stateRate(i) === user.stateRate(15)) {
             } else {
               if ($dataStates[i].meta['Category'] === ' StateSPabNomal' && user.stateRate(i) === user.stateRate(30)) {
               } else {
-                value4 += `\x1bI[${$dataStates[i].iconIndex}]${$dataStates[i].name}耐性率:${Math.floor(user.stateRate(i) * 100)}%\n`;
+                statsTextPart4 += `\x1bI[${$dataStates[i].iconIndex}]${$dataStates[i].name}耐性率:${Math.floor(user.stateRate(i) * 100)}%\n`;
               }
             }
           }
@@ -1514,73 +1514,73 @@ battle_xsarStatas = function (id1) {
     }
   }
 
-  if (id1 >= 20) {
-    const arr1 = [18, 19, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80];
-    const list = arr1;
-    list.forEach(function (id) {
-      if (user.elementAmplifyRate(id) !== 0) {
-        amygame_elementIcon(id);
-        value4 += `\\C[16]\x1bI[${valueElementIconArr[0]}]特攻率:\\C[0]${Math.floor(user.elementAmplifyRate(id) * 100)}%\n`;
+  if (battlerIdentifier >= 20) {
+    const attackElementIds = [18, 19, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80];
+    const elementList = attackElementIds;
+    elementList.forEach(function (elementId) {
+      if (user.elementAmplifyRate(elementId) !== 0) {
+        amygame_elementIcon(elementId);
+        statsTextPart4 += `\\C[16]\x1bI[${valueElementIconArr[0]}]特攻率:\\C[0]${Math.floor(user.elementAmplifyRate(elementId) * 100)}%\n`;
       }
     });
   } else {
     for (let i = 1; i <= $dataSystem.elements.length - 1; i++) {
-      if ([1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 16, 17].some(function (id2) {
-        return id2 === i;
+      if ([1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 16, 17].some(function (elem) {
+        return elem === i;
       })) {
       } else {
         if (user.elementRate(i) !== 1) {
           amygame_elementIcon(i);
-          let value5;
+          let resistanceText;
           if (valueElementIconArr[0] === 1) {
-            value5 = `\\C[16]${$dataSystem.elements[i]}耐性率\\C[0]:`;
+            resistanceText = `\\C[16]${$dataSystem.elements[i]}耐性率\\C[0]:`;
           } else {
-            value5 = `\\C[16]\x1bI[${valueElementIconArr[3]}]耐性率\\C[0]:`;
+            resistanceText = `\\C[16]\x1bI[${valueElementIconArr[3]}]耐性率\\C[0]:`;
           }
-          value4 += `${value5}${Math.floor(user.elementRate(i) * 100)}%\n`;
+          statsTextPart4 += `${resistanceText}${Math.floor(user.elementRate(i) * 100)}%\n`;
         }
       }
     }
   }
   {
-    let value5 = 900;
-    if (value4 !== `\\C[2]詳細能力値[4]\\C[0]\n`) {
+    let windowWidth = 900;
+    if (statsTextPart4 !== `\\C[2]詳細能力値[4]\\C[0]\n`) {
       WindowManager.show(4, 900, 105, 380, 663);
-      WindowManager.drawText(4, `\\fs[25]${value4}`);
-      value5 = 1280;
+      WindowManager.drawText(4, `\\fs[25]${statsTextPart4}`);
+      windowWidth = 1280;
     } else {
-      if (id1 === 20 && $gameParty.inBattle()) {
+      if (battlerIdentifier === 20 && $gameParty.inBattle()) {
         $gameSwitches.setValue(375, true);
         title_battleUp(user);
         passive_addCondition(user);
         $gameSwitches.setValue(375, false);
       }
     }
-    WindowManager.show(0, 0, 0, value5, 105);
-    WindowManager.drawText(0, `\\fs[25]${value1}`);
+    WindowManager.show(0, 0, 0, windowWidth, 105);
+    WindowManager.drawText(0, `\\fs[25]${statsTextPart1}`);
   }
 
   {
-    if (id1 === 20) {
-      let value2;
+    if (battlerIdentifier === 20) {
+      let classInfo;
       if (user.subclass()) {
-        value2 = `[${$dataClasses[user._classId].name}/${$dataClasses[user._subclassId].name}]`;
+        classInfo = `[${$dataClasses[user._classId].name}/${$dataClasses[user._subclassId].name}]`;
       } else {
-        value2 = `${$dataClasses[user._classId].name}`;
+        classInfo = `${$dataClasses[user._classId].name}`;
       }
-      let value3;
+      let additionalInfo;
       if ($gameParty.inBattle()) {
-        value3 = `\\C[16]BuffLimit:\\C[0]${user.maxBuffLimit(2)} \\C[16]D.cap:\\C[0]${user.maximumDamage()} \\C[16]H.cap:\\C[0]${user.maximumHealing() - user.maximumHealing() - user.maximumHealing()}`;
+        additionalInfo = `\\C[16]BuffLimit:\\C[0]${user.maxBuffLimit(2)} \\C[16]D.cap:\\C[0]${user.maximumDamage()} \\C[16]H.cap:\\C[0]${user.maximumHealing() - user.maximumHealing() - user.maximumHealing()}`;
       } else {
-        value3 = `役職:${$gameVariables.value(380 + $gameVariables.value(20))[59]}`;
+        additionalInfo = `役職:${$gameVariables.value(380 + $gameVariables.value(20))[59]}`;
       }
-      let value1 = `${value2}${user.nickname()}\\set[${$gameVariables.value(20)}]\n${value3}`;
+      let headerText = `${classInfo}${user.nickname()}\\set[${$gameVariables.value(20)}]\n${additionalInfo}`;
       WindowManager.show(0, 0, 0, 0, 105);
-      WindowManager.drawText(0, `\\fs[25]${value1}`);
+      WindowManager.drawText(0, `\\fs[25]${headerText}`);
     } else {
-      let value1 = `${user.name()}`;
+      let headerText = `${user.name()}`;
       WindowManager.show(0, 0, 0, 0, 105);
-      WindowManager.drawText(0, `\\fs[25]${value1}`);
+      WindowManager.drawText(0, `\\fs[25]${headerText}`);
     }
   }
 };
