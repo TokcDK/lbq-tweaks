@@ -1307,20 +1307,36 @@ actor_kousokukaijo1 = function (id) {
 
 //パーティメンバーが居る時に拘束解除。
 actor_kousokukaijo2 = function (boundActorId) {
-
-  for (let memberIndex = 0; memberIndex < $gameParty.battleMembers().length; memberIndex++) {
-    const partyMember = $gameParty.battleMembers()[memberIndex];
-    if (partyMember.isStateAffected(89)) {
-      const partyMemberIndex = partyMember.index();
-      $gameParty.members()[partyMemberIndex].startAnimation(351, false, 0);
-      const bindRemoveMessages = $dataActors[$gameParty.battleMembers()[memberIndex].actorId()].meta['BindRemove'].split(',');
-      $gameVariables.setValue(525, bindRemoveMessages[getRandomIndex(bindRemoveMessages.length)]);
-      const logMessage = partyMember.name() + 'は' + $gameActors.actor(boundActorId).name() + 'の拘束を解きに掛かった！';
-      BattleManager._logWindow.push(`addText`, logMessage);
-      $gameActors.actor(boundActorId).removeState(63);
-    }
-  };
-
+  // Cache the battle members array to avoid repeated function calls
+  const battleMembers = $gameParty.battleMembers();
+  const boundActor = $gameActors.actor(boundActorId);
+  
+  // Check if there are any party members with state 89 (rescue state)
+  for (let i = 0; i < battleMembers.length; i++) {
+    const partyMember = battleMembers[i];
+    
+    // Skip if this member doesn't have the rescue state
+    if (!partyMember.isStateAffected(89)) continue;
+    
+    // Play animation on the rescuing party member
+    partyMember.startAnimation(351, false, 0);
+    
+    // Get a random message from the actor's metadata
+    const actorId = partyMember.actorId();
+    const bindRemoveMessages = $dataActors[actorId].meta['BindRemove'].split(',');
+    const randomMessage = bindRemoveMessages[getRandomIndex(bindRemoveMessages.length)];
+    $gameVariables.setValue(525, randomMessage);
+    
+    // Display battle log message
+    const logMessage = `${partyMember.name()}は${boundActor.name()}の拘束を解きに掛かった！`;
+    BattleManager._logWindow.push('addText', logMessage);
+    
+    // Remove the bind state from the bound actor
+    boundActor.removeState(63);
+    
+    // No need to continue checking other party members once one is found who can unbind
+    break;
+  }
 };
 
 //パーティメンバーが居る時に拘束解除時の反応。
