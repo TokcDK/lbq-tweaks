@@ -1257,38 +1257,52 @@ function processFaceImageBattleBustUpBattleBustUp(basePictureId, actorId, faceIm
 // Process the hypnosis effect for the actor if state 782 is active.
 //---------------------------------------------------------------------
 function processHypnosisEffectBattleBustUpBattleBustUp(basePictureId, actorId, horizontalAdjustment, verticalShift, moveOffsetX, moveOffsetY, pictureScale, extraMoveDuration) {
-  if (!$gameSwitches.value(471)) {
-    if ($gameActors.actor(actorId).isStateAffected(782)) {
-      if ($gameScreen.picture(99)) {
-        let hypnosisCount = $gameActors.actor(actorId).getStateCounter(782); // e.g., 60,40,20
-        let hypnosisImageName = actorId + 'Actor' + "HypnosisEye_0";
-        $gameScreen.setPicturesAnimation(2, 10, "連番", hypnosisCount);
-        $gameScreen.showPicture(
-          99,
-          "/img/talkface/" + hypnosisImageName,
-          1,
-          640 + horizontalAdjustment,
-          384 + verticalShift + moveOffsetY,
-          pictureScale,
-          pictureScale,
-          0,
-          0
-        );
-        $gameScreen.movePicture(
-          99,
-          1,
-          640 + moveOffsetX,
-          384 + moveOffsetY,
-          100,
-          100,
-          255,
-          0,
-          extraMoveDuration + 10
-        );
-        $gameScreen.picture(99).startAnimationFrame(3, true, [1, 1, 1, 2]);
-      }
-    }
+  // Early exit conditions to avoid unnecessary processing
+  if ($gameSwitches.value(471) || !$gameActors.actor(actorId).isStateAffected(782) || !$gameScreen.picture(99)) {
+    return;
   }
+
+  // Cache values to reduce property lookups
+  const actor = $gameActors.actor(actorId);
+  const hypnosisCount = actor.getStateCounter(782);
+  const hypnosisImageName = `${actorId}ActorHypnosisEye_0`;
+  
+  // Set animation parameters once
+  $gameScreen.setPicturesAnimation(2, 10, "連番", hypnosisCount);
+  
+  // Calculate positions once
+  const initialX = 640 + horizontalAdjustment;
+  const initialY = 384 + verticalShift + moveOffsetY;
+  const targetX = 640 + moveOffsetX;
+  const targetY = 384 + moveOffsetY;
+  
+  // Show and move the picture
+  $gameScreen.showPicture(
+    99,
+    "/img/talkface/" + hypnosisImageName,
+    1,
+    initialX,
+    initialY,
+    pictureScale,
+    pictureScale,
+    0,
+    0
+  );
+  
+  $gameScreen.movePicture(
+    99,
+    1,
+    targetX,
+    targetY,
+    100,
+    100,
+    255,
+    0,
+    extraMoveDuration + 10
+  );
+  
+  // Start the animation frame with fixed parameters
+  $gameScreen.picture(99).startAnimationFrame(3, true, [1, 1, 1, 2]);
 }
 
 function getFaceImageNameBattleBustUp(actorId, i) {
