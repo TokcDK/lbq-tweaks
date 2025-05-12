@@ -1224,7 +1224,7 @@ tachie_hyouji2 = function (gameActor) {
   $gameVariables.setValue(20, actorId);
   tachie_bless(basePictureId, 1);
   if ($gameSwitches.value(30)) {
-    tachie_aura();
+    tachie_aura1(gameActor);
   }
 };
 

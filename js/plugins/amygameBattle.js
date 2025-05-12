@@ -1253,17 +1253,17 @@ tachie_aura = function () {
   // Early exits for most common cases to avoid unnecessary processing
   if (!$gameParty.inBattle()) return;
 
-  const actorId = $gameVariables.value(20);
-  const actor = $gameActors.actor(actorId);
+  tachie_aura1($gameActors.actor($gameVariables.value(20)));
+}
+tachie_aura1 = function (gameActor) {
+  // Early exits for most common cases to avoid unnecessary processing
+  if (!$gameParty.inBattle()) return;
   
   // Combine conditions for better performance
-  if (actor.tp < 100 || !isGirl(actor)) return;
-
-  // Cache actor data to avoid repeated lookups
-  const actorData = $dataActors[actorId];
-  const tachiePictureId = Number(actorData.meta['tachiePicId']);
+  if (gameActor.tp < 100 || !isGirl(gameActor)) return;
   
   // Check if the picture exists before proceeding
+  const tachiePictureId = Number(gameActor.actor().meta['tachiePicId']);
   if (!$gameScreen.picture(tachiePictureId)) return;
 
   // Get all required variables at once to minimize variable lookups
