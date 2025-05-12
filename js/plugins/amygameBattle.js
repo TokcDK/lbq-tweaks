@@ -1401,7 +1401,7 @@ battle_xsarStatas = function (battlerActorId) {
     return includeBonus ? base + valueAttackAmplifysActorId[$gameVariables.value(20)][index] : base;
   }
 
-  const isActor = battlerActorId >= 20;
+  const isExtraActor = battlerActorId >= 20;
   const user = battlerActorId === 20 ? $gameActors.actor($gameVariables.value(20)) : $gameTroop.members()[battlerActorId];
 
   let statsTextPart1 = [];
@@ -1440,7 +1440,7 @@ battle_xsarStatas = function (battlerActorId) {
   statsTextPart2.push(`\\C[2]詳細能力値[2]\\C[0]\n`);
   for (let i = 1; i <= 9; i++) {
     amygame_elementIcon(i);
-    const elementAmplifyValue = calcElementAmplify(user, i, isActor);
+    const elementAmplifyValue = calcElementAmplify(user, i, isExtraActor);
     let amplifyLabel = (i === 1 || i === 2) ? `威力率　` : `属性威力率`;
     statsTextPart2.push(`\\C[16]\x1bI[${valueElementIconArr[1]}]${$dataSystem.elements[i]}${amplifyLabel}:\\C[0]${elementAmplifyValue}%\n`);
   }
@@ -1452,7 +1452,7 @@ battle_xsarStatas = function (battlerActorId) {
 
   let statsTextPart3 = [];
   statsTextPart3.push(`\\C[2]詳細能力値[3]\\C[0]\n`);
-  if (isActor) {
+  if (isExtraActor) {
     skill_addPowerSet(user, $dataSkills, 1, 1);
     if (valueAddPowerCustom >= 1) {
       statsTextPart3.push(`\\C[16]\\I[666]スキル威力率:\\C[0]+${valueAddPowerCustom}\n`);
@@ -1524,7 +1524,7 @@ battle_xsarStatas = function (battlerActorId) {
     }
   }
 
-  if (isActor) {
+  if (isExtraActor) {
     const elementList = attackElementIdsBattleXsarStatas;
     elementList.forEach(function (elementId) {
       if (user.elementAmplifyRate(elementId) !== 0) {
