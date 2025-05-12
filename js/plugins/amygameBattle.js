@@ -1384,114 +1384,153 @@ overkill_count = function () {
 const elemIdsBattleXsarStatas = [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 16, 17];
 const attackElementIdsBattleXsarStatas = [18, 19, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80];
 battle_xsarStatas = function (battlerActorId) {
-  function calcXParam(user, index) {
-    return Math.floor(user.xparam(index) * 100);
-  }
-  function calcSParam(user, index) {
-    return Math.floor(user.sparam(index) * 100);
-  }
-  function calcElementRate(user, index) {
-    return Math.floor(user.elementRate(index) * 100);
-  }
-  function calcCritMultBonus(user) {
-    return user.criticalMultiplierBonus() * 100;
-  }
-  function calcElementAmplify(user, index, includeBonus) {
-    let base = Math.floor(user.elementAmplifyRate(index) * 100);
-    return includeBonus ? base + valueAttackAmplifysActorId[$gameVariables.value(20)][index] : base;
-  }
-
+  // Determine if the actor is extra and set user reference
   const isExtraActor = battlerActorId >= 20;
-  const user = battlerActorId === 20
-              ? $gameActors.actor(battlerActorId) 
-              : $gameTroop.members()[battlerActorId];
+  const user = (battlerActorId === 20)
+    ? $gameActors.actor(battlerActorId)
+    : $gameTroop.members()[battlerActorId];
 
-  let statsTextPart1 = [];
-  statsTextPart1.push(`\\C[2]詳細能力値[1]\\C[0]\n`);
-  statsTextPart1.push(`\\C[16]\\I[636]連撃率　  　:\\C[0]${n}%\n`);
-  statsTextPart1.push(`\\C[16]\\I[637]回復率　　  :\\C[0]${calcElementRate(user, 12)}%\n`);
-  statsTextPart1.push(`\\C[16]\\I[630]命中率　　　:\\C[0]${calcXParam(user, 0)}%\n`);
-  statsTextPart1.push(`\\C[16]\\I[632]回避率　　　:\\C[0]${calcXParam(user, 1)}%\n`);
-  statsTextPart1.push(`\\C[16]\\I[631]会心率　　　:\\C[0]${calcXParam(user, 2)}%\n`);
-  //statsTextPart1.push(`会心回避率:${user.xparam(3)*100}%\n`);
-  //statsTextPart1.push(`魔法回避率:${user.xparam(4)*100}%\n`);
-  //statsTextPart1.push(`魔法反射率:${user.xparam(5)*100}%\n`);
-  //statsTextPart1.push(`反撃率:${user.xparam(6)*100}%\n`);
-  statsTextPart1.push(`\\C[16]\\I[640]HP再生率　　:\\C[0]${calcXParam(user, 7)}%\n`);
-  statsTextPart1.push(`\\C[16]\\I[641]MP再生率　　:\\C[0]${calcXParam(user, 8)}%\n`);
-  statsTextPart1.push(`\\C[16]\\I[642]TP再生率　　:\\C[0]${calcXParam(user, 9)}%\n`);
-  statsTextPart1.push(`\\C[16]\\I[633]狙われ率　　:\\C[0]${calcSParam(user, 0)}%\n`);
-  //statsTextPart1.push(`防御効果率:${user.sparam(1)*100}%\n`);
-  //statsTextPart1.push(`回復効果率:${user.sparam(2)*100}%\n`);
-  //statsTextPart1.push(`薬の効果:${user.sparam(3)*100}%\n`);
-  statsTextPart1.push(`\\C[16]\\I[634]MP消費率　　:\\C[0]${calcSParam(user, 4)}%\n`);
-  statsTextPart1.push(`\\C[16]\\I[635]TPﾁｬｰｼﾞ率　 :\\C[0]${calcSParam(user, 5)}%\n`);
-  statsTextPart1.push(`\\C[16]\\I[638]物理ﾀﾞﾒｶｯﾄ率:\\C[0]${calcSParam(user, 6)}%\n`);
-  statsTextPart1.push(`\\C[16]\\I[639]魔法ﾀﾞﾒｶｯﾄ率:\\C[0]${calcSParam(user, 7)}%\n`);
-  //statsTextPart1.push(`床ダメージ率:${user.sparam(8)*100}%\n`);
-  statsTextPart1.push(`\\C[16]\\I[656]経験獲得率　:\\C[0]${calcSParam(user, 9)}%\n`);
-  {
-    let stateRate15Percent = Math.floor(user.stateRate(15) * 100);
-    let stateRate30Percent = Math.floor(user.stateRate(30) * 100);
-    statsTextPart1.push(`\\C[16]\\I[624]ﾎﾟｰｼｮﾝ耐性率:\\C[0]${$gameVariables.value(380 + $gameVariables.value(20))[58]}%\n`);
-    statsTextPart1.push(`\\C[16]\\I[683]通常異常耐性:\\C[0]${stateRate15Percent}%\n`);
-    statsTextPart1.push(`\\C[16]\\I[684]特殊異常耐性:\\C[0]${stateRate30Percent}%\n`);
+  // Build text parts from separated logic functions
+  const statsTextPart1 = buildStatsTextPart1BattleXsarStatas(user);
+  const statsTextPart2 = buildStatsTextPart2BattleXsarStatas(user, isExtraActor);
+  const statsTextPart3 = buildStatsTextPart3BattleXsarStatas(user, isExtraActor);
+  const statsTextPart4 = buildStatsTextPart4BattleXsarStatas(user, isExtraActor);
+
+  // Show windows and draw texts for parts 1, 2, 3
+  WindowManager.show(1, 0, 105, 300, 663);
+  WindowManager.show(2, 300, 105, 300, 663);
+  WindowManager.show(3, 600, 105, 300, 663);
+  WindowManager.drawText(1, `\\fs[25]${statsTextPart1}`);
+  WindowManager.drawText(2, `\\fs[25]${statsTextPart2}`);
+  WindowManager.drawText(3, `\\fs[25]${statsTextPart3}`);
+
+  // Process part 4: if non-empty, display in its own window
+  if (statsTextPart4 !== `\\C[2]詳細能力値[4]\\C[0]\n`) {
+    WindowManager.show(4, 900, 105, 380, 663);
+    WindowManager.drawText(4, `\\fs[25]${statsTextPart4}`);
+    // Adjust main window width if part 4 is present
+    WindowManager.show(0, 0, 0, 1280, 105);
+    WindowManager.drawText(0, `\\fs[25]${statsTextPart1}`);
+  } else {
+    // If no part 4, then possibly show title & passive effects for battler actor 20
+    if (battlerActorId === 20 && $gameParty.inBattle()) {
+      $gameSwitches.setValue(375, true);
+      title_battleUp(user);
+      passive_addCondition(user);
+      $gameSwitches.setValue(375, false);
+    }
+    WindowManager.show(0, 0, 0, 900, 105);
+    WindowManager.drawText(0, `\\fs[25]${statsTextPart1}`);
   }
 
-  let statsTextPart2 = [];
-  statsTextPart2.push(`\\C[2]詳細能力値[2]\\C[0]\n`);
+  // Draw header text in window 0 based on actor type
+  {
+    const headerText = buildHeaderTextBattleXsarStatas(user, battlerActorId);
+    WindowManager.show(0, 0, 0, 0, 105);
+    WindowManager.drawText(0, `\\fs[25]${headerText}`);
+  }
+};
+
+function calcXParamBattleXsarStatas(user, index) {
+  return Math.floor(user.xparam(index) * 100);
+}
+function calcSParamBattleXsarStatas(user, index) {
+  return Math.floor(user.sparam(index) * 100);
+}
+function calcElementRateBattleXsarStatas(user, index) {
+  return Math.floor(user.elementRate(index) * 100);
+}
+function calcCritMultBonusBattleXsarStatas(user) {
+  return user.criticalMultiplierBonus() * 100;
+}
+function calcStateRate(user, index) {
+  return Math.floor(user.stateRate(index) * 100);
+}
+function calcElementAmplifyBattleXsarStatas(user, index, includeBonus) {
+  let base = Math.floor(user.elementAmplifyRate(index) * 100);
+  return includeBonus ? base + valueAttackAmplifysActorId[$gameVariables.value(20)][index] : base;
+}
+
+function buildStatsTextPart1BattleXsarStatas(user) {
+  let statsTextPart1 = "";
+  statsTextPart1 += `\\C[2]詳細能力値[1]\\C[0]\n`;
+  statsTextPart1 += `\\C[16]\\I[636]連撃率　  　:\\C[0]${"n"}%\n`;
+  statsTextPart1 += `\\C[16]\\I[637]回復率　　  :\\C[0]${calcElementRateBattleXsarStatas(user, 12)}%\n`;
+  statsTextPart1 += `\\C[16]\\I[630]命中率　　　:\\C[0]${calcXParamBattleXsarStatas(user, 0)}%\n`;
+  statsTextPart1 += `\\C[16]\\I[632]回避率　　　:\\C[0]${calcXParamBattleXsarStatas(user, 1)}%\n`;
+  statsTextPart1 += `\\C[16]\\I[631]会心率　　　:\\C[0]${calcXParamBattleXsarStatas(user, 2)}%\n`;
+  //txt += `会心回避率:${user.xparam(3)*100}%\n`;
+  //txt += `魔法回避率:${user.xparam(4)*100}%\n`;
+  //txt += `魔法反射率:${user.xparam(5)*100}%\n`;
+  //txt += `反撃率:${user.xparam(6)*100}%\n`;
+  statsTextPart1 += `\\C[16]\\I[640]HP再生率　　:\\C[0]${calcXParamBattleXsarStatas(user, 7)}%\n`;
+  statsTextPart1 += `\\C[16]\\I[641]MP再生率　　:\\C[0]${calcXParamBattleXsarStatas(user, 8)}%\n`;
+  statsTextPart1 += `\\C[16]\\I[642]TP再生率　　:\\C[0]${calcXParamBattleXsarStatas(user, 9)}%\n`;
+  statsTextPart1 += `\\C[16]\\I[633]狙われ率　　:\\C[0]${calcSParamBattleXsarStatas(user, 0)}%\n`;
+  //txt += `防御効果率:${user.sparam(1)*100}%\n`;
+  //txt += `回復効果率:${user.sparam(2)*100}%\n`;
+  //txt += `薬の効果:${user.sparam(3)*100}%\n`;
+  statsTextPart1 += `\\C[16]\\I[634]MP消費率　　:\\C[0]${calcSParamBattleXsarStatas(user, 4)}%\n`;
+  statsTextPart1 += `\\C[16]\\I[635]TPﾁｬｰｼﾞ率　 :\\C[0]${calcSParamBattleXsarStatas(user, 5)}%\n`;
+  statsTextPart1 += `\\C[16]\\I[638]物理ﾀﾞﾒｶｯﾄ率:\\C[0]${calcSParamBattleXsarStatas(user, 6)}%\n`;
+  statsTextPart1 += `\\C[16]\\I[639]魔法ﾀﾞﾒｶｯﾄ率:\\C[0]${calcSParamBattleXsarStatas(user, 7)}%\n`;
+  //txt += `床ダメージ率:${user.sparam(8)*100}%\n`;
+  statsTextPart1 += `\\C[16]\\I[656]経験獲得率　:\\C[0]${calcSParamBattleXsarStatas(user, 9)}%\n`;
+  {
+    statsTextPart1 += `\\C[16]\\I[624]ﾎﾟｰｼｮﾝ耐性率:\\C[0]${$gameVariables.value(380 + $gameVariables.value(20))[58]}%\n`;
+    statsTextPart1 += `\\C[16]\\I[683]通常異常耐性:\\C[0]${calcStateRate(user, 15)}%\n`;
+    statsTextPart1 += `\\C[16]\\I[684]特殊異常耐性:\\C[0]${calcStateRate(user, 30) }%\n`;
+  }
+  return statsTextPart1;
+}
+
+function buildStatsTextPart2BattleXsarStatas(user, isExtraActor) {
+  let statsTextPart2 = "";
+  statsTextPart2 += `\\C[2]詳細能力値[2]\\C[0]\n`;
   for (let i = 1; i <= 9; i++) {
     amygame_elementIcon(i);
-    const elementAmplifyValue = calcElementAmplify(user, i, isExtraActor);
+    const elementAmplifyValue = calcElementAmplifyBattleXsarStatas(user, i, isExtraActor);
     let amplifyLabel = (i === 1 || i === 2) ? `威力率　` : `属性威力率`;
-    statsTextPart2.push(`\\C[16]\x1bI[${valueElementIconArr[1]}]${$dataSystem.elements[i]}${amplifyLabel}:\\C[0]${elementAmplifyValue}%\n`);
+    statsTextPart2 += `\\C[16]\x1bI[${valueElementIconArr[1]}]${$dataSystem.elements[i]}${amplifyLabel}:\\C[0]${elementAmplifyValue}%\n`;
   }
   for (let i = 1; i <= 9; i++) {
     amygame_elementIcon(i);
     let resistanceLabel = (i === 1 || i === 2) ? `耐性率　` : `属性耐性率`;
-    statsTextPart2.push(`\\C[16]\x1bI[${valueElementIconArr[1]}]${$dataSystem.elements[i]}${resistanceLabel}:\\C[0]${calcElementRate(user, i)}%\n`);
+    statsTextPart2 += `\\C[16]\x1bI[${valueElementIconArr[1]}]${$dataSystem.elements[i]}${resistanceLabel}:\\C[0]${calcElementRateBattleXsarStatas(user, i)}%\n`;
   }
+  return statsTextPart2;
+}
 
-  let statsTextPart3 = [];
-  statsTextPart3.push(`\\C[2]詳細能力値[3]\\C[0]\n`);
+function buildStatsTextPart3BattleXsarStatas(user, isExtraActor) {
+  let statsTextPart3 = "";
+  statsTextPart3 += `\\C[2]詳細能力値[3]\\C[0]\n`;
   if (isExtraActor) {
     skill_addPowerSet(user, $dataSkills, 1, 1);
     if (valueAddPowerCustom >= 1) {
-      statsTextPart3.push(`\\C[16]\\I[666]スキル威力率:\\C[0]+${valueAddPowerCustom}\n`);
+      statsTextPart3 += `\\C[16]\\I[666]スキル威力率:\\C[0]+${valueAddPowerCustom}\n`;
     }
   }
+  statsTextPart3 += `\\C[16]\\I[31]奥義威力率　:\\C[0]${calcElementAmplifyBattleXsarStatas(user, 10, isExtraActor)}%\n`;
+  statsTextPart3 += `\\C[16]\\I[673]ｱﾋﾞﾘﾃｨ威力率:\\C[0]${calcElementAmplifyBattleXsarStatas(user, 20, isExtraActor)}%\n`;
+  statsTextPart3 += `\\C[16]\\I[78]会心威力率　:\\C[0]${calcCritMultBonusBattleXsarStatas(user)}%\n`;
+  statsTextPart3 += `\\C[16]\\I[480]剣威力率　　:\\C[0]${calcElementAmplifyBattleXsarStatas(user, 21, isExtraActor)}%\n`;
+  statsTextPart3 += `\\C[16]\\I[481]短剣威力率　:\\C[0]${calcElementAmplifyBattleXsarStatas(user, 22, isExtraActor)}%\n`;
+  statsTextPart3 += `\\C[16]\\I[482]刀威力率　　:\\C[0]${calcElementAmplifyBattleXsarStatas(user, 23, isExtraActor)}%\n`;
+  statsTextPart3 += `\\C[16]\\I[483]杖威力率　　:\\C[0]${calcElementAmplifyBattleXsarStatas(user, 24, isExtraActor)}%\n`;
+  statsTextPart3 += `\\C[16]\\I[484]拳威力率　　:\\C[0]${calcElementAmplifyBattleXsarStatas(user, 25, isExtraActor)}%\n`;
+  statsTextPart3 += `\\C[16]\\I[485]槍威力率　　:\\C[0]${calcElementAmplifyBattleXsarStatas(user, 26, isExtraActor)}%\n`;
+  statsTextPart3 += `\\C[16]\\I[486]斧威力率　　:\\C[0]${calcElementAmplifyBattleXsarStatas(user, 27, isExtraActor)}%\n`;
+  statsTextPart3 += `\\C[16]\\I[487]銃威力率　　:\\C[0]${calcElementAmplifyBattleXsarStatas(user, 28, isExtraActor)}%\n`;
+  statsTextPart3 += `\\C[16]\\I[488]弓威力率　　:\\C[0]${calcElementAmplifyBattleXsarStatas(user, 29, isExtraActor)}%\n`;
+  statsTextPart3 += `\\C[16]\\I[489]楽器威力率　:\\C[0]${calcElementAmplifyBattleXsarStatas(user, 30, isExtraActor)}%\n`;
+  // 神聖邪悪耐性率表示 (if needed)
+  // if (false) { ... }
+  return statsTextPart3;
+}
 
-  statsTextPart3.push(`\\C[16]\\I[31]奥義威力率　:\\C[0]${calcElementAmplify(user, 10, isExtraActor)}%\n`);
-  statsTextPart3.push(`\\C[16]\\I[673]ｱﾋﾞﾘﾃｨ威力率:\\C[0]${calcElementAmplify(user, 20, isExtraActor)}%\n`);
-  statsTextPart3.push(`\\C[16]\\I[78]会心威力率　:\\C[0]${calcCritMultBonus(user)}%\n`);
-  statsTextPart3.push(`\\C[16]\\I[480]剣威力率　　:\\C[0]${calcElementAmplify(user, 21, isExtraActor)}%\n`);
-  statsTextPart3.push(`\\C[16]\\I[481]短剣威力率　:\\C[0]${calcElementAmplify(user, 22, isExtraActor)}%\n`);
-  statsTextPart3.push(`\\C[16]\\I[482]刀威力率　　:\\C[0]${calcElementAmplify(user, 23, isExtraActor)}%\n`);
-  statsTextPart3.push(`\\C[16]\\I[483]杖威力率　　:\\C[0]${calcElementAmplify(user, 24, isExtraActor)}%\n`);
-  statsTextPart3.push(`\\C[16]\\I[484]拳威力率　　:\\C[0]${calcElementAmplify(user, 25, isExtraActor)}%\n`);
-  statsTextPart3.push(`\\C[16]\\I[485]槍威力率　　:\\C[0]${calcElementAmplify(user, 26, isExtraActor)}%\n`);
-  statsTextPart3.push(`\\C[16]\\I[486]斧威力率　　:\\C[0]${calcElementAmplify(user, 27, isExtraActor)}%\n`);
-  statsTextPart3.push(`\\C[16]\\I[487]銃威力率　　:\\C[0]${calcElementAmplify(user, 28, isExtraActor)}%\n`);
-  statsTextPart3.push(`\\C[16]\\I[488]弓威力率　　:\\C[0]${calcElementAmplify(user, 29, isExtraActor)}%\n`);
-  statsTextPart3.push(`\\C[16]\\I[489]楽器威力率　:\\C[0]${calcElementAmplify(user, 30, isExtraActor)}%\n`);
-
-  //神聖邪悪耐性率表示 (if needed)
-  if (false) {
-    if (user.elementAmplifyRate(16) * 100 >= 110) { statsTextPart3.push(`\\C[16]\\I[172]威力率:\\C[0]${Math.floor(user.elementAmplifyRate(16) * 100)}%\n`); }
-    if (user.elementAmplifyRate(17) * 100 >= 110) { statsTextPart3.push(`\\C[16]\\I[173]威力率:\\C[0]${Math.floor(user.elementAmplifyRate(17) * 100)}%\n`); }
-    if (user.elementRate(16) * 100 >= 110) { statsTextPart3.push(`\\C[16]\\I[172]耐性率:\\C[0]${Math.floor(user.elementRate(16) * 100)}%\n`); }
-    if (user.elementRate(17) * 100 >= 110) { statsTextPart3.push(`\\C[16]\\I[173]耐性率:\\C[0]${Math.floor(user.elementRate(17) * 100)}%\n`); }
-  }
-
-  WindowManager.show(1, 0, 105, 300, 663);
-  WindowManager.show(2, 300, 105, 300, 663);
-  WindowManager.show(3, 600, 105, 300, 663);
-  WindowManager.drawText(1, `\\fs[25]${statsTextPart1.join('')}`);
-  WindowManager.drawText(2, `\\fs[25]${statsTextPart2.join('')}`);
-  WindowManager.drawText(3, `\\fs[25]${statsTextPart3.join('')}`);
-
-  let statsTextPart4 = [];
-  statsTextPart4.push(`\\C[2]詳細能力値[4]\\C[0]\n`);
+function buildStatsTextPart4BattleXsarStatas(user, isExtraActor) {
+  let statsTextPart4 = "";
+  statsTextPart4 += `\\C[2]詳細能力値[4]\\C[0]\n`;
   const start = 1;
   const end = $dataStates.length - 1;
   for (let i = start; i <= end; i++) {
@@ -1499,32 +1538,32 @@ battle_xsarStatas = function (battlerActorId) {
     if (stateMeta['Category']) {
       if (stateMeta['Category'] === ' StateabNomal' || stateMeta['Category'] === ' StateSPabNomal') {
         if (user.isStateResist(i)) {
-          statsTextPart4.push(`\x1bI[${$dataStates[i].iconIndex}]${$dataStates[i].name}:\\C[2][無効化]\\C[0]\n`);
+          statsTextPart4 += `\x1bI[${$dataStates[i].iconIndex}]${$dataStates[i].name}:\\C[2][無効化]\\C[0]\n`;
         } else {
           if (user.stateRate(i) !== 1.0) {
             if ((stateMeta['Category'] === ' StateabNomal' && user.stateRate(i) === user.stateRate(15)) ||
                 (stateMeta['Category'] === ' StateSPabNomal' && user.stateRate(i) === user.stateRate(30))) {
               // Do nothing when equal to default state rate.
             } else {
-              statsTextPart4.push(`\x1bI[${$dataStates[i].iconIndex}]${$dataStates[i].name}耐性率:${Math.floor(user.stateRate(i) * 100)}%\n`);
+              statsTextPart4 += `\x1bI[${$dataStates[i].iconIndex}]${$dataStates[i].name}耐性率:${Math.floor(user.stateRate(i) * 100)}%\n`;
             }
           }
         }
       }
     }
   }
-
   if (isExtraActor) {
     const elementList = attackElementIdsBattleXsarStatas;
     elementList.forEach(function (elementId) {
       if (user.elementAmplifyRate(elementId) !== 0) {
         amygame_elementIcon(elementId);
-        statsTextPart4.push(`\\C[16]\x1bI[${valueElementIconArr[0]}]特攻率:\\C[0]${calcElementAmplify(user, elementId, false)}%\n`);
+        statsTextPart4 += `\\C[16]\x1bI[${valueElementIconArr[0]}]特攻率:\\C[0]${calcElementAmplifyBattleXsarStatas(user, elementId, false)}%\n`;
       }
     });
   } else {
-    for (let i = 1, end = $dataSystem.elements.length - 1; i <= end; i++) {
+    for (let i = 1, endE = $dataSystem.elements.length - 1; i <= endE; i++) {
       if (elemIdsBattleXsarStatas.some(function (elem) { return elem === i; })) {
+        // Skip if in the array
       } else {
         if (user.elementRate(i) !== 1) {
           amygame_elementIcon(i);
@@ -1534,53 +1573,35 @@ battle_xsarStatas = function (battlerActorId) {
           } else {
             resistanceText = `\\C[16]\x1bI[${valueElementIconArr[3]}]耐性率\\C[0]:`;
           }
-          statsTextPart4.push(`${resistanceText}${calcElementRate(user, i)}%\n`);
+          statsTextPart4 += `${resistanceText}${calcElementRateBattleXsarStatas(user, i)}%\n`;
         }
       }
     }
   }
-  {
-    let windowWidth = 900;
-    if (statsTextPart4.join('') !== `\\C[2]詳細能力値[4]\\C[0]\n`) {
-      WindowManager.show(4, 900, 105, 380, 663);
-      WindowManager.drawText(4, `\\fs[25]${statsTextPart4.join('')}`);
-      windowWidth = 1280;
-    } else {
-      if (battlerActorId === 20 && $gameParty.inBattle()) {
-        $gameSwitches.setValue(375, true);
-        title_battleUp(user);
-        passive_addCondition(user);
-        $gameSwitches.setValue(375, false);
-      }
-    }
-    WindowManager.show(0, 0, 0, windowWidth, 105);
-    WindowManager.drawText(0, `\\fs[25]${statsTextPart1.join('')}`);
-  }
+  return statsTextPart4;
+}
 
-  {
-    if (battlerActorId === 20) {
-      let classInfo;
-      if (user.subclass()) {
-        classInfo = `[${$dataClasses[user._classId].name}/${$dataClasses[user._subclassId].name}]`;
-      } else {
-        classInfo = `${$dataClasses[user._classId].name}`;
-      }
-      let additionalInfo;
-      if ($gameParty.inBattle()) {
-        additionalInfo = `\\C[16]BuffLimit:\\C[0]${user.maxBuffLimit(2)} \\C[16]D.cap:\\C[0]${user.maximumDamage()} \\C[16]H.cap:\\C[0]${user.maximumHealing() - user.maximumHealing() - user.maximumHealing()}`;
-      } else {
-        additionalInfo = `役職:${$gameVariables.value(380 + $gameVariables.value(20))[59]}`;
-      }
-      let headerText = `${classInfo}${user.nickname()}\\set[${$gameVariables.value(20)}]\n${additionalInfo}`;
-      WindowManager.show(0, 0, 0, 0, 105);
-      WindowManager.drawText(0, `\\fs[25]${headerText}`);
+function buildHeaderTextBattleXsarStatas(user, battlerActorId) {
+  let headerText = "";
+  if (battlerActorId === 20) {
+    let classInfo;
+    if (user.subclass()) {
+      classInfo = `[${$dataClasses[user._classId].name}/${$dataClasses[user._subclassId].name}]`;
     } else {
-      let headerText = `${user.name()}`;
-      WindowManager.show(0, 0, 0, 0, 105);
-      WindowManager.drawText(0, `\\fs[25]${headerText}`);
+      classInfo = `${$dataClasses[user._classId].name}`;
     }
+    let additionalInfo;
+    if ($gameParty.inBattle()) {
+      additionalInfo = `\\C[16]BuffLimit:\\C[0]${user.maxBuffLimit(2)} \\C[16]D.cap:\\C[0]${user.maximumDamage()} \\C[16]H.cap:\\C[0]${user.maximumHealing() - user.maximumHealing() - user.maximumHealing()}`;
+    } else {
+      additionalInfo = `役職:${$gameVariables.value(380 + $gameVariables.value(20))[59]}`;
+    }
+    headerText = `${classInfo}${user.nickname()}\\set[${$gameVariables.value(20)}]\n${additionalInfo}`;
+  } else {
+    headerText = `${user.name()}`;
   }
-};
+  return headerText;
+}
 
 //エネミー撃破時にドロップボックス設定
 enemywin_treasurebox1 = function (id1) {
