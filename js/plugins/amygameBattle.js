@@ -3290,14 +3290,14 @@ enemy_instantwin = function () {
   const item240 = $dataItems[$gameVariables.value(240)];
   let expCount = 0;
   let goldCount = 0;
-  const rate = 0.5;//rate
-  const flat = 20;//flat
-  const rate1 = 0.6;
-  const flat1 = 10;
+  const expRateMultiplier = 0.5; //rate
+  const expFlatBonus = 20; //flat
+  const goldRateMultiplier = 0.6;
+  const goldFlatBonus = 10;
   valueWordSet1 = ``;
   valueWordSet3 = ``;
-  const arrItemEnemyLV = item240.meta['EnemyLV'].split(',');
-  actor1_setup1(item240, arrItemEnemyLV[getRandomIndex(arrItemEnemyLV.length)]);
+  const enemyLevelArray = item240.meta['EnemyLV'].split(',');
+  actor1_setup1(item240, enemyLevelArray[getRandomIndex(enemyLevelArray.length)]);
   //特殊ステート対応討伐カウント // tweak: commented because no data change
   /* if($gameVariables.value(350) != 0){
    for (var i = 0; i <= $gameVariables.value(350).length-1; i++) {
@@ -3324,34 +3324,37 @@ enemy_instantwin = function () {
      };
    };
   }; */
-  const gameVar220 = $gameVariables.value(220);
+  const enemyIdArray = $gameVariables.value(220);
   const dropUpItem = $dataItems[valueItemDropUpItem];
-  const arrItemBattleEnemyPopC = item240.meta['BattleEnemyPopC'].split(',');
-  arr4 = [];
-  const end = Number(arrItemBattleEnemyPopC[getRandomIndex(arrItemBattleEnemyPopC.length)]);
-  for (var i = 1; i <= end; i++) {
-    let intValue1 = Number(arrItemEnemyLV[getRandomIndex(arrItemEnemyLV.length)]);
-    if (intValue1 == 0) { intValue1 = 1 };
-    const intValue1minus1 = intValue1 - 1;
-    const enemy = $dataEnemies[Number(gameVar220[getRandomIndex(gameVar220.length)])];
-    expCount += Math.round(enemy.exp * (1 + intValue1minus1 * rate) + (flat * intValue1minus1));
-    goldCount += Math.round(enemy.gold * (1 + intValue1minus1 * rate1) + (flat1 * intValue1minus1));
+  const enemyPopChanceArray = item240.meta['BattleEnemyPopC'].split(',');
+  const dropResultAccumulator = [];
+  const valueWordSet1Array = [];
+  const popEnemyCount = Number(enemyPopChanceArray[getRandomIndex(enemyPopChanceArray.length)]);
+  for (var popIndex = 1; popIndex <= popEnemyCount; popIndex++) {
+    let selectedEnemyLevel = Number(enemyLevelArray[getRandomIndex(enemyLevelArray.length)]);
+    if (selectedEnemyLevel == 0) { selectedEnemyLevel = 1; }
+    const enemyLevelOffset = selectedEnemyLevel - 1;
+    const enemy = $dataEnemies[Number(enemyIdArray[getRandomIndex(enemyIdArray.length)])];
+    expCount += Math.round(enemy.exp * (1 + enemyLevelOffset * expRateMultiplier) + (expFlatBonus * enemyLevelOffset));
+    goldCount += Math.round(enemy.gold * (1 + enemyLevelOffset * goldRateMultiplier) + (goldFlatBonus * enemyLevelOffset));
 
     enemy_dropSelection(actor20);
-    const drop_probability = drop_probabilityCalculation(intValue1, dropUpItem);
-    if (drop_probability >= 90) {
-      drop_enemyDropRate(0, arr4);//計算のみ。計算結果はarr4に蓄積。
-      drop_genericDropRate(0, arr4);//valueDropItemsに格納
+    const currentDropProbability = drop_probabilityCalculation(selectedEnemyLevel, dropUpItem);
+    if (currentDropProbability >= 90) {
+      drop_enemyDropRate(0, dropResultAccumulator); //計算のみ。計算結果はdropResultAccumulatorに蓄積。
+      drop_genericDropRate(0, dropResultAccumulator); //valueDropItemsに格納
       const itemToDrop = $dataItems[valueDropItems];
       const itemName = `\\C[24]\x1bI[${itemToDrop.iconIndex}]${itemToDrop.name}\\C[0]`;
       const message = `${itemName}を獲得した。\n`;
-      valueWordSet1 += `${message}`;
+      valueWordSet1Array.push(message);
       $gameSystem.pushInfoLog(message);
       //CommonPopupManager.showInfo({},`\\C[24]\x1bI[${$dataItems[valueDropItems].iconIndex}]${$dataItems[valueDropItems].name}\\C[0]を獲得した。`,null);
       $gameParty.gainItem(itemToDrop, 1);
     };
 
   }
+  
+  valueWordSet1 += valueWordSet1Array.join(``);
 
   const result = `\\C[2]BattleResult!\\C[0]`;
   const exp = `\\C[10]${expCount}\\C[0]`;
