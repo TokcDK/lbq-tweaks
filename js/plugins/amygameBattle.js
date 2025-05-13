@@ -7,10 +7,10 @@
 //(function() {
 
 // enemy_dropSelection global vars (to not declare each time)
-var itemsSourceKindPicNames = ['ItemDrop_Items', 'ItemDrop_Weapons', 'ItemDrop_Armors'];
-var xShiftCoords = [50, 75, 100, 125, 150, 175, 200];
-var yShiftCoords = [-50, -40, -30, -20, -10, 0, 10, 20];
-var durations = [80, 85, 90, 95, 100];
+var itemsSourceKindPicNamesEnemyDropSelection = ['ItemDrop_Items', 'ItemDrop_Weapons', 'ItemDrop_Armors'];
+var xShiftCoordsEnemyDropSelection = [50, 75, 100, 125, 150, 175, 200];
+var yShiftCoordsEnemyDropSelection = [-50, -40, -30, -20, -10, 0, 10, 20];
+var durationsEnemyDropSelection = [80, 85, 90, 95, 100];
 //エネミー戦闘不能時にドロップ計算
 enemy_dropSelection = function (user) {
 
@@ -46,9 +46,9 @@ enemy_dropSelection = function (user) {
   const itemDropDataArray = get_item_drop_data(user);
   const itemDropDataArrayLength = itemDropDataArray.length;
   const itemsSourceKinds = [$dataItems, $dataWeapons, $dataArmors];
-  const xShiftCoordsLength = xShiftCoords.length;
-  const yShiftCoordsLength = yShiftCoords.length;
-  const durationsLength = durations.length;
+  const xShiftCoordsLength = xShiftCoordsEnemyDropSelection.length;
+  const yShiftCoordsLength = yShiftCoordsEnemyDropSelection.length;
+  const durationsLength = durationsEnemyDropSelection.length;
   const userIndex = user.index() + 1;
   const coordinateX = $gameTroop.getX(userIndex);
   const coordinateY = $gameTroop.getY(userIndex);
@@ -64,14 +64,14 @@ enemy_dropSelection = function (user) {
     const itemDropDataKindNum = Number(itemDropData[1]);
     valueItems = itemsSourceKinds[itemDropDataKindNum];
     const valueItem = valueItems[Number(itemDropData[2])];
-    const picName = itemsSourceKindPicNames[itemDropDataKindNum];
+    const picName = itemsSourceKindPicNamesEnemyDropSelection[itemDropDataKindNum];
     if (isInBattle) {
       $gameTroop.addDropItem(valueItem);
       //var value1 = `\x1bI[${valueItems[Number(arr1[i][2])].iconIndex}]`;
       //var arr7 = [-50,-60,-70,-80,-90,-100,-110,-120,-130,-140,-150,-160,-170,-180,-190,-200];
-      const shiftX = xShiftCoords[getRandomIndex(xShiftCoordsLength)];//x
-      const shiftY = yShiftCoords[getRandomIndex(yShiftCoordsLength)];//y
-      const duration = durations[getRandomIndex(durationsLength)];//wait
+      const shiftX = xShiftCoordsEnemyDropSelection[getRandomIndex(xShiftCoordsLength)];//x
+      const shiftY = yShiftCoordsEnemyDropSelection[getRandomIndex(yShiftCoordsLength)];//y
+      const duration = durationsEnemyDropSelection[getRandomIndex(durationsLength)];//wait
       //var value7 = arr7[getRandomIndex(arr7.length)];//jump
       picture_motion1("smooth", [0]);
       //$gameScreen.setDTextPicture(value1, 32);//元から
