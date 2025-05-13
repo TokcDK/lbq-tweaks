@@ -3577,44 +3577,44 @@ drop_walletItemBoxGet = function (value12, id12) {
 
 //汎用ドロップ設定
 drop_genericDropRate = function (battleDrop, itemsToDrop) {
-  const gameVariable240 = $gameVariables.value(240);
-  let value11 = 1;
+  const itemId = $gameVariables.value(240);
+  let genericDropRate = 1;
 
-  if (gameVariable240 >= 1) {
-    const value = $dataItems[gameVariable240];
-    if (value.meta.GenericDropRate) {
-      const arr11 = value.meta.GenericDropRate.split(',');
-      value11 = Number(arr11[getRandomIndex(arr11.length)]);
+  if (itemId >= 1) {
+    const dropItemData = $dataItems[itemId];
+    if (dropItemData.meta.GenericDropRate) {
+      const genericDropRateArray = dropItemData.meta.GenericDropRate.split(',');
+      genericDropRate = Number(genericDropRateArray[getRandomIndex(genericDropRateArray.length)]);
     }
   }
 
-  const valueItemDropRate1Length = valueItemDropRate1.length;
-  const items = $dataItems;
+  const itemDropRateArrayLength = valueItemDropRate1.length;
+  const allItems = $dataItems;
   const gameSwitch2State = $gameSwitches.value(2);
-  const isBattleIsTrue = battleDrop !== 0;
-  for (let i = 0; i < valueItemDropRate1Length; i++) {
-    const dropItemI = valueItemDropRate1[i];
-    let value15 = 1;
+  const isBattle = battleDrop !== 0;
+  for (let i = 0; i < itemDropRateArrayLength; i++) {
+    const currentDropItemId = valueItemDropRate1[i];
+    let dropLotteryValue = 1;
 
-    if (isBattleIsTrue && !gameSwitch2State) continue;
+    if (isBattle && !gameSwitch2State) continue;
 
-    const item = items[dropItemI];
+    const item = allItems[currentDropItemId];
     const itemDropRate = item.meta['DropRate'];
-    const isBattleDrop = isBattleIsTrue || !item.meta['NoBattleDrop'];
+    const isBattleDrop = isBattle || !item.meta['NoBattleDrop'];
     if (!isBattleDrop || !itemDropRate) continue;
 
-    const list = itemDropRate.split(',');
+    const dropRateList = itemDropRate.split(',');
 
-    for (let id11 of list) {
-      if (id11 != value11) continue;
+    for (let dropRateOption of dropRateList) {
+      if (dropRateOption != genericDropRate) continue;
 
       const itemDropLottery = item.meta['DropLottery'];
       if (itemDropLottery) {
-        value15 = Number(itemDropLottery);
+        dropLotteryValue = Number(itemDropLottery);
       }
 
-      for (let j = 1; j <= value15; j++) {
-        itemsToDrop.push(dropItemI);
+      for (let count = 1; count <= dropLotteryValue; count++) {
+        itemsToDrop.push(currentDropItemId);
       }
     }
   }
