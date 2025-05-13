@@ -242,37 +242,37 @@ allAnimeattack_moveBase = function (isMove2) {
 }
 
 //ダメージ時に計算。（変更が多いため先頭に置く）value4はstateId。value2未使用
-damage_keisan1 = function (user, target, action, value, value1, value2, animationId, stateId) {
+damage_keisan1 = function (user, target, action, damageAmount, critAnimationId, unusedParam, animationId, stateId) {
 
   if (!$gameSwitches.value(141)) return;
 
-  const gameVar536 = $gameVariables.value(526);
-  for (let i = 1; i <= gameVar536; i++) {
-    const isValid = action && value > 0 && valueSkillDamageType == 1;
+  const damageHitCount = $gameVariables.value(526);
+  for (let hitIndex = 1; hitIndex <= damageHitCount; hitIndex++) {
+    const isValid = action && damageAmount > 0 && valueSkillDamageType == 1;
     if (!isValid) continue;
 
-    let colorOpacity = 50;
-    let snakePower = 0;
-    let speed = 4;
+    let flashOpacity = 50;
+    let shakeIntensity = 0;
+    let shakeSpeed = 4;
     let duration = 10;
 
-    let colorDataArray;
+    let flashColorData;
     if (!$gameVariables.value(331)) {
-      colorDataArray = [200, 0, 0, colorOpacity];
-      $gameVariables.setValue(331, colorDataArray);
+      flashColorData = [200, 0, 0, flashOpacity];
+      $gameVariables.setValue(331, flashColorData);
     } else {
-      colorDataArray = $gameVariables.value(331);
-      colorDataArray[3] = colorOpacity;
+      flashColorData = $gameVariables.value(331);
+      flashColorData[3] = flashOpacity;
     };
-    colorDataArray[3] = colorOpacity;
+    flashColorData[3] = flashOpacity;
 
-    if (i == 1) {
+    if (hitIndex == 1) {
       if (target.result().critical) {
         if (user.isActor()) {
           $gameVariables.value(380 + user.actorId())[68] += 1;
         }
         if (target.hp <= 0 && valueCollapseAnime >= 1) { } else {
-          target.startAnimation(value1, true, 0);
+          target.startAnimation(critAnimationId, true, 0);
         }
       }
       if (target.hp != 0 && valueTotalDamageCount2 == 0) {
@@ -280,95 +280,95 @@ damage_keisan1 = function (user, target, action, value, value1, value2, animatio
       }
 
       if (target.isActor()) {
-        if (value >= target.mhp / 2) {
+        if (damageAmount >= target.mhp / 2) {
           state_addFormula1([41, 25, user, target, user.mdf, target.luk]);//負傷ステート
         };
       };
-      if (value >= target.mhp / 10) {
-        let valueTarget;
-        let value13
+      if (damageAmount >= target.mhp / 10) {
+        let targetGroup;
+        let positionYOffset;
         if (target.isActor()) {
-          valueTarget = $gameParty;
-          value13 = -24;
+          targetGroup = $gameParty;
+          positionYOffset = -24;
         } else {
-          valueTarget = $gameTroop;
-          value13 = -100;
+          targetGroup = $gameTroop;
+          positionYOffset = -100;
         };
         const targetIndex = target.index();
-        let value10 = 'wave_' + targetIndex;
-        let value11 = valueTarget.getX(targetIndex + 1);
-        let value12 = valueTarget.getY(targetIndex + 1) + value13;
-        let value14 = 50;
-        let value15 = 30;
-        let value16 = 0.05;
-        if (value >= target.mhp / 10 * 3) {
-          value14 = 100;
-          value15 = 40;
+        let filterId = 'wave_' + targetIndex;
+        let filterX = targetGroup.getX(targetIndex + 1);
+        let filterY = targetGroup.getY(targetIndex + 1) + positionYOffset;
+        let shockwaveIntensity = 50;
+        let shockwaveRadius = 30;
+        let shockwaveDurationMultiplier = 0.05;
+        if (damageAmount >= target.mhp / 10 * 3) {
+          shockwaveIntensity = 100;
+          shockwaveRadius = 40;
         };
-        if (value >= target.mhp / 2) {
-          value14 = 150;
-          value15 = 50;
+        if (damageAmount >= target.mhp / 2) {
+          shockwaveIntensity = 150;
+          shockwaveRadius = 50;
         };
-        if (value >= target.mhp) {
-          value14 = 200;
-          value16 = 0.06;
+        if (damageAmount >= target.mhp) {
+          shockwaveIntensity = 200;
+          shockwaveDurationMultiplier = 0.06;
         };
-        $gameMap.createFilter(value10, 'shockwave', 0, 'screen');
-        $gameMap.setFilter(value10, [value11, value12, -1, value15, value14, 1]);
-        $gameMap.setFilterAddiTime(value10, value16);
+        $gameMap.createFilter(filterId, 'shockwave', 0, 'screen');
+        $gameMap.setFilter(filterId, [filterX, filterY, -1, shockwaveRadius, shockwaveIntensity, 1]);
+        $gameMap.setFilterAddiTime(filterId, shockwaveDurationMultiplier);
       }
       duration = 10;
-      if (target.mhp / 100 >= value) {
-        snakePower = 130;
-        colorOpacity -= 50;
+      if (target.mhp / 100 >= damageAmount) {
+        shakeIntensity = 130;
+        flashOpacity -= 50;
         duration -= 5;
-        speed -= 3;
+        shakeSpeed -= 3;
       }
-      else if (target.mhp <= value) {
-        snakePower += 1;
-        colorOpacity += 25;
+      else if (target.mhp <= damageAmount) {
+        shakeIntensity += 1;
+        flashOpacity += 25;
         duration += 5;
-        speed += 2;
+        shakeSpeed += 2;
       }
 
-      if (gameVar536 >= 2) {
-        duration += gameVar536 * 3;
+      if (damageHitCount >= 2) {
+        duration += damageHitCount * 3;
       };
-      $gameScreen.startFlash(colorDataArray, duration);
-      $gameScreen.startShake(snakePower, speed, duration);
+      $gameScreen.startFlash(flashColorData, duration);
+      $gameScreen.startShake(shakeIntensity, shakeSpeed, duration);
     }
     let animDelay = 0;
     if (animationId >= 1) {
-      if (i >= 2) {
+      if (hitIndex >= 2) {
         const animation = $dataAnimations[animationId];
         const animFramesLength = animation.frames.length;
-        let animDelayMax = 4;
-        if (animation.name.match(/!/)) { animDelayMax = 1 }
-        else if (animation.name.match(/&/)) { animDelayMax = 2 }
-        else if (animation.name.match(/$/)) { animDelayMax = 3 };
+        let maxAnimationDelay = 4;
+        if (animation.name.match(/!/)) { maxAnimationDelay = 1 }
+        else if (animation.name.match(/&/)) { maxAnimationDelay = 2 }
+        else if (animation.name.match(/$/)) { maxAnimationDelay = 3 };
 
-        animDelay = Math.ceil((animFramesLength * 4 / 5) * animDelayMax / 4) * (i - 1);
+        animDelay = Math.ceil((animFramesLength * 4 / 5) * maxAnimationDelay / 4) * (hitIndex - 1);
       } else {
         animDelay = 0;
       }
     }
     /*
        if(valueBattleAddAttack >= 1){//<BattleAddAttackSet:50>未使用	
-         let value1 = Math.round(value * valueBattleAddAttack / 100);
+         let value1 = Math.round(damageAmount * valueBattleAddAttack / 100);
          target.gainHp(-value1);
          target.startDamagePopup();
        };
     */
-    if (i >= 2) {
-      let value5 = getRandomIndex(41) - 20;
-      value5 = Math.round(value * value5 / 100);
-      target.gainHp(-value - value5);
+    if (hitIndex >= 2) {
+      let randomOffset = getRandomIndex(41) - 20;
+      randomOffset = Math.round(damageAmount * randomOffset / 100);
+      target.gainHp(-damageAmount - randomOffset);
       target.startDamagePopup();
 
-      if (i == 2) {
+      if (hitIndex == 2) {
         //if(target.hp <= 0 && valueCollapseAnime >= 1){}else{
-        $gameScreen.startFlash(colorDataArray, duration);
-        $gameScreen.startShake(snakePower, speed, duration);
+        $gameScreen.startFlash(flashColorData, duration);
+        $gameScreen.startShake(shakeIntensity, shakeSpeed, duration);
         //};
       }
     }
@@ -377,8 +377,8 @@ damage_keisan1 = function (user, target, action, value, value1, value2, animatio
       target.startAnimation(animationId, true, animDelay);
       //};
     }
-    target.addStateCounter(stateId, value);
-    valueTotalDamageCount += value;
+    target.addStateCounter(stateId, damageAmount);
+    valueTotalDamageCount += damageAmount;
     valueTotalDamageCount2 += 1;
   }
 }
