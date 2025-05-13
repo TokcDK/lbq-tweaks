@@ -58,7 +58,7 @@ enemy_dropSelection = function (user) {
     const itemDropData = itemDropDataArray[i];
     if (!itemDropData) continue;
 
-    const valueDropCount1 = drop_probabilityCalculation2(user, Number(itemDropData[0]), dropUpItem);
+    valueDropCount1 = drop_probabilityCalculation2(user, Number(itemDropData[0]), dropUpItem);
     if (valueDropCount1 != 1) continue;
 
     const itemDropDataKindNum = Number(itemDropData[1]);
