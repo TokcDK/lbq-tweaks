@@ -3630,114 +3630,117 @@ function drop_enemyDropRate(unusedParam, eligibleDropItems) {
   const enemyIdArray = $gameVariables.value(220);
   const selectedEnemyLevel = Number(enemyLevelData[getRandomIndex(enemyLevelData.length)]);
   const selectedEnemyIndex = Number(enemyIdArray[getRandomIndex(enemyIdArray.length)]);
+  const enemyMeta = $dataEnemies[selectedEnemyIndex].meta;
 
   const itemsLength = $dataItems.length;
   for (let itemIndex = 1; itemIndex < itemsLength; itemIndex++) {
-    const conditionalItemDrop = $dataEnemies[selectedEnemyIndex].meta['Conditional Item ' + itemIndex + ' Drop'];
+    const conditionalItemDrop = enemyMeta['Conditional Item ' + itemIndex + ' Drop'];
     if (!conditionalItemDrop) {
       continue;
     }
-    
+
     const lotteryRarity = $dataItems[itemIndex].meta['LotteryRearity'];
-    if (lotteryRarity) {
-      let rarityThreshold;
+    if (!lotteryRarity) {
+      continue;
+    }
 
-      switch (Number(lotteryRarity)) {
-        case 1:
-        case 2:
-          rarityThreshold = 1;
-          break;
-        case 3:
-          rarityThreshold = 10;
-          break;
-        case 4:
-          rarityThreshold = 20;
-          break;
-        case 5:
-        case 6:
-          rarityThreshold = 30;
-          break;
-        case 7:
-        case 8:
-          rarityThreshold = 40;
-          break;
-        case 9:
-        case 10:
-          rarityThreshold = 50;
-          break;
-      }
+    let rarityThreshold;
 
-      if (selectedEnemyLevel >= rarityThreshold) {
-        eligibleDropItems.push(itemIndex);
-      }
+    switch (Number(lotteryRarity)) {
+      case 1:
+      case 2:
+        rarityThreshold = 1;
+        break;
+      case 3:
+        rarityThreshold = 10;
+        break;
+      case 4:
+        rarityThreshold = 20;
+        break;
+      case 5:
+      case 6:
+        rarityThreshold = 30;
+        break;
+      case 7:
+      case 8:
+        rarityThreshold = 40;
+        break;
+      case 9:
+      case 10:
+        rarityThreshold = 50;
+        break;
+    }
+
+    if (selectedEnemyLevel >= rarityThreshold) {
+      eligibleDropItems.push(itemIndex);
     }
   }
 }
 
 //ジョブステートエネミーorジョブ持ち追いはぎスクリプト
 //drop_JobStateWAget(1,10);//1武器2防具ダンジョン外の場合の想定レベル
-drop_JobStateWAget = function (valueItemsType, value10) {
+drop_JobStateWAget = function (equipmentType, unusedParam) {
   const DEFAULT_ENEMY_LEVEL = 30;
   const LEVEL_DIVISOR = 10;
   const MIN_REARITY = 1;
   const MAX_REARITY = 10;
 
-  let arr4 = [0];
-  let valueClassState = 0;
-  let valueEnemyLevel;
+  let eligibleItemIndices = [0];
+  let classStateDropData = 0;
+  let enemyLevel;
 
   if (!$gameParty.inBattle()) {
     if ($gameMap.event(valueEnemyEventId).event().meta['classStateDrop']) {
-      valueClassState = $gameMap.event(valueEnemyEventId).event().meta['classStateDrop'].split(',');
+      classStateDropData = $gameMap.event(valueEnemyEventId).event().meta['classStateDrop'].split(',');
 
-      const gameVar240Value = $gameVariables.value(240);
-      if (gameVar240Value === 0) {
-        valueEnemyLevel = DEFAULT_ENEMY_LEVEL;
+      const targetItemId = $gameVariables.value(240);
+      if (targetItemId === 0) {
+        enemyLevel = DEFAULT_ENEMY_LEVEL;
       } else {
-        const arr1 = $dataItems[gameVar240Value].meta['EnemyLV'].split(',');
-        valueEnemyLevel = Number(arr1[getRandomIndex(arr1.length)]);
+        const enemyLevelArray = $dataItems[targetItemId].meta['EnemyLV'].split(',');
+        enemyLevel = Number(enemyLevelArray[getRandomIndex(enemyLevelArray.length)]);
       }
     }
   }
 
-  if (!valueClassState) return;
+  if (!classStateDropData) return;
 
-  let lotteryRearity = Math.round(valueEnemyLevel / LEVEL_DIVISOR);
-  lotteryRearity = Math.max(MIN_REARITY, Math.min(lotteryRearity, MAX_REARITY));
-  let start = 1;
-  const isArmors = valueItemsType === 2;
-  let valueItems, end, vTypeId;
+  let calculatedLotteryRarity = Math.round(enemyLevel / LEVEL_DIVISOR);
+  calculatedLotteryRarity = Math.max(MIN_REARITY, Math.min(calculatedLotteryRarity, MAX_REARITY));
+  let startIndex = 1;
+  const isArmors = equipmentType === 2;
+  let equipmentData, endIndex, requiredEquipmentTypeId;
 
   if (isArmors) {
-    valueItems = $dataArmors;
-    end = valueArmorsLength;
-    vTypeId = Number(valueClassState[2]);
+    equipmentData = $dataArmors;
+    endIndex = valueArmorsLength;
+    requiredEquipmentTypeId = Number(classStateDropData[2]);
   } else {
-    valueItems = $dataWeapons;
-    end = $dataWeapons.length - 1;
-    vTypeId = Number(valueClassState[1]);
+    equipmentData = $dataWeapons;
+    endIndex = $dataWeapons.length - 1;
+    requiredEquipmentTypeId = Number(classStateDropData[1]);
   }
 
-  for (let i = start; i <= end; i++) {
-    const item = valueItems[i];
-    const itemLotteryRearity = item.meta['LotteryRearity'];
-    if (itemLotteryRearity && !item.meta['GatchaOutOfRange']) {
-      const valueTypeId = isArmors ? item.atypeId : item.wtypeId;
-      if (vTypeId === valueTypeId && lotteryRearity >= Number(itemLotteryRearity)) {
-        arr4.push(i);
+  for (let index = startIndex; index <= endIndex; index++) {
+    const equipmentItem = equipmentData[index];
+    const equipmentItemLotteryRarity = equipmentItem.meta['LotteryRearity'];
+    if (equipmentItemLotteryRarity && !equipmentItem.meta['GatchaOutOfRange']) {
+      const equipmentItemTypeId = isArmors ? equipmentItem.atypeId : equipmentItem.wtypeId;
+      if (requiredEquipmentTypeId === equipmentItemTypeId && calculatedLotteryRarity >= Number(equipmentItemLotteryRarity)) {
+        eligibleItemIndices.push(index);
       }
     }
   }
 
-  const dropItemId = arr4[getRandomIndex(arr4.length)];
-  if (dropItemId !== 0) {
+  const selectedDropItemIndex = eligibleItemIndices[getRandomIndex(eligibleItemIndices.length)];
+  if (selectedDropItemIndex !== 0) {
     if ($gameParty.inBattle()) {
-      $gameTroop.addDropItem(valueItems[dropItemId]);
+      $gameTroop.addDropItem(equipmentData[selectedDropItemIndex]);
     } else {
-      const item = valueItems[dropItemId];
-      const itemName = `\\C[24]\x1bI[${item.iconIndex}]${item.name}\\C[0]`;
+      const equipmentItem = equipmentData[selectedDropItemIndex];
+      const itemName = `\\C[24]\x1bI[${equipmentItem.iconIndex}]${equipmentItem.name}\\C[0]`;
       CommonPopupManager.showInfo({}, `${itemName}を獲得した。`, null);
-      $gameParty.gainItem(item, 1);
+      $gameParty.gainItem(equipmentItem, 1);
     }
   }
 }
