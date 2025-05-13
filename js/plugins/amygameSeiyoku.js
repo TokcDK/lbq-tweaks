@@ -1814,6 +1814,8 @@ const defaultSexualEcstasyHi = [`「アッ…」`, `「ンっ…」`, `「ンン
 const defaultSexualEcstasyMiddle = [`「アッ…\\I[12]」`, `「ンっ…」`, `「ンンっ…\\I[12]」`, `（ピクっ…\\I[12]）`];
 const defaultSexualEcstasyLow = ['「ヤァッ…！」', '「ダメっ…！」', '「ヤメッ…！」',
   '「アっ…、ァァ…」', '（ビクンッ）'];
+const textWindowIdOptionsSceneTextBgv = [28, 29, 30, 31, 32, 33, 34, 35, 36];
+const additionalXOffsetOptionsSceneTextBgv = [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, -50, -60, -70, -80, -90, -100, -110, -120, -130, -140, -150];
 scene_textBgv = function(actorId, baseX, baseY, offsetMode, waitMode, fontSetting) {
 
   const actor = $gameActors.actor(actorId);
@@ -1873,8 +1875,7 @@ scene_textBgv = function(actorId, baseX, baseY, offsetMode, waitMode, fontSettin
     waitTimeOptions = [100, 110, 120, 130, 140, 150, 160];
     chosenWaitTime = waitTimeOptions[getRandomIndex(waitTimeOptions.length)];
   }
-  const textWindowIdOptions = [28, 29, 30, 31, 32, 33, 34, 35, 36];
-  const chosenTextWindowId = textWindowIdOptions[getRandomIndex(textWindowIdOptions.length)];
+  const chosenTextWindowId = textWindowIdOptionsSceneTextBgv[getRandomIndex(textWindowIdOptionsSceneTextBgv.length)];
   $gameScreen.setDTextPicture(`${chosenPhrase}`, chosenTextWindowId);
   $gameScreen.dWindowFrame = 'ON';
   if (fontSetting == 0) {} else { $gameScreen.setDtextFont(fontSetting); }
@@ -1883,8 +1884,7 @@ scene_textBgv = function(actorId, baseX, baseY, offsetMode, waitMode, fontSettin
     $gameScreen.showPicture(chosenPictureId, "", 1, offsetBaseX + chosenXOffset, offsetBaseY + chosenYOffset, 150, 150, 255, 0);
     $gameScreen.movePicture(chosenPictureId, 1, offsetBaseX + chosenXOffset, offsetBaseY + chosenYOffset, 100, 100, 0, 0, chosenWaitTime);
   } else {
-    const additionalXOffsetOptions = [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, -50, -60, -70, -80, -90, -100, -110, -120, -130, -140, -150];
-    const additionalXOffset = additionalXOffsetOptions[getRandomIndex(additionalXOffsetOptions.length)];
+    const additionalXOffset = additionalXOffsetOptionsSceneTextBgv[getRandomIndex(additionalXOffsetOptionsSceneTextBgv.length)];
     $gameScreen.showPicture(chosenPictureId, "", 1, offsetBaseX + chosenXOffset + additionalXOffset, offsetBaseY + chosenYOffset, 100, 100, 255, 0);
     $gameScreen.movePicture(chosenPictureId, 1, offsetBaseX + chosenXOffset, offsetBaseY + chosenYOffset, 100, 100, 0, 0, chosenWaitTime);
   }
