@@ -1281,7 +1281,8 @@ function calculateHorizontalAdjustmentBattleBustUpBattleBustUp() {
 //---------------------------------------------------------------------
 function processFaceImageBattleBustUpBattleBustUp(basePictureId, actorId, faceImageName, index, horizontalShift, verticalShift, moveOffsetX, moveOffsetY, pictureScale, extraMoveDuration) {
   // Get the proper face image name and flag for display
-  const { faceImageName, showPictureFlag } = getFaceImageNameBattleBustUp(actorId, index);
+  const { faceImageName1, showPictureFlag } = getFaceImageNameBattleBustUp(actorId, index);
+  faceImageName = faceImageName1;
 
   if (showPictureFlag === true) {
     $gameScreen.showPicture(
