@@ -3414,6 +3414,18 @@ drop_probabilityCalculation = function (actorLevel, dropUpItem) {
 };
 
 //ドロップするかどうかの確率計算2
+const dropModifierMapDropProbabilityCalculation2 = {
+  1: 10,
+  2: 9,
+  3: 8,
+  4: 7,
+  5: 6,
+  6: 5,
+  7: 4,
+  8: 3,
+  9: 2,
+  10: 1
+};
 drop_probabilityCalculation2 = function (user, dropCategory, dropUpItem) {
 
   let dropCount = 0;
@@ -3428,6 +3440,7 @@ drop_probabilityCalculation2 = function (user, dropCategory, dropUpItem) {
     else if (dropCategory == 7) { calculatedLevelLimit = 30 }
     else if (dropCategory == 8) { calculatedLevelLimit = 40 }
     if (dropCategory > 8) { calculatedLevelLimit = 50 };
+    
     canDrop = calculatedLevelLimit < valueDropEnemyLevel;
   } else {
     canDrop = true;
@@ -3437,16 +3450,7 @@ drop_probabilityCalculation2 = function (user, dropCategory, dropUpItem) {
   if (canDrop /*&& value14*/) {
     let dropModifier = 5;
     //if(dropCategory == 0){...};
-    if (dropCategory == 1) { dropModifier = 10 }
-    else if (dropCategory == 2) { dropModifier = 9 }
-    else if (dropCategory == 3) { dropModifier = 8 }
-    else if (dropCategory == 4) { dropModifier = 7 }
-    else if (dropCategory == 5) { dropModifier = 6 }
-    else if (dropCategory == 6) { dropModifier = 5 }
-    else if (dropCategory == 7) { dropModifier = 4 }
-    else if (dropCategory == 8) { dropModifier = 3 }
-    else if (dropCategory == 9) { dropModifier = 2 }
-    else if (dropCategory == 10) { dropModifier = 1 };
+    dropModifier = dropModifierMapDropProbabilityCalculation2[dropCategory] || dropModifier;
 
     let modifierIncrement = dropModifier / 3;
     dropModifier += modifierIncrement + (valueDropEnemyLevel / 10);
