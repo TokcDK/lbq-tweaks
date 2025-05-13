@@ -62,15 +62,15 @@ this.pluginCommand("P_CALL_CE", args);
 //(function() {
 
 //立ち絵会話衣装を実際の立ち絵に反映させる。回想時は自動でoff
-tachie_clothReflect = function(id1){
+tachie_clothReflect = function(actorId){
 
-if(!$gameSwitches.value(29)){
-  const arr = $gameVariables.value(id1 + 540);
-  const arr1 = $gameVariables.value(id1 + 440);
-  for (var i = 0; i <= 42; i++) {
-    arr[i] = arr1[i];
+  if(!$gameSwitches.value(29)){
+    const targetClothingData = $gameVariables.value(actorId + 540);
+    const sourceClothingData = $gameVariables.value(actorId + 440);
+    for (var i = 0; i <= 42; i++) {
+      targetClothingData[i] = sourceClothingData[i];
+    }
   }
-}
 
 };
 
