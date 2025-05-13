@@ -75,18 +75,20 @@ if(!$gameSwitches.value(29)){
 };
 
 //立ち絵ムーブ。
-picTachie_move1 = function(picId,id2,id3,id4,id5,id6,id7){
-
-if($gameScreen.picture(picId)){
-  const gameScreenPicture = gameScreen.picture(picId);
-  const x = gameScreenPicture.x() + id2;
-  const y = gameScreenPicture.y() + id3;
-  const scaleX = gameScreenPicture.scaleX() + id4;
-  const scaleY = gameScreenPicture.scaleY() + id5;
-  const origin = gameScreenPicture.origin();
-  $gameScreen.movePicture(picId,origin,x,y,scaleX,scaleY,id6,0,id7);
-}
-
+picTachie_move1 = function (picId, offsetX, offsetY, scaleOffsetX, scaleOffsetY, targetOpacity, moveDuration) {
+  if (typeof picId !== 'number' || picId < 1) {
+    console.warn("Invalid picId:", picId);
+    return;
+  }
+  const picture = $gameScreen.picture(picId);
+  if (picture) {
+    const newX = picture.x() + (Number(offsetX) || 0);
+    const newY = picture.y() + (Number(offsetY) || 0);
+    const newScaleX = picture.scaleX() + (Number(scaleOffsetX) || 0);
+    const newScaleY = picture.scaleY() + (Number(scaleOffsetY) || 0);
+    const pictureOrigin = picture.origin();
+    $gameScreen.movePicture(picId, pictureOrigin, newX, newY, newScaleX, newScaleY, Number(targetOpacity) || 255, 0, Number(moveDuration) || 60);
+  }
 };
 
 //衣装状態でスイッチオンオフ.<EvStartCloth:1,1>と併用
