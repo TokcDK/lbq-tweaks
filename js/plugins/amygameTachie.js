@@ -92,11 +92,11 @@ picTachie_move1 = function (picId, offsetX, offsetY, scaleOffsetX, scaleOffsetY,
 };
 
 //衣装状態でスイッチオンオフ.<EvStartCloth:1,1>と併用
-tachie_switchOnOff = function(id){
+tachie_switchOnOff = function (id) {
 
-if (id == 1) {
-  $gameSwitches.setValue(601, $gameVariables.value(440 + id)[20] == 0);
-}
+  if (id == 1) {
+    $gameSwitches.setValue(601, $gameVariables.value(440 + id)[20] == 0);
+  }
 
 };
 
