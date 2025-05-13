@@ -3393,24 +3393,40 @@ enemy_instantwin = function () {
 };
 
 //ドロップするかどうかの確率計算
-drop_probabilityCalculation = function (actorLevel, dropUpItem) {
+drop_probabilityCalculation = function(actorLevel, dropUpItem) {
+  // Start with a random base probability, then add bonus based on the actor level
+  let probability = getRandomIndex(101) + Math.round(actorLevel / 10);
 
-  let drop_probability = getRandomIndex(101);
-  drop_probability += Math.round(actorLevel / 10);
-  if ($gameVariables.value(54) == 1) { drop_probability += 5 };//パーティが一人の場合確率アップ
+  // Increase probability if party size is one (game variable 54 equals 1)
+  if ($gameVariables.value(54) === 1) {
+    probability += 5;
+  }
 
-  const gameVar516 = $gameVariables.value(516);
-  if (gameVar516 >= 1000) { drop_probability += 4 }
-  else if (gameVar516 >= 500) { drop_probability += 3 }
-  else if (gameVar516 >= 300) { drop_probability += 2 }
-  else if (gameVar516 >= 100) { drop_probability += 1 };
+  // Adjust probability based on the value of game variable 516
+  const dropVariable = $gameVariables.value(516);
+  if (dropVariable >= 1000) {
+    probability += 4;
+  } else if (dropVariable >= 500) {
+    probability += 3;
+  } else if (dropVariable >= 300) {
+    probability += 2;
+  } else if (dropVariable >= 100) {
+    probability += 1;
+  }
 
-  if ($gameParty.hasItem(dropUpItem)) { drop_probability += 1 };
-  if ($gameParty.membersState(296)) { drop_probability += 1 };
-  if ($gameParty.membersState(297)) { drop_probability += 1 };
-  if ($gameParty.membersState(298)) { drop_probability += 1 };
+  // Increase probability if the party has the drop-up item
+  if ($gameParty.hasItem(dropUpItem)) {
+    probability += 1;
+  }
 
-  return drop_probability;
+  // Increase probability based on specific party member states (IDs: 296, 297, 298)
+  [296, 297, 298].forEach(id => {
+    if ($gameParty.membersState(id)) {
+      probability += 1;
+    }
+  });
+
+  return probability;
 };
 
 //ドロップするかどうかの確率計算2
@@ -3440,7 +3456,7 @@ drop_probabilityCalculation2 = function (user, dropCategory, dropUpItem) {
     else if (dropCategory == 7) { calculatedLevelLimit = 30 }
     else if (dropCategory == 8) { calculatedLevelLimit = 40 }
     if (dropCategory > 8) { calculatedLevelLimit = 50 };
-    
+
     canDrop = calculatedLevelLimit < valueDropEnemyLevel;
   } else {
     canDrop = true;
