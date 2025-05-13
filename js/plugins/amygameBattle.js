@@ -104,6 +104,18 @@ enemy_dropSelection = function (user) {
 
 };
 
+
+function addDropIfStateAffected(user, stateId, dropDataArray, drops) {
+  if (user.isStateAffected(stateId)) {
+    drops.forEach(drop => dropDataArray.push(drop));
+  }
+};
+
+const getItemDropDataStateIds = [851, 852, 853, 854, 855, 856, 857, 858, 859, 860,
+  861, 862, 863, 864, 865, 866, 867, 868, 869, 870,
+  871, 872, 873, 874, 875, 876, 877, 878, 879, 880
+];
+
 get_item_drop_data = function (user) {
 
   valueDropEnemyLevel = $gameParty.inBattle() ? user.level : Math.ceil($gameActors.actor($gameVariables.value(11)).level / 2);
@@ -123,88 +135,134 @@ get_item_drop_data = function (user) {
   for (let i = 51; i <= 56; i++) {
     if (user.isStateAffected(i)) itemDropDataArray.push([4, 0, i + 103]);
   };
-  if (user.isStateAffected(610)) {
-    itemDropDataArray.push([0, 0, 10]);
-    itemDropDataArray.push([1, 0, 196]);
-    itemDropDataArray.push([3, 0, 197]);
-    itemDropDataArray.push([5, 0, 198]);
-    itemDropDataArray.push([9, 0, 199]);
-    itemDropDataArray.push([6, 0, 190]);
-    itemDropDataArray.push([7, 0, 147]);
-    itemDropDataArray.push([10, 0, 148]);
-    itemDropDataArray.push([8, 0, 152]);
-    itemDropDataArray.push([8, 0, 153]);
-    itemDropDataArray.push([10, 0, 170]);
-  };
-  if (user.isStateAffected(451)) {
-    itemDropDataArray.push([6, 0, 191]);
-    itemDropDataArray.push([6, 0, 161]);
-  };
-  if (user.isStateAffected(451)) {
-    itemDropDataArray.push([6, 0, 163]);
-  };
-  if (user.isStateAffected(452)) {
-    itemDropDataArray.push([7, 0, 192]);
-    itemDropDataArray.push([6, 0, 162]);
-    itemDropDataArray.push([6, 0, 164]);
-  };
-  if (user.isStateAffected(453)) {
-    itemDropDataArray.push([8, 0, 193]);
-    itemDropDataArray.push([10, 0, 169]);
-  };
-  if (user.isStateAffected(454)) {
-    itemDropDataArray.push([10, 0, 194]);
-    itemDropDataArray.push([10, 0, 169]);
-    if (user.isStateAffected(465)) itemDropDataArray.push([3, 0, 1289]); //神の肉,食材+神格
-  };
-  if (user.isStateAffected(441)) { itemDropDataArray.push([6, 0, 165]); };
-  if (user.isStateAffected(442)) { itemDropDataArray.push([6, 0, 165]); };
-  if (user.isStateAffected(443)) { itemDropDataArray.push([6, 0, 166]); };
-  if (user.isStateAffected(446)) { itemDropDataArray.push([6, 0, 167]); };
-  if (user.isStateAffected(455)) { itemDropDataArray.push([6, 0, 168]); };
-  if (user.isStateAffected(448)) { itemDropDataArray.push([10, 0, 169]); };
-  if ([851, 852, 853, 854, 855, 856, 857, 858, 859, 860, 861, 862, 863, 864, 865, 866, 867, 868, 869, 870, 871, 872, 873, 874, 875, 876, 877, 878, 879, 880].some(function (id) { return user.isStateAffected(id) })) {
-    itemDropDataArray.push([6, 0, 170]);
-    itemDropDataArray.push([6, 2, id - 780]);
-  };
+
+  addDropIfStateAffected(user, 610, itemDropDataArray, [
+    [0, 0, 10],
+    [1, 0, 196],
+    [3, 0, 197],
+    [5, 0, 198],
+    [9, 0, 199],
+    [6, 0, 190],
+    [7, 0, 147],
+    [10, 0, 148],
+    [8, 0, 152],
+    [8, 0, 153],
+    [10, 0, 170]
+  ]);
+
+  // Combine both drops for state 451
+  addDropIfStateAffected(user, 451, itemDropDataArray, [
+    [6, 0, 191],
+    [6, 0, 161],
+    [6, 0, 163]
+  ]);
+
+  addDropIfStateAffected(user, 452, itemDropDataArray, [
+    [7, 0, 192],
+    [6, 0, 162],
+    [6, 0, 164]
+  ]);
+
+  addDropIfStateAffected(user, 453, itemDropDataArray, [
+    [8, 0, 193],
+    [10, 0, 169]
+  ]);
+
+  addDropIfStateAffected(user, 454, itemDropDataArray, [
+    [10, 0, 194],
+    [10, 0, 169]
+  ]);
+  if (user.isStateAffected(454) && user.isStateAffected(465)) {
+    // Separate nested check for state 465 when 454 is active
+    addDropIfStateAffected(user, 465, itemDropDataArray, [
+      [3, 0, 1289]
+    ]);
+  }
+
+  addDropIfStateAffected(user, 441, itemDropDataArray, [
+    [6, 0, 165]
+  ]);
+  addDropIfStateAffected(user, 442, itemDropDataArray, [
+    [6, 0, 165]
+  ]);
+  addDropIfStateAffected(user, 443, itemDropDataArray, [
+    [6, 0, 166]
+  ]);
+  addDropIfStateAffected(user, 446, itemDropDataArray, [
+    [6, 0, 167]
+  ]);
+  addDropIfStateAffected(user, 455, itemDropDataArray, [
+    [6, 0, 168]
+  ]);
+  addDropIfStateAffected(user, 448, itemDropDataArray, [
+    [10, 0, 169]
+  ]);
+
+  getItemDropDataStateIds.forEach(function (id) {
+    addDropIfStateAffected(user, id, itemDropDataArray, [
+      [6, 0, 170],
+      [6, 2, id - 780]
+    ]);
+  });
+
   if (user.isStateAffected(410)) {
-    itemDropDataArray.push([6, 0, 185]);
-    itemDropDataArray.push([7, 0, 186]);
-    itemDropDataArray.push([8, 0, 187]);
-    itemDropDataArray.push([10, 0, 188]);
-    itemDropDataArray.push([5, 0, 1115]);
-    itemDropDataArray.push([8, 0, 1117]);
+    addDropIfStateAffected(user, 410, itemDropDataArray, [
+      [6, 0, 185],
+      [7, 0, 186],
+      [8, 0, 187],
+      [10, 0, 188],
+      [5, 0, 1115],
+      [8, 0, 1117]
+    ]);
     if (valueDropEnemyLevel >= 1 && valueDropEnemyLevel <= 20) {
-      itemDropDataArray.push([2, 0, 1118]);
-      itemDropDataArray.push([3, 0, 1119]);
-      itemDropDataArray.push([4, 0, 1120]);
-      itemDropDataArray.push([5, 0, 1121]);
-    };
+      addDropIfStateAffected(user, 410, itemDropDataArray, [
+        [2, 0, 1118],
+        [3, 0, 1119],
+        [4, 0, 1120],
+        [5, 0, 1121]
+      ]);
+    }
     if (valueDropEnemyLevel >= 11) {
-      itemDropDataArray.push([6, 0, 1122]);
-      itemDropDataArray.push([7, 0, 1123]);
-      itemDropDataArray.push([8, 0, 1124]);
-      itemDropDataArray.push([10, 0, 1125]);
-    };
-  };
-  if (user.isStateAffected(440)) {
-    itemDropDataArray.push([5, 0, 220]);//プライマル・アニマ
-    itemDropDataArray.push([8, 0, 240]);
-  };
-  if (user.isStateAffected(461)) { itemDropDataArray.push([5, 0, 251]); };//人型とうのドロップ
-  if (user.isStateAffected(462)) { itemDropDataArray.push([5, 0, 252]); };
-  if (user.isStateAffected(463)) { itemDropDataArray.push([5, 0, 253]); };
-  if (user.isStateAffected(464)) { itemDropDataArray.push([5, 0, 254]); };
-  if (user.isStateAffected(465)) {
-    itemDropDataArray.push([5, 0, 255]);
-    itemDropDataArray.push([3, 0, 1287]); //魔物肉
-  };
-  if (user.isStateAffected(466)) { itemDropDataArray.push([5, 0, 256]); };
-  if (user.isStateAffected(467)) { itemDropDataArray.push([5, 0, 257]); };
-  if (user.isStateAffected(479)) {
-    itemDropDataArray.push([6, 0, 270]); //特殊ステートドロップ
-    itemDropDataArray.push([5, 0, 269]);
-  };
+      addDropIfStateAffected(user, 410, itemDropDataArray, [
+        [6, 0, 1122],
+        [7, 0, 1123],
+        [8, 0, 1124],
+        [10, 0, 1125]
+      ]);
+    }
+  }
+
+  addDropIfStateAffected(user, 440, itemDropDataArray, [
+    [5, 0, 220],
+    [8, 0, 240]
+  ]);
+
+  addDropIfStateAffected(user, 461, itemDropDataArray, [
+    [5, 0, 251]
+  ]);
+  addDropIfStateAffected(user, 462, itemDropDataArray, [
+    [5, 0, 252]
+  ]);
+  addDropIfStateAffected(user, 463, itemDropDataArray, [
+    [5, 0, 253]
+  ]);
+  addDropIfStateAffected(user, 464, itemDropDataArray, [
+    [5, 0, 254]
+  ]);
+  addDropIfStateAffected(user, 465, itemDropDataArray, [
+    [5, 0, 255],
+    [3, 0, 1287]
+  ]);
+  addDropIfStateAffected(user, 466, itemDropDataArray, [
+    [5, 0, 256]
+  ]);
+  addDropIfStateAffected(user, 467, itemDropDataArray, [
+    [5, 0, 257]
+  ]);
+  addDropIfStateAffected(user, 479, itemDropDataArray, [
+    [6, 0, 270],
+    [5, 0, 269]
+  ]);
 
   if (user.isStateAffected(475)) { itemDropDataArray.push([6, 0, 151]); };
   for (let i = 421; i <= 439; i++) {
