@@ -62,7 +62,7 @@ enemy_dropSelection = function (user) {
     if (valueDropCount1 != 1) continue;
 
     const itemDropDataKindNum = Number(itemDropData[1]);
-    valueItems = itemsSourceKinds[itemDropDataKindNum];
+    const valueItems = itemsSourceKinds[itemDropDataKindNum];
     const valueItem = valueItems[Number(itemDropData[2])];
     const picName = itemsSourceKindPicNamesEnemyDropSelection[itemDropDataKindNum];
     if (isInBattle) {
