@@ -101,28 +101,43 @@ tachie_switchOnOff = function (id) {
 };
 
 //立ち絵演出クリアも。1実行0終了
-tachie_partDirectSet = function (pictureId, enableFlag, particleType) {
-
-  if (enableFlag == 1) {
-    if (particleType == 1) {
-      $gameScreen.startFlash([255, 255, 255, 200], 120);
-      AudioManager.playSe({ "name": "Up1", "volume": 90, "pitch": 110, "pan": 0 });
-      $gameScreen._particle.particleSet(0, 'actor_particleLight', 'picture:' + pictureId, 'def', 'screen');
-    }
-    else if (particleType == 2) {
-      $gameScreen.startFlash([0, 0, 0, 200], 120);
-      AudioManager.playSe({ "name": "Down4", "volume": 90, "pitch": 90, "pan": 0 });
-      $gameScreen._particle.particleSet(0, 'enemy_particleDark', 'picture:' + pictureId, 'def', 'screen');
-    }
+tachie_partDirectSet = function(pictureId, enableFlag, particleType) {
+  // Early return if particleType is not valid (1 or 2)
+  if (particleType !== 1 && particleType !== 2) return;
+  
+  // Cache particle name for better performance
+  const particleName = particleType === 1 ? 'actor_particleLight' : 'enemy_particleDark';
+  
+  if (enableFlag === 1) {
+    // Create sound effect configuration object only once
+    const soundConfig = {
+      name: particleType === 1 ? "Up1" : "Down4",
+      volume: 90,
+      pitch: particleType === 1 ? 110 : 90,
+      pan: 0
+    };
+    
+    // Flash with appropriate color
+    $gameScreen.startFlash(
+      particleType === 1 ? [255, 255, 255, 200] : [0, 0, 0, 200], 
+      120
+    );
+    
+    // Play sound effect
+    AudioManager.playSe(soundConfig);
+    
+    // Set particle with target as picture ID
+    $gameScreen._particle.particleSet(
+      0, 
+      particleName, 
+      'picture:' + pictureId, 
+      'def', 
+      'screen'
+    );
   } else {
-    if (particleType == 1) {
-      $gameScreen._particle.particleClear('actor_particleLight');
-    }
-    else if (particleType == 2) {
-      $gameScreen._particle.particleClear('enemy_particleDark');
-    }
+    // Clear particle effect when disabling
+    $gameScreen._particle.particleClear(particleName);
   }
-
 };
 
 //ピクチャの動き方設定
