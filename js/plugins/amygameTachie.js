@@ -476,7 +476,7 @@ function processCostumeChangeAtype2TachieDousa(targetPicId, changeCostumeId, cha
   targetPic._opacity = cachedAttributes[5];
 }
 
-function updateStandingPictureAtype3TachieDousa(targetPicId) {
+function updateStandingPictureAtype3TachieDousa(targetPicId, targetPic) {
   // Calculate index for tachie picture data (adjusting from 1-indexed to zero-indexed)
   let standPicIndex = parseInt(targetPicId, 10) || 0;
   standPicIndex--;
