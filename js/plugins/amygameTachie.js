@@ -215,7 +215,7 @@ tachie_dousa = function (actionType, actorParameter, expressionCode, targetPicId
         break;
       case 3:
         // --------- Action Type 3: Refreshing standing picture from tachie data ----------
-        updateStandingPictureAtype3TachieDousa(targetPicId, targetPic);
+        updateStandingPictureAtype3TachieDousa(targetPicId);
         break;
       default:
         break;
@@ -476,7 +476,7 @@ function processCostumeChangeAtype2TachieDousa(targetPicId, changeCostumeId, cha
   targetPic._opacity = cachedAttributes[5];
 }
 
-function updateStandingPictureAtype3TachieDousa(targetPicId, targetPic) {
+function updateStandingPictureAtype3TachieDousa(targetPicId) {
   // Calculate index for tachie picture data (adjusting from 1-indexed to zero-indexed)
   let standPicIndex = parseInt(targetPicId, 10) || 0;
   standPicIndex--;
