@@ -534,7 +534,8 @@ tachie_bless = function(pictureId, blessType) {
   } else {
     let baseBreathSettings = [100, 100, 250, 0.004, 0.003];  //立ち絵用息遣い設定。基本状態
     if (blessType == 1) {
-      if ($gameActors.actor($gameVariables.value(20)).isStateAffected(61)) {
+      const actor = $gameActors.actor($gameVariables.value(20));
+      if (actor && actor.isStateAffected(61)) {
         baseBreathSettings = [100, 100, 150, 0.005, 0.004];    //立ち絵用息遣い設定。発情状態
       } else {
         if ($gameParty.inBattle()) {
