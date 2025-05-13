@@ -1818,26 +1818,26 @@ const textWindowIdOptionsSceneTextBgv = [28, 29, 30, 31, 32, 33, 34, 35, 36];
 const additionalXOffsetOptionsSceneTextBgv = [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, -50, -60, -70, -80, -90, -100, -110, -120, -130, -140, -150];
 scene_textBgv = function(actorId, baseX, baseY, offsetMode, waitMode, fontSetting) {
 
-  const actor = $gameActors.actor(actorId);
-  const actorData = $dataActors[actorId];
+  const gameActor = $gameActors.actor(actorId);
+  const dataActor = gameActor.actor();
   //const actorNickname = actor.nickname();
   let ecstasyPhrases = [];
   let combinedEcstasyArray = [];
 
   if ($gameSwitches.value(119)) {
-    if (actor.isLearnedSkill(68)) {
-      ecstasyPhrases = actorData.meta['SexualEcstasyHi'] 
-          ? actorData.meta['SexualEcstasyHi'].split(',')
+    if (gameActor.isLearnedSkill(68)) {
+      ecstasyPhrases = dataActor.meta['SexualEcstasyHi'] 
+          ? dataActor.meta['SexualEcstasyHi'].split(',')
           : defaultSexualEcstasyHi;
     } else {
-      if (actor.isLearnedSkill(65)) {
-        ecstasyPhrases = actorData.meta['SexualEcstasyMiddle'] 
-          ? actorData.meta['SexualEcstasyMiddle'].split(',')
+      if (gameActor.isLearnedSkill(65)) {
+        ecstasyPhrases = dataActor.meta['SexualEcstasyMiddle'] 
+          ? dataActor.meta['SexualEcstasyMiddle'].split(',')
           : defaultSexualEcstasyMiddle;
       } else {
 
-        ecstasyPhrases = actorData.meta['SexualEcstasyLow'] 
-          ? actorData.meta['SexualEcstasyLow'].split(',') 
+        ecstasyPhrases = dataActor.meta['SexualEcstasyLow'] 
+          ? dataActor.meta['SexualEcstasyLow'].split(',') 
           : defaultSexualEcstasyLow;
       }
     }
