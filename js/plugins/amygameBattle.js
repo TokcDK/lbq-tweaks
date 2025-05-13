@@ -3623,50 +3623,52 @@ drop_genericDropRate = function (battleDrop, itemsToDrop) {
 };
 
 //汎用ドロップエネミー対象設定ダンジョンのみ。計算のみ計算結果はarr4に蓄積。簡易討伐時
-function drop_enemyDropRate(value12, arr4) {
+function drop_enemyDropRate(unusedParam, eligibleDropItems) {
 
   const item = $dataItems[$gameVariables.value(240)];
-  const itemEnemyLVdata = item.meta['EnemyLV'].split(',');
-  const arrdrop3 = $gameVariables.value(220);
-  const itemEnemyLVdataSelectedIndex = Number(itemEnemyLVdata[getRandomIndex(itemEnemyLVdata.length)]);
-  const enemyIndex = Number(arrdrop3[getRandomIndex(arrdrop3.length)]);
+  const enemyLevelData = item.meta['EnemyLV'].split(',');
+  const enemyIdArray = $gameVariables.value(220);
+  const selectedEnemyLevel = Number(enemyLevelData[getRandomIndex(enemyLevelData.length)]);
+  const selectedEnemyIndex = Number(enemyIdArray[getRandomIndex(enemyIdArray.length)]);
 
   const itemsLength = $dataItems.length;
-  for (let i = 1; i < itemsLength; i++) {
-    const conditionalItemDrop = $dataEnemies[enemyIndex].meta['Conditional Item ' + i + ' Drop'];
-    if (conditionalItemDrop) {
-      const lotteryRarity = $dataItems[i].meta['LotteryRearity'];
-      if (lotteryRarity) {
-        let rarityNum;
+  for (let itemIndex = 1; itemIndex < itemsLength; itemIndex++) {
+    const conditionalItemDrop = $dataEnemies[selectedEnemyIndex].meta['Conditional Item ' + itemIndex + ' Drop'];
+    if (!conditionalItemDrop) {
+      continue;
+    }
+    
+    const lotteryRarity = $dataItems[itemIndex].meta['LotteryRearity'];
+    if (lotteryRarity) {
+      let rarityThreshold;
 
-        switch (Number(lotteryRarity)) {
-          case 1:
-          case 2:
-            rarityNum = 1;
-            break;
-          case 3:
-            rarityNum = 10;
-            break;
-          case 4:
-            rarityNum = 20;
-            break;
-          case 5:
-          case 6:
-            rarityNum = 30;
-            break;
-          case 7:
-          case 8:
-            rarityNum = 40;
-            break;
-          case 9:
-          case 10:
-            rarityNum = 50;
-            break;
-        }
+      switch (Number(lotteryRarity)) {
+        case 1:
+        case 2:
+          rarityThreshold = 1;
+          break;
+        case 3:
+          rarityThreshold = 10;
+          break;
+        case 4:
+          rarityThreshold = 20;
+          break;
+        case 5:
+        case 6:
+          rarityThreshold = 30;
+          break;
+        case 7:
+        case 8:
+          rarityThreshold = 40;
+          break;
+        case 9:
+        case 10:
+          rarityThreshold = 50;
+          break;
+      }
 
-        if (itemEnemyLVdataSelectedIndex >= rarityNum) {
-          arr4.push(i);
-        }
+      if (selectedEnemyLevel >= rarityThreshold) {
+        eligibleDropItems.push(itemIndex);
       }
     }
   }
