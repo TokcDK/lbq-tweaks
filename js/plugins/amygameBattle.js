@@ -3414,67 +3414,67 @@ drop_probabilityCalculation = function (actorLevel, dropUpItem) {
 };
 
 //ドロップするかどうかの確率計算2
-drop_probabilityCalculation2 = function (user, id1, dropUpItem) {
+drop_probabilityCalculation2 = function (user, dropCategory, dropUpItem) {
 
-  var valueDropCount1 = 0;
+  let dropCount = 0;
 
   let canDrop;
-  if (id1 >= 5) {
-    let id2 = id1 * 20;
-    if (id2 == 0) { id2 = 999 }//0はレベル制限しない汎用ドロップ
-    else if (id2 >= 51) { id2 = 999 };//レアリティが6以上なら制限なし
+  if (dropCategory >= 5) {
+    let calculatedLevelLimit = dropCategory * 20;
+    if (calculatedLevelLimit == 0) { calculatedLevelLimit = 999 } //0はレベル制限しない汎用ドロップ
+    else if (calculatedLevelLimit >= 51) { calculatedLevelLimit = 999 };//レアリティが6以上なら制限なし
 
-    if (id1 < 7) { id2 = 20 }
-    else if (id1 == 7) { id2 = 30 }
-    else if (id1 == 8) { id2 = 40 }
-    if (id1 > 8) { id2 = 50 };
-    canDrop = id2 < valueDropEnemyLevel;
+    if (dropCategory < 7) { calculatedLevelLimit = 20 }
+    else if (dropCategory == 7) { calculatedLevelLimit = 30 }
+    else if (dropCategory == 8) { calculatedLevelLimit = 40 }
+    if (dropCategory > 8) { calculatedLevelLimit = 50 };
+    canDrop = calculatedLevelLimit < valueDropEnemyLevel;
   } else {
     canDrop = true;
   };
 
-  //var value14 = true;//id2 > valueDropEnemyLevel;//高レベルでドロップ制限はなし
+  //var value14 = true;//dropCategory > valueDropEnemyLevel;//高レベルでドロップ制限はなし
   if (canDrop /*&& value14*/) {
-    let dropMod1 = 5;
-    //if(id1 == 0){value11 = 5};
-    if (id1 == 1) { dropMod1 = 10 }
-    else if (id1 == 2) { dropMod1 = 9 }
-    else if (id1 == 3) { dropMod1 = 8 }
-    else if (id1 == 4) { dropMod1 = 7 }
-    else if (id1 == 5) { dropMod1 = 6 }
-    else if (id1 == 6) { dropMod1 = 5 }
-    else if (id1 == 7) { dropMod1 = 4 }
-    else if (id1 == 8) { dropMod1 = 3 }
-    else if (id1 == 9) { dropMod1 = 2 }
-    else if (id1 == 10) { dropMod1 = 1 };
+    let dropModifier = 5;
+    //if(dropCategory == 0){...};
+    if (dropCategory == 1) { dropModifier = 10 }
+    else if (dropCategory == 2) { dropModifier = 9 }
+    else if (dropCategory == 3) { dropModifier = 8 }
+    else if (dropCategory == 4) { dropModifier = 7 }
+    else if (dropCategory == 5) { dropModifier = 6 }
+    else if (dropCategory == 6) { dropModifier = 5 }
+    else if (dropCategory == 7) { dropModifier = 4 }
+    else if (dropCategory == 8) { dropModifier = 3 }
+    else if (dropCategory == 9) { dropModifier = 2 }
+    else if (dropCategory == 10) { dropModifier = 1 };
 
-    let dropMod2 = dropMod1 / 3;
-    dropMod1 += dropMod2 + (valueDropEnemyLevel / 10);
-    if ($gameTroop.turnCount() <= 1) { dropMod1 += dropMod2 * 3 };
-    if ($gameVariables.value(54) == 1) { dropMod1 += dropMod2 * 5 };//パーティが一人の場合確率アップ
+    let modifierIncrement = dropModifier / 3;
+    dropModifier += modifierIncrement + (valueDropEnemyLevel / 10);
+    if ($gameTroop.turnCount() <= 1) { dropModifier += modifierIncrement * 3 };
+    if ($gameVariables.value(54) == 1) { dropModifier += modifierIncrement * 5 };//パーティが一人の場合確率アップ
 
-    const gameVariable516 = $gameVariables.value(516);
-    if (gameVariable516 >= 100) { dropMod1 += dropMod2 };
-    if (gameVariable516 >= 300) { dropMod1 += dropMod2 };
-    if (gameVariable516 >= 500) { dropMod1 += dropMod2 };
-    if (gameVariable516 >= 1000) { dropMod1 += dropMod2 };
-    if (gameVariable516 >= 1500) { dropMod1 += dropMod2 };
-    if (gameVariable516 >= 2000) { dropMod1 += dropMod2 };
+    const dropVariable = $gameVariables.value(516);
+    if (dropVariable >= 100) { dropModifier += modifierIncrement };
+    if (dropVariable >= 300) { dropModifier += modifierIncrement };
+    if (dropVariable >= 500) { dropModifier += modifierIncrement };
+    if (dropVariable >= 1000) { dropModifier += modifierIncrement };
+    if (dropVariable >= 1500) { dropModifier += modifierIncrement };
+    if (dropVariable >= 2000) { dropModifier += modifierIncrement };
 
-    if ($gameParty.hasItem(dropUpItem)) { dropMod1 += dropMod2 * 3 };
-    if ($gameParty.membersState(296)) { dropMod1 += dropMod2 * 2 };
-    if ($gameParty.membersState(297)) { dropMod1 += dropMod2 * 2 };
-    if ($gameParty.membersState(298)) { dropMod1 += dropMod2 * 2 };
+    if ($gameParty.hasItem(dropUpItem)) { dropModifier += modifierIncrement * 3 };
+    if ($gameParty.membersState(296)) { dropModifier += modifierIncrement * 2 };
+    if ($gameParty.membersState(297)) { dropModifier += modifierIncrement * 2 };
+    if ($gameParty.membersState(298)) { dropModifier += modifierIncrement * 2 };
     if (user.isStateAffected(186)) {
       if (user._stateCounter[186] >= 1) {
-        dropMod1 += dropMod2 * user._stateCounter[186];
+        dropModifier += modifierIncrement * user._stateCounter[186];
       };
     };
 
-    const dropMod3 = getRandomIndex(100) + 1;
-    if (dropMod1 >= dropMod3) { valueDropCount1 += 1 };
+    const randomChance = getRandomIndex(100) + 1;
+    if (dropModifier >= randomChance) { dropCount += 1 };
 
-    return valueDropCount1;
+    return dropCount;
   };
 
 };
