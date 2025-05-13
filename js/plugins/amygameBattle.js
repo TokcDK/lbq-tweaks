@@ -19,6 +19,7 @@ enemy_dropSelection = function (user) {
   const isInBattle = $gameParty.inBattle();
   if (!isDuringStripping && !isDuringRipping) {
     const tribalSubjugationIds = $gameVariables.value(52);
+    const valueWordSet3Array = [];
     for (let i = 1; i < valueSubjugationPoint.length; i++) {//討伐数カウント
       const stateId = valueSubjugationPoint[i];
       if (!user.isStateAffected(stateId)) continue;
@@ -29,10 +30,13 @@ enemy_dropSelection = function (user) {
       const name = `\x1bSIM[${stateId}]`;
       const num = `\\C[10]+1\\C[0]`;
       const messageText = `${name}：討伐数${num}\n`;
-      valueWordSet3 += `${messageText}`;
+      valueWordSet3Array.push(messageText);
       $gameSystem.pushInfoLog(messageText);
       //CommonPopupManager.showInfo({},value1,null);
     }
+
+    valueWordSet3 += valueWordSet3Array.join('');
+
     if (!user.isStateAffected(436)) {
       tribalSubjugationIds[1] += 1;//ヒューマン以外の魔物当日討伐数
       tribalSubjugationIds[2] += 1;//ヒューマン以外の魔物総合討伐数
@@ -49,6 +53,7 @@ enemy_dropSelection = function (user) {
   const coordinateX = $gameTroop.getX(userIndex);
   const coordinateY = $gameTroop.getY(userIndex);
   const dropUpItem = $dataItems[valueItemDropUpItem];
+  const valueWordSet1Array = [];
   for (let i = 0; i < itemDropDataArrayLength; i++) {
     const itemDropData = itemDropDataArray[i];
     if (!itemDropData) continue;
@@ -88,13 +93,14 @@ enemy_dropSelection = function (user) {
           const item = `${itemIcon}${itemName}`;
           const num = `\\C[2]1\\C[0]`;
           const messageText = `${item}を${num}個入手！\n`;
-          valueWordSet1 += `${messageText}`;
+          valueWordSet1Array.push(messageText);
           $gameSystem.pushInfoLog(messageText);
           //CommonPopupManager.showInfo({},value11,null);
         }
       }
     }
   }
+  valueWordSet1 += valueWordSet1Array.join('');
 
 };
 
