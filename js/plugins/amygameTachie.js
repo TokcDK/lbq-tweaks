@@ -253,14 +253,8 @@ function getEasingAndFadeValuesTachieDousa() {
 
 function processCostumeChangeAnimationAtype0TachieDousa(actorParameter, showCostumeId, changeCostumeId, changeCostumeParam, targetPicId, sourcePicId, expressionCode) {
   // Determine move durations based on costume change flag
-  let primaryMoveDuration, fadeDelayDuration;
-  if (changeCostumeId === 0) {
-    primaryMoveDuration = 60;
-    fadeDelayDuration = 30;
-  } else {
-    primaryMoveDuration = changeCostumeId + changeCostumeId;
-    fadeDelayDuration = changeCostumeId;
-  }
+  let primaryMoveDuration = changeCostumeId === 0 ? 60 : changeCostumeId + changeCostumeId;
+  let fadeDelayDuration = changeCostumeId === 0 ? 30 : changeCostumeId;
 
   // Cache source picture values for smooth transition
   let sourcePic = $gameScreen.picture(sourcePicId);
@@ -290,7 +284,6 @@ function processCostumeChangeAnimationAtype0TachieDousa(actorParameter, showCost
       } else {
         tachie_settei2();
       }
-
       const targetPic = $gameScreen.picture(targetPicId);
       targetPic._origin = originalOrigin;
       targetPic._x = originalX;
@@ -304,18 +297,23 @@ function processCostumeChangeAnimationAtype0TachieDousa(actorParameter, showCost
       if (targetPic) {
         $gameScreen.erasePicture(targetPicId);
       }
-      console.debug("tachie_dousa: New picture path: " + "/img/tachies/" + actorParameter);
-      $gameScreen.showPicture(
-        targetPicId,
-        "/img/tachies/" + actorParameter, // asdf, warn: was crash because of missing image path setup here!
-        originalOrigin,
-        originalX,
-        originalY,
-        originalScaleX,
-        originalScaleY,
-        0,
-        0
-      );
+      if (typeof actorParameter === 'string' && actorParameter.trim() !== '') {
+        console.debug("tachie_dousa: New picture path: " + "/img/tachies/" + actorParameter);
+        $gameScreen.showPicture(
+          targetPicId,
+          "/img/tachies/" + actorParameter, // asdf, warn: was crash because of missing image path setup here!
+          originalOrigin,
+          originalX,
+          originalY,
+          originalScaleX,
+          originalScaleY,
+          0,
+          0
+        );
+      } else {
+        console.warn("Invalid actorParameter for image path:", actorParameter);
+        $gameScreen.erasePicture(targetPicId); // Fallback to avoid crash
+      }
     }
 
     // Process costume change animation if the parameter is set
@@ -340,12 +338,12 @@ function processCostumeChangeAnimationAtype0TachieDousa(actorParameter, showCost
     }
 
     // Update event graphics if variable 292 holds a valid event ID for the actor
-    if ($gameVariables.value(292) !== 0) {
-      if ($gameVariables.value(292)[$gameVariables.value(20)] >= 1) {
-        const event = $gameMap.event($gameVariables.value(292)[$gameVariables.value(20)]);
-        const actor = $gameActors.actor($gameVariables.value(20));
-        event.setImage(actor.characterName(), actor.characterIndex());
-      }
+    const dynamicallyGeneratedEventIds = $gameVariables.value(292); // Use the dynamically generated ID array for events
+    const actorId = $gameVariables.value(20);
+    if (dynamicallyGeneratedEventIds !== 0 && dynamicallyGeneratedEventIds[actorId] >= 1) {
+      const event = $gameMap.event(dynamicallyGeneratedEventIds[actorId]);
+      const actor = $gameActors.actor(actorId);
+      event.setImage(actor.characterName(), actor.characterIndex());
     }
   }
 }
