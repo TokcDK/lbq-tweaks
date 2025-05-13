@@ -1810,77 +1810,84 @@ if(id1 == 6){
 };
 
 //☆☆汎用Ｈシーン時に文字ＢＧＶ。<汎用シーン性感低:>scene_textBgv($gameVariables.value(318),640,384);
-scene_textBgv = function(id91,id92,id93,id94,id95,id96){
+const defaultSexualEcstasyHi = [`「アッ…」`, `「ンっ…」`, `「ンンっ…」`, `（ピクっ…\\I[12]）`];
+const defaultSexualEcstasyMiddle = [`「アッ…\\I[12]」`, `「ンっ…」`, `「ンンっ…\\I[12]」`, `（ピクっ…\\I[12]）`];
+const defaultSexualEcstasyLow = ['「ヤァッ…！」', '「ダメっ…！」', '「ヤメッ…！」',
+  '「アっ…、ァァ…」', '（ビクンッ）'];
+scene_textBgv = function(actorId, baseX, baseY, offsetMode, waitMode, fontSetting) {
 
-var actor = $gameActors.actor(id91);
-var actor1 = $dataActors[id91];
-var value91 = actor.nickname();
-var arr91 = [];
-var array9 = [];
+  const actor = $gameActors.actor(actorId);
+  const actorData = $dataActors[actorId];
+  //const actorNickname = actor.nickname();
+  let ecstasyPhrases = [];
+  let combinedEcstasyArray = [];
 
-if($gameSwitches.value(119)){
-  if(actor.isLearnedSkill(68)){
-    if(actor1.meta['SexualEcstasyHi']){var arr91 = actor1.meta['SexualEcstasyHi'].split(',')};
-      var array = [`「アッ…」`,`「ンっ…」`,`「ンンっ…」`,`（ピクっ…\\I[12]）`];
-  } else {
-    if(actor.isLearnedSkill(65)){
-      if(actor1.meta['SexualEcstasyMiddle']){var arr91 = actor1.meta['SexualEcstasyMiddle'].split(',')};
-      var array = [`「アッ…\\I[12]」`,`「ンっ…」`,`「ンンっ…\\I[12]」`,`（ピクっ…\\I[12]）`];
+  if ($gameSwitches.value(119)) {
+    if (actor.isLearnedSkill(68)) {
+      ecstasyPhrases = actorData.meta['SexualEcstasyHi'] 
+          ? actorData.meta['SexualEcstasyHi'].split(',')
+          : defaultSexualEcstasyHi;
     } else {
-      var array = ['「ヤァッ…！」','「ダメっ…！」','「ヤメッ…！」',
-      '「アっ…、ァァ…」','（ビクンッ）'];
-      if(actor1.meta['SexualEcstasyLow']){var arr91 = actor1.meta['SexualEcstasyLow'].split(',')};
-    };
-  };
-} else {
-  var array9 = $gameVariables.value(707);
-};
-//if(arr91 == 0){}else{array9.push(arr91)};
-if(arr91 == 0){}else{array9 = array9.concat(arr91)};
-var value92 = array9[getRandomIndex(array9.length)];
-if($gameVariables.value(299) == 0){
-  $gameVariables.setValue(299,[121,122,123,124,125,126,127,128,129,130]);
-};
-var array92 = $gameVariables.value(299);
-var value93 = array92[getRandomIndex(array92.length)];//ID
-let index = array92.findIndex(array92 => array92 === value93); 
-if(index >= 0){
-  array92.splice(index, 1);
-}
-var value98 = id92;
-var value99 = id93;
-if(id94 == 1){
-  var array91 = [50,100,150,200,0,-50,-100,-150,-200];
-  var array92 = [100,150,200,0,-100,-200,-300,-350];
-} else {
-  var array91 = [100,200,300,400,0,-100,-200,-300,-400];
-  var array92 = [100,150,200,0,-100,-200,-300,-350];
-};
-var value94 = array91[getRandomIndex(array91.length)];//x
-var value95 = array92[getRandomIndex(array92.length)];//y
-if(id95 == 0){
-  var array94 = [80,90,100,110,120];//wait
-  var value96 = array94[getRandomIndex(array94.length)];
-} else {
-  var array94 = [100,110,120,130,140,150,160];
-  var value96 = array94[getRandomIndex(array94.length)];
-};
-var array93 = [28,29,30,31,32,33,34,35,36];
-var value97 = array93[getRandomIndex(array93.length)];
-$gameScreen.setDTextPicture(`${value92}`, value97);
-$gameScreen.dWindowFrame = 'ON';
-if(id96 == 0){}else{$gameScreen.setDtextFont(id96)};
-$gameScreen.dTextAlign = 1;
-if(id95 == 0){
-  $gameScreen.showPicture(value93,"",1,value98 + value94,value99 + value95,150,150,255,0);
-  $gameScreen.movePicture(value93,1,value98 + value94,value99 + value95,100,100,0,0,value96);
-} else {
-  var array95 = [50,60,70,80,90,100,110,120,130,140,150,-50,-60,-70,-80,-90,-100,-110,-120,-130,-140,-150];
-  var value10 = array95[getRandomIndex(array95.length)];
-  $gameScreen.showPicture(value93,"",1,value98 + value94 + value10,value99 + value95,100,100,255,0);
-  $gameScreen.movePicture(value93,1,value98 + value94,value99 + value95,100,100,0,0,value96);
-};
+      if (actor.isLearnedSkill(65)) {
+        ecstasyPhrases = actorData.meta['SexualEcstasyMiddle'] 
+          ? actorData.meta['SexualEcstasyMiddle'].split(',')
+          : defaultSexualEcstasyMiddle;
+      } else {
 
+        ecstasyPhrases = actorData.meta['SexualEcstasyLow'] 
+          ? actorData.meta['SexualEcstasyLow'].split(',') 
+          : defaultSexualEcstasyLow;
+      }
+    }
+  } else {
+    combinedEcstasyArray = $gameVariables.value(707);
+  }
+  if (ecstasyPhrases == 0) {} else { combinedEcstasyArray = combinedEcstasyArray.concat(ecstasyPhrases); }
+  const chosenPhrase = combinedEcstasyArray[getRandomIndex(combinedEcstasyArray.length)];
+  if ($gameVariables.value(299) == 0) {
+    $gameVariables.setValue(299, [121, 122, 123, 124, 125, 126, 127, 128, 129, 130]);
+  }
+  let availablePictureIds = $gameVariables.value(299);
+  const chosenPictureId = availablePictureIds[getRandomIndex(availablePictureIds.length)]; //ID
+  let foundIndex = availablePictureIds.findIndex(idItem => idItem === chosenPictureId);
+  if (foundIndex >= 0) {
+    availablePictureIds.splice(foundIndex, 1);
+  }
+  const offsetBaseX = baseX;
+  const offsetBaseY = baseY;
+  let xOffsetOptions, yOffsetOptions;
+  if (offsetMode == 1) {
+    xOffsetOptions = [50, 100, 150, 200, 0, -50, -100, -150, -200];
+    yOffsetOptions = [100, 150, 200, 0, -100, -200, -300, -350];
+  } else {
+    xOffsetOptions = [100, 200, 300, 400, 0, -100, -200, -300, -400];
+    yOffsetOptions = [100, 150, 200, 0, -100, -200, -300, -350];
+  }
+  const chosenXOffset = xOffsetOptions[getRandomIndex(xOffsetOptions.length)]; //x offset
+  const chosenYOffset = yOffsetOptions[getRandomIndex(yOffsetOptions.length)]; //y offset
+  let waitTimeOptions, chosenWaitTime;
+  if (waitMode == 0) {
+    waitTimeOptions = [80, 90, 100, 110, 120]; // wait durations
+    chosenWaitTime = waitTimeOptions[getRandomIndex(waitTimeOptions.length)];
+  } else {
+    waitTimeOptions = [100, 110, 120, 130, 140, 150, 160];
+    chosenWaitTime = waitTimeOptions[getRandomIndex(waitTimeOptions.length)];
+  }
+  const textWindowIdOptions = [28, 29, 30, 31, 32, 33, 34, 35, 36];
+  const chosenTextWindowId = textWindowIdOptions[getRandomIndex(textWindowIdOptions.length)];
+  $gameScreen.setDTextPicture(`${chosenPhrase}`, chosenTextWindowId);
+  $gameScreen.dWindowFrame = 'ON';
+  if (fontSetting == 0) {} else { $gameScreen.setDtextFont(fontSetting); }
+  $gameScreen.dTextAlign = 1;
+  if (waitMode == 0) {
+    $gameScreen.showPicture(chosenPictureId, "", 1, offsetBaseX + chosenXOffset, offsetBaseY + chosenYOffset, 150, 150, 255, 0);
+    $gameScreen.movePicture(chosenPictureId, 1, offsetBaseX + chosenXOffset, offsetBaseY + chosenYOffset, 100, 100, 0, 0, chosenWaitTime);
+  } else {
+    const additionalXOffsetOptions = [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, -50, -60, -70, -80, -90, -100, -110, -120, -130, -140, -150];
+    const additionalXOffset = additionalXOffsetOptions[getRandomIndex(additionalXOffsetOptions.length)];
+    $gameScreen.showPicture(chosenPictureId, "", 1, offsetBaseX + chosenXOffset + additionalXOffset, offsetBaseY + chosenYOffset, 100, 100, 255, 0);
+    $gameScreen.movePicture(chosenPictureId, 1, offsetBaseX + chosenXOffset, offsetBaseY + chosenYOffset, 100, 100, 0, 0, chosenWaitTime);
+  }
 };
 
 //☆☆CGの一部分で一言台詞pic_oneWord(valueSerialPictureId,x,y,25,60,arr1);
