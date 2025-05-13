@@ -461,6 +461,10 @@ function animatePictureAtype1TachieDousa(targetPicId, actorParameter, sourcePicI
 function processCostumeChangeAtype2TachieDousa(targetPicId, changeCostumeId, changeCostumeParam) {
   // Cache targetPic attributes for reuse in the costume change
   const targetPic = $gameScreen.picture(targetPicId);
+  if(!targetPic) {
+    return;
+  }
+  
   const cachedAttributes = [
     targetPic.origin(),
     targetPic.x(),
