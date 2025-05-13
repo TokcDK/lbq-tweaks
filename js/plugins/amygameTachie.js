@@ -393,8 +393,14 @@ function animatePictureAtype1TachieDousa(targetPicId, actorParameter, sourcePicI
   if (actorParameter >= 1) {
     tachie_settei2();
   } else {
+    let initialX;
+    if (sourcePicId === 0) initialX = 690; // 640 + 50
+    else if (sourcePicId === 1) initialX = 400; // 300 + 100
+    else if (sourcePicId === 2) initialX = 0; // 100 - 100
+    else initialX = 100; // Default
+
     // Show a new picture using actorParameter as image name
-    $gameScreen.showPicture(targetPicId, "/img/tachies/" + actorParameter, 1, easingFunction, picY, picScaleX, picScaleY, 0, 0);
+    $gameScreen.showPicture(targetPicId, "/img/tachies/" + actorParameter, 1, initialX, picY, picScaleX, picScaleY, 0, 0);
   }
 
   // Cache target picture attributes for consistency
@@ -405,21 +411,18 @@ function animatePictureAtype1TachieDousa(targetPicId, actorParameter, sourcePicI
   targetPic._opacity = 0;
 
   let targetXPos = (sourcePicId === 1) ? 300 : 100;
-
   // Adjust based on sourcePicId values
   if (sourcePicId === 0) {
     targetXPos = 640;
-    targetPic._x = targetXPos + 50;
+    targetPic._x = 690; // 640 + 50
   }
   if (sourcePicId === 1) {
     if ($gameVariables.value(152) === 0) {
-      targetXPos = 1024 + 100;
+      targetXPos = 1124; // 1024 + 100
     } else {
       targetXPos = 1280 - targetXPos + $gameVariables.value(164) - ($gameVariables.value(152) * 80);
     }
-    if ($gameSwitches.value(126)) {
-      targetXPos += 50;
-    }
+    if ($gameSwitches.value(126)) targetXPos += 50;
     targetPic._x = targetXPos + 100;
     $gameVariables.setValue(164, $gameVariables.value(164) + 150);
   }
@@ -439,6 +442,7 @@ function animatePictureAtype1TachieDousa(targetPicId, actorParameter, sourcePicI
     tachie_bless(targetPicId, 0);
   }
 }
+
 function processCostumeChangeAtype2TachieDousa(targetPicId, changeCostumeId, changeCostumeParam) {
   // Cache targetPic attributes for reuse in the costume change
   const targetPic = $gameScreen.picture(targetPicId);
