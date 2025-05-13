@@ -54,17 +54,17 @@ this.pluginCommand("P_CALL_CE", args);
  */
 
 /*:
- * @plugindesc このゲーム専用プラグイン
- * @author 作者名
- * @help ゲーム専用に作成された初期読み込み用プラグイン
- */
+* @plugindesc このゲーム専用プラグイン
+* @author 作者名
+* @help ゲーム専用に作成された初期読み込み用プラグイン
+*/
 
 //(function() {
 
 //立ち絵会話衣装を実際の立ち絵に反映させる。回想時は自動でoff
-tachie_clothReflect = function(actorId){
+tachie_clothReflect = function (actorId) {
 
-  if(!$gameSwitches.value(29)){
+  if (!$gameSwitches.value(29)) {
     const targetClothingData = $gameVariables.value(actorId + 540);
     const sourceClothingData = $gameVariables.value(actorId + 440);
     for (var i = 0; i <= 42; i++) {
@@ -101,72 +101,72 @@ tachie_switchOnOff = function (id) {
 };
 
 //立ち絵演出クリアも。1実行0終了
-tachie_partDirectSet = function(id3,id2,id1){
+tachie_partDirectSet = function (id3, id2, id1) {
 
-if(id2 == 1){
-    if(id1 == 1){
-      $gameScreen.startFlash([255,255,255,200], 120);
-      AudioManager.playSe({ "name": "Up1","volume":90,"pitch":110,"pan":0});
-      $gameScreen._particle.particleSet(0, 'actor_particleLight','picture:' + id3,'def','screen');
+  if (id2 == 1) {
+    if (id1 == 1) {
+      $gameScreen.startFlash([255, 255, 255, 200], 120);
+      AudioManager.playSe({ "name": "Up1", "volume": 90, "pitch": 110, "pan": 0 });
+      $gameScreen._particle.particleSet(0, 'actor_particleLight', 'picture:' + id3, 'def', 'screen');
     }
-    else if(id1 == 2){
-      $gameScreen.startFlash([0,0,0,200], 120);
-      AudioManager.playSe({ "name": "Down4","volume":90,"pitch":90,"pan":0});
-      $gameScreen._particle.particleSet(0, 'enemy_particleDark','picture:' + id3,'def','screen');
+    else if (id1 == 2) {
+      $gameScreen.startFlash([0, 0, 0, 200], 120);
+      AudioManager.playSe({ "name": "Down4", "volume": 90, "pitch": 90, "pan": 0 });
+      $gameScreen._particle.particleSet(0, 'enemy_particleDark', 'picture:' + id3, 'def', 'screen');
     }
-} else {
-    if(id1 == 1){
+  } else {
+    if (id1 == 1) {
       $gameScreen._particle.particleClear('actor_particleLight');
     }
-    else if(id1 == 2){
+    else if (id1 == 2) {
       $gameScreen._particle.particleClear('enemy_particleDark');
     }
-}
+  }
 
 };
 
 //ピクチャの動き方設定
-picture_easingConfiguration = function(value1){
+picture_easingConfiguration = function (value1) {
 
-$gameTemp._easingX = value1;
-$gameTemp._easingY = value1;
-$gameTemp._easingSx = value1;
-$gameTemp._easingSy = value1;
-$gameTemp._easingOp = value1;
+  $gameTemp._easingX = value1;
+  $gameTemp._easingY = value1;
+  $gameTemp._easingSx = value1;
+  $gameTemp._easingSy = value1;
+  $gameTemp._easingOp = value1;
 
 };
 
 //☆立ち絵会話最初の設定
-tachie_kaiwastart = function(id1,id2,id3,id4){
+tachie_kaiwastart = function (id1, id2, id3, id4) {
 
-$gameSwitches.setValue(127,id1);//急ぎtrue通常false
-$gameSwitches.setValue(126,id2)//拡大true通常false
-$gameVariables.setValue(152,id4);//右登場人数
-$gameVariables.setValue(153,id3);//左登場人数
-$gameSwitches.setValue(5,false);//スキップon。手前のコモンでスイッチonにしているため
-$gameScreen.showPicture(5,'ScreenBlackOut',1,640,384,100,100,25,0);
-picture_fade1(5,"fadeIn",valueWipeImg,60,5);
+  $gameSwitches.setValue(127, id1);//急ぎtrue通常false
+  $gameSwitches.setValue(126, id2)//拡大true通常false
+  $gameVariables.setValue(152, id4);//右登場人数
+  $gameVariables.setValue(153, id3);//左登場人数
+  $gameSwitches.setValue(5, false);//スキップon。手前のコモンでスイッチonにしているため
+  $gameScreen.showPicture(5, 'ScreenBlackOut', 1, 640, 384, 100, 100, 25, 0);
+  picture_fade1(5, "fadeIn", valueWipeImg, 60, 5);
 
 
 };
 
 //☆立ち絵会話衣装破損設定//ｱｸﾀｰID,破損部位,ﾋﾟｸID,1で全損0で破損、101は破損CG表示ﾋﾟｸID始点,id5が1で破損、0で脱衣
-tachie_clothesHason = function(id1,id2,id3,id4,id5){
+tachie_clothesHason = function (id1, id2, id3, id4, id5) {
 
-$gameVariables.setValue(20,id1);
-clothes_hason1([id2],id4);
-$gameSwitches.setValue(143,false);
-if($gameVariables.value(244) >= 1){
-  clothes_hason2(id3,id5);
-  if(id5 == 1){
-    $gameScreen.startFlash([255,255,255,170], 20);
-    AudioManager.playSe({ "name": "Collapse2","volume":50,"pitch":130,"pan":0});
-    $gameScreen.shakePicture(id3, 3, 9, 0, 20);
+  $gameVariables.setValue(20, id1);
+  clothes_hason1([id2], id4);
+  $gameSwitches.setValue(143, false);
+  if ($gameVariables.value(244) >= 1) {
+    clothes_hason2(id3, id5);
+    if (id5 == 1) {
+      $gameScreen.startFlash([255, 255, 255, 170], 20);
+      AudioManager.playSe({ "name": "Collapse2", "volume": 50, "pitch": 130, "pan": 0 });
+      $gameScreen.shakePicture(id3, 3, 9, 0, 20);
+    }
+    else if (id5 == 0) {
+      AudioManager.playSe({ "name": "Z_ClothesTakeOff", "volume": 150, "pitch": 110, "pan": 0 });
+    }
   }
-  else if(id5 == 0){
-    AudioManager.playSe({ "name": "Z_ClothesTakeOff","volume":150,"pitch":110,"pan":0});
-  }
-}
 
 };
 
@@ -359,7 +359,7 @@ function calculateScaleAndPositionTachieDousa(actorParameter, targetPicId, expre
     $gameVariables.setValue(20, actorParameter);
     $gameVariables.setValue(300, targetPicId);
     $gameVariables.setValue(151, expressionCode); // Set expression code
-    
+
     // Use general configuration for numeric actorParameter
     ({ scale: picScaleY = picScaleX, y: picY } = scaleConfigGeneral1TachieDousaMap[isScaled]);
   } else {
@@ -382,7 +382,7 @@ function calculateScaleAndPositionTachieDousa(actorParameter, targetPicId, expre
     }
   }
 
-  return {picY, picScaleX, picScaleY};
+  return { picY, picScaleX, picScaleY };
 }
 
 function animatePictureAtype1TachieDousa(targetPicId, actorParameter, sourcePicId, showCostumeId, easingFunction, picY, picScaleX, picScaleY, fadeDuration) {
@@ -514,56 +514,56 @@ function updateStandingPictureAtype3TachieDousa(targetPicId) {
 }
 
 //☆☆着せ替え直接指定
-kisekae_tyokusetusitei = function(id1,id2){
+kisekae_tyokusetusitei = function (id1, id2) {
 
-const actor = $gameActors.actor($gameVariables.value(20));
-$gameVariables.setValue(19,id1);
-if(!$gameParty.hasItem($dataItems[id1])){
-  $gameParty.gainItem($dataItems[id1], 1);
-  for (var i = 1; i <= 9; i++) {
-    if($dataItems[id1].meta['SubstituteGetItem' + 1]){
-      $gameParty.gainItem($dataItems[Number($dataItems[id1].meta['SubstituteGetItem' + 1])], 1);
+  const actor = $gameActors.actor($gameVariables.value(20));
+  $gameVariables.setValue(19, id1);
+  if (!$gameParty.hasItem($dataItems[id1])) {
+    $gameParty.gainItem($dataItems[id1], 1);
+    for (var i = 1; i <= 9; i++) {
+      if ($dataItems[id1].meta['SubstituteGetItem' + 1]) {
+        $gameParty.gainItem($dataItems[Number($dataItems[id1].meta['SubstituteGetItem' + 1])], 1);
+      };
+    };
+    if ($dataItems[id1].meta['TotalCloth'] && $dataItems[id1].meta['subCategory'] && $dataItems[id1].meta['ClothType']) {
+      clothes_get($gameVariables.value(20), $dataItems[id1].meta['subCategory'], $dataItems[id1].meta['ClothType']);
     };
   };
-  if($dataItems[id1].meta['TotalCloth'] && $dataItems[id1].meta['subCategory'] && $dataItems[id1].meta['ClothType']){
-    clothes_get($gameVariables.value(20),$dataItems[id1].meta['subCategory'],$dataItems[id1].meta['ClothType']);
-  };
-};
-//現在衣装を呼び出し
+  //現在衣装を呼び出し
   var start = 1; var end = 40;
   for (var i = start; i <= end; i++) {
-    $gameVariables.setValue(i+460,$gameVariables.value($gameVariables.value(20)+440)[i]);
+    $gameVariables.setValue(i + 460, $gameVariables.value($gameVariables.value(20) + 440)[i]);
   };
 
-if($dataItems[$gameVariables.value(19)].meta['ClothSpecify']){
-  $gameVariables.value($gameVariables.value(20)+440)[41] = Number($dataItems[$gameVariables.value(19)].meta['TotalCloth']);
-  $gameVariables.value($gameVariables.value(20)+440)[0] = $gameVariables.value(19);
-  //現在衣装を初期化
+  if ($dataItems[$gameVariables.value(19)].meta['ClothSpecify']) {
+    $gameVariables.value($gameVariables.value(20) + 440)[41] = Number($dataItems[$gameVariables.value(19)].meta['TotalCloth']);
+    $gameVariables.value($gameVariables.value(20) + 440)[0] = $gameVariables.value(19);
+    //現在衣装を初期化
     var start = 1; var end = 40;
-      for (var i = start; i <= end; i++) {
-        $gameVariables.setValue(i+460,0);
-      };
-      $gameVariables.setValue(465,Number($dataItems[$gameVariables.value(19)].meta['ClothSpecify']));
-      if(id2 >= 1){
-        $gameVariables.setValue(493,id2);
-      };
-  actor.addState(23);
-} else {
-  actor.removeState(23);
-  kisekae_naibusyori1();
-};
+    for (var i = start; i <= end; i++) {
+      $gameVariables.setValue(i + 460, 0);
+    };
+    $gameVariables.setValue(465, Number($dataItems[$gameVariables.value(19)].meta['ClothSpecify']));
+    if (id2 >= 1) {
+      $gameVariables.setValue(493, id2);
+    };
+    actor.addState(23);
+  } else {
+    actor.removeState(23);
+    kisekae_naibusyori1();
+  };
 
-//衣装情報を更新
-var start = 1; var end = 40;
+  //衣装情報を更新
+  var start = 1; var end = 40;
   for (var i = start; i <= end; i++) {
-    $gameVariables.value($gameVariables.value(20)+440)[i] = $gameVariables.value(i+460);
+    $gameVariables.value($gameVariables.value(20) + 440)[i] = $gameVariables.value(i + 460);
   }
-tachie_settei3(actor);
+  tachie_settei3(actor);
 
 };
 
 //☆☆着せ替え内部処理一部
-kisekae_naibusyori1 = function(){
+kisekae_naibusyori1 = function () {
 
   const gameVar20 = $gameVariables.value(20);
   const gameVar20_440 = gameVar20 + 440;
@@ -572,13 +572,13 @@ kisekae_naibusyori1 = function(){
   const clothTypeId460 = 460;
 
   $gameVariables.value(gameVar20_440)[0] = 0;
-  if(item_gameVar19.meta['TotalCloth']){
+  if (item_gameVar19.meta['TotalCloth']) {
     $gameVariables.value(gameVar20_440)[41] = Number(item_gameVar19.meta['TotalCloth']);
     $gameVariables.value(gameVar20_440)[0] = gameVar19;
     //現在衣装を初期化
     for (var i = 1; i <= 40; i++) if (i !== 4) $gameVariables.setValue(i + clothTypeId460, 0);
 
-    if(item_gameVar19.meta['subCategory'] !== '全裸'){
+    if (item_gameVar19.meta['subCategory'] !== '全裸') {
       const gameVar20_380 = gameVar20 + 380;
       for (let clothTypeName of ['通常', item_gameVar19.meta['ClothType']]) {
         const max = $dataItems.length;
@@ -586,9 +586,9 @@ kisekae_naibusyori1 = function(){
           const item = $dataItems[i];
           if (item.meta['ClothType'] !== clothTypeName) continue;
           const itemEICSwitchNum = Number(item.meta['EICSwitch']);
-          if (gameVar20_380 == itemEICSwitchNum 
-            || gameVar20 + 180 == itemEICSwitchNum 
-            || 200 == itemEICSwitchNum 
+          if (gameVar20_380 == itemEICSwitchNum
+            || gameVar20 + 180 == itemEICSwitchNum
+            || 200 == itemEICSwitchNum
             || 400 == itemEICSwitchNum) {
             if (item.meta['subCategory'] === item_gameVar19.meta['subCategory']) {
               const value1 = Number(item.meta['ClothSwitch']);
@@ -622,9 +622,9 @@ tachie_settei2 = function () {
   console.debug("tachie_settei2: tachie_settei2 completed successfully");
 }
 
-tachie_settei3 = function(gameActor) {
+tachie_settei3 = function (gameActor) {
 
-  if(!$gameParty.battleMembers().includes(gameActor)){
+  if (!$gameParty.battleMembers().includes(gameActor)) {
     console.debug("tachie_settei3: Actor not in battle party! Skip..");
     return;
   }
@@ -634,8 +634,8 @@ tachie_settei3 = function(gameActor) {
 
   // Reset temporary clothing variables (561-600)
   console.debug("tachie_settei3: Resetting temporary clothing variables (561-600)");
-  for (let variableIndex = 561; variableIndex <= 600; variableIndex++) { 
-    $gameVariables.setValue(variableIndex, 0); 
+  for (let variableIndex = 561; variableIndex <= 600; variableIndex++) {
+    $gameVariables.setValue(variableIndex, 0);
   }
 
   // Load current clothing data from actor to working variables (461-500)
@@ -652,26 +652,26 @@ tachie_settei3 = function(gameActor) {
     // Handle doll state - store current clothing in temp variables and clear current
     if (gameActor.isStateAffected(valueDollStateId)) {
       console.debug("tachie_settei3: Actor is in doll state, saving clothing to temporary storage and clearing current clothing");
-      
+
       // Save clothing to temporary storage (561-600)
       for (let clothingIndex = 1; clothingIndex <= 40; clothingIndex++) {
         $gameVariables.setValue(clothingIndex + 560, $gameVariables.value(clothingIndex + 460));
       }
-      
+
       // Clear current clothing except setting body to type 3
       for (let clothingIndex = 1; clothingIndex <= 40; clothingIndex++) {
         $gameVariables.setValue(clothingIndex + 460, 0);
       }
       $gameVariables.setValue(1 + 460, 3); // Set body type
       console.debug("tachie_settei3: Doll state processing complete: Clothing cleared and body type set");
-    }    
+    }
     else { // Normal character processing
       console.debug("tachie_settei3: Actor is not in doll state, processing normal female character");
       rosyutu_genkai(); // Calculate exposure limits
       console.debug("tachie_settei3: Calculated exposure limits");
       rosyutu_genzai(); // Calculate current exposure
       console.debug("tachie_settei3: Calculated current exposure");
-      
+
       // Apply custom pose/expression settings if not in specified state
       if (!gameActor.isStateAffected(23)) {
         console.debug("tachie_settei3: Actor not affected by state 23 (Forced costume setting), applying tachie_settei1");
@@ -706,7 +706,7 @@ tachie_settei3 = function(gameActor) {
   // Update character graphics
   console.debug("tachie_settei3: Updating character graphics via charagra_henkou1");
   charagra_henkou1(actorId);
-  
+
   // Update clothing-related global values for female characters
   if (isGirl(gameActor)) {
     console.debug("tachie_settei3: Updating global clothing variables for female actor");
@@ -720,30 +720,30 @@ tachie_settei3 = function(gameActor) {
 };
 
 //☆☆キャラグラ変更。
-charagra_henkou1 = function(actorId) {
+charagra_henkou1 = function (actorId) {
   // Return early if actorId is invalid
   if (actorId < 1) return;
 
   // Get actor reference
   const actor = $gameActors.actor(actorId);
-  
+
   // Return early if actor isn't female
   if (!isGirl(actor)) return;
-  
+
   // Process character graphics change
   charagra_choice1(actorId);
-  
+
   // Apply special processing for Liscia Blue
   isyou_senyouLisciaBlueOnly(actorId);
-  
+
   // Set character and battler images
   const characterImageId = actorId + '_' + $gameVariables.value(21);
   const characterImageIndex = $gameVariables.value(22);
   const battlerImageId = actorId + '_' + $gameVariables.value(23);
-  
+
   actor.setCharacterImage(characterImageId, characterImageIndex);
   actor.setBattlerImage(battlerImageId);
-  
+
   // Set switch if not in battle
   if (!$gameParty.inBattle()) {
     $gameSwitches.setValue(148, true);
@@ -751,96 +751,96 @@ charagra_henkou1 = function(actorId) {
 };
 
 // for charagra_choice1
-set_charachip_graphics = function(itemMeta){
-	$gameVariables.setValue(21, Number(itemMeta['CharaChip1']));//1102は全裸指定
-	$gameVariables.setValue(22, Number(itemMeta['CharaChip2']));
-	$gameVariables.setValue(23, Number(itemMeta['CharaChipsv']));
+set_charachip_graphics = function (itemMeta) {
+  $gameVariables.setValue(21, Number(itemMeta['CharaChip1']));//1102は全裸指定
+  $gameVariables.setValue(22, Number(itemMeta['CharaChip2']));
+  $gameVariables.setValue(23, Number(itemMeta['CharaChipsv']));
 }
 
 //☆☆キャラチップ決定用計算
-charagra_choice1 = function(id1){
+charagra_choice1 = function (id1) {
 
-const actor = $gameActors.actor(id1);
+  const actor = $gameActors.actor(id1);
 
-if(actor.isStateAffected(23)){
-  const itemMeta = $dataItems[$gameVariables.value(id1 + 440)[0]].meta;
-  set_charachip_graphics(itemMeta);
-  
-} else {
-  const value5 = $gameVariables.value(id1+380)[4];
-  let value1 = $gameVariables.value(id1+440)[0];//0アイテムID
-  //var value2 = $gameVariables.value(id1+440)[41];//41会話グラ用指定ID
-  set_charachip_graphics($dataItems[zenravalueId].meta);
-  
-  if(value5 <= 9){
-    const charachipDataArr = $gameVariables.value(id1 + 440);
-    charachipDataArr[0] = 0;
-    charachipDataArr[41] = 1;
-    value1 = 0;
-  };
-  if(value1 == 0 && value5 >= 26){
-  //現在衣装を呼び出し
-    for (let i = 1; i <= 40; i++) {
-      $gameVariables.setValue(i+460,[i]);
+  if (actor.isStateAffected(23)) {
+    const itemMeta = $dataItems[$gameVariables.value(id1 + 440)[0]].meta;
+    set_charachip_graphics(itemMeta);
+
+  } else {
+    const value5 = $gameVariables.value(id1 + 380)[4];
+    let value1 = $gameVariables.value(id1 + 440)[0];//0アイテムID
+    //var value2 = $gameVariables.value(id1+440)[41];//41会話グラ用指定ID
+    set_charachip_graphics($dataItems[zenravalueId].meta);
+
+    if (value5 <= 9) {
+      const charachipDataArr = $gameVariables.value(id1 + 440);
+      charachipDataArr[0] = 0;
+      charachipDataArr[41] = 1;
+      value1 = 0;
     };
-    let array = Array(21).fill(0);//21
-	  const itemsCount = $dataItems.length;
-    for (let id = 461;id<=500;id++){
-      for(let i=1331; i < itemsCount; i ++){
-        const itemMeta = $dataItems[i].meta;
-        if(itemMeta['TotalCloth']) continue;
-        
-        const itemEICSwitchNum = Number(itemMeta['EICSwitch']);
-        let isBreak = false;
-        switch(itemEICSwitchNum) {
-          case 200:
-          case id1 + 180:
-          case id1 + 380: {
-            if(id == Number(itemMeta['ClothSwitch']) + 460) break;
-            if($gameVariables.value(id) != Number(itemMeta['ClothAllocationNumber'])) break;
-
-            //if(itemMeta['SingleCloth']){}else{
-            array[Number(itemMeta['subCategory'])] += Number(itemMeta['ClothUncoverCount']);//露出度で加算
-            isBreak = true;
-          }
-        }
-        if (isBreak) break;
-      }
-    }
-    const max = array.reduce(function(a,b){  
-      return Math.max(a,b);
-    });
-    let index = array.findIndex(array => array === max); 
-    if(index >= 0){
-		const itemsCount = $dataItems.length;
+    if (value1 == 0 && value5 >= 26) {
+      //現在衣装を呼び出し
+      for (let i = 1; i <= 40; i++) {
+        $gameVariables.setValue(i + 460, [i]);
+      };
+      let array = Array(21).fill(0);//21
+      const itemsCount = $dataItems.length;
+      for (let id = 461; id <= 500; id++) {
         for (let i = 1331; i < itemsCount; i++) {
           const itemMeta = $dataItems[i].meta;
-          if (!itemMeta['TotalCloth']) continue;
-		  
+          if (itemMeta['TotalCloth']) continue;
+
           const itemEICSwitchNum = Number(itemMeta['EICSwitch']);
           let isBreak = false;
-          switch(itemEICSwitchNum) {
-            case 400:
+          switch (itemEICSwitchNum) {
+            case 200:
+            case id1 + 180:
             case id1 + 380: {
-              if(index != Number(itemMeta['subCategory'])) break;
-              
-              set_charachip_graphics(itemMeta);
+              if (id == Number(itemMeta['ClothSwitch']) + 460) break;
+              if ($gameVariables.value(id) != Number(itemMeta['ClothAllocationNumber'])) break;
 
-              $gameVariables.value(id1+440)[0] = i;
-              $gameVariables.value(id1+440)[41] = Number(itemMeta['TotalCloth']);
+              //if(itemMeta['SingleCloth']){}else{
+              array[Number(itemMeta['subCategory'])] += Number(itemMeta['ClothUncoverCount']);//露出度で加算
               isBreak = true;
             }
           }
           if (isBreak) break;
-		    }
-	  }
-  }
-  
-  if(value1 >= 1){
-    set_charachip_graphics($dataItems[value1].meta);
-  }
-};
-tachie_switchOnOff();
+        }
+      }
+      const max = array.reduce(function (a, b) {
+        return Math.max(a, b);
+      });
+      let index = array.findIndex(array => array === max);
+      if (index >= 0) {
+        const itemsCount = $dataItems.length;
+        for (let i = 1331; i < itemsCount; i++) {
+          const itemMeta = $dataItems[i].meta;
+          if (!itemMeta['TotalCloth']) continue;
+
+          const itemEICSwitchNum = Number(itemMeta['EICSwitch']);
+          let isBreak = false;
+          switch (itemEICSwitchNum) {
+            case 400:
+            case id1 + 380: {
+              if (index != Number(itemMeta['subCategory'])) break;
+
+              set_charachip_graphics(itemMeta);
+
+              $gameVariables.value(id1 + 440)[0] = i;
+              $gameVariables.value(id1 + 440)[41] = Number(itemMeta['TotalCloth']);
+              isBreak = true;
+            }
+          }
+          if (isBreak) break;
+        }
+      }
+    }
+
+    if (value1 >= 1) {
+      set_charachip_graphics($dataItems[value1].meta);
+    }
+  };
+  tachie_switchOnOff();
 
 };
 
@@ -856,7 +856,7 @@ tachie_naibusyori2 = function (gameActor) {
 
   // Set character name for standing image
   $gameVariables.setValue(118, actorCharName);
-  
+
   // Determine the picture ID to use
   //const isSwitch90On = $gameSwitches.value(90); // 立ち絵会話時自動on
   //const actorPicId = getPreviousTachiePicId(); // 立ち絵表示時ﾋﾟｸﾁｬ指定ID
@@ -869,16 +869,16 @@ tachie_naibusyori2 = function (gameActor) {
   //console.debug(`tachie_naibusyori2: dataActor.meta['tachiePicId'] determined as ${dataActor.meta['tachiePicId']}`);
   console.debug(`tachie_naibusyori2: picId determined as ${picId}`);
   $gameVariables.setValue(117, picId);
-  
+
   // Calculate the zero-based tachie number
   const tachieIndex = Math.max(-1, picId - 1);
   console.debug(`tachie_naibusyori2: tachieIndex calculated as ${tachieIndex}`);
-  
+
   // Get references to avoid repeated lookups
   const tachieData = $TKMvar.tachie;
   const charList = tachieData.CharList;
   const picData = tachieData.PicData;
-  
+
   // Initialize character parts if switch 20 is ON
   if ($gameSwitches.value(20)) {
     console.debug("tachie_naibusyori2: Switch 20 is ON! Initializing character parts.");
@@ -896,7 +896,7 @@ tachie_naibusyori2 = function (gameActor) {
       console.debug(`runTachieLoop: Condition for part ${j} is ${condition}`);
       return condition;
     });
-    
+
     // Clear previous picture if it exists
     if (tachieIndex !== -1 && tachieIndex < picData.length) {
       console.debug(`tachie_naibusyori2: Erasing previous picture with picNum ${picData[tachieIndex].picNum}`);
@@ -904,12 +904,12 @@ tachie_naibusyori2 = function (gameActor) {
     } else {
       console.debug("tachie_naibusyori2: tachieIndex out of bounds, cannot erase previous picture.");
     }
-    
+
     // Initialize character parts array
     charList[actorCharName] = Array(tachieData.MaxLayer).fill(0);
     console.debug(`tachie_naibusyori2: Initialized charList for ${actorCharName} with ${tachieData.MaxLayer} layers.`);
   }
-  
+
   // Handle state 19 (clear standing picture)
   if ($gameActors.actor(actorId).isStateAffected(19)) {
     console.debug(`tachie_naibusyori2: Actor ${actorId} is in state 19. Clearing standing picture.`);
@@ -927,20 +927,20 @@ tachie_naibusyori2 = function (gameActor) {
       return currVal;
     });
   }
-  
+
   // Check if we need to change the character's standing image
   if (tachieIndex !== -1) {
     // Update character data if different from current
     const currentChar = tachieIndex < picData.length ? picData[tachieIndex].char : null;
     console.debug(`tachie_naibusyori2: currentChar = ${currentChar}, desired = ${actorCharName}`);
-    
+
     if (currentChar !== actorCharName && actorCharName in charList && tachieIndex < picData.length) {
       console.debug(`tachie_naibusyori2: Updating picData at index ${tachieIndex} with new char ${actorCharName}`);
       picData[tachieIndex].char = actorCharName;
       picData[tachieIndex].bitmap = [];
       tachieData.preloadBitmap(tachieIndex);
     }
-    
+
     // Show the standing picture if it exists
     if (tachieIndex < picData.length && picData[tachieIndex].char) {
       const pictureId = picData[tachieIndex].picNum;
@@ -973,62 +973,62 @@ function runTachieLoop(start, end, getThirdArg, condition = () => true) {
 
 //☆☆立ち絵内部処理CP一つずつ
 /**
- * Handles internal processing for character parts in the tachie (standing image) system.
- * Updates a specific part of a character's standing image and manages its bitmap resources.
- * @param {Array} args - [characterName, partName, partNumber]
- */
-tachie_naibusyori1 = function(args) {
+* Handles internal processing for character parts in the tachie (standing image) system.
+* Updates a specific part of a character's standing image and manages its bitmap resources.
+* @param {Array} args - [characterName, partName, partNumber]
+*/
+tachie_naibusyori1 = function (args) {
   // Extract parameters for clarity
   const characterName = args[0];
   const partName = args[1];
   const partNumber = parseInt(args[2], 10) || 0;
-  
+
   // Early exit if character doesn't exist
   if (!(characterName in $TKMvar.tachie.CharList)) {
     return;
   }
-  
+
   // Cache frequently accessed objects
   const tachie = $TKMvar.tachie;
   const charList = tachie.CharList;
   const partsNameArr = tachie.partsNameArr;
   const picData = tachie.PicData;
-  
+
   // Find the layer corresponding to this part name
   const layerNum = partsNameArr.indexOf(partName);
   if (layerNum === -1) {
     return; // Part name not found in layers
   }
-  
+
   // Skip if the part is already set to the requested number
   if (charList[characterName][layerNum] === partNumber) {
     return;
   }
-  
+
   // Update the character part in the list
   charList[characterName][layerNum] = partNumber;
-  
+
   // Update the bitmap cache for each picture using this character
   const picCount = picData.length;
   for (let i = 0; i < picCount; i++) {
     if (picData[i].char !== characterName) continue;
 
     const pic = picData[i];
-    
+
     // Initialize bitmap array if needed
     if (!pic.bitmap) {
       tachie.preloadBitmap(i);
     }
-    
+
     // Set or clear the bitmap for the specified layer
     if (partNumber === 0) {
       pic.bitmap[layerNum] = null;
     } else {
       const imagePath = characterName + "_" + partsNameArr[layerNum] + "_" + partNumber;
-      
+
       // Load the image into the bitmap cache
       pic.bitmap[layerNum] = ImageManager.loadPicture("/img/tachies/" + imagePath, 0);
-      
+
       // Pre-cache using Galv's cache system
       Galv.CACHE.load('tachies', imagePath);
     }
@@ -1270,7 +1270,7 @@ const damageFaceExpressionsMap = {
 };
 const EFFECT_STATE_IDS = [61, 65, 84, 85, 86]; // 発情、自慰、精液
 const HIGHEST_FACE_OPTIONS = [29, 30, 31, 32, 37, 38, 39, 40, 41, 42, 43, 44];  // For intensity >= 900
-const HIGHER_FACE_OPTIONS = [29, 30, 31, 32, 37, 38, 39, 40];                  
+const HIGHER_FACE_OPTIONS = [29, 30, 31, 32, 37, 38, 39, 40];
 const MODERATE_FACE_OPTIONS = [25, 26, 27, 28, 29, 30, 31, 32];                    // For intensity >= 700
 const MILD_FACE_OPTIONS = [21, 22, 23, 24, 25, 26, 27, 28];                    // For intensity >= 500
 const LOW_FACE_OPTIONS = [17, 18, 19, 20, 21, 22, 23, 24];                    // For intensity >= 300
@@ -1795,7 +1795,7 @@ function handleSweatEffectTachieSettei1(gameActor, $gameVariables, $gameSwitches
 //#endregion
 
 //破損時第一段階
-clothes_hason1 = function(array,id1){
+clothes_hason1 = function (array, id1) {
 
   const gameVar20 = $gameVariables.value(20);
   if (id1 >= 1) {
@@ -1841,7 +1841,7 @@ clothes_hason1 = function(array,id1){
 };
 
 //破損時切れ端ColorHue用
-clothes_hason2 = function(id1,id2){
+clothes_hason2 = function (id1, id2) {
 
   const item = $dataItems[$gameVariables.value(244)];
   const itemClothSwitch = item.meta['ClothSwitch'];
@@ -1863,7 +1863,7 @@ clothes_hason2 = function(id1,id2){
       if (item.meta['ClothAllocationNumber']) {
         let value2;
         //if (id1 == 0) {
-          value2 = pic._x;//$gameVariables.value(105);
+        value2 = pic._x;//$gameVariables.value(105);
         //} else {
         //value2 = pic._x;
         //}
@@ -1953,76 +1953,77 @@ clothes_hason2 = function(id1,id2){
 };
 
 //着せ替え時統合衣装他処理
-clothes_change1 = function(){
+clothes_change1 = function () {
 
-const id = 1;
-const value1 = 380 + $gameVariables.value(20); 
-const value2 = 400;
-const itemsCount = $dataItems.length;
+  const id = 1;
+  const value1 = 380 + $gameVariables.value(20);
+  const value2 = 400;
+  const itemsCount = $dataItems.length;
 
-valueRandomSet = Array(101).fill(0);
+  valueRandomSet = Array(101).fill(0);
 
-let j = 1;
-for(let i = 1; i < itemsCount; i ++){
-  const item = $dataItems[i];
-  if ($gameParty.hasItem(item)){
-    const value3 = Number(item.meta['EICSwitch']);
-      if(value3 == value1 || value3 == value2 ){
+  let j = 1;
+  for (let i = 1; i < itemsCount; i++) {
+    const item = $dataItems[i];
+    if ($gameParty.hasItem(item)) {
+      const value3 = Number(item.meta['EICSwitch']);
+      if (value3 == value1 || value3 == value2) {
         const choiceParams = {
-        text: item.name,
-        value: i};
+          text: item.name,
+          value: i
+        };
         $gameSystem.addCustomChoice(id, choiceParams);
         valueRandomSet[j] = i;
-        j ++;
+        j++;
       }
+    }
   }
-}
 
 };
 
 //着せ替え時単品目処理
-clothes_change2 = function(){
+clothes_change2 = function () {
 
-const id = 2;
-const actorId = $gameVariables.value(20);
-const value1 = 380 + actorId; 
-const value2 = 400;
-const itemsCount = $dataItems.length;
-const item19 = $dataItems[$gameVariables.value(19)];
+  const id = 2;
+  const actorId = $gameVariables.value(20);
+  const value1 = 380 + actorId;
+  const value2 = 400;
+  const itemsCount = $dataItems.length;
+  const item19 = $dataItems[$gameVariables.value(19)];
 
-$gameScreen.showPicture(100,'/img/tachies/actor' + actorId + '_5_99',1,1200,550,20,20,200,0);
-valueRandomSet = Array(201).fill(0);
+  $gameScreen.showPicture(100, '/img/tachies/actor' + actorId + '_5_99', 1, 1200, 550, 20, 20, 200, 0);
+  valueRandomSet = Array(201).fill(0);
 
-let j = 1;
-for(let i=1; i < itemsCount; i ++){
-  const item = $dataItems[i];
-  if ($gameParty.hasItem(item) && 
-    item19.meta['subCategory'] == item.meta['subCategory'] ){
-    const itemEICSwitchNum = Number(item.meta['EICSwitch']);
-      if(itemEICSwitchNum == value1 || itemEICSwitchNum == value2 || itemEICSwitchNum == value1-200 || itemEICSwitchNum == value2-200){
+  let j = 1;
+  for (let i = 1; i < itemsCount; i++) {
+    const item = $dataItems[i];
+    if ($gameParty.hasItem(item) &&
+      item19.meta['subCategory'] == item.meta['subCategory']) {
+      const itemEICSwitchNum = Number(item.meta['EICSwitch']);
+      if (itemEICSwitchNum == value1 || itemEICSwitchNum == value2 || itemEICSwitchNum == value1 - 200 || itemEICSwitchNum == value2 - 200) {
         const choiceParams = { text: item.name, value: i };
         $gameSystem.addCustomChoice(id, choiceParams);
-        if(!item.meta['TotalCloth']){
-          if(Number(item.meta['ClothAllocationNumber']) >= 1){
-            $gameScreen.showPicture(j + 100, "/img/tachies/" + 'actor' + actorId + '_' + Number(item.meta['ClothSwitch']) + '_' + Number(item.meta['ClothAllocationNumber']),1,1200,550,20,20,0,0);
-            $gameMessage.setSelectPictureId(j-1, j+100);
+        if (!item.meta['TotalCloth']) {
+          if (Number(item.meta['ClothAllocationNumber']) >= 1) {
+            $gameScreen.showPicture(j + 100, "/img/tachies/" + 'actor' + actorId + '_' + Number(item.meta['ClothSwitch']) + '_' + Number(item.meta['ClothAllocationNumber']), 1, 1200, 550, 20, 20, 0, 0);
+            $gameMessage.setSelectPictureId(j - 1, j + 100);
           };
         };
         valueRandomSet[j] = i;
         j++;
       }
+    }
   }
-}
 
 };
 
 //衣装取得
-clothes_get = function(id,value1,value2){
+clothes_get = function (id, value1, value2) {
 
-  $gameVariables.setValue(20,id); // replaced $gameVariables.value(20) below by id, get id is much faster than get variable value
+  $gameVariables.setValue(20, id); // replaced $gameVariables.value(20) below by id, get id is much faster than get variable value
   const items = $dataItems;
   const itemsCount = items.length;
-  for(let i1=1301; i1 < itemsCount; i1 ++){
+  for (let i1 = 1301; i1 < itemsCount; i1++) {
     const item = items[i1];
     const itemEICSwitchNum = Number(item.meta['EICSwitch']);
     if (id + 380 == itemEICSwitchNum || id + 180 == itemEICSwitchNum || 200 == itemEICSwitchNum || 400 == itemEICSwitchNum) {
