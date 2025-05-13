@@ -204,6 +204,7 @@ tachie_dousa = function (actionType, actorParameter, expressionCode, targetPicId
       case 0:
         // --------- Action Type 0: Conversation picture change and costume update ----------
         processCostumeChangeAnimationAtype0TachieDousa(actorParameter, showCostumeId, changeCostumeId, changeCostumeParam, targetPicId, sourcePicId, expressionCode);
+        break;
       case 1:
         // --------- Action Type 1: Standard picture display with position easing ----------
         animatePictureAtype1TachieDousa(targetPicId, actorParameter, sourcePicId, showCostumeId, easingFunction, picY, picScaleX, picScaleY, fadeDuration);
