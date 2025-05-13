@@ -14,16 +14,16 @@ var durations = [80, 85, 90, 95, 100];
 //エネミー戦闘不能時にドロップ計算
 enemy_dropSelection = function (user) {
 
-  const gameSwitch607 = $gameSwitches.value(607);
-  const gameSwitch608 = $gameSwitches.value(608);
+  const isDuringStripping = $gameSwitches.value(607);
+  const isDuringRipping = $gameSwitches.value(608);
   const isInBattle = $gameParty.inBattle();
-  if (!gameSwitch607 && !gameSwitch608) {
-    const gameVar52 = $gameVariables.value(52);
+  if (!isDuringStripping && !isDuringRipping) {
+    const tribalSubjugationIds = $gameVariables.value(52);
     for (let i = 1; i < valueSubjugationPoint.length; i++) {//討伐数カウント
       const stateId = valueSubjugationPoint[i];
       if (!user.isStateAffected(stateId)) continue;
 
-      gameVar52[stateId] += 1;
+      tribalSubjugationIds[stateId] += 1;
       if (isInBattle) continue;
 
       const name = `\x1bSIM[${stateId}]`;
@@ -34,8 +34,8 @@ enemy_dropSelection = function (user) {
       //CommonPopupManager.showInfo({},value1,null);
     }
     if (!user.isStateAffected(436)) {
-      gameVar52[1] += 1;//ヒューマン以外の魔物当日討伐数
-      gameVar52[2] += 1;//ヒューマン以外の魔物総合討伐数
+      tribalSubjugationIds[1] += 1;//ヒューマン以外の魔物当日討伐数
+      tribalSubjugationIds[2] += 1;//ヒューマン以外の魔物総合討伐数
     }
   };
 
@@ -76,7 +76,7 @@ enemy_dropSelection = function (user) {
       $gameScreen.movePicture(valueDropEnemyPicId, 1, coordinateX + shiftX, coordinateY + shiftY, 100, 100, 0, 0, duration);
       valueDropEnemyPicId += 1;
     } else {
-      if (gameSwitch607 || gameSwitch608) {
+      if (isDuringStripping || isDuringRipping) {
         $gameVariables.setValue(22, itemDropDataKindNum);
         $gameVariables.setValue(23, Number(itemDropData[2]));
         item_getSkillLevel(valueFootpadSkillId, $gameVariables.value(22), $gameVariables.value(23));
