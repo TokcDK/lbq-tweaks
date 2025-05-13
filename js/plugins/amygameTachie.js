@@ -381,13 +381,19 @@ function calculateScaleAndPositionTachieDousa(actorParameter, targetPicId, expre
     $gameVariables.setValue(151, expressionCode); // Set expression code
 
     // Use general configuration for numeric actorParameter
-    ({ scale: picScaleY = picScaleX, y: picY } = scaleConfigGeneral1TachieDousaMap[isScaled]);
+    const { scale, y } = scaleConfigGeneral1TachieDousaMap[isScaled];
+    picScaleY = picScaleX = scale;
+    picY = y;
   } else {
     // Use textual configuration if actorParameter is not numeric
-    ({ scale: picScaleY = picScaleX, y: picY } = scaleConfigGeneral2TachieDousaMap[isScaled]);
-
+    const { scale, y } = scaleConfigGeneral2TachieDousaMap[isScaled];
+    picScaleY = picScaleX = scale;
+    picY = y;
+    
     if (actorParameter.match(/SS/)) {
-      ({ scale: picScaleY = picScaleX, y: picY } = scaleConfigSSTachieDousaMap[isScaled]);
+      const { scale, y } = scaleConfigSSTachieDousaMap[isScaled];
+      picScaleY = picScaleX = scale;
+      picY = y;
     }
     if (actorParameter.match(/Upper/)) {
       picY = 384;
