@@ -1192,7 +1192,11 @@ battle_bustUp1 = function (gameActor, basePictureId, baseMoveX, baseMoveY, baseD
   };
 
   // Setup picture motion and compute picture scale & vertical shift
-  const { pictureScale, verticalShift } = setupScaleAndShiftBattleBustUpBattleBustUp();
+  let pictureScale;
+  let verticalShift;
+  const result = setupScaleAndShiftBattleBustUpBattleBustUp();
+  pictureScale = result.pictureScale;
+  verticalShift = result.verticalShift;
 
   // Calculate horizontal adjustment based on battle state and switches
   const horizontalShift = calculateHorizontalAdjustmentBattleBustUpBattleBustUp();
