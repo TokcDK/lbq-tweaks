@@ -101,24 +101,24 @@ tachie_switchOnOff = function (id) {
 };
 
 //立ち絵演出クリアも。1実行0終了
-tachie_partDirectSet = function (id3, id2, id1) {
+tachie_partDirectSet = function (pictureId, enableFlag, particleType) {
 
-  if (id2 == 1) {
-    if (id1 == 1) {
+  if (enableFlag == 1) {
+    if (particleType == 1) {
       $gameScreen.startFlash([255, 255, 255, 200], 120);
       AudioManager.playSe({ "name": "Up1", "volume": 90, "pitch": 110, "pan": 0 });
-      $gameScreen._particle.particleSet(0, 'actor_particleLight', 'picture:' + id3, 'def', 'screen');
+      $gameScreen._particle.particleSet(0, 'actor_particleLight', 'picture:' + pictureId, 'def', 'screen');
     }
-    else if (id1 == 2) {
+    else if (particleType == 2) {
       $gameScreen.startFlash([0, 0, 0, 200], 120);
       AudioManager.playSe({ "name": "Down4", "volume": 90, "pitch": 90, "pan": 0 });
-      $gameScreen._particle.particleSet(0, 'enemy_particleDark', 'picture:' + id3, 'def', 'screen');
+      $gameScreen._particle.particleSet(0, 'enemy_particleDark', 'picture:' + pictureId, 'def', 'screen');
     }
   } else {
-    if (id1 == 1) {
+    if (particleType == 1) {
       $gameScreen._particle.particleClear('actor_particleLight');
     }
-    else if (id1 == 2) {
+    else if (particleType == 2) {
       $gameScreen._particle.particleClear('enemy_particleDark');
     }
   }
