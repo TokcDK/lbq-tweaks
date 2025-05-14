@@ -2418,16 +2418,16 @@ actor_battleSekughara1 = function () {
 //☆☆H時の音や効果 BGSライン。通常1,Ｈ2-9,天候10,Bgv10+アクターID//
 sex_direction = function (id1, id2, id3) {
 
-  var id4 = 0;
+  let id4 = 0;
   if ($gameVariables.value(530) >= 1) {
     $gameVariables.setValue(20, $gameVariables.value(530));
     if ($dataActors[$gameVariables.value(20)].meta['HvoicePattern']) {
-      var id4 = Number($dataActors[$gameVariables.value(20)].meta['HvoicePattern']);
+      id4 = Number($dataActors[$gameVariables.value(20)].meta['HvoicePattern']);
       if (id2 == 0) {
         if ($gameActors.actor($gameVariables.value(530)).isLearnedSkill(65)) {
-          var id2 = 2;
+          id2 = 2;
         } else {
-          var id2 = 1;
+          id2 = 1;
         };
       };
     };
@@ -2437,245 +2437,245 @@ sex_direction = function (id1, id2, id3) {
     $gameVariables.setValue(194, 1);
   };
   if (id1 == 0) {
-    var arr1 = ['hScene_Direct1'];
-    for (var i = 0; i <= arr1.length - 1; i++) {
+    const arr1 = ['hScene_Direct1'];
+    for (let i = 0; i <= arr1.length - 1; i++) {
       $gameScreen._particle.particleClear(arr1[i]);
     };
-    var value1 = getRandomIndex(41) + 180;
-    var value2 = getRandomIndex(21) + 40;
+    let value1 = getRandomIndex(41) + 180;
+    const value2 = getRandomIndex(21) + 40;
     $gameScreen.startFlash([255, 119, 255, value1], value2);
-    var value1 = 'hScene_Direct1';
+    value1 = 'hScene_Direct1';
     $gameScreen._particle.particleSet(0, value1, 'screen', 'def', 'screen');
   };
   if (id1 == 1) {//ピストン弱
     $gameVariables.setValue(194, $gameVariables.value(194) + 1);
     $gameSystem.setBgsLine($gameVariables.value(194));
-    var value1 = "21_Piston1";
-    var value2 = getRandomIndex(21) + 90;
-    var value3 = getRandomIndex(31) + 90;
+    const value1 = "21_Piston1";
+    const value2 = getRandomIndex(21) + 90;
+    const value3 = getRandomIndex(31) + 90;
     AudioManager.playBgs({ "name": value1, "volume": value2, "pitch": value3, "pan": 0 });
     if (id4 >= 1 && id2 <= 9) {
       $gameSystem.setBgsLine(10 + $gameVariables.value(20));
-      var value4 = 5;
-      var arr1 = [1];
-      if (id3 == 1) { var arr1 = [1, 2, 3] };
+      let value4 = 5;
+      let arr1 = [1];
+      if (id3 == 1) { arr1 = [1, 2, 3]; }
       if (id2 == 2) {
         value4 += 1;
-        if (id3 == 1) { var arr1 = [1, 2, 3] };
+        if (id3 == 1) { arr1 = [1, 2, 3]; }
       };
-      var value5 = arr1[getRandomIndex(arr1.length)];
-      var value1 = "51_pattern" + id4 + "_" + value4 + "_" + value5;
-      var value2 = getRandomIndex(21) + 100;
-      var value3 = getRandomIndex(21) + 100;
-      AudioManager.playBgs({ "name": value1, "volume": value2, "pitch": value3, "pan": 0 });
+      const value5 = arr1[getRandomIndex(arr1.length)];
+      let newValue1 = "51_pattern" + id4 + "_" + value4 + "_" + value5;
+      const newValue2 = getRandomIndex(21) + 100;
+      const newValue3 = getRandomIndex(21) + 100;
+      AudioManager.playBgs({ "name": newValue1, "volume": newValue2, "pitch": newValue3, "pan": 0 });
     };
   };
   if (id1 == 2) {//ピストン強
     $gameVariables.setValue(194, $gameVariables.value(194) + 1);
     $gameSystem.setBgsLine($gameVariables.value(194));
-    var value1 = "21_Piston1";
-    var value2 = getRandomIndex(21) + 90;
-    var value3 = getRandomIndex(31) + 120;
+    const value1 = "21_Piston1";
+    const value2 = getRandomIndex(21) + 90;
+    const value3 = getRandomIndex(31) + 120;
     AudioManager.playBgs({ "name": value1, "volume": value2, "pitch": value3, "pan": 0 });
     if (id4 >= 1 && id2 <= 9) {
       $gameSystem.setBgsLine(10 + $gameVariables.value(20));
-      var value4 = 5;
-      var arr1 = [1];
-      if (id3 == 1) { var arr1 = [1, 2, 3] };
+      let value4 = 5;
+      let arr1 = [1];
+      if (id3 == 1) { arr1 = [1, 2, 3]; }
       if (id2 == 2) {
         value4 += 1;
-        if (id3 == 1) { var arr1 = [1, 2, 3] };
+        if (id3 == 1) { arr1 = [1, 2, 3]; }
       };
-      var value5 = arr1[getRandomIndex(arr1.length)];
-      var value1 = "51_pattern" + id4 + "_" + value4 + "_" + value5;
-      var value2 = getRandomIndex(21) + 70;
-      var value3 = getRandomIndex(21) + 110;
-      AudioManager.playBgs({ "name": value1, "volume": value2, "pitch": value3, "pan": 0 });
+      const value5 = arr1[getRandomIndex(arr1.length)];
+      let newValue1 = "51_pattern" + id4 + "_" + value4 + "_" + value5;
+      const newValue2 = getRandomIndex(21) + 70;
+      const newValue3 = getRandomIndex(21) + 110;
+      AudioManager.playBgs({ "name": newValue1, "volume": newValue2, "pitch": newValue3, "pan": 0 });
     };
   };
   if (id1 == 3) {//愛液
     $gameVariables.setValue(194, $gameVariables.value(194) + 1);
     $gameSystem.setBgsLine($gameVariables.value(194));
-    var value1 = "21_LoveJuice";
-    var value2 = getRandomIndex(31) + 80;
-    var value3 = getRandomIndex(41) + 80;
+    const value1 = "21_LoveJuice";
+    const value2 = getRandomIndex(31) + 80;
+    const value3 = getRandomIndex(41) + 80;
     AudioManager.playBgs({ "name": value1, "volume": value2, "pitch": value3, "pan": 0 });
     $gameVariables.setValue(194, $gameVariables.value(194) + 1);
     $gameSystem.setBgsLine($gameVariables.value(194));
-    var value1 = "21_LoveJuice";
-    var value2 = getRandomIndex(31) + 80;
-    var value3 = getRandomIndex(41) + 50;
-    AudioManager.playBgs({ "name": value1, "volume": value2, "pitch": value3, "pan": 0 });
+    let newValue1 = "21_LoveJuice";
+    const newValue2 = getRandomIndex(31) + 80;
+    const newValue3 = getRandomIndex(41) + 50;
+    AudioManager.playBgs({ "name": newValue1, "volume": newValue2, "pitch": newValue3, "pan": 0 });
     if (id4 >= 1 && id2 <= 9) {
       $gameSystem.setBgsLine(10 + $gameVariables.value(20));
-      var value4 = 7;
-      var arr1 = [1];
-      if (id3 == 1) { var arr1 = [1, 2, 3] };
+      let value4 = 7;
+      let arr1 = [1];
+      if (id3 == 1) { arr1 = [1, 2, 3]; }
       if (id2 == 2) {
         value4 += 1;
-        if (id3 == 1) { var arr1 = [1, 2] };
+        if (id3 == 1) { arr1 = [1, 2]; }
       };
-      var value5 = arr1[getRandomIndex(arr1.length)];
-      var value1 = "51_pattern" + id4 + "_" + value4 + "_" + value5;
-      var value2 = getRandomIndex(21) + 70;
-      var value3 = getRandomIndex(21) + 100;
-      AudioManager.playBgs({ "name": value1, "volume": value2, "pitch": value3, "pan": 0 });
+      const value5 = arr1[getRandomIndex(arr1.length)];
+      newValue1 = "51_pattern" + id4 + "_" + value4 + "_" + value5;
+      const newNewValue2 = getRandomIndex(21) + 70;
+      const newNewValue3 = getRandomIndex(21) + 100;
+      AudioManager.playBgs({ "name": newValue1, "volume": newNewValue2, "pitch": newNewValue3, "pan": 0 });
     };
   };
   if (id1 == 4) {//キス
     $gameVariables.setValue(194, $gameVariables.value(194) + 1);
     $gameSystem.setBgsLine($gameVariables.value(194));
-    var value1 = "21_LoveJuice";
-    var value2 = getRandomIndex(31) + 80;
-    var value3 = getRandomIndex(41) + 80;
+    const value1 = "21_LoveJuice";
+    const value2 = getRandomIndex(31) + 80;
+    const value3 = getRandomIndex(41) + 80;
     AudioManager.playBgs({ "name": value1, "volume": value2, "pitch": value3, "pan": 0 });
     $gameVariables.setValue(194, $gameVariables.value(194) + 1);
     $gameSystem.setBgsLine($gameVariables.value(194));
-    var value1 = "21_LoveJuice";
-    var value2 = getRandomIndex(31) + 80;
-    var value3 = getRandomIndex(41) + 50;
-    AudioManager.playBgs({ "name": value1, "volume": value2, "pitch": value3, "pan": 0 });
+    let newValue1 = "21_LoveJuice";
+    const newValue2 = getRandomIndex(31) + 80;
+    const newValue3 = getRandomIndex(41) + 50;
+    AudioManager.playBgs({ "name": newValue1, "volume": newValue2, "pitch": newValue3, "pan": 0 });
     if (id4 >= 1 && id2 <= 9) {
       $gameSystem.setBgsLine(10 + $gameVariables.value(20));
-      var value4 = 1;
-      var arr1 = [1];
-      if (id3 == 1) { var arr1 = [1, 2, 3] };
+      let value4 = 1;
+      let arr1 = [1];
+      if (id3 == 1) { arr1 = [1, 2, 3]; }
       if (id2 == 2) {
         value4 += 1;
-        if (id3 == 1) { var arr1 = [1, 2, 3, 4, 5, 6] };
+        if (id3 == 1) { arr1 = [1, 2, 3, 4, 5, 6]; }
       };
-      var value5 = arr1[getRandomIndex(arr1.length)];
-      var value1 = "51_pattern" + id4 + "_" + value4 + "_" + value5;
-      var value2 = getRandomIndex(21) + 70;
-      var value3 = getRandomIndex(31) + 90;
-      AudioManager.playBgs({ "name": value1, "volume": value2, "pitch": value3, "pan": 0 });
+      const value5 = arr1[getRandomIndex(arr1.length)];
+      newValue1 = "51_pattern" + id4 + "_" + value4 + "_" + value5;
+      const newNewValue2 = getRandomIndex(21) + 70;
+      const newNewValue3 = getRandomIndex(31) + 90;
+      AudioManager.playBgs({ "name": newValue1, "volume": newNewValue2, "pitch": newNewValue3, "pan": 0 });
     };
   };
   if (id1 == 5) {//フェラ
     $gameVariables.setValue(194, $gameVariables.value(194) + 1);
     $gameSystem.setBgsLine($gameVariables.value(194));
-    var value1 = "21_LoveJuice";
-    var value2 = getRandomIndex(31) + 80;
-    var value3 = getRandomIndex(41) + 80;
+    const value1 = "21_LoveJuice";
+    const value2 = getRandomIndex(31) + 80;
+    const value3 = getRandomIndex(41) + 80;
     AudioManager.playBgs({ "name": value1, "volume": value2, "pitch": value3, "pan": 0 });
     $gameVariables.setValue(194, $gameVariables.value(194) + 1);
     $gameSystem.setBgsLine($gameVariables.value(194));
-    var value1 = "21_LoveJuice";
-    var value2 = getRandomIndex(31) + 80;
-    var value3 = getRandomIndex(41) + 50;
-    AudioManager.playBgs({ "name": value1, "volume": value2, "pitch": value3, "pan": 0 });
+    let newValue1 = "21_LoveJuice";
+    const newValue2 = getRandomIndex(31) + 80;
+    const newValue3 = getRandomIndex(41) + 50;
+    AudioManager.playBgs({ "name": newValue1, "volume": newValue2, "pitch": newValue3, "pan": 0 });
     if (id4 >= 1) {
       $gameSystem.setBgsLine(10 + $gameVariables.value(20));
-      var value4 = 3;
-      var arr1 = [1];
-      if (id3 == 1) { var arr1 = [1, 2, 3, 4, 5, 6, 7, 8] };
+      let value4 = 3;
+      let arr1 = [1];
+      if (id3 == 1) { arr1 = [1, 2, 3, 4, 5, 6, 7, 8]; }
       if (id2 == 2) {
         value4 += 1;
-        if (id3 == 1) { var arr1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] };
+        if (id3 == 1) { arr1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; }
       };
-      var value5 = arr1[getRandomIndex(arr1.length)];
-      var value1 = "51_pattern" + id4 + "_" + value4 + "_" + value5;
-      var value2 = getRandomIndex(21) + 70;
-      var value3 = getRandomIndex(31) + 90;
-      AudioManager.playBgs({ "name": value1, "volume": value2, "pitch": value3, "pan": 0 });
+      const value5 = arr1[getRandomIndex(arr1.length)];
+      newValue1 = "51_pattern" + id4 + "_" + value4 + "_" + value5;
+      const newNewValue2 = getRandomIndex(21) + 70;
+      const newNewValue3 = getRandomIndex(21) + 90;
+      AudioManager.playBgs({ "name": newValue1, "volume": newNewValue2, "pitch": newNewValue3, "pan": 0 });
     };
   };
   if (id1 == 6) {//揉み
     $gameVariables.setValue(194, $gameVariables.value(194) + 1);
     $gameSystem.setBgsLine($gameVariables.value(194));
-    var value1 = "21_BustKnead";
-    var value2 = getRandomIndex(11) + 10;
-    var value3 = getRandomIndex(41) + 80;
+    const value1 = "21_BustKnead";
+    const value2 = getRandomIndex(11) + 10;
+    const value3 = getRandomIndex(41) + 80;
     AudioManager.playBgs({ "name": value1, "volume": value2, "pitch": value3, "pan": 0 });
     if (id4 >= 1 && id2 <= 9) {
       $gameSystem.setBgsLine(10 + $gameVariables.value(20));
-      var value4 = 7;
-      var arr1 = [1];
-      if (id3 == 1) { var arr1 = [1, 2, 3] };
+      let value4 = 7;
+      let arr1 = [1];
+      if (id3 == 1) { arr1 = [1, 2, 3]; }
       if (id2 == 2) {
         value4 += 1;
-        if (id3 == 1) { var arr1 = [1, 2] };
+        if (id3 == 1) { arr1 = [1, 2]; }
       };
-      var value5 = arr1[getRandomIndex(arr1.length)];
-      var value1 = "51_pattern" + id4 + "_" + value4 + "_" + value5;
-      var value2 = getRandomIndex(21) + 70;
-      var value3 = getRandomIndex(21) + 100;
-      AudioManager.playBgs({ "name": value1, "volume": value2, "pitch": value3, "pan": 0 });
+      const value5 = arr1[getRandomIndex(arr1.length)];
+      const newValue1 = "51_pattern" + id4 + "_" + value4 + "_" + value5;
+      const newValue2 = getRandomIndex(21) + 70;
+      const newValue3 = getRandomIndex(21) + 100;
+      AudioManager.playBgs({ "name": newValue1, "volume": newValue2, "pitch": newValue3, "pan": 0 });
     };
   };
   if (id1 == 7) {//機械振動
     $gameVariables.setValue(194, $gameVariables.value(194) + 1);
     $gameSystem.setBgsLine($gameVariables.value(194));
-    var value1 = "21_HandyMassager2";
-    var value2 = getRandomIndex(21) + 50;
-    var value3 = getRandomIndex(21) + 80;
+    const value1 = "21_HandyMassager2";
+    const value2 = getRandomIndex(21) + 50;
+    const value3 = getRandomIndex(21) + 80;
     AudioManager.playBgs({ "name": value1, "volume": value2, "pitch": value3, "pan": 0 });
     if (id4 >= 1 && id2 <= 9) {
       $gameSystem.setBgsLine(10 + $gameVariables.value(20));
-      var value4 = 7;
-      var arr1 = [1];
-      if (id3 == 1) { var arr1 = [1, 2, 3] };
+      let value4 = 7;
+      let arr1 = [1];
+      if (id3 == 1) { arr1 = [1, 2, 3]; }
       if (id2 == 2) {
         value4 += 1;
-        if (id3 == 1) { var arr1 = [1, 2] };
+        if (id3 == 1) { arr1 = [1, 2]; }
       };
-      var value5 = arr1[getRandomIndex(arr1.length)];
-      var value1 = "51_pattern" + id4 + "_" + value4 + "_" + value5;
-      var value2 = getRandomIndex(21) + 70;
-      var value3 = getRandomIndex(21) + 100;
-      AudioManager.playBgs({ "name": value1, "volume": value2, "pitch": value3, "pan": 0 });
+      const value5 = arr1[getRandomIndex(arr1.length)];
+      const newValue1 = "51_pattern" + id4 + "_" + value4 + "_" + value5;
+      const newValue2 = getRandomIndex(21) + 70;
+      const newValue3 = getRandomIndex(21) + 100;
+      AudioManager.playBgs({ "name": newValue1, "volume": newValue2, "pitch": newValue3, "pan": 0 });
     };
   };
   if (id1 == 8) {//機械振動激しく
     $gameVariables.setValue(194, $gameVariables.value(194) + 1);
     $gameSystem.setBgsLine($gameVariables.value(194));
-    var value1 = "21_HandyMassager2";
-    var value2 = getRandomIndex(21) + 60;
-    var value3 = getRandomIndex(31) + 100;
+    const value1 = "21_HandyMassager2";
+    const value2 = getRandomIndex(21) + 60;
+    const value3 = getRandomIndex(31) + 100;
     AudioManager.playBgs({ "name": value1, "volume": value2, "pitch": value3, "pan": 0 });
     if (id4 >= 1 && id2 <= 9) {
       $gameSystem.setBgsLine(10 + $gameVariables.value(20));
-      var value4 = 7;
-      var arr1 = [1];
-      if (id3 == 1) { var arr1 = [1, 2, 3] };
+      let value4 = 7;
+      let arr1 = [1];
+      if (id3 == 1) { arr1 = [1, 2, 3]; }
       if (id2 == 2) {
         value4 += 1;
-        if (id3 == 1) { var arr1 = [1, 2] };
+        if (id3 == 1) { arr1 = [1, 2]; }
       };
-      var value5 = arr1[getRandomIndex(arr1.length)];
-      var value1 = "51_pattern" + id4 + "_" + value4 + "_" + value5;
-      var value2 = getRandomIndex(21) + 70;
-      var value3 = getRandomIndex(21) + 100;
-      AudioManager.playBgs({ "name": value1, "volume": value2, "pitch": value3, "pan": 0 });
+      const value5 = arr1[getRandomIndex(arr1.length)];
+      const newValue1 = "51_pattern" + id4 + "_" + value4 + "_" + value5;
+      const newValue2 = getRandomIndex(21) + 70;
+      const newValue3 = getRandomIndex(21) + 100;
+      AudioManager.playBgs({ "name": newValue1, "volume": newValue2, "pitch": newValue3, "pan": 0 });
     };
   };
   if (id1 == 11) {//挿入
     adv_partDirectPlay(7);
     if (valueSexWait == 0) {
-      var value1 = getRandomIndex(41) + 160;
-      var value2 = getRandomIndex(21) + 50;
-      var value3 = getRandomIndex(5) + 6;
+      let value1 = getRandomIndex(41) + 160;
+      let value2 = getRandomIndex(21) + 50;
+      let value3 = getRandomIndex(5) + 6;
       $gameScreen.startFlash([255, 119, 255, value1], value2);
       $gameScreen.startShake(value3, value3, value2);
-      var array = ['Z_zamen1', 'Z_zamen2'];
-      var value1 = array[getRandomIndex(array.length)];
-      var value2 = getRandomIndex(21) + 100;
-      var value3 = getRandomIndex(41) + 80;
+      let arr1 = ['Z_zamen1', 'Z_zamen2'];
+      value1 = arr1[getRandomIndex(arr1.length)];
+      value2 = getRandomIndex(21) + 100;
+      value3 = getRandomIndex(41) + 80;
       AudioManager.playSe({ "name": value1, "volume": value2, "pitch": value3, "pan": 0 });
     };
     if (valueSexWait >= 1) {
-      var value1 = getRandomIndex(41) + 160;
-      var value2 = getRandomIndex(21) + 50;
+      let value1 = getRandomIndex(41) + 160;
+      let value2 = getRandomIndex(21) + 50;
       $gameScreen.startFlash([255, 119, 255, value1], value2);
-      var array = ['Z_zamen1', 'Z_zamen2'];
-      var value1 = array[getRandomIndex(array.length)];
-      var value2 = getRandomIndex(21) + 100;
-      var value3 = getRandomIndex(41) + 80;
+      let arr1 = ['Z_zamen1', 'Z_zamen2'];
+      value1 = arr1[getRandomIndex(arr1.length)];
+      value2 = getRandomIndex(21) + 100;
+      let value3 = getRandomIndex(41) + 80;
       AudioManager.playSe({ "name": value1, "volume": value2, "pitch": value3, "pan": 0 });
-      var array = ['Z_Insert'];
-      var value1 = array[getRandomIndex(array.length)];
-      var value2 = getRandomIndex(21) + 150;
-      var value3 = getRandomIndex(41) + 80;
+      let arr2 = ['Z_Insert'];
+      value1 = arr2[getRandomIndex(arr2.length)];
+      value2 = getRandomIndex(21) + 150;
+      value3 = getRandomIndex(41) + 80;
       AudioManager.playSe({ "name": value1, "volume": value2, "pitch": value3, "pan": 0 });
     };
     if (valueSexWait >= 1) {
@@ -2689,30 +2689,30 @@ sex_direction = function (id1, id2, id3) {
     adv_partDirectSet(0);
     sex_direction(0);//集中線終了
     if (valueSexWait == 0) {
-      var value1 = getRandomIndex(41) + 160;
-      var value2 = getRandomIndex(21) + 50;
-      var value3 = getRandomIndex(5) + 6;
+      let value1 = getRandomIndex(41) + 160;
+      let value2 = getRandomIndex(21) + 50;
+      let value3 = getRandomIndex(5) + 6;
       $gameScreen.startFlash([255, 119, 255, value1], value2);
       $gameScreen.startShake(value3, value3, value2);
-      var array = ['Z_zamen'];
-      var value1 = array[getRandomIndex(array.length)];
-      var value2 = getRandomIndex(21) + 100;
-      var value3 = getRandomIndex(51) + 100;
+      let arr1 = ['Z_zamen'];
+      value1 = arr1[getRandomIndex(arr1.length)];
+      value2 = getRandomIndex(21) + 100;
+      value3 = getRandomIndex(51) + 100;
       AudioManager.playSe({ "name": value1, "volume": value2, "pitch": value3, "pan": 0 });
     };
     if (valueSexWait >= 1) {
-      var value1 = getRandomIndex(41) + 160;
-      var value2 = getRandomIndex(21) + 50;
+      let value1 = getRandomIndex(41) + 160;
+      let value2 = getRandomIndex(21) + 50;
       $gameScreen.startFlash([255, 119, 255, value1], value2);
-      var array = ['Z_zamen1', 'Z_zamen2'];
-      var value1 = array[getRandomIndex(array.length)];
-      var value2 = getRandomIndex(21) + 100;
-      var value3 = getRandomIndex(41) + 80;
+      let arr1 = ['Z_zamen1', 'Z_zamen2'];
+      value1 = arr1[getRandomIndex(arr1.length)];
+      value2 = getRandomIndex(21) + 100;
+      let value3 = getRandomIndex(41) + 80;
       AudioManager.playSe({ "name": value1, "volume": value2, "pitch": value3, "pan": 0 });
-      var array = ['Z_zamen1', 'Z_zamen2'];
-      var value1 = array[getRandomIndex(array.length)];
-      var value2 = getRandomIndex(21) + 100;
-      var value3 = getRandomIndex(41) + 80;
+      let arr2 = ['Z_zamen1', 'Z_zamen2'];
+      value1 = arr2[getRandomIndex(arr2.length)];
+      value2 = getRandomIndex(21) + 100;
+      value3 = getRandomIndex(41) + 80;
       AudioManager.playSe({ "name": value1, "volume": value2, "pitch": value3, "pan": 0 });
     };
     if (valueSexWait >= 1) {
@@ -2726,30 +2726,30 @@ sex_direction = function (id1, id2, id3) {
     adv_partDirectSet(0);
     sex_direction(0);//集中線終了
     if (valueSexWait == 0) {
-      var value1 = getRandomIndex(41) + 160;
-      var value2 = getRandomIndex(21) + 50;
-      var value3 = getRandomIndex(5) + 6;
+      let value1 = getRandomIndex(41) + 160;
+      let value2 = getRandomIndex(21) + 50;
+      let value3 = getRandomIndex(5) + 6;
       $gameScreen.startFlash([255, 119, 255, value1], value2);
       $gameScreen.startShake(value3, value3, value2);
-      var array = ['Z_zamen1', 'Z_zamen2'];
-      var value1 = array[getRandomIndex(array.length)];
-      var value2 = getRandomIndex(21) + 100;
-      var value3 = getRandomIndex(41) + 80;
+      let arr1 = ['Z_zamen1', 'Z_zamen2'];
+      value1 = arr1[getRandomIndex(arr1.length)];
+      value2 = getRandomIndex(21) + 100;
+      value3 = getRandomIndex(41) + 80;
       AudioManager.playSe({ "name": value1, "volume": value2, "pitch": value3, "pan": 0 });
     };
     if (valueSexWait >= 1) {
-      var value1 = getRandomIndex(41) + 160;
-      var value2 = getRandomIndex(21) + 50;
+      let value1 = getRandomIndex(41) + 160;
+      let value2 = getRandomIndex(21) + 50;
       $gameScreen.startFlash([255, 119, 255, value1], value2);
-      var array = ['Z_zamen1', 'Z_zamen2'];
-      var value1 = array[getRandomIndex(array.length)];
-      var value2 = getRandomIndex(21) + 100;
-      var value3 = getRandomIndex(41) + 80;
+      let arr1 = ['Z_zamen1', 'Z_zamen2'];
+      value1 = arr1[getRandomIndex(arr1.length)];
+      value2 = getRandomIndex(21) + 100;
+      let value3 = getRandomIndex(41) + 80;
       AudioManager.playSe({ "name": value1, "volume": value2, "pitch": value3, "pan": 0 });
-      var array = ['Z_zamen1', 'Z_zamen2'];
-      var value1 = array[getRandomIndex(array.length)];
-      var value2 = getRandomIndex(21) + 100;
-      var value3 = getRandomIndex(41) + 80;
+      let arr2 = ['Z_zamen1', 'Z_zamen2'];
+      value1 = arr2[getRandomIndex(arr2.length)];
+      value2 = getRandomIndex(21) + 100;
+      value3 = getRandomIndex(41) + 80;
       AudioManager.playSe({ "name": value1, "volume": value2, "pitch": value3, "pan": 0 });
     };
     if (valueSexWait >= 1) {
@@ -2759,31 +2759,31 @@ sex_direction = function (id1, id2, id3) {
     };
   };
   if (id1 == 51) {//写真撮影
-    var value2 = 'ScreenWhiteOut';
+    const value2 = 'ScreenWhiteOut';
     $gameScreen.showPicture(id2, value2, 1, 640, 384, 100, 100, 250, 0);
     $gameScreen.movePicture(id2, 1, 640, 384, 100, 100, 0, 0, 20);
-    var value1 = 'ZH_Photograph';
+    const value1 = 'ZH_Photograph';
     AudioManager.playSe({ "name": value1, "volume": 100, "pitch": 100, "pan": 0 });
     valueSexWait = 30;
   };
   if (id1 == 52) {//眼パチ閉
-    var value2 = 'ScreenBlackOut';
+    const value2 = 'ScreenBlackOut';
     $gameScreen.showPicture(id2, value2, 1, 640, 384, 100, 100, 255, 0);
-    var value3 = 'SceneCloseOpenEyes';
+    const value3 = 'SceneCloseOpenEyes';
     picture_fade1(id2, "fadeIn", value3, id3, 5);
     valueSexWait = id3;
   };
   if (id1 == 53) {//眼パチ開く
-    var value2 = 'ScreenBlackOut';
+    const value2 = 'ScreenBlackOut';
     $gameScreen.showPicture(id2, value2, 1, 640, 384, 100, 100, 255, 0);
-    var value3 = 'SceneCloseOpenEyes';
+    const value3 = 'SceneCloseOpenEyes';
     picture_fade1(id2, "fadeOut", value3, id3, 5);
     valueSexWait = id3;
   };
   if (id1 == 54) {//薄くピンク点灯
     $gameScreen.setPicturesAnimation(2, id3 / 2, "横", id3);
     //$gameScreen.setPicturesAnimation(2, 1, "横", id3);
-    var value2 = 'ScreenPinkFlash';
+    const value2 = 'ScreenPinkFlash';
     $gameScreen.showPicture(111, value2, 1, 640, 384, 100, 100, id2, 3);
     $gameScreen.picture(111).startAnimationFrame(1, true, [1, 1, 1, 2]);
   };
