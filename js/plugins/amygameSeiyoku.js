@@ -382,57 +382,58 @@ ${arr1[8]} ${arr1[9]}`);
 };
 
 //MVP計算用
-battlerecord_mvp = function(id1){
+battlerecord_mvp = function (id1) {
 
-var arr1 = [];var arr2 = [];var arr3 = [];var arr4 = [];
-var arr5 = [];var arr6 = [];var arr7 = [];var arr8 = [];
-for (var i = 0; i <= $gameParty.members().length-1; i++) {
-  var value1 = $gameParty.members()[i]._actorId;
-  var actor = $gameActors.actor(value1);
-  arr1.push(actor.getAllKillEnemyCounter());
-  arr2.push(actor.attackDamageMax);
-  arr3.push(actor.attackDamageSum);
-  arr4.push($gameVariables.value(351)[value1]);
-  arr5.push(actor.acceptDamageMax);
-  arr6.push(actor.acceptDamageSum);
-  arr7.push(actor.deadCounter);
-  arr8.push($gameVariables.value(298)[value1]);
-};
+  const arr1 = []; const arr2 = []; const arr3 = []; const arr4 = [];
+  const arr5 = []; const arr6 = []; const arr7 = []; const arr8 = [];
+  const gamePartyMembers = $gameParty.members();
+  for (let i = 0, end = gamePartyMembers.length - 1; i <= end; i++) {
+    const value1 = gamePartyMembers[i]._actorId;
+    const actor = $gameActors.actor(value1);
+    arr1.push(actor.getAllKillEnemyCounter());
+    arr2.push(actor.attackDamageMax);
+    arr3.push(actor.attackDamageSum);
+    arr4.push($gameVariables.value(351)[value1]);
+    arr5.push(actor.acceptDamageMax);
+    arr6.push(actor.acceptDamageSum);
+    arr7.push(actor.deadCounter);
+    arr8.push($gameVariables.value(298)[value1]);
+  };
 
-var max1 = arr1.reduce(function(a,b){  
-return Math.max(a,b);
-});
-$gameVariables.value(350)[1] = max1;
-var max2 = arr2.reduce(function(a,b){  
-return Math.max(a,b);
-});
-$gameVariables.value(350)[2] = max2;
-var max3 = arr3.reduce(function(a,b){  
-return Math.max(a,b);
-});
-$gameVariables.value(350)[3] = max3;
-var max4 = arr4.reduce(function(a,b){  
-return Math.max(a,b);
-});
-$gameVariables.value(350)[4] = max4;
-var max5 = arr5.reduce(function(a,b){  
-return Math.max(a,b);
-});
-$gameVariables.value(350)[5] = max5;
-var max6 = arr6.reduce(function(a,b){  
-return Math.max(a,b);
-});
-$gameVariables.value(350)[6] = max6;
-var max7 = arr7.reduce(function(a,b){  
-return Math.max(a,b);
-});
-$gameVariables.value(350)[7] = max7;
-var max8 = arr8.reduce(function(a,b){  
-return Math.max(a,b);
-});
-$gameVariables.value(350)[8] = max8;
+  const max1 = arr1.reduce(function (a, b) {
+    return Math.max(a, b);
+  });
+  $gameVariables.value(350)[1] = max1;
+  const max2 = arr2.reduce(function (a, b) {
+    return Math.max(a, b);
+  });
+  $gameVariables.value(350)[2] = max2;
+  const max3 = arr3.reduce(function (a, b) {
+    return Math.max(a, b);
+  });
+  $gameVariables.value(350)[3] = max3;
+  const max4 = arr4.reduce(function (a, b) {
+    return Math.max(a, b);
+  });
+  $gameVariables.value(350)[4] = max4;
+  const max5 = arr5.reduce(function (a, b) {
+    return Math.max(a, b);
+  });
+  $gameVariables.value(350)[5] = max5;
+  const max6 = arr6.reduce(function (a, b) {
+    return Math.max(a, b);
+  });
+  $gameVariables.value(350)[6] = max6;
+  const max7 = arr7.reduce(function (a, b) {
+    return Math.max(a, b);
+  });
+  $gameVariables.value(350)[7] = max7;
+  const max8 = arr8.reduce(function (a, b) {
+    return Math.max(a, b);
+  });
+  $gameVariables.value(350)[8] = max8;
 
-};
+  };
 
 //☆☆アクター変数20の通常ステータス表示,0と4ウィンド使用
 actor_stateshyouji = function () {
