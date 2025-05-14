@@ -2514,7 +2514,7 @@ function actionType0SexDirection() {
 
 // Abstract base class for sex action sounds
 class SexActionSound {
-  constructor(actionName, baseSound, volumeOffset, pitchOffset, patternStrength, patternVolumeOffset, patternPitchOffset, useSecondSound = false, secondSound = null) {
+  constructor(actionName, baseSound, volumeOffset, pitchOffset, patternStrength, patternVolumeOffset, patternPitchOffset, options = {}) {
     this.actionName = actionName;
     this.baseSound = baseSound;
     this.volumeOffset = volumeOffset;
@@ -2522,8 +2522,14 @@ class SexActionSound {
     this.patternStrength = patternStrength;
     this.patternVolumeOffset = patternVolumeOffset;
     this.patternPitchOffset = patternPitchOffset;
-    this.useSecondSound = useSecondSound;
-    this.secondSound = secondSound || baseSound;
+    
+    // Default options
+    this.useSecondSound = options.useSecondSound || false;
+    this.secondSound = options.secondSound || baseSound;
+    this.secondVolumeOffset = options.secondVolumeOffset || this.volumeOffset;
+    this.secondPitchOffset = options.secondPitchOffset || (this.pitchOffset - 30); // Typically lower pitch for second sound
+    this.volumeRandomRange = options.volumeRandomRange || 21;
+    this.pitchRandomRange = options.pitchRandomRange || 31;
   }
   
   play(voicePatternNum, pistonIntensity, patternVariant) {
@@ -2532,16 +2538,16 @@ class SexActionSound {
     $gameSystem.setBgsLine($gameVariables.value(194));
     
     // Play the base sound (piston, love juice, etc)
-    const soundVolume = getRandomIndex(21) + this.volumeOffset;
-    const soundPitch = getRandomIndex(31) + this.pitchOffset;
+    const soundVolume = getRandomIndex(this.volumeRandomRange) + this.volumeOffset;
+    const soundPitch = getRandomIndex(this.pitchRandomRange) + this.pitchOffset;
     AudioManager.playBgs({ "name": this.baseSound, "volume": soundVolume, "pitch": soundPitch, "pan": 0 });
 
     // Play second sound if enabled
     if (this.useSecondSound) {
       $gameVariables.setValue(194, $gameVariables.value(194) + 1);
       $gameSystem.setBgsLine($gameVariables.value(194));
-      const secondSoundVolume = getRandomIndex(31) + this.volumeOffset;
-      const secondSoundPitch = getRandomIndex(41) + (this.pitchOffset - 30); // Typically lower pitch for second sound
+      const secondSoundVolume = getRandomIndex(this.volumeRandomRange) + this.secondVolumeOffset;
+      const secondSoundPitch = getRandomIndex(this.pitchRandomRange) + this.secondPitchOffset;
       AudioManager.playBgs({ "name": this.secondSound, "volume": secondSoundVolume, "pitch": secondSoundPitch, "pan": 0 });
     }
 
@@ -2592,13 +2598,16 @@ class StrongPistonSound extends SexActionSound {
 
 class LoveJuiceSound extends SexActionSound {
   constructor() {
-    super("愛液", "21_LoveJuice", 80, 80, 7, 70, 100, true);
+    super("愛液", "21_LoveJuice", 80, 80, 7, 70, 100, { useSecondSound: true });
   }
 }
 
 class KissSound extends SexActionSound {
   constructor() {
-    super("キス", "21_LoveJuice", 80, 80, 1, 70, 90, true, "21_LoveJuice");
+    super("キス", "21_LoveJuice", 80, 80, 1, 70, 90, { 
+      useSecondSound: true, 
+      secondSound: "21_LoveJuice" 
+    });
   }
   
   getPatternOptions(pistonIntensity) {
@@ -2612,12 +2621,21 @@ class FellateSound extends SexActionSound {
     // Base sound "21_LoveJuice" is used with volume offset 80 and pitch offset 80.
     // Initial pattern strength is 3, pattern volume offset is 70, and pattern pitch offset is 90.
     // useSecondSound is true for additional sound with a typically lower pitch.
-    super("フェラ", "21_LoveJuice", 80, 80, 3, 70, 90, true);
+    super("フェラ", "21_LoveJuice", 80, 80, 3, 70, 90, { useSecondSound: true });
   }
   
   // Override to supply the specific pattern options for fellation.
   getPatternOptions(pistonIntensity) {
     return pistonIntensity == 2 ? [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] : [1, 2, 3, 4, 5, 6, 7, 8];
+  }
+}
+
+// New derived class for breast kneading action
+class BustKneadSound extends SexActionSound {
+  constructor() {
+    super("揉み", "21_BustKnead", 10, 80, 7, 70, 100, {
+      volumeRandomRange: 11 // Special randomRange for bust knead
+    });
   }
 }
 
@@ -2627,6 +2645,7 @@ const strongPistonSound = new StrongPistonSound();
 const loveJuiceSound = new LoveJuiceSound();
 const kissSound = new KissSound();
 const fellateSound = new FellateSound();
+const bustKneadSound = new BustKneadSound();
 
 function actionType1SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
   // (actionType 1) ピストン弱
@@ -2655,28 +2674,7 @@ function actionType5SexDirection(pistonIntensity, patternVariant, voicePatternNu
 
 function actionType6SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
   // (actionType 6) 揉み
-  $gameVariables.setValue(194, $gameVariables.value(194) + 1);
-  $gameSystem.setBgsLine($gameVariables.value(194));
-  const bustKneadSound = "21_BustKnead";
-  const bustKneadVolume = getRandomIndex(11) + 10;
-  const bustKneadPitch = getRandomIndex(41) + 80;
-  AudioManager.playBgs({ "name": bustKneadSound, "volume": bustKneadVolume, "pitch": bustKneadPitch, "pan": 0 });
-  
-  if (voicePatternNum >= 1 && pistonIntensity <= 9) {
-    $gameSystem.setBgsLine(10 + $gameVariables.value(20));
-    let bustKneadPatternStrength = 7;
-    let bustKneadPatternOptions = [1];
-    if (patternVariant == 1) { bustKneadPatternOptions = [1, 2, 3]; }
-    if (pistonIntensity == 2) {
-      bustKneadPatternStrength += 1;
-      if (patternVariant == 1) { bustKneadPatternOptions = [1, 2]; }
-    }
-    const chosenBustKneadPatternOption = bustKneadPatternOptions[getRandomIndex(bustKneadPatternOptions.length)];
-    const patternName = "51_pattern" + voicePatternNum + "_" + bustKneadPatternStrength + "_" + chosenBustKneadPatternOption;
-    const patternVolume = getRandomIndex(21) + 70;
-    const patternPitch = getRandomIndex(21) + 100;
-    AudioManager.playBgs({ "name": patternName, "volume": patternVolume, "pitch": patternPitch, "pan": 0 });
-  }
+  bustKneadSound.play(voicePatternNum, pistonIntensity, patternVariant);
 }
 
 function actionType7SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
