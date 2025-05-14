@@ -443,9 +443,10 @@ if(!$gameSwitches.value(496) && !$gameSwitches.value(130) && $gameVariables.valu
   var value1 = 0;
 };
 WindowManager.show(0, value1, 0, 430, 202);
-seiyoku_jougenn();
-
 var actor = $gameActors.actor($gameVariables.value(20));
+
+seiyoku_jougenn1(actor);
+
 var value = $gameVariables.value($gameVariables.value(20)+380);
 var id1 = 400;
 
@@ -585,27 +586,30 @@ if($gameSwitches.value(130)){
 
 };
 //☆☆性欲度上限計算。露出計算時とＨプロフ表示時に一緒にやっておく
-seiyoku_jougenn = function(){
+seiyoku_jougenn = function () {
+  const actorId = $gameVariables.value(20);
+  const gameActor = $gameActors.actor(actorId);
+  seiyoku_jougenn1(gameActor);
+}
+seiyoku_jougenn1 = function (gameActor){
 
-const gameVar20 = $gameVariables.value(20);
-const gameVar20_300 = gameVar20 + 380;
-const gameVar_20_300Array = $gameVariables.value(gameVar20_300);
-gameVar_20_300Array[0] = 0;
-const actor = $gameActors.actor(gameVar20);
-for (const id of valueHstaSuppression) {
-  if(!actor.isLearnedSkill(id)) continue;
-  const skill = $dataSkills[id];
-  if (actor.isLearnedSkill(Number(skill.meta['Hide if Learned Skill']))) continue;
+  const actorVariableIndex = currentActorId + 380;
+  const actorSuppressionValues = $gameVariables.value(actorVariableIndex);
+  actorSuppressionValues[0] = 0;
+  for (const requiredSkillId of valueHstaSuppression) {
+    if (!gameActor.isLearnedSkill(requiredSkillId)) continue;
+    const suppressionSkill = $dataSkills[requiredSkillId];
+    if (gameActor.isLearnedSkill(Number(suppressionSkill.meta['Hide if Learned Skill']))) continue;
 
-  const arr1 = skill.meta['HstaSuppression'].split(',');
-  const arr1_0n = Number(arr1[0]);
-  if (arr1_0n == 0 || arr1_0n == 401) {
-    const value2 = Number(arr1[1]) * 100;
-    if (gameVar_20_300Array[0] == 0 || value2 <= gameVar_20_300Array[0]) {
-      gameVar_20_300Array[0] = value2 - 1;
+    const suppressionParams = suppressionSkill.meta['HstaSuppression'].split(',');
+    const suppressionType = Number(suppressionParams[0]);
+    if (suppressionType == 0 || suppressionType == 401) {
+      const suppressionThreshold = Number(suppressionParams[1]) * 100;
+      if (actorSuppressionValues[0] == 0 || suppressionThreshold <= actorSuppressionValues[0]) {
+        actorSuppressionValues[0] = suppressionThreshold - 1;
+      }
     }
   }
-}
 
 };
 
@@ -647,7 +651,7 @@ rosyutu_genkai1 = function(gameActor){
   $gameVariables.value(gameActor.actorId() + 380)[5] = $gameVariables.value(id);
   $gameVariables.setValue(id,0);
 
-seiyoku_jougenn();
+seiyoku_jougenn1(gameActor);
 
 };
 
@@ -657,12 +661,15 @@ const rosyutu_genzai_ids = [
   471, 472, 473, 474, 475, 476, 477, 478, 479, 480,
   481, 482, 483, 484, 485, 486, 487, 488, 489, 490,
   491, 492, 493, 494, 495, 496, 497, 498, 499, 500];
-rosyutu_genzai = function(){
+rosyutu_genzai = function () {
+  const actorId = $gameVariables.value(20);
+  rosyutu_genzai1(actorId);
+}
+rosyutu_genzai1 = function(actorId){
 
   $gameVariables.setValue(404, 0);
-  const gameVar20 = $gameVariables.value(20);
-  const gameVar20_180 = gameVar20 + 180;
-  const gameVar20_380 = gameVar20 + 380;
+  const actorId_180 = actorId + 180;
+  const actorId_380 = actorId + 380;
   const itemsLen = $dataItems.length;
   for (var i = 1201; i < itemsLen; i++) {
     const item = $dataItems[i];
@@ -674,8 +681,8 @@ rosyutu_genzai = function(){
     const itemMetaClothUncoverCountNum = Number(item.meta['ClothUncoverCount']);
     for (const id of rosyutu_genzai_ids) {
       switch (itemMetaEICSwitchNum) {
-        case gameVar20_180:
-        case gameVar20_380:
+        case actorId_180:
+        case actorId_380:
         case 200:
           break;
         default:
@@ -689,7 +696,7 @@ rosyutu_genzai = function(){
     }
   }
 
-  $gameVariables.value(gameVar20_380)[4] = $gameVariables.value(404);
+  $gameVariables.value(actorId_380)[4] = $gameVariables.value(404);
   $gameVariables.setValue(404, 0);
 };
 
@@ -1216,7 +1223,7 @@ if(id == 3){
 seiyoku_genkai = function(){
 
 seiyoku_jougenn();
-var actor = $gameActors.actor($gameVariables.value(20));
+//var actor = $gameActors.actor($gameVariables.value(20));
 if($gameVariables.value(401) + $gameVariables.value($gameVariables.value(20)+380)[1] >= $gameVariables.value($gameVariables.value(20)+380)[0] && $gameVariables.value($gameVariables.value(20)+380)[0] >= 1){
   if($gameSwitches.value(475)){
     TickerManager.show(`性欲度上限のため、性欲度上昇が抑制された。`);
@@ -1340,7 +1347,7 @@ seiyoku_hosei = function(){
 var actor = $gameActors.actor($gameVariables.value(20));
 //現在。限界露出度設定
 rosyutu_genkai1(actor);
-rosyutu_genzai();
+rosyutu_genzai1(actor.actorId());
 //発情値を設定
 $gameVariables.setValue(402,$gameVariables.value(401));
 //初体験時の相手をＨステ配列41に記録
