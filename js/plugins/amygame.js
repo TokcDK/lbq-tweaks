@@ -6346,23 +6346,23 @@
 
     if (!chestMeta['TchestType']) return;
 
-    const chestOptions = collectChestOptions(chestMeta);
-    const selectedOption = selectRandomChestOption(chestOptions);
+    const chestOptions = collectChestOptionsAnnihilationItemBonus(chestMeta);
+    const selectedOption = selectRandomChestOptionAnnihilationItemBonus(chestOptions);
 
     if (!selectedOption) return;
 
-    const itemData = getItemAndAwardToPlayer(selectedOption);
+    const itemData = getItemAndAwardToPlayerAnnihilationItemBonus(selectedOption);
 
     // displayBonusMessage
 
     const item = `\\C[24]\x1bI[${itemData.iconIndex}]${itemData.name}\\C[0]`;
     valueWordSet1 = `全滅ボーナスとして${item}を入手した！`;
 
-    checkForRareItemFlags(chestMeta, selectedOption.itemIndex);
+    checkForRareItemFlagsAnnihilationItemBonus(chestMeta, selectedOption.itemIndex);
   };
 
   // Collects all possible chest reward options from the chest metadata
-  collectChestOptions = function (chestMeta) {
+  collectChestOptionsAnnihilationItemBonus = function (chestMeta) {
     const options = [];
 
     // Add standard chest items
@@ -6400,13 +6400,13 @@
   };
 
   // Selects a random option from the available chest options
-  selectRandomChestOption = function (options) {
+  selectRandomChestOptionAnnihilationItemBonus = function (options) {
     if (options.length === 0) return null;
     return options[getRandomIndex(options.length)];
   };
 
   // Retrieves the item based on type and index, then gives it to the player
-  getItemAndAwardToPlayer = function (option) {
+  getItemAndAwardToPlayerAnnihilationItemBonus = function (option) {
     const itemArray = getItemEquipmentSource(option.type);
     const item = itemArray[option.itemIndex];
 
@@ -6420,7 +6420,7 @@
   };
 
   // Checks if the selected item is a rare item and sets appropriate flags
-  checkForRareItemFlags = function (chestMeta, selectedItemIndex) {
+  checkForRareItemFlagsAnnihilationItemBonus = function (chestMeta, selectedItemIndex) {
     // Check standard rare item flag
     if (chestMeta['TchestRere'] && selectedItemIndex == Number(chestMeta['TchestRere'])) {
       $gameSwitches.setValue(439, true);
