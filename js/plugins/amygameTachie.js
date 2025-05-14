@@ -697,7 +697,7 @@ tachie_settei3 = function (gameActor) {
     }
     else { // Normal character processing
       console.debug("tachie_settei3: Actor is not in doll state, processing normal female character");
-      rosyutu_genkai(); // Calculate exposure limits
+      rosyutu_genkai1(gameActor); // Calculate exposure limits
       console.debug("tachie_settei3: Calculated exposure limits");
       rosyutu_genzai(); // Calculate current exposure
       console.debug("tachie_settei3: Calculated current exposure");
