@@ -2639,6 +2639,29 @@ class BustKneadSound extends SexActionSound {
   }
 }
 
+// New derived class for machine vibration action
+class MachineVibrationSound extends SexActionSound {
+  constructor() {
+    // Using base sound "21_HandyMassager2" with volume offset 50 and pitch offset 80.
+    // Initial pattern strength is 7, pattern volume offset is 70, and pattern pitch offset is 100.
+    super("機械振動", "21_HandyMassager2", 50, 80, 7, 70, 100);
+  }
+}
+
+// New derived class for intense machine vibration action
+class IntenseMachineVibrationSound extends SexActionSound {
+  constructor() {
+    // Using base sound "21_HandyMassager2" with volume offset 60 and pitch offset 100.
+    // Initial pattern strength is 7, pattern volume offset is 70, and pattern pitch offset is 100.
+    super("機械振動激しく", "21_HandyMassager2", 60, 100, 7, 70, 100);
+  }
+
+  // Override getPatternOptions to provide the specific pattern options for intense vibration
+  getPatternOptions(pistonIntensity) {
+    return pistonIntensity == 2 ? [1, 2] : [1, 2, 3];
+  }
+}
+
 // Create instances for reuse
 const weakPistonSound = new WeakPistonSound();
 const strongPistonSound = new StrongPistonSound();
@@ -2646,6 +2669,8 @@ const loveJuiceSound = new LoveJuiceSound();
 const kissSound = new KissSound();
 const fellateSound = new FellateSound();
 const bustKneadSound = new BustKneadSound();
+const machineVibrationSound = new MachineVibrationSound();
+const intenseMachineVibrationSound = new IntenseMachineVibrationSound();
 
 function actionType1SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
   // (actionType 1) ピストン弱
@@ -2679,54 +2704,13 @@ function actionType6SexDirection(pistonIntensity, patternVariant, voicePatternNu
 
 function actionType7SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
   // (actionType 7) 機械振動
-  $gameVariables.setValue(194, $gameVariables.value(194) + 1);
-  $gameSystem.setBgsLine($gameVariables.value(194));
-  const massagerSound = "21_HandyMassager2";
-  const massagerVolume = getRandomIndex(21) + 50;
-  const massagerPitch = getRandomIndex(21) + 80;
-  AudioManager.playBgs({ "name": massagerSound, "volume": massagerVolume, "pitch": massagerPitch, "pan": 0 });
-  
-  if (voicePatternNum >= 1 && pistonIntensity <= 9) {
-    $gameSystem.setBgsLine(10 + $gameVariables.value(20));
-    let massagerPatternStrength = 7;
-    let massagerPatternOptions = [1];
-    if (patternVariant == 1) { massagerPatternOptions = [1, 2, 3]; }
-    if (pistonIntensity == 2) {
-      massagerPatternStrength += 1;
-      if (patternVariant == 1) { massagerPatternOptions = [1, 2]; }
-    }
-    const chosenMassagerPatternOption = massagerPatternOptions[getRandomIndex(massagerPatternOptions.length)];
-    const patternName = "51_pattern" + voicePatternNum + "_" + massagerPatternStrength + "_" + chosenMassagerPatternOption;
-    const patternVolume = getRandomIndex(21) + 70;
-    const patternPitch = getRandomIndex(21) + 100;
-    AudioManager.playBgs({ "name": patternName, "volume": patternVolume, "pitch": patternPitch, "pan": 0 });
-  }
+  // This action plays the machine vibration sound using the instance of MachineVibrationSound.
+  machineVibrationSound.play(voicePatternNum, pistonIntensity, patternVariant);
 }
 
 function actionType8SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
   // (actionType 8) 機械振動激しく
-  $gameVariables.setValue(194, $gameVariables.value(194) + 1);
-  $gameSystem.setBgsLine($gameVariables.value(194));
-  const massagerStrongSound = "21_HandyMassager2";
-  const strongMassagerVolume = getRandomIndex(21) + 60;
-  const strongMassagerPitch = getRandomIndex(31) + 100;
-  AudioManager.playBgs({ "name": massagerStrongSound, "volume": strongMassagerVolume, "pitch": strongMassagerPitch, "pan": 0 });
-  
-  if (voicePatternNum >= 1 && pistonIntensity <= 9) {
-    $gameSystem.setBgsLine(10 + $gameVariables.value(20));
-    let massagerStrongPatternStrength = 7;
-    let massagerStrongPatternOptions = [1];
-    if (patternVariant == 1) { massagerStrongPatternOptions = [1, 2, 3]; }
-    if (pistonIntensity == 2) {
-      massagerStrongPatternStrength += 1;
-      if (patternVariant == 1) { massagerStrongPatternOptions = [1, 2]; }
-    }
-    const chosenMassagerStrongPatternOption = massagerStrongPatternOptions[getRandomIndex(massagerStrongPatternOptions.length)];
-    const patternName = "51_pattern" + voicePatternNum + "_" + massagerStrongPatternStrength + "_" + chosenMassagerStrongPatternOption;
-    const patternVolume = getRandomIndex(21) + 70;
-    const patternPitch = getRandomIndex(21) + 100;
-    AudioManager.playBgs({ "name": patternName, "volume": patternVolume, "pitch": patternPitch, "pan": 0 });
-  }
+  intenseMachineVibrationSound.play(voicePatternNum, pistonIntensity, patternVariant);
 }
 
 function actionType11SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
