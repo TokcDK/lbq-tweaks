@@ -2514,7 +2514,7 @@ function actionType0SexDirection() {
 
 // Abstract base class for sex action sounds
 class SexActionSound {
-  constructor(actionName, baseSound, volumeOffset, pitchOffset, patternStrength, patternVolumeOffset, patternPitchOffset) {
+  constructor(actionName, baseSound, volumeOffset, pitchOffset, patternStrength, patternVolumeOffset, patternPitchOffset, useSecondSound = false, secondSound = null) {
     this.actionName = actionName;
     this.baseSound = baseSound;
     this.volumeOffset = volumeOffset;
@@ -2522,6 +2522,8 @@ class SexActionSound {
     this.patternStrength = patternStrength;
     this.patternVolumeOffset = patternVolumeOffset;
     this.patternPitchOffset = patternPitchOffset;
+    this.useSecondSound = useSecondSound;
+    this.secondSound = secondSound || baseSound;
   }
   
   play(voicePatternNum, pistonIntensity, patternVariant) {
@@ -2534,13 +2536,24 @@ class SexActionSound {
     const soundPitch = getRandomIndex(31) + this.pitchOffset;
     AudioManager.playBgs({ "name": this.baseSound, "volume": soundVolume, "pitch": soundPitch, "pan": 0 });
 
+    // Play second sound if enabled
+    if (this.useSecondSound) {
+      $gameVariables.setValue(194, $gameVariables.value(194) + 1);
+      $gameSystem.setBgsLine($gameVariables.value(194));
+      const secondSoundVolume = getRandomIndex(31) + this.volumeOffset;
+      const secondSoundPitch = getRandomIndex(41) + (this.pitchOffset - 30); // Typically lower pitch for second sound
+      AudioManager.playBgs({ "name": this.secondSound, "volume": secondSoundVolume, "pitch": secondSoundPitch, "pan": 0 });
+    }
+
     // Play the voice pattern if available
     if (voicePatternNum >= 1 && pistonIntensity <= 9) {
       $gameSystem.setBgsLine(10 + $gameVariables.value(20));
       
       // Determine pattern options based on variant and intensity
       let patternOptions = [1];
-      if (patternVariant == 1) { patternOptions = [1, 2, 3]; }
+      if (patternVariant == 1) { 
+        patternOptions = this.getPatternOptions(pistonIntensity);
+      }
       
       // Adjust strength if needed
       let finalPatternStrength = this.patternStrength;
@@ -2558,6 +2571,10 @@ class SexActionSound {
       AudioManager.playBgs({ "name": patternName, "volume": patternVolume, "pitch": patternPitch, "pan": 0 });
     }
   }
+
+  getPatternOptions(pistonIntensity) {
+    return pistonIntensity == 2 ? [1, 2] : [1, 2, 3];
+  }
 }
 
 // Derived classes for specific sex actions
@@ -2573,9 +2590,16 @@ class StrongPistonSound extends SexActionSound {
   }
 }
 
+class LoveJuiceSound extends SexActionSound {
+  constructor() {
+    super("愛液", "21_LoveJuice", 80, 80, 7, 70, 100, true);
+  }
+}
+
 // Create instances for reuse
 const weakPistonSound = new WeakPistonSound();
 const strongPistonSound = new StrongPistonSound();
+const loveJuiceSound = new LoveJuiceSound();
 
 function actionType1SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
   // (actionType 1) ピストン弱
@@ -2589,35 +2613,7 @@ function actionType2SexDirection(pistonIntensity, patternVariant, voicePatternNu
 
 function actionType3SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
   // (actionType 3) 愛液
-  $gameVariables.setValue(194, $gameVariables.value(194) + 1);
-  $gameSystem.setBgsLine($gameVariables.value(194));
-  const loveJuiceSound = "21_LoveJuice";
-  const loveJuiceVolume = getRandomIndex(31) + 80;
-  const loveJuicePitch = getRandomIndex(41) + 80;
-  AudioManager.playBgs({ "name": loveJuiceSound, "volume": loveJuiceVolume, "pitch": loveJuicePitch, "pan": 0 });
-  
-  $gameVariables.setValue(194, $gameVariables.value(194) + 1);
-  $gameSystem.setBgsLine($gameVariables.value(194));
-  let secondLoveJuiceSound = "21_LoveJuice";
-  const secondLoveJuiceVolume = getRandomIndex(31) + 80;
-  const secondLoveJuicePitch = getRandomIndex(41) + 50;
-  AudioManager.playBgs({ "name": secondLoveJuiceSound, "volume": secondLoveJuiceVolume, "pitch": secondLoveJuicePitch, "pan": 0 });
-  
-  if (voicePatternNum >= 1 && pistonIntensity <= 9) {
-    $gameSystem.setBgsLine(10 + $gameVariables.value(20));
-    let loveJuicePatternStrength = 7;
-    let loveJuicePatternOptions = [1];
-    if (patternVariant == 1) { loveJuicePatternOptions = [1, 2, 3]; }
-    if (pistonIntensity == 2) {
-      loveJuicePatternStrength += 1;
-      if (patternVariant == 1) { loveJuicePatternOptions = [1, 2]; }
-    }
-    const chosenLoveJuicePatternOption = loveJuicePatternOptions[getRandomIndex(loveJuicePatternOptions.length)];
-    secondLoveJuiceSound = "51_pattern" + voicePatternNum + "_" + loveJuicePatternStrength + "_" + chosenLoveJuicePatternOption;
-    const patternSoundVolume = getRandomIndex(21) + 70;
-    const patternSoundPitch = getRandomIndex(21) + 100;
-    AudioManager.playBgs({ "name": secondLoveJuiceSound, "volume": patternSoundVolume, "pitch": patternSoundPitch, "pan": 0 });
-  }
+  loveJuiceSound.play(voicePatternNum, pistonIntensity, patternVariant);
 }
 
 function actionType4SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
