@@ -6346,23 +6346,23 @@
 
     if (!chestMeta['TchestType']) return;
 
-    const chestOptions = collectChestOptionsAnnihilationItemBonus(chestMeta);
-    const selectedOption = selectRandomChestOptionAnnihilationItemBonus(chestOptions);
+    const chestOptions = collectChestOptions(chestMeta);
+    const selectedOption = selectRandomChestOption(chestOptions);
 
     if (!selectedOption) return;
 
-    const itemData = getItemAndAwardToPlayerAnnihilationItemBonus(selectedOption);
+    const itemData = getItemAndAwardToPlayer(selectedOption);
 
     // displayBonusMessage
 
     const item = `\\C[24]\x1bI[${itemData.iconIndex}]${itemData.name}\\C[0]`;
     valueWordSet1 = `全滅ボーナスとして${item}を入手した！`;
 
-    checkForRareItemFlagsAnnihilationItemBonus(chestMeta, selectedOption.itemIndex);
+    checkForRareItemFlags(chestMeta, selectedOption.itemIndex);
   };
 
   // Collects all possible chest reward options from the chest metadata
-  collectChestOptionsAnnihilationItemBonus = function (chestMeta) {
+  collectChestOptions = function (chestMeta) {
     const options = [];
 
     // Add standard chest items
@@ -6400,13 +6400,13 @@
   };
 
   // Selects a random option from the available chest options
-  selectRandomChestOptionAnnihilationItemBonus = function (options) {
+  selectRandomChestOption = function (options) {
     if (options.length === 0) return null;
     return options[getRandomIndex(options.length)];
   };
 
   // Retrieves the item based on type and index, then gives it to the player
-  getItemAndAwardToPlayerAnnihilationItemBonus = function (option) {
+  getItemAndAwardToPlayer = function (option) {
     const itemArray = getItemEquipmentSource(option.type);
     const item = itemArray[option.itemIndex];
 
@@ -6420,7 +6420,7 @@
   };
 
   // Checks if the selected item is a rare item and sets appropriate flags
-  checkForRareItemFlagsAnnihilationItemBonus = function (chestMeta, selectedItemIndex) {
+  checkForRareItemFlags = function (chestMeta, selectedItemIndex) {
     // Check standard rare item flag
     if (chestMeta['TchestRere'] && selectedItemIndex == Number(chestMeta['TchestRere'])) {
       $gameSwitches.setValue(439, true);
@@ -6604,10 +6604,10 @@
       }
     }
   }
-  SetNPCFamilyName = function () {
+  setNPCFamilyName = function () {
     setNPCInfo(354, 'FamilyName', function (actorId) { return $dataWeapons[actorId + 200].name; });
   }
-  SetNPCProfession = function () {
+  setNPCProfession = function () {
     setNPCInfo(353, 'Profession', function (actorId) { return $gameVariables.value(actorId + 380)[59]; });
   }
   setItemSGType2GlossaryText123 = function () {
