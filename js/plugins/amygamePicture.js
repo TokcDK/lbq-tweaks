@@ -541,26 +541,24 @@ tachie_bless = function(pictureId, blessType) {
 
   // Default breath settings [x, y, frequency, scaleX, scaleY]
   const baseBreathSettings = [100, 100, 250, 0.004, 0.003]; // Base settings
-  
-  // Only modify settings if it's the main character breath type
-  if (blessType === 1) {
-    const actor = $gameActors.actor($gameVariables.value(20));
-    
-    // Change settings based on state or battle
-    if (actor && actor.isStateAffected(61)) {
-      // Excited state
-      baseBreathSettings[2] = 150;  // Faster frequency
-      baseBreathSettings[3] = 0.005; // Higher X scale
-      baseBreathSettings[4] = 0.004; // Higher Y scale
-    } else if ($gameParty.inBattle()) {
-      // Battle state
-      baseBreathSettings[2] = 200; // Medium frequency
-    }
-  }
 
   // Apply breath effect based on type
   switch (blessType) {
     case 1: // Standing picture
+      // Only modify settings if it's the main character breath type
+      const actor = $gameActors.actor($gameVariables.value(20));
+
+      // Change settings based on state or battle
+      if (actor && actor.isStateAffected(61)) {
+        // Excited state
+        baseBreathSettings[2] = 150;  // Faster frequency
+        baseBreathSettings[3] = 0.005; // Higher X scale
+        baseBreathSettings[4] = 0.004; // Higher Y scale
+      } else if ($gameParty.inBattle()) {
+        // Battle state
+        baseBreathSettings[2] = 200; // Medium frequency
+      }
+
       valueTachieBless = baseBreathSettings;
       UTSU.PictureBreath.on([pictureId], valueTachieBless[2]);
       
