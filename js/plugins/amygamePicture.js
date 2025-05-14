@@ -528,58 +528,72 @@ for(var i = 1; i <= 250; i++){
 //息継ぎ設定getPreviousTachiePicId()
 //[0]息遣いx軸[1]y軸,立ち絵x100y100[2]頻度,平時250戦時150[3]拡縮度x,立ち絵0.005[4]拡縮度y,立ち絵0.004
 tachie_bless = function(pictureId, blessType) {
+  // Early exit if turning off breath effect
+  if (blessType === 0) {
+    UTSU.PictureBreath.off([pictureId]);
+    return;
+  }
 
-  if (blessType == 0) {
-    UTSU.PictureBreath.off([pictureId])
-  } else {
-    let baseBreathSettings = [100, 100, 250, 0.004, 0.003];  //立ち絵用息遣い設定。基本状態
-    if (blessType == 1) {
-      const actor = $gameActors.actor($gameVariables.value(20));
-      if (actor && actor.isStateAffected(61)) {
-        baseBreathSettings = [100, 100, 150, 0.005, 0.004];    //立ち絵用息遣い設定。発情状態
-      } else {
-        if ($gameParty.inBattle()) {
-          baseBreathSettings = [100, 100, 200, 0.004, 0.003];    //立ち絵用息遣い設定。戦闘状態
-        }
-      }
+  // Skip processing if breath cut switch is on
+  if ($gameSwitches.value(45)) {
+    return;
+  }
+
+  // Default breath settings [x, y, frequency, scaleX, scaleY]
+  const baseBreathSettings = [100, 100, 250, 0.004, 0.003]; // Base settings
+  
+  // Only modify settings if it's the main character breath type
+  if (blessType === 1) {
+    const actor = $gameActors.actor($gameVariables.value(20));
+    
+    // Change settings based on state or battle
+    if (actor && actor.isStateAffected(61)) {
+      // Excited state
+      baseBreathSettings[2] = 150;  // Faster frequency
+      baseBreathSettings[3] = 0.005; // Higher X scale
+      baseBreathSettings[4] = 0.004; // Higher Y scale
+    } else if ($gameParty.inBattle()) {
+      // Battle state
+      baseBreathSettings[2] = 200; // Medium frequency
     }
-    if (!$gameSwitches.value(45)) { //息継ぎカットスイッチ
-      switch (blessType) {
-        case 1: { //立ち絵用
-          valueTachieBless = baseBreathSettings;
-          UTSU.PictureBreath.on([pictureId], valueTachieBless[2]);
-          if ($gameScreen.picture(45)) { //オーラ
-            UTSU.PictureBreath.on(45, valueTachieBless[2]);
-          }
-          break;
-        }
-        case 6: { //イベントＣＧ
-          valueTachieBless6 = baseBreathSettings;
-          UTSU.PictureBreath6.on([pictureId], valueTachieBless6[2]);
-          break;
-        }
-        case 5: { //イベントＣＧ
-          valueTachieBless5 = baseBreathSettings;
-          UTSU.PictureBreath5.on([pictureId], valueTachieBless5[2]);
-          break;
-        }
-        case 4: { //顔グラ乳揺れ
-          valueTachieBless4 = baseBreathSettings;
-          UTSU.PictureBreath4.on([pictureId], valueTachieBless4[2]);
-          break;
-        }
-        case 3: { //顔グラ身体
-          valueTachieBless3 = baseBreathSettings;
-          UTSU.PictureBreath3.on([pictureId], valueTachieBless3[2]);
-          break;
-        }
-        case 2: {
-          valueTachieBless2 = baseBreathSettings;
-          UTSU.PictureBreath2.on([pictureId], valueTachieBless2[2]);
-          break;
-        }
+  }
+
+  // Apply breath effect based on type
+  switch (blessType) {
+    case 1: // Standing picture
+      valueTachieBless = baseBreathSettings;
+      UTSU.PictureBreath.on([pictureId], valueTachieBless[2]);
+      
+      // If aura picture exists (45), apply same effect
+      if ($gameScreen.picture(45)) {
+        UTSU.PictureBreath.on([45], valueTachieBless[2]);
       }
-    }
+      break;
+      
+    case 2:
+      valueTachieBless2 = baseBreathSettings;
+      UTSU.PictureBreath2.on([pictureId], valueTachieBless2[2]);
+      break;
+      
+    case 3: // Face graphic body
+      valueTachieBless3 = baseBreathSettings;
+      UTSU.PictureBreath3.on([pictureId], valueTachieBless3[2]);
+      break;
+      
+    case 4: // Face graphic breast movement
+      valueTachieBless4 = baseBreathSettings;
+      UTSU.PictureBreath4.on([pictureId], valueTachieBless4[2]);
+      break;
+      
+    case 5: // Event CG
+      valueTachieBless5 = baseBreathSettings;
+      UTSU.PictureBreath5.on([pictureId], valueTachieBless5[2]);
+      break;
+      
+    case 6: // Event CG
+      valueTachieBless6 = baseBreathSettings;
+      UTSU.PictureBreath6.on([pictureId], valueTachieBless6[2]);
+      break;
   }
 }
 
