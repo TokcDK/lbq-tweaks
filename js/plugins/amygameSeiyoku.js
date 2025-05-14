@@ -2606,11 +2606,27 @@ class KissSound extends SexActionSound {
   }
 }
 
+// New derived class for fellation action
+class FellateSound extends SexActionSound {
+  constructor() {
+    // Base sound "21_LoveJuice" is used with volume offset 80 and pitch offset 80.
+    // Initial pattern strength is 3, pattern volume offset is 70, and pattern pitch offset is 90.
+    // useSecondSound is true for additional sound with a typically lower pitch.
+    super("フェラ", "21_LoveJuice", 80, 80, 3, 70, 90, true);
+  }
+  
+  // Override to supply the specific pattern options for fellation.
+  getPatternOptions(pistonIntensity) {
+    return pistonIntensity == 2 ? [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] : [1, 2, 3, 4, 5, 6, 7, 8];
+  }
+}
+
 // Create instances for reuse
 const weakPistonSound = new WeakPistonSound();
 const strongPistonSound = new StrongPistonSound();
 const loveJuiceSound = new LoveJuiceSound();
 const kissSound = new KissSound();
+const fellateSound = new FellateSound();
 
 function actionType1SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
   // (actionType 1) ピストン弱
@@ -2634,35 +2650,7 @@ function actionType4SexDirection(pistonIntensity, patternVariant, voicePatternNu
 
 function actionType5SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
   // (actionType 5) フェラ
-  $gameVariables.setValue(194, $gameVariables.value(194) + 1);
-  $gameSystem.setBgsLine($gameVariables.value(194));
-  const fellationSound = "21_LoveJuice";
-  const fellationVolume = getRandomIndex(31) + 80;
-  const fellationPitch = getRandomIndex(41) + 80;
-  AudioManager.playBgs({ "name": fellationSound, "volume": fellationVolume, "pitch": fellationPitch, "pan": 0 });
-  
-  $gameVariables.setValue(194, $gameVariables.value(194) + 1);
-  $gameSystem.setBgsLine($gameVariables.value(194));
-  let secondFellationSound = "21_LoveJuice";
-  const secondFellationVolume = getRandomIndex(31) + 80;
-  const secondFellationPitch = getRandomIndex(41) + 50;
-  AudioManager.playBgs({ "name": secondFellationSound, "volume": secondFellationVolume, "pitch": secondFellationPitch, "pan": 0 });
-  
-  if (voicePatternNum >= 1) {
-    $gameSystem.setBgsLine(10 + $gameVariables.value(20));
-    let fellationPatternStrength = 3;
-    let fellationPatternOptions = [1];
-    if (patternVariant == 1) { fellationPatternOptions = [1, 2, 3, 4, 5, 6, 7, 8]; }
-    if (pistonIntensity == 2) {
-      fellationPatternStrength += 1;
-      if (patternVariant == 1) { fellationPatternOptions = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; }
-    }
-    const chosenFellationPatternOption = fellationPatternOptions[getRandomIndex(fellationPatternOptions.length)];
-    secondFellationSound = "51_pattern" + voicePatternNum + "_" + fellationPatternStrength + "_" + chosenFellationPatternOption;
-    const patternSoundVolume = getRandomIndex(21) + 70;
-    const patternSoundPitch = getRandomIndex(21) + 90;
-    AudioManager.playBgs({ "name": secondFellationSound, "volume": patternSoundVolume, "pitch": patternSoundPitch, "pan": 0 });
-  }
+  fellateSound.play(voicePatternNum, pistonIntensity, patternVariant);
 }
 
 function actionType6SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
