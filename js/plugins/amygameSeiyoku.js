@@ -435,6 +435,15 @@ $gameVariables.value(350)[8] = max8;
 };
 
 //☆☆アクター変数20の通常ステータス表示,0と4ウィンド使用
+
+// Process MVP indicators for battle statistics
+function setupMvpIndicatorActorStateshyouji(value, actorValue, isMvp) {
+  if (value === 0) return '';
+  if (value === actorValue) {
+    return isMvp ? '\\C[17][MVP!]\\C[0]' : '\\C[10][WORST…]\\C[0]';
+  }
+  return '';
+}
 actor_stateshyouji = function() {
 
   {
@@ -517,78 +526,16 @@ actor_stateshyouji = function() {
       let mvpDead = mvpStats[7];
       let mvpDefeatValue = mvpStats[8];
 
-      if (mvpKill == 0) {
-        mvpKill = ``;
-      } else {
-        if (mvpKill == actor.getAllKillEnemyCounter()) {
-          mvpKill = `\\C[17][MVP!]\\C[0]`;
-        } else {
-          mvpKill = ``;
-        }
-      }
-      if (mvpAttackMax == 0) {
-        mvpAttackMax = ``;
-      } else {
-        if (mvpAttackMax == actor.attackDamageMax) {
-          mvpAttackMax = `\\C[17][MVP!]\\C[0]`;
-        } else {
-          mvpAttackMax = ``;
-        }
-      }
-      if (mvpAttackSum == 0) {
-        mvpAttackSum = ``;
-      } else {
-        if (mvpAttackSum == actor.attackDamageSum) {
-          mvpAttackSum = `\\C[17][MVP!]\\C[0]`;
-        } else {
-          mvpAttackSum = ``;
-        }
-      }
-      if (mvpCritical == 0) {
-        mvpCritical = ``;
-      } else {
-        if (mvpCritical == totalKillValue) {
-          mvpCritical = `\\C[17][MVP!]\\C[0]`;
-        } else {
-          mvpCritical = ``;
-        }
-      }
-      if (mvpAcceptMax == 0) {
-        mvpAcceptMax = ``;
-      } else {
-        if (mvpAcceptMax == actor.acceptDamageMax) {
-          mvpAcceptMax = `\\C[17][MVP!]\\C[0]`;
-        } else {
-          mvpAcceptMax = ``;
-        }
-      }
-      if (mvpAcceptSum == 0) {
-        mvpAcceptSum = ``;
-      } else {
-        if (mvpAcceptSum == actor.acceptDamageSum) {
-          mvpAcceptSum = `\\C[17][MVP!]\\C[0]`;
-        } else {
-          mvpAcceptSum = ``;
-        }
-      }
-      if (mvpDead == 0) {
-        mvpDead = ``;
-      } else {
-        if (mvpDead == actor.deadCounter) {
-          mvpDead = `\\C[10][WORST…]\\C[0]`;
-        } else {
-          mvpDead = ``;
-        }
-      }
-      if (mvpDefeatValue == 0) {
-        mvpDefeatValue = ``;
-      } else {
-        if (mvpDefeatValue == totalDamageValue) {
-          mvpDefeatValue = `\\C[17][MVP!]\\C[0]`;
-        } else {
-          mvpDefeatValue = ``;
-        }
-      }
+      // Set MVP indicators for each stat
+      mvpKill = setupMvpIndicatorActorStateshyouji(mvpKill, actor.getAllKillEnemyCounter(), true);
+      mvpAttackMax = setupMvpIndicatorActorStateshyouji(mvpAttackMax, actor.attackDamageMax, true);
+      mvpAttackSum = setupMvpIndicatorActorStateshyouji(mvpAttackSum, actor.attackDamageSum, true);
+      mvpDefeatValue = setupMvpIndicatorActorStateshyouji(mvpDefeatValue, totalDamageValue, true);
+      mvpCritical = setupMvpIndicatorActorStateshyouji(mvpCritical, totalKillValue/2, true); // Note: using totalKillValue/2 for OverKill
+      mvpAcceptMax = setupMvpIndicatorActorStateshyouji(mvpAcceptMax, actor.acceptDamageMax, true);
+      mvpAcceptSum = setupMvpIndicatorActorStateshyouji(mvpAcceptSum, actor.acceptDamageSum, true);
+      mvpDead = setupMvpIndicatorActorStateshyouji(mvpDead, actor.deadCounter, false);
+
       const battleRecordText = `\\C[16]<Battle Record!>\\C[0]
 TotalKill  :\\C[10]${actor.getAllKillEnemyCounter()}\\C[0]${mvpKill}
 MaxAssalt  :\\C[10]${actor.attackDamageMax}\\C[0]${mvpAttackMax}
