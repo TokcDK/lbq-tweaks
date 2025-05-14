@@ -2434,56 +2434,60 @@ sex_direction = function (actionType, pistonIntensity, patternVariant) {
   }
 
   // Delegate each actionType to a standalone function (with 'SexDirection' suffix)
-  if (actionType == 99) {
-    actionType99SexDirection();
-  }
-  if (actionType == 0) {
-    actionType0SexDirection();
-  }
-  if (actionType == 1) { // ピストン弱
-    actionType1SexDirection(pistonIntensity, patternVariant, voicePatternNum);
-  }
-  if (actionType == 2) { // ピストン強
-    actionType2SexDirection(pistonIntensity, patternVariant, voicePatternNum);
-  }
-  if (actionType == 3) { // 愛液
-    actionType3SexDirection(pistonIntensity, patternVariant, voicePatternNum);
-  }
-  if (actionType == 4) { // キス
-    actionType4SexDirection(pistonIntensity, patternVariant, voicePatternNum);
-  }
-  if (actionType == 5) { // フェラ
-    actionType5SexDirection(pistonIntensity, patternVariant, voicePatternNum);
-  }
-  if (actionType == 6) { // 揉み
-    actionType6SexDirection(pistonIntensity, patternVariant, voicePatternNum);
-  }
-  if (actionType == 7) { // 機械振動
-    actionType7SexDirection(pistonIntensity, patternVariant, voicePatternNum);
-  }
-  if (actionType == 8) { // 機械振動激しく
-    actionType8SexDirection(pistonIntensity, patternVariant, voicePatternNum);
-  }
-  if (actionType == 11) { // 挿入
-    actionType11SexDirection(pistonIntensity, patternVariant, voicePatternNum);
-  }
-  if (actionType == 12) { // 射精
-    actionType12SexDirection(pistonIntensity, patternVariant, voicePatternNum);
-  }
-  if (actionType == 13) { // 射精以外で終了
-    actionType13SexDirection(pistonIntensity, patternVariant, voicePatternNum);
-  }
-  if (actionType == 51) { // 写真撮影
-    actionType51SexDirection(pistonIntensity, patternVariant, voicePatternNum);
-  }
-  if (actionType == 52) { // 眼パチ閉
-    actionType52SexDirection(pistonIntensity, patternVariant, voicePatternNum);
-  }
-  if (actionType == 53) { // 眼パチ開く
-    actionType53SexDirection(pistonIntensity, patternVariant, voicePatternNum);
-  }
-  if (actionType == 54) { // 薄くピンク点灯
-    actionType54SexDirection(pistonIntensity, patternVariant, voicePatternNum);
+  switch (actionType) {
+    case 99:
+      actionType99SexDirection();
+      break;
+    case 0:
+      actionType0SexDirection();
+      break;
+    case 1: // ピストン弱
+      actionType1SexDirection(pistonIntensity, patternVariant, voicePatternNum);
+      break;
+    case 2: // ピストン強
+      actionType2SexDirection(pistonIntensity, patternVariant, voicePatternNum);
+      break;
+    case 3: // 愛液
+      actionType3SexDirection(pistonIntensity, patternVariant, voicePatternNum);
+      break;
+    case 4: // キス
+      actionType4SexDirection(pistonIntensity, patternVariant, voicePatternNum);
+      break;
+    case 5: // フェラ
+      actionType5SexDirection(pistonIntensity, patternVariant, voicePatternNum);
+      break;
+    case 6: // 揉み
+      actionType6SexDirection(pistonIntensity, patternVariant, voicePatternNum);
+      break;
+    case 7: // 機械振動
+      actionType7SexDirection(pistonIntensity, patternVariant, voicePatternNum);
+      break;
+    case 8: // 機械振動激しく
+      actionType8SexDirection(pistonIntensity, patternVariant, voicePatternNum);
+      break;
+    case 11: // 挿入
+      actionType11SexDirection(pistonIntensity, patternVariant, voicePatternNum);
+      break;
+    case 12: // 射精
+      actionType12SexDirection(pistonIntensity, patternVariant, voicePatternNum);
+      break;
+    case 13: // 射精以外で終了
+      actionType13SexDirection(pistonIntensity, patternVariant, voicePatternNum);
+      break;
+    case 51: // 写真撮影
+      actionType51SexDirection(pistonIntensity, patternVariant, voicePatternNum);
+      break;
+    case 52: // 眼パチ閉
+      actionType52SexDirection(pistonIntensity, patternVariant, voicePatternNum);
+      break;
+    case 53: // 眼パチ開く
+      actionType53SexDirection(pistonIntensity, patternVariant, voicePatternNum);
+      break;
+    case 54: // 薄くピンク点灯
+      actionType54SexDirection(pistonIntensity, patternVariant, voicePatternNum);
+      break;
+    default:
+      break;
   }
 };
 
