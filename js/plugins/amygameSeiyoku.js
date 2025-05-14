@@ -1377,201 +1377,219 @@ $gameSwitches.setValue(122,false);
 
 //☆☆性欲度補正
 seiyoku_hosei = function(){
+  const actorId = $gameVariables.value(20);
+  const actor = $gameActors.actor(actorId);
 
-var actor = $gameActors.actor($gameVariables.value(20));
-//現在。限界露出度設定
-rosyutu_genkai1(actor);
-rosyutu_genzai1(actor.actorId());
-//発情値を設定
-$gameVariables.setValue(402,$gameVariables.value(401));
-//初体験時の相手をＨステ配列41に記録
-var value1 = 6;
-var value2 = 41;
-if($gameVariables.value($gameVariables.value(20)+380)[value1] == 0 && $gameVariables.value(400 + value1) >= 1){
-  $gameVariables.value($gameVariables.value(20)+380)[value2] = $gameVariables.value(22);
-};
-//相手が魔物場合に魔物姦回数+1.事前に数字が入っている場合は無視。
-if($gameVariables.value(420) == 0){
-  if($dataWeapons[$gameVariables.value(340)].meta['monster']){
-    $gameVariables.setValue(420,1);
-  };
-};
-//人数が指定されている場合、339に数が格納されているので経験人数に反映
-//同一人物の場合に経験人数上昇を抑制
-var value4 = $gameVariables.value(340)-300;
-if($gameVariables.value($gameVariables.value(20)+360)[value4] == 0){
-  var value1 = 9;
-  $gameVariables.setValue(400+ value1,$gameVariables.value(400 + value1) + $gameVariables.value(339));
-};
-//各相手とのＨ回数を記録。
-var value1 = 6;
-var value2 = 7;
-var value3 = 8;
-if($gameVariables.value(400 + value1) >= 1 ||
-$gameVariables.value(400 + value2) >= 1 ||
-$gameVariables.value(400 + value3) >= 1){
-  var value4 = $gameVariables.value(340) - 300;
-  $gameVariables.value($gameVariables.value(20)+360)[value4] += 1;
-};
-//膣姦の時に中だしか否か。膣射回数に数字を入れている場合はその数字をそのまま採用。
-var value1 = $gameVariables.value(406);
-var value2 = 411;
-var value3 = 0;
-if(value1 >= 1 && $gameVariables.value(value2) == 0){
-  for (var i = 1; i <= value1; i++) {
-    var arr = [1,0,1,0,1,1]
-    var value4 = arr[getRandomIndex(arr.length)];
-    if(value4 == 1){
-      value3 += 1;
-    };
-  };
-  if(actor.battleSkillsRaw().includes(871) || actor.isStateAffected(73)){
-    var value3 = value1;
-  };
-  if(actor.battleSkillsRaw().includes(872) || actor.isStateAffected(74)){
-    var value3 = 0;
-  };
-  if(value3 >= 1){
-    $gameVariables.setValue(value2,$gameVariables.value(value2) + value3 );
-  };
-};
-//尻姦の時に中だしか否か
-var value1 = $gameVariables.value(407);
-var value2 = 412;
-var value3 = 0;
-if(value1 >= 1 && $gameVariables.value(value2) == 0){
-  for (var i = 1; i <= value1; i++) {
-    var arr = [1,0,1,0,1,1]
-    var value4 = arr[getRandomIndex(arr.length)];
-    if(value4 == 1){
-      value3 += 1;
-    };
-  };
-  if(actor.battleSkillsRaw().includes(871) || actor.isStateAffected(73)){
-    var value3 = value1;
-  };
-  if(actor.battleSkillsRaw().includes(872) || actor.isStateAffected(74)){
-    var value3 = 0;
-  };
-  if(value3 >= 1){
-    $gameVariables.setValue(value2,$gameVariables.value(value2) + value3 );
-  };
-};
-//フェラの時に中だしか否か
-var value1 = $gameVariables.value(408);
-var value2 = 416;
-var value3 = 0;
-if(value1 >= 1 && $gameVariables.value(value2) == 0){
-  for (var i = 1; i <= value1; i++) {
-    var arr = [1,0,1,0,1,1]
-    var value4 = arr[getRandomIndex(arr.length)];
-    if(value4 == 1){
-      value3 += 1;
-    };
-  };
-  if(actor.battleSkillsRaw().includes(871) || actor.isStateAffected(73)){
-    var value3 = value1;
-  };
-  if(actor.battleSkillsRaw().includes(872) || actor.isStateAffected(74)){
-    var value3 = 0;
-  };
-  if(value3 >= 1){
-    $gameVariables.setValue(value2,$gameVariables.value(value2) + value3 );
-  };
-};
-//経験人数二人以上で輪姦
-var value1 = 409;
-var value2 = 419;
-if($gameVariables.value(value1) >= 2){
-  $gameVariables.setValue(value2, 1);
-};
+  //現在。限界露出度設定
+  rosyutu_genkai1(actor);
+  rosyutu_genzai1(actor.actorId());
 
-//受精するかどうか
-jusei_keisan();
-//回数に応じて各開発度に＋
-var array1 = [406,407,408,410,408,408,411,412,416,413,421,426,414]
-var array2 = [431,432,433,435,438,437,436,436,436,434,434,439,434]
-var start = 0;
-var end = 12;//配列の数に応じて変更
-var value2 = 0;
-for (var i = start; i <= end; i++) {
-  if($gameVariables.value(array1[i]) >= 1){
-    var value1 = $gameVariables.value(array1[i]);
-    if(actor.elementRate(37) >= 1.1){
-      var value1 = $gameVariables.value(array1[i]) + Math.round(actor.elementRate(37));
-      var value2 = 1;
-    };
-    $gameVariables.setValue(array2[i],$gameVariables.value(array2[i])+value1);
-  };
-};
-if(value2 == 1){
-  var value8 = `\\C[27]<Reproduction>\\C[0]補正。各開発度/経験度加算値に\\C[27]+${Math.round(actor.elementRate(37))}\\C[0]\n`;
-  eval("valueWordSet" + valueCountSet2 +" += value8");
-  valueCountSet1 += 1;
-  if((valueCountSet1 %3) == 0){
-    valueCountSet2 += 1
-    var value1 = `\\C[10]H-Passive[${valueCountSet2}]\\C[0]\n`;
-    eval("valueWordSet" + valueCountSet2 +" = value1");
-  };
-};
-//各開発度のランクに応じて回数上昇の時に開発度に補正
-var array1 = [406,407,408,410,411,412,413,413,418,419,420]
-var array2 = [ 51, 52, 53, 55, 56, 56, 51, 52, 54, 54, 54]
-var array3 = [434,434,434,434,434,434,431,432,434,434,434]
-var array4 = [  2,  3,  3,  2,  3,  4,  2,  4,  4,  5,  5]
-var start = 0;var end = 10;
-for (var i = start; i <= end; i++) {
-  if(actor.skillMasteryLevel(array2[i]) >= Number(array4[i]) && $gameVariables.value(array1[i]) >= 1){
-    var value1 = $gameVariables.value(array1[i]) * actor.skillMasteryLevel(array2[i])
-    $gameVariables.setValue(array3[i],$gameVariables.value(array3[i])+value1);
-}};
-//ステート精液の付与
-var value1 = 411;
-if($gameVariables.value(value1) >= 1){actor.addState(84)};
-var value2 = 408;
-if($gameVariables.value(value2) >= 1){actor.addState(85)};
-var value3 = 419;
-if($gameVariables.value(value3) >= 1){actor.addState(86)};
-//開発度ランクに応じて乗算。スキル51-59。最後に実行
-var start = 1;
-var end = 9;
-for (var i = start; i <= end; i++) {
-  if(actor.skillMasteryLevel(i+50) >= 1 && $gameVariables.value(i+430) >= 2){
-    var value1 = $gameVariables.value(i+430)*actor.skillMasteryLevel(i+50)
-    $gameVariables.setValue(i+430,value1)
-}};
-//発情値を性感開発値で増幅
-if(actor.skillMasteryLevel(54) >= 1 && $gameVariables.value(402) >= 1){
-  var value1 = $gameVariables.value(402) * actor.skillMasteryLevel(54);
-  $gameVariables.setValue(402,$gameVariables.value(402)+value1);
-};
-//発情値100で絶頂回数+
-if($gameVariables.value(402) >= 100){
-  $gameVariables.setValue(414, $gameVariables.value(414)+1);
-  if(actor.isLearnedSkill(65)){//スケベっこ以上で膣アナルフェラ回数に応じて絶頂回数+
-    var value1 = $gameVariables.value(406);
-    value1 += $gameVariables.value(407);
-    value1 += $gameVariables.value(408);
-    var value2 = getRandomIndex(value1);
-    $gameVariables.setValue(414, $gameVariables.value(414)+value1);
-  };
-};
-//性感開発度に応じて絶頂時に潮吹きと失禁回数+
-if(actor.skillMasteryLevel(54) >= 3){
-  if($gameVariables.value(414) >= 1){
-    var value1 = getRandomIndex(101);
-    var value1 = value1 + (actor.skillMasteryLevel(54) * 10);
-    if(value1 >= 80){
-      $gameVariables.setValue(425, $gameVariables.value(425)+1);
-    };
-    var value1 = getRandomIndex(101);
-    var value1 = value1 + (actor.skillMasteryLevel(54) * 10);
-    if(value1 >= 110){
-      $gameVariables.setValue(424, $gameVariables.value(424)+1);
-    };
-  };
-};
+  //発情値を設定
+  $gameVariables.setValue(402, $gameVariables.value(401));
 
+  //初体験時の相手をＨステ配列41に記録
+  const initialExperienceIndex = 6;
+  const recordPartnerIndex = 41;
+  if($gameVariables.value(actorId+380)[initialExperienceIndex] == 0 && $gameVariables.value(400 + initialExperienceIndex) >= 1){
+    $gameVariables.value(actorId+380)[recordPartnerIndex] = $gameVariables.value(22);
+  };
+
+  //相手が魔物場合に魔物姦回数+1.事前に数字が入っている場合は無視。
+  if($gameVariables.value(420) == 0){
+    if($dataWeapons[$gameVariables.value(340)].meta['monster']){
+      $gameVariables.setValue(420, 1);
+    };
+  };
+
+  //人数が指定されている場合、339に数が格納されているので経験人数に反映
+  //同一人物の場合に経験人数上昇を抑制
+  const partyMemberIndex = $gameVariables.value(340) - 300;
+  if($gameVariables.value(actorId+360)[partyMemberIndex] == 0){
+    const experienceCountId = 9;
+    $gameVariables.setValue(400 + experienceCountId, $gameVariables.value(400 + experienceCountId) + $gameVariables.value(339));
+  };
+
+  //各相手とのＨ回数を記録。
+  const hCountIndex1 = 6;
+  const hCountIndex2 = 7;
+  const hCountIndex3 = 8;
+  if($gameVariables.value(400 + hCountIndex1) >= 1 ||
+     $gameVariables.value(400 + hCountIndex2) >= 1 ||
+     $gameVariables.value(400 + hCountIndex3) >= 1){
+    const partyMemberHIndex = $gameVariables.value(340) - 300;
+    $gameVariables.value(actorId+360)[partyMemberHIndex] += 1;
+  };
+
+  //膣姦の時に中だしか否か。膣射回数に数字を入れている場合はその数字をそのまま採用。
+  const vaginalHCount = $gameVariables.value(406);
+  const vaginalCounterVar = 411;
+  let computedVaginalInternal = 0;
+  if(vaginalHCount >= 1 && $gameVariables.value(vaginalCounterVar) == 0){
+    for (let vaginalIteration = 1; vaginalIteration <= vaginalHCount; vaginalIteration++) {
+      const coinFlipArray = [1, 0, 1, 0, 1, 1];
+      const coinFlipResult = coinFlipArray[getRandomIndex(coinFlipArray.length)];
+      if(coinFlipResult == 1){
+        computedVaginalInternal += 1;
+      };
+    };
+    if(actor.battleSkillsRaw().includes(871) || actor.isStateAffected(73)){
+      computedVaginalInternal = vaginalHCount;
+    };
+    if(actor.battleSkillsRaw().includes(872) || actor.isStateAffected(74)){
+      computedVaginalInternal = 0;
+    };
+    if(computedVaginalInternal >= 1){
+      $gameVariables.setValue(vaginalCounterVar, $gameVariables.value(vaginalCounterVar) + computedVaginalInternal );
+    };
+  };
+
+  const actorBattleSkillRaw = actor.battleSkillsRaw();
+
+  //尻姦の時に中だしか否か
+  const analHCount = $gameVariables.value(407);
+  const analCounterVar = 412;
+  let computedAnalInternal = 0;
+  if(analHCount >= 1 && $gameVariables.value(analCounterVar) == 0){
+    for (let analIteration = 1; analIteration <= analHCount; analIteration++) {
+      const coinFlipArray = [1, 0, 1, 0, 1, 1];
+      const coinFlipResult = coinFlipArray[getRandomIndex(coinFlipArray.length)];
+      if(coinFlipResult == 1){
+        computedAnalInternal += 1;
+      };
+    };
+    if (actorBattleSkillRaw.includes(871) || actor.isStateAffected(73)){
+      computedAnalInternal = analHCount;
+    };
+    if (actorBattleSkillRaw.includes(872) || actor.isStateAffected(74)){
+      computedAnalInternal = 0;
+    };
+    if(computedAnalInternal >= 1){
+      $gameVariables.setValue(analCounterVar, $gameVariables.value(analCounterVar) + computedAnalInternal );
+    };
+  };
+  //フェラの時に中だしか否か
+  const fellationCount = $gameVariables.value(408);
+  const fellationCounterVar = 416;
+  let computedFellationInternal = 0;
+  if(fellationCount >= 1 && $gameVariables.value(fellationCounterVar) == 0){
+    for (let fellationIteration = 1; fellationIteration <= fellationCount; fellationIteration++) {
+      const coinFlipArray = [1, 0, 1, 0, 1, 1];
+      const coinFlipResult = coinFlipArray[getRandomIndex(coinFlipArray.length)];
+      if(coinFlipResult == 1){
+        computedFellationInternal += 1;
+      };
+    };
+    if (actorBattleSkillRaw.includes(871) || actor.isStateAffected(73)){
+      computedFellationInternal = fellationCount;
+    };
+    if (actorBattleSkillRaw.includes(872) || actor.isStateAffected(74)){
+      computedFellationInternal = 0;
+    };
+    if(computedFellationInternal >= 1){
+      $gameVariables.setValue(fellationCounterVar, $gameVariables.value(fellationCounterVar) + computedFellationInternal );
+    };
+  };
+  //経験人数二人以上で輪姦
+  const experienceThresholdVar = 409;
+  const groupRapeVar = 419;
+  if($gameVariables.value(experienceThresholdVar) >= 2){
+    $gameVariables.setValue(groupRapeVar, 1);
+  };
+
+  //受精するかどうか
+  jusei_keisan();
+  
+  //回数に応じて各開発度に＋
+  const developmentSourceVars = [406,407,408,410,408,408,411,412,416,413,421,426,414];
+  const developmentTargetVars = [431,432,433,435,438,437,436,436,436,434,434,439,434];
+  const devStartIdx = 0;
+  const devEndIdx = 12; //配列の数に応じて変更
+  let reproductionAmplificationFlag = 0;
+  for (let devIndex = devStartIdx; devIndex <= devEndIdx; devIndex++) {
+    if($gameVariables.value(developmentSourceVars[devIndex]) >= 1){
+      let baseDevelopmentValue = $gameVariables.value(developmentSourceVars[devIndex]);
+      if(actor.elementRate(37) >= 1.1){
+        baseDevelopmentValue = $gameVariables.value(developmentSourceVars[devIndex]) + Math.round(actor.elementRate(37));
+        reproductionAmplificationFlag = 1;
+      };
+      $gameVariables.setValue(developmentTargetVars[devIndex], $gameVariables.value(developmentTargetVars[devIndex]) + baseDevelopmentValue);
+    };
+  };
+  if(reproductionAmplificationFlag == 1){
+    const reproductionMessage = `\\C[27]<Reproduction>\\C[0]補正。各開発度/経験度加算値に\\C[27]+${Math.round(actor.elementRate(37))}\\C[0]\n`;
+    eval("valueWordSet" + valueCountSet2 + " += reproductionMessage");
+    valueCountSet1 += 1;
+    if((valueCountSet1 % 3) == 0){
+      valueCountSet2 += 1;
+      const passiveMessage = `\\C[10]H-Passive[${valueCountSet2}]\\C[0]\n`;
+      eval("valueWordSet" + valueCountSet2 + " = passiveMessage");
+    };
+  };
+  //ステート精液の付与
+  const vaginalStateCheck = 411;
+  if($gameVariables.value(vaginalStateCheck) >= 1){ actor.addState(84); }
+  const fellationStateCheck = 408;
+  if($gameVariables.value(fellationStateCheck) >= 1){ actor.addState(85); }
+  const groupRapeStateCheck = 419;
+  if($gameVariables.value(groupRapeStateCheck) >= 1){ actor.addState(86); }
+  //各開発度のランクに応じて回数上昇の時に開発度に補正
+  const devSourceArray = [406,407,408,410,411,412,413,413,418,419,420];
+  const devSkillIndices = [51, 52, 53, 55, 56, 56, 51, 52, 54, 54, 54];
+  const devTargetArray = [434,434,434,434,434,434,431,432,434,434,434];
+  const devSkillThresholds = [2, 3, 3, 2, 3, 4, 2, 4, 4, 5, 5];
+  const devStartIdx2 = 0;
+  const devEndIdx2 = 10;
+  for (let j = devStartIdx2; j <= devEndIdx2; j++) {
+    if(actor.skillMasteryLevel(devSkillIndices[j]) >= Number(devSkillThresholds[j]) && $gameVariables.value(devSourceArray[j]) >= 1){
+      const developmentAdjustment = $gameVariables.value(devSourceArray[j]) * actor.skillMasteryLevel(devSkillIndices[j]);
+      $gameVariables.setValue(devTargetArray[j], $gameVariables.value(devTargetArray[j]) + developmentAdjustment);
+    };
+  };
+  //開発度ランクに応じて回数上昇の時に乗算。スキル51-59。最後に実行
+  const multiplyStartIdx = 1;
+  const multiplyEndIdx = 9;
+  for (let k = multiplyStartIdx; k <= multiplyEndIdx; k++) {
+    if(actor.skillMasteryLevel(k + 50) >= 1 && $gameVariables.value(k + 430) >= 2){
+      const multipliedValue = $gameVariables.value(k + 430) * actor.skillMasteryLevel(k + 50);
+      $gameVariables.setValue(k + 430, multipliedValue);
+    };
+  };
+  //発情値を性感開発値で増幅
+  if(actor.skillMasteryLevel(54) >= 1 && $gameVariables.value(402) >= 1){
+    const passionAmplification = $gameVariables.value(402) * actor.skillMasteryLevel(54);
+    $gameVariables.setValue(402, $gameVariables.value(402) + passionAmplification);
+  };
+  //発情値100で絶頂回数+
+  if($gameVariables.value(402) >= 100){
+    $gameVariables.setValue(414, $gameVariables.value(414) + 1);
+    if(actor.isLearnedSkill(65)){//スケベっこ以上で膣アナルフェラ回数に応じて絶頂回数+
+      let aggregateHCount = $gameVariables.value(406);
+      aggregateHCount += $gameVariables.value(407);
+      aggregateHCount += $gameVariables.value(408);
+      const extraClimax = getRandomIndex(aggregateHCount);
+      $gameVariables.setValue(414, $gameVariables.value(414) + aggregateHCount);
+    };
+  };
+  //性感開発度に応じて絶頂時に潮吹きと失禁回数+
+  if(actor.skillMasteryLevel(54) >= 3){
+    if($gameVariables.value(414) >= 1){
+      {
+        let randomClimaxModifier = getRandomIndex(101);
+        randomClimaxModifier = randomClimaxModifier + (actor.skillMasteryLevel(54) * 10);
+        if(randomClimaxModifier >= 80){
+          $gameVariables.setValue(425, $gameVariables.value(425) + 1);
+        };
+      }
+      {
+        let randomClimaxModifier = getRandomIndex(101);
+        randomClimaxModifier = randomClimaxModifier + (actor.skillMasteryLevel(54) * 10);
+        if(randomClimaxModifier >= 110){
+          $gameVariables.setValue(424, $gameVariables.value(424) + 1);
+        };
+      }
+    };
+  };
+  
 };
 
 //☆☆性欲度情報を更新
