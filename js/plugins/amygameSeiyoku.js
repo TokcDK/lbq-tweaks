@@ -382,58 +382,54 @@ ${arr1[8]} ${arr1[9]}`);
 };
 
 //MVP計算用
-battlerecord_mvp = function (id1) {
+battlerecord_mvp = function (unusedParam) {
 
-  const arr1 = []; const arr2 = []; const arr3 = []; const arr4 = [];
-  const arr5 = []; const arr6 = []; const arr7 = []; const arr8 = [];
-  const gamePartyMembers = $gameParty.members();
-  for (let i = 0, end = gamePartyMembers.length - 1; i <= end; i++) {
-    const value1 = gamePartyMembers[i]._actorId;
-    const actor = $gameActors.actor(value1);
-    arr1.push(actor.getAllKillEnemyCounter());
-    arr2.push(actor.attackDamageMax);
-    arr3.push(actor.attackDamageSum);
-    arr4.push($gameVariables.value(351)[value1]);
-    arr5.push(actor.acceptDamageMax);
-    arr6.push(actor.acceptDamageSum);
-    arr7.push(actor.deadCounter);
-    arr8.push($gameVariables.value(298)[value1]);
+  const killEnemyCounters = [];
+  const maxAttackDamageArr = [];
+  const totalAttackDamageArr = [];
+  const skillAcquisitionSequenceValues = [];
+  const maxAcceptedDamageArr = [];
+  const totalAcceptedDamageArr = [];
+  const deadCounters = [];
+  const gameVar298Values = [];
+  const partyMembers = $gameParty.members();
+  const skillAcquisitionSequence = $gameVariables.value(351);
+  const var298Array = $gameVariables.value(298);
+  for (let index = 0, lastIndex = partyMembers.length - 1; index <= lastIndex; index++) {
+    const actorId = partyMembers[index]._actorId;
+    const actor = $gameActors.actor(actorId);
+
+    killEnemyCounters.push(actor.getAllKillEnemyCounter());
+    maxAttackDamageArr.push(actor.attackDamageMax);
+    totalAttackDamageArr.push(actor.attackDamageSum);
+    skillAcquisitionSequenceValues.push(skillAcquisitionSequence[actorId]);
+    maxAcceptedDamageArr.push(actor.acceptDamageMax);
+    totalAcceptedDamageArr.push(actor.acceptDamageSum);
+    deadCounters.push(actor.deadCounter);
+    gameVar298Values.push(var298Array[actorId]);
   };
 
-  const max1 = arr1.reduce(function (a, b) {
-    return Math.max(a, b);
+  const mvpKillCounter = killEnemyCounters.reduce(function (acc, val) {
+    return Math.max(acc, val);
   });
-  $gameVariables.value(350)[1] = max1;
-  const max2 = arr2.reduce(function (a, b) {
-    return Math.max(a, b);
-  });
-  $gameVariables.value(350)[2] = max2;
-  const max3 = arr3.reduce(function (a, b) {
-    return Math.max(a, b);
-  });
-  $gameVariables.value(350)[3] = max3;
-  const max4 = arr4.reduce(function (a, b) {
-    return Math.max(a, b);
-  });
-  $gameVariables.value(350)[4] = max4;
-  const max5 = arr5.reduce(function (a, b) {
-    return Math.max(a, b);
-  });
-  $gameVariables.value(350)[5] = max5;
-  const max6 = arr6.reduce(function (a, b) {
-    return Math.max(a, b);
-  });
-  $gameVariables.value(350)[6] = max6;
-  const max7 = arr7.reduce(function (a, b) {
-    return Math.max(a, b);
-  });
-  $gameVariables.value(350)[7] = max7;
-  const max8 = arr8.reduce(function (a, b) {
-    return Math.max(a, b);
-  });
-  $gameVariables.value(350)[8] = max8;
+  const mvp = $gameVariables.value(350);
+  mvp[1] = mvpKillCounter;
+  const mvpMaxAttackDamage = maxAttackDamageArr.reduce((acc, val) => Math.max(acc, val));
+  mvp[2] = mvpMaxAttackDamage;
+  const mvpTotalAttackDamage = totalAttackDamageArr.reduce((acc, val) => Math.max(acc, val));
+  mvp[3] = mvpTotalAttackDamage;
+  const mvpGameVar351 = skillAcquisitionSequenceValues.reduce((acc, val) => Math.max(acc, val));
+  mvp[4] = mvpGameVar351;
+  const mvpMaxAcceptedDamage = maxAcceptedDamageArr.reduce((acc, val) => Math.max(acc, val));
+  mvp[5] = mvpMaxAcceptedDamage;
+  const mvpTotalAcceptedDamage = totalAcceptedDamageArr.reduce((acc, val) => Math.max(acc, val));
+  mvp[6] = mvpTotalAcceptedDamage;
+  const mvpDeadCounter = deadCounters.reduce((acc, val) => Math.max(acc, val));
+  mvp[7] = mvpDeadCounter;
+  const mvpGameVar298 = gameVar298Values.reduce((acc, val) => Math.max(acc, val));
+  mvp[8] = mvpGameVar298;
 
-  };
+};
 
 //☆☆アクター変数20の通常ステータス表示,0と4ウィンド使用
 actor_stateshyouji = function () {
