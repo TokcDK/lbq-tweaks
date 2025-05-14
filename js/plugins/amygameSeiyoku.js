@@ -435,155 +435,216 @@ $gameVariables.value(350)[8] = max8;
 };
 
 //☆☆アクター変数20の通常ステータス表示,0と4ウィンド使用
-actor_stateshyouji = function(){
+actor_stateshyouji = function() {
 
-if(!$gameSwitches.value(496) && !$gameSwitches.value(130) && $gameVariables.value(193) == 0){
-  var value1 = 0 + 128;
-} else {
-  var value1 = 0;
-};
-WindowManager.show(0, value1, 0, 430, 202);
-var actor = $gameActors.actor($gameVariables.value(20));
+  {
+    let windowYOffset;
+    if (!$gameSwitches.value(496) && !$gameSwitches.value(130) && $gameVariables.value(193) == 0) {
+      windowYOffset = 128;
+    } else {
+      windowYOffset = 0;
+    }
+    WindowManager.show(0, windowYOffset, 0, 430, 202);
+    const actor = $gameActors.actor($gameVariables.value(20));
 
-seiyoku_jougenn1(actor);
+    seiyoku_jougenn1(actor);
 
-var value = $gameVariables.value($gameVariables.value(20)+380);
-var id1 = 400;
+    const actorStateValues = $gameVariables.value($gameVariables.value(20) + 380);
+    const baseIndex = 400;
 
-//性欲度表示用情報を書き込み
-var start = 1; var end = 40;
-for (var i = start; i <= end; i++) {
-  if($gameVariables.value(id1 + i) >= 1){
-    var value1 = `\\C[2]+${$gameVariables.value(id1 +i)}\\C[0]`;
-  }else{
-    var value1 = '　';
+    //性欲度表示用情報を書き込み
+    const displayStart = 1, displayEnd = 40;
+    for (let i = displayStart; i <= displayEnd; i++) {
+      let statDisplay;
+      if ($gameVariables.value(baseIndex + i) >= 1) {
+        statDisplay = `\\C[2]+${$gameVariables.value(baseIndex + i)}\\C[0]`;
+      } else {
+        statDisplay = '　';
+      }
+      eval("valueWordSet" + i + " = statDisplay");
+    }
+
+    //現在のＨステートを変数643に代入
+    windowYOffset = 0;
+    $gameVariables.setValue(windowYOffset + 643, `\\I[16]`);
+    const stateDisplayList = valueHstateDisplay;
+    stateDisplayList.forEach(function(stateId) {
+      if (actor.isStateAffected(stateId)) {
+        $gameVariables.setValue(windowYOffset + 643, $gameVariables.value(windowYOffset + 643) + `\\I[${$dataStates[stateId].iconIndex}]`);
+      }
+    }, this);
+    let stateThreshold;
+    if (actor.isLearnedSkill(74)) {
+      stateThreshold = 500;
+    }
+    if (actor.isLearnedSkill(72)) {
+      stateThreshold = 200;
+    }
+    let actorInfoText = `\\fs[24]\\C[1]${actor.nickname()}\\C[0]\n`;
+    actorInfoText += `\x1bSET[${actor.actorId()}]\n`;
+    if (isGirl($gameActors.actor($gameVariables.value(20)))) {
+      let firstStateDisplay;
+      if (actorStateValues[0] == 0) {
+        firstStateDisplay = ` `;
+      } else {
+        firstStateDisplay = `<${actorStateValues[0]}>`;
+      }
+      actorInfoText += `\\C[27]${$dataSystem.variables[baseIndex + 1]}\\C[0]${actorStateValues[1]}${firstStateDisplay}${eval("valueWordSet" + 1)}`;
+      actorInfoText += `\\C[27]${$dataSystem.variables[baseIndex + 2]}\\C[0]${actorStateValues[2]}${eval("valueWordSet" + 2)}\n`;
+      actorInfoText += `\\C[27]${$dataSystem.variables[baseIndex + 4]}\\C[0]${actorStateValues[4]}<${actorStateValues[5]}>`;
+      if (actor.isLearnedSkill(65)) {
+        actorInfoText += `\\C[27]${$dataSystem.variables[baseIndex + 3]}\\C[0]${actorStateValues[3]}%　\n`;
+      } else {
+        actorInfoText += `\\C[27]${$dataSystem.variables[baseIndex + 3]}\\C[0]───%　\n`;
+      }
+      actorInfoText += `\\V[643]`;
+    }
+    WindowManager.drawText(0, actorInfoText);
   }
-  eval("valueWordSet" + i +" = value1");
-};
 
-//現在のＨステートを変数643に代入
-var value1 = 0;
-$gameVariables.setValue(value1+643,`\\I[16]`);
-var list = valueHstateDisplay;
-list.forEach(function(id) {
-  if(actor.isStateAffected(id)){
-    $gameVariables.setValue(value1+643,$gameVariables.value(value1+643)+`\\I[${$dataStates[id].iconIndex}]`)
-}}, this);
-if(actor.isLearnedSkill(74)){
-  var value30 = 500;
-};
-if(actor.isLearnedSkill(72)){
-  var value30 = 200;
-};
-var value2 = `\\fs[24]\\C[1]${actor.nickname()}\\C[0]\n`;
-value2 += `\x1bSET[${actor.actorId()}]\n`;
-if(isGirl($gameActors.actor($gameVariables.value(20)))){
-  if(value[0] == 0){var value3 = ` `}else{var value3 = `<${value[0]}>`};
-  value2 += `\\C[27]${$dataSystem.variables[id1+1]}\\C[0]${value[1]}${value3}${eval("valueWordSet" + 1)}`;
-  value2 += `\\C[27]${$dataSystem.variables[id1+2]}\\C[0]${value[2]}${eval("valueWordSet" + 2)}\n`;
-  value2 += `\\C[27]${$dataSystem.variables[id1+4]}\\C[0]${value[4]}<${value[5]}>`;
-  if(actor.isLearnedSkill(65)){
-    value2 += `\\C[27]${$dataSystem.variables[id1+3]}\\C[0]${value[3]}%　\n`;
-  } else {
-    value2 += `\\C[27]${$dataSystem.variables[id1+3]}\\C[0]───%　\n`;
-  };
-  value2 += `\\V[643]`;
-};
-WindowManager.drawText(0, value2);
-if($gameSwitches.value(130)){
-  var value21 = $gameVariables.value(351)[$gameVariables.value(20)];
-  var value22 = $gameVariables.value(298)[$gameVariables.value(20)];
-  var value11 = $gameVariables.value(350)[1];
-  var value12 = $gameVariables.value(350)[2];
-  var value13 = $gameVariables.value(350)[3];
-  var value14 = $gameVariables.value(350)[4];
-  var value15 = $gameVariables.value(350)[5];
-  var value16 = $gameVariables.value(350)[6];
-  var value17 = $gameVariables.value(350)[7];
-  var value18 = $gameVariables.value(350)[8];
-  if(value11 == 0){
-    value11 = ``;
-  } else {
-    if(value11 == actor.getAllKillEnemyCounter()){value11 = `\\C[17][MVP!]\\C[0]`}else{value11 = ``};
-  };
-  if(value12 == 0){
-    value12 = ``;
-  } else {
-    if(value12 == actor.attackDamageMax){         value12 = `\\C[17][MVP!]\\C[0]`}else{value12 = ``};
-  };
-  if(value13 == 0){
-    value13 = ``;
-  } else {
-    if(value13 == actor.attackDamageSum){         value13 = `\\C[17][MVP!]\\C[0]`}else{value13 = ``};
-  };
-  if(value14 == 0){
-    value14 = ``;
-  } else {
-    if(value14 == value21)              {         value14 = `\\C[17][MVP!]\\C[0]`}else{value14 = ``};
-  };
-  if(value15 == 0){
-    value15 = ``;
-  } else {
-    if(value15 == actor.acceptDamageMax){         value15 = `\\C[17][MVP!]\\C[0]`}else{value15 = ``};
-  };
-  if(value16 == 0){
-    value16 = ``;
-  } else {
-    if(value16 == actor.acceptDamageSum){         value16 = `\\C[17][MVP!]\\C[0]`}else{value16 = ``};
-  };
-  if(value17 == 0){
-    value17 = ``;
-  } else {
-    if(value17 == actor.deadCounter){             value17 = `\\C[10][WORST…]\\C[0]`}else{value17 = ``};
-  };
-  if(value18 == 0){
-    value18 = ``;
-  } else {
-    if(value18 == value22)          {             value18 = `\\C[17][MVP!]\\C[0]`}else{value18 = ``};
-  };
-var value10 = `\\C[16]<Battle Record!>\\C[0]
-TotalKill  :\\C[10]${actor.getAllKillEnemyCounter()}\\C[0]${value11}
-MaxAssalt  :\\C[10]${actor.attackDamageMax}\\C[0]${value12}
-TotalAssalt:\\C[10]${actor.attackDamageSum}\\C[0]${value13}
-Critical   :\\C[10]${value22}\\C[0]${value18}
-OverKill   :\\C[10]${value21/2}\\C[0]${value14}
-MaxDamage  :\\C[1]${actor.acceptDamageMax}\\C[0]${value15}
-TotalDamage:\\C[1]${actor.acceptDamageSum}\\C[0]${value16}
-Defead     :\\C[1]${actor.deadCounter}\\C[0]${value17}
+  if ($gameSwitches.value(130)) {
+    {
+      const totalKillValue = $gameVariables.value(351)[$gameVariables.value(20)];
+      const totalDamageValue = $gameVariables.value(298)[$gameVariables.value(20)];
+      let mvpKill = $gameVariables.value(350)[1];
+      let mvpAttackMax = $gameVariables.value(350)[2];
+      let mvpAttackSum = $gameVariables.value(350)[3];
+      let mvpCritical = $gameVariables.value(350)[4];
+      let mvpAcceptMax = $gameVariables.value(350)[5];
+      let mvpAcceptSum = $gameVariables.value(350)[6];
+      let mvpDead = $gameVariables.value(350)[7];
+      let mvpDefeatValue = $gameVariables.value(350)[8];
+      if (mvpKill == 0) {
+        mvpKill = ``;
+      } else {
+        if (mvpKill == actor.getAllKillEnemyCounter()) {
+          mvpKill = `\\C[17][MVP!]\\C[0]`;
+        } else {
+          mvpKill = ``;
+        }
+      }
+      if (mvpAttackMax == 0) {
+        mvpAttackMax = ``;
+      } else {
+        if (mvpAttackMax == actor.attackDamageMax) {
+          mvpAttackMax = `\\C[17][MVP!]\\C[0]`;
+        } else {
+          mvpAttackMax = ``;
+        }
+      }
+      if (mvpAttackSum == 0) {
+        mvpAttackSum = ``;
+      } else {
+        if (mvpAttackSum == actor.attackDamageSum) {
+          mvpAttackSum = `\\C[17][MVP!]\\C[0]`;
+        } else {
+          mvpAttackSum = ``;
+        }
+      }
+      if (mvpCritical == 0) {
+        mvpCritical = ``;
+      } else {
+        if (mvpCritical == totalKillValue) {
+          mvpCritical = `\\C[17][MVP!]\\C[0]`;
+        } else {
+          mvpCritical = ``;
+        }
+      }
+      if (mvpAcceptMax == 0) {
+        mvpAcceptMax = ``;
+      } else {
+        if (mvpAcceptMax == actor.acceptDamageMax) {
+          mvpAcceptMax = `\\C[17][MVP!]\\C[0]`;
+        } else {
+          mvpAcceptMax = ``;
+        }
+      }
+      if (mvpAcceptSum == 0) {
+        mvpAcceptSum = ``;
+      } else {
+        if (mvpAcceptSum == actor.acceptDamageSum) {
+          mvpAcceptSum = `\\C[17][MVP!]\\C[0]`;
+        } else {
+          mvpAcceptSum = ``;
+        }
+      }
+      if (mvpDead == 0) {
+        mvpDead = ``;
+      } else {
+        if (mvpDead == actor.deadCounter) {
+          mvpDead = `\\C[10][WORST…]\\C[0]`;
+        } else {
+          mvpDead = ``;
+        }
+      }
+      if (mvpDefeatValue == 0) {
+        mvpDefeatValue = ``;
+      } else {
+        if (mvpDefeatValue == totalDamageValue) {
+          mvpDefeatValue = `\\C[17][MVP!]\\C[0]`;
+        } else {
+          mvpDefeatValue = ``;
+        }
+      }
+      const battleRecordText = `\\C[16]<Battle Record!>\\C[0]
+TotalKill  :\\C[10]${actor.getAllKillEnemyCounter()}\\C[0]${mvpKill}
+MaxAssalt  :\\C[10]${actor.attackDamageMax}\\C[0]${mvpAttackMax}
+TotalAssalt:\\C[10]${actor.attackDamageSum}\\C[0]${mvpAttackSum}
+Critical   :\\C[10]${totalDamageValue}\\C[0]${mvpDefeatValue}
+OverKill   :\\C[10]${totalKillValue/2}\\C[0]${mvpCritical}
+MaxDamage  :\\C[1]${actor.acceptDamageMax}\\C[0]${mvpAcceptMax}
+TotalDamage:\\C[1]${actor.acceptDamageSum}\\C[0]${mvpAcceptSum}
+Defead     :\\C[1]${actor.deadCounter}\\C[0]${mvpDead}
 `;
-WindowManager.show(1, 0, 200, 500, 389);
-WindowManager.drawText(1, value10);
-};
-var value1 = 0; var value2 = 0;var value3 = 0;
-var value4 = 0; var value5 = 0; var value6 = 0;
-var value7 = 0;
-for (var i = 1; i <= $dataSkills.length-1; i++) {
-  if (!$dataSkills[i].name == '') {
-    if($dataSkills[i].stypeId == 2){value1 += actor.getSkillUseCounter(i)};
-    if($dataSkills[i].stypeId == 5){value2 += actor.getSkillUseCounter(i)};
-    if($dataSkills[i].stypeId == 6){value3 += actor.getSkillUseCounter(i)};
-    if($dataSkills[i].stypeId == 7){value4 += actor.getSkillUseCounter(i)};
-    if($dataSkills[i].stypeId == 8){value5 += actor.getSkillUseCounter(i)};
-    if($dataSkills[i].stypeId == 12){value6 += actor.getSkillUseCounter(i)};
-    if($dataSkills[i].stypeId == 13){value7 += actor.getSkillUseCounter(i)};
-}};
-var value6 = `\\C[16]<Skill Record!>\\C[0]
-Attack   :${value1}
-S-Ability:${value2}
-A-Ability:${value3}
-W-Ability:${value4}
-R-Ability:${value5}
-Burst!   :${value6}
-Chain!   :${value7}
-`;
-WindowManager.show(2, 500, 200, 268, 389);
-WindowManager.drawText(2, value6);
-if($gameSwitches.value(130)){
-  WindowManager.show(4, 430, 0, 340, 202);
-  hstates_heights($gameVariables.value(20),253);
-  WindowManager.drawText(4, `\\V[253]`);
-};
+      WindowManager.show(1, 0, 200, 500, 389);
+      WindowManager.drawText(1, battleRecordText);
+    }
+  }
 
+  {
+    let attackUsageTotal = 0, sAbilityUsageTotal = 0, aAbilityUsageTotal = 0, wAbilityUsageTotal = 0, rAbilityUsageTotal = 0, burstUsageTotal = 0, chainUsageTotal = 0;
+    for (let skillId = 1; skillId <= $dataSkills.length - 1; skillId++) {
+      if (!$dataSkills[skillId].name == '') {
+        if ($dataSkills[skillId].stypeId == 2) { 
+          attackUsageTotal += actor.getSkillUseCounter(skillId); 
+        }
+        if ($dataSkills[skillId].stypeId == 5) { 
+          sAbilityUsageTotal += actor.getSkillUseCounter(skillId); 
+        }
+        if ($dataSkills[skillId].stypeId == 6) { 
+          aAbilityUsageTotal += actor.getSkillUseCounter(skillId); 
+        }
+        if ($dataSkills[skillId].stypeId == 7) { 
+          wAbilityUsageTotal += actor.getSkillUseCounter(skillId); 
+        }
+        if ($dataSkills[skillId].stypeId == 8) { 
+          rAbilityUsageTotal += actor.getSkillUseCounter(skillId); 
+        }
+        if ($dataSkills[skillId].stypeId == 12) { 
+          burstUsageTotal += actor.getSkillUseCounter(skillId); 
+        }
+        if ($dataSkills[skillId].stypeId == 13) { 
+          chainUsageTotal += actor.getSkillUseCounter(skillId); 
+        }
+      }
+    }
+    const skillRecordText = `\\C[16]<Skill Record!>\\C[0]
+Attack   :${attackUsageTotal}
+S-Ability:${sAbilityUsageTotal}
+A-Ability:${aAbilityUsageTotal}
+W-Ability:${wAbilityUsageTotal}
+R-Ability:${rAbilityUsageTotal}
+Burst!   :${burstUsageTotal}
+Chain!   :${chainUsageTotal}
+`;
+    WindowManager.show(2, 500, 200, 268, 389);
+    WindowManager.drawText(2, skillRecordText);
+    if ($gameSwitches.value(130)) {
+      WindowManager.show(4, 430, 0, 340, 202);
+      hstates_heights($gameVariables.value(20), 253);
+      WindowManager.drawText(4, `\\V[253]`);
+    }
+  }
 };
 //☆☆性欲度上限計算。露出計算時とＨプロフ表示時に一緒にやっておく
 seiyoku_jougenn = function () {
