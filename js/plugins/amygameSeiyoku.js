@@ -1498,7 +1498,7 @@ seiyoku_hosei = function(){
 
   //受精するかどうか
   jusei_keisan();
-  
+
   //回数に応じて各開発度に＋
   const developmentSourceVars = [406,407,408,410,408,408,411,412,416,413,421,426,414];
   const developmentTargetVars = [431,432,433,435,438,437,436,436,436,434,434,439,434];
@@ -1566,7 +1566,7 @@ seiyoku_hosei = function(){
       let aggregateHCount = $gameVariables.value(406);
       aggregateHCount += $gameVariables.value(407);
       aggregateHCount += $gameVariables.value(408);
-      const extraClimax = getRandomIndex(aggregateHCount);
+      const extraClimax = getRandomIndex(aggregateHCount); // maybe in the value below mast be append the extraClimax value instead of aggregateHCount
       $gameVariables.setValue(414, $gameVariables.value(414) + aggregateHCount);
     };
   };
