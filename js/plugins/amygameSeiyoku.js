@@ -2596,10 +2596,21 @@ class LoveJuiceSound extends SexActionSound {
   }
 }
 
+class KissSound extends SexActionSound {
+  constructor() {
+    super("キス", "21_LoveJuice", 80, 80, 1, 70, 90, true, "21_LoveJuice");
+  }
+  
+  getPatternOptions(pistonIntensity) {
+    return pistonIntensity == 2 ? [1, 2, 3, 4, 5, 6] : [1, 2, 3];
+  }
+}
+
 // Create instances for reuse
 const weakPistonSound = new WeakPistonSound();
 const strongPistonSound = new StrongPistonSound();
 const loveJuiceSound = new LoveJuiceSound();
+const kissSound = new KissSound();
 
 function actionType1SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
   // (actionType 1) ピストン弱
@@ -2618,35 +2629,7 @@ function actionType3SexDirection(pistonIntensity, patternVariant, voicePatternNu
 
 function actionType4SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
   // (actionType 4) キス
-  $gameVariables.setValue(194, $gameVariables.value(194) + 1);
-  $gameSystem.setBgsLine($gameVariables.value(194));
-  const kissSound = "21_LoveJuice";
-  const kissVolume = getRandomIndex(31) + 80;
-  const kissPitch = getRandomIndex(41) + 80;
-  AudioManager.playBgs({ "name": kissSound, "volume": kissVolume, "pitch": kissPitch, "pan": 0 });
-  
-  $gameVariables.setValue(194, $gameVariables.value(194) + 1);
-  $gameSystem.setBgsLine($gameVariables.value(194));
-  let secondKissSound = "21_LoveJuice";
-  const secondKissVolume = getRandomIndex(31) + 80;
-  const secondKissPitch = getRandomIndex(41) + 50;
-  AudioManager.playBgs({ "name": secondKissSound, "volume": secondKissVolume, "pitch": secondKissPitch, "pan": 0 });
-  
-  if (voicePatternNum >= 1 && pistonIntensity <= 9) {
-    $gameSystem.setBgsLine(10 + $gameVariables.value(20));
-    let kissPatternStrength = 1;
-    let kissPatternOptions = [1];
-    if (patternVariant == 1) { kissPatternOptions = [1, 2, 3]; }
-    if (pistonIntensity == 2) {
-      kissPatternStrength += 1;
-      if (patternVariant == 1) { kissPatternOptions = [1, 2, 3, 4, 5, 6]; }
-    }
-    const chosenKissPatternOption = kissPatternOptions[getRandomIndex(kissPatternOptions.length)];
-    secondKissSound = "51_pattern" + voicePatternNum + "_" + kissPatternStrength + "_" + chosenKissPatternOption;
-    const patternSoundVolume = getRandomIndex(21) + 70;
-    const patternSoundPitch = getRandomIndex(31) + 90;
-    AudioManager.playBgs({ "name": secondKissSound, "volume": patternSoundVolume, "pitch": patternSoundPitch, "pan": 0 });
-  }
+  kissSound.play(voicePatternNum, pistonIntensity, patternVariant);
 }
 
 function actionType5SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
