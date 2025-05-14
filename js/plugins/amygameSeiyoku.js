@@ -486,7 +486,7 @@ actor_stateshyouji = function() {
     if (actor.isLearnedSkill(74)) {
       stateThreshold = 500;
     }
-    if (actor.isLearnedSkill(72)) {
+    else if (actor.isLearnedSkill(72)) {
       stateThreshold = 200;
     }
     let actorInfoText = `\\fs[24]\\C[1]${actor.nickname()}\\C[0]\n`;
@@ -513,8 +513,9 @@ actor_stateshyouji = function() {
 
   if ($gameSwitches.value(130)) {
     {
-      const totalKillValue = $gameVariables.value(351)[$gameVariables.value(20)];
-      const totalDamageValue = $gameVariables.value(298)[$gameVariables.value(20)];
+      const actorId = $gameVariables.value(20);
+      const totalKillValue = $gameVariables.value(351)[actorId];
+      const totalDamageValue = $gameVariables.value(298)[actorId];
 
       const mvpStats = $gameVariables.value(350);
       let mvpKill = mvpStats[1];
@@ -596,6 +597,7 @@ Chain!   :${chainUsageTotal}
 
     WindowManager.show(2, 500, 200, 268, 389);
     WindowManager.drawText(2, skillRecordText);
+    
     if ($gameSwitches.value(130)) {
       WindowManager.show(4, 430, 0, 340, 202);
       hstates_heights($gameVariables.value(20), 253);
