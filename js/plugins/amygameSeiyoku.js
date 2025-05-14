@@ -435,6 +435,14 @@ $gameVariables.value(350)[8] = max8;
 };
 
 //☆☆アクター変数20の通常ステータス表示,0と4ウィンド使用
+actor_stateshyouji = function () {
+  const actorId = $gameVariables.value(20);
+  const actor = $gameActors.actor(actorId);
+
+  updateActorHStateDisplayActorStateshyouji(actor, actorId);
+  displayBattleRecordActorStateshyouji(actor, actorId);
+  displaySkillRecordActorStateshyouji(actor);
+};
 
 // Process MVP indicators for battle statistics
 function setupMvpIndicatorActorStateshyouji(value, actorValue, isMvp) {
@@ -444,148 +452,157 @@ function setupMvpIndicatorActorStateshyouji(value, actorValue, isMvp) {
   }
   return '';
 }
-actor_stateshyouji = function() {
 
-  {
-    let windowYOffset;
-    if (!$gameSwitches.value(496) && !$gameSwitches.value(130) && $gameVariables.value(193) == 0) {
-      windowYOffset = 128;
-    } else {
-      windowYOffset = 0;
-    }
-    WindowManager.show(0, windowYOffset, 0, 430, 202);
-    const actorId = $gameVariables.value(20);
-    const actor = $gameActors.actor(actorId);
-
-    seiyoku_jougenn1(actor);
-
-    const actorStateValues = $gameVariables.value(actorId + 380);
-    const baseIndex = 400;
-
-    //性欲度表示用情報を書き込み
-    const displayStart = 1, displayEnd = 40;
-    for (let i = displayStart; i <= displayEnd; i++) {
-      let statDisplay;
-      if ($gameVariables.value(baseIndex + i) >= 1) {
-        statDisplay = `\\C[2]+${$gameVariables.value(baseIndex + i)}\\C[0]`;
-      } else {
-        statDisplay = '　';
-      }
-      eval("valueWordSet" + i + " = statDisplay");
-    }
-
-    //現在のＨステートを変数643に代入
+function updateActorHStateDisplayActorStateshyouji(actor, actorId) {
+  let windowYOffset;
+  if (!$gameSwitches.value(496) && !$gameSwitches.value(130) && $gameVariables.value(193) === 0) {
+    windowYOffset = 128;
+  } else {
     windowYOffset = 0;
-    $gameVariables.setValue(windowYOffset + 643, `\\I[16]`);
-    const stateDisplayList = valueHstateDisplay;
-    stateDisplayList.forEach(function(stateId) {
-      if (actor.isStateAffected(stateId)) {
-        $gameVariables.setValue(windowYOffset + 643, $gameVariables.value(windowYOffset + 643) + `\\I[${$dataStates[stateId].iconIndex}]`);
-      }
-    }, this);
-    let stateThreshold;
-    if (actor.isLearnedSkill(74)) {
-      stateThreshold = 500;
+  }
+  WindowManager.show(0, windowYOffset, 0, 430, 202);
+  const actorId = actor.actorId();
+
+  seiyoku_jougenn1(actor);
+
+  const actorStateValues = $gameVariables.value(actorId + 380);
+  const baseIndex = 400;
+
+  // 性欲度表示用情報を書き込み
+  const displayStart = 1, displayEnd = 40;
+  for (let i = displayStart; i <= displayEnd; i++) {
+    let statDisplay;
+    if ($gameVariables.value(baseIndex + i) >= 1) {
+      statDisplay = `\\C[2]+${$gameVariables.value(baseIndex + i)}\\C[0]`;
+    } else {
+      statDisplay = '　';
     }
-    else if (actor.isLearnedSkill(72)) {
-      stateThreshold = 200;
-    }
-    let actorInfoText = `\\fs[24]\\C[1]${actor.nickname()}\\C[0]\n`;
-    actorInfoText += `\x1bSET[${actor.actorId()}]\n`;
-    if (isGirl($gameActors.actor($gameVariables.value(20)))) {
-      let firstStateDisplay;
-      if (actorStateValues[0] == 0) {
-        firstStateDisplay = ` `;
-      } else {
-        firstStateDisplay = `<${actorStateValues[0]}>`;
-      }
-      actorInfoText += `\\C[27]${$dataSystem.variables[baseIndex + 1]}\\C[0]${actorStateValues[1]}${firstStateDisplay}${eval("valueWordSet" + 1)}`;
-      actorInfoText += `\\C[27]${$dataSystem.variables[baseIndex + 2]}\\C[0]${actorStateValues[2]}${eval("valueWordSet" + 2)}\n`;
-      actorInfoText += `\\C[27]${$dataSystem.variables[baseIndex + 4]}\\C[0]${actorStateValues[4]}<${actorStateValues[5]}>`;
-      if (actor.isLearnedSkill(65)) {
-        actorInfoText += `\\C[27]${$dataSystem.variables[baseIndex + 3]}\\C[0]${actorStateValues[3]}%　\n`;
-      } else {
-        actorInfoText += `\\C[27]${$dataSystem.variables[baseIndex + 3]}\\C[0]───%　\n`;
-      }
-      actorInfoText += `\\V[643]`;
-    }
-    WindowManager.drawText(0, actorInfoText);
+    eval("valueWordSet" + i + " = statDisplay");
   }
 
-  if ($gameSwitches.value(130)) {
-    {
-      const totalKillValue = $gameVariables.value(351)[actorId];
-      const totalDamageValue = $gameVariables.value(298)[actorId];
+  // 現在のＨステートを変数643に代入
+  $gameVariables.setValue(643, `\\I[16]`);
+  const stateDisplayList = valueHstateDisplay; // assumed defined globally
+  stateDisplayList.forEach(function (stateId) {
+    if (actor.isStateAffected(stateId)) {
+      $gameVariables.setValue(643, $gameVariables.value(643) + `\\I[${$dataStates[stateId].iconIndex}]`);
+    }
+  });
 
-      const mvpStats = $gameVariables.value(350);
-      let mvpKill = mvpStats[1];
-      let mvpAttackMax = mvpStats[2];
-      let mvpAttackSum = mvpStats[3];
-      let mvpCritical = mvpStats[4];
-      let mvpAcceptMax = mvpStats[5];
-      let mvpAcceptSum = mvpStats[6];
-      let mvpDead = mvpStats[7];
-      let mvpDefeatValue = mvpStats[8];
+  let stateThreshold;
+  if (actor.isLearnedSkill(74)) {
+    stateThreshold = 500;
+  } else if (actor.isLearnedSkill(72)) {
+    stateThreshold = 200;
+  }
 
-      // Set MVP indicators for each stat
-      mvpKill = setupMvpIndicatorActorStateshyouji(mvpKill, actor.getAllKillEnemyCounter(), true);
-      mvpAttackMax = setupMvpIndicatorActorStateshyouji(mvpAttackMax, actor.attackDamageMax, true);
-      mvpAttackSum = setupMvpIndicatorActorStateshyouji(mvpAttackSum, actor.attackDamageSum, true);
-      mvpDefeatValue = setupMvpIndicatorActorStateshyouji(mvpDefeatValue, totalDamageValue, true);
-      mvpCritical = setupMvpIndicatorActorStateshyouji(mvpCritical, totalKillValue/2, true); // Note: using totalKillValue/2 for OverKill
-      mvpAcceptMax = setupMvpIndicatorActorStateshyouji(mvpAcceptMax, actor.acceptDamageMax, true);
-      mvpAcceptSum = setupMvpIndicatorActorStateshyouji(mvpAcceptSum, actor.acceptDamageSum, true);
-      mvpDead = setupMvpIndicatorActorStateshyouji(mvpDead, actor.deadCounter, false);
+  let actorInfoText = `\\fs[24]\\C[1]${actor.nickname()}\\C[0]\n`;
+  actorInfoText += `\x1bSET[${actor.actorId()}]\n`;
+  if (isGirl(actor)) {
+    let firstStateDisplay;
+    if (actorStateValues[0] === 0) {
+      firstStateDisplay = ` `;
+    } else {
+      firstStateDisplay = `<${actorStateValues[0]}>`;
+    }
+    actorInfoText += `\\C[27]${$dataSystem.variables[baseIndex + 1]}\\C[0]${actorStateValues[1]}${firstStateDisplay}${eval("valueWordSet" + 1)}`;
+    actorInfoText += `\\C[27]${$dataSystem.variables[baseIndex + 2]}\\C[0]${actorStateValues[2]}${eval("valueWordSet" + 2)}\n`;
+    actorInfoText += `\\C[27]${$dataSystem.variables[baseIndex + 4]}\\C[0]${actorStateValues[4]}<${actorStateValues[5]}>`;
+    if (actor.isLearnedSkill(65)) {
+      actorInfoText += `\\C[27]${$dataSystem.variables[baseIndex + 3]}\\C[0]${actorStateValues[3]}%　\n`;
+    } else {
+      actorInfoText += `\\C[27]${$dataSystem.variables[baseIndex + 3]}\\C[0]───%　\n`;
+    }
+    actorInfoText += `\\V[643]`;
+  }
+  WindowManager.drawText(0, actorInfoText);
+}
 
-      const battleRecordText = `\\C[16]<Battle Record!>\\C[0]
+function displayBattleRecordActorStateshyouji(actor, actorId) {
+  if (!$gameSwitches.value(130)) {
+    return;
+  }
+
+  const totalKillValue = $gameVariables.value(351)[actorId];
+  const totalDamageValue = $gameVariables.value(298)[actorId];
+
+  const mvpStats = $gameVariables.value(350);
+  let mvpKill = mvpStats[1];
+  let mvpAttackMax = mvpStats[2];
+  let mvpAttackSum = mvpStats[3];
+  let mvpCritical = mvpStats[4];
+  let mvpAcceptMax = mvpStats[5];
+  let mvpAcceptSum = mvpStats[6];
+  let mvpDead = mvpStats[7];
+  let mvpDefeatValue = mvpStats[8];
+
+  // Set MVP indicators for each stat
+  mvpKill = setupMvpIndicatorActorStateshyouji(mvpKill, actor.getAllKillEnemyCounter(), true);
+  mvpAttackMax = setupMvpIndicatorActorStateshyouji(mvpAttackMax, actor.attackDamageMax, true);
+  mvpAttackSum = setupMvpIndicatorActorStateshyouji(mvpAttackSum, actor.attackDamageSum, true);
+  mvpDefeatValue = setupMvpIndicatorActorStateshyouji(mvpDefeatValue, totalDamageValue, true);
+  mvpCritical = setupMvpIndicatorActorStateshyouji(mvpCritical, totalKillValue / 2, true); // using totalKillValue/2 for OverKill
+  mvpAcceptMax = setupMvpIndicatorActorStateshyouji(mvpAcceptMax, actor.acceptDamageMax, true);
+  mvpAcceptSum = setupMvpIndicatorActorStateshyouji(mvpAcceptSum, actor.acceptDamageSum, true);
+  mvpDead = setupMvpIndicatorActorStateshyouji(mvpDead, actor.deadCounter, false);
+
+  const battleRecordText = `\\C[16]<Battle Record!>\\C[0]
 TotalKill  :\\C[10]${actor.getAllKillEnemyCounter()}\\C[0]${mvpKill}
 MaxAssalt  :\\C[10]${actor.attackDamageMax}\\C[0]${mvpAttackMax}
 TotalAssalt:\\C[10]${actor.attackDamageSum}\\C[0]${mvpAttackSum}
 Critical   :\\C[10]${totalDamageValue}\\C[0]${mvpDefeatValue}
-OverKill   :\\C[10]${totalKillValue/2}\\C[0]${mvpCritical}
+OverKill   :\\C[10]${totalKillValue / 2}\\C[0]${mvpCritical}
 MaxDamage  :\\C[1]${actor.acceptDamageMax}\\C[0]${mvpAcceptMax}
 TotalDamage:\\C[1]${actor.acceptDamageSum}\\C[0]${mvpAcceptSum}
 Defead     :\\C[1]${actor.deadCounter}\\C[0]${mvpDead}
 `;
-      WindowManager.show(1, 0, 200, 500, 389);
-      WindowManager.drawText(1, battleRecordText);
+  WindowManager.show(1, 0, 200, 500, 389);
+  WindowManager.drawText(1, battleRecordText);
+}
+
+// New function to display the skill record
+function displaySkillRecordActorStateshyouji(actor) {
+  let attackUsageTotal = 0,
+    sAbilityUsageTotal = 0,
+    aAbilityUsageTotal = 0,
+    wAbilityUsageTotal = 0,
+    rAbilityUsageTotal = 0,
+    burstUsageTotal = 0,
+    chainUsageTotal = 0;
+
+  for (let skillId = 1; skillId <= $dataSkills.length - 1; skillId++) {
+    if ($dataSkills[skillId].name === '') { // Skip skills with empty names
+      continue;
+    }
+
+    switch ($dataSkills[skillId].stypeId) {
+      case 2:
+        attackUsageTotal += actor.getSkillUseCounter(skillId);
+        break;
+      case 5:
+        sAbilityUsageTotal += actor.getSkillUseCounter(skillId);
+        break;
+      case 6:
+        aAbilityUsageTotal += actor.getSkillUseCounter(skillId);
+        break;
+      case 7:
+        wAbilityUsageTotal += actor.getSkillUseCounter(skillId);
+        break;
+      case 8:
+        rAbilityUsageTotal += actor.getSkillUseCounter(skillId);
+        break;
+      case 12:
+        burstUsageTotal += actor.getSkillUseCounter(skillId);
+        break;
+      case 13:
+        chainUsageTotal += actor.getSkillUseCounter(skillId);
+        break;
+      default:
+        break;
     }
   }
 
-  {
-    let attackUsageTotal = 0, sAbilityUsageTotal = 0, aAbilityUsageTotal = 0, wAbilityUsageTotal = 0, rAbilityUsageTotal = 0, burstUsageTotal = 0, chainUsageTotal = 0;
-    for (let skillId = 1; skillId <= $dataSkills.length - 1; skillId++) {
-      if (!$dataSkills[skillId].name !== '') {
-        continue;
-      }
-
-      switch ($dataSkills[skillId].stypeId) {
-        case 2:
-          attackUsageTotal += actor.getSkillUseCounter(skillId);
-          break;
-        case 5:
-          sAbilityUsageTotal += actor.getSkillUseCounter(skillId);
-          break;
-        case 6:
-          aAbilityUsageTotal += actor.getSkillUseCounter(skillId);
-          break;
-        case 7:
-          wAbilityUsageTotal += actor.getSkillUseCounter(skillId);
-          break;
-        case 8:
-          rAbilityUsageTotal += actor.getSkillUseCounter(skillId);
-          break;
-        case 12:
-          burstUsageTotal += actor.getSkillUseCounter(skillId);
-          break;
-        case 13:
-          chainUsageTotal += actor.getSkillUseCounter(skillId);
-          break;
-        default:
-          break;
-      }
-    }
-    const skillRecordText = `\\C[16]<Skill Record!>\\C[0]
+  const skillRecordText = `\\C[16]<Skill Record!>\\C[0]
 Attack   :${attackUsageTotal}
 S-Ability:${sAbilityUsageTotal}
 A-Ability:${aAbilityUsageTotal}
@@ -595,16 +612,16 @@ Burst!   :${burstUsageTotal}
 Chain!   :${chainUsageTotal}
 `;
 
-    WindowManager.show(2, 500, 200, 268, 389);
-    WindowManager.drawText(2, skillRecordText);
+  WindowManager.show(2, 500, 200, 268, 389);
+  WindowManager.drawText(2, skillRecordText);
 
-    if ($gameSwitches.value(130)) {
-      WindowManager.show(4, 430, 0, 340, 202);
-      hstates_heights($gameVariables.value(20), 253);
-      WindowManager.drawText(4, `\\V[253]`);
-    }
+  if ($gameSwitches.value(130)) {
+    WindowManager.show(4, 430, 0, 340, 202);
+    hstates_heights($gameVariables.value(20), 253);
+    WindowManager.drawText(4, `\\V[253]`);
   }
-};
+}
+
 //☆☆性欲度上限計算。露出計算時とＨプロフ表示時に一緒にやっておく
 seiyoku_jougenn = function () {
   const actorId = $gameVariables.value(20);
