@@ -506,14 +506,17 @@ actor_stateshyouji = function() {
     {
       const totalKillValue = $gameVariables.value(351)[$gameVariables.value(20)];
       const totalDamageValue = $gameVariables.value(298)[$gameVariables.value(20)];
-      let mvpKill = $gameVariables.value(350)[1];
-      let mvpAttackMax = $gameVariables.value(350)[2];
-      let mvpAttackSum = $gameVariables.value(350)[3];
-      let mvpCritical = $gameVariables.value(350)[4];
-      let mvpAcceptMax = $gameVariables.value(350)[5];
-      let mvpAcceptSum = $gameVariables.value(350)[6];
-      let mvpDead = $gameVariables.value(350)[7];
-      let mvpDefeatValue = $gameVariables.value(350)[8];
+
+      const mvpStats = $gameVariables.value(350);
+      let mvpKill = mvpStats[1];
+      let mvpAttackMax = mvpStats[2];
+      let mvpAttackSum = mvpStats[3];
+      let mvpCritical = mvpStats[4];
+      let mvpAcceptMax = mvpStats[5];
+      let mvpAcceptSum = mvpStats[6];
+      let mvpDead = mvpStats[7];
+      let mvpDefeatValue = mvpStats[8];
+
       if (mvpKill == 0) {
         mvpKill = ``;
       } else {
@@ -604,28 +607,34 @@ Defead     :\\C[1]${actor.deadCounter}\\C[0]${mvpDead}
   {
     let attackUsageTotal = 0, sAbilityUsageTotal = 0, aAbilityUsageTotal = 0, wAbilityUsageTotal = 0, rAbilityUsageTotal = 0, burstUsageTotal = 0, chainUsageTotal = 0;
     for (let skillId = 1; skillId <= $dataSkills.length - 1; skillId++) {
-      if (!$dataSkills[skillId].name == '') {
-        if ($dataSkills[skillId].stypeId == 2) { 
-          attackUsageTotal += actor.getSkillUseCounter(skillId); 
-        }
-        if ($dataSkills[skillId].stypeId == 5) { 
-          sAbilityUsageTotal += actor.getSkillUseCounter(skillId); 
-        }
-        if ($dataSkills[skillId].stypeId == 6) { 
-          aAbilityUsageTotal += actor.getSkillUseCounter(skillId); 
-        }
-        if ($dataSkills[skillId].stypeId == 7) { 
-          wAbilityUsageTotal += actor.getSkillUseCounter(skillId); 
-        }
-        if ($dataSkills[skillId].stypeId == 8) { 
-          rAbilityUsageTotal += actor.getSkillUseCounter(skillId); 
-        }
-        if ($dataSkills[skillId].stypeId == 12) { 
-          burstUsageTotal += actor.getSkillUseCounter(skillId); 
-        }
-        if ($dataSkills[skillId].stypeId == 13) { 
-          chainUsageTotal += actor.getSkillUseCounter(skillId); 
-        }
+      if (!$dataSkills[skillId].name !== '') {
+        continue;
+      }
+
+      switch ($dataSkills[skillId].stypeId) {
+        case 2:
+          attackUsageTotal += actor.getSkillUseCounter(skillId);
+          break;
+        case 5:
+          sAbilityUsageTotal += actor.getSkillUseCounter(skillId);
+          break;
+        case 6:
+          aAbilityUsageTotal += actor.getSkillUseCounter(skillId);
+          break;
+        case 7:
+          wAbilityUsageTotal += actor.getSkillUseCounter(skillId);
+          break;
+        case 8:
+          rAbilityUsageTotal += actor.getSkillUseCounter(skillId);
+          break;
+        case 12:
+          burstUsageTotal += actor.getSkillUseCounter(skillId);
+          break;
+        case 13:
+          chainUsageTotal += actor.getSkillUseCounter(skillId);
+          break;
+        default:
+          break;
       }
     }
     const skillRecordText = `\\C[16]<Skill Record!>\\C[0]
@@ -637,6 +646,7 @@ R-Ability:${rAbilityUsageTotal}
 Burst!   :${burstUsageTotal}
 Chain!   :${chainUsageTotal}
 `;
+
     WindowManager.show(2, 500, 200, 268, 389);
     WindowManager.drawText(2, skillRecordText);
     if ($gameSwitches.value(130)) {
