@@ -454,11 +454,12 @@ actor_stateshyouji = function() {
       windowYOffset = 0;
     }
     WindowManager.show(0, windowYOffset, 0, 430, 202);
-    const actor = $gameActors.actor($gameVariables.value(20));
+    const actorId = $gameVariables.value(20);
+    const actor = $gameActors.actor(actorId);
 
     seiyoku_jougenn1(actor);
 
-    const actorStateValues = $gameVariables.value($gameVariables.value(20) + 380);
+    const actorStateValues = $gameVariables.value(actorId + 380);
     const baseIndex = 400;
 
     //性欲度表示用情報を書き込み
@@ -513,7 +514,6 @@ actor_stateshyouji = function() {
 
   if ($gameSwitches.value(130)) {
     {
-      const actorId = $gameVariables.value(20);
       const totalKillValue = $gameVariables.value(351)[actorId];
       const totalDamageValue = $gameVariables.value(298)[actorId];
 
@@ -597,7 +597,7 @@ Chain!   :${chainUsageTotal}
 
     WindowManager.show(2, 500, 200, 268, 389);
     WindowManager.drawText(2, skillRecordText);
-    
+
     if ($gameSwitches.value(130)) {
       WindowManager.show(4, 430, 0, 340, 202);
       hstates_heights($gameVariables.value(20), 253);
