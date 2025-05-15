@@ -2588,6 +2588,10 @@ class WeakPistonSound extends SexActionSound {
   constructor() {
     super("ピストン弱", "21_Piston1", 90, 90, 5, 100, 100);
   }
+
+  getPatternOptions(pistonIntensity) {
+    return [1, 2, 3];
+  }
 }
 
 class StrongPistonSound extends SexActionSound {
