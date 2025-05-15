@@ -2564,53 +2564,54 @@ function actionType2SexDirection(pistonIntensity, patternVariant, voicePatternNu
   }
 }
 
+class SexDirectionAction {
+  constructor(pistonIntensity, patternVariant, voicePatternNum) {
+    this.pistonIntensity = pistonIntensity;
+    this.patternVariant = patternVariant;
+    this.voicePatternNum = voicePatternNum;
+  }
+
+  playPatternedSound(basePistonStrength, patternOptions, volumeOffset, extraPitch) {
+  }
+
+  // Abstract method that must be implemented by subclasses
+  execute() {
+    throw new Error("execute() must be implemented by subclass");
+  }
+}
+
 // Function for action type 3: 愛液 (Liquid/Erotic fluid effect)
 // This function plays background sounds according to the given parameters and applies a secondary sound layer
 function actionType3SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
-  // Increase the global sound line index and update the BGS line accordingly
   $gameVariables.setValue(194, $gameVariables.value(194) + 1);
   $gameSystem.setBgsLine($gameVariables.value(194));
-  
-  // Primary sound configuration for LoveJuice
+
   const sound = "21_LoveJuice";
-  const volume = getRandomIndex(31) + 80; // random volume offset between 80 and 110
-  const pitch = getRandomIndex(41) + 80;  // random pitch offset between 80 and 120
+  const volume = getRandomIndex(31) + 80;
+  const pitch = getRandomIndex(41) + 80;
   AudioManager.playBgs({ "name": sound, "volume": volume, "pitch": pitch, "pan": 0 });
-  
-  // Increase the sound line index again for the secondary layer
+
   $gameVariables.setValue(194, $gameVariables.value(194) + 1);
   $gameSystem.setBgsLine($gameVariables.value(194));
-  
-  // Secondary sound configuration, using the same LoveJuice resource
+
   let soundSecondary = "21_LoveJuice";
   const volumeSecondary = getRandomIndex(31) + 80;
-  const pitchSecondary = getRandomIndex(41) + 50; // slightly different pitch offset for contrast
+  const pitchSecondary = getRandomIndex(41) + 50;
   AudioManager.playBgs({ "name": soundSecondary, "volume": volumeSecondary, "pitch": pitchSecondary, "pan": 0 });
 
-  // If there is a valid voice pattern and pistonIntensity is within allowed range:
   if (voicePatternNum >= 1 && pistonIntensity <= 9) {
-    // Set a new sound line based on actor id (offset by 10)
     $gameSystem.setBgsLine(10 + $gameVariables.value(20));
-    
-    // Initialize piston strength and pattern options.
-    // Default piston strength is 7
     let pistonStrength = 7;
     let patternOptions = [1];
-    // If patternVariant flag is set, expand pattern options
     if (patternVariant === 1) { patternOptions = [1, 2, 3]; }
-    // Adjust pistonStrength and restrict options if pistonIntensity equals 2
     if (pistonIntensity === 2) {
       pistonStrength += 1;
       if (patternVariant === 1) { patternOptions = [1, 2]; }
     }
-    // Randomly select one option from the available pattern options
     const patternOption = patternOptions[getRandomIndex(patternOptions.length)];
-    // Build the pattern name using voicePatternNum, adjusted pistonStrength, and the selected option
     let patternName = "51_pattern" + voicePatternNum + "_" + pistonStrength + "_" + patternOption;
-    // Configure volume and pitch for the patterned sound
     const patternVolume = getRandomIndex(21) + 70;
     const patternPitch = getRandomIndex(21) + 100;
-    // Play the patterned background sound
     AudioManager.playBgs({ "name": patternName, "volume": patternVolume, "pitch": patternPitch, "pan": 0 });
   }
 }
@@ -2619,49 +2620,35 @@ function actionType3SexDirection(pistonIntensity, patternVariant, voicePatternNu
 // This function plays background sounds for a kissing effect including primary and secondary sound layers,
 // and then, if applicable, plays a patterned sound based on the input parameters.
 function actionType4SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
-  // Increase the global sound line index and update the BGS line for the primary kiss sound
   $gameVariables.setValue(194, $gameVariables.value(194) + 1);
   $gameSystem.setBgsLine($gameVariables.value(194));
-  
-  // Primary configuration for the kiss sound effect using LoveJuice as the audio resource
+
   const sound = "21_LoveJuice";
   const volume = getRandomIndex(31) + 80;
   const pitch = getRandomIndex(41) + 80;
   AudioManager.playBgs({ "name": sound, "volume": volume, "pitch": pitch, "pan": 0 });
-  
-  // Increase sound line index for secondary kiss sound
+
   $gameVariables.setValue(194, $gameVariables.value(194) + 1);
   $gameSystem.setBgsLine($gameVariables.value(194));
-  
-  // Secondary sound configuration; similar to primary but with a slightly lower pitch offset
+
   let soundSecondary = "21_LoveJuice";
   const volumeSecondary = getRandomIndex(31) + 80;
   const pitchSecondary = getRandomIndex(41) + 50;
   AudioManager.playBgs({ "name": soundSecondary, "volume": volumeSecondary, "pitch": pitchSecondary, "pan": 0 });
-  
-  // If valid voice pattern exists and pistonIntensity is within range, play an extra patterned sound
+
   if (voicePatternNum >= 1 && pistonIntensity <= 9) {
-    // Set a new sound line using the actor id offset
     $gameSystem.setBgsLine(10 + $gameVariables.value(20));
-    
-    // For kiss effect, initialize piston strength to 1
     let pistonStrength = 1;
     let patternOptions = [1];
-    // Expand pattern options if patternVariant flag is enabled
     if (patternVariant === 1) { patternOptions = [1, 2, 3]; }
-    // If pistonIntensity is 2, increment pistonStrength and offer more pattern options
     if (pistonIntensity === 2) {
       pistonStrength += 1;
       if (patternVariant === 1) { patternOptions = [1, 2, 3, 4, 5, 6]; }
     }
-    // Choose a random pattern option from the available set
     const patternOption = patternOptions[getRandomIndex(patternOptions.length)];
-    // Construct the pattern name string with voicePatternNum, pistonStrength, and the chosen option
     let patternName = "51_pattern" + voicePatternNum + "_" + pistonStrength + "_" + patternOption;
-    // Set volume and pitch offsets specific for the kiss effect patterned sound
     const patternVolume = getRandomIndex(21) + 70;
     const patternPitch = getRandomIndex(31) + 90;
-    // Play the patterned BGS for the kiss effect
     AudioManager.playBgs({ "name": patternName, "volume": patternVolume, "pitch": patternPitch, "pan": 0 });
   }
 }
