@@ -2653,7 +2653,7 @@ class SexDirectionActionBase {
   }
 
   // Abstract method that must be implemented by subclasses
-  execute() {
+  play() {
     this.updateBgsLineSetting();
     this.playBgs(this.soundName, this.volumeOffset, this.pitchOffset);
 
