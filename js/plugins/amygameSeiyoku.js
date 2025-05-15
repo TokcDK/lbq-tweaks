@@ -2603,18 +2603,23 @@ class StrongPistonSound extends SexActionSound {
 
 class LoveJuiceSound extends SexActionSound {
   constructor() {
-    super("愛液", "21_LoveJuice", 80, 80, 7, 70, 100, { useSecondSound: true });
+    super("愛液", "21_LoveJuice", 80, 80, 7, 70, 100, {
+      useSecondSound: true,
+      volumeRandomRange: 31,
+      pitchRandomRange: 41
+    });
   }
 }
 
 class KissSound extends SexActionSound {
   constructor() {
-    super("キス", "21_LoveJuice", 80, 80, 1, 70, 90, { 
-      useSecondSound: true, 
-      secondSound: "21_LoveJuice" 
+    super("キス", "21_LoveJuice", 80, 80, 1, 70, 90, {
+      useSecondSound: true,
+      volumeRandomRange: 31,
+      pitchRandomRange: 41,
+      patternPitchRandomRange: 31
     });
   }
-  
   getPatternOptions(pistonIntensity) {
     return pistonIntensity == 2 ? [1, 2, 3, 4, 5, 6] : [1, 2, 3];
   }
@@ -2626,9 +2631,12 @@ class FellateSound extends SexActionSound {
     // Base sound "21_LoveJuice" is used with volume offset 80 and pitch offset 80.
     // Initial pattern strength is 3, pattern volume offset is 70, and pattern pitch offset is 90.
     // useSecondSound is true for additional sound with a typically lower pitch.
-    super("フェラ", "21_LoveJuice", 80, 80, 3, 70, 90, { useSecondSound: true });
+    super("フェラ", "21_LoveJuice", 80, 80, 3, 70, 90, {
+      useSecondSound: true,
+      volumeRandomRange: 31,
+      pitchRandomRange: 41
+    });
   }
-  
   // Override to supply the specific pattern options for fellation.
   getPatternOptions(pistonIntensity) {
     return pistonIntensity == 2 ? [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] : [1, 2, 3, 4, 5, 6, 7, 8];
@@ -2639,7 +2647,8 @@ class FellateSound extends SexActionSound {
 class BustKneadSound extends SexActionSound {
   constructor() {
     super("揉み", "21_BustKnead", 10, 80, 7, 70, 100, {
-      volumeRandomRange: 11 // Special randomRange for bust knead
+      volumeRandomRange: 11,
+      pitchRandomRange: 41
     });
   }
 }
@@ -2647,9 +2656,9 @@ class BustKneadSound extends SexActionSound {
 // New derived class for machine vibration action
 class MachineVibrationSound extends SexActionSound {
   constructor() {
-    // Using base sound "21_HandyMassager2" with volume offset 50 and pitch offset 80.
-    // Initial pattern strength is 7, pattern volume offset is 70, and pattern pitch offset is 100.
-    super("機械振動", "21_HandyMassager2", 50, 80, 7, 70, 100);
+    super("機械振動", "21_HandyMassager2", 50, 80, 7, 70, 100, {
+      pitchRandomRange: 21
+    });
   }
 }
 
