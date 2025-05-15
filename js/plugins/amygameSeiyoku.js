@@ -2564,19 +2564,46 @@ function actionType2SexDirection(pistonIntensity, patternVariant, voicePatternNu
   }
 }
 
-class SexDirectionAction {
+class SexDirectionActionBase {
   constructor(pistonIntensity, patternVariant, voicePatternNum) {
     this.pistonIntensity = pistonIntensity;
     this.patternVariant = patternVariant;
     this.voicePatternNum = voicePatternNum;
   }
 
-  playPatternedSound(basePistonStrength, patternOptions, volumeOffset, extraPitch) {
-  }
-
   // Abstract method that must be implemented by subclasses
   execute() {
-    throw new Error("execute() must be implemented by subclass");
+    $gameVariables.setValue(194, $gameVariables.value(194) + 1);
+    $gameSystem.setBgsLine($gameVariables.value(194));
+
+    const sound = "21_LoveJuice";
+    const volume = getRandomIndex(31) + 80;
+    const pitch = getRandomIndex(41) + 80;
+    AudioManager.playBgs({ "name": sound, "volume": volume, "pitch": pitch, "pan": 0 });
+
+    $gameVariables.setValue(194, $gameVariables.value(194) + 1);
+    $gameSystem.setBgsLine($gameVariables.value(194));
+
+    let soundSecondary = "21_LoveJuice";
+    const volumeSecondary = getRandomIndex(31) + 80;
+    const pitchSecondary = getRandomIndex(41) + 50;
+    AudioManager.playBgs({ "name": soundSecondary, "volume": volumeSecondary, "pitch": pitchSecondary, "pan": 0 });
+
+    if (voicePatternNum >= 1 && pistonIntensity <= 9) {
+      $gameSystem.setBgsLine(10 + $gameVariables.value(20));
+      let pistonStrength = 7;
+      let patternOptions = [1];
+      if (patternVariant === 1) { patternOptions = [1, 2, 3]; }
+      if (pistonIntensity === 2) {
+        pistonStrength += 1;
+        if (patternVariant === 1) { patternOptions = [1, 2]; }
+      }
+      const patternOption = patternOptions[getRandomIndex(patternOptions.length)];
+      let patternName = "51_pattern" + voicePatternNum + "_" + pistonStrength + "_" + patternOption;
+      const patternVolume = getRandomIndex(21) + 70;
+      const patternPitch = getRandomIndex(21) + 100;
+      AudioManager.playBgs({ "name": patternName, "volume": patternVolume, "pitch": patternPitch, "pan": 0 });
+    }
   }
 }
 
