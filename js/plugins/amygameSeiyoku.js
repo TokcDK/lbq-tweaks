@@ -2522,7 +2522,7 @@ class SexActionSound {
     this.patternStrength = patternStrength;
     this.patternVolumeOffset = patternVolumeOffset;
     this.patternPitchOffset = patternPitchOffset;
-    
+
     // Default options
     this.useSecondSound = options.useSecondSound || false;
     this.secondSound = options.secondSound || baseSound;
@@ -2530,13 +2530,14 @@ class SexActionSound {
     this.secondPitchOffset = options.secondPitchOffset || (this.pitchOffset - 30); // Typically lower pitch for second sound
     this.volumeRandomRange = options.volumeRandomRange || 21;
     this.pitchRandomRange = options.pitchRandomRange || 31;
+    this.patternVolumeRandomRange = options.patternVolumeRandomRange || 21;
+    this.patternPitchRandomRange = options.patternPitchRandomRange || 21;
   }
   
   play(voicePatternNum, pistonIntensity, patternVariant) {
     // Increment and set BGS line
     $gameVariables.setValue(194, $gameVariables.value(194) + 1);
     $gameSystem.setBgsLine($gameVariables.value(194));
-    
     // Play the base sound (piston, love juice, etc)
     const soundVolume = getRandomIndex(this.volumeRandomRange) + this.volumeOffset;
     const soundPitch = getRandomIndex(this.pitchRandomRange) + this.pitchOffset;
@@ -2554,26 +2555,22 @@ class SexActionSound {
     // Play the voice pattern if available
     if (voicePatternNum >= 1 && pistonIntensity <= 9) {
       $gameSystem.setBgsLine(10 + $gameVariables.value(20));
-      
       // Determine pattern options based on variant and intensity
       let patternOptions = [1];
-      if (patternVariant == 1) { 
+      if (patternVariant == 1) {
         patternOptions = this.getPatternOptions(pistonIntensity);
       }
-      
       // Adjust strength if needed
       let finalPatternStrength = this.patternStrength;
       if (pistonIntensity == 2) {
         finalPatternStrength += 1;
       }
-      
       // Select a random pattern option
       const chosenPatternOption = patternOptions[getRandomIndex(patternOptions.length)];
-      
       // Create pattern name and play it
-      const patternName = "51_pattern" + voicePatternNum + "_" + finalPatternStrength + "_" + chosenPatternOption;
-      const patternVolume = getRandomIndex(21) + this.patternVolumeOffset;
-      const patternPitch = getRandomIndex(21) + this.patternPitchOffset;
+      const patternName = `51_pattern${voicePatternNum}_${finalPatternStrength}_${chosenPatternOption}`;
+      const patternVolume = getRandomIndex(this.patternVolumeRandomRange) + this.patternVolumeOffset;
+      const patternPitch = getRandomIndex(this.patternPitchRandomRange) + this.patternPitchOffset;
       AudioManager.playBgs({ "name": patternName, "volume": patternVolume, "pitch": patternPitch, "pan": 0 });
     }
   }
