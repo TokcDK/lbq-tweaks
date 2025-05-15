@@ -2571,39 +2571,99 @@ class SexDirectionActionBase {
     this.voicePatternNum = voicePatternNum;
   }
 
+  // first play bgs getters
+  get soundName() {
+    return "21_LoveJuice";
+  }
+  get volumeOffset() {
+    return 80;
+  }
+  get pitchOffset() {
+    return 80;
+  }
+
+  // optional second play bgs getters
+  get playSecond() {
+    return true;
+  }
+  get soundName2() {
+    this.soundName;
+  }
+  get volumeOffset2() {
+    return this.volumeOffset;
+  }
+  get pitchOffset2() {
+    return 50;
+  }
+
+  updateBgsLineSetting() {
+    // Automatically update the BGS line configuration variable
+    $gameVariables.setValue(194, $gameVariables.value(194) + 1);
+    $gameSystem.setBgsLine($gameVariables.value(194));
+  }
+
+  playBgs(soundName, volumeOffset, pitchOffset) {
+    const sound = soundName;
+    const volume = getRandomIndex(31) + volumeOffset;
+    const pitch = getRandomIndex(41) + pitchOffset;
+    AudioManager.playBgs({ "name": sound, "volume": volume, "pitch": pitch, "pan": 0 });
+  }
+
+  get pistonStrength() {
+    throw new Error("pistonStrength is not implemented");
+  }
+  get patternVolumeOffset() {
+    return 70;
+  }
+  get patternPitchOffset() {
+    return 100;
+  }
+  get isValidToPlayPatternBgs() {
+    return this.voicePatternNum >= 1 && this.pistonIntensity <= 9;
+  }
+  getPatternSoundName(patternOption) {
+    return "51_pattern" + this.voicePatternNum + "_" + this.pistonStrength + "_" + patternOption;
+  }
+
+  getPatternOption() {
+    $gameSystem.setBgsLine(10 + $gameVariables.value(20));
+    let pistonStrength = this.pistonStrength;
+    let patternOptions = [1];
+    if (this.patternVariant === 1) {
+      patternOptions = [1, 2, 3];
+    }
+    if (this.pistonIntensity === 2) {
+      pistonStrength += 1;
+      if (this.patternVariant === 1) {
+        patternOptions = [1, 2];
+      }
+    }
+    return patternOptions[getRandomIndex(patternOptions.length)];
+  }
+  
+  playPatternBGS() {
+    if (!this.isValidToPlayPatternBgs) {
+      return;
+    }
+
+    const patternName = this.getPatternSoundName(this.getPatternOption());
+    const patternVolume = getRandomIndex(21) + this.patternVolumeOffset;
+    const patternPitch = getRandomIndex(21) + this.patternPitchOffset;
+    AudioManager.playBgs({ "name": patternName, "volume": patternVolume, "pitch": patternPitch, "pan": 0 });
+  }
+
   // Abstract method that must be implemented by subclasses
   execute() {
-    $gameVariables.setValue(194, $gameVariables.value(194) + 1);
-    $gameSystem.setBgsLine($gameVariables.value(194));
+    this.updateBgsLineSetting();
+    this.playBgs(this.soundName, this.volumeOffset, this.pitchOffset);
 
-    const sound = "21_LoveJuice";
-    const volume = getRandomIndex(31) + 80;
-    const pitch = getRandomIndex(41) + 80;
-    AudioManager.playBgs({ "name": sound, "volume": volume, "pitch": pitch, "pan": 0 });
-
-    $gameVariables.setValue(194, $gameVariables.value(194) + 1);
-    $gameSystem.setBgsLine($gameVariables.value(194));
-
-    let soundSecondary = "21_LoveJuice";
-    const volumeSecondary = getRandomIndex(31) + 80;
-    const pitchSecondary = getRandomIndex(41) + 50;
-    AudioManager.playBgs({ "name": soundSecondary, "volume": volumeSecondary, "pitch": pitchSecondary, "pan": 0 });
-
-    if (voicePatternNum >= 1 && pistonIntensity <= 9) {
-      $gameSystem.setBgsLine(10 + $gameVariables.value(20));
-      let pistonStrength = 7;
-      let patternOptions = [1];
-      if (patternVariant === 1) { patternOptions = [1, 2, 3]; }
-      if (pistonIntensity === 2) {
-        pistonStrength += 1;
-        if (patternVariant === 1) { patternOptions = [1, 2]; }
-      }
-      const patternOption = patternOptions[getRandomIndex(patternOptions.length)];
-      let patternName = "51_pattern" + voicePatternNum + "_" + pistonStrength + "_" + patternOption;
-      const patternVolume = getRandomIndex(21) + 70;
-      const patternPitch = getRandomIndex(21) + 100;
-      AudioManager.playBgs({ "name": patternName, "volume": patternVolume, "pitch": patternPitch, "pan": 0 });
+    if (this.playSecond) {
+      this.updateBgsLineSetting();
+      this.playBgs(this.soundName2, this.volumeOffset2, this.pitchOffset2);
     }
+      
+    // Modified selection placeholder code:
+    playVoicePatternBGS();
   }
 }
 
