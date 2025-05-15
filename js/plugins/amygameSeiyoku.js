@@ -2532,6 +2532,7 @@ class SexActionSound {
     this.pitchRandomRange = options.pitchRandomRange || 31;
     this.patternVolumeRandomRange = options.patternVolumeRandomRange || 21;
     this.patternPitchRandomRange = options.patternPitchRandomRange || 21;
+    this.requirePistonIntensityCheck = options.requirePistonIntensityCheck !== false;
   }
   
   play(voicePatternNum, pistonIntensity, patternVariant) {
@@ -2553,7 +2554,7 @@ class SexActionSound {
     }
 
     // Play the voice pattern if available
-    if (voicePatternNum >= 1 && pistonIntensity <= 9) {
+    if (voicePatternNum >= 1 && (!this.requirePistonIntensityCheck || pistonIntensity <= 9)) {
       $gameSystem.setBgsLine(10 + $gameVariables.value(20));
       // Determine pattern options based on variant and intensity
       let patternOptions = [1];
@@ -2634,7 +2635,8 @@ class FellateSound extends SexActionSound {
     super("フェラ", "21_LoveJuice", 80, 80, 3, 70, 90, {
       useSecondSound: true,
       volumeRandomRange: 31,
-      pitchRandomRange: 41
+      pitchRandomRange: 41,
+      requirePistonIntensityCheck: false
     });
   }
   // Override to supply the specific pattern options for fellation.
