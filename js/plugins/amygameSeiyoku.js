@@ -2577,8 +2577,14 @@ class SexActionSoundEffectBase {
   get soundName() {
     return "21_LoveJuice";
   }
+  get volumeRandomIndexMax() {
+    return 31;
+  }
   get volumeOffset() {
     return 80;
+  }
+  get pitchRandomIndexMax() {
+    return 41;
   }
   get pitchOffset() {
     return 80;
@@ -2591,8 +2597,14 @@ class SexActionSoundEffectBase {
   get soundName2() {
     this.soundName;
   }
+  get volumeRandomIndexMax2() {
+    return this.volumeRandomIndexMax;
+  }
   get volumeOffset2() {
     return this.volumeOffset;
+  }
+  get pitchRandomIndexMax2() {
+    return this.pitchRandomIndexMax;
   }
   get pitchOffset2() {
     return 50;
@@ -2604,10 +2616,10 @@ class SexActionSoundEffectBase {
     $gameSystem.setBgsLine($gameVariables.value(194));
   }
 
-  playBgs(soundName, volumeOffset, pitchOffset) {
+  playBgs(soundName, volumeOffset, pitchOffset, volumeRandomIndexMax, pitchRandomIndexMax) {
     const sound = soundName;
-    const volume = getRandomIndex(31) + volumeOffset;
-    const pitch = getRandomIndex(41) + pitchOffset;
+    const volume = getRandomIndex(volumeRandomIndexMax) + volumeOffset;
+    const pitch = getRandomIndex(pitchRandomIndexMax) + pitchOffset;
     AudioManager.playBgs({ "name": sound, "volume": volume, "pitch": pitch, "pan": 0 });
   }
 
@@ -2672,11 +2684,11 @@ class SexActionSoundEffectBase {
   // Abstract method that must be implemented by subclasses
   play() {
     this.updateBgsLineSetting();
-    this.playBgs(this.soundName, this.volumeOffset, this.pitchOffset);
+    this.playBgs(this.soundName, this.volumeOffset, this.pitchOffset, this.volumeRandomIndexMax, this.pitchRandomIndexMax);
 
     if (this.playSecond) {
       this.updateBgsLineSetting();
-      this.playBgs(this.soundName2, this.volumeOffset2, this.pitchOffset2);
+      this.playBgs(this.soundName2, this.volumeOffset2, this.pitchOffset2, this.volumeRandomIndexMax2, this.pitchRandomIndexMax2);
     }
       
     // Modified selection placeholder code:
@@ -2738,6 +2750,26 @@ class FellatioSoundEffect extends SexActionSoundEffectBase {
   }
 }
 
+class BustKneadSoundEffect extends SexActionSoundEffectBase {
+  constructor(pistonIntensity, patternVariant, voicePatternNum) {
+    super(pistonIntensity, patternVariant, voicePatternNum);
+  }
+
+  get soundName() {
+    return "21_BustKnead";
+  }
+  get volumeRandomIndexMax() {
+    return 11;
+  }
+  get volumeOffset() {
+    return 10;
+  }
+
+  get playSecond() {
+    return false;
+  }
+}
+
 // Function for action type 3: 愛液 (Liquid/Erotic fluid effect)
 // This function plays background sounds according to the given parameters and applies a secondary sound layer
 function actionType3SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
@@ -2762,28 +2794,8 @@ function actionType5SexDirection(pistonIntensity, patternVariant, voicePatternNu
 
 function actionType6SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
   // (actionType 6) 揉み
-  $gameVariables.setValue(194, $gameVariables.value(194) + 1);
-  $gameSystem.setBgsLine($gameVariables.value(194));
-  const sound = "21_BustKnead";
-  const volume = getRandomIndex(11) + 10;
-  const pitch = getRandomIndex(41) + 80;
-  AudioManager.playBgs({ "name": sound, "volume": volume, "pitch": pitch, "pan": 0 });
-
-  if (voicePatternNum >= 1 && pistonIntensity <= 9) {
-    $gameSystem.setBgsLine(10 + $gameVariables.value(20));
-    let pistonStrength = 7;
-    let patternOptions = [1];
-    if (patternVariant === 1) { patternOptions = [1, 2, 3]; }
-    if (pistonIntensity === 2) {
-      pistonStrength += 1;
-      if (patternVariant === 1) { patternOptions = [1, 2]; }
-    }
-    const patternOption = patternOptions[getRandomIndex(patternOptions.length)];
-    let patternName = "51_pattern" + voicePatternNum + "_" + pistonStrength + "_" + patternOption;
-    const patternVolume = getRandomIndex(21) + 70;
-    const patternPitch = getRandomIndex(21) + 100;
-    AudioManager.playBgs({ "name": patternName, "volume": patternVolume, "pitch": patternPitch, "pan": 0 });
-  }
+  const bustKneadSoundEffect = new BustKneadSoundEffect(pistonIntensity, patternVariant, voicePatternNum);
+  bustKneadSoundEffect.play();
 }
 
 function actionType7SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
