@@ -2623,7 +2623,7 @@ class SexActionSoundEffectBase {
     AudioManager.playBgs({ "name": sound, "volume": volume, "pitch": pitch, "pan": 0 });
   }
 
-  get pistonStrength() {
+  get patternStrength() {
     return 7;
   }
   get patternVolumeOffset() {
@@ -2642,7 +2642,7 @@ class SexActionSoundEffectBase {
     return this.voicePatternNum >= 1 && this.pistonIntensity <= 9;
   }
   getPatternSoundName(patternOption) {
-    return "51_pattern" + this.voicePatternNum + "_" + this.pistonStrength + "_" + patternOption;
+    return "51_pattern" + this.voicePatternNum + "_" + this._patternStrength + "_" + patternOption;
   }
   get patternOptions0() {
     return [1];
@@ -2657,12 +2657,13 @@ class SexActionSoundEffectBase {
   getPatternOption() {
     $gameSystem.setBgsLine(10 + $gameVariables.value(20));
     let patternOptions = this.patternOptions0;
+    this._patternStrength = this.patternStrength;
     
     if (this.patternVariant === 1) {
       patternOptions = this.patternOptions1;
     }
     if (this.pistonIntensity === 2) {
-      this.pistonStrength += 1;
+      this._patternStrength += 1;
       if (this.patternVariant === 1) {
         patternOptions = this.patternOptions2;
       }
@@ -2707,7 +2708,8 @@ class KissSoundEffect extends SexActionSoundEffectBase {
     super(pistonIntensity, patternVariant, voicePatternNum);
   }
 
-  get pistonStrength() {
+  _patternStrength = 1;
+  get patternStrength() {
     return 1;
   }
 
@@ -2729,7 +2731,7 @@ class FellatioSoundEffect extends SexActionSoundEffectBase {
     super(pistonIntensity, patternVariant, voicePatternNum);
   }
 
-  get pistonStrength() {
+  get patternStrength() {
     return 3;
   }
 
