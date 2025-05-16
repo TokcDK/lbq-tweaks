@@ -943,7 +943,8 @@ tachie_naibusyori2 = function (gameActor) {
   // Handle state 19 (clear standing picture)
   if ($gameActors.actor(actorId).isStateAffected(19)) {
     console.debug(`tachie_naibusyori2: Actor ${actorId} is in state 19. Clearing standing picture.`);
-    tachie_clear(picId);
+    //tachie_clear(picId); // undefined function
+    console.warn("use missing tachie_clear function");
     runTachieLoop(1, 40, () => {
       console.debug("runTachieLoop: Clearing clothing part, returning '0'");
       return "0";
