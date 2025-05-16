@@ -2772,6 +2772,29 @@ class BustKneadSoundEffect extends SexActionSoundEffectBase {
   }
 }
 
+class HandyMassager2SoundEffect extends SexActionSoundEffectBase {
+  constructor(pistonIntensity, patternVariant, voicePatternNum) {
+    super(pistonIntensity, patternVariant, voicePatternNum);
+  }
+
+  get soundName() {
+    return "21_HandyMassager2";
+  }
+  get volumeRandomIndexMax() {
+    return 21;
+  }
+  get volumeOffset() {
+    return 50;
+  }
+  get pitchRandomIndexMax() {
+    return 21;
+  }
+
+  get playSecond() {
+    return false;
+  }
+}
+
 // Function for action type 3: 愛液 (Liquid/Erotic fluid effect)
 // This function plays background sounds according to the given parameters and applies a secondary sound layer
 function actionType3SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
@@ -2802,28 +2825,8 @@ function actionType6SexDirection(pistonIntensity, patternVariant, voicePatternNu
 
 function actionType7SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
   // (actionType 7) 機械振動
-  $gameVariables.setValue(194, $gameVariables.value(194) + 1);
-  $gameSystem.setBgsLine($gameVariables.value(194));
-  const sound = "21_HandyMassager2";
-  const volume = getRandomIndex(21) + 50;
-  const pitch = getRandomIndex(21) + 80;
-  AudioManager.playBgs({ "name": sound, "volume": volume, "pitch": pitch, "pan": 0 });
-
-  if (voicePatternNum >= 1 && pistonIntensity <= 9) {
-    $gameSystem.setBgsLine(10 + $gameVariables.value(20));
-    let pistonStrength = 7;
-    let patternOptions = [1];
-    if (patternVariant === 1) { patternOptions = [1, 2, 3]; }
-    if (pistonIntensity === 2) {
-      pistonStrength += 1;
-      if (patternVariant === 1) { patternOptions = [1, 2]; }
-    }
-    const patternOption = patternOptions[getRandomIndex(patternOptions.length)];
-    let patternName = "51_pattern" + voicePatternNum + "_" + pistonStrength + "_" + patternOption;
-    const patternVolume = getRandomIndex(21) + 70;
-    const patternPitch = getRandomIndex(21) + 100;
-    AudioManager.playBgs({ "name": patternName, "volume": patternVolume, "pitch": patternPitch, "pan": 0 });
-  }
+  const handyMassager2SoundEffect = new HandyMassager2SoundEffect(pistonIntensity, patternVariant, voicePatternNum);
+  handyMassager2SoundEffect.play();
 }
 
 function actionType8SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
