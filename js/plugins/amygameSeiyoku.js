@@ -3200,21 +3200,32 @@ function adv_HpartDirectPlay_ExtremeClimax() {
 }
 
 //☆☆性欲スキルで確立上昇最大50%
-seiyoku_skillProbabilityUp = function () {
+const skillRangeSeiyokuSkillProbabilityUp = [61, 62, 63, 64, 65, 66, 67, 68, 69, 70];
+seiyoku_skillProbabilityUp = function() {
   const actorId = $gameVariables.value(20);
-  if (actorId == 0) { $gameVariables.setValue(21, 1) };
+  if (actorId === 0) { 
+    $gameVariables.setValue(21, 1);
+    return; // Early return if no valid actor
+  }
+  
   const currentActor = $gameActors.actor(actorId);
+  if (!currentActor) {
+    valueCountSet3 = 0;
+    return; // Protect against non-existent actor
+  }
+
+  // Define skill range
+  const probabilityPerSkill = 5;
+  
+  // Calculate probability increase with a standard loop
   let totalProbabilityIncrease = 0;
-  if (currentActor.learnSkill(61)) { totalProbabilityIncrease += 5 };
-  if (currentActor.learnSkill(62)) { totalProbabilityIncrease += 5 };
-  if (currentActor.learnSkill(63)) { totalProbabilityIncrease += 5 };
-  if (currentActor.learnSkill(64)) { totalProbabilityIncrease += 5 };
-  if (currentActor.learnSkill(65)) { totalProbabilityIncrease += 5 };
-  if (currentActor.learnSkill(66)) { totalProbabilityIncrease += 5 };
-  if (currentActor.learnSkill(67)) { totalProbabilityIncrease += 5 };
-  if (currentActor.learnSkill(68)) { totalProbabilityIncrease += 5 };
-  if (currentActor.learnSkill(69)) { totalProbabilityIncrease += 5 };
-  if (currentActor.learnSkill(70)) { totalProbabilityIncrease += 5 };
+  for (skillId of skillRangeSeiyokuSkillProbabilityUp) {
+    if (currentActor.isLearnedSkill(skillId)) {
+      totalProbabilityIncrease += probabilityPerSkill;
+    }
+  }
+  
+  // Store the result
   valueCountSet3 = totalProbabilityIncrease;
 };
 
