@@ -1689,17 +1689,17 @@
     const troopId = 10; //グループIDを指定
     const enemyTroopH = $dataTroops[troopId];
     const troopMeta = $dataItems[$gameVariables.value(240)].meta;
-    enemyTroopH.name = troopMeta['TroopNameH'];
+    enemyTroopH.name = troopMeta['TroopName']; // TroopNameH is missing
     enemyTroopH.members = []; //グループのメンバーを空に
     const spawnPoolH = $gameVariables.value(228);
     const spawnPoolHLength = spawnPoolH.length;
 
     // add enemies to enemy troop
-    const battleEnemyPopHOptions = troopMeta['BattleEnemyPopCH'].split(',');
+    const battleEnemyPopHOptions = troopMeta['BattleEnemyPopC'].split(','); // BattleEnemyPopCH is missing
     const enemyCountToSpawn = Number(battleEnemyPopHOptions[getRandomIndex(battleEnemyPopHOptions.length)]);
     for (let spawnIndex = 1; spawnIndex <= enemyCountToSpawn; spawnIndex++) {
       // get enemy data
-      let enemySpawnId = Number(spawnPoolH[getRandomIndex(spawnPoolHLength)]); //出現エネミースポーン
+      let enemySpawnId = Number(spawnPoolH[getRandomIndex(spawnPoolHLength)]) || 0; //出現エネミースポーン
       let isHidden = (spawnIndex >= enemyCountToSpawn) ? true : false;
       const { spawnX, spawnY } = getSpawnCoordinatesHEnemyTroopPush(spawnIndex, enemyCountToSpawn, xOffsetOptions, yNegativeOffsetOptions, yPositiveOffsetOptions);
       
@@ -1711,15 +1711,48 @@
 
   function getSpawnCoordinatesHEnemyTroopPush(spawnIndex, enemyCountToSpawn, xOffsetOptions, yNegativeOffsetOptions, yPositiveOffsetOptions) {
     let spawnX, spawnY;
-    if (spawnIndex == 1) { spawnX = 450; spawnY = 350; }
-    if (enemyCountToSpawn == 1) { spawnX = 350; spawnY = 420; }
-    if (spawnIndex == 2) { spawnX = 400; spawnY = 500; }
-    if (spawnIndex == 3) { spawnX = 350; spawnY = 350; }
-    if (spawnIndex == 4) { spawnX = 300; spawnY = 500; }
-    if (spawnIndex == 5) { spawnX = 250; spawnY = 350; }
-    if (spawnIndex == 6) { spawnX = 200; spawnY = 500; }
-    if (spawnIndex == 7) { spawnX = 150; spawnY = 350; }
-    if (spawnIndex == 8) { spawnX = 100; spawnY = 500; }
+    switch (spawnIndex) {
+      case 1:
+        if (enemyCountToSpawn === 1) {
+          spawnX = 350;
+          spawnY = 420;
+          break;
+        }
+
+        spawnX = 450;
+        spawnY = 350;
+        break;
+      case 2:
+        spawnX = 400;
+        spawnY = 500;
+        break;
+      case 3:
+        spawnX = 350;
+        spawnY = 350;
+        break;
+      case 4:
+        spawnX = 300;
+        spawnY = 500;
+        break;
+      case 5:
+        spawnX = 250;
+        spawnY = 350;
+        break;
+      case 6:
+        spawnX = 200;
+        spawnY = 500;
+        break;
+      case 7:
+        spawnX = 150;
+        spawnY = 350;
+        break;
+      case 8:
+        spawnX = 100;
+        spawnY = 500;
+        break;
+      default:
+        break;
+    }
 
     if (spawnIndex >= 2 && spawnIndex <= 6) {
       spawnX = spawnX + Number(xOffsetOptions[getRandomIndex(xOffsetOptions.length)]);
@@ -2460,7 +2493,7 @@
       gameVariables.setValue(224, Number(mapInfoMeta['MapEnemyPopC']));
     }
 
-    if (mapInfoMeta['MapEnemyPopCH']) {
+    if (mapInfoMeta['MapEnemyPopCH']) { // MapEnemyPopCH is missing!
       gameVariables.setValue(227, Number(mapInfoMeta['MapEnemyPopCH']));
     }
 
