@@ -2004,50 +2004,57 @@ pic_oneWord = function (pictureSlot, baseX, baseY, textMotionParam, moveDuration
 };
 
 //出産時の計算式
-actor_pregnancyCalculation = function (id1) {
+actor_pregnancyCalculation = function (actorId) {
 
-  $gameVariables.setValue(20, id1);
-  if ($gameActors.actor($gameVariables.value(20)).isStateAffected(83)) {
-    var actor = $gameActors.actor($gameVariables.value(20));
-    //actor.addStateCounter(83, +10);
-    var value1 = getRandomIndex(101);
-    if (true) {
-      actor.removeState(83);
-      actor.removeStateCounter(83);
-      $gameVariables.setValue(94, actor.name());
-    };
-    if (!actor.isStateAffected(83)) {
-      //妊娠時の一時的なサイズ増量表現を消去させる
-      var value1 = $gameVariables.value(20);
-      $gameVariables.value(value1 + 380)[42] = 0;
-      $gameVariables.value(value1 + 380)[43] = 0;
-      $gameVariables.value(value1 + 380)[44] = 0;
-      $gameVariables.value(value1 + 380)[45] = 0;
-      //妊娠相手を特定する
-      var array = [];
-      var array2 = $gameVariables.value($gameVariables.value(20) + 360);
-      for (var i = 101; i <= 200; i++) {
-        if (array2[i] >= 1) {
-          array.push(i);
-        }
-      };
-      var value1 = array[getRandomIndex(array.length)];
-      if (value1 == 0) { var value1 = 102 };
-      $gameVariables.value($gameVariables.value(20) + 360)[value1 + 100] += 1;
-      if ($gameVariables.value($gameVariables.value(20) + 380)[49] == 0) {
-        $gameVariables.value($gameVariables.value(20) + 380)[49] = value1 + 200;
-      };
-      //受精相手を特定するための配列を0にする。
-      var start = 101;
-      var end = 200;
-      for (var i = start; i <= end; i++) {
-        if ($gameVariables.value($gameVariables.value(20) + 360)[i] >= 1) {
-          $gameVariables.value($gameVariables.value(20) + 360)[i] = 0;
-        }
-      };
+  $gameVariables.setValue(20, actorId);
+  const actor = $gameActors.actor(actorId);
+  if (!actor.isStateAffected(83)) {
+    return;
+  };
+  
+  //actor.addStateCounter(83, +10);
+  //const randomValue = getRandomIndex(101);
+  if (true) {
+    actor.removeState(83);
+    actor.removeStateCounter(83);
+    $gameVariables.setValue(94, actor.name());
+  };
+  if ( actor.isStateAffected(83)) {
+    return;
+  }
+
+  //妊娠時の一時的なサイズ増量表現を消去させる
+  const actorId380 = actorId + 380;
+  const hRecordsCount = $gameVariables.value(actorId380)[0];
+  hRecordsCount[42] = 0;
+  hRecordsCount[43] = 0;
+  hRecordsCount[44] = 0;
+  hRecordsCount[45] = 0;
+
+  //妊娠相手を特定する
+  const potentialPartners = [];
+  const actorId360 = actorId + 360;
+  const partnerHRecords = $gameVariables.value(actorId360);
+  for (let partnerIndex = 101; partnerIndex <= 200; partnerIndex++) {
+    if (partnerHRecords[partnerIndex] >= 1) {
+      potentialPartners.push(partnerIndex);
     }
   };
-
+  const selectedPartner = potentialPartners[getRandomIndex(potentialPartners.length)];
+  const finalPartner = (selectedPartner == 0) ? 102 : selectedPartner;
+  partnerHRecords[finalPartner + 100] += 1;
+  if (hRecordsCount[49] == 0) {
+    hRecordsCount[49] = finalPartner + 200;
+  };
+  
+  //受精相手を特定するための配列を0にする。
+  const startPartner = 101;
+  const endPartner = 200;
+  for (let partnerIndex = startPartner; partnerIndex <= endPartner; partnerIndex++) {
+    if (partnerHRecords[partnerIndex] >= 1) {
+      partnerHRecords[partnerIndex] = 0;
+    }
+  };
 };
 
 //☆☆Hプロフィール表示時立ち絵
