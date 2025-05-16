@@ -628,7 +628,7 @@ seiyoku_jougenn = function () {
 }
 seiyoku_jougenn1 = function (gameActor) {
 
-  const actorVariableIndex = currentActorId + 380;
+  const actorVariableIndex = gameActor.actorId() + 380;
   const actorSuppressionValues = $gameVariables.value(actorVariableIndex);
   actorSuppressionValues[0] = 0;
   for (const requiredSkillId of valueHstaSuppression) {
