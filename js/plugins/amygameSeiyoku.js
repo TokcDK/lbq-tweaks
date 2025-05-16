@@ -2564,7 +2564,7 @@ function actionType2SexDirection(pistonIntensity, patternVariant, voicePatternNu
   }
 }
 
-class SexDirectionActionBase {
+class SexActionBase {
   constructor(pistonIntensity, patternVariant, voicePatternNum) {
     this.pistonIntensity = pistonIntensity;
     this.patternVariant = patternVariant;
