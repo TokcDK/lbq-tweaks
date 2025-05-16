@@ -2802,6 +2802,23 @@ class Piston1SoundEffect extends SexActionSoundEffectBase {
     return 100;
   }
 }
+class Piston2SoundEffect extends Piston1SoundEffect {
+  constructor(pistonIntensity, patternVariant, voicePatternNum) {
+    super(pistonIntensity, patternVariant, voicePatternNum);
+  }
+  get pitchOffset() {
+    return 120;
+  }
+  get playSecond() {
+    return false;
+  }
+  get patternVolumeOffset() {
+    return 70;
+  }
+  get patternPitchOffset() {
+    return 110;
+  }
+}
 
 function actionType1SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
   // (actionType 1) ピストン弱
@@ -2811,28 +2828,8 @@ function actionType1SexDirection(pistonIntensity, patternVariant, voicePatternNu
 
 function actionType2SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
   // (actionType 2) ピストン強
-  $gameVariables.setValue(194, $gameVariables.value(194) + 1);
-  $gameSystem.setBgsLine($gameVariables.value(194));
-  const sound = "21_Piston1";
-  const volume = getRandomIndex(21) + 90;
-  const pitch = getRandomIndex(31) + 120;
-  AudioManager.playBgs({ "name": sound, "volume": volume, "pitch": pitch, "pan": 0 });
-
-  if (voicePatternNum >= 1 && pistonIntensity <= 9) {
-    $gameSystem.setBgsLine(10 + $gameVariables.value(20));
-    let pistonStrength = 5;
-    let patternOptions = [1];
-    if (patternVariant === 1) { patternOptions = [1, 2, 3]; }
-    if (pistonIntensity === 2) {
-      pistonStrength += 1;
-      if (patternVariant === 1) { patternOptions = [1, 2, 3]; }
-    }
-    const patternOption = patternOptions[getRandomIndex(patternOptions.length)];
-    let patternName = "51_pattern" + voicePatternNum + "_" + pistonStrength + "_" + patternOption;
-    const patternVolume = getRandomIndex(21) + 70;
-    const patternPitch = getRandomIndex(21) + 110;
-    AudioManager.playBgs({ "name": patternName, "volume": patternVolume, "pitch": patternPitch, "pan": 0 });
-  }
+  const piston2SoundEffect = new Piston2SoundEffect(pistonIntensity, patternVariant, voicePatternNum);
+  piston2SoundEffect.play();
 }
 
 // Function for action type 3: 愛液 (Liquid/Erotic fluid effect)
