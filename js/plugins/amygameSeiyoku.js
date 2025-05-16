@@ -2876,38 +2876,34 @@ function actionType8SexDirection(pistonIntensity, patternVariant, voicePatternNu
 function actionType11SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
   // (actionType 11) 挿入
   adv_partDirectPlay(7);
+  
+  // Options used for sound effects
+  const SE_OPTIONS = ['Z_zamen1', 'Z_zamen2'];
+
+  // Helper function to play a random sound effect based on SE_OPTIONS.
+  function playRandomSE() {
+    const seName = SE_OPTIONS[getRandomIndex(SE_OPTIONS.length)];
+    const seVolume = getRandomIndex(21) + 100;
+    const sePitch = getRandomIndex(41) + 80;
+    AudioManager.playSe({ name: seName, volume: seVolume, pitch: sePitch, pan: 0 });
+  }
 
   if (valueSexWait >= 1) {
-    let flashDuration = getRandomIndex(41) + 160;
-    let shakeIntensity = getRandomIndex(21) + 50;
+    // When there's a wait value present, play flash and two SE effects.
+    const flashDuration = getRandomIndex(41) + 160;
+    const shakeIntensity = getRandomIndex(21) + 50;
     $gameScreen.startFlash([255, 119, 255, flashDuration], shakeIntensity);
-    let seOptions = ['Z_zamen1', 'Z_zamen2'];
-    let seName = seOptions[getRandomIndex(seOptions.length)];
-    let seVolume = getRandomIndex(21) + 100;
-    let sePitch = getRandomIndex(41) + 80;
-    AudioManager.playSe({ "name": seName, "volume": seVolume, "pitch": sePitch, "pan": 0 });
-    let seOptionsAlt = ['Z_zamen1', 'Z_zamen2'];
-    seName = seOptionsAlt[getRandomIndex(seOptionsAlt.length)];
-    seVolume = getRandomIndex(21) + 100;
-    sePitch = getRandomIndex(41) + 80;
-    AudioManager.playSe({ "name": seName, "volume": seVolume, "pitch": sePitch, "pan": 0 });
-
+    playRandomSE();
+    playRandomSE();
     valueSexWait = 0;
-  }
-  else {
-    if (valueSexWait == 0) {
-      let flashDuration = getRandomIndex(41) + 160;
-      let shakeIntensity = getRandomIndex(21) + 50;
-      let shakeDuration = getRandomIndex(5) + 6;
-      $gameScreen.startFlash([255, 119, 255, flashDuration], shakeIntensity);
-      $gameScreen.startShake(shakeDuration, shakeDuration, shakeIntensity);
-      let seOptions = ['Z_zamen1', 'Z_zamen2'];
-      let seName = seOptions[getRandomIndex(seOptions.length)];
-      let seVolume = getRandomIndex(21) + 100;
-      let sePitch = getRandomIndex(41) + 80;
-      AudioManager.playSe({ "name": seName, "volume": seVolume, "pitch": sePitch, "pan": 0 });
-    }
-
+  } else {
+    // When no wait is set, play flash, shake and one SE, then update wait.
+    const flashDuration = getRandomIndex(41) + 160;
+    const shakeIntensity = getRandomIndex(21) + 50;
+    const shakeDuration = getRandomIndex(5) + 6;
+    $gameScreen.startFlash([255, 119, 255, flashDuration], shakeIntensity);
+    $gameScreen.startShake(shakeDuration, shakeDuration, shakeIntensity);
+    playRandomSE();
     valueSexWait = getRandomIndex(21) + 20;
   }
 }
