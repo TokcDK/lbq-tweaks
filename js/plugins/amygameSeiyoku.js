@@ -2564,12 +2564,14 @@ function actionType2SexDirection(pistonIntensity, patternVariant, voicePatternNu
   }
 }
 
-class SexActionBase {
+class SexActionSoundEffectBase {
   constructor(pistonIntensity, patternVariant, voicePatternNum) {
     this.pistonIntensity = pistonIntensity;
     this.patternVariant = patternVariant;
     this.voicePatternNum = voicePatternNum;
   }
+
+  // default values are for sex action 3, FluidSoundEffect
 
   // first play bgs getters
   get soundName() {
@@ -2610,7 +2612,7 @@ class SexActionBase {
   }
 
   get pistonStrength() {
-    throw new Error("pistonStrength is not implemented");
+    return 7;
   }
   get patternVolumeOffset() {
     return 70;
@@ -2618,24 +2620,39 @@ class SexActionBase {
   get patternPitchOffset() {
     return 100;
   }
+  get patternVolumeRandomIndexMax() {
+    return 21;
+  }
+  get patternPitchRandomIndexMax() {
+    return 21;
+  }
   get isValidToPlayPatternBgs() {
     return this.voicePatternNum >= 1 && this.pistonIntensity <= 9;
   }
   getPatternSoundName(patternOption) {
     return "51_pattern" + this.voicePatternNum + "_" + this.pistonStrength + "_" + patternOption;
   }
+  get patternOptions0() {
+    return [1];
+  }
+  get patternOptions1() {
+    return [1, 2, 3];
+  }
+  get patternOptions2() {
+    return [1, 2];
+  }
 
   getPatternOption() {
     $gameSystem.setBgsLine(10 + $gameVariables.value(20));
-    let pistonStrength = this.pistonStrength;
-    let patternOptions = [1];
+    let patternOptions = this.patternOptions0;
+    
     if (this.patternVariant === 1) {
-      patternOptions = [1, 2, 3];
+      patternOptions = this.patternOptions1;
     }
     if (this.pistonIntensity === 2) {
-      pistonStrength += 1;
+      this.pistonStrength += 1;
       if (this.patternVariant === 1) {
-        patternOptions = [1, 2];
+        patternOptions = this.patternOptions2;
       }
     }
     return patternOptions[getRandomIndex(patternOptions.length)];
@@ -2647,8 +2664,8 @@ class SexActionBase {
     }
 
     const patternName = this.getPatternSoundName(this.getPatternOption());
-    const patternVolume = getRandomIndex(21) + this.patternVolumeOffset;
-    const patternPitch = getRandomIndex(21) + this.patternPitchOffset;
+    const patternVolume = getRandomIndex(this.patternVolumeRandomIndexMax) + this.patternVolumeOffset;
+    const patternPitch = getRandomIndex(this.patternPitchRandomIndexMax) + this.patternPitchOffset;
     AudioManager.playBgs({ "name": patternName, "volume": patternVolume, "pitch": patternPitch, "pan": 0 });
   }
 
@@ -2667,77 +2684,48 @@ class SexActionBase {
   }
 }
 
+class FluidSoundEffect extends SexActionSoundEffectBase {
+  constructor(pistonIntensity, patternVariant, voicePatternNum) {
+    super(pistonIntensity, patternVariant, voicePatternNum);
+  }
+}
+
+class KissSoundEffect extends SexActionSoundEffectBase {
+  constructor(pistonIntensity, patternVariant, voicePatternNum) {
+    super(pistonIntensity, patternVariant, voicePatternNum);
+  }
+
+  get pistonStrength() {
+    return 1;
+  }
+
+  get patternOptions2() {
+    return [1, 2, 3, 4, 5, 6];
+  }
+
+  get patternPitchRandomIndexMax() {
+    return 31;
+  }
+
+  get patternPitchOffset() {
+    return 90;
+  }
+}
+
 // Function for action type 3: 愛液 (Liquid/Erotic fluid effect)
 // This function plays background sounds according to the given parameters and applies a secondary sound layer
 function actionType3SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
-  $gameVariables.setValue(194, $gameVariables.value(194) + 1);
-  $gameSystem.setBgsLine($gameVariables.value(194));
-
-  const sound = "21_LoveJuice";
-  const volume = getRandomIndex(31) + 80;
-  const pitch = getRandomIndex(41) + 80;
-  AudioManager.playBgs({ "name": sound, "volume": volume, "pitch": pitch, "pan": 0 });
-
-  $gameVariables.setValue(194, $gameVariables.value(194) + 1);
-  $gameSystem.setBgsLine($gameVariables.value(194));
-
-  let soundSecondary = "21_LoveJuice";
-  const volumeSecondary = getRandomIndex(31) + 80;
-  const pitchSecondary = getRandomIndex(41) + 50;
-  AudioManager.playBgs({ "name": soundSecondary, "volume": volumeSecondary, "pitch": pitchSecondary, "pan": 0 });
-
-  if (voicePatternNum >= 1 && pistonIntensity <= 9) {
-    $gameSystem.setBgsLine(10 + $gameVariables.value(20));
-    let pistonStrength = 7;
-    let patternOptions = [1];
-    if (patternVariant === 1) { patternOptions = [1, 2, 3]; }
-    if (pistonIntensity === 2) {
-      pistonStrength += 1;
-      if (patternVariant === 1) { patternOptions = [1, 2]; }
-    }
-    const patternOption = patternOptions[getRandomIndex(patternOptions.length)];
-    let patternName = "51_pattern" + voicePatternNum + "_" + pistonStrength + "_" + patternOption;
-    const patternVolume = getRandomIndex(21) + 70;
-    const patternPitch = getRandomIndex(21) + 100;
-    AudioManager.playBgs({ "name": patternName, "volume": patternVolume, "pitch": patternPitch, "pan": 0 });
-  }
+  // (actionType 3) 愛液
+  const fluidSoundEffect = new FluidSoundEffect(pistonIntensity, patternVariant, voicePatternNum);
+  fluidSoundEffect.play();
 }
 
 // Function for action type 4: キス (Kiss effect)
 // This function plays background sounds for a kissing effect including primary and secondary sound layers,
 // and then, if applicable, plays a patterned sound based on the input parameters.
 function actionType4SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
-  $gameVariables.setValue(194, $gameVariables.value(194) + 1);
-  $gameSystem.setBgsLine($gameVariables.value(194));
-
-  const sound = "21_LoveJuice";
-  const volume = getRandomIndex(31) + 80;
-  const pitch = getRandomIndex(41) + 80;
-  AudioManager.playBgs({ "name": sound, "volume": volume, "pitch": pitch, "pan": 0 });
-
-  $gameVariables.setValue(194, $gameVariables.value(194) + 1);
-  $gameSystem.setBgsLine($gameVariables.value(194));
-
-  let soundSecondary = "21_LoveJuice";
-  const volumeSecondary = getRandomIndex(31) + 80;
-  const pitchSecondary = getRandomIndex(41) + 50;
-  AudioManager.playBgs({ "name": soundSecondary, "volume": volumeSecondary, "pitch": pitchSecondary, "pan": 0 });
-
-  if (voicePatternNum >= 1 && pistonIntensity <= 9) {
-    $gameSystem.setBgsLine(10 + $gameVariables.value(20));
-    let pistonStrength = 1;
-    let patternOptions = [1];
-    if (patternVariant === 1) { patternOptions = [1, 2, 3]; }
-    if (pistonIntensity === 2) {
-      pistonStrength += 1;
-      if (patternVariant === 1) { patternOptions = [1, 2, 3, 4, 5, 6]; }
-    }
-    const patternOption = patternOptions[getRandomIndex(patternOptions.length)];
-    let patternName = "51_pattern" + voicePatternNum + "_" + pistonStrength + "_" + patternOption;
-    const patternVolume = getRandomIndex(21) + 70;
-    const patternPitch = getRandomIndex(31) + 90;
-    AudioManager.playBgs({ "name": patternName, "volume": patternVolume, "pitch": patternPitch, "pan": 0 });
-  }
+  const KissSoundEffect = new FluidSoundEffect(pistonIntensity, patternVariant, voicePatternNum);
+  KissSoundEffect.play();
 }
 
 function actionType5SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
