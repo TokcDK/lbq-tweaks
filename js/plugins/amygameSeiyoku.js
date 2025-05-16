@@ -2795,6 +2795,32 @@ class HandyMassager2SoundEffect extends SexActionSoundEffectBase {
   }
 }
 
+class VibratorSoundEffect extends SexActionSoundEffectBase {
+  constructor(pistonIntensity, patternVariant, voicePatternNum) {
+    super(pistonIntensity, patternVariant, voicePatternNum);
+  }
+
+  get soundName() {
+    return "21_HandyMassager2";
+  }
+  get volumeRandomIndexMax() {
+    return 21;
+  }
+  get volumeOffset() {
+    return 60;
+  }
+  get pitchRandomIndexMax() {
+    return 31;
+  }
+  get pitchOffset() {
+    return 100;
+  }
+
+  get playSecond() {
+    return false;
+  }
+}
+
 // Function for action type 3: 愛液 (Liquid/Erotic fluid effect)
 // This function plays background sounds according to the given parameters and applies a secondary sound layer
 function actionType3SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
@@ -2831,28 +2857,8 @@ function actionType7SexDirection(pistonIntensity, patternVariant, voicePatternNu
 
 function actionType8SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
   // (actionType 8) 機械振動激しく
-  $gameVariables.setValue(194, $gameVariables.value(194) + 1);
-  $gameSystem.setBgsLine($gameVariables.value(194));
-  const sound = "21_HandyMassager2";
-  const volume = getRandomIndex(21) + 60;
-  const pitch = getRandomIndex(31) + 100;
-  AudioManager.playBgs({ "name": sound, "volume": volume, "pitch": pitch, "pan": 0 });
-
-  if (voicePatternNum >= 1 && pistonIntensity <= 9) {
-    $gameSystem.setBgsLine(10 + $gameVariables.value(20));
-    let pistonStrength = 7;
-    let patternOptions = [1];
-    if (patternVariant === 1) { patternOptions = [1, 2, 3]; }
-    if (pistonIntensity === 2) {
-      pistonStrength += 1;
-      if (patternVariant === 1) { patternOptions = [1, 2]; }
-    }
-    const patternOption = patternOptions[getRandomIndex(patternOptions.length)];
-    let patternName = "51_pattern" + voicePatternNum + "_" + pistonStrength + "_" + patternOption;
-    const patternVolume = getRandomIndex(21) + 70;
-    const patternPitch = getRandomIndex(21) + 100;
-    AudioManager.playBgs({ "name": patternName, "volume": patternVolume, "pitch": patternPitch, "pan": 0 });
-  }
+  const vibratorSoundEffect = new VibratorSoundEffect(pistonIntensity, patternVariant, voicePatternNum);
+  vibratorSoundEffect.play();
 }
 
 function actionType11SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
