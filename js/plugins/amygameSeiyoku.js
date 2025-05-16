@@ -2646,8 +2646,60 @@ class SexActionSoundEffectBase {
 }
 
 class FluidSoundEffect extends SexActionSoundEffectBase {
+  // this params are using as default for base class
   constructor(pistonIntensity, patternVariant, voicePatternNum) {
     super(pistonIntensity, patternVariant, voicePatternNum);
+  }
+}
+
+class Piston1SoundEffect extends SexActionSoundEffectBase {
+  constructor(pistonIntensity, patternVariant, voicePatternNum) {
+    super(pistonIntensity, patternVariant, voicePatternNum);
+  }
+
+  get soundName() {
+    return "21_Piston1";
+  }
+  get volumeRandomIndexMax() {
+    return 21;
+  }
+  get volumeOffset() {
+    return 90;
+  }
+  get pitchRandomIndexMax() {
+    return 31;
+  }
+  get pitchOffset() {
+    return 90;
+  }
+  get playSecond() {
+    return false;
+  }
+  get patternStrength() {
+    return 5;
+  }
+  get patternOptions2() {
+    return [1, 2, 3];
+  }
+  get patternVolumeOffset() {
+    return 100;
+  }
+}
+class Piston2SoundEffect extends Piston1SoundEffect {
+  constructor(pistonIntensity, patternVariant, voicePatternNum) {
+    super(pistonIntensity, patternVariant, voicePatternNum);
+  }
+  get pitchOffset() {
+    return 120;
+  }
+  get playSecond() {
+    return false;
+  }
+  get patternVolumeOffset() {
+    return 70;
+  }
+  get patternPitchOffset() {
+    return 110;
   }
 }
 
@@ -2766,57 +2818,6 @@ class VibratorSoundEffect extends SexActionSoundEffectBase {
 
   get playSecond() {
     return false;
-  }
-}
-
-class Piston1SoundEffect extends SexActionSoundEffectBase {
-  constructor(pistonIntensity, patternVariant, voicePatternNum) {
-    super(pistonIntensity, patternVariant, voicePatternNum);
-  }
-
-  get soundName() {
-    return "21_Piston1";
-  }
-  get volumeRandomIndexMax() {
-    return 21;
-  }
-  get volumeOffset() {
-    return 90;
-  }
-  get pitchRandomIndexMax() {
-    return 31;
-  }
-  get pitchOffset() {
-    return 90;
-  }
-  get playSecond() {
-    return false;
-  }
-  get patternStrength() {
-    return 5;
-  }
-  get patternOptions2() {
-    return [1, 2, 3];
-  }
-  get patternVolumeOffset() {
-    return 100;
-  }
-}
-class Piston2SoundEffect extends Piston1SoundEffect {
-  constructor(pistonIntensity, patternVariant, voicePatternNum) {
-    super(pistonIntensity, patternVariant, voicePatternNum);
-  }
-  get pitchOffset() {
-    return 120;
-  }
-  get playSecond() {
-    return false;
-  }
-  get patternVolumeOffset() {
-    return 70;
-  }
-  get patternPitchOffset() {
-    return 110;
   }
 }
 
