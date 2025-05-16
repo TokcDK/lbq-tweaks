@@ -2512,58 +2512,6 @@ function actionType0SexDirection() {
   $gameScreen._particle.particleSet(0, directParticleName, 'screen', 'def', 'screen');
 }
 
-function actionType1SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
-  // (actionType 1) ピストン弱
-  $gameVariables.setValue(194, $gameVariables.value(194) + 1);
-  $gameSystem.setBgsLine($gameVariables.value(194));
-  const sound = "21_Piston1";
-  const volume = getRandomIndex(21) + 90;
-  const pitch = getRandomIndex(31) + 90;
-  AudioManager.playBgs({ "name": sound, "volume": volume, "pitch": pitch, "pan": 0 });
-
-  if (voicePatternNum >= 1 && pistonIntensity <= 9) {
-    $gameSystem.setBgsLine(10 + $gameVariables.value(20));
-    let pistonStrength = 5;
-    let patternOptions = [1];
-    if (patternVariant === 1) { patternOptions = [1, 2, 3]; }
-    if (pistonIntensity === 2) {
-      pistonStrength += 1;
-      if (patternVariant === 1) { patternOptions = [1, 2, 3]; }
-    }
-    const patternOption = patternOptions[getRandomIndex(patternOptions.length)];
-    let patternName = "51_pattern" + voicePatternNum + "_" + pistonStrength + "_" + patternOption;
-    const patternVolume = getRandomIndex(21) + 100;
-    const patternPitch = getRandomIndex(21) + 100;
-    AudioManager.playBgs({ "name": patternName, "volume": patternVolume, "pitch": patternPitch, "pan": 0 });
-  }
-}
-
-function actionType2SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
-  // (actionType 2) ピストン強
-  $gameVariables.setValue(194, $gameVariables.value(194) + 1);
-  $gameSystem.setBgsLine($gameVariables.value(194));
-  const sound = "21_Piston1";
-  const volume = getRandomIndex(21) + 90;
-  const pitch = getRandomIndex(31) + 120;
-  AudioManager.playBgs({ "name": sound, "volume": volume, "pitch": pitch, "pan": 0 });
-
-  if (voicePatternNum >= 1 && pistonIntensity <= 9) {
-    $gameSystem.setBgsLine(10 + $gameVariables.value(20));
-    let pistonStrength = 5;
-    let patternOptions = [1];
-    if (patternVariant === 1) { patternOptions = [1, 2, 3]; }
-    if (pistonIntensity === 2) {
-      pistonStrength += 1;
-      if (patternVariant === 1) { patternOptions = [1, 2, 3]; }
-    }
-    const patternOption = patternOptions[getRandomIndex(patternOptions.length)];
-    let patternName = "51_pattern" + voicePatternNum + "_" + pistonStrength + "_" + patternOption;
-    const patternVolume = getRandomIndex(21) + 70;
-    const patternPitch = getRandomIndex(21) + 110;
-    AudioManager.playBgs({ "name": patternName, "volume": patternVolume, "pitch": patternPitch, "pan": 0 });
-  }
-}
-
 class SexActionSoundEffectBase {
   constructor(pistonIntensity, patternVariant, voicePatternNum) {
     this.pistonIntensity = pistonIntensity;
@@ -2818,6 +2766,72 @@ class VibratorSoundEffect extends SexActionSoundEffectBase {
 
   get playSecond() {
     return false;
+  }
+}
+
+class Piston1SoundEffect extends SexActionSoundEffectBase {
+  constructor(pistonIntensity, patternVariant, voicePatternNum) {
+    super(pistonIntensity, patternVariant, voicePatternNum);
+  }
+
+  get soundName() {
+    return "21_Piston1";
+  }
+  get volumeRandomIndexMax() {
+    return 21;
+  }
+  get volumeOffset() {
+    return 90;
+  }
+  get pitchRandomIndexMax() {
+    return 31;
+  }
+  get pitchOffset() {
+    return 90;
+  }
+  get playSecond() {
+    return false;
+  }
+  get patternStrength() {
+    return 5;
+  }
+  get patternOptions2() {
+    return [1, 2, 3];
+  }
+  get patternVolumeOffset() {
+    return 100;
+  }
+}
+
+function actionType1SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
+  // (actionType 1) ピストン弱
+  const piston1SoundEffect = new Piston1SoundEffect(pistonIntensity, patternVariant, voicePatternNum);
+  piston1SoundEffect.play();  
+}
+
+function actionType2SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
+  // (actionType 2) ピストン強
+  $gameVariables.setValue(194, $gameVariables.value(194) + 1);
+  $gameSystem.setBgsLine($gameVariables.value(194));
+  const sound = "21_Piston1";
+  const volume = getRandomIndex(21) + 90;
+  const pitch = getRandomIndex(31) + 120;
+  AudioManager.playBgs({ "name": sound, "volume": volume, "pitch": pitch, "pan": 0 });
+
+  if (voicePatternNum >= 1 && pistonIntensity <= 9) {
+    $gameSystem.setBgsLine(10 + $gameVariables.value(20));
+    let pistonStrength = 5;
+    let patternOptions = [1];
+    if (patternVariant === 1) { patternOptions = [1, 2, 3]; }
+    if (pistonIntensity === 2) {
+      pistonStrength += 1;
+      if (patternVariant === 1) { patternOptions = [1, 2, 3]; }
+    }
+    const patternOption = patternOptions[getRandomIndex(patternOptions.length)];
+    let patternName = "51_pattern" + voicePatternNum + "_" + pistonStrength + "_" + patternOption;
+    const patternVolume = getRandomIndex(21) + 70;
+    const patternPitch = getRandomIndex(21) + 110;
+    AudioManager.playBgs({ "name": patternName, "volume": patternVolume, "pitch": patternPitch, "pan": 0 });
   }
 }
 
