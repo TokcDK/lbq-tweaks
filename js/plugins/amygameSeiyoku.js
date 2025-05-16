@@ -2712,6 +2712,32 @@ class KissSoundEffect extends SexActionSoundEffectBase {
   }
 }
 
+class FellatioSoundEffect extends SexActionSoundEffectBase {
+  constructor(pistonIntensity, patternVariant, voicePatternNum) {
+    super(pistonIntensity, patternVariant, voicePatternNum);
+  }
+
+  get pistonStrength() {
+    return 3;
+  }
+
+  get patternOptions1() {
+    return [1, 2, 3, 4, 5, 6, 7, 8];
+  }
+
+  get patternOptions2() {
+    return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  }
+
+  get isValidToPlayPatternBgs() {
+    return this.voicePatternNum >= 1;
+  }
+
+  get patternPitchOffset() {
+    return 90;
+  }
+}
+
 // Function for action type 3: 愛液 (Liquid/Erotic fluid effect)
 // This function plays background sounds according to the given parameters and applies a secondary sound layer
 function actionType3SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
@@ -2730,35 +2756,8 @@ function actionType4SexDirection(pistonIntensity, patternVariant, voicePatternNu
 
 function actionType5SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
   // (actionType 5) フェラ
-  $gameVariables.setValue(194, $gameVariables.value(194) + 1);
-  $gameSystem.setBgsLine($gameVariables.value(194));
-  const sound = "21_LoveJuice";
-  const volume = getRandomIndex(31) + 80;
-  const pitch = getRandomIndex(41) + 80;
-  AudioManager.playBgs({ "name": sound, "volume": volume, "pitch": pitch, "pan": 0 });
-
-  $gameVariables.setValue(194, $gameVariables.value(194) + 1);
-  $gameSystem.setBgsLine($gameVariables.value(194));
-  let soundSecondary = "21_LoveJuice";
-  const volumeSecondary = getRandomIndex(31) + 80;
-  const pitchSecondary = getRandomIndex(41) + 50;
-  AudioManager.playBgs({ "name": soundSecondary, "volume": volumeSecondary, "pitch": pitchSecondary, "pan": 0 });
-
-  if (voicePatternNum >= 1) {
-    $gameSystem.setBgsLine(10 + $gameVariables.value(20));
-    let pistonStrength = 3;
-    let patternOptions = [1];
-    if (patternVariant === 1) { patternOptions = [1, 2, 3, 4, 5, 6, 7, 8]; }
-    if (pistonIntensity === 2) {
-      pistonStrength += 1;
-      if (patternVariant === 1) { patternOptions = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; }
-    }
-    const patternOption = patternOptions[getRandomIndex(patternOptions.length)];
-    let patternName = "51_pattern" + voicePatternNum + "_" + pistonStrength + "_" + patternOption;
-    const patternVolume = getRandomIndex(21) + 70;
-    const patternPitch = getRandomIndex(21) + 90;
-    AudioManager.playBgs({ "name": patternName, "volume": patternVolume, "pitch": patternPitch, "pan": 0 });
-  }
+  const fellatioSoundEffect = new FellatioSoundEffect(pistonIntensity, patternVariant, voicePatternNum);
+  fellatioSoundEffect.play();
 }
 
 function actionType6SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
