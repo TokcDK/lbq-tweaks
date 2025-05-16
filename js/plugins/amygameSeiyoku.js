@@ -2877,21 +2877,7 @@ function actionType11SexDirection(pistonIntensity, patternVariant, voicePatternN
   // (actionType 11) 挿入
   adv_partDirectPlay(7);
 
-  let isMoreOf1 = false;
-  if (valueSexWait == 0) {
-    let flashDuration = getRandomIndex(41) + 160;
-    let shakeIntensity = getRandomIndex(21) + 50;
-    let shakeDuration = getRandomIndex(5) + 6;
-    $gameScreen.startFlash([255, 119, 255, flashDuration], shakeIntensity);
-    $gameScreen.startShake(shakeDuration, shakeDuration, shakeIntensity);
-    let seOptions = ['Z_zamen1', 'Z_zamen2'];
-    let seName = seOptions[getRandomIndex(seOptions.length)];
-    let seVolume = getRandomIndex(21) + 100;
-    let sePitch = getRandomIndex(41) + 80;
-    AudioManager.playSe({ "name": seName, "volume": seVolume, "pitch": sePitch, "pan": 0 });
-  }
-  else if (valueSexWait >= 1) {
-    isMoreOf1 = true;
+  if (valueSexWait >= 1) {
     let flashDuration = getRandomIndex(41) + 160;
     let shakeIntensity = getRandomIndex(21) + 50;
     $gameScreen.startFlash([255, 119, 255, flashDuration], shakeIntensity);
@@ -2905,11 +2891,23 @@ function actionType11SexDirection(pistonIntensity, patternVariant, voicePatternN
     seVolume = getRandomIndex(21) + 100;
     sePitch = getRandomIndex(41) + 80;
     AudioManager.playSe({ "name": seName, "volume": seVolume, "pitch": sePitch, "pan": 0 });
-  }
 
-  if (isMoreOf1) {
     valueSexWait = 0;
-  } else {
+  }
+  else {
+    if (valueSexWait == 0) {
+      let flashDuration = getRandomIndex(41) + 160;
+      let shakeIntensity = getRandomIndex(21) + 50;
+      let shakeDuration = getRandomIndex(5) + 6;
+      $gameScreen.startFlash([255, 119, 255, flashDuration], shakeIntensity);
+      $gameScreen.startShake(shakeDuration, shakeDuration, shakeIntensity);
+      let seOptions = ['Z_zamen1', 'Z_zamen2'];
+      let seName = seOptions[getRandomIndex(seOptions.length)];
+      let seVolume = getRandomIndex(21) + 100;
+      let sePitch = getRandomIndex(41) + 80;
+      AudioManager.playSe({ "name": seName, "volume": seVolume, "pitch": sePitch, "pan": 0 });
+    }
+
     valueSexWait = getRandomIndex(21) + 20;
   }
 }
