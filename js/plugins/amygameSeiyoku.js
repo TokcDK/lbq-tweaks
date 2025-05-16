@@ -2975,22 +2975,24 @@ function actionType51SexDirection(pistonIntensity, patternVariant, voicePatternN
   valueSexWait = 30;
 }
 
-function actionType52SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
-  // (actionType 52) 眼パチ閉
+// Refactored helper function for both 眼パチ閉 and 眼パチ開く
+function actionTypeEyesSexDirection(pistonIntensity, patternVariant, voicePatternNum, fadeType) {
+  // fadeType: use "fadeIn" for 眼パチ閉, "fadeOut" for 眼パチ開く
   const blackOutPictureName = 'ScreenBlackOut';
   $gameScreen.showPicture(pistonIntensity, blackOutPictureName, 1, 640, 384, 100, 100, 255, 0);
   const sceneCloseOpenEyes = 'SceneCloseOpenEyes';
-  picture_fade1(pistonIntensity, "fadeIn", sceneCloseOpenEyes, patternVariant, 5);
+  picture_fade1(pistonIntensity, fadeType, sceneCloseOpenEyes, patternVariant, 5);
   valueSexWait = patternVariant;
 }
 
+// (actionType 52) 眼パチ閉
+function actionType52SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
+  actionTypeEyesSexDirection(pistonIntensity, patternVariant, voicePatternNum, "fadeIn");
+}
+
+// (actionType 53) 眼パチ開く
 function actionType53SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
-  // (actionType 53) 眼パチ開く
-  const blackOutPictureName = 'ScreenBlackOut';
-  $gameScreen.showPicture(pistonIntensity, blackOutPictureName, 1, 640, 384, 100, 100, 255, 0);
-  const sceneCloseOpenEyes = 'SceneCloseOpenEyes';
-  picture_fade1(pistonIntensity, "fadeOut", sceneCloseOpenEyes, patternVariant, 5);
-  valueSexWait = patternVariant;
+  actionTypeEyesSexDirection(pistonIntensity, patternVariant, voicePatternNum, "fadeOut");
 }
 
 function actionType54SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
