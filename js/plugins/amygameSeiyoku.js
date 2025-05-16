@@ -3201,22 +3201,21 @@ function adv_HpartDirectPlay_ExtremeClimax() {
 
 //☆☆性欲スキルで確立上昇最大50%
 seiyoku_skillProbabilityUp = function () {
-
-  if ($gameVariables.value(20) == 0) { $gameVariables.setValue(21, 1) };
-  var actor = $gameActors.actor($gameVariables.value(20));
-  var value91 = 0;
-  if (actor.learnSkill(61)) { value91 += 5 };
-  if (actor.learnSkill(62)) { value91 += 5 };
-  if (actor.learnSkill(63)) { value91 += 5 };
-  if (actor.learnSkill(64)) { value91 += 5 };
-  if (actor.learnSkill(65)) { value91 += 5 };
-  if (actor.learnSkill(66)) { value91 += 5 };
-  if (actor.learnSkill(67)) { value91 += 5 };
-  if (actor.learnSkill(68)) { value91 += 5 };
-  if (actor.learnSkill(69)) { value91 += 5 };
-  if (actor.learnSkill(70)) { value91 += 5 };
-  valueCountSet3 = value91;
-
+  const actorId = $gameVariables.value(20);
+  if (actorId == 0) { $gameVariables.setValue(21, 1) };
+  const currentActor = $gameActors.actor(actorId);
+  let totalProbabilityIncrease = 0;
+  if (currentActor.learnSkill(61)) { totalProbabilityIncrease += 5 };
+  if (currentActor.learnSkill(62)) { totalProbabilityIncrease += 5 };
+  if (currentActor.learnSkill(63)) { totalProbabilityIncrease += 5 };
+  if (currentActor.learnSkill(64)) { totalProbabilityIncrease += 5 };
+  if (currentActor.learnSkill(65)) { totalProbabilityIncrease += 5 };
+  if (currentActor.learnSkill(66)) { totalProbabilityIncrease += 5 };
+  if (currentActor.learnSkill(67)) { totalProbabilityIncrease += 5 };
+  if (currentActor.learnSkill(68)) { totalProbabilityIncrease += 5 };
+  if (currentActor.learnSkill(69)) { totalProbabilityIncrease += 5 };
+  if (currentActor.learnSkill(70)) { totalProbabilityIncrease += 5 };
+  valueCountSet3 = totalProbabilityIncrease;
 };
 
 //☆☆エネミーステートでドロップ
