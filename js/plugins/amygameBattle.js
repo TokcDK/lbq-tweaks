@@ -4844,26 +4844,26 @@ enemy_preSetup1 = function (eventId) {
 };
 
 //戦闘マップでの簡易討伐
-battle_simpleSubjugation = function (id1) {
+battle_simpleSubjugation = function (subjugationId) {
 
   if ($gameSwitches.value(201)) {
-    var actor = $gameActors.actor($gameVariables.value(11));
-    var value = $dataItems[$gameVariables.value(240)];
-    var array = value.meta['EnemyLV'].split(',');
-    var max = array.reduce(function (a, b) {
-      return Math.max(a, b);
+    const mainActor = $gameActors.actor($gameVariables.value(11));
+    const battleItem = $dataItems[$gameVariables.value(240)];
+    const enemyLvArray = battleItem.meta['EnemyLV'].split(',');
+    const maxEnemyLv = enemyLvArray.reduce(function (currentMax, level) {
+      return Math.max(currentMax, level);
     });
-    var value1 = max;
-    var value2 = actor.level;
-    if (value2 >= value1 || $gameSwitches.value(41)) {
+    const requiredLevel = maxEnemyLv;
+    const actorLevel = mainActor.level;
+    if (actorLevel >= requiredLevel || $gameSwitches.value(41)) {
       $gameSwitches.setValue(98, true);
       enemy_instantwin();
-      for (var i = 0; i < $gameParty.battleMembers().length; i++) {
-        var actor = $gameParty.battleMembers()[i];
-        actor.gainJp(1);
-      };
-    };
-  };
+      for (let i = 0; i < $gameParty.battleMembers().length; i++) {
+        const battleMember = $gameParty.battleMembers()[i];
+        battleMember.gainJp(1);
+      }
+    }
+  }
 
 };
 
