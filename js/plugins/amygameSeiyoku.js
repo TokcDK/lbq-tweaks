@@ -3201,27 +3201,30 @@ function adv_HpartDirectPlay_ExtremeClimax() {
 
 //☆☆性欲スキルで確立上昇最大50%
 const skillRangeSeiyokuSkillProbabilityUp = [61, 62, 63, 64, 65, 66, 67, 68, 69, 70];
-seiyoku_skillProbabilityUp = function() {
+seiyoku_skillProbabilityUp = function () {
   const actorId = $gameVariables.value(20);
-  if (actorId === 0) { 
+  if (actorId === 0) {
     $gameVariables.setValue(21, 1);
     return; // Early return if no valid actor
   }
-  
-  const currentActor = $gameActors.actor(actorId);
-  if (!currentActor) {
+
+  const gameActor = $gameActors.actor(actorId);
+
+  seiyoku_skillProbabilityUp1(gameActor);
+}
+seiyoku_skillProbabilityUp1 = function (gameActor) {
+  if (!gameActor) {
     valueCountSet3 = 0;
     return; // Protect against non-existent actor
   }
 
   // Define skill range
-  const probabilityPerSkill = 5;
   
   // Calculate probability increase with a standard loop
   let totalProbabilityIncrease = 0;
   for (skillId of skillRangeSeiyokuSkillProbabilityUp) {
-    if (currentActor.isLearnedSkill(skillId)) {
-      totalProbabilityIncrease += probabilityPerSkill;
+    if (gameActor.isLearnedSkill(skillId)) {
+      totalProbabilityIncrease += 5;
     }
   }
   
