@@ -3005,56 +3005,50 @@ function actionType54SexDirection(pistonIntensity, patternVariant, voicePatternN
 
 //ADVＨパート演出クリアも。0実行1終了
 adv_HpartDirectPlay = function (effectType) {
-
-  if (effectType == 0) {
-    const particleNamesToClear = ['Ecstasy_c1', 'lines_heightH1'];
-    for (let index = 0; index <= particleNamesToClear.length - 1; index++) {
-      $gameScreen._particle.particleClear(particleNamesToClear[index]);
+  switch (effectType) {
+    case 0: {
+      const particleNamesToClear = ['Ecstasy_c1', 'lines_heightH1'];
+      for (let index = 0; index < particleNamesToClear.length; index++) {
+        $gameScreen._particle.particleClear(particleNamesToClear[index]);
+      }
+      break;
     }
-  }
-  if (effectType == 1) { //感じる
-    {
+    case 1: { // 感じる
       const particleName = 'Ecstasy_c1';
       $gameScreen._particle.particlePlay(0, particleName, 'screen', 'def', 'spriteset');
       $gameScreen._particle.particleUpdate([particleName, 'alpha', '0.4', '0']);
-    }
-    {
       const heartbeatSoundOptions = ['Z_HeartBeatDarty'];
       const selectedHeartbeatSound = heartbeatSoundOptions[getRandomIndex(heartbeatSoundOptions.length)];
       const soundVolume = getRandomIndex(21) + 100;
       const soundPitch = getRandomIndex(41) + 60;
-      AudioManager.playSe({ "name": selectedHeartbeatSound, "volume": soundVolume, "pitch": soundPitch, "pan": 0 });
+      AudioManager.playSe({ name: selectedHeartbeatSound, volume: soundVolume, pitch: soundPitch, pan: 0 });
       filter_direct(9, 640 - 128, 368, 40);
+      break;
     }
-  }
-  if (effectType == 2) { //激しく感じる
-    {
+    case 2: { // 激しく感じる
       const particleName = 'Ecstasy_c1';
       $gameScreen._particle.particlePlay(0, particleName, 'screen', 'def', 'spriteset');
       $gameScreen._particle.particleUpdate([particleName, 'alpha', '0.4', '0']);
       $gameScreen._particle.particleUpdate([particleName, 'scale', '10', '40']);
-    }
-    {
       const heartbeatSoundOptions = ['Z_HeartBeatDarty'];
       const selectedHeartbeatSound = heartbeatSoundOptions[getRandomIndex(heartbeatSoundOptions.length)];
       const soundVolume = getRandomIndex(21) + 100;
       const soundPitch = getRandomIndex(41) + 40;
-      AudioManager.playSe({ "name": selectedHeartbeatSound, "volume": soundVolume, "pitch": soundPitch, "pan": 0 });
+      AudioManager.playSe({ name: selectedHeartbeatSound, volume: soundVolume, pitch: soundPitch, pan: 0 });
       filter_direct(9, 640 - 128, 368, 60);
+      break;
     }
-  }
-  if (effectType == 3) { //絶頂激しく感じる永続クリア必須
-    if (valueWordSet0 == '絶頂') {
-      filter_direct(1, 640, 384, 0.03);
-      valueWordSet0 = 0;
-      adv_HpartDirectPlay(0);
-      adv_partDirectSet(0);
-      $gameScreen.eraseParallax(7);
-      $gameScreen.erasePicture(51);
-      $gameScreen.erasePicture(57);
-    } else {
-      valueWordSet0 = '絶頂';
-      {
+    case 3: { // 絶頂激しく感じる永続クリア必須
+      if (valueWordSet0 == '絶頂') {
+        filter_direct(1, 640, 384, 0.03);
+        valueWordSet0 = 0;
+        adv_HpartDirectPlay(0);
+        adv_partDirectSet(0);
+        $gameScreen.eraseParallax(7);
+        $gameScreen.erasePicture(51);
+        $gameScreen.erasePicture(57);
+      } else {
+        valueWordSet0 = '絶頂';
         const pistonPictureId = 57;
         let pistonMultiplier;
         if ($gameActors.actor($gameVariables.value(20)).isLearnedSkill(66)) {
@@ -3064,46 +3058,41 @@ adv_HpartDirectPlay = function (effectType) {
         }
         hcg_piston(pistonPictureId, 5, 1, 1);
         filter_direct(1, 640, 384, 0.01);
-        //parallax_scroll(7,'ScreenBattleEcstasyConcentratedLineHeight',0,20,0,-50,255);
         adv_partDirectSet(2);
-      }
-      {
         const particleName = 'Ecstasy_c1';
         $gameScreen._particle.particlePlay(0, particleName, 'screen', 'def', 'spritset');
         $gameScreen._particle.particleUpdate([particleName, 'scale', '10', '20']);
         $gameScreen._particle.particleUpdate([particleName, 'alpha', '0.30', '0']);
-        //$gameScreen._particle.particleUpdate([particleName,'emitterLifetime','-1']);
       }
+      break;
     }
-  }
-  if (effectType == 4) { //軽く感じる
-    {
+    case 4: { // 軽く感じる
       const particleName = 'Ecstasy_c1';
       $gameScreen._particle.particlePlay(0, particleName, 'screen', 'def', 'spriteset');
       $gameScreen._particle.particleUpdate([particleName, 'alpha', '0.3', '0']);
-    }
-    {
       const heartbeatSoundOptions = ['Z_HeartBeatDarty'];
       const selectedHeartbeatSound = heartbeatSoundOptions[getRandomIndex(heartbeatSoundOptions.length)];
       const soundVolume = getRandomIndex(21) + 100;
       const soundPitch = getRandomIndex(41) + 80;
-      AudioManager.playSe({ "name": selectedHeartbeatSound, "volume": soundVolume, "pitch": soundPitch, "pan": 0 });
+      AudioManager.playSe({ name: selectedHeartbeatSound, volume: soundVolume, pitch: soundPitch, pan: 0 });
       filter_direct(9, 640 - 128, 368, 30);
+      break;
     }
-  }
-  if (effectType == 5) { //乳見せ
-    {
+    case 5: { // 乳見せ
       const particleName = 'Ecstasy_c1';
       $gameScreen._particle.particlePlay(0, particleName, 'screen', 'def', 'spriteset');
       $gameScreen._particle.particleUpdate([particleName, 'alpha', '0.2', '0']);
-    }
-    {
       const kneadSoundOptions = ['ZH_Knead1', 'ZH_Knead1', 'ZH_Knead1'];
       const selectedKneadSound = kneadSoundOptions[getRandomIndex(kneadSoundOptions.length)];
       const soundVolume = getRandomIndex(21) + 100;
       const soundPitch = getRandomIndex(41) + 80;
-      AudioManager.playSe({ "name": selectedKneadSound, "volume": soundVolume, "pitch": soundPitch, "pan": 0 });
+      AudioManager.playSe({ name: selectedKneadSound, volume: soundVolume, pitch: soundPitch, pan: 0 });
       $gameScreen.startFlash([255, 119, 255, 200], 60);
+      break;
+    }
+    default: {
+      // Do nothing for unknown effect types
+      break;
     }
   }
 };
