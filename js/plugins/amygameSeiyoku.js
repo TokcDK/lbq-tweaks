@@ -3045,44 +3045,110 @@ function adv_HpartDirectPlay_Clear() {
   }
 }
 
+// Base class for ADV H part direct play effects
+class AdvHPartDirectPlayEffect {
+  constructor(options = {}) {
+    this.particleName = 'Ecstasy_c1';
+    // options: alpha (string), scaleUpdate (array of two strings), soundPitchOffset (number), filterDuration (number)
+    this.alpha = options.alpha || '0.4';
+    this.scaleUpdate = options.scaleUpdate; // e.g. ['10','40'] – if not given, no scale update is made.
+    this.soundPitchOffset = options.soundPitchOffset || 60;
+    this.filterDuration = options.filterDuration || 40;
+  }
+  
+  final() {
+    filter_direct(9, 640 - 128, 368, this.filterDuration);
+  }
+  
+  play() {
+    // Play the particle effect
+    $gameScreen._particle.particlePlay(0, this.particleName, 'screen', 'def', 'spriteset');
+    $gameScreen._particle.particleUpdate([this.particleName, 'alpha', this.alpha, '0']);
+    if (this.scaleUpdate !== undefined) {
+      $gameScreen._particle.particleUpdate([this.particleName, 'scale', this.scaleUpdate[0], this.scaleUpdate[1]]);
+    }
+    const heartbeatSoundOptions = ['Z_HeartBeatDarty'];
+    const selectedHeartbeatSound = heartbeatSoundOptions[getRandomIndex(heartbeatSoundOptions.length)];
+    const soundVolume = getRandomIndex(21) + 100;
+    const soundPitch = getRandomIndex(41) + this.soundPitchOffset;
+    AudioManager.playSe({ name: selectedHeartbeatSound, volume: soundVolume, pitch: soundPitch, pan: 0 });
+    final();
+  }
+}
+
+/*:
+ * Function: adv_HpartDirectPlay_Feel
+ * @description Case 1: 感じる
+ */
+class AdvHPartDirectPlay_FeelEffect extends AdvHPartDirectPlayEffect {
+  constructor() {
+    super({
+      alpha: '0.4',         // set alpha to 0.4
+      // No scale update needed for "感じる"
+      soundPitchOffset: 60,   // sound pitch offset for Feel is 60
+      filterDuration: 40      // filter duration set to 40
+    });
+  }
+}
+
+/*:
+ * Function: adv_HpartDirectPlay_StrongFeel
+ * @description Case 2: 激しく感じる
+ */
+class AdvHPartDirectPlay_StrongFeelEffect extends AdvHPartDirectPlayEffect {
+  constructor() {
+    super({
+      alpha: '0.4',         // set alpha to 0.4
+      scaleUpdate: ['10', '40'],  // update scale from 10 to 40
+      soundPitchOffset: 40,   // sound pitch offset for Strong Feel is 40
+      filterDuration: 60      // filter duration set to 60
+    });
+  }
+}
+
+/*:
+ * Function: adv_HpartDirectPlay_LightFeel
+ * @description Case 4: 軽く感じる
+ */
+class AdvHPartDirectPlay_LightFeelEffect extends AdvHPartDirectPlayEffect {
+  constructor() {
+    super({
+      alpha: '0.3',         // lighter effect: set alpha to 0.3
+      // No scale update needed for "軽く感じる"
+      soundPitchOffset: 80,   // sound pitch offset for Light Feel is 80
+      filterDuration: 30      // filter duration set to 30
+    });
+  }
+}
+
+// Modified functions using the refactored base class and extended instances
+
 function adv_HpartDirectPlay_Feel() {
   // Case 1: 感じる
-  const particleName = 'Ecstasy_c1';
-  $gameScreen._particle.particlePlay(0, particleName, 'screen', 'def', 'spriteset');
-  $gameScreen._particle.particleUpdate([particleName, 'alpha', '0.4', '0']);
-  const heartbeatSoundOptions = ['Z_HeartBeatDarty'];
-  const selectedHeartbeatSound = heartbeatSoundOptions[getRandomIndex(heartbeatSoundOptions.length)];
-  const soundVolume = getRandomIndex(21) + 100;
-  const soundPitch = getRandomIndex(41) + 60;
-  AudioManager.playSe({ name: selectedHeartbeatSound, volume: soundVolume, pitch: soundPitch, pan: 0 });
-  filter_direct(9, 640 - 128, 368, 40);
+  new AdvHPartDirectPlay_FeelEffect().play();
 }
 
 function adv_HpartDirectPlay_StrongFeel() {
   // Case 2: 激しく感じる
-  const particleName = 'Ecstasy_c1';
-  $gameScreen._particle.particlePlay(0, particleName, 'screen', 'def', 'spriteset');
-  $gameScreen._particle.particleUpdate([particleName, 'alpha', '0.4', '0']);
-  $gameScreen._particle.particleUpdate([particleName, 'scale', '10', '40']);
-  const heartbeatSoundOptions = ['Z_HeartBeatDarty'];
-  const selectedHeartbeatSound = heartbeatSoundOptions[getRandomIndex(heartbeatSoundOptions.length)];
-  const soundVolume = getRandomIndex(21) + 100;
-  const soundPitch = getRandomIndex(41) + 40;
-  AudioManager.playSe({ name: selectedHeartbeatSound, volume: soundVolume, pitch: soundPitch, pan: 0 });
-  filter_direct(9, 640 - 128, 368, 60);
+  new AdvHPartDirectPlay_StrongFeelEffect().play();
 }
 
 function adv_HpartDirectPlay_LightFeel() {
   // Case 4: 軽く感じる
+  new AdvHPartDirectPlay_LightFeelEffect().play();
+}
+
+function adv_HpartDirectPlay_ShowBreasts() {
+  // Case 5: 乳見せ
   const particleName = 'Ecstasy_c1';
   $gameScreen._particle.particlePlay(0, particleName, 'screen', 'def', 'spriteset');
-  $gameScreen._particle.particleUpdate([particleName, 'alpha', '0.3', '0']);
-  const heartbeatSoundOptions = ['Z_HeartBeatDarty'];
-  const selectedHeartbeatSound = heartbeatSoundOptions[getRandomIndex(heartbeatSoundOptions.length)];
+  $gameScreen._particle.particleUpdate([particleName, 'alpha', '0.2', '0']);
+  const kneadSoundOptions = ['ZH_Knead1', 'ZH_Knead1', 'ZH_Knead1'];
+  const selectedKneadSound = kneadSoundOptions[getRandomIndex(kneadSoundOptions.length)];
   const soundVolume = getRandomIndex(21) + 100;
   const soundPitch = getRandomIndex(41) + 80;
-  AudioManager.playSe({ name: selectedHeartbeatSound, volume: soundVolume, pitch: soundPitch, pan: 0 });
-  filter_direct(9, 640 - 128, 368, 30);
+  AudioManager.playSe({ name: selectedKneadSound, volume: soundVolume, pitch: soundPitch, pan: 0 });
+  $gameScreen.startFlash([255, 119, 255, 200], 60);
 }
 
 function adv_HpartDirectPlay_ExtremeClimax() {
@@ -3112,19 +3178,6 @@ function adv_HpartDirectPlay_ExtremeClimax() {
     $gameScreen._particle.particleUpdate([particleName, 'scale', '10', '20']);
     $gameScreen._particle.particleUpdate([particleName, 'alpha', '0.30', '0']);
   }
-}
-
-function adv_HpartDirectPlay_ShowBreasts() {
-  // Case 5: 乳見せ
-  const particleName = 'Ecstasy_c1';
-  $gameScreen._particle.particlePlay(0, particleName, 'screen', 'def', 'spriteset');
-  $gameScreen._particle.particleUpdate([particleName, 'alpha', '0.2', '0']);
-  const kneadSoundOptions = ['ZH_Knead1', 'ZH_Knead1', 'ZH_Knead1'];
-  const selectedKneadSound = kneadSoundOptions[getRandomIndex(kneadSoundOptions.length)];
-  const soundVolume = getRandomIndex(21) + 100;
-  const soundPitch = getRandomIndex(41) + 80;
-  AudioManager.playSe({ name: selectedKneadSound, volume: soundVolume, pitch: soundPitch, pan: 0 });
-  $gameScreen.startFlash([255, 119, 255, 200], 60);
 }
 
 //☆☆性欲スキルで確立上昇最大50%
