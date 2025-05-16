@@ -2925,23 +2925,25 @@ class InsertionSoundEffect {
   }
 }
 
-class EjaculationSoundEffect extends InsertionSoundEffect {
-  get seOptions() { 
-    return ['Z_zamen'];
-  }
-
+class NoEjaculationSoundEffect extends InsertionSoundEffect {
   get maxRandomIndexSexWait() {
     return 11;
-  }
-
-  get noWaitSePitch() {
-    return getRandomIndex(51) + 100;
   }
 
   prePlay() {
     AudioManager.stopAllBgs();
     adv_partDirectSet(0);
     sex_direction(0); // 結束：集中線終了
+  }
+}
+
+class EjaculationSoundEffect extends NoEjaculationSoundEffect {
+  get seOptions() { 
+    return ['Z_zamen'];
+  }
+
+  get noWaitSePitch() {
+    return getRandomIndex(51) + 100;
   }
 }
 
@@ -2959,43 +2961,8 @@ function actionType12SexDirection(pistonIntensity, patternVariant, voicePatternN
 
 function actionType13SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
   // (actionType 13) 射精以外で終了.
-  AudioManager.stopAllBgs();
-  adv_partDirectSet(0);
-  sex_direction(0); // 集中線終了
-
-  if (valueSexWait >= 1) {
-    let flashDuration = getRandomIndex(41) + 160;
-    let flashIntensity = getRandomIndex(21) + 50;
-    $gameScreen.startFlash([255, 119, 255, flashDuration], flashIntensity);
-    let seOptions = ['Z_zamen1', 'Z_zamen2'];
-    let seName = seOptions[getRandomIndex(seOptions.length)];
-    let seVolume = getRandomIndex(21) + 100;
-    let sePitch = getRandomIndex(41) + 80;
-    AudioManager.playSe({ "name": seName, "volume": seVolume, "pitch": sePitch, "pan": 0 });
-    let seOptionsAlt = ['Z_zamen1', 'Z_zamen2'];
-    seName = seOptionsAlt[getRandomIndex(seOptionsAlt.length)];
-    seVolume = getRandomIndex(21) + 100;
-    sePitch = getRandomIndex(41) + 80;
-    AudioManager.playSe({ "name": seName, "volume": seVolume, "pitch": sePitch, "pan": 0 });
-
-    valueSexWait = 0;
-  }
-  else {
-    if (valueSexWait == 0) {
-      let flashDuration = getRandomIndex(41) + 160;
-      let flashIntensity = getRandomIndex(21) + 50;
-      let shakeDuration = getRandomIndex(5) + 6;
-      $gameScreen.startFlash([255, 119, 255, flashDuration], flashIntensity);
-      $gameScreen.startShake(shakeDuration, shakeDuration, flashIntensity);
-      let seOptions = ['Z_zamen1', 'Z_zamen2'];
-      let seName = seOptions[getRandomIndex(seOptions.length)];
-      let seVolume = getRandomIndex(21) + 100;
-      let sePitch = getRandomIndex(41) + 80;
-      AudioManager.playSe({ "name": seName, "volume": seVolume, "pitch": sePitch, "pan": 0 });
-    }
-
-    valueSexWait = getRandomIndex(11) + 20;
-  }
+  const noEjaculationSE = new NoEjaculationSoundEffect(pistonIntensity, patternVariant, voicePatternNum);
+  noEjaculationSE.prePlay();
 }
 
 function actionType51SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
