@@ -2876,6 +2876,8 @@ function actionType8SexDirection(pistonIntensity, patternVariant, voicePatternNu
 function actionType11SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
   // (actionType 11) 挿入
   adv_partDirectPlay(7);
+
+  let isMoreOf1 = false;
   if (valueSexWait == 0) {
     let flashDuration = getRandomIndex(41) + 160;
     let shakeIntensity = getRandomIndex(21) + 50;
@@ -2888,7 +2890,8 @@ function actionType11SexDirection(pistonIntensity, patternVariant, voicePatternN
     let sePitch = getRandomIndex(41) + 80;
     AudioManager.playSe({ "name": seName, "volume": seVolume, "pitch": sePitch, "pan": 0 });
   }
-  if (valueSexWait >= 1) {
+  else if (valueSexWait >= 1) {
+    isMoreOf1 = true;
     let flashDuration = getRandomIndex(41) + 160;
     let shakeIntensity = getRandomIndex(21) + 50;
     $gameScreen.startFlash([255, 119, 255, flashDuration], shakeIntensity);
@@ -2903,7 +2906,8 @@ function actionType11SexDirection(pistonIntensity, patternVariant, voicePatternN
     sePitch = getRandomIndex(41) + 80;
     AudioManager.playSe({ "name": seName, "volume": seVolume, "pitch": sePitch, "pan": 0 });
   }
-  if (valueSexWait >= 1) {
+
+  if (isMoreOf1) {
     valueSexWait = 0;
   } else {
     valueSexWait = getRandomIndex(21) + 20;
