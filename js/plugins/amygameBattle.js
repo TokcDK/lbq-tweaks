@@ -2741,7 +2741,7 @@ function pacondProcessElementPassives(user) {
   valuePassiveElementP.forEach(function (skillId) {
     const skill = $dataSkills[skillId];
     const skillMeta = skill.meta;
-    const hideSkillId = Number(skillMeta['Hide if Learned Skill'] || 0);
+    const hideSkillId = Number(skillMeta['Hide if Learned Skill'] || -1);
 
     if (!skill.meta['PassiveElementP']) return;
 
@@ -2774,7 +2774,7 @@ function pacondProcessElementPassives(user) {
   valueAddPowerCustomSkill.forEach(function (skillId) {
     const skill = $dataSkills[skillId];
     const skillMeta = skill.meta;
-    const hideSkillId = Number(skillMeta['Hide if Learned Skill'] || 0);
+    const hideSkillId = Number(skillMeta['Hide if Learned Skill'] || -1);
 
     if (user.isLearnedSkill(skillId) &&
       user.battleSkillsRaw().includes(skillId) &&
