@@ -1085,7 +1085,7 @@ tachie_syoukyo1 = function (tachiePicId) {
 //☆☆立ち絵表示
 tachie_hyouji1 = function (actorId) {
   const gameActor = $gameActors.actor(actorId);
-  tachie_hyoujiGameActor(gameActor);
+  tachie_hyouji2(gameActor);
 }
 tachie_hyouji2 = function (gameActor) {
 
