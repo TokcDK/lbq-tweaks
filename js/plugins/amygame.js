@@ -6457,13 +6457,14 @@
     // Check standard rare item flag
     if (chestMeta['TchestRere'] && selectedItemIndex == Number(chestMeta['TchestRere'])) {
       $gameSwitches.setValue(439, true);
+      return;
     }
-
     // Check first annihilation rare item flag
     if (chestMeta['firstAnnihilationItem']) {
       const firstAnnihilationIndex = Number(chestMeta['firstAnnihilationItem'].split(',')[1]);
       if (selectedItemIndex == firstAnnihilationIndex) {
         $gameSwitches.setValue(439, true);
+        return;
       }
     }
 
@@ -6472,6 +6473,7 @@
       const chestOnlyIndex = Number(chestMeta['TchestOnly'].split(',')[4]);
       if (selectedItemIndex == chestOnlyIndex) {
         $gameSwitches.setValue(439, true);
+        return;
       }
     }
   };
