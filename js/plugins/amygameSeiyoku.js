@@ -634,7 +634,8 @@ seiyoku_jougenn1 = function (gameActor) {
   for (const requiredSkillId of valueHstaSuppression) {
     if (!gameActor.isLearnedSkill(requiredSkillId)) continue;
     const suppressionSkill = $dataSkills[requiredSkillId];
-    if (gameActor.isLearnedSkill(Number(suppressionSkill.meta['Hide if Learned Skill']))) continue;
+    const hideIfLearnedSkillId = suppressionSkill.meta['Hide if Learned Skill']; // 'Hide if Learned Skill' is missing in meta
+    if (hideIfLearnedSkillId && gameActor.isLearnedSkill(Number(hideIfLearnedSkillId))) continue;
 
     const suppressionParams = suppressionSkill.meta['HstaSuppression'].split(',');
     const suppressionType = Number(suppressionParams[0]);
