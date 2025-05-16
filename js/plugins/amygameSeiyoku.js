@@ -459,7 +459,7 @@ function updateActorHStateDisplayActorStateshyouji(actor, actorId) {
     windowYOffset = 0;
   }
   WindowManager.show(0, windowYOffset, 0, 430, 202);
-  const actorId = actor.actorId();
+  actorId = actorId || actor.actorId();
 
   seiyoku_jougenn1(actor);
 
@@ -2046,7 +2046,7 @@ actor_pregnancyCalculation = function (actorId) {
   if (hRecordsCount[49] == 0) {
     hRecordsCount[49] = finalPartner + 200;
   };
-  
+
   //受精相手を特定するための配列を0にする。
   const startPartner = 101;
   const endPartner = 200;
