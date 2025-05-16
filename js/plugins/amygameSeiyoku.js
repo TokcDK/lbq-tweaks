@@ -2873,33 +2873,32 @@ function actionType8SexDirection(pistonIntensity, patternVariant, voicePatternNu
   vibratorSoundEffect.play();
 }
 
+
+
+// Options used for sound effects
+const SE_OPTIONS = ['Z_zamen1', 'Z_zamen2'];
+// Helper function to play a random sound effect based on SE_OPTIONS.
+function playRandomSE(seName, seVolume, sePitch, seOptions) {
+  seOptions = seOptions || SE_OPTIONS;
+  seName = seName || seOptions[getRandomIndex(seOptions.length)];
+  seVolume = seVolume || getRandomIndex(21) + 100;
+  sePitch = sePitch || getRandomIndex(41) + 80;
+  AudioManager.playSe({ name: seName, volume: seVolume, pitch: sePitch, pan: 0 });
+}
+
 function actionType11SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
   // (actionType 11) 挿入
   adv_partDirectPlay(7);
-  
-  // Options used for sound effects
-  const SE_OPTIONS = ['Z_zamen1', 'Z_zamen2'];
 
-  // Helper function to play a random sound effect based on SE_OPTIONS.
-  function playRandomSE() {
-    const seName = SE_OPTIONS[getRandomIndex(SE_OPTIONS.length)];
-    const seVolume = getRandomIndex(21) + 100;
-    const sePitch = getRandomIndex(41) + 80;
-    AudioManager.playSe({ name: seName, volume: seVolume, pitch: sePitch, pan: 0 });
-  }
-
+  const flashDuration = getRandomIndex(41) + 160;
+  const shakeIntensity = getRandomIndex(21) + 50;
   if (valueSexWait >= 1) {
-    // When there's a wait value present, play flash and two SE effects.
-    const flashDuration = getRandomIndex(41) + 160;
-    const shakeIntensity = getRandomIndex(21) + 50;
     $gameScreen.startFlash([255, 119, 255, flashDuration], shakeIntensity);
     playRandomSE();
     playRandomSE();
     valueSexWait = 0;
   } else {
     // When no wait is set, play flash, shake and one SE, then update wait.
-    const flashDuration = getRandomIndex(41) + 160;
-    const shakeIntensity = getRandomIndex(21) + 50;
     const shakeDuration = getRandomIndex(5) + 6;
     $gameScreen.startFlash([255, 119, 255, flashDuration], shakeIntensity);
     $gameScreen.startShake(shakeDuration, shakeDuration, shakeIntensity);
@@ -2916,8 +2915,8 @@ function actionType12SexDirection(pistonIntensity, patternVariant, voicePatternN
 
   if (valueSexWait >= 1) {
     let flashDuration = getRandomIndex(41) + 160;
-    let flashIntensity = getRandomIndex(21) + 50;
-    $gameScreen.startFlash([255, 119, 255, flashDuration], flashIntensity);
+    let shakeIntensity = getRandomIndex(21) + 50;
+    $gameScreen.startFlash([255, 119, 255, flashDuration], shakeIntensity);
     let seOptions = ['Z_zamen1', 'Z_zamen2'];
     let seName = seOptions[getRandomIndex(seOptions.length)];
     let seVolume = getRandomIndex(21) + 100;
