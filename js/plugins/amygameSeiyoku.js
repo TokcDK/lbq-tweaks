@@ -1985,25 +1985,21 @@ scene_textBgv = function (actorId, baseX, baseY, offsetMode, waitMode, fontSetti
 };
 
 //☆☆CGの一部分で一言台詞pic_oneWord(valueSerialPictureId,x,y,25,60,arr1);
-pic_oneWord = function (id1, id2, id3, id4, id5, arr1, id6) {
+pic_oneWord = function (pictureSlot, baseX, baseY, textMotionParam, moveDuration, textOptions, fontSetting) {
 
-  if (id4 >= 100) {
-    picture_motion1("smooth", [0]);
-  } else {
-    picture_motion1("linear", [0]);
-  };
-  var arr2 = [-50, 0, 50, -100, 100];
-  var value3 = getRandomIndex(201) - 100;
-  var value4 = getRandomIndex(201) - 100;
-  var value5 = arr1[getRandomIndex(arr1.length)];
-  $gameScreen.setDTextPicture(value5, id4);
+  picture_motion1(textMotionParam >= 100 ? "smooth" : "linear", [0]);
+  //var arr2 = [-50, 0, 50, -100, 100];
+  const randomXOffset = getRandomIndex(201) - 100;
+  const randomYOffset = getRandomIndex(201) - 100;
+  const chosenText = textOptions[getRandomIndex(textOptions.length)];
+  $gameScreen.setDTextPicture(chosenText, textMotionParam);
   $gameScreen.dWindowFrame = 'ON';
-  if (id6 == 0) { } else { $gameScreen.setDtextFont(id6) };
+  if (fontSetting !== 0) { $gameScreen.setDtextFont(fontSetting) };
   $gameScreen.dTextAlign = 1;
-  var value1 = id2;
-  var value2 = id3;
-  $gameScreen.showPicture(id1, "", 1, value1 + value3, value2 + value4, 50, 50, 255, 0);
-  $gameScreen.movePicture(id1, 1, value1 + value3, value2 + value4, 150, 150, 0, 0, id5);
+  const actualBaseX = baseX;
+  const actualBaseY = baseY;
+  $gameScreen.showPicture(pictureSlot, "", 1, actualBaseX + randomXOffset, actualBaseY + randomYOffset, 50, 50, 255, 0);
+  $gameScreen.movePicture(pictureSlot, 1, actualBaseX + randomXOffset, actualBaseY + randomYOffset, 150, 150, 0, 0, moveDuration);
 
 };
 
