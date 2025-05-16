@@ -3055,6 +3055,10 @@ class AdvHPartDirectPlayEffect {
     this.soundPitchOffset = options.soundPitchOffset || 60;
     this.filterDuration = options.filterDuration || 40;
   }
+
+  get heartbeatSoundOptions(){
+    return ['Z_HeartBeatDarty'];
+  }
   
   final() {
     filter_direct(9, 640 - 128, 368, this.filterDuration);
@@ -3067,7 +3071,7 @@ class AdvHPartDirectPlayEffect {
     if (this.scaleUpdate !== undefined) {
       $gameScreen._particle.particleUpdate([this.particleName, 'scale', this.scaleUpdate[0], this.scaleUpdate[1]]);
     }
-    const heartbeatSoundOptions = ['Z_HeartBeatDarty'];
+    const heartbeatSoundOptions = this.heartbeatSoundOptions;
     const selectedHeartbeatSound = heartbeatSoundOptions[getRandomIndex(heartbeatSoundOptions.length)];
     const soundVolume = getRandomIndex(21) + 100;
     const soundPitch = getRandomIndex(41) + this.soundPitchOffset;
@@ -3121,6 +3125,29 @@ class AdvHPartDirectPlay_LightFeelEffect extends AdvHPartDirectPlayEffect {
   }
 }
 
+/*:
+ * Function: adv_HpartDirectPlay_ShowBreasts
+ * @description Case 4: 乳見せ
+ */
+class Adv_HpartDirectPlay_ShowBreastsEffect extends AdvHPartDirectPlayEffect {
+  constructor() {
+    super({
+      alpha: '0.2',         // lighter effect: set alpha to 0.3
+      // No scale update needed for "軽く感じる"
+      soundPitchOffset: 80,   // sound pitch offset for Light Feel is 80
+      filterDuration: 0      // filter duration set to 0 , not using here
+    });
+  }
+
+  get heartbeatSoundOptions() {
+    return ['ZH_Knead1', 'ZH_Knead1', 'ZH_Knead1'];
+  }
+
+  final() {
+    $gameScreen.startFlash([255, 119, 255, 200], 60); // override standart final action with own specific
+  }
+}
+
 // Modified functions using the refactored base class and extended instances
 
 function adv_HpartDirectPlay_Feel() {
@@ -3140,15 +3167,7 @@ function adv_HpartDirectPlay_LightFeel() {
 
 function adv_HpartDirectPlay_ShowBreasts() {
   // Case 5: 乳見せ
-  const particleName = 'Ecstasy_c1';
-  $gameScreen._particle.particlePlay(0, particleName, 'screen', 'def', 'spriteset');
-  $gameScreen._particle.particleUpdate([particleName, 'alpha', '0.2', '0']);
-  const kneadSoundOptions = ['ZH_Knead1', 'ZH_Knead1', 'ZH_Knead1'];
-  const selectedKneadSound = kneadSoundOptions[getRandomIndex(kneadSoundOptions.length)];
-  const soundVolume = getRandomIndex(21) + 100;
-  const soundPitch = getRandomIndex(41) + 80;
-  AudioManager.playSe({ name: selectedKneadSound, volume: soundVolume, pitch: soundPitch, pan: 0 });
-  $gameScreen.startFlash([255, 119, 255, 200], 60);
+  new Adv_HpartDirectPlay_ShowBreastsEffect().play();
 }
 
 function adv_HpartDirectPlay_ExtremeClimax() {
