@@ -4845,26 +4845,37 @@ enemy_preSetup1 = function (eventId) {
 
 //戦闘マップでの簡易討伐
 battle_simpleSubjugation = function (subjugationId) {
-
-  if ($gameSwitches.value(201)) {
-    const mainActor = $gameActors.actor($gameVariables.value(11));
+  if (!$gameSwitches.value(201)) return; // return when battle_simpleSubjugation is disabled
+  
+  // Only calculate level requirements if needed
+  const isForceSubjugation = $gameSwitches.value(41);
+  
+  // Skip level check if force subjugation is active
+  if (!isForceSubjugation) {
     const battleItem = $dataItems[$gameVariables.value(240)];
     const enemyLvArray = battleItem.meta['EnemyLV'].split(',');
-    const maxEnemyLv = enemyLvArray.reduce(function (currentMax, level) {
-      return Math.max(currentMax, level);
-    });
-    const requiredLevel = maxEnemyLv;
-    const actorLevel = mainActor.level;
-    if (actorLevel >= requiredLevel || $gameSwitches.value(41)) {
-      $gameSwitches.setValue(98, true);
-      enemy_instantwin();
-      for (let i = 0; i < $gameParty.battleMembers().length; i++) {
-        const battleMember = $gameParty.battleMembers()[i];
-        battleMember.gainJp(1);
-      }
+    
+    // Find max level in a single pass
+    let maxEnemyLv = 0;
+    for (let i = 0, len = enemyLvArray.length; i < len; i++) {
+      const level = Number(enemyLvArray[i]);
+      if (level > maxEnemyLv) maxEnemyLv = level;
     }
+    
+    // Early return if actor level is insufficient
+    const actorLevel = $gameActors.actor($gameVariables.value(11)).level;
+    if (actorLevel < maxEnemyLv) return;
   }
-
+  
+  // Process subjugation when conditions are met
+  $gameSwitches.setValue(98, true);
+  enemy_instantwin();
+  
+  // Award JP to all battle members
+  const battleMembers = $gameParty.battleMembers();
+  for (let i = 0, len = battleMembers.length; i < len; i++) {
+    battleMembers[i].gainJp(1);
+  }
 };
 
 //state_addbuffdebuff(1,2,user,target,stateId,271);
