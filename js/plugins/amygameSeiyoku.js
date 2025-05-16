@@ -2919,18 +2919,7 @@ function actionType12SexDirection(pistonIntensity, patternVariant, voicePatternN
   AudioManager.stopAllBgs();
   adv_partDirectSet(0);
   sex_direction(0); // 結束：集中線終了
-  if (valueSexWait == 0) {
-    let flashDuration = getRandomIndex(41) + 160;
-    let flashIntensity = getRandomIndex(21) + 50;
-    let shakeDuration = getRandomIndex(5) + 6;
-    $gameScreen.startFlash([255, 119, 255, flashDuration], flashIntensity);
-    $gameScreen.startShake(shakeDuration, shakeDuration, flashIntensity);
-    let seOptions = ['Z_zamen'];
-    let seName = seOptions[getRandomIndex(seOptions.length)];
-    let seVolume = getRandomIndex(21) + 100;
-    let sePitch = getRandomIndex(51) + 100;
-    AudioManager.playSe({ "name": seName, "volume": seVolume, "pitch": sePitch, "pan": 0 });
-  }
+
   if (valueSexWait >= 1) {
     let flashDuration = getRandomIndex(41) + 160;
     let flashIntensity = getRandomIndex(21) + 50;
@@ -2945,10 +2934,23 @@ function actionType12SexDirection(pistonIntensity, patternVariant, voicePatternN
     seVolume = getRandomIndex(21) + 100;
     sePitch = getRandomIndex(41) + 80;
     AudioManager.playSe({ "name": seName, "volume": seVolume, "pitch": sePitch, "pan": 0 });
-  }
-  if (valueSexWait >= 1) {
+
     valueSexWait = 0;
-  } else {
+  }
+  else {
+    if (valueSexWait == 0) {
+      let flashDuration = getRandomIndex(41) + 160;
+      let flashIntensity = getRandomIndex(21) + 50;
+      let shakeDuration = getRandomIndex(5) + 6;
+      $gameScreen.startFlash([255, 119, 255, flashDuration], flashIntensity);
+      $gameScreen.startShake(shakeDuration, shakeDuration, flashIntensity);
+      let seOptions = ['Z_zamen'];
+      let seName = seOptions[getRandomIndex(seOptions.length)];
+      let seVolume = getRandomIndex(21) + 100;
+      let sePitch = getRandomIndex(51) + 100;
+      AudioManager.playSe({ "name": seName, "volume": seVolume, "pitch": sePitch, "pan": 0 });
+    }
+
     valueSexWait = getRandomIndex(11) + 20;
   }
 }
