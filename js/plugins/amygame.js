@@ -2493,7 +2493,7 @@
       gameVariables.setValue(224, Number(mapInfoMeta['MapEnemyPopC']));
     }
 
-    if (mapInfoMeta['MapEnemyPopCH']) { // MapEnemyPopCH is missing!
+    if (mapInfoMeta['MapEnemyPopCH']) {
       gameVariables.setValue(227, Number(mapInfoMeta['MapEnemyPopCH']));
     }
 
