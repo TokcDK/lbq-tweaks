@@ -433,6 +433,7 @@ function animatePictureAtype1TachieDousa(targetPicId, actorParameter, sourcePicI
   const targetPic = $gameScreen.picture(targetPicId);
   if(!targetPic) {
     const test = $gameScreen.picture(sourcePicId);
+    return;
   }
   targetPic._origin = 1;
   targetPic._y = picY;
