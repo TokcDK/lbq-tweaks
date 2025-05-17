@@ -431,6 +431,9 @@ function animatePictureAtype1TachieDousa(targetPicId, actorParameter, sourcePicI
 
   // Cache target picture attributes for consistency
   const targetPic = $gameScreen.picture(targetPicId);
+  if(!targetPic) {
+    const test = $gameScreen.picture(sourcePicId);
+  }
   targetPic._origin = 1;
   targetPic._y = picY;
   targetPic._scaleY = picScaleY;
