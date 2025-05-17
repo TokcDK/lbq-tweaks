@@ -25663,7 +25663,7 @@ var BaseTexture = function (_EventEmitter) {
         // Svg size is handled during load
         if (this.imageType !== 'svg') {
             if (!this.source) {
-                console.error("BaseTexture update error: 'source' is undefined. Please ensure the source is properly loaded before updating dimensions.", { this: this});
+                console.warn("BaseTexture update error: 'source' is undefined. Please ensure the source is properly loaded before updating dimensions.", { this: this});
             }
             else {
                 this.realWidth = this.source.naturalWidth || this.source.videoWidth || this.source.width;
