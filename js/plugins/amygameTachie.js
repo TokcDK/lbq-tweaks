@@ -375,7 +375,7 @@ function calculateScaleAndPositionTachieDousa(actorParameter, targetPicId, expre
   let picY, picScaleX, picScaleY;
 
   // Check if actorParameter is numeric (including 0)
-  if (typeof actorParameter === 'number' || (!isNaN(actorParameter) && actorParameter !== null)) {
+  if ((typeof actorParameter === 'number' || (!isNaN(actorParameter) && actorParameter !== null)) && actorParameter >= 0) {
     $gameVariables.setValue(20, actorParameter);
     $gameVariables.setValue(300, targetPicId);
     $gameVariables.setValue(151, expressionCode); // Set expression code
