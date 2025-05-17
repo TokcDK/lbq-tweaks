@@ -340,7 +340,7 @@ function processCostumeChangeAnimationAtype0TachieDousa(actorParameter, showCost
 
     // Process costume change animation if the parameter is set
     if (changeCostumeParam >= 1) {
-      if (targetPicId >= originalScaleY) {
+      if (targetPicId >= sourcePicId) {
         $gameScreen.movePicture(targetPicId, originalOrigin, originalX, originalY, originalScaleX, originalScaleY, originalOpacity, 0, fadeDelayDuration);
         picture_fade1(targetPicId, "fadeIn", 'Hpicture2', fadeDelayDuration, 5);
         $gameScreen.movePicture(sourcePicId, originalOrigin, originalX, originalY, originalScaleX, originalScaleY, 0, 0, primaryMoveDuration);
