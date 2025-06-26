@@ -1709,77 +1709,60 @@
     }
   };
 
+  // Base position mapping for spawn indexes
+  const spawnCoordinateBasePositions = {
+    1: { x: 450, y: 350 },
+    2: { x: 400, y: 500 },
+    3: { x: 350, y: 350 },
+    4: { x: 300, y: 500 },
+    5: { x: 250, y: 350 },
+    6: { x: 200, y: 500 },
+    7: { x: 150, y: 350 },
+    8: { x: 100, y: 500 }
+  };
+
   function getSpawnCoordinatesHEnemyTroopPush(spawnIndex, enemyCountToSpawn, xOffsetOptions, yNegativeOffsetOptions, yPositiveOffsetOptions) {
-    let spawnX, spawnY;
-    switch (spawnIndex) {
-      case 1:
-        if (enemyCountToSpawn === 1) {
-          spawnX = 350;
-          spawnY = 420;
-          break;
-        }
 
-        spawnX = 450;
-        spawnY = 350;
-        break;
-      case 2:
-        spawnX = 400;
-        spawnY = 500;
-        break;
-      case 3:
-        spawnX = 350;
-        spawnY = 350;
-        break;
-      case 4:
-        spawnX = 300;
-        spawnY = 500;
-        break;
-      case 5:
-        spawnX = 250;
-        spawnY = 350;
-        break;
-      case 6:
-        spawnX = 200;
-        spawnY = 500;
-        break;
-      case 7:
-        spawnX = 150;
-        spawnY = 350;
-        break;
-      case 8:
-        spawnX = 100;
-        spawnY = 500;
-        break;
-      default:
-        break;
+    // Special case for single enemy
+    if (enemyCountToSpawn === 1 && spawnIndex === 1) {
+      return { spawnX: 350, spawnY: 420 };
     }
 
+    // Get base position or default to {0, 0}
+    const basePosition = spawnCoordinateBasePositions[spawnIndex] || { x: 0, y: 0 };
+    let spawnX = basePosition.x;
+    let spawnY = basePosition.y;
+
+    // Apply random X offset for middle positions
     if (spawnIndex >= 2 && spawnIndex <= 6) {
-      spawnX = spawnX + Number(xOffsetOptions[getRandomIndex(xOffsetOptions.length)]);
+      spawnX += Number(xOffsetOptions[getRandomIndex(xOffsetOptions.length)]);
     }
 
-    if (spawnIndex == 2 || spawnIndex == 4 || spawnIndex == 6 || spawnIndex == 8) {
-      spawnY = spawnY + Number(yNegativeOffsetOptions[getRandomIndex(yNegativeOffsetOptions.length)]);
-    } else {
-      spawnY = spawnY + Number(yPositiveOffsetOptions[getRandomIndex(yPositiveOffsetOptions.length)]);
-    }
+    // Apply random Y offset based on even/odd spawn index
+    const isEven = spawnIndex % 2 === 0;
+    const yOffsetOptions = isEven ? yNegativeOffsetOptions : yPositiveOffsetOptions;
+    spawnY += Number(yOffsetOptions[getRandomIndex(yOffsetOptions.length)]);
 
-    if (enemyCountToSpawn == 2) {
-      if (spawnIndex == 2) { spawnX = spawnX - 200; }
+    // Apply positioning adjustments based on enemy count
+    if (enemyCountToSpawn === 2) {
+      if (spawnIndex === 2) spawnX -= 200;
+    } 
+    else if (enemyCountToSpawn === 3) {
+      if (spawnIndex === 2) spawnX -= 100;
+      if (spawnIndex === 3) spawnX -= 100;
     }
-    if (enemyCountToSpawn == 3) {
-      if (spawnIndex == 2) { spawnX = spawnX - 100; }
-      if (spawnIndex == 3) { spawnX = spawnX - 100; }
+    else if (enemyCountToSpawn === 4) {
+      if (spawnIndex === 2) spawnX -= 100;
+      if (spawnIndex === 3) spawnX -= 100;
+      if (spawnIndex === 4) spawnX -= 200;
     }
-    if (enemyCountToSpawn == 4) {
-      if (spawnIndex == 2) { spawnX = spawnX - 100; }
-      if (spawnIndex == 3) { spawnX = spawnX - 100; }
-      if (spawnIndex == 4) { spawnX = spawnX - 200; }
-    }
-    if (enemyCountToSpawn == 5) {
-      if (spawnIndex == 3) { spawnX = spawnX - 100; spawnY = spawnY + 50; }
-      if (spawnIndex == 4) { spawnX = spawnX - 200; }
-      if (spawnIndex == 5) { spawnX = spawnX - 100; }
+    else if (enemyCountToSpawn === 5) {
+      if (spawnIndex === 3) {
+        spawnX -= 100;
+        spawnY += 50;
+      }
+      if (spawnIndex === 4) spawnX -= 200;
+      if (spawnIndex === 5) spawnX -= 100;
     }
 
     return { spawnX, spawnY };
