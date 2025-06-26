@@ -1775,32 +1775,31 @@
     const end = $dataTroops.length - 1;
     for (let i = start; i <= end; i++) {
       const troop = $dataTroops[i];
-      if (troop.name.match(/one/)) {
-        troop.members[0].x = 250;
-        troop.members[0].y = 330;
-      }
-      if (troop.name.match(/big/)) {
-        troop.members[0].x = 250;
-        troop.members[0].y = 400;
-      }
-      if (troop.name.match(/500/)) {
-        troop.members[0].x = 250;
-        troop.members[0].y = 500;
-      }
-      if (troop.name.match(/600/)) {
-        troop.members[0].x = 250;
-        troop.members[0].y = 600;
-      }
-      if (troop.name.match(/768/)) {
-        troop.members[0].x = 250;
-        troop.members[0].y = 768;
-      }
       if (troop.name.match(/バハムート/)) {
         troop.members[0].x = 150;
         troop.members[0].y = 600;
       }
+      else if (troop.name.match(/768/)) {
+        troop.members[0].x = 250;
+        troop.members[0].y = 768;
+      }
+      else if (troop.name.match(/600/)) {
+        troop.members[0].x = 250;
+        troop.members[0].y = 600;
+      }
+      else if (troop.name.match(/500/)) {
+        troop.members[0].x = 250;
+        troop.members[0].y = 500;
+      }
+      else if (troop.name.match(/big/)) {
+        troop.members[0].x = 250;
+        troop.members[0].y = 400;
+      }
+      else if (troop.name.match(/one/)) {
+        troop.members[0].x = 250;
+        troop.members[0].y = 330;
+      }
     }
-
   };
 
   //図鑑のテキスト代入
