@@ -1775,6 +1775,8 @@
     const end = $dataTroops.length - 1;
     for (let i = start; i <= end; i++) {
       const troop = $dataTroops[i];
+      if(!troop || !troop.members || troop.members.length === 0) continue; // Skip empty troops
+
       if (troop.name.match(/バハムート/)) {
         troop.members[0].x = 150;
         troop.members[0].y = 600;
