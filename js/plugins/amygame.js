@@ -1768,38 +1768,33 @@
     return { spawnX, spawnY };
   }
 
+  // Pre-define position mappings for different troop name patterns
+  const enemyBossTroopPositionMappings = {
+    'バハムート': { x: 150, y: 600 },
+    '768': { x: 250, y: 768 },
+    '600': { x: 250, y: 600 },
+    '500': { x: 250, y: 500 },
+    'big': { x: 250, y: 400 },
+    'one': { x: 250, y: 330 }
+  };
   //エネミーグループ配置設定。bosssetup時に実行
   enemy_troopPosition1 = function () {
 
-    const start = 1;
-    const end = $dataTroops.length - 1;
-    for (let i = start; i <= end; i++) {
+    // Process each troop in the database
+    const troopsLength = $dataTroops.length;
+    for (let i = 1; i < troopsLength; i++) {
       const troop = $dataTroops[i];
-      if(!troop || !troop.members || troop.members.length === 0) continue; // Skip empty troops
-
-      if (troop.name.match(/バハムート/)) {
-        troop.members[0].x = 150;
-        troop.members[0].y = 600;
-      }
-      else if (troop.name.match(/768/)) {
-        troop.members[0].x = 250;
-        troop.members[0].y = 768;
-      }
-      else if (troop.name.match(/600/)) {
-        troop.members[0].x = 250;
-        troop.members[0].y = 600;
-      }
-      else if (troop.name.match(/500/)) {
-        troop.members[0].x = 250;
-        troop.members[0].y = 500;
-      }
-      else if (troop.name.match(/big/)) {
-        troop.members[0].x = 250;
-        troop.members[0].y = 400;
-      }
-      else if (troop.name.match(/one/)) {
-        troop.members[0].x = 250;
-        troop.members[0].y = 330;
+      
+      // Skip invalid troops or those without members
+      if (!troop || !troop.members || troop.members.length === 0) continue;
+      
+      // Find matching pattern and apply position
+      for (const [pattern, position] of Object.entries(enemyBossTroopPositionMappings)) {
+        if (troop.name.match(pattern)) {
+          troop.members[0].x = position.x;
+          troop.members[0].y = position.y;
+          break; // Exit the loop once a match is found
+        }
       }
     }
   };
