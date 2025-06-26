@@ -1771,45 +1771,45 @@
   //エネミーグループ配置設定。bosssetup時に実行
   enemy_troopPosition1 = function () {
 
-    var start = 1;
-    var end = $dataTroops.length - 1;
-    for (var i = start; i <= end; i++) {
-      var troop = $dataTroops[i];
+    const start = 1;
+    const end = $dataTroops.length - 1;
+    for (let i = start; i <= end; i++) {
+      const troop = $dataTroops[i];
       if (troop.name.match(/one/)) {
-      var value2 = 250;
-      var value3 = 330;
-      troop.members[0].x = value2;
-      troop.members[0].y = value3;
+        const value2 = 250;
+        const value3 = 330;
+        troop.members[0].x = value2;
+        troop.members[0].y = value3;
       }
       if (troop.name.match(/big/)) {
-      var value2 = 250;
-      var value3 = 400;
-      troop.members[0].x = value2;
-      troop.members[0].y = value3;
+        const value2 = 250;
+        const value3 = 400;
+        troop.members[0].x = value2;
+        troop.members[0].y = value3;
       }
       if (troop.name.match(/500/)) {
-      var value2 = 250;
-      var value3 = 500;
-      troop.members[0].x = value2;
-      troop.members[0].y = value3;
+        const value2 = 250;
+        const value3 = 500;
+        troop.members[0].x = value2;
+        troop.members[0].y = value3;
       }
       if (troop.name.match(/600/)) {
-      var value2 = 250;
-      var value3 = 600;
-      troop.members[0].x = value2;
-      troop.members[0].y = value3;
+        const value2 = 250;
+        const value3 = 600;
+        troop.members[0].x = value2;
+        troop.members[0].y = value3;
       }
       if (troop.name.match(/768/)) {
-      var value2 = 250;
-      var value3 = 768;
-      troop.members[0].x = value2;
-      troop.members[0].y = value3;
+        const value2 = 250;
+        const value3 = 768;
+        troop.members[0].x = value2;
+        troop.members[0].y = value3;
       }
       if (troop.name.match(/バハムート/)) {
-      var value2 = 150;
-      var value3 = 600;
-      troop.members[0].x = value2;
-      troop.members[0].y = value3;
+        const value2 = 150;
+        const value3 = 600;
+        troop.members[0].x = value2;
+        troop.members[0].y = value3;
       }
     };
 
