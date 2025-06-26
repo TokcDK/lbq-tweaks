@@ -1774,42 +1774,43 @@
     var start = 1;
     var end = $dataTroops.length - 1;
     for (var i = start; i <= end; i++) {
-      if ($dataTroops[i].name.match(/one/)) {
-        var value2 = 250;
-        var value3 = 330;
-        $dataTroops[i].members[0].x = value2;
-        $dataTroops[i].members[0].y = value3;
-      };
-      if ($dataTroops[i].name.match(/big/)) {
-        var value2 = 250;
-        var value3 = 400;
-        $dataTroops[i].members[0].x = value2;
-        $dataTroops[i].members[0].y = value3;
-      };
-      if ($dataTroops[i].name.match(/500/)) {
-        var value2 = 250;
-        var value3 = 500;
-        $dataTroops[i].members[0].x = value2;
-        $dataTroops[i].members[0].y = value3;
-      };
-      if ($dataTroops[i].name.match(/600/)) {
-        var value2 = 250;
-        var value3 = 600;
-        $dataTroops[i].members[0].x = value2;
-        $dataTroops[i].members[0].y = value3;
-      };
-      if ($dataTroops[i].name.match(/768/)) {
-        var value2 = 250;
-        var value3 = 768;
-        $dataTroops[i].members[0].x = value2;
-        $dataTroops[i].members[0].y = value3;
-      };
-      if ($dataTroops[i].name.match(/バハムート/)) {
-        var value2 = 150;
-        var value3 = 600;
-        $dataTroops[i].members[0].x = value2;
-        $dataTroops[i].members[0].y = value3;
-      };
+      var troop = $dataTroops[i];
+      if (troop.name.match(/one/)) {
+      var value2 = 250;
+      var value3 = 330;
+      troop.members[0].x = value2;
+      troop.members[0].y = value3;
+      }
+      if (troop.name.match(/big/)) {
+      var value2 = 250;
+      var value3 = 400;
+      troop.members[0].x = value2;
+      troop.members[0].y = value3;
+      }
+      if (troop.name.match(/500/)) {
+      var value2 = 250;
+      var value3 = 500;
+      troop.members[0].x = value2;
+      troop.members[0].y = value3;
+      }
+      if (troop.name.match(/600/)) {
+      var value2 = 250;
+      var value3 = 600;
+      troop.members[0].x = value2;
+      troop.members[0].y = value3;
+      }
+      if (troop.name.match(/768/)) {
+      var value2 = 250;
+      var value3 = 768;
+      troop.members[0].x = value2;
+      troop.members[0].y = value3;
+      }
+      if (troop.name.match(/バハムート/)) {
+      var value2 = 150;
+      var value3 = 600;
+      troop.members[0].x = value2;
+      troop.members[0].y = value3;
+      }
     };
 
   }
