@@ -1776,44 +1776,32 @@
     for (let i = start; i <= end; i++) {
       const troop = $dataTroops[i];
       if (troop.name.match(/one/)) {
-        const value2 = 250;
-        const value3 = 330;
-        troop.members[0].x = value2;
-        troop.members[0].y = value3;
+        troop.members[0].x = 250;
+        troop.members[0].y = 330;
       }
       if (troop.name.match(/big/)) {
-        const value2 = 250;
-        const value3 = 400;
-        troop.members[0].x = value2;
-        troop.members[0].y = value3;
+        troop.members[0].x = 250;
+        troop.members[0].y = 400;
       }
       if (troop.name.match(/500/)) {
-        const value2 = 250;
-        const value3 = 500;
-        troop.members[0].x = value2;
-        troop.members[0].y = value3;
+        troop.members[0].x = 250;
+        troop.members[0].y = 500;
       }
       if (troop.name.match(/600/)) {
-        const value2 = 250;
-        const value3 = 600;
-        troop.members[0].x = value2;
-        troop.members[0].y = value3;
+        troop.members[0].x = 250;
+        troop.members[0].y = 600;
       }
       if (troop.name.match(/768/)) {
-        const value2 = 250;
-        const value3 = 768;
-        troop.members[0].x = value2;
-        troop.members[0].y = value3;
+        troop.members[0].x = 250;
+        troop.members[0].y = 768;
       }
       if (troop.name.match(/バハムート/)) {
-        const value2 = 150;
-        const value3 = 600;
-        troop.members[0].x = value2;
-        troop.members[0].y = value3;
+        troop.members[0].x = 150;
+        troop.members[0].y = 600;
       }
-    };
+    }
 
-  }
+  };
 
   //図鑑のテキスト代入
   scene_Glossarytext1 = function (itemId, variableId) {
