@@ -134,6 +134,8 @@ var QuestSystem = (function() {
     name: 'QuestSetRank',
     process: function(item, ctx) {
       if (!item.meta['QuestSetRank']) return;
+
+      console.log('Processing QuestSetRank for item ID:', item.id);
       
       var rankValue = Number(item.meta['QuestSetRank']);
       if (rankValue < 1) return;

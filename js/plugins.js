@@ -20,6 +20,7 @@ var $plugins =
 {"name":"EaseEventLoad","status":false,"description":"[Ver1.1.0]イベント処理軽量化","parameters":{"opt1valid":"true","opt2valid":"false","opt3valid":"false","opt4valid":"false","opt5valid":"true"}},
 {"name":"GraphicalDesignMode","status":true,"description":"GUI画面デザインプラグイン\nパラメータを変更したら「プロジェクトの保存」（Ctrl+S）","parameters":{"デザインモード":"false","自動保存":"false","モバイル版作成":"false","モバイル偽装":"false","ウィンドウ透過":"false","グリッドサイズ":"48","パディング":"0","フォントサイズ":"0","行の高さ":"0","背景透明度":"0","アイコンサイズ調整":"false","背景表示可否固定":"false","右クリックで消去":"false","メッセージウィンドウを無視":"false"}},
 {"name":"amygame0","status":true,"description":"このゲーム専用プラグイン","parameters":{}},
+{"name":"amygameQuestSystem","status":true,"description":"for amygameQuest/amygame_settei","parameters":{}},
 {"name":"amygameSettei","status":true,"description":"このゲーム専用プラグイン","parameters":{}},
 {"name":"amygame","status":true,"description":"このゲーム専用プラグイン","parameters":{}},
 {"name":"amygameChara","status":true,"description":"","parameters":{}},
