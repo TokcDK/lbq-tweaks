@@ -2643,9 +2643,9 @@ class SexActionSoundEffectBase {
       this.updateBgsLineSetting();
       this.playBgs(this.soundName2, this.volumeOffset2, this.pitchOffset2, this.volumeRandomIndexMax2, this.pitchRandomIndexMax2);
     }
-      
+
     // Modified selection placeholder code:
-    playVoicePatternBGS();
+    this.playPatternBGS();
   }
 }
 
@@ -3080,7 +3080,7 @@ class AdvHPartDirectPlayEffect {
     const soundVolume = getRandomIndex(21) + 100;
     const soundPitch = getRandomIndex(41) + this.soundPitchOffset;
     AudioManager.playSe({ name: selectedHeartbeatSound, volume: soundVolume, pitch: soundPitch, pan: 0 });
-    final();
+    this.final();
   }
 }
 
