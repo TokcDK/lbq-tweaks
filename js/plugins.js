@@ -432,5 +432,6 @@ var $plugins =
 {"name":"Debug_ThrottleImage","status":false,"description":"画像読み込みを遅くします","parameters":{"Delay":"2000"}},
 {"name":"------------------------","status":false,"description":"----------------------------------------------------------------------------------","parameters":{}},
 {"name":"amygameFixes","status":true,"description":"","parameters":{}},
-{"name":"CommonEventsHelper","status":true,"description":"Shared functions extracted from repeated Script commands in CommonEvents.json","parameters":{}}
+{"name":"CommonEventsHelper","status":true,"description":"Shared functions extracted from repeated Script commands in CommonEvents.json","parameters":{}},
+{"name":"AmygameHelper","status":true,"description":"Shared parameterized functions extracted from repeated Script commands in data/*.json","parameters":{}}
 ];
