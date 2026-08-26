@@ -19,6 +19,7 @@ var $plugins =
 {"name":"MPP_Patch","status":true,"description":"【2019/11/30】不具合修正プラグイン","parameters":{"Patch1 enabled?":"true","Patch2 enabled?":"true","Patch3 enabled?":"true","Patch4 enabled?":"true","Patch5 enabled?":"true","Patch6 enabled?":"true","Patch7 enabled?":"false","Patch8 enabled?":"false","Patch9 enabled?":"true","Patch10 enabled?":"true","Patch11 enabled?":"true","Patch12 enabled?":"true","Patch13 enabled?":"true","Patch14 enabled?":"true","Patch15 enabled?":"true","Patch16 enabled?":"true","Patch17 enabled?":"true","Patch18 enabled?":"true","Patch19 enabled?":"true"}},
 {"name":"EaseEventLoad","status":false,"description":"[Ver1.1.0]イベント処理軽量化","parameters":{"opt1valid":"true","opt2valid":"false","opt3valid":"false","opt4valid":"false","opt5valid":"true"}},
 {"name":"GraphicalDesignMode","status":true,"description":"GUI画面デザインプラグイン\nパラメータを変更したら「プロジェクトの保存」（Ctrl+S）","parameters":{"デザインモード":"false","自動保存":"false","モバイル版作成":"false","モバイル偽装":"false","ウィンドウ透過":"false","グリッドサイズ":"48","パディング":"0","フォントサイズ":"0","行の高さ":"0","背景透明度":"0","アイコンサイズ調整":"false","背景表示可否固定":"false","右クリックで消去":"false","メッセージウィンドウを無視":"false"}},
+{"name":"CommonEventsHelper.js","status":true,"description":"Shared functions extracted from repeated Script commands in CommonEvents.json","parameters":{}},
 {"name":"amygame0","status":true,"description":"このゲーム専用プラグイン","parameters":{}},
 {"name":"amygameQuestSystem","status":true,"description":"for amygameQuest/amygame_settei","parameters":{}},
 {"name":"amygameSettei","status":true,"description":"このゲーム専用プラグイン","parameters":{}},
