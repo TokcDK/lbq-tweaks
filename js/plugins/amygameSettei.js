@@ -411,85 +411,85 @@ valueDispelGuardState = [];//<DispelGuard>
 //amygame_elementIcon(id3);
 amygame_elementIcon = function(valueElementIcon){
 
-  var value15 = 0;var value12 = 16;var value13 = 16;var value14 = 16;
-  if(valueElementIcon == 1 ){var value12 = 77; var value13 = 77; var value14 = 77};
-  if(valueElementIcon == 2 ){var value12 = 79; var value13 = 79; var value14 = 79};
-  if(valueElementIcon == 3 ){var value12 = 64; var value13 = 448;var value14 = 464};
-  if(valueElementIcon == 4 ){var value12 = 65; var value13 = 449;var value14 = 465};
-  if(valueElementIcon == 5 ){var value12 = 66; var value13 = 450;var value14 = 466};
-  if(valueElementIcon == 6 ){var value12 = 67; var value13 = 451;var value14 = 467};
-  if(valueElementIcon == 7 ){var value12 = 68; var value13 = 452;var value14 = 468};
-  if(valueElementIcon == 8 ){var value12 = 69; var value13 = 453;var value14 = 469};
-  if(valueElementIcon == 9 ){var value12 = 70; var value13 = 454;var value14 = 470};
-  if(valueElementIcon == 10){var value12 =  31;var value13 =  31;var value14 = 31};
-  if(valueElementIcon == 11){var value12 = 636;var value13 = 652;var value14 = 636};
-  if(valueElementIcon == 12){var value12 = 637;var value13 = 637;var value14 = 653};
-  if(valueElementIcon == 13){var value12 = 657;var value13 = 657;var value14 = 657};//ドロップアップ
-  if(valueElementIcon == 14){var value12 = 657;var value13 = 657;var value14 = 657};//ドロップアップ
-  if(valueElementIcon == 15){var value12 =  92;var value13 =  92;var value14 = 92};
-  if(valueElementIcon == 16){var value12 = 172;var value13 = 172;var value14 = 172};
-  if(valueElementIcon == 17){var value12 = 173;var value13 = 173;var value14 = 173};
-  if(valueElementIcon == 18){var value12 = 174;var value13 = 174;var value14 = 174};
-  if(valueElementIcon == 19){var value12 = 175;var value13 = 175;var value14 = 175};
-  if(valueElementIcon == 20){var value12 = 673;var value13 = 673;var value14 = 673};//アビリティ
-  if(valueElementIcon == 21){var value12 = 480;var value13 = 480;var value14 = 480};
-  if(valueElementIcon == 22){var value12 = 481;var value13 = 481;var value14 = 481};
-  if(valueElementIcon == 23){var value12 = 482;var value13 = 482;var value14 = 482};
-  if(valueElementIcon == 24){var value12 = 483;var value13 = 483;var value14 = 483};
-  if(valueElementIcon == 25){var value12 = 484;var value13 = 484;var value14 = 484};
-  if(valueElementIcon == 26){var value12 = 485;var value13 = 485;var value14 = 485};
-  if(valueElementIcon == 27){var value12 = 486;var value13 = 486;var value14 = 486};
-  if(valueElementIcon == 28){var value12 = 487;var value13 = 487;var value14 = 487};
-  if(valueElementIcon == 29){var value12 = 488;var value13 = 488;var value14 = 488};
-  if(valueElementIcon == 30){var value12 = 489;var value13 = 489;var value14 = 489};
-  if(valueElementIcon == 31){var value12 = 110;var value13 = 110;var value14 = 110};
-  if(valueElementIcon == 32){var value12 = 105;var value13 = 105;var value14 = 105};
-  if(valueElementIcon == 33){var value12 = 294;var value13 = 294;var value14 = 294};
-  if(valueElementIcon == 34){var value12 = 213;var value13 = 213;var value14 = 213};
-  if(valueElementIcon == 35){var value15 = 1;var value12 = `[霊体属性無効化]`;var value13 =  16;var value14 =  16};//霊体に物理で通常ダメ
-  if(valueElementIcon == 36){var value12 = 100;var value13 = 100;var value14 = 100};
-  if(valueElementIcon == 39){var value12 = 505;var value13 = 505;var value14 = 505};
-  if(valueElementIcon == 40){var value12 = 504;var value13 = 504;var value14 = 504};
-  if(valueElementIcon == 41){var value15 = 1;var value12 = `[状態異常数に応じて与D上昇]`;var value13 =  `[状態異常数に応じて与D上昇]`;var value14 =  `[状態異常数+1]`};//状態異常数
-  if(valueElementIcon == 42){var value12 = 622;var value13 = 622;var value14 = 622};
-  if(valueElementIcon == 43){var value12 = 621;var value13 = 621;var value14 = 621};
-  if(valueElementIcon == 44){var value12 = 620;var value13 = 620;var value14 = 620};
-  if(valueElementIcon == 45){var value12 = 619;var value13 = 619;var value14 = 619};
-  if(valueElementIcon == 46){var value12 = 608;var value13 = 608;var value14 = 608};
-  if(valueElementIcon == 47){var value12 = 609;var value13 = 609;var value14 = 609};
-  if(valueElementIcon == 48){var value12 = 617;var value13 = 617;var value14 = 617};
-  if(valueElementIcon == 49){var value12 = 618;var value13 = 618;var value14 = 618};
-  if(valueElementIcon == 50){var value12 = 611;var value13 = 611;var value14 = 611};
-  if(valueElementIcon == 51){var value12 = 612;var value13 = 612;var value14 = 612};
-  if(valueElementIcon == 52){var value12 = 613;var value13 = 613;var value14 = 613};
-  if(valueElementIcon == 53){var value12 = 614;var value13 = 614;var value14 = 614};
-  if(valueElementIcon == 54){var value12 = 615;var value13 = 615;var value14 = 615};
-  if(valueElementIcon == 55){var value12 = 616;var value13 = 616;var value14 = 616};
-  if(valueElementIcon == 56){var value12 = 542;var value13 = 542;var value14 = 542};
-  if(valueElementIcon == 57){var value12 = 623;var value13 = 623;var value14 = 623};
-  if(valueElementIcon == 59){var value12 =  94;var value13 =  94;var value14 =  94};
-  if(valueElementIcon == 60){var value12 =  95;var value13 =  95;var value14 =  95};
-  if(valueElementIcon == 61){var value12 = 560;var value13 = 560;var value14 = 560};
-  if(valueElementIcon == 62){var value12 = 561;var value13 = 561;var value14 = 561};
-  if(valueElementIcon == 63){var value12 = 562;var value13 = 562;var value14 = 562};
-  if(valueElementIcon == 64){var value12 = 563;var value13 = 563;var value14 = 563};
-  if(valueElementIcon == 65){var value12 = 564;var value13 = 564;var value14 = 564};
-  if(valueElementIcon == 66){var value12 = 565;var value13 = 565;var value14 = 565};
-  if(valueElementIcon == 67){var value12 = 566;var value13 = 566;var value14 = 566};
-  if(valueElementIcon == 68){var value12 = 567;var value13 = 567;var value14 = 567};
-  if(valueElementIcon == 69){var value12 = 568;var value13 = 568;var value14 = 568};
-  if(valueElementIcon == 70){var value12 = 569;var value13 = 569;var value14 = 569};
+  var elementSpecialFlag = 0;var elementIconSlot1 = 16;var elementIconSlot2 = 16;var elementIconSlot3 = 16;
+  if(valueElementIcon == 1 ){var elementIconSlot1 = 77; var elementIconSlot2 = 77; var elementIconSlot3 = 77};
+  if(valueElementIcon == 2 ){var elementIconSlot1 = 79; var elementIconSlot2 = 79; var elementIconSlot3 = 79};
+  if(valueElementIcon == 3 ){var elementIconSlot1 = 64; var elementIconSlot2 = 448;var elementIconSlot3 = 464};
+  if(valueElementIcon == 4 ){var elementIconSlot1 = 65; var elementIconSlot2 = 449;var elementIconSlot3 = 465};
+  if(valueElementIcon == 5 ){var elementIconSlot1 = 66; var elementIconSlot2 = 450;var elementIconSlot3 = 466};
+  if(valueElementIcon == 6 ){var elementIconSlot1 = 67; var elementIconSlot2 = 451;var elementIconSlot3 = 467};
+  if(valueElementIcon == 7 ){var elementIconSlot1 = 68; var elementIconSlot2 = 452;var elementIconSlot3 = 468};
+  if(valueElementIcon == 8 ){var elementIconSlot1 = 69; var elementIconSlot2 = 453;var elementIconSlot3 = 469};
+  if(valueElementIcon == 9 ){var elementIconSlot1 = 70; var elementIconSlot2 = 454;var elementIconSlot3 = 470};
+  if(valueElementIcon == 10){var elementIconSlot1 =  31;var elementIconSlot2 =  31;var elementIconSlot3 = 31};
+  if(valueElementIcon == 11){var elementIconSlot1 = 636;var elementIconSlot2 = 652;var elementIconSlot3 = 636};
+  if(valueElementIcon == 12){var elementIconSlot1 = 637;var elementIconSlot2 = 637;var elementIconSlot3 = 653};
+  if(valueElementIcon == 13){var elementIconSlot1 = 657;var elementIconSlot2 = 657;var elementIconSlot3 = 657};//ドロップアップ
+  if(valueElementIcon == 14){var elementIconSlot1 = 657;var elementIconSlot2 = 657;var elementIconSlot3 = 657};//ドロップアップ
+  if(valueElementIcon == 15){var elementIconSlot1 =  92;var elementIconSlot2 =  92;var elementIconSlot3 = 92};
+  if(valueElementIcon == 16){var elementIconSlot1 = 172;var elementIconSlot2 = 172;var elementIconSlot3 = 172};
+  if(valueElementIcon == 17){var elementIconSlot1 = 173;var elementIconSlot2 = 173;var elementIconSlot3 = 173};
+  if(valueElementIcon == 18){var elementIconSlot1 = 174;var elementIconSlot2 = 174;var elementIconSlot3 = 174};
+  if(valueElementIcon == 19){var elementIconSlot1 = 175;var elementIconSlot2 = 175;var elementIconSlot3 = 175};
+  if(valueElementIcon == 20){var elementIconSlot1 = 673;var elementIconSlot2 = 673;var elementIconSlot3 = 673};//アビリティ
+  if(valueElementIcon == 21){var elementIconSlot1 = 480;var elementIconSlot2 = 480;var elementIconSlot3 = 480};
+  if(valueElementIcon == 22){var elementIconSlot1 = 481;var elementIconSlot2 = 481;var elementIconSlot3 = 481};
+  if(valueElementIcon == 23){var elementIconSlot1 = 482;var elementIconSlot2 = 482;var elementIconSlot3 = 482};
+  if(valueElementIcon == 24){var elementIconSlot1 = 483;var elementIconSlot2 = 483;var elementIconSlot3 = 483};
+  if(valueElementIcon == 25){var elementIconSlot1 = 484;var elementIconSlot2 = 484;var elementIconSlot3 = 484};
+  if(valueElementIcon == 26){var elementIconSlot1 = 485;var elementIconSlot2 = 485;var elementIconSlot3 = 485};
+  if(valueElementIcon == 27){var elementIconSlot1 = 486;var elementIconSlot2 = 486;var elementIconSlot3 = 486};
+  if(valueElementIcon == 28){var elementIconSlot1 = 487;var elementIconSlot2 = 487;var elementIconSlot3 = 487};
+  if(valueElementIcon == 29){var elementIconSlot1 = 488;var elementIconSlot2 = 488;var elementIconSlot3 = 488};
+  if(valueElementIcon == 30){var elementIconSlot1 = 489;var elementIconSlot2 = 489;var elementIconSlot3 = 489};
+  if(valueElementIcon == 31){var elementIconSlot1 = 110;var elementIconSlot2 = 110;var elementIconSlot3 = 110};
+  if(valueElementIcon == 32){var elementIconSlot1 = 105;var elementIconSlot2 = 105;var elementIconSlot3 = 105};
+  if(valueElementIcon == 33){var elementIconSlot1 = 294;var elementIconSlot2 = 294;var elementIconSlot3 = 294};
+  if(valueElementIcon == 34){var elementIconSlot1 = 213;var elementIconSlot2 = 213;var elementIconSlot3 = 213};
+  if(valueElementIcon == 35){var elementSpecialFlag = 1;var elementIconSlot1 = `[霊体属性無効化]`;var elementIconSlot2 =  16;var elementIconSlot3 =  16};//霊体に物理で通常ダメ
+  if(valueElementIcon == 36){var elementIconSlot1 = 100;var elementIconSlot2 = 100;var elementIconSlot3 = 100};
+  if(valueElementIcon == 39){var elementIconSlot1 = 505;var elementIconSlot2 = 505;var elementIconSlot3 = 505};
+  if(valueElementIcon == 40){var elementIconSlot1 = 504;var elementIconSlot2 = 504;var elementIconSlot3 = 504};
+  if(valueElementIcon == 41){var elementSpecialFlag = 1;var elementIconSlot1 = `[状態異常数に応じて与D上昇]`;var elementIconSlot2 =  `[状態異常数に応じて与D上昇]`;var elementIconSlot3 =  `[状態異常数+1]`};//状態異常数
+  if(valueElementIcon == 42){var elementIconSlot1 = 622;var elementIconSlot2 = 622;var elementIconSlot3 = 622};
+  if(valueElementIcon == 43){var elementIconSlot1 = 621;var elementIconSlot2 = 621;var elementIconSlot3 = 621};
+  if(valueElementIcon == 44){var elementIconSlot1 = 620;var elementIconSlot2 = 620;var elementIconSlot3 = 620};
+  if(valueElementIcon == 45){var elementIconSlot1 = 619;var elementIconSlot2 = 619;var elementIconSlot3 = 619};
+  if(valueElementIcon == 46){var elementIconSlot1 = 608;var elementIconSlot2 = 608;var elementIconSlot3 = 608};
+  if(valueElementIcon == 47){var elementIconSlot1 = 609;var elementIconSlot2 = 609;var elementIconSlot3 = 609};
+  if(valueElementIcon == 48){var elementIconSlot1 = 617;var elementIconSlot2 = 617;var elementIconSlot3 = 617};
+  if(valueElementIcon == 49){var elementIconSlot1 = 618;var elementIconSlot2 = 618;var elementIconSlot3 = 618};
+  if(valueElementIcon == 50){var elementIconSlot1 = 611;var elementIconSlot2 = 611;var elementIconSlot3 = 611};
+  if(valueElementIcon == 51){var elementIconSlot1 = 612;var elementIconSlot2 = 612;var elementIconSlot3 = 612};
+  if(valueElementIcon == 52){var elementIconSlot1 = 613;var elementIconSlot2 = 613;var elementIconSlot3 = 613};
+  if(valueElementIcon == 53){var elementIconSlot1 = 614;var elementIconSlot2 = 614;var elementIconSlot3 = 614};
+  if(valueElementIcon == 54){var elementIconSlot1 = 615;var elementIconSlot2 = 615;var elementIconSlot3 = 615};
+  if(valueElementIcon == 55){var elementIconSlot1 = 616;var elementIconSlot2 = 616;var elementIconSlot3 = 616};
+  if(valueElementIcon == 56){var elementIconSlot1 = 542;var elementIconSlot2 = 542;var elementIconSlot3 = 542};
+  if(valueElementIcon == 57){var elementIconSlot1 = 623;var elementIconSlot2 = 623;var elementIconSlot3 = 623};
+  if(valueElementIcon == 59){var elementIconSlot1 =  94;var elementIconSlot2 =  94;var elementIconSlot3 =  94};
+  if(valueElementIcon == 60){var elementIconSlot1 =  95;var elementIconSlot2 =  95;var elementIconSlot3 =  95};
+  if(valueElementIcon == 61){var elementIconSlot1 = 560;var elementIconSlot2 = 560;var elementIconSlot3 = 560};
+  if(valueElementIcon == 62){var elementIconSlot1 = 561;var elementIconSlot2 = 561;var elementIconSlot3 = 561};
+  if(valueElementIcon == 63){var elementIconSlot1 = 562;var elementIconSlot2 = 562;var elementIconSlot3 = 562};
+  if(valueElementIcon == 64){var elementIconSlot1 = 563;var elementIconSlot2 = 563;var elementIconSlot3 = 563};
+  if(valueElementIcon == 65){var elementIconSlot1 = 564;var elementIconSlot2 = 564;var elementIconSlot3 = 564};
+  if(valueElementIcon == 66){var elementIconSlot1 = 565;var elementIconSlot2 = 565;var elementIconSlot3 = 565};
+  if(valueElementIcon == 67){var elementIconSlot1 = 566;var elementIconSlot2 = 566;var elementIconSlot3 = 566};
+  if(valueElementIcon == 68){var elementIconSlot1 = 567;var elementIconSlot2 = 567;var elementIconSlot3 = 567};
+  if(valueElementIcon == 69){var elementIconSlot1 = 568;var elementIconSlot2 = 568;var elementIconSlot3 = 568};
+  if(valueElementIcon == 70){var elementIconSlot1 = 569;var elementIconSlot2 = 569;var elementIconSlot3 = 569};
   //予備枠
-  if(valueElementIcon == 74){var value12 = 570;var value13 = 570;var value14 = 570};
-  if(valueElementIcon == 75){var value12 = 571;var value13 = 571;var value14 = 571};
-  if(valueElementIcon == 76){var value12 = 572;var value13 = 572;var value14 = 572};
-  if(valueElementIcon == 77){var value12 = 573;var value13 = 573;var value14 = 573};
-  if(valueElementIcon == 78){var value12 = 574;var value13 = 574;var value14 = 574};
-  if(valueElementIcon == 79){var value12 = 575;var value13 = 575;var value14 = 575};
-  if(valueElementIcon == 80){var value12 = 508;var value13 = 508;var value14 = 508};
-  if(valueElementIcon == 82){var value15 = 1;var value12 = `[トレジャーハント与D上昇]`;var value13 = `[トレジャーハント与D上昇威力]`;var value14 = 508};
-  if(valueElementIcon == 83){var value15 = 1;var value12 = `[魅了特攻]`;var value13 = 16;var value14 = 16};
-  valueElementIconArr = [value15,value12,value13,value14];//valueElementIconArr[0]
+  if(valueElementIcon == 74){var elementIconSlot1 = 570;var elementIconSlot2 = 570;var elementIconSlot3 = 570};
+  if(valueElementIcon == 75){var elementIconSlot1 = 571;var elementIconSlot2 = 571;var elementIconSlot3 = 571};
+  if(valueElementIcon == 76){var elementIconSlot1 = 572;var elementIconSlot2 = 572;var elementIconSlot3 = 572};
+  if(valueElementIcon == 77){var elementIconSlot1 = 573;var elementIconSlot2 = 573;var elementIconSlot3 = 573};
+  if(valueElementIcon == 78){var elementIconSlot1 = 574;var elementIconSlot2 = 574;var elementIconSlot3 = 574};
+  if(valueElementIcon == 79){var elementIconSlot1 = 575;var elementIconSlot2 = 575;var elementIconSlot3 = 575};
+  if(valueElementIcon == 80){var elementIconSlot1 = 508;var elementIconSlot2 = 508;var elementIconSlot3 = 508};
+  if(valueElementIcon == 82){var elementSpecialFlag = 1;var elementIconSlot1 = `[トレジャーハント与D上昇]`;var elementIconSlot2 = `[トレジャーハント与D上昇威力]`;var elementIconSlot3 = 508};
+  if(valueElementIcon == 83){var elementSpecialFlag = 1;var elementIconSlot1 = `[魅了特攻]`;var elementIconSlot2 = 16;var elementIconSlot3 = 16};
+  valueElementIconArr = [elementSpecialFlag,elementIconSlot1,elementIconSlot2,elementIconSlot3];//valueElementIconArr[0]
 
 };
 

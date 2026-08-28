@@ -7,7 +7,7 @@
 //(function(){
 
 //中身スクリプト
-scene_joukenNakami = function (id1, itemIndex, value23, value24, value25, value26) {
+scene_joukenNakami = function (id1, itemIndex, occurrenceSwitchOffset, checkSwitchOffset, occurrenceCountVarId, unmetCountVarId) {
 
   const dataItem = $dataItems[itemIndex];
   if (!dataItem || !dataItem.name) return;
@@ -40,7 +40,7 @@ scene_joukenNakami = function (id1, itemIndex, value23, value24, value25, value2
   const offStatusString = `\\C[12]×\\C[0]`;
 
   //行数超過する場合にここでid毎に対応
-  //if(i == 401){let value42 = 4};
+  //if(i == 401){let completionSwitchId2 = 4};
 
   let dataItemMeta = dataItem.meta['EventSetBattle'];
   if (dataItemMeta) {
@@ -54,7 +54,7 @@ scene_joukenNakami = function (id1, itemIndex, value23, value24, value25, value2
     }
   }
 
-  //場所による条件設定value11
+  //場所による条件設定mainQuestStageIndex
   dataItemMeta = dataItem.meta['EventSetMap'];
   if (dataItemMeta) {
     let itemEventSetMapNum = Number(dataItemMeta);
@@ -134,7 +134,7 @@ scene_joukenNakami = function (id1, itemIndex, value23, value24, value25, value2
       if (itemEventSetPerspectiveNum == $gameVariables.value(2)) { } else { messageText += offStatusString };
       if (!$gameActors.actor(itemEventSetPerspectiveNum).isLearnedSkill(407)) {
         eventSceneMissing = 0;
-        //value41 += `[要:未加入キャラ]`;
+        //completionSwitchId1 += `[要:未加入キャラ]`;
         actorNotJoined = 1;
       }
     }
@@ -200,7 +200,7 @@ scene_joukenNakami = function (id1, itemIndex, value23, value24, value25, value2
         messageText += offStatusString;
         if (!$gameActors.actor(Number(arr[id])).isLearnedSkill(407)) {
           eventSceneMissing = 0;
-          //value41 += `[要:未加入キャラ]`;
+          //completionSwitchId1 += `[要:未加入キャラ]`;
           actorNotJoined = 1;
         }
       }
@@ -477,7 +477,7 @@ scene_joukenNakami = function (id1, itemIndex, value23, value24, value25, value2
       }
     }
   }
-  //if(value43 >= value42){value5 += `\n`;value43 = 0};
+  //if(completionSwitchId3 >= completionSwitchId2){choiceDescriptionText += `\n`;completionSwitchId3 = 0};
 
   for (let id = 1; id < 10; id++) {
     dataItemMeta = dataItem.meta['EventSetHexpArr' + id];
@@ -577,11 +577,11 @@ scene_joukenNakami = function (id1, itemIndex, value23, value24, value25, value2
         messageText += offStatusString;
         eventSceneMissing = 0;
         insufficientMainQuest = 1;
-        //value41 += `[メイン進行${skillId}↑]`;
+        //completionSwitchId1 += `[メイン進行${skillId}↑]`;
       }
     }
   }
-  //if(value43 >= value42){value5 += `\n`;let value43 = 0};
+  //if(completionSwitchId3 >= completionSwitchId2){choiceDescriptionText += `\n`;let completionSwitchId3 = 0};
 
   //変数条件
   for (let id = 1; id < 10; id++) {
@@ -753,15 +753,15 @@ scene_joukenNakami = function (id1, itemIndex, value23, value24, value25, value2
     valueSceneDescription1 += `[要:未加入キャラ] `;
   }
   if (mainQuestProgress != 0) {
-    if ($gameVariables.value(356)[value11] != 0 || value11 == 2) {
+    if ($gameVariables.value(356)[mainQuestStageIndex] != 0 || mainQuestStageIndex == 2) {
       valueSceneDescription1 += `${mainQuestProgress}`;
     } else {
       valueSceneDescription1 += `[未到達マップ]`;
     }
   } else {
 
-    if ($gameSwitches.value(value24 + itemIndex)) {// || $gameSwitches.value(435) && !$gameParty.hasItem($dataItems[i])
-      value10 += 1;
+    if ($gameSwitches.value(checkSwitchOffset + itemIndex)) {// || $gameSwitches.value(435) && !$gameParty.hasItem($dataItems[i])
+      mapSceneOccurrenceCount += 1;
 
     } else {
 
@@ -775,26 +775,26 @@ scene_joukenNakami = function (id1, itemIndex, value23, value24, value25, value2
           BattleManager._logWindow.push(`addText`, conditionPrefixText);
         }
 
-        value10 += 1;
-        let value14 = `${valueSceneName1}\n${valueSceneDescription1}\n`;
-        /*   let value15 = 1; //WARN not using? temp commented
-          if (value10 >= 81) { value15 = 10 }
-          else if (value10 >= 71) { value15 = 9 }
-          else if (value10 >= 61) { value15 = 8 }
-          else if (value10 >= 51) { value15 = 7 }
-          else if (value10 >= 41) { value15 = 6 }
-          else if (value10 >= 31) { value15 = 4 }
-          else if (value10 >= 21) { value15 = 3 }
-          else if (value10 >= 11) { value15 = 2 } */
+        mapSceneOccurrenceCount += 1;
+        let sceneTextBlock = `${valueSceneName1}\n${valueSceneDescription1}\n`;
+        /*   let sceneItemId5 = 1; //WARN not using? temp commented
+          if (mapSceneOccurrenceCount >= 81) { sceneItemId5 = 10 }
+          else if (mapSceneOccurrenceCount >= 71) { sceneItemId5 = 9 }
+          else if (mapSceneOccurrenceCount >= 61) { sceneItemId5 = 8 }
+          else if (mapSceneOccurrenceCount >= 51) { sceneItemId5 = 7 }
+          else if (mapSceneOccurrenceCount >= 41) { sceneItemId5 = 6 }
+          else if (mapSceneOccurrenceCount >= 31) { sceneItemId5 = 4 }
+          else if (mapSceneOccurrenceCount >= 21) { sceneItemId5 = 3 }
+          else if (mapSceneOccurrenceCount >= 11) { sceneItemId5 = 2 } */
         if (unmetConditionCount == metConditionCount) {
-          var value0 = `${value14}`;
-          eval("valueWordSet" + valueCountSet2 + " += value0");
+          var sceneWordChunk = `${sceneTextBlock}`;
+          eval("valueWordSet" + valueCountSet2 + " += sceneWordChunk");
           valueCountSet1 += 1;
           if ((valueCountSet1 % 10) == 0) {
             valueCountSet2 += 1;
-            eval("valueWordSet" + valueCountSet2 + " = value46");
+            eval("valueWordSet" + valueCountSet2 + " = initialWordSetText");
           };
-          $gameSwitches.setValue(itemIndex + value23, true);//発生用スイッチ
+          $gameSwitches.setValue(itemIndex + occurrenceSwitchOffset, true);//発生用スイッチ
           if (valueCountDefeadSwitche1 >= 1) {
             valueCountDefeadSwitche2 = itemIndex;
           };
@@ -811,41 +811,41 @@ scene_joukenNakami = function (id1, itemIndex, value23, value24, value25, value2
           };
           if ($gameParty.inBattle()) {
             if (inBattle == 1) {
-              $gameVariables.setValue(value25, $gameVariables.value(value25) + 1);
+              $gameVariables.setValue(occurrenceCountVarId, $gameVariables.value(occurrenceCountVarId) + 1);
             };
           } else {
-            $gameVariables.setValue(value25, $gameVariables.value(value25) + 1);
+            $gameVariables.setValue(occurrenceCountVarId, $gameVariables.value(occurrenceCountVarId) + 1);
           };
         } else {
-          var value0 = `\\C[5]${value14}\\C[0]`;
-          eval("valueWordSet" + valueCountSet2 + " += value0");
+          var sceneWordChunk = `\\C[5]${sceneTextBlock}\\C[0]`;
+          eval("valueWordSet" + valueCountSet2 + " += sceneWordChunk");
           valueCountSet1 += 1;
           if ((valueCountSet1 % 10) == 0) {
             valueCountSet2 += 1;
-            eval("valueWordSet" + valueCountSet2 + " = value46");
+            eval("valueWordSet" + valueCountSet2 + " = initialWordSetText");
           };
-          $gameSwitches.setValue(itemIndex + value23, false);//発生用スイッチ
+          $gameSwitches.setValue(itemIndex + occurrenceSwitchOffset, false);//発生用スイッチ
 
           if ($gameParty.inBattle()) {
             if (inBattle == 1) {
-              $gameVariables.setValue(value26, $gameVariables.value(value26) + 1);
+              $gameVariables.setValue(unmetCountVarId, $gameVariables.value(unmetCountVarId) + 1);
             }
           } else {
-            $gameVariables.setValue(value26, $gameVariables.value(value26) + 1);
+            $gameVariables.setValue(unmetCountVarId, $gameVariables.value(unmetCountVarId) + 1);
           };
 
         };
 
       } else {
-        var value0 = `\\C[1]${tempAssignSceneOccurText}\\C[0]`;
-        eval("valueWordSet" + valueCountSet2 + " += value0");
+        var sceneWordChunk = `\\C[1]${tempAssignSceneOccurText}\\C[0]`;
+        eval("valueWordSet" + valueCountSet2 + " += sceneWordChunk");
         valueCountSet1 += 1;
         if ((valueCountSet1 % 10) == 0) {
           valueCountSet2 += 1;
-          eval("valueWordSet" + valueCountSet2 + " = value46");
+          eval("valueWordSet" + valueCountSet2 + " = initialWordSetText");
         };
         if (!dataItem.meta['RepeatScene']) {
-          $gameSwitches.setValue(itemIndex + value23, false);//発生用スイッチ
+          $gameSwitches.setValue(itemIndex + occurrenceSwitchOffset, false);//発生用スイッチ
         }
       }
     }
@@ -871,22 +871,22 @@ scene_joukensettei = function (id1) {
 
   valueCountSet1 = 0;
   valueCountSet2 = 1;
-  value46 = ` `;
-  eval("valueWordSet" + valueCountSet2 + " = value46");
-  value10 = 0;//そのマップで発生するシーン数
-  //value15 = 1;//変数800+value15で表示するための変数
+  initialWordSetText = ` `;
+  eval("valueWordSet" + valueCountSet2 + " = initialWordSetText");
+  mapSceneOccurrenceCount = 0;//そのマップで発生するシーン数
+  //sceneItemId5 = 1;//変数800+sceneItemId5で表示するための変数
   j = 0;//配列を番号順に居れるため
 
-  let start, end, value23, value24, value25, value26;
+  let start, end, occurrenceSwitchOffset, checkSwitchOffset, occurrenceCountVarId, unmetCountVarId;
   const setValuesById = (varId1, varId2, s, e, v23, v24, v25, v26, varId3, varId4) => {
     $gameSwitches.setValue(varId1, false);
     $gameSwitches.setValue(varId2, false);
     start = s;
     end = e;
-    value23 = v23;
-    value24 = v24;
-    value25 = v25;//成立数変数
-    value26 = v26;//未成立数変数
+    occurrenceSwitchOffset = v23;
+    checkSwitchOffset = v24;
+    occurrenceCountVarId = v25;//成立数変数
+    unmetCountVarId = v26;//未成立数変数
     $gameVariables.setValue(varId3, 0);
     $gameVariables.setValue(varId4, 0);
   }
@@ -902,12 +902,12 @@ scene_joukensettei = function (id1) {
   }
 
   for (let i = start; i <= end; i++) {
-    scene_joukenNakami(id1, i, value23, value24, value25, value26);
+    scene_joukenNakami(id1, i, occurrenceSwitchOffset, checkSwitchOffset, occurrenceCountVarId, unmetCountVarId);
   }
 
   const setValuesById1 = (v25, v26, arrVal) => {
-    value25 = v25;//成立数変数
-    value26 = v26;//未成立数変数
+    occurrenceCountVarId = v25;//成立数変数
+    unmetCountVarId = v26;//未成立数変数
     arrAdd = arrVal;
   }
   let arrAdd;
@@ -929,7 +929,7 @@ scene_joukensettei = function (id1) {
     const addEventCompSwiNum = Number(itemMeta['AddEventCompSwi']);//達成スイッチ
     const addAddEventCommonIdNum = Number(itemMeta['AddAddEventCommonId']);//コモID。並列スイッチも逆算して代入。スクリプト内では使わない
     const addEventParallelSwiNum = Number(itemMeta['AddEventParallelSwi']);//並列スイッチ
-    scene_joukenNakami(id1, id, addEventIncidenceSwiNum, addEventCompSwiNum, value25, value26, addAddEventCommonIdNum, addEventParallelSwiNum);
+    scene_joukenNakami(id1, id, addEventIncidenceSwiNum, addEventCompSwiNum, occurrenceCountVarId, unmetCountVarId, addAddEventCommonIdNum, addEventParallelSwiNum);
   }
 
   $gameVariables.setValue(195, valueCountSet1);//表示時の個数を入れる事でコモンイベントのウィンド数を抑制
@@ -973,8 +973,8 @@ event_pararelSet = function (id1, id2, id3, id4) {
   set_playerPosition2(161);
   if (id4 >= 1) { $gamePlayer.setDirection(id4) };
   if (event.event().meta['EvSceneSet']) {
-    const value1 = Number(event.event().meta['EvSceneSet'].split(',')[0]);
-    event_pararelStarting(1, value1, id1);
+    const sceneItemId = Number(event.event().meta['EvSceneSet'].split(',')[0]);
+    event_pararelStarting(1, sceneItemId, id1);
   }
 
 }
@@ -1077,40 +1077,40 @@ Npc_TemporarilySave = function (id1, id2) {
 }
 
 //段階シーンを選択肢で表示
-scene_choiceDecision = function (arr1, value6) {//scene_choiceDecision([503,502,501],161);
+scene_choiceDecision = function (arr1, choiceSwitchId) {//scene_choiceDecision([503,502,501],161);
 
-  $gameSwitches.setValue(value6, false);
-  let value2 = 0;
-  let value5 = ` `;
-  for (const value1 of arr1) {
-    let value4 = 0; // hope it will be set
-    let value3 = 0; // hope it will be set
-    if (value1 >= 401 && value1 <= 500) {
-      value3 = value1 + 800;
-      value4 = value1 + 900;
+  $gameSwitches.setValue(choiceSwitchId, false);
+  let selectedItemId = 0;
+  let choiceDescriptionText = ` `;
+  for (const sceneItemId of arr1) {
+    let completionSwitchId = 0; // hope it will be set
+    let incidenceSwitchId = 0; // hope it will be set
+    if (sceneItemId >= 401 && sceneItemId <= 500) {
+      incidenceSwitchId = sceneItemId + 800;
+      completionSwitchId = sceneItemId + 900;
     }
-    else if (value1 >= 501 && value1 <= 600) {
-      value3 = value1 + 500;
-      value4 = value1 + 600;
+    else if (sceneItemId >= 501 && sceneItemId <= 600) {
+      incidenceSwitchId = sceneItemId + 500;
+      completionSwitchId = sceneItemId + 600;
     }
-    if ($dataItems[value1].meta['AddEventIncidenceSwi']) {
-      value3 = Number($dataItems[value1].meta['AddEventIncidenceSwi']);
+    if ($dataItems[sceneItemId].meta['AddEventIncidenceSwi']) {
+      incidenceSwitchId = Number($dataItems[sceneItemId].meta['AddEventIncidenceSwi']);
     }
-    if ($dataItems[value1].meta['AddEventCompSwi']) {
-      value4 = Number($dataItems[value1].meta['AddEventCompSwi']);
+    if ($dataItems[sceneItemId].meta['AddEventCompSwi']) {
+      completionSwitchId = Number($dataItems[sceneItemId].meta['AddEventCompSwi']);
     }
-    if (!value4 || !value3) console.warn(`One of value3 or value4 was not set! Code can work incorrect! value3:${value3},value4:${value4}`);
+    if (!completionSwitchId || !incidenceSwitchId) console.warn(`One of value3 or value4 was not set! Code can work incorrect! value3:${incidenceSwitchId},value4:${completionSwitchId}`);
 
-    if (!$gameSwitches.value(value4)) {
-      value5 = `\x1bIIN[${value1}]\n${$dataItems[value1].description}`;
+    if (!$gameSwitches.value(completionSwitchId)) {
+      choiceDescriptionText = `\x1bIIN[${sceneItemId}]\n${$dataItems[sceneItemId].description}`;
     }
-    if ($gameSwitches.value(value3) && !$gameSwitches.value(value4)) {
-      $gameSwitches.setValue(value6, true);
-      value2 = value1;
+    if ($gameSwitches.value(incidenceSwitchId) && !$gameSwitches.value(completionSwitchId)) {
+      $gameSwitches.setValue(choiceSwitchId, true);
+      selectedItemId = sceneItemId;
     }
   }
-  valueCountSet1 = value2;
-  $gameVariables.setValue(22, value5);
+  valueCountSet1 = selectedItemId;
+  $gameVariables.setValue(22, choiceDescriptionText);
 
 };
 

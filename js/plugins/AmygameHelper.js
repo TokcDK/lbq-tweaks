@@ -125,13 +125,13 @@
 	//   event_respawnSetA(value1,<a>,<b>,<c>[,<d>]);
 	//   this._eventId = $gameVariables.value(292)[value1];
 	AGH_respawnPartyAndSetId = function (interp, a, b, c, d) {
-		var value1 = $gameVariables.value(530);
+		var spawnSlot = $gameVariables.value(530);
 		if (arguments.length >= 5) {
-			event_respawnSetA(value1, a, b, c, d);
+			event_respawnSetA(spawnSlot, a, b, c, d);
 		} else {
-			event_respawnSetA(value1, a, b, c);
+			event_respawnSetA(spawnSlot, a, b, c);
 		}
-		interp._eventId = $gameVariables.value(292)[value1];
+		interp._eventId = $gameVariables.value(292)[spawnSlot];
 	};
 
 	// Replaces (~31x):
@@ -140,8 +140,8 @@
 	//   event.locate(<x>, <y>);
 	//   event.setDirection(<dir>);
 	AGH_locateSpawnedNpc = function (id, x, y, dir) {
-		var value1 = id;
-		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		var spawnSlot = id;
+		var event = $gameMap.event($gameVariables.value(292)[spawnSlot]);
 		event.locate(x, y);
 		event.setDirection(dir);
 	};
@@ -165,9 +165,9 @@
 	// Replaces (~24x): region/map unlock notification popup (common event 45).
 	AGH_regionUnlockNotice = function (interp, sw1, sw2) {
 		interp.sVal(20, 0);
-		var value1 = $dataSystem.switches[sw1];
-		var value2 = $dataSystem.switches[sw2];
-		valueWordSet0 = `${value2}に\\C[16]${value1}\\C[0]が追加されました`;
+		var newEntryName = $dataSystem.switches[sw1];
+		var regionName = $dataSystem.switches[sw2];
+		valueWordSet0 = `${regionName}に\\C[16]${newEntryName}\\C[0]が追加されました`;
 		valueWordSetEx = 0; //補足が必要な場合
 		interp.setupChild($dataCommonEvents[45].list, 0);
 	};
@@ -200,8 +200,8 @@
 	//   var value1 = <picId>;
 	//   $gameScreen.movePicture(value1,<origin>,<x>,<y>,100,<scaleY>,0,0,<dur>);
 	AGH_movePictureTo = function (picId, origin, x, y, scaleY, dur) {
-		var value1 = picId;
-		$gameScreen.movePicture(value1, origin, x, y, 100, scaleY, 0, 0, dur);
+		var pictureId = picId;
+		$gameScreen.movePicture(pictureId, origin, x, y, 100, scaleY, 0, 0, dur);
 	};
 
 	// Replaces (~16x):
@@ -221,8 +221,8 @@
 	//   picture_fade1(valuePic1,"fadeIn",<fadeTarget>,<frames>,5);
 	AGH_showCgFadeIn = function (picId, imageName, fadeTarget, frames) {
 		valuePic1 = picId;
-		var value2 = imageName;
-		$gameScreen.showPicture(valuePic1, value2, 1, 640, 384, 100, 100, 255, 0);
+		var cgImageName = imageName;
+		$gameScreen.showPicture(valuePic1, cgImageName, 1, 640, 384, 100, 100, 255, 0);
 		picture_fade1(valuePic1, "fadeIn", fadeTarget, frames, 5);
 	};
 
@@ -290,11 +290,11 @@
 	//   var value1..3 = $gameVariables.value(value)[0..2];
 	//   if(value1 >= 1){ transfer(saved) } else { transfer(default) }
 	AGH_warpFromSave = function (slot) {
-		var value1 = $gameVariables.value(slot)[0];
-		var value2 = $gameVariables.value(slot)[1];
-		var value3 = $gameVariables.value(slot)[2];
-		if (value1 >= 1) {
-			$gamePlayer.reserveTransfer(value1, value2, value3, 2, 2);
+		var mapId = $gameVariables.value(slot)[0];
+		var mapX = $gameVariables.value(slot)[1];
+		var mapY = $gameVariables.value(slot)[2];
+		if (mapId >= 1) {
+			$gamePlayer.reserveTransfer(mapId, mapX, mapY, 2, 2);
 		} else {
 			$gamePlayer.reserveTransfer(14, 2, 2, 2, 2);
 		};
@@ -402,11 +402,11 @@
 	//   var value1 = 11;
 	//   event_respawnSetN(value1,16,15,0,'npcUnique1',0,4);
 	CEH_respawnMainNpcDefault = function (interp) {
-		var value1 = $gameVariables.value(530);
-		event_respawnSetA(value1, 14, 34, 1, 4);
-		interp._eventId = $gameVariables.value(292)[value1];
-		var value1 = 11;
-		event_respawnSetN(value1, 16, 15, 0, 'npcUnique1', 0, 4);
+		var spawnSlot = $gameVariables.value(530);
+		event_respawnSetA(spawnSlot, 14, 34, 1, 4);
+		interp._eventId = $gameVariables.value(292)[spawnSlot];
+		var spawnSlot = 11;
+		event_respawnSetN(spawnSlot, 16, 15, 0, 'npcUnique1', 0, 4);
 	};
 
 	// Replaces (18x):
@@ -417,12 +417,12 @@
 	//   var value1 = 11;
 	//   event_respawnSetN(value1,16,4,1,arr1[6],arr1[7],2);
 	CEH_respawnSubNpcWithPreset = function (interp) {
-		var value1 = $gameVariables.value(530);
+		var spawnSlot = $gameVariables.value(530);
 		var arr1 = $gameVariables.value(163)[$gameVariables.value(535)];
-		event_respawnSetA(value1, 15, 4, 0, 6);
-		var event = $gameMap.event($gameVariables.value(292)[value1]);
-		var value1 = 11;
-		event_respawnSetN(value1, 16, 4, 1, arr1[6], arr1[7], 2);
+		event_respawnSetA(spawnSlot, 15, 4, 0, 6);
+		var event = $gameMap.event($gameVariables.value(292)[spawnSlot]);
+		var spawnSlot = 11;
+		event_respawnSetN(spawnSlot, 16, 4, 1, arr1[6], arr1[7], 2);
 	};
 
 	// Replaces (11x):
@@ -434,13 +434,13 @@
 	//   event.setDirection(arr1[5]);
 	//   this._eventId = $gameVariables.value(292)[value1];
 	CEH_respawnSubNpcWithImage = function (interp) {
-		var value1 = $gameVariables.value(530);
+		var spawnSlot = $gameVariables.value(530);
 		var arr1 = $gameVariables.value(163)[$gameVariables.value(535)];
-		event_respawnSetA(value1, arr1[3], arr1[4], 1);
-		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event_respawnSetA(spawnSlot, arr1[3], arr1[4], 1);
+		var event = $gameMap.event($gameVariables.value(292)[spawnSlot]);
 		event.setImage(arr1[1], arr1[2]);
 		event.setDirection(arr1[5]);
-		interp._eventId = $gameVariables.value(292)[value1];
+		interp._eventId = $gameVariables.value(292)[spawnSlot];
 	};
 
 	// Replaces (11x):
@@ -451,12 +451,12 @@
 	//   var value1 = 11;
 	//   event_respawnSetN(value1,arr1[8],arr1[9],0,arr1[6],arr1[7],arr1[10]);
 	CEH_respawnSubNpcWithPresetArr = function (interp) {
-		var value1 = $gameVariables.value(530);
+		var spawnSlot = $gameVariables.value(530);
 		var arr1 = $gameVariables.value(163)[$gameVariables.value(535)];
-		event_respawnSetA(value1, arr1[3], arr1[4], 1, arr1[5]);
-		interp._eventId = $gameVariables.value(292)[value1];
-		var value1 = 11;
-		event_respawnSetN(value1, arr1[8], arr1[9], 0, arr1[6], arr1[7], arr1[10]);
+		event_respawnSetA(spawnSlot, arr1[3], arr1[4], 1, arr1[5]);
+		interp._eventId = $gameVariables.value(292)[spawnSlot];
+		var spawnSlot = 11;
+		event_respawnSetN(spawnSlot, arr1[8], arr1[9], 0, arr1[6], arr1[7], arr1[10]);
 	};
 
 	//=============================================================================
@@ -468,9 +468,9 @@
 	//   var value1 = $gameVariables.value(292)[value1];
 	//   drowsepost.camera.zoom(1, 60, value1);
 	CEH_zoomToPartySpawnedEvent = function () {
-		var value1 = $gameVariables.value(530);
-		var value1 = $gameVariables.value(292)[value1];
-		drowsepost.camera.zoom(1, 60, value1);
+		var spawnSlot = $gameVariables.value(530);
+		var spawnedEventId = $gameVariables.value(292)[spawnSlot];
+		drowsepost.camera.zoom(1, 60, spawnedEventId);
 	};
 
 	// Replaces (17x):
@@ -496,8 +496,8 @@
 	//   $gameScreen.showPicture(51,value2,1,640,384,100,100,200,0);
 	//   picture_fade1(51,"fadeIn",valueWipeImg,60,5);
 	CEH_blackoutFadeIn = function () {
-		var value2 = 'ScreenBlackOut';
-		$gameScreen.showPicture(51, value2, 1, 640, 384, 100, 100, 200, 0);
+		var blackoutImageName = 'ScreenBlackOut';
+		$gameScreen.showPicture(51, blackoutImageName, 1, 640, 384, 100, 100, 200, 0);
 		picture_fade1(51, "fadeIn", valueWipeImg, 60, 5);
 	};
 
@@ -558,9 +558,9 @@
 	//   var value1 = $gameVariables.value(292)[value1];
 	//   event_partyCharaMove(45,"this.turnTowardCharacter($gameMap.event("+value1+"));");
 	CEH_turnPartyTowardSpawnedEvent = function () {
-		var value1 = $gameVariables.value(530);
-		var value1 = $gameVariables.value(292)[value1];
-		event_partyCharaMove(45, "this.turnTowardCharacter($gameMap.event(" + value1 + "));");
+		var spawnSlot = $gameVariables.value(530);
+		var spawnedEventId = $gameVariables.value(292)[spawnSlot];
+		event_partyCharaMove(45, "this.turnTowardCharacter($gameMap.event(" + spawnedEventId + "));");
 	};
 
 	// Replaces (11x):

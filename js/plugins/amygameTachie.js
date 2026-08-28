@@ -141,13 +141,13 @@ tachie_partDirectSet = function(pictureId, enableFlag, particleType) {
 };
 
 //ピクチャの動き方設定
-picture_easingConfiguration = function (value1) {
+picture_easingConfiguration = function (easingValue) {
 
-  $gameTemp._easingX = value1;
-  $gameTemp._easingY = value1;
-  $gameTemp._easingSx = value1;
-  $gameTemp._easingSy = value1;
-  $gameTemp._easingOp = value1;
+  $gameTemp._easingX = easingValue;
+  $gameTemp._easingY = easingValue;
+  $gameTemp._easingSx = easingValue;
+  $gameTemp._easingSy = easingValue;
+  $gameTemp._easingOp = easingValue;
 
 };
 
@@ -625,18 +625,18 @@ kisekae_naibusyori1 = function () {
             || 200 == itemEICSwitchNum
             || 400 == itemEICSwitchNum) {
             if (item.meta['subCategory'] === item_gameVar19.meta['subCategory']) {
-              const value1 = Number(item.meta['ClothSwitch']);
-              const value2 = Number(item.meta['ClothAllocationNumber']);
-              $gameVariables.setValue(clothTypeId460 + value1, value2);
+              const clothSwitchId = Number(item.meta['ClothSwitch']);
+              const clothAllocationNumber = Number(item.meta['ClothAllocationNumber']);
+              $gameVariables.setValue(clothTypeId460 + clothSwitchId, clothAllocationNumber);
             }
           }
         };
       }
     };
   } else {
-    const value1 = Number(item_gameVar19.meta['ClothSwitch']);
-    const value2 = Number(item_gameVar19.meta['ClothAllocationNumber']);
-    $gameVariables.setValue(clothTypeId460 + value1, $gameVariables.value(clothTypeId460 + value1) == value2 ? 0 : value2);
+    const clothSwitchId = Number(item_gameVar19.meta['ClothSwitch']);
+    const clothAllocationNumber = Number(item_gameVar19.meta['ClothAllocationNumber']);
+    $gameVariables.setValue(clothTypeId460 + clothSwitchId, $gameVariables.value(clothTypeId460 + clothSwitchId) == clothAllocationNumber ? 0 : clothAllocationNumber);
   };
 
 };
@@ -801,18 +801,18 @@ charagra_choice1 = function (id1) {
     set_charachip_graphics(itemMeta);
 
   } else {
-    const value5 = $gameVariables.value(id1 + 380)[4];
-    let value1 = $gameVariables.value(id1 + 440)[0];//0アイテムID
+    const exposureValue = $gameVariables.value(id1 + 380)[4];
+    let currentCostumeItemId = $gameVariables.value(id1 + 440)[0];//0アイテムID
     //var value2 = $gameVariables.value(id1+440)[41];//41会話グラ用指定ID
     set_charachip_graphics($dataItems[zenravalueId].meta);
 
-    if (value5 <= 9) {
+    if (exposureValue <= 9) {
       const charachipDataArr = $gameVariables.value(id1 + 440);
       charachipDataArr[0] = 0;
       charachipDataArr[41] = 1;
-      value1 = 0;
+      currentCostumeItemId = 0;
     };
-    if (value1 == 0 && value5 >= 26) {
+    if (currentCostumeItemId == 0 && exposureValue >= 26) {
       //現在衣装を呼び出し
       for (let i = 1; i <= 40; i++) {
         $gameVariables.setValue(i + 460, [i]);
@@ -870,8 +870,8 @@ charagra_choice1 = function (id1) {
       }
     }
 
-    if (value1 >= 1) {
-      set_charachip_graphics($dataItems[value1].meta);
+    if (currentCostumeItemId >= 1) {
+      set_charachip_graphics($dataItems[currentCostumeItemId].meta);
     }
   };
   tachie_switchOnOff();
@@ -1840,15 +1840,15 @@ clothes_hason1 = function (array, id1) {
   };
   $gameVariables.setValue(243, 0);
   $gameVariables.setValue(244, 0);
-  const value1 = array[getRandomIndex(array.length)];
-  if (value1 == 1) return;
-  if ($gameVariables.value(460 + value1) < 1) return;
+  const brokenPartSlotId = array[getRandomIndex(array.length)];
+  if (brokenPartSlotId == 1) return;
+  if ($gameVariables.value(460 + brokenPartSlotId) < 1) return;
 
   const itemCount = $dataItems.length;
   for (let i = 1205; i < itemCount; i++) {
     const item = $dataItems[i];
-    if (value1 != Number(item.meta['ClothSwitch'])) continue;
-    if ($gameVariables.value(value1 + 460) != Number(item.meta['ClothAllocationNumber'])) continue;
+    if (brokenPartSlotId != Number(item.meta['ClothSwitch'])) continue;
+    if ($gameVariables.value(brokenPartSlotId + 460) != Number(item.meta['ClothAllocationNumber'])) continue;
 
     const itemEICSwitchNum = Number(item.meta['EICSwitch']);
     if (itemEICSwitchNum != 200 && gameVar20 != itemEICSwitchNum - 180 && gameVar20 != itemEICSwitchNum - 380) continue;
@@ -1858,14 +1858,14 @@ clothes_hason1 = function (array, id1) {
     $gameSwitches.setValue(143, true);
     if (item.meta['ClothBreakage']) {
       const itemClothBreakageNum = Number(item.meta['ClothBreakage']);
-      if (itemClothBreakageNum != $gameVariables.value(460 + value1)) {
-        $gameVariables.setValue(460 + value1, itemClothBreakageNum);
+      if (itemClothBreakageNum != $gameVariables.value(460 + brokenPartSlotId)) {
+        $gameVariables.setValue(460 + brokenPartSlotId, itemClothBreakageNum);
       }
     } else {
-      $gameVariables.setValue(460 + value1, 0);
+      $gameVariables.setValue(460 + brokenPartSlotId, 0);
     }
     if (id1 >= 1) {
-      $gameVariables.setValue(460 + value1, 0);
+      $gameVariables.setValue(460 + brokenPartSlotId, 0);
     }
     //衣装情報を更新
     for (let i = 1; i <= 40; i++) {
@@ -1882,39 +1882,39 @@ clothes_hason2 = function (id1, id2) {
   const itemClothSwitch = item.meta['ClothSwitch'];
   if (!itemClothSwitch) return;
 
-  const value6 = $gameVariables.value(20);
-  const value7 = Number(itemClothSwitch);
-  let value1;
+  const actorId = $gameVariables.value(20);
+  const clothSwitchId = Number(itemClothSwitch);
+  let brokenPiecePicId;
   if (id1 == 0) {
-    value1 = Number($dataActors[$gameVariables.value(20)].meta['tachiePicId']);
+    brokenPiecePicId = Number($dataActors[$gameVariables.value(20)].meta['tachiePicId']);
   } else {
-    value1 = id1;
+    brokenPiecePicId = id1;
   }
-  const pic = $gameScreen.picture(value1);
+  const pic = $gameScreen.picture(brokenPiecePicId);
   if (pic) {
     if (item.meta['EICSwitch']) {
       //let value6 = Number(item.meta['EICSwitch']);
       //if(value6-180 == $gameVariables.value(20)){value6 -= 180}else{value6 -= 200};
       if (item.meta['ClothAllocationNumber']) {
-        let value2;
+        let pictureX;
         //if (id1 == 0) {
-        value2 = pic._x;//$gameVariables.value(105);
+        pictureX = pic._x;//$gameVariables.value(105);
         //} else {
-        //value2 = pic._x;
+        //pictureX = pic._x;
         //}
-        const value3 = pic._y;
-        const value4 = pic._scaleX;
-        const value5 = pic._scaleY;
+        const pictureY = pic._y;
+        const scaleX = pic._scaleX;
+        const scaleY = pic._scaleY;
 
-        const value8 = Number(item.meta['ClothAllocationNumber']);
-        $gameScreen.showPicture(valueCountSet1, "/img/tachies/" + 'actor' + value6 + '_' + value7 + '_' + value8, 1, value2, value3, value4, value5, 255, 0);
+        const clothAllocationNumber = Number(item.meta['ClothAllocationNumber']);
+        $gameScreen.showPicture(valueCountSet1, "/img/tachies/" + 'actor' + actorId + '_' + clothSwitchId + '_' + clothAllocationNumber, 1, pictureX, pictureY, scaleX, scaleY, 255, 0);
 
         if (id2 == 1) {
-          $gameScreen.movePicture(valueCountSet1, 1, value2, value3, value4 * 2, value5, 0, 0, 60);
+          $gameScreen.movePicture(valueCountSet1, 1, pictureX, pictureY, scaleX * 2, scaleY, 0, 0, 60);
           picture_fade1(valueCountSet1, "fadeOut", 'Hscene005', 60, 5);
         }
         if (id2 == 0) {
-          $gameScreen.movePicture(valueCountSet1, 1, value2, value3 + value3, value4, value5, 0, 0, 60);
+          $gameScreen.movePicture(valueCountSet1, 1, pictureX, pictureY + pictureY, scaleX, scaleY, 0, 0, 60);
         }
         valueCountSet1 += 1;
       }
@@ -1923,7 +1923,7 @@ clothes_hason2 = function (id1, id2) {
 
   // was outside of but moved inside of first because of repeating check
   if (id2 !== 1 /* || !itemClothSwitch */) return;
-  if (value7 != 20 && value7 != 21 && value7 != 22 && value7 != 23 && value7 != 25) return;
+  if (clothSwitchId != 20 && clothSwitchId != 21 && clothSwitchId != 22 && clothSwitchId != 23 && clothSwitchId != 25) return;
   if (!pic) return;
 
   if (!item.meta['EICSwitch']) return;
@@ -1933,56 +1933,56 @@ clothes_hason2 = function (id1, id2) {
   //if(value6-180 == $gameVariables.value(20)){value6 -= 180}else{value6 -= 200};
   if (!item.meta['ClothAllocationNumber']) return;
 
-  let value2;
+  let pictureX;
   if (id1 == 0) {
-    value2 = $gameVariables.value(105);
+    pictureX = $gameVariables.value(105);
   } else {
-    value2 = pic._x;
+    pictureX = pic._x;
   }
-  const value3 = pic._y;
-  const value4 = pic._scaleX;
-  const value5 = pic._scaleY;
+  const pictureY = pic._y;
+  const scaleX = pic._scaleX;
+  const scaleY = pic._scaleY;
 
   //let value8 = Number(item.meta['ClothAllocationNumber']);
-  let value11 = 0;
-  let value12 = 0;
+  let hueOffsetX = 0;
+  let hueOffsetY = 0;
   if (item.meta['ColorHue2']) {
     const itemColorHue2DataArray = item.meta['ColorHue2'].split(',');
-    const value9 = Number(itemColorHue2DataArray[0]);
-    const value10 = Number(itemColorHue2DataArray[1]);
+    const hueAxisSelector = Number(itemColorHue2DataArray[0]);
+    const hueOffsetMagnitude = Number(itemColorHue2DataArray[1]);
     //let value14 = Number(item.meta['ColorHue2'].split(',')[2]);
-    if (value9 == 1) {
-      value11 = value10;
+    if (hueAxisSelector == 1) {
+      hueOffsetX = hueOffsetMagnitude;
     } else {
-      value12 = value10;
+      hueOffsetY = hueOffsetMagnitude;
     }
     //Galv.CACHE.load('pictures','actor' + value6 + '_' + 42 + '_' + value7);
     //$gameScreen.showPicture_hue(valueCountSet1,'actor' + value6 + '_' + 42 + '_' + value7,value14,1,
-    //value2+value11,value3+value12,value4-value4-value4,value5-value5-value5,255,0);
-    $gameScreen.showPicture(valueCountSet1, "/img/tachies/" + 'actor' + value6 + '_' + 42 + '_' + value7, 1,
-      value2 + value11, value3 + value12, value4 - value4 - value4, value5 - value5 - value5, 255, 0);
+    //pictureX+hueOffsetX,pictureY+hueOffsetY,scaleX-scaleX-scaleX,scaleY-scaleY-scaleY,255,0);
+    $gameScreen.showPicture(valueCountSet1, "/img/tachies/" + 'actor' + actorId + '_' + 42 + '_' + clothSwitchId, 1,
+      pictureX + hueOffsetX, pictureY + hueOffsetY, scaleX - scaleX - scaleX, scaleY - scaleY - scaleY, 255, 0);
     if (id2 == 1) {
-      $gameScreen.movePicture(valueCountSet1, 1, value2 + value11, value3 + value12, value4 - value4 - value4, value5 - value5 - value5, 0, 0, 60);
+      $gameScreen.movePicture(valueCountSet1, 1, pictureX + hueOffsetX, pictureY + hueOffsetY, scaleX - scaleX - scaleX, scaleY - scaleY - scaleY, 0, 0, 60);
       picture_fade1(valueCountSet1, "fadeOut", 'Hscene005', 60, 5);
     }
     else if (id2 == 0) {
-      $gameScreen.movePicture(valueCountSet1, 1, value2, value3 + value3, value4 - value4 - value4, value5 - value5 - value5, 0, 0, 60);
+      $gameScreen.movePicture(valueCountSet1, 1, pictureX, pictureY + pictureY, scaleX - scaleX - scaleX, scaleY - scaleY - scaleY, 0, 0, 60);
     }
     valueCountSet1 += 1;
   }
   if (item.meta['ColorHue']) {
     //let value13 = Number(item.meta['ColorHue']);
-    //$gameScreen.showPicture_hue(valueCountSet1,'actor' + value6 + '_' + 42 + '_' + value7,value13,1,value2,value3,value4,value5,255,0);
-    $gameScreen.showPicture(valueCountSet1, "/img/tachies/" + 'actor' + value6 + '_' + 42 + '_' + value7, 1, value2, value3, value4, value5, 255, 0);
+    //$gameScreen.showPicture_hue(valueCountSet1,'actor' + value6 + '_' + 42 + '_' + value7,value13,1,pictureX,pictureY,scaleX,scaleY,255,0);
+    $gameScreen.showPicture(valueCountSet1, "/img/tachies/" + 'actor' + actorId + '_' + 42 + '_' + clothSwitchId, 1, pictureX, pictureY, scaleX, scaleY, 255, 0);
   } else {
-    $gameScreen.showPicture(valueCountSet1, "/img/tachies/" + 'actor' + value6 + '_' + 42 + '_' + value7, 1, value2, value3, value4, value5, 255, 0);
+    $gameScreen.showPicture(valueCountSet1, "/img/tachies/" + 'actor' + actorId + '_' + 42 + '_' + clothSwitchId, 1, pictureX, pictureY, scaleX, scaleY, 255, 0);
   }
   if (id2 == 1) {
-    $gameScreen.movePicture(valueCountSet1, 1, value2, value3, value4, value5, 0, 0, 60);
+    $gameScreen.movePicture(valueCountSet1, 1, pictureX, pictureY, scaleX, scaleY, 0, 0, 60);
     picture_fade1(valueCountSet1, "fadeOut", 'Hscene005', 60, 5);
   }
   else if (id2 == 0) {
-    $gameScreen.movePicture(valueCountSet1, 1, value2, value3 + value3, value4, value5, 0, 0, 60);
+    $gameScreen.movePicture(valueCountSet1, 1, pictureX, pictureY + pictureY, scaleX, scaleY, 0, 0, 60);
   }
   valueCountSet1 += 1;
 };
@@ -1991,8 +1991,8 @@ clothes_hason2 = function (id1, id2) {
 clothes_change1 = function () {
 
   const id = 1;
-  const value1 = 380 + $gameVariables.value(20);
-  const value2 = 400;
+  const actorEicBaseId = 380 + $gameVariables.value(20);
+  const globalEicId = 400;
   const itemsCount = $dataItems.length;
 
   valueRandomSet = Array(101).fill(0);
@@ -2001,8 +2001,8 @@ clothes_change1 = function () {
   for (let i = 1; i < itemsCount; i++) {
     const item = $dataItems[i];
     if ($gameParty.hasItem(item)) {
-      const value3 = Number(item.meta['EICSwitch']);
-      if (value3 == value1 || value3 == value2) {
+      const itemEicSwitchNum = Number(item.meta['EICSwitch']);
+      if (itemEicSwitchNum == actorEicBaseId || itemEicSwitchNum == globalEicId) {
         const choiceParams = {
           text: item.name,
           value: i
@@ -2021,8 +2021,8 @@ clothes_change2 = function () {
 
   const id = 2;
   const actorId = $gameVariables.value(20);
-  const value1 = 380 + actorId;
-  const value2 = 400;
+  const actorEicBaseId = 380 + actorId;
+  const globalEicId = 400;
   const itemsCount = $dataItems.length;
   const item19 = $dataItems[$gameVariables.value(19)];
 
@@ -2035,7 +2035,7 @@ clothes_change2 = function () {
     if ($gameParty.hasItem(item) &&
       item19.meta['subCategory'] == item.meta['subCategory']) {
       const itemEICSwitchNum = Number(item.meta['EICSwitch']);
-      if (itemEICSwitchNum == value1 || itemEICSwitchNum == value2 || itemEICSwitchNum == value1 - 200 || itemEICSwitchNum == value2 - 200) {
+      if (itemEICSwitchNum == actorEicBaseId || itemEICSwitchNum == globalEicId || itemEICSwitchNum == actorEicBaseId - 200 || itemEICSwitchNum == globalEicId - 200) {
         const choiceParams = { text: item.name, value: i };
         $gameSystem.addCustomChoice(id, choiceParams);
         if (!item.meta['TotalCloth']) {
@@ -2053,7 +2053,7 @@ clothes_change2 = function () {
 };
 
 //衣装取得
-clothes_get = function (id, value1, value2) {
+clothes_get = function (id, subCategory, clothType) {
 
   $gameVariables.setValue(20, id); // replaced $gameVariables.value(20) below by id, get id is much faster than get variable value
   const items = $dataItems;
@@ -2062,7 +2062,7 @@ clothes_get = function (id, value1, value2) {
     const item = items[i1];
     const itemEICSwitchNum = Number(item.meta['EICSwitch']);
     if (id + 380 == itemEICSwitchNum || id + 180 == itemEICSwitchNum || 200 == itemEICSwitchNum || 400 == itemEICSwitchNum) {
-      if (item.meta['subCategory'] == value1 && item.meta['ClothType'] == value2) {
+      if (item.meta['subCategory'] == subCategory && item.meta['ClothType'] == clothType) {
         $gameParty.gainItem(item, 1);
       }
     }

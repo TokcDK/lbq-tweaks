@@ -53,56 +53,56 @@ Galv.CACHE.load('system','ActiveMessageSkin');
 //ピクチャ表示（通常のピクチャ表示のみ！）
 pic_1 = function(id1,id2,id3,id4,id5,id6,id7,id8,id9,id10,id11){
 
-var value1 = id10/2;
-var value2 = id11/2;
-var value3 = 1;
+var halfWidth = id10/2;
+var halfHeight = id11/2;
+var scaleMultiplier = 1;
 if(id4 <= 3){
-  var value3 = 2;
+  var scaleMultiplier = 2;
     if(id1 == 3){
-      var value3 = 5;
+      var scaleMultiplier = 5;
     }
 }
 if(id7 >= 61 && id4 <= 3){
-  var value3 = 5;
+  var scaleMultiplier = 5;
 }
-var value4 = 0;
-var value5 = 0;
+var offsetX = 0;
+var offsetY = 0;
 if(id4 == 3){
-  var value6 = getRandomIndex(3);
-  var value3 = 1
-  if(value6 == 0){var value4 = 50}
-  if(value6 == 1){var value4 = -50}
-  if(value6 == 2){var value5 = 50}
-  if(value6 == 3){var value5 = -50}
-//if(value6 >= 1){var value4 = 100}//テスト
+  var randomDirectionIndex = getRandomIndex(3);
+  var scaleMultiplier = 1
+  if(randomDirectionIndex == 0){var offsetX = 50}
+  if(randomDirectionIndex == 1){var offsetX = -50}
+  if(randomDirectionIndex == 2){var offsetY = 50}
+  if(randomDirectionIndex == 3){var offsetY = -50}
+//if(randomDirectionIndex >= 1){var offsetX = 100}//テスト
 }
 if(id1 >= 4){
-  if(id4 == 4){var value5 = id1}
-  if(id4 == 5){var value4 = -id1}
-  if(id4 == 6){var value4 = id1}
-  if(id4 == 7){var value5 = -id1}
+  if(id4 == 4){var offsetY = id1}
+  if(id4 == 5){var offsetX = -id1}
+  if(id4 == 6){var offsetX = id1}
+  if(id4 == 7){var offsetY = -id1}
 } else {
-  if(id4 == 4){var value5 = 100}
-  if(id4 == 5){var value4 = -100}
-  if(id4 == 6){var value4 = 100}
-  if(id4 == 7){var value5 = -100}
+  if(id4 == 4){var offsetY = 100}
+  if(id4 == 5){var offsetX = -100}
+  if(id4 == 6){var offsetX = 100}
+  if(id4 == 7){var offsetY = -100}
 }
-if(id4 == 1){var value3 = 0}
-if(id4 == 2){var value3 = 1}
+if(id4 == 1){var scaleMultiplier = 0}
+if(id4 == 2){var scaleMultiplier = 1}
 if(id4 >= 3){
   if(!$gameScreen.picture(id2-1)){
     picture_motion1("smooth",[0]);
-    var value10 = 200;
+    var hueValue = 200;
     if($gameVariables.value(20) >= 1){
       if($dataActors[$gameVariables.value(20)].meta['tachieHue']){
-        var value10 = Number($dataActors[$gameVariables.value(20)].meta['tachieHue']);
+        var hueValue = Number($dataActors[$gameVariables.value(20)].meta['tachieHue']);
     }}
-    $gameScreen.showPicture_hue(id2-1, id3, value10, 1, id8/2+value1+value4+value4, id9/2+value2+value5+value5, id5*value3, id5*value3, 0, 0);
-    $gameScreen.movePicture(id2-1, 1,id8/2+value1,id9/2+value2,id5, id5, 150, 0, id7+20);
+    $gameScreen.showPicture_hue(id2-1, id3, hueValue, 1, id8/2+halfWidth+offsetX+offsetX, id9/2+halfHeight+offsetY+offsetY, id5*scaleMultiplier, id5*scaleMultiplier, 0, 0);
+    $gameScreen.movePicture(id2-1, 1,id8/2+halfWidth,id9/2+halfHeight,id5, id5, 150, 0, id7+20);
   }
 }
-$gameScreen.showPicture(id2,id3,1,id8/2+value1+value4,id9/2+value2+value5,id5*value3,id5*value3,0,0);
-$gameScreen.movePicture(id2, 1,id8/2+value1,id9/2+value2,id5, id5, id6, 0, id7);
+$gameScreen.showPicture(id2,id3,1,id8/2+halfWidth+offsetX,id9/2+halfHeight+offsetY,id5*scaleMultiplier,id5*scaleMultiplier,0,0);
+$gameScreen.movePicture(id2, 1,id8/2+halfWidth,id9/2+halfHeight,id5, id5, id6, 0, id7);
 if(id1 <= 1){
   if(id7 <= 60){
     AudioManager.playSe({"name":"Z_CGDispray","volume":20,"pitch":150,"pan":0});
@@ -123,7 +123,7 @@ if(id1 <= 1){
 pic_setArray = function(id5,id1,id2,id3,id4,id6){
 
 if(id5 <= 0){
-  valueParallelPic1 = 0;  
+  valueParallelPic1 = 0;
   valueParallelPic2 = 0;
   valueParallelPic3 = 0;
   valueParallelPic4 = 0;
@@ -215,22 +215,22 @@ if(id1 == valueParallelPic1 || id1 == valueParallelPic2 || id1 == valueParallelP
 pic_set = function(id1,id2,id3,id4){
 
 if($gameScreen.picture(id1)){
-  var value1 = $gameScreen.picture(id1).origin();
-  var value2 = $gameScreen.picture(id1).x();
-  var value3 = $gameScreen.picture(id1).y();
-  var value4 = $gameScreen.picture(id1).scaleX();
-  var value5 = $gameScreen.picture(id1).scaleY();
-  var value6 = $gameScreen.picture(id1).opacity();
-  var value7 = $gameScreen.picture(id1).blendMode();
-  if(id2 == 1){var value6 = id3}
-  if(id2 == 2){var value2 = id3 + value2}
-  if(id2 == 3){var value3 = id3 + value3}
+  var pictureOrigin = $gameScreen.picture(id1).origin();
+  var pictureX = $gameScreen.picture(id1).x();
+  var pictureY = $gameScreen.picture(id1).y();
+  var scaleX = $gameScreen.picture(id1).scaleX();
+  var scaleY = $gameScreen.picture(id1).scaleY();
+  var opacity = $gameScreen.picture(id1).opacity();
+  var blendMode = $gameScreen.picture(id1).blendMode();
+  if(id2 == 1){var opacity = id3}
+  if(id2 == 2){var pictureX = id3 + pictureX}
+  if(id2 == 3){var pictureY = id3 + pictureY}
   if(id2 == 4){
-    var value4 = id3
-    var value5 = id3
+    var scaleX = id3
+    var scaleY = id3
   }
-  if(id2 == 5){var value7 = id3}
-  $gameScreen.movePicture(id1,value1,value2,value3,value4,value5,value6,value7,id4);
+  if(id2 == 5){var blendMode = id3}
+  $gameScreen.movePicture(id1,pictureOrigin,pictureX,pictureY,scaleX,scaleY,opacity,blendMode,id4);
 }
 
 }
@@ -259,12 +259,12 @@ if($gameScreen.picture(id1)){
       UTSU.PictureBreath6.off([id1]);
     }
   }
-  var value1 = $gameScreen.picture(id1).x() + id2;
-  var value2 = $gameScreen.picture(id1).y() + id3;
-  //var value3 = id4;//$gameScreen.picture(id1).scaleX() + id4;
-  //var value4 = id5;//$gameScreen.picture(id1).scaleY() + id5;
-  var value5 = $gameScreen.picture(id1).origin();
-  $gameScreen.movePicture(id1,value5,value1,value2,id4,id5,id6,0,id7);
+  var targetX = $gameScreen.picture(id1).x() + id2;
+  var targetY = $gameScreen.picture(id1).y() + id3;
+  //var scaleMultiplier = id4;//$gameScreen.picture(id1).scaleX() + id4;
+  //var scaleMultiplier2 = id5;//$gameScreen.picture(id1).scaleY() + id5;
+  var pictureOrigin = $gameScreen.picture(id1).origin();
+  $gameScreen.movePicture(id1,pictureOrigin,targetX,targetY,id4,id5,id6,0,id7);
 }
 
 }
@@ -291,68 +291,68 @@ if($gameScreen.picture(id1)){
 }
 
 //ピクチャアニメ
-picture_anime1 = function(value1,value2,value3,value4,value5,value6,value7,value8,value9){
+picture_anime1 = function(animePicId,animePicName,animeP1,animeP2,animeP3,animeP4,animeF1,animeF2,animeF3){
 
-$gameScreen.setPicturesAnimation(value3, value4, value5, value6);
-$gameScreen.showPicture(value1,value2,1,640,384,100,100,0,0);
-$gameScreen.picture(value1).startAnimationFrame(value7, value8, value9);
+$gameScreen.setPicturesAnimation(animeP1, animeP2, animeP3, animeP4);
+$gameScreen.showPicture(animePicId,animePicName,1,640,384,100,100,0,0);
+$gameScreen.picture(animePicId).startAnimationFrame(animeF1, animeF2, animeF3);
 
 }
 
 //ピクチャアニメセル指定
-picture_anime2 = function(value1,value2,value3,value4,value5,value6,id1){
+picture_anime2 = function(animePicId,animePicName,animeP1,animeP2,animeP3,animeP4,id1){
 
-if(!$gameScreen.picture(value1)){
-  $gameScreen.setPicturesAnimation(value3, value4, value5, value6);
-  $gameScreen.showPicture(value1,value2,1,640,384,100,100,0,0);
+if(!$gameScreen.picture(animePicId)){
+  $gameScreen.setPicturesAnimation(animeP1, animeP2, animeP3, animeP4);
+  $gameScreen.showPicture(animePicId,animePicName,1,640,384,100,100,0,0);
 }
-$gameScreen.picture(value1).cell = id1;
+$gameScreen.picture(animePicId).cell = id1;
 
 }
 
 //ピクチャに対してアニメーション
-picture_animation1 = function(value1,value2,value3,value4){
+picture_animation1 = function(animPicId,animX,animY,animationId){
 
-if($gameScreen.picture(value1)){
-  value2 += $gameScreen.picture(value1).x();
-  value3 += $gameScreen.picture(value1).y();
-  $gameScreen.startAnimation(value2, value3, value4, false);
+if($gameScreen.picture(animPicId)){
+  animX += $gameScreen.picture(animPicId).x();
+  animY += $gameScreen.picture(animPicId).y();
+  $gameScreen.startAnimation(animX, animY, animationId, false);
 }
 
 }
 
 //ピクチャフェードインアウト
-picture_fade1 = function(value1,value6,value3,value7,value5){
+picture_fade1 = function(fadePicId,fadeType,fadeGlowA,fadeWait,fadeGlowB){
 
-if($gameScreen.picture(value1)){
+if($gameScreen.picture(fadePicId)){
   if(!$gameSwitches.value(651)){
-    $gameScreen.picture(value1)._GWInfo = $gameScreen.createGWInfo([value6,value3,value7,value5]);
+    $gameScreen.picture(fadePicId)._GWInfo = $gameScreen.createGWInfo([fadeType,fadeGlowA,fadeWait,fadeGlowB]);
   }
-  if(value6 == "fadeOut"){
-    if($gameScreen.picture(value1)._breathActive){
-      UTSU.PictureBreath.off([value1]);
+  if(fadeType == "fadeOut"){
+    if($gameScreen.picture(fadePicId)._breathActive){
+      UTSU.PictureBreath.off([fadePicId]);
     }
-    if($gameScreen.picture(value1)._breathActive2){
-      UTSU.PictureBreath2.off([value1]);
+    if($gameScreen.picture(fadePicId)._breathActive2){
+      UTSU.PictureBreath2.off([fadePicId]);
     }
-    if($gameScreen.picture(value1)._breathActive3){
-      UTSU.PictureBreath3.off([value1]);
+    if($gameScreen.picture(fadePicId)._breathActive3){
+      UTSU.PictureBreath3.off([fadePicId]);
     }
-    if($gameScreen.picture(value1)._breathActive4){
-      UTSU.PictureBreath4.off([value1]);
+    if($gameScreen.picture(fadePicId)._breathActive4){
+      UTSU.PictureBreath4.off([fadePicId]);
     }
-    if($gameScreen.picture(value1)._breathActive5){
-      UTSU.PictureBreath5.off([value1]);
+    if($gameScreen.picture(fadePicId)._breathActive5){
+      UTSU.PictureBreath5.off([fadePicId]);
     }
-    if($gameScreen.picture(value1)._breathActive6){
-      UTSU.PictureBreath6.off([value1]);
+    if($gameScreen.picture(fadePicId)._breathActive6){
+      UTSU.PictureBreath6.off([fadePicId]);
     }
-    var value2 = $gameScreen.picture(value1).x();
-    var value3 = $gameScreen.picture(value1).y();
-    var value4 = $gameScreen.picture(value1).scaleX();
-    var value5 = $gameScreen.picture(value1).scaleY();
-    var value6 = $gameScreen.picture(value1).origin();
-    $gameScreen.movePicture(value1,value6,value2,value3,value4,value5,0,0,value7);
+    var fadeX = $gameScreen.picture(fadePicId).x();
+    var fadeGlowA = $gameScreen.picture(fadePicId).y();
+    var fadeScaleX = $gameScreen.picture(fadePicId).scaleX();
+    var fadeGlowB = $gameScreen.picture(fadePicId).scaleY();
+    var fadeType = $gameScreen.picture(fadePicId).origin();
+    $gameScreen.movePicture(fadePicId,fadeType,fadeX,fadeGlowA,fadeScaleX,fadeGlowB,0,0,fadeWait);
   }
 }
 
@@ -363,19 +363,19 @@ pic_eraseP = function(id1,array){
 
 picture_motion1("smooth",[0]);
 if(id1 == 1){
-  var value11 = getRandomIndex(21) + 40;
-  var value12 = getRandomIndex(4);
-  var value13 = 0;
-  var value14 = 0;
-  if(value12 == 0){var value13 = 50}
-  if(value12 == 1){var value14 = 50}
-  if(value12 == 2){var value13 = -50}
-  if(value12 == 3){var value14 = -50}
+  var eraseWait = getRandomIndex(21) + 40;
+  var randomDirectionIndex = getRandomIndex(4);
+  var offsetX = 0;
+  var offsetY = 0;
+  if(randomDirectionIndex == 0){var offsetX = 50}
+  if(randomDirectionIndex == 1){var offsetY = 50}
+  if(randomDirectionIndex == 2){var offsetX = -50}
+  if(randomDirectionIndex == 3){var offsetY = -50}
 }
 if(id1 == 2){
-  var value11 = 60;
-  var value13 = 0;
-  var value14 = 0;
+  var eraseWait = 60;
+  var offsetX = 0;
+  var offsetY = 0;
 }
 var list = array;
 list.forEach(function(id2) {
@@ -403,13 +403,13 @@ list.forEach(function(id2) {
     }
     if(id1 >= 1){
       if($gameScreen.picture(id2)){
-      var value1 = $gameScreen.picture(id2).origin();
-      var value2 = $gameScreen.picture(id2).x() + value13;
-      var value3 = $gameScreen.picture(id2).y() + value14;
-      var value4 = $gameScreen.picture(id2).scaleX();
-      var value5 = $gameScreen.picture(id2).scaleY();
-      //var value6 = $gameScreen.picture(id2).opacity();
-      $gameScreen.movePicture(id2,value1,value2,value3,value4,value5,0,0,value11);
+      var pictureOrigin = $gameScreen.picture(id2).origin();
+      var pictureX = $gameScreen.picture(id2).x() + offsetX;
+      var pictureY = $gameScreen.picture(id2).y() + offsetY;
+      var scaleX = $gameScreen.picture(id2).scaleX();
+      var scaleY = $gameScreen.picture(id2).scaleY();
+      //var opacity = $gameScreen.picture(id2).opacity();
+      $gameScreen.movePicture(id2,pictureOrigin,pictureX,pictureY,scaleX,scaleY,0,0,eraseWait);
       }
     } else {
       $gameScreen.erasePicture(id2);
@@ -482,16 +482,16 @@ if($gameScreen.picture($gameVariables.value(281))){
   $gameVariables.value(282)[3] = $gameScreen.picture($gameVariables.value(281)).y();
   var pictureId = $gameVariables.value(281), variableIdOfWidth = 4, variableIdOfHeight = 5;
   var spritePicture = SceneManager._scene._spriteset._pictureContainer.children.filter(function(picture) {
-    return picture._pictureId == pictureId; 
-  })[0]; 
+    return picture._pictureId == pictureId;
+  })[0];
   $gameVariables.value(282)[variableIdOfWidth] = spritePicture.width;
   $gameVariables.value(282)[variableIdOfHeight] = spritePicture.height;
   $gameVariables.value(282)[6] = 95;
-  var value1 = ($gameVariables.value(282)[4]/2)*(100-$gameVariables.value(282)[6])/100;
-  var value2 = ($gameVariables.value(282)[5]/2)*(100-$gameVariables.value(282)[6])/100;
-  var value3 = $gameVariables.value(282)[2]+value1;
-  var value4 = $gameVariables.value(282)[3]+value2;
-  $gameScreen.movePicture($gameVariables.value(281),1,value3,value4-10,
+  var halfWidthOffset = ($gameVariables.value(282)[4]/2)*(100-$gameVariables.value(282)[6])/100;
+  var halfHeightOffset = ($gameVariables.value(282)[5]/2)*(100-$gameVariables.value(282)[6])/100;
+  var targetX = $gameVariables.value(282)[2]+halfWidthOffset;
+  var targetY = $gameVariables.value(282)[3]+halfHeightOffset;
+  $gameScreen.movePicture($gameVariables.value(281),1,targetX,targetY-10,
   $gameVariables.value(282)[6],$gameVariables.value(282)[6],255,0,2);
 }
 
@@ -561,33 +561,33 @@ tachie_bless = function(pictureId, blessType) {
 
       valueTachieBless = baseBreathSettings;
       UTSU.PictureBreath.on([pictureId], valueTachieBless[2]);
-      
+
       // If aura picture exists (45), apply same effect
       if ($gameScreen.picture(45)) {
         UTSU.PictureBreath.on([45], valueTachieBless[2]);
       }
       break;
-      
+
     case 2:
       valueTachieBless2 = baseBreathSettings;
       UTSU.PictureBreath2.on([pictureId], valueTachieBless2[2]);
       break;
-      
+
     case 3: // Face graphic body
       valueTachieBless3 = baseBreathSettings;
       UTSU.PictureBreath3.on([pictureId], valueTachieBless3[2]);
       break;
-      
+
     case 4: // Face graphic breast movement
       valueTachieBless4 = baseBreathSettings;
       UTSU.PictureBreath4.on([pictureId], valueTachieBless4[2]);
       break;
-      
+
     case 5: // Event CG
       valueTachieBless5 = baseBreathSettings;
       UTSU.PictureBreath5.on([pictureId], valueTachieBless5[2]);
       break;
-      
+
     case 6: // Event CG
       valueTachieBless6 = baseBreathSettings;
       UTSU.PictureBreath6.on([pictureId], valueTachieBless6[2]);
@@ -603,85 +603,85 @@ if($gameSwitches.value(43)) return; //高演出カット
 let array;
 switch(id12){
 case 1: {//右横
- switch(id13){
-  case 1: { array = [-1,3,100, 0.015, 0.001]; break; }
-  case 2: { array = [-1,3,60, 0.020, 0.001]; break; }
-  case 3: { array = [-1,3,40, 0.025, 0.001]; break; }
- }
- break;
+  switch(id13){
+   case 1: { array = [-1,3,100, 0.015, 0.001]; break; }
+   case 2: { array = [-1,3,60, 0.020, 0.001]; break; }
+   case 3: { array = [-1,3,40, 0.025, 0.001]; break; }
+  }
+  break;
 }
 case 2: {//左横
- switch(id13){
-  case 1: { array = [-1,3,100, -0.015, 0.001]; break; }
-  case 2: { array = [-1,3,60, -0.020, 0.001]; break; }
-  case 3: { array = [-1,3,40, -0.025, 0.001]; break; }
- }
- break;
+  switch(id13){
+   case 1: { array = [-1,3,100, -0.015, 0.001]; break; }
+   case 2: { array = [-1,3,60, -0.020, 0.001]; break; }
+   case 3: { array = [-1,3,40, -0.025, 0.001]; break; }
+  }
+  break;
 }
 case 3: {//左斜め
- switch(id13){
-  case 1: { array = [1,1,100, 0.015, 0.015]; break; }
-  case 2: { array = [1,1,50, 0.02, 0.02]; break; }
-  case 3: { array = [1,1,20, 0.03, 0.03]; break; }
- }
- break;
+  switch(id13){
+   case 1: { array = [1,1,100, 0.015, 0.015]; break; }
+   case 2: { array = [1,1,50, 0.02, 0.02]; break; }
+   case 3: { array = [1,1,20, 0.03, 0.03]; break; }
+  }
+  break;
 }
 case 4: {//右斜め
- switch(id13){
-  case 1: { array = [-1,1,100, 0.015, 0.015]; break; }
-  case 2: { array = [-1,1,50, 0.02, 0.02]; break; }
-  case 3: { array = [-1,1,20, 0.03, 0.03]; break; }
- }
- break;
+  switch(id13){
+   case 1: { array = [-1,1,100, 0.015, 0.015]; break; }
+   case 2: { array = [-1,1,50, 0.02, 0.02]; break; }
+   case 3: { array = [-1,1,20, 0.03, 0.03]; break; }
+  }
+  break;
 }
 case 5: {//正面
- switch(id13){
-  case 1: { array = [100,100,100, 0.005, 0.004]; break; }
-  case 2: { array = [150,150,50, 0.005, 0.004]; break; }
-  case 3: { array = [200,200,20, 0.020, 0.015]; break; }
- }
- break;
+  switch(id13){
+   case 1: { array = [100,100,100, 0.005, 0.004]; break; }
+   case 2: { array = [150,150,50, 0.005, 0.004]; break; }
+   case 3: { array = [200,200,20, 0.020, 0.015]; break; }
+  }
+  break;
 }
 case 6: {//正面痙攣（事後）
- switch(id13){
-  case 1: { array = [100,100,200, 0.003, 0.002]; break; }
-  case 2: { array = [100,100,100, 0.003, 0.002]; break; }
-  case 3: { array = [100,100,20, 0.003, 0.002]; break; }
- }
- break;
+  switch(id13){
+   case 1: { array = [100,100,200, 0.003, 0.002]; break; }
+   case 2: { array = [100,100,100, 0.003, 0.002]; break; }
+   case 3: { array = [100,100,20, 0.003, 0.002]; break; }
+  }
+  break;
 }
 case 7: {//縦
- switch(id13){
-  //case 1: { array = [100,100,100, 0.015, 0.04]; break; }
-  case 1: { array = [100,100,100, 0.015, 0.02]; break; }
-  case 2: { array = [100,100,50, 0.015, 0.04]; break; }
-  case 3: { array = [100,100,20, 0.015, 0.05]; break; }
- }
- break;
+  switch(id13){
+   //case 1: { array = [100,100,100, 0.015, 0.04]; break; }
+   case 1: { array = [100,100,100, 0.015, 0.02]; break; }
+   case 2: { array = [100,100,50, 0.015, 0.04]; break; }
+   case 3: { array = [100,100,20, 0.015, 0.05]; break; }
+  }
+  break;
 }
 case 8: {//横左右に身動ぎ
- switch(id13){
-  case 1: { array = [100,100,150, 0.01, 0.005]; break; }
-  case 2: { array = [100,100,100, 0.02, 0.015]; break; }
-  case 3: { array = [100,100,50, 0.03, 0.020]; break; }
- }
- break;
+  switch(id13){
+   case 1: { array = [100,100,150, 0.01, 0.005]; break; }
+   case 2: { array = [100,100,100, 0.02, 0.015]; break; }
+   case 3: { array = [100,100,50, 0.03, 0.020]; break; }
+  }
+  break;
 }
 case 9: {//プロフィール乳揺れ正面
- switch(id13){
-  case 1: { array = [100,100,150, 0.015, 0.03]; break; }
-  case 2: { array = [100,100,50, 0.020, 0.04]; break; }
-  case 3: { array = [100,100,20, 0.025, 0.05]; break; }
- }
- break;
+  switch(id13){
+   case 1: { array = [100,100,150, 0.015, 0.03]; break; }
+   case 2: { array = [100,100,50, 0.020, 0.04]; break; }
+   case 3: { array = [100,100,20, 0.025, 0.05]; break; }
+  }
+  break;
 }
 case 10: {//顔グラ乳揺れ正面
- switch(id13){
-  case 1: { array = [100,100,150, 0.010, 0.02]; break; }
-  case 2: { array = [100,100,100, 0.020, 0.04]; break; }
-  case 3: { array = [100,100,50, 0.025, 0.05]; break; }
- }
- break;
+  switch(id13){
+   case 1: { array = [100,100,150, 0.010, 0.02]; break; }
+   case 2: { array = [100,100,100, 0.020, 0.04]; break; }
+   case 3: { array = [100,100,50, 0.025, 0.05]; break; }
+  }
+  break;
 }
 };
 
@@ -745,10 +745,10 @@ $gameScreen.startFlash([255,255,255,200],60);
 actor_skillMasteryGet = function(id1,id2){
 
 var value = id1;
-var actor = $gameActors.actor($gameVariables.value(11)); 
+var actor = $gameActors.actor($gameVariables.value(11));
 actor.gainSkillMasteryUses(value,$gameVariables.value(203));//変更熟練度
-var value1 = `\\C[1]＜${$dataSkills[value].name}＞\\C[0]熟練度\\C[10]\\V[203]\\C[0]獲得！\n`;
-$gameVariables.setValue(id2,$gameVariables.value(id2)+value1);
+var masteryText = `\\C[1]＜${$dataSkills[value].name}＞\\C[0]熟練度\\C[10]\\V[203]\\C[0]獲得！\n`;
+$gameVariables.setValue(id2,$gameVariables.value(id2)+masteryText);
 
 }
 
@@ -756,15 +756,15 @@ $gameVariables.setValue(id2,$gameVariables.value(id2)+value1);
 genjou_tyokuzenScene = function(){
 
 var value = 50;
-var value3 = 0;
+var pictureCounter = 0;
 var start = $gameVariables.value(73);
 var end = $gameVariables.value(74);
 for(var i = start; i <= end; i++){
   $gameVariables.setValue(20,i);
   var actor = $gameActors.actor($gameVariables.value(20));
   if($gameParty.members().contains($gameActors.actor($gameVariables.value(20)))){
-    var value2 = $gameVariables.value($gameVariables.value(20)+380)[46];
-    if(value2 == 0){
+    var statePictureId = $gameVariables.value($gameVariables.value(20)+380)[46];
+    if(statePictureId == 0){
       $gameVariables.setValue(191,1);
       if(actor.isLearnedSkill(62)){$gameVariables.setValue(191,2)}
       if(actor.isLearnedSkill(64)){$gameVariables.setValue(191,3)}
@@ -776,19 +776,19 @@ for(var i = start; i <= end; i++){
       $gameScreen.movePicture(value+1,0,0,0,100,100,255,0,20);
       $gameScreen.movePicture(value+2,0,0,0,100,100,255,0,20);
     } else {
-      $gameScreen.showPicture(value+1,value2,0,-200,0,100,100,0,0);
+      $gameScreen.showPicture(value+1,statePictureId,0,-200,0,100,100,0,0);
       $gameScreen.movePicture(value+1,0,0,0,100,100,255,0,20);
     }
     value += 2;
-    value3 += 1
+    pictureCounter += 1
 }}
 var value = 50;
-if(value3 == 2){
+if(pictureCounter == 2){
   $gameScreen.movePicture(value+3,0,512,0,100,100,255,0,20);
   $gameScreen.movePicture(value+4,0,512,0,100,100,255,0,20);
 }
-if(value3 >= 3){ 
-  for(var i = value; i <= value+value3; i++){
+if(pictureCounter >= 3){
+  for(var i = value; i <= value+pictureCounter; i++){
     $gameScreen.picture(i)._scaleX = 50;
     $gameScreen.picture(i)._scaleY = 50;
     if(i == 2){
@@ -819,7 +819,8 @@ if(value3 >= 3){
       $gameScreen.picture(i)._x = 768;
       $gameScreen.picture(i)._y = 384;
     }
-}}
+  }
+}
 
 }
 
@@ -866,15 +867,15 @@ if($gameScreen.picture(id1)){
 //ﾋﾟｸid,ﾌｧｲﾙ,x,y,scale,wait,0そのまま1横ズレ2拡縮,最後は変更数値pic_showMove1(valuePic1+3,valueScenePic+'03',640-128,384,100,60,0,0);
 pic_showMove1 = function(id1,id2,id3,id4,id5,id6,id7,id8){
 
-var value1 = 0;
-var value2 = 0;
+var offsetX = 0;
+var offsetY = 0;
 if(id7 == 1){
-  var value1 = id8;
+  var offsetX = id8;
 }
 if(id7 == 2){
-  var value2 = id8;
+  var offsetY = id8;
 }
-$gameScreen.showPicture(id1,id2,1,id3 + value1,id4,id5 + value2,id5 + value2,0,0);
+$gameScreen.showPicture(id1,id2,1,id3 + offsetX,id4,id5 + offsetY,id5 + offsetY,0,0);
 $gameScreen.movePicture(id1,1,id3,id4,id5,id5,255,0,id6);
 
 }

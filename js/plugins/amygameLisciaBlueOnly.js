@@ -36,8 +36,8 @@ class BookTipBase {
   }
 
   setValueTalkSet() {
-    const value3 = [0, 1, 640, 384, 100, 100, 255];
-    valueTalkSet = [this.bookTitle(), this.bookDescription(), value3];
+    const talkLayout = [0, 1, 640, 384, 100, 100, 255];
+    valueTalkSet = [this.bookTitle(), this.bookDescription(), talkLayout];
   }
 
   execute() {
@@ -893,12 +893,12 @@ gabWord_exeScript = function (arrNpcGab1) {
 gabWord_setBattle = function () {
 
   var arrNpcGab1 = [];
-  var value4 = 0;
-  var value3 = $gameParty.battleMembers().length;
-  var value2 = getRandomIndex(value3);
-  var value1 = $gameParty.battleMembers()[value2].actorId();
-  $gameVariables.setValue(53, $gameActors.actor(value1).nickname());
-  $gameVariables.setValue(625, $gameVariables.value(380 + value1)[59]);
+  var introSetFlag = 0;
+  var memberCount = $gameParty.battleMembers().length;
+  var randomMemberIndex = getRandomIndex(memberCount);
+  var actorId = $gameParty.battleMembers()[randomMemberIndex].actorId();
+  $gameVariables.setValue(53, $gameActors.actor(actorId).nickname());
+  $gameVariables.setValue(625, $gameVariables.value(380 + actorId)[59]);
   if ($gameVariables.value(229) == 0) {//グループID
     $gameVariables.setValue(68, 80)//GAB表示時間。二言目以上の時
     var arrNpcGab1 = [];
@@ -906,19 +906,19 @@ gabWord_setBattle = function () {
     gabWord_exeScript(arrNpcGab1);
     var arrNpcGab1 = [];
     arrNpcGab1.push([`「油断せず行きますよ──ッ！！」`, '1Actor1', 3]);
-    var value4 = 1;
+    var introSetFlag = 1;
   };
-  if (value4 == 0 && !$gameSwitches.value(211)) {
-    if (value3 == 1) {
+  if (introSetFlag == 0 && !$gameSwitches.value(211)) {
+    if (memberCount == 1) {
       for (var i = 1; i <= 9; i++) {
-        if ($dataActors[value1].meta['GabBattleTurnAlone_' + i]) {
-          arrNpcGab1.push($dataActors[value1].meta['GabBattleTurnAlone_' + i].split(','));
+        if ($dataActors[actorId].meta['GabBattleTurnAlone_' + i]) {
+          arrNpcGab1.push($dataActors[actorId].meta['GabBattleTurnAlone_' + i].split(','));
         };
       };
     } else {
       for (var i = 1; i <= 9; i++) {
-        if ($dataActors[value1].meta['GabBattleTurn_' + i]) {
-          arrNpcGab1.push($dataActors[value1].meta['GabBattleTurn_' + i].split(','));
+        if ($dataActors[actorId].meta['GabBattleTurn_' + i]) {
+          arrNpcGab1.push($dataActors[actorId].meta['GabBattleTurn_' + i].split(','));
         };
       };
     };
@@ -1101,28 +1101,28 @@ rosyutu_wordChoice = function (id1) {
 production_separateSetProfile = function (id1) {
 
   if (id1 == 1) {//リーシャ
-    var value1 =
+    var profileText =
       `気高く尊き秩序の蒼光纏う、若き騎空団団長（代理）。
 全空でも有数の騎士を父に持ち、
 自身も七光りでは終わらぬ才を持つ。
 生真面目な気質で、事案の類には容赦が無い。\n`;
   };
   if (id1 == 2) {//モニカ
-    var value1 =
+    var profileText =
       `剛勇鮮烈な武威の閃電煌めく、（実質的に）第四船団長。
 一行の中では年長者であり、
 年相応の落ち着きと研鑽を積んだ甘党系武闘派騎空士。
 齢に相応しき外見になりたいが、諦めてもいる。\n`;
   };
   if (id1 == 3) {//雄ドラフ
-    var value1 =
+    var profileText =
       `雄ドラフらしいマッスルが頼れるナイスガイ。
 秩序の騎空団創設者とも轡を並べたベテラン騎空士。
 秩序の騎空団内部でも信頼厚く、\\N[1]の
 守役のような立ち位置。嫁さん募集中。\n`;
   };
   if (id1 == 4) {//女ヒューマン
-    var value1 =
+    var profileText =
       `秩序の騎空団では若手に入る、実力派騎空士。
 生きる為に汚れ仕事に手を染めていたが、
 \\N[1]父のパーティにボコられて改心する。
@@ -1130,14 +1130,14 @@ production_separateSetProfile = function (id1) {
 カレシ募集中。\n`;
   };
   if (id1 == 5) {//少年
-    var value1 =
+    var profileText =
       `賊によって家族と住む場所を失った薄幸の少年エルーン。
 現在は秩序の騎空士見習いとして励んでいる。
 その経緯から団長代理付きのような立場になっており、
 \\N[1]に淡い思いを抱いている。
 今作の不幸枠。\n`;
     if ($gameVariables.value(135) >= 49) {
-      var value1 =
+      var profileText =
         `賊によって家族と住む場所を失った薄幸の少年エルーン。
 現在は秩序の騎空士見習いとして励んでいる。
 その経緯から団長代理付きのような立場になっており、
@@ -1146,19 +1146,19 @@ production_separateSetProfile = function (id1) {
     };
   };
   if (id1 == 6) {//糞ガキ
-    var value1 =
+    var profileText =
       `コルブラント王国に措いて由緒正しき血脈を
 保つ名門伯爵家嫡男。\n`;
-    //value1 += //進行に応じて追加。
+    //profileText += //進行に応じて追加。
   };
   if (id1 == 7) {//大臣
-    var value1 =
+    var profileText =
       `コルブラント王国の内政を一手に取り仕切る大臣。
 辣腕と評判。\n`;
   };
 
   var actor = $gameActors.actor(id1);
-  actor.setProfile(value1);
+  actor.setProfile(profileText);
 
 };
 
@@ -1168,25 +1168,25 @@ production_ChangeSetProfile = function () {
   var actor = $gameActors.actor($gameVariables.value(20));
   if ($gameVariables.value(20) == 1) {
     if (actor.isLearnedSkill(65)) {
-      var value1 =
+      var profileText =
         `致命的に狂った歯車は、秩序の女を一人の雌にした。
 あの蒼光は、最早戻る事は無い。`;
     } else {
       if (actor.isLearnedSkill(64)) {
-        var value1 =
+        var profileText =
           `呵責無き凌辱の大火は、秩序に癒えぬ恥辱の痕を刻む。
 不動の筈であった優先順位に僅かな瑕疵が現れ始め…。
 心身より湧き上がる肉欲の疼きは
 確実に\\set[1]を歪ませていく…。`;
       } else {
         if (actor.isLearnedSkill(62)) {
-          var value1 =
+          var profileText =
             `望まぬ穢れは秩序の光を貶め始めている…。
 然れどその蒼光は未だ顕在なり。
 しかし、薄暗がりを照らす彼女の光は人面獣心の徒を
 惹きつけて已まないのも事実であろう…。`
         } else {
-          var value1 =
+          var profileText =
             `生命活動の大半を＜秩序＞に捧げている弊害か、
 性的な事物に疎い。男社会で育った弊害か無防備な面も。
 団内では異性としての人気も高いのだが、
@@ -1198,7 +1198,7 @@ production_ChangeSetProfile = function () {
   //サブヒロインはスイッチで設定するかも？
   if ($gameVariables.value(20) == 2) {
     if (actor.isLearnedSkill(65)) {
-      var value1 =
+      var profileText =
         `堕ちた武人は、夜な夜な男を口説き部屋へと連れ込む。
 一夜の快楽に耽るため…。
 その肉欲に狂わされている事を自覚しながら、
@@ -1206,18 +1206,18 @@ production_ChangeSetProfile = function () {
 `;
     } else {
       if (actor.isLearnedSkill(63)) {
-        var value1 =
+        var profileText =
           `淫欲に目覚めた武人は、男を欲し始める…。
 その欲求は、逆らう術を、彼女は持たない…。`;
       } else {
         if (actor.isLearnedSkill(61)) {
-          var value1 =
+          var profileText =
             `忌まわしき呪縛は、秩序の騎空士が誇る女傑すら
 狂わせた…。
 未だ自覚こそ無いものの、
 彼女は確かに道を踏み外そうとしている…。`
         } else {
-          var value1 =
+          var profileText =
             `武家の出生である為か、外見に反比例して
 硬い気質の持ち主。男女の由無し事からは縁遠い。
 \\N[1]と団内女性人気を二分しているが、
@@ -1226,7 +1226,7 @@ production_ChangeSetProfile = function () {
       }
     }
   };
-  actor.setProfile(value1);
+  actor.setProfile(profileText);
 
 };
 
@@ -1260,20 +1260,20 @@ seisyoujuu_select1 = function () {
   valueCountSet3 = 0;
   valueCountSet4 = 0;
   $gameSwitches.setValue(380, false);
-  var value1 = 0;
+  var ownedCount = 0;
   valueItems = $dataArmors;
   for (var i = 1; i <= valueArmorsLength; i++) {
     if (valueItems[i].etypeId == 6) {
       if (valueItems[i].meta['ItemPicture']) {
         valueCountSet3 += 1;
         if ($gameParty.hasItem(valueItems[i], true)) {
-          value1 += 1;
+          ownedCount += 1;
           valueCountSet4 += 1;
         }
       }
     }
   };
-  if (value1 >= 1) { $gameSwitches.setValue(380, true) };
+  if (ownedCount >= 1) { $gameSwitches.setValue(380, true) };
 
 };
 
@@ -1286,9 +1286,9 @@ seisyoujuu_select2 = function (id1) {
   else if (id1 == 1) {
     //valueItems = $dataArmors;
     //const value0 = 0;
-    let value1 = 101;
-    //const value2 = 'ScreenBlackOut';
-    let value3 = 0;
+    let pictureId = 101;
+    //const picturePath = 'ScreenBlackOut';
+    let choiceIndex = 0;
     const txt = `\\I[508]星晶石入手率＜${valueCountSet4}/${valueCountSet3}＞`;
     const choiceParams = {
       text: txt,
@@ -1296,7 +1296,7 @@ seisyoujuu_select2 = function (id1) {
     };
     let id = 1;
     $gameSystem.addCustomChoice(id, choiceParams);
-    value3 += 1;
+    choiceIndex += 1;
     valueItems = $dataArmors;
     for (let i = 1; i <= valueArmorsLength; i++) {
       const item = valueItems[i];
@@ -1312,30 +1312,30 @@ seisyoujuu_select2 = function (id1) {
             };
             $gameSystem.addCustomChoice(id, choiceParams);
             const itemPictureDataArr = itemPictureData.split(',');
-            const value5 = Number(itemPictureDataArr[1]);
+            const pictureOffsetY = Number(itemPictureDataArr[1]);
 
-            let value6;
-            let value7;
-            if (value5 >= 0) {
-              value6 = 50;
-              value7 = 0;
+            let pictureScale;
+            let extraYOffset;
+            if (pictureOffsetY >= 0) {
+              pictureScale = 50;
+              extraYOffset = 0;
             } else {
-              value6 = 100;
-              value7 = 200;
+              pictureScale = 100;
+              extraYOffset = 200;
             };
 
-            const value2 = `/img/sv_enemies/Summon_${itemPictureDataArr[0]}`;
-            $gameScreen.showPicture(value1, value2, 1, 640 + 200, 384 + value5 - 150 + value7, value6, value6, 0, 0);
-            $gameMessage.setSelectPictureId(value3, value1);
+            const picturePath = `/img/sv_enemies/Summon_${itemPictureDataArr[0]}`;
+            $gameScreen.showPicture(pictureId, picturePath, 1, 640 + 200, 384 + pictureOffsetY - 150 + extraYOffset, pictureScale, pictureScale, 0, 0);
+            $gameMessage.setSelectPictureId(choiceIndex, pictureId);
             if (itemMeta['summonDescription']) {
               const summonDescription = itemMeta['summonDescription'];
               $gameScreen.setDTextPicture(summonDescription, 28);
               $gameScreen.dWindowFrame = 'ON';
-              $gameScreen.showPicture(value1 + 1, '', 0, 10, 606, 100, 100, 0, 0);
-              $gameMessage.setSelectPictureId(value3, value1 + 1);
+              $gameScreen.showPicture(pictureId + 1, '', 0, 10, 606, 100, 100, 0, 0);
+              $gameMessage.setSelectPictureId(choiceIndex, pictureId + 1);
             };
-            value1 += 2;
-            value3 += 1;
+            pictureId += 2;
+            choiceIndex += 1;
           }
         }
       }
@@ -1391,8 +1391,8 @@ kobetu_isyousettei = function () {
 
 kobetu_isyousettei1 = function (actor) {
 
-  var value1 = 460;
-  $gameVariables.setValue(value1 + 5, 1);
+  var baseVarId = 460;
+  $gameVariables.setValue(baseVarId + 5, 1);
   //var actor = $gameActors.actor($gameVariables.value(20));
 
   if ($gameVariables.value(20) == 1) {
@@ -1402,176 +1402,176 @@ kobetu_isyousettei1 = function (actor) {
     //場合によって帽子を37に設定
 
     //スカート破損。影
-    if ($gameVariables.value(value1 + 22) == 2) {
-      $gameVariables.setValue(value1 + 16, 3);
+    if ($gameVariables.value(baseVarId + 22) == 2) {
+      $gameVariables.setValue(baseVarId + 16, 3);
     };
     //腰帯の影
-    if ($gameVariables.value(value1 + 23) == 1) {
-      $gameVariables.setValue(value1 + 19, 3);
+    if ($gameVariables.value(baseVarId + 23) == 1) {
+      $gameVariables.setValue(baseVarId + 19, 3);
     };
     //スカートの影。靴の設定よりも前
-    if ([1, 4].some(function (id) { return $gameVariables.value(value1 + 22) == (id) })) {
-      $gameVariables.setValue(value1 + 16, 1);
+    if ([1, 4].some(function (id) { return $gameVariables.value(baseVarId + 22) == (id) })) {
+      $gameVariables.setValue(baseVarId + 16, 1);
     };
 
     if ($gameSwitches.value(97) || $gameParty.inBattle()) { } else { //立ち絵会話時と戦闘時にランダム表情変化を禁止する。
       //平常時、確率でドヤ顔
-      if ([1, 2, 5, 6, 15].some(function (id) { return $gameVariables.value(value1 + 33) == (id) })) {
+      if ([1, 2, 5, 6, 15].some(function (id) { return $gameVariables.value(baseVarId + 33) == (id) })) {
         var arr = [1, 1, 1, 1, 2, 1, 1, 1];
-        var value2 = arr[getRandomIndex(arr.length)];
-        if (value2 == 2) {
-          $gameVariables.setValue(value1 + 33, 53);
+        var randomFaceIndex = arr[getRandomIndex(arr.length)];
+        if (randomFaceIndex == 2) {
+          $gameVariables.setValue(baseVarId + 33, 53);
         }
       };
     };
 
     //メイドエプロン＋左腕股間隠し
 
-    if ($gameVariables.value(value1 + 15) == 4 &&
-      $gameVariables.value(value1 + 25) == 1) {
-      $gameVariables.setValue(value1 + 15, 1);
+    if ($gameVariables.value(baseVarId + 15) == 4 &&
+      $gameVariables.value(baseVarId + 25) == 1) {
+      $gameVariables.setValue(baseVarId + 15, 1);
     };
     //1帽子。深くかぶる。条件、未定
-    if ($gameVariables.value(value1 + 32) == 2 && $gameVariables.value(value1 + 35) == 10) {
-      $gameVariables.setValue(value1 + 132, $gameVariables.value(value1 + 32));
-      $gameVariables.setValue(value1 + 37, 4);
-      $gameVariables.setValue(value1 + 32, 0);
-      $gameVariables.setValue(value1 + 31, 0);
+    if ($gameVariables.value(baseVarId + 32) == 2 && $gameVariables.value(baseVarId + 35) == 10) {
+      $gameVariables.setValue(baseVarId + 132, $gameVariables.value(baseVarId + 32));
+      $gameVariables.setValue(baseVarId + 37, 4);
+      $gameVariables.setValue(baseVarId + 32, 0);
+      $gameVariables.setValue(baseVarId + 31, 0);
     };
     //2帽子。アイマスケ時に16から27へ
-    if ($gameVariables.value(value1 + 32) >= 1 && $gameVariables.value(value1 + 35) == 1) {
-      $gameVariables.setValue(value1 + 37, $gameVariables.value(value1 + 32));
+    if ($gameVariables.value(baseVarId + 32) >= 1 && $gameVariables.value(baseVarId + 35) == 1) {
+      $gameVariables.setValue(baseVarId + 37, $gameVariables.value(baseVarId + 32));
     };
     //靴。奴隷衣装装備時に16から27へ
-    if ($gameVariables.value(value1 + 20) == 11 && $gameVariables.value(value1 + 18) >= 1) {
-      $gameVariables.setValue(value1 + 27, $gameVariables.value(value1 + 18));
+    if ($gameVariables.value(baseVarId + 20) == 11 && $gameVariables.value(baseVarId + 18) >= 1) {
+      $gameVariables.setValue(baseVarId + 27, $gameVariables.value(baseVarId + 18));
     };
     //靴。娼婦下着装備時に16から27へ
-    if ($gameVariables.value(value1 + 20) == 10 && $gameVariables.value(value1 + 18) >= 1) {
-      $gameVariables.setValue(value1 + 27, $gameVariables.value(value1 + 18));
+    if ($gameVariables.value(baseVarId + 20) == 10 && $gameVariables.value(baseVarId + 18) >= 1) {
+      $gameVariables.setValue(baseVarId + 27, $gameVariables.value(baseVarId + 18));
     };
     //バスタオルの肌影
-    if ($gameVariables.value(value1 + 23) == 6 && !$gameVariables.value(value1 + 20) == 10 &&
-      !$gameVariables.value(value1 + 20) == 11) {
-      $gameVariables.setValue(value1 + 19, 4);
+    if ($gameVariables.value(baseVarId + 23) == 6 && !$gameVariables.value(baseVarId + 20) == 10 &&
+      !$gameVariables.value(baseVarId + 20) == 11) {
+      $gameVariables.setValue(baseVarId + 19, 4);
     };
     //メイドエプロン1の肌影
-    if ($gameVariables.value(value1 + 25) == 1 && !$gameVariables.value(value1 + 20) == 10 &&
-      !$gameVariables.value(value1 + 20) == 11) {
-      $gameVariables.setValue(value1 + 19, 1);
+    if ($gameVariables.value(baseVarId + 25) == 1 && !$gameVariables.value(baseVarId + 20) == 10 &&
+      !$gameVariables.value(baseVarId + 20) == 11) {
+      $gameVariables.setValue(baseVarId + 19, 1);
     };
     //メイドエプロン2の肌影
-    if ($gameVariables.value(value1 + 25) == 2 && $gameVariables.value(value1 + 20) == 0) {
-      $gameVariables.setValue(value1 + 19, 2);
+    if ($gameVariables.value(baseVarId + 25) == 2 && $gameVariables.value(baseVarId + 20) == 0) {
+      $gameVariables.setValue(baseVarId + 19, 2);
     };
     //メイドエプロン1が23に着用の時3に変更
-    if ($gameVariables.value(value1 + 25) == 1 && $gameVariables.value(value1 + 23) == 4 &&
-      $gameVariables.value(value1 + 23) == 5) {
-      $gameVariables.setValue(value1 + 125, $gameVariables.value(value1 + 25));
-      $gameVariables.setValue(value1 + 25, 3);
+    if ($gameVariables.value(baseVarId + 25) == 1 && $gameVariables.value(baseVarId + 23) == 4 &&
+      $gameVariables.value(baseVarId + 23) == 5) {
+      $gameVariables.setValue(baseVarId + 125, $gameVariables.value(baseVarId + 25));
+      $gameVariables.setValue(baseVarId + 25, 3);
     };
     //左腕股間露出時。衣装によって通常に
-    if ($gameVariables.value(value1 + 21) == 11 || $gameVariables.value(value1 + 23) >= 1) {
-      $gameVariables.setValue(value1 + 15, 1);
+    if ($gameVariables.value(baseVarId + 21) == 11 || $gameVariables.value(baseVarId + 23) >= 1) {
+      $gameVariables.setValue(baseVarId + 15, 1);
     };
     //秩序アームカバー左手
-    if ($gameVariables.value(value1 + 17) == 1) {
-      $gameVariables.setValue(value1 + 26, 2);
+    if ($gameVariables.value(baseVarId + 17) == 1) {
+      $gameVariables.setValue(baseVarId + 26, 2);
     };
     //メイドアームカバー左手
-    if ($gameVariables.value(value1 + 17) == 2) {
-      $gameVariables.setValue(value1 + 26, 3);
+    if ($gameVariables.value(baseVarId + 17) == 2) {
+      $gameVariables.setValue(baseVarId + 26, 3);
     };
     //腰帯、破損で裾
-    if ($gameVariables.value(value1 + 23) == 1) {
-      $gameVariables.setValue(value1 + 3, 1);
+    if ($gameVariables.value(baseVarId + 23) == 1) {
+      $gameVariables.setValue(baseVarId + 3, 1);
     };
-    if ($gameVariables.value(value1 + 23) == 2) {
-      $gameVariables.setValue(value1 + 3, 2);
+    if ($gameVariables.value(baseVarId + 23) == 2) {
+      $gameVariables.setValue(baseVarId + 3, 2);
     };
     //1サーコート裾
-    if ($gameVariables.value(value1 + 28) == 3) {
-      $gameVariables.setValue(value1 + 2, 1);
+    if ($gameVariables.value(baseVarId + 28) == 3) {
+      $gameVariables.setValue(baseVarId + 2, 1);
     };
     //2サーコートでロング
-    if ($gameVariables.value(value1 + 28) == 3 && $gameVariables.value(value1 + 4) == 1) {
-      $gameVariables.setValue(value1 + 104, $gameVariables.value(value1 + 4));
-      $gameVariables.setValue(value1 + 4, 2);
+    if ($gameVariables.value(baseVarId + 28) == 3 && $gameVariables.value(baseVarId + 4) == 1) {
+      $gameVariables.setValue(baseVarId + 104, $gameVariables.value(baseVarId + 4));
+      $gameVariables.setValue(baseVarId + 4, 2);
     };
     //3サーコートでポニテ
-    if ($gameVariables.value(value1 + 28) == 3 && $gameVariables.value(value1 + 4) == 3) {
-      $gameVariables.setValue(value1 + 128, $gameVariables.value(value1 + 28));
-      $gameVariables.setValue(value1 + 28, 2);
-      $gameVariables.setValue(value1 + 104, $gameVariables.value(value1 + 4));
-      $gameVariables.setValue(value1 + 4, 4);
+    if ($gameVariables.value(baseVarId + 28) == 3 && $gameVariables.value(baseVarId + 4) == 3) {
+      $gameVariables.setValue(baseVarId + 128, $gameVariables.value(baseVarId + 28));
+      $gameVariables.setValue(baseVarId + 28, 2);
+      $gameVariables.setValue(baseVarId + 104, $gameVariables.value(baseVarId + 4));
+      $gameVariables.setValue(baseVarId + 4, 4);
     };
     //1破損サーコート裾
-    if ($gameVariables.value(value1 + 28) == 4) {
-      $gameVariables.setValue(value1 + 2, 2);
+    if ($gameVariables.value(baseVarId + 28) == 4) {
+      $gameVariables.setValue(baseVarId + 2, 2);
     };
     //ブラで乳房隠し1
-    if ([4, 5, 11].some(function (id) { return $gameVariables.value(value1 + 21) == (id) })) {
-      $gameVariables.setValue(value1 + 10, 0);
+    if ([4, 5, 11].some(function (id) { return $gameVariables.value(baseVarId + 21) == (id) })) {
+      $gameVariables.setValue(baseVarId + 10, 0);
     };
     //上衣で乳房隠し1
-    if ([6].some(function (id) { return $gameVariables.value(value1 + 23) == (id) })) {
-      $gameVariables.setValue(value1 + 10, 0);
+    if ([6].some(function (id) { return $gameVariables.value(baseVarId + 23) == (id) })) {
+      $gameVariables.setValue(baseVarId + 10, 0);
     };
     //左腕衣装1アームカバーで乳房露出時
-    if ($gameVariables.value(value1 + 15) == 4 && $gameVariables.value(value1 + 26) == 2) {
-      $gameVariables.setValue(value1 + 26, 1);
-      $gameVariables.setValue(value1 + 15, 0);
+    if ($gameVariables.value(baseVarId + 15) == 4 && $gameVariables.value(baseVarId + 26) == 2) {
+      $gameVariables.setValue(baseVarId + 26, 1);
+      $gameVariables.setValue(baseVarId + 15, 0);
     };
     //右腕衣装1アームカバーで乳房露出時
-    if ($gameVariables.value(value1 + 9) == 4 && $gameVariables.value(value1 + 17) == 1) {
-      $gameVariables.setValue(value1 + 117, $gameVariables.value(value1 + 17));
-      $gameVariables.setValue(value1 + 24, 1);
-      $gameVariables.setValue(value1 + 17, 0);
-      $gameVariables.setValue(value1 + 9, 6);
-      $gameVariables.setValue(value1 + 10, 1);
+    if ($gameVariables.value(baseVarId + 9) == 4 && $gameVariables.value(baseVarId + 17) == 1) {
+      $gameVariables.setValue(baseVarId + 117, $gameVariables.value(baseVarId + 17));
+      $gameVariables.setValue(baseVarId + 24, 1);
+      $gameVariables.setValue(baseVarId + 17, 0);
+      $gameVariables.setValue(baseVarId + 9, 6);
+      $gameVariables.setValue(baseVarId + 10, 1);
     };
     //武器を表示
-    if ($gameVariables.value(value1 + 9) == 1) {
+    if ($gameVariables.value(baseVarId + 9) == 1) {
       if (actor._equips[0]._itemId >= 1 && $gameSwitches.value(201) || $gameSwitches.value(239)) {
-        $gameVariables.setValue(value1 + 24, 0);
-        $gameVariables.setValue(value1 + 9, 5);
-        $gameVariables.setValue(value1 + 10, 1);
+        $gameVariables.setValue(baseVarId + 24, 0);
+        $gameVariables.setValue(baseVarId + 9, 5);
+        $gameVariables.setValue(baseVarId + 10, 1);
       }
     };
     //秩序アームカバー時武器表示
-    if ($gameVariables.value(value1 + 9) == 5 && $gameVariables.value(value1 + 17) == 1) {
-      $gameVariables.setValue(value1 + 30, 1);
-      $gameVariables.setValue(value1 + 30, 2);
-      $gameVariables.setValue(value1 + 9, 6);
-      $gameVariables.setValue(value1 + 10, 1);
+    if ($gameVariables.value(baseVarId + 9) == 5 && $gameVariables.value(baseVarId + 17) == 1) {
+      $gameVariables.setValue(baseVarId + 30, 1);
+      $gameVariables.setValue(baseVarId + 30, 2);
+      $gameVariables.setValue(baseVarId + 9, 6);
+      $gameVariables.setValue(baseVarId + 10, 1);
     };
 
     //透け条件
     if (actor.isStateAffected(71)) {
       //水着トップ透ける
-      if ($gameVariables.value(value1 + 21) == 6) {
-        $gameVariables.setValue(value1 + 121, $gameVariables.value(value1 + 21));
-        $gameVariables.setValue(value1 + 21, 8);
+      if ($gameVariables.value(baseVarId + 21) == 6) {
+        $gameVariables.setValue(baseVarId + 121, $gameVariables.value(baseVarId + 21));
+        $gameVariables.setValue(baseVarId + 21, 8);
       };
       //秩序ショーツ透ける
-      if ($gameVariables.value(value1 + 20) == 1) {
-        $gameVariables.setValue(value1 + 120, $gameVariables.value(value1 + 20));
-        $gameVariables.setValue(value1 + 20, 2);
+      if ($gameVariables.value(baseVarId + 20) == 1) {
+        $gameVariables.setValue(baseVarId + 120, $gameVariables.value(baseVarId + 20));
+        $gameVariables.setValue(baseVarId + 20, 2);
       };
       //水着ボトム透ける
-      if ($gameVariables.value(value1 + 20) == 5) {
-        $gameVariables.setValue(value1 + 120, $gameVariables.value(value1 + 20));
-        $gameVariables.setValue(value1 + 20, 7);
+      if ($gameVariables.value(baseVarId + 20) == 5) {
+        $gameVariables.setValue(baseVarId + 120, $gameVariables.value(baseVarId + 20));
+        $gameVariables.setValue(baseVarId + 20, 7);
       };
       //タンクトップ透ける
-      if ($gameVariables.value(value1 + 21) == 4) {
-        $gameVariables.setValue(value1 + 121, $gameVariables.value(value1 + 21));
-        $gameVariables.setValue(value1 + 21, 5);
+      if ($gameVariables.value(baseVarId + 21) == 4) {
+        $gameVariables.setValue(baseVarId + 121, $gameVariables.value(baseVarId + 21));
+        $gameVariables.setValue(baseVarId + 21, 5);
       };
       //差分タンクトップ透ける
-      if ($gameVariables.value(value1 + 21) == 1) {
-        $gameVariables.setValue(value1 + 121, $gameVariables.value(value1 + 21));
-        $gameVariables.setValue(value1 + 21, 12);
+      if ($gameVariables.value(baseVarId + 21) == 1) {
+        $gameVariables.setValue(baseVarId + 121, $gameVariables.value(baseVarId + 21));
+        $gameVariables.setValue(baseVarId + 21, 12);
       };
     };
 
@@ -1580,128 +1580,128 @@ kobetu_isyousettei1 = function (actor) {
   if ($gameVariables.value(20) == 2) {
 
     //モニカ水着着用時局部隠し無効
-    if ($gameVariables.value(value1 + 15) == 4 && $gameVariables.value(value1 + 21) == 3) {
-      $gameVariables.setValue(value1 + 15, 1);
+    if ($gameVariables.value(baseVarId + 15) == 4 && $gameVariables.value(baseVarId + 21) == 3) {
+      $gameVariables.setValue(baseVarId + 15, 1);
     };
     //モニカコート着用時局部隠し無効
-    if ($gameVariables.value(value1 + 9) == 4 && $gameVariables.value(value1 + 23) >= 1) {
-      $gameVariables.setValue(value1 + 9, 1);
+    if ($gameVariables.value(baseVarId + 9) == 4 && $gameVariables.value(baseVarId + 23) >= 1) {
+      $gameVariables.setValue(baseVarId + 9, 1);
     };
     //モニカコート着用時局部隠し無効
-    if ($gameVariables.value(value1 + 9) == 4 && $gameVariables.value(value1 + 28) >= 2) {
-      $gameVariables.setValue(value1 + 9, 1);
-      $gameVariables.setValue(value1 + 15, 1);
+    if ($gameVariables.value(baseVarId + 9) == 4 && $gameVariables.value(baseVarId + 28) >= 2) {
+      $gameVariables.setValue(baseVarId + 9, 1);
+      $gameVariables.setValue(baseVarId + 15, 1);
     };
     //モニカコート着用時局部隠し無効2
-    if ($gameVariables.value(value1 + 15) == 4 && $gameVariables.value(value1 + 28) >= 2) {
-      $gameVariables.setValue(value1 + 9, 1);
-      $gameVariables.setValue(value1 + 15, 1);
+    if ($gameVariables.value(baseVarId + 15) == 4 && $gameVariables.value(baseVarId + 28) >= 2) {
+      $gameVariables.setValue(baseVarId + 9, 1);
+      $gameVariables.setValue(baseVarId + 15, 1);
     };
     //腕カバー右手に反映
-    if ($gameVariables.value(value1 + 17) >= 1) {
-      $gameVariables.setValue(value1 + 26, $gameVariables.value(value1 + 17));
+    if ($gameVariables.value(baseVarId + 17) >= 1) {
+      $gameVariables.setValue(baseVarId + 26, $gameVariables.value(baseVarId + 17));
     };
     //腕隠し時に腕カバー消去
-    if ($gameVariables.value(value1 + 9) >= 2) {
-      $gameVariables.setValue(value1 + 117, $gameVariables.value(value1 + 17));
-      $gameVariables.setValue(value1 + 124, $gameVariables.value(value1 + 24));
-      $gameVariables.setValue(value1 + 17, 0);
-      $gameVariables.setValue(value1 + 24, 0);
+    if ($gameVariables.value(baseVarId + 9) >= 2) {
+      $gameVariables.setValue(baseVarId + 117, $gameVariables.value(baseVarId + 17));
+      $gameVariables.setValue(baseVarId + 124, $gameVariables.value(baseVarId + 24));
+      $gameVariables.setValue(baseVarId + 17, 0);
+      $gameVariables.setValue(baseVarId + 24, 0);
     };
-    if ($gameVariables.value(value1 + 15) >= 2) {
-      $gameVariables.setValue(value1 + 26, 0);
+    if ($gameVariables.value(baseVarId + 15) >= 2) {
+      $gameVariables.setValue(baseVarId + 26, 0);
     };
     //モニカ解禁シャツ時にインナーありで変化
-    if ($gameVariables.value(value1 + 23) == 2 && [1, 2].some(function (id) { return $gameVariables.value(value1 + 21) == (id) })) {
-      $gameVariables.setValue(value1 + 123, $gameVariables.value(value1 + 23));
-      $gameVariables.setValue(value1 + 23, 4);
+    if ($gameVariables.value(baseVarId + 23) == 2 && [1, 2].some(function (id) { return $gameVariables.value(baseVarId + 21) == (id) })) {
+      $gameVariables.setValue(baseVarId + 123, $gameVariables.value(baseVarId + 23));
+      $gameVariables.setValue(baseVarId + 23, 4);
     };
     //シャツとインナー上で乳房非表示
-    if ([1, 2, 3, 4].some(function (id) { return $gameVariables.value(value1 + 21) == (id) }) ||
-      [1, 2].some(function (id) { return $gameVariables.value(value1 + 23) == (id) }) ||
-      $gameVariables.value(value1 + 23) == 4) {
-      $gameVariables.setValue(value1 + 10, 0); $gameVariables.setValue(value1 + 11, 0);
+    if ([1, 2, 3, 4].some(function (id) { return $gameVariables.value(baseVarId + 21) == (id) }) ||
+      [1, 2].some(function (id) { return $gameVariables.value(baseVarId + 23) == (id) }) ||
+      $gameVariables.value(baseVarId + 23) == 4) {
+      $gameVariables.setValue(baseVarId + 10, 0); $gameVariables.setValue(baseVarId + 11, 0);
     };
     //シャツ表示でインナー上非表示
-    if ([1, 2, 4].some(function (id) { return $gameVariables.value(value1 + 23) == (id) }) &&
-      $gameVariables.value(value1 + 21) >= 1) {
-      //$gameVariables.setValue(value1+121,$gameVariables.value(value1+21));
-      //$gameVariables.setValue(value1+21,0);
+    if ([1, 2, 4].some(function (id) { return $gameVariables.value(baseVarId + 23) == (id) }) &&
+      $gameVariables.value(baseVarId + 21) >= 1) {
+      //$gameVariables.setValue(baseVarId+121,$gameVariables.value(baseVarId+21));
+      //$gameVariables.setValue(baseVarId+21,0);
     };
     //帽子被り時髪型に影
-    if ($gameVariables.value(value1 + 32) == 2) {
-      $gameVariables.setValue(value1 + 31, 3);
+    if ($gameVariables.value(baseVarId + 32) == 2) {
+      $gameVariables.setValue(baseVarId + 31, 3);
     };
     //コート着用時に手袋変更
-    if ($gameVariables.value(value1 + 28) == 2 || $gameVariables.value(value1 + 28) == 3) {
-      if ($gameVariables.value(value1 + 17) == 1) {
-        $gameVariables.setValue(value1 + 117, $gameVariables.value(value1 + 17));
-        $gameVariables.setValue(value1 + 17, 2);
-        $gameVariables.setValue(value1 + 26, 2);
+    if ($gameVariables.value(baseVarId + 28) == 2 || $gameVariables.value(baseVarId + 28) == 3) {
+      if ($gameVariables.value(baseVarId + 17) == 1) {
+        $gameVariables.setValue(baseVarId + 117, $gameVariables.value(baseVarId + 17));
+        $gameVariables.setValue(baseVarId + 17, 2);
+        $gameVariables.setValue(baseVarId + 26, 2);
       }
     };
     //コート着用時アームなしで落ち影
-    if ($gameVariables.value(value1 + 28) >= 2) {
-      if ($gameVariables.value(value1 + 17) == 0) {
-        $gameVariables.setValue(value1 + 117, $gameVariables.value(value1 + 17));
-        $gameVariables.setValue(value1 + 17, 4);
+    if ($gameVariables.value(baseVarId + 28) >= 2) {
+      if ($gameVariables.value(baseVarId + 17) == 0) {
+        $gameVariables.setValue(baseVarId + 117, $gameVariables.value(baseVarId + 17));
+        $gameVariables.setValue(baseVarId + 17, 4);
       };
-      if ($gameVariables.value(value1 + 26) == 0) {
-        $gameVariables.setValue(value1 + 26, 4);
+      if ($gameVariables.value(baseVarId + 26) == 0) {
+        $gameVariables.setValue(baseVarId + 26, 4);
       };
     };
     //コート着用時にシャツスカートインナー上下なしで乳房丸出し発情時限定
-    if ($gameVariables.value(value1 + 28) == 2 && $gameVariables.value(value1 + 21) == 0 &&
-      $gameVariables.value(value1 + 23) == 0) {
+    if ($gameVariables.value(baseVarId + 28) == 2 && $gameVariables.value(baseVarId + 21) == 0 &&
+      $gameVariables.value(baseVarId + 23) == 0) {
       if (actor.isStateAffected(61)) {
-        $gameVariables.setValue(value1 + 128, $gameVariables.value(value1 + 28));
-        $gameVariables.setValue(value1 + 28, 3);
+        $gameVariables.setValue(baseVarId + 128, $gameVariables.value(baseVarId + 28));
+        $gameVariables.setValue(baseVarId + 28, 3);
       };
     };
     //コートの裏地、肌影
-    if ($gameVariables.value(value1 + 28) == 2 || $gameVariables.value(value1 + 28) == 3) {
-      $gameVariables.setValue(value1 + 3, 1);
-      $gameVariables.setValue(value1 + 16, 1);
+    if ($gameVariables.value(baseVarId + 28) == 2 || $gameVariables.value(baseVarId + 28) == 3) {
+      $gameVariables.setValue(baseVarId + 3, 1);
+      $gameVariables.setValue(baseVarId + 16, 1);
     };
 
     //武器を表示
-    if ($gameVariables.value(value1 + 9) == 1) {
+    if ($gameVariables.value(baseVarId + 9) == 1) {
       if (actor._equips[0]._itemId >= 1 && $gameSwitches.value(201) || $gameSwitches.value(239)) {
-        $gameVariables.setValue(value1 + 2, 1);
-        $gameVariables.setValue(value1 + 9, 5);
+        $gameVariables.setValue(baseVarId + 2, 1);
+        $gameVariables.setValue(baseVarId + 9, 5);
       }
     };
 
     //服上影服なしなら消去
-    if ($gameVariables.value(value1 + 16) >= 1 && $gameVariables.value(value1 + 22) == 0) {
-      $gameVariables.setValue(value1 + 16, 0);
+    if ($gameVariables.value(baseVarId + 16) >= 1 && $gameVariables.value(baseVarId + 22) == 0) {
+      $gameVariables.setValue(baseVarId + 16, 0);
     };
     //透け条件
     if (actor.isStateAffected(71)) {
       //ボトムショーパン透ける
-      if ($gameVariables.value(value1 + 20) == 1) {
-        $gameVariables.setValue(value1 + 120, $gameVariables.value(value1 + 20));
-        $gameVariables.setValue(value1 + 20, 4);
+      if ($gameVariables.value(baseVarId + 20) == 1) {
+        $gameVariables.setValue(baseVarId + 120, $gameVariables.value(baseVarId + 20));
+        $gameVariables.setValue(baseVarId + 20, 4);
       };
       //タンクトップ透ける
-      if ($gameVariables.value(value1 + 21) == 1) {
-        $gameVariables.setValue(value1 + 121, $gameVariables.value(value1 + 21));
-        $gameVariables.setValue(value1 + 21, 7);
+      if ($gameVariables.value(baseVarId + 21) == 1) {
+        $gameVariables.setValue(baseVarId + 121, $gameVariables.value(baseVarId + 21));
+        $gameVariables.setValue(baseVarId + 21, 7);
       };
       //タンクトップ2透ける
-      if ($gameVariables.value(value1 + 21) == 2) {
-        $gameVariables.setValue(value1 + 121, $gameVariables.value(value1 + 21));
-        $gameVariables.setValue(value1 + 21, 8);
+      if ($gameVariables.value(baseVarId + 21) == 2) {
+        $gameVariables.setValue(baseVarId + 121, $gameVariables.value(baseVarId + 21));
+        $gameVariables.setValue(baseVarId + 21, 8);
       };
       //水着透ける
-      if ($gameVariables.value(value1 + 21) == 3) {
-        $gameVariables.setValue(value1 + 121, $gameVariables.value(value1 + 21));
-        $gameVariables.setValue(value1 + 21, 9);
+      if ($gameVariables.value(baseVarId + 21) == 3) {
+        $gameVariables.setValue(baseVarId + 121, $gameVariables.value(baseVarId + 21));
+        $gameVariables.setValue(baseVarId + 21, 9);
       };
       //シャツ透ける
-      if ($gameVariables.value(value1 + 23) == 2) {
-        $gameVariables.setValue(value1 + 123, $gameVariables.value(value1 + 23));
-        $gameVariables.setValue(value1 + 23, 5);
+      if ($gameVariables.value(baseVarId + 23) == 2) {
+        $gameVariables.setValue(baseVarId + 123, $gameVariables.value(baseVarId + 23));
+        $gameVariables.setValue(baseVarId + 23, 5);
       };
     };
 
@@ -1785,45 +1785,45 @@ jouhou_buySetup = function () {
   };
   $gameSystem.addCustomChoice(id, choiceParams);
   for (var i = 1; i < $dataItems.length; i++) {
-    var value1 = 0;
-    var value4 = 0;
+    var availStatus = 0;
+    var hasGoldFlag = 0;
     if ($dataItems[i].meta['BattleMapInformation']) {
       if ($dataItems[i].meta['SetJouhouVal']) {
         var arr1 = $dataItems[i].meta['SetJouhouVal'].split(',');
         if (Number(arr1[0]) == 0) { arr1[0] = 135 };
         if ($gameVariables.value(Number(arr1[0])) >= Number(arr1[1])) {
-          var value1 = 1;
+          var availStatus = 1;
         }
       };
       if ($dataItems[i].meta['SetJouhouSwi']) {
-        var value2 = $dataItems[i].meta['SetJouhouSwi'];
-        if (value2 == 0) { var value2 = 2 };
-        if ($gameSwitches.value(Number(value2))) {
-          var value1 = 1;
+        var conditionSwitchId = $dataItems[i].meta['SetJouhouSwi'];
+        if (conditionSwitchId == 0) { var conditionSwitchId = 2 };
+        if ($gameSwitches.value(Number(conditionSwitchId))) {
+          var availStatus = 1;
         }
       };
       if ($gameParty.hasItem($dataItems[i], true)) {
-        var value1 = 2;
+        var availStatus = 2;
       };
       if ($dataItems[i].meta['SetJouhouGold']) {
-        var value3 = Number($dataItems[i].meta['SetJouhouGold']);
-        if ($gameParty.gold() > value3) {
-          var value4 = 1;
+        var requiredGold = Number($dataItems[i].meta['SetJouhouGold']);
+        if ($gameParty.gold() > requiredGold) {
+          var hasGoldFlag = 1;
         }
       };
-      if (value1 == 1) {
-        var value5 = `${$dataItems[i].name}:${$dataItems[i].meta['SetJouhouGold']}\\G`;
-        if (value4 == 0) { value5 += `en(s[1])` };
-        var value6 = i;
+      if (availStatus == 1) {
+        var choiceText = `${$dataItems[i].name}:${$dataItems[i].meta['SetJouhouGold']}\\G`;
+        if (hasGoldFlag == 0) { choiceText += `en(s[1])` };
+        var itemId = i;
       } else {
-        var value5 = `？？？en(s[1])`;
-        var value6 = 0;
+        var choiceText = `？？？en(s[1])`;
+        var itemId = 0;
       };
-      if (value1 < 2) {
+      if (availStatus < 2) {
         const id = 1;
         const choiceParams = {
-          text: value5,
-          value: value6
+          text: choiceText,
+          value: itemId
         };
         $gameSystem.addCustomChoice(id, choiceParams);
       };
@@ -1838,137 +1838,137 @@ wakingup_pic = function () {
   valuePic1 = 71;
   var actor = $gameActors.actor($gameVariables.value(2));
   if ($gameSwitches.value(202) && $gameSwitches.value(204)) {
-    var value3 = 1;
-    var value4 = getRandomIndex(3) + 1;
-    var value5 = getRandomIndex(2) + 0;
-    var value6 = 5;
-    var arr1 = [8, 8, 8, 11, 8, 8]; var value7 = arr1[getRandomIndex(arr1.length)];
+    var wakeVariant1 = 1;
+    var wakeVariant2 = getRandomIndex(3) + 1;
+    var poseValue1 = getRandomIndex(2) + 0;
+    var poseValue2 = 5;
+    var arr1 = [8, 8, 8, 11, 8, 8]; var poseValue3 = arr1[getRandomIndex(arr1.length)];
   } else {
-    var value3 = 2;
-    var value4 = getRandomIndex(2) + 2;
-    var value5 = 2;
-    var value6 = 5;
-    var value7 = 9;
+    var wakeVariant1 = 2;
+    var wakeVariant2 = getRandomIndex(2) + 2;
+    var poseValue1 = 2;
+    var poseValue2 = 5;
+    var poseValue3 = 9;
   };
   if (actor.isStateAffected(61)) {
-    var value5 = 4;
-    var value6 = 6;
-    var value7 = 12;
+    var poseValue1 = 4;
+    var poseValue2 = 6;
+    var poseValue3 = 12;
   };
   if (actor.isStateAffected(67)) {
-    var value5 = 3;
-    var value6 = 7;
-    var value7 = 10;
+    var poseValue1 = 3;
+    var poseValue2 = 7;
+    var poseValue3 = 10;
   };
   if ($gameSwitches.value(465)) {
-    var value5 = getRandomIndex(2) + 0;
-    var value6 = 5;
-    var arr1 = [8, 8, 8, 11, 8, 8]; var value7 = arr1[getRandomIndex(arr1.length)];
+    var poseValue1 = getRandomIndex(2) + 0;
+    var poseValue2 = 5;
+    var arr1 = [8, 8, 8, 11, 8, 8]; var poseValue3 = arr1[getRandomIndex(arr1.length)];
   };
-  var value2 = 'Zev_WakingUp1_' + value3;
-  $gameScreen.showPicture(valuePic1, value2, 1, 640 + 384 + 128, 384 + 50, 100, 100, 0, 0);
+  var wakeImageName = 'Zev_WakingUp1_' + wakeVariant1;
+  $gameScreen.showPicture(valuePic1, wakeImageName, 1, 640 + 384 + 128, 384 + 50, 100, 100, 0, 0);
   $gameScreen.movePicture(valuePic1, 1, 640 + 384 + 128, 384, 100, 100, 255, 0, 120);
-  var value2 = 'Zev_WakingUp2_' + value4;
-  $gameScreen.showPicture(valuePic1 + 1, value2, 1, 640 + 384 + 128, 384 + 50, 100, 100, 0, 0);
+  var wakeImageName = 'Zev_WakingUp2_' + wakeVariant2;
+  $gameScreen.showPicture(valuePic1 + 1, wakeImageName, 1, 640 + 384 + 128, 384 + 50, 100, 100, 0, 0);
   $gameScreen.movePicture(valuePic1 + 1, 1, 640 + 384 + 128, 384, 100, 100, 255, 0, 120);
   $gameScreen.setPicturesAnimation(13, 4, "連番", 8);
-  var value2 = 'Zev_WakingUp3_00';
-  $gameScreen.showPicture(valuePic1 + 2, value2, 1, 640 + 384 + 128, 384 + 50, 100, 100, 0, 0);
+  var wakeImageName = 'Zev_WakingUp3_00';
+  $gameScreen.showPicture(valuePic1 + 2, wakeImageName, 1, 640 + 384 + 128, 384 + 50, 100, 100, 0, 0);
   $gameScreen.movePicture(valuePic1 + 2, 1, 640 + 384 + 128, 384, 100, 100, 255, 0, 120);
-  valueScriptArray1 = [value5 + 1, value6 + 1, value7 + 1];
-  $gameScreen.picture(valuePic1 + 2).cell = value5;
+  valueScriptArray1 = [poseValue1 + 1, poseValue2 + 1, poseValue3 + 1];
+  $gameScreen.picture(valuePic1 + 2).cell = poseValue1;
 
 };
 
 //宿泊時表示ピクチャvalue18 value21～
-syukuhaku_pic = function (value12) {
+syukuhaku_pic = function (actorSlotId) {
 
-  var actor = $gameActors.actor(value12);
-  var value14 = $gameVariables.value(value12 + 380)[4];
+  var actor = $gameActors.actor(actorSlotId);
+  var exposureLevel = $gameVariables.value(actorSlotId + 380)[4];
   var array = [];
-  var value20 = 0;
+  var locationType = 0;
   if ($gameSwitches.value(203)) {
-    var value20 = 2;
+    var locationType = 2;
   } else {
-    var value20 = 1;
+    var locationType = 1;
   };
-  if (value20 >= 1) { array.push("Zev_StaySleep0-" + value20) };
+  if (locationType >= 1) { array.push("Zev_StaySleep0-" + locationType) };
   array.push("Zev_StaySleep1-1");
-  var value22 = 1;
-  if (actor.hpRate() <= 0.3) { var value22 = 2 };
-  if (actor.isStateAffected(61) || $gameSwitches.value(465)) { var value22 = 3 };
+  var sleepPose = 1;
+  if (actor.hpRate() <= 0.3) { var sleepPose = 2 };
+  if (actor.isStateAffected(61) || $gameSwitches.value(465)) { var sleepPose = 3 };
   if (actor.isLearnedSkill(66)) {
     for (var id = 0; id <= valueHstateDisplay.length - 1; id++) {
       if (actor.isStateAffected(valueHstateDisplay[id])) {
-        var value22 = 4;
+        var sleepPose = 4;
         break;
       };
     };
   };
-  if (value22 >= 1) { array.push("Zev_StaySleep2-" + value22) };
-  var value23 = 0;
-  if (value14 >= 49) {
-    var value15 = getRandomIndex(4);
-    if (value15 >= 2) { var value23 = 1 };
-    if (value15 == 1) { var value23 = 2 };
-    if (value15 == 0) { var value23 = 3 };
+  if (sleepPose >= 1) { array.push("Zev_StaySleep2-" + sleepPose) };
+  var sleepVariant3 = 0;
+  if (exposureLevel >= 49) {
+    var sleepRand3 = getRandomIndex(4);
+    if (sleepRand3 >= 2) { var sleepVariant3 = 1 };
+    if (sleepRand3 == 1) { var sleepVariant3 = 2 };
+    if (sleepRand3 == 0) { var sleepVariant3 = 3 };
   };
-  if (value23 >= 1) { array.push("Zev_StaySleep3-" + value23) };
-  var value24 = 1;
-  if (actor.isStateAffected(67)) { var value24 = 2 };
-  var value16 = getRandomIndex(10);
-  if (actor.isLearnedSkill(66)) { value16 += 1 };
-  if (actor.isLearnedSkill(67)) { value16 += 1 };
-  if (actor.isLearnedSkill(68)) { value16 += 1 };
-  if (actor.isLearnedSkill(69)) { value16 += 1 };
-  if (actor.isLearnedSkill(70)) { value16 += 1 };
-  if (value16 >= 8) { var value24 = 0 };
-  if (value24 >= 1) { array.push("Zev_StaySleep4-" + value24) };
-  var value25 = getRandomIndex(3);
-  if (value22 >= 4) { var value25 = 0 };
-  if (value25 >= 1) { array.push("Zev_StaySleep5-" + value25) };
+  if (sleepVariant3 >= 1) { array.push("Zev_StaySleep3-" + sleepVariant3) };
+  var sleepVariant4 = 1;
+  if (actor.isStateAffected(67)) { var sleepVariant4 = 2 };
+  var skillBonus = getRandomIndex(10);
+  if (actor.isLearnedSkill(66)) { skillBonus += 1 };
+  if (actor.isLearnedSkill(67)) { skillBonus += 1 };
+  if (actor.isLearnedSkill(68)) { skillBonus += 1 };
+  if (actor.isLearnedSkill(69)) { skillBonus += 1 };
+  if (actor.isLearnedSkill(70)) { skillBonus += 1 };
+  if (skillBonus >= 8) { var sleepVariant4 = 0 };
+  if (sleepVariant4 >= 1) { array.push("Zev_StaySleep4-" + sleepVariant4) };
+  var sleepVariant5 = getRandomIndex(3);
+  if (sleepPose >= 4) { var sleepVariant5 = 0 };
+  if (sleepVariant5 >= 1) { array.push("Zev_StaySleep5-" + sleepVariant5) };
 
-  var value26 = 0;
-  if (value22 >= 4) { var value26 = 1 };//value22の判定を利用
-  if (value26 >= 1) { array.push("Zev_StaySleep6-" + value26) };
+  var sleepVariant6 = 0;
+  if (sleepPose >= 4) { var sleepVariant6 = 1 };//value22の判定を利用
+  if (sleepVariant6 >= 1) { array.push("Zev_StaySleep6-" + sleepVariant6) };
 
-  var value10 = 1;
-  var value11 = getRandomIndex(2);//ピクチャ表示時に中央1か左上0か
-  var value9 = getRandomIndex(3) + 1;
-  if (value9 >= 2) { var value10 = getRandomIndex(value9) + 1 };
-  var value5 = 1600; var value6 = 1200;
-  var value7 = 1280; var value8 = 768;
-  var value13 = getRandomIndex(2);
-  if (value13 >= 1) {
-    var value1 = value7 / 2 + (value5 * value10 - value7) / 2;//x始点。+で左
-    var value2 = value8 / 2 - (value6 * value10 - value8) / 2;//y始点。-で下
-    var value3 = value7 / 2 - (value5 - value7) / 2;//x終点。-で右
-    var value4 = value8 / 2 + (value6 - value8) / 2;//y終点。+で上
+  var scaleFactor = 1;
+  var positionIndex = getRandomIndex(2);//ピクチャ表示時に中央1か左上0か
+  var zoomScale = getRandomIndex(3) + 1;
+  if (zoomScale >= 2) { var scaleFactor = getRandomIndex(zoomScale) + 1 };
+  var baseWidth = 1600; var baseHeight = 1200;
+  var refWidth = 1280; var refHeight = 768;
+  var coordRand = getRandomIndex(2);
+  if (coordRand >= 1) {
+    var startX = refWidth / 2 + (baseWidth * scaleFactor - refWidth) / 2;//x始点。+で左
+    var startY = refHeight / 2 - (baseHeight * scaleFactor - refHeight) / 2;//y始点。-で下
+    var endX = refWidth / 2 - (baseWidth - refWidth) / 2;//x終点。-で右
+    var endY = refHeight / 2 + (baseHeight - refHeight) / 2;//y終点。+で上
   } else {
-    var value1 = value7 / 2 - (value5 * value10 - value7) / 2;//x始点。+で左
-    var value2 = value8 / 2 + (value6 * value10 - value8) / 2;//y始点。-で下
-    var value3 = value7 / 2 + (value5 - value7) / 2;//x終点。-で右
-    var value4 = value8 / 2 - (value6 - value8) / 2;//y終点。+で上
+    var startX = refWidth / 2 - (baseWidth * scaleFactor - refWidth) / 2;//x始点。+で左
+    var startY = refHeight / 2 + (baseHeight * scaleFactor - refHeight) / 2;//y始点。-で下
+    var endX = refWidth / 2 + (baseWidth - refWidth) / 2;//x終点。-で右
+    var endY = refHeight / 2 - (baseHeight - refHeight) / 2;//y終点。+で上
   };
-  var value17 = 50;//特定IDだけを透明にしたいけど出来なかった
+  var picOpacity = 50;//特定IDだけを透明にしたいけど出来なかった
   var id1 = 51;
   for (var id = 0; id <= array.length - 1; id++) {
-    $gameScreen.showPicture(id1, array[id], value11, value1, value2, 100 * value9, 100 * value9, value17, 0);
+    $gameScreen.showPicture(id1, array[id], positionIndex, startX, startY, 100 * zoomScale, 100 * zoomScale, picOpacity, 0);
     id1 += 1;
   };
-  var value19 = 100;
-  var value18 = getRandomIndex(2);
-  if (value18 >= 1) {
-    var value3 = value7 / 2;
-    var value4 = value8 / 2;
-    var value19 = 80;
+  var moveOpacity = 100;
+  var moveRand = getRandomIndex(2);
+  if (moveRand >= 1) {
+    var endX = refWidth / 2;
+    var endY = refHeight / 2;
+    var moveOpacity = 80;
   };
   var id1 = 51;
   for (var id = 0; id <= array.length - 1; id++) {
-    $gameScreen.movePicture(id1, 1, value3, value4, value19, value19, 255, 0, 240);
+    $gameScreen.movePicture(id1, 1, endX, endY, moveOpacity, moveOpacity, 255, 0, 240);
     id1 += 1;
   };
-  if (value22 >= 4) {
+  if (sleepPose >= 4) {
     AudioManager.playMe({ "name": "21_Inn1", "volume": 50, "pitch": 100, "pan": 0 });
   } else {
     AudioManager.playMe({ "name": "21_Inn2", "volume": 50, "pitch": 100, "pan": 0 });
@@ -1980,67 +1980,67 @@ syukuhaku_pic = function (value12) {
 original_direct = function (id1, id2, id3, id4, id5, id6) {
 
   if (id1 == 1) {//バハムート登場/退場
-    var value1 = 61;
-    var value2 = "/img/parallaxes/BattleField1_1";//仮パララックス名。
-    $gameScreen.showPicture(value1, value2, 1, 640, 384, 100, 100, 0, 0);
-    $gameScreen.movePicture(value1, 1, 640, 384, 100, 100, 250, 0, 60);
-    hcg_piston(value1, 5, 1);
-    var value2 = 'TachieMonster1';//仮ピクチャ名。
-    $gameScreen.showPicture(value1 + 1, value2, 1, 640 - 400, 384 + 100, -100, 100, 0, 0);
-    $gameScreen.movePicture(value1 + 1, 1, 640 - 200, 384 + 100, -100, 100, 255, 0, 60);
-    hcg_piston(value1 + 1, 5, 1);
+    var picId = 61;
+    var pictureName = "/img/parallaxes/BattleField1_1";//仮パララックス名。
+    $gameScreen.showPicture(picId, pictureName, 1, 640, 384, 100, 100, 0, 0);
+    $gameScreen.movePicture(picId, 1, 640, 384, 100, 100, 250, 0, 60);
+    hcg_piston(picId, 5, 1);
+    var pictureName = 'TachieMonster1';//仮ピクチャ名。
+    $gameScreen.showPicture(picId + 1, pictureName, 1, 640 - 400, 384 + 100, -100, 100, 0, 0);
+    $gameScreen.movePicture(picId + 1, 1, 640 - 200, 384 + 100, -100, 100, 255, 0, 60);
+    hcg_piston(picId + 1, 5, 1);
     if ($gameParty.inBattle()) {
       valueWordSet10 = 'battleWeather';
     } else {
       valueWordSet10 = 'weather';
     };
-    var value1 = 'stardust_w';
-    $gameScreen._particle.particleSet(0, value1, valueWordSet10, 'def', 'screen');
-    var value1 = 'thunder_w';
-    $gameScreen._particle.particleSet(0, value1, valueWordSet10, 'def', 'screen');
+    var picId = 'stardust_w';
+    $gameScreen._particle.particleSet(0, picId, valueWordSet10, 'def', 'screen');
+    var picId = 'thunder_w';
+    $gameScreen._particle.particleSet(0, picId, valueWordSet10, 'def', 'screen');
   };
   if (id1 == 2) {//バハムート登場/退場
-    var value1 = 61;
-    $gameScreen.erasePicture(value1);
-    $gameScreen.erasePicture(value1 + 1);
-    var value1 = 'stardust_w';
-    $gameScreen._particle.particleClear(value1);
-    var value1 = 'thunder_w';
-    $gameScreen._particle.particleClear(value1);
+    var picId = 61;
+    $gameScreen.erasePicture(picId);
+    $gameScreen.erasePicture(picId + 1);
+    var picId = 'stardust_w';
+    $gameScreen._particle.particleClear(picId);
+    var picId = 'thunder_w';
+    $gameScreen._particle.particleClear(picId);
   };
   if (id1 == 3) {//オーラ処理。original_direct(3,this._eventId,1,0,0,0);
-    var value1 = 'aura_static_b';
-    $gameScreen._particle.particleSet(String(id2), value1 + '-' + id2, 'this', value1, '99');
-    $gameScreen._particle.particleUpdate([value1 + '-' + id2, 'alpha', '0', '0.7@0.5', '0']);
-    $gameScreen._particle.particleUpdate([value1 + '-' + id2, 'blendMode', '1']);
-    $gameScreen._particle.particleUpdate([value1 + '-' + id2, 'scale', '0', '0.6']);
-    $gameScreen._particle.particleUpdate([value1 + '-' + id2, 'lifetime', '1.1', '1.1']);
-    if (id3 == 1) { $gameScreen._particle.particleUpdate([value1 + '-' + id2, 'color', '#ffffff', '#00eeff']) };//リーシャ
-    if (id3 == 2) { $gameScreen._particle.particleUpdate([value1 + '-' + id2, 'color', '#ffffff', '#f2ff00']) };//モニカ
-    $gameScreen._particle.particleUpdate([value1 + '-' + id2, 'pos', 0, -20]);
+    var picId = 'aura_static_b';
+    $gameScreen._particle.particleSet(String(id2), picId + '-' + id2, 'this', picId, '99');
+    $gameScreen._particle.particleUpdate([picId + '-' + id2, 'alpha', '0', '0.7@0.5', '0']);
+    $gameScreen._particle.particleUpdate([picId + '-' + id2, 'blendMode', '1']);
+    $gameScreen._particle.particleUpdate([picId + '-' + id2, 'scale', '0', '0.6']);
+    $gameScreen._particle.particleUpdate([picId + '-' + id2, 'lifetime', '1.1', '1.1']);
+    if (id3 == 1) { $gameScreen._particle.particleUpdate([picId + '-' + id2, 'color', '#ffffff', '#00eeff']) };//リーシャ
+    if (id3 == 2) { $gameScreen._particle.particleUpdate([picId + '-' + id2, 'color', '#ffffff', '#f2ff00']) };//モニカ
+    $gameScreen._particle.particleUpdate([picId + '-' + id2, 'pos', 0, -20]);
   };
   if (id1 == 4) {//オーラ処理終了
-    var value1 = 'aura_static_b' + '-' + id2;
-    $gameScreen._particle.particleClear(value1);
+    var picId = 'aura_static_b' + '-' + id2;
+    $gameScreen._particle.particleClear(picId);
   };
   if (id1 == 5) {//少年暴走ベルセルクoriginal_direct(5,this._eventId,0,0,0,0);
-    var value1 = 'magic_circle_c2';
+    var picId = 'magic_circle_c2';
     var arr1 = [String(id2), 'this', '99'];
-    $gameScreen._particle.particleSet(arr1[0], value1 + '-' + id2, arr1[1], value1, arr1[2]);
-    var value1 = 'monster_c';
+    $gameScreen._particle.particleSet(arr1[0], picId + '-' + id2, arr1[1], picId, arr1[2]);
+    var picId = 'monster_c';
     var arr1 = [String(id2), 'this', '99'];
-    $gameScreen._particle.particleSet(arr1[0], value1 + '-' + id2, arr1[1], value1, arr1[2]);
-    var value1 = 'mysterious_torch_c';
+    $gameScreen._particle.particleSet(arr1[0], picId + '-' + id2, arr1[1], picId, arr1[2]);
+    var picId = 'mysterious_torch_c';
     var arr1 = [String(id2), 'this', '99'];
-    $gameScreen._particle.particleSet(arr1[0], value1 + '-' + id2, arr1[1], value1, arr1[2]);
+    $gameScreen._particle.particleSet(arr1[0], picId + '-' + id2, arr1[1], picId, arr1[2]);
   };
   if (id1 == 6) {//少年暴走ベルセルク終了
-    var value1 = 'magic_circle_c2' + '-' + id2;
-    $gameScreen._particle.particleClear(value1);
-    var value1 = 'monster_c' + '-' + id2;
-    $gameScreen._particle.particleClear(value1);
-    var value1 = 'mysterious_torch_c' + '-' + id2;
-    $gameScreen._particle.particleClear(value1);
+    var picId = 'magic_circle_c2' + '-' + id2;
+    $gameScreen._particle.particleClear(picId);
+    var picId = 'monster_c' + '-' + id2;
+    $gameScreen._particle.particleClear(picId);
+    var picId = 'mysterious_torch_c' + '-' + id2;
+    $gameScreen._particle.particleClear(picId);
   };
 
 };
@@ -2143,8 +2143,8 @@ original_main = function (id100, id101) {
         break;
       }
       case 3: {
-        const value1 = $gameScreen.picture(valuePic1 + 4).y();
-        pic_move1(valuePic1 + 4, 0, (384 + (1390 - 768) / 2) - value1, 100, 100, 255, 600);
+        const pictureY = $gameScreen.picture(valuePic1 + 4).y();
+        pic_move1(valuePic1 + 4, 0, (384 + (1390 - 768) / 2) - pictureY, 100, 100, 255, 600);
       }
       case 4: {
         parallax_scroll(valuePic1 + 5, 'ScreenConcentratedLineWidthBackGraund', 0, 20, 20, 0, 255);
@@ -2152,8 +2152,8 @@ original_main = function (id100, id101) {
       }
       case 5: {
         pic_move1(valuePic1 + 10, 0, 0, 100, 100, 255, 60);
-        const value1 = $gameScreen.picture(valuePic1 + 12).x();
-        pic_move1(valuePic1 + 12, (640 + (1500 - 1280) / 2) - value1, 0, 100, 100, 255, 40);
+        const pictureX = $gameScreen.picture(valuePic1 + 12).x();
+        pic_move1(valuePic1 + 12, (640 + (1500 - 1280) / 2) - pictureX, 0, 100, 100, 255, 40);
         //パララックスで4と残像で1
         filter_direct(10, 10, 10, 20);
         break;
@@ -2166,11 +2166,11 @@ original_main = function (id100, id101) {
         const event = $gameMap.event(eventId);
         event.setOpacity(200);
         eventId = $gameVariables.value(292)[$gameVariables.value(530)];
-        let value1 = 'monster_c';
-        $gameScreen._particle.particleSet('attach:event:' + eventId, value1 + '-' + eventId, 'this', value1);
-        $gameScreen._particle.particleUpdate([value1, 'color', '#007dff', '#66b1ff']);
-        value1 = 'monster_c' + '-' + eventId;
-        $gameScreen._particle.particleClear(value1);
+        let particleName = 'monster_c';
+        $gameScreen._particle.particleSet('attach:event:' + eventId, particleName + '-' + eventId, 'this', particleName);
+        $gameScreen._particle.particleUpdate([particleName, 'color', '#007dff', '#66b1ff']);
+        particleName = 'monster_c' + '-' + eventId;
+        $gameScreen._particle.particleClear(particleName);
         break;
       }
     }
@@ -2212,33 +2212,33 @@ original_souwa = function (id100, id101) {
 
   if (id100 == 31) {//秩序の酒場に不良団員npc2人と酒とつまみを生成。id11-15まで使用
     if (id101 == 1) {
-      let value1 = 11;
-      event_respawnSetN(value1, 16, 15, 0, 'npcOrder2', 0);
-      let event = $gameMap.event($gameVariables.value(292)[value1]);
+      let eventSlotId = 11;
+      event_respawnSetN(eventSlotId, 16, 15, 0, 'npcOrder2', 0);
+      let event = $gameMap.event($gameVariables.value(292)[eventSlotId]);
       event.setDirection(4);
 
-      value1 = 12;
-      event_respawnSetN(value1, 13, 15, 0, 'npcOrder2', 3);
-      event = $gameMap.event($gameVariables.value(292)[value1]);
+      eventSlotId = 12;
+      event_respawnSetN(eventSlotId, 13, 15, 0, 'npcOrder2', 3);
+      event = $gameMap.event($gameVariables.value(292)[eventSlotId]);
       event.setDirection(6);
 
-      value1 = 13;
-      goodsEvent_respawn(value1, 'food_2', 1, 4, 2, 15, 15);
-      event = $gameMap.event($gameVariables.value(292)[value1]);
+      eventSlotId = 13;
+      goodsEvent_respawn(eventSlotId, 'food_2', 1, 4, 2, 15, 15);
+      event = $gameMap.event($gameVariables.value(292)[eventSlotId]);
       event._spriteOffsetX = 25;
       event._spriteOffsetY = 10;
       event._priorityType = 2;
 
-      value1 = 14;
-      goodsEvent_respawn(value1, 'food_2', 3, 6, 0, 14, 15);
-      event = $gameMap.event($gameVariables.value(292)[value1]);
+      eventSlotId = 14;
+      goodsEvent_respawn(eventSlotId, 'food_2', 3, 6, 0, 14, 15);
+      event = $gameMap.event($gameVariables.value(292)[eventSlotId]);
       event._spriteOffsetX = -25;
       event._spriteOffsetY = 10;
       event._priorityType = 2;
 
-      value1 = 15;
-      goodsEvent_respawn(value1, 'food_1', 0, 4, 0, 15, 15);
-      event = $gameMap.event($gameVariables.value(292)[value1]);
+      eventSlotId = 15;
+      goodsEvent_respawn(eventSlotId, 'food_1', 0, 4, 0, 15, 15);
+      event = $gameMap.event($gameVariables.value(292)[eventSlotId]);
       event._spriteOffsetX = -24;
     };
   };

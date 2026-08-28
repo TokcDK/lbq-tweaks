@@ -17,27 +17,27 @@ chara_oneWord = function(id1,id2,id3,id4,arr1,arr2,arr3,id6){
 // };
 picture_motion1("smooth", [0]);
 
-const value5 = arr3[getRandomIndex(arr3.length)];
-$gameScreen.setDTextPicture(value5, id3);
+const randomLine = arr3[getRandomIndex(arr3.length)];
+$gameScreen.setDTextPicture(randomLine, id3);
 $gameScreen.dWindowFrame = 'ON';
 if(id6 == 0){}else{$gameScreen.setDtextFont(id6)};
 $gameScreen.dTextAlign = 1;
 
-let value1;
-let value2;
+let screenXPos;
+let screenYPos;
 if(!!$gameMap.event(id2)) {
   const ev = $gameMap.event(id2);
-  value1 = ev.screenX() * $gameScreen.zoomScale();
-  value2 = (ev.screenY() - 70) * $gameScreen.zoomScale();
+  screenXPos = ev.screenX() * $gameScreen.zoomScale();
+  screenYPos = (ev.screenY() - 70) * $gameScreen.zoomScale();
 } else {
-  value1 = 640;
-  value2 = 384;
+  screenXPos = 640;
+  screenYPos = 384;
 };
 
-const value3 = arr1[getRandomIndex(arr1.length)];
-const value4 = arr2[getRandomIndex(arr2.length)];
-$gameScreen.showPicture(id1,"",1,value1+value3,value2+value4,50,50,255,0);
-$gameScreen.movePicture(id1,1,value1+value3,value2+value4,150,150,0,0,id4);
+const randXOffset = arr1[getRandomIndex(arr1.length)];
+const randYOffset = arr2[getRandomIndex(arr2.length)];
+$gameScreen.showPicture(id1,"",1,screenXPos+randXOffset,screenYPos+randYOffset,50,50,255,0);
+$gameScreen.movePicture(id1,1,screenXPos+randXOffset,screenYPos+randYOffset,150,150,0,0,id4);
 
 };
 
@@ -95,9 +95,9 @@ for (let id = $gameMap.events().length; id > 0; id--) {
 }
 
 //主観イベントの現在位置にプレイヤーを設置してシーン終了event_PlayerArrangement($gameVariables.value(530));
-event_PlayerArrangement = function(value1){
+event_PlayerArrangement = function(eventIndex){
 
-const eventId = $gameVariables.value(292)[value1];
+const eventId = $gameVariables.value(292)[eventIndex];
 const event = $gameMap.event(eventId);
 if(!!event) {
   if($gameSwitches.value(29)){
@@ -164,8 +164,8 @@ $gameVariables.setValue(37,getRandomIndex(3) + 2);
 $gameVariables.setValue(34,5);
 $gameVariables.setValue(36,[0,8]);//インデックス
   if($gameSwitches.value(203)){//屋外
-    var value1 = getRandomIndex(11);
-    if(value1 >= 9){
+    var npcTypeRandom = getRandomIndex(11);
+    if(npcTypeRandom >= 9){
       $gameVariables.setValue(33,'npcCastle');
       $gameVariables.setValue(35,1);
       $gameVariables.setValue(37,getRandomIndex(3) + 2);
@@ -178,8 +178,8 @@ $gameVariables.setValue(36,[0,8]);//インデックス
   };
   if($gameSwitches.value(242)){//城
     var arr = [1,2];
-    var value5 = arr[getRandomIndex(arr.length)]
-      if(value5 == 1){
+    var castleMaidChoice = arr[getRandomIndex(arr.length)]
+      if(castleMaidChoice == 1){
         $gameVariables.setValue(33,'npcCastle');
         $gameVariables.setValue(35,getRandomIndex(2) + 1);
         $gameVariables.setValue(37,getRandomIndex(2) + 2);
@@ -295,8 +295,8 @@ map_npcPositionSetEvent = function (id, mapId) {
 
   if (eventEvent.meta['foodC']) {//decorationFood
     let foodIndex = 1;
-    const value3 = getRandomIndex(7) + 0;
-    event.setImage('food_' + foodIndex, value3);
+    const foodPattern = getRandomIndex(7) + 0;
+    event.setImage('food_' + foodIndex, foodPattern);
     let arr1 = [2, 4, 6, 8];
     foodIndex = arr1[getRandomIndex(arr1.length)];
     event.setDirection(foodIndex);//2,4,6,8
@@ -337,55 +337,55 @@ map_npcPositionSetEvent = function (id, mapId) {
     event.setDirectionFix(true);
   }
   else if (eventEvent.meta['NpcProstitute']) {
-    const value2 = 'npcNakidWoman';
-    const value3 = getRandomIndex(3) + 1;
-    const value4 = getRandomIndex(7) + 0;
-    event.setImage(value2 + value3, value4);
+    const prosName = 'npcNakidWoman';
+    const prosIndex = getRandomIndex(3) + 1;
+    const prosPattern = getRandomIndex(7) + 0;
+    event.setImage(prosName + prosIndex, prosPattern);
   }
   else if (eventEvent.meta['NpcProstituteGuest']) {
-    const value2 = 'npcFugou';
-    const value3 = 1;
-    const value4 = getRandomIndex(4) + 4;
-    event.setImage(value2 + value3, value4);
+    const guestName = 'npcFugou';
+    const guestIndex = 1;
+    const guestPattern = getRandomIndex(4) + 4;
+    event.setImage(guestName + guestIndex, guestPattern);
   }
-  else if (eventEvent.meta['StandNPC']) {
+    else if (eventEvent.meta['StandNPC']) {
     map_npcGraphicSet();
-    const value4 = $gameVariables.value(33);
-    const value2 = $gameVariables.value(35);
-    const value3 = Math.floor(Math.random() * $gameVariables.value(36)[1]) + $gameVariables.value(36)[0];
-    event.setImage(value4 + value2, value3);
+    const graphicKind = $gameVariables.value(33);
+    const graphicIndex = $gameVariables.value(35);
+    const graphicPattern = Math.floor(Math.random() * $gameVariables.value(36)[1]) + $gameVariables.value(36)[0];
+    event.setImage(graphicKind + graphicIndex, graphicPattern);
   }
-  else if (eventEvent.meta['BloodBody']) {
+    else if (eventEvent.meta['BloodBody']) {
     map_npcGraphicSet();
-    const value4 = $gameVariables.value(33);
-    const value2 = $gameVariables.value(35);
-    const value3 = Math.floor(Math.random() * $gameVariables.value(36)[1]) + $gameVariables.value(36)[0];
-    event.setImage(value4 + value2, value3);
+    const graphicKind = $gameVariables.value(33);
+    const graphicIndex = $gameVariables.value(35);
+    const graphicPattern = Math.floor(Math.random() * $gameVariables.value(36)[1]) + $gameVariables.value(36)[0];
+    event.setImage(graphicKind + graphicIndex, graphicPattern);
     const arr1 = [45, 135, -45, -135];
-    const value5 = arr1[getRandomIndex(arr1.length)];
-    event.setAngle(value5);
+    const bloodAngle = arr1[getRandomIndex(arr1.length)];
+    event.setAngle(bloodAngle);
     event.setDirection(8);
     $gameMap.spawnEvent(99, event.x, event.y, true);//血痕
-    const value6 = $gameMap.getLastSpawnEventId();
-    if (value5 == 45) { value7 = 20; value8 = 20 };
-    if (value5 == 135) { value7 = 20; value8 = 40 };
-    if (value5 == -45) { value7 = -20; value8 = 20 };
-    if (value5 == -135) { value7 = -20; value8 = 40 };
-    $gameMap.event(value6)._spriteOffsetX += value7;//yep
-    $gameMap.event(value6)._spriteOffsetY += value8;
+    const bloodEventId = $gameMap.getLastSpawnEventId();
+    if (bloodAngle == 45) { spriteOffsetX = 20; spriteOffsetY = 20 };
+    if (bloodAngle == 135) { spriteOffsetX = 20; spriteOffsetY = 40 };
+    if (bloodAngle == -45) { spriteOffsetX = -20; spriteOffsetY = 20 };
+    if (bloodAngle == -135) { spriteOffsetX = -20; spriteOffsetY = 40 };
+    $gameMap.event(bloodEventId)._spriteOffsetX += spriteOffsetX;//yep
+    $gameMap.event(bloodEventId)._spriteOffsetY += spriteOffsetY;
   }
 
-  let value12 = 0;
+  let eraseFlag = 0;
   if (event.characterName()) {//で画像なし状態のキャラ判定
     if (eventEvent.meta['BossGura']) {
-      //let value13 = 0;
+      //let moveRouteCode = 0;
       const arr1 = eventEvent.meta['BossGura'].split(',');
       const arr2 = $dataEnemies[Number(arr1[1])].meta['BossGura'] ? $dataEnemies[Number(arr1[1])].meta['BossGura'].split(',') : [20, 30, 0.2];
       valueBossCharaGura = [id, $dataEnemies[Number(arr1[1])].meta['BossEnemy'].split(',')[2], Number(arr2[0]), Number(arr2[1]), Number(arr2[2])];
       boss_charaGuraCGSet(valueBossCharaGura);
     }
     if (eventEvent.meta['BossGura2']) {
-      //let value13 = 0;
+      //let moveRouteCode = 0;
       const arr2 = eventEvent.meta['BossGura2'].split(',');
       valueBossCharaGura = [id, arr2[0], Number(arr2[1]), Number(arr2[2]), Number(arr2[3])];
       boss_charaGuraCGSet(valueBossCharaGura);
@@ -396,48 +396,48 @@ map_npcPositionSetEvent = function (id, mapId) {
       eventEvent.moveLight(Number(arr1[0]), Number(arr1[1]), Number(arr1[2]), Number(arr1[3]));
     }
     if (eventEvent.meta['PerspectiveA']) {
-      let value13 = 0;
+      let hideIndicator = 0;
       const arr1 = eventEvent.meta['PerspectiveA'].split(',');
       for (let i = 0; i <= arr1.length - 1; i++) {
-        if (Number(arr1[i]) <= 0) { value13 = 1 } else {
+        if (Number(arr1[i]) <= 0) { hideIndicator = 1 } else {
           if ($gameSwitches.value(Number(arr1[i]) + 440)) {
-            value13 = 1;
+            hideIndicator = 1;
           }
         }
       }
-      if (value13 == 0) { value12 = 1 };
+      if (hideIndicator == 0) { eraseFlag = 1 };
     }
 
     if (eventEvent.meta['EvSceneSet']) {//<EvSceneSet:401,1,0>1で達成時に消去で2なら消去なし。0で♡1で笑-1でなし
-      let value13 = 0;
+      let hideIndicator = 0;
       const arr1 = eventEvent.meta['EvSceneSet'].split(',');
-      const value1 = Number(arr1[0]);
-      let value2 = 0;//発生
-      let value3 = 0;//達成
-      let value4 = 'h';//イベアイコン
-      if (value1 >= 401 && value1 <= 500) { value2 = value1 + 800; value3 = value1 + 900 };
-      if (value1 >= 501 && value1 <= 600) { value2 = value1 + 500; value3 = value1 + 600 };
-      if ($dataItems[value1].meta['AddEventIncidenceSwi']) {
-        value2 = Number($dataItems[value1].meta['AddEventIncidenceSwi']);
+      const sceneItemId = Number(arr1[0]);
+      let incidenceSw = 0;//発生
+      let compSw = 0;//達成
+      let indIcon = 'h';//イベアイコン
+      if (sceneItemId >= 401 && sceneItemId <= 500) { incidenceSw = sceneItemId + 800; compSw = sceneItemId + 900 };
+      if (sceneItemId >= 501 && sceneItemId <= 600) { incidenceSw = sceneItemId + 500; compSw = sceneItemId + 600 };
+      if ($dataItems[sceneItemId].meta['AddEventIncidenceSwi']) {
+        incidenceSw = Number($dataItems[sceneItemId].meta['AddEventIncidenceSwi']);
       };
-      if ($dataItems[value1].meta['AddEventCompSwi']) {
-        value3 = Number($dataItems[value1].meta['AddEventCompSwi']);
+      if ($dataItems[sceneItemId].meta['AddEventCompSwi']) {
+        compSw = Number($dataItems[sceneItemId].meta['AddEventCompSwi']);
       };
-      if (value2 <= 1) { value13 = 1 };
-      if ($gameSwitches.value(value2)) { value13 = 1 };
-      if (Number(arr1[1]) == 1 && $gameSwitches.value(value3)) { value13 = 0 };
-      if (value13 == 0) {
-        value12 = 1;
+      if (incidenceSw <= 1) { hideIndicator = 1 };
+      if ($gameSwitches.value(incidenceSw)) { hideIndicator = 1 };
+      if (Number(arr1[1]) == 1 && $gameSwitches.value(compSw)) { hideIndicator = 0 };
+      if (hideIndicator == 0) {
+        eraseFlag = 1;
       } else {
         const arr2Num = Number(arr1[2]);
-        if (arr2Num == 0) { value4 = 'h' };
-        if (arr2Num == 1) { value4 = 'h1' };
-        if (arr2Num == 2) { value4 = 't' };
-        if (arr2Num == 3) { value4 = 'e' };
-        if (arr2Num == -1) { value4 = null };
-        if (value4) {
+        if (arr2Num == 0) { indIcon = 'h' };
+        if (arr2Num == 1) { indIcon = 'h1' };
+        if (arr2Num == 2) { indIcon = 't' };
+        if (arr2Num == 3) { indIcon = 'e' };
+        if (arr2Num == -1) { indIcon = null };
+        if (indIcon) {
           const char = event;
-          char.setIndicators(value4, 0, false, 0, 0, "", 0, false, false, 0, true, 0, -10);
+          char.setIndicators(indIcon, 0, false, 0, 0, "", 0, false, false, 0, true, 0, -10);
           char._indData.ref = true;
           char._indData.fontSize = 28;
           char._indData.ref = true;
@@ -447,23 +447,23 @@ map_npcPositionSetEvent = function (id, mapId) {
       }
     }
     if (eventEvent.meta['EvStartSw']) {
-      let value13 = 0;
+      let hideIndicator = 0;
       const arr1 = eventEvent.meta['EvStartSw'].split(',');
       for (let i = 0; i < arr1.length; i++) {
-        if (Number(arr1[i]) <= 1) { value13 = 1 } else {
+        if (Number(arr1[i]) <= 1) { hideIndicator = 1 } else {
           if ($gameSwitches.value(Number(arr1[i]))) {
-            value13 = 1;
+            hideIndicator = 1;
           }
         }
       }
-      if (value13 == 0) { value12 = 1 };
+      if (hideIndicator == 0) { eraseFlag = 1 };
     }
     if (eventEvent.meta['EvEndSw']) {
       const arr1 = eventEvent.meta['EvEndSw'].split(',');
       for (let i = 0; i < arr1.length; i++) {
         if (Number(arr1[i]) >= 1) {
           if ($gameSwitches.value(Number(arr1[i]))) {
-            value12 = 1;
+            eraseFlag = 1;
             break;
           }
         }
@@ -473,33 +473,33 @@ map_npcPositionSetEvent = function (id, mapId) {
     if (eventEvent.meta['EvStartCloth']) {
       //let character = event;
       const eventEventEvStartClothArr = eventEvent.meta['EvStartCloth'].split(',');
-      const value1 = Number(eventEventEvStartClothArr[0]);
-      const value2 = Number(eventEventEvStartClothArr[1]);
-      if (value1 >= 1) {
-        if ($gameVariables.value(440 + value1)[41] == value2) { } else {
-          value12 = 1;
+      const clothSlot = Number(eventEventEvStartClothArr[0]);
+      const clothReq = Number(eventEventEvStartClothArr[1]);
+      if (clothSlot >= 1) {
+        if ($gameVariables.value(440 + clothSlot)[41] == clothReq) { } else {
+          eraseFlag = 1;
         }
       }
     }
     if (eventEvent.meta['EvStartVal']) {
       //let character = event;
       const eventEventEvStartValArr = eventEvent.meta['EvStartVal'].split(',');
-      const value1 = Number(eventEventEvStartValArr[0]);
-      const value2 = Number(eventEventEvStartValArr[1]);
-      if (value1 >= 1) {
-        if ($gameVariables.value(value1) >= value2) { } else {
-          value12 = 1;
+      const startVarId = Number(eventEventEvStartValArr[0]);
+      const startReqVal = Number(eventEventEvStartValArr[1]);
+      if (startVarId >= 1) {
+        if ($gameVariables.value(startVarId) >= startReqVal) { } else {
+          eraseFlag = 1;
         }
       }
     }
     if (eventEvent.meta['EvEndVal']) {
       //let character = event;
       const eventEventEvEndValArr = eventEvent.meta['EvEndVal'].split(',');
-      const value1 = Number(eventEventEvEndValArr[0]);
-      const value2 = Number(eventEventEvEndValArr[1]);
-      if (value1 >= 1) {
-        if ($gameVariables.value(value1) >= value2) {
-          value12 = 1;
+      const endVarId = Number(eventEventEvEndValArr[0]);
+      const endReqVal = Number(eventEventEvEndValArr[1]);
+      if (endVarId >= 1) {
+        if ($gameVariables.value(endVarId) >= endReqVal) {
+          eraseFlag = 1;
         }
       }
     }
@@ -509,7 +509,7 @@ map_npcPositionSetEvent = function (id, mapId) {
       for (let i = 0; i <= arr1.length - 1; i++) {
         if (Number(arr1[i]) >= 1) {
           if ($gameVariables.value(135) == Number(arr1[i])) {
-            value12 = 1;
+            eraseFlag = 1;
             break;
           }
         }
@@ -522,13 +522,13 @@ map_npcPositionSetEvent = function (id, mapId) {
         const arr1iNum = Number(arr1[i]);
         if (arr1iNum >= 501 && arr1iNum <= 600) {
           if ($gameSwitches.value(arr1iNum + 500) && !$gameSwitches.value(arr1iNum + 600)) {
-            value12 = 1;
+            eraseFlag = 1;
             break;
           }
         }
         else if (arr1iNum >= 401 && arr1iNum <= 500) {
           if ($gameSwitches.value(arr1iNum + 800) && !$gameSwitches.value(arr1iNum + 900)) {
-            value12 = 1;
+            eraseFlag = 1;
             break;
           }
         }
@@ -540,35 +540,35 @@ map_npcPositionSetEvent = function (id, mapId) {
       for (let i = 0; i <= arr1.length - 1; i++) {
         if (Number(arr1[i]) >= 1) {
           if ($gameParty.hasItem($dataItems[Number(arr1[i])], true)) {
-            value12 = 1;
+            eraseFlag = 1;
           }
         }
       }
     }
     if (eventEvent.meta['QuestSet']) {//
       //let character = event;
-      const value1 = eventEvent.meta['QuestSet'];
-      $gameSelfSwitches.setValue([mapId, id, 'B'], valueQuestArray5[value1 - 800] == 1);
-      $gameSelfSwitches.setValue([mapId, id, 'A'], $gameParty.hasItem($dataItems[Number(value1)], true));
+      const questItemId = eventEvent.meta['QuestSet'];
+      $gameSelfSwitches.setValue([mapId, id, 'B'], valueQuestArray5[questItemId - 800] == 1);
+      $gameSelfSwitches.setValue([mapId, id, 'A'], $gameParty.hasItem($dataItems[Number(questItemId)], true));
       //if($gameParty.hasItem($dataItems[Number(value1) + 100],true)){
-      //let value12 = 1;
+      //let eraseFlag = 1;
       //}
     }
 
-    if (value12 == 1) { $gameMap.eraseEvent(id) }
-    else if (value12 == 0) {
+    if (eraseFlag == 1) { $gameMap.eraseEvent(id) }
+    else if (eraseFlag == 0) {
       if (eventEvent.meta['PSet']) {
         const character = event;
-        const value1 = Number(eventEvent.meta['PSet'].split(',')[0]);
-        const value2 = Number(eventEvent.meta['PSet'].split(',')[1]);
-        character.locate(value1, value2);
+        const locateX = Number(eventEvent.meta['PSet'].split(',')[0]);
+        const locateY = Number(eventEvent.meta['PSet'].split(',')[1]);
+        character.locate(locateX, locateY);
         //character.setDirection(4);
       };
       if (eventEvent.meta['Amassage']) {//<Amassage:901,おはよう\I[16]>
         const arr = eventEvent.meta['Amassage'].split(',');
-        const value1 = Number(arr[0]);
-        const value2 = arr[1];
-        $gameVariables.setValue(value1, value2);
+        const msgVarId = Number(arr[0]);
+        const msgText = arr[1];
+        $gameVariables.setValue(msgVarId, msgText);
         $gameMap.forceDisplayActiveMessage(id);
       };
 
@@ -582,9 +582,9 @@ map_npcPositionSetEvent = function (id, mapId) {
           if (!hswX) continue;
 
           const hswXArr = eventEvent.meta['H' + num + 'sw' + id1].split(',');
-          const value1 = Number(hswXArr[0]);
-          const value2 = Number(hswXArr[1]);
-          if ($gameSwitches.value(value1) && !$gameSwitches.value(value2)) {
+          const hswTargetSw = Number(hswXArr[0]);
+          const hswBlockSw = Number(hswXArr[1]);
+          if ($gameSwitches.value(hswTargetSw) && !$gameSwitches.value(hswBlockSw)) {
             const char = event;
             char.setIndicators('h' + num, 0, false, 0, 0, "", 0, false, false, 0, true, 0, -20);
             char._indData.ref = true;
@@ -619,37 +619,37 @@ var map_npcRespawnNpcDirections = [2, 4, 6, 8];
 //NPC動的生成。0マップ最初。1任意タイミング
 map_npcRespawn = function(id2,id3){
 
-let value1 = 1;
-if(valueRegionMapArray[value1] < 1) return;
+let spawnCount = 1;
+if(valueRegionMapArray[spawnCount] < 1) return;
 
 if(id2 == 0){
-  value1 = $gameVariables.value(241);
+  spawnCount = $gameVariables.value(241);
   if($gameSwitches.value(16)){
-    value1 += getRandomIndex(3) + 1;
+    spawnCount += getRandomIndex(3) + 1;
   };
   if($gameSwitches.value(14)){
-    value1 += getRandomIndex(3);
+    spawnCount += getRandomIndex(3);
   };
   if($gameSwitches.value(15)){
-    value1 = Math.round($gameVariables.value(241) / 10);
+    spawnCount = Math.round($gameVariables.value(241) / 10);
   };
 } else {
-  value1 = 1;
+  spawnCount = 1;
 };
-if(id2 == 0 && $gameVariables.value(235) > value1){
-  value1 = 0;
+if(id2 == 0 && $gameVariables.value(235) > spawnCount){
+  spawnCount = 0;
 };
 let j = 0;
 if(!$gameSwitches.value(140) ||
 $gameParty.inBattle() ||
-value1 < 1 ||
+spawnCount < 1 ||
 $gameVariables.value(202).some(function (id) { return $gameMap.mapId() == id })) return;
 
-  for (let id1 = 1; id1 <= value1; id1++) {
-    let value11 = id3;
+  for (let id1 = 1; id1 <= spawnCount; id1++) {
+    let sourceEventId = id3;
     if(id3 == 0){
       map_npcGraphicSet();
-      value11 = [52,55][getRandomIndex(2)];//テンプレ元イベントID
+      sourceEventId = [52,55][getRandomIndex(2)];//テンプレ元イベントID
     }
     const conditionMap         = {};
     conditionMap.passable    = 1;
@@ -657,7 +657,7 @@ $gameVariables.value(202).some(function (id) { return $gameMap.mapId() == id }))
     conditionMap.collided    = 3;
     conditionMap.terrainTags = [0];
     conditionMap.regionIds   = [1];
-    $gameMap.spawnEventRandom(value11, conditionMap, true);
+    $gameMap.spawnEventRandom(sourceEventId, conditionMap, true);
     const lastSpawnEventId = $gameMap.getLastSpawnEventId();
     const charaEventToRespawn = $gameMap.event(lastSpawnEventId);
     if($gameSwitches.value(377)){
@@ -679,7 +679,7 @@ $gameVariables.value(202).some(function (id) { return $gameMap.mapId() == id }))
     const npcMoveSpeed = $gameVariables.value(37);//移動速度
     charaEventToRespawn.setMoveSpeed(npcMoveSpeed);
 
-    const npcMoveFrequency = value11 == 52 ? //移動頻度。直線かランダムで変更。
+    const npcMoveFrequency = sourceEventId == 52 ? //移動頻度。直線かランダムで変更。
       [3, 4, 5][getRandomIndex(3)]
       : $gameVariables.value(34);
     charaEventToRespawn.setMoveFrequency(npcMoveFrequency);
@@ -687,7 +687,7 @@ $gameVariables.value(202).some(function (id) { return $gameMap.mapId() == id }))
     $gameVariables.setValue(235,$gameVariables.value(235) + 1);
     j += [1,2,1,2,1,1,2][getRandomIndex(7)];
 
-    if (id1 + j >= value1) break;
+    if (id1 + j >= spawnCount) break;
   }
 
 };
@@ -695,8 +695,8 @@ $gameVariables.value(202).some(function (id) { return $gameMap.mapId() == id }))
 //エネミー動的生成。0通常。1エロ。map_enemyRespawn(0);
 map_enemyRespawn = function(id2){
 
-let value1 = 1;
-if(valueRegionMapArray[value1] < 1) return;
+let enemySpawnCount = 1;
+if(valueRegionMapArray[enemySpawnCount] < 1) return;
 
 //$gameVariables.value(334);//最大数
 //$gameVariables.value(335);//討伐数
@@ -707,33 +707,33 @@ if(valueRegionMapArray[value1] < 1) return;
   const maxOccurNum = id2 == 0 ? 224 : 227;//最大出現数変数
   const appearance = id2 == 0 ? 222 : 226;//現在出現数変数
 
-  value1 = $gameVariables.value(maxOccurNum);//
+  enemySpawnCount = $gameVariables.value(maxOccurNum);//
   if($gameSwitches.value(15)){
     //var value1 = $gameVariables.value(value11) + Math.round($gameVariables.value(value11) / 5);
   };
-  value1 -= $gameVariables.value(appearance);
+  enemySpawnCount -= $gameVariables.value(appearance);
   if($gameVariables.value(appearance) > $gameVariables.value(maxOccurNum)){
-    value1 = 0;
+    enemySpawnCount = 0;
   };
   //討伐数 + 現在出現数　＞　エネミー最大ポップ数20
   if($gameVariables.value(335) + $gameVariables.value(appearance) >= $gameVariables.value(334)){
-    value1 = 0;
+    enemySpawnCount = 0;
   };
-  //if($gameVariables.value(335) + $gameVariables.value(value12) >= $gameVariables.value(334)){
+  //if($gameVariables.value(335) + $gameVariables.value(eraseFlag) >= $gameVariables.value(334)){
     //var value1 = 0;
   //};
   if(id2 == 1){
     if(!$gameSwitches.value($gameVariables.value(236))){
-      value1 = 0;
+      enemySpawnCount = 0;
     };
   };
   //var j = 0;//
   if (!$gameSwitches.value(140) ||
     $gameParty.inBattle() ||
-    value1 < 1 ||
+    enemySpawnCount < 1 ||
     $gameVariables.value(202).some(function (id) { return $gameMap.mapId() == id })) return;
 
-      for (let id1 = 1; id1 <= value1; id1++) {
+      for (let id1 = 1; id1 <= enemySpawnCount; id1++) {
         const conditionMap       = {};
         conditionMap.passable    = 1;
         conditionMap.screen      = 0;
@@ -748,31 +748,31 @@ if(valueRegionMapArray[value1] < 1) return;
         Number($dataItems[$gameVariables.value(240)].meta.EnemyGraphic.split(',')[1]));
         enemyEventToRespawn.setOpacity(255);//scale
         if($dataItems[$gameVariables.value(240)].meta.BigEnemyGraphic){enemyEventToRespawn.setScale(150, 150)};
-        let value15 = getRandomIndex(4) + 1;
-        let value16 = getRandomIndex(4) + 1;
+        let enemyMoveSpeed = getRandomIndex(4) + 1;
+        let enemyMoveFrequency = getRandomIndex(4) + 1;
         if($gameSwitches.value(363)){
-          value15 = getRandomIndex(3) + 3;
-          value16 = getRandomIndex(3) + 3;
+          enemyMoveSpeed = getRandomIndex(3) + 3;
+          enemyMoveFrequency = getRandomIndex(3) + 3;
         };
         if($gameSwitches.value(368)){
-          value15 = getRandomIndex(2) + 1;
-          value16 = getRandomIndex(2) + 1;
+          enemyMoveSpeed = getRandomIndex(2) + 1;
+          enemyMoveFrequency = getRandomIndex(2) + 1;
         };
-        enemyEventToRespawn.setMoveSpeed(value15);
-        enemyEventToRespawn.setMoveFrequency(value16);
+        enemyEventToRespawn.setMoveSpeed(enemyMoveSpeed);
+        enemyEventToRespawn.setMoveFrequency(enemyMoveFrequency);
         if($gameSwitches.value(360)){
           enemyEventToRespawn.setScale(150, 150);
         };
         if(id2 == 1){
           enemyEventToRespawn.setTone(50, -100, 50);
         };
-        let value13 = 9;
-        const value14 = getRandomIndex(11);
-        if(value14 >= 9){
-          value13 = 10;
+        let moveRouteCode = 9;
+        const moveRouteRandom = getRandomIndex(11);
+        if(moveRouteRandom >= 9){
+          moveRouteCode = 10;
         } 
-        if(value14 <= 1){
-          value13 = 11;
+        if(moveRouteRandom <= 1){
+          moveRouteCode = 11;
         } 
         if(id2 == 1 || $gameSwitches.value(493)){
 /*
@@ -793,7 +793,7 @@ if(valueRegionMapArray[value1] < 1) return;
             {"code":0}],"repeat":true,"skippable":true});
           } else {
             enemyEventToRespawn.forceMoveRoute({
-            "list":[{"code":value13},
+            "list":[{"code":moveRouteCode},
             {"code":0}],"repeat":true,"skippable":true});
           };
         };
@@ -893,10 +893,10 @@ if($gameSwitches.value(201)){
   for (var i = 1; i <= 9; i++) {
     if(value.meta['warpPoint' + i]){
       var arr2 = value.meta['warpPoint' + i].split(',');
-      var value2 = 131;//ワープ魔方陣<warpPoint1:1,1,1>
-      var value1 = Number(arr2[0]);
-        if(value1 == $gameMap.mapId()){
-         $gameMap.spawnEvent(value2, Number(arr2[1]), Number(arr2[2]), true);
+      var warpEventId = 131;//ワープ魔方陣<warpPoint1:1,1,1>
+      var targetMapId = Number(arr2[0]);
+        if(targetMapId == $gameMap.mapId()){
+         $gameMap.spawnEvent(warpEventId, Number(arr2[1]), Number(arr2[2]), true);
            if($gameVariables.value(211)[$gameVariables.value(240)][i] == 1){
              $gameSelfSwitches.setValue([$gameMap.mapId(), $gameMap.getLastSpawnEventId(), 'A'], true);
            };
@@ -905,18 +905,18 @@ if($gameSwitches.value(201)){
   };
   if(value.meta['warpStart']){
     var arr2 = value.meta['warpStart'].split(',');
-    var value2 = 132;//ワープ魔方陣。入口<warpStart:1,1,1>
-    var value1 = Number(arr2[0]);
-      if(value1 == $gameMap.mapId()){
-        $gameMap.spawnEvent(value2, Number(arr2[1]), Number(arr2[2]), true);
+      var warpEventId = 132;//ワープ魔方陣。入口<warpStart:1,1,1>
+      var targetMapId = Number(arr2[0]);
+        if(targetMapId == $gameMap.mapId()){
+         $gameMap.spawnEvent(warpEventId, Number(arr2[1]), Number(arr2[2]), true);
       };
   };
   if(value.meta['TchestOnly']){
     var arr2 = value.meta['TchestOnly'].split(',');
-    var value2 = 113;//レア宝箱
-    var value1 = Number(arr2[0]);
-      if(value1 == $gameMap.mapId()){
-        $gameMap.spawnEvent(value2, Number(arr2[1]), Number(arr2[2]), true);
+      var warpEventId = 113;//レア宝箱
+      var targetMapId = Number(arr2[0]);
+        if(targetMapId == $gameMap.mapId()){
+         $gameMap.spawnEvent(warpEventId, Number(arr2[1]), Number(arr2[2]), true);
           if($gameVariables.value(212)[$gameVariables.value(240)] == 1){
             $gameSelfSwitches.setValue([$gameMap.mapId(), $gameMap.getLastSpawnEventId(), 'A'], true);
           };
@@ -939,9 +939,9 @@ if($gameVariables.value(238) >= 1){
 		const arr2 = [18+n,[1],[1],1,0,3,[0],[1]];//小銭生成
 		const var238 = $gameVariables.value(238);
 		const array1 = [var238-2, var238-1, var238, var238+1];
-		let value2 = array1[getRandomIndex(array1.length)];
-		if(value2 < 1) value2 = 1 ;
-		map_otherGraphicSet(value2, 0, arr2);
+      let coinSpawnCount = array1[getRandomIndex(array1.length)];
+      if(coinSpawnCount < 1) coinSpawnCount = 1 ;
+      map_otherGraphicSet(coinSpawnCount, 0, arr2);
 	  }
   }
 }
@@ -953,33 +953,33 @@ if($gameSwitches.value(201)){
     map_otherGraphicSet(1,0,arr2);
   }
   if($gameVariables.value(215)[$gameVariables.value(240)].length >= 1 && valueRegionMapArray[8] >= 1){
-    let value2 = Math.ceil($gameVariables.value(215)[$gameVariables.value(240)].length/$gameVariables.value(217));
-    if (value2 > valueRegionMapArray[8]) { value2 = valueRegionMapArray[8] };
-    const arr2 = [86,[1],[1],1,0,0,[0],[8]];
-    map_otherGraphicSet(value2,0,arr2);
+      let treasureSpawnCount = Math.ceil($gameVariables.value(215)[$gameVariables.value(240)].length/$gameVariables.value(217));
+      if (treasureSpawnCount > valueRegionMapArray[8]) { treasureSpawnCount = valueRegionMapArray[8] };
+      const arr2 = [86,[1],[1],1,0,0,[0],[8]];
+      map_otherGraphicSet(treasureSpawnCount,0,arr2);
     $gameVariables.value(536).push($gameMap.getLastSpawnEventId());
   }
   if($gameSwitches.value(207) && $gameVariables.value(238) >= 3 && $gameVariables.value(270) >= 20 && valueRegionMapArray[1] >= 1){
     const arr2 = [20, [1], [1], 1, 0, 0, [0], [1]];//トラップ。エネミーレベル20以上
-    const value1 = $gameVariables.value(238);
-    const array1 = [value1-2,value1-1,value1,value1+1];
-    let value2 = array1[getRandomIndex(array1.length)];
-    if(value2 <= 0){value2 = 1};
-    map_otherGraphicSet(value2,0,arr2);
+      const trapBaseVar = $gameVariables.value(238);
+      const array1 = [trapBaseVar-2,trapBaseVar-1,trapBaseVar,trapBaseVar+1];
+      let trapSpawnCount = array1[getRandomIndex(array1.length)];
+      if(trapSpawnCount <= 0){trapSpawnCount = 1};
+      map_otherGraphicSet(trapSpawnCount,0,arr2);
   }
 }
 
 if($gameVariables.value(260) >= 1 && valueRegionMapArray[1] >= 1){
-  let value2 = $gameVariables.value(260);
-  value2 += Math.round($gameVariables.value(238)/2);
-  value2 += getRandomIndex(4) + -2;
-  if (value2 >= 1) {
-    const arr = [70, 93, 85, 92, 91, 94, 88, 89, 95, 96];//亡骸
-    for (let id10 = 1; id10 <= value2; id10++) {
-        const value1 = arr[getRandomIndex(arr.length)];
-        const arr2 = [value1,[1],[1],1,0,0,[0],[1]];
-        map_otherGraphicSet(1,0,arr2);
-      }
+      let corpseSpawnCount = $gameVariables.value(260);
+      corpseSpawnCount += Math.round($gameVariables.value(238)/2);
+      corpseSpawnCount += getRandomIndex(4) + -2;
+      if (corpseSpawnCount >= 1) {
+        const arr = [70, 93, 85, 92, 91, 94, 88, 89, 95, 96];//亡骸
+        for (let id10 = 1; id10 <= corpseSpawnCount; id10++) {
+            const corpseId = arr[getRandomIndex(arr.length)];
+            const arr2 = [corpseId,[1],[1],1,0,0,[0],[1]];
+            map_otherGraphicSet(1,0,arr2);
+          }
   }
 }
 
@@ -990,24 +990,24 @@ for (let id10 = 1; id10 <= 10; id10++) {//固有素材。<CGPriority:1,1>
   const isValid = gameVar259[id10] >= 1;
   if (!isValid) continue; // 'gameVar259[id10] < 1' is not the same here for some reason :(
 
-  let value2 = Math.round(gameVar238);
-  value2 += getRandomIndex(6) + 5;
-  if (value2 < 1) continue;
-  
-  const value1 = value1Arr[id10];
-  if (id10 == 7) {
-    if (valueRegionMapArray[3] >= 1) {
-      const arr1 = 0;
-      const arr2 = [value1, [1], [1], 1, 0, 3, [3], [3]];
-      map_otherGraphicSet(value2, arr1, arr2);
-    }
-  } else {
-    if (valueRegionMapArray[1] >= 1) {
-      const arr1 = 0;
-      const arr2 = [value1, [1], [1], 1, 0, 3, [0], [1]];
-      map_otherGraphicSet(value2, arr1, arr2);
-    }
-  }
+      let materialSpawnCount = Math.round(gameVar238);
+      materialSpawnCount += getRandomIndex(6) + 5;
+      if (materialSpawnCount < 1) continue;
+      
+      const materialId = value1Arr[id10];
+      if (id10 == 7) {
+        if (valueRegionMapArray[3] >= 1) {
+          const arr1 = 0;
+          const arr2 = [materialId, [1], [1], 1, 0, 3, [3], [3]];
+          map_otherGraphicSet(materialSpawnCount, arr1, arr2);
+        }
+      } else {
+        if (valueRegionMapArray[1] >= 1) {
+          const arr1 = 0;
+          const arr2 = [materialId, [1], [1], 1, 0, 3, [0], [1]];
+          map_otherGraphicSet(materialSpawnCount, arr1, arr2);
+        }
+      }
 }
 
 }
@@ -1064,14 +1064,14 @@ for (var id = start; id > 0; id--) {
 };
 
 //シーン時にアクターイベント生成とＩＤ記憶
-event_respawnSetA = function(value1,value2,value3,value4,value5){
-  const actor = $gameActors.actor(value1);
-  event_respawnSetAN(value1, value2, value3, value4, value5, value1 + 20, actor.characterName(), actor.characterIndex(), 0);
+event_respawnSetA = function(charaSlotId,posX,posY,zoomFlag,direction){
+  const actor = $gameActors.actor(charaSlotId);
+  event_respawnSetAN(charaSlotId, posX, posY, zoomFlag, direction, charaSlotId + 20, actor.characterName(), actor.characterIndex(), 0);
 };
 
 //シーン時にＮＰＣイベント生成とＩＤ記憶event_respawnSetN(11,x,y,0,'People1',0);
-event_respawnSetN = function(value1,value2,value3,value4,id1,id2,value5){
-  event_respawnSetAN(value1, value2, value3, value4, value5, 40, id1, id2, 1);
+event_respawnSetN = function(charaSlotId,posX,posY,zoomFlag,id1,id2,direction){
+  event_respawnSetAN(charaSlotId, posX, posY, zoomFlag, direction, 40, id1, id2, 1);
 };
 
 /*:
@@ -1079,46 +1079,46 @@ event_respawnSetN = function(value1,value2,value3,value4,id1,id2,value5){
  * @function
  * @param {integer} an
 */
-event_respawnSetAN = function (value1, value2, value3, value4, value5, id0, id1, id2, an) {
+event_respawnSetAN = function (charaSlotId, posX, posY, zoomFlag, direction, id0, id1, id2, an) {
 
-  const value6 = $gameMap.eventIdXy(value2, value3);
-  if (value6 >= 1) {
-    const ev = $gameMap.event(value6);
+  const existingEventId = $gameMap.eventIdXy(posX, posY);
+  if (existingEventId >= 1) {
+    const ev = $gameMap.event(existingEventId);
     if (!ev.event().meta['Respawn']) {
       if (an === 0 || !ev.isThrough()) {
-        $gameMap.eraseEvent(value6);
+        $gameMap.eraseEvent(existingEventId);
       };
     };
   };
 
-  $gameMap.spawnEvent(id0, value2, value3, true);
+  $gameMap.spawnEvent(id0, posX, posY, true);
   const eventId = $gameMap.getLastSpawnEventId();
   const gameVar292 = $gameVariables.value(292);
-  gameVar292[value1] = eventId;
-  const event = $gameMap.event(gameVar292[value1]);
+  gameVar292[charaSlotId] = eventId;
+  const event = $gameMap.event(gameVar292[charaSlotId]);
   event.setImage(id1, id2);
-  if ([2, 4, 6, 8].some(function (id3) { return value5 == id3 })) {
-    event.setDirection(value5);
+  if ([2, 4, 6, 8].some(function (id3) { return direction == id3 })) {
+    event.setDirection(direction);
   };
   
-  if (value4 == 1) {
-    drowsepost.camera.zoom(1, 60, gameVar292[value1]);
-    if (an === 0) $gameSystem._listenerEvent = gameVar292[value1];
+  if (zoomFlag == 1) {
+    drowsepost.camera.zoom(1, 60, gameVar292[charaSlotId]);
+    if (an === 0) $gameSystem._listenerEvent = gameVar292[charaSlotId];
     //$gamePlayer.setTransparent(true);
   };
 
 };
 
 //シーン時に道具イベント生成。0一時指定ID-生成済みID指定で生成省略,1ﾌｧｲﾙ名2ｲﾝﾃﾞｯｸｽ3方向4ﾊﾟﾀｰﾝ5x6y
-goodsEvent_respawn = function(value1,id1,id2,id3,id4,id5,id6){
+goodsEvent_respawn = function(charaSlotId,id1,id2,id3,id4,id5,id6){
 
 let eventId;
-if($gameVariables.value(292)[value1] == 0){
+if($gameVariables.value(292)[charaSlotId] == 0){
   $gameMap.spawnEvent(102, id5, id6, true);
   eventId = $gameMap.getLastSpawnEventId();
-  $gameVariables.value(292)[value1] = eventId;
+  $gameVariables.value(292)[charaSlotId] = eventId;
 } else {
-  eventId = $gameVariables.value(292)[value1];
+  eventId = $gameVariables.value(292)[charaSlotId];
 };
 
 goodsEvent_imageChange(eventId, id1, id2, id3, id4);
@@ -1164,9 +1164,9 @@ for (let i = start; i <= end; i++) {
     }
     event_respawnSetA(i, x + arr2[0], y + arr2[1], 0, 0);
   } else {
-    let value5 = 0;
+    let placedCount = 0;
     for (let j = 0; j <= 10; j++) {
-      if (value5 == 0 && arr1 != []) {
+      if (placedCount == 0 && arr1 != []) {
         const ev = $gameMap.event(gameVar292[gameVar530]);
         const x = ev.x;
         const y = ev.y;
@@ -1175,10 +1175,10 @@ for (let i = start; i <= end; i++) {
         if (index >= 0) {
           arr1.splice(index, 1);
         };
-        const value4 = $gameMap.terrainTag(x + arr2[0], y + arr2[1]);
-        if (value4 == 1) {
+        const terrainTagValue = $gameMap.terrainTag(x + arr2[0], y + arr2[1]);
+        if (terrainTagValue == 1) {
           event_respawnSetA(i, x + arr2[0], y + arr2[1], 0, 0);
-          value5 += 1;
+          placedCount += 1;
         }
       }
     }
@@ -1201,10 +1201,10 @@ for (let i = 1; i <= 15; i++) {
 }
 
 //メモタグ指定で一括で同じ動作event_NpcCharaMove(3,0,'Actor'); event_NpcCharaMove(45,"UP: 10;",'Actor');
-event_NpcCharaMove = function(id1,id2,value1){
+event_NpcCharaMove = function(id1,id2,metaName){
 
   for (var id = 200; id > 0; id--) {
-    event_partyMoveEventForceMoveRoute(id1, id2, id, value1);
+    event_partyMoveEventForceMoveRoute(id1, id2, id, metaName);
   };
 };
 
@@ -1311,21 +1311,21 @@ event_doorOpenCloseSe = function(id1,id2){
 };
 
 //そのマップのNPC死体任意位置作成。ランダムはコモン162
-people_bloodBodySet = function(value2,value3){
+people_bloodBodySet = function(posX,posY){
 
 map_npcGraphicSet();
-$gameMap.spawnEvent(74, value2, value3, true);
+$gameMap.spawnEvent(74, posX, posY, true);
 const event = $gameMap.event($gameMap.getLastSpawnEventId());
 const arr1 = [6,7];
-const value1 = arr1[getRandomIndex(arr1.length)];
-event.setImage('Damage2', value1);
+const damagePattern = arr1[getRandomIndex(arr1.length)];
+event.setImage('Damage2', damagePattern);
 const gameVar36 = $gameVariables.value(36);
-const value4 = Math.floor(Math.random() * gameVar36[1]) + gameVar36[0];
-event.setImage($gameVariables.value(33)+$gameVariables.value(35), value4);
+const charaPattern = Math.floor(Math.random() * gameVar36[1]) + gameVar36[0];
+event.setImage($gameVariables.value(33)+$gameVariables.value(35), charaPattern);
 event.setDirectionFix(false);
 event.setDirection(8);
 event.setDirectionFix(true);
-$gameMap.spawnEvent(99, value2, value3, true);
+$gameMap.spawnEvent(99, posX, posY, true);
 
 };
 
@@ -1375,26 +1375,26 @@ else if(id1 == 1){
 //動物食材指定
 animal_IngredientsSelect = function(id1){
 
-let value1 = 1271;
+let dropItemId = 1271;
 const eventCharaName = $gameMap.event(id1)._characterName;
-if(eventCharaName.match(/Pig/)){value1 = 1272}
-else if(eventCharaName.match(/Horse/)){value1 = 1273}
-else if(eventCharaName.match(/Cow/)){value1 = 1274}
-else if(eventCharaName.match(/Sheep/)){value1 = 1275}
-else if(eventCharaName.match(/Chicken/)){value1 = 1276}
-else if(eventCharaName.match(/Goat/)){value1 = 1277}
-else if(eventCharaName.match(/Monkey/)){value1 = 1283}
-else if(eventCharaName.match(/Bear/)){value1 = 1278}
-else if(eventCharaName.match(/Deer/)){value1 = 1279}
-else if(eventCharaName.match(/Boar/)){value1 = 1280}
-else if(eventCharaName.match(/BigCat/)){value1 = 1283}
-else if(eventCharaName.match(/Cow/)){value1 = 1274}
-else if(eventCharaName.match(/Crab/)){value1 = 1281}
-else if(eventCharaName.match(/Frog/)){value1 = 1282}
-else if(eventCharaName.match(/fish/)){value1 = 1286}
-else if($gameSwitches.value(258) && eventCharaName.match(/Cow/)){value1 = 1288};
+if(eventCharaName.match(/Pig/)){dropItemId = 1272}
+else if(eventCharaName.match(/Horse/)){dropItemId = 1273}
+else if(eventCharaName.match(/Cow/)){dropItemId = 1274}
+else if(eventCharaName.match(/Sheep/)){dropItemId = 1275}
+else if(eventCharaName.match(/Chicken/)){dropItemId = 1276}
+else if(eventCharaName.match(/Goat/)){dropItemId = 1277}
+else if(eventCharaName.match(/Monkey/)){dropItemId = 1283}
+else if(eventCharaName.match(/Bear/)){dropItemId = 1278}
+else if(eventCharaName.match(/Deer/)){dropItemId = 1279}
+else if(eventCharaName.match(/Boar/)){dropItemId = 1280}
+else if(eventCharaName.match(/BigCat/)){dropItemId = 1283}
+else if(eventCharaName.match(/Cow/)){dropItemId = 1274}
+else if(eventCharaName.match(/Crab/)){dropItemId = 1281}
+else if(eventCharaName.match(/Frog/)){dropItemId = 1282}
+else if(eventCharaName.match(/fish/)){dropItemId = 1286}
+else if($gameSwitches.value(258) && eventCharaName.match(/Cow/)){dropItemId = 1288};
 
-valueDropItems = value1;
+valueDropItems = dropItemId;
 valueanimalEventId = id1;
 
 };
@@ -1402,27 +1402,27 @@ valueanimalEventId = id1;
 //動物反応指定
 animal_ActionSelect = function(id1){
 
-let value1 = 0;
-let value2 = ``;
+let hasReaction = 0;
+let reactionText = ``;
 const eventCharaName = $gameMap.event(id1)._characterName;
-if(eventCharaName.match(/Pig/)){value1 = 1;value2 = `ブヒっ`}
+if(eventCharaName.match(/Pig/)){hasReaction = 1;reactionText = `ブヒっ`}
 else if(eventCharaName.match(/Horse/)){AudioManager.playSe({"name":'Horse',"volume":70,"pitch":100,"pan":0})}
 else if(eventCharaName.match(/Cow/)){AudioManager.playSe({"name":'Cow',"volume":70,"pitch":100,"pan":0})}
-else if(eventCharaName.match(/Sheep/)){value1 = 1;value2 = `メェっ…`}
+else if(eventCharaName.match(/Sheep/)){hasReaction = 1;reactionText = `メェっ…`}
 else if(eventCharaName.match(/Chicken/)){AudioManager.playSe({"name":'Chicken',"volume":70,"pitch":100,"pan":0})}
-else if(eventCharaName.match(/Goat/)){value1 = 1;value2 = `メェ～～っ`}
-else if(eventCharaName.match(/Monkey/)){value1 = 1;value2 = `ウキィっ！`}
+else if(eventCharaName.match(/Goat/)){hasReaction = 1;reactionText = `メェ～～っ`}
+else if(eventCharaName.match(/Monkey/)){hasReaction = 1;reactionText = `ウキィっ！`}
 else if(eventCharaName.match(/Bear/)){AudioManager.playSe({"name":'Monster6',"volume":70,"pitch":80,"pan":0})}
-else if(eventCharaName.match(/Deer/)){value1 = 1;value2 = `ピィっ`}
-else if(eventCharaName.match(/Boar/)){value1 = 1;value2 = `ブルルゥっ！`}
+else if(eventCharaName.match(/Deer/)){hasReaction = 1;reactionText = `ピィっ`}
+else if(eventCharaName.match(/Boar/)){hasReaction = 1;reactionText = `ブルルゥっ！`}
 else if(eventCharaName.match(/BigCat/)){AudioManager.playSe({"name":'Monster1',"volume":70,"pitch":120,"pan":0})}
 else if(eventCharaName.match(/Cow/)){AudioManager.playSe({"name":'Cow',"volume":70,"pitch":100,"pan":0})}
-else if(eventCharaName.match(/Crab/)){value1 = 1;value2 = `カニィっ`}
+else if(eventCharaName.match(/Crab/)){hasReaction = 1;reactionText = `カニィっ`}
 else if(eventCharaName.match(/Frog/)){AudioManager.playSe({"name":'Frog',"volume":70,"pitch":100,"pan":0})}
 else if(eventCharaName.match(/fish/)){};
 
-if(value1 == 1){
-  valueanimalEvent2Id = value2;
+if(hasReaction == 1){
+  valueanimalEvent2Id = reactionText;
 };
 
 };
