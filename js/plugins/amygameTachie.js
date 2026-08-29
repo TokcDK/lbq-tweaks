@@ -658,10 +658,11 @@ tachie_settei2 = function () {
 
 tachie_settei3 = function (gameActor) {
 
-  if (!$gameParty.battleMembers().includes(gameActor)) {
-    console.debug("tachie_settei3: Actor not in battle party! Skip..");
-    return;
-  }
+  // was purpose to optimize by exclude not inbattle actors but it case new game crash, reverted, remove this commented later
+  // if (!$gameParty.battleMembers().includes(gameActor)) {
+  //   console.debug("tachie_settei3: Actor not in battle party! Skip..");
+  //   return;
+  // }
   const actorId = gameActor.actorId();
   const actorClothingDataId = actorId + 440;
   const actorClothingData = $gameVariables.value(actorClothingDataId);
