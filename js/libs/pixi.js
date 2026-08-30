@@ -25662,10 +25662,15 @@ var BaseTexture = function (_EventEmitter) {
     BaseTexture.prototype.update = function update() {
         // Svg size is handled during load
         if (this.imageType !== 'svg') {
-            this.realWidth = this.source.naturalWidth || this.source.videoWidth || this.source.width;
-            this.realHeight = this.source.naturalHeight || this.source.videoHeight || this.source.height;
-
-            this._updateDimensions();
+            if (!this.source) {
+                console.warn("BaseTexture update error: 'source' is undefined. Please ensure the source is properly loaded before updating dimensions.", { this: this});
+            }
+            else {
+                this.realWidth = this.source.naturalWidth || this.source.videoWidth || this.source.width;
+                this.realHeight = this.source.naturalHeight || this.source.videoHeight || this.source.height;
+    
+                this._updateDimensions();
+            }
         }
 
         this.emit('update', this);

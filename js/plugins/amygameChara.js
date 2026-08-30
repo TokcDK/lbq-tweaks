@@ -17,7 +17,7 @@ chara_oneWord = function(id1,id2,id3,id4,arr1,arr2,arr3,id6){
 // };
 picture_motion1("smooth", [0]);
 
-const value5 = arr3[Math.floor(Math.random() * arr3.length)];
+const value5 = arr3[getRandomIndex(arr3.length)];
 $gameScreen.setDTextPicture(value5, id3);
 $gameScreen.dWindowFrame = 'ON';
 if(id6 == 0){}else{$gameScreen.setDtextFont(id6)};
@@ -34,8 +34,8 @@ if(!!$gameMap.event(id2)) {
   value2 = 384;
 };
 
-const value3 = arr1[Math.floor(Math.random() * arr1.length)];
-const value4 = arr2[Math.floor(Math.random() * arr2.length)];
+const value3 = arr1[getRandomIndex(arr1.length)];
+const value4 = arr2[getRandomIndex(arr2.length)];
 $gameScreen.showPicture(id1,"",1,value1+value3,value2+value4,50,50,255,0);
 $gameScreen.movePicture(id1,1,value1+value3,value2+value4,150,150,0,0,id4);
 
@@ -159,75 +159,75 @@ if(!!$gameMap.event(id1)) {
 map_npcGraphicSet = function(){
 
 $gameVariables.setValue(33,'npc');
-$gameVariables.setValue(35,Math.floor( Math.random() * 6) + 1);
-$gameVariables.setValue(37,Math.floor( Math.random() * 3) + 2);
+$gameVariables.setValue(35,getRandomIndex(6) + 1);
+$gameVariables.setValue(37,getRandomIndex(3) + 2);
 $gameVariables.setValue(34,5);
 $gameVariables.setValue(36,[0,8]);//インデックス
   if($gameSwitches.value(203)){//屋外
-    var value1 = Math.floor( Math.random() * 11);
+    var value1 = getRandomIndex(11);
     if(value1 >= 9){
       $gameVariables.setValue(33,'npcCastle');
       $gameVariables.setValue(35,1);
-      $gameVariables.setValue(37,Math.floor( Math.random() * 3) + 2);
+      $gameVariables.setValue(37,getRandomIndex(3) + 2);
     };
   };
   if($gameSwitches.value(282)){//浜辺
     $gameVariables.setValue(33,'npcSwimsuit');
-    $gameVariables.setValue(35,Math.floor( Math.random() * 4) + 1);
-    $gameVariables.setValue(37,Math.floor( Math.random() * 3) + 2);
+    $gameVariables.setValue(35,getRandomIndex(4) + 1);
+    $gameVariables.setValue(37,getRandomIndex(3) + 2);
   };
   if($gameSwitches.value(242)){//城
     var arr = [1,2];
-    var value5 = arr[Math.floor(Math.random() * arr.length)]
+    var value5 = arr[getRandomIndex(arr.length)]
       if(value5 == 1){
         $gameVariables.setValue(33,'npcCastle');
-        $gameVariables.setValue(35,Math.floor( Math.random() * 2) + 1);
-        $gameVariables.setValue(37,Math.floor( Math.random() * 2) + 2);
+        $gameVariables.setValue(35,getRandomIndex(2) + 1);
+        $gameVariables.setValue(37,getRandomIndex(2) + 2);
       } else {
         $gameVariables.setValue(33,'npcMaid');
         $gameVariables.setValue(35,1);
-        $gameVariables.setValue(37,Math.floor( Math.random() * 2) + 2);
+        $gameVariables.setValue(37,getRandomIndex(2) + 2);
       };
   };
   if($gameSwitches.value(276)){//城終盤
     $gameVariables.setValue(33,'npcOrder');
     $gameVariables.setValue(35,1);
-    $gameVariables.setValue(37,Math.floor( Math.random() * 2) + 2);
+    $gameVariables.setValue(37,getRandomIndex(2) + 2);
   };
   if($gameSwitches.value(261)){//秩序
     $gameVariables.setValue(33,'npcOrder');
     $gameVariables.setValue(35,1);
-    $gameVariables.setValue(37,Math.floor( Math.random() * 2) + 2);
+    $gameVariables.setValue(37,getRandomIndex(2) + 2);
   };
   if($gameSwitches.value(246)){//貴族
     $gameVariables.setValue(33,'npcMaid');
     $gameVariables.setValue(35,1);
-    $gameVariables.setValue(37,Math.floor( Math.random() * 2) + 2);
+    $gameVariables.setValue(37,getRandomIndex(2) + 2);
   };
   if($gameSwitches.value(300)){//病院
     $gameVariables.setValue(33,'npcDoctor');
     $gameVariables.setValue(35,1);
-    $gameVariables.setValue(37,Math.floor( Math.random() * 2) + 2);
+    $gameVariables.setValue(37,getRandomIndex(2) + 2);
   };
   if($gameSwitches.value(235) || $gameSwitches.value(237)){//ギルドと武器防具屋
     $gameVariables.setValue(33,'Actor');
-    $gameVariables.setValue(35,Math.floor( Math.random() * 3) + 1);
-    $gameVariables.setValue(37,Math.floor( Math.random() * 2) + 2);
+    $gameVariables.setValue(35,getRandomIndex(3) + 1);
+    $gameVariables.setValue(37,getRandomIndex(2) + 2);
   };
   if($gameSwitches.value(232)){//富豪
     $gameVariables.setValue(33,'npcFugou');
     $gameVariables.setValue(35,3);
-    $gameVariables.setValue(37,Math.floor( Math.random() * 2) + 2);
+    $gameVariables.setValue(37,getRandomIndex(2) + 2);
     $gameVariables.setValue(36,[0,4]);//インデックス
   };
   if($gameSwitches.value(230)){//スラム悪人
     $gameVariables.setValue(33,'BB_akunin');
     $gameVariables.setValue(35,5);
-    $gameVariables.setValue(37,Math.floor( Math.random() * 2) + 2);
+    $gameVariables.setValue(37,getRandomIndex(2) + 2);
   };
   if($gameSwitches.value(15)){//夜
     if($gameSwitches.value(203)){//屋外
-      $gameVariables.setValue(241,Math.floor( Math.random() * 5) + 1);
+      $gameVariables.setValue(241,getRandomIndex(5) + 1);
     } else {
       $gameVariables.setValue(241,0);
     };
@@ -295,20 +295,20 @@ map_npcPositionSetEvent = function (id, mapId) {
 
   if (eventEvent.meta['foodC']) {//decorationFood
     let foodIndex = 1;
-    const value3 = Math.floor(Math.random() * 7) + 0;
+    const value3 = getRandomIndex(7) + 0;
     event.setImage('food_' + foodIndex, value3);
     let arr1 = [2, 4, 6, 8];
-    foodIndex = arr1[Math.floor(Math.random() * arr1.length)];
+    foodIndex = arr1[getRandomIndex(arr1.length)];
     event.setDirection(foodIndex);//2,4,6,8
     arr1 = [0, 1, 2];
-    foodIndex = arr1[Math.floor(Math.random() * arr1.length)];
+    foodIndex = arr1[getRandomIndex(arr1.length)];
     event.setPattern(foodIndex);//0,1,2
     event._originalPattern = foodIndex;
     event.setDirectionFix(true);//向き固定
   }
   else if (eventEvent.meta['decorationFood']) {
     const arr2 = [[1, 5, 8, 1], [1, 5, 8, 2], [1, 6, 8, 0], [1, 6, 8, 1], [2, 0, 2, 1], [2, 1, 2, 2], [2, 0, 6, 0], [2, 0, 6, 1]];
-    const arr1 = arr2[Math.floor(Math.random() * arr2.length)];
+    const arr1 = arr2[getRandomIndex(arr2.length)];
     event.setDirectionFix(false);
     event.setImage('food_' + arr1[0], arr1[1]);
     event.setDirection(arr1[2]);
@@ -318,7 +318,7 @@ map_npcPositionSetEvent = function (id, mapId) {
   }
   else if (eventEvent.meta['Alcol']) {
     const arr2 = [[0, 6, 0], [0, 6, 1], [0, 6, 2], [1, 4, 1], [1, 4, 2], [2, 4, 0], [2, 4, 1]];
-    const arr1 = arr2[Math.floor(Math.random() * arr2.length)];
+    const arr1 = arr2[getRandomIndex(arr2.length)];
     event.setDirectionFix(false);
     event.setImage('food_2', arr1[0]);
     event.setDirection(arr1[1]);
@@ -328,7 +328,7 @@ map_npcPositionSetEvent = function (id, mapId) {
   }
   else if (eventEvent.meta['foodPlate']) {
     const arr2 = [[2, 0, 8, 0], [2, 0, 8, 1], [2, 0, 8, 1], [2, 1, 8, 0], [2, 1, 8, 1], [2, 1, 8, 2], [2, 2, 8, 0], [2, 2, 8, 1]];
-    const arr1 = arr2[Math.floor(Math.random() * arr2.length)];
+    const arr1 = arr2[getRandomIndex(arr2.length)];
     event.setDirectionFix(false);
     event.setImage('food_' + arr1[0], arr1[1]);
     event.setDirection(arr1[2]);
@@ -338,14 +338,14 @@ map_npcPositionSetEvent = function (id, mapId) {
   }
   else if (eventEvent.meta['NpcProstitute']) {
     const value2 = 'npcNakidWoman';
-    const value3 = Math.floor(Math.random() * 3) + 1;
-    const value4 = Math.floor(Math.random() * 7) + 0;
+    const value3 = getRandomIndex(3) + 1;
+    const value4 = getRandomIndex(7) + 0;
     event.setImage(value2 + value3, value4);
   }
   else if (eventEvent.meta['NpcProstituteGuest']) {
     const value2 = 'npcFugou';
     const value3 = 1;
-    const value4 = Math.floor(Math.random() * 4) + 4;
+    const value4 = getRandomIndex(4) + 4;
     event.setImage(value2 + value3, value4);
   }
   else if (eventEvent.meta['StandNPC']) {
@@ -362,7 +362,7 @@ map_npcPositionSetEvent = function (id, mapId) {
     const value3 = Math.floor(Math.random() * $gameVariables.value(36)[1]) + $gameVariables.value(36)[0];
     event.setImage(value4 + value2, value3);
     const arr1 = [45, 135, -45, -135];
-    const value5 = arr1[Math.floor(Math.random() * arr1.length)];
+    const value5 = arr1[getRandomIndex(arr1.length)];
     event.setAngle(value5);
     event.setDirection(8);
     $gameMap.spawnEvent(99, event.x, event.y, true);//血痕
@@ -625,10 +625,10 @@ if(valueRegionMapArray[value1] < 1) return;
 if(id2 == 0){
   value1 = $gameVariables.value(241);
   if($gameSwitches.value(16)){
-    value1 += Math.floor( Math.random() * 3) + 1;
+    value1 += getRandomIndex(3) + 1;
   };
   if($gameSwitches.value(14)){
-    value1 += Math.floor( Math.random() * 3);
+    value1 += getRandomIndex(3);
   };
   if($gameSwitches.value(15)){
     value1 = Math.round($gameVariables.value(241) / 10);
@@ -649,7 +649,7 @@ $gameVariables.value(202).some(function (id) { return $gameMap.mapId() == id }))
     let value11 = id3;
     if(id3 == 0){
       map_npcGraphicSet();
-      value11 = [52,55][Math.floor(Math.random() * 2)];//テンプレ元イベントID
+      value11 = [52,55][getRandomIndex(2)];//テンプレ元イベントID
     }
     const conditionMap         = {};
     conditionMap.passable    = 1;
@@ -671,7 +671,7 @@ $gameVariables.value(202).some(function (id) { return $gameMap.mapId() == id }))
     charaEventToRespawn.setImage(charaName + charaNum, Math.floor(Math.random() * charaCoords[1]) + charaCoords[0]);
 
     //event.setPattern(value2);//0,1,2不要
-    charaEventToRespawn.setDirection(map_npcRespawnNpcDirections[Math.floor(Math.random() * map_npcRespawnNpcDirections.length)]);//2,4,6,8
+    charaEventToRespawn.setDirection(map_npcRespawnNpcDirections[getRandomIndex(map_npcRespawnNpcDirections.length)]);//2,4,6,8
 
     const npcOpacity = id2 == 0 ? 0/*初期透明度*/ : 255;
     charaEventToRespawn.setOpacity(npcOpacity);
@@ -680,12 +680,12 @@ $gameVariables.value(202).some(function (id) { return $gameMap.mapId() == id }))
     charaEventToRespawn.setMoveSpeed(npcMoveSpeed);
 
     const npcMoveFrequency = value11 == 52 ? //移動頻度。直線かランダムで変更。
-      [3, 4, 5][Math.floor(Math.random() * 3)]
+      [3, 4, 5][getRandomIndex(3)]
       : $gameVariables.value(34);
     charaEventToRespawn.setMoveFrequency(npcMoveFrequency);
 
     $gameVariables.setValue(235,$gameVariables.value(235) + 1);
-    j += [1,2,1,2,1,1,2][Math.floor(Math.random() * 7)];
+    j += [1,2,1,2,1,1,2][getRandomIndex(7)];
 
     if (id1 + j >= value1) break;
   }
@@ -748,15 +748,15 @@ if(valueRegionMapArray[value1] < 1) return;
         Number($dataItems[$gameVariables.value(240)].meta.EnemyGraphic.split(',')[1]));
         enemyEventToRespawn.setOpacity(255);//scale
         if($dataItems[$gameVariables.value(240)].meta.BigEnemyGraphic){enemyEventToRespawn.setScale(150, 150)};
-        let value15 = Math.floor( Math.random() * 4) + 1;
-        let value16 = Math.floor( Math.random() * 4) + 1;
+        let value15 = getRandomIndex(4) + 1;
+        let value16 = getRandomIndex(4) + 1;
         if($gameSwitches.value(363)){
-          value15 = Math.floor( Math.random() * 3) + 3;
-          value16 = Math.floor( Math.random() * 3) + 3;
+          value15 = getRandomIndex(3) + 3;
+          value16 = getRandomIndex(3) + 3;
         };
         if($gameSwitches.value(368)){
-          value15 = Math.floor( Math.random() * 2) + 1;
-          value16 = Math.floor( Math.random() * 2) + 1;
+          value15 = getRandomIndex(2) + 1;
+          value16 = getRandomIndex(2) + 1;
         };
         enemyEventToRespawn.setMoveSpeed(value15);
         enemyEventToRespawn.setMoveFrequency(value16);
@@ -767,7 +767,7 @@ if(valueRegionMapArray[value1] < 1) return;
           enemyEventToRespawn.setTone(50, -100, 50);
         };
         let value13 = 9;
-        const value14 = Math.floor( Math.random() * 11);
+        const value14 = getRandomIndex(11);
         if(value14 >= 9){
           value13 = 10;
         } 
@@ -817,7 +817,7 @@ map_animalGraphicSet = function(id1){
   let arr2 = 0;
   const gameSwitch15 = $gameSwitches.value(15);
   if($gameSwitches.value(366)){//夜梟、飛行or待機
-    const rnd0or1 = Math.floor( Math.random() * 2);
+    const rnd0or1 = getRandomIndex(2);
       if(rnd0or1 == 0){
         if(valueRegionMapArray[1] >= 1){ 
           arr1 = ["ZanimalForestNightOwl1"];
@@ -939,7 +939,7 @@ if($gameVariables.value(238) >= 1){
 		const arr2 = [18+n,[1],[1],1,0,3,[0],[1]];//小銭生成
 		const var238 = $gameVariables.value(238);
 		const array1 = [var238-2, var238-1, var238, var238+1];
-		let value2 = array1[Math.floor(Math.random() * array1.length)];
+		let value2 = array1[getRandomIndex(array1.length)];
 		if(value2 < 1) value2 = 1 ;
 		map_otherGraphicSet(value2, 0, arr2);
 	  }
@@ -963,7 +963,7 @@ if($gameSwitches.value(201)){
     const arr2 = [20, [1], [1], 1, 0, 0, [0], [1]];//トラップ。エネミーレベル20以上
     const value1 = $gameVariables.value(238);
     const array1 = [value1-2,value1-1,value1,value1+1];
-    let value2 = array1[Math.floor(Math.random() * array1.length)];
+    let value2 = array1[getRandomIndex(array1.length)];
     if(value2 <= 0){value2 = 1};
     map_otherGraphicSet(value2,0,arr2);
   }
@@ -972,11 +972,11 @@ if($gameSwitches.value(201)){
 if($gameVariables.value(260) >= 1 && valueRegionMapArray[1] >= 1){
   let value2 = $gameVariables.value(260);
   value2 += Math.round($gameVariables.value(238)/2);
-  value2 += Math.floor( Math.random() * 4) + -2;
+  value2 += getRandomIndex(4) + -2;
   if (value2 >= 1) {
     const arr = [70, 93, 85, 92, 91, 94, 88, 89, 95, 96];//亡骸
     for (let id10 = 1; id10 <= value2; id10++) {
-        const value1 = arr[Math.floor(Math.random() * arr.length)];
+        const value1 = arr[getRandomIndex(arr.length)];
         const arr2 = [value1,[1],[1],1,0,0,[0],[1]];
         map_otherGraphicSet(1,0,arr2);
       }
@@ -991,7 +991,7 @@ for (let id10 = 1; id10 <= 10; id10++) {//固有素材。<CGPriority:1,1>
   if (!isValid) continue; // 'gameVar259[id10] < 1' is not the same here for some reason :(
 
   let value2 = Math.round(gameVar238);
-  value2 += Math.floor(Math.random() * 6) + 5;
+  value2 += getRandomIndex(6) + 5;
   if (value2 < 1) continue;
   
   const value1 = value1Arr[id10];
@@ -1036,12 +1036,12 @@ map_otherGraphicSet = function(id1,arr1,arr2){
     gameVar210SpawnEventIdsArray.push(lastSpawnEventId);
     const event = gameMap.event(lastSpawnEventId);
     if(arr1){
-      event.setImage(arr1[Math.floor(Math.random() * arr1.length)],Math.floor( Math.random() * 8) + 0);
+      event.setImage(arr1[getRandomIndex(arr1.length)],getRandomIndex(8) + 0);
     }
     event.setMoveSpeed(arr2[1][Math.floor(Math.random() * arr2[1].length)]);//1-6
     event.setMoveFrequency(arr2[2][Math.floor(Math.random() * arr2[2].length)]);//1-5
     
-    //j += map_otherGraphicSetEndNowArray[Math.floor(Math.random() * map_otherGraphicSetEndNowArrayLen)];
+    //j += map_otherGraphicSetEndNowArray[getRandomIndex(map_otherGraphicSetEndNowArrayLen)];
     j += Math.random() < 0.14 ? 2 : 1; // 14% 1 of 7
 	if(i + j >= end){
       break;
@@ -1157,7 +1157,7 @@ for (let i = start; i <= end; i++) {
   if (gameVar530 == 0) {
     const x = $gamePlayer.x;
     const y = $gamePlayer.y;
-    const arr2 = arr1[Math.floor(Math.random() * arr1.length)];//ID
+    const arr2 = arr1[getRandomIndex(arr1.length)];//ID
     const index = arr1.findIndex(arr1 => arr1 == arr2);
     if (index >= 0) {
       arr1.splice(index, 1);
@@ -1170,7 +1170,7 @@ for (let i = start; i <= end; i++) {
         const ev = $gameMap.event(gameVar292[gameVar530]);
         const x = ev.x;
         const y = ev.y;
-        const arr2 = arr1[Math.floor(Math.random() * arr1.length)];//ID
+        const arr2 = arr1[getRandomIndex(arr1.length)];//ID
         const index = arr1.findIndex(arr1 => arr1 == arr2);
         if (index >= 0) {
           arr1.splice(index, 1);
@@ -1317,7 +1317,7 @@ map_npcGraphicSet();
 $gameMap.spawnEvent(74, value2, value3, true);
 const event = $gameMap.event($gameMap.getLastSpawnEventId());
 const arr1 = [6,7];
-const value1 = arr1[Math.floor(Math.random() * arr1.length)];
+const value1 = arr1[getRandomIndex(arr1.length)];
 event.setImage('Damage2', value1);
 const gameVar36 = $gameVariables.value(36);
 const value4 = Math.floor(Math.random() * gameVar36[1]) + gameVar36[0];

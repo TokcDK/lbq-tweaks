@@ -287,7 +287,7 @@ kantei_nakami = function(){
 $gameParty.loseItem($dataItems[$gameVariables.value(19)], 1);
 if($dataItems[$gameVariables.value(19)].meta['鑑定']){
   var arr = $dataItems[$gameVariables.value(19)].meta['鑑定'].split(',');
-  var value2 = arr[Math.floor(Math.random() * arr.length)];
+  var value2 = arr[getRandomIndex(arr.length)];
 };
 if($dataItems[$gameVariables.value(19)].meta['鑑定道具']){var item = $dataItems};
 if($dataItems[$gameVariables.value(19)].meta['鑑定武器']){var item = $dataWeapons};
@@ -311,7 +311,7 @@ if(item == $dataWeapons && $dataItems[$gameVariables.value(19)].meta['鑑定カ�
           arr1.push(i);
     }}};
   }, this);
-  var value2 = arr1[Math.floor(Math.random() * arr1.length)];
+  var value2 = arr1[getRandomIndex(arr1.length)];
 };
 if(item == $dataArmors && $dataItems[$gameVariables.value(19)].meta['鑑定カテゴリ']){
   var arr1 = [];
@@ -324,7 +324,7 @@ if(item == $dataArmors && $dataItems[$gameVariables.value(19)].meta['鑑定カ�
           arr1.push(i);
     }}};
   }, this);
-  var value2 = arr1[Math.floor(Math.random() * arr1.length)];
+  var value2 = arr1[getRandomIndex(arr1.length)];
 };
 if(item == $dataItems && $dataItems[$gameVariables.value(19)].meta['鑑定カテゴリ']){
   var arr1 = [];
@@ -337,7 +337,7 @@ if(item == $dataItems && $dataItems[$gameVariables.value(19)].meta['鑑定カテ
           arr1.push(i);
     }}};
   }, this);
-  var value2 = arr1[Math.floor(Math.random() * arr1.length)];
+  var value2 = arr1[getRandomIndex(arr1.length)];
 };
 if($dataItems[$gameVariables.value(19)].meta['鑑定レアリティ版']){
   var arr1 = [];
@@ -350,7 +350,7 @@ if($dataItems[$gameVariables.value(19)].meta['鑑定レアリティ版']){
       }};
     };
   }, this);
-  var value2 = arr1[Math.floor(Math.random() * arr1.length)];
+  var value2 = arr1[getRandomIndex(arr1.length)];
 };
 $gameParty.gainItem(item[value2], 1);
 //一括鑑定時で条件分岐
@@ -485,7 +485,7 @@ if (itemUniqueMaterial === undefined || itemUniqueMaterial === null) return;
 const itemUniqueMaterialArray = item.meta['UniqueMaterial' + id10].split(',');
 const value1 = $gameSwitches.value(605) ? 
 Number(itemUniqueMaterialArray[0]) :
-itemUniqueMaterialArray[Math.floor(Math.random() * itemUniqueMaterialArray.length)];
+itemUniqueMaterialArray[getRandomIndex(itemUniqueMaterialArray.length)];
 
 const value5 = id11 == 0 ? valueHarvestingSkillId : valueMiningSkillId;
 item_getSkillLevel(value5,0,value1);
@@ -1110,7 +1110,7 @@ var start = 0;var end = 3;
 for (var i = start; i <= end; i++) {
   if($gameParty.battleMembers()[i]){
     var value2 = $gameParty.battleMembers()[i].actorId()
-    if(is_girl($gameActors.actor(value2))){
+    if(isGirl($gameActors.actor(value2))){
       value4 += 1;
       var actor = $gameActors.actor(value2);
       if($dataActors[value2].meta['IconGura']){
@@ -1757,7 +1757,7 @@ if(id3 == 2){
   AudioManager.playSe({"name":'ZH_Sexy',"volume":40,"pitch":130,"pan":0});
   $gameScreen.startFlash([255,119,255,200], 60);
   var arr1 = [1,2];
-  var value5 = arr1[Math.floor(Math.random() * arr1.length)];
+  var value5 = arr1[getRandomIndex(arr1.length)];
   if(value5 == 1){
     var value1 = 55;
     var value2 = 'ScreenBlackOut';
@@ -1791,7 +1791,7 @@ if(id3 == 2){
 };
 if(id3 == 3){
   var value2 = actor.skillMasteryLevel(valueBusinessSkillId) * 10;
-  var value3 = Math.floor( Math.random() * 101) + value2 + valueRandomSet;
+  var value3 = getRandomIndex(101) + value2 + valueRandomSet;
   if($gameMap.event(id1).event().meta['NoDiscount']){
     var value6 = 1000;
   } else {
@@ -1800,7 +1800,7 @@ if(id3 == 3){
   var value4 = `成功計算式：\\C[2]${value3}\\C[0] >= \\C[1]${value6}\\C[0] \n`;
   $gameVariables.setValue(21,$gameVariables.value(21)+value4);
     if(value3 >= value6){
-      var value5 = Math.floor( Math.random() * 11) + (actor.skillMasteryLevel(valueBusinessSkillId) * 5) + valueRandomSet;
+      var value5 = getRandomIndex(11) + (actor.skillMasteryLevel(valueBusinessSkillId) * 5) + valueRandomSet;
       $gameSelfSwitches.setVariableValue([$gameMap.mapId(), id1, 10], value5);
       valueCountSet3 = 1;
     };
@@ -2001,7 +2001,7 @@ for (var y = $gamePlayer.y-value4; y <= $gamePlayer.y+value4; y++) {
              y >= $gamePlayer.y+1 && event.direction() == 8 ||
              x <= $gamePlayer.x-1 && event.direction() == 6 ||
              x >= $gamePlayer.x+1 && event.direction() == 4 ){
-               var value5 = Math.floor( Math.random() * 101);
+               var value5 = getRandomIndex(101);
                var value6 = 0;
                //
                if(actor.isLearnedSkill(value10)){

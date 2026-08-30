@@ -3798,7 +3798,7 @@ TouchInput._onMouseUp = function(event) {
 TouchInput._onWheel = function(event) {
     this._events.wheelX += event.deltaX;
     this._events.wheelY += event.deltaY;
-    event.preventDefault();
+    //event.preventDefault(); // event.preventDefault();[Intervention] Unable to preventDefault inside passive event listener due to target being treated as passive. See https://www.chromestatus.com/feature/6662647093133312
 };
 
 /**

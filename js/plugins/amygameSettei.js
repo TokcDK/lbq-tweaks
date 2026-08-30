@@ -215,7 +215,6 @@ valueChainElement = 0;
 valueChainSkillId = 0;
 valuePicArr1= Array(15).fill(0);
 valuePicWait= 0;
-valuePicWait2= 0;
 valuePicWait2= 0;//original_scene系列用
 valueShakeArr1 = [];
 valueShakeArr2 = [];

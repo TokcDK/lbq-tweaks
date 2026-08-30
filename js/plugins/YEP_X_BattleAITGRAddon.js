@@ -14,7 +14,7 @@
  */
 AIManager.setProperTarget = function(group) {
     var action = this.action();
-    var randomTarget = group[Math.floor(Math.random() * group.length)];
+    var randomTarget = group[getRandomIndex(group.length)];
     if (!randomTarget) return action.setTarget(0);
     if (group.length <= 0) return action.setTarget(randomTarget.index());
     var line = this._aiTarget.toUpperCase();
@@ -120,7 +120,7 @@ AIManager.getParamId = function(string) {
 };
 
 AIManager.setHighestTgrTarget = function(group) {
-    var maintarget = group[Math.floor(Math.random() * group.length)];
+    var maintarget = group[getRandomIndex(group.length)];
     for (var i = 0; i < group.length; ++i) {
       var target = group[i];
       if (target.tgr > maintarget.tgr) {
@@ -131,7 +131,7 @@ AIManager.setHighestTgrTarget = function(group) {
 };
 
 AIManager.setLowestTgrTarget = function(group) {
-    var maintarget = group[Math.floor(Math.random() * group.length)];
+    var maintarget = group[getRandomIndex(group.length)];
     for (var i = 0; i < group.length; ++i) {
       var target = group[i];
       if (target.tgr < maintarget.tgr) {

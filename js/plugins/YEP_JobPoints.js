@@ -487,8 +487,12 @@ Game_Actor.prototype.initJp = function() {
 };
 
 Game_Actor.prototype.setJp = function(value, classId) {
+    if(!value) return; // asdf, dont think the re is reason to set 0 jp points
+
     value = parseInt(value);
-    if (value === NaN) value = 0;
+    if (!value) return; // asdf, was not parsed to int
+    
+    //if (value === NaN) value = 0;
     classId = classId || this.currentClass().id;
 		if (!this._jp) this._jp = {};
     if (!this._jp[classId]) this._jp[classId] = 0;
@@ -516,8 +520,12 @@ Game_Actor.prototype.jpRate = function() {
 };
 
 Game_Actor.prototype.gainJp = function(value, classId) {
+    if (!value) return; // asdf, dont think the re is reason to add 0 jp points
+
     value = parseInt(value);
-    if (value === NaN) value = 0;
+    if (!value) return; // asdf, was not parsed to int
+
+    //if (value === NaN) value = 0;
 		classId = classId || this.currentClass().id;
 		value = Math.floor(value * this.jpRate());
 		if ($gameParty.inBattle()) {
@@ -539,12 +547,16 @@ Game_Actor.prototype.isSublcassEarnJp = function() {
 Game_Actor.prototype.gainJpSubclass = function(value) {
     var classId = this.subclass().id;
     value = Math.round(value * Yanfly.Param.SubclassJp);
+    if(!value) return; // nothing to get for subclass
+
     this.setJp(this.jp(classId) + value, classId);
 };
 
-Game_Actor.prototype.loseJp = function(value, classId) {
-		classId = classId || this.currentClass().id;
-		this.setJp(this.jp(classId) - value, classId);
+Game_Actor.prototype.loseJp = function (value, classId) {
+  if (!value) return; // nothing to lose
+
+  classId = classId || this.currentClass().id;
+  this.setJp(this.jp(classId) - value, classId);
 };
 
 Game_Actor.prototype.battleJp = function() {
@@ -563,17 +575,19 @@ Yanfly.JP.Game_Actor_levelUp = Game_Actor.prototype.levelUp;
 Game_Actor.prototype.levelUp = function() {
     Yanfly.JP.Game_Actor_levelUp.call(this);
     if (this._preventJpLevelUpGain) return;
-    var user = this;
-    var target = this;
-    var a = this;
-    var b = this;
-    var level = this.level;
-    var code = Yanfly.Param.JpPerLevel;
+    //var user = this;
+    //var target = this;
+    //var a = this;
+    //var b = this;
+    //var level = this.level;
+    const code = Yanfly.Param.JpPerLevel;
+    let value;
     try {
-      var value = eval(code)
+      value = eval(code)
     } catch (e) {
-      var value = 0;
+      value = 0;
       Yanfly.Util.displayError(e, code, 'LEVEL UP JP FORMULA ERROR');
+      return;
     }
 		this.gainJp(value, this.currentClass().id);
 };
@@ -583,10 +597,10 @@ Game_Actor.prototype.levelUp = function() {
 //=============================================================================
 
 Game_Enemy.prototype.jp = function() {
-    var user = this;
-    var target = this;
-    var a = this;
-    var b = this;
+    //svar user = this;
+    //var target = this;
+    //var a = this;
+    //var b = this;
     var code = this.enemy().jp;
     try {
       return eval(code);

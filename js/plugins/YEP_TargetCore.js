@@ -701,7 +701,7 @@ Game_Action.prototype.makeCustomTargets = function() {
     var number = this.numTargets();
     var group = $gameParty.aliveMembers().concat($gameTroop.aliveMembers());
     for (var i = 0; i < number; ++i) {
-      var member = group[Math.floor(Math.random() * group.length)];
+      var member = group[getRandomIndex(group.length)];
       targets.push(member);
     }
   } else if (this.isForEverybody()) {

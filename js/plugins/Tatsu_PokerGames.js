@@ -1377,7 +1377,7 @@
             TatsuPokerGameP.rsfCnt &&
             TatsuPokerGameP.rsfPercentageSwitch > 0 &&
             $gameSwitches.value(TatsuPokerGameP.rsfPercentageSwitch)) {
-            let rand = Math.floor(Math.random() * 100);
+            let rand = getRandomIndex(100);
             if (rand <= $gameVariables.value(TatsuPokerGameP.rsfPercentage)) {
                 isRoyalStraightFlush = true;
                 if (TatsuPokerGameP.rsfCnt > 0 && $gameVariables.value(TatsuPokerGameP.rsfCnt) > 0) {

@@ -68,7 +68,7 @@ if(id7 >= 61 && id4 <= 3){
 var value4 = 0;
 var value5 = 0;
 if(id4 == 3){
-  var value6 = Math.floor( Math.random() * 3);
+  var value6 = getRandomIndex(3);
   var value3 = 1
   if(value6 == 0){var value4 = 50}
   if(value6 == 1){var value4 = -50}
@@ -147,7 +147,7 @@ if($gameScreen.picture(id1)){
   valuePicArr1[8] = id2;//x
   valuePicArr1[9] = id3;//y
   valuePicArr1[10] = id6;//ウェイト
-  valuePicArr1[12] = Math.floor( Math.random() * 51) + 100;//残像の-透明度
+  valuePicArr1[12] = getRandomIndex(51) + 100;//残像の-透明度
   valuePicArr1[13] = id4;//scale
   $gameScreen.showPicture_hue(valuePicArr1[0]-1,valuePicArr1[11],283,valuePicArr1[1],valuePicArr1[2],valuePicArr1[3],
   valuePicArr1[4],valuePicArr1[5],valuePicArr1[6]-valuePicArr1[12],0);
@@ -168,17 +168,17 @@ var valuePicVal1 = 0;
 var valuePicVal2 = 0;
 if(id1 == valueParallelPic1 || id1 == valueParallelPic2 || id1 == valueParallelPic3 || id1 == valueParallelPic4){
   if($gameScreen.picture(id1)){
-    if(valuePicArr1[8] >= 1){var valuePicVal1 = valuePicArr1[8] - Math.floor( Math.random() * 5)}
-    if(valuePicArr1[8] <= -1){var valuePicVal1 = valuePicArr1[8] + Math.floor( Math.random() * 5)}
-    if(valuePicArr1[9] >= 1){var valuePicVal2 = valuePicArr1[9] - Math.floor( Math.random() * 5)}
-    if(valuePicArr1[9] <= -1){var valuePicVal2 = valuePicArr1[9] + Math.floor( Math.random() * 5)}
-    if(valuePicArr1[8] == 0){var valuePicVal1 = Math.floor( Math.random() * 7) - 3}
-    if(valuePicArr1[9] == 0){var valuePicVal2 = Math.floor( Math.random() * 7) - 3}
+    if(valuePicArr1[8] >= 1){var valuePicVal1 = valuePicArr1[8] - getRandomIndex(5)}
+    if(valuePicArr1[8] <= -1){var valuePicVal1 = valuePicArr1[8] + getRandomIndex(5)}
+    if(valuePicArr1[9] >= 1){var valuePicVal2 = valuePicArr1[9] - getRandomIndex(5)}
+    if(valuePicArr1[9] <= -1){var valuePicVal2 = valuePicArr1[9] + getRandomIndex(5)}
+    if(valuePicArr1[8] == 0){var valuePicVal1 = getRandomIndex(7) - 3}
+    if(valuePicArr1[9] == 0){var valuePicVal2 = getRandomIndex(7) - 3}
     //curveFunctions.patternX = curveFunctions.getPattern('jump', [valuePicVal1]);
     //curveFunctions.patternY = curveFunctions.getPattern('jump', [valuePicVal2]);
     if(valuePicArr1[13] == 0){
-      var valuePicVal3 = Math.floor( Math.random() * 3);
-      var valuePicVal4 = Math.floor( Math.random() * 3);
+      var valuePicVal3 = getRandomIndex(3);
+      var valuePicVal4 = getRandomIndex(3);
     } else {
       var valuePicVal3 = valuePicArr1[13];
       var valuePicVal4 = valuePicArr1[13];
@@ -189,10 +189,10 @@ if(id1 == valueParallelPic1 || id1 == valueParallelPic2 || id1 == valueParallelP
     curveFunctions.patternY = curveFunctions.getPattern('spline', arr1);
     curveFunctions.patternScaleX = curveFunctions.getPattern('jump', [valuePicVal3]);
     curveFunctions.patternScaleY = curveFunctions.getPattern('jump', [valuePicVal4]);
-    valuePicWait += valuePicArr1[10] - Math.floor( Math.random() * 5);
+    valuePicWait += valuePicArr1[10] - getRandomIndex(5);
     $gameScreen.movePicture(valuePicArr1[0],valuePicArr1[1],valuePicArr1[2],valuePicArr1[3],
     valuePicArr1[4],valuePicArr1[5],valuePicArr1[6],valuePicArr1[7],valuePicWait);
-    var valuePicVal4 = Math.floor( Math.random() * 4) + 1;
+    var valuePicVal4 = getRandomIndex(4) + 1;
     var valuePicVal5 = valuePicWait - valuePicVal4;
     if(valuePicVal5 <= 1){var valuePicVal5 = 2}
     if(id1 == valueParallelPic1){
@@ -363,8 +363,8 @@ pic_eraseP = function(id1,array){
 
 picture_motion1("smooth",[0]);
 if(id1 == 1){
-  var value11 = Math.floor( Math.random() * 21) + 40;
-  var value12 = Math.floor( Math.random() * 4);
+  var value11 = getRandomIndex(21) + 40;
+  var value12 = getRandomIndex(4);
   var value13 = 0;
   var value14 = 0;
   if(value12 == 0){var value13 = 50}
@@ -525,62 +525,74 @@ for(var i = 1; i <= 250; i++){
 
 }
 
-//息継ぎ設定$gameVariables.value(300)
+//息継ぎ設定getPreviousTachiePicId()
 //[0]息遣いx軸[1]y軸,立ち絵x100y100[2]頻度,平時250戦時150[3]拡縮度x,立ち絵0.005[4]拡縮度y,立ち絵0.004
-tachie_bless = function(id11,id12){
+tachie_bless = function(pictureId, blessType) {
+  // Early exit if turning off breath effect
+  if (blessType === 0) {
+    UTSU.PictureBreath.off([pictureId]);
+    return;
+  }
 
-if(id12 == 0){
-  UTSU.PictureBreath.off([id11])
-} else {
-  let arr1 = [100,100,250,0.004,0.003];  //立ち絵用息遣い設定。基本状態
-    if(id12 == 1){
-      if($gameActors.actor($gameVariables.value(20)).isStateAffected(61)){
-        arr1 = [100,100,150,0.005,0.004];    //立ち絵用息遣い設定。発情状態
-      } else {
-        if($gameParty.inBattle()){
-          arr1 = [100,100,200,0.004,0.003];    //立ち絵用息遣い設定。戦闘状態
-        }
-      }
-    }
-    if(!$gameSwitches.value(45)){ //息継ぎカットスイッチ
-	 switch(id12){
-      case 1: {//立ち絵用
-        valueTachieBless = arr1;
-        UTSU.PictureBreath.on([id11], valueTachieBless[2]);
-          if($gameScreen.picture(45)){//オーラ
-            UTSU.PictureBreath.on(45, valueTachieBless[2]);
-          }
-		break;
-      }
-      case 6: {//イベントＣＧ
-        valueTachieBless6 = arr1;
-        UTSU.PictureBreath6.on([id11], valueTachieBless6[2]);
-		break;
-      }
-      case 5: {//イベントＣＧ
-        valueTachieBless5 = arr1;
-        UTSU.PictureBreath5.on([id11], valueTachieBless5[2]);
-		break;
-      }
-      case 4: {//顔グラ乳揺れ
-        valueTachieBless4 = arr1;
-        UTSU.PictureBreath4.on([id11], valueTachieBless4[2]);
-		break;
-      }
-      case 3: {//顔グラ身体
-        valueTachieBless3 = arr1;
-        UTSU.PictureBreath3.on([id11], valueTachieBless3[2]);
-		break;
-      }
-      case 2: {
-        valueTachieBless2 = arr1;
-        UTSU.PictureBreath2.on([id11], valueTachieBless2[2]);
-		break;
-      }
-	 }
-    }
-}
+  // Skip processing if breath cut switch is on
+  if ($gameSwitches.value(45)) {
+    return;
+  }
 
+  // Default breath settings [x, y, frequency, scaleX, scaleY]
+  const baseBreathSettings = [100, 100, 250, 0.004, 0.003]; // Base settings
+
+  // Apply breath effect based on type
+  switch (blessType) {
+    case 1: // Standing picture
+      // Only modify settings if it's the main character breath type
+      const actor = $gameActors.actor($gameVariables.value(20));
+
+      // Change settings based on state or battle
+      if (actor && actor.isStateAffected(61)) {
+        // Excited state
+        baseBreathSettings[2] = 150;  // Faster frequency
+        baseBreathSettings[3] = 0.005; // Higher X scale
+        baseBreathSettings[4] = 0.004; // Higher Y scale
+      } else if ($gameParty.inBattle()) {
+        // Battle state
+        baseBreathSettings[2] = 200; // Medium frequency
+      }
+
+      valueTachieBless = baseBreathSettings;
+      UTSU.PictureBreath.on([pictureId], valueTachieBless[2]);
+      
+      // If aura picture exists (45), apply same effect
+      if ($gameScreen.picture(45)) {
+        UTSU.PictureBreath.on([45], valueTachieBless[2]);
+      }
+      break;
+      
+    case 2:
+      valueTachieBless2 = baseBreathSettings;
+      UTSU.PictureBreath2.on([pictureId], valueTachieBless2[2]);
+      break;
+      
+    case 3: // Face graphic body
+      valueTachieBless3 = baseBreathSettings;
+      UTSU.PictureBreath3.on([pictureId], valueTachieBless3[2]);
+      break;
+      
+    case 4: // Face graphic breast movement
+      valueTachieBless4 = baseBreathSettings;
+      UTSU.PictureBreath4.on([pictureId], valueTachieBless4[2]);
+      break;
+      
+    case 5: // Event CG
+      valueTachieBless5 = baseBreathSettings;
+      UTSU.PictureBreath5.on([pictureId], valueTachieBless5[2]);
+      break;
+      
+    case 6: // Event CG
+      valueTachieBless6 = baseBreathSettings;
+      UTSU.PictureBreath6.on([pictureId], valueTachieBless6[2]);
+      break;
+  }
 }
 
 //CGでピストン表現hcg_piston(value1,7,1,1);
@@ -841,10 +853,10 @@ if($gameScreen.picture(id1)){
   if(!!$gameMap.event(1)) {
     $gameMap.event(1).forceMoveRoute({
     "list":[
-      {"code":45,"parameters": ["if($gameScreen.picture(valueCharaWaitCountarray1[1])){$gameScreen.movePicture(valueCharaWaitCountarray1[1],1,valueCharaWaitCountarray1[2],valueCharaWaitCountarray1[3],valueCharaWaitCountarray1[4],valueCharaWaitCountarray1[5],valueCharaWaitCountarray1[6],valueCharaWaitCountarray1[7],valueCharaWaitCountarray1[8] + (Math.floor( Math.random() * 11) - 5))}"]},
-      {"code":15, "parameters":[valueCharaWaitCountarray1[8] + (Math.floor( Math.random() * 11) - 5)]},
-      {"code":45,"parameters": ["if($gameScreen.picture(valueCharaWaitCountarray1[1])){$gameScreen.movePicture(valueCharaWaitCountarray1[1],1,valueCharaWaitCountarray2[2] + (Math.floor( Math.random() * 3) - 2),valueCharaWaitCountarray2[3] + (Math.floor( Math.random() * 3) - 2),valueCharaWaitCountarray2[4] + (Math.floor( Math.random() * 3) - 2),valueCharaWaitCountarray2[5] + (Math.floor( Math.random() * 3) - 2),valueCharaWaitCountarray2[6],valueCharaWaitCountarray2[7],valueCharaWaitCountarray1[8] + (Math.floor( Math.random() * 11) - 5))}"]},
-      {"code":15, "parameters":[valueCharaWaitCountarray1[8] + (Math.floor( Math.random() * 11) - 5)]},
+      {"code":45,"parameters": ["if($gameScreen.picture(valueCharaWaitCountarray1[1])){$gameScreen.movePicture(valueCharaWaitCountarray1[1],1,valueCharaWaitCountarray1[2],valueCharaWaitCountarray1[3],valueCharaWaitCountarray1[4],valueCharaWaitCountarray1[5],valueCharaWaitCountarray1[6],valueCharaWaitCountarray1[7],valueCharaWaitCountarray1[8] + (getRandomIndex(11) - 5))}"]},
+      {"code":15, "parameters":[valueCharaWaitCountarray1[8] + (getRandomIndex(11) - 5)]},
+      {"code":45,"parameters": ["if($gameScreen.picture(valueCharaWaitCountarray1[1])){$gameScreen.movePicture(valueCharaWaitCountarray1[1],1,valueCharaWaitCountarray2[2] + (getRandomIndex(3) - 2),valueCharaWaitCountarray2[3] + (getRandomIndex(3) - 2),valueCharaWaitCountarray2[4] + (getRandomIndex(3) - 2),valueCharaWaitCountarray2[5] + (getRandomIndex(3) - 2),valueCharaWaitCountarray2[6],valueCharaWaitCountarray2[7],valueCharaWaitCountarray1[8] + (getRandomIndex(11) - 5))}"]},
+      {"code":15, "parameters":[valueCharaWaitCountarray1[8] + (getRandomIndex(11) - 5)]},
     {"code":0}],"repeat":true,"skippable":true});
   }
 }

@@ -935,7 +935,7 @@ AIManager.setActionGroup = function(group) {
 AIManager.setProperTarget = function(group) {
     this.setActionGroup(group);
     var action = this.action();
-    var randomTarget = group[Math.floor(Math.random() * group.length)];
+    var randomTarget = group[getRandomIndex(group.length)];
     if (!randomTarget) return action.setTarget(0);
     if (group.length <= 0) return action.setTarget(randomTarget.index());
     var line = this._aiTarget.toUpperCase();
@@ -1039,7 +1039,7 @@ AIManager.getParamId = function(string) {
 };
 
 AIManager.setHighestHpRateTarget = function(group) {
-    var maintarget = group[Math.floor(Math.random() * group.length)];
+    var maintarget = group[getRandomIndex(group.length)];
     for (var i = 0; i < group.length; ++i) {
       var target = group[i];
       if (target.hp / target.mhp > maintarget.hp / maintarget.mhp) {
@@ -1050,7 +1050,7 @@ AIManager.setHighestHpRateTarget = function(group) {
 };
 
 AIManager.setHighestHpFlatTarget = function(group) {
-    var maintarget = group[Math.floor(Math.random() * group.length)];
+    var maintarget = group[getRandomIndex(group.length)];
     for (var i = 0; i < group.length; ++i) {
       var target = group[i];
       if (target.hp > maintarget.hp) maintarget = target;
@@ -1059,7 +1059,7 @@ AIManager.setHighestHpFlatTarget = function(group) {
 };
 
 AIManager.setLowestHpRateTarget = function(group) {
-    var maintarget = group[Math.floor(Math.random() * group.length)];
+    var maintarget = group[getRandomIndex(group.length)];
     for (var i = 0; i < group.length; ++i) {
       var target = group[i];
       if (target.hp / target.mhp < maintarget.hp / maintarget.mhp) {
@@ -1070,7 +1070,7 @@ AIManager.setLowestHpRateTarget = function(group) {
 };
 
 AIManager.setLowestHpFlatTarget = function(group) {
-    var maintarget = group[Math.floor(Math.random() * group.length)];
+    var maintarget = group[getRandomIndex(group.length)];
     for (var i = 0; i < group.length; ++i) {
       var target = group[i];
       if (target.hp < maintarget.hp) maintarget = target;
@@ -1079,7 +1079,7 @@ AIManager.setLowestHpFlatTarget = function(group) {
 };
 
 AIManager.setHighestMpRateTarget = function(group) {
-    var maintarget = group[Math.floor(Math.random() * group.length)];
+    var maintarget = group[getRandomIndex(group.length)];
     for (var i = 0; i < group.length; ++i) {
       var target = group[i];
       if (target.mp / target.mmp > maintarget.mp / maintarget.mmp) {
@@ -1090,7 +1090,7 @@ AIManager.setHighestMpRateTarget = function(group) {
 };
 
 AIManager.setHighestMpFlatTarget = function(group) {
-    var maintarget = group[Math.floor(Math.random() * group.length)];
+    var maintarget = group[getRandomIndex(group.length)];
     for (var i = 0; i < group.length; ++i) {
       var target = group[i];
       if (target.mp > maintarget.mp) maintarget = target;
@@ -1099,7 +1099,7 @@ AIManager.setHighestMpFlatTarget = function(group) {
 };
 
 AIManager.setLowestMpRateTarget = function(group) {
-    var maintarget = group[Math.floor(Math.random() * group.length)];
+    var maintarget = group[getRandomIndex(group.length)];
     for (var i = 0; i < group.length; ++i) {
       var target = group[i];
       if (target.mp / target.mmp < maintarget.mp / maintarget.mmp) {
@@ -1110,7 +1110,7 @@ AIManager.setLowestMpRateTarget = function(group) {
 };
 
 AIManager.setLowestMpFlatTarget = function(group) {
-    var maintarget = group[Math.floor(Math.random() * group.length)];
+    var maintarget = group[getRandomIndex(group.length)];
     for (var i = 0; i < group.length; ++i) {
       var target = group[i];
       if (target.mp < maintarget.mp) maintarget = target;
@@ -1119,7 +1119,7 @@ AIManager.setLowestMpFlatTarget = function(group) {
 };
 
 AIManager.setHighestParamTarget = function(group, id) {
-    var maintarget = group[Math.floor(Math.random() * group.length)];
+    var maintarget = group[getRandomIndex(group.length)];
     for (var i = 0; i < group.length; ++i) {
       var target = group[i];
       if (target.param(id) > maintarget.param(id)) maintarget = target;
@@ -1128,7 +1128,7 @@ AIManager.setHighestParamTarget = function(group, id) {
 };
 
 AIManager.setLowestParamTarget = function(group, id) {
-    var maintarget = group[Math.floor(Math.random() * group.length)];
+    var maintarget = group[getRandomIndex(group.length)];
     for (var i = 0; i < group.length; ++i) {
       var target = group[i];
       if (target.param(id) < maintarget.param(id)) maintarget = target;
@@ -1137,7 +1137,7 @@ AIManager.setLowestParamTarget = function(group, id) {
 };
 
 AIManager.setHighestLevelTarget = function(group, id) {
-    var maintarget = group[Math.floor(Math.random() * group.length)];
+    var maintarget = group[getRandomIndex(group.length)];
     for (var i = 0; i < group.length; ++i) {
       var target = group[i];
       if (target.level > maintarget.level) maintarget = target;
@@ -1146,7 +1146,7 @@ AIManager.setHighestLevelTarget = function(group, id) {
 };
 
 AIManager.setLowestLevelTarget = function(group, id) {
-    var maintarget = group[Math.floor(Math.random() * group.length)];
+    var maintarget = group[getRandomIndex(group.length)];
     for (var i = 0; i < group.length; ++i) {
       var target = group[i];
       if (target.level < maintarget.level) maintarget = target;
@@ -1155,7 +1155,7 @@ AIManager.setLowestLevelTarget = function(group, id) {
 };
 
 AIManager.setHighestMaxTpTarget = function(group, id) {
-    var maintarget = group[Math.floor(Math.random() * group.length)];
+    var maintarget = group[getRandomIndex(group.length)];
     for (var i = 0; i < group.length; ++i) {
       var target = group[i];
       if (target.tp > maintarget.maxTp()) maintarget = target;
@@ -1164,7 +1164,7 @@ AIManager.setHighestMaxTpTarget = function(group, id) {
 };
 
 AIManager.setLowestMaxTpTarget = function(group, id) {
-    var maintarget = group[Math.floor(Math.random() * group.length)];
+    var maintarget = group[getRandomIndex(group.length)];
     for (var i = 0; i < group.length; ++i) {
       var target = group[i];
       if (target.tp < maintarget.maxTp()) maintarget = target;
@@ -1173,7 +1173,7 @@ AIManager.setLowestMaxTpTarget = function(group, id) {
 };
 
 AIManager.setHighestTpTarget = function(group, id) {
-    var maintarget = group[Math.floor(Math.random() * group.length)];
+    var maintarget = group[getRandomIndex(group.length)];
     for (var i = 0; i < group.length; ++i) {
       var target = group[i];
       if (target.tp > maintarget.tp) maintarget = target;
@@ -1182,7 +1182,7 @@ AIManager.setHighestTpTarget = function(group, id) {
 };
 
 AIManager.setLowestTpTarget = function(group, id) {
-    var maintarget = group[Math.floor(Math.random() * group.length)];
+    var maintarget = group[getRandomIndex(group.length)];
     for (var i = 0; i < group.length; ++i) {
       var target = group[i];
       if (target.tp < maintarget.tp) maintarget = target;
@@ -1191,7 +1191,7 @@ AIManager.setLowestTpTarget = function(group, id) {
 };
 
 AIManager.setRandomTarget = function(group) {
-    var target = group[Math.floor(Math.random() * group.length)];
+    var target = group[getRandomIndex(group.length)];
     this.action().setTarget(target.index())
 };
 

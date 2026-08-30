@@ -831,7 +831,7 @@ BattleManager.actionMotionTarget = function(name, actionArgs) {
     } else if (['randattack'].contains(cmd)) {
       var motions = ['thrust', 'swing', 'missile'];
       movers.forEach(function(mover) {
-        var motion = motions[Math.floor(Math.random() * motions.length)];
+        var motion = motions[getRandomIndex(motions.length)];
         mover.forceMotion(motion);
       });
       return false;
