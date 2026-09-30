@@ -582,12 +582,17 @@
     };
 
     Game_Map.prototype.updatePictureCommonEvents = function() {
-        this._pictureCommonEvents.forEach(function(event) {
+        // Called from Game_Map.updateEvents every frame, and the list lives on
+        // $gameMap, so rebuilding it with filter() allocated a fresh array (plus two
+        // closures) every frame and churned the save graph. Compact in place instead.
+        var list = this._pictureCommonEvents;
+        var kept = 0;
+        for (var i = 0; i < list.length; i++) {
+            var event = list[i];
             event.update();
-        });
-        this._pictureCommonEvents = this._pictureCommonEvents.filter(function(event) {
-            return event.isRunning();
-        })
+            if (event.isRunning()) list[kept++] = event;
+        }
+        list.length = kept;
     };
 
     //=============================================================================
@@ -1094,16 +1099,21 @@
         this._updateBindKeyState();
     };
 
+    // Hoisted so the callback is allocated once at load rather than on every
+    // Input.update frame. Map.forEach still drives it, so deleting entries during
+    // the walk behaves exactly as before.
+    function updateBindKeyStateEntry(frame, keyName) {
+        frame--;
+        if (frame === 0 || !this._currentState[keyName]) {
+            this._currentState[keyName] = false;
+            this._bindKeyStateFrames.delete(keyName);
+        } else {
+            this._bindKeyStateFrames.set(keyName, frame);
+        }
+    }
+
     Input._updateBindKeyState = function() {
-        this._bindKeyStateFrames.forEach(function(frame, keyName) {
-            frame--;
-            if (frame === 0 || !this._currentState[keyName]) {
-                this._currentState[keyName] = false;
-                this._bindKeyStateFrames.delete(keyName);
-            } else {
-                this._bindKeyStateFrames.set(keyName, frame);
-            }
-        }, this);
+        this._bindKeyStateFrames.forEach(updateBindKeyStateEntry, this);
     };
 
     //=============================================================================

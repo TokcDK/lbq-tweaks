@@ -49,9 +49,11 @@
 
     //
     Game_Troop.prototype.updateCommonEvents = function() {
-        this._commonEvents.forEach(function(event) {
-            event.update();
-        });
+        var list = this._commonEvents;
+        if (!list) return;
+        for (var i = 0; i < list.length; i++) {
+            list[i].update();
+        }
     };
 
     //

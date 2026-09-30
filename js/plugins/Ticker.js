@@ -110,6 +110,10 @@
       this._backSprite.opacity = (this.frameCount / TOGGLE_DURATION) * BACKGROUND_OPACITY;
       this.contentsOpacity = (this.frameCount / TOGGLE_DURATION) * 255;
       this.textX = ((1 - this.frameCount * 2 / TOGGLE_DURATION) * 100).clamp(0, 100);
+      // Only the slide-in phase moves the text, so only that phase needs a redraw.
+      // Refreshing here unconditionally used to clear the full-width contents
+      // bitmap and re-lay-out the text every frame for the whole display duration.
+      this.refresh();
       if(this.frameCount == TOGGLE_DURATION){
         this.isShowing = false;
         this.isDisplaying = true;
@@ -132,7 +136,6 @@
         };
       }
     }
-    this.refresh();
   };
 
 })();

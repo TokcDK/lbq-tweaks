@@ -784,6 +784,7 @@ Game_Map.prototype.setup = function(mapId) {
     Alias.GaMa_setup.apply(this, arguments);
     this.darknessOpacity = 0;
     this._mapLights = {};
+    this._mapLightList = [];
     var darkness = MPPlugin.MapMetadata.Darkness || "Darkness";
     var mapLight = MPPlugin.MapMetadata.MapLight || "MapLight";
     for (var name in $dataMap.meta) {
@@ -818,26 +819,42 @@ Game_Map.prototype.allMapLights = function() {
 };
 
 Game_Map.prototype.showMapLight = function(id, x, y) {
-    if (!this._mapLights[id]) this._mapLights[id] = new MppGame_MapLight();
+    if (!this._mapLights[id]) {
+        this._mapLights[id] = new MppGame_MapLight();
+        this._mapLightList.push(this._mapLights[id]);
+    }
     this._mapLights[id].setPos(x, y);
 };
 
 Game_Map.prototype.moveMapLight = function(id, r, c, o, a) {
-    if (!this._mapLights[id]) this._mapLights[id] = new MppGame_MapLight();
+    if (!this._mapLights[id]) {
+        this._mapLights[id] = new MppGame_MapLight();
+        this._mapLightList.push(this._mapLights[id]);
+    }
     this._mapLights[id].move(r, c, o, a);
 };
 
 Game_Map.prototype.eraseMapLight = function(id) {
+    var light = this._mapLights[id];
     delete this._mapLights[id];
+    var list = this._mapLightList;
+    if (light && list) {
+        var idx = list.indexOf(light);
+        if (idx >= 0) list.splice(idx, 1);
+    }
 };
 
 //623
 Alias.GaMa_update = Game_Map.prototype.update;
 Game_Map.prototype.update = function(sceneActive) {
     Alias.GaMa_update.apply(this, arguments);
-    var mapLights = this._mapLights;
-    for (var id in mapLights) {
-        mapLights[id].update();
+    // Walk the dense list maintained by show/move/eraseMapLight instead of doing a
+    // for..in over the id-keyed object every frame. Same lights, same order of
+    // creation, no per-frame key enumeration.
+    var list = this._mapLightList;
+    if (!list) return;
+    for (var i = 0; i < list.length; i++) {
+        list[i].update();
     }
 };
 

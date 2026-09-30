@@ -778,11 +778,20 @@ function Game_PrefabEvent() {
     };
 
     Spriteset_Map.prototype.updatePrefabEvent = function() {
-        $gameMap.getPrefabEvents().forEach(function(event) {
-            if (!event.isSpritePrepared()) {
-                this.makePrefabEventSprite(event);
+        // This runs every frame. $gameMap.events() rebuilds a filtered copy of the
+        // sparse _events array on every call and getPrefabEvents() filters it again,
+        // so the old chain allocated two arrays plus two closures per frame on top of
+        // the scan. Walk the live _events array instead; entries are sparse, hence the
+        // truthiness test, and the scan order is unchanged.
+        var events = $gameMap._events;
+        if (events) {
+            for (var e = 0; e < events.length; e++) {
+                var event = events[e];
+                if (event && event.isPrefab() && !event.isSpritePrepared()) {
+                    this.makePrefabEventSprite(event);
+                }
             }
-        }.bind(this));
+        }
         for (var i = 0, n = this._characterSprites.length; i < n; i++) {
             if (this._characterSprites[i].isCharacterExtinct()) {
                 this.removePrefabEventSprite(i--);

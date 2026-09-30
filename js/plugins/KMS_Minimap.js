@@ -873,17 +873,19 @@ Sprite_Minimap.prototype.updatePassageSprite = function()
  */
 Sprite_Minimap.prototype.updateObjectSprites = function()
 {
-    this._objectSprites.forEach(function(sprite)
+    var sprites = this._objectSprites;
+    for (var i = 0; i < sprites.length; i++)
     {
+        var sprite = sprites[i];
         var obj = sprite.getObject();
         if (!obj || !this.isInDrawRange(obj.x - 1, obj.y - 1))
         {
             sprite.visible = false;
-            return;
+            continue;
         }
 
         sprite.updatePosition(this._drawRange.begin, this._scrollDiff);
-    }, this);
+    }
 };
 
 /**

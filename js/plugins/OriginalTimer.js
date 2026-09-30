@@ -475,7 +475,6 @@
         if (SwitchState = 'ON') SwitchState = true;
         if (SwitchState = 'OFF') SwitchState = false;
         if (SwitchState = 'REVERSE'){
-          console.log(SwitchState)
           if ($gameSwitches._data[SwitchNumber] == null) SwitchState = false;
           SwitchState = !$gameSwitches._data[SwitchNumber]
         }

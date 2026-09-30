@@ -1397,11 +1397,14 @@ var $dataContainerProperties = null;
     };
 
     Scene_Base.prototype.updateCustomPicture = function() {
-        this._customPictures.forEach(function(picture) {
+        // Per frame: iterate in place instead of allocating a callback each time.
+        var pictures = this._customPictures;
+        for (var i = 0; i < pictures.length; i++) {
+            var picture = pictures[i];
             if (picture.switchId > 0) {
                 picture.visible = $gameSwitches.value(picture.switchId);
             }
-        });
+        }
     };
 
     Scene_Base.prototype.updateCustomWindow = function() {
@@ -1415,7 +1418,10 @@ var $dataContainerProperties = null;
     };
 
     Scene_Base.prototype.updateCustomWindowVisible = function() {
-        this._customWindows.forEach(function(windowItem) {
+        // Per frame: iterate in place instead of allocating a callback each time.
+        var windows = this._customWindows;
+        for (var i = 0; i < windows.length; i++) {
+            var windowItem = windows[i];
             if (windowItem.switchId > 0) {
                 if ($gameSwitches.value(windowItem.switchId)) {
                     windowItem.show();
@@ -1423,7 +1429,7 @@ var $dataContainerProperties = null;
                     windowItem.hide();
                 }
             }
-        }, this);
+        }
     };
 
     //=============================================================================

@@ -62,13 +62,19 @@
     };
 
     Game_System.prototype.updateMessageCommonEvents = function() {
-        if (!this._messageCommonEvents || this._messageCommonEvents.length === 0) return;
-        this._messageCommonEvents.forEach(function(interpreter) {
+        var list = this._messageCommonEvents;
+        if (!list || list.length === 0) return;
+        // Compact in place instead of rebuilding the array every frame: this runs
+        // once per frame from Window_Message.update, and the array lives on
+        // $gameSystem, so a fresh array each frame was also churned through
+        // JsonEx on every save.
+        var kept = 0;
+        for (var i = 0; i < list.length; i++) {
+            var interpreter = list[i];
             interpreter.update();
-        });
-        this._messageCommonEvents = this._messageCommonEvents.filter(function(interpreter) {
-            return interpreter.isRunning();
-        });
+            if (interpreter.isRunning()) list[kept++] = interpreter;
+        }
+        list.length = kept;
     };
 
     //=============================================================================
