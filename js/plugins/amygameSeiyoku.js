@@ -53,8 +53,8 @@ h_BattleEcstasyDirect = function () {
     var ecstasyLevelTag = 'Low'; var ecstasyRank = 1;
     //if($gameActors.actor($gameVariables.value(20)).isLearnedSkill(62)){var ecstasyLevelTag = 'Middle';var ecstasyRank = 2};
     //if($gameActors.actor($gameVariables.value(20)).isLearnedSkill(65)){var ecstasyLevelTag = 'Hi';var ecstasyRank = 3};
-    var arr1 = $dataActors[$gameVariables.value(20)].meta['SexualZettyou' + ecstasyLevelTag].split(',');
-    var ecstasyValue = arr1[getRandomIndex(arr1.length)];
+    var ecstasyCandidateValues = $dataActors[$gameVariables.value(20)].meta['SexualZettyou' + ecstasyLevelTag].split(',');
+    var ecstasyValue = ecstasyCandidateValues[getRandomIndex(ecstasyCandidateValues.length)];
     var ecstasyName = `${actor.name()}`;
     $gameVariables.setValue(21, `\\nw[${ecstasyName}]${ecstasyValue}`);
     var ecstasyValue = 'Zev_BattleEcstasy' + $gameVariables.value(20) + '_' + ecstasyRank;
@@ -68,23 +68,23 @@ h_BattleEcstasyDirect = function () {
 };
 
 //相手とＨ済みの場合に表示するためのスクリプト
-h_keikenhyouji1 = function (id2, id1) {
+h_keikenhyouji1 = function (resultVarId, partnerWeaponId) {
 
-  var partnerWeaponId = id1;
-  if (!$dataWeapons[id1] || !$gameActors.actor(21)) return;
-  if ($gameVariables.value(353)[id1 - 300] != 0) {
-    $gameActors.actor(21).setName(`\x1bnnp[${id1}]`);
+  var partnerWeaponId = partnerWeaponId;
+  if (!$dataWeapons[partnerWeaponId] || !$gameActors.actor(21)) return;
+  if ($gameVariables.value(353)[partnerWeaponId - 300] != 0) {
+    $gameActors.actor(21).setName(`\x1bnnp[${partnerWeaponId}]`);
   } else {
-    $gameActors.actor(21).setName($dataWeapons[id1].name);
+    $gameActors.actor(21).setName($dataWeapons[partnerWeaponId].name);
   };
-  valueScenePartnerId = id1;
+  valueScenePartnerId = partnerWeaponId;
   if ($gameVariables.value($gameVariables.value(20) + 360)[partnerWeaponId - 100] >= 1) {
     h_partnerFullName(22, partnerWeaponId);
-    var partnerDescription = $dataWeapons[id1].description;
+    var partnerDescription = $dataWeapons[partnerWeaponId].description;
     if (partnerDescription == 0) {
       var partnerInfoText = `\n`;
     } else {
-      var partnerInfoText = `${$dataWeapons[id1].description}\n`;
+      var partnerInfoText = `${$dataWeapons[partnerWeaponId].description}\n`;
     };
     var partnerName = $gameVariables.value(22);
     partnerInfoText += `\n${partnerName}との\\C[27]Ｈ回数：${$gameVariables.value($gameVariables.value(20) + 360)[partnerWeaponId - 100]}\\C[0]`
@@ -94,27 +94,27 @@ h_keikenhyouji1 = function (id2, id1) {
     if ($gameVariables.value($gameVariables.value(20) + 360)[partnerWeaponId] >= 1) {
       partnerInfoText += `　${partnerName}の子を宿しているかも知れない…。`
     };
-    $gameVariables.setValue(id2, `【${partnerInfoText}】`);
+    $gameVariables.setValue(resultVarId, `【${partnerInfoText}】`);
   } else {
-    $gameVariables.setValue(id2, 0);
+    $gameVariables.setValue(resultVarId, 0);
   };
 
 };
 
 //相手とＨ済みの場合に表示するためのスクリプト
-h_keikenhyouji2 = function (id2, id1) {
+h_keikenhyouji2 = function (textVarId, showFlag) {
 
-  if (id2 != 0) {
-    if (id1 == 1) {
-      if ($gameVariables.value(id2) != 0) {
+  if (textVarId != 0) {
+    if (showFlag == 1) {
+      if ($gameVariables.value(textVarId) != 0) {
         $gameScreen.dWindowFrame = 'ON';
-        $gameScreen.setDTextPicture($gameVariables.value(id2), 25);
+        $gameScreen.setDTextPicture($gameVariables.value(textVarId), 25);
         $gameScreen.showPicture(150, "", 0, 100, 100, 100, 100, 0, 0);
         $gameScreen.movePicture(150, 0, 10, 100, 100, 100, 255, 0, 30);
       };
     };
   };
-  if (id1 == 0) {
+  if (showFlag == 0) {
     pic_move1(150, -100, 100, 100, 100, 0, 60);
   };
 
@@ -151,34 +151,34 @@ h_hennreki = function () {
 };
 
 //h_partnerFullName(22,$gameVariables.value(340)); //代入変数id,相手id指定変数
-h_partnerFullName = function (id3, id4) {
+h_partnerFullName = function (resultVarId, partnerWeaponId) {
 
-  var partnerNameText = `\\C[23]${$dataWeapons[id4].name}\\C[0]`;
-  if ($dataWeapons[id4].meta['FamilyName']) {
-    partnerNameText += `\\C[23]=${$dataWeapons[id4].meta['FamilyName']}\\C[0]`;
+  var partnerNameText = `\\C[23]${$dataWeapons[partnerWeaponId].name}\\C[0]`;
+  if ($dataWeapons[partnerWeaponId].meta['FamilyName']) {
+    partnerNameText += `\\C[23]=${$dataWeapons[partnerWeaponId].meta['FamilyName']}\\C[0]`;
   };
-  if ($dataWeapons[id4].meta['FamilyNameKanji']) {
-    var partnerNameText = `\\C[23]${$dataWeapons[id4].meta['FamilyNameKanji']}\\C[0] ${partnerNameText}`;
+  if ($dataWeapons[partnerWeaponId].meta['FamilyNameKanji']) {
+    var partnerNameText = `\\C[23]${$dataWeapons[partnerWeaponId].meta['FamilyNameKanji']}\\C[0] ${partnerNameText}`;
   };
-  if ($dataWeapons[id4].meta['SubstitutionActorId']) {
-    var substitutionActorId = Number($dataWeapons[id4].meta['SubstitutionActorId']);
+  if ($dataWeapons[partnerWeaponId].meta['SubstitutionActorId']) {
+    var substitutionActorId = Number($dataWeapons[partnerWeaponId].meta['SubstitutionActorId']);
     var partnerNameText = `\x1bSET[${substitutionActorId}]`;
   };
-  $gameVariables.setValue(id3, partnerNameText);
+  $gameVariables.setValue(resultVarId, partnerNameText);
 
 };
 
 //Ｈ経験値更新
-h_exp = function (id1, picname, id2, hideFlag, simpleFlag, pastSceneFlag) {
+h_exp = function (actorId, picname, partnerWeaponId, hideFlag, simpleFlag, pastSceneFlag) {
 
   $gameVariables.setValue(339, 0);
-  $gameVariables.setValue(20, id1);
+  $gameVariables.setValue(20, actorId);
   $gameVariables.setValue(193, picname);
   $gameVariables.value($gameVariables.value(20) + 380)[46] = $gameVariables.value(193);
   $gameSwitches.setValue(121, hideFlag);//非表示
   $gameSwitches.setValue(122, simpleFlag);//性欲性感のみ簡易主にアイテム使用時
   $gameSwitches.setValue(123, pastSceneFlag);//過去シーンならオン
-  $gameVariables.setValue(340, id2);//301汎用
+  $gameVariables.setValue(340, partnerWeaponId);//301汎用
   $gameVariables.setValue(94, $gameActors.actor($gameVariables.value(20)).name());
   $gameVariables.setValue(22, $dataWeapons[$gameVariables.value(340)].name);
   if ($dataWeapons[$gameVariables.value(340)].meta['NumberOfPeople']) {
@@ -188,65 +188,65 @@ h_exp = function (id1, picname, id2, hideFlag, simpleFlag, pastSceneFlag) {
 };
 
 //性経験値加算式
-h_exp1 = function (id0, id1, id2, id3, id4, id5) {
+h_exp1 = function (expVar406, expVar409, expVar408, expVar407, expVar413, expVar414) {
 
-  $gameVariables.setValue(406, id0);
-  $gameVariables.setValue(409, id1);
-  $gameVariables.setValue(408, id2);
-  $gameVariables.setValue(407, id3);
-  $gameVariables.setValue(413, id4);
-  $gameVariables.setValue(414, id5);
+  $gameVariables.setValue(406, expVar406);
+  $gameVariables.setValue(409, expVar409);
+  $gameVariables.setValue(408, expVar408);
+  $gameVariables.setValue(407, expVar407);
+  $gameVariables.setValue(413, expVar413);
+  $gameVariables.setValue(414, expVar414);
 
 };
 
 h_exp1ex = function (id) {
 
   for (var i = 1; i <= id; i++) {
-    var arr1 = [6, 6, 6, 6, 7, 8, 8];
-    var randomArrIndex = arr1[getRandomIndex(arr1.length)];
+    var ecstasySlotCandidates = [6, 6, 6, 6, 7, 8, 8];
+    var randomArrIndex = ecstasySlotCandidates[getRandomIndex(ecstasySlotCandidates.length)];
     $gameVariables.setValue(400 + randomArrIndex, $gameVariables.value(400 + randomArrIndex) + 1);
   };
 
 };
 
-h_exp2 = function (id0, id1, id2, id3, id5, id4) {
+h_exp2 = function (expVar417, expVar418, expVar420, expVar419, expVar430, expVar410) {
 
-  $gameVariables.setValue(417, id0);
-  $gameVariables.setValue(418, id1);
-  $gameVariables.setValue(420, id2);
-  $gameVariables.setValue(419, id3);
-  $gameVariables.setValue(430, id5);
-  $gameVariables.setValue(410, id4);
-
-};
-
-h_exp3 = function (id0, id1, id2, id3, id4, id5, id6, id7, id8, id9, id10) {
-
-  $gameVariables.setValue(421, id0);
-  $gameVariables.setValue(422, id1);
-  $gameVariables.setValue(423, id2);
-  $gameVariables.setValue(424, id3);
-  $gameVariables.setValue(425, id4);
-  $gameVariables.setValue(426, id5);
-  $gameVariables.setValue(415, id6);
-  $gameVariables.setValue(428, id7);
-  $gameVariables.setValue(411, id8);
-  $gameVariables.setValue(412, id9);
-  $gameVariables.setValue(416, id10);
+  $gameVariables.setValue(417, expVar417);
+  $gameVariables.setValue(418, expVar418);
+  $gameVariables.setValue(420, expVar420);
+  $gameVariables.setValue(419, expVar419);
+  $gameVariables.setValue(430, expVar430);
+  $gameVariables.setValue(410, expVar410);
 
 };
 
-h_exp4 = function (id0, id1, id2, id3, id4, id5, id6, id7, id8) {
+h_exp3 = function (expVar421, expVar422, expVar423, expVar424, expVar425, expVar426, expVar415, expVar428, expVar411, expVar412, expVar416) {
 
-  $gameVariables.setValue(431, id0);
-  $gameVariables.setValue(432, id1);
-  $gameVariables.setValue(433, id2);
-  $gameVariables.setValue(434, id3);
-  $gameVariables.setValue(435, id4);
-  $gameVariables.setValue(436, id5);
-  $gameVariables.setValue(437, id6);
-  $gameVariables.setValue(438, id7);
-  $gameVariables.setValue(427, id8);
+  $gameVariables.setValue(421, expVar421);
+  $gameVariables.setValue(422, expVar422);
+  $gameVariables.setValue(423, expVar423);
+  $gameVariables.setValue(424, expVar424);
+  $gameVariables.setValue(425, expVar425);
+  $gameVariables.setValue(426, expVar426);
+  $gameVariables.setValue(415, expVar415);
+  $gameVariables.setValue(428, expVar428);
+  $gameVariables.setValue(411, expVar411);
+  $gameVariables.setValue(412, expVar412);
+  $gameVariables.setValue(416, expVar416);
+
+};
+
+h_exp4 = function (expVar431, expVar432, expVar433, expVar434, expVar435, expVar436, expVar437, expVar438, expVar427) {
+
+  $gameVariables.setValue(431, expVar431);
+  $gameVariables.setValue(432, expVar432);
+  $gameVariables.setValue(433, expVar433);
+  $gameVariables.setValue(434, expVar434);
+  $gameVariables.setValue(435, expVar435);
+  $gameVariables.setValue(436, expVar436);
+  $gameVariables.setValue(437, expVar437);
+  $gameVariables.setValue(438, expVar438);
+  $gameVariables.setValue(427, expVar427);
 
 };
 
@@ -328,12 +328,12 @@ actor_Hstateshyouji1 = function () {
   WindowManager.show(2, windowPos2, 200, 389, 390);
   var actor = $gameActors.actor($gameVariables.value(20));
   var value = $gameVariables.value($gameVariables.value(20) + 380);
-  var id1 = 400;
+  var masteryVarOffset = 400;
   //性欲度表示用情報を書き込み
   var start = 1; var end = 40;
   for (var i = start; i <= end; i++) {
-    if ($gameVariables.value(id1 + i) >= 1) {
-      var displayValue = `\\C[2]+${$gameVariables.value(id1 + i)}\\C[0]`;
+    if ($gameVariables.value(masteryVarOffset + i) >= 1) {
+      var displayValue = `\\C[2]+${$gameVariables.value(masteryVarOffset + i)}\\C[0]`;
     } else {
       var displayValue = '　';
     }
@@ -342,19 +342,19 @@ actor_Hstateshyouji1 = function () {
   var displayText = `\\fs[24]`;
   var list = [6, 7, 8, 9, 10, 11, 12, 16, 13, 14, 15];
   list.forEach(function (i) {
-    displayText += `\\C[27]${$dataSystem.variables[id1 + i]}\\C[0]${value[i]}回${eval("valueWordSet" + i)}\n`;
+    displayText += `\\C[27]${$dataSystem.variables[masteryVarOffset + i]}\\C[0]${value[i]}回${eval("valueWordSet" + i)}\n`;
   }, this);
   WindowManager.drawText(1, displayText);
 
   var stateDisplayText = `\\fs[24]`;
   var list = [17, 18, 19, 30, 20, 21, 22, 23, 24, 25, 26, 28];
   list.forEach(function (i) {
-    stateDisplayText += `\\C[27]${$dataSystem.variables[id1 + i]}\\C[0]${value[i]}回${eval("valueWordSet" + i)}\n`;
+    stateDisplayText += `\\C[27]${$dataSystem.variables[masteryVarOffset + i]}\\C[0]${value[i]}回${eval("valueWordSet" + i)}\n`;
   }, this);
   WindowManager.drawText(2, stateDisplayText);
 
   if (!$gameSwitches.value(130)) {
-    var arr1 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];//開発度ランク0では未開発表示
+    var masteryTextBySlot = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];//開発度ランク0では未開発表示
     var start = 51; var end = 59;
     for (var i = start; i <= end; i++) {
       if (actor.skillMasteryLevel(i) >= 1 && actor.isLearnedSkill(i)) {
@@ -365,9 +365,9 @@ actor_Hstateshyouji1 = function () {
         if (actor.skillMasteryLevel(i) == 5) { var stateDisplayText = `\\C[27][A]\\C[0]` };
         if (actor.skillMasteryLevel(i) >= 6) { var stateDisplayText = `\\C[30][S]\\C[0]` };
         var displayValue = i - 20;
-        arr1[i - 50] = `\x1bI[${$dataSkills[i].iconIndex}]${stateDisplayText}:${actor.skillMasteryUses(i)}${eval("valueWordSet" + displayValue)}`;
+        masteryTextBySlot[i - 50] = `\x1bI[${$dataSkills[i].iconIndex}]${stateDisplayText}:${actor.skillMasteryUses(i)}${eval("valueWordSet" + displayValue)}`;
       } else {
-        arr1[i - 50] = `\\C[1]未開発\\C[0]\\I[0] `;
+        masteryTextBySlot[i - 50] = `\\C[1]未開発\\C[0]\\I[0] `;
       };
     };
     if (!$gameSwitches.value(496) && !$gameSwitches.value(130) && $gameVariables.value(193) == 0) {
@@ -376,11 +376,11 @@ actor_Hstateshyouji1 = function () {
       var displayText = 430;
     };
     WindowManager.show(3, displayText, 0, 338, 202);
-    WindowManager.drawText(3, `\\fs[22][開発度]\\I[0]${arr1[1]}
-${arr1[2]} ${arr1[3]}
-${arr1[4]} ${arr1[5]}
-${arr1[6]} ${arr1[7]}
-${arr1[8]} ${arr1[9]}`);
+    WindowManager.drawText(3, `\\fs[22][開発度]\\I[0]${masteryTextBySlot[1]}
+${masteryTextBySlot[2]} ${masteryTextBySlot[3]}
+${masteryTextBySlot[4]} ${masteryTextBySlot[5]}
+${masteryTextBySlot[6]} ${masteryTextBySlot[7]}
+${masteryTextBySlot[8]} ${masteryTextBySlot[9]}`);
   };
 };
 
@@ -795,7 +795,7 @@ jusei_clear = function () {
 };
 
 //☆☆Ｈステのうち、身長等
-hstates_heights = function (id, id2) {
+hstates_heights = function (id, resultVarId) {
 
   var actor1 = $gameActors.actor(id);
   if (actor1 && isGirl(actor1)) {
@@ -892,7 +892,7 @@ hstates_heights = function (id, id2) {
     if ($gameVariables.value(id + 380)[6] >= 1000) {
       var virginLabel = `\\C[30][中古]\\C[0]`
     };
-    $gameVariables.setValue(id2,
+    $gameVariables.setValue(resultVarId,
       `\\fs[25]\\C[16]HT:\\C[0]${heightCm}\\C[16]cm\\C[0]　\\C[16]WT:\\C[0]${weightKg}\\C[16]kg\\C[0]
 \\C[16]Cup:\\C[0][${cupSize}] \\C[16]B:\\C[0]${bustCm} \\C[16]W:\\C[0]${waistCm} \\C[16]H:\\C[0]${hipCm}
 ${bodyStyleLabel}
@@ -906,23 +906,23 @@ ${reproductionLabel}`);
     $gameVariables.value(id + 380)[56] = cupSize;
   } else {
     if ($dataActors[id] && $dataActors[id].meta['BodyStyle']) {
-      $gameVariables.setValue(id2, `\\C[21][${$dataActors[id].meta['BodyStyle']}]\\C[0]`);
+      $gameVariables.setValue(resultVarId, `\\C[21][${$dataActors[id].meta['BodyStyle']}]\\C[0]`);
     } else {
-      $gameVariables.setValue(id2, `NoData`);
+      $gameVariables.setValue(resultVarId, `NoData`);
     };
   };
 
 };
 
 //☆☆Hスキル習得通常パターン
-hskill_learn = function (id1) {
+hskill_learn = function (learnModeId) {
 
   var actor = $gameActors.actor($gameVariables.value(20));
   if (!actor) return;
   var list = valueGetHskillLearn;
   list.forEach(function (i) {
-    if (id1 == 1) { var valueLearn = !actor.isLearnedSkill(i) };
-    if (id1 == 2) { var valueLearn = actor.isLearnedSkill(i) };
+    if (learnModeId == 1) { var valueLearn = !actor.isLearnedSkill(i) };
+    if (learnModeId == 2) { var valueLearn = actor.isLearnedSkill(i) };
     if (valueLearn) {
       $gameVariables.setValue(641, 0);
       if ($gameVariables.value(340) >= 1) {
@@ -980,7 +980,7 @@ hskill_learn = function (id1) {
           };
         } else {
           //リセット時のみ実行。スキル忘却
-          if (id1 == 2) {
+          if (learnModeId == 2) {
             actor.forgetSkill(i);
             var hskValue1 = `──${$dataSkills[i].name}忘却…──`;
             CommonPopupManager.showInfo({}, hskValue1, null);
@@ -997,7 +997,7 @@ hskill_learn = function (id1) {
       };
     };
   }, this);
-  if (valueHskillLearnArr.length > 0 && id1 == 1) {
+  if (valueHskillLearnArr.length > 0 && learnModeId == 1) {
     for (var i = 0; i <= valueHskillLearnArr.length - 1; i++) {
       var hskValue0 = `──\\C[2]H-Passive\\C[0]\\C[27]\x1bSIN[${valueHskillLearnArr[i]}]\\C[0]RankUp!──\n`;
       hskValue0 += `${$dataSkills[valueHskillLearnArr[i]].description}\\C[0]\n`;
@@ -1010,7 +1010,7 @@ hskill_learn = function (id1) {
       };
     };
   };
-  if (id1 == 1) {
+  if (learnModeId == 1) {
     hskill_learn2();
   };
 
@@ -1716,20 +1716,20 @@ seiyoku_hanei = function () {
 };
 
 //☆☆スキルアイテム使用による性欲数値更新a,b,this.item().id,1
-seiyoku_itemHanei = function (id1, id2, id3, id4) {
+seiyoku_itemHanei = function (unusedArg1, targetItem, itemOrSkillId, isSkill) {
 
-  if (id4 == 1) {
-    var valueItems = $dataSkills;
+  if (isSkill == 1) {
+    var databaseEntries = $dataSkills;
   } else {
-    var valueItems = $dataItems;
+    var databaseEntries = $dataItems;
   };
-  $gameVariables.setValue(20, id2.actorId());
+  $gameVariables.setValue(20, targetItem.actorId());
   var actor = $gameActors.actor($gameVariables.value(20));
   if (!actor) return;
-  if ($dataActors[id2.actorId()] && $dataActors[id2.actorId()].meta['Heroine']) {
+  if ($dataActors[targetItem.actorId()] && $dataActors[targetItem.actorId()].meta['Heroine']) {
     //使用アイテム名表示。アイテム使用時はパッシブ反映しない。
-    if (valueItems[id3].meta['性欲度使用制限']) {
-      var libidoUseLimitSkill = Number(valueItems[id3].meta['性欲度使用制限']);
+    if (databaseEntries[itemOrSkillId].meta['性欲度使用制限']) {
+      var libidoUseLimitSkill = Number(databaseEntries[itemOrSkillId].meta['性欲度使用制限']);
     } else {
       var libidoUseLimitSkill = 18;
     };
@@ -1739,7 +1739,7 @@ seiyoku_itemHanei = function (id1, id2, id3, id4) {
     if ($gameActors.actor($gameVariables.value(20)).isLearnedSkill(libidoUseLimitSkill)) {
       for (var i = 401; i <= 440; i++) { $gameVariables.setValue(i, 0) };
       h_exp($gameVariables.value(20), '0_1_0', 306, false, true, false);
-      var itemMessage = valueItems[id3].meta['HitemJudgement'].split(',');
+      var itemMessage = databaseEntries[itemOrSkillId].meta['HitemJudgement'].split(',');
       $gameVariables.setValue(Number(itemMessage[0]), Number(itemMessage[1]));
       $gameSwitches.setValue(475, true);
       valueWordSet0 = ``;
@@ -1751,18 +1751,18 @@ seiyoku_itemHanei = function (id1, id2, id3, id4) {
       for (var i = 401; i <= 440; i++) { $gameVariables.setValue(i, 0) };
       $gameVariables.setValue(506, ' ');
       $gameSwitches.setValue(130, false);
-      if (valueItems == $dataItems) {
-        var itemMessage = `${valueItems[id3].name}：${$gameParty.numItems(valueItems[id3])}個`;
+      if (databaseEntries == $dataItems) {
+        var itemMessage = `${databaseEntries[itemOrSkillId].name}：${$gameParty.numItems(databaseEntries[itemOrSkillId])}個`;
         TickerManager.show(itemMessage);
       };
     } else {
-      $gameParty.gainItem(valueItems[id3], +1);
+      $gameParty.gainItem(databaseEntries[itemOrSkillId], +1);
       var itemMessage = `条件を満たしていない為、${actor.name()}には使用する事が出来ない…。`;
       TickerManager.show(itemMessage);
     };
     $gameSwitches.setValue(475, false);
   } else {
-    $gameParty.gainItem(valueItems[id3], +1);
+    $gameParty.gainItem(databaseEntries[itemOrSkillId], +1);
     var itemMessage = `${actor.name()}には使用する事が出来ない…。`;
     TickerManager.show(itemMessage);
   };
@@ -1791,7 +1791,7 @@ jusei_todayrate = function () {
 };
 
 //☆☆キャラの各種遍歴代入actor_Hhennreki(3);valueWordSet
-actor_Hhennreki = function (id1) {
+actor_Hhennreki = function (unusedArg1) {
 
   var wordSetIndex = `付与されているHステート\n`;
   for (var i = 1; i <= 10; i++) { eval("valueWordSet" + i + " = wordSetIndex") };
@@ -1815,17 +1815,17 @@ actor_Hhennreki = function (id1) {
 
 //☆☆キャラの各種遍歴代入前実行2actor_Hhennreki2Before(4,5,6);
 //選択肢番号は、実際の配列番号+1にしている。
-actor_Hhennreki2Before = function (id1) {
+actor_Hhennreki2Before = function (displayTypeId) {
 
   var actor = $gameActors.actor($gameVariables.value(20));
   if (!actor) return;
-  if (4 == id1) {
+  if (4 == displayTypeId) {
     var historyHeaderText = `\\I[526]\\C[27]男性遍歴　　　　　　\\C[0]　　 　　　　　　　　　　　　　　　`;
   };
-  if (5 == id1) {
+  if (5 == displayTypeId) {
     var historyHeaderText = `\\I[428]\\C[27]出産履歴　　　　　　\\C[0]　　 　　　　　　　　　　　　　　　`;
   };
-  if (6 == id1) {
+  if (6 == displayTypeId) {
     var historyHeaderText = `\\I[556]\\C[27]シーン履歴（直近100件）\\C[0]　　　　　　　　　　　　　　　　`;
   };
   const id = 1;
@@ -1834,7 +1834,7 @@ actor_Hhennreki2Before = function (id1) {
     value: 0
   };
   $gameSystem.addCustomChoice(id, choiceParams);
-  if (4 == id1 && $gameVariables.value($gameVariables.value(20) + 380)[41] != 0) {//41は名前を入れている
+  if (4 == displayTypeId && $gameVariables.value($gameVariables.value(20) + 380)[41] != 0) {//41は名前を入れている
     if (actor.isLearnedSkill(67)) {
       var historyHeaderText = `\\C[27]初体験の相手:\\C[0]`;
     } else {
@@ -1848,7 +1848,7 @@ actor_Hhennreki2Before = function (id1) {
     };
     $gameSystem.addCustomChoice(id, choiceParams);
   };
-  if (5 == id1 && $gameVariables.value($gameVariables.value(20) + 380)[49] >= 1) {//49はidを入れている
+  if (5 == displayTypeId && $gameVariables.value($gameVariables.value(20) + 380)[49] >= 1) {//49はidを入れている
     if (actor.isLearnedSkill(67)) {
       var historyHeaderText = `\\C[27]初子の父親:\\C[0]`;
     } else {
@@ -1866,20 +1866,20 @@ actor_Hhennreki2Before = function (id1) {
 };
 
 //☆☆キャラの各種遍歴代入2actor_Hhennreki2(4,5,6);
-actor_Hhennreki2 = function (id1) {
+actor_Hhennreki2 = function (displayTypeId) {
 
-  if (4 == id1 || 5 == id1) {
+  if (4 == displayTypeId || 5 == displayTypeId) {
     var actor = $gameActors.actor($gameVariables.value(20));
     if (!actor) return;
-    var arr1 = [0];
-    var arr2 = $gameVariables.value(360 + $gameVariables.value(20));
-    if (4 == id1) { var startIndex = 1; var nameOffset = 300; var reverseOffset = 100 };
-    if (5 == id1) { var startIndex = 201; var nameOffset = 100; var reverseOffset = -100 };
+    var hhennrekiNameEntries = [0];
+    var hhennrekiCounts = $gameVariables.value(360 + $gameVariables.value(20));
+    if (4 == displayTypeId) { var startIndex = 1; var nameOffset = 300; var reverseOffset = 100 };
+    if (5 == displayTypeId) { var startIndex = 201; var nameOffset = 100; var reverseOffset = -100 };
     var j = 0;
-    if (id1 == 4 || id1 == 5) {
+    if (displayTypeId == 4 || displayTypeId == 5) {
       for (var i = startIndex; i <= startIndex + 99; i++) {
         j += 1;
-        if (arr2[i] >= 1) {
+        if (hhennrekiCounts[i] >= 1) {
           var entryText = `\\C[16]${$dataWeapons[i + nameOffset].name}\\C[0]:`;
           if ($dataWeapons[i + nameOffset].meta['Profession']) {
             var entryText = `[${$dataWeapons[i + nameOffset].meta['Profession']}]\\C[16]${$dataWeapons[i + nameOffset].name}\\C[0]:`;
@@ -1889,13 +1889,13 @@ actor_Hhennreki2 = function (id1) {
             };
           };
           if (actor.isLearnedSkill(67)) {
-            entryText += `\\C[27]${arr2[i]}\\C[0]回`;
+            entryText += `\\C[27]${hhennrekiCounts[i]}\\C[0]回`;
           } else {
-            entryText += `\\C[1]${arr2[i]}\\C[0]回`;
+            entryText += `\\C[1]${hhennrekiCounts[i]}\\C[0]回`;
           };
           if ($gameSwitches.value(164)) {
-            if (id1 == 4) {
-              if (arr2[i + reverseOffset] >= 1) {
+            if (displayTypeId == 4) {
+              if (hhennrekiCounts[i + reverseOffset] >= 1) {
                 entryText += `\\I[374]？`;
               }
             }
@@ -1910,13 +1910,13 @@ actor_Hhennreki2 = function (id1) {
       };
     };
   };
-  if (id1 == 6) {
-    var arr1 = $gameVariables.value(174) ? $gameVariables.value(174)[$gameVariables.value(20)] : 0;
-    if (arr1 && arr1.length > 0) {
-      for (var i = arr1.length - 1; i >= 1; i--) {
+  if (displayTypeId == 6) {
+    var hhennrekiNameEntries = $gameVariables.value(174) ? $gameVariables.value(174)[$gameVariables.value(20)] : 0;
+    if (hhennrekiNameEntries && hhennrekiNameEntries.length > 0) {
+      for (var i = hhennrekiNameEntries.length - 1; i >= 1; i--) {
         const id = 1;
         const choiceParams = {
-          text: `\\FS[25]${arr1[i]}`,
+          text: `\\FS[25]${hhennrekiNameEntries[i]}`,
           value: i + 1
         };
         $gameSystem.addCustomChoice(id, choiceParams);
@@ -2293,11 +2293,11 @@ function setActorStateBasedOnSkillsHStatesTachie(actor) {
 }
 
 //☆☆性欲度情報をリセット
-seiyoku_parameterReset = function (id1) {
+seiyoku_parameterReset = function (resetModeId) {
 
   var actor = $gameActors.actor($gameVariables.value(20));
   if (!actor) return;
-  if (id1 == 1) {//選択肢作成
+  if (resetModeId == 1) {//選択肢作成
     var start = 401; var end = 440;
     for (var i = start; i <= end; i++) {
       if (i != 405) {
@@ -2317,7 +2317,7 @@ seiyoku_parameterReset = function (id1) {
     $gameSystem.addCustomChoice(id, choiceParams);
     for (var i = 401; i <= 439; i++) {//431-439経験値
       //if(i != 402 || i != 403 || i != 404 || i != 405 || i != 428 || i != 429){
-      if ([402, 403, 404, 405, 428, 429].some(function (id2) { return id2 == i })) { } else {
+      if ([402, 403, 404, 405, 428, 429].some(function (excludedVarId) { return excludedVarId == i })) { } else {
         var variableNameText = $dataSystem.variables[i];
         //var variableNameText = variableNameText.replace("　", "");
         //var variableNameText = variableNameText.replace("　", "");
@@ -2333,7 +2333,7 @@ seiyoku_parameterReset = function (id1) {
       };
     };
   };
-  if (id1 == 2) {//反映
+  if (resetModeId == 2) {//反映
     var start = $gameVariables.value(19) - 400;
     var end = $gameVariables.value(19) - 400;
     if ($gameVariables.value(19) == 0) {

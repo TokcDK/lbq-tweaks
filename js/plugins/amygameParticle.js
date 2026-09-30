@@ -57,48 +57,48 @@ weather_set = function(){
 
 valueWeather = Array(51).fill(0);
 
-var arr1 = [0.1,0.15,0.20,0.25,0.30];//暗闇の視界制限
-var randomValue2 =  arr1[getRandomIndex(arr1.length)];
+var candidateValues = [0.1,0.15,0.20,0.25,0.30];//暗闇の視界制限
+var randomValue2 =  candidateValues[getRandomIndex(candidateValues.length)];
 valueWeather[1] = randomValue2;
 var randomValue2 =  getRandomIndex(6) + 1;
 valueWeather[2] = randomValue2;
-var arr1 = [0.3,0.4,0.5];//六色ネオン
-var randomValue2 =  arr1[getRandomIndex(arr1.length)];
+var candidateValues = [0.3,0.4,0.5];//六色ネオン
+var randomValue2 =  candidateValues[getRandomIndex(candidateValues.length)];
 valueWeather[3] = randomValue2;
-var arr1 = [0.02,0.03,0.04,0.05,0.06];//薄いフォグ
-var randomValue2 =  arr1[getRandomIndex(arr1.length)];
+var candidateValues = [0.02,0.03,0.04,0.05,0.06];//薄いフォグ
+var randomValue2 =  candidateValues[getRandomIndex(candidateValues.length)];
 valueWeather[4] = randomValue2;
 var randomValue2 =  getRandomIndex(6) + 5;
 valueWeather[5] = randomValue2;
 var randomValue2 =  getRandomIndex(51) + 50;
 valueWeather[6] = randomValue2;
-var arr1 = [0.05,0.06,0.07,0.08,0.09];//モヤの影
-var randomValue2 =  arr1[getRandomIndex(arr1.length)];
+var candidateValues = [0.05,0.06,0.07,0.08,0.09];//モヤの影
+var randomValue2 =  candidateValues[getRandomIndex(candidateValues.length)];
 valueWeather[7] = randomValue2;//透明
 var randomValue2 =  getRandomIndex(51) + 50;
 valueWeather[8] = randomValue2;//速度
 var randomValue2 =  getRandomIndex(6) + 5;
 valueWeather[9] = randomValue2;//スケール
-var arr1 = [-500,0,600];//全体マップ
-var randomValue2 =  arr1[getRandomIndex(arr1.length)];
+var candidateValues = [-500,0,600];//全体マップ
+var randomValue2 =  candidateValues[getRandomIndex(candidateValues.length)];
 valueWeather[10] = randomValue2;
-var arr1 = [0.25,0.30,0.35,0.40];
-var randomValue2 =  arr1[getRandomIndex(arr1.length)];
+var candidateValues = [0.25,0.30,0.35,0.40];
+var randomValue2 =  candidateValues[getRandomIndex(candidateValues.length)];
 valueWeather[11] = randomValue2;
 var randomValue2 =  getRandomIndex(5) + 6;
 valueWeather[12] = randomValue2;
 var randomValue2 =  getRandomIndex(26) + 25;//天候:雲
 valueWeather[13] = randomValue2;
-var arr1 = [0.30,0.31,0.32,0.33,0.35,0.35,0.36,0.37,0.38,0.39,0.40,0.45];//雲透明
-var randomValue2 =  arr1[getRandomIndex(arr1.length)];
+var candidateValues = [0.30,0.31,0.32,0.33,0.35,0.35,0.36,0.37,0.38,0.39,0.40,0.45];//雲透明
+var randomValue2 =  candidateValues[getRandomIndex(candidateValues.length)];
 valueWeather[14] = randomValue2;
 var randomValue2 =  getRandomIndex(76) + 25;//雲の影
 valueWeather[15] = randomValue2;//速度
-var arr1 = [0.10,0.15,0.20,0.25,0.30,0.35,0.40];
-var randomValue2 =  arr1[getRandomIndex(arr1.length)];
+var candidateValues = [0.10,0.15,0.20,0.25,0.30,0.35,0.40];
+var randomValue2 =  candidateValues[getRandomIndex(candidateValues.length)];
 valueWeather[16] = randomValue2;//透明度
-var arr1 = [0.1,0.11,0.12,0.13,0.14,0.15];//木漏れ日[weather]
-var randomValue2 =  arr1[getRandomIndex(arr1.length)];
+var candidateValues = [0.1,0.11,0.12,0.13,0.14,0.15];//木漏れ日[weather]
+var randomValue2 =  candidateValues[getRandomIndex(candidateValues.length)];
 valueWeather[17] = randomValue2;
 var randomValue2 =  getRandomIndex(8) + 7;
 var randomValue3 =  getRandomIndex(10) + 15;
@@ -106,26 +106,26 @@ valueWeather[18] = randomValue2;
 valueWeather[19] = randomValue3;
 var randomValue2 =  getRandomIndex(5) + 0;
 valueWeather[20] = randomValue2;
-var arr1 = [-500,0,600];//太陽光のフレア
-var randomValue2 =  arr1[getRandomIndex(arr1.length)];
+var candidateValues = [-500,0,600];//太陽光のフレア
+var randomValue2 =  candidateValues[getRandomIndex(candidateValues.length)];
 valueWeather[21] = randomValue2;
-var arr1 = [0.5,0.6,0.7,0.8,0.9,1.0];
-var randomValue2 =  arr1[getRandomIndex(arr1.length)];
+var candidateValues = [0.5,0.6,0.7,0.8,0.9,1.0];
+var randomValue2 =  candidateValues[getRandomIndex(candidateValues.length)];
 valueWeather[22] = randomValue2;
 var randomValue2 =  getRandomIndex(3) + 4;
 valueWeather[23] = randomValue2;
-var arr1 = [0.05,0.06,0.07];//淡いライトリーク。夜の街。
-var randomValue2 =  arr1[getRandomIndex(arr1.length)];
+var candidateValues = [0.05,0.06,0.07];//淡いライトリーク。夜の街。
+var randomValue2 =  candidateValues[getRandomIndex(candidateValues.length)];
 valueWeather[24] = randomValue2;
 var randomValue2 =  getRandomIndex(41) + 10;
 valueWeather[25] = randomValue2;
-var arr1 = [0.06,0.07,0.08,0.09,0.05];//青&緑のライトリーク
-var randomValue2 =  arr1[getRandomIndex(arr1.length)];
+var candidateValues = [0.06,0.07,0.08,0.09,0.05];//青&緑のライトリーク
+var randomValue2 =  candidateValues[getRandomIndex(candidateValues.length)];
 valueWeather[26] = randomValue2;
 var randomValue2 =  getRandomIndex(5) + 1;
 valueWeather[27] = randomValue2;
-var arr1 = [0.08,0.09,0.10,0.11,0.12];//fog_battle_front
-var randomValue2 =  arr1[getRandomIndex(arr1.length)];
+var candidateValues = [0.08,0.09,0.10,0.11,0.12];//fog_battle_front
+var randomValue2 =  candidateValues[getRandomIndex(candidateValues.length)];
 valueWeather[28] = randomValue2;
 var randomValue2 =  getRandomIndex(71) + 30;
 valueWeather[29] = randomValue2;
@@ -157,8 +157,8 @@ if($gameMap.parallaxName() === "BlueSky" && $gameSwitches.value(15)){
   $gameMap.changeParallax("StarlitSky",true,false,1,0);
 };
 if($dataMap.meta['LightChara']){//<LightChara:1, 3, 200, 0.1>
-  var arr1 = $dataMap.meta['LightChara'].split(',');
-  var valueLightChara = Number(arr1[0]);
+  var lightCharaValues = $dataMap.meta['LightChara'].split(',');
+  var valueLightChara = Number(lightCharaValues[0]);
 };
 if(!$gameSwitches.value(212)){
   if($gameSwitches.value(15)){
@@ -186,7 +186,7 @@ if(valueDarkness >= 1){
   $gameMap.darknessOpacity = valueDarkness;
 };
 if(valueLightChara >= 1){
-  $gamePlayer.moveLight(Number(arr1[0]), Number(arr1[1]), Number(arr1[2]), Number(arr1[3]));
+  $gamePlayer.moveLight(Number(lightCharaValues[0]), Number(lightCharaValues[1]), Number(lightCharaValues[2]), Number(lightCharaValues[3]));
 };
 if(!$gameSwitches.value(46)){
   map_weatherSet2();
@@ -320,11 +320,11 @@ if(gameVarValue11 == 12){
 if(gameVarValue11 == 13){
   var effectName1 = 'flare_s';//太陽光のフレア//砂漠
   $gameScreen._particle.particleSet(0,effectName1,valueWeather1,'def','99');
-  var arr1 = [-500,0,600];
-  var weatherValue2 =  arr1[getRandomIndex(arr1.length)];
+  var candidateValues = [-500,0,600];
+  var weatherValue2 =  candidateValues[getRandomIndex(candidateValues.length)];
   $gameScreen._particle.particleUpdate([effectName1,'pos',String(weatherValue2),-600]);
-  var arr1 = [0.5,0.6,0.7,0.8,0.9,1.0];
-  var weatherValue2 =  arr1[getRandomIndex(arr1.length)];
+  var candidateValues = [0.5,0.6,0.7,0.8,0.9,1.0];
+  var weatherValue2 =  candidateValues[getRandomIndex(candidateValues.length)];
   $gameScreen._particle.particleUpdate([effectName1,'alpha','0',weatherValue2+'@0.2',weatherValue2+'@0.8','0']);
   $gameScreen._particle.particleUpdate([effectName1,'scale','10','10']);
   var gameVarValue10 = 1;
@@ -340,9 +340,9 @@ if(gameVarValue11 == 15){
 
 };
 if(gameVarValue10 >= 1){
-  var arr1 = ['fog_w','fog_shadow_w','flash_s','cloud_w','stardust_w','cloud_shadow_w',
+  var candidateValues = ['fog_w','fog_shadow_w','flash_s','cloud_w','stardust_w','cloud_shadow_w',
   'dappled_r1','flare_s','light_leak_s','light_leak_s2'];
-  var list = arr1;
+  var list = candidateValues;
   list.forEach(function(id) {
     $gameScreen._particle.particleClear(id);
   }, this);
@@ -444,71 +444,71 @@ map_regionSet = function(){
 //if($gameMap.regionId($gamePlayer._realX, $gamePlayer._realY+1) == 91){
   //$gameSwitches.setValue(206,true);
 //};
-var arr1 = Array(151).fill(0);
+var regionEventCounts = Array(151).fill(0);
 for (var i = 0; i <= $gameMap.width() - 1; i++) {
   for (var j = 0; j <= $gameMap.height() - 1; j++) {
     if($gameMap.regionId(i,j) >= 1){    
-      arr1[$gameMap.regionId(i,j)] += 1;
+      regionEventCounts[$gameMap.regionId(i,j)] += 1;
 }}};
-  valueRegionMapArray =  arr1;
+  valueRegionMapArray =  regionEventCounts;
   var numericValue1 = 30;
-  if(arr1[numericValue1] >= 1){
+  if(regionEventCounts[numericValue1] >= 1){
     var effectName2 = 'dappled_r';
     $gameScreen._particle.particleSet(0,effectName2,'region:' + numericValue1,'def','above');
   };
   var numericValue1 = 31;
-  if(arr1[numericValue1] >= 1){
+  if(regionEventCounts[numericValue1] >= 1){
     var effectName2 = 'light_pillar_r';
     $gameScreen._particle.particleSet(0,effectName2,'region:' + numericValue1,'def','above');
   };
   var numericValue1 = 32;
-  if(arr1[numericValue1] >= 1){
+  if(regionEventCounts[numericValue1] >= 1){
     var effectName2 = 'light_floor_r';
     $gameScreen._particle.particleSet(0,effectName2,'region:' + numericValue1,'def','below');
   };
   var numericValue1 = 33;
-  if(arr1[numericValue1] >= 1){
+  if(regionEventCounts[numericValue1] >= 1){
     var effectName2 = 'bubble_cp';
     $gameScreen._particle.particleSet(0,effectName2,'region:' + numericValue1,'def','above');
   };
   var numericValue1 = 34;
-  if(arr1[numericValue1] >= 1){
+  if(regionEventCounts[numericValue1] >= 1){
     var effectName2 = 'darkness_r';
     $gameScreen._particle.particleSet(0,effectName2,'region:' + numericValue1,'def','above');
   };
   var numericValue1 = 35;
-  if(arr1[numericValue1] >= 1){
+  if(regionEventCounts[numericValue1] >= 1){
     var effectName2 = 'poison_r';
     $gameScreen._particle.particleSet(0,effectName2,'region:' + numericValue1,'def','below');
   };
   var numericValue1 = 36;
-  if(arr1[numericValue1] >= 1){
+  if(regionEventCounts[numericValue1] >= 1){
     $gameScreen._particle.particleSet(0,'dark_hole_r','region:' + numericValue1,'def','above');
     $gameScreen._particle.particleSet(0,'dark_hole_r_2','region:' + numericValue1,'def','above');
     $gameScreen._particle.particleSet(0,'dark_hole_r_3','region:' + numericValue1,'def','above');
   };
   var numericValue1 = 37;
-  if(arr1[numericValue1] >= 1){
+  if(regionEventCounts[numericValue1] >= 1){
     var effectName2 = 'magma_r';
     $gameScreen._particle.particleSet(0,effectName2,'region:' + numericValue1,'def','below');
   };
   var numericValue1 = 38;
-  if(arr1[numericValue1] >= 1){
+  if(regionEventCounts[numericValue1] >= 1){
     var effectName2 = 'ripple_r';
     $gameScreen._particle.particleSet(0,effectName2,'region:' + numericValue1,'def','below');
   };
   var numericValue1 = 3;
-  if(arr1[numericValue1] >= 1){
+  if(regionEventCounts[numericValue1] >= 1){
     $gameScreen._particle.particleSet(0,'splash_walk','walk:player:' + numericValue1,'def','below');
     $gameScreen._particle.particleSet(0,'ripple_walk','walk:player:' + numericValue1,'def','below');
   };
   //135拠点着替え 134拠点宿泊 133拠点クリスタルなし 123死体 119火災 130回復魔方陣 87滝下 2滝上
-  var arr2 = [246,245,244,241, 99, 73, 83, 82, 81,241,241,241,203,200,199,186,183, 90,165,162,159,158,154,135,134, 67, 77, 87,  2, 61,100, 49, 60, 54, 66, 50, 51, 65, 97,101,115,123,119,117,138,231,48,116];//動的生成元イベントID
-  var arr3 = [112,111,110,109,108,107,106,105,104,101,102,103, 18, 94, 95, 17, 60, 69, 70, 71, 72, 73, 74, 93, 92, 90, 89, 88, 87, 86, 85, 84, 83, 82, 81, 80, 79, 78, 77, 76, 75, 29, 28, 20, 19, 16, 7,  6];//リージョンID
-  for (var i = 0; i <= arr2.length-1; i++) {
-    var effectName2 = Number(arr2[i]);//死体。npc配置で血痕
-    var numericValue1 = Number(arr3[i]);
-    if(arr1[numericValue1] >= 1){
+  var sourceEventIds = [246,245,244,241, 99, 73, 83, 82, 81,241,241,241,203,200,199,186,183, 90,165,162,159,158,154,135,134, 67, 77, 87,  2, 61,100, 49, 60, 54, 66, 50, 51, 65, 97,101,115,123,119,117,138,231,48,116];//動的生成元イベントID
+  var regionIds = [112,111,110,109,108,107,106,105,104,101,102,103, 18, 94, 95, 17, 60, 69, 70, 71, 72, 73, 74, 93, 92, 90, 89, 88, 87, 86, 85, 84, 83, 82, 81, 80, 79, 78, 77, 76, 75, 29, 28, 20, 19, 16, 7,  6];//リージョンID
+  for (var i = 0; i <= sourceEventIds.length-1; i++) {
+    var effectName2 = Number(sourceEventIds[i]);//死体。npc配置で血痕
+    var numericValue1 = Number(regionIds[i]);
+    if(regionEventCounts[numericValue1] >= 1){
       var map_width = $gameMap.width();
       var map_height = $gameMap.height();
         for (var y = 0; y < map_height; y++) {
@@ -524,7 +524,7 @@ for (var i = 0; i <= $gameMap.width() - 1; i++) {
   if(!$gameSwitches.value(15)){    //夜に勝手に作成されるので、スクリプト夜生成禁止にする
   var effectName2 = 111;//立ちNPC
   for (var numericValue1 = 24; numericValue1 <= 27; numericValue1++) {
-    if(arr1[numericValue1] >= 1){
+    if(regionEventCounts[numericValue1] >= 1){
       var map_width = $gameMap.width();
       var map_height = $gameMap.height();
         for (var y = 0; y < map_height; y++) {
@@ -543,7 +543,7 @@ for (var i = 0; i <= $gameMap.width() - 1; i++) {
   if($gameSwitches.value(15)){
   var effectName2 = 191;//立ちNPC
   for (var numericValue1 = 41; numericValue1 <= 44; numericValue1++) {
-    if(arr1[numericValue1] >= 1){
+    if(regionEventCounts[numericValue1] >= 1){
       var map_width = $gameMap.width();
       var map_height = $gameMap.height();
         for (var y = 0; y < map_height; y++) {
@@ -568,7 +568,7 @@ for (var i = 0; i <= $gameMap.width() - 1; i++) {
     };
     if(numericValue1 == 23){var effectName2 = 120};
     if(gameSwitchValue3){
-    if(arr1[numericValue1] >= 1){
+    if(regionEventCounts[numericValue1] >= 1){
       var map_width = $gameMap.width();
       var map_height = $gameMap.height();
         for (var y = 0; y < map_height; y++) {
@@ -591,55 +591,55 @@ for (var i = 0; i <= $gameMap.width() - 1; i++) {
 };
 
 //ADVパート演出
-adv_partDirectPlay = function(id1){
+adv_partDirectPlay = function(effectTypeId){
 
-if(id1 == 0){
+if(effectTypeId == 0){
   if($gameScreen._tone_temp != 0){
     $gameScreen.startTint($gameScreen._tone_temp, 10);
     $gameScreen._tone_temp = 0;
   };
-  var arr1 = ['gloom_sp','glitter_sp','hearts_sp','questions_sp','feather_sp','ether_sp','lines_sp','direct_screenRing',
+  var effectNameCandidates = ['gloom_sp','glitter_sp','hearts_sp','questions_sp','feather_sp','ether_sp','lines_sp','direct_screenRing',
   'direct_screenDiffusion1','text_dispray1','direct_screenRing','direct_screenDiffusion2','direct_screenDiffusion3',
   'direct_screenSquare'];
-  for (var i = 0; i <= arr1.length-1; i++) {
-    $gameScreen._particle.particleClear(arr1[i]);
+  for (var i = 0; i <= effectNameCandidates.length-1; i++) {
+    $gameScreen._particle.particleClear(effectNameCandidates[i]);
   };
 };
-if(id1 == 1){
+if(effectTypeId == 1){
   var effectName1 = 'gloom_sp';//どんより
   var colorValue2 = "Down3";
   AudioManager.playSe({"name":colorValue2,"volume":90,"pitch":70,"pan":0});
   $gameScreen.startFlash([0,0,0,200], 120);
   $gameScreen._particle.particlePlay(0,effectName1,'screen','def','screen');
 };
-if(id1 == 2){
+if(effectTypeId == 2){
   var effectName1 = 'glitter_sp';//
   $gameScreen.startFlash([255,255,255,200], 120);
   var colorValue2 = "Up3";
   AudioManager.playSe({"name":colorValue2,"volume":90,"pitch":100,"pan":0});
   $gameScreen._particle.particlePlay(0,effectName1,'screen','def','screen');
 };
-if(id1 == 3){
+if(effectTypeId == 3){
   var effectName1 = 'hearts_sp';//
   $gameScreen.startFlash([255,119,255,200], 120);
   var colorValue2 = "11_Sexy";
   AudioManager.playMe({"name":colorValue2,"volume":90,"pitch":150,"pan":0});
   $gameScreen._particle.particlePlay(0,effectName1,'screen','def','screen');
 };
-if(id1 == 4){
+if(effectTypeId == 4){
   var effectName1 = 'questions_sp';//
   $gameScreen.startFlash([255,255,255,200], 120);
   var colorValue2 = "Saint1";
   AudioManager.playSe({"name":colorValue2,"volume":90,"pitch":70,"pan":0});
   $gameScreen._particle.particlePlay(0,effectName1,'screen','def','screen');
 };
-if(id1 == 5){
+if(effectTypeId == 5){
   var effectName1 = 'feather_sp';//
   var colorValue2 = "Z11_RareTreasureBox";
   AudioManager.playSe({"name":colorValue2,"volume":60,"pitch":100,"pan":0});
   $gameScreen._particle.particlePlay(0,effectName1,'screen','def','screen');
 };
-if(id1 == 6){
+if(effectTypeId == 6){
   var effectName1 = 'ether_sp';//戦闘敗北時
   var colorValue2 = "Z_Summoning";
   AudioManager.playSe({"name":colorValue2,"volume":60,"pitch":120,"pan":0});
@@ -647,14 +647,14 @@ if(id1 == 6){
   var effectName1 = `拠点に強制帰還されます…。`;
   TickerManager.show(effectName1);
 };
-if(id1 == 7){
+if(effectTypeId == 7){
   var effectName1 = 'lines_sp';//集中線
   $gameScreen.startFlash([255,255,255,200], 120);
   var colorValue2 = "Wind1";
   AudioManager.playSe({"name":colorValue2,"volume":90,"pitch":120,"pan":0});
   $gameScreen._particle.particlePlay(0,effectName1,'screen','def','screen');
 };
-if(id1 == 8){//宝箱レア演出。元コモンで色調変更
+if(effectTypeId == 8){//宝箱レア演出。元コモンで色調変更
   $gameScreen.startFlash([255,255,255,200], 30);
     if($gameScreen._tone_temp == 0){
       $gameScreen._tone_temp = $gameScreen.tone().concat();  
@@ -673,7 +673,7 @@ if(id1 == 8){//宝箱レア演出。元コモンで色調変更
   var effectName1 = 'direct_screenDiffusion1';//
   $gameScreen._particle.particlePlay(0,effectName1,'screen','def','screen');
 };
-if(id1 == 9){//仲間加入
+if(effectTypeId == 9){//仲間加入
   $gameScreen.startFlash([255,255,255,200], 30);
     if($gameScreen._tone_temp == 0){
       $gameScreen._tone_temp = $gameScreen.tone().concat();  
@@ -701,14 +701,14 @@ if(id1 == 9){//仲間加入
   } else {
     $gameScreen.movePicture(effectName1,1,640-50,384,100,100,255,0,30);
   };
-  var arr1 = [2,6];
-  var effectName1 = arr1[getRandomIndex(arr1.length)];
+  var effectNameCandidates = [2,6];
+  var effectName1 = effectNameCandidates[getRandomIndex(effectNameCandidates.length)];
   valueFaceSelect = effectName1; 
   $gameSwitches.setValue(436,true);
   battle_bustUp(101,550,0,40);
   $gameSwitches.setValue(436,false);
 };
-if(id1 == 10){//ワープポイントアクティベート
+if(effectTypeId == 10){//ワープポイントアクティベート
   var effectName1 = "Item4";
   AudioManager.playSe({"name":effectName1,"volume":50,"pitch":50,"pan":0});
   $gameScreen.startFlash([255,255,255,200], 30);
@@ -729,7 +729,7 @@ if(id1 == 10){//ワープポイントアクティベート
   var effectName1 = 'direct_screenDiffusion2';//
   $gameScreen._particle.particlePlay(0,effectName1,'screen','def','screen');
 };
-if(id1 == 11){//拠点アクティベート
+if(effectTypeId == 11){//拠点アクティベート
   var effectName1 = "Item4";
   AudioManager.playSe({"name":effectName1,"volume":50,"pitch":50,"pan":0});
   $gameScreen.startFlash([255,255,255,200], 30);
@@ -750,7 +750,7 @@ if(id1 == 11){//拠点アクティベート
   var effectName1 = 'direct_screenDiffusion3';//
   $gameScreen._particle.particlePlay(0,effectName1,'screen','def','screen');
 };
-if(id1 == 12){//夜シーン強制
+if(effectTypeId == 12){//夜シーン強制
   picture_motion1("smooth",[0]);
   var effectName1 = 'direct_screenSquare';
   $gameScreen._particle.particlePlay(0,effectName1,'screen','def','screen');
@@ -762,7 +762,7 @@ if(id1 == 12){//夜シーン強制
   $gameScreen.showPicture(effectName1,"",1,640+50,384,100,100,0,0);
   $gameScreen.movePicture(effectName1,1,640,384,100,100,255,0,20);
 };
-if(id1 == 13){//シーンタイトル通知
+if(effectTypeId == 13){//シーンタイトル通知
   picture_motion1("smooth",[0]);
   var effectName1 = 102;
   var colorValue2 = 'ScreenCenterTextDisPrayTitle';
@@ -782,27 +782,27 @@ if(id1 == 13){//シーンタイトル通知
   $gameScreen.showPicture(effectName1,"",0,10,170,0,100,0,0);
   $gameScreen.movePicture(effectName1,0,50,170,100,100,255,0,30);
 };
-if(id1 == 14 || id1 == 15 || id1 == 16){//アイテムスキル称号獲得忘却。Ｈ通常どちらも。
-  var id4 = $gameVariables.value(20);
-  var id2 = $gameVariables.value(19);
-  var actor = $gameActors.actor(id4);
-  if(id1 == 14){valueItems = $dataItems};
-  if(id1 == 15 || id1 == 16){valueItems = $dataSkills};
-  if(id1 == 14){
-    if(Number(valueItems[id2].meta['EICSwitch']) == 104){//通常
-      var id3 = 1;
+if(effectTypeId == 14 || effectTypeId == 15 || effectTypeId == 16){//アイテムスキル称号獲得忘却。Ｈ通常どちらも。
+  var actorId = $gameVariables.value(20);
+  var dbEntryId = $gameVariables.value(19);
+  var actor = $gameActors.actor(actorId);
+  if(effectTypeId == 14){valueItems = $dataItems};
+  if(effectTypeId == 15 || effectTypeId == 16){valueItems = $dataSkills};
+  if(effectTypeId == 14){
+    if(Number(valueItems[dbEntryId].meta['EICSwitch']) == 104){//通常
+      var hModeLevel = 1;
     } else {
-      var id3 = 2;
+      var hModeLevel = 2;
     };
   };
-  if(id1 == 15 || id1 == 16){
-    if(valueItems[id2].stypeId == 14 || valueItems[id2].stypeId == 15){//Hスキル
-      var id3 = 2;
+  if(effectTypeId == 15 || effectTypeId == 16){
+    if(valueItems[dbEntryId].stypeId == 14 || valueItems[dbEntryId].stypeId == 15){//Hスキル
+      var hModeLevel = 2;
     } else {
-      var id3 = 1;
+      var hModeLevel = 1;
     };
   };
-  if(id3 == 1){//通常
+  if(hModeLevel == 1){//通常
     AudioManager.playMe({"name":"21_SkillLearn","volume":60,"pitch":100,"pan":0});
     $gameScreen.startFlash([255,255,255,200], 30);
     $gameVariables.setValue(22,300); 
@@ -822,52 +822,52 @@ if(id1 == 14 || id1 == 15 || id1 == 16){//アイテムスキル称号獲得忘�
   $gameScreen.movePicture(effectName1,1,640,384,100,100,250,0,60);
   var effectName1 = 'direct_screenRing';
   $gameScreen._particle.particleSet(0,effectName1,'screen','def','screen');
-    if(id3 == 1){
+    if(hModeLevel == 1){
       $gameScreen._particle.particleUpdate([effectName1,'color','#8fceff','#ffffff']);//通常
     } else {
       $gameScreen._particle.particleUpdate([effectName1,'color','#dc7dff','#ffffff']);//H関係
     };
-    if(id3 == 1){
+    if(hModeLevel == 1){
       var effectName1 = 'direct_screenDiffusion2';
     } else {
       var effectName1 = 'direct_screenDiffusionH';
     };
     $gameScreen._particle.particleSet(0,effectName1,'screen','def','screen');
-    if(id3 == 1){
+    if(hModeLevel == 1){
       $gameScreen._particle.particleUpdate([effectName1,'color','#8fceff','#ffffff']);//通常
     };
-    if(id1 == 14){var effectName1 = `\\C[16]称号\\C[0]＜\\C[2]\x1bIIN[${id2}]\\C[0]＞獲得！`};
-    if(id1 == 15){var effectName1 = `\\C[16]${$dataSystem.skillTypes[valueItems[id2].stypeId]}\\C[0]＜\\C[2]\x1bSIN[${id2}]\\C[0]＞獲得！`};
-    if(id1 == 16){var effectName1 = `\\C[16]${$dataSystem.skillTypes[valueItems[id2].stypeId]}\\C[0]＜\\C[2]\x1bSIN[${id2}]\\C[0]＞忘却…`};
+    if(effectTypeId == 14){var effectName1 = `\\C[16]称号\\C[0]＜\\C[2]\x1bIIN[${dbEntryId}]\\C[0]＞獲得！`};
+    if(effectTypeId == 15){var effectName1 = `\\C[16]${$dataSystem.skillTypes[valueItems[dbEntryId].stypeId]}\\C[0]＜\\C[2]\x1bSIN[${dbEntryId}]\\C[0]＞獲得！`};
+    if(effectTypeId == 16){var effectName1 = `\\C[16]${$dataSystem.skillTypes[valueItems[dbEntryId].stypeId]}\\C[0]＜\\C[2]\x1bSIN[${dbEntryId}]\\C[0]＞忘却…`};
   var colorValue2 = 28;
   $gameScreen.setDTextPicture(effectName1, colorValue2);
   var effectName1 = 60;
   $gameScreen.showPicture(effectName1,"",1,640,384,100,100,0,0);
   $gameScreen.movePicture(effectName1,1,640-100,384,100,100,255,0,60);
     if(!$gameSwitches.value(29)){
-      if(id1 == 14){$gameParty.gainItem(valueItems[id2], 1)};
-      if(id1 == 15 && !!actor){actor.learnSkill(id2)};
-      if(id1 == 16 && !!actor){actor.forgetSkill(id2)};
+      if(effectTypeId == 14){$gameParty.gainItem(valueItems[dbEntryId], 1)};
+      if(effectTypeId == 15 && !!actor){actor.learnSkill(dbEntryId)};
+      if(effectTypeId == 16 && !!actor){actor.forgetSkill(dbEntryId)};
     };
-    if(id3 == 1){
-      var arr1 = [2,6];
-      if(id4 == 1){arr1.push(53)};
+    if(hModeLevel == 1){
+      var effectNameCandidates = [2,6];
+      if(actorId == 1){effectNameCandidates.push(53)};
     };
-    if(id3 == 2){
+    if(hModeLevel == 2){
       if(!!actor && actor.isLearnedSkill(65)){
-        var arr1 = [27,28,29,30,31,32,39,40,41];
+        var effectNameCandidates = [27,28,29,30,31,32,39,40,41];
       } else {
-        var arr1 = [21,22,23,24,25];
+        var effectNameCandidates = [21,22,23,24,25];
       };
     };
-    var effectName1 = arr1[getRandomIndex(arr1.length)];
+    var effectName1 = effectNameCandidates[getRandomIndex(effectNameCandidates.length)];
     valueFaceSelect = effectName1; 
     $gameSwitches.setValue(436,true);
     battle_bustUp(52,550,0,120);
     $gameSwitches.setValue(436,false);
-    valueWordSet0 = `解説文:\n${valueItems[id2].description}`;
+    valueWordSet0 = `解説文:\n${valueItems[dbEntryId].description}`;
 };
-if(id1 == 17){//汎用演出。valueWordSet0に文章入れておく。
+if(effectTypeId == 17){//汎用演出。valueWordSet0に文章入れておく。
   //console.log(`顔グラピクID変更の為にピクID変更の必要ありamygameParticle787行`);
   var actor = $gameActors.actor($gameVariables.value(20));
   $gameScreen.startFlash([255,255,255,200], 30);
@@ -896,15 +896,15 @@ if(id1 == 17){//汎用演出。valueWordSet0に文章入れておく。
       var effectName1 = 60;
       $gameScreen.showPicture(effectName1,"",1,640,384,100,100,0,0);
       $gameScreen.movePicture(effectName1,1,640-200,384,100,100,255,0,60);
-        var arr1 = [2,6];
-        if($gameVariables.value(20) == 1){arr1.push(53)};//りしゃぶる。リーシャ。ドヤ顔
-        var effectName1 = arr1[getRandomIndex(arr1.length)];
+        var effectNameCandidates = [2,6];
+        if($gameVariables.value(20) == 1){effectNameCandidates.push(53)};//りしゃぶる。リーシャ。ドヤ顔
+        var effectName1 = effectNameCandidates[getRandomIndex(effectNameCandidates.length)];
         valueFaceSelect = effectName1; 
         $gameSwitches.setValue(436,true);
         battle_bustUp(52,550,0,120);
         $gameSwitches.setValue(436,false);
 };
-if(id1 == 18){//汎用演出顔グラなし。valueWordSet0に文章入れておく。
+if(effectTypeId == 18){//汎用演出顔グラなし。valueWordSet0に文章入れておく。
   $gameScreen.startFlash([255,255,255,200], 30);
     if($gameScreen._tone_temp == 0){
       $gameScreen._tone_temp = $gameScreen.tone().concat();  
@@ -934,7 +934,7 @@ if(id1 == 18){//汎用演出顔グラなし。valueWordSet0に文章入れてお
       $gameScreen.showPicture(effectName1,"",1,640,384,100,100,0,0);
       $gameScreen.movePicture(effectName1,1,640,384,100,100,255,0,60);
 };
-if(id1 == 19){//汎用2行まで演出顔グラなしH。valueWordSet0に文章入れておく。
+if(effectTypeId == 19){//汎用2行まで演出顔グラなしH。valueWordSet0に文章入れておく。
   //hSkill_rankUpWordDirect(1,1,671,1);で使用
   var effectName1 = getRandomIndex(51) + 100;
   AudioManager.playSe({"name":'ZH_SexyVoice',"volume":50,"pitch":effectName1,"pan":0});
@@ -974,7 +974,7 @@ if(id1 == 19){//汎用2行まで演出顔グラなしH。valueWordSet0に文章�
       $gameScreen.showPicture(effectName1,"",1,640,384,100,100,0,0);
       $gameScreen.movePicture(effectName1,1,640,384,100,100,255,0,60);
 };
-if(id1 == 20){//睡眠誘導光
+if(effectTypeId == 20){//睡眠誘導光
   var effectName1 = 'ether_sp';
   $gameScreen._particle.particlePlay(0,effectName1,'screen','def','screen');
   var colorValue2 = '#dd00ff';
@@ -989,7 +989,7 @@ if(id1 == 20){//睡眠誘導光
   var colorValue3 = getRandomIndex(26) + 50;;
   AudioManager.playSe({"name":colorValue2,"volume":90,"pitch":colorValue3,"pan":0});
 };
-if(id1 == 21){//眠気の兆候
+if(effectTypeId == 21){//眠気の兆候
   var effectName1 = 'bubble_w';
   $gameScreen._particle.particlePlay(0,effectName1,'screen','def','screen');
   var colorValue2 = '#ff00e9';
@@ -1012,7 +1012,7 @@ if(id1 == 21){//眠気の兆候
   var colorValue3 = getRandomIndex(26) + 50;;
   AudioManager.playSe({"name":colorValue2,"volume":90,"pitch":colorValue3,"pan":0});
 };
-if(id1 == 22){
+if(effectTypeId == 22){
   var colorValue2 = "Magic2";
   AudioManager.playSe({"name":colorValue2,"volume":100,"pitch":70,"pan":0});
   $gameScreen.startFlash([136,0,0,150], 60);
@@ -1021,7 +1021,7 @@ if(id1 == 22){
   var effectName1 = 'htext_dispray2';
   $gameScreen._particle.particlePlay(0,effectName1,'screen','def','screen');
 };
-if(id1 == 23){//催眠掛かる
+if(effectTypeId == 23){//催眠掛かる
   $gameScreen.startFlash([255,119,255,204], 60);
   var colorValue2 = "Saint1";
   AudioManager.playSe({"name":colorValue2,"volume":100,"pitch":130,"pan":0});
@@ -1038,27 +1038,27 @@ if(id1 == 23){//催眠掛かる
 };
 
 //ADVパート演出クリアも。0でクリア
-adv_partDirectSet = function(id1){
+adv_partDirectSet = function(effectTypeId){
 
-  if(id1 != 0 && id1 != 6 && id1 != 9){
+  if(effectTypeId != 0 && effectTypeId != 6 && effectTypeId != 9){
     if($gameScreen._tone_temp == 0){
       $gameScreen._tone_temp = $gameScreen.tone().concat();  
       $gameScreen.startTint([-100,-100,-100,100], 10);//他より薄くしている
     };
   };
-  if(id1 == 0){
+  if(effectTypeId == 0){
     if($gameScreen._tone_temp != 0){
       $gameScreen.startTint($gameScreen._tone_temp, 10);
       $gameScreen._tone_temp = 0;
     };
-    var arr1 = ['lines_width1','lines_width2','lines_width3','lines_width4','lines_height1','lines_height2','lines_height3','lines_height4',
+    var particleNamesToClear = ['lines_width1','lines_width2','lines_width3','lines_width4','lines_height1','lines_height2','lines_height3','lines_height4',
                'lines_heightSB','lines_heightS','lines_sp1','shower_event','cloud_w_front','actor_particleLight','enemy_particleDark','cloud_w',
                'hologram_screen','lifeStorm_screen'];
-    for (var i = 0; i <= arr1.length-1; i++) {
-      $gameScreen._particle.particleClear(arr1[i]);
+    for (var i = 0; i <= particleNamesToClear.length-1; i++) {
+      $gameScreen._particle.particleClear(particleNamesToClear[i]);
     };
   };
-  if(id1 == 1){
+  if(effectTypeId == 1){
     var effectName1 = 'lines_width1';
     $gameScreen._particle.particleSet(0,effectName1,'screen','def','above');
     var effectName1 = 'lines_width4';
@@ -1068,7 +1068,7 @@ adv_partDirectSet = function(id1){
     var effectName1 = 'lines_width3';
     $gameScreen._particle.particleSet(0,effectName1,'screen','def','spriteset');
   };
-  if(id1 == 2){
+  if(effectTypeId == 2){
     var effectName1 = 'lines_height1';
     $gameScreen._particle.particleSet(0,effectName1,'screen','def','spriteset');
     var effectName1 = 'lines_height4';
@@ -1078,30 +1078,30 @@ adv_partDirectSet = function(id1){
     var effectName1 = 'lines_height3';
     $gameScreen._particle.particleSet(0,effectName1,'screen','def','spriteset');
   };
-  if(id1 == 3){
+  if(effectTypeId == 3){
     var effectName1 = 'lines_heightSB';//下から粒子
     $gameScreen._particle.particleSet(0,effectName1,'screen','def','spriteset');
     var effectName1 = 'lines_heightS';//下から粒子
     $gameScreen._particle.particleSet(0,effectName1,'screen','def','spriteset');
   };
-  if(id1 == 4){
+  if(effectTypeId == 4){
     var effectName1 = 'lines_sp1';//集中線永続
     $gameScreen.startFlash([255,255,255,200], 120);
     var effectName2 = "Wind1";
     AudioManager.playSe({"name":effectName2,"volume":90,"pitch":120,"pan":0});
     $gameScreen._particle.particleSet(0,effectName1,'screen','def','spriteset');
   };
-  if(id1 == 5){
+  if(effectTypeId == 5){
     var effectName1 = 'shower_event';//シャワー
     var effectName2 = "z_Shower";
     AudioManager.playSe({"name":effectName2,"volume":90,"pitch":120,"pan":0});
     $gameScreen._particle.particleSet(0,effectName1,'screen','def','spriteset');
   };
-  if(id1 == 6){
+  if(effectTypeId == 6){
     var effectName1 = 'cloud_w_front';
     $gameScreen._particle.particleSet(0,effectName1,'weather','def','spriteset');
   };
-  if(id1 == 7){
+  if(effectTypeId == 7){
     $gameScreen.startFlash([255,255,255,200], 120);
     var effectName2 = "Up1";
     AudioManager.playSe({"name":effectName2,"volume":90,"pitch":110,"pan":0});
@@ -1109,7 +1109,7 @@ adv_partDirectSet = function(id1){
     $gameScreen._particle.particleSet(0,effectName1,'weather','def','spriteset');
     $gameScreen._particle.particleUpdate([effectName1,'rect',-700,400,1300,768]);
   };
-  if(id1 == 8){
+  if(effectTypeId == 8){
     $gameScreen.startFlash([0,0,0,200], 120);
     var effectName2 = "Down4";
     AudioManager.playSe({"name":effectName2,"volume":90,"pitch":90,"pan":0});
@@ -1117,11 +1117,11 @@ adv_partDirectSet = function(id1){
     $gameScreen._particle.particleSet(0,effectName1,'weather','def','spriteset');
     $gameScreen._particle.particleUpdate([effectName1,'rect',-700,400,1300,768]);
   };
-  if(id1 == 9){
+  if(effectTypeId == 9){
     var effectName1 = 'cloud_w';//天候:雲
     $gameScreen._particle.particleSet(0,effectName1,'weather','def','spriteset');
   };
-  if(id1 == 10){//生命の嵐
+  if(effectTypeId == 10){//生命の嵐
     var effectName1 = 'hologram_screen';
     $gameScreen._particle.particleSet(0,effectName1,'screen','def','spriteset');
     var effectName1 = 'lifeStorm_screen';
@@ -1131,15 +1131,15 @@ adv_partDirectSet = function(id1){
 };
 
 //フィルター演出filter_direct(1,640,384,0.01);//種類.x軸,y軸,強さ
-filter_direct = function(id1,randomValue1,randomValue2,stringValue3){//0消去1絶頂2洗脳3グニャ～4oldfilm5ノイズ発生6ノイズ濃さ7ぼかし/8ぼかし濃さ/10グリッチｳｪｲﾄのみ
+filter_direct = function(filterTypeId,randomValue1,randomValue2,stringValue3){//0消去1絶頂2洗脳3グニャ～4oldfilm5ノイズ発生6ノイズ濃さ7ぼかし/8ぼかし濃さ/10グリッチｳｪｲﾄのみ
 
-if(id1 == 0){
+if(filterTypeId == 0){
   var list = ['zettyou','brainwashing','sepia','gunya1','noise1','bokasi','dokun'];
-  list.forEach(function(id2) {
-    $gameMap.eraseFilter(id2);
+  list.forEach(function(filterName) {
+    $gameMap.eraseFilter(filterName);
   }, this);
 };
-if(id1 == 1){
+if(filterTypeId == 1){
   $gameScreen.startFlash([255,119,255,204], 60);
   var effectName10 = 'zettyou';
   $gameMap.createFilter(effectName10,'shockwave',0,'screen');
@@ -1147,7 +1147,7 @@ if(id1 == 1){
   $gameMap.setFilterAddiTime(effectName10,stringValue3);
   $gameMap.eraseFilterAfterMove(effectName10);
 };
-if(id1 == 2){
+if(filterTypeId == 2){
   var effectName4 = 180;
   if(stringValue3 == 0.02){var effectName4 = 180};
   if(stringValue3 == 0.03){var effectName4 = 150};
@@ -1158,18 +1158,18 @@ if(id1 == 2){
   $gameMap.createFilter(effectName10,'shockwave',0,'screen');
   if(stringValue3 >= 0.04){
     $gameMap.setFilter(effectName10,[randomValue1,randomValue2,-1,200,300,1]);
-    var arr1 = ['ZH_sticky2',100,100];
-    var effectName4 = getRandomIndex(26) + Number(arr1[2]);
+    var seParams = ['ZH_sticky2',100,100];
+    var effectName4 = getRandomIndex(26) + Number(seParams[2]);
     $gameScreen.startShake(7, 7, 60);
   } else {
     $gameMap.setFilter(effectName10,[randomValue1,randomValue2,-1,30,160,1]);
-    var arr1 = ['Saint1',75,50];
-    var effectName4 = getRandomIndex(26) + Number(arr1[2]);
+    var seParams = ['Saint1',75,50];
+    var effectName4 = getRandomIndex(26) + Number(seParams[2]);
   };
-  AudioManager.playSe({"name":arr1[0],"volume":Number(arr1[1]),"pitch":effectName4,"pan":0});
+  AudioManager.playSe({"name":seParams[0],"volume":Number(seParams[1]),"pitch":effectName4,"pan":0});
   $gameMap.setFilterAddiTime(effectName10,stringValue3);
 };
-if(id1 == 3){
+if(filterTypeId == 3){
   AudioManager.playSe({"name":"Z_BlackOut","volume":80,"pitch":50,"pan":0});
   var effectName10 = 'gunya1';
   $gameMap.createFilter(effectName10,'twist',0,'screen');
@@ -1180,27 +1180,27 @@ if(id1 == 3){
   $gameMap.moveFilterQueue(effectName10,[randomValue1,randomValue2,1280,8],180);
   $gameMap.moveFilterQueue(effectName10,[randomValue1,randomValue2,1280,10],800);
 };
-if(id1 == 4){
+if(filterTypeId == 4){
   var effectName10 = 'sepia';
   $gameMap.createFilter(effectName10,'oldfilm',0,'screen');
 };
-if(id1 == 5){
+if(filterTypeId == 5){
   var effectName10 = 'noise1';
   $gameMap.createFilter(effectName10,'noise',0,'screen');
   $gameMap.setFilter(effectName10,[randomValue1]);
 };
-if(id1 == 6){
+if(filterTypeId == 6){
   $gameMap.moveFilterQueue(effectName10,[randomValue1],randomValue2);
 };
-if(id1 == 7){
+if(filterTypeId == 7){
   var effectName10 = 'bokasi';
   $gameMap.createFilter(effectName10,'blur',0,'screen');
   $gameMap.setFilter(effectName10,[randomValue1]);
 };
-if(id1 == 8){
+if(filterTypeId == 8){
   $gameMap.moveFilterQueue(effectName10,[randomValue1],randomValue2);
 };
-if(id1 == 9){
+if(filterTypeId == 9){
   var effectName10 = 'dokun';
   $gameMap.createFilter(effectName10,'zoomblur',0,'screen');
   $gameMap.setFilter(effectName10,[randomValue1,randomValue2,0,0.5]);
@@ -1215,7 +1215,7 @@ if(id1 == 9){
   AudioManager.playSe({"name":'Z_HeartBeat',"volume":90,"pitch":effectName4,"pan":0});
   $gameScreen.startFlash([255,255,255,effectName4], stringValue3);
 };
-if(id1 == 10){
+if(filterTypeId == 10){
   var effectName10 = 'glitch1';
   var effectName4 = 2;//getRandomIndex(11) + 5;
   if(randomValue1 == 1000){var effectName5 = getRandomIndex(360)}else{var effectName5 = randomValue1};
@@ -1230,17 +1230,17 @@ if(id1 == 10){
 };
 
 //属性によるパーティクル発生
-element_particleSet = function(id11,parallaxName1,parallaxName2,effectName5){
+element_particleSet = function(elementParticleTypeId,parallaxName1,parallaxName2,effectName5){
 
-  if(id11 == 0){
+  if(elementParticleTypeId == 0){
     picture_fade1(parallaxName1-1,"fadeOut",'102',60,5);
     picture_fade1(parallaxName1+1,"fadeOut",'102',60,5);
-    var arr1 = ['sparks_w2','petal_w','lines_width3','stardust_w','bubble_w','diamonddust_w','black_particle_w','ether_sp'];
-    for (var i = 0; i <= arr1.length-1; i++) {
-      $gameScreen._particle.particleClear(arr1[i]);
+    var particleNamesToClear = ['sparks_w2','petal_w','lines_width3','stardust_w','bubble_w','diamonddust_w','black_particle_w','ether_sp'];
+    for (var i = 0; i <= particleNamesToClear.length-1; i++) {
+      $gameScreen._particle.particleClear(particleNamesToClear[i]);
     };
   };
-  if(id11 == 1){
+  if(elementParticleTypeId == 1){
     var parallaxName3 = 'ether_sp';
     if(parallaxName2 == 51 || parallaxName2 == 3){var parallaxName3 = 'sparks_w2'};
     if(parallaxName2 == 52 || parallaxName2 == 4){var parallaxName3 = 'petal_w'};
@@ -1251,7 +1251,7 @@ element_particleSet = function(id11,parallaxName1,parallaxName2,effectName5){
     if(parallaxName2 == 57 || parallaxName2 == 9){var parallaxName3 = 'ether_sp'};
     $gameScreen._particle.particleSet(0,parallaxName3,'screen','def','spriteset');
   };
-  if(id11 == 2){
+  if(elementParticleTypeId == 2){
     if(parallaxName2 >= 1){
       var parallaxName3 = '/img/parallaxes/Scene_Element_' + parallaxName2;
       $gameScreen.showPicture(parallaxName1-1,parallaxName3,1,640,384+effectName5,100,100,200,1);
@@ -1266,7 +1266,7 @@ element_particleSet = function(id11,parallaxName1,parallaxName2,effectName5){
 };
 
 //gabによるパーティクル発生
-gab_wordParticle = function(id10){
+gab_wordParticle = function(gabText){
 
 AudioManager.playSe({"name":'Chime2',"volume":90,"pitch":100,"pan":0});
 var effectName1 = 'text_dispray2';
@@ -1277,25 +1277,25 @@ if (scene._gabWindow) scene.clearGabWindow();
 $gameScreen._particle.particlePlay(0,effectName1,'screen','def','screen');
 //$gameScreen._particle.particleUpdate([effectName1,'pos',-600,-260]);
 $gameScreen._particle.particleExceed(effectName1,0.3);
-var gabData = [`　　　${id10}`,'',0,0,'',0];
+var gabData = [`　　　${gabText}`,'',0,0,'',0];
 if (scene._gabWindow) scene.startGabWindow(gabData);
 
 };
 
 //Hランク上昇任意hSkill_rankUpWordDirect(1,1,671,1);//1が最初2が文字で0で締め,ｱｸﾀｰ,ｽｷﾙid,ﾗﾝｸｾｯﾄ
-hSkill_rankUpWordDirect = function(id1,id2,id3,id4){
+hSkill_rankUpWordDirect = function(messageTypeId,actorIdOrMessageText,skillId,masteryLevel){
 
-if(id1 == 1){
-  var actor = $gameActors.actor(id2);
-  if(!$gameSwitches.value(29)){actor.setSkillMasteryLevel(id3, id4)};
-  valueWordSet0 = `\\C[26]${actor.name()}\\C[0]の\\C[27]<\\sin[${id3}]>\\C[0]ランクが\\C[10]${id4}\\C[0]になった…。`;
+if(messageTypeId == 1){
+  var actor = $gameActors.actor(actorIdOrMessageText);
+  if(!$gameSwitches.value(29)){actor.setSkillMasteryLevel(skillId, masteryLevel)};
+  valueWordSet0 = `\\C[26]${actor.name()}\\C[0]の\\C[27]<\\sin[${skillId}]>\\C[0]ランクが\\C[10]${masteryLevel}\\C[0]になった…。`;
   adv_partDirectPlay(19);
 };
-if(id1 == 2){
-  valueWordSet0 = id2;
+if(messageTypeId == 2){
+  valueWordSet0 = actorIdOrMessageText;
   adv_partDirectPlay(19);
 };
-if(id1 == 0){
+if(messageTypeId == 0){
   adv_partDirectPlay(0);
   picture_fade1(108,"fadeOut",'Hscene005',120,5);
   $gameScreen.movePicture(109,1,640-200,384,100,100,0,0,120);
@@ -1305,105 +1305,105 @@ if(id1 == 0){
 };
 
 //獲得物の簡易表示get_infoDirect(0,51,0,1);
-get_infoDirect = function(id1,id2,id3,id4){
+get_infoDirect = function(databaseTypeId,databaseEntryId,actorId,itemAmount){
 
-var arr1 = ['Saint5',75,50];
-if(id1 == 0){var gameSwitchValue1 = `\\C[2]＜\x1bIIN[${id2}]＞\\C[0]`;var valueItems = $dataItems;var stringValue2 = `を入手した！`};
-if(id1 == 1){var gameSwitchValue1 = `\\C[2]＜\x1bWIN[${id2}]＞\\C[0]`;var valueItems = $dataWeapons;var stringValue2 = `を入手した！`};
-if(id1 == 2){var gameSwitchValue1 = `\\C[2]＜\x1bAIN[${id2}]＞\\C[0]`;var valueItems = $dataArmors;var stringValue2 = `を入手した！`};
-if(id1 == 3){var gameSwitchValue1 = `\\C[2]＜\x1bSIN[${id2}]＞\\C[0]`;var valueItems = $dataSkills;var stringValue2 = `獲得した！`};
-if(id1 == 4){var gameSwitchValue1 = `\\C[6]${id2.toLocaleString()}\G\\C[0]`;var valueItems = $dataSkills;var stringValue2 = `入手した！`};
-if(id1 == 5){var gameSwitchValue1 = `\\C[2]＜\x1bJ[${id2}]＞\\C[0]`;var valueItems = $dataClasses;var stringValue2 = `が解放された！`};
-if(id2 <= -1 && id1 == 4){var stringValue2 = `失った…。`};
-if([0,1,2].some(function(id){return id1 == id})){
-  if(id4 <= -1){
+var seParams = ['Saint5',75,50];
+if(databaseTypeId == 0){var gameSwitchValue1 = `\\C[2]＜\x1bIIN[${databaseEntryId}]＞\\C[0]`;var databaseEntries = $dataItems;var stringValue2 = `を入手した！`};
+if(databaseTypeId == 1){var gameSwitchValue1 = `\\C[2]＜\x1bWIN[${databaseEntryId}]＞\\C[0]`;var databaseEntries = $dataWeapons;var stringValue2 = `を入手した！`};
+if(databaseTypeId == 2){var gameSwitchValue1 = `\\C[2]＜\x1bAIN[${databaseEntryId}]＞\\C[0]`;var databaseEntries = $dataArmors;var stringValue2 = `を入手した！`};
+if(databaseTypeId == 3){var gameSwitchValue1 = `\\C[2]＜\x1bSIN[${databaseEntryId}]＞\\C[0]`;var databaseEntries = $dataSkills;var stringValue2 = `獲得した！`};
+if(databaseTypeId == 4){var gameSwitchValue1 = `\\C[6]${databaseEntryId.toLocaleString()}\G\\C[0]`;var databaseEntries = $dataSkills;var stringValue2 = `入手した！`};
+if(databaseTypeId == 5){var gameSwitchValue1 = `\\C[2]＜\x1bJ[${databaseEntryId}]＞\\C[0]`;var databaseEntries = $dataClasses;var stringValue2 = `が解放された！`};
+if(databaseEntryId <= -1 && databaseTypeId == 4){var stringValue2 = `失った…。`};
+if([0,1,2].some(function(id){return databaseTypeId == id})){
+  if(itemAmount <= -1){
     var stringValue2 = `を失った…。`;
 }};
-if(id1 == 4){
+if(databaseTypeId == 4){
   var gameSwitchValue5 = 100;
-  if(id2 >= 10000 && id2 <= 30000){var gameSwitchValue5 = 90};
-  if(id2 >= 30001 && id2 <= 60000){var gameSwitchValue5 = 80};
-  if(id2 >= 60001 && id2 <= 100000){var gameSwitchValue5 = 70};
-  if(id2 >= 100001 && id2 <= 200000){var gameSwitchValue5 = 60};
-  if(id2 >= 200001){var gameSwitchValue5 = 50};
-  var arr1 = ['Shop1',100,gameSwitchValue5];
-  if(!$gameSwitches.value(29)){$gameParty.gainGold(id2)};
+  if(databaseEntryId >= 10000 && databaseEntryId <= 30000){var gameSwitchValue5 = 90};
+  if(databaseEntryId >= 30001 && databaseEntryId <= 60000){var gameSwitchValue5 = 80};
+  if(databaseEntryId >= 60001 && databaseEntryId <= 100000){var gameSwitchValue5 = 70};
+  if(databaseEntryId >= 100001 && databaseEntryId <= 200000){var gameSwitchValue5 = 60};
+  if(databaseEntryId >= 200001){var gameSwitchValue5 = 50};
+  var seParams = ['Shop1',100,gameSwitchValue5];
+  if(!$gameSwitches.value(29)){$gameParty.gainGold(databaseEntryId)};
 } else {
-  if(!valueItems[id2]) return;
-  if(valueItems[id2].meta['EICSwitch']){
-    if(Number(valueItems[id2].meta['EICSwitch']) == 104){
+  if(!databaseEntries[databaseEntryId]) return;
+  if(databaseEntries[databaseEntryId].meta['EICSwitch']){
+    if(Number(databaseEntries[databaseEntryId].meta['EICSwitch']) == 104){
       var gameSwitchValue1 = `\\C[17]称号:\\C[0]`　+ gameSwitchValue1;
     };
-    if(Number(valueItems[id2].meta['EICSwitch']) == 105){
+    if(Number(databaseEntries[databaseEntryId].meta['EICSwitch']) == 105){
       var gameSwitchValue1 = `\\C[27]Ｈ称号:\\C[0]`　+ gameSwitchValue1;
-      var arr1 = ['ZH_Sexy',50,150];
+      var seParams = ['ZH_Sexy',50,150];
     };
-    if(Number(valueItems[id2].meta['EICSwitch']) == 108){
+    if(Number(databaseEntries[databaseEntryId].meta['EICSwitch']) == 108){
       var gameSwitchValue1 = `\\C[20]クエスト:\\C[0]`　+ gameSwitchValue1;
     };
   };
-  if(id1 == 3){
-    var gameSwitchValue1 = `${$dataSystem.skillTypes[valueItems[id2].stypeId]}:` + gameSwitchValue1;
-    if(valueItems[id2].stypeId == 14 || valueItems[id2].stypeId == 15){
+  if(databaseTypeId == 3){
+    var gameSwitchValue1 = `${$dataSystem.skillTypes[databaseEntries[databaseEntryId].stypeId]}:` + gameSwitchValue1;
+    if(databaseEntries[databaseEntryId].stypeId == 14 || databaseEntries[databaseEntryId].stypeId == 15){
       var stringValue2 = `を獲得した………。`;
-      var arr1 = ['ZH_Sexy',50,150];
+      var seParams = ['ZH_Sexy',50,150];
     };
   };
-  if(id1 == 5){
-    if(valueItems[id2].meta['Subclass Only']){
+  if(databaseTypeId == 5){
+    if(databaseEntries[databaseEntryId].meta['Subclass Only']){
       var gameVarValue4 = `\\C[17]サブジョブ \\C[0]`;
     } else {
       var gameVarValue4 = `\\C[20]メインジョブ \\C[0]`;
     };
-    if(valueItems[id2].meta['classRank']){
-      if(Number(valueItems[id2].meta['classRank']) == 1){gameVarValue4 += `Class\\C[10]Ⅰ\\C[0]`};
-      if(Number(valueItems[id2].meta['classRank']) == 2){gameVarValue4 += `Class\\C[10]Ⅱ\C[0]`};
-      if(Number(valueItems[id2].meta['classRank']) == 3){gameVarValue4 += `Class\\C[10]Ⅲ\\C[0]`};
-      if(Number(valueItems[id2].meta['classRank']) == 4){gameVarValue4 += `Class\\C[10]Ⅳ\\C[0]`};
+    if(databaseEntries[databaseEntryId].meta['classRank']){
+      if(Number(databaseEntries[databaseEntryId].meta['classRank']) == 1){gameVarValue4 += `Class\\C[10]Ⅰ\\C[0]`};
+      if(Number(databaseEntries[databaseEntryId].meta['classRank']) == 2){gameVarValue4 += `Class\\C[10]Ⅱ\C[0]`};
+      if(Number(databaseEntries[databaseEntryId].meta['classRank']) == 3){gameVarValue4 += `Class\\C[10]Ⅲ\\C[0]`};
+      if(Number(databaseEntries[databaseEntryId].meta['classRank']) == 4){gameVarValue4 += `Class\\C[10]Ⅳ\\C[0]`};
     };
     var gameSwitchValue1 = `${gameVarValue4}:`　+ gameSwitchValue1;
   };
-  if(id1 <= 2){
-    if(!$gameSwitches.value(29)){$gameParty.gainItem(valueItems[id2], id4)};
+  if(databaseTypeId <= 2){
+    if(!$gameSwitches.value(29)){$gameParty.gainItem(databaseEntries[databaseEntryId], itemAmount)};
   };
-  if(id1 == 3){
-    if(id3 == 0){
+  if(databaseTypeId == 3){
+    if(actorId == 0){
       var gameVarValue4 = $gameVariables.value(2);
     } else {
-      var gameVarValue4 = id3;
+      var gameVarValue4 = actorId;
     };
     var actor = $gameActors.actor(gameVarValue4);
-    if(!!actor && !actor.isLearnedSkill(id2)){
-      if(!$gameSwitches.value(29)){actor.learnSkill(id2)};
+    if(!!actor && !actor.isLearnedSkill(databaseEntryId)){
+      if(!$gameSwitches.value(29)){actor.learnSkill(databaseEntryId)};
     };
     var gameSwitchValue1 = `\x1bN[${gameVarValue4}]が`　+ gameSwitchValue1;
   };
-  if(id1 == 5){
-    if(id3 == 0){
+  if(databaseTypeId == 5){
+    if(actorId == 0){
       var gameVarValue4 = $gameVariables.value(2);
     } else {
-      var gameVarValue4 = id3;
+      var gameVarValue4 = actorId;
     };
     var actor = $gameActors.actor(gameVarValue4);
-    if(!!actor && !actor._unlockedClasses.contains(id2)){
-      if(!$gameSwitches.value(29)){actor.unlockClass(id2)};
+    if(!!actor && !actor._unlockedClasses.contains(databaseEntryId)){
+      if(!$gameSwitches.value(29)){actor.unlockClass(databaseEntryId)};
     };
     var gameSwitchValue1 = `\x1bN[${gameVarValue4}]の`　+ gameSwitchValue1;
   };
 };
-if([0,1,2].some(function(id){return id1 == id})){
-  var gameSwitchValue1 = gameSwitchValue1 + `×${id4} `
+if([0,1,2].some(function(id){return databaseTypeId == id})){
+  var gameSwitchValue1 = gameSwitchValue1 + `×${itemAmount} `
 };
 var gameSwitchValue3 = `　　${gameSwitchValue1} ${stringValue2}`;
 TickerManager.show(gameSwitchValue3);
 if($gameSwitches.value(124)){
-  if([0,1,2,3].some(function(id){return id1 == id})){
-    var arr2 = valueItems[id2].description.split("\n");
-    if(arr2[0] == 0){}else{TickerManager.show(`　　　解説文:${arr2[0]}`)};
-    if(arr2[1] == 0){}else{TickerManager.show(`　　　${arr2[1]}`)};
+  if([0,1,2,3].some(function(id){return databaseTypeId == id})){
+    var descriptionLines = databaseEntries[databaseEntryId].description.split("\n");
+    if(descriptionLines[0] == 0){}else{TickerManager.show(`　　　解説文:${descriptionLines[0]}`)};
+    if(descriptionLines[1] == 0){}else{TickerManager.show(`　　　${descriptionLines[1]}`)};
   };
 };
-AudioManager.playSe({"name":arr1[0],"volume":Number(arr1[1]),"pitch":Number(arr1[2]),"pan":0});
+AudioManager.playSe({"name":seParams[0],"volume":Number(seParams[1]),"pitch":Number(seParams[2]),"pan":0});
 if(!$gameParty.inBattle()){
   if($gameVariables.value(530) == 0){
     $gamePlayer.requestAnimation(229);
@@ -1419,9 +1419,9 @@ itemGet_afterProcess();
 };
 
 //直接的演出指定
-direct_staging1 = function(id1,valuePic1,scratchValue2,scratchValue3){
+direct_staging1 = function(stagingTypeId,valuePic1,scratchValue2,scratchValue3){
 
-if(id1 == 1){//1絶望的な回想
+if(stagingTypeId == 1){//1絶望的な回想
   pic_1(2,valuePic1,scratchValue2,0,100,255,60,1280,768,scratchValue3,0);
   $gameScreen.startFlash([255,255,255,170], 60);
   filter_direct(9,640,384,60);
@@ -1429,7 +1429,7 @@ if(id1 == 1){//1絶望的な回想
   filter_direct(4,0,0,0);
   filter_direct(5,0.1,0,0);
 };
-if(id1 == 2){
+if(stagingTypeId == 2){
 
 };
 

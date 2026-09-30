@@ -886,8 +886,8 @@ var QuestSystem = (function() {
   // MAIN PROCESSING FUNCTION
   // ============================================================
   
-  function processQuests(id5) {
-    var config = RANGE_CONFIGS[id5];
+  function processQuests(rangeConfigId) {
+    var config = RANGE_CONFIGS[rangeConfigId];
     if (!config) return;
     
     // Initialize global array if needed

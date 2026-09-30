@@ -846,8 +846,8 @@ class OriginalText2 extends OriginalTextBase {
 //#endregion
 
 
-htext_word = function (id1) {
-  switch (id1) {
+htext_word = function (wordSetId) {
+  switch (wordSetId) {
     case 3: {
       valueHtextWord = ['「アッ\\I[12]\\I[12]\\I[12]」', '「ンッ\\I[12]」', '「ンン…\\I[12]」', '「ンクっ…\\I[12]」', '「ァンっ…\\I[12]」', '「ヒィンっ…\\I[12]」', '「アヒィっ…\\I[12]」'];
       break;
@@ -863,24 +863,24 @@ htext_word = function (id1) {
   }
 }
 
-gabWord_exeScriptNoFace = function (arrNpcGab1) {
+gabWord_exeScriptNoFace = function (gabLineCandidates) {
 
-  if (!arrNpcGab1 || arrNpcGab1.length === 0) return;
-  var arrNpcGab2 = arrNpcGab1[getRandomIndex(arrNpcGab1.length)];
+  if (!gabLineCandidates || gabLineCandidates.length === 0) return;
+  var gabLine = gabLineCandidates[getRandomIndex(gabLineCandidates.length)];
   var scene = SceneManager._scene;
-  var gabData = [arrNpcGab2[0], '', 0, 0, '', 0];
-  if (!$gameParty.inBattle()) { $gameSystem.pushInfoLog(arrNpcGab2[0]) };//追加。インフォログにギャブ内容を直接入れる。
+  var gabData = [gabLine[0], '', 0, 0, '', 0];
+  if (!$gameParty.inBattle()) { $gameSystem.pushInfoLog(gabLine[0]) };//追加。インフォログにギャブ内容を直接入れる。
   if (scene && scene._gabWindow) scene.startGabWindow(gabData);
 
 };
 
-gabWord_exeScript = function (arrNpcGab1) {
+gabWord_exeScript = function (gabLineCandidates) {
 
-  if (!arrNpcGab1 || arrNpcGab1.length === 0) return;
-  var arrNpcGab2 = arrNpcGab1[getRandomIndex(arrNpcGab1.length)];
+  if (!gabLineCandidates || gabLineCandidates.length === 0) return;
+  var gabLine = gabLineCandidates[getRandomIndex(gabLineCandidates.length)];
   var scene = SceneManager._scene;
-  var gabData = [arrNpcGab2[0], 'face', arrNpcGab2[1], Number(arrNpcGab2[2]), '', 0];
-  if (!$gameParty.inBattle()) { $gameSystem.pushInfoLog(arrNpcGab2[0]) };//追加。インフォログにギャブ内容を直接入れる。
+  var gabData = [gabLine[0], 'face', gabLine[1], Number(gabLine[2]), '', 0];
+  if (!$gameParty.inBattle()) { $gameSystem.pushInfoLog(gabLine[0]) };//追加。インフォログにギャブ内容を直接入れる。
   if (scene && scene._gabWindow) scene.startGabWindow(gabData);
 
 };
@@ -888,7 +888,7 @@ gabWord_exeScript = function (arrNpcGab1) {
 //戦闘開始時Gab。
 gabWord_setBattle = function () {
 
-  var arrNpcGab1 = [];
+  var gabLineCandidates = [];
   var introSetFlag = 0;
   var memberCount = $gameParty.battleMembers().length;
   if (memberCount === 0) return;
@@ -898,24 +898,24 @@ gabWord_setBattle = function () {
   $gameVariables.setValue(625, $gameVariables.value(380 + actorId)[59]);
   if ($gameVariables.value(229) == 0) {//グループID
     $gameVariables.setValue(68, 80)//GAB表示時間。二言目以上の時
-    var arrNpcGab1 = [];
-    arrNpcGab1.push([`「秩序の名に措いて…、私は負けませんッ！！」`, '1Actor1', 7]);
-    gabWord_exeScript(arrNpcGab1);
-    var arrNpcGab1 = [];
-    arrNpcGab1.push([`「油断せず行きますよ──ッ！！」`, '1Actor1', 3]);
+    var gabLineCandidates = [];
+    gabLineCandidates.push([`「秩序の名に措いて…、私は負けませんッ！！」`, '1Actor1', 7]);
+    gabWord_exeScript(gabLineCandidates);
+    var gabLineCandidates = [];
+    gabLineCandidates.push([`「油断せず行きますよ──ッ！！」`, '1Actor1', 3]);
     var introSetFlag = 1;
   };
   if (introSetFlag == 0 && !$gameSwitches.value(211)) {
     if (memberCount == 1) {
       for (var i = 1; i <= 9; i++) {
         if ($dataActors[actorId].meta['GabBattleTurnAlone_' + i]) {
-          arrNpcGab1.push($dataActors[actorId].meta['GabBattleTurnAlone_' + i].split(','));
+          gabLineCandidates.push($dataActors[actorId].meta['GabBattleTurnAlone_' + i].split(','));
         };
       };
     } else {
       for (var i = 1; i <= 9; i++) {
         if ($dataActors[actorId].meta['GabBattleTurn_' + i]) {
-          arrNpcGab1.push($dataActors[actorId].meta['GabBattleTurn_' + i].split(','));
+          gabLineCandidates.push($dataActors[actorId].meta['GabBattleTurn_' + i].split(','));
         };
       };
     };
@@ -925,87 +925,87 @@ gabWord_setBattle = function () {
     //arrNpcGab1.push([`「押し通る──ッ！！」`,'NPC1',7]);
     //arrNpcGab1.push([`「押し通る──ッ！！」`,'NPC2',0]);
   };
-  gabWord_exeScript(arrNpcGab1);
+  gabWord_exeScript(gabLineCandidates);
 
 };
 
 //マップ移動時ＮＰＣ呟き。
 gabWord_setNpc = function () {
 
-  var arrNpcGab1 = [];
+  var gabLineCandidates = [];
   if ($gameParty.numItems($dataItems[10]) >= 1000) {
-    arrNpcGab1.push([`【中年男】「\\iin[10]が貯まってるじゃないか。早く交換に行きな」`, 'GabPeople4', 4]);
-    arrNpcGab1.push([`【女性】「\\iin[10]が貯まってるじゃない。交換に行ってきたら？」`, 'GabPeople4', 3]);
-    arrNpcGab1.push([`【少年】「\\iin[10]が貯まっていますよ？　交換に行くべきでは」`, 'GabPeople4', 0]);
+    gabLineCandidates.push([`【中年男】「\\iin[10]が貯まってるじゃないか。早く交換に行きな」`, 'GabPeople4', 4]);
+    gabLineCandidates.push([`【女性】「\\iin[10]が貯まってるじゃない。交換に行ってきたら？」`, 'GabPeople4', 3]);
+    gabLineCandidates.push([`【少年】「\\iin[10]が貯まっていますよ？　交換に行くべきでは」`, 'GabPeople4', 0]);
   };
   if ($gameSwitches.value(241) && $gameSwitches.value(203)) {//コルブラント屋外
     if ($gameVariables.value(135) >= 42 && $gameVariables.value(135) <= 43) {
-      arrNpcGab1.push([`【中年男】「何やら城の方が騒がしいな…」`, 'GabPeople1', 4]);
-      arrNpcGab1.push([`【老婆】「何があったって言うんだい、全く…」`, 'GabPeople1', 7]);
-      arrNpcGab1.push([`【青年】「騎士団長が何とかしてくれるさ！」`, 'GabPeople1', 2]);
-      arrNpcGab1.push([`【少年】「ヒャ、ヒャハ～～………」`, 'GabPeople1', 0]);
+      gabLineCandidates.push([`【中年男】「何やら城の方が騒がしいな…」`, 'GabPeople1', 4]);
+      gabLineCandidates.push([`【老婆】「何があったって言うんだい、全く…」`, 'GabPeople1', 7]);
+      gabLineCandidates.push([`【青年】「騎士団長が何とかしてくれるさ！」`, 'GabPeople1', 2]);
+      gabLineCandidates.push([`【少年】「ヒャ、ヒャハ～～………」`, 'GabPeople1', 0]);
     } else {
       if ($gameVariables.value(135) >= 47) {
-        arrNpcGab1.push([`【中年男】「宰相が逆賊だったんだって？　オレは前から怪しいと──」`, 'GabPeople1', 4]);
-        arrNpcGab1.push([`【老婆】「\\N[7]様がねぇ…、一体何だって………」`, 'GabPeople1', 7]);
+        gabLineCandidates.push([`【中年男】「宰相が逆賊だったんだって？　オレは前から怪しいと──」`, 'GabPeople1', 4]);
+        gabLineCandidates.push([`【老婆】「\\N[7]様がねぇ…、一体何だって………」`, 'GabPeople1', 7]);
       } else {
-        arrNpcGab1.push([`【中年男】「最近盗賊が暴れてるんだって？　全く騎士団は何をしてるんだよ──」`, 'GabPeople1', 4]);
-        arrNpcGab1.push([`【老婆】「最近は物騒な話ばっかりで嫌になるねぇ──」`, 'GabPeople1', 7]);
+        gabLineCandidates.push([`【中年男】「最近盗賊が暴れてるんだって？　全く騎士団は何をしてるんだよ──」`, 'GabPeople1', 4]);
+        gabLineCandidates.push([`【老婆】「最近は物騒な話ばっかりで嫌になるねぇ──」`, 'GabPeople1', 7]);
       };
-      arrNpcGab1.push([`【青年】「コルブラント島は初めてかい？　この島は良い所だよ！」`, 'GabPeople1', 2]);
-      arrNpcGab1.push([`【少年】「ヒャッハーーッ」`, 'GabPeople1', 0]);
+      gabLineCandidates.push([`【青年】「コルブラント島は初めてかい？　この島は良い所だよ！」`, 'GabPeople1', 2]);
+      gabLineCandidates.push([`【少年】「ヒャッハーーッ」`, 'GabPeople1', 0]);
     }
   };
   if ($gameSwitches.value(242) || $gameSwitches.value(276)) {//王城、後半も
     if ($gameVariables.value(135) >= 42) {
-      arrNpcGab1.push([`【団員】「制圧完了！」`, 'GabPeople2', 4]);
-      arrNpcGab1.push([`【団員】「異常なし！」`, 'GabActor1', 7]);
+      gabLineCandidates.push([`【団員】「制圧完了！」`, 'GabPeople2', 4]);
+      gabLineCandidates.push([`【団員】「異常なし！」`, 'GabActor1', 7]);
     } else {
-      arrNpcGab1.push([`【兵士】「異常ありません！」`, 'GabPeople3', 7]);
-      arrNpcGab1.push([`【メイド】「これはお目汚しを。失礼致しました──」`, 'GabPeople2', 5]);
-      arrNpcGab1.push([`【貴族】「フン。平民風情が城内を闊歩するなど。身の程をしれ──」`, 'GabPeople3', 4]);
+      gabLineCandidates.push([`【兵士】「異常ありません！」`, 'GabPeople3', 7]);
+      gabLineCandidates.push([`【メイド】「これはお目汚しを。失礼致しました──」`, 'GabPeople2', 5]);
+      gabLineCandidates.push([`【貴族】「フン。平民風情が城内を闊歩するなど。身の程をしれ──」`, 'GabPeople3', 4]);
       if ($gameVariables.value(135) <= 49) {
-        arrNpcGab1.push([`【兵士】「何だってよそ者に討伐なんて(ﾌﾞﾂﾌﾞﾂ…)──」`, 'GabPeople3', 7]);
+        gabLineCandidates.push([`【兵士】「何だってよそ者に討伐なんて(ﾌﾞﾂﾌﾞﾂ…)──」`, 'GabPeople3', 7]);
       };
     };
   };
   if ($gameSwitches.value(261)) {//秩序
     if ($gameVariables.value(135) >= 100) {
-      arrNpcGab1.push([`【団員】「お、団長代理じゃねーか。相変わらずエロい身体してるぜ\\I[12]」`, 'GabEroPeople1', 1]);
-      arrNpcGab1.push([`【団員】「ククク…──\\I[12]」`, 'GabEroPeople1', 4]);
+      gabLineCandidates.push([`【団員】「お、団長代理じゃねーか。相変わらずエロい身体してるぜ\\I[12]」`, 'GabEroPeople1', 1]);
+      gabLineCandidates.push([`【団員】「ククク…──\\I[12]」`, 'GabEroPeople1', 4]);
     } else {
-      arrNpcGab1.push([`【団員】「全空に、秩序を──！」`, 'GabPeople2', 4]);
-      arrNpcGab1.push([`【団員】「全空に、秩序を──！」`, 'GabActor1', 7]);
+      gabLineCandidates.push([`【団員】「全空に、秩序を──！」`, 'GabPeople2', 4]);
+      gabLineCandidates.push([`【団員】「全空に、秩序を──！」`, 'GabActor1', 7]);
     };
   };
   if ($gameSwitches.value(281) && $gameSwitches.value(203)) {//アウギュステ屋外
-    arrNpcGab1.push([`【青年】「ここはアウギュステ。年中観光客で賑わってる島だよ──」`, 'GabPeople4', 2]);
-    arrNpcGab1.push([`【少年】「ウキャキャキャーーーッ♪」`, 'GabPeople1', 0]);
-    arrNpcGab1.push([`【宗教男】「母なる海を汚す者、汝この地より立ち去るべし──」`, 'GabPeople4', 6]);
+    gabLineCandidates.push([`【青年】「ここはアウギュステ。年中観光客で賑わってる島だよ──」`, 'GabPeople4', 2]);
+    gabLineCandidates.push([`【少年】「ウキャキャキャーーーッ♪」`, 'GabPeople1', 0]);
+    gabLineCandidates.push([`【宗教男】「母なる海を汚す者、汝この地より立ち去るべし──」`, 'GabPeople4', 6]);
     if ($gameVariables.value(135) >= 32) {
-      arrNpcGab1.push([`【中年男】「例のクスリも下火になってきたみたいだな。助かる話だぜ」`, 'GabPeople4', 4]);
+      gabLineCandidates.push([`【中年男】「例のクスリも下火になってきたみたいだな。助かる話だぜ」`, 'GabPeople4', 4]);
     } else {
-      arrNpcGab1.push([`【中年男】「最近この街じゃ妙なクスリが出回ってるみたいでな…。アンタも気を付けなよ──」`, 'GabPeople4', 4]);
+      gabLineCandidates.push([`【中年男】「最近この街じゃ妙なクスリが出回ってるみたいでな…。アンタも気を付けなよ──」`, 'GabPeople4', 4]);
     }
     if ($gameVariables.value(135) <= 32) {
-      arrNpcGab1.push([`【青年？】「オホ…、オホホホォォォゥゥゥッッ──\\I[12]」`, 'GabEroPeople1', 0]);
-      arrNpcGab1.push([`【老人？】「儂は…神じゃったんか…、神、神、カミカミカミカミカァッハァァ──ッ\\I[12]」`, 'GabEroPeople1', 1]);
-      arrNpcGab1.push([`【中年？】「アヘ\\I[12] ア、ヒハヒハ\\I[12]」`, 'GabEroPeople1', 3]);
+      gabLineCandidates.push([`【青年？】「オホ…、オホホホォォォゥゥゥッッ──\\I[12]」`, 'GabEroPeople1', 0]);
+      gabLineCandidates.push([`【老人？】「儂は…神じゃったんか…、神、神、カミカミカミカミカァッハァァ──ッ\\I[12]」`, 'GabEroPeople1', 1]);
+      gabLineCandidates.push([`【中年？】「アヘ\\I[12] ア、ヒハヒハ\\I[12]」`, 'GabEroPeople1', 3]);
     };
   };
   if ($gameSwitches.value(282)) {//浜辺
-    arrNpcGab1.push([`【青年】「青い海、白い砂浜。完璧だッぜッ！！」`, 'GabPeople1', 2]);
-    arrNpcGab1.push([`【頭アウギュステ】「やっぱり年に一度は此処にリゾートに来ないとね──」`, 'GabActor2', 2]);
+    gabLineCandidates.push([`【青年】「青い海、白い砂浜。完璧だッぜッ！！」`, 'GabPeople1', 2]);
+    gabLineCandidates.push([`【頭アウギュステ】「やっぱり年に一度は此処にリゾートに来ないとね──」`, 'GabActor2', 2]);
     if ($gameVariables.value(135) <= 32) {
-      arrNpcGab1.push([`【青年？】「オホ…、オホホホォォォゥゥゥッッ──\\I[12]」`, 'GabEroPeople1', 0]);
-      arrNpcGab1.push([`【老人？】「儂は…神じゃったんか…、神、神、カミカミカミカミカァッハァァ──ッ\\I[12]」`, 'GabEroPeople1', 1]);
-      arrNpcGab1.push([`【中年？】「アヘ\\I[12] ア、ヒハヒハ\\I[12]」`, 'GabEroPeople1', 3]);
+      gabLineCandidates.push([`【青年？】「オホ…、オホホホォォォゥゥゥッッ──\\I[12]」`, 'GabEroPeople1', 0]);
+      gabLineCandidates.push([`【老人？】「儂は…神じゃったんか…、神、神、カミカミカミカミカァッハァァ──ッ\\I[12]」`, 'GabEroPeople1', 1]);
+      gabLineCandidates.push([`【中年？】「アヘ\\I[12] ア、ヒハヒハ\\I[12]」`, 'GabEroPeople1', 3]);
     };
   };
   if ($gameSwitches.value(301)) {//ジュエルリゾート
-    arrNpcGab1.push([`【少年】「ここに来ると、お父さん達が大はしゃぎするんだよね──」`, 'GabPeople4', 0]);
-    arrNpcGab1.push([`【中年】「カジノで今月の家賃まで溶かしちゃった。テヘペロ\\I[12]」`, 'GabPeople4', 4]);
-    arrNpcGab1.push([`【熟女】（無言で中年男のボディをサンドバックにしている…）`, 'GabPeople4', 5]);
+    gabLineCandidates.push([`【少年】「ここに来ると、お父さん達が大はしゃぎするんだよね──」`, 'GabPeople4', 0]);
+    gabLineCandidates.push([`【中年】「カジノで今月の家賃まで溶かしちゃった。テヘペロ\\I[12]」`, 'GabPeople4', 4]);
+    gabLineCandidates.push([`【熟女】（無言で中年男のボディをサンドバックにしている…）`, 'GabPeople4', 5]);
   };
   if ($gameSwitches.value(321) && $gameSwitches.value(203)) {//犯罪都市屋外
 
@@ -1014,70 +1014,70 @@ gabWord_setNpc = function () {
     rosyutu_wordChoiceNPC($gameParty.battleMembers()[0].actorId());
   };
 
-  gabWord_exeScript(arrNpcGab1);
+  gabWord_exeScript(gabLineCandidates);
 
 };
 //露出限界判定時にnpc台詞設定
-rosyutu_wordChoiceNPC = function (id1) {
+rosyutu_wordChoiceNPC = function (actorId) {
 
-  var arrNpcGab1 = [];
-  if ($gameVariables.value(id1 + 380)[4] <= 90) {
-    arrNpcGab1.push([`【中年男】「………………………（視線をこちらに固定しながら）」`, 'GabEroPeople1', 3]);
+  var gabLineCandidates = [];
+  if ($gameVariables.value(actorId + 380)[4] <= 90) {
+    gabLineCandidates.push([`【中年男】「………………………（視線をこちらに固定しながら）」`, 'GabEroPeople1', 3]);
   };
-  if ($gameVariables.value(id1 + 380)[4] <= 50) {
-    arrNpcGab1.push([`【青年】「（ニヤニヤ──\\I[12]）」`, 'GabEroPeople1', 0]);
-    arrNpcGab1.push([`【青年】「ヒュゥ──\\I[12]」`, 'GabEroPeople1', 2]);
+  if ($gameVariables.value(actorId + 380)[4] <= 50) {
+    gabLineCandidates.push([`【青年】「（ニヤニヤ──\\I[12]）」`, 'GabEroPeople1', 0]);
+    gabLineCandidates.push([`【青年】「ヒュゥ──\\I[12]」`, 'GabEroPeople1', 2]);
   };
-  if ($gameVariables.value(id1 + 380)[4] <= 25) {
-    arrNpcGab1.push([`【青年】「エロい格好しやがって──\\I[12]」`, 'GabEroPeople1', 1]);
-    arrNpcGab1.push([`【青年】「ヘッヘッヘ──\\I[12]」`, 'GabEroPeople1', 4]);
-    arrNpcGab1.push([`【青年】（こちらをジっと見ながらポケットに入れた手を激しく動かしている…）`, 'GabEroPeople1', 5]);
-    arrNpcGab1.push([`【青年】（こちらをジっと見ながらポケットに入れた手を激しく動かしている…）`, 'GabEroPeople1', 6]);
-    arrNpcGab1.push([`【青年】（こちらをジっと見ながらポケットに入れた手を激しく動かしている…）`, 'GabEroPeople1', 7]);
+  if ($gameVariables.value(actorId + 380)[4] <= 25) {
+    gabLineCandidates.push([`【青年】「エロい格好しやがって──\\I[12]」`, 'GabEroPeople1', 1]);
+    gabLineCandidates.push([`【青年】「ヘッヘッヘ──\\I[12]」`, 'GabEroPeople1', 4]);
+    gabLineCandidates.push([`【青年】（こちらをジっと見ながらポケットに入れた手を激しく動かしている…）`, 'GabEroPeople1', 5]);
+    gabLineCandidates.push([`【青年】（こちらをジっと見ながらポケットに入れた手を激しく動かしている…）`, 'GabEroPeople1', 6]);
+    gabLineCandidates.push([`【青年】（こちらをジっと見ながらポケットに入れた手を激しく動かしている…）`, 'GabEroPeople1', 7]);
   };
-  if ($gameVariables.value(id1 + 380)[4] <= 25 && $gameVariables.value(id1 + 380)[1] >= 500) {
-    arrNpcGab1.push([`【青年】「オイオイ、あの秩序の女、また乳デカくなってんじゃねーの──\\I[12]」`, 'GabEroPeople1', 5]);
-    arrNpcGab1.push([`【青年】「秩序秩序って、自分が一番秩序乱してんじゃね？」（←呆れ顔）`, 'GabEroPeople1', 6]);
-    arrNpcGab1.push([`【青年】「慧漏いな…」`, 'GabEroPeople1', 7]);
+  if ($gameVariables.value(actorId + 380)[4] <= 25 && $gameVariables.value(actorId + 380)[1] >= 500) {
+    gabLineCandidates.push([`【青年】「オイオイ、あの秩序の女、また乳デカくなってんじゃねーの──\\I[12]」`, 'GabEroPeople1', 5]);
+    gabLineCandidates.push([`【青年】「秩序秩序って、自分が一番秩序乱してんじゃね？」（←呆れ顔）`, 'GabEroPeople1', 6]);
+    gabLineCandidates.push([`【青年】「慧漏いな…」`, 'GabEroPeople1', 7]);
   };
-  gabWord_exeScript(arrNpcGab1);
+  gabWord_exeScript(gabLineCandidates);
 
 };
 //露出限界判定時に台詞設定
-rosyutu_wordChoice = function (id1) {
+rosyutu_wordChoice = function (actorId) {
 
-  var actor = $gameActors.actor(id1);
+  var actor = $gameActors.actor(actorId);
   if (!actor) return;
-  var arr2 = [];
-  if (id1 == 2) {
-    var arr1 = [`「乙女にさせる格好では無いだろうが…っ」`, 3, 2]; arr2.push(arr1);
+  var gabLineCandidates = [];
+  if (actorId == 2) {
+    var gabLine = [`「乙女にさせる格好では無いだろうが…っ」`, 3, 2]; gabLineCandidates.push(gabLine);
   };
-  if (id1 == 1) {
-    if ($gameVariables.value(id1 + 380)[4] >= 70) {
-      var arr1 = [`「そ、その…、早く着替えましょう………」`, 3, 7]; arr2.push(arr1);
-      var arr1 = [`「は、恥ずかしいんですけど………」`, 3, 4]; arr2.push(arr1);
+  if (actorId == 1) {
+    if ($gameVariables.value(actorId + 380)[4] >= 70) {
+      var gabLine = [`「そ、その…、早く着替えましょう………」`, 3, 7]; gabLineCandidates.push(gabLine);
+      var gabLine = [`「は、恥ずかしいんですけど………」`, 3, 4]; gabLineCandidates.push(gabLine);
     } else {
-      var arr1 = [`「…巫山戯ないでくれませんか…！？」`, 3, 2]; arr2.push(arr1);
-      var arr1 = [`「………」（←変質者を見る目）`, 3, 0]; arr2.push(arr1);
+      var gabLine = [`「…巫山戯ないでくれませんか…！？」`, 3, 2]; gabLineCandidates.push(gabLine);
+      var gabLine = [`「………」（←変質者を見る目）`, 3, 0]; gabLineCandidates.push(gabLine);
     };
 
-    if ($gameVariables.value(id1 + 440)[41] == 2) {
-      var arr1 = [`「…街中でする格好ではありませんよね…？」`, 4, 1]; arr2.push(arr1);//水着
+    if ($gameVariables.value(actorId + 440)[41] == 2) {
+      var gabLine = [`「…街中でする格好ではありませんよね…？」`, 4, 1]; gabLineCandidates.push(gabLine);//水着
     };
-    if ($gameVariables.value(id1 + 440)[41] == 3) {
-      var arr1 = [`「…街中でする格好ではありませんよね…？」`, 4, 1]; arr2.push(arr1);//メイド
+    if ($gameVariables.value(actorId + 440)[41] == 3) {
+      var gabLine = [`「…街中でする格好ではありませんよね…？」`, 4, 1]; gabLineCandidates.push(gabLine);//メイド
     };
-    if ($gameVariables.value(id1 + 440)[41] == 99) {
-      var arr1 = [`「頭がおかしいんじゃ無いですか！！」`, 3, 3]; arr2.push(arr1);//奴隷
+    if ($gameVariables.value(actorId + 440)[41] == 99) {
+      var gabLine = [`「頭がおかしいんじゃ無いですか！！」`, 3, 3]; gabLineCandidates.push(gabLine);//奴隷
       ensyutu_ikari(60, 'Thunder9');
     };
     if (actor.isStateAffected(70)) {
-      var arr1 = [`「早く着替えましょう…！」`, 3, 5]; arr2.push(arr1);//破損
+      var gabLine = [`「早く着替えましょう…！」`, 3, 5]; gabLineCandidates.push(gabLine);//破損
     };
-    if ($gameVariables.value(id1 + 440)[0] >= 1) {
+    if ($gameVariables.value(actorId + 440)[0] >= 1) {
       const clothItem = $dataItems[$gameVariables.value($gameVariables.value(20) + 440)[0]];
       if (clothItem && clothItem.meta['ClothType'] == '改') {
-        var arr1 = [`「こんな破廉恥な恰好、秩序として受け入れられません！！」`, 3, 3]; arr2.push(arr1);//改造衣装
+        var gabLine = [`「こんな破廉恥な恰好、秩序として受け入れられません！！」`, 3, 3]; gabLineCandidates.push(gabLine);//改造衣装
         ensyutu_ikari(60, 'Thunder9');
       }
     };
@@ -1086,39 +1086,39 @@ rosyutu_wordChoice = function (id1) {
 
     };
     if ($gameSwitches.value(206) || $gameSwitches.value(213)) {//露出開発度などで条件分岐
-      var arr1 = [`「こんな破廉恥な恰好、秩序として受け入れられません！！」`, 3, 3]; arr2.push(arr1);
+      var gabLine = [`「こんな破廉恥な恰好、秩序として受け入れられません！！」`, 3, 3]; gabLineCandidates.push(gabLine);
     };
   };
-  var array1 = arr2.length > 0 ? arr2[getRandomIndex(arr2.length)] : 0;
-  $gameVariables.setValue(21, array1);
+  var chosenGabLine = gabLineCandidates.length > 0 ? gabLineCandidates[getRandomIndex(gabLineCandidates.length)] : 0;
+  $gameVariables.setValue(21, chosenGabLine);
 
 };
 
 //作品ごとで変更させる個人プロフィール
-production_separateSetProfile = function (id1) {
+production_separateSetProfile = function (actorId) {
 
-  if (id1 == 1) {//リーシャ
+  if (actorId == 1) {//リーシャ
     var profileText =
       `気高く尊き秩序の蒼光纏う、若き騎空団団長（代理）。
 全空でも有数の騎士を父に持ち、
 自身も七光りでは終わらぬ才を持つ。
 生真面目な気質で、事案の類には容赦が無い。\n`;
   };
-  if (id1 == 2) {//モニカ
+  if (actorId == 2) {//モニカ
     var profileText =
       `剛勇鮮烈な武威の閃電煌めく、（実質的に）第四船団長。
 一行の中では年長者であり、
 年相応の落ち着きと研鑽を積んだ甘党系武闘派騎空士。
 齢に相応しき外見になりたいが、諦めてもいる。\n`;
   };
-  if (id1 == 3) {//雄ドラフ
+  if (actorId == 3) {//雄ドラフ
     var profileText =
       `雄ドラフらしいマッスルが頼れるナイスガイ。
 秩序の騎空団創設者とも轡を並べたベテラン騎空士。
 秩序の騎空団内部でも信頼厚く、\\N[1]の
 守役のような立ち位置。嫁さん募集中。\n`;
   };
-  if (id1 == 4) {//女ヒューマン
+  if (actorId == 4) {//女ヒューマン
     var profileText =
       `秩序の騎空団では若手に入る、実力派騎空士。
 生きる為に汚れ仕事に手を染めていたが、
@@ -1126,7 +1126,7 @@ production_separateSetProfile = function (id1) {
 以降は秩序の騎空士として優秀な戦果を挙げている。
 カレシ募集中。\n`;
   };
-  if (id1 == 5) {//少年
+  if (actorId == 5) {//少年
     var profileText =
       `賊によって家族と住む場所を失った薄幸の少年エルーン。
 現在は秩序の騎空士見習いとして励んでいる。
@@ -1142,19 +1142,19 @@ production_separateSetProfile = function (id1) {
 今作の不幸枠、兼、疫病神。\n`;
     };
   };
-  if (id1 == 6) {//糞ガキ
+  if (actorId == 6) {//糞ガキ
     var profileText =
       `コルブラント王国に措いて由緒正しき血脈を
 保つ名門伯爵家嫡男。\n`;
     //profileText += //進行に応じて追加。
   };
-  if (id1 == 7) {//大臣
+  if (actorId == 7) {//大臣
     var profileText =
       `コルブラント王国の内政を一手に取り仕切る大臣。
 辣腕と評判。\n`;
   };
 
-  var actor = $gameActors.actor(id1);
+  var actor = $gameActors.actor(actorId);
   if (!actor || !profileText) return;
   actor.setProfile(profileText);
 
@@ -1277,12 +1277,12 @@ seisyoujuu_select1 = function () {
 };
 
 //入手した星晶獣の一覧valueCountSet1 = 0;
-seisyoujuu_select2 = function (id1) {
+seisyoujuu_select2 = function (selectModeId) {
 
-  if (id1 == 0) {
+  if (selectModeId == 0) {
     for (let i = 100; i <= 205; i++) { $gameScreen.erasePicture(i) };
   }
-  else if (id1 == 1) {
+  else if (selectModeId == 1) {
     //valueItems = $dataArmors;
     //const value0 = 0;
     let pictureId = 101;
@@ -1356,30 +1356,30 @@ kobetu_isyouSetOther = function () {
   tachie_settei3($gameActors.actor(4));
 
   gameVariables.setValue(20, 5);
-  let array = gameVariables.value(445);
-  array[5] = 1;//身体
-  array[7] = 1;//ペニス
-  array[23] = 1;//衣装
-  array[33] = 1;//表情
-  array[37] = 1;//髪型
+  let unlockFlags = gameVariables.value(445);
+  unlockFlags[5] = 1;//身体
+  unlockFlags[7] = 1;//ペニス
+  unlockFlags[23] = 1;//衣装
+  unlockFlags[33] = 1;//表情
+  unlockFlags[37] = 1;//髪型
   tachie_settei3($gameActors.actor(5));
 
   gameVariables.setValue(20, 6);
-  array = gameVariables.value(446);
-  array[5] = 1;
-  array[7] = 1;
-  array[23] = 1;
-  array[33] = 1;
-  array[37] = 0;
+  unlockFlags = gameVariables.value(446);
+  unlockFlags[5] = 1;
+  unlockFlags[7] = 1;
+  unlockFlags[23] = 1;
+  unlockFlags[33] = 1;
+  unlockFlags[37] = 0;
   tachie_settei3($gameActors.actor(6));
 
   gameVariables.setValue(20, 7);
-  array = gameVariables.value(447);
-  array[5] = 1;
-  array[7] = 1;
-  array[23] = 1;
-  array[33] = 1;
-  array[37] = 0;
+  unlockFlags = gameVariables.value(447);
+  unlockFlags[5] = 1;
+  unlockFlags[7] = 1;
+  unlockFlags[23] = 1;
+  unlockFlags[33] = 1;
+  unlockFlags[37] = 0;
   tachie_settei3($gameActors.actor(7));
 
 };
@@ -1708,12 +1708,12 @@ kobetu_isyousettei1 = function (actor) {
 };
 
 //リーシャとモニカに露出状態でのキャラチップコート着用
-isyou_senyouLisciaBlueOnly = function (id2) {
+isyou_senyouLisciaBlueOnly = function (actorId) {
 
-  if (id2 == 1) {
-    valueBustUpCloth2[id2] = valueBustUpCloth[id2];//バスト存在しない衣装がある場合ここで処理
-    if ($gameVariables.value(440 + id2)[28] == 3) {
-      if ([20, 21, 22, 23, 25].every(function (id) { return $gameVariables.value(440 + id2)[id] == 0 })) {
+  if (actorId == 1) {
+    valueBustUpCloth2[actorId] = valueBustUpCloth[actorId];//バスト存在しない衣装がある場合ここで処理
+    if ($gameVariables.value(440 + actorId)[28] == 3) {
+      if ([20, 21, 22, 23, 25].every(function (id) { return $gameVariables.value(440 + actorId)[id] == 0 })) {
         $gameVariables.setValue(22, 5);
         $gameVariables.setValue(23, 5);
       };
@@ -1727,10 +1727,10 @@ isyou_senyouLisciaBlueOnly = function (id2) {
       };
     };
   };
-  if (id2 == 2) {
-    valueBustUpCloth2[id2] = valueBustUpCloth[id2];
-    if ($gameVariables.value(440 + id2)[28] == 2) {
-      if ([20, 21, 22, 23, 25].every(function (id) { return $gameVariables.value(440 + id2)[id] == 0 })) {
+  if (actorId == 2) {
+    valueBustUpCloth2[actorId] = valueBustUpCloth[actorId];
+    if ($gameVariables.value(440 + actorId)[28] == 2) {
+      if ([20, 21, 22, 23, 25].every(function (id) { return $gameVariables.value(440 + actorId)[id] == 0 })) {
         $gameVariables.setValue(22, 5);
         $gameVariables.setValue(23, 5);
       };
@@ -1745,7 +1745,7 @@ isyou_senyouLisciaBlueOnly = function (id2) {
     };
   };
 
-  if ($dataActors[id2].meta['bustBlessNo']) { valueBustUpCloth2[id2] = -1 };//乳揺れ無いキャラ
+  if ($dataActors[actorId].meta['bustBlessNo']) { valueBustUpCloth2[actorId] = -1 };//乳揺れ無いキャラ
 
 };
 
@@ -1787,9 +1787,9 @@ jouhou_buySetup = function () {
     var hasGoldFlag = 0;
     if ($dataItems[i].meta['BattleMapInformation']) {
       if ($dataItems[i].meta['SetJouhouVal']) {
-        var arr1 = $dataItems[i].meta['SetJouhouVal'].split(',');
-        if (Number(arr1[0]) == 0) { arr1[0] = 135 };
-        if ($gameVariables.value(Number(arr1[0])) >= Number(arr1[1])) {
+        var setJouhouValues = $dataItems[i].meta['SetJouhouVal'].split(',');
+        if (Number(setJouhouValues[0]) == 0) { setJouhouValues[0] = 135 };
+        if ($gameVariables.value(Number(setJouhouValues[0])) >= Number(setJouhouValues[1])) {
           var availStatus = 1;
         }
       };
@@ -1841,7 +1841,7 @@ wakingup_pic = function () {
     var wakeVariant2 = getRandomIndex(3) + 1;
     var poseValue1 = getRandomIndex(2) + 0;
     var poseValue2 = 5;
-    var arr1 = [8, 8, 8, 11, 8, 8]; var poseValue3 = arr1[getRandomIndex(arr1.length)];
+    var candidatePoseValues = [8, 8, 8, 11, 8, 8]; var poseValue3 = candidatePoseValues[getRandomIndex(candidatePoseValues.length)];
   } else {
     var wakeVariant1 = 2;
     var wakeVariant2 = getRandomIndex(2) + 2;
@@ -1862,7 +1862,7 @@ wakingup_pic = function () {
   if ($gameSwitches.value(465)) {
     var poseValue1 = getRandomIndex(2) + 0;
     var poseValue2 = 5;
-    var arr1 = [8, 8, 8, 11, 8, 8]; var poseValue3 = arr1[getRandomIndex(arr1.length)];
+    var candidatePoseValues = [8, 8, 8, 11, 8, 8]; var poseValue3 = candidatePoseValues[getRandomIndex(candidatePoseValues.length)];
   };
   var wakeImageName = 'Zev_WakingUp1_' + wakeVariant1;
   $gameScreen.showPicture(valuePic1, wakeImageName, 1, 640 + 384 + 128, 384 + 50, 100, 100, 0, 0);
@@ -1885,15 +1885,15 @@ syukuhaku_pic = function (actorSlotId) {
   var actor = $gameActors.actor(actorSlotId);
   if (!actor) return;
   var exposureLevel = $gameVariables.value(actorSlotId + 380)[4];
-  var array = [];
+  var sleepPictureNames = [];
   var locationType = 0;
   if ($gameSwitches.value(203)) {
     var locationType = 2;
   } else {
     var locationType = 1;
   };
-  if (locationType >= 1) { array.push("Zev_StaySleep0-" + locationType) };
-  array.push("Zev_StaySleep1-1");
+  if (locationType >= 1) { sleepPictureNames.push("Zev_StaySleep0-" + locationType) };
+  sleepPictureNames.push("Zev_StaySleep1-1");
   var sleepPose = 1;
   if (actor.hpRate() <= 0.3) { var sleepPose = 2 };
   if (actor.isStateAffected(61) || $gameSwitches.value(465)) { var sleepPose = 3 };
@@ -1905,7 +1905,7 @@ syukuhaku_pic = function (actorSlotId) {
       };
     };
   };
-  if (sleepPose >= 1) { array.push("Zev_StaySleep2-" + sleepPose) };
+  if (sleepPose >= 1) { sleepPictureNames.push("Zev_StaySleep2-" + sleepPose) };
   var sleepVariant3 = 0;
   if (exposureLevel >= 49) {
     var sleepRand3 = getRandomIndex(4);
@@ -1913,7 +1913,7 @@ syukuhaku_pic = function (actorSlotId) {
     if (sleepRand3 == 1) { var sleepVariant3 = 2 };
     if (sleepRand3 == 0) { var sleepVariant3 = 3 };
   };
-  if (sleepVariant3 >= 1) { array.push("Zev_StaySleep3-" + sleepVariant3) };
+  if (sleepVariant3 >= 1) { sleepPictureNames.push("Zev_StaySleep3-" + sleepVariant3) };
   var sleepVariant4 = 1;
   if (actor.isStateAffected(67)) { var sleepVariant4 = 2 };
   var skillBonus = getRandomIndex(10);
@@ -1923,14 +1923,14 @@ syukuhaku_pic = function (actorSlotId) {
   if (actor.isLearnedSkill(69)) { skillBonus += 1 };
   if (actor.isLearnedSkill(70)) { skillBonus += 1 };
   if (skillBonus >= 8) { var sleepVariant4 = 0 };
-  if (sleepVariant4 >= 1) { array.push("Zev_StaySleep4-" + sleepVariant4) };
+  if (sleepVariant4 >= 1) { sleepPictureNames.push("Zev_StaySleep4-" + sleepVariant4) };
   var sleepVariant5 = getRandomIndex(3);
   if (sleepPose >= 4) { var sleepVariant5 = 0 };
-  if (sleepVariant5 >= 1) { array.push("Zev_StaySleep5-" + sleepVariant5) };
+  if (sleepVariant5 >= 1) { sleepPictureNames.push("Zev_StaySleep5-" + sleepVariant5) };
 
   var sleepVariant6 = 0;
   if (sleepPose >= 4) { var sleepVariant6 = 1 };//value22の判定を利用
-  if (sleepVariant6 >= 1) { array.push("Zev_StaySleep6-" + sleepVariant6) };
+  if (sleepVariant6 >= 1) { sleepPictureNames.push("Zev_StaySleep6-" + sleepVariant6) };
 
   var scaleFactor = 1;
   var positionIndex = getRandomIndex(2);//ピクチャ表示時に中央1か左上0か
@@ -1951,10 +1951,10 @@ syukuhaku_pic = function (actorSlotId) {
     var endY = refHeight / 2 - (baseHeight - refHeight) / 2;//y終点。+で上
   };
   var picOpacity = 50;//特定IDだけを透明にしたいけど出来なかった
-  var id1 = 51;
-  for (var id = 0; id <= array.length - 1; id++) {
-    $gameScreen.showPicture(id1, array[id], positionIndex, startX, startY, 100 * zoomScale, 100 * zoomScale, picOpacity, 0);
-    id1 += 1;
+  var pictureId = 51;
+  for (var id = 0; id <= sleepPictureNames.length - 1; id++) {
+    $gameScreen.showPicture(pictureId, sleepPictureNames[id], positionIndex, startX, startY, 100 * zoomScale, 100 * zoomScale, picOpacity, 0);
+    pictureId += 1;
   };
   var moveOpacity = 100;
   var moveRand = getRandomIndex(2);
@@ -1963,10 +1963,10 @@ syukuhaku_pic = function (actorSlotId) {
     var endY = refHeight / 2;
     var moveOpacity = 80;
   };
-  var id1 = 51;
-  for (var id = 0; id <= array.length - 1; id++) {
-    $gameScreen.movePicture(id1, 1, endX, endY, moveOpacity, moveOpacity, 255, 0, 240);
-    id1 += 1;
+  var pictureId = 51;
+  for (var id = 0; id <= sleepPictureNames.length - 1; id++) {
+    $gameScreen.movePicture(pictureId, 1, endX, endY, moveOpacity, moveOpacity, 255, 0, 240);
+    pictureId += 1;
   };
   if (sleepPose >= 4) {
     AudioManager.playMe({ "name": "21_Inn1", "volume": 50, "pitch": 100, "pan": 0 });
@@ -1977,9 +1977,9 @@ syukuhaku_pic = function (actorSlotId) {
 };
 
 //作品オリジナルの演出に使用original_direct(1,0,0,0,0,0);没original_mainに引き抜いて使用
-original_direct = function (id1, id2, id3, id4, id5, id6) {
+original_direct = function (effectTypeId, particleGroupId, auraColorVariantId, unusedArg4, unusedArg5, unusedArg6) {
 
-  if (id1 == 1) {//バハムート登場/退場
+  if (effectTypeId == 1) {//バハムート登場/退場
     var picId = 61;
     var pictureName = "/img/parallaxes/BattleField1_1";//仮パララックス名。
     $gameScreen.showPicture(picId, pictureName, 1, 640, 384, 100, 100, 0, 0);
@@ -1999,7 +1999,7 @@ original_direct = function (id1, id2, id3, id4, id5, id6) {
     var picId = 'thunder_w';
     $gameScreen._particle.particleSet(0, picId, valueWordSet10, 'def', 'screen');
   };
-  if (id1 == 2) {//バハムート登場/退場
+  if (effectTypeId == 2) {//バハムート登場/退場
     var picId = 61;
     $gameScreen.erasePicture(picId);
     $gameScreen.erasePicture(picId + 1);
@@ -2008,38 +2008,38 @@ original_direct = function (id1, id2, id3, id4, id5, id6) {
     var picId = 'thunder_w';
     $gameScreen._particle.particleClear(picId);
   };
-  if (id1 == 3) {//オーラ処理。original_direct(3,this._eventId,1,0,0,0);
+  if (effectTypeId == 3) {//オーラ処理。original_direct(3,this._eventId,1,0,0,0);
     var picId = 'aura_static_b';
-    $gameScreen._particle.particleSet(String(id2), picId + '-' + id2, 'this', picId, '99');
-    $gameScreen._particle.particleUpdate([picId + '-' + id2, 'alpha', '0', '0.7@0.5', '0']);
-    $gameScreen._particle.particleUpdate([picId + '-' + id2, 'blendMode', '1']);
-    $gameScreen._particle.particleUpdate([picId + '-' + id2, 'scale', '0', '0.6']);
-    $gameScreen._particle.particleUpdate([picId + '-' + id2, 'lifetime', '1.1', '1.1']);
-    if (id3 == 1) { $gameScreen._particle.particleUpdate([picId + '-' + id2, 'color', '#ffffff', '#00eeff']) };//リーシャ
-    if (id3 == 2) { $gameScreen._particle.particleUpdate([picId + '-' + id2, 'color', '#ffffff', '#f2ff00']) };//モニカ
-    $gameScreen._particle.particleUpdate([picId + '-' + id2, 'pos', 0, -20]);
+    $gameScreen._particle.particleSet(String(particleGroupId), picId + '-' + particleGroupId, 'this', picId, '99');
+    $gameScreen._particle.particleUpdate([picId + '-' + particleGroupId, 'alpha', '0', '0.7@0.5', '0']);
+    $gameScreen._particle.particleUpdate([picId + '-' + particleGroupId, 'blendMode', '1']);
+    $gameScreen._particle.particleUpdate([picId + '-' + particleGroupId, 'scale', '0', '0.6']);
+    $gameScreen._particle.particleUpdate([picId + '-' + particleGroupId, 'lifetime', '1.1', '1.1']);
+    if (auraColorVariantId == 1) { $gameScreen._particle.particleUpdate([picId + '-' + particleGroupId, 'color', '#ffffff', '#00eeff']) };//リーシャ
+    if (auraColorVariantId == 2) { $gameScreen._particle.particleUpdate([picId + '-' + particleGroupId, 'color', '#ffffff', '#f2ff00']) };//モニカ
+    $gameScreen._particle.particleUpdate([picId + '-' + particleGroupId, 'pos', 0, -20]);
   };
-  if (id1 == 4) {//オーラ処理終了
-    var picId = 'aura_static_b' + '-' + id2;
+  if (effectTypeId == 4) {//オーラ処理終了
+    var picId = 'aura_static_b' + '-' + particleGroupId;
     $gameScreen._particle.particleClear(picId);
   };
-  if (id1 == 5) {//少年暴走ベルセルクoriginal_direct(5,this._eventId,0,0,0,0);
+  if (effectTypeId == 5) {//少年暴走ベルセルクoriginal_direct(5,this._eventId,0,0,0,0);
     var picId = 'magic_circle_c2';
-    var arr1 = [String(id2), 'this', '99'];
-    $gameScreen._particle.particleSet(arr1[0], picId + '-' + id2, arr1[1], picId, arr1[2]);
+    var particleParams = [String(particleGroupId), 'this', '99'];
+    $gameScreen._particle.particleSet(particleParams[0], picId + '-' + particleGroupId, particleParams[1], picId, particleParams[2]);
     var picId = 'monster_c';
-    var arr1 = [String(id2), 'this', '99'];
-    $gameScreen._particle.particleSet(arr1[0], picId + '-' + id2, arr1[1], picId, arr1[2]);
+    var particleParams = [String(particleGroupId), 'this', '99'];
+    $gameScreen._particle.particleSet(particleParams[0], picId + '-' + particleGroupId, particleParams[1], picId, particleParams[2]);
     var picId = 'mysterious_torch_c';
-    var arr1 = [String(id2), 'this', '99'];
-    $gameScreen._particle.particleSet(arr1[0], picId + '-' + id2, arr1[1], picId, arr1[2]);
+    var particleParams = [String(particleGroupId), 'this', '99'];
+    $gameScreen._particle.particleSet(particleParams[0], picId + '-' + particleGroupId, particleParams[1], picId, particleParams[2]);
   };
-  if (id1 == 6) {//少年暴走ベルセルク終了
-    var picId = 'magic_circle_c2' + '-' + id2;
+  if (effectTypeId == 6) {//少年暴走ベルセルク終了
+    var picId = 'magic_circle_c2' + '-' + particleGroupId;
     $gameScreen._particle.particleClear(picId);
-    var picId = 'monster_c' + '-' + id2;
+    var picId = 'monster_c' + '-' + particleGroupId;
     $gameScreen._particle.particleClear(picId);
-    var picId = 'mysterious_torch_c' + '-' + id2;
+    var picId = 'mysterious_torch_c' + '-' + particleGroupId;
     $gameScreen._particle.particleClear(picId);
   };
 
@@ -2048,20 +2048,20 @@ original_direct = function (id1, id2, id3, id4, id5, id6) {
 //作品オリジナルの移動禁止処理
 original_stopMoveSwi = function () {
 
-  var arr3 = [$gameSwitches.value(1), $gameSwitches.value(1)];
-  var arr4 = [!$gameSwitches.value(2), !$gameSwitches.value(2)];
-  var arr5 = [[18, 14, 42], [18, 14, 42]];
-  var arr6 = [[1, 1, `今は先に行くところがあります`], [1, 1, `今は先に行くところがあります`]];
-  for (var i = 0; i < arr3.length; i++) {
-    if (arr3[i] && arr4[i]) {
+  var entryEnabledFlags = [$gameSwitches.value(1), $gameSwitches.value(1)];
+  var exitBlockedFlags = [!$gameSwitches.value(2), !$gameSwitches.value(2)];
+  var targetPositions = [[18, 14, 42], [18, 14, 42]];
+  var variableAssignments = [[1, 1, `今は先に行くところがあります`], [1, 1, `今は先に行くところがあります`]];
+  for (var i = 0; i < entryEnabledFlags.length; i++) {
+    if (entryEnabledFlags[i] && exitBlockedFlags[i]) {
       $gameSwitches.setValue(434, true);
-      var arr1 = arr5[i];
-      var arr2 = [$gameMap.mapId(), $gamePlayer._realX, $gamePlayer._realY];
-      if (arr1[0] == arr2[0]) {
-        if (arr1[1] == arr2[1] || arr1[1] == arr2[1] + 1 || arr1[1] == arr2[1] - 1) {
-          if (arr1[2] == arr2[2] || arr1[2] == arr2[2] + 1 || arr1[2] == arr2[2] - 1) {
+      var targetPosition = targetPositions[i];
+      var playerPosition = [$gameMap.mapId(), $gamePlayer._realX, $gamePlayer._realY];
+      if (targetPosition[0] == playerPosition[0]) {
+        if (targetPosition[1] == playerPosition[1] || targetPosition[1] == playerPosition[1] + 1 || targetPosition[1] == playerPosition[1] - 1) {
+          if (targetPosition[2] == playerPosition[2] || targetPosition[2] == playerPosition[2] + 1 || targetPosition[2] == playerPosition[2] - 1) {
             $gameSwitches.setValue(434, false);
-            $gameVariables.setValue(21, arr6[i][2]);
+            $gameVariables.setValue(21, variableAssignments[i][2]);
           }
         }
       }
@@ -2601,12 +2601,12 @@ function monicaMassageStep3OriginalScene(valuePic1) {
   }
 }
 
-function monicaMassageStep4OriginalScene(valuePic1, id3, id4) {// id3,id4 undefined here because did not set in parent function
+function monicaMassageStep4OriginalScene(valuePic1, yOffset, scalePercent) {// id3,id4 undefined here because did not set in parent function
   // Case 4: Move all pictures with dynamic parameters (id3 and id4)
   for (let pictureIndex = valuePic1; pictureIndex <= valuePic1 + 10; pictureIndex++) {
     if ($gameScreen.picture(pictureIndex)) {
       const currentOpacity = $gameScreen.picture(pictureIndex).opacity();
-      $gameScreen.movePicture(pictureIndex, 1, 640, 384 + id3, id4, id4, currentOpacity, 0, 120);
+      $gameScreen.movePicture(pictureIndex, 1, 640, 384 + yOffset, scalePercent, scalePercent, currentOpacity, 0, 120);
     }
   }
 }

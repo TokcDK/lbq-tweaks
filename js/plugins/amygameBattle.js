@@ -62,12 +62,12 @@ enemy_dropSelection = function (user) {
     if (valueDropCount1 != 1) continue;
 
     const itemDropDataKindNum = Number(itemDropData[1]);
-    const valueItems = itemsSourceKinds[itemDropDataKindNum];
-    const valueItem = valueItems ? valueItems[Number(itemDropData[2])] : null;
-    if (!valueItem) continue;
+    const dropSourceEntries = itemsSourceKinds[itemDropDataKindNum];
+    const dropItem = dropSourceEntries ? dropSourceEntries[Number(itemDropData[2])] : null;
+    if (!dropItem) continue;
     const picName = itemsSourceKindPicNamesEnemyDropSelection[itemDropDataKindNum];
     if (isInBattle) {
-      $gameTroop.addDropItem(valueItem);
+      $gameTroop.addDropItem(dropItem);
       //var value1 = `\x1bI[${valueItems[Number(arr1[i][2])].iconIndex}]`;
       //var arr7 = [-50,-60,-70,-80,-90,-100,-110,-120,-130,-140,-150,-160,-170,-180,-190,-200];
       const shiftX = xShiftCoordsEnemyDropSelection[getRandomIndex(xShiftCoordsLength)];//x
@@ -88,9 +88,9 @@ enemy_dropSelection = function (user) {
         item_getSkillLevel(valueFootpadSkillId, $gameVariables.value(22), $gameVariables.value(23));
       } else {
         if (Number(itemDropData[2]) >= 1) {
-          $gameParty.gainItem(valueItem, 1);
-          const itemIcon = `\x1bI[${valueItem.iconIndex}]`;
-          const itemName = `\\C[2]${valueItem.name}\\C[0]`;
+          $gameParty.gainItem(dropItem, 1);
+          const itemIcon = `\x1bI[${dropItem.iconIndex}]`;
+          const itemName = `\\C[2]${dropItem.name}\\C[0]`;
           const item = `${itemIcon}${itemName}`;
           const num = `\\C[2]1\\C[0]`;
           const messageText = `${item}を${num}個入手！\n`;
@@ -279,8 +279,8 @@ get_item_drop_data = function (user) {
       const stateRaceDropKind = $dataStates[i] && $dataStates[i].meta['RaceDropKind'];
       if (stateRaceDropKind) {
         const stateRaceDropKinds = stateRaceDropKind.split(',');
-        for (let id1 = 0; id1 <= stateRaceDropKinds.length - 1; id1++) {
-          const stateRaceDropKindIndex = Number(stateRaceDropKinds[id1]);
+        for (let kindIndex = 0; kindIndex <= stateRaceDropKinds.length - 1; kindIndex++) {
+          const stateRaceDropKindIndex = Number(stateRaceDropKinds[kindIndex]);
           const raceDropItem = $dataItems[stateRaceDropKindIndex];
           const itemRaceDropRarity = raceDropItem && raceDropItem.meta['RaceDropRarity'];
           if (itemRaceDropRarity) {
@@ -301,9 +301,9 @@ allAnimeattack_move2 = function () { allAnimeattack_moveBase(true); }
 allAnimeattack_moveBase = function (isMove2) {
 
   const max = !$gameSwitches.value(464) ? 8 : 4;
-  const shift1 = max == 8 ? (isMove2 ? -100 : 100) : (isMove2 ? 350 : -350);
-  const shift2 = max == 8 ? (isMove2 ? -350 : 350) : (isMove2 ? 200 : -200);
-  const shift = $gameVariables.value(182) == 11 ? shift1 : shift2;
+  const stepShift = max == 8 ? (isMove2 ? -100 : 100) : (isMove2 ? 350 : -350);
+  const dashShift = max == 8 ? (isMove2 ? -350 : 350) : (isMove2 ? 200 : -200);
+  const shift = $gameVariables.value(182) == 11 ? stepShift : dashShift;
   for (let i = 1; i <= max; i++) {
     $gameTroop.move(i, shift, 0, 20);
   }
@@ -453,44 +453,44 @@ damage_keisan1 = function (user, target, action, damageAmount, critAnimationId, 
 }
 
 //スキルパワー加算計算skill_addPowerSet(user,$dataSkills,1,1);
-skill_addPowerSet = function (user, valueItems, id1, id2) {
+skill_addPowerSet = function (user, dbEntries, dbEntryId, powerCategoryId) {
 
   valueAddPowerCustom = 0;
   if (user.isActor()) {
-    var arr1 = valueAddPowerCustomSkill;
-    if (arr1 != 0) {
-      for (var i = 0; i <= arr1.length - 1; i++) {
-        if (user.isLearnedSkill(arr1[i]) && user.battleSkillsRaw().includes(arr1[i])) {
-          valueAddPowerCustom += Number($dataSkills[arr1[i]].meta['AddPowerCustom']);
-          if ($dataSkills[arr1[i]].meta['Max Mastery Level']) {
-            valueAddPowerCustom += user.skillMasteryLevel(arr1[i]);
+    var addPowerCustomIds = valueAddPowerCustomSkill;
+    if (addPowerCustomIds != 0) {
+      for (var i = 0; i <= addPowerCustomIds.length - 1; i++) {
+        if (user.isLearnedSkill(addPowerCustomIds[i]) && user.battleSkillsRaw().includes(addPowerCustomIds[i])) {
+          valueAddPowerCustom += Number($dataSkills[addPowerCustomIds[i]].meta['AddPowerCustom']);
+          if ($dataSkills[addPowerCustomIds[i]].meta['Max Mastery Level']) {
+            valueAddPowerCustom += user.skillMasteryLevel(addPowerCustomIds[i]);
           };
         };
       }
     };
-    var arr1 = valueAddPowerCustomWeapon;
-    if (arr1 != 0) {
-      for (var i = 0; i <= arr1.length - 1; i++) {
-        if (user.hasWeapon($dataWeapons[arr1[i]])) { valueAddPowerCustom += Number($dataWeapons[Number(arr1[i])].meta['AddPowerCustom']) };
+    var addPowerCustomIds = valueAddPowerCustomWeapon;
+    if (addPowerCustomIds != 0) {
+      for (var i = 0; i <= addPowerCustomIds.length - 1; i++) {
+        if (user.hasWeapon($dataWeapons[addPowerCustomIds[i]])) { valueAddPowerCustom += Number($dataWeapons[Number(addPowerCustomIds[i])].meta['AddPowerCustom']) };
       }
     };
-    var arr1 = valueAddPowerCustomArmor;
-    if (arr1 != 0) {
-      for (var i = 0; i <= arr1.length - 1; i++) {
-        if (user.hasArmor($dataArmors[arr1[i]])) { valueAddPowerCustom += Number($dataArmors[arr1[i]].meta['AddPowerCustom']) };
+    var addPowerCustomIds = valueAddPowerCustomArmor;
+    if (addPowerCustomIds != 0) {
+      for (var i = 0; i <= addPowerCustomIds.length - 1; i++) {
+        if (user.hasArmor($dataArmors[addPowerCustomIds[i]])) { valueAddPowerCustom += Number($dataArmors[addPowerCustomIds[i]].meta['AddPowerCustom']) };
       }
     };
   };
-  var arr1 = valueAddPowerCustomState;
-  if (arr1 != 0) {
-    for (var i = 0; i <= arr1.length - 1; i++) {
-      if (user.isStateAffected(arr1[i])) { valueAddPowerCustom += Number($dataStates[arr1[i]].meta['AddPowerCustom']) };
+  var addPowerCustomIds = valueAddPowerCustomState;
+  if (addPowerCustomIds != 0) {
+    for (var i = 0; i <= addPowerCustomIds.length - 1; i++) {
+      if (user.isStateAffected(addPowerCustomIds[i])) { valueAddPowerCustom += Number($dataStates[addPowerCustomIds[i]].meta['AddPowerCustom']) };
     }
   };
-  if (id2 == 2) { } else {
-    if (valueItems[id1].stypeId == 12) {
+  if (powerCategoryId == 2) { } else {
+    if (dbEntries[dbEntryId].stypeId == 12) {
       if (user.isActor()) {
-        if (valueItems[id1].meta['ユニーク']) {
+        if (dbEntries[dbEntryId].meta['ユニーク']) {
           if ($gameVariables.value(287)[user.actorId()][10] >= 1) {
             valueAddPowerCustom += $gameVariables.value(287)[user.actorId()][10];
           };
@@ -1000,8 +1000,8 @@ Element_DebuffRateA = function (target, stateId) {
   var code = 11;
   var stateElementId = Number($dataStates[stateId].meta['ElementId']);
   var stateDebuffRate = Number($dataStates[stateId].meta['DebuffRate']);
-  const target1 = $dataStates[(target.isEnemy() ? 490 : 486) + target.index()];
-  target1.traits.push({ code: code, dataId: stateElementId, value: 1 + (stateDebuffRate / 100) });
+  const stateData = $dataStates[(target.isEnemy() ? 490 : 486) + target.index()];
+  stateData.traits.push({ code: code, dataId: stateElementId, value: 1 + (stateDebuffRate / 100) });
   target.addStateCounter(stateId, +(stateDebuffRate / 100));
 
 };
@@ -1013,8 +1013,8 @@ Element_DebuffRateR = function (target, stateId) {
     const code = 11;
     const dataId = Number($dataStates[stateId].meta['ElementId']);
     const dataStateId = target.isEnemy() ? 490 : 486;
-    const target1 = $dataStates[dataStateId + target.index()];
-    target1.traits.push({ code: code, dataId: dataId, value: 1 - target.getStateCounter(stateId) });
+    const stateData = $dataStates[dataStateId + target.index()];
+    stateData.traits.push({ code: code, dataId: dataId, value: 1 - target.getStateCounter(stateId) });
     target.removeStateCounter(stateId);
   };
 };
@@ -1091,13 +1091,13 @@ state_removeEffect1 = function (user, target, stateId, animationId) {
 };
 
 //特殊効果ステート発動時のアクション
-activate_spcialState = function (user, id1) {
+activate_spcialState = function (user, stateId) {
 
-  if ($dataStates[id1].meta['activateRate']) {
+  if ($dataStates[stateId].meta['activateRate']) {
     if (user.isLearnedSkill(746) && user.skillMasteryLevel(746) >= 1) {
-      var activationThreshold = Number($dataStates[id1].meta['activateRate']) - ((Number($dataStates[id1].meta['activateRate']) * user.skillMasteryLevel(746) / 10));
+      var activationThreshold = Number($dataStates[stateId].meta['activateRate']) - ((Number($dataStates[stateId].meta['activateRate']) * user.skillMasteryLevel(746) / 10));
     } else {
-      var activationThreshold = Number($dataStates[id1].meta['activateRate']);
+      var activationThreshold = Number($dataStates[stateId].meta['activateRate']);
     };
     if (user.battleSkillsRaw().includes(747)) {
       var activationThreshold = activationThreshold - (activationThreshold * 2 / 10);
@@ -1118,11 +1118,11 @@ activate_spcialState = function (user, id1) {
       user.addState(109);
     };
   };
-  if ($dataStates[id1].meta['activatePoint']) {
+  if ($dataStates[stateId].meta['activatePoint']) {
     if (user.isLearnedSkill(746) && user.skillMasteryLevel(746) >= 1) {
-      var activationThreshold = Number($dataStates[id1].meta['activatePoint']) - (Number($dataStates[id1].meta['activatePoint']) * user.skillMasteryLevel(746) / 10);
+      var activationThreshold = Number($dataStates[stateId].meta['activatePoint']) - (Number($dataStates[stateId].meta['activatePoint']) * user.skillMasteryLevel(746) / 10);
     } else {
-      var activationThreshold = Number($dataStates[id1].meta['activatePoint']);
+      var activationThreshold = Number($dataStates[stateId].meta['activatePoint']);
     };
     if (user.battleSkillsRaw().includes(747)) {
       var activationThreshold = activationThreshold - (activationThreshold * 2 / 10);
@@ -1910,7 +1910,7 @@ function buildHeaderTextBattleXsarStatas(user, IsEnemy) {
 }
 
 //エネミー撃破時にドロップボックス設定
-enemywin_treasurebox1 = function (id1) {
+enemywin_treasurebox1 = function (unusedArg1) {
 
   $gameVariables.value(160)[4] = 0;
   $gameVariables.value(160)[7] = 0;
@@ -1954,9 +1954,9 @@ enemywin_treasurebox1 = function (id1) {
 };
 
 //エネミー撃破時にドロップボックス設定
-enemywin_treasurebox2 = function (id1) {
+enemywin_treasurebox2 = function (eventId) {
 
-  const sourceEvent = $gameMap.event(id1);
+  const sourceEvent = $gameMap.event(eventId);
   if (!sourceEvent) return;
 
   for (var i = 1; i <= 100; i++) {
@@ -2028,7 +2028,7 @@ battleback_change2 = function () {
     spriteset.battlebackOpacity(3, 255);
   };
 
-  var arr1 = [-0.1, -0.2, -0.3, -0.4, -0.5, 0.1, 0.2, 0.3, 0.4, 0.5];
+  var scrollSpeedCandidates = [-0.1, -0.2, -0.3, -0.4, -0.5, 0.1, 0.2, 0.3, 0.4, 0.5];
   var selectedBgKey = 0;
   if ($gameVariables.value(240) >= 1) {
     var value = $dataItems[$gameVariables.value(240)];
@@ -2042,9 +2042,9 @@ battleback_change2 = function () {
   if (!value) return;
   if (selectedBgKey != 0) {
     var arr = value.meta[selectedBgKey].split(',');
-    var scrollSpeedX = arr1[getRandomIndex(arr1.length)];
+    var scrollSpeedX = scrollSpeedCandidates[getRandomIndex(scrollSpeedCandidates.length)];
     var scrollOpacityValue = getRandomIndex(56) + 200;
-    var scrollSpeedY = arr1[getRandomIndex(arr1.length)];
+    var scrollSpeedY = scrollSpeedCandidates[getRandomIndex(scrollSpeedCandidates.length)];
     var battlebackDuration = 120;
     var spriteset = SceneManager._scene._spriteset;
     if (Number(arr[1]) == 0) { } else {
@@ -2070,9 +2070,9 @@ battleback_change2 = function () {
   if (selectedBgKey != 0) {
     if (value.meta[selectedBgKey]) {
       var arr = value.meta[selectedBgKey].split(',');
-      var scrollSpeedX = arr1[getRandomIndex(arr1.length)];
+      var scrollSpeedX = scrollSpeedCandidates[getRandomIndex(scrollSpeedCandidates.length)];
       var scrollOpacityValue = getRandomIndex(101) + 100;
-      var scrollSpeedY = arr1[getRandomIndex(arr1.length)];
+      var scrollSpeedY = scrollSpeedCandidates[getRandomIndex(scrollSpeedCandidates.length)];
       var bitmap = ImageManager.loadBitmap("img/parallaxes/", arr[0], Number(arr[4]), true);
       spriteset.addNewBattleback(3, bitmap, 0, battlebackDuration);
       if (Number(arr[1]) == 0) { } else {
@@ -2100,9 +2100,9 @@ battleback_change2 = function () {
   if (selectedBgKey != 0) {
     if (value.meta[selectedBgKey]) {
       var arr = value.meta[selectedBgKey].split(',');
-      var scrollSpeedX = arr1[getRandomIndex(arr1.length)];
+      var scrollSpeedX = scrollSpeedCandidates[getRandomIndex(scrollSpeedCandidates.length)];
       var scrollOpacityValue = getRandomIndex(101) + 100;
-      var scrollSpeedY = arr1[getRandomIndex(arr1.length)];
+      var scrollSpeedY = scrollSpeedCandidates[getRandomIndex(scrollSpeedCandidates.length)];
       var bitmap = ImageManager.loadBitmap("img/parallaxes/", arr[0], Number(arr[4]), true);
       spriteset.addNewBattleback(4, bitmap, 0, battlebackDuration);
       if (Number(arr[1]) == 0) { } else {
@@ -2130,9 +2130,9 @@ battleback_change2 = function () {
   if (selectedBgKey != 0) {
     if (value.meta[selectedBgKey]) {
       var arr = value.meta[selectedBgKey].split(',');
-      var scrollSpeedX = arr1[getRandomIndex(arr1.length)];
+      var scrollSpeedX = scrollSpeedCandidates[getRandomIndex(scrollSpeedCandidates.length)];
       var scrollOpacityValue = getRandomIndex(101) + 100;
-      var scrollSpeedY = arr1[getRandomIndex(arr1.length)];
+      var scrollSpeedY = scrollSpeedCandidates[getRandomIndex(scrollSpeedCandidates.length)];
       var bitmap = ImageManager.loadBitmap("img/parallaxes/", arr[0], Number(arr[4]), true);
       spriteset.addNewBattleback(5, bitmap, 0, battlebackDuration);
       if (Number(arr[1]) == 0) { } else {
@@ -2160,9 +2160,9 @@ battleback_change2 = function () {
   if (selectedBgKey != 0) {
     if (value.meta[selectedBgKey]) {
       var arr = value.meta[selectedBgKey].split(',');
-      var scrollSpeedX = arr1[getRandomIndex(arr1.length)];
+      var scrollSpeedX = scrollSpeedCandidates[getRandomIndex(scrollSpeedCandidates.length)];
       var scrollOpacityValue = getRandomIndex(101) + 100;
-      var scrollSpeedY = arr1[getRandomIndex(arr1.length)];
+      var scrollSpeedY = scrollSpeedCandidates[getRandomIndex(scrollSpeedCandidates.length)];
       var bitmap = ImageManager.loadBitmap("img/parallaxes/", arr[0], Number(arr[4]), true);
       spriteset.addNewBattleback(6, bitmap, 0, battlebackDuration);
       if (Number(arr[1]) == 0) { } else {
@@ -2186,17 +2186,17 @@ battleback_change2 = function () {
 };
 
 //戦闘時一言集
-battle_wordset = function (id1) {
+battle_wordset = function (wordSetId) {
 
   if (ConfigManager.battleAniSpeed < 3) return;
 
-  let array0 = 0;
-  let array1 = 0;
-  let array2 = 0;
+  let statusWordCandidates = 0;
+  let damageWordCandidates = 0;
+  let attackWordCandidates = 0;
   let actorId = $gameVariables.value(20);
   const gameTroopMembers = $gameTroop.members();
   const gameVar276 = $gameVariables.value(276);
-  if (id1 == 1) {
+  if (wordSetId == 1) {
     if (gameVar276 == 1) {
       if ($gameSwitches.value(464)) {
         $gameVariables.setValue(20, $gameParty.battleMembers()[actorId].actorId());
@@ -2224,34 +2224,34 @@ battle_wordset = function (id1) {
       valueFaceSelect = 48;
 
     };
-    array2 = actorMeta['BattleAttack'].split(',');
+    attackWordCandidates = actorMeta['BattleAttack'].split(',');
     if (actor.isStateAffected(61)) {
-      const arr2 = [21, 22, 23, 24];
-      valueFaceSelect = arr2[getRandomIndex(arr2.length)];
+      const faceCandidates = [21, 22, 23, 24];
+      valueFaceSelect = faceCandidates[getRandomIndex(faceCandidates.length)];
     };
     if (actor.isStateAffected(68)) {
-      const arr1 = [17, 18, 19, 20];
-      valueFaceSelect = arr1[getRandomIndex(arr1.length)];
+      const faceCandidates = [17, 18, 19, 20];
+      valueFaceSelect = faceCandidates[getRandomIndex(faceCandidates.length)];
     };
     const gameVar182 = $gameVariables.value(182);
     if (gameVar182 == 5) {
       //var array1 = actorMeta['S-AbilityUse'].split(',');
-      array2 = actorMeta['S-AbilityUse'].split(',');
+      attackWordCandidates = actorMeta['S-AbilityUse'].split(',');
       valueFaceSelect = 15;
     }
     else if (gameVar182 == 6) {
       //var array1 = actorMeta['A-AbilityUse'].split(',');
-      array2 = actorMeta['A-AbilityUse'].split(',');
+      attackWordCandidates = actorMeta['A-AbilityUse'].split(',');
       //フェイスは通常攻撃を流用
     }
     else if (gameVar182 == 7) {
       //var array1 = actorMeta['W-AbilityUse'].split(',');
-      array2 = actorMeta['W-AbilityUse'].split(',');
+      attackWordCandidates = actorMeta['W-AbilityUse'].split(',');
       valueFaceSelect = 13;
     }
     else if (gameVar182 == 8) {
       //var array1 = actorMeta['R-AbilityUse'].split(',');
-      array2 = actorMeta['R-AbilityUse'].split(',');
+      attackWordCandidates = actorMeta['R-AbilityUse'].split(',');
       valueFaceSelect = 6;
     };
 
@@ -2261,65 +2261,65 @@ battle_wordset = function (id1) {
     valueFaceSelect = 9;
     const damageThresholdVar514 = $gameVariables.value(514);
     const currentHpPercent = actor.hpRate() * 100;
-    array1 = actorMeta['BattleDamage'].split(',');
+    damageWordCandidates = actorMeta['BattleDamage'].split(',');
     if (damageThresholdVar514 - currentHpPercent >= 50) {
-      array1 = actorMeta['BattleBigDamage'].split(',');
+      damageWordCandidates = actorMeta['BattleBigDamage'].split(',');
       valueFaceSelect = 45;
     }
     else if (damageThresholdVar514 - currentHpPercent <= 2) {
-      array1 = actorMeta['BattleSmallDamage'].split(',');
+      damageWordCandidates = actorMeta['BattleSmallDamage'].split(',');
       valueFaceSelect = 4;
     }
     else if (damageThresholdVar514 == currentHpPercent) {
-      array1 = actorMeta['Battle0Damage'].split(',');
+      damageWordCandidates = actorMeta['Battle0Damage'].split(',');
       valueFaceSelect = 6;
     }
   }
   else if (gameVar276 == 0) {
     if ($gameVariables.value(263) >= 3) { //ターン数 
-      array0 = actorMeta['BattleTurn2'].split(',');
+      statusWordCandidates = actorMeta['BattleTurn2'].split(',');
     }
     if ([34, 35, 36].some(function (id) { return actor.isStateAffected(id) })) {  //疲労時
-      array0 = actorMeta['BattleFatigue'].split(',');
+      statusWordCandidates = actorMeta['BattleFatigue'].split(',');
     }
     if (actor.isStateAffected(37)) {  //ブラック
-      array0 = actorMeta['BattleFatigueBlack'].split(',');
-      array2 = actorMeta['BattleFatigueBlackAttack'].split(',');
-      array1 = actorMeta['BattleFatigueBlackDamage'].split(',');
+      statusWordCandidates = actorMeta['BattleFatigueBlack'].split(',');
+      attackWordCandidates = actorMeta['BattleFatigueBlackAttack'].split(',');
+      damageWordCandidates = actorMeta['BattleFatigueBlackDamage'].split(',');
     }
     if (actor.hpRate() <= 0.3) {  //瀕死  
-      array0 = actorMeta['BattleDying'].split(',');
+      statusWordCandidates = actorMeta['BattleDying'].split(',');
     }
     if ($gameParty.battleMembers().length >= 2 && $gameParty.aliveMembers().length <= 1) {  //最後の一人
-      array0 = actorMeta['BattleLastOne'].split(',');
+      statusWordCandidates = actorMeta['BattleLastOne'].split(',');
     }
 
     if (actor.isStateAffected(61) && isGirl(actor)) {  //発情
       if (actor.isLearnedSkill(65)) {
-        array0 = actorMeta['BattleSexualExcitementMax'].split(',');
-        array2 = actorMeta['BattleSexualExcitementMaxAttack'].split(',');//攻撃
-        array1 = actorMeta['BattleSexualExcitementMaxDamage'].split(',');//ダメージ
+        statusWordCandidates = actorMeta['BattleSexualExcitementMax'].split(',');
+        attackWordCandidates = actorMeta['BattleSexualExcitementMaxAttack'].split(',');//攻撃
+        damageWordCandidates = actorMeta['BattleSexualExcitementMaxDamage'].split(',');//ダメージ
       } else {
-        array0 = actorMeta['BattleSexualExcitement'].split(',');
-        array2 = actorMeta['BattleSexualExcitementAttack'].split(',');//攻撃
-        array1 = actorMeta['BattleSexualExcitementDamage'].split(',');//ダメージ
+        statusWordCandidates = actorMeta['BattleSexualExcitement'].split(',');
+        attackWordCandidates = actorMeta['BattleSexualExcitementAttack'].split(',');//攻撃
+        damageWordCandidates = actorMeta['BattleSexualExcitementDamage'].split(',');//ダメージ
       };
     }
     if (actor.isStateAffected(63) && isGirl(actor)) {
       if (actor.isLearnedSkill(65)) {//拘束
-        array0 = actorMeta['BattleBindMax'].split(',');
+        statusWordCandidates = actorMeta['BattleBindMax'].split(',');
       } else {
-        array0 = actorMeta['BattleBind'].split(',');
+        statusWordCandidates = actorMeta['BattleBind'].split(',');
       };
     };
     if (actor.isStateAffected(68) && isGirl(actor)) {    //激情
-      array0 = actorMeta['BattlePassion'].split(',');
+      statusWordCandidates = actorMeta['BattlePassion'].split(',');
     };
     if (actor.isStateAffected(64) && isGirl(actor)) {    //放心
       if (actor.isLearnedSkill(65)) {
-        array0 = actorMeta['BattleAbsentlyMax'].split(',');
+        statusWordCandidates = actorMeta['BattleAbsentlyMax'].split(',');
       } else {
-        array0 = actorMeta['BattleAbsently'].split(',');
+        statusWordCandidates = actorMeta['BattleAbsently'].split(',');
       };
     };
   }
@@ -2327,21 +2327,21 @@ battle_wordset = function (id1) {
   let messageText = ``;
   const enemy1 = gameTroopMembers[$gameVariables.value(92)];
   const enemyName = enemy1 ? enemy1.name() : '';
-  if (id1 == 0) {
-    if (array0) {
-      messageText = actorName + array0[getRandomIndex(array0.length)];
+  if (wordSetId == 0) {
+    if (statusWordCandidates) {
+      messageText = actorName + statusWordCandidates[getRandomIndex(statusWordCandidates.length)];
     }
   }
-  else if (id1 == 1) {
+  else if (wordSetId == 1) {
     if (gameVar276 == 2) {
-      if (array2) {
-        let array = actorMeta['BattleAttack2Conbo'].split(',');
-        let num = array[getRandomIndex(array.length)];
+      if (attackWordCandidates) {
+        let comboWordCandidates = actorMeta['BattleAttack2Conbo'].split(',');
+        let num = comboWordCandidates[getRandomIndex(comboWordCandidates.length)];
         valueWordSet9 = `${actor.name()}の\\C[2]2連撃\\C[0]！ ${num}`;
-        array = actorMeta['BattleAttack3Conbo'].split(',');
-        num = array[getRandomIndex(array.length)];
+        comboWordCandidates = actorMeta['BattleAttack3Conbo'].split(',');
+        num = comboWordCandidates[getRandomIndex(comboWordCandidates.length)];
         valueWordSet10 = `${actor.name()}の\\C[2]3連撃\\C[0]！ ${num}`;
-        messageText = actorName + array2[getRandomIndex(array2.length)];
+        messageText = actorName + attackWordCandidates[getRandomIndex(attackWordCandidates.length)];
         battle_bustUp1(actor, 86, 500, 10, 20);
       };
     }
@@ -2352,21 +2352,21 @@ battle_wordset = function (id1) {
       valueWordSet10 = `${enemyName}の\\C[2]3連撃\\C[0]！`;
     };
   }
-  else if (id1 == 2) {
+  else if (wordSetId == 2) {
     const gameVar464 = $gameSwitches.value(464);
     if (gameVar276 == 2 && !gameVar464) {
       const enemy2 = enemy1 && $dataEnemies[enemy1.enemyId()];
       if (enemy2 && enemy2.meta['EnemyDamageWord']) {
-        const array = enemy2.meta['EnemyDamageWord'].split(',');
-        messageText = `${enemyName}${array[getRandomIndex(array.length)]}`;
+        const enemyWordCandidates = enemy2.meta['EnemyDamageWord'].split(',');
+        messageText = `${enemyName}${enemyWordCandidates[getRandomIndex(enemyWordCandidates.length)]}`;
       } else {
         messageText = `${enemyName}は攻撃を受けた！`;
       };
     }
     else if (gameVar276 == 1) {
       if (gameVar464) {
-        if (array1) {
-          messageText = actorName + array1[getRandomIndex(array1.length)];
+        if (damageWordCandidates) {
+          messageText = actorName + damageWordCandidates[getRandomIndex(damageWordCandidates.length)];
           battle_bustUp1(actor, 86, 500, 10, 40);
         }
       }
@@ -3076,10 +3076,10 @@ function tbcsAddCategoryDescription(stateData) {
 //#endregion
 
 //エネミーに様々なセッティング
-enemy_battleSetting = function (id10) {
+enemy_battleSetting = function (troopIndex) {
 
   const gameTroopMembers = $gameTroop.members();
-  const gameTroopMember = gameTroopMembers[id10];
+  const gameTroopMember = gameTroopMembers[troopIndex];
   if (!gameTroopMember) return;
   const enemyId = gameTroopMember._enemyId;
   const target = $gameSwitches.value(426) ? $dataEnemies[$gameTroop.members()[0]._enemyId] : $dataItems[$gameVariables.value(240)];
@@ -3162,24 +3162,24 @@ enemy_battleSetting = function (id10) {
     gameTroopMember.addState(extraLevel);
   };
   if (enemyId <= 29) {
-    const arr2 = $gameVariables.value(345)[enemyId - 20];
-    for (let j = 0; j <= arr2.length - 1; j++) {
-      gameTroopMember.addState(arr2[j]);
+    const initialStateIds = $gameVariables.value(345)[enemyId - 20];
+    for (let j = 0; j <= initialStateIds.length - 1; j++) {
+      gameTroopMember.addState(initialStateIds[j]);
     };
   };
   if (enemyId == 30 && $gameVariables.value(343) != 0) {//ボスステート処理
-    let arr2 = $gameVariables.value(343);
-    for (let j = 0; j <= arr2.length - 1; j++) {
-      gameTroopMember.addState(arr2[j]);
+    let stateOrDropValues = $gameVariables.value(343);
+    for (let j = 0; j <= stateOrDropValues.length - 1; j++) {
+      gameTroopMember.addState(stateOrDropValues[j]);
     };
     if (target.meta['BossDrop1']) {
       for (var j = 1; j <= 9; j++) {
         if (target.meta['BossDrop' + j]) {
-          arr2 = target.meta['BossDrop' + j].split(',');
-          valueItems = getItemEquipmentSource(Number(arr2[0]));
+          stateOrDropValues = target.meta['BossDrop' + j].split(',');
+          valueItems = getItemEquipmentSource(Number(stateOrDropValues[0]));
 
-          if (Number(arr2[2]) >= getRandomIndex(101)) {
-            $gameTroop.addDropItem(valueItems[Number(arr2[1])]);
+          if (Number(stateOrDropValues[2]) >= getRandomIndex(101)) {
+            $gameTroop.addDropItem(valueItems[Number(stateOrDropValues[1])]);
           };
         }
       }
@@ -3272,20 +3272,20 @@ enemy_battleSetting = function (id10) {
     }
   };
   //var value11 = 1;
-  let arr4 = valueStateEnemyExpRate;
-  for (let j = 0; j < arr4.length; j++) {
-    if (gameTroopMember.isStateAffected(arr4[j]) && gameTroopMember.isAlive()) {
-      if ($dataStates[arr4[j]].meta['EnemyExpRate']) {
-        valueTotalexp += Number($dataStates[arr4[j]].meta['EnemyExpRate']);
+  let rateStateIds = valueStateEnemyExpRate;
+  for (let j = 0; j < rateStateIds.length; j++) {
+    if (gameTroopMember.isStateAffected(rateStateIds[j]) && gameTroopMember.isAlive()) {
+      if ($dataStates[rateStateIds[j]].meta['EnemyExpRate']) {
+        valueTotalexp += Number($dataStates[rateStateIds[j]].meta['EnemyExpRate']);
       };
     };
   };
   //var value11 = 1;
-  arr4 = valueStateEnemyGoldRate;
-  for (let j = 0; j < arr4.length; j++) {
-    if (gameTroopMember.isStateAffected(arr4[j]) && gameTroopMember.isAlive()) {
-      if ($dataStates[arr4[j]].meta['EnemyGoldRate']) {
-        valueTotalgold += Number($dataStates[arr4[j]].meta['EnemyGoldRate']);
+  rateStateIds = valueStateEnemyGoldRate;
+  for (let j = 0; j < rateStateIds.length; j++) {
+    if (gameTroopMember.isStateAffected(rateStateIds[j]) && gameTroopMember.isAlive()) {
+      if ($dataStates[rateStateIds[j]].meta['EnemyGoldRate']) {
+        valueTotalgold += Number($dataStates[rateStateIds[j]].meta['EnemyGoldRate']);
       };
     };
   };
@@ -3296,8 +3296,8 @@ enemy_battleSetting = function (id10) {
     for (let j = 1; j <= dropCount; j++) {
       const drop_probability = drop_probabilityCalculation(gameTroopMemberLevel, dropUpItem);
       if (drop_probability >= 90) {
-        const arr6 = [];
-        drop_genericDropRate(0, arr6);
+        const itemsToDrop = [];
+        drop_genericDropRate(0, itemsToDrop);
         $gameTroop.addDropItem($dataItems[valueDropItems]);
       };
     };
@@ -3305,8 +3305,8 @@ enemy_battleSetting = function (id10) {
   const drop_probability = drop_probabilityCalculation(gameTroopMember.level, dropUpItem);
   if (drop_probability >= 90) {
     let stateId = 0;
-    for (const id11 of valueClassStateA) {
-      if (gameTroopMember.isStateAffected(id11)) { stateId = id11 };
+    for (const stateId of valueClassStateA) {
+      if (gameTroopMember.isStateAffected(stateId)) { stateId = stateId };
     }
     if (stateId >= 1) {
       valueClassState = $dataStates[stateId].meta['classStateDrop'].split(',');
@@ -3547,9 +3547,9 @@ drop_probabilityCalculation2 = function (user, dropCategory, dropUpItem) {
 //採取物の設定
 harvesting_itemSelect = function () {
 
-  var arr4 = [];
+  var itemsToDrop = [];
   //var value1 = 0; 
-  drop_genericDropRate(1, arr4);
+  drop_genericDropRate(1, itemsToDrop);
   $gameVariables.setValue(23, valueDropItems);
   if (valueDropItems == 0) {
     $gameVariables.setValue(23, 1191);//1191は石ころ
@@ -3558,7 +3558,7 @@ harvesting_itemSelect = function () {
 };
 
 //汎用財布ドロップ設定
-drop_walletItemBoxGet = function (fallbackDropCategory, id12) {
+drop_walletItemBoxGet = function (fallbackDropCategory, isWallet) {
   const footpadSkillId = valueFootpadSkillId;
   const actor = $gameActors.actor($gameVariables.value(11));
   if (!actor) return;
@@ -3576,16 +3576,16 @@ drop_walletItemBoxGet = function (fallbackDropCategory, id12) {
     return;
   }
 
-  const arr12 = [];
+  const candidateItemIds = [];
   const gameVariable240 = $gameVariables.value(240);
   const value = $dataItems[gameVariable240];
   if (!value || !value.meta.GenericDropRate) return;
-  const arr11 = value.meta.GenericDropRate.split(',');
+  const genericDropRates = value.meta.GenericDropRate.split(',');
   let selectedDropRateId = (gameVariable240 >= 1)
-    ? Number(arr11[getRandomIndex(arr11.length)]) || 1
+    ? Number(genericDropRates[getRandomIndex(genericDropRates.length)]) || 1
     : fallbackDropCategory;
 
-  const listType = (id12 === 1) ? 'walletIn' : 'ItemBag';
+  const listType = (isWallet === 1) ? 'walletIn' : 'ItemBag';
   const dataItemsLength = $dataItems.length;
 
   for (let i = 1; i < dataItemsLength; i++) {
@@ -3596,21 +3596,21 @@ drop_walletItemBoxGet = function (fallbackDropCategory, id12) {
 
     const list = item.meta.DropRate.split(',');
 
-    if (list.some(id11 => Number(id11) === selectedDropRateId)) {
-      arr12.push(i);
+    if (list.some(dropRateId => Number(dropRateId) === selectedDropRateId)) {
+      candidateItemIds.push(i);
     }
   }
 
-  const arr12Length = arr12.length;
-  if (arr12Length === 0) {
+  const candidateItemCount = candidateItemIds.length;
+  if (candidateItemCount === 0) {
     return;
   }
 
   const numItemsToGain = getRandomIndex(3) + 1;
 
   for (let i = 1; i <= numItemsToGain; i++) {
-    const randomIndex = getRandomIndex(arr12Length);
-    const selectedItemId = arr12[randomIndex];
+    const randomIndex = getRandomIndex(candidateItemCount);
+    const selectedItemId = candidateItemIds[randomIndex];
     const item = $dataItems[selectedItemId];
     const itemInfo = `\\C[24]\x1bI[${item.iconIndex}]${item.name}\\C[0]を獲得した。`;
 
@@ -3797,7 +3797,7 @@ drop_JobStateWAget = function (equipmentType, unusedParam) {
 }
 
 //追いはぎ時の確率と武器防具入手
-footpad_probabilityUp = function (id1) {
+footpad_probabilityUp = function (equipmentType) {
 
   const actor = $gameActors.actor($gameVariables.value(11));
   if (!actor) return;
@@ -3815,7 +3815,7 @@ footpad_probabilityUp = function (id1) {
     drop_probability += actor.skillMasteryLevel(skillId) * 3;
   };
   if (drop_probability >= 90) {
-    drop_JobStateWAget(id1, enemyDropChance);
+    drop_JobStateWAget(equipmentType, enemyDropChance);
   };
 };
 
@@ -3840,18 +3840,18 @@ item_itemBoxOpen = function (a, b, itemId) {
 
 
       if (!boxItem.meta['ItemBag']) return;
-      const arr2 = boxItem.meta['ItemBag'].split(',');
-      const id2 = arr2[getRandomIndex(arr2.length)];
-      for (let id3 = 0; id3 <= id2; id3++) {
-        const id12 = itemTypeId[getRandomIndex(itemTypeId.length)];
-        valueItems = getItemEquipmentSource(id12);
+      const itemBagValues = boxItem.meta['ItemBag'].split(',');
+      const drawCount = itemBagValues[getRandomIndex(itemBagValues.length)];
+      for (let drawIndex = 0; drawIndex <= drawCount; drawIndex++) {
+        const entryCategoryId = itemTypeId[getRandomIndex(itemTypeId.length)];
+        valueItems = getItemEquipmentSource(entryCategoryId);
 
         if ($dataItems[itemId].meta['HentaiBox']) {
           valueItems = $dataItems;
           isSeiyokuItem = $dataItems[itemId].meta['SeiyokuItem'];
         };
         const end = valueItems == $dataArmors ? valueArmorsLength : valueItems.length - 1;
-        const arr12 = [0];
+        const weightedItemIds = [0];
         for (let i = 1; i <= end; i++) {
           let matchedItemCount = 0;
           valueItem = valueItems[i];
@@ -3872,27 +3872,27 @@ item_itemBoxOpen = function (a, b, itemId) {
             if (valueItemLotteryRearity && isSeiyokuItem) {
               const valueItemLotteryRearityNum = Number(valueItemLotteryRearity);
               const list = $dataItems[itemId].meta['ItemBagRearity'].split(',');
-              for (const id11 of list) {
-                if (id11 == valueItemLotteryRearityNum) {
+              for (const rarityValue of list) {
+                if (rarityValue == valueItemLotteryRearityNum) {
                   for (let j = 10; j >= valueItemLotteryRearityNum; j--) {
-                    arr12.push(i);
+                    weightedItemIds.push(i);
                   };
                 };
               }
             };
           };
         };
-        valueDropItems = Number(arr12[getRandomIndex(arr12.length)]);
+        valueDropItems = Number(weightedItemIds[getRandomIndex(weightedItemIds.length)]);
         if (valueDropItems >= 1) {
           let itemGainCount = 1;
-          const valueItem = valueItems[valueDropItems];
-          if (id12 == 0) {
-            if (valueItem.price == 0) { itemGainCount = 1 }
-            else if (valueItem.price <= 1000) { itemGainCount = getRandomIndex(6) + 1 }
-            else if (valueItem.price <= 10000) { itemGainCount = getRandomIndex(3) + 1 }
+          const gainedItem = valueItems[valueDropItems];
+          if (entryCategoryId == 0) {
+            if (gainedItem.price == 0) { itemGainCount = 1 }
+            else if (gainedItem.price <= 1000) { itemGainCount = getRandomIndex(6) + 1 }
+            else if (gainedItem.price <= 10000) { itemGainCount = getRandomIndex(3) + 1 }
           };
-          $gameParty.gainItem(valueItem, itemGainCount);
-          valueItemBoxOpen += `[\x1bI[${valueItem.iconIndex}]${valueItem.name}×${itemGainCount}]`;
+          $gameParty.gainItem(gainedItem, itemGainCount);
+          valueItemBoxOpen += `[\x1bI[${gainedItem.iconIndex}]${gainedItem.name}×${itemGainCount}]`;
           openedItemCount += 1;
           if ((openedItemCount % 3) == 0) { valueItemBoxOpen += `\n` };
         };
@@ -3967,9 +3967,9 @@ party_SoroCombiAddRemove = function () {
 };
 
 //特殊なステートの時にダメージの計算式をバトルログに出力。
-attack_DamageFormula = function (user, target, id1) {
+attack_DamageFormula = function (user, target, skillId) {
 
-  const skill = $dataSkills[id1];
+  const skill = $dataSkills[skillId];
   if ($gameSwitches.value(141)) {
     const skillDamageFormulaData = skill.meta['DamageFormula2'].split(',');
     damage = Math.max($attack1(Number(skillDamageFormulaData[0]), user, target,
@@ -4008,7 +4008,7 @@ attack_DamageFormula = function (user, target, id1) {
       text = `[会心発生！] 倍率${user.criticalMultiplierBonus() * 100}%`;
       BattleManager._logWindow.push(`addText`, text);
     };
-    text = `[分散値] ${$dataSkills[id1].damage.variance}`;
+    text = `[分散値] ${$dataSkills[skillId].damage.variance}`;
     BattleManager._logWindow.push(`addText`, text);
   };
 
@@ -4090,8 +4090,8 @@ boss_actionPattarn1 = function (a) {
     }
   }
 
-  let arr1 = [gameVar346[0], gameVar346[3], gameVar346[4], gameVar346[5], gameVar346[6]];
-  candidateSkillId = arr1[getRandomIndex(arr1.length)];
+  let candidateSkillIds = [gameVar346[0], gameVar346[3], gameVar346[4], gameVar346[5], gameVar346[6]];
+  candidateSkillId = candidateSkillIds[getRandomIndex(candidateSkillIds.length)];
   if (candidateSkillId == 0) {
     candidateSkillId = gameVar346[0];
   };
@@ -4104,9 +4104,9 @@ boss_actionPattarn1 = function (a) {
     randomRoll += 2;//前衛アタック持ちが後衛の時にアビリティ使用確立アップ
   };
   if (randomRoll >= 5) {
-    arr1 = [gameVar346[1], gameVar346[7], gameVar346[8], gameVar346[9]];
+    candidateSkillIds = [gameVar346[1], gameVar346[7], gameVar346[8], gameVar346[9]];
     for (let i = 1; i <= 10; i++) {
-      candidateSkillId = arr1[getRandomIndex(arr1.length)];
+      candidateSkillId = candidateSkillIds[getRandomIndex(candidateSkillIds.length)];
       if (candidateSkillId == 0) {
         candidateSkillId = gameVar346[1];
       };
@@ -4146,7 +4146,7 @@ boss_actionPattarn1 = function (a) {
 };
 
 //ボス行動コモン内予測計算
-boss_actionPredict = function (predictedSkillId, id1) {
+boss_actionPredict = function (predictedSkillId, predictionModeId) {
 
   var masteryCheckSkillId = 777;//
   var enemy1 = $gameTroop.members()[0];
@@ -4155,7 +4155,7 @@ boss_actionPredict = function (predictedSkillId, id1) {
   if (!actor) return;
   var masteryBonus = actor.skillMasteryLevel(masteryCheckSkillId) * 10;
   var predictionMessage = 1;
-  if (id1 == 1) {
+  if (predictionModeId == 1) {
     if (actor.isStateAffected(292)) {
       if (masteryBonus + actor.level > enemy1.level) {
         //if(true){
@@ -4170,7 +4170,7 @@ boss_actionPredict = function (predictedSkillId, id1) {
       BattleManager._logWindow.push(`addText`, predictionMessage);
     };
   };
-  if (id1 == 2) {
+  if (predictionModeId == 2) {
     if (actor.isStateAffected(292)) {
       if (masteryBonus + actor.level > enemy1.level) {
         //if(true){
@@ -4223,92 +4223,92 @@ skill_additionalSet = function (user, target) {
     var list = [1, 2, 3, 4, 5, 6, 7, 8, 9];
     list.forEach(function (id) {
       if ($dataSkills[$gameVariables.value(96)].meta['additionalSet' + id]) {
-        var arr1 = $dataSkills[$gameVariables.value(96)].meta['additionalSet' + id].split(',');
-        if (Number(arr1[4]) >= 1) {
-          if (Number(arr1[1]) == 1) {
+        var additionalSetValues = $dataSkills[$gameVariables.value(96)].meta['additionalSet' + id].split(',');
+        if (Number(additionalSetValues[4]) >= 1) {
+          if (Number(additionalSetValues[1]) == 1) {
             var actor = $gameActors.actor($gameVariables.value(20));
-            actor.startAnimation(Number(arr1[4]), true, 1);
+            actor.startAnimation(Number(additionalSetValues[4]), true, 1);
           };
-          if (Number(arr1[1]) == 2) {
+          if (Number(additionalSetValues[1]) == 2) {
             var actor = $gameActors.actor($gameVariables.value(20));
-            if ($dataAnimations[Number(arr1[4])].position == 3) {
-              actor.startAnimation(Number(arr1[4]), true, 1);
+            if ($dataAnimations[Number(additionalSetValues[4])].position == 3) {
+              actor.startAnimation(Number(additionalSetValues[4]), true, 1);
             } else {
               for (var i = 0; i < $gameParty.battleMembers().length; i++) {
                 var actor = $gameParty.battleMembers()[i];
                 if (actor.isAlive()) {
-                  actor.startAnimation(Number(arr1[4]), true, 1);
+                  actor.startAnimation(Number(additionalSetValues[4]), true, 1);
                 };
               };
             };
           };
-          if (Number(arr1[1]) == 3) {
-            var target1 = $gameTroop.members()[$gameVariables.value(92)];
-            target1.startAnimation(Number(arr1[4]), true, 1);
+          if (Number(additionalSetValues[1]) == 3) {
+            var battler = $gameTroop.members()[$gameVariables.value(92)];
+            battler.startAnimation(Number(additionalSetValues[4]), true, 1);
           };
-          if (Number(arr1[1]) == 4) {
-            var target1 = $gameTroop.members()[$gameVariables.value(92)];
-            if ($dataAnimations[Number(arr1[4])].position == 3) {
-              target1.startAnimation(Number(arr1[4]), true, 1);
+          if (Number(additionalSetValues[1]) == 4) {
+            var battler = $gameTroop.members()[$gameVariables.value(92)];
+            if ($dataAnimations[Number(additionalSetValues[4])].position == 3) {
+              battler.startAnimation(Number(additionalSetValues[4]), true, 1);
             } else {
               for (var i = 0; i < $gameTroop.members().length; i++) {
-                var target1 = $gameTroop.members()[i];
-                target1.startAnimation(Number(arr1[4]), true, 1);
+                var battler = $gameTroop.members()[i];
+                battler.startAnimation(Number(additionalSetValues[4]), true, 1);
               };
             };
           };
         };
-        if (Number(arr1[1]) == 1) {//ステート付与
-          if (Number(arr1[0]) == 1) {
+        if (Number(additionalSetValues[1]) == 1) {//ステート付与
+          if (Number(additionalSetValues[0]) == 1) {
             var actor = $gameActors.actor($gameVariables.value(20));
-            for (var i = 1; i <= Number(arr1[2]); i++) {
-              if (Number(arr1[3]) == 201) {
+            for (var i = 1; i <= Number(additionalSetValues[2]); i++) {
+              if (Number(additionalSetValues[3]) == 201) {
                 for (var j = 206; j <= 211; j++) {
                   actor.addState(j);
                 };
               } else {
-                actor.addState(Number(arr1[3]));
+                actor.addState(Number(additionalSetValues[3]));
               };
             };
           };
-          if (Number(arr1[0]) == 2) {
+          if (Number(additionalSetValues[0]) == 2) {
             for (var i = 0; i < $gameParty.battleMembers().length; i++) {
               var actor = $gameParty.battleMembers()[i];
               if (actor.isAlive()) {
-                if (Number(arr1[3]) == 201) {
+                if (Number(additionalSetValues[3]) == 201) {
                   for (var j = 206; j <= 211; j++) {
                     actor.addState(j);
                   };
                 } else {
-                  actor.addState(Number(arr1[3]));
+                  actor.addState(Number(additionalSetValues[3]));
                 };
               };
             };
           };
-          if (Number(arr1[0]) == 3) {
-            var target1 = $gameTroop.members()[$gameVariables.value(92)];
-            if (target1.isAlive()) {
-              for (var i = 1; i <= Number(arr1[2]); i++) {
-                if (Number(arr1[3]) == 201) {
+          if (Number(additionalSetValues[0]) == 3) {
+            var battler = $gameTroop.members()[$gameVariables.value(92)];
+            if (battler.isAlive()) {
+              for (var i = 1; i <= Number(additionalSetValues[2]); i++) {
+                if (Number(additionalSetValues[3]) == 201) {
                   for (var j = 206; j <= 211; j++) {
-                    state_addFormula1([j, 50, user, target1, user.mdf, target1.luk]);
+                    state_addFormula1([j, 50, user, battler, user.mdf, battler.luk]);
                   };
                 } else {
-                  state_addFormula1([Number(arr1[3]), 50, user, target1, user.mdf, target1.luk]);
+                  state_addFormula1([Number(additionalSetValues[3]), 50, user, battler, user.mdf, battler.luk]);
                 };
               };
             };
           };
-          if (Number(arr1[0]) == 4) {
+          if (Number(additionalSetValues[0]) == 4) {
             for (var i = 0; i < $gameTroop.members().length; i++) {
-              var target1 = $gameTroop.members()[i];
-              if (target1.isAlive()) {
-                if (Number(arr1[3]) == 201) {
+              var battler = $gameTroop.members()[i];
+              if (battler.isAlive()) {
+                if (Number(additionalSetValues[3]) == 201) {
                   for (var j = 206; j <= 210; j++) {
-                    state_addFormula1([j, 50, user, target1, user.mdf, target1.luk]);
+                    state_addFormula1([j, 50, user, battler, user.mdf, battler.luk]);
                   };
                 } else {
-                  state_addFormula1([Number(arr1[3]), 50, user, target1, user.mdf, target1.luk]);
+                  state_addFormula1([Number(additionalSetValues[3]), 50, user, battler, user.mdf, battler.luk]);
                 };
               };
             };
@@ -4321,10 +4321,10 @@ skill_additionalSet = function (user, target) {
 };
 
 //スキル名表示。id2はid1が2の場合のみ名前を入れておく
-skillWord_direction = function (id1, id2) {
+skillWord_direction = function (displayModeId, messageText) {
 
   let pictureY = 384 - 310;
-  if (id1 == 2) {
+  if (displayModeId == 2) {
     if ($gameParty.inBattle()) {
       if ($gameSwitches.value(211)) {
         $gameTemp._battler_bhp_temp[2] = true;
@@ -4335,11 +4335,11 @@ skillWord_direction = function (id1, id2) {
     };
     $gameScreen.dWindowFrame = 'ON';
     $gameScreen.dTextAlign = 1;
-    $gameScreen.setDTextPicture(`${id2}`, 28);
+    $gameScreen.setDTextPicture(`${messageText}`, 28);
     $gameScreen.showPicture(100, "", 1, 640 + 50, pictureY, 100, 100, 0, 0);
     $gameScreen.movePicture(100, 1, 640, pictureY, 100, 100, 255, 0, 30);
   };
-  if (id1 == 0) {
+  if (displayModeId == 0) {
     if ($gameParty.inBattle()) {
       if ($gameSwitches.value(211)) {
         $gameTemp._battler_bhp_temp[2] = true;
@@ -4377,9 +4377,9 @@ skillWord_direction = function (id1, id2) {
 };
 
 //奥義名表示
-ougiWord_direction = function (id1) {
+ougiWord_direction = function (displayModeId) {
 
-  if (id1 == 0) {
+  if (displayModeId == 0) {
     if (!BattleManager._subject) return;
     if (BattleManager._subject.isActor()) {
       var user = $gameActors.actor($gameVariables.value(20)).index();
@@ -4949,22 +4949,22 @@ battle_simpleSubjugation = function (subjugationId) {
 };
 
 //state_addbuffdebuff(1,2,user,target,stateId,271);
-state_addbuffdebuff = function (id5, id6, id1, id2, id3, id4) {
+state_addbuffdebuff = function (isBuff, buffParamId, user, target, stateId, animationId) {
 
-  var buffParamId = id6;
+  var buffParamId = buffParamId;
   var turns = getRandomIndex(3) + 3;
-  if (id5 == 1) {
-    id2.addBuff(buffParamId, turns);
+  if (isBuff == 1) {
+    target.addBuff(buffParamId, turns);
   } else {
-    id2.addDebuff(buffParamId, turns);
+    target.addDebuff(buffParamId, turns);
   };
-  if (id2._stateCounter[id3] >= 5) { } else {
-    state_addEffect1(id1, id2, id3, id4);
+  if (target._stateCounter[stateId] >= 5) { } else {
+    state_addEffect1(user, target, stateId, animationId);
   };
-  if (id2._stateCounter[id3] >= 1) {
-    id2.addStateCounter(id3, +1);
+  if (target._stateCounter[stateId] >= 1) {
+    target.addStateCounter(stateId, +1);
   } else {
-    id2.setStateCounter(id3, 1);
+    target.setStateCounter(stateId, 1);
   };
 
 };
@@ -5008,8 +5008,8 @@ skill_equipOperation = function (actor, actor2, itemId) {
   const actorId = actor.actorId();
   const actorName = `\\C[2]${actor.name()}\\C[0]`;
   if (itemId == 427) {//記憶
-    const arr1 = actor.battleSkillsRaw();
-    gameVar351Arr[actorId] = arr1.clone();
+    const battleSkillIds = actor.battleSkillsRaw();
+    gameVar351Arr[actorId] = battleSkillIds.clone();
     TickerManager.show(`${actorName}のスキル装備状態を記録しました`);
   }
   else if (itemId == 428) {//復元
@@ -5029,10 +5029,10 @@ skill_equipOperation = function (actor, actor2, itemId) {
   }
   else if (itemId == 430) {//一括装着
     const skillIds = Array(actor.battleSkillsRaw().length).fill(0);
-    let id1 = 0;
-    let id2 = actor.battleSkillsRaw().length - isGirl(actor) ? 200 : 100;//10Ｇパッシブ
-    let id3 = actor.battleSkillsRaw().length - 100;//15Hパッシブ
-    let id4 = 0;
+    let normalIndex = 0;
+    let gClassIndex = actor.battleSkillsRaw().length - isGirl(actor) ? 200 : 100;//10Ｇパッシブ
+    let hClassIndex = actor.battleSkillsRaw().length - 100;//15Hパッシブ
+    let validSkillCount = 0;
     for (let i = 1; i < $dataSkills.length; i++) {
       const skill = $dataSkills[i];
       if (skill.name === '') continue;
@@ -5040,19 +5040,19 @@ skill_equipOperation = function (actor, actor2, itemId) {
       const isValid = skill.meta['Skill Tier'] && (actor.isLearnedSkill(i) || actor.addedSkills().contains(i));
       if (!isValid) continue;
 
-      id4 += 1;
+      validSkillCount += 1;
       if (skill.stypeId == 10) {
-        skillIds[id2] = i;
-        id2 += 1;
+        skillIds[gClassIndex] = i;
+        gClassIndex += 1;
       } else if (skill.stypeId == 15) {
-        skillIds[id3] = i;
-        id3 += 1;
+        skillIds[hClassIndex] = i;
+        hClassIndex += 1;
       } else {
-        skillIds[id1] = i;
-        id1 += 1;
+        skillIds[normalIndex] = i;
+        normalIndex += 1;
       }
     }
-    if (id4 >= 1) {
+    if (validSkillCount >= 1) {
       actor.clearEquipBattleSkills();
       for (let i = 0; i < skillIds.length; i++) {
         const skillId = skillIds[i];
@@ -5073,9 +5073,9 @@ skill_equipOperation = function (actor, actor2, itemId) {
 }
 
 //ステータス表示非表示
-battleStatus_showHide = function (id1) {
+battleStatus_showHide = function (hideFlag) {
 
-  const on = id1 == 0;
+  const on = hideFlag == 0;
   if (Imported.MOG_BattleHud) {
     $gameSystem._bhud_visible = on;
   } else {
@@ -5180,9 +5180,9 @@ battle_stateAnime1 = function (target) {
 }
 
 //パーティレベルを一時記憶/呼び出し
-party_levelSaveLoad = function (id1) {
+party_levelSaveLoad = function (modeId) {
 
-  if (id1 == 0) {
+  if (modeId == 0) {
     valuePartyMainLv = Array(21).fill(0);
     valuePartySubLv = Array(21).fill(0);
     var start = $gameVariables.value(75);
@@ -5197,7 +5197,7 @@ party_levelSaveLoad = function (id1) {
       };
     };
   };
-  if (id1 == 1) {
+  if (modeId == 1) {
     var levelUpFlag = 0;
     for (var i = 0; i <= valuePartyMainLv.length - 1; i++) {
       if (valuePartyMainLv[i] >= 1) {
@@ -5213,7 +5213,7 @@ party_levelSaveLoad = function (id1) {
       $gamePlayer.requestAnimation(297);
     };
   };
-  if (id1 == 2) {
+  if (modeId == 2) {
     var levelUpFlag = 0;
     for (var i = 0; i <= valuePartyMainLv.length - 1; i++) {
       if (valuePartySubLv[i] >= 1) {
@@ -5232,10 +5232,10 @@ party_levelSaveLoad = function (id1) {
 
 };
 
-actor_custom_replace_attack = function (user, id1, id2) {
+actor_custom_replace_attack = function (user, attackWhenArmed, attackWhenUnarmed) {
   const userStateAffected64 = user.isStateAffected(64);
   return (userStateAffected64 || user.isStateAffected(63))
-    ? (userStateAffected64 || user.isLearnedSkill(66) ? id1 : id2)
+    ? (userStateAffected64 || user.isLearnedSkill(66) ? attackWhenArmed : attackWhenUnarmed)
     : actor_custom_replace_attack_sub(user);
 };
 

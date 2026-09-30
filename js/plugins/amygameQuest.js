@@ -7,23 +7,23 @@
 (function(){
 
 //クエスト報酬設定。クエストで変数21-23は報酬で使っているので使用不可。
-quest_housyuukeisan = function (id1) {
+quest_housyuukeisan = function (questItemId) {
   //NOTE: 下記3変数は呼び出し元のquest_housyuuが読み取るため暗黙グローバルとして扱う
   rewardGoldAmount = 0;
   rewardItemAmount = 0;
   
   additionalCompletionText = `\n\\C[16]●追加報酬\\C[0]\n`;
-  let id2 = Number(valueQuestRankD[1]);
-  let id3 = Number(valueQuestRankD[2]);
-  const itemData = $dataItems[id1];
+  let rankGoldAmount = Number(valueQuestRankD[1]);
+  let rankItemAmount = Number(valueQuestRankD[2]);
+  const itemData = $dataItems[questItemId];
   if (!itemData) return;
-  const id4 = itemData.iconIndex;
+  const questIconIndex = itemData.iconIndex;
 
   const set_Id2_id3 = (arr) => {
-	  id2 = Number(arr[1]);
-	  id3 = Number(arr[2]);
+	  rankGoldAmount = Number(arr[1]);
+	  rankItemAmount = Number(arr[2]);
   }
-  switch (id4) {
+  switch (questIconIndex) {
     case 422: // C
     case 426: // EX,C報酬
 	  set_Id2_id3(valueQuestRankC);
@@ -38,26 +38,26 @@ quest_housyuukeisan = function (id1) {
 	  set_Id2_id3(valueQuestRankS);
       break;
   }
-  rewardGoldAmount = id2;
-  rewardItemAmount = id3;
+  rewardGoldAmount = rankGoldAmount;
+  rewardItemAmount = rankItemAmount;
 
-  let j = 0;
-  for (const i1 in itemData.meta) {
-    if (!itemData.meta.hasOwnProperty(i1) || !i1.startsWith('QuestSpcialPrice')) continue;
+  let rewardEntryCount = 0;
+  for (const metaKey in itemData.meta) {
+    if (!itemData.meta.hasOwnProperty(metaKey) || !metaKey.startsWith('QuestSpcialPrice')) continue;
 
-    const arr1 = itemData.meta[i1].split(',');
-    const itemType = Number(arr1[0]);
+    const specialPriceValues = itemData.meta[metaKey].split(',');
+    const itemType = Number(specialPriceValues[0]);
 
     let item;
     switch (itemType) {
       case 0:
-        item = $dataItems[Number(arr1[1])];
+        item = $dataItems[Number(specialPriceValues[1])];
         break;
       case 1:
-        item = $dataWeapons[Number(arr1[1])];
+        item = $dataWeapons[Number(specialPriceValues[1])];
         break;
       case 2:
-        item = $dataArmors[Number(arr1[1])];
+        item = $dataArmors[Number(specialPriceValues[1])];
         break;
       case 4:
         item = $dataItems[10];
@@ -68,17 +68,17 @@ quest_housyuukeisan = function (id1) {
     if (!item) continue;
 
     if ($gameSwitches.value(518)) {
-      $gameParty.gainItem(item, Number(arr1[2]));
+      $gameParty.gainItem(item, Number(specialPriceValues[2]));
     }
 
     if (itemType === 3) {
-      additionalCompletionText += `[\\C[2]${Number(arr1[2])}\\C[0]\\G] `;
+      additionalCompletionText += `[\\C[2]${Number(specialPriceValues[2])}\\C[0]\\G] `;
     } else {
-      additionalCompletionText += `[${item.name}:\\C[2]+${Number(arr1[2])}\\C[0]] `;
+      additionalCompletionText += `[${item.name}:\\C[2]+${Number(specialPriceValues[2])}\\C[0]] `;
     }
 
-    j += 1;
-    if (j % 3 === 0) {
+    rewardEntryCount += 1;
+    if (rewardEntryCount % 3 === 0) {
       additionalCompletionText += `\n`;
     }
   }
@@ -104,8 +104,8 @@ quest_settei_getItemEquipmentSource = function (arr, i) {
 }
 
 //クエストの解説、発生、達成の設定value12までで10が未使用value8
-quest_settei = function(id5) {
-  QuestSystem.process(id5);
+quest_settei = function(rangeConfigId) {
+  QuestSystem.process(rangeConfigId);
 };
 
 //クエスト報酬設定
@@ -220,18 +220,18 @@ quest_housyuu = function (questId, completionType) {
 };
 
 //クエスト達成報告準備
-quest_tasseiHoukoku = function(id4,id5){
+quest_tasseiHoukoku = function(startQuestId,endQuestId){
 
-var id2 = 0;//選択肢順番
-var id3 = 101;//ピクチャID
-if(id4 >= 1001){
-  var id6 = 900;
+var choiceOrder = 0;//選択肢順番
+var choicePictureId = 101;//ピクチャID
+if(startQuestId >= 1001){
+  var questBaseId = 900;
 } else {
-  var id6 = 800;
+  var questBaseId = 800;
 };
-for (var i = id4; i <= id5; i++) {
+for (var i = startQuestId; i <= endQuestId; i++) {
   if($gameParty.hasItem($dataItems[i]) && !$dataItems[i].meta['singleQuestIncidence']){
-    if(valueQuestArray6[i-id6] == 1){
+    if(valueQuestArray6[i-questBaseId] == 1){
       var choiceText = `\\C[2][達成]${$dataItems[i].name}\\C[0]`;
     } else {
       var choiceText = `\\C[16][未達]${$dataItems[i].name}\\C[0]`;
@@ -239,27 +239,27 @@ for (var i = id4; i <= id5; i++) {
     const id = 1; 
     const choiceParams = {text: choiceText,value: i};
     $gameSystem.addCustomChoice(id, choiceParams);
-    var choiceText = `${valueQuestArray2[i-id4+1]}`;
+    var choiceText = `${valueQuestArray2[i-startQuestId+1]}`;
     $gameScreen.setDTextPicture(choiceText, 22);
     $gameScreen.dWindowFrame = 'ON';
-    $gameScreen.showPicture(id3,"",0,600,100,100,100,0,0);
-    $gameMessage.setSelectPictureId(id2, id3);
-    id2 += 1;
-    id3 += 1;
+    $gameScreen.showPicture(choicePictureId,"",0,600,100,100,100,0,0);
+    $gameMessage.setSelectPictureId(choiceOrder, choicePictureId);
+    choiceOrder += 1;
+    choicePictureId += 1;
   };
 };
 
 };
 
 //クエスト受注情報掲示
-quest_jutyuuDisplay = function(id1){
+quest_jutyuuDisplay = function(questTypeId){
 
 itemGet_afterProcess();
-var arr1 = [];
-var arr2 = [];
+var questLineTexts = [];
+var questItemIds = [];
 var displayedQuestCount = 0;
-if(id1 == 1){var j = 800;var j1 = 100;var questCategory = '受注クエスト'};
-if(id1 == 2){var j = 900;var j1 = 50;var questCategory = 'デイリークエスト'};
+if(questTypeId == 1){var questBaseId = 800;var ownedMarkerItemOffset = 100;var questCategory = '受注クエスト'};
+if(questTypeId == 2){var questBaseId = 900;var ownedMarkerItemOffset = 50;var questCategory = 'デイリークエスト'};
 for (var i = 1; i <= $dataItems.length-1; i++) {
   var questLineText = 0;
   var acceptableQuestCount = 0;
@@ -271,8 +271,8 @@ for (var i = 1; i <= $dataItems.length-1; i++) {
             if($dataItems[i].meta['QuestSetMap'] && $gameVariables.value(230) >= 1) {
               if(Number($dataItems[i].meta['QuestSetMap']) == Number($dataWeapons[$gameVariables.value(230)].meta['MapSwitch']) || Number($dataItems[i].meta['QuestSetMap']) == 0) {
                 var questLineText = `\x1bI[${$dataItems[i].iconIndex}]${$dataItems[i].name}`;
-                if(valueQuestArray5[i-j] == 1){
-                  if(!$gameParty.hasItem($dataItems[i+j1])){
+                if(valueQuestArray5[i-questBaseId] == 1){
+                  if(!$gameParty.hasItem($dataItems[i+ownedMarkerItemOffset])){
                     if(!$gameParty.hasItem($dataItems[i])){
                       var questLineText = `\\C[2][受注可能]\\C[0]${questLineText}`;
                       valueCountSet1 = 1;
@@ -291,36 +291,36 @@ for (var i = 1; i <= $dataItems.length-1; i++) {
               };
             };
             if(acceptableQuestCount >= 1){//if(questLineText != 0){
-              arr1.push(questLineText);
-              arr2.push(i);
+              questLineTexts.push(questLineText);
+              questItemIds.push(i);
               displayedQuestCount += 1;
               if(displayedQuestCount >= 12){//12
                 break;
               };
             };
 }}}}}};
-if(arr1 != 0){
-valueWordArray = arr1;
-valueCountArray = arr2;
+if(questLineTexts != 0){
+valueWordArray = questLineTexts;
+valueCountArray = questItemIds;
 
 };
 
 };
 
 //クエスト受注設定
-quest_jutyuu = function(id1,i){
+quest_jutyuu = function(questTypeId,i){
 
 itemGet_afterProcess();
-if(id1 == 1){var j = 800;var j1 = 100;var questCategory = '受注クエスト'};
-if(id1 == 2){var j = 900;var j1 = 50;var questCategory = 'デイリークエスト'};
+if(questTypeId == 1){var questBaseId = 800;var ownedMarkerItemOffset = 100;var questCategory = '受注クエスト'};
+if(questTypeId == 2){var questBaseId = 900;var ownedMarkerItemOffset = 50;var questCategory = 'デイリークエスト'};
 $gameSwitches.setValue(380,false);
   if(!$dataItems[i].name == '') {
     if($dataItems[i].meta['EICSwitch']) {
       if(Number($dataItems[i].meta['EICSwitch']) == 108) {
         if($dataItems[i].meta['SGカテゴリ'] == questCategory) {
-          if(valueQuestArray5[i-j] == 1){
+          if(valueQuestArray5[i-questBaseId] == 1){
             if($dataItems[i].meta['singleQuestIncidence']){}else{
-              if(!$gameParty.hasItem($dataItems[i+j1])){
+              if(!$gameParty.hasItem($dataItems[i+ownedMarkerItemOffset])){
                 if(!$gameParty.hasItem($dataItems[i])){
                   $gameParty.gainItem($dataItems[i], 1);
                   var notifyText = `クエスト\\C[2]\x1bIIN[${i}]\\C[0]を受注しました。`;
@@ -337,23 +337,23 @@ $gameSwitches.setValue(380,false);
 };
 
 //クエスト受注設定
-quest_jutyuu2 = function(id1){
+quest_jutyuu2 = function(questTypeId){
 
 itemGet_afterProcess();
-if(id1 == 1){var j = 800;var j1 = 100;var questCategory = '受注クエスト'};
-if(id1 == 2){var j = 900;var j1 = 50;var questCategory = 'デイリークエスト';$gameSwitches.setValue(644,true)};
+if(questTypeId == 1){var questBaseId = 800;var ownedMarkerItemOffset = 100;var questCategory = '受注クエスト'};
+if(questTypeId == 2){var questBaseId = 900;var ownedMarkerItemOffset = 50;var questCategory = 'デイリークエスト';$gameSwitches.setValue(644,true)};
 $gameSwitches.setValue(380,false);
 for (var i = 1; i <= $dataItems.length-1; i++) {
   if(!$dataItems[i].name == '') {
     if($dataItems[i].meta['EICSwitch']) {
       if(Number($dataItems[i].meta['EICSwitch']) == 108) {
         if($dataItems[i].meta['SGカテゴリ'] == questCategory) {
-          if(valueQuestArray5[i-j] == 1){
+          if(valueQuestArray5[i-questBaseId] == 1){
             if($dataItems[i].meta['singleQuestIncidence']){}else{
-              if(!$gameParty.hasItem($dataItems[i+j1])){
+              if(!$gameParty.hasItem($dataItems[i+ownedMarkerItemOffset])){
                 if(!$gameParty.hasItem($dataItems[i])){
                   $gameParty.gainItem($dataItems[i], 1);
-                  if(id1 == 1){
+                  if(questTypeId == 1){
                     var notifyText = `クエスト\\C[2]\x1bIIN[${i}]\\C[0]を受注しました。`;
                     CommonPopupManager.showInfo({},notifyText,null); 
                   } else {
@@ -362,7 +362,7 @@ for (var i = 1; i <= $dataItems.length-1; i++) {
                   };
                 $gameSwitches.setValue(380,true);
 }}}}}}}}};
-if($gameSwitches.value(380) && $gameSwitches.value(128) && id1 == 2){
+if($gameSwitches.value(380) && $gameSwitches.value(128) && questTypeId == 2){
   var notifyText = `デイリークエストを受注しました。`;
   CommonPopupManager.showInfo({},notifyText,null); 
 };
@@ -390,10 +390,10 @@ if(valueQuestArray5[questItemId-questBaseId] == 0){
   $gameSwitches.setValue(380,true);
 };
 var startConditions = valueQuestArray7[questItemId-questBaseId];
-var arr1 = typeof startConditions === 'string' ? startConditions.split("\n") : [];
-for (var i = 0; i <= arr1.length-1; i++) {
-  if(arr1[i] == 0){}else{
-    questInfoText += `${arr1[i]}`;
+var startConditionLines = typeof startConditions === 'string' ? startConditions.split("\n") : [];
+for (var i = 0; i <= startConditionLines.length-1; i++) {
+  if(startConditionLines[i] == 0){}else{
+    questInfoText += `${startConditionLines[i]}`;
     infoLineCount += 1;
     if((infoLineCount %2) == 0){questInfoText += `\n`};
   };

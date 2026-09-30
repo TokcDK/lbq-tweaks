@@ -111,8 +111,8 @@
 		if (!mapEvent) return;
 		var bossGura = mapEvent.event().meta['BossGura'];
 		if (!bossGura) return;
-		var arr1 = bossGura.split(',');
-		boss_setup1(Number(arr1[0]), Number(arr1[1]));
+		var bossGuraParams = bossGura.split(',');
+		boss_setup1(Number(bossGuraParams[0]), Number(bossGuraParams[1]));
 	};
 
 	//=============================================================================
@@ -165,11 +165,11 @@
 	AGH_npcGroupAction = function (ids, action) {
 		var spawnIdList = aghSpawnIdList();
 		if (spawnIdList.length === 0) return;
-		var arr1 = [];
+		var spawnEventIds = [];
 		ids.forEach(function (id) {
-			arr1.push(spawnIdList[id]);
+			spawnEventIds.push(spawnIdList[id]);
 		});
-		event_NpcCharaMoveId(45, action, arr1);
+		event_NpcCharaMoveId(45, action, spawnEventIds);
 	};
 
 	//=============================================================================
@@ -224,8 +224,8 @@
 	//   pic_eraseP(<layer>,arr1);
 	AGH_erasePictureRange = function (switchId, layer, ids) {
 		$gameSwitches.setValue(switchId, false);
-		var arr1 = ids;
-		pic_eraseP(layer, arr1);
+		var picIds = ids;
+		pic_eraseP(layer, picIds);
 	};
 
 	// Replaces (~12x):
@@ -435,12 +435,12 @@
 	//   event_respawnSetN(value1,16,4,1,arr1[6],arr1[7],2);
 	CEH_respawnSubNpcWithPreset = function (interp) {
 		var presetList = $gameVariables.value(163);
-		var arr1 = Array.isArray(presetList) ? presetList[$gameVariables.value(535)] : null;
-		if (!arr1) return;
+		var npcPreset = Array.isArray(presetList) ? presetList[$gameVariables.value(535)] : null;
+		if (!npcPreset) return;
 		var spawnSlot = $gameVariables.value(530);
 		event_respawnSetA(spawnSlot, 15, 4, 0, 6);
 		var spawnSlot = 11;
-		event_respawnSetN(spawnSlot, 16, 4, 1, arr1[6], arr1[7], 2);
+		event_respawnSetN(spawnSlot, 16, 4, 1, npcPreset[6], npcPreset[7], 2);
 	};
 
 	// Replaces (11x):
@@ -453,14 +453,14 @@
 	//   this._eventId = $gameVariables.value(292)[value1];
 	CEH_respawnSubNpcWithImage = function (interp) {
 		var presetList = $gameVariables.value(163);
-		var arr1 = Array.isArray(presetList) ? presetList[$gameVariables.value(535)] : null;
-		if (!arr1) return;
+		var npcPreset = Array.isArray(presetList) ? presetList[$gameVariables.value(535)] : null;
+		if (!npcPreset) return;
 		var spawnSlot = $gameVariables.value(530);
-		event_respawnSetA(spawnSlot, arr1[3], arr1[4], 1);
+		event_respawnSetA(spawnSlot, npcPreset[3], npcPreset[4], 1);
 		var event = $gameMap.event(aghSpawnIdList()[spawnSlot]);
 		if (event) {
-			event.setImage(arr1[1], arr1[2]);
-			event.setDirection(arr1[5]);
+			event.setImage(npcPreset[1], npcPreset[2]);
+			event.setDirection(npcPreset[5]);
 		}
 		interp._eventId = aghSpawnIdList()[spawnSlot] || 0;
 	};
@@ -474,13 +474,13 @@
 	//   event_respawnSetN(value1,arr1[8],arr1[9],0,arr1[6],arr1[7],arr1[10]);
 	CEH_respawnSubNpcWithPresetArr = function (interp) {
 		var presetList = $gameVariables.value(163);
-		var arr1 = Array.isArray(presetList) ? presetList[$gameVariables.value(535)] : null;
-		if (!arr1) return;
+		var npcPreset = Array.isArray(presetList) ? presetList[$gameVariables.value(535)] : null;
+		if (!npcPreset) return;
 		var spawnSlot = $gameVariables.value(530);
-		event_respawnSetA(spawnSlot, arr1[3], arr1[4], 1, arr1[5]);
+		event_respawnSetA(spawnSlot, npcPreset[3], npcPreset[4], 1, npcPreset[5]);
 		interp._eventId = aghSpawnIdList()[spawnSlot] || 0;
 		var spawnSlot = 11;
-		event_respawnSetN(spawnSlot, arr1[8], arr1[9], 0, arr1[6], arr1[7], arr1[10]);
+		event_respawnSetN(spawnSlot, npcPreset[8], npcPreset[9], 0, npcPreset[6], npcPreset[7], npcPreset[10]);
 	};
 
 	//=============================================================================
@@ -554,9 +554,9 @@
 	//   $gameVariables.setValue(171,[arr1[0],arr1[3],arr1[4]]);
 	CEH_setScenePosFromPreset = function () {
 		var presetList = $gameVariables.value(163);
-		var arr1 = Array.isArray(presetList) ? presetList[$gameVariables.value(535)] : null;
-		if (!arr1) return;
-		$gameVariables.setValue(171, [arr1[0], arr1[3], arr1[4]]);
+		var npcPreset = Array.isArray(presetList) ? presetList[$gameVariables.value(535)] : null;
+		if (!npcPreset) return;
+		$gameVariables.setValue(171, [npcPreset[0], npcPreset[3], npcPreset[4]]);
 	};
 
 	// Replaces (13x):

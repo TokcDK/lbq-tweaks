@@ -7,13 +7,13 @@
 //(function(){
 
 //picture_motion1("smooth",[0]);
-picture_motion1 = function(id1,id2){
+picture_motion1 = function(motionType,motionParams){
 
-curveFunctions.patternX = curveFunctions.getPattern(id1, id2);
-curveFunctions.patternY = curveFunctions.getPattern(id1, id2);
-curveFunctions.patternScaleX = curveFunctions.getPattern(id1, id2);
-curveFunctions.patternScaleY = curveFunctions.getPattern(id1, id2);
-curveFunctions.patternOpacity = curveFunctions.getPattern(id1, id2);
+curveFunctions.patternX = curveFunctions.getPattern(motionType, motionParams);
+curveFunctions.patternY = curveFunctions.getPattern(motionType, motionParams);
+curveFunctions.patternScaleX = curveFunctions.getPattern(motionType, motionParams);
+curveFunctions.patternScaleY = curveFunctions.getPattern(motionType, motionParams);
+curveFunctions.patternOpacity = curveFunctions.getPattern(motionType, motionParams);
 
 }
 
@@ -51,23 +51,23 @@ Galv.CACHE.load('system','ActiveMessageSkin');
 }
 
 //ピクチャ表示（通常のピクチャ表示のみ！）
-pic_1 = function(id1,id2,id3,id4,id5,id6,id7,id8,id9,id10,id11){
+pic_1 = function(flashTypeId,pictureId,pictureName,entryTypeId,scale,opacity,waitFrames,width,height,baseWidth,baseHeight){
 
-var halfWidth = id10/2;
-var halfHeight = id11/2;
+var halfWidth = baseWidth/2;
+var halfHeight = baseHeight/2;
 var scaleMultiplier = 1;
-if(id4 <= 3){
+if(entryTypeId <= 3){
   var scaleMultiplier = 2;
-    if(id1 == 3){
+    if(flashTypeId == 3){
       var scaleMultiplier = 5;
     }
 }
-if(id7 >= 61 && id4 <= 3){
+if(waitFrames >= 61 && entryTypeId <= 3){
   var scaleMultiplier = 5;
 }
 var offsetX = 0;
 var offsetY = 0;
-if(id4 == 3){
+if(entryTypeId == 3){
   var randomDirectionIndex = getRandomIndex(3);
   var scaleMultiplier = 1;
   if(randomDirectionIndex == 0){var offsetX = 50}
@@ -76,43 +76,43 @@ if(id4 == 3){
   if(randomDirectionIndex == 3){var offsetY = -50}
 //if(randomDirectionIndex >= 1){var offsetX = 100}//テスト
 }
-if(id1 >= 4){
-  if(id4 == 4){var offsetY = id1}
-  if(id4 == 5){var offsetX = -id1}
-  if(id4 == 6){var offsetX = id1}
-  if(id4 == 7){var offsetY = -id1}
+if(flashTypeId >= 4){
+  if(entryTypeId == 4){var offsetY = flashTypeId}
+  if(entryTypeId == 5){var offsetX = -flashTypeId}
+  if(entryTypeId == 6){var offsetX = flashTypeId}
+  if(entryTypeId == 7){var offsetY = -flashTypeId}
 } else {
-  if(id4 == 4){var offsetY = 100}
-  if(id4 == 5){var offsetX = -100}
-  if(id4 == 6){var offsetX = 100}
-  if(id4 == 7){var offsetY = -100}
+  if(entryTypeId == 4){var offsetY = 100}
+  if(entryTypeId == 5){var offsetX = -100}
+  if(entryTypeId == 6){var offsetX = 100}
+  if(entryTypeId == 7){var offsetY = -100}
 }
-if(id4 == 1){var scaleMultiplier = 0}
-if(id4 == 2){var scaleMultiplier = 1}
-if(id4 >= 3){
-  if(!$gameScreen.picture(id2-1)){
+if(entryTypeId == 1){var scaleMultiplier = 0}
+if(entryTypeId == 2){var scaleMultiplier = 1}
+if(entryTypeId >= 3){
+  if(!$gameScreen.picture(pictureId-1)){
     picture_motion1("smooth",[0]);
     var hueValue = 200;
     if($gameVariables.value(20) >= 1){
       if($dataActors[$gameVariables.value(20)].meta['tachieHue']){
         var hueValue = Number($dataActors[$gameVariables.value(20)].meta['tachieHue']);
     }}
-    $gameScreen.showPicture_hue(id2-1, id3, hueValue, 1, id8/2+halfWidth+offsetX+offsetX, id9/2+halfHeight+offsetY+offsetY, id5*scaleMultiplier, id5*scaleMultiplier, 0, 0);
-    $gameScreen.movePicture(id2-1, 1,id8/2+halfWidth,id9/2+halfHeight,id5, id5, 150, 0, id7+20);
+    $gameScreen.showPicture_hue(pictureId-1, pictureName, hueValue, 1, width/2+halfWidth+offsetX+offsetX, height/2+halfHeight+offsetY+offsetY, scale*scaleMultiplier, scale*scaleMultiplier, 0, 0);
+    $gameScreen.movePicture(pictureId-1, 1,width/2+halfWidth,height/2+halfHeight,scale, scale, 150, 0, waitFrames+20);
   }
 }
-$gameScreen.showPicture(id2,id3,1,id8/2+halfWidth+offsetX,id9/2+halfHeight+offsetY,id5*scaleMultiplier,id5*scaleMultiplier,0,0);
-$gameScreen.movePicture(id2, 1,id8/2+halfWidth,id9/2+halfHeight,id5, id5, id6, 0, id7);
-if(id1 <= 1){
-  if(id7 <= 60){
+$gameScreen.showPicture(pictureId,pictureName,1,width/2+halfWidth+offsetX,height/2+halfHeight+offsetY,scale*scaleMultiplier,scale*scaleMultiplier,0,0);
+$gameScreen.movePicture(pictureId, 1,width/2+halfWidth,height/2+halfHeight,scale, scale, opacity, 0, waitFrames);
+if(flashTypeId <= 1){
+  if(waitFrames <= 60){
     AudioManager.playSe({"name":"Z_CGDispray","volume":20,"pitch":150,"pan":0});
-      if(id1 == 1){
-        $gameScreen.startFlash([255,255,255,204], id7);
-        $gameScreen.startShake(7, 7, id7/2);
+      if(flashTypeId == 1){
+        $gameScreen.startFlash([255,255,255,204], waitFrames);
+        $gameScreen.startShake(7, 7, waitFrames/2);
       }
-      if(id1 == 0){
-        $gameScreen.startFlash([255,119,255,204], id7);
-        $gameScreen.startShake(5, 5, id7/2);
+      if(flashTypeId == 0){
+        $gameScreen.startFlash([255,119,255,204], waitFrames);
+        $gameScreen.startShake(5, 5, waitFrames/2);
       }
   }
 }
@@ -120,9 +120,9 @@ if(id1 <= 1){
 }
 
 //ピクチャ指定して配列に代入
-pic_setArray = function(id5,id1,id2,id3,id4,id6){
+pic_setArray = function(parallelSlotId,pictureId,jitterX,jitterY,scaleAmount,waitFrames){
 
-if(id5 <= 0){
+if(parallelSlotId <= 0){
   valueParallelPic1 = 0;
   valueParallelPic2 = 0;
   valueParallelPic3 = 0;
@@ -130,25 +130,25 @@ if(id5 <= 0){
   picture_motion1("smooth",[0]);
 }
 valuePicArr1= Array(15).fill(0);
-if(id5 <= 1){valueParallelPic1 = id1}
-if(id5 == 2){valueParallelPic2 = id1}
-if(id5 == 3){valueParallelPic3 = id1}
-if(id5 == 4){valueParallelPic4 = id1}
-if($gameScreen.picture(id1)){
-  valuePicArr1[0] = id1;
-  valuePicArr1[11] = $gameScreen.picture(id1).name();
-  valuePicArr1[1] = $gameScreen.picture(id1).origin();
-  valuePicArr1[2] = $gameScreen.picture(id1).x();
-  valuePicArr1[3] = $gameScreen.picture(id1).y();
-  valuePicArr1[4] = $gameScreen.picture(id1).scaleX();
-  valuePicArr1[5] = $gameScreen.picture(id1).scaleY();
-  valuePicArr1[6] = $gameScreen.picture(id1).opacity();
-  valuePicArr1[7] = $gameScreen.picture(id1).blendMode();
-  valuePicArr1[8] = id2;//x
-  valuePicArr1[9] = id3;//y
-  valuePicArr1[10] = id6;//ウェイト
+if(parallelSlotId <= 1){valueParallelPic1 = pictureId}
+if(parallelSlotId == 2){valueParallelPic2 = pictureId}
+if(parallelSlotId == 3){valueParallelPic3 = pictureId}
+if(parallelSlotId == 4){valueParallelPic4 = pictureId}
+if($gameScreen.picture(pictureId)){
+  valuePicArr1[0] = pictureId;
+  valuePicArr1[11] = $gameScreen.picture(pictureId).name();
+  valuePicArr1[1] = $gameScreen.picture(pictureId).origin();
+  valuePicArr1[2] = $gameScreen.picture(pictureId).x();
+  valuePicArr1[3] = $gameScreen.picture(pictureId).y();
+  valuePicArr1[4] = $gameScreen.picture(pictureId).scaleX();
+  valuePicArr1[5] = $gameScreen.picture(pictureId).scaleY();
+  valuePicArr1[6] = $gameScreen.picture(pictureId).opacity();
+  valuePicArr1[7] = $gameScreen.picture(pictureId).blendMode();
+  valuePicArr1[8] = jitterX;//x
+  valuePicArr1[9] = jitterY;//y
+  valuePicArr1[10] = waitFrames;//ウェイト
   valuePicArr1[12] = getRandomIndex(51) + 100;//残像の-透明度
-  valuePicArr1[13] = id4;//scale
+  valuePicArr1[13] = scaleAmount;//scale
   $gameScreen.showPicture_hue(valuePicArr1[0]-1,valuePicArr1[11],283,valuePicArr1[1],valuePicArr1[2],valuePicArr1[3],
   valuePicArr1[4],valuePicArr1[5],valuePicArr1[6]-valuePicArr1[12],0);
 }
@@ -156,7 +156,7 @@ if($gameScreen.picture(id1)){
 }
 
 //ピクチャ指定して配列に代入したものを並列処理
-pic_setArrayParallel1 = function(id1){
+pic_setArrayParallel1 = function(pictureId){
 
 var valuePicVal1 = 0;
 var valuePicVal2 = 0;
@@ -166,8 +166,8 @@ var valuePicVal5 = 0;
 valuePicWait = 0;
 var valuePicVal1 = 0;
 var valuePicVal2 = 0;
-if(id1 == valueParallelPic1 || id1 == valueParallelPic2 || id1 == valueParallelPic3 || id1 == valueParallelPic4){
-  if($gameScreen.picture(id1)){
+if(pictureId == valueParallelPic1 || pictureId == valueParallelPic2 || pictureId == valueParallelPic3 || pictureId == valueParallelPic4){
+  if($gameScreen.picture(pictureId)){
     if(valuePicArr1[8] >= 1){var valuePicVal1 = valuePicArr1[8] - getRandomIndex(5)}
     if(valuePicArr1[8] <= -1){var valuePicVal1 = valuePicArr1[8] + getRandomIndex(5)}
     if(valuePicArr1[9] >= 1){var valuePicVal2 = valuePicArr1[9] - getRandomIndex(5)}
@@ -183,10 +183,10 @@ if(id1 == valueParallelPic1 || id1 == valueParallelPic2 || id1 == valueParallelP
       var valuePicVal3 = valuePicArr1[13];
       var valuePicVal4 = valuePicArr1[13];
     }
-    var arr1 = [valuePicArr1[2],valuePicArr1[2]+valuePicVal1,valuePicArr1[2]+valuePicVal3,valuePicArr1[2]];
-    curveFunctions.patternX = curveFunctions.getPattern('spline', arr1);
-    var arr1 = [valuePicArr1[3],valuePicArr1[3]+valuePicVal2,valuePicArr1[3]+valuePicVal4,valuePicArr1[3]];
-    curveFunctions.patternY = curveFunctions.getPattern('spline', arr1);
+    var splinePoints = [valuePicArr1[2],valuePicArr1[2]+valuePicVal1,valuePicArr1[2]+valuePicVal3,valuePicArr1[2]];
+    curveFunctions.patternX = curveFunctions.getPattern('spline', splinePoints);
+    var splinePoints = [valuePicArr1[3],valuePicArr1[3]+valuePicVal2,valuePicArr1[3]+valuePicVal4,valuePicArr1[3]];
+    curveFunctions.patternY = curveFunctions.getPattern('spline', splinePoints);
     curveFunctions.patternScaleX = curveFunctions.getPattern('jump', [valuePicVal3]);
     curveFunctions.patternScaleY = curveFunctions.getPattern('jump', [valuePicVal4]);
     valuePicWait += valuePicArr1[10] - getRandomIndex(5);
@@ -195,9 +195,9 @@ if(id1 == valueParallelPic1 || id1 == valueParallelPic2 || id1 == valueParallelP
     var valuePicVal4 = getRandomIndex(4) + 1;
     var valuePicVal5 = valuePicWait - valuePicVal4;
     if(valuePicVal5 <= 1){var valuePicVal5 = 2}
-    if(id1 == valueParallelPic1){
-      if($gameScreen.picture(id1 - 1)){
-        $gameScreen.movePicture(id1-1,valuePicArr1[1],valuePicArr1[2],valuePicArr1[3],
+    if(pictureId == valueParallelPic1){
+      if($gameScreen.picture(pictureId - 1)){
+        $gameScreen.movePicture(pictureId-1,valuePicArr1[1],valuePicArr1[2],valuePicArr1[3],
         valuePicArr1[4],valuePicArr1[5],valuePicArr1[6]-valuePicArr1[12],0,valuePicVal5);
       }
     }
@@ -212,79 +212,79 @@ if(id1 == valueParallelPic1 || id1 == valueParallelPic2 || id1 == valueParallelP
 
 //ピクチャ指定して表示pic_set(51,1,255,60);
 //id1ﾋﾟｸﾁｬid2が1透明2x3y4拡大5合成,id3で指定値,id4ウェイト
-pic_set = function(id1,id2,id3,id4){
+pic_set = function(pictureId,setTargetId,targetValue,waitFrames){
 
-if($gameScreen.picture(id1)){
-  var pictureOrigin = $gameScreen.picture(id1).origin();
-  var pictureX = $gameScreen.picture(id1).x();
-  var pictureY = $gameScreen.picture(id1).y();
-  var scaleX = $gameScreen.picture(id1).scaleX();
-  var scaleY = $gameScreen.picture(id1).scaleY();
-  var opacity = $gameScreen.picture(id1).opacity();
-  var blendMode = $gameScreen.picture(id1).blendMode();
-  if(id2 == 1){var opacity = id3}
-  if(id2 == 2){var pictureX = id3 + pictureX}
-  if(id2 == 3){var pictureY = id3 + pictureY}
-  if(id2 == 4){
-    var scaleX = id3
-    var scaleY = id3
+if($gameScreen.picture(pictureId)){
+  var pictureOrigin = $gameScreen.picture(pictureId).origin();
+  var pictureX = $gameScreen.picture(pictureId).x();
+  var pictureY = $gameScreen.picture(pictureId).y();
+  var scaleX = $gameScreen.picture(pictureId).scaleX();
+  var scaleY = $gameScreen.picture(pictureId).scaleY();
+  var opacity = $gameScreen.picture(pictureId).opacity();
+  var blendMode = $gameScreen.picture(pictureId).blendMode();
+  if(setTargetId == 1){var opacity = targetValue}
+  if(setTargetId == 2){var pictureX = targetValue + pictureX}
+  if(setTargetId == 3){var pictureY = targetValue + pictureY}
+  if(setTargetId == 4){
+    var scaleX = targetValue
+    var scaleY = targetValue
   }
-  if(id2 == 5){var blendMode = id3}
-  $gameScreen.movePicture(id1,pictureOrigin,pictureX,pictureY,scaleX,scaleY,opacity,blendMode,id4);
+  if(setTargetId == 5){var blendMode = targetValue}
+  $gameScreen.movePicture(pictureId,pictureOrigin,pictureX,pictureY,scaleX,scaleY,opacity,blendMode,waitFrames);
 }
 
 }
 
 //元位置記してピクチャムーブ。pic_move1(88,-300,0,100,100,0,90);//0id,1x,2y,3拡x,4拡y,5opa,6wait
-pic_move1 = function(id1,id2,id3,id4,id5,id6,id7){
+pic_move1 = function(pictureId,x,y,scaleX,scaleY,opacity,waitFrames){
 
-if($gameScreen.picture(id1)){
-  if(id6 == 0){
-    if($gameScreen.picture(id1)._breathActive){
-      UTSU.PictureBreath.off([id1]);
+if($gameScreen.picture(pictureId)){
+  if(opacity == 0){
+    if($gameScreen.picture(pictureId)._breathActive){
+      UTSU.PictureBreath.off([pictureId]);
     }
-    if($gameScreen.picture(id1)._breathActive2){
-      UTSU.PictureBreath2.off([id1]);
+    if($gameScreen.picture(pictureId)._breathActive2){
+      UTSU.PictureBreath2.off([pictureId]);
     }
-    if($gameScreen.picture(id1)._breathActive3){
-      UTSU.PictureBreath3.off([id1]);
+    if($gameScreen.picture(pictureId)._breathActive3){
+      UTSU.PictureBreath3.off([pictureId]);
     }
-    if($gameScreen.picture(id1)._breathActive4){
-      UTSU.PictureBreath4.off([id1]);
+    if($gameScreen.picture(pictureId)._breathActive4){
+      UTSU.PictureBreath4.off([pictureId]);
     }
-    if($gameScreen.picture(id1)._breathActive5){
-      UTSU.PictureBreath5.off([id1]);
+    if($gameScreen.picture(pictureId)._breathActive5){
+      UTSU.PictureBreath5.off([pictureId]);
     }
-    if($gameScreen.picture(id1)._breathActive6){
-      UTSU.PictureBreath6.off([id1]);
+    if($gameScreen.picture(pictureId)._breathActive6){
+      UTSU.PictureBreath6.off([pictureId]);
     }
   }
-  var targetX = $gameScreen.picture(id1).x() + id2;
-  var targetY = $gameScreen.picture(id1).y() + id3;
+  var targetX = $gameScreen.picture(pictureId).x() + x;
+  var targetY = $gameScreen.picture(pictureId).y() + y;
   //var scaleMultiplier = id4;//$gameScreen.picture(id1).scaleX() + id4;
   //var scaleMultiplier2 = id5;//$gameScreen.picture(id1).scaleY() + id5;
-  var pictureOrigin = $gameScreen.picture(id1).origin();
-  $gameScreen.movePicture(id1,pictureOrigin,targetX,targetY,id4,id5,id6,0,id7);
+  var pictureOrigin = $gameScreen.picture(pictureId).origin();
+  $gameScreen.movePicture(pictureId,pictureOrigin,targetX,targetY,scaleX,scaleY,opacity,0,waitFrames);
 }
 
 }
 
 //ピクid1の位置情報をもとにピクチャid2表示.id1元ﾋﾟｸ,id2表示ﾋﾟｸ,画像名,表示ｳｪｲﾄ,id5が1で元ﾋﾟｸ消去で0で無効
-pic_locationSet = function(id1,id2,id3,id4,id5){
+pic_locationSet = function(sourcePictureId,targetPictureId,pictureName,waitFrames,isAlsoFadeOut){
 
-if($gameScreen.picture(id1)){
-  var arr1 = [0,0,0,0,0,0,0,0];
-  arr1[1] = $gameScreen.picture(id1).origin();
-  arr1[2] = $gameScreen.picture(id1).x();
-  arr1[3] = $gameScreen.picture(id1).y();
-  arr1[4] = $gameScreen.picture(id1).scaleX();
-  arr1[5] = $gameScreen.picture(id1).scaleY();
-  arr1[6] = $gameScreen.picture(id1).opacity();
-  arr1[7] = $gameScreen.picture(id1).blendMode();
-  $gameScreen.showPicture(id2,id3,arr1[1],arr1[2],arr1[3],arr1[4],arr1[5],0,arr1[7]);
-  $gameScreen.movePicture(id2,arr1[1],arr1[2],arr1[3],arr1[4],arr1[5],arr1[6],arr1[7],id4);
-  if(id5 == 1){
-    $gameScreen.movePicture(id1,arr1[1],arr1[2],arr1[3],arr1[4],arr1[5],0,arr1[7],id4*2);
+if($gameScreen.picture(sourcePictureId)){
+  var pictureState = [0,0,0,0,0,0,0,0];
+  pictureState[1] = $gameScreen.picture(sourcePictureId).origin();
+  pictureState[2] = $gameScreen.picture(sourcePictureId).x();
+  pictureState[3] = $gameScreen.picture(sourcePictureId).y();
+  pictureState[4] = $gameScreen.picture(sourcePictureId).scaleX();
+  pictureState[5] = $gameScreen.picture(sourcePictureId).scaleY();
+  pictureState[6] = $gameScreen.picture(sourcePictureId).opacity();
+  pictureState[7] = $gameScreen.picture(sourcePictureId).blendMode();
+  $gameScreen.showPicture(targetPictureId,pictureName,pictureState[1],pictureState[2],pictureState[3],pictureState[4],pictureState[5],0,pictureState[7]);
+  $gameScreen.movePicture(targetPictureId,pictureState[1],pictureState[2],pictureState[3],pictureState[4],pictureState[5],pictureState[6],pictureState[7],waitFrames);
+  if(isAlsoFadeOut == 1){
+    $gameScreen.movePicture(sourcePictureId,pictureState[1],pictureState[2],pictureState[3],pictureState[4],pictureState[5],0,pictureState[7],waitFrames*2);
   }
 }
 
@@ -300,13 +300,13 @@ $gameScreen.picture(animePicId).startAnimationFrame(animeF1, animeF2, animeF3);
 }
 
 //ピクチャアニメセル指定
-picture_anime2 = function(animePicId,animePicName,animeP1,animeP2,animeP3,animeP4,id1){
+picture_anime2 = function(animePicId,animePicName,animeP1,animeP2,animeP3,animeP4,cellIndex){
 
 if(!$gameScreen.picture(animePicId)){
   $gameScreen.setPicturesAnimation(animeP1, animeP2, animeP3, animeP4);
   $gameScreen.showPicture(animePicId,animePicName,1,640,384,100,100,0,0);
 }
-$gameScreen.picture(animePicId).cell = id1;
+$gameScreen.picture(animePicId).cell = cellIndex;
 
 }
 
@@ -359,10 +359,10 @@ if($gameScreen.picture(fadePicId)){
 }
 
 //ピクチャ指定消去
-pic_eraseP = function(id1,array){
+pic_eraseP = function(eraseStyleId,pictureIds){
 
 picture_motion1("smooth",[0]);
-if(id1 == 1){
+if(eraseStyleId == 1){
   var eraseWait = getRandomIndex(21) + 40;
   var randomDirectionIndex = getRandomIndex(4);
   var offsetX = 0;
@@ -372,47 +372,47 @@ if(id1 == 1){
   if(randomDirectionIndex == 2){var offsetX = -50}
   if(randomDirectionIndex == 3){var offsetY = -50}
 }
-if(id1 == 2){
+if(eraseStyleId == 2){
   var eraseWait = 60;
   var offsetX = 0;
   var offsetY = 0;
 }
-var list = array;
-list.forEach(function(id2) {
-  if($gameScreen.picture(id2)){
-    if($gameScreen.picture(id2)._breathActive){
-      UTSU.PictureBreath.off([id2]);
+var list = pictureIds;
+list.forEach(function(pictureId) {
+  if($gameScreen.picture(pictureId)){
+    if($gameScreen.picture(pictureId)._breathActive){
+      UTSU.PictureBreath.off([pictureId]);
     }
-    if($gameScreen.picture(id2)._breathActive2){
-      UTSU.PictureBreath2.off([id2]);
+    if($gameScreen.picture(pictureId)._breathActive2){
+      UTSU.PictureBreath2.off([pictureId]);
     }
-    if($gameScreen.picture(id2)._breathActive3){
-      UTSU.PictureBreath3.off([id2]);
+    if($gameScreen.picture(pictureId)._breathActive3){
+      UTSU.PictureBreath3.off([pictureId]);
     }
-    if($gameScreen.picture(id2)._breathActive4){
-      UTSU.PictureBreath4.off([id2]);
+    if($gameScreen.picture(pictureId)._breathActive4){
+      UTSU.PictureBreath4.off([pictureId]);
     }
-    if($gameScreen.picture(id2)._breathActive5){
-      UTSU.PictureBreath5.off([id2]);
+    if($gameScreen.picture(pictureId)._breathActive5){
+      UTSU.PictureBreath5.off([pictureId]);
     }
-    if($gameScreen.picture(id2)._breathActive6){
-      UTSU.PictureBreath6.off([id2]);
+    if($gameScreen.picture(pictureId)._breathActive6){
+      UTSU.PictureBreath6.off([pictureId]);
     }
-    if($gameScreen.picture(id2).isParallaxBase()){
-      $gameScreen.eraseParallax(id2);
+    if($gameScreen.picture(pictureId).isParallaxBase()){
+      $gameScreen.eraseParallax(pictureId);
     }
-    if(id1 >= 1){
-      if($gameScreen.picture(id2)){
-      var pictureOrigin = $gameScreen.picture(id2).origin();
-      var pictureX = $gameScreen.picture(id2).x() + offsetX;
-      var pictureY = $gameScreen.picture(id2).y() + offsetY;
-      var scaleX = $gameScreen.picture(id2).scaleX();
-      var scaleY = $gameScreen.picture(id2).scaleY();
+    if(eraseStyleId >= 1){
+      if($gameScreen.picture(pictureId)){
+      var pictureOrigin = $gameScreen.picture(pictureId).origin();
+      var pictureX = $gameScreen.picture(pictureId).x() + offsetX;
+      var pictureY = $gameScreen.picture(pictureId).y() + offsetY;
+      var scaleX = $gameScreen.picture(pictureId).scaleX();
+      var scaleY = $gameScreen.picture(pictureId).scaleY();
       //var opacity = $gameScreen.picture(id2).opacity();
-      $gameScreen.movePicture(id2,pictureOrigin,pictureX,pictureY,scaleX,scaleY,0,0,eraseWait);
+      $gameScreen.movePicture(pictureId,pictureOrigin,pictureX,pictureY,scaleX,scaleY,0,0,eraseWait);
       }
     } else {
-      $gameScreen.erasePicture(id2);
+      $gameScreen.erasePicture(pictureId);
     }
   }
 }, this);
@@ -420,12 +420,12 @@ list.forEach(function(id2) {
 }
 
 //ピクチャ一括消去
-pic_erase = function(id1){
+pic_erase = function(eraseModeId){
 
-if(id1 == 0){var arr1 = [0]}
-if(id1 == 1){var arr1 = [1,2,3,4,6,9,10,47,48,49,50,94,95]}
+if(eraseModeId == 0){var exemptPictureIds = [0]}
+if(eraseModeId == 1){var exemptPictureIds = [1,2,3,4,6,9,10,47,48,49,50,94,95]}
 for (var i = 1; i <= 250; i++) {
-  if(arr1.some(function(id){return id == i})){} else {
+  if(exemptPictureIds.some(function(id){return id == i})){} else {
     //$gameScreen.showPicture(i,'0_1_0',1,640-128,384,1,1,50,0);
     if($gameScreen.picture(i)){
       if($gameScreen.picture(i)._breathActive){
@@ -457,25 +457,25 @@ for (var i = 1; i <= 250; i++) {
 //ピクチャブレスオフ
 pic_blessoff = function(){
 
-var arr2 = [];
+var pictureIds = [];
 for (var i = 1; i <= 250; i++) {
   if($gameScreen.picture(i)){
-    arr2.push(i);
+    pictureIds.push(i);
   }
 }
-UTSU.PictureBreath.off(arr2);
-UTSU.PictureBreath2.off(arr2);
-UTSU.PictureBreath3.off(arr2);
-UTSU.PictureBreath4.off(arr2);
-UTSU.PictureBreath5.off(arr2);
-UTSU.PictureBreath6.off(arr2);
+UTSU.PictureBreath.off(pictureIds);
+UTSU.PictureBreath2.off(pictureIds);
+UTSU.PictureBreath3.off(pictureIds);
+UTSU.PictureBreath4.off(pictureIds);
+UTSU.PictureBreath5.off(pictureIds);
+UTSU.PictureBreath6.off(pictureIds);
 
 }
 
 //ピクチャボタン動作
-picture_bottan1 = function(id1){
+picture_bottan1 = function(pictureId){
 
-$gameVariables.setValue(281,id1);
+$gameVariables.setValue(281,pictureId);
 $gameVariables.setValue(282,[0,0,0,0,0,0,0,0,0,0,0]);
 if($gameScreen.picture($gameVariables.value(281))){
   $gameVariables.value(282)[2] = $gameScreen.picture($gameVariables.value(281)).x();
@@ -597,125 +597,125 @@ tachie_bless = function(pictureId, blessType) {
 }
 
 //CGでピストン表現hcg_piston(value1,7,1,1);
-hcg_piston = function(id11,id12,id13,id14){
+hcg_piston = function(pictureId,breathTypeId,breathPresetId,breathLayerId){
 
 if($gameSwitches.value(43)) return; //高演出カット
 
-let array;
-switch(id12){
+let breathParams;
+switch(breathTypeId){
 case 1: {//右横
-  switch(id13){
-   case 1: { array = [-1,3,100, 0.015, 0.001]; break; }
-   case 2: { array = [-1,3,60, 0.020, 0.001]; break; }
-   case 3: { array = [-1,3,40, 0.025, 0.001]; break; }
+  switch(breathPresetId){
+   case 1: { breathParams = [-1,3,100, 0.015, 0.001]; break; }
+   case 2: { breathParams = [-1,3,60, 0.020, 0.001]; break; }
+   case 3: { breathParams = [-1,3,40, 0.025, 0.001]; break; }
   }
   break;
 }
 case 2: {//左横
-  switch(id13){
-   case 1: { array = [-1,3,100, -0.015, 0.001]; break; }
-   case 2: { array = [-1,3,60, -0.020, 0.001]; break; }
-   case 3: { array = [-1,3,40, -0.025, 0.001]; break; }
+  switch(breathPresetId){
+   case 1: { breathParams = [-1,3,100, -0.015, 0.001]; break; }
+   case 2: { breathParams = [-1,3,60, -0.020, 0.001]; break; }
+   case 3: { breathParams = [-1,3,40, -0.025, 0.001]; break; }
   }
   break;
 }
 case 3: {//左斜め
-  switch(id13){
-   case 1: { array = [1,1,100, 0.015, 0.015]; break; }
-   case 2: { array = [1,1,50, 0.02, 0.02]; break; }
-   case 3: { array = [1,1,20, 0.03, 0.03]; break; }
+  switch(breathPresetId){
+   case 1: { breathParams = [1,1,100, 0.015, 0.015]; break; }
+   case 2: { breathParams = [1,1,50, 0.02, 0.02]; break; }
+   case 3: { breathParams = [1,1,20, 0.03, 0.03]; break; }
   }
   break;
 }
 case 4: {//右斜め
-  switch(id13){
-   case 1: { array = [-1,1,100, 0.015, 0.015]; break; }
-   case 2: { array = [-1,1,50, 0.02, 0.02]; break; }
-   case 3: { array = [-1,1,20, 0.03, 0.03]; break; }
+  switch(breathPresetId){
+   case 1: { breathParams = [-1,1,100, 0.015, 0.015]; break; }
+   case 2: { breathParams = [-1,1,50, 0.02, 0.02]; break; }
+   case 3: { breathParams = [-1,1,20, 0.03, 0.03]; break; }
   }
   break;
 }
 case 5: {//正面
-  switch(id13){
-   case 1: { array = [100,100,100, 0.005, 0.004]; break; }
-   case 2: { array = [150,150,50, 0.005, 0.004]; break; }
-   case 3: { array = [200,200,20, 0.020, 0.015]; break; }
+  switch(breathPresetId){
+   case 1: { breathParams = [100,100,100, 0.005, 0.004]; break; }
+   case 2: { breathParams = [150,150,50, 0.005, 0.004]; break; }
+   case 3: { breathParams = [200,200,20, 0.020, 0.015]; break; }
   }
   break;
 }
 case 6: {//正面痙攣（事後）
-  switch(id13){
-   case 1: { array = [100,100,200, 0.003, 0.002]; break; }
-   case 2: { array = [100,100,100, 0.003, 0.002]; break; }
-   case 3: { array = [100,100,20, 0.003, 0.002]; break; }
+  switch(breathPresetId){
+   case 1: { breathParams = [100,100,200, 0.003, 0.002]; break; }
+   case 2: { breathParams = [100,100,100, 0.003, 0.002]; break; }
+   case 3: { breathParams = [100,100,20, 0.003, 0.002]; break; }
   }
   break;
 }
 case 7: {//縦
-  switch(id13){
+  switch(breathPresetId){
    //case 1: { array = [100,100,100, 0.015, 0.04]; break; }
-   case 1: { array = [100,100,100, 0.015, 0.02]; break; }
-   case 2: { array = [100,100,50, 0.015, 0.04]; break; }
-   case 3: { array = [100,100,20, 0.015, 0.05]; break; }
+   case 1: { breathParams = [100,100,100, 0.015, 0.02]; break; }
+   case 2: { breathParams = [100,100,50, 0.015, 0.04]; break; }
+   case 3: { breathParams = [100,100,20, 0.015, 0.05]; break; }
   }
   break;
 }
 case 8: {//横左右に身動ぎ
-  switch(id13){
-   case 1: { array = [100,100,150, 0.01, 0.005]; break; }
-   case 2: { array = [100,100,100, 0.02, 0.015]; break; }
-   case 3: { array = [100,100,50, 0.03, 0.020]; break; }
+  switch(breathPresetId){
+   case 1: { breathParams = [100,100,150, 0.01, 0.005]; break; }
+   case 2: { breathParams = [100,100,100, 0.02, 0.015]; break; }
+   case 3: { breathParams = [100,100,50, 0.03, 0.020]; break; }
   }
   break;
 }
 case 9: {//プロフィール乳揺れ正面
-  switch(id13){
-   case 1: { array = [100,100,150, 0.015, 0.03]; break; }
-   case 2: { array = [100,100,50, 0.020, 0.04]; break; }
-   case 3: { array = [100,100,20, 0.025, 0.05]; break; }
+  switch(breathPresetId){
+   case 1: { breathParams = [100,100,150, 0.015, 0.03]; break; }
+   case 2: { breathParams = [100,100,50, 0.020, 0.04]; break; }
+   case 3: { breathParams = [100,100,20, 0.025, 0.05]; break; }
   }
   break;
 }
 case 10: {//顔グラ乳揺れ正面
-  switch(id13){
-   case 1: { array = [100,100,150, 0.010, 0.02]; break; }
-   case 2: { array = [100,100,100, 0.020, 0.04]; break; }
-   case 3: { array = [100,100,50, 0.025, 0.05]; break; }
+  switch(breathPresetId){
+   case 1: { breathParams = [100,100,150, 0.010, 0.02]; break; }
+   case 2: { breathParams = [100,100,100, 0.020, 0.04]; break; }
+   case 3: { breathParams = [100,100,50, 0.025, 0.05]; break; }
   }
   break;
 }
 };
-if(!array) return;
+if(!breathParams) return;
 
-switch(id14){
+switch(breathLayerId){
   case 1: {//立ち絵用orイベCG用
-    valueTachieBless = array;
-    UTSU.PictureBreath.on([id11], valueTachieBless[2]);
+    valueTachieBless = breathParams;
+    UTSU.PictureBreath.on([pictureId], valueTachieBless[2]);
 	break;
   }
   case 2: {//イベCG用
-    valueTachieBless2 = array;
-    UTSU.PictureBreath2.on([id11], valueTachieBless2[2]);
+    valueTachieBless2 = breathParams;
+    UTSU.PictureBreath2.on([pictureId], valueTachieBless2[2]);
 	break;
   }
   case 3: {//顔グラ身体
-    valueTachieBless3 = array;
-    UTSU.PictureBreath3.on([id11], valueTachieBless3[2]);
+    valueTachieBless3 = breathParams;
+    UTSU.PictureBreath3.on([pictureId], valueTachieBless3[2]);
 	break;
   }
   case 4: {//顔グラ乳揺れ
-    valueTachieBless4 = array;
-    UTSU.PictureBreath4.on([id11], valueTachieBless4[2]);
+    valueTachieBless4 = breathParams;
+    UTSU.PictureBreath4.on([pictureId], valueTachieBless4[2]);
 	break;
   }
   case 5: {//イベントＣＧ
-    valueTachieBless5 = array;
-    UTSU.PictureBreath5.on([id11], valueTachieBless5[2]);
+    valueTachieBless5 = breathParams;
+    UTSU.PictureBreath5.on([pictureId], valueTachieBless5[2]);
 	break;
   }
   case 6: {//イベントＣＧ
-    valueTachieBless6 = array;
-    UTSU.PictureBreath6.on([id11], valueTachieBless6[2]);
+    valueTachieBless6 = breathParams;
+    UTSU.PictureBreath6.on([pictureId], valueTachieBless6[2]);
 	break;
   }
 };
@@ -723,34 +723,34 @@ switch(id14){
 }
 
 //パララックススクロール
-parallax_scroll = function(id1,id2,id3,id4,id5,id6,id7){
+parallax_scroll = function(parallaxIndex,parallaxName,parallaxX,fadeOpacity,scrollX,scrollY,fadeWait){
 
-$gameScreen.showParallax(id1,id2,0,id3);
-$gameScreen.fadeParallax(id1,id7,id4);
-$gameScreen.scrollParallax(id1,id5,id6);
+$gameScreen.showParallax(parallaxIndex,parallaxName,0,parallaxX);
+$gameScreen.fadeParallax(parallaxIndex,fadeWait,fadeOpacity);
+$gameScreen.scrollParallax(parallaxIndex,scrollX,scrollY);
 
 }
 
 //集中線真ん中picture_rotate(74,"ScreenConcentratedLineCenter",640,384,200,1,30);
-picture_rotate = function(id1,id2,id3,id4,id5,id6,id7){
+picture_rotate = function(pictureId,pictureName,x,y,opacity,blendMode,rotationDegrees){
 
-$gameScreen.showPicture(id1,
-id2,1,id3,id4,0,0,0,1);
-$gameScreen.movePicture(id1,1,
-id3,id4,100,100,id5,id6,20);
-$gameScreen.rotatePicture(id1, id7);
+$gameScreen.showPicture(pictureId,
+pictureName,1,x,y,0,0,0,1);
+$gameScreen.movePicture(pictureId,1,
+x,y,100,100,opacity,blendMode,20);
+$gameScreen.rotatePicture(pictureId, rotationDegrees);
 $gameScreen.startFlash([255,255,255,200],60);
 
 }
 
 //主人公パッシブ獲得
-actor_skillMasteryGet = function(id1,id2){
+actor_skillMasteryGet = function(skillId,logVarId){
 
-var value = id1;
+var value = skillId;
 var actor = $gameActors.actor($gameVariables.value(11));
 if(actor) actor.gainSkillMasteryUses(value,$gameVariables.value(203));//変更熟練度
 var masteryText = `\\C[1]＜${$dataSkills[value].name}＞\\C[0]熟練度\\C[10]\\V[203]\\C[0]獲得！\n`;
-$gameVariables.setValue(id2,$gameVariables.value(id2)+masteryText);
+$gameVariables.setValue(logVarId,$gameVariables.value(logVarId)+masteryText);
 
 }
 
@@ -835,25 +835,25 @@ AudioManager.playSe({"name":"Z_CGDispray","volume":25,"pitch":150,"pan":0});
 }
 
 //移動ルートでピクチャ処理//ﾋﾟｸid,x,y,scale,opa,wait
-picture_ParallelMove = function(id1,id2,id3,id4,id5,id6){
+picture_ParallelMove = function(pictureId,offsetX,offsetY,offsetScale,opacity,waitFrames){
 
 valueCharaWaitCountarray1 = [0,0,0,0,0,0,0,0,0,0,0];
 valueCharaWaitCountarray2 = [0,0,0,0,0,0,0,0,0,0,0];
-if($gameScreen.picture(id1)){
-  valueCharaWaitCountarray1[1] = id1;
-  valueCharaWaitCountarray1[2] = $gameScreen.picture(id1).x();
-  valueCharaWaitCountarray1[3] = $gameScreen.picture(id1).y();
-  valueCharaWaitCountarray1[4] = $gameScreen.picture(id1).scaleX();
-  valueCharaWaitCountarray1[5] = $gameScreen.picture(id1).scaleY();
-  valueCharaWaitCountarray1[6] = id5;
-  valueCharaWaitCountarray1[7] = $gameScreen.picture(id1).blendMode();
-  valueCharaWaitCountarray1[8] = id6;
-  valueCharaWaitCountarray2[2] = $gameScreen.picture(id1).x() + id2;
-  valueCharaWaitCountarray2[3] = $gameScreen.picture(id1).y() + id3;
-  valueCharaWaitCountarray2[4] = $gameScreen.picture(id1).scaleX() + id4;
-  valueCharaWaitCountarray2[5] = $gameScreen.picture(id1).scaleY() + id4;
-  valueCharaWaitCountarray2[6] = $gameScreen.picture(id1).opacity();
-  valueCharaWaitCountarray2[7] = $gameScreen.picture(id1).blendMode();
+if($gameScreen.picture(pictureId)){
+  valueCharaWaitCountarray1[1] = pictureId;
+  valueCharaWaitCountarray1[2] = $gameScreen.picture(pictureId).x();
+  valueCharaWaitCountarray1[3] = $gameScreen.picture(pictureId).y();
+  valueCharaWaitCountarray1[4] = $gameScreen.picture(pictureId).scaleX();
+  valueCharaWaitCountarray1[5] = $gameScreen.picture(pictureId).scaleY();
+  valueCharaWaitCountarray1[6] = opacity;
+  valueCharaWaitCountarray1[7] = $gameScreen.picture(pictureId).blendMode();
+  valueCharaWaitCountarray1[8] = waitFrames;
+  valueCharaWaitCountarray2[2] = $gameScreen.picture(pictureId).x() + offsetX;
+  valueCharaWaitCountarray2[3] = $gameScreen.picture(pictureId).y() + offsetY;
+  valueCharaWaitCountarray2[4] = $gameScreen.picture(pictureId).scaleX() + offsetScale;
+  valueCharaWaitCountarray2[5] = $gameScreen.picture(pictureId).scaleY() + offsetScale;
+  valueCharaWaitCountarray2[6] = $gameScreen.picture(pictureId).opacity();
+  valueCharaWaitCountarray2[7] = $gameScreen.picture(pictureId).blendMode();
   if(!!$gameMap.event(1)) {
     $gameMap.event(1).forceMoveRoute({
     "list":[
@@ -868,18 +868,18 @@ if($gameScreen.picture(id1)){
 }
 
 //ﾋﾟｸid,ﾌｧｲﾙ,x,y,scale,wait,0そのまま1横ズレ2拡縮,最後は変更数値pic_showMove1(valuePic1+3,valueScenePic+'03',640-128,384,100,60,0,0);
-pic_showMove1 = function(id1,id2,id3,id4,id5,id6,id7,id8){
+pic_showMove1 = function(pictureId,pictureName,x,y,scale,waitFrames,offsetAxisId,offsetAmount){
 
 var offsetX = 0;
 var offsetY = 0;
-if(id7 == 1){
-  var offsetX = id8;
+if(offsetAxisId == 1){
+  var offsetX = offsetAmount;
 }
-if(id7 == 2){
-  var offsetY = id8;
+if(offsetAxisId == 2){
+  var offsetY = offsetAmount;
 }
-$gameScreen.showPicture(id1,id2,1,id3 + offsetX,id4,id5 + offsetY,id5 + offsetY,0,0);
-$gameScreen.movePicture(id1,1,id3,id4,id5,id5,255,0,id6);
+$gameScreen.showPicture(pictureId,pictureName,1,x + offsetX,y,scale + offsetY,scale + offsetY,0,0);
+$gameScreen.movePicture(pictureId,1,x,y,scale,scale,255,0,waitFrames);
 
 }
 

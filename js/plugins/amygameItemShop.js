@@ -80,13 +80,13 @@ itemGet_afterProcess = function(){
 
       CommonPopupManager.showInfo({}, medalTotalPts, null);
 
-      const arr1 = exValue.split("\n");
-      const arr2 = currentQuestValue.split("\n");
+      const previousValueLines = exValue.split("\n");
+      const currentValueLines = currentQuestValue.split("\n");
 
-      for (let id1 = 0, len = arr1.length; id1 < len; id1++) {
-        if (arr1[id1] === arr2[id1]) continue;
+      for (let lineIndex = 0, len = previousValueLines.length; lineIndex < len; lineIndex++) {
+        if (previousValueLines[lineIndex] === currentValueLines[lineIndex]) continue;
 
-        CommonPopupManager.showInfo({}, arr2[id1], null);
+        CommonPopupManager.showInfo({}, currentValueLines[lineIndex], null);
 
         if (valueQuestArray6[i] !== 1) continue;
 
@@ -184,35 +184,35 @@ itemGet_afterProcess = function(){
 };
 
 //アイテムのHPMPポーション効果
-item_Potion1 = function(a,b,itemId){
+item_Potion1 = function(usedItem,targetItem,itemId){
 
 var potionResistDelta = Number($dataItems[itemId].meta['PotionResist']);
-var currentResist = $gameVariables.value(380 + b.actorId())[58];
+var currentResist = $gameVariables.value(380 + targetItem.actorId())[58];
 var potionUsePoint = Number($dataItems[itemId].meta['PotionUsePoint']);
-if(b.isStateAffected(291)){
+if(targetItem.isStateAffected(291)){
   var potionResistDelta = 0;
 } else {
-  b.addState(39);
+  targetItem.addState(39);
 };
 if(potionUsePoint == 1){
   if($dataItems[itemId].damage.type == 3){
-    valuePotion1 = Math.round(b.mhp * (100-currentResist)/100);
+    valuePotion1 = Math.round(targetItem.mhp * (100-currentResist)/100);
   } else {
-    valuePotion1 = Math.round(b.mmp * (100-currentResist)/100);
+    valuePotion1 = Math.round(targetItem.mmp * (100-currentResist)/100);
   };
 } else {
   valuePotion1 = Math.round(potionUsePoint * (100-currentResist)/100);
 };
-$gameVariables.value(380 + b.actorId())[58] += potionResistDelta;
+$gameVariables.value(380 + targetItem.actorId())[58] += potionResistDelta;
 if($dataItems[itemId].damage.type == 3){
   var hpMpLabel = `HP`;
 } else {
   var hpMpLabel = `MP`;
 };
-if(b.isStateAffected(291)){
-  var potionMessage = `${b.name()}の${hpMpLabel}が${valuePotion1}回復！ 耐性値上昇は無効化されている。[${$gameVariables.value(380 + b.actorId())[58]}%]`;
+if(targetItem.isStateAffected(291)){
+  var potionMessage = `${targetItem.name()}の${hpMpLabel}が${valuePotion1}回復！ 耐性値上昇は無効化されている。[${$gameVariables.value(380 + targetItem.actorId())[58]}%]`;
 } else {
-  var potionMessage = `${b.name()}の${hpMpLabel}が${valuePotion1}回復！ 耐性値が${potionResistDelta}%上昇し${$gameVariables.value(380 + b.actorId())[58]}%になった。`;
+  var potionMessage = `${targetItem.name()}の${hpMpLabel}が${valuePotion1}回復！ 耐性値が${potionResistDelta}%上昇し${$gameVariables.value(380 + targetItem.actorId())[58]}%になった。`;
 };
 if($gameParty.inBattle()){
   BattleManager._logWindow.push(`addText`, potionMessage);
@@ -309,56 +309,56 @@ if(!item){return};
 //防具は装備タイプ$dataArmors[id].etypeId
 //道具はメタでカテゴリ
 if(item == $dataWeapons && $dataItems[$gameVariables.value(19)].meta['鑑定カテゴリ']){
-  var arr1 = [];
+  var candidateItemIndices = [];
   var list = $dataItems[$gameVariables.value(19)].meta['鑑定カテゴリランク'].split(',');
-  list.forEach(function(id1) {
+  list.forEach(function(rarityValue) {
     for (var i = 1; i <= itemListEnd; i++) {
       if(item[i].meta['LotteryRearity']){
         if(item[i].wtypeId == Number($dataItems[$gameVariables.value(19)].meta['鑑定カテゴリ']) && 
-        Number(item[i].meta['LotteryRearity']) == id1){
-          arr1.push(i);
+        Number(item[i].meta['LotteryRearity']) == rarityValue){
+          candidateItemIndices.push(i);
     }}};
   }, this);
-  var chosenItemIndex = arr1[getRandomIndex(arr1.length)];
+  var chosenItemIndex = candidateItemIndices[getRandomIndex(candidateItemIndices.length)];
 };
 if(item == $dataArmors && $dataItems[$gameVariables.value(19)].meta['鑑定カテゴリ']){
-  var arr1 = [];
+  var candidateItemIndices = [];
   var list = $dataItems[$gameVariables.value(19)].meta['鑑定カテゴリランク'].split(',');
-  list.forEach(function(id1) {
+  list.forEach(function(rarityValue) {
     for (var i = 1; i <= itemListEnd; i++) {
       if(item[i].meta['LotteryRearity']){
         if(item[i].etypeId == Number($dataItems[$gameVariables.value(19)].meta['鑑定カテゴリ']) && 
-        Number(item[i].meta['LotteryRearity']) == id1){
-          arr1.push(i);
+        Number(item[i].meta['LotteryRearity']) == rarityValue){
+          candidateItemIndices.push(i);
     }}};
   }, this);
-  var chosenItemIndex = arr1[getRandomIndex(arr1.length)];
+  var chosenItemIndex = candidateItemIndices[getRandomIndex(candidateItemIndices.length)];
 };
 if(item == $dataItems && $dataItems[$gameVariables.value(19)].meta['鑑定カテゴリ']){
-  var arr1 = [];
+  var candidateItemIndices = [];
   var list = $dataItems[$gameVariables.value(19)].meta['鑑定カテゴリランク'].split(',');
-  list.forEach(function(id1) {
+  list.forEach(function(rarityValue) {
     for (var i = 1; i <= itemListEnd; i++) {
       if(item[i].meta['Menu Category'] && item[i].meta['LotteryRearity']){
         if(item[i].meta['Menu Category'] == $dataItems[$gameVariables.value(19)].meta['鑑定カテゴリ'] && 
-        Number(item[i].meta['LotteryRearity']) == id1){
-          arr1.push(i);
+        Number(item[i].meta['LotteryRearity']) == rarityValue){
+          candidateItemIndices.push(i);
     }}};
   }, this);
-  var chosenItemIndex = arr1[getRandomIndex(arr1.length)];
+  var chosenItemIndex = candidateItemIndices[getRandomIndex(candidateItemIndices.length)];
 };
 if($dataItems[$gameVariables.value(19)].meta['鑑定レアリティ版']){
-  var arr1 = [];
+  var candidateItemIndices = [];
   var list = $dataItems[$gameVariables.value(19)].meta['鑑定レアリティ版'].split(',');
-  list.forEach(function(id1) {
+  list.forEach(function(rarityValue) {
     for (var i = 1; i <= itemListEnd; i++) {
       if(item[i].meta['LotteryRearity']){
-        if(Number(item[i].meta['LotteryRearity']) == id1){
-          arr1.push(i);
+        if(Number(item[i].meta['LotteryRearity']) == rarityValue){
+          candidateItemIndices.push(i);
       }};
     };
   }, this);
-  var chosenItemIndex = arr1[getRandomIndex(arr1.length)];
+  var chosenItemIndex = candidateItemIndices[getRandomIndex(candidateItemIndices.length)];
 };
 var appraisalItem = item[chosenItemIndex];
 if(!appraisalItem){return};
@@ -375,37 +375,37 @@ if(!$gameSwitches.value(114)){
 };
 
 //鑑定アイテム版
-kantei_item = function(a,b,itemId){
+kantei_item = function(usedItem,targetItem,itemId){
 
-if(b.actorId() == a.actorId()){
+if(targetItem.actorId() == usedItem.actorId()){
   $gameVariables.setValue(19,itemId)
-  var actor = a;
+  var actor = usedItem;
   var targetItemData = $dataItems[$gameVariables.value(19)];
   var appraisalSuccessFlag = 0;
-  var id1 = valueAppraisalSkillId;
-  if(actor.mp >= $dataSkills[id1].mpCost){
-    if(actor.isLearnedSkill(id1)){
-      if(targetItemData.meta['下級鑑定品'] && actor.skillMasteryLevel(id1) >= 1){
+  var appraisalSkillId = valueAppraisalSkillId;
+  if(actor.mp >= $dataSkills[appraisalSkillId].mpCost){
+    if(actor.isLearnedSkill(appraisalSkillId)){
+      if(targetItemData.meta['下級鑑定品'] && actor.skillMasteryLevel(appraisalSkillId) >= 1){
         var appraisalSuccessFlag = 1;
       };
-      if(targetItemData.meta['中級鑑定品'] && actor.skillMasteryLevel(id1) >= 2){
+      if(targetItemData.meta['中級鑑定品'] && actor.skillMasteryLevel(appraisalSkillId) >= 2){
         var appraisalSuccessFlag = 1;
       };
-      if(targetItemData.meta['上級鑑定品'] && actor.skillMasteryLevel(id1) >= 3){
+      if(targetItemData.meta['上級鑑定品'] && actor.skillMasteryLevel(appraisalSkillId) >= 3){
         var appraisalSuccessFlag = 1;
       };
       if(appraisalSuccessFlag == 1){
         kantei_nakami();
-        if(actor.skillMasteryLevel(id1) <= 3){
-          actor.gainMp(-$dataSkills[id1].mpCost);
-          actor.gainSkillMasteryUses(id1, $gameVariables.value(203));//変更熟練度
-          TickerManager.show(`${actor.name()}のMPが5消費された。【現在MP${actor.mp}/${actor.param(1)}】＜\\C[3]\x1bSIN[${id1}]\\C[0]＞熟練度\\V[203]獲得！（${actor.skillMasteryUses(id1)}/${actor.skillMasteryUsageMax(id1)}）`);
+        if(actor.skillMasteryLevel(appraisalSkillId) <= 3){
+          actor.gainMp(-$dataSkills[appraisalSkillId].mpCost);
+          actor.gainSkillMasteryUses(appraisalSkillId, $gameVariables.value(203));//変更熟練度
+          TickerManager.show(`${actor.name()}のMPが5消費された。【現在MP${actor.mp}/${actor.param(1)}】＜\\C[3]\x1bSIN[${appraisalSkillId}]\\C[0]＞熟練度\\V[203]獲得！（${actor.skillMasteryUses(appraisalSkillId)}/${actor.skillMasteryUsageMax(appraisalSkillId)}）`);
         };
       } else {
-        TickerManager.show(`\\C[1]\x1bSIN[${id1}]ランク\\C[0]が足りません…。`);
+        TickerManager.show(`\\C[1]\x1bSIN[${appraisalSkillId}]ランク\\C[0]が足りません…。`);
       };
     } else {
-      TickerManager.show(`パーソナルスキル＜\\C[3]\x1bSIN[${id1}]\\C[0]＞が必要です…。`);
+      TickerManager.show(`パーソナルスキル＜\\C[3]\x1bSIN[${appraisalSkillId}]\\C[0]＞が必要です…。`);
     };
   } else {
     TickerManager.show(`${actor.name()}のMPが足りません…。`);
@@ -415,7 +415,7 @@ if(b.actorId() == a.actorId()){
 };
 
 //鑑定一括
-kantei_ikkatu = function(a,b,itemId){
+kantei_ikkatu = function(unusedArg1,unusedArg2,itemId){
 
 $gameSwitches.setValue(69,true);
 $gameSwitches.setValue(114,true);
@@ -482,7 +482,7 @@ if(lowAppraisalCount + midAppraisalCount + highAppraisalCount == 0){
 };
 
 //拾得物スクリプト。item_getScript1(0,1);
-item_getScript1 = function(id11,id10){
+item_getScript1 = function(gatherModeId,materialSlotId){
 
 //var actor = $gameActors.actor($gameVariables.value(2));
 const item = $gameVariables.value(240) >= 1 ? 
@@ -490,21 +490,21 @@ $dataItems[$gameVariables.value(240)] :
 $dataWeapons[$gameVariables.value(230)];
 if(!item){return};
 
-const itemUniqueMaterial = item.meta['UniqueMaterial' + id10];
+const itemUniqueMaterial = item.meta['UniqueMaterial' + materialSlotId];
 if (itemUniqueMaterial === undefined || itemUniqueMaterial === null) return;
 
-const itemUniqueMaterialArray = item.meta['UniqueMaterial' + id10].split(',');
+const itemUniqueMaterialArray = item.meta['UniqueMaterial' + materialSlotId].split(',');
 const materialIndex = $gameSwitches.value(605) ? 
 Number(itemUniqueMaterialArray[0]) :
 itemUniqueMaterialArray[getRandomIndex(itemUniqueMaterialArray.length)];
 
-const gatherSkillId = id11 == 0 ? valueHarvestingSkillId : valueMiningSkillId;
+const gatherSkillId = gatherModeId == 0 ? valueHarvestingSkillId : valueMiningSkillId;
 item_getSkillLevel(gatherSkillId,0,materialIndex);
 
 };
 
 //熟練度上昇拾得物。スキルid、アイテム種別3お金0アイテム1武器2防具、金額orアイテムID,0でスキル熟練度のみアップ
-item_getSkillLevel = function(skillId,itemType,id3){
+item_getSkillLevel = function(skillId,itemType,rewardId){
 
 let skillGainMessage = `　`; 
 let skillLevel = 0;
@@ -524,27 +524,27 @@ if (skillMasteryLevel == Number($dataSkills[skillId].meta['Max Mastery Level']))
   }
 }
 
-let id4 = skillMasteryLevel;
-if(id4 == 0){id4 = 1}
-else if(id3 == 10 || id3 == 141){
+let rewardAmount = skillMasteryLevel;
+if(rewardAmount == 0){rewardAmount = 1}
+else if(rewardId == 10 || rewardId == 141){
   if(actor.isLearnedSkill(799)){
-    id4 = id4 * 10;
+    rewardAmount = rewardAmount * 10;
   };
 };
 
 let gainReportText = `　`;
-if(id3 >= 1){
+if(rewardId >= 1){
   let item;
   if(itemType == 0){item = $dataItems};
   if(itemType == 1){item = $dataWeapons};
   if(itemType == 2){item = $dataArmors};
   if(itemType == 3){
-    id3 = id3 * id4;
-    $gameParty.gainGold(id3);
-    gainReportText = `\\C[3]小銭を拾った。（+\\C[10]${id3}\\C[0]\\G）`;
-  } else if(item && item[id3]){
-    $gameParty.gainItem(item[id3],id4);
-    gainReportText = `\\C[3]\x1bI[${item[id3].iconIndex}]${item[id3].name}\\C[0]を\\C[10]${id4}\\C[0]個入手した。`;
+    rewardId = rewardId * rewardAmount;
+    $gameParty.gainGold(rewardId);
+    gainReportText = `\\C[3]小銭を拾った。（+\\C[10]${rewardId}\\C[0]\\G）`;
+  } else if(item && item[rewardId]){
+    $gameParty.gainItem(item[rewardId],rewardAmount);
+    gainReportText = `\\C[3]\x1bI[${item[rewardId].iconIndex}]${item[rewardId].name}\\C[0]を\\C[10]${rewardAmount}\\C[0]個入手した。`;
   };
 };
 CommonPopupManager.showInfo({},gainReportText + skillGainMessage,null);
@@ -606,7 +606,7 @@ get_skill_rarity = function (skillMasteryLevel, maxSkillMasteryLevel){
 }
 
 //アイテム使用で熟練度アップ
-item_skilljukurenndoup = function(id1){
+item_skilljukurenndoup = function(selectionModeId){
 
 var actor = $gameActors.actor($gameVariables.value(20));
 var value = $dataItems[$gameVariables.value(93)]
@@ -619,7 +619,7 @@ if($dataSkills[appraisalTargetId].meta['Max Mastery Level']){
   var usageMax = actor.skillMasteryUsageMax(appraisalTargetId);
   var rankUpMessage = 0;
   $gameVariables.setValue(23,actor.skillMasteryLevel(appraisalTargetId));
-  if(id1 == 2){
+  if(selectionModeId == 2){
     actor.gainSkillMasteryUses(appraisalTargetId, masteryGain);
     $gameParty.loseItem(value, 1);
     var usageMax = actor.skillMasteryUsageMax(appraisalTargetId);
@@ -654,69 +654,69 @@ WindowManager.drawText(1, `${infoMessageText}`);
 };
 
 //アイテム価格等説明
-item_priceinfo = function(id1,itemId){
+item_priceinfo = function(databaseTypeId,itemId){
 
-if(id1 == 0){var valueItems = $dataItems}; 
-if(id1 == 1){var valueItems = $dataWeapons}; 
-if(id1 == 2){var valueItems = $dataArmors};
-if(!valueItems || !valueItems[itemId]){return};
+if(databaseTypeId == 0){var databaseEntries = $dataItems}; 
+if(databaseTypeId == 1){var databaseEntries = $dataWeapons}; 
+if(databaseTypeId == 2){var databaseEntries = $dataArmors};
+if(!databaseEntries || !databaseEntries[itemId]){return};
 var priceInfoText = ``;
-if(Number(valueItems[itemId].price) >= 1){
-  var itemInfoValue = Math.floor(valueItems[itemId].price/2);
+if(Number(databaseEntries[itemId].price) >= 1){
+  var itemInfoValue = Math.floor(databaseEntries[itemId].price/2);
   var priceInfoText = `買取価格:\\C[2]${itemInfoValue.toLocaleString()}\\C[0]\\G\n`
 };
-if(valueItems[itemId].meta['Sell Price']){
-  var itemInfoValue = Number(valueItems[itemId].meta['Sell Price']);
+if(databaseEntries[itemId].meta['Sell Price']){
+  var itemInfoValue = Number(databaseEntries[itemId].meta['Sell Price']);
   var priceInfoText = `買取価格:\\C[2]${itemInfoValue.toLocaleString()}\\C[0]\n`;
 };
-if(valueItems[itemId].meta['Variable 57 Sell Price']){
-  var itemInfoValue = Number(valueItems[itemId].meta['Variable 57 Sell Price']);
+if(databaseEntries[itemId].meta['Variable 57 Sell Price']){
+  var itemInfoValue = Number(databaseEntries[itemId].meta['Variable 57 Sell Price']);
   var priceInfoText = `売却pt:\\C[2]${itemInfoValue.toLocaleString()}${$dataSystem.variables[57]}\\C[0]\n`;
 };
-if(valueItems[itemId].meta['Variable 69 Sell Price']){
-  var itemInfoValue = Number(valueItems[itemId].meta['Variable 69 Sell Price']);
+if(databaseEntries[itemId].meta['Variable 69 Sell Price']){
+  var itemInfoValue = Number(databaseEntries[itemId].meta['Variable 69 Sell Price']);
   var priceInfoText = `売却pt:\\C[2]${itemInfoValue.toLocaleString()}${$dataSystem.variables[69]}\\C[0]\n`;
 };
-if(valueItems[itemId].meta['Item 270 Sell Price']){
-  var itemInfoValue = Number(valueItems[itemId].meta['Item 270 Sell Price']);
+if(databaseEntries[itemId].meta['Item 270 Sell Price']){
+  var itemInfoValue = Number(databaseEntries[itemId].meta['Item 270 Sell Price']);
   var priceInfoText = `売却:\\C[2]${$dataItems[270].name}${itemInfoValue.toLocaleString()}個\\C[0]\n`;
 };
-if(valueItems[itemId].meta['Item 147 Sell Price']){
-  var itemInfoValue = Number(valueItems[itemId].meta['Item 147 Sell Price']);
+if(databaseEntries[itemId].meta['Item 147 Sell Price']){
+  var itemInfoValue = Number(databaseEntries[itemId].meta['Item 147 Sell Price']);
   var priceInfoText = `売却:\\C[2]${$dataItems[147].name}${itemInfoValue.toLocaleString()}個\\C[0]\n`;
 };
-if(valueItems[itemId].meta['Item 152 Sell Price']){
-  var itemInfoValue = Number(valueItems[itemId].meta['Item 152 Sell Price']);
+if(databaseEntries[itemId].meta['Item 152 Sell Price']){
+  var itemInfoValue = Number(databaseEntries[itemId].meta['Item 152 Sell Price']);
   var priceInfoText = `売却:\\C[2]${$dataItems[152].name}${itemInfoValue.toLocaleString()}個\\C[0]\n`;
 };
-if(Number(valueItems[itemId].price) == 0 &&
-!valueItems[itemId].meta['Sell Price'] &&
-!valueItems[itemId].meta['Variable 57 Sell Price'] &&
-!valueItems[itemId].meta['Variable 69 Sell Price'] &&
-!valueItems[itemId].meta['Item 270 Sell Price'] &&
-!valueItems[itemId].meta['Item 147 Sell Price'] &&
-!valueItems[itemId].meta['Item 152 Sell Price']) {
+if(Number(databaseEntries[itemId].price) == 0 &&
+!databaseEntries[itemId].meta['Sell Price'] &&
+!databaseEntries[itemId].meta['Variable 57 Sell Price'] &&
+!databaseEntries[itemId].meta['Variable 69 Sell Price'] &&
+!databaseEntries[itemId].meta['Item 270 Sell Price'] &&
+!databaseEntries[itemId].meta['Item 147 Sell Price'] &&
+!databaseEntries[itemId].meta['Item 152 Sell Price']) {
   var priceInfoText = `\\C[1][売却不可]\\C[0]\n`;
 };
 //抽選に応じたランク指定
-if(valueItems[itemId].meta['LotteryRearity']){
-  var itemInfoValue = Number(valueItems[itemId].meta['LotteryRearity']);
+if(databaseEntries[itemId].meta['LotteryRearity']){
+  var itemInfoValue = Number(databaseEntries[itemId].meta['LotteryRearity']);
   priceInfoText += `ランク:\\C[14]${itemInfoValue}\\C[0]\n`;
 } else {
   priceInfoText += `ランク:──\n`;
 };
-if(!valueItems[itemId].meta.ShopRank){
+if(!databaseEntries[itemId].meta.ShopRank){
   priceInfoText += `\\C[29][非売品]\\C[0]\n`;
 };
-if(valueItems[itemId].meta.ShopRank && !valueItems[itemId].meta['LotteryRearity']){
+if(databaseEntries[itemId].meta.ShopRank && !databaseEntries[itemId].meta['LotteryRearity']){
   priceInfoText += `\\C[29][販売のみ]\\C[0]\n`;
 };
-if($gameSelfSwitches.getVariableValue([4, 11+id1, itemId]) == 1){
+if($gameSelfSwitches.getVariableValue([4, 11+databaseTypeId, itemId]) == 1){
   priceInfoText += `\\C[10][一括売却対象]\\C[0]\n`;
 };
-if(id1 == 1){
-    if(valueItems[itemId].wtypeId >= 1){
-      var itemInfoValue = $dataSystem.weaponTypes[valueItems[itemId].wtypeId];
+if(databaseTypeId == 1){
+    if(databaseEntries[itemId].wtypeId >= 1){
+      var itemInfoValue = $dataSystem.weaponTypes[databaseEntries[itemId].wtypeId];
         priceInfoText += `基本通常攻撃:`;
         if(itemInfoValue == `剣`){priceInfoText += `\\C[2]Sword\\C[0]<\\SIN[101]>\n[与D*1.0倍/対象前衛のみ]\n`};
         if(itemInfoValue == `短剣`){priceInfoText += `\\C[2]Dagger\\C[0]<\\SIN[111]>\n[与D*0.5倍/2Hit/対象前衛のみ]\n`};
@@ -735,33 +735,33 @@ if(id1 == 1){
         if(itemInfoValue == `牙`){priceInfoText += `\\C[2]Fang\\C[0]<\\SIN[921]>\n[与D*1.0倍/対象前衛のみ]\n`};
     };
 };
-if(valueItems[itemId].meta['SetBonus']){
+if(databaseEntries[itemId].meta['SetBonus']){
   priceInfoText += `\\C[14][セットボーナス効果]\\C[0]\n`;
 };
-if(valueItems[itemId].meta['Custom Equip Requirement Text'] || valueItems[itemId].meta['Equip Requirement']){
+if(databaseEntries[itemId].meta['Custom Equip Requirement Text'] || databaseEntries[itemId].meta['Equip Requirement']){
   priceInfoText += `\\C[10][装備条件あり]\\C[0]\n`;
 };
 //レアリティ昇格素材か否か
-if(valueItems[itemId].meta['LRpromotionM']){
+if(databaseEntries[itemId].meta['LRpromotionM']){
   priceInfoText += `\\C[28][RarelityLR解放素材]\\C[0]\n`;
 };
-if(valueItems[itemId].meta['URpromotionM']){
+if(databaseEntries[itemId].meta['URpromotionM']){
   priceInfoText += `\\C[28][RarelityUR解放素材]\\C[0]\n`;
 };
-if(valueItems[itemId].meta['SSRpromotionM']){
+if(databaseEntries[itemId].meta['SSRpromotionM']){
   priceInfoText += `\\C[28][RarelitySSR解放素材]\\C[0]\n`;
 };
-if(valueItems[itemId].meta['SRpromotionM']){
+if(databaseEntries[itemId].meta['SRpromotionM']){
   priceInfoText += `\\C[28][RarelitySR解放素材]\\C[0]\n`;
 };
-if(valueItems[itemId].meta['RpromotionM']){
+if(databaseEntries[itemId].meta['RpromotionM']){
   priceInfoText += `\\C[28][RarelityR解放素材]\\C[0]\n`;
 };
 //ジョブ解放素材か否か
-if(valueItems[itemId].meta['class2JobReleaseM']){
+if(databaseEntries[itemId].meta['class2JobReleaseM']){
   priceInfoText += `\\C[20][Class2ndJob解放素材]\\C[0]\n`;
 };
-if(valueItems[itemId].meta['returnItem']){
+if(databaseEntries[itemId].meta['returnItem']){
   var itemInfoValue = 22
   for (var i = 1; i <= 100; i++) {
     if($gameVariables.value(327)[i] == 2){
@@ -773,23 +773,23 @@ if(valueItems[itemId].meta['returnItem']){
   priceInfoText += `${$dataWeapons[itemInfoValue].name}\n`;
 };
 //アビリティ解放素材か否か
-if(valueItems[itemId].meta['AbilityLearnM']){
-  var itemInfoValue = Number(valueItems[itemId].meta['AbilityLearnM']);
+if(databaseEntries[itemId].meta['AbilityLearnM']){
+  var itemInfoValue = Number(databaseEntries[itemId].meta['AbilityLearnM']);
   priceInfoText += `\\C[3][アビリティ習得コスト素材]\\C[0]\n`;
   priceInfoText += `\\C[21]${$dataClasses[itemInfoValue].name}系列\\C[0]\n`;
 };
 //錬金素材か否か
-if(id1 == 0){var synthItemId = itemId}; 
-if(id1 == 1){var synthItemId = itemId + 2000}; 
-if(id1 == 2){var synthItemId = itemId + 3000}; 
+if(databaseTypeId == 0){var synthItemId = itemId}; 
+if(databaseTypeId == 1){var synthItemId = itemId + 2000}; 
+if(databaseTypeId == 2){var synthItemId = itemId + 3000}; 
 if(valueItemsSynth1[synthItemId] != 0){
   priceInfoText += `[錬金素材元対象]\n`;
   if(valueItemsSynth1[synthItemId].length >= 40){//文字数カウント
     priceInfoText += `\\C[14][多岐に渡る錬金素材元]\\C[0]\n`;
   } else {
     var actor = $gameActors.actor($gameVariables.value(2));
-    if(valueItems[itemId].meta['LotteryRearity']){
-      if(actor.skillMasteryLevel(valueAlchemySkillId) <= 3 && Number(valueItems[itemId].meta['LotteryRearity']) >= 8){
+    if(databaseEntries[itemId].meta['LotteryRearity']){
+      if(actor.skillMasteryLevel(valueAlchemySkillId) <= 3 && Number(databaseEntries[itemId].meta['LotteryRearity']) >= 8){
         priceInfoText += `\\C[10]錬金Rank4以上で表示\\C[0]\n`;
       } else {
         priceInfoText += `\\C[3]${valueItemsSynth1[synthItemId]}\\C[0]\n`;
@@ -800,18 +800,18 @@ if(valueItemsSynth1[synthItemId] != 0){
   };
 };
 //アイテム単一合成時のインフォの定型パターン
-if(valueItems[itemId].meta['単一アイテム錬金']){
+if(databaseEntries[itemId].meta['単一アイテム錬金']){
   var alchemySkillId = valueAlchemySkillId;//錬金スキル
-  var arr1 = valueItems[itemId].meta['単一アイテム錬金'].split(',');
+  var singleItemAlchemyValues = databaseEntries[itemId].meta['単一アイテム錬金'].split(',');
   //if($gameParty.hasItem(valueItems[Number(arr1[0])])){//前提アイテム消去
   if(true){
-    priceInfoText += `[可]\\C[14]${valueItems[Number(arr1[2])].name}\\C[0]
-[要]\\C[2]${$dataSkills[alchemySkillId].name}Rank${arr1[1]}\\C[0]
-\\C[1]${valueItems[itemId].name}\\C[0]×${arr1[3]}個\n`;
+    priceInfoText += `[可]\\C[14]${databaseEntries[Number(singleItemAlchemyValues[2])].name}\\C[0]
+[要]\\C[2]${$dataSkills[alchemySkillId].name}Rank${singleItemAlchemyValues[1]}\\C[0]
+\\C[1]${databaseEntries[itemId].name}\\C[0]×${singleItemAlchemyValues[3]}個\n`;
   };
 };
 //クエスト素材か判定
-if(id1 == 0 && valueQuestArray1[itemId] && valueQuestArray1[itemId][0] == 1 || id1 == 1 && valueQuestArray1[itemId+2000] && valueQuestArray1[itemId+2000][0] == 2 || id1 == 2 && valueQuestArray1[itemId+3000] && valueQuestArray1[itemId+3000][0] == 3){
+if(databaseTypeId == 0 && valueQuestArray1[itemId] && valueQuestArray1[itemId][0] == 1 || databaseTypeId == 1 && valueQuestArray1[itemId+2000] && valueQuestArray1[itemId+2000][0] == 2 || databaseTypeId == 2 && valueQuestArray1[itemId+3000] && valueQuestArray1[itemId+3000][0] == 3){
   priceInfoText += `\\C[14][クエスト指定素材]\\C[0]`;
   if(valueQuestArray1[itemId][1] >= 801 && valueQuestArray1[itemId][1] <= 900){
     if($gameParty.hasItem($dataItems[valueQuestArray1[itemId][1] + 100],true)){
@@ -824,12 +824,12 @@ if(id1 == 0 && valueQuestArray1[itemId] && valueQuestArray1[itemId][0] == 1 || i
   };
 };
 
-if(id1 == 2){
-  if(valueItems[itemId].etypeId == 6){
-    if(valueItems[itemId].meta['ItemPicture']){
+if(databaseTypeId == 2){
+  if(databaseEntries[itemId].etypeId == 6){
+    if(databaseEntries[itemId].meta['ItemPicture']){
       priceInfoText += `強化値:\\C[10]${$gameVariables.value(352)[itemId - valueSeisyoujuuStartId]}\\C[0]\n`;
 }}};
-if(valueItems[itemId].meta['GatchaHasRange']){
+if(databaseEntries[itemId].meta['GatchaHasRange']){
   priceInfoText += `[所持でガチャ排出品に追加]\n`;
 };
 $gameVariables.setValue(801,priceInfoText);
@@ -837,26 +837,26 @@ $gameVariables.setValue(801,priceInfoText);
 };
 
 //アイテム使用時の単一合成パターン。使用アイテムを素材にする場合
-item_synthesis = function(a,b,itemId){
+item_synthesis = function(usedItem,targetItem,itemId){
 
-if(b.actorId() == a.actorId()){
+if(targetItem.actorId() == usedItem.actorId()){
   if(!$dataItems[itemId].meta['単一アイテム錬金']){return};
-  var arr1 = $dataItems[itemId].meta['単一アイテム錬金'].split(',');
+  var singleItemAlchemyValues = $dataItems[itemId].meta['単一アイテム錬金'].split(',');
   var alchemySkillRef = valueAlchemySkillId;//錬金スキル
   var alchemyBoostSkillId = 792;//錬金増加スキル
   //if($gameParty.hasItem($dataItems[Number(arr1[0])])){//前提アイテム消去
     if(true){
     var actor = $gameActors.actor($gameVariables.value(2));
     if(actor.isLearnedSkill(alchemyBoostSkillId)){craftAmount = 2} else {craftAmount = 1};
-    if(actor.isLearnedSkill(alchemySkillRef) && actor.skillMasteryLevel(alchemySkillRef) >= Number(arr1[1]) ){
-      if($gameParty.numItems($dataItems[itemId]) < Number(arr1[3]) ){
+    if(actor.isLearnedSkill(alchemySkillRef) && actor.skillMasteryLevel(alchemySkillRef) >= Number(singleItemAlchemyValues[1]) ){
+      if($gameParty.numItems($dataItems[itemId]) < Number(singleItemAlchemyValues[3]) ){
         TickerManager.show('必要素材が足りません。');
       } else { 
         AudioManager.playSe({"name":"Z11_AlchemySuccess","volume":80,"pitch":110,"pan":0});
-        $gameParty.loseItem($dataItems[itemId], Number(arr1[3]) );
-        $gameParty.gainItem($dataItems[ Number(arr1[2]) ], craftAmount);
-        var craftSuccessMessage = `\x1bIIN[${itemId}]を${arr1[3]}個消費して\\C[10]\x1bIIN[${Number(arr1[2])}]\\C[0]を${craftAmount}個制作した！`;
-        var craftInfoMessage = `\x1bIIN[${itemId}]\\C[1]${$gameParty.numItems($dataItems[itemId])}\\C[0]個/\x1bIIN[${Number(arr1[2])}]\\C[10]${$gameParty.numItems($dataItems[Number(arr1[2])])}\\C[0]個`
+        $gameParty.loseItem($dataItems[itemId], Number(singleItemAlchemyValues[3]) );
+        $gameParty.gainItem($dataItems[ Number(singleItemAlchemyValues[2]) ], craftAmount);
+        var craftSuccessMessage = `\x1bIIN[${itemId}]を${singleItemAlchemyValues[3]}個消費して\\C[10]\x1bIIN[${Number(singleItemAlchemyValues[2])}]\\C[0]を${craftAmount}個制作した！`;
+        var craftInfoMessage = `\x1bIIN[${itemId}]\\C[1]${$gameParty.numItems($dataItems[itemId])}\\C[0]個/\x1bIIN[${Number(singleItemAlchemyValues[2])}]\\C[10]${$gameParty.numItems($dataItems[Number(singleItemAlchemyValues[2])])}\\C[0]個`
         TickerManager.show(craftSuccessMessage);
         TickerManager.show(craftInfoMessage);
       };
@@ -883,8 +883,8 @@ var end = $dataItems.length-1;
 for (var i = start; i <= end; i++) {
   if($dataItems[i].meta['Item Recipe']){
     for (var j = 0; j <= $dataItems[i].recipeItem.length-1; j++) {
-      for (var id1 = 0; id1 <= $dataItems[ $dataItems[i].recipeItem[j] ].synthIngredients.length-1; id1++) {
-        var synthIngredient = DataManager.getSynthesisIngredient($dataItems[$dataItems[i].recipeItem[j]], id1);
+      for (var ingredientIndex = 0; ingredientIndex <= $dataItems[ $dataItems[i].recipeItem[j] ].synthIngredients.length-1; ingredientIndex++) {
+        var synthIngredient = DataManager.getSynthesisIngredient($dataItems[$dataItems[i].recipeItem[j]], ingredientIndex);
         if(synthIngredient.meta['No Augment Slots']){
           if(synthIngredient.etypeId == 1){
             var augmentSlotOffset = 2000;
@@ -909,8 +909,8 @@ for (var i = start; i <= end; i++) {
   };
   if($dataItems[i].meta['Weapon Recipe']){
     for (var j = 0; j <= $dataItems[i].recipeWeapon.length-1; j++) {
-      for (var id1 = 0; id1 <= $dataWeapons[ $dataItems[i].recipeWeapon[j] ].synthIngredients.length-1; id1++) {
-        var synthIngredient = DataManager.getSynthesisIngredient($dataWeapons[$dataItems[i].recipeWeapon[j]], id1);
+      for (var ingredientIndex = 0; ingredientIndex <= $dataWeapons[ $dataItems[i].recipeWeapon[j] ].synthIngredients.length-1; ingredientIndex++) {
+        var synthIngredient = DataManager.getSynthesisIngredient($dataWeapons[$dataItems[i].recipeWeapon[j]], ingredientIndex);
         if(synthIngredient.meta['No Augment Slots']){
           if(synthIngredient.etypeId == 1){
             var augmentSlotOffset = 2000;
@@ -935,8 +935,8 @@ for (var i = start; i <= end; i++) {
   };
   if($dataItems[i].meta['Armor Recipe']){
     for (var j = 0; j <= $dataItems[i].recipeArmor.length-1; j++) {
-      for (var id1 = 0; id1 <= $dataArmors[ $dataItems[i].recipeArmor[j] ].synthIngredients.length-1; id1++) {
-        var synthIngredient = DataManager.getSynthesisIngredient($dataArmors[$dataItems[i].recipeArmor[j]], id1);
+      for (var ingredientIndex = 0; ingredientIndex <= $dataArmors[ $dataItems[i].recipeArmor[j] ].synthIngredients.length-1; ingredientIndex++) {
+        var synthIngredient = DataManager.getSynthesisIngredient($dataArmors[$dataItems[i].recipeArmor[j]], ingredientIndex);
         if(synthIngredient.meta['No Augment Slots']){
           if(synthIngredient.etypeId == 1){
             var augmentSlotOffset = 2000;
@@ -964,41 +964,41 @@ for (var i = start; i <= end; i++) {
 };
 
 //固有武器拡張要素設定
-weapon_uniqueSet = function(id1){
+weapon_uniqueSet = function(weaponSlotId){
 
 var enhanceAppliedFlag = 0;
-if (!$dataWeapons[id1+80] || $dataWeapons[id1+80].name !== '') {
+if (!$dataWeapons[weaponSlotId+80] || $dataWeapons[weaponSlotId+80].name !== '') {
   for (var i = 1; i <= 9; i++) {
-    if($dataWeapons[id1+80].meta['EnhanceName'+i]){
-      var arr1 = $dataWeapons[id1+80].meta['EnhanceName'+i].split(',');
-      if($gameVariables.value(287)[id1][10] >= Number(arr1[0])){
-        $dataWeapons[id1+80].name = arr1[1] + $dataWeapons[id1+80].meta['BasicName'];
+    if($dataWeapons[weaponSlotId+80].meta['EnhanceName'+i]){
+      var enhanceNameValues = $dataWeapons[weaponSlotId+80].meta['EnhanceName'+i].split(',');
+      if($gameVariables.value(287)[weaponSlotId][10] >= Number(enhanceNameValues[0])){
+        $dataWeapons[weaponSlotId+80].name = enhanceNameValues[1] + $dataWeapons[weaponSlotId+80].meta['BasicName'];
         var enhanceAppliedFlag = 1;
-        var uniqueSkillId = Number($dataWeapons[id1+80].meta['UniqueOugi']) + 1;
+        var uniqueSkillId = Number($dataWeapons[weaponSlotId+80].meta['UniqueOugi']) + 1;
   }}}
   if(enhanceAppliedFlag == 0){
-    $dataWeapons[id1+80].name = $dataWeapons[id1+80].meta['BasicName'];
-    var uniqueSkillId = Number($dataWeapons[id1+80].meta['UniqueOugi']);
+    $dataWeapons[weaponSlotId+80].name = $dataWeapons[weaponSlotId+80].meta['BasicName'];
+    var uniqueSkillId = Number($dataWeapons[weaponSlotId+80].meta['UniqueOugi']);
   };
-  $gameVariables.value(287)[id1][9] = uniqueSkillId;
-  $dataWeapons[id1+80].traits = [];
-  $dataWeapons[id1+80].traits.push({code: 43, dataId: uniqueSkillId, value: 0.00})
+  $gameVariables.value(287)[weaponSlotId][9] = uniqueSkillId;
+  $dataWeapons[weaponSlotId+80].traits = [];
+  $dataWeapons[weaponSlotId+80].traits.push({code: 43, dataId: uniqueSkillId, value: 0.00})
   for (var i = 11; i <= 30; i++) {
-    if($gameVariables.value(287)[id1][i] >= 1){
-      if($gameVariables.value(287)[id1][i] == 1){ $dataWeapons[id1+80].traits.push({code: 22, dataId: 0, value: 0.01}) };
-      if($gameVariables.value(287)[id1][i] == 2){ $dataWeapons[id1+80].traits.push({code: 22, dataId: 1, value: 0.01}) };
-      if($gameVariables.value(287)[id1][i] == 3){ $dataWeapons[id1+80].traits.push({code: 22, dataId: 2, value: 0.01}) };
-      if($gameVariables.value(287)[id1][i] == 4){ $dataWeapons[id1+80].traits.push({code: 22, dataId: 7, value: 0.01}) };
-      if($gameVariables.value(287)[id1][i] == 5){ $dataWeapons[id1+80].traits.push({code: 22, dataId: 8, value: 0.01}) };
-      if($gameVariables.value(287)[id1][i] == 6){ $dataWeapons[id1+80].traits.push({code: 22, dataId: 9, value: 0.01}) };
-      if($gameVariables.value(287)[id1][i] == 7){ $dataWeapons[id1+80].traits.push({code: 21, dataId: 0, value: 1+0.05}) };//MHP未使用
-      if($gameVariables.value(287)[id1][i] == 8){ $dataWeapons[id1+80].traits.push({code: 21, dataId: 1, value: 1+0.05}) };//MMP未使用
-      if($gameVariables.value(287)[id1][i] == 9){ $dataWeapons[id1+80].traits.push({code: 21, dataId: 2, value: 1+0.05}) };
-      if($gameVariables.value(287)[id1][i] == 10){ $dataWeapons[id1+80].traits.push({code: 21, dataId: 3, value: 1+0.05}) };
-      if($gameVariables.value(287)[id1][i] == 11){ $dataWeapons[id1+80].traits.push({code: 21, dataId: 4, value: 1+0.05}) };
-      if($gameVariables.value(287)[id1][i] == 12){ $dataWeapons[id1+80].traits.push({code: 21, dataId: 5, value: 1+0.05}) };
-      if($gameVariables.value(287)[id1][i] == 13){ $dataWeapons[id1+80].traits.push({code: 21, dataId: 6, value: 1+0.05}) };
-      if($gameVariables.value(287)[id1][i] == 14){ $dataWeapons[id1+80].traits.push({code: 21, dataId: 7, value: 1+0.05}) };
+    if($gameVariables.value(287)[weaponSlotId][i] >= 1){
+      if($gameVariables.value(287)[weaponSlotId][i] == 1){ $dataWeapons[weaponSlotId+80].traits.push({code: 22, dataId: 0, value: 0.01}) };
+      if($gameVariables.value(287)[weaponSlotId][i] == 2){ $dataWeapons[weaponSlotId+80].traits.push({code: 22, dataId: 1, value: 0.01}) };
+      if($gameVariables.value(287)[weaponSlotId][i] == 3){ $dataWeapons[weaponSlotId+80].traits.push({code: 22, dataId: 2, value: 0.01}) };
+      if($gameVariables.value(287)[weaponSlotId][i] == 4){ $dataWeapons[weaponSlotId+80].traits.push({code: 22, dataId: 7, value: 0.01}) };
+      if($gameVariables.value(287)[weaponSlotId][i] == 5){ $dataWeapons[weaponSlotId+80].traits.push({code: 22, dataId: 8, value: 0.01}) };
+      if($gameVariables.value(287)[weaponSlotId][i] == 6){ $dataWeapons[weaponSlotId+80].traits.push({code: 22, dataId: 9, value: 0.01}) };
+      if($gameVariables.value(287)[weaponSlotId][i] == 7){ $dataWeapons[weaponSlotId+80].traits.push({code: 21, dataId: 0, value: 1+0.05}) };//MHP未使用
+      if($gameVariables.value(287)[weaponSlotId][i] == 8){ $dataWeapons[weaponSlotId+80].traits.push({code: 21, dataId: 1, value: 1+0.05}) };//MMP未使用
+      if($gameVariables.value(287)[weaponSlotId][i] == 9){ $dataWeapons[weaponSlotId+80].traits.push({code: 21, dataId: 2, value: 1+0.05}) };
+      if($gameVariables.value(287)[weaponSlotId][i] == 10){ $dataWeapons[weaponSlotId+80].traits.push({code: 21, dataId: 3, value: 1+0.05}) };
+      if($gameVariables.value(287)[weaponSlotId][i] == 11){ $dataWeapons[weaponSlotId+80].traits.push({code: 21, dataId: 4, value: 1+0.05}) };
+      if($gameVariables.value(287)[weaponSlotId][i] == 12){ $dataWeapons[weaponSlotId+80].traits.push({code: 21, dataId: 5, value: 1+0.05}) };
+      if($gameVariables.value(287)[weaponSlotId][i] == 13){ $dataWeapons[weaponSlotId+80].traits.push({code: 21, dataId: 6, value: 1+0.05}) };
+      if($gameVariables.value(287)[weaponSlotId][i] == 14){ $dataWeapons[weaponSlotId+80].traits.push({code: 21, dataId: 7, value: 1+0.05}) };
   }};
   $gamePlayer.refresh();
 };
@@ -1061,41 +1061,41 @@ if(valueCountSet3 == 3){
 };
 
 //固有武器強化過程weapon_uniqueEnhance($gameVariables.value(20));2,3,4,5,6,7
-weapon_uniqueEnhance = function(id,id2){
+weapon_uniqueEnhance = function(id,enhanceModeId){
 
-if(id2 == 1){
+if(enhanceModeId == 1){
   var enhanceCostValue = 1500;
-  var arr1 = [30,0,0,0,0,0];
-  var arr2 = [0,0];
+  var uniqueStatGains = [30,0,0,0,0,0];
+  var uniqueSkillIds = [0,0];
   if($gameVariables.value(287)[id][10] >= 1){
     var enhanceCostValue = 3000 * $gameVariables.value(287)[id][10];
-    var arr1 = [30,0,0,0,0,0];
-    var arr2 = [0,0];
+    var uniqueStatGains = [30,0,0,0,0,0];
+    var uniqueSkillIds = [0,0];
   };
   if($gameVariables.value(287)[id][10] >= 5){
     var enhanceCostValue = 5000 * $gameVariables.value(287)[id][10];
-    var arr1 = [50,0,30,0,0,0];
-    var arr2 = [1204,$gameVariables.value(287)[id][10]];
+    var uniqueStatGains = [50,0,30,0,0,0];
+    var uniqueSkillIds = [1204,$gameVariables.value(287)[id][10]];
   };
   if($gameVariables.value(287)[id][10] >= 10){
     var enhanceCostValue = 10000 * $gameVariables.value(287)[id][10];
-    var arr1 = [100,0,50,30,30,0];
-    var arr2 = [1206,$gameVariables.value(287)[id][10]];
+    var uniqueStatGains = [100,0,50,30,30,0];
+    var uniqueSkillIds = [1206,$gameVariables.value(287)[id][10]];
   };
   if($gameVariables.value(287)[id][10] >= 15){
     var enhanceCostValue = 100000 * $gameVariables.value(287)[id][10];
-    var arr1 = [100,0,50,50,50,50];
-    var arr2 = [1208,$gameVariables.value(287)[id][10]];
+    var uniqueStatGains = [100,0,50,50,50,50];
+    var uniqueSkillIds = [1208,$gameVariables.value(287)[id][10]];
   };
   valueCountSet1 = enhanceCostValue;
-  valueScriptArray1 = arr1;
-  valueScriptArray2 = arr2;
+  valueScriptArray1 = uniqueStatGains;
+  valueScriptArray2 = uniqueSkillIds;
 };
-if(id2 == 2){
-  var arr3 = valueScriptArray1;
+if(enhanceModeId == 2){
+  var uniqueStatGainList = valueScriptArray1;
   for (var i = 0; i <= 5; i++) {
-    if(arr3[i] >= 1){
-      $gameVariables.value(287)[id][i+2] += arr3[i];
+    if(uniqueStatGainList[i] >= 1){
+      $gameVariables.value(287)[id][i+2] += uniqueStatGainList[i];
     };
   };
 };
@@ -1103,11 +1103,11 @@ if(id2 == 2){
 };
 
 //収集表示アイテムリスト表示item_collectList1(  );
-item_collectList1 = function(id1){
+item_collectList1 = function(varId){
 
 var start = 1;var end = 4;
 for (var i = start; i <= end; i++) {
-  if($gameVariables.value(id1)[i] == 0){
+  if($gameVariables.value(varId)[i] == 0){
     eval("var collectSlot" + i + "=  `[登録なし]`");
   }else{
     eval("var collectSlot" + i + "=  `[${$dataItems[$gameVariables.value(id1)[i]].name}:${$gameParty.numItems($dataItems[$gameVariables.value(id1)[i]])}]`");
@@ -1120,7 +1120,7 @@ $gameScreen.showPicture(48,"",0,10,698,100,100,255,0);
 };
 
 //収集表示アイテムリスト表示actor_miniHstatusList1(330);
-actor_miniHstatusList1 = function(id1){
+actor_miniHstatusList1 = function(varId){
 
 var girlMemberCount = 0;
 var start = 0;var end = 3;
@@ -1131,9 +1131,9 @@ for (var i = start; i <= end; i++) {
       girlMemberCount += 1;
       var actor = $gameActors.actor(memberActorId);
       if($dataActors[memberActorId].meta['IconGura']){
-        $gameVariables.value(id1)[i] = `\x1bI[${Number($dataActors[memberActorId].meta['IconGura'])}]`;
+        $gameVariables.value(varId)[i] = `\x1bI[${Number($dataActors[memberActorId].meta['IconGura'])}]`;
       } else {
-        $gameVariables.value(id1)[i] = `[${actor.name()}]`;
+        $gameVariables.value(varId)[i] = `[${actor.name()}]`;
       };
 /*:
       $gameVariables.value(id1)[i] = `[${actor.name()}]`;
@@ -1144,14 +1144,14 @@ for (var i = start; i <= end; i++) {
         $gameVariables.value(id1)[i] += `　`;
       };
 */
-      $gameVariables.value(id1)[i] += `\\I[12]:${$gameVariables.value(memberActorId+380)[1]} \\I[376]:${$gameVariables.value(memberActorId+380)[2]}`;
+      $gameVariables.value(varId)[i] += `\\I[12]:${$gameVariables.value(memberActorId+380)[1]} \\I[376]:${$gameVariables.value(memberActorId+380)[2]}`;
       var list = valueHstateDisplay;
       list.forEach(function(id) {
         if(actor.isStateAffected(id)){
-          $gameVariables.value(id1)[i] += `\\I[${$dataStates[id].iconIndex}]`;
+          $gameVariables.value(varId)[i] += `\\I[${$dataStates[id].iconIndex}]`;
         ;}
       }, this);
-      $gameScreen.setDTextPicture($gameVariables.value(id1)[i], 22);
+      $gameScreen.setDTextPicture($gameVariables.value(varId)[i], 22);
 }}};
 if(girlMemberCount >= 1){
   var iconOffsetValue = 758 + (girlMemberCount * -30);
@@ -1162,23 +1162,23 @@ if(girlMemberCount >= 1){
 };
 
 //ショップの品目指定。shop_preparation1(1,1,0);//種類/ランク/0読み込みのみ1ショップ処理実行valueCountSet3 = 5;//4,6
-shop_preparation1 = function(id1,id2,id3){
+shop_preparation1 = function(databaseTypeId,lotteryRarity,sortFlag){
 
-var array = [];
-if(id1 == 1){valueItems = $dataWeapons};
-if(id1 == 2){valueItems = $dataArmors};
-if(id1 == 0){valueItems = $dataItems};
+var shopEntries = [];
+if(databaseTypeId == 1){valueItems = $dataWeapons};
+if(databaseTypeId == 2){valueItems = $dataArmors};
+if(databaseTypeId == 0){valueItems = $dataItems};
 var start = 1;
-if(id1 == 2){
+if(databaseTypeId == 2){
   var end = valueArmorsLength;
 } else {
   var end = valueItems.length-1;
 };
-if(id1 == 0){var rankMatchFlag = true};
+if(databaseTypeId == 0){var rankMatchFlag = true};
 for (var i = start; i <= end; i++) {
   if(valueItems[i].meta['ShopRank'] && valueItems[i].meta['LotteryRearity']){
     if(valueItems[i].meta['SeiyokuItem']){}else{
-      if(id1 == 1 || id1 == 2){
+      if(databaseTypeId == 1 || databaseTypeId == 2){
         if(valueCountSet3 == valueItems[i].etypeId){
           var rankMatchFlag = true;
         } else {
@@ -1187,17 +1187,17 @@ for (var i = start; i <= end; i++) {
       };
       if(rankMatchFlag){
         var lotteryRarity = Number(valueItems[i].meta['LotteryRearity']);
-        if(lotteryRarity == id2){
-          var arr1 = [0,0,0,0];
-          arr1[0] = id1;
-          arr1[1] = i;
-          array.push(arr1);//この場合はこちらが正解
+        if(lotteryRarity == lotteryRarity){
+          var shopEntry = [0,0,0,0];
+          shopEntry[0] = databaseTypeId;
+          shopEntry[1] = i;
+          shopEntries.push(shopEntry);//この場合はこちらが正解
         };
       };
     };
 }};
-if(id3 == 1){
-  goods = array;
+if(sortFlag == 1){
+  goods = shopEntries;
   SceneManager.push(Scene_Shop);
   SceneManager.prepareNextScene(goods, false);
 };
@@ -1205,31 +1205,31 @@ if(id3 == 1){
 };
 
 //性欲品ショップ。shop_preparationH(0,1,1);
-shop_preparationH = function(id1,id2,id3){
+shop_preparationH = function(unusedArg1,seiyokuItemId,sortFlag){
 
-var array = [];
+var shopEntries = [];
 var list = [0,1,2];
-list.forEach(function(id1) {
-  if(id1 == 1){valueItems = $dataWeapons};
-  if(id1 == 2){valueItems = $dataArmors};
-  if(id1 == 0){valueItems = $dataItems};
+list.forEach(function(databaseTypeId) {
+  if(databaseTypeId == 1){valueItems = $dataWeapons};
+  if(databaseTypeId == 2){valueItems = $dataArmors};
+  if(databaseTypeId == 0){valueItems = $dataItems};
   var start = 1;
-    if(id1 == 2){
+    if(databaseTypeId == 2){
     var end = valueArmorsLength;
   } else {
     var end = valueItems.length-1;
   };
   for (var i = start; i <= end; i++) {
     if(valueItems[i].meta['SeiyokuItem']){
-      if(Number(valueItems[i].meta['SeiyokuItem']) == id2){
-        var arr1 = [0,0,0,0];
-        arr1[0] = id1;
-        arr1[1] = i;
-        array.push(arr1);//この場合はこちらが正解
+      if(Number(valueItems[i].meta['SeiyokuItem']) == seiyokuItemId){
+        var shopEntry = [0,0,0,0];
+        shopEntry[0] = databaseTypeId;
+        shopEntry[1] = i;
+        shopEntries.push(shopEntry);//この場合はこちらが正解
   }}};
 }, this);
-if(id3 == 1){
-  goods = array;
+if(sortFlag == 1){
+  goods = shopEntries;
   SceneManager.push(Scene_Shop);
   SceneManager.prepareNextScene(goods, true);
 };
@@ -1237,22 +1237,22 @@ if(id3 == 1){
 };
 
 //食品ショップ。shop_preparationE(0,1,1);
-shop_preparationE = function(id1,id2,id3){
+shop_preparationE = function(databaseTypeId,eatShopId,sortFlag){
 
-var array = [];
+var shopEntries = [];
 valueItems = $dataItems
 var start = 1;
 var end = valueItems.length-1;
 for (var i = start; i <= end; i++) {
   if(valueItems[i].meta['EatShop']){
-    if(Number(valueItems[i].meta['EatShop']) == id2){
-      var arr1 = [0,0,0,0];
-        arr1[0] = id1;
-        arr1[1] = i;
-        array.push(arr1);//この場合はこちらが正解
+    if(Number(valueItems[i].meta['EatShop']) == eatShopId){
+      var shopEntry = [0,0,0,0];
+        shopEntry[0] = databaseTypeId;
+        shopEntry[1] = i;
+        shopEntries.push(shopEntry);//この場合はこちらが正解
 }}};
-if(id3 == 1){
-  goods = array;
+if(sortFlag == 1){
+  goods = shopEntries;
   SceneManager.push(Scene_Shop);
   SceneManager.prepareNextScene(goods, true);
 };
@@ -1260,22 +1260,22 @@ if(id3 == 1){
 };
 
 //食材ショップ。shop_preparationEI(0,1,1);
-shop_preparationEI = function(id1,id2,id3){
+shop_preparationEI = function(databaseTypeId,ingredientsShopId,sortFlag){
 
-var array = [];
+var shopEntries = [];
 valueItems = $dataItems
 var start = 1;
 var end = valueItems.length-1;
 for (var i = start; i <= end; i++) {
   if(valueItems[i].meta['IngredientsShop']){
-    if(Number(valueItems[i].meta['IngredientsShop']) == id2){
-      var arr1 = [0,0,0,0];
-        arr1[0] = id1;
-        arr1[1] = i;
-        array.push(arr1);//この場合はこちらが正解
+    if(Number(valueItems[i].meta['IngredientsShop']) == ingredientsShopId){
+      var shopEntry = [0,0,0,0];
+        shopEntry[0] = databaseTypeId;
+        shopEntry[1] = i;
+        shopEntries.push(shopEntry);//この場合はこちらが正解
 }}};
-if(id3 == 1){
-  goods = array;
+if(sortFlag == 1){
+  goods = shopEntries;
   SceneManager.push(Scene_Shop);
   SceneManager.prepareNextScene(goods, true);
 };
@@ -1283,63 +1283,63 @@ if(id3 == 1){
 };
 
 //カジノ"Variable 69 Buy Price",ブースト薬"Variable 57 Buy Price" otherShop_preparation1(57,0,1);
-otherShop_preparation1 = function(buyPriceVarId,id2,id3){//id2が0で一括
+otherShop_preparation1 = function(buyPriceVarId,lotteryRarity,sortFlag){//id2が0で一括
 
-var array = [];
-for (var id1 = 0; id1 <= 2; id1++) {
-  if(id1 == 1){var valueItems = $dataWeapons};
-  if(id1 == 2){var valueItems = $dataArmors};
-  if(id1 == 0){var valueItems = $dataItems};
+var shopEntries = [];
+for (var databaseTypeId = 0; databaseTypeId <= 2; databaseTypeId++) {
+  if(databaseTypeId == 1){var databaseEntries = $dataWeapons};
+  if(databaseTypeId == 2){var databaseEntries = $dataArmors};
+  if(databaseTypeId == 0){var databaseEntries = $dataItems};
   var start = 1;
-  if(id1 == 2){
+  if(databaseTypeId == 2){
     var end = valueArmorsLength;
   } else {
-    var end = valueItems.length-1;
+    var end = databaseEntries.length-1;
   };
   for (var i = start; i <= end; i++) {
-    if(valueItems[i].meta['Variable '+buyPriceVarId+' Buy Price']){//<Variable 69 Buy Price: 100000>
-      if(id2 == 0){var rarityMatchFlag = true};
-      if(id2 >= 1){var rarityMatchFlag = Number(valueItems[i].meta['LotteryRearity']) == id2};
+    if(databaseEntries[i].meta['Variable '+buyPriceVarId+' Buy Price']){//<Variable 69 Buy Price: 100000>
+      if(lotteryRarity == 0){var rarityMatchFlag = true};
+      if(lotteryRarity >= 1){var rarityMatchFlag = Number(databaseEntries[i].meta['LotteryRearity']) == lotteryRarity};
       if(rarityMatchFlag){
-        var arr1 = [0,0,1,0];
-        arr1[0] = id1;
-        arr1[1] = i;
-        array.push(arr1);
+        var shopEntry = [0,0,1,0];
+        shopEntry[0] = databaseTypeId;
+        shopEntry[1] = i;
+        shopEntries.push(shopEntry);
       };
     };
   };
 };
-if(id3 == 1){
-  goods = array;
+if(sortFlag == 1){
+  goods = shopEntries;
   SceneManager.push(Scene_Shop);
   SceneManager.prepareNextScene(goods, true);
 };
 
 };
 
-bookShop_preparert2 = function(id1,id2,id3){
+bookShop_preparert2 = function(databaseTypeId,bookShopId,sortFlag){
 
-var array = [];
+var shopEntries = [];
 valueItems = $dataItems
 var start = 1;
 var end = valueItems.length-1;
 for (var i = start; i <= end; i++) {
   if(valueItems[i].meta['bookShop']){
-    if(Number(valueItems[i].meta['bookShop']) == id2){
-      var arr1 = [0,0,0,0];
-        arr1[0] = id1;
-        arr1[1] = i;
-        array.push(arr1);//この場合はこちらが正解
+    if(Number(valueItems[i].meta['bookShop']) == bookShopId){
+      var shopEntry = [0,0,0,0];
+        shopEntry[0] = databaseTypeId;
+        shopEntry[1] = i;
+        shopEntries.push(shopEntry);//この場合はこちらが正解
 }}};
-if(id3 == 1){
-  goods = array;
+if(sortFlag == 1){
+  goods = shopEntries;
   SceneManager.push(Scene_Shop);
   SceneManager.prepareNextScene(goods, true);
 };
 
 };
 
-bookShop_preparert = function(id1){
+bookShop_preparert = function(bookShopId){
 
 for (var i = 1; i <= $dataItems.length-1; i++) {
   if($dataItems[i].name !== '') {
@@ -1349,7 +1349,7 @@ for (var i = 1; i <= $dataItems.length-1; i++) {
       } else {
         var bookOwnedFlag = true;
       };
-      if(Number($dataItems[i].meta['bookShop']) == id1 && bookOwnedFlag) {
+      if(Number($dataItems[i].meta['bookShop']) == bookShopId && bookOwnedFlag) {
         var bookPrice = $dataItems[i].price;
         if(valueCountSet3 != 0){
           var bookPrice = Math.floor(bookPrice - (bookPrice * valueCountSet3 / 100));
@@ -1397,64 +1397,64 @@ for (var i = 1; i <= $dataItems.length-1; i++) {
 //<jouhouBuyVariable:135,1><jouhouBuySwitche:135>
 jouhouShop_preparert = function(){
 
-var arr1 = [];
+var buyItemIds = [];
 for(var i = 1; i <= $dataItems.length-1; i++){
   if($dataItems[i].meta['jouhouBuyVariable']){
-    var arr2 = $dataItems[i].meta['jouhouBuyVariable'].split(',');
-    if(Number(arr2[0]) >= 1){
-      if($gameVariables.value(Number(arr2[0])) >= Number(arr2[1])){
-        arr1.push(i);
+    var jouhouBuyValues = $dataItems[i].meta['jouhouBuyVariable'].split(',');
+    if(Number(jouhouBuyValues[0]) >= 1){
+      if($gameVariables.value(Number(jouhouBuyValues[0])) >= Number(jouhouBuyValues[1])){
+        buyItemIds.push(i);
       } else {
-        arr1.push(6);
+        buyItemIds.push(6);
       };
   }};
   if($dataItems[i].meta['jouhouBuySwitche']){
     if(Number($dataItems[i].meta['jouhouBuySwitche']) >= 1){
       if($gameSwitches.value(Number($dataItems[i].meta['jouhouBuySwitche']))){ 
-        arr1.push(i);
+        buyItemIds.push(i);
       } else {
-        arr1.push(6);
+        buyItemIds.push(6);
       };
   }};
   var infoItemNameText = 6;//jouhouBuyItem
   if($dataItems[i].meta['jouhouBuyItem']){
-    var arr2 = $dataItems[i].meta['jouhouBuyItem'].split(',');
-    for(var j = 0; j <= arr2.length-1; j++){
-      if(Number(arr2[j]) >= 1){
-        if($gameParty.hasItem($dataItems[Number(arr2[j])],true)){
+    var jouhouBuyValues = $dataItems[i].meta['jouhouBuyItem'].split(',');
+    for(var j = 0; j <= jouhouBuyValues.length-1; j++){
+      if(Number(jouhouBuyValues[j]) >= 1){
+        if($gameParty.hasItem($dataItems[Number(jouhouBuyValues[j])],true)){
           var infoItemNameText = i;
         };
     }}
-    arr1.push(infoItemNameText);
+    buyItemIds.push(infoItemNameText);
   };
 };
-for(var j = 0; j <= arr1.length-1; j++){
-  var infoItemNameText = $dataItems[arr1[j]].name;//
-  if(arr1[j] != 6){
-    infoItemNameText += ` \\C[2](${$dataItems[arr1[j]].price.toLocaleString()}\\G)\\C[0]`;
-    if($gameParty.hasItem($dataItems[arr1[j]],true)){
+for(var j = 0; j <= buyItemIds.length-1; j++){
+  var infoItemNameText = $dataItems[buyItemIds[j]].name;//
+  if(buyItemIds[j] != 6){
+    infoItemNameText += ` \\C[2](${$dataItems[buyItemIds[j]].price.toLocaleString()}\\G)\\C[0]`;
+    if($gameParty.hasItem($dataItems[buyItemIds[j]],true)){
       infoItemNameText += `\\C[10][購入済み]\\C[0]`;
     };
   };
   const id = 1; 
   const choiceParams = {
   text: `${infoItemNameText}`,
-  value: arr1[j]};
+  value: buyItemIds[j]};
   $gameSystem.addCustomChoice(id, choiceParams);
 };
 
 };
 
 //食事イベント
-item_eatEvent2 = function(a,b,itemId){
+item_eatEvent2 = function(usedItem,targetItem,itemId){
 
-if(b.actorId() == a.actorId()){
+if(targetItem.actorId() == usedItem.actorId()){
   if(!$gameSwitches.value(603)){
     if($gameVariables.value(13) > $gameVariables.value(16)){
       for(var i = 1; i <= 9; i++){
         if($dataItems[itemId].meta['eatEffect' + i]){
-          var arr3 = $dataItems[itemId].meta['eatEffect' + i].split(',');
-          $gameVariables.value(620).push([Number(arr3[0]),Number(arr3[1]),Number(arr3[2])]);
+          var eatEffectValues = $dataItems[itemId].meta['eatEffect' + i].split(',');
+          $gameVariables.value(620).push([Number(eatEffectValues[0]),Number(eatEffectValues[1]),Number(eatEffectValues[2])]);
         };
       };
       $gameVariables.setValue(16,$gameVariables.value(16) + 1);
@@ -1499,7 +1499,7 @@ if(b.actorId() == a.actorId()){
 };
 
 //食事イベント、没
-item_eatEvent = function(a,b,itemId){
+item_eatEvent = function(unusedArg1,unusedArg2,itemId){
 
 if($gameVariables.value(16) > $gameVariables.value(13)){
   TickerManager.show('満腹でこれ以上は食べられない…。');
@@ -1532,12 +1532,12 @@ if($gameVariables.value(16) > $gameVariables.value(13)){
 };
 
 //アイテム財布からルビ入手。
-wallet_insideGet = function(a,b,itemId,id1){
+wallet_insideGet = function(usedItem,targetItem,itemId,databaseTypeId){
 
-if(b.actorId() == a.actorId()){
-  if(id1 == 1){valueItems = $dataWeapons};
-  if(id1 == 2){valueItems = $dataArmors};
-  if(id1 == 0){valueItems = $dataItems};
+if(targetItem.actorId() == usedItem.actorId()){
+  if(databaseTypeId == 1){valueItems = $dataWeapons};
+  if(databaseTypeId == 2){valueItems = $dataArmors};
+  if(databaseTypeId == 0){valueItems = $dataItems};
   var walletMin = Number(valueItems[itemId].meta['walletIn'].split(',')[0]);
   var walletRange = Number(valueItems[itemId].meta['walletIn'].split(',')[1]);
   var walletGainAmount = Math.floor( Math.random() * walletRange+1) + walletMin;
@@ -1549,131 +1549,131 @@ if(b.actorId() == a.actorId()){
 };
 
 //アイテム一括売却対象選択ikkatu_sellChoice(0,' Goods');
-ikkatu_sellChoice = function(id1,id2){
+ikkatu_sellChoice = function(databaseTypeId,menuCategoryId){
 
-var arr1 = [];
-var arr2 = [];
-if(id1 == 0){var valueItems = $dataItems};
-if(id1 == 1){var valueItems = $dataWeapons};
-if(id1 == 2){var valueItems = $dataArmors};
+var sellChoiceTexts = [];
+var sellItemIds = [];
+if(databaseTypeId == 0){var databaseEntries = $dataItems};
+if(databaseTypeId == 1){var databaseEntries = $dataWeapons};
+if(databaseTypeId == 2){var databaseEntries = $dataArmors};
 var start = 1;
-if(id1 == 2){
+if(databaseTypeId == 2){
   var end = valueArmorsLength;
 } else {
-  var end = valueItems.length-1;
+  var end = databaseEntries.length-1;
 };
 for (var i = start; i <= end; i++) {
   var sellChoiceText = 0;
-  if(id1 == 0){
-    var categoryMatchFlag = valueItems[i].meta['Menu Category'] == id2;
+  if(databaseTypeId == 0){
+    var categoryMatchFlag = databaseEntries[i].meta['Menu Category'] == menuCategoryId;
   } else {
     var categoryMatchFlag = true;
   };
-  if(id1 == 2){
-    var etypeMatchFlag = valueItems[i].etypeId != 3;
+  if(databaseTypeId == 2){
+    var etypeMatchFlag = databaseEntries[i].etypeId != 3;
   } else {
     var etypeMatchFlag = true;
   };
-  if(valueItems[i].name !== '') {
-    if(valueItems[i].price >= 1 || valueItems[i].meta['Sell Price'] || valueItems[i].meta['Variable 57 Sell Price'] || valueItems[i].meta['Variable 69 Sell Price'] || valueItems[i].meta['Item 270 Sell Price'] || valueItems[i].meta['Item 147 Sell Price'] || valueItems[i].meta['Item 152 Sell Price']){
-      if($gameParty.hasItem(valueItems[i])){
+  if(databaseEntries[i].name !== '') {
+    if(databaseEntries[i].price >= 1 || databaseEntries[i].meta['Sell Price'] || databaseEntries[i].meta['Variable 57 Sell Price'] || databaseEntries[i].meta['Variable 69 Sell Price'] || databaseEntries[i].meta['Item 270 Sell Price'] || databaseEntries[i].meta['Item 147 Sell Price'] || databaseEntries[i].meta['Item 152 Sell Price']){
+      if($gameParty.hasItem(databaseEntries[i])){
         if(etypeMatchFlag && categoryMatchFlag){
-          if($gameSelfSwitches.getVariableValue([4, id1 + 11, i]) == 0){
+          if($gameSelfSwitches.getVariableValue([4, databaseTypeId + 11, i]) == 0){
             var rarityColorCode = 0;
           } else {
             var rarityColorCode = 10;
           };
-          var sellChoiceText = `\\FS[25]\\C[${rarityColorCode}]\x1bI[${valueItems[i].iconIndex}]${valueItems[i].name}:${$gameParty.numItems(valueItems[i])}\\C[0]`;
+          var sellChoiceText = `\\FS[25]\\C[${rarityColorCode}]\x1bI[${databaseEntries[i].iconIndex}]${databaseEntries[i].name}:${$gameParty.numItems(databaseEntries[i])}\\C[0]`;
           if(sellChoiceText != 0){
-            arr1.push(sellChoiceText);
-            arr2.push(i);
+            sellChoiceTexts.push(sellChoiceText);
+            sellItemIds.push(i);
           };
 }}}}};
-if(arr1.length >= 1){
-  valueWordArray = arr1;
-  valueCountArray = arr2;
+if(sellChoiceTexts.length >= 1){
+  valueWordArray = sellChoiceTexts;
+  valueCountArray = sellItemIds;
 };
 };
 
 //アイテム一括売却対象選択
-ikkatu_sellChoice2 = function(id1){
+ikkatu_sellChoice2 = function(databaseTypeId){
 
-var arr1 = [];
-var arr2 = [];
-var arr3 = [];
-if(id1 == 0){var valueItems = $dataItems};
-if(id1 == 1){var valueItems = $dataWeapons};
-if(id1 == 2){var valueItems = $dataArmors};
+var sellItemLines = [];
+var sellItemIds = [];
+var databaseTypeIds = [];
+if(databaseTypeId == 0){var databaseEntries = $dataItems};
+if(databaseTypeId == 1){var databaseEntries = $dataWeapons};
+if(databaseTypeId == 2){var databaseEntries = $dataArmors};
 var start = 1;
-if(id1 == 2){
+if(databaseTypeId == 2){
   var end = valueArmorsLength;
 } else {
-  var end = valueItems.length-1;
+  var end = databaseEntries.length-1;
 };
 for (var i = start; i <= end; i++) {
-  if($gameSelfSwitches.getVariableValue([4, id1 + 11, i]) == 1){
-    var sellItemLine = `\\FS[25]\x1bI[${valueItems[i].iconIndex}]${valueItems[i].name}:${$gameParty.numItems(valueItems[i])}`;
+  if($gameSelfSwitches.getVariableValue([4, databaseTypeId + 11, i]) == 1){
+    var sellItemLine = `\\FS[25]\x1bI[${databaseEntries[i].iconIndex}]${databaseEntries[i].name}:${$gameParty.numItems(databaseEntries[i])}`;
     if(sellItemLine != 0){
-      arr1.push(sellItemLine);
-      arr2.push(i);
-      arr3.push(id1);
+      sellItemLines.push(sellItemLine);
+      sellItemIds.push(i);
+      databaseTypeIds.push(databaseTypeId);
     };
   };
 };
-if(arr1.length >= 1){
-  valueWordArray = arr1;
-  valueCountArray = arr2;
-  valueCountArray2 = arr3;
+if(sellItemLines.length >= 1){
+  valueWordArray = sellItemLines;
+  valueCountArray = sellItemIds;
+  valueCountArray2 = databaseTypeIds;
 };
 
 };
 
 //アイテム一括売却実行内部計算
-item_ikkatu = function(id1){
+item_ikkatu = function(databaseTypeId){
 
-if(id1 == 0){var valueItems = $dataItems};
-if(id1 == 1){var valueItems = $dataWeapons};
-if(id1 == 2){var valueItems = $dataArmors};
+if(databaseTypeId == 0){var databaseEntries = $dataItems};
+if(databaseTypeId == 1){var databaseEntries = $dataWeapons};
+if(databaseTypeId == 2){var databaseEntries = $dataArmors};
 var collectedItemTotal = 0;//実行回数記録用。10回で一旦ウェイト
 //value6が個数。value7が価格。value8が名前。value9が価格×個数。value10が表示用
 var start = 1;
-if(id1 == 2){
+if(databaseTypeId == 2){
   var end = valueArmorsLength;
 } else {
-  var end = valueItems.length-1;
+  var end = databaseEntries.length-1;
 };
 for (var i = start; i <= end; i++) {
-  if($gameParty.hasItem(valueItems[i])){
-    var selfSwitchCount = $gameSelfSwitches.getVariableValue([4, 11+id1, i]);
+  if($gameParty.hasItem(databaseEntries[i])){
+    var selfSwitchCount = $gameSelfSwitches.getVariableValue([4, 11+databaseTypeId, i]);
     if(selfSwitchCount >= 1){  
       collectedItemTotal += 1;
       var baseSellPrice = 0;
-      if(valueItems[i].meta['Sell Price']){
-        var baseSellPrice = Number(valueItems[i].meta['Sell Price']);
+      if(databaseEntries[i].meta['Sell Price']){
+        var baseSellPrice = Number(databaseEntries[i].meta['Sell Price']);
       };
-      if(valueItems[i].meta['Price']){
-        var baseSellPrice = Math.round(Number(valueItems[i].meta['Price']) / 2);
+      if(databaseEntries[i].meta['Price']){
+        var baseSellPrice = Math.round(Number(databaseEntries[i].meta['Price']) / 2);
       };
       var sellPriceVar57 = 0;
-      if(valueItems[i].meta['Variable 57 Sell Price']){
-        var sellPriceVar57 = Number(valueItems[i].meta['Variable 57 Sell Price']);
+      if(databaseEntries[i].meta['Variable 57 Sell Price']){
+        var sellPriceVar57 = Number(databaseEntries[i].meta['Variable 57 Sell Price']);
       };
-      if(valueItems[i].meta['Variable 69 Sell Price']){
-        var sellPriceVar57 = Number(valueItems[i].meta['Variable 69 Sell Price']);
+      if(databaseEntries[i].meta['Variable 69 Sell Price']){
+        var sellPriceVar57 = Number(databaseEntries[i].meta['Variable 69 Sell Price']);
       };
       var sellPriceVar69 = 0;
-      if(valueItems[i].meta['Item 270 Sell Price']){
-        var sellPriceVar69 = Number(valueItems[i].meta['Item 270 Sell Price']);
+      if(databaseEntries[i].meta['Item 270 Sell Price']){
+        var sellPriceVar69 = Number(databaseEntries[i].meta['Item 270 Sell Price']);
       };
-      if(valueItems[i].meta['Item 147 Sell Price']){
-        var sellPriceVar69 = Number(valueItems[i].meta['Item 147 Sell Price']);
+      if(databaseEntries[i].meta['Item 147 Sell Price']){
+        var sellPriceVar69 = Number(databaseEntries[i].meta['Item 147 Sell Price']);
       };
-      if(valueItems[i].meta['Item 152 Sell Price']){
-        var sellPriceVar69 = Number(valueItems[i].meta['Item 152 Sell Price']);
+      if(databaseEntries[i].meta['Item 152 Sell Price']){
+        var sellPriceVar69 = Number(databaseEntries[i].meta['Item 152 Sell Price']);
       };
-      var sellItemCount = $gameParty.numItems(valueItems[i]);
-      var itemBasePrice = valueItems[i].price;
-      var sellItemNameText = `\x1bI[${valueItems[i].iconIndex}]${valueItems[i].name}`;
+      var sellItemCount = $gameParty.numItems(databaseEntries[i]);
+      var itemBasePrice = databaseEntries[i].price;
+      var sellItemNameText = `\x1bI[${databaseEntries[i].iconIndex}]${databaseEntries[i].name}`;
       if(baseSellPrice >= 1){
         var baseSellPrice = baseSellPrice * sellItemCount;
       };
@@ -1694,22 +1694,22 @@ for (var i = start; i <= end; i++) {
         //arr1[2] = value7 + value3;
         //arr1[3] = value4;
         //arr1[4] = value5;
-        $gameParty.loseItem(valueItems[i], sellItemCount);
+        $gameParty.loseItem(databaseEntries[i], sellItemCount);
         if(itemBasePrice + baseSellPrice >= 1){$gameParty.gainGold(itemBasePrice + baseSellPrice)};
-        if(valueItems[i].meta['Variable 57 Sell Price']){
+        if(databaseEntries[i].meta['Variable 57 Sell Price']){
           if(sellPriceVar57 >= 1){$gameVariables.setValue(57,$gameVariables.value(57) + sellPriceVar57)};
         };
-        if(valueItems[i].meta['Variable 69 Sell Price']){
+        if(databaseEntries[i].meta['Variable 69 Sell Price']){
           if(sellPriceVar57 >= 1){$gameVariables.setValue(69,$gameVariables.value(69) + sellPriceVar57)};
         };
         if(sellPriceVar69 >= 1){
-          if(valueItems[i].meta['Item 270 Sell Price']){
+          if(databaseEntries[i].meta['Item 270 Sell Price']){
             $gameParty.gainItem($dataItems[270], sellPriceVar69);
           };
-          if(valueItems[i].meta['Item 147 Sell Price']){
+          if(databaseEntries[i].meta['Item 147 Sell Price']){
             $gameParty.gainItem($dataItems[147], sellPriceVar69);
           };
-          if(valueItems[i].meta['Item 152 Sell Price']){
+          if(databaseEntries[i].meta['Item 152 Sell Price']){
             $gameParty.gainItem($dataItems[152], sellPriceVar69);
           };
         };
@@ -1721,48 +1721,48 @@ for (var i = start; i <= end; i++) {
 };
 
 //ショップの購入レート設定shop_taxDecision1(this._eventId);
-shop_taxDecision1 = function(id1){
+shop_taxDecision1 = function(eventId){
 
 valueCountSet1 = 0;
 valueCountSet2 = 0;
 valueCountSet3 = 0;
 valueRandomSet = 0;
 $gameSwitches.setValue(380,false);
-var id2 = $gameSelfSwitches.getVariableValue([$gameMap.mapId(), id1, 10]);
+var taxRate = $gameSelfSwitches.getVariableValue([$gameMap.mapId(), eventId, 10]);
 var actor = $gameActors.actor($gameVariables.value(11));
-if(!actor || !$gameMap.event(id1)){return};
-if($gameSelfSwitches.value([$gameMap.mapId(), id1, 'B'])){
-  $gameSystem.setBuyTaxTo(id2);
+if(!actor || !$gameMap.event(eventId)){return};
+if($gameSelfSwitches.value([$gameMap.mapId(), eventId, 'B'])){
+  $gameSystem.setBuyTaxTo(taxRate);
 } else {
   $gameSystem.setBuyTaxTo(0);
 };
-if($gameSelfSwitches.value([$gameMap.mapId(), id1, 'A'])){
+if($gameSelfSwitches.value([$gameMap.mapId(), eventId, 'A'])){
   valueCountSet1 += 1;
 };
 if($gameSwitches.value(138)){//商業on
-  if($gameMap.event(id1).event().meta['Man'] && 
+  if($gameMap.event(eventId).event().meta['Man'] && 
   actor.battleSkillsRaw().contains(valueHoneyTrapSkillId)){
     valueCountSet2 += 1;
   };
-  if(!$gameSelfSwitches.value([$gameMap.mapId(), id1, 'B'])){//交渉は一日一回
+  if(!$gameSelfSwitches.value([$gameMap.mapId(), eventId, 'B'])){//交渉は一日一回
     $gameSwitches.setValue(380,true);
   };
 };
-if(id2 <= -1){
-  var taxInfoText = `値段交渉済み：\\C[10]${-id2}%\\C[0]の値引きが行われます。`;
+if(taxRate <= -1){
+  var taxInfoText = `値段交渉済み：\\C[10]${-taxRate}%\\C[0]の値引きが行われます。`;
   CommonPopupManager.showInfo({},taxInfoText,null);
 };
 
 };
 
 //ショップの購入レート設定。順番にコモンでウェイトを挟んでいるshop_taxDecision2(this._eventId,1);
-shop_taxDecision2 = function(id1,id3){
+shop_taxDecision2 = function(eventId,decisionModeId){
 
 $gameSwitches.setValue(380,false);
-var id2 = $gameSelfSwitches.getVariableValue([$gameMap.mapId(), id1, 10]);
+var unusedVar = $gameSelfSwitches.getVariableValue([$gameMap.mapId(), eventId, 10]);
 var actor = $gameActors.actor($gameVariables.value(11));
 if(!actor){return};
-if(id3 == 1){
+if(decisionModeId == 1){
   //$gamePlayer.requestBalloon(8);
   //event.requestBalloon(8);
   $gameVariables.setValue(21,`値引き交渉を行っています…。\n`);
@@ -1772,14 +1772,14 @@ if(id3 == 1){
   $gameScreen.showPicture(100,"",0,10+50,100,100,100,0,0);
   $gameScreen.movePicture(100,0,10,100,100,100,255,0,60);
 };
-if(id3 == 2){
+if(decisionModeId == 2){
   valueRandomSet = 10;
   var honeyTrapValue = 'hStates_hexpUp';
   $gameScreen._particle.particleSet(0,honeyTrapValue,'screen','def','spriteset');
   AudioManager.playSe({"name":'ZH_Sexy',"volume":40,"pitch":130,"pan":0});
   $gameScreen.startFlash([255,119,255,200], 60);
-  var arr1 = [1,2];
-  var trapVariant = arr1[getRandomIndex(arr1.length)];
+  var trapVariantCandidates = [1,2];
+  var trapVariant = trapVariantCandidates[getRandomIndex(trapVariantCandidates.length)];
   if(trapVariant == 1){
     var honeyTrapValue = 55;
     var trapPictureName = 'ScreenBlackOut';
@@ -1811,10 +1811,10 @@ if(id3 == 2){
     $gameScreen.movePicture(honeyTrapValue+1,1,640,384,100,100,250,0,60);
   };
 };
-if(id3 == 3){
+if(decisionModeId == 3){
   var trapPictureName = actor.skillMasteryLevel(valueBusinessSkillId) * 10;
   var trapSceneName = getRandomIndex(101) + trapPictureName + valueRandomSet;
-  if($gameMap.event(id1).event().meta['NoDiscount']){
+  if($gameMap.event(eventId).event().meta['NoDiscount']){
     var successThreshold = 1000;
   } else {
     var successThreshold = 60;
@@ -1823,19 +1823,19 @@ if(id3 == 3){
   $gameVariables.setValue(21,$gameVariables.value(21)+trapInfoText);
     if(trapSceneName >= successThreshold){
       var trapVariant = getRandomIndex(11) + (actor.skillMasteryLevel(valueBusinessSkillId) * 5) + valueRandomSet;
-      $gameSelfSwitches.setVariableValue([$gameMap.mapId(), id1, 10], trapVariant);
+      $gameSelfSwitches.setVariableValue([$gameMap.mapId(), eventId, 10], trapVariant);
       valueCountSet3 = 1;
     };
 };
-if(id3 == 4){
+if(decisionModeId == 4){
   if(valueCountSet3 == 1){
     $gamePlayer.requestBalloon(3);
     AudioManager.playSe({"name":'Z11_QuestClear',"volume":50,"pitch":130,"pan":0});
-    var trapPictureName = $gameSelfSwitches.getVariableValue([$gameMap.mapId(), id1, 10]);
+    var trapPictureName = $gameSelfSwitches.getVariableValue([$gameMap.mapId(), eventId, 10]);
     var honeyTrapValue = `交渉成功！ \\C[10]${trapPictureName}%\\C[0]の値引きが行われます。\n`;
     $gameVariables.setValue(21,$gameVariables.value(21)+honeyTrapValue);
       if(valueCountSet2 == 1){//色仕掛け使用時に値引き成功でセルフAオン
-        $gameSelfSwitches.setValue([$gameMap.mapId(), id1, 'A'], true);
+        $gameSelfSwitches.setValue([$gameMap.mapId(), eventId, 'A'], true);
       };
   } else {
     $gamePlayer.requestBalloon(6);
@@ -1843,20 +1843,20 @@ if(id3 == 4){
     var honeyTrapValue = `交渉失敗…。`;
     $gameVariables.setValue(21,$gameVariables.value(21)+honeyTrapValue);
   };
-$gameSelfSwitches.setValue([$gameMap.mapId(), id1, 'B'], true);
+$gameSelfSwitches.setValue([$gameMap.mapId(), eventId, 'B'], true);
 };
 
 };
 
 //価格と所持金比較。id1に価格でid2が0で所持金1でコイン2で戦貨。id1が0でid2が種別id3がアイテムID。shop_priceComparison(10000,0,0);
-shop_priceComparison = function(id1,id2,itemId){
+shop_priceComparison = function(costAmount,currencyTypeId,itemId){
 
-valuePriceSet1 = id1;
-var id4 = $gameParty.gold();
-if(id1 == 0){
-  if(id2 == 1){valueItems = $dataWeapons};
-  if(id2 == 2){valueItems = $dataArmors};
-  if(id2 == 0){valueItems = $dataItems};
+valuePriceSet1 = costAmount;
+var ownedAmount = $gameParty.gold();
+if(costAmount == 0){
+  if(currencyTypeId == 1){valueItems = $dataWeapons};
+  if(currencyTypeId == 2){valueItems = $dataArmors};
+  if(currencyTypeId == 0){valueItems = $dataItems};
   var comparedPrice = 0;
   if(Number(valueItems[itemId].price) >= 1){
     var comparedPrice = valueItems[itemId].price;
@@ -1868,32 +1868,32 @@ valuePriceSet1 = comparedPrice;
 };
 var priceLabel = `所持金`;
 var currencyLabel = `\\G`;
-if(id1 >= 1 && id2 == 1){
+if(costAmount >= 1 && currencyTypeId == 1){
 var priceLabel = `コイン`;
 var currencyLabel = `枚`;
-var id4 = $gameVariables.value(69);
+var ownedAmount = $gameVariables.value(69);
 };
-if(id1 >= 1 && id2 == 2){
+if(costAmount >= 1 && currencyTypeId == 2){
 var priceLabel = `戦貨`;
 var currencyLabel = `枚`;
-var id4 = $gameParty.numItems($dataItems[10]);
+var ownedAmount = $gameParty.numItems($dataItems[10]);
 };
-if(id4 >= id1){
-  var priceDifference = id4-id1;
-  var priceComparisonText = `${priceLabel}:${id4.toLocaleString()}${currencyLabel} - 支払額:${id1.toLocaleString()}${currencyLabel} = \\C[14]${priceDifference.toLocaleString()}${currencyLabel}\\C[0]…`;
+if(ownedAmount >= costAmount){
+  var priceDifference = ownedAmount-costAmount;
+  var priceComparisonText = `${priceLabel}:${ownedAmount.toLocaleString()}${currencyLabel} - 支払額:${costAmount.toLocaleString()}${currencyLabel} = \\C[14]${priceDifference.toLocaleString()}${currencyLabel}\\C[0]…`;
   CommonPopupManager.showInfo({},priceComparisonText,null);
   AudioManager.playSe({"name":'Shop',"volume":90,"pitch":100,"pan":0});
-  if(id1 >= 1 && id2 == 1){
-    $gameVariables.setValue(69,$gameVariables.value(69) - id1);
+  if(costAmount >= 1 && currencyTypeId == 1){
+    $gameVariables.setValue(69,$gameVariables.value(69) - costAmount);
   } else {
-    if(id1 >= 1 && id2 == 2){
-      $gameParty.gainItem($dataItems[10], -id1);
+    if(costAmount >= 1 && currencyTypeId == 2){
+      $gameParty.gainItem($dataItems[10], -costAmount);
     } else {
-      $gameParty.gainGold(-id1);
+      $gameParty.gainGold(-costAmount);
   }};
   $gameSwitches.setValue(380,true);
 } else {
-  var priceComparisonText = `${priceLabel}:${id4.toLocaleString()}${currencyLabel} < 支払額:${id1.toLocaleString()}${currencyLabel}　所持金が足りなかった…`;
+  var priceComparisonText = `${priceLabel}:${ownedAmount.toLocaleString()}${currencyLabel} < 支払額:${costAmount.toLocaleString()}${currencyLabel}　所持金が足りなかった…`;
   CommonPopupManager.showInfo({},priceComparisonText,null);
   $gameSwitches.setValue(380,false);
 };
@@ -1901,21 +1901,21 @@ if(id4 >= id1){
 };
 
 //ワンオフアイテム購入処理
-item_oneOffBuy = function(id3,id1,id2,id4){
+item_oneOffBuy = function(buyModeId,databaseTypeId,dbEntryId,buyFlag){
 
-if(id1 == 0){valueItems = $dataItems[id2]};
-if(id1 == 1){valueItems = $dataWeapons[id2]};
-if(id1 == 2){valueItems = $dataArmors[id2]};
+if(databaseTypeId == 0){valueItems = $dataItems[dbEntryId]};
+if(databaseTypeId == 1){valueItems = $dataWeapons[dbEntryId]};
+if(databaseTypeId == 2){valueItems = $dataArmors[dbEntryId]};
 if(!valueItems){return};
 var buyPictureId = 101;
 var passiveStateId = 0;
-if(id3 == 1){
-  if(id4 == 0){
+if(buyModeId == 1){
+  if(buyFlag == 0){
     var picturePath = "/img/parallaxes/Scene_ItemsBuy";
     $gameScreen.showPicture(buyPictureId-3,picturePath,1,640,384,100,100,0,0);
     $gameScreen.movePicture(buyPictureId-3,1,640,384,100,100,250,0,40);  
   };
-  if(id4 == 1){
+  if(buyFlag == 1){
     var picturePath = "/img/parallaxes/" + $gameVariables.value(508);
     $gameScreen.showPicture(buyPictureId-3,picturePath,1,640,384,100,100,0,0);
     $gameScreen.movePicture(buyPictureId-3,1,640,384,100,100,250,0,40);  
@@ -1952,26 +1952,26 @@ ${valueItems.description}`);
       picture_fade1(buyPictureId,"157",'162',60,5);
     };
   };
-  if(id1 == 1 || id1 == 2){
+  if(databaseTypeId == 1 || databaseTypeId == 2){
     if(valueItems.traits[0] && valueItems.traits[0].code == 43){
       var picturePath = $dataSkills[valueItems.traits[0].dataId].animationId
       $gameScreen.startAnimation(640, 368+pictureYOffset, picturePath, false);
   }};
 };
-if(id3 == 2){
+if(buyModeId == 2){
   $gameParty.gainItem(valueItems, 1);
   $gameParty.loseGold($gameVariables.value(22));
   var buyPictureId = `\x1bI[${valueItems.iconIndex}]\\C[16]${valueItems.name}\\C[0]を購入した。\\C[1](-${$gameVariables.value(22)}\\G)\\C[0]`;
   CommonPopupManager.showInfo({},buyPictureId,null);
   AudioManager.playSe({"name":'Shop1',"volume":90,"pitch":100,"pan":0});
 };
-if(id3 == 3){//戦闘で勝利
+if(buyModeId == 3){//戦闘で勝利
   $gameParty.gainItem(valueItems, 1);
   valueWordSet0 = `\x1bI[${valueItems.iconIndex}]\\C[16]${valueItems.name}\\C[0]を入手した！`;
   AudioManager.playSe({"name":'Z11_RareTreasureBox',"volume":50,"pitch":120,"pan":0});
   adv_partDirectPlay(18);
 };
-if(id3 == 0){
+if(buyModeId == 0){
   pic_eraseP(0,[buyPictureId-3,buyPictureId-2]);
   picture_fade1(buyPictureId,"fadeOut",'Hscene005',60,5);
   element_particleSet(0,buyPictureId,passiveStateId,pictureYOffset);
@@ -1979,23 +1979,23 @@ if(id3 == 0){
 
 };
 
-gain_itemGainExp1 = function(a,b,itemId,id1){
+gain_itemGainExp1 = function(unusedArg1,actor,itemId,databaseTypeId){
 
-if(id1 == 0){var value = $dataItems[itemId]};
-if(id1 == 1){var value = $dataSkills[itemId]};
+if(databaseTypeId == 0){var value = $dataItems[itemId]};
+if(databaseTypeId == 1){var value = $dataSkills[itemId]};
 if(!value){return};
 if(value.meta['gainExp']){
   var gainExpAmount = Number(value.meta['gainExp']);
 } else {
   var gainExpAmount = 100;
 };
-b.changeExp(b.currentExp()+gainExpAmount, false);
-if(b.subclass()){
-  b.gainExpSubclass(gainExpAmount);
+actor.changeExp(actor.currentExp()+gainExpAmount, false);
+if(actor.subclass()){
+  actor.gainExpSubclass(gainExpAmount);
 };
-var gainExpMessage = `${b.name()}の経験値\\C[2]+${gainExpAmount}\\C[0]　<TotalExp:${b.currentExp()} `;
-if(b.subclass()){
-  gainExpMessage += `TotalExp2:${b._exp[b._subclassId]}>`;
+var gainExpMessage = `${actor.name()}の経験値\\C[2]+${gainExpAmount}\\C[0]　<TotalExp:${actor.currentExp()} `;
+if(actor.subclass()){
+  gainExpMessage += `TotalExp2:${actor._exp[actor._subclassId]}>`;
 } else {
   gainExpMessage += `>`;
 };
@@ -2005,7 +2005,7 @@ if(b.subclass()){
 
 //盗み処理。スキルによる確率処理などがまだ。id1種別id2アイテムIDid3数・steal_direction1(0,51,1);
 //イベント。透明化したNPCを例外処理して目撃させる。超高額アイテムを意図的に盗ませる
-steal_direction1 = function(id1,id2,id3){
+steal_direction1 = function(databaseTypeId,dbEntryId,stealCount){
 
 var actor = $gameActors.actor($gameVariables.value(2));
 if(!actor){return};
@@ -2042,19 +2042,19 @@ for (var y = $gamePlayer.y-searchRadius; y <= $gamePlayer.y+searchRadius; y++) {
                };
            };
 }}}};
-if(id1 == 1){valueItems = $dataWeapons};
-if(id1 == 2){valueItems = $dataArmors};
-if(id1 == 0){valueItems = $dataItems};
-var stealMessage = `\x1bI[${valueItems[id2].iconIndex}]${valueItems[id2].name}を\\C[2]${id3}個\\C[0]盗んだ！`;
+if(databaseTypeId == 1){valueItems = $dataWeapons};
+if(databaseTypeId == 2){valueItems = $dataArmors};
+if(databaseTypeId == 0){valueItems = $dataItems};
+var stealMessage = `\x1bI[${valueItems[dbEntryId].iconIndex}]${valueItems[dbEntryId].name}を\\C[2]${stealCount}個\\C[0]盗んだ！`;
 CommonPopupManager.showInfo({},stealMessage,null);
-$gameParty.gainItem(valueItems[id2], id3);
+$gameParty.gainItem(valueItems[dbEntryId], stealCount);
   if(stealSuccessFlag >= 1){
     var bountyPrice = 0;
-    if(Number(valueItems[id2].price) >= 1){
-      var bountyPrice = valueItems[id2].price;
+    if(Number(valueItems[dbEntryId].price) >= 1){
+      var bountyPrice = valueItems[dbEntryId].price;
     };
-    if(valueItems[id2].meta['Buy Price']){
-      var bountyPrice = Number(valueItems[id2].meta['Buy Price']);
+    if(valueItems[dbEntryId].meta['Buy Price']){
+      var bountyPrice = Number(valueItems[dbEntryId].meta['Buy Price']);
     };
     var bountyCashRate = 1000;
     if($dataWeapons[$gameVariables.value(230)] && $dataWeapons[$gameVariables.value(230)].meta['bountyCashRate']){

@@ -7,7 +7,7 @@
 //(function(){
 
 //中身スクリプト
-scene_joukenNakami = function (id1, itemIndex, occurrenceSwitchOffset, checkSwitchOffset, occurrenceCountVarId, unmetCountVarId) {
+scene_joukenNakami = function (sceneGroupId, itemIndex, occurrenceSwitchOffset, checkSwitchOffset, occurrenceCountVarId, unmetCountVarId) {
 
   const dataItem = $dataItems[itemIndex];
   if (!dataItem || !dataItem.name) return;
@@ -160,8 +160,8 @@ scene_joukenNakami = function (id1, itemIndex, occurrenceSwitchOffset, checkSwit
   event_set_swi = function (metaName, num1, prefix, isSet) {
     if (dataItem.meta[metaName]) {
       const arr = dataItem.meta[metaName].split(',');
-      const arrLen = arr.length;
-      for (let id = 0; id < arrLen; id++) {
+      const switchIdValuesLength = arr.length;
+      for (let id = 0; id < switchIdValuesLength; id++) {
         if (arr[id] == 0) {
           arr[id] = num1;
         } else {
@@ -235,8 +235,8 @@ scene_joukenNakami = function (id1, itemIndex, occurrenceSwitchOffset, checkSwit
       if (!arr[id]) continue;
 
       //conditionCount += 1;
-      const arrIdNum = Number(arr[id]);
-      const item = $dataItems[arrIdNum];
+      const sceneItemId = Number(arr[id]);
+      const item = $dataItems[sceneItemId];
       if (!item) continue;
       const itemMetaEICSwitch = item.meta['EICSwitch'];
       if (itemMetaEICSwitch) {
@@ -262,16 +262,16 @@ scene_joukenNakami = function (id1, itemIndex, occurrenceSwitchOffset, checkSwit
           messageText += `[`;
         };
       };
-      messageText += `\x1bIIN[${arrIdNum}]`;
+      messageText += `\x1bIIN[${sceneItemId}]`;
       lineCount += 1;
       textSubst = $gameParty.hasItem(item);
       if (itemMetaEICSwitch) {
         const itemMetaEICSwitchNum = Number(itemMetaEICSwitch);
         if (itemMetaEICSwitchNum == 103) {
-          textSubst = $gameSwitches.value(arrIdNum + 600);
+          textSubst = $gameSwitches.value(sceneItemId + 600);
         }
         else if (itemMetaEICSwitchNum == 102) {
-          textSubst = $gameSwitches.value(arrIdNum + 900);
+          textSubst = $gameSwitches.value(sceneItemId + 900);
         }
       }
       if (textSubst) {
@@ -737,14 +737,14 @@ scene_joukenNakami = function (id1, itemIndex, occurrenceSwitchOffset, checkSwit
   dataItemMeta = dataItem.meta['EventEraseMain'];
   if (dataItemMeta) {
     const dataItemMetaArray = dataItemMeta.split(',');
-    const arr1 = Number(dataItemMetaArray[0]);
-    const arr2 = Number(dataItemMetaArray[1]);
-    if (arr2 >= 1) {
-      if ($gameVariables.value(arr1) > arr2) {
+    const mainQuestVarId = Number(dataItemMetaArray[0]);
+    const mainQuestProgress = Number(dataItemMetaArray[1]);
+    if (mainQuestProgress >= 1) {
+      if ($gameVariables.value(mainQuestVarId) > mainQuestProgress) {
         cannotExecute = 1;
         messageText += `[メインクエスト進行につき発生不可]`;
       } else {
-        messageText += `[メインクエスト進行＜${arr2}＞で発生不可]`;
+        messageText += `[メインクエスト進行＜${mainQuestProgress}＞で発生不可]`;
       }
       lineCount += 1;
     }
@@ -754,12 +754,12 @@ scene_joukenNakami = function (id1, itemIndex, occurrenceSwitchOffset, checkSwit
   dataItemMeta = dataItem.meta['EventEraseVal'];
   if (dataItemMeta) {
     const dataItemMetaArray = dataItemMeta.split(',');
-    const arr1 = Number(dataItemMetaArray[0]);
-    const arr2 = Number(dataItemMetaArray[1]);
-    if (arr1 >= 1) {
-      textSubst = $dataSystem.variables[arr1];
+    const targetVarId = Number(dataItemMetaArray[0]);
+    const targetVarValue = Number(dataItemMetaArray[1]);
+    if (targetVarId >= 1) {
+      textSubst = $dataSystem.variables[targetVarId];
       textSubst = scene_joukenNakami_clean_prefixes(textSubst);
-      if ($gameVariables.value(arr1) > arr2) {
+      if ($gameVariables.value(targetVarId) > targetVarValue) {
         cannotExecute = 1;
         messageText += `[${textSubst}一定につき発生不可]`;
       } else {
@@ -810,8 +810,8 @@ scene_joukenNakami = function (id1, itemIndex, occurrenceSwitchOffset, checkSwit
       if (marGenScene1 >= 1 && cannotExecute == 0) {
 
         if (marGenScene1 >= 1) {
-          if (id1 == 1) { $gameSwitches.setValue(479, true) };
-          if (id1 == 2) { $gameSwitches.setValue(480, true) };
+          if (sceneGroupId == 1) { $gameSwitches.setValue(479, true) };
+          if (sceneGroupId == 2) { $gameSwitches.setValue(480, true) };
         }
         if (inBattle == 1 && $gameParty.inBattle()) {
           BattleManager._logWindow.push(`addText`, conditionPrefixText);
@@ -897,7 +897,7 @@ scene_joukenNakami = function (id1, itemIndex, occurrenceSwitchOffset, checkSwit
 
 //回想挿話発生条件式。回想scene_jouken(2);。挿話scene_jouken(1);
 //☆☆☆条件追加。<EventSetVal1:0,0>
-scene_joukensettei = function (id1) {
+scene_joukensettei = function (sceneGroupId) {
 
   $gameVariables.setValue(195, 0);//表示時の個数を入れる事でコモンイベントのウィンド数を抑制
 
@@ -933,39 +933,39 @@ scene_joukensettei = function (id1) {
     $gameVariables.setValue(varId4, 0);
   }
 
-  if (id1 == 1) {
+  if (sceneGroupId == 1) {
     setValuesById(479, 367, 401, 500, 800, 900, 517, 518, 517, 518);
   }
-  else if (id1 == 2) {
+  else if (sceneGroupId == 2) {
     setValuesById(480, 369, 501, 600, 500, 600, 504, 505, 504, 505);
   }
   else {
-    console.warn(`id1 is ${id1}! must be 1 or 2!`);
+    console.warn(`id1 is ${sceneGroupId}! must be 1 or 2!`);
   }
 
   for (let i = start; i <= end; i++) {
-    scene_joukenNakami(id1, i, occurrenceSwitchOffset, checkSwitchOffset, occurrenceCountVarId, unmetCountVarId);
+    scene_joukenNakami(sceneGroupId, i, occurrenceSwitchOffset, checkSwitchOffset, occurrenceCountVarId, unmetCountVarId);
   }
 
   const setValuesById1 = (v25, v26, arrVal) => {
     occurrenceCountVarId = v25;//成立数変数
     unmetCountVarId = v26;//未成立数変数
-    arrAdd = arrVal;
+    insertableItemIds = arrVal;
   }
-  let arrAdd;
-  if (id1 == 1) {
+  let insertableItemIds;
+  if (sceneGroupId == 1) {
     setValuesById1(517, 518, valueSouwasceneAddId);
   }
-  else if (id1 == 2) {
+  else if (sceneGroupId == 2) {
     setValuesById1(504, 505, valueHsceneAddId);
   }
   else {
-    console.warn(`id1 is ${id1}! must be 1 or 2!`);
+    console.warn(`id1 is ${sceneGroupId}! must be 1 or 2!`);
   }
 
   //アイテムID<HsceneItem><SouwaItem>
-  if (!Array.isArray(arrAdd)) return;
-  for (const id of arrAdd) {
+  if (!Array.isArray(insertableItemIds)) return;
+  for (const id of insertableItemIds) {
     const item = $dataItems[id];
     if (!item) continue;
     const itemMeta = item.meta;
@@ -973,7 +973,7 @@ scene_joukensettei = function (id1) {
     const addEventCompSwiNum = Number(itemMeta['AddEventCompSwi']);//達成スイッチ
     const addAddEventCommonIdNum = Number(itemMeta['AddAddEventCommonId']);//コモID。並列スイッチも逆算して代入。スクリプト内では使わない
     const addEventParallelSwiNum = Number(itemMeta['AddEventParallelSwi']);//並列スイッチ
-    scene_joukenNakami(id1, id, addEventIncidenceSwiNum, addEventCompSwiNum, occurrenceCountVarId, unmetCountVarId, addAddEventCommonIdNum, addEventParallelSwiNum);
+    scene_joukenNakami(sceneGroupId, id, addEventIncidenceSwiNum, addEventCompSwiNum, occurrenceCountVarId, unmetCountVarId, addAddEventCommonIdNum, addEventParallelSwiNum);
   }
 
   $gameVariables.setValue(195, valueCountSet1);//表示時の個数を入れる事でコモンイベントのウィンド数を抑制
@@ -1010,37 +1010,37 @@ scene_commonIdRec = function (itemId) {
 }
 
 //イベントから挿話シーン発生event_pararelSet(this._eventId,0,1,8);
-event_pararelSet = function (id1, id2, id3, id4) {
+event_pararelSet = function (eventId, offsetX, offsetY, playerDirection) {
 
-  event_charaPreset(id1);
-  event_charaRoot(id1);
-  const event = $gameMap.event(id1);
+  event_charaPreset(eventId);
+  event_charaRoot(eventId);
+  const event = $gameMap.event(eventId);
   if (!event) return;
-  $gameVariables.setValue(161, [$gameMap.mapId(), event._realX + id2, event._realY + id3]);
+  $gameVariables.setValue(161, [$gameMap.mapId(), event._realX + offsetX, event._realY + offsetY]);
   set_playerPosition2(161);
-  if (id4 >= 1) { $gamePlayer.setDirection(id4) };
+  if (playerDirection >= 1) { $gamePlayer.setDirection(playerDirection) };
   if (event.event().meta['EvSceneSet']) {
     const sceneItemId = Number(event.event().meta['EvSceneSet'].split(',')[0]);
-    event_pararelStarting(1, sceneItemId, id1);
+    event_pararelStarting(1, sceneItemId, eventId);
   }
 
 }
 
 var event_pararelStartingCEventIdsArray = [119, 125, 429, 481];
 //並列イベントスイッチオン。id1が0でﾒｲﾝ1でｼｰﾝ挿話,event_pararelStarting(1,501,this._eventId);
-event_pararelStarting = function (id1, id2, id3) {
+event_pararelStarting = function (isCommonEventTarget, targetId, sourceEventId) {
 
   valueCountDefeadSwitche2 = 0;//全滅スイッチオン時に成立判定
   //本体では0に出来ないためここでやっている
-  const array = $gameMap._commonEvents.filter(function (event) {
+  const activeCommonEventIds = $gameMap._commonEvents.filter(function (event) {
     return event.isActive();
   }).map(function (event) {
     return event.event().id;
   });
 
   let isFound = false;
-  for (let i = 0; i < array.length; i++) {
-    const eventId = array[i];
+  for (let i = 0; i < activeCommonEventIds.length; i++) {
+    const eventId = activeCommonEventIds[i];
     if (eventId < 2) continue;
     const cEventSwitchId = $dataCommonEvents[eventId].switchId;
     if (!cEventSwitchId) continue;
@@ -1050,12 +1050,12 @@ event_pararelStarting = function (id1, id2, id3) {
     break;
   }
   if (!isFound) {
-    valueParallelEventId = id3;
-    if (id1 == 0 || (id2 >= 401 && id2 <= 600)) {
-      const targetCommonEvent = $dataCommonEvents[id2];
+    valueParallelEventId = sourceEventId;
+    if (isCommonEventTarget == 0 || (targetId >= 401 && targetId <= 600)) {
+      const targetCommonEvent = $dataCommonEvents[targetId];
       if (targetCommonEvent) $gameSwitches.setValue(targetCommonEvent.switchId, true);
     } else {
-      const parallelTargetItem = $dataItems[id2];
+      const parallelTargetItem = $dataItems[targetId];
       const itemAddEventParallelSwi = parallelTargetItem ? parallelTargetItem.meta['AddEventParallelSwi'] : null;
       if (itemAddEventParallelSwi) {
         const parallelCommonEvent = $dataCommonEvents[Number(itemAddEventParallelSwi)];
@@ -1067,17 +1067,17 @@ event_pararelStarting = function (id1, id2, id3) {
   if (!$gameSwitches.value(29)) {
     const gameVar163 = $gameVariables.value(163);
     if (Array.isArray(gameVar163)) {
-      gameVar163[id2] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-      const gameVar163Id2 = gameVar163[id2];
+      gameVar163[targetId] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+      const gameVar163Id2 = gameVar163[targetId];
       gameVar163Id2[0] = $gameMap.mapId();
       gameVar163Id2[1] = $gamePlayer.characterName();
       gameVar163Id2[2] = $gamePlayer.characterIndex();
       gameVar163Id2[3] = $gamePlayer._realX;
       gameVar163Id2[4] = $gamePlayer._realY;
       gameVar163Id2[5] = $gamePlayer.direction();
-      if (id3) {
-        if (!!$gameMap.event(id3)) {
-          const event = $gameMap.event(id3);
+      if (sourceEventId) {
+        if (!!$gameMap.event(sourceEventId)) {
+          const event = $gameMap.event(sourceEventId);
           gameVar163Id2[6] = event.characterName();
           gameVar163Id2[7] = event.characterIndex();
           gameVar163Id2[8] = event._realX;
@@ -1093,9 +1093,9 @@ event_pararelStarting = function (id1, id2, id3) {
 }
 
 //一時的にキャラグラ記憶ともろもろ設定,id2が0でスタート。1で終了
-Npc_TemporarilySave = function (id1, id2) {
+Npc_TemporarilySave = function (eventId, saveMode) {
 
-  if (id2 == 0) {
+  if (saveMode == 0) {
     valueNpcGuraTemporarilySave = Array(12).fill(0);
     valueNpcGuraTemporarilySave[0] = $gameMap.mapId();
     valueNpcGuraTemporarilySave[1] = $gamePlayer.characterName();
@@ -1103,8 +1103,8 @@ Npc_TemporarilySave = function (id1, id2) {
     valueNpcGuraTemporarilySave[3] = $gamePlayer._realX;
     valueNpcGuraTemporarilySave[4] = $gamePlayer._realY;
     valueNpcGuraTemporarilySave[5] = $gamePlayer.direction();
-    if (!!$gameMap.event(id1)) {
-      const event = $gameMap.event(id1);
+    if (!!$gameMap.event(eventId)) {
+      const event = $gameMap.event(eventId);
       valueNpcGuraTemporarilySave[6] = event.characterName();
       valueNpcGuraTemporarilySave[7] = event.characterIndex();
       valueNpcGuraTemporarilySave[8] = event._realX;
@@ -1117,7 +1117,7 @@ Npc_TemporarilySave = function (id1, id2) {
       if ($gameSwitches.value(i)) { $gameVariables.setValue(320, i) };
     };
   }
-  else if (id2 == 1) {
+  else if (saveMode == 1) {
     if ($gameVariables.value(320) >= 1) {
       for (let i = 13; i <= 15; i++) { $gameSwitches.setValue(i, false) };
       $gameSwitches.setValue($gameVariables.value(320), true);
@@ -1129,12 +1129,12 @@ Npc_TemporarilySave = function (id1, id2) {
 }
 
 //段階シーンを選択肢で表示
-scene_choiceDecision = function (arr1, choiceSwitchId) {//scene_choiceDecision([503,502,501],161);
+scene_choiceDecision = function (choiceItemIds, choiceSwitchId) {//scene_choiceDecision([503,502,501],161);
 
   $gameSwitches.setValue(choiceSwitchId, false);
   let selectedItemId = 0;
   let choiceDescriptionText = ` `;
-  for (const sceneItemId of arr1) {
+  for (const sceneItemId of choiceItemIds) {
     const sceneItem = $dataItems[sceneItemId];
     if (!sceneItem) continue;
     let completionSwitchId = 0; // hope it will be set
