@@ -2426,7 +2426,7 @@ title_battleUp = function (actor) {
     }
 
     const effectParams = currentItem.meta['titleEffect1'].split(',');
-    const effectValue = Number(effectParams[2]);
+    let effectValue = Number(effectParams[2]);
 
     if (!$gameSwitches.value(375)) {
       // Handle conditions when the switch is not active
