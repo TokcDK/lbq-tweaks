@@ -3305,8 +3305,8 @@ enemy_battleSetting = function (troopIndex) {
   const drop_probability = drop_probabilityCalculation(gameTroopMember.level, dropUpItem);
   if (drop_probability >= 90) {
     let stateId = 0;
-    for (const stateId of valueClassStateA) {
-      if (gameTroopMember.isStateAffected(stateId)) { stateId = stateId };
+    for (const classStateId of valueClassStateA) {
+      if (gameTroopMember.isStateAffected(classStateId)) { stateId = classStateId };
     }
     if (stateId >= 1) {
       valueClassState = $dataStates[stateId].meta['classStateDrop'].split(',');
@@ -4949,9 +4949,9 @@ battle_simpleSubjugation = function (subjugationId) {
 };
 
 //state_addbuffdebuff(1,2,user,target,stateId,271);
-state_addbuffdebuff = function (isBuff, buffParamId, user, target, stateId, animationId) {
+state_addbuffdebuff = function (isBuff, requestedBuffParamId, user, target, stateId, animationId) {
 
-  var buffParamId = buffParamId;
+  var buffParamId = requestedBuffParamId;
   var turns = getRandomIndex(3) + 3;
   if (isBuff == 1) {
     target.addBuff(buffParamId, turns);

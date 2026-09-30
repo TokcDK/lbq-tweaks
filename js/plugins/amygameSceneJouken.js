@@ -738,9 +738,9 @@ scene_joukenNakami = function (sceneGroupId, itemIndex, occurrenceSwitchOffset, 
   if (dataItemMeta) {
     const dataItemMetaArray = dataItemMeta.split(',');
     const mainQuestVarId = Number(dataItemMetaArray[0]);
-    const mainQuestProgress = Number(dataItemMetaArray[1]);
-    if (mainQuestProgress >= 1) {
-      if ($gameVariables.value(mainQuestVarId) > mainQuestProgress) {
+const requiredMainQuestProgress = Number(dataItemMetaArray[1]);
+    if (requiredMainQuestProgress >= 1) {
+      if ($gameVariables.value(mainQuestVarId) > requiredMainQuestProgress) {
         cannotExecute = 1;
         messageText += `[メインクエスト進行につき発生不可]`;
       } else {

@@ -1162,7 +1162,7 @@ if(girlMemberCount >= 1){
 };
 
 //ショップの品目指定。shop_preparation1(1,1,0);//種類/ランク/0読み込みのみ1ショップ処理実行valueCountSet3 = 5;//4,6
-shop_preparation1 = function(databaseTypeId,lotteryRarity,sortFlag){
+shop_preparation1 = function(databaseTypeId,targetRarity,sortFlag){
 
 var shopEntries = [];
 if(databaseTypeId == 1){valueItems = $dataWeapons};
@@ -1187,7 +1187,7 @@ for (var i = start; i <= end; i++) {
       };
       if(rankMatchFlag){
         var lotteryRarity = Number(valueItems[i].meta['LotteryRearity']);
-        if(lotteryRarity == lotteryRarity){
+        if(lotteryRarity == targetRarity){
           var shopEntry = [0,0,0,0];
           shopEntry[0] = databaseTypeId;
           shopEntry[1] = i;

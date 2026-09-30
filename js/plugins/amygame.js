@@ -4243,7 +4243,7 @@
   };
 
   //初めて来る街でマップ名表示
-  map_centerDispray = function (pictureId, centerDisplayText) {
+  map_centerDispray = function (pictureId, mapTitleText) {
 
     var screenPictureId = pictureId;
     var backgroundPictureName = 'ScreenBlackOut';
@@ -4252,7 +4252,7 @@
     var backgroundPictureName = 'ScreenCenterTextDisPray';
     $gameScreen.showPicture(screenPictureId + 1, backgroundPictureName, 1, 640, 384, 100, 0, 0, 0);
     $gameScreen.movePicture(screenPictureId + 1, 1, 640, 384, 100, 100, 255, 0, 30);
-    var centerDisplayText = centerDisplayText;
+    var centerDisplayText = mapTitleText;
     $gameScreen.setDTextPicture(`\\f[b]${centerDisplayText}`, 40);
     $gameScreen.setDtextFont('ＭＳ Ｐ明朝');
     pic_1(2, screenPictureId + 3, '', 3, 100, 255, 90, 1280, 768, 0, 0);

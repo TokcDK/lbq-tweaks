@@ -473,9 +473,9 @@ UTSU.PictureBreath6.off(pictureIds);
 }
 
 //ピクチャボタン動作
-picture_bottan1 = function(pictureId){
+picture_bottan1 = function(buttonPictureId){
 
-$gameVariables.setValue(281,pictureId);
+$gameVariables.setValue(281,buttonPictureId);
 $gameVariables.setValue(282,[0,0,0,0,0,0,0,0,0,0,0]);
 if($gameScreen.picture($gameVariables.value(281))){
   $gameVariables.value(282)[2] = $gameScreen.picture($gameVariables.value(281)).x();

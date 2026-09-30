@@ -382,8 +382,8 @@ map_npcPositionSetEvent = function (id, mapId) {
       const bossGuraValues = eventEvent.meta['BossGura'].split(',');
       const enemyData = $dataEnemies[Number(bossGuraValues[1])];
       if (!!enemyData && !!enemyData.meta['BossEnemy']) {
-        const bossGuraValues = enemyData.meta['BossGura'] ? enemyData.meta['BossGura'].split(',') : [20, 30, 0.2];
-        valueBossCharaGura = [id, enemyData.meta['BossEnemy'].split(',')[2], Number(bossGuraValues[0]), Number(bossGuraValues[1]), Number(bossGuraValues[2])];
+        const enemyBossGuraValues = enemyData.meta['BossGura'] ? enemyData.meta['BossGura'].split(',') : [20, 30, 0.2];
+        valueBossCharaGura = [id, enemyData.meta['BossEnemy'].split(',')[2], Number(enemyBossGuraValues[0]), Number(enemyBossGuraValues[1]), Number(enemyBossGuraValues[2])];
         boss_charaGuraCGSet(valueBossCharaGura);
       };
     }
@@ -624,7 +624,7 @@ if(!!$gameMap.event(valueBossCharaGura[0])) {
 
 var map_npcRespawnNpcDirections = [2, 4, 6, 8];
 //NPC動的生成。0マップ最初。1任意タイミング
-map_npcRespawn = function(respawnModeId,sourceEventId){
+map_npcRespawn = function(respawnModeId, requestedSourceEventId){
 
 let spawnCount = 1;
 if(valueRegionMapArray[spawnCount] < 1) return;
@@ -653,8 +653,8 @@ spawnCount < 1 ||
 $gameVariables.value(202).some(function (id) { return $gameMap.mapId() == id })) return;
 
   for (let spawnIndex = 1; spawnIndex <= spawnCount; spawnIndex++) {
-    let sourceEventId = sourceEventId;
-    if(sourceEventId == 0){
+    let sourceEventId = requestedSourceEventId;
+    if(requestedSourceEventId == 0){
       map_npcGraphicSet();
       sourceEventId = [52,55][getRandomIndex(2)];//テンプレ元イベントID
     }

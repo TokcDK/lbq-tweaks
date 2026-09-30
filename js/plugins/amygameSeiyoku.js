@@ -68,23 +68,23 @@ h_BattleEcstasyDirect = function () {
 };
 
 //相手とＨ済みの場合に表示するためのスクリプト
-h_keikenhyouji1 = function (resultVarId, partnerWeaponId) {
+h_keikenhyouji1 = function (resultVarId, requestedPartnerWeaponId) {
 
-  var partnerWeaponId = partnerWeaponId;
-  if (!$dataWeapons[partnerWeaponId] || !$gameActors.actor(21)) return;
-  if ($gameVariables.value(353)[partnerWeaponId - 300] != 0) {
-    $gameActors.actor(21).setName(`\x1bnnp[${partnerWeaponId}]`);
+var partnerWeaponId = requestedPartnerWeaponId;
+  if (!$dataWeapons[requestedPartnerWeaponId] || !$gameActors.actor(21)) return;
+  if ($gameVariables.value(353)[requestedPartnerWeaponId - 300] != 0) {
+    $gameActors.actor(21).setName(`\x1bnnp[${requestedPartnerWeaponId}]`);
   } else {
-    $gameActors.actor(21).setName($dataWeapons[partnerWeaponId].name);
+    $gameActors.actor(21).setName($dataWeapons[requestedPartnerWeaponId].name);
   };
-  valueScenePartnerId = partnerWeaponId;
+  valueScenePartnerId = requestedPartnerWeaponId;
   if ($gameVariables.value($gameVariables.value(20) + 360)[partnerWeaponId - 100] >= 1) {
     h_partnerFullName(22, partnerWeaponId);
-    var partnerDescription = $dataWeapons[partnerWeaponId].description;
+    var partnerDescription = $dataWeapons[requestedPartnerWeaponId].description;
     if (partnerDescription == 0) {
       var partnerInfoText = `\n`;
     } else {
-      var partnerInfoText = `${$dataWeapons[partnerWeaponId].description}\n`;
+      var partnerInfoText = `${$dataWeapons[requestedPartnerWeaponId].description}\n`;
     };
     var partnerName = $gameVariables.value(22);
     partnerInfoText += `\n${partnerName}との\\C[27]Ｈ回数：${$gameVariables.value($gameVariables.value(20) + 360)[partnerWeaponId - 100]}\\C[0]`
