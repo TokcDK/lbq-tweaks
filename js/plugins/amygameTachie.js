@@ -67,6 +67,7 @@ tachie_clothReflect = function (actorId) {
   if (!$gameSwitches.value(29)) {
     const targetClothingData = $gameVariables.value(actorId + 540);
     const sourceClothingData = $gameVariables.value(actorId + 440);
+    if (!targetClothingData || !sourceClothingData) return;
     for (var i = 0; i <= 42; i++) {
       targetClothingData[i] = sourceClothingData[i];
     }
@@ -94,9 +95,10 @@ picTachie_move1 = function (picId, offsetX, offsetY, scaleOffsetX, scaleOffsetY,
 //衣装状態でスイッチオンオフ.<EvStartCloth:1,1>と併用
 tachie_switchOnOff = function (id) {
 
-  if (id == 1) {
-    $gameSwitches.setValue(601, $gameVariables.value(440 + id)[20] == 0);
-  }
+  if (id !== 1) return;
+  const clothingData = $gameVariables.value(440 + id);
+  if (!clothingData) return;
+  $gameSwitches.setValue(601, clothingData[20] == 0);
 
 };
 
@@ -253,7 +255,7 @@ function checkDollStateTachieDousa(actionType, dollStateId) {
   let flag = 0;
   if (actionItemIdsTachieDousa.some(function (actionItem) { return actionType === actionItem; })) {
     const actor = $gameActors.actor($gameVariables.value(20));
-    if (actor.isStateAffected(dollStateId)) {
+    if (actor && actor.isStateAffected(dollStateId)) {
       flag = 1;
     }
   }
@@ -307,12 +309,14 @@ function processCostumeChangeAnimationAtype0TachieDousa(actorParameter, showCost
         tachie_settei2();
       }
       const targetPic = $gameScreen.picture(targetPicId);
-      targetPic._origin = originalOrigin;
-      targetPic._x = originalX;
-      targetPic._y = originalY;
-      targetPic._scaleX = originalScaleX;
-      targetPic._scaleY = originalScaleY;
-      targetPic._opacity = 0;
+      if (targetPic) {
+        targetPic._origin = originalOrigin;
+        targetPic._x = originalX;
+        targetPic._y = originalY;
+        targetPic._scaleX = originalScaleX;
+        targetPic._scaleY = originalScaleY;
+        targetPic._opacity = 0;
+      }
     } else {
       // Otherwise, erase target picture and then show a new picture
       let targetPic = $gameScreen.picture(targetPicId);
@@ -320,10 +324,9 @@ function processCostumeChangeAnimationAtype0TachieDousa(actorParameter, showCost
         $gameScreen.erasePicture(targetPicId);
       }
       if (typeof actorParameter === 'string' && actorParameter.trim() !== '') {
-        console.debug("tachie_dousa: New picture path: " + "/img/tachies/" + actorParameter);
         $gameScreen.showPicture(
           targetPicId,
-          "/img/tachies/" + actorParameter, // asdf, warn: was crash because of missing image path setup here!
+          "/img/tachies/" + actorParameter,
           originalOrigin,
           originalX,
           originalY,
@@ -365,7 +368,9 @@ function processCostumeChangeAnimationAtype0TachieDousa(actorParameter, showCost
     if (dynamicallyGeneratedEventIds !== 0 && dynamicallyGeneratedEventIds[actorId] >= 1) {
       const event = $gameMap.event(dynamicallyGeneratedEventIds[actorId]);
       const actor = $gameActors.actor(actorId);
-      event.setImage(actor.characterName(), actor.characterIndex());
+      if (event && actor) {
+        event.setImage(actor.characterName(), actor.characterIndex());
+      }
     }
   }
 }
@@ -390,19 +395,19 @@ function calculateScaleAndPositionTachieDousa(actorParameter, targetPicId, expre
     picScaleY = picScaleX = scale;
     picY = y;
     
-    if (actorParameter.match(/SS/)) {
+    if (String(actorParameter).match(/SS/)) {
       const { scale, y } = scaleConfigSSTachieDousaMap[isScaled];
       picScaleY = picScaleX = scale;
       picY = y;
     }
-    if (actorParameter.match(/Upper/)) {
+    if (String(actorParameter).match(/Upper/)) {
       picY = 384;
     }
-    if (actorParameter.match(/Scale/)) {
+    if (String(actorParameter).match(/Scale/)) {
       picScaleX = 100;
       picY = 384;
     }
-    if (actorParameter.match(/State/)) {
+    if (String(actorParameter).match(/State/)) {
       picScaleY = picScaleX = 100;
       picY = 384;
     }
@@ -426,13 +431,17 @@ function animatePictureAtype1TachieDousa(targetPicId, actorParameter, sourcePicI
     else initialX = 100; // Default
 
     // Show a new picture using actorParameter as image name
-    $gameScreen.showPicture(targetPicId, "/img/tachies/" + actorParameter, 1, initialX, picY, picScaleX, picScaleY, 0, 0);
+    if (typeof actorParameter === 'string' && actorParameter.trim() !== '') {
+      $gameScreen.showPicture(targetPicId, "/img/tachies/" + actorParameter, 1, initialX, picY, picScaleX, picScaleY, 0, 0);
+    } else {
+      console.warn("Invalid actorParameter for image path:", actorParameter);
+      $gameScreen.erasePicture(targetPicId);
+    }
   }
 
   // Cache target picture attributes for consistency
   const targetPic = $gameScreen.picture(targetPicId);
   if(!targetPic) {
-    const test = $gameScreen.picture(sourcePicId);
     return;
   }
   targetPic._origin = 1;
@@ -501,7 +510,9 @@ function processCostumeChangeAtype2TachieDousa(targetPicId, changeCostumeId, cha
     if ($gameVariables.value(292)[$gameVariables.value(20)] >= 1) {
       const event = $gameMap.event($gameVariables.value(292)[$gameVariables.value(20)]);
       const actor = $gameActors.actor($gameVariables.value(20));
-      event.setImage(actor.characterName(), actor.characterIndex());
+      if (event && actor) {
+        event.setImage(actor.characterName(), actor.characterIndex());
+      }
     }
   }
 
@@ -535,12 +546,14 @@ function updateStandingPictureAtype3TachieDousa(targetPicId) {
   }
   // Restore target picture properties from cached values
   const targetPic = $gameScreen.picture(targetPicId);
-  targetPic._origin = valueTacieSet[0];
-  targetPic._x = valueTacieSet[1];
-  targetPic._y = valueTacieSet[2];
-  targetPic._scaleX = valueTacieSet[3];
-  targetPic._scaleY = valueTacieSet[4];
-  targetPic._opacity = valueTacieSet[5];
+  if (targetPic) {
+    targetPic._origin = valueTacieSet[0];
+    targetPic._x = valueTacieSet[1];
+    targetPic._y = valueTacieSet[2];
+    targetPic._scaleX = valueTacieSet[3];
+    targetPic._scaleY = valueTacieSet[4];
+    targetPic._opacity = valueTacieSet[5];
+  }
   // Finalize picture settings with a set function (likely updating fade and opacity)
   pic_set(targetPicId, 1, 255, 10);
   // Clear cached temporary values
@@ -551,7 +564,9 @@ function updateStandingPictureAtype3TachieDousa(targetPicId) {
 kisekae_tyokusetusitei = function (id1, id2) {
 
   const actor = $gameActors.actor($gameVariables.value(20));
+  if (!actor) return;
   $gameVariables.setValue(19, id1);
+  if (!$dataItems[id1]) return;
   if (!$gameParty.hasItem($dataItems[id1])) {
     $gameParty.gainItem($dataItems[id1], 1);
     for (var i = 1; i <= 9; i++) {
@@ -605,6 +620,10 @@ kisekae_naibusyori1 = function () {
   const item_gameVar19 = $dataItems[gameVar19];
   const clothTypeId460 = 460;
 
+  if (!item_gameVar19) return;
+  const actorClothingData = $gameVariables.value(gameVar20_440);
+  if (!actorClothingData) return;
+
   $gameVariables.value(gameVar20_440)[0] = 0;
   if (item_gameVar19.meta['TotalCloth']) {
     $gameVariables.value(gameVar20_440)[41] = Number(item_gameVar19.meta['TotalCloth']);
@@ -643,24 +662,21 @@ kisekae_naibusyori1 = function () {
 
 //☆☆立ち絵設定。本体
 tachie_settei2 = function () {
-  console.debug("tachie_settei2: Entering tachie_settei2");
 
   // Get actor information and datas
   const actorId = $gameVariables.value(20);
-  console.debug(`tachie_settei2: Actor ID: ${actorId}`);
   const gameActor = $gameActors.actor(actorId);
-  console.debug(`tachie_settei2: Actor name: ${gameActor.name()}`);
+  if (!gameActor) return;
 
   tachie_settei3(gameActor);
-
-  console.debug("tachie_settei2: tachie_settei2 completed successfully");
 }
 
 tachie_settei3 = function (gameActor) {
 
+  if (!gameActor) return;
+
   // was purpose to optimize by exclude not inbattle actors but it case new game crash, reverted, remove this commented later
   // if (!$gameParty.battleMembers().includes(gameActor)) {
-  //   console.debug("tachie_settei3: Actor not in battle party! Skip..");
   //   return;
   // }
   const actorId = gameActor.actorId();
@@ -668,25 +684,20 @@ tachie_settei3 = function (gameActor) {
   const actorClothingData = $gameVariables.value(actorClothingDataId);
 
   // Reset temporary clothing variables (561-600)
-  console.debug("tachie_settei3: Resetting temporary clothing variables (561-600)");
   for (let variableIndex = 561; variableIndex <= 600; variableIndex++) {
     $gameVariables.setValue(variableIndex, 0);
   }
 
   // Load current clothing data from actor to working variables (461-500)
-  console.debug("tachie_settei3: Loading current clothing data from actor");
   for (let clothingIndex = 1; clothingIndex <= 40; clothingIndex++) {
     $gameVariables.setValue(clothingIndex + 460, actorClothingData[clothingIndex]);
   }
 
   // Only process further for female characters
-  console.debug("tachie_settei3: Only process further for female characters");
   if (isGirl(gameActor)) {
-    console.debug("tachie_settei3: Actor is female, processing female-specific logic");
 
     // Handle doll state - store current clothing in temp variables and clear current
     if (gameActor.isStateAffected(valueDollStateId)) {
-      console.debug("tachie_settei3: Actor is in doll state, saving clothing to temporary storage and clearing current clothing");
 
       // Save clothing to temporary storage (561-600)
       for (let clothingIndex = 1; clothingIndex <= 40; clothingIndex++) {
@@ -698,33 +709,22 @@ tachie_settei3 = function (gameActor) {
         $gameVariables.setValue(clothingIndex + 460, 0);
       }
       $gameVariables.setValue(1 + 460, 3); // Set body type
-      console.debug("tachie_settei3: Doll state processing complete: Clothing cleared and body type set");
     }
     else { // Normal character processing
-      console.debug("tachie_settei3: Actor is not in doll state, processing normal female character");
       rosyutu_genkai1(gameActor); // Calculate exposure limits
-      console.debug("tachie_settei3: Calculated exposure limits");
       rosyutu_genzai1(gameActor.actorId()); // Calculate current exposure
-      console.debug("tachie_settei3: Calculated current exposure");
 
       // Apply custom pose/expression settings if not in specified state
       if (!gameActor.isStateAffected(23)) {
-        console.debug("tachie_settei3: Actor not affected by state 23 (Forced costume setting), applying tachie_settei1");
         tachie_settei1(gameActor);
-      } else {
-        console.debug("tachie_settei3: Actor is affected by state 23, skipping custom pose/expression settings");
       }
     }
-  } else {
-    console.debug("tachie_settei3: Actor is not female, skipping female-specific clothing processing");
   }
 
   // Process internal tachie display data
-  console.debug("tachie_settei3: Processing internal tachie display data with tachie_naibusyori2");
   tachie_naibusyori2(gameActor);
 
   // Restore any temporary clothing that was saved
-  console.debug("tachie_settei3: Restoring temporary clothing values from storage (561-600) if present");
   for (let clothingIndex = 1; clothingIndex <= 40; clothingIndex++) {
     const temporaryClothingData = $gameVariables.value(clothingIndex + 560);
     if (temporaryClothingData >= 1) {
@@ -733,18 +733,15 @@ tachie_settei3 = function (gameActor) {
   }
 
   // Update actor's clothing data from working variables
-  console.debug("tachie_settei3: Updating actor's clothing data from working variables (461-500)");
   for (let clothingIndex = 1; clothingIndex <= 40; clothingIndex++) {
     actorClothingData[clothingIndex] = $gameVariables.value(clothingIndex + 460);
   }
 
   // Update character graphics
-  console.debug("tachie_settei3: Updating character graphics via charagra_henkou1");
   charagra_henkou1(actorId);
 
   // Update clothing-related global values for female characters
   if (isGirl(gameActor)) {
-    console.debug("tachie_settei3: Updating global clothing variables for female actor");
     valueLiningCloth[actorId] = actorClothingData[2];
     valueBackHairCloth[actorId] = gameActor.isStateAffected(23) ? 1 : actorClothingData[4];
     valueCoatCloth[actorId] = actorClothingData[28];
@@ -761,6 +758,9 @@ charagra_henkou1 = function (actorId) {
 
   // Get actor reference
   const actor = $gameActors.actor(actorId);
+
+  // Return early if actor wasn't found
+  if (!actor) return;
 
   // Return early if actor isn't female
   if (!isGirl(actor)) return;
@@ -796,19 +796,27 @@ set_charachip_graphics = function (itemMeta) {
 charagra_choice1 = function (id1) {
 
   const actor = $gameActors.actor(id1);
+  if (!actor) return;
 
   if (actor.isStateAffected(23)) {
-    const itemMeta = $dataItems[$gameVariables.value(id1 + 440)[0]].meta;
-    set_charachip_graphics(itemMeta);
+    const currentItem = $dataItems[$gameVariables.value(id1 + 440)[0]];
+    if (currentItem) {
+      const itemMeta = currentItem.meta;
+      set_charachip_graphics(itemMeta);
+    }
 
   } else {
-    const exposureValue = $gameVariables.value(id1 + 380)[4];
-    let currentCostumeItemId = $gameVariables.value(id1 + 440)[0];//0アイテムID
+    const exposureData = $gameVariables.value(id1 + 380);
+    const charachipDataArr = $gameVariables.value(id1 + 440);
+    if (!exposureData || !charachipDataArr) return;
+    const exposureValue = exposureData[4];
+    let currentCostumeItemId = charachipDataArr[0];//0アイテムID
     //var value2 = $gameVariables.value(id1+440)[41];//41会話グラ用指定ID
-    set_charachip_graphics($dataItems[zenravalueId].meta);
+    const zenraItem = $dataItems[zenravalueId];
+    if (!zenraItem) return;
+    set_charachip_graphics(zenraItem.meta);
 
     if (exposureValue <= 9) {
-      const charachipDataArr = $gameVariables.value(id1 + 440);
       charachipDataArr[0] = 0;
       charachipDataArr[41] = 1;
       currentCostumeItemId = 0;
@@ -816,7 +824,7 @@ charagra_choice1 = function (id1) {
     if (currentCostumeItemId == 0 && exposureValue >= 26) {
       //現在衣装を呼び出し
       for (let i = 1; i <= 40; i++) {
-        $gameVariables.setValue(i + 460, [i]);
+        $gameVariables.setValue(i + 460, i);
       };
       let array = Array(21).fill(0);//21
       const itemsCount = $dataItems.length;
@@ -871,7 +879,7 @@ charagra_choice1 = function (id1) {
       }
     }
 
-    if (currentCostumeItemId >= 1) {
+    if (currentCostumeItemId >= 1 && $dataItems[currentCostumeItemId]) {
       set_charachip_graphics($dataItems[currentCostumeItemId].meta);
     }
   };
@@ -879,15 +887,21 @@ charagra_choice1 = function (id1) {
 
 };
 
+// tachie_clear is not defined anywhere, warn only once instead of on every refresh
+let warnedMissingTachieClearTachieNaibusyori2 = false;
+function warnMissingTachieClearTachieNaibusyori2() {
+  if (warnedMissingTachieClearTachieNaibusyori2) return;
+  warnedMissingTachieClearTachieNaibusyori2 = true;
+  console.warn("use missing tachie_clear function");
+}
+
 //☆☆立ち絵内部処理。本体
 tachie_naibusyori2 = function (gameActor) {
   // Cache frequently used variables
   const actorId = gameActor.actorId();// $gameVariables.value(20);
-  console.debug(`tachie_naibusyori2: Retrieved actorId = ${actorId}`);
   const actorCharName = 'actor' + actorId;
-  console.debug(`tachie_naibusyori2: actorCharName set to ${actorCharName}`);
   const dataActor = gameActor.actor(); // $dataActors[actorId];
-  console.debug(`tachie_naibusyori2: actor.name= ${dataActor.name}`);
+  if (!dataActor) return;
 
   // Set character name for standing image
   $gameVariables.setValue(118, actorCharName);
@@ -899,15 +913,10 @@ tachie_naibusyori2 = function (gameActor) {
   //   ? actorPicId 
   //   : Number(dataActor.meta['tachiePicId']);
   const picId = Number(dataActor.meta['tachiePicId']); // after input gameActor added we get picId only from dataActor
-  //console.debug(`tachie_naibusyori2: isSwitch90On determined as ${isSwitch90On}`);
-  //console.debug(`tachie_naibusyori2: actorPicId determined as ${actorPicId}`);
-  //console.debug(`tachie_naibusyori2: dataActor.meta['tachiePicId'] determined as ${dataActor.meta['tachiePicId']}`);
-  console.debug(`tachie_naibusyori2: picId determined as ${picId}`);
   $gameVariables.setValue(117, picId);
 
   // Calculate the zero-based tachie number
   const tachieIndex = Math.max(-1, picId - 1);
-  console.debug(`tachie_naibusyori2: tachieIndex calculated as ${tachieIndex}`);
 
   // Get references to avoid repeated lookups
   const tachieData = $TKMvar.tachie;
@@ -916,51 +925,33 @@ tachie_naibusyori2 = function (gameActor) {
 
   // Initialize character parts if switch 20 is ON
   if ($gameSwitches.value(20)) {
-    console.debug("tachie_naibusyori2: Switch 20 is ON! Initializing character parts.");
-    // Log current clothing variable values before initialization
-    for (let j = 1; j <= 40; j++) {
-      console.debug(`Before runTachieLoop - Variable ${j + 460}: ${$gameVariables.value(j + 460)}`);
-    }
     // Process each clothing part
     runTachieLoop(1, 40, j => {
-      const val = $gameVariables.value(j + 460);
-      console.debug(`runTachieLoop: For part ${j}, value = ${val}`);
-      return val;
+      return $gameVariables.value(j + 460);
     }, j => {
-      const condition = $gameVariables.value(j + 460) >= 0;
-      console.debug(`runTachieLoop: Condition for part ${j} is ${condition}`);
-      return condition;
+      return $gameVariables.value(j + 460) >= 0;
     });
 
     // Clear previous picture if it exists
     if (tachieIndex !== -1 && tachieIndex < picData.length) {
-      console.debug(`tachie_naibusyori2: Erasing previous picture with picNum ${picData[tachieIndex].picNum}`);
       $gameScreen.erasePicture(picData[tachieIndex].picNum);
-    } else {
-      console.debug("tachie_naibusyori2: tachieIndex out of bounds, cannot erase previous picture.");
     }
 
     // Initialize character parts array
     charList[actorCharName] = Array(tachieData.MaxLayer).fill(0);
-    console.debug(`tachie_naibusyori2: Initialized charList for ${actorCharName} with ${tachieData.MaxLayer} layers.`);
   }
 
   // Handle state 19 (clear standing picture)
-  if ($gameActors.actor(actorId).isStateAffected(19)) {
-    console.debug(`tachie_naibusyori2: Actor ${actorId} is in state 19. Clearing standing picture.`);
+  if (gameActor.isStateAffected(19)) {
     //tachie_clear(picId); // undefined function
-    console.warn("use missing tachie_clear function");
+    warnMissingTachieClearTachieNaibusyori2();
     runTachieLoop(1, 40, () => {
-      console.debug("runTachieLoop: Clearing clothing part, returning '0'");
       return "0";
     });
   } else {
-    console.debug(`tachie_naibusyori2: Normal case for actor ${actorId}. Applying clothing parts.`);
     // Normal case: apply clothing parts
     runTachieLoop(1, 40, j => {
-      const currVal = $gameVariables.value(j + 460);
-      console.debug(`runTachieLoop: For part ${j}, current value = ${currVal}`);
-      return currVal;
+      return $gameVariables.value(j + 460);
     });
   }
 
@@ -968,10 +959,8 @@ tachie_naibusyori2 = function (gameActor) {
   if (tachieIndex !== -1) {
     // Update character data if different from current
     const currentChar = tachieIndex < picData.length ? picData[tachieIndex].char : null;
-    console.debug(`tachie_naibusyori2: currentChar = ${currentChar}, desired = ${actorCharName}`);
 
     if (currentChar !== actorCharName && actorCharName in charList && tachieIndex < picData.length) {
-      console.debug(`tachie_naibusyori2: Updating picData at index ${tachieIndex} with new char ${actorCharName}`);
       picData[tachieIndex].char = actorCharName;
       picData[tachieIndex].bitmap = [];
       tachieData.preloadBitmap(tachieIndex);
@@ -983,13 +972,8 @@ tachie_naibusyori2 = function (gameActor) {
       const name = "TKMtachie_" + picData[tachieIndex].char + "_";
       const x = picData[tachieIndex].x;
       const y = picData[tachieIndex].y;
-      console.debug(`tachie_naibusyori2: Showing picture with picNum ${pictureId}, name ${name}, at (${x}, ${y})`);
       $gameScreen.showPicture(pictureId, name, 0, x, y, 85, 85, 0, 0);
-    } else {
-      console.debug("tachie_naibusyori2: Picture data not found or character not set.");
     }
-  } else {
-    console.debug("tachie_naibusyori2: tachieIndex is -1, skipping standing picture display.");
   }
 };
 
@@ -1091,13 +1075,18 @@ tachie_syoukyo1 = function (tachiePicId) {
 //☆☆立ち絵表示
 tachie_hyouji1 = function (actorId) {
   const gameActor = $gameActors.actor(actorId);
+  if (!gameActor) return;
   tachie_hyouji2(gameActor);
 }
 tachie_hyouji2 = function (gameActor) {
 
+  if (!gameActor) return;
+  const dataActor = gameActor.actor();
+  if (!dataActor) return;
+
   const actorId = gameActor.actorId();
   $gameVariables.setValue(112, actorId);
-  const tachiePicId = Number(gameActor.actor().meta['tachiePicId']);
+  const tachiePicId = Number(dataActor.meta['tachiePicId']);
   $gameVariables.setValue(300, tachiePicId);
 
   let stateEffectCount = 1;
@@ -1227,6 +1216,7 @@ tachie_hyouji2 = function (gameActor) {
   //const CharList = $TKMvar.tachie.CharList;
   //const MaxLayer = $TKMvar.tachie.MaxLayer;
   const PicData = $TKMvar.tachie.PicData;
+  if (tachieIndex < 0 || tachieIndex >= PicData.length) return;
   const pictureId = PicData[tachieIndex]["picNum"];
   const characterName = PicData[tachieIndex]["char"];
   const nameStr = "TKMtachie_" + characterName + "_";
@@ -1239,7 +1229,7 @@ tachie_hyouji2 = function (gameActor) {
   $gameScreen.showPicture(pictureId, nameStr, 1,
     $gameVariables.value(101), $gameVariables.value(102),
     $gameVariables.value(103), $gameVariables.value(104), $gameVariables.value(149), 0);
-  if ($gameActors.actor(actorId).isStateAffected(602) && !$gameSwitches.value(150)) {
+  if (gameActor.isStateAffected(602) && !$gameSwitches.value(150)) {
     $gameScreen.showPicture(7, "/img/tachies/" + 'actor' + actorId + '_1_3', 1,
       $gameVariables.value(101) + horizontalOffset, $gameVariables.value(102) + afterimageYOffset,
       $gameVariables.value(103), $gameVariables.value(104), effectOverlayOpacity, 1);
@@ -1488,13 +1478,15 @@ function applyTemporaryStateEffectsTachieSettei1(actor) {
     if (!actor.isStateAffected(tempStateId)) continue;
 
     // Parse state metadata to get part ID and new value
-    const tachieChangeTempArr = $dataStates[tempStateId].meta['TachieChangeStateTemporary'].split(',');
+    const tachieChangeTempMeta = $dataStates[tempStateId].meta['TachieChangeStateTemporary'];
+    if (!tachieChangeTempMeta) continue;
+    const tachieChangeTempArr = tachieChangeTempMeta.split(',');
     const targetPartId = Number(tachieChangeTempArr[0]);
     const newPartValue = Number(tachieChangeTempArr[1]);
 
     // Apply the change to the target part
     const targetVariableId = TACHIE_SETTEI1_BASE_VAR_ID + targetPartId;
-    $gameVariables.setValue(targetVariableId, $gameVariables.value(targetVariableId)); // Store original value
+    $gameVariables.setValue(targetVariableId + 100, $gameVariables.value(targetVariableId)); // Store original value
     $gameVariables.setValue(targetVariableId, newPartValue); // Set new value
   }
 }
@@ -1880,6 +1872,7 @@ clothes_hason1 = function (array, id1) {
 clothes_hason2 = function (id1, id2) {
 
   const item = $dataItems[$gameVariables.value(244)];
+  if (!item) return;
   const itemClothSwitch = item.meta['ClothSwitch'];
   if (!itemClothSwitch) return;
 
@@ -1887,7 +1880,8 @@ clothes_hason2 = function (id1, id2) {
   const clothSwitchId = Number(itemClothSwitch);
   let brokenPiecePicId;
   if (id1 == 0) {
-    brokenPiecePicId = Number($dataActors[$gameVariables.value(20)].meta['tachiePicId']);
+    const dataActor = $dataActors[$gameVariables.value(20)];
+    brokenPiecePicId = dataActor ? Number(dataActor.meta['tachiePicId']) : 0;
   } else {
     brokenPiecePicId = id1;
   }
@@ -2026,6 +2020,7 @@ clothes_change2 = function () {
   const globalEicId = 400;
   const itemsCount = $dataItems.length;
   const item19 = $dataItems[$gameVariables.value(19)];
+  if (!item19) return;
 
   $gameScreen.showPicture(100, '/img/tachies/actor' + actorId + '_5_99', 1, 1200, 550, 20, 20, 200, 0);
   valueRandomSet = Array(201).fill(0);

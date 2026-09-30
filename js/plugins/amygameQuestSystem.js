@@ -90,7 +90,16 @@ var QuestSystem = (function() {
   }
 
   function isActorAvailable(actor) {
+    if (!actor) return false;
     return actor.isLearnedSkill(18) && !actor.isStateAffected(valueDollStateId);
+  }
+
+  //変数が未設定/配列でない場合に index アクセスで落ちないためのヘルパ
+  //未設定時の比較結果は従来(例外)ではなく undefined になる
+  function getArrayValue(varId, index) {
+    var arr = $gameVariables.value(varId);
+    if (!Array.isArray(arr)) return undefined;
+    return arr[index];
   }
 
   function createConditionContext(item, index, offset) {
@@ -135,8 +144,6 @@ var QuestSystem = (function() {
     process: function(item, ctx) {
       if (!item.meta['QuestSetRank']) return;
 
-      console.log('Processing QuestSetRank for item ID:', item.id);
-      
       var rankValue = Number(item.meta['QuestSetRank']);
       if (rankValue < 1) return;
       
@@ -146,7 +153,9 @@ var QuestSystem = (function() {
       if (rankValue >= 2) itemId = 694;
       if (rankValue >= 3) itemId = 695;
       
-      var isMet = $gameParty.hasItem($dataItems[itemId], true);
+      var rankItem = $dataItems[itemId];
+      if (!rankItem) return;
+      var isMet = $gameParty.hasItem(rankItem, true);
       ctx.startTotal++;
       if (isMet) ctx.startMet++;
       ctx.startText += isMet ? MARKERS.SUCCESS + '\n' : MARKERS.FAILURE + '\n';
@@ -160,8 +169,9 @@ var QuestSystem = (function() {
       if (!item.meta['QuestSetPerspective']) return;
       
       var perspectiveId = Number(item.meta['QuestSetPerspective']);
-      if (perspectiveId >= 1 && perspectiveId !== getCurrentActorId()) {
-        ctx.startText += '[' + $gameActors.actor(perspectiveId).name() + '視点]\n';
+      var perspectiveActor = perspectiveId >= 1 ? $gameActors.actor(perspectiveId) : null;
+      if (perspectiveId >= 1 && perspectiveId !== getCurrentActorId() && perspectiveActor) {
+        ctx.startText += '[' + perspectiveActor.name() + '視点]\n';
       }
       
       var isMet = $gameSwitches.value(perspectiveId + 440);
@@ -193,6 +203,7 @@ var QuestSystem = (function() {
         if (actorId === 0) actorId = getCurrentActorId();
         
         var actor = $gameActors.actor(actorId);
+        if (!actor) continue;
         
         if (actorId !== getCurrentActorId()) {
           ctx.startText += '[' + actor.name() + ']';
@@ -305,7 +316,8 @@ var QuestSystem = (function() {
         var paramType = Number(arr[1]);
         var targetValue = Number(arr[2]);
         var actor = $gameActors.actor(actorId);
-        var currentValue = $gameVariables.value(actorId + 380)[paramType];
+        if (!actor) continue;
+        var currentValue = getArrayValue(actorId + 380, paramType);
         var isMet;
         
         if (paramType === 4) { // 露出度 - less than or equal
@@ -333,10 +345,13 @@ var QuestSystem = (function() {
       var actorId = Number(arr[0]);
       var skillId = Number(arr[1]) || DEFAULT_VALUES.SKILL_ID;
       var actor = actorId >= 1 ? $gameActors.actor(actorId) : getCurrentActor();
+      if (!actor) return;
+      var skill = $dataSkills[skillId];
+      if (!skill) return;
       
       if (skillId !== DEFAULT_VALUES.SKILL_ID) {
         var prefix = (actorId === getCurrentActorId()) ? '' : actor.name() + 'が';
-        ctx.startText += '【' + prefix + $dataSkills[skillId].name + '習得';
+        ctx.startText += '【' + prefix + skill.name + '習得';
       }
       
       var isMet = actor.isLearnedSkill(skillId);
@@ -356,10 +371,13 @@ var QuestSystem = (function() {
       var actorId = Number(arr[0]) || getCurrentActorId();
       var skillId = Number(arr[1]) || DEFAULT_VALUES.SKILL_ID;
       var actor = $gameActors.actor(actorId);
+      if (!actor) return;
+      var skill = $dataSkills[skillId];
+      if (!skill) return;
       
       if (skillId !== DEFAULT_VALUES.SKILL_ID) {
         var prefix = (actorId === getCurrentActorId()) ? '' : actor.name() + 'が';
-        ctx.startText += '【' + prefix + $dataSkills[skillId].name + '装着';
+        ctx.startText += '【' + prefix + skill.name + '装着';
       }
       
       var isMet = actor.battleSkillsRaw().includes(skillId);
@@ -380,10 +398,13 @@ var QuestSystem = (function() {
       var skillId = Number(arr[1]) || DEFAULT_VALUES.SKILL_ID;
       var requiredRank = Number(arr[2]);
       var actor = actorId >= 1 ? $gameActors.actor(actorId) : getCurrentActor();
+      if (!actor) return;
+      var skill = $dataSkills[skillId];
+      if (!skill) return;
       
       if (skillId !== DEFAULT_VALUES.SKILL_ID) {
         var prefix = (actorId === getCurrentActorId()) ? '' : actor.name() + 'が';
-        ctx.startText += '【' + prefix + $dataSkills[skillId].name + 'ランク' + requiredRank + '以上';
+        ctx.startText += '【' + prefix + skill.name + 'ランク' + requiredRank + '以上';
       }
       
       var isMet = actor.isLearnedSkill(skillId) && actor.skillMasteryLevel(skillId) >= requiredRank;
@@ -403,6 +424,7 @@ var QuestSystem = (function() {
       var actorId = Number(arr[0]) || getCurrentActorId();
       var stateId = Number(arr[1]) || DEFAULT_VALUES.STATE_ID;
       var actor = $gameActors.actor(actorId);
+      if (!actor) return;
       
       if (stateId !== DEFAULT_VALUES.STATE_ID) {
         var prefix = (actorId === getCurrentActorId()) ? '' : actor.name() + 'が';
@@ -427,12 +449,14 @@ var QuestSystem = (function() {
       var itemId = Number(arr[1]) || DEFAULT_VALUES.ITEM_ID;
       var requiredAmount = Number(arr[2]);
       var itemsCollection = getItemsCollection(itemType);
+      var targetItem = itemsCollection[itemId];
+      if (!targetItem) return;
       
       if (itemId !== DEFAULT_VALUES.ITEM_ID) {
-        ctx.startText += '【' + itemsCollection[itemId].name + '所持';
+        ctx.startText += '【' + targetItem.name + '所持';
       }
       
-      var isMet = $gameParty.numItems(itemsCollection[itemId]) >= requiredAmount;
+      var isMet = $gameParty.numItems(targetItem) >= requiredAmount;
       ctx.startTotal++;
       if (isMet) ctx.startMet++;
       ctx.startText += isMet ? MARKERS.SUCCESS + '】\n' : MARKERS.FAILURE + '】\n';
@@ -448,7 +472,7 @@ var QuestSystem = (function() {
       var arr = parseMetaArray(item.meta['QuestSetSubjugation']);
       var subjugationId = Number(arr[0]) || DEFAULT_VALUES.SUBJUGATION_VAR;
       var targetCount = Number(arr[1]);
-      var currentCount = $gameVariables.value(52)[subjugationId];
+      var currentCount = getArrayValue(52, subjugationId);
       
       if (subjugationId >= 3) {
         ctx.startText += '【\\x1bSIM[' + subjugationId + ']\\C[10]' + targetCount + '\\C[0]体討伐';
@@ -478,6 +502,7 @@ var QuestSystem = (function() {
         if (itemId === DEFAULT_VALUES.ITEM_ID) continue;
         
         var targetItem = $dataItems[itemId];
+        if (!targetItem) continue;
         
         if (targetItem.meta['EICSwitch']) {
           var eicSwitch = Number(targetItem.meta['EICSwitch']);
@@ -514,8 +539,9 @@ var QuestSystem = (function() {
       if (!item.meta['QuestCompPerspective']) return;
       
       var perspectiveId = Number(item.meta['QuestCompPerspective']);
-      if (perspectiveId >= 1 && perspectiveId !== getCurrentActorId()) {
-        ctx.completionText += '[' + $gameActors.actor(perspectiveId).name() + '視点';
+      var perspectiveActor = perspectiveId >= 1 ? $gameActors.actor(perspectiveId) : null;
+      if (perspectiveId >= 1 && perspectiveId !== getCurrentActorId() && perspectiveActor) {
+        ctx.completionText += '[' + perspectiveActor.name() + '視点';
       }
       
       var isMet = $gameSwitches.value(perspectiveId + 440);
@@ -537,6 +563,7 @@ var QuestSystem = (function() {
       for (var id = 0; id < arr.length; id++) {
         var actorId = Number(arr[id]) || getCurrentActorId();
         var actor = $gameActors.actor(actorId);
+        if (!actor) continue;
         
         ctx.completionText += '[' + actor.name();
         hasExternalActor = true;
@@ -562,7 +589,7 @@ var QuestSystem = (function() {
         var arr = parseMetaArray(item.meta[metaKey]);
         var subjugationId = Number(arr[0]);
         var targetCount = Number(arr[1]);
-        var currentCount = $gameVariables.value(52)[subjugationId];
+        var currentCount = getArrayValue(52, subjugationId);
         
         if (subjugationId <= 5) {
           if (subjugationId === 1) {
@@ -603,8 +630,10 @@ var QuestSystem = (function() {
         
         if (itemId === DEFAULT_VALUES.ITEM_ID) continue;
         
-        var currentAmount = $gameParty.numItems(itemsCollection[itemId]);
-        ctx.completionText += '【\\C[2]' + itemsCollection[itemId].name + '\\C[0]:' + currentAmount + '/' + requiredAmount;
+        var collectItem = itemsCollection[itemId];
+        if (!collectItem) continue;
+        var currentAmount = $gameParty.numItems(collectItem);
+        ctx.completionText += '【\\C[2]' + collectItem.name + '\\C[0]:' + currentAmount + '/' + requiredAmount;
         
         var isMet = currentAmount >= requiredAmount;
         ctx.completionTotal++;
@@ -635,8 +664,10 @@ var QuestSystem = (function() {
         
         if (itemId === DEFAULT_VALUES.ITEM_ID) continue;
         
-        var currentAmount = $gameParty.numItems(itemsCollection[itemId]);
-        ctx.completionText += '【\\C[2]' + itemsCollection[itemId].name + '\\C[0]:' + currentAmount + '/' + requiredAmount;
+        var deliveryItem = itemsCollection[itemId];
+        if (!deliveryItem) continue;
+        var currentAmount = $gameParty.numItems(deliveryItem);
+        ctx.completionText += '【\\C[2]' + deliveryItem.name + '\\C[0]:' + currentAmount + '/' + requiredAmount;
         
         var isMet = currentAmount >= requiredAmount;
         ctx.completionTotal++;
@@ -687,7 +718,7 @@ var QuestSystem = (function() {
         
         if (varId === DEFAULT_VALUES.VARIABLE_ID) continue;
         
-        var currentValue = $gameVariables.value(varId)[arrayIndex];
+        var currentValue = getArrayValue(varId, arrayIndex);
         ctx.completionText += '【\\C[2]' + $dataSystem.variables[varId] + '\\C[0]:' + currentValue + '/' + targetValue;
         
         var isMet = currentValue >= targetValue;
@@ -710,11 +741,14 @@ var QuestSystem = (function() {
         var actorId = Number(arr[0]);
         var skillId = Number(arr[1]) || DEFAULT_VALUES.SKILL_ID;
         var actor = actorId >= 1 ? $gameActors.actor(actorId) : getCurrentActor();
+        if (!actor) continue;
+        var skill = $dataSkills[skillId];
+        if (!skill) continue;
         
         if (skillId === DEFAULT_VALUES.SKILL_ID) continue;
         
         var prefix = (actorId === getCurrentActorId()) ? '' : actor.name() + 'が';
-        ctx.completionText += '【' + prefix + '\\C[2]' + $dataSkills[skillId].name + '\\C[0]:';
+        ctx.completionText += '【' + prefix + '\\C[2]' + skill.name + '\\C[0]:';
         
         var isMet = actor.isLearnedSkill(skillId);
         ctx.completionTotal++;
@@ -736,11 +770,14 @@ var QuestSystem = (function() {
         var actorId = Number(arr[0]);
         var skillId = Number(arr[1]) || DEFAULT_VALUES.SKILL_ID;
         var actor = actorId >= 1 ? $gameActors.actor(actorId) : getCurrentActor();
+        if (!actor) continue;
+        var skill = $dataSkills[skillId];
+        if (!skill) continue;
         
         if (skillId === DEFAULT_VALUES.SKILL_ID) continue;
         
         var prefix = (actorId === getCurrentActorId()) ? '' : actor.name() + 'が';
-        ctx.completionText += '【' + prefix + '\\C[2]' + $dataSkills[skillId].name + '\\C[0]:';
+        ctx.completionText += '【' + prefix + '\\C[2]' + skill.name + '\\C[0]:';
         
         var isMet = actor.battleSkillsRaw().includes(skillId);
         ctx.completionTotal++;
@@ -763,11 +800,14 @@ var QuestSystem = (function() {
         var skillId = Number(arr[1]) || DEFAULT_VALUES.SKILL_ID;
         var requiredRank = Number(arr[2]);
         var actor = actorId >= 1 ? $gameActors.actor(actorId) : getCurrentActor();
+        if (!actor) continue;
+        var skill = $dataSkills[skillId];
+        if (!skill) continue;
         
         if (skillId === DEFAULT_VALUES.SKILL_ID) continue;
         
         var prefix = (actorId === getCurrentActorId()) ? '' : actor.name() + 'が';
-        ctx.completionText += '【' + prefix + '\\C[2]' + $dataSkills[skillId].name + '\\C[0]ランク' + requiredRank + ':';
+        ctx.completionText += '【' + prefix + '\\C[2]' + skill.name + '\\C[0]ランク' + requiredRank + ':';
         
         var isMet = actor.skillMasteryLevel(skillId) >= requiredRank;
         ctx.completionTotal++;
@@ -789,6 +829,7 @@ var QuestSystem = (function() {
         var actorId = Number(arr[0]);
         var stateId = Number(arr[1]) || DEFAULT_VALUES.STATE_ID;
         var actor = actorId >= 1 ? $gameActors.actor(actorId) : getCurrentActor();
+        if (!actor) continue;
         
         if (stateId === DEFAULT_VALUES.STATE_ID) continue;
         
@@ -859,7 +900,7 @@ var QuestSystem = (function() {
     var offset = config.offset;
     
     for (var i = start; i <= end; i++) {
-      if ($dataItems[i].name === '') continue;
+      if (!$dataItems[i] || $dataItems[i].name === '') continue;
       
       var item = $dataItems[i];
       var ctx = createConditionContext(item, i, offset);

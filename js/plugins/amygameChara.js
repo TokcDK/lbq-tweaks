@@ -380,9 +380,12 @@ map_npcPositionSetEvent = function (id, mapId) {
     if (eventEvent.meta['BossGura']) {
       //let moveRouteCode = 0;
       const arr1 = eventEvent.meta['BossGura'].split(',');
-      const arr2 = $dataEnemies[Number(arr1[1])].meta['BossGura'] ? $dataEnemies[Number(arr1[1])].meta['BossGura'].split(',') : [20, 30, 0.2];
-      valueBossCharaGura = [id, $dataEnemies[Number(arr1[1])].meta['BossEnemy'].split(',')[2], Number(arr2[0]), Number(arr2[1]), Number(arr2[2])];
-      boss_charaGuraCGSet(valueBossCharaGura);
+      const enemyData = $dataEnemies[Number(arr1[1])];
+      if (!!enemyData && !!enemyData.meta['BossEnemy']) {
+        const arr2 = enemyData.meta['BossGura'] ? enemyData.meta['BossGura'].split(',') : [20, 30, 0.2];
+        valueBossCharaGura = [id, enemyData.meta['BossEnemy'].split(',')[2], Number(arr2[0]), Number(arr2[1]), Number(arr2[2])];
+        boss_charaGuraCGSet(valueBossCharaGura);
+      };
     }
     if (eventEvent.meta['BossGura2']) {
       //let moveRouteCode = 0;
@@ -417,11 +420,15 @@ map_npcPositionSetEvent = function (id, mapId) {
       let indIcon = 'h';//イベアイコン
       if (sceneItemId >= 401 && sceneItemId <= 500) { incidenceSw = sceneItemId + 800; compSw = sceneItemId + 900 };
       if (sceneItemId >= 501 && sceneItemId <= 600) { incidenceSw = sceneItemId + 500; compSw = sceneItemId + 600 };
-      if ($dataItems[sceneItemId].meta['AddEventIncidenceSwi']) {
-        incidenceSw = Number($dataItems[sceneItemId].meta['AddEventIncidenceSwi']);
-      };
-      if ($dataItems[sceneItemId].meta['AddEventCompSwi']) {
-        compSw = Number($dataItems[sceneItemId].meta['AddEventCompSwi']);
+      if (!!$dataItems[sceneItemId]) {
+        if ($dataItems[sceneItemId].meta['AddEventIncidenceSwi']) {
+          incidenceSw = Number($dataItems[sceneItemId].meta['AddEventIncidenceSwi']);
+        };
+        if ($dataItems[sceneItemId].meta['AddEventCompSwi']) {
+          compSw = Number($dataItems[sceneItemId].meta['AddEventCompSwi']);
+        };
+      } else {
+        incidenceSw = 0;
       };
       if (incidenceSw <= 1) { hideIndicator = 1 };
       if ($gameSwitches.value(incidenceSw)) { hideIndicator = 1 };
@@ -660,6 +667,7 @@ $gameVariables.value(202).some(function (id) { return $gameMap.mapId() == id }))
     $gameMap.spawnEventRandom(sourceEventId, conditionMap, true);
     const lastSpawnEventId = $gameMap.getLastSpawnEventId();
     const charaEventToRespawn = $gameMap.event(lastSpawnEventId);
+    if(!charaEventToRespawn) continue;//生成位置が見つからず生成되지 않은場合
     if($gameSwitches.value(377)){
       charaEventToRespawn._priorityType = 1;
     };
@@ -743,9 +751,12 @@ if(valueRegionMapArray[enemySpawnCount] < 1) return;
         $gameMap.spawnEventRandom(originalEventId, conditionMap, true);
 
         const enemyEventToRespawn = $gameMap.event($gameMap.getLastSpawnEventId());
+        if(!enemyEventToRespawn) continue;//生成位置が見つからず生成되지 않은場合
+        const enemyGraphic = $dataItems[$gameVariables.value(240)] ? $dataItems[$gameVariables.value(240)].meta.EnemyGraphic : null;
+        if(!enemyGraphic) continue;
         enemyEventToRespawn._trigger = 2; // spawned enemy will attack player, trigger set to event touch
-        enemyEventToRespawn.setImage($dataItems[$gameVariables.value(240)].meta.EnemyGraphic.split(',')[0], 
-        Number($dataItems[$gameVariables.value(240)].meta.EnemyGraphic.split(',')[1]));
+        enemyEventToRespawn.setImage(enemyGraphic.split(',')[0], 
+        Number(enemyGraphic.split(',')[1]));
         enemyEventToRespawn.setOpacity(255);//scale
         if($dataItems[$gameVariables.value(240)].meta.BigEnemyGraphic){enemyEventToRespawn.setScale(150, 150)};
         let enemyMoveSpeed = getRandomIndex(4) + 1;
@@ -803,7 +814,8 @@ if(valueRegionMapArray[enemySpawnCount] < 1) return;
             //$gameScreen.startAnimation(640, 368, 226, false);
           };
         };
-        $gameVariables.value(537).push($gameMap.getLastSpawnEventId());
+        const gameVar537 = $gameVariables.value(537);
+        if(Array.isArray(gameVar537)){gameVar537.push($gameMap.getLastSpawnEventId())};
         $gameVariables.setValue(appearance,$gameVariables.value(appearance) + 1);
       }
 };
@@ -889,6 +901,7 @@ if($gameVariables.value(230) >= 1){
 if($gameVariables.value(240) >= 1){
   var value = $dataItems[$gameVariables.value(240)];
 };
+if(!value) return;
 if($gameSwitches.value(201)){
   for (var i = 1; i <= 9; i++) {
     if(value.meta['warpPoint' + i]){
@@ -1033,8 +1046,9 @@ map_otherGraphicSet = function(id1,arr1,arr2){
     gameMap.spawnEventRandom(arr2[0], conditionMap, true);
     
 	const lastSpawnEventId = gameMap.getLastSpawnEventId();
-    gameVar210SpawnEventIdsArray.push(lastSpawnEventId);
     const event = gameMap.event(lastSpawnEventId);
+    if(!event) continue;//生成位置が見つからず生成されていない場合は前回の生成IDの誤登録も避ける
+    gameVar210SpawnEventIdsArray.push(lastSpawnEventId);
     if(arr1){
       event.setImage(arr1[getRandomIndex(arr1.length)],getRandomIndex(8) + 0);
     }
@@ -1066,6 +1080,7 @@ for (var id = start; id > 0; id--) {
 //シーン時にアクターイベント生成とＩＤ記憶
 event_respawnSetA = function(charaSlotId,posX,posY,zoomFlag,direction){
   const actor = $gameActors.actor(charaSlotId);
+  if(!actor) return;
   event_respawnSetAN(charaSlotId, posX, posY, zoomFlag, direction, charaSlotId + 20, actor.characterName(), actor.characterIndex(), 0);
 };
 
@@ -1096,6 +1111,7 @@ event_respawnSetAN = function (charaSlotId, posX, posY, zoomFlag, direction, id0
   const gameVar292 = $gameVariables.value(292);
   gameVar292[charaSlotId] = eventId;
   const event = $gameMap.event(gameVar292[charaSlotId]);
+  if(!event) return;
   event.setImage(id1, id2);
   if ([2, 4, 6, 8].some(function (id3) { return direction == id3 })) {
     event.setDirection(direction);
@@ -1130,6 +1146,7 @@ goodsEvent_imageChange(eventId, id1, id2, id3, id4);
 goodsEvent_imageChange = function(eventId,id1,id2,id3,id4){
 
 const event = $gameMap.event(eventId);
+if(!event) return;
 event.setDirectionFix(false);
 event.setImage(id1, id2);
 event.setDirection(id3);
@@ -1151,14 +1168,16 @@ const start = $gameVariables.value(75);
 const end = $gameVariables.value(76);
 const gameVar530 = $gameVariables.value(530);
 for (let i = start; i <= end; i++) {
-  const isValid = gameVar530 !== i && $gameActors.actor(i).isLearnedSkill(18);
+  const actor = $gameActors.actor(i);
+  const isValid = !!actor && gameVar530 !== i && actor.isLearnedSkill(18);
   if (!isValid) continue;
 
   if (gameVar530 == 0) {
+    if (arr1.length < 1) continue;
     const x = $gamePlayer.x;
     const y = $gamePlayer.y;
     const arr2 = arr1[getRandomIndex(arr1.length)];//ID
-    const index = arr1.findIndex(arr1 => arr1 == arr2);
+    const index = arr1.findIndex(arr1 => arr1 === arr2);
     if (index >= 0) {
       arr1.splice(index, 1);
     }
@@ -1166,12 +1185,13 @@ for (let i = start; i <= end; i++) {
   } else {
     let placedCount = 0;
     for (let j = 0; j <= 10; j++) {
-      if (placedCount == 0 && arr1 != []) {
+      if (placedCount == 0 && arr1.length >= 1) {
         const ev = $gameMap.event(gameVar292[gameVar530]);
+        if(!ev) break;
         const x = ev.x;
         const y = ev.y;
         const arr2 = arr1[getRandomIndex(arr1.length)];//ID
-        const index = arr1.findIndex(arr1 => arr1 == arr2);
+        const index = arr1.findIndex(arr1 => arr1 === arr2);
         if (index >= 0) {
           arr1.splice(index, 1);
         };
@@ -1334,6 +1354,7 @@ event_togetherSelf = function(id1,id2){
 
   const arr = [301, 302, 303, 304, 305, 306, 307, 308, 309, 310];
   const mapId = $gameMap.mapId();
+  if(!$gameMap.event(id1)) return;
   for (var id = 100; id > 0; id--) {
     if (id != id1) {
       const ev = $gameMap.event(id);
@@ -1356,6 +1377,7 @@ event_togetherSelf = function(id1,id2){
 event_charaIndicators = function(id1,id2,id3,id4,id5,id6,id7){
 
 const char = $gameMap.event(id2);
+if(!char) return;
 if(id1 == 0){
   char.clearIndicators();
   char._indData.ref = true;
@@ -1376,7 +1398,9 @@ else if(id1 == 1){
 animal_IngredientsSelect = function(id1){
 
 let dropItemId = 1271;
-const eventCharaName = $gameMap.event(id1)._characterName;
+const animalEvent = $gameMap.event(id1);
+if(!animalEvent) return;
+const eventCharaName = animalEvent._characterName;
 if(eventCharaName.match(/Pig/)){dropItemId = 1272}
 else if(eventCharaName.match(/Horse/)){dropItemId = 1273}
 else if(eventCharaName.match(/Cow/)){dropItemId = 1274}
@@ -1404,7 +1428,9 @@ animal_ActionSelect = function(id1){
 
 let hasReaction = 0;
 let reactionText = ``;
-const eventCharaName = $gameMap.event(id1)._characterName;
+const animalEvent = $gameMap.event(id1);
+if(!animalEvent) return;
+const eventCharaName = animalEvent._characterName;
 if(eventCharaName.match(/Pig/)){hasReaction = 1;reactionText = `ブヒっ`}
 else if(eventCharaName.match(/Horse/)){AudioManager.playSe({"name":'Horse',"volume":70,"pitch":100,"pan":0})}
 else if(eventCharaName.match(/Cow/)){AudioManager.playSe({"name":'Cow',"volume":70,"pitch":100,"pan":0})}
@@ -1419,9 +1445,10 @@ else if(eventCharaName.match(/BigCat/)){AudioManager.playSe({"name":'Monster1',"
 else if(eventCharaName.match(/Cow/)){AudioManager.playSe({"name":'Cow',"volume":70,"pitch":100,"pan":0})}
 else if(eventCharaName.match(/Crab/)){hasReaction = 1;reactionText = `カニィっ`}
 else if(eventCharaName.match(/Frog/)){AudioManager.playSe({"name":'Frog',"volume":70,"pitch":100,"pan":0})}
-else if(eventCharaName.match(/fish/)){};
+else if(eventCharaName.match(/fish/)){//魚はリアクション無し
+};
 
-if(hasReaction == 1){
+if(hasReaction === 1){
   valueanimalEvent2Id = reactionText;
 };
 

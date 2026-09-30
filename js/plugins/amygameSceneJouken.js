@@ -39,6 +39,18 @@ scene_joukenNakami = function (id1, itemIndex, occurrenceSwitchOffset, checkSwit
   const onStatusString = `\\C[14]〇\\C[0]`;
   const offStatusString = `\\C[12]×\\C[0]`;
 
+  //内部用。$gameActors.actor(id) は未加入/未設定で undefined を返す
+  function nakamiActor (id) {
+    return $gameActors.actor(Number(id));
+  }
+
+  //内部用。変数が未設定/配列でない場合に index アクセスで落ちないためのヘルパ
+  function nakamiArrayValue (varId, index) {
+    const arr = $gameVariables.value(varId);
+    if (!Array.isArray(arr)) return undefined;
+    return arr[index];
+  }
+
   //行数超過する場合にここでid毎に対応
   //if(i == 401){let completionSwitchId2 = 4};
 
@@ -120,8 +132,10 @@ scene_joukenNakami = function (id1, itemIndex, occurrenceSwitchOffset, checkSwit
     const itemEventSetPerspectiveNum = Number(dataItemMeta);
     if (itemEventSetPerspectiveNum >= 1) {
       //conditionCount += 1;
+      const perspectiveActor = nakamiActor(itemEventSetPerspectiveNum);
+      if (!perspectiveActor) return;
       if (itemEventSetPerspectiveNum == $gameVariables.value(2)) { } else {
-        messageText += `[${$gameActors.actor(itemEventSetPerspectiveNum).name()}視点`;
+        messageText += `[${perspectiveActor.name()}視点`;
         lineCount += 1;
       }
     }
@@ -132,7 +146,8 @@ scene_joukenNakami = function (id1, itemIndex, occurrenceSwitchOffset, checkSwit
     } else {
       unmetConditionCount += 1;
       if (itemEventSetPerspectiveNum == $gameVariables.value(2)) { } else { messageText += offStatusString };
-      if (!$gameActors.actor(itemEventSetPerspectiveNum).isLearnedSkill(407)) {
+      const perspectiveActor = nakamiActor(itemEventSetPerspectiveNum);
+      if (perspectiveActor && !perspectiveActor.isLearnedSkill(407)) {
         eventSceneMissing = 0;
         //completionSwitchId1 += `[要:未加入キャラ]`;
         actorNotJoined = 1;
@@ -187,10 +202,14 @@ scene_joukenNakami = function (id1, itemIndex, occurrenceSwitchOffset, checkSwit
         arr[id] = $gameVariables.value(11);//誰でもいいアクター
       } else {
         //conditionCount += 1;
-        messageText += `[${$gameActors.actor(Number(arr[id])).name()}]`;
+        const listActor = nakamiActor(arr[id]);
+        if (!listActor) continue;
+        messageText += `[${listActor.name()}]`;
         lineCount += 1;
       };
-      requirement = $gameActors.actor(Number(arr[id])).isLearnedSkill(18) && !$gameActors.actor(Number(arr[id])).isStateAffected(valueDollStateId);
+      const actor = nakamiActor(arr[id]);
+      if (!actor) continue;
+      requirement = actor.isLearnedSkill(18) && !actor.isStateAffected(valueDollStateId);
       if (requirement) {
         unmetConditionCount += 1;
         metConditionCount += 1;
@@ -198,7 +217,7 @@ scene_joukenNakami = function (id1, itemIndex, occurrenceSwitchOffset, checkSwit
       } else {
         unmetConditionCount += 1;
         messageText += offStatusString;
-        if (!$gameActors.actor(Number(arr[id])).isLearnedSkill(407)) {
+        if (!actor.isLearnedSkill(407)) {
           eventSceneMissing = 0;
           //completionSwitchId1 += `[要:未加入キャラ]`;
           actorNotJoined = 1;
@@ -218,6 +237,7 @@ scene_joukenNakami = function (id1, itemIndex, occurrenceSwitchOffset, checkSwit
       //conditionCount += 1;
       const arrIdNum = Number(arr[id]);
       const item = $dataItems[arrIdNum];
+      if (!item) continue;
       const itemMetaEICSwitch = item.meta['EICSwitch'];
       if (itemMetaEICSwitch) {
         const itemMetaEICSwitchNum = Number(itemMetaEICSwitch);
@@ -277,14 +297,16 @@ scene_joukenNakami = function (id1, itemIndex, occurrenceSwitchOffset, checkSwit
       if (!arr[0]) {
         arr[0] = $gameVariables.value(2);//基準となるアクター
       }
-      const actor = $gameActors.actor(Number(arr[0]));
+      const actor = nakamiActor(arr[0]);
       const skillId = Number(arr[1]);
       const rankNum = Number(arr[2]);
+      if (!actor) continue;
       //conditionCount += 1;
       if (!$gameSwitches.value(435) && !actor.isLearnedSkill(skillId)) {
         messageText += `[${actor.name()}が特定スキルランク${rankNum}↑]`;
       } else {
         const skill = $dataSkills[skillId];
+        if (!skill) continue;
         if (arr[0] == $gameVariables.value(2)) {
           messageText += `[${skill.name}:Rank${rankNum}↑`;
         } else {
@@ -315,12 +337,14 @@ scene_joukenNakami = function (id1, itemIndex, occurrenceSwitchOffset, checkSwit
       }
       const actorId = Number(arr[0]);
       const skillId = Number(arr[1]);
-      const actor = $gameActors.actor(actorId);
+      const actor = nakamiActor(actorId);
+      if (!actor) continue;
       //conditionCount += 1;
       if (!$gameSwitches.value(435) && !actor.isLearnedSkill(skillId)) {
         messageText += `[${actor.name()}が特定スキル習得`;
       } else {
         const skill = $dataSkills[skillId];
+        if (!skill) continue;
         if (arr[0] == $gameVariables.value(2)) {
           messageText += `[${skill.name}習得`;
         } else {
@@ -348,12 +372,14 @@ scene_joukenNakami = function (id1, itemIndex, occurrenceSwitchOffset, checkSwit
       if (arr[0] == 0) { arr[0] = $gameVariables.value(2) };
       const actorId = Number(arr[0]);
       const skillId = Number(arr[1]);
-      const actor = $gameActors.actor(actorId);
+      const actor = nakamiActor(actorId);
+      if (!actor) continue;
       //conditionCount += 1;
       if (!$gameSwitches.value(435) && !actor.isLearnedSkill(skillId)) {
         messageText += `[${actor.name()}が特定スキル装着`;
       } else {
         const skill = $dataSkills[skillId];
+        if (!skill) continue;
         if (arr[0] == $gameVariables.value(2)) {
           messageText += `[${skill.name}装着`;
         } else {
@@ -381,7 +407,8 @@ scene_joukenNakami = function (id1, itemIndex, occurrenceSwitchOffset, checkSwit
       if (arr[0] == 0) { arr[0] = $gameVariables.value(2) };
       const actorId = Number(arr[0]);
       const skillId = Number(arr[1]);
-      const actor = $gameActors.actor(actorId);
+      const actor = nakamiActor(actorId);
+      if (!actor) continue;
       //conditionCount += 1;
       if (arr[0] == $gameVariables.value(2)) {
         messageText += `State:[\x1bSIM[${skillId}]`;
@@ -409,10 +436,12 @@ scene_joukenNakami = function (id1, itemIndex, occurrenceSwitchOffset, checkSwit
       if (arr[0] == 0) { arr[0] = $gameVariables.value(2) };
       const actorId = Number(arr[0]);
       const skillId = Number(arr[1]);
-      const actor = $gameActors.actor(actorId);
+      const actor = nakamiActor(actorId);
+      if (!actor) continue;
       //conditionCount += 1;
       requirement = 18;
-      if (!$gameSwitches.value(435) && !actor._unlockedClasses.contains(skillId)) {
+      const unlockedClasses = actor._unlockedClasses || [];
+      if (!$gameSwitches.value(435) && !unlockedClasses.contains(skillId)) {
         messageText += `[${actor.name()}が特定ジョブ`;
       } else {
         messageText += `[${actor.name()}がジョブ:\x1bJ[${skillId}]`;
@@ -441,9 +470,10 @@ scene_joukenNakami = function (id1, itemIndex, occurrenceSwitchOffset, checkSwit
       const arr = dataItemMeta.split(',');
       const actorId = Number(arr[0]);
       const skillId = Number(arr[1]);
-      messageText += `[\\C[2]\x1bSIM[${actorId}]\\C[0]:\\C[10]${$gameVariables.value(52)[actorId]}\\C[0]/${skillId}`;
+      const subjugationCount = nakamiArrayValue(52, actorId);
+      messageText += `[\\C[2]\x1bSIM[${actorId}]\\C[0]:\\C[10]${subjugationCount}\\C[0]/${skillId}`;
       lineCount += 1;
-      if ($gameVariables.value(52)[actorId] >= skillId) {
+      if (subjugationCount >= skillId) {
         unmetConditionCount += 1;
         metConditionCount += 1;
         messageText += onStatusString;
@@ -486,14 +516,15 @@ scene_joukenNakami = function (id1, itemIndex, occurrenceSwitchOffset, checkSwit
       const actorId = Number(arr[0]);
       const skillId = Number(arr[1]);
       const rankNum = Number(arr[2]);
-      const actor = $gameActors.actor(actorId);
+      const actor = nakamiActor(actorId);
+      if (!actor) continue;
       //conditionCount += 1;
       const skillName = $dataSystem.variables[skillId + 400];
       if (skillId == 4) {//露出度
-        textSubst = $gameVariables.value(actorId + 380)[skillId] <= rankNum
+        textSubst = nakamiArrayValue(actorId + 380, skillId) <= rankNum
         messageText += `[\\C[27]${actor.name()}\\C[0]${skillName}${rankNum}以下`;
       } else {
-        textSubst = $gameVariables.value(actorId + 380)[skillId] >= rankNum
+        textSubst = nakamiArrayValue(actorId + 380, skillId) >= rankNum
         messageText += `[\\C[27]${actor.name()}\\C[0]${skillName}${rankNum}以上`;
       };
       lineCount += 1;
@@ -516,11 +547,13 @@ scene_joukenNakami = function (id1, itemIndex, occurrenceSwitchOffset, checkSwit
       const actorId = Number(arr[0]);
       const skillId = Number(arr[1]);
       const rankNum = Number(arr[2]);
-      const actor = $gameActors.actor(actorId);
+      const actor = nakamiActor(actorId);
+      if (!actor) continue;
       //conditionCount += 1;
       if (skillId == 41) {
         for (let j = 1; j <= $dataItems.length - 1; j++) {
           const item = $dataItems[j];
+          if (!item) continue;
           if (item.meta['TotalCloth']) {
             if (Number(item.meta['TotalCloth']) == rankNum) {
               if (Number(item.meta['EICSwitch']) == 380 + actorId) {
@@ -532,13 +565,15 @@ scene_joukenNakami = function (id1, itemIndex, occurrenceSwitchOffset, checkSwit
         }
       } else {
         if (skillId == 0) {
-          messageText += `[${actor.name()}が${$dataItems[rankNum].name}着用`;
+          const clothItem = $dataItems[rankNum];
+          if (!clothItem) continue;
+          messageText += `[${actor.name()}が${clothItem.name}着用`;
         } else {
           messageText += `[${actor.name()}の${$dataSystem.switches[skillId + 460]}に特定衣装`;
         };
       }
       lineCount += 2;
-      if ($gameVariables.value(actorId + 440)[skillId] == rankNum) {
+      if (nakamiArrayValue(actorId + 440, skillId) == rankNum) {
         unmetConditionCount += 1;
         metConditionCount += 1;
         messageText += onStatusString;
@@ -551,7 +586,7 @@ scene_joukenNakami = function (id1, itemIndex, occurrenceSwitchOffset, checkSwit
   if (lineCount >= lineBreakCount) { messageText += `\n`; lineCount = 0 };
 
   //EventSetMainRoot
-  dataItemMeta = dataItem.meta['EventSetMainRoot' + id];
+  dataItemMeta = dataItem.meta['EventSetMainRoot'];
   if (dataItemMeta) {
     const arr = dataItemMeta.split(',');
     const actorId = Number(arr[0]);
@@ -598,7 +633,9 @@ scene_joukenNakami = function (id1, itemIndex, occurrenceSwitchOffset, checkSwit
           messageText += `[単独行動`;
         } else {
           if (621 <= actorId && actorId <= 624) {//621からパーティ一人目のアクターID
-            messageText += `[${actorId - 620}番目:${$gameActors.actor(skillId).name()}`;
+            const partyActor = nakamiActor(skillId);
+            if (!partyActor) continue;
+            messageText += `[${actorId - 620}番目:${partyActor.name()}`;
           } else {
             textSubst = $dataSystem.variables[actorId];
             textSubst = scene_joukenNakami_clean_prefixes(textSubst);
@@ -632,8 +669,10 @@ scene_joukenNakami = function (id1, itemIndex, occurrenceSwitchOffset, checkSwit
         //conditionCount += 1;
       };
       lineCount += 1;
+      const countItem = $dataItems[actorId];
+      if (!countItem) continue;
       messageText += `\x1bIIN[${actorId}:\\C[2]${skillId}\\C[0]]`;
-      if ($gameParty.numItems($dataItems[actorId]) >= skillId) {
+      if ($gameParty.numItems(countItem) >= skillId) {
         unmetConditionCount += 1;
         metConditionCount += 1;
         messageText += onStatusString;
@@ -654,14 +693,17 @@ scene_joukenNakami = function (id1, itemIndex, occurrenceSwitchOffset, checkSwit
       if (Number(arr[id]) == 0) {
         arr[id] = 20;//存在しないアクター
       } else {
-        if ($gameActors.actor(Number(arr[id])).isLearnedSkill(407)) {
-          textSubst = `${$gameActors.actor(Number(arr[id])).name()}`;
+        const eraseActor = nakamiActor(arr[id]);
+        if (eraseActor && eraseActor.isLearnedSkill(407)) {
+          textSubst = `${eraseActor.name()}`;
         } else {
           textSubst = `？？？`;
         };
         //conditionCount += 1;
       };
-      requirement = $gameActors.actor(Number(arr[id])).isLearnedSkill(18) && !$gameActors.actor(Number(arr[id])).isStateAffected(valueDollStateId);
+      const eraseCheckActor = nakamiActor(arr[id]);
+      if (!eraseCheckActor) continue;
+      requirement = eraseCheckActor.isLearnedSkill(18) && !eraseCheckActor.isStateAffected(valueDollStateId);
       if (arr[id] != 20) {
         if (requirement) {
           cannotExecute = 1;
@@ -922,8 +964,10 @@ scene_joukensettei = function (id1) {
   }
 
   //アイテムID<HsceneItem><SouwaItem>
+  if (!Array.isArray(arrAdd)) return;
   for (const id of arrAdd) {
     const item = $dataItems[id];
+    if (!item) continue;
     const itemMeta = item.meta;
     const addEventIncidenceSwiNum = Number(itemMeta['AddEventIncidenceSwi']);//発生スイッチ。リセットなしの1601-1700の間に実行。
     const addEventCompSwiNum = Number(itemMeta['AddEventCompSwi']);//達成スイッチ
@@ -947,11 +991,13 @@ scene_joukensettei = function (id1) {
 //☆☆☆条件追加。<EventSetVal1:0,0>
 scene_commonIdRec = function (itemId) {
 
-  const itemAddAddEventCommonId = $dataItems[itemId].meta['AddAddEventCommonId'];
+  const sceneItem = $dataItems[itemId];
+  if (!sceneItem) return;
+  const itemAddAddEventCommonId = sceneItem.meta['AddAddEventCommonId'];
   let addAddEventCommonId = itemAddAddEventCommonId ? Number(itemAddAddEventCommonId) : itemId;
 
   if (addAddEventCommonId >= 2) {
-    event_pararelStarting(1, itemId, 1)
+    event_pararelStarting(1, itemId, 1);
   } else {
     if ($gameSwitches.value(29)) {
       TickerManager.show('無効なIDが選択されました。ホームに帰還します。');
@@ -969,6 +1015,7 @@ event_pararelSet = function (id1, id2, id3, id4) {
   event_charaPreset(id1);
   event_charaRoot(id1);
   const event = $gameMap.event(id1);
+  if (!event) return;
   $gameVariables.setValue(161, [$gameMap.mapId(), event._realX + id2, event._realY + id3]);
   set_playerPosition2(161);
   if (id4 >= 1) { $gamePlayer.setDirection(id4) };
@@ -1005,34 +1052,39 @@ event_pararelStarting = function (id1, id2, id3) {
   if (!isFound) {
     valueParallelEventId = id3;
     if (id1 == 0 || (id2 >= 401 && id2 <= 600)) {
-      $gameSwitches.setValue($dataCommonEvents[id2].switchId, true);
+      const targetCommonEvent = $dataCommonEvents[id2];
+      if (targetCommonEvent) $gameSwitches.setValue(targetCommonEvent.switchId, true);
     } else {
-      const itemAddEventParallelSwi = $dataItems[id2].meta['AddEventParallelSwi'];
+      const parallelTargetItem = $dataItems[id2];
+      const itemAddEventParallelSwi = parallelTargetItem ? parallelTargetItem.meta['AddEventParallelSwi'] : null;
       if (itemAddEventParallelSwi) {
-        $gameSwitches.setValue($dataCommonEvents[Number(itemAddEventParallelSwi)].switchId, true);
+        const parallelCommonEvent = $dataCommonEvents[Number(itemAddEventParallelSwi)];
+        if (parallelCommonEvent) $gameSwitches.setValue(parallelCommonEvent.switchId, true);
       }
     }
   }
 
   if (!$gameSwitches.value(29)) {
     const gameVar163 = $gameVariables.value(163);
-    gameVar163[id2] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-    const gameVar163Id2 = gameVar163[id2];
-    gameVar163Id2[0] = $gameMap.mapId();
-    gameVar163Id2[1] = $gamePlayer.characterName();
-    gameVar163Id2[2] = $gamePlayer.characterIndex();
-    gameVar163Id2[3] = $gamePlayer._realX;
-    gameVar163Id2[4] = $gamePlayer._realY;
-    gameVar163Id2[5] = $gamePlayer.direction();
-    if (id3) {
-      if (!!$gameMap.event(id3)) {
-        const event = $gameMap.event(id3);
-        gameVar163Id2[6] = event.characterName();
-        gameVar163Id2[7] = event.characterIndex();
-        gameVar163Id2[8] = event._realX;
-        gameVar163Id2[9] = event._realY;
-        gameVar163Id2[10] = event.direction();
-        gameVar163Id2[11] = event.pattern();
+    if (Array.isArray(gameVar163)) {
+      gameVar163[id2] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+      const gameVar163Id2 = gameVar163[id2];
+      gameVar163Id2[0] = $gameMap.mapId();
+      gameVar163Id2[1] = $gamePlayer.characterName();
+      gameVar163Id2[2] = $gamePlayer.characterIndex();
+      gameVar163Id2[3] = $gamePlayer._realX;
+      gameVar163Id2[4] = $gamePlayer._realY;
+      gameVar163Id2[5] = $gamePlayer.direction();
+      if (id3) {
+        if (!!$gameMap.event(id3)) {
+          const event = $gameMap.event(id3);
+          gameVar163Id2[6] = event.characterName();
+          gameVar163Id2[7] = event.characterIndex();
+          gameVar163Id2[8] = event._realX;
+          gameVar163Id2[9] = event._realY;
+          gameVar163Id2[10] = event.direction();
+          gameVar163Id2[11] = event.pattern();
+        }
       }
     }
   }
@@ -1083,6 +1135,8 @@ scene_choiceDecision = function (arr1, choiceSwitchId) {//scene_choiceDecision([
   let selectedItemId = 0;
   let choiceDescriptionText = ` `;
   for (const sceneItemId of arr1) {
+    const sceneItem = $dataItems[sceneItemId];
+    if (!sceneItem) continue;
     let completionSwitchId = 0; // hope it will be set
     let incidenceSwitchId = 0; // hope it will be set
     if (sceneItemId >= 401 && sceneItemId <= 500) {
@@ -1093,16 +1147,16 @@ scene_choiceDecision = function (arr1, choiceSwitchId) {//scene_choiceDecision([
       incidenceSwitchId = sceneItemId + 500;
       completionSwitchId = sceneItemId + 600;
     }
-    if ($dataItems[sceneItemId].meta['AddEventIncidenceSwi']) {
-      incidenceSwitchId = Number($dataItems[sceneItemId].meta['AddEventIncidenceSwi']);
+    if (sceneItem.meta['AddEventIncidenceSwi']) {
+      incidenceSwitchId = Number(sceneItem.meta['AddEventIncidenceSwi']);
     }
-    if ($dataItems[sceneItemId].meta['AddEventCompSwi']) {
-      completionSwitchId = Number($dataItems[sceneItemId].meta['AddEventCompSwi']);
+    if (sceneItem.meta['AddEventCompSwi']) {
+      completionSwitchId = Number(sceneItem.meta['AddEventCompSwi']);
     }
     if (!completionSwitchId || !incidenceSwitchId) console.warn(`One of value3 or value4 was not set! Code can work incorrect! value3:${incidenceSwitchId},value4:${completionSwitchId}`);
 
     if (!$gameSwitches.value(completionSwitchId)) {
-      choiceDescriptionText = `\x1bIIN[${sceneItemId}]\n${$dataItems[sceneItemId].description}`;
+      choiceDescriptionText = `\x1bIIN[${sceneItemId}]\n${sceneItem.description}`;
     }
     if ($gameSwitches.value(incidenceSwitchId) && !$gameSwitches.value(completionSwitchId)) {
       $gameSwitches.setValue(choiceSwitchId, true);
@@ -1175,9 +1229,11 @@ function getSwitchBasedSouwaChoices() {
  */
 function isSwitchBasedSouwaAvailable(switchId, itemId) {
   if (!$gameSwitches.value(switchId)) return false;
-  if ($gameParty.hasItem(itemId)) return false;
+  const item = $dataItems[itemId];
+  if (!item) return false;
+  if ($gameParty.hasItem(item)) return false;
   if ($gameSwitches.value(switchId + 100)) return false;
-  if ($dataItems[itemId].meta['singleSouwaIncidence']) return false;
+  if (item.meta['singleSouwaIncidence']) return false;
   
   return true;
 }
@@ -1191,10 +1247,11 @@ function getMetaBasedSouwaChoices() {
   
   for (let itemId = 1; itemId < $dataItems.length; itemId++) {
     const currentItem = $dataItems[itemId];
+    if (!currentItem) continue;
     
     if (!isMetaBasedSouwaAvailable(currentItem, itemId)) continue;
     
-    choices.push(Number(currentItem.meta['AddEventParallelSwi']));
+    choices.push(itemId);
   }
   
   return choices;
@@ -1210,7 +1267,7 @@ function isMetaBasedSouwaAvailable(item, itemId) {
   if (!item.meta['AddEventIncidenceSwi']) return false;
   if (Number(item.meta['EICSwitch']) !== 102) return false;
   if (!$gameSwitches.value(Number(item.meta['AddEventIncidenceSwi']))) return false;
-  if ($gameParty.hasItem(itemId)) return false;
+  if ($gameParty.hasItem(item)) return false;
   if ($gameSwitches.value(Number(item.meta['AddEventCompSwi']))) return false;
   if (item.meta['singleSouwaIncidence']) return false;
   
@@ -1224,7 +1281,9 @@ function isMetaBasedSouwaAvailable(item, itemId) {
 function addSouwaChoicesToGameSystem(choices) {
   for (let index = 0; index < choices.length; index++) {
     const chosenItemId = choices[index];
-    const chosenItemName = $dataItems[chosenItemId].name;
+    const chosenItem = $dataItems[chosenItemId];
+    if (!chosenItem) continue;
+    const chosenItemName = chosenItem.name;
     
     const choiceParams = {
       text: `${chosenItemName}`,
@@ -1246,6 +1305,7 @@ scene_allNavigation = function () {
 
   for (let i = 1; i < $dataItems.length; i++) {
     const item = $dataItems[i];
+    if (!item) continue;
     if (item.meta['EICSwitch']) {
       if (Number(item.meta['EICSwitch']) == itemEICSwitchId) {
         valueScriptArray1.push(i);

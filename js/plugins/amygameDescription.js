@@ -95,7 +95,7 @@ if(id1 == 1 || id1 == 2 || id1 == 4 || id1 == 5){
           calcTmp += 1;
         };
   }}};
-  if(statUpCount == 5){
+  if(statUpCount == 5 && valueItems[i].traits[4]){
            if(valueItems[i].traits[4].value >= 1){
               var fragText = `\\I[658]+`;
               var valNum = Math.round((valueItems[i].traits[4].value - 1) * 100);
@@ -758,7 +758,6 @@ list.forEach(function(id3) {
           fragText += `+`;
         };
       };
-      ;
     if(Number(arr1[0]) == 1){arr11[1] += `${fragText}`};
     if(Number(arr1[0]) == 2){arr11[2] += `${fragText}`};
     if(Number(arr1[0]) == 3){arr11[3] += `${fragText}`};
@@ -935,7 +934,7 @@ if(valueItems[i].meta['dispelCountPlus']){
 };
 
 if(valueItems[i].meta['Passive State'] && !valueItems[i].meta['パッシブ隠蔽']){
-  if($dataStates[Number(valueItems[i].meta['Passive State'])].meta['SpcialState']){
+  if($dataStates[Number(valueItems[i].meta['Passive State'])] && $dataStates[Number(valueItems[i].meta['Passive State'])].meta['SpcialState']){
     effectText += `\\C[${colorCode}]特殊効果付与\\C[0]<\x1bSIM[${Number(valueItems[i].meta['Passive State'])}]> `;
   } else {
     effectText += `\\C[${colorCode}]付与\\C[0]<\x1bSIM[${Number(valueItems[i].meta['Passive State'])}]> `;
@@ -1085,7 +1084,7 @@ if(valueItems[i].meta['HP Cost']){
 };
 if(valueItems[i].meta['MP Cost']){
   var valNum = valueItems[i].meta['MP Cost'].replace(' ','');
-  effectText += `[\\C[16]HP${valNum}消費\\C[0]]`;
+  effectText += `[\\C[16]MP${valNum}消費\\C[0]]`;
 };
 if(valueItems[i].meta['SpcialState']){
   suffixText += `[\\C[${colorCode}]\x1bSIM[110]で発動\\C[0]][\x1bSIM[109]で効果消失]`;
@@ -1142,7 +1141,7 @@ if(valueItems[i].meta['HP Life Steal Physical'] && valueItems[i].meta['HP Life S
     var valNum = valNum.replace('%','');
     if(Number(valNum) >= 1){
       var colorCode = 2;
-      var effectText = `[\\C[${colorCode}]物理与Dの${Number(valNum)}%HP吸収回復\\C[0]]`;
+      effectText += `[\\C[${colorCode}]物理与Dの${Number(valNum)}%HP吸収回復\\C[0]]`;
     } else {
       var colorCode = 10;
       effectText += `[\\C[${colorCode}]物理与Dの${Number(valNum)}%HP反動ﾀﾞﾒｰｼﾞ\\C[0]]`;
@@ -1319,7 +1318,7 @@ if(valueItems[i].meta['HtitleGetArray']){
 };
 if(valueItems[i].meta['annihilationTitle']){
   var arr1 = valueItems[i].meta['annihilationTitle'].split(',');
-  if(Number(arr1[0]) >= 20){
+  if(Number(arr1[0]) >= 20 && $dataItems[Number(arr1[0])]){
     var valNum = `\\C[1]<${$dataItems[Number(arr1[0])].name}>\\C[0]殲滅回数:\\C[10]${Number(arr1[1])}\\C[0]回以上`;
   };
   if(Number(arr1[0]) == 1){
@@ -1689,21 +1688,21 @@ if(id1 == 4){
   } else {
     var valNum = 0;
     if(valueEquipPassiveSkill.length >= 1){
-      for (var id3 = 1; id3 <= valueEquipPassiveSkill.length-1; id3++) {
+      for (var id3 = 0; id3 <= valueEquipPassiveSkill.length-1; id3++) {
         if(valueEquipPassiveSkill[id3] == i){
           var valNum = 1;
         };
       };
     };
     if(valueEquipPassiveWeapon.length >= 1){
-      for (var id3 = 1; id3 <= valueEquipPassiveWeapon.length-1; id3++) {
+      for (var id3 = 0; id3 <= valueEquipPassiveWeapon.length-1; id3++) {
         if(valueEquipPassiveWeapon[id3] == i){
           var valNum = 1;
         };
       };
     };
     if(valueEquipPassiveArmor.length >= 1){
-      for (var id3 = 1; id3 <= valueEquipPassiveArmor.length-1; id3++) {
+      for (var id3 = 0; id3 <= valueEquipPassiveArmor.length-1; id3++) {
         if(valueEquipPassiveArmor[id3] == i){
           var valNum = 1;
         };

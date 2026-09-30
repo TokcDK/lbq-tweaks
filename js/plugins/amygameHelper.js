@@ -19,6 +19,12 @@
 
 (function () {
 
+	//内部用。変数292(スポーンID一覧)が未設定/配列でない場合の事故を防ぐ
+	function aghSpawnIdList () {
+		var spawnIdList = $gameVariables.value(292);
+		return Array.isArray(spawnIdList) ? spawnIdList : [];
+	}
+
 	//=============================================================================
 	// Scene return / position bookkeeping (common event 54 family)
 	//=============================================================================
@@ -86,6 +92,7 @@
 	// Replaces (~37x): spawn blood-stain decal behind defeated boss event.
 	AGH_bossBloodMark = function () {
 		var event = $gameMap.event(valueBossId);
+		if (!event) return;
 		event.resetPattern();
 		event._originalPattern = 1;
 		event.setAngle(45);
@@ -100,7 +107,11 @@
 	//   var arr1 = $gameMap.event(this._eventId).event().meta['BossGura'].split(',');
 	//   boss_setup1(Number(arr1[0]),Number(arr1[1]));
 	AGH_bossSetupFromMeta = function (interp) {
-		var arr1 = $gameMap.event(interp._eventId).event().meta['BossGura'].split(',');
+		var mapEvent = $gameMap.event(interp._eventId);
+		if (!mapEvent) return;
+		var bossGura = mapEvent.event().meta['BossGura'];
+		if (!bossGura) return;
+		var arr1 = bossGura.split(',');
 		boss_setup1(Number(arr1[0]), Number(arr1[1]));
 	};
 
@@ -131,7 +142,7 @@
 		} else {
 			event_respawnSetA(spawnSlot, a, b, c);
 		}
-		interp._eventId = $gameVariables.value(292)[spawnSlot];
+		interp._eventId = aghSpawnIdList()[spawnSlot] || 0;
 	};
 
 	// Replaces (~31x):
@@ -141,7 +152,8 @@
 	//   event.setDirection(<dir>);
 	AGH_locateSpawnedNpc = function (id, x, y, dir) {
 		var spawnSlot = id;
-		var event = $gameMap.event($gameVariables.value(292)[spawnSlot]);
+		var event = $gameMap.event(aghSpawnIdList()[spawnSlot]);
+		if (!event) return;
 		event.locate(x, y);
 		event.setDirection(dir);
 	};
@@ -151,9 +163,11 @@
 	//   arr1.push($gameVariables.value(292)[<id1>]); ...
 	//   event_NpcCharaMoveId(45,"<action>",arr1);
 	AGH_npcGroupAction = function (ids, action) {
+		var spawnIdList = aghSpawnIdList();
+		if (spawnIdList.length === 0) return;
 		var arr1 = [];
 		ids.forEach(function (id) {
-			arr1.push($gameVariables.value(292)[id]);
+			arr1.push(spawnIdList[id]);
 		});
 		event_NpcCharaMoveId(45, action, arr1);
 	};
@@ -290,9 +304,11 @@
 	//   var value1..3 = $gameVariables.value(value)[0..2];
 	//   if(value1 >= 1){ transfer(saved) } else { transfer(default) }
 	AGH_warpFromSave = function (slot) {
-		var mapId = $gameVariables.value(slot)[0];
-		var mapX = $gameVariables.value(slot)[1];
-		var mapY = $gameVariables.value(slot)[2];
+		var savedPos = $gameVariables.value(slot);
+		if (!Array.isArray(savedPos)) savedPos = [];
+		var mapId = savedPos[0];
+		var mapX = savedPos[1];
+		var mapY = savedPos[2];
 		if (mapId >= 1) {
 			$gamePlayer.reserveTransfer(mapId, mapX, mapY, 2, 2);
 		} else {
@@ -342,7 +358,7 @@
 	//   var value1 = 11;//$gameVariables.value(530);
 	//   this._eventId = $gameVariables.value(292)[value1];
 	CEH_setEventIdFromSpawnList = function (interp, id) {
-		interp._eventId = $gameVariables.value(292)[id];
+		interp._eventId = aghSpawnIdList()[id] || 0;
 	};
 
 	// Replaces (18x):
@@ -356,10 +372,11 @@
 	//     ...
 	//   };
 	CEH_eraseAllSpawnedEvents = function () {
-		for (var i = 0; i <= $gameVariables.value(292).length - 1; i++) {
-			if ($gameVariables.value(292)[i] >= 1) {
-				if (!!$gameMap.event($gameVariables.value(292)[i])) {
-					if (!$gameParty.inBattle()) { $gameMap.eraseEvent($gameVariables.value(292)[i]) };
+		var spawnIdList = aghSpawnIdList();
+		for (var i = 0; i <= spawnIdList.length - 1; i++) {
+			if (spawnIdList[i] >= 1) {
+				if (!!$gameMap.event(spawnIdList[i])) {
+					if (!$gameParty.inBattle()) { $gameMap.eraseEvent(spawnIdList[i]) };
 				};
 			};
 		};
@@ -404,7 +421,7 @@
 	CEH_respawnMainNpcDefault = function (interp) {
 		var spawnSlot = $gameVariables.value(530);
 		event_respawnSetA(spawnSlot, 14, 34, 1, 4);
-		interp._eventId = $gameVariables.value(292)[spawnSlot];
+		interp._eventId = aghSpawnIdList()[spawnSlot] || 0;
 		var spawnSlot = 11;
 		event_respawnSetN(spawnSlot, 16, 15, 0, 'npcUnique1', 0, 4);
 	};
@@ -417,10 +434,11 @@
 	//   var value1 = 11;
 	//   event_respawnSetN(value1,16,4,1,arr1[6],arr1[7],2);
 	CEH_respawnSubNpcWithPreset = function (interp) {
+		var presetList = $gameVariables.value(163);
+		var arr1 = Array.isArray(presetList) ? presetList[$gameVariables.value(535)] : null;
+		if (!arr1) return;
 		var spawnSlot = $gameVariables.value(530);
-		var arr1 = $gameVariables.value(163)[$gameVariables.value(535)];
 		event_respawnSetA(spawnSlot, 15, 4, 0, 6);
-		var event = $gameMap.event($gameVariables.value(292)[spawnSlot]);
 		var spawnSlot = 11;
 		event_respawnSetN(spawnSlot, 16, 4, 1, arr1[6], arr1[7], 2);
 	};
@@ -434,13 +452,17 @@
 	//   event.setDirection(arr1[5]);
 	//   this._eventId = $gameVariables.value(292)[value1];
 	CEH_respawnSubNpcWithImage = function (interp) {
+		var presetList = $gameVariables.value(163);
+		var arr1 = Array.isArray(presetList) ? presetList[$gameVariables.value(535)] : null;
+		if (!arr1) return;
 		var spawnSlot = $gameVariables.value(530);
-		var arr1 = $gameVariables.value(163)[$gameVariables.value(535)];
 		event_respawnSetA(spawnSlot, arr1[3], arr1[4], 1);
-		var event = $gameMap.event($gameVariables.value(292)[spawnSlot]);
-		event.setImage(arr1[1], arr1[2]);
-		event.setDirection(arr1[5]);
-		interp._eventId = $gameVariables.value(292)[spawnSlot];
+		var event = $gameMap.event(aghSpawnIdList()[spawnSlot]);
+		if (event) {
+			event.setImage(arr1[1], arr1[2]);
+			event.setDirection(arr1[5]);
+		}
+		interp._eventId = aghSpawnIdList()[spawnSlot] || 0;
 	};
 
 	// Replaces (11x):
@@ -451,10 +473,12 @@
 	//   var value1 = 11;
 	//   event_respawnSetN(value1,arr1[8],arr1[9],0,arr1[6],arr1[7],arr1[10]);
 	CEH_respawnSubNpcWithPresetArr = function (interp) {
+		var presetList = $gameVariables.value(163);
+		var arr1 = Array.isArray(presetList) ? presetList[$gameVariables.value(535)] : null;
+		if (!arr1) return;
 		var spawnSlot = $gameVariables.value(530);
-		var arr1 = $gameVariables.value(163)[$gameVariables.value(535)];
 		event_respawnSetA(spawnSlot, arr1[3], arr1[4], 1, arr1[5]);
-		interp._eventId = $gameVariables.value(292)[spawnSlot];
+		interp._eventId = aghSpawnIdList()[spawnSlot] || 0;
 		var spawnSlot = 11;
 		event_respawnSetN(spawnSlot, arr1[8], arr1[9], 0, arr1[6], arr1[7], arr1[10]);
 	};
@@ -469,7 +493,7 @@
 	//   drowsepost.camera.zoom(1, 60, value1);
 	CEH_zoomToPartySpawnedEvent = function () {
 		var spawnSlot = $gameVariables.value(530);
-		var spawnedEventId = $gameVariables.value(292)[spawnSlot];
+		var spawnedEventId = aghSpawnIdList()[spawnSlot] || 0;
 		drowsepost.camera.zoom(1, 60, spawnedEventId);
 	};
 
@@ -529,7 +553,9 @@
 	//   var arr1 = $gameVariables.value(163)[$gameVariables.value(535)];
 	//   $gameVariables.setValue(171,[arr1[0],arr1[3],arr1[4]]);
 	CEH_setScenePosFromPreset = function () {
-		var arr1 = $gameVariables.value(163)[$gameVariables.value(535)];
+		var presetList = $gameVariables.value(163);
+		var arr1 = Array.isArray(presetList) ? presetList[$gameVariables.value(535)] : null;
+		if (!arr1) return;
 		$gameVariables.setValue(171, [arr1[0], arr1[3], arr1[4]]);
 	};
 
@@ -559,7 +585,7 @@
 	//   event_partyCharaMove(45,"this.turnTowardCharacter($gameMap.event("+value1+"));");
 	CEH_turnPartyTowardSpawnedEvent = function () {
 		var spawnSlot = $gameVariables.value(530);
-		var spawnedEventId = $gameVariables.value(292)[spawnSlot];
+		var spawnedEventId = aghSpawnIdList()[spawnSlot] || 0;
 		event_partyCharaMove(45, "this.turnTowardCharacter($gameMap.event(" + spawnedEventId + "));");
 	};
 

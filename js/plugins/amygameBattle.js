@@ -63,7 +63,8 @@ enemy_dropSelection = function (user) {
 
     const itemDropDataKindNum = Number(itemDropData[1]);
     const valueItems = itemsSourceKinds[itemDropDataKindNum];
-    const valueItem = valueItems[Number(itemDropData[2])];
+    const valueItem = valueItems ? valueItems[Number(itemDropData[2])] : null;
+    if (!valueItem) continue;
     const picName = itemsSourceKindPicNamesEnemyDropSelection[itemDropDataKindNum];
     if (isInBattle) {
       $gameTroop.addDropItem(valueItem);
@@ -118,13 +119,21 @@ const getItemDropDataStateIds = [851, 852, 853, 854, 855, 856, 857, 858, 859, 86
 
 get_item_drop_data = function (user) {
 
-  valueDropEnemyLevel = $gameParty.inBattle() ? user.level : Math.ceil($gameActors.actor($gameVariables.value(11)).level / 2);
+  if ($gameParty.inBattle()) {
+    valueDropEnemyLevel = user.level;
+  } else {
+    const levelActor = $gameActors.actor($gameVariables.value(11));
+    const levelReference = levelActor || $gameParty.leader();
+    if (!levelReference) return;
+    valueDropEnemyLevel = Math.ceil(levelReference.level / 2);
+  }
 
   const itemDropDataArray = [];
   let stateAddPowerCustomCount = 0;
   for (let i = 0; i < valueAddPowerCustomState.length; i++) {
     if (user.isStateAffected(valueAddPowerCustomState[i])) {
-      stateAddPowerCustomCount += Number($dataStates[valueAddPowerCustomState[i]].meta['AddPowerCustom']);
+      const addPowerStateData = $dataStates[valueAddPowerCustomState[i]];
+      stateAddPowerCustomCount += addPowerStateData ? Number(addPowerStateData.meta['AddPowerCustom']) : 0;
     }
   };
   if (stateAddPowerCustomCount >= 1) {
@@ -267,12 +276,13 @@ get_item_drop_data = function (user) {
   if (user.isStateAffected(475)) { itemDropDataArray.push([6, 0, 151]); };
   for (let i = 421; i <= 439; i++) {
     if (user.isStateAffected(i)) {
-      const stateRaceDropKind = $dataStates[i].meta['RaceDropKind'];
+      const stateRaceDropKind = $dataStates[i] && $dataStates[i].meta['RaceDropKind'];
       if (stateRaceDropKind) {
         const stateRaceDropKinds = stateRaceDropKind.split(',');
         for (let id1 = 0; id1 <= stateRaceDropKinds.length - 1; id1++) {
           const stateRaceDropKindIndex = Number(stateRaceDropKinds[id1]);
-          const itemRaceDropRarity = $dataItems[stateRaceDropKindIndex].meta['RaceDropRarity'];
+          const raceDropItem = $dataItems[stateRaceDropKindIndex];
+          const itemRaceDropRarity = raceDropItem && raceDropItem.meta['RaceDropRarity'];
           if (itemRaceDropRarity) {
             itemDropDataArray.push([Number(itemRaceDropRarity), 0, stateRaceDropKindIndex]);
           };
@@ -399,6 +409,7 @@ damage_keisan1 = function (user, target, action, damageAmount, critAnimationId, 
     if (animationId >= 1) {
       if (hitIndex >= 2) {
         const animation = $dataAnimations[animationId];
+        if (!animation) continue;
         const animFramesLength = animation.frames.length;
         let maxAnimationDelay = 4;
         if (animation.name.match(/!/)) { maxAnimationDelay = 1 }
@@ -642,6 +653,7 @@ function ak1ConfigureAnimationSettings(skillId) {
   const currentItem = sourceItems[skillId];
   $gameVariables.setValue(181, currentItem.animationId);
   const animation = $dataAnimations[currentItem.animationId];
+  if (!animation) return;
   const frameCount = animation.frames.length;
 
   if (currentItem.stypeId == 12) {
@@ -1002,7 +1014,7 @@ Element_DebuffRateR = function (target, stateId) {
     const dataId = Number($dataStates[stateId].meta['ElementId']);
     const dataStateId = target.isEnemy() ? 490 : 486;
     const target1 = $dataStates[dataStateId + target.index()];
-    target1.traits.push({ code: code, dataId: dataId, value: 1 - target.getStateCounter[stateId] });
+    target1.traits.push({ code: code, dataId: dataId, value: 1 - target.getStateCounter(stateId) });
     target.removeStateCounter(stateId);
   };
 };
@@ -1014,6 +1026,7 @@ state_addEffect1 = function (user, target, stateId, animationId) {
 
   if (!$gameTroop.isAllDead() && $gameParty.inBattle()) {
     const stateData = $dataStates[stateId];
+    if (!stateData) return;
     const stateMeta = stateData.meta;
     let resistanceFactor;
     resistanceFactor = target.isStateAffected(289) ? 0.2 : 0.1;
@@ -1163,6 +1176,7 @@ chain_skill = function () {
     } else {
       valueChainSkillId = Number($dataStates[valueChainElement].meta['ChainID']);
     };
+    if (!$dataSkills[valueChainSkillId]) return;
     if ($dataSkills[valueChainSkillId].meta['2rdChain'] || $dataSkills[valueChainSkillId].meta['3rdChain'] || $dataSkills[valueChainSkillId].meta['4thChain']) {
       if (valueChainMemberCount == 2) {
         $dataSkills[valueChainSkillId].name = $dataSkills[valueChainSkillId].meta['2rdChain'];
@@ -1186,6 +1200,9 @@ battle_bustUp = function (basePictureId, baseMoveX, baseMoveY, baseDurationOffse
   battle_bustUp1(actor, basePictureId, baseMoveX, baseMoveY, baseDurationOffset);
 }
 battle_bustUp1 = function (gameActor, basePictureId, baseMoveX, baseMoveY, baseDurationOffset) {
+  if (!gameActor) {
+    return;
+  };
   // Get the acting actor's ID from the game variables
   if (!isGirl(gameActor)) {
     return;
@@ -1333,7 +1350,7 @@ function processHypnosisEffectBattleBustUpBattleBustUp(basePictureId, gameActor,
 
   // Cache values to reduce property lookups
   const hypnosisCount = gameActor.getStateCounter(782);
-  const hypnosisImageName = `${actorId}ActorHypnosisEye_0`;
+  const hypnosisImageName = `${gameActor.actorId()}ActorHypnosisEye_0`;
   
   // Set animation parameters once
   $gameScreen.setPicturesAnimation(2, 10, "連番", hypnosisCount);
@@ -1458,6 +1475,7 @@ tachie_aura = function () {
 tachie_aura1 = function (gameActor) {
   // Early exits for most common cases to avoid unnecessary processing
   if (!$gameParty.inBattle()) return;
+  if (!gameActor) return;
   
   // Combine conditions for better performance
   if (gameActor.tp < 100 || !isGirl(gameActor)) return;
@@ -1540,6 +1558,7 @@ actor_kousokukaijo1 = function (boundActorId) {
 actor_kousokukaijo2 = function (boundActorId) {
   const battleMembers = $gameParty.battleMembers();
   const boundActor = $gameActors.actor(boundActorId);
+  if (!boundActor) return;
   
   // Check if there are any party members with state 89 (rescue state)
   for (let i = 0; i < battleMembers.length; i++) {
@@ -1589,6 +1608,7 @@ actor_kousokukaijo3 = function(actorId) {
   // Get rescuing party member and bound actor
   const partyMember = battleMembers[rescuingMemberIndex];
   const actor = $gameActors.actor(actorId);
+  if (!actor) return;
   const actorData = actor.actor();
   
   // Handle state changes
@@ -1711,7 +1731,7 @@ battle_xsarStatas1 = function (user, isEnemy) {
 
   // Draw header text in window 0 based on actor type
   {
-    const headerText = buildHeaderTextBattleXsarStatas(user, IsEnemy);
+    const headerText = buildHeaderTextBattleXsarStatas(user, isEnemy);
     WindowManager.show(0, 0, 0, 0, 105);
     WindowManager.drawText(0, `\\fs[25]${headerText}`);
   }
@@ -1936,10 +1956,13 @@ enemywin_treasurebox1 = function (id1) {
 //エネミー撃破時にドロップボックス設定
 enemywin_treasurebox2 = function (id1) {
 
+  const sourceEvent = $gameMap.event(id1);
+  if (!sourceEvent) return;
+
   for (var i = 1; i <= 100; i++) {
     var searchResultFlag = 0;
-    var eventX = $gameMap.event(id1).x;
-    var eventY = $gameMap.event(id1).y;
+    var eventX = sourceEvent.x;
+    var eventY = sourceEvent.y;
     var playerX = $gamePlayer.x;//プレイヤー座標
     var playerY = $gamePlayer.y;
     var randomOffsetX = [-2, -1, 0, 1, 2][getRandomIndex(5)];
@@ -1972,10 +1995,11 @@ enemywin_treasurebox2 = function (id1) {
     conditionMap.regionIds = [1];
     $gameMap.spawnEventRandom(eventX, conditionMap, true);
   } else {
-    $gameMap.spawnEvent(eventX, $gameMap.event(id1).x, $gameMap.event(id1).y, true);
+    $gameMap.spawnEvent(eventX, sourceEvent.x, sourceEvent.y, true);
   };
   var eventY = $gameMap.getLastSpawnEventId();
   var event = $gameMap.event(eventY);
+  if (!event) return;
   var eventX = 'chest_c3';
   $gameScreen._particle.particlePlay(eventY, eventX, 'attach:this', 'def', 'above');
   $gameScreen._particle.particleExceed(eventX, 0.5);
@@ -1989,6 +2013,7 @@ enemywin_treasurebox2 = function (id1) {
 battleback_change2 = function () {
 
   //戦闘中パーティクル
+  if (!SceneManager._scene || !SceneManager._scene._spriteset) return;
   var scrollSpeedX = 'fog_battle_front';
   $gameScreen._particle.particleSet(0, scrollSpeedX, 'battleWeather', 'def', 'above');
   var scrollOpacityValue = valueWeather[28];
@@ -2003,9 +2028,9 @@ battleback_change2 = function () {
     spriteset.battlebackOpacity(3, 255);
   };
 
+  var arr1 = [-0.1, -0.2, -0.3, -0.4, -0.5, 0.1, 0.2, 0.3, 0.4, 0.5];
   var selectedBgKey = 0;
   if ($gameVariables.value(240) >= 1) {
-    var arr1 = [-0.1, -0.2, -0.3, -0.4, -0.5, 0.1, 0.2, 0.3, 0.4, 0.5];
     var value = $dataItems[$gameVariables.value(240)];
     if (value.meta['BG1']) { var selectedBgKey = 'BG1' };
     if ($gameSwitches.value(15) && value.meta['BG1N']) {
@@ -2014,6 +2039,7 @@ battleback_change2 = function () {
   } else {
     var value = $dataMap;
   };
+  if (!value) return;
   if (selectedBgKey != 0) {
     var arr = value.meta[selectedBgKey].split(',');
     var scrollSpeedX = arr1[getRandomIndex(arr1.length)];
@@ -2184,10 +2210,11 @@ battle_wordset = function (id1) {
   }
 
   $gameVariables.setValue(277, 0);//二言目台詞用。現在未使用
-  $gameVariables.setValue(53, $gameActors.actor(actorId).nickname());
+  const actor = $gameActors.actor(actorId);
+  if (!actor) return;
+  $gameVariables.setValue(53, actor.nickname());
   $gameVariables.setValue(625, $gameVariables.value(380 + actorId)[59]);
 
-  const actor = $gameActors.actor(actorId);
   const actorName = actor.name();
   const actorMeta = $dataActors[actorId].meta;
   if (gameVar276 == 2) {
@@ -2299,7 +2326,7 @@ battle_wordset = function (id1) {
 
   let messageText = ``;
   const enemy1 = gameTroopMembers[$gameVariables.value(92)];
-  const enemyName = enemy1.name();
+  const enemyName = enemy1 ? enemy1.name() : '';
   if (id1 == 0) {
     if (array0) {
       messageText = actorName + array0[getRandomIndex(array0.length)];
@@ -2328,8 +2355,8 @@ battle_wordset = function (id1) {
   else if (id1 == 2) {
     const gameVar464 = $gameSwitches.value(464);
     if (gameVar276 == 2 && !gameVar464) {
-      const enemy2 = $dataEnemies[enemy1.enemyId()];
-      if (enemy2.meta['EnemyDamageWord']) {
+      const enemy2 = enemy1 && $dataEnemies[enemy1.enemyId()];
+      if (enemy2 && enemy2.meta['EnemyDamageWord']) {
         const array = enemy2.meta['EnemyDamageWord'].split(',');
         messageText = `${enemyName}${array[getRandomIndex(array.length)]}`;
       } else {
@@ -2370,7 +2397,11 @@ title_battleUp = function (actor) {
   let titleCount = 0;
   const titleEffects = [];
 
-  const variable288Length = $gameVariables.value(288).length;
+  const titleItemIdArray = $gameVariables.value(288);
+  if (!titleItemIdArray) {
+    return;
+  }
+  const variable288Length = titleItemIdArray.length;
 
   if (variable288Length === 0) {
     return;
@@ -2379,13 +2410,16 @@ title_battleUp = function (actor) {
   let currentItem = $dataItems;
 
   for (let itemId = 0; itemId < variable288Length; itemId++) {
-    const currentItemId = $gameVariables.value(288)[itemId];
+    const currentItemId = titleItemIdArray[itemId];
 
     if (currentItemId === 0) {
       continue;
     }
 
     currentItem = $dataItems[currentItemId];
+    if (!currentItem) {
+      continue;
+    }
 
     if (!currentItem.meta['titleEffect1']) {
       continue;
@@ -2482,7 +2516,7 @@ title_battleUp = function (actor) {
   for (let i = 0, len = titleEffects.length; i < len; i++) {
     valueGetInfoPointX = 900;
     CommonPopupManager.showInfo({}, titleEffects[i], null);
-    BattleManager._logWindow.push(addText, titleEffects[i]);
+    BattleManager._logWindow.push('addText', titleEffects[i]);
   }
 
   valueGetInfoPointX = 0;
@@ -2873,7 +2907,7 @@ traitBattle_changeSetting = function (user, stateId, multiplier) {
       const absoluteValue = Math.abs(traitValue);
 
       // Process trait based on its code and add to description
-      const traitDescription = tbcsProcessTraitByCode(traitCode, traitDataId, traitValue, absoluteValue);
+      const traitDescription = tbcsProcessTraitByCode(stateData, traitCode, traitDataId, traitValue, absoluteValue);
 
       description += traitDescription;
       traitCount++;
@@ -2885,26 +2919,26 @@ traitBattle_changeSetting = function (user, stateId, multiplier) {
   }
 
   // Finalize description with category info if available
-  tbcsFinalizeDescription();
+  description = tbcsFinalizeDescription(stateData, description);
 
   user.refresh();
 };
 
 // Helper function to process trait based on code
-function tbcsProcessTraitByCode(code, dataId, value, absoluteValue) {
+function tbcsProcessTraitByCode(stateData, code, dataId, value, absoluteValue) {
   switch (code) {
-    case 11: return tbcsProcessElementTrait(code, dataId, value, absoluteValue);
-    case 13: return tbcsProcessStateResistanceTrait(code, dataId, value, absoluteValue);
-    case 14: return tbcsProcessStateImmunityTrait(code, dataId);
-    case 21: return tbcsProcessParameterTrait(code, dataId, value, absoluteValue);
-    case 22: return tbcsProcessExParameterTrait(code, dataId, value, absoluteValue);
-    case 23: return tbcsProcessSpParameterTrait(code, dataId, value, absoluteValue);
+    case 11: return tbcsProcessElementTrait(stateData, code, dataId, value, absoluteValue);
+    case 13: return tbcsProcessStateResistanceTrait(stateData, code, dataId, value, absoluteValue);
+    case 14: return tbcsProcessStateImmunityTrait(stateData, code, dataId);
+    case 21: return tbcsProcessParameterTrait(stateData, code, dataId, value, absoluteValue);
+    case 22: return tbcsProcessExParameterTrait(stateData, code, dataId, value, absoluteValue);
+    case 23: return tbcsProcessSpParameterTrait(stateData, code, dataId, value, absoluteValue);
     default: return '';
   }
 }
 
 // Process element trait
-function tbcsProcessElementTrait(code, dataId, value, absoluteValue) {
+function tbcsProcessElementTrait(stateData, code, dataId, value, absoluteValue) {
   stateData.traits.push({ code: code, dataId: dataId, value: 1 + value });
 
   if ([10, 11, 12, 15, 20, 38, 39, 40, 41].some(function (id) { return id == dataId })) {
@@ -2918,11 +2952,11 @@ function tbcsProcessElementTrait(code, dataId, value, absoluteValue) {
 }
 
 // Process state resistance trait
-function tbcsProcessStateResistanceTrait(code, dataId, value, absoluteValue) {
+function tbcsProcessStateResistanceTrait(stateData, code, dataId, value, absoluteValue) {
   const modifier = value >= 0.01 ? `\\C[1]-` : `\\C[2]+`;
 
   // Add state resistance traits for matching states
-  tbcsAddStateTraits(code, dataId, value);
+  tbcsAddStateTraits(stateData, code, dataId, value);
 
   // Return description based on dataId
   const percent = absoluteValue * 100;
@@ -2939,9 +2973,9 @@ function tbcsProcessStateResistanceTrait(code, dataId, value, absoluteValue) {
 }
 
 // Process state immunity trait
-function tbcsProcessStateImmunityTrait(code, dataId) {
+function tbcsProcessStateImmunityTrait(stateData, code, dataId) {
   // Add state immunity traits for matching states
-  tbcsAddStateTraits(code, dataId, 0, true);
+  tbcsAddStateTraits(stateData, code, dataId, 0, true);
 
   // Return description based on dataId
   switch (dataId) {
@@ -2957,7 +2991,7 @@ function tbcsProcessStateImmunityTrait(code, dataId) {
 }
 
 // Helper to add state traits
-function tbcsAddStateTraits(code, dataId, value, isImmunity) {
+function tbcsAddStateTraits(stateData, code, dataId, value, isImmunity) {
   for (let j = 1; j <= $dataStates.length - 1; j++) {
     if (tbcsShouldAddStateTrait(dataId, j)) {
       stateData.traits.push({
@@ -2987,59 +3021,57 @@ function tbcsShouldAddStateTrait(dataId, stateId) {
 }
 
 // Process parameter trait
-function tbcsProcessParameterTrait(code, dataId, value, absoluteValue) {
+function tbcsProcessParameterTrait(stateData, code, dataId, value, absoluteValue) {
   const modifier = value >= 0.01 ? `\\C[2]+` : `\\C[1]-`;
   stateData.traits.push({ code: code, dataId: dataId, value: 1 + value });
   return `:\\C[16][${TextManager.param(dataId)}${modifier}${absoluteValue * 100}%]\\C[0]`;
 }
 
 // Process ex-parameter trait
-function tbcsProcessExParameterTrait(code, dataId, value, absoluteValue) {
+function tbcsProcessExParameterTrait(stateData, code, dataId, value, absoluteValue) {
   const modifier = value >= 0.01 ? `\\C[2]+` : `\\C[1]-`;
   stateData.traits.push({ code: code, dataId: dataId, value: value });
   return `:\\C[16][${FTKR.CSS.cssStatus.xparam[dataId]}${modifier}${absoluteValue * 100}%]\\C[0]`;
 }
 
 // Process sp-parameter trait
-function tbcsProcessSpParameterTrait(code, dataId, value, absoluteValue) {
+function tbcsProcessSpParameterTrait(stateData, code, dataId, value, absoluteValue) {
   const modifier = value >= 0.01 ? `\\C[2]+` : `\\C[1]-`;
   stateData.traits.push({ code: code, dataId: dataId, value: 1 + value });
   return `:\\C[16][${FTKR.CSS.cssStatus.sparam[dataId]}${modifier}${absoluteValue * 100}%]\\C[0]`;
 }
 
 // Helper to finalize description
-function tbcsFinalizeDescription() {
+function tbcsFinalizeDescription(stateData, description) {
   if (stateData.meta['Help Description']) {
     if (stateData.meta['DescriptionWord']) {
       description = `[${stateData.meta['DescriptionWord']}]${description}`;
     }
 
     if (stateData.meta['Category']) {
-      tbcsAddCategoryDescription();
+      description += tbcsAddCategoryDescription(stateData);
     }
 
     stateData.description = description;
   }
+  return description;
 }
 
 // Add category description if needed
-function tbcsAddCategoryDescription() {
+function tbcsAddCategoryDescription(stateData) {
   const category = stateData.meta['Category'];
 
   switch (category) {
     case ' InvalidDispel':
-      description += `[${$dataStates[201].description}]`;
-      break;
+      return `[${$dataStates[201].description}]`;
     case ' PowerUp':
-      description += `[${$dataStates[202].description}]`;
-      break;
+      return `[${$dataStates[202].description}]`;
     case ' StateSPabNomal':
-      description += `[${$dataStates[30].description}]`;
-      break;
+      return `[${$dataStates[30].description}]`;
     case ' StateUnique':
-      description += `[${$dataStates[40].description}]`;
-      break;
+      return `[${$dataStates[40].description}]`;
   }
+  return '';
 }
 //#endregion
 
@@ -3048,8 +3080,10 @@ enemy_battleSetting = function (id10) {
 
   const gameTroopMembers = $gameTroop.members();
   const gameTroopMember = gameTroopMembers[id10];
+  if (!gameTroopMember) return;
   const enemyId = gameTroopMember._enemyId;
   const target = $gameSwitches.value(426) ? $dataEnemies[$gameTroop.members()[0]._enemyId] : $dataItems[$gameVariables.value(240)];
+  if (!target) return;
   const targetEnemyLV = target.meta['EnemyLV'];
   const targetEnemyLVDataArray = targetEnemyLV ? targetEnemyLV.split(',') : [1, 1];
   const targetEnemyElement = target.meta['EnemyElement'];
@@ -3090,8 +3124,11 @@ enemy_battleSetting = function (id10) {
   };
   if (targetEnemyLV) {
     if (Number(targetEnemyLV) == 0) {
-      level = $gameActors.actor($gameVariables.value(2)).level;
-      gameTroopMember.changeLevel(level);
+      const enemyActor = $gameActors.actor($gameVariables.value(2));
+      if (enemyActor) {
+        level = enemyActor.level;
+        gameTroopMember.changeLevel(level);
+      }
     };
   }
   const gameVar350 = $gameVariables.value(350);
@@ -3295,6 +3332,7 @@ enemy_instantwin = function () {
   const gameVariables = $gameVariables;
   const item240 = $dataItems[gameVariables.value(240)];
   const actor20 = $gameActors.actor(20);
+  if (!item240 || !actor20) return;
   
   // Initialize counters and arrays
   let expCount = 0;
@@ -3310,6 +3348,7 @@ enemy_instantwin = function () {
   
   // Get cached values used in the loop
   const enemyIdArray = gameVariables.value(220);
+  if (!enemyIdArray || !enemyIdArray.length) return;
   const dropUpItem = $dataItems[valueItemDropUpItem];
   const enemyPopChanceArray = item240.meta['BattleEnemyPopC'].split(',');
   const popEnemyCount = Number(enemyPopChanceArray[getRandomIndex(enemyPopChanceArray.length)]);
@@ -3323,6 +3362,7 @@ enemy_instantwin = function () {
     // Get random enemy data
     const enemyId = Number(enemyIdArray[getRandomIndex(enemyIdArray.length)]);
     const enemy = $dataEnemies[enemyId];
+    if (!enemy) continue;
     
     // Calculate rewards
     expCount += Math.round(enemy.exp * (1 + enemyLevelOffset * INSTAWIN_EXP_RATE_MULTIPLIER) + (INSTAWIN_EXP_FLAT_BONUS * enemyLevelOffset));
@@ -3521,6 +3561,7 @@ harvesting_itemSelect = function () {
 drop_walletItemBoxGet = function (fallbackDropCategory, id12) {
   const footpadSkillId = valueFootpadSkillId;
   const actor = $gameActors.actor($gameVariables.value(11));
+  if (!actor) return;
   if (!actor.isLearnedSkill(footpadSkillId) || actor.skillMasteryLevel(footpadSkillId) < 1) {
     return;
   }
@@ -3538,6 +3579,7 @@ drop_walletItemBoxGet = function (fallbackDropCategory, id12) {
   const arr12 = [];
   const gameVariable240 = $gameVariables.value(240);
   const value = $dataItems[gameVariable240];
+  if (!value || !value.meta.GenericDropRate) return;
   const arr11 = value.meta.GenericDropRate.split(',');
   let selectedDropRateId = (gameVariable240 >= 1)
     ? Number(arr11[getRandomIndex(arr11.length)]) || 1
@@ -3584,7 +3626,7 @@ drop_genericDropRate = function (battleDrop, itemsToDrop) {
 
   if (itemId >= 1) {
     const dropItemData = $dataItems[itemId];
-    if (dropItemData.meta.GenericDropRate) {
+    if (dropItemData && dropItemData.meta.GenericDropRate) {
       const genericDropRateArray = dropItemData.meta.GenericDropRate.split(',');
       genericDropRate = Number(genericDropRateArray[getRandomIndex(genericDropRateArray.length)]);
     }
@@ -3601,6 +3643,7 @@ drop_genericDropRate = function (battleDrop, itemsToDrop) {
     if (isBattle && !gameSwitch2State) continue;
 
     const item = allItems[currentDropItemId];
+    if (!item) continue;
     const itemDropRate = item.meta['DropRate'];
     const isBattleDrop = isBattle || !item.meta['NoBattleDrop'];
     if (!isBattleDrop || !itemDropRate) continue;
@@ -3628,11 +3671,15 @@ drop_genericDropRate = function (battleDrop, itemsToDrop) {
 function drop_enemyDropRate(unusedParam, eligibleDropItems) {
 
   const item = $dataItems[$gameVariables.value(240)];
+  if (!item || !item.meta['EnemyLV']) return;
   const enemyLevelData = item.meta['EnemyLV'].split(',');
   const enemyIdArray = $gameVariables.value(220);
+  if (!enemyIdArray || !enemyIdArray.length) return;
   const selectedEnemyLevel = Number(enemyLevelData[getRandomIndex(enemyLevelData.length)]);
   const selectedEnemyIndex = Number(enemyIdArray[getRandomIndex(enemyIdArray.length)]);
-  const enemyMeta = $dataEnemies[selectedEnemyIndex].meta;
+  const baseEnemy = $dataEnemies[selectedEnemyIndex];
+  if (!baseEnemy) return;
+  const enemyMeta = baseEnemy.meta;
 
   const itemsLength = $dataItems.length;
   for (let itemIndex = 1; itemIndex < itemsLength; itemIndex++) {
@@ -3692,15 +3739,17 @@ drop_JobStateWAget = function (equipmentType, unusedParam) {
   let enemyLevel;
 
   if (!$gameParty.inBattle()) {
-    if ($gameMap.event(valueEnemyEventId).event().meta['classStateDrop']) {
-      classStateDropData = $gameMap.event(valueEnemyEventId).event().meta['classStateDrop'].split(',');
+    const mapEvent = $gameMap.event(valueEnemyEventId);
+    if (mapEvent && mapEvent.event().meta['classStateDrop']) {
+      classStateDropData = mapEvent.event().meta['classStateDrop'].split(',');
 
       const targetItemId = $gameVariables.value(240);
       if (targetItemId === 0) {
         enemyLevel = DEFAULT_ENEMY_LEVEL;
       } else {
-        const enemyLevelArray = $dataItems[targetItemId].meta['EnemyLV'].split(',');
-        enemyLevel = Number(enemyLevelArray[getRandomIndex(enemyLevelArray.length)]);
+        const targetItem = $dataItems[targetItemId];
+        const enemyLevelArray = targetItem && targetItem.meta['EnemyLV'] ? targetItem.meta['EnemyLV'].split(',') : [];
+        enemyLevel = enemyLevelArray.length ? Number(enemyLevelArray[getRandomIndex(enemyLevelArray.length)]) : DEFAULT_ENEMY_LEVEL;
       }
     }
   }
@@ -3751,9 +3800,11 @@ drop_JobStateWAget = function (equipmentType, unusedParam) {
 footpad_probabilityUp = function (id1) {
 
   const actor = $gameActors.actor($gameVariables.value(11));
+  if (!actor) return;
   let enemyDropChance = 10;
   if ($gameVariables.value(240) >= 1) {
     const item = $dataItems[$gameVariables.value(240)];
+    if (!item || !item.meta['EnemyLV']) return;
     const itemEnemyLVData = item.meta['EnemyLV'].split(',');
     enemyDropChance = Number(itemEnemyLVData[getRandomIndex(itemEnemyLVData.length)]);
   };
@@ -3771,6 +3822,8 @@ footpad_probabilityUp = function (id1) {
 //アイテムボックス開封
 item_itemBoxOpen = function (a, b, itemId) {
 
+  const boxItem = $dataItems[itemId];
+  if (!boxItem) return;
   if (b.actorId() == a.actorId()) {
     if ($gameSwitches.value(115)) {
       $gameSwitches.setValue(115, false)
@@ -3779,14 +3832,15 @@ item_itemBoxOpen = function (a, b, itemId) {
       $gameSwitches.setValue(115, true);
       $gameParty.loseItem($dataItems[itemId], 1);
 
-      valueItemBoxOpen = `${$dataItems[itemId].name}の内訳（もう一度使用でウィンドウ閉じる）\n`;
+      valueItemBoxOpen = `${boxItem.name}の内訳（もう一度使用でウィンドウ閉じる）\n`;
       let openedItemCount = 0;
       //var value18 = 0;
-      let isSeiyokuItem = !$dataItems[itemId].meta['SeiyokuItem'];
+      let isSeiyokuItem = !boxItem.meta['SeiyokuItem'];
       const itemTypeId = [0, 0, 0, 1, 0, 0, 2, 0];
 
 
-      const arr2 = $dataItems[itemId].meta['ItemBag'].split(',');
+      if (!boxItem.meta['ItemBag']) return;
+      const arr2 = boxItem.meta['ItemBag'].split(',');
       const id2 = arr2[getRandomIndex(arr2.length)];
       for (let id3 = 0; id3 <= id2; id3++) {
         const id12 = itemTypeId[getRandomIndex(itemTypeId.length)];
@@ -3870,7 +3924,7 @@ actor_stateExpGoldRate = function () {
       if (stateRate) {
         // here is using isExp boolean because int value like valueTotalgold is not reference type and if set them to array it will be new int objects 
         if (isExp) valueTotalexp += Number(stateRate);
-        else valueTotalgold + Number(stateRate);
+        else valueTotalgold += Number(stateRate);
       };
     };
   }
@@ -3928,7 +3982,7 @@ attack_DamageFormula = function (user, target, id1) {
     if (skill.meta['Multiple Elements']) {
       userAttackElements.push(...skill.meta['Multiple Elements'].split(','));
     };
-    const skillDamageElementId = $dataSkills[1].damage.elementId;
+    const skillDamageElementId = skill.damage.elementId;
     if (skillDamageElementId >= 1) {
       userAttackElements.push(skillDamageElementId);
     };
@@ -3964,6 +4018,7 @@ attack_DamageFormula = function (user, target, id1) {
 boss_actionPattarn1 = function (a) {
 
   const gameVar346 = $gameVariables.value(346);
+  if (!gameVar346) return;
 
   let selectedSkillId = 0;
   let chosenSkillId = 0;
@@ -3973,7 +4028,7 @@ boss_actionPattarn1 = function (a) {
     if (a.isStateAffected(416)) {
       candidateSkillId = gameVar346[3];
     } else {
-      if (a.meetsSkillConditions($dataSkills[gameVar346[2]])) {
+      if ($dataSkills[gameVar346[2]] && a.meetsSkillConditions($dataSkills[gameVar346[2]])) {
         selectedSkillId = gameVar346[2];
       }
     }
@@ -3988,6 +4043,7 @@ boss_actionPattarn1 = function (a) {
     const stateId = gameVar347i[1];
     const skillId = gameVar347i[2];
     const skill = $dataSkills[skillId];
+    if (!skill) continue;
     if (typeId == 0) {//HPトリガー
       if (899 != skillId && a.hpRate() <= stateId / 100) {
         if (!gameVar470 && skill.tpCost == 100) { a.gainTp(100) };
@@ -4044,7 +4100,7 @@ boss_actionPattarn1 = function (a) {
   };
   const fallbackSkillId = candidateSkillId;
   let randomRoll = getRandomIndex(11);
-  if (a.isStateAffected(29) && $dataSkills[gameVar346[0]].meta['Select Conditions']) {
+  if (a.isStateAffected(29) && $dataSkills[gameVar346[0]] && $dataSkills[gameVar346[0]].meta['Select Conditions']) {
     randomRoll += 2;//前衛アタック持ちが後衛の時にアビリティ使用確立アップ
   };
   if (randomRoll >= 5) {
@@ -4054,7 +4110,7 @@ boss_actionPattarn1 = function (a) {
       if (candidateSkillId == 0) {
         candidateSkillId = gameVar346[1];
       };
-      if (a.meetsSkillConditions($dataSkills[candidateSkillId])) {
+      if ($dataSkills[candidateSkillId] && a.meetsSkillConditions($dataSkills[candidateSkillId])) {
         break;
       };
     };
@@ -4062,11 +4118,11 @@ boss_actionPattarn1 = function (a) {
 
   let bossActionId = candidateSkillId;
   if (selectedSkillId >= 1) {
-    if (!a.meetsSkillConditions($dataSkills[selectedSkillId])) {
+    if (!$dataSkills[selectedSkillId] || !a.meetsSkillConditions($dataSkills[selectedSkillId])) {
       selectedSkillId = 0;
     };
   };
-  if (!a.meetsSkillConditions($dataSkills[bossActionId])) {
+  if (!$dataSkills[bossActionId] || !a.meetsSkillConditions($dataSkills[bossActionId])) {
     bossActionId = fallbackSkillId;
   };
   if ([101, 111, 121, 131, 141, 151, 161, 171, 181, 191, 901, 911, 921].some(function (id) { return bossActionId == id })) {
@@ -4094,7 +4150,9 @@ boss_actionPredict = function (predictedSkillId, id1) {
 
   var masteryCheckSkillId = 777;//
   var enemy1 = $gameTroop.members()[0];
+  if (!enemy1) return;
   var actor = $gameActors.actor($gameVariables.value(2));
+  if (!actor) return;
   var masteryBonus = actor.skillMasteryLevel(masteryCheckSkillId) * 10;
   var predictionMessage = 1;
   if (id1 == 1) {
@@ -4173,7 +4231,7 @@ skill_additionalSet = function (user, target) {
           };
           if (Number(arr1[1]) == 2) {
             var actor = $gameActors.actor($gameVariables.value(20));
-            if ($dataAnimations[Number(arr1[4])].position() == 3) {
+            if ($dataAnimations[Number(arr1[4])].position == 3) {
               actor.startAnimation(Number(arr1[4]), true, 1);
             } else {
               for (var i = 0; i < $gameParty.battleMembers().length; i++) {
@@ -4190,7 +4248,7 @@ skill_additionalSet = function (user, target) {
           };
           if (Number(arr1[1]) == 4) {
             var target1 = $gameTroop.members()[$gameVariables.value(92)];
-            if ($dataAnimations[Number(arr1[4])].position() == 3) {
+            if ($dataAnimations[Number(arr1[4])].position == 3) {
               target1.startAnimation(Number(arr1[4]), true, 1);
             } else {
               for (var i = 0; i < $gameTroop.members().length; i++) {
@@ -4322,6 +4380,7 @@ skillWord_direction = function (id1, id2) {
 ougiWord_direction = function (id1) {
 
   if (id1 == 0) {
+    if (!BattleManager._subject) return;
     if (BattleManager._subject.isActor()) {
       var user = $gameActors.actor($gameVariables.value(20)).index();
     } else {
@@ -4619,11 +4678,13 @@ function sdp1ClearSummonParticles() {
 
 // Animates the summon picture fading out
 function sdp1AnimateSummonPictureFadeOut(pictureId) {
-  const picOrigin = $gameScreen.picture(pictureId).origin();
-  const picX = $gameScreen.picture(pictureId).x();
-  const picY = $gameScreen.picture(pictureId).y();
-  const picScaleX = $gameScreen.picture(pictureId).scaleX();
-  const picScaleY = $gameScreen.picture(pictureId).scaleY();
+  const picture = $gameScreen.picture(pictureId);
+  if (!picture) return;
+  const picOrigin = picture.origin();
+  const picX = picture.x();
+  const picY = picture.y();
+  const picScaleX = picture.scaleX();
+  const picScaleY = picture.scaleY();
 
   $gameScreen.movePicture(pictureId, picOrigin, picX, picY, picScaleX, picScaleY + 100, 0, 0, 60);
   picture_fade1(pictureId, "fadeOut", 'Hscene005', 60, 5);
@@ -4666,6 +4727,7 @@ function sdp1PlaySummonAppearanceEffects() {
 
 // Shows the summon picture with appropriate positioning and animation
 function sdp1ShowSummonPicture(pictureId, skill) {
+  if (!skill || !skill.meta['picSize']) return;
   const picSizeArr = skill.meta['picSize'].split(',');
   const picturePath = "/img/sv_enemies/Summon_" + Number(picSizeArr[0]);
   const offsetX = Number(picSizeArr[1]);
@@ -4678,6 +4740,7 @@ function sdp1ShowSummonPicture(pictureId, skill) {
 
 // Configures particle effects for the summon based on skill properties
 function sdp1ConfigureSummonParticles(skill) {
+  if (!skill || !skill.meta['picSize']) return;
   const particle = $gameScreen._particle;
   const picSizeArr = skill.meta['picSize'].split(',');
 
@@ -4739,8 +4802,10 @@ function sdp1ApplySummonElementColors(particle, skill) {
 
 // Handles displaying the skill name for a summon
 function sdp1HandleSummonSkillDisplay(pictureId) {
-  const picX2 = $gameScreen.picture(pictureId).x();
-  const picY2 = $gameScreen.picture(pictureId).y();
+  const picture = $gameScreen.picture(pictureId);
+  if (!picture) return;
+  const picX2 = picture.x();
+  const picY2 = picture.y();
 
   // Play animation at the picture's position
   $gameScreen.startAnimation(picX2, picY2, 301, false);
@@ -4752,6 +4817,7 @@ function sdp1HandleSummonSkillDisplay(pictureId) {
 // Displays the skill name with optional ruby text above it
 function sdp1DisplaySummonSkillName(pictureId, xPosition) {
   const currentSkill = $dataSkills[$gameVariables.value(96)];
+  if (!currentSkill) return;
   const displayText = `\x1bSIN[${$gameVariables.value(96)}]`;
 
   // Set up optional ruby text if available
@@ -4769,7 +4835,7 @@ function sdp1DisplaySummonSkillName(pictureId, xPosition) {
 
 // Prepares ruby text for a skill if available
 function sdp1SetupSummonRubyText(skill) {
-  if (!skill.meta['rubi']) return;
+  if (!skill || !skill.meta['rubi']) return;
 
   let rubiText = skill.meta['rubi'];
   // Remove spaces from ruby text
@@ -4854,6 +4920,7 @@ battle_simpleSubjugation = function (subjugationId) {
   // Skip level check if force subjugation is active
   if (!isForceSubjugation) {
     const battleItem = $dataItems[$gameVariables.value(240)];
+    if (!battleItem || !battleItem.meta['EnemyLV']) return;
     const enemyLvArray = battleItem.meta['EnemyLV'].split(',');
     
     // Find max level in a single pass
@@ -4864,7 +4931,9 @@ battle_simpleSubjugation = function (subjugationId) {
     }
     
     // Early return if actor level is insufficient
-    const actorLevel = $gameActors.actor($gameVariables.value(11)).level;
+    const levelActor = $gameActors.actor($gameVariables.value(11));
+    if (!levelActor) return;
+    const actorLevel = levelActor.level;
     if (actorLevel < maxEnemyLv) return;
   }
   
@@ -5012,11 +5081,8 @@ battleStatus_showHide = function (id1) {
   } else {
     if (on) BattleManager._statusWindow.show(); else BattleManager._statusWindow.hide();
   };
-  if ($gameSwitches.value(211)) {
-    if (SceneManager._scene._bosshp_sprites === undefined) {
-      console.warn('SceneManager._scene._bosshp_sprites is undefined!');
-    }
-    else SceneManager._scene._bosshp_sprites.visible = on;
+  if ($gameSwitches.value(211) && SceneManager._scene && SceneManager._scene._bosshp_sprites) {
+    SceneManager._scene._bosshp_sprites.visible = on;
   }
 
 }
@@ -5028,6 +5094,7 @@ state_addFormula1 = function(params) {
   
   // Cache state data
   const stateData = $dataStates[stateId];
+  if (!stateData) return;
   
   // Skip processing if target is immune
   const targetName = `\\C[16]${target.name()}\\C[0]`;

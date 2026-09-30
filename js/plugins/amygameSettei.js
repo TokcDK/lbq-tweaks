@@ -514,13 +514,14 @@ gameVariables.setValue(202,[]);
 const dataMap = $dataMap;
 const dataMapLength = dataMap.length; 
 for (let i = 1; i < dataMapLength; i++) {
-  if(dataMap[i].meta['EventRespawnBan']){
+  if(dataMap[i] && dataMap[i].meta['EventRespawnBan']){
     gameVariables.value(202).push(i);
 }};
 weather_set();
 const dataStates = $dataStates;
 const dataStatesCount = dataStates.length;
 for (let i = 1; i < dataStatesCount; i++) {
+  if (!dataStates[i]) continue;
   const meta = dataStates[i].meta;
   pushValid(meta['HstateDisplaySet'], valueHstateDisplay, i);
   pushValid(meta['BattleEndCoutaClearState'], valueStateBattleClear, i);
@@ -551,6 +552,7 @@ for (let i = 1; i < dataStatesCount; i++) {
 const dataSkills = $dataSkills;
 const dataSkillsCount = dataSkills.length;
 for (let i = 1; i < dataSkillsCount; i++) {
+  if (!dataSkills[i]) continue;
   const meta = dataSkills[i].meta;
   pushValid(meta['SwicthOnOffUse'] && meta['MCharacterLearn'], valuePersonalSkill, i);
   pushValid(meta['SkillChangeName'], valueChangeSkill, i);
@@ -573,6 +575,7 @@ for (let i = 1; i < dataSkillsCount; i++) {
 const dataItems = $dataItems;
 const dataItemsCount = dataItems.length;
 for (let i = 1; i < dataItemsCount; i++) {
+  if (!dataItems[i]) continue;
   const meta = dataItems[i].meta;
   pushValid(meta['SkillCostToday'], valueOneDayLimitItem, i);
   pushValid(meta['HexpReflectionSkill'], valueHStatesUp2, i);
@@ -587,6 +590,7 @@ for (let i = 1; i < dataItemsCount; i++) {
 const dataWeapons = $dataWeapons;
 const dataWeaponsCount = dataWeapons.length;
 for (let i = 1; i < dataWeaponsCount; i++) {
+  if (!dataWeapons[i]) continue;
   const meta = dataWeapons[i].meta;
   pushValid(meta['TownInformation'], valueJouhouTown, i);
   pushValid(meta['AddPowerCustom'], valueAddPowerCustomWeapon, i);
@@ -595,6 +599,7 @@ for (let i = 1; i < dataWeaponsCount; i++) {
 };
 const dataArmors = $dataArmors;
 for (let i = 1; i <= valueArmorsLength; i++) {
+  if (!dataArmors[i]) continue;
   const meta = dataArmors[i].meta;
   pushValid(meta['AddPowerCustom'], valueAddPowerCustomArmor, i);
   pushArray(meta['Equip State'], valueEquipPassiveArmor);

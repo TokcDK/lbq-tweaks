@@ -8,14 +8,15 @@
 
 //クエスト報酬設定。クエストで変数21-23は報酬で使っているので使用不可。
 quest_housyuukeisan = function (id1) {
-  //WARN: valueCountSet1 and valueCountSet2 is not changing here! Some init values?
-  var valueCountSet1 = 0;
-  var valueCountSet2 = 0;
+  //NOTE: 下記3変数は呼び出し元のquest_housyuuが読み取るため暗黙グローバルとして扱う
+  rewardGoldAmount = 0;
+  rewardItemAmount = 0;
   
-  let valueCountSet3 = `\n\\C[16]●追加報酬\\C[0]\n`;
+  additionalCompletionText = `\n\\C[16]●追加報酬\\C[0]\n`;
   let id2 = Number(valueQuestRankD[1]);
   let id3 = Number(valueQuestRankD[2]);
   const itemData = $dataItems[id1];
+  if (!itemData) return;
   const id4 = itemData.iconIndex;
 
   const set_Id2_id3 = (arr) => {
@@ -37,6 +38,8 @@ quest_housyuukeisan = function (id1) {
 	  set_Id2_id3(valueQuestRankS);
       break;
   }
+  rewardGoldAmount = id2;
+  rewardItemAmount = id3;
 
   let j = 0;
   for (const i1 in itemData.meta) {
@@ -62,20 +65,21 @@ quest_housyuukeisan = function (id1) {
       default:
         continue;
     }
+    if (!item) continue;
 
     if ($gameSwitches.value(518)) {
       $gameParty.gainItem(item, Number(arr1[2]));
     }
 
     if (itemType === 3) {
-      valueCountSet3 += `[\\C[2]${Number(arr1[2])}\\C[0]\\G] `;
+      additionalCompletionText += `[\\C[2]${Number(arr1[2])}\\C[0]\\G] `;
     } else {
-      valueCountSet3 += `[${item.name}:\\C[2]+${Number(arr1[2])}\\C[0]] `;
+      additionalCompletionText += `[${item.name}:\\C[2]+${Number(arr1[2])}\\C[0]] `;
     }
 
     j += 1;
     if (j % 3 === 0) {
-      valueCountSet3 += `\n`;
+      additionalCompletionText += `\n`;
     }
   }
 };
@@ -109,6 +113,7 @@ quest_housyuu = function (questId, completionType) {
   const baseItemId = questId >= 1001 ? 900 : 800;
   const questRewardItem = questId >= 1001 ? $dataItems[questId + 50] : $dataItems[questId + 100];
   const questItem = $dataItems[questId];
+  if (!questItem) return;
   const questCategory = questItem.meta['SGカテゴリ'];
 
   const switch518Enabled = $gameSwitches.value(518);
@@ -135,6 +140,7 @@ quest_housyuu = function (questId, completionType) {
     if (deliveryArr[0] == 5) continue;
 
     const deliveryItem = deliveryItemCategory[Number(deliveryArr[0])];
+    if (!deliveryItem) continue;
     if (switch518Enabled) {
       $gameParty.loseItem(deliveryItem, Number(deliveryArr[2]));
     }
@@ -198,7 +204,7 @@ quest_housyuu = function (questId, completionType) {
   $gameSwitches.setValue(380, true);
 
   if (switch518Enabled && questCategory) {
-    if (questCategory == '受注クエスト' || questCategory == 'ＥＸ受注クエスト') {
+    if (questCategory === '受注クエスト' || questCategory === 'ＥＸ受注クエスト') {
       $gameVariables.setValue(50, $gameVariables.value(50) + 1);
     } else {
       $gameVariables.setValue(150, $gameVariables.value(150) + 1);
@@ -383,7 +389,8 @@ if(valueQuestArray5[questItemId-questBaseId] == 0){
   var questInfoText = `\x1bI[${$dataItems[questItemId].iconIndex}]${$dataItems[questItemId].name}\n`;
   $gameSwitches.setValue(380,true);
 };
-var arr1 = valueQuestArray7[questItemId-questBaseId].split("\n");
+var startConditions = valueQuestArray7[questItemId-questBaseId];
+var arr1 = typeof startConditions === 'string' ? startConditions.split("\n") : [];
 for (var i = 0; i <= arr1.length-1; i++) {
   if(arr1[i] == 0){}else{
     questInfoText += `${arr1[i]}`;

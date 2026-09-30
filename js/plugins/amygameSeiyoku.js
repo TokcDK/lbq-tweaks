@@ -47,7 +47,8 @@ weeks_toggleOtherH = function () {
 h_BattleEcstasyDirect = function () {
 
   adv_HpartDirectPlay(3);
-  if ($dataActors[$gameVariables.value(20)].meta['SexualZettyouLow']) {
+  var actorData = $dataActors[$gameVariables.value(20)];
+  if (actorData && actorData.meta['SexualZettyouLow']) {
     var actor = $gameActors.actor($gameVariables.value(20));
     var ecstasyLevelTag = 'Low'; var ecstasyRank = 1;
     //if($gameActors.actor($gameVariables.value(20)).isLearnedSkill(62)){var ecstasyLevelTag = 'Middle';var ecstasyRank = 2};
@@ -70,6 +71,7 @@ h_BattleEcstasyDirect = function () {
 h_keikenhyouji1 = function (id2, id1) {
 
   var partnerWeaponId = id1;
+  if (!$dataWeapons[id1] || !$gameActors.actor(21)) return;
   if ($gameVariables.value(353)[id1 - 300] != 0) {
     $gameActors.actor(21).setName(`\x1bnnp[${id1}]`);
   } else {
@@ -394,6 +396,7 @@ battlerecord_mvp = function (unusedParam) {
   const deadCounters = [];
   const gameVar298Values = [];
   const partyMembers = $gameParty.members();
+  if (partyMembers.length === 0) return;
   const skillAcquisitionSequence = $gameVariables.value(351);
   const var298Array = $gameVariables.value(298);
   for (let index = 0, lastIndex = partyMembers.length - 1; index <= lastIndex; index++) {
@@ -436,6 +439,7 @@ battlerecord_mvp = function (unusedParam) {
 actor_stateshyouji = function () {
   const actorId = $gameVariables.value(20);
   const actor = $gameActors.actor(actorId);
+  if (!actor) return;
 
   updateActorHStateDisplayActorStateshyouji(actor, actorId);
   displayBattleRecordActorStateshyouji(actor, actorId);
@@ -569,7 +573,7 @@ function displaySkillRecordActorStateshyouji(actor) {
     chainUsageTotal = 0;
 
   for (let skillId = 1; skillId <= $dataSkills.length - 1; skillId++) {
-    if ($dataSkills[skillId].name === '') { // Skip skills with empty names
+    if (!$dataSkills[skillId] || $dataSkills[skillId].name === '') { // Skip skills with empty names
       continue;
     }
 
@@ -628,6 +632,7 @@ seiyoku_jougenn = function () {
 }
 seiyoku_jougenn1 = function (gameActor) {
 
+  if (!gameActor) return;
   const actorVariableIndex = gameActor.actorId() + 380;
   const actorSuppressionValues = $gameVariables.value(actorVariableIndex);
   actorSuppressionValues[0] = 0;
@@ -637,7 +642,9 @@ seiyoku_jougenn1 = function (gameActor) {
     const hideIfLearnedSkillId = suppressionSkill.meta['Hide if Learned Skill']; // 'Hide if Learned Skill' is missing in meta
     if (hideIfLearnedSkillId && gameActor.isLearnedSkill(Number(hideIfLearnedSkillId))) continue;
 
-    const suppressionParams = suppressionSkill.meta['HstaSuppression'].split(',');
+    const suppressionParamsRaw = suppressionSkill.meta['HstaSuppression'];
+    if (!suppressionParamsRaw) continue;
+    const suppressionParams = suppressionParamsRaw.split(',');
     const suppressionType = Number(suppressionParams[0]);
     if (suppressionType == 0 || suppressionType == 401) {
       const suppressionThreshold = Number(suppressionParams[1]) * 100;
@@ -659,6 +666,7 @@ rosyutu_genkai = function () {
 }
 rosyutu_genkai1 = function (gameActor) {
 
+  if (!gameActor) return;
   const id = 405; // 400 + 5
   $gameVariables.setValue(id, 100);
   const actorSkillLevel = gameActor.skillMasteryLevel(55);
@@ -741,6 +749,7 @@ jusei_keisan = function () {
 
   var fertilizationBase = 11;
   var actor = $gameActors.actor($gameVariables.value(20));
+  if (!actor) return;
   if (!actor.isStateAffected(83) && actor.isLearnedSkill(65)) {
     if ($gameVariables.value(400 + fertilizationBase) >= 1) {
       var fertilizationRate = $gameVariables.value($gameVariables.value(20) + 380)[3];
@@ -768,9 +777,11 @@ jusei_keisan = function () {
 jusei_clear = function () {
 
   var list = $gameVariables.value(247);
+  if (!list) return;
   list.forEach(function (id) {
     $gameVariables.setValue(20, id);
     var actor = $gameActors.actor(id);
+    if (!actor) return;
     actor.removeState(79);//受精前段階ステート消滅
     if (!actor.isStateAffected(82)) {
       for (var i = 101; i <= 200; i++) {
@@ -786,9 +797,10 @@ jusei_clear = function () {
 //☆☆Ｈステのうち、身長等
 hstates_heights = function (id, id2) {
 
-  if (isGirl($gameActors.actor(id))) {
+  var actor1 = $gameActors.actor(id);
+  if (actor1 && isGirl(actor1)) {
     var actor = $dataActors[id];
-    var actor1 = $gameActors.actor(id);
+    if (!actor || !actor.meta['HeightEtc']) return;
     if (actor1.elementRate(37) >= 1.1) {
       var reproductionLabel = `\\fs[25]Reproduction:${Math.round(actor1.elementRate(37))}%`;
     } else {
@@ -866,8 +878,6 @@ hstates_heights = function (id, id2) {
           if (physiqueChangeCount >= physiqueUpCount / 2) {
             //bodyStyleLabel += `\\V[27][Ｈな${$dataActors[id].meta['BodyStyle']}]\\C[0]`;
             bodyStyleLabel += `\\C[21][${$dataActors[id].meta['BodyStyle']}]\\C[0]`;
-          } else {
-            bodyStyleLabel += `\\C[21][${$dataActors[id].meta['BodyStyle']}]\\C[0]`;
           }
         }
       }
@@ -895,7 +905,7 @@ ${reproductionLabel}`);
     $gameVariables.value(id + 380)[55] = hipCm;
     $gameVariables.value(id + 380)[56] = cupSize;
   } else {
-    if ($dataActors[id].meta['BodyStyle']) {
+    if ($dataActors[id] && $dataActors[id].meta['BodyStyle']) {
       $gameVariables.setValue(id2, `\\C[21][${$dataActors[id].meta['BodyStyle']}]\\C[0]`);
     } else {
       $gameVariables.setValue(id2, `NoData`);
@@ -908,6 +918,7 @@ ${reproductionLabel}`);
 hskill_learn = function (id1) {
 
   var actor = $gameActors.actor($gameVariables.value(20));
+  if (!actor) return;
   var list = valueGetHskillLearn;
   list.forEach(function (i) {
     if (id1 == 1) { var valueLearn = !actor.isLearnedSkill(i) };
@@ -986,7 +997,7 @@ hskill_learn = function (id1) {
       };
     };
   }, this);
-  if (valueHskillLearnArr != 0 && id1 == 1) {
+  if (valueHskillLearnArr.length > 0 && id1 == 1) {
     for (var i = 0; i <= valueHskillLearnArr.length - 1; i++) {
       var hskValue0 = `──\\C[2]H-Passive\\C[0]\\C[27]\x1bSIN[${valueHskillLearnArr[i]}]\\C[0]RankUp!──\n`;
       hskValue0 += `${$dataSkills[valueHskillLearnArr[i]].description}\\C[0]\n`;
@@ -1009,10 +1020,11 @@ hskill_learn = function (id1) {
 hskill_learn2 = function () {
 
   var actor = $gameActors.actor($gameVariables.value(20));
+  if (!actor) return;
   var exposureSkillId = 55;//露出開発度
   var itemOrClothId = zenravalueId;//全裸
   var rankThreshold = 1;
-  if (actor.skillMasteryLevel(exposureSkillId) >= rankThreshold && !$gameParty.hasItem($dataItems[itemOrClothId])) {
+  if ($dataItems[itemOrClothId] && actor.skillMasteryLevel(exposureSkillId) >= rankThreshold && !$gameParty.hasItem($dataItems[itemOrClothId])) {
     $gameParty.gainItem($dataItems[itemOrClothId], 1);
     var learnMessage = `──\\C[2]${$dataSkills[exposureSkillId].name}\\C[0]が${rankThreshold}到達！　\\C[27]\x1bIIN[${itemOrClothId}]\\C[0]Get!──\n`;
     learnMessage += `${$dataItems[itemOrClothId].description}\\C[0]\n`;
@@ -1026,7 +1038,7 @@ hskill_learn2 = function () {
   };
   var itemOrClothId = clothPartsChoice;//パーツ指定
   var rankThreshold = 2;
-  if (actor.skillMasteryLevel(exposureSkillId) >= rankThreshold && !$gameParty.hasItem($dataItems[itemOrClothId])) {
+  if ($dataItems[itemOrClothId] && actor.skillMasteryLevel(exposureSkillId) >= rankThreshold && !$gameParty.hasItem($dataItems[itemOrClothId])) {
     $gameParty.gainItem($dataItems[itemOrClothId], 1);
     var learnMessage = `──\\C[2]${$dataSkills[exposureSkillId].name}\\C[0]が${rankThreshold}到達！　\\C[27]\x1bIIN[${itemOrClothId}]\\C[0]Get!──\n`;
     learnMessage += `${$dataItems[itemOrClothId].description}\\C[0]\n`;
@@ -1189,6 +1201,7 @@ hStates_up1 = function (id) {
   if (id == 2) { var value = $dataItems; var metaList = valueHStatesUp2 };
   if (id == 3) { var value = $dataStates; var metaList = valueHStatesUp3 };
   var actor = $gameActors.actor($gameVariables.value(20));
+  if (!actor || !value || !metaList) return;
   var list = metaList;
   list.forEach(function (i) {
     if (value[i].meta['HexpReflectionSkill'] && actor.battleSkillsRaw().includes(i)) {
@@ -1302,6 +1315,7 @@ seiyoku_genkai = function () {
 hstates_rankSeigen = function () {
 
   var actor = $gameActors.actor($gameVariables.value(20));
+  if (!actor) return;
   var suppressionResult = `　`;
   var list = valueHstaSuppression;
   list.forEach(function (id) {
@@ -1359,6 +1373,7 @@ seiyoku_kanniHyouji = function () {
     valueWordSet0 = `${$gameVariables.value(506)}\n`;
   };
   var actor = $gameActors.actor($gameVariables.value(20));
+  if (!actor) return;
   var start = 401; var end = 440;
   for (var i = start; i <= end; i++) {
     var skipFlag = 0;
@@ -1622,6 +1637,7 @@ seiyoku_hosei = function () {
 seiyoku_hanei = function () {
 
   var actor = $gameActors.actor($gameVariables.value(20));
+  if (!actor) return;
   var start = 1; var end = 30;
   for (var i = start; i <= end; i++) {
     $gameVariables.value($gameVariables.value(20) + 380)[i] += $gameVariables.value(i + 400);
@@ -1708,8 +1724,9 @@ seiyoku_itemHanei = function (id1, id2, id3, id4) {
     var valueItems = $dataItems;
   };
   $gameVariables.setValue(20, id2.actorId());
-  if ($dataActors[id2.actorId()].meta['Heroine']) {
-    var actor = $gameActors.actor($gameVariables.value(20));
+  var actor = $gameActors.actor($gameVariables.value(20));
+  if (!actor) return;
+  if ($dataActors[id2.actorId()] && $dataActors[id2.actorId()].meta['Heroine']) {
     //使用アイテム名表示。アイテム使用時はパッシブ反映しない。
     if (valueItems[id3].meta['性欲度使用制限']) {
       var libidoUseLimitSkill = Number(valueItems[id3].meta['性欲度使用制限']);
@@ -1757,8 +1774,10 @@ jusei_todayrate = function () {
 
   var fertilizationSkillId = 65;//スケベっこで解放
   var list = $gameVariables.value(247);
+  if (!list) return;
   list.forEach(function (id) {
     var actor = $gameActors.actor(id);
+    if (!actor) return;
     if (actor.isLearnedSkill(fertilizationSkillId)) {
       $gameVariables.value(id + 380)[3] = getRandomIndex(11);
       if (actor.battleSkillsRaw().includes(870)) {
@@ -1778,6 +1797,7 @@ actor_Hhennreki = function (id1) {
   for (var i = 1; i <= 10; i++) { eval("valueWordSet" + i + " = wordSetIndex") };
   var wordSetIndex = 1;
   var actor = $gameActors.actor($gameVariables.value(20));
+  if (!actor) return;
   var list = valueHstateDisplay;
   list.forEach(function (id) {
     if (actor.isStateAffected(id)) {
@@ -1798,6 +1818,7 @@ actor_Hhennreki = function (id1) {
 actor_Hhennreki2Before = function (id1) {
 
   var actor = $gameActors.actor($gameVariables.value(20));
+  if (!actor) return;
   if (4 == id1) {
     var historyHeaderText = `\\I[526]\\C[27]男性遍歴　　　　　　\\C[0]　　 　　　　　　　　　　　　　　　`;
   };
@@ -1849,6 +1870,7 @@ actor_Hhennreki2 = function (id1) {
 
   if (4 == id1 || 5 == id1) {
     var actor = $gameActors.actor($gameVariables.value(20));
+    if (!actor) return;
     var arr1 = [0];
     var arr2 = $gameVariables.value(360 + $gameVariables.value(20));
     if (4 == id1) { var startIndex = 1; var nameOffset = 300; var reverseOffset = 100 };
@@ -1889,8 +1911,8 @@ actor_Hhennreki2 = function (id1) {
     };
   };
   if (id1 == 6) {
-    var arr1 = $gameVariables.value(174)[$gameVariables.value(20)];
-    if (arr1 != 0) {
+    var arr1 = $gameVariables.value(174) ? $gameVariables.value(174)[$gameVariables.value(20)] : 0;
+    if (arr1 && arr1.length > 0) {
       for (var i = arr1.length - 1; i >= 1; i--) {
         const id = 1;
         const choiceParams = {
@@ -1914,6 +1936,7 @@ const additionalXOffsetOptionsSceneTextBgv = [50, 60, 70, 80, 90, 100, 110, 120,
 scene_textBgv = function (actorId, baseX, baseY, offsetMode, waitMode, fontSetting) {
 
   const gameActor = $gameActors.actor(actorId);
+  if (!gameActor) return;
   const dataActor = gameActor.actor();
   //const actorNickname = actor.nickname();
   let ecstasyPhrases = [];
@@ -1937,14 +1960,18 @@ scene_textBgv = function (actorId, baseX, baseY, offsetMode, waitMode, fontSetti
       }
     }
   } else {
-    combinedEcstasyArray = $gameVariables.value(707);
+    combinedEcstasyArray = $gameVariables.value(707) || [];
   }
-  if (ecstasyPhrases == 0) { } else { combinedEcstasyArray = combinedEcstasyArray.concat(ecstasyPhrases); }
-  const chosenPhrase = combinedEcstasyArray[getRandomIndex(combinedEcstasyArray.length)];
+  if (ecstasyPhrases.length > 0) { combinedEcstasyArray = combinedEcstasyArray.concat(ecstasyPhrases); }
+  const chosenPhrase = combinedEcstasyArray[getRandomIndex(combinedEcstasyArray.length)] || '';
   if ($gameVariables.value(299) == 0) {
     $gameVariables.setValue(299, [121, 122, 123, 124, 125, 126, 127, 128, 129, 130]);
   }
   let availablePictureIds = $gameVariables.value(299);
+  if (!availablePictureIds || availablePictureIds.length === 0) {
+    availablePictureIds = [121, 122, 123, 124, 125, 126, 127, 128, 129, 130];
+    $gameVariables.setValue(299, availablePictureIds);
+  }
   const chosenPictureId = availablePictureIds[getRandomIndex(availablePictureIds.length)]; //ID
   let foundIndex = availablePictureIds.findIndex(idItem => idItem === chosenPictureId);
   if (foundIndex >= 0) {
@@ -2009,6 +2036,7 @@ actor_pregnancyCalculation = function (actorId) {
 
   $gameVariables.setValue(20, actorId);
   const actor = $gameActors.actor(actorId);
+  if (!actor) return;
   if (!actor.isStateAffected(83)) {
     return;
   };
@@ -2026,7 +2054,7 @@ actor_pregnancyCalculation = function (actorId) {
 
   //妊娠時の一時的なサイズ増量表現を消去させる
   const actorId380 = actorId + 380;
-  const hRecordsCount = $gameVariables.value(actorId380)[0];
+  const hRecordsCount = $gameVariables.value(actorId380);
   hRecordsCount[42] = 0;
   hRecordsCount[43] = 0;
   hRecordsCount[44] = 0;
@@ -2042,7 +2070,7 @@ actor_pregnancyCalculation = function (actorId) {
     }
   };
   const selectedPartner = potentialPartners[getRandomIndex(potentialPartners.length)];
-  const finalPartner = (selectedPartner == 0) ? 102 : selectedPartner;
+  const finalPartner = selectedPartner ? selectedPartner : 102;
   partnerHRecords[finalPartner + 100] += 1;
   if (hRecordsCount[49] == 0) {
     hRecordsCount[49] = finalPartner + 200;
@@ -2083,6 +2111,7 @@ actor_hStatesTachie = function (mode) {
 
   const actorId = $gameVariables.value(20);
   const gameActor = $gameActors.actor(actorId); // bad using global dinamic! but the function was called from common event
+  if (!gameActor) return;
   if (!isGirl(gameActor)) {
     tachie_hyouji2(gameActor);
   } else {
@@ -2267,6 +2296,7 @@ function setActorStateBasedOnSkillsHStatesTachie(actor) {
 seiyoku_parameterReset = function (id1) {
 
   var actor = $gameActors.actor($gameVariables.value(20));
+  if (!actor) return;
   if (id1 == 1) {//選択肢作成
     var start = 401; var end = 440;
     for (var i = start; i <= end; i++) {
@@ -2353,6 +2383,7 @@ seiyoku_parameterReset = function (id1) {
 actor_battleSekughara1 = function () {
 
   var actor = $gameActors.actor($gameVariables.value(20));
+  if (!actor) return;
   var secuharaStateId = 81;
   actor.addState(secuharaStateId);
   if (actor._stateCounter[secuharaStateId] >= 1) {
@@ -2425,7 +2456,7 @@ sex_direction = function (actionType, pistonIntensity, patternVariant) {
   let voicePatternNum = 0;
   if ($gameVariables.value(530) >= 1) {
     $gameVariables.setValue(20, $gameVariables.value(530));
-    if ($dataActors[$gameVariables.value(20)].meta['HvoicePattern']) {
+    if ($dataActors[$gameVariables.value(20)] && $dataActors[$gameVariables.value(20)].meta['HvoicePattern']) {
       voicePatternNum = Number($dataActors[$gameVariables.value(20)].meta['HvoicePattern']);
       if (pistonIntensity == 0) {
         if ($gameActors.actor($gameVariables.value(530)).isLearnedSkill(65)) {
@@ -2547,7 +2578,7 @@ class SexActionSoundEffectBase {
     return true;
   }
   get soundName2() {
-    this.soundName;
+    return this.soundName;
   }
   get volumeRandomIndexMax2() {
     return this.volumeRandomIndexMax;
@@ -2641,7 +2672,7 @@ class SexActionSoundEffectBase {
 
     if (this.playSecond) {
       this.updateBgsLineSetting();
-      this.playBgs(this.soundName2, this.volumeOffset2, this.pitchOffset2, this.volumeRandomIndexMax2, this.pitchRandomIndexMax2);
+      this.playBgs(this.soundName2(), this.volumeOffset2(), this.pitchOffset2(), this.volumeRandomIndexMax2(), this.pitchRandomIndexMax2());
     }
 
     // Modified selection placeholder code:
@@ -2849,8 +2880,8 @@ function actionType3SexDirection(pistonIntensity, patternVariant, voicePatternNu
 // This function plays background sounds for a kissing effect including primary and secondary sound layers,
 // and then, if applicable, plays a patterned sound based on the input parameters.
 function actionType4SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
-  const KissSoundEffect = new FluidSoundEffect(pistonIntensity, patternVariant, voicePatternNum);
-  KissSoundEffect.play();
+  const kissSoundEffect = new KissSoundEffect(pistonIntensity, patternVariant, voicePatternNum);
+  kissSoundEffect.play();
 }
 
 function actionType5SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
@@ -2906,7 +2937,7 @@ class InsertionSoundEffect {
   };
 
   play() {
-    prePlay();
+    this.prePlay();
 
     const flashDuration = getRandomIndex(41) + 160;
     const shakeIntensity = getRandomIndex(21) + 50;
@@ -3188,7 +3219,7 @@ function adv_HpartDirectPlay_ExtremeClimax() {
     valueWordSet0 = '絶頂';
     const pistonPictureId = 57;
     let pistonMultiplier;
-    if ($gameActors.actor($gameVariables.value(20)).isLearnedSkill(66)) {
+    if ($gameActors.actor($gameVariables.value(20)) && $gameActors.actor($gameVariables.value(20)).isLearnedSkill(66)) {
       pistonMultiplier = 2;
     } else {
       pistonMultiplier = 1;
@@ -3226,7 +3257,7 @@ seiyoku_skillProbabilityUp1 = function (gameActor) {
   
   // Calculate probability increase with a standard loop
   let totalProbabilityIncrease = 0;
-  for (skillId of skillRangeSeiyokuSkillProbabilityUp) {
+  for (const skillId of skillRangeSeiyokuSkillProbabilityUp) {
     if (gameActor.isLearnedSkill(skillId)) {
       totalProbabilityIncrease += 5;
     }

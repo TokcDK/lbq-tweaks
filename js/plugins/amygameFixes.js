@@ -36,21 +36,23 @@
   ];
 
   //???there is call of it somewhere but cant find it by function name
-  run_old_savegame_fixes = function () {
-    runOldSavegameFixes();
-  }
+  window.run_old_savegame_fixes = function () {
+    window.runOldSavegameFixes();
+  };
 
   // functions need to run after saved game loaded
   /*:
   * @function
   * @help it ru after each saved game loaded
   */
-  runOldSavegameFixes = function () {
+  window.runOldSavegameFixes = function () {
 
     if (wasExecuted) return;
     wasExecuted = true;
 
-    const leader = $gameParty.leader();
+    const leader = $gameParty && $gameParty.leader();
+    if (!leader) return;
+
     for (const skillId of skillIdsToCheck) {
       if (leader.isLearnedSkill(skillId)) continue;
 
@@ -58,10 +60,10 @@
 
       // debug
       //leader.setSkillMasteryLevel(skillId, 1);
-      //const skill = $dataSkills[skillId];   
+      //const skill = $dataSkills[skillId];
       //console.log(`add skill: name:${skill.name}, id:${skillId}`);
     }
-  }
+  };
 })();
 
 // todo

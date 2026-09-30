@@ -579,9 +579,6 @@
         $gameSystem.setMessagePopupFree(popupPosition[0], popupPosition[1]);
       } else {
         var eventId = popupEventId;
-        if (isNaN(eventId)) {
-          eventId = eventId;
-        }
         $gameSystem.setMessagePopup(eventId);
         var windowPosition;
         windowPosition = popupPosition;
@@ -853,7 +850,6 @@
     //複合スキル
     if (skillLearnedFlag == 0) {//797見極め習得
       var id = valueIdentifySkillId;
-      console.log("valueIdentifySkillId 1:" + valueIdentifySkillId);
       if (!actor.isLearnedSkill(id)) {
         let learnConditionSkillId = 766;
         const learnConditionId = 764;
@@ -866,7 +862,6 @@
     };
     if (skillLearnedFlag == 0) {//799大量採取
       var id = valueIdentifySkillId;
-      console.log("valueIdentifySkillId 2:" + valueIdentifySkillId);
       if (!actor.isLearnedSkill(id)) {
         learnConditionSkillId = 763;
         var learnConditionId = 764;
@@ -980,7 +975,7 @@
             const skillRankNum = 10 * $gameVariables.value(203);
             actor.gainSkillMasteryUses(id1, skillRankNum);//変更熟練度
             const skillRank = `\\C[3]${skillRankNum}\\C[0]`;
-            TickerManager.show(`${actorName}の${skillName}熟練度を${skillRank}}獲得した！`);
+            TickerManager.show(`${actorName}の${skillName}熟練度を${skillRank}獲得した！`);
             const skillMasteryLevel = actor.skillMasteryLevel(id1);
             const skillMasteryUses = `\\C[2]${actor.skillMasteryUses(id1)}`;
             const skillMasteryUsageMax = `${actor.skillMasteryUsageMax(id1)}\\C[0]`;
@@ -1028,7 +1023,8 @@
   //スキルアイテム使用時に立ち絵が変化する場合。事前に$gameVariables.setValue(20,b.actorId());
   tachie_usedChange1 = function (gameActor) {
 
-    if (!gameActor.actor().meta['Heroine']) return;
+    const gameActorData = gameActor.actor();
+    if (!gameActorData || !gameActorData.meta['Heroine']) return;
 
     if (!$gameSwitches.value(131) || !$gameParty.inBattle()) {
       if ($gameSwitches.value(42) && $gameVariables.value(3) == gameActor.actorId()) {
@@ -1828,12 +1824,13 @@
 
     // Add element info
     glossaryText.push(`　　\\C[16]属性：\\C[0]`);
-    if (Number(itemMeta['EnemyElement']) === 0) {
+    if (!itemMeta['EnemyElement'] || Number(itemMeta['EnemyElement']) === 0) {
       glossaryText.push(`？？？`);
     } else {
       enemyElementArray.forEach(elem => {
-        const item = dataStates[Number(elem)].name;
-        glossaryText.push(`【\\C[13]${item}\\C[0]】　`);
+        const stateData = dataStates[Number(elem)];
+        if (!stateData) return;
+        glossaryText.push(`【\\C[13]${stateData.name}\\C[0]】　`);
       });
     }
 
@@ -1976,7 +1973,7 @@
     processedText.push(`\n`);
     let conditionStateCount = 0;
 
-    for (let enemyId = 21; enemyId <= 21 + stateCount; enemyId++) {
+    for (let enemyId = 21; enemyId < 21 + stateCount; enemyId++) {
       const enemy = dataEnemies[enemyId];
       if (!enemy) continue;
 
@@ -2614,7 +2611,7 @@
         }
       }
       // Set battleback if keys are available
-      if (battleBgKey) {
+      if (battleBgKey && mapInfoMeta[battleBgName] && mapInfoMeta[battleBgKey]) {
         const bg1 = mapInfoMeta[battleBgName].split(',')[0];
         const bg2 = mapInfoMeta[battleBgKey].split(',')[0];
         gameMap.changeBattleback(bg1, bg2);
@@ -3157,10 +3154,11 @@
         };
       };
     };
-    var arr1 = value.meta['BossStateInformation'].split(',');//
+    if (!bossEnemyData) return;//'<BossEnemy>'未有時の下部処理回避
+    var arr1 = value.meta['BossStateInformation'] ? value.meta['BossStateInformation'].split(',') : [];//
     for (var i = 0; i <= arr1.length - 1; i++) {
       if (Number(arr1[i]) >= 1) {
-        if ($dataStates[Number(arr1[i])].meta['valueBossBgm']) {
+        if ($dataStates[Number(arr1[i])] && $dataStates[Number(arr1[i])].meta['valueBossBgm']) {
           var arr2 = $dataStates[Number(arr1[i])].meta['valueBossBgm'].split(',');
           $gameVariables.setValue(337, [arr2[0], Number(arr2[1]), Number(arr2[2]), Number(arr2[3])]);
         };
@@ -3338,7 +3336,7 @@
       for (var j = 0; j <= arr6.length - 1; j++) {
         if (arr9[j] > arr10[j]) {
           arr10[j] = arr9[j];
-          arr8 = actor.actorId();
+          arr8[j] = actor.actorId();
         }
       };
     };
@@ -3483,7 +3481,7 @@
               const itemJ = $dataItems[j];
               if (itemJ.meta['OnSwitch']) {
                 var arr2 = itemJ.meta['OnSwitch'].split(',');
-                for (var id1 = 1; id1 <= arr2.length - 1; id1++) {
+                for (var id1 = 0; id1 <= arr2.length - 1; id1++) {
                   if (Number(arr2[id1]) == 207) {
                     annihilationCount += gameVar257[j];
                     break;
@@ -4194,6 +4192,8 @@
         var end = valueItems.length - 1;
       };
       for (var i = start; i <= end; i++) {
+        var valueItem = valueItems[i];
+        if (!valueItem) continue;
         if (id1 == 1) {
           var confinementValue = $gameParty.hasItem(valueItem, true);
         } else {
@@ -4391,7 +4391,7 @@
 
     const gameVariables = $gameVariables;
     const gameSwitches = $gameSwitches;
-    const isInBattle = isInBattle;
+    const isInBattle = $gameParty.inBattle();
     const gamePlayer = $gamePlayer;
     if (id1 == 1) {
       if (gameVariables.value(528) == 0) {
@@ -4483,7 +4483,8 @@
   eventScene_StartEnd = function (startEndFlag, selectionSwitchId, sceneParamValue, eventItemId) {
 
     valueCountSet1 = 0;
-    $gameVariables.setValue(49, $gameActors.actor($gameVariables.value(11)).name());
+    const startSceneActor = $gameActors.actor($gameVariables.value(11));
+    if (startSceneActor) { $gameVariables.setValue(49, startSceneActor.name()) };
     $gameVariables.setValue(525, 0); //達成スイッチid変数
     if (eventItemId >= 401) {
       if ($dataItems[eventItemId].meta['AddEventCompSwi']) {
@@ -4718,7 +4719,7 @@
         } else {
           const actorIndex = $gameActors.actor(valueHeroineCoice[i]).index() + actorIndexShift;
           const actor = $gameParty.members()[actorIndex];
-          if (isGirl(actor)) {
+          if (actor && isGirl(actor)) {
             $gameVariables.setValue(targetVarId, actor.actorId());
             break;
           }
@@ -5687,7 +5688,7 @@
         }
       };
       for (let i = 1; i < dataStatesCount; i++) {
-        if (dataSkills[i].meta['SceneFactorClearReset']) {
+        if (dataStates[i].meta['SceneFactorClearReset']) {
           for (let j = gameVariables.value(75); j <= gameVariables.value(76); j++) {
             const actor = gameActors.actor(j);
             if (actor.isStateAffected(i)) {
@@ -6159,7 +6160,7 @@
         $gameScreen.showPicture(i + basePictureId + 1, '', 0, 334, 10, 100, 100, 255, 0);
         $gameMessage.setSelectPictureId(i, i + basePictureId + 1);
       };
-      if ($gameVariables.value(534)[i][0] != 0) {
+      if ($gameVariables.value(534)[i] && $gameVariables.value(534)[i][0] != 0) {
         //$gameScreen.showPicture(i + basePictureId,$gameVariables.value(534)[i][0],$gameVariables.value(534)[i][1],
         //$gameVariables.value(534)[i][2]+334-100-50,$gameVariables.value(534)[i][3],
         //$gameVariables.value(534)[i][4],$gameVariables.value(534)[i][5],$gameVariables.value(534)[i][6],0);
@@ -6543,7 +6544,7 @@
       case 2:
         return $dataStates;
       default:
-        console.error(`getItemsSourceSkillsItemsStates: id(${id}}) is not 0,1,2!`);
+        console.error(`getItemsSourceSkillsItemsStates: id(${id}) is not 0,1,2!`);
         return null;
     }
   }
@@ -6712,7 +6713,9 @@
 
   evStateCleanFromActors = function (actorInitId, actorEndId, stateId) {
     for (let actorId = actorInitId; actorId <= actorEndId; actorId++) {
-      $gameActors.actor(actorId).removeState(stateId);
+      const gameActor = $gameActors.actor(actorId);
+      if (!gameActor) continue;
+      gameActor.removeState(stateId);
     }
   };
 
@@ -6825,9 +6828,9 @@
   resetChildEventAppearance = function () {
     const eventIds = $gameVariables.value(292);
     for (let eventId = 11; eventId <= 13; eventId++) {
-      const eventId = eventIds[eventId]; // this._eventId
-      if ($gameMap.event(eventId)) {
-        const mapEvent = $gameMap.event(eventId);
+      const childEventId = eventIds[eventId]; // this._eventId
+      if ($gameMap.event(childEventId)) {
+        const mapEvent = $gameMap.event(childEventId);
         mapEvent.setStepAnime(false);
         mapEvent.setWalkAnime(false);
         mapEvent.setDirection(2);
@@ -6836,7 +6839,7 @@
         mapEvent.setAngle(45);
         mapEvent._spriteOffsetX = -12;
         mapEvent._spriteOffsetY = -12;
-        mapEvent._kageM.clear();
+        if (mapEvent._kageM) mapEvent._kageM.clear();
         mapEvent.setFace(6, true, true); // For child events: mapEvent.setFace(6, true, true, 0, 6, 0, 6);
       }
     }

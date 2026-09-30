@@ -865,27 +865,23 @@ htext_word = function (id1) {
 
 gabWord_exeScriptNoFace = function (arrNpcGab1) {
 
-  var arrNpcGab2 = [];
+  if (!arrNpcGab1 || arrNpcGab1.length === 0) return;
   var arrNpcGab2 = arrNpcGab1[getRandomIndex(arrNpcGab1.length)];
-  if (arrNpcGab1 != 0) {
-    var scene = SceneManager._scene;
-    var gabData = [arrNpcGab2[0], '', 0, 0, '', 0];
-    if (!$gameParty.inBattle()) { $gameSystem.pushInfoLog(arrNpcGab2[0]) };//追加。インフォログにギャブ内容を直接入れる。
-    if (scene._gabWindow) scene.startGabWindow(gabData);
-  };
+  var scene = SceneManager._scene;
+  var gabData = [arrNpcGab2[0], '', 0, 0, '', 0];
+  if (!$gameParty.inBattle()) { $gameSystem.pushInfoLog(arrNpcGab2[0]) };//追加。インフォログにギャブ内容を直接入れる。
+  if (scene && scene._gabWindow) scene.startGabWindow(gabData);
 
 };
 
 gabWord_exeScript = function (arrNpcGab1) {
 
-  var arrNpcGab2 = [];
+  if (!arrNpcGab1 || arrNpcGab1.length === 0) return;
   var arrNpcGab2 = arrNpcGab1[getRandomIndex(arrNpcGab1.length)];
-  if (arrNpcGab1 != 0) {
-    var scene = SceneManager._scene;
-    var gabData = [arrNpcGab2[0], 'face', arrNpcGab2[1], Number(arrNpcGab2[2]), '', 0];
-    if (!$gameParty.inBattle()) { $gameSystem.pushInfoLog(arrNpcGab2[0]) };//追加。インフォログにギャブ内容を直接入れる。
-    if (scene._gabWindow) scene.startGabWindow(gabData);
-  };
+  var scene = SceneManager._scene;
+  var gabData = [arrNpcGab2[0], 'face', arrNpcGab2[1], Number(arrNpcGab2[2]), '', 0];
+  if (!$gameParty.inBattle()) { $gameSystem.pushInfoLog(arrNpcGab2[0]) };//追加。インフォログにギャブ内容を直接入れる。
+  if (scene && scene._gabWindow) scene.startGabWindow(gabData);
 
 };
 
@@ -895,6 +891,7 @@ gabWord_setBattle = function () {
   var arrNpcGab1 = [];
   var introSetFlag = 0;
   var memberCount = $gameParty.battleMembers().length;
+  if (memberCount === 0) return;
   var randomMemberIndex = getRandomIndex(memberCount);
   var actorId = $gameParty.battleMembers()[randomMemberIndex].actorId();
   $gameVariables.setValue(53, $gameActors.actor(actorId).nickname());
@@ -1013,7 +1010,7 @@ gabWord_setNpc = function () {
   if ($gameSwitches.value(321) && $gameSwitches.value(203)) {//犯罪都市屋外
 
   };
-  if (isGirl($gameParty.battleMembers()[0])) {//先頭キャラ女か。露出状態での発言
+  if ($gameParty.battleMembers()[0] && isGirl($gameParty.battleMembers()[0])) {//先頭キャラ女か。露出状態での発言
     rosyutu_wordChoiceNPC($gameParty.battleMembers()[0].actorId());
   };
 
@@ -1050,6 +1047,7 @@ rosyutu_wordChoiceNPC = function (id1) {
 rosyutu_wordChoice = function (id1) {
 
   var actor = $gameActors.actor(id1);
+  if (!actor) return;
   var arr2 = [];
   if (id1 == 2) {
     var arr1 = [`「乙女にさせる格好では無いだろうが…っ」`, 3, 2]; arr2.push(arr1);
@@ -1077,11 +1075,10 @@ rosyutu_wordChoice = function (id1) {
       var arr1 = [`「早く着替えましょう…！」`, 3, 5]; arr2.push(arr1);//破損
     };
     if ($gameVariables.value(id1 + 440)[0] >= 1) {
-      if ($dataItems[$gameVariables.value($gameVariables.value(20) + 440)[0]].meta['ClothType']) {
-        if ($dataItems[$gameVariables.value($gameVariables.value(20) + 440)[0]].meta['ClothType'] == '改') {
-          var arr1 = [`「こんな破廉恥な恰好、秩序として受け入れられません！！」`, 3, 3]; arr2.push(arr1);//改造衣装
-          ensyutu_ikari(60, 'Thunder9');
-        }
+      const clothItem = $dataItems[$gameVariables.value($gameVariables.value(20) + 440)[0]];
+      if (clothItem && clothItem.meta['ClothType'] == '改') {
+        var arr1 = [`「こんな破廉恥な恰好、秩序として受け入れられません！！」`, 3, 3]; arr2.push(arr1);//改造衣装
+        ensyutu_ikari(60, 'Thunder9');
       }
     };
 
@@ -1092,7 +1089,7 @@ rosyutu_wordChoice = function (id1) {
       var arr1 = [`「こんな破廉恥な恰好、秩序として受け入れられません！！」`, 3, 3]; arr2.push(arr1);
     };
   };
-  var array1 = arr2[getRandomIndex(arr2.length)];
+  var array1 = arr2.length > 0 ? arr2[getRandomIndex(arr2.length)] : 0;
   $gameVariables.setValue(21, array1);
 
 };
@@ -1158,6 +1155,7 @@ production_separateSetProfile = function (id1) {
   };
 
   var actor = $gameActors.actor(id1);
+  if (!actor || !profileText) return;
   actor.setProfile(profileText);
 
 };
@@ -1166,6 +1164,7 @@ production_separateSetProfile = function (id1) {
 production_ChangeSetProfile = function () {
 
   var actor = $gameActors.actor($gameVariables.value(20));
+  if (!actor) return;
   if ($gameVariables.value(20) == 1) {
     if (actor.isLearnedSkill(65)) {
       var profileText =
@@ -1242,7 +1241,7 @@ seisyoujuu_addParamsAll = function () {
 //星晶獣パラメータの強化
 seisyoujuu_addParams = function (i) {
 
-  if ($dataArmors[i].etypeId == 6) {
+  if ($dataArmors[i] && $dataArmors[i].etypeId == 6) {
     if ($dataArmors[i].meta['ItemPicture']) {
       if ($gameVariables.value(352)[i - valueSeisyoujuuStartId] >= 1) {
         for (var j = 2; j <= 7; j++) {
@@ -1451,13 +1450,13 @@ kobetu_isyousettei1 = function (actor) {
       $gameVariables.setValue(baseVarId + 27, $gameVariables.value(baseVarId + 18));
     };
     //バスタオルの肌影
-    if ($gameVariables.value(baseVarId + 23) == 6 && !$gameVariables.value(baseVarId + 20) == 10 &&
-      !$gameVariables.value(baseVarId + 20) == 11) {
+    if ($gameVariables.value(baseVarId + 23) == 6 && $gameVariables.value(baseVarId + 20) != 10 &&
+      $gameVariables.value(baseVarId + 20) != 11) {
       $gameVariables.setValue(baseVarId + 19, 4);
     };
     //メイドエプロン1の肌影
-    if ($gameVariables.value(baseVarId + 25) == 1 && !$gameVariables.value(baseVarId + 20) == 10 &&
-      !$gameVariables.value(baseVarId + 20) == 11) {
+    if ($gameVariables.value(baseVarId + 25) == 1 && $gameVariables.value(baseVarId + 20) != 10 &&
+      $gameVariables.value(baseVarId + 20) != 11) {
       $gameVariables.setValue(baseVarId + 19, 1);
     };
     //メイドエプロン2の肌影
@@ -1540,7 +1539,6 @@ kobetu_isyousettei1 = function (actor) {
     };
     //秩序アームカバー時武器表示
     if ($gameVariables.value(baseVarId + 9) == 5 && $gameVariables.value(baseVarId + 17) == 1) {
-      $gameVariables.setValue(baseVarId + 30, 1);
       $gameVariables.setValue(baseVarId + 30, 2);
       $gameVariables.setValue(baseVarId + 9, 6);
       $gameVariables.setValue(baseVarId + 10, 1);
@@ -1766,7 +1764,7 @@ actor_setBattleResult = function () {
         $gameVariables.value(380 + i)[66] = 1;
       };
       if (i == 6 && $gameActors.actor(i).subclass()) {
-        if (gameActors.actor(i)._subclassId == 49) {
+        if ($gameActors.actor(i)._subclassId == 49) {
           $gameVariables.value(380 + i)[66] = 1;
         };
       };
@@ -1807,7 +1805,7 @@ jouhou_buySetup = function () {
       };
       if ($dataItems[i].meta['SetJouhouGold']) {
         var requiredGold = Number($dataItems[i].meta['SetJouhouGold']);
-        if ($gameParty.gold() > requiredGold) {
+        if ($gameParty.gold() >= requiredGold) {
           var hasGoldFlag = 1;
         }
       };
@@ -1837,6 +1835,7 @@ wakingup_pic = function () {
 
   valuePic1 = 71;
   var actor = $gameActors.actor($gameVariables.value(2));
+  if (!actor) return;
   if ($gameSwitches.value(202) && $gameSwitches.value(204)) {
     var wakeVariant1 = 1;
     var wakeVariant2 = getRandomIndex(3) + 1;
@@ -1884,6 +1883,7 @@ wakingup_pic = function () {
 syukuhaku_pic = function (actorSlotId) {
 
   var actor = $gameActors.actor(actorSlotId);
+  if (!actor) return;
   var exposureLevel = $gameVariables.value(actorSlotId + 380)[4];
   var array = [];
   var locationType = 0;
@@ -2055,7 +2055,7 @@ original_stopMoveSwi = function () {
   for (var i = 0; i < arr3.length; i++) {
     if (arr3[i] && arr4[i]) {
       $gameSwitches.setValue(434, true);
-      var arr1 = arr4[i];
+      var arr1 = arr5[i];
       var arr2 = [$gameMap.mapId(), $gamePlayer._realX, $gamePlayer._realY];
       if (arr1[0] == arr2[0]) {
         if (arr1[1] == arr2[1] || arr1[1] == arr2[1] + 1 || arr1[1] == arr2[1] - 1) {
@@ -2108,9 +2108,8 @@ original_tips = function (bookId) {
   let TipClass = originalTipsMap[bookId];
   if (TipClass) {
     tip = new TipClass();
+    tip.execute();
   }
-
-  tip.execute();
 };
 
 //作品オリジナルのメインシーンピクチャやキャラグラ移動等処理。全てid直接入力
@@ -2143,8 +2142,11 @@ original_main = function (id100, id101) {
         break;
       }
       case 3: {
-        const pictureY = $gameScreen.picture(valuePic1 + 4).y();
-        pic_move1(valuePic1 + 4, 0, (384 + (1390 - 768) / 2) - pictureY, 100, 100, 255, 600);
+        const picture4 = $gameScreen.picture(valuePic1 + 4);
+        if (picture4) {
+          const pictureY = picture4.y();
+          pic_move1(valuePic1 + 4, 0, (384 + (1390 - 768) / 2) - pictureY, 100, 100, 255, 600);
+        }
       }
       case 4: {
         parallax_scroll(valuePic1 + 5, 'ScreenConcentratedLineWidthBackGraund', 0, 20, 20, 0, 255);
@@ -2161,10 +2163,11 @@ original_main = function (id100, id101) {
       case 6: { pic_move1(valuePic1 + 12, -200, 0, 100, 100, 0, 40); break; }
       case 7: { //地面黒塗りと残像作成
         $gameMap.spawnEvent(146, 25, 35, true);
+        if (!$gameVariables.value(292)) return;
         $gameVariables.value(292)[13] = $gameMap.getLastSpawnEventId();
         let eventId = $gameVariables.value(292)[13];
         const event = $gameMap.event(eventId);
-        event.setOpacity(200);
+        if (event) event.setOpacity(200);
         eventId = $gameVariables.value(292)[$gameVariables.value(530)];
         let particleName = 'monster_c';
         $gameScreen._particle.particleSet('attach:event:' + eventId, particleName + '-' + eventId, 'this', particleName);

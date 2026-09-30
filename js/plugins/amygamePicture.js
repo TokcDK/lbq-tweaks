@@ -69,7 +69,7 @@ var offsetX = 0;
 var offsetY = 0;
 if(id4 == 3){
   var randomDirectionIndex = getRandomIndex(3);
-  var scaleMultiplier = 1
+  var scaleMultiplier = 1;
   if(randomDirectionIndex == 0){var offsetX = 50}
   if(randomDirectionIndex == 1){var offsetX = -50}
   if(randomDirectionIndex == 2){var offsetY = 50}
@@ -183,9 +183,9 @@ if(id1 == valueParallelPic1 || id1 == valueParallelPic2 || id1 == valueParallelP
       var valuePicVal3 = valuePicArr1[13];
       var valuePicVal4 = valuePicArr1[13];
     }
-    var arr1 = [valuePicArr1[2],valuePicArr1[2]+valuePicVal1,valuePicArr1[2]+valuePicVal3,valuePicArr1[2]]
+    var arr1 = [valuePicArr1[2],valuePicArr1[2]+valuePicVal1,valuePicArr1[2]+valuePicVal3,valuePicArr1[2]];
     curveFunctions.patternX = curveFunctions.getPattern('spline', arr1);
-    var arr1 = [valuePicArr1[3],valuePicArr1[3]+valuePicVal2,valuePicArr1[3]+valuePicVal4,valuePicArr1[3]]
+    var arr1 = [valuePicArr1[3],valuePicArr1[3]+valuePicVal2,valuePicArr1[3]+valuePicVal4,valuePicArr1[3]];
     curveFunctions.patternY = curveFunctions.getPattern('spline', arr1);
     curveFunctions.patternScaleX = curveFunctions.getPattern('jump', [valuePicVal3]);
     curveFunctions.patternScaleY = curveFunctions.getPattern('jump', [valuePicVal4]);
@@ -328,7 +328,7 @@ if($gameScreen.picture(fadePicId)){
   if(!$gameSwitches.value(651)){
     $gameScreen.picture(fadePicId)._GWInfo = $gameScreen.createGWInfo([fadeType,fadeGlowA,fadeWait,fadeGlowB]);
   }
-  if(fadeType == "fadeOut"){
+  if(fadeType === "fadeOut"){
     if($gameScreen.picture(fadePicId)._breathActive){
       UTSU.PictureBreath.off([fadePicId]);
     }
@@ -463,12 +463,12 @@ for (var i = 1; i <= 250; i++) {
     arr2.push(i);
   }
 }
-UTSU.PictureBreath.off([arr2]);
-UTSU.PictureBreath2.off([arr2]);
-UTSU.PictureBreath3.off([arr2]);
-UTSU.PictureBreath4.off([arr2]);
-UTSU.PictureBreath5.off([arr2]);
-UTSU.PictureBreath6.off([arr2]);
+UTSU.PictureBreath.off(arr2);
+UTSU.PictureBreath2.off(arr2);
+UTSU.PictureBreath3.off(arr2);
+UTSU.PictureBreath4.off(arr2);
+UTSU.PictureBreath5.off(arr2);
+UTSU.PictureBreath6.off(arr2);
 
 }
 
@@ -482,8 +482,9 @@ if($gameScreen.picture($gameVariables.value(281))){
   $gameVariables.value(282)[3] = $gameScreen.picture($gameVariables.value(281)).y();
   var pictureId = $gameVariables.value(281), variableIdOfWidth = 4, variableIdOfHeight = 5;
   var spritePicture = SceneManager._scene._spriteset._pictureContainer.children.filter(function(picture) {
-    return picture._pictureId == pictureId;
+    return picture._pictureId === pictureId;
   })[0];
+  if(!spritePicture) return;
   $gameVariables.value(282)[variableIdOfWidth] = spritePicture.width;
   $gameVariables.value(282)[variableIdOfHeight] = spritePicture.height;
   $gameVariables.value(282)[6] = 95;
@@ -684,6 +685,7 @@ case 10: {//顔グラ乳揺れ正面
   break;
 }
 };
+if(!array) return;
 
 switch(id14){
   case 1: {//立ち絵用orイベCG用
@@ -746,7 +748,7 @@ actor_skillMasteryGet = function(id1,id2){
 
 var value = id1;
 var actor = $gameActors.actor($gameVariables.value(11));
-actor.gainSkillMasteryUses(value,$gameVariables.value(203));//変更熟練度
+if(actor) actor.gainSkillMasteryUses(value,$gameVariables.value(203));//変更熟練度
 var masteryText = `\\C[1]＜${$dataSkills[value].name}＞\\C[0]熟練度\\C[10]\\V[203]\\C[0]獲得！\n`;
 $gameVariables.setValue(id2,$gameVariables.value(id2)+masteryText);
 
@@ -789,33 +791,34 @@ if(pictureCounter == 2){
 }
 if(pictureCounter >= 3){
   for(var i = value; i <= value+pictureCounter; i++){
+    if(!$gameScreen.picture(i)) continue;
     $gameScreen.picture(i)._scaleX = 50;
     $gameScreen.picture(i)._scaleY = 50;
-    if(i == 2){
+    if(i === 2){
       $gameScreen.picture(i)._x = 256;
       $gameScreen.picture(i)._y = 384;
     }
-    if(i == 3){
+    if(i === 3){
       $gameScreen.picture(i)._x = 0;
       $gameScreen.picture(i)._y = 384;
     }
-    if(i == 4){
+    if(i === 4){
       $gameScreen.picture(i)._x = 256;
       $gameScreen.picture(i)._y = 384;
     }
-    if(i == 5){
+    if(i === 5){
       $gameScreen.picture(i)._x = 512;
       $gameScreen.picture(i)._y = 0;
     }
-    if(i == 6){
+    if(i === 6){
       $gameScreen.picture(i)._x = 768;
       $gameScreen.picture(i)._y = 384;
     }
-    if(i == 7){
+    if(i === 7){
       $gameScreen.picture(i)._x = 512;
       $gameScreen.picture(i)._y = 384;
     }
-    if(i == 8){
+    if(i === 8){
       $gameScreen.picture(i)._x = 768;
       $gameScreen.picture(i)._y = 384;
     }
@@ -834,8 +837,8 @@ AudioManager.playSe({"name":"Z_CGDispray","volume":25,"pitch":150,"pan":0});
 //移動ルートでピクチャ処理//ﾋﾟｸid,x,y,scale,opa,wait
 picture_ParallelMove = function(id1,id2,id3,id4,id5,id6){
 
-valueCharaWaitCountarray1 [0,0,0,0,0,0,0,0,0,0,0];
-valueCharaWaitCountarray2 [0,0,0,0,0,0,0,0,0,0,0];
+valueCharaWaitCountarray1 = [0,0,0,0,0,0,0,0,0,0,0];
+valueCharaWaitCountarray2 = [0,0,0,0,0,0,0,0,0,0,0];
 if($gameScreen.picture(id1)){
   valueCharaWaitCountarray1[1] = id1;
   valueCharaWaitCountarray1[2] = $gameScreen.picture(id1).x();

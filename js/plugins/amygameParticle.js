@@ -15,6 +15,7 @@ if($gameSwitches.value(15)){
 };
 var effectName2 = 'above';
 var actor = $gameParty.members()[0];
+if(!actor) return;
 if(actor.isStateAffected(61)){var effectName1 = 'charm_bw2';var effectName2 = 'above'};
 if(actor._subclassId == 41 || actor._subclassId == 42){var effectName1 = 'romantic_mood';var effectName2 = 'below'};
 $gameScreen._particle.particleSet(0,'menu','Scene_Menu',effectName1,effectName2);
@@ -686,7 +687,7 @@ if(id1 == 9){//仲間加入
   var effectName1 = 'text_dispray1';//仲間加入
   $gameScreen._particle.particleSet(0,effectName1,'screen','def','screen');
   $gameScreen._particle.particleUpdate([effectName1,'pos',-600,20]);
-  if($dataActors[$gameVariables.value(20)].meta['NpcChara']){
+  if($dataActors[$gameVariables.value(20)] && $dataActors[$gameVariables.value(20)].meta['NpcChara']){
     $gameScreen._particle.particleUpdate([effectName1,'color','#e59fff','#6d80ff']);
   };
   var effectName1 = `\\V[53]\\V[49]がパーティに加わった！`;
@@ -694,7 +695,8 @@ if(id1 == 9){//仲間加入
   $gameScreen.setDTextPicture(effectName1, colorValue2);
   var effectName1 = 100;
   $gameScreen.showPicture(effectName1,"",1,640,384,100,100,0,0);
-  if(isGirl($gameActors.actor($gameVariables.value(20)))){
+  const joinActor = $gameActors.actor($gameVariables.value(20));
+  if(!!joinActor && isGirl(joinActor)){
     $gameScreen.movePicture(effectName1,1,640-200,384,100,100,255,0,30);
   } else {
     $gameScreen.movePicture(effectName1,1,640-50,384,100,100,255,0,30);
@@ -708,7 +710,7 @@ if(id1 == 9){//仲間加入
 };
 if(id1 == 10){//ワープポイントアクティベート
   var effectName1 = "Item4";
-  AudioManager.playSe({"name":colorValue2,"volume":50,"pitch":50,"pan":0});
+  AudioManager.playSe({"name":effectName1,"volume":50,"pitch":50,"pan":0});
   $gameScreen.startFlash([255,255,255,200], 30);
     if($gameScreen._tone_temp == 0){
       $gameScreen._tone_temp = $gameScreen.tone().concat();  
@@ -729,7 +731,7 @@ if(id1 == 10){//ワープポイントアクティベート
 };
 if(id1 == 11){//拠点アクティベート
   var effectName1 = "Item4";
-  AudioManager.playSe({"name":colorValue2,"volume":50,"pitch":50,"pan":0});
+  AudioManager.playSe({"name":effectName1,"volume":50,"pitch":50,"pan":0});
   $gameScreen.startFlash([255,255,255,200], 30);
     if($gameScreen._tone_temp == 0){
       $gameScreen._tone_temp = $gameScreen.tone().concat();  
@@ -844,15 +846,15 @@ if(id1 == 14 || id1 == 15 || id1 == 16){//アイテムスキル称号獲得忘�
   $gameScreen.movePicture(effectName1,1,640-100,384,100,100,255,0,60);
     if(!$gameSwitches.value(29)){
       if(id1 == 14){$gameParty.gainItem(valueItems[id2], 1)};
-      if(id1 == 15){actor.learnSkill(id2)};
-      if(id1 == 16){actor.forgetSkill(id2)};
+      if(id1 == 15 && !!actor){actor.learnSkill(id2)};
+      if(id1 == 16 && !!actor){actor.forgetSkill(id2)};
     };
     if(id3 == 1){
       var arr1 = [2,6];
       if(id4 == 1){arr1.push(53)};
     };
     if(id3 == 2){
-      if(actor.isLearnedSkill(65)){
+      if(!!actor && actor.isLearnedSkill(65)){
         var arr1 = [27,28,29,30,31,32,39,40,41];
       } else {
         var arr1 = [21,22,23,24,25];
@@ -1038,7 +1040,7 @@ if(id1 == 23){//催眠掛かる
 //ADVパート演出クリアも。0でクリア
 adv_partDirectSet = function(id1){
 
-  if(id1 != 0 & id1 != 6 & id1 != 9){
+  if(id1 != 0 && id1 != 6 && id1 != 9){
     if($gameScreen._tone_temp == 0){
       $gameScreen._tone_temp = $gameScreen.tone().concat();  
       $gameScreen.startTint([-100,-100,-100,100], 10);//他より薄くしている
@@ -1270,6 +1272,7 @@ AudioManager.playSe({"name":'Chime2',"volume":90,"pitch":100,"pan":0});
 var effectName1 = 'text_dispray2';
 $gameScreen._particle.particleClear(effectName1);
 var scene = SceneManager._scene;
+if(!scene) return;
 if (scene._gabWindow) scene.clearGabWindow();
 $gameScreen._particle.particlePlay(0,effectName1,'screen','def','screen');
 //$gameScreen._particle.particleUpdate([effectName1,'pos',-600,-260]);
@@ -1310,7 +1313,7 @@ if(id1 == 1){var gameSwitchValue1 = `\\C[2]＜\x1bWIN[${id2}]＞\\C[0]`;var valu
 if(id1 == 2){var gameSwitchValue1 = `\\C[2]＜\x1bAIN[${id2}]＞\\C[0]`;var valueItems = $dataArmors;var stringValue2 = `を入手した！`};
 if(id1 == 3){var gameSwitchValue1 = `\\C[2]＜\x1bSIN[${id2}]＞\\C[0]`;var valueItems = $dataSkills;var stringValue2 = `獲得した！`};
 if(id1 == 4){var gameSwitchValue1 = `\\C[6]${id2.toLocaleString()}\G\\C[0]`;var valueItems = $dataSkills;var stringValue2 = `入手した！`};
-if(id1 == 5){var gameSwitchValue1 = `\\C[2]＜\x1bJ[${id2}]＞\\C[0]`;var valueItems = $dataclasses;var stringValue2 = `が解放された！`};
+if(id1 == 5){var gameSwitchValue1 = `\\C[2]＜\x1bJ[${id2}]＞\\C[0]`;var valueItems = $dataClasses;var stringValue2 = `が解放された！`};
 if(id2 <= -1 && id1 == 4){var stringValue2 = `失った…。`};
 if([0,1,2].some(function(id){return id1 == id})){
   if(id4 <= -1){
@@ -1326,6 +1329,7 @@ if(id1 == 4){
   var arr1 = ['Shop1',100,gameSwitchValue5];
   if(!$gameSwitches.value(29)){$gameParty.gainGold(id2)};
 } else {
+  if(!valueItems[id2]) return;
   if(valueItems[id2].meta['EICSwitch']){
     if(Number(valueItems[id2].meta['EICSwitch']) == 104){
       var gameSwitchValue1 = `\\C[17]称号:\\C[0]`　+ gameSwitchValue1;
@@ -1369,7 +1373,7 @@ if(id1 == 4){
       var gameVarValue4 = id3;
     };
     var actor = $gameActors.actor(gameVarValue4);
-    if(!actor.isLearnedSkill(id2)){
+    if(!!actor && !actor.isLearnedSkill(id2)){
       if(!$gameSwitches.value(29)){actor.learnSkill(id2)};
     };
     var gameSwitchValue1 = `\x1bN[${gameVarValue4}]が`　+ gameSwitchValue1;
@@ -1381,7 +1385,7 @@ if(id1 == 4){
       var gameVarValue4 = id3;
     };
     var actor = $gameActors.actor(gameVarValue4);
-    if(!actor._unlockedClasses.contains(id2)){
+    if(!!actor && !actor._unlockedClasses.contains(id2)){
       if(!$gameSwitches.value(29)){actor.unlockClass(id2)};
     };
     var gameSwitchValue1 = `\x1bN[${gameVarValue4}]の`　+ gameSwitchValue1;
