@@ -146,12 +146,39 @@ ProgressWatcher.truncateProgress = function () {
     }
 };
 
+// PERF: the option list is a pure function of the query string, but this function
+// is called millions of times while a save file loads (DataManager.isBattleTest()
+// alone runs it once per skill per battler inside the passive-state rebuild).
+// Re-running .slice().split() plus a linear .contains() on every call was 54% of
+// the load-time profile. The parsed sets are cached, keyed on the source strings,
+// so a change to location.search or nw.App.argv still invalidates them. The
+// returned values are unchanged: true when the name is in the query string,
+// otherwise the same boolean the old && chain produced.
+Utils._isOptionValid_optionSet = function (query) {
+    var set = new Set();
+    var parts = query.split('&');
+    for (var i = 0; i < parts.length; i++) {
+        set.add(parts[i]);
+    }
+    return set;
+};
+
 Utils.isOptionValid = function (name) {
 
-    if (location.search.slice(1).split('&').contains(name)) {
+    var search = location.search;
+    if (search !== Utils._isOptionValid_search) {
+        Utils._isOptionValid_search = search;
+        Utils._isOptionValid_searchOptions = Utils._isOptionValid_optionSet(search.slice(1));
+    }
+    if (Utils._isOptionValid_searchOptions.has(name)) {
         return true;
     }
-    return typeof nw !== "undefined" && nw.App.argv.length > 0 && nw.App.argv[0].split('&').contains(name);
+    var argv0 = (typeof nw !== "undefined" && nw.App.argv.length > 0) ? nw.App.argv[0] : null;
+    if (argv0 !== Utils._isOptionValid_argv) {
+        Utils._isOptionValid_argv = argv0;
+        Utils._isOptionValid_argvOptions = argv0 === null ? new Set() : Utils._isOptionValid_optionSet(argv0);
+    }
+    return argv0 !== null && Utils._isOptionValid_argvOptions.has(name);
 }
 
 SceneManager.preferableRendererType = function () {

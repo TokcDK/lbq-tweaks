@@ -7708,9 +7708,19 @@ Utils.RPGMAKER_VERSION = '1.6.1';
 console.log('RPG Maker Version ' + Utils.RPGMAKER_VERSION + ' updates loaded');
 
 Utils.isOptionValid = function(name) {
-    if (location.search.slice(1).split('&').contains(name)) {return 1;};
-    if (typeof nw !== "undefined" && nw.App.argv.length > 0 && nw.App.argv[0].split('&').contains(name)) {return 1;};
-    return 0;
+    // PERF: cached per source string (see rpg_core.js). Return values unchanged.
+    var search = location.search;
+    if (search !== Utils._isOptionValid_search) {
+        Utils._isOptionValid_search = search;
+        Utils._isOptionValid_searchOptions = Utils._isOptionValid_optionSet(search.slice(1));
+    }
+    if (Utils._isOptionValid_searchOptions.has(name)) {return 1;};
+    var argv0 = (typeof nw !== "undefined" && nw.App.argv.length > 0) ? nw.App.argv[0] : null;
+    if (argv0 !== Utils._isOptionValid_argv) {
+        Utils._isOptionValid_argv = argv0;
+        Utils._isOptionValid_argvOptions = argv0 === null ? new Set() : Utils._isOptionValid_optionSet(argv0);
+    }
+    return argv0 !== null && Utils._isOptionValid_argvOptions.has(name) ? 1 : 0;
 };
 
 WebAudio.prototype._startPlaying = function(loop, offset) {

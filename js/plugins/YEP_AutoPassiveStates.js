@@ -423,10 +423,13 @@ Game_BattlerBase.prototype.refresh = function() {
 
 Yanfly.APS.Game_BattlerBase_states = Game_BattlerBase.prototype.states;
 Game_BattlerBase.prototype.states = function() {
-    var array = Yanfly.APS.Game_BattlerBase_states.call(this);
-    array = array.concat(this.passiveStates());
-    this.sortPassiveStates(array);
-    return array;
+  var array = Yanfly.APS.Game_BattlerBase_states.call(this);
+  var passive = this.passiveStates();
+  for (var i = 0; i < passive.length; ++i) {
+    array.push(passive[i]);
+  }
+  this.sortPassiveStates(array);
+  return array;
 };
 
 Yanfly.APS.Game_BattlerBase_isStateAffected =
@@ -437,14 +440,20 @@ Game_BattlerBase.prototype.isStateAffected = function(stateId) {
 };
 
 Game_BattlerBase.prototype.passiveStates = function() {
-    var array = [];
-    var raw = this.passiveStatesRaw();
-    for (var i = 0; i < raw.length; ++i) {
-      var state = $dataStates[raw[i]];
-      if (state && array.contains(state)) continue;
-      array.push(state);
+  // PERF: array.contains(state) inside the loop was O(n^2). Same "first
+  // occurrence wins" result, O(1) per element via a Set.
+  var array = [];
+  var seen = new Set();
+  var raw = this.passiveStatesRaw();
+  for (var i = 0; i < raw.length; ++i) {
+    var state = $dataStates[raw[i]];
+    if (state) {
+      if (seen.has(state)) continue;
+      seen.add(state);
     }
-    return array;
+    array.push(state);
+  }
+  return array;
 };
 
 Game_BattlerBase.prototype.passiveStatesRaw = function() {
@@ -538,11 +547,16 @@ Game_BattlerBase.prototype.passiveStateConditionEval = function(state) {
 };
 
 Game_BattlerBase.prototype.sortPassiveStates = function(array) {
+    // PERF: the old tie-break was `return a - b;` on state *objects*, which is
+    // always NaN. A NaN comparator result is ordered as "equal" by the engine,
+    // so returning 0 explicitly produces the exact same ordering while skipping
+    // the engine's comparator-fallback path (this callback alone was 380ms of the
+    // load trace).
     array.sort(function(a, b) {
       var p1 = a.priority;
       var p2 = b.priority;
       if (p1 !== p2) return p2 - p1;
-      return a - b;
+      return 0;
     });
 };
 
@@ -572,18 +586,34 @@ Game_Battler.prototype.removeState = function(stateId) {
 
 Game_Actor.prototype.passiveStatesRaw = function() {
     if (this._passiveStatesRaw !== undefined) return this._passiveStatesRaw;
-    var array = Game_BattlerBase.prototype.passiveStatesRaw.call(this);
-    array = array.concat(this.getPassiveStateData(this.actor()));
-    array = array.concat(this.getPassiveStateData(this.currentClass()));
-    for (var i = 0; i < this.equips().length; ++i) {
-      var equip = this.equips()[i];
-      array = array.concat(this.getPassiveStateData(equip));
+    // PERF: this rebuilds on every battler refresh() and is the single hottest
+    // path during save load. Three problems were fixed here, all order-preserving:
+    //   - array = array.concat(...) allocated a new array per source (O(n^2))
+    //   - this.equips() was called twice per iteration and allocates a new array
+    //     on every call (Game_Actor.equips() maps over _equips)
+    //   - .filter(Yanfly.Util.onlyUnique) used indexOf, i.e. O(n^2)
+    var result = [];
+    var seen = new Set();
+    var add = function(list) {
+      for (var k = 0; k < list.length; ++k) {
+        var stateId = list[k];
+        if (seen.has(stateId)) continue;
+        seen.add(stateId);
+        result.push(stateId);
+      }
+    };
+    var i;
+    add(Game_BattlerBase.prototype.passiveStatesRaw.call(this));
+    add(this.getPassiveStateData(this.actor()));
+    add(this.getPassiveStateData(this.currentClass()));
+    var equips = this.equips();
+    for (i = 0; i < equips.length; ++i) {
+      add(this.getPassiveStateData(equips[i]));
     }
-    for (var i = 0; i < this._skills.length; ++i) {
-      var skill = $dataSkills[this._skills[i]];
-      array = array.concat(this.getPassiveStateData(skill));
+    for (i = 0; i < this._skills.length; ++i) {
+      add(this.getPassiveStateData($dataSkills[this._skills[i]]));
     }
-    this._passiveStatesRaw = array.filter(Yanfly.Util.onlyUnique)
+    this._passiveStatesRaw = result;
     return this._passiveStatesRaw;
 };
 
