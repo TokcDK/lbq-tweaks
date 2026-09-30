@@ -285,11 +285,18 @@ Bitmap.prototype.drawText = function(text, x, y, maxWidth, lineHeight, align) {
     var alpha = context.globalAlpha;
     
     // Handle text alignment
-    if (align === 'center') {
-        tx += maxWidth / 2;
-    } else if (align === 'right') {
-        tx += maxWidth;
-    }
+	switch (align) {
+		case 'center':
+			tx += maxWidth / 2;
+			break;
+		case 'right':
+			tx += maxWidth;
+			break;
+		case 'left':
+			break;
+		default:
+			align = 'left'; // asdf default is left
+	}
     
     // Draw text efficiently with minimal context changes
     context.save();
