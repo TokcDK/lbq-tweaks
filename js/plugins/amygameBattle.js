@@ -1986,6 +1986,7 @@ enemywin_treasurebox2 = function (eventId) {
   };
 
   var eventX = 4;
+  var eventY;
   if ($gameVariables.value(160)[1] == 0) {
     var conditionMap = {};
     conditionMap.passable = 1;
@@ -1993,11 +1994,15 @@ enemywin_treasurebox2 = function (eventId) {
     conditionMap.collided = 3;
     conditionMap.terrainTags = [1];
     conditionMap.regionIds = [1];
-    $gameMap.spawnEventRandom(eventX, conditionMap, true);
+    // BUGFIX: use the returned id. getLastSpawnEventId() returns a STALE id
+    // when the random spawn finds no valid position, which made the code
+    // attach a chest particle to an unrelated existing event.
+    eventY = $gameMap.spawnEventRandom(eventX, conditionMap, true);
   } else {
     $gameMap.spawnEvent(eventX, sourceEvent.x, sourceEvent.y, true);
+    eventY = $gameMap.getLastSpawnEventId();
   };
-  var eventY = $gameMap.getLastSpawnEventId();
+  if (!eventY) return;
   var event = $gameMap.event(eventY);
   if (!event) return;
   var eventX = 'chest_c3';

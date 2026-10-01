@@ -504,9 +504,17 @@ function Game_PrefabEvent() {
         var position = this.getConditionalValidPosition(conditions);
         if (position) {
             this.spawnEvent(originalEventId, position.x, position.y, isTemplate);
+            // BUGFIX: callers used to read getLastSpawnEventId() unconditionally.
+            // When no position was found nothing was spawned, so that call
+            // returned a STALE id from a previous spawn and the caller then
+            // re-configured that unrelated event (wrong graphic / move speed /
+            // duplicate id). Report success so callers can skip instead.
+            return this.getLastSpawnEventId();
         } else {
-            console.log(conditionMap);
-            console.warn('座標の取得に失敗しました。');
+            console.warn('座標の取得に失敗しました。 templateEventId=' + originalEventId +
+                ' regionIds=' + JSON.stringify(conditionMap.regionIds) +
+                ' terrainTags=' + JSON.stringify(conditionMap.terrainTags));
+            return null;
         }
     };
 

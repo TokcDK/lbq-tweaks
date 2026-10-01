@@ -664,8 +664,9 @@ $gameVariables.value(202).some(function (id) { return $gameMap.mapId() == id }))
     conditionMap.collided    = 3;
     conditionMap.terrainTags = [0];
     conditionMap.regionIds   = [1];
-    $gameMap.spawnEventRandom(sourceEventId, conditionMap, true);
-    const lastSpawnEventId = $gameMap.getLastSpawnEventId();
+// BUGFIX: same stale-id bug as map_otherGraphicSet - skip on failure.
+    const lastSpawnEventId = $gameMap.spawnEventRandom(sourceEventId, conditionMap, true);
+    if(!lastSpawnEventId) continue;
     const charaEventToRespawn = $gameMap.event(lastSpawnEventId);
     if(!charaEventToRespawn) continue;//生成位置が見つからず生成되지 않은場合
     if($gameSwitches.value(377)){
@@ -748,9 +749,12 @@ if(valueRegionMapArray[enemySpawnCount] < 1) return;
         conditionMap.collided    = 3;
         conditionMap.terrainTags = [1];
         conditionMap.regionIds   = [1];        
-        $gameMap.spawnEventRandom(originalEventId, conditionMap, true);
-
-        const enemyEventToRespawn = $gameMap.event($gameMap.getLastSpawnEventId());
+        // BUGFIX: same stale-id bug - getLastSpawnEventId() returned the previous
+        // spawn when this one failed, so an unrelated existing event was
+        // re-imaged as an enemy.
+        const enemySpawnedId = $gameMap.spawnEventRandom(originalEventId, conditionMap, true);
+        if(!enemySpawnedId) continue;
+        const enemyEventToRespawn = $gameMap.event(enemySpawnedId);
         if(!enemyEventToRespawn) continue;//生成位置が見つからず生成되지 않은場合
         const enemyGraphic = $dataItems[$gameVariables.value(240)] ? $dataItems[$gameVariables.value(240)].meta.EnemyGraphic : null;
         if(!enemyGraphic) continue;
@@ -815,7 +819,7 @@ if(valueRegionMapArray[enemySpawnCount] < 1) return;
           };
         };
         const gameVar537 = $gameVariables.value(537);
-        if(Array.isArray(gameVar537)){gameVar537.push($gameMap.getLastSpawnEventId())};
+        if(Array.isArray(gameVar537)){gameVar537.push(enemySpawnedId)};
         $gameVariables.setValue(appearance,$gameVariables.value(appearance) + 1);
       }
 };
@@ -969,8 +973,9 @@ if($gameSwitches.value(201)){
       let treasureSpawnCount = Math.ceil($gameVariables.value(215)[$gameVariables.value(240)].length/$gameVariables.value(217));
       if (treasureSpawnCount > valueRegionMapArray[8]) { treasureSpawnCount = valueRegionMapArray[8] };
       const treasureSpawnConditions = [86,[1],[1],1,0,0,[0],[8]];
-      map_otherGraphicSet(treasureSpawnCount,0,treasureSpawnConditions);
-    $gameVariables.value(536).push($gameMap.getLastSpawnEventId());
+      // BUGFIX: only record the treasure id if a spawn actually happened.
+      const spawnedTreasureEventId = map_otherGraphicSet(treasureSpawnCount,0,treasureSpawnConditions);
+      if(spawnedTreasureEventId) $gameVariables.value(536).push(spawnedTreasureEventId);
   }
   if($gameSwitches.value(207) && $gameVariables.value(238) >= 3 && $gameVariables.value(270) >= 20 && valueRegionMapArray[1] >= 1){
     const trapSpawnConditions = [20, [1], [1], 1, 0, 0, [0], [1]];//トラップ。エネミーレベル20以上
@@ -1030,9 +1035,13 @@ for (let materialSlotId = 1; materialSlotId <= 10; materialSlotId++) {//固有�
 //const map_otherGraphicSetEndNowArrayLen = map_otherGraphicSetEndNowArray.length;
 map_otherGraphicSet = function(spawnCount,graphicNames,spawnConditions){
 
-  if(!spawnConditions || spawnConditions.length == 0) return;
+  if(!spawnConditions || spawnConditions.length == 0) return null;
 
   let j = 0;
+  // BUGFIX: return the id of the event THIS call actually spawned (null when
+  // every attempt failed). Callers used to read getLastSpawnEventId(), which
+  // still points at the previous spawn after a failure.
+  let lastSpawnedId = null;
   const gameVar210SpawnEventIdsArray = $gameVariables.value(210);
   const end = spawnCount == 0 ? $gameVariables.value(238) : spawnCount;
   const gameMap = $gameMap;
@@ -1043,11 +1052,11 @@ map_otherGraphicSet = function(spawnCount,graphicNames,spawnConditions){
     conditionMap.collided    = spawnConditions[5];
     conditionMap.terrainTags = spawnConditions[6];
     conditionMap.regionIds   = spawnConditions[7];
-    gameMap.spawnEventRandom(spawnConditions[0], conditionMap, true);
-    
-	const lastSpawnEventId = gameMap.getLastSpawnEventId();
+    const lastSpawnEventId = gameMap.spawnEventRandom(spawnConditions[0], conditionMap, true);
+    if(!lastSpawnEventId) continue;
     const event = gameMap.event(lastSpawnEventId);
     if(!event) continue;//生成位置が見つからず生成されていない場合は前回の生成IDの誤登録も避ける
+    lastSpawnedId = lastSpawnEventId;
     gameVar210SpawnEventIdsArray.push(lastSpawnEventId);
     if(graphicNames){
       event.setImage(graphicNames[getRandomIndex(graphicNames.length)],getRandomIndex(8) + 0);
@@ -1061,6 +1070,7 @@ map_otherGraphicSet = function(spawnCount,graphicNames,spawnConditions){
       break;
     }
   }
+  return lastSpawnedId;
 }
 
 //マップイベント消去メモタグで指定
