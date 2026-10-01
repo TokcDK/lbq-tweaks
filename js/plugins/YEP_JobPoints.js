@@ -478,7 +478,8 @@ Game_Actor.prototype.jp = function(classId) {
 
 Game_Actor.prototype.initJp = function() {
     var actor = this.actor();
-    this._subclassJpRemainder = {}; // reset the carried fraction on (re)setup
+    this._jpRateRemainder = {};      // reset the carried jpRate() fraction on (re)setup
+    this._subclassJpRemainder = {}; // reset the carried subclass share fraction
     for (var i = 0; i < $dataClasses.length; i++) {
 			if (actor.startingJp) {
 				var jp = actor.startingJp[i] || 0;
@@ -528,14 +529,39 @@ Game_Actor.prototype.gainJp = function(value, classId) {
 
     //if (value === NaN) value = 0;
 		classId = classId || this.currentClass().id;
-		value = Math.floor(value * this.jpRate());
-		if ($gameParty.inBattle()) {
-      this._battleJp = this._battleJp || 0;
-			this._battleJp += value;
-		}
-		this.setJp(this.jp(classId) + value, classId);
+
+    // BUGFIX: this used to be
+    //     value = Math.floor(value * this.jpRate());
+    // i.e. the floor was applied independently on every call, so any fraction
+    // was thrown away each time. With jpRate() below 1 - an actor, class, item
+    // or state with a JP rate under 100% - a stream of small payouts such as
+    // "JP Per Enemy: 1" rounded down to 0, and because setJp() refuses a value
+    // of 0 the gain was not recorded at all. The JP silently vanished.
+    // The fraction is now carried per class, so the actor ends up with exactly
+    // floor(jpRate() * total) instead of a truncated sum.
+    var rate = this.jpRate();
+    this._jpRateRemainder = this._jpRateRemainder || {};
+    var carried = (this._jpRateRemainder[classId] || 0) + value * rate;
+    // The epsilon absorbs binary floating point drift in the carried fraction
+    // (adding 0.1 a hundred times gives 9.999999999999831, not 10), which would
+    // otherwise strand the actor a whole point short of the true total.
+    var gained = Math.floor(carried + 1e-9);
+
+    if (gained > 0) {
+      if ($gameParty.inBattle()) {
+        this._battleJp = this._battleJp || 0;
+        this._battleJp += gained;
+      }
+      this.setJp(this.jp(classId) + gained, classId);
+    }
+    // Written AFTER setJp()/jp(): those can lazily call initJp(), which clears
+    // this map, so the carried fraction has to be stored once they are done.
+    this._jpRateRemainder[classId] = carried - gained;
+
+    // The subclass share is based on what the primary class actually gained,
+    // which is why `gained` is passed instead of the requested `value`.
     if (classId === this.currentClass().id && this.isSublcassEarnJp()) {
-      this.gainJpSubclass(value);
+      this.gainJpSubclass(gained);
     }
 };
 
@@ -565,7 +591,7 @@ Game_Actor.prototype.gainJpSubclass = function(value) {
     // unpredictable rounded lump that is usually zero.
     this._subclassJpRemainder = this._subclassJpRemainder || {};
     var carried = (this._subclassJpRemainder[classId] || 0) + value * rate;
-    var whole = Math.floor(carried);
+    var whole = Math.floor(carried + 1e-9); // epsilon for the same fp drift
     if (whole >= 1) {
       this.setJp(this.jp(classId) + whole, classId);
     }
