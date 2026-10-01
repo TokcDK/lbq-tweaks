@@ -129,7 +129,7 @@ Yanfly.Subclass.version = 1.11
  * @decimals 2
  * @min 0
  * @desc When gaining EXP, how much should subclasses earn?
- * @default 0.25
+ * @default 0.50
  *
  * @param JP
  * @parent ---Parameters---
@@ -137,7 +137,7 @@ Yanfly.Subclass.version = 1.11
  * @decimals 2
  * @min 0
  * @desc When gaining JP, how much should subclasses earn?
- * @default 0.25
+ * @default 0.50
  *
  * @param ---Traits---
  * @default
