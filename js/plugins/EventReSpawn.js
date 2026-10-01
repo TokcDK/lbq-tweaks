@@ -584,9 +584,54 @@ function Game_PrefabEvent() {
     };
 
     Game_Map.prototype.isErsCheckAnyDirectionPassable = function(x, y) {
-        return [2, 4, 6, 8].some(function(direction) {
+        // Cardinal directions. Behaviour unchanged.
+        if ([2, 4, 6, 8].some(function(direction) {
             return $gamePlayer.isMapPassable(x, y, direction);
+        })) {
+            return true;
+        }
+        // Diagonal neighbours. These used to be ignored, so a tile boxed in on
+        // all four sides looked unreachable and failed the entire random spawn
+        // (the "could not get coordinates" warning). The result of this function
+        // can now only go from false to true - it never rejects a position that
+        // used to be accepted.
+        //
+        // Note on the engine's own corner rule: Game_CharacterBase
+        // .canPassDiagonally() was NOT used on purpose. It requires one of the
+        // two ORTHOGONAL neighbours to be passable, and the cardinal check above
+        // already tests every orthogonal with the same predicate
+        // ($gamePlayer.isMapPassable). So the corner rule can never rescue a
+        // tile whose four cardinals are blocked - it would be a no-op. Here a
+        // diagonal neighbour simply has to be a valid tile that itself has a
+        // passable exit.
+        //
+        // Two safety rules, both because this core's
+        // Game_Map.isPassable(x, y, d) converts `d` into a passage bitmask,
+        // (1 << (d / 2 - 1)) & 0x0f: the diagonal constants 1/3/7/9 produce a
+        // mask of 0 and checkPassage() treats a 0 mask as "passable", which would
+        // report EVERY tile as passable. Therefore only cardinal directions
+        // (2 = down, 4 = left, 6 = right, 8 = up) are ever passed to
+        // isPassable()/isMapPassable() below, and diagonal offsets are computed
+        // explicitly with $gameMap.roundX/roundY (which honour looping maps).
+        if (!$gameMap.isValid(x, y)) return false;
+
+        // Never place an event on a tile that cannot be entered at all.
+        var originPassable = [2, 4, 6, 8].some(function(direction) {
+            return $gameMap.isPassable(x, y, direction);
         });
+        if (!originPassable) return false;
+
+        var diagonals = [[-1, -1], [1, -1], [-1, 1], [1, 1]];
+        for (var i = 0; i < diagonals.length; ++i) {
+            var tx = $gameMap.roundX(x + diagonals[i][0]);
+            var ty = $gameMap.roundY(y + diagonals[i][1]);
+            if (!$gameMap.isValid(tx, ty)) continue;
+            var targetHasExit = [2, 4, 6, 8].some(function(direction) {
+                return $gamePlayer.isMapPassable(tx, ty, direction);
+            });
+            if (targetHasExit) return true;
+        }
+        return false;
     };
 
     Game_Map.prototype.isErsCheckScreenInOut = function(type, x, y) {
