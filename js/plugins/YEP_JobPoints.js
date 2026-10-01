@@ -478,6 +478,7 @@ Game_Actor.prototype.jp = function(classId) {
 
 Game_Actor.prototype.initJp = function() {
     var actor = this.actor();
+    this._subclassJpRemainder = {}; // reset the carried fraction on (re)setup
     for (var i = 0; i < $dataClasses.length; i++) {
 			if (actor.startingJp) {
 				var jp = actor.startingJp[i] || 0;
@@ -546,10 +547,31 @@ Game_Actor.prototype.isSublcassEarnJp = function() {
 
 Game_Actor.prototype.gainJpSubclass = function(value) {
     var classId = this.subclass().id;
-    value = Math.round(value * Yanfly.Param.SubclassJp);
-    if(!value) return; // nothing to get for subclass
+    var rate = Yanfly.Param.SubclassJp;
+    if (!(rate > 0)) return; // subclass JP sharing disabled by the parameter
 
-    this.setJp(this.jp(classId) + value, classId);
+    // BUGFIX: this used to round EVERY call on its own -
+    //     value = Math.round(value * rate);
+    //     if (!value) return;
+    // With the default rate of 0.25 that means Math.round(1 * 0.25) === 0, so a
+    // stream of small payouts (1 JP per enemy per "JP Per Enemy", small item /
+    // target gains, ...) was rounded down to zero and thrown away EVERY time.
+    // The second job therefore stayed at 0 JP forever: its field in the Learn
+    // Skills window was empty and no second-job skill could ever be unlocked,
+    // while the primary class kept the full amount.
+    //
+    // The fractional part is now carried over per class, so over time the
+    // second job receives exactly rate * (total JP earned), instead of an
+    // unpredictable rounded lump that is usually zero.
+    this._subclassJpRemainder = this._subclassJpRemainder || {};
+    var carried = (this._subclassJpRemainder[classId] || 0) + value * rate;
+    var whole = Math.floor(carried);
+    if (whole >= 1) {
+      this.setJp(this.jp(classId) + whole, classId);
+    }
+    // Written AFTER setJp()/jp() on purpose: those can lazily call initJp(),
+    // which resets this map, and the carried fraction must survive that.
+    this._subclassJpRemainder[classId] = carried - whole;
 };
 
 Game_Actor.prototype.loseJp = function (value, classId) {
