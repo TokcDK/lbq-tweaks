@@ -599,4 +599,177 @@
 		valueFaceSelect = 8;
 	};
 
+//=============================================================================
+	// Event Script blocks migrated out of data/CommonEvents.json + data/Map*.json
+	//----------------------------------------------------------------------------
+	// RPG Maker splits a multi-line Script command into several CONSECUTIVE
+	// 355/655 commands, so the same few snippets were copy-pasted all over the
+	// event data (273 blocks across 78 distinct snippets). Each one is now a single
+	// call to a function below; the per-event differences are arguments.
+	//
+	// These helpers deliberately write the same implicit globals the snippets
+	// wrote (valuePic1, valueBossId, valueCountSet*, valueTalkSet, ...), because
+	// the Show Picture / Move Picture commands that follow in the editor read
+	// those globals.
+	//=============================================================================
+	
+	// Replaces (62x): $gameSystem.vnChoices = true|false;
+	AGH_setVisualNovelChoices = function (enabled) {
+		$gameSystem.vnChoices = enabled;
+	};
+	
+	// Replaces (87x): event_charaPreset(id); event_charaRoot(id);
+	event_charaPrepChara = function (eventId) {
+		event_charaPreset(eventId);
+		event_charaRoot(eventId);
+	};
+	
+	// Replaces (25x): valueBossId = id; event_charaPreset(id); event_charaRoot(id);
+	CEH_bossMarkAndCharaPrep = function (eventId) {
+		valueBossId = eventId;
+		event_charaPrepChara(eventId);
+	};
+	
+	// Replaces (26x): event_charaPreset/Root + page variable -> event_pararelStarting
+	CEH_mapEventPararelStart = function (eventId) {
+		event_charaPrepChara(eventId);
+		var pageVariable = $dataMap.events[eventId].pages[0].conditions.variableValue;
+		event_pararelStarting(0, pageVariable + 301, eventId);
+	};
+	
+	// Replaces (18x): var value1 = `text`; CommonPopupManager.showInfo({},value1,null);
+	AGH_popupInfo = function (text) {
+		CommonPopupManager.showInfo({}, text, null);
+	};
+	
+	// Replaces (8x): var value1 = `text`; TickerManager.show(value1);
+	AGH_tickerInfo = function (text) {
+		TickerManager.show(text);
+	};
+	
+	// Replaces (21x): valueBossAddLevel = 0; valueEnemyAddLevel = 0;
+	CEH_clearBossAddLevels = function () {
+		valueBossAddLevel = 0;
+		valueEnemyAddLevel = 0;
+	};
+	
+	// Replaces (5x): value = $dataItems[$gameVariables.value(240)]; popEnemy_setUp(value);
+	CEH_popEnemySetUp = function () {
+		var dungeonItem = $dataItems[$gameVariables.value(240)];
+		popEnemy_setUp(dungeonItem);
+	};
+	
+	// Replaces (13x): this._eventId = $gameVariables.value(292)[slot];
+	CEH_setEventIdFromSpawnList = function (interp, slot) {
+		interp._eventId = $gameVariables.value(292)[slot];
+	};
+	
+	// Replaces (10x): valueEnemyEventId = this.eventId(); this.sVal(21,this.eventId());
+	CEH_storeEnemyEventId = function (interp) {
+		valueEnemyEventId = interp.eventId();
+		interp.sVal(21, interp.eventId());
+	};
+	
+	// Replaces (9x): this._eventId = valueBossId; CEH_storeThisEventId(this); pic_erase(0);
+	CEH_restoreBossEvent = function (interp) {
+		interp._eventId = valueBossId;
+		CEH_storeThisEventId(interp);
+		pic_erase(0);
+	};
+	
+	// Replaces (9x): self switch [mapId, eventId, 10] -> variable 21 as a grouped string
+	AGH_selfSwitchValue10ToVar21 = function (interp) {
+		var slotValue = $gameSelfSwitches.getVariableValue([$gameMap.mapId(), interp._eventId, 10]);
+		$gameVariables.setValue(21, slotValue.toLocaleString());
+	};
+	
+	// Replaces (6x): same self switch -> shop_priceComparison(value,1,0)
+	AGH_shopPriceComparisonFromSelfSwitch = function (interp) {
+		var priceValue = $gameSelfSwitches.getVariableValue([$gameMap.mapId(), interp._eventId, 10]);
+		shop_priceComparison(priceValue, 1, 0);
+	};
+	
+	// Replaces (9x): shop NPC naming + weapon reference + menu type
+	AGH_setShopNpc = function (actorId, actorName, weaponName, menuTypeId) {
+		$gameActors.actor(actorId).setName(actorName);
+		$gameVariables.value(400)[59] = weaponName;
+		valueCountSet1 = menuTypeId;
+	};
+	
+	// Replaces (7x): valueCountSet1 = kindId; valueCountSet2 = targetId;
+	AGH_setCountSetPair = function (kindId, targetId) {
+		valueCountSet1 = kindId;
+		valueCountSet2 = targetId;
+	};
+	
+	// Replaces (7x): find the weapon flagged in variable 327 and warp to its
+	// <HomePosition>. Falls back to weapon 22 when none is flagged.
+	CEH_returnHomeWeaponPosition = function (interp) {
+		var weaponId = 22;
+		for (var i = 1; i <= 100; i++) {
+			if ($gameVariables.value(327)[i] == 2) {
+				weaponId = i;
+				break;
+			}
+		}
+		var homePosition = $dataWeapons[weaponId].meta['HomePosition'].split(',');
+		$gameVariables.setValue(161, [Number(homePosition[0]), Number(homePosition[1]), Number(homePosition[2])]);
+		CEH_sceneReturnSetup(interp, $gameVariables.value(161));
+	};
+	
+	// Replaces (6x): $dataItems[clothPartsChoice].name = `...`;
+	AGH_setClothPartsChoiceName = function (name) {
+		$dataItems[clothPartsChoice].name = name;
+	};
+	
+	// Replaces (6x): valuePic1 = picId; showPicture(640,384) + picture_fade1.
+	// valuePic1 is still assigned because later commands read it.
+	AGH_setPicAndFadeIn = function (picId, imageName, opacity) {
+		valuePic1 = picId;
+		$gameScreen.showPicture(picId, imageName, 1, 640, 384, 100, 100, opacity, 0);
+		picture_fade1(picId, 'fadeIn', valueWipeImg, 60, 5);
+	};
+	
+	// Replaces (5x): showPicture + picture_fade1 at an explicit position.
+	AGH_showPictureFadeIn = function (picId, imageName, x, y, scaleX, scaleY, opacity, fadeWait, moveWait) {
+		$gameScreen.showPicture(picId, imageName, 1, x, y, scaleX, scaleY, opacity, 0);
+		picture_fade1(picId, 'fadeIn', valueWipeImg, fadeWait, moveWait);
+	};
+	
+	// Replaces (6x): the one-line talk popup (common event 60).
+	// NOTE: the original assigned valueTalkSet twice, the second assignment
+	// overwriting the first with [0,0,0]. That looks like a leftover bug in the
+	// event data, but it is preserved here on purpose so behaviour is identical;
+	// if the intent was [mode, 250, eventId], delete the second line.
+	AGH_openTalkWindow = function (interp, mode) {
+		interp.sVal(172, 21);
+		valueTalkSet = [mode, 250, interp._eventId];
+		valueTalkSet = [0, 0, 0];
+		interp.setupChild($dataCommonEvents[60].list, 0);
+	};
+	
+	// Replaces (6x): clear the particle attached to this event.
+	AGH_clearEventParticle = function (interp, particlePrefix) {
+		var particleName = particlePrefix + '-' + interp._eventId;
+		$gameScreen._particle.particleClear(particleName);
+	};
+	
+	// Replaces (4x): this._eventId = id; drowsepost.camera.zoom(mode, 60, this._eventId);
+	CEH_focusEventAndZoom = function (interp, eventId, zoomMode) {
+		interp._eventId = eventId;
+		drowsepost.camera.zoom(zoomMode, 60, interp._eventId);
+	};
+	
+	// Replaces (4x): open the quest board for the <QuestSet> item on this event.
+	AGH_openQuestSetForThisEvent = function (interp) {
+		valueCountSet1 = Number($gameMap.event(interp._eventId).event().meta['QuestSet']);
+		quest_singleJutyuu(valueCountSet1);
+	};
+	
+	// Replaces (4x): respawn a main NPC into a party slot, then make the
+	// interpreter act on the event that was just created.
+	CEH_respawnMainNpcAndTarget = function (interp, slot, x, y, zoomFlag, direction) {
+		event_respawnSetA(slot, x, y, zoomFlag, direction);
+		interp._eventId = $gameVariables.value(292)[slot];
+	};
 })();
