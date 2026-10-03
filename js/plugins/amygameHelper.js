@@ -772,4 +772,72 @@
 		event_respawnSetA(slot, x, y, zoomFlag, direction);
 		interp._eventId = $gameVariables.value(292)[slot];
 	};
+//=============================================================================
+	// Event Script blocks migrated out of data/CommonEvents.json + data/Map*.json
+	// (second pass: whole-run blocks that were still inline)
+	//----------------------------------------------------------------------------
+	// Each block was one 355 plus its contiguous 655 lines, and its whole content
+	// was a single repeatable pattern. Interpreter context is passed explicitly
+	// as `interp` because event-script `this` is the Game_Interpreter.
+	//=============================================================================
+	
+	// Replaces (21x): build the three one-line arrays inline, then chara_oneWord.
+	AGH_charaOneWord = function (picId, eventId, textPicId, waitFrames, randX, randY, lines) {
+		chara_oneWord(picId, eventId, textPicId, waitFrames, [randX], [randY], lines);
+	};
+	
+	// Replaces (5x): spawn the summons-boss event, register it in slot 12 and
+	// start the boss intro CG + animation.
+	AGH_summonBossCharaGura = function (x, y, imageName, cgWidth, cgHeight, animScale, animId) {
+		var slot = 12;
+		$gameMap.spawnEvent(192, x, y, true);
+		var eventId = $gameMap.getLastSpawnEventId();
+		$gameVariables.value(292)[slot] = eventId;
+		var event = $gameMap.event($gameVariables.value(292)[slot]);
+		event._priorityType = 2;
+		valueBossCharaGura = [$gameVariables.value(292)[slot], imageName, cgWidth, cgHeight, animScale];
+		boss_charaGuraCGSet(valueBossCharaGura);
+		event.requestAnimation(animId);
+	};
+	
+	// Replaces (6x): rebuild both the main and the sub NPC from the scene preset
+	// held in variable 163, then wipe the screen.
+	CEH_respawnSubNpcFromScenePreset = function (interp) {
+		var mainSlot = $gameVariables.value(530);
+		var preset = $gameVariables.value(163)[$gameVariables.value(535)];
+		event_respawnSetA(mainSlot, preset[3], preset[4], 1);
+		var event = $gameMap.event($gameVariables.value(292)[mainSlot]);
+		event.setImage(preset[1], preset[2]);
+		event.setDirection(preset[5]);
+		interp._eventId = $gameVariables.value(292)[mainSlot];
+		var subSlot = 11;
+		event_respawnSetN(subSlot, preset[8], preset[9], 0, preset[6], preset[7]);
+		event = $gameMap.event($gameVariables.value(292)[subSlot]);
+		event.setDirection(preset[10]);
+		CEH_wipeFadeOut101();
+	};
+	
+	// Replaces (5x): the goods-drag sprite, whose ids and image names were fixed.
+	AGH_showGoodsDragSprite = function () {
+		valuePic1 = 55;
+		valueScenePic = 'Goods_drag1_';
+		$gameScreen.setPicturesAnimation(2, 10, "連番", 20);
+		var picId = valuePic1 + 4;
+		var imageName = valueScenePic + '05_00';
+		$gameScreen.showPicture(picId, imageName, 1, 640 - 128, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(picId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
+		if ($gameScreen.picture(picId)) {
+			$gameScreen.picture(picId).startAnimationFrame(1, true, [1, 1, 1, 2]);
+		};
+	};
+	
+	// Replaces (4x): this._eventId = valueEnemyEventId;
+	CEH_setEventIdFromEnemyEvent = function (interp) {
+		interp._eventId = valueEnemyEventId;
+	};
+	
+	// Replaces (4x): a custom label stored in a data-system switch slot.
+	AGH_setDataSystemLabel = function (index, label) {
+		$dataSystem.switches[index] = label;
+	};
 })();
