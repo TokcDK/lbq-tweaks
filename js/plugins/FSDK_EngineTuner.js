@@ -208,7 +208,12 @@ Bitmap.prototype._createCanvas = function (width, height) {
         var h = Math.max(this._image.height || 0, 1);
         this.__canvas.width = w;
         this.__canvas.height = h;
-        this._createBaseTexture(this._canvas);
+        // BUGFIX: this passed this._canvas, but this override only ever creates
+        // __canvas (the MZ 1.6 property). With the older core/YEP naming the
+        // _canvas property can be undefined here, so the base texture was built
+        // from undefined and every later update() logged
+        // "BaseTexture update error: 'source' is undefined".
+        this._createBaseTexture(this.__canvas || this._canvas);
 
         this.__context.drawImage(this._image, 0, 0);
     }
@@ -371,15 +376,46 @@ Bitmap.prototype.drawSmallText = function (text, x, y, maxWidth, lineHeight, ali
     bitmap.clear();
 };
 
+// The base texture lives under a different property depending on which
+// Bitmap implementation is in effect: this engine's core (rpg_core.js, MZ
+// 1.6.2) uses __baseTexture, while YEP_X_CoreUpdatesOpt's older
+// Bitmap.initialize still uses _baseTexture. Read both so this keeps working
+// whichever one ran.
+function fsdkBitmapBaseTexture(bitmap) {
+    return bitmap._baseTexture || bitmap.__baseTexture || null;
+}
+
+// A texture can become unusable between frames: BaseTexture.destroy() nulls
+// `source`, and PIXI's update() then logs "BaseTexture update error: 'source'
+// is undefined". Never call update() on such a texture.
+function fsdkBaseTextureIsAlive(baseTexture) {
+    if (!baseTexture) return false;
+    if (baseTexture.destroyed || baseTexture._destroyed) return false;
+    return !!baseTexture.source;
+}
+
 Bitmap.prototype.checkDirty = function () {
-    if (this._dirty) {
-        this._baseTexture.update();
-        var baseTexture = this._baseTexture;
-        setTimeout(function () {
-            baseTexture.update();
-        }, 0);
-        this._dirty = false;
+    if (!this._dirty) return;
+    var baseTexture = fsdkBitmapBaseTexture(this);
+    if (fsdkBaseTextureIsAlive(baseTexture)) {
+        baseTexture.update();
     }
+    this._dirty = false;
+
+    // A second update is needed after the render, but it must not fire against
+    // a texture that was replaced or destroyed in the meantime, otherwise PIXI
+    // logs the "'source' is undefined" warning on a stale texture.
+    if (this._fsdkUpdateTimer) {
+        clearTimeout(this._fsdkUpdateTimer);
+        this._fsdkUpdateTimer = null;
+    }
+    var self = this;
+    this._fsdkUpdateTimer = setTimeout(function () {
+        self._fsdkUpdateTimer = null;
+        if (fsdkBitmapBaseTexture(self) !== baseTexture) return;
+        if (!fsdkBaseTextureIsAlive(baseTexture)) return;
+        baseTexture.update();
+    }, 0);
 };
 
 Bitmap.prototype._requestImage = function (url) {
