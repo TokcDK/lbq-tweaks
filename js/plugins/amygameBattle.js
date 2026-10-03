@@ -5237,6 +5237,80 @@ party_levelSaveLoad = function (modeId) {
 
 };
 
+//=============================================================================
+//=============================================================================
+// Weapon-unleash replacement skills
+//   backs the <Custom Replace Attack> / <Custom Replace Guard> note blocks in
+//   data/Actors.json, data/Weapons.json and data/Armors.json, which used to hold
+//   a copy-pasted eval snippet per entry. The notes now only call the functions
+//   below, so the logic lives here once. Every note still passes its own numbers.
+//=============================================================================
+
+// Attack id per equipped weapon type: 1 -> 101, 2 -> 111, ... 10 -> 191.
+const attackIdsMapAcraSub = {
+  1: 101, 2: 111, 3: 121, 4: 131, 5: 141,
+  6: 151, 7: 161, 8: 171, 9: 181, 10: 191
+};
+
+// Guard id per equipped weapon type: 1 -> 501, 2 -> 502, ... 10 -> 510.
+const guardIdsMapAcraSub = {
+  1: 501, 2: 502, 3: 503, 4: 504, 5: 505,
+  6: 506, 7: 507, 8: 508, 9: 509, 10: 510
+};
+
+// Weapon in the actor's first weapon slot, or null when that slot is empty or
+// its id no longer exists in the database. The old note code read
+// user._equips[0]._itemId and then $dataWeapons[id] without checking either.
+function replaceFirstSlotWeapon(user) {
+  const slot = user._equips && user._equips[0];
+  if (!slot || slot._itemId < 1) return null;
+  return $dataWeapons[slot._itemId] || null;
+}
+
+// First equipped weapon type (1..10), or 0 when the actor carries none.
+function replaceEquippedWeaponType(user) {
+  for (let typeId = 1; typeId <= 10; typeId++) {
+    if (user.isWtypeEquipped(typeId)) return typeId;
+  }
+  return 0;
+}
+
+// Base attack id from the weapon type; 1 (plain attack) when unarmed.
+function replaceBaseAttackId(user) {
+  const typeId = replaceEquippedWeaponType(user);
+  return typeId ? (attackIdsMapAcraSub[typeId] || 1) : 1;
+}
+
+// Base guard id from the weapon type; 0 when the actor carries no weapon.
+function replaceBaseGuardId(user) {
+  const typeId = replaceEquippedWeaponType(user);
+  return typeId ? (guardIdsMapAcraSub[typeId] || 0) : 0;
+}
+
+// Bonus every attack replacement shares: only the FIRST match applies. The
+// earliest version of this code summed all of them, so an actor with state 282
+// *and* an extra learned skill got +7 instead of +5.
+function replaceAttackBonusId(user, attackId) {
+  if (user.isStateAffected(283)) return attackId + 6;
+  if (user.isStateAffected(282)) return attackId + 5;
+  if (user.isLearnedSkill(attackId + 4)) return attackId + 4;
+  if (user.isLearnedSkill(attackId + 3)) return attackId + 3;
+  if (user.isLearnedSkill(attackId + 2)) return attackId + 2;
+  if (user.isLearnedSkill(attackId + 1)) return attackId + 1;
+  return attackId;
+}
+
+// <UniqueOugi> resolves to variable 287[actorId][9]; 0 when that is not set.
+function replaceUniqueOugiId(user) {
+  const uniqueData = $gameVariables.value(287);
+  if (!Array.isArray(uniqueData)) return 0;
+  const actorData = uniqueData[user.actorId()];
+  if (!Array.isArray(actorData)) return 0;
+  return Number(actorData[9]) || 0;
+}
+
+// States 63/64 (plus skill 66) short-circuit to the actor's special attacks.
+// Actors without that state pair call actor_custom_replace_attack_sub directly.
 actor_custom_replace_attack = function (user, attackWhenArmed, attackWhenUnarmed) {
   const userStateAffected64 = user.isStateAffected(64);
   return (userStateAffected64 || user.isStateAffected(63))
@@ -5244,106 +5318,78 @@ actor_custom_replace_attack = function (user, attackWhenArmed, attackWhenUnarmed
     : actor_custom_replace_attack_sub(user);
 };
 
-const attackIdsMapAcraSub = {
-  1: 101,
-  2: 111,
-  3: 121,
-  4: 131,
-  5: 141,
-  6: 151,
-  7: 161,
-  8: 171,
-  9: 181,
-  10: 191
-};
+// Weapon driven attack replacement; returns 1 (plain attack) when unarmed.
 actor_custom_replace_attack_sub = function(user) {
-  // Early return if no weapon equipped
-  const firstEquippedItemId = user._equips[0]._itemId;
-  if (firstEquippedItemId < 1) {
-    return 1;
-  }
-  
-  // Get the weapon data once
-  const firstWeapon = $dataWeapons[firstEquippedItemId];
-  
-  // Check for special attack override from weapon metadata
+  const firstWeapon = replaceFirstSlotWeapon(user);
+  if (!firstWeapon) return 1;
+
+  // <SpecialAttack> on the weapon overrides everything below.
   const specialAttackMeta = firstWeapon.meta['SpecialAttack'];
   if (specialAttackMeta) {
     const specialAttackId = Number(specialAttackMeta);
-    if (specialAttackId >= 1) {
-      return specialAttackId;
-    }
+    if (specialAttackId >= 1) return specialAttackId;
   }
-  
-  // Find base attack ID from equipped weapon type
-  let attackId = 1;
-  for (let typeId = 1; typeId <= 10; typeId++) {
-    if (user.isWtypeEquipped(typeId)) {
-      attackId = attackIdsMapAcraSub[typeId] || 1;
-      break;
-    }
-  }
-  
-  // Apply state and skill modifiers
-  // Using addition instead of multiple increments for better performance
-  attackId += (user.isStateAffected(283) ? 6 : 0) +
-              (user.isStateAffected(282) ? 5 : 0) +
-              (user.isLearnedSkill(attackId + 4) ? 4 : 0) +
-              (user.isLearnedSkill(attackId + 3) ? 3 : 0) +
-              (user.isLearnedSkill(attackId + 2) ? 2 : 0) +
-              (user.isLearnedSkill(attackId + 1) ? 1 : 0);
-              
-  return attackId;
+  return replaceAttackBonusId(user, replaceBaseAttackId(user));
 };
 
-actor_custom_replace_guard = function (user) {
-  const userEquips0ItemId = user._equips[0]._itemId;
-  if (userEquips0ItemId >= 1 && user.tp >= 100) {
-
-    const weapon0 = $dataWeapons[userEquips0ItemId];
-    const weapon0trait0 = weapon0.traits[0];
-    if (weapon0trait0 !== undefined) return weapon0trait0.dataId;
-
-    const weapon0MetaSpecialOugi = weapon0.meta['SpecialOugi'];
-    if (weapon0MetaSpecialOugi) {
-      const weapon0MetaSpecialOugiNum = Number(weapon0MetaSpecialOugi);
-      if (weapon0MetaSpecialOugiNum >= 1) {
-        return weapon0MetaSpecialOugiNum;
-      };
-    };
-
-    if (weapon0.meta['UniqueOugi']) {
-      var gameVariablesValue287UserActorId9 = $gameVariables.value(287)[user.actorId()][9];
-      if (gameVariablesValue287UserActorId9 >= 1) {
-        return gameVariablesValue287UserActorId9;
-      };
-    };
-  };
-
-  return 2;
+// A weapon note that pins one attack id for whoever carries it, ignoring
+// equipment and TP (data/Weapons.json, id 1 = sword -> 101).
+actor_custom_replace_attack_fixed = function (user, baseSkillId) {
+  return replaceAttackBonusId(user, baseSkillId);
 };
 
-actor_custom_replace_guard1 = function (user) {
-  const userEquips0ItemId = user._equips[0]._itemId;
-  if (userEquips0ItemId >= 1 && user.tp >= 100) {
-    if (user.isWtypeEquipped(1)) { return 501 }
-    else if (user.isWtypeEquipped(2)) { return 502 }
-    else if (user.isWtypeEquipped(3)) { return 503 }
-    else if (user.isWtypeEquipped(4)) { return 504 }
-    else if (user.isWtypeEquipped(5)) { return 505 }
-    else if (user.isWtypeEquipped(6)) { return 506 }
-    else if (user.isWtypeEquipped(7)) { return 507 }
-    else if (user.isWtypeEquipped(8)) { return 508 }
-    else if (user.isWtypeEquipped(9)) { return 509 }
-    else if (user.isWtypeEquipped(10)) { return 510 };
+// An armour note that shifts the weapon-type attack id while TP is still below
+// tpLimit (data/Armors.json, id 23 = +2 below full TP). When the condition is
+// not met it hands back fallbackSkillId so the caller leaves its own id alone.
+actor_custom_replace_attack_shifted = function (user, offset, tpLimit, fallbackSkillId) {
+  if (user.tp >= tpLimit) return fallbackSkillId;
+  const typeId = replaceEquippedWeaponType(user);
+  if (!typeId) return fallbackSkillId;
+  return (attackIdsMapAcraSub[typeId] || 0) + offset;
+};
 
-    const weapon0MetaSpecialOugi = $dataWeapons[userEquips0ItemId].meta['SpecialOugi'];
-    if (weapon0MetaSpecialOugi) {
-      return Number(weapon0MetaSpecialOugi)
-    };
+// Guard replacement derived from the weapon's first trait (code 43 = add skill),
+// then overridden by <SpecialOugi> and finally by <UniqueOugi>.
+// activeOnly: true  -> when there is no weapon in slot 1 or TP is below 100,
+//                     hand back fallbackSkillId so the caller can keep its own
+//                     id untouched (actors that only replace at full TP).
+// activeOnly: false -> fall back to the plain guard id 2 instead.
+actor_custom_replace_guard = function (user, activeOnly, fallbackSkillId) {
+  const firstWeapon = replaceFirstSlotWeapon(user);
+  if (!firstWeapon || user.tp < 100) {
+    return activeOnly ? fallbackSkillId : 2;
   };
+  let guardSkillId = 2;
+  const weaponTrait0 = firstWeapon.traits[0];
+  if (weaponTrait0 !== undefined) guardSkillId = weaponTrait0.dataId;
+  const specialOugiMeta = firstWeapon.meta['SpecialOugi'];
+  if (specialOugiMeta) {
+    const specialOugiId = Number(specialOugiMeta);
+    if (specialOugiId >= 1) guardSkillId = specialOugiId;
+  };
+  if (firstWeapon.meta['UniqueOugi']) {
+    const uniqueOugiId = replaceUniqueOugiId(user);
+    if (uniqueOugiId >= 1) guardSkillId = uniqueOugiId;
+  };
+  return guardSkillId;
+};
 
-  return 2;
+// Guard replacement derived from the weapon type (501 .. 510), with
+// <SpecialOugi> overriding it. Same activeOnly handling as above.
+actor_custom_replace_guard1 = function (user, activeOnly, fallbackSkillId) {
+  const firstWeapon = replaceFirstSlotWeapon(user);
+  if (!firstWeapon || user.tp < 100) {
+    return activeOnly ? fallbackSkillId : 2;
+  };
+  let guardSkillId = replaceBaseGuardId(user) || 2;
+  const specialOugiMeta = firstWeapon.meta['SpecialOugi'];
+  if (specialOugiMeta) {
+    const specialOugiId = Number(specialOugiMeta);
+    // The previous version returned the tag value without this check, so a
+    // <SpecialOugi:0> wiped the guard id out entirely.
+    if (specialOugiId >= 1) guardSkillId = specialOugiId;
+  };
+  return guardSkillId;
 };
 
 //ボス行動コモン内予測計算
