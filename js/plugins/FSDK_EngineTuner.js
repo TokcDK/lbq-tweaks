@@ -209,11 +209,12 @@ Bitmap.prototype._createCanvas = function (width, height) {
         this.__canvas.width = w;
         this.__canvas.height = h;
         // BUGFIX: this passed this._canvas, but this override only ever creates
-        // __canvas (the MZ 1.6 property). With the older core/YEP naming the
-        // _canvas property can be undefined here, so the base texture was built
-        // from undefined and every later update() logged
+        // __canvas (the MZ 1.6 property), so the base texture was built from
+        // undefined and every later update() logged
         // "BaseTexture update error: 'source' is undefined".
-        this._createBaseTexture(this.__canvas || this._canvas);
+        // Read only __canvas here: `this._canvas` is a lazy getter that calls
+        // _createCanvas() again, which would recurse into this method.
+        this._createBaseTexture(this.__canvas);
 
         this.__context.drawImage(this._image, 0, 0);
     }
@@ -376,13 +377,23 @@ Bitmap.prototype.drawSmallText = function (text, x, y, maxWidth, lineHeight, ali
     bitmap.clear();
 };
 
-// The base texture lives under a different property depending on which
-// Bitmap implementation is in effect: this engine's core (rpg_core.js, MZ
-// 1.6.2) uses __baseTexture, while YEP_X_CoreUpdatesOpt's older
-// Bitmap.initialize still uses _baseTexture. Read both so this keeps working
-// whichever one ran.
+// Resolve the base texture WITHOUT triggering Bitmap.prototype._baseTexture,
+// which rpg_core.js defines as a lazy getter:
+//     _baseTexture: { get: function(){
+//         if (!this.__baseTexture) this._createBaseTexture(this._image || this.__canvas);
+//         return this.__baseTexture; } }
+// Merely reading it can therefore *create* a texture - and once the bitmap has
+// been torn down (_clearImgInstance() clears _image, and __canvas can be gone)
+// it builds one from null and Bitmap._createBaseTexture throws on
+// `source.width`. So read the real storage (__baseTexture) and only fall back to
+// a plain own-property _baseTexture, as set by the older
+// YEP_X_CoreUpdatesOpt Bitmap.initialize.
 function fsdkBitmapBaseTexture(bitmap) {
-    return bitmap._baseTexture || bitmap.__baseTexture || null;
+    if (!bitmap) return null;
+    if (bitmap.__baseTexture) return bitmap.__baseTexture;
+    var own = Object.getOwnPropertyDescriptor(bitmap, '_baseTexture');
+    if (own && Object.prototype.hasOwnProperty.call(own, 'value')) return own.value;
+    return null;
 }
 
 // A texture can become unusable between frames: BaseTexture.destroy() nulls
