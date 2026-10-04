@@ -35,23 +35,22 @@
     430, // skill equip all
   ];
 
-  //???there is call of it somewhere but cant find it by function name
-  window.run_old_savegame_fixes = function () {
-    window.runOldSavegameFixes();
-  };
-
   // functions need to run after saved game loaded
   /*:
   * @function
-  * @help it ru after each saved game loaded
+  * @help it runs after each saved game loaded
   */
   window.runOldSavegameFixes = function () {
 
     if (wasExecuted) return;
-    wasExecuted = true;
 
     const leader = $gameParty && $gameParty.leader();
     if (!leader) return;
+
+    // Only consume the one-shot flag once the fix has actually been applied.
+    // Setting it before the guard above would silently skip the repair for the
+    // whole save if this runs before $gameParty is available.
+    wasExecuted = true;
 
     for (const skillId of skillIdsToCheck) {
       if (leader.isLearnedSkill(skillId)) continue;

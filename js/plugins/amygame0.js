@@ -355,9 +355,13 @@
     windowEventItemStart.call(this);
   };
 
+  // Switch ids controlling the event-item "choose item" window layout.
+  const EVENT_ITEM_LAYOUT_HALF_WIDTH_SWITCH_ID = 111;
+  const EVENT_ITEM_SINGLE_COLUMN_SWITCH_ID = 400;
+
   Window_EventItem.prototype.initializeWidth = function () {
     const isDefaultWidth = this.isDefaultSize();
-    const switchOn = $gameSwitches.value(111);
+    const switchOn = $gameSwitches.value(EVENT_ITEM_LAYOUT_HALF_WIDTH_SWITCH_ID);
 
     if (isDefaultWidth && switchOn) {
       this.width = this.defaultWidth() / 2 - $gameVariables.value(338);
@@ -367,7 +371,7 @@
   };
 
   Window_EventItem.prototype.maxCols = function () {
-    return $gameSwitches.value(400) ? 1 : 2;
+    return $gameSwitches.value(EVENT_ITEM_SINGLE_COLUMN_SWITCH_ID) ? 1 : 2;
   };
 
   Window_EventItem.prototype.defaultWidth = function () {
