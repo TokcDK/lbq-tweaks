@@ -357,8 +357,14 @@
 	// and (34x):
 	//   var value1 = 11;//$gameVariables.value(530);
 	//   this._eventId = $gameVariables.value(292)[value1];
-	CEH_setEventIdFromSpawnList = function (interp, id) {
-		interp._eventId = aghSpawnIdList()[id] || 0;
+	//
+	// NOTE: this helper was previously defined twice in this file. The second
+	// definition read $gameVariables.value(292) directly and so threw whenever the
+	// variable had not been initialised to an array yet, and it also dropped the
+	// `|| 0` fallback, leaving _eventId undefined for an empty slot. The single
+	// definition below keeps the guarded accessor and the fallback.
+	CEH_setEventIdFromSpawnList = function (interp, slot) {
+		interp._eventId = aghSpawnIdList()[slot] || 0;
 	};
 
 	// Replaces (18x):
@@ -659,11 +665,6 @@
 		popEnemy_setUp(dungeonItem);
 	};
 	
-	// Replaces (13x): this._eventId = $gameVariables.value(292)[slot];
-	CEH_setEventIdFromSpawnList = function (interp, slot) {
-		interp._eventId = $gameVariables.value(292)[slot];
-	};
-	
 	// Replaces (10x): valueEnemyEventId = this.eventId(); this.sVal(21,this.eventId());
 	CEH_storeEnemyEventId = function (interp) {
 		valueEnemyEventId = interp.eventId();
@@ -839,5 +840,61 @@
 	// Replaces (4x): a custom label stored in a data-system switch slot.
 	AGH_setDataSystemLabel = function (index, label) {
 		$dataSystem.switches[index] = label;
+	};
+
+	//=============================================================================
+	// Debug / authoring support (common event 52, "ファイルチェック用スクリプト")
+	//=============================================================================
+
+	// Shows every database entry that carries the given meta tag as a picture,
+	// so an author can eyeball whether the tag resolves to a real graphic.
+	//
+	// Replaces (7x): an 11-line inline loop over $dataEnemies / $dataItems that
+	// differed only in which meta tag it read, which comma field it took, and
+	// which image folder it prefixed:
+	//   var value2 = 'BossEnemy';
+	//   var valueItems = $dataEnemies; var end = valueItems.length - 1;
+	//   var j = 1;
+	//   for (var i = 1; i <= end; i++) {
+	//     if (valueItems[i].meta[value2]) {
+	//       var value1 = valueItems[i].meta[value2].split(',')[2];
+	//       var value1 = '/img/sv_enemies/' + value1;
+	//       console.log(`${i}  ${value1}`);
+	//       $gameScreen.showPicture(j, value1, 1, 640-128, 384, 100, 100, 255, 0);
+	//       j += 1;
+	//     }
+	//   }
+	AGH_previewMetaTaggedPictures = function (database, metaKey, fieldIndex, pathPrefix) {
+		var end = database.length - 1;
+		var pictureId = 1;
+		for (var i = 1; i <= end; i++) {
+			var metaValue = database[i].meta[metaKey];
+			if (!metaValue) continue;
+			var imageName = pathPrefix + metaValue.split(',')[fieldIndex];
+			console.log(`${i}  ${imageName}`);
+			$gameScreen.showPicture(pictureId, imageName, 1, 640 - 128, 384, 100, 100, 255, 0);
+			pictureId += 1;
+		}
+	};
+
+	//=============================================================================
+	// Boss victory aftermath (common events 356-363)
+	//=============================================================================
+
+	// Shared post-boss bookkeeping. Every boss common event ends with this
+	// sequence; only the memo item id and the objective text differ.
+	//
+	// Replaces (8x):
+	//   this.sVal(530, 1);                                 // 主格キャラ
+	//   this.sVal(535, <itemId>);                          // 挿話回想の場合アイテムID
+	//   valueWeatherSceneSet = 0;
+	//   $gameVariables.setValue(292, Array(21).fill(0));
+	//   $gameVariables.setValue(134, `<objective text>`);
+	AGH_bossVictoryAftermath = function (interp, memoItemId, objectiveText) {
+		interp.sVal(530, 1);
+		interp.sVal(535, memoItemId);
+		valueWeatherSceneSet = 0;
+		$gameVariables.setValue(292, Array(21).fill(0));
+		$gameVariables.setValue(134, objectiveText);
 	};
 })();
