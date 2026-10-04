@@ -409,90 +409,108 @@ valueDispelGuardState = [];//<DispelGuard>
 };
 
 //amygame_elementIcon(id3);
+// Element / skill-type id -> [specialFlag, slot1, slot2, slot3].
+//
+// specialFlag is 1 when slot1 (and usually slot2) hold a literal text label instead
+// of an icon index: callers test `arr[0] >= 1` and then print `arr[1]` unescaped.
+// The three slot columns are the "name / amplify / rate" icon positions that the
+// description and stats-screen text builders read back.
+//
+// Ids with no entry here fall back to ELEMENT_ICON_DEFAULT (plain icon, no label).
+const ELEMENT_ICON_TABLE = {
+  1: [0, 77, 77, 77],
+  2: [0, 79, 79, 79],
+  3: [0, 64, 448, 464],
+  4: [0, 65, 449, 465],
+  5: [0, 66, 450, 466],
+  6: [0, 67, 451, 467],
+  7: [0, 68, 452, 468],
+  8: [0, 69, 453, 469],
+  9: [0, 70, 454, 470],
+  10: [0, 31, 31, 31],
+  11: [0, 636, 652, 636],
+  12: [0, 637, 637, 653],
+  13: [0, 657, 657, 657], //ドロップアップ
+  14: [0, 657, 657, 657], //ドロップアップ
+  15: [0, 92, 92, 92],
+  16: [0, 172, 172, 172],
+  17: [0, 173, 173, 173],
+  18: [0, 174, 174, 174],
+  19: [0, 175, 175, 175],
+  20: [0, 673, 673, 673], //アビリティ
+  21: [0, 480, 480, 480],
+  22: [0, 481, 481, 481],
+  23: [0, 482, 482, 482],
+  24: [0, 483, 483, 483],
+  25: [0, 484, 484, 484],
+  26: [0, 485, 485, 485],
+  27: [0, 486, 486, 486],
+  28: [0, 487, 487, 487],
+  29: [0, 488, 488, 488],
+  30: [0, 489, 489, 489],
+  31: [0, 110, 110, 110],
+  32: [0, 105, 105, 105],
+  33: [0, 294, 294, 294],
+  34: [0, 213, 213, 213],
+  35: [1, '[霊体属性無効化]', 16, 16], //霊体に物理で通常ダメ
+  36: [0, 100, 100, 100],
+  39: [0, 505, 505, 505],
+  40: [0, 504, 504, 504],
+  41: [1, '[状態異常数に応じて与D上昇]', '[状態異常数に応じて与D上昇]', '[状態異常数+1]'], //状態異常数
+  42: [0, 622, 622, 622],
+  43: [0, 621, 621, 621],
+  44: [0, 620, 620, 620],
+  45: [0, 619, 619, 619],
+  46: [0, 608, 608, 608],
+  47: [0, 609, 609, 609],
+  48: [0, 617, 617, 617],
+  49: [0, 618, 618, 618],
+  50: [0, 611, 611, 611],
+  51: [0, 612, 612, 612],
+  52: [0, 613, 613, 613],
+  53: [0, 614, 614, 614],
+  54: [0, 615, 615, 615],
+  55: [0, 616, 616, 616],
+  56: [0, 542, 542, 542],
+  57: [0, 623, 623, 623],
+  59: [0, 94, 94, 94],
+  60: [0, 95, 95, 95],
+  61: [0, 560, 560, 560],
+  62: [0, 561, 561, 561],
+  63: [0, 562, 562, 562],
+  64: [0, 563, 563, 563],
+  65: [0, 564, 564, 564],
+  66: [0, 565, 565, 565],
+  67: [0, 566, 566, 566],
+  68: [0, 567, 567, 567],
+  69: [0, 568, 568, 568],
+  70: [0, 569, 569, 569],
+  //予備枠
+  74: [0, 570, 570, 570],
+  75: [0, 571, 571, 571],
+  76: [0, 572, 572, 572],
+  77: [0, 573, 573, 573],
+  78: [0, 574, 574, 574],
+  79: [0, 575, 575, 575],
+  80: [0, 508, 508, 508],
+  82: [1, '[トレジャーハント与D上昇]', '[トレジャーハント与D上昇威力]', 508],
+  83: [1, '[魅了特攻]', 16, 16]
+};
+const ELEMENT_ICON_DEFAULT = [0, 16, 16, 16];
+
+// Resolves an element / skill-type id to its icon descriptor and returns
+// [specialFlag, slot1, slot2, slot3].
+//
+// The returned array is freshly built on every call, so a caller may hold on to
+// it. valueElementIconArr is still assigned for the event Script blocks and any
+// other call site that reads the global right after calling this.
 amygame_elementIcon = function(valueElementIcon){
 
-  var elementSpecialFlag = 0;var elementIconSlot1 = 16;var elementIconSlot2 = 16;var elementIconSlot3 = 16;
-  if(valueElementIcon == 1 ){var elementIconSlot1 = 77; var elementIconSlot2 = 77; var elementIconSlot3 = 77};
-  if(valueElementIcon == 2 ){var elementIconSlot1 = 79; var elementIconSlot2 = 79; var elementIconSlot3 = 79};
-  if(valueElementIcon == 3 ){var elementIconSlot1 = 64; var elementIconSlot2 = 448;var elementIconSlot3 = 464};
-  if(valueElementIcon == 4 ){var elementIconSlot1 = 65; var elementIconSlot2 = 449;var elementIconSlot3 = 465};
-  if(valueElementIcon == 5 ){var elementIconSlot1 = 66; var elementIconSlot2 = 450;var elementIconSlot3 = 466};
-  if(valueElementIcon == 6 ){var elementIconSlot1 = 67; var elementIconSlot2 = 451;var elementIconSlot3 = 467};
-  if(valueElementIcon == 7 ){var elementIconSlot1 = 68; var elementIconSlot2 = 452;var elementIconSlot3 = 468};
-  if(valueElementIcon == 8 ){var elementIconSlot1 = 69; var elementIconSlot2 = 453;var elementIconSlot3 = 469};
-  if(valueElementIcon == 9 ){var elementIconSlot1 = 70; var elementIconSlot2 = 454;var elementIconSlot3 = 470};
-  if(valueElementIcon == 10){var elementIconSlot1 =  31;var elementIconSlot2 =  31;var elementIconSlot3 = 31};
-  if(valueElementIcon == 11){var elementIconSlot1 = 636;var elementIconSlot2 = 652;var elementIconSlot3 = 636};
-  if(valueElementIcon == 12){var elementIconSlot1 = 637;var elementIconSlot2 = 637;var elementIconSlot3 = 653};
-  if(valueElementIcon == 13){var elementIconSlot1 = 657;var elementIconSlot2 = 657;var elementIconSlot3 = 657};//ドロップアップ
-  if(valueElementIcon == 14){var elementIconSlot1 = 657;var elementIconSlot2 = 657;var elementIconSlot3 = 657};//ドロップアップ
-  if(valueElementIcon == 15){var elementIconSlot1 =  92;var elementIconSlot2 =  92;var elementIconSlot3 = 92};
-  if(valueElementIcon == 16){var elementIconSlot1 = 172;var elementIconSlot2 = 172;var elementIconSlot3 = 172};
-  if(valueElementIcon == 17){var elementIconSlot1 = 173;var elementIconSlot2 = 173;var elementIconSlot3 = 173};
-  if(valueElementIcon == 18){var elementIconSlot1 = 174;var elementIconSlot2 = 174;var elementIconSlot3 = 174};
-  if(valueElementIcon == 19){var elementIconSlot1 = 175;var elementIconSlot2 = 175;var elementIconSlot3 = 175};
-  if(valueElementIcon == 20){var elementIconSlot1 = 673;var elementIconSlot2 = 673;var elementIconSlot3 = 673};//アビリティ
-  if(valueElementIcon == 21){var elementIconSlot1 = 480;var elementIconSlot2 = 480;var elementIconSlot3 = 480};
-  if(valueElementIcon == 22){var elementIconSlot1 = 481;var elementIconSlot2 = 481;var elementIconSlot3 = 481};
-  if(valueElementIcon == 23){var elementIconSlot1 = 482;var elementIconSlot2 = 482;var elementIconSlot3 = 482};
-  if(valueElementIcon == 24){var elementIconSlot1 = 483;var elementIconSlot2 = 483;var elementIconSlot3 = 483};
-  if(valueElementIcon == 25){var elementIconSlot1 = 484;var elementIconSlot2 = 484;var elementIconSlot3 = 484};
-  if(valueElementIcon == 26){var elementIconSlot1 = 485;var elementIconSlot2 = 485;var elementIconSlot3 = 485};
-  if(valueElementIcon == 27){var elementIconSlot1 = 486;var elementIconSlot2 = 486;var elementIconSlot3 = 486};
-  if(valueElementIcon == 28){var elementIconSlot1 = 487;var elementIconSlot2 = 487;var elementIconSlot3 = 487};
-  if(valueElementIcon == 29){var elementIconSlot1 = 488;var elementIconSlot2 = 488;var elementIconSlot3 = 488};
-  if(valueElementIcon == 30){var elementIconSlot1 = 489;var elementIconSlot2 = 489;var elementIconSlot3 = 489};
-  if(valueElementIcon == 31){var elementIconSlot1 = 110;var elementIconSlot2 = 110;var elementIconSlot3 = 110};
-  if(valueElementIcon == 32){var elementIconSlot1 = 105;var elementIconSlot2 = 105;var elementIconSlot3 = 105};
-  if(valueElementIcon == 33){var elementIconSlot1 = 294;var elementIconSlot2 = 294;var elementIconSlot3 = 294};
-  if(valueElementIcon == 34){var elementIconSlot1 = 213;var elementIconSlot2 = 213;var elementIconSlot3 = 213};
-  if(valueElementIcon == 35){var elementSpecialFlag = 1;var elementIconSlot1 = `[霊体属性無効化]`;var elementIconSlot2 =  16;var elementIconSlot3 =  16};//霊体に物理で通常ダメ
-  if(valueElementIcon == 36){var elementIconSlot1 = 100;var elementIconSlot2 = 100;var elementIconSlot3 = 100};
-  if(valueElementIcon == 39){var elementIconSlot1 = 505;var elementIconSlot2 = 505;var elementIconSlot3 = 505};
-  if(valueElementIcon == 40){var elementIconSlot1 = 504;var elementIconSlot2 = 504;var elementIconSlot3 = 504};
-  if(valueElementIcon == 41){var elementSpecialFlag = 1;var elementIconSlot1 = `[状態異常数に応じて与D上昇]`;var elementIconSlot2 =  `[状態異常数に応じて与D上昇]`;var elementIconSlot3 =  `[状態異常数+1]`};//状態異常数
-  if(valueElementIcon == 42){var elementIconSlot1 = 622;var elementIconSlot2 = 622;var elementIconSlot3 = 622};
-  if(valueElementIcon == 43){var elementIconSlot1 = 621;var elementIconSlot2 = 621;var elementIconSlot3 = 621};
-  if(valueElementIcon == 44){var elementIconSlot1 = 620;var elementIconSlot2 = 620;var elementIconSlot3 = 620};
-  if(valueElementIcon == 45){var elementIconSlot1 = 619;var elementIconSlot2 = 619;var elementIconSlot3 = 619};
-  if(valueElementIcon == 46){var elementIconSlot1 = 608;var elementIconSlot2 = 608;var elementIconSlot3 = 608};
-  if(valueElementIcon == 47){var elementIconSlot1 = 609;var elementIconSlot2 = 609;var elementIconSlot3 = 609};
-  if(valueElementIcon == 48){var elementIconSlot1 = 617;var elementIconSlot2 = 617;var elementIconSlot3 = 617};
-  if(valueElementIcon == 49){var elementIconSlot1 = 618;var elementIconSlot2 = 618;var elementIconSlot3 = 618};
-  if(valueElementIcon == 50){var elementIconSlot1 = 611;var elementIconSlot2 = 611;var elementIconSlot3 = 611};
-  if(valueElementIcon == 51){var elementIconSlot1 = 612;var elementIconSlot2 = 612;var elementIconSlot3 = 612};
-  if(valueElementIcon == 52){var elementIconSlot1 = 613;var elementIconSlot2 = 613;var elementIconSlot3 = 613};
-  if(valueElementIcon == 53){var elementIconSlot1 = 614;var elementIconSlot2 = 614;var elementIconSlot3 = 614};
-  if(valueElementIcon == 54){var elementIconSlot1 = 615;var elementIconSlot2 = 615;var elementIconSlot3 = 615};
-  if(valueElementIcon == 55){var elementIconSlot1 = 616;var elementIconSlot2 = 616;var elementIconSlot3 = 616};
-  if(valueElementIcon == 56){var elementIconSlot1 = 542;var elementIconSlot2 = 542;var elementIconSlot3 = 542};
-  if(valueElementIcon == 57){var elementIconSlot1 = 623;var elementIconSlot2 = 623;var elementIconSlot3 = 623};
-  if(valueElementIcon == 59){var elementIconSlot1 =  94;var elementIconSlot2 =  94;var elementIconSlot3 =  94};
-  if(valueElementIcon == 60){var elementIconSlot1 =  95;var elementIconSlot2 =  95;var elementIconSlot3 =  95};
-  if(valueElementIcon == 61){var elementIconSlot1 = 560;var elementIconSlot2 = 560;var elementIconSlot3 = 560};
-  if(valueElementIcon == 62){var elementIconSlot1 = 561;var elementIconSlot2 = 561;var elementIconSlot3 = 561};
-  if(valueElementIcon == 63){var elementIconSlot1 = 562;var elementIconSlot2 = 562;var elementIconSlot3 = 562};
-  if(valueElementIcon == 64){var elementIconSlot1 = 563;var elementIconSlot2 = 563;var elementIconSlot3 = 563};
-  if(valueElementIcon == 65){var elementIconSlot1 = 564;var elementIconSlot2 = 564;var elementIconSlot3 = 564};
-  if(valueElementIcon == 66){var elementIconSlot1 = 565;var elementIconSlot2 = 565;var elementIconSlot3 = 565};
-  if(valueElementIcon == 67){var elementIconSlot1 = 566;var elementIconSlot2 = 566;var elementIconSlot3 = 566};
-  if(valueElementIcon == 68){var elementIconSlot1 = 567;var elementIconSlot2 = 567;var elementIconSlot3 = 567};
-  if(valueElementIcon == 69){var elementIconSlot1 = 568;var elementIconSlot2 = 568;var elementIconSlot3 = 568};
-  if(valueElementIcon == 70){var elementIconSlot1 = 569;var elementIconSlot2 = 569;var elementIconSlot3 = 569};
-  //予備枠
-  if(valueElementIcon == 74){var elementIconSlot1 = 570;var elementIconSlot2 = 570;var elementIconSlot3 = 570};
-  if(valueElementIcon == 75){var elementIconSlot1 = 571;var elementIconSlot2 = 571;var elementIconSlot3 = 571};
-  if(valueElementIcon == 76){var elementIconSlot1 = 572;var elementIconSlot2 = 572;var elementIconSlot3 = 572};
-  if(valueElementIcon == 77){var elementIconSlot1 = 573;var elementIconSlot2 = 573;var elementIconSlot3 = 573};
-  if(valueElementIcon == 78){var elementIconSlot1 = 574;var elementIconSlot2 = 574;var elementIconSlot3 = 574};
-  if(valueElementIcon == 79){var elementIconSlot1 = 575;var elementIconSlot2 = 575;var elementIconSlot3 = 575};
-  if(valueElementIcon == 80){var elementIconSlot1 = 508;var elementIconSlot2 = 508;var elementIconSlot3 = 508};
-  if(valueElementIcon == 82){var elementSpecialFlag = 1;var elementIconSlot1 = `[トレジャーハント与D上昇]`;var elementIconSlot2 = `[トレジャーハント与D上昇威力]`;var elementIconSlot3 = 508};
-  if(valueElementIcon == 83){var elementSpecialFlag = 1;var elementIconSlot1 = `[魅了特攻]`;var elementIconSlot2 = 16;var elementIconSlot3 = 16};
-  valueElementIconArr = [elementSpecialFlag,elementIconSlot1,elementIconSlot2,elementIconSlot3];//valueElementIconArr[0]
+  var elementIcon = (ELEMENT_ICON_TABLE[Number(valueElementIcon)] || ELEMENT_ICON_DEFAULT).slice();//valueElementIconArr[0]
+  valueElementIconArr = elementIcon;
+  return elementIcon;
 
 };
-
 })();
 
 pushArray = function(metaValue, targetArray){

@@ -453,17 +453,23 @@ damage_keisan1 = function (user, target, action, damageAmount, critAnimationId, 
 }
 
 //スキルパワー加算計算skill_addPowerSet(user,$dataSkills,1,1);
+// Returns the total skill-power bonus in percent.
+//
+// The total is also published as valueAddPowerCustom because js/plugins/SkillFormula.js
+// adds it to the level inside its damage formula, and the stats text builders read it
+// right after calling this. The accumulation itself uses a local, so a re-entrant call
+// can no longer corrupt a partially built total.
 skill_addPowerSet = function (user, dbEntries, dbEntryId, powerCategoryId) {
 
-  valueAddPowerCustom = 0;
+  var addPowerCustom = 0;
   if (user.isActor()) {
     var addPowerCustomIds = valueAddPowerCustomSkill;
     if (addPowerCustomIds != 0) {
       for (var i = 0; i <= addPowerCustomIds.length - 1; i++) {
         if (user.isLearnedSkill(addPowerCustomIds[i]) && user.battleSkillsRaw().includes(addPowerCustomIds[i])) {
-          valueAddPowerCustom += Number($dataSkills[addPowerCustomIds[i]].meta['AddPowerCustom']);
+          addPowerCustom += Number($dataSkills[addPowerCustomIds[i]].meta['AddPowerCustom']);
           if ($dataSkills[addPowerCustomIds[i]].meta['Max Mastery Level']) {
-            valueAddPowerCustom += user.skillMasteryLevel(addPowerCustomIds[i]);
+            addPowerCustom += user.skillMasteryLevel(addPowerCustomIds[i]);
           };
         };
       }
@@ -471,20 +477,20 @@ skill_addPowerSet = function (user, dbEntries, dbEntryId, powerCategoryId) {
     var addPowerCustomIds = valueAddPowerCustomWeapon;
     if (addPowerCustomIds != 0) {
       for (var i = 0; i <= addPowerCustomIds.length - 1; i++) {
-        if (user.hasWeapon($dataWeapons[addPowerCustomIds[i]])) { valueAddPowerCustom += Number($dataWeapons[Number(addPowerCustomIds[i])].meta['AddPowerCustom']) };
+        if (user.hasWeapon($dataWeapons[addPowerCustomIds[i]])) { addPowerCustom += Number($dataWeapons[Number(addPowerCustomIds[i])].meta['AddPowerCustom']) };
       }
     };
     var addPowerCustomIds = valueAddPowerCustomArmor;
     if (addPowerCustomIds != 0) {
       for (var i = 0; i <= addPowerCustomIds.length - 1; i++) {
-        if (user.hasArmor($dataArmors[addPowerCustomIds[i]])) { valueAddPowerCustom += Number($dataArmors[addPowerCustomIds[i]].meta['AddPowerCustom']) };
+        if (user.hasArmor($dataArmors[addPowerCustomIds[i]])) { addPowerCustom += Number($dataArmors[addPowerCustomIds[i]].meta['AddPowerCustom']) };
       }
     };
   };
   var addPowerCustomIds = valueAddPowerCustomState;
   if (addPowerCustomIds != 0) {
     for (var i = 0; i <= addPowerCustomIds.length - 1; i++) {
-      if (user.isStateAffected(addPowerCustomIds[i])) { valueAddPowerCustom += Number($dataStates[addPowerCustomIds[i]].meta['AddPowerCustom']) };
+      if (user.isStateAffected(addPowerCustomIds[i])) { addPowerCustom += Number($dataStates[addPowerCustomIds[i]].meta['AddPowerCustom']) };
     }
   };
   if (powerCategoryId == 2) { } else {
@@ -492,15 +498,15 @@ skill_addPowerSet = function (user, dbEntries, dbEntryId, powerCategoryId) {
       if (user.isActor()) {
         if (dbEntries[dbEntryId].meta['ユニーク']) {
           if ($gameVariables.value(287)[user.actorId()][10] >= 1) {
-            valueAddPowerCustom += $gameVariables.value(287)[user.actorId()][10];
+            addPowerCustom += $gameVariables.value(287)[user.actorId()][10];
           };
         } else {
           if ($dataWeapons[user.equips()[0].id].meta['LotteryRearity']) {
-            valueAddPowerCustom += Number($dataWeapons[user.equips()[0].id].meta['LotteryRearity']);
+            addPowerCustom += Number($dataWeapons[user.equips()[0].id].meta['LotteryRearity']);
           };
         };
       } else {
-        valueAddPowerCustom += Math.round(user.level / 10);
+        addPowerCustom += Math.round(user.level / 10);
       };
     };
   };
@@ -513,6 +519,8 @@ skill_addPowerSet = function (user, dbEntries, dbEntryId, powerCategoryId) {
    };
   };
   */
+  valueAddPowerCustom = addPowerCustom;
+  return addPowerCustom;
 
 };
 
@@ -524,38 +532,45 @@ const ak1DamageFlashDesignationData = [255, 255, 255, 0];
 // uses globals like valueCertainlyDouble, valueCertainlyTriple, valueNormalAttackHit, and valueAttackAbilityHit without explicit declaration
 // 
 attack_keisan1 = function (user, skillId, sourceTypeId) {
-  // Initialize attack variables and clean up UI
-  ak1InitializeAttackVariables(user, skillId, sourceTypeId);
+  // Initialize attack variables and clean up UI. The database the skill lives in
+  // is resolved once here and handed to every step below, so no step has to
+  // reach for a global to find it.
+  const sourceDatabase = ak1InitializeAttackVariables(user, skillId, sourceTypeId);
   ak1CleanupPreviousAttackUI();
 
   // Set up the skill and its properties
-  ak1SetupSkillProperties(user, skillId, sourceTypeId);
+  ak1SetupSkillProperties(user, sourceDatabase, skillId, sourceTypeId);
 
-  // Calculate multi-attack count
+  // Calculate multi-attack count.
+  // The result is not consumed anywhere today (the executed hit count comes from
+  // game variable 526) and is deliberately left unused so the calculation and its
+  // random draws stay exactly as they were.
   ak1CalculateMultiAttackCount(user);
 
   // Configure animation settings
-  ak1ConfigureAnimationSettings(skillId);
+  ak1ConfigureAnimationSettings(sourceDatabase, skillId);
 
   // Set up attack states and elements
-  ak1SetupAttackStatesAndElements(user, skillId);
+  const attackElements = ak1SetupAttackStatesAndElements(user, sourceDatabase, skillId);
 
   // Handle damage visualization and special effects
-  ak1ConfigureDamageVisualization(user, skillId);
+  ak1ConfigureDamageVisualization(user, sourceDatabase, skillId, attackElements);
 
   // Process skill-specific movement and projectile settings
-  ak1ProcessSkillSpecialSettings(user, skillId);
+  ak1ProcessSkillSpecialSettings(user, sourceDatabase, skillId);
 
   // Handle mastery progression and brave command
   ak1ProcessSkillMasteryAndBraveCommand(user, skillId);
 
   // Apply final skill customization
-  ak1ApplyFinalSkillCustomization(user, skillId);
+  ak1ApplyFinalSkillCustomization(user, sourceDatabase, skillId);
 };
 
 // Initialize attack variables and set source
+// Returns the database the current skill lives in ($dataItems or $dataSkills), so
+// the rest of the setup pipeline receives it instead of reading the implicit
+// global `sourceItems` this function used to assign.
 function ak1InitializeAttackVariables(user, skillId, sourceTypeId) {
-  sourceItems = sourceTypeId == 2 ? $dataItems : $dataSkills;
   valueSkillSpecialDispel35 = 0;
   totalDamageCountDuringAction = 0;
   valueDropEnemyPicId = 101;
@@ -570,6 +585,8 @@ function ak1InitializeAttackVariables(user, skillId, sourceTypeId) {
   valueAttackCount = 0;
   valueTotalDamageCount = 0; // Total damage variable for this action
   $gameVariables.setValue(331, []); // Array for damage flash configuration
+
+  return sourceTypeId == 2 ? $dataItems : $dataSkills;
 }
 
 // Clean up UI from previous attacks
@@ -593,17 +610,21 @@ function ak1CleanupPreviousAttackUI() {
 }
 
 // Set up skill properties and basic settings
-function ak1SetupSkillProperties(user, skillId, sourceTypeId) {
-  skill_addPowerSet(user, sourceItems, skillId, sourceTypeId);
-  const currentItem = sourceItems[skillId];
+function ak1SetupSkillProperties(user, sourceDatabase, skillId, sourceTypeId) {
+  // skill_addPowerSet's total is consumed through the valueAddPowerCustom global
+  // (js/plugins/SkillFormula.js and the stats text builders read it), so it is not
+  // threaded through here.
+  skill_addPowerSet(user, sourceDatabase, skillId, sourceTypeId);
+  const currentItem = sourceDatabase[skillId];
 
   $gameVariables.setValue(182, currentItem.stypeId);
   valueSkillDamageType = currentItem.damage.type;
 }
 
 // Calculate how many attacks will be performed
+// Returns the multi-attack count (previously accumulated into a leaked global).
 function ak1CalculateMultiAttackCount(user) {
-  multiAttackCount = 1;
+  let multiAttackCount = 1;
   const elementAttackRate = user.elementRate(11) * 10;
 
   // Use a single random calculation to determine both checks
@@ -621,11 +642,11 @@ function ak1CalculateMultiAttackCount(user) {
   }
 
   // Apply guaranteed multi-attacks from states
-  ak1ApplyGuaranteedMultiAttacks(user);
+  return ak1ApplyGuaranteedMultiAttacks(user, multiAttackCount);
 }
 
 // Apply guaranteed double and triple attacks from states
-function ak1ApplyGuaranteedMultiAttacks(user) {
+function ak1ApplyGuaranteedMultiAttacks(user, multiAttackCount) {
   // Check for guaranteed double attack
   // Define constant arrays with state IDs and corresponding attack counts to add
   const multiAttackStates = [
@@ -646,11 +667,12 @@ function ak1ApplyGuaranteedMultiAttacks(user) {
       }
     }
   }
+  return multiAttackCount;
 }
 
 // Configure animation settings for the skill
-function ak1ConfigureAnimationSettings(skillId) {
-  const currentItem = sourceItems[skillId];
+function ak1ConfigureAnimationSettings(sourceDatabase, skillId) {
+  const currentItem = sourceDatabase[skillId];
   $gameVariables.setValue(181, currentItem.animationId);
   const animation = $dataAnimations[currentItem.animationId];
   if (!animation) return;
@@ -672,19 +694,23 @@ function ak1ConfigureAnimationSettings(skillId) {
 }
 
 // Set up attack states and elements
-function ak1SetupAttackStatesAndElements(user, skillId) {
-  const currentItem = sourceItems[skillId];
+// Returns the list of attack element ids (see ak1SetupAttackElements).
+function ak1SetupAttackStatesAndElements(user, sourceDatabase, skillId) {
+  const currentItem = sourceDatabase[skillId];
 
-  // Get attack states and add skill effect states
-  valueAttackStates = user.attackStates();
+  // Get attack states and add skill effect states. The array is also published as
+  // valueAttackStates, which the state-application step further down reads.
+  const attackStates = user.attackStates();
   for (let i = 0; i <= 19; i++) {
     const effect = currentItem.effects[i];
     if (effect && effect.code == 21 && effect.dataId >= 2) {
-      valueAttackStates.push(effect.dataId);
+      attackStates.push(effect.dataId);
     }
   }
+  valueAttackStates = attackStates;
 
-  // Handle level fluctuation
+  // Handle level fluctuation. Published as a global because js/plugins/
+  // SkillFormula.js reads valueLevelFluctuation from inside its damage formula.
   if (user.isStateAffected(410)) {
     if (currentItem.meta['LevelFluctuation']) {
       valueLevelFluctuation = Number(currentItem.meta['LevelFluctuation']);
@@ -694,12 +720,13 @@ function ak1SetupAttackStatesAndElements(user, skillId) {
   }
 
   // Set up attack elements
-  ak1SetupAttackElements(user, currentItem);
+  return ak1SetupAttackElements(user, currentItem);
 }
 
 // Set up attack elements from skill and user properties
+// Returns the assembled element id list (previously leaked as a global).
 function ak1SetupAttackElements(user, currentItem) {
-  attackElementsList = [];
+  const attackElementsList = [];
 
   // Add elements from skill metadata
   if (currentItem.meta['Multiple Elements']) {
@@ -713,11 +740,13 @@ function ak1SetupAttackElements(user, currentItem) {
 
   // Add user's innate attack elements
   attackElementsList.push(...user.attackElements());
+
+  return attackElementsList;
 }
 
 // Configure damage visualization based on elements and skill properties
-function ak1ConfigureDamageVisualization(user, skillId) {
-  const currentItem = sourceItems[skillId];
+function ak1ConfigureDamageVisualization(user, sourceDatabase, skillId, attackElementsList) {
+  const currentItem = sourceDatabase[skillId];
   $gameVariables.setValue(93, 131); // Default damage visualization
   $gameVariables.setValue(526, 1); // Default hit count
 
@@ -725,7 +754,7 @@ function ak1ConfigureDamageVisualization(user, skillId) {
   ak1ConfigureElementDamageVisualization(currentItem);
 
   // Configure special flash effect based on elements
-  ak1ConfigureElementFlashEffect(user);
+  ak1ConfigureElementFlashEffect(user, attackElementsList);
 }
 
 // Configure damage visualization based on elements in the skill
@@ -753,7 +782,7 @@ function ak1ConfigureElementDamageVisualization(currentItem) {
 
 // Configure flash effect based on the user's elemental affinities
 const testIds = new Set([3, 4, 5, 6, 7, 8, 9]);
-function ak1ConfigureElementFlashEffect(user) {
+function ak1ConfigureElementFlashEffect(user, attackElementsList) {
   const candidateElements = [0];
 
   const len = attackElementsList.length;
@@ -775,8 +804,8 @@ function ak1ConfigureElementFlashEffect(user) {
 }
 
 // Process skill-specific movement and projectile settings
-function ak1ProcessSkillSpecialSettings(user, skillId) {
-  const currentItem = sourceItems[skillId];
+function ak1ProcessSkillSpecialSettings(user, sourceDatabase, skillId) {
+  const currentItem = sourceDatabase[skillId];
 
   const meta = currentItem.meta;
   $gameVariables.setValue(349, meta['moveReaction'] ? Number(meta['moveReaction']) : 0);
@@ -791,7 +820,6 @@ function ak1ProcessSkillSpecialSettings(user, skillId) {
 
 // Process skill mastery progression and brave command effects
 function ak1ProcessSkillMasteryAndBraveCommand(user, skillId) {
-  //const currentItem = sourceItems[skillId];
   const abilityUsageDistinction = $gameVariables.value(182);
 
   // Handle skill mastery progression
@@ -852,8 +880,8 @@ function ak1ProcessBraveCommandState(abilityUsageDistinction) {
 }
 
 // Apply final skill customization based on metadata and skill type
-function ak1ApplyFinalSkillCustomization(user, skillId) {
-  const currentItem = sourceItems[skillId];
+function ak1ApplyFinalSkillCustomization(user, sourceDatabase, skillId) {
+  const currentItem = sourceDatabase[skillId];
   const currentItemName = currentItem.name;
   const abilityUsageDistinction = $gameVariables.value(182);
 
@@ -1790,15 +1818,15 @@ function buildStatsTextPart2BattleXsarStatas(user, isEnemy) {
   let statsTextPart2 = "";
   statsTextPart2 += `\\C[2]詳細能力値[2]\\C[0]\n`;
   for (let i = 1; i <= 9; i++) {
-    amygame_elementIcon(i);
+    const elementIcon = amygame_elementIcon(i);
     const elementAmplifyValue = calcElementAmplifyBattleXsarStatas(user, i, isEnemy);
     let amplifyLabel = (i === 1 || i === 2) ? `威力率　` : `属性威力率`;
-    statsTextPart2 += `\\C[16]\x1bI[${valueElementIconArr[1]}]${$dataSystem.elements[i]}${amplifyLabel}:\\C[0]${elementAmplifyValue}%\n`;
+    statsTextPart2 += `\\C[16]\x1bI[${elementIcon[1]}]${$dataSystem.elements[i]}${amplifyLabel}:\\C[0]${elementAmplifyValue}%\n`;
   }
   for (let i = 1; i <= 9; i++) {
-    amygame_elementIcon(i);
+    const elementIcon = amygame_elementIcon(i);
     let resistanceLabel = (i === 1 || i === 2) ? `耐性率　` : `属性耐性率`;
-    statsTextPart2 += `\\C[16]\x1bI[${valueElementIconArr[1]}]${$dataSystem.elements[i]}${resistanceLabel}:\\C[0]${calcElementRateBattleXsarStatas(user, i)}%\n`;
+    statsTextPart2 += `\\C[16]\x1bI[${elementIcon[1]}]${$dataSystem.elements[i]}${resistanceLabel}:\\C[0]${calcElementRateBattleXsarStatas(user, i)}%\n`;
   }
   return statsTextPart2;
 }
@@ -1864,8 +1892,11 @@ function buildStatsTextPart4BattleXsarStatas(user, isEnemy) {
     const elementList = attackElementIdsBattleXsarStatas;
     elementList.forEach(function (elementId) {
       if (user.elementAmplifyRate(elementId) !== 0) {
-        amygame_elementIcon(elementId);
-        statsTextPart4 += `\\C[16]\x1bI[${valueElementIconArr[0]}]${resistanceJP}:\\C[0]${calcElementAmplifyBattleXsarStatas(user, elementId, false)}%\n`;
+        const elementIcon = amygame_elementIcon(elementId);
+        // NOTE: index 0 is the "special" flag, not an icon id - the two branches
+        // below use [0] as a flag while this line uses it as an icon index. Left
+        // as-is (see commit message); changing it would alter displayed stats.
+        statsTextPart4 += `\\C[16]\x1bI[${elementIcon[0]}]${resistanceJP}:\\C[0]${calcElementAmplifyBattleXsarStatas(user, elementId, false)}%\n`;
       }
     });
   } else {
@@ -1874,9 +1905,9 @@ function buildStatsTextPart4BattleXsarStatas(user, isEnemy) {
         // Skip if in the array
       } else {
         if (user.elementRate(i) !== 1) {
-          amygame_elementIcon(i);
+          const elementIcon = amygame_elementIcon(i);
           let resistanceText;
-          const icon = valueElementIconArr[0] === 1 ? `${$dataSystem.elements[i]}` : `\x1bI[${valueElementIconArr[3]}]`;
+          const icon = elementIcon[0] === 1 ? `${$dataSystem.elements[i]}` : `\x1bI[${elementIcon[3]}]`;
           resistanceText = `\\C[16]${icon}${resistanceJP}\\C[0]:`;
           statsTextPart4 += `${resistanceText}${calcElementRateBattleXsarStatas(user, i)}%\n`;
         }
@@ -4016,10 +4047,12 @@ attack_DamageFormula = function (user, target, skillId) {
       let attackElementRatePct = Math.round(valueAttackAmplifysActorId[user.actorId()][userAttackElement]);
       attackElementRatePct = attackElementRatePct + Math.round(user.elementAmplifyRate(userAttackElement) * 100 + 100);
       const targetElementRatePct = Math.round(target.elementRate(userAttackElement) * 100);
-      amygame_elementIcon(userAttackElement);
+      const elementIcon = amygame_elementIcon(userAttackElement);
       if (attackElementRatePct != 100 || targetElementRatePct != 100) {
-        if (valueElementIconArr[1] != 1 || valueElementIconArr[1] != 16) {
-          text += `\x1bI[${valueElementIconArr[1]}]:${attackElementRatePct}-${targetElementRatePct} `;
+        // NOTE: `!= 1 || != 16` can never be false, so this guard is inert. Kept
+        // as-is (see commit message) rather than guess which operator was meant.
+        if (elementIcon[1] != 1 || elementIcon[1] != 16) {
+          text += `\x1bI[${elementIcon[1]}]:${attackElementRatePct}-${targetElementRatePct} `;
         }
       };
     };

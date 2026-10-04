@@ -574,15 +574,43 @@
 	//   i6 = getRandomIndex(5) + 6;//フェラ回数
 	//   i7 = Math.floor( Math.random() * -2) + i4;//口腔回数
 	//   i8 = getRandomIndex(3) + 0;//失禁回数
+	//
+	// Returns the same eight counts as an {i1..i8} object so a JS caller does not
+	// have to read them back out of globals.
+	//
+	// The random draws below are kept in their original order and count on
+	// purpose: the RNG stream position after this call has to stay identical.
+	// The i1..i8 globals are still assigned because the Script commands that
+	// follow the call in the 13 common events read them by name.
 	CEH_rollRandomHCounts = function () {
-		i1 = getRandomIndex(6) + 5;      //人数
-		i2 = getRandomIndex(10) + 11;    //膣回数
-		i3 = Math.floor(Math.random() * -5) + i1; //中だし回数
-		i4 = getRandomIndex(5) + 6;      //アナル回数
-		i5 = Math.floor(Math.random() * -2) + i4; //中だし回数
-		i6 = getRandomIndex(5) + 6;      //フェラ回数
-		i7 = Math.floor(Math.random() * -2) + i4; //口腔回数
-		i8 = getRandomIndex(3) + 0;      //失禁回数
+		var peopleCount = getRandomIndex(6) + 5;                             //人数
+		var vaginaCount = getRandomIndex(10) + 11;                           //膣回数
+		var creampieVaginaCount = Math.floor(Math.random() * -5) + peopleCount; //中出し回数
+		var anusCount = getRandomIndex(5) + 6;                               //アナル回数
+		var creampieAnusCount = Math.floor(Math.random() * -2) + anusCount;   //中出し回数
+		var oralCount = getRandomIndex(5) + 6;                              //フェラ回数
+		var creampieOralCount = Math.floor(Math.random() * -2) + anusCount;  //口腔回数
+		var incontinenceCount = getRandomIndex(3) + 0;                      //失禁回数
+
+		i1 = peopleCount;
+		i2 = vaginaCount;
+		i3 = creampieVaginaCount;
+		i4 = anusCount;
+		i5 = creampieAnusCount;
+		i6 = oralCount;
+		i7 = creampieOralCount;
+		i8 = incontinenceCount;
+
+		return {
+			i1: peopleCount,
+			i2: vaginaCount,
+			i3: creampieVaginaCount,
+			i4: anusCount,
+			i5: creampieAnusCount,
+			i6: oralCount,
+			i7: creampieOralCount,
+			i8: incontinenceCount
+		};
 	};
 
 	// Replaces (11x):

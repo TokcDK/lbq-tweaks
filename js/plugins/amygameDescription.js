@@ -153,12 +153,12 @@ if(databaseTypeId == 1 || databaseTypeId == 2 || databaseTypeId == 4 || database
       if(valueItems[i].traits[traitIndex].code == 31){
         for (var traitDataId = 1; traitDataId <= $dataSystem.elements.length-1; traitDataId++) {
           if(valueItems[i].traits[traitIndex].dataId == traitDataId){
-            amygame_elementIcon(traitDataId);
+            const elementIcon = amygame_elementIcon(traitDataId);
               var effectValue = Math.round((valueItems[i].traits[traitIndex].value - 1) * 100);
-              if(valueElementIconArr[0] >= 1){
-                var fragText = `${valueElementIconArr[1]}`;
+              if(elementIcon[0] >= 1){
+                var fragText = `${elementIcon[1]}`;
               } else {
-                var fragText = `\x1bI[${valueElementIconArr[1]}]`;
+                var fragText = `\x1bI[${elementIcon[1]}]`;
               };
               if(valueItems[i].meta['EnemyState']){}else{
                 if([18,19,51,52,53,54,55,56,57,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,82,83].some(function(id){return id == traitDataId})){
@@ -172,25 +172,25 @@ if(databaseTypeId == 1 || databaseTypeId == 2 || databaseTypeId == 4 || database
       if(valueItems[i].traits[traitIndex].code == 11){
         for (var traitDataId = 1; traitDataId <= $dataSystem.elements.length-1; traitDataId++) {
           if(valueItems[i].traits[traitIndex].dataId == traitDataId){
-            amygame_elementIcon(traitDataId);
-              if(valueElementIconArr[0] >= 1){
-                var fragText = `${valueElementIconArr[1]}`;
+            const elementIcon = amygame_elementIcon(traitDataId);
+              if(elementIcon[0] >= 1){
+                var fragText = `${elementIcon[1]}`;
               } else {
                 if(valueItems[i].traits[traitIndex].value >= 1){
                   var effectValue = Math.round((valueItems[i].traits[traitIndex].value - 1) * 100);
                   if(traitDataId == 11){var effectValue = Math.round((valueItems[i].traits[traitIndex].value - 1) * 10)};
                     if( [10,11,12,15,20,38,39,40,41].some(function(id){return id == traitDataId}) ){
-                      var fragText = `\x1bI[${valueElementIconArr[3]}]+`;
+                      var fragText = `\x1bI[${elementIcon[3]}]+`;
                     } else {
-                      var fragText = `\x1bI[${valueElementIconArr[3]}]耐性-`;
+                      var fragText = `\x1bI[${elementIcon[3]}]耐性-`;
                     };
                 } else {
                   var effectValue = Math.round((1 - valueItems[i].traits[traitIndex].value) * 100);
                   if(traitDataId == 11){var effectValue = Math.round((1 - valueItems[i].traits[traitIndex].value) * 10)};
                     if( [10,11,12,15,20,38,39,40,41].some(function(id){return id == traitDataId}) ){
-                      var fragText = `\x1bI[${valueElementIconArr[3]}]-`;
+                      var fragText = `\x1bI[${elementIcon[3]}]-`;
                     } else {
-                      var fragText = `\x1bI[${valueElementIconArr[3]}]耐性+`;
+                      var fragText = `\x1bI[${elementIcon[3]}]耐性+`;
                     };
                 };
               };
@@ -575,11 +575,11 @@ if(databaseTypeId == 3){
   if(valueItems[i].meta['Multiple Elements']){
     var metaValues = valueItems[i].meta['Multiple Elements'].split(',');
       for (var traitDataId = 0; traitDataId <= metaValues.length-1; traitDataId++) {
-            amygame_elementIcon(metaValues[traitDataId]);
-              if(valueElementIconArr[0] >= 1){
-                var fragText = `${valueElementIconArr[1]}`;
+            const elementIcon = amygame_elementIcon(metaValues[traitDataId]);
+              if(elementIcon[0] >= 1){
+                var fragText = `${elementIcon[1]}`;
               } else {
-                var fragText = `\x1bI[${valueElementIconArr[1]}]`;
+                var fragText = `\x1bI[${elementIcon[1]}]`;
               };
         skillElementText += `\\C[${colorCode}]${fragText}\\C[0]`;
     };
@@ -943,23 +943,23 @@ if(valueItems[i].meta['Passive State'] && !valueItems[i].meta['パッシブ隠�
 
 for (var traitDataId = 1; traitDataId <= $dataSystem.elements.length-1; traitDataId++) {
   if(valueItems[i].meta['Element Amplify ' + traitDataId]){
-            amygame_elementIcon(traitDataId);
+            const elementIcon = amygame_elementIcon(traitDataId);
               var effectValue = valueItems[i].meta['Element Amplify ' + traitDataId].replace(' ','');
-              if(valueElementIconArr[0] >= 1){
-                var fragText = `${valueElementIconArr[1]}威力`;
+              if(elementIcon[0] >= 1){
+                var fragText = `${elementIcon[1]}威力`;
               } else {
-                var fragText = `\x1bI[${valueElementIconArr[2]}]威力`;
+                var fragText = `\x1bI[${elementIcon[2]}]威力`;
               };
             effectText += `${fragText}${effectValue} `;
 }};//属性威力加算
 
 if(valueItems[i].meta['PassiveElementP']){//<Max Mastery Level: 5>
   var metaValues = valueItems[i].meta['PassiveElementP'].split(',');
-  amygame_elementIcon(Number(metaValues[0]));
-  if(valueElementIconArr[0] >= 1){
-    var fragText = `${valueElementIconArr[1]}威力`;
+  const elementIcon = amygame_elementIcon(Number(metaValues[0]));
+  if(elementIcon[0] >= 1){
+    var fragText = `${elementIcon[1]}威力`;
   } else {
-    var fragText = `\x1bI[${valueElementIconArr[2]}]威力`;
+    var fragText = `\x1bI[${elementIcon[2]}]威力`;
   };
   //var value9 = `${$dataSystem.elements[Number(arr1[0])]}威力:`;
   if(Number(metaValues[1]) >= 1){

@@ -42,35 +42,43 @@ $gameScreen.movePicture(pictureId,1,screenXPos+randXOffset,screenYPos+randYOffse
 };
 
 //プレイヤー（イベント）の向き対応座標x,y,id1が2で正面,8が背後,4が左,6が右
+// Returns the tile directly in front of `event` for the requested facing id as
+// [x, y]. facingId is a direction constant (2/4/6/8); any other value leaves the
+// point on the event's own tile.
+// valueDirectionPointX / valueDirectionPointY are still assigned because
+// amygameSettei.js declares them as part of the project's shared value* state.
 event_charaDirectionPoint = function(event,facingId){
 
-valueDirectionPointX = event._realX;
-valueDirectionPointY = event._realY;
 const eventDirection = event.direction();
+var pointX = event._realX;
+var pointY = event._realY;
 if(facingId == 2){
-  if(eventDirection == 2){valueDirectionPointY += 1}
-  else if(eventDirection == 4){valueDirectionPointX -= 1}
-  else if(eventDirection == 6){valueDirectionPointX += 1}
-  else if(eventDirection == 8){valueDirectionPointY -= 1};
+  if(eventDirection == 2){pointY += 1}
+  else if(eventDirection == 4){pointX -= 1}
+  else if(eventDirection == 6){pointX += 1}
+  else if(eventDirection == 8){pointY -= 1};
 }
 else if(facingId == 8){
-  if(eventDirection == 2){valueDirectionPointY -= 1}
-  else if(eventDirection == 4){valueDirectionPointX += 1}
-  else if(eventDirection == 6){valueDirectionPointX -= 1}
-  else if(eventDirection == 8){valueDirectionPointY += 1};
+  if(eventDirection == 2){pointY -= 1}
+  else if(eventDirection == 4){pointX += 1}
+  else if(eventDirection == 6){pointX -= 1}
+  else if(eventDirection == 8){pointY += 1};
 }
 else if(facingId == 4){
-  if(eventDirection == 2){valueDirectionPointX += 1}
-  else if(eventDirection == 4){valueDirectionPointY += 1}
-  else if(eventDirection == 6){valueDirectionPointY -= 1}
-  else if(eventDirection == 8){valueDirectionPointX -= 1};
+  if(eventDirection == 2){pointX += 1}
+  else if(eventDirection == 4){pointY += 1}
+  else if(eventDirection == 6){pointY -= 1}
+  else if(eventDirection == 8){pointX -= 1};
 }
 else if(facingId == 6){
-  if(eventDirection == 2){valueDirectionPointX -= 1}
-  else if(eventDirection == 4){valueDirectionPointY -= 1}
-  else if(eventDirection == 6){valueDirectionPointY += 1}
-  else if(eventDirection == 8){valueDirectionPointX += 1};
+  if(eventDirection == 2){pointX -= 1}
+  else if(eventDirection == 4){pointY -= 1}
+  else if(eventDirection == 6){pointY += 1}
+  else if(eventDirection == 8){pointX += 1};
 };
+valueDirectionPointX = pointX;
+valueDirectionPointY = pointY;
+return [pointX, pointY];
 
 };
 
@@ -103,9 +111,9 @@ if(!!event) {
   if($gameSwitches.value(29)){
     $gameVariables.setValue(171,0);
   } else {
-    event_charaDirectionPoint(event,0);
+    const directionPoint = event_charaDirectionPoint(event,0);
     $gamePlayer.setDirection(event.direction());
-    const playerPosition = [$gameMap.mapId(),valueDirectionPointX,valueDirectionPointY];
+    const playerPosition = [$gameMap.mapId(),directionPoint[0],directionPoint[1]];
     $gameVariables.setValue(171,playerPosition);
   }
 } else {
