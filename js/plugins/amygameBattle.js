@@ -3302,8 +3302,8 @@ enemy_battleSetting = function (troopIndex) {
       const drop_probability = drop_probabilityCalculation(gameTroopMemberLevel, dropUpItem);
       if (drop_probability >= 90) {
         const itemsToDrop = [];
-        drop_genericDropRate(0, itemsToDrop);
-        $gameTroop.addDropItem($dataItems[valueDropItems]);
+        const valueDropItemIndex = drop_genericDropRate(0, itemsToDrop);
+        $gameTroop.addDropItem($dataItems[valueDropItemIndex]);
       };
     };
   };
@@ -3380,10 +3380,10 @@ enemy_instantwin = function () {
       // Calculate drop items
       dropResultAccumulator.length = 0; // Clear array without creating a new one
       drop_enemyDropRate(0, dropResultAccumulator);
-      drop_genericDropRate(0, dropResultAccumulator);
+      const valueDropItemIndex = drop_genericDropRate(0, dropResultAccumulator);
       
       // Process dropped item
-      const itemToDrop = $dataItems[valueDropItems];
+      const itemToDrop = $dataItems[valueDropItemIndex];
       if (itemToDrop) {
         const item = `\\C[24]\x1bI[${itemToDrop.iconIndex}]${itemToDrop.name}\\C[0]`;
         const itemMessage = `${item}を獲得した。\n`;
@@ -3554,9 +3554,9 @@ harvesting_itemSelect = function () {
 
   var itemsToDrop = [];
   //var value1 = 0; 
-  drop_genericDropRate(1, itemsToDrop);
-  $gameVariables.setValue(23, valueDropItems);
-  if (valueDropItems == 0) {
+  const valueDropItemIndex = drop_genericDropRate(1, itemsToDrop);
+  $gameVariables.setValue(23, valueDropItemIndex);
+  if (valueDropItemIndex == 0) {
     $gameVariables.setValue(23, 1191);//1191は石ころ
   };
 
@@ -3655,6 +3655,11 @@ drop_genericDropRate = function (battleDrop, itemsToDrop) {
 
     const dropRateList = itemDropRate.split(',');
 
+	
+	if (itemsToDrop === undefined || itemsToDrop === null) {
+		itemsToDrop = [];
+	}
+	
     for (let dropRateOption of dropRateList) {
       if (dropRateOption != genericDropRate) continue;
 
@@ -3724,6 +3729,10 @@ function drop_enemyDropRate(unusedParam, eligibleDropItems) {
         rarityThreshold = 50;
         break;
     }
+	
+	if (eligibleDropItems === undefined || eligibleDropItems === null) {
+		eligibleDropItems = [];
+	}
 
     if (selectedEnemyLevel >= rarityThreshold) {
       eligibleDropItems.push(itemIndex);
