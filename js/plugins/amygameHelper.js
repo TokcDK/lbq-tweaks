@@ -964,4 +964,31 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		valueTalkSet = [title, mode, pictureLayout];
 		interp.setupChild($dataCommonEvents[60].list, 0);
 	};
+
+	// =========================================================================
+	// Field drop roll (common events 187 / 188 / 196)
+	// =========================================================================
+
+	// Rolls the field drop for the current enemy and applies the matching
+	// proficiency gain. The candidate index list is created here rather than by the
+	// caller: the original relied on a bare `arr4 = []` (an implicit global that is
+	// read nowhere else) or on `var arr4` hoisted into a one-shot eval scope, so the
+	// accumulator was always fresh per invocation. Making it a local here preserves
+	// that and keeps the global out of the picture entirely.
+	//
+	// drop_genericDropRate still writes the legacy valueDropItems global for older
+	// call sites; we use its return value instead of reading the global back.
+	AGH_fieldDropItemId = function (skillId) {
+		const itemToDropIndexes = [];
+		drop_enemyDropRate(0, itemToDropIndexes);
+		const valueDropItemIndex = drop_genericDropRate(0, itemToDropIndexes);
+
+		//熟練度上昇拾得物。
+		//スキルid、アイテム種別3お金0アイテム1武器2防具、金額orアイテムID
+		$gameVariables.setValue(22, 0);
+		$gameVariables.setValue(23, valueDropItemIndex);
+		item_getSkillLevel(skillId, 0, valueDropItemIndex);
+
+		return valueDropItemIndex;
+	};
 })();

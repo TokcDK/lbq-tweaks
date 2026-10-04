@@ -1,4 +1,4 @@
-﻿/*:
+/*:
 * @plugindesc このゲーム専用プラグイン
 * @author 作者名
 * @help ゲーム専用に作成された初期読み込み用プラグイン
@@ -3641,6 +3641,15 @@ drop_genericDropRate = function (battleDrop, itemsToDrop) {
   const allItems = $dataItems;
   const gameSwitch2State = $gameSwitches.value(2);
   const isBattle = battleDrop !== 0;
+
+  // Normalise the accumulator up front rather than inside the loop below: the
+  // return statement reads itemsToDrop unconditionally, so guarding it only inside
+  // the loop left a path where an empty valueItemDropRate1 made the final line
+  // dereference an undefined argument.
+  if (itemsToDrop === undefined || itemsToDrop === null) {
+    itemsToDrop = [];
+  }
+
   for (let i = 0; i < itemDropRateArrayLength; i++) {
     const currentDropItemId = valueItemDropRate1[i];
     let dropLotteryValue = 1;
@@ -3655,11 +3664,6 @@ drop_genericDropRate = function (battleDrop, itemsToDrop) {
 
     const dropRateList = itemDropRate.split(',');
 
-	
-	if (itemsToDrop === undefined || itemsToDrop === null) {
-		itemsToDrop = [];
-	}
-	
     for (let dropRateOption of dropRateList) {
       if (dropRateOption != genericDropRate) continue;
 
@@ -3685,6 +3689,12 @@ function drop_enemyDropRate(unusedParam, eligibleDropItems) {
   const enemyLevelData = item.meta['EnemyLV'].split(',');
   const enemyIdArray = $gameVariables.value(220);
   if (!enemyIdArray || !enemyIdArray.length) return;
+
+  // Same reasoning as drop_genericDropRate: hoist the accumulator guard out of the
+  // loop so it does not depend on the loop body running.
+  if (eligibleDropItems === undefined || eligibleDropItems === null) {
+    eligibleDropItems = [];
+  }
   const selectedEnemyLevel = Number(enemyLevelData[getRandomIndex(enemyLevelData.length)]);
   const selectedEnemyIndex = Number(enemyIdArray[getRandomIndex(enemyIdArray.length)]);
   const baseEnemy = $dataEnemies[selectedEnemyIndex];
@@ -3726,13 +3736,9 @@ function drop_enemyDropRate(unusedParam, eligibleDropItems) {
         break;
       case 9:
       case 10:
-        rarityThreshold = 50;
-        break;
+rarityThreshold = 50;
+      break;
     }
-	
-	if (eligibleDropItems === undefined || eligibleDropItems === null) {
-		eligibleDropItems = [];
-	}
 
     if (selectedEnemyLevel >= rarityThreshold) {
       eligibleDropItems.push(itemIndex);
