@@ -897,4 +897,71 @@
 		$gameVariables.setValue(292, Array(21).fill(0));
 		$gameVariables.setValue(134, objectiveText);
 	};
+
+	// --------------------------------------------------------------------------
+	// Opens an H scene: picture slot, scene-art prefix, memo item, record id, weather.
+	// The "汎用" family also re-reads variable 530 into variable 20; the "陵辱"
+	// family does not, which is why syncActorVariable is a parameter.
+	// Replaces (5x) the common opening sequence.
+	// --------------------------------------------------------------------------
+AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemId, recordId, weatherSceneSet, syncActorVariable) {
+		// The 陵辱 family never assigned valuePic1 in the original, so a null picId
+		// must leave the existing value alone rather than overwrite it with null.
+		if (picId != null) {
+			valuePic1 = picId;
+		}
+		valueScenePic = scenePicPrefix;
+		interp.sVal(530, mainCharId);
+		interp.sVal(535, memoItemId);
+		h_keikenhyouji1(521, recordId);
+		valueWeatherSceneSet = weatherSceneSet;
+		if (syncActorVariable) {
+			$gameVariables.setValue(20, $gameVariables.value(530));
+		}
+	};
+
+	// --------------------------------------------------------------------------
+	// Applies the standard H-scene experience bundle: the base gain, a random
+	// message, and the four h_exp channels. Only the h_exp3 gain vector differs
+	// between scenes, so it is passed through as an argument array.
+	// Replaces (4x).
+	// --------------------------------------------------------------------------
+	AGH_hSceneExperience = function (interp, exp3Args) {
+		h_exp($gameVariables.value(20), valueScenePic + '99', valueScenePartnerId, false, false, false);
+		interp.sVal(401, getRandomIndex(11) + 20);
+		interp.sVal(506, `\\V[94]は\\V[22]とセックスした…。`);
+		h_exp1(1, 1, 0, 0, 0, 1);
+		h_exp2(1, 0, 0, 0, 0, 0);
+		h_exp3.apply(null, exp3Args);
+		h_exp4(5, 0, 0, 5, 0, 5, 0, 1, 0);
+		interp.setupChild($dataCommonEvents[85].list, 0);
+	};
+
+	// --------------------------------------------------------------------------
+	// Claims post-battle spoils when the party holds enough, otherwise raises the
+	// shortage ticker and sets switch 380 so the caller can retry later.
+	// Replaces (2x) in the two loot events.
+	// --------------------------------------------------------------------------
+	AGH_warLootPickup = function (interp, itemId, count, popupLabel) {
+		$gameSwitches.setValue(380, false);
+		if ($gameParty.numItems($dataItems[itemId]) >= count) {
+			$gameParty.loseItem($dataItems[itemId], count);
+			interp.addPopup(["add", "text:" + popupLabel]);
+		} else {
+			TickerManager.show(`${$dataItems[itemId].name}が${count}枚必要です`);
+			$gameSwitches.setValue(380, true);
+		}
+	};
+
+	// --------------------------------------------------------------------------
+	// Shows a tips popup via the shared talk common event. pictureLayout is the
+	// literal [image,x,y,scaleX,scaleY,opacity] array the source built inline.
+	// Replaces (2x) in the prologue-end common event.
+	// --------------------------------------------------------------------------
+	AGH_showTipPopup = function (interp, title, pictureLayout) {
+		interp.sVal(172, 2);
+		var mode = 0;
+		valueTalkSet = [title, mode, pictureLayout];
+		interp.setupChild($dataCommonEvents[60].list, 0);
+	};
 })();
