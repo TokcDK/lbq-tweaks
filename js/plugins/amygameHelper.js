@@ -979,8 +979,7 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// drop_genericDropRate still writes the legacy valueDropItems global for older
 	// call sites; we use its return value instead of reading the global back.
 	AGH_fieldDropItemId = function (skillId) {
-		const itemToDropIndexes = [];
-		drop_enemyDropRate(0, itemToDropIndexes);
+		const itemToDropIndexes = drop_enemyDropRate(0, null);
 		const valueDropItemIndex = drop_genericDropRate(0, itemToDropIndexes);
 
 		//熟練度上昇拾得物。

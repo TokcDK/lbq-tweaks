@@ -3736,7 +3736,7 @@ function drop_enemyDropRate(unusedParam, eligibleDropItems) {
         break;
       case 9:
       case 10:
-rarityThreshold = 50;
+        rarityThreshold = 50;
       break;
     }
 
@@ -3744,6 +3744,8 @@ rarityThreshold = 50;
       eligibleDropItems.push(itemIndex);
     }
   }
+  
+  return eligibleDropItems;
 }
 
 //ジョブステートエネミーorジョブ持ち追いはぎスクリプト
