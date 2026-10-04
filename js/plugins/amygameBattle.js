@@ -3669,7 +3669,7 @@ drop_genericDropRate = function (battleDrop, itemsToDrop) {
     }
   }
 
-  valueDropItems = Number(itemsToDrop[getRandomIndex(itemsToDrop.length)]);
+  return valueDropItems = Number(itemsToDrop[getRandomIndex(itemsToDrop.length)]);
 };
 
 //汎用ドロップエネミー対象設定ダンジョンのみ。計算のみ計算結果はarr4に蓄積。簡易討伐時
