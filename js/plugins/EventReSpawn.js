@@ -6,6 +6,9 @@
 // http://opensource.org/licenses/mit-license.php
 // ----------------------------------------------------------------------------
 // Version
+// 1.12.5 2024/11/27 1.12.4 の修正ロジックに誤りがあった問題を修正
+// 1.12.4 2024/11/26 1.12.3 の修正でイベントIDが0のイベントが生成される可能性がある問題を修正
+// 1.12.3 2024/11/26 イベントの生成と破棄を繰り返したときに徐々に動作が重くなっていく問題を修正
 // 1.12.2 2021/11/23 セルフスイッチを維持しない設定のときはテンプレートイベントのセルフ変数も消去するよう変更
 // 1.12.1 2021/10/05 1.2.0の機能でイベントを配置したとき、イベント画像が2つ重なって表示されてしまう問題を修正
 // 1.12.0 2021/09/16 リージョンを配置するだけでマップイベントやテンプレートイベントのコピーを自動配置できる機能を追加
@@ -450,7 +453,7 @@ function Game_PrefabEvent() {
 
     Game_Map.prototype.spawnEvent = function(originalEventId, x, y, isTemplate) {
         if (this.isExistEventData(originalEventId, isTemplate) && $gameMap.isValid(x, y)) {
-            var eventId = this.getEventIdSequence();
+            var eventId = this.findSpawnEventId();
             if (!isTemplate) {
                 var originalEvent = this.event(originalEventId);
                 if (this.isTemplateSpawn(originalEventId)) {
@@ -555,6 +558,7 @@ function Game_PrefabEvent() {
                 this.isErsCheckRegionId.bind(this, conditionMap.regionIds),
                 createMapDataKey('regionIds', conditionMap.regionIds)));
         }
+		
         return conditions;
     };
 
@@ -566,7 +570,13 @@ function Game_PrefabEvent() {
         }
     };
 
-    Game_Map.prototype.getEventIdSequence = function() {
+    Game_Map.prototype.findSpawnEventId = function() {
+        if (this._eventIdSequence > 100) {
+            const erasedIndex = this._events.findIndex((event, index) => !event && index > 0);
+            if (erasedIndex > 0) {
+                return erasedIndex;
+            }
+        }
         return this._eventIdSequence++;
     };
 
