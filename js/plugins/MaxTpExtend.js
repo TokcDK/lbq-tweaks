@@ -67,7 +67,7 @@
      * @returns {String} meta value
      */
     var getMetaValue = function(object, tagName) {
-        return object && tagName && object.meta.hasOwnProperty(tagName) ? convertEscapeCharacters(object.meta[tagName]) : null;
+        return object.meta.hasOwnProperty(tagName) ? convertEscapeCharacters(object.meta[tagName]) : null;
     };
 
     /**
