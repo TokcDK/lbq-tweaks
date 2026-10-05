@@ -483,39 +483,79 @@ function Game_PrefabEvent() {
         return isTemplate ? !!$dataTemplateEvents[eventId] : !!this.event(eventId);
     };
 
+    /**
+     * 生成条件の判定関数を1つまとめます。
+     * @param {Function} test 座標を受け取り条件を満たすかを返す判定関数
+     * @param {String} mapDataKey マップデータだけで結果が決まる条件なら、その識別キー。
+     *                             実行時の状態に依存する条件には null を指定します。
+     * @returns {Object}
+     */
+    var createSpawnCondition = function(test, mapDataKey) {
+        return {test: test, mapDataKey: mapDataKey || null};
+    };
+
+    /**
+     * 条件指定から候補座標の絞り込みに使えるマップデータ条件のキーを作ります。
+     * ID の「0」は「判定なし」を意味するので、キーからは除外します。
+     * 除外した結果が空なら絞り込みに使えない（=null）条件です。
+     * @param {String} name 条件名
+     * @param {Array} ids 条件指定された ID 一覧
+     * @returns {String|null}
+     */
+    var createMapDataKey = function(name, ids) {
+        var targets = (ids || []).filter(function(id) {
+            return !!id;
+        });
+        return targets.length ? name + '=' + targets.join(',') : null;
+    };
+
     Game_Map.prototype.spawnEventRandom = function(originalEventId, conditionMap, isTemplate) {
-        var conditions = [];
-        conditions.push(this.isValid.bind(this));
-        if (conditionMap.passable) {
-            conditions.push(this.isErsCheckAnyDirectionPassable.bind(this));
-        }
-        if (conditionMap.screen) {
-            conditions.push(this.isErsCheckScreenInOut.bind(this, conditionMap.screen));
-        }
-        if (conditionMap.collided) {
-            conditions.push(this.isErsCheckCollidedSomeone.bind(this, conditionMap.collided));
-        }
-        if (conditionMap.terrainTags) {
-            conditions.push(this.isErsCheckTerrainTag.bind(this, conditionMap.terrainTags));
-        }
-        if (conditionMap.regionIds) {
-            conditions.push(this.isErsCheckRegionId.bind(this, conditionMap.regionIds));
-        }
-        var position = this.getConditionalValidPosition(conditions);
-        if (position) {
-            this.spawnEvent(originalEventId, position.x, position.y, isTemplate);
-            // BUGFIX: callers used to read getLastSpawnEventId() unconditionally.
-            // When no position was found nothing was spawned, so that call
-            // returned a STALE id from a previous spawn and the caller then
-            // re-configured that unrelated event (wrong graphic / move speed /
-            // duplicate id). Report success so callers can skip instead.
-            return this.getLastSpawnEventId();
-        } else {
+        var position = this.getConditionalValidPosition(this.createSpawnConditions(conditionMap));
+        if (!position) {
             console.warn('座標の取得に失敗しました。 templateEventId=' + originalEventId +
                 ' regionIds=' + JSON.stringify(conditionMap.regionIds) +
                 ' terrainTags=' + JSON.stringify(conditionMap.terrainTags));
             return null;
         }
+        this.spawnEvent(originalEventId, position.x, position.y, isTemplate);
+        // BUGFIX: callers used to read getLastSpawnEventId() unconditionally.
+        // When no position was found nothing was spawned, so that call
+        // returned a STALE id from a previous spawn and the caller then
+        // re-configured that unrelated event (wrong graphic / move speed /
+        // duplicate id). Report success so callers can skip instead.
+        return this.getLastSpawnEventId();
+    };
+
+    /**
+     * 条件マップから判定条件のリストを作ります。
+     * 「マップデータだけで決まる条件」と「実行時の状態に依存する条件」を区別して
+     * 保持します。前者は候補座標の事前計算に、後者は抽選ごとの判定に利用します。
+     * @param {Object} conditionMap 生成側が指定した条件
+     * @returns {Array} 判定条件のリスト
+     */
+    Game_Map.prototype.createSpawnConditions = function(conditionMap) {
+        var conditions = [];
+        conditions.push(createSpawnCondition(this.isValid.bind(this)));
+        if (conditionMap.passable) {
+            conditions.push(createSpawnCondition(this.isErsCheckAnyDirectionPassable.bind(this)));
+        }
+        if (conditionMap.screen) {
+            conditions.push(createSpawnCondition(this.isErsCheckScreenInOut.bind(this, conditionMap.screen)));
+        }
+        if (conditionMap.collided) {
+            conditions.push(createSpawnCondition(this.isErsCheckCollidedSomeone.bind(this, conditionMap.collided)));
+        }
+        if (conditionMap.terrainTags) {
+            conditions.push(createSpawnCondition(
+                this.isErsCheckTerrainTag.bind(this, conditionMap.terrainTags),
+                createMapDataKey('terrainTags', conditionMap.terrainTags)));
+        }
+        if (conditionMap.regionIds) {
+            conditions.push(createSpawnCondition(
+                this.isErsCheckRegionId.bind(this, conditionMap.regionIds),
+                createMapDataKey('regionIds', conditionMap.regionIds)));
+        }
+        return conditions;
     };
 
     var _Game_Map_eraseEvent      = Game_Map.prototype.eraseEvent;
@@ -559,79 +599,157 @@ function Game_PrefabEvent() {
         return !$gamePlayer.isTransferring() || this.mapId() === $gamePlayer.newMapId();
     };
 
+    /**
+     * 条件を満たすマスを1つ探します。
+     * 抽選の前に「マップデータだけで決まる条件」で候補を絞り込むため、
+     * リジョンのように候補がごく少ない条件でも抽選が外れにくくなっています。
+     * @param {Array} conditions 判定条件のリスト
+     * @returns {Object|null} 生成可能な座標。条件を満たすマスが無い場合は null
+     */
     Game_Map.prototype.getConditionalValidPosition = function(conditions) {
+        if (!$dataMap) return null;
+        var candidates = this.getSpawnCandidates(conditions);
+        if (candidates && candidates.length <= 0) return null;
+        var runtimeConditions = conditions.filter(function(condition) {
+            return !condition.mapDataKey;
+        });
+        if (!$gameSwitches.value(param.CertainSpawnSwitch)) {
+            var position = this.sampleSpawnPosition(runtimeConditions, candidates);
+            if (position) return position;
+        }
+        // 抽選で当たらなかった場合は候補を全て走査します（=「確定出力方式」と同じ処理）。
+        // これにより「座標の取得に失敗」は本当に条件を満たすマスが存在しない場合のみになります。
+        return this.scanSpawnPosition(runtimeConditions, candidates);
+    };
+
+    /**
+     * 条件を満たすマスをランダムに抽選します。
+     * @param {Array} conditions 実行時の状態に依存する条件のリスト
+     * @param {Array|null} candidates 候補座標のリスト。null の場合はマップ全体が候補
+     * @returns {Object|null} 試行回数内に見つからなければ null
+     */
+    Game_Map.prototype.sampleSpawnPosition = function(conditions, candidates) {
         var tryCount = param.tryRandomCount || 1000;
-        if (!$gameSwitches.value(param.CertainSpawnSwitch) && tryCount > 0) {
-            var x, y, count = 0;
-            do {
-                x = Math.randomInt($dataMap.width);
-                y = Math.randomInt($dataMap.height);
-            } while (!conditions.every(this.checkValidPosition.bind(this, x, y)) && ++count < tryCount);
-            return count < tryCount ? {x: x, y: y} : null;
-        } else {
-            var positions = [];
-            for (var ix = 0; ix < $dataMap.width; ++ix) for (var iy = 0; iy < $dataMap.height; ++iy) {
-                if (conditions.every(this.checkValidPosition.bind(this, ix, iy))) {
-                    positions.push({x: ix, y: iy});
+        for (var count = 0; count < tryCount; ++count) {
+            var position = this.pickSpawnCandidate(candidates);
+            if (this.matchesAllSpawnConditions(conditions, position.x, position.y)) {
+                return position;
+            }
+        }
+        return null;
+    };
+
+    /**
+     * 抽選対象のマスを1つ返します。
+     * @param {Array|null} candidates 候補座標のリスト。null の場合はマップ全体が候補
+     * @returns {Object}
+     */
+    Game_Map.prototype.pickSpawnCandidate = function(candidates) {
+        if (candidates) {
+            return candidates[Math.randomInt(candidates.length)];
+        }
+        return {x: Math.randomInt(this.width()), y: Math.randomInt(this.height())};
+    };
+
+    /**
+     * 候補を先頭から走査して条件を満たすマスを1つ返します（「確定出力方式」）。
+     * 条件を満たすマスの集合から一様に選ぶため、抽選と同じ分布になります。
+     * @param {Array} conditions 実行時の状態に依存する条件のリスト
+     * @param {Array|null} candidates 候補座標のリスト。null の場合はマップ全体が候補
+     * @returns {Object|null} 条件を満たすマスが無ければ null
+     */
+    Game_Map.prototype.scanSpawnPosition = function(conditions, candidates) {
+        var targets = candidates || this.collectAllSpawnPositions();
+        var found = [];
+        for (var i = 0; i < targets.length; ++i) {
+            var position = targets[i];
+            if (this.matchesAllSpawnConditions(conditions, position.x, position.y)) {
+                found.push(position);
+            }
+        }
+        return found.length ? found[Math.randomInt(found.length)] : null;
+    };
+
+    Game_Map.prototype.collectAllSpawnPositions = function() {
+        var positions = [];
+        for (var y = 0; y < this.height(); ++y) {
+            for (var x = 0; x < this.width(); ++x) {
+                positions.push({x: x, y: y});
+            }
+        }
+        return positions;
+    };
+
+    /**
+     * マップデータだけで決まる条件を満たすマス（=生成候補）の一覧を返します。
+     * 絞り込みに使える条件が無い場合はマップ全体が候補なので null を返します。
+     * 一覧は $dataMap とタイルセットが同じである限り使い回せます。
+     * @param {Array} conditions 判定条件のリスト
+     * @returns {Array|null} 候補座標のリスト
+     */
+    Game_Map.prototype.getSpawnCandidates = function(conditions) {
+        var mapDataConditions = conditions.filter(function(condition) {
+            return !!condition.mapDataKey;
+        });
+        if (mapDataConditions.length <= 0) return null;
+        var cacheKey = mapDataConditions.map(function(condition) {
+            return condition.mapDataKey;
+        }).join('&');
+        var cache = this.getSpawnCandidateCache();
+        if (cache.has(cacheKey)) return cache.get(cacheKey);
+        var candidates = [];
+        for (var y = 0; y < this.height(); ++y) {
+            for (var x = 0; x < this.width(); ++x) {
+                if (this.matchesAllSpawnConditions(mapDataConditions, x, y)) {
+                    candidates.push({x: x, y: y});
                 }
             }
-            return positions.length ? positions[Math.randomInt(positions.length)] : null;
         }
+        cache.set(cacheKey, candidates);
+        return candidates;
+    };
+
+    /**
+     * 生成候補のキャッシュを取得します。
+     * 場所移動やセーブ読み込みでマップデータが入れ替わった場合は作り直します。
+     */
+    Game_Map.prototype.getSpawnCandidateCache = function() {
+        if (this._spawnCandidateCacheData !== $dataMap || this._spawnCandidateCacheTileset !== this.tileset()) {
+            this._spawnCandidateCacheData    = $dataMap;
+            this._spawnCandidateCacheTileset = this.tileset();
+            this._spawnCandidateCache        = new Map();
+        }
+        return this._spawnCandidateCache;
+    };
+
+    Game_Map.prototype.matchesAllSpawnConditions = function(conditions, x, y) {
+        for (var i = 0; i < conditions.length; ++i) {
+            if (!this.checkValidPosition(x, y, conditions[i])) return false;
+        }
+        return true;
     };
 
     Game_Map.prototype.checkValidPosition = function(x, y, condition) {
-        return condition(x, y);
+        return condition.test(x, y);
     };
 
     Game_Map.prototype.isErsCheckAnyDirectionPassable = function(x, y) {
-        // Cardinal directions. Behaviour unchanged.
-        if ([2, 4, 6, 8].some(function(direction) {
+        // Cardinal directions only (2=down 4=left 6=right 8=up).
+        // The diagonal constants must never be passed to isPassable(): this core
+        // turns `d` into a passage bitmask with (1 << (d / 2 - 1)) & 0x0f, so 1/3/7/9
+        // produce a mask of 0, which checkPassage() treats as "passable" - every
+        // single tile would then be reported as passable.
+        //
+        // A previous revision of this function tried to also accept a diagonally
+        // adjacent exit, but it was unreachable: when the loop above fails,
+        // $gameMap.isPassable() (which is exactly what $gamePlayer.isMapPassable()
+        // evaluates while the player is on foot) fails for the same four
+        // directions, so the extra guard always returned early. Sparse spawn
+        // conditions are handled in getConditionalValidPosition() instead, where
+        // the candidates are narrowed down before drawing.
+        return [2, 4, 6, 8].some(function(direction) {
             return $gamePlayer.isMapPassable(x, y, direction);
-        })) {
-            return true;
-        }
-        // Diagonal neighbours. These used to be ignored, so a tile boxed in on
-        // all four sides looked unreachable and failed the entire random spawn
-        // (the "could not get coordinates" warning). The result of this function
-        // can now only go from false to true - it never rejects a position that
-        // used to be accepted.
-        //
-        // Note on the engine's own corner rule: Game_CharacterBase
-        // .canPassDiagonally() was NOT used on purpose. It requires one of the
-        // two ORTHOGONAL neighbours to be passable, and the cardinal check above
-        // already tests every orthogonal with the same predicate
-        // ($gamePlayer.isMapPassable). So the corner rule can never rescue a
-        // tile whose four cardinals are blocked - it would be a no-op. Here a
-        // diagonal neighbour simply has to be a valid tile that itself has a
-        // passable exit.
-        //
-        // Two safety rules, both because this core's
-        // Game_Map.isPassable(x, y, d) converts `d` into a passage bitmask,
-        // (1 << (d / 2 - 1)) & 0x0f: the diagonal constants 1/3/7/9 produce a
-        // mask of 0 and checkPassage() treats a 0 mask as "passable", which would
-        // report EVERY tile as passable. Therefore only cardinal directions
-        // (2 = down, 4 = left, 6 = right, 8 = up) are ever passed to
-        // isPassable()/isMapPassable() below, and diagonal offsets are computed
-        // explicitly with $gameMap.roundX/roundY (which honour looping maps).
-        if (!$gameMap.isValid(x, y)) return false;
-
-        // Never place an event on a tile that cannot be entered at all.
-        var originPassable = [2, 4, 6, 8].some(function(direction) {
-            return $gameMap.isPassable(x, y, direction);
         });
-        if (!originPassable) return false;
-
-        var diagonals = [[-1, -1], [1, -1], [-1, 1], [1, 1]];
-        for (var i = 0; i < diagonals.length; ++i) {
-            var tx = $gameMap.roundX(x + diagonals[i][0]);
-            var ty = $gameMap.roundY(y + diagonals[i][1]);
-            if (!$gameMap.isValid(tx, ty)) continue;
-            var targetHasExit = [2, 4, 6, 8].some(function(direction) {
-                return $gamePlayer.isMapPassable(tx, ty, direction);
-            });
-            if (targetHasExit) return true;
-        }
-        return false;
     };
 
     Game_Map.prototype.isErsCheckScreenInOut = function(type, x, y) {

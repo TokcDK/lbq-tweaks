@@ -676,7 +676,7 @@ $gameVariables.value(202).some(function (id) { return $gameMap.mapId() == id }))
     const lastSpawnEventId = $gameMap.spawnEventRandom(sourceEventId, conditionMap, true);
     if(!lastSpawnEventId) continue;
     const charaEventToRespawn = $gameMap.event(lastSpawnEventId);
-    if(!charaEventToRespawn) continue;//生成位置が見つからず生成되지 않은場合
+    if(!charaEventToRespawn) continue;//生成していない場合
     if($gameSwitches.value(377)){
       charaEventToRespawn._priorityType = 1;
     };
@@ -763,7 +763,7 @@ if(valueRegionMapArray[enemySpawnCount] < 1) return;
         const enemySpawnedId = $gameMap.spawnEventRandom(originalEventId, conditionMap, true);
         if(!enemySpawnedId) continue;
         const enemyEventToRespawn = $gameMap.event(enemySpawnedId);
-        if(!enemyEventToRespawn) continue;//生成位置が見つからず生成되지 않은場合
+        if(!enemyEventToRespawn) continue;//生成していない場合
         const enemyGraphic = $dataItems[$gameVariables.value(240)] ? $dataItems[$gameVariables.value(240)].meta.EnemyGraphic : null;
         if(!enemyGraphic) continue;
         enemyEventToRespawn._trigger = 2; // spawned enemy will attack player, trigger set to event touch

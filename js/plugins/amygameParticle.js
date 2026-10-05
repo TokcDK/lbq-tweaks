@@ -438,19 +438,38 @@ if(gameVarValue10 == 0){
 
 };
 
+//リージョンごとのタイル数を数えて valueRegionMapArray を更新する。
+//マップデータのみで決まる値なので、リージョン指定のパーティクル設定とは独立に扱える。
+map_regionCountSet = function(){
+
+var regionEventCounts = Array(151).fill(0);
+for (var i = 0; i <= $gameMap.width() - 1; i++) {
+  for (var j = 0; j <= $gameMap.height() - 1; j++) {
+    var regionId = $gameMap.regionId(i,j);
+    if(regionId >= 1){
+      regionEventCounts[regionId] += 1;
+}}};
+  valueRegionMapArray =  regionEventCounts;
+  return regionEventCounts;
+};
+
+//リージョン数の更新はイベントに頼らず、マップ読み込みのたびに確実に行う。
+//(以前はマップ最初のイベントからのみ更新していたため、そのイベントが実行されない
+// セーブ読み込み時などには前のマップの値が残り、存在しないリージョンのイベントを
+//  生成しようとして「座標の取得に失敗」していた)
+var _Scene_Map_onMapLoaded = Scene_Map.prototype.onMapLoaded;
+Scene_Map.prototype.onMapLoaded = function(){
+  _Scene_Map_onMapLoaded.apply(this, arguments);
+  if ($gameMap) map_regionCountSet();
+};
+
 //特定リージョンに対応したパーティクルと動的生成その他
 map_regionSet = function(){
 
 //if($gameMap.regionId($gamePlayer._realX, $gamePlayer._realY+1) == 91){
   //$gameSwitches.setValue(206,true);
 //};
-var regionEventCounts = Array(151).fill(0);
-for (var i = 0; i <= $gameMap.width() - 1; i++) {
-  for (var j = 0; j <= $gameMap.height() - 1; j++) {
-    if($gameMap.regionId(i,j) >= 1){    
-      regionEventCounts[$gameMap.regionId(i,j)] += 1;
-}}};
-  valueRegionMapArray =  regionEventCounts;
+var regionEventCounts = map_regionCountSet();
   var numericValue1 = 30;
   if(regionEventCounts[numericValue1] >= 1){
     var effectName2 = 'dappled_r';
