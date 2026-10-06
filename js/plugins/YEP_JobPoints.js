@@ -478,6 +478,14 @@ Game_Actor.prototype.jp = function(classId) {
 
 Game_Actor.prototype.initJp = function() {
     var actor = this.actor();
+    // BUGFIX: when no actor carries a <Starting JP> notetag - which is the case
+    // for every actor in this game - the loop below never called setJp(), so
+    // this._jp stayed undefined and jp() lazily re-ran this whole function on
+    // EVERY call. Each of those re-runs wiped _jpRateRemainder and
+    // _subclassJpRemainder, throwing away the carried fractions that
+    // gainJp()/gainJpSubclass() exist to preserve. Creating the map up front
+    // makes the lazy re-entry happen at most once.
+    this._jp = this._jp || {};
     this._jpRateRemainder = {};      // reset the carried jpRate() fraction on (re)setup
     this._subclassJpRemainder = {}; // reset the carried subclass share fraction
     for (var i = 0; i < $dataClasses.length; i++) {
@@ -489,19 +497,26 @@ Game_Actor.prototype.initJp = function() {
 };
 
 Game_Actor.prototype.setJp = function(value, classId) {
-    if(!value) return; // asdf, dont think the re is reason to set 0 jp points
-
     value = parseInt(value);
-    if (!value) return; // asdf, was not parsed to int
-    
-    //if (value === NaN) value = 0;
+    if (isNaN(value)) return; // nothing usable to assign
+
+    // BUGFIX: this used to bail out on any falsy value -
+    //     if(!value) return; // asdf, dont think the re is reason to set 0 jp points
+    //     if (!value) return; // asdf, was not parsed to int
+    // which made setJp(0) a silent no-op. Spending the LAST of your JP - a
+    // 100 JP skill learned while holding exactly 100 JP - therefore never
+    // reached the actor: loseJp() computed the correct new total of 0, setJp()
+    // threw it away, and the JP stayed in the pool to be spent again. Cheaper
+    // skills were unaffected because their remainder was non-zero. Only NaN,
+    // an actually unusable value, is rejected now.
     classId = classId || this.currentClass().id;
-		if (!this._jp) this._jp = {};
-    if (!this._jp[classId]) this._jp[classId] = 0;
-    this._jp[classId] = Math.max(0, value);
-    if (Yanfly.Param.JpMax > 0) {
-      this._jp[classId] = Math.min(Yanfly.Param.JpMax, value);
-    }
+    if (!this._jp) this._jp = {};
+    var jp = Math.max(0, value);
+    // BUGFIX: the cap used to be applied to the raw `value` rather than to the
+    // already clamped result, so with a JP Max configured a negative value was
+    // stored as a negative JP total.
+    if (Yanfly.Param.JpMax > 0) jp = Math.min(Yanfly.Param.JpMax, jp);
+    this._jp[classId] = jp;
 };
 
 Game_Actor.prototype.jpRate = function() {
