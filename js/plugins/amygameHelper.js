@@ -1088,7 +1088,9 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_stateApplyInstantDeath = function (user, target, stateId) {
 		if (!target.isStateAffected(1) && $gameParty.inBattle()) {
 			state_applyCommonEffect(user, target, stateId, 260);
-			BattleManager._logWindow.push(`addText`, target.name() + `に` + $dataStates[stateId].name + `が発動した！`)
+			var targetName = target.name();
+			var stateName = $dataStates[stateId].name;
+			BattleManager._logWindow.push(`addText`, `${targetName}に${stateName}が発動した！`)
 			target.gainHp(-999999);
 			target.addState(1);
 		}
@@ -1387,7 +1389,10 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 			user.gainHp(-accumulatedDamage);
 			if (user.isDead()) user.performCollapse();
 		}
-		var logText = `${user.name()}の${$dataStates[stateId].name}が解除！ 蓄積ダメージ\\C[10]${accumulatedDamage}\\C[0]を受けた…`;
+		var userName = user.name();
+		var stateName = $dataStates[stateId].name;
+		var damage = `\\C[10]${accumulatedDamage}\\C[0]`;
+		var logText = `${userName}の${stateName}が解除！ 蓄積ダメージ${damage}を受けた…`;
 		BattleManager._logWindow.push(`addText`, logText);
 		user.removeStateCounter(stateId);
 		user.removeState(stateId);
@@ -1599,7 +1604,8 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 
 	// Replaces (1x, state 64 放心): recovery log line plus the opacity restore.
 	AGH_stateRemoveRelief = function (user, target, stateId) {
-		BattleManager._logWindow.push(`addText`, target.name() + `は立ち直った！`)
+		var targetName = target.name();
+		BattleManager._logWindow.push(`addText`, `${targetName}は立ち直った！`)
 		target.spriteOpacity(255, 20);
 	};
 
@@ -1695,7 +1701,8 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// gauge while break mode is up, then removes the marker.
 	AGH_stateApplyModeGaugeDown = function (user, target, stateId) {
 		if (target.isStateAffected(stateId - 2)) {
-			BattleManager._logWindow.push(`addText`, `${target.name()}の\\C[10]モードゲージ\\C[0]が20減少した！`)
+			var targetName = target.name();
+			BattleManager._logWindow.push(`addText`, `${targetName}の\\C[10]モードゲージ\\C[0]が20減少した！`)
 			state_applyCommonEffect(user, target, stateId, 261);
 			$gameTroop.losePartyLimitGauge(20);
 		}
@@ -1706,7 +1713,9 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// break-mode state instead of letting it expire, then removes the marker.
 	AGH_stateApplyBreakModeKeep = function (user, target, stateId) {
 		if (target.isStateAffected(stateId - 2)) {
-			BattleManager._logWindow.push(`addText`, `${target.name()}の\\C[1]＜${$dataStates[stateId - 2].name}＞\\C[0]のターンが初期化された！`)
+			var targetName = target.name();
+			var stateName = `\\C[1]＜${$dataStates[stateId - 2].name}＞\\C[0]`;
+			BattleManager._logWindow.push(`addText`, `${targetName}の${stateName}のターンが初期化された！`)
 			state_applyCommonEffect(user, target, stateId - 2, 261);
 		}
 		target.removeState(stateId);
@@ -1720,7 +1729,9 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// SyntaxError, so the whole notetag failed to compile. The backticks are
 	// restored here.
 	AGH_stateApplyBegForLife = function (user, target, stateId) {
-		BattleManager._logWindow.push(`addText`, `${target.name()}は\\sim[427]を始めた！`);
+		var targetName = target.name();
+		var stateName = `\\sim[427]`;
+		BattleManager._logWindow.push(`addText`, `${targetName}は${stateName}を始めた！`);
 		var pleaStateIds = [421, 436];
 		pleaStateIds.forEach(function (id) {
 			if (target.isStateAffected(id)) {
@@ -1852,7 +1863,8 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		if ($gameParty.aliveMembers().length === 1) {
 			user.addState(1);
 		} else {
-			BattleManager._logWindow.push(`addText`, `\\C[16]${user.name()}\\C[0]「は、早く倒してしまえっ！」`);
+			var userName = `\\C[16]${user.name()}\\C[0]`;
+			BattleManager._logWindow.push(`addText`, `${userName}「は、早く倒してしまえっ！」`);
 			user.spriteOpacity(0, 30);
 		}
 	};
@@ -1877,7 +1889,9 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 				var troopMembers = $gameTroop.members();
 				var troopCount = troopMembers.length;
 				if (troopCount >= 1) {
-					BattleManager._logWindow.push(`addText`, `${target.name()}の\\SIM[${stateId}]が発動！`);
+					var targetName = target.name();
+					var stateName = `\\SIM[${stateId}]`;
+					BattleManager._logWindow.push(`addText`, `${targetName}の${stateName}が発動！`);
 					user.startAnimation(509, true, 0);
 					for (var i = 0; i < troopCount; i++) {
 						troopMembers[i].startAnimation(132, true, 10);
@@ -1976,7 +1990,9 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// NOTE: the original passed `this` as the forEach thisArg, but the callback
 	// never referenced `this`; the argument is dropped.
 	AGH_stateTurnEndInotigoiMessage = function (user, target, stateId, simStateId, watchedStateIds) {
-		BattleManager._logWindow.push(`addText`, `${target.name()}は\\sim[${simStateId}]をしている…。`);
+		var targetName = target.name();
+		var stateName = `\\sim[${simStateId}]`;
+		BattleManager._logWindow.push(`addText`, `${targetName}は${stateName}をしている…。`);
 		watchedStateIds.forEach(function (id) {
 			if (!target.isStateAffected(id)) return;
 			var lines = $dataStates[stateId].meta['inotigoi' + id].split(',');
@@ -1990,7 +2006,9 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		if (!user.isAlive()) return;
 		var counterDamage = target._stateCounter[stateId];
 		if (counterDamage >= 1) {
-			BattleManager._logWindow.push(`addText`, `${target.name()}はターン中に\\C[10]${counterDamage}\\C[0]のダメージを受けた！`);
+			var targetName = target.name();
+			var damage = `\\C[10]${counterDamage}\\C[0]`;
+			BattleManager._logWindow.push(`addText`, `${targetName}はターン中に${damage}のダメージを受けた！`);
 			target.setStateCounter(stateId, 0);
 		}
 		var actor = $gameActors.actor(user.actorId());
@@ -2002,8 +2020,8 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		var motionType = Number(weaponData.meta['MotionType']);
 		var motionName = '';
 		if (motionType === 0) motionName = 'thrust';
-		if (motionType === 1) motionName = 'swing';
-		if (motionType === 2) motionName = 'missile';
+		else if (motionType === 1) motionName = 'swing';
+		else if (motionType === 2) motionName = 'missile';
 		user.requestMotion(motionName);
 		user.startWeaponAnimation(weaponNumber);
 	};
@@ -2013,11 +2031,14 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_stateTurnEndReportCounterDamageTp = function (user, target, stateId) {
 		if (!user.isAlive()) return;
 		var counterDamage = target._stateCounter[stateId];
+		var targetName = target.name();
+		var tpValue = `\\C[6]` + target.tp + `\\C[0]`;
 		if (counterDamage >= 1) {
-			BattleManager._logWindow.push(`addText`, target.name() + `のTP\\C[6]` + target.tp + `\\C[0]% ターン中に\\C[10]` + counterDamage + `\\C[0]のダメージを受けた！`);
+			var damage = `\\C[10]` + counterDamage + `\\C[0]`;
+			BattleManager._logWindow.push(`addText`, `${targetName}のTP${tpValue}% ターン中に${damage}のダメージを受けた！`);
 			target.setStateCounter(stateId, 0);
 		} else {
-			BattleManager._logWindow.push(`addText`, target.name() + `のTP\\C[6]` + target.tp + `\\C[0]%`);
+			BattleManager._logWindow.push(`addText`, `${targetName}のTP${tpValue}%`);
 		}
 	};
 
@@ -2097,8 +2118,9 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 
 	// Replaces (1x, state 94): the "runs away" battle start.
 	AGH_stateBattleFlee = function (user, target, stateId) {
-		BattleManager._logWindow.push(`addText`, `\\C[16]${user.name()}\\C[0]「ヒィィ～～っ！」`);
-		BattleManager._logWindow.push(`addText`, `\\C[16]${user.name()}\\C[0]は逃げ出した！`);
+		var userName = `\\C[16]${user.name()}\\C[0]`;
+		BattleManager._logWindow.push(`addText`, `${userName}「ヒィィ～～っ！」`);
+		BattleManager._logWindow.push(`addText`, `${userName}は逃げ出した！`);
 		AudioManager.playSe({ "name": 'Z_FootRun', "volume": 90, "pitch": 150, "pan": 0 });
 		user.spriteOpacity(0, 60);
 		$gameParty.move(user.index() + 1, 400, 0, 60);
@@ -2208,13 +2230,15 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 				$gameTroop.losePartyLimitGauge(5);
 			}
 		}
+		var targetName = target.name();
 		if (target.isStateAffected(415)) {
 			var gaugeLoss = Math.floor(20 * value / target.mhp).clamp(15, 50);
 			$gameTroop.losePartyLimitGauge(gaugeLoss);
 			if ($gameTroop.partyLimitGauge() <= 0) {
 				target.removeState(415);
 				target.addState(416);
-				BattleManager._logWindow.push(`addText`, target.name() + `が` + $dataStates[416].name + `になった！`);
+				var stateName = $dataStates[416].name;
+				BattleManager._logWindow.push(`addText`, `${targetName}が${stateName}になった！`);
 				state_applyCommonEffect(user, target, 416, 251);
 			}
 		}
@@ -2223,7 +2247,8 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		}
 		if ($gameTroop.partyLimitGaugeCurrent() >= 1) {
 			target.addState(415);
-			BattleManager._logWindow.push(`addText`, target.name() + `が` + $dataStates[415].name + `になった！`);
+			var stateName = $dataStates[415].name;
+			BattleManager._logWindow.push(`addText`, `${targetName}が${stateName}になった！`);
 			state_applyCommonEffect(user, target, 415, 252);
 		}
 		return value;
