@@ -2646,4 +2646,226 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 			element: 12
 		};
 	};
+
+	//=============================================================================
+	// Skill notetag code (data/Skills.json)
+	//----------------------------------------------------------------------------
+	// YEP_SkillCore eval's these bodies directly inside methods on
+	// Game_BattlerBase, with `item` bound to the skill and `user`/`a`/`subject` to
+	// the battler. <Custom Requirement> must leave its answer in `value` (which
+	// starts as true) and <Custom Show Eval> in `visible`; <Custom HP Cost> and
+	// <Custom TP Cost> must leave the new cost in `cost` (which starts as the
+	// skill's flat cost plus its per-MHP / per-maxTP share). <Custom Execution>
+	// returns nothing.
+	//
+	// Note that these are all direct eval's, so a body that throws leaves the
+	// answer at its initial value - the plugins wrap them in try/catch. Helpers
+	// that call Game_Actor-only methods (battleSkillsRaw, isAtypeEquipped, ...)
+	// therefore still behave identically when `user` is an enemy: the throw
+	// propagates out of the eval into the same catch.
+	//=============================================================================
+
+	// Replaces (1x, skill 23): requires switchId to be OFF.
+	AGH_skillRequireSwitchOff = function (user, item, switchId) {
+		return !$gameSwitches.value(switchId);
+	};
+
+	// Replaces (2x, skills 24 / 42): requires onSwitchId ON and offSwitchId OFF.
+	//   24: if (s201) { value = !s414 } else { value = false }
+	//   42: if (s213) { value = false } else { value = s202 }
+	// Both reduce to s[on] && !s[off].
+	AGH_skillRequireSwitchGate = function (user, item, onSwitchId, offSwitchId) {
+		return $gameSwitches.value(onSwitchId) && !$gameSwitches.value(offSwitchId);
+	};
+
+	// Replaces (143x, skills 80-399 / 831 / 832): usable only while the skill is
+	// equipped as a battle skill.
+	AGH_skillRequireEquippedAsBattleSkill = function (user, item) {
+		return user.battleSkillsRaw().contains(item.id);
+	};
+
+	// Replaces (5x, skills 256 / 258 / 306 / 308 / 356): requires an armor of
+	// atypeId to be equipped.
+	AGH_skillRequireArmorTypeEquipped = function (user, item, atypeId) {
+		return user.isAtypeEquipped(atypeId);
+	};
+
+	// Replaces (9x, skills 701-704 / 706-710): requires a weapon of wtypeId to be
+	// equipped.
+	AGH_skillRequireWeaponTypeEquipped = function (user, item, wtypeId) {
+		return user.isWtypeEquipped(wtypeId);
+	};
+
+	// Replaces (7x, skills 711-717): requires stateId to be active.
+	AGH_skillRequireStateAffected = function (user, item, stateId) {
+		return user.isStateAffected(stateId);
+	};
+
+	// Replaces (1x, skill 373): usable outside battle, or while the party holds
+	// more gold than the value stored in goldVariableId.
+	AGH_skillRequireNotInBattleOrGoldAbove = function (user, item, goldVariableId) {
+		return !$gameParty.inBattle() || $gameParty.gold() > $gameVariables.value(goldVariableId);
+	};
+
+	// Replaces (34x, skills 600-633): free for allies, but an enemy needs at least
+	// tpThreshold TP.
+	AGH_skillRequireEnemyTpOrAlly = function (user, item, tpThreshold) {
+		if (!user.isEnemy()) return true;
+		return user.tp >= tpThreshold;
+	};
+
+	// Replaces (1x, skill 681): only listed while stateId is active.
+	AGH_skillShowEvalStateAffected = function (user, item, stateId) {
+		return user.isStateAffected(stateId);
+	};
+
+	// Replaces (1x, skill 363): HP cost is a rounded share of the user's CURRENT
+	// hp - `user.hp / divisor * multiplier`, i.e. divisor 99 / multiplier 100
+	// charges a little more than every point of HP the user has left.
+	AGH_skillHpCostFromCurrentHp = function (user, item, divisor, multiplier) {
+		return Math.round(user.hp / divisor * multiplier);
+	};
+
+	// Replaces (34x, skills 600-633): enemies pay tpSurcharge more TP.
+	AGH_skillTpCostEnemySurcharge = function (user, item, cost, tpSurcharge) {
+		if (user.isEnemy()) cost += tpSurcharge;
+		return cost;
+	};
+
+	// Replaces (1x, skill 90): writes each [variableId, value] pair.
+	AGH_skillExecutionSetVariables = function (user, item, pairs) {
+		for (var i = 0; i < pairs.length; i++) {
+			$gameVariables.setValue(pairs[i][0], pairs[i][1]);
+		}
+	};
+
+	// Replaces (1x, skill 373 ルビフリップ): spends the gold amount the player
+	// has parked in goldVariableId (the menu-driven 消費額 the skill toggles).
+	AGH_skillExecutionLoseGoldFromVariable = function (user, item, goldVariableId) {
+		$gameParty.loseGold($gameVariables.value(goldVariableId));
+	};
+
+	//=============================================================================
+	// Custom targets (data/Skills.json, data/Items.json <Custom Target Eval>)
+	//----------------------------------------------------------------------------
+	// Different scope from the tags above: YEP_TargetCore's makeEvalTargets fills
+	// and RETURNS a local `targets` array, with `user` = the action's subject and
+	// `foes`/`allies` = the opposing / friendly unit. The helpers push into the
+	// array the caller passes in, because that array is the return value.
+	//
+	// The tag is owned by YEP_TargetCore, not YEP_SkillCore, so it applies to
+	// items as well as skills - hence the neutral AGH_targetEval prefix.
+	//=============================================================================
+
+	// Replaces (1x, skill 17): every living foe whose level is a multiple of 3.
+	AGH_targetEvalFoesLevelMultipleOf3 = function (targets, foes) {
+		var aliveFoes = foes.aliveMembers();
+		for (var i = 0; i < aliveFoes.length; ++i) {
+			var member = aliveFoes[i];
+			if (member.level % 3 === 0) targets.push(member);
+		}
+	};
+
+	// Replaces (2x, skill 369 五神の慈しみ / item 99 ラスト・エリクサー): the whole
+	// party.
+	// BUGFIX: both originals pushed into `target` - a single Game_Battler, which
+	// has no push() - instead of `targets`. makeEvalTargets threw, YEP's
+	// try/catch swallowed it and the skill/item silently targeted nothing at all.
+	AGH_targetEvalAllPartyBattleMembers = function (targets) {
+		var members = $gameParty.battleMembers();
+		for (var i = 0; i < members.length; ++i) {
+			targets.push(members[i]);
+		}
+	};
+
+	// Replaces (1x, skill 949 五神の慈しみ): the whole troop.
+	// BUGFIX: same `target` -> `targets` mistake as the party version above.
+	AGH_targetEvalAllTroopMembers = function (targets) {
+		var members = $gameTroop.members();
+		for (var i = 0; i < members.length; ++i) {
+			targets.push(members[i]);
+		}
+	};
+
+	//=============================================================================
+	// Class base parameter formulas (data/Classes.json <Custom Class Parameters>)
+	//----------------------------------------------------------------------------
+	// WARNING: this tag is NOT a plain eval block. YEP_X_ClassBaseParam parses each
+	// line as "<PARAM> = <expression>", keeps ONLY the expression, and appends it
+	// to baseParamFormula[paramId]. That per-parameter string is then eval'd on its
+	// own in Game_Actor.classBaseParamFormula, where `this`/`user` is the actor and
+	// `level` is the level being computed.
+	//
+	// So only the right-hand side of each line can be migrated. Replacing the whole
+	// body with a call would leave the formula empty, paramBase() would fall back
+	// to the default, and every class would silently revert to its editor values.
+	//=============================================================================
+
+	// Replaces (10x, classes 1-5 / 21-25): the per-actor growth curve.
+	//   <PARAM> = level * statas[i] * ceil(level / 20) * classRank + statas[i] * 2
+	AGH_classBaseParamActorStatas = function (user, level, statas, statIndex) {
+		var base = statas[statIndex];
+		var classRank = Number($dataClasses[user._classId].meta['classRank']);
+		return level * base * Math.ceil(level / 20) * classRank + base * 2;
+	};
+
+	// Replaces (35x, classes 41-80): subclass growth, scaled by a tier multiplier
+	// of 1 / 2 / 3.
+	//   <PARAM> = this.classLevel(this._subclassId) * statas[i] * multiplier
+	AGH_classBaseParamSubclassStatas = function (user, statas, statIndex, multiplier) {
+		return user.classLevel(user._subclassId) * statas[statIndex] * multiplier;
+	};
+
+	//=============================================================================
+	// Equipment notetag code (data/Armors.json, data/Weapons.json)
+	//----------------------------------------------------------------------------
+	// YEP_X_EquipRequirements eval's <Custom Equip Requirement Condition> inside
+	// meetEquipEvalRequirements(item) with `condition` as the answer (starting
+	// true) and `user`/`a`/`subject` bound to the battler; `item` is the function
+	// argument, so it is in scope.
+	//
+	// YEP_EquipCore accumulates <Custom Parameters> into item.parameterEval and
+	// eval's the WHOLE block once per parameter in evalParamPlus(item, paramId),
+	// with maxhp/maxmp/atk/def/mat/mdf/agi/luk/all pre-declared and `user` bound to
+	// the actor. Each line assigns one of those locals, so again only the
+	// right-hand side moves.
+	//=============================================================================
+
+	// Replaces (20x, armors 81-100): equippable once at least one of skillIds has
+	// been learned.
+	AGH_equipReqConditionLearnedAny = function (user, item, skillIds) {
+		for (var i = 0; i < skillIds.length; i++) {
+			if (user.isLearnedSkill(skillIds[i])) return true;
+		}
+		return false;
+	};
+
+	// Replaces (2x, weapons 81 / 82): equippable only by the actor whose id sits
+	// actorIdOffset above the weapon's own id.
+	AGH_equipReqConditionActorMatchesOffset = function (user, item, actorIdOffset) {
+		return user.actorId() === item.id - actorIdOffset;
+	};
+
+	// Replaces (8x, armor 104): the parameter scales with the wearer's level.
+	AGH_equipParamFromActorLevel = function (user, item, perLevel) {
+		return user.level * perLevel;
+	};
+
+	// Replaces (1x, weapon 2): the parameter is read straight out of a game
+	// variable.
+	AGH_equipParamFromVariable = function (user, item, variableId) {
+		return $gameVariables.value(variableId);
+	};
+
+	// Replaces (2x, weapons 2 / 3): `all` is split evenly between the battle
+	// members, so it is added to every parameter.
+	AGH_equipParamAllSplitAmongParty = function (user, item, total) {
+		return total / $gameParty.battleMembers().length;
+	};
+
+	// Replaces (16x, weapons 81 / 82): the parameter is one cell of a game
+	// variable row, addressed by the weapon's own id.
+	AGH_equipParamFromVariableRow = function (user, item, variableId, idOffset, statIndex) {
+		return $gameVariables.value(variableId)[item.id - idOffset][statIndex];
+	};
 })();
