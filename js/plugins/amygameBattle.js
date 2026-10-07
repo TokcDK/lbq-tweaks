@@ -1020,7 +1020,10 @@ ak1ApplyValueAttackHit = function (user, stateArray, stateMetaName) {
 }
 
 //属性耐性ダウン付与
-Element_DebuffRateA = function (target, stateId) {
+// Renamed from Element_DebuffRateA: the A/R suffix carried no meaning and the
+// function is only ever called from a <Custom Apply Effect> notetag. See
+// state_removeElementDebuffRate below for the removal counterpart.
+state_applyElementDebuffRate = function (target, stateId) {
 
   if (target._stateCounter[stateId] < 0.001) {
     target.setStateCounter(stateId, 0);
@@ -1035,7 +1038,8 @@ Element_DebuffRateA = function (target, stateId) {
 };
 
 //属性耐性ダウン解除
-Element_DebuffRateR = function (target, stateId) {
+// Renamed from Element_DebuffRateR (see state_applyElementDebuffRate above).
+state_removeElementDebuffRate = function (target, stateId) {
 
   if (target._stateCounter[stateId] >= 1) {
     const code = 11;
@@ -1048,9 +1052,16 @@ Element_DebuffRateR = function (target, stateId) {
 };
 
 //ステート付与時のアクション
+//
+// Renamed from state_addEffect1. This is the shared "<Custom Apply Effect>"
+// entry point referenced by ~200 states in data/states.json: it registers the
+// state in the per-battler resistance slot, chains the <stateAddState:...>
+// reactions and plays the animation / name popup. The trailing "1" was a
+// meaningless copy-paste index, so it was dropped; every call site in
+// data/states.json was renamed with it.
 const defaultPopupColorArray = [255, 128, 0, 255, 256];
 const alternativePopupColorArray = [255, 0, 187, 189, 256];
-state_addEffect1 = function (user, target, stateId, animationId) {
+state_applyCommonEffect = function (user, target, stateId, animationId) {
 
   if (!$gameTroop.isAllDead() && $gameParty.inBattle()) {
     const stateData = $dataStates[stateId];
@@ -1092,7 +1103,10 @@ state_addEffect1 = function (user, target, stateId, animationId) {
 };
 
 //ステート解除時のアクション
-state_removeEffect1 = function (user, target, stateId, animationId) {
+//
+// Renamed from state_removeEffect1: the removal counterpart of
+// state_applyCommonEffect above (animation + "was removed" battle-log line).
+state_removeCommonEffect = function (user, target, stateId, animationId) {
 
   user.removeStateCounter(stateId);
   if (!$gameTroop.isAllDead() && $gameParty.inBattle()) {
@@ -5003,8 +5017,12 @@ battle_simpleSubjugation = function (subjugationId) {
   }
 };
 
-//state_addbuffdebuff(1,2,user,target,stateId,271);
-state_addbuffdebuff = function (isBuff, requestedBuffParamId, user, target, stateId, animationId) {
+// Renamed from state_addbuffdebuff (and state_removebuffdebuff /
+// state_turnEndbuffdebuff below) so the compound words are readable. Called
+// from the <Custom Apply Effect> / <Custom Remove Effect> notetags of the
+// 206-217 stat-up/down states in data/states.json.
+//state_addBuffDebuff(1,2,user,target,stateId,271);
+state_addBuffDebuff = function (isBuff, requestedBuffParamId, user, target, stateId, animationId) {
 
   var buffParamId = requestedBuffParamId;
   var turns = getRandomIndex(3) + 3;
@@ -5014,7 +5032,7 @@ state_addbuffdebuff = function (isBuff, requestedBuffParamId, user, target, stat
     target.addDebuff(buffParamId, turns);
   };
   if (target._stateCounter[stateId] >= 5) { } else {
-    state_addEffect1(user, target, stateId, animationId);
+    state_applyCommonEffect(user, target, stateId, animationId);
   };
   if (target._stateCounter[stateId] >= 1) {
     target.addStateCounter(stateId, +1);
@@ -5024,20 +5042,22 @@ state_addbuffdebuff = function (isBuff, requestedBuffParamId, user, target, stat
 
 };
 
-//state_removebuffdebuff(1,2,user,target,stateId,271);
-state_removebuffdebuff = function (id, buffId, user, target, stateId, animationId) {
+//state_removeBuffDebuff(1,2,user,target,stateId,271);
+state_removeBuffDebuff = function (id, buffId, user, target, stateId, animationId) {
 
   if ($gameTroop.isAllDead() || target._buffs[buffId] < 1) { } else {
     target.removeState(stateId);
     target.removeBuff(buffId);
     //BattleManager._logWindow.push(`addText`, id2.name() + `の`+$dataStates[id3].name+`が解除された`);
-    state_removeEffect1(user, target, stateId, animationId);
+    state_removeCommonEffect(user, target, stateId, animationId);
   };
 
 };
 
-//state_turnEndbuffdebuff(1,2,user,target,stateId,271);
-state_turnEndbuffdebuff = function (mode, buffId, user, target, stateId, animationId) {
+//state_turnEndBuffDebuff(1,2,user,target,stateId,271);
+// NOTE: not referenced by any notetag in the data files; kept for parity with
+// the add/remove pair above.
+state_turnEndBuffDebuff = function (mode, buffId, user, target, stateId, animationId) {
 
   user.removeStateCounter(stateId);
   let removeEffect
@@ -5049,7 +5069,7 @@ state_turnEndbuffdebuff = function (mode, buffId, user, target, stateId, animati
   if (removeEffect) {
     target.removeState(stateId);
     //id2.removeBuff(value1);
-    state_removeEffect1(user, target, stateId, animationId);
+    state_removeCommonEffect(user, target, stateId, animationId);
   };
 
 };

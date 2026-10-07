@@ -1018,4 +1018,746 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 
 		return valueDropItemIndex;
 	};
+
+	//=============================================================================
+	// State notetag effects (data/states.json <Custom Apply Effect> /
+	// <Custom Remove Effect>)
+	//----------------------------------------------------------------------------
+	// YEP_BuffsStatesCore runs each of those notetag bodies through a *direct*
+	// `eval` inside Game_Battler.prototype.customEffectEval, so a body can see:
+	//
+	//   this === user === target === the battler the state sits on
+	//   stateId                       the state being applied / removed
+	//   a, origin, s, v              plugin aliases (unused by any body here)
+	//
+	// The bodies were moved out of the database into the functions below and are
+	// invoked as a single call from the notetag, e.g.
+	//
+	//   <Custom Apply Effect>
+	//   AGH_stateApplyPoisonStack(user,target,stateId);
+	//   </Custom Apply Effect>
+	//
+	// Two details make the move behaviour-preserving:
+	//   * the plugin still wraps the call in its try/catch, so a failure is still
+	//     reported as "CUSTOM STATE <id> CODE ERROR" with the same granularity;
+	//   * `var` declarations inside the eval'd body were local to
+	//     customEffectEval anyway (sloppy-mode direct eval hoists them into the
+	//     calling function's variable environment), so nothing leaked to globals
+	//     before and nothing leaks now.
+	//
+	// Where several states shared one body the body is parameterised instead of
+	// duplicated, and the generic `value1..value9` / `arr1..arr9` locals were
+	// renamed after what they actually hold.
+	//
+	// The state ids below are only documentation - every function is driven by
+	// the stateId it is handed at runtime.
+	//=============================================================================
+
+	// --- Collapse / death -------------------------------------------------------
+
+	// Replaces (1x, state 1 戦闘不能): a unit that carries state 390 and still has
+	// 30% MP is revived instead of collapsing; otherwise the enemy drop roll runs
+	// and, when a special collapse animation has already wiped the troop, the
+	// surviving lead member is faded out.
+	AGH_stateApplyCollapse = function (user, target, stateId) {
+		if (user.isStateAffected(390) && user.mpRate() >= 0.3) {
+			user.removeState(stateId);
+			var reviveHp = Math.ceil(user.mmp * 0.3);
+			user.gainHp(reviveHp);
+			var reviveMpCost = Math.ceil(user.mmp * 0.3);
+			user.gainMp(-reviveMpCost);
+			user.startDamagePopup();
+			user.clearResult();
+			user.startAnimation(436, false, 0);
+		} else {
+			if (user.isEnemy()) {
+				enemy_dropSelection(user);
+			};
+			if (valueCollapseAnime >= 1 && user.isEnemy()) {
+				if ($gameTroop.aliveMembers().length == 0) {
+					$gameTroop.members()[0].spriteOpacity(0, 120);
+					pic_eraseP(0, [51, 52, 53, 54, 55, 56, 57]);
+					$gameTroop.members()[0].startAnimation(valueCollapseAnime, false, 40);
+				};
+			};
+		};
+	};
+
+	// Replaces (1x, state 38 即死): instant death, guarded so that an already
+	// collapsed target is not killed twice.
+	AGH_stateApplyInstantDeath = function (user, target, stateId) {
+		if (!target.isStateAffected(1) && $gameParty.inBattle()) {
+			state_applyCommonEffect(user, target, stateId, 260);
+			BattleManager._logWindow.push(`addText`, target.name() + `に` + $dataStates[stateId].name + `が発動した！`)
+			target.gainHp(-999999);
+			target.addState(1);
+		}
+	};
+
+	// Replaces (4x, states 411 ボス / 412 大ボス / 413 ラスボス / 414 真のボス):
+	// picks the collapse animation a dying boss uses and, for everything above
+	// the plain ボス tier, also grants state 289 敵者適合.
+	//
+	// respectState436 mirrors the database: states 411/412 only overwrote
+	// valueCollapseAnime while state 436 人類種 was absent, while 413/414
+	// assigned it unconditionally.
+	AGH_stateApplyBossCollapse = function (user, target, animeId, respectState436, addSacredState) {
+		if (!respectState436 || !target.isStateAffected(436)) {
+			valueCollapseAnime = animeId;
+		};
+		if (addSacredState) {
+			user.addState(289);
+		};
+	};
+
+	// --- Counter ladders --------------------------------------------------------
+
+	// Replaces (1x, state 4 毒): poison stacks; the fifth application is converted
+	// into state 12 猛毒 and the counter is cleared.
+	AGH_stateApplyPoisonStack = function (user, target, stateId) {
+		if ($gameParty.inBattle()) {
+			state_applyCommonEffect(user, target, stateId, 261);
+			if (target._stateCounter[stateId] >= 5) {
+				target.addState(12);
+				target.removeStateCounter(stateId);
+				target.removeState(stateId);
+			} else {
+				if (target._stateCounter[stateId] >= 1) {
+					target.addStateCounter(stateId, +1);
+				} else {
+					target.setStateCounter(stateId, 1);
+				};
+			};
+		};
+	};
+
+	// Replaces (1x, state 31 疲労操作用非表示): five-step fatigue ladder
+	// 32 疲労(小) -> 37 疲労(ブラック).
+	AGH_stateApplyFatigueTier = function (user, target, stateId) {
+		state_applyCommonEffect(user, target, stateId, 261);
+		if (target._stateCounter[stateId] >= 5) {
+			target.addState(37);
+			target.removeState(36);
+			target.removeState(stateId);
+			target.addStateCounter(stateId, +1);
+		} else if (target._stateCounter[stateId] >= 4) {
+			target.addState(36);
+			target.removeState(35);
+			target.addStateCounter(stateId, +1);
+		} else if (target._stateCounter[stateId] >= 3) {
+			target.addState(35);
+			target.removeState(34);
+			target.addStateCounter(stateId, +1);
+		} else if (target._stateCounter[stateId] >= 2) {
+			target.addState(34);
+			target.removeState(33);
+			target.addStateCounter(stateId, +1);
+		} else if (target._stateCounter[stateId] >= 1) {
+			target.addState(33);
+			target.removeState(32);
+			target.addStateCounter(stateId, +1);
+		} else {
+			target.setStateCounter(stateId, 1);
+			target.addState(32);
+		};
+	};
+
+	// Replaces (1x, state 31 疲労操作用非表示): tears the whole fatigue ladder down.
+	AGH_stateRemoveFatigueTier = function (user, target, stateId) {
+		state_removeCommonEffect(user, target, stateId, 262);
+		target.removeState(stateId);
+		target.setStateCounter(stateId, 0);
+		target.removeState(32);
+		target.removeState(33);
+		target.removeState(34);
+		target.removeState(35);
+		target.removeState(36);
+	};
+
+	// Replaces (1x, state 42 呪苛): five applications upgrade to stateId+1.
+	AGH_stateApplyCurseTorment = function (user, target, stateId) {
+		state_applyCommonEffect(user, target, stateId, 261);
+		if (target._stateCounter[stateId] >= 5) {
+			target.addState(stateId + 1);
+			target.removeState(stateId);
+		} else {
+			if (target._stateCounter[stateId] >= 1) {
+				target.addStateCounter(stateId, +1);
+			} else {
+				target.setStateCounter(stateId, 1);
+			}
+		};
+	};
+
+	// Replaces (1x, state 42 呪苛): only play the removal effect when the upgraded
+	// state is still on the target.
+	AGH_stateRemoveCurseTorment = function (user, target, stateId) {
+		if (target.isStateAffected(stateId + 1)) {
+			state_removeCommonEffect(user, target, stateId, 262);
+		};
+	};
+
+	// Replaces (3x, states 44 恐怖 / 45 恐慌 / 46 狂乱): if a stronger tier of the
+	// same family is already active the incoming state is not stacked but
+	// escalated straight to stateId+1; otherwise it stacks up to five and then
+	// escalates. higherTierCount is how many tiers above this one the family has
+	// (3 / 2 / 1 for 44 / 45 / 46).
+	AGH_stateApplyEscalatingTier = function (user, target, stateId, higherTierCount) {
+		var higherTierIds = [];
+		for (var tier = 1; tier <= higherTierCount; tier++) {
+			higherTierIds.push(stateId + tier);
+		}
+		if (higherTierIds.some(function (id) { return target.isStateAffected(id) })) {
+			target.addState(stateId + 1);
+			target.removeState(stateId);
+		} else {
+			state_applyCommonEffect(user, target, stateId, 261);
+			if (target._stateCounter[stateId] >= 5) {
+				target.addState(stateId + 1);
+				target.removeState(stateId);
+			} else {
+				if (target._stateCounter[stateId] >= 1) {
+					target.addStateCounter(stateId, +1);
+				} else {
+					target.setStateCounter(stateId, 1);
+				}
+			};
+		};
+	};
+
+	// Replaces (3x, states 44 恐怖 / 45 恐慌 / 46 狂乱): the escalation counterpart.
+	//
+	// NOTE: the condition is the *opposite* of AGH_stateRemoveCurseTorment /
+	// AGH_stateRemoveStanceUpgrade - the database wrote
+	//   if([higher tiers].some(...)) {} else { <removal effect> }
+	// so the removal effect only plays when the state really expired rather than
+	// being swallowed by an escalation. higherTierCount is 3 / 2 / 1.
+	AGH_stateRemoveEscalatingTier = function (user, target, stateId, higherTierCount) {
+		var higherTierIds = [];
+		for (var tier = 1; tier <= higherTierCount; tier++) {
+			higherTierIds.push(stateId + tier);
+		}
+		if (!higherTierIds.some(function (id) { return target.isStateAffected(id) })) {
+			state_removeCommonEffect(user, target, stateId, 262);
+		};
+	};
+
+	// Replaces (2x, states 402 超覚醒 / 403 限界超越): drops the weaker
+	// abnormal-state tiers below this one and re-registers the normal-abnormal
+	// class. lowerTierCount is 1 / 2 for 402 / 403.
+	AGH_stateApplyAwakeningTier = function (user, target, stateId, lowerTierCount) {
+		for (var tier = 1; tier <= lowerTierCount; tier++) {
+			if (target.isStateAffected(stateId - tier)) {
+				target.removeState(stateId - tier);
+			};
+		};
+		abNomal_Clear(target, target, stateId, 2);
+	};
+
+	// Replaces (1x, state 662 ブレイブコマンド): distributes the four command
+	// counters recorded on the caster to the matching party / enemy members, then
+	// consumes the state.
+	//
+	// NOTE: the counter is re-read from target._stateCounter on every line on
+	// purpose. When the target is itself a party member, the
+	// actor.setStateCounter(...) inside the loops overwrites the array, and the
+	// original observed that overwrite; caching the array first would change the
+	// result.
+	AGH_stateApplyBraveCommand = function (user, target, stateId) {
+		state_applyCommonEffect(user, target, stateId, 274);
+		if (target._stateCounter[stateId][0] >= 0) {
+			if (target._stateCounter[stateId][0] >= 1) {
+				for (var i = 0; i < $gameParty.battleMembers().length; i++) {
+					var actor = $gameParty.battleMembers()[i];
+					actor.addState(663);
+					actor.setStateCounter(stateId, target._stateCounter[stateId][0]);
+				};
+			};
+			if (target._stateCounter[stateId][1] >= 1) {
+				for (var i = 0; i < $gameParty.battleMembers().length; i++) {
+					var actor = $gameParty.battleMembers()[i];
+					actor.addState(664);
+					actor.setStateCounter(stateId, target._stateCounter[stateId][1]);
+				};
+			};
+			if (target._stateCounter[stateId][2] >= 1) {
+				for (var i = 0; i < $gameTroop.members().length; i++) {
+					var enemy = $gameTroop.members()[i];
+					enemy.addState(665);
+					enemy.setStateCounter(stateId, target._stateCounter[stateId][2]);
+				};
+			};
+			if (target._stateCounter[stateId][3] >= 1) {
+				for (var i = 0; i < $gameParty.battleMembers().length; i++) {
+					var actor = $gameParty.battleMembers()[i];
+					actor.addState(666);
+					actor.setStateCounter(stateId, target._stateCounter[stateId][3]);
+				};
+			};
+			target.removeState(stateId);
+			target.removeStateCounter(stateId);
+			target.addCooldown(217, +5);
+		} else {
+			target.setStateCounter(stateId, [0, 0, 0, 0]);
+		};
+	};
+
+	// Replaces (4x, states 663 強化号令 / 664 攻撃号令 / 665 弱体号令 / 666 回復号令):
+	// rebuilds the state's trait set for the stored counter value, then runs the
+	// shared add effect.
+	AGH_stateApplyCommandOrder = function (user, target, stateId) {
+		traitBattle_changeSetting(user, stateId, user._stateCounter[stateId]);
+		state_applyCommonEffect(user, target, stateId, 274);
+	};
+
+	// Replaces (4x, states 663-666): the removal counterpart.
+	AGH_stateRemoveCommandOrder = function (user, target, stateId) {
+		state_removeCommonEffect(user, target, stateId, 275);
+		user.removeStateCounter(stateId);
+	};
+
+	// --- Flat stat / damage conversions -----------------------------------------
+
+	// Replaces (1x, state 157 魔装): turns MAT into a flat Atk/Def/Mdf/Agi/Luk
+	// bonus and remembers the granted amount in the state counter.
+	AGH_stateApplyMagicArmor = function (user, target, stateId) {
+		var masteryMultiplier = 1 + (user.skillMasteryLevel(307) / 100 * 2);
+		if (masteryMultiplier == 0) { masteryMultiplier = 1 };
+		var statBonus = Math.round(user.mat / 100 * 20 * masteryMultiplier);
+		user.setStateCounter(stateId, statBonus);
+		user.addAtk(statBonus);
+		user.addDef(statBonus);
+		user.addMdf(statBonus);
+		user.addAgi(statBonus);
+		user.addLuk(statBonus);
+		var popupText = `Atk/Def/Dex/Agi/Luk20%up!`;
+		target.startMessagePopup(popupText, [255, 0, 0, 255, 0, 256]);
+		state_applyCommonEffect(user, target, stateId, 271);
+	};
+
+	// Replaces (1x, state 157 魔装): gives the stored bonus back.
+	AGH_stateRemoveMagicArmor = function (user, target, stateId) {
+		if (user.getStateCounter(stateId) >= 1) {
+			var statBonus = user.getStateCounter(stateId);
+			user.minusAtk(statBonus);
+			user.minusDef(statBonus);
+			user.minusMdf(statBonus);
+			user.minusAgi(statBonus);
+			user.minusLuk(statBonus);
+			var popupText = `Atk/Def/Dex/Agi/Luk20%Down…`;
+			target.startMessagePopup(popupText, [255, 0, 187, 189, 0, 256]);
+		};
+		user.removeStateCounter(stateId);
+		state_removeCommonEffect(user, target, stateId, 272);
+	};
+
+	// Replaces (1x, state 895 デストロイ・フォーム): converts the unit's current DEF
+	// into ATK and remembers how much was moved.
+	AGH_stateApplyDestroyForm = function (user, target, stateId) {
+		var convertedDef = user.def;
+		user.setStateCounter(stateId, convertedDef);
+		user.addAtk(convertedDef);
+		user.minusDef(convertedDef);
+		state_applyCommonEffect(user, target, stateId, 274);
+	};
+
+	// Replaces (1x, state 895 デストロイ・フォーム): moves the DEF back.
+	AGH_stateRemoveDestroyForm = function (user, target, stateId) {
+		if (user.getStateCounter(stateId) >= 1) {
+			var convertedDef = user.getStateCounter(stateId);
+			user.minusAtk(convertedDef);
+			user.addDef(convertedDef);
+		};
+		user.removeStateCounter(stateId);
+		state_removeCommonEffect(user, target, stateId, 275);
+	};
+
+	// Replaces (1x, state 155 ファルサス・ガード): pays the accumulated counter out
+	// as direct damage when the guard drops, then logs the amount.
+	//
+	// BUGFIX: the database body called `this.changeHp(user, -value1, true)`.
+	// changeHp only ever existed on Game_Interpreter, never on Game_Battler, so
+	// every removal of state 155 threw a TypeError that the plugin's try/catch
+	// swallowed - the stored damage was never dealt and the two lines after it
+	// never ran. The body below reproduces Game_Interpreter.changeHp(target,
+	// value, allowDeath) semantics on the battler instead.
+	AGH_stateRemoveFalSasGuard = function (user, target, stateId) {
+		var accumulatedDamage = user.getStateCounter(stateId);
+		if (user.isAlive()) {
+			user.gainHp(-accumulatedDamage);
+			if (user.isDead()) user.performCollapse();
+		}
+		var logText = `${user.name()}の${$dataStates[stateId].name}が解除！ 蓄積ダメージ\\C[10]${accumulatedDamage}\\C[0]を受けた…`;
+		BattleManager._logWindow.push(`addText`, logText);
+		user.removeStateCounter(stateId);
+		user.removeState(stateId);
+	};
+
+	// Replaces (1x, state 849 二王の諍い): one hit of damage per abnormal state on
+	// the unit, then the state consumes itself.
+	//
+	// BUGFIX: the damage line read `user.gainHp(-value)`, but no variable named
+	// `value` is in scope there (only the unrelated implicit global written by
+	// amygame.js while setting up boss battles), so the notetag either threw a
+	// ReferenceError or dealt NaN damage. The accumulated count is used instead.
+	// If the intent was a flat 1 damage per hit, change the one line to
+	// `user.gainHp(-1)`.
+	AGH_stateApplyTwoKingsFeud = function (user, target, stateId) {
+		state_applyCommonEffect(user, target, stateId, 271);
+		if (user.isAlive()) {
+			var abnormalStateCount = 0;
+			for (var i = 1; i <= $dataStates.length - 1; i++) {
+				if ($dataStates[i].meta['StateabNomal'] || $dataStates[i].meta['StateSPabNomal'] || $dataStates[i].meta['StateUnique']) {
+					if (user.isStateAffected(i)) {
+						abnormalStateCount += 1;
+					}
+				}
+			};
+			if (abnormalStateCount >= 1) {
+				for (var i = 1; i <= abnormalStateCount; i++) {
+					if (user.isAlive()) {
+						user.gainHp(-abnormalStateCount);
+						user.startDamagePopup();
+						user.clearResult();
+					} else {
+						break;
+					};
+				};
+			};
+			user.removeState(stateId);
+		};
+	};
+
+	// --- Random / rolled effects ------------------------------------------------
+
+	// Replaces (1x, state 299 ランダムバフ): grants one random stat buff for 3-5
+	// turns.
+	//
+	// NOTE: the database removed the state *before* running the shared add effect,
+	// which is kept here so the animation/popup still plays after the state is
+	// gone.
+	AGH_stateApplyRandomBuff = function (user, target, stateId) {
+		target.removeState(stateId);
+		var buffParamId = [2, 3, 4, 5, 6, 7][getRandomIndex(6)]
+		var buffTurns = getRandomIndex(3) + 3;
+		target.addBuff(buffParamId, buffTurns);
+		state_applyCommonEffect(user, target, stateId, 271);
+	};
+
+	// Replaces (1x, state 301 ランダムデバフ): applies one random resistance-down
+	// state, then removes the marker state.
+	//
+	// NOTE: the second random draw is unused by the original body but is kept
+	// because it advances the RNG stream, and every later roll in the same action
+	// depends on that position.
+	AGH_stateApplyRandomDebuff = function (user, target, stateId) {
+		var debuffStateId = [212, 213, 214, 215, 216, 217][getRandomIndex(6)]
+		var unusedTurnsDraw = getRandomIndex(3) + 3; //RNG stream position
+		target.addState(debuffStateId);
+		state_applyCommonEffect(user, target, stateId, 277);
+		target.removeState(stateId);
+	};
+
+	// Replaces (1x, state 320 属性弱体): on a 6-in-11 roll, applies the
+	// resistance-down state matching the attacker's own element tag, then removes
+	// the marker. No element tag means no effect.
+	AGH_stateApplyElementBreak = function (user, target, stateId) {
+		if (target.isAlive()) {
+			var weaknessStateId = 0;
+			var elementRoll = getRandomIndex(11);
+			if (elementRoll >= 6) {
+				if (user.isStateAffected(51)) { weaknessStateId = 311 };
+				if (user.isStateAffected(52)) { weaknessStateId = 312 };
+				if (user.isStateAffected(53)) { weaknessStateId = 313 };
+				if (user.isStateAffected(54)) { weaknessStateId = 314 };
+				if (user.isStateAffected(55) || user.isStateAffected(58)) { weaknessStateId = 315 };
+				if (user.isStateAffected(56) || user.isStateAffected(59)) { weaknessStateId = 316 };
+				if (user.isStateAffected(49)) { weaknessStateId = 318 };
+				if (user.isStateAffected(50)) { weaknessStateId = 319 };
+				if (weaknessStateId >= 1) {
+					state_addFormula1([weaknessStateId, 50, user, target, user.mdf, target.luk]);
+				};
+			};
+		};
+		target.removeState(stateId);
+	};
+
+	// --- Element resistance -----------------------------------------------------
+
+	// Replaces (9x, states 311-319 element weakness): lowers the target's
+	// resistance to the state's element, then runs the shared add effect.
+	AGH_stateApplyElementWeakness = function (user, target, stateId) {
+		state_applyElementDebuffRate(target, stateId);
+		state_applyCommonEffect(user, target, stateId, 277);
+	};
+
+	// Replaces (9x, states 311-319 element weakness): restores the resistance.
+	AGH_stateRemoveElementWeakness = function (user, target, stateId) {
+		state_removeElementDebuffRate(target, stateId);
+		state_removeCommonEffect(user, target, stateId, 278);
+	};
+
+	// Replaces (2x, states 55 光属性 / 56 闇属性): enemy-only element tag swap, e.g.
+	// 55 -> 58 when a light element is applied.
+	AGH_stateApplyElementSwap = function (user, target, stateId, addStateId) {
+		if (user.isEnemy()) {
+			user.removeState(stateId);
+			user.addState(addStateId);
+		};
+	};
+
+	// Replaces (1x, state 62 破損): chains into the follow-up state
+	// (70 衣装破損).
+	AGH_stateApplyFollowUpState = function (user, target, stateId, addStateId) {
+		target.addState(addStateId);
+	};
+
+	// --- Guard ladders ----------------------------------------------------------
+
+	// Replaces (24x, states 515-538 属性の加護 family): the six element guard tiers
+	// (小 / 中 / 大 / 極大) form a ladder whose rungs are six state ids apart.
+	// tier is 0 for 小, 1 for 中, 2 for 大, 3 for 極大:
+	//   * a stronger tier already on the unit cancels the incoming weaker one;
+	//   * the incoming tier clears every weaker tier below it;
+	//   * the shared add effect runs last.
+	//
+	// NOTE: tiers 0-2 re-checked the state before playing the effect while the
+	// 極大 tier (533-538) called it unconditionally, which is why the guard is
+	// conditional on the tier here.
+	AGH_stateApplyElementGuard = function (user, target, stateId, tier, animationId) {
+		for (var up = 1; up <= 3 - tier; up++) {
+			if (user.isStateAffected(stateId + 6 * up)) {
+				user.removeState(stateId);
+				break;
+			};
+		};
+		for (var down = 1; down <= tier; down++) {
+			if (user.isStateAffected(stateId - 6 * down)) {
+				user.removeState(stateId - 6 * down);
+			};
+		};
+		if (tier >= 3 || user.isStateAffected(stateId)) {
+			state_applyCommonEffect(user, target, stateId, animationId);
+		};
+	};
+
+	// Replaces (6x, states 539-544 无の加護 family): the same idea as
+	// AGH_stateApplyElementGuard but the rungs are one state id apart and the
+	// upgrade / downgrade sets are not symmetric in the database, so both are
+	// passed in explicitly as offsets from stateId.
+	//
+	// effectFirst is set for 544 无の加護(神撃) only, which played the add effect
+	// before clearing the weaker tiers instead of after.
+	AGH_stateApplyNullGuard = function (user, target, stateId, upgradeOffsets, downgradeOffsets, animationId, effectFirst) {
+		if (effectFirst) {
+			state_applyCommonEffect(user, target, stateId, animationId);
+		};
+		for (var up = 0; up < upgradeOffsets.length; up++) {
+			if (user.isStateAffected(stateId + upgradeOffsets[up])) {
+				user.removeState(stateId);
+				break;
+			};
+		};
+		for (var down = 0; down < downgradeOffsets.length; down++) {
+			if (user.isStateAffected(stateId - downgradeOffsets[down])) {
+				user.removeState(stateId - downgradeOffsets[down]);
+			};
+		};
+		if (!effectFirst && user.isStateAffected(stateId)) {
+			state_applyCommonEffect(user, target, stateId, animationId);
+		};
+	};
+
+	// --- Stance upgrades --------------------------------------------------------
+
+	// Replaces (2x, states 802 フォーカス / 822 ソング・オブ・グランデ): when the unit
+	// knows the listed skill the stance escalates to stateId+1 instead of
+	// lingering. skillId is 320 / 350 for 802 / 822.
+	AGH_stateApplyStanceUpgrade = function (user, target, stateId, skillId) {
+		state_applyCommonEffect(user, target, stateId, 271);
+		if (user.battleSkillsRaw().contains(skillId)) {
+			user.addState(stateId + 1);
+			user.removeState(stateId);
+		};
+	};
+
+	// Replaces (2x, states 802 フォーカス / 822 ソング・オブ・グランデ): only play the
+	// removal effect while the escalated state is still active.
+	AGH_stateRemoveStanceUpgrade = function (user, target, stateId) {
+		if (!!user.isStateAffected(stateId + 1)) {
+			state_removeCommonEffect(user, target, stateId, 272);
+		};
+	};
+
+	// --- Misc single-state effects ----------------------------------------------
+
+	// Replaces (3x, states 151 果たし合い / 154 青眼の構え / 155 ファルサス・ガード):
+	// the guard counter starts at zero.
+	AGH_stateApplyResetCounter = function (user, target, stateId) {
+		user.setStateCounter(stateId, 0);
+	};
+
+	// Replaces (1x, state 64 放心): recovery log line plus the opacity restore.
+	AGH_stateRemoveRelief = function (user, target, stateId) {
+		BattleManager._logWindow.push(`addText`, target.name() + `は立ち直った！`)
+		target.spriteOpacity(255, 20);
+	};
+
+	// Replaces (1x, state 172 鴉雀無声): weapon-type driven follow-up states, and
+	// the state always removes itself.
+	AGH_stateApplyCrowSilence = function (user, target, stateId) {
+		if (user.isWtypeEquipped(3)) {
+			user.addState(173);
+		};
+		if (user.isWtypeEquipped(9)) {
+			user.addState(174);
+			user.gainTp(-30);
+			user.startMessagePopup('TP-30%', [255, 0, 0, 255], 0, 256);
+		};
+		user.removeState(stateId);
+	};
+
+	// Replaces (1x, state 177 ブレイブソウル): grants state 201 once per 10% of
+	// remaining HP, at least once, then removes itself.
+	//
+	// BUGFIX: the database loop read `for (var 1 = start; i <= value1; i++)`,
+	// which is a SyntaxError ("Unexpected number"). The plugin evaluates notetags
+	// with a bare eval, so the whole body failed to compile and the state did
+	// nothing at all. The counter is now a normal `var i = 1`.
+	AGH_stateApplyBraveSoul = function (user, target, stateId) {
+		var braveSoulStacks = Math.round(user.hpRate() * 10);
+		if (braveSoulStacks <= 1) { braveSoulStacks = 1 };
+		for (var i = 1; i <= braveSoulStacks; i++) {
+			user.addState(201);
+		};
+		user.removeState(stateId);
+	};
+
+	// Replaces (1x, state 186 トレジャーハント): stacks a counter while in battle.
+	//
+	// NOTE: the database guard read `>= 1 || <= 9`, which is true for every
+	// number, so the reset branch was unreachable. Kept as-is: the observable
+	// behaviour (the counter always increments) is the same either way.
+	AGH_stateApplyTreasureHunt = function (user, target, stateId) {
+		if ($gameParty.inBattle()) {
+			state_applyCommonEffect(user, target, stateId, 261);
+			if (target._stateCounter[stateId] >= 1 || target._stateCounter[stateId] <= 9) {
+				target.addStateCounter(stateId, +1);
+			} else {
+				target.setStateCounter(stateId, 1);
+			};
+		};
+	};
+
+	// Replaces (1x, state 194 トレマーラウンド): applies the two tremolo states to
+	// every battle member, then drops this state.
+	//
+	// NOTE: `actor` is declared with `var` inside the loop, so after the loop it
+	// still points at the *last* battle member and only that member loses the
+	// state. Preserved on purpose; hoisting the declaration would change which
+	// battler is affected.
+	AGH_stateApplyTremaRound = function (user, target, stateId) {
+		for (var i = 0; i < $gameParty.battleMembers().length; i++) {
+			var actor = $gameParty.battleMembers()[i];
+			actor.addState(206);
+			actor.addState(207);
+		};
+		actor.removeState(stateId);
+	};
+
+	// Replaces (2x, states 266 連撃ボーナス / 267 三連撃ボーナス): battle-log banner.
+	AGH_stateApplyStrikeBonus = function (user, target, stateId, logText) {
+		BattleManager._logWindow.push(`addText`, logText)
+	};
+
+	// Replaces (1x, state 292 浄眼): re-runs the boss action pattern when the lead
+	// troop member is a boss individual and can still act.
+	AGH_stateApplyPureEye = function (user, target, stateId) {
+		var leadEnemy = $gameTroop.members()[0];
+		if (leadEnemy.isStateAffected(410) &&
+			leadEnemy.isAlive() &&
+			!leadEnemy.isRestricted()) {
+			$gameSwitches.setValue(470, true);
+			boss_actionPattarn1(leadEnemy);
+			$gameSwitches.setValue(470, false);
+		};
+	};
+
+	// Replaces (5x, states 321/323/324/898/905 delay family): grants the delay TP
+	// gain declared in the notetag, then removes the state.
+	AGH_stateApplyDelay = function (user, target, stateId) {
+		state_applyCommonEffect(user, target, stateId, 277);
+		target.gainTp(Number($dataStates[stateId].meta['TPGain1']));
+		target.removeState(stateId);
+	};
+
+	// Replaces (1x, state 417 モードゲージ減少): drains 20 points of the party limit
+	// gauge while break mode is up, then removes the marker.
+	AGH_stateApplyModeGaugeDown = function (user, target, stateId) {
+		if (target.isStateAffected(stateId - 2)) {
+			BattleManager._logWindow.push(`addText`, `${target.name()}の\\C[10]モードゲージ\\C[0]が20減少した！`)
+			state_applyCommonEffect(user, target, stateId, 261);
+			$gameTroop.losePartyLimitGauge(20);
+		}
+		target.removeState(stateId);
+	};
+
+	// Replaces (1x, state 418 ブレイクモード維持): resets the turn counter of the
+	// break-mode state instead of letting it expire, then removes the marker.
+	AGH_stateApplyBreakModeKeep = function (user, target, stateId) {
+		if (target.isStateAffected(stateId - 2)) {
+			BattleManager._logWindow.push(`addText`, `${target.name()}の\\C[1]＜${$dataStates[stateId - 2].name}＞\\C[0]のターンが初期化された！`)
+			state_applyCommonEffect(user, target, stateId - 2, 261);
+		}
+		target.removeState(stateId);
+	};
+
+	// Replaces (1x, state 472 命乞い): plays the plea message plus one random
+	// flavour line per active plea state.
+	//
+	// BUGFIX: both _logWindow.push calls in the database lost their
+	// template-literal backticks (`push(addText, ${target.name()}…)`), which is a
+	// SyntaxError, so the whole notetag failed to compile. The backticks are
+	// restored here.
+	AGH_stateApplyBegForLife = function (user, target, stateId) {
+		BattleManager._logWindow.push(`addText`, `${target.name()}は\\sim[427]を始めた！`);
+		var pleaStateIds = [421, 436];
+		pleaStateIds.forEach(function (id) {
+			if (target.isStateAffected(id)) {
+				var pleaLines = $dataStates[stateId].meta['inotigoi' + id].split(',');
+				var pleaLine = pleaLines[getRandomIndex(pleaLines.length)];
+				BattleManager._logWindow.push(`addText`, pleaLine);
+			};
+		}, this);
+	};
+
+	// Replaces (1x, state 551 エネミー変身): re-skins the enemy from the
+	// valueWordSet9 preset (battler name, hue, move distance).
+	AGH_stateApplyEnemyTransform = function (user, target, stateId) {
+		var presetParts = $dataEnemies[user._enemyId].meta[valueWordSet9].split(',');
+		var moveDistance = Number(presetParts[3]);
+		$gameTroop.move(user.index() + 1, 0, moveDistance, 40);
+		$dataEnemies[user._enemyId].battlerName = presetParts[1];
+		$dataEnemies[user._enemyId].battlerHue = presetParts[2];
+	};
+
+	// Replaces (3x, states 594 Thrust / 595 Swing / 596 Missile): plays the
+	// equipped weapon's animation with the matching battler frame for one motion
+	// type. motionType is 'Thrust' / 'Swing' / 'Missile'.
+	//
+	// NOTE: the original also read meta['MotionType'] into a local that was never
+	// used; the read had no side effect, so it is not carried over.
+	AGH_stateApplyWeaponMotion = function (user, target, stateId, motionType) {
+		var weaponData = $dataWeapons[$gameActors.actor(user.actorId()).equips()[0].id];
+		var weaponNumber = Number(weaponData.meta['WeaponNumber']);
+		user.battler().setFrame(motionType, 2);
+		user.startWeaponAnimation(weaponNumber);
+	};
+
+	// Replaces (1x, state 771 被虐体質): resets a non-negative counter.
+	AGH_stateApplyMasochism = function (user, target, stateId) {
+		if (target._stateCounter[stateId] >= 0) {
+			target.setStateCounter(stateId, 0);
+		};
+	};
 })();
