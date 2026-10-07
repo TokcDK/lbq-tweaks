@@ -1133,7 +1133,7 @@ state_removeCommonEffect = function (user, target, stateId, animationId) {
 };
 
 //特殊効果ステート発動時のアクション
-activate_spcialState = function (user, stateId) {
+activate_specialState = function (user, stateId) {
 
   if ($dataStates[stateId].meta['activateRate']) {
     if (user.isLearnedSkill(746) && user.skillMasteryLevel(746) >= 1) {

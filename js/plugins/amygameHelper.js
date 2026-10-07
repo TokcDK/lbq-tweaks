@@ -1760,4 +1760,890 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 			target.setStateCounter(stateId, 0);
 		};
 	};
+
+	//=============================================================================
+	// State notetag effects, part 2 (the remaining <Custom ...> tags)
+	//----------------------------------------------------------------------------
+	// data/States.json carries five more eval scopes besides Apply/Remove. Each
+	// one binds a different set of names, which is what fixes the signature of the
+	// helpers below:
+	//
+	//  1. Game_Battler.prototype.customEffectEval(stateId, type)
+	//     <Custom Turn Start Effect>, <Custom Turn End Effect>,
+	//     <Custom Action Start Effect>, <Custom Action End Effect>,
+	//     <Custom Battle Effect> (and the unused victory/defeat/escape).
+	//     this === user === target === the battler the state sits on.
+	//     No `value` is in scope.  -> AGH_...(user, target, stateId)
+	//
+	//  2. Game_Action.prototype.customEffectEval(target, stateId, type, side, value)
+	//     <Custom Initiate Effect>, <Custom Select Effect>, <Custom Deselect Effect>,
+	//     <Custom Conclude Effect>            -> AGH_...(user, target, stateId)
+	//     <Custom Confirm Effect>, <Custom React Effect>, <Custom Respond Effect>
+	//                                         -> AGH_...(user, target, stateId, value)
+	//     this === the Game_Action, user === attacker === a === the action's subject,
+	//     target === defender === b.
+	//     For the four value-carrying types the plugin *writes the return value back*
+	//     (Game_Action.executeDamage: `value = this.reactStateEffects(...)`), so those
+	//     helpers must return the - possibly modified - value and the notetag reads
+	//     `value = AGH_...(...)`.
+	//     Bodies that used `this` (this.isHpEffect()) take the action as their first
+	//     argument, because `this` inside a plain function is not the action.
+	//
+	//  3. Game_BattlerBase.prototype.passiveStateConditionEval(state) -
+	//     <Custom Passive Condition>, and the identical
+	//     Game_BattlerBase.prototype.auraStateConditionEval(state) -
+	//     <Custom Aura Condition>. Both compile the body with
+	//     new Function('condition','a','user','subject','b','target','s','v',
+	//                  body + '\nreturn condition;')
+	//     and call it with `this` bound to the battler. `stateId` is NOT in scope,
+	//     and the body has to leave the result in `condition`, so the helpers return
+	//     a boolean and the notetag reads `condition = AGH_...(...)`.
+	//
+	//  4. Game_Battler.prototype.processDamageOverTimeStateEffect(state) -
+	//     <Custom Regen Formula> (YEP_X_ExtDoT). The body is concatenated into
+	//     state.dotFormula and eval'd directly, where a === origin === the state's
+	//     origin and b === user === target === the battler. The body has to leave
+	//     its result in `value` (an undeclared global!), and may also override the
+	//     `variance` and `element` locals. The helper returns those three in an
+	//     object and the notetag unpacks them, so `variance` / `element` still land
+	//     in the enclosing function's locals exactly as before.
+	//
+	// Bodies that were already a single call to a properly named function
+	// (state_turnEndBuffDebuff, enemy_battleStartCry) were left untouched.
+	//=============================================================================
+
+	// --- Turn Start -------------------------------------------------------------
+
+	// Replaces (1x, state 235): starts the turn with an empty damage counter.
+	AGH_stateTurnStartResetCounter = function (user, target, stateId) {
+		user.setStateCounter(stateId, 0);
+	};
+
+	// Replaces (2x, states 594 Thrust / 595 Swing / 596 Missile): drops the
+	// weapon-motion states and restores the default battler frame. guardStateId
+	// (state 64 for state 594, 0 for 595/596) skips the reset while the battler is
+	// under that state.
+	AGH_stateTurnStartClearWeaponMotion = function (user, target, stateId, guardStateId) {
+		if (guardStateId > 0 && user.isStateAffected(guardStateId)) return;
+		user.removeState(594);
+		user.removeState(595);
+		user.removeState(596);
+		user.battler().setMaxFrame(4);
+	};
+
+	// Replaces (2x, states 618 背水 / 619 渾身): converts the missing HP ratio into
+	// a state counter scaled by the battler's rate for elementId (39 / 40).
+	AGH_stateTurnStartElementCounter = function (user, target, stateId, elementId) {
+		if (!user.isAlive()) {
+			user.setStateCounter(stateId, 0);
+			return;
+		}
+		var missingHpRate = 1 - user.hpRate();
+		var elementScaledRate = missingHpRate * user.elementRate(elementId);
+		var counterRate = Math.round(elementScaledRate * 100 / 2);
+		user.setStateCounter(stateId, counterRate / 100);
+	};
+
+	// --- Turn End ---------------------------------------------------------------
+
+	// Replaces (1x, state 94): the last surviving party member collapses, otherwise
+	// the battler taunts and fades out.
+	AGH_stateTurnEndFleeOrTaunt = function (user, target, stateId) {
+		if ($gameParty.aliveMembers().length === 1) {
+			user.addState(1);
+		} else {
+			BattleManager._logWindow.push(`addText`, `\\C[16]${user.name()}\\C[0]「は、早く倒してしまえっ！」`);
+			user.spriteOpacity(0, 30);
+		}
+	};
+
+	// Replaces (1x, state 154): once the stored counter is non-zero, forces skillId
+	// on the battler's own side and clears both the counter and the state.
+	AGH_stateTurnEndForceSkill = function (user, target, stateId, skillId) {
+		if (user.getStateCounter(stateId) >= 1) {
+			BattleManager.queueForceAction(user, skillId, -1);
+		}
+		user.removeStateCounter(stateId);
+		user.removeState(stateId);
+	};
+
+	// Replaces (1x, state 235): spends the damage accumulated during the turn over
+	// the whole enemy troop, then resets the counter. The original read
+	// target._stateCounter[stateId] twice; it is read once here.
+	AGH_stateTurnEndDamageTroop = function (user, target, stateId) {
+		if (user.isAlive()) {
+			var accumulatedDamage = target._stateCounter[stateId];
+			if (accumulatedDamage >= 1) {
+				var troopMembers = $gameTroop.members();
+				var troopCount = troopMembers.length;
+				if (troopCount >= 1) {
+					BattleManager._logWindow.push(`addText`, `${target.name()}の\\SIM[${stateId}]が発動！`);
+					user.startAnimation(509, true, 0);
+					for (var i = 0; i < troopCount; i++) {
+						troopMembers[i].startAnimation(132, true, 10);
+						var damagePerMember = Math.round(accumulatedDamage * 2 / troopCount);
+						target.gainHp(-damagePerMember);
+						target.startDamagePopup();
+					}
+				}
+			}
+		}
+		user.setStateCounter(stateId, 0);
+	};
+
+	// Replaces (1x, state 302 種): the seed sprouts into a random abnormal state
+	// (毒/暗闇/沈黙/激昂/混乱/魅了/睡眠/スタン) on the whole unit, then removes itself.
+	//
+	// BUGFIX: the original called `target.aliveMembers()`, but
+	//   * aliveMembers() is a Game_Unit method while `target` is a Game_Battler,
+	//     so the call threw "target.aliveMembers is not a function"; and
+	//   * Game_Unit.prototype.aliveMembers() returns a plain Array (it is
+	//     `members().filter(...)`), which has no addState()/startAnimation()
+	//     either - so even on a unit the second line would have thrown.
+	// The plugin's try/catch swallowed both, and the state never did anything.
+	// It now walks the state holder's own unit, which is the literal reading of
+	// the original. The animation delay is read once and the 279 accumulator
+	// advances once, exactly as the original did - whether the delay was meant to
+	// stagger per member is not recoverable from the broken source.
+	AGH_stateTurnEndSeedSpread = function (user, target, stateId) {
+		var seedStateId = [4, 5, 6, 7, 8, 9, 10, 11][getRandomIndex(8)];
+		var unitMembers = target.friendsUnit().aliveMembers();
+		unitMembers.forEach(function (member) {
+			member.addState(seedStateId);
+		});
+		target.removeState(stateId);
+		if (ConfigManager.battleAniSpeed >= 3) {
+			var animationDelay = $gameVariables.value(279);
+			unitMembers.forEach(function (member) {
+				member.startAnimation(277, false, animationDelay);
+			});
+			$gameVariables.setValue(279, animationDelay + $gameVariables.value(280));
+		}
+	};
+
+	// Replaces (1x, state 327): clears the battler's abnormal states.
+	AGH_stateTurnEndClearAbnormal = function (user, target, stateId) {
+		if (!target.isAlive()) return;
+		abNomal_Clear(target, target, stateId, 2);
+	};
+
+	// Replaces (3x, states 403 / 405 / 475): the same, but only on a 1-in-11 roll of
+	// at least `threshold`.
+	AGH_stateTurnEndClearAbnormalChance = function (user, target, stateId, threshold) {
+		if (!target.isAlive()) return;
+		if (getRandomIndex(11) < threshold) return;
+		abNomal_Clear(target, target, stateId, 2);
+	};
+
+	// Replaces (1x, state 329): adds one state picked at random out of stateIds.
+	AGH_stateTurnEndAddRandomState = function (user, target, stateId, stateIds) {
+		if (!target.isAlive()) return;
+		target.addState(stateIds[getRandomIndex(stateIds.length)]);
+	};
+
+	// Replaces (3x, states 405 / 412 / 413 / 414): the same, gated on an
+	// at-least-`threshold` roll of 1-in-11.
+	AGH_stateTurnEndAddRandomStateChance = function (user, target, stateId, threshold, stateIds) {
+		if (!target.isAlive()) return;
+		if (getRandomIndex(11) < threshold) return;
+		target.addState(stateIds[getRandomIndex(stateIds.length)]);
+	};
+
+	// Replaces (4x, states 395 自己再生(小) / 396 (中) / 397 (大) / 398 (超)): while
+	// wounded, drains drainRate of max MP. Note the rates are 0.01/0.02/0.03/0.05
+	// while the matching regen formulas use 1/2/3/5 - the asymmetry is in the
+	// original data.
+	AGH_stateTurnEndDrainMp = function (user, target, stateId, drainRate) {
+		if (!user.isAlive()) return;
+		if (user.hpRate() === 1.00 || user.mpRate() < drainRate) return;
+		var drain = Math.round(user.mmp * drainRate);
+		user.gainMp(-drain);
+		user.startDamagePopup();
+	};
+
+	// Replaces (1x, state 420): plays animationId on the battler and heals it for
+	// the damage its own origin is missing.
+	AGH_stateTurnEndHealMissingHp = function (user, target, stateId, animationId) {
+		target.startAnimation(animationId, true, 0);
+		target.gainHp(user.mhp - user.hp);
+		target.startDamagePopup();
+	};
+
+	// Replaces (1x, state 472): prints the "…をしている…。" line and then one random
+	// flavour line per watched state the battler is under, read from the
+	// meta['inotigoi<id>'] notetag.
+	//
+	// NOTE: the original passed `this` as the forEach thisArg, but the callback
+	// never referenced `this`; the argument is dropped.
+	AGH_stateTurnEndInotigoiMessage = function (user, target, stateId, simStateId, watchedStateIds) {
+		BattleManager._logWindow.push(`addText`, `${target.name()}は\\sim[${simStateId}]をしている…。`);
+		watchedStateIds.forEach(function (id) {
+			if (!target.isStateAffected(id)) return;
+			var lines = $dataStates[stateId].meta['inotigoi' + id].split(',');
+			BattleManager._logWindow.push(`addText`, lines[getRandomIndex(lines.length)]);
+		});
+	};
+
+	// Replaces (1x, state 600): reports the damage taken during the turn and then
+	// re-requests the equipped weapon's motion so the actor keeps animating.
+	AGH_stateTurnEndReportCounterDamageAndMotion = function (user, target, stateId) {
+		if (!user.isAlive()) return;
+		var counterDamage = target._stateCounter[stateId];
+		if (counterDamage >= 1) {
+			BattleManager._logWindow.push(`addText`, `${target.name()}はターン中に\\C[10]${counterDamage}\\C[0]のダメージを受けた！`);
+			target.setStateCounter(stateId, 0);
+		}
+		var actor = $gameActors.actor(user.actorId());
+		var weapon = actor.equips()[0];
+		if (!$dataSystem.optSideView || user.isStateAffected(1) || user.isStateAffected(64) || !weapon) return;
+		var weaponData = $dataWeapons[weapon.id];
+		if (!weaponData.meta['WeaponNumber'] || !weaponData.meta['MotionType']) return;
+		var weaponNumber = Number(weaponData.meta['WeaponNumber']);
+		var motionType = Number(weaponData.meta['MotionType']);
+		var motionName = '';
+		if (motionType === 0) motionName = 'thrust';
+		if (motionType === 1) motionName = 'swing';
+		if (motionType === 2) motionName = 'missile';
+		user.requestMotion(motionName);
+		user.startWeaponAnimation(weaponNumber);
+	};
+
+	// Replaces (1x, state 610): reports the damage taken during the turn together
+	// with the battler's current TP percentage.
+	AGH_stateTurnEndReportCounterDamageTp = function (user, target, stateId) {
+		if (!user.isAlive()) return;
+		var counterDamage = target._stateCounter[stateId];
+		if (counterDamage >= 1) {
+			BattleManager._logWindow.push(`addText`, target.name() + `のTP\\C[6]` + target.tp + `\\C[0]% ターン中に\\C[10]` + counterDamage + `\\C[0]のダメージを受けた！`);
+			target.setStateCounter(stateId, 0);
+		} else {
+			BattleManager._logWindow.push(`addText`, target.name() + `のTP\\C[6]` + target.tp + `\\C[0]%`);
+		}
+	};
+
+	// --- Action Start -----------------------------------------------------------
+
+	// Replaces (1x, state 157): charges the state's <TurnCost> against MP, or drops
+	// the state when the battler cannot pay.
+	AGH_stateActionStartPayTurnCostMp = function (user, target, stateId) {
+		var turnCost = Number($dataStates[stateId].meta['TurnCost']);
+		if (user.mp >= turnCost) {
+			user.gainMp(-turnCost);
+		} else {
+			user.removeState(stateId);
+		}
+	};
+
+	// Replaces (1x, state 895): the HP-paying twin of the above.
+	AGH_stateActionStartPayTurnCostHp = function (user, target, stateId) {
+		var turnCost = Number($dataStates[stateId].meta['TurnCost']);
+		if (user.hp >= turnCost) {
+			user.gainHp(-turnCost);
+		} else {
+			user.removeState(stateId);
+		}
+	};
+
+	// --- Action End -------------------------------------------------------------
+
+	// Replaces (1x, state 151): remembers which slot the previous action hit (as
+	// 'E<n>' in the state counter) and hands out state 206 for a repeated target or
+	// state 213 for a fresh one.
+	AGH_stateActionEndTrackLastTarget = function (user, target, stateId) {
+		var action = BattleManager._action;
+		var unit = action.isForOpponent() ? action.opponentsUnit() : action.friendsUnit();
+		var lastTarget = unit.members()[BattleManager._subject._lastTargetIndex];
+		if (!lastTarget.isStateAffected(610)) return;
+		var targetMarker = 'E' + (BattleManager._subject._lastTargetIndex + 1);
+		if (user.getStateCounter(stateId) == 0) {
+			user.setStateCounter(stateId, targetMarker);
+			return;
+		}
+		if (user.getStateCounter(stateId) === targetMarker && !$gameTroop.isAllDead() && $gameParty.inBattle()) {
+			user.addState(206);
+		} else {
+			user.setStateCounter(stateId, targetMarker);
+			user.addState(213);
+		}
+	};
+
+	// Replaces (2x, states 802 / 803): drops the state while the battle mode
+	// variable holds modeValue.
+	AGH_stateActionEndRemoveInMode = function (user, target, stateId, modeVariableId, modeValue) {
+		if ($gameVariables.value(modeVariableId) != modeValue) return;
+		user.removeState(stateId);
+	};
+
+	// Replaces (1x, state 846): while the battle mode variable is 6, banks up to
+	// four actions before the state is consumed.
+	//
+	// NOTE: the `user._stateCounter[stateId] >= 1` branch is dead - the counter is
+	// removed on the line above, so the read is always undefined and the else
+	// branch always runs. Kept verbatim so the behaviour is unchanged.
+	AGH_stateActionEndResolveCounter = function (user, target, stateId) {
+		if ($gameVariables.value(182) != 6) return;
+		if (target._stateCounter[stateId] >= 4) {
+			user.removeStateCounter(stateId);
+			user.removeState(stateId);
+			if (user._stateCounter[stateId] >= 1) {
+				user.addStateCounter(stateId, +1);
+			} else {
+				user.setStateCounter(stateId, 1);
+			}
+		}
+	};
+
+	// --- Battle -----------------------------------------------------------------
+
+	// Replaces (1x, state 94): the "runs away" battle start.
+	AGH_stateBattleFlee = function (user, target, stateId) {
+		BattleManager._logWindow.push(`addText`, `\\C[16]${user.name()}\\C[0]「ヒィィ～～っ！」`);
+		BattleManager._logWindow.push(`addText`, `\\C[16]${user.name()}\\C[0]は逃げ出した！`);
+		AudioManager.playSe({ "name": 'Z_FootRun', "volume": 90, "pitch": 150, "pan": 0 });
+		user.spriteOpacity(0, 60);
+		$gameParty.move(user.index() + 1, 400, 0, 60);
+	};
+
+	// Replaces (1x, state 425): the standard enemy battle cry plus a mark state.
+	AGH_stateBattleCryAndMark = function (user, target, stateId, markStateId) {
+		enemy_battleStartCry(user);
+		if (!target.isStateAffected(markStateId)) {
+			target.addState(markStateId);
+		}
+	};
+
+	// Replaces (1x, state 600): sets up the actor's per-index battle state, the
+	// state counter and the weapon-motion state (594/595/596) chosen from the
+	// equipped weapon's <MotionType>.
+	//
+	// NOTE: the original also read meta['WeaponNumber'] into a local it never used;
+	// that read has no side effect and is not carried over.
+	AGH_stateBattleInitWeaponMotion = function (user, target, stateId) {
+		user.addState(486 + user.index());
+		if (user.isBattleMember()) {
+			user.setStateCounter(stateId, 0);
+		}
+		if (!$dataSystem.optSideView) return;
+		if (user.isStateAffected(1) || user.isStateAffected(64)) return;
+		if (!user.isBattleMember()) return;
+		var weapon = user.equips()[0];
+		if (!weapon) return;
+		var weaponData = $dataWeapons[weapon.id];
+		if (!weaponData.meta['WeaponNumber'] || !weaponData.meta['MotionType']) return;
+		var motionType = Number(weaponData.meta['MotionType']);
+		if (motionType === 0) user.addState(594);
+		if (motionType === 1) user.addState(595);
+		if (motionType === 2) user.addState(596);
+	};
+
+	// Replaces (1x, state 610): rolls the starting TP, shows it as a popup, applies
+	// the per-index state and seeds the enemy battle AI.
+	AGH_stateBattleInitTpGauge = function (user, target, stateId) {
+		user.setStateCounter(stateId, 0);
+		user.gainTp(getRandomIndex(31) + 20);
+		target.startMessagePopup('TP:' + user.tp, [255, 128, 0, 255, 256]);
+		user.addState(490 + user.index());
+		if (user.isAlive()) {
+			enemy_battleSetting(user.index());
+		}
+	};
+
+	// --- React ------------------------------------------------------------------
+
+	// Replaces (3x, states 161 / 332 / 893): plays a hit animation without touching
+	// the damage.
+	AGH_stateReactPlayAnimation = function (user, target, stateId, value, animationId) {
+		target.startAnimation(animationId, true, 0);
+		return value;
+	};
+
+	// Replaces (1x, state 162): 31% chance to halve the incoming HP damage.
+	AGH_stateReactHalveDamageChance = function (action, user, target, stateId, value) {
+		if (action.isHpEffect() && value > 0) {
+			if (getRandomIndex(101) <= 30) {
+				target.startAnimation(257, true, 0);
+				value = value / 2;
+			}
+		}
+		return value;
+	};
+
+	// Replaces (1x, state 180): plays the guard animation, then nullifies the
+	// incoming HP damage and drops the state.
+	AGH_stateReactNullifyDamageAndRemove = function (action, user, target, stateId, value) {
+		target.startAnimation(259, true, 0);
+		if (action.isHpEffect() && value > 0) {
+			value = 0;
+			user.removeState(stateId);
+		}
+		return value;
+	};
+
+	// Replaces (1x, state 183): parks a fifth of the incoming damage in the state
+	// counter and lets the rest through, then drops the state.
+	AGH_stateReactRedirectOneFifthDamage = function (action, user, target, stateId, value) {
+		if (action.isHpEffect() && value > 0) {
+			target.setStateCounter(stateId, value / 5);
+			value = Math.round(value - (value / 5));
+			user.removeState(stateId);
+		}
+		return value;
+	};
+
+	// Replaces (1x, state 410): converts incoming damage into party limit gauge
+	// movement and swaps between the 415 "gauge up" and 416 "broken" states.
+	AGH_stateReactPartyLimitGauge = function (action, user, target, stateId, value) {
+		if (!action.isHpEffect() || value <= 0 || !target.isAlive()) return value;
+		if (target.isStateAffected(407)) {
+			if (target.isStateAffected(415)) {
+				$gameTroop.losePartyLimitGauge(5);
+			} else {
+				$gameTroop.gainPartyLimitGauge(5);
+			}
+		}
+		if (target.isStateAffected(408)) {
+			if (target.isStateAffected(415)) {
+				$gameTroop.gainPartyLimitGauge(5);
+			} else {
+				$gameTroop.losePartyLimitGauge(5);
+			}
+		}
+		if (target.isStateAffected(415)) {
+			var gaugeLoss = Math.floor(20 * value / target.mhp).clamp(15, 50);
+			$gameTroop.losePartyLimitGauge(gaugeLoss);
+			if ($gameTroop.partyLimitGauge() <= 0) {
+				target.removeState(415);
+				target.addState(416);
+				BattleManager._logWindow.push(`addText`, target.name() + `が` + $dataStates[416].name + `になった！`);
+				state_applyCommonEffect(user, target, 416, 251);
+			}
+		}
+		if (target.isStateAffected(416)) {
+			$gameTroop.setPartyLimitGauge(0);
+		}
+		if ($gameTroop.partyLimitGaugeCurrent() >= 1) {
+			target.addState(415);
+			BattleManager._logWindow.push(`addText`, target.name() + `が` + $dataStates[415].name + `になった！`);
+			state_applyCommonEffect(user, target, 415, 252);
+		}
+		return value;
+	};
+
+	// Replaces (2x, states 467 / 468): incoming HP damage is clamped to 1 unless
+	// the metal-killer global is set or the hit was a critical (爆発ポーション).
+	AGH_stateReactMinimizeUnlessMetalKiller = function (action, user, target, stateId, value) {
+		if (!action.isHpEffect() || value <= 0) return value;
+		if (valueMetalKiller === 1 || target.result().critical) return value;
+		return 1;
+	};
+
+	// Replaces (1x, state 472): counts every HP-damaging hit in a game variable.
+	AGH_stateReactCountHpDamage = function (action, user, target, stateId, value, variableId) {
+		if (action.isHpEffect() && value > 0) {
+			$gameVariables.setValue(variableId, $gameVariables.value(variableId) + 1);
+		}
+		return value;
+	};
+
+	// Replaces (1x, state 600): routes the incoming hit through the shared
+	// damage_keisan1 formula (formulaType 121) and leaves the damage alone.
+	AGH_stateReactDamageFormula = function (action, user, target, stateId, value, formulaType) {
+		damage_keisan1(user, target, action.isHpEffect(), value, formulaType, 0, $gameVariables.value(93), stateId);
+		return value;
+	};
+
+	// Replaces (1x, state 771): on taking HP damage, plays the victory motion and
+	// stacks a counter that grows with the actor's variable block.
+	AGH_stateReactAddCounterOnHit = function (action, user, target, stateId, value) {
+		if (!action.isHpEffect() || value <= 0) return value;
+		target.requestMotion('Victory');
+		AudioManager.playSe({ "name": 'ZH_Knead1', "volume": 50, "pitch": 120, "pan": 0 });
+		var counter = getRandomIndex(10) + 1;
+		counter = counter + Math.ceil($gameVariables.value(target.actorId() + 380)[1] / 100);
+		target.addStateCounter(stateId, counter);
+		return value;
+	};
+
+	// Replaces (1x, state 812): the state is consumed by the first HP hit.
+	AGH_stateReactRemoveSelfOnHit = function (action, user, target, stateId, value) {
+		if (action.isHpEffect() && value > 0) {
+			target.removeState(stateId);
+		}
+		return value;
+	};
+
+	// --- Respond ----------------------------------------------------------------
+
+	// Replaces (1x, state 25): the last-man-standing rescue. Every party member is
+	// revived and the lead battle member plays the recovery animation.
+	//
+	// NOTE: the original wrote `var actor = $gameParty.battleMembers()[0]` inside a
+	// callback that already had an `actor` parameter - the `var` rebinds the
+	// parameter, so the animation always played on battleMembers()[0]. Renaming the
+	// local keeps that behaviour but makes it obvious.
+	AGH_stateRespondPartyRescue = function (user, target, stateId, value) {
+		if ($gameParty.aliveMembers().length === 0) {
+			$gameParty.members().forEach(function (actor) {
+				actor.addState(24);
+				actor.recoverAll();
+				var leadActor = $gameParty.battleMembers()[0];
+				leadActor.startAnimation(396, false, 0);
+				$gameSwitches.setValue(145, true);
+			});
+		}
+		return value;
+	};
+
+	// Replaces (1x, state 63): heals the target by the damage just dealt.
+	AGH_stateRespondHealByDamage = function (action, user, target, stateId, value) {
+		if (action.isHpEffect() && value > 0) {
+			target.gainHp(value);
+		}
+		return value;
+	};
+
+	// Replaces (1x, state 94): fades the battler out after being hit.
+	AGH_stateRespondFadeOut = function (user, target, stateId, value) {
+		target.spriteOpacity(0, 30);
+		return value;
+	};
+
+	// Replaces (2x, states 154 / 235): banks the incoming damage in the state
+	// counter for the turn-end payout.
+	AGH_stateRespondStoreDamage = function (user, target, stateId, value) {
+		user.addStateCounter(stateId, value);
+		return value;
+	};
+
+	// Replaces (1x, state 155): banks the damage and cancels it entirely.
+	AGH_stateRespondAbsorbDamage = function (user, target, stateId, value) {
+		user.addStateCounter(stateId, value);
+		return 0;
+	};
+
+	// Replaces (1x, state 602): while the battler is under guardStateId, records the
+	// actor id in variable 20 and reserves a common event.
+	AGH_stateRespondReserveCommonEventOnState = function (user, target, stateId, value, guardStateId, commonEventId) {
+		if (target.isStateAffected(guardStateId)) {
+			$gameVariables.setValue(20, target.actorId());
+			$gameTemp.reserveCommonEvent(commonEventId);
+		}
+		return value;
+	};
+
+	// Replaces (1x, state 610): the enemy-side damage formula, the kill tally and
+	// the per-species collapse animation.
+	AGH_stateRespondEnemyDamageFormula = function (action, user, target, stateId, value) {
+		damage_keisan1(user, target, action.isHpEffect(), value, 120, 0, $gameVariables.value(93), stateId);
+		if (target.hp <= 0 && $gameVariables.value(240) >= 1) {
+			$gameVariables.value(258)[$gameVariables.value(240)] += 1;
+		}
+		if (!target.isAlive() && valueCollapseAnime == 0) {
+			var collapseAnimationId = 598;
+			if ($gameSwitches.value(207)) collapseAnimationId = 0;
+			if (target.isStateAffected(435)) collapseAnimationId = 591; //機械種,爆発
+			if (target.isStateAffected(436)) collapseAnimationId = 599; //人種、流血小さめ
+			if (target.isStateAffected(425) || target.isStateAffected(426)) collapseAnimationId = 600; //霊体不死、成仏
+			if (target.isStateAffected(434) || target.isStateAffected(429)) collapseAnimationId = 597; //ﾐﾐｯｸｺﾞｰﾚﾑ,特殊
+			if (target.isStateAffected(437) || target.isStateAffected(438)) collapseAnimationId = 601; //天使悪魔,特殊
+			if (target.isStateAffected(439)) collapseAnimationId = 602; //竜、特殊
+			if (collapseAnimationId >= 1) {
+				target.startAnimation(collapseAnimationId, true, 0);
+			}
+			// The original's else-branch only built the argument list for a
+			// commented-out $gameScreen._particle.particlePlay() call, so it had no
+			// observable effect.
+		}
+		return value;
+	};
+
+	// Replaces (1x, state 842): heals the target by the incoming damage scaled by
+	// its rate for elementId.
+	AGH_stateRespondHealByElement = function (action, user, target, stateId, value, elementId) {
+		if (target.isAlive()) {
+			if (action.isHpEffect() && value > 0) {
+				target.gainHp(Math.floor(value * target.elementRate(elementId)));
+			}
+		}
+		return value;
+	};
+
+	// --- Confirm ----------------------------------------------------------------
+
+	// Replaces (1x, state 156): guarantees a critical hit.
+	AGH_stateConfirmCritical = function (user, target, stateId, value) {
+		target.result().critical = true;
+		return value;
+	};
+
+	// Replaces (1x, state 290): breaks the equipped weapon when the hit's critical
+	// state contradicts what the weapon wants (71/72 want a crit, 73 wants none).
+	AGH_stateConfirmBreakWeapon = function (user, target, stateId, value) {
+		if (!user.equips()[0] || $gameVariables.value(182) != 2) return value;
+		var weaponId = user._equips[0]._itemId;
+		var shouldBreak = false;
+		if (weaponId == 71 || weaponId == 72) {
+			shouldBreak = !!target.result().critical;
+		}
+		if (weaponId == 73) {
+			shouldBreak = !target.result().critical;
+		}
+		if (shouldBreak) {
+			user.changeEquipById(1, 0);
+			$gameParty.loseItem($dataWeapons[weaponId], 1);
+			AudioManager.playSe({ "name": "壊れた音", "volume": 100, "pitch": 110, "pan": 50 });
+		}
+		return value;
+	};
+
+	// Replaces (1x, state 599): runs the shared attack formula and accumulates the
+	// damage dealt into the actor's block of variable 293.
+	AGH_stateConfirmTrackDamage = function (action, user, target, stateId, value) {
+		attack_DamageFormula(user, target, $gameVariables.value(96));
+		if (action.isHpEffect() && value > 0) {
+			$gameVariables.value(293)[user.actorId() + 10] += value;
+		}
+		return value;
+	};
+
+	// --- Conclude ---------------------------------------------------------------
+
+	// Replaces (2x, states 309 / 310): on an at-least-`threshold` roll, runs the
+	// formula skill matching whichever of the battler's stance states is active.
+	// stateSkillGroups is a list of [[requiredStateIds...], formulaSkillId] pairs,
+	// applied in order so the last match wins. Each group short-circuits like the
+	// original `a || b` test, which matters only for how many isStateAffected()
+	// probes are made.
+	AGH_stateConcludeFormulaByState = function (user, target, stateId, threshold, stateSkillGroups) {
+		if (!user.isAlive() || !target.isAlive() || !target.isActor()) return;
+		if (getRandomIndex(11) < threshold) return;
+		var formulaSkillId = 0;
+		for (var i = 0; i < stateSkillGroups.length; i++) {
+			var group = stateSkillGroups[i];
+			var matched = false;
+			for (var j = 0; j < group[0].length; j++) {
+				if (user.isStateAffected(group[0][j])) {
+					matched = true;
+					break;
+				}
+			}
+			if (matched) formulaSkillId = group[1];
+		}
+		if (formulaSkillId >= 1) {
+			state_addFormula1([formulaSkillId, 50, user, target, user.mdf, target.luk]);
+		}
+	};
+
+	// Replaces (1x, state 326): strips one tier of the target's power-up.
+	AGH_stateConcludeDispelPowerUp = function (user, target, stateId) {
+		if (!user.isAlive() || !target.isAlive() || !target.isActor()) return;
+		powerUp_dispel(user, target, stateId, 2);
+	};
+
+	// Replaces (3x, states 401 / 402 / 403 / 405): the same, on a 1-in-11 roll of at
+	// least `threshold`.
+	AGH_stateConcludeDispelPowerUpChance = function (user, target, stateId, threshold) {
+		if (!target.isAlive() || !target.isActor()) return;
+		if (getRandomIndex(11) < threshold) return;
+		powerUp_dispel(user, target, stateId, 2);
+	};
+
+	// Replaces (1x, state 328): runs one formula skill picked at random.
+	AGH_stateConcludeRandomFormula = function (user, target, stateId, formulaSkillIds) {
+		if (!user.isAlive() || !target.isAlive() || !target.isActor()) return;
+		var formulaSkillId = formulaSkillIds[getRandomIndex(formulaSkillIds.length)];
+		state_addFormula1([formulaSkillId, 50, user, target, user.mdf, target.luk]);
+	};
+
+	// Replaces (1x, state 405): the same, gated on an at-least-`threshold` roll.
+	AGH_stateConcludeRandomFormulaChance = function (user, target, stateId, threshold, formulaSkillIds) {
+		if (!target.isAlive() || !target.isActor()) return;
+		if (getRandomIndex(11) < threshold) return;
+		var formulaSkillId = formulaSkillIds[getRandomIndex(formulaSkillIds.length)];
+		state_addFormula1([formulaSkillId, 50, user, target, user.mdf, target.luk]);
+	};
+
+	// --- Select / Deselect / Initiate -------------------------------------------
+
+	// Replaces (1x, state 425): lifts the mark state when the "dispel" global is up.
+	AGH_stateSelectRemoveMarkOnDispel = function (user, target, stateId, markStateId) {
+		if (valueSkillSpecialDispel35 >= 1 && target.isStateAffected(markStateId)) {
+			target.removeState(markStateId);
+		}
+	};
+
+	// Replaces (1x, state 13): re-applies addStateId whenever guardStateId is absent.
+	AGH_stateDeselectAddStateUnlessAffected = function (user, target, stateId, guardStateId, addStateId) {
+		if (!target.isStateAffected(guardStateId)) {
+			target.addState(addStateId);
+		}
+	};
+
+	// Replaces (1x, state 425): a deliberate no-op. The original body's only
+	// statement was commented out ("解除されない場合にあり" - for the case where the
+	// mark must not be lifted), so the tag exists purely as documentation.
+	AGH_stateDeselectKeepMark = function (user, target, stateId) {
+	};
+
+	// Replaces (1x, state 184): on the qualifying battle modes, upgrades the state
+	// when its prerequisite is present and grants state 201 for the named skills.
+	AGH_stateInitiateTierUp = function (user, target, stateId) {
+		var battleMode = $gameVariables.value(182);
+		if (battleMode != 2 && battleMode != 12) return;
+		if (user.isStateAffected(181)) {
+			user.addState(stateId + 1);
+		}
+		var currentSkillId = $gameVariables.value(96);
+		if (currentSkillId == 256 || currentSkillId == 306 || currentSkillId == 356) {
+			user.addState(201);
+		}
+	};
+
+	// --- Shared state plumbing --------------------------------------------------
+
+	// Replaces the many bare `target.addState(n)` bodies (2x Action Start 131/137/
+	// 141/147 + 133/143 + 134/144 + 136/146 + 138/148 + 139/149 + 140/150 + 889,
+	// Turn End 47).
+	AGH_stateAddState = function (user, target, stateId, addStateId) {
+		target.addState(addStateId);
+	};
+
+	// Replaces (1x, state 332): applies a whole ladder of states at once, but only
+	// while the battler is alive - the original wrapped the six addState() calls in
+	// `if (target.isAlive()) { ... }`.
+	AGH_stateAddStatesIfAlive = function (user, target, stateId, stateIds) {
+		if (!target.isAlive()) return;
+		stateIds.forEach(function (id) {
+			target.addState(id);
+		});
+	};
+
+	//=============================================================================
+	// State notetag conditions (data/states.json <Custom Passive Condition> /
+	// <Custom Aura Condition>)
+	//----------------------------------------------------------------------------
+	// Both are compiled with new Function('condition', ...) and must leave the
+	// answer in `condition`, so these helpers return a boolean and the notetag body
+	// is `condition = AGH_...(user, ...);`. `stateId` is not available in that
+	// scope, which is why every id below is passed in explicitly.
+	//=============================================================================
+
+	// Replaces (1x, state 104): the battler must have the passive-condition weapon
+	// type equipped. valuewtype is the shared global from amygameSettei.js.
+	AGH_statePassiveConditionWeaponType = function (user, weaponType) {
+		return user.isWtypeEquipped(weaponType);
+	};
+
+	// Replaces (26x, states 179 / 184 / 298 / 651 / 652 / 653 / 654 / 659 / 660 /
+	// 661 / 700 / 801 / 804 / 808 / 811 / 817 / 831-840): the battler must have the
+	// given skill equipped in battle.
+	AGH_statePassiveConditionBattleSkill = function (user, skillId) {
+		return user.battleSkillsRaw().includes(skillId);
+	};
+
+	// Replaces (1x, state 184): the same, only while a battle is running.
+	AGH_statePassiveConditionBattleSkillInBattle = function (user, skillId) {
+		return user.battleSkillsRaw().includes(skillId) && $gameParty.inBattle();
+	};
+
+	// Replaces (1x, state 162): a battle skill plus a matching armour type.
+	AGH_statePassiveConditionBattleSkillAndArmorType = function (user, skillId, armorTypeId) {
+		return user.battleSkillsRaw().includes(skillId) && user.isAtypeEquipped(armorTypeId);
+	};
+
+	// Replaces (1x, state 166): a battle skill plus a matching weapon type.
+	AGH_statePassiveConditionBattleSkillAndWeaponType = function (user, skillId, weaponTypeId) {
+		return user.battleSkillsRaw().includes(skillId) && user.isWtypeEquipped(weaponTypeId);
+	};
+
+	// Replaces (1x, state 621): a battle skill that must not have been learned as a
+	// permanent skill.
+	AGH_statePassiveConditionBattleSkillNotLearned = function (user, skillId, excludedSkillId) {
+		return user.battleSkillsRaw().includes(skillId) && !user.isLearnedSkill(excludedSkillId);
+	};
+
+	// Replaces (3x, states 616 / 620 / 700): the state is active until the skill is
+	// learned permanently.
+	AGH_statePassiveConditionNotLearnedSkill = function (user, skillId) {
+		return !user.isLearnedSkill(skillId);
+	};
+
+	// Replaces (1x, state 700): the battle skill must sit at an exact mastery level.
+	AGH_statePassiveConditionBattleSkillMasteryLevel = function (user, skillId, level) {
+		if (!user.battleSkillsRaw().includes(skillId)) return false;
+		return user.skillMasteryLevel(skillId) === level;
+	};
+
+	// Replaces (9x, states 673-677 / 687-691): an inclusive band on an element rate.
+	AGH_statePassiveConditionElementRateRange = function (user, elementId, minRate, maxRate) {
+		var rate = user.elementRate(elementId);
+		return rate >= minRate && rate <= maxRate;
+	};
+
+	// Replaces (2x, states 501 / 502): a cell of a two-dimensional game variable
+	// must have reached minValue.
+	AGH_statePassiveConditionVariableCellAtLeast = function (user, variableId, rowIndex, columnIndex, minValue) {
+		return $gameVariables.value(variableId)[rowIndex][columnIndex] >= minValue;
+	};
+
+	// Replaces (2x, states 618 / 619): only while a battle is running and the
+	// battler is alive.
+	AGH_statePassiveConditionInBattleAlive = function (user) {
+		return $gameParty.inBattle() && user.isAlive();
+	};
+
+	// Replaces (4x, states 332 / 447 / 449 / 450): the aura is suppressed while the
+	// battler carries blockedStateId.
+	AGH_stateAuraConditionNotAffected = function (user, blockedStateId) {
+		return !user.isStateAffected(blockedStateId);
+	};
+
+	// Replaces (2x, states 444 揮下戦士 / 445 揮下魔導士): suppressed by
+	// blockedStateId, otherwise it needs requiredStateId (441 / 442).
+	AGH_stateAuraConditionNotAffectedAndAffected = function (user, blockedStateId, requiredStateId) {
+		if (user.isStateAffected(blockedStateId)) return false;
+		return user.isStateAffected(requiredStateId);
+	};
+
+	//=============================================================================
+	// State notetag regen formulas (data/states.json <Custom Regen Formula>)
+	//----------------------------------------------------------------------------
+	// YEP_X_ExtDoT concatenates the body into state.dotFormula and eval's it inside
+	// processDamageOverTimeStateEffect, where `a`/`origin` is the state's origin and
+	// `b`/`user`/`target` is the battler being regenerated. The body has to leave
+	// its result in `value`, and may also override the `variance` / `element`
+	// locals. These helpers return all three in an object; the notetag unpacks them,
+	// so the two locals are still assigned in the enclosing function exactly as
+	// before.
+	//
+	// BUGFIX: `value` is not declared in processDamageOverTimeStateEffect, so in the
+	// original a formula whose condition failed left whatever the previous DoT state
+	// had written into the global `value` - the battler then healed for that stale
+	// amount. The helpers seed value with 0 instead, which is what the failing
+	// branch clearly intends.
+	//=============================================================================
+
+	// Replaces (5x, states 395 自己再生(小) / 396 (中) / 397 (大) / 398 (超) / 399 (神)):
+	// while the origin is wounded and still has mpThreshold MP, heals
+	// mpMultiplier x the origin's max MP.
+	AGH_stateRegenFormulaSelfMp = function (origin, user, target, stateId, mpThreshold, mpMultiplier) {
+		var state = $dataStates[stateId];
+		var result = { value: 0, variance: state.dotVariance, element: state.dotElement };
+		if (origin.hpRate() !== 1.00 && origin.mpRate() >= mpThreshold) {
+			result.value = Math.round(origin.mmp * mpMultiplier);
+			result.variance = 10;
+			result.element = 12;
+		}
+		return result;
+	};
+
+	// Replaces (1x, state 666 回復号令): heals twice the origin's MAT for every stack
+	// of the state counter.
+	AGH_stateRegenFormulaMasteryCommand = function (origin, user, target, stateId) {
+		return {
+			value: origin.mat * 2 * user._stateCounter[stateId],
+			variance: 10,
+			element: 12
+		};
+	};
 })();
