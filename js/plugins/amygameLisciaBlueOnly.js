@@ -82,7 +82,8 @@ class Tip2 extends BookTipBase {//<淫統薬>インデュ・アビス
     return 2;
   }
   bookTitle() {
-    return `${$dataWeapons[452].name}─その１─`;
+    var weaponName = $dataWeapons[452].name;
+    return `${weaponName}─その１─`;
   }
   bookDescription() {
     return `コルブラント島でその断片を確保した星晶獣、
@@ -110,7 +111,8 @@ class Tip3 extends BookTipBase {//<淫統薬>インデュ・アビス
     return 2;
   }
   bookTitle() {
-    return `${$dataWeapons[452].name}─その３─`;
+    var weaponName = $dataWeapons[452].name;
+    return `${weaponName}─その３─`;
   }
   bookDescription() {
     return `
@@ -135,7 +137,8 @@ class Tip4 extends BookTipBase {//<試薬品>インデュルゲンス・リキ�
     return 2;
   }
   bookTitle() {
-    return `${$dataWeapons[453].name}`;
+    var weaponName = $dataWeapons[453].name;
+    return `${weaponName}`;
   }
   bookDescription() {
     return `開発された\\wn[452]の試作品。
@@ -159,7 +162,8 @@ class Tip5 extends BookTipBase {//<淫紋>アビス・クレスト使用ずみ
     return 2;
   }
   bookTitle() {
-    return `${$dataWeapons[454].name}`;
+    var weaponName = $dataWeapons[454].name;
+    return `${weaponName}`;
   }
   bookDescription() {
     return `触手型魔物である「\\wn[455]」が使う、
@@ -189,7 +193,8 @@ class Tip6 extends BookTipBase {//<淫統光>HMD型インデュ・アビス.使�
     return 2;
   }
   bookTitle() {
-    return `${$dataWeapons[457].name}`;
+    var weaponName = $dataWeapons[457].name;
+    return `${weaponName}`;
   }
   bookDescription() {
     return `服薬が必要な\\wn[452]に対して、
@@ -215,7 +220,8 @@ class Tip7 extends BookTipBase {//<アビス・クレスト>と<インデュ・�
     return 2;
   }
   bookTitle() {
-    return `${$dataWeapons[458].name}`;
+    var weaponName = $dataWeapons[458].name;
+    return `${weaponName}`;
   }
   bookDescription() {
     return `両者には根幹技術に措いて同様の手法が用いられている
@@ -241,7 +247,8 @@ class Tip8 extends BookTipBase {//使用済み
     return 2;
   }
   bookTitle() {
-    return `${$dataWeapons[80].name}`;
+    var weaponName = $dataWeapons[80].name;
+    return `${weaponName}`;
   }
   bookDescription() {
     return `数年前よりコルブラント島に出没するようになった空賊団。
@@ -270,7 +277,8 @@ class Tip11 extends BookTipBase {//<星晶獣>インペリウム・グノーシ�
     return 2;
   }
   bookTitle() {
-    return `${$dataWeapons[451].name}`;
+    var weaponName = $dataWeapons[451].name;
+    return `${weaponName}`;
   }
   bookDescription() {
     return `コルブラント島で存在を確認された星晶獣。
@@ -299,7 +307,8 @@ class Tip12 extends BookTipBase {//<星晶獣>インペリウム・グノーシ�
     return 3;
   }
   bookTitle() {
-    return `${$dataWeapons[451].name}─その２─`;
+    var weaponName = $dataWeapons[451].name;
+    return `${weaponName}─その２─`;
   }
   bookDescription() {
     return `既にその存在は朽ち果て、遺骸は大森林の地下深くに埋没している。
@@ -326,7 +335,9 @@ class Tip13 extends BookTipBase {//「インペルの神水」使用済み
     return 2;
   }
   bookTitle() {
-    return `${$dataItems[1162].name} またの名を「${$dataWeapons[460].name}」`;
+	var itemName = $dataItems[1162].name;
+	var weaponName = $dataWeapons[460].name;
+    return `${itemName} またの名を「${weaponName}」`;
   }
   bookDescription() {
     return `中央森林で汲み取れる湧き水。
@@ -385,7 +396,9 @@ class Tip15 extends BookTipBase {//クサンについて。ラストバトル時
     return 3;
   }
   bookTitle() {
-    return `${$gameActors.actor(7).name()}=コルド＝${$dataActors[7].meta['SecondName'].split(',')[1]}`;
+    var actorName = $gameActors.actor(7).name();
+    var actorSecondName = $dataActors[7].meta['SecondName'].split(',')[1];
+    return `${actorName}=コルド＝${actorSecondName}─その２─`;
   }
   bookDescription() {
     return `\\swi[247]元宰相。
@@ -417,7 +430,9 @@ class Tip16 extends BookTipBase {//クサンについて2。使用ずみ
   }
   //var value1 = `\\set[7]─その２─`;
   bookTitle() {
-    return `${$gameActors.actor(7).name()}=コルド＝${$dataActors[7].meta['SecondName'].split(',')[1]}─その２─`;
+    var actorName = $gameActors.actor(7).name();
+    var actorSecondName = $dataActors[7].meta['SecondName'].split(',')[1];
+    return `${actorName}=コルド＝${actorSecondName}─その２─`;
   }
   bookDescription() {
     return `未だ復権という野心にその身を焦がす\\swi[247]元宰相。
@@ -448,7 +463,8 @@ class Tip17 extends BookTipBase {//騎士団長,入手ずみ
     return 3;
   }
   bookTitle() {
-    return `${$dataWeapons[351].name}=${$dataWeapons[351].meta['FamilyName']}`;
+    var weaponName = $dataWeapons[351].name;
+    return `${weaponName}=${$dataWeapons[351].meta['FamilyName']}`;
   }
   bookDescription() {
     return `\\swi[247]騎士団長。
@@ -479,7 +495,8 @@ class Tip18 extends BookTipBase {//国王。使用ずみ
     return 2;
   }
   bookTitle() {
-    return `${$dataWeapons[359].name}=${$dataWeapons[359].meta['FamilyName']}`;
+    var weaponName = $dataWeapons[359].name;
+    return `${weaponName}=${$dataWeapons[359].meta['FamilyName']}`;
   }
   bookDescription() {
     return `\\swi[247]国王。自他共に認める無能な王。
@@ -507,7 +524,8 @@ class Tip19 extends BookTipBase {//<淫触薬>アビス・リキッド、使用�
     return 2;
   }
   bookTitle() {
-    return `${$dataWeapons[459].name}`;
+    var weaponName = $dataWeapons[459].name;
+    return `${weaponName}`;
   }
   bookDescription() {
     return `\\wn[452]を元にして作成された派生薬の一つ。
@@ -614,7 +632,8 @@ class Tip23 extends BookTipBase {//<淫統薬>インデュ・アビス
     return 2;
   }
   bookTitle() {
-    return `${$dataWeapons[452].name}─その２─`;
+    var weaponName = $dataWeapons[452].name;
+    return `${weaponName}─その２─`;
   }
   bookDescription() {
     return `これを解消する為の研究は主に、
@@ -1288,7 +1307,9 @@ seisyoujuu_select2 = function (selectModeId) {
     let pictureId = 101;
     //const picturePath = 'ScreenBlackOut';
     let choiceIndex = 0;
-    const txt = `\\I[508]星晶石入手率＜${valueCountSet4}/${valueCountSet3}＞`;
+    var current = valueCountSet4;
+    var max = valueCountSet3;
+    const txt = `\\I[508]星晶石入手率＜${current}/${max}＞`;
     const choiceParams = {
       text: txt,
       value: 0
