@@ -52,6 +52,9 @@ const PARAM_ICON_DEFAULT = [16, 16, 16];
 // icons are swapped relative to every other entry.
 const SPARAM_ICONS_NEGATIVE_IS_GOOD = [6, 7];
 
+// `<additionalSetN>` target index 1-4 -> the "to whom" prefix label.
+const ADDITIONAL_SET_TARGET_LABELS = [``, `使用者に`, `味方全体に`, `対象敵に`, `敵全体に`];//翻訳対象
+
 // `<Skill Tier N Slots>` -> the label shown for slot N.
 const SKILL_TIER_SLOT_LABELS = [``, `Ability装着数`, `Main装着数`, `Job装着数`,
                                 `G-Passive装着数`, `Passive装着数`, `H-Passive装着数`];
@@ -127,6 +130,32 @@ const EQUIPPED_SKILL_TYPE_IDS = [9, 10, 15];
 // Weapon type id 12 marks the Burst skill type.
 const BURST_SKILL_TYPE_ID = 12;
 
+// ---------------------------------------------------------------------------
+// Translatable labels
+//
+// A `//翻訳対象` marker means the literal's *value* is human-readable text that
+// has to reach a translator. Everything around it — `\C[n]`, `\I[n]`, the
+// `\x1b*` name codes, wrapper brackets, and pure-ASCII tokens such as `Rank:`,
+// `TP`, `%` — stays in the template literal. The string a translator edits then
+// reads as a word or a short phrase instead of mostly control-code noise, and
+// the codes cannot be mangled by the translation pass.
+//
+// Only labels shared by more than one site live here; a label used once is a
+// local `const` immediately above the statement that consumes it.
+// ---------------------------------------------------------------------------
+const CONDITION_LABEL = `条件`;//翻訳対象
+const POWER_LABEL = `威力`;//翻訳対象
+const DRAIN_LABEL = `与Dの`;//翻訳対象
+const ABSORB_LABEL = `吸収回復`;//翻訳対象
+const OR_MORE_SUFFIX = `以上`;//翻訳対象
+const TIMES_SUFFIX = `倍`;//翻訳対象
+const SUITABLE_LV_LABEL = `適正Lv`;//翻訳対象
+const TP_LABEL = `TP`;//翻訳対象
+const RANK_LABEL = `Rank`;//翻訳対象
+// Entry 18 of the damage-formula table is the only entry carrying text; the
+// `GunDamage` tag further down the item section reuses the same word.
+const FIXED_VALUE_TEXT = `固定値`;//翻訳対象
+
 // `DamageFormula2` first field -> the blurb shown for it. Every entry is the
 // body of `[\C[${colorCode}]…\C[0]`. Ids 8, 9 and 10 are built from the
 // remaining fields and are handled before this table is consulted; id 31 has
@@ -137,7 +166,7 @@ const DAMAGE_FORMULA_TEXT = {
   11: `\\I[34]70%\\I[37]20%\\I[38]10%`, 12: `\\I[34]20%\\I[37]40%\\I[38]40%`,
   13: `\\I[34]60%\\I[37]40%`, 14: `\\I[36]100%`,
   15: `\\I[34]40%\\I[37]30%\\I[38]30%`, 16: `\\I[34]80%\\I[37]20%`, 17: `\\I[34]100%`,
-  18: `\\I[37]50%+固定値`, 19: `\\I[34]20%\\I[37]80%`, 20: `\\I[36]50%\\I[37]50%`,
+  18: `\\I[37]50%+${FIXED_VALUE_TEXT}`, 19: `\\I[34]20%\\I[37]80%`, 20: `\\I[36]50%\\I[37]50%`,
   24: `\\I[37]50%\\I[39]50%`, 25: `\\I[37]50%`,
   28: `\\I[34]100%`, 29: `\\I[34]80%\\I[37]10%\\I[38]10%`, 30: `\\I[34]70%\\I[37]10%\\I[38]20%`
 };
@@ -152,7 +181,7 @@ function elementLabel(elementId) {
 }
 function elementAmplifyLabel(elementId) {
   const elementIcon = amygame_elementIcon(elementId);
-  return elementIcon[0] >= 1 ? `${elementIcon[1]}威力` : `\x1bI[${elementIcon[2]}]威力`;
+  return elementIcon[0] >= 1 ? `${elementIcon[1]}${POWER_LABEL}` : `\x1bI[${elementIcon[2]}]${POWER_LABEL}`;
 }
 // The `\x1bI[n]` icon used by the element-resist trait (code 11). Takes the
 // already-fetched descriptor: `amygame_elementIcon` allocates a fresh array on
@@ -230,7 +259,7 @@ function recoveryEffectText(iconId, value, unit, direction) {
 function lifeStealText(prefix, rawValue, resource, lossSuffix) {
   const value = Number(String(rawValue).replace(' ', '').replace('%', ''));
   const isGain = value >= 1;
-  return `[\\C[${isGain ? 2 : 10}]${prefix}与Dの${value}%${resource}${isGain ? `吸収回復` : lossSuffix}\\C[0]]`;
+  return `[\\C[${isGain ? 2 : 10}]${prefix}${DRAIN_LABEL}${value}%${resource}${isGain ? ABSORB_LABEL : lossSuffix}\\C[0]]`;
 }
 function lifeStealGroupText(meta, resource, lossSuffix) {
   const physical = meta[resource + ' Life Steal Physical'];
@@ -258,8 +287,9 @@ function statEffectName(metaValues) {
     case 1: return FTKR.CSS.cssStatus.xparam[statIndex];
     case 2: return FTKR.CSS.cssStatus.sparam[statIndex];
     case 3:
+      const specialAttackLabel = `特攻`;//翻訳対象
       return `${$dataSystem.elements[statIndex]}`
-        + (ATTACK_AMPLIFY_ELEMENT_IDS.indexOf(statIndex) >= 0 ? `特攻` : ``) + `威力`;
+        + (ATTACK_AMPLIFY_ELEMENT_IDS.indexOf(statIndex) >= 0 ? specialAttackLabel : ``) + POWER_LABEL;
     default: return undefined;
   };
 }
@@ -340,12 +370,14 @@ continue;
 };
 
 if(databaseTypeId == 1 || databaseTypeId == 2){
-  var headerText = `[\\C[${colorCode}]分類\\C[0]:${$dataSystem.equipTypes[item.etypeId]}]`;
+  const categoryLabel = `分類`;//翻訳対象
+  const typeLabel = `種別`;//翻訳対象
+  var headerText = `[\\C[${colorCode}]${categoryLabel}\\C[0]:${$dataSystem.equipTypes[item.etypeId]}]`;
     if(databaseTypeId == 1 && item.wtypeId >= 1){
       var weaponTypeName = $dataSystem.weaponTypes[item.wtypeId];
-      headerText += `[\\C[${colorCode}]種別\\C[0]:${weaponTypeName}]`
+      headerText += `[\\C[${colorCode}]${typeLabel}\\C[0]:${weaponTypeName}]`
     };
-    if(databaseTypeId == 2 && item.atypeId >= 1){headerText += `[\\C[${colorCode}]種別\\C[0]:${$dataSystem.armorTypes[item.atypeId]}]`};
+    if(databaseTypeId == 2 && item.atypeId >= 1){headerText += `[\\C[${colorCode}]${typeLabel}\\C[0]:${$dataSystem.armorTypes[item.atypeId]}]`};
 if(databaseTypeId == 1 || databaseTypeId == 2){
   if(itemMeta['LotteryRearity']){
     headerText += `[\\I[517]:${Number(itemMeta['LotteryRearity'])}]`;
@@ -594,11 +626,13 @@ if(itemMeta['HSkillLearn']){
     const premiseVariable = itemMeta['PremiseVariable' + premiseIndex];
     const premiseArrangement = itemMeta['PremiseArrangement' + premiseIndex];
     if(premiseSkill){
-      premiseTexts.push(`\\C[27]<${$dataSkills[Number(premiseSkill)].name}>\\C[0]習得`);
+      const learnSuffix = `習得`;//翻訳対象
+      premiseTexts.push(`\\C[27]<${$dataSkills[Number(premiseSkill)].name}>\\C[0]${learnSuffix}`);
     };
     if(premiseSkillRank){
       const rankValues = splitMetaValues(premiseSkillRank);
-      premiseTexts.push(`\\C[27]<${$dataSkills[Number(rankValues[0])].name}>\\C[0]Rank:\\C[27]${Number(rankValues[1])}\\C[0]到達`);
+      const reachSuffix = `到達`;//翻訳対象
+      premiseTexts.push(`\\C[27]<${$dataSkills[Number(rankValues[0])].name}>\\C[0]${RANK_LABEL}:\\C[27]${Number(rankValues[1])}\\C[0]${reachSuffix}`);
     };
     if(premiseVariable){
       const variableValues = splitMetaValues(premiseVariable);
@@ -606,14 +640,15 @@ if(itemMeta['HSkillLearn']){
       // one colon — five sequential first-occurrence replaces, not a global one.
       const variableName = `${$dataSystem.variables[Number(variableValues[0])]}`
         .replace("　", "").replace("　", "").replace("　", "").replace(" ", "").replace(":", "");
-      premiseTexts.push(`\\C[27]${variableName}\\C[0]:\\C[27]${Number(variableValues[1])}\\C[0]以上`);
+      premiseTexts.push(`\\C[27]${variableName}\\C[0]:\\C[27]${Number(variableValues[1])}\\C[0]${OR_MORE_SUFFIX}`);
     };
     if(premiseArrangement){
       const arrangementValues = splitMetaValues(premiseArrangement);
-      premiseTexts.push(`\\C[27]${valueHentaiArrangement[Number(arrangementValues[0])]}\\C[0]:\\C[27]${Number(arrangementValues[1])}\\C[0]以上`);
+      premiseTexts.push(`\\C[27]${valueHentaiArrangement[Number(arrangementValues[0])]}\\C[0]:\\C[27]${Number(arrangementValues[1])}\\C[0]${OR_MORE_SUFFIX}`);
     };
   };
-  effectText += `[条件:${premiseTexts.length ? premiseTexts.join(``) : `\\C[27]なし\\C[0]`}]`;
+  const noneLabel = `なし`;//翻訳対象
+  effectText += `[${CONDITION_LABEL}:${premiseTexts.length ? premiseTexts.join(``) : `\\C[27]${noneLabel}\\C[0]`}]`;
 };
 
 if(itemMeta['DescriptionWord']){
@@ -627,7 +662,7 @@ if(itemMeta['DescriptionWord']){
 
 if(itemMeta['GunDamage']){
 var effectValue = itemMeta['GunDamage'];
-effectText += `[固定値:${effectValue}] `;
+effectText += `[${FIXED_VALUE_TEXT}:${effectValue}] `;
 };//銃武器の固定値
 
 if(databaseTypeId == 3 || databaseTypeId == 0){
@@ -668,7 +703,8 @@ if(databaseTypeId == 0 || (databaseTypeId == 3 && BATTLE_SKILL_TYPE_IDS.indexOf(
 
 if(databaseTypeId == 3 && TURN_ACTION_SKILL_TYPE_IDS.indexOf(item.stypeId) >= 0 && !itemMeta['Instant']){
   var colorCode = 13;
-  headerText += `\\C[${colorCode}]<ターン行動>\\C[0] `;
+  const turnActionText = `ターン行動`;//翻訳対象
+  headerText += `\\C[${colorCode}]<${turnActionText}>\\C[0] `;
   var colorCode = 2;
 };
   if(item.scope >= 1 && BATTLE_SKILL_TYPE_IDS_WITH_SCOPE.indexOf(item.stypeId) >= 0){
@@ -690,21 +726,26 @@ if(itemMeta['Custom Cooldown Mastery Formula'] || itemMeta['Custom MP Cost Maste
   //value11 += `[${value9}]`;
 };
 if(itemMeta['Select Conditions']){
-  headerText += `[\\C[${colorCode}]対象前衛のみ\\C[0]] `;
+  const frontGuardOnlyText = `対象前衛のみ`;//翻訳対象
+  headerText += `[\\C[${colorCode}]${frontGuardOnlyText}\\C[0]] `;
 };
 if(itemMeta['SkillLearningClass']){
   var effectValue = `${$dataSystem.skillTypes[item.stypeId]}`;
   var fragText = Number(itemMeta['SkillLearningClass']);
   if(fragText != 100){
-    effectText += `[\\C[${colorCode}]${effectValue}\\C[0]] [\\C[${colorCode}]\x1bJ[${fragText}]\\C[0]習得] `;
+    const learnNameCode = `\x1bJ[${fragText}]`;//名前コード。翻訳対象外
+    const learnText = `習得`;//翻訳対象
+    effectText += `[\\C[${colorCode}]${effectValue}\\C[0]] [\\C[${colorCode}]${learnNameCode}\\C[0]${learnText}] `;
   };
 };
 if(itemMeta['Limit Uses']){
   var fragText = Number(itemMeta['Limit Uses']);
   if(itemMeta['Not Recover All Uses']){//<After Battle Uses Recover: 0>もセット
-    headerText += `[\\C[${colorCode}]1日${fragText}回\\C[0]] `;
+    const dailyUsesText = `1日${fragText}回`;//翻訳対象
+    headerText += `[\\C[${colorCode}]${dailyUsesText}\\C[0]] `;
   } else {
-    headerText += `[\\C[${colorCode}]戦闘中${fragText}回\\C[0]] `;
+    const battleUsesText = `戦闘中${fragText}回`;//翻訳対象
+    headerText += `[\\C[${colorCode}]${battleUsesText}\\C[0]] `;
   };
 };
 if(databaseTypeId == 0){
@@ -715,7 +756,8 @@ if(databaseTypeId == 0){
 if(databaseTypeId == 0){
   if(itemMeta['SeiyokuItem']){
     var colorCode = 27;
-    effectText += `[\\C[${colorCode}]性欲品\\C[0]] `;
+    const lustItemText = `性欲品`;//翻訳対象
+    effectText += `[\\C[${colorCode}]${lustItemText}\\C[0]] `;
   };
 };
 var colorCode = 2;
@@ -770,12 +812,15 @@ if(item.damage.type >= 1){
       } else {
         var effectValue = `全`;
       };
-      effectText += `[\\C[${colorCode}]${fragText}\\C[3]${effectValue}\\C[0]回復]`;
+      const recoveryText = `回復`;//翻訳対象
+      effectText += `[\\C[${colorCode}]${fragText}\\C[3]${effectValue}\\C[0]${recoveryText}]`;
   };
 };
 if(itemMeta['SkillStateAddRemove']){
   var fragText = Number(itemMeta['SkillStateAddRemove']);
-  effectText += `[\\C[${colorCode}]\x1bSIM[${fragText}]\\C[0]付与/解除]`;//
+  const stateNameCode = `\x1bSIM[${fragText}]`;//ステート名コード。翻訳対象外
+  const grantRemoveText = `付与/解除`;//翻訳対象
+  effectText += `[\\C[${colorCode}]${stateNameCode}\\C[0]${grantRemoveText}]`;//
 };
 if(itemMeta['PotionResist']){
   var fragText = Number(itemMeta['PotionResist']);
@@ -783,7 +828,8 @@ if(itemMeta['PotionResist']){
 };
 if(item.speed != 0){
   var fragText = item.speed;
-  effectText += `\\C[${colorCode}]Speed\\C[0]:${fragText} `;
+  const speedLabel = `Speed`;//翻訳対象
+  effectText += `\\C[${colorCode}]${speedLabel}\\C[0]:${fragText} `;
 };
 if(itemMeta['Repeat']){
   var fragText = Number(itemMeta['Repeat']);
@@ -803,7 +849,7 @@ if(itemMeta['RankUpPoint']){
     if(Number(itemMeta['Max Mastery Level']) == 1){
       effectText += `\\I[664]:${fragText} `;
     } else {
-      effectText += `\\I[664]:${fragText}*Rank `;
+      effectText += `\\I[664]:${fragText}*${RANK_LABEL} `;
     };
   };
 };
@@ -816,10 +862,16 @@ if(itemMeta['Max Mastery Level']){
 };
 if(item.tpGain != 0){
   var fragText = item.tpGain;
-  effectText += `\\C[${colorCode}]TP\\C[0]:${fragText}\\C[10]↑\\C[0] `;
+  effectText += `\\C[${colorCode}]${TP_LABEL}\\C[0]:${fragText}\\C[10]↑\\C[0] `;
 };
 
-var additionalSetTextByTarget = [0,`[\\C[${colorCode}]使用者に`,`[\\C[${colorCode}]味方全体に`,`[\\C[${colorCode}]対象敵に`,`[\\C[${colorCode}]敵全体に`];
+var additionalSetTextByTarget = [
+  0,
+  `[\\C[${colorCode}]${ADDITIONAL_SET_TARGET_LABELS[1]}`,
+  `[\\C[${colorCode}]${ADDITIONAL_SET_TARGET_LABELS[2]}`,
+  `[\\C[${colorCode}]${ADDITIONAL_SET_TARGET_LABELS[3]}`,
+  `[\\C[${colorCode}]${ADDITIONAL_SET_TARGET_LABELS[4]}`,
+];
 var additionalSetCountByTarget = [0,0,0,0,0];
 // Nine `<additionalSetN>` slots, each `target,flag,stacks,stateId`. The state
 // icon ladder and the four-way "which target" dispatch were written out twice
@@ -840,7 +892,8 @@ for (let additionalSetSlot = 1; additionalSetSlot <= 9; additionalSetSlot++) {
 // below prints an empty "付与" for it — that is the original behaviour.
 for (let targetIndex = 1; targetIndex <= 4; targetIndex++) {
   if(additionalSetCountByTarget[targetIndex] >= 1){
-    effectText += `${additionalSetTextByTarget[targetIndex]}付与\\C[0]] `;
+    const additionalSetGrantText = `付与`;//翻訳対象
+    effectText += `${additionalSetTextByTarget[targetIndex]}${additionalSetGrantText}\\C[0]] `;
   };
 };
 
@@ -873,9 +926,10 @@ for (let targetIndex = 1; targetIndex <= 4; targetIndex++) {
 
       if(effect.code == 22){
         const removePercent = Math.round(effect.value1 * 100);
+        const removalLabel = `解除`;//翻訳対象
         effectText += removePercent == 100
-          ? `[\\C[3]解除:\\C[0]${stateIcon}]`
-          : `[\\C[3]解除:\\C[0]${stateIcon}${removePercent}%]`;
+          ? `[\\C[3]${removalLabel}:\\C[0]${stateIcon}]`
+          : `[\\C[3]${removalLabel}:\\C[0]${stateIcon}${removePercent}%]`;
         continue;
       };
 
@@ -897,9 +951,10 @@ for (let targetIndex = 1; targetIndex <= 4; targetIndex++) {
           : ` ${state.minTurns}～${state.maxTurns}t`;
       };
       const grantPercent = Math.round(effect.value1 * 100);
+      const grantLabel = `付与`;//翻訳対象
       effectText += grantPercent == 100
-        ? `[\\C[${colorCode}]付与:\\C[0]${stateIconText(stateId)}${turnText}]`
-        : `[\\C[${colorCode}]付与:\\C[0]${stateIconText(stateId)}${grantPercent}%${turnText}]`;
+        ? `[\\C[${colorCode}]${grantLabel}:\\C[0]${stateIconText(stateId)}${turnText}]`
+        : `[\\C[${colorCode}]${grantLabel}:\\C[0]${stateIconText(stateId)}${grantPercent}%${turnText}]`;
     };
   };
 
@@ -907,28 +962,37 @@ for (let targetIndex = 1; targetIndex <= 4; targetIndex++) {
 
 if(itemMeta['dispelCount']){
   var fragText = Number(itemMeta['dispelCount']);
-  effectText += `[\\C[${colorCode}]強化状態\\C[3]${fragText}つ\\C[${colorCode}]消去\\C[0]]`;
+  const dispelStateText = `強化状態`;//翻訳対象
+  const dispelCountSuffix = `つ`;//翻訳対象
+  const dispelActionText = `消去`;//翻訳対象
+  effectText += `[\\C[${colorCode}]${dispelStateText}\\C[3]${fragText}${dispelCountSuffix}\\C[${colorCode}]${dispelActionText}\\C[0]]`;
 };
 if(itemMeta['abNomalClearCount']){
   var fragText = Number(itemMeta['abNomalClearCount']);
+  const clearCountSuffix = `つ`;//翻訳対象
+  const clearRecoverText = `回復`;//翻訳対象
   if(itemMeta['StateabNomalOnly']){
-    effectText += `[\\C[${colorCode}]\\I[683]\\C[3]${fragText}つ\\C[${colorCode}]回復\\C[0]]`;
+    effectText += `[\\C[${colorCode}]\\I[683]\\C[3]${fragText}${clearCountSuffix}\\C[${colorCode}]${clearRecoverText}\\C[0]]`;
   } else {
-    effectText += `[\\C[${colorCode}]\\I[683]\\I[684]\\C[3]${fragText}つ\\C[${colorCode}]回復\\C[0]]`;
+    effectText += `[\\C[${colorCode}]\\I[683]\\I[684]\\C[3]${fragText}${clearCountSuffix}\\C[${colorCode}]${clearRecoverText}\\C[0]]`;
   };
 };
 if(itemMeta['abNomalClearCountPlus']){
-  effectText += `[\\C[${colorCode}]状態異常回復数+(Magic/300)\\C[0]]`;
+  const ailmentRecoveryText = `状態異常回復数+(Magic/300)`;//翻訳対象
+  effectText += `[\\C[${colorCode}]${ailmentRecoveryText}\\C[0]]`;
 };
 if(itemMeta['dispelCountPlus']){
-  effectText += `[\\C[${colorCode}]強化解除数+(Magic/300)\\C[0]]`;
+  const buffRemovalText = `強化解除数+(Magic/300)`;//翻訳対象
+  effectText += `[\\C[${colorCode}]${buffRemovalText}\\C[0]]`;
 };
 
 if(itemMeta['Passive State'] && !itemMeta['パッシブ隠蔽']){
   if($dataStates[Number(itemMeta['Passive State'])] && $dataStates[Number(itemMeta['Passive State'])].meta['SpcialState']){
-    effectText += `\\C[${colorCode}]特殊効果付与\\C[0]<\x1bSIM[${Number(itemMeta['Passive State'])}]> `;
+    const specialEffectGrantText = `特殊効果付与`;//翻訳対象
+    effectText += `\\C[${colorCode}]${specialEffectGrantText}\\C[0]<\x1bSIM[${Number(itemMeta['Passive State'])}]> `;
   } else {
-    effectText += `\\C[${colorCode}]付与\\C[0]<\x1bSIM[${Number(itemMeta['Passive State'])}]> `;
+    const passiveGrantText = `付与`;//翻訳対象
+    effectText += `\\C[${colorCode}]${passiveGrantText}\\C[0]<\x1bSIM[${Number(itemMeta['Passive State'])}]> `;
   };
 };//パッシブステート
 
@@ -951,7 +1015,8 @@ if(itemMeta['PassiveElementP']){//<Max Mastery Level: 5>
 if(itemMeta['SpecialAttack']){
   var effectValue = Number(itemMeta['SpecialAttack']);
   var fragText = `<\x1bSIN[${effectValue}]>`;
-  effectText += `\\C[${colorCode}]Attack\\C[0]${fragText} `;
+  const attackLabel = `Attack`;//翻訳対象
+  effectText += `\\C[${colorCode}]${attackLabel}\\C[0]${fragText} `;
 };
 if(itemMeta['AddPowerWeapon']){
   var effectValue = itemMeta['AddPowerWeapon'];
@@ -959,122 +1024,159 @@ if(itemMeta['AddPowerWeapon']){
 };//スキルのパワーに加算
 if(itemMeta['Critical Multiplier']){
   var effectValue = itemMeta['Critical Multiplier'].replace(' ','');
-  effectText += `\\I[78]威力${effectValue} `;
+  effectText += `\\I[78]${POWER_LABEL}${effectValue} `;
 };//会心威力
 if(itemMeta['Counter Skills']){
   var effectValue = itemMeta['Counter Skills'];
-  effectText += `\\C[16]反撃スキル:\x1bSIN[${effectValue}]\\C[0] `;
+  const counterSkillLabel = `反撃スキル`;//翻訳対象
+  effectText += `\\C[16]${counterSkillLabel}:\x1bSIN[${effectValue}]\\C[0] `;
 };
 if(itemMeta['Counter Total']){
   var effectValue = itemMeta['Counter Total'];
   var effectValue = effectValue.replace(" +", "");
-  effectText += `\\C[16][最大反撃回数:${Number(effectValue)+1}回]\\C[0] `;
+  const maxCounterText = `最大反撃回数:${Number(effectValue)+1}回`;//翻訳対象
+  effectText += `\\C[16][${maxCounterText}]\\C[0] `;
 };
 if(itemMeta['CertainlyDouble']){
-  effectText += `\\C[16][必ず2連撃以上]\\C[0] `;
+  const certainlyDoubleText = `必ず2連撃以上`;//翻訳対象
+  effectText += `\\C[16][${certainlyDoubleText}]\\C[0] `;
 };
 if(itemMeta['CertainlyTriple']){
-  effectText += `\\C[16][必ず3連撃]\\C[0] `;
+  const certainlyTripleText = `必ず3連撃`;//翻訳対象
+  effectText += `\\C[16][${certainlyTripleText}]\\C[0] `;
 };
 if(itemMeta['NormalAttackHit']){
   var effectValue = itemMeta['NormalAttackHit'];
-  effectText += `\\C[16][通常攻撃Hit数+${effectValue}]\\C[0] `;
+  const normalAttackHitText = `通常攻撃Hit数+${effectValue}`;//翻訳対象
+  effectText += `\\C[16][${normalAttackHitText}]\\C[0] `;
 };
 if(itemMeta['AttackAbilityHit']){
   var effectValue = itemMeta['AttackAbilityHit'];
-  effectText += `\\C[16][通常/アビリティ攻撃Hit数+${effectValue}]\\C[0] `;
+  const attackAbilityHitText = `通常/アビリティ攻撃Hit数+${effectValue}`;//翻訳対象
+  effectText += `\\C[16][${attackAbilityHitText}]\\C[0] `;
 };
 if(itemMeta['BattleAddAttackSet']){
   var effectValue = itemMeta['BattleAddAttackSet'];
-  effectText += `\\C[16][追撃${effectValue}%]\\C[0] `;
+  const pursuitText = `追撃${effectValue}%`;//翻訳対象
+  effectText += `\\C[16][${pursuitText}]\\C[0] `;
 };
 if(itemMeta['Evade Counter']){
-  effectText += `\\C[16][回避後に反撃]\\C[0] `;
+  const evadeCounterText = `回避後に反撃`;//翻訳対象
+  effectText += `\\C[16][${evadeCounterText}]\\C[0] `;
 };
 if(itemMeta['Hit Counter']){
-  effectText += `\\C[16][攻撃受後に反撃]\\C[0] `;
+  const hitCounterText = `攻撃受後に反撃`;//翻訳対象
+  effectText += `\\C[16][${hitCounterText}]\\C[0] `;
 };
 if(itemMeta['MaxTp']){
   var effectValue = itemMeta['MaxTp'];
-  effectText += `\\C[16]MaxTp\\C[0]+${effectValue} `;
+  const maxTpLabel = `MaxTp`;//翻訳対象
+  effectText += `\\C[16]${maxTpLabel}\\C[0]+${effectValue} `;
 };
 if(itemMeta['elementRegist6']){
   var effectValue = itemMeta['elementRegist6'];
   if(effectValue == 0){
-    effectText += `\\C[${colorCode}]六属性完全耐性\\C[0] `;
+    const sixElementFullResistText = `六属性完全耐性`;//翻訳対象
+    effectText += `\\C[${colorCode}]${sixElementFullResistText}\\C[0] `;
   } else {
-    effectText += `\\C[${colorCode}]六属性耐性\\C[0]${effectValue}% `;
+    const sixElementResistText = `六属性耐性`;//翻訳対象
+    effectText += `\\C[${colorCode}]${sixElementResistText}\\C[0]${effectValue}% `;
   };
 };
 if(itemMeta['elementRegist9']){
   var effectValue = itemMeta['elementRegist9'];
   if(effectValue == 0){
-    effectText += `\\C[${colorCode}]九属性完全耐性\\C[0] `;
+    const nineElementFullResistText = `九属性完全耐性`;//翻訳対象
+    effectText += `\\C[${colorCode}]${nineElementFullResistText}\\C[0] `;
   } else {
-    effectText += `\\C[${colorCode}]九属性耐性\\C[0]${effectValue}% `;
+    const nineElementResistText = `九属性耐性`;//翻訳対象
+    effectText += `\\C[${colorCode}]${nineElementResistText}\\C[0]${effectValue}% `;
   };
 };
 if(itemMeta['StateabNomalResist']){
   var effectValue = itemMeta['StateabNomalResist'];
   if(effectValue == 0){
-    effectText += `\\C[${colorCode}]\\I[683]無効\\C[0] `;
+    const nullifyText = `無効`;//翻訳対象
+    effectText += `\\C[${colorCode}]\\I[683]${nullifyText}\\C[0] `;
   } else {
-    effectText += `\\C[${colorCode}]\\I[683]耐性\\C[0]+${effectValue}% `;
+    const resistText = `耐性`;//翻訳対象
+    effectText += `\\C[${colorCode}]\\I[683]${resistText}\\C[0]+${effectValue}% `;
   };
 };
 if(itemMeta['StateSPabNomalResist']){
   var effectValue = itemMeta['StateSPabNomalResist'];
   if(effectValue == 0){
-    effectText += `\\C[${colorCode}]\\I[684]無効\\C[0] `;
+    const spNullifyText = `無効`;//翻訳対象
+    effectText += `\\C[${colorCode}]\\I[684]${spNullifyText}\\C[0] `;
   } else {
-    effectText += `\\C[${colorCode}]\\I[684]耐性\\C[0]+${effectValue}% `;
+    const spResistText = `耐性`;//翻訳対象
+    effectText += `\\C[${colorCode}]\\I[684]${spResistText}\\C[0]+${effectValue}% `;
   };
 };
 if(itemMeta['DispelGuard']){
-  effectText += `\\C[${colorCode}]強化消去無効\\C[0] `;
+  const dispelGuardText = `強化消去無効`;//翻訳対象
+  effectText += `\\C[${colorCode}]${dispelGuardText}\\C[0] `;
 };
 if(itemMeta['Level Up Recover All']){
-    effectText += `[\\C[16]LvUp時に全回復\\C[0]]`;
+    const levelUpRecoverAllText = `LvUp時に全回復`;//翻訳対象
+    effectText += `[\\C[16]${levelUpRecoverAllText}\\C[0]]`;
 };
 if(itemMeta['Bypass Damage Cap']){
-  effectText += `\\C[16]D.Cap無効\\C[0] `;
+  const bypassDamageCapText = `D.Cap無効`;//翻訳対象
+  effectText += `\\C[16]${bypassDamageCapText}\\C[0] `;
 } else {
   if(itemMeta['Damage Cap']){
     var effectValue = itemMeta['Damage Cap'].replace(' ','');
-    effectText += `\\C[16]D.Cap:\\C[0]${effectValue} `;
+    const damageCapLabel = `D.Cap`;//翻訳対象
+    effectText += `\\C[16]${damageCapLabel}:\\C[0]${effectValue} `;
   };
 };
 if(itemMeta['Bypass Heal Cap']){
-  effectText += `\\C[16]H.Cap無効\\C[0] `;
+  const bypassHealCapText = `H.Cap無効`;//翻訳対象
+  effectText += `\\C[16]${bypassHealCapText}\\C[0] `;
 } else {
   if(itemMeta['Heal Cap']){
     var effectValue = itemMeta['Heal Cap'].replace(' ','');
-    effectText += `\\C[16]H.Cap:\\C[0]${effectValue} `;
+    const healCapLabel = `H.Cap`;//翻訳対象
+    effectText += `\\C[16]${healCapLabel}:\\C[0]${effectValue} `;
   };
 };
 if(itemMeta['HP Cost']){
   var effectValue = itemMeta['HP Cost'].replace(' ','');
-  effectText += `[\\C[16]HP${effectValue}消費\\C[0]]`;
+  const hpCostText = `HP${effectValue}消費`;//翻訳対象
+  effectText += `[\\C[16]${hpCostText}\\C[0]]`;
 };
 if(itemMeta['MP Cost']){
   var effectValue = itemMeta['MP Cost'].replace(' ','');
-  effectText += `[\\C[16]MP${effectValue}消費\\C[0]]`;
+  const mpCostText = `MP${effectValue}消費`;//翻訳対象
+  effectText += `[\\C[16]${mpCostText}\\C[0]]`;
 };
 if(itemMeta['SpcialState']){
-  suffixText += `[\\C[${colorCode}]\x1bSIM[110]で発動\\C[0]][\x1bSIM[109]で効果消失]`;
-  effectText += `[\\C[${colorCode}]行動時MP消費/消費MP未満で\\I[252]付与\\C[0]]`;
+  // The two `\x1bSIM[n]` codes expand to *state names*, i.e. to other
+  // game text, so they stay outside the translatable strings.
+  const activationStateIcon = `\x1bSIM[110]`;
+  const activationText = `で発動`;//翻訳対象
+  const expiryStateIcon = `\x1bSIM[109]`;
+  const expiryText = `で効果消失`;//翻訳対象
+  suffixText += `[\\C[${colorCode}]${activationStateIcon}${activationText}\\C[0]][${expiryStateIcon}${expiryText}]`;
+  const activationConditionText = `行動時MP消費/消費MP未満で`;//翻訳対象
+  const grantText = `付与`;//翻訳対象
+  effectText += `[\\C[${colorCode}]${activationConditionText}\\I[252]${grantText}\\C[0]]`;
 };
 if(itemMeta['activateRate']){
   var effectValue = Math.round(itemMeta['activateRate'] * 100);
-  suffixText += `[消費MP:MMP\\C[10]${effectValue}%\\C[0]]`;
+  const consumeMpText = `消費MP:MMP`;//翻訳対象
+  suffixText += `[${consumeMpText}\\C[10]${effectValue}%\\C[0]]`;
 };
 if(itemMeta['activatePoint']){//使ってない？
   var effectValue = itemMeta['activatePoint'];
-  suffixText += `[消費MP:\\C[2]${effectValue}\\C[0]]`;
+  const consumeMpLabel = `消費MP:`;//翻訳対象
+  suffixText += `[${consumeMpLabel}\\C[2]${effectValue}\\C[0]]`;
 };
 if(itemMeta['Global Cooldown']){
   var effectValue = Number(itemMeta['Global Cooldown']);
-  suffixText += `[全てのCT:\\C[2]${effectValue}\\C[0]]`;
+  const allCooldownLabel = `全てのCT:`;//翻訳対象
+  suffixText += `[${allCooldownLabel}\\C[2]${effectValue}\\C[0]]`;
 };
 // `SType N Cooldown` / `SType N Warmup` for skill types 1-15: the same row with
 // a different icon, written out twice.
@@ -1094,48 +1196,57 @@ var colorCode = 2;
 if(itemMeta['HP Life Steal']){
   var effectValue = itemMeta['HP Life Steal'].replace(' ','');
   var effectValue = effectValue.replace('%','');
-  effectText += `[\\C[${colorCode}]与Dの${Number(effectValue)}%HP吸収回復\\C[0]]`;
+  effectText += `[\\C[${colorCode}]${DRAIN_LABEL}${Number(effectValue)}%HP${ABSORB_LABEL}\\C[0]]`;
 };
 if(itemMeta['MP Life Steal']){
   var effectValue = itemMeta['MP Life Steal'].replace(' ','');
   var effectValue = effectValue.replace('%','');
-  effectText += `[\\C[${colorCode}]与Dの${Number(effectValue)}%HP吸収回復\\C[0]]`;
+  effectText += `[\\C[${colorCode}]${DRAIN_LABEL}${Number(effectValue)}%HP${ABSORB_LABEL}\\C[0]]`;
 };
 if(itemMeta['RankMaxLearning']){
   if(item.stypeId != 11){//召喚は前提スキルがあるため除外
     if(Number(itemMeta['Max Mastery Level']) >= 2){
-      effectText += `[\\C[${colorCode}]RankMaxで習得が可能になる\\C[0]]`;
+      const rankMaxLearnText = `RankMaxで習得が可能になる`;//翻訳対象
+      effectText += `[\\C[${colorCode}]${rankMaxLearnText}\\C[0]]`;
     } else {
-      effectText += `[\\C[${colorCode}]熟練度Maxで習得が可能になる\\C[0]]`;
+      const masteryMaxLearnText = `熟練度Maxで習得が可能になる`;//翻訳対象
+      effectText += `[\\C[${colorCode}]${masteryMaxLearnText}\\C[0]]`;
     };
   };
 };
 if(itemMeta['trapEvasion']){
-  effectText += `[\\C[${colorCode}]引っ掛かったトラップを自動で回避する\\C[0]]`;
+  const trapEvasionText = `引っ掛かったトラップを自動で回避する`;//翻訳対象
+  effectText += `[\\C[${colorCode}]${trapEvasionText}\\C[0]]`;
 };
 if(itemMeta['SemenRemove']){
   var colorCode = 27;
   var effectValue = Number(itemMeta['SemenRemove']);
-  effectText += `[\\C[${colorCode}]状態異常精液${effectValue}つ回復\\C[0]]`;
+  const semenRemoveText = `状態異常精液${effectValue}つ回復`;//翻訳対象
+  effectText += `[\\C[${colorCode}]${semenRemoveText}\\C[0]]`;
 };
 if(itemMeta['HstaSuppression']){
   var colorCode = 27;
   var metaValues = itemMeta['HstaSuppression'].split(',');
   var effectValue = Number(metaValues[1]);
+  const desireLimitText = `性欲度${effectValue*100}まで`;//翻訳対象
+  const developmentLimitText = `各開発/経験度${effectValue}まで`;//翻訳対象
   if(Number(metaValues[0]) == 0){
-    effectText += `[\\C[${colorCode}]性欲度${effectValue*100}まで\\C[0]][\\C[${colorCode}]各開発/経験度${effectValue}まで\\C[0]]`;
+    effectText += `[\\C[${colorCode}]${desireLimitText}\\C[0]][\\C[${colorCode}]${developmentLimitText}\\C[0]]`;
   } else {
-    effectText += `[\\C[${colorCode}]${$dataSystem.variables[Number(metaValues[0])]}のランク${effectValue}まで\\C[0]]`;
+    const rankVariableName = $dataSystem.variables[Number(metaValues[0])];
+    const rankLimitText = `のランク${effectValue}まで`;//翻訳対象
+    effectText += `[\\C[${colorCode}]${rankVariableName}${rankLimitText}\\C[0]]`;
   };
 };
 var colorCode = 2;
 if(itemMeta['TPGain1']){
   var effectValue = itemMeta['TPGain1'];
-  effectText += `[\\C[${colorCode}]TP${effectValue}%\\C[0]]`;
+  effectText += `[\\C[${colorCode}]${TP_LABEL}${effectValue}%\\C[0]]`;
 };
 if(itemMeta['gainExp']){
   var effectValue = itemMeta['gainExp'];
-  effectText += `[\\C[${colorCode}]獲得Exp:${effectValue}%\\C[0]]`;
+  const gainExpLabel = `獲得Exp`;//翻訳対象
+  effectText += `[\\C[${colorCode}]${gainExpLabel}:${effectValue}%\\C[0]]`;
 };
 for (let tierIndex = 1; tierIndex <= 6; tierIndex++) {
   const tierSlots = itemMeta['Skill Tier ' + tierIndex + ' Slots'];
@@ -1150,69 +1261,80 @@ var colorCode = 2;
 if(itemMeta['titleGetSwitch']){
   var effectValue = Number(itemMeta['titleGetSwitch']);
   if(effectValue == 2 || itemMeta['DescriptionWord']){}else{
-    effectText += `\\C[${colorCode}][条件:${$dataSystem.switches[effectValue]}]\\C[0]`;
+    effectText += `\\C[${colorCode}][${CONDITION_LABEL}:${$dataSystem.switches[effectValue]}]\\C[0]`;
   };
 };
 if(itemMeta['titleGetVariable']){
   var metaValues = itemMeta['titleGetVariable'].split(',');
   if(itemMeta['DescriptionWord']){}else{
-    effectText += `\\C[${colorCode}][条件:${$dataSystem.variables[Number(metaValues[0])]}:${Number(metaValues[1])}]\\C[0]`;
+    effectText += `\\C[${colorCode}][${CONDITION_LABEL}:${$dataSystem.variables[Number(metaValues[0])]}:${Number(metaValues[1])}]\\C[0]`;
   };
 };
 if(itemMeta['titleGetArray']){
   var metaValues = itemMeta['titleGetArray'].split(',');
   if(itemMeta['DescriptionWord']){}else{
     if(Number(metaValues[0]) == 52){
-      effectText += `\\C[${colorCode}][条件:\x1bSIM[${Number(metaValues[1])}]:${Number(metaValues[2])}体討伐]\\C[0]`;
+      const subjugationCountLabel = `体討伐`;//翻訳対象
+      effectText += `\\C[${colorCode}][${CONDITION_LABEL}:\x1bSIM[${Number(metaValues[1])}]:${Number(metaValues[2])}${subjugationCountLabel}]\\C[0]`;
     };
   };
 };
 if(itemMeta['titleGetItems']){
   var metaValues = itemMeta['titleGetItems'].split(',');
   if(itemMeta['DescriptionWord']){}else{
-    effectText += `\\C[${colorCode}][条件:\x1bIIN[${Number(metaValues[0])}]:${Number(metaValues[1])}個]\\C[0]`;
+    const quantityLabel = `個`;//翻訳対象
+    effectText += `\\C[${colorCode}][${CONDITION_LABEL}:\x1bIIN[${Number(metaValues[0])}]:${Number(metaValues[1])}${quantityLabel}]\\C[0]`;
   };
 };
 if(itemMeta['titleGetSkillRank']){
   var metaValues = itemMeta['titleGetSkillRank'].split(',');
-  effectText += `\\C[${colorCode}][条件:パーティの誰かが\x1bSIN[${Number(metaValues[0])}]Rank:${Number(metaValues[1])}以上]\\C[0]`;
+  const partyMemberLabel = `パーティの誰かが`;//翻訳対象
+  effectText += `\\C[${colorCode}][${CONDITION_LABEL}:${partyMemberLabel}\x1bSIN[${Number(metaValues[0])}]${RANK_LABEL}:${Number(metaValues[1])}${OR_MORE_SUFFIX}]\\C[0]`;
 };
 if(itemMeta['titleGetAchievement']){
   var metaValues = itemMeta['titleGetAchievement'].split(',');
   if(itemMeta['DescriptionWord']){}else{
     const achievementName = ACHIEVEMENT_NAMES[Number(metaValues[0])];
-    const personalTag = itemMeta['KojinTitle'] ? `[個人]` : ``;
-    effectText += `\\C[${colorCode}][条件:${achievementName}${personalTag}:${Number(metaValues[1])}]\\C[0]`;
+    const personalTagLabel = `個人`;//翻訳対象
+    const personalTag = itemMeta['KojinTitle'] ? `[${personalTagLabel}]` : ``;
+    effectText += `\\C[${colorCode}][${CONDITION_LABEL}:${achievementName}${personalTag}:${Number(metaValues[1])}]\\C[0]`;
   };
 };
 if(itemMeta['HtitleGetArray']){
   var metaValues = itemMeta['HtitleGetArray'].split(',');
   if(itemMeta['DescriptionWord']){}else{
-    effectText += `\\C[${colorCode}][条件:${$dataSystem.variables[Number(metaValues[0]) + 400]}:${Number(metaValues[1])}]\\C[0]`;
+    effectText += `\\C[${colorCode}][${CONDITION_LABEL}:${$dataSystem.variables[Number(metaValues[0]) + 400]}:${Number(metaValues[1])}]\\C[0]`;
   };
 };
 if(itemMeta['annihilationTitle']){
   var metaValues = itemMeta['annihilationTitle'].split(',');
+  const annihilationCountLabel = `殲滅回数`;//翻訳対象
+  const totalAnnihilationCountLabel = `の総殲滅回数`;//翻訳対象
+  const allMapsLabel = `全マップ`;//翻訳対象
+  const allDungeonsLabel = `全ダンジョン`;//翻訳対象
+  const timesOrMoreSuffix = `回以上`;//翻訳対象
   if(Number(metaValues[0]) >= 20 && $dataItems[Number(metaValues[0])]){
-    var effectValue = `\\C[1]<${$dataItems[Number(metaValues[0])].name}>\\C[0]殲滅回数:\\C[10]${Number(metaValues[1])}\\C[0]回以上`;
+    var effectValue = `\\C[1]<${$dataItems[Number(metaValues[0])].name}>\\C[0]${annihilationCountLabel}:\\C[10]${Number(metaValues[1])}\\C[0]${timesOrMoreSuffix}`;
   };
   if(Number(metaValues[0]) == 1){
-    var effectValue = `\\C[1]<全マップ>\\C[0]の総殲滅回数:\\C[10]${Number(metaValues[0])}\\C[0]回以上`;
+    var effectValue = `\\C[1]<${allMapsLabel}>\\C[0]${totalAnnihilationCountLabel}:\\C[10]${Number(metaValues[0])}\\C[0]${timesOrMoreSuffix}`;
   };
   if(Number(metaValues[0]) == 2){
-    var effectValue = `\\C[1]<全ダンジョン>\\C[0]の総殲滅回数:\\C[10]${Number(metaValues[0])}\\C[0]回以上`;
+    var effectValue = `\\C[1]<${allDungeonsLabel}>\\C[0]${totalAnnihilationCountLabel}:\\C[10]${Number(metaValues[0])}\\C[0]${timesOrMoreSuffix}`;
   };
-    effectText += `\\C[${colorCode}][条件:${effectValue}\\C[${colorCode}]]\\C[0]`;
+    effectText += `\\C[${colorCode}][${CONDITION_LABEL}:${effectValue}\\C[${colorCode}]]\\C[0]`;
 };
 if(itemMeta['PassivePlusTrait']){
   var metaValues = itemMeta['PassivePlusTrait'].split(',');
   if(Number(metaValues[0]) == 11){
     var effectValue = Number(metaValues[2]);
+    const damageResistLabel = `ダメージ耐性`;//翻訳対象
+    const elementName = $dataSystem.elements[Number(metaValues[1])];
     if(effectValue >= 0){
-      effectText += `[\\C[${colorCode}]${$dataSystem.elements[Number(metaValues[1])]}\\C[0]ダメージ耐性${Math.round(effectValue * 100)}%Down]`;
+      effectText += `[\\C[${colorCode}]${elementName}\\C[0]${damageResistLabel}${Math.round(effectValue * 100)}%Down]`;
     } else {
       var effectValue = effectValue - effectValue - effectValue;
-      effectText += `[\\C[${colorCode}]${$dataSystem.elements[Number(metaValues[1])]}\\C[0]ダメージ耐性${Math.round(effectValue * 100)}%Up]`;
+      effectText += `[\\C[${colorCode}]${elementName}\\C[0]${damageResistLabel}${Math.round(effectValue * 100)}%Up]`;
     };
   };
 };
@@ -1273,32 +1395,42 @@ for (let statEffectSlot = 1; statEffectSlot <= 9; statEffectSlot++) {
 //娼婦系説明文
 if(itemMeta['ProstitutionMoneyUp']){
     var effectValue = itemMeta['ProstitutionMoneyUp'];
-    effectText += `\\C[27]売春額に${effectValue}倍補正\\C[0] `;
+    const prostitutionBonusText = `売春額に${effectValue}倍補正`;//翻訳対象
+    effectText += `\\C[27]${prostitutionBonusText}\\C[0] `;
 };
 if(itemMeta['BustSizeChange']){
     var effectValue = itemMeta['BustSizeChange'];
-    effectText += `\\C[27]BustSize+${effectValue}cm\\C[0] `;
+    const bustSizeLabel = `BustSize`;//翻訳対象
+    effectText += `\\C[27]${bustSizeLabel}+${effectValue}cm\\C[0] `;
 };
 if(itemMeta['HipSizeChange']){
     var effectValue = itemMeta['HipSizeChange'];
-    effectText += `\\C[27]HipSize+${effectValue}cm\\C[0] `;
+    const hipSizeLabel = `HipSize`;//翻訳対象
+    effectText += `\\C[27]${hipSizeLabel}+${effectValue}cm\\C[0] `;
 };
 if(itemMeta['BodyWeightChange']){
     var effectValue = itemMeta['BodyWeightChange'];
-    effectText += `\\C[27]BodyWeight+${effectValue}kg\\C[0] `;
+    const bodyWeightLabel = `BodyWeight`;//翻訳対象
+    effectText += `\\C[27]${bodyWeightLabel}+${effectValue}kg\\C[0] `;
 };
 
 if(itemMeta['下級鑑定品'] || itemMeta['中級鑑定品'] || itemMeta['上級鑑定品']){
-  var fragText = `\\C[3][未鑑定品]\\C[0]`;
-    if(itemMeta['下級鑑定品']){fragText += `\\C[${colorCode}][下級]\\C[0]`};
-    if(itemMeta['中級鑑定品']){fragText += `\\C[${colorCode}][中級]\\C[0]`};
-    if(itemMeta['上級鑑定品']){fragText += `\\C[${colorCode}][上級]\\C[0]`};
+  const unidentifiedLabel = `未鑑定品`;//翻訳対象
+  const lowGradeLabel = `下級`;//翻訳対象
+  const midGradeLabel = `中級`;//翻訳対象
+  const highGradeLabel = `上級`;//翻訳対象
+  var fragText = `\\C[3][${unidentifiedLabel}]\\C[0]`;
+    if(itemMeta['下級鑑定品']){fragText += `\\C[${colorCode}][${lowGradeLabel}]\\C[0]`};
+    if(itemMeta['中級鑑定品']){fragText += `\\C[${colorCode}][${midGradeLabel}]\\C[0]`};
+    if(itemMeta['上級鑑定品']){fragText += `\\C[${colorCode}][${highGradeLabel}]\\C[0]`};
       effectText += `${fragText} `;
 };
 
 if(itemMeta['walletIn']){
   var effectValue = itemMeta['BodyWeightChange'];
-  effectText += `\\C[${colorCode}][使用で\\G入手]\\C[0] `;
+  const useWithLabel = `使用で`;//翻訳対象
+  const obtainLabel = `入手`;//翻訳対象
+  effectText += `\\C[${colorCode}][${useWithLabel}\\G${obtainLabel}]\\C[0] `;
 };
 if(itemMeta['QuestSetMap']){
   if(Number(itemMeta['QuestSetMap']) == 0){
@@ -1307,19 +1439,21 @@ if(itemMeta['QuestSetMap']){
     var effectValue = $dataSystem.switches[Number(itemMeta['QuestSetMap'])];
   };
   var colorCode = 16;
-  effectText += `[\\C[${colorCode}]受注\\C[0]:\\C[2]${effectValue}\\C[0]] `;
+  const acceptLabel = `受注`;//翻訳対象
+  effectText += `[\\C[${colorCode}]${acceptLabel}\\C[0]:\\C[2]${effectValue}\\C[0]] `;
   var colorCode = 2;
 };
 if(itemMeta['QuestSubjectMap']){
   var effectValue = $dataSystem.switches[Number(itemMeta['QuestSubjectMap'])];
   var colorCode = 16;
-  effectText += `[\\C[${colorCode}]対象\\C[0]:\\C[2]${effectValue}\\C[0]]\n`;
+  const targetLabel = `対象`;//翻訳対象
+  effectText += `[\\C[${colorCode}]${targetLabel}\\C[0]:\\C[2]${effectValue}\\C[0]]\n`;
   var colorCode = 2;
 };
 if(itemMeta['QuestSuitableLv']){
     var effectValue = Number(itemMeta['QuestSuitableLv']);
     var colorCode = 16;
-    effectText += `[\\C[${colorCode}]適正Lv\\C[0]:\\C[2]${effectValue}\\C[0]] `;
+    effectText += `[\\C[${colorCode}]${SUITABLE_LV_LABEL}\\C[0]:\\C[2]${effectValue}\\C[0]] `;
     var colorCode = 2;
 } else {
   if(itemMeta['QuestSubjectMap']){
@@ -1331,7 +1465,7 @@ if(itemMeta['QuestSuitableLv']){
             var metaValues = $dataItems[traitDataId].meta['EnemyLV'].split(',');
             var fragText = Math.min(...metaValues);
             var colorCode = 16;
-            effectText += `[\\C[${colorCode}]適正Lv\\C[0]:\\C[2]${fragText}\\C[0]] `;
+            effectText += `[\\C[${colorCode}]${SUITABLE_LV_LABEL}\\C[0]:\\C[2]${fragText}\\C[0]] `;
             var colorCode = 2;
             break;
     }}}};
@@ -1349,33 +1483,40 @@ for (const [questMetaKey, questLabel] of QUEST_OBJECTIVE_LABELS) {
   };
 };
 if(itemMeta['CoercionQuest']){
-  effectText += `[\\C[${colorCode}]クエスト進行中に強制進行あり\\C[0]] `;
+  const questForcedProgressText = `クエスト進行中に強制進行あり`;//翻訳対象
+  effectText += `[\\C[${colorCode}]${questForcedProgressText}\\C[0]] `;
 };
 if(itemMeta['Stuff']){
   var effectValue = Number(itemMeta['Stuff']);
-  effectText += `\\C[${colorCode}][満腹度+${effectValue}（${$gameVariables.value(16)}/${$gameVariables.value(13)}）]\\C[0] `;
+  const satietyText = `満腹度+${effectValue}（${$gameVariables.value(16)}/${$gameVariables.value(13)}）`;//翻訳対象
+  effectText += `\\C[${colorCode}][${satietyText}]\\C[0] `;
 };
 if(itemMeta['ＴＰ']){
   var effectValue = Number(itemMeta['ＴＰ']);
-  effectText += `\\C[${colorCode}][TP+${effectValue}]\\C[0] `;
+  effectText += `\\C[${colorCode}][${TP_LABEL}+${effectValue}]\\C[0] `;
 };
 if(itemMeta['Ingredients']){
-  effectText += `\\C[${colorCode}][食材(換金用途)]\\C[0] `;
+  const ingredientLabel = `食材(換金用途)`;//翻訳対象
+  effectText += `\\C[${colorCode}][${ingredientLabel}]\\C[0] `;
 };
 if(itemMeta['Alcohol']){
-  effectText += `\\C[${colorCode}][アルコール]\\C[0] `;
+  const alcoholLabel = `アルコール`;//翻訳対象
+  effectText += `\\C[${colorCode}][${alcoholLabel}]\\C[0] `;
 };
 if(itemMeta['ExpiryDate']){
   if(itemMeta['Menu Category']){
     if(itemMeta['Menu Category'] == ' Food'){
-      effectText += `\\C[${colorCode}][賞味期限当日中]\\C[0] `;
+      const expirySameDayLabel = `賞味期限当日中`;//翻訳対象
+      effectText += `\\C[${colorCode}][${expirySameDayLabel}]\\C[0] `;
     };
   } else {
-      effectText += `\\C[${colorCode}][翌日自動返却]\\C[0] `;
+      const expiryNextDayLabel = `翌日自動返却`;//翻訳対象
+      effectText += `\\C[${colorCode}][${expiryNextDayLabel}]\\C[0] `;
   };
 };
 if(itemMeta['EventFactorClearReset']){
-  effectText += `\\C[${colorCode}][クエスト関連アイテム]\\C[0] `;
+  const questItemLabel = `クエスト関連アイテム`;//翻訳対象
+  effectText += `\\C[${colorCode}][${questItemLabel}]\\C[0] `;
 };
 if(itemMeta['AddPowerCustom']){
   var effectValue = Number(itemMeta['AddPowerCustom']);
@@ -1389,28 +1530,30 @@ if(itemMeta['RaceDropRarity']){
 };
 if(itemMeta['PartyExpRate']){
   var effectValue = itemMeta['PartyExpRate'];
-  effectText += `\\I[296]${effectValue}倍 `;
+  effectText += `\\I[296]${effectValue}${TIMES_SUFFIX} `;
 };
 if(itemMeta['PartyGoldRate']){
   var effectValue = itemMeta['PartyGoldRate'];
-  effectText += `\\I[314]${effectValue}倍 `;
+  effectText += `\\I[314]${effectValue}${TIMES_SUFFIX} `;
 };
 if(itemMeta['EnemyExpRate']){
   var effectValue = itemMeta['EnemyExpRate'];
-  effectText += `\\I[296]${effectValue}倍 `;
+  effectText += `\\I[296]${effectValue}${TIMES_SUFFIX} `;
 };
 if(itemMeta['EnemyGoldRate']){
   var effectValue = itemMeta['EnemyGoldRate'];
-  effectText += `\\I[314]${effectValue}倍 `;
+  effectText += `\\I[314]${effectValue}${TIMES_SUFFIX} `;
 };
 //↓スキル最後に付けるようにする。
 
 if(itemMeta['Learn Require Eval']){
-    headerText += `[\\C[${colorCode}]習得条件あり\\C[0]]`;
+    const learnRequirementLabel = `習得条件あり`;//翻訳対象
+    headerText += `[\\C[${colorCode}]${learnRequirementLabel}\\C[0]]`;
 };
 
 if(itemMeta['SwicthOnOffUse']){
-    effectText += `[\\C[${colorCode}]使用でOn/Off\\C[0]]`;
+    const toggleOnUseLabel = `使用でOn/Off`;//翻訳対象
+    effectText += `[\\C[${colorCode}]${toggleOnUseLabel}\\C[0]]`;
 };
 
 //↓ステート最後に付けるようにする。
@@ -1420,13 +1563,15 @@ if(categoryStateId){
   suffixText += `\\C[${colorCode}]${$dataStates[categoryStateId].description}\\C[0] `;
 };
 if(itemMeta['timeRemove']){
-  effectText += `[\\C[${colorCode}]時間経過で解除\\C[0]]`;
+  const timeReleaseLabel = `時間経過で解除`;//翻訳対象
+  effectText += `[\\C[${colorCode}]${timeReleaseLabel}\\C[0]]`;
 };
 
 if(databaseTypeId == 4){
   if(itemMeta['registUp']){
     var effectValue = itemMeta['registUp'];
-    effectText += `[\\C[${colorCode}]付与時に耐性率${effectValue}%up\\C[0]]`;
+    const resistOnApplyText = `付与時に耐性率${effectValue}%up`;//翻訳対象
+    effectText += `[\\C[${colorCode}]${resistOnApplyText}\\C[0]]`;
   };
   if(item.autoRemovalTiming >= 1){
     var fragText = `\\I[75]:${item.minTurns}`;
@@ -1501,17 +1646,22 @@ if(databaseTypeId == 1 || databaseTypeId == 2 || databaseTypeId == 4 || database
 function attackSkillRankText(skill, headerText) {
   let descriptionText = headerText;
   const masteryEffect = skill.meta['Mastery Effect'];
+  const rankCorrectionLabel = `ランク補正`;//翻訳対象
+  const damagePerRankLabel = `ダメージ値にランク毎`;//翻訳対象
   descriptionText += masteryEffect
-    ? `[ランク補正:ダメージ値にランク毎${masteryEffect.replace(' Damage Per Level', '').replace(' ', '')}]\n`
+    ? `[${rankCorrectionLabel}:${damagePerRankLabel}${masteryEffect.replace(' Damage Per Level', '').replace(' ', '')}]\n`
     : `\n`;
   for (const derivedTag of [`NormalAttackDerived`, `NormalAttackDerivedSuper`]) {
     const derivedMeta = skill.meta[derivedTag];
     if(!derivedMeta){ continue; };
     const metaValues = derivedMeta.split(',');
     const derivedSkillName = $dataSkills[Number(metaValues[1])].name;
+    const derivedRankLabel = `ランク${metaValues[0]}で`;//翻訳対象
+    const derivedRankConditionLabel = `ランク${metaValues[0]}と特殊条件を満たす事で`;//翻訳対象
+    const derivedSkillSuffix = `が派生発生`;//翻訳対象
     descriptionText += derivedTag == `NormalAttackDerived`
-      ? `[ランク${metaValues[0]}で\\C[2]${derivedSkillName}\\C[0]が派生発生]`
-      : `[ランク${metaValues[0]}と特殊条件を満たす事で\\C[2]${derivedSkillName}\\C[0]が派生発生]`;
+      ? `[${derivedRankLabel}\\C[2]${derivedSkillName}\\C[0]${derivedSkillSuffix}]`
+      : `[${derivedRankConditionLabel}\\C[2]${derivedSkillName}\\C[0]${derivedSkillSuffix}]`;
   };
   return descriptionText;
 }
@@ -1557,7 +1707,9 @@ class_addKaisetu1 = function(){
     // tag yields NaN and stays NaN, as before.
     const rawRank = Number(classMeta['classRank']);
     const classRankVal = rawRank == 0 ? 1 : rawRank;
-    let descriptionText = classMeta['Primary Only'] ? `[\\C[1]メイン\\C[0]]` : `[\\C[5]サブ\\C[0]]`;
+    const primaryClassLabel = `メイン`;//翻訳対象
+    const secondaryClassLabel = `サブ`;//翻訳対象
+    let descriptionText = classMeta['Primary Only'] ? `[\\C[1]${primaryClassLabel}\\C[0]]` : `[\\C[5]${secondaryClassLabel}\\C[0]]`;
     descriptionText += `[Class${CLASS_RANK_NUMERALS[classRankVal]}]`;
     const growthStatRow = growthStatText(growthStats, classRankVal);
     descriptionText += `[GrowStatas:${growthStatRow}]\n`;
@@ -1567,7 +1719,8 @@ class_addKaisetu1 = function(){
       if(!learning){ continue; };
       // Main classes only list the skills the current playthrough has reached.
       if(classMeta['Primary Only'] && learning.level < $gameVariables.value(6)){ continue; };
-      descriptionText += `[Lv${learning.level}:\\C[2]\x1bSIN[${learning.skillId}]\\C[0]]`;
+      const levelLabel = `Lv`;//翻訳対象
+      descriptionText += `[${levelLabel}${learning.level}:\\C[2]\x1bSIN[${learning.skillId}]\\C[0]]`;
     };
     valueAddDescriptionClass[classId] = descriptionText;
     valueClassGrowStatasComparison[classId] = comparisonText;
