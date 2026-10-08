@@ -1593,22 +1593,6 @@ if(valueItems[i].meta['ExpiryDate']){
 if(valueItems[i].meta['EventFactorClearReset']){
   effectText += `\\C[${colorCode}][クエスト関連アイテム]\\C[0] `;
 };
-//アイテムのカテゴリ素材
-/*:
-if(valueItems[i].meta['Menu Category'] && valueItems[i].meta['LotteryRearity']){
-  if(valueItems[i].meta['Menu Category'] == ' Material'){
-  if(Number(valueItems[i].meta['LotteryRearity']) == 3){var value9 = `条件:\\C[${value26}]対象LV10以上\\C[0]`};
-  if(Number(valueItems[i].meta['LotteryRearity']) == 4){var value9 = `条件:\\C[${value26}]対象LV20以上\\C[0]`};
-  if(Number(valueItems[i].meta['LotteryRearity']) == 5){var value9 = `条件:\\C[${value26}]対象LV30以上\\C[0]`};
-  if(Number(valueItems[i].meta['LotteryRearity']) == 6){var value9 = `条件:\\C[${value26}]対象LV30以上\\C[0]`};
-  if(Number(valueItems[i].meta['LotteryRearity']) == 7){var value9 = `条件:\\C[${value26}]対象LV40以上\\C[0]`};
-  if(Number(valueItems[i].meta['LotteryRearity']) == 8){var value9 = `条件:\\C[${value26}]対象LV40以上\\C[0]`};
-  if(Number(valueItems[i].meta['LotteryRearity']) == 9){var value9 = `条件:\\C[${value26}]対象LV50以上\\C[0]`};
-  if(Number(valueItems[i].meta['LotteryRearity']) == 10){var value9 = `条件:\\C[${value26}]対象LV50以上\\C[0]`};
-    value10 += `${value9} `;
-  };
-};
-*/
 if(valueItems[i].meta['AddPowerCustom']){
   var effectValue = Number(valueItems[i].meta['AddPowerCustom']);
     if(effectValue >= 1){
