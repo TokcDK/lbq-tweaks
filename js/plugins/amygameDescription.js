@@ -394,7 +394,8 @@ if(databaseTypeId == 1 || databaseTypeId == 2 || databaseTypeId == 4 || database
     };
   };
   if(tenWeaponCount >= 10){
-    effectText += `${colorTaggedText(colorCode, `武器種:`)}十種武器 `;
+    var colorTaggeredText = colorTaggedText(colorCode, `武器種:`);
+    effectText += `${colorTaggeredText}十種武器 `;
   };
 
   var effectValue = 0;
@@ -452,9 +453,11 @@ if(databaseTypeId == 1 || databaseTypeId == 2 || databaseTypeId == 4 || database
         if(traitDataId >= 1 && traitDataId <= $dataSystem.elements.length-1){
           if(!itemMeta['EnemyState']){
             if(SPECIAL_ATTACK_ELEMENT_IDS.indexOf(traitDataId) >= 0){
-              effectText += `${colorTaggedText(colorCode, `特攻属性付与`)}${elementLabel(traitDataId)} `;
+              var colorTaggeredText = colorTaggedText(colorCode, `特攻属性付与`);
+              effectText += `${colorTaggeredText}${elementLabel(traitDataId)} `;
             } else {
-              effectText += `${colorTaggedText(colorCode, `攻撃属性付与`)}${elementLabel(traitDataId)}\\C[${colorCode}] `;
+              var colorTaggeredText = colorTaggedText(colorCode, `攻撃属性付与`);
+              effectText += `${colorTaggeredText}${elementLabel(traitDataId)}\\C[${colorCode}] `;
             };
           };
         };
@@ -488,10 +491,12 @@ if(databaseTypeId == 1 || databaseTypeId == 2 || databaseTypeId == 4 || database
         if(traitDataId >= 0 && traitDataId <= 7){
           if(traitValue >= 1){
             var effectValue = Math.round((traitValue - 1) * 100);
-            var fragText = `${colorTaggedText(1, `耐性-`)}\x1bI[${traitDataId + 48}]`;
+            var colorTaggeredText = colorTaggedText(1, `耐性-`);
+            var fragText = `${colorTaggeredText}\x1bI[${traitDataId + 48}]`;
           } else {
             var effectValue = Math.round((1 - traitValue) * 100);
-            var fragText = `${colorTaggedText(colorCode, `耐性+`)}\x1bI[${traitDataId + 48}]`;
+            var colorTaggeredText = colorTaggedText(colorCode, `耐性+`);
+            var fragText = `${colorTaggeredText}\x1bI[${traitDataId + 48}]`;
           };
           effectText += `${fragText}${effectValue}% `;
         };
@@ -501,13 +506,15 @@ if(databaseTypeId == 1 || databaseTypeId == 2 || databaseTypeId == 4 || database
         if(traitDataId >= 1 && traitDataId <= $dataStates.length-1){
           var effectValue = Math.round(Math.abs(traitValue - 1) * 100);
           var resistColor = traitValue >= 1 ? 1 : colorCode;
-          effectText += `\\C[0]${colorTaggedText(resistColor, traitValue >= 1 ? `耐性-` : `耐性+`)}${stateIconText(traitDataId)}${effectValue}% `;
+          var colorTaggeredText = colorTaggedText(resistColor, traitValue >= 1 ? `耐性-` : `耐性+`);
+          effectText += `\\C[0]${colorTaggeredText}${stateIconText(traitDataId)}${effectValue}% `;
         };
       };
 
       if(trait.code == 14){
         if(traitDataId >= 1 && traitDataId <= $dataStates.length-1){
-          effectText += `${colorTaggedText(colorCode, `無効化`)}${stateIconText(traitDataId)} `;
+          var colorTaggeredText = colorTaggedText(colorCode, `無効化`);
+          effectText += `${colorTaggeredText}${stateIconText(traitDataId)} `;
         };
       };
 
@@ -541,19 +548,22 @@ if(databaseTypeId == 1 || databaseTypeId == 2 || databaseTypeId == 4 || database
 
       if(trait.code == 32){ //31は先頭で実行済み。
         if(traitDataId >= 1 && traitDataId <= $dataStates.length-1){
-          effectText += `${colorTaggedText(colorCode, `ステート付与`)}${stateIconText(traitDataId)}${Math.round(traitValue * 100)}% `;
+          var colorTaggeredText = colorTaggedText(colorCode, `ステート付与`);
+          effectText += `${colorTaggeredText}${stateIconText(traitDataId)}${Math.round(traitValue * 100)}% `;
         };
       };
 
       if(trait.code == 33){
         if(traitDataId == 0){
-          effectText += `${colorTaggedText(colorCode, `AttackSpeed+`)}${Math.round(traitValue)} `;
+          var colorTaggeredText = colorTaggedText(colorCode, `AttackSpeed+`);
+          effectText += `${colorTaggeredText}${Math.round(traitValue)} `;
         };
       };
 
       if(trait.code == 41){
         if(traitDataId >= 1 && traitDataId <= $dataSystem.skillTypes.length-1){
-          effectText += `${colorTaggedText(colorCode, `使用可能`)}<${$dataSystem.skillTypes[traitDataId]}> `;
+          var colorTaggeredText = colorTaggedText(colorCode, `使用可能`);
+          effectText += `${colorTaggeredText}<${$dataSystem.skillTypes[traitDataId]}> `;
         };
       };
 
@@ -567,9 +577,11 @@ if(databaseTypeId == 1 || databaseTypeId == 2 || databaseTypeId == 4 || database
         if(traitDataId >= 1 && traitDataId <= $dataSkills.length-1){
           var skillRef = `<\x1bSIN[${traitDataId}]>`;
           if(databaseTypeId == 1 && $dataSkills[traitDataId].stypeId == BURST_SKILL_TYPE_ID){
-            effectText += `${colorTaggedText(colorCode, `Burst`)}${skillRef} `;
+            var colorTaggeredText = colorTaggedText(colorCode, `Burst`);
+            effectText += `${colorTaggeredText}${skillRef} `;
           } else {
-            effectText += `${colorTaggedText(colorCode, `使用可能`)}${skillRef} `;
+            var colorTaggeredText = colorTaggedText(colorCode, `使用可能`);
+            effectText += `${colorTaggeredText}${skillRef} `;
           };
         };
       };
@@ -582,31 +594,36 @@ if(databaseTypeId == 1 || databaseTypeId == 2 || databaseTypeId == 4 || database
 
       if(tenWeaponCount <= 9 && trait.code == 51){
         if(traitDataId >= 1 && traitDataId <= $dataSystem.weaponTypes.length-1){
-          effectText += `${colorTaggedText(colorCode, `武器種`)}<${$dataSystem.weaponTypes[traitDataId]}> `;
+          var colorTaggeredText = colorTaggedText(colorCode, `武器種`);
+          effectText += `${colorTaggeredText}<${$dataSystem.weaponTypes[traitDataId]}> `;
         };
       };
 
       if(trait.code == 52){
         if(traitDataId >= 2 && traitDataId <= $dataSystem.armorTypes.length-1){
-          effectText += `${colorTaggedText(colorCode, `防具種`)}<${$dataSystem.armorTypes[traitDataId]}> `;
+          var colorTaggeredText = colorTaggedText(colorCode, `防具種`);
+          effectText += `${colorTaggeredText}<${$dataSystem.armorTypes[traitDataId]}> `;
         };
       };
 
       if(trait.code == 53){
         if(traitDataId >= 1 && traitDataId <= $dataSystem.equipTypes.length-1){
-          effectText += `${colorTaggedText(1, `装備固定`)}<${$dataSystem.equipTypes[traitDataId]}> `;
+          var colorTaggeredText = colorTaggedText(1, `装備固定`);
+          effectText += `${colorTaggeredText}<${$dataSystem.equipTypes[traitDataId]}> `;
         };
       };
 
       if(trait.code == 54){
         if(traitDataId >= 1 && traitDataId <= $dataSystem.equipTypes.length-1){
-          effectText += `${colorTaggedText(1, `装備封印`)}<${$dataSystem.equipTypes[traitDataId]}> `;
+          var colorTaggeredText = colorTaggedText(1, `装備封印`);
+          effectText += `${colorTaggeredText}<${$dataSystem.equipTypes[traitDataId]}> `;
         };
       };
 
       if(trait.code == 61){
         if(traitDataId == 0){
-          effectText += `${colorTaggedText(colorCode, `行動回数追加`)}${Math.round(traitValue * 100)}% `;
+          var colorTaggeredText = colorTaggedText(colorCode, `行動回数追加`);
+          effectText += `${colorTaggeredText}${Math.round(traitValue * 100)}% `;
         };
       };
 
