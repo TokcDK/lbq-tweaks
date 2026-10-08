@@ -870,6 +870,15 @@ Window_SaveInfo.prototype.updateIndex = function() {
   this._currentFile = id;
   this._waitTime = 30;
   this._drawRetry = 0;
+  // BUGFIX: 空のセーブデータで予約した再試行は「前のスロット」のもの。
+  // スロットを移ったら取り消す。取り消さないと、次のスロットの refresh() が
+  // _saveContents をオブジェクトにした後に古いタイマーが発火し、
+  // JsonEx.parse(オブジェクト) が例外を投げる。setTimeout の中なので
+  // SceneManager.update のハンドラでは拾えず、コンソールにエラーが出る。
+  if (this._drawTimer) {
+    clearTimeout(this._drawTimer);
+    this._drawTimer = null;
+  }
   this.contents.clear();
 };
 
@@ -889,7 +898,21 @@ Window_SaveInfo.prototype.refresh = function() {
   dy = this.drawGameTitle(dy);
   if (!this._valid) return this.drawInvalidText(dy);
   this._saveContents = StorageManager.load(this.savefileId());
-  this.drawContents(dy);
+  // BUGFIX: 書き込みが中断されたセーブデータや、別ゲーム/旧形式のセーブデータでは
+  // JsonEx.parse や以降の描画が例外を投げる。ここは Window_SaveInfo.update から、
+  // つまりゲームループから呼ばれるので、例外は SceneManager.update の
+  // catchException まで抜け、Graphics.printError + SceneManager.stop() で
+  // ゲームがエラー画面のまま停止する。プレビュー描画の失敗でゲームを落とさないよう、
+  // ここで受け止めて「不正なセーブデータ」表示に切り替える。
+  try {
+    this.drawContents(dy);
+  } catch (e) {
+    console.error(e);
+    this._valid = false;
+    this._saveContents = null;
+    this.contents.clear();
+    this.drawInvalidText(0);
+  }
 };
 
 Window_SaveInfo.prototype.drawGameTitle = function(dy) {
@@ -922,7 +945,8 @@ Window_SaveInfo.prototype.drawContents = function(dy) {
     // 5回（約250ms）で諦めて「空」表示に切り替える。
     this._drawRetry = (this._drawRetry || 0) + 1;
     if (this._drawRetry <= 5) {
-      return setTimeout(this.drawContents.bind(this, dy), 50);
+      this._drawTimer = setTimeout(this.drawContents.bind(this, dy), 50);
+      return this._drawTimer;
     }
     this._valid = false;
     return this.drawInvalidText(dy);
@@ -1437,6 +1461,12 @@ Scene_File.prototype.onActionDelete = function() {
 Scene_File.prototype.performActionDelete = function() {
     AudioManager.playSe(Yanfly.Param.SaveDeleteSound);
     StorageManager.remove(this.savefileId());
+    // BUGFIX: remove() は本体ファイルしか消さないため、セーブ失敗時の
+    // ロールバック用に残っている .bak が生き残る。その状態でそのスロットへの
+    // セーブが後から失敗すると DataManager.saveGame のロールバック
+    // (remove + restoreBackup) が .bak を書き戻し、削除したデータが復活する。
+    // 削除時はバックアップも一緒に消す。
+    StorageManager.cleanBackup(this.savefileId());
     this.onActionCancel();
     this._listWindow.refresh();
     this._actionWindow._currentFile = this.savefileId() - 1;
