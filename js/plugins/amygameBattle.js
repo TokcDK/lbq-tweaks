@@ -3469,10 +3469,12 @@ enemy_instantwin = function () {
   } else {
     let resultMessage = valueWordSet2;
     if (dropCount >= 1) {
-      resultMessage += `ドロップ(\\C[2]+${dropCount}\\C[0])\n`;
+	  var dropCnt = `\\C[2]+${dropCount}\\C[0]`;
+      resultMessage += `ドロップ(${dropCnt})\n`;
     }
     if (defeatsCount >= 1) {
-      resultMessage += `討伐カウント(\\C[2]+${defeatsCount}\\C[0])`;
+	  var loseCnt = `\\C[2]+${defeatsCount}\\C[0]`;
+      resultMessage += `討伐カウント(${loseCnt})`;
     }
     gameVariables.setValue(701, resultMessage);
   }
@@ -3662,7 +3664,8 @@ drop_walletItemBoxGet = function (fallbackDropCategory, isWallet) {
     const randomIndex = getRandomIndex(candidateItemCount);
     const selectedItemId = candidateItemIds[randomIndex];
     const item = $dataItems[selectedItemId];
-    const itemInfo = `\\C[24]\x1bI[${item.iconIndex}]${item.name}\\C[0]を獲得した。`;
+	const itemTitle = `\\C[24]\x1bI[${item.iconIndex}]${item.name}\\C[0]`;
+    const itemInfo = `${itemTitle}を獲得した。`;
 
     CommonPopupManager.showInfo({}, itemInfo, null);
     $gameParty.gainItem(item, 1);
@@ -4224,16 +4227,18 @@ boss_actionPredict = function (predictedSkillId, predictionModeId) {
   if (!actor) return;
   var masteryBonus = actor.skillMasteryLevel(masteryCheckSkillId) * 10;
   var predictionMessage = 1;
+  var enemyName = enemy1.name();
   if (predictionModeId == 1) {
     if (actor.isStateAffected(292)) {
       if (masteryBonus + actor.level > enemy1.level) {
         //if(true){
-        var predictionMessage = `${enemy1.name()}は\x1bSIN[${predictedSkillId}]を発動するようだ…。`;
+		var skill = `\x1bSIN[${predictedSkillId}]`;
+        var predictionMessage = `${enemyName}は${skill}を発動するようだ…。`;
       } else {
-        var predictionMessage = `${enemy1.name()}の力が強大な為、行動を予測する事が出来ない…。`;
+        var predictionMessage = `${enemyName}の力が強大な為、行動を予測する事が出来ない…。`;
       };
     } else {
-      var predictionMessage = `${enemy1.name()}から大きな力の予兆を感じる…。。`;
+      var predictionMessage = `${enemyName}から大きな力の予兆を感じる…。。`;
     };
     if (predictionMessage == 1) { } else {
       BattleManager._logWindow.push(`addText`, predictionMessage);
@@ -4243,9 +4248,10 @@ boss_actionPredict = function (predictedSkillId, predictionModeId) {
     if (actor.isStateAffected(292)) {
       if (masteryBonus + actor.level > enemy1.level) {
         //if(true){
-        var predictionMessage = `${enemy1.name()}は\x1bSIN[${predictedSkillId}]を使用するようだ…。`;
+		var skill = `\x1bSIN[${predictedSkillId}]`;
+        var predictionMessage = `${enemyName}は${skill}を使用するようだ…。`;
       } else {
-        var predictionMessage = `${enemy1.name()}の力が強大な為、行動を予測する事が出来ない…。`;
+        var predictionMessage = `${enemyName}の力が強大な為、行動を予測する事が出来ない…。`;
       };
       if (predictionMessage == 1) { } else {
         BattleManager._logWindow.push(`addText`, predictionMessage);
