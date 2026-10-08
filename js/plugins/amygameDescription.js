@@ -1154,9 +1154,9 @@ if(itemMeta['MP Cost']){
 if(itemMeta['SpcialState']){
   // The two `\x1bSIM[n]` codes expand to *state names*, i.e. to other
   // game text, so they stay outside the translatable strings.
-  const activationStateIcon = `\x1bSIM[110]`;
+  const activationStateIcon = `\x1bSIM[110]`;//ステート名コード。翻訳対象外
   const activationText = `で発動`;//翻訳対象
-  const expiryStateIcon = `\x1bSIM[109]`;
+  const expiryStateIcon = `\x1bSIM[109]`;//ステート名コード。翻訳対象外
   const expiryText = `で効果消失`;//翻訳対象
   suffixText += `[\\C[${colorCode}]${activationStateIcon}${activationText}\\C[0]][${expiryStateIcon}${expiryText}]`;
   const activationConditionText = `行動時MP消費/消費MP未満で`;//翻訳対象
