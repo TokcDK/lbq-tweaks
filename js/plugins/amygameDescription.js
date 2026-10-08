@@ -474,9 +474,10 @@ if(databaseTypeId == 1 || databaseTypeId == 2 || databaseTypeId == 4 || database
             // Element 11 is scaled by 10 rather than 100, so a "10% resist" is
             // written as 1 in the database.
             var effectValue = Math.round(Math.abs(traitValue - 1) * (traitDataId == 11 ? 10 : 100));
-            var fragText = `${elementResistIcon(elementIcon)}${RESIST_SPECIAL_ELEMENT_IDS.indexOf(traitDataId) >= 0
-              ? (traitValue >= 1 ? `+` : `-`)
-              : (traitValue >= 1 ? `耐性-` : `耐性+`)}`;
+			var pm = traitValue >= 1 ? `+` : `-`;
+			var pmName = traitValue >= 1 ? `耐性-` : `耐性+`;
+			var pmMsg = RESIST_SPECIAL_ELEMENT_IDS.indexOf(traitDataId) >= 0 ? pm : pmName;
+            var fragText = `${elementResistIcon(elementIcon)}(${pmMsg})`;
           };
           // Element ids 35/37/38/41 are never listed, and 41-80 are enemy-only:
           // the latter are hidden altogether when the page is a state page.
@@ -542,7 +543,8 @@ if(databaseTypeId == 1 || databaseTypeId == 2 || databaseTypeId == 4 || database
           var sparamIcons = SPARAM_ICONS[traitDataId] || PARAM_ICON_DEFAULT;
           var negativeIsGood = SPARAM_ICONS_NEGATIVE_IS_GOOD.indexOf(traitDataId) >= 0;
           var isUp = (traitValue >= 1) !== negativeIsGood;
-          effectText += `\x1bI[${isUp ? sparamIcons[1] : sparamIcons[2]}]${isUp ? `+` : `-`}${Math.round(Math.abs(traitValue - 1) * 100)}% `;
+		  const pm = isUp ? `+` : `-`;
+          effectText += `\x1bI[${isUp ? sparamIcons[1] : sparamIcons[2]}]${pm}${Math.round(Math.abs(traitValue - 1) * 100)}% `;
         };
       };
 
@@ -665,7 +667,9 @@ if(itemMeta['HSkillLearn']){
     };
   };
   const noneLabel = `なし`;//翻訳対象
-  effectText += `[${CONDITION_LABEL}:${premiseTexts.length ? premiseTexts.join(``) : `\\C[27]${noneLabel}\\C[0]`}]`;
+  var coloredNoneLabel = `\\C[27]${noneLabel}\\C[0]`;
+  var premiseTextMerged = premiseTexts.join(``);
+  effectText += `[${CONDITION_LABEL}:${premiseTexts.length ? premiseTextMerged : coloredNoneLabel}]`;
 };
 
 if(itemMeta['DescriptionWord']){
@@ -1622,8 +1626,9 @@ if(databaseTypeId != 4){
 // new line; with it, the description word (if any) is the only thing appended,
 // and it too goes on its own line.
 const descWordPart = descWordText == 0 ? `` : descWordText;
+const descWordPart1 = descWordPart ? `\n${descWordPart}` : ``;
 const tempDesc = itemMeta['NoAddDescription']
-  ? `${headerText}${item.description}${suffixText}${descWordPart ? `\n${descWordPart}` : ``}`
+  ? `${headerText}${item.description}${suffixText}${descWordPart1}`
   : `${headerText}${item.description}${suffixText}\n${descWordPart}${effectText}`;
 if(databaseTypeId == 0 || databaseTypeId == 1 || databaseTypeId == 2 || databaseTypeId == 3){
   item.description = tempDesc;
