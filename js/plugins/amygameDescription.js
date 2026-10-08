@@ -629,9 +629,13 @@ if(valueItems[i].meta['DamageFormula2']){
     if(metaValues[0] == 5){var fragText = `[\\C[${colorCode}]\\I[35]100%\\C[0]`};
     if(metaValues[0] == 6){var fragText = `[\\C[${colorCode}]\\I[37]50%\\I[38]50%\\C[0]`};
     if(metaValues[0] == 7){var fragText = `[\\C[${colorCode}]\\I[34]50%\\I[37]50%\\C[0]`};
-    if(metaValues[0] == 8){var fragText = `[\\C[3]回復:\\I[36]100%(対象の\\I[36]も影響)\\C[0]`};
-    if(metaValues[0] == 9){var fragText = `[\\C[3]回復:\\I[34]100%(対象の\\I[35]も影響)\\C[0]`};
-    if(metaValues[0] == 10){var fragText = `[\\C[${colorCode}]現在HPの${metaValues[1]}%消費して×${metaValues[2]}倍の与ダメ\\C[0]`};
+    if(metaValues[0] == 8){var fragText = recoveryEffectMsg(36, 36);};
+    if(metaValues[0] == 9){var fragText = recoveryEffectMsg(34, 35);};
+    if(metaValues[0] == 10){
+		var absorbNum = metaValues[1];var dmgNum = metaValues[2];
+		var msg = `現在HPの${absorbNum}%消費して×${dmgNum}倍の与ダメ`;
+		var fragText = `[\\C[${colorCode}]${msg}\\C[0]`;
+	};
     if(metaValues[0] == 11){var fragText = `[\\C[${colorCode}]\\I[34]70%\\I[37]20%\\I[38]10%\\C[0]`};
     if(metaValues[0] == 12){var fragText = `[\\C[${colorCode}]\\I[34]20%\\I[37]40%\\I[38]40%\\C[0]`};
     if(metaValues[0] == 13){var fragText = `[\\C[${colorCode}]\\I[34]60%\\I[37]40%\\C[0]`};
@@ -639,7 +643,11 @@ if(valueItems[i].meta['DamageFormula2']){
     if(metaValues[0] == 15){var fragText = `[\\C[${colorCode}]\\I[34]40%\\I[37]30%\\I[38]30%\\C[0]`};
     if(metaValues[0] == 16){var fragText = `[\\C[${colorCode}]\\I[34]80%\\I[37]20%\\C[0]`};
     if(metaValues[0] == 17){var fragText = `[\\C[${colorCode}]\\I[34]100%\\C[0]`};
-    if(metaValues[0] == 18){var fragText = `[\\C[${colorCode}]\\I[37]50%+固定値\\C[0]`};
+    if(metaValues[0] == 18){
+		var item = `\\I[37]`;
+		var msg = `${item}50%+固定値`;
+		var fragText = `[\\C[${colorCode}]${msg}\\C[0]`
+	};
     if(metaValues[0] == 19){var fragText = `[\\C[${colorCode}]\\I[34]20%\\I[37]80%\\C[0]`};
     if(metaValues[0] == 20){var fragText = `[\\C[${colorCode}]\\I[36]50%\\I[37]50%\\C[0]`};
     if(metaValues[0] == 24){var fragText = `[\\C[${colorCode}]\\I[37]50%\\I[39]50%\\C[0]`};
@@ -660,7 +668,8 @@ if(valueItems[i].meta['DamageFormula2']){
     };
   suffixText += `${fragText} `;//元文章の後に追記される。
   if(valueItems[i].meta['LevelFluctuation']){
-    suffixText += `[${valueItems[i].meta['LevelFluctuation']}ﾚﾍﾞﾙ毎に威力+]`;
+	var lvlN = valueItems[i].meta['LevelFluctuation'];
+    suffixText += `[${lvlN}ﾚﾍﾞﾙ毎に威力+]`;
   };
 };
 
@@ -886,6 +895,7 @@ if( Number(additionalSetCountByTarget[4]) >= 1 ){effectText += `${additionalSetT
               if(consecStateCount >= 1){
                   effectText += `\\C[${colorCode}]+\\C[0]`;         
               } else {
+				var bonus = `付与`;
                 if(effectValue == 100){
                   effectText += `[\\C[${colorCode}]付与:\\C[0]${fragText}${calcTmp}]`;
                 } else {
@@ -1818,6 +1828,14 @@ for (var i = start; i <= end; i++) {
 }};
 
 };
+
+recoveryEffectMsg = function (ind1,ind2) {
+	const obj1 = `\\I[ind1]`;
+	const obj2 = `\\I[ind2]`;
+	const effectName = `回復`;
+	const extraEffectMsg = `対象の${obj2}も影響`;
+	return `[\\C[3]${effectName}:${obj1}100%(${extraEffectMsg})\\C[0]`;
+}
 
 //ジョブの追加説明文valueAddDescriptionClass
 class_addKaisetu1 = function(){
