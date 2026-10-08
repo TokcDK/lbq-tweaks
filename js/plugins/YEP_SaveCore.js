@@ -869,6 +869,7 @@ Window_SaveInfo.prototype.updateIndex = function() {
   var id = this.savefileId();
   this._currentFile = id;
   this._waitTime = 30;
+  this._drawRetry = 0;
   this.contents.clear();
 };
 
@@ -915,8 +916,18 @@ Window_SaveInfo.prototype.drawInvalidText = function(dy) {
 
 Window_SaveInfo.prototype.drawContents = function(dy) {
   if (!this._saveContents) {
-    return setTimeout(this.drawContents.bind(this, dy), 50);
+    // BUGFIX: StorageManager.load() は同期なので、ここで再試行しても値は入らない。
+    // セーブデータが空/欠損していると setTimeout が無限に再帰し、情報ウィンドウが
+    // 空のままタイマーを回し続ける（スロット削除直後に発生する）。
+    // 5回（約250ms）で諦めて「空」表示に切り替える。
+    this._drawRetry = (this._drawRetry || 0) + 1;
+    if (this._drawRetry <= 5) {
+      return setTimeout(this.drawContents.bind(this, dy), 50);
+    }
+    this._valid = false;
+    return this.drawInvalidText(dy);
   }
+  this._drawRetry = 0;
   this._saveContents = JsonEx.parse(this._saveContents);
   dy = this.drawPartyGraphics(dy);
   dy = this.drawPartyNames(dy);
