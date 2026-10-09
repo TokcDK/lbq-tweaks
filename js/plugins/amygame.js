@@ -3838,16 +3838,17 @@
             if (isGirl(gameActor)) {
                 valueFaceSelect = 6;
                 var randomFaceIndex = getRandomIndex(8);
-                if (randomFaceIndex == 0) { valueFaceSelect = 1 };//通常
-                if (randomFaceIndex == 1) { valueFaceSelect = 2 };//笑顔
-                if (randomFaceIndex == 2) { valueFaceSelect = 5 };//真顔
-                if (randomFaceIndex == 3) { valueFaceSelect = 15 };//目を瞑る
-                if (gameActor.isLearnedSkill(66)) {
-                    if (randomFaceIndex == 4) { valueFaceSelect = 40 };//頬染め
-                    if (randomFaceIndex == 5) { valueFaceSelect = 39 };//頬染めウィンク
-                    if (randomFaceIndex == 6) { valueFaceSelect = 38 };//頬染め挑発的
-                    if (randomFaceIndex == 7) { valueFaceSelect = 41 };//頬染め目にハート
+                if (randomFaceIndex == 0) { valueFaceSelect = 1 }//通常
+                else if (randomFaceIndex == 1) { valueFaceSelect = 2 }//笑顔
+                else if (randomFaceIndex == 2) { valueFaceSelect = 5 }//真顔
+                else if (randomFaceIndex == 3) { valueFaceSelect = 15 }//目を瞑る
+                else if (gameActor.isLearnedSkill(66)) {
+                    if (randomFaceIndex == 4) { valueFaceSelect = 40 }//頬染め
+                    else if (randomFaceIndex == 5) { valueFaceSelect = 39 }//頬染めウィンク
+                    else if (randomFaceIndex == 6) { valueFaceSelect = 38 }//頬染め挑発的
+                    else if (randomFaceIndex == 7) { valueFaceSelect = 41 };//頬染め目にハート
                 };
+                
                 battle_bustUp1(gameActor, choicePictureId, 0, 0, 10);
                 for (var j = 0; j <= 7; j++) {
                     if ($gameScreen.picture(choicePictureId + j)) {
