@@ -3773,7 +3773,7 @@
                 $gameScreen.dWindowFrame = 'ON';
                 $gameScreen.showPicture(pictureSlot + 100, '', 0, 20, 10, 100, 100, 0, 0);
                 $gameMessage.setSelectPictureId(choiceIndex, pictureSlot + 100);
-                const message = `　　　　　　\\C[14]──詳細情報──\\C[0]　　　　　　　　\n${info}`;
+                const message = `　　　　　　` + colorTaggedText(14, `──詳細情報──`) + `　　　　　　　　` + `\n${info}`;
                 $gameScreen.setDTextPicture(message, 28);
                 $gameScreen.dWindowFrame = 'ON';
                 $gameScreen.showPicture(pictureSlot + 100 + 1, '', 0, 640, 110, 100, 100, 0, 0);
