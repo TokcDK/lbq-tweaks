@@ -6,18 +6,24 @@
 
 (function () {
 
+    function clearSelfSwitchVariableRange(mapId, eventId, lastVariableId) {
+        for (let variableId = 1; variableId <= lastVariableId; variableId++) {
+            $gameSelfSwitches.setVariableValue([mapId, eventId, variableId], 0);
+        }
+    }
+
+    function initializeGameVariableArrays(gameVariables, firstVariableId, lastVariableId, arrayLength) {
+        for (let variableId = firstVariableId; variableId <= lastVariableId; variableId++) {
+            gameVariables.setValue(variableId, Array(arrayLength).fill(0));
+        }
+    }
+
     amygame_startUpArrangement = function () {
 
         //一括売却設定のため
-        for (let i = 1; i <= 2000; i++) {
-            $gameSelfSwitches.setVariableValue([4, 11, i], 0);
-        };
-        for (let i = 1; i <= 1000; i++) {
-            $gameSelfSwitches.setVariableValue([4, 12, i], 0);
-        };
-        for (let i = 1; i <= 1000; i++) {
-            $gameSelfSwitches.setVariableValue([4, 13, i], 0);
-        };
+        clearSelfSwitchVariableRange(4, 11, 2000);
+        clearSelfSwitchVariableRange(4, 12, 1000);
+        clearSelfSwitchVariableRange(4, 13, 1000);
 
         const gameVariables = $gameVariables;
         //マップ行った事があるか判定配列.総数500以下で設定
@@ -37,7 +43,7 @@
             gameVariables355[i][4][50] = `${presetBaseName}4`;
         };
         //各アクターの装備スキル配列記憶用
-        gameVariables.setValue(351, Array(21).fill([]));
+        gameVariables.setValue(351, Array.from({ length: 21 }, () => []));
         //各ステート毎の討伐数設定。主に種族対象,1が当日魔物討伐数,2が総魔物討伐数
         gameVariables.setValue(52, Array(1001).fill(0));
         //Tipsタイトルと内容配列。
@@ -49,7 +55,7 @@
         //個別リセットフラグonoff
         gameVariables.setValue(183, [0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0]);//10
         //各キャラの性欲度初期配列↓
-        for (let i = 381; i <= 400; i++) { gameVariables.setValue(i, Array(101).fill(0)) };
+        initializeGameVariableArrays(gameVariables, 381, 400, 101);
         //0は性欲度上限。41は初体験相手,42,43,44,45は妊娠時サイズ増加。妊娠時に計測。
         //46に直前のHｼｰﾝﾋﾟｸﾁｬ,49に初出産相手。50は苗字、51,52,53,54,55は身長体重スリーサイズ
         //56がカップ数,58はポーション耐性59は役職
@@ -63,13 +69,13 @@
         for (let i = start; i <= end; i++) { gameVariables.value(i + 380)[46] = 0 };
 
         //各キャラの衣装初期配列↓
-        for (let i = 441; i <= 460; i++) { gameVariables.setValue(i, Array(43).fill(0)) };
-        for (let i = 541; i <= 560; i++) { gameVariables.setValue(i, Array(43).fill(0)) };
+        initializeGameVariableArrays(gameVariables, 441, 460, 43);
+        initializeGameVariableArrays(gameVariables, 541, 560, 43);
         //計43。0は統合時のアイテムID。41は会話立ち絵用衣装指定変数代入用(TotalCloth)
         //42は露出超過回数
 
         //NPCのキャラごとＨ回数。
-        for (let i = 361; i <= 380; i++) { gameVariables.setValue(i, Array(301).fill(0)) };
+        initializeGameVariableArrays(gameVariables, 361, 380, 301);
         //計301.対応する相手とのH回数。101～200は受精した状態で1。
         //201～300は子供の数。301～400は現在の役職名。0は使用しない。
 
@@ -168,7 +174,7 @@
         const weaponsLen = $dataWeapons.length;
         for (let i = 1; i < weaponsLen; i++) {
             const weapon = $dataWeapons[i];
-            if (!weapon.name == '') {
+            if (weapon.name !== '') {
                 const weaponMapSwitch = weapon.meta['MapSwitch'];
                 if (weaponMapSwitch) {
                     weapon.name = `${switches[Number(weaponMapSwitch)]}`;
@@ -176,13 +182,13 @@
             };
         };
 
-        const copyItem = (item, itemIndex, x) => {
-            item.name = '[' + itemIndex + ']' + item.name;
+        const copyItem = (item, sequenceNumber, databaseIndex, offset) => {
+            item.name = '[' + sequenceNumber + ']' + item.name;
 
-            const itemX = $dataItems[i + x];
-            itemX.iconIndex = item.iconIndex;
-            itemX.name = `${item.name}[了]`;
-            itemX.description = item.description;
+            const completedItem = $dataItems[databaseIndex + offset];
+            completedItem.iconIndex = item.iconIndex;
+            completedItem.name = `${item.name}[了]`;
+            completedItem.description = item.description;
         };
         const setItemName = (item, itemIndex, i, x) => {
             if (item.meta['追加コモンID'] || (i >= (401 + x) && i <= (500 + x))) {
@@ -267,11 +273,11 @@
                     else if (itemEICSwitchNumber == 108) {
                         const itemCategory = itemMeta['SGカテゴリ'];
                         if (itemCategory == '受注クエスト' || itemCategory == 'ＥＸ受注クエスト') {//特別クエスト使わない。クエスト801～を901に名前と解説とアイコンをコピーする
-                            copyItem(item, copyIndexFor100Offset, 100);
+                            copyItem(item, copyIndexFor100Offset, i, 100);
                             copyIndexFor100Offset += 1;
                         }
                         else if (itemCategory == 'デイリークエスト') {
-                            copyItem(item, copyIndexFor50Offset, 50);
+                            copyItem(item, copyIndexFor50Offset, i, 50);
                             copyIndexFor50Offset += 1;
                         };
                     };
@@ -468,20 +474,24 @@
     //ステート付与されているかどうか。名前21に全員の名前、変数21に人数、変数22にid
     actor_stateCheck = function (stateId) {
 
-        var affectedActorIds = [];
-        var stateAffectedNames = ``;
-        var start = $gameVariables.value(75);
-        var end = $gameVariables.value(76);
-        for (var i = start; i <= end; i++) {
-            actor = $gameActors.actor(i);
-            if (actor.isStateAffected(stateId)) {
-                affectedActorIds.push(i);
+        const affectedActorIds = [];
+        const firstActorId = $gameVariables.value(75);
+        const lastActorId = $gameVariables.value(76);
+        for (let actorId = firstActorId; actorId <= lastActorId; actorId++) {
+            const gameActor = $gameActors.actor(actorId);
+            if (gameActor.isStateAffected(stateId)) {
+                affectedActorIds.push(actorId);
             }
         };
-        for (var i = 0; i <= affectedActorIds.length - 1; i++) {
-            if (stateId == 83) { $gameSelfSwitches.setValue([$gameMap.mapId(), affectedActorIds[i], 'A'], true) };
-            stateAffectedNames += `${$gameActors.actor(affectedActorIds[i]).name()} `;
-        };
+
+        const affectedActorNames = affectedActorIds.map(function (actorId) {
+            if (stateId == 83) { $gameSelfSwitches.setValue([$gameMap.mapId(), actorId, 'A'], true) };
+            return $gameActors.actor(actorId).name();
+        });
+        let stateAffectedNames = affectedActorNames.join(' ');
+        if (affectedActorNames.length > 0) {
+            stateAffectedNames += ` `;
+        }
         if (affectedActorIds.length >= 2) {
             stateAffectedNames += `達`;
         };
@@ -579,27 +589,23 @@
             $gameSystem.clearMessagePopupFree();
             $gameSystem.clearMessagePopup();
             $gameMessage.setMessageRow(4);
+            return;
         };
-        if (displayModeId == 1) {
-            valueAutoSkipPicX = 1000;
-            $gameSystem.clearMessagePopupFree();
-            if (popupEventId == 0) {
-                $gameSystem.setMessagePopupFree(popupPosition[0], popupPosition[1]);
-            } else {
-                var eventId = popupEventId;
-                $gameSystem.setMessagePopup(eventId);
-                var windowPosition;
-                windowPosition = popupPosition;
-                if (windowPosition === 1) {
-                    $gameSystem.setPopupFixUpper(eventId);
-                } else {
-                    if (windowPosition === 2) {
-                        $gameSystem.setPopupFixLower(eventId);
-                    };
-                };
+        if (displayModeId != 1) return;
+
+        valueAutoSkipPicX = 1000;
+        $gameSystem.clearMessagePopupFree();
+        if (popupEventId == 0) {
+            $gameSystem.setMessagePopupFree(popupPosition[0], popupPosition[1]);
+        } else {
+            $gameSystem.setMessagePopup(popupEventId);
+            if (popupPosition === 1) {
+                $gameSystem.setPopupFixUpper(popupEventId);
+            } else if (popupPosition === 2) {
+                $gameSystem.setPopupFixLower(popupEventId);
             };
-            $gameMessage.setMessageRow(messageRow);
         };
+        $gameMessage.setMessageRow(messageRow);
 
     };
 
@@ -753,7 +759,7 @@
                     let j = 0;
                     for (var i = 0; i <= uniqueStateIds.length - 1; i++) {
                         const stateId = uniqueStateIds[i];
-                        if ($dataStates[stateId].iconIndex >= 1 && !$dataStates[stateId].name == '') {
+                        if ($dataStates[stateId].iconIndex >= 1 && $dataStates[stateId].name !== '') {
                             messageText += `\x1bI[${$dataStates[stateId].iconIndex}]`;
                             j += 1;
                             if ((j % 9) == 0) {
@@ -2732,7 +2738,7 @@
             if (!gameSwitches.value(124)) {
                 if (bgmName === 'NoMusic') {
                     AudioManager.fadeOutBgm(10);
-                } else if (AudioManager.saveBgm() !== bgmName) {
+                } else if (AudioManager.saveBgm().name !== bgmName) {
                     AudioManager.playBgm({
                         name: valueMapBGM[0],
                         volume: valueMapBGM[1],
@@ -3335,7 +3341,7 @@
             for (var j = 1; j <= $dataSkills.length - 1; j++) {
                 const skill = $dataSkills[j];
                 for (var titleCheckId = 0; titleCheckId <= customAchievementIds.length - 1; titleCheckId++) {
-                    if (!skill.name == '') {
+                    if (skill.name !== '') {
                         if (skill.stypeId == skillTypeIds[titleCheckId]) {
                             useCounts[titleCheckId] += actor.getSkillUseCounter(j);
                         }
@@ -3365,7 +3371,7 @@
             const item = $dataItems[i];
             if (item.meta['EICSwitch']) {
                 if (Number(item.meta['EICSwitch']) == 104 || Number(item.meta['EICSwitch']) == 105) {
-                    if (!item.name == '' && !$gameParty.hasItem(item)) {
+                    if (item.name !== '' && !$gameParty.hasItem(item)) {
                         var titleCheckId = 2;//スイッチID。最初にtrueにして成立しない場合は途中でfalse
                         var titleCheckVarId = 2;//変数id若しくは$gameVariables.value(380 + $gameVariables.value(2))の主人公Ｈ配列id
                         var titleCheckThreshold = 0;//value2の値.
@@ -3543,10 +3549,10 @@
         let levelUpActorCount = 0;
         start = $gameVariables.value(75);
         end = $gameVariables.value(76);
-        for (var i = start; i <= end; i++) {
-            actor = $gameActors.actor(i);
-            if (actor.currentExp() > $gameVariables.value(i + 380)[65]) {
-                const expCalc = actor.currentExp() - $gameVariables.value(i + 380)[65];
+        for (let actorId = start; actorId <= end; actorId++) {
+            const actor = $gameActors.actor(actorId);
+            if (actor.currentExp() > $gameVariables.value(actorId + 380)[65]) {
+                const expCalc = actor.currentExp() - $gameVariables.value(actorId + 380)[65];
                 const exp = `\\C[2]${expCalc.toLocaleString()}\\C[0]　`
                 $gameVariables.setValue(539, $gameVariables.value(539) + `${actor.name()}本日獲得経験値:${exp}`);
                 levelUpActorCount += 1;
@@ -3555,7 +3561,7 @@
                     $gameVariables.setValue(540, $gameVariables.value(540) + 1);
                 };
             };
-            $gameVariables.value(i + 380)[65] = actor.currentExp();
+            $gameVariables.value(actorId + 380)[65] = actor.currentExp();
         };
         if (levelUpActorCount == 1 || levelUpActorCount == 3 || levelUpActorCount == 5 || levelUpActorCount == 7) {
             $gameVariables.setValue(539, $gameVariables.value(539) + `\n`);
@@ -3685,8 +3691,9 @@
             if (selectedItemIndex === 0) { //レアリティ1でmax1アイテムを作らない。
                 eligibleItemIndices = [];
                 chosenRarity = 1;
-                for (let i = 1; i <= itemsLength; i++) {
+                for (let i = 1; i < itemsLength; i++) {
                     const currentItem = valueItems[i];
+                    if (!currentItem) continue;
                     if (currentItem.meta['GatchaOutOfRange']) continue;
                     if (currentItem.meta['GatchaHasRange']
                         && !$gameParty.hasItem(currentItem)) continue;
@@ -3899,7 +3906,7 @@
         var start = 1;
         var end = $dataStates.length - 1;
         for (var i = start; i <= end; i++) {
-            if ($gameParty.membersState(i) && $dataStates[i].iconIndex >= 1 && !$dataStates[i].name == '' && !$dataStates[i].description == '') {
+            if ($gameParty.membersState(i) && $dataStates[i].iconIndex >= 1 && $dataStates[i].name !== '' && $dataStates[i].description !== '') {
                 for (var partyMemberIndex = 0; partyMemberIndex <= $gameParty.members().length - 1; partyMemberIndex++) {
                     if ($gameParty.members()[partyMemberIndex].isStateAffected(i)) {
                         var actor = $gameParty.members()[partyMemberIndex];
@@ -5268,6 +5275,11 @@
 
     };
 
+    function getScaledTrapValue(enemyLevelValues, multiplier) {
+        const baseValue = Number(enemyLevelValues[getRandomIndex(enemyLevelValues.length)]) * multiplier;
+        return Math.floor(Math.random() * (baseValue * 10)) + (baseValue + 1);
+    }
+
     trap_starting1 = function (trapModeId, eventId) {
 
         var event = $gameMap.event(eventId);
@@ -5327,11 +5339,9 @@
                     var randomRoll = getRandomIndex(900) + 101;
                     var damageAmount = getRandomIndex(900) + 101;
                     if ($gameVariables.value(240) >= 1) {
-                        var enemyLevelValues = $dataItems[$gameVariables.value(240)].meta['EnemyLV'].split(',');
-                        var randomRoll = enemyLevelValues[getRandomIndex(enemyLevelValues.length)] * 10;
-                        var randomRoll = Math.floor(Math.random() * (randomRoll * 10)) + (randomRoll + 1);
-                        var damageAmount = enemyLevelValues[getRandomIndex(enemyLevelValues.length)] * 10;
-                        var damageAmount = Math.floor(Math.random() * (damageAmount * 10)) + (damageAmount + 1);
+                        const enemyLevelValues = $dataItems[$gameVariables.value(240)].meta['EnemyLV'].split(',');
+                        randomRoll = getScaledTrapValue(enemyLevelValues, 10);
+                        damageAmount = getScaledTrapValue(enemyLevelValues, 10);
                     };
                     if (randomRoll > evasionThreshold) {
                         $gamePlayer.requestAnimation(131);
@@ -5355,11 +5365,9 @@
                     var randomRoll = getRandomIndex(900) + 101;
                     var damageAmount = getRandomIndex(900) + 101;
                     if ($gameVariables.value(240) >= 1) {
-                        var enemyLevelValues = $dataItems[$gameVariables.value(240)].meta['EnemyLV'].split(',');
-                        var randomRoll = enemyLevelValues[getRandomIndex(enemyLevelValues.length)] * 10;
-                        var randomRoll = Math.floor(Math.random() * (randomRoll * 10)) + (randomRoll + 1);
-                        var damageAmount = enemyLevelValues[getRandomIndex(enemyLevelValues.length)] * 1;
-                        var damageAmount = Math.floor(Math.random() * (damageAmount * 10)) + (damageAmount + 1);
+                        const enemyLevelValues = $dataItems[$gameVariables.value(240)].meta['EnemyLV'].split(',');
+                        randomRoll = getScaledTrapValue(enemyLevelValues, 10);
+                        damageAmount = getScaledTrapValue(enemyLevelValues, 1);
                     };
                     if (randomRoll > evasionThreshold) {
                         $gamePlayer.requestAnimation(58);
@@ -5383,9 +5391,8 @@
                     var randomRoll = getRandomIndex(900) + 101;
                     var damageAmount = getRandomIndex(90) + 11;
                     if ($gameVariables.value(240) >= 1) {
-                        var enemyLevelValues = $dataItems[$gameVariables.value(240)].meta['EnemyLV'].split(',');
-                        var randomRoll = enemyLevelValues[getRandomIndex(enemyLevelValues.length)] * 10;
-                        var randomRoll = Math.floor(Math.random() * (randomRoll * 10)) + (randomRoll + 1);
+                        const enemyLevelValues = $dataItems[$gameVariables.value(240)].meta['EnemyLV'].split(',');
+                        randomRoll = getScaledTrapValue(enemyLevelValues, 10);
                     };
                     if (randomRoll > evasionThreshold) {
                         $gamePlayer.requestAnimation(58);
@@ -5978,7 +5985,7 @@
             evalValueBattleRecord_i[10] = `────`
             for (var j = 11; j <= 17; j++) { evalValueBattleRecord_i[j] = 0 };
             for (var j = 1; j < dataSkillsCount; j++) {
-                if (!$dataSkills[j].name == '') {
+                if ($dataSkills[j].name !== '') {
                     const skillStypeId = $dataSkills[j].stypeId;
                     if (skillStypeId == 2) { evalValueBattleRecord_i[11] += actor.getSkillUseCounter(j) };
                     if (skillStypeId == 5) { evalValueBattleRecord_i[12] += actor.getSkillUseCounter(j) };
@@ -6367,51 +6374,43 @@
 
     };
 
+    function createRandomWordSegment(wordHeadCandidates, wordBodyCandidates, wordTailCandidates, shakeOffsetCandidates) {
+        const wordHead = wordHeadCandidates[getRandomIndex(wordHeadCandidates.length)];
+        const wordBody = wordBodyCandidates[getRandomIndex(wordBodyCandidates.length)];
+        const fontSize = wordTailCandidates[getRandomIndex(wordTailCandidates.length)];
+        let shakeOffset;
+
+        if (wordBody == ` `) {
+            shakeOffset = -getRandomIndex(11);
+        } else if (wordBody == `\\C[27]♥\\C[0]` || wordBody == `\\C[27]♡\\C[0]`) {
+            shakeOffset = getRandomIndex(6);
+        } else {
+            shakeOffset = shakeOffsetCandidates[getRandomIndex(shakeOffsetCandidates.length)];
+            if (fontSize >= 40) {
+                shakeOffset += Math.ceil(fontSize / 4);
+            };
+        }
+
+        return `\x1bfs[${fontSize}]${wordHead}${wordBody}\\MX[${-shakeOffset}]`;
+    }
+
+    function appendRandomWordSegments(targetVarId, count, wordHeadCandidates, wordBodyCandidates, wordTailCandidates, shakeOffsetCandidates) {
+        let generatedText = $gameVariables.value(targetVarId);
+        for (let index = 0; index < count; index++) {
+            generatedText += createRandomWordSegment(wordHeadCandidates, wordBodyCandidates, wordTailCandidates, shakeOffsetCandidates);
+        }
+        $gameVariables.setValue(targetVarId, generatedText);
+    }
+
     //文字ランダム作成
     text_randumWord = function (targetVarId, actorIdCode, wordRepeatCount, wordHeadCandidates, wordBodyCandidates, wordTailCandidates, shakeOffsetCandidates) {
 
         $gameVariables.setValue(targetVarId, `\\AT[${actorIdCode}]`);
-        for (var i = 1; i <= wordRepeatCount; i++) {
-            var wordPart1 = wordHeadCandidates[getRandomIndex(wordHeadCandidates.length)];
-            var wordPart2 = wordBodyCandidates[getRandomIndex(wordBodyCandidates.length)];
-            var wordPart3 = wordTailCandidates[getRandomIndex(wordTailCandidates.length)];
-            if (wordPart2 == ` `) {
-                var shakeOffset = getRandomIndex(11);
-                var shakeOffset = -shakeOffset;
-            } else {
-                if (wordPart2 == `\\C[27]♥\\C[0]` || wordPart2 == `\\C[27]♡\\C[0]`) {
-                    var shakeOffset = getRandomIndex(6);
-                } else {
-                    var shakeOffset = shakeOffsetCandidates[getRandomIndex(shakeOffsetCandidates.length)];
-                    if (wordPart3 >= 40) {
-                        shakeOffset += Math.ceil(wordPart3 / 4);
-                    };
-                };
-            };
-            //var wordPart1 = `${wordPart1}\\MY[0]`;
-            $gameVariables.setValue(targetVarId, $gameVariables.value(targetVarId) + `\x1bfs[${wordPart3}]${wordPart1}${wordPart2}\\MX[${-shakeOffset}]`);//
-        };
+        //var wordPart1 = `${wordPart1}\\MY[0]`;
+        appendRandomWordSegments(targetVarId, wordRepeatCount, wordHeadCandidates, wordBodyCandidates, wordTailCandidates, shakeOffsetCandidates);//
         if (wordRepeatCount >= 20) {
             $gameVariables.setValue(targetVarId, $gameVariables.value(targetVarId) + `\n`);
-            for (var i = 1; i <= wordRepeatCount; i++) {
-                var wordPart1 = wordHeadCandidates[getRandomIndex(wordHeadCandidates.length)];
-                var wordPart2 = wordBodyCandidates[getRandomIndex(wordBodyCandidates.length)];
-                var wordPart3 = wordTailCandidates[getRandomIndex(wordTailCandidates.length)];
-                if (wordPart2 == ` `) {
-                    var shakeOffset = getRandomIndex(11);
-                    var shakeOffset = -shakeOffset;
-                } else {
-                    if (wordPart2 == `\\C[27]♥\\C[0]` || wordPart2 == `\\C[27]♡\\C[0]`) {
-                        var shakeOffset = getRandomIndex(6);
-                    } else {
-                        var shakeOffset = shakeOffsetCandidates[getRandomIndex(shakeOffsetCandidates.length)];
-                        if (wordPart3 >= 40) {
-                            shakeOffset += Math.ceil(wordPart3 / 4);
-                        };
-                    };
-                };
-                $gameVariables.setValue(targetVarId, $gameVariables.value(targetVarId) + `\x1bfs[${wordPart3}]${wordPart1}${wordPart2}\\MX[${-shakeOffset}]`);//
-            };
+            appendRandomWordSegments(targetVarId, wordRepeatCount, wordHeadCandidates, wordBodyCandidates, wordTailCandidates, shakeOffsetCandidates);//
         };
         //Graphics.loadFont("GameFont","fonts/eromangasimaji.otf");
 
@@ -6580,14 +6579,12 @@
 
     // Renamed from triggerParallelEventIfQuestAndMapMatch
     triggerParallelEventIfQuestAndMapMatch = function (questProgress, mapId, eventParallelParam, skipGuardCheck, switchId) {
-        if ($gameVariables.value(135) == questProgress) {
-            if ($gameMap.mapId() == mapId) {
-                if (skipGuardCheck || $gameSwitches.value(switchId)) { // Guard win condition check
-                    event_pararelStarting(0, eventParallelParam, 0);
-                    $gameSwitches.setValue(474, true);
-                }
-            }
-        }
+        if ($gameVariables.value(135) != questProgress) return;
+        if ($gameMap.mapId() != mapId) return;
+        if (!skipGuardCheck && !$gameSwitches.value(switchId)) return; // Guard win condition check
+
+        event_pararelStarting(0, eventParallelParam, 0);
+        $gameSwitches.setValue(474, true);
     }
 
     scene_joukenNakami_clean_prefixes = function (text) {
@@ -6867,6 +6864,9 @@
     //#endregion
 
     ev23MorningDayEveningNightSwitch = function (parent) {
+        const wasNight = $gameSwitches.value(15);
+        const wasDay = $gameSwitches.value(14);
+
         // First reset all time switches
         for (let i = 13; i <= 15; i++) {
             $gameSwitches.setValue(i, false);
@@ -6874,11 +6874,11 @@
 
         // Determine the next time of day
         let nextTimeOfDay;
-        if ($gameSwitches.value(15)) {
+        if (wasNight) {
             nextTimeOfDay = 13; // Morning (after Night)
             parent.sVal(539, $gameVariables.value(539) + `夜になりました。\n`);
             parent.sVal(540, $gameVariables.value(540) + 1);
-        } else if ($gameSwitches.value(14)) {
+        } else if (wasDay) {
             nextTimeOfDay = 15; // Night (after Day)
             parent.sVal(539, $gameVariables.value(539) + `昼になりました。\n`);
             parent.sVal(540, $gameVariables.value(540) + 1);
