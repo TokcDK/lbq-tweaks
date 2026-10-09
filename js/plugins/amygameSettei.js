@@ -90,6 +90,7 @@ valueBusinessSkillId = 771;
 valueFootpadSkillId = 772;
 valueStrippingSkillId = 773;
 valueIdentifySkillId = 797;
+valueMassGatheringSkillId = 799;
 valueHoneyTrapSkillId = 875;
 valueFightingSpiritSkillId = 778;
 valueLeadershipSkillId = 779;

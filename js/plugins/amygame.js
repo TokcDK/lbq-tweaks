@@ -31,10 +31,10 @@
         for (let i = start; i <= end; i++) {
             gameVariables355[i] = [0, Array(51).fill(0), Array(51).fill(0), Array(51).fill(0), Array(51).fill(0)];
 
-            gameVariables355[i][1][50] = '${presetBaseName}1';
-            gameVariables355[i][2][50] = '${presetBaseName}2';
-            gameVariables355[i][3][50] = '${presetBaseName}3';
-            gameVariables355[i][4][50] = '${presetBaseName}4';
+            gameVariables355[i][1][50] = `${presetBaseName}1`;
+            gameVariables355[i][2][50] = `${presetBaseName}2`;
+            gameVariables355[i][3][50] = `${presetBaseName}3`;
+            gameVariables355[i][4][50] = `${presetBaseName}4`;
         };
         //各アクターの装備スキル配列記憶用
         gameVariables.setValue(351, Array(21).fill([]));
@@ -859,9 +859,9 @@
         if (skillLearnedFlag == 0) {//797見極め習得
             var id = valueIdentifySkillId;
             if (!actor.isLearnedSkill(id)) {
-                let learnConditionSkillId = 766;
-                const learnConditionId = 764;
-                let masteryThreshold = 3;
+                const learnConditionSkillId = valueAppraisalSkillId;
+                const learnConditionId = valueHarvestingSkillId;
+                const masteryThreshold = 3;
                 if (actor.isLearnedSkill(learnConditionSkillId) && actor.skillMasteryLevel(learnConditionId) >= masteryThreshold) {
                     actor.learnSkill(id);
                     $gameVariables.setValue(19, id);
@@ -869,11 +869,11 @@
             };
         };
         if (skillLearnedFlag == 0) {//799大量採取
-            var id = valueIdentifySkillId;
+            var id = valueMassGatheringSkillId;
             if (!actor.isLearnedSkill(id)) {
-                learnConditionSkillId = 763;
-                var learnConditionId = 764;
-                masteryThreshold = 2;
+                const learnConditionSkillId = valueHuntingSkillId;
+                const learnConditionId = valueHarvestingSkillId;
+                const masteryThreshold = 2;
                 if (actor.skillMasteryLevel(learnConditionSkillId) >= masteryThreshold && actor.skillMasteryLevel(learnConditionId) >= masteryThreshold) {
                     actor.learnSkill(id);
                     $gameVariables.setValue(19, id);
@@ -1696,22 +1696,22 @@
         const troopId = 10; //グループIDを指定
         const enemyTroopH = $dataTroops[troopId];
         const troopMeta = $dataItems[$gameVariables.value(240)].meta;
-        enemyTroopH.name = troopMeta['TroopName']; // TroopNameH is missing
+        enemyTroopH.name = troopMeta['TroopNameH'];
         enemyTroopH.members = []; //グループのメンバーを空に
         const spawnPoolH = $gameVariables.value(228);
         const spawnPoolHLength = spawnPoolH.length;
 
         // add enemies to enemy troop
-        const battleEnemyPopHOptions = troopMeta['BattleEnemyPopC'].split(','); // BattleEnemyPopCH is missing
+        const battleEnemyPopHOptions = troopMeta['BattleEnemyPopCH'].split(',');
         const enemyCountToSpawn = Number(battleEnemyPopHOptions[getRandomIndex(battleEnemyPopHOptions.length)]);
         for (let spawnIndex = 1; spawnIndex <= enemyCountToSpawn; spawnIndex++) {
             // get enemy data
             let enemySpawnId = Number(spawnPoolH[getRandomIndex(spawnPoolHLength)]) || 0; //出現エネミースポーン
-            let isHidden = (spawnIndex >= enemyCountToSpawn) ? true : false;
             const { spawnX, spawnY } = getSpawnCoordinatesHEnemyTroopPush(spawnIndex, enemyCountToSpawn, xOffsetOptions, yNegativeOffsetOptions, yPositiveOffsetOptions);
 
             // add enemy
-            const enemy = { enemyId: enemySpawnId, x: spawnX, y: spawnY, hidden: isHidden }; //追加するエネミーの設定(ID1、座標(100,100)、表示有)
+            // 元コードでも hidden は常に false 固定(算出していた value5 はコメントアウトされていた)
+            const enemy = { enemyId: enemySpawnId, x: spawnX, y: spawnY, hidden: false }; //追加するエネミーの設定(ID1、座標(100,100)、表示有)
             enemyTroopH.members.push(enemy); //設定したエネミーをグループに追加
         }
     };
@@ -2839,7 +2839,6 @@
         $gameVariables.setValue(228, []);//そのダンジョンに出現するエロエネミーID
         $gameVariables.setValue(242, []);//そのダンジョンに出現するレアエネミーID
         $gameVariables.setValue(345, [[], [], [], [], [], [], [], [], [], [], []]);
-        var unusedVar = [];
         var start = 1;
         var end = 10;
         for (var i = start; i <= end; i++) {
@@ -3210,7 +3209,6 @@
             //エネミー隊列変更
             var start = 0; var end = $gameTroop.members().length - 1;
             for (var i = start; i <= end; i++) {
-                var troopId = $gameVariables.value(229);
                 var troopX = $gameTroop.getX(i + 1);
                 if (troopX <= 200) {
                     $gameTroop.members()[i].setRow(2);
@@ -3898,8 +3896,6 @@
         valueCountSet2 = 1;
         var headerText = `付与ステート一覧\n`;
         eval("valueWordSet" + valueCountSet2 + " = headerText");
-        var listInitCounter = 1;
-        var wordSetSlot = 0;
         var start = 1;
         var end = $dataStates.length - 1;
         for (var i = start; i <= end; i++) {
@@ -4067,6 +4063,11 @@
     }
 
     //レアリティの昇格計算
+    // 昇格に必要な素材の作業配列。CommonEvent 235 が mode 1 → 2 → 0 の順で
+    // 呼ぶ前提で、mode 1 が詰めて mode 2/0 が読む。宣言が無いと window を汚し、
+    // mode 1 を経ずに呼ばれた場合は undefined.length で落ちる。
+    let arr1 = [];
+    let arr2 = [];
     reality_setPromotion = function (promotionModeId, actorId) {
 
         if (promotionModeId == 1) {
@@ -4086,7 +4087,7 @@
                 for (var rank in RANK_BY_PROMOTION_DATA) {
                     var rankData = RANK_BY_PROMOTION_DATA[rank];
                     if (promotionValue == rankData.promotionValue) {
-                        valueWordSet2 = '<' + rankData.promotionCode + '>` + `昇格'; // do not translate, meta
+                        valueWordSet2 = '<' + rankData.promotionCode + '>昇格';
                         valueWordSet1 = rankData.promotionCode + 'promotionM'; // do not translate, meta
                         valueCountSet2 = rankData.cost;
                         break;
@@ -5557,7 +5558,6 @@
         //get_loopChoiceDisplay1(2,0,2);//一括売却
         //get_loopChoiceDisplay1(3,0,2);//一括売却
 
-        var sourceEntries = getItemEquipmentSource(entryCategoryId);
         //picture_motion1("linear",[0]);
         $gameVariables.setValue(177, columnCount);
         if (listKindId == 1) {//クエスト掲示
@@ -6761,8 +6761,7 @@
         const timeget = new Date();
         const year = timeget.getFullYear();
         const month = timeget.getMonth() + 1;
-        const day = timeget.getDay();//
-        //var date = timeget.getDate();
+        const day = timeget.getDate();//日(1-31)。getDay()は曜日(0-6)なので使わない
         const hour = timeget.getHours();
         const min = timeget.getMinutes();
         const sec = timeget.getSeconds();
