@@ -5562,7 +5562,7 @@
         $gameVariables.setValue(177, columnCount);
         if (listKindId == 1) {//クエスト掲示
             WindowManager.show(0, 0, 0, 1280, 110);
-            var titleText = `　　　　　　　　　　　　　　　　　　　クエスト掲示板`;
+            var titleText = `　　　　　　　　　　　　　　　　　　　` + `クエスト掲示板`;
             WindowManager.drawText(0, titleText);
             var choicePromptText = `　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　`;
         };
@@ -5597,7 +5597,11 @@
             };
             if (listKindId == 1) {//クエスト
                 if (valueWordArray[i] == `？？？`) {
-                    var choiceText = `\\C[1][受注不可]\\C[0]\x1bI[${$dataItems[valueCountArray[i]].iconIndex}]？？？`
+                    var prefix = '[' +colorTaggedText(1, `受注不可`) + ']';
+                    var iconIndex = $dataItems[valueCountArray[i]].iconIndex;
+                    var icon = `\x1bI[${iconIndex}]`;
+                    var unknownText = `？？？`;
+                    var choiceText = prefix+icon+unknownText
                     var dTextContent = valueQuestArray7[valueCountArray[i] - 800];
                 } else {
                     var dTextContent = valueQuestArray4[valueCountArray[i] - 800];
@@ -6191,7 +6195,8 @@
                         descBuilder += `\n`;
                     };
                 };
-                stateData.description = `\\sim[${stateId}]:時間経過で解除。\n${descBuilder}`;
+                const effectNote = `時間経過で解除。`;
+                stateData.description = `\\sim[${stateId}]:${effectNote}\n${descBuilder}`;
             };
         };
         $gamePlayer.refresh();
@@ -6893,7 +6898,10 @@
     ev23showElapsedMessage = function () {
         const dayNum = $gameVariables.value(58);
         const weekNum = $gameVariables.value(55);
-        TickerManager.show(`──${dayNum}日目(${weekNum}曜日)経過──`);
+        const dd = `日目`;
+        const ww = `曜日`;
+        const progress = `経過`;
+        TickerManager.show(`──${dayNum}${dd}(${weekNum}${ww})${progress}──`);
     }
 
     resetChildEventAppearance = function () {
