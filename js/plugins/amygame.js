@@ -3490,13 +3490,14 @@
                         var annihilationCount = 0;
                         for (var j = 1; j <= 100; j++) {
                             const itemJ = $dataItems[j];
-                            if (itemJ.meta['OnSwitch']) {
-                                var onSwitchValues = itemJ.meta['OnSwitch'].split(',');
-                                for (var switchIndex = 0; switchIndex <= onSwitchValues.length - 1; switchIndex++) {
-                                    if (Number(onSwitchValues[switchIndex]) == 207) {
-                                        annihilationCount += gameVar257[j];
-                                        break;
-                                    };
+                            if (!itemJ.meta['OnSwitch']) {
+                                continue;
+                            };
+                            var onSwitchValues = itemJ.meta['OnSwitch'].split(',');
+                            for (var switchIndex = 0; switchIndex <= onSwitchValues.length - 1; switchIndex++) {
+                                if (Number(onSwitchValues[switchIndex]) == 207) {
+                                    annihilationCount += gameVar257[j];
+                                    break;
                                 };
                             };
                         };
@@ -3584,6 +3585,19 @@
     //ガチャスクリプト
     item_gacha = function () {
 
+        const RARITY_COLOR_TAG_INFOS = {
+            1: [0, 473],
+            2: [2, 473],
+            3: [22, 473],
+            4: [21, 473],
+            5: [29, 473],
+            6: [28, 474],
+            7: [24, 475],
+            8: [26, 476],
+            9: [27, 477],
+            10: [25, 478],
+        }
+
         //内容のほうで開始時点ではレアリティを8に制限
         gacha_naiyou(3, 0);
         if (valueGachaId >= 1) {
@@ -3592,19 +3606,16 @@
             if ($gameVariables.value(23) < lotteryRarity) {
                 $gameVariables.setValue(23, lotteryRarity);
             };
-            if (lotteryRarity == 1) { var rarityColorTag = `\\C[0]<Rarity:\\I[473]>\\C[0]` };
-            if (lotteryRarity == 2) { var rarityColorTag = `\\C[2]<Rarity:\\I[473]>\\C[0]` };
-            if (lotteryRarity == 3) { var rarityColorTag = `\\C[22]<Rarity:\\I[473]>\\C[0]` };
-            if (lotteryRarity == 4) { var rarityColorTag = `\\C[21]<Rarity:\\I[473]>\\C[0]` };
-            if (lotteryRarity == 5) { var rarityColorTag = `\\C[29]<Rarity:\\I[473]>\\C[0]` };
-            if (lotteryRarity == 6) { var rarityColorTag = `\\C[28]<Rarity:\\I[474]>\\C[0]` };
-            if (lotteryRarity == 7) { var rarityColorTag = `\\C[24]<Rarity:\\I[475]>\\C[0]` };
-            if (lotteryRarity == 8) { var rarityColorTag = `\\C[26]<Rarity:\\I[476]>\\C[0]` };
-            if (lotteryRarity == 9) { var rarityColorTag = `\\C[14]<Rarity:\\I[477]>\\C[0]` };
-            if (lotteryRarity == 10) { var rarityColorTag = `\\C[17]<Rarity:\\I[478]>\\C[0]` };
-            if (valueItems == $dataItems) { var gachaResultMessage = `${rarityColorTag}\\C[16]\\iin[${valueGachaId}]\\C[0]が排出されました！` };
-            if (valueItems == $dataWeapons) { var gachaResultMessage = `${rarityColorTag}\\C[16]\\win[${valueGachaId}]\\C[0]が排出されました！` };
-            if (valueItems == $dataArmors) { var gachaResultMessage = `${rarityColorTag}\\C[16]\\ain[${valueGachaId}]\\C[0]が排出されました！` };
+
+            const colorCode = RARITY_COLOR_TAG_INFOS[lotteryRarity][0];
+            const itemIndex = RARITY_COLOR_TAG_INFOS[lotteryRarity][1];
+            var rarityColorTag = colorTaggedText(colorCode, `<Rarity:\\I[${itemIndex}]`);
+
+            if (valueItems == $dataItems) { var gacha = `${rarityColorTag}\\C[16]\\iin[${valueGachaId}]\\C[0]`; }
+            else if (valueItems == $dataWeapons) { var gacha = `${rarityColorTag}\\C[16]\\win[${valueGachaId}]\\C[0]`; }
+            else if (valueItems == $dataArmors) { var gacha = `${rarityColorTag}\\C[16]\\ain[${valueGachaId}]\\C[0]`; };
+            var gachaResultMessage = `${gacha}が排出されました！`;
+
             if ($gameSwitches.value(380)) {
                 $gameVariables.setValue(21, $gameVariables.value(21) + 1);
                 $gameVariables.setValue(22, $gameVariables.value(22) + `${gachaResultMessage}\n`);
