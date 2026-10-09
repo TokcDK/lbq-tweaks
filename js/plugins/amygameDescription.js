@@ -22,6 +22,11 @@
 // globals, so a top-level table would capture undefined.
 // ---------------------------------------------------------------------------
 
+// `[\C[n]label\C[0]] ` — the shape shared by most single-value effect notes.
+colorTaggedText = function (colorCode, text) {
+  return `\\C[${colorCode}]${text}\\C[0]`;
+}
+
 // databaseTypeId -> the database to rewrite. Resolved per call for the reason
 // above. An unknown id keeps the previous selection, as the original did.
 descriptionDatabase = function(databaseTypeId){
@@ -175,22 +180,22 @@ const DAMAGE_FORMULA_TEXT = {
 // forms the trait scan needs. `amygame_elementIcon` already centralises the id
 // table; these wrappers stop every call site from repeating the
 // `elementIcon[0] >= 1 ? name : icon` test.
-function elementLabel(elementId) {
+elementLabel = function (elementId) {
   const elementIcon = amygame_elementIcon(elementId);
   return elementIcon[0] >= 1 ? `${elementIcon[1]}` : `\x1bI[${elementIcon[1]}]`;
 }
-function elementAmplifyLabel(elementId) {
+elementAmplifyLabel = function (elementId) {
   const elementIcon = amygame_elementIcon(elementId);
   return elementIcon[0] >= 1 ? `${elementIcon[1]}${POWER_LABEL}` : `\x1bI[${elementIcon[2]}]${POWER_LABEL}`;
 }
 // The `\x1bI[n]` icon used by the element-resist trait (code 11). Takes the
 // already-fetched descriptor: `amygame_elementIcon` allocates a fresh array on
 // every call, so the trait scan reads it once.
-function elementResistIcon(elementIcon) {
+elementResistIcon = function (elementIcon) {
   return `\x1bI[${elementIcon[3]}]`;
 }
 // State id -> the icon to draw for it, honouring the battle-state sheet range.
-function stateIconText(stateId) {
+stateIconText = function (stateId) {
   const battleIcon = BATTLE_STATE_ICONS[stateId - BATTLE_STATE_ICON_FIRST_ID];
   if (battleIcon) return battleIcon;
   return $dataStates[stateId].iconIndex >= 1
@@ -199,7 +204,7 @@ function stateIconText(stateId) {
 }
 // Same, but for the `<additionalSet>` path, which falls back to `\x1bSIM[n]`
 // and appends one `+` per extra stack.
-function additionalSetStateIcon(stateId, stackCount) {
+additionalSetStateIcon = function (stateId, stackCount) {
   const battleIcon = BATTLE_STATE_ICONS[stateId - BATTLE_STATE_ICON_FIRST_ID];
   let text = battleIcon ? battleIcon : `\x1bSIM[${stateId}]`;
   if (ADDITIONAL_SET_EXTRA_ICONS[stateId]) text = ADDITIONAL_SET_EXTRA_ICONS[stateId];
@@ -211,7 +216,7 @@ function additionalSetStateIcon(stateId, stackCount) {
 }
 // The passive-state lists built by amyGameSettei.js hold their ids as strings
 // (`pushArray` pushes `metaValue.split(',')`), so the test has to stay loose.
-function containsState(passiveList, stateId) {
+containsState = function (passiveList, stateId) {
   for (let index = 0; index < passiveList.length; index++) {
     if(passiveList[index] == stateId){ return true; };
   };
@@ -219,12 +224,12 @@ function containsState(passiveList, stateId) {
 }
 // `value1,value2` style meta, split and trimmed. Trimming matters: the notes in
 // this project are hand-written and carry stray spaces after the commas.
-function splitMetaValues(metaValue) {
+splitMetaValues = function (metaValue) {
   return String(metaValue).split(',').map(function (part) { return part.trim(); });
 }
 // Growth-stat row for a class, e.g. `\C[16]Mhp\C[10]120\C[0],…`. Built once and
 // reused: the original pasted this 8-stat expression into two long templates.
-function growthStatText(growthStats, rankValue) {
+growthStatText = function (growthStats, rankValue) {
   return GROWTH_STAT_LABELS.map(function (label, index) {
     return `\\C[16]${label}\\C[10]${Number(growthStats[index]) * rankValue}\\C[0]`;
   }).join(',');
@@ -233,7 +238,7 @@ function growthStatText(growthStats, rankValue) {
 // and above/below 1 selects the up or down icon. `isUniform` is true when every
 // stat in the run carried the same multiplier, in which case the percentage is
 // dropped (showing "×2" once is clearer than eight identical percentages).
-function allStatUpText(traitValue, upIcon, downIcon, isUniform) {
+allStatUpText = function (traitValue, upIcon, downIcon, isUniform) {
   const icon = traitValue >= 1 ? upIcon : downIcon;
   const percent = Math.round(Math.abs(traitValue - 1) * 100);
   return isUniform ? `${icon} ` : `${icon}${percent}% `;
@@ -245,19 +250,19 @@ function allStatUpText(traitValue, upIcon, downIcon, isUniform) {
 // The icon table is a module-scope constant: it was previously rebuilt inside
 // the per-entry loop, which allocated the same object once per database entry.
 const RECOVERY_EFFECT_ICONS = {11: 627, 12: 628, 13: 629};
-function recoveryEffectText(iconId, value, unit, direction) {
+recoveryEffectText = function (iconId, value, unit, direction) {
   return `[\\C[${value >= 1 ? 3 : 4}]\\I[${iconId}]:${value}${unit}${direction}\\C[0]]`;
 }
 // `<HP|MP Life Steal Physical|Magical>`: four near-identical blocks. The value
 // comes from the physical tag when both are present, and the prefix names
 // whichever tags are in play. `lossSuffix` differs between HP (反動ﾀﾞﾒｰｼﾞ) and
 // MP (消耗); a value below 1 means the skill costs rather than drains.
-function lifeStealText(prefix, rawValue, resource, lossSuffix) {
+lifeStealText = function (prefix, rawValue, resource, lossSuffix) {
   const value = Number(String(rawValue).replace(' ', '').replace('%', ''));
   const isGain = value >= 1;
   return `[\\C[${isGain ? 2 : 10}]${prefix}${DRAIN_LABEL}${value}%${resource}${isGain ? ABSORB_LABEL : lossSuffix}\\C[0]]`;
 }
-function lifeStealGroupText(meta, resource, lossSuffix) {
+lifeStealGroupText = function (meta, resource, lossSuffix) {
   const physical = meta[resource + ' Life Steal Physical'];
   const magical = meta[resource + ' Life Steal Magical'];
   if(physical && magical){
@@ -275,7 +280,7 @@ function lifeStealGroupText(meta, resource, lossSuffix) {
 // A `switch` rather than four `if`s: every arm returns, and `sourceIndex` is
 // already a number, so `switch`'s `===` is the same test the `==` chain made —
 // with one jump instead of up to four comparisons.
-function statEffectName(metaValues) {
+statEffectName = function (metaValues) {
   const sourceIndex = Number(metaValues[0]);
   const statIndex = Number(metaValues[1]);
   switch(sourceIndex){
@@ -294,14 +299,14 @@ function statEffectName(metaValues) {
 // NW.js build, so reach the global object the old way. The tables have to be
 // read at call time: this file is evaluated before that one.
 const GAME_GLOBALS = (function () { return this; })();
-function classGrowthStats(classIconIndex) {
+classGrowthStats = function (classIconIndex) {
   const tableName = CLASS_GROWTH_STAT_NAMES[Number(classIconIndex)];
   return (tableName && GAME_GLOBALS[tableName]) || valuePeplesStatas;
 }
 // The class comparison list pads every name out to six display cells. The
 // original spelled that out as five branches, one per source length.
 const CLASS_NAME_WIDTH = 6;
-function classComparisonName(className) {
+classComparisonName = function (className) {
   const paddingLength = className.length >= 1 && className.length < CLASS_NAME_WIDTH
     ? CLASS_NAME_WIDTH - className.length : 0;
   return className + `　`.repeat(paddingLength);
@@ -1661,7 +1666,7 @@ if(databaseTypeId == 1 || databaseTypeId == 2 || databaseTypeId == 4 || database
 // derive into. The 101-200 and 901-950 blocks were the same body with a
 // different header and output slot; 901-950 has no `<NormalAttackDerivedSuper>`
 // tag in this database, so handling it in the shared body is a no-op there.
-function attackSkillRankText(skill, headerText) {
+attackSkillRankText = function (skill, headerText) {
   let descriptionText = headerText;
   const masteryEffect = skill.meta['Mastery Effect'];
   const rankCorrectionLabel = `ランク補正`;//翻訳対象

@@ -3848,7 +3848,7 @@
                     else if (randomFaceIndex == 6) { valueFaceSelect = 38 }//頬染め挑発的
                     else if (randomFaceIndex == 7) { valueFaceSelect = 41 };//頬染め目にハート
                 };
-                
+
                 battle_bustUp1(gameActor, choicePictureId, 0, 0, 10);
                 for (var j = 0; j <= 7; j++) {
                     if ($gameScreen.picture(choicePictureId + j)) {
@@ -3995,36 +3995,76 @@
             $gameVariables.value(i + 380)[50] = $dataWeapons[i + 200].name;
         };
     };
+
+    const ACTOR_RARITY_RANK_DATA = {
+        // rarityRank: [skillId, rankLv, code, maxLevel]
+        0: {skillId: 406, rankLv: 0, code: 'N', maxLv: 9},
+        1: {skillId: 405, rankLv: 1, code: 'R', maxLv: 39},
+        2: {skillId: 404, rankLv: 2, code: 'SR', maxLv: 59},
+        3: {skillId: 403, rankLv: 3, code: 'SSR', maxLv: 79},
+        4: {skillId: 402, rankLv: 4, code: 'UR', maxLv: 98},
+        5: {skillId: 401, rankLv: 5, code: 'LR', maxLv: 998},
+    }
+
+    /*
+    * Get actor rarity rank data
+    */
+    getRarityRank = function (actor) {
+        for ( var rarityRank in ACTOR_RARITY_RANK_DATA ) {
+            var rank = ACTOR_RARITY_RANK_DATA[rarityRank];
+            if (actor.isLearnedSkill(rank.skillId)) {
+                return rank;
+            };
+        }
+    };
+
     //レアリティを設定
     reality_setUp = function (actorId) {
 
         var actor = $gameActors.actor(actorId);
-        if (actor.isLearnedSkill(401)) { var rarityRank = 5; var rarityCode = 'LR'; var maxLevelValue = 998 };
-        if (actor.isLearnedSkill(402)) { var rarityRank = 4; var rarityCode = 'UR'; var maxLevelValue = 98 };
-        if (actor.isLearnedSkill(403)) { var rarityRank = 3; var rarityCode = 'SSR'; var maxLevelValue = 79 };
-        if (actor.isLearnedSkill(404)) { var rarityRank = 2; var rarityCode = 'SR'; var maxLevelValue = 59 };
-        if (actor.isLearnedSkill(405)) { var rarityRank = 1; var rarityCode = 'R'; var maxLevelValue = 39 };
-        if (actor.isLearnedSkill(406)) { var rarityRank = 0; var rarityCode = 'N'; var maxLevelValue = 9 };
-        valueCountSet1 = rarityCode;
-        actor.gainMaxLevel(-999);
-        actor.gainMaxLevel(maxLevelValue);
-        actor.setupCssbgi(1, 'actorreality' + rarityCode, 0, 0, 0, 0, 0);
-        actor.setFaceImage("Actor_" + actorId, rarityRank);
+        var rank = getRarityRank(actor);
 
+        actor.gainMaxLevel(-999);
+        actor.gainMaxLevel(rank.maxLv);
+        actor.setupCssbgi(1, 'actorreality' + (valueCountSet1 = rank.code), 0, 0, 0, 0, 0);
+        actor.setFaceImage("Actor_" + actorId, rank.rankLv);
     };
+
+    const ACTOR_RARITY_RANK_SKILLS_DATA = {
+        // rarityRank: { skillId, forgetSkillIds: [], learnSkillIds: [] }
+        5: {skillId: 401, forgetSkillIds: [], learnSkillIds: []},
+        4: {skillId: 402, forgetSkillIds: [402], learnSkillIds: [401]},
+        3: {skillId: 403, forgetSkillIds: [403], learnSkillIds: [402]},
+        2: {skillId: 404, forgetSkillIds: [404], learnSkillIds: [403]},
+        1: {skillId: 405, forgetSkillIds: [405], learnSkillIds: [404]},
+        0: {skillId: 406, forgetSkillIds: [406], learnSkillIds: [405]},
+    }
 
     //レアリティアップ
     reality_Up = function (actorId) {
 
         var actor = $gameActors.actor(actorId);
-        if (actor.isLearnedSkill(401)) { };
-        if (actor.isLearnedSkill(402)) { actor.forgetSkill(402); actor.learnSkill(401) };
-        if (actor.isLearnedSkill(403)) { actor.forgetSkill(403); actor.learnSkill(402) };
-        if (actor.isLearnedSkill(404)) { actor.forgetSkill(404); actor.learnSkill(403) };
-        if (actor.isLearnedSkill(405)) { actor.forgetSkill(405); actor.learnSkill(404) };
-        if (actor.isLearnedSkill(406)) { actor.forgetSkill(406); actor.learnSkill(405) };
-
+        for (var rank in ACTOR_RARITY_RANK_SKILLS_DATA) {
+            var rankData = ACTOR_RARITY_RANK_SKILLS_DATA[rank];
+            if (actor.isLearnedSkill(rankData.skillId)) {
+                rankData.forgetSkillIds.forEach(function (id) {
+                    actor.forgetSkill(id);
+                }, this);
+                rankData.learnSkillIds.forEach(function (id) {
+                    actor.learnSkill(id);
+                }, this);
+            };
+        }
     };
+
+    const RANK_BY_PROMOTION_DATA = {
+        // rankLv: { promotionValue, promotionCode, cost }
+        0: { promotionValue: 402, promotionCode: 'LR', cost: 1000000 },
+        1: { promotionValue: 403, promotionCode: 'UR', cost: 100000 },
+        2: { promotionValue: 404, promotionCode: 'SSR', cost: 50000 },
+        3: { promotionValue: 405, promotionCode: 'SR', cost: 10000 },
+        4: { promotionValue: 406, promotionCode: 'R', cost: 1000 },
+    }
 
     //レアリティの昇格計算
     reality_setPromotion = function (promotionModeId, actorId) {
@@ -4043,17 +4083,23 @@
             if (valueCountSet1 == 401) {
                 //最高レアのため昇格不可
             } else {
-                if (promotionValue == 402) { valueWordSet2 = '<LR>昇格'; valueWordSet1 = 'LRpromotionM'; valueCountSet2 = 1000000 };
-                if (promotionValue == 403) { valueWordSet2 = '<UR>昇格'; valueWordSet1 = 'URpromotionM'; valueCountSet2 = 100000 };
-                if (promotionValue == 404) { valueWordSet2 = '<SSR>昇格'; valueWordSet1 = 'SSRpromotionM'; valueCountSet2 = 50000 };
-                if (promotionValue == 405) { valueWordSet2 = '<SR>昇格'; valueWordSet1 = 'SRpromotionM'; valueCountSet2 = 10000 };
-                if (promotionValue == 406) { valueWordSet2 = '<R>昇格'; valueWordSet1 = 'RpromotionM'; valueCountSet2 = 1000 };
+                for (var rank in RANK_BY_PROMOTION_DATA) {
+                    var rankData = RANK_BY_PROMOTION_DATA[rank];
+                    if (promotionValue == rankData.promotionValue) {
+                        valueWordSet2 = '<' + rankData.promotionCode + '>` + `昇格'; // do not translate, meta
+                        valueWordSet1 = rankData.promotionCode + 'promotionM'; // do not translate, meta
+                        valueCountSet2 = rankData.cost;
+                        break;
+                    }
+                };
+
                 for (var i = 1; i <= $dataItems.length - 1; i++) {
                     if ($dataItems[i].meta[valueWordSet1]) {
                         arr1.push(i);
                         arr2.push(Number($dataItems[i].meta[valueWordSet1]));
                     };
                 };
+
                 var promotionMessage = `${valueWordSet2}\n`;
                 for (var i = 0; i <= arr1.length - 1; i++) {
                     promotionMessage += `\x1bIIN[${arr1[i]}]:\\C[10]${arr2[i]}\\C[0]個<${$gameParty.numItems($dataItems[arr1[i]])}>\n`;
@@ -6983,10 +7029,6 @@
             }
         }
     };
-    // `[\C[n]label\C[0]] ` — the shape shared by most single-value effect notes.
-    function colorTaggedText(colorCode, text) {
-        return `\\C[${colorCode}]${text}\\C[0]`;
-    }
     //#endregion
 
 }());
