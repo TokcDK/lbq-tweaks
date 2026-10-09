@@ -4087,7 +4087,7 @@
                 for (var rank in RANK_BY_PROMOTION_DATA) {
                     var rankData = RANK_BY_PROMOTION_DATA[rank];
                     if (promotionValue == rankData.promotionValue) {
-                        valueWordSet2 = '<' + rankData.promotionCode + '>昇格';
+                        valueWordSet2 = '<' + rankData.promotionCode + '>' + '昇格';
                         valueWordSet1 = rankData.promotionCode + 'promotionM'; // do not translate, meta
                         valueCountSet2 = rankData.cost;
                         break;
