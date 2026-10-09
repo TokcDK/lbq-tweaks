@@ -217,10 +217,6 @@ function containsState(passiveList, stateId) {
   };
   return false;
 }
-// `[\C[n]label\C[0]] ` — the shape shared by most single-value effect notes.
-function colorTaggedText(colorCode, text) {
-  return `\\C[${colorCode}]${text}\\C[0]`;
-}
 // `value1,value2` style meta, split and trimmed. Trimming matters: the notes in
 // this project are hand-written and carry stray spaces after the commas.
 function splitMetaValues(metaValue) {

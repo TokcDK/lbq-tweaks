@@ -233,7 +233,8 @@
         };
         if (itemMeta['annihilationTitle']) {
           if (Number(itemMeta['annihilationTitle'].split(',')[0]) >= 20) {
-            item.name = `${$dataItems[Number(itemMeta['annihilationTitle'].split(',')[0])].name}を殲滅せし者`;
+			var target = $dataItems[Number(itemMeta['annihilationTitle'].split(',')[0])].name;
+            item.name = `${target}を殲滅せし者`;
           };
         };
         if (itemMeta['MapSwitch']) {
@@ -6958,6 +6959,10 @@
       }
     }
   };
+	// `[\C[n]label\C[0]] ` — the shape shared by most single-value effect notes.
+	function colorTaggedText(colorCode, text) {
+	  return `\\C[${colorCode}]${text}\\C[0]`;
+	}
   //#endregion
 
 }());
