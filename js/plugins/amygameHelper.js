@@ -2893,4 +2893,523 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_equipParamFromVariableRow = function (user, item, variableId, idOffset, statIndex) {
 		return $gameVariables.value(variableId)[item.id - idOffset][statIndex];
 	};
+
+	// =====================================================================
+	// Skill learn conditions (data/Skills.json)
+	//
+	// <Learn Show Eval> and <Learn Require Eval> are both evaluated by
+	// Window_SkillLearn.prototype.getEvalLine (YEP_SkillLearnSystem.js:983):
+	//
+	//     var value = undefined;
+	//     var a = this._actor; var user = this._actor; var subject = this._actor;
+	//     var s = $gameSwitches._data; var v = $gameVariables._data;
+	//     try { eval(code); } catch (e) { ... }
+	//     return value;
+	//
+	// A direct eval whose answer must be left in `value`, starting from
+	// `undefined`. There is no `item` and no `this`; `a`/`user`/`subject` are
+	// the actor. The caller treats `undefined` as "no opinion" and falls through
+	// to the default level / skill / switch / mastery checks, so a body that
+	// assigns to anything but `value` silently disables itself.
+	//
+	// BUGFIX: 71 of the 79 <Learn Show Eval> bodies were written as
+	// `value1 = learn_show_eval_...(user, N);`. `value1` is not declared in this
+	// scope, so the assignment created a global and `value` stayed undefined -
+	// every one of those custom show conditions was dead and the skills fell
+	// back to the default rules. They now assign to `value`.
+	//
+	// The four `learn_show_eval_*` helpers themselves live in amygame.js beside
+	// the rest of the learn-menu code (they were extracted before this file
+	// existed); the helpers below are the bodies that were still inline.
+	// =====================================================================
+
+	// Replaces (6x, skills 694-699): shown while the given parameter is 100+.
+	AGH_learnShowEvalParamAbove = function (user, paramId, threshold) {
+		return user.param(paramId) >= threshold;
+	};
+
+	// Replaces (1x skill 747 上級魔力操作 / 1x skill 748 超級魔力操作): the
+	// upgrade stays visible only until it is learned, and only while the
+	// prerequisite is learned and the actor's MAT is high enough. Skill 747
+	// additionally requires the prerequisite to be at max mastery.
+	AGH_learnShowEvalMagicControlUpgrade = function (user, skillId, reqSkillId, reqMat, reqMastery) {
+		if (user.isLearnedSkill(skillId)) return false;
+		if (!user.isLearnedSkill(reqSkillId)) return false;
+		if (user.mat < reqMat) return false;
+		if (reqMastery
+				&& user.skillMasteryLevel(reqSkillId) < Number($dataSkills[reqSkillId].meta['Max Mastery Level'])) {
+			return false;
+		}
+		return true;
+	};
+
+	// Replaces (21x): the skill is learnable once its prerequisite is learned
+	// and mastered to at least minMastery.
+	AGH_learnRequireSkillMastered = function (user, skillId, minMastery) {
+		return user.isLearnedSkill(skillId) && user.skillMasteryLevel(skillId) >= minMastery;
+	};
+
+	// Replaces (6x): the skill is learnable once its prerequisite is learned.
+	AGH_learnRequireSkillLearned = function (user, skillId) {
+		return user.isLearnedSkill(skillId);
+	};
+
+	// Replaces (20x): the skill is learnable once its prerequisite has reached
+	// its own max mastery level.
+	AGH_learnRequireSkillMaxMastery = function (user, skillId) {
+		return user.skillMasteryLevel(skillId) >= Number($dataSkills[skillId].meta['Max Mastery Level']);
+	};
+
+	// Replaces (11x): the skill is learnable while the party carries the item
+	// (including in the bag, hence the second argument to hasItem).
+	AGH_learnRequirePartyHasItem = function (user, itemId) {
+		return $gameParty.hasItem($dataItems[itemId], true);
+	};
+
+	// Replaces (1x, skill 746 魔力操作): learnable once MAT reaches the
+	// threshold.
+	AGH_learnRequireMatAbove = function (user, threshold) {
+		return user.mat >= threshold;
+	};
+
+	// Replaces (6x): learnable once every listed skill is mastered to at least
+	// minMastery.
+	AGH_learnRequireAllSkillsMastered = function (user, skillIds, minMastery) {
+		return skillIds.every(function (id) {
+			return user.skillMasteryLevel(id) >= minMastery;
+		});
+	};
+
+	// Replaces (1x, skill 331 カウンターⅡ): learnable once the prerequisite is
+	// mastered AND a second skill is learned.
+	AGH_learnRequireSkillMasteredAndOther = function (user, skillId, minMastery, otherSkillId) {
+		return user.isLearnedSkill(skillId)
+			&& user.skillMasteryLevel(skillId) >= minMastery
+			&& user.isLearnedSkill(otherSkillId);
+	};
+
+	// =====================================================================
+	// Damage formulas (data/Skills.json)
+	//
+	// <damage formula> replaces the database formula box entirely and is
+	// evaluated by Game_Action.prototype.evalDamageFormula
+	// (YEP_DamageCore.js:1353):
+	//
+	//     var item = this.item();
+	//     var a = this.subject(); var b = target;
+	//     var user = this.subject(); var subject = this.subject();
+	//     var s = $gameSwitches._data; var v = $gameVariables._data;
+	//     var sign = ([3, 4].contains(item.damage.type) ? -1 : 1);
+	//     var value = 0;
+	//     if (item.damage.custom) { eval(item.damage.formula); value = Math.max(value, 0) * sign; }
+	//
+	// The answer goes in `value`. `this` is the Game_Action and `target` is the
+	// action's target. NOTE: MPP_Patch (plugins.js:19) and YEP_X_CoreUpdatesOpt
+	// (:65) each redefine evalDamageFormula too, but YEP_DamageCore loads last
+	// (:116), so this is the definition that wins - MPP_Patch's patch 16 (the
+	// NaN guard and the `v[n]` substitution) is dead code in this project.
+	//
+	// Helpers used by the other 270-odd bodies (skillItem_titles, skill_titles,
+	// skill_personalonoff, skill_equipOperation, skill_stateonoff,
+	// powerUp_dispel, abNomal_Clear, seiyoku_itemHanei, kantei_ikkatu,
+	// search_object) already existed; only the still-inline bodies are here.
+	// =====================================================================
+
+	// Replaces (1x, skill 17 メモ): swaps the actor's normal-attack skill for
+	// the one whose id sits 400 below this skill's, after clearing the whole
+	// 101-200 state band.
+	AGH_damageFormulaSwapAttackSkill = function (action, user, target) {
+		if (target.actorId() !== user.actorId()) return;
+		var item = action.item();
+		var stateId = item.id - 400;
+		if (target.isStateAffected(stateId)) {
+			TickerManager.show(target.name() + 'の通常攻撃は' + item.name + 'です');
+			return;
+		}
+		for (var i = 101; i <= 200; i++) target.removeState(i);
+		target.addState(stateId);
+		TickerManager.show(target.name() + 'の通常攻撃を' + item.name + 'に変更しました');
+	};
+
+	// Replaces (1x, skill 26 持ち上げ＜OFF＞): flips the pickup flag and the
+	// skill's own name between ＜ON＞ and ＜OFF＞.
+	AGH_damageFormulaTogglePickup = function (action, user, target) {
+		if (target.actorId() !== user.actorId()) return;
+		var item = action.item();
+		if (item.name === `持ち上げ＜ON＞`) {
+			$gameSystem._pickupData[0] = false;
+			item.name = '持ち上げ＜OFF＞';
+		} else {
+			$gameSystem._pickupData[0] = true;
+			item.name = '持ち上げ＜ON＞';
+		}
+		TickerManager.show(`<\x1bSIN[${item.id}]>に変更しました`);
+	};
+
+	// Replaces (1x, skill 35 マップステータス).
+	AGH_damageFormulaSelectMapStatus = function (action, user, target) {
+		if (target.actorId() !== user.actorId()) return;
+		var item = action.item();
+		skill_sentaku(item.id, 0);
+		TickerManager.show('＜' + item.name + '＞に変更しました');
+		info_SetY($gameVariables.value(200));
+	};
+
+	// Replaces (1x, skill 42 視点変更): moves the map viewpoint state (601)
+	// from the actor currently in variable 11 to the caster.
+	AGH_damageFormulaChangeViewpoint = function (user, target) {
+		if (target.actorId() !== user.actorId()) return;
+		var currentViewpointActorId = $gameVariables.value(11);
+		if (user.actorId() === currentViewpointActorId) {
+			TickerManager.show(`現在の視点は${user.name()}の為、変更はありません。`);
+			return;
+		}
+		$gameSwitches.setValue(151, true);
+		$gameActors.actor(currentViewpointActorId).removeState(601);
+		$gameVariables.setValue(11, user.actorId());
+		$gameActors.actor($gameVariables.value(11)).addState(601);
+		TickerManager.show(`現在の視点を${user.name()}に変更しました。`);
+	};
+
+	// Replaces (1x, skill 45 立ち絵全裸): toggles the actor's nude flag (cell
+	// 23 of variable 440 + actorId) and refreshes the portrait.
+	//
+	// BUGFIX: both messages were single-quoted strings, so the player was shown
+	// the literal text `${b.name}は着衣になりました。`. They are template
+	// literals now, and `${b.name}` became `${target.name()}` - `name` is a
+	// method on Game_Battler, so interpolating it without the call would have
+	// printed the function source instead of the actor's name.
+	AGH_damageFormulaToggleNude = function (target) {
+		var nudeFlags = $gameVariables.value(440 + target.actorId());
+		if (nudeFlags[23] === 1) {
+			nudeFlags[23] = 0;
+			TickerManager.show(`${target.name()}は着衣になりました。`);
+		} else {
+			nudeFlags[23] = 1;
+			TickerManager.show(`${target.name()}は全裸になりました。`);
+		}
+		$gameVariables.setValue(20, target.actorId());
+		tachie_settei2();
+	};
+
+	// Replaces (1x, skill 90 青眼の構え用反撃用スキル).
+	//
+	// NOT fixed, deliberately. The original body was:
+	//     var value1 = 206;
+	//     var value2 = a.getStateCounter(154);
+	//     if(value2 == 0){ ...log... } else { value2 * a.skillMasteryLevel(value1) - b * 2 };
+	// Two bugs sit here and they happen to cancel out:
+	//   * the else-branch is a bare expression, so its result was discarded and
+	//     the skill always dealt 0 damage;
+	//   * `b * 2` is NaN anyway, because Game_Battler has no valueOf.
+	// The helper returns the value instead of assigning it, which keeps the
+	// damage at 0 exactly as before. Assigning it to `value` would make the
+	// damage - and then the target's HP - NaN, which is a worse bug than the
+	// one being fixed. What the counter should actually deal is a design
+	// decision, so it is left alone and reported.
+	AGH_damageFormulaStanceCounter = function (user, target, sourceSkillId, stanceStateId) {
+		var counter = user.getStateCounter(stanceStateId);
+		if (counter === 0) {
+			BattleManager._logWindow.push(`addText`,
+				target.name() + 'の' + $dataSkills[sourceSkillId].name + 'は不発に終わった…。');
+			return 0;
+		}
+		return counter * user.skillMasteryLevel(sourceSkillId) - target * 2;
+	};
+
+	// Replaces (1x, skill 373 ルビフリップ): in battle this is the damage
+	// formula; outside battle it steps the 消費額 variable (268) through
+	// 1000 -> 10000 -> 100000 -> 1000000 -> 10000000 -> 1000 and reports it.
+	AGH_damageFormulaRubyFlip = function (action, user, target) {
+		var item = action.item();
+		if ($gameParty.inBattle()) {
+			var parts = String($dataSkills[item.id].meta['DamageFormula2']).split(',');
+			return Math.max(
+				$attack1(Number(parts[0]), user, target, Number(parts[1])) * Number(parts[2]),
+				user.mdf / 10);
+		}
+		var nextCost = {
+			10000000: 1000,
+			1000000: 10000000,
+			100000: 1000000,
+			10000: 100000,
+			1000: 10000
+		}[$gameVariables.value(268)];
+		if (nextCost !== undefined) $gameVariables.setValue(268, nextCost);
+		TickerManager.show(`\x1bSIN[${item.id}]の消費額が\\C[10]${$gameVariables.value(268).toLocaleString()}\\C[0]に変更されました。`);
+		return 0;
+	};
+
+	// Replaces (1x, skill 686 完全支配).
+	//
+	// BUGFIX: the database had `b.isLearnedSkill(687);` - a query whose result
+	// was thrown away, so the target was never actually granted skill 687 even
+	// though the message says it was (「…は[絶対服従]を付与された！」).
+	AGH_damageFormulaDominate = function (target) {
+		if ($dataActors[target.actorId()].meta['Mcharacter']) {
+			target.learnSkill(687);
+			TickerManager.show(`\\C[27]${target.name()}\\C[0]は\x1bSIN[687]を付与された！`);
+		} else {
+			TickerManager.show(`\\C[2]${target.name()}\\C[0]には効果が無かった…。`);
+		}
+	};
+
+	// Replaces (1x, skill 787 隠形): toggles the map stealth mode.
+	AGH_damageFormulaToggleStealth = function (user, target) {
+		if (target.actorId() !== user.actorId()) return;
+		if ($gameSwitches.value(202)) {
+			TickerManager.show(`このマップでは使用できません。`);
+			return;
+		}
+		if (!$gamePlayer.isStealthMode()) {
+			$gamePlayer.setStealthTimer(10800);
+			TickerManager.show(`＜ステルス・モード＞がオンになりました。`);
+		} else {
+			$gamePlayer.setStealthMode(false);
+			TickerManager.show(`＜ステルス・モード＞がオフになりました。`);
+		}
+	};
+
+	// Replaces (1x, skill 788 看破): unlocks the enemy status view.
+	AGH_damageFormulaRevealStatus = function (target) {
+		$gameVariables.setValue(92, target.index());
+		if (!$gameSwitches.value(95)) {
+			$gameSwitches.setValue(95, true);
+			time_settei();
+			BattleManager._logWindow.push(`addText`, `${target.name()}達のStatus閲覧可能`);
+		}
+	};
+
+	// Replaces (1x, skill 789 感知): scans every event on the map and reports
+	// how many unopened treasures, symbols, H-enemies and gather points are
+	// left. Toggles window 0 on switch 603.
+	AGH_damageFormulaSenseMap = function (user, target) {
+		if (target.actorId() !== user.actorId()) return;
+		if ($gameSwitches.value(202)) {
+			TickerManager.show(`このマップでは使用できません。`);
+			return;
+		}
+		var treasureCount = 0;
+		var monsterSymbolCount = 0;
+		var hEnemyCount = 0;
+		var whiteTreasureCount = 0;
+		var gatherPointCount = 0;
+		var minePointCount = 0;
+		var dropPointCount = 0;
+		var dungeonTreasureTotal = $gameVariables.value(215)[$gameVariables.value(240)].length;
+		var mapId = $gameMap.mapId();
+		for (var eventId = 200; eventId > 0; eventId--) {
+			if (!$gameMap.event(eventId)) continue;
+			var meta = $gameMap.event(eventId).event().meta;
+			if (meta['TreasureBox'] && !$gameSelfSwitches.value([mapId, eventId, 'A'])) {
+				treasureCount += 1;
+			}
+			if (meta['MonsterSymbol']
+					&& !$gameSelfSwitches.value([mapId, eventId, 'C'])
+					&& !$gameSelfSwitches.value([mapId, eventId, 'B'])) {
+				monsterSymbolCount += 1;
+			}
+			if (meta['Henemy']
+					&& !$gameSelfSwitches.value([mapId, eventId, 'C'])
+					&& !$gameSelfSwitches.value([mapId, eventId, 'B'])) {
+				hEnemyCount += 1;
+			}
+			if (meta['TreasureBoxW'] && !$gameSelfSwitches.value([mapId, eventId, 'A'])) {
+				whiteTreasureCount += 1;
+			}
+			if (meta['IconDisplay']) {
+				var iconId = Number(meta['IconDisplay']);
+				var iconSeen = $gameSelfSwitches.value([mapId, eventId, 'B']);
+				if (iconId === 183 && !iconSeen) gatherPointCount += 1;
+				if (iconId === 216 && !iconSeen) minePointCount += 1;
+				if (iconId === 208 && !iconSeen) dropPointCount += 1;
+			}
+		}
+		if (!$gameSwitches.value(603)) {
+			var reportText = `このダンジョンorフィールド内の通常宝箱現在数：${dungeonTreasureTotal}個
+現在マップエネミー数　　：${monsterSymbolCount}/${$gameVariables.value(224)}体　現在マップＨエネミー数　：${hEnemyCount}/${$gameVariables.value(227)}体
+現在マップ宝箱数　　　　：${treasureCount}個　　　現在マップ白銀宝箱数　　：${whiteTreasureCount}個
+現在マップ採取ポイント数：${gatherPointCount}個　　現在マップ採掘ポイント数：${minePointCount}個
+現在マップ落とし物数　　：${dropPointCount}個
+
+※ カーソルをそのままで決定ボタンorマウス左クリック
+`;
+			WindowManager.show(0, 0, 0, 1280, 290);
+			WindowManager.drawText(0, reportText);
+			valueCountSet1 = 1;
+			$gameSwitches.setValue(603, true);
+		} else {
+			WindowManager.hide(0);
+			valueCountSet1 = 0;
+			$gameSwitches.setValue(603, false);
+		}
+	};
+
+	// Replaces (4x, skills 791 拠点錬金 / 792 単一錬金個数+ / 794 【匠】掘り /
+	// 799 大量採取).
+	//
+	// BUGFIX: the database called `skill_titles(a,b,this.item().id)`, and no
+	// function of that name exists anywhere in the project - so the whole
+	// <damage formula> threw a ReferenceError that YEP's try/catch swallowed.
+	// The other 226 title skills all call `skillItem_titles(a,b,this.item().id,0)`
+	// (the 4th argument selects $dataSkills over $dataItems), so these four do
+	// too. Inert today - all four are occasion 3 ("never"), so the tag is
+	// unreachable - but no longer a dangling reference.
+	AGH_damageFormulaSkillTitle = function (action, user, target) {
+		skillItem_titles(user, target, action.item().id, 0);
+	};
+
+	// =====================================================================
+	// Skill after-effects (data/Skills.json)
+	//
+	// <After Eval> is evaluated by Game_Action.prototype.applyAfterEval
+	// (YEP_SkillCore.js:1119):
+	//
+	//     var item = this.item();
+	//     var a = this.subject(); var b = target;
+	//     var user = this.subject(); var subject = this.subject();
+	//     var s = $gameSwitches._data; var v = $gameVariables._data;
+	//     var code = item.customAfterEval;
+	//     try { eval(code); } catch (e) { ... }
+	//
+	// A direct eval that RETURNS NOTHING - the body only has side effects.
+	// `this` is the Game_Action, `target` is the action's target, and
+	// `item`/`a`/`b`/`user` are all bound.
+	// =====================================================================
+
+	// Replaces (6x, skills 207 / 208 / 222 / 324 / 362 / 388).
+	AGH_afterEvalAddState = function (user, stateId) {
+		user.addState(stateId);
+	};
+
+	// Replaces (4x, skills 284 / 294 / 332 / 338).
+	AGH_afterEvalGainTp = function (user, amount) {
+		user.gainTp(amount);
+	};
+
+	// Replaces (3x, skills 298 / 349 / 397): an equipped instrument (weapon
+	// type 10) adds a state to the target.
+	AGH_afterEvalInstrumentTargetState = function (user, target, stateId) {
+		if (!user.isActor()) return;
+		if (!user.isWtypeEquipped(10)) return;
+		target.addState(stateId);
+	};
+
+	// Replaces (2x, skills 296 / 346): an equipped instrument adds a state to
+	// the user.
+	AGH_afterEvalInstrumentSelfState = function (user, stateId) {
+		if (!user.isActor()) return;
+		if (!user.isWtypeEquipped(10)) return;
+		user.addState(stateId);
+	};
+
+	// Replaces (2x, skills 347 / 348): an equipped instrument rolls a state
+	// formula on the target.
+	AGH_afterEvalInstrumentStateFormula = function (user, target, stateId) {
+		if (!user.isActor()) return;
+		if (!user.isWtypeEquipped(10)) return;
+		state_addFormula1([stateId, 50, user, target, user.mdf, target.luk]);
+	};
+
+	// Replaces (1x, skill 297 チャームボイスⅠ): the same, with a battle-log
+	// line first.
+	AGH_afterEvalInstrumentStateFormulaLogged = function (user, target, stateId) {
+		if (!user.isActor()) return;
+		if (!user.isWtypeEquipped(10)) return;
+		BattleManager._logWindow.push(`addText`, `楽器装備による追加効果！`);
+		state_addFormula1([stateId, 50, user, target, user.mdf, target.luk]);
+	};
+
+	// Replaces (2x, skills 248 ヒールオールⅢ / 311 ヒールオールⅡ): the passive
+	// battle skill adds a state to the user.
+	AGH_afterEvalBattleSkillAddState = function (user, skillId, stateId) {
+		if (user.battleSkillsRaw().contains(skillId)) user.addState(stateId);
+	};
+
+	// Replaces (2x, skills 250 リヴァイブⅡ / 313 リヴァイブ): the passive battle
+	// skill heals the target for a tenth of the skill's DamageFormula2 attack.
+	AGH_afterEvalBattleSkillHealFromAttack = function (action, user, target, skillId) {
+		if (!user.battleSkillsRaw().contains(skillId)) return;
+		var parts = String($dataSkills[action.item().id].meta['DamageFormula2']).split(',');
+		var damage = Math.max(
+			$attack1(Number(parts[0]), user, target, Number(parts[1])) * Number(parts[2]),
+			user.mdf / 10);
+		target.gainHp(Math.round(damage / 10));
+	};
+
+	// Replaces (1x, skill 391 チャフリリース).
+	AGH_afterEvalDispelAndAddState = function (action, user, target, stateId) {
+		powerUp_dispel(user, target, action.item().id, 0);
+		user.addState(stateId);
+	};
+
+	// Replaces (1x, skill 398 デファンデュ): an equipped instrument adds a state
+	// to every battle member.
+	AGH_afterEvalInstrumentPartyState = function (user, stateId) {
+		if (!user.isActor()) return;
+		if (!user.isWtypeEquipped(10)) return;
+		var members = $gameParty.battleMembers();
+		for (var i = 0; i < members.length; i++) {
+			members[i].addState(stateId);
+		}
+	};
+
+	// Replaces (1x, skill 431 経験値獲得率1000%up).
+	AGH_afterEvalLogExpRate = function (target) {
+		var rate = Math.round(target.exr * 100);
+		BattleManager._logWindow.push(`addText`, target.name() + 'の経験値獲得率が上昇し' + rate + '%になった！');
+	};
+
+	// Replaces (1x, skill 432 ルピ獲得率1000%up).
+	AGH_afterEvalLogGoldRate = function () {
+		BattleManager._logWindow.push(`addText`, 'パーティの獲得\\Gレートが10倍になった！');
+	};
+
+	// Replaces (2x, skills 433 ダメージ上限撤廃 / 434 バフ上限最大値 - the
+	// database gives both the same body, so both announce a damage cap).
+	AGH_afterEvalLogDamageCapRemoved = function (target) {
+		BattleManager._logWindow.push(`addText`, target.name() + 'のダメージ上限が取り払われた！');
+	};
+
+	// Replaces (1x, skill 891 仲間を呼ぶ).
+	AGH_afterEvalLogCalledAllies = function (target) {
+		BattleManager._logWindow.push(`addText`, target.name() + 'は仲間を呼んだ！');
+	};
+
+	// Replaces (1x, skill 892 様子を見る). The idle line is rolled BEFORE the
+	// state checks, exactly as in the original, so the RNG stream is unchanged.
+	AGH_afterEvalLogIdleMessage = function (target) {
+		var lines = [
+			`はこちらの様子を見ている…。`,
+			`はボーっとしている…。`,
+			`はあらぬ方向を眺めている…。`,
+			`は故郷に想いを馳せている…。`
+		];
+		var text = lines[getRandomIndex(lines.length)];
+		if (target.isStateAffected(420)) text = '「………………」。';
+		if (target.isStateAffected(91)) text = 'は厭らしい嗤いを浮かべている…。';
+		BattleManager._logWindow.push(`addText`, target.name() + text);
+	};
+
+	// Replaces (1x, skill 893 Ｈ攻撃).
+	AGH_afterEvalSetSwitch = function (switchId) {
+		$gameSwitches.setValue(switchId, true);
+	};
+
+	// Replaces (1x, skill 894 逃げる): the enemy refunds the exp/gold rate its
+	// own states had granted, then reports the new totals. valueTotalexp /
+	// valueTotalgold are the globals declared in amygameSettei.js.
+	AGH_afterEvalFleeAndReport = function (user, target) {
+		user._states.forEach(function (stateId) {
+			if ($dataStates[stateId].meta['EnemyExpRate']) {
+				valueTotalexp -= Number($dataStates[stateId].meta['EnemyExpRate']);
+			}
+			if ($dataStates[stateId].meta['EnemyGoldRate']) {
+				valueTotalgold -= Number($dataStates[stateId].meta['EnemyGoldRate']);
+			}
+		});
+		BattleManager._logWindow.push(`addText`, target.name() + 'は逃げ出した！');
+		BattleManager._logWindow.push(`addText`, `経験値レート:${valueTotalexp}`);
+		BattleManager._logWindow.push(`addText`, `\\Gレート:${valueTotalgold}`);
+	};
 })();
