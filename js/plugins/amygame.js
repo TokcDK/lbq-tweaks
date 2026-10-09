@@ -27,14 +27,14 @@
         let start = gameVariables.value(73);
         let end = gameVariables.value(74);
         const gameVariables355 = gameVariables.value(355);
-
+        const presetBaseName = `プリセット`;
         for (let i = start; i <= end; i++) {
             gameVariables355[i] = [0, Array(51).fill(0), Array(51).fill(0), Array(51).fill(0), Array(51).fill(0)];
 
-            gameVariables355[i][1][50] = 'プリセット1';
-            gameVariables355[i][2][50] = 'プリセット2';
-            gameVariables355[i][3][50] = 'プリセット3';
-            gameVariables355[i][4][50] = 'プリセット4';
+            gameVariables355[i][1][50] = '${presetBaseName}1';
+            gameVariables355[i][2][50] = '${presetBaseName}2';
+            gameVariables355[i][3][50] = '${presetBaseName}3';
+            gameVariables355[i][4][50] = '${presetBaseName}4';
         };
         //各アクターの装備スキル配列記憶用
         gameVariables.setValue(351, Array(21).fill([]));
@@ -505,7 +505,9 @@
             };
             if (displayModeId == 0) {
                 $gameScreen.startAnimation(100, 150, 300, false);
-                TickerManager.show(`　　\\C[1]${actorName}\\C[0]の役職名が\\C[2]${professionName}\\C[0]に変更されました。`);
+                const actor = colorTaggedText(1, actorName);
+                const job = colorTaggedText(2, professionName);
+                TickerManager.show(`　　` + `${actor}の役職名が${job}に変更されました。`);
             };
         };
 
@@ -555,16 +557,19 @@
         const currentProfession = $gameVariables.value(380 + actorId)[59];
 
         // Only update if profession has changed
-        if (currentProfession !== newProfession) {
-            if (!$gameSwitches.value(380)) {
-                const actorName = `\\N[${actorId}]`;
-                const professionChangeMessage =
-                    `　　${actorName}の役職名が\\C[1]<${currentProfession}>\\C[0]から\\C[2]<${newProfession}>\\C[0]に変更されました。`;
-                TickerManager.show(professionChangeMessage);
-            }
+        if (currentProfession === newProfession) return;
 
-            $gameVariables.value(380 + actorId)[59] = newProfession;
+        if (!$gameSwitches.value(380)) {
+            const actorName = `\\N[${actorId}]`;
+            const actor = colorTaggedText(1, actorName);
+            const jobCur = '<' + colorTaggedText(1, currentProfession) + '>';
+            const jobNew = '<' + colorTaggedText(2, newProfession) + '>';
+            const professionChangeMessage =
+                `　　` + `${actor}の役職名${jobCur}から${jobNew}に変更されました。`;
+            TickerManager.show(professionChangeMessage);
         }
+
+        $gameVariables.value(380 + actorId)[59] = newProfession;
     };
 
     message_popup2 = function (popupEventId, popupPosition, messageRow, displayModeId) {
@@ -888,28 +893,31 @@
         var end = 200;
         for (var i = start; i <= end; i++) {
             const skill = $dataSkills[i];
-            if (skill.name !== '') {
-                const skillMetaNormalAttackDerived = skill.meta['NormalAttackDerived'];
-                if (skillMetaNormalAttackDerived) {
-                    var normalAttackDerivedValues = skillMetaNormalAttackDerived.split(',');
-                    var derivedSkillId = Number(normalAttackDerivedValues[1]);
-                    var masteryThreshold = Number(normalAttackDerivedValues[0]);
-                    if (!actor.isLearnedSkill(derivedSkillId) && actor.skillMasteryLevel(i) >= masteryThreshold) {
-                        actor.learnSkill(derivedSkillId);
-                        if (!$gameParty.inBattle()) {
-                            $gamePlayer.requestAnimation(learnAnimationId)
-                        } else {
-                            $gameParty.members()[actor.index()].startAnimation(learnAnimationId, false, 0);
-                        };
-                        AudioManager.playMe({ "name": value, "volume": 60, "pitch": 120, "pan": 0 });
-                        var learnMessage = `${actor.name()}の\x1bSIN[${i}]がRank${masteryThreshold}に到達し、\x1bSIN[${derivedSkillId}]が派生した！`;
-                        if ($gameParty.inBattle()) {
-                            BattleManager._logWindow.push(`addText`, learnMessage);
-                        } else {
-                            gab_wordParticle(learnMessage);
-                        };
-                    }
-                }
+            if (skill.name === '') {
+                continue;
+            }
+            const skillMetaNormalAttackDerived = skill.meta['NormalAttackDerived'];
+            if (!skillMetaNormalAttackDerived) {
+                continue;
+            }
+
+            var normalAttackDerivedValues = skillMetaNormalAttackDerived.split(',');
+            var derivedSkillId = Number(normalAttackDerivedValues[1]);
+            var masteryThreshold = Number(normalAttackDerivedValues[0]);
+            if (!actor.isLearnedSkill(derivedSkillId) && actor.skillMasteryLevel(i) >= masteryThreshold) {
+                actor.learnSkill(derivedSkillId);
+                if (!$gameParty.inBattle()) {
+                    $gamePlayer.requestAnimation(learnAnimationId)
+                } else {
+                    $gameParty.members()[actor.index()].startAnimation(learnAnimationId, false, 0);
+                };
+                AudioManager.playMe({ "name": value, "volume": 60, "pitch": 120, "pan": 0 });
+                var learnMessage = `${actor.name()}の\x1bSIN[${i}]がRank${masteryThreshold}に到達し、\x1bSIN[${derivedSkillId}]が派生した！`;
+                if ($gameParty.inBattle()) {
+                    BattleManager._logWindow.push(`addText`, learnMessage);
+                } else {
+                    gab_wordParticle(learnMessage);
+                };
             }
         };
 
@@ -1054,9 +1062,9 @@
             $gameVariables.setValue(20, target.actorId());
             tachie_usedChange1(target);
 
-            TickerManager.show(heroineName + 'はぶっかけられた！');
+            TickerManager.show(`${heroineName}はぶっかけられた！`);
         } else {
-            TickerManager.show(heroineName + 'は対象キャラでは無いため、効果が無かった…。');
+            TickerManager.show(`${heroineName}は対象キャラでは無いため、効果が無かった…。`);
 
             if (valueItemsType == 1) {
                 $gameParty.gainItem(sourceEntries[itemId], +1);
