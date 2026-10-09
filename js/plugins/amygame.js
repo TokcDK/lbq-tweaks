@@ -3611,9 +3611,11 @@
             const itemIndex = RARITY_COLOR_TAG_INFOS[lotteryRarity][1];
             var rarityColorTag = colorTaggedText(colorCode, `<Rarity:\\I[${itemIndex}]`);
 
-            if (valueItems == $dataItems) { var gacha = `${rarityColorTag}\\C[16]\\iin[${valueGachaId}]\\C[0]`; }
-            else if (valueItems == $dataWeapons) { var gacha = `${rarityColorTag}\\C[16]\\win[${valueGachaId}]\\C[0]`; }
-            else if (valueItems == $dataArmors) { var gacha = `${rarityColorTag}\\C[16]\\ain[${valueGachaId}]\\C[0]`; };
+            if (valueItems == $dataItems) { var itemTypePrefix = `\\iin`; }
+            else if (valueItems == $dataWeapons) { var itemTypePrefix = `\\win`; }
+            else if (valueItems == $dataArmors) { var itemTypePrefix = `\\ain`; };
+            var prefixGacha = colorTaggedText(16, `${itemTypePrefix}[${valueGachaId}]`);
+            var gacha = rarityColorTag + prefixGacha;
             var gachaResultMessage = `${gacha}が排出されました！`;
 
             if ($gameSwitches.value(380)) {
