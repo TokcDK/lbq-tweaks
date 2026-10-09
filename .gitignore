@@ -21,4 +21,4 @@ js/plugins/amygame.js
 /.vscode
 
 /.*/
-v8.log
+/v8.log
