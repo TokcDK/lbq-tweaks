@@ -2347,7 +2347,7 @@ function buildDamageWordBattleWordset(gameVar276, damageWordCandidates, actorNam
 
 // Elements whose resistance is written as a plain "UP!"/"DOWN!" rather than
 // "耐性…". Shared by the title effects and the pacond/tbcs trait descriptions.
-const RESIST_SPECIAL_ELEMENT_IDS = [10, 11, 12, 15, 20, 38, 39, 40, 41];
+const RESIST_SPECIAL_ELEMENT_IDS = [10, 11, 12, 15, 20, 38, 39, 40, 41]; // also was declared in amygameDescription.js
 
 //戦闘開始時に称号効果
 const TITLE_RESIST_ELEMENT_IDS_TITLE_BATTLE_UP = RESIST_SPECIAL_ELEMENT_IDS;

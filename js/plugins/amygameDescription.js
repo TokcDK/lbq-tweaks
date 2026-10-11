@@ -120,7 +120,7 @@ const SPECIAL_ATTACK_ELEMENT_IDS = [18, 19, 51, 52, 53, 54, 55, 56, 57, 61, 62, 
                                     71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 82, 83];
 const ATTACK_AMPLIFY_ELEMENT_IDS = [18, 19, 51, 52, 53, 54, 55, 56, 57, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70,
                                     71, 72, 73, 74, 75, 76, 77, 78, 79, 80];
-const RESIST_SPECIAL_ELEMENT_IDS = [10, 11, 12, 15, 20, 38, 39, 40, 41];
+//const RESIST_SPECIAL_ELEMENT_IDS = [10, 11, 12, 15, 20, 38, 39, 40, 41];// declared in amygameBattle.js
 const RESIST_EXCLUDED_ELEMENT_IDS = [35, 37, 38, 41];
 
 // Skill type ids that are cast in battle. Two slightly different sets are in
