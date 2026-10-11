@@ -875,7 +875,6 @@ item_addSynthesisHelp = function(){
 
 valueItemsSynth1 = Array(4001).fill(0);
 var alchemySkillId = valueAlchemySkillId;//錬金スキル
-var alchemySkillRank = 1;//錬金スキルランク
 var actor = $gameActors.actor($gameVariables.value(2));
 if(!actor){return};
 var start = 1;
@@ -1759,7 +1758,6 @@ if(taxRate <= -1){
 shop_taxDecision2 = function(eventId,decisionModeId){
 
 $gameSwitches.setValue(380,false);
-var unusedVar = $gameSelfSwitches.getVariableValue([$gameMap.mapId(), eventId, 10]);
 var actor = $gameActors.actor($gameVariables.value(11));
 if(!actor){return};
 if(decisionModeId == 1){

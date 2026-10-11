@@ -1167,7 +1167,6 @@ actor_HpassiveConditions = function (a, b, itemId) {
       $gameSwitches.setValue(115, true)
       var actor = $gameActors.actor(b.actorId());
       var value = `${actor.name()}の未収得\\C[27]<H-Passive>\\C[0]\n`
-      var passiveListBase = 120;
       var unlearnedCount = 0;
       var windowHeight = 0;
       var start = 1;

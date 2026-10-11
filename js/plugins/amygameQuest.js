@@ -263,7 +263,7 @@ if(questTypeId == 2){var questBaseId = 900;var ownedMarkerItemOffset = 50;var qu
 for (var i = 1; i <= $dataItems.length-1; i++) {
   var questLineText = 0;
   var acceptableQuestCount = 0;
-  if(!$dataItems[i].name == '') {
+  if($dataItems[i].name != '') {
     if($dataItems[i].meta['EICSwitch']) {
       if(Number($dataItems[i].meta['EICSwitch']) == 108) {
         if($dataItems[i].meta['SGカテゴリ'] == questCategory) {
@@ -314,7 +314,7 @@ itemGet_afterProcess();
 if(questTypeId == 1){var questBaseId = 800;var ownedMarkerItemOffset = 100;var questCategory = '受注クエスト'};
 if(questTypeId == 2){var questBaseId = 900;var ownedMarkerItemOffset = 50;var questCategory = 'デイリークエスト'};
 $gameSwitches.setValue(380,false);
-  if(!$dataItems[i].name == '') {
+  if($dataItems[i].name != '') {
     if($dataItems[i].meta['EICSwitch']) {
       if(Number($dataItems[i].meta['EICSwitch']) == 108) {
         if($dataItems[i].meta['SGカテゴリ'] == questCategory) {
@@ -344,7 +344,7 @@ if(questTypeId == 1){var questBaseId = 800;var ownedMarkerItemOffset = 100;var q
 if(questTypeId == 2){var questBaseId = 900;var ownedMarkerItemOffset = 50;var questCategory = 'デイリークエスト';$gameSwitches.setValue(644,true)};
 $gameSwitches.setValue(380,false);
 for (var i = 1; i <= $dataItems.length-1; i++) {
-  if(!$dataItems[i].name == '') {
+  if($dataItems[i].name != '') {
     if($dataItems[i].meta['EICSwitch']) {
       if(Number($dataItems[i].meta['EICSwitch']) == 108) {
         if($dataItems[i].meta['SGカテゴリ'] == questCategory) {
