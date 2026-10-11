@@ -1719,22 +1719,21 @@
 
     henemy_troopPush = function () {
 
-        if ($gameVariables.value(228) === 0) return; // have empty H enemy's pool
+        const spawnPoolH = $gameVariables.value(228);
+        // Hエネミーが出現しないダンジョンではプールが空配列のまま。旧ガード(=== 0)は
+        // 空配列を素通りするため、H専用メタを持たないデータで split が落ちていた。
+        if (!spawnPoolH || spawnPoolH.length === 0) return;
 
         const troopId = 10; //グループIDを指定
         const enemyTroopH = $dataTroops[troopId];
-		console.log(`variable 240 value is: ${$gameVariables.value(240)}`);
-		const troop = $dataItems[$gameVariables.value(240)];
-        const troopMeta = troop.meta;
-		console.log(`troop id is: ${troop.id}`);
-		console.log(`troop name is: ${troop.name}`);
-        enemyTroopH.name = troopMeta['TroopNameH'];
+        const troopMeta = $dataItems[$gameVariables.value(240)].meta;
+        // H専用メタを持たないダンジョンもあるため、通常版のキーへフォールバックする
+        enemyTroopH.name = troopMeta['TroopNameH'] || troopMeta['TroopName'];
         enemyTroopH.members = []; //グループのメンバーを空に
-        const spawnPoolH = $gameVariables.value(228);
         const spawnPoolHLength = spawnPoolH.length;
 
         // add enemies to enemy troop
-        const battleEnemyPopHOptions = troopMeta['BattleEnemyPopCH'].split(',');
+        const battleEnemyPopHOptions = (troopMeta['BattleEnemyPopCH'] || troopMeta['BattleEnemyPopC']).split(',');
         const enemyCountToSpawn = Number(battleEnemyPopHOptions[getRandomIndex(battleEnemyPopHOptions.length)]);
         for (let spawnIndex = 1; spawnIndex <= enemyCountToSpawn; spawnIndex++) {
             // get enemy data
