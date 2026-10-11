@@ -1098,10 +1098,16 @@
             };
         };
 
-        const messageText = target.name() + (semenCount >= 1 ? 'は白濁を洗浄した。(' + semenCount + ')\\iin[120]を入手' : 'には効果が無かった');
+        const targetName = target.name();
+        const cnt = `(${semenCount})`;
+        const itemName = `\\iin[120]`;
+        const txtObtained = cnt + `${itemName}を入手`;
+        const nonEmptyMessage = `${targetName}は白濁を洗浄した。` + txtObtained;
+        const emptyMessage = `${targetName}には効果が無かった`;
+        const messageText = semenCount >= 1 ? nonEmptyMessage : emptyMessage;
         showMessage(messageText);
         target.addState(71);
-        showMessage(target.name() + 'は濡れてしまった');
+        showMessage(`${targetName}は濡れてしまった`);
 
         $gameVariables.setValue(20, target.actorId());
         tachie_usedChange1(target);
@@ -1125,9 +1131,10 @@
     cloth_repair1 = function (user, target, itemId, itemsToReturn) {
 
         const itemsSource = itemsToReturn == 0 ? $dataSkills : $dataItems;
+        const targetName = target.name();
         if (target.isStateAffected(23)) {
             if (itemsToReturn == 1) $gameParty.gainItem(itemsSource[itemId], +1);
-            showMessage('現在の' + target.name() + 'は衣装修復対象ではありません。');
+            showMessage(`現在の${targetName}は衣装修復対象ではありません。`);
         } else {
             $gameVariables.setValue(20, target.actorId());
             //const target = target; //const actor = $dataActors[$gameVariables.value(20)];
@@ -1136,10 +1143,10 @@
                 $gameVariables.setValue(19, Number(target.meta['MainCloth']));
                 kisekae_tyokusetusitei($gameVariables.value(19), 0);
                 tachie_usedChange1(target);
-                showMessage(target.name() + 'の衣装を修復しました。');
+                showMessage(`${targetName}の衣装を修復しました。`);
             } else {
                 if (itemsToReturn == 1) $gameParty.gainItem(itemsSource[itemId], +1);
-                showMessage(target.name() + 'は衣装修復の対象ではありません。');
+                showMessage(`${targetName}は衣装修復の対象ではありません。`);
             }
         }
 
@@ -1159,7 +1166,8 @@
         if (sourceEntries[itemId].meta['StateabNomalOnly']) {
             var stateCategory = b.getStateCategoryAffectedCount('StateabNomal');
             if (stateCategory == 0) {
-                var resultMessage = `${b.name()}は基本状態異常を付与されていない為、効果が無かった。`;
+                const targetName = b.name();
+                var resultMessage = `${targetName}は基本状態異常を付与されていない為、効果が無かった。`;
                 if (a.isActor()) {
                     if ($gameParty.inBattle()) {
                         BattleManager._logWindow.push(`addText`, resultMessage);
@@ -1175,7 +1183,8 @@
         } else {
             var stateCategory = b.getStateCategoryAffectedCount('StateabNomal') + b.getStateCategoryAffectedCount('StateSPabNomal');
             if (stateCategory == 0) {
-                var resultMessage = `${b.name()}は基本特殊状態異常を付与されていない為、効果が無かった。`;
+                const targetName = b.name();
+                var resultMessage = `${targetName}は基本特殊状態異常を付与されていない為、効果が無かった。`;
                 if (a.isActor()) {
                     if ($gameParty.inBattle()) {
                         BattleManager._logWindow.push(`addText`, resultMessage);
@@ -1193,7 +1202,10 @@
             if (sourceEntries[itemId].meta['abNomalClearCountPlus']) {
                 var stateCategory = Math.floor(a.param(4) / 300);
                 if (stateCategory >= 1) {
-                    var resultMessage = `${a.name()}の\\C[16]Magic\\C[0]により回復数\\C[3]+${stateCategory}\\C[0]！`;
+                    const targetName = a.name();
+                    const magic = colorTaggedText(16, 'Magic');
+                    const amount = colorTaggedText(3, '+'+ stateCategory);
+                    var resultMessage = `${targetName}の${magic}により回復数${amount}！`;
                     if (a.isActor()) {
                         if ($gameParty.inBattle()) {
                             BattleManager._logWindow.push(`addText`, resultMessage);
@@ -1215,7 +1227,9 @@
                     var clearCountRemaining = clearCountRemaining - skipOrCountFlag;
                 };
                 b.removeStateCategory(stateCategory, removedStateCount);
-                var resultMessage = `${b.name()}の基本状態異常を\\C[3]${removedStateCount}\\C[0]個回復した！`;
+                const targetName = b.name();
+                const cnt = colorTaggedText(3, removedStateCount);
+                var resultMessage = `${targetName}の基本状態異常を${cnt}個回復した！`;
                 if ($gameParty.inBattle()) {
                     BattleManager._logWindow.push(`addText`, resultMessage);
                 } else {
@@ -1234,7 +1248,9 @@
                         var clearCountRemaining = clearCountRemaining - skipOrCountFlag;
                     };
                     b.removeStateCategory(stateCategory, removedStateCount);
-                    var resultMessage = `${b.name()}の特殊状態異常を\\C[3]${removedStateCount}\\C[0]個回復した！`;
+                    const targetName = b.name();
+                    const cnt = colorTaggedText(3, removedStateCount);
+                    var resultMessage = `${targetName}の特殊状態異常を${cnt}個回復した！`;
                     showMessage(resultMessage);
                 };
             };
@@ -1286,7 +1302,8 @@
             };
             var stateCategory = b.getStateCategoryAffectedCount('PowerUp');
             if (stateCategory == 0) {
-                var resultMessage = `${b.name()}は強化状態を付与されていない為、効果が無かった。`;
+                const targetName = b.name();
+                var resultMessage = `${targetName}は強化状態を付与されていない為、効果が無かった。`;
                 if (a.isActor()) {
                     if ($gameParty.inBattle()) {
                         BattleManager._logWindow.push(`addText`, resultMessage);
@@ -1302,7 +1319,10 @@
             if (sourceEntries[itemId].meta['dispelCountPlus']) {
                 var stateCategory = Math.floor(a.param(4) / 300);
                 if (stateCategory >= 1) {
-                    var resultMessage = `${a.name()}の\\C[16]Magic\\C[0]により消去数\\C[3]+${stateCategory}\\C[0]！`;
+                    const targetName = a.name();
+                    const magic = colorTaggedText(16, `Magic`);
+                    const amount = colorTaggedText(3, '+' + stateCategory)
+                    var resultMessage = `${targetName}の${magic}により消去数${amount}！`;
                     if (a.isActor()) {
                         if ($gameParty.inBattle()) {
                             BattleManager._logWindow.push(`addText`, resultMessage);
@@ -1324,7 +1344,9 @@
                     var dispelCountRemaining = dispelCountRemaining - skipOrCountFlag;
                 };
                 b.removeStateCategory(stateCategory, removedStateCount);
-                var resultMessage = `${b.name()}の強化状態を\\C[3]${removedStateCount}\\C[0]個消去した！`;
+                const targetName = b.name();s
+                const cnt = colorTaggedText(3, removedStateCount)
+                var resultMessage = `${targetName}の強化状態を${cnt}個消去した！`;
                 if ($gameParty.inBattle()) {
                     BattleManager._logWindow.push(`addText`, resultMessage);
                 } else {
