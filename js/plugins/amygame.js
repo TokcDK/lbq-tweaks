@@ -1723,7 +1723,11 @@
 
         const troopId = 10; //グループIDを指定
         const enemyTroopH = $dataTroops[troopId];
-        const troopMeta = $dataItems[$gameVariables.value(240)].meta;
+		console.log(`variable 240 value is: ${$gameVariables.value(240)}`);
+		const troop = $dataItems[$gameVariables.value(240)];
+        const troopMeta = troop.meta;
+		console.log(`troop id is: ${troop.id}`);
+		console.log(`troop name is: ${troop.name}`);
         enemyTroopH.name = troopMeta['TroopNameH'];
         enemyTroopH.members = []; //グループのメンバーを空に
         const spawnPoolH = $gameVariables.value(228);
