@@ -422,7 +422,7 @@ damage_keisan1 = function (user, target, action, damageAmount, critAnimationId, 
       }
     }
     /*
-       if(valueBattleAddAttack >= 1){//<BattleAddAttackSet:50>未使用	
+       if(valueBattleAddAttack >= 1){//<BattleAddAttackSet:50>未使用
          let value1 = Math.round(damageAmount * valueBattleAddAttack / 100);
          target.gainHp(-value1);
          target.startDamagePopup();
@@ -511,7 +511,7 @@ skill_addPowerSet = function (user, dbEntries, dbEntryId, powerCategoryId) {
     };
   };
   /*
-  valueBattleAddAttack = 0;//<BattleAddAttackSet:50>未使用	
+  valueBattleAddAttack = 0;//<BattleAddAttackSet:50>未使用
   var arr1 = valueBattleAddAttackSet;
   for (var i = 0; i <= arr1.length-1; i++) {
    if(user.isStateAffected(arr1[i])){
@@ -3469,11 +3469,11 @@ enemy_instantwin = function () {
   } else {
     let resultMessage = valueWordSet2;
     if (dropCount >= 1) {
-	  var dropCnt = `\\C[2]+${dropCount}\\C[0]`;
+      var dropCnt = `\\C[2]+${dropCount}\\C[0]`;
       resultMessage += `ドロップ(${dropCnt})\n`;
     }
     if (defeatsCount >= 1) {
-	  var loseCnt = `\\C[2]+${defeatsCount}\\C[0]`;
+      var loseCnt = `\\C[2]+${defeatsCount}\\C[0]`;
       resultMessage += `討伐カウント(${loseCnt})`;
     }
     gameVariables.setValue(701, resultMessage);
@@ -3664,7 +3664,7 @@ drop_walletItemBoxGet = function (fallbackDropCategory, isWallet) {
     const randomIndex = getRandomIndex(candidateItemCount);
     const selectedItemId = candidateItemIds[randomIndex];
     const item = $dataItems[selectedItemId];
-	const itemTitle = `\\C[24]\x1bI[${item.iconIndex}]${item.name}\\C[0]`;
+    const itemTitle = `\\C[24]\x1bI[${item.iconIndex}]${item.name}\\C[0]`;
     const itemInfo = `${itemTitle}を獲得した。`;
 
     CommonPopupManager.showInfo({}, itemInfo, null);
@@ -4232,7 +4232,7 @@ boss_actionPredict = function (predictedSkillId, predictionModeId) {
     if (actor.isStateAffected(292)) {
       if (masteryBonus + actor.level > enemy1.level) {
         //if(true){
-		var skill = `\x1bSIN[${predictedSkillId}]`;
+        var skill = `\x1bSIN[${predictedSkillId}]`;
         var predictionMessage = `${enemyName}は${skill}を発動するようだ…。`;
       } else {
         var predictionMessage = `${enemyName}の力が強大な為、行動を予測する事が出来ない…。`;
@@ -4248,7 +4248,7 @@ boss_actionPredict = function (predictedSkillId, predictionModeId) {
     if (actor.isStateAffected(292)) {
       if (masteryBonus + actor.level > enemy1.level) {
         //if(true){
-		var skill = `\x1bSIN[${predictedSkillId}]`;
+        var skill = `\x1bSIN[${predictedSkillId}]`;
         var predictionMessage = `${enemyName}は${skill}を使用するようだ…。`;
       } else {
         var predictionMessage = `${enemyName}の力が強大な為、行動を予測する事が出来ない…。`;
