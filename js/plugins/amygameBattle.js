@@ -1154,7 +1154,9 @@ function buildActivationThresholdActivateSpecialState(user, baseValue) {
 // MP. `insufficientMpStateId` only picks which \SIM[n] icon the message shows.
 function applyActivationActivateSpecialState(user, canActivate, cost, insufficientMpStateId) {
   if (!canActivate) {
-    const insufficientMpMessage = `${user.name()}はMPが足らず\\SIM[${insufficientMpStateId}]になった…`;
+    const userName = user.name();
+    const stateName = `\\SIM[${insufficientMpStateId}]`;
+    const insufficientMpMessage = `${userName}はMPが足らず${stateName}になった…`;
     BattleManager._logWindow.push(`addText`, insufficientMpMessage);
     user.startAnimation(275, true, 0);
     user.addState(109);
@@ -1590,7 +1592,9 @@ actor_kousokukaijo2 = function (boundActorId) {
     $gameVariables.setValue(525, randomMessage);
     
     // Display battle log message
-    const logMessage = `${partyMember.name()}は${boundActor.name()}の拘束を解きに掛かった！`;
+    const actorName = partyMember.name();
+    const boundActorName = boundActor.name()
+    const logMessage = `${actorName}は${boundActorName}の拘束を解きに掛かった！`;
     BattleManager._logWindow.push('addText', logMessage);
     
     // Remove the bind state from the bound actor
@@ -1845,7 +1849,9 @@ function buildStatsTextPart3BattleXsarStatas(user, isEnemy) {
   if (isEnemy) {
     skill_addPowerSet(user, $dataSkills, 1, 1);
     if (valueAddPowerCustom >= 1) {
-      statsTextPart3 += `\\C[16]\\I[666]スキル威力率:\\C[0]+${valueAddPowerCustom}\n`;
+      const skillName = `\\I[666]`;
+      const skillMsgPrefix = colorTaggedText(16, `${skillName}スキル威力率`);
+      statsTextPart3 += `${skillMsgPrefix}:+${valueAddPowerCustom}\n`;
     }
   }
   statsTextPart3 += formatStatLine(31, "奥義威力率　", calcElementAmplifyBattleXsarStatas(user, 10, true));
@@ -2901,11 +2907,14 @@ function tbcsProcessStateResistanceTrait(stateData, code, dataId, value, absolut
   const percent = absoluteValue * 100;
   switch (dataId) {
     case 0:
-      return `:\\C[16][基本特殊固有状態異常耐性${modifier}${percent}]\\C[0]`;
+      const baseResToUniqueStatus = colorTaggedText(16, `基本特殊固有状態異常耐性${modifier}${percent}`);
+      return `:[${baseResToUniqueStatus}]`;
     case 1:
-      return `:\\C[16][基本状態異常耐性${modifier}${percent}]\\C[0]`;
+      const baseResToStatus = colorTaggedText(16, `基本状態異常耐性${modifier}${percent}`);
+      return `:[${baseResToStatus}]`;
     case 2:
-      return `:\\C[16][特殊状態異常耐性${modifier}${percent}]\\C[0]`;
+      const baseResToSpecStatus = colorTaggedText(16, `特殊状態異常耐性${modifier}${percent}`);
+      return `:[${baseResToSpecStatus}]`;
     default:
       return '';
   }
@@ -2919,11 +2928,14 @@ function tbcsProcessStateImmunityTrait(stateData, code, dataId) {
   // Return description based on dataId
   switch (dataId) {
     case 0:
-      return `:\\C[16][基本特殊固有状態異常無効]\\C[0]`;
+      const baseImmToUniqueStatus = colorTaggedText(16, `基本特殊固有状態異常無効`);
+      return `:[${baseImmToUniqueStatus}]`;
     case 1:
-      return `:\\C[16][基本状態異常耐性無効]\\C[0]`;
+      const baseImmToStatus = colorTaggedText(16, `基本状態異常無効`);
+      return `:[${baseImmToStatus}]`;
     case 2:
-      return `:\\C[16][特殊状態異常耐性無効]\\C[0]`;
+      const baseImmToSpecStatus = colorTaggedText(16, `特殊状態異常耐性無効`);
+      return `:[${baseImmToSpecStatus}]`;
     default:
       return '';
   }
@@ -3286,7 +3298,8 @@ enemy_instantwin = function () {
   const result = `\\C[2]BattleResult!\\C[0]`;
   const exp = `\\C[10]${expCount}\\C[0]`;
   const gold = `\\C[14]${goldCount}\\C[0]`;
-  const battleResultMessage = `${result}\n経験値${exp}、${gold}\\Gを入手！ JPを1獲得した。`;
+  const resultEGJtext = `経験値${exp}、${gold}\\Gを入手！ JPを1獲得した。`;
+  const battleResultMessage = `${result}\n${resultEGJtext}`;
   $gameSystem.pushInfoLog(battleResultMessage);
   valueWordSet2 = `${battleResultMessage}\n`;
   
@@ -3926,10 +3939,12 @@ attack_DamageFormula = function (user, target, skillId) {
     BattleManager._logWindow.push(`addText`, text);
   };
   if (target.result().critical) {
-    text = `[会心発生！] 倍率${user.criticalMultiplierBonus() * 100}%`;
+    const critPercent = user.criticalMultiplierBonus() * 100;
+    text = `[会心発生！] 倍率${critPercent}%`;
     BattleManager._logWindow.push(`addText`, text);
   };
-  text = `[分散値] ${$dataSkills[skillId].damage.variance}`;
+  const skillDamageVar = $dataSkills[skillId].damage.variance;
+  text = `[分散値] ${skillDamageVar}`;
   BattleManager._logWindow.push(`addText`, text);
 
 };
@@ -4108,7 +4123,8 @@ boss_actionPredict = function (predictedSkillId, predictionModeId) {
 function buildActionPredictionMessageBossActionPredict(actor, enemy, enemyName, predictedSkillId, masteryBonus, verbPhrase, unaffectedMessage) {
   if (!actor.isStateAffected(292)) return unaffectedMessage;
   if (masteryBonus + actor.level > enemy.level) {
-    return `${enemyName}は\x1bSIN[${predictedSkillId}]を${verbPhrase}…。`;
+    const skillName = `\x1bSIN[${predictedSkillId}]`;
+    return `${enemyName}は${skillName}を${verbPhrase}…。`;
   }
   return `${enemyName}の力が強大な為、行動を予測する事が出来ない…。`;
 }
@@ -4901,7 +4917,7 @@ skill_equipOperation = function (actor, actor2, itemId) {
 
   const gameVar351Arr = $gameVariables.value(351);
   const actorId = actor.actorId();
-  const actorName = `\\C[2]${actor.name()}\\C[0]`;
+  const actorName = colorTaggedText(2, actor.name());
   if (itemId == 427) {//記憶
     const battleSkillIds = actor.battleSkillsRaw();
     gameVar351Arr[actorId] = battleSkillIds.clone();
@@ -4909,7 +4925,7 @@ skill_equipOperation = function (actor, actor2, itemId) {
   }
   else if (itemId == 428) {//復元
     if (gameVar351Arr[actorId] == 0) {
-      TickerManager.show(`\\C[2]${actor.name()}\\C[0]はスキル装備状態を記録していません`);
+      TickerManager.show(`${actorName}はスキル装備状態を記録していません`);
       return;
     }
     actor.clearEquipBattleSkills();
@@ -4989,7 +5005,8 @@ state_addFormula1 = function(params) {
   const targetName = `\\C[16]${target.name()}\\C[0]`;
   const stateName = `\\C[10]${stateData.name}\\C[0]`;
   if (target.isStateResist(stateId)) {
-    showMessage(`${targetName}は${stateName}を無効化した！。（\\C[10]完全耐性\\C[0]）`);
+    const completeImmunityMesg = colorTaggedText(10, '完全耐性');
+    showMessage(`${targetName}は${stateName}を無効化した！。（${completeImmunityMesg}）`);
     return;
   }
   
@@ -5109,8 +5126,11 @@ function announceLevelUpsPartyLevelSaveLoad(savedLevels, jobJP, levelOf, classOf
     if (!actor) continue;
     const currentLevel = levelOf(actor);
     if (currentLevel <= savedLevels[i]) continue;
-    const className = classOf(actor).name;
-    const levelUpMessage = `\\C[2]${actor.name()}\\C[0]の${jobJP}\\C[14]<${className}>\\C[0]Lvが\\C[10]${currentLevel - savedLevels[i]}\\C[0]上がった！ (${currentLevel})`;
+    const classNameBase = classOf(actor).name;
+    const actorName = colorTaggedText(2, actor.name());
+    const className = colorTaggedText(14, `<${classNameBase}>`);
+    const jpbonusCnt = colorTaggedText(19, `${currentLevel - savedLevels[i]}`);
+    const levelUpMessage = `${actorName}の${jobJP}${className}Lvが${jpbonusCnt}上がった！ (${currentLevel})`;
     CommonPopupManager.showInfo({}, levelUpMessage, null);
     levelUpFlag = 1;
   }
