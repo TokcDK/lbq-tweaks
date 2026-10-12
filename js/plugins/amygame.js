@@ -1204,7 +1204,7 @@
                 if (stateCategory >= 1) {
                     const targetName = a.name();
                     const magic = colorTaggedText(16, 'Magic');
-                    const amount = colorTaggedText(3, '+'+ stateCategory);
+                    const amount = colorTaggedText(3, '+' + stateCategory);
                     var resultMessage = `${targetName}の${magic}により回復数${amount}！`;
                     if (a.isActor()) {
                         if ($gameParty.inBattle()) {
@@ -1344,7 +1344,7 @@
                     var dispelCountRemaining = dispelCountRemaining - skipOrCountFlag;
                 };
                 b.removeStateCategory(stateCategory, removedStateCount);
-                const targetName = b.name();s
+                const targetName = b.name();
                 const cnt = colorTaggedText(3, removedStateCount)
                 var resultMessage = `${targetName}の強化状態を${cnt}個消去した！`;
                 if ($gameParty.inBattle()) {
@@ -3265,11 +3265,26 @@
     hint1_zenpan = function (hintTypeId) {
 
         var uncollectedHeader = `　\n`;
-        if (hintTypeId == 102) { uncollectedHeader = `未発生挿話\n` }
-        else if (hintTypeId == 103) { uncollectedHeader = `未発生シーン\n` }
-        else if (hintTypeId == 104) { uncollectedHeader = `未回収タイトル\n` }
-        else if (hintTypeId == 105) { uncollectedHeader = `未回収Ｈタイトル\n` }
-        else if (hintTypeId == 108) { uncollectedHeader = `未発生クエスト\n` };
+        switch (hintTypeId) {
+            case 102:
+                uncollectedHeader = `未発生挿話` + `\n`;
+                break;
+            case 103:
+                uncollectedHeader = `未発生シーン` + `\n`;
+                break;
+            case 104:
+                uncollectedHeader = `未回収タイトル` + `\n`;
+                break;
+            case 105:
+                uncollectedHeader = `未回収Ｈタイトル` + `\n`;
+                break;
+            case 108:
+                uncollectedHeader = `未発生クエスト` + `\n`;
+                break;
+            default:
+                break;
+        }
+
         eval("valueWordSet" + valueCountSet2 + " = uncollectedHeader");
 
         valueCountSet1 = 0;
@@ -3277,16 +3292,19 @@
         const max = $dataItems.length - 1;
         for (var i = 1; i < max; i++) {
             const item = $dataItems[i];
-            if (item.meta['EICSwitch']) {
-                if (Number(item.meta['EICSwitch']) == hintTypeId && !$gameParty.hasItem(item)) {
-                    var hintLineText = `\\C[2]${item.name}\\C[0]\n${item.description}\n`;
-                    eval("valueWordSet" + valueCountSet2 + " += hintLineText");
-                    valueCountSet1 += 1;
-                    if ((valueCountSet1 % 6) == 0) {
-                        valueCountSet2 += 1;
-                        eval("valueWordSet" + valueCountSet2 + " = uncollectedHeader");
-                    };
-                };
+            if (!item.meta['EICSwitch']) {
+                continue;
+            };
+            if (Number(item.meta['EICSwitch']) !== hintTypeId || $gameParty.hasItem(item)) {
+                continue;
+            };
+
+            var hintLineText = `\\C[2]${item.name}\\C[0]\n${item.description}\n`;
+            eval("valueWordSet" + valueCountSet2 + " += hintLineText");
+            valueCountSet1 += 1;
+            if ((valueCountSet1 % 6) == 0) {
+                valueCountSet2 += 1;
+                eval("valueWordSet" + valueCountSet2 + " = uncollectedHeader");
             };
         };
 
@@ -3312,29 +3330,30 @@
         const max = $gameMap.events().length >= 50 ? 200 : 100;
         for (var id = max; id > 0; id--) {
             const event = $gameMap.event(id);
-            if (!!event) {
-                //if(!$gameSelfSwitches.value([$gameMap.mapId(), event, 'B'])){
-                if (!$gameSelfSwitches.value([$gameMap.mapId(), id, 'B'])) {
-                    if (event.event().meta['IconDisplay']) {
-                        var target = event;
-                        if ($gameSwitches.value(79)) {
-                            target.setIconOnEvent(Number(event.event().meta['IconDisplay']));
-                        } else {
-                            target.clearIconOnEvent();
-                        }
-                    };
-                    if (event.event().meta['TrapDisplay']) {
-                        var target = event;
-                        if ($gameSwitches.value(135)) {
-                            target.setIconOnEvent(Number(event.event().meta['TrapDisplay']));
-                        } else {
-                            target.clearIconOnEvent();
-                        }
-                    };
-                }
+            if (!event) {
+                continue;
             };
+            //if(!$gameSelfSwitches.value([$gameMap.mapId(), event, 'B'])){
+            if ($gameSelfSwitches.value([$gameMap.mapId(), id, 'B'])) {
+                continue;
+            }
+
+            setEventIcon(event, 'IconDisplay', 79);
+            setEventIcon(event, 'TrapDisplay', 135);
         };
     };
+
+    function setEventIcon(event, metaName, switchId) {
+        const eventMeta = event.event().meta[metaName];
+        if (!eventMeta) {
+            return;
+        }
+        if ($gameSwitches.value(switchId)) {
+            event.setIconOnEvent(Number(eventMeta));
+        } else {
+            event.clearIconOnEvent();
+        }
+    }
 
     //タイトル入手
     item_titleget = function (unusedArg1, unusedArg2) {
@@ -4026,19 +4045,19 @@
 
     const ACTOR_RARITY_RANK_DATA = {
         // rarityRank: [skillId, rankLv, code, maxLevel]
-        0: {skillId: 406, rankLv: 0, code: 'N', maxLv: 9},
-        1: {skillId: 405, rankLv: 1, code: 'R', maxLv: 39},
-        2: {skillId: 404, rankLv: 2, code: 'SR', maxLv: 59},
-        3: {skillId: 403, rankLv: 3, code: 'SSR', maxLv: 79},
-        4: {skillId: 402, rankLv: 4, code: 'UR', maxLv: 98},
-        5: {skillId: 401, rankLv: 5, code: 'LR', maxLv: 998},
+        0: { skillId: 406, rankLv: 0, code: 'N', maxLv: 9 },
+        1: { skillId: 405, rankLv: 1, code: 'R', maxLv: 39 },
+        2: { skillId: 404, rankLv: 2, code: 'SR', maxLv: 59 },
+        3: { skillId: 403, rankLv: 3, code: 'SSR', maxLv: 79 },
+        4: { skillId: 402, rankLv: 4, code: 'UR', maxLv: 98 },
+        5: { skillId: 401, rankLv: 5, code: 'LR', maxLv: 998 },
     }
 
     /*
     * Get actor rarity rank data
     */
     getRarityRank = function (actor) {
-        for ( var rarityRank in ACTOR_RARITY_RANK_DATA ) {
+        for (var rarityRank in ACTOR_RARITY_RANK_DATA) {
             var rank = ACTOR_RARITY_RANK_DATA[rarityRank];
             if (actor.isLearnedSkill(rank.skillId)) {
                 return rank;
@@ -4060,12 +4079,12 @@
 
     const ACTOR_RARITY_RANK_SKILLS_DATA = {
         // rarityRank: { skillId, forgetSkillIds: [], learnSkillIds: [] }
-        5: {skillId: 401, forgetSkillIds: [], learnSkillIds: []},
-        4: {skillId: 402, forgetSkillIds: [402], learnSkillIds: [401]},
-        3: {skillId: 403, forgetSkillIds: [403], learnSkillIds: [402]},
-        2: {skillId: 404, forgetSkillIds: [404], learnSkillIds: [403]},
-        1: {skillId: 405, forgetSkillIds: [405], learnSkillIds: [404]},
-        0: {skillId: 406, forgetSkillIds: [406], learnSkillIds: [405]},
+        5: { skillId: 401, forgetSkillIds: [], learnSkillIds: [] },
+        4: { skillId: 402, forgetSkillIds: [402], learnSkillIds: [401] },
+        3: { skillId: 403, forgetSkillIds: [403], learnSkillIds: [402] },
+        2: { skillId: 404, forgetSkillIds: [404], learnSkillIds: [403] },
+        1: { skillId: 405, forgetSkillIds: [405], learnSkillIds: [404] },
+        0: { skillId: 406, forgetSkillIds: [406], learnSkillIds: [405] },
     }
 
     //レアリティアップ
@@ -5629,11 +5648,11 @@
             };
             if (listKindId == 1) {//クエスト
                 if (valueWordArray[i] == `？？？`) {
-                    var prefix = '[' +colorTaggedText(1, `受注不可`) + ']';
+                    var prefix = '[' + colorTaggedText(1, `受注不可`) + ']';
                     var iconIndex = $dataItems[valueCountArray[i]].iconIndex;
                     var icon = `\x1bI[${iconIndex}]`;
                     var unknownText = `？？？`;
-                    var choiceText = prefix+icon+unknownText
+                    var choiceText = prefix + icon + unknownText
                     var dTextContent = valueQuestArray7[valueCountArray[i] - 800];
                 } else {
                     var dTextContent = valueQuestArray4[valueCountArray[i] - 800];
