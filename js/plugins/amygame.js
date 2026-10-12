@@ -3261,35 +3261,25 @@
 
     };
 
+    //ヒント種別(EICSwitch値)ごとの見出し。CommonEvent 178の設計に合わせた
+    //定義。分岐(switch)で持つと、実際には呼ばれない種別が到達不能なcaseと
+    //して残るため、表として持つ。
+    const HINT_TYPE_HEADERS = {
+        102: `未発生挿話`,
+        103: `未発生シーン`,
+        104: `未回収タイトル`,
+        105: `未回収Ｈタイトル`,
+        108: `未発生クエスト`,
+    };
+
     //代入して全般ヒントとして作成
     hint1_zenpan = function (hintTypeId) {
 
         //呼び出し元(CommonEvent 178)は$gameVariables.value(19)を渡す。変数に
-        //入っているのが数値とは限らないので、switch(厳密比較)でも比較が崩れ
-        //ないように数値化しておく(元は==で比較していた)。
+        //入っているのが数値とは限らないので、比較が崩れないように数値化する。
         const hintType = Number(hintTypeId);
 
-        var uncollectedHeader = `　\n`;
-        switch (hintType) {
-            case 102:
-                uncollectedHeader = `未発生挿話` + `\n`;
-                break;
-            case 103:
-                uncollectedHeader = `未発生シーン` + `\n`;
-                break;
-            case 104:
-                uncollectedHeader = `未回収タイトル` + `\n`;
-                break;
-            case 105:
-                uncollectedHeader = `未回収Ｈタイトル` + `\n`;
-                break;
-            case 108:
-                uncollectedHeader = `未発生クエスト` + `\n`;
-                break;
-            default:
-                break;
-        }
-
+        var uncollectedHeader = `${HINT_TYPE_HEADERS[hintType] || '　'}\n`;
         eval("valueWordSet" + valueCountSet2 + " = uncollectedHeader");
 
         valueCountSet1 = 0;
@@ -3358,14 +3348,11 @@
             let iconShown = false;
             for (const iconDefinition of EVENT_ICON_METAS) {
                 const eventMeta = eventData.meta[iconDefinition.meta];
-                if (!eventMeta) {
-                    continue;
-                }
+                if (!eventMeta) continue;
                 iconMetaFound = true;
-                if ($gameSwitches.value(iconDefinition.switchId)) {
-                    event.setIconOnEvent(Number(eventMeta));
-                    iconShown = true;
-                }
+                if (!$gameSwitches.value(iconDefinition.switchId)) continue;
+                event.setIconOnEvent(Number(eventMeta));
+                iconShown = true;
             };
             if (iconMetaFound && !iconShown) {
                 event.clearIconOnEvent();
@@ -5472,18 +5459,18 @@
                 $gameVariables.setValue(161, 0);
                 //IDの上限(100/200)で打ち切ると、それを超えるIDのイベントを取り
                 //こぼす(Map003は247イベントあり、生成イベントはさらに大きいIDを
-                //取る)。実在するイベントの最大IDを走査開始点にする。
-                const warpSearchStartId = $gameMap.events().reduce(function (maxId, event) {
-                    return Math.max(maxId, event.eventId());
-                }, 0);
-                for (var id = warpSearchStartId; id > 0; id--) {
-                    if (!!$gameMap.event(id)) {
-                        if ($gameMap.event(id).event().meta['warpTrap']) {
-                            valueCountSet2 = id;
-                            $gameVariables.setValue(161, [$gameMap.mapId(), $gameMap.event(id).x, $gameMap.event(id).y]);
-                            break;
-                        }
-                    }
+                //取る)。実在するイベントをIDの降順で走査し、最初に見つかった
+                //<warpTrap>を使う。event()がnullのイベントでも落ちないように
+                //データの有無を確認する。
+                const warpTrapEvents = $gameMap.events().slice().sort(function (a, b) {
+                    return b.eventId() - a.eventId();
+                });
+                for (const warpEvent of warpTrapEvents) {
+                    const warpEventData = warpEvent.event();
+                    if (!warpEventData || !warpEventData.meta['warpTrap']) continue;
+                    valueCountSet2 = warpEvent.eventId();
+                    $gameVariables.setValue(161, [$gameMap.mapId(), warpEvent.x, warpEvent.y]);
+                    break;
                 };
                 var infoText = `転送トラップが発動した！`;
                 CommonPopupManager.showInfo({}, infoText, null);

@@ -89,15 +89,18 @@ const mapID = $gameMap.mapId();
 $gameSystem.savePrefabEventCondition(mapID);
 $gameSwitches.setValue(140,false);
 $gameSwitches.setValue(156,false);
-for (let id = $gameMap.events().length; id > 0; id--) {
-  if (!$gameMap.event(id)) continue;
-
-  if ($gameMap.event(id).event().meta['Respawn']) {
-    $gameMap.eraseEvent(id);
-  } else {
-    $gameSelfSwitches.setValue([mapID, id, "C"], false);
-    $gameSelfSwitches.setValue([mapID, id, "D"], false);
+//events().lengthは「実在するイベント数」で最大IDではない。IDが飛んでいる
+//マップ(例: Map007は68個で最大ID80)では大きいIDを取りこぼすので、実在
+//するイベントをそのまま回す。event()がnullのイベントでも落ちないように
+//データの有無を確認する。
+for (const event of $gameMap.events()) {
+  const eventData = event.event();
+  if (eventData && eventData.meta['Respawn']) {
+    $gameMap.eraseEvent(event.eventId());
+    continue;
   }
+  $gameSelfSwitches.setValue([mapID, event.eventId(), "C"], false);
+  $gameSelfSwitches.setValue([mapID, event.eventId(), "D"], false);
 }
 
 }
@@ -249,13 +252,13 @@ worldMap_eraseSelect = function(){
   const gameVar135 = $gameVariables.value(135);
   const max = $gameVariables.value(173).length;
   const mapId = $gameMap.mapId();
-  for (let id = 50; id > 0; id--) {
-    const eventData = $gameMap.event(id);
-    if (!eventData) continue;
-
+  //IDの上限(50)で打ち切ると、それを超えるIDのイベントを取りこぼす。
+  //実在するイベントをそのまま回す。event()がnullのイベントは対象外。
+  for (const eventData of $gameMap.events()) {
     const event = eventData.event();
-    if (!!event.meta['WorldNotErase']) continue;
+    if (!event || event.meta['WorldNotErase']) continue;
 
+    const id = eventData.eventId();
     for (let j = 0; j < max; j++) {
       if (gameVar135 == j) {
         const eventMQProgress = event.meta['MQProgress'];
@@ -275,11 +278,17 @@ worldMap_eraseSelect = function(){
 map_npcPositionSet = function () {
 
   $gameVariables.setValue(173, []);
-  const eventsCount = $gameMap.events().length;
-  const start = eventsCount >= 50 ? 200 : 100;
   const mapId = $gameMap.mapId();
-  //for (var id2 = $gameMap.events().length; id2 > 0; id2--) {
-  for (let id = start; id > 0; id--) {
+  //IDの上限(100/200)で打ち切ると、それを超えるIDのイベントを取りこぼす
+  //(Map003は247イベントあり、生成イベントはさらに大きいIDを取る)。変数
+  //173へのpush順はCommonEvent 299(場所移動制限)の判定順に影響するため、
+  //元の降順(IDの大きい方から)を保つ。
+  const npcEventIds = $gameMap.events().map(function (event) {
+    return event.eventId();
+  }).sort(function (a, b) {
+    return b - a;
+  });
+  for (const id of npcEventIds) {
     map_npcPositionSetEvent(id, mapId);
   }
 }
@@ -288,6 +297,7 @@ map_npcPositionSetEvent = function (id, mapId) {
   const event = $gameMap.event(id);
   if (!event) return;
   const eventEvent = event.event();
+  if (!eventEvent) return;
 
   if ($gameSelfSwitches.value([mapId, id, 'A']) && !$gameSwitches.value(209)) {
     if (eventEvent.meta['NoAClear']) { } else {
@@ -1243,8 +1253,11 @@ for (let i = 1; i <= 15; i++) {
 //メモタグ指定で一括で同じ動作event_NpcCharaMove(3,0,'Actor'); event_NpcCharaMove(45,"UP: 10;",'Actor');
 event_NpcCharaMove = function(moveRouteCode,moveRouteParameters,metaName){
 
-  for (var id = 200; id > 0; id--) {
-    event_partyMoveEventForceMoveRoute(moveRouteCode, moveRouteParameters, id, metaName);
+  //IDの上限(200)で打ち切ると、それを超えるIDのイベントを取りこぼす
+  //(Map003は247イベントあり、生成イベントはさらに大きいIDを取る)。
+  //実在するイベントをそのまま回す。
+  for (const event of $gameMap.events()) {
+    event_partyMoveEventForceMoveRoute(moveRouteCode, moveRouteParameters, event.eventId(), metaName);
   };
 };
 
@@ -1252,8 +1265,10 @@ event_NpcCharaMove = function(moveRouteCode,moveRouteParameters,metaName){
 event_partyMoveEventForceMoveRoute = function (moveRouteCode, moveRouteParameters, eventId, metaName) {
 
   const event = $gameMap.event(eventId);
-  const isValid = !!event && (metaName === '' || event.event().meta[metaName]);
-  if (!isValid) return;
+  if (!event) return;
+  const eventData = event.event();
+  if (!eventData) return;
+  if (metaName !== '' && !eventData.meta[metaName]) return;
 
   //WARN! both forceMoveRoute below is identical! useless condition id1 == 45 , typo?
   event.forceMoveRoute({
@@ -1374,21 +1389,27 @@ event_togetherSelf = function(eventId,selfSwitchKey){
 
   const arr = [301, 302, 303, 304, 305, 306, 307, 308, 309, 310];
   const mapId = $gameMap.mapId();
-  if(!$gameMap.event(eventId)) return;
-  for (var id = 100; id > 0; id--) {
-    if (id != eventId) {
-      const ev = $gameMap.event(id);
-      if (!!ev) {
-        const evCharaNameId = ev.event().meta['CharaNameId'];
-        if (evCharaNameId) {
-          if (Number($gameMap.event(eventId).event().meta['CharaNameId']) == Number(evCharaNameId)) {
-            if (arr.some(function (excludedEventId) { return id == excludedEventId })) { } else {
-              $gameSelfSwitches.setValue([mapId, id, selfSwitchKey], true);
-            };
-          }
-        }
-      }
-    }
+  const sourceEvent = $gameMap.event(eventId);
+  if (!sourceEvent) return;
+  const sourceEventData = sourceEvent.event();
+  if (!sourceEventData) return;
+
+  //IDの上限(100)で打ち切ると、それを超えるIDのイベントを取りこぼす
+  //(Map003のCharaNameIdイベントはID181/196/198にあり、旧コードでは1件も
+  //対象にならなかった)。実在するイベントをそのまま回す。
+  for (const event of $gameMap.events()) {
+    const id = event.eventId();
+    if (id == eventId) continue;
+
+    const eventData = event.event();
+    if (!eventData) continue;
+
+    const evCharaNameId = eventData.meta['CharaNameId'];
+    if (!evCharaNameId) continue;
+    if (Number(sourceEventData.meta['CharaNameId']) != Number(evCharaNameId)) continue;
+    if (arr.some(function (excludedEventId) { return id == excludedEventId })) continue;
+
+    $gameSelfSwitches.setValue([mapId, id, selfSwitchKey], true);
   }
 }
 
