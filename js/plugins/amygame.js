@@ -3264,8 +3264,13 @@
     //代入して全般ヒントとして作成
     hint1_zenpan = function (hintTypeId) {
 
+        //呼び出し元(CommonEvent 178)は$gameVariables.value(19)を渡す。変数に
+        //入っているのが数値とは限らないので、switch(厳密比較)でも比較が崩れ
+        //ないように数値化しておく(元は==で比較していた)。
+        const hintType = Number(hintTypeId);
+
         var uncollectedHeader = `　\n`;
-        switch (hintTypeId) {
+        switch (hintType) {
             case 102:
                 uncollectedHeader = `未発生挿話` + `\n`;
                 break;
@@ -3295,7 +3300,7 @@
             if (!item.meta['EICSwitch']) {
                 continue;
             };
-            if (Number(item.meta['EICSwitch']) !== hintTypeId || $gameParty.hasItem(item)) {
+            if (Number(item.meta['EICSwitch']) !== hintType || $gameParty.hasItem(item)) {
                 continue;
             };
 
@@ -3324,36 +3329,49 @@
 
     };
 
+    //オブジェクト探知(79)とトラップ視認(135)が表示するアイコンのメタ。
+    //1つのイベントが両方のメタを持つことがあるので、まとめて扱う。
+    const EVENT_ICON_METAS = [
+        { meta: 'IconDisplay', switchId: 79 },
+        { meta: 'TrapDisplay', switchId: 135 },
+    ];
+
     //オブジェクト探知とトラップ視認実行
     search_object = function () {
 
-        const max = $gameMap.events().length >= 50 ? 200 : 100;
-        for (var id = max; id > 0; id--) {
-            const event = $gameMap.event(id);
-            if (!event) {
+        //IDの上限(100/200)で打ち切ると、それを超えるIDのイベントを取りこぼす
+        //(Map003は247イベントあり、生成イベントはさらに大きいIDを取る)。
+        //実在するイベントをそのまま回す。
+        for (const event of $gameMap.events()) {
+            const eventData = event.event();
+            if (!eventData) {
                 continue;
-            };
-            //if(!$gameSelfSwitches.value([$gameMap.mapId(), event, 'B'])){
-            if ($gameSelfSwitches.value([$gameMap.mapId(), id, 'B'])) {
+            }
+            if ($gameSelfSwitches.value([$gameMap.mapId(), event.eventId(), 'B'])) {
                 continue;
             }
 
-            setEventIcon(event, 'IconDisplay', 79);
-            setEventIcon(event, 'TrapDisplay', 135);
+            //メタごとにスイッチを見てアイコンを反映する。片方のメタのスイッチが
+            //OFFというだけで、もう片方が表示したアイコンまで消してしまわない
+            //ように、表示したものが1つも無いときだけ消去する。
+            let iconMetaFound = false;
+            let iconShown = false;
+            for (const iconDefinition of EVENT_ICON_METAS) {
+                const eventMeta = eventData.meta[iconDefinition.meta];
+                if (!eventMeta) {
+                    continue;
+                }
+                iconMetaFound = true;
+                if ($gameSwitches.value(iconDefinition.switchId)) {
+                    event.setIconOnEvent(Number(eventMeta));
+                    iconShown = true;
+                }
+            };
+            if (iconMetaFound && !iconShown) {
+                event.clearIconOnEvent();
+            }
         };
     };
-
-    function setEventIcon(event, metaName, switchId) {
-        const eventMeta = event.event().meta[metaName];
-        if (!eventMeta) {
-            return;
-        }
-        if ($gameSwitches.value(switchId)) {
-            event.setIconOnEvent(Number(eventMeta));
-        } else {
-            event.clearIconOnEvent();
-        }
-    }
 
     //タイトル入手
     item_titleget = function (unusedArg1, unusedArg2) {
@@ -5452,12 +5470,12 @@
             };
             if (valueCountSet1 == 13) {
                 $gameVariables.setValue(161, 0);
-                var infoText = $gameMap.events().length;
-                if (infoText >= 50) {
-                    var warpSearchStartId = 200;
-                } else {
-                    var warpSearchStartId = 100;
-                };
+                //IDの上限(100/200)で打ち切ると、それを超えるIDのイベントを取り
+                //こぼす(Map003は247イベントあり、生成イベントはさらに大きいIDを
+                //取る)。実在するイベントの最大IDを走査開始点にする。
+                const warpSearchStartId = $gameMap.events().reduce(function (maxId, event) {
+                    return Math.max(maxId, event.eventId());
+                }, 0);
                 for (var id = warpSearchStartId; id > 0; id--) {
                     if (!!$gameMap.event(id)) {
                         if ($gameMap.event(id).event().meta['warpTrap']) {

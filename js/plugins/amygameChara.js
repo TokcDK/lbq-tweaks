@@ -1084,12 +1084,14 @@ map_otherGraphicSet = function(spawnCount,graphicNames,spawnConditions){
 //マップイベント消去メモタグで指定
 map_eventErase = function(metaKey){
 
-const eventsCount = $gameMap.events().length;
-const start = eventsCount >= 90 ? 200 : 100;
-for (var id = start; id > 0; id--) {
-  const ev = $gameMap.event(id);
-  if (!!ev && ev.event().meta[metaKey]) {
-    $gameMap.eraseEvent(id);
+//IDの上限(100/200)で打ち切ると、それを超えるIDのイベントを取りこぼす
+//(Map003は247イベントあり、生成イベントはさらに大きいIDを取る)。
+//実在するイベントをそのまま回す。eraseEventは_eventsを書き換えるので、
+//events()の戻り値(毎回作られるコピー)を回す。
+for (const event of $gameMap.events()) {
+  const eventData = event.event();
+  if (eventData && eventData.meta[metaKey]) {
+    $gameMap.eraseEvent(event.eventId());
   }
 }
 
