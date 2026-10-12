@@ -1907,7 +1907,6 @@
 
         // Add enemy information
         glossaryText.push(`\\C[16]・出現エネミー\\C[0]\n`);
-        let enemyCount = 0;
         const enemyPopArray = [];
 
         // Collect enemy info
@@ -1918,7 +1917,6 @@
             enemyPopArray.push(enemyInfo);
 
             glossaryText.push(`【\\C[2]${enemyInfo[1]}\\C[0]】`);
-            enemyCount += 1;
             if ((i % 2) === 0) {
                 glossaryText.push(`\n`);
             }
@@ -5520,12 +5518,6 @@
     //獲得物等一覧表示
     get_loopListDisplay = function () {
 
-        var windowYOffset = 0;
-        if (valueCountSet2 >= 2) {
-            windowYOffset += 6 * 3 * 38;
-        } else {
-            windowYOffset += valueCountSet1 * 3 * 38 + 60;
-        };
         var windowY = 50;
         if (valueCountSet1 <= 3) {
             windowY = 250 - (valueCountSet1 * 40);
@@ -6018,7 +6010,6 @@
         const partyMembers = $gameParty.members();
         for (var i = 0; i < gamePartyMembersCount; i++) {
             if (i == 4) break;
-            const valueBattleRecord_i = "valueBattleRecord_" + i;
             eval("valueBattleRecord_" + i + " = Array(21).fill(-1)");
             var actor = partyMembers[i];
             const evalValueBattleRecord_i = eval("valueBattleRecord_" + i);

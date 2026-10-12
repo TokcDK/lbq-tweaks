@@ -2168,6 +2168,7 @@ original_main = function (id100, id101) {
           const pictureY = picture4.y();
           pic_move1(valuePic1 + 4, 0, (384 + (1390 - 768) / 2) - pictureY, 100, 100, 255, 600);
         }
+        break;
       }
       case 4: {
         parallax_scroll(valuePic1 + 5, 'ScreenConcentratedLineWidthBackGraund', 0, 20, 20, 0, 255);
