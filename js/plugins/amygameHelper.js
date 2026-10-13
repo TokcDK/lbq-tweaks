@@ -3412,4 +3412,6005 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		BattleManager._logWindow.push(`addText`, `経験値レート:${valueTotalexp}`);
 		BattleManager._logWindow.push(`addText`, `\\Gレート:${valueTotalgold}`);
 	};
+//=============================================================================
+// Event Script (355/655) migration
+//=============================================================================
+//
+// The functions below were generated from the Script (355/655) command blocks
+// in data/CommonEvents.json and data/Map*.json. Every block that was either
+// duplicated across events or proven to execute at runtime was moved here, and
+// each source command was reduced to a single call:
+//
+//   AGH_evtNNNN_xxx();            // self-contained bodies
+//   AGH_evtNNNN_xxx(this, ...);   // bodies that used the interpreter (this)
+//
+// Contracts:
+//  - functions whose name ends without an interpreter argument receive the
+//    Game_Interpreter as their first argument; the body is executed through
+//    .call(interp) so `this` keeps its original meaning, including for the
+//    callbacks that were passed `this` in the source block.
+//  - __a0, __a1, ... are the literals that differed between the duplicated
+//    source blocks (numbers and strings), in first-occurrence order.
+//  - Player-facing text is split into `var xxx = `...`; //翻訳対象` (language)
+//    and `// code, not translation text` (control codes) consts at the top of
+//    the function; the message template below interpolates them, so the
+//    rendered string is byte-identical to the original.
+//  - Bodies intentionally assign implicit globals (valuePic1, valueCountSet*)
+//    exactly like the original snippets; this file is not strict mode.
+	// Replaces (1x): data/CommonEvents.json:common-event:1
+	AGH_evt0000_SnippetSetValue250 = function () {
+		var colorCode2 = `\\C[2]`; // code, not translation text
+		var colorReset = `\\C[0]`; // code, not translation text
+		var msgText1 = `シーンの多くは、メインクエスト終了後に開放される。`; //翻訳対象
+		var msgText2 = `本作には多様な強化システムを採用しているが、\nメインクエストとシーン回収だけを考えれば、\n極論レベルを上げて剣と杖で殴っていれば問題ない。`; //翻訳対象
+		var msgText3 = `「朝昼」と「夜」では発生するイベントに変化がある。\nこれはメインクエストに措いても同様。\n進行条件が「〇〇に会いに行く」などの場合、\n夜では会えない事が多い。日を改めて日中に会いに行こう`; //翻訳対象
+		var msgText4 = `シーンや挿話には「同一人物のシーンは同日に発生しない」という\n縛りが存在する場合がある。\n日数経過をさせる事で発生するようになる。`; //翻訳対象
+		var msgText5 = `メインクエスト進行時の戦闘に、敗北Ｈはない`; //翻訳対象
+		var msgText6 = `Ｈエネミーはそのマップで敗北Ｈを経験する事で出現する。\nＨエネミーに敗北すると汎用全滅シーンが発生する。`; //翻訳対象
+		var msgText7 = `「称号」は、条件を満たした後、「一日の始まり」か「ギルド受付」と\n話した直後に付与される。`; //翻訳対象
+		$gameVariables.setValue(250,
+		[`${colorCode2}[1]${colorReset}${msgText1}`,
+		`
+${colorCode2}[2]${colorReset}${msgText2}`,
+		`
+${colorCode2}[3]${colorReset}${msgText3}`,
+		`
+${colorCode2}[4]${colorReset}${msgText4}`,
+		`
+${colorCode2}[5]${colorReset}${msgText5}`,
+		`
+${colorCode2}[6]${colorReset}${msgText6}`,
+		`
+${colorCode2}[7]${colorReset}${msgText7}`,
+		`${colorCode2}[8]${colorReset}`,
+		`${colorCode2}[9]${colorReset}`,
+		`${colorCode2}[10]${colorReset}`]);
+	};
+
+	// Replaces (14x): data/CommonEvents.json:common-event:1, data/CommonEvents.json:common-event:21, data/CommonEvents.json:common-event:22, data/CommonEvents.json:common-event:47, data/CommonEvents.json:common-event:66, data/CommonEvents.json:common-event:167, …
+	AGH_evt0001_SnippetPicture_motion1 = function () {
+		//picture_motion1("smooth",[0]);
+		picture_motion1("linear",[0]);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:1
+	AGH_evt0002_Snippet = function () {
+		$gameMessage._IZSTPicShowParam = [550+640,384+100,100,100,100];
+		$gameMessage._IZSTPicMoveParam = [500+640,384+100,100,100,255,30];
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:1
+	AGH_evt0003_SnippetSetValue81 = function () {
+		$gameVariables.setValue(81,0)//メニュー背景横スク
+		$gameVariables.setValue(82,0)//メニュー背景縦スク
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:1
+	AGH_evt0004_SnippetSetValue73 = function () {
+		$gameVariables.setValue(73,1)//ヒロインキャラ始点変数
+		$gameVariables.setValue(74,2)//ヒロインキャラ終点変数
+		$gameVariables.setValue(247,[1,2])//ヒロインID配列変数
+		$gameVariables.setValue(75,1)//登場キャラ始点変数
+		$gameVariables.setValue(76,7)//登場キャラ終点変数
+		$gameVariables.setValue(248,[1,2,3,4,5,6,7])//キャラID配列変数
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:1, data/CommonEvents.json:common-event:102
+	AGH_evt0005_SnippetSetValue68 = function () {
+		$gameVariables.setValue(68,120)//GAB表示時間
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:1
+	AGH_evt0006_SnippetSetValue71 = function () {
+		$gameVariables.setValue(71,180);//ティッカー表示時間
+		$gameVariables.setValue(185,0);//TickerＹ軸変更
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:1
+	AGH_evt0007_SnippetSetValue65 = function () {
+		$gameVariables.setValue(65,180)//KMSポップアップ表示時間
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:1
+	AGH_evt0008_SnippetSetValue279 = function () {
+		$gameVariables.setValue(279,10)//ステート付与解除アニメウェイト
+		$gameVariables.setValue(280,10)//280に上乗せ分ウェイト
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:1
+	AGH_evt0009_SnippetSetValue254 = function () {
+		$gameVariables.setValue(254,1);//メニュー表示変数1で固定
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:2, data/CommonEvents.json:common-event:53
+	AGH_evt0010_SnippetLisciaBlueQuest163 = function (__a0) {
+		//LisciaBlueQuestフォルダに書き出し
+		var arr1 = $gameVariables.value(__a0);
+		fs.writeFileSync( "valueLocationPreset.txt" ,JSON.stringify(arr1) )
+	};
+
+	// Replaces (19x): data/CommonEvents.json:common-event:5, data/CommonEvents.json:common-event:87, data/CommonEvents.json:common-event:109, data/CommonEvents.json:common-event:110, data/CommonEvents.json:common-event:111, data/CommonEvents.json:common-event:112, …
+	AGH_evt0011_SnippetValueCountSet1 = function (__a0) {
+		valueCountSet1 = __a0;
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:5, data/CommonEvents.json:common-event:192
+	AGH_evt0012_SnippetValueCountSet1 = function (interp) {
+		return (function () {
+		if(valueCountSet1 != 0){
+		  event_pararelStarting(1,valueCountSet1,interp._eventId);
+		};
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:5, data/Map003.json:map-event:133:page:2
+	AGH_evt0013_SnippetValue135 = function (interp) {
+		return (function () {
+		var value1 = 'statue_orb_c';
+		$gameScreen._particle.particleSet(interp._eventId,value1+'-'+interp._eventId,'this',value1,'above');
+		var value1 = 'statue_orb_c'+'-'+interp._eventId;
+		$gameScreen._particle.particleUpdate([value1,'color','#ff00f7','#ffffff']);
+		$gameScreen._particle.particleUpdate([value1,'pos',0,-35]);
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:5, data/CommonEvents.json:common-event:15
+	AGH_evt0014_SnippetValue194 = function (__a0, __a1) {
+		var value1 = 94;
+		if($gameScreen.picture(value1)){
+		  var value7 = $gameScreen.picture(value1).origin();
+		  var value2 = $gameScreen.picture(value1).x();
+		  var value3 = $gameScreen.picture(value1).y();
+		  var value4 = $gameScreen.picture(value1).scaleX();
+		  var value5 = $gameScreen.picture(value1).scaleY();
+		  var value6 = __a0;//$gameScreen.picture(value1).opacity();
+		  $gameScreen.movePicture(value1,value7,value2,value3,value4,value5,value6,0,__a1);
+		};
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:5, data/CommonEvents.json:common-event:87, data/CommonEvents.json:common-event:89
+	AGH_evt0015_SnippetValue1 = function (__a0) {
+		var value1 = __a0;
+		$gameScreen._particle.particleSet(0,value1,'screen','def','spriteset');
+	};
+
+	// Replaces (14x): data/CommonEvents.json:common-event:5, data/CommonEvents.json:common-event:42, data/CommonEvents.json:common-event:65, data/CommonEvents.json:common-event:87, data/CommonEvents.json:common-event:89, data/CommonEvents.json:common-event:132, …
+	AGH_evt0016_SnippetValueCountSet3 = function (__a0) {
+		valueCountSet3 = __a0;
+	};
+
+	// Replaces (14x): data/CommonEvents.json:common-event:5, data/CommonEvents.json:common-event:23, data/CommonEvents.json:common-event:42, data/CommonEvents.json:common-event:65, data/CommonEvents.json:common-event:87, data/CommonEvents.json:common-event:89, …
+	AGH_evt0017_SnippetWindowManager = function (__a0) {
+		WindowManager.hide(__a0);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:5, data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
+	AGH_evt0018_SnippetValue121 = function (interp) {
+		return (function () {
+		var value1 = arr[getRandomIndex(arr.length)];
+		let index = arr.findIndex(arr => arr === value1); 
+		if(index >= 0){
+		arr.splice(index, 1);
+		}
+		interp.sVal(21,arr);
+		if(arr == 0){arr = [1,2,3,4,5]};
+		}).call(interp);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:5
+	AGH_evt0019_SnippetEvents = function () {
+		for (var id = $gameMap.events().length; id > 0; id--) {
+		if(!!$gameMap.event(id)) {
+		if ($gameMap.event(id).event().meta['NPC'] ||
+		$gameMap.event(id).event().meta['動物'] ||
+		$gameMap.event(id).event().meta['Encounter Direction Lock'] ){
+		$gameMap.eraseEvent(id);
+		}}};
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:37
+	AGH_evt0020_SnippetEvents = function () {
+		for (var id = $gameMap.events().length; id > 0; id--) {
+		if(!!$gameMap.event(id)) {
+		if ($gameMap.event(id).event().meta['NPC'] ||
+		$gameMap.event(id).event().meta['Animal'] ||
+		$gameMap.event(id).event().meta['Encounter Direction Lock'] ){
+		$gameMap.eraseEvent(id);
+		}}};
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:9, data/Map003.json:map-event:133:page:2
+	AGH_evt0021_SnippetStart75 = function () {
+		var start = $gameVariables.value(75);
+		var end = $gameVariables.value(76);
+		for(var id1 = start; id1 <= end; id1++){
+		  Profession_basicReturn(id1);
+		};
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:9
+	AGH_evt0022_SnippetSVal354 = function (interp, __a0, __a1, __a2, __a3, __a4, __a5) {
+		return (function (__a0, __a1, __a2, __a3, __a4, __a5) {
+		interp.sVal(__a0,Array(101).fill(0));
+		for(var i = 301; i <= 400; i++){
+		  if(!$dataWeapons[i].name == '') {
+		    if($dataWeapons[i].meta['SubstitutionActorId']){
+		      var value1 = Number($dataWeapons[i].meta['SubstitutionActorId']);
+		      $gameVariables.value(__a1)[i-300] = __a2;
+		    };
+		    if($dataWeapons[i].meta[__a3]){
+		      $gameVariables.value(__a4)[i-300] = __a5;
+		    };
+		  };
+		};
+		}).call(interp, __a0, __a1, __a2, __a3, __a4, __a5);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:9, data/CommonEvents.json:common-event:24, data/Map003.json:map-event:131:page:2
+	AGH_evt0023_SnippetList248 = function (interp) {
+		return (function () {
+		var list = $gameVariables.value(248);
+		list.forEach(function(id) {
+		  $gameActors.actor(id).removeState(39);
+		  $gameVariables.value(380 + id)[58] =  0;
+		}, interp);
+		}).call(interp);
+	};
+
+	// Replaces (11x): data/CommonEvents.json:common-event:9, data/CommonEvents.json:common-event:11, data/CommonEvents.json:common-event:12, data/CommonEvents.json:common-event:64, data/CommonEvents.json:common-event:254, data/Map003.json:map-event:133:page:2, …
+	AGH_evt0024_SnippetSVal316 = function (interp, __a0, __a1) {
+		return (function (__a0, __a1) {
+		interp.sVal(__a0,Array(__a1).fill(0));
+		}).call(interp, __a0, __a1);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:10, data/CommonEvents.json:common-event:21
+	AGH_evt0025_SnippetValueStartCommentary0 = function () {
+		valueStartCommentary0 = 1;
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:11, data/CommonEvents.json:common-event:24
+	AGH_evt0026_SnippetEvent500 = function (__a0) {
+		for(var i = 1; i <= 500; i++){
+		  for (var id = 200; id > 0; id--) {
+		    //if(!!$gameMap.event(id)) {
+		      $gameSelfSwitches.setValue([i, id, __a0], false);
+		    //};
+		  };
+		};
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:12, data/CommonEvents.json:common-event:54, data/Map003.json:map-event:235:page:1, data/Map018.json:map-event:39:page:1
+	AGH_evt0027_SnippetSetValue287 = function (__a0, __a1) {
+		$gameVariables.setValue(__a0,Array(__a1).fill(0));
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:12, data/Map003.json:map-event:113:page:1
+	AGH_evt0028_Snippet = function (__a0, __a1, __a2) {
+		$gameVariables.value(__a0)[$gameVariables.value(__a1)] = __a2;
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:12, data/CommonEvents.json:common-event:205
+	AGH_evt0029_Snippet = function () {
+		$gameSystem._cursorHidden = true;
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:12
+	AGH_evt0030_SnippetSetValue508 = function () {
+		$gameVariables.setValue(508,'BlueSky')
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:431
+	AGH_evt0031_SnippetSetValue21 = function () {
+		var msgText1 = `幹部団員 `; //翻訳対象
+		var code1 = `\\}`; // code, not translation text
+		var msgText2 = `秩序の騎空団`; //翻訳対象
+		$gameVariables.setValue(21,`${msgText1}${code1}${msgText2}`)
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:12
+	AGH_evt0032_SnippetSetValue55 = function () {
+		var msgText1 = `月`; //翻訳対象
+		$gameVariables.setValue(55, `${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:12
+	AGH_evt0033_SnippetSetValue515 = function () {
+		var msgText1 = `持ち上げoff`; //翻訳対象
+		$gameVariables.setValue(515, `${msgText1}`);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:290, data/CommonEvents.json:common-event:295
+	AGH_evt0034_SnippetSetValue21 = function () {
+		var code1 = `\\SP[0]`; // code, not translation text
+		var msgText1 = `イベント：IIN[`; //翻訳対象
+		var msgText2 = `]は、既に閲覧済みです。\nスキップしますか？\n（そのイベントで獲得できる称号や性経験値などは入手できます。\n但し、獲得物に選択肢が関係する場合は入手できません）`; //翻訳対象
+		$gameVariables.setValue(21,
+		`${code1}${msgText1}${$gameVariables.value(142)}${msgText2}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:301
+	AGH_evt0035_SnippetSetValue134 = function () {
+		var msgText1 = `まずは王城へと向かいましょう。\n王都北側に入り口がある筈です。`; //翻訳対象
+		$gameVariables.setValue(134,
+		`${msgText1}`);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:302, data/CommonEvents.json:common-event:303
+	AGH_evt0036_SnippetSetValue134 = function () {
+		var msgText1 = `宿へ向かいましょうか`; //翻訳対象
+		$gameVariables.setValue(134,
+		`${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:304
+	AGH_evt0037_SnippetSetValue134 = function () {
+		var msgText1 = `【騎空士ギルド】へ向かいましょう。\n確か、王城の手前ほどの場所にあったはずです`; //翻訳対象
+		$gameVariables.setValue(134,
+		`${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:305
+	AGH_evt0038_SnippetSetValue134 = function () {
+		var msgText1 = `情報屋に会いに行きましょう。\n表向きは書店を営業していると聞いています`; //翻訳対象
+		$gameVariables.setValue(134,
+		`${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:309
+	AGH_evt0039_SnippetSetValue134 = function () {
+		var msgText1 = `空賊に関する資料が届いているかも知れません。\n宿屋に戻りましょう`; //翻訳対象
+		$gameVariables.setValue(134,
+		`${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:311
+	AGH_evt0040_SnippetSetValue134 = function () {
+		var msgText1 = `中央平原の空賊達を\n１０人捕縛(討伐)しましょう\n ＜`; //翻訳対象
+		var code1 = `\\v[642]`; // code, not translation text
+		var msgText2 = ` / 10人＞`; //翻訳対象
+		$gameVariables.setValue(134,
+		`${msgText1}${code1}${msgText2}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:312
+	AGH_evt0041_SnippetSetValue134 = function () {
+		var code1 = `\\N[5]`; // code, not translation text
+		var msgText1 = `くんのレベルを10に上げて教会へと向かいましょう。\n空賊達が居なくなった`; //翻訳対象
+		var code2 = `\\swi[252]`; // code, not translation text
+		var msgText2 = `が、\n狩場に適してしるようですね。\n情報屋で情報を購入しておいた方が良いかも知れません。`; //翻訳対象
+		$gameVariables.setValue(134,
+		`${code1}${msgText1}${code2}${msgText2}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:313
+	AGH_evt0042_SnippetSetValue134 = function () {
+		var msgText1 = `そろそろ、尋問が終わって空賊達の拠点が\n割り出されているでしょうか`; //翻訳対象
+		$gameVariables.setValue(134,
+		`${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:314
+	AGH_evt0043_SnippetSetValue134 = function () {
+		var msgText1 = `集落へと向かいましょうか`; //翻訳対象
+		$gameVariables.setValue(134,
+		`${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:315
+	AGH_evt0044_SnippetSetValue134 = function () {
+		var msgText1 = `この集落のまとめ役の方に\n`; //翻訳対象
+		var code1 = `\\in[26]`; // code, not translation text
+		var msgText2 = `に関する\n情報を聞きに行きましょう`; //翻訳対象
+		$gameVariables.setValue(134,
+		`${msgText1}${code1}${msgText2}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:316
+	AGH_evt0045_SnippetSetValue134 = function () {
+		var code1 = `\\swi[254]`; // code, not translation text
+		var msgText1 = `へ向かいましょう。\n`; //翻訳対象
+		var code2 = `\\sim[424]`; // code, not translation text
+		var msgText2 = `や`; //翻訳対象
+		var code3 = `\\sim[425]`; // code, not translation text
+		var msgText3 = `対策を\nしておいた方が良いかも知れません。\n`; //翻訳対象
+		var code4 = `\\ain[175]`; // code, not translation text
+		var msgText4 = `などですね`; //翻訳対象
+		$gameVariables.setValue(134,
+		`${code1}${msgText1}${code2}${msgText2}${code3}${msgText3}${code4}${msgText4}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:317
+	AGH_evt0046_SnippetSetValue134 = function () {
+		var msgText1 = `この有様になった、原因がある筈です。\n墓地の中を調べていきましょう`; //翻訳対象
+		$gameVariables.setValue(134,
+		`${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:318
+	AGH_evt0047_SnippetSetValue134 = function () {
+		var code1 = `\\swi[254]`; // code, not translation text
+		var msgText1 = `のボスを討伐しましょう！`; //翻訳対象
+		$gameVariables.setValue(134,
+		`${code1}${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:319
+	AGH_evt0048_SnippetSetValue134 = function () {
+		var code1 = `\\swi[256]`; // code, not translation text
+		var msgText1 = `へ向かいましょう`; //翻訳対象
+		$gameVariables.setValue(134,
+		`${code1}${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:320
+	AGH_evt0049_SnippetSetValue134 = function () {
+		var msgText1 = `この森を抜ければ空賊団のアジトです。\n行きましょう`; //翻訳対象
+		$gameVariables.setValue(134,
+		`${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:321
+	AGH_evt0050_SnippetSetValue134 = function () {
+		var msgText1 = `さあ、アジトへと突入しましょう！`; //翻訳対象
+		$gameVariables.setValue(134,
+		`${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:322
+	AGH_evt0051_SnippetSetValue134 = function () {
+		var code1 = `\\swi[255]`; // code, not translation text
+		var msgText1 = `のボスを討伐しましょう！`; //翻訳対象
+		$gameVariables.setValue(134,
+		`${code1}${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:323
+	AGH_evt0052_SnippetSetValue134 = function () {
+		var msgText1 = `城を出ましょう`; //翻訳対象
+		$gameVariables.setValue(134,
+		`${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:324
+	AGH_evt0053_SnippetSetValue134 = function () {
+		var msgText1 = `宿に戻ってみんなと合流しましょう`; //翻訳対象
+		$gameVariables.setValue(134,
+		`${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:325
+	AGH_evt0054_SnippetSetValue134 = function () {
+		var msgText1 = `新しく発見されたという\n`; //翻訳対象
+		var code1 = `\\in[22]`; // code, not translation text
+		var msgText2 = `へ向かいましょう`; //翻訳対象
+		$gameVariables.setValue(134,
+		`${msgText1}${code1}${msgText2}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:326
+	AGH_evt0055_SnippetSetValue134 = function () {
+		var code1 = `\\swi[332]`; // code, not translation text
+		var msgText1 = `のボスを討伐しましょう！`; //翻訳対象
+		$gameVariables.setValue(134,
+		`${code1}${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:327
+	AGH_evt0056_SnippetSetValue134 = function () {
+		var code1 = `\\swi[223]`; // code, not translation text
+		var msgText1 = `へと向かい、\n`; //翻訳対象
+		var code2 = `\\N[2]`; // code, not translation text
+		var msgText2 = `さんと合流しましょう`; //翻訳対象
+		$gameVariables.setValue(134,
+		`${code1}${msgText1}${code2}${msgText2}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:328
+	AGH_evt0057_SnippetSetValue134 = function () {
+		var msgText1 = `雑貨屋に水着を買いに行きましょうか…`; //翻訳対象
+		$gameVariables.setValue(134,
+		`${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:329
+	AGH_evt0058_SnippetSetValue134 = function () {
+		var msgText1 = `浜辺に行って`; //翻訳対象
+		var code1 = `\\N[2]`; // code, not translation text
+		var msgText2 = `さんと合流しましょう。\nお昼でないと居ないでしょうから気を付けましょうね`; //翻訳対象
+		$gameVariables.setValue(134,
+		`${msgText1}${code1}${msgText2}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:330
+	AGH_evt0059_SnippetSetValue134 = function () {
+		var code1 = `\\swi[284]`; // code, not translation text
+		var msgText1 = `へ向かいましょう。`; //翻訳対象
+		$gameVariables.setValue(134,
+		`${code1}${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:331
+	AGH_evt0060_SnippetSetValue134 = function () {
+		var code1 = `\\swi[284]`; // code, not translation text
+		var msgText1 = `にある入口から中に入りましょう`; //翻訳対象
+		$gameVariables.setValue(134,
+		`${code1}${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:332
+	AGH_evt0061_SnippetSetValue134 = function () {
+		var code1 = `\\swi[285]`; // code, not translation text
+		var msgText1 = `の奥へと進みましょう──`; //翻訳対象
+		$gameVariables.setValue(134,
+		`${code1}${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:333
+	AGH_evt0062_SnippetSetValue134 = function () {
+		var code1 = `\\swi[286]`; // code, not translation text
+		var msgText1 = `のボスを討伐しましょう！`; //翻訳対象
+		$gameVariables.setValue(134,
+		`${code1}${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:334
+	AGH_evt0063_SnippetSetValue134 = function () {
+		var code1 = `\\swi[221]`; // code, not translation text
+		var msgText1 = `に戻って、\n`; //翻訳対象
+		var code2 = `\\N[4]`; // code, not translation text
+		var msgText2 = `さん達と合流しましょう`; //翻訳対象
+		$gameVariables.setValue(134,
+		`${code1}${msgText1}${code2}${msgText2}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:335
+	AGH_evt0064_SnippetSetValue134 = function () {
+		var msgText1 = `情報屋を訪ねましょう`; //翻訳対象
+		$gameVariables.setValue(134,
+		`${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:336
+	AGH_evt0065_SnippetSetValue134 = function () {
+		var code1 = `\\swi[334]`; // code, not translation text
+		var msgText1 = `へ向かいましょう。\n1層を通り抜けます`; //翻訳対象
+		$gameVariables.setValue(134,
+		`${code1}${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:337
+	AGH_evt0066_SnippetSetValue134 = function () {
+		var msgText1 = `小屋に突入しましょう`; //翻訳対象
+		$gameVariables.setValue(134,
+		`${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:338
+	AGH_evt0067_SnippetSetValue134 = function () {
+		var code1 = `\\swi[221]`; // code, not translation text
+		var msgText1 = `の宿に向かいましょう`; //翻訳対象
+		$gameVariables.setValue(134,
+		`${code1}${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:339
+	AGH_evt0068_SnippetSetValue134 = function () {
+		var msgText1 = `日中に王城へ向かいましょう`; //翻訳対象
+		$gameVariables.setValue(134,
+		`${msgText1}`);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:340, data/CommonEvents.json:common-event:341
+	AGH_evt0069_SnippetSetValue134 = function () {
+		var msgText1 = `どうしましょうか…`; //翻訳対象
+		$gameVariables.setValue(134,
+		`${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:342
+	AGH_evt0070_SnippetSetValue134 = function () {
+		var msgText1 = `宰相の元へ向かいましょう`; //翻訳対象
+		$gameVariables.setValue(134,
+		`${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:343
+	AGH_evt0071_SnippetSetValue134 = function () {
+		var msgText1 = `謁見の間で、騎士団長との戦いです`; //翻訳対象
+		$gameVariables.setValue(134,
+		`${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:344
+	AGH_evt0072_SnippetSetValue134 = function () {
+		var code1 = `\\swi[254]`; // code, not translation text
+		var msgText1 = `の祭殿へ向かいましょう。\nそこから、`; //翻訳対象
+		var code2 = `\\swi[257]`; // code, not translation text
+		var msgText2 = `へと行ける筈です`; //翻訳対象
+		$gameVariables.setValue(134,
+		`${code1}${msgText1}${code2}${msgText2}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:345
+	AGH_evt0073_SnippetSetValue134 = function () {
+		var code1 = `\\swi[257]`; // code, not translation text
+		var msgText1 = `へ向かいましょう`; //翻訳対象
+		$gameVariables.setValue(134,
+		`${code1}${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:346
+	AGH_evt0074_SnippetSetValue134 = function () {
+		var code1 = `\\swi[257]`; // code, not translation text
+		var msgText1 = `のボスを討伐しましょう！`; //翻訳対象
+		$gameVariables.setValue(134,
+		`${code1}${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:347
+	AGH_evt0075_SnippetSetValue134 = function () {
+		var msgText1 = `中で物音がしましたね。\n何か変化があったのかも知れません。\n行ってみましょう`; //翻訳対象
+		$gameVariables.setValue(134,
+		`${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:348
+	AGH_evt0076_SnippetSetValue134 = function () {
+		var msgText1 = `最期の決戦です…。\n『尊き契りの間』の`; //翻訳対象
+		var code1 = `\\set[7]`; // code, not translation text
+		var msgText2 = `を\n撃破しましょう！`; //翻訳対象
+		$gameVariables.setValue(134,
+		`${msgText1}${code1}${msgText2}`);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:349, data/CommonEvents.json:common-event:350
+	AGH_evt0077_SnippetSetValue134 = function () {
+		var msgText1 = `何処に行きましょうか？\n（メインクエスト完了）`; //翻訳対象
+		$gameVariables.setValue(134,
+		`${msgText1}`);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:12, data/CommonEvents.json:common-event:64
+	AGH_evt0078_SnippetSVal19 = function (interp, __a0) {
+		return (function (__a0) {
+		interp.sVal(19,Number($dataActors[$gameVariables.value(__a0)].meta['MainCloth']));
+		kisekae_tyokusetusitei($gameVariables.value(19),0);
+		}).call(interp, __a0);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:12
+	AGH_evt0079_SnippetConfigManager = function (__a0) {
+		ConfigManager.battleAniSpeed = __a0;
+	};
+
+	// Replaces (18x): data/CommonEvents.json:common-event:12, data/CommonEvents.json:common-event:212, data/CommonEvents.json:common-event:295, data/Map007.json:map-event:23:page:1, data/Map035.json:map-event:20:page:1, …
+	AGH_evt0080_SnippetSetValue83 = function (__a0, __a1) {
+		$gameVariables.setValue(__a0,__a1);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:13, data/CommonEvents.json:common-event:24
+	AGH_evt0081_SnippetGotItemInfo = function () {
+		$gameParty.gotItemInfo = [];
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:13, data/CommonEvents.json:common-event:22
+	AGH_evt0082_SnippetList248 = function (interp) {
+		return (function () {
+		var list = $gameVariables.value(248);
+		list.forEach(function(id) {
+		var value1 = getRandomIndex(61) + 40;
+		var actor = $gameActors.actor(id);
+		actor.gainTp(value1);
+		}, interp);
+		}).call(interp);
+	};
+
+	// Replaces (89x): data/CommonEvents.json:common-event:13, data/CommonEvents.json:common-event:96, data/CommonEvents.json:common-event:270, data/CommonEvents.json:common-event:301, data/CommonEvents.json:common-event:302, data/CommonEvents.json:common-event:303, …
+	AGH_evt0083_SnippetSetupChild60 = function (interp, __a0) {
+		return (function (__a0) {
+		interp.setupChild($dataCommonEvents[__a0].list, 0);
+		}).call(interp, __a0);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:14
+	AGH_evt0084_SnippetArr = function (__a0) {
+		var arr = pic_setArray3;
+		var valueParallelPic5 = arr[0];
+		var valueParallelPic6 = arr[1];
+		var valueParallelPic7 = arr[__a0];
+		valuePicWait2 = arr[2] + Math.floor( Math.random() * (arr[3] * 2 + 1)) - arr[3];
+		pic_set(valueParallelPic6,valueParallelPic5,
+		valueParallelPic7,valuePicWait2);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:14, data/CommonEvents.json:common-event:17
+	AGH_evt0085_SnippetArr111 = function () {
+		var arr1 = valueParallelPicSe1;
+		if(arr1[0] != 0){
+		  var value1 = getRandomIndex(11) + Number(arr1[1]);
+		  var value2 = getRandomIndex(21) + Number(arr1[2]);
+		  AudioManager.playSe({"name":arr1[0],"volume":value1,"pitch":value2,"pan":0});
+		};
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:15
+	AGH_evt0086_SnippetValue195 = function () {
+		var value1 = 95;
+		if($gameScreen.picture(value1)){
+		  var value7 = $gameScreen.picture(value1).origin();
+		  var value2 = $gameScreen.picture(value1).x() - 90;
+		  var value3 = $gameScreen.picture(value1).y();
+		  var value4 = $gameScreen.picture(value1).scaleX();
+		  var value5 = $gameScreen.picture(value1).scaleY();
+		  var value6 = $gameScreen.picture(value1).opacity();
+		  $gameScreen.movePicture(value1,value7,value2,value3,value4,value5,value6,0,1);
+		};
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:16, data/CommonEvents.json:common-event:205
+	AGH_evt0087_SnippetRefresh = function () {
+		$gamePlayer.refresh();
+		$gameMap.requestRefresh();
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:17
+	AGH_evt0088_SnippetValuePicWait = function (interp) {
+		return (function () {
+		if(valuePicWait >= 1){
+		  var value1 = getRandomIndex(3);
+		  interp.wait(valuePicWait + value1);
+		};
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:17
+	AGH_evt0089_SnippetValue153 = function (interp, __a0, __a1) {
+		return (function (__a0, __a1) {
+		var value1 = 53;
+		$gameScreen.movePicture(value1+2,1,640+50-128,384,100,100,240,0,__a0);
+		interp.wait(__a1);
+		}).call(interp, __a0, __a1);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:17
+	AGH_evt0090_SnippetValue153 = function (interp, __a0, __a1) {
+		return (function (__a0, __a1) {
+		var value1 = 53;
+		$gameScreen.movePicture(value1+2,1,640-50-128,384,100,100,240,0,__a0);
+		interp.wait(__a1);
+		}).call(interp, __a0, __a1);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:18, data/CommonEvents.json:common-event:53
+	AGH_evt0091_SnippetSetValue541 = function () {
+		for(var i = 541; i <= 560; i++){$gameVariables.setValue(i,Array(43).fill(0))};
+	};
+
+	// Replaces (7x): data/CommonEvents.json:common-event:18, data/CommonEvents.json:common-event:66, data/CommonEvents.json:common-event:67, data/CommonEvents.json:common-event:110, data/CommonEvents.json:common-event:212, data/Map005.json:map-event:2:page:1, …
+	AGH_evt0092_SnippetValue151 = function (__a0, __a1, __a2, __a3, __a4, __a5, __a6, __a7, __a8) {
+		var value1 = __a0;
+		var value2 = __a1;
+		$gameScreen.showPicture(value1,value2,1,640,384,__a2,__a3,__a4,0);
+		$gameScreen.movePicture(value1,1,640,384,__a5,__a6,__a7,0,__a8);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:19, data/CommonEvents.json:common-event:20, data/Map005.json:map-event:2:page:1
+	AGH_evt0093_SnippetValue151 = function (__a0, __a1, __a2, __a3, __a4, __a5) {
+		var value1 = __a0;
+		$gameScreen.movePicture(value1,1,640,384,100,__a1,0,0,__a2);
+		var value1 = __a3;
+		$gameScreen.movePicture(value1,1,640,384,100,__a4,0,0,__a5);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:19, data/CommonEvents.json:common-event:20
+	AGH_evt0094_SnippetList75 = function (interp) {
+		return (function () {
+		var list = valueTachieChangeStateTemporary;
+		list.forEach(function(id1) {
+		  var start = $gameVariables.value(75);
+		  var end = $gameVariables.value(76);
+		    for (var i = start; i <= end; i++) {
+		      $gameActors.actor(i).removeState(id1);
+		    };
+		}, interp);
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:19, data/CommonEvents.json:common-event:20
+	AGH_evt0095_SnippetList247 = function (interp) {
+		return (function () {
+		var list = $gameVariables.value(247);
+		list.forEach(function(id) {
+		  var actor = $gameActors.actor(id);
+		    if($gameParty.members().contains(actor)){
+		      var start = 0; var end = 42;
+		        for (var i = start; i <= end; i++) {
+		          $gameVariables.value(id+440)[i] = $gameVariables.value(id+540)[i]
+		        };
+		        $gameVariables.setValue(20,id);
+		        tachie_settei2();
+		}}, interp);
+		}).call(interp);
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:21, data/CommonEvents.json:common-event:173, data/CommonEvents.json:common-event:183, data/Map003.json:map-event:83:page:1
+	AGH_evt0096_SnippetValue1100 = function (__a0) {
+		var value1 = 100;
+		var value2 = 'ScreenFoundationChoice';
+		$gameScreen.showPicture(value1,value2,0,0,0+300,100,100,0,0);
+		$gameScreen.movePicture(value1,0,0,0,100,100,255,0,120);
+		var value1 = 99;
+		var value2 = __a0;
+		$gameScreen.showPicture(value1,value2,0,300+20,0,200,200,0,0);
+		$gameScreen.movePicture(value1,0,300,0,200,200,255,0,120);
+		$gameScreen.showPicture(98,'ScreenBlackOut',1,640,384,100,100,150,0);
+		picture_fade1(98,"fadeIn",valueWipeImg,60,5);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:21, data/Map003.json:map-event:75:page:1
+	AGH_evt0097_SnippetErasePicture70 = function (__a0, __a1) {
+		$gameScreen.erasePicture(__a0);
+		$gameScreen.erasePicture(__a1);
+	};
+
+	// Replaces (14x): data/CommonEvents.json:common-event:21, data/CommonEvents.json:common-event:111, data/CommonEvents.json:common-event:112, data/CommonEvents.json:common-event:167, data/CommonEvents.json:common-event:173, data/CommonEvents.json:common-event:183, …
+	AGH_evt0098_SnippetErasePicture99 = function (__a0, __a1) {
+		for (var i = __a0; i <= __a1; i++) {$gameScreen.erasePicture(i)};
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:22, data/CommonEvents.json:common-event:23
+	AGH_evt0099_SnippetJusei_clear = function () {
+		//受精してるキャラ以外の受精相手記録を消滅
+		jusei_clear();
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:22
+	AGH_evt0100_SnippetSVal539 = function (interp) {
+		var varCode49 = `\\V[49]`; // code, not translation text
+		var msgText1 = `は傷付いた身体を休めた…。\n`; //翻訳対象
+		return (function () {
+		interp.sVal(539,`${varCode49}${msgText1}`);
+		interp.sVal(540,$gameVariables.value(540) + 1);
+		}).call(interp);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:83
+	AGH_evt0101_SnippetSVal539 = function (interp) {
+		var msgText1 = `は`; //翻訳対象
+		var colorCode27 = `\\C[27]`; // code, not translation text
+		var msgText2 = `発情`; //翻訳対象
+		var colorReset = `\\C[0]`; // code, not translation text
+		var msgText3 = `した肢体を慰めている…。\n`; //翻訳対象
+		return (function () {
+		interp.sVal(539,`${actor.name()}${msgText1}${colorCode27}${msgText2}${colorReset}${msgText3}`);
+		interp.sVal(540,$gameVariables.value(540) + 1);
+		}).call(interp);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:83
+	AGH_evt0102_SnippetSVal539 = function (interp) {
+		var msgText1 = `は`; //翻訳対象
+		var colorCode27 = `\\C[27]`; // code, not translation text
+		var msgText2 = `発情`; //翻訳対象
+		var colorReset = `\\C[0]`; // code, not translation text
+		var msgText3 = `した肢体を持て余している…。\n`; //翻訳対象
+		return (function () {
+		interp.sVal(539,`${actor.name()}${msgText1}${colorCode27}${msgText2}${colorReset}${msgText3}`);
+		interp.sVal(540,$gameVariables.value(540) + 1);
+		}).call(interp);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:23
+	AGH_evt0103_SnippetWindowManager22 = function () {
+		var code1 = `\\fs[22]`; // code, not translation text
+		var varCode539 = `\\V[539]`; // code, not translation text
+		WindowManager.drawText(1, `${code1}${varCode539}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:23
+	AGH_evt0104_SnippetWindowManager28 = function () {
+		var code1 = `\\fs[28]`; // code, not translation text
+		var varCode539 = `\\V[539]`; // code, not translation text
+		WindowManager.drawText(1, `${code1}${varCode539}`);
+	};
+
+	// Replaces (1x): data/Map003.json:map-event:161:page:1
+	AGH_evt0105_SnippetWindowManager = function () {
+		WindowManager.drawText(0, ``);
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:23, data/CommonEvents.json:common-event:25, data/CommonEvents.json:common-event:30, data/CommonEvents.json:common-event:54
+	AGH_evt0106_SnippetSetValue176 = function (__a0, __a1, __a2, __a3, __a4) {
+		$gameVariables.setValue(__a0,[__a1,__a2,__a3]);
+		set_playerPosition2(__a4);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:24, data/Map003.json:map-event:131:page:2
+	AGH_evt0107_SnippetStart75 = function () {
+		var start = 1;
+		var end = $dataSkills.length-1;
+		for (var i = start; i <= end; i++) {
+		  if($dataSkills[i].meta['Not Recover All Uses']){
+		      for (var j = $gameVariables.value(75); j <= $gameVariables.value(76); j++) {
+		        var value1 = Number($dataSkills[i].meta['Limit Uses']);
+		        $gameActors.actor(j).paySkillLimitedUseCost(i, -value1);
+		      };
+		  };
+		};
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:24, data/Map003.json:map-event:131:page:2
+	AGH_evt0108_SnippetStart75 = function () {
+		var start = 1;
+		var end = $dataStates.length-1;
+		for (var i = start; i <= end; i++) {
+		  if($dataStates[i].meta['Category']){
+		    if($dataStates[i].meta['Category'] === ' StateSPabNomal'){
+		      for (var j = $gameVariables.value(75); j <= $gameVariables.value(76); j++) {
+		        $gameActors.actor(j).removeState(i);
+		      };
+		    };
+		  };
+		};
+	};
+
+	// Replaces (5x): data/CommonEvents.json:common-event:29, data/CommonEvents.json:common-event:40
+	AGH_evt0109_SnippetValueMenuCloth = function (__a0) {
+		valueMenuCloth = __a0;
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:29, data/CommonEvents.json:common-event:30
+	AGH_evt0110_SnippetSetValue71 = function (__a0, __a1) {
+		$gameVariables.setValue(71,__a0);//ティッカー。計算式で使うため
+		$gameVariables.setValue(185,__a1);//TickerＹ軸変更
+	};
+
+	// Replaces (8x): data/CommonEvents.json:common-event:30, data/CommonEvents.json:common-event:64, data/CommonEvents.json:common-event:104, …
+	AGH_evt0111_SnippetUpdateRows = function () {
+		$gameParty.updateRows();
+	};
+
+	// Replaces (6x): data/CommonEvents.json:common-event:30, data/CommonEvents.json:common-event:64
+	AGH_evt0112_SnippetSetValue53 = function (__a0, __a1) {
+		$gameVariables.setValue(53,$gameActors.actor($gameVariables.value(__a0)).nickname());
+		$gameVariables.setValue(49,$gameActors.actor($gameVariables.value(__a1)).name());
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:30, data/CommonEvents.json:common-event:221
+	AGH_evt0113_SnippetHasItem240 = function () {
+		if(!$gameParty.hasItem($dataItems[$gameVariables.value(240)])){
+		  $gameSwitches.setValue(74,true);
+		};
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:37
+	AGH_evt0114_SnippetOriginal_autoEventFlag = function () {
+		//original_autoEventFlag();
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:37
+	AGH_evt0115_SnippetSetValue440 = function () {
+		if($gameVariables.value(1+440)[41] == 2){
+		  $gameSwitches.setValue(516,true);
+		} else {
+		  $gameSwitches.setValue(516,false);
+		};
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:40
+	AGH_evt0116_SnippetMembers61 = function () {
+		for (var i = 0; i < $gameParty.members().length; i++) {
+		  if ($gameParty.members()[i].isStateAffected(61) && !$gameParty.members()[i].isStateAffected(71)) {
+		    $gameParty.members()[i].addState(71);
+		}};
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:40
+	AGH_evt0117_SnippetActor863 = function () {
+		//オーバードーズ状態でスイッチオンオフ
+		var actor = $gameActors.actor($gameVariables.value(2));
+		var value1 = 863;
+		var value2 = 502;
+		if(actor.battleSkillsRaw().includes(value1)){
+		$gameSwitches.setValue(value2,true);
+		} else {
+		$gameSwitches.setValue(value2,false);
+		};
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:40
+	AGH_evt0118_SnippetOnoff11 = function () {
+		//主人公性欲度スキルでonoff
+		var actor = $gameActors.actor($gameVariables.value(11));
+		var start = 1;
+		var end = 10;
+		for (var i = start; i <= end; i++) {
+		if(actor.isLearnedSkill(i + 60)){
+		$gameSwitches.setValue(i + 400,true);
+		} else {
+		$gameSwitches.setValue(i + 400,false);
+		}};
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:40
+	AGH_evt0119_SnippetList = function (interp) {
+		return (function () {
+		//習得者不在時に自動でスイッチオフ
+		var list = valuePersonalSkill;
+		list.forEach(function(id) {
+		  if($dataSkills[id].meta.SwicthOnOffUse){
+		    if($gameParty.membersLeSkill(id)){}else{
+		      skill_personalonoffAutoOff(id,0);
+		  }};
+		}, interp);
+		}).call(interp);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:40
+	AGH_evt0120_SnippetList = function (interp) {
+		return (function () {
+		//習得者不在時に自動でスイッチオフ
+		var list = valuePersonalItem;
+		list.forEach(function(id) {
+		  if($dataItems[id].meta.SwicthOnOffUse){
+		    if(!$gameParty.hasItem($dataItems[id],true)){
+		      skill_personalonoffAutoOff(id,1);
+		  }};
+		}, interp);
+		}).call(interp);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:40
+	AGH_evt0121_SnippetStart75 = function () {
+		//現在の視点によってスイッチ切り替え
+		var start = $gameVariables.value(75);
+		var end = $gameVariables.value(76);
+		for (var i = start; i <= end; i++) {
+		  $gameSwitches.setValue(440 + i,false);
+		  if($gameVariables.value(11) == i){
+		    $gameSwitches.setValue(440 + i,true);
+		  };
+		};
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:42, data/CommonEvents.json:common-event:47
+	AGH_evt0122_SnippetTickerManager = function () {
+		var msgText1 = `未発生のシーンは存在しません。`; //翻訳対象
+		TickerManager.show(`${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:66
+	AGH_evt0123_SnippetTickerManager = function () {
+		var msgText1 = `条件が変動した為、現在このマップで発生する挿話はありません`; //翻訳対象
+		TickerManager.show(`${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:68
+	AGH_evt0124_SnippetTickerManager = function () {
+		var msgText1 = `戦闘マップではクイックセーブを行なえません`; //翻訳対象
+		TickerManager.show(`${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:68
+	AGH_evt0125_SnippetTickerManager = function () {
+		var msgText1 = `回想中はクイックセーブを行なえません`; //翻訳対象
+		TickerManager.show(`${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:68
+	AGH_evt0126_SnippetTickerManager = function () {
+		var msgText1 = `ファイル５１にクイックセーブしました`; //翻訳対象
+		TickerManager.show(`${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:68
+	AGH_evt0127_SnippetTickerManager = function () {
+		var msgText1 = `最終使用ファイルにクイックセーブしました`; //翻訳対象
+		TickerManager.show(`${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:68
+	AGH_evt0128_SnippetTickerManager = function () {
+		var msgText1 = `ファイル１にクイックセーブしました`; //翻訳対象
+		TickerManager.show(`${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:202
+	AGH_evt0129_SnippetTickerManager = function () {
+		var msgText1 = `戦闘速度を最速に変更しました`; //翻訳対象
+		TickerManager.show(`${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:202
+	AGH_evt0130_SnippetTickerManager = function () {
+		var msgText1 = `戦闘速度を速いに変更しました`; //翻訳対象
+		TickerManager.show(`${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:202
+	AGH_evt0131_SnippetTickerManager = function () {
+		var msgText1 = `戦闘速度を通常に変更しました`; //翻訳対象
+		TickerManager.show(`${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:259
+	AGH_evt0132_SnippetTickerManager801 = function () {
+		var varCode801 = `\\V[801]`; // code, not translation text
+		TickerManager.show(`${varCode801}`);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:44, data/CommonEvents.json:common-event:45
+	AGH_evt0133_SnippetPic_move151 = function () {
+		for (var i = 51; i <= 60; i++) {
+		  pic_move1(i,-100,0,100,100,0,60);
+		};
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:44, data/CommonEvents.json:common-event:45
+	AGH_evt0134_SnippetValueWordSetEx = function () {
+		valueWordSetEx = 0;
+	};
+
+	// Replaces (8x): data/CommonEvents.json:common-event:47, data/CommonEvents.json:common-event:166, data/CommonEvents.json:common-event:173, data/CommonEvents.json:common-event:174, data/CommonEvents.json:common-event:176, data/CommonEvents.json:common-event:183, …
+	AGH_evt0135_SnippetVnChoices = function () {
+		$gameSystem.vnChoices = false;
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:47, data/CommonEvents.json:common-event:87
+	AGH_evt0136_SnippetPic_eraseP101 = function (__a0, __a1, __a2) {
+		for (var i = __a0; i <= __a1; i++) {pic_eraseP(__a2,[i])};
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:49
+	AGH_evt0137_SnippetDelete = function () {
+		delete window.$dataMap2;
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:52
+	AGH_evt0138_SnippetValue2640 = function (__a0, __a1, __a2) {
+		var value2 = __a0;
+		var valueItems = $dataItems;var end = valueItems.length-1;
+		var j = 1;
+		for(var i = 1; i <= end; i++){
+		  for(var i1 = 1; i1 <= 9; i1++){
+		    if(valueItems[i].meta[value2+i1]){
+		      var value1 = valueItems[i].meta[value2+i1].split(',')[__a1];
+		      var value1 = __a2 + value1;
+		      console.log(`${i}  ${value1}`);
+		      $gameScreen.showPicture(j,value1,1,640-128,384,100,100,255,0);
+		      j += 1;
+		}}};
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:52
+	AGH_evt0139_SnippetValue2640 = function (__a0) {
+		var value2 = __a0;
+		var valueItems = $dataWeapons;var end = valueItems.length-1;
+		var j = 1;
+		for(var i = 1; i <= end; i++){
+		  if(valueItems[i].meta[value2]){
+		    var value1 = valueItems[i].meta[value2].split(',')[0];
+		      var value1 = '/img/parallaxes/' + value1;
+		      console.log(`${i}  ${value1}`);
+		    $gameScreen.showPicture(j,value1,1,640-128,384,100,100,255,0);
+		    j += 1;
+		}};
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:52
+	AGH_evt0140_SnippetValue2100 = function (__a0) {
+		var value2 = __a0;
+		var valueItems = $dataItems;var end = valueItems.length-1;
+		var j = 1;
+		for(var i = 1; i <= end; i++){
+		  if(valueItems[i].meta[value2]){
+		    var value1 = valueItems[i].meta[value2].split(',')[0];
+		    if(value1 != 'NoMusic'){
+		      console.log(`${i}  ${value1}`);
+		    AudioManager.playBgm({"name":value1,"volume":100,"pitch":100,"pan":0});
+		    j += 1;
+		}}};
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:52
+	AGH_evt0141_SnippetValue2100 = function (__a0) {
+		var value2 = __a0;
+		var valueItems = $dataWeapons;var end = valueItems.length-1;
+		var j = 1;
+		for(var i = 1; i <= end; i++){
+		  if(valueItems[i].meta[value2]){
+		    var value1 = valueItems[i].meta[value2].split(',')[0];
+		    if(value1 != 'NoMusic'){
+		      console.log(`${i}  ${value1}`);
+		    AudioManager.playBgm({"name":value1,"volume":100,"pitch":100,"pan":0});
+		    j += 1;
+		}}};
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:53, data/Map007.json:map-event:2:page:1
+	AGH_evt0142_SnippetArr301 = function () {
+		//ｱｸﾀｰID,ﾋﾟｸﾁｬ,H相手(301ﾓﾌﾞ305対象なし306アイテム),非表示,簡易,過去シーンか否か
+		//var arr = [1,2,3,4,5];$gameVariables.setValue(401,arr[getRandomIndex(arr.length)]);
+		//this.sVal(506,`\\V[94]は\\V[22]に情報の対価としてセクハラされた…。`);
+		//this.sVal(506,`\\V[94]はモブにセクハラされた…。`);
+		
+		i1 = getRandomIndex(3) + 100;
+		var arr1 = [1,2,3,4,5];
+		i2 = arr1[getRandomIndex(arr1.length)];
+		//var value3 = $gameTroop.aliveMembers().length;
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:53
+	AGH_evt0143_SnippetConsole52 = function (__a0) {
+		console.log($gameVariables.value(__a0));
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:53, data/Map007.json:map-event:7:page:1
+	AGH_evt0144_SnippetDataItems51 = function (__a0, __a1) {
+		for(var i = __a0; i <= __a1; i++){
+		if (!$dataItems[i].name == '') {
+		$gameParty.gainItem($dataItems[i], 15);
+		}};
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:53, data/Map003.json:map-event:3:page:1
+	AGH_evt0145_SnippetConsole20 = function () {
+		console.log($gameActors.actor(20));
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:53, data/CommonEvents.json:common-event:199
+	AGH_evt0146_SnippetConsole19 = function (__a0) {
+		console.log(__a0);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:54, data/CommonEvents.json:common-event:301
+	AGH_evt0147_SnippetValuePic1101 = function () {
+		valuePic1 = 101;
+		var value2 = 'ScreenBlackOut';
+		$gameScreen.showPicture(valuePic1,value2,1,640,384,100,100,255,0);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:59, data/CommonEvents.json:common-event:60
+	AGH_evt0148_SnippetValueTalkSet = function () {
+		valueTalkSet = 0;
+		valueTalkarr1 = [];
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:60
+	AGH_evt0149_SnippetValue1 = function () {
+		var msgText1 = `Tips:`; //翻訳対象
+		var colorCode3 = `\\C[3]`; // code, not translation text
+		var colorReset = `\\C[0]`; // code, not translation text
+		var msgText2 = `を獲得`; //翻訳対象
+		  var value1 = `${msgText1}${colorCode3}${valueTalkSet[0]}${colorReset}${msgText2}`;
+		  CommonPopupManager.showInfo({},value1,null);
+	};
+
+	// Replaces (1x): data/Map003.json:map-event:3:page:2
+	AGH_evt0150_SnippetValue160 = function () {
+		var value1 = `60 seconds Waiting…`;
+		CommonPopupManager.showInfo({},value1,null);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:60
+	AGH_evt0151_SnippetValue1 = function () {
+		var value1 = 'easeOutQuad';//通常顔グラ演出
+		picture_easingConfiguration(value1);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:60, data/Map007.json:map-event:4:page:1
+	AGH_evt0152_SnippetValue1 = function (__a0) {
+		var value1 = __a0;
+		picture_easingConfiguration(value1);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:60
+	AGH_evt0153_SnippetArr1781 = function (__a0, __a1, __a2) {
+		var arr1 = valueTalkSet;
+		var actor = $gameActors.actor(arr1[1]);
+		if(arr1[0] == 1){actor.addState(__a0)};
+		if(arr1[0] == 2){pic_locationSet(91,92,"/img/talkface/" + arr1[1] + __a1,60,0)};
+		if(arr1[0] == 0){
+		  actor.removeState(__a2);
+		  pic_move1(92,0,0,100,100,0,120);
+		};
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:60
+	AGH_evt0154_SnippetValue2101 = function () {
+		var value2 = 'ScreenBlackOut';
+		$gameScreen.showPicture(101,value2,1,640,384,100,100,valueTalkSet[3],0);
+		picture_fade1(101,"fadeIn",valueWipeImg,60,5);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:61, data/CommonEvents.json:common-event:62
+	AGH_evt0155_SnippetSVal131 = function (interp, __a0) {
+		return (function (__a0) {
+		interp.sVal(131,__a0);interp.sVal(14,1);//ｺﾓﾝID・変数ID
+		interp.sVal(121,0);interp.sVal(122,0);interp.sVal(123,0);
+		interp.setupChild($dataCommonEvents[$gameVariables.value(131)].list, 0);
+		//
+		}).call(interp, __a0);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:61
+	AGH_evt0156_SnippetAudioManager100 = function () {
+		var msgText1 = `鼓動`; //翻訳対象
+		AudioManager.playSe({"name":`${msgText1}`,"volume":100,"pitch":$gameVariables.value(122),"pan":0})
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:62
+	AGH_evt0157_SnippetAudioManager100 = function () {
+		AudioManager.playSe({"name":"Z_HeartBeat","volume":100,"pitch":$gameVariables.value(122),"pan":0})
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:61, data/CommonEvents.json:common-event:62
+	AGH_evt0158_SnippetStartFlash255 = function () {
+		$gameScreen.startFlash([255,119,255,200], $gameVariables.value(121))
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:61, data/CommonEvents.json:common-event:62
+	AGH_evt0159_SnippetStartShake121 = function () {
+		$gameScreen.startShake(7, 7, $gameVariables.value(121))
+	};
+
+	// Replaces (5x): data/CommonEvents.json:common-event:63, data/CommonEvents.json:common-event:64
+	AGH_evt0160_SnippetActor21 = function (__a0, __a1) {
+		$gameActors.actor(__a0).setName($gameVariables.value(__a1))
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:64, data/CommonEvents.json:common-event:401, data/Map100.json:map-event:11:page:1
+	AGH_evt0161_SnippetSVal14 = function (interp, __a0, __a1, __a2) {
+		return (function (__a0, __a1, __a2) {
+		interp.sVal(__a0,__a1);
+		interp.setupChild($dataCommonEvents[__a2].list, 0);
+		}).call(interp, __a0, __a1, __a2);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:64
+	AGH_evt0162_SnippetSetValue126 = function (__a0, __a1, __a2, __a3) {
+		$gameVariables.setValue(__a0,$gameVariables.value(__a1) - $gameVariables.value(__a2) - $gameVariables.value(__a3));
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:64
+	AGH_evt0163_SnippetCharacter121 = function (interp) {
+		return (function () {
+		interp.character($gameVariables.value(121)).forceMoveRoute({
+		"list":[
+		{"code":36},{"code":37},{"code":29, "parameters":[$gameVariables.value(122)]},
+		{"code":30, "parameters":[$gameVariables.value(123)]},
+		{ "code": 45, "parameters": ["this.requestAnimation($gameVariables.value(124));"] },
+		{ "code": 45, "parameters": ["this.jumpEx($gameVariables.value(125),$gameVariables.value(126),$gameVariables.value(127),$gameVariables.value(128));"] },
+		{"code":25},{"code":32},{"code":34},{"code":35},
+		//{ "code": 45, "parameters": ["this.startOpacity(60,$gameVariables.value(129));"] },
+		{"code":0}],"repeat":false,"skippable":true});
+		interp._character = interp.character($gameVariables.value(121))
+		interp.setWaitMode('route')
+		}).call(interp);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:64
+	AGH_evt0164_SnippetValue1 = function (interp) {
+		var msgText1 = `パーティが再集合されました`; //翻訳対象
+		return (function () {
+		value1 = `${msgText1}`;
+		var args = new Array( String(value1) ); 
+		interp.pluginCommand("ShowInfo", args);
+		}).call(interp);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:64
+	AGH_evt0165_SnippetValue1 = function (interp) {
+		var msgText1 = `パーティが一時解散されました`; //翻訳対象
+		return (function () {
+		value1 = `${msgText1}`;
+		var args = new Array( String(value1) ); 
+		interp.pluginCommand("ShowInfo", args);
+		}).call(interp);
+	};
+
+	// Replaces (7x): data/CommonEvents.json:common-event:64, data/CommonEvents.json:common-event:373, data/Map054.json:map-event:2:page:1, data/Map054.json:map-event:2:page:2, data/Map054.json:map-event:2:page:3, data/Map054.json:map-event:2:page:4, …
+	AGH_evt0166_SnippetSVal14 = function (interp, __a0) {
+		return (function (__a0) {
+		interp.sVal(14,__a0);//パーティ一時解散コモン
+		interp.setupChild($dataCommonEvents[64].list, 0);
+		}).call(interp, __a0);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:64
+	AGH_evt0167_SnippetActor20 = function () {
+		$gameActors.actor($gameVariables.value(20)).refresh();
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:64
+	AGH_evt0168_SnippetPic_move1100 = function () {
+		for (var i = 1; i <= 7; i++) {
+		  pic_move1(100+i,0,30,-500,0);
+		};
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:64
+	AGH_evt0169_SnippetAddActor20 = function () {
+		$gameParty.addActor($gameVariables.value(20));
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:64
+	AGH_evt0170_SnippetActor20 = function (__a0) {
+		$gameActors.actor($gameVariables.value(20)).learnSkill(__a0);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:64
+	AGH_evt0171_SnippetAddActor = function (__a0) {
+		$gameParty.addActor($gameVariables.value(__a0))
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:66, data/CommonEvents.json:common-event:87
+	AGH_evt0172_SnippetWindowManager = function () {
+		WindowManager.hide(1);
+		WindowManager.hide(2);
+		WindowManager.hide(3);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:66, data/Map007.json:map-event:23:page:1
+	AGH_evt0173_SnippetErasePicture13 = function (__a0) {
+		$gameScreen.erasePicture(__a0);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:66, data/CommonEvents.json:common-event:212
+	AGH_evt0174_SnippetSVal131 = function (interp, __a0, __a1) {
+		return (function (__a0, __a1) {
+		interp.sVal(131,64);interp.sVal(14,__a0);//ｺﾓﾝID・変数ID
+		interp.sVal(121,0);interp.sVal(122,0);interp.sVal(__a1,0);
+		interp.setupChild($dataCommonEvents[$gameVariables.value(131)].list, 0);
+		}).call(interp, __a0, __a1);
+	};
+
+	// Replaces (10x): data/CommonEvents.json:common-event:66, data/CommonEvents.json:common-event:173, data/CommonEvents.json:common-event:183, data/CommonEvents.json:common-event:192, data/CommonEvents.json:common-event:203, data/CommonEvents.json:common-event:237, …
+	AGH_evt0175_SnippetVnChoices = function () {
+		$gameSystem.vnChoices = true;
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:72, data/Map005.json:map-event:2:page:1
+	AGH_evt0176_SnippetWindow = function () {
+		window.close()
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:73
+	AGH_evt0177_SnippetArgs509 = function (interp) {
+		var msgText1 = `ファイル`; //翻訳対象
+		var varCode509 = `\\V[509]`; // code, not translation text
+		var msgText2 = `にオートセーブしました`; //翻訳対象
+		return (function () {
+		var args = new Array( `${msgText1}${varCode509}${msgText2}`);
+		interp.pluginCommand("ShowInfo", args);
+		}).call(interp);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:73
+	AGH_evt0178_SnippetArgs51 = function (interp) {
+		var msgText1 = `ファイル51にオートセーブしました`; //翻訳対象
+		return (function () {
+		var args = new Array( `${msgText1}`);
+		interp.pluginCommand("ShowInfo", args);
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:77, data/CommonEvents.json:common-event:78
+	AGH_evt0179_SnippetValue1706 = function (interp, __a0) {
+		return (function (__a0) {
+		var value1 = $gameVariables.value(706)[3];
+		var value1 = getRandomIndex(__a0) + value1-30;
+		interp.wait(value1);
+		}).call(interp, __a0);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:78
+	AGH_evt0180_SnippetWait60 = function (interp, __a0) {
+		return (function (__a0) {
+		interp.wait(__a0)
+		}).call(interp, __a0);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:85
+	AGH_evt0181_SnippetSeiyoku_hanei = function () {
+		//性欲度情報を更新
+		seiyoku_hanei();
+	};
+
+	// Replaces (5x): data/CommonEvents.json:common-event:85, data/CommonEvents.json:common-event:109, data/CommonEvents.json:common-event:110, data/CommonEvents.json:common-event:113, data/CommonEvents.json:common-event:159
+	AGH_evt0182_SnippetSVal401 = function (interp) {
+		return (function () {
+		for(var i = 401; i <= 440; i++){interp.sVal(i,0)};
+		}).call(interp);
+	};
+
+	// Replaces (7x): data/CommonEvents.json:common-event:85, data/CommonEvents.json:common-event:401, data/CommonEvents.json:common-event:516, data/CommonEvents.json:common-event:546, data/Map200.json:map-event:11:page:1, …
+	AGH_evt0183_SnippetSVal506 = function (interp, __a0, __a1) {
+		return (function (__a0, __a1) {
+		interp.sVal(__a0,__a1);
+		}).call(interp, __a0, __a1);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:536
+	AGH_evt0184_SnippetSVal23 = function (interp) {
+		var msgText1 = `の`; //翻訳対象
+		return (function () {
+		interp.sVal(23,`${$gameVariables.value(1+380)[56]}${msgText1}${$gameVariables.value(1+380)[53]}`);
+		}).call(interp);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:86, data/CommonEvents.json:common-event:245
+	AGH_evt0185_SnippetValue1 = function (__a0, __a1, __a2) {
+		var value1 = __a0;
+		$gameScreen._particle.particlePlay(0,value1,__a1,'def',__a2);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:86, data/CommonEvents.json:common-event:179
+	AGH_evt0186_SnippetSetValue30 = function (__a0, __a1) {
+		$gameVariables.setValue(__a0,__a1);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:103
+	AGH_evt0187_SnippetSetValue332 = function () {
+		var icon296 = `\\I[296]`; // code, not translation text
+		var icon313 = `\\I[313]`; // code, not translation text
+		$gameVariables.setValue(332,`${icon296}:${Math.round(valueTotalexp)}${icon313}:${Math.round(valueTotalgold)}`);
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:139:page:1, data/Map003.json:map-event:140:page:1
+	AGH_evt0188_SnippetSetValue801 = function () {
+		var msgText1 = `残念だったわね？`; //翻訳対象
+		$gameVariables.setValue(801,`${msgText1}`);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:87
+	AGH_evt0189_SnippetParticleUpdate = function () {
+		$gameScreen._particle.particleUpdate(['hStates_bodyShine1','emitterLifetime',1]);
+		$gameScreen._particle.particleClear('hStates_bodyShine1');
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:87
+	AGH_evt0190_SnippetActor20 = function (interp) {
+		var code1 = `\\>`; // code, not translation text
+		return (function () {
+		var actor = $gameActors.actor($gameVariables.value(20));
+		$gameMessage.newPage();
+		$gameMessage.add(`${code1}${actor.profile()}`);
+		interp.setWaitMode('message');
+		}).call(interp);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:87
+	AGH_evt0191_SnippetActor20 = function (interp) {
+		var code1 = `\\SP[0]`; // code, not translation text
+		return (function () {
+		var actor = $gameActors.actor($gameVariables.value(20));
+		$gameMessage.newPage();
+		$gameMessage.add(`${code1}${actor.profile()}`);
+		interp.setWaitMode('message');
+		}).call(interp);
+	};
+
+	// Replaces (5x): data/CommonEvents.json:common-event:87, data/CommonEvents.json:common-event:256
+	AGH_evt0192_SnippetArray360 = function (__a0, __a1, __a2) {
+		var array = [0];
+		var arr1 = $gameVariables.value(360 + $gameVariables.value(20));
+		for (var i = __a0; i <= __a1; i++) {
+		if(arr1[i] >= 1){
+		array.push(arr1[i]);
+		}};
+		var max = array.reduce(function(a,b){  
+		return Math.max(a,b);
+		});
+		if(max >= 1){
+		$gameSwitches.setValue(__a2,true);
+		};
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:87
+	AGH_evt0193_SnippetValueGraphicsWidth = function (__a0) {
+		valueGraphicsWidth = __a0;
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:87, data/CommonEvents.json:common-event:256
+	AGH_evt0194_SnippetActor_Hhennreki219 = function () {
+		actor_Hhennreki2($gameVariables.value(19));
+		//選択肢番号は、実際の配列番号+1にしている。
+		//もしピクチャ表示する場合は注意。
+	};
+
+	// Replaces (9x): data/CommonEvents.json:common-event:87, data/CommonEvents.json:common-event:166, data/CommonEvents.json:common-event:203, data/CommonEvents.json:common-event:238, data/CommonEvents.json:common-event:239, data/CommonEvents.json:common-event:241, …
+	AGH_evt0195_SnippetWindowManager = function () {
+		WindowManager.hideAll();
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:90
+	AGH_evt0196_SnippetSVal21 = function (interp) {
+		return (function () {
+		interp.sVal(21,
+		);
+		}).call(interp);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:92, data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
+	AGH_evt0197_SnippetValue151 = function () {
+		var value1 = 51;
+		picture_fade1(value1,"fadeOut",'Hscene005',300,5);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:94
+	AGH_evt0198_SnippetMovePicture60 = function (interp, __a0, __a1, __a2) {
+		return (function (__a0, __a1, __a2) {
+		var value = 60;
+		$gameScreen.movePicture(__a0+1+value,1,1280/2,768/2,100,100,0,0,__a1);
+		interp.wait(__a2);
+		}).call(interp, __a0, __a1, __a2);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:101
+	AGH_evt0199_SnippetValue225 = function (interp) {
+		var msgText1 = `カットインエネミー演出色々`; //翻訳対象
+		var msgText2 = `敵カットイン`; //翻訳対象
+		return (function () {
+		var value2 = 'CutInCG_EnemyDefeat';
+		valueCutInSet1 = [`${msgText1}`,value2,0,2.0,2.0,25,60];
+		var args = new Array(String(valueCutInSet1[0]));
+		interp.pluginCommand(`${msgText2}`, args);
+		}).call(interp);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:104
+	AGH_evt0200_SnippetValue220 = function (interp) {
+		var msgText1 = `Ｈシーン演出`; //翻訳対象
+		var msgText2 = `味方カットイン`; //翻訳対象
+		return (function () {
+		var value2 = `Zev_BattleMasturbation${$gameVariables.value(20)}_1`;
+		valueCutInSet1 = [`${msgText1}`,value2,270,1.5,1.2,25,60];
+		var args = new Array(String(valueCutInSet1[0]));
+		interp.pluginCommand(`${msgText2}`, args);
+		}).call(interp);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:101
+	AGH_evt0201_SnippetValue111 = function () {
+		var msgText1 = `達`; //翻訳対象
+		var value1 = `${$gameActors.actor($gameVariables.value(11)).name()}`;
+		if($gameParty.battleMembers().length >= 2){
+		  value1 += `${msgText1}`;
+		};
+		$gameVariables.setValue(49,value1);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:496, data/CommonEvents.json:common-event:516
+	AGH_evt0202_SnippetValue1530 = function () {
+		var msgText1 = `一行`; //翻訳対象
+		var value1 = `${$gameActors.actor($gameVariables.value(530)).name()}`;
+		if($gameParty.battleMembers().length >= 2){
+		  value1 += `${msgText1}`;
+		};
+		$gameVariables.setValue(21,value1);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:101
+	AGH_evt0203_SnippetSet_homeMoveForced = function () {
+		set_homeMoveForced();//拠点に強制移動
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:102
+	AGH_evt0204_SnippetValueBattleSexCountArr21 = function () {
+		valueBattleSexCountArr = Array(21).fill(0);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:102
+	AGH_evt0205_SnippetDataSystem = function () {
+		$dataSystem.optSideView = true;
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:102
+	AGH_evt0206_SnippetValueCollapseAnime = function () {
+		valueCollapseAnime = 0;
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:102
+	AGH_evt0207_SnippetValueScriptArray182 = function () {
+		valueScriptArray1 = [0,0,0,0,0,0,0,0,0,0,0];
+		var value1 = 82;
+		if($gameParty.membersState(value1)){
+		  for (var i = 0; i < $gameParty.members().length; i++) {
+		    var actor = $gameParty.members()[i];
+		      if(actor.isStateAffected(value1)){
+		        if(actor._stateCounter[value1] >= 0){
+		          valueScriptArray1[i] = actor._stateCounter[value1];
+		}}}};
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:102
+	AGH_evt0208_SnippetMembers = function () {
+		for (var i = 0; i < $gameParty.members().length; i++) {
+		  var actor = $gameParty.members()[i];
+		  actor.clearStateCounters();
+		};
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:102
+	AGH_evt0209_SnippetValue182 = function () {
+		var value1 = 82;
+		for (var i = 0; i < valueScriptArray1.length; i++) {
+		  if(valueScriptArray1[i] >= 1){
+		    if($gameParty.members()[i].isStateAffected(value1)){
+		      $gameParty.members()[i].setStateCounter(value1, valueScriptArray1[i]);
+		}}};
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:102
+	AGH_evt0210_SnippetList = function (interp) {
+		return (function () {
+		var list = valueStateBattleClear;
+		const battlers = $gameParty.battleMembers(); list.forEach(function(id) {
+		  if($gameParty.membersState(id)){
+		    for (let i = 0; i < battlers.length; i++) {
+		      const actor = battlers[i];
+		      if($gameParty.members().contains(actor)){
+		        if(actor.isStateAffected(id)){
+		          actor.removeStateCounter(id);
+		    }}};
+		  };
+		}, interp);
+		}).call(interp);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:102
+	AGH_evt0211_SnippetValueTotalexp = function () {
+		valueTotalexp = 1;
+		valueTotalgold = 1;
+		valueMaxEnemyLv = 0;
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:102
+	AGH_evt0212_SnippetBattleMembers486 = function () {
+		for (var i = 0; i < $gameParty.battleMembers().length; i++) {
+		  var actor = $gameParty.battleMembers()[i];
+		  actor.clearParamPlus();
+		  actor.clearXParamPlus();
+		  actor.clearSParamPlus();
+		  actor.removeState(486);
+		  actor.removeState(487);
+		  actor.removeState(488);
+		  actor.removeState(489);
+		  actor.refresh();
+		};
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:102
+	AGH_evt0213_SnippetState486 = function () {
+		for (let i = 486; i <= 489; i++) {
+		  const state = $dataStates[i]; state.traits = [];
+		  state.traits.push({code: 53, dataId: 6, value: 0.1});
+		};
+		for (var i = 490; i <= 497; i++) {
+		  $dataStates[i].traits = [];
+		};
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:102
+	AGH_evt0214_Snippet = function () {
+		$gameParty._steps += $gameVariables.value(290);
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:103, data/CommonEvents.json:common-event:300, data/CommonEvents.json:common-event:301
+	AGH_evt0215_SnippetSetValue95 = function (__a0) {
+		$gameSwitches.setValue(__a0,true);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:104, data/CommonEvents.json:common-event:140
+	AGH_evt0216_SnippetCutin_preparation20 = function (interp, __a0) {
+		var msgText1 = `味方カットイン`; //翻訳対象
+		return (function (__a0) {
+		cutin_preparation(__a0,$gameVariables.value(20));
+		if(valueCutInSet1[0] != 0){
+		  var args = new Array(String(valueCutInSet1[0]));
+		  interp.pluginCommand(`${msgText1}`, args);
+		};
+		}).call(interp, __a0);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:140
+	AGH_evt0217_SnippetCutin_preparation20 = function (interp) {
+		var msgText1 = `敵カットイン`; //翻訳対象
+		return (function () {
+		cutin_preparation(0,$gameVariables.value(20));
+		if(valueCutInSet1[0] != 0){
+		  var args = new Array(String(valueCutInSet1[0]));
+		  interp.pluginCommand(`${msgText1}`, args);
+		};
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:104
+	AGH_evt0218_SnippetValueChainAddPower = function () {
+		valueChainAddPower = 0;
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:104, data/CommonEvents.json:common-event:129
+	AGH_evt0219_SnippetMembers410 = function () {
+		if($gameTroop.members()[0].isStateAffected(410) && 
+		$gameTroop.members()[0].isAlive() && 
+		!$gameTroop.members()[0].isRestricted ()){
+		  $gameSwitches.setValue(470,true);
+		  boss_actionPattarn1($gameTroop.members()[0]);
+		  $gameSwitches.setValue(470,false);
+		};
+	};
+
+	// Replaces (8x): data/CommonEvents.json:common-event:105, data/CommonEvents.json:common-event:109, data/CommonEvents.json:common-event:141, data/CommonEvents.json:common-event:184, data/CommonEvents.json:common-event:381, data/Map007.json:map-event:3:page:1, …
+	AGH_evt0220_SnippetSetValue439 = function (__a0) {
+		$gameSwitches.setValue(__a0,false);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:105, data/CommonEvents.json:common-event:122
+	AGH_evt0221_Snippet = function (__a0) {
+		if($gameVariables.value(240) >= 1){
+		  $gameVariables.value(__a0)[$gameVariables.value(240)] += 1;
+		};
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:105, data/CommonEvents.json:common-event:122, data/CommonEvents.json:common-event:205
+	AGH_evt0222_SnippetStart218 = function () {
+		var start = 1;
+		var end = $dataItems.length-1;
+		  for (var i = start; i <= end; i++) {
+		    if($dataItems[i].meta['SG種別']){
+		      if(Number($dataItems[i].meta['SG種別']) == 2){
+		        scene_Glossarytext1(i,218);
+		        scene_Glossarytext2(i,213);
+		        scene_Glossarytext3(i,219);
+		}}};
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:106, data/CommonEvents.json:common-event:111, data/CommonEvents.json:common-event:112, data/CommonEvents.json:common-event:167
+	AGH_evt0223_SnippetStart40 = function () {
+		//現在衣装を呼び出し
+		var start = 1; var end = 40;
+		for (var i = start; i <= end; i++) {
+		$gameVariables.setValue(i+460,
+		$gameVariables.value($gameVariables.value(20)+440)[i]);
+		};
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:106, data/CommonEvents.json:common-event:111, data/CommonEvents.json:common-event:112
+	AGH_evt0224_SnippetStart40 = function (interp) {
+		return (function () {
+		//一時代入した仮情報を立ち絵指定後に反映
+		var start = 1; var end = 40;
+		for (var i = start; i <= end; i++) {
+		if($gameVariables.value(i+560) >= 1){
+		interp.sVal(i+460,$gameVariables.value(i+560));
+		}};
+		}).call(interp);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:106, data/CommonEvents.json:common-event:111, data/CommonEvents.json:common-event:112
+	AGH_evt0225_SnippetStart40 = function () {
+		//衣装情報を更新
+		var start = 1; var end = 40;
+		for (var i = start; i <= end; i++) {
+		$gameVariables.value($gameVariables.value(20)+440)[i] = $gameVariables.value(i+460)
+		};
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:106, data/CommonEvents.json:common-event:109
+	AGH_evt0226_SnippetActor20 = function () {
+		var msgText1 = `は拘束された！`; //翻訳対象
+		var actor = $gameActors.actor($gameVariables.value(20));
+		BattleManager._logWindow.push(`addText`, `${actor.name()}${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:109
+	AGH_evt0227_SnippetActor20 = function () {
+		var msgText1 = `は襲い掛かられた！`; //翻訳対象
+		var actor = $gameActors.actor($gameVariables.value(20));
+		BattleManager._logWindow.push(`addText`, `${actor.name()}${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:109
+	AGH_evt0228_SnippetActor20 = function () {
+		var msgText1 = `は拘束から逃れた！`; //翻訳対象
+		var actor = $gameActors.actor($gameVariables.value(20));
+		BattleManager._logWindow.push(`addText`, `${actor.name()}${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:110
+	AGH_evt0229_SnippetActor20 = function () {
+		var msgText1 = `は犯されている…。`; //翻訳対象
+		var actor = $gameActors.actor($gameVariables.value(20));
+		BattleManager._logWindow.push(`addText`, `${actor.name()}${msgText1}`);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:109, data/CommonEvents.json:common-event:110
+	AGH_evt0230_SnippetArr1121 = function () {
+		var arr1 = [121,122,123,124,125,126,127,128,129,130];
+		pic_eraseP(0,arr1);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:109, data/CommonEvents.json:common-event:110
+	AGH_evt0231_SnippetActor20 = function (__a0) {
+		var actor = $gameActors.actor($gameVariables.value(20));
+		actor.addState(__a0);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:109
+	AGH_evt0232_SnippetDataSystem703 = function () {
+		if($dataSystem.optSideView){
+		  if($gameVariables.value(703) != 0){
+		    var value1 = $gameVariables.value(92) + 1;
+		    $gameTroop.set(value1, $gameVariables.value(703)[0], $gameVariables.value(703)[1], 30);
+		    $gameVariables.setValue(703, 0);
+		  };
+		};
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:110, data/Map003.json:map-event:218:page:2
+	AGH_evt0233_SnippetH_exp110 = function (interp, __a0, __a1, __a2, __a3, __a4) {
+		return (function (__a0, __a1, __a2, __a3, __a4) {
+		//     膣,経,フ,ア,自,絶
+		h_exp1( __a0, __a1, 0, 0, 0, 0);//6//h_exp1ex(10);
+		//     和,強,異,輪,乱,露
+		h_exp2( 0, __a2, __a3, 0, 0, 0);//6
+		//     セ,乳,尻,失,潮,売,妊,子,中,ア,口(射精先)
+		h_exp3( 0, 0, 0, 0, 0, 0, 0, 0, __a4, 0, 0);//10
+		//     膣,尻,口,感,露,精,性,奉,売
+		h_exp4( 0, 0, 0, 0, 0, 0, 0, 0, 0);//9
+		interp.setupChild($dataCommonEvents[85].list, 0);
+		}).call(interp, __a0, __a1, __a2, __a3, __a4);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:111, data/CommonEvents.json:common-event:112
+	AGH_evt0234_SnippetActor20 = function () {
+		var msgText1 = `しかし`; //翻訳対象
+		var msgText2 = `は既に全裸であった…`; //翻訳対象
+		var actor = $gameActors.actor($gameVariables.value(20));
+		var value2 = `${msgText1}${actor.name()}${msgText2}`;
+		if($gameParty.inBattle()){
+		  BattleManager._logWindow.push(`addText`, value2);
+		} else {
+		  CommonPopupManager.showInfo({},value2,null);
+		};
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:112
+	AGH_evt0235_SnippetActor20 = function () {
+		var msgText1 = `しかし`; //翻訳対象
+		var msgText2 = `には効果が無かった。　（現在露出値:`; //翻訳対象
+		var msgText3 = `）`; //翻訳対象
+		var actor = $gameActors.actor($gameVariables.value(20));
+		var value2 = `${msgText1}${actor.name()}${msgText2}${value1}${msgText3}`;
+		if($gameParty.inBattle()){
+		  BattleManager._logWindow.push(`addText`, value2);
+		} else {
+		  CommonPopupManager.showInfo({},value2,null);
+		};
+	};
+
+	// Replaces (13x): data/CommonEvents.json:common-event:119, data/CommonEvents.json:common-event:122, data/Map035.json:map-event:20:page:1, data/Map054.json:map-event:2:page:1, data/Map054.json:map-event:2:page:2, data/Map054.json:map-event:2:page:3, …
+	AGH_evt0236_SnippetValueBossEnemyId304 = function (__a0) {
+		$gameVariables.value(__a0)[valueBossEnemyId] += 1;
+	};
+
+	// Replaces (7x): data/CommonEvents.json:common-event:119, data/CommonEvents.json:common-event:122, data/Map035.json:map-event:20:page:1, data/Map054.json:map-event:2:page:1, data/Map054.json:map-event:2:page:2, data/Map054.json:map-event:2:page:3, …
+	AGH_evt0237_SnippetValueBossAddLevel = function () {
+		valueBossAddLevel = 0;
+	};
+
+	// Replaces (6x): data/CommonEvents.json:common-event:120, data/CommonEvents.json:common-event:121, data/CommonEvents.json:common-event:300
+	AGH_evt0238_SnippetValueVictoryResult10 = function (__a0) {
+		valueVictoryResult = __a0;
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:120
+	AGH_evt0239_SnippetValueWordSet1 = function () {
+		valueWordSet1 = 0;
+		valueWordSet2 = 0;
+		valueWordSet3 = 0;
+	};
+
+	// Replaces (5x): data/CommonEvents.json:common-event:120, data/CommonEvents.json:common-event:188, data/CommonEvents.json:common-event:196
+	AGH_evt0240_SnippetSVal14 = function (interp, __a0, __a1, __a2, __a3, __a4) {
+		return (function (__a0, __a1, __a2, __a3, __a4) {
+		interp.sVal(14,26);interp.sVal(121,interp._eventId);
+		interp.sVal(122,getRandomIndex(8) + 8);
+		interp.sVal(123,5);
+		//アニメid
+		interp.sVal(124,1);
+		interp.sVal(125,getRandomIndex(__a0) + -__a1);
+		interp.sVal(126,getRandomIndex(__a2) + -__a3);
+		interp.sVal(127,getRandomIndex(2) + __a4);
+		interp.sVal(128,getRandomIndex(2) + 0);
+		interp.sVal(129,getRandomIndex(181) + 0);
+		interp.setupChild($dataCommonEvents[64].list, 0);
+		}).call(interp, __a0, __a1, __a2, __a3, __a4);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:120, data/CommonEvents.json:common-event:121
+	AGH_evt0241_SnippetResult = function (interp) {
+		return (function () {
+		$result = interp._branch[interp._indent]
+		}).call(interp);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:120
+	AGH_evt0242_SnippetCharacter41 = function (interp) {
+		return (function () {
+		interp.character(0).forceMoveRoute({
+		"list":[{"code":41,
+		"parameters":[$dataItems[$gameVariables.value(240)].meta.EnemyGraphic.split(',')[0],
+		Number($dataItems[$gameVariables.value(240)].meta.EnemyGraphic.split(',')[1])]},
+		{"code":15, "parameters":[10]},
+		{ "code": 45, "parameters": ["this.setAngle([-45,45,-90,90][getRandomIndex(4)]);"] },
+		{"code":32},{"code":34},{"code":35},{"code":37},
+		{"code":0}]});
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:122, data/CommonEvents.json:common-event:297
+	AGH_evt0243_SnippetValueMaxEnemyLv10 = function () {
+		if(valueMaxEnemyLv >= 1){
+		var start = 1;
+		var end = Math.ceil(valueMaxEnemyLv / 10);
+		  for (var i = start; i <= end; i++) {
+		    enemywin_treasurebox1(valueBossId);
+		      if($gameVariables.value(160)[4] >= 1){
+		        enemywin_treasurebox2(valueBossId);
+		      };
+		  };
+		};
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:124
+	AGH_evt0244_SnippetSetValue52 = function () {
+		$gameSelfSwitches.setValue([$gameVariables.value(52), $gameVariables.value(223), "D"], true)
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:124
+	AGH_evt0245_SnippetCharacter223 = function (interp, __a0) {
+		return (function (__a0) {
+		interp.character($gameVariables.value(223)).requestAnimation(__a0);
+		}).call(interp, __a0);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:129
+	AGH_evt0246_SnippetCutin_preparation20 = function (interp) {
+		var msgText1 = `敵カットイン`; //翻訳対象
+		return (function () {
+		cutin_preparation(8,$gameVariables.value(20));
+		if(valueCutInSet1[0] != 0){
+		  var args = new Array(valueCutInSet1[0]);
+		  interp.pluginCommand(`${msgText1}`, args);
+		};
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:81:page:1, data/Map003.json:map-event:82:page:1
+	AGH_evt0247_SnippetCutin_preparation20 = function (interp) {
+		var msgText1 = `味方カットイン`; //翻訳対象
+		return (function () {
+		cutin_preparation(7,$gameVariables.value(20));
+		if(valueCutInSet1[0] != 0){
+		  var args = new Array(valueCutInSet1[0]);
+		  interp.pluginCommand(`${msgText1}`, args);
+		};
+		}).call(interp);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:138
+	AGH_evt0248_SnippetActor20 = function (interp) {
+		var msgText1 = `「行きますよ、皆さん！」`; //翻訳対象
+		var msgText2 = `「`; //翻訳対象
+		var code1 = `\\N[2]`; // code, not translation text
+		var msgText3 = `さん、行きましょう！」`; //翻訳対象
+		return (function () {
+		var actor = $gameActors.actor($gameVariables.value(20));
+		var value1 = `${actor.name()}${msgText1}`;
+		if($gameActors.actor(2).isStateAffected(234)){var value1 = `${actor.name()}${msgText2}${code1}${msgText3}`};
+		var args = new Array(String(value1));
+		interp.pluginCommand("GabText", args);
+		}).call(interp);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:138
+	AGH_evt0249_SnippetActor20 = function (interp) {
+		var msgText1 = `「往くぞ！」`; //翻訳対象
+		var msgText2 = `「往くぞ、`; //翻訳対象
+		var code1 = `\\N[1]`; // code, not translation text
+		var msgText3 = `！」`; //翻訳対象
+		return (function () {
+		var actor = $gameActors.actor($gameVariables.value(20));
+		var value1 = `${actor.name()}${msgText1}`;
+		if($gameActors.actor(1).isStateAffected(234)){var value1 = `${actor.name()}${msgText2}${code1}${msgText3}`};
+		var args = new Array(String(value1));
+		interp.pluginCommand("GabText", args);
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:138
+	AGH_evt0250_SnippetSetValue182 = function (interp) {
+		var msgText1 = `味方カットイン`; //翻訳対象
+		return (function () {
+		$gameVariables.setValue(182,13);
+		cutin_preparation(1,$gameVariables.value(20));
+		if(valueCutInSet1[0] != 0){
+		  var args = new Array(String(valueCutInSet1[0]));
+		  interp.pluginCommand(`${msgText1}`, args);
+		};
+		}).call(interp);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:138
+	AGH_evt0251_SnippetValue2 = function (interp) {
+		var msgText1 = `「ああ！　我らの力、見せてやろう！！」`; //翻訳対象
+		return (function () {
+		var value2 = 2;
+		var actor = $gameActors.actor(value2);
+		var value1 = `${actor.name()}${msgText1}`;
+		var args = new Array(String(value1));
+		interp.pluginCommand("GabText", args);
+		}).call(interp);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:138
+	AGH_evt0252_SnippetValue2 = function (interp) {
+		var msgText1 = `「はい、`; //翻訳対象
+		var code1 = `\\N[2]`; // code, not translation text
+		var msgText2 = `さん！」`; //翻訳対象
+		return (function () {
+		var value2 = 1;
+		var actor = $gameActors.actor(value2);
+		var value1 = `${actor.name()}${msgText1}${code1}${msgText2}`;
+		var args = new Array(String(value1));
+		interp.pluginCommand("GabText", args);
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:138
+	AGH_evt0253_SnippetValue2182 = function (interp, __a0) {
+		var msgText1 = `味方カットイン`; //翻訳対象
+		return (function (__a0) {
+		var value2 = __a0;
+		$gameVariables.setValue(182,13);
+		cutin_preparation(1,value2);
+		if(valueCutInSet1[0] != 0){
+		  var args = new Array(String(valueCutInSet1[0]));
+		  interp.pluginCommand(`${msgText1}`, args);
+		};
+		}).call(interp, __a0);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:158
+	AGH_evt0254_SnippetSVal207 = function (interp) {
+		return (function () {
+		interp.sVal(207,101);//露出縛りなし
+		}).call(interp);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:158
+	AGH_evt0255_SnippetList247 = function (interp) {
+		return (function () {
+		var list = $gameVariables.value(247);
+		list.forEach(function(id) {
+		  var value1 = 0;
+		  if($gameVariables.value(207) == 101){var value1 = 1};
+		  if($gameVariables.value(207) >= 1 && $gameVariables.value(207) == $gameVariables.value(id+440)[41]){var value1 = 1}; 
+		  if(value1 == 0 && $gameParty.members().contains($gameActors.actor(id))){
+		    if($gameVariables.value(id+380)[4] <  $gameVariables.value(id+380)[5]){
+		      $gameActors.actor(id).addState(78);
+		}}}, interp);
+		}).call(interp);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:160
+	AGH_evt0256_SnippetInBattle20 = function () {
+		if(!$gameParty.inBattle()){
+		  $gameVariables.setValue(20,$gameVariables.value(3));
+		  tachie_settei2();
+		};
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:160
+	AGH_evt0257_SnippetInBattle71 = function (interp) {
+		return (function () {
+		if(!$gameParty.inBattle()){
+		  tachie_hyouji1($gameVariables.value(3));
+		  var args = new Array(String(getPreviousTachiePicId()),'71','2','ON')
+		  interp.pluginCommand("P_CALL_CE", args);
+		};
+		}).call(interp);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:161
+	AGH_evt0258_SnippetHideFollowers209 = function () {
+		if($gameSwitches.value(209) ||
+		$gameSwitches.value(202)){
+		$gamePlayer.hideFollowers();
+		};
+		if($gameSwitches.value(201) ||
+		$gameSwitches.value(205)){
+		$gamePlayer.showFollowers();
+		};
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:161
+	AGH_evt0259_SnippetFollowers = function () {
+		if($gamePlayer.followers().follower(0).isVisible() ){
+		$gamePlayer.resetCustomizeGraphic();
+		};
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:161
+	AGH_evt0260_SnippetCharacter41 = function (interp) {
+		return (function () {
+		interp.character(-1).forceMoveRoute({
+		"list":[{"code":41, "parameters":[$gameVariables.value(11) + '_' + $gameVariables.value(21),$gameVariables.value(22)]},
+		{"code":38},{"code":29, "parameters":[4]},{"code":31},{"code":33},{"code":0}],});
+		}).call(interp);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:161
+	AGH_evt0261_SnippetRefresh = function () {
+		$gamePlayer.refresh()
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:167
+	AGH_evt0262_SnippetActor20 = function (interp) {
+		var msgText1 = `　`; //翻訳対象
+		var icon155 = `\\I[155]`; // code, not translation text
+		return (function () {
+		var actor = $gameActors.actor($gameVariables.value(20))
+		interp.sVal(519,`${actor.name()}${msgText1}${icon155}:${$gameVariables.value($gameVariables.value(20)+380)[4]}(${$gameVariables.value($gameVariables.value(20)+380)[5]})
+`);
+		}).call(interp);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:167
+	AGH_evt0263_SnippetNumber20 = function () {
+		$gameVariables.value($gameVariables.value(20)+440)[41] = Number($dataItems[$gameVariables.value(19)].meta['TotalCloth']);
+		$gameVariables.value(348)[$gameVariables.value(20)] = $gameVariables.value($gameVariables.value(20)+440)[41];
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:167
+	AGH_evt0264_Snippet = function () {
+		$gameVariables.value($gameVariables.value(20)+440)[0] = $gameVariables.value(19);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:167
+	AGH_evt0265_SnippetStart40 = function () {
+		//現在衣装を初期化
+		var start = 1; var end = 40;
+		for (var i = start; i <= end; i++) {
+		if(i == 4){
+		} else {
+		$gameVariables.setValue(i+460,0);
+		}};
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:167
+	AGH_evt0266_SnippetStart40 = function () {
+		//衣装情報を更新
+		var start = 1; var end = 40;
+		for (var i = start; i <= end; i++) {
+		$gameVariables.value($gameVariables.value(20)+440)[i] = $gameVariables.value(i+460)
+		}
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:172
+	AGH_evt0267_SnippetValue1101 = function () {
+		var value1 = 101;
+		var value2 = 'ScreenBlackOut';
+		$gameScreen.showPicture(value1-1,value2,1,640,384,100,100,0,0);
+		$gameScreen.movePicture(value1-1,1,640,384,100,100,150,0,40);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:174
+	AGH_evt0268_SnippetValueCountSet2 = function () {
+		valueCountSet2 = 0;
+		valueWordSet0 = 0;
+		valueWordArray = [];
+		valueCountArray = [];
+		valueCountArray2 = [];
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:174
+	AGH_evt0269_SnippetValueCountSet2 = function (__a0) {
+		valueCountSet2 = 0;
+		valueWordSet0 = __a0;
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:174
+	AGH_evt0270_SnippetValueCountSet2 = function (__a0) {
+		valueCountSet2 = __a0;
+		valueWordSet0 = 0;
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:174, data/CommonEvents.json:common-event:181
+	AGH_evt0271_SnippetSetValue19 = function () {
+		$gameVariables.setValue(19,valueCountArray3[$gameVariables.value(19)]);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:175, data/CommonEvents.json:common-event:180
+	AGH_evt0272_SnippetValueCountSet1 = function () {
+		valueCountSet1 = 0;
+		valueIkkatuArray = [];
+		item_ikkatu(0);
+		item_ikkatu(1);
+		item_ikkatu(2);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:175, data/CommonEvents.json:common-event:180
+	AGH_evt0273_SnippetValueCountSet257 = function () {
+		valueCountSet2 = valueIkkatuArray.length;
+		valueCountSet3 = 0;//+1で件数合計
+		valueCountSet4 = 0;//個数累計
+		valueCountSet5 = 0;//金額合計
+		valueCountSet6 = 0;//変数57合計
+		valueCountSet7 = 0;//ｱｲﾃﾑID270合計
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:175, data/CommonEvents.json:common-event:180
+	AGH_evt0274_SnippetWindowManager = function () {
+		WindowManager.hide(1);
+		WindowManager.hide(2);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:175, data/CommonEvents.json:common-event:180
+	AGH_evt0275_SnippetValueIkkatuArray = function () {
+		valueIkkatuArray = [];
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:176
+	AGH_evt0276_SnippetValue119 = function (__a0) {
+		var value1 = $gameVariables.value(19);
+		$gameVariables.value(293)[value1] += 1;
+		if($gameVariables.value(293)[value1] >= __a0){
+		$gameVariables.value(293)[value1] = 1;
+		};
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:176
+	AGH_evt0277_SnippetValue1293 = function (__a0) {
+		var value1 = __a0;
+		$gameVariables.value(293)[value1] = $gameVariables.value(20+value1);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:176
+	AGH_evt0278_SnippetChoiceParams = function () {
+		var msgText1 = `未指定`; //翻訳対象
+		const id = 1; 
+		const choiceParams = {
+		text: `${msgText1}`,
+		value: 0};
+		$gameSystem.addCustomChoice(id, choiceParams);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:259
+	AGH_evt0279_SnippetChoiceParams20 = function () {
+		var code1 = `\\fs[20]`; // code, not translation text
+		var code2 = `\\fs[28]`; // code, not translation text
+		    const id = 1; 
+		    const choiceParams = {
+		    text: `${code1}${$dataSystem.switches[430]}${code2}`,
+		    value: 99};
+		    $gameSystem.addCustomChoice(id, choiceParams);
+	};
+
+	// Replaces (1x): data/Map003.json:map-event:83:page:1
+	AGH_evt0280_SnippetChoiceParams22 = function () {
+		var msgText1 = `　　　　　　　　　　　　　`; //翻訳対象
+		const id = 1; 
+		const choiceParams = {
+		text: `${$gameVariables.value(22)}${msgText1}`,
+		value: 0};
+		$gameSystem.addCustomChoice(id, choiceParams);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:184, data/Map003.json:map-event:20:page:1, data/Map003.json:map-event:133:page:2
+	AGH_evt0281_SnippetValueCountSet9 = function (interp) {
+		return (function () {
+		interp._eventId = valueCountSet9;
+		}).call(interp);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:184, data/Map003.json:map-event:20:page:1, data/Map003.json:map-event:133:page:2
+	AGH_evt0282_SnippetEvent292 = function () {
+		if(!!$gameMap.event($gameVariables.value(292)[0])) {
+		  $gameMap.eraseEvent($gameVariables.value(292)[0]);
+		};
+		$gameVariables.value(292)[0] = 0;
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:185
+	AGH_evt0283_SnippetValueShopMaxCols = function () {
+		valueShopMaxCols = 1;
+		array = [];
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:185
+	AGH_evt0284_SnippetValueShopMaxCols = function () {
+		valueShopMaxCols = 2;
+	};
+
+	// Replaces (5x): data/CommonEvents.json:common-event:187, data/CommonEvents.json:common-event:188, data/CommonEvents.json:common-event:196
+	AGH_evt0285_SnippetActor120 = function () {
+		var actor1 = $gameActors.actor(20);
+		enemy_dropSelection(actor1);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:188
+	AGH_evt0286_SnippetValueEnemyEventId = function (interp) {
+		return (function () {
+		interp._eventId = valueEnemyEventId;
+		}).call(interp);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:189, data/CommonEvents.json:common-event:190, data/CommonEvents.json:common-event:196
+	AGH_evt0287_SnippetValueanimalEventId = function (interp) {
+		return (function () {
+		interp._eventId = valueanimalEventId;
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:190, data/CommonEvents.json:common-event:195
+	AGH_evt0288_SnippetValue299 = function () {
+		var value2 = $gameMap.event(valueanimalEventId).x;
+		var value3 = $gameMap.event(valueanimalEventId).y;
+		$gameMap.spawnEvent(99, value2, value3, true);
+		var eventId = $gameMap.getLastSpawnEventId();
+		var event = $gameMap.event(eventId);
+		event.startScale(10,50,50);
+		event._priorityType = 0;
+		event.setOpacity(150);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:192
+	AGH_evt0289_SnippetActor21 = function () {
+		var msgText1 = `情報屋`; //翻訳対象
+		$gameActors.actor(21).setName(`${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:239
+	AGH_evt0290_SnippetActor21 = function () {
+		var msgText1 = `鑑定屋`; //翻訳対象
+		$gameActors.actor(21).setName(`${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:305
+	AGH_evt0291_SnippetActor21 = function () {
+		var msgText1 = `受付嬢`; //翻訳対象
+		var code1 = `\\}`; // code, not translation text
+		var msgText2 = `支部`; //翻訳対象
+		var code2 = `\\{`; // code, not translation text
+		$gameActors.actor(21).setName(`${msgText1}${code1} ${$dataWeapons[76].name} ${$dataWeapons[22].name}${msgText2}${code2}`);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:511, data/Map094.json:map-event:45:page:1
+	AGH_evt0292_SnippetActor22 = function () {
+		var msgText1 = `受付`; //翻訳対象
+		var code1 = `\\}`; // code, not translation text
+		var code2 = `\\{`; // code, not translation text
+		$gameActors.actor(22).setName(`${msgText1}${code1} ${$dataWeapons[70].name}${code2}`);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:196
+	AGH_evt0293_SnippetEvent202 = function (__a0) {
+		var event = $gameMap.event(valueEnemyEventId);
+		event.requestAnimation(__a0);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:199
+	AGH_evt0294_SnippetSetValue380 = function () {
+		$gameSwitches.setValue(380,false);
+		var id = $gameVariables.value(19);
+		if ($gameMap.event(id).event().meta['WorldMenu']){
+		  $gameSwitches.setValue(380,true);
+		};
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:201, data/CommonEvents.json:common-event:202
+	AGH_evt0295_SnippetValue122 = function () {
+		var value1 = 22;
+		for (var i = 1; i <= 100; i++) {
+		  if($gameVariables.value(327)[i] == 2){
+		    var value1 = i;
+		    break;
+		}};
+		$gameVariables.setValue(19,value1);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:201, data/CommonEvents.json:common-event:202, data/Map003.json:map-event:133:page:2
+	AGH_evt0296_SnippetArr119 = function () {
+		var arr1 = $dataWeapons[$gameVariables.value(19)].meta['HomePosition'].split(',');
+		if(Number(arr1[3]) == 0){
+		  var value1 = 1;
+		} else {
+		  var value1 = -1;
+		};
+		$gameVariables.setValue(161,[Number(arr1[0]),
+		Number(arr1[1]) + value1,Number(arr1[2])]);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:201, data/CommonEvents.json:common-event:202
+	AGH_evt0297_SnippetArr1240 = function () {
+		if($gameVariables.value(240) >= 1){
+		  var arr1 = $dataItems[$gameVariables.value(240)].meta['EscapeMapID'].split(',');
+		  $gameVariables.setValue(161,[Number(arr1[0]),Number(arr1[1]),Number(arr1[2])]);
+		} else {
+		  $gameVariables.setValue(161,[14,26,7]);
+		};
+		if(Number(arr1[0]) != $gameMap.mapId()){
+		  $gameSwitches.setValue(140,false);//マップ最初の処理終了スイッチ
+		};
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:202
+	AGH_evt0298_SnippetConfigManager = function (__a0) {
+		ConfigManager.battleAniSpeed = __a0
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:205
+	AGH_evt0299_SnippetDataSkills26 = function () {
+		var msgText1 = `持ち上げ＜OFF＞`; //翻訳対象
+		$gameSystem._pickupData[0] = false;
+		$dataSkills[26].name =`${msgText1}`;
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:205
+	AGH_evt0300_SnippetList = function (interp) {
+		return (function () {
+		var list = valueChangeSkill;
+		list.forEach(function(id) {
+		  skill_personalonoffload(id,0);
+		}, interp);
+		var list = valueVariablesChangeSkill;
+		list.forEach(function(id) {
+		  skill_sentaku(id,0);
+		}, interp);
+		}).call(interp);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:205
+	AGH_evt0301_SnippetList = function (interp) {
+		return (function () {
+		var list = valuePersonalSkill;
+		list.forEach(function(id) {
+		  skill_personalonoffload(id,0);
+		}, interp);
+		}).call(interp);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:205
+	AGH_evt0302_SnippetList = function (interp) {
+		return (function () {
+		var list = valuePersonalItem;
+		list.forEach(function(id) {
+		  skill_personalonoffload(id,1);
+		}, interp);
+		}).call(interp);
+	};
+
+	// Replaces (6x): data/CommonEvents.json:common-event:205, data/CommonEvents.json:common-event:292, data/CommonEvents.json:common-event:313
+	AGH_evt0303_SnippetEvent100 = function (__a0) {
+		for (var id = 1; id < 100; id++) {
+		  if(!!$gameMap.event(id)) {
+		    if ($gameMap.event(id).event().meta['MapFirsttAction'] ){
+		      var value1 = $gameMap.mapId();
+		      var value2 = id;
+		      var value3 = __a0;
+		      var value4 = false;
+		      $gameSelfSwitches.setValue([value1, value2, value3], value4);
+		      break;
+		}}};
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:205
+	AGH_evt0304_SnippetList248 = function (interp) {
+		return (function () {
+		var list = $gameVariables.value(248);
+		list.forEach(function(id) {
+		  $dataWeapons[id+200].name = $gameVariables.value(id+380)[50]; 
+		  weapon_uniqueSet(id);
+		}, interp);
+		}).call(interp);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:205
+	AGH_evt0305_SnippetSeisyoujuu_addParamsAll = function () {
+		seisyoujuu_addParamsAll();//星晶獣強化反映
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:205
+	AGH_evt0306_SnippetTrait_changeSetting106 = function () {
+		trait_changeSetting(106);//信仰バフステート変動設定
+		trait_changeSetting(107);//食事バフステート変動設定
+		info_SetY($gameVariables.value(200));//インフォY軸補正値ミニステで変更
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:205
+	AGH_evt0307_SnippetNPC = function () {
+		//NPC役職名配列
+		setNPCProfession();
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:205
+	AGH_evt0308_SnippetNPC = function () {
+		//NPC苗字設定
+		setNPCFamilyName();
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:205
+	AGH_evt0309_SnippetActor11 = function () {
+		var actor = $gameActors.actor($gameVariables.value(11));
+		if(actor.skillMasteryLevel(772) > Number($dataSkills[772].meta['Max Mastery Level'])){
+		  actor.setSkillMasteryLevel(772, 5);
+		};
+		if(actor.skillMasteryLevel(773) > Number($dataSkills[773].meta['Max Mastery Level'])){
+		  actor.setSkillMasteryLevel(773, 5);
+		};
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:210, data/CommonEvents.json:common-event:259
+	AGH_evt0310_SnippetArr290 = function (__a0) {
+		var arr2 = [];
+		for (var i = __a0; i <= 200; i++) {
+		  if($gameScreen.picture(i)){
+		    arr2.push(i);
+		  };
+		};
+		pic_eraseP(0,arr2);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:211, data/CommonEvents.json:common-event:215
+	AGH_evt0311_SnippetValue1247 = function (interp) {
+		return (function () {
+		var value1 = 0;
+		var list = $gameVariables.value(247);
+		list.forEach(function(id) {
+		if($gameParty.members().contains($gameActors.actor(id))){
+		$gameSwitches.setValue(id+100,true);
+		value1 += 1;
+		}}, interp);
+		if(value1 <= 1){
+		$gameSwitches.setValue(379,true);
+		};
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:217, data/CommonEvents.json:common-event:249
+	AGH_evt0312_SnippetSVal702 = function (interp) {
+		return (function () {
+		interp.sVal(702,$gameVariables.value(702) + 1);
+		//this.character($gameVariables.value(196)).requestAnimation(180);
+		//this.addPopup(["add","text:\\V[702]"]);
+		}).call(interp);
+	};
+
+	// Replaces (10x): data/CommonEvents.json:common-event:219, data/CommonEvents.json:common-event:307, data/CommonEvents.json:common-event:401, data/CommonEvents.json:common-event:411, data/CommonEvents.json:common-event:451, data/Map007.json:map-event:3:page:1, …
+	AGH_evt0313_SnippetSVal21 = function (interp, __a0, __a1) {
+		return (function (__a0, __a1) {
+		interp.sVal(__a0,__a1);
+		}).call(interp, __a0, __a1);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:221
+	AGH_evt0314_SnippetShowPicture194 = function (__a0, __a1, __a2, __a3, __a4) {
+		$gameScreen.showPicture(__a0,__a1,__a2,
+		__a3,__a4,100,100,255,0)
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:221
+	AGH_evt0315_SnippetShowPicture488 = function () {
+		if($gameSwitches.value(488)){
+		  $gameScreen.showPicture(3,'PictureBottan3a',1,
+		  255,39,100,100,255,0)
+		} else {
+		  $gameScreen.showPicture(3,'PictureBottan3',1,
+		  255,39,100,100,255,0)
+		};
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:221
+	AGH_evt0316_SnippetShowPicture316 = function (__a0, __a1, __a2, __a3, __a4, __a5) {
+		$gameScreen.showPicture(__a0,__a1,1,
+		__a2,39,100,100,255,0)
+		$gameScreen.showPicture(__a3,__a4,1,
+		__a5,39,100,100,255,0)
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:234
+	AGH_evt0317_SnippetArr150 = function (interp) {
+		var msgText1 = `親愛なる隣人の旅路に祝福を──`; //翻訳対象
+		return (function () {
+		var arr1 = [0];
+		var arr2 = [-50];
+		var arr3 = [`${msgText1}`];
+		chara_oneWord(100,interp._eventId,28,240,arr1,arr2,arr3,0);
+		}).call(interp);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:338
+	AGH_evt0318_SnippetArr150 = function (interp) {
+		var msgText1 = `ゴクゴクっ──`; //翻訳対象
+		return (function () {
+		var arr1 = [0];
+		var arr2 = [-50];
+		var arr3 = [`${msgText1}`];
+		chara_oneWord(100,interp._eventId,25,240,arr1,arr2,arr3,0);
+		}).call(interp);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:541
+	AGH_evt0319_SnippetArr150 = function (interp) {
+		var msgText1 = `ガサゴソ…`; //翻訳対象
+		return (function () {
+		var arr1 = [0];
+		var arr2 = [-50];
+		var arr3 = [`${msgText1}`];
+		chara_oneWord(100,interp._eventId,25,180,arr1,arr2,arr3,0);
+		}).call(interp);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:235
+	AGH_evt0320_SnippetActor20 = function () {
+		var msgText1 = `\\set[`; //翻訳対象
+		var msgText2 = `]は、<`; //翻訳対象
+		var msgText3 = `>に\\rb[昇格,レアリティ・アップ]した！`; //翻訳対象
+		var actor = $gameActors.actor($gameVariables.value(20));
+		$gameVariables.setValue(21,
+		`${msgText1}${$gameVariables.value(20)}${msgText2}${valueCountSet1}${msgText3}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:254
+	AGH_evt0321_SnippetActor20 = function () {
+		var msgText1 = `を初期化します。よろしいですか？\n（H履歴は影響ありませんが、\n各種開発度ランクはリセットされます。\nサブジョブのレベルは完全にはリセットされません）`; //翻訳対象
+		var actor = $gameActors.actor($gameVariables.value(20));
+		$gameVariables.setValue(21,
+		`${actor.name()}${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:254
+	AGH_evt0322_SnippetActor20 = function () {
+		var msgText1 = `のリセット処理が完了しました。`; //翻訳対象
+		var actor = $gameActors.actor($gameVariables.value(20));
+		$gameVariables.setValue(21,
+		`${actor.name()}${msgText1}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:259
+	AGH_evt0323_SnippetActor20 = function () {
+		var msgText1 = `は[`; //翻訳対象
+		var msgText2 = `]のジョブ解放条件を満たしていません…。\n`; //翻訳対象
+		var actor = $gameActors.actor($gameVariables.value(20));
+		$gameVariables.setValue(801,
+		`${actor.name()}${msgText1}${$dataClasses[$gameVariables.value(21)].name}${msgText2}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:313
+	AGH_evt0324_SnippetActor20 = function () {
+		var msgText1 = `\\set[`; //翻訳対象
+		var msgText2 = `]は、`; //翻訳対象
+		var code1 = `\\sin[405]`; // code, not translation text
+		var msgText3 = `に\\rb[昇格,レアリティ・アップ]した！`; //翻訳対象
+		var actor = $gameActors.actor($gameVariables.value(20));
+		$gameVariables.setValue(21,
+		`${msgText1}${$gameVariables.value(20)}${msgText2}${code1}${msgText3}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:236
+	AGH_evt0325_SnippetActor20 = function () {
+		var msgText1 = `バニーさん`; //翻訳対象
+		$gameActors.actor(20).setName(`${msgText1}`);
+		$gameVariables.value(400)[59] = `${$dataWeapons[433].name}`;
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:242, data/Map094.json:map-event:32:page:1
+	AGH_evt0326_SnippetActor20 = function (__a0) {
+		var msgText1 = `受付`; //翻訳対象
+		$gameActors.actor(20).setName(`${msgText1}`);
+		$gameVariables.value(400)[59] = __a0;
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:246
+	AGH_evt0327_SnippetActor20 = function () {
+		var msgText1 = `ピエロ`; //翻訳対象
+		var msgText2 = `タートル・エクスペリエンス社`; //翻訳対象
+		$gameActors.actor(20).setName(`${msgText1}`);
+		$gameVariables.value(400)[59] = `${msgText2}`;
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:308, data/CommonEvents.json:common-event:355
+	AGH_evt0328_SnippetActor20 = function () {
+		var msgText1 = `ボスゴブリン`; //翻訳対象
+		$gameActors.actor(20).setName(`${msgText1}`);
+		$gameVariables.value(400)[59] = `${$dataSystem.switches[248]}`;
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:390, data/CommonEvents.json:common-event:576
+	AGH_evt0329_SnippetActor20 = function () {
+		var msgText1 = `女将`; //翻訳対象
+		$gameActors.actor(20).setName(`${msgText1}`);
+		$gameVariables.value(400)[59] = `${$dataWeapons[434].name}`;
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:155:page:1, data/Map022.json:map-event:6:page:1
+	AGH_evt0330_SnippetActor20 = function () {
+		var msgText1 = `受付嬢`; //翻訳対象
+		var msgText2 = `支部`; //翻訳対象
+		$gameActors.actor(20).setName(`${msgText1}`);
+		$gameVariables.value(400)[59] = `${$dataWeapons[76].name}${$dataWeapons[22].name}${msgText2}`;
+	};
+
+	// Replaces (1x): data/Map003.json:map-event:164:page:1
+	AGH_evt0331_SnippetActor20 = function () {
+		var msgText1 = `販売員`; //翻訳対象
+		var msgText2 = `ギルド出張所`; //翻訳対象
+		$gameActors.actor(20).setName(`${msgText1}`);
+		$gameVariables.value(400)[59] = `${$dataWeapons[402].name}${msgText2}`;
+	};
+
+	// Replaces (4x): data/Map003.json:map-event:188:page:1, data/Map024.json:map-event:2:page:1, data/Map079.json:map-event:2:page:1, data/Map195.json:map-event:2:page:1
+	AGH_evt0332_SnippetActor20 = function () {
+		var msgText1 = `神官`; //翻訳対象
+		var msgText2 = `支部`; //翻訳対象
+		$gameActors.actor(20).setName(`${msgText1}`);
+		$gameVariables.value(400)[59] = `${$dataWeapons[77].name}${$dataWeapons[22].name}${msgText2}`;
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:229:page:1, data/Map023.json:map-event:3:page:1
+	AGH_evt0333_SnippetActor20 = function () {
+		var msgText1 = `鍛冶師`; //翻訳対象
+		$gameActors.actor(20).setName(`${msgText1}`);
+		$gameVariables.value(400)[59] = `${$dataWeapons[401].name}`;
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:230:page:1, data/Map021.json:map-event:10:page:1
+	AGH_evt0334_SnippetActor20 = function () {
+		var msgText1 = `鑑定師`; //翻訳対象
+		$gameActors.actor(20).setName(`${msgText1}`);
+		$gameVariables.value(400)[59] = `${$dataWeapons[403].name}`;
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:233:page:1, data/Map022.json:map-event:9:page:1
+	AGH_evt0335_SnippetActor20 = function () {
+		var msgText1 = `錬金術師`; //翻訳対象
+		var msgText2 = `流れの錬金術師`; //翻訳対象
+		$gameActors.actor(20).setName(`${msgText1}`);
+		$gameVariables.value(400)[59] = `${msgText2}`;
+	};
+
+	// Replaces (1x): data/Map018.json:map-event:27:page:1
+	AGH_evt0336_SnippetActor20 = function () {
+		var msgText1 = `おばさん`; //翻訳対象
+		var msgText2 = `ネルガド住民`; //翻訳対象
+		$gameActors.actor(20).setName(`${msgText1}`);
+		$gameVariables.value(400)[59] = `${msgText2}`;
+	};
+
+	// Replaces (1x): data/Map018.json:map-event:28:page:1
+	AGH_evt0337_SnippetActor20 = function () {
+		var msgText1 = `お姉さん`; //翻訳対象
+		var msgText2 = `ネルガド住民`; //翻訳対象
+		$gameActors.actor(20).setName(`${msgText1}`);
+		$gameVariables.value(400)[59] = `${msgText2}`;
+	};
+
+	// Replaces (1x): data/Map022.json:map-event:3:page:1
+	AGH_evt0338_SnippetActor20 = function () {
+		var msgText1 = `販売員`; //翻訳対象
+		$gameActors.actor(20).setName(`${msgText1}`);
+		$gameVariables.value(400)[59] = `${$dataWeapons[402].name}`;
+	};
+
+	// Replaces (1x): data/Map048.json:map-event:3:page:1
+	AGH_evt0339_SnippetActor20 = function () {
+		var msgText1 = `受付`; //翻訳対象
+		var msgText2 = `支部`; //翻訳対象
+		$gameActors.actor(20).setName(`${msgText1}`);
+		$gameVariables.value(400)[59] = `${$dataWeapons[76].name}${$dataWeapons[41].name}${msgText2}`;
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:240
+	AGH_evt0340_SnippetValueCountSet1 = function (__a0, __a1) {
+		if(valueCountSet1 == __a0){valueScriptArray1 = [__a1]};
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:241
+	AGH_evt0341_SnippetWeapon_uniqueSet20 = function (__a0) {
+		var msgText1 = `\\WIN[`; //翻訳対象
+		var varCode801 = `\\V[801]`; // code, not translation text
+		var msgText2 = `\n※付与効果は強化の度に選択/追加されていきます。`; //翻訳対象
+		var id = $gameVariables.value(20);
+		weapon_uniqueSet(id);
+		valueCountSet3 = __a0;
+		weapon_uniqueAdd(id+80);
+		var value1 = `${msgText1}${id+80}]
+${varCode801}${msgText2}`;
+		WindowManager.show(0, 270, 80, 1010, 450);
+		WindowManager.drawText(0, `${value1}`);
+	};
+
+	// Replaces (26x): data/CommonEvents.json:common-event:241, data/CommonEvents.json:common-event:301, data/CommonEvents.json:common-event:336, data/CommonEvents.json:common-event:337, data/CommonEvents.json:common-event:338, data/CommonEvents.json:common-event:344, …
+	AGH_evt0342_SnippetSetValue = function (__a0, __a1) {
+		$gameSelfSwitches.setValue([$gameMap.mapId(), __a0, __a1], true);
+	};
+
+	// Replaces (9x): data/CommonEvents.json:common-event:241, data/CommonEvents.json:common-event:292, data/CommonEvents.json:common-event:305, data/CommonEvents.json:common-event:310, data/CommonEvents.json:common-event:316, data/CommonEvents.json:common-event:336, …
+	AGH_evt0343_SnippetSetValue = function (__a0, __a1) {
+		$gameSelfSwitches.setValue([$gameMap.mapId(), __a0, __a1], false);
+	};
+
+	// Replaces (6x): data/CommonEvents.json:common-event:243, data/CommonEvents.json:common-event:244
+	AGH_evt0344_SnippetValue1100 = function (__a0) {
+		var value1 = 100;
+		var value2 = __a0;
+		var arr1 = [4,5,6,7];
+		var value3 = arr1[getRandomIndex(arr1.length)];
+		pic_1(2,value1,value2,value3,100,255,20,1280,768,0,0);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:248, data/CommonEvents.json:common-event:249
+	AGH_evt0345_Snippet = function (interp) {
+		return (function () {
+		interp._eventId = $gameVariables.value(196);
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:256
+	AGH_evt0346_SnippetSetValue20 = function (__a0, __a1, __a2, __a3, __a4, __a5) {
+		var msgText1 = `なし`; //翻訳対象
+		if($gameVariables.value($gameVariables.value(20)+380)[__a0] != 0){
+		  $gameSwitches.setValue(__a1,true);
+		  $gameVariables.setValue(__a2,$dataWeapons[$gameVariables.value($gameVariables.value(20)+380)[__a3]].name);
+		} else {
+		  $gameSwitches.setValue(__a4,false);
+		  $gameVariables.setValue(__a5,`${msgText1}`);
+		};
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:256
+	AGH_evt0347_Snippet = function (__a0) {
+		$gameVariables.value($gameVariables.value(20)+380)[__a0] = 0;
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:259, data/CommonEvents.json:common-event:338, data/CommonEvents.json:common-event:361
+	AGH_evt0348_SnippetValue113 = function (__a0, __a1, __a2, __a3) {
+		var value1 = __a0;
+		$gameMap.spawnEvent(146, __a1, __a2, true);
+		$gameVariables.value(292)[value1] = $gameMap.getLastSpawnEventId();
+		var eventId = $gameVariables.value(292)[value1];
+		var event = $gameMap.event(eventId);
+		event.setOpacity(__a3);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:259
+	AGH_evt0349_SnippetEvent292 = function (__a0, __a1) {
+		  $gameMap.event($gameVariables.value(292)[__a0]).forceMoveRoute({
+		  "list":[
+		  {"code":45, "parameters":[__a1]},
+		  {"code":0}],"repeat":false,"skippable":true});
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:259
+	AGH_evt0350_SnippetEvent292 = function (__a0, __a1) {
+		  $gameMap.event($gameVariables.value(292)[12]).forceMoveRoute({
+		  "list":[
+		  {"code":45, "parameters":[__a0]},
+		  {"code":45, "parameters":[__a1]},
+		  {"code":0}],"repeat":false,"skippable":true});
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:259
+	AGH_evt0351_SnippetEraseEvent292 = function () {
+		$gameMap.eraseEvent($gameVariables.value(292)[11]);
+		$gameMap.eraseEvent($gameVariables.value(292)[12]);
+		$gameVariables.value(292)[11] = 0;
+		$gameVariables.value(292)[12] = 0;
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:259, data/CommonEvents.json:common-event:301
+	AGH_evt0352_Snippet = function (interp, __a0) {
+		return (function (__a0) {
+		interp._eventId = $gameVariables.value(292)[__a0];
+		}).call(interp, __a0);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:288
+	AGH_evt0353_SnippetActor135 = function () {
+		if($gameVariables.value(135) == 12){
+		  if($gameSwitches.value(233)){//教会
+		    if($gameActors.actor(5).level >= 10){
+		      event_pararelStarting(0,313,0);
+		      $gameSwitches.setValue(474,true);
+		    };
+		  };
+		};
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:288
+	AGH_evt0354_SnippetMapId135 = function () {
+		if($gameVariables.value(135) == 11){
+		  if($gameMap.mapId() == 96){
+		    if($gameVariables.value(642) >= 10){
+		      event_pararelStarting(0,312,0);
+		      $gameSwitches.setValue(474,true);
+		    };
+		  };
+		};
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:288
+	AGH_evt0355_SnippetValueGetInfoPointX = function (__a0) {
+		valueGetInfoPointX = __a0;
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:290, data/CommonEvents.json:common-event:295
+	AGH_evt0356_SnippetValue1142 = function () {
+		var value1 = $gameVariables.value(142);
+		$gameVariables.setValue(141,`${value1}`);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:291, data/CommonEvents.json:common-event:296
+	AGH_evt0357_SnippetValueScriptArray1 = function () {
+		valueScriptArray1 = [];
+		valueScriptArray2 = [];
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:292, data/CommonEvents.json:common-event:301, data/CommonEvents.json:common-event:343
+	AGH_evt0358_SnippetSetWaitMode = function (interp) {
+		return (function () {
+		interp.setWaitMode('scroll');
+		}).call(interp);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:292, data/CommonEvents.json:common-event:335, data/CommonEvents.json:common-event:337
+	AGH_evt0359_SnippetValuePic155 = function () {
+		valuePic1 = 55;
+		valueScenePic = 'ZX_Main034_';
+		var value2 = valueScenePic+'01';
+		$gameScreen.showPicture(valuePic1,value2,1,640,384,100,100,0,0);
+		$gameScreen.movePicture(valuePic1,1,640,384,100,100,255,0,60);
+		picture_fade1(valuePic1,"fadeIn",valueWipeImg,60,5);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:292, data/CommonEvents.json:common-event:338
+	AGH_evt0360_SnippetNPC18 = function (interp, __a0) {
+		return (function (__a0) {
+		//「一人で立ち絵変化させる時は4」「NPC会話の時は0」
+		tachie_kaiwastart(false,false,1,__a0);
+		interp.setupChild($dataCommonEvents[18].list, 0);
+		}).call(interp, __a0);
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:292, data/CommonEvents.json:common-event:329, data/Map007.json:map-event:23:page:1
+	AGH_evt0361_SnippetValue1150 = function () {
+		var value1 = 'Z_ClothesTakeOff';
+		AudioManager.playSe({"name":value1,"volume":150,"pitch":100,"pan":0});
+	};
+
+	// Replaces (6x): data/CommonEvents.json:common-event:292, data/CommonEvents.json:common-event:304, data/CommonEvents.json:common-event:325, data/CommonEvents.json:common-event:327, data/CommonEvents.json:common-event:335, data/CommonEvents.json:common-event:339
+	AGH_evt0362_SnippetValue1530 = function () {
+		var value1 = $gameVariables.value(530);
+		event_respawnSetA(value1,13,5,0);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.setDirection(2);
+		var value1 = 3;//$gameVariables.value(530);
+		event_respawnSetA(value1,14,6,0);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.setDirection(4);
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:292, data/CommonEvents.json:common-event:327
+	AGH_evt0363_SnippetValue1530 = function (__a0, __a1, __a2, __a3) {
+		var value1 = __a0;//$gameVariables.value(530);
+		event_respawnSetA(value1,__a1,__a2,0);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.setDirection(__a3);
+	};
+
+	// Replaces (5x): data/CommonEvents.json:common-event:292, data/CommonEvents.json:common-event:310, data/CommonEvents.json:common-event:314, data/CommonEvents.json:common-event:316
+	AGH_evt0364_SnippetSetValue11 = function (interp, __a0, __a1, __a2) {
+		return (function (__a0, __a1, __a2) {
+		$gameSelfSwitches.setValue([$gameMap.mapId(), __a0, 'A'], true);
+		var value1 = 11;
+		event_respawnSetN(value1,__a1,__a2,0,'Goods9',0,2);
+		interp._eventId = $gameVariables.value(292)[value1];
+		}).call(interp, __a0, __a1, __a2);
+	};
+
+	// Replaces (5x): data/CommonEvents.json:common-event:292, data/CommonEvents.json:common-event:310, data/CommonEvents.json:common-event:314
+	AGH_evt0365_SnippetValue1530 = function () {
+		var value1 = $gameVariables.value(530);
+		event_respawnSetA(value1,13,5,0,2);
+		var value1 = 3;//$gameVariables.value(530);
+		event_respawnSetA(value1,14,6,0,4);
+		var value1 = 4;//$gameVariables.value(530);
+		event_respawnSetA(value1,12,6,0,6);
+		var value1 = 5;//$gameVariables.value(530);
+		event_respawnSetA(value1,13,7,0,8);
+	};
+
+	// Replaces (11x): data/CommonEvents.json:common-event:294, data/CommonEvents.json:common-event:368, data/CommonEvents.json:common-event:370, data/CommonEvents.json:common-event:371, data/CommonEvents.json:common-event:372, data/CommonEvents.json:common-event:373, …
+	AGH_evt0366_SnippetH_keikenhyouji2521 = function (__a0) {
+		h_keikenhyouji2(521,__a0);//backGraund_menuMapSelectで消去
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:297, data/CommonEvents.json:common-event:400
+	AGH_evt0367_SnippetList292 = function (interp) {
+		return (function () {
+		var list = $gameVariables.value(292);
+		list.forEach(function(id1) {
+		  if(id1 == 0){}else{
+		    if(!!$gameMap.event(id1)) {
+		      $gameMap.eraseEvent(id1);
+		  }};
+		}, interp);
+		}).call(interp);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:298
+	AGH_evt0368_SnippetValuePic155 = function () {
+		valuePic1 = 55;
+		valueCountSet1 = getRandomIndex(51) + 200;
+		var value3 = [1,2,1,1][getRandomIndex(4)];
+		if($gameVariables.value(17) >= 500){
+		  var value3 = [2,3,4,5][getRandomIndex(4)];
+		};
+		var value2 = "Zev_Opening1_"+value3;
+		$gameScreen.showPicture(valuePic1,value2,1,640+450-500,384,300,300,0,0);
+		$gameScreen.movePicture(valuePic1,1,640+450,384,100,100,valueCountSet1,0,300);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:298
+	AGH_evt0369_SnippetSetPicturesAnimation17 = function () {
+		var msgText1 = `連番`; //翻訳対象
+		$gameScreen.setPicturesAnimation(3, 2, `${msgText1}`, 5);
+		var value3 = 1;
+		if($gameVariables.value(17) >= 500){
+		  var value3 = 2;
+		};
+		var value2 = "Zev_Opening2_"+value3+"_0";
+		$gameScreen.showPicture(valuePic1+1,value2,1,640+450-500,384,300,300,0,0);
+		$gameScreen.movePicture(valuePic1+1,1,640+450,384,100,100,valueCountSet1,0,300);
+		tachie_bless(valuePic1,2);
+		tachie_bless(valuePic1+1,2);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:298
+	AGH_evt0370_SnippetValue199 = function () {
+		var value1 = 'wing_r2';
+		var arr1 = ['2','this','99'];
+		$gameScreen._particle.particlePlay(arr1[0],value1 + '-' + 2,arr1[1],value1,arr1[2]);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:299
+	AGH_evt0371_SnippetList173 = function (interp) {
+		return (function () {
+		var list = $gameVariables.value(173);
+		list.forEach(function(id) {
+		  if($gameVariables.value(135) == id){
+		    var id1 = this._eventId;
+		    var event = $gameMap.event(id1).event();
+		    $gameSwitches.setValue(414,true);
+		    if(event.meta['MQProgress']){
+		      if(Number(event.meta['MQProgress']) == id){
+		        $gameSwitches.setValue(414,false);
+		}}};
+		}, interp);
+		}).call(interp);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:300
+	AGH_evt0372_SnippetSVal20 = function (interp) {
+		var msgText1 = `全体マップに`; //翻訳対象
+		var colorCode16 = `\\C[16]`; // code, not translation text
+		var colorReset = `\\C[0]`; // code, not translation text
+		var msgText2 = `が追加されました`; //翻訳対象
+		return (function () {
+		interp.sVal(20,0);
+		var value1 = $dataSystem.switches[252];
+		valueWordSet0 = `${msgText1}${colorCode16}${value1}${colorReset}${msgText2}`;
+		valueWordSetEx = 0;//補足が必要な場合
+		interp.setupChild($dataCommonEvents[45].list, 0);
+		}).call(interp);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:350
+	AGH_evt0373_SnippetSVal20 = function (interp) {
+		var msgText1 = `からクリア後ダンジョンに行けるようになりました`; //翻訳対象
+		return (function () {
+		interp.sVal(20,0);
+		var value1 = $dataSystem.switches[259];
+		valueWordSet0 = `${value1}${msgText1}`;
+		valueWordSetEx = 0;//補足が必要な場合
+		interp.setupChild($dataCommonEvents[45].list, 0);
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:300, data/CommonEvents.json:common-event:301
+	AGH_evt0374_SnippetValue111 = function (interp) {
+		return (function () {
+		var value1 = 11;
+		event_respawnSetN(value1,25,7,0,'$airship02',0);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		interp._eventId = $gameVariables.value(292)[value1];
+		event.setDirection(4);
+		}).call(interp);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:300, data/CommonEvents.json:common-event:301, data/CommonEvents.json:common-event:349
+	AGH_evt0375_SnippetValue199 = function (interp) {
+		return (function () {
+		var value1 = 'wing_r2';
+		var arr1 = [interp._eventId,'this','99'];
+		$gameScreen._particle.particlePlay(arr1[0],value1 + '-' + arr1[0],arr1[1],value1,arr1[2]);
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:300, data/Map007.json:map-event:3:page:1
+	AGH_evt0376_SnippetSetValue292 = function (interp) {
+		return (function () {
+		//$gameVariables.setValue(292,Array(21).fill(0));
+		var value1 = 20;
+		event_charaZanzou(interp._eventId,value1);
+		interp._eventId = $gameVariables.value(292)[value1];
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:300, data/Map007.json:map-event:3:page:1
+	AGH_evt0377_SnippetValue119 = function (interp) {
+		return (function () {
+		var value1 = 19;
+		event_charaZanzou(interp._eventId,value1);
+		interp._eventId = $gameVariables.value(292)[value1];
+		}).call(interp);
+	};
+
+	// Replaces (151x): data/CommonEvents.json:common-event:301, data/CommonEvents.json:common-event:302, data/CommonEvents.json:common-event:303, data/CommonEvents.json:common-event:304, data/CommonEvents.json:common-event:305, data/CommonEvents.json:common-event:306, …
+	AGH_evt0378_SnippetSetValue171 = function (__a0, __a1, __a2, __a3) {
+		$gameVariables.setValue(__a0,[__a1,__a2,__a3]);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:301, data/CommonEvents.json:common-event:452
+	AGH_evt0379_SnippetSVal172 = function (interp, __a0) {
+		return (function (__a0) {
+		interp.sVal(172,__a0);
+		valueTalkSet = [1,1];//1で付与2で直接表示\CE[60]のみ0で解除,ｱｸﾀｰid
+		interp.setupChild($dataCommonEvents[60].list, 0);
+		}).call(interp, __a0);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:301, data/CommonEvents.json:common-event:338
+	AGH_evt0380_SnippetValue1292 = function (__a0) {
+		var value1 = __a0;//$gameVariables.value(292)[value1];
+		message_popup2(value1,0,2,1);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:301, data/CommonEvents.json:common-event:305, data/CommonEvents.json:common-event:309
+	AGH_evt0381_SnippetSetValue71 = function (__a0, __a1) {
+		$gameVariables.setValue(71,240);
+		get_infoDirect(0,__a0,0,__a1);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:301, data/Map007.json:map-event:4:page:1
+	AGH_evt0382_SnippetSetValue256 = function () {
+		$gameVariables.setValue(256,11);//火事
+		map_weatherSet2();
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:301
+	AGH_evt0383_SnippetSetValue33 = function (__a0) {
+		for (var i = 1; i <= 5; i++) {
+		$gameVariables.setValue(33,'BB_akunin');
+		$gameVariables.setValue(35,3);
+		$gameVariables.setValue(37,getRandomIndex(3) + 2);
+		$gameVariables.setValue(34,getRandomIndex(2) + 4);
+		map_npcRespawn(1,__a0);
+		};
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:301
+	AGH_evt0384_SnippetArr150 = function () {
+		var msgText1 = `「ヒャッハァッッ！」`; //翻訳対象
+		var arr1 = [0];
+		var arr2 = [-50];
+		var arr3 = [`${msgText1}`];
+		chara_oneWord(76,3,25,120,arr1,arr2,arr3,'SourceHanSerif-Heavy');
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:301
+	AGH_evt0385_SnippetArr150 = function () {
+		var msgText1 = `「ギャアアアアアアアアアッッ────！！」`; //翻訳対象
+		var arr1 = [0];
+		var arr2 = [-50];
+		var arr3 = [`${msgText1}`];
+		chara_oneWord(77,3,25,180,arr1,arr2,arr3,'genkai-mincho');
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:301
+	AGH_evt0386_SnippetArr150 = function () {
+		var msgText1 = `ウオオオオォォッッ！！`; //翻訳対象
+		var arr1 = [0];
+		var arr2 = [-50];
+		var arr3 = [`${msgText1}`];
+		chara_oneWord(100,6,25,180,arr1,arr2,arr3,'Tamanegiv6');
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:301
+	AGH_evt0387_SnippetSetValue21 = function () {
+		var msgText1 = `空賊A `; //翻訳対象
+		var code1 = `\\}`; // code, not translation text
+		var msgText2 = `空賊B `; //翻訳対象
+		$gameVariables.setValue(21,`${msgText1}${code1}${$dataWeapons[74].name}`);
+		$gameVariables.setValue(22,`${msgText2}${code1}${$dataWeapons[74].name}`);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:301
+	AGH_evt0388_SnippetSetValue21 = function () {
+		var msgText1 = `少年 `; //翻訳対象
+		var code1 = `\\}`; // code, not translation text
+		var msgText2 = `空賊C `; //翻訳対象
+		$gameVariables.setValue(21,`${msgText1}${code1}${$dataWeapons[79].name}`);
+		$gameVariables.setValue(22,`${msgText2}${code1}${$dataWeapons[74].name}`);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:301
+	AGH_evt0389_SnippetSetValue256 = function (__a0) {
+		$gameVariables.setValue(256,__a0);//本降り
+		map_weatherSet2();
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:301, data/Map007.json:map-event:3:page:1
+	AGH_evt0390_Snippet = function (interp, __a0) {
+		return (function (__a0) {
+		interp._eventId = __a0;
+		}).call(interp, __a0);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:301, data/CommonEvents.json:common-event:401
+	AGH_evt0391_SnippetActor22 = function (__a0) {
+		$gameActors.actor(22).setName($gameActors.actor(__a0).name().slice(0, 1));
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:301, data/CommonEvents.json:common-event:471
+	AGH_evt0392_SnippetValuePic155 = function () {
+		valuePic1 = 55;
+		for (var i = 0; i <= 3; i++) {pic_eraseP(1,[valuePic1+i])};
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:301, data/CommonEvents.json:common-event:349
+	AGH_evt0393_SnippetValue1530 = function (interp, __a0, __a1, __a2, __a3) {
+		return (function (__a0, __a1, __a2, __a3) {
+		var value1 = __a0;//$gameVariables.value(530);
+		event_respawnSetA(value1,__a1,__a2,__a3);
+		interp._eventId = $gameVariables.value(292)[value1];
+		}).call(interp, __a0, __a1, __a2, __a3);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:301, data/CommonEvents.json:common-event:543
+	AGH_evt0394_SnippetValuePic151 = function (__a0, __a1) {
+		valuePic1 = __a0;
+		var value2 = 'ScreenBlackOut';
+		$gameScreen.showPicture(valuePic1,value2,1,640,384,100,100,__a1,0);
+		picture_fade1(valuePic1,"fadeIn",valueWipeImg,60,5);
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:301, data/CommonEvents.json:common-event:302, data/Map018.json:map-event:32:page:1
+	AGH_evt0395_SnippetSetValue21 = function (__a0) {
+		$gameVariables.setValue(21,
+		$gameVariables.value(380+__a0)[59]);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:301, data/Map094.json:map-event:45:page:1
+	AGH_evt0396_SnippetValuePic151 = function (__a0) {
+		valuePic1 = __a0;
+		picture_fade1(valuePic1,"fadeOut",valueWipeImg,60,5);
+	};
+
+	// Replaces (7x): data/CommonEvents.json:common-event:301, data/CommonEvents.json:common-event:303, data/CommonEvents.json:common-event:324, …
+	AGH_evt0397_SnippetSaveBgm = function (__a0) {
+		$gameSystem.saveBgm();
+		AudioManager.fadeOutBgm(__a0);
+	};
+
+	// Replaces (7x): data/CommonEvents.json:common-event:301, data/CommonEvents.json:common-event:304, data/CommonEvents.json:common-event:305, …
+	AGH_evt0398_SnippetSVal21 = function (interp, __a0, __a1) {
+		return (function (__a0, __a1) {
+		interp.sVal(__a0,$dataSystem.switches[__a1]);
+		}).call(interp, __a0, __a1);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:301, data/CommonEvents.json:common-event:471
+	AGH_evt0399_SnippetValue1241 = function (interp, __a0) {
+		var msgText1 = `\\CL【`; //翻訳対象
+		var msgText2 = `】`; //翻訳対象
+		return (function (__a0) {
+		var value1 = $dataSystem.switches[__a0];
+		map_centerDispray(55,`${msgText1}${value1}${msgText2}`);
+		interp.wait(40);
+		}).call(interp, __a0);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:301
+	AGH_evt0400_SnippetValuePic113 = function (__a0) {
+		valuePic1 = __a0;
+		picTachie_move1(valuePic1,-500,0,0,0,0,60);
+	};
+
+	// Replaces (7x): data/CommonEvents.json:common-event:302, data/CommonEvents.json:common-event:304, data/CommonEvents.json:common-event:305, data/CommonEvents.json:common-event:309, data/CommonEvents.json:common-event:339, data/CommonEvents.json:common-event:382, …
+	AGH_evt0401_SnippetValue1530 = function (__a0) {
+		var value1 = $gameVariables.value(530);
+		var arr1 = $gameVariables.value(163)[$gameVariables.value(535)];
+		event_respawnSetA(value1,arr1[3],arr1[4],1);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.setImage(arr1[1], arr1[2]);
+		event.setDirection(arr1[5]);
+		var value1 = __a0;
+		event_respawnSetN(value1,arr1[8],arr1[9],0,arr1[6],arr1[7]);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.setDirection(arr1[10]);
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:302, data/CommonEvents.json:common-event:305, data/CommonEvents.json:common-event:401, data/Map094.json:map-event:45:page:1
+	AGH_evt0402_SnippetValue1530 = function (__a0, __a1, __a2, __a3) {
+		var value1 = $gameVariables.value(530);
+		event_respawnSetA(value1,__a0,__a1,__a2);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.setDirection(__a3);
+	};
+
+	// Replaces (6x): data/CommonEvents.json:common-event:302, data/CommonEvents.json:common-event:305, data/CommonEvents.json:common-event:511, data/CommonEvents.json:common-event:552, data/Map094.json:map-event:45:page:1
+	AGH_evt0403_SnippetValue111 = function (__a0, __a1, __a2, __a3, __a4, __a5, __a6) {
+		var value1 = __a0;
+		event_respawnSetN(value1,__a1,__a2,__a3,__a4,__a5);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.setDirection(__a6);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:303, data/CommonEvents.json:common-event:324
+	AGH_evt0404_SnippetValue111 = function (__a0, __a1) {
+		var value1 = 11;
+		event_respawnSetN(value1,13,22,0,'People3',6);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.setDirection(8);
+		var value1 = 12;
+		event_respawnSetN(value1,__a0,23,0,'People3',7);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.setDirection(8);
+		var value1 = 13;
+		event_respawnSetN(value1,__a1,23,0,'People3',7);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.setDirection(8);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:303, data/CommonEvents.json:common-event:324, data/CommonEvents.json:common-event:471
+	AGH_evt0405_SnippetEvent12 = function (__a0, __a1, __a2) {
+		for (var i = __a0; i <= __a1; i++) {
+		  $gameMap.event($gameVariables.value(292)[i]).forceMoveRoute({
+		  "list":[
+		  {"code":45, "parameters":["this.startOpacity(60,0);"]},
+		  {"code":45, "parameters":[__a2]},
+		  {"code":0}],"repeat":false,"skippable":true});
+		};
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:304, data/CommonEvents.json:common-event:325, data/CommonEvents.json:common-event:335, data/CommonEvents.json:common-event:339
+	AGH_evt0406_SnippetValue1530 = function () {
+		var value1 = 4;//$gameVariables.value(530);
+		event_respawnSetA(value1,12,6,0);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.setDirection(6);
+		var value1 = 5;//$gameVariables.value(530);
+		event_respawnSetA(value1,13,7,0);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.setDirection(8);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:305, data/CommonEvents.json:common-event:306
+	AGH_evt0407_SnippetValue1530 = function (interp, __a0, __a1) {
+		return (function (__a0, __a1) {
+		var value1 = $gameVariables.value(530);
+		event_respawnSetA(value1,__a0,__a1,1);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.setDirection(2);
+		var value1 = $gameVariables.value(530);
+		interp._eventId = $gameVariables.value(292)[value1];
+		}).call(interp, __a0, __a1);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:306
+	AGH_evt0408_SnippetSetValue134 = function (interp) {
+		var msgText1 = `街で準備を整えて、\n`; //翻訳対象
+		var code1 = `\\in[21]`; // code, not translation text
+		var msgText2 = `へ向かいましょう！`; //翻訳対象
+		return (function () {
+		$gameVariables.setValue(134,
+		`${msgText1}${code1}${msgText2}`);
+		interp.sVal(21,$dataSystem.switches[248]);
+		}).call(interp);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:308
+	AGH_evt0409_SnippetSetValue134 = function (interp) {
+		var msgText1 = `戦いは避けられませんね…。\n`; //翻訳対象
+		var code1 = `\\in[21]`; // code, not translation text
+		var msgText2 = `ボスを討伐しましょう！`; //翻訳対象
+		return (function () {
+		$gameVariables.setValue(134,
+		`${msgText1}${code1}${msgText2}`);
+		interp.sVal(21,$dataSystem.switches[248]);
+		}).call(interp);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:310
+	AGH_evt0410_SnippetSetValue134 = function (interp) {
+		var msgText1 = `中央平原へ行きましょう`; //翻訳対象
+		return (function () {
+		$gameVariables.setValue(134,
+		`${msgText1}`);
+		interp.sVal(21,$dataSystem.switches[248]);
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:306, data/CommonEvents.json:common-event:336
+	AGH_evt0411_SnippetValue1530 = function () {
+		var value1 = $gameVariables.value(530);
+		var arr1 = $gameVariables.value(163)[$gameVariables.value(535)];
+		event_respawnSetA(value1,7,9,1,4);
+		var value1 = 11;
+		event_respawnSetN(value1,arr1[8],arr1[9],0,arr1[6],arr1[7]);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.setDirection(6);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:306, data/CommonEvents.json:common-event:342
+	AGH_evt0412_SnippetValuePic155 = function (__a0) {
+		valuePic1 = 55;
+		valueScenePic = __a0;
+		var value2 = valueScenePic;
+		$gameScreen.showPicture(valuePic1,value2,1,640-128,384-20,100,100,0,0);
+		$gameScreen.movePicture(valuePic1,1,640-128,384,100,100,255,0,60);
+	};
+
+	// Replaces (16x): data/CommonEvents.json:common-event:306, data/CommonEvents.json:common-event:310, data/CommonEvents.json:common-event:314, data/CommonEvents.json:common-event:325, data/CommonEvents.json:common-event:330, data/CommonEvents.json:common-event:336, …
+	AGH_evt0413_SnippetSetValue71 = function (__a0, __a1, __a2) {
+		$gameVariables.setValue(71,240);//ティッカーウェイト
+		get_infoDirect(__a0,__a1,0,__a2);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:306
+	AGH_evt0414_SnippetPic_move1100 = function (__a0, __a1) {
+		//pic_move1(valuePic1+1,0,0,100,100,0,90);
+		var value1 = valuePic1+__a0;
+		var value2 = valueScenePic+__a1;
+		$gameScreen.showPicture(value1,value2,1,640-128+50,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128+50,384,100,100,255,0,60);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:306
+	AGH_evt0415_SnippetArr1707 = function () {
+		var msgText1 = `「ハァ、ハァ…」`; //翻訳対象
+		var msgText2 = `「ン………」`; //翻訳対象
+		var msgText3 = `「ハァ…」`; //翻訳対象
+		var msgText4 = `「ハァっ………」`; //翻訳対象
+		var arr1 = [`${msgText1}`,`${msgText2}`,`${msgText3}`,`${msgText4}`];//文字BGV
+		$gameVariables.setValue(707,arr1);
+		$gameVariables.setValue(706,[640-128,386,1,120,0,'eromangasimaji']);
+		$gameSwitches.setValue(125,true);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:391
+	AGH_evt0416_SnippetArr112 = function () {
+		var msgText1 = `「アンっ`; //翻訳対象
+		var icon12 = `\\I[12]`; // code, not translation text
+		var msgText2 = `」`; //翻訳対象
+		var msgText3 = `「ヒゥンっ`; //翻訳対象
+		var msgText4 = `」`; //翻訳対象
+		var msgText5 = `「アッ`; //翻訳対象
+		var msgText6 = `　ンン`; //翻訳対象
+		var msgText7 = `」`; //翻訳対象
+		var msgText8 = `「ヒンs[20]ンs[28]っ`; //翻訳対象
+		var msgText9 = `」`; //翻訳対象
+		var arr1 = [`${msgText1}${icon12}${msgText2}`,`${msgText3}${icon12}${msgText4}`,`${msgText5}${icon12}${msgText6}${icon12}${msgText7}`,`${msgText8}${icon12}${msgText9}`];//文字BGV
+		$gameVariables.setValue(707,arr1);
+		$gameVariables.setValue(706,[640-128,386,0,80,0,'eromangasimaji']);
+		$gameSwitches.setValue(125,true);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:531
+	AGH_evt0417_SnippetArr112 = function () {
+		var msgText1 = `「アンっ`; //翻訳対象
+		var icon12 = `\\I[12]`; // code, not translation text
+		var msgText2 = `」`; //翻訳対象
+		var msgText3 = `「ヒゥンっ`; //翻訳対象
+		var msgText4 = `」`; //翻訳対象
+		var msgText5 = `「アッ`; //翻訳対象
+		var msgText6 = `　ンン`; //翻訳対象
+		var msgText7 = `」`; //翻訳対象
+		var msgText8 = `「ヒンンっ`; //翻訳対象
+		var msgText9 = `」`; //翻訳対象
+		var arr1 = [`${msgText1}${icon12}${msgText2}`,`${msgText3}${icon12}${msgText4}`,`${msgText5}${icon12}${msgText6}${icon12}${msgText7}`,`${msgText8}${icon12}${msgText9}`];//文字BGV
+		$gameVariables.setValue(707,arr1);
+		$gameVariables.setValue(706,[640-128,386,0,120,0,'eromangasimaji']);
+		$gameSwitches.setValue(125,true);
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:307, data/CommonEvents.json:common-event:311, data/CommonEvents.json:common-event:317, data/CommonEvents.json:common-event:320
+	AGH_evt0418_SnippetEvent200 = function () {
+		for (var id = 200; id > 0; id--) {
+		  if(!!$gameMap.event(id)) {
+		    if ($gameMap.event(id).event().meta['MonsterSymbol']){
+		      $gameMap.event(id).forceMoveRoute({
+		      "list":[
+		  {"code":15, "parameters":[600]},
+		  {"code":0}],"repeat":true,"skippable":true});
+		}}};
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:307
+	AGH_evt0419_SnippetValuePic113 = function () {
+		valuePic1 = 13;
+		var value1 = $gameScreen.picture(valuePic1).scaleX();
+		picTachie_move1(valuePic1,0,0,-value1*2,0,255,60);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:307, data/CommonEvents.json:common-event:335, data/CommonEvents.json:common-event:337
+	AGH_evt0420_SnippetSVal21 = function (interp, __a0) {
+		var msgText1 = `＆`; //翻訳対象
+		return (function (__a0) {
+		interp.sVal(__a0,
+		`${$gameActors.actor(3).name()}${msgText1}${$gameActors.actor(4).name()}`
+		);
+		}).call(interp, __a0);
+	};
+
+	// Replaces (7x): data/CommonEvents.json:common-event:313, data/CommonEvents.json:common-event:322, data/CommonEvents.json:common-event:326, data/CommonEvents.json:common-event:338, data/CommonEvents.json:common-event:339, data/CommonEvents.json:common-event:355, …
+	AGH_evt0421_SnippetSVal23 = function (interp, __a0) {
+		return (function (__a0) {
+		interp.sVal(23,
+		__a0
+		);
+		}).call(interp, __a0);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:337
+	AGH_evt0422_SnippetSVal23 = function (interp) {
+		var msgText1 = `以外`; //翻訳対象
+		return (function () {
+		interp.sVal(23,
+		`${$gameActors.actor(4).name()}${msgText1}`
+		);
+		}).call(interp);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:356
+	AGH_evt0423_SnippetSVal23 = function (interp) {
+		var msgText1 = `＆`; //翻訳対象
+		var msgText2 = `＆`; //翻訳対象
+		return (function () {
+		interp.sVal(23,
+		`${$gameActors.actor(3).name()}${msgText1}${$gameActors.actor(4).name()}${msgText2}${$gameActors.actor(5).name()}`
+		);
+		}).call(interp);
+	};
+
+	// Replaces (5x): data/CommonEvents.json:common-event:308, data/CommonEvents.json:common-event:317, data/CommonEvents.json:common-event:320, data/CommonEvents.json:common-event:327, data/CommonEvents.json:common-event:328
+	AGH_evt0424_SnippetValue1530 = function () {
+		var value1 = $gameVariables.value(530);
+		var arr1 = $gameVariables.value(163)[$gameVariables.value(535)];
+		event_respawnSetA(value1,arr1[3],arr1[4],1);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.setImage(arr1[1], arr1[2]);
+		event.setDirection(arr1[5]);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:309, data/CommonEvents.json:common-event:334
+	AGH_evt0425_SnippetSetValue71 = function (__a0, __a1, __a2, __a3) {
+		$gameVariables.setValue(71,240);
+		get_infoDirect(__a0,__a1,0,1);
+		get_infoDirect(0,__a2,0,__a3);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:312
+	AGH_evt0426_SnippetSVal172 = function (interp, __a0) {
+		var code1 = `\\swi[252]`; // code, not translation text
+		var msgText1 = `の出現エネミーが変化しました。`; //翻訳対象
+		return (function (__a0) {
+		interp.sVal(172,19);//中央に一言メッセージ
+		var value1 = `${code1}${msgText1}`;
+		valueTalkSet = [__a0,28,value1,255];//0で消去 1で通常 2で時間経過  255で背景透明度
+		interp.setupChild($dataCommonEvents[60].list, 0);
+		}).call(interp, __a0);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:314
+	AGH_evt0427_SnippetSetValue11 = function (__a0) {
+		$gameSelfSwitches.setValue([$gameMap.mapId(), __a0, 'A'], true);
+		var value1 = 11;
+	};
+
+	// Replaces (6x): data/CommonEvents.json:common-event:316, data/CommonEvents.json:common-event:319, data/CommonEvents.json:common-event:368, data/CommonEvents.json:common-event:495, data/CommonEvents.json:common-event:532, data/CommonEvents.json:common-event:548
+	AGH_evt0428_SnippetSetValue71 = function (__a0, __a1, __a2, __a3) {
+		$gameVariables.setValue(71,240);//ティッカーウェイト
+		get_infoDirect(0,__a0,0,1);
+		get_infoDirect(__a1,__a2,0,__a3);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:318, data/CommonEvents.json:common-event:326, data/CommonEvents.json:common-event:333
+	AGH_evt0429_SnippetValue112 = function () {
+		var value1 = 12;
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.requestAnimation(635);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:322, data/CommonEvents.json:common-event:354
+	AGH_evt0430_SnippetValue111 = function () {
+		var value1 = 11;
+		event_respawnSetN(value1,27,8,0,'BB_akunin3',5);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.setDirection(2);
+		event._spriteOffsetY = -10;
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:322, data/CommonEvents.json:common-event:354, data/CommonEvents.json:common-event:358
+	AGH_evt0431_SnippetValue116 = function () {
+		var value1 = 16;
+		event_respawnSetN(value1,27,17,0,'BB_akunin3',0);
+		var value1 = 12;
+		event_respawnSetN(value1,25,15,0,'BB_akunin3',1);
+		var value1 = 13;
+		event_respawnSetN(value1,24,13,0,'BB_akunin3',2);
+		var value1 = 14;
+		event_respawnSetN(value1,29,15,0,'BB_akunin3',3);
+		var value1 = 15;
+		event_respawnSetN(value1,31,14,0,'BB_akunin3',4);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:322, data/CommonEvents.json:common-event:335
+	AGH_evt0432_SnippetArr1292 = function (__a0) {
+		var arr1 = [];
+		arr1.push($gameVariables.value(292)[3]);
+		arr1.push($gameVariables.value(292)[4]);
+		arr1.push($gameVariables.value(292)[5]);
+		event_NpcCharaMoveId(__a0,0,arr1);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:323, data/CommonEvents.json:common-event:332
+	AGH_evt0433_SnippetValue1530 = function (interp, __a0, __a1, __a2) {
+		return (function (__a0, __a1, __a2) {
+		var value1 = $gameVariables.value(530);
+		var arr1 = $gameVariables.value(163)[$gameVariables.value(535)];
+		event_respawnSetA(value1,__a0,__a1,1,__a2);
+		interp._eventId = $gameVariables.value(292)[value1];
+		}).call(interp, __a0, __a1, __a2);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:325, data/CommonEvents.json:common-event:338
+	AGH_evt0434_SnippetValue1530 = function (interp) {
+		return (function () {
+		var value1 = $gameVariables.value(530);
+		var arr1 = $gameVariables.value(163)[$gameVariables.value(535)];
+		event_respawnSetA(value1,arr1[3],arr1[4],1);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.setImage(arr1[1], arr1[2]);
+		event.setDirection(arr1[5]);
+		var value1 = 11;
+		event_respawnSetN(value1,arr1[8],arr1[9],0,arr1[6],arr1[7]);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.setDirection(arr1[10]);
+		interp._eventId = $gameVariables.value(292)[value1];
+		}).call(interp);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:327, data/CommonEvents.json:common-event:332, data/CommonEvents.json:common-event:349
+	AGH_evt0435_SnippetEvent_partyCharaMove17 = function (__a0) {
+		event_partyCharaMove(__a0,0);//19上を向く
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:329
+	AGH_evt0436_SnippetActor693 = function () {
+		var actor = $gameActors.actor(1);
+		actor.addState(693);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:330, data/CommonEvents.json:common-event:331
+	AGH_evt0437_SnippetSetValue171 = function (interp) {
+		return (function () {
+		$gameVariables.setValue(171,[41,32,11]);
+		//$gameVariables.setValue(528,100);
+		interp.setupChild($dataCommonEvents[54].list, 0);
+		}).call(interp);
+	};
+
+	// Replaces (7x): data/CommonEvents.json:common-event:331, data/CommonEvents.json:common-event:338, data/CommonEvents.json:common-event:356, data/CommonEvents.json:common-event:359, data/CommonEvents.json:common-event:536, data/CommonEvents.json:common-event:546, …
+	AGH_evt0438_SnippetValue1530 = function (__a0) {
+		var value1 = __a0;//$gameVariables.value(530);
+		var value1 = $gameVariables.value(292)[value1];
+		drowsepost.camera.zoom(1, 60, value1);
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:331, data/CommonEvents.json:common-event:511, data/Map094.json:map-event:45:page:1
+	AGH_evt0439_SnippetValue113 = function (__a0, __a1) {
+		var value1 = $gameMap.mapId();
+		var value2 = __a0;//this._eventId;
+		var value3 = __a1;
+		var value4 = true;//false;
+		$gameSelfSwitches.setValue([value1, value2, value3], value4);
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:331, data/CommonEvents.json:common-event:337, data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
+	AGH_evt0440_SnippetDrowsepost60 = function (__a0) {
+		drowsepost.camera.zoom(1, 60, __a0);
+	};
+
+	// Replaces (5x): data/CommonEvents.json:common-event:331, data/CommonEvents.json:common-event:337, data/CommonEvents.json:common-event:339, data/CommonEvents.json:common-event:530
+	AGH_evt0441_SnippetArr1292 = function (__a0, __a1, __a2) {
+		var arr1 = [];
+		arr1.push($gameVariables.value(292)[__a0]);
+		arr1.push($gameVariables.value(292)[__a1]);
+		event_NpcCharaMoveId(__a2,0,arr1);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:333, data/CommonEvents.json:common-event:348
+	AGH_evt0442_SnippetValue1530 = function (interp, __a0, __a1, __a2, __a3, __a4) {
+		return (function (__a0, __a1, __a2, __a3, __a4) {
+		var value1 = $gameVariables.value(530);
+		event_respawnSetA(value1,12,__a0,1,8);
+		interp._eventId = $gameVariables.value(292)[value1];
+		var value1 = 11;
+		event_respawnSetN(value1,12,__a1,0,__a2,__a3,__a4);
+		}).call(interp, __a0, __a1, __a2, __a3, __a4);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:336, data/CommonEvents.json:common-event:347, data/CommonEvents.json:common-event:349
+	AGH_evt0443_SnippetValue111 = function (interp, __a0, __a1, __a2, __a3) {
+		return (function (__a0, __a1, __a2, __a3) {
+		var value1 = 11;
+		event_respawnSetN(value1,__a0,__a1,0,__a2,0,__a3);
+		interp._eventId = $gameVariables.value(292)[value1];
+		}).call(interp, __a0, __a1, __a2, __a3);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:338
+	AGH_evt0444_SnippetActor20 = function (interp, __a0) {
+		return (function (__a0) {
+		var actor = $gameActors.actor($gameVariables.value(20));
+		tachie_dousa(2,1,__a0,15,1,255,1344,0,0);
+		tachie_dousa(1,1,4,15,1,255,0,0,0);
+		interp.wait(3);
+		}).call(interp, __a0);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:338, data/CommonEvents.json:common-event:361, data/CommonEvents.json:common-event:471
+	AGH_evt0445_SnippetDrowsepost60 = function (interp) {
+		return (function () {
+		drowsepost.camera.zoom(1.5, 60, interp._eventId);
+		}).call(interp);
+	};
+
+	// Replaces (6x): data/CommonEvents.json:common-event:338, data/CommonEvents.json:common-event:346, data/CommonEvents.json:common-event:361, data/CommonEvents.json:common-event:471, data/CommonEvents.json:common-event:530
+	AGH_evt0446_SnippetArr1292 = function (__a0, __a1, __a2) {
+		var arr1 = [];
+		arr1.push($gameVariables.value(292)[__a0]);
+		event_NpcCharaMoveId(__a1,__a2,arr1);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:338, data/CommonEvents.json:common-event:547
+	AGH_evt0447_SnippetValue111 = function (__a0, __a1, __a2, __a3, __a4) {
+		var value1 = 11;
+		event_respawnSetN(value1,__a0,__a1,0,__a2,__a3,__a4);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:338, data/CommonEvents.json:common-event:536
+	AGH_evt0448_SnippetValue1 = function (__a0) {
+		var value1 = valuePic1;
+		if($gameScreen.picture(value1)){
+		  $gameScreen.picture(value1).startAnimationFrame(__a0, true, [1,1,1,2]);
+		};
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:338
+	AGH_evt0449_SnippetArr112 = function () {
+		var msgText1 = `「アッ`; //翻訳対象
+		var icon12 = `\\I[12]`; // code, not translation text
+		var msgText2 = `」`; //翻訳対象
+		var msgText3 = `「ンッ`; //翻訳対象
+		var msgText4 = `」`; //翻訳対象
+		var msgText5 = `「ンン…`; //翻訳対象
+		var msgText6 = `」`; //翻訳対象
+		var msgText7 = `「ンクっ…`; //翻訳対象
+		var msgText8 = `」`; //翻訳対象
+		var msgText9 = `「ァンっ…`; //翻訳対象
+		var msgText10 = `」`; //翻訳対象
+		var arr1 = [`${msgText1}${icon12}${msgText2}`,`${msgText3}${icon12}${msgText4}`,`${msgText5}${icon12}${msgText6}`,`${msgText7}${icon12}${msgText8}`,`${msgText9}${icon12}${msgText10}`];//文字BGV
+		$gameVariables.setValue(707,arr1);
+		$gameVariables.setValue(706,[640-128,386,1,180,0,'eromangasimaji']);
+		$gameSwitches.setValue(125,true);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:518
+	AGH_evt0450_SnippetArr1707 = function () {
+		var msgText1 = `「………ァっ」`; //翻訳対象
+		var msgText2 = `「いや…」`; //翻訳対象
+		var msgText3 = `「ンン──……」`; //翻訳対象
+		var msgText4 = `「ンクっ…」`; //翻訳対象
+		var msgText5 = `「ァンっ…」`; //翻訳対象
+		var arr1 = [`${msgText1}`,`${msgText2}`,`${msgText3}`,`${msgText4}`,`${msgText5}`];//文字BGV
+		$gameVariables.setValue(707,arr1);
+		$gameVariables.setValue(706,[640-128,386,1,180,0,'eromangasimaji']);
+		$gameSwitches.setValue(125,true);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:338
+	AGH_evt0451_SnippetValue2101 = function (__a0, __a1) {
+		var value2 = __a0;
+		$gameScreen.showPicture(__a1,value2,1,640,384,100,100,255,0);
+		picture_fade1(valuePic1,"fadeIn",'150',60,5);
+	};
+
+	// Replaces (6x): data/CommonEvents.json:common-event:338, data/CommonEvents.json:common-event:368, data/CommonEvents.json:common-event:495, data/CommonEvents.json:common-event:532, data/CommonEvents.json:common-event:547, data/CommonEvents.json:common-event:548
+	AGH_evt0452_SnippetSVal20 = function (interp, __a0) {
+		return (function (__a0) {
+		interp.sVal(20,$gameVariables.value(2));
+		interp.sVal(19,__a0);
+		interp.sVal(14,16);//14ｱｲﾃﾑ称号15ｽｷﾙ習得16忘却,変数19にID
+		interp.setupChild($dataCommonEvents[44].list, 0);
+		}).call(interp, __a0);
+	};
+
+	// Replaces (5x): data/CommonEvents.json:common-event:338, data/CommonEvents.json:common-event:341, data/CommonEvents.json:common-event:507, data/CommonEvents.json:common-event:517, data/CommonEvents.json:common-event:545
+	AGH_evt0453_SnippetValue107 = function (__a0, __a1, __a2, __a3) {
+		var value1 = valuePic1+__a0;
+		var value2 = valueScenePic+__a1;
+		$gameScreen.showPicture(value1,value2,1,640-128,384,__a2,__a3,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+	};
+
+	// Replaces (11x): data/CommonEvents.json:common-event:338, data/CommonEvents.json:common-event:481, data/CommonEvents.json:common-event:503, data/CommonEvents.json:common-event:536, data/CommonEvents.json:common-event:537, data/CommonEvents.json:common-event:544, …
+	AGH_evt0454_SnippetDarknessOpacity = function (__a0) {
+		$gameMap.darknessOpacity = __a0;
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:341
+	AGH_evt0455_SnippetValuePic155 = function () {
+		valuePic1 = 55;
+		var value2 = 'ScreenBlackOut';
+		$gameScreen.showPicture(valuePic1-1,value2,1,640,384,100,100,200,0);
+		picture_fade1(valuePic1-1,"fadeIn",valueWipeImg,60,5);
+	};
+
+	// Replaces (8x): data/CommonEvents.json:common-event:341, …
+	AGH_evt0456_SnippetValue102 = function (__a0, __a1, __a2, __a3) {
+		var value1 = valuePic1+__a0;
+		var value2 = valueScenePic+__a1;
+		$gameScreen.showPicture(value1,value2,1,640-128,384,__a2,__a3,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:341, data/CommonEvents.json:common-event:342
+	AGH_evt0457_SnippetValue1530 = function (interp) {
+		return (function () {
+		var value1 = 5;//$gameVariables.value(530);
+		event_respawnSetA(value1,13,6,1,4);
+		interp._eventId = $gameVariables.value(292)[value1];
+		event_respawnSetN(11,18,10,0,'npcCastle1',2,4);
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:342
+	AGH_evt0458_SnippetGraphics10 = function (interp, __a0) {
+		return (function (__a0) {
+		Graphics.loadFont("GameFont",__a0);
+		interp.wait(10);
+		}).call(interp, __a0);
+	};
+
+	// Replaces (8x): data/CommonEvents.json:common-event:342, data/CommonEvents.json:common-event:382, data/CommonEvents.json:common-event:511, data/Map094.json:map-event:45:page:1, …
+	AGH_evt0459_SnippetValue112 = function (__a0, __a1) {
+		var value1 = __a0;
+		var value1 = $gameVariables.value(292)[value1];
+		message_popup2(value1,0,__a1,1);
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:342, data/CommonEvents.json:common-event:364
+	AGH_evt0460_SnippetSVal14 = function (interp, __a0) {
+		return (function (__a0) {
+		interp.sVal(14,19);interp.sVal(20,__a0);interp.sVal(121,0);//仲間加入コモン
+		interp.setupChild($dataCommonEvents[64].list, 0);
+		}).call(interp, __a0);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:343
+	AGH_evt0461_SnippetValue1292 = function (__a0) {
+		var value1 = 'monster_c';
+		var value2 = $gameVariables.value(292)[__a0];
+		$gameScreen._particle.particleSet(value2,value1+'-'+value2,'this',value1);
+		//$gameScreen._particle.particleClear(value1+'-'+value2);
+		var value1 = 'mahoujin_c';
+		$gameScreen._particle.particleSet(value2,value1+'-'+value2,'this',value1);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:349, data/CommonEvents.json:common-event:542
+	AGH_evt0462_SnippetValue1530 = function (interp) {
+		return (function () {
+		var value1 = $gameVariables.value(530);
+		var arr1 = $gameVariables.value(163)[$gameVariables.value(535)];
+		event_respawnSetA(value1,arr1[3],arr1[4],1,arr1[5]);
+		interp._eventId = $gameVariables.value(292)[value1];
+		}).call(interp);
+	};
+
+	// Replaces (6x): data/CommonEvents.json:common-event:356, data/CommonEvents.json:common-event:357, data/CommonEvents.json:common-event:358, data/CommonEvents.json:common-event:359, data/CommonEvents.json:common-event:360, data/CommonEvents.json:common-event:362
+	AGH_evt0463_SnippetValue1530 = function (__a0, __a1) {
+		var value1 = $gameVariables.value(530);
+		event_respawnSetA(value1,__a0,__a1,1,8);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:356
+	AGH_evt0464_SnippetValue1530 = function (interp, __a0, __a1, __a2, __a3, __a4) {
+		return (function (__a0, __a1, __a2, __a3, __a4) {
+		var value1 = 3;//$gameVariables.value(530);
+		var value1 = $gameVariables.value(292)[value1];
+		character = interp.character(value1);
+		character.locate(__a0, 14);
+		character.setDirection(__a1);
+		var value1 = 4;//$gameVariables.value(530);
+		var value1 = $gameVariables.value(292)[value1];
+		character = interp.character(value1);
+		character.locate(__a2, __a3);
+		character.setDirection(__a4);
+		}).call(interp, __a0, __a1, __a2, __a3, __a4);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:356
+	AGH_evt0465_SnippetValue1530 = function (interp, __a0, __a1) {
+		var msgText1 = `ガサゴソ──`; //翻訳対象
+		return (function (__a0, __a1) {
+		var value1 = __a0;//$gameVariables.value(530);
+		interp._eventId = $gameVariables.value(292)[value1];
+		var arr1 = [0];
+		var arr2 = [-10];
+		var arr3 = [`${msgText1}`];
+		chara_oneWord(__a1,interp._eventId,25,180,arr1,arr2,arr3);
+		}).call(interp, __a0, __a1);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:356
+	AGH_evt0466_SnippetValue1530 = function () {
+		var value1 = $gameVariables.value(530);
+		var value1 = $gameVariables.value(292)[value1];
+		event_partyCharaMove(45,"this.moveTowardCharacter($gameMap.event("+value1+"));");
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:358, data/CommonEvents.json:common-event:361
+	AGH_evt0467_SnippetValue112 = function (__a0) {
+		for (var i = 12; i <= __a0; i++) {
+		  var value1 = $gameVariables.value(292)[i]; //this._eventId
+		  if(!!$gameMap.event(value1)) {
+		    var event = $gameMap.event(value1);
+		    event.setStepAnime(false);event.setWalkAnime(false);
+		    event.setDirection(2);event.resetPattern();
+		    event._originalPattern = 1;event.setAngle(45);
+		    event._spriteOffsetX = -12;event._spriteOffsetY = -12;
+		    event._kageM.clear();
+		    event.setFace(6,true,true);
+		}};
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:359, data/CommonEvents.json:common-event:361
+	AGH_evt0468_SnippetValueBossId = function (interp) {
+		return (function () {
+		interp._eventId = valueBossId;
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:359
+	AGH_evt0469_SnippetValue1530 = function (__a0, __a1, __a2, __a3, __a4, __a5, __a6, __a7) {
+		var value1 = __a0;//$gameVariables.value(530);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.locate(__a1, __a2);
+		event.setDirection(__a3);
+		var value1 = __a4;//$gameVariables.value(530);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.locate(__a5, __a6);
+		event.setDirection(__a7);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:361
+	AGH_evt0470_SnippetSVal20 = function (interp) {
+		var msgText1 = `　　`; //翻訳対象
+		var colorCode16 = `\\C[16]`; // code, not translation text
+		var colorReset = `\\C[0]`; // code, not translation text
+		var msgText2 = `はメインクラス2ndジョブ`; //翻訳対象
+		var colorCode2 = `\\C[2]`; // code, not translation text
+		var msgText3 = `＜`; //翻訳対象
+		var code1 = `\\j[21]`; // code, not translation text
+		var msgText4 = `＞`; //翻訳対象
+		var msgText5 = `に目覚めた！`; //翻訳対象
+		return (function () {
+		interp.sVal(20,1);
+		var actor = $gameActors.actor($gameVariables.value(20));
+		valueWordSet0 = `${msgText1}${colorCode16}${actor.name()}${colorReset}${msgText2}${colorCode2}${msgText3}${code1}${msgText4}${colorReset}${msgText5}`;
+		valueWordSetEx = 0;//補足が必要な場合
+		interp.setupChild($dataCommonEvents[45].list, 0);
+		}).call(interp);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:361
+	AGH_evt0471_SnippetSVal20 = function (interp) {
+		var msgText1 = `　　`; //翻訳対象
+		var colorCode16 = `\\C[16]`; // code, not translation text
+		var colorReset = `\\C[0]`; // code, not translation text
+		var msgText2 = `はメインクラス2ndジョブ`; //翻訳対象
+		var colorCode2 = `\\C[2]`; // code, not translation text
+		var msgText3 = `＜`; //翻訳対象
+		var code1 = `\\j[22]`; // code, not translation text
+		var msgText4 = `＞`; //翻訳対象
+		var msgText5 = `に目覚めた！`; //翻訳対象
+		return (function () {
+		interp.sVal(20,2);
+		var actor = $gameActors.actor($gameVariables.value(20));
+		valueWordSet0 = `${msgText1}${colorCode16}${actor.name()}${colorReset}${msgText2}${colorCode2}${msgText3}${code1}${msgText4}${colorReset}${msgText5}`;
+		valueWordSetEx = 0;//補足が必要な場合
+		interp.setupChild($dataCommonEvents[45].list, 0);
+		}).call(interp);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:361
+	AGH_evt0472_SnippetSVal20 = function (interp) {
+		var msgText1 = `　　`; //翻訳対象
+		var colorCode16 = `\\C[16]`; // code, not translation text
+		var colorReset = `\\C[0]`; // code, not translation text
+		var msgText2 = `はメインクラス2ndジョブ`; //翻訳対象
+		var colorCode2 = `\\C[2]`; // code, not translation text
+		var msgText3 = `＜`; //翻訳対象
+		var code1 = `\\j[23]`; // code, not translation text
+		var msgText4 = `＞`; //翻訳対象
+		var msgText5 = `に目覚めた！`; //翻訳対象
+		return (function () {
+		interp.sVal(20,3);
+		var actor = $gameActors.actor($gameVariables.value(20));
+		valueWordSet0 = `${msgText1}${colorCode16}${actor.name()}${colorReset}${msgText2}${colorCode2}${msgText3}${code1}${msgText4}${colorReset}${msgText5}`;
+		valueWordSetEx = 0;//補足が必要な場合
+		interp.setupChild($dataCommonEvents[45].list, 0);
+		}).call(interp);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:361
+	AGH_evt0473_SnippetSVal20 = function (interp) {
+		var msgText1 = `　　`; //翻訳対象
+		var colorCode16 = `\\C[16]`; // code, not translation text
+		var colorReset = `\\C[0]`; // code, not translation text
+		var msgText2 = `はメインクラス2ndジョブ`; //翻訳対象
+		var colorCode2 = `\\C[2]`; // code, not translation text
+		var msgText3 = `＜`; //翻訳対象
+		var code1 = `\\j[24]`; // code, not translation text
+		var msgText4 = `＞`; //翻訳対象
+		var msgText5 = `に目覚めた！`; //翻訳対象
+		return (function () {
+		interp.sVal(20,4);
+		var actor = $gameActors.actor($gameVariables.value(20));
+		valueWordSet0 = `${msgText1}${colorCode16}${actor.name()}${colorReset}${msgText2}${colorCode2}${msgText3}${code1}${msgText4}${colorReset}${msgText5}`;
+		valueWordSetEx = 0;//補足が必要な場合
+		interp.setupChild($dataCommonEvents[45].list, 0);
+		}).call(interp);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:471
+	AGH_evt0474_SnippetSVal20 = function (interp) {
+		var msgText1 = `　　　　　　`; //翻訳対象
+		var colorCode16 = `\\C[16]`; // code, not translation text
+		var colorReset = `\\C[0]`; // code, not translation text
+		var msgText2 = `はメインクラス2ndジョブ`; //翻訳対象
+		var colorCode2 = `\\C[2]`; // code, not translation text
+		var msgText3 = `＜`; //翻訳対象
+		var code1 = `\\j[25]`; // code, not translation text
+		var msgText4 = `＞`; //翻訳対象
+		var msgText5 = `に目覚めた！`; //翻訳対象
+		return (function () {
+		interp.sVal(20,5);
+		var actor = $gameActors.actor($gameVariables.value(20));
+		valueWordSet0 = `${msgText1}${colorCode16}${actor.name()}${colorReset}${msgText2}${colorCode2}${msgText3}${code1}${msgText4}${colorReset}${msgText5}`;
+		valueWordSetEx = 0;//補足が必要な場合
+		interp.setupChild($dataCommonEvents[45].list, 0);
+		}).call(interp);
+	};
+
+	// Replaces (7x): data/CommonEvents.json:common-event:368, data/CommonEvents.json:common-event:409, data/CommonEvents.json:common-event:412, data/CommonEvents.json:common-event:414, data/CommonEvents.json:common-event:495, data/CommonEvents.json:common-event:532, …
+	AGH_evt0475_SnippetSetMap_musicSelect22 = function () {
+		setMap_musicSelect(1,22,0);//種別,id,0屋内1屋外
+		setMap_parallaxSelect(1,22,1);
+		backGraund_menuMapSelect(2,0,0,0);//右6,70表示の場合
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:368, data/CommonEvents.json:common-event:495, data/CommonEvents.json:common-event:532, data/CommonEvents.json:common-event:548
+	AGH_evt0476_SnippetArr1292 = function () {
+		var arr1 = [];
+		arr1.push($gameVariables.value(292)[1]);
+		arr1.push($gameVariables.value(292)[11]);
+		event_NpcCharaMoveId(16,0,arr1);
+		//1下移動16下向く39透明化
+		//event_partyCharaMove(45,"this.turnTowardCharacter($gameMap.event("+value1+"));");
+		//event_partyCharaMove(45,"UP: 10;"); //"UP: 10;"
+		//event_partyCharaMove(45,"this.requestBalloon(1);");
+		//event_partyCharaMove(45,"this.requestAnimation(617);");
+	};
+
+	// Replaces (6x): data/CommonEvents.json:common-event:368, data/CommonEvents.json:common-event:386, data/CommonEvents.json:common-event:387, data/CommonEvents.json:common-event:495, data/CommonEvents.json:common-event:532, data/CommonEvents.json:common-event:548
+	AGH_evt0477_SnippetValue1161 = function () {
+		var value1 = 1000000;
+		if($gameParty.gold() >= value1){
+		  $gameSwitches.setValue(161,true);
+		} else {
+		  $gameSwitches.setValue(161,false);
+		};
+	};
+
+	// Replaces (9x): data/CommonEvents.json:common-event:368, data/CommonEvents.json:common-event:412, data/CommonEvents.json:common-event:495, data/CommonEvents.json:common-event:507, data/CommonEvents.json:common-event:526, data/CommonEvents.json:common-event:532, …
+	AGH_evt0478_SnippetValue102 = function (__a0, __a1, __a2, __a3) {
+		var value1 = valuePic1+__a0;
+		var value2 = valueScenePic+__a1;
+		pic_locationSet(value1-__a2,value1,value2,60,1);
+		tachie_bless(value1,__a3);
+	};
+
+	// Replaces (5x): data/CommonEvents.json:common-event:368, data/CommonEvents.json:common-event:412, data/CommonEvents.json:common-event:495, data/CommonEvents.json:common-event:532, data/CommonEvents.json:common-event:548
+	AGH_evt0479_SnippetValue101 = function () {
+		var value1 = valuePic2+1;
+		var value2 = valueScenePic+'01';
+		$gameScreen.showPicture(value1,value2,1,640+480+50,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640+480,384,100,100,255,0,60);
+		tachie_bless(value1,1);
+		var value1 = valuePic1+1;
+		var value2 = valueScenePic+'02';
+		$gameScreen.showPicture(value1,value2,1,640-128,384-20,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		hcg_piston(value1,5,1,2);
+	};
+
+	// Replaces (6x): data/CommonEvents.json:common-event:368, data/CommonEvents.json:common-event:412, data/CommonEvents.json:common-event:495, data/CommonEvents.json:common-event:532, data/CommonEvents.json:common-event:548, data/CommonEvents.json:common-event:573
+	AGH_evt0480_SnippetValue21024 = function () {
+		var value2 = 'Screen1024Frame';//1024ﾋﾟｸ表示の際のフレーム枠、,id70
+		$gameScreen.showPicture(valuePic2,value2,1,640-78,384,100,100,255,0);
+		picture_fade1(valuePic2,"fadeIn",valueWipeImg,60,5);
+		tachie_bless(value1,5);
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:368, data/CommonEvents.json:common-event:495, data/CommonEvents.json:common-event:532, data/CommonEvents.json:common-event:548
+	AGH_evt0481_SnippetArr112 = function () {
+		var arr1 = [];
+		htext_word(3);//3高2中1低
+		arr1 = arr1.concat(valueHtextWord);
+		//var arr1 = ['（ドキっ）','（ドキドキ）','（ドクン）','ドキッ'];//文字BGV
+		//var arr1 = ['「アッ\\I[12]」','「ンッ\\I[12]」','「ンン…\\I[12]」','「ンクっ…\\I[12]」','「ァンっ…\\I[12]」'];//文字BGV
+		//var arr1 = ['「………ァっ」','「いや…」','「ンン──……」','「ンクっ…」','「ァンっ…」'];//文字BGV
+		$gameVariables.setValue(707,arr1);
+		$gameVariables.setValue(706,[640-128,386,1,60,0,'eromangasimaji']);
+		$gameSwitches.setValue(125,true);
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:368, data/CommonEvents.json:common-event:495, data/CommonEvents.json:common-event:532, data/CommonEvents.json:common-event:548
+	AGH_evt0482_SnippetValue102 = function () {
+		var value1 = valuePic1+2;
+		var value2 = valueScenePic+'02';
+		$gameScreen.showPicture(value1,value2,1,640,384,100,100,255,0);
+		pic_setArray1 = [1,value1,0,-30,0,20];
+		pic_setArray2 = [1,value1,0,0,3,30]; //pic_setArray2 = [1,0,0,0,0,0];
+		valueParallelPicSe1 = ['ZH_sticky4',20,60];
+		valueParallelPicSe2 = ['ZH_sticky4',20,60];
+		hcg_piston(value1,7,2,1);
+		$gameSwitches.setValue(429,true);
+	};
+
+	// Replaces (7x): data/CommonEvents.json:common-event:368, data/CommonEvents.json:common-event:410, data/CommonEvents.json:common-event:495, data/CommonEvents.json:common-event:532, data/CommonEvents.json:common-event:548, data/CommonEvents.json:common-event:571, …
+	AGH_evt0483_SnippetSetupChild18 = function (interp) {
+		return (function () {
+		//this.setupChild($dataCommonEvents[18].list, 0);
+		interp.setupChild($dataCommonEvents[19].list, 0);
+		}).call(interp);
+	};
+
+	// Replaces (11x): data/CommonEvents.json:common-event:368, data/CommonEvents.json:common-event:410, data/CommonEvents.json:common-event:495, data/CommonEvents.json:common-event:532, data/CommonEvents.json:common-event:536, data/CommonEvents.json:common-event:548, …
+	AGH_evt0484_SnippetTachie_dousa16 = function (__a0, __a1, __a2, __a3) {
+		tachie_dousa(0,1,__a0,__a1,__a2,__a3,120,0,0);
+		var value1 = 'Z_ClothesTakeOff';//ピッチ50か100。消去ウェイトで変更
+		AudioManager.playSe({"name":value1,"volume":150,"pitch":100,"pan":0});
+		//tachie_clothReflect(1);//ｱｸﾀｰid
+	};
+
+	// Replaces (6x): data/CommonEvents.json:common-event:368, data/CommonEvents.json:common-event:495, data/CommonEvents.json:common-event:532, data/CommonEvents.json:common-event:548, data/Map041.json:map-event:7:page:1, data/Map083.json:map-event:6:page:1
+	AGH_evt0485_SnippetSVal23 = function (interp, __a0) {
+		var code1 = `\\v[23]`; // code, not translation text
+		return (function (__a0) {
+		interp.sVal(23,__a0);
+		interp.sVal(172,19);//中央に一言メッセージ,何行でも良し
+		var value1 = `${code1}`;
+		valueTalkSet = [1,28,value1,100];//0で消去 1で通常 2で時間経過  255で背景透明度
+		interp.setupChild($dataCommonEvents[60].list, 0);
+		}).call(interp, __a0);
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:370, data/CommonEvents.json:common-event:371, data/CommonEvents.json:common-event:383, data/CommonEvents.json:common-event:384
+	AGH_evt0486_SnippetSVal530 = function (interp) {
+		return (function () {
+		interp.sVal(530,1);//主格キャラ
+		}).call(interp);
+	};
+
+	// Replaces (6x): data/CommonEvents.json:common-event:370, data/CommonEvents.json:common-event:371, data/CommonEvents.json:common-event:372, data/CommonEvents.json:common-event:373, data/CommonEvents.json:common-event:383, data/CommonEvents.json:common-event:384
+	AGH_evt0487_SnippetH_keikenhyouji1521 = function (__a0) {
+		h_keikenhyouji1(521,__a0);//記録変数,相手ID
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:371, data/CommonEvents.json:common-event:372
+	AGH_evt0488_SnippetValue2800 = function (interp, __a0) {
+		var msgText1 = `デイリークエスト`; //翻訳対象
+		return (function (__a0) {
+		var value2 = 800;valueCountSet1 = __a0;
+		if($dataItems[valueCountSet1].meta['SGカテゴリ']){
+		  if($dataItems[valueCountSet1].meta['SGカテゴリ'] == `${msgText1}`){
+		    var value2 = 900;
+		  } else {
+		    var value2 = 800;
+		  };
+		};
+		var value1 = `\x1bIIN[${valueCountSet1}]\n${valueQuestArray4[valueCountSet1-value2]}`;
+		interp.sVal(172,10);
+		valueTalkSet = [24,value1,1];
+		interp.setupChild($dataCommonEvents[60].list, 0);
+		}).call(interp, __a0);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:383, data/CommonEvents.json:common-event:384, data/CommonEvents.json:common-event:528
+	AGH_evt0489_SnippetSVal530 = function (interp, __a0, __a1) {
+		return (function (__a0, __a1) {
+		interp.sVal(530,1);//主格キャラ
+		$gameVariables.setValue(292,Array(21).fill(0));
+		var value1 = $gameVariables.value(530);
+		event_respawnSetA(value1,__a0,5,1,8);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event._spriteOffsetX = -24;
+		var value1 = 5;//$gameVariables.value(530);
+		event_respawnSetA(value1,__a1,5,1,8);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event._spriteOffsetX = -24;
+		}).call(interp, __a0, __a1);
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:389, data/CommonEvents.json:common-event:507, data/CommonEvents.json:common-event:508, data/CommonEvents.json:common-event:509
+	AGH_evt0490_SnippetValue1530 = function (interp) {
+		return (function () {
+		var value1 = $gameVariables.value(530);
+		var arr1 = $gameVariables.value(163)[$gameVariables.value(535)];
+		event_respawnSetA(value1,12,10,1,4);
+		interp._eventId = $gameVariables.value(292)[value1];
+		var value1 = 11;
+		event_respawnSetN(value1,13,10,0,'npcUnique1',0,4);
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:389, data/CommonEvents.json:common-event:509
+	AGH_evt0491_SnippetValue1530 = function () {
+		var value1 = $gameVariables.value(530);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.locate(18, 10);
+		event.setDirection(8);
+		event._spriteOffsetY = -12;
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:389, data/CommonEvents.json:common-event:509
+	AGH_evt0492_SnippetValue103 = function () {
+		var value1 = valuePic1+3;
+		var value2 = valueScenePic+'03';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		var value1 = valuePic1+4;
+		var value2 = valueScenePic+'04';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		//pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:389, data/CommonEvents.json:common-event:509
+	AGH_evt0493_SnippetValue1 = function () {
+		var value1 = valuePic1+4;
+		hcg_piston(value1,7,1,1);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:389, data/CommonEvents.json:common-event:509
+	AGH_evt0494_SnippetValue106 = function (__a0, __a1, __a2) {
+		var value1 = valuePic1+__a0;
+		var value2 = valueScenePic+__a1;
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		pic_move1(value1-1,0,0,100,100,0,90);
+		hcg_piston(value1,6,__a2,1);
+	};
+
+	// Replaces (5x): data/CommonEvents.json:common-event:390, data/CommonEvents.json:common-event:391, data/CommonEvents.json:common-event:393, data/CommonEvents.json:common-event:399, data/CommonEvents.json:common-event:530
+	AGH_evt0495_SnippetSetValue = function (__a0, __a1) {
+		$gameSelfSwitches.setValue([$gameMap.mapId(), __a0, 'C'], true);
+		$gameSelfSwitches.setValue([$gameMap.mapId(), __a1, 'C'], true);
+	};
+
+	// Replaces (8x): data/CommonEvents.json:common-event:391, data/CommonEvents.json:common-event:393, data/CommonEvents.json:common-event:399, data/CommonEvents.json:common-event:546, …
+	AGH_evt0496_SnippetValuePic151 = function (__a0, __a1) {
+		valuePic1 = 51;
+		var value1 = valuePic1+__a0;
+		var value2 = valueScenePic+__a1;
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		//tachie_bless(value1,2);
+		//pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (7x): data/CommonEvents.json:common-event:391, data/CommonEvents.json:common-event:393, data/CommonEvents.json:common-event:399, data/CommonEvents.json:common-event:531, data/CommonEvents.json:common-event:573, …
+	AGH_evt0497_SnippetValue105 = function (__a0, __a1, __a2) {
+		var value1 = valuePic1+__a0;
+		var value2 = valueScenePic+__a1;
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		hcg_piston(value1,__a2,1,1);
+		pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:391, data/CommonEvents.json:common-event:393, data/CommonEvents.json:common-event:399
+	AGH_evt0498_SnippetValue112 = function () {
+		var value1 = valuePic1+12;
+		var value2 = valueScenePic+'12';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,200,0);
+		hcg_piston(value1,7,1,2);
+		//pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (7x): data/CommonEvents.json:common-event:391, data/CommonEvents.json:common-event:393, data/CommonEvents.json:common-event:399, data/CommonEvents.json:common-event:530, data/CommonEvents.json:common-event:531, data/CommonEvents.json:common-event:572, …
+	AGH_evt0499_SnippetValue190 = function (__a0, __a1, __a2) {
+		var value1 = valuePic1+__a0;
+		pic_move1(value1,0,0,__a1,__a2,0,90);
+	};
+
+	// Replaces (9x): data/CommonEvents.json:common-event:391, data/CommonEvents.json:common-event:393, data/CommonEvents.json:common-event:399, data/CommonEvents.json:common-event:526, data/CommonEvents.json:common-event:531, data/CommonEvents.json:common-event:545, …
+	AGH_evt0500_SnippetValue106 = function (__a0, __a1, __a2) {
+		var value1 = valuePic1+__a0;
+		var value2 = valueScenePic+__a1;
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		tachie_bless(value1,__a2);
+		pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (7x): data/CommonEvents.json:common-event:392, data/Map003.json:map-event:181:page:1, data/Map003.json:map-event:218:page:2, data/Map003.json:map-event:235:page:1, data/Map018.json:map-event:25:page:1, data/Map018.json:map-event:39:page:1, …
+	AGH_evt0501_SnippetNpc_TemporarilySave = function () {
+		Npc_TemporarilySave(0,1);//終了処理
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:393, data/CommonEvents.json:common-event:399, data/CommonEvents.json:common-event:547
+	AGH_evt0502_SnippetValue120 = function (__a0) {
+		var value1 = $gameVariables.value(__a0);//文字HBGV
+		$gameVariables.setValue(318,value1);
+		$gameVariables.setValue(706,[640-128,386,1,80,0,'eromangasimaji']);
+		$gameSwitches.setValue(119,true);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:401
+	AGH_evt0503_SnippetValue115 = function (__a0, __a1, __a2, __a3) {
+		var value1 = __a0;
+		event_respawnSetA(value1,__a1,34,__a2);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.setDirection(__a3);
+	};
+
+	// Replaces (8x): data/CommonEvents.json:common-event:401, data/CommonEvents.json:common-event:414, data/CommonEvents.json:common-event:444, …
+	AGH_evt0504_SnippetSetMessageRow = function (__a0) {
+		$gameMessage.setMessageRow(__a0);
+	};
+
+	// Replaces (5x): data/CommonEvents.json:common-event:406, data/CommonEvents.json:common-event:496, data/CommonEvents.json:common-event:517, data/CommonEvents.json:common-event:518, data/CommonEvents.json:common-event:519
+	AGH_evt0505_SnippetSetMap_musicSelect21 = function () {
+		//setMap_musicSelect(0,21,0);
+		setMap_parallaxSelect(0,21,0);
+		backGraund_menuMapSelect(2,'Dungeon1_2',0,0);//
+	};
+
+	// Replaces (7x): data/CommonEvents.json:common-event:406, data/CommonEvents.json:common-event:496, data/CommonEvents.json:common-event:516, data/CommonEvents.json:common-event:517, data/CommonEvents.json:common-event:518, data/CommonEvents.json:common-event:519, …
+	AGH_evt0506_SnippetValuePic151 = function () {
+		valuePic1 = 51;
+	};
+
+	// Replaces (6x): data/CommonEvents.json:common-event:406, data/CommonEvents.json:common-event:496, data/CommonEvents.json:common-event:516, data/CommonEvents.json:common-event:517, data/CommonEvents.json:common-event:518, data/CommonEvents.json:common-event:519
+	AGH_evt0507_SnippetValue100 = function (__a0) {
+		var value1 = valuePic1;
+		var value2 = valueScenePic+'00';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,__a0,0);
+		picture_fade1(valuePic1,"fadeIn",valueWipeImg,60,5);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:410
+	AGH_evt0508_SnippetBackGraund_menuMapSelect70 = function (__a0) {
+		backGraund_menuMapSelect(2,__a0,0,0);//右6,70表示の場合
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:410, data/CommonEvents.json:common-event:546, data/CommonEvents.json:common-event:547
+	AGH_evt0509_SnippetValue102 = function (__a0, __a1, __a2) {
+		var value1 = valuePic1+__a0;
+		var value2 = valueScenePic+__a1;
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,__a2,0);
+		tachie_bless(value1,2);
+		//pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:414, data/CommonEvents.json:common-event:451
+	AGH_evt0510_SnippetTachie_kaiwastart = function (__a0) {
+		tachie_kaiwastart(false,true,__a0,1);
+		//急ぎ,拡大,右人数,左人数
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:430, data/CommonEvents.json:common-event:432
+	AGH_evt0511_SnippetValue1530 = function (interp) {
+		return (function () {
+		var value1 = $gameVariables.value(530);
+		var arr1 = $gameVariables.value(163)[$gameVariables.value(535)];
+		event_respawnSetA(value1,8,7,1);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.setImage(arr1[1], arr1[2]);
+		event.setDirection(6);
+		interp._eventId = $gameVariables.value(292)[value1];
+		}).call(interp);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:431
+	AGH_evt0512_SnippetValue111 = function (__a0, __a1, __a2) {
+		var value1 = __a0;
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.requestBalloon(__a1);
+		var value1 = $gameVariables.value(292)[value1];
+		message_popup2(value1,0,__a2,1);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:441, data/CommonEvents.json:common-event:552
+	AGH_evt0513_SnippetValue1530 = function () {
+		var value1 = $gameVariables.value(530);
+		var arr1 = $gameVariables.value(163)[$gameVariables.value(535)];
+		event_respawnSetA(value1,15,4,0);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.setImage(arr1[1], arr1[2]);
+		event.setDirection(6);
+		var value1 = 11;
+		event_respawnSetN(value1,16,4,1,arr1[6],arr1[7]);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.setDirection(2);
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:441, data/CommonEvents.json:common-event:442, data/CommonEvents.json:common-event:552
+	AGH_evt0514_SnippetValue1530 = function (__a0, __a1, __a2, __a3, __a4, __a5, __a6, __a7) {
+		var value1 = $gameVariables.value(530);
+		event_respawnSetA(value1,__a0,__a1,1);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.setDirection(__a2);
+		var value1 = 11;
+		event_respawnSetN(value1,__a3,__a4,0,__a5,__a6);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.setDirection(__a7);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:442
+	AGH_evt0515_SnippetValue1530 = function (interp, __a0, __a1, __a2, __a3, __a4, __a5) {
+		return (function (__a0, __a1, __a2, __a3, __a4, __a5) {
+		var value1 = $gameVariables.value(530);
+		var arr1 = $gameVariables.value(163)[$gameVariables.value(535)];
+		event_respawnSetA(value1,__a0,__a1,__a2);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.setImage(arr1[1], arr1[2]);
+		event.setDirection(2);
+		interp._eventId = $gameVariables.value(292)[value1];
+		var value1 = 11;
+		event_respawnSetN(value1,__a3,__a4,__a5,arr1[6],arr1[7]);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.setDirection(2);
+		}).call(interp, __a0, __a1, __a2, __a3, __a4, __a5);
+	};
+
+	// Replaces (5x): data/CommonEvents.json:common-event:442, data/CommonEvents.json:common-event:552
+	AGH_evt0516_SnippetSetBgsLine = function (__a0) {
+		$gameSystem.setBgsLine(__a0);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:451
+	AGH_evt0517_SnippetValue1530 = function (interp) {
+		return (function () {
+		var value1 = 1;//$gameVariables.value(530);
+		//event_respawnSetN(value1,16,6,0,'1_1',2);
+		interp._eventId = $gameVariables.value(292)[value1];
+		}).call(interp);
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:451, data/Map007.json:map-event:4:page:1
+	AGH_evt0518_SnippetValue158 = function (__a0, __a1, __a2) {
+		var value1 = __a0;
+		var value2 = __a1;
+		$gameScreen.showPicture(value1,value2,1,640,384,100,100,__a2,0);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:471, data/CommonEvents.json:common-event:541
+	AGH_evt0519_SnippetValue1530 = function (interp, __a0, __a1, __a2) {
+		return (function (__a0, __a1, __a2) {
+		var value1 = 5;//$gameVariables.value(530);
+		event_respawnSetA(value1,__a0,__a1,1,__a2);
+		interp._eventId = $gameVariables.value(292)[value1];
+		}).call(interp, __a0, __a1, __a2);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:471
+	AGH_evt0520_SnippetEvent_respawnSetN12 = function (interp, __a0, __a1, __a2, __a3, __a4, __a5) {
+		return (function (__a0, __a1, __a2, __a3, __a4, __a5) {
+		event_respawnSetN(__a0,__a1,12,__a2,'npcUnique3',__a3,__a4);
+		interp._eventId = $gameVariables.value(292)[__a5];
+		}).call(interp, __a0, __a1, __a2, __a3, __a4, __a5);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:471
+	AGH_evt0521_SnippetSVal172 = function (interp, __a0) {
+		return (function (__a0) {
+		interp.sVal(172,21);
+		valueTalkSet = [__a0,250,interp._eventId];//1で付与0で解除,透明度,参照ｲﾍﾞid,valueTalkSet = [0,0,0];
+		interp.setupChild($dataCommonEvents[60].list, 0);
+		}).call(interp, __a0);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:471
+	AGH_evt0522_SnippetArr150 = function () {
+		var msgText1 = `オラァッ！！`; //翻訳対象
+		var arr1 = [0];
+		var arr2 = [-50];
+		var arr3 = [`${msgText1}`];
+		chara_oneWord(100,$gameVariables.value(292)[11],25,120,arr1,arr2,arr3,0);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:471
+	AGH_evt0523_SnippetArr150 = function () {
+		var msgText1 = `ガハッッ！？`; //翻訳対象
+		var arr1 = [0];
+		var arr2 = [-50];
+		var arr3 = [`${msgText1}`];
+		chara_oneWord(100,$gameVariables.value(292)[5],25,120,arr1,arr2,arr3,0);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:471
+	AGH_evt0524_SnippetArr150 = function () {
+		var msgText1 = `フンッ！`; //翻訳対象
+		var arr1 = [0];
+		var arr2 = [-50];
+		var arr3 = [`${msgText1}`];
+		chara_oneWord(100,$gameVariables.value(292)[11],25,180,arr1,arr2,arr3,0);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:481
+	AGH_evt0525_SnippetStartFlash255 = function () {
+		$gameScreen.startFlash([255,119,255,200], 60)
+		$gameScreen.startShake(7, 7, 20);
+		$gameScreen.startAnimation(640-256, 368, 634, false);
+	};
+
+	// Replaces (5x): data/CommonEvents.json:common-event:495, data/CommonEvents.json:common-event:532, data/CommonEvents.json:common-event:548, data/CommonEvents.json:common-event:572, data/CommonEvents.json:common-event:573
+	AGH_evt0526_SnippetValue1530 = function (__a0) {
+		var value1 = $gameVariables.value(530);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.setImage('1_1', __a0);
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:495, data/CommonEvents.json:common-event:532, data/CommonEvents.json:common-event:548, data/CommonEvents.json:common-event:572
+	AGH_evt0527_SnippetValue1 = function () {
+		var value1 = valuePic1+7;
+		pic_eraseP(0,[value1]);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:495, data/CommonEvents.json:common-event:532, data/CommonEvents.json:common-event:548
+	AGH_evt0528_SnippetAdv_HpartDirectPlay12 = function (interp) {
+		return (function () {
+		//絶頂射精
+		adv_HpartDirectPlay(3);
+		sex_direction(12,0,0);
+		interp.wait(valueSexWait);
+		}).call(interp);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:495, data/CommonEvents.json:common-event:532, data/CommonEvents.json:common-event:548
+	AGH_evt0529_SnippetAdv_partDirectSet = function (interp) {
+		return (function () {
+		//ピストン
+		adv_partDirectSet(1);//ピストンの時1
+		sex_direction(1,0,0);
+		interp.wait(valueSexWait);
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:496, data/CommonEvents.json:common-event:516
+	AGH_evt0530_SnippetValue101 = function (__a0) {
+		var value1 = valuePic1+1;//非表示状態
+		var value2 = valueScenePic+'01';
+		$gameScreen.showPicture(value1,value2,1,640-128,384+50,100,100,0,0);
+		//$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		tachie_bless(value1,__a0);
+	};
+
+	// Replaces (5x): data/CommonEvents.json:common-event:496, data/CommonEvents.json:common-event:516, data/CommonEvents.json:common-event:517, data/CommonEvents.json:common-event:518, data/CommonEvents.json:common-event:519
+	AGH_evt0531_SnippetValue102 = function (__a0, __a1, __a2) {
+		var value1 = valuePic1+__a0;
+		var value2 = valueScenePic+__a1;
+		$gameScreen.showPicture(value1,value2,1,640-128,384+__a2,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		tachie_bless(value1,2);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:496
+	AGH_evt0532_SnippetValue110 = function () {
+		var value1 = valuePic1+10;
+		var value2 = valueScenePic+'21';
+		$gameScreen.showPicture(value1,value2,1,640-128+50,384,100,100,0,0);
+		//$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		tachie_bless(value1,2);
+	};
+
+	// Replaces (12x): data/CommonEvents.json:common-event:496, data/CommonEvents.json:common-event:516, data/CommonEvents.json:common-event:517, data/CommonEvents.json:common-event:518, data/CommonEvents.json:common-event:519, …
+	AGH_evt0533_SnippetValue103 = function (__a0, __a1, __a2, __a3, __a4, __a5, __a6, __a7) {
+		var value1 = valuePic1+__a0;
+		var value2 = valueScenePic+__a1;
+		$gameScreen.showPicture(value1,value2,1,640-128,384,__a2,__a3,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,__a4);
+		tachie_bless(value1,__a5);
+		pic_move1(valuePic1+__a6,0,0,100,100,0,__a7);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:496, data/CommonEvents.json:common-event:516
+	AGH_evt0534_SnippetValue101 = function () {
+		var value1 = valuePic1+1;//非表示状態
+		var value2 = valueScenePic+'01';
+		//$gameScreen.showPicture(value1,value2,1,640-128,384+50,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+	};
+
+	// Replaces (6x): data/CommonEvents.json:common-event:507, data/CommonEvents.json:common-event:508, data/CommonEvents.json:common-event:509, data/CommonEvents.json:common-event:541
+	AGH_evt0535_SnippetValue103 = function (__a0, __a1, __a2, __a3) {
+		var value1 = valuePic1+__a0;
+		var value2 = valueScenePic+__a1;
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,__a2,__a3,0);
+	};
+
+	// Replaces (6x): data/CommonEvents.json:common-event:508
+	AGH_evt0536_SnippetValue103 = function (__a0, __a1) {
+		var value1 = valuePic1+__a0;
+		var value2 = valueScenePic+__a1;
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		pic_move1(value1-1,0,0,100,100,0,90);
+		tachie_bless(value1,2);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:511, data/Map094.json:map-event:45:page:1
+	AGH_evt0537_SnippetArr1292 = function () {
+		var arr1 = [];
+		arr1.push($gameVariables.value(292)[1]);
+		arr1.push($gameVariables.value(292)[12]);
+		event_NpcCharaMoveId(16,0,arr1); 
+		event_NpcCharaMoveId(45,"this.requestBalloon(1);",arr1);
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:511, data/Map094.json:map-event:45:page:1
+	AGH_evt0538_SnippetEvent = function (interp, __a0) {
+		return (function (__a0) {
+		var event = $gameMap.event(interp._eventId);
+		event.setFace(__a0,true,true);
+		}).call(interp, __a0);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:511, data/Map094.json:map-event:45:page:1
+	AGH_evt0539_SnippetEvent = function (interp) {
+		return (function () {
+		var event = $gameMap.event(interp._eventId);
+		event.removeFace();
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:511, data/Map094.json:map-event:45:page:1
+	AGH_evt0540_SnippetValue111 = function () {
+		var value1 = 11;//$gameVariables.value(530);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.locate(34, 20);event.setDirection(2);
+		var value1 = $gameVariables.value(530);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.locate(34, 19);event.setDirection(2);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:511, data/CommonEvents.json:common-event:552, data/Map094.json:map-event:45:page:1
+	AGH_evt0541_SnippetValue1530 = function (interp) {
+		return (function () {
+		var value1 = $gameVariables.value(530);
+		interp._eventId = $gameVariables.value(292)[value1];
+		drowsepost.camera.zoom(1, 60, interp._eventId);
+		}).call(interp);
+	};
+
+	// Replaces (5x): data/CommonEvents.json:common-event:516, data/CommonEvents.json:common-event:517, data/CommonEvents.json:common-event:518, data/CommonEvents.json:common-event:519, data/CommonEvents.json:common-event:526
+	AGH_evt0542_SnippetValueScenePic01 = function (interp, __a0, __a1, __a2) {
+		return (function (__a0, __a1, __a2) {
+		valueScenePic = __a0;
+		//var value2 = valueScenePic+'01';
+		interp.sVal(530,1);//主格キャラ
+		interp.sVal(535,__a1);//挿話回想の場合アイテムID。メインは0
+		h_keikenhyouji1(521,__a2);//記録変数,相手ID,名前id21に名前と役職名
+		valueWeatherSceneSet = 0;
+		}).call(interp, __a0, __a1, __a2);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:516, data/CommonEvents.json:common-event:526
+	AGH_evt0543_SnippetSetMap_musicSelect21 = function (__a0) {
+		//setMap_musicSelect(0,21,0);
+		setMap_parallaxSelect(0,__a0,0);
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:516, data/CommonEvents.json:common-event:517, data/CommonEvents.json:common-event:518, data/CommonEvents.json:common-event:519
+	AGH_evt0544_SnippetBackGraund_menuMapSelect = function () {
+		backGraund_menuMapSelect(2,'Dungeon1_2',0,0);//
+	};
+
+	// Replaces (6x): data/CommonEvents.json:common-event:517, data/CommonEvents.json:common-event:518, data/CommonEvents.json:common-event:519
+	AGH_evt0545_SnippetValueScenePic = function (__a0) {
+		valueScenePic = __a0;
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:517, data/CommonEvents.json:common-event:518, data/CommonEvents.json:common-event:519
+	AGH_evt0546_SnippetValue110 = function () {
+		var value1 = valuePic1+10;
+		var value2 = valueScenePic+'21';
+		$gameScreen.showPicture(value1,value2,1,640-128+50,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		tachie_bless(value1,2);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:517, data/CommonEvents.json:common-event:518, data/CommonEvents.json:common-event:519
+	AGH_evt0547_SnippetValue102 = function () {
+		var value1 = valuePic1+2;
+		var value2 = valueScenePic+'02';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,300,300,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		tachie_bless(value1,2);
+		picture_se1();
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:517, data/CommonEvents.json:common-event:518, data/CommonEvents.json:common-event:519
+	AGH_evt0548_SnippetSex_direction11 = function (interp, __a0) {
+		return (function (__a0) {
+		sex_direction(__a0,0,0);
+		interp.wait(valueSexWait);
+		adv_partDirectSet(1);//ピストンの時
+		}).call(interp, __a0);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:517, data/CommonEvents.json:common-event:518, data/CommonEvents.json:common-event:519
+	AGH_evt0549_SnippetShowPicture75 = function () {
+		$gameScreen.showPicture(75,'ScreenBlackOut',1,640,384,100,100,150,0);
+		picture_fade1(75,"fadeIn",valueWipeImg,60,5);
+	};
+
+	// Replaces (5x): data/CommonEvents.json:common-event:526, data/CommonEvents.json:common-event:530, data/Map083.json:map-event:6:page:1
+	AGH_evt0550_SnippetValue251 = function (__a0, __a1, __a2) {
+		var value2 = 'ScreenBlackOut';
+		$gameScreen.showPicture(__a0,value2,1,640,384,100,100,__a1,0);
+		picture_fade1(__a2,"fadeIn",valueWipeImg,60,5);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:526, data/CommonEvents.json:common-event:576
+	AGH_evt0551_SnippetValue105 = function (__a0, __a1, __a2) {
+		var value1 = valuePic1+__a0;
+		var value2 = valueScenePic+__a1;
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,__a2,0);
+		tachie_bless(value1,2);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:530
+	AGH_evt0552_SnippetSVal172 = function (interp, __a0) {
+		return (function (__a0) {
+		interp.sVal(172,16);
+		valueTalkSet = [__a0,1,60];//1で付与2で直接表示\CE[60]のみ0で解除,ｱｸﾀｰid,ﾌﾚｰﾑ60,40,20
+		interp.setupChild($dataCommonEvents[60].list, 0)
+		}).call(interp, __a0);
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:530, data/CommonEvents.json:common-event:531, data/CommonEvents.json:common-event:536
+	AGH_evt0553_SnippetValuePic151 = function (__a0, __a1) {
+		valuePic1 = 51;
+		var value1 = valuePic1+__a0;
+		var value2 = valueScenePic+__a1;
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		tachie_bless(value1,2);
+		//pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:530
+	AGH_evt0554_SnippetValue150 = function () {
+		var value1 = 50;
+		var value2 = valueScenePic+'02';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		//pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (6x): data/CommonEvents.json:common-event:530, data/CommonEvents.json:common-event:531, data/CommonEvents.json:common-event:573
+	AGH_evt0555_SnippetValue103 = function (__a0, __a1, __a2, __a3, __a4) {
+		var value1 = valuePic1+__a0;
+		var value2 = valueScenePic+__a1;
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		hcg_piston(value1,__a2,__a3,__a4);
+		//pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:530, data/Map081.json:map-event:3:page:1, data/Map083.json:map-event:6:page:1
+	AGH_evt0556_SnippetSVal14 = function (interp) {
+		return (function () {
+		interp.sVal(14,22);//パーティ再結成コモン
+		interp.setupChild($dataCommonEvents[64].list, 0);
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:531, data/CommonEvents.json:common-event:546
+	AGH_evt0557_SnippetValuePic151 = function (__a0, __a1) {
+		valuePic1 = 51;
+		var value1 = valuePic1+__a0;
+		var value2 = valueScenePic+__a1;
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		tachie_bless(value1,2);
+		pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:536, data/CommonEvents.json:common-event:537
+	AGH_evt0558_SnippetValue215 = function (__a0, __a1, __a2, __a3, __a4, __a5, __a6, __a7, __a8, __a9, __a10, __a11) {
+		var value2 = getRandomIndex(6) + 1;
+		var value3 = getRandomIndex(7); 
+		event_respawnSetN(__a0,__a1,__a2,0,'npc'+value2,value3,__a3);
+		var value2 = getRandomIndex(6) + 1;
+		var value3 = getRandomIndex(7); 
+		event_respawnSetN(__a4,__a5,__a6,0,'npc'+value2,value3,__a7);
+		var value2 = getRandomIndex(6) + 1;
+		var value3 = getRandomIndex(7); 
+		event_respawnSetN(__a8,__a9,__a10,0,'npc'+value2,value3,__a11);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:536, data/CommonEvents.json:common-event:537
+	AGH_evt0559_SnippetValue112 = function () {
+		for (var i = 12; i <= 17; i++) {
+		  var value1 = $gameVariables.value(292)[i]; //this._eventId
+		  if(!!$gameMap.event(value1)) {
+		    var event = $gameMap.event(value1);
+		    event.setTransparent(true);
+		}};
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:536, data/CommonEvents.json:common-event:537
+	AGH_evt0560_SnippetValue118 = function (__a0, __a1) {
+		var value1 = 18;
+		goodsEvent_respawn(value1,'food_2',4,2,0,__a0,__a1);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event._priorityType = 2;
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:537
+	AGH_evt0561_SnippetValue103 = function (__a0, __a1) {
+		var value1 = valuePic1+__a0;
+		pic_showMove1(value1,valueScenePic+__a1,640-128,384,100,60,2,200);
+		tachie_bless(value1,2);
+		pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:541, data/CommonEvents.json:common-event:543
+	AGH_evt0562_SnippetValue102 = function (__a0, __a1) {
+		var value1 = valuePic1+__a0;
+		var value2 = valueScenePic+__a1;
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		tachie_bless(value1,2);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:541, data/CommonEvents.json:common-event:543
+	AGH_evt0563_SnippetPic_setArray115 = function (__a0, __a1, __a2, __a3) {
+		pic_setArray1 = [1,valuePic1+__a0,0,-15,0,20];
+		pic_setArray2 = [1,valuePic1+__a1,0,0,3,30]; //pic_setArray2 = [1,0,0,0,0,0];
+		valueParallelPicSe1 = ['ZH_sticky4',__a2,10];
+		valueParallelPicSe2 = [0,0,0];
+		hcg_piston(valuePic1+__a3,7,2,1);
+		$gameSwitches.setValue(429,true);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:542
+	AGH_evt0564_SnippetValue102 = function (__a0, __a1) {
+		var value1 = valuePic2+__a0;
+		var value2 = valueScenePic+__a1;
+		$gameScreen.showPicture(value1,value2,1,640+480,384-118,100,100,200,0);
+		$gameScreen.movePicture(value1,1,640+480,384+50,100,100,255,0,240);
+		tachie_bless(value1,2);
+		pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:543, data/CommonEvents.json:common-event:572, data/CommonEvents.json:common-event:573
+	AGH_evt0565_SnippetValue1 = function (__a0) {
+		var value1 = valuePic1+__a0;
+		if($gameScreen.picture(value1)){
+		  $gameScreen.picture(value1).startAnimationFrame(1, true, [1,1,1,2]);
+		};
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:543, data/CommonEvents.json:common-event:546
+	AGH_evt0566_SnippetValue1530 = function () {
+		var value1 = $gameVariables.value(530);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		//var event = $gameMap.event(this._eventId);
+		event.setFace(11,true,true);
+		event.setStepAnime(false);
+		event.setWalkAnime(false);
+		event.setDirection(2);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:544, data/CommonEvents.json:common-event:545
+	AGH_evt0567_SnippetArr1163 = function () {
+		var arr1 = $gameVariables.value(163)[$gameVariables.value(535)];
+		$gameMap.spawnEvent(236,arr1[8], arr1[9], true)
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:544
+	AGH_evt0568_SnippetValue101 = function (__a0, __a1) {
+		var value1 = valuePic2+__a0;
+		var value2 = valueScenePic+__a1;
+		$gameScreen.showPicture(value1,value2,1,640+480+50,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640+480,384,100,100,255,0,60);
+		tachie_bless(value1,2);
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:546
+	AGH_evt0569_SnippetValuePic151 = function (__a0, __a1) {
+		valuePic1 = 51;
+		var value1 = valuePic1+__a0;
+		var value2 = valueScenePic+__a1;
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		//tachie_bless(value1,2);
+		pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:547
+	AGH_evt0570_SnippetValue102 = function (__a0, __a1) {
+		var value1 = valuePic1+__a0;
+		var value2 = valueScenePic+__a1;
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		//tachie_bless(value1,2);
+		//pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (6x): data/CommonEvents.json:common-event:547, data/CommonEvents.json:common-event:572, data/CommonEvents.json:common-event:576
+	AGH_evt0571_SnippetValue105 = function (__a0, __a1, __a2) {
+		var value1 = valuePic1+__a0;
+		var value2 = valueScenePic+__a1;
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		tachie_bless(value1,__a2);
+		//pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:552
+	AGH_evt0572_SnippetValue1292 = function (interp, __a0) {
+		return (function (__a0) {
+		interp._eventId = __a0;//$gameVariables.value(292)[value1];
+		}).call(interp, __a0);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:571, data/CommonEvents.json:common-event:572, data/CommonEvents.json:common-event:573
+	AGH_evt0573_SnippetValue1530 = function (interp) {
+		return (function () {
+		var value1 = $gameVariables.value(530);
+		var arr1 = $gameVariables.value(163)[$gameVariables.value(535)];
+		event_respawnSetA(value1,10,11,1,4);
+		interp._eventId = $gameVariables.value(292)[value1];
+		var value1 = 11;
+		event_respawnSetN(value1,arr1[8],arr1[9],0,arr1[6],arr1[7],6);
+		}).call(interp);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:571, data/CommonEvents.json:common-event:573
+	AGH_evt0574_SnippetValue102 = function (__a0, __a1, __a2, __a3) {
+		var value1 = valuePic1+__a0;
+		var value2 = valueScenePic+__a1;
+		$gameScreen.showPicture(value1,value2,1,640-128,384-__a2,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		tachie_bless(value1,__a3);
+		//pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:572
+	AGH_evt0575_SnippetValue130 = function (__a0, __a1) {
+		var value1 = valuePic1+7;
+		pic_setArray1 = [1,value1,0,-30,5,__a0];
+		pic_setArray2 = [1,value1,0,30,3,__a1]; //pic_setArray2 = [1,0,0,0,0,0];
+		valueParallelPicSe1 = [0,0,0];
+		valueParallelPicSe2 = [0,0,0];
+		$gameSwitches.setValue(429,true);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:572, data/CommonEvents.json:common-event:573
+	AGH_evt0576_SnippetValue109 = function (__a0, __a1, __a2, __a3) {
+		var value1 = valuePic1+__a0;
+		var value2 = valueScenePic+__a1;
+		$gameScreen.showPicture(value1,value2,1,640-128,384+50,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		hcg_piston(value1,__a2,__a3,1);
+		//pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (1x): data/Map003.json:map-event:3:page:1
+	AGH_evt0577_SnippetValue1 = function () {
+		var value1 = 'easeOutQuad';
+		//var value1 = 'easeInQuad';//無難すぎ？
+		picture_easingConfiguration(value1);
+	};
+
+	// Replaces (1x): data/Map003.json:map-event:3:page:1
+	AGH_evt0578_SnippetSetValue537 = function () {
+		$gameVariables.setValue(537,[]);//エネミー
+		$gameVariables.setValue(538,[]);//Hエネミー
+	};
+
+	// Replaces (1x): data/Map003.json:map-event:3:page:2
+	AGH_evt0579_SnippetActor120 = function () {
+		var actor1 = $gameActors.actor(20);
+		for (var i = 1; i <= $dataStates.length-1; i++) {
+		  if(actor1.isStateAffected(i)){
+		    actor1.removeState(i);
+		  };
+		};
+	};
+
+	// Replaces (4x): data/Map003.json:map-event:3:page:2, data/Map093.json:map-event:2:page:1, data/Map093.json:map-event:2:page:2
+	AGH_evt0580_SnippetStartFadeIn60 = function (__a0) {
+		$gameScreen.startFadeIn(__a0);
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:3:page:2, data/Map003.json:map-event:16:page:1
+	AGH_evt0581_SnippetRefreshMinimapCache = function () {
+		$gameMap.refreshMinimapCache();
+	};
+
+	// Replaces (4x): data/Map003.json:map-event:6:page:1, data/Map003.json:map-event:8:page:1, data/Map003.json:map-event:107:page:1, data/Map003.json:map-event:182:page:1
+	AGH_evt0582_SnippetStartFadeOut30 = function (interp) {
+		return (function () {
+		$gameScreen.startFadeOut(30);
+		interp.wait(30);
+		}).call(interp);
+	};
+
+	// Replaces (3x): data/Map003.json:map-event:7:page:1, data/Map046.json:map-event:9:page:1, data/Map197.json:map-event:6:page:1
+	AGH_evt0583_SnippetHasItem1231 = function (interp, __a0, __a1) {
+		return (function (__a0, __a1) {
+		if($gameParty.hasItem($dataItems[__a0],true) || $gameParty.hasItem($dataItems[__a1],true)){
+		  $gameSelfSwitches.setValue([$gameMap.mapId(), interp._eventId, 'B'], false);
+		} else {
+		  $gameSelfSwitches.setValue([$gameMap.mapId(), interp._eventId, 'B'], true);
+		};
+		}).call(interp, __a0, __a1);
+	};
+
+	// Replaces (5x): data/Map003.json:map-event:16:page:1, data/Map003.json:map-event:16:page:2, data/Map003.json:map-event:16:page:3, data/Map003.json:map-event:17:page:1, data/Map003.json:map-event:17:page:3
+	AGH_evt0584_SnippetValueEnemyEventId = function (interp) {
+		return (function () {
+		valueEnemyEventId = interp.eventId();
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:19:page:1
+	AGH_evt0585_SnippetSetValue22 = function (__a0) {
+		$gameVariables.setValue(22,0);
+		var value = __a0;
+		$gameVariables.setValue(23,value);
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:20:page:1, data/Map003.json:map-event:133:page:2
+	AGH_evt0586_SnippetValueCountSet9292 = function (interp) {
+		return (function () {
+		valueCountSet9 = interp._eventId;
+		interp._eventId = $gameVariables.value(292)[0];
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:20:page:1, data/Map003.json:map-event:133:page:2
+	AGH_evt0587_SnippetValue1 = function (interp, __a0) {
+		return (function (__a0) {
+		var value1 = __a0+'-'+interp._eventId;
+		$gameScreen._particle.particleClear(value1);
+		}).call(interp, __a0);
+	};
+
+	// Replaces (1x): data/Map003.json:map-event:44:page:1
+	AGH_evt0588_SnippetAddPopup = function (interp) {
+		var msgText1 = `text:ﾋﾟｲｲｲ──…`; //翻訳対象
+		return (function () {
+		interp.addPopup(["add",`${msgText1}`]);
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:62:page:1, data/Map003.json:map-event:63:page:1
+	AGH_evt0589_SnippetAddPopup = function (interp) {
+		var msgText1 = `text:ホゥ…`; //翻訳対象
+		return (function () {
+		interp.addPopup(["add",`${msgText1}`]);
+		}).call(interp);
+	};
+
+	// Replaces (1x): data/Map003.json:map-event:64:page:1
+	AGH_evt0590_SnippetAddPopup = function (interp) {
+		var msgText1 = `text:ペンっ`; //翻訳対象
+		return (function () {
+		interp.addPopup(["add",`${msgText1}`]);
+		}).call(interp);
+	};
+
+	// Replaces (4x): data/Map003.json:map-event:57:page:1, data/Map003.json:map-event:58:page:1, data/Map003.json:map-event:59:page:1, data/Map126.json:map-event:4:page:1
+	AGH_evt0591_SnippetValueanimalEvent2Id30 = function (interp) {
+		return (function () {
+		valueanimalEvent2Id = 0;
+		animal_ActionSelect(interp._eventId);
+		if(valueanimalEvent2Id != 0){
+		  interp.addPopup(["add",`text:${valueanimalEvent2Id}`]);
+		} else {
+		  interp.wait(30);
+		};
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:81:page:1, data/Map003.json:map-event:82:page:1
+	AGH_evt0592_SnippetSVal23 = function (interp) {
+		return (function () {
+		if($gameVariables.value(23) == 6){interp.sVal(24,128)};
+		if($gameVariables.value(23) == 7){interp.sVal(24,127)};
+		if($gameVariables.value(23) == 8){interp.sVal(24,126)};
+		if($gameVariables.value(23) == 9){interp.sVal(24,125)};
+		if($gameVariables.value(23) >= 10){interp.sVal(24,124)};
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:133:page:2
+	AGH_evt0593_SnippetValue2100 = function (__a0) {
+		var value2 = 0;
+		for (var i = 1; i <= 100; i++) {
+		  if($gameVariables.value(327)[i] >= 1){
+		    value2 += 1;
+		}};
+		if(value2 >= 2){
+		  $gameSwitches.setValue(__a0,true);
+		};
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:133:page:2
+	AGH_evt0594_SnippetSetValue327 = function (__a0, __a1, __a2, __a3, __a4, __a5) {
+		if($gameVariables.value(327)[__a0] >= 1){
+		  $gameSwitches.setValue(__a1,true);
+		} else {
+		  $gameSwitches.setValue(__a2,false);
+		};
+		if($gameVariables.value(327)[__a3] >= 1){
+		  $gameSwitches.setValue(__a4,true);
+		} else {
+		  $gameSwitches.setValue(__a5,false);
+		};
+	};
+
+	// Replaces (3x): data/Map003.json:map-event:139:page:1, data/Map003.json:map-event:140:page:1, data/Map003.json:map-event:142:page:1
+	AGH_evt0595_SnippetSetVariableValue10 = function (interp) {
+		return (function () {
+		$gameSelfSwitches.setVariableValue([$gameMap.mapId(), 
+		interp._eventId, 10], 10);
+		}).call(interp);
+	};
+
+	// Replaces (4x): data/Map003.json:map-event:139:page:1, data/Map003.json:map-event:140:page:1
+	AGH_evt0596_SnippetValue169 = function () {
+		var msgText1 = `Coin: `; //翻訳対象
+		var msgText2 = `枚`; //翻訳対象
+		var value1 = `${msgText1}${$gameVariables.value(69).toLocaleString()}${msgText2}`;
+		var value2 = 28;
+		$gameScreen.setDTextPicture(value1, value2);
+		$gameScreen.dWindowFrame = 'ON';
+		var value1 = 99;
+		$gameScreen.showPicture(value1,"",1,640+50,50,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640,50,100,100,255,0,60);
+	};
+
+	// Replaces (3x): data/Map003.json:map-event:139:page:1, data/Map003.json:map-event:140:page:1, data/Map003.json:map-event:142:page:1
+	AGH_evt0597_SnippetValue110 = function (interp) {
+		return (function () {
+		var value1 = $gameSelfSwitches.getVariableValue([$gameMap.mapId(), interp._eventId, 10]);
+		var value2 = 10;
+		if(value1 == 10){var value2 = 100};
+		if(value1 == 100){var value2 = 1000};
+		if(value1 == 1000){var value2 = 10000};
+		if(value1 == 10000){var value2 = 10};
+		$gameSelfSwitches.setVariableValue([$gameMap.mapId(), 
+		interp._eventId, 10], value2);
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:139:page:1, data/Map003.json:map-event:140:page:1
+	AGH_evt0598_SnippetValue198 = function () {
+		var value1 = 98;
+		var value2 = '/img/dice/background';
+		$gameScreen.showPicture(value1,value2,1,640+50,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640,384,100,100,255,0,30);
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:139:page:1, data/Map003.json:map-event:140:page:1
+	AGH_evt0599_SnippetSetValue801 = function (interp) {
+		var msgText1 = `おめでとう。`; //翻訳対象
+		var msgText2 = `コイン+`; //翻訳対象
+		var msgText3 = `枚`; //翻訳対象
+		return (function () {
+		$gameVariables.setValue(801,`${msgText1}`);
+		var value1 = $gameSelfSwitches.getVariableValue([$gameMap.mapId(), interp._eventId, 10]);
+		var value2 = value1 * 2;
+		$gameVariables.setValue(69,$gameVariables.value(69) + value2);
+		var value1 = `${msgText2}${value2}${msgText3}`;
+		CommonPopupManager.showInfo({},value1,null);
+		}).call(interp);
+	};
+
+	// Replaces (3x): data/Map003.json:map-event:141:page:1, data/Map003.json:map-event:247:page:1, data/Map007.json:map-event:53:page:1
+	AGH_evt0600_SnippetSetVariableValue10 = function (interp) {
+		return (function () {
+		$gameSelfSwitches.setVariableValue([$gameMap.mapId(), 
+		interp._eventId, 10], 10);
+		valueBetCoinlist = [10];//ポーカー用ベットレート
+		}).call(interp);
+	};
+
+	// Replaces (3x): data/Map003.json:map-event:141:page:1, data/Map003.json:map-event:247:page:1, data/Map007.json:map-event:53:page:1
+	AGH_evt0601_SnippetValue110 = function (interp) {
+		return (function () {
+		var value1 = $gameSelfSwitches.getVariableValue([$gameMap.mapId(), interp._eventId, 10]);
+		var value2 = 10;
+		if(value1 == 10){var value2 = 100};
+		if(value1 == 100){var value2 = 1000};
+		if(value1 == 1000){var value2 = 10000};
+		if(value1 == 10000){var value2 = 10};
+		$gameSelfSwitches.setVariableValue([$gameMap.mapId(), 
+		interp._eventId, 10], value2);
+		valueBetCoinlist = [value2];
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:142:page:1
+	AGH_evt0602_SnippetValueMenuBackOpacity = function (__a0) {
+		valueMenuBackOpacity = __a0;
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:151:page:1, data/Map003.json:map-event:242:page:1
+	AGH_evt0603_SnippetSetValue380 = function (interp) {
+		return (function () {
+		$gameSwitches.setValue(380,false);
+		if(!$gameSelfSwitches.value([$gameMap.mapId(), interp._eventId, 'A'])){
+		  $gameSwitches.setValue(380,true);
+		};
+		if(!$gameSelfSwitches.value([$gameMap.mapId(), interp._eventId, 'B'])){
+		  $gameSwitches.setValue(380,true);
+		};
+		}).call(interp);
+	};
+
+	// Replaces (10x): data/Map003.json:map-event:156:page:1, data/Map003.json:map-event:157:page:1, data/Map003.json:map-event:174:page:1, data/Map035.json:map-event:20:page:1, data/Map096.json:map-event:6:page:1, data/Map096.json:map-event:6:page:2, …
+	AGH_evt0604_SnippetValueBossId = function (interp) {
+		return (function () {
+		valueBossId = interp._eventId;
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:157:page:1, data/Map165.json:map-event:12:page:1
+	AGH_evt0605_SnippetDataItems240 = function () {
+		value = $dataItems[$gameVariables.value(240)];
+		popEnemy_setUp(value);
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:166:page:2, data/Map003.json:map-event:243:page:2
+	AGH_evt0606_SnippetValue2800 = function (interp) {
+		var msgText1 = `デイリークエスト`; //翻訳対象
+		return (function () {
+		var value2 = 800;
+		if($dataItems[valueCountSet1].meta['SGカテゴリ']){
+		  if($dataItems[valueCountSet1].meta['SGカテゴリ'] == `${msgText1}`){
+		    var value2 = 900;
+		  } else {
+		    var value2 = 800;
+		  };
+		};
+		var value1 = `\x1bIIN[${valueCountSet1}]\n${valueQuestArray4[valueCountSet1-value2]}`;
+		interp.sVal(172,10);
+		valueTalkSet = [24,value1,0];
+		interp.setupChild($dataCommonEvents[60].list, 0);
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:166:page:2, data/Map003.json:map-event:243:page:2
+	AGH_evt0607_SnippetValue1 = function () {
+		var msgText1 = `クエスト`; //翻訳対象
+		var colorCode3 = `\\C[3]`; // code, not translation text
+		var msgText2 = `IIN[`; //翻訳対象
+		var colorReset = `\\C[0]`; // code, not translation text
+		var msgText3 = `を受注しました。`; //翻訳対象
+		var value1 = `${msgText1}${colorCode3}${msgText2}${valueCountSet1}]${colorReset}${msgText3}`;
+		TickerManager.show(value1);
+		$gameParty.gainItem($dataItems[valueCountSet1], 1);
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:166:page:3, data/Map003.json:map-event:243:page:3
+	AGH_evt0608_SnippetValue2800 = function (interp) {
+		var msgText1 = `デイリークエスト`; //翻訳対象
+		return (function () {
+		var value2 = 800;valueCountSet1 = Number($gameMap.event(interp._eventId).event().meta['QuestSet']);
+		if($dataItems[valueCountSet1].meta['SGカテゴリ']){
+		  if($dataItems[valueCountSet1].meta['SGカテゴリ'] == `${msgText1}`){
+		    var value2 = 900;
+		  } else {
+		    var value2 = 800;
+		  };
+		};
+		var value1 = `\x1bIIN[${valueCountSet1}]\n${valueQuestArray4[valueCountSet1-value2]}`;
+		interp.sVal(172,10);
+		valueTalkSet = [24,value1,1];
+		interp.setupChild($dataCommonEvents[60].list, 0);
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:167:page:1, data/Map007.json:map-event:20:page:1
+	AGH_evt0609_SnippetEvent = function (interp) {
+		return (function () {
+		if ($gameMap.event(interp._eventId).event().meta['EvSceneSet']){
+		  var arr1 = $gameMap.event(interp._eventId).event().meta['EvSceneSet'].split(',');
+		  var value1 = Number(arr1[0]);
+		  event_pararelStarting(1,value1,interp._eventId);
+		};
+		}).call(interp);
+	};
+
+	// Replaces (3x): data/Map003.json:map-event:168:page:2, data/Map007.json:map-event:69:page:2, data/Map064.json:map-event:1:page:3
+	AGH_evt0610_SnippetValue2800 = function (interp) {
+		var msgText1 = `デイリークエスト`; //翻訳対象
+		return (function () {
+		var value2 = 800;
+		if($dataItems[valueCountSet1].meta['SGカテゴリ']){
+		  if($dataItems[valueCountSet1].meta['SGカテゴリ'] == `${msgText1}`){
+		    var value2 = 900;
+		  } else {
+		    var value2 = 800;
+		  };
+		};
+		var value1 = `\x1bIIN[${valueCountSet1}]\n${valueQuestArray4[valueCountSet1-value2]}`;
+		interp.sVal(172,10);
+		valueTalkSet = [24,value1];
+		interp.setupChild($dataCommonEvents[60].list, 0);
+		}).call(interp);
+	};
+
+	// Replaces (5x): data/Map003.json:map-event:179:page:1, data/Map003.json:map-event:194:page:1, data/Map092.json:map-event:3:page:1, data/Map139.json:map-event:4:page:1, data/Map144.json:map-event:12:page:1
+	AGH_evt0611_SnippetValueBossId = function (interp) {
+		return (function () {
+		valueBossId = interp._eventId;
+		event_charaPreset(interp._eventId);
+		event_charaRoot(interp._eventId);
+		}).call(interp);
+	};
+
+	// Replaces (7x): data/Map003.json:map-event:180:page:1, data/Map193.json:map-event:6:page:1, data/Map193.json:map-event:7:page:1, data/Map193.json:map-event:8:page:1, data/Map193.json:map-event:9:page:1, data/Map193.json:map-event:10:page:1, …
+	AGH_evt0612_SnippetValue114 = function () {
+		var value1 = $gameMap.tileId(6, 14, 1)
+		console.log(`${value1}`);
+	};
+
+	// Replaces (33x): data/Map003.json:map-event:181:page:1, data/Map003.json:map-event:198:page:1, data/Map003.json:map-event:209:page:1, data/Map003.json:map-event:218:page:1, data/Map003.json:map-event:234:page:1, data/Map003.json:map-event:235:page:1, …
+	AGH_evt0613_SnippetCharaNameId = function (interp) {
+		return (function () {
+		//CharaNameIdが同一のイベントを一日消去
+		event_togetherSelf(interp._eventId,'B');
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:196:page:1, data/Map018.json:map-event:31:page:1
+	AGH_evt0614_SnippetEvent_pararelSet = function (interp) {
+		return (function () {
+		event_pararelSet(interp._eventId,0,1,8);
+		//ｲﾍﾞﾝﾄに対するx,yのズラす歩数と主人公の向き
+		}).call(interp);
+	};
+
+	// Replaces (22x): data/Map003.json:map-event:198:page:1, data/Map003.json:map-event:209:page:1, data/Map007.json:map-event:71:page:1, data/Map012.json:map-event:6:page:1, data/Map012.json:map-event:7:page:1, data/Map018.json:map-event:15:page:1, …
+	AGH_evt0615_SnippetEvSceneSet = function (interp, __a0) {
+		return (function (__a0) {
+		//ｲﾝｼﾞｹｰﾀｰ等消去,帰還座標記憶,EvSceneSetでｲﾍﾞ起動ｽｲｯﾁ指定
+		//ｲﾍﾞﾝﾄに対するx,yのズラす歩数と主人公の向き
+		event_pararelSet(interp._eventId,0,1,__a0);
+		}).call(interp, __a0);
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:233:page:1, data/Map022.json:map-event:9:page:1
+	AGH_evt0616_SnippetValue135 = function (interp) {
+		return (function () {
+		var value1 = 'statue_orb_c';
+		$gameScreen._particle.particleSet(interp._eventId,value1+'-'+interp._eventId,'this',value1,'above');
+		var value1 = 'statue_orb_c'+'-'+interp._eventId;
+		$gameScreen._particle.particleUpdate([value1,'color','#ff00f7','#ffffff']);
+		$gameScreen._particle.particleUpdate([value1,'pos',0,-35-48]);
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:235:page:1, data/Map018.json:map-event:39:page:1
+	AGH_evt0617_SnippetValueThisEventId = function (interp) {
+		return (function () {
+		if(interp._eventId >= 1){
+		  valueThisEventId = interp._eventId;
+		} else {
+		  valueThisEventId = 0;
+		};
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:235:page:1, data/Map018.json:map-event:39:page:1
+	AGH_evt0618_SnippetArr111 = function () {
+		var arr1 = valueNpcGuraTemporarilySave;
+		var value1 = 11;
+		event_respawnSetN(value1,arr1[8]-1,arr1[9],0,arr1[6],arr1[7],6);
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:235:page:1, data/Map018.json:map-event:39:page:1
+	AGH_evt0619_SnippetValueThisEventId = function (interp) {
+		return (function () {
+		if(valueThisEventId >= 1){interp._eventId = valueThisEventId};
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:235:page:1, data/Map018.json:map-event:39:page:1
+	AGH_evt0620_SnippetEvent292 = function () {
+		  for (var i = 0; i <= $gameVariables.value(292).length-1; i++) {
+		    if($gameVariables.value(292)[i] >= 1){
+		      if(!!$gameMap.event($gameVariables.value(292)[i])) {
+		        if(!$gameParty.inBattle()){$gameMap.eraseEvent($gameVariables.value(292)[i])};
+		      };
+		    };
+		  };
+	};
+
+	// Replaces (1x): data/Map003.json:map-event:237:page:1
+	AGH_evt0621_SnippetActor20 = function () {
+		var msgText1 = `宿受付`; //翻訳対象
+		var msgText2 = `「いらっしゃい。\nウチは一泊`; //翻訳対象
+		var varCode21 = `\\V[21]`; // code, not translation text
+		var code1 = `\\G`; // code, not translation text
+		var msgText3 = `よ。\n泊まっていくのかしら？」\n`; //翻訳対象
+		$gameActors.actor(20).setName(`${msgText1}`);
+		$gameVariables.value(400)[59] = `${$dataWeapons[421].name}`;
+		valueCountSet1 = 1231;
+		valueCountSet2 = 1232;
+		$gameVariables.setValue(23,
+		`${msgText2}${varCode21}${code1}${msgText3}`);
+		$gameVariables.setValue(22,'$FACE[People4, 5]');
+		//$gameScreen.setPreparePictureName($FACE[People4,5]);/解らん
+		//
+	};
+
+	// Replaces (1x): data/Map046.json:map-event:4:page:1
+	AGH_evt0622_SnippetActor20 = function () {
+		var msgText1 = `宿女将`; //翻訳対象
+		var msgText2 = `「いらっしゃい。\nウチは一泊`; //翻訳対象
+		var varCode21 = `\\V[21]`; // code, not translation text
+		var code1 = `\\G`; // code, not translation text
+		var msgText3 = `よ。\n泊まっていくのかしら？」\n`; //翻訳対象
+		$gameActors.actor(20).setName(`${msgText1}`);
+		$gameVariables.value(400)[59] = `${$dataWeapons[421].name}`;
+		valueCountSet1 = 1231;
+		valueCountSet2 = 1232;
+		$gameVariables.setValue(23,
+		`${msgText2}${varCode21}${code1}${msgText3}`);
+		$gameVariables.setValue(22,'$FACE[People4, 5]');
+		//$gameScreen.setPreparePictureName($FACE[People4,5]);/解らん
+		//
+	};
+
+	// Replaces (1x): data/Map005.json:map-event:2:page:1
+	AGH_evt0623_Snippet = function () {
+		$gameScreen._tone_temp = 0;
+	};
+
+	// Replaces (1x): data/Map005.json:map-event:2:page:1
+	AGH_evt0624_SnippetSceneManager = function () {
+		SceneManager.push(Scene_Load)
+	};
+
+	// Replaces (3x): data/Map007.json:map-event:3:page:1
+	AGH_evt0625_SnippetValue10640 = function (__a0, __a1, __a2, __a3, __a4, __a5) {
+		var value10 = __a0;
+		$gameMap.createFilter(value10,'shockwave',0,'screen');
+		$gameMap.setFilter(value10,[640,__a1,-1,__a2,__a3,__a4]);
+		$gameMap.setFilterAddiTime(value10,__a5);
+	};
+
+	// Replaces (2x): data/Map007.json:map-event:3:page:1
+	AGH_evt0626_SnippetSVal20 = function (interp, __a0) {
+		return (function (__a0) {
+		interp.sVal(20,1);
+		interp.sVal(21,__a0);
+		interp.sVal(22,-400);
+		interp.setupChild($dataCommonEvents[141].list, 0);
+		}).call(interp, __a0);
+	};
+
+	// Replaces (2x): data/Map007.json:map-event:3:page:1
+	AGH_evt0627_SnippetValue110000 = function (__a0) {
+		var value1 = __a0;
+		$dataEnemies[21].params[0] = value1;
+		$dataEnemies[22].params[0] = value1;
+		$dataEnemies[41].params[0] = value1;
+		$dataEnemies[42].params[0] = value1;
+		$dataEnemies[61].params[0] = value1;
+		$dataEnemies[62].params[0] = value1;
+	};
+
+	// Replaces (2x): data/Map007.json:map-event:3:page:1, data/Map007.json:map-event:7:page:1
+	AGH_evt0628_SnippetActor718 = function (__a0, __a1, __a2) {
+		$gameActors.actor(__a0).gainSkillMasteryLevel(__a1, +__a2)
+	};
+
+	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:33:page:1
+	AGH_evt0629_SnippetParticleClear = function () {
+		$gameScreen._particle.particleClear('all');
+	};
+
+	// Replaces (2x): data/Map007.json:map-event:4:page:1
+	AGH_evt0630_SnippetParticleEdit57 = function (__a0) {
+		$gameScreen._particle.particleEdit(0,__a0,'picture:57','def','above');
+	};
+
+	// Replaces (2x): data/Map007.json:map-event:4:page:1
+	AGH_evt0631_SnippetValue1 = function () {
+		var value1 = 'easeInOutQuad';
+		//var value1 = 'easeInSine';
+		picture_easingConfiguration(value1);
+	};
+
+	// Replaces (2x): data/Map007.json:map-event:4:page:1
+	AGH_evt0632_SnippetValue153 = function () {
+		var value1 = 53;
+		var value2 = 'Xev100_00back';
+		pic_1(0,value1,value2,0,100,255,60,1280,768,-256,0);
+	};
+
+	// Replaces (3x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:7:page:1
+	AGH_evt0633_SnippetStart75 = function (interp, __a0) {
+		return (function (__a0) {
+		var start = $gameVariables.value(75);
+		var end = $gameVariables.value(76);
+		for (var i = start; i <= end; i++) {
+		var value1 = $gameActors.actor(i)._classId;
+		var args = new Array(String(i),__a0,String(value1));
+		interp.pluginCommand("gainJp", args);
+		//var value1 = $gameActors.actor(i)._subclassId;
+		//var args = new Array(String(i),"50",String(value1));
+		//this.pluginCommand("gainJp", args);
+		};
+		}).call(interp, __a0);
+	};
+
+	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
+	AGH_evt0634_SnippetSetTransparent = function () {
+		$gamePlayer.setTransparent(true);
+	};
+
+	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
+	AGH_evt0635_SnippetValue155 = function (interp) {
+		return (function () {
+		var value1 = 55;
+		for (var i = 0; i <= 3; i++) {$gameScreen.movePicture(value1+i,1,640,384,100,0,0,0,30)};
+		interp.wait(40);
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
+	AGH_evt0636_SnippetValue155 = function () {
+		var value1 = 55;
+		for (var i = 0; i <= 3; i++) {$gameScreen.erasePicture(value1+i)};
+	};
+
+	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
+	AGH_evt0637_SnippetDataStates110 = function () {
+		var msgText1 = `\nあああああ`; //翻訳対象
+		if($dataStates[110].meta['Help Description']){
+		$dataStates[110].description = `${$dataStates[110].description}${msgText1}`
+		}
+	};
+
+	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
+	AGH_evt0638_SnippetSetupChild64 = function (interp) {
+		return (function () {
+		interp.setupChild($dataCommonEvents[64].list, 0);
+		interp.sVal(14,21);//パーティ一時解散コモン
+		}).call(interp);
+	};
+
+	// Replaces (3x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1, data/Map007.json:map-event:23:page:1
+	AGH_evt0639_SnippetSetValue42 = function (interp) {
+		return (function () {
+		$gameSwitches.setValue(42,true);
+		tachie_hyouji1($gameVariables.value(20));
+		var args = new Array(String(getPreviousTachiePicId()),'71','2','ON')
+		interp.pluginCommand("P_CALL_CE", args);
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
+	AGH_evt0640_SnippetMembers154 = function (interp) {
+		return (function () {
+		$gameParty.members().forEach(function(actor) {
+		if(!actor.isBattleMember()){
+		$gameVariables.value(154).push(actor._actorId);
+		$gameParty.removeActor(actor._actorId)
+		}
+		}, interp);
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
+	AGH_evt0641_SnippetSetValue42 = function () {
+		$gameSwitches.setValue(42,true);
+		tachie_hyouji1($gameVariables.value(20));
+	};
+
+	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
+	AGH_evt0642_SnippetSetPicturesAnimation40 = function () {
+		var msgText1 = `横`; //翻訳対象
+		var msgText2 = `画面ピンク`; //翻訳対象
+		$gameScreen.setPicturesAnimation(2, 1, `${msgText1}`, 40);
+		$gameScreen.showPicture(91,`${msgText2}`,1,640,384,100,100,200,0);
+		$gameScreen.picture(91).startAnimationFrame(1, true, 1);
+	};
+
+	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
+	AGH_evt0643_SnippetGWMessageSetting256 = function () {
+		$gameSystem.GWMessageSetting.useGW = 'ON';
+		$gameSystem.GWMessageSetting.imgName = 'Dunjon008';
+		$gameSystem.GWMessageSetting.fadeSpeed = 256;
+	};
+
+	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
+	AGH_evt0644_SnippetConsole = function () {
+		//console.log($dataItems[7].meta['Item Recipe'].split(',')[8]);
+		//console.log($dataItems[7].recipeArmor.length);
+		console.log($dataItems[7].recipeItem[1]);
+		//console.log(value1);
+	};
+
+	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
+	AGH_evt0645_SnippetValue1234 = function (interp) {
+		return (function () {
+		value1 = DataManager.getSynthesisIngredient($dataItems[234], 0);
+		//value1 = DataManager.getSynthesisQuantity($dataItems[234], 1);
+		//console.log($dataItems[234].synthIngredients.length);
+		console.log(valueItemsSynth1);
+		interp.sVal(21,value1.id + 1000);
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
+	AGH_evt0646_SnippetSVal86 = function (interp) {
+		var msgText1 = `testピクチャ`; //翻訳対象
+		var msgText2 = `Ｈシーン演出`; //翻訳対象
+		var msgText3 = `味方カットイン`; //翻訳対象
+		return (function () {
+		interp.sVal(86,3);interp.sVal(87,3);interp.sVal(245,40);interp.sVal(246,80);
+		var value = `${msgText1}`;
+		interp.sVal(251,value);
+		var args = new Array(`${msgText2}`);
+		interp.pluginCommand(`${msgText3}`, args);
+		}).call(interp);
+	};
+
+	// Replaces (3x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1, data/Map007.json:map-event:23:page:1
+	AGH_evt0647_SnippetValue1309 = function (interp, __a0) {
+		return (function (__a0) {
+		var value1 = __a0;
+		var args = new Array("FadeImg",String(value1));
+		interp.pluginCommand("GWTrans_Setting", args);
+		var args = new Array("FadeInImg",String(value1));
+		interp.pluginCommand("GWTrans_Setting", args);
+		var args = new Array("on");
+		interp.pluginCommand("GWTransition", args);
+		}).call(interp, __a0);
+	};
+
+	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
+	AGH_evt0648_SnippetSVal21 = function (interp) {
+		return (function () {
+		interp.sVal(21,[0,[],0,0,0,0,0,0,0]);
+		$gameVariables.value(21)[1].push(5);
+		$gameVariables.value(21)[1].push(556);
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
+	AGH_evt0649_SnippetCommon_script126 = function (interp) {
+		return (function () {
+		common_script1(26,interp._eventId,6,5,131,4,0,15,2,90);
+		interp.setupChild($dataCommonEvents[64].list, 0);
+		//id,ｲﾍﾞid,速度,頻度,ｱﾆid,x,y,高さ,回転数,角度
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
+	AGH_evt0650_SnippetConsole20 = function () {
+		console.log(eval("valueDanjonTreasure" + $gameVariables.value(20)));
+		console.log(eval("valueDanjonTrSyurui" + $gameVariables.value(20)));
+		var arr1 = eval("valueDanjonTreasure" + $gameVariables.value(20));
+		var arr2 = eval("valueDanjonTrSyurui" + $gameVariables.value(20));
+		var value1 = arr1[getRandomIndex(arr1.length)];
+		let index = arr1.findIndex(arr1 => arr1 === value1); 
+		if(index >= 0){
+		arr1.splice(index, 1);
+		}
+		console.log(arr1);
+		console.log($dataItems[value1].name);
+	};
+
+	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
+	AGH_evt0651_SnippetFollowers21 = function (interp) {
+		return (function () {
+		//if($gamePlayer.followers().follower(i).isVisible() ){
+		//this.sVal(21,2);
+		//} else {
+		//this.sVal(21,1);
+		//};
+		interp.sVal(21,valueFighterStatas);
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
+	AGH_evt0652_SnippetCharacter = function (interp) {
+		return (function () {
+		interp.character(0).x == interp.character(-1).x && interp.character(0).y == interp.character(-1).y
+		value2 = $gameMap.eventIdXy(9, 3)
+		$gameVariables.setValue(2, value2)
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
+	AGH_evt0653_SnippetActor101 = function () {
+		$gameActors.actor(1).gainSkillMasteryLevel(101, +1)
+		$gameActors.actor(1).gainSkillMasteryUses(201, 15)
+	};
+
+	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
+	AGH_evt0654_SnippetActor = function () {
+		$gameActors.actor(n)._characterIndex
+		$gameActors.actor(n)._characterName
+	};
+
+	// Replaces (3x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1, data/Map007.json:map-event:17:page:1
+	AGH_evt0655_SnippetValue1153 = function (interp) {
+		return (function () {
+		var value1 = "153";//一刀両断102崩壊161横両断008封印054内側から153
+		var value2 = "character";//"picture"
+		var args = new Array(String(value2),"0","fadeOut",
+		String(value1),"180","5");
+		interp.pluginCommand("GWFade", args);
+		}).call(interp);
+	};
+
+	// Replaces (3x): data/Map007.json:map-event:5:page:1
+	AGH_evt0656_SnippetHcg_piston55 = function (__a0) {
+		hcg_piston(55,1,__a0);
+		//ピクID,1縦2横3左斜め4右斜め,1緩め2通常3ラスト
+	};
+
+	// Replaces (3x): data/Map007.json:map-event:5:page:1
+	AGH_evt0657_SnippetSVal14 = function (interp, __a0) {
+		return (function (__a0) {
+		interp.sVal(14,__a0);//Ｈ効果
+		interp.setupChild($dataCommonEvents[58].list, 0);
+		}).call(interp, __a0);
+	};
+
+	// Replaces (3x): data/Map007.json:map-event:23:page:1
+	AGH_evt0658_SnippetErasePicture12 = function (interp, __a0) {
+		return (function (__a0) {
+		$gameScreen.erasePicture(__a0);
+		interp.wait(3);
+		}).call(interp, __a0);
+	};
+
+	// Replaces (3x): data/Map007.json:map-event:34:page:1
+	AGH_evt0659_SnippetValueSerialPictureId50 = function (interp) {
+		var msgText1 = `「オラッ！」`; //翻訳対象
+		var msgText2 = `「オラァッ！」`; //翻訳対象
+		return (function () {
+		valueSerialPictureId += 1;
+		var arr1 = [-50,0,50,-100,100];
+		var arr2 = [-50,0,50,-100,100];
+		var arr3 = [`${msgText1}`,`${msgText2}`];
+		chara_oneWord(valueSerialPictureId,interp._eventId,25,60,arr1,arr2,arr3);
+		interp.wait(20);
+		}).call(interp);
+	};
+
+	// Replaces (4x): data/Map054.json:map-event:2:page:1, data/Map054.json:map-event:2:page:2, data/Map054.json:map-event:2:page:3, data/Map054.json:map-event:2:page:4
+	AGH_evt0660_SnippetSVal29 = function (interp, __a0, __a1) {
+		return (function (__a0, __a1) {
+		interp.sVal(29,__a0);
+		boss_setup1(2,__a1);
+		}).call(interp, __a0, __a1);
+	};
+
+	// Replaces (4x): data/Map054.json:map-event:2:page:1, data/Map054.json:map-event:2:page:2, data/Map054.json:map-event:2:page:3, data/Map054.json:map-event:2:page:4
+	AGH_evt0661_SnippetValue145 = function (interp) {
+		return (function () {
+		var value1 = interp._eventId
+		if(!!$gameMap.event(value1)) {
+		    var event = $gameMap.event(value1);
+		    event.setStepAnime(false);event.setWalkAnime(false);
+		    event.setDirection(2);event.resetPattern();
+		    event._originalPattern = 1;event.setAngle(45);
+		    event._spriteOffsetX = -12;event._spriteOffsetY = -12;
+		    event._kageM.clear();
+		    event.setFace(6,true,true);//Child用event.setFace(6,true,true,0,6,0,6);
+		};
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/Map085.json:map-event:2:page:1, data/Map085.json:map-event:3:page:1
+	AGH_evt0662_SnippetValue5190 = function (interp) {
+		return (function () {
+		var value5 = $gameMap.event(interp.eventId()).x;
+		var value6 = $gameMap.event(interp.eventId()).y;
+		$gameMap.spawnEvent(190, value5, value6, true);
+		}).call(interp);
+	};
+
+	// Replaces (2x): data/Map100.json:map-event:11:page:1
+	AGH_evt0663_SnippetValue119 = function (interp, __a0) {
+		return (function (__a0) {
+		var value1 = $gameVariables.value(19);
+		var value2 = __a0;
+		interp.character(value1).requestAnimation(value2);
+		}).call(interp, __a0);
+	};
+
+	// Replaces (1x): data/Map100.json:map-event:11:page:1
+	AGH_evt0664_SnippetLoseGold100000 = function () {
+		$gameParty.loseGold(100000);
+		for (var i = 1; i <= $dataItems.length-1; i++) {
+		if($dataItems[i].meta['クラス3ジョブ解放素材']){
+		var value5 = i;
+		break;
+		}};
+		$gameParty.loseItem($dataItems[value5], 1);
+	};
+
+	// Replaces (1x): data/Map100.json:map-event:11:page:1
+	AGH_evt0665_SnippetLoseGold10000 = function () {
+		$gameParty.loseGold(10000);
+		for (var i = 1; i <= $dataItems.length-1; i++) {
+		if($dataItems[i].meta['クラス2ジョブ解放素材']){
+		var value5 = i;
+		break;
+		}};
+		$gameParty.loseItem($dataItems[value5], 1);
+	};
+
+
 })();
