@@ -3419,18 +3419,20 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 // The functions below were generated from the Script (355/655) command blocks
 // in data/CommonEvents.json and data/Map*.json. Every block that was either
 // duplicated across events or proven to execute at runtime was moved here, and
-// each source command was reduced to a single call:
+// each source command was reduced to a single call to a readable,
+// context-based helper (e.g. showHExperienceTable1(), setupRespawnEnemyAVar292And530()):
 //
-//   AGH_evtNNNN_xxx();            // self-contained bodies
-//   AGH_evtNNNN_xxx(this, ...);   // bodies that used the interpreter (this)
+//   helperName();            // self-contained bodies
+//   helperName(interp, ...); // bodies that used the interpreter (this)
 //
 // Contracts:
-//  - functions whose name ends without an interpreter argument receive the
-//    Game_Interpreter as their first argument; the body is executed through
+//  - functions that drive a child interpreter receive the Game_Interpreter as
+//    their first argument (named `interp`); the body is executed through
 //    .call(interp) so `this` keeps its original meaning, including for the
 //    callbacks that were passed `this` in the source block.
-//  - __a0, __a1, ... are the literals that differed between the duplicated
-//    source blocks (numbers and strings), in first-occurrence order.
+//  - Parameters are named by their role/meaning in the source block (e.g.
+//    newValue, countValue, posX, posX2, requestedPartnerWeaponId) instead of
+//    the old positional __a0, __a1, ... placeholders.
 //  - Player-facing text is split into `var xxx = `...`; //翻訳対象` (language)
 //    and `// code, not translation text` (control codes) consts at the top of
 //    the function; the message template below interpolates them, so the
