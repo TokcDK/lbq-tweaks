@@ -3433,56 +3433,51 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 //  - Parameters are named by their role/meaning in the source block (e.g.
 //    newValue, countValue, posX, posX2, requestedPartnerWeaponId) instead of
 //    the old positional __a0, __a1, ... placeholders.
-//  - Player-facing text is split into `var xxx = `...`; //翻訳対象` (language)
+//  - Player-facing text is split into `var xxx = `...`;` (language)
 //    and `// code, not translation text` (control codes) consts at the top of
 //    the function; the message template below interpolates them, so the
 //    rendered string is byte-identical to the original.
 //  - Bodies intentionally assign implicit globals (valuePic1, valueCountSet*)
 //    exactly like the original snippets; this file is not strict mode.
 	// Replaces (1x): data/CommonEvents.json:common-event:1
-	setVariable250GameplayTips = function () {
-		var colorCode4 = `\\C[2]`; // code, not translation text
-		var colorResetCode = `\\C[0]`; // code, not translation text
-		var messageText2 = `シーンの多くは、メインクエスト終了後に開放される。`; //翻訳対象
-		var textPart2 = `本作には多様な強化システムを採用しているが、\nメインクエストとシーン回収だけを考えれば、\n極論レベルを上げて剣と杖で殴っていれば問題ない。`; //翻訳対象
-		var textPart3 = `「朝昼」と「夜」では発生するイベントに変化がある。\nこれはメインクエストに措いても同様。\n進行条件が「〇〇に会いに行く」などの場合、\n夜では会えない事が多い。日を改めて日中に会いに行こう`; //翻訳対象
-		var textPart4 = `シーンや挿話には「同一人物のシーンは同日に発生しない」という\n縛りが存在する場合がある。\n日数経過をさせる事で発生するようになる。`; //翻訳対象
-		var textPart5 = `メインクエスト進行時の戦闘に、敗北Ｈはない`; //翻訳対象
-		var textPart6 = `Ｈエネミーはそのマップで敗北Ｈを経験する事で出現する。\nＨエネミーに敗北すると汎用全滅シーンが発生する。`; //翻訳対象
-		var textPart7 = `「称号」は、条件を満たした後、「一日の始まり」か「ギルド受付」と\n話した直後に付与される。`; //翻訳対象
+	AGH_setVariable250GameplayTips = function () {
+		var colorCode2 = `\\C[2]`;
+		var colorResetCode = `\\C[0]`;
+		var messageText2 = `シーンの多くは、メインクエスト終了後に開放される。`;
+		var textPart2 = `本作には多様な強化システムを採用しているが、\nメインクエストとシーン回収だけを考えれば、\n極論レベルを上げて剣と杖で殴っていれば問題ない。`;
+		var textPart3 = `「朝昼」と「夜」では発生するイベントに変化がある。\nこれはメインクエストに措いても同様。\n進行条件が「〇〇に会いに行く」などの場合、\n夜では会えない事が多い。日を改めて日中に会いに行こう`;
+		var textPart4 = `シーンや挿話には「同一人物のシーンは同日に発生しない」という\n縛りが存在する場合がある。\n日数経過をさせる事で発生するようになる。`;
+		var textPart5 = `メインクエスト進行時の戦闘に、敗北Ｈはない`;
+		var textPart6 = `Ｈエネミーはそのマップで敗北Ｈを経験する事で出現する。\nＨエネミーに敗北すると汎用全滅シーンが発生する。`;
+		var textPart7 = `「称号」は、条件を満たした後、「一日の始まり」か「ギルド受付」と\n話した直後に付与される。`;
 		$gameVariables.setValue(250,
-		[`${colorCode4}[1]${colorResetCode}${messageText2}`,
-		`
-${colorCode4}[2]${colorResetCode}${textPart2}`,
-		`
-${colorCode4}[3]${colorResetCode}${textPart3}`,
-		`
-${colorCode4}[4]${colorResetCode}${textPart4}`,
-		`
-${colorCode4}[5]${colorResetCode}${textPart5}`,
-		`
-${colorCode4}[6]${colorResetCode}${textPart6}`,
-		`
-${colorCode4}[7]${colorResetCode}${textPart7}`,
-		`${colorCode4}[8]${colorResetCode}`,
-		`${colorCode4}[9]${colorResetCode}`,
-		`${colorCode4}[10]${colorResetCode}`]);
+		[	`${colorCode2}[1]${colorResetCode}${messageText2}`,
+			`${colorCode2}[2]${colorResetCode}${textPart2}`,
+			`${colorCode2}[3]${colorResetCode}${textPart3}`,
+			`${colorCode2}[4]${colorResetCode}${textPart4}`,
+			`${colorCode2}[5]${colorResetCode}${textPart5}`,
+			`${colorCode2}[6]${colorResetCode}${textPart6}`,
+			`${colorCode2}[7]${colorResetCode}${textPart7}`,
+			`${colorCode2}[8]${colorResetCode}`,
+			`${colorCode2}[9]${colorResetCode}`,
+			`${colorCode2}[10]${colorResetCode}`
+		]);
 	};
 
 	// Replaces (14x): data/CommonEvents.json:common-event:1, data/CommonEvents.json:common-event:21, data/CommonEvents.json:common-event:22, data/CommonEvents.json:common-event:47, data/CommonEvents.json:common-event:66, data/CommonEvents.json:common-event:167, …
-	setPictureMotion1 = function () {
+	AGH_setPictureMotion1 = function () {
 		//picture_motion1("smooth",[0]);
 		picture_motion1("linear",[0]);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:1
-	setMessagePictureAnimationParams = function () {
+	AGH_setMessagePictureAnimationParams = function () {
 		$gameMessage._IZSTPicShowParam = [550+640,384+100,100,100,100];
 		$gameMessage._IZSTPicMoveParam = [500+640,384+100,100,100,255,30];
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:1
-	setVariable81 = function () {
+	AGH_setHVScrollingMenuBackground = function () {
 		$gameVariables.setValue(81,0)//メニュー背景横スク
 		$gameVariables.setValue(82,0)//メニュー背景縦スク
 	};
@@ -3704,371 +3699,368 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (1x): data/CommonEvents.json:common-event:431
 	setVariable21Text = function () {
-		var textPrefix = `幹部団員 `; //翻訳対象
-		var controlCode = `\\}`; // code, not translation text
-		var textSuffix = `秩序の騎空団`; //翻訳対象
+		var textPrefix = `幹部団員 `;
+		var controlCode = `\\}`;
+		var textSuffix = `秩序の騎空団`;
 		$gameVariables.setValue(21,`${textPrefix}${controlCode}${textSuffix}`)
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:12
 	setVariable55Text = function () {
-		var messageText2 = `月`; //翻訳対象
+		var messageText2 = `月`;
 		$gameVariables.setValue(55, `${messageText2}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:12
 	setVariable515Text = function () {
-		var messageText2 = `持ち上げoff`; //翻訳対象
+		var messageText2 = `持ち上げoff`;
 		$gameVariables.setValue(515, `${messageText2}`);
 	};
 
 	// Replaces (2x): data/CommonEvents.json:common-event:290, data/CommonEvents.json:common-event:295
 	setVariable21TextVar142 = function () {
-		var controlCode = `\\SP[0]`; // code, not translation text
-		var textPrefix = `イベント：IIN[`; //翻訳対象
-		var textSuffix = `]は、既に閲覧済みです。\nスキップしますか？\n（そのイベントで獲得できる称号や性経験値などは入手できます。\n但し、獲得物に選択肢が関係する場合は入手できません）`; //翻訳対象
+		var controlCode = `\\SP[0]`;
+		var textPrefix = `イベント：IIN[`;
+		var textSuffix = `]は、既に閲覧済みです。\nスキップしますか？\n（そのイベントで獲得できる称号や性経験値などは入手できます。\n但し、獲得物に選択肢が関係する場合は入手できません）`;
 		$gameVariables.setValue(21,
 		`${controlCode}${textPrefix}${$gameVariables.value(142)}${textSuffix}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:301
 	setQuestObjectiveHeadToRoyalCastle = function () {
-		var messageText2 = `まずは王城へと向かいましょう。\n王都北側に入り口がある筈です。`; //翻訳対象
+		var messageText2 = `まずは王城へと向かいましょう。\n王都北側に入り口がある筈です。`;
 		$gameVariables.setValue(134,
 		`${messageText2}`);
 	};
 
 	// Replaces (2x): data/CommonEvents.json:common-event:302, data/CommonEvents.json:common-event:303
 	setQuestObjectiveHeadToInn = function () {
-		var messageText2 = `宿へ向かいましょうか`; //翻訳対象
+		var messageText2 = `宿へ向かいましょうか`;
 		$gameVariables.setValue(134,
 		`${messageText2}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:304
 	setQuestObjectiveHeadToGuild = function () {
-		var messageText2 = `【騎空士ギルド】へ向かいましょう。\n確か、王城の手前ほどの場所にあったはずです`; //翻訳対象
+		var messageText2 = `【騎空士ギルド】へ向かいましょう。\n確か、王城の手前ほどの場所にあったはずです`;
 		$gameVariables.setValue(134,
 		`${messageText2}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:305
 	setQuestObjectiveVisitInformant = function () {
-		var messageText2 = `情報屋に会いに行きましょう。\n表向きは書店を営業していると聞いています`; //翻訳対象
+		var messageText2 = `情報屋に会いに行きましょう。\n表向きは書店を営業していると聞いています`;
 		$gameVariables.setValue(134,
 		`${messageText2}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:309
 	setQuestObjectiveReturnToInn = function () {
-		var messageText2 = `空賊に関する資料が届いているかも知れません。\n宿屋に戻りましょう`; //翻訳対象
+		var messageText2 = `空賊に関する資料が届いているかも知れません。\n宿屋に戻りましょう`;
 		$gameVariables.setValue(134,
 		`${messageText2}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:311
 	setQuestObjectiveCaptureCentralPlainsBandits = function () {
-		var textPrefix = `中央平原の空賊達を\n１０人捕縛(討伐)しましょう\n ＜`; //翻訳対象
-		var controlCode = `\\v[642]`; // code, not translation text
-		var textSuffix = ` / 10人＞`; //翻訳対象
+		var textPrefix = `中央平原の空賊達を\n１０人捕縛(討伐)しましょう\n ＜`;
+		var controlCode = `\\v[642]`;
+		var textSuffix = ` / 10人＞`;
 		$gameVariables.setValue(134,
 		`${textPrefix}${controlCode}${textSuffix}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:312
 	setQuestObjectiveReachLevelTenThenChurch = function () {
-		var controlCode1 = `\\N[5]`; // code, not translation text
-		var textPrefix = `くんのレベルを10に上げて教会へと向かいましょう。\n空賊達が居なくなった`; //翻訳対象
-		var controlCode2 = `\\swi[252]`; // code, not translation text
-		var textSuffix = `が、\n狩場に適してしるようですね。\n情報屋で情報を購入しておいた方が良いかも知れません。`; //翻訳対象
+		var characterName = `\\N[5]`;
+		var textPrefix = `${characterName}くんのレベルを10に上げて教会へと向かいましょう。\n空賊達が居なくなった`;
+		var locationName = `\\swi[252]`;
+		var textSuffix = `${locationName}が、\n狩場に適してしるようですね。\n情報屋で情報を購入しておいた方が良いかも知れません。`;
 		$gameVariables.setValue(134,
-		`${controlCode1}${textPrefix}${controlCode2}${textSuffix}`);
+		`${textPrefix}${textSuffix}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:313
 	setQuestObjectiveLocateBanditHideout = function () {
-		var messageText2 = `そろそろ、尋問が終わって空賊達の拠点が\n割り出されているでしょうか`; //翻訳対象
+		var messageText2 = `そろそろ、尋問が終わって空賊達の拠点が\n割り出されているでしょうか`;
 		$gameVariables.setValue(134,
 		`${messageText2}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:314
 	setQuestObjectiveHeadToVillage = function () {
-		var messageText2 = `集落へと向かいましょうか`; //翻訳対象
+		var messageText2 = `集落へと向かいましょうか`;
 		$gameVariables.setValue(134,
 		`${messageText2}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:315
 	setQuestObjectiveAskVillageElder = function () {
-		var textPrefix = `この集落のまとめ役の方に\n`; //翻訳対象
-		var controlCode = `\\in[26]`; // code, not translation text
-		var textSuffix = `に関する\n情報を聞きに行きましょう`; //翻訳対象
+		var textPrefix = `この集落のまとめ役の方に\n`;
+		var itemName = `\\in[26]`;
+		var textSuffix = `${itemName}に関する\n情報を聞きに行きましょう`;
 		$gameVariables.setValue(134,
-		`${textPrefix}${controlCode}${textSuffix}`);
+		`${textPrefix}${textSuffix}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:316
 	setQuestObjectivePrepareCountermeasures = function () {
-		var controlCode1 = `\\swi[254]`; // code, not translation text
-		var textPrefix = `へ向かいましょう。\n`; //翻訳対象
-		var controlCode2 = `\\sim[424]`; // code, not translation text
-		var textPart2 = `や`; //翻訳対象
-		var controlCode3 = `\\sim[425]`; // code, not translation text
-		var textPart3 = `対策を\nしておいた方が良いかも知れません。\n`; //翻訳対象
-		var controlCode4 = `\\ain[175]`; // code, not translation text
-		var textSuffix = `などですね`; //翻訳対象
+		var name1 = `\\swi[254]`;
+		var textPrefix = `${name1}へ向かいましょう。`+`\n`;
+		var state1Name = `\\sim[424]`;
+		var state2Name = `\\sim[425]`;
+		var textPart3 = `${state1Name}や${state2Name}対策を\nしておいた方が良いかも知れません。` +`\n`;
+		var armorName = `\\ain[175]`;
+		var textSuffix = `${armorName}などですね`;
 		$gameVariables.setValue(134,
-		`${controlCode1}${textPrefix}${controlCode2}${textPart2}${controlCode3}${textPart3}${controlCode4}${textSuffix}`);
+		`${textPrefix}${textPart2}${textPart3}${textSuffix}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:317
 	setQuestObjectiveSearchGraveyard = function () {
-		var messageText2 = `この有様になった、原因がある筈です。\n墓地の中を調べていきましょう`; //翻訳対象
+		var messageText2 = `この有様になった、原因がある筈です。\n墓地の中を調べていきましょう`;
 		$gameVariables.setValue(134,
 		`${messageText2}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:318
 	setQuestObjectiveDefeatGraveyardBoss = function () {
-		var controlCode = `\\swi[254]`; // code, not translation text
-		var messageText2 = `のボスを討伐しましょう！`; //翻訳対象
+		var bossName = `\\swi[254]`;
+		var messageText2 = `${bossName}のボスを討伐しましょう！`;
 		$gameVariables.setValue(134,
-		`${controlCode}${messageText2}`);
+		messageText2);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:319
 	setQuestObjectiveHeadToNamedPlace = function () {
-		var controlCode = `\\swi[256]`; // code, not translation text
-		var messageText2 = `へ向かいましょう`; //翻訳対象
+		var name = `\\swi[256]`;
+		var messageText2 = `${name}へ向かいましょう`;
 		$gameVariables.setValue(134,
-		`${controlCode}${messageText2}`);
+		`${messageText2}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:320
 	setQuestObjectiveCrossForestToHideout = function () {
-		var messageText2 = `この森を抜ければ空賊団のアジトです。\n行きましょう`; //翻訳対象
+		var messageText2 = `この森を抜ければ空賊団のアジトです。\n行きましょう`;
 		$gameVariables.setValue(134,
 		`${messageText2}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:321
 	setQuestObjectiveRaidBanditHideout = function () {
-		var messageText2 = `さあ、アジトへと突入しましょう！`; //翻訳対象
+		var messageText2 = `さあ、アジトへと突入しましょう！`;
 		$gameVariables.setValue(134,
 		`${messageText2}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:322
 	setQuestObjectiveDefeatHideoutBoss = function () {
-		var controlCode = `\\swi[255]`; // code, not translation text
-		var messageText2 = `のボスを討伐しましょう！`; //翻訳対象
+		var controlCode = `\\swi[255]`;
+		var messageText2 = `のボスを討伐しましょう！`;
 		$gameVariables.setValue(134,
 		`${controlCode}${messageText2}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:323
 	setQuestObjectiveLeaveCastle = function () {
-		var messageText2 = `城を出ましょう`; //翻訳対象
+		var messageText2 = `城を出ましょう`;
 		$gameVariables.setValue(134,
 		`${messageText2}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:324
 	setQuestObjectiveRegroupAtInn = function () {
-		var messageText2 = `宿に戻ってみんなと合流しましょう`; //翻訳対象
+		var messageText2 = `宿に戻ってみんなと合流しましょう`;
 		$gameVariables.setValue(134,
 		`${messageText2}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:325
 	setQuestObjectiveHeadToNewlyFoundSite = function () {
-		var textPrefix = `新しく発見されたという\n`; //翻訳対象
-		var controlCode = `\\in[22]`; // code, not translation text
-		var textSuffix = `へ向かいましょう`; //翻訳対象
+		var textPrefix = `新しく発見されたという\n`;
+		var controlCode = `\\in[22]`;
+		var textSuffix = `へ向かいましょう`;
 		$gameVariables.setValue(134,
 		`${textPrefix}${controlCode}${textSuffix}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:326
 	setQuestObjectiveDefeatSiteBoss = function () {
-		var controlCode = `\\swi[332]`; // code, not translation text
-		var messageText2 = `のボスを討伐しましょう！`; //翻訳対象
+		var controlCode = `\\swi[332]`;
+		var messageText2 = `のボスを討伐しましょう！`;
 		$gameVariables.setValue(134,
 		`${controlCode}${messageText2}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:327
 	setQuestObjectiveMeetCompanionAtPlace = function () {
-		var controlCode1 = `\\swi[223]`; // code, not translation text
-		var textPrefix = `へと向かい、\n`; //翻訳対象
-		var controlCode2 = `\\N[2]`; // code, not translation text
-		var textSuffix = `さんと合流しましょう`; //翻訳対象
+		var name1 = `\\swi[223]`;
+		var textPrefix = `${name1}へと向かい、`+`\n`;
+		var charaName = `\\N[2]`;
+		var textSuffix = `${charaName}さんと合流しましょう`;
 		$gameVariables.setValue(134,
-		`${controlCode1}${textPrefix}${controlCode2}${textSuffix}`);
+		`${textPrefix}${textSuffix}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:328
 	setQuestObjectiveBuySwimsuit = function () {
-		var messageText2 = `雑貨屋に水着を買いに行きましょうか…`; //翻訳対象
+		var messageText2 = `雑貨屋に水着を買いに行きましょうか…`;
 		$gameVariables.setValue(134,
 		`${messageText2}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:329
 	setQuestObjectiveMeetCompanionAtBeach = function () {
-		var textPrefix = `浜辺に行って`; //翻訳対象
-		var controlCode = `\\N[2]`; // code, not translation text
-		var textSuffix = `さんと合流しましょう。\nお昼でないと居ないでしょうから気を付けましょうね`; //翻訳対象
-		$gameVariables.setValue(134,
-		`${textPrefix}${controlCode}${textSuffix}`);
+		var charaName = `\\N[2]`;
+		var text = `浜辺に行って${charaName}さんと合流しましょう。\nお昼でないと居ないでしょうから気を付けましょうね`;
+		$gameVariables.setValue(134, text);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:330
 	setQuestObjectiveAdvanceToNamedPlace = function () {
-		var controlCode = `\\swi[284]`; // code, not translation text
-		var messageText2 = `へ向かいましょう。`; //翻訳対象
+		var controlCode = `\\swi[284]`;
+		var messageText2 = `へ向かいましょう。`;
 		$gameVariables.setValue(134,
 		`${controlCode}${messageText2}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:331
 	setQuestObjectiveEnterFromEntrance = function () {
-		var controlCode = `\\swi[284]`; // code, not translation text
-		var messageText2 = `にある入口から中に入りましょう`; //翻訳対象
+		var controlCode = `\\swi[284]`;
+		var messageText2 = `にある入口から中に入りましょう`;
 		$gameVariables.setValue(134,
 		`${controlCode}${messageText2}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:332
 	setQuestObjectiveGoDeeper = function () {
-		var controlCode = `\\swi[285]`; // code, not translation text
-		var messageText2 = `の奥へと進みましょう──`; //翻訳対象
+		var controlCode = `\\swi[285]`;
+		var messageText2 = `の奥へと進みましょう──`;
 		$gameVariables.setValue(134,
 		`${controlCode}${messageText2}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:333
 	setQuestObjectiveDefeatDepthBoss = function () {
-		var controlCode = `\\swi[286]`; // code, not translation text
-		var messageText2 = `のボスを討伐しましょう！`; //翻訳対象
+		var controlCode = `\\swi[286]`;
+		var messageText2 = `のボスを討伐しましょう！`;
 		$gameVariables.setValue(134,
 		`${controlCode}${messageText2}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:334
 	setQuestObjectiveReturnAndRegroup = function () {
-		var controlCode1 = `\\swi[221]`; // code, not translation text
-		var textPrefix = `に戻って、\n`; //翻訳対象
-		var controlCode2 = `\\N[4]`; // code, not translation text
-		var textSuffix = `さん達と合流しましょう`; //翻訳対象
+		var controlCode1 = `\\swi[221]`;
+		var textPrefix = `に戻って、\n`;
+		var controlCode2 = `\\N[4]`;
+		var textSuffix = `さん達と合流しましょう`;
 		$gameVariables.setValue(134,
 		`${controlCode1}${textPrefix}${controlCode2}${textSuffix}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:335
 	setQuestObjectiveVisitInformantAgain = function () {
-		var messageText2 = `情報屋を訪ねましょう`; //翻訳対象
+		var messageText2 = `情報屋を訪ねましょう`;
 		$gameVariables.setValue(134,
 		`${messageText2}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:336
 	setQuestObjectivePassFirstFloor = function () {
-		var controlCode = `\\swi[334]`; // code, not translation text
-		var messageText2 = `へ向かいましょう。\n1層を通り抜けます`; //翻訳対象
+		var controlCode = `\\swi[334]`;
+		var messageText2 = `へ向かいましょう。\n1層を通り抜けます`;
 		$gameVariables.setValue(134,
 		`${controlCode}${messageText2}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:337
 	setQuestObjectiveRaidHut = function () {
-		var messageText2 = `小屋に突入しましょう`; //翻訳対象
+		var messageText2 = `小屋に突入しましょう`;
 		$gameVariables.setValue(134,
 		`${messageText2}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:338
 	setQuestObjectiveHeadToLocalInn = function () {
-		var controlCode = `\\swi[221]`; // code, not translation text
-		var messageText2 = `の宿に向かいましょう`; //翻訳対象
+		var controlCode = `\\swi[221]`;
+		var messageText2 = `の宿に向かいましょう`;
 		$gameVariables.setValue(134,
 		`${controlCode}${messageText2}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:339
 	setQuestObjectiveVisitCastleByDay = function () {
-		var messageText2 = `日中に王城へ向かいましょう`; //翻訳対象
+		var messageText2 = `日中に王城へ向かいましょう`;
 		$gameVariables.setValue(134,
 		`${messageText2}`);
 	};
 
 	// Replaces (2x): data/CommonEvents.json:common-event:340, data/CommonEvents.json:common-event:341
 	setQuestObjectiveAwaitPlayerChoice = function () {
-		var messageText2 = `どうしましょうか…`; //翻訳対象
+		var messageText2 = `どうしましょうか…`;
 		$gameVariables.setValue(134,
 		`${messageText2}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:342
 	setQuestObjectiveVisitChancellor = function () {
-		var messageText2 = `宰相の元へ向かいましょう`; //翻訳対象
+		var messageText2 = `宰相の元へ向かいましょう`;
 		$gameVariables.setValue(134,
 		`${messageText2}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:343
 	setQuestObjectiveFightKnightCommander = function () {
-		var messageText2 = `謁見の間で、騎士団長との戦いです`; //翻訳対象
+		var messageText2 = `謁見の間で、騎士団長との戦いです`;
 		$gameVariables.setValue(134,
 		`${messageText2}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:344
 	setQuestObjectiveHeadToFestivalHall = function () {
-		var controlCode1 = `\\swi[254]`; // code, not translation text
-		var textPrefix = `の祭殿へ向かいましょう。\nそこから、`; //翻訳対象
-		var controlCode2 = `\\swi[257]`; // code, not translation text
-		var textSuffix = `へと行ける筈です`; //翻訳対象
+		var controlCode1 = `\\swi[254]`;
+		var textPrefix = `の祭殿へ向かいましょう。\nそこから、`;
+		var controlCode2 = `\\swi[257]`;
+		var textSuffix = `へと行ける筈です`;
 		$gameVariables.setValue(134,
 		`${controlCode1}${textPrefix}${controlCode2}${textSuffix}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:345
 	setQuestObjectiveContinueMainQuest = function () {
-		var controlCode = `\\swi[257]`; // code, not translation text
-		var messageText2 = `へ向かいましょう`; //翻訳対象
+		var controlCode = `\\swi[257]`;
+		var messageText2 = `へ向かいましょう`;
 		$gameVariables.setValue(134,
 		`${controlCode}${messageText2}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:346
 	setQuestObjectiveDefeatAreaBoss = function () {
-		var controlCode = `\\swi[257]`; // code, not translation text
-		var messageText2 = `のボスを討伐しましょう！`; //翻訳対象
+		var controlCode = `\\swi[257]`;
+		var messageText2 = `のボスを討伐しましょう！`;
 		$gameVariables.setValue(134,
 		`${controlCode}${messageText2}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:347
 	setQuestObjectiveInvestigateNoise = function () {
-		var messageText2 = `中で物音がしましたね。\n何か変化があったのかも知れません。\n行ってみましょう`; //翻訳対象
+		var messageText2 = `中で物音がしましたね。\n何か変化があったのかも知れません。\n行ってみましょう`;
 		$gameVariables.setValue(134,
 		`${messageText2}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:348
 	setQuestObjectiveFinalBattle = function () {
-		var textPrefix = `最期の決戦です…。\n『尊き契りの間』の`; //翻訳対象
-		var controlCode = `\\set[7]`; // code, not translation text
-		var textSuffix = `を\n撃破しましょう！`; //翻訳対象
+		var textPrefix = `最期の決戦です…。\n『尊き契りの間』の`;
+		var controlCode = `\\set[7]`;
+		var textSuffix = `を\n撃破しましょう！`;
 		$gameVariables.setValue(134,
 		`${textPrefix}${controlCode}${textSuffix}`);
 	};
 
 	// Replaces (2x): data/CommonEvents.json:common-event:349, data/CommonEvents.json:common-event:350
 	setQuestObjectiveMainQuestComplete = function () {
-		var messageText2 = `何処に行きましょうか？\n（メインクエスト完了）`; //翻訳対象
+		var messageText2 = `何処に行きましょうか？\n（メインクエスト完了）`;
 		$gameVariables.setValue(134,
 		`${messageText2}`);
 	};
@@ -4269,8 +4261,8 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (1x): data/CommonEvents.json:common-event:22
 	setSelfVariable539Var540 = function (interp) {
-		var variableCode = `\\V[49]`; // code, not translation text
-		var messageText2 = `は傷付いた身体を休めた…。\n`; //翻訳対象
+		var variableCode = `\\V[49]`;
+		var messageText2 = `は傷付いた身体を休めた…。\n`;
 		return (function () {
 		interp.sVal(539,`${variableCode}${messageText2}`);
 		interp.sVal(540,$gameVariables.value(540) + 1);
@@ -4279,11 +4271,11 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (1x): data/CommonEvents.json:common-event:83
 	setSelfVariable539Var540_2 = function (interp) {
-		var textPrefix = `は`; //翻訳対象
-		var colorCode4 = `\\C[27]`; // code, not translation text
-		var textPart2 = `発情`; //翻訳対象
-		var colorResetCode = `\\C[0]`; // code, not translation text
-		var textSuffix = `した肢体を慰めている…。\n`; //翻訳対象
+		var textPrefix = `は`;
+		var colorCode4 = `\\C[27]`;
+		var textPart2 = `発情`;
+		var colorResetCode = `\\C[0]`;
+		var textSuffix = `した肢体を慰めている…。\n`;
 		return (function () {
 		interp.sVal(539,`${actor.name()}${textPrefix}${colorCode4}${textPart2}${colorResetCode}${textSuffix}`);
 		interp.sVal(540,$gameVariables.value(540) + 1);
@@ -4292,11 +4284,11 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (1x): data/CommonEvents.json:common-event:83
 	setSelfVariable539Var540_3 = function (interp) {
-		var textPrefix = `は`; //翻訳対象
-		var colorCode4 = `\\C[27]`; // code, not translation text
-		var textPart2 = `発情`; //翻訳対象
-		var colorResetCode = `\\C[0]`; // code, not translation text
-		var textSuffix = `した肢体を持て余している…。\n`; //翻訳対象
+		var textPrefix = `は`;
+		var colorCode4 = `\\C[27]`;
+		var textPart2 = `発情`;
+		var colorResetCode = `\\C[0]`;
+		var textSuffix = `した肢体を持て余している…。\n`;
 		return (function () {
 		interp.sVal(539,`${actor.name()}${textPrefix}${colorCode4}${textPart2}${colorResetCode}${textSuffix}`);
 		interp.sVal(540,$gameVariables.value(540) + 1);
@@ -4305,15 +4297,15 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (1x): data/CommonEvents.json:common-event:23
 	drawWindowText = function () {
-		var controlCode = `\\fs[22]`; // code, not translation text
-		var variableCode = `\\V[539]`; // code, not translation text
+		var controlCode = `\\fs[22]`;
+		var variableCode = `\\V[539]`;
 		WindowManager.drawText(1, `${controlCode}${variableCode}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:23
 	drawWindowText2 = function () {
-		var controlCode = `\\fs[28]`; // code, not translation text
-		var variableCode = `\\V[539]`; // code, not translation text
+		var controlCode = `\\fs[28]`;
+		var variableCode = `\\V[539]`;
 		WindowManager.drawText(1, `${controlCode}${variableCode}`);
 	};
 
@@ -4478,67 +4470,67 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (4x): data/CommonEvents.json:common-event:42, data/CommonEvents.json:common-event:47
 	showTickerNoPendingScenes = function () {
-		var messageText2 = `未発生のシーンは存在しません。`; //翻訳対象
+		var messageText2 = `未発生のシーンは存在しません。`;
 		TickerManager.show(`${messageText2}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:66
 	showTickerNoEpisodesOnThisMap = function () {
-		var messageText2 = `条件が変動した為、現在このマップで発生する挿話はありません`; //翻訳対象
+		var messageText2 = `条件が変動した為、現在このマップで発生する挿話はありません`;
 		TickerManager.show(`${messageText2}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:68
 	showTickerNoQuickSaveInBattleMap = function () {
-		var messageText2 = `戦闘マップではクイックセーブを行なえません`; //翻訳対象
+		var messageText2 = `戦闘マップではクイックセーブを行なえません`;
 		TickerManager.show(`${messageText2}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:68
 	showTickerNoQuickSaveWhileRecalling = function () {
-		var messageText2 = `回想中はクイックセーブを行なえません`; //翻訳対象
+		var messageText2 = `回想中はクイックセーブを行なえません`;
 		TickerManager.show(`${messageText2}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:68
 	showTickerQuickSavedToFile51 = function () {
-		var messageText2 = `ファイル５１にクイックセーブしました`; //翻訳対象
+		var messageText2 = `ファイル５１にクイックセーブしました`;
 		TickerManager.show(`${messageText2}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:68
 	showTickerQuickSavedToLastFile = function () {
-		var messageText2 = `最終使用ファイルにクイックセーブしました`; //翻訳対象
+		var messageText2 = `最終使用ファイルにクイックセーブしました`;
 		TickerManager.show(`${messageText2}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:68
 	showTickerQuickSavedToFile1 = function () {
-		var messageText2 = `ファイル１にクイックセーブしました`; //翻訳対象
+		var messageText2 = `ファイル１にクイックセーブしました`;
 		TickerManager.show(`${messageText2}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:202
 	showTickerBattleSpeedSetToFastest = function () {
-		var messageText2 = `戦闘速度を最速に変更しました`; //翻訳対象
+		var messageText2 = `戦闘速度を最速に変更しました`;
 		TickerManager.show(`${messageText2}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:202
 	showTickerBattleSpeedSetToFast = function () {
-		var messageText2 = `戦闘速度を速いに変更しました`; //翻訳対象
+		var messageText2 = `戦闘速度を速いに変更しました`;
 		TickerManager.show(`${messageText2}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:202
 	showTickerBattleSpeedSetToNormal = function () {
-		var messageText2 = `戦闘速度を通常に変更しました`; //翻訳対象
+		var messageText2 = `戦闘速度を通常に変更しました`;
 		TickerManager.show(`${messageText2}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:259
 	showTickerVariable801 = function () {
-		var variableCode = `\\V[801]`; // code, not translation text
+		var variableCode = `\\V[801]`;
 		TickerManager.show(`${variableCode}`);
 	};
 
@@ -4681,10 +4673,10 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (1x): data/CommonEvents.json:common-event:60
 	showInfoPopup = function () {
-		var textPrefix = `Tips:`; //翻訳対象
-		var colorCode4 = `\\C[3]`; // code, not translation text
-		var colorResetCode = `\\C[0]`; // code, not translation text
-		var textSuffix = `を獲得`; //翻訳対象
+		var textPrefix = `Tips:`;
+		var colorCode4 = `\\C[3]`;
+		var colorResetCode = `\\C[0]`;
+		var textSuffix = `を獲得`;
 		  var text3 = `${textPrefix}${colorCode4}${valueTalkSet[0]}${colorResetCode}${textSuffix}`;
 		  CommonPopupManager.showInfo({},text3,null);
 	};
@@ -4738,7 +4730,7 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (1x): data/CommonEvents.json:common-event:61
 	playSeEffectVar122 = function () {
-		var messageText2 = `鼓動`; //翻訳対象
+		var messageText2 = `鼓動`;
 		AudioManager.playSe({"name":`${messageText2}`,"volume":100,"pitch":$gameVariables.value(122),"pan":0})
 	};
 
@@ -4794,7 +4786,7 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (1x): data/CommonEvents.json:common-event:64
 	runPluginCommandShowInfo = function (interp) {
-		var messageText2 = `パーティが再集合されました`; //翻訳対象
+		var messageText2 = `パーティが再集合されました`;
 		return (function () {
 		value1 = `${messageText2}`;
 		var args3 = new Array( String(value1) ); 
@@ -4804,7 +4796,7 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (1x): data/CommonEvents.json:common-event:64
 	runPluginCommandShowInfo2 = function (interp) {
-		var messageText2 = `パーティが一時解散されました`; //翻訳対象
+		var messageText2 = `パーティが一時解散されました`;
 		return (function () {
 		value1 = `${messageText2}`;
 		var args3 = new Array( String(value1) ); 
@@ -4880,9 +4872,9 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (1x): data/CommonEvents.json:common-event:73
 	runPluginCommandShowInfo3 = function (interp) {
-		var textPrefix = `ファイル`; //翻訳対象
-		var variableCode = `\\V[509]`; // code, not translation text
-		var textSuffix = `にオートセーブしました`; //翻訳対象
+		var textPrefix = `ファイル`;
+		var variableCode = `\\V[509]`;
+		var textSuffix = `にオートセーブしました`;
 		return (function () {
 		var args3 = new Array( `${textPrefix}${variableCode}${textSuffix}`);
 		interp.pluginCommand("ShowInfo", args3);
@@ -4891,7 +4883,7 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (1x): data/CommonEvents.json:common-event:73
 	runPluginCommandShowInfo4 = function (interp) {
-		var messageText2 = `ファイル51にオートセーブしました`; //翻訳対象
+		var messageText2 = `ファイル51にオートセーブしました`;
 		return (function () {
 		var args3 = new Array( `${messageText2}`);
 		interp.pluginCommand("ShowInfo", args3);
@@ -4936,7 +4928,7 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (1x): data/CommonEvents.json:common-event:536
 	setSelfVariable23Var1 = function (interp) {
-		var messageText2 = `の`; //翻訳対象
+		var messageText2 = `の`;
 		return (function () {
 		interp.sVal(23,`${$gameVariables.value(1+380)[56]}${messageText2}${$gameVariables.value(1+380)[53]}`);
 		}).call(interp);
@@ -4955,14 +4947,14 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (1x): data/CommonEvents.json:common-event:103
 	setVariable332Text = function () {
-		var iconCode296 = `\\I[296]`; // code, not translation text
-		var iconCode313 = `\\I[313]`; // code, not translation text
+		var iconCode296 = `\\I[296]`;
+		var iconCode313 = `\\I[313]`;
 		$gameVariables.setValue(332,`${iconCode296}:${Math.round(valueTotalexp)}${iconCode313}:${Math.round(valueTotalgold)}`);
 	};
 
 	// Replaces (2x): data/Map003.json:map-event:139:page:1, data/Map003.json:map-event:140:page:1
 	setVariable801Text = function () {
-		var messageText2 = `残念だったわね？`; //翻訳対象
+		var messageText2 = `残念だったわね？`;
 		$gameVariables.setValue(801,`${messageText2}`);
 	};
 
@@ -4974,7 +4966,7 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (2x): data/CommonEvents.json:common-event:87
 	appendMessageTextVar20 = function (interp) {
-		var controlCode = `\\>`; // code, not translation text
+		var controlCode = `\\>`;
 		return (function () {
 		var variable20Value = $gameActors.actor($gameVariables.value(20));
 		$gameMessage.newPage();
@@ -4985,7 +4977,7 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (1x): data/CommonEvents.json:common-event:87
 	appendMessageTextVar20_2 = function (interp) {
-		var controlCode = `\\SP[0]`; // code, not translation text
+		var controlCode = `\\SP[0]`;
 		return (function () {
 		var variable20Value = $gameActors.actor($gameVariables.value(20));
 		$gameMessage.newPage();
@@ -5052,8 +5044,8 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (1x): data/CommonEvents.json:common-event:101
 	runPluginCommandCutInCG_EnemyDefeat = function (interp) {
-		var messageText2 = `カットインエネミー演出色々`; //翻訳対象
-		var textPart2 = `敵カットイン`; //翻訳対象
+		var messageText2 = `カットインエネミー演出色々`;
+		var textPart2 = `敵カットイン`;
 		return (function () {
 		var nameValue = 'CutInCG_EnemyDefeat';
 		valueCutInSet1 = [`${messageText2}`,nameValue,0,2.0,2.0,25,60];
@@ -5064,8 +5056,8 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (1x): data/CommonEvents.json:common-event:104
 	runPluginCommandVar20 = function (interp) {
-		var textPrefix = `Ｈシーン演出`; //翻訳対象
-		var textSuffix = `味方カットイン`; //翻訳対象
+		var textPrefix = `Ｈシーン演出`;
+		var textSuffix = `味方カットイン`;
 		return (function () {
 		var variable20Value = `Zev_BattleMasturbation${$gameVariables.value(20)}_1`;
 		valueCutInSet1 = [`${textPrefix}`,variable20Value,270,1.5,1.2,25,60];
@@ -5076,7 +5068,7 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (1x): data/CommonEvents.json:common-event:101
 	updateActorFromVariable11 = function () {
-		var messageText2 = `達`; //翻訳対象
+		var messageText2 = `達`;
 		var variable11Value = `${$gameActors.actor($gameVariables.value(11)).name()}`;
 		if($gameParty.battleMembers().length >= 2){
 		  variable11Value += `${messageText2}`;
@@ -5086,7 +5078,7 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (2x): data/CommonEvents.json:common-event:496, data/CommonEvents.json:common-event:516
 	updateActorFromVariable530 = function () {
-		var messageText2 = `一行`; //翻訳対象
+		var messageText2 = `一行`;
 		var variable530Value = `${$gameActors.actor($gameVariables.value(530)).name()}`;
 		if($gameParty.battleMembers().length >= 2){
 		  variable530Value += `${messageText2}`;
@@ -5207,7 +5199,7 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (2x): data/CommonEvents.json:common-event:104, data/CommonEvents.json:common-event:140
 	prepareCutInVar20 = function (interp, pictureId) {
-		var messageText2 = `味方カットイン`; //翻訳対象
+		var messageText2 = `味方カットイン`;
 		return (function (pictureId) {
 		cutin_preparation(pictureId,$gameVariables.value(20));
 		if(valueCutInSet1[0] != 0){
@@ -5219,7 +5211,7 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (1x): data/CommonEvents.json:common-event:140
 	prepareCutInVar20_2 = function (interp) {
-		var messageText2 = `敵カットイン`; //翻訳対象
+		var messageText2 = `敵カットイン`;
 		return (function () {
 		cutin_preparation(0,$gameVariables.value(20));
 		if(valueCutInSet1[0] != 0){
@@ -5303,28 +5295,28 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (3x): data/CommonEvents.json:common-event:106, data/CommonEvents.json:common-event:109
 	pushBattleLogTextVar20 = function () {
-		var messageText2 = `は拘束された！`; //翻訳対象
+		var messageText2 = `は拘束された！`;
 		var variable20Value = $gameActors.actor($gameVariables.value(20));
 		BattleManager._logWindow.push(`addText`, `${variable20Value.name()}${messageText2}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:109
 	pushBattleLogTextVar20_2 = function () {
-		var messageText2 = `は襲い掛かられた！`; //翻訳対象
+		var messageText2 = `は襲い掛かられた！`;
 		var variable20Value = $gameActors.actor($gameVariables.value(20));
 		BattleManager._logWindow.push(`addText`, `${variable20Value.name()}${messageText2}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:109
 	pushBattleLogTextVar20_3 = function () {
-		var messageText2 = `は拘束から逃れた！`; //翻訳対象
+		var messageText2 = `は拘束から逃れた！`;
 		var variable20Value = $gameActors.actor($gameVariables.value(20));
 		BattleManager._logWindow.push(`addText`, `${variable20Value.name()}${messageText2}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:110
 	pushBattleLogTextVar20_4 = function () {
-		var messageText2 = `は犯されている…。`; //翻訳対象
+		var messageText2 = `は犯されている…。`;
 		var variable20Value = $gameActors.actor($gameVariables.value(20));
 		BattleManager._logWindow.push(`addText`, `${variable20Value.name()}${messageText2}`);
 	};
@@ -5369,8 +5361,8 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (2x): data/CommonEvents.json:common-event:111, data/CommonEvents.json:common-event:112
 	showInfoPopupVar20 = function () {
-		var textPrefix = `しかし`; //翻訳対象
-		var textSuffix = `は既に全裸であった…`; //翻訳対象
+		var textPrefix = `しかし`;
+		var textSuffix = `は既に全裸であった…`;
 		var variable20Value = $gameActors.actor($gameVariables.value(20));
 		var text3 = `${textPrefix}${variable20Value.name()}${textSuffix}`;
 		if($gameParty.inBattle()){
@@ -5382,9 +5374,9 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (1x): data/CommonEvents.json:common-event:112
 	showInfoPopupVar20_2 = function () {
-		var textPrefix = `しかし`; //翻訳対象
-		var textPart2 = `には効果が無かった。　（現在露出値:`; //翻訳対象
-		var textSuffix = `）`; //翻訳対象
+		var textPrefix = `しかし`;
+		var textPart2 = `には効果が無かった。　（現在露出値:`;
+		var textSuffix = `）`;
 		var variable20Value = $gameActors.actor($gameVariables.value(20));
 		var text3 = `${textPrefix}${variable20Value.name()}${textPart2}${value1}${textSuffix}`;
 		if($gameParty.inBattle()){
@@ -5482,7 +5474,7 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (1x): data/CommonEvents.json:common-event:129
 	prepareCutInVar20_3 = function (interp) {
-		var messageText2 = `敵カットイン`; //翻訳対象
+		var messageText2 = `敵カットイン`;
 		return (function () {
 		cutin_preparation(8,$gameVariables.value(20));
 		if(valueCutInSet1[0] != 0){
@@ -5494,7 +5486,7 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (2x): data/Map003.json:map-event:81:page:1, data/Map003.json:map-event:82:page:1
 	prepareCutInVar20_4 = function (interp) {
-		var messageText2 = `味方カットイン`; //翻訳対象
+		var messageText2 = `味方カットイン`;
 		return (function () {
 		cutin_preparation(7,$gameVariables.value(20));
 		if(valueCutInSet1[0] != 0){
@@ -5506,10 +5498,10 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (1x): data/CommonEvents.json:common-event:138
 	configureActorFromVariable20GabText = function (interp) {
-		var messageText2 = `「行きますよ、皆さん！」`; //翻訳対象
-		var textPart2 = `「`; //翻訳対象
-		var controlCode = `\\N[2]`; // code, not translation text
-		var textPart3 = `さん、行きましょう！」`; //翻訳対象
+		var messageText2 = `「行きますよ、皆さん！」`;
+		var textPart2 = `「`;
+		var controlCode = `\\N[2]`;
+		var textPart3 = `さん、行きましょう！」`;
 		return (function () {
 		var variable20Value = $gameActors.actor($gameVariables.value(20));
 		var arraySize = `${variable20Value.name()}${messageText2}`;
@@ -5521,10 +5513,10 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (1x): data/CommonEvents.json:common-event:138
 	configureActorFromVariable20Actor1 = function (interp) {
-		var messageText2 = `「往くぞ！」`; //翻訳対象
-		var textPart2 = `「往くぞ、`; //翻訳対象
-		var controlCode = `\\N[1]`; // code, not translation text
-		var textPart3 = `！」`; //翻訳対象
+		var messageText2 = `「往くぞ！」`;
+		var textPart2 = `「往くぞ、`;
+		var controlCode = `\\N[1]`;
+		var textPart3 = `！」`;
 		return (function () {
 		var variable20Value = $gameActors.actor($gameVariables.value(20));
 		var arraySize = `${variable20Value.name()}${messageText2}`;
@@ -5536,7 +5528,7 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (2x): data/CommonEvents.json:common-event:138
 	prepareCutInVar182And20 = function (interp) {
-		var messageText2 = `味方カットイン`; //翻訳対象
+		var messageText2 = `味方カットイン`;
 		return (function () {
 		$gameVariables.setValue(182,13);
 		cutin_preparation(1,$gameVariables.value(20));
@@ -5549,7 +5541,7 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (1x): data/CommonEvents.json:common-event:138
 	runPluginCommandGabText = function (interp) {
-		var messageText2 = `「ああ！　我らの力、見せてやろう！！」`; //翻訳対象
+		var messageText2 = `「ああ！　我らの力、見せてやろう！！」`;
 		return (function () {
 		var actorId3 = 2;
 		var actor3 = $gameActors.actor(actorId3);
@@ -5561,9 +5553,9 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (1x): data/CommonEvents.json:common-event:138
 	runPluginCommandGabText2 = function (interp) {
-		var textPrefix = `「はい、`; //翻訳対象
-		var controlCode = `\\N[2]`; // code, not translation text
-		var textSuffix = `さん！」`; //翻訳対象
+		var textPrefix = `「はい、`;
+		var controlCode = `\\N[2]`;
+		var textSuffix = `さん！」`;
 		return (function () {
 		var actorId3 = 1;
 		var actor3 = $gameActors.actor(actorId3);
@@ -5575,7 +5567,7 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (2x): data/CommonEvents.json:common-event:138
 	prepareCutInVar182 = function (interp, argument1) {
-		var messageText2 = `味方カットイン`; //翻訳対象
+		var messageText2 = `味方カットイン`;
 		return (function (argument1) {
 		var cutinType2 = argument1;
 		$gameVariables.setValue(182,13);
@@ -5663,8 +5655,8 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (2x): data/CommonEvents.json:common-event:167
 	configureActorFromVariable20 = function (interp) {
-		var messageText2 = `　`; //翻訳対象
-		var iconCode = `\\I[155]`; // code, not translation text
+		var messageText2 = `　`;
+		var iconCode = `\\I[155]`;
 		return (function () {
 		var variable20Value = $gameActors.actor($gameVariables.value(20))
 		interp.sVal(519,`${variable20Value.name()}${messageText2}${iconCode}:${$gameVariables.value($gameVariables.value(20)+380)[4]}(${$gameVariables.value($gameVariables.value(20)+380)[5]})
@@ -5784,7 +5776,7 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (1x): data/CommonEvents.json:common-event:176
 	addCustomChoice = function () {
-		var messageText2 = `未指定`; //翻訳対象
+		var messageText2 = `未指定`;
 		const constantValue = 1; 
 		const choiceParams2 = {
 		text: `${messageText2}`,
@@ -5794,8 +5786,8 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (1x): data/CommonEvents.json:common-event:259
 	addCustomChoice2 = function () {
-		var controlCode1 = `\\fs[20]`; // code, not translation text
-		var controlCode2 = `\\fs[28]`; // code, not translation text
+		var controlCode1 = `\\fs[20]`;
+		var controlCode2 = `\\fs[28]`;
 		    const constantValue = 1; 
 		    const choiceParams2 = {
 		    text: `${controlCode1}${$dataSystem.switches[430]}${controlCode2}`,
@@ -5805,7 +5797,7 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (1x): data/Map003.json:map-event:83:page:1
 	addCustomChoiceVar22 = function () {
-		var messageText2 = `　　　　　　　　　　　　　`; //翻訳対象
+		var messageText2 = `　　　　　　　　　　　　　`;
 		const constantValue = 1; 
 		const variable22Value = {
 		text: `${$gameVariables.value(22)}${messageText2}`,
@@ -5873,30 +5865,30 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (1x): data/CommonEvents.json:common-event:192
 	setActor21Name = function () {
-		var messageText2 = `情報屋`; //翻訳対象
+		var messageText2 = `情報屋`;
 		$gameActors.actor(21).setName(`${messageText2}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:239
 	setActor21Name2 = function () {
-		var messageText2 = `鑑定屋`; //翻訳対象
+		var messageText2 = `鑑定屋`;
 		$gameActors.actor(21).setName(`${messageText2}`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:305
 	setActor21Name3 = function () {
-		var textPrefix = `受付嬢`; //翻訳対象
-		var controlCode1 = `\\}`; // code, not translation text
-		var textSuffix = `支部`; //翻訳対象
-		var controlCode2 = `\\{`; // code, not translation text
+		var textPrefix = `受付嬢`;
+		var controlCode1 = `\\}`;
+		var textSuffix = `支部`;
+		var controlCode2 = `\\{`;
 		$gameActors.actor(21).setName(`${textPrefix}${controlCode1} ${$dataWeapons[76].name} ${$dataWeapons[22].name}${textSuffix}${controlCode2}`);
 	};
 
 	// Replaces (2x): data/CommonEvents.json:common-event:511, data/Map094.json:map-event:45:page:1
 	setActor22Name = function () {
-		var messageText2 = `受付`; //翻訳対象
-		var controlCode1 = `\\}`; // code, not translation text
-		var controlCode2 = `\\{`; // code, not translation text
+		var messageText2 = `受付`;
+		var controlCode1 = `\\}`;
+		var controlCode2 = `\\{`;
 		$gameActors.actor(22).setName(`${messageText2}${controlCode1} ${$dataWeapons[70].name}${controlCode2}`);
 	};
 
@@ -5958,7 +5950,7 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (1x): data/CommonEvents.json:common-event:205
 	setPickupSkillLabel = function () {
-		var messageText2 = `持ち上げ＜OFF＞`; //翻訳対象
+		var messageText2 = `持ち上げ＜OFF＞`;
 		$gameSystem._pickupData[0] = false;
 		$dataSkills[26].name =`${messageText2}`;
 	};
@@ -6127,7 +6119,7 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (1x): data/CommonEvents.json:common-event:234
 	speakCharacterOneLiner = function (interp) {
-		var messageText2 = `親愛なる隣人の旅路に祝福を──`; //翻訳対象
+		var messageText2 = `親愛なる隣人の旅路に祝福を──`;
 		return (function () {
 		var randomXOffsets = [0];
 		var randomYOffsets = [-50];
@@ -6138,7 +6130,7 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (1x): data/CommonEvents.json:common-event:338
 	speakCharacterOneLiner2 = function (interp) {
-		var messageText2 = `ゴクゴクっ──`; //翻訳対象
+		var messageText2 = `ゴクゴクっ──`;
 		return (function () {
 		var randomXOffsets = [0];
 		var randomYOffsets = [-50];
@@ -6149,7 +6141,7 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (1x): data/CommonEvents.json:common-event:541
 	speakCharacterOneLiner3 = function (interp) {
-		var messageText2 = `ガサゴソ…`; //翻訳対象
+		var messageText2 = `ガサゴソ…`;
 		return (function () {
 		var randomXOffsets = [0];
 		var randomYOffsets = [-50];
@@ -6160,9 +6152,9 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (1x): data/CommonEvents.json:common-event:235
 	configureActorFromVariable20Var21 = function () {
-		var textPrefix = `\\set[`; //翻訳対象
-		var textPart2 = `]は、<`; //翻訳対象
-		var textSuffix = `>に\\rb[昇格,レアリティ・アップ]した！`; //翻訳対象
+		var textPrefix = `\\set[`;
+		var textPart2 = `]は、<`;
+		var textSuffix = `>に\\rb[昇格,レアリティ・アップ]した！`;
 		var variable20Value = $gameActors.actor($gameVariables.value(20));
 		$gameVariables.setValue(21,
 		`${textPrefix}${$gameVariables.value(20)}${textPart2}${valueCountSet1}${textSuffix}`);
@@ -6170,7 +6162,7 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (1x): data/CommonEvents.json:common-event:254
 	configureActorFromVariable20Var21_2 = function () {
-		var messageText2 = `を初期化します。よろしいですか？\n（H履歴は影響ありませんが、\n各種開発度ランクはリセットされます。\nサブジョブのレベルは完全にはリセットされません）`; //翻訳対象
+		var messageText2 = `を初期化します。よろしいですか？\n（H履歴は影響ありませんが、\n各種開発度ランクはリセットされます。\nサブジョブのレベルは完全にはリセットされません）`;
 		var variable20Value = $gameActors.actor($gameVariables.value(20));
 		$gameVariables.setValue(21,
 		`${variable20Value.name()}${messageText2}`);
@@ -6178,7 +6170,7 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (1x): data/CommonEvents.json:common-event:254
 	configureActorFromVariable20Var21_3 = function () {
-		var messageText2 = `のリセット処理が完了しました。`; //翻訳対象
+		var messageText2 = `のリセット処理が完了しました。`;
 		var variable20Value = $gameActors.actor($gameVariables.value(20));
 		$gameVariables.setValue(21,
 		`${variable20Value.name()}${messageText2}`);
@@ -6186,8 +6178,8 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (1x): data/CommonEvents.json:common-event:259
 	configureActorFromVariable20Var801And21 = function () {
-		var textPrefix = `は[`; //翻訳対象
-		var textSuffix = `]のジョブ解放条件を満たしていません…。\n`; //翻訳対象
+		var textPrefix = `は[`;
+		var textSuffix = `]のジョブ解放条件を満たしていません…。\n`;
 		var variable20Value = $gameActors.actor($gameVariables.value(20));
 		$gameVariables.setValue(801,
 		`${variable20Value.name()}${textPrefix}${$dataClasses[$gameVariables.value(21)].name}${textSuffix}`);
@@ -6195,10 +6187,10 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (1x): data/CommonEvents.json:common-event:313
 	configureActorFromVariable20Var21_4 = function () {
-		var textPrefix = `\\set[`; //翻訳対象
-		var textPart2 = `]は、`; //翻訳対象
-		var controlCode = `\\sin[405]`; // code, not translation text
-		var textSuffix = `に\\rb[昇格,レアリティ・アップ]した！`; //翻訳対象
+		var textPrefix = `\\set[`;
+		var textPart2 = `]は、`;
+		var controlCode = `\\sin[405]`;
+		var textSuffix = `に\\rb[昇格,レアリティ・アップ]した！`;
 		var variable20Value = $gameActors.actor($gameVariables.value(20));
 		$gameVariables.setValue(21,
 		`${textPrefix}${$gameVariables.value(20)}${textPart2}${controlCode}${textSuffix}`);
@@ -6206,113 +6198,113 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (1x): data/CommonEvents.json:common-event:236
 	setActor20NameVar400 = function () {
-		var messageText2 = `バニーさん`; //翻訳対象
+		var messageText2 = `バニーさん`;
 		$gameActors.actor(20).setName(`${messageText2}`);
 		$gameVariables.value(400)[59] = `${$dataWeapons[433].name}`;
 	};
 
 	// Replaces (2x): data/CommonEvents.json:common-event:242, data/Map094.json:map-event:32:page:1
 	setActor20NameVar400_2 = function (textValue) {
-		var messageText2 = `受付`; //翻訳対象
+		var messageText2 = `受付`;
 		$gameActors.actor(20).setName(`${messageText2}`);
 		$gameVariables.value(400)[59] = textValue;
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:246
 	setActor20NameVar400_3 = function () {
-		var messageText2 = `ピエロ`; //翻訳対象
-		var textPart2 = `タートル・エクスペリエンス社`; //翻訳対象
+		var messageText2 = `ピエロ`;
+		var textPart2 = `タートル・エクスペリエンス社`;
 		$gameActors.actor(20).setName(`${messageText2}`);
 		$gameVariables.value(400)[59] = `${textPart2}`;
 	};
 
 	// Replaces (2x): data/CommonEvents.json:common-event:308, data/CommonEvents.json:common-event:355
 	setActor20NameVar400_4 = function () {
-		var messageText2 = `ボスゴブリン`; //翻訳対象
+		var messageText2 = `ボスゴブリン`;
 		$gameActors.actor(20).setName(`${messageText2}`);
 		$gameVariables.value(400)[59] = `${$dataSystem.switches[248]}`;
 	};
 
 	// Replaces (2x): data/CommonEvents.json:common-event:390, data/CommonEvents.json:common-event:576
 	setActor20NameVar400_5 = function () {
-		var messageText2 = `女将`; //翻訳対象
+		var messageText2 = `女将`;
 		$gameActors.actor(20).setName(`${messageText2}`);
 		$gameVariables.value(400)[59] = `${$dataWeapons[434].name}`;
 	};
 
 	// Replaces (2x): data/Map003.json:map-event:155:page:1, data/Map022.json:map-event:6:page:1
 	setActor20NameVar400_6 = function () {
-		var messageText2 = `受付嬢`; //翻訳対象
-		var textPart2 = `支部`; //翻訳対象
+		var messageText2 = `受付嬢`;
+		var textPart2 = `支部`;
 		$gameActors.actor(20).setName(`${messageText2}`);
 		$gameVariables.value(400)[59] = `${$dataWeapons[76].name}${$dataWeapons[22].name}${textPart2}`;
 	};
 
 	// Replaces (1x): data/Map003.json:map-event:164:page:1
 	setActor20NameVar400_7 = function () {
-		var messageText2 = `販売員`; //翻訳対象
-		var textPart2 = `ギルド出張所`; //翻訳対象
+		var messageText2 = `販売員`;
+		var textPart2 = `ギルド出張所`;
 		$gameActors.actor(20).setName(`${messageText2}`);
 		$gameVariables.value(400)[59] = `${$dataWeapons[402].name}${textPart2}`;
 	};
 
 	// Replaces (4x): data/Map003.json:map-event:188:page:1, data/Map024.json:map-event:2:page:1, data/Map079.json:map-event:2:page:1, data/Map195.json:map-event:2:page:1
 	setActor20NameVar400_8 = function () {
-		var messageText2 = `神官`; //翻訳対象
-		var textPart2 = `支部`; //翻訳対象
+		var messageText2 = `神官`;
+		var textPart2 = `支部`;
 		$gameActors.actor(20).setName(`${messageText2}`);
 		$gameVariables.value(400)[59] = `${$dataWeapons[77].name}${$dataWeapons[22].name}${textPart2}`;
 	};
 
 	// Replaces (2x): data/Map003.json:map-event:229:page:1, data/Map023.json:map-event:3:page:1
 	setActor20NameVar400_9 = function () {
-		var messageText2 = `鍛冶師`; //翻訳対象
+		var messageText2 = `鍛冶師`;
 		$gameActors.actor(20).setName(`${messageText2}`);
 		$gameVariables.value(400)[59] = `${$dataWeapons[401].name}`;
 	};
 
 	// Replaces (2x): data/Map003.json:map-event:230:page:1, data/Map021.json:map-event:10:page:1
 	setActor20NameVar400_10 = function () {
-		var messageText2 = `鑑定師`; //翻訳対象
+		var messageText2 = `鑑定師`;
 		$gameActors.actor(20).setName(`${messageText2}`);
 		$gameVariables.value(400)[59] = `${$dataWeapons[403].name}`;
 	};
 
 	// Replaces (2x): data/Map003.json:map-event:233:page:1, data/Map022.json:map-event:9:page:1
 	setActor20NameVar400_11 = function () {
-		var messageText2 = `錬金術師`; //翻訳対象
-		var textPart2 = `流れの錬金術師`; //翻訳対象
+		var messageText2 = `錬金術師`;
+		var textPart2 = `流れの錬金術師`;
 		$gameActors.actor(20).setName(`${messageText2}`);
 		$gameVariables.value(400)[59] = `${textPart2}`;
 	};
 
 	// Replaces (1x): data/Map018.json:map-event:27:page:1
 	setActor20NameVar400_12 = function () {
-		var messageText2 = `おばさん`; //翻訳対象
-		var textPart2 = `ネルガド住民`; //翻訳対象
+		var messageText2 = `おばさん`;
+		var textPart2 = `ネルガド住民`;
 		$gameActors.actor(20).setName(`${messageText2}`);
 		$gameVariables.value(400)[59] = `${textPart2}`;
 	};
 
 	// Replaces (1x): data/Map018.json:map-event:28:page:1
 	setActor20NameVar400_13 = function () {
-		var messageText2 = `お姉さん`; //翻訳対象
-		var textPart2 = `ネルガド住民`; //翻訳対象
+		var messageText2 = `お姉さん`;
+		var textPart2 = `ネルガド住民`;
 		$gameActors.actor(20).setName(`${messageText2}`);
 		$gameVariables.value(400)[59] = `${textPart2}`;
 	};
 
 	// Replaces (1x): data/Map022.json:map-event:3:page:1
 	setActor20NameVar400_14 = function () {
-		var messageText2 = `販売員`; //翻訳対象
+		var messageText2 = `販売員`;
 		$gameActors.actor(20).setName(`${messageText2}`);
 		$gameVariables.value(400)[59] = `${$dataWeapons[402].name}`;
 	};
 
 	// Replaces (1x): data/Map048.json:map-event:3:page:1
 	setActor20NameVar400_15 = function () {
-		var messageText2 = `受付`; //翻訳対象
-		var textPart2 = `支部`; //翻訳対象
+		var messageText2 = `受付`;
+		var textPart2 = `支部`;
 		$gameActors.actor(20).setName(`${messageText2}`);
 		$gameVariables.value(400)[59] = `${$dataWeapons[76].name}${$dataWeapons[41].name}${textPart2}`;
 	};
@@ -6324,9 +6316,9 @@ ${colorCode4}[7]${colorResetCode}${textPart7}`,
 
 	// Replaces (2x): data/CommonEvents.json:common-event:241
 	setWeaponUniqueAndAddWeaponUnique = function (countValue) {
-		var textPrefix = `\\WIN[`; //翻訳対象
-		var variableCode = `\\V[801]`; // code, not translation text
-		var textSuffix = `\n※付与効果は強化の度に選択/追加されていきます。`; //翻訳対象
+		var textPrefix = `\\WIN[`;
+		var variableCode = `\\V[801]`;
+		var textSuffix = `\n※付与効果は強化の度に選択/追加されていきます。`;
 		var variable20Value = $gameVariables.value(20);
 		weapon_uniqueSet(variable20Value);
 		valueCountSet3 = countValue;
@@ -6365,7 +6357,7 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (2x): data/CommonEvents.json:common-event:256
 	setWeaponNameOrNone = function (weaponSlotIndex, switchId, variableId, newValue, switchId2, variableId2) {
-		var messageText2 = `なし`; //翻訳対象
+		var messageText2 = `なし`;
 		if($gameVariables.value($gameVariables.value(20)+380)[weaponSlotIndex] != 0){
 		  $gameSwitches.setValue(switchId,true);
 		  $gameVariables.setValue(variableId,$dataWeapons[$gameVariables.value($gameVariables.value(20)+380)[newValue]].name);
@@ -6570,7 +6562,7 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (1x): data/CommonEvents.json:common-event:298
 	blessStandingPictureVar17 = function () {
-		var messageText2 = `連番`; //翻訳対象
+		var messageText2 = `連番`;
 		$gameScreen.setPicturesAnimation(3, 2, `${messageText2}`, 5);
 		var constantValue = 1;
 		if($gameVariables.value(17) >= 500){
@@ -6609,10 +6601,10 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (1x): data/CommonEvents.json:common-event:300
 	setupChildInterpreter4 = function (interp) {
-		var textPrefix = `全体マップに`; //翻訳対象
-		var colorCode4 = `\\C[16]`; // code, not translation text
-		var colorResetCode = `\\C[0]`; // code, not translation text
-		var textSuffix = `が追加されました`; //翻訳対象
+		var textPrefix = `全体マップに`;
+		var colorCode4 = `\\C[16]`;
+		var colorResetCode = `\\C[0]`;
+		var textSuffix = `が追加されました`;
 		return (function () {
 		interp.sVal(20,0);
 		var tempValue = $dataSystem.switches[252];
@@ -6624,7 +6616,7 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (1x): data/CommonEvents.json:common-event:350
 	setupChildInterpreter5 = function (interp) {
-		var messageText2 = `からクリア後ダンジョンに行けるようになりました`; //翻訳対象
+		var messageText2 = `からクリア後ダンジョンに行けるようになりました`;
 		return (function () {
 		interp.sVal(20,0);
 		var tempValue = $dataSystem.switches[259];
@@ -6718,7 +6710,7 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (1x): data/CommonEvents.json:common-event:301
 	speakCharacterOneLinerSourceHanSerifHeavy = function () {
-		var messageText2 = `「ヒャッハァッッ！」`; //翻訳対象
+		var messageText2 = `「ヒャッハァッッ！」`;
 		var randomXOffsets = [0];
 		var randomYOffsets = [-50];
 		var lineCandidates = [`${messageText2}`];
@@ -6727,7 +6719,7 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (1x): data/CommonEvents.json:common-event:301
 	speakCharacterOneLinerGenkaiMincho = function () {
-		var messageText2 = `「ギャアアアアアアアアアッッ────！！」`; //翻訳対象
+		var messageText2 = `「ギャアアアアアアアアアッッ────！！」`;
 		var randomXOffsets = [0];
 		var randomYOffsets = [-50];
 		var lineCandidates = [`${messageText2}`];
@@ -6736,7 +6728,7 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (1x): data/CommonEvents.json:common-event:301
 	speakCharacterOneLinerTamanegiv6 = function () {
-		var messageText2 = `ウオオオオォォッッ！！`; //翻訳対象
+		var messageText2 = `ウオオオオォォッッ！！`;
 		var randomXOffsets = [0];
 		var randomYOffsets = [-50];
 		var lineCandidates = [`${messageText2}`];
@@ -6745,18 +6737,18 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (1x): data/CommonEvents.json:common-event:301
 	setVariable21TextVar22 = function () {
-		var messageText2 = `空賊A `; //翻訳対象
-		var controlCode = `\\}`; // code, not translation text
-		var textPart2 = `空賊B `; //翻訳対象
+		var messageText2 = `空賊A `;
+		var controlCode = `\\}`;
+		var textPart2 = `空賊B `;
 		$gameVariables.setValue(21,`${messageText2}${controlCode}${$dataWeapons[74].name}`);
 		$gameVariables.setValue(22,`${textPart2}${controlCode}${$dataWeapons[74].name}`);
 	};
 
 	// Replaces (3x): data/CommonEvents.json:common-event:301
 	setVariable21TextVar22_2 = function () {
-		var messageText2 = `少年 `; //翻訳対象
-		var controlCode = `\\}`; // code, not translation text
-		var textPart2 = `空賊C `; //翻訳対象
+		var messageText2 = `少年 `;
+		var controlCode = `\\}`;
+		var textPart2 = `空賊C `;
 		$gameVariables.setValue(21,`${messageText2}${controlCode}${$dataWeapons[79].name}`);
 		$gameVariables.setValue(22,`${textPart2}${controlCode}${$dataWeapons[74].name}`);
 	};
@@ -6829,8 +6821,8 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (2x): data/CommonEvents.json:common-event:301, data/CommonEvents.json:common-event:471
 	showMapCenterLabel = function (interp, switchIndex) {
-		var textPrefix = `\\CL【`; //翻訳対象
-		var textSuffix = `】`; //翻訳対象
+		var textPrefix = `\\CL【`;
+		var textSuffix = `】`;
 		return (function (switchIndex) {
 		var tempValue = $dataSystem.switches[switchIndex];
 		map_centerDispray(55,`${textPrefix}${tempValue}${textSuffix}`);
@@ -6927,9 +6919,9 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (1x): data/CommonEvents.json:common-event:306
 	setQuestObjectivePrepareInTownAndAdvance = function (interp) {
-		var textPrefix = `街で準備を整えて、\n`; //翻訳対象
-		var controlCode = `\\in[21]`; // code, not translation text
-		var textSuffix = `へ向かいましょう！`; //翻訳対象
+		var textPrefix = `街で準備を整えて、\n`;
+		var controlCode = `\\in[21]`;
+		var textSuffix = `へ向かいましょう！`;
 		return (function () {
 		$gameVariables.setValue(134,
 		`${textPrefix}${controlCode}${textSuffix}`);
@@ -6939,9 +6931,9 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (1x): data/CommonEvents.json:common-event:308
 	setQuestObjectiveFightUnavoidableBoss = function (interp) {
-		var textPrefix = `戦いは避けられませんね…。\n`; //翻訳対象
-		var controlCode = `\\in[21]`; // code, not translation text
-		var textSuffix = `ボスを討伐しましょう！`; //翻訳対象
+		var textPrefix = `戦いは避けられませんね…。\n`;
+		var controlCode = `\\in[21]`;
+		var textSuffix = `ボスを討伐しましょう！`;
 		return (function () {
 		$gameVariables.setValue(134,
 		`${textPrefix}${controlCode}${textSuffix}`);
@@ -6951,7 +6943,7 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (1x): data/CommonEvents.json:common-event:310
 	setQuestObjectiveGoToCentralPlains = function (interp) {
-		var messageText2 = `中央平原へ行きましょう`; //翻訳対象
+		var messageText2 = `中央平原へ行きましょう`;
 		return (function () {
 		$gameVariables.setValue(134,
 		`${messageText2}`);
@@ -6996,10 +6988,10 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (1x): data/CommonEvents.json:common-event:306
 	setVariable707Var706Switch125 = function () {
-		var messageText2 = `「ハァ、ハァ…」`; //翻訳対象
-		var textPart2 = `「ン………」`; //翻訳対象
-		var textPart3 = `「ハァ…」`; //翻訳対象
-		var textPart4 = `「ハァっ………」`; //翻訳対象
+		var messageText2 = `「ハァ、ハァ…」`;
+		var textPart2 = `「ン………」`;
+		var textPart3 = `「ハァ…」`;
+		var textPart4 = `「ハァっ………」`;
 		var newValue2 = [`${messageText2}`,`${textPart2}`,`${textPart3}`,`${textPart4}`];//文字BGV
 		$gameVariables.setValue(707,newValue2);
 		$gameVariables.setValue(706,[640-128,386,1,120,0,'eromangasimaji']);
@@ -7008,16 +7000,16 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (1x): data/CommonEvents.json:common-event:391
 	setVariable707Var706Switch125_2 = function () {
-		var textPrefix = `「アンっ`; //翻訳対象
-		var iconCode = `\\I[12]`; // code, not translation text
-		var textSuffix = `」`; //翻訳対象
-		var textPart3 = `「ヒゥンっ`; //翻訳対象
-		var textPart4 = `」`; //翻訳対象
-		var textPart5 = `「アッ`; //翻訳対象
-		var textPart6 = `　ンン`; //翻訳対象
-		var textPart7 = `」`; //翻訳対象
-		var textPart8 = `「ヒンs[20]ンs[28]っ`; //翻訳対象
-		var textPart9 = `」`; //翻訳対象
+		var textPrefix = `「アンっ`;
+		var iconCode = `\\I[12]`;
+		var textSuffix = `」`;
+		var textPart3 = `「ヒゥンっ`;
+		var textPart4 = `」`;
+		var textPart5 = `「アッ`;
+		var textPart6 = `　ンン`;
+		var textPart7 = `」`;
+		var textPart8 = `「ヒンs[20]ンs[28]っ`;
+		var textPart9 = `」`;
 		var newValue2 = [`${textPrefix}${iconCode}${textSuffix}`,`${textPart3}${iconCode}${textPart4}`,`${textPart5}${iconCode}${textPart6}${iconCode}${textPart7}`,`${textPart8}${iconCode}${textPart9}`];//文字BGV
 		$gameVariables.setValue(707,newValue2);
 		$gameVariables.setValue(706,[640-128,386,0,80,0,'eromangasimaji']);
@@ -7026,16 +7018,16 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (1x): data/CommonEvents.json:common-event:531
 	setVariable707Var706Switch125_3 = function () {
-		var textPrefix = `「アンっ`; //翻訳対象
-		var iconCode = `\\I[12]`; // code, not translation text
-		var textSuffix = `」`; //翻訳対象
-		var textPart3 = `「ヒゥンっ`; //翻訳対象
-		var textPart4 = `」`; //翻訳対象
-		var textPart5 = `「アッ`; //翻訳対象
-		var textPart6 = `　ンン`; //翻訳対象
-		var textPart7 = `」`; //翻訳対象
-		var textPart8 = `「ヒンンっ`; //翻訳対象
-		var textPart9 = `」`; //翻訳対象
+		var textPrefix = `「アンっ`;
+		var iconCode = `\\I[12]`;
+		var textSuffix = `」`;
+		var textPart3 = `「ヒゥンっ`;
+		var textPart4 = `」`;
+		var textPart5 = `「アッ`;
+		var textPart6 = `　ンン`;
+		var textPart7 = `」`;
+		var textPart8 = `「ヒンンっ`;
+		var textPart9 = `」`;
 		var newValue2 = [`${textPrefix}${iconCode}${textSuffix}`,`${textPart3}${iconCode}${textPart4}`,`${textPart5}${iconCode}${textPart6}${iconCode}${textPart7}`,`${textPart8}${iconCode}${textPart9}`];//文字BGV
 		$gameVariables.setValue(707,newValue2);
 		$gameVariables.setValue(706,[640-128,386,0,120,0,'eromangasimaji']);
@@ -7063,7 +7055,7 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (3x): data/CommonEvents.json:common-event:307, data/CommonEvents.json:common-event:335, data/CommonEvents.json:common-event:337
 	setSelfVariableToActorPairNames = function (interp, variableId) {
-		var messageText2 = `＆`; //翻訳対象
+		var messageText2 = `＆`;
 		return (function (variableId) {
 		interp.sVal(variableId,
 		`${$gameActors.actor(3).name()}${messageText2}${$gameActors.actor(4).name()}`
@@ -7082,7 +7074,7 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (1x): data/CommonEvents.json:common-event:337
 	setSelfVariableToActorNameWithExcept = function (interp) {
-		var messageText2 = `以外`; //翻訳対象
+		var messageText2 = `以外`;
 		return (function () {
 		interp.sVal(23,
 		`${$gameActors.actor(4).name()}${messageText2}`
@@ -7092,8 +7084,8 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (1x): data/CommonEvents.json:common-event:356
 	setSelfVariableToActorTrioNames = function (interp) {
-		var textPrefix = `＆`; //翻訳対象
-		var textSuffix = `＆`; //翻訳対象
+		var textPrefix = `＆`;
+		var textSuffix = `＆`;
 		return (function () {
 		interp.sVal(23,
 		`${$gameActors.actor(3).name()}${textPrefix}${$gameActors.actor(4).name()}${textSuffix}${$gameActors.actor(5).name()}`
@@ -7120,8 +7112,8 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (2x): data/CommonEvents.json:common-event:312
 	setupChildInterpreter7 = function (interp, talkPictureId) {
-		var controlCode = `\\swi[252]`; // code, not translation text
-		var messageText2 = `の出現エネミーが変化しました。`; //翻訳対象
+		var controlCode = `\\swi[252]`;
+		var messageText2 = `の出現エネミーが変化しました。`;
 		return (function (talkPictureId) {
 		interp.sVal(172,19);//中央に一言メッセージ
 		var templateText = `${controlCode}${messageText2}`;
@@ -7318,17 +7310,17 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (1x): data/CommonEvents.json:common-event:338
 	setVariable707Var706Switch125_4 = function () {
-		var textPrefix = `「アッ`; //翻訳対象
-		var iconCode = `\\I[12]`; // code, not translation text
-		var textSuffix = `」`; //翻訳対象
-		var textPart3 = `「ンッ`; //翻訳対象
-		var textPart4 = `」`; //翻訳対象
-		var textPart5 = `「ンン…`; //翻訳対象
-		var textPart6 = `」`; //翻訳対象
-		var textPart7 = `「ンクっ…`; //翻訳対象
-		var textPart8 = `」`; //翻訳対象
-		var textPart9 = `「ァンっ…`; //翻訳対象
-		var textPart10 = `」`; //翻訳対象
+		var textPrefix = `「アッ`;
+		var iconCode = `\\I[12]`;
+		var textSuffix = `」`;
+		var textPart3 = `「ンッ`;
+		var textPart4 = `」`;
+		var textPart5 = `「ンン…`;
+		var textPart6 = `」`;
+		var textPart7 = `「ンクっ…`;
+		var textPart8 = `」`;
+		var textPart9 = `「ァンっ…`;
+		var textPart10 = `」`;
 		var newValue2 = [`${textPrefix}${iconCode}${textSuffix}`,`${textPart3}${iconCode}${textPart4}`,`${textPart5}${iconCode}${textPart6}`,`${textPart7}${iconCode}${textPart8}`,`${textPart9}${iconCode}${textPart10}`];//文字BGV
 		$gameVariables.setValue(707,newValue2);
 		$gameVariables.setValue(706,[640-128,386,1,180,0,'eromangasimaji']);
@@ -7337,11 +7329,11 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (1x): data/CommonEvents.json:common-event:518
 	setVariable707Var706Switch125_5 = function () {
-		var messageText2 = `「………ァっ」`; //翻訳対象
-		var textPart2 = `「いや…」`; //翻訳対象
-		var textPart3 = `「ンン──……」`; //翻訳対象
-		var textPart4 = `「ンクっ…」`; //翻訳対象
-		var textPart5 = `「ァンっ…」`; //翻訳対象
+		var messageText2 = `「………ァっ」`;
+		var textPart2 = `「いや…」`;
+		var textPart3 = `「ンン──……」`;
+		var textPart4 = `「ンクっ…」`;
+		var textPart5 = `「ァンっ…」`;
 		var newValue2 = [`${messageText2}`,`${textPart2}`,`${textPart3}`,`${textPart4}`,`${textPart5}`];//文字BGV
 		$gameVariables.setValue(707,newValue2);
 		$gameVariables.setValue(706,[640-128,386,1,180,0,'eromangasimaji']);
@@ -7472,7 +7464,7 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (3x): data/CommonEvents.json:common-event:356
 	speakCharacterOneLinerVar530And292 = function (interp, variableId, pictureId) {
-		var messageText2 = `ガサゴソ──`; //翻訳対象
+		var messageText2 = `ガサゴソ──`;
 		return (function (variableId, pictureId) {
 		var variableId2 = variableId;//$gameVariables.value(530);
 		interp._eventId = $gameVariables.value(292)[variableId2];
@@ -7526,15 +7518,15 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (1x): data/CommonEvents.json:common-event:361
 	configureActorFromVariable20_2 = function (interp) {
-		var textPrefix = `　　`; //翻訳対象
-		var colorCode162 = `\\C[16]`; // code, not translation text
-		var colorResetCode = `\\C[0]`; // code, not translation text
-		var textPart2 = `はメインクラス2ndジョブ`; //翻訳対象
-		var colorCode22 = `\\C[2]`; // code, not translation text
-		var textPart3 = `＜`; //翻訳対象
-		var controlCode = `\\j[21]`; // code, not translation text
-		var textPart4 = `＞`; //翻訳対象
-		var textSuffix = `に目覚めた！`; //翻訳対象
+		var textPrefix = `　　`;
+		var colorCode162 = `\\C[16]`;
+		var colorResetCode = `\\C[0]`;
+		var textPart2 = `はメインクラス2ndジョブ`;
+		var colorCode22 = `\\C[2]`;
+		var textPart3 = `＜`;
+		var controlCode = `\\j[21]`;
+		var textPart4 = `＞`;
+		var textSuffix = `に目覚めた！`;
 		return (function () {
 		interp.sVal(20,1);
 		var variable20Value = $gameActors.actor($gameVariables.value(20));
@@ -7546,15 +7538,15 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (1x): data/CommonEvents.json:common-event:361
 	configureActorFromVariable20_3 = function (interp) {
-		var textPrefix = `　　`; //翻訳対象
-		var colorCode162 = `\\C[16]`; // code, not translation text
-		var colorResetCode = `\\C[0]`; // code, not translation text
-		var textPart2 = `はメインクラス2ndジョブ`; //翻訳対象
-		var colorCode22 = `\\C[2]`; // code, not translation text
-		var textPart3 = `＜`; //翻訳対象
-		var controlCode = `\\j[22]`; // code, not translation text
-		var textPart4 = `＞`; //翻訳対象
-		var textSuffix = `に目覚めた！`; //翻訳対象
+		var textPrefix = `　　`;
+		var colorCode162 = `\\C[16]`;
+		var colorResetCode = `\\C[0]`;
+		var textPart2 = `はメインクラス2ndジョブ`;
+		var colorCode22 = `\\C[2]`;
+		var textPart3 = `＜`;
+		var controlCode = `\\j[22]`;
+		var textPart4 = `＞`;
+		var textSuffix = `に目覚めた！`;
 		return (function () {
 		interp.sVal(20,2);
 		var variable20Value = $gameActors.actor($gameVariables.value(20));
@@ -7566,15 +7558,15 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (1x): data/CommonEvents.json:common-event:361
 	configureActorFromVariable20_4 = function (interp) {
-		var textPrefix = `　　`; //翻訳対象
-		var colorCode162 = `\\C[16]`; // code, not translation text
-		var colorResetCode = `\\C[0]`; // code, not translation text
-		var textPart2 = `はメインクラス2ndジョブ`; //翻訳対象
-		var colorCode22 = `\\C[2]`; // code, not translation text
-		var textPart3 = `＜`; //翻訳対象
-		var controlCode = `\\j[23]`; // code, not translation text
-		var textPart4 = `＞`; //翻訳対象
-		var textSuffix = `に目覚めた！`; //翻訳対象
+		var textPrefix = `　　`;
+		var colorCode162 = `\\C[16]`;
+		var colorResetCode = `\\C[0]`;
+		var textPart2 = `はメインクラス2ndジョブ`;
+		var colorCode22 = `\\C[2]`;
+		var textPart3 = `＜`;
+		var controlCode = `\\j[23]`;
+		var textPart4 = `＞`;
+		var textSuffix = `に目覚めた！`;
 		return (function () {
 		interp.sVal(20,3);
 		var variable20Value = $gameActors.actor($gameVariables.value(20));
@@ -7586,15 +7578,15 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (1x): data/CommonEvents.json:common-event:361
 	configureActorFromVariable20_5 = function (interp) {
-		var textPrefix = `　　`; //翻訳対象
-		var colorCode162 = `\\C[16]`; // code, not translation text
-		var colorResetCode = `\\C[0]`; // code, not translation text
-		var textPart2 = `はメインクラス2ndジョブ`; //翻訳対象
-		var colorCode22 = `\\C[2]`; // code, not translation text
-		var textPart3 = `＜`; //翻訳対象
-		var controlCode = `\\j[24]`; // code, not translation text
-		var textPart4 = `＞`; //翻訳対象
-		var textSuffix = `に目覚めた！`; //翻訳対象
+		var textPrefix = `　　`;
+		var colorCode162 = `\\C[16]`;
+		var colorResetCode = `\\C[0]`;
+		var textPart2 = `はメインクラス2ndジョブ`;
+		var colorCode22 = `\\C[2]`;
+		var textPart3 = `＜`;
+		var controlCode = `\\j[24]`;
+		var textPart4 = `＞`;
+		var textSuffix = `に目覚めた！`;
 		return (function () {
 		interp.sVal(20,4);
 		var variable20Value = $gameActors.actor($gameVariables.value(20));
@@ -7606,15 +7598,15 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (1x): data/CommonEvents.json:common-event:471
 	configureActorFromVariable20_6 = function (interp) {
-		var textPrefix = `　　　　　　`; //翻訳対象
-		var colorCode162 = `\\C[16]`; // code, not translation text
-		var colorResetCode = `\\C[0]`; // code, not translation text
-		var textPart2 = `はメインクラス2ndジョブ`; //翻訳対象
-		var colorCode22 = `\\C[2]`; // code, not translation text
-		var textPart3 = `＜`; //翻訳対象
-		var controlCode = `\\j[25]`; // code, not translation text
-		var textPart4 = `＞`; //翻訳対象
-		var textSuffix = `に目覚めた！`; //翻訳対象
+		var textPrefix = `　　　　　　`;
+		var colorCode162 = `\\C[16]`;
+		var colorResetCode = `\\C[0]`;
+		var textPart2 = `はメインクラス2ndジョブ`;
+		var colorCode22 = `\\C[2]`;
+		var textPart3 = `＜`;
+		var controlCode = `\\j[25]`;
+		var textPart4 = `＞`;
+		var textSuffix = `に目覚めた！`;
 		return (function () {
 		interp.sVal(20,5);
 		var variable20Value = $gameActors.actor($gameVariables.value(20));
@@ -7728,7 +7720,7 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (6x): data/CommonEvents.json:common-event:368, data/CommonEvents.json:common-event:495, data/CommonEvents.json:common-event:532, data/CommonEvents.json:common-event:548, data/Map041.json:map-event:7:page:1, data/Map083.json:map-event:6:page:1
 	setupChildInterpreter10 = function (interp, newValue) {
-		var controlCode = `\\v[23]`; // code, not translation text
+		var controlCode = `\\v[23]`;
 		return (function (newValue) {
 		interp.sVal(23,newValue);
 		interp.sVal(172,19);//中央に一言メッセージ,何行でも良し
@@ -7752,7 +7744,7 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (2x): data/CommonEvents.json:common-event:371, data/CommonEvents.json:common-event:372
 	setupChildInterpreter11 = function (interp, countValue) {
-		var messageText2 = `デイリークエスト`; //翻訳対象
+		var messageText2 = `デイリークエスト`;
 		return (function (countValue) {
 		var constantValue = 800;valueCountSet1 = countValue;
 		if($dataItems[valueCountSet1].meta['SGカテゴリ']){
@@ -8067,7 +8059,7 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (1x): data/CommonEvents.json:common-event:471
 	speakCharacterOneLinerVar292 = function () {
-		var messageText2 = `オラァッ！！`; //翻訳対象
+		var messageText2 = `オラァッ！！`;
 		var randomXOffsets = [0];
 		var randomYOffsets = [-50];
 		var lineCandidates = [`${messageText2}`];
@@ -8076,7 +8068,7 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (1x): data/CommonEvents.json:common-event:471
 	speakCharacterOneLinerVar292_2 = function () {
-		var messageText2 = `ガハッッ！？`; //翻訳対象
+		var messageText2 = `ガハッッ！？`;
 		var randomXOffsets = [0];
 		var randomYOffsets = [-50];
 		var lineCandidates = [`${messageText2}`];
@@ -8085,7 +8077,7 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (1x): data/CommonEvents.json:common-event:471
 	speakCharacterOneLinerVar292_3 = function () {
-		var messageText2 = `フンッ！`; //翻訳対象
+		var messageText2 = `フンッ！`;
 		var randomXOffsets = [0];
 		var randomYOffsets = [-50];
 		var lineCandidates = [`${messageText2}`];
@@ -8639,7 +8631,7 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (1x): data/Map003.json:map-event:44:page:1
 	addPopupOnomatopoeia1 = function (interp) {
-		var messageText2 = `text:ﾋﾟｲｲｲ──…`; //翻訳対象
+		var messageText2 = `text:ﾋﾟｲｲｲ──…`;
 		return (function () {
 		interp.addPopup(["add",`${messageText2}`]);
 		}).call(interp);
@@ -8647,7 +8639,7 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (2x): data/Map003.json:map-event:62:page:1, data/Map003.json:map-event:63:page:1
 	addPopupOnomatopoeia2 = function (interp) {
-		var messageText2 = `text:ホゥ…`; //翻訳対象
+		var messageText2 = `text:ホゥ…`;
 		return (function () {
 		interp.addPopup(["add",`${messageText2}`]);
 		}).call(interp);
@@ -8655,7 +8647,7 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (1x): data/Map003.json:map-event:64:page:1
 	addPopupOnomatopoeia3 = function (interp) {
-		var messageText2 = `text:ペンっ`; //翻訳対象
+		var messageText2 = `text:ペンっ`;
 		return (function () {
 		interp.addPopup(["add",`${messageText2}`]);
 		}).call(interp);
@@ -8721,8 +8713,8 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (4x): data/Map003.json:map-event:139:page:1, data/Map003.json:map-event:140:page:1
 	readVariable69 = function () {
-		var textPrefix = `Coin: `; //翻訳対象
-		var textSuffix = `枚`; //翻訳対象
+		var textPrefix = `Coin: `;
+		var textSuffix = `枚`;
 		var variable69Value = `${textPrefix}${$gameVariables.value(69).toLocaleString()}${textSuffix}`;
 		var constantValue = 28;
 		$gameScreen.setDTextPicture(variable69Value, constantValue);
@@ -8756,9 +8748,9 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (2x): data/Map003.json:map-event:139:page:1, data/Map003.json:map-event:140:page:1
 	showInfoPopupVar801And69 = function (interp) {
-		var messageText2 = `おめでとう。`; //翻訳対象
-		var textPart2 = `コイン+`; //翻訳対象
-		var textPart3 = `枚`; //翻訳対象
+		var messageText2 = `おめでとう。`;
+		var textPart2 = `コイン+`;
+		var textPart3 = `枚`;
 		return (function () {
 		$gameVariables.setValue(801,`${messageText2}`);
 		var text3 = $gameSelfSwitches.getVariableValue([$gameMap.mapId(), interp._eventId, 10]);
@@ -8826,7 +8818,7 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (2x): data/Map003.json:map-event:166:page:2, data/Map003.json:map-event:243:page:2
 	setupChildInterpreter15 = function (interp) {
-		var messageText2 = `デイリークエスト`; //翻訳対象
+		var messageText2 = `デイリークエスト`;
 		return (function () {
 		var constantValue = 800;
 		if($dataItems[valueCountSet1].meta['SGカテゴリ']){
@@ -8845,11 +8837,11 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (2x): data/Map003.json:map-event:166:page:2, data/Map003.json:map-event:243:page:2
 	showTickerQuestAccepted = function () {
-		var textPrefix = `クエスト`; //翻訳対象
-		var colorCode4 = `\\C[3]`; // code, not translation text
-		var textPart2 = `IIN[`; //翻訳対象
-		var colorResetCode = `\\C[0]`; // code, not translation text
-		var textSuffix = `を受注しました。`; //翻訳対象
+		var textPrefix = `クエスト`;
+		var colorCode4 = `\\C[3]`;
+		var textPart2 = `IIN[`;
+		var colorResetCode = `\\C[0]`;
+		var textSuffix = `を受注しました。`;
 		var tickerText = `${textPrefix}${colorCode4}${textPart2}${valueCountSet1}]${colorResetCode}${textSuffix}`;
 		TickerManager.show(tickerText);
 		$gameParty.gainItem($dataItems[valueCountSet1], 1);
@@ -8857,7 +8849,7 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (2x): data/Map003.json:map-event:166:page:3, data/Map003.json:map-event:243:page:3
 	setupChildInterpreterForQuestSet = function (interp) {
-		var messageText2 = `デイリークエスト`; //翻訳対象
+		var messageText2 = `デイリークエスト`;
 		return (function () {
 		var constantValue = 800;valueCountSet1 = Number($gameMap.event(interp._eventId).event().meta['QuestSet']);
 		if($dataItems[valueCountSet1].meta['SGカテゴリ']){
@@ -8887,7 +8879,7 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (3x): data/Map003.json:map-event:168:page:2, data/Map007.json:map-event:69:page:2, data/Map064.json:map-event:1:page:3
 	setupChildInterpreter16 = function (interp) {
-		var messageText2 = `デイリークエスト`; //翻訳対象
+		var messageText2 = `デイリークエスト`;
 		return (function () {
 		var constantValue = 800;
 		if($dataItems[valueCountSet1].meta['SGカテゴリ']){
@@ -8993,11 +8985,11 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (1x): data/Map003.json:map-event:237:page:1
 	setActor20NameVar400And23Etc = function () {
-		var messageText2 = `宿受付`; //翻訳対象
-		var textPart2 = `「いらっしゃい。\nウチは一泊`; //翻訳対象
-		var variableCode = `\\V[21]`; // code, not translation text
-		var controlCode = `\\G`; // code, not translation text
-		var textPart3 = `よ。\n泊まっていくのかしら？」\n`; //翻訳対象
+		var messageText2 = `宿受付`;
+		var textPart2 = `「いらっしゃい。\nウチは一泊`;
+		var variableCode = `\\V[21]`;
+		var controlCode = `\\G`;
+		var textPart3 = `よ。\n泊まっていくのかしら？」\n`;
 		$gameActors.actor(20).setName(`${messageText2}`);
 		$gameVariables.value(400)[59] = `${$dataWeapons[421].name}`;
 		valueCountSet1 = 1231;
@@ -9011,11 +9003,11 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (1x): data/Map046.json:map-event:4:page:1
 	setActor20NameVar400And23Etc2 = function () {
-		var messageText2 = `宿女将`; //翻訳対象
-		var textPart2 = `「いらっしゃい。\nウチは一泊`; //翻訳対象
-		var variableCode = `\\V[21]`; // code, not translation text
-		var controlCode = `\\G`; // code, not translation text
-		var textPart3 = `よ。\n泊まっていくのかしら？」\n`; //翻訳対象
+		var messageText2 = `宿女将`;
+		var textPart2 = `「いらっしゃい。\nウチは一泊`;
+		var variableCode = `\\V[21]`;
+		var controlCode = `\\G`;
+		var textPart3 = `よ。\n泊まっていくのかしら？」\n`;
 		$gameActors.actor(20).setName(`${messageText2}`);
 		$gameVariables.value(400)[59] = `${$dataWeapons[421].name}`;
 		valueCountSet1 = 1231;
@@ -9133,7 +9125,7 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
 	appendStateDescription = function () {
-		var messageText2 = `\nあああああ`; //翻訳対象
+		var messageText2 = `\nあああああ`;
 		if($dataStates[110].meta['Help Description']){
 		$dataStates[110].description = `${$dataStates[110].description}${messageText2}`
 		}
@@ -9177,8 +9169,8 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
 	showPicture91 = function () {
-		var messageText2 = `横`; //翻訳対象
-		var textPart2 = `画面ピンク`; //翻訳対象
+		var messageText2 = `横`;
+		var textPart2 = `画面ピンク`;
 		$gameScreen.setPicturesAnimation(2, 1, `${messageText2}`, 40);
 		$gameScreen.showPicture(91,`${textPart2}`,1,640,384,100,100,200,0);
 		$gameScreen.picture(91).startAnimationFrame(1, true, 1);
@@ -9212,9 +9204,9 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
 	runPluginCommand = function (interp) {
-		var messageText2 = `testピクチャ`; //翻訳対象
-		var textPart2 = `Ｈシーン演出`; //翻訳対象
-		var textPart3 = `味方カットイン`; //翻訳対象
+		var messageText2 = `testピクチャ`;
+		var textPart2 = `Ｈシーン演出`;
+		var textPart3 = `味方カットイン`;
 		return (function () {
 		interp.sVal(86,3);interp.sVal(87,3);interp.sVal(245,40);interp.sVal(246,80);
 		var newValue2 = `${messageText2}`;
@@ -9338,8 +9330,8 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (3x): data/Map007.json:map-event:34:page:1
 	speakCharacterOneLiner4 = function (interp) {
-		var messageText2 = `「オラッ！」`; //翻訳対象
-		var textPart2 = `「オラァッ！」`; //翻訳対象
+		var messageText2 = `「オラッ！」`;
+		var textPart2 = `「オラァッ！」`;
 		return (function () {
 		valueSerialPictureId += 1;
 		var randomXOffsets = [-50,0,50,-100,100];
