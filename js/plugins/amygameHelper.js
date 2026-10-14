@@ -3412,37 +3412,35 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		BattleManager._logWindow.push(`addText`, `経験値レート:${valueTotalexp}`);
 		BattleManager._logWindow.push(`addText`, `\\Gレート:${valueTotalgold}`);
 	};
-//=============================================================================
-// Event Script (355/655) migration
-//=============================================================================
-//
-// The functions below were generated from the Script (355/655) command blocks
-// in data/CommonEvents.json and data/Map*.json. Every block that was either
-// duplicated across events or proven to execute at runtime was moved here, and
-// each source command was reduced to a single call to a readable,
-// context-based helper (e.g. showHExperienceTable1(), setupRespawnEnemyAVar292And530()):
-//
-//   helperName();            // self-contained bodies
-//   helperName(interp, ...); // bodies that used the interpreter (this)
-//
-// Contracts:
-//  - functions that drive a child interpreter receive the Game_Interpreter as
-//    their first argument (named `interp`); the body is executed through
-//    .call(interp) so `this` keeps its original meaning, including for the
-//    callbacks that were passed `this` in the source block.
-//  - Parameters are named by their role/meaning in the source block (e.g.
-//    newValue, countValue, posX, posX2, requestedPartnerWeaponId) instead of
-//    the old positional __a0, __a1, ... placeholders.
-//  - Player-facing text is split into `var xxx = `...`;` (language)
-//    and `// code, not translation text` (control codes) consts at the top of
-//    the function; the message template below interpolates them, so the
-//    rendered string is byte-identical to the original.
-//  - Bodies intentionally assign implicit globals (valuePic1, valueCountSet*)
-//    exactly like the original snippets; this file is not strict mode.
+	//=============================================================================
+	// Event Script (355/655) migration
+	//=============================================================================
+	//
+	// The functions below were generated from the Script (355/655) command blocks
+	// in data/CommonEvents.json and data/Map*.json. Every block that was either
+	// duplicated across events or proven to execute at runtime was moved here, and
+	// each source command was reduced to a single call to a readable,
+	// context-based helper (e.g. showHExperienceTable1(), setupRespawnEnemyAVar292And530()):
+	//
+	//   helperName();            // self-contained bodies
+	//   helperName(interp, ...); // bodies that used the interpreter (this)
+	//
+	// Contracts:
+	//  - functions that drive a child interpreter receive the Game_Interpreter as
+	//    their first argument (named `interp`); the body is executed through
+	//    .call(interp) so `this` keeps its original meaning, including for the
+	//    callbacks that were passed `this` in the source block.
+	//  - Parameters are named by their role/meaning in the source block (e.g.
+	//    newValue, countValue, posX, posX2, requestedPartnerWeaponId) instead of
+	//    the old positional __a0, __a1, ... placeholders.
+	//  - Player-facing text is split into `var xxx = `...`;` (language)
+	//    and `// code, not translation text` (control codes) consts at the top of
+	//    the function; the message template below interpolates them, so the
+	//    rendered string is byte-identical to the original.
+	//  - Bodies intentionally assign implicit globals (valuePic1, valueCountSet*)
+	//    exactly like the original snippets; this file is not strict mode.
 	// Replaces (1x): data/CommonEvents.json:common-event:1
 	AGH_setVariable250GameplayTips = function () {
-		var colorCode2 = `\\C[2]`;
-		var colorResetCode = `\\C[0]`;
 		var messageText2 = `シーンの多くは、メインクエスト終了後に開放される。`;
 		var textPart2 = `本作には多様な強化システムを採用しているが、\nメインクエストとシーン回収だけを考えれば、\n極論レベルを上げて剣と杖で殴っていれば問題ない。`;
 		var textPart3 = `「朝昼」と「夜」では発生するイベントに変化がある。\nこれはメインクエストに措いても同様。\n進行条件が「〇〇に会いに行く」などの場合、\n夜では会えない事が多い。日を改めて日中に会いに行こう`;
@@ -3452,16 +3450,16 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		var textPart7 = `「称号」は、条件を満たした後、「一日の始まり」か「ギルド受付」と\n話した直後に付与される。`;
 		$gameVariables.setValue(250,
 			[	
-				colorTaggetText(2, `[1]`) + `${messageText2}`,
-				colorTaggetText(2, `[2]`) + `${textPart2}`,
-				colorTaggetText(2, `[3]`) + `${textPart3}`,
-				colorTaggetText(2, `[4]`) + `${textPart4}`,
-				colorTaggetText(2, `[5]`) + `${textPart5}`,
-				colorTaggetText(2, `[6]`) + `${textPart6}`,
-				colorTaggetText(7, `[1]`) + `${textPart7}`,
-				colorTaggetText(2, `[8]`),
-				colorTaggetText(2, `[9]`),
-				colorTaggetText(2, `[10]`)
+				colorTaggedText(2, `[1]`) + `${messageText2}`,
+				colorTaggedText(2, `[2]`) + `${textPart2}`,
+				colorTaggedText(2, `[3]`) + `${textPart3}`,
+				colorTaggedText(2, `[4]`) + `${textPart4}`,
+				colorTaggedText(2, `[5]`) + `${textPart5}`,
+				colorTaggedText(2, `[6]`) + `${textPart6}`,
+				colorTaggedText(7, `[1]`) + `${textPart7}`,
+				colorTaggedText(2, `[8]`),
+				colorTaggedText(2, `[9]`),
+				colorTaggedText(2, `[10]`)
 			]
 		);
 	};
@@ -3484,209 +3482,520 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		$gameVariables.setValue(82,0)//メニュー背景縦スク
 	};
 
+	/* ============================================================================
+	 * Shared helpers
+	 * ----------------------------------------------------------------------------
+	 * These functions are called *by name* from data/CommonEvents.json and from the
+	 * map data, so every public name is preserved.  Only the bodies were rewritten
+	 * in terms of the helpers below — they replace patterns that had been
+	 * copy-pasted dozens (in a few cases hundreds) of times.
+	 *
+	 * Variable-naming convention used throughout:
+	 *   variableNNValue      -> contextName          (e.g. actorId, partnerWeaponId)
+	 *   pictureId2/name2/x4  -> pictureId/pictureName/x
+	 *   numericValue/text... -> the real meaning (posX, duration, particleName, ...)
+	 * ========================================================================== */
+
+	/* --- variables / switches / self switches -------------------------------- */
+
+	function varValue(variableId) { return $gameVariables.value(variableId); }
+	function setVar(variableId, value) { $gameVariables.setValue(variableId, value); }
+	function setSelfVar(interp, variableId, value) { interp.sVal(variableId, value); }
+	function clearSelfVarRange(interp, firstId, lastId) {
+		range(firstId, lastId).forEach(variableId => setSelfVar(interp, variableId, 0));
+	}
+	function range(from, to) {
+		const values = [];
+		for (let value = from; value <= to; value++) values.push(value);
+		return values;
+	}
+	/* `enableSwitch` / `disableSwitch` are public (called from the data files) and
+	   are defined once, further down in the switches section. */
+	function selfSwitchOn(mapId, eventId, key) { $gameSelfSwitches.setValue([mapId, eventId, key], true); }
+	function selfSwitchOff(mapId, eventId, key) { $gameSelfSwitches.setValue([mapId, eventId, key], false); }
+	function mapSelfSwitchOn(eventId, key) { selfSwitchOn($gameMap.mapId(), eventId, key); }
+	function mapSelfSwitchOff(eventId, key) { selfSwitchOff($gameMap.mapId(), eventId, key); }
+	function actorFromVariable(variableId) { return $gameActors.actor(varValue(variableId)); }
+	function applyFlagToSwitch(switchId, flag) { $gameSwitches.setValue(switchId, !!flag); }
+	function findItemIdByMetaKey(metaKey) {
+		const itemId = range(1, $dataItems.length - 1).find(id => $dataItems[id].meta[metaKey]);
+		return itemId || 0;
+	}
+	function spendGoldForJobMaterial(goldAmount, materialMetaKey) {
+		$gameParty.loseGold(goldAmount);
+		$gameParty.loseItem($dataItems[findItemIdByMetaKey(materialMetaKey)], 1);
+	}
+	function eraseEventsWithMetaKeys(metaKeys) {
+		for (let eventId = $gameMap.events().length; eventId > 0; eventId--) {
+			const mapEvent = $gameMap.event(eventId);
+			if (!mapEvent) continue;
+			if (metaKeys.some(metaKey => mapEvent.event().meta[metaKey])) $gameMap.eraseEvent(eventId);
+		}
+	}
+	/**
+	 * Same as forEachDatabaseMeta(), but with the original debug-scan quirk kept:
+	 * the loop advanced by the "slot" counter instead of 1, so only a subset of
+	 * the database is visited.  The callback returns true when the slot counter
+	 * must advance (i.e. when the original incremented it).
+	 */
+	function forEachSteppedMetaEntry(database, metaKey, callback) {
+		let slotCounter = 1;
+		for (let entryId = 1; entryId < database.length; entryId += slotCounter) {
+			const metaValue = database[entryId].meta[metaKey];
+			if (!metaValue) continue;
+			if (callback(entryId, metaValue, slotCounter)) slotCounter += 1;
+		}
+	}
+	function forEachDatabaseMeta(database, metaKey, callback) {
+		for (let entryId = 1; entryId < database.length; entryId++) {
+			const metaValue = database[entryId].meta[metaKey];
+			if (metaValue) callback(entryId, metaValue);
+		}
+	}
+
+	/* --- recurring state ids (documented once instead of per call site) ------ */
+
+	const DEPLOYED_ACTOR_START_VAR = 75;      // 登場キャラ始点
+	const DEPLOYED_ACTOR_END_VAR = 76;        // 登場キャラ終点
+	const HEROINE_ID_LIST_VAR = 247;          // ヒロインID配列
+	const CURRENT_ACTOR_VAR = 20;             // 汎用「対象キャラ」
+	const LEAD_ACTOR_VAR = 530;               // 主格キャラ
+	const SPAWNED_EVENT_TABLE_VAR = 292;      // スポーンしたイベントID表
+	const NPC_PRESET_TABLE_VAR = 163;         // NPC外見プリセット表
+	const NPC_PRESET_INDEX_VAR = 535;         // 使用中のプリセット番号
+	const QUEST_OBJECTIVE_VAR = 134;          // クエスト目標テキスト
+	const TICKER_WAIT_VAR = 71;               // ティッカー表示ウェイト
+	const TICKER_WAIT_FRAMES = 240;
+
+	function forEachDeployedActor(callback) {
+		range(varValue(DEPLOYED_ACTOR_START_VAR), varValue(DEPLOYED_ACTOR_END_VAR)).forEach(callback);
+	}
+	function forEachHeroine(callback) { varValue(HEROINE_ID_LIST_VAR).forEach(callback); }
+	function currentActor() { return actorFromVariable(CURRENT_ACTOR_VAR); }
+	function spawnedEventId(slotIndex) { return varValue(SPAWNED_EVENT_TABLE_VAR)[slotIndex]; }
+	function spawnedEvent(slotIndex) { return $gameMap.event(spawnedEventId(slotIndex)); }
+	function currentNpcPreset() { return varValue(NPC_PRESET_TABLE_VAR)[varValue(NPC_PRESET_INDEX_VAR)]; }
+
+	/* --- pictures ------------------------------------------------------------ */
+
+	const SCENE_PICTURE_X = 640 - 128;   // 512 : left-hand scene pictures
+	const SCENE_PICTURE_Y = 384;
+	const RIGHT_PICTURE_X = 640 + 480;   // 1120: right-hand scene pictures
+	const SCENE_FADE_FRAMES = 60;
+
+	function showPic(pictureId, pictureName, x, y, scaleX, scaleY, opacity, origin) {
+		$gameScreen.showPicture(pictureId, pictureName, origin === undefined ? 1 : origin, x, y, scaleX, scaleY, opacity, 0);
+	}
+	function movePic(pictureId, x, y, scaleX, scaleY, opacity, duration, origin) {
+		$gameScreen.movePicture(pictureId, origin === undefined ? 1 : origin, x, y, scaleX, scaleY, opacity, 0, duration);
+	}
+	/**
+	 * "Scene picture fade-in": show a picture, then animate it into place at full
+	 * opacity.  Unspecified target values default to the source values, except
+	 * scale (100%) and opacity (255) which every caller animates towards.
+	 */
+	function showScenePicture(pictureId, pictureName, options = {}) {
+		const {
+			x = SCENE_PICTURE_X, y = SCENE_PICTURE_Y,
+			scaleX = 100, scaleY = 100, opacity = 0,
+			toX = x, toY = y, toScaleX = 100, toScaleY = 100, toOpacity = 255,
+			duration = SCENE_FADE_FRAMES, origin = 1,
+		} = options;
+		showPic(pictureId, pictureName, x, y, scaleX, scaleY, opacity, origin);
+		movePic(pictureId, toX, toY, toScaleX, toScaleY, toOpacity, duration, origin);
+	}
+	/**
+	 * Core of the whole `blessStandingPicture*` family: show a picture, optionally
+	 * slide it to its resting position, apply the blessed-tachie effect and
+	 * optionally slide the previous picture away.
+	 */
+	function showBlessedPicture(pictureId, pictureName, options = {}) {
+		const {
+			x = SCENE_PICTURE_X, y = SCENE_PICTURE_Y,
+			scaleX = 100, scaleY = 100, opacity = 0,
+			animate = true, toX = x, toY = y, toOpacity = 255, duration = SCENE_FADE_FRAMES,
+			blessType = 2, slidePreviousId = 0, slideFrames = 90,
+		} = options;
+		showPic(pictureId, pictureName, x, y, scaleX, scaleY, opacity, 1);
+		if (animate) movePic(pictureId, toX, toY, 100, 100, toOpacity, duration, 1);
+		tachie_bless(pictureId, blessType);
+		if (slidePreviousId) pic_move1(slidePreviousId, 0, 0, 100, 100, 0, slideFrames);
+	}
+	function showScreenBlackOut(pictureId, opacity) {
+		showPic(pictureId, 'ScreenBlackOut', 640, 384, 100, 100, opacity, 1);
+	}
+	function fadeInScreenBlackOut(pictureId, opacity, fadePictureId) {
+		showScreenBlackOut(pictureId, opacity);
+		picture_fade1(fadePictureId === undefined ? pictureId : fadePictureId, 'fadeIn', valueWipeImg, 60, 5);
+	}
+	function slideScenePictureAway(picIndex, waitFrames) {
+		pic_move1(valuePic1 + picIndex - 1, 0, 0, 100, 100, 0, waitFrames === undefined ? 90 : waitFrames);
+	}
+	function movePictureRetainingScale(pictureId, xOffset, opacity, duration) {
+		const picture = $gameScreen.picture(pictureId);
+		if (!picture) return;
+		$gameScreen.movePicture(pictureId, picture.origin(), picture.x() + xOffset, picture.y(),
+			picture.scaleX(), picture.scaleY(), opacity === null ? picture.opacity() : opacity, 0, duration);
+	}
+	function erasePictureRangeBetween(rangeStart, rangeEnd) {
+		range(rangeStart, rangeEnd).forEach(pictureId => $gameScreen.erasePicture(pictureId));
+	}
+
+	/* --- particles ----------------------------------------------------------- */
+
+	function particleSet(...args) { $gameScreen._particle.particleSet(...args); }
+	function particlePlay(...args) { $gameScreen._particle.particlePlay(...args); }
+	function particleUpdate(...args) { $gameScreen._particle.particleUpdate(...args); }
+	function particleClear(particleId) { $gameScreen._particle.particleClear(particleId); }
+	function spawnStatueOrbParticle(interp, yOffset) {
+		const particleName = 'statue_orb_c';
+		const particleId = `${particleName}-${interp._eventId}`;
+		particleSet(interp._eventId, particleId, 'this', particleName, 'above');
+		particleUpdate([particleId, 'color', '#ff00f7', '#ffffff']);
+		particleUpdate([particleId, 'pos', 0, yOffset]);
+	}
+	function spawnWingParticle(eventId) {
+		const particleName = 'wing_r2';
+		particlePlay(eventId, `${particleName}-${eventId}`, 'this', particleName, '99');
+	}
+
+	/* --- translator-friendly text markers -------------------------------------
+	 * Message strings write the engine's control characters as an inline
+	 * placeholder instead of the raw escape, e.g.
+	 *
+	 *     `「${characterName(2)}さん、行きましょう！」`   instead of   `「\N[2]さん、行きましょう！」`
+	 *
+	 * Each helper expands back to the very control code the game already used, so
+	 * the rendered text is unchanged — a translator (or a tool that extracts the
+	 * strings) sees ${whatItIs(n)} instead of a cryptic backslash pair.  The names
+	 * follow the wording of the marker list at the top of the file; the complete
+	 * table is repeated right below that list.
+	 */
+	/* @markers-off */
+	function textSpeed(cps) { return `\\SP[${cps}]`; }                        // \SP[n]  text speed
+	function animationType(typeId) { return `\\AT[${typeId}]`; }              // \AT[n]  animation type
+	function setString(setId) { return `\\SET[${setId}]`; }                   // \SET[n] set string
+	function oneChar(chars) { return `\\CO[${chars}]`; }                      // \CO[S]  display as one character
+	function ruby(text, rubyText) { return `\\RB[${text},${rubyText}]`; }     // \RB[S,R] text with ruby
+	function shiftNextX(pixels) { return `\\MX[${pixels}]`; }                 // \MX[n]  shift next letter X
+	function shiftNextY(pixels) { return `\\MY[${pixels}]`; }                 // \MY[n]  shift next letter Y
+	function nextCharX(x) { return `\\PX[${x}]`; }                            // \PX[n]  next character X
+	function nextCharY(y) { return `\\PY[${y}]`; }                            // \PY[n]  next character Y
+	function switchOnText(switchId) { return `\\SW[${switchId}]`; }           // \SW[n]  turn on switch n
+	function skillName(skillId) { return `\\SN[${skillId}]`; }                // \SN[n]  skill name
+	function skillIconName(skillId) { return `\\SIN[${skillId}]`; }           // \SIN[n] icon + skill name
+	function itemName(itemId) { return `\\IN[${itemId}]`; }                   // \IN[n]  item name
+	function itemIconName(itemId) { return `\\IIN[${itemId}]`; }              // \IIN[n] icon + item name
+	function weaponName(weaponId) { return `\\WN[${weaponId}]`; }             // \WN[n]  weapon name
+	function weaponIconName(weaponId) { return `\\WIN[${weaponId}]`; }        // \WIN[n] icon + weapon name
+	function armorName(armorId) { return `\\AN[${armorId}]`; }                // \AN[n]  armor name
+	function armorIconName(armorId) { return `\\AIN[${armorId}]`; }           // \AIN[n] icon + armor name
+	function waitEffect() { return '\\WE'; }                                  // \WE     wait for the production
+	function fontColor(colorIndex) { return `\\C[${colorIndex}]`; }           // \C[n]   font color
+	function fontColorRGB(r, g, b) { return `\\C[${r},${g},${b}]`; }          // \C[r,g,b]
+	function fontSize(size) { return `\\FS[${size}]`; }                       // \FS[n]  font size
+	function invertBold() { return '\\FB'; }                                  // \FB     invert bold flag
+	function invertItalic() { return '\\FI'; }                                // \FI     invert italic flag
+	function charOpacity(opacity) { return `\\OP[${opacity}]`; }              // \OP[n]  character opacity
+	function outlineColor(colorIndex) { return `\\OC[${colorIndex}]`; }       // \OC[n]  character edge color
+	function outlineColorRGB(r, g, b) { return `\\OC[${r},${g},${b}]`; }      // \OC[r,g,b]
+	function outlineColorRGBA(r, g, b, a) { return `\\OC[${r},${g},${b},${a}]`; }  // \OC[r,g,b,a]
+	function outlineWidth(width) { return `\\OW[${width}]`; }                 // \OW[n]  character edge width
+	function rubyColor(colorIndex) { return `\\RC[${colorIndex}]`; }          // \RC[n]  ruby color
+	function rubyColorRGB(r, g, b) { return `\\RC[${r},${g},${b}]`; }         // \RC[r,g,b]
+	function rubyColorRGBA(r, g, b, a) { return `\\RC[${r},${g},${b},${a}]`; }    // \RC[r,g,b,a]
+	function resetTextStyle() { return '\\DF'; }                              // \DF     back to default settings
+	function saveTextStyle() { return '\\SV'; }                               // \SV     memorize settings
+	function loadTextStyle() { return '\\LD'; }                               // \LD     recall memorized settings
+	function noSkip() { return '\\A'; }                                       // \A      forbid skipping
+	function allowSkipTemporarily() { return '\\ES'; }                        // \ES     allow skipping for now
+	function fadeOutType(typeId) { return `\\FO[${typeId}]`; }                // \FO[n]  fade-out type
+	/* the five below are not in the list above but are used by the data files: */
+	function characterName(actorId) { return `\\N[${actorId}]`; }             // \N[n]   character name
+	function variableText(variableId) { return `\\V[${variableId}]`; }        // \V[n]   value of variable n
+	function icon(iconIndex) { return `\\I[${iconIndex}]`; }                  // \I[n]   icon
+	function jobName(jobId) { return `\\j[${jobId}]`; }                       // \j[n]   job name
+	function switchName(switchId) { return `\\swi[${switchId}]`; }            // \swi[n] name of switch n (used as place names)
+	/* Control characters of the other text / label plug-ins.  They are not in the
+	 * list above, so each name only says what the code is; the place the data uses
+	 * it in (noted on the right) is what tells them apart. */
+	function goldIcon() { return '\\G'; }                                      // \G      currency glyph — follows a price
+	function braceRight() { return '\\}'; }                                    // \}      right brace glyph — name labels / quest lines
+	function braceLeft() { return '\\{'; }                                     // \{      left brace glyph — name labels / quest lines
+	function instantText() { return '\\>'; }                                   // \>      show the rest of the message at once
+	function centerLabel(text) { return `\\CL${text}`; }                       // \CL…    centre this label on the map (map_centerDispray)
+	function itemIconNameEsc(itemId) { return `\x1bIIN[${itemId}]`; }           // ESC + IIN[n] — quest-list spelling
+	/* @markers-on */
+
+	/* --- text, popups, ticker ------------------------------------------------ */
+
+	function setQuestObjective(text) { setVar(QUEST_OBJECTIVE_VAR, text); }
+	function showTicker(message) { TickerManager.show(`${message}`); }
+	function showCommonInfo(text) { CommonPopupManager.showInfo({}, text, null); }
+	function pushBattleLog(text) { BattleManager._logWindow.push('addText', text); }
+	function showInfoOrBattleLog(text) {
+		if ($gameParty.inBattle()) pushBattleLog(text);
+		else showCommonInfo(text);
+	}
+	function setTickerWait(frames) { setVar(TICKER_WAIT_VAR, frames === undefined ? TICKER_WAIT_FRAMES : frames); }
+	function fetchInfo(databaseTypeId, databaseEntryId, itemAmount) {
+		setTickerWait();
+		get_infoDirect(databaseTypeId, databaseEntryId, 0, itemAmount);
+	}
+	function fetchInfoWithLeadingEntry(leadingTypeId, leadingEntryId, databaseTypeId, databaseEntryId, itemAmount) {
+		setTickerWait();
+		get_infoDirect(leadingTypeId, leadingEntryId, 0, 1);
+		get_infoDirect(databaseTypeId, databaseEntryId, 0, itemAmount);
+	}
+	function setTickerDisplayTime(displayFrames, yOffset) {
+		setVar(TICKER_WAIT_VAR, displayFrames);
+		setVar(185, yOffset);
+	}
+	function startTextBGVoice(lines, layerPreset, speed) {
+		setVar(707, lines);
+		setVar(706, [640 - 128, 386, layerPreset, speed, 0, 'eromangasimaji']);
+		enableSwitch(125);
+	}
+	function pushActorBattleLog(suffix) {
+		const actorName = currentActor().name();
+		pushBattleLog(`${actorName}${suffix}`);
+	}
+	function runShowInfoPlugin(interp, message) {
+		callPluginCommand(interp, 'ShowInfo', message);
+	}
+	function playPitchVariableSe(seName) {
+		AudioManager.playSe({ name: seName, volume: 100, pitch: varValue(122), pan: 0 });
+	}
+	function forEachCostumeSlot(callback) {
+		range(1, 40).forEach(callback);
+	}
+	function decorateWithActorName(message) {
+		return `${currentActor().name()}${message}`;
+	}
+	/** 「はメインクラス2ndジョブ＜\j[2X]＞に目覚めた！」 + common event 45. */
+	function setSecondJobAwakeningMessage(interp, jobIndex, leadingSpaces) {
+		setSelfVar(interp, CURRENT_ACTOR_VAR, jobIndex);
+		const fontColor16 = fontColor(16);
+		const awakeningActorName = currentActor().name();   // the actor that awakens
+		const fontColor0 = fontColor(0);
+		const fontColor2 = fontColor(2);
+		const secondJobName = jobName(jobIndex + 20);
+		valueWordSet0 = `${leadingSpaces}${fontColor16}${awakeningActorName}${fontColor0}` +
+			`はメインクラス2ndジョブ${fontColor2}＜${secondJobName}＞${fontColor0}に目覚めた！`;
+		valueWordSetEx = 0;   // 補足が必要な場合
+		runCommonEventAsChild(interp, 45);
+	}
+	function appendStoredSelfLine(interp, message) {
+		setSelfVar(interp, 539, message);
+		setSelfVar(interp, 540, varValue(540) + 1);
+	}
+	function setNpcIdentity(actorId, npcName, subtitle) {
+		$gameActors.actor(actorId).setName(npcName);
+		if (subtitle !== undefined) varValue(400)[59] = subtitle;
+	}
+	function actorNameWithPartySuffix(variableId, suffix) {
+		const actorName = actorFromVariable(variableId).name();
+		return $gameParty.battleMembers().length >= 2 ? `${actorName}${suffix}` : actorName;
+	}
+	function speakOneLiner(interp, pictureId, lines, options = {}) {   // `interp` may be null when no wait is needed
+		const {
+			fontSize = 25, fontWeight = 180, fontFace = 0,
+			xOffsets = [0], yOffsets = [-50],
+			eventId = interp._eventId, waitFrames = 0,
+		} = options;
+		chara_oneWord(pictureId, eventId, fontSize, fontWeight, xOffsets, yOffsets, [].concat(lines), fontFace);
+		if (waitFrames && interp) interp.wait(waitFrames);
+	}
+
+	/* --- plugin commands / cut-ins ------------------------------------------- */
+
+	function callPluginCommand(interp, commandName, ...commandArgs) {
+		interp.pluginCommand(commandName, commandArgs.map(String));
+	}
+	function requestCutIn(interp, commandName, cutInParams) {
+		valueCutInSet1 = cutInParams;
+		callPluginCommand(interp, commandName, cutInParams[0]);
+	}
+	function prepareCutIn(interp, commandName, cutInSlotId, actorId) {
+		cutin_preparation(cutInSlotId, actorId);
+		if (valueCutInSet1[0] !== 0) callPluginCommand(interp, commandName, valueCutInSet1[0]);
+	}
+	function callStandingPicturePlugin(interp) {
+		callPluginCommand(interp, 'P_CALL_CE', getPreviousTachiePicId(), '71', '2', 'ON');
+	}
+
+	/* --- visual-novel / cutscene state --------------------------------------- */
+
+	function setVisualNovelChoices(enabled) { $gameSystem.vnChoices = enabled; }
+
+	/* --- common events ------------------------------------------------------- */
+
+	// Replaces (89x): data/CommonEvents.json:common-event:13, data/CommonEvents.json:common-event:96, data/CommonEvents.json:common-event:270, data/CommonEvents.json:common-event:301, data/CommonEvents.json:common-event:302, data/CommonEvents.json:common-event:303, …
+	// The one entry point that lives in the helper layer: both the other entries and
+	// the data files call it by name, so it stays a top-level assignment (a global in
+	// the plugin scope, exactly like the original) instead of a helper declaration.
+	runCommonEventAsChild = function (interp, commonEventId) {
+		interp.setupChild($dataCommonEvents[commonEventId].list, 0);
+	};
+	function setSelfVarAndRunCommonEvent(interp, selfVarId, value, commonEventId) {
+		setSelfVar(interp, selfVarId, value);
+		runCommonEventAsChild(interp, commonEventId);
+	}
+	function showOneLineTalk(interp, talkLayoutId, talkParams) {
+		setSelfVar(interp, 172, talkLayoutId);
+		valueTalkSet = talkParams;
+		runCommonEventAsChild(interp, 60);
+	}
+	function questDialogueText(itemId) {
+		const isDailyQuest = $dataItems[itemId].meta['SGカテゴリ'] === 'デイリークエスト';
+		const baseItemId = isDailyQuest ? 900 : 800;
+		// NOTE: this is the quest-list line, not a message window: its renderer wants
+		//       the ESC spelling (0x1b + `IIN[n]`) the original used, which is what
+		//       itemIconNameEsc() emits.
+		return `${itemIconNameEsc(itemId)}\n${valueQuestArray4[itemId - baseItemId]}`;
+	}
+
+	/* --- spawned map events -------------------------------------------------- */
+
+	function respawnActor(slotIndex, posX, posY, zoomFlag) {
+		event_respawnSetA(slotIndex, posX, posY, zoomFlag);
+		return spawnedEvent(slotIndex);
+	}
+	/** Same as respawnActor(), but the direction is handed to the plugin itself. */
+	function respawnActorFacing(slotIndex, posX, posY, zoomFlag, direction) {
+		event_respawnSetA(slotIndex, posX, posY, zoomFlag, direction);
+		return spawnedEvent(slotIndex);
+	}
+	function respawnNpc(slotIndex, posX, posY, zoomFlag, imageName, imageIndex) {
+		event_respawnSetN(slotIndex, posX, posY, zoomFlag, imageName, imageIndex);
+		return spawnedEvent(slotIndex);
+	}
+	/** Same as respawnNpc(), but the direction is handed to the plugin itself. */
+	function respawnNpcFacing(slotIndex, posX, posY, zoomFlag, imageName, imageIndex, direction) {
+		event_respawnSetN(slotIndex, posX, posY, zoomFlag, imageName, imageIndex, direction);
+		return spawnedEvent(slotIndex);
+	}
+	function placeSpawnedEvent(slotIndex, x, y, direction) {
+		const event = spawnedEvent(slotIndex);
+		event.locate(x, y);
+		event.setDirection(direction);
+		return event;
+	}
+	function moveSpawnedEvents(moveRouteCode, moveRouteParameters, slotIndexes) {
+		event_NpcCharaMoveId(moveRouteCode, moveRouteParameters, slotIndexes.map(spawnedEventId));
+	}
+	function respawnLeadActorFromPreset(zoomFlag) {
+		const npcPreset = currentNpcPreset();
+		const leadSlot = varValue(LEAD_ACTOR_VAR);
+		const event = respawnActor(leadSlot, npcPreset[3], npcPreset[4], zoomFlag);
+		event.setImage(npcPreset[1], npcPreset[2]);
+		event.setDirection(npcPreset[5]);
+		return leadSlot;
+	}
+	function respawnSideNpcFromPreset(slotIndex, direction) {
+		const npcPreset = currentNpcPreset();
+		const event = respawnNpc(slotIndex, npcPreset[8], npcPreset[9], 0, npcPreset[6], npcPreset[7]);
+		event.setDirection(direction === undefined ? npcPreset[10] : direction);
+	}
+	function zoomCameraOnEvent(targetEventId, zoomLevel) {
+		drowsepost.camera.zoom(zoomLevel === undefined ? 1 : zoomLevel, 60, targetEventId);
+	}
+
+	/* --- debug helpers ------------------------------------------------------- */
+
+	function showDebugPicture(pictureSlot, entryId, picturePath) {
+		console.log(`${entryId}  ${picturePath}`);
+		showPic(pictureSlot, picturePath, 640 - 128, 384, 100, 100, 255, 1);
+	}
+	function playMetaBgm(entryId, bgmName) {
+		if (bgmName === 'NoMusic') return;
+		console.log(`${entryId}  ${bgmName}`);
+		AudioManager.playBgm({ name: bgmName, volume: 100, pitch: 100, pan: 0 });
+	}
+	/* ============================================================================
+	 * Setup / configuration
+	 * ========================================================================== */
+
 	// Replaces (1x): data/CommonEvents.json:common-event:1
 	setVariable73 = function () {
-		$gameVariables.setValue(73,1)//ヒロインキャラ始点変数
-		$gameVariables.setValue(74,2)//ヒロインキャラ終点変数
-		$gameVariables.setValue(247,[1,2])//ヒロインID配列変数
-		$gameVariables.setValue(75,1)//登場キャラ始点変数
-		$gameVariables.setValue(76,7)//登場キャラ終点変数
-		$gameVariables.setValue(248,[1,2,3,4,5,6,7])//キャラID配列変数
+		setVar(73, 1);   // ヒロインキャラ始点変数
+		setVar(74, 2);   // ヒロインキャラ終点変数
+		setVar(247, [1, 2]);                // ヒロインID配列変数
+		setVar(75, 1);   // 登場キャラ始点変数
+		setVar(76, 7);   // 登場キャラ終点変数
+		setVar(248, [1, 2, 3, 4, 5, 6, 7]); // キャラID配列変数
 	};
 
 	// Replaces (2x): data/CommonEvents.json:common-event:1, data/CommonEvents.json:common-event:102
 	setVariable68 = function () {
-		$gameVariables.setValue(68,120)//GAB表示時間
+		setVar(68, 120);   // GAB表示時間
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:1
 	setVariable71Var185 = function () {
-		$gameVariables.setValue(71,180);//ティッカー表示時間
-		$gameVariables.setValue(185,0);//TickerＹ軸変更
+		setTickerDisplayTime(180, 0);   // ティッカー表示時間 / TickerY軸変更
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:1
 	setVariable65 = function () {
-		$gameVariables.setValue(65,180)//KMSポップアップ表示時間
+		setVar(65, 180);   // KMSポップアップ表示時間
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:1
 	setVariable279 = function () {
-		$gameVariables.setValue(279,10)//ステート付与解除アニメウェイト
-		$gameVariables.setValue(280,10)//280に上乗せ分ウェイト
+		setVar(279, 10);   // ステート付与解除アニメウェイト
+		setVar(280, 10);   // 280に上乗せ分ウェイト
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:1
 	setVariable254 = function () {
-		$gameVariables.setValue(254,1);//メニュー表示変数1で固定
+		setVar(254, 1);   // メニュー表示変数1で固定
 	};
+
+	/* ============================================================================
+	 * Variables / save files
+	 * ========================================================================== */
 
 	// Replaces (2x): data/CommonEvents.json:common-event:2, data/CommonEvents.json:common-event:53
 	dumpLocationPresetToFile = function (variableId) {
-		//LisciaBlueQuestフォルダに書き出し
-		var variableValue = $gameVariables.value(variableId);
-		fs.writeFileSync( "valueLocationPreset.txt" ,JSON.stringify(variableValue) )
+		// LisciaBlueQuestフォルダに書き出し
+		fs.writeFileSync('valueLocationPreset.txt', JSON.stringify(varValue(variableId)));
 	};
 
-	// Replaces (19x): data/CommonEvents.json:common-event:5, data/CommonEvents.json:common-event:87, data/CommonEvents.json:common-event:109, data/CommonEvents.json:common-event:110, data/CommonEvents.json:common-event:111, data/CommonEvents.json:common-event:112, …
-	setValueCountSet1 = function (countValue) {
-		valueCountSet1 = countValue;
+	// Replaces (19x): data/CommonEvents.json:common-event:5, :87, :109, :110, :111, :112, ...
+	setValueCountSet1 = function (setValue) {
+		valueCountSet1 = setValue;
 	};
 
-	// Replaces (2x): data/CommonEvents.json:common-event:5, data/CommonEvents.json:common-event:192
-	startParallelEvent = function (interp) {
-		return (function () {
-		if(valueCountSet1 != 0){
-		  event_pararelStarting(1,valueCountSet1,interp._eventId);
-		};
-		}).call(interp);
+	// Replaces (14x): data/CommonEvents.json:common-event:5, :42, :65, :87, :89, :132, ...
+	setValueCountSet3 = function (setValue) {
+		valueCountSet3 = setValue;
 	};
 
-	// Replaces (2x): data/CommonEvents.json:common-event:5, data/Map003.json:map-event:133:page:2
-	spawnScreenParticleStatue_orb_c = function (interp) {
-		return (function () {
-		var particleName2 = 'statue_orb_c';
-		$gameScreen._particle.particleSet(interp._eventId,particleName2+'-'+interp._eventId,'this',particleName2,'above');
-		var particleName2 = 'statue_orb_c'+'-'+interp._eventId;
-		$gameScreen._particle.particleUpdate([particleName2,'color','#ff00f7','#ffffff']);
-		$gameScreen._particle.particleUpdate([particleName2,'pos',0,-35]);
-		}).call(interp);
+	// Replaces (18x): data/CommonEvents.json:common-event:12, :212, :295, Map007.json:map-event:23:page:1, ...
+	assignVariableValueFromArgs = function (variableId, value) {
+		setVar(variableId, value);
 	};
 
-	// Replaces (2x): data/CommonEvents.json:common-event:5, data/CommonEvents.json:common-event:15
-	movePictureKeepingScale = function (numericValue, duration) {
-		var pictureId2 = 94;
-		if($gameScreen.picture(pictureId2)){
-		  var origin2 = $gameScreen.picture(pictureId2).origin();
-		  var x4 = $gameScreen.picture(pictureId2).x();
-		  var y5 = $gameScreen.picture(pictureId2).y();
-		  var scaleX2 = $gameScreen.picture(pictureId2).scaleX();
-		  var scaleY2 = $gameScreen.picture(pictureId2).scaleY();
-		  var opacity2 = numericValue;//$gameScreen.picture(value1).opacity();
-		  $gameScreen.movePicture(pictureId2,origin2,x4,y5,scaleX2,scaleY2,opacity2,0,duration);
-		};
+	// Replaces (2x): data/CommonEvents.json:common-event:86, data/CommonEvents.json:common-event:179
+	// Writes a game variable — exactly what `assignVariableValueFromArgs` above does,
+	// so it is folded into it instead of repeating the body. The name is kept because
+	// the data files call it directly.
+	assignVariableValue = assignVariableValueFromArgs;
+
+	// Replaces (4x): data/CommonEvents.json:common-event:12, :54, Map003.json:map-event:235:page:1, Map018.json:map-event:39:page:1
+	initVariableArrayFromSize = function (variableId, arraySize) {
+		setVar(variableId, Array(arraySize).fill(0));
 	};
 
-	// Replaces (3x): data/CommonEvents.json:common-event:5, data/CommonEvents.json:common-event:87, data/CommonEvents.json:common-event:89
-	spawnScreenParticleSpriteset = function (textValue) {
-		var particleName2 = textValue;
-		$gameScreen._particle.particleSet(0,particleName2,'screen','def','spriteset');
+	// Replaces (11x): data/CommonEvents.json:common-event:9, :11, :12, :64, :254, Map003.json:map-event:133:page:2, ...
+	initSelfVariableArrayFromSize = function (interp, variableId, arraySize) {
+		setSelfVar(interp, variableId, Array(arraySize).fill(0));
 	};
 
-	// Replaces (14x): data/CommonEvents.json:common-event:5, data/CommonEvents.json:common-event:42, data/CommonEvents.json:common-event:65, data/CommonEvents.json:common-event:87, data/CommonEvents.json:common-event:89, data/CommonEvents.json:common-event:132, …
-	setValueCountSet3 = function (countValue) {
-		valueCountSet3 = countValue;
-	};
-
-	// Replaces (14x): data/CommonEvents.json:common-event:5, data/CommonEvents.json:common-event:23, data/CommonEvents.json:common-event:42, data/CommonEvents.json:common-event:65, data/CommonEvents.json:common-event:87, data/CommonEvents.json:common-event:89, …
-	hideWindow = function (windowId) {
-		WindowManager.hide(windowId);
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:5, data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
-	setSelfVariable21 = function (interp) {
-		return (function () {
-		var randomValue4 = arr[getRandomIndex(arr.length)];
-		let entryIndex2 = arr.findIndex(arr => arr === randomValue4); 
-		if(entryIndex2 >= 0){
-		arr.splice(entryIndex2, 1);
-		}
-		interp.sVal(21,arr);
-		if(arr == 0){arr = [1,2,3,4,5]};
-		}).call(interp);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:5
-	eraseNpcEvents = function () {
-		for (var eventId2 = $gameMap.events().length; eventId2 > 0; eventId2--) {
-		if(!!$gameMap.event(eventId2)) {
-		if ($gameMap.event(eventId2).event().meta['NPC'] ||
-		$gameMap.event(eventId2).event().meta['動物'] ||
-		$gameMap.event(eventId2).event().meta['Encounter Direction Lock'] ){
-		$gameMap.eraseEvent(eventId2);
-		}}};
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:37
-	eraseNpcEvents2 = function () {
-		for (var eventId2 = $gameMap.events().length; eventId2 > 0; eventId2--) {
-		if(!!$gameMap.event(eventId2)) {
-		if ($gameMap.event(eventId2).event().meta['NPC'] ||
-		$gameMap.event(eventId2).event().meta['Animal'] ||
-		$gameMap.event(eventId2).event().meta['Encounter Direction Lock'] ){
-		$gameMap.eraseEvent(eventId2);
-		}}};
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:9, data/Map003.json:map-event:133:page:2
-	returnProfessionBasics = function () {
-		var variable75Value = $gameVariables.value(75);
-		var variable76Value = $gameVariables.value(76);
-		for(var tempValue = variable75Value; tempValue <= variable76Value; tempValue++){
-		  Profession_basicReturn(tempValue);
-		};
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:9
-	nameWeaponsFromVariable = function (interp, variableId, variableId2, numericValue, textValue, variableId3, numericValue2) {
-		return (function (variableId, variableId2, numericValue, textValue, variableId3, numericValue2) {
-		interp.sVal(variableId,Array(101).fill(0));
-		for(var weaponId2 = 301; weaponId2 <= 400; weaponId2++){
-		  if(!$dataWeapons[weaponId2].name == '') {
-		    if($dataWeapons[weaponId2].meta['SubstitutionActorId']){
-		      var databaseEntries2 = Number($dataWeapons[weaponId2].meta['SubstitutionActorId']);
-		      $gameVariables.value(variableId2)[weaponId2-300] = numericValue;
-		    };
-		    if($dataWeapons[weaponId2].meta[textValue]){
-		      $gameVariables.value(variableId3)[weaponId2-300] = numericValue2;
-		    };
-		  };
-		};
-		}).call(interp, variableId, variableId2, numericValue, textValue, variableId3, numericValue2);
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:9, data/CommonEvents.json:common-event:24, data/Map003.json:map-event:131:page:2
-	removeStateFromListActorsVar248And380 = function (interp) {
-		return (function () {
-		var variable248Value = $gameVariables.value(248);
-		variable248Value.forEach(function(id) {
-		  $gameActors.actor(id).removeState(39);
-		  $gameVariables.value(380 + id)[58] =  0;
-		}, interp);
-		}).call(interp);
-	};
-
-	// Replaces (11x): data/CommonEvents.json:common-event:9, data/CommonEvents.json:common-event:11, data/CommonEvents.json:common-event:12, data/CommonEvents.json:common-event:64, data/CommonEvents.json:common-event:254, data/Map003.json:map-event:133:page:2, …
-	initSelfVariableArrayFromSize = function (interp, variableId, newValue) {
-		return (function (variableId, newValue) {
-		interp.sVal(variableId,Array(newValue).fill(0));
-		}).call(interp, variableId, newValue);
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:10, data/CommonEvents.json:common-event:21
-	setValueStartCommentary0 = function () {
-		valueStartCommentary0 = 1;
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:11, data/CommonEvents.json:common-event:24
-	setMapSelfSwitch = function (key) {
-		for(var loopIndex = 1; loopIndex <= 500; loopIndex++){
-		  for (var key3 = 200; key3 > 0; key3--) {
-		    //if(!!$gameMap.event(id)) {
-		      $gameSelfSwitches.setValue([loopIndex, key3, key], false);
-		    //};
-		  };
-		};
-	};
-
-	// Replaces (4x): data/CommonEvents.json:common-event:12, data/CommonEvents.json:common-event:54, data/Map003.json:map-event:235:page:1, data/Map018.json:map-event:39:page:1
-	initVariableArrayFromSize = function (variableId, newValue) {
-		$gameVariables.setValue(variableId,Array(newValue).fill(0));
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:12, data/Map003.json:map-event:113:page:1
-	writeVariableSlotFromIndex = function (variableId, variableId2, numericValue) {
-		$gameVariables.value(variableId)[$gameVariables.value(variableId2)] = numericValue;
+	// Replaces (2x): data/CommonEvents.json:common-event:12, data/CommonEvents.json:Map003.json:map-event:113:page:1
+	writeVariableSlotFromIndex = function (variableId, indexVariableId, value) {
+		varValue(variableId)[varValue(indexVariableId)] = value;
 	};
 
 	// Replaces (2x): data/CommonEvents.json:common-event:12, data/CommonEvents.json:common-event:205
@@ -3696,394 +4005,353 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 
 	// Replaces (1x): data/CommonEvents.json:common-event:12
 	setVariable508 = function () {
-		$gameVariables.setValue(508,'BlueSky')
+		setVar(508, 'BlueSky');
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:431
 	setVariable21Text = function () {
-		var textPrefix = `幹部団員 `;
-		var controlCode = `\\}`;
-		var textSuffix = `秩序の騎空団`;
-		$gameVariables.setValue(21,`${textPrefix}${controlCode}${textSuffix}`)
+		setVar(21, `幹部団員 ${braceRight()}秩序の騎空団`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:12
 	setVariable55Text = function () {
-		var messageText2 = `月`;
-		$gameVariables.setValue(55, `${messageText2}`);
+		setVar(55, '月');
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:12
 	setVariable515Text = function () {
-		var messageText2 = `持ち上げoff`;
-		$gameVariables.setValue(515, `${messageText2}`);
+		setVar(515, '持ち上げoff');
 	};
 
 	// Replaces (2x): data/CommonEvents.json:common-event:290, data/CommonEvents.json:common-event:295
 	setVariable21TextVar142 = function () {
-		var controlCode = `\\SP[0]`;
-		var textPrefix = `イベント：IIN[`;
-		var textSuffix = `]は、既に閲覧済みです。\nスキップしますか？\n（そのイベントで獲得できる称号や性経験値などは入手できます。\n但し、獲得物に選択肢が関係する場合は入手できません）`;
-		$gameVariables.setValue(21,
-		`${controlCode}${textPrefix}${$gameVariables.value(142)}${textSuffix}`);
+		const textSpeed0 = textSpeed(0);
+		const viewedEventItemIcon = itemIconName(varValue(142));   // variable 142 (scratch): item of the already-viewed event
+		setVar(21,
+			`${textSpeed0}イベント：${viewedEventItemIcon}は、既に閲覧済みです。\nスキップしますか？\n（そのイベントで獲得できる称号や性経験値などは入手できます。\n但し、獲得物に選択肢が関係する場合は入手できません）`);
 	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:290, data/CommonEvents.json:common-event:295
+	setVariable141Text = function () {
+		const viewedEventItemId = varValue(142);   // variable 142 (scratch): item of the already-viewed event
+		setVar(141, `${viewedEventItemId}`);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:291, data/CommonEvents.json:common-event:296
+	setValueScriptArray1_2 = function () {
+		valueScriptArray1 = [];
+		valueScriptArray2 = [];
+	};
+
+	// Replaces (151x): data/CommonEvents.json:common-event:301, data/CommonEvents.json:common-event:302, data/CommonEvents.json:common-event:303, data/CommonEvents.json:common-event:304, data/CommonEvents.json:common-event:305, data/CommonEvents.json:common-event:306, …
+	// Writes a 3-element array into a game variable (coordinate / slot triples).
+	assignVariableTripleFromArgs = function (variableId, newValue, newValue2, newValue3) {
+		setVar(variableId, [newValue, newValue2, newValue3]);
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:301, data/CommonEvents.json:common-event:302, data/Map018.json:map-event:32:page:1
+	// Copies slot 59 of an actor's H-stat record into the shared variable 21
+	// (`380 + actorIndex`: 0 = actor 20, 1..4 = actors 1..4).
+	setVariable21 = function (actorIndex) {
+		setVar(21, varValue(380 + actorIndex)[59]);
+	};
+
+	/* ============================================================================
+	 * Quest objectives (all of them write variable 134)
+	 * ========================================================================== */
 
 	// Replaces (1x): data/CommonEvents.json:common-event:301
 	setQuestObjectiveHeadToRoyalCastle = function () {
-		var messageText2 = `まずは王城へと向かいましょう。\n王都北側に入り口がある筈です。`;
-		$gameVariables.setValue(134,
-		`${messageText2}`);
+		setQuestObjective('まずは王城へと向かいましょう。\n王都北側に入り口がある筈です。');
 	};
 
 	// Replaces (2x): data/CommonEvents.json:common-event:302, data/CommonEvents.json:common-event:303
 	setQuestObjectiveHeadToInn = function () {
-		var messageText2 = `宿へ向かいましょうか`;
-		$gameVariables.setValue(134,
-		`${messageText2}`);
+		setQuestObjective('宿へ向かいましょうか');
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:304
 	setQuestObjectiveHeadToGuild = function () {
-		var messageText2 = `【騎空士ギルド】へ向かいましょう。\n確か、王城の手前ほどの場所にあったはずです`;
-		$gameVariables.setValue(134,
-		`${messageText2}`);
+		setQuestObjective('【騎空士ギルド】へ向かいましょう。\n確か、王城の手前ほどの場所にあったはずです');
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:305
 	setQuestObjectiveVisitInformant = function () {
-		var messageText2 = `情報屋に会いに行きましょう。\n表向きは書店を営業していると聞いています`;
-		$gameVariables.setValue(134,
-		`${messageText2}`);
+		setQuestObjective('情報屋に会いに行きましょう。\n表向きは書店を営業していると聞いています');
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:309
 	setQuestObjectiveReturnToInn = function () {
-		var messageText2 = `空賊に関する資料が届いているかも知れません。\n宿屋に戻りましょう`;
-		$gameVariables.setValue(134,
-		`${messageText2}`);
+		setQuestObjective('空賊に関する資料が届いているかも知れません。\n宿屋に戻りましょう');
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:311
 	setQuestObjectiveCaptureCentralPlainsBandits = function () {
-		var textPrefix = `中央平原の空賊達を\n１０人捕縛(討伐)しましょう\n ＜`;
-		var controlCode = `\\v[642]`;
-		var textSuffix = ` / 10人＞`;
-		$gameVariables.setValue(134,
-		`${textPrefix}${controlCode}${textSuffix}`);
+		const defeatedBanditCount = variableText(642);   // variable 642: ﾒｲﾝ10中央平原討伐数
+		setQuestObjective(`中央平原の空賊達を\n１０人捕縛(討伐)しましょう\n ＜${defeatedBanditCount} / 10人＞`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:312
 	setQuestObjectiveReachLevelTenThenChurch = function () {
-		var characterName = `\\N[5]`;
-		var textPrefix = `${characterName}くんのレベルを10に上げて教会へと向かいましょう。\n空賊達が居なくなった`;
-		var locationName = `\\swi[252]`;
-		var textSuffix = `${locationName}が、\n狩場に適してしるようですね。\n情報屋で情報を購入しておいた方が良いかも知れません。`;
-		$gameVariables.setValue(134,
-		`${textPrefix}${textSuffix}`);
+		const characterName5 = characterName(5);
+		const centralPlainsName = switchName(252);   // switch 252: 中央平原
+		setQuestObjective(`${characterName5}くんのレベルを10に上げて教会へと向かいましょう。\n` +
+			`空賊達が居なくなった${centralPlainsName}が、\n狩場に適してしるようですね。\n` +
+			'情報屋で情報を購入しておいた方が良いかも知れません。');
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:313
 	setQuestObjectiveLocateBanditHideout = function () {
-		var messageText2 = `そろそろ、尋問が終わって空賊達の拠点が\n割り出されているでしょうか`;
-		$gameVariables.setValue(134,
-		`${messageText2}`);
+		setQuestObjective('そろそろ、尋問が終わって空賊達の拠点が\n割り出されているでしょうか');
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:314
 	setQuestObjectiveHeadToVillage = function () {
-		var messageText2 = `集落へと向かいましょうか`;
-		$gameVariables.setValue(134,
-		`${messageText2}`);
+		setQuestObjective('集落へと向かいましょうか');
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:315
 	setQuestObjectiveAskVillageElder = function () {
-		var textPrefix = `この集落のまとめ役の方に\n`;
-		var itemName = `\\in[26]`;
-		var textSuffix = `${itemName}に関する\n情報を聞きに行きましょう`;
-		$gameVariables.setValue(134,
-		`${textPrefix}${textSuffix}`);
+		const itemName26 = itemName(26);
+		setQuestObjective(`この集落のまとめ役の方に\n${itemName26}に関する\n情報を聞きに行きましょう`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:316
 	setQuestObjectivePrepareCountermeasures = function () {
-		var name1 = `\\swi[254]`;
-		var textPrefix = `${name1}へ向かいましょう。`+`\n`;
-		var state1Name = `\\sim[424]`;
-		var state2Name = `\\sim[425]`;
-		var textPart3 = `${state1Name}や${state2Name}対策を\nしておいた方が良いかも知れません。` +`\n`;
-		var armorName = `\\ain[175]`;
-		var textSuffix = `${armorName}などですね`;
-		$gameVariables.setValue(134,
-		`${textPrefix}${textPart2}${textPart3}${textSuffix}`);
+		const graveyardName = switchName(254);   // switch 254: 共同墓地
+		const skillIcon424 = skillIconName(424);
+		const skillIcon425 = skillIconName(425);
+		const armorIcon175 = armorIconName(175);
+		// NOTE: textPart2 is not declared in this scope in the original either —
+		//       it comes from the global scope, so it is kept as-is.
+		setQuestObjective(`${graveyardName}へ向かいましょう。\n${textPart2}` +
+			`${skillIcon424}や${skillIcon425}対策を\nしておいた方が良いかも知れません。\n` +
+			`${armorIcon175}などですね`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:317
 	setQuestObjectiveSearchGraveyard = function () {
-		var messageText2 = `この有様になった、原因がある筈です。\n墓地の中を調べていきましょう`;
-		$gameVariables.setValue(134,
-		`${messageText2}`);
+		setQuestObjective('この有様になった、原因がある筈です。\n墓地の中を調べていきましょう');
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:318
 	setQuestObjectiveDefeatGraveyardBoss = function () {
-		var bossName = `\\swi[254]`;
-		var messageText2 = `${bossName}のボスを討伐しましょう！`;
-		$gameVariables.setValue(134,
-		messageText2);
+		const graveyardName = switchName(254);   // switch 254: 共同墓地
+		setQuestObjective(`${graveyardName}のボスを討伐しましょう！`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:319
 	setQuestObjectiveHeadToNamedPlace = function () {
-		var name = `\\swi[256]`;
-		var messageText2 = `${name}へ向かいましょう`;
-		$gameVariables.setValue(134,
-		`${messageText2}`);
+		const centralForestName = switchName(256);   // switch 256: 中央森林
+		setQuestObjective(`${centralForestName}へ向かいましょう`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:320
 	setQuestObjectiveCrossForestToHideout = function () {
-		var messageText2 = `この森を抜ければ空賊団のアジトです。\n行きましょう`;
-		$gameVariables.setValue(134,
-		`${messageText2}`);
+		setQuestObjective('この森を抜ければ空賊団のアジトです。\n行きましょう');
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:321
 	setQuestObjectiveRaidBanditHideout = function () {
-		var messageText2 = `さあ、アジトへと突入しましょう！`;
-		$gameVariables.setValue(134,
-		`${messageText2}`);
+		setQuestObjective('さあ、アジトへと突入しましょう！');
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:322
 	setQuestObjectiveDefeatHideoutBoss = function () {
-		var controlCode = `\\swi[255]`;
-		var messageText2 = `のボスを討伐しましょう！`;
-		$gameVariables.setValue(134,
-		`${controlCode}${messageText2}`);
+		const skyPirateHideoutName = switchName(255);   // switch 255: 空賊団本拠地
+		setQuestObjective(`${skyPirateHideoutName}のボスを討伐しましょう！`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:323
 	setQuestObjectiveLeaveCastle = function () {
-		var messageText2 = `城を出ましょう`;
-		$gameVariables.setValue(134,
-		`${messageText2}`);
+		setQuestObjective('城を出ましょう');
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:324
 	setQuestObjectiveRegroupAtInn = function () {
-		var messageText2 = `宿に戻ってみんなと合流しましょう`;
-		$gameVariables.setValue(134,
-		`${messageText2}`);
+		setQuestObjective('宿に戻ってみんなと合流しましょう');
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:325
 	setQuestObjectiveHeadToNewlyFoundSite = function () {
-		var textPrefix = `新しく発見されたという\n`;
-		var controlCode = `\\in[22]`;
-		var textSuffix = `へ向かいましょう`;
-		$gameVariables.setValue(134,
-		`${textPrefix}${controlCode}${textSuffix}`);
+		const itemName22 = itemName(22);
+		setQuestObjective(`新しく発見されたという\n${itemName22}へ向かいましょう`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:326
 	setQuestObjectiveDefeatSiteBoss = function () {
-		var controlCode = `\\swi[332]`;
-		var messageText2 = `のボスを討伐しましょう！`;
-		$gameVariables.setValue(134,
-		`${controlCode}${messageText2}`);
+		const kamunaoiCaveName = switchName(332);   // switch 332: カムナオイ洞窟[裏]
+		setQuestObjective(`${kamunaoiCaveName}のボスを討伐しましょう！`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:327
 	setQuestObjectiveMeetCompanionAtPlace = function () {
-		var name1 = `\\swi[223]`;
-		var textPrefix = `${name1}へと向かい、`+`\n`;
-		var charaName = `\\N[2]`;
-		var textSuffix = `${charaName}さんと合流しましょう`;
-		$gameVariables.setValue(134,
-		`${textPrefix}${textSuffix}`);
+		const augusteIslandsName = switchName(223);   // switch 223: アウギュステ列島
+		const characterName2 = characterName(2);
+		setQuestObjective(`${augusteIslandsName}へと向かい、\n${characterName2}さんと合流しましょう`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:328
 	setQuestObjectiveBuySwimsuit = function () {
-		var messageText2 = `雑貨屋に水着を買いに行きましょうか…`;
-		$gameVariables.setValue(134,
-		`${messageText2}`);
+		setQuestObjective('雑貨屋に水着を買いに行きましょうか…');
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:329
 	setQuestObjectiveMeetCompanionAtBeach = function () {
-		var charaName = `\\N[2]`;
-		var text = `浜辺に行って${charaName}さんと合流しましょう。\nお昼でないと居ないでしょうから気を付けましょうね`;
-		$gameVariables.setValue(134, text);
+		const characterName2 = characterName(2);
+		setQuestObjective(`浜辺に行って${characterName2}さんと合流しましょう。\nお昼でないと居ないでしょうから気を付けましょうね`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:330
 	setQuestObjectiveAdvanceToNamedPlace = function () {
-		var controlCode = `\\swi[284]`;
-		var messageText2 = `へ向かいましょう。`;
-		$gameVariables.setValue(134,
-		`${controlCode}${messageText2}`);
+		const greatWaterfallName = switchName(284);   // switch 284: 大爆滝
+		setQuestObjective(`${greatWaterfallName}へ向かいましょう。`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:331
 	setQuestObjectiveEnterFromEntrance = function () {
-		var controlCode = `\\swi[284]`;
-		var messageText2 = `にある入口から中に入りましょう`;
-		$gameVariables.setValue(134,
-		`${controlCode}${messageText2}`);
+		const greatWaterfallName = switchName(284);   // switch 284: 大爆滝
+		setQuestObjective(`${greatWaterfallName}にある入口から中に入りましょう`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:332
 	setQuestObjectiveGoDeeper = function () {
-		var controlCode = `\\swi[285]`;
-		var messageText2 = `の奥へと進みましょう──`;
-		$gameVariables.setValue(134,
-		`${controlCode}${messageText2}`);
+		const undergroundLakeName = switchName(285);   // switch 285: 地底湖
+		setQuestObjective(`${undergroundLakeName}の奥へと進みましょう──`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:333
 	setQuestObjectiveDefeatDepthBoss = function () {
-		var controlCode = `\\swi[286]`;
-		var messageText2 = `のボスを討伐しましょう！`;
-		$gameVariables.setValue(134,
-		`${controlCode}${messageText2}`);
+		const undergroundLabName = switchName(286);   // switch 286: 地底湖奥研究所
+		setQuestObjective(`${undergroundLabName}のボスを討伐しましょう！`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:334
 	setQuestObjectiveReturnAndRegroup = function () {
-		var controlCode1 = `\\swi[221]`;
-		var textPrefix = `に戻って、\n`;
-		var controlCode2 = `\\N[4]`;
-		var textSuffix = `さん達と合流しましょう`;
-		$gameVariables.setValue(134,
-		`${controlCode1}${textPrefix}${controlCode2}${textSuffix}`);
+		const corblantIslandName = switchName(221);   // switch 221: コルブラント島
+		const characterName4 = characterName(4);
+		setQuestObjective(`${corblantIslandName}に戻って、\n${characterName4}さん達と合流しましょう`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:335
 	setQuestObjectiveVisitInformantAgain = function () {
-		var messageText2 = `情報屋を訪ねましょう`;
-		$gameVariables.setValue(134,
-		`${messageText2}`);
+		setQuestObjective('情報屋を訪ねましょう');
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:336
 	setQuestObjectivePassFirstFloor = function () {
-		var controlCode = `\\swi[334]`;
-		var messageText2 = `へ向かいましょう。\n1層を通り抜けます`;
-		$gameVariables.setValue(134,
-		`${controlCode}${messageText2}`);
+		const kleistMountainName = switchName(334);   // switch 334: クライスト山[1F]
+		setQuestObjective(`${kleistMountainName}へ向かいましょう。\n1層を通り抜けます`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:337
 	setQuestObjectiveRaidHut = function () {
-		var messageText2 = `小屋に突入しましょう`;
-		$gameVariables.setValue(134,
-		`${messageText2}`);
+		setQuestObjective('小屋に突入しましょう');
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:338
 	setQuestObjectiveHeadToLocalInn = function () {
-		var controlCode = `\\swi[221]`;
-		var messageText2 = `の宿に向かいましょう`;
-		$gameVariables.setValue(134,
-		`${controlCode}${messageText2}`);
+		const corblantIslandName = switchName(221);   // switch 221: コルブラント島
+		setQuestObjective(`${corblantIslandName}の宿に向かいましょう`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:339
 	setQuestObjectiveVisitCastleByDay = function () {
-		var messageText2 = `日中に王城へ向かいましょう`;
-		$gameVariables.setValue(134,
-		`${messageText2}`);
+		setQuestObjective('日中に王城へ向かいましょう');
 	};
 
 	// Replaces (2x): data/CommonEvents.json:common-event:340, data/CommonEvents.json:common-event:341
 	setQuestObjectiveAwaitPlayerChoice = function () {
-		var messageText2 = `どうしましょうか…`;
-		$gameVariables.setValue(134,
-		`${messageText2}`);
+		setQuestObjective('どうしましょうか…');
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:342
 	setQuestObjectiveVisitChancellor = function () {
-		var messageText2 = `宰相の元へ向かいましょう`;
-		$gameVariables.setValue(134,
-		`${messageText2}`);
+		setQuestObjective('宰相の元へ向かいましょう');
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:343
 	setQuestObjectiveFightKnightCommander = function () {
-		var messageText2 = `謁見の間で、騎士団長との戦いです`;
-		$gameVariables.setValue(134,
-		`${messageText2}`);
+		setQuestObjective('謁見の間で、騎士団長との戦いです');
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:344
 	setQuestObjectiveHeadToFestivalHall = function () {
-		var controlCode1 = `\\swi[254]`;
-		var textPrefix = `の祭殿へ向かいましょう。\nそこから、`;
-		var controlCode2 = `\\swi[257]`;
-		var textSuffix = `へと行ける筈です`;
-		$gameVariables.setValue(134,
-		`${controlCode1}${textPrefix}${controlCode2}${textSuffix}`);
+		const graveyardName = switchName(254);   // switch 254: 共同墓地
+		const undergroundTunnelName = switchName(257);   // switch 257: 地下坑道
+		setQuestObjective(`${graveyardName}の祭殿へ向かいましょう。\nそこから、${undergroundTunnelName}へと行ける筈です`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:345
 	setQuestObjectiveContinueMainQuest = function () {
-		var controlCode = `\\swi[257]`;
-		var messageText2 = `へ向かいましょう`;
-		$gameVariables.setValue(134,
-		`${controlCode}${messageText2}`);
+		const undergroundTunnelName = switchName(257);   // switch 257: 地下坑道
+		setQuestObjective(`${undergroundTunnelName}へ向かいましょう`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:346
 	setQuestObjectiveDefeatAreaBoss = function () {
-		var controlCode = `\\swi[257]`;
-		var messageText2 = `のボスを討伐しましょう！`;
-		$gameVariables.setValue(134,
-		`${controlCode}${messageText2}`);
+		const undergroundTunnelName = switchName(257);   // switch 257: 地下坑道
+		setQuestObjective(`${undergroundTunnelName}のボスを討伐しましょう！`);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:347
 	setQuestObjectiveInvestigateNoise = function () {
-		var messageText2 = `中で物音がしましたね。\n何か変化があったのかも知れません。\n行ってみましょう`;
-		$gameVariables.setValue(134,
-		`${messageText2}`);
+		setQuestObjective('中で物音がしましたね。\n何か変化があったのかも知れません。\n行ってみましょう');
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:348
 	setQuestObjectiveFinalBattle = function () {
-		var textPrefix = `最期の決戦です…。\n『尊き契りの間』の`;
-		var controlCode = `\\set[7]`;
-		var textSuffix = `を\n撃破しましょう！`;
-		$gameVariables.setValue(134,
-		`${textPrefix}${controlCode}${textSuffix}`);
+		const setString7 = setString(7);
+		setQuestObjective(`最期の決戦です…。\n『尊き契りの間』の${setString7}を\n撃破しましょう！`);
 	};
 
 	// Replaces (2x): data/CommonEvents.json:common-event:349, data/CommonEvents.json:common-event:350
 	setQuestObjectiveMainQuestComplete = function () {
-		var messageText2 = `何処に行きましょうか？\n（メインクエスト完了）`;
-		$gameVariables.setValue(134,
-		`${messageText2}`);
+		setQuestObjective('何処に行きましょうか？\n（メインクエスト完了）');
 	};
 
+	// Replaces (1x): data/CommonEvents.json:common-event:306
+	setQuestObjectivePrepareInTownAndAdvance = function (interp) {
+		const itemName21 = itemName(21);
+		setQuestObjective(`街で準備を整えて、\n${itemName21}へ向かいましょう！`);
+		setSelfVar(interp, 21, $dataSystem.switches[248]);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:308
+	setQuestObjectiveFightUnavoidableBoss = function (interp) {
+		const itemName21 = itemName(21);
+		setQuestObjective(`戦いは避けられませんね…。\n${itemName21}ボスを討伐しましょう！`);
+		setSelfVar(interp, 21, $dataSystem.switches[248]);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:310
+	setQuestObjectiveGoToCentralPlains = function (interp) {
+		setQuestObjective('中央平原へ行きましょう');
+		setSelfVar(interp, 21, $dataSystem.switches[248]);
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:139:page:1, data/Map003.json:map-event:140:page:1
+	setVariable801Text = function () {
+		setVar(801, '残念だったね？');
+	};
+	/* ============================================================================
+	 * Actors / party / skills / states
+	 * ========================================================================== */
+
 	// Replaces (2x): data/CommonEvents.json:common-event:12, data/CommonEvents.json:common-event:64
-	setCostumeDirectSite = function (interp, newValue) {
-		return (function (newValue) {
-		interp.sVal(19,Number($dataActors[$gameVariables.value(newValue)].meta['MainCloth']));
-		kisekae_tyokusetusitei($gameVariables.value(19),0);
-		}).call(interp, newValue);
+	setCostumeDirectSite = function (interp, actorVariableId) {
+		setSelfVar(interp, 19, Number($dataActors[varValue(actorVariableId)].meta['MainCloth']));
+		kisekae_tyokusetusitei(varValue(19), 0);
 	};
 
 	// Replaces (2x): data/CommonEvents.json:common-event:12
-	setBattleAnimationSpeed = function (battleAnimationSpeed) {
-		ConfigManager.battleAniSpeed = battleAnimationSpeed;
+	setBattleAnimationSpeed = function (speed) {
+		ConfigManager.battleAniSpeed = speed;
 	};
 
-	// Replaces (18x): data/CommonEvents.json:common-event:12, data/CommonEvents.json:common-event:212, data/CommonEvents.json:common-event:295, data/Map007.json:map-event:23:page:1, data/Map035.json:map-event:20:page:1, …
-	assignVariableValueFromArgs = function (variableId, newValue) {
-		$gameVariables.setValue(variableId,newValue);
-	};
+	// Replaces (3x): data/CommonEvents.json:common-event:202
+	// Same body as `setBattleAnimationSpeed` above (right-hand side of common-event:202).
+	setBattleAnimationSpeed2 = setBattleAnimationSpeed;
 
 	// Replaces (2x): data/CommonEvents.json:common-event:13, data/CommonEvents.json:common-event:24
 	clearGotItemInfo = function () {
@@ -4092,57 +4360,603 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 
 	// Replaces (2x): data/CommonEvents.json:common-event:13, data/CommonEvents.json:common-event:22
 	grantTpToListActors = function (interp) {
-		return (function () {
-		var variable248Value = $gameVariables.value(248);
-		variable248Value.forEach(function(id) {
-		var tp2 = getRandomIndex(61) + 40;
-		var actor3 = $gameActors.actor(id);
-		actor3.gainTp(tp2);
-		}, interp);
-		}).call(interp);
+		forEachHeroine(heroineId => {
+			$gameActors.actor(heroineId).gainTp(getRandomIndex(61) + 40);
+		});
 	};
 
-	// Replaces (89x): data/CommonEvents.json:common-event:13, data/CommonEvents.json:common-event:96, data/CommonEvents.json:common-event:270, data/CommonEvents.json:common-event:301, data/CommonEvents.json:common-event:302, data/CommonEvents.json:common-event:303, …
-	runCommonEventAsChild = function (interp, list) {
-		return (function (list) {
-		interp.setupChild($dataCommonEvents[list].list, 0);
-		}).call(interp, list);
+	// Replaces (2x): data/CommonEvents.json:common-event:9, data/Map003.json:map-event:133:page:2
+	returnProfessionBasics = function () {
+		forEachDeployedActor(actorId => Profession_basicReturn(actorId));
 	};
 
-	// Replaces (2x): data/CommonEvents.json:common-event:14
-	setPicture = function (presetIndex) {
-		var tempValue = pic_setArray3;
-		var pictureName2 = tempValue[0];
-		var pictureId2 = tempValue[1];
-		var origin2 = tempValue[presetIndex];
-		valuePicWait2 = tempValue[2] + Math.floor( Math.random() * (tempValue[3] * 2 + 1)) - tempValue[3];
-		pic_set(pictureId2,pictureName2,
-		origin2,valuePicWait2);
+	// Replaces (3x): data/CommonEvents.json:common-event:9, data/CommonEvents.json:common-event:24, data/Map003.json:map-event:131:page:2
+	removeStateFromListActorsVar248And380 = function (interp) {
+		forEachHeroine(heroineId => {
+			$gameActors.actor(heroineId).removeState(39);
+			varValue(380 + heroineId)[58] = 0;
+		});
 	};
 
-	// Replaces (3x): data/CommonEvents.json:common-event:14, data/CommonEvents.json:common-event:17
-	playParallelPictureSeName = function () {
-		var se2 = valueParallelPicSe1;
-		if(se2[0] != 0){
-		  var se3 = getRandomIndex(11) + Number(se2[1]);
-		  var se4 = getRandomIndex(21) + Number(se2[2]);
-		  AudioManager.playSe({"name":se2[0],"volume":se3,"pitch":se4,"pan":0});
-		};
+	// Replaces (2x): data/CommonEvents.json:common-event:19, data/CommonEvents.json:common-event:20
+	removeStateFromListActorsVar75And76 = function (interp) {
+		valueTachieChangeStateTemporary.forEach(stateId => {
+			forEachDeployedActor(actorId => $gameActors.actor(actorId).removeState(stateId));
+		});
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:102
+	removeStateFromListActors = function () {
+		$gameParty.battleMembers().forEach(battleMember => {
+			battleMember.clearParamPlus();
+			battleMember.clearXParamPlus();
+			battleMember.clearSParamPlus();
+			range(486, 489).forEach(stateId => battleMember.removeState(stateId));
+			battleMember.refresh();
+		});
+	};
+
+	// Replaces (1x): data/Map003.json:map-event:3:page:2
+	removeStateFromListActorsActor20 = function () {
+		const actor = $gameActors.actor(20);
+		range(1, $dataStates.length - 1)
+			.filter(stateId => actor.isStateAffected(stateId))
+			.forEach(stateId => actor.removeState(stateId));
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:109, data/CommonEvents.json:common-event:110
+	addStateToActorFromVariable20 = function (stateId) {
+		currentActor().addState(stateId);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:329
+	addStateToActorFromVariable20Actor1 = function () {
+		$gameActors.actor(1).addState(693);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:158
+	addStateToActorFromVariable20Var247And207 = function (interp) {
+		const exposureOverride = varValue(207);   // 101 = 露出縛りなし
+		forEachHeroine(heroineId => {
+			let shouldAddState = exposureOverride === 101;
+			if (!shouldAddState && exposureOverride >= 1 && exposureOverride === varValue(heroineId + 440)[41]) {
+				shouldAddState = true;
+			}
+			const isExposureShort =
+				varValue(heroineId + 380)[4] < varValue(heroineId + 380)[5];
+			if (shouldAddState && isExposureShort && $gameParty.members().contains($gameActors.actor(heroineId))) {
+				$gameActors.actor(heroineId).addState(78);
+			}
+		});
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:9
+	nameWeaponsFromVariable = function (interp, arrayVariableId, sourceVariableId, sourceValue, metaKey, targetVariableId, targetValue) {
+		setSelfVar(interp, arrayVariableId, Array(101).fill(0));
+		range(301, 400).forEach(weaponId => {
+			const weapon = $dataWeapons[weaponId];
+			if (weapon.name !== '') {
+				if (weapon.meta['SubstitutionActorId']) {
+					varValue(sourceVariableId)[weaponId - 300] = sourceValue;
+				}
+				if (weapon.meta[metaKey]) {
+					varValue(targetVariableId)[weaponId - 300] = targetValue;
+				}
+			}
+		});
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:30, data/CommonEvents.json:common-event:64
+	setVariable53 = function (nicknameVariableId, nameVariableId) {
+		setVar(53, actorFromVariable(nicknameVariableId).nickname());
+		setVar(49, actorFromVariable(nameVariableId).name());
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:63, data/CommonEvents.json:common-event:64
+	nameActorFromVariable = function (actorId, nameVariableId) {
+		$gameActors.actor(actorId).setName(varValue(nameVariableId));
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:64
+	refreshCurrentActor = function () {
+		$gameActors.actor(varValue(CURRENT_ACTOR_VAR)).refresh();
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:64
+	addPartyActorVar20 = function () {
+		$gameParty.addActor(varValue(CURRENT_ACTOR_VAR));
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:64
+	addPartyActor = function (actorVariableId) {
+		$gameParty.addActor(varValue(actorVariableId));
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:64
+	teachSkillToActorFromVariable20 = function (skillId) {
+		$gameActors.actor(varValue(CURRENT_ACTOR_VAR)).learnSkill(skillId);
+	};
+
+	// Replaces (8x): data/CommonEvents.json:common-event:30, :64, :104, ...
+	updatePartyRows = function () {
+		$gameParty.updateRows();
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:40
+	applyEvolvedStateToParty = function () {
+		$gameParty.members().forEach(partyMember => {
+			if (partyMember.isStateAffected(61) && !partyMember.isStateAffected(71)) {
+				partyMember.addState(71);
+			}
+		});
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:40
+	configureActorFromVariable2 = function () {
+		// オーバードーズ状態でスイッチオンオフ
+		const OVERDOSE_SKILL_ID = 863;
+		const OVERDOSE_SWITCH_ID = 502;
+		const hasOverdoseSkill = actorFromVariable(2).battleSkillsRaw().includes(OVERDOSE_SKILL_ID);
+		$gameSwitches.setValue(OVERDOSE_SWITCH_ID, hasOverdoseSkill);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:40
+	syncLearnedSkillSwitches = function () {
+		// 主人公性欲度スキルでonoff
+		const hero = actorFromVariable(11);
+		range(1, 10).forEach(actorId => {
+			$gameSwitches.setValue(actorId + 400, hero.isLearnedSkill(actorId + 60));
+		});
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:40
+	autoOffSkillPersonalSwitch = function (interp) {
+		// 習得者不在時に自動でスイッチオフ
+		valuePersonalSkill.forEach(skillId => {
+			if ($dataSkills[skillId].meta.SwicthOnOffUse && !$gameParty.membersLeSkill(skillId)) {
+				skill_personalonoffAutoOff(skillId, 0);
+			}
+		});
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:40
+	autoOffSkillPersonalSwitch2 = function (interp) {
+		// 習得者不在時に自動でスイッチオフ
+		valuePersonalItem.forEach(itemId => {
+			const item = $dataItems[itemId];
+			if (item.meta.SwicthOnOffUse && !$gameParty.hasItem(item, true)) {
+				skill_personalonoffAutoOff(itemId, 1);
+			}
+		});
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:40
+	readVariable75 = function () {
+		// 現在の視点によってスイッチ切り替え
+		const currentViewpointActorId = varValue(11);
+		forEachDeployedActor(actorId => {
+			$gameSwitches.setValue(440 + actorId, actorId === currentViewpointActorId);
+		});
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:102
+	clearPartyStateCounters = function () {
+		$gameParty.members().forEach(partyMember => partyMember.clearStateCounters());
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:102
+	applyStateToParty = function () {
+		const BATTLE_STATE_ID = 82;
+		valueScriptArray1 = Array(11).fill(0);
+		if ($gameParty.membersState(BATTLE_STATE_ID)) {
+			$gameParty.members().forEach((partyMember, memberIndex) => {
+				if (partyMember.isStateAffected(BATTLE_STATE_ID) && partyMember._stateCounter[BATTLE_STATE_ID] >= 0) {
+					valueScriptArray1[memberIndex] = partyMember._stateCounter[BATTLE_STATE_ID];
+				}
+			});
+		}
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:102
+	restoreStateCountersFromScriptArray = function () {
+		const BATTLE_STATE_ID = 82;
+		range(0, valueScriptArray1.length - 1).forEach(memberIndex => {
+			const savedCounter = valueScriptArray1[memberIndex];
+			const partyMember = $gameParty.members()[memberIndex];
+			if (savedCounter >= 1 && partyMember.isStateAffected(BATTLE_STATE_ID)) {
+				partyMember.setStateCounter(BATTLE_STATE_ID, savedCounter);
+			}
+		});
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:102
+	applyStateToParty2 = function (interp) {
+		const battleMembers = $gameParty.battleMembers();
+		valueStateBattleClear.forEach(stateId => {
+			if (!$gameParty.membersState(stateId)) return;
+			battleMembers.forEach(battleMember => {
+				if ($gameParty.members().contains(battleMember) && battleMember.isStateAffected(stateId)) {
+					battleMember.removeStateCounter(stateId);
+				}
+			});
+		});
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:102
+	setValueTotalexp = function () {
+		valueTotalexp = 1;
+		valueTotalgold = 1;
+		valueMaxEnemyLv = 0;
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:102
+	resetStateTraits = function () {
+		range(486, 489).forEach(stateId => {
+			const state = $dataStates[stateId];
+			state.traits = [{ code: 53, dataId: 6, value: 0.1 }];
+		});
+		range(490, 497).forEach(stateId => { $dataStates[stateId].traits = []; });
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:102
+	addStepsFromVariable = function () {
+		$gameParty._steps += varValue(290);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:24, data/Map003.json:map-event:131:page:2
+	resetSkillUseCounts = function () {
+		range(1, $dataSkills.length - 1).forEach(skillId => {
+			const skill = $dataSkills[skillId];
+			if (!skill.meta['Not Recover All Uses']) return;
+			const limitUses = Number(skill.meta['Limit Uses']);
+			forEachDeployedActor(actorId => {
+				$gameActors.actor(actorId).paySkillLimitedUseCost(skillId, -limitUses);
+			});
+		});
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:24, data/Map003.json:map-event:131:page:2
+	resetStateSpAbilities = function () {
+		range(1, $dataStates.length - 1).forEach(stateId => {
+			if ($dataStates[stateId].meta['Category'] === ' StateSPabNomal') {
+				forEachDeployedActor(actorId => $gameActors.actor(actorId).removeState(stateId));
+			}
+		});
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:205
+	configureActorFromVariable11 = function () {
+		const hero = actorFromVariable(11);
+		[772, 773].forEach(skillId => {
+			const maxMasteryLevel = Number($dataSkills[skillId].meta['Max Mastery Level']);
+			if (hero.skillMasteryLevel(skillId) > maxMasteryLevel) {
+				hero.setSkillMasteryLevel(skillId, 5);
+			}
+		});
+	};
+
+	/* ============================================================================
+	 * Ticker / popups
+	 * ========================================================================== */
+
+	// Replaces (4x): data/CommonEvents.json:common-event:42, data/CommonEvents.json:common-event:47
+	showTickerNoPendingScenes = function () {
+		showTicker('未発生のシーンは存在しません。');
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:66
+	showTickerNoEpisodesOnThisMap = function () {
+		showTicker('条件が変動した為、現在このマップで発生する挿話はありません');
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:68
+	showTickerNoQuickSaveInBattleMap = function () {
+		showTicker('戦闘マップではクイックセーブを行なえません');
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:68
+	showTickerNoQuickSaveWhileRecalling = function () {
+		showTicker('回想中はクイックセーブを行なえません');
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:68
+	showTickerQuickSavedToFile51 = function () {
+		showTicker('ファイル５１にクイックセーブしました');
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:68
+	showTickerQuickSavedToLastFile = function () {
+		showTicker('最終使用ファイルにクイックセーブしました');
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:68
+	showTickerQuickSavedToFile1 = function () {
+		showTicker('ファイル１にクイックセーブしました');
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:202
+	showTickerBattleSpeedSetToFastest = function () {
+		showTicker('戦闘速度を最速に変更しました');
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:202
+	showTickerBattleSpeedSetToFast = function () {
+		showTicker('戦闘速度を速いに変更しました');
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:202
+	showTickerBattleSpeedSetToNormal = function () {
+		showTicker('戦闘速度を通常に変更しました');
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:259
+	showTickerVariable801 = function () {
+		const tickerText = variableText(801);   // variable 801: 文字等代入一時変数820まで (the ticker line)
+		showTicker(`${tickerText}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:60
+	showInfoPopup = function () {
+		const fontColor3 = fontColor(3);
+		const talkSet0 = valueTalkSet[0];
+		const fontColor0 = fontColor(0);
+		showCommonInfo(`Tips:${fontColor3}${talkSet0}${fontColor0}を獲得`);
+	};
+
+	// Replaces (1x): data/Map003.json:map-event:3:page:2
+	showInfoPopup2 = function () {
+		showCommonInfo('60 seconds Waiting…');
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:87
+	setValueGraphicsWidth = function (graphicsWidth) {
+		valueGraphicsWidth = graphicsWidth;
+	};
+
+	/* ============================================================================
+	 * Switches driven by game state
+	 * ========================================================================== */
+
+	// Replaces (2x): data/CommonEvents.json:common-event:30, data/CommonEvents.json:common-event:221
+	setSwitch74 = function () {
+		if (!$gameParty.hasItem($dataItems[varValue(240)])) enableSwitch(74);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:37
+	setSwitch516 = function () {
+		// 変数441(= 1+440)の衣装スロット41が 2 のときだけON
+		$gameSwitches.setValue(516, varValue(441)[41] == 2);
+	};
+
+	// Replaces (6x): data/CommonEvents.json:common-event:368, :386, :387, :495, :532, :548
+	setSwitch161 = function () {
+		$gameSwitches.setValue(161, $gameParty.gold() >= 1000000);
+	};
+
+	// Replaces (5x): data/CommonEvents.json:common-event:211, data/CommonEvents.json:common-event:215
+	setSwitch379 = function (interp) {
+		let deployedHeroineCount = 0;
+		forEachHeroine(heroineId => {
+			if ($gameParty.members().contains($gameActors.actor(heroineId))) {
+				enableSwitch(heroineId + 100);
+				deployedHeroineCount += 1;
+			}
+		});
+		if (deployedHeroineCount <= 1) enableSwitch(379);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:199
+	setSwitch380Var19 = function () {
+		const worldMenuEventId = varValue(19);   // variable 19 (scratch): the event the menu opened on
+		disableSwitch(380);
+		if ($gameMap.event(worldMenuEventId).event().meta['WorldMenu']) enableSwitch(380);
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:151:page:1, data/Map003.json:map-event:242:page:1
+	setSwitch380 = function (interp) {
+		disableSwitch(380);
+		const mapId = $gameMap.mapId();
+		if (!$gameSelfSwitches.value([mapId, interp._eventId, 'A'])) enableSwitch(380);
+		if (!$gameSelfSwitches.value([mapId, interp._eventId, 'B'])) enableSwitch(380);
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:133:page:2
+	enableSwitchVar327 = function (switchId) {
+		const weaponSlotRecords = varValue(327);   // variable 327: 拠点アクティベート記録配列 (per-slot activation records)
+		const unlockedWeaponCount = range(1, 100).filter(slotIndex => weaponSlotRecords[slotIndex] >= 1).length;
+		if (unlockedWeaponCount >= 2) enableSwitch(switchId);
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:103, :300, :301
+	enableSwitch = function (switchId) {
+		$gameSwitches.setValue(switchId, true);
+	};
+
+	// Replaces (8x): data/CommonEvents.json:common-event:105, :109, :141, :184, :381, Map007.json:map-event:3:page:1, ...
+	disableSwitch = function (switchId) {
+		$gameSwitches.setValue(switchId, false);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:299
+	// Quest-target movement lock: while the main quest progress (variable 135)
+	// matches an entry of the in-map quest-progress list (variable 173), switch 414
+	// ("movement blocked") is ON — and OFF again when this event's <MQProgress>
+	// note equals that entry, i.e. when this event is the quest target itself.
+	setSwitch414 = function (interp) {
+		const questProgressList = varValue(173);
+		const mainQuestProgress = varValue(135);
+		const currentMapEvent = $gameMap.event(interp._eventId).event();
+		questProgressList.forEach((questProgressId) => {
+			if (mainQuestProgress != questProgressId) return;
+			$gameSwitches.setValue(414, true);
+			if (currentMapEvent.meta['MQProgress'] && Number(currentMapEvent.meta['MQProgress']) == questProgressId) {
+				$gameSwitches.setValue(414, false);
+			}
+		});
+	};
+
+	/* ============================================================================
+	 * Parallel events, common-event helpers and pictures (core)
+	 * ========================================================================== */
+
+	// Replaces (2x): data/CommonEvents.json:common-event:5, data/CommonEvents.json:common-event:192
+	startParallelEvent = function (interp) {
+		if (valueCountSet1 !== 0) event_pararelStarting(1, valueCountSet1, interp._eventId);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:5, data/Map003.json:map-event:133:page:2
+	spawnScreenParticleStatue_orb_c = function (interp) {
+		spawnStatueOrbParticle(interp, -35);
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:233:page:1, data/Map022.json:map-event:9:page:1
+	spawnScreenParticleStatue_orb_c2 = function (interp) {
+		spawnStatueOrbParticle(interp, -35 - 48);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:5, data/CommonEvents.json:common-event:15
+	movePictureKeepingScale = function (opacity, duration) {
+		movePictureRetainingScale(94, 0, opacity, duration);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:15
 	movePictureKeepingScale2 = function () {
-		var pictureId2 = 95;
-		if($gameScreen.picture(pictureId2)){
-		  var origin2 = $gameScreen.picture(pictureId2).origin();
-		  var x4 = $gameScreen.picture(pictureId2).x() - 90;
-		  var y5 = $gameScreen.picture(pictureId2).y();
-		  var scaleX2 = $gameScreen.picture(pictureId2).scaleX();
-		  var scaleY2 = $gameScreen.picture(pictureId2).scaleY();
-		  var opacity2 = $gameScreen.picture(pictureId2).opacity();
-		  $gameScreen.movePicture(pictureId2,origin2,x4,y5,scaleX2,scaleY2,opacity2,0,1);
-		};
+		movePictureRetainingScale(95, -90, null, 1);
 	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:5, data/CommonEvents.json:common-event:87, data/CommonEvents.json:common-event:89
+	spawnScreenParticleSpriteset = function (particleName) {
+		$gameScreen._particle.particleSet(0, particleName, 'screen', 'def', 'spriteset');
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:343
+	// Spawns the monster and the magic-circle particle of a spawned-event slot.
+	// NOTE: the original re-declared `particleName2` for the second particle — the
+	// two names are spelled out here instead.
+	spawnScreenParticleVar292 = function (slotIndex) {
+		const particleValue = spawnedEventId(slotIndex);
+		const monsterParticle = 'monster_c';
+		const magicCircleParticle = 'mahoujin_c';
+		particleSet(particleValue, `${monsterParticle}-${particleValue}`, 'this', monsterParticle);
+		particleSet(particleValue, `${magicCircleParticle}-${particleValue}`, 'this', magicCircleParticle);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:86, data/CommonEvents.json:common-event:245
+	playScreenParticle = function (particleName, particleDefinitionName, particleDefinition) {
+		particlePlay(0, particleName, particleDefinitionName, 'def', particleDefinition);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:87
+	updateScreenParticle = function () {
+		particleUpdate(['hStates_bodyShine1', 'emitterLifetime', 1]);
+		particleClear('hStates_bodyShine1');
+	};
+
+	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:33:page:1
+	clearScreenParticleAll = function () {
+		particleClear('all');
+	};
+
+	// Replaces (2x): data/Map007.json:map-event:4:page:1
+	particleEditParticle = function (particleName) {
+		$gameScreen._particle.particleEdit(0, particleName, 'picture:57', 'def', 'above');
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:20:page:1, data/Map003.json:map-event:133:page:2
+	clearScreenParticle = function (interp, particleName) {
+		particleClear(`${particleName}-${interp._eventId}`);
+	};
+
+	// Replaces (14x): data/CommonEvents.json:common-event:5, :23, :42, :65, :87, :89, ...
+	hideWindow = function (windowId) {
+		WindowManager.hide(windowId);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:66, data/CommonEvents.json:common-event:87
+	hideWindow2 = function () {
+		[1, 2, 3].forEach(windowId => WindowManager.hide(windowId));
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:175, data/CommonEvents.json:common-event:180
+	hideWindow3 = function () {
+		[1, 2].forEach(windowId => WindowManager.hide(windowId));
+	};
+
+	// Replaces (9x): data/CommonEvents.json:common-event:87, :166, :203, :238, :239, :241, ...
+	hideAllWindows = function () {
+		WindowManager.hideAll();
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:5, data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
+	setSelfVariable21 = function (interp) {
+		// NOTE: `arr` is the shared pool in global scope, and variable 21 holds the
+		//       *same array reference*.  The trailing reset is kept verbatim — an
+		//       array is never == 0, so it is dead code in the original as well.
+		const pickedCharacterId = arr[getRandomIndex(arr.length)];
+		const pickedIndex = arr.findIndex(poolId => poolId === pickedCharacterId);
+		if (pickedIndex >= 0) arr.splice(pickedIndex, 1);
+		setSelfVar(interp, 21, arr);
+		if (arr == 0) arr = [1, 2, 3, 4, 5];
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:5
+	eraseNpcEvents = function () {
+		eraseEventsWithMetaKeys(['NPC', '動物', 'Encounter Direction Lock']);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:37
+	eraseNpcEvents2 = function () {
+		eraseEventsWithMetaKeys(['NPC', 'Animal', 'Encounter Direction Lock']);
+	};
+
+	/* ============================================================================
+	 * Messages / windows
+	 * ========================================================================== */
+
+	// Replaces (2x): data/CommonEvents.json:common-event:87
+	appendMessageTextVar20 = function (interp) {
+		$gameMessage.newPage();
+		const actorProfile = currentActor().profile();
+		$gameMessage.add(`${instantText()}${actorProfile}`);
+		interp.setWaitMode('message');
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:87
+	appendMessageTextVar20_2 = function (interp) {
+		$gameMessage.newPage();
+		const textSpeed0 = textSpeed(0);
+		const actorProfile = currentActor().profile();
+		$gameMessage.add(`${textSpeed0}${actorProfile}`);
+		interp.setWaitMode('message');
+	};
+
+	// Replaces (8x): data/CommonEvents.json:common-event:401, :414, :444, ...
+	setMessageRowCount = function (rowCount) {
+		$gameMessage.setMessageRow(rowCount);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:23
+	drawWindowText = function () {
+		const fontSize22 = fontSize(22);
+		const endOfDayInfoText = variableText(539);   // variable 539: 一日終了時情報表示文字列変数
+		WindowManager.drawText(1, `${fontSize22}${endOfDayInfoText}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:23
+	drawWindowText2 = function () {
+		const fontSize28 = fontSize(28);
+		const endOfDayInfoText = variableText(539);   // variable 539: 一日終了時情報表示文字列変数
+		WindowManager.drawText(1, `${fontSize28}${endOfDayInfoText}`);
+	};
+
+	// Replaces (1x): data/Map003.json:map-event:161:page:1
+	drawWindowText3 = function () {
+		WindowManager.drawText(0, '');
+	};
+
+	/* ============================================================================
+	 * System / misc
+	 * ========================================================================== */
 
 	// Replaces (2x): data/CommonEvents.json:common-event:16, data/CommonEvents.json:common-event:205
 	refreshPlayer = function () {
@@ -4150,205 +4964,26 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		$gameMap.requestRefresh();
 	};
 
-	// Replaces (2x): data/CommonEvents.json:common-event:17
-	waitRandomPictureDelay = function (interp) {
-		return (function () {
-		if(valuePicWait >= 1){
-		  var waitFrames = getRandomIndex(3);
-		  interp.wait(valuePicWait + waitFrames);
-		};
-		}).call(interp);
+	// Replaces (1x): data/CommonEvents.json:common-event:161
+	refreshPlayer2 = function () {
+		$gamePlayer.refresh();
 	};
 
-	// Replaces (2x): data/CommonEvents.json:common-event:17
-	slidePictureInFromRightAndWait = function (interp, duration, waitFrames) {
-		return (function (duration, waitFrames) {
-		var pictureId2 = 53;
-		$gameScreen.movePicture(pictureId2+2,1,640+50-128,384,100,100,240,0,duration);
-		interp.wait(waitFrames);
-		}).call(interp, duration, waitFrames);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:17
-	slidePictureInFromLeftAndWait = function (interp, duration, waitFrames) {
-		return (function (duration, waitFrames) {
-		var pictureId2 = 53;
-		$gameScreen.movePicture(pictureId2+2,1,640-50-128,384,100,100,240,0,duration);
-		interp.wait(waitFrames);
-		}).call(interp, duration, waitFrames);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:18, data/CommonEvents.json:common-event:53
-	initWeaponSlotVariableArrays = function () {
-		for(var loopIndex = 541; loopIndex <= 560; loopIndex++){$gameVariables.setValue(loopIndex,Array(43).fill(0))};
-	};
-
-	// Replaces (7x): data/CommonEvents.json:common-event:18, data/CommonEvents.json:common-event:66, data/CommonEvents.json:common-event:67, data/CommonEvents.json:common-event:110, data/CommonEvents.json:common-event:212, data/Map005.json:map-event:2:page:1, …
-	showAndMovePicturePairFromArgs = function (numericValue, textValue, scaleX, scaleY, opacity, scaleX2, scaleY2, opacity2, duration) {
-		var pictureId2 = numericValue;
-		var pictureName2 = textValue;
-		$gameScreen.showPicture(pictureId2,pictureName2,1,640,384,scaleX,scaleY,opacity,0);
-		$gameScreen.movePicture(pictureId2,1,640,384,scaleX2,scaleY2,opacity2,0,duration);
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:19, data/CommonEvents.json:common-event:20, data/Map005.json:map-event:2:page:1
-	moveTwoPicturesFromArgs = function (numericValue, scaleY, duration, numericValue2, scaleY2, duration2) {
-		var pictureId2 = numericValue;
-		$gameScreen.movePicture(pictureId2,1,640,384,100,scaleY,0,0,duration);
-		var pictureId2 = numericValue2;
-		$gameScreen.movePicture(pictureId2,1,640,384,100,scaleY2,0,0,duration2);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:19, data/CommonEvents.json:common-event:20
-	removeStateFromListActorsVar75And76 = function (interp) {
-		return (function () {
-		var tachieChangeStateTemporary = valueTachieChangeStateTemporary;
-		tachieChangeStateTemporary.forEach(function(id1) {
-		  var variable75Value = $gameVariables.value(75);
-		  var variable76Value = $gameVariables.value(76);
-		    for (var loopIndex = variable75Value; loopIndex <= variable76Value; loopIndex++) {
-		      $gameActors.actor(loopIndex).removeState(id1);
-		    };
-		}, interp);
-		}).call(interp);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:19, data/CommonEvents.json:common-event:20
-	configureStandingPicture2Var247And20 = function (interp) {
-		return (function () {
-		var variable247Value = $gameVariables.value(247);
-		variable247Value.forEach(function(id) {
-		  var actor3 = $gameActors.actor(id);
-		    if($gameParty.members().contains(actor3)){
-		      var rangeStart2 = 0; var rangeEnd2 = 42;
-		        for (var slotIndex2 = rangeStart2; slotIndex2 <= rangeEnd2; slotIndex2++) {
-		          $gameVariables.value(id+440)[slotIndex2] = $gameVariables.value(id+540)[slotIndex2]
-		        };
-		        $gameVariables.setValue(20,id);
-		        tachie_settei2();
-		}}, interp);
-		}).call(interp);
-	};
-
-	// Replaces (4x): data/CommonEvents.json:common-event:21, data/CommonEvents.json:common-event:173, data/CommonEvents.json:common-event:183, data/Map003.json:map-event:83:page:1
-	fadePicture1Pic98 = function (textValue) {
-		var pictureId2 = 100;
-		var pictureName2 = 'ScreenFoundationChoice';
-		$gameScreen.showPicture(pictureId2,pictureName2,0,0,0+300,100,100,0,0);
-		$gameScreen.movePicture(pictureId2,0,0,0,100,100,255,0,120);
-		var pictureId2 = 99;
-		var pictureName2 = textValue;
-		$gameScreen.showPicture(pictureId2,pictureName2,0,300+20,0,200,200,0,0);
-		$gameScreen.movePicture(pictureId2,0,300,0,200,200,255,0,120);
-		$gameScreen.showPicture(98,'ScreenBlackOut',1,640,384,100,100,150,0);
-		picture_fade1(98,"fadeIn",valueWipeImg,60,5);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:21, data/Map003.json:map-event:75:page:1
-	eraseTwoPictures = function (pictureId, pictureId2) {
-		$gameScreen.erasePicture(pictureId);
-		$gameScreen.erasePicture(pictureId2);
-	};
-
-	// Replaces (14x): data/CommonEvents.json:common-event:21, data/CommonEvents.json:common-event:111, data/CommonEvents.json:common-event:112, data/CommonEvents.json:common-event:167, data/CommonEvents.json:common-event:173, data/CommonEvents.json:common-event:183, …
-	erasePictureRange = function (rangeStart, rangeEnd) {
-		for (var loopIndex = rangeStart; loopIndex <= rangeEnd; loopIndex++) {$gameScreen.erasePicture(loopIndex)};
+	// Replaces (2x): data/Map003.json:map-event:3:page:2, data/Map003.json:map-event:16:page:1
+	refreshMinimapCache = function () {
+		$gameMap.refreshMinimapCache();
 	};
 
 	// Replaces (2x): data/CommonEvents.json:common-event:22, data/CommonEvents.json:common-event:23
 	clearJuseiFlag = function () {
-		//受精してるキャラ以外の受精相手記録を消滅
+		// 受精してるキャラ以外の受精相手記録を消滅
 		jusei_clear();
 	};
 
-	// Replaces (1x): data/CommonEvents.json:common-event:22
-	setSelfVariable539Var540 = function (interp) {
-		var variableCode = `\\V[49]`;
-		var messageText2 = `は傷付いた身体を休めた…。\n`;
-		return (function () {
-		interp.sVal(539,`${variableCode}${messageText2}`);
-		interp.sVal(540,$gameVariables.value(540) + 1);
-		}).call(interp);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:83
-	setSelfVariable539Var540_2 = function (interp) {
-		var textPrefix = `は`;
-		var colorCode4 = `\\C[27]`;
-		var textPart2 = `発情`;
-		var colorResetCode = `\\C[0]`;
-		var textSuffix = `した肢体を慰めている…。\n`;
-		return (function () {
-		interp.sVal(539,`${actor.name()}${textPrefix}${colorCode4}${textPart2}${colorResetCode}${textSuffix}`);
-		interp.sVal(540,$gameVariables.value(540) + 1);
-		}).call(interp);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:83
-	setSelfVariable539Var540_3 = function (interp) {
-		var textPrefix = `は`;
-		var colorCode4 = `\\C[27]`;
-		var textPart2 = `発情`;
-		var colorResetCode = `\\C[0]`;
-		var textSuffix = `した肢体を持て余している…。\n`;
-		return (function () {
-		interp.sVal(539,`${actor.name()}${textPrefix}${colorCode4}${textPart2}${colorResetCode}${textSuffix}`);
-		interp.sVal(540,$gameVariables.value(540) + 1);
-		}).call(interp);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:23
-	drawWindowText = function () {
-		var controlCode = `\\fs[22]`;
-		var variableCode = `\\V[539]`;
-		WindowManager.drawText(1, `${controlCode}${variableCode}`);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:23
-	drawWindowText2 = function () {
-		var controlCode = `\\fs[28]`;
-		var variableCode = `\\V[539]`;
-		WindowManager.drawText(1, `${controlCode}${variableCode}`);
-	};
-
-	// Replaces (1x): data/Map003.json:map-event:161:page:1
-	drawWindowText3 = function () {
-		WindowManager.drawText(0, ``);
-	};
-
-	// Replaces (4x): data/CommonEvents.json:common-event:23, data/CommonEvents.json:common-event:25, data/CommonEvents.json:common-event:30, data/CommonEvents.json:common-event:54
-	setPlayerPosition2 = function (variableId, newValue, newValue2, newValue3, x) {
-		$gameVariables.setValue(variableId,[newValue,newValue2,newValue3]);
-		set_playerPosition2(x);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:24, data/Map003.json:map-event:131:page:2
-	resetSkillUseCounts = function () {
-		var rangeStart2 = 1;
-		var databaseEntries2 = $dataSkills.length-1;
-		for (var skillId2 = rangeStart2; skillId2 <= databaseEntries2; skillId2++) {
-		  if($dataSkills[skillId2].meta['Not Recover All Uses']){
-		      for (var loopIndex = $gameVariables.value(75); loopIndex <= $gameVariables.value(76); loopIndex++) {
-		        var databaseEntries3 = Number($dataSkills[skillId2].meta['Limit Uses']);
-		        $gameActors.actor(loopIndex).paySkillLimitedUseCost(skillId2, -databaseEntries3);
-		      };
-		  };
-		};
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:24, data/Map003.json:map-event:131:page:2
-	resetStateSpAbilities = function () {
-		var rangeStart2 = 1;
-		var databaseEntries2 = $dataStates.length-1;
-		for (var stateId2 = rangeStart2; stateId2 <= databaseEntries2; stateId2++) {
-		  if($dataStates[stateId2].meta['Category']){
-		    if($dataStates[stateId2].meta['Category'] === ' StateSPabNomal'){
-		      for (var loopIndex = $gameVariables.value(75); loopIndex <= $gameVariables.value(76); loopIndex++) {
-		        $gameActors.actor(loopIndex).removeState(stateId2);
-		      };
-		    };
-		  };
-		};
+	// Replaces (2x): data/CommonEvents.json:common-event:23, data/CommonEvents.json:common-event:25, :30, :54
+	setPlayerPosition2 = function (variableId, mapId, x, y, eventId) {
+		setVar(variableId, [mapId, x, y]);
+		set_playerPosition2(eventId);
 	};
 
 	// Replaces (5x): data/CommonEvents.json:common-event:29, data/CommonEvents.json:common-event:40
@@ -4357,741 +4992,351 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	};
 
 	// Replaces (2x): data/CommonEvents.json:common-event:29, data/CommonEvents.json:common-event:30
-	setVariable71Var185_2 = function (newValue, newValue2) {
-		$gameVariables.setValue(71,newValue);//ティッカー。計算式で使うため
-		$gameVariables.setValue(185,newValue2);//TickerＹ軸変更
+	setVariable71Var185_2 = function (tickerFrames, tickerYOffset) {
+		setTickerDisplayTime(tickerFrames, tickerYOffset);
 	};
 
-	// Replaces (8x): data/CommonEvents.json:common-event:30, data/CommonEvents.json:common-event:64, data/CommonEvents.json:common-event:104, …
-	updatePartyRows = function () {
-		$gameParty.updateRows();
+	// Replaces (1x): data/CommonEvents.json:common-event:77, data/CommonEvents.json:common-event:78
+	readVariable706 = function (interp, randomRange) {
+		const baseWait = varValue(706)[3];
+		interp.wait(getRandomIndex(randomRange) + baseWait - 30);
 	};
 
-	// Replaces (6x): data/CommonEvents.json:common-event:30, data/CommonEvents.json:common-event:64
-	setVariable53 = function (newValue, newValue2) {
-		$gameVariables.setValue(53,$gameActors.actor($gameVariables.value(newValue)).nickname());
-		$gameVariables.setValue(49,$gameActors.actor($gameVariables.value(newValue2)).name());
+	// Replaces (2x): data/CommonEvents.json:common-event:78
+	waitFrames = function (interp, frameCount) {
+		interp.wait(frameCount);
 	};
 
-	// Replaces (2x): data/CommonEvents.json:common-event:30, data/CommonEvents.json:common-event:221
-	setSwitch74 = function () {
-		if(!$gameParty.hasItem($dataItems[$gameVariables.value(240)])){
-		  $gameSwitches.setValue(74,true);
-		};
+	// Replaces (4x): data/CommonEvents.json:common-event:301
+	respawnMapNpc = function (npcSlotId) {
+		range(1, 5).forEach(() => {
+			setVar(33, 'BB_akunin');
+			setVar(35, 3);
+			setVar(37, getRandomIndex(3) + 2);
+			setVar(34, getRandomIndex(2) + 4);
+			map_npcRespawn(1, npcSlotId);
+		});
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:139:page:1, data/Map003.json:map-event:140:page:1
+	readVariable69 = function () {
+		const coinAmountText = varValue(69).toLocaleString();   // variable 69 (scratch): coin count
+		const coinText = `Coin: ${coinAmountText}枚`;
+		$gameScreen.setDTextPicture(coinText, 28);
+		$gameScreen.dWindowFrame = 'ON';
+		showPic(99, '', 640 + 50, 50, 100, 100, 0, 1);
+		movePic(99, 640, 50, 100, 100, 255, 60, 1);
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:139:page:1, data/Map003.json:map-event:140:page:1
+	showDiceBackground = function () {
+		showPic(98, '/img/dice/background', 640 + 50, 384, 100, 100, 0, 1);
+		movePic(98, 640, 384, 100, 100, 255, 30, 1);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:37
 	noop = function () {
-		//original_autoEventFlag();
+		// original_autoEventFlag();
+	};
+	/* ============================================================================
+	 * Talk layouts, cut-ins, child interpreters
+	 * ========================================================================== */
+
+	// Replaces (2x): data/CommonEvents.json:common-event:14
+	setPicture = function (presetIndex) {
+		const presetValues = pic_setArray3;
+		valuePicWait2 = presetValues[2] + Math.floor(Math.random() * (presetValues[3] * 2 + 1)) - presetValues[3];
+		pic_set(presetValues[1], presetValues[0], presetValues[presetIndex], valuePicWait2);
 	};
 
-	// Replaces (1x): data/CommonEvents.json:common-event:37
-	setSwitch516 = function () {
-		if($gameVariables.value(1+440)[41] == 2){
-		  $gameSwitches.setValue(516,true);
-		} else {
-		  $gameSwitches.setValue(516,false);
-		};
+	// Replaces (3x): data/CommonEvents.json:common-event:14, data/CommonEvents.json:common-event:17
+	playParallelPictureSeName = function () {
+		const [seName, minVolume, minPitch] = valueParallelPicSe1;
+		if (seName != 0) {
+			AudioManager.playSe({
+				name: seName,
+				volume: getRandomIndex(11) + Number(minVolume),
+				pitch: getRandomIndex(21) + Number(minPitch),
+				pan: 0,
+			});
+		}
 	};
 
-	// Replaces (1x): data/CommonEvents.json:common-event:40
-	applyEvolvedStateToParty = function () {
-		for (var memberIndex = 0; memberIndex < $gameParty.members().length; memberIndex++) {
-		  if ($gameParty.members()[memberIndex].isStateAffected(61) && !$gameParty.members()[memberIndex].isStateAffected(71)) {
-		    $gameParty.members()[memberIndex].addState(71);
-		}};
+	// Replaces (2x): data/CommonEvents.json:common-event:17
+	waitRandomPictureDelay = function (interp) {
+		if (valuePicWait >= 1) interp.wait(valuePicWait + getRandomIndex(3));
 	};
 
-	// Replaces (1x): data/CommonEvents.json:common-event:40
-	configureActorFromVariable2 = function () {
-		//オーバードーズ状態でスイッチオンオフ
-		var variable2Value = $gameActors.actor($gameVariables.value(2));
-		var constantValue = 863;
-		var switchId2 = 502;
-		if(variable2Value.battleSkillsRaw().includes(constantValue)){
-		$gameSwitches.setValue(switchId2,true);
-		} else {
-		$gameSwitches.setValue(switchId2,false);
-		};
+	// Replaces (2x): data/CommonEvents.json:common-event:17
+	slidePictureInFromRightAndWait = function (interp, duration, waitFrames) {
+		const SLIDE_PICTURE_ID = 55;   // 53 + 2
+		movePic(SLIDE_PICTURE_ID, 640 + 50 - 128, 384, 100, 100, 240, duration, 1);
+		interp.wait(waitFrames);
 	};
 
-	// Replaces (1x): data/CommonEvents.json:common-event:40
-	syncLearnedSkillSwitches = function () {
-		//主人公性欲度スキルでonoff
-		var variable11Value = $gameActors.actor($gameVariables.value(11));
-		var rangeStart2 = 1;
-		var rangeEnd2 = 10;
-		for (var actorId3 = rangeStart2; actorId3 <= rangeEnd2; actorId3++) {
-		if(variable11Value.isLearnedSkill(actorId3 + 60)){
-		$gameSwitches.setValue(actorId3 + 400,true);
-		} else {
-		$gameSwitches.setValue(actorId3 + 400,false);
-		}};
+	// Replaces (2x): data/CommonEvents.json:common-event:17
+	slidePictureInFromLeftAndWait = function (interp, duration, waitFrames) {
+		const SLIDE_PICTURE_ID = 55;   // 53 + 2
+		movePic(SLIDE_PICTURE_ID, 640 - 50 - 128, 384, 100, 100, 240, duration, 1);
+		interp.wait(waitFrames);
 	};
 
-	// Replaces (1x): data/CommonEvents.json:common-event:40
-	autoOffSkillPersonalSwitch = function (interp) {
-		return (function () {
-		//習得者不在時に自動でスイッチオフ
-		var personalSkill = valuePersonalSkill;
-		personalSkill.forEach(function(id) {
-		  if($dataSkills[id].meta.SwicthOnOffUse){
-		    if($gameParty.membersLeSkill(id)){}else{
-		      skill_personalonoffAutoOff(id,0);
-		  }};
-		}, interp);
-		}).call(interp);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:40
-	autoOffSkillPersonalSwitch2 = function (interp) {
-		return (function () {
-		//習得者不在時に自動でスイッチオフ
-		var personalItem = valuePersonalItem;
-		personalItem.forEach(function(id) {
-		  if($dataItems[id].meta.SwicthOnOffUse){
-		    if(!$gameParty.hasItem($dataItems[id],true)){
-		      skill_personalonoffAutoOff(id,1);
-		  }};
-		}, interp);
-		}).call(interp);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:40
-	readVariable75 = function () {
-		//現在の視点によってスイッチ切り替え
-		var variable75Value = $gameVariables.value(75);
-		var variable76Value = $gameVariables.value(76);
-		for (var loopIndex = variable75Value; loopIndex <= variable76Value; loopIndex++) {
-		  $gameSwitches.setValue(440 + loopIndex,false);
-		  if($gameVariables.value(11) == loopIndex){
-		    $gameSwitches.setValue(440 + loopIndex,true);
-		  };
-		};
-	};
-
-	// Replaces (4x): data/CommonEvents.json:common-event:42, data/CommonEvents.json:common-event:47
-	showTickerNoPendingScenes = function () {
-		var messageText2 = `未発生のシーンは存在しません。`;
-		TickerManager.show(`${messageText2}`);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:66
-	showTickerNoEpisodesOnThisMap = function () {
-		var messageText2 = `条件が変動した為、現在このマップで発生する挿話はありません`;
-		TickerManager.show(`${messageText2}`);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:68
-	showTickerNoQuickSaveInBattleMap = function () {
-		var messageText2 = `戦闘マップではクイックセーブを行なえません`;
-		TickerManager.show(`${messageText2}`);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:68
-	showTickerNoQuickSaveWhileRecalling = function () {
-		var messageText2 = `回想中はクイックセーブを行なえません`;
-		TickerManager.show(`${messageText2}`);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:68
-	showTickerQuickSavedToFile51 = function () {
-		var messageText2 = `ファイル５１にクイックセーブしました`;
-		TickerManager.show(`${messageText2}`);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:68
-	showTickerQuickSavedToLastFile = function () {
-		var messageText2 = `最終使用ファイルにクイックセーブしました`;
-		TickerManager.show(`${messageText2}`);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:68
-	showTickerQuickSavedToFile1 = function () {
-		var messageText2 = `ファイル１にクイックセーブしました`;
-		TickerManager.show(`${messageText2}`);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:202
-	showTickerBattleSpeedSetToFastest = function () {
-		var messageText2 = `戦闘速度を最速に変更しました`;
-		TickerManager.show(`${messageText2}`);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:202
-	showTickerBattleSpeedSetToFast = function () {
-		var messageText2 = `戦闘速度を速いに変更しました`;
-		TickerManager.show(`${messageText2}`);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:202
-	showTickerBattleSpeedSetToNormal = function () {
-		var messageText2 = `戦闘速度を通常に変更しました`;
-		TickerManager.show(`${messageText2}`);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:259
-	showTickerVariable801 = function () {
-		var variableCode = `\\V[801]`;
-		TickerManager.show(`${variableCode}`);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:44, data/CommonEvents.json:common-event:45
-	movePicture1 = function () {
-		for (var loopIndex = 51; loopIndex <= 60; loopIndex++) {
-		  pic_move1(loopIndex,-100,0,100,100,0,60);
-		};
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:44, data/CommonEvents.json:common-event:45
-	setValueWordSetEx = function () {
-		valueWordSetEx = 0;
-	};
-
-	// Replaces (8x): data/CommonEvents.json:common-event:47, data/CommonEvents.json:common-event:166, data/CommonEvents.json:common-event:173, data/CommonEvents.json:common-event:174, data/CommonEvents.json:common-event:176, data/CommonEvents.json:common-event:183, …
-	disableVisualNovelChoices = function () {
-		$gameSystem.vnChoices = false;
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:47, data/CommonEvents.json:common-event:87
-	erasePictureP = function (rangeStart, rangeEnd, eraseStyleId) {
-		for (var loopIndex = rangeStart; loopIndex <= rangeEnd; loopIndex++) {pic_eraseP(eraseStyleId,[loopIndex])};
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:49
-	dropCachedMapData = function () {
-		delete window.$dataMap2;
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:52
-	logDebugValue = function (textValue, numericValue, textValue2) {
-		var textValue3 = textValue;
-		var databaseEntries2 = $dataItems;var tempValue = databaseEntries2.length-1;
-		var loopIndex = 1;
-		for(var loopIndex2 = 1; loopIndex2 <= tempValue; loopIndex2++){
-		  for(var constantValue = 1; constantValue <= 9; constantValue++){
-		    if(databaseEntries2[loopIndex2].meta[textValue3+constantValue]){
-		      var pictureName2 = databaseEntries2[loopIndex2].meta[textValue3+constantValue].split(',')[numericValue];
-		      var pictureName2 = textValue2 + pictureName2;
-		      console.log(`${loopIndex2}  ${pictureName2}`);
-		      $gameScreen.showPicture(loopIndex,pictureName2,1,640-128,384,100,100,255,0);
-		      loopIndex += 1;
-		}}};
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:52
-	logDebugValue2 = function (textValue) {
-		var textValue2 = textValue;
-		var databaseEntries2 = $dataWeapons;var tempValue = databaseEntries2.length-1;
-		var loopIndex = 1;
-		for(var loopIndex2 = 1; loopIndex2 <= tempValue; loopIndex2++){
-		  if(databaseEntries2[loopIndex2].meta[textValue2]){
-		    var pictureName2 = databaseEntries2[loopIndex2].meta[textValue2].split(',')[0];
-		      var pictureName2 = '/img/parallaxes/' + pictureName2;
-		      console.log(`${loopIndex2}  ${pictureName2}`);
-		    $gameScreen.showPicture(loopIndex,pictureName2,1,640-128,384,100,100,255,0);
-		    loopIndex += 1;
-		}};
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:52
-	playItemMusicFromMetaName = function (textValue) {
-		var textValue2 = textValue;
-		var databaseEntries2 = $dataItems;var tempValue = databaseEntries2.length-1;
-		var loopIndex = 1;
-		for(var loopIndex2 = 1; loopIndex2 <= tempValue; loopIndex2++){
-		  if(databaseEntries2[loopIndex2].meta[textValue2]){
-		    var bgm2 = databaseEntries2[loopIndex2].meta[textValue2].split(',')[0];
-		    if(bgm2 != 'NoMusic'){
-		      console.log(`${loopIndex2}  ${bgm2}`);
-		    AudioManager.playBgm({"name":bgm2,"volume":100,"pitch":100,"pan":0});
-		    loopIndex += 1;
-		}}};
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:52
-	playItemMusicFromMetaName2 = function (textValue) {
-		var textValue2 = textValue;
-		var databaseEntries2 = $dataWeapons;var tempValue = databaseEntries2.length-1;
-		var loopIndex = 1;
-		for(var loopIndex2 = 1; loopIndex2 <= tempValue; loopIndex2++){
-		  if(databaseEntries2[loopIndex2].meta[textValue2]){
-		    var bgm2 = databaseEntries2[loopIndex2].meta[textValue2].split(',')[0];
-		    if(bgm2 != 'NoMusic'){
-		      console.log(`${loopIndex2}  ${bgm2}`);
-		    AudioManager.playBgm({"name":bgm2,"volume":100,"pitch":100,"pan":0});
-		    loopIndex += 1;
-		}}};
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:53, data/Map007.json:map-event:2:page:1
-	pickRandomIndexes = function () {
-		//ｱｸﾀｰID,ﾋﾟｸﾁｬ,H相手(301ﾓﾌﾞ305対象なし306アイテム),非表示,簡易,過去シーンか否か
-		//var arr = [1,2,3,4,5];$gameVariables.setValue(401,arr[getRandomIndex(arr.length)]);
-		//this.sVal(506,`\\V[94]は\\V[22]に情報の対価としてセクハラされた…。`);
-		//this.sVal(506,`\\V[94]はモブにセクハラされた…。`);
-		
-		i1 = getRandomIndex(3) + 100;
-		var presetValues = [1,2,3,4,5];
-		i2 = presetValues[getRandomIndex(presetValues.length)];
-		//var value3 = $gameTroop.aliveMembers().length;
-	};
-
-	// Replaces (4x): data/CommonEvents.json:common-event:53
-	logVariableValue = function (variableId) {
-		console.log($gameVariables.value(variableId));
-	};
-
-	// Replaces (4x): data/CommonEvents.json:common-event:53, data/Map007.json:map-event:7:page:1
-	gainItem = function (rangeStart, rangeEnd) {
-		for(var itemId2 = rangeStart; itemId2 <= rangeEnd; itemId2++){
-		if (!$dataItems[itemId2].name == '') {
-		$gameParty.gainItem($dataItems[itemId2], 15);
-		}};
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:53, data/Map003.json:map-event:3:page:1
-	logDebugValueActor20 = function () {
-		console.log($gameActors.actor(20));
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:53, data/CommonEvents.json:common-event:199
-	logDebugValue3 = function (textValue) {
-		console.log(textValue);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:54, data/CommonEvents.json:common-event:301
-	blackOutScreenAndFadeScreenBlackOut = function () {
-		valuePic1 = 101;
-		var pictureName2 = 'ScreenBlackOut';
-		$gameScreen.showPicture(valuePic1,pictureName2,1,640,384,100,100,255,0);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:59, data/CommonEvents.json:common-event:60
+	// Replaces (1x): data/CommonEvents.json:common-event:60
 	setValueTalkSet = function () {
 		valueTalkSet = 0;
 		valueTalkarr1 = [];
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:60
-	showInfoPopup = function () {
-		var textPrefix = `Tips:`;
-		var colorCode4 = `\\C[3]`;
-		var colorResetCode = `\\C[0]`;
-		var textSuffix = `を獲得`;
-		  var text3 = `${textPrefix}${colorCode4}${valueTalkSet[0]}${colorResetCode}${textSuffix}`;
-		  CommonPopupManager.showInfo({},text3,null);
-	};
-
-	// Replaces (1x): data/Map003.json:map-event:3:page:2
-	showInfoPopup2 = function () {
-		var text3 = `60 seconds Waiting…`;
-		CommonPopupManager.showInfo({},text3,null);
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:60
-	configurePictureEasing = function () {
-		var easingValue = 'easeOutQuad';//通常顔グラ演出
-		picture_easingConfiguration(easingValue);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:60, data/Map007.json:map-event:4:page:1
-	configurePictureEasing2 = function (textValue) {
-		var easingValue = textValue;
-		picture_easingConfiguration(easingValue);
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:60
-	setPictureLocationAndMovePicture1 = function (stateId, argument2, stateId2) {
-		var actorId3 = valueTalkSet;
-		var actor3 = $gameActors.actor(actorId3[1]);
-		if(actorId3[0] == 1){actor3.addState(stateId)};
-		if(actorId3[0] == 2){pic_locationSet(91,92,"/img/talkface/" + actorId3[1] + argument2,60,0)};
-		if(actorId3[0] == 0){
-		  actor3.removeState(stateId2);
-		  pic_move1(92,0,0,100,100,0,120);
-		};
+	setPictureLocationAndMovePicture1 = function (stateId, facePathSuffix, removeStateId) {
+		const talkParams = valueTalkSet;
+		const talkActor = $gameActors.actor(talkParams[1]);
+		if (talkParams[0] == 1) talkActor.addState(stateId);
+		if (talkParams[0] == 2) pic_locationSet(91, 92, `/img/talkface/${talkParams[1]}${facePathSuffix}`, 60, 0);
+		if (talkParams[0] == 0) {
+			talkActor.removeState(removeStateId);
+			pic_move1(92, 0, 0, 100, 100, 0, 120);
+		}
 	};
 
 	// Replaces (2x): data/CommonEvents.json:common-event:60
 	fadePicture1Pic101 = function () {
-		var pictureName2 = 'ScreenBlackOut';
-		$gameScreen.showPicture(101,pictureName2,1,640,384,100,100,valueTalkSet[3],0);
-		picture_fade1(101,"fadeIn",valueWipeImg,60,5);
+		showScreenBlackOut(101, valueTalkSet[3]);
+		picture_fade1(101, 'fadeIn', valueWipeImg, 60, 5);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:60
+	configurePictureEasing = function () {
+		picture_easingConfiguration('easeOutQuad');   // 通常顔グラ演出
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:60, data/Map007.json:map-event:4:page:1
+	configurePictureEasing2 = function (easingType) {
+		picture_easingConfiguration(easingType);
+	};
+
+	// Replaces (1x): data/Map003.json:map-event:3:page:1
+	configurePictureEasing3 = function () {
+		picture_easingConfiguration('easeOutQuad');
+	};
+
+	// Replaces (2x): data/Map007.json:map-event:4:page:1
+	configurePictureEasingEaseInOutQuad = function () {
+		picture_easingConfiguration('easeInOutQuad');
 	};
 
 	// Replaces (2x): data/CommonEvents.json:common-event:61, data/CommonEvents.json:common-event:62
-	setupChildInterpreterVar131 = function (interp, newValue) {
-		return (function (newValue) {
-		interp.sVal(131,newValue);interp.sVal(14,1);//ｺﾓﾝID・変数ID
-		interp.sVal(121,0);interp.sVal(122,0);interp.sVal(123,0);
-		interp.setupChild($dataCommonEvents[$gameVariables.value(131)].list, 0);
-		//
-		}).call(interp, newValue);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:61
-	playSeEffectVar122 = function () {
-		var messageText2 = `鼓動`;
-		AudioManager.playSe({"name":`${messageText2}`,"volume":100,"pitch":$gameVariables.value(122),"pan":0})
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:62
-	playSeEffectVar122_2 = function () {
-		AudioManager.playSe({"name":"Z_HeartBeat","volume":100,"pitch":$gameVariables.value(122),"pan":0})
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:61, data/CommonEvents.json:common-event:62
-	flashScreenVar121 = function () {
-		$gameScreen.startFlash([255,119,255,200], $gameVariables.value(121))
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:61, data/CommonEvents.json:common-event:62
-	shakeScreen = function () {
-		$gameScreen.startShake(7, 7, $gameVariables.value(121))
-	};
-
-	// Replaces (5x): data/CommonEvents.json:common-event:63, data/CommonEvents.json:common-event:64
-	nameActorFromVariable = function (actorId, variableId) {
-		$gameActors.actor(actorId).setName($gameVariables.value(variableId))
-	};
-
-	// Replaces (4x): data/CommonEvents.json:common-event:64, data/CommonEvents.json:common-event:401, data/Map100.json:map-event:11:page:1
-	setupChildInterpreter = function (interp, variableId, newValue, list) {
-		return (function (variableId, newValue, list) {
-		interp.sVal(variableId,newValue);
-		interp.setupChild($dataCommonEvents[list].list, 0);
-		}).call(interp, variableId, newValue, list);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:64
-	subtractVariables = function (variableId, newValue, newValue2, newValue3) {
-		$gameVariables.setValue(variableId,$gameVariables.value(newValue) - $gameVariables.value(newValue2) - $gameVariables.value(newValue3));
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:64
-	forceCharacterMoveRouteVar121And122Etc = function (interp) {
-		return (function () {
-		interp.character($gameVariables.value(121)).forceMoveRoute({
-		"list":[
-		{"code":36},{"code":37},{"code":29, "parameters":[$gameVariables.value(122)]},
-		{"code":30, "parameters":[$gameVariables.value(123)]},
-		{ "code": 45, "parameters": ["this.requestAnimation($gameVariables.value(124));"] },
-		{ "code": 45, "parameters": ["this.jumpEx($gameVariables.value(125),$gameVariables.value(126),$gameVariables.value(127),$gameVariables.value(128));"] },
-		{"code":25},{"code":32},{"code":34},{"code":35},
-		//{ "code": 45, "parameters": ["this.startOpacity(60,$gameVariables.value(129));"] },
-		{"code":0}],"repeat":false,"skippable":true});
-		interp._character = interp.character($gameVariables.value(121))
-		interp.setWaitMode('route')
-		}).call(interp);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:64
-	runPluginCommandShowInfo = function (interp) {
-		var messageText2 = `パーティが再集合されました`;
-		return (function () {
-		value1 = `${messageText2}`;
-		var args3 = new Array( String(value1) ); 
-		interp.pluginCommand("ShowInfo", args3);
-		}).call(interp);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:64
-	runPluginCommandShowInfo2 = function (interp) {
-		var messageText2 = `パーティが一時解散されました`;
-		return (function () {
-		value1 = `${messageText2}`;
-		var args3 = new Array( String(value1) ); 
-		interp.pluginCommand("ShowInfo", args3);
-		}).call(interp);
-	};
-
-	// Replaces (7x): data/CommonEvents.json:common-event:64, data/CommonEvents.json:common-event:373, data/Map054.json:map-event:2:page:1, data/Map054.json:map-event:2:page:2, data/Map054.json:map-event:2:page:3, data/Map054.json:map-event:2:page:4, …
-	setupChildInterpreter2 = function (interp, newValue) {
-		return (function (newValue) {
-		interp.sVal(14,newValue);//パーティ一時解散コモン
-		interp.setupChild($dataCommonEvents[64].list, 0);
-		}).call(interp, newValue);
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:64
-	refreshCurrentActor = function () {
-		$gameActors.actor($gameVariables.value(20)).refresh();
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:64
-	movePicture1_2 = function () {
-		for (var loopIndex = 1; loopIndex <= 7; loopIndex++) {
-		  pic_move1(100+loopIndex,0,30,-500,0);
-		};
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:64
-	addPartyActorVar20 = function () {
-		$gameParty.addActor($gameVariables.value(20));
-	};
-
-	// Replaces (4x): data/CommonEvents.json:common-event:64
-	teachSkillToActorFromVariable20 = function (skillId) {
-		$gameActors.actor($gameVariables.value(20)).learnSkill(skillId);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:64
-	addPartyActor = function (variableId) {
-		$gameParty.addActor($gameVariables.value(variableId))
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:66, data/CommonEvents.json:common-event:87
-	hideWindow2 = function () {
-		WindowManager.hide(1);
-		WindowManager.hide(2);
-		WindowManager.hide(3);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:66, data/Map007.json:map-event:23:page:1
-	erasePictureById = function (pictureId) {
-		$gameScreen.erasePicture(pictureId);
+	setupChildInterpreterVar131 = function (interp, value) {
+		// ｺﾓﾝID・変数ID
+		setSelfVar(interp, 131, value);
+		setSelfVar(interp, 14, 1);
+		[121, 122, 123].forEach(variableId => setSelfVar(interp, variableId, 0));
+		runCommonEventAsChild(interp, varValue(131));
 	};
 
 	// Replaces (2x): data/CommonEvents.json:common-event:66, data/CommonEvents.json:common-event:212
-	setupChildInterpreterVar131_2 = function (interp, newValue, variableId) {
-		return (function (newValue, variableId) {
-		interp.sVal(131,64);interp.sVal(14,newValue);//ｺﾓﾝID・変数ID
-		interp.sVal(121,0);interp.sVal(122,0);interp.sVal(variableId,0);
-		interp.setupChild($dataCommonEvents[$gameVariables.value(131)].list, 0);
-		}).call(interp, newValue, variableId);
+	setupChildInterpreterVar131_2 = function (interp, value, variableId) {
+		setSelfVar(interp, 131, 64);
+		setSelfVar(interp, 14, value);
+		setSelfVar(interp, 121, 0);
+		setSelfVar(interp, 122, 0);
+		setSelfVar(interp, variableId, 0);
+		runCommonEventAsChild(interp, varValue(131));
 	};
 
-	// Replaces (10x): data/CommonEvents.json:common-event:66, data/CommonEvents.json:common-event:173, data/CommonEvents.json:common-event:183, data/CommonEvents.json:common-event:192, data/CommonEvents.json:common-event:203, data/CommonEvents.json:common-event:237, …
-	enableVisualNovelChoices = function () {
-		$gameSystem.vnChoices = true;
+	// Replaces (4x): data/CommonEvents.json:common-event:64, data/CommonEvents.json:common-event:401, data/Map100.json:map-event:11:page:1
+	setupChildInterpreter = function (interp, variableId, value, commonEventId) {
+		setSelfVar(interp, variableId, value);
+		runCommonEventAsChild(interp, commonEventId);
 	};
 
-	// Replaces (2x): data/CommonEvents.json:common-event:72, data/Map005.json:map-event:2:page:1
-	closeGameWindow = function () {
-		window.close()
+	// Replaces (7x): data/CommonEvents.json:common-event:64, :373, Map054.json:map-event:2:page:1..4, ...
+	setupChildInterpreter2 = function (interp, value) {
+		setSelfVar(interp, 14, value);   // パーティ一時解散コモン
+		runCommonEventAsChild(interp, 64);
 	};
 
-	// Replaces (1x): data/CommonEvents.json:common-event:73
-	runPluginCommandShowInfo3 = function (interp) {
-		var textPrefix = `ファイル`;
-		var variableCode = `\\V[509]`;
-		var textSuffix = `にオートセーブしました`;
-		return (function () {
-		var args3 = new Array( `${textPrefix}${variableCode}${textSuffix}`);
-		interp.pluginCommand("ShowInfo", args3);
-		}).call(interp);
+	// Replaces (3x): data/CommonEvents.json:common-event:530, Map081.json:map-event:3:page:1, Map083.json:map-event:6:page:1
+	setupChildInterpreter14 = function (interp) {
+		setSelfVar(interp, 14, 22);   // パーティ再結成コモン
+		runCommonEventAsChild(interp, 64);
 	};
 
-	// Replaces (1x): data/CommonEvents.json:common-event:73
-	runPluginCommandShowInfo4 = function (interp) {
-		var messageText2 = `ファイル51にオートセーブしました`;
-		return (function () {
-		var args3 = new Array( `${messageText2}`);
-		interp.pluginCommand("ShowInfo", args3);
-		}).call(interp);
+	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
+	setupChildInterpreter18 = function (interp) {
+		runCommonEventAsChild(interp, 64);
+		setSelfVar(interp, 14, 21);   // パーティ一時解散コモン
 	};
 
-	// Replaces (2x): data/CommonEvents.json:common-event:77, data/CommonEvents.json:common-event:78
-	readVariable706 = function (interp, randomRange) {
-		return (function (randomRange) {
-		var variable706Value = $gameVariables.value(706)[3];
-		var variable706Value = getRandomIndex(randomRange) + variable706Value-30;
-		interp.wait(variable706Value);
-		}).call(interp, randomRange);
+	// Replaces (7x): data/CommonEvents.json:common-event:368, :410, :495, :532, :548, :571, ...
+	setupChildInterpreter9 = function (interp) {
+		runCommonEventAsChild(interp, 19);
 	};
 
-	// Replaces (2x): data/CommonEvents.json:common-event:78
-	waitFrames = function (interp, waitFrames) {
-		return (function (waitFrames) {
-		interp.wait(waitFrames)
-		}).call(interp, waitFrames);
+	// Replaces (4x): data/CommonEvents.json:common-event:342, data/CommonEvents.json:common-event:364
+	setupChildInterpreter8 = function (interp, value) {
+		// 仲間加入コモン
+		setSelfVar(interp, 14, 19);
+		setSelfVar(interp, 20, value);
+		setSelfVar(interp, 121, 0);
+		runCommonEventAsChild(interp, 64);
 	};
 
-	// Replaces (2x): data/CommonEvents.json:common-event:85
-	propagateLibido = function () {
-		//性欲度情報を更新
-		seiyoku_hanei();
+	// Replaces (3x): data/CommonEvents.json:common-event:330, data/CommonEvents.json:common-event:331
+	setupChildInterpreterVar171 = function (interp) {
+		setVar(171, [41, 32, 11]);
+		runCommonEventAsChild(interp, 54);
 	};
 
-	// Replaces (5x): data/CommonEvents.json:common-event:85, data/CommonEvents.json:common-event:109, data/CommonEvents.json:common-event:110, data/CommonEvents.json:common-event:113, data/CommonEvents.json:common-event:159
-	setSelfVariable0 = function (interp) {
-		return (function () {
-		for(var loopIndex = 401; loopIndex <= 440; loopIndex++){interp.sVal(loopIndex,0)};
-		}).call(interp);
+	// Replaces (1x): data/Map007.json:map-event:3:page:1
+	applyMapShockwaveFilter = function (filterName, waveWidth, waveHeight, wavePower, speed, additionalTime) {
+		$gameMap.createFilter(filterName, 'shockwave', 0, 'screen');
+		$gameMap.setFilter(filterName, [640, waveWidth, -1, waveHeight, wavePower, speed]);
+		$gameMap.setFilterAddiTime(filterName, additionalTime);
 	};
 
-	// Replaces (7x): data/CommonEvents.json:common-event:85, data/CommonEvents.json:common-event:401, data/CommonEvents.json:common-event:516, data/CommonEvents.json:common-event:546, data/Map200.json:map-event:11:page:1, …
-	assignSelfVariableValue = function (interp, variableId, newValue) {
-		return (function (variableId, newValue) {
-		interp.sVal(variableId,newValue);
-		}).call(interp, variableId, newValue);
+	// Replaces (2x): data/Map007.json:map-event:3:page:1
+	setupChildInterpreter17 = function (interp, value) {
+		setSelfVar(interp, 20, 1);
+		setSelfVar(interp, 21, value);
+		setSelfVar(interp, 22, -400);
+		runCommonEventAsChild(interp, 141);
 	};
 
-	// Replaces (1x): data/CommonEvents.json:common-event:536
-	setSelfVariable23Var1 = function (interp) {
-		var messageText2 = `の`;
-		return (function () {
-		interp.sVal(23,`${$gameVariables.value(1+380)[56]}${messageText2}${$gameVariables.value(1+380)[53]}`);
-		}).call(interp);
+	// Replaces (2x): data/Map007.json:map-event:5:page:1
+	setupChildInterpreter19 = function (interp, value) {
+		setSelfVar(interp, 14, value);   // Ｈ効果
+		runCommonEventAsChild(interp, 58);
 	};
 
-	// Replaces (3x): data/CommonEvents.json:common-event:86, data/CommonEvents.json:common-event:245
-	playScreenParticle = function (textValue, particleName, particleDefinition) {
-		var particleName2 = textValue;
-		$gameScreen._particle.particlePlay(0,particleName2,particleName,'def',particleDefinition);
+	// Replaces (5x): data/CommonEvents.json:common-event:120, data/CommonEvents.json:common-event:188, data/CommonEvents.json:common-event:196
+	setupChildInterpreter3 = function (interp, randomXRange, randomXOffset, randomYRange, randomYOffset, randomSpeedBase) {
+		setSelfVar(interp, 14, 26);
+		setSelfVar(interp, 121, interp._eventId);
+		setSelfVar(interp, 122, getRandomIndex(8) + 8);
+		setSelfVar(interp, 123, 5);
+		setSelfVar(interp, 124, 1);   // アニメid
+		setSelfVar(interp, 125, getRandomIndex(randomXRange) - randomXOffset);
+		setSelfVar(interp, 126, getRandomIndex(randomYRange) - randomYOffset);
+		setSelfVar(interp, 127, getRandomIndex(2) + randomSpeedBase);
+		setSelfVar(interp, 128, getRandomIndex(2) + 0);
+		setSelfVar(interp, 129, getRandomIndex(181) + 0);
+		runCommonEventAsChild(interp, 64);
 	};
 
-	// Replaces (2x): data/CommonEvents.json:common-event:86, data/CommonEvents.json:common-event:179
-	assignVariableValue = function (variableId, newValue) {
-		$gameVariables.setValue(variableId,newValue);
+	// Replaces (2x): data/CommonEvents.json:common-event:120, data/CommonEvents.json:common-event:121
+	readBranchResult = function (interp) {
+		$result = interp._branch[interp._indent];
 	};
 
-	// Replaces (1x): data/CommonEvents.json:common-event:103
-	setVariable332Text = function () {
-		var iconCode296 = `\\I[296]`;
-		var iconCode313 = `\\I[313]`;
-		$gameVariables.setValue(332,`${iconCode296}:${Math.round(valueTotalexp)}${iconCode313}:${Math.round(valueTotalgold)}`);
+	// Replaces (2x): data/CommonEvents.json:common-event:301, data/CommonEvents.json:common-event:452
+	setupChildInterpreter6 = function (interp, value) {
+		setSelfVar(interp, 172, value);
+		valueTalkSet = [1, 1];   // 1で付与2で直接表示 \CE[60]のみ0で解除, ｱｸﾀｰid
+		runCommonEventAsChild(interp, 60);
 	};
 
-	// Replaces (2x): data/Map003.json:map-event:139:page:1, data/Map003.json:map-event:140:page:1
-	setVariable801Text = function () {
-		var messageText2 = `残念だったわね？`;
-		$gameVariables.setValue(801,`${messageText2}`);
+	// Replaces (6x): data/CommonEvents.json:common-event:368, :495, :532, :548, Map041.json:map-event:7:page:1, Map083.json:map-event:6:page:1
+	setupChildInterpreter10 = function (interp, talkLine) {
+		// 中央に一言メッセージ, 何行でも良し
+		setSelfVar(interp, 23, talkLine);
+		const talkLineText = variableText(23);   // variable 23: 乱数汎用3 (here: the one-line talk text)
+		showOneLineTalk(interp, 19, [1, 28, `${talkLineText}`, 100]);
 	};
 
-	// Replaces (3x): data/CommonEvents.json:common-event:87
-	updateScreenParticle = function () {
-		$gameScreen._particle.particleUpdate(['hStates_bodyShine1','emitterLifetime',1]);
-		$gameScreen._particle.particleClear('hStates_bodyShine1');
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:87
-	appendMessageTextVar20 = function (interp) {
-		var controlCode = `\\>`;
-		return (function () {
-		var variable20Value = $gameActors.actor($gameVariables.value(20));
-		$gameMessage.newPage();
-		$gameMessage.add(`${controlCode}${variable20Value.profile()}`);
-		interp.setWaitMode('message');
-		}).call(interp);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:87
-	appendMessageTextVar20_2 = function (interp) {
-		var controlCode = `\\SP[0]`;
-		return (function () {
-		var variable20Value = $gameActors.actor($gameVariables.value(20));
-		$gameMessage.newPage();
-		$gameMessage.add(`${controlCode}${variable20Value.profile()}`);
-		interp.setWaitMode('message');
-		}).call(interp);
-	};
-
-	// Replaces (5x): data/CommonEvents.json:common-event:87, data/CommonEvents.json:common-event:256
-	flagIfAnySlotFilled = function (rangeStart, rangeEnd, switchId) {
-		var presetValues = [0];
-		var variable20Value = $gameVariables.value(360 + $gameVariables.value(20));
-		for (var loopIndex = rangeStart; loopIndex <= rangeEnd; loopIndex++) {
-		if(variable20Value[loopIndex] >= 1){
-		presetValues.push(variable20Value[loopIndex]);
-		}};
-		var computedCount = presetValues.reduce(function(a,b){  
-		return Math.max(a,b);
-		});
-		if(computedCount >= 1){
-		$gameSwitches.setValue(switchId,true);
-		};
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:87
-	setValueGraphicsWidth = function (graphicsWidth) {
-		valueGraphicsWidth = graphicsWidth;
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:87, data/CommonEvents.json:common-event:256
-	applyActorHHistory2 = function () {
-		actor_Hhennreki2($gameVariables.value(19));
-		//選択肢番号は、実際の配列番号+1にしている。
-		//もしピクチャ表示する場合は注意。
-	};
-
-	// Replaces (9x): data/CommonEvents.json:common-event:87, data/CommonEvents.json:common-event:166, data/CommonEvents.json:common-event:203, data/CommonEvents.json:common-event:238, data/CommonEvents.json:common-event:239, data/CommonEvents.json:common-event:241, …
-	hideAllWindows = function () {
-		WindowManager.hideAll();
-	};
-
-	// Replaces (4x): data/CommonEvents.json:common-event:90
-	setSelfVariable21_2 = function (interp) {
-		return (function () {
-		interp.sVal(21,
-		);
-		}).call(interp);
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:92, data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
-	fadePicture1FadeOut = function () {
-		var fadePicId = 51;
-		picture_fade1(fadePicId,"fadeOut",'Hscene005',300,5);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:94
-	movePictureRowAndWait = function (interp, pictureId, duration, waitFrames) {
-		return (function (pictureId, duration, waitFrames) {
-		var pictureId2 = 60;
-		$gameScreen.movePicture(pictureId+1+pictureId2,1,1280/2,768/2,100,100,0,0,duration);
-		interp.wait(waitFrames);
-		}).call(interp, pictureId, duration, waitFrames);
-	};
+	/* ============================================================================
+	 * Cut-ins / plugin commands
+	 * ========================================================================== */
 
 	// Replaces (1x): data/CommonEvents.json:common-event:101
 	runPluginCommandCutInCG_EnemyDefeat = function (interp) {
-		var messageText2 = `カットインエネミー演出色々`;
-		var textPart2 = `敵カットイン`;
-		return (function () {
-		var nameValue = 'CutInCG_EnemyDefeat';
-		valueCutInSet1 = [`${messageText2}`,nameValue,0,2.0,2.0,25,60];
-		var args3 = new Array(String(valueCutInSet1[0]));
-		interp.pluginCommand(`${textPart2}`, args3);
-		}).call(interp);
+		requestCutIn(interp, '敵カットイン', ['カットインエネミー演出色々', 'CutInCG_EnemyDefeat', 0, 2.0, 2.0, 25, 60]);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:104
 	runPluginCommandVar20 = function (interp) {
-		var textPrefix = `Ｈシーン演出`;
-		var textSuffix = `味方カットイン`;
-		return (function () {
-		var variable20Value = `Zev_BattleMasturbation${$gameVariables.value(20)}_1`;
-		valueCutInSet1 = [`${textPrefix}`,variable20Value,270,1.5,1.2,25,60];
-		var args3 = new Array(String(valueCutInSet1[0]));
-		interp.pluginCommand(`${textSuffix}`, args3);
-		}).call(interp);
+		const cutInImageName = `Zev_BattleMasturbation${varValue(CURRENT_ACTOR_VAR)}_1`;
+		requestCutIn(interp, '味方カットイン', ['Ｈシーン演出', cutInImageName, 270, 1.5, 1.2, 25, 60]);
 	};
 
-	// Replaces (1x): data/CommonEvents.json:common-event:101
-	updateActorFromVariable11 = function () {
-		var messageText2 = `達`;
-		var variable11Value = `${$gameActors.actor($gameVariables.value(11)).name()}`;
-		if($gameParty.battleMembers().length >= 2){
-		  variable11Value += `${messageText2}`;
-		};
-		$gameVariables.setValue(49,variable11Value);
+	// Replaces (2x): data/CommonEvents.json:common-event:104, data/CommonEvents.json:common-event:140
+	prepareCutInVar20 = function (interp, pictureId) {
+		prepareCutIn(interp, '味方カットイン', pictureId, varValue(CURRENT_ACTOR_VAR));
 	};
 
-	// Replaces (2x): data/CommonEvents.json:common-event:496, data/CommonEvents.json:common-event:516
-	updateActorFromVariable530 = function () {
-		var messageText2 = `一行`;
-		var variable530Value = `${$gameActors.actor($gameVariables.value(530)).name()}`;
-		if($gameParty.battleMembers().length >= 2){
-		  variable530Value += `${messageText2}`;
-		};
-		$gameVariables.setValue(21,variable530Value);
+	// Replaces (1x): data/CommonEvents.json:common-event:140
+	prepareCutInVar20_2 = function (interp) {
+		prepareCutIn(interp, '敵カットイン', 0, varValue(CURRENT_ACTOR_VAR));
 	};
 
-	// Replaces (2x): data/CommonEvents.json:common-event:101
-	forceHomeMove = function () {
-		set_homeMoveForced();//拠点に強制移動
+	// Replaces (1x): data/CommonEvents.json:common-event:129
+	prepareCutInVar20_3 = function (interp) {
+		prepareCutIn(interp, '敵カットイン', 8, varValue(CURRENT_ACTOR_VAR));
 	};
+
+	// Replaces (2x): data/Map003.json:map-event:81:page:1, data/Map003.json:map-event:82:page:1
+	prepareCutInVar20_4 = function (interp) {
+		prepareCutIn(interp, '味方カットイン', 7, varValue(CURRENT_ACTOR_VAR));
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:138
+	prepareCutInVar182And20 = function (interp) {
+		setVar(182, 13);
+		prepareCutIn(interp, '味方カットイン', 1, varValue(CURRENT_ACTOR_VAR));
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:138
+	prepareCutInVar182 = function (interp, cutInSlotId) {
+		setVar(182, 13);
+		prepareCutIn(interp, '味方カットイン', 1, cutInSlotId);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:64
+	runPluginCommandShowInfo = function (interp) {
+		runShowInfoPlugin(interp, 'パーティが再集合されました');
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:64
+	runPluginCommandShowInfo2 = function (interp) {
+		runShowInfoPlugin(interp, 'パーティが一時解散されました');
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:73
+	runPluginCommandShowInfo3 = function (interp) {
+		const autosaveFileName = variableText(509);   // variable 509: [NoReset]オートセーブ指定変数
+		runShowInfoPlugin(interp, `ファイル${autosaveFileName}にオートセーブしました`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:73
+	runPluginCommandShowInfo4 = function (interp) {
+		runShowInfoPlugin(interp, 'ファイル51にオートセーブしました');
+	};
+
+	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
+	runPluginCommandFadeImg = function (interp, imageName) {
+		callPluginCommand(interp, 'GWTrans_Setting', 'FadeImg', imageName);
+		callPluginCommand(interp, 'GWTrans_Setting', 'FadeInImg', imageName);
+		callPluginCommand(interp, 'GWTransition', 'on');
+	};
+
+	// Replaces (3x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1, data/Map007.json:map-event:17:page:1
+	runPluginCommand153 = function (interp) {
+		// 一刀両断102崩壊161横両断008封印054内側から153
+		callPluginCommand(interp, 'GWFade', 'character', '0', 'fadeOut', '153', '180', '5');
+	};
+
+	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
+	runPluginCommand = function (interp) {
+		[86, 87].forEach(variableId => setSelfVar(interp, variableId, 3));
+		setSelfVar(interp, 245, 40);
+		setSelfVar(interp, 246, 80);
+		setSelfVar(interp, 251, 'testピクチャ');
+		callPluginCommand(interp, '味方カットイン', 'Ｈシーン演出');
+	};
+
+	/* ============================================================================
+	 * Battle / victory
+	 * ========================================================================== */
 
 	// Replaces (1x): data/CommonEvents.json:common-event:102
 	setValueBattleSexCountArr = function () {
@@ -5108,121 +5353,6 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		valueCollapseAnime = 0;
 	};
 
-	// Replaces (1x): data/CommonEvents.json:common-event:102
-	applyStateToParty = function () {
-		valueScriptArray1 = [0,0,0,0,0,0,0,0,0,0,0];
-		var stateId2 = 82;
-		if($gameParty.membersState(stateId2)){
-		  for (var memberIndex = 0; memberIndex < $gameParty.members().length; memberIndex++) {
-		    var partyMember2 = $gameParty.members()[memberIndex];
-		      if(partyMember2.isStateAffected(stateId2)){
-		        if(partyMember2._stateCounter[stateId2] >= 0){
-		          valueScriptArray1[memberIndex] = partyMember2._stateCounter[stateId2];
-		}}}};
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:102
-	clearPartyStateCounters = function () {
-		for (var memberIndex = 0; memberIndex < $gameParty.members().length; memberIndex++) {
-		  var partyMember2 = $gameParty.members()[memberIndex];
-		  partyMember2.clearStateCounters();
-		};
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:102
-	restoreStateCountersFromScriptArray = function () {
-		var constantValue = 82;
-		for (var memberIndex = 0; memberIndex < valueScriptArray1.length; memberIndex++) {
-		  if(valueScriptArray1[memberIndex] >= 1){
-		    if($gameParty.members()[memberIndex].isStateAffected(constantValue)){
-		      $gameParty.members()[memberIndex].setStateCounter(constantValue, valueScriptArray1[memberIndex]);
-		}}};
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:102
-	applyStateToParty2 = function (interp) {
-		return (function () {
-		var stateBattleClear = valueStateBattleClear;
-		const partyBattleMembers = $gameParty.battleMembers(); stateBattleClear.forEach(function(id) {
-		  if($gameParty.membersState(id)){
-		    for (let loopIndex = 0; loopIndex < partyBattleMembers.length; loopIndex++) {
-		      const tempValue = partyBattleMembers[loopIndex];
-		      if($gameParty.members().contains(tempValue)){
-		        if(tempValue.isStateAffected(id)){
-		          tempValue.removeStateCounter(id);
-		    }}};
-		  };
-		}, interp);
-		}).call(interp);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:102
-	setValueTotalexp = function () {
-		valueTotalexp = 1;
-		valueTotalgold = 1;
-		valueMaxEnemyLv = 0;
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:102
-	removeStateFromListActors = function () {
-		for (var memberIndex = 0; memberIndex < $gameParty.battleMembers().length; memberIndex++) {
-		  var battleMember = $gameParty.battleMembers()[memberIndex];
-		  battleMember.clearParamPlus();
-		  battleMember.clearXParamPlus();
-		  battleMember.clearSParamPlus();
-		  battleMember.removeState(486);
-		  battleMember.removeState(487);
-		  battleMember.removeState(488);
-		  battleMember.removeState(489);
-		  battleMember.refresh();
-		};
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:102
-	resetStateTraits = function () {
-		for (let stateId2 = 486; stateId2 <= 489; stateId2++) {
-		  const databaseEntries2 = $dataStates[stateId2]; databaseEntries2.traits = [];
-		  databaseEntries2.traits.push({code: 53, dataId: 6, value: 0.1});
-		};
-		for (var stateId2 = 490; stateId2 <= 497; stateId2++) {
-		  $dataStates[stateId2].traits = [];
-		};
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:102
-	addStepsFromVariable = function () {
-		$gameParty._steps += $gameVariables.value(290);
-	};
-
-	// Replaces (4x): data/CommonEvents.json:common-event:103, data/CommonEvents.json:common-event:300, data/CommonEvents.json:common-event:301
-	enableSwitch = function (switchId) {
-		$gameSwitches.setValue(switchId,true);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:104, data/CommonEvents.json:common-event:140
-	prepareCutInVar20 = function (interp, pictureId) {
-		var messageText2 = `味方カットイン`;
-		return (function (pictureId) {
-		cutin_preparation(pictureId,$gameVariables.value(20));
-		if(valueCutInSet1[0] != 0){
-		  var args3 = new Array(String(valueCutInSet1[0]));
-		  interp.pluginCommand(`${messageText2}`, args3);
-		};
-		}).call(interp, pictureId);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:140
-	prepareCutInVar20_2 = function (interp) {
-		var messageText2 = `敵カットイン`;
-		return (function () {
-		cutin_preparation(0,$gameVariables.value(20));
-		if(valueCutInSet1[0] != 0){
-		  var args3 = new Array(String(valueCutInSet1[0]));
-		  interp.pluginCommand(`${messageText2}`, args3);
-		};
-		}).call(interp);
-	};
-
 	// Replaces (2x): data/CommonEvents.json:common-event:104
 	setValueChainAddPower = function () {
 		valueChainAddPower = 0;
@@ -5230,177 +5360,41 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 
 	// Replaces (2x): data/CommonEvents.json:common-event:104, data/CommonEvents.json:common-event:129
 	runBossActionPattern1 = function () {
-		if($gameTroop.members()[0].isStateAffected(410) && 
-		$gameTroop.members()[0].isAlive() && 
-		!$gameTroop.members()[0].isRestricted ()){
-		  $gameSwitches.setValue(470,true);
-		  boss_actionPattarn1($gameTroop.members()[0]);
-		  $gameSwitches.setValue(470,false);
-		};
-	};
-
-	// Replaces (8x): data/CommonEvents.json:common-event:105, data/CommonEvents.json:common-event:109, data/CommonEvents.json:common-event:141, data/CommonEvents.json:common-event:184, data/CommonEvents.json:common-event:381, data/Map007.json:map-event:3:page:1, …
-	disableSwitch = function (switchId) {
-		$gameSwitches.setValue(switchId,false);
+		const boss = $gameTroop.members()[0];
+		if (boss.isStateAffected(410) && boss.isAlive() && !boss.isRestricted()) {
+			enableSwitch(470);
+			boss_actionPattarn1(boss);
+			disableSwitch(470);
+		}
 	};
 
 	// Replaces (2x): data/CommonEvents.json:common-event:105, data/CommonEvents.json:common-event:122
-	countDefeatedEnemyVar240 = function (variableId) {
-		if($gameVariables.value(240) >= 1){
-		  $gameVariables.value(variableId)[$gameVariables.value(240)] += 1;
-		};
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:105, data/CommonEvents.json:common-event:122, data/CommonEvents.json:common-event:205
-	setGlossaryText1AndSetGlossaryText2 = function () {
-		var rangeStart2 = 1;
-		var databaseEntries2 = $dataItems.length-1;
-		  for (var itemId2 = rangeStart2; itemId2 <= databaseEntries2; itemId2++) {
-		    if($dataItems[itemId2].meta['SG種別']){
-		      if(Number($dataItems[itemId2].meta['SG種別']) == 2){
-		        scene_Glossarytext1(itemId2,218);
-		        scene_Glossarytext2(itemId2,213);
-		        scene_Glossarytext3(itemId2,219);
-		}}};
-	};
-
-	// Replaces (4x): data/CommonEvents.json:common-event:106, data/CommonEvents.json:common-event:111, data/CommonEvents.json:common-event:112, data/CommonEvents.json:common-event:167
-	loadPartyStatBlockVar20 = function () {
-		//現在衣装を呼び出し
-		var rangeStart2 = 1; var rangeEnd2 = 40;
-		for (var loopIndex = rangeStart2; loopIndex <= rangeEnd2; loopIndex++) {
-		$gameVariables.setValue(loopIndex+460,
-		$gameVariables.value($gameVariables.value(20)+440)[loopIndex]);
-		};
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:106, data/CommonEvents.json:common-event:111, data/CommonEvents.json:common-event:112
-	loadPartyStatBlock = function (interp) {
-		return (function () {
-		//一時代入した仮情報を立ち絵指定後に反映
-		var rangeStart2 = 1; var rangeEnd2 = 40;
-		for (var loopIndex = rangeStart2; loopIndex <= rangeEnd2; loopIndex++) {
-		if($gameVariables.value(loopIndex+560) >= 1){
-		interp.sVal(loopIndex+460,$gameVariables.value(loopIndex+560));
-		}};
-		}).call(interp);
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:106, data/CommonEvents.json:common-event:111, data/CommonEvents.json:common-event:112
-	savePartyStatBlockVar20 = function () {
-		//衣装情報を更新
-		var rangeStart2 = 1; var rangeEnd2 = 40;
-		for (var loopIndex = rangeStart2; loopIndex <= rangeEnd2; loopIndex++) {
-		$gameVariables.value($gameVariables.value(20)+440)[loopIndex] = $gameVariables.value(loopIndex+460)
-		};
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:106, data/CommonEvents.json:common-event:109
-	pushBattleLogTextVar20 = function () {
-		var messageText2 = `は拘束された！`;
-		var variable20Value = $gameActors.actor($gameVariables.value(20));
-		BattleManager._logWindow.push(`addText`, `${variable20Value.name()}${messageText2}`);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:109
-	pushBattleLogTextVar20_2 = function () {
-		var messageText2 = `は襲い掛かられた！`;
-		var variable20Value = $gameActors.actor($gameVariables.value(20));
-		BattleManager._logWindow.push(`addText`, `${variable20Value.name()}${messageText2}`);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:109
-	pushBattleLogTextVar20_3 = function () {
-		var messageText2 = `は拘束から逃れた！`;
-		var variable20Value = $gameActors.actor($gameVariables.value(20));
-		BattleManager._logWindow.push(`addText`, `${variable20Value.name()}${messageText2}`);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:110
-	pushBattleLogTextVar20_4 = function () {
-		var messageText2 = `は犯されている…。`;
-		var variable20Value = $gameActors.actor($gameVariables.value(20));
-		BattleManager._logWindow.push(`addText`, `${variable20Value.name()}${messageText2}`);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:109, data/CommonEvents.json:common-event:110
-	erasePictureP2 = function () {
-		var pictureIds2 = [121,122,123,124,125,126,127,128,129,130];
-		pic_eraseP(0,pictureIds2);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:109, data/CommonEvents.json:common-event:110
-	addStateToActorFromVariable20 = function (stateId) {
-		var variable20Value = $gameActors.actor($gameVariables.value(20));
-		variable20Value.addState(stateId);
+	countDefeatedEnemyVar240 = function (defeatCountVariableId) {
+		const dungeonInfoItemId = varValue(240);   // variable 240: ダンジョン毎情報アイテム指定変数
+		if (dungeonInfoItemId >= 1) varValue(defeatCountVariableId)[dungeonInfoItemId] += 1;
 	};
 
 	// Replaces (2x): data/CommonEvents.json:common-event:109
 	setVariable703 = function () {
-		if($dataSystem.optSideView){
-		  if($gameVariables.value(703) != 0){
-		    var variable92Value = $gameVariables.value(92) + 1;
-		    $gameTroop.set(variable92Value, $gameVariables.value(703)[0], $gameVariables.value(703)[1], 30);
-		    $gameVariables.setValue(703, 0);
-		  };
-		};
+		const enemyMovePosition = varValue(703);   // variable 703: 拘束時敵移動一時配列
+		if (!$dataSystem.optSideView) return;
+		if (enemyMovePosition == 0) return;
+		// TODO: original bug — 92/703 are not documented arrays; kept verbatim.
+		$gameTroop.set(varValue(92) + 1, enemyMovePosition[0], enemyMovePosition[1], 30);
+		setVar(703, 0);
 	};
 
 	// Replaces (2x): data/CommonEvents.json:common-event:110, data/Map003.json:map-event:218:page:2
-	grantHExp1AndGrantHExp1Extra = function (interp, expVar406, expVar409, expVar4092, expVar408, numericValue) {
-		return (function (expVar406, expVar409, expVar4092, expVar408, numericValue) {
+	grantHExp1AndGrantHExp1Extra = function (interp, vaginalExp, analExp, fellatioExp, affectionExp, inseminationCount) {
 		//     膣,経,フ,ア,自,絶
-		h_exp1( expVar406, expVar409, 0, 0, 0, 0);//6//h_exp1ex(10);
+		h_exp1(vaginalExp, analExp, 0, 0, 0, 0);
 		//     和,強,異,輪,乱,露
-		h_exp2( 0, expVar4092, expVar408, 0, 0, 0);//6
+		h_exp2(0, fellatioExp, affectionExp, 0, 0, 0);
 		//     セ,乳,尻,失,潮,売,妊,子,中,ア,口(射精先)
-		h_exp3( 0, 0, 0, 0, 0, 0, 0, 0, numericValue, 0, 0);//10
+		h_exp3(0, 0, 0, 0, 0, 0, 0, 0, inseminationCount, 0, 0);
 		//     膣,尻,口,感,露,精,性,奉,売
-		h_exp4( 0, 0, 0, 0, 0, 0, 0, 0, 0);//9
-		interp.setupChild($dataCommonEvents[85].list, 0);
-		}).call(interp, expVar406, expVar409, expVar4092, expVar408, numericValue);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:111, data/CommonEvents.json:common-event:112
-	showInfoPopupVar20 = function () {
-		var textPrefix = `しかし`;
-		var textSuffix = `は既に全裸であった…`;
-		var variable20Value = $gameActors.actor($gameVariables.value(20));
-		var text3 = `${textPrefix}${variable20Value.name()}${textSuffix}`;
-		if($gameParty.inBattle()){
-		  BattleManager._logWindow.push(`addText`, text3);
-		} else {
-		  CommonPopupManager.showInfo({},text3,null);
-		};
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:112
-	showInfoPopupVar20_2 = function () {
-		var textPrefix = `しかし`;
-		var textPart2 = `には効果が無かった。　（現在露出値:`;
-		var textSuffix = `）`;
-		var variable20Value = $gameActors.actor($gameVariables.value(20));
-		var text3 = `${textPrefix}${variable20Value.name()}${textPart2}${value1}${textSuffix}`;
-		if($gameParty.inBattle()){
-		  BattleManager._logWindow.push(`addText`, text3);
-		} else {
-		  CommonPopupManager.showInfo({},text3,null);
-		};
-	};
-
-	// Replaces (13x): data/CommonEvents.json:common-event:119, data/CommonEvents.json:common-event:122, data/Map035.json:map-event:20:page:1, data/Map054.json:map-event:2:page:1, data/Map054.json:map-event:2:page:2, data/Map054.json:map-event:2:page:3, …
-	countBossEnemyDefeat = function (variableId) {
-		$gameVariables.value(variableId)[valueBossEnemyId] += 1;
-	};
-
-	// Replaces (7x): data/CommonEvents.json:common-event:119, data/CommonEvents.json:common-event:122, data/Map035.json:map-event:20:page:1, data/Map054.json:map-event:2:page:1, data/Map054.json:map-event:2:page:2, data/Map054.json:map-event:2:page:3, …
-	setValueBossAddLevel = function () {
-		valueBossAddLevel = 0;
-	};
-
-	// Replaces (6x): data/CommonEvents.json:common-event:120, data/CommonEvents.json:common-event:121, data/CommonEvents.json:common-event:300
-	setValueVictoryResult = function (victoryResult) {
-		valueVictoryResult = victoryResult;
+		h_exp4(0, 0, 0, 0, 0, 0, 0, 0, 0);
+		runCommonEventAsChild(interp, 85);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:120
@@ -5410,299 +5404,1447 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		valueWordSet3 = 0;
 	};
 
-	// Replaces (5x): data/CommonEvents.json:common-event:120, data/CommonEvents.json:common-event:188, data/CommonEvents.json:common-event:196
-	setupChildInterpreter3 = function (interp, newValue, newValue2, newValue3, newValue4, newValue5) {
-		return (function (newValue, newValue2, newValue3, newValue4, newValue5) {
-		interp.sVal(14,26);interp.sVal(121,interp._eventId);
-		interp.sVal(122,getRandomIndex(8) + 8);
-		interp.sVal(123,5);
-		//アニメid
-		interp.sVal(124,1);
-		interp.sVal(125,getRandomIndex(newValue) + -newValue2);
-		interp.sVal(126,getRandomIndex(newValue3) + -newValue4);
-		interp.sVal(127,getRandomIndex(2) + newValue5);
-		interp.sVal(128,getRandomIndex(2) + 0);
-		interp.sVal(129,getRandomIndex(181) + 0);
-		interp.setupChild($dataCommonEvents[64].list, 0);
-		}).call(interp, newValue, newValue2, newValue3, newValue4, newValue5);
+	// Replaces (6x): data/CommonEvents.json:common-event:120, :121, :300
+	setValueVictoryResult = function (victoryResult) {
+		valueVictoryResult = victoryResult;
 	};
 
-	// Replaces (2x): data/CommonEvents.json:common-event:120, data/CommonEvents.json:common-event:121
-	readBranchResult = function (interp) {
-		return (function () {
-		$result = interp._branch[interp._indent]
-		}).call(interp);
+	// Replaces (13x): data/CommonEvents.json:common-event:119, :122, Map035.json:map-event:20:page:1, ...
+	countBossEnemyDefeat = function (defeatCountVariableId) {
+		varValue(defeatCountVariableId)[valueBossEnemyId] += 1;
 	};
 
-	// Replaces (1x): data/CommonEvents.json:common-event:120
-	forceCharacterMoveRouteVar240 = function (interp) {
-		return (function () {
-		interp.character(0).forceMoveRoute({
-		"list":[{"code":41,
-		"parameters":[$dataItems[$gameVariables.value(240)].meta.EnemyGraphic.split(',')[0],
-		Number($dataItems[$gameVariables.value(240)].meta.EnemyGraphic.split(',')[1])]},
-		{"code":15, "parameters":[10]},
-		{ "code": 45, "parameters": ["this.setAngle([-45,45,-90,90][getRandomIndex(4)]);"] },
-		{"code":32},{"code":34},{"code":35},{"code":37},
-		{"code":0}]});
-		}).call(interp);
+	// Replaces (7x): data/CommonEvents.json:common-event:119, :122, Map035.json:map-event:20:page:1, ...
+	setValueBossAddLevel = function () {
+		valueBossAddLevel = 0;
 	};
 
 	// Replaces (2x): data/CommonEvents.json:common-event:122, data/CommonEvents.json:common-event:297
 	openVictoryTreasureBox1AndOpenVictoryTreasureBox2 = function () {
-		if(valueMaxEnemyLv >= 1){
-		var rangeStart2 = 1;
-		var computedCount = Math.ceil(valueMaxEnemyLv / 10);
-		  for (var loopIndex = rangeStart2; loopIndex <= computedCount; loopIndex++) {
-		    enemywin_treasurebox1(valueBossId);
-		      if($gameVariables.value(160)[4] >= 1){
-		        enemywin_treasurebox2(valueBossId);
-		      };
-		  };
-		};
+		if (valueMaxEnemyLv < 1) return;
+		const treasureBoxCount = Math.ceil(valueMaxEnemyLv / 10);
+		range(1, treasureBoxCount).forEach(() => {
+			enemywin_treasurebox1(valueBossId);
+			if (varValue(160)[4] >= 1) enemywin_treasurebox2(valueBossId);
+		});
 	};
 
-	// Replaces (2x): data/CommonEvents.json:common-event:124
-	setMapSelfSwitchVar52And223 = function () {
-		$gameSelfSwitches.setValue([$gameVariables.value(52), $gameVariables.value(223), "D"], true)
+	// Replaces (1x): data/CommonEvents.json:common-event:120
+	forceCharacterMoveRouteVar240 = function (interp) {
+		const enemyGraphicParts = $dataItems[varValue(240)].meta.EnemyGraphic.split(',');
+		interp.character(0).forceMoveRoute({
+			list: [
+				{ code: 41, parameters: [enemyGraphicParts[0], Number(enemyGraphicParts[1])] },
+				{ code: 15, parameters: [10] },
+				{ code: 45, parameters: ['this.setAngle([-45,45,-90,90][getRandomIndex(4)]);'] },
+				{ code: 32 }, { code: 34 }, { code: 35 }, { code: 37 },
+				{ code: 0 },
+			],
+		});
 	};
 
-	// Replaces (2x): data/CommonEvents.json:common-event:124
-	requestEventAnimationVar223 = function (interp, animationId) {
-		return (function (animationId) {
-		interp.character($gameVariables.value(223)).requestAnimation(animationId);
-		}).call(interp, animationId);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:129
-	prepareCutInVar20_3 = function (interp) {
-		var messageText2 = `敵カットイン`;
-		return (function () {
-		cutin_preparation(8,$gameVariables.value(20));
-		if(valueCutInSet1[0] != 0){
-		  var args3 = new Array(valueCutInSet1[0]);
-		  interp.pluginCommand(`${messageText2}`, args3);
-		};
-		}).call(interp);
-	};
-
-	// Replaces (2x): data/Map003.json:map-event:81:page:1, data/Map003.json:map-event:82:page:1
-	prepareCutInVar20_4 = function (interp) {
-		var messageText2 = `味方カットイン`;
-		return (function () {
-		cutin_preparation(7,$gameVariables.value(20));
-		if(valueCutInSet1[0] != 0){
-		  var args3 = new Array(valueCutInSet1[0]);
-		  interp.pluginCommand(`${messageText2}`, args3);
-		};
-		}).call(interp);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:138
-	configureActorFromVariable20GabText = function (interp) {
-		var messageText2 = `「行きますよ、皆さん！」`;
-		var textPart2 = `「`;
-		var controlCode = `\\N[2]`;
-		var textPart3 = `さん、行きましょう！」`;
-		return (function () {
-		var variable20Value = $gameActors.actor($gameVariables.value(20));
-		var arraySize = `${variable20Value.name()}${messageText2}`;
-		if($gameActors.actor(2).isStateAffected(234)){var arraySize = `${variable20Value.name()}${textPart2}${controlCode}${textPart3}`};
-		var args3 = new Array(String(arraySize));
-		interp.pluginCommand("GabText", args3);
-		}).call(interp);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:138
-	configureActorFromVariable20Actor1 = function (interp) {
-		var messageText2 = `「往くぞ！」`;
-		var textPart2 = `「往くぞ、`;
-		var controlCode = `\\N[1]`;
-		var textPart3 = `！」`;
-		return (function () {
-		var variable20Value = $gameActors.actor($gameVariables.value(20));
-		var arraySize = `${variable20Value.name()}${messageText2}`;
-		if($gameActors.actor(1).isStateAffected(234)){var arraySize = `${variable20Value.name()}${textPart2}${controlCode}${textPart3}`};
-		var args3 = new Array(String(arraySize));
-		interp.pluginCommand("GabText", args3);
-		}).call(interp);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:138
-	prepareCutInVar182And20 = function (interp) {
-		var messageText2 = `味方カットイン`;
-		return (function () {
-		$gameVariables.setValue(182,13);
-		cutin_preparation(1,$gameVariables.value(20));
-		if(valueCutInSet1[0] != 0){
-		  var args3 = new Array(String(valueCutInSet1[0]));
-		  interp.pluginCommand(`${messageText2}`, args3);
-		};
-		}).call(interp);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:138
-	runPluginCommandGabText = function (interp) {
-		var messageText2 = `「ああ！　我らの力、見せてやろう！！」`;
-		return (function () {
-		var actorId3 = 2;
-		var actor3 = $gameActors.actor(actorId3);
-		var arraySize = `${actor3.name()}${messageText2}`;
-		var args3 = new Array(String(arraySize));
-		interp.pluginCommand("GabText", args3);
-		}).call(interp);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:138
-	runPluginCommandGabText2 = function (interp) {
-		var textPrefix = `「はい、`;
-		var controlCode = `\\N[2]`;
-		var textSuffix = `さん！」`;
-		return (function () {
-		var actorId3 = 1;
-		var actor3 = $gameActors.actor(actorId3);
-		var arraySize = `${actor3.name()}${textPrefix}${controlCode}${textSuffix}`;
-		var args3 = new Array(String(arraySize));
-		interp.pluginCommand("GabText", args3);
-		}).call(interp);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:138
-	prepareCutInVar182 = function (interp, argument1) {
-		var messageText2 = `味方カットイン`;
-		return (function (argument1) {
-		var cutinType2 = argument1;
-		$gameVariables.setValue(182,13);
-		cutin_preparation(1,cutinType2);
-		if(valueCutInSet1[0] != 0){
-		  var args3 = new Array(String(valueCutInSet1[0]));
-		  interp.pluginCommand(`${messageText2}`, args3);
-		};
-		}).call(interp, argument1);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:158
-	setSelfVariable207 = function (interp) {
-		return (function () {
-		interp.sVal(207,101);//露出縛りなし
-		}).call(interp);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:158
-	addStateToActorFromVariable20Var247And207 = function (interp) {
-		return (function () {
-		var variable247Value = $gameVariables.value(247);
-		variable247Value.forEach(function(id) {
-		  var constantValue = 0;
-		  if($gameVariables.value(207) == 101){var constantValue = 1};
-		  if($gameVariables.value(207) >= 1 && $gameVariables.value(207) == $gameVariables.value(id+440)[41]){var constantValue = 1}; 
-		  if(constantValue == 0 && $gameParty.members().contains($gameActors.actor(id))){
-		    if($gameVariables.value(id+380)[4] <  $gameVariables.value(id+380)[5]){
-		      $gameActors.actor(id).addState(78);
-		}}}, interp);
-		}).call(interp);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:160
-	configureStandingPicture2Var20And3 = function () {
-		if(!$gameParty.inBattle()){
-		  $gameVariables.setValue(20,$gameVariables.value(3));
-		  tachie_settei2();
-		};
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:160
-	showStandingPicture1AndGetPreviousStandingPicIdVar3 = function (interp) {
-		return (function () {
-		if(!$gameParty.inBattle()){
-		  tachie_hyouji1($gameVariables.value(3));
-		  var args3 = new Array(String(getPreviousTachiePicId()),'71','2','ON')
-		  interp.pluginCommand("P_CALL_CE", args3);
-		};
-		}).call(interp);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:161
-	hideFollowers = function () {
-		if($gameSwitches.value(209) ||
-		$gameSwitches.value(202)){
-		$gamePlayer.hideFollowers();
-		};
-		if($gameSwitches.value(201) ||
-		$gameSwitches.value(205)){
-		$gamePlayer.showFollowers();
-		};
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:161
-	resetPlayerGraphic = function () {
-		if($gamePlayer.followers().follower(0).isVisible() ){
-		$gamePlayer.resetCustomizeGraphic();
-		};
+	// Replaces (1x): data/CommonEvents.json:common-event:64
+	forceCharacterMoveRouteVar121And122Etc = function (interp) {
+		interp.character(varValue(121)).forceMoveRoute({
+			list: [
+				{ code: 36 }, { code: 37 },
+				{ code: 29, parameters: [varValue(122)] },
+				{ code: 30, parameters: [varValue(123)] },
+				{ code: 45, parameters: ['this.requestAnimation($gameVariables.value(124));'] },
+				{ code: 45, parameters: ['this.jumpEx($gameVariables.value(125),$gameVariables.value(126),$gameVariables.value(127),$gameVariables.value(128));'] },
+				{ code: 25 }, { code: 32 }, { code: 34 }, { code: 35 },
+				{ code: 0 },
+			],
+			repeat: false,
+			skippable: true,
+		});
+		interp._character = interp.character(varValue(121));
+		interp.setWaitMode('route');
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:161
 	forceCharacterMoveRouteVar11And21Etc = function (interp) {
-		return (function () {
 		interp.character(-1).forceMoveRoute({
-		"list":[{"code":41, "parameters":[$gameVariables.value(11) + '_' + $gameVariables.value(21),$gameVariables.value(22)]},
-		{"code":38},{"code":29, "parameters":[4]},{"code":31},{"code":33},{"code":0}],});
-		}).call(interp);
+			list: [
+				{ code: 41, parameters: [`${varValue(11)}_${varValue(21)}`, varValue(22)] },
+				{ code: 38 }, { code: 29, parameters: [4] }, { code: 31 }, { code: 33 }, { code: 0 },
+			],
+		});
 	};
 
-	// Replaces (1x): data/CommonEvents.json:common-event:161
-	refreshPlayer2 = function () {
-		$gamePlayer.refresh()
+	// Replaces (2x): data/CommonEvents.json:common-event:259
+	forceCharacterMoveRouteVar292 = function (eventSlotIndex, moveRouteScript) {
+		spawnedEvent(eventSlotIndex).forceMoveRoute({
+			list: [
+				{ code: 45, parameters: [moveRouteScript] },
+				{ code: 0 },
+			],
+			repeat: false,
+			skippable: true,
+		});
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:259
+	forceCharacterMoveRouteVar292_2 = function (firstMoveRouteScript, secondMoveRouteScript) {
+		spawnedEvent(12).forceMoveRoute({
+			list: [
+				{ code: 45, parameters: [firstMoveRouteScript] },
+				{ code: 45, parameters: [secondMoveRouteScript] },
+				{ code: 0 },
+			],
+			repeat: false,
+			skippable: true,
+		});
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:303, :324, :471
+	forceCharacterMoveRouteVar292_3 = function (firstSlotIndex, lastSlotIndex, moveRouteScript) {
+		range(firstSlotIndex, lastSlotIndex).forEach(slotIndex => {
+			spawnedEvent(slotIndex).forceMoveRoute({
+				list: [
+					{ code: 45, parameters: ['this.startOpacity(60,0);'] },
+					{ code: 45, parameters: [moveRouteScript] },
+					{ code: 0 },
+				],
+				repeat: false,
+				skippable: true,
+			});
+		});
+	};
+
+	/* ============================================================================
+	 * Party / costume stat blocks
+	 * ========================================================================== */
+
+	// Replaces (4x): data/CommonEvents.json:common-event:106, :111, :112, :167
+	loadPartyStatBlockVar20 = function () {
+		// 現在衣装を呼び出し
+		forEachCostumeSlot(slotIndex => {
+			setVar(slotIndex + 460, varValue(varValue(CURRENT_ACTOR_VAR) + 440)[slotIndex]);
+		});
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:106, :111, :112
+	loadPartyStatBlock = function (interp) {
+		// 一時代入した仮情報を立ち絵指定後に反映
+		forEachCostumeSlot(slotIndex => {
+			if (varValue(slotIndex + 560) >= 1) setSelfVar(interp, slotIndex + 460, varValue(slotIndex + 560));
+		});
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:106, :111, :112
+	savePartyStatBlockVar20 = function () {
+		// 衣装情報を更新
+		forEachCostumeSlot(slotIndex => {
+			varValue(varValue(CURRENT_ACTOR_VAR) + 440)[slotIndex] = varValue(slotIndex + 460);
+		});
 	};
 
 	// Replaces (2x): data/CommonEvents.json:common-event:167
-	configureActorFromVariable20 = function (interp) {
-		var messageText2 = `　`;
-		var iconCode = `\\I[155]`;
-		return (function () {
-		var variable20Value = $gameActors.actor($gameVariables.value(20))
-		interp.sVal(519,`${variable20Value.name()}${messageText2}${iconCode}:${$gameVariables.value($gameVariables.value(20)+380)[4]}(${$gameVariables.value($gameVariables.value(20)+380)[5]})
-`);
-		}).call(interp);
+	// Class-2 twin of `savePartyStatBlockVar20` above — same slot copy, folded into it.
+	savePartyStatBlockVar20_2 = savePartyStatBlockVar20;
+
+	// Replaces (2x): data/CommonEvents.json:common-event:167
+	setVariable0 = function () {
+		// 現在衣装を初期化
+		forEachCostumeSlot(slotIndex => {
+			if (slotIndex != 4) setVar(slotIndex + 460, 0);
+		});
 	};
 
 	// Replaces (3x): data/CommonEvents.json:common-event:167
 	writeVariableArraySlotVar20And19Etc = function () {
-		$gameVariables.value($gameVariables.value(20)+440)[41] = Number($dataItems[$gameVariables.value(19)].meta['TotalCloth']);
-		$gameVariables.value(348)[$gameVariables.value(20)] = $gameVariables.value($gameVariables.value(20)+440)[41];
+		const currentActorId = varValue(CURRENT_ACTOR_VAR);
+		varValue(currentActorId + 440)[41] = Number($dataItems[varValue(19)].meta['TotalCloth']);
+		varValue(348)[currentActorId] = varValue(currentActorId + 440)[41];
 	};
 
 	// Replaces (3x): data/CommonEvents.json:common-event:167
 	saveCharacterIdToStatBlock = function () {
-		$gameVariables.value($gameVariables.value(20)+440)[0] = $gameVariables.value(19);
+		varValue(varValue(CURRENT_ACTOR_VAR) + 440)[0] = varValue(19);
 	};
 
 	// Replaces (2x): data/CommonEvents.json:common-event:167
-	setVariable0 = function () {
-		//現在衣装を初期化
-		var rangeStart2 = 1; var rangeEnd2 = 40;
-		for (var loopIndex = rangeStart2; loopIndex <= rangeEnd2; loopIndex++) {
-		if(loopIndex == 4){
+	configureActorFromVariable20 = function (interp) {
+		const currentActorId = varValue(CURRENT_ACTOR_VAR);
+		const icon155 = icon(155);
+		const costumeStatusIcon = `${icon155}`;
+		const actorName = currentActor().name();
+		const exposureValue = varValue(currentActorId + 380)[4];   // 380+actorId slot 4: exposure value
+		const exposureLimit = varValue(currentActorId + 380)[5];   // 380+actorId slot 5: exposure limit
+		setSelfVar(interp, 519,
+			`${actorName}　${costumeStatusIcon}:` +
+			`${exposureValue}` +
+			`(${exposureLimit})\n`);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:256
+	setWeaponNameOrNone = function (weaponSlotIndex, hasWeaponSwitchId, weaponNameVariableId, weaponIndex, noWeaponSwitchId, noWeaponVariableId) {
+		if (varValue(varValue(CURRENT_ACTOR_VAR) + 380)[weaponSlotIndex] != 0) {
+			enableSwitch(hasWeaponSwitchId);
+			setVar(weaponNameVariableId, $dataWeapons[varValue(varValue(CURRENT_ACTOR_VAR) + 380)[weaponIndex]].name);
 		} else {
-		$gameVariables.setValue(loopIndex+460,0);
-		}};
+			disableSwitch(noWeaponSwitchId);
+			setVar(noWeaponVariableId, 'なし');
+		}
 	};
 
-	// Replaces (2x): data/CommonEvents.json:common-event:167
-	savePartyStatBlockVar20_2 = function () {
-		//衣装情報を更新
-		var rangeStart2 = 1; var rangeEnd2 = 40;
-		for (var loopIndex = rangeStart2; loopIndex <= rangeEnd2; loopIndex++) {
-		$gameVariables.value($gameVariables.value(20)+440)[loopIndex] = $gameVariables.value(loopIndex+460)
-		}
+	// Replaces (2x): data/CommonEvents.json:common-event:256
+	clearWeaponSlot = function (weaponSlotIndex) {
+		varValue(varValue(CURRENT_ACTOR_VAR) + 380)[weaponSlotIndex] = 0;
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:205
+	setWeaponUnique = function (interp) {
+		forEachHeroine(heroineId => {
+			$dataWeapons[heroineId + 200].name = varValue(heroineId + 380)[50];
+			weapon_uniqueSet(heroineId);
+		});
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:241
+	setWeaponUniqueAndAddWeaponUnique = function (setValue) {
+		const actorVariableId = varValue(CURRENT_ACTOR_VAR);
+		const weaponId = actorVariableId + 80;
+		weapon_uniqueSet(actorVariableId);
+		valueCountSet3 = setValue;
+		weapon_uniqueAdd(weaponId);
+		WindowManager.show(0, 270, 80, 1010, 450);
+		const weaponIcon = weaponIconName(weaponId);
+		const weaponNoteText = variableText(801);   // variable 801: 文字等代入一時変数820まで (the weapon note)
+		WindowManager.drawText(0, `${weaponIcon}\n${weaponNoteText}\n※付与効果は強化の度に選択/追加されていきます。`);
+	};
+
+	/* ============================================================================
+	 * Battle log / popups
+	 * ========================================================================== */
+
+	// Replaces (3x): data/CommonEvents.json:common-event:106, data/CommonEvents.json:common-event:109
+	pushBattleLogTextVar20 = function () {
+		pushActorBattleLog('は拘束された！');
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:109
+	pushBattleLogTextVar20_2 = function () {
+		pushActorBattleLog('は襲い掛かられた！');
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:109
+	pushBattleLogTextVar20_3 = function () {
+		pushActorBattleLog('は拘束から逃れた！');
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:110
+	pushBattleLogTextVar20_4 = function () {
+		pushActorBattleLog('は犯されている…。');
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:111, data/CommonEvents.json:common-event:112
+	showInfoPopupVar20 = function () {
+		const actorName = currentActor().name();
+		showInfoOrBattleLog(`しかし${actorName}は既に全裸であった…`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:112
+	showInfoPopupVar20_2 = function () {
+		const exposureValue = value1;
+		const actorName = currentActor().name();
+		showInfoOrBattleLog(`しかし${actorName}には効果が無かった。　（現在露出値:${exposureValue}）`);
+	};
+
+	/* ============================================================================
+	 * Parallel / map events
+	 * ========================================================================== */
+
+	// Replaces (1x): data/CommonEvents.json:common-event:288
+	startParallelEventVar135Actor5Switch474 = function () {
+		if (varValue(135) !== 12) return;
+		if (!$gameSwitches.value(233)) return;   // 教会
+		if ($gameActors.actor(5).level < 10) return;
+		event_pararelStarting(0, 313, 0);
+		enableSwitch(474);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:288
+	startParallelEventVar135And642Switch474 = function () {
+		if (varValue(135) !== 11) return;
+		if ($gameMap.mapId() !== 96) return;
+		if (varValue(642) < 10) return;
+		event_pararelStarting(0, 312, 0);
+		enableSwitch(474);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:288
+	setValueGetInfoPointX = function (getInfoPointX) {
+		valueGetInfoPointX = getInfoPointX;
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:298
+	playScreenParticleWing_r2 = function () {
+		spawnWingParticle(2);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:300, :301, :349
+	playScreenParticleWing_r2_2 = function (interp) {
+		spawnWingParticle(interp._eventId);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:190, data/CommonEvents.json:common-event:195
+	spawnMapEvent = function () {
+		const animalEvent = $gameMap.event(valueanimalEventId);
+		$gameMap.spawnEvent(99, animalEvent.x, animalEvent.y, true);
+		const spawnedAnimalEvent = $gameMap.event($gameMap.getLastSpawnEventId());
+		spawnedAnimalEvent.startScale(10, 50, 50);
+		spawnedAnimalEvent._priorityType = 0;
+		spawnedAnimalEvent.setOpacity(150);
+	};
+
+	// Replaces (2x): data/Map085.json:map-event:2:page:1, data/Map085.json:map-event:3:page:1
+	spawnMapEvent2 = function (interp) {
+		const sourceEvent = $gameMap.event(interp.eventId());
+		$gameMap.spawnEvent(190, sourceEvent.x, sourceEvent.y, true);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:259, :338, :361
+	spawnMapEventVar292 = function (slotIndex, posX, posY, opacity) {
+		$gameMap.spawnEvent(146, posX, posY, true);
+		varValue(SPAWNED_EVENT_TABLE_VAR)[slotIndex] = $gameMap.getLastSpawnEventId();
+		spawnedEvent(slotIndex).setOpacity(opacity);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:544, data/CommonEvents.json:common-event:545
+	spawnMapEventVar163And535 = function () {
+		const npcPreset = currentNpcPreset();
+		$gameMap.spawnEvent(236, npcPreset[8], npcPreset[9], true);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:184, data/Map003.json:map-event:20:page:1, data/Map003.json:map-event:133:page:2
+	bindInterpreterToValueCountSet9 = function (interp) {
+		interp._eventId = valueCountSet9;
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:188
+	bindInterpreterToValueEnemyEventId = function (interp) {
+		interp._eventId = valueEnemyEventId;
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:189, :190, :196
+	bindInterpreterToValueanimalEventId = function (interp) {
+		interp._eventId = valueanimalEventId;
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:359, :361
+	bindInterpreterToValueBossId = function (interp) {
+		interp._eventId = valueBossId;
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:235:page:1, data/Map018.json:map-event:39:page:1
+	bindInterpreterToValueThisEventId = function (interp) {
+		if (valueThisEventId >= 1) interp._eventId = valueThisEventId;
+	};
+
+	// Replaces (5x): data/Map003.json:map-event:16:page:1..3 etc.
+	storeValueEnemyEventIdFromEvent = function (interp) {
+		valueEnemyEventId = interp.eventId();
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:20:page:1, data/Map003.json:map-event:133:page:2
+	storeValueCountSet9FromInterpreter = function (interp) {
+		valueCountSet9 = interp._eventId;
+		interp._eventId = varValue(SPAWNED_EVENT_TABLE_VAR)[0];
+	};
+
+	// Replaces (10x): data/Map003.json:map-event:156:page:1, ... Map035.json:map-event:20:page:1, ...
+	storeValueBossIdFromInterpreter = function (interp) {
+		valueBossId = interp._eventId;
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:235:page:1, data/Map018.json:map-event:39:page:1
+	storeThisEventIdOrClear = function (interp) {
+		valueThisEventId = interp._eventId >= 1 ? interp._eventId : 0;
+	};
+
+	/* ============================================================================
+	 * Erasing spawned events
+	 * ========================================================================== */
+
+	// Replaces (3x): data/CommonEvents.json:common-event:184, Map003.json:map-event:20:page:1, Map003.json:map-event:133:page:2
+	writeVariableArraySlotVar292 = function () {
+		const spawnedEventTable = varValue(SPAWNED_EVENT_TABLE_VAR);
+		const firstSpawnedEventId = spawnedEventTable[0];
+		if (firstSpawnedEventId && $gameMap.event(firstSpawnedEventId)) $gameMap.eraseEvent(firstSpawnedEventId);
+		spawnedEventTable[0] = 0;
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:259
+	writeVariableArraySlotVar292_2 = function () {
+		[11, 12].forEach(slotIndex => {
+			$gameMap.eraseEvent(spawnedEventId(slotIndex));
+			varValue(SPAWNED_EVENT_TABLE_VAR)[slotIndex] = 0;
+		});
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:297, data/CommonEvents.json:common-event:400
+	readVariable292_2 = function (interp) {
+		varValue(SPAWNED_EVENT_TABLE_VAR).forEach(spawnedId => {
+			if (spawnedId && $gameMap.event(spawnedId)) $gameMap.eraseEvent(spawnedId);
+		});
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:235:page:1, data/Map018.json:map-event:39:page:1
+	readVariable292_4 = function () {
+		varValue(SPAWNED_EVENT_TABLE_VAR).forEach(spawnedId => {
+			if (spawnedId >= 1 && $gameMap.event(spawnedId) && !$gameParty.inBattle()) {
+				$gameMap.eraseEvent(spawnedId);
+			}
+		});
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:536, data/CommonEvents.json:common-event:537
+	readVariable292_3 = function () {
+		range(12, 17).forEach(slotIndex => {
+			const spawnedId = spawnedEventId(slotIndex);
+			const mapEvent = $gameMap.event(spawnedId);
+			if (mapEvent) mapEvent.setTransparent(true);
+		});
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:358, data/CommonEvents.json:common-event:361
+	setEventFaceVar292 = function (lastSlotIndex) {
+		range(12, lastSlotIndex).forEach(slotIndex => {
+			const spawnedId = spawnedEventId(slotIndex);
+			if (!$gameMap.event(spawnedId)) return;
+			const event = $gameMap.event(spawnedId);
+			event.setStepAnime(false);
+			event.setWalkAnime(false);
+			event.setDirection(2);
+			event.resetPattern();
+			event._originalPattern = 1;
+			event.setAngle(45);
+			event._spriteOffsetX = -12;
+			event._spriteOffsetY = -12;
+			event._kageM.clear();
+			event.setFace(6, true, true);
+		});
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:511, data/Map094.json:map-event:45:page:1
+	setEventFace = function (interp, faceId) {
+		$gameMap.event(interp._eventId).setFace(faceId, true, true);
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:511, data/Map094.json:map-event:45:page:1
+	clearEventFace = function (interp) {
+		$gameMap.event(interp._eventId).removeFace();
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:543, data/CommonEvents.json:common-event:546
+	setEventFaceVar530And292 = function () {
+		const leadEvent = spawnedEvent(varValue(LEAD_ACTOR_VAR));
+		leadEvent.setFace(11, true, true);
+		leadEvent.setStepAnime(false);
+		leadEvent.setWalkAnime(false);
+		leadEvent.setDirection(2);
+	};
+
+	// Replaces (2x): data/Map054.json:map-event:2:page:1..4
+	setEventFace2 = function (interp) {
+		const mapEvent = $gameMap.event(interp._eventId);
+		if (!mapEvent) return;
+		mapEvent.setStepAnime(false);
+		mapEvent.setWalkAnime(false);
+		mapEvent.setDirection(2);
+		mapEvent.resetPattern();
+		mapEvent._originalPattern = 1;
+		mapEvent.setAngle(45);
+		mapEvent._spriteOffsetX = -12;
+		mapEvent._spriteOffsetY = -12;
+		mapEvent._kageM.clear();
+		mapEvent.setFace(6, true, true);
+	};
+
+	// Replaces (7x): data/CommonEvents.json:common-event:392, Map003.json events, Map018.json events
+	gatherNearbyEvents = function (interp) {
+		// CharaNameIdが同一のイベントを一日消去
+		event_togetherSelf(interp._eventId, 'B');
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:196:page:1, data/Map018.json:map-event:31:page:1
+	setParallelEvent = function (interp) {
+		// ｲﾍﾞﾝﾄに対するx,yのズラす歩数と主人公の向き
+		event_pararelSet(interp._eventId, 0, 1, 8);
+	};
+
+	// Replaces (22x): data/Map003.json:map-event:198:page:1, ... data/Map018.json:map-event:15:page:1, ...
+	setParallelEventFromEvSceneSet = function (interp, playerDirection) {
+		// ｲﾝｼﾞｹｰﾀｰ等消去, 帰還座標記憶, EvSceneSetでｲﾍﾞ起動ｽｲｯﾁ指定
+		event_pararelSet(interp._eventId, 0, 1, playerDirection);
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:167:page:1, data/Map007.json:map-event:20:page:1
+	startParallelEventFromEvSceneSetMeta = function (interp) {
+		const evSceneSet = $gameMap.event(interp._eventId).event().meta['EvSceneSet'];
+		if (!evSceneSet) return;
+		event_pararelStarting(1, Number(evSceneSet.split(',')[0]), interp._eventId);
+	};
+
+	// Replaces (5x): data/Map003.json:map-event:179:page:1, ... Map144.json:map-event:12:page:1
+	presetEventCharacterAndRootEventCharacter = function (interp) {
+		valueBossId = interp._eventId;
+		event_charaPreset(interp._eventId);
+		event_charaRoot(interp._eventId);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:292, :301, :343
+	setInterpreterWaitMode = function (interp) {
+		interp.setWaitMode('scroll');
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:302, :305, :401, data/Map094.json:map-event:45:page:1
+	setupRespawnEnemyAVar530And292_4 = function (posX, posY, zoomFlag, direction) {
+		respawnActor(varValue(LEAD_ACTOR_VAR), posX, posY, zoomFlag).setDirection(direction);
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:304, :325, :335, :339
+	setupRespawnEnemyAVar530And292_5 = function () {
+		respawnActor(4, 12, 6, 0).setDirection(6);
+		respawnActor(5, 13, 7, 0).setDirection(8);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:356, :357, :358, ... :362
+	setupRespawnEnemyAVar530_2 = function (posX, posY) {
+		respawnActorFacing(varValue(LEAD_ACTOR_VAR), posX, posY, 1, 8);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:401
+	setupRespawnEnemyAVar292 = function (slotIndex, posX, zoomFlag, direction) {
+		respawnActor(slotIndex, posX, 34, zoomFlag).setDirection(direction);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:303, data/CommonEvents.json:common-event:324
+	setupRespawnEnemyNVar292_4 = function (posX, posX2) {
+		respawnNpcFacing(11, 13, 22, 0, 'People3', 6, 8);
+		respawnNpcFacing(12, posX, 23, 0, 'People3', 7, 8);
+		respawnNpcFacing(13, posX2, 23, 0, 'People3', 7, 8);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:322, data/CommonEvents.json:common-event:354
+	setupRespawnEnemyNVar292_5 = function () {
+		const spawnedNpc = respawnNpcFacing(11, 27, 8, 0, 'BB_akunin3', 5, 2);
+		spawnedNpc._spriteOffsetY = -10;
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:322, :354, :358
+	setupRespawnEnemyNBB_akunin3 = function () {
+		const npcPlacements = [
+			[16, 27, 17, 0],
+			[12, 25, 15, 1],
+			[13, 24, 13, 2],
+			[14, 29, 15, 3],
+			[15, 31, 14, 4],
+		];
+		npcPlacements.forEach(([slotIndex, posX, posY, imageIndex]) => {
+			respawnNpc(slotIndex, posX, posY, 0, 'BB_akunin3', imageIndex);
+		});
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:338, data/CommonEvents.json:common-event:547
+	setupRespawnEnemyN = function (posX, posY, imageName, imageIndex, direction) {
+		respawnNpcFacing(11, posX, posY, 0, imageName, imageIndex, direction);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:300, data/CommonEvents.json:common-event:301
+	setupRespawnEnemyNVar292_2 = function (interp) {
+		event_respawnSetN(11, 25, 7, 0, '$airship02', 0);
+		const spawnedNpc = spawnedEvent(11);
+		interp._eventId = spawnedEventId(11);
+		spawnedNpc.setDirection(4);
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:536, data/CommonEvents.json:common-event:537
+	setupRespawnEnemyNNpc = function (slotIndex, posX, posY, direction, slotIndex2, posX2, posY2, direction2, slotIndex3, posX3, posY3, direction3) {
+		const placeRandomNpc = (slot, x, y, faceDirection) => {
+			event_respawnSetN(slot, x, y, 0, 'npc' + (getRandomIndex(6) + 1), getRandomIndex(7), faceDirection);
+		};
+		placeRandomNpc(slotIndex, posX, posY, direction);
+		placeRandomNpc(slotIndex2, posX2, posY2, direction2);
+		placeRandomNpc(slotIndex3, posX3, posY3, direction3);
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:235:page:1, data/Map018.json:map-event:39:page:1
+	setupRespawnEnemyN2 = function () {
+		const savedNpc = valueNpcGuraTemporarilySave;
+		event_respawnSetN(11, savedNpc[8] - 1, savedNpc[9], 0, savedNpc[6], savedNpc[7], 6);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:536, data/CommonEvents.json:common-event:537
+	respawnGoodsEvent = function (quantity, priceOrFlag) {
+		const GOODS_SLOT_INDEX = 18;
+		goodsEvent_respawn(GOODS_SLOT_INDEX, 'food_2', 4, 2, 0, quantity, priceOrFlag);
+		spawnedEvent(GOODS_SLOT_INDEX)._priorityType = 2;
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:157:page:1, data/Map165.json:map-event:12:page:1
+	setupPopEnemy = function () {
+		popEnemy_setUp($dataItems[varValue(240)]);
+	};
+
+	// Replaces (5x): data/CommonEvents.json:common-event:292, :304, :314, :316
+	setupRespawnEnemyNVar292 = function (interp, selfSwitchKey, posX, posY) {
+		mapSelfSwitchOn(selfSwitchKey, 'A');
+		event_respawnSetN(11, posX, posY, 0, 'Goods9', 0, 2);
+		interp._eventId = spawnedEventId(11);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:333, data/CommonEvents.json:common-event:348
+	setupRespawnEnemyAAndSetupRespawnEnemyNVar530And292 = function (interp, posY, posY2, imageName, imageIndex, direction) {
+		const leadActorId = varValue(LEAD_ACTOR_VAR);
+		respawnActorFacing(leadActorId, 12, posY, 1, 8);
+		interp._eventId = spawnedEventId(leadActorId);
+		event_respawnSetN(11, 12, posY2, 0, imageName, imageIndex, direction);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:336, data/CommonEvents.json:common-event:347, data/CommonEvents.json:common-event:349
+	setupRespawnEnemyNVar292_6 = function (interp, posX, posY, imageName, direction) {
+		event_respawnSetN(11, posX, posY, 0, imageName, 0, direction);
+		interp._eventId = spawnedEventId(11);
+	};
+
+	// Replaces (6x): data/CommonEvents.json:common-event:302, :305, :511, :552, data/Map094.json:map-event:45:page:1
+	setupRespawnEnemyNVar292_3 = function (slotIndex, posX, posY, zoomFlag, imageName, imageIndex, direction) {
+		respawnNpc(slotIndex, posX, posY, zoomFlag, imageName, imageIndex).setDirection(direction);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:305, data/CommonEvents.json:common-event:306
+	setupRespawnEnemyAVar530And292_6 = function (interp, posX, posY) {
+		const leadActorId = varValue(LEAD_ACTOR_VAR);
+		respawnActor(leadActorId, posX, posY, 1).setDirection(2);
+		interp._eventId = spawnedEventId(leadActorId);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:471, data/CommonEvents.json:common-event:541
+	setupRespawnEnemyAVar530And292_7 = function (interp, posX, posY, direction) {
+		respawnActorFacing(5, posX, posY, 1, direction);
+		interp._eventId = spawnedEventId(5);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:471
+	setupRespawnEnemyNVar292_7 = function (interp, slotIndex, posX, zoomFlag, imageIndex, direction, referenceSlotIndex) {
+		event_respawnSetN(slotIndex, posX, 12, zoomFlag, 'npcUnique3', imageIndex, direction);
+		interp._eventId = spawnedEventId(referenceSlotIndex);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:383, :384, :528
+	setupRespawnEnemyAVar292And530 = function (interp, posX, posX2) {
+		setSelfVar(interp, LEAD_ACTOR_VAR, 1);   // 主格キャラ
+		setVar(SPAWNED_EVENT_TABLE_VAR, Array(21).fill(0));
+		respawnActor(varValue(LEAD_ACTOR_VAR), posX, 5, 1).setDirection(8);
+		spawnedEvent(varValue(LEAD_ACTOR_VAR))._spriteOffsetX = -24;
+		respawnActor(5, posX2, 5, 1).setDirection(8);
+		spawnedEvent(5)._spriteOffsetX = -24;
+	};
+	/* ============================================================================
+	 * Scene pictures (show + fade in)
+	 *
+	 * Every "…AndFadeIn" function below is one call of showScenePicture():
+	 *   show  [x, y, scaleX, scaleY, opacity]  ->  move to [x, y, 100, 100, 255]
+	 * Only the parameters that actually differ per call site are passed.
+	 * ========================================================================== */
+
+	// Replaces (2x): data/CommonEvents.json:common-event:306, data/CommonEvents.json:common-event:342
+	showScenePictureAndFadeIn = function (scenePicName) {
+		valuePic1 = 55;
+		valueScenePic = scenePicName;
+		showScenePicture(valuePic1, valueScenePic, { y: 384 - 20 });
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:306
+	showScenePictureAndFadeIn2 = function (picIndex, picIndex2) {
+		showScenePicture(valuePic1 + picIndex, valueScenePic + picIndex2, { x: 640 - 128 + 50 });
+	};
+
+	// Replaces (5x): data/CommonEvents.json:common-event:338, :341, :507, :517, :545
+	showScenePictureAndFadeIn3 = function (picIndex, picIndex2, scaleX, scaleY) {
+		showScenePicture(valuePic1 + picIndex, valueScenePic + picIndex2, { scaleX, scaleY });
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:389, data/CommonEvents.json:common-event:509
+	showScenePictureAndFadeIn4 = function () {
+		showScenePictureAndFadeIn3(3, '03', 100, 100);
+		showScenePictureAndFadeIn3(4, '04', 100, 100);
+	};
+
+	// Replaces (8x): data/CommonEvents.json:common-event:391, :393, :399, :546, ...
+	showScenePictureAndFadeIn5 = function (picIndex, picIndex2) {
+		valuePic1 = 51;
+		showScenePicture(valuePic1 + picIndex, valueScenePic + picIndex2);
+	};
+
+	// Replaces (6x): data/CommonEvents.json:common-event:507, :508, :509, :541
+	showScenePictureAndFadeIn6 = function (picIndex, picIndex2, scaleY, opacity) {
+		showPic(valuePic1 + picIndex, valueScenePic + picIndex2, 640 - 128, 384, 100, scaleY, opacity, 1);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:530
+	showScenePictureAndFadeIn7 = function () {
+		showScenePicture(50, valueScenePic + '02');
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:547
+	showScenePictureAndFadeIn8 = function (picIndex, picIndex2) {
+		showScenePicture(valuePic1 + picIndex, valueScenePic + picIndex2);
+	};
+
+	// Replaces (8x): data/CommonEvents.json:common-event:341, ...
+	movePicture1_3 = function (picIndex, picIndex2, scaleX, scaleY) {
+		showScenePictureAndFadeIn3(picIndex, picIndex2, scaleX, scaleY);
+		slideScenePictureAway(picIndex);
+	};
+
+	// Replaces (7x): data/CommonEvents.json:common-event:391, :393, :399, :530, :531, :572, ...
+	movePicture1_4 = function (picIndex, scaleX, scaleY) {
+		pic_move1(valuePic1 + picIndex, 0, 0, scaleX, scaleY, 0, 90);
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:546
+	movePicture1_5 = function (picIndex, picIndex2) {
+		valuePic1 = 51;
+		const pictureId = valuePic1 + picIndex;
+		showScenePicture(pictureId, valueScenePic + picIndex2);
+		slideScenePictureAway(picIndex);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:496, data/CommonEvents.json:common-event:516
+	moveScenePictureAndFadeIn = function () {
+		movePic(valuePic1 + 1, 640 - 128, 384, 100, 100, 255, 60, 1);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:306
+	fadePicture1FadeIn = function (scenePicName, pictureId) {
+		showPic(pictureId, scenePicName, 640, 384, 100, 100, 255, 1);
+		picture_fade1(valuePic1, 'fadeIn', '150', 60, 5);
+	};
+
+	// Replaces (6x): data/CommonEvents.json:common-event:406, :496, :516, :517, :518, :519
+	fadePicture1FadeIn_2 = function (opacity) {
+		showPic(valuePic1, valueScenePic + '00', 640 - 128, 384, 100, 100, opacity, 1);
+		picture_fade1(valuePic1, 'fadeIn', valueWipeImg, 60, 5);
+	};
+
+	// Replaces (7x): data/CommonEvents.json:common-event:406, :496, :516, :517, :518, :519, ...
+	setValuePic1 = function () {
+		valuePic1 = 51;
+	};
+
+	// Replaces (6x): data/CommonEvents.json:common-event:517, :518, :519
+	setValueScenePic = function (scenePicName) {
+		valueScenePic = scenePicName;
+	};
+
+	/* ============================================================================
+	 * Standing pictures (blessed)
+	 * ========================================================================== */
+
+	// Replaces (3x): data/CommonEvents.json:common-event:410, :546, :547
+	blessStandingPicture = function (picIndex, picIndex2, opacity) {
+		showBlessedPicture(valuePic1 + picIndex, valueScenePic + picIndex2, { opacity, animate: false });
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:496, data/CommonEvents.json:common-event:516
+	blessStandingPicture2 = function (blessType) {
+		const pictureId = valuePic1 + 1;   // 非表示状態
+		showBlessedPicture(pictureId, valueScenePic + '01', { y: 384 + 50, animate: false, blessType });
+	};
+
+	// Replaces (5x): data/CommonEvents.json:common-event:496, :516, :517, :518, :519
+	blessStandingPicture3 = function (picIndex, picIndex2, yOffset) {
+		showBlessedPicture(valuePic1 + picIndex, valueScenePic + picIndex2, { y: 384 + yOffset });
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:496
+	blessStandingPicture4 = function () {
+		const pictureId = valuePic1 + 10;
+		showBlessedPicture(pictureId, valueScenePic + '21', { x: 640 - 128 + 50, animate: false });
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:517, :518, :519
+	blessStandingPicture5 = function () {
+		const pictureId = valuePic1 + 10;
+		showBlessedPicture(pictureId, valueScenePic + '21', { x: 640 - 128 + 50 });
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:526, data/CommonEvents.json:common-event:576
+	// Identical to `blessStandingPicture` above (no bless call), folded into it.
+	blessStandingPicture6 = blessStandingPicture;
+
+	// Replaces (4x): data/CommonEvents.json:common-event:530, :531, :536
+	blessStandingPicture7 = function (picIndex, picIndex2) {
+		valuePic1 = 51;
+		showBlessedPicture(valuePic1 + picIndex, valueScenePic + picIndex2);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:541, data/CommonEvents.json:common-event:543
+	blessStandingPicture8 = function (picIndex, picIndex2) {
+		showBlessedPicture(valuePic1 + picIndex, valueScenePic + picIndex2);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:544
+	blessStandingPicture9 = function (picIndex, picIndex2) {
+		showBlessedPicture(valuePic2 + picIndex, valueScenePic + picIndex2, { x: 640 + 480 + 50, toX: 640 + 480 });
+	};
+
+	// Replaces (6x): data/CommonEvents.json:common-event:547, :572, :576
+	blessStandingPicture10 = function (picIndex, picIndex2, blessType) {
+		showBlessedPicture(valuePic1 + picIndex, valueScenePic + picIndex2, { blessType });
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:571, :572, :573
+	blessStandingPicture11 = function (picIndex, picIndex2, yOffset, blessType) {
+		showBlessedPicture(valuePic1 + picIndex, valueScenePic + picIndex2, { y: 384 - yOffset, blessType });
+	};
+
+	// Replaces (9x): data/CommonEvents.json:common-event:391, :393, :399, :526, :531, :545, ...
+	blessStandingPictureAndMovePicture1 = function (picIndex, picIndex2, blessType) {
+		const pictureId = valuePic1 + picIndex;
+		showBlessedPicture(pictureId, valueScenePic + picIndex2, { blessType, slidePreviousId: pictureId - 1 });
+	};
+
+	// Replaces (12x): data/CommonEvents.json:common-event:496, :516, :517, :518, :519, ...
+	blessStandingPictureAndMovePicture1_2 = function (picIndex, picIndex2, scaleX, scaleY, duration, blessType, previousPicIndex, waitFrames) {
+		const pictureId = valuePic1 + picIndex;
+		showBlessedPicture(pictureId, valueScenePic + picIndex2, {
+			scaleX, scaleY, duration, blessType,
+			slidePreviousId: valuePic1 + previousPicIndex, slideFrames: waitFrames,
+		});
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:531, data/CommonEvents.json:common-event:546
+	blessStandingPictureAndMovePicture1_3 = function (picIndex, picIndex2) {
+		valuePic1 = 51;
+		const pictureId = valuePic1 + picIndex;
+		showBlessedPicture(pictureId, valueScenePic + picIndex2, { slidePreviousId: pictureId - 1 });
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:542
+	blessStandingPictureAndMovePicture1_4 = function (picIndex, picIndex2) {
+		const pictureId = valuePic2 + picIndex;
+		showBlessedPicture(pictureId, valueScenePic + picIndex2, {
+			x: 640 + 480, y: 384 - 118, opacity: 200,
+			toX: 640 + 480, toY: 384 + 50, duration: 240,
+			slidePreviousId: pictureId - 1,
+		});
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:517, :518, :519
+	blessStandingPictureAndPlayPictureSe1 = function () {
+		const pictureId = valuePic1 + 2;
+		showBlessedPicture(pictureId, valueScenePic + '02', { scaleX: 300, scaleY: 300 });
+		picture_se1();
+	};
+
+	// Replaces (5x): data/CommonEvents.json:common-event:368, :412, :495, :532, :548
+	blessStandingPictureAndPlayHcgPiston = function () {
+		showBlessedPicture(valuePic2 + 1, valueScenePic + '01', {
+			x: 640 + 480 + 50, toX: 640 + 480, blessType: 1,
+		});
+		const hcgPictureId = valuePic1 + 1;
+		showScenePicture(hcgPictureId, valueScenePic + '02', { y: 384 - 20 });
+		hcg_piston(hcgPictureId, 5, 1, 2);
+	};
+
+	// Replaces (6x): data/CommonEvents.json:common-event:368, data/CommonEvents.json:common-event:412, data/CommonEvents.json:common-event:495, data/CommonEvents.json:common-event:532, data/CommonEvents.json:common-event:548, data/CommonEvents.json:common-event:573
+	// Shows the 1024-frame overlay (picture 70) at full opacity, fades it in and
+	// blesses standing picture 1.
+	fadePicture1AndBlessStandingPicture = function () {
+		const framePictureId = valuePic2;
+		const framePictureName = 'Screen1024Frame';   // 1024ピク表示の際のフレーム枠
+		showPic(framePictureId, framePictureName, 640 - 78, 384, 100, 100, 255, 1);
+		picture_fade1(framePictureId, 'fadeIn', valueWipeImg, 60, 5);
+		tachie_bless(value1, 5);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:64
+	// Slides the seven scene pictures (ids 101..107) to the left edge.
+	movePicture1_2 = function () {
+		range(1, 7).forEach(pictureIndex => pic_move1(100 + pictureIndex, 0, 30, -500, 0));
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:537
+	showAndMovePicture1AndBlessStandingPicture = function (picIndex, pictureName) {
+		const pictureId = valuePic1 + picIndex;
+		pic_showMove1(pictureId, valueScenePic + pictureName, 640 - 128, 384, 100, 60, 2, 200);
+		tachie_bless(pictureId, 2);
+		slideScenePictureAway(picIndex);
+	};
+
+	// Replaces (9x): data/CommonEvents.json:common-event:368, :412, :495, :507, :526, :532, ...
+	setPictureLocationAndBlessStandingPicture = function (picIndex, picIndex2, pictureId, blessType) {
+		const targetPictureId = valuePic1 + picIndex;
+		pic_locationSet(targetPictureId - pictureId, targetPictureId, valueScenePic + picIndex2, 60, 1);
+		tachie_bless(targetPictureId, blessType);
+	};
+
+	/* ============================================================================
+	 * Screen overlays / fades
+	 * ========================================================================== */
+
+	// Replaces (2x): data/CommonEvents.json:common-event:54, data/CommonEvents.json:common-event:301
+	blackOutScreenAndFadeScreenBlackOut = function () {
+		valuePic1 = 101;
+		showScreenBlackOut(valuePic1, 255);
 	};
 
 	// Replaces (2x): data/CommonEvents.json:common-event:172
 	blackOutScreenAndFadeScreenBlackOut2 = function () {
-		var pictureId2 = 101;
-		var pictureName2 = 'ScreenBlackOut';
-		$gameScreen.showPicture(pictureId2-1,pictureName2,1,640,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId2-1,1,640,384,100,100,150,0,40);
+		showPic(100, 'ScreenBlackOut', 640, 384, 100, 100, 0, 1);
+		movePic(100, 640, 384, 100, 100, 150, 40, 1);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:301, data/CommonEvents.json:common-event:543
+	fadePicture1ScreenBlackOut = function (actorPictureId, opacity) {
+		fadeInScreenBlackOut(actorPictureId, opacity);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:341
+	fadePicture1ScreenBlackOut_2 = function () {
+		fadeInScreenBlackOut(55 - 1, 200);
+	};
+
+	// Replaces (5x): data/CommonEvents.json:common-event:526, :530, Map083.json:map-event:6:page:1
+	fadePicture1ScreenBlackOut_3 = function (pictureId, opacity, fadePictureId) {
+		fadeInScreenBlackOut(pictureId, opacity, fadePictureId);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:517, :518, :519
+	fadePicture1Pic75 = function () {
+		fadeInScreenBlackOut(75, 150);
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:21, data/CommonEvents.json:common-event:173, :183, Map003.json:map-event:83:page:1
+	fadePicture1Pic98 = function (choicePictureName) {
+		showPic(100, 'ScreenFoundationChoice', 0 + 300, 0, 100, 100, 0, 0);
+		movePic(100, 0, 0, 100, 100, 255, 120, 0);
+		showPic(99, choicePictureName, 300 + 20, 0, 200, 200, 0, 0);
+		movePic(99, 300, 0, 200, 200, 255, 120, 0);
+		fadeInScreenBlackOut(98, 150);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:92, Map007.json:map-event:4:page:1, Map007.json:map-event:6:page:1
+	fadePicture1FadeOut = function () {
+		picture_fade1(51, 'fadeOut', 'Hscene005', 300, 5);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:301, data/Map094.json:map-event:45:page:1
+	fadePicture1FadeOut_2 = function (actorPictureId) {
+		valuePic1 = actorPictureId;
+		picture_fade1(valuePic1, 'fadeOut', valueWipeImg, 60, 5);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:292, :335, :337
+	fadePicture1ZX_Main034_ = function () {
+		valuePic1 = 55;
+		valueScenePic = 'ZX_Main034_';
+		showPic(valuePic1, valueScenePic + '01', 640, 384, 100, 100, 0, 1);
+		movePic(valuePic1, 640, 384, 100, 100, 255, 60, 1);
+		picture_fade1(valuePic1, 'fadeIn', valueWipeImg, 60, 5);
+	};
+
+	// Replaces (4x): data/Map003.json:map-event:3:page:2, data/Map093.json:map-event:2:page:1, page:2, ...
+	fadeInScreen = function (duration) {
+		$gameScreen.startFadeIn(duration);
+	};
+
+	// Replaces (4x): data/Map003.json:map-event:6:page:1, :8:page:1, :107:page:1, :182:page:1
+	fadeOutScreen = function (interp) {
+		$gameScreen.startFadeOut(30);
+		interp.wait(30);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:298
+	setValuePic1Var17 = function () {
+		valuePic1 = 55;
+		valueCountSet1 = getRandomIndex(51) + 200;
+		let presetValues = [1, 2, 1, 1][getRandomIndex(4)];
+		if (varValue(17) >= 500) presetValues = [2, 3, 4, 5][getRandomIndex(4)];
+		const pictureName = `Zev_Opening1_${presetValues}`;
+		showPic(valuePic1, pictureName, 640 + 450 - 500, 384, 300, 300, 0, 1);
+		movePic(valuePic1, 640 + 450, 384, 100, 100, valueCountSet1, 300, 1);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:298
+	blessStandingPictureVar17 = function () {
+		$gameScreen.setPicturesAnimation(3, 2, '連番', 5);
+		const presetValues = varValue(17) >= 500 ? 2 : 1;
+		const pictureName = `Zev_Opening2_${presetValues}_0`;
+		showPic(valuePic1 + 1, pictureName, 640 + 450 - 500, 384, 300, 300, 0, 1);
+		movePic(valuePic1 + 1, 640 + 450, 384, 100, 100, valueCountSet1, 300, 1);
+		tachie_bless(valuePic1, 2);
+		tachie_bless(valuePic1 + 1, 2);
+	};
+
+	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
+	shrinkPictureRow = function (interp) {
+		const PICTURE_ROW_FIRST_ID = 55;
+		range(0, 3).forEach(offset => movePic(PICTURE_ROW_FIRST_ID + offset, 640, 384, 100, 0, 0, 30, 1));
+		interp.wait(40);
+	};
+
+	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
+	erasePictureRow = function () {
+		const PICTURE_ROW_FIRST_ID = 55;
+		range(0, 3).forEach(offset => $gameScreen.erasePicture(PICTURE_ROW_FIRST_ID + offset));
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:301, data/CommonEvents.json:common-event:471
+	erasePictureP4 = function () {
+		valuePic1 = 55;
+		range(0, 3).forEach(offset => pic_eraseP(1, [valuePic1 + offset]));
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:109, data/CommonEvents.json:common-event:110
+	erasePictureP2 = function () {
+		pic_eraseP(0, [121, 122, 123, 124, 125, 126, 127, 128, 129, 130]);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:210, data/CommonEvents.json:common-event:259
+	erasePictureP3 = function (firstPictureId) {
+		const existingPictureIds = range(firstPictureId, 200).filter(pictureId => $gameScreen.picture(pictureId));
+		pic_eraseP(0, existingPictureIds);
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:495, :532, :548, :572
+	erasePictureP5 = function () {
+		pic_eraseP(0, [valuePic1 + 7]);
+	};
+
+	// Replaces (2x): data/Map007.json:map-event:23:page:1
+	erasePictureById2 = function (interp, pictureId) {
+		$gameScreen.erasePicture(pictureId);
+		interp.wait(3);
+	};
+
+	/* ============================================================================
+	 * Boss / H-scene picture choreography
+	 * ========================================================================== */
+
+	// Replaces (6x): data/CommonEvents.json:common-event:389, :509
+	playHcgPiston = function () {
+		hcg_piston(valuePic1 + 4, 7, 1, 1);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:391, :393, :399
+	playHcgPiston2 = function () {
+		const pictureId = valuePic1 + 12;
+		showPic(pictureId, valueScenePic + '12', 640 - 128, 384, 100, 100, 200, 1);
+		hcg_piston(pictureId, 7, 1, 2);
+	};
+
+	// Replaces (6x): data/CommonEvents.json:common-event:530, :531, :573
+	playHcgPiston3 = function (picIndex, picIndex2, breathTypeId, breathPresetId, breathLayerId) {
+		const pictureId = valuePic1 + picIndex;
+		showScenePicture(pictureId, valueScenePic + picIndex2);
+		hcg_piston(pictureId, breathTypeId, breathPresetId, breathLayerId);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:572, data/CommonEvents.json:common-event:573
+	playHcgPiston4 = function (picIndex, picIndex2, breathTypeId, breathPresetId) {
+		const pictureId = valuePic1 + picIndex;
+		showScenePicture(pictureId, valueScenePic + picIndex2, { y: 384 + 50 });
+		hcg_piston(pictureId, breathTypeId, breathPresetId, 1);
+	};
+
+	// Replaces (3x): data/Map007.json:map-event:5:page:1
+	playHcgPiston5 = function (breathPresetId) {
+		// ピクID, 1縦2横3左斜め4右斜め, 1緩め2通常3ラスト
+		hcg_piston(55, 1, breathPresetId);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:389, :509
+	movePicture1AndPlayHcgPiston = function (picIndex, picIndex2, breathPresetId) {
+		const pictureId = valuePic1 + picIndex;
+		showScenePicture(pictureId, valueScenePic + picIndex2);
+		slideScenePictureAway(picIndex);
+		hcg_piston(pictureId, 6, breathPresetId, 1);
+	};
+
+	// Replaces (7x): data/CommonEvents.json:common-event:391, :393, :399, :531, :573, ...
+	playHcgPistonAndMovePicture1 = function (picIndex, picIndex2, breathTypeId) {
+		const pictureId = valuePic1 + picIndex;
+		showScenePicture(pictureId, valueScenePic + picIndex2);
+		hcg_piston(pictureId, breathTypeId, 1, 1);
+		slideScenePictureAway(picIndex);
+	};
+
+	// Replaces (6x): data/CommonEvents.json:common-event:508
+	movePicture1AndBlessStandingPicture = function (picIndex, picIndex2) {
+		const pictureId = valuePic1 + picIndex;
+		showBlessedPicture(pictureId, valueScenePic + picIndex2, { slidePreviousId: pictureId - 1 });
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:368, :495, :532, :548
+	playHcgPistonSwitch429 = function () {
+		const pictureId = valuePic1 + 2;
+		showPic(pictureId, valueScenePic + '02', 640, 384, 100, 100, 255, 1);
+		pic_setArray1 = [1, pictureId, 0, -30, 0, 20];
+		pic_setArray2 = [1, pictureId, 0, 0, 3, 30];
+		valueParallelPicSe1 = ['ZH_sticky4', 20, 60];
+		valueParallelPicSe2 = ['ZH_sticky4', 20, 60];
+		hcg_piston(pictureId, 7, 2, 1);
+		enableSwitch(429);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:541, data/CommonEvents.json:common-event:543
+	playHcgPistonSwitch429_2 = function (picIndex, picIndex2, seVolume, pictureId) {
+		pic_setArray1 = [1, valuePic1 + picIndex, 0, -15, 0, 20];
+		pic_setArray2 = [1, valuePic1 + picIndex2, 0, 0, 3, 30];
+		valueParallelPicSe1 = ['ZH_sticky4', seVolume, 10];
+		valueParallelPicSe2 = [0, 0, 0];
+		hcg_piston(valuePic1 + pictureId, 7, 2, 1);
+		enableSwitch(429);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:572
+	playParallelPictureSeSwitch429 = function (seVolume1, seVolume2) {
+		const pictureId = valuePic1 + 7;
+		pic_setArray1 = [1, pictureId, 0, -30, 5, seVolume1];
+		pic_setArray2 = [1, pictureId, 0, 30, 3, seVolume2];
+		valueParallelPicSe1 = [0, 0, 0];
+		valueParallelPicSe2 = [0, 0, 0];
+		enableSwitch(429);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:495, :532, :548
+	playAdvHPartDirectAndSetSexDirection = function (interp) {
+		// 絶頂射精
+		adv_HpartDirectPlay(3);
+		sex_direction(12, 0, 0);
+		interp.wait(valueSexWait);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:495, :532, :548
+	setAdvPartDirectAndSetSexDirection = function (interp) {
+		// ピストン
+		adv_partDirectSet(1);
+		sex_direction(1, 0, 0);
+		interp.wait(valueSexWait);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:517, :518, :519
+	setSexDirectionAndSetAdvPartDirect = function (interp, actionType) {
+		sex_direction(actionType, 0, 0);
+		interp.wait(valueSexWait);
+		adv_partDirectSet(1);   // ピストンの時
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:338, data/CommonEvents.json:common-event:536
+	startPictureAnimationFrame = function (frameId) {
+		const pictureId = valuePic1;
+		if ($gameScreen.picture(pictureId)) {
+			$gameScreen.picture(pictureId).startAnimationFrame(frameId, true, [1, 1, 1, 2]);
+		}
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:543, :572, :573
+	startPictureAnimationFrame2 = function (picIndex) {
+		const pictureId = valuePic1 + picIndex;
+		if ($gameScreen.picture(pictureId)) {
+			$gameScreen.picture(pictureId).startAnimationFrame(1, true, [1, 1, 1, 2]);
+		}
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:338
+	setStandingPictureActionVar20 = function (interp, expressionCode) {
+		tachie_dousa(2, 1, expressionCode, 15, 1, 255, 1344, 0, 0);
+		tachie_dousa(1, 1, 4, 15, 1, 255, 0, 0, 0);
+		interp.wait(3);
+	};
+
+	// Replaces (11x): data/CommonEvents.json:common-event:368, :410, :495, :532, :536, :548, ...
+	setStandingPictureActionZ_ClothesTakeOff = function (expressionCode, targetPicId, sourcePicId, showCostumeId) {
+		tachie_dousa(0, 1, expressionCode, targetPicId, sourcePicId, showCostumeId, 120, 0, 0);
+		playSeEffectZ_ClothesTakeOff();
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:292, :329, Map007.json:map-event:23:page:1
+	playSeEffectZ_ClothesTakeOff = function () {
+		const SE_NAME = 'Z_ClothesTakeOff';   // ピッチ50か100。消去ウェイトで変更
+		AudioManager.playSe({ name: SE_NAME, volume: 150, pitch: 100, pan: 0 });
+	};
+	/* ============================================================================
+	 * Flow / state variables
+	 * ========================================================================== */
+
+	// Replaces (5x): data/CommonEvents.json:common-event:85, :109, :110, :113, :159
+	setSelfVariable0 = function (interp) {
+		clearSelfVarRange(interp, 401, 440);
+	};
+
+	// Replaces (7x): data/CommonEvents.json:common-event:85, :401, :516, :546, Map200.json:map-event:11:page:1, ...
+	assignSelfVariableValue = function (interp, variableId, value) {
+		setSelfVar(interp, variableId, value);
+	};
+
+	// Replaces (10x): data/CommonEvents.json:common-event:219, :307, :401, :411, :451, Map007.json:map-event:3:page:1, ...
+	assignSelfVariableValue2 = assignSelfVariableValue;   // identical helper, kept under its original name
+
+	// Replaces (7x): data/CommonEvents.json:common-event:313, :322, :326, :338, :339, :355, ...
+	setSelfVariable23 = function (interp, line) {
+		setSelfVar(interp, 23, line);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:536
+	setSelfVariable23Var1 = function (interp) {
+		const actorHStatArray = varValue(381);   // variable 381: アクター1Ｈステ配列
+		const hStatValue56 = actorHStatArray[56];   // 381 slot 56 — no name in System.json
+		const hStatValue53 = actorHStatArray[53];   // 381 slot 53 — no name in System.json
+		setSelfVar(interp, 23, `${hStatValue56}の${hStatValue53}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:158
+	setSelfVariable207 = function (interp) {
+		setSelfVar(interp, 207, 101);   // 露出縛りなし
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:217, data/CommonEvents.json:common-event:249
+	setSelfVariable702 = function (interp) {
+		setSelfVar(interp, 702, varValue(702) + 1);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:307, :335, :337
+	setSelfVariableToActorPairNames = function (interp, variableId) {
+		const actorName3 = $gameActors.actor(3).name();
+		const actorName4 = $gameActors.actor(4).name();
+		setSelfVar(interp, variableId, `${actorName3}＆${actorName4}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:337
+	setSelfVariableToActorNameWithExcept = function (interp) {
+		const actorName4 = $gameActors.actor(4).name();
+		setSelfVar(interp, 23, `${actorName4}以外`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:356
+	setSelfVariableToActorTrioNames = function (interp) {
+		const actorName3 = $gameActors.actor(3).name();
+		const actorName4 = $gameActors.actor(4).name();
+		const actorName5 = $gameActors.actor(5).name();
+		setSelfVar(interp, 23,
+			`${actorName3}＆${actorName4}＆${actorName5}`);
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:90
+	setSelfVariable21_2 = function (interp) {
+		setSelfVar(interp, 21, '');
+	};
+
+	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
+	setSelfVariable21_3 = function (interp) {
+		const sharedPoolArray = varValue(21);   // variable 21: 乱数汎用1 (the shared character pool)
+		setSelfVar(interp, 21, [0, [], 0, 0, 0, 0, 0, 0, 0]);
+		sharedPoolArray[1].push(5);
+		sharedPoolArray[1].push(556);
+	};
+
+	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
+	setSelfVariable21_4 = function (interp) {
+		setSelfVar(interp, 21, valueFighterStatas);
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:81:page:1, data/Map003.json:map-event:82:page:1
+	setSelfVariable24 = function (interp) {
+		const expressionId = varValue(23);
+		const expressionByExpressionId = { 6: 128, 7: 127, 8: 126, 9: 125 };
+		const matchedExpressionId = expressionId >= 10 ? 124 : expressionByExpressionId[expressionId];
+		if (matchedExpressionId) setSelfVar(interp, 24, matchedExpressionId);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:103
+	setVariable332Text = function () {
+		const icon296 = icon(296);
+		const totalexpRounded = Math.round(valueTotalexp);
+		const icon313 = icon(313);
+		const totalgoldRounded = Math.round(valueTotalgold);
+		setVar(332, `${icon296}:${totalexpRounded}${icon313}:${totalgoldRounded}`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:12
+	setVariable537 = function () {
+		setVar(537, []);   // エネミー
+		setVar(538, []);   // Hエネミー
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:19:page:1
+	setVariable22 = function (nextValue) {
+		setVar(22, 0);
+		setVar(23, nextValue);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:174, data/CommonEvents.json:common-event:181
+	setVariable19 = function () {
+		setVar(19, valueCountArray3[varValue(19)]);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:201, data/CommonEvents.json:common-event:202
+	setVariable19Var327 = function () {
+		const weaponSlotRecords = varValue(327);   // variable 327: 拠点アクティベート記録配列 (per-slot activation records)
+		let targetSlotIndex = 22;
+		for (let slotIndex = 1; slotIndex <= 100; slotIndex++) {
+			if (weaponSlotRecords[slotIndex] == 2) {
+				targetSlotIndex = slotIndex;
+				break;
+			}
+		}
+		setVar(19, targetSlotIndex);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:201, :202, data/Map003.json:map-event:133:page:2
+	setVariable161 = function () {
+		const homePosition = $dataWeapons[varValue(19)].meta['HomePosition'].split(',');
+		const homePositionYOffset = Number(homePosition[3]) == 0 ? 1 : -1;
+		setVar(161, [Number(homePosition[0]), Number(homePosition[1]) + homePositionYOffset, Number(homePosition[2])]);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:201, data/CommonEvents.json:common-event:202
+	countDefeatedEnemyVar240And161Switch140 = function () {
+		const dungeonInfoItemId = varValue(240);   // variable 240: ダンジョン毎情報アイテム指定変数
+		let escapeMapPosition;
+		if (dungeonInfoItemId >= 1) {
+			escapeMapPosition = $dataItems[dungeonInfoItemId].meta['EscapeMapID'].split(',');
+			setVar(161, [Number(escapeMapPosition[0]), Number(escapeMapPosition[1]), Number(escapeMapPosition[2])]);
+		} else {
+			setVar(161, [14, 26, 7]);
+		}
+		if (Number(escapeMapPosition[0]) != $gameMap.mapId()) {
+			disableSwitch(140);   // マップ最初の処理終了スイッチ
+		}
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:240
+	setValueScriptArray1 = function (setValue, arrayValue) {
+		if (valueCountSet1 == setValue) valueScriptArray1 = [arrayValue];
+	};
+
+	// Replaces (3x): data/Map003.json:map-event:139:page:1, :140:page:1, :142:page:1
+	cycleSelfSwitchVariable = function (interp) {
+		$gameSelfSwitches.setVariableValue([$gameMap.mapId(), interp._eventId, 10], 10);
+	};
+
+	// Replaces (3x): data/Map003.json:map-event:139:page:1, :140:page:1, :142:page:1
+	cycleSelfSwitchVariable2 = function (interp) {
+		const nextBetRateByCurrentRate = { 10: 100, 100: 1000, 1000: 10000, 10000: 10 };
+		const currentBetRate = $gameSelfSwitches.getVariableValue([$gameMap.mapId(), interp._eventId, 10]);
+		$gameSelfSwitches.setVariableValue([$gameMap.mapId(), interp._eventId, 10], nextBetRateByCurrentRate[currentBetRate]);
+	};
+
+	// Replaces (3x): data/Map003.json:map-event:141:page:1, data/Map003.json:map-event:247:page:1, data/Map007.json:map-event:53:page:1
+	setValueBetCoinlist = function (interp) {
+		cycleSelfSwitchVariable(interp);
+		valueBetCoinlist = [10];   // ポーカー用ベットレート
+	};
+
+	// Replaces (3x): data/Map003.json:map-event:141:page:1, data/Map003.json:map-event:247:page:1, data/Map007.json:map-event:53:page:1
+	setValueBetCoinlist2 = function (interp) {
+		const nextBetRateByCurrentRate = { 10: 100, 100: 1000, 1000: 10000, 10000: 10 };
+		const currentBetRate = $gameSelfSwitches.getVariableValue([$gameMap.mapId(), interp._eventId, 10]);
+		const nextBetRate = nextBetRateByCurrentRate[currentBetRate];
+		$gameSelfSwitches.setVariableValue([$gameMap.mapId(), interp._eventId, 10], nextBetRate);
+		valueBetCoinlist = [nextBetRate];
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:142:page:1
+	setValueMenuBackOpacity = function (opacity) {
+		valueMenuBackOpacity = opacity;
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:139:page:1, data/Map003.json:map-event:140:page:1
+	showInfoPopupVar801And69 = function (interp) {
+		setVar(801, 'おめでとう。');
+		const betRate = $gameSelfSwitches.getVariableValue([$gameMap.mapId(), interp._eventId, 10]);
+		const coinPrize = betRate * 2;
+		setVar(69, varValue(69) + coinPrize);
+		showCommonInfo(`コイン+${coinPrize}枚`);
+	};
+
+	/* ============================================================================
+	 * Selection / shop / items
+	 * ========================================================================== */
+
+	// Replaces (5x): data/CommonEvents.json:common-event:187, :188, :196
+	selectEnemyDrop = function () {
+		enemy_dropSelection($gameActors.actor(20));
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:176
+	addCustomChoice = function () {
+		$gameSystem.addCustomChoice(1, { text: '未指定', value: 0 });
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:259
+	addCustomChoice2 = function () {
+		const fontSize20 = fontSize(20);
+		const skipCutsceneChoiceText = $dataSystem.switches[430];
+		const fontSize28 = fontSize(28);
+		$gameSystem.addCustomChoice(1, { text: `${fontSize20}${skipCutsceneChoiceText}${fontSize28}`, value: 99 });
+	};
+
+	// Replaces (1x): data/Map003.json:map-event:83:page:1
+	addCustomChoiceVar22 = function () {
+		const customChoiceText = varValue(22);   // variable 22: 乱数汎用2 (here: the choice text)
+		$gameSystem.addCustomChoice(1, { text: `${customChoiceText}　　　　　　　　　　　　　`, value: 0 });
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:185
+	setValueShopMaxCols = function () {
+		valueShopMaxCols = 1;
+		array = [];
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:185
+	setValueShopMaxCols2 = function () {
+		valueShopMaxCols = 2;
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:53, data/Map007.json:map-event:7:page:1
+	gainItem = function (firstItemId, lastItemId) {
+		range(firstItemId, lastItemId).forEach(itemId => {
+			const item = $dataItems[itemId];
+			if (item.name !== '') $gameParty.gainItem(item, 15);
+		});
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:175, data/CommonEvents.json:common-event:180
+	useItemBulk = function () {
+		valueCountSet1 = 0;
+		valueIkkatuArray = [];
+		[0, 1, 2].forEach(itemCategoryId => item_ikkatu(itemCategoryId));
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:175, data/CommonEvents.json:common-event:180
+	setValueIkkatuArray = function () {
+		valueIkkatuArray = [];
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:175, data/CommonEvents.json:common-event:180
+	setValueCountSet2_4 = function () {
+		valueCountSet2 = valueIkkatuArray.length;
+		valueCountSet3 = 0;   // +1で件数合計
+		valueCountSet4 = 0;   // 個数累計
+		valueCountSet5 = 0;   // 金額合計
+		valueCountSet6 = 0;   // 変数57合計
+		valueCountSet7 = 0;   // ｱｲﾃﾑID270合計
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:176
+	writeVariableArraySlotVar19And293 = function (maxValue) {
+		const trainingDummyCounts = varValue(293);   // variable 293: 訓練人形事前設定配列
+		const itemId = varValue(19);
+		trainingDummyCounts[itemId] += 1;
+		if (trainingDummyCounts[itemId] >= maxValue) trainingDummyCounts[itemId] = 1;
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:176
+	writeVariableArraySlotVar293And20 = function (charaSlotId) {
+		varValue(293)[charaSlotId] = varValue(20 + charaSlotId);
 	};
 
 	// Replaces (2x): data/CommonEvents.json:common-event:174
@@ -5721,3304 +6863,295 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	};
 
 	// Replaces (3x): data/CommonEvents.json:common-event:174
-	setValueCountSet2_3 = function (countValue) {
-		valueCountSet2 = countValue;
+	setValueCountSet2_3 = function (setValue) {
+		valueCountSet2 = setValue;
 		valueWordSet0 = 0;
 	};
 
-	// Replaces (2x): data/CommonEvents.json:common-event:174, data/CommonEvents.json:common-event:181
-	setVariable19 = function () {
-		$gameVariables.setValue(19,valueCountArray3[$gameVariables.value(19)]);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:175, data/CommonEvents.json:common-event:180
-	useItemBulk = function () {
-		valueCountSet1 = 0;
-		valueIkkatuArray = [];
-		item_ikkatu(0);
-		item_ikkatu(1);
-		item_ikkatu(2);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:175, data/CommonEvents.json:common-event:180
-	setValueCountSet2_4 = function () {
-		valueCountSet2 = valueIkkatuArray.length;
-		valueCountSet3 = 0;//+1で件数合計
-		valueCountSet4 = 0;//個数累計
-		valueCountSet5 = 0;//金額合計
-		valueCountSet6 = 0;//変数57合計
-		valueCountSet7 = 0;//ｱｲﾃﾑID270合計
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:175, data/CommonEvents.json:common-event:180
-	hideWindow3 = function () {
-		WindowManager.hide(1);
-		WindowManager.hide(2);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:175, data/CommonEvents.json:common-event:180
-	setValueIkkatuArray = function () {
-		valueIkkatuArray = [];
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:176
-	writeVariableArraySlotVar19And293 = function (numericValue) {
-		var variable19Value = $gameVariables.value(19);
-		$gameVariables.value(293)[variable19Value] += 1;
-		if($gameVariables.value(293)[variable19Value] >= numericValue){
-		$gameVariables.value(293)[variable19Value] = 1;
-		};
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:176
-	writeVariableArraySlotVar293And20 = function (numericValue) {
-		var variableId2 = numericValue;
-		$gameVariables.value(293)[variableId2] = $gameVariables.value(20+variableId2);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:176
-	addCustomChoice = function () {
-		var messageText2 = `未指定`;
-		const constantValue = 1; 
-		const choiceParams2 = {
-		text: `${messageText2}`,
-		value: 0};
-		$gameSystem.addCustomChoice(constantValue, choiceParams2);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:259
-	addCustomChoice2 = function () {
-		var controlCode1 = `\\fs[20]`;
-		var controlCode2 = `\\fs[28]`;
-		    const constantValue = 1; 
-		    const choiceParams2 = {
-		    text: `${controlCode1}${$dataSystem.switches[430]}${controlCode2}`,
-		    value: 99};
-		    $gameSystem.addCustomChoice(constantValue, choiceParams2);
-	};
-
-	// Replaces (1x): data/Map003.json:map-event:83:page:1
-	addCustomChoiceVar22 = function () {
-		var messageText2 = `　　　　　　　　　　　　　`;
-		const constantValue = 1; 
-		const variable22Value = {
-		text: `${$gameVariables.value(22)}${messageText2}`,
-		value: 0};
-		$gameSystem.addCustomChoice(constantValue, variable22Value);
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:184, data/Map003.json:map-event:20:page:1, data/Map003.json:map-event:133:page:2
-	bindInterpreterToValueCountSet9 = function (interp) {
-		return (function () {
-		interp._eventId = valueCountSet9;
-		}).call(interp);
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:184, data/Map003.json:map-event:20:page:1, data/Map003.json:map-event:133:page:2
-	writeVariableArraySlotVar292 = function () {
-		if(!!$gameMap.event($gameVariables.value(292)[0])) {
-		  $gameMap.eraseEvent($gameVariables.value(292)[0]);
-		};
-		$gameVariables.value(292)[0] = 0;
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:185
-	setValueShopMaxCols = function () {
-		valueShopMaxCols = 1;
-		array = [];
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:185
-	setValueShopMaxCols2 = function () {
-		valueShopMaxCols = 2;
-	};
-
-	// Replaces (5x): data/CommonEvents.json:common-event:187, data/CommonEvents.json:common-event:188, data/CommonEvents.json:common-event:196
-	selectEnemyDrop = function () {
-		var user2 = $gameActors.actor(20);
-		enemy_dropSelection(user2);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:188
-	bindInterpreterToValueEnemyEventId = function (interp) {
-		return (function () {
-		interp._eventId = valueEnemyEventId;
-		}).call(interp);
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:189, data/CommonEvents.json:common-event:190, data/CommonEvents.json:common-event:196
-	bindInterpreterToValueanimalEventId = function (interp) {
-		return (function () {
-		interp._eventId = valueanimalEventId;
-		}).call(interp);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:190, data/CommonEvents.json:common-event:195
-	spawnMapEvent = function () {
-		var x4 = $gameMap.event(valueanimalEventId).x;
-		var y5 = $gameMap.event(valueanimalEventId).y;
-		$gameMap.spawnEvent(99, x4, y5, true);
-		var mapGetLastSpawnEventId = $gameMap.getLastSpawnEventId();
-		var event2 = $gameMap.event(mapGetLastSpawnEventId);
-		event2.startScale(10,50,50);
-		event2._priorityType = 0;
-		event2.setOpacity(150);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:192
-	setActor21Name = function () {
-		var messageText2 = `情報屋`;
-		$gameActors.actor(21).setName(`${messageText2}`);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:239
-	setActor21Name2 = function () {
-		var messageText2 = `鑑定屋`;
-		$gameActors.actor(21).setName(`${messageText2}`);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:305
-	setActor21Name3 = function () {
-		var textPrefix = `受付嬢`;
-		var controlCode1 = `\\}`;
-		var textSuffix = `支部`;
-		var controlCode2 = `\\{`;
-		$gameActors.actor(21).setName(`${textPrefix}${controlCode1} ${$dataWeapons[76].name} ${$dataWeapons[22].name}${textSuffix}${controlCode2}`);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:511, data/Map094.json:map-event:45:page:1
-	setActor22Name = function () {
-		var messageText2 = `受付`;
-		var controlCode1 = `\\}`;
-		var controlCode2 = `\\{`;
-		$gameActors.actor(22).setName(`${messageText2}${controlCode1} ${$dataWeapons[70].name}${controlCode2}`);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:196
-	requestEventAnimation = function (animationId) {
-		var event2 = $gameMap.event(valueEnemyEventId);
-		event2.requestAnimation(animationId);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:199
-	setSwitch380Var19 = function () {
-		$gameSwitches.setValue(380,false);
-		var variable19Value = $gameVariables.value(19);
-		if ($gameMap.event(variable19Value).event().meta['WorldMenu']){
-		  $gameSwitches.setValue(380,true);
-		};
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:201, data/CommonEvents.json:common-event:202
-	setVariable19Var327 = function () {
-		var newValue2 = 22;
-		for (var slotIndex2 = 1; slotIndex2 <= 100; slotIndex2++) {
-		  if($gameVariables.value(327)[slotIndex2] == 2){
-		    var newValue2 = slotIndex2;
-		    break;
-		}};
-		$gameVariables.setValue(19,newValue2);
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:201, data/CommonEvents.json:common-event:202, data/Map003.json:map-event:133:page:2
-	setVariable161 = function () {
-		var variable19Value = $dataWeapons[$gameVariables.value(19)].meta['HomePosition'].split(',');
-		if(Number(variable19Value[3]) == 0){
-		  var newValue2 = 1;
-		} else {
-		  var newValue2 = -1;
-		};
-		$gameVariables.setValue(161,[Number(variable19Value[0]),
-		Number(variable19Value[1]) + newValue2,Number(variable19Value[2])]);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:201, data/CommonEvents.json:common-event:202
-	countDefeatedEnemyVar240And161Switch140 = function () {
-		if($gameVariables.value(240) >= 1){
-		  var variable240Value = $dataItems[$gameVariables.value(240)].meta['EscapeMapID'].split(',');
-		  $gameVariables.setValue(161,[Number(variable240Value[0]),Number(variable240Value[1]),Number(variable240Value[2])]);
-		} else {
-		  $gameVariables.setValue(161,[14,26,7]);
-		};
-		if(Number(variable240Value[0]) != $gameMap.mapId()){
-		  $gameSwitches.setValue(140,false);//マップ最初の処理終了スイッチ
-		};
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:202
-	setBattleAnimationSpeed2 = function (battleAnimationSpeed) {
-		ConfigManager.battleAniSpeed = battleAnimationSpeed
+	// Replaces (2x): data/CommonEvents.json:common-event:44, data/CommonEvents.json:common-event:45
+	setValueWordSetEx = function () {
+		valueWordSetEx = 0;
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:205
 	setPickupSkillLabel = function () {
-		var messageText2 = `持ち上げ＜OFF＞`;
 		$gameSystem._pickupData[0] = false;
-		$dataSkills[26].name =`${messageText2}`;
+		$dataSkills[26].name = '持ち上げ＜OFF＞';
 	};
 
-	// Replaces (1x): data/CommonEvents.json:common-event:205
-	loadSkillPersonalSwitchAndSelectSkill = function (interp) {
-		return (function () {
-		var changeSkill = valueChangeSkill;
-		changeSkill.forEach(function(id) {
-		  skill_personalonoffload(id,0);
-		}, interp);
-		var changeSkill = valueVariablesChangeSkill;
-		changeSkill.forEach(function(id) {
-		  skill_sentaku(id,0);
-		}, interp);
-		}).call(interp);
+	/* ============================================================================
+	 * Actor names (receptionists / shop keepers / NPCs)
+	 * ========================================================================== */
+
+	// Replaces (1x): data/CommonEvents.json:common-event:192
+	setActor21Name = function () {
+		setNpcIdentity(21, '情報屋');
 	};
 
-	// Replaces (1x): data/CommonEvents.json:common-event:205
-	loadSkillPersonalSwitch = function (interp) {
-		return (function () {
-		var personalSkill = valuePersonalSkill;
-		personalSkill.forEach(function(id) {
-		  skill_personalonoffload(id,0);
-		}, interp);
-		}).call(interp);
+	// Replaces (1x): data/CommonEvents.json:common-event:239
+	setActor21Name2 = function () {
+		setNpcIdentity(21, '鑑定屋');
 	};
 
-	// Replaces (1x): data/CommonEvents.json:common-event:205
-	loadSkillPersonalSwitch2 = function (interp) {
-		return (function () {
-		var personalItem = valuePersonalItem;
-		personalItem.forEach(function(id) {
-		  skill_personalonoffload(id,1);
-		}, interp);
-		}).call(interp);
+	// Replaces (1x): data/CommonEvents.json:common-event:305
+	setActor21Name3 = function () {
+		const weaponName76 = $dataWeapons[76].name;
+		const weaponName22 = $dataWeapons[22].name;
+		setNpcIdentity(21, `受付嬢${braceRight()} ${weaponName76} ${weaponName22}支部${braceLeft()}`);
 	};
 
-	// Replaces (6x): data/CommonEvents.json:common-event:205, data/CommonEvents.json:common-event:292, data/CommonEvents.json:common-event:313
-	setMapSelfSwitchMapFirsttAction = function (textValue) {
-		for (var eventId2 = 1; eventId2 < 100; eventId2++) {
-		  if(!!$gameMap.event(eventId2)) {
-		    if ($gameMap.event(eventId2).event().meta['MapFirsttAction'] ){
-		      var mapMapId = $gameMap.mapId();
-		      var key3 = eventId2;
-		      var key4 = textValue;
-		      var newValue2 = false;
-		      $gameSelfSwitches.setValue([mapMapId, key3, key4], newValue2);
-		      break;
-		}}};
+	// Replaces (2x): data/CommonEvents.json:common-event:511, data/Map094.json:map-event:45:page:1
+	setActor22Name = function () {
+		const weaponName70 = $dataWeapons[70].name;
+		setNpcIdentity(22, `受付${braceRight()} ${weaponName70}${braceLeft()}`);
 	};
 
-	// Replaces (1x): data/CommonEvents.json:common-event:205
-	setWeaponUnique = function (interp) {
-		return (function () {
-		var variable248Value = $gameVariables.value(248);
-		variable248Value.forEach(function(id) {
-		  $dataWeapons[id+200].name = $gameVariables.value(id+380)[50]; 
-		  weapon_uniqueSet(id);
-		}, interp);
-		}).call(interp);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:205
-	addAllSacredBeastParams = function () {
-		seisyoujuu_addParamsAll();//星晶獣強化反映
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:205
-	setTraitChangeAndSetInfoY = function () {
-		trait_changeSetting(106);//信仰バフステート変動設定
-		trait_changeSetting(107);//食事バフステート変動設定
-		info_SetY($gameVariables.value(200));//インフォY軸補正値ミニステで変更
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:205
-	setNpcProfession = function () {
-		//NPC役職名配列
-		setNPCProfession();
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:205
-	setNpcFamilyName = function () {
-		//NPC苗字設定
-		setNPCFamilyName();
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:205
-	configureActorFromVariable11 = function () {
-		var variable11Value = $gameActors.actor($gameVariables.value(11));
-		if(variable11Value.skillMasteryLevel(772) > Number($dataSkills[772].meta['Max Mastery Level'])){
-		  variable11Value.setSkillMasteryLevel(772, 5);
-		};
-		if(variable11Value.skillMasteryLevel(773) > Number($dataSkills[773].meta['Max Mastery Level'])){
-		  variable11Value.setSkillMasteryLevel(773, 5);
-		};
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:210, data/CommonEvents.json:common-event:259
-	erasePictureP3 = function (rangeStart) {
-		var pictureIds2 = [];
-		for (var loopIndex = rangeStart; loopIndex <= 200; loopIndex++) {
-		  if($gameScreen.picture(loopIndex)){
-		    pictureIds2.push(loopIndex);
-		  };
-		};
-		pic_eraseP(0,pictureIds2);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:211, data/CommonEvents.json:common-event:215
-	setSwitch379 = function (interp) {
-		return (function () {
-		var constantValue = 0;
-		var variable247Value = $gameVariables.value(247);
-		variable247Value.forEach(function(id) {
-		if($gameParty.members().contains($gameActors.actor(id))){
-		$gameSwitches.setValue(id+100,true);
-		constantValue += 1;
-		}}, interp);
-		if(constantValue <= 1){
-		$gameSwitches.setValue(379,true);
-		};
-		}).call(interp);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:217, data/CommonEvents.json:common-event:249
-	setSelfVariable702 = function (interp) {
-		return (function () {
-		interp.sVal(702,$gameVariables.value(702) + 1);
-		//this.character($gameVariables.value(196)).requestAnimation(180);
-		//this.addPopup(["add","text:\\V[702]"]);
-		}).call(interp);
-	};
-
-	// Replaces (10x): data/CommonEvents.json:common-event:219, data/CommonEvents.json:common-event:307, data/CommonEvents.json:common-event:401, data/CommonEvents.json:common-event:411, data/CommonEvents.json:common-event:451, data/Map007.json:map-event:3:page:1, …
-	assignSelfVariableValue2 = function (interp, variableId, newValue) {
-		return (function (variableId, newValue) {
-		interp.sVal(variableId,newValue);
-		}).call(interp, variableId, newValue);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:221
-	showPictureFromArgs = function (pictureId, pictureName, origin, x, y) {
-		$gameScreen.showPicture(pictureId,pictureName,origin,
-		x,y,100,100,255,0)
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:221
-	showPicture3 = function () {
-		if($gameSwitches.value(488)){
-		  $gameScreen.showPicture(3,'PictureBottan3a',1,
-		  255,39,100,100,255,0)
-		} else {
-		  $gameScreen.showPicture(3,'PictureBottan3',1,
-		  255,39,100,100,255,0)
-		};
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:221
-	showPictureFromArgs2 = function (pictureId, pictureName, x, pictureId2, pictureName2, x2) {
-		$gameScreen.showPicture(pictureId,pictureName,1,
-		x,39,100,100,255,0)
-		$gameScreen.showPicture(pictureId2,pictureName2,1,
-		x2,39,100,100,255,0)
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:234
-	speakCharacterOneLiner = function (interp) {
-		var messageText2 = `親愛なる隣人の旅路に祝福を──`;
-		return (function () {
-		var randomXOffsets = [0];
-		var randomYOffsets = [-50];
-		var lineCandidates = [`${messageText2}`];
-		chara_oneWord(100,interp._eventId,28,240,randomXOffsets,randomYOffsets,lineCandidates,0);
-		}).call(interp);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:338
-	speakCharacterOneLiner2 = function (interp) {
-		var messageText2 = `ゴクゴクっ──`;
-		return (function () {
-		var randomXOffsets = [0];
-		var randomYOffsets = [-50];
-		var lineCandidates = [`${messageText2}`];
-		chara_oneWord(100,interp._eventId,25,240,randomXOffsets,randomYOffsets,lineCandidates,0);
-		}).call(interp);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:541
-	speakCharacterOneLiner3 = function (interp) {
-		var messageText2 = `ガサゴソ…`;
-		return (function () {
-		var randomXOffsets = [0];
-		var randomYOffsets = [-50];
-		var lineCandidates = [`${messageText2}`];
-		chara_oneWord(100,interp._eventId,25,180,randomXOffsets,randomYOffsets,lineCandidates,0);
-		}).call(interp);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:235
-	configureActorFromVariable20Var21 = function () {
-		var textPrefix = `\\set[`;
-		var textPart2 = `]は、<`;
-		var textSuffix = `>に\\rb[昇格,レアリティ・アップ]した！`;
-		var variable20Value = $gameActors.actor($gameVariables.value(20));
-		$gameVariables.setValue(21,
-		`${textPrefix}${$gameVariables.value(20)}${textPart2}${valueCountSet1}${textSuffix}`);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:254
-	configureActorFromVariable20Var21_2 = function () {
-		var messageText2 = `を初期化します。よろしいですか？\n（H履歴は影響ありませんが、\n各種開発度ランクはリセットされます。\nサブジョブのレベルは完全にはリセットされません）`;
-		var variable20Value = $gameActors.actor($gameVariables.value(20));
-		$gameVariables.setValue(21,
-		`${variable20Value.name()}${messageText2}`);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:254
-	configureActorFromVariable20Var21_3 = function () {
-		var messageText2 = `のリセット処理が完了しました。`;
-		var variable20Value = $gameActors.actor($gameVariables.value(20));
-		$gameVariables.setValue(21,
-		`${variable20Value.name()}${messageText2}`);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:259
-	configureActorFromVariable20Var801And21 = function () {
-		var textPrefix = `は[`;
-		var textSuffix = `]のジョブ解放条件を満たしていません…。\n`;
-		var variable20Value = $gameActors.actor($gameVariables.value(20));
-		$gameVariables.setValue(801,
-		`${variable20Value.name()}${textPrefix}${$dataClasses[$gameVariables.value(21)].name}${textSuffix}`);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:313
-	configureActorFromVariable20Var21_4 = function () {
-		var textPrefix = `\\set[`;
-		var textPart2 = `]は、`;
-		var controlCode = `\\sin[405]`;
-		var textSuffix = `に\\rb[昇格,レアリティ・アップ]した！`;
-		var variable20Value = $gameActors.actor($gameVariables.value(20));
-		$gameVariables.setValue(21,
-		`${textPrefix}${$gameVariables.value(20)}${textPart2}${controlCode}${textSuffix}`);
+	// Replaces (2x): data/CommonEvents.json:common-event:301, data/CommonEvents.json:common-event:401
+	setActor22Name2 = function (nameVariableActorId) {
+		$gameActors.actor(22).setName($gameActors.actor(nameVariableActorId).name().slice(0, 1));
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:236
 	setActor20NameVar400 = function () {
-		var messageText2 = `バニーさん`;
-		$gameActors.actor(20).setName(`${messageText2}`);
-		$gameVariables.value(400)[59] = `${$dataWeapons[433].name}`;
+		setNpcIdentity(20, 'バニーさん', $dataWeapons[433].name);
 	};
 
 	// Replaces (2x): data/CommonEvents.json:common-event:242, data/Map094.json:map-event:32:page:1
-	setActor20NameVar400_2 = function (textValue) {
-		var messageText2 = `受付`;
-		$gameActors.actor(20).setName(`${messageText2}`);
-		$gameVariables.value(400)[59] = textValue;
+	setActor20NameVar400_2 = function (subtitle) {
+		setNpcIdentity(20, '受付', subtitle);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:246
 	setActor20NameVar400_3 = function () {
-		var messageText2 = `ピエロ`;
-		var textPart2 = `タートル・エクスペリエンス社`;
-		$gameActors.actor(20).setName(`${messageText2}`);
-		$gameVariables.value(400)[59] = `${textPart2}`;
+		setNpcIdentity(20, 'ピエロ', 'タートル・エクスペリエンス社');
 	};
 
 	// Replaces (2x): data/CommonEvents.json:common-event:308, data/CommonEvents.json:common-event:355
 	setActor20NameVar400_4 = function () {
-		var messageText2 = `ボスゴブリン`;
-		$gameActors.actor(20).setName(`${messageText2}`);
-		$gameVariables.value(400)[59] = `${$dataSystem.switches[248]}`;
+		setNpcIdentity(20, 'ボスゴブリン', $dataSystem.switches[248]);
 	};
 
 	// Replaces (2x): data/CommonEvents.json:common-event:390, data/CommonEvents.json:common-event:576
 	setActor20NameVar400_5 = function () {
-		var messageText2 = `女将`;
-		$gameActors.actor(20).setName(`${messageText2}`);
-		$gameVariables.value(400)[59] = `${$dataWeapons[434].name}`;
+		setNpcIdentity(20, '女将', $dataWeapons[434].name);
 	};
 
 	// Replaces (2x): data/Map003.json:map-event:155:page:1, data/Map022.json:map-event:6:page:1
 	setActor20NameVar400_6 = function () {
-		var messageText2 = `受付嬢`;
-		var textPart2 = `支部`;
-		$gameActors.actor(20).setName(`${messageText2}`);
-		$gameVariables.value(400)[59] = `${$dataWeapons[76].name}${$dataWeapons[22].name}${textPart2}`;
+		const weaponName76 = $dataWeapons[76].name;
+		const weaponName22 = $dataWeapons[22].name;
+		setNpcIdentity(20, '受付嬢', `${weaponName76}${weaponName22}支部`);
 	};
 
 	// Replaces (1x): data/Map003.json:map-event:164:page:1
 	setActor20NameVar400_7 = function () {
-		var messageText2 = `販売員`;
-		var textPart2 = `ギルド出張所`;
-		$gameActors.actor(20).setName(`${messageText2}`);
-		$gameVariables.value(400)[59] = `${$dataWeapons[402].name}${textPart2}`;
+		const weaponName402 = $dataWeapons[402].name;
+		setNpcIdentity(20, '販売員', `${weaponName402}ギルド出張所`);
 	};
 
-	// Replaces (4x): data/Map003.json:map-event:188:page:1, data/Map024.json:map-event:2:page:1, data/Map079.json:map-event:2:page:1, data/Map195.json:map-event:2:page:1
+	// Replaces (4x): data/Map003.json:map-event:188:page:1, data/Map024.json:map-event:2:page:1, ...
 	setActor20NameVar400_8 = function () {
-		var messageText2 = `神官`;
-		var textPart2 = `支部`;
-		$gameActors.actor(20).setName(`${messageText2}`);
-		$gameVariables.value(400)[59] = `${$dataWeapons[77].name}${$dataWeapons[22].name}${textPart2}`;
+		const weaponName77 = $dataWeapons[77].name;
+		const weaponName22 = $dataWeapons[22].name;
+		setNpcIdentity(20, '神官', `${weaponName77}${weaponName22}支部`);
 	};
 
 	// Replaces (2x): data/Map003.json:map-event:229:page:1, data/Map023.json:map-event:3:page:1
 	setActor20NameVar400_9 = function () {
-		var messageText2 = `鍛冶師`;
-		$gameActors.actor(20).setName(`${messageText2}`);
-		$gameVariables.value(400)[59] = `${$dataWeapons[401].name}`;
+		setNpcIdentity(20, '鍛冶師', $dataWeapons[401].name);
 	};
 
 	// Replaces (2x): data/Map003.json:map-event:230:page:1, data/Map021.json:map-event:10:page:1
 	setActor20NameVar400_10 = function () {
-		var messageText2 = `鑑定師`;
-		$gameActors.actor(20).setName(`${messageText2}`);
-		$gameVariables.value(400)[59] = `${$dataWeapons[403].name}`;
+		setNpcIdentity(20, '鑑定師', $dataWeapons[403].name);
 	};
 
 	// Replaces (2x): data/Map003.json:map-event:233:page:1, data/Map022.json:map-event:9:page:1
 	setActor20NameVar400_11 = function () {
-		var messageText2 = `錬金術師`;
-		var textPart2 = `流れの錬金術師`;
-		$gameActors.actor(20).setName(`${messageText2}`);
-		$gameVariables.value(400)[59] = `${textPart2}`;
+		setNpcIdentity(20, '錬金術師', '流れの錬金術師');
 	};
 
 	// Replaces (1x): data/Map018.json:map-event:27:page:1
 	setActor20NameVar400_12 = function () {
-		var messageText2 = `おばさん`;
-		var textPart2 = `ネルガド住民`;
-		$gameActors.actor(20).setName(`${messageText2}`);
-		$gameVariables.value(400)[59] = `${textPart2}`;
+		setNpcIdentity(20, 'おばさん', 'ネルガド住民');
 	};
 
 	// Replaces (1x): data/Map018.json:map-event:28:page:1
 	setActor20NameVar400_13 = function () {
-		var messageText2 = `お姉さん`;
-		var textPart2 = `ネルガド住民`;
-		$gameActors.actor(20).setName(`${messageText2}`);
-		$gameVariables.value(400)[59] = `${textPart2}`;
+		setNpcIdentity(20, 'お姉さん', 'ネルガド住民');
 	};
 
 	// Replaces (1x): data/Map022.json:map-event:3:page:1
 	setActor20NameVar400_14 = function () {
-		var messageText2 = `販売員`;
-		$gameActors.actor(20).setName(`${messageText2}`);
-		$gameVariables.value(400)[59] = `${$dataWeapons[402].name}`;
+		setNpcIdentity(20, '販売員', $dataWeapons[402].name);
 	};
 
 	// Replaces (1x): data/Map048.json:map-event:3:page:1
 	setActor20NameVar400_15 = function () {
-		var messageText2 = `受付`;
-		var textPart2 = `支部`;
-		$gameActors.actor(20).setName(`${messageText2}`);
-		$gameVariables.value(400)[59] = `${$dataWeapons[76].name}${$dataWeapons[41].name}${textPart2}`;
+		const weaponName76 = $dataWeapons[76].name;
+		const weaponName41 = $dataWeapons[41].name;
+		setNpcIdentity(20, '受付', `${weaponName76}${weaponName41}支部`);
 	};
 
-	// Replaces (2x): data/CommonEvents.json:common-event:240
-	setValueScriptArray1 = function (numericValue, numericValue2) {
-		if(valueCountSet1 == numericValue){valueScriptArray1 = [numericValue2]};
+	// Replaces (1x): data/Map003.json:map-event:237:page:1
+	setActor20NameVar400And23Etc = function () {
+		setNpcIdentity(20, '宿受付', $dataWeapons[421].name);
+		valueCountSet1 = 1231;
+		valueCountSet2 = 1232;
+		const innPriceText = variableText(21);   // variable 21: 乱数汎用1 (here: the nightly price)
+		setVar(23, `「いらっしゃい。\nウチは一泊${innPriceText}${goldIcon()}よ。\n泊まっていくのかしら？」\n`);
+		setVar(22, '$FACE[People4, 5]');
 	};
 
-	// Replaces (2x): data/CommonEvents.json:common-event:241
-	setWeaponUniqueAndAddWeaponUnique = function (countValue) {
-		var textPrefix = `\\WIN[`;
-		var variableCode = `\\V[801]`;
-		var textSuffix = `\n※付与効果は強化の度に選択/追加されていきます。`;
-		var variable20Value = $gameVariables.value(20);
-		weapon_uniqueSet(variable20Value);
-		valueCountSet3 = countValue;
-		weapon_uniqueAdd(variable20Value+80);
-		var text3 = `${textPrefix}${variable20Value+80}]
-${variableCode}${textSuffix}`;
-		WindowManager.show(0, 270, 80, 1010, 450);
-		WindowManager.drawText(0, `${text3}`);
+	// Replaces (1x): data/Map046.json:map-event:4:page:1
+	setActor20NameVar400And23Etc2 = function () {
+		setNpcIdentity(20, '宿女将', $dataWeapons[421].name);
+		valueCountSet1 = 1231;
+		valueCountSet2 = 1232;
+		const innPriceText = variableText(21);   // variable 21: 乱数汎用1 (here: the nightly price)
+		setVar(23, `「いらっしゃい。\nウチは一泊${innPriceText}${goldIcon()}よ。\n泊まっていくかしら？」\n`);
+		setVar(22, '$FACE[People4, 5]');
 	};
 
-	// Replaces (26x): data/CommonEvents.json:common-event:241, data/CommonEvents.json:common-event:301, data/CommonEvents.json:common-event:336, data/CommonEvents.json:common-event:337, data/CommonEvents.json:common-event:338, data/CommonEvents.json:common-event:344, …
-	enableMapSelfSwitchForEvent = function (key, key2) {
-		$gameSelfSwitches.setValue([$gameMap.mapId(), key, key2], true);
+	/* ============================================================================
+	 * Standing-picture helpers and NPC presets
+	 * ========================================================================== */
+
+	// Replaces (1x): data/CommonEvents.json:common-event:160
+	configureStandingPicture2Var20And3 = function () {
+		if ($gameParty.inBattle()) return;
+		setVar(20, varValue(3));
+		tachie_settei2();
 	};
 
-	// Replaces (9x): data/CommonEvents.json:common-event:241, data/CommonEvents.json:common-event:292, data/CommonEvents.json:common-event:305, data/CommonEvents.json:common-event:310, data/CommonEvents.json:common-event:316, data/CommonEvents.json:common-event:336, …
-	enableMapSelfSwitchForEventAtKey = function (key, key2) {
-		$gameSelfSwitches.setValue([$gameMap.mapId(), key, key2], false);
+	// Replaces (1x): data/CommonEvents.json:common-event:160
+	showStandingPicture1AndGetPreviousStandingPicIdVar3 = function (interp) {
+		if ($gameParty.inBattle()) return;
+		tachie_hyouji1(varValue(3));
+		callStandingPicturePlugin(interp);
 	};
 
-	// Replaces (6x): data/CommonEvents.json:common-event:243, data/CommonEvents.json:common-event:244
-	showPicture1 = function (textValue) {
-		var constantValue = 100;
-		var textValue2 = textValue;
-		var presetValues = [4,5,6,7];
-		var randomValue4 = presetValues[getRandomIndex(presetValues.length)];
-		pic_1(2,constantValue,textValue2,randomValue4,100,255,20,1280,768,0,0);
+	// Replaces (3x): data/Map007.json:map-event:4:page:1, :6:page:1, :23:page:1
+	showStandingPicture1AndGetPreviousStandingPicIdVar20Switch42 = function (interp) {
+		enableSwitch(42);
+		tachie_hyouji1(varValue(CURRENT_ACTOR_VAR));
+		callStandingPicturePlugin(interp);
 	};
 
-	// Replaces (2x): data/CommonEvents.json:common-event:248, data/CommonEvents.json:common-event:249
-	readVariable196 = function (interp) {
-		return (function () {
-		interp._eventId = $gameVariables.value(196);
-		}).call(interp);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:256
-	setWeaponNameOrNone = function (weaponSlotIndex, switchId, variableId, newValue, switchId2, variableId2) {
-		var messageText2 = `なし`;
-		if($gameVariables.value($gameVariables.value(20)+380)[weaponSlotIndex] != 0){
-		  $gameSwitches.setValue(switchId,true);
-		  $gameVariables.setValue(variableId,$dataWeapons[$gameVariables.value($gameVariables.value(20)+380)[newValue]].name);
-		} else {
-		  $gameSwitches.setValue(switchId2,false);
-		  $gameVariables.setValue(variableId2,`${messageText2}`);
-		};
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:256
-	clearWeaponSlot = function (weaponSlotIndex) {
-		$gameVariables.value($gameVariables.value(20)+380)[weaponSlotIndex] = 0;
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:259, data/CommonEvents.json:common-event:338, data/CommonEvents.json:common-event:361
-	spawnMapEventVar292 = function (numericValue, x, y, opacity) {
-		var numericValue2 = numericValue;
-		$gameMap.spawnEvent(146, x, y, true);
-		$gameVariables.value(292)[numericValue2] = $gameMap.getLastSpawnEventId();
-		var variable292Value = $gameVariables.value(292)[numericValue2];
-		var event2 = $gameMap.event(variable292Value);
-		event2.setOpacity(opacity);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:259
-	forceCharacterMoveRouteVar292 = function (eventId, moveRouteParameter) {
-		  $gameMap.event($gameVariables.value(292)[eventId]).forceMoveRoute({
-		  "list":[
-		  {"code":45, "parameters":[moveRouteParameter]},
-		  {"code":0}],"repeat":false,"skippable":true});
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:259
-	forceCharacterMoveRouteVar292_2 = function (moveRouteParameter, moveRouteParameter2) {
-		  $gameMap.event($gameVariables.value(292)[12]).forceMoveRoute({
-		  "list":[
-		  {"code":45, "parameters":[moveRouteParameter]},
-		  {"code":45, "parameters":[moveRouteParameter2]},
-		  {"code":0}],"repeat":false,"skippable":true});
-	};
-
-	// Replaces (4x): data/CommonEvents.json:common-event:259
-	writeVariableArraySlotVar292_2 = function () {
-		$gameMap.eraseEvent($gameVariables.value(292)[11]);
-		$gameMap.eraseEvent($gameVariables.value(292)[12]);
-		$gameVariables.value(292)[11] = 0;
-		$gameVariables.value(292)[12] = 0;
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:259, data/CommonEvents.json:common-event:301
-	readVariable292 = function (interp, slotIndex) {
-		return (function (slotIndex) {
-		interp._eventId = $gameVariables.value(292)[slotIndex];
-		}).call(interp, slotIndex);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:288
-	startParallelEventVar135Actor5Switch474 = function () {
-		if($gameVariables.value(135) == 12){
-		  if($gameSwitches.value(233)){//教会
-		    if($gameActors.actor(5).level >= 10){
-		      event_pararelStarting(0,313,0);
-		      $gameSwitches.setValue(474,true);
-		    };
-		  };
-		};
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:288
-	startParallelEventVar135And642Switch474 = function () {
-		if($gameVariables.value(135) == 11){
-		  if($gameMap.mapId() == 96){
-		    if($gameVariables.value(642) >= 10){
-		      event_pararelStarting(0,312,0);
-		      $gameSwitches.setValue(474,true);
-		    };
-		  };
-		};
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:288
-	setValueGetInfoPointX = function (getInfoPointX) {
-		valueGetInfoPointX = getInfoPointX;
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:290, data/CommonEvents.json:common-event:295
-	setVariable141Text = function () {
-		var variable142Value = $gameVariables.value(142);
-		$gameVariables.setValue(141,`${variable142Value}`);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:291, data/CommonEvents.json:common-event:296
-	setValueScriptArray1_2 = function () {
-		valueScriptArray1 = [];
-		valueScriptArray2 = [];
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:292, data/CommonEvents.json:common-event:301, data/CommonEvents.json:common-event:343
-	setInterpreterWaitMode = function (interp) {
-		return (function () {
-		interp.setWaitMode('scroll');
-		}).call(interp);
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:292, data/CommonEvents.json:common-event:335, data/CommonEvents.json:common-event:337
-	fadePicture1ZX_Main034_ = function () {
-		valuePic1 = 55;
-		valueScenePic = 'ZX_Main034_';
-		var pictureName2 = valueScenePic+'01';
-		$gameScreen.showPicture(valuePic1,pictureName2,1,640,384,100,100,0,0);
-		$gameScreen.movePicture(valuePic1,1,640,384,100,100,255,0,60);
-		picture_fade1(valuePic1,"fadeIn",valueWipeImg,60,5);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:292, data/CommonEvents.json:common-event:338
-	startStandingPictureDialogue = function (interp, argument1) {
-		return (function (argument1) {
-		//「一人で立ち絵変化させる時は4」「NPC会話の時は0」
-		tachie_kaiwastart(false,false,1,argument1);
-		interp.setupChild($dataCommonEvents[18].list, 0);
-		}).call(interp, argument1);
-	};
-
-	// Replaces (4x): data/CommonEvents.json:common-event:292, data/CommonEvents.json:common-event:329, data/Map007.json:map-event:23:page:1
-	playSeEffectZ_ClothesTakeOff = function () {
-		var se2 = 'Z_ClothesTakeOff';
-		AudioManager.playSe({"name":se2,"volume":150,"pitch":100,"pan":0});
-	};
-
-	// Replaces (6x): data/CommonEvents.json:common-event:292, data/CommonEvents.json:common-event:304, data/CommonEvents.json:common-event:325, data/CommonEvents.json:common-event:327, data/CommonEvents.json:common-event:335, data/CommonEvents.json:common-event:339
-	setupRespawnEnemyAVar530And292 = function () {
-		var variable530Value = $gameVariables.value(530);
-		event_respawnSetA(variable530Value,13,5,0);
-		var variable292Value = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		variable292Value.setDirection(2);
-		var variable530Value = 3;//$gameVariables.value(530);
-		event_respawnSetA(variable530Value,14,6,0);
-		var variable292Value = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		variable292Value.setDirection(4);
-	};
-
-	// Replaces (4x): data/CommonEvents.json:common-event:292, data/CommonEvents.json:common-event:327
-	setupRespawnEnemyAVar530And292_2 = function (variableId, posX, posY, direction) {
-		var charaSlotId = variableId;//$gameVariables.value(530);
-		event_respawnSetA(charaSlotId,posX,posY,0);
-		var variable292Value = $gameMap.event($gameVariables.value(292)[charaSlotId]);
-		variable292Value.setDirection(direction);
-	};
-
-	// Replaces (5x): data/CommonEvents.json:common-event:292, data/CommonEvents.json:common-event:310, data/CommonEvents.json:common-event:314, data/CommonEvents.json:common-event:316
-	setupRespawnEnemyNVar292 = function (interp, key, posX, posY) {
-		return (function (key, posX, posY) {
-		$gameSelfSwitches.setValue([$gameMap.mapId(), key, 'A'], true);
-		var charaSlotId = 11;
-		event_respawnSetN(charaSlotId,posX,posY,0,'Goods9',0,2);
-		interp._eventId = $gameVariables.value(292)[charaSlotId];
-		}).call(interp, key, posX, posY);
-	};
-
-	// Replaces (5x): data/CommonEvents.json:common-event:292, data/CommonEvents.json:common-event:310, data/CommonEvents.json:common-event:314
-	setupRespawnEnemyAVar530 = function () {
-		var variable530Value = $gameVariables.value(530);
-		event_respawnSetA(variable530Value,13,5,0,2);
-		var variable530Value = 3;//$gameVariables.value(530);
-		event_respawnSetA(variable530Value,14,6,0,4);
-		var variable530Value = 4;//$gameVariables.value(530);
-		event_respawnSetA(variable530Value,12,6,0,6);
-		var variable530Value = 5;//$gameVariables.value(530);
-		event_respawnSetA(variable530Value,13,7,0,8);
-	};
-
-	// Replaces (11x): data/CommonEvents.json:common-event:294, data/CommonEvents.json:common-event:368, data/CommonEvents.json:common-event:370, data/CommonEvents.json:common-event:371, data/CommonEvents.json:common-event:372, data/CommonEvents.json:common-event:373, …
-	showHExperienceTable2 = function (requestedPartnerWeaponId) {
-		h_keikenhyouji2(521,requestedPartnerWeaponId);//backGraund_menuMapSelectで消去
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:297, data/CommonEvents.json:common-event:400
-	readVariable292_2 = function (interp) {
-		return (function () {
-		var variable292Value = $gameVariables.value(292);
-		variable292Value.forEach(function(id1) {
-		  if(id1 == 0){}else{
-		    if(!!$gameMap.event(id1)) {
-		      $gameMap.eraseEvent(id1);
-		  }};
-		}, interp);
-		}).call(interp);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:298
-	setValuePic1Var17 = function () {
-		valuePic1 = 55;
-		valueCountSet1 = getRandomIndex(51) + 200;
-		var presetValues = [1,2,1,1][getRandomIndex(4)];
-		if($gameVariables.value(17) >= 500){
-		  var presetValues = [2,3,4,5][getRandomIndex(4)];
-		};
-		var pictureName2 = "Zev_Opening1_"+presetValues;
-		$gameScreen.showPicture(valuePic1,pictureName2,1,640+450-500,384,300,300,0,0);
-		$gameScreen.movePicture(valuePic1,1,640+450,384,100,100,valueCountSet1,0,300);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:298
-	blessStandingPictureVar17 = function () {
-		var messageText2 = `連番`;
-		$gameScreen.setPicturesAnimation(3, 2, `${messageText2}`, 5);
-		var constantValue = 1;
-		if($gameVariables.value(17) >= 500){
-		  var constantValue = 2;
-		};
-		var pictureName2 = "Zev_Opening2_"+constantValue+"_0";
-		$gameScreen.showPicture(valuePic1+1,pictureName2,1,640+450-500,384,300,300,0,0);
-		$gameScreen.movePicture(valuePic1+1,1,640+450,384,100,100,valueCountSet1,0,300);
-		tachie_bless(valuePic1,2);
-		tachie_bless(valuePic1+1,2);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:298
-	playScreenParticleWing_r2 = function () {
-		var particleName2 = 'wing_r2';
-		var eventId2 = ['2','this','99'];
-		$gameScreen._particle.particlePlay(eventId2[0],particleName2 + '-' + 2,eventId2[1],particleName2,eventId2[2]);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:299
-	setSwitch414 = function (interp) {
-		return (function () {
-		var variable173Value = $gameVariables.value(173);
-		variable173Value.forEach(function(id) {
-		  if($gameVariables.value(135) == id){
-		    var eventId2 = this._eventId;
-		    var event2 = $gameMap.event(eventId2).event();
-		    $gameSwitches.setValue(414,true);
-		    if(event2.meta['MQProgress']){
-		      if(Number(event2.meta['MQProgress']) == id){
-		        $gameSwitches.setValue(414,false);
-		}}};
-		}, interp);
-		}).call(interp);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:300
-	setupChildInterpreter4 = function (interp) {
-		var textPrefix = `全体マップに`;
-		var colorCode4 = `\\C[16]`;
-		var colorResetCode = `\\C[0]`;
-		var textSuffix = `が追加されました`;
-		return (function () {
-		interp.sVal(20,0);
-		var tempValue = $dataSystem.switches[252];
-		valueWordSet0 = `${textPrefix}${colorCode4}${tempValue}${colorResetCode}${textSuffix}`;
-		valueWordSetEx = 0;//補足が必要な場合
-		interp.setupChild($dataCommonEvents[45].list, 0);
-		}).call(interp);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:350
-	setupChildInterpreter5 = function (interp) {
-		var messageText2 = `からクリア後ダンジョンに行けるようになりました`;
-		return (function () {
-		interp.sVal(20,0);
-		var tempValue = $dataSystem.switches[259];
-		valueWordSet0 = `${tempValue}${messageText2}`;
-		valueWordSetEx = 0;//補足が必要な場合
-		interp.setupChild($dataCommonEvents[45].list, 0);
-		}).call(interp);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:300, data/CommonEvents.json:common-event:301
-	setupRespawnEnemyNVar292_2 = function (interp) {
-		return (function () {
-		var charaSlotId = 11;
-		event_respawnSetN(charaSlotId,25,7,0,'$airship02',0);
-		var variable292Value = $gameMap.event($gameVariables.value(292)[charaSlotId]);
-		interp._eventId = $gameVariables.value(292)[charaSlotId];
-		variable292Value.setDirection(4);
-		}).call(interp);
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:300, data/CommonEvents.json:common-event:301, data/CommonEvents.json:common-event:349
-	playScreenParticleWing_r2_2 = function (interp) {
-		return (function () {
-		var particleName2 = 'wing_r2';
-		var eventId2 = [interp._eventId,'this','99'];
-		$gameScreen._particle.particlePlay(eventId2[0],particleName2 + '-' + eventId2[0],eventId2[1],particleName2,eventId2[2]);
-		}).call(interp);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:300, data/Map007.json:map-event:3:page:1
-	setEventCharacterAfterimageVar292 = function (interp) {
-		return (function () {
-		//$gameVariables.setValue(292,Array(21).fill(0));
-		var zanzouType = 20;
-		event_charaZanzou(interp._eventId,zanzouType);
-		interp._eventId = $gameVariables.value(292)[zanzouType];
-		}).call(interp);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:300, data/Map007.json:map-event:3:page:1
-	setEventCharacterAfterimageVar292_2 = function (interp) {
-		return (function () {
-		var zanzouType = 19;
-		event_charaZanzou(interp._eventId,zanzouType);
-		interp._eventId = $gameVariables.value(292)[zanzouType];
-		}).call(interp);
-	};
-
-	// Replaces (151x): data/CommonEvents.json:common-event:301, data/CommonEvents.json:common-event:302, data/CommonEvents.json:common-event:303, data/CommonEvents.json:common-event:304, data/CommonEvents.json:common-event:305, data/CommonEvents.json:common-event:306, …
-	assignVariableTripleFromArgs = function (variableId, newValue, newValue2, newValue3) {
-		$gameVariables.setValue(variableId,[newValue,newValue2,newValue3]);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:301, data/CommonEvents.json:common-event:452
-	setupChildInterpreter6 = function (interp, newValue) {
-		return (function (newValue) {
-		interp.sVal(172,newValue);
-		valueTalkSet = [1,1];//1で付与2で直接表示\CE[60]のみ0で解除,ｱｸﾀｰid
-		interp.setupChild($dataCommonEvents[60].list, 0);
-		}).call(interp, newValue);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:301, data/CommonEvents.json:common-event:338
-	showPopupMessage2Var292 = function (variableId) {
-		var messageId = variableId;//$gameVariables.value(292)[value1];
-		message_popup2(messageId,0,2,1);
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:301, data/CommonEvents.json:common-event:305, data/CommonEvents.json:common-event:309
-	fetchInfoDirectVar71 = function (databaseEntryId, itemAmount) {
-		$gameVariables.setValue(71,240);
-		get_infoDirect(0,databaseEntryId,0,itemAmount);
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:301, data/Map007.json:map-event:4:page:1
-	setMapWeather2Var256 = function () {
-		$gameVariables.setValue(256,11);//火事
-		map_weatherSet2();
-	};
-
-	// Replaces (4x): data/CommonEvents.json:common-event:301
-	respawnMapNpc = function (npcId) {
-		for (var loopIndex = 1; loopIndex <= 5; loopIndex++) {
-		$gameVariables.setValue(33,'BB_akunin');
-		$gameVariables.setValue(35,3);
-		$gameVariables.setValue(37,getRandomIndex(3) + 2);
-		$gameVariables.setValue(34,getRandomIndex(2) + 4);
-		map_npcRespawn(1,npcId);
-		};
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:301
-	speakCharacterOneLinerSourceHanSerifHeavy = function () {
-		var messageText2 = `「ヒャッハァッッ！」`;
-		var randomXOffsets = [0];
-		var randomYOffsets = [-50];
-		var lineCandidates = [`${messageText2}`];
-		chara_oneWord(76,3,25,120,randomXOffsets,randomYOffsets,lineCandidates,'SourceHanSerif-Heavy');
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:301
-	speakCharacterOneLinerGenkaiMincho = function () {
-		var messageText2 = `「ギャアアアアアアアアアッッ────！！」`;
-		var randomXOffsets = [0];
-		var randomYOffsets = [-50];
-		var lineCandidates = [`${messageText2}`];
-		chara_oneWord(77,3,25,180,randomXOffsets,randomYOffsets,lineCandidates,'genkai-mincho');
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:301
-	speakCharacterOneLinerTamanegiv6 = function () {
-		var messageText2 = `ウオオオオォォッッ！！`;
-		var randomXOffsets = [0];
-		var randomYOffsets = [-50];
-		var lineCandidates = [`${messageText2}`];
-		chara_oneWord(100,6,25,180,randomXOffsets,randomYOffsets,lineCandidates,'Tamanegiv6');
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:301
-	setVariable21TextVar22 = function () {
-		var messageText2 = `空賊A `;
-		var controlCode = `\\}`;
-		var textPart2 = `空賊B `;
-		$gameVariables.setValue(21,`${messageText2}${controlCode}${$dataWeapons[74].name}`);
-		$gameVariables.setValue(22,`${textPart2}${controlCode}${$dataWeapons[74].name}`);
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:301
-	setVariable21TextVar22_2 = function () {
-		var messageText2 = `少年 `;
-		var controlCode = `\\}`;
-		var textPart2 = `空賊C `;
-		$gameVariables.setValue(21,`${messageText2}${controlCode}${$dataWeapons[79].name}`);
-		$gameVariables.setValue(22,`${textPart2}${controlCode}${$dataWeapons[74].name}`);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:301
-	setMapWeather2Var256_2 = function (newValue) {
-		$gameVariables.setValue(256,newValue);//本降り
-		map_weatherSet2();
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:301, data/Map007.json:map-event:3:page:1
-	bindInterpreterToEventId = function (interp, argument1) {
-		return (function (argument1) {
-		interp._eventId = argument1;
-		}).call(interp, argument1);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:301, data/CommonEvents.json:common-event:401
-	setActor22Name2 = function (actorId) {
-		$gameActors.actor(22).setName($gameActors.actor(actorId).name().slice(0, 1));
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:301, data/CommonEvents.json:common-event:471
-	erasePictureP4 = function () {
-		valuePic1 = 55;
-		for (var loopIndex = 0; loopIndex <= 3; loopIndex++) {pic_eraseP(1,[valuePic1+loopIndex])};
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:301, data/CommonEvents.json:common-event:349
-	setupRespawnEnemyAVar530And292_3 = function (interp, variableId, posX, posY, zoomFlag) {
-		return (function (variableId, posX, posY, zoomFlag) {
-		var charaSlotId = variableId;//$gameVariables.value(530);
-		event_respawnSetA(charaSlotId,posX,posY,zoomFlag);
-		interp._eventId = $gameVariables.value(292)[charaSlotId];
-		}).call(interp, variableId, posX, posY, zoomFlag);
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:301, data/CommonEvents.json:common-event:543
-	fadePicture1ScreenBlackOut = function (actorPictureId, opacity) {
-		valuePic1 = actorPictureId;
-		var pictureName2 = 'ScreenBlackOut';
-		$gameScreen.showPicture(valuePic1,pictureName2,1,640,384,100,100,opacity,0);
-		picture_fade1(valuePic1,"fadeIn",valueWipeImg,60,5);
-	};
-
-	// Replaces (4x): data/CommonEvents.json:common-event:301, data/CommonEvents.json:common-event:302, data/Map018.json:map-event:32:page:1
-	setVariable21 = function (newValue) {
-		$gameVariables.setValue(21,
-		$gameVariables.value(380+newValue)[59]);
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:301, data/Map094.json:map-event:45:page:1
-	fadePicture1FadeOut_2 = function (actorPictureId) {
-		valuePic1 = actorPictureId;
-		picture_fade1(valuePic1,"fadeOut",valueWipeImg,60,5);
-	};
-
-	// Replaces (7x): data/CommonEvents.json:common-event:301, data/CommonEvents.json:common-event:303, data/CommonEvents.json:common-event:324, …
-	saveBgmAndFadeOut = function (duration) {
-		$gameSystem.saveBgm();
-		AudioManager.fadeOutBgm(duration);
-	};
-
-	// Replaces (7x): data/CommonEvents.json:common-event:301, data/CommonEvents.json:common-event:304, data/CommonEvents.json:common-event:305, …
-	assignSelfVariableFromSystemSwitch = function (interp, variableId, newValue) {
-		return (function (variableId, newValue) {
-		interp.sVal(variableId,$dataSystem.switches[newValue]);
-		}).call(interp, variableId, newValue);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:301, data/CommonEvents.json:common-event:471
-	showMapCenterLabel = function (interp, switchIndex) {
-		var textPrefix = `\\CL【`;
-		var textSuffix = `】`;
-		return (function (switchIndex) {
-		var tempValue = $dataSystem.switches[switchIndex];
-		map_centerDispray(55,`${textPrefix}${tempValue}${textSuffix}`);
-		interp.wait(40);
-		}).call(interp, switchIndex);
+	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
+	showStandingPicture1 = function () {
+		enableSwitch(42);
+		tachie_hyouji1(varValue(CURRENT_ACTOR_VAR));
 	};
 
 	// Replaces (2x): data/CommonEvents.json:common-event:301
 	moveStandingPicture1 = function (actorPictureId) {
 		valuePic1 = actorPictureId;
-		picTachie_move1(valuePic1,-500,0,0,0,0,60);
-	};
-
-	// Replaces (7x): data/CommonEvents.json:common-event:302, data/CommonEvents.json:common-event:304, data/CommonEvents.json:common-event:305, data/CommonEvents.json:common-event:309, data/CommonEvents.json:common-event:339, data/CommonEvents.json:common-event:382, …
-	setupRespawnEnemyAAndSetupRespawnEnemyNVar530And163Etc = function (numericValue) {
-		var variable530Value = $gameVariables.value(530);
-		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
-		event_respawnSetA(variable530Value,variable163Value[3],variable163Value[4],1);
-		var variable292Value = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		variable292Value.setImage(variable163Value[1], variable163Value[2]);
-		variable292Value.setDirection(variable163Value[5]);
-		var variable530Value = numericValue;
-		event_respawnSetN(variable530Value,variable163Value[8],variable163Value[9],0,variable163Value[6],variable163Value[7]);
-		var variable292Value = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		variable292Value.setDirection(variable163Value[10]);
-	};
-
-	// Replaces (4x): data/CommonEvents.json:common-event:302, data/CommonEvents.json:common-event:305, data/CommonEvents.json:common-event:401, data/Map094.json:map-event:45:page:1
-	setupRespawnEnemyAVar530And292_4 = function (posX, posY, zoomFlag, direction) {
-		var variable530Value = $gameVariables.value(530);
-		event_respawnSetA(variable530Value,posX,posY,zoomFlag);
-		var variable292Value = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		variable292Value.setDirection(direction);
-	};
-
-	// Replaces (6x): data/CommonEvents.json:common-event:302, data/CommonEvents.json:common-event:305, data/CommonEvents.json:common-event:511, data/CommonEvents.json:common-event:552, data/Map094.json:map-event:45:page:1
-	setupRespawnEnemyNVar292_3 = function (numericValue, posX, posY, zoomFlag, imageName, imageIndex, direction) {
-		var charaSlotId = numericValue;
-		event_respawnSetN(charaSlotId,posX,posY,zoomFlag,imageName,imageIndex);
-		var variable292Value = $gameMap.event($gameVariables.value(292)[charaSlotId]);
-		variable292Value.setDirection(direction);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:303, data/CommonEvents.json:common-event:324
-	setupRespawnEnemyNVar292_4 = function (posX, posX2) {
-		var charaSlotId = 11;
-		event_respawnSetN(charaSlotId,13,22,0,'People3',6);
-		var variable292Value = $gameMap.event($gameVariables.value(292)[charaSlotId]);
-		variable292Value.setDirection(8);
-		var charaSlotId = 12;
-		event_respawnSetN(charaSlotId,posX,23,0,'People3',7);
-		var variable292Value = $gameMap.event($gameVariables.value(292)[charaSlotId]);
-		variable292Value.setDirection(8);
-		var charaSlotId = 13;
-		event_respawnSetN(charaSlotId,posX2,23,0,'People3',7);
-		var variable292Value = $gameMap.event($gameVariables.value(292)[charaSlotId]);
-		variable292Value.setDirection(8);
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:303, data/CommonEvents.json:common-event:324, data/CommonEvents.json:common-event:471
-	forceCharacterMoveRouteVar292_3 = function (rangeStart, rangeEnd, moveRouteParameter) {
-		for (var slotIndex2 = rangeStart; slotIndex2 <= rangeEnd; slotIndex2++) {
-		  $gameMap.event($gameVariables.value(292)[slotIndex2]).forceMoveRoute({
-		  "list":[
-		  {"code":45, "parameters":["this.startOpacity(60,0);"]},
-		  {"code":45, "parameters":[moveRouteParameter]},
-		  {"code":0}],"repeat":false,"skippable":true});
-		};
-	};
-
-	// Replaces (4x): data/CommonEvents.json:common-event:304, data/CommonEvents.json:common-event:325, data/CommonEvents.json:common-event:335, data/CommonEvents.json:common-event:339
-	setupRespawnEnemyAVar530And292_5 = function () {
-		var charaSlotId = 4;//$gameVariables.value(530);
-		event_respawnSetA(charaSlotId,12,6,0);
-		var variable292Value = $gameMap.event($gameVariables.value(292)[charaSlotId]);
-		variable292Value.setDirection(6);
-		var charaSlotId = 5;//$gameVariables.value(530);
-		event_respawnSetA(charaSlotId,13,7,0);
-		var variable292Value = $gameMap.event($gameVariables.value(292)[charaSlotId]);
-		variable292Value.setDirection(8);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:305, data/CommonEvents.json:common-event:306
-	setupRespawnEnemyAVar530And292_6 = function (interp, posX, posY) {
-		return (function (posX, posY) {
-		var variable530Value = $gameVariables.value(530);
-		event_respawnSetA(variable530Value,posX,posY,1);
-		var variable292Value = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		variable292Value.setDirection(2);
-		var variable530Value = $gameVariables.value(530);
-		interp._eventId = $gameVariables.value(292)[variable530Value];
-		}).call(interp, posX, posY);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:306
-	setQuestObjectivePrepareInTownAndAdvance = function (interp) {
-		var textPrefix = `街で準備を整えて、\n`;
-		var controlCode = `\\in[21]`;
-		var textSuffix = `へ向かいましょう！`;
-		return (function () {
-		$gameVariables.setValue(134,
-		`${textPrefix}${controlCode}${textSuffix}`);
-		interp.sVal(21,$dataSystem.switches[248]);
-		}).call(interp);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:308
-	setQuestObjectiveFightUnavoidableBoss = function (interp) {
-		var textPrefix = `戦いは避けられませんね…。\n`;
-		var controlCode = `\\in[21]`;
-		var textSuffix = `ボスを討伐しましょう！`;
-		return (function () {
-		$gameVariables.setValue(134,
-		`${textPrefix}${controlCode}${textSuffix}`);
-		interp.sVal(21,$dataSystem.switches[248]);
-		}).call(interp);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:310
-	setQuestObjectiveGoToCentralPlains = function (interp) {
-		var messageText2 = `中央平原へ行きましょう`;
-		return (function () {
-		$gameVariables.setValue(134,
-		`${messageText2}`);
-		interp.sVal(21,$dataSystem.switches[248]);
-		}).call(interp);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:306, data/CommonEvents.json:common-event:336
-	setupRespawnEnemyAAndSetupRespawnEnemyNVar530And163Etc2 = function () {
-		var variable530Value = $gameVariables.value(530);
-		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
-		event_respawnSetA(variable530Value,7,9,1,4);
-		var variable530Value = 11;
-		event_respawnSetN(variable530Value,variable163Value[8],variable163Value[9],0,variable163Value[6],variable163Value[7]);
-		var variable292Value = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		variable292Value.setDirection(6);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:306, data/CommonEvents.json:common-event:342
-	showScenePictureAndFadeIn = function (scenePicName) {
-		valuePic1 = 55;
-		valueScenePic = scenePicName;
-		var pictureName2 = valueScenePic;
-		$gameScreen.showPicture(valuePic1,pictureName2,1,640-128,384-20,100,100,0,0);
-		$gameScreen.movePicture(valuePic1,1,640-128,384,100,100,255,0,60);
-	};
-
-	// Replaces (16x): data/CommonEvents.json:common-event:306, data/CommonEvents.json:common-event:310, data/CommonEvents.json:common-event:314, data/CommonEvents.json:common-event:325, data/CommonEvents.json:common-event:330, data/CommonEvents.json:common-event:336, …
-	fetchInfoDirectVar71_2 = function (databaseTypeId, databaseEntryId, itemAmount) {
-		$gameVariables.setValue(71,240);//ティッカーウェイト
-		get_infoDirect(databaseTypeId,databaseEntryId,0,itemAmount);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:306
-	showScenePictureAndFadeIn2 = function (picIndex, picIndex2) {
-		//pic_move1(valuePic1+1,0,0,100,100,0,90);
-		var pictureId2 = valuePic1+picIndex;
-		var pictureName2 = valueScenePic+picIndex2;
-		$gameScreen.showPicture(pictureId2,pictureName2,1,640-128+50,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId2,1,640-128+50,384,100,100,255,0,60);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:306
-	setVariable707Var706Switch125 = function () {
-		var messageText2 = `「ハァ、ハァ…」`;
-		var textPart2 = `「ン………」`;
-		var textPart3 = `「ハァ…」`;
-		var textPart4 = `「ハァっ………」`;
-		var newValue2 = [`${messageText2}`,`${textPart2}`,`${textPart3}`,`${textPart4}`];//文字BGV
-		$gameVariables.setValue(707,newValue2);
-		$gameVariables.setValue(706,[640-128,386,1,120,0,'eromangasimaji']);
-		$gameSwitches.setValue(125,true);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:391
-	setVariable707Var706Switch125_2 = function () {
-		var textPrefix = `「アンっ`;
-		var iconCode = `\\I[12]`;
-		var textSuffix = `」`;
-		var textPart3 = `「ヒゥンっ`;
-		var textPart4 = `」`;
-		var textPart5 = `「アッ`;
-		var textPart6 = `　ンン`;
-		var textPart7 = `」`;
-		var textPart8 = `「ヒンs[20]ンs[28]っ`;
-		var textPart9 = `」`;
-		var newValue2 = [`${textPrefix}${iconCode}${textSuffix}`,`${textPart3}${iconCode}${textPart4}`,`${textPart5}${iconCode}${textPart6}${iconCode}${textPart7}`,`${textPart8}${iconCode}${textPart9}`];//文字BGV
-		$gameVariables.setValue(707,newValue2);
-		$gameVariables.setValue(706,[640-128,386,0,80,0,'eromangasimaji']);
-		$gameSwitches.setValue(125,true);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:531
-	setVariable707Var706Switch125_3 = function () {
-		var textPrefix = `「アンっ`;
-		var iconCode = `\\I[12]`;
-		var textSuffix = `」`;
-		var textPart3 = `「ヒゥンっ`;
-		var textPart4 = `」`;
-		var textPart5 = `「アッ`;
-		var textPart6 = `　ンン`;
-		var textPart7 = `」`;
-		var textPart8 = `「ヒンンっ`;
-		var textPart9 = `」`;
-		var newValue2 = [`${textPrefix}${iconCode}${textSuffix}`,`${textPart3}${iconCode}${textPart4}`,`${textPart5}${iconCode}${textPart6}${iconCode}${textPart7}`,`${textPart8}${iconCode}${textPart9}`];//文字BGV
-		$gameVariables.setValue(707,newValue2);
-		$gameVariables.setValue(706,[640-128,386,0,120,0,'eromangasimaji']);
-		$gameSwitches.setValue(125,true);
-	};
-
-	// Replaces (4x): data/CommonEvents.json:common-event:307, data/CommonEvents.json:common-event:311, data/CommonEvents.json:common-event:317, data/CommonEvents.json:common-event:320
-	lockMonsterSymbolRoute = function () {
-		for (var eventId2 = 200; eventId2 > 0; eventId2--) {
-		  if(!!$gameMap.event(eventId2)) {
-		    if ($gameMap.event(eventId2).event().meta['MonsterSymbol']){
-		      $gameMap.event(eventId2).forceMoveRoute({
-		      "list":[
-		  {"code":15, "parameters":[600]},
-		  {"code":0}],"repeat":true,"skippable":true});
-		}}};
+		picTachie_move1(valuePic1, -500, 0, 0, 0, 0, 60);
 	};
 
 	// Replaces (2x): data/CommonEvents.json:common-event:307
 	moveStandingPicture1_2 = function () {
 		valuePic1 = 13;
-		var scaleX2 = $gameScreen.picture(valuePic1).scaleX();
-		picTachie_move1(valuePic1,0,0,-scaleX2*2,0,255,60);
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:307, data/CommonEvents.json:common-event:335, data/CommonEvents.json:common-event:337
-	setSelfVariableToActorPairNames = function (interp, variableId) {
-		var messageText2 = `＆`;
-		return (function (variableId) {
-		interp.sVal(variableId,
-		`${$gameActors.actor(3).name()}${messageText2}${$gameActors.actor(4).name()}`
-		);
-		}).call(interp, variableId);
-	};
-
-	// Replaces (7x): data/CommonEvents.json:common-event:313, data/CommonEvents.json:common-event:322, data/CommonEvents.json:common-event:326, data/CommonEvents.json:common-event:338, data/CommonEvents.json:common-event:339, data/CommonEvents.json:common-event:355, …
-	setSelfVariable23 = function (interp, newValue) {
-		return (function (newValue) {
-		interp.sVal(23,
-		newValue
-		);
-		}).call(interp, newValue);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:337
-	setSelfVariableToActorNameWithExcept = function (interp) {
-		var messageText2 = `以外`;
-		return (function () {
-		interp.sVal(23,
-		`${$gameActors.actor(4).name()}${messageText2}`
-		);
-		}).call(interp);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:356
-	setSelfVariableToActorTrioNames = function (interp) {
-		var textPrefix = `＆`;
-		var textSuffix = `＆`;
-		return (function () {
-		interp.sVal(23,
-		`${$gameActors.actor(3).name()}${textPrefix}${$gameActors.actor(4).name()}${textSuffix}${$gameActors.actor(5).name()}`
-		);
-		}).call(interp);
-	};
-
-	// Replaces (5x): data/CommonEvents.json:common-event:308, data/CommonEvents.json:common-event:317, data/CommonEvents.json:common-event:320, data/CommonEvents.json:common-event:327, data/CommonEvents.json:common-event:328
-	setupRespawnEnemyAVar530And163Etc = function () {
-		var variable530Value = $gameVariables.value(530);
-		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
-		event_respawnSetA(variable530Value,variable163Value[3],variable163Value[4],1);
-		var variable292Value = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		variable292Value.setImage(variable163Value[1], variable163Value[2]);
-		variable292Value.setDirection(variable163Value[5]);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:309, data/CommonEvents.json:common-event:334
-	fetchInfoDirectVar71_3 = function (databaseTypeId, databaseEntryId, databaseEntryId2, itemAmount) {
-		$gameVariables.setValue(71,240);
-		get_infoDirect(databaseTypeId,databaseEntryId,0,1);
-		get_infoDirect(0,databaseEntryId2,0,itemAmount);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:312
-	setupChildInterpreter7 = function (interp, talkPictureId) {
-		var controlCode = `\\swi[252]`;
-		var messageText2 = `の出現エネミーが変化しました。`;
-		return (function (talkPictureId) {
-		interp.sVal(172,19);//中央に一言メッセージ
-		var templateText = `${controlCode}${messageText2}`;
-		valueTalkSet = [talkPictureId,28,templateText,255];//0で消去 1で通常 2で時間経過  255で背景透明度
-		interp.setupChild($dataCommonEvents[60].list, 0);
-		}).call(interp, talkPictureId);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:314
-	setMapSelfSwitch2 = function (key) {
-		$gameSelfSwitches.setValue([$gameMap.mapId(), key, 'A'], true);
-		var constantValue = 11;
-	};
-
-	// Replaces (6x): data/CommonEvents.json:common-event:316, data/CommonEvents.json:common-event:319, data/CommonEvents.json:common-event:368, data/CommonEvents.json:common-event:495, data/CommonEvents.json:common-event:532, data/CommonEvents.json:common-event:548
-	fetchInfoDirectVar71_4 = function (databaseEntryId, databaseTypeId, databaseEntryId2, itemAmount) {
-		$gameVariables.setValue(71,240);//ティッカーウェイト
-		get_infoDirect(0,databaseEntryId,0,1);
-		get_infoDirect(databaseTypeId,databaseEntryId2,0,itemAmount);
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:318, data/CommonEvents.json:common-event:326, data/CommonEvents.json:common-event:333
-	requestEventAnimationVar292 = function () {
-		var eventId2 = 12;
-		var variable292Value = $gameMap.event($gameVariables.value(292)[eventId2]);
-		variable292Value.requestAnimation(635);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:322, data/CommonEvents.json:common-event:354
-	setupRespawnEnemyNVar292_5 = function () {
-		var charaSlotId = 11;
-		event_respawnSetN(charaSlotId,27,8,0,'BB_akunin3',5);
-		var variable292Value = $gameMap.event($gameVariables.value(292)[charaSlotId]);
-		variable292Value.setDirection(2);
-		variable292Value._spriteOffsetY = -10;
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:322, data/CommonEvents.json:common-event:354, data/CommonEvents.json:common-event:358
-	setupRespawnEnemyNBB_akunin3 = function () {
-		var charaSlotId = 16;
-		event_respawnSetN(charaSlotId,27,17,0,'BB_akunin3',0);
-		var charaSlotId = 12;
-		event_respawnSetN(charaSlotId,25,15,0,'BB_akunin3',1);
-		var charaSlotId = 13;
-		event_respawnSetN(charaSlotId,24,13,0,'BB_akunin3',2);
-		var charaSlotId = 14;
-		event_respawnSetN(charaSlotId,29,15,0,'BB_akunin3',3);
-		var charaSlotId = 15;
-		event_respawnSetN(charaSlotId,31,14,0,'BB_akunin3',4);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:322, data/CommonEvents.json:common-event:335
-	moveNpcCharacterByIdVar292 = function (moveRouteCode) {
-		var eventIds2 = [];
-		eventIds2.push($gameVariables.value(292)[3]);
-		eventIds2.push($gameVariables.value(292)[4]);
-		eventIds2.push($gameVariables.value(292)[5]);
-		event_NpcCharaMoveId(moveRouteCode,0,eventIds2);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:323, data/CommonEvents.json:common-event:332
-	setupRespawnEnemyAVar530And163Etc2 = function (interp, posX, posY, direction) {
-		return (function (posX, posY, direction) {
-		var variable530Value = $gameVariables.value(530);
-		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
-		event_respawnSetA(variable530Value,posX,posY,1,direction);
-		interp._eventId = $gameVariables.value(292)[variable530Value];
-		}).call(interp, posX, posY, direction);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:325, data/CommonEvents.json:common-event:338
-	setupRespawnEnemyAAndSetupRespawnEnemyNVar530And163Etc3 = function (interp) {
-		return (function () {
-		var variable530Value = $gameVariables.value(530);
-		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
-		event_respawnSetA(variable530Value,variable163Value[3],variable163Value[4],1);
-		var variable292Value = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		variable292Value.setImage(variable163Value[1], variable163Value[2]);
-		variable292Value.setDirection(variable163Value[5]);
-		var variable530Value = 11;
-		event_respawnSetN(variable530Value,variable163Value[8],variable163Value[9],0,variable163Value[6],variable163Value[7]);
-		var variable292Value = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		variable292Value.setDirection(variable163Value[10]);
-		interp._eventId = $gameVariables.value(292)[variable530Value];
-		}).call(interp);
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:327, data/CommonEvents.json:common-event:332, data/CommonEvents.json:common-event:349
-	movePartyCharacter = function (moveRouteCode) {
-		event_partyCharaMove(moveRouteCode,0);//19上を向く
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:329
-	addStateToActorFromVariable20Actor1 = function () {
-		var actor3 = $gameActors.actor(1);
-		actor3.addState(693);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:330, data/CommonEvents.json:common-event:331
-	setupChildInterpreterVar171 = function (interp) {
-		return (function () {
-		$gameVariables.setValue(171,[41,32,11]);
-		//$gameVariables.setValue(528,100);
-		interp.setupChild($dataCommonEvents[54].list, 0);
-		}).call(interp);
-	};
-
-	// Replaces (7x): data/CommonEvents.json:common-event:331, data/CommonEvents.json:common-event:338, data/CommonEvents.json:common-event:356, data/CommonEvents.json:common-event:359, data/CommonEvents.json:common-event:536, data/CommonEvents.json:common-event:546, …
-	zoomCameraVar530And292 = function (variableId) {
-		var easing = variableId;//$gameVariables.value(530);
-		var easing = $gameVariables.value(292)[easing];
-		drowsepost.camera.zoom(1, 60, easing);
-	};
-
-	// Replaces (4x): data/CommonEvents.json:common-event:331, data/CommonEvents.json:common-event:511, data/Map094.json:map-event:45:page:1
-	setMapSelfSwitch3 = function (numericValue, textValue) {
-		var mapMapId = $gameMap.mapId();
-		var key3 = numericValue;//this._eventId;
-		var key4 = textValue;
-		var newValue2 = true;//false;
-		$gameSelfSwitches.setValue([mapMapId, key3, key4], newValue2);
-	};
-
-	// Replaces (4x): data/CommonEvents.json:common-event:331, data/CommonEvents.json:common-event:337, data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
-	zoomCamera = function (easing) {
-		drowsepost.camera.zoom(1, 60, easing);
-	};
-
-	// Replaces (5x): data/CommonEvents.json:common-event:331, data/CommonEvents.json:common-event:337, data/CommonEvents.json:common-event:339, data/CommonEvents.json:common-event:530
-	moveNpcCharacterByIdVar292_2 = function (slotIndex, slotIndex2, moveRouteCode) {
-		var eventIds2 = [];
-		eventIds2.push($gameVariables.value(292)[slotIndex]);
-		eventIds2.push($gameVariables.value(292)[slotIndex2]);
-		event_NpcCharaMoveId(moveRouteCode,0,eventIds2);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:333, data/CommonEvents.json:common-event:348
-	setupRespawnEnemyAAndSetupRespawnEnemyNVar530And292 = function (interp, posY, posY2, imageName, imageIndex, direction) {
-		return (function (posY, posY2, imageName, imageIndex, direction) {
-		var variable530Value = $gameVariables.value(530);
-		event_respawnSetA(variable530Value,12,posY,1,8);
-		interp._eventId = $gameVariables.value(292)[variable530Value];
-		var variable530Value = 11;
-		event_respawnSetN(variable530Value,12,posY2,0,imageName,imageIndex,direction);
-		}).call(interp, posY, posY2, imageName, imageIndex, direction);
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:336, data/CommonEvents.json:common-event:347, data/CommonEvents.json:common-event:349
-	setupRespawnEnemyNVar292_6 = function (interp, posX, posY, imageName, direction) {
-		return (function (posX, posY, imageName, direction) {
-		var charaSlotId = 11;
-		event_respawnSetN(charaSlotId,posX,posY,0,imageName,0,direction);
-		interp._eventId = $gameVariables.value(292)[charaSlotId];
-		}).call(interp, posX, posY, imageName, direction);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:338
-	setStandingPictureActionVar20 = function (interp, expressionCode) {
-		return (function (expressionCode) {
-		var variable20Value = $gameActors.actor($gameVariables.value(20));
-		tachie_dousa(2,1,expressionCode,15,1,255,1344,0,0);
-		tachie_dousa(1,1,4,15,1,255,0,0,0);
-		interp.wait(3);
-		}).call(interp, expressionCode);
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:338, data/CommonEvents.json:common-event:361, data/CommonEvents.json:common-event:471
-	zoomCamera2 = function (interp) {
-		return (function () {
-		drowsepost.camera.zoom(1.5, 60, interp._eventId);
-		}).call(interp);
-	};
-
-	// Replaces (6x): data/CommonEvents.json:common-event:338, data/CommonEvents.json:common-event:346, data/CommonEvents.json:common-event:361, data/CommonEvents.json:common-event:471, data/CommonEvents.json:common-event:530
-	moveNpcCharacterByIdVar292_3 = function (slotIndex, moveRouteCode, moveRouteParameters) {
-		var eventIds2 = [];
-		eventIds2.push($gameVariables.value(292)[slotIndex]);
-		event_NpcCharaMoveId(moveRouteCode,moveRouteParameters,eventIds2);
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:338, data/CommonEvents.json:common-event:547
-	setupRespawnEnemyN = function (posX, posY, imageName, imageIndex, direction) {
-		var charaSlotId = 11;
-		event_respawnSetN(charaSlotId,posX,posY,0,imageName,imageIndex,direction);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:338, data/CommonEvents.json:common-event:536
-	startPictureAnimationFrame = function (numericValue) {
-		var pic1 = valuePic1;
-		if($gameScreen.picture(pic1)){
-		  $gameScreen.picture(pic1).startAnimationFrame(numericValue, true, [1,1,1,2]);
-		};
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:338
-	setVariable707Var706Switch125_4 = function () {
-		var textPrefix = `「アッ`;
-		var iconCode = `\\I[12]`;
-		var textSuffix = `」`;
-		var textPart3 = `「ンッ`;
-		var textPart4 = `」`;
-		var textPart5 = `「ンン…`;
-		var textPart6 = `」`;
-		var textPart7 = `「ンクっ…`;
-		var textPart8 = `」`;
-		var textPart9 = `「ァンっ…`;
-		var textPart10 = `」`;
-		var newValue2 = [`${textPrefix}${iconCode}${textSuffix}`,`${textPart3}${iconCode}${textPart4}`,`${textPart5}${iconCode}${textPart6}`,`${textPart7}${iconCode}${textPart8}`,`${textPart9}${iconCode}${textPart10}`];//文字BGV
-		$gameVariables.setValue(707,newValue2);
-		$gameVariables.setValue(706,[640-128,386,1,180,0,'eromangasimaji']);
-		$gameSwitches.setValue(125,true);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:518
-	setVariable707Var706Switch125_5 = function () {
-		var messageText2 = `「………ァっ」`;
-		var textPart2 = `「いや…」`;
-		var textPart3 = `「ンン──……」`;
-		var textPart4 = `「ンクっ…」`;
-		var textPart5 = `「ァンっ…」`;
-		var newValue2 = [`${messageText2}`,`${textPart2}`,`${textPart3}`,`${textPart4}`,`${textPart5}`];//文字BGV
-		$gameVariables.setValue(707,newValue2);
-		$gameVariables.setValue(706,[640-128,386,1,180,0,'eromangasimaji']);
-		$gameSwitches.setValue(125,true);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:338
-	fadePicture1FadeIn = function (textValue, pictureId) {
-		var pictureName2 = textValue;
-		$gameScreen.showPicture(pictureId,pictureName2,1,640,384,100,100,255,0);
-		picture_fade1(valuePic1,"fadeIn",'150',60,5);
-	};
-
-	// Replaces (6x): data/CommonEvents.json:common-event:338, data/CommonEvents.json:common-event:368, data/CommonEvents.json:common-event:495, data/CommonEvents.json:common-event:532, data/CommonEvents.json:common-event:547, data/CommonEvents.json:common-event:548
-	setupChildInterpreterVar2 = function (interp, newValue) {
-		return (function (newValue) {
-		interp.sVal(20,$gameVariables.value(2));
-		interp.sVal(19,newValue);
-		interp.sVal(14,16);//14ｱｲﾃﾑ称号15ｽｷﾙ習得16忘却,変数19にID
-		interp.setupChild($dataCommonEvents[44].list, 0);
-		}).call(interp, newValue);
-	};
-
-	// Replaces (5x): data/CommonEvents.json:common-event:338, data/CommonEvents.json:common-event:341, data/CommonEvents.json:common-event:507, data/CommonEvents.json:common-event:517, data/CommonEvents.json:common-event:545
-	showScenePictureAndFadeIn3 = function (picIndex, picIndex2, scaleX, scaleY) {
-		var pictureId2 = valuePic1+picIndex;
-		var pictureName2 = valueScenePic+picIndex2;
-		$gameScreen.showPicture(pictureId2,pictureName2,1,640-128,384,scaleX,scaleY,0,0);
-		$gameScreen.movePicture(pictureId2,1,640-128,384,100,100,255,0,60);
-	};
-
-	// Replaces (11x): data/CommonEvents.json:common-event:338, data/CommonEvents.json:common-event:481, data/CommonEvents.json:common-event:503, data/CommonEvents.json:common-event:536, data/CommonEvents.json:common-event:537, data/CommonEvents.json:common-event:544, …
-	setDarknessOpacity = function (opacity) {
-		$gameMap.darknessOpacity = opacity;
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:341
-	fadePicture1ScreenBlackOut_2 = function () {
-		valuePic1 = 55;
-		var pictureName2 = 'ScreenBlackOut';
-		$gameScreen.showPicture(valuePic1-1,pictureName2,1,640,384,100,100,200,0);
-		picture_fade1(valuePic1-1,"fadeIn",valueWipeImg,60,5);
-	};
-
-	// Replaces (8x): data/CommonEvents.json:common-event:341, …
-	movePicture1_3 = function (picIndex, picIndex2, scaleX, scaleY) {
-		var pictureId2 = valuePic1+picIndex;
-		var pictureName2 = valueScenePic+picIndex2;
-		$gameScreen.showPicture(pictureId2,pictureName2,1,640-128,384,scaleX,scaleY,0,0);
-		$gameScreen.movePicture(pictureId2,1,640-128,384,100,100,255,0,60);
-		pic_move1(pictureId2-1,0,0,100,100,0,90);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:341, data/CommonEvents.json:common-event:342
-	setupRespawnEnemyAAndSetupRespawnEnemyNVar530And292_2 = function (interp) {
-		return (function () {
-		var charaSlotId = 5;//$gameVariables.value(530);
-		event_respawnSetA(charaSlotId,13,6,1,4);
-		interp._eventId = $gameVariables.value(292)[charaSlotId];
-		event_respawnSetN(11,18,10,0,'npcCastle1',2,4);
-		}).call(interp);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:342
-	loadGameFont = function (interp, fontSize) {
-		return (function (fontSize) {
-		Graphics.loadFont("GameFont",fontSize);
-		interp.wait(10);
-		}).call(interp, fontSize);
-	};
-
-	// Replaces (8x): data/CommonEvents.json:common-event:342, data/CommonEvents.json:common-event:382, data/CommonEvents.json:common-event:511, data/Map094.json:map-event:45:page:1, …
-	showPopupMessage2Var292_2 = function (numericValue, numericValue2) {
-		var messageId = numericValue;
-		var messageId = $gameVariables.value(292)[messageId];
-		message_popup2(messageId,0,numericValue2,1);
-	};
-
-	// Replaces (4x): data/CommonEvents.json:common-event:342, data/CommonEvents.json:common-event:364
-	setupChildInterpreter8 = function (interp, newValue) {
-		return (function (newValue) {
-		interp.sVal(14,19);interp.sVal(20,newValue);interp.sVal(121,0);//仲間加入コモン
-		interp.setupChild($dataCommonEvents[64].list, 0);
-		}).call(interp, newValue);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:343
-	spawnScreenParticleVar292 = function (slotIndex) {
-		var particleName2 = 'monster_c';
-		var variable292Value = $gameVariables.value(292)[slotIndex];
-		$gameScreen._particle.particleSet(variable292Value,particleName2+'-'+variable292Value,'this',particleName2);
-		//$gameScreen._particle.particleClear(value1+'-'+value2);
-		var particleName2 = 'mahoujin_c';
-		$gameScreen._particle.particleSet(variable292Value,particleName2+'-'+variable292Value,'this',particleName2);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:349, data/CommonEvents.json:common-event:542
-	setupRespawnEnemyAVar530And163Etc3 = function (interp) {
-		return (function () {
-		var variable530Value = $gameVariables.value(530);
-		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
-		event_respawnSetA(variable530Value,variable163Value[3],variable163Value[4],1,variable163Value[5]);
-		interp._eventId = $gameVariables.value(292)[variable530Value];
-		}).call(interp);
-	};
-
-	// Replaces (6x): data/CommonEvents.json:common-event:356, data/CommonEvents.json:common-event:357, data/CommonEvents.json:common-event:358, data/CommonEvents.json:common-event:359, data/CommonEvents.json:common-event:360, data/CommonEvents.json:common-event:362
-	setupRespawnEnemyAVar530_2 = function (posX, posY) {
-		var variable530Value = $gameVariables.value(530);
-		event_respawnSetA(variable530Value,posX,posY,1,8);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:356
-	readVariable530Var292 = function (interp, x, direction, x2, y, direction2) {
-		return (function (x, direction, x2, y, direction2) {
-		var characterId = 3;//$gameVariables.value(530);
-		var characterId = $gameVariables.value(292)[characterId];
-		character = interp.character(characterId);
-		character.locate(x, 14);
-		character.setDirection(direction);
-		var characterId = 4;//$gameVariables.value(530);
-		var characterId = $gameVariables.value(292)[characterId];
-		character = interp.character(characterId);
-		character.locate(x2, y);
-		character.setDirection(direction2);
-		}).call(interp, x, direction, x2, y, direction2);
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:356
-	speakCharacterOneLinerVar530And292 = function (interp, variableId, pictureId) {
-		var messageText2 = `ガサゴソ──`;
-		return (function (variableId, pictureId) {
-		var variableId2 = variableId;//$gameVariables.value(530);
-		interp._eventId = $gameVariables.value(292)[variableId2];
-		var randomXOffsets = [0];
-		var randomYOffsets = [-10];
-		var lineCandidates = [`${messageText2}`];
-		chara_oneWord(pictureId,interp._eventId,25,180,randomXOffsets,randomYOffsets,lineCandidates);
-		}).call(interp, variableId, pictureId);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:356
-	movePartyCharacterVar530And292 = function () {
-		var variable530Value = $gameVariables.value(530);
-		var variable530Value = $gameVariables.value(292)[variable530Value];
-		event_partyCharaMove(45,"this.moveTowardCharacter($gameMap.event("+variable530Value+"));");
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:358, data/CommonEvents.json:common-event:361
-	setEventFaceVar292 = function (rangeEnd) {
-		for (var slotIndex2 = 12; slotIndex2 <= rangeEnd; slotIndex2++) {
-		  var variable292Value = $gameVariables.value(292)[slotIndex2]; //this._eventId
-		  if(!!$gameMap.event(variable292Value)) {
-		    var event2 = $gameMap.event(variable292Value);
-		    event2.setStepAnime(false);event2.setWalkAnime(false);
-		    event2.setDirection(2);event2.resetPattern();
-		    event2._originalPattern = 1;event2.setAngle(45);
-		    event2._spriteOffsetX = -12;event2._spriteOffsetY = -12;
-		    event2._kageM.clear();
-		    event2.setFace(6,true,true);
-		}};
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:359, data/CommonEvents.json:common-event:361
-	bindInterpreterToValueBossId = function (interp) {
-		return (function () {
-		interp._eventId = valueBossId;
-		}).call(interp);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:359
-	readVariable530Var292_2 = function (variableId, x, y, direction, variableId2, x2, y2, direction2) {
-		var eventId2 = variableId;//$gameVariables.value(530);
-		var variable292Value = $gameMap.event($gameVariables.value(292)[eventId2]);
-		variable292Value.locate(x, y);
-		variable292Value.setDirection(direction);
-		var eventId2 = variableId2;//$gameVariables.value(530);
-		var variable292Value = $gameMap.event($gameVariables.value(292)[eventId2]);
-		variable292Value.locate(x2, y2);
-		variable292Value.setDirection(direction2);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:361
-	configureActorFromVariable20_2 = function (interp) {
-		var textPrefix = `　　`;
-		var colorCode162 = `\\C[16]`;
-		var colorResetCode = `\\C[0]`;
-		var textPart2 = `はメインクラス2ndジョブ`;
-		var colorCode22 = `\\C[2]`;
-		var textPart3 = `＜`;
-		var controlCode = `\\j[21]`;
-		var textPart4 = `＞`;
-		var textSuffix = `に目覚めた！`;
-		return (function () {
-		interp.sVal(20,1);
-		var variable20Value = $gameActors.actor($gameVariables.value(20));
-		valueWordSet0 = `${textPrefix}${colorCode162}${variable20Value.name()}${colorResetCode}${textPart2}${colorCode22}${textPart3}${controlCode}${textPart4}${colorResetCode}${textSuffix}`;
-		valueWordSetEx = 0;//補足が必要な場合
-		interp.setupChild($dataCommonEvents[45].list, 0);
-		}).call(interp);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:361
-	configureActorFromVariable20_3 = function (interp) {
-		var textPrefix = `　　`;
-		var colorCode162 = `\\C[16]`;
-		var colorResetCode = `\\C[0]`;
-		var textPart2 = `はメインクラス2ndジョブ`;
-		var colorCode22 = `\\C[2]`;
-		var textPart3 = `＜`;
-		var controlCode = `\\j[22]`;
-		var textPart4 = `＞`;
-		var textSuffix = `に目覚めた！`;
-		return (function () {
-		interp.sVal(20,2);
-		var variable20Value = $gameActors.actor($gameVariables.value(20));
-		valueWordSet0 = `${textPrefix}${colorCode162}${variable20Value.name()}${colorResetCode}${textPart2}${colorCode22}${textPart3}${controlCode}${textPart4}${colorResetCode}${textSuffix}`;
-		valueWordSetEx = 0;//補足が必要な場合
-		interp.setupChild($dataCommonEvents[45].list, 0);
-		}).call(interp);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:361
-	configureActorFromVariable20_4 = function (interp) {
-		var textPrefix = `　　`;
-		var colorCode162 = `\\C[16]`;
-		var colorResetCode = `\\C[0]`;
-		var textPart2 = `はメインクラス2ndジョブ`;
-		var colorCode22 = `\\C[2]`;
-		var textPart3 = `＜`;
-		var controlCode = `\\j[23]`;
-		var textPart4 = `＞`;
-		var textSuffix = `に目覚めた！`;
-		return (function () {
-		interp.sVal(20,3);
-		var variable20Value = $gameActors.actor($gameVariables.value(20));
-		valueWordSet0 = `${textPrefix}${colorCode162}${variable20Value.name()}${colorResetCode}${textPart2}${colorCode22}${textPart3}${controlCode}${textPart4}${colorResetCode}${textSuffix}`;
-		valueWordSetEx = 0;//補足が必要な場合
-		interp.setupChild($dataCommonEvents[45].list, 0);
-		}).call(interp);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:361
-	configureActorFromVariable20_5 = function (interp) {
-		var textPrefix = `　　`;
-		var colorCode162 = `\\C[16]`;
-		var colorResetCode = `\\C[0]`;
-		var textPart2 = `はメインクラス2ndジョブ`;
-		var colorCode22 = `\\C[2]`;
-		var textPart3 = `＜`;
-		var controlCode = `\\j[24]`;
-		var textPart4 = `＞`;
-		var textSuffix = `に目覚めた！`;
-		return (function () {
-		interp.sVal(20,4);
-		var variable20Value = $gameActors.actor($gameVariables.value(20));
-		valueWordSet0 = `${textPrefix}${colorCode162}${variable20Value.name()}${colorResetCode}${textPart2}${colorCode22}${textPart3}${controlCode}${textPart4}${colorResetCode}${textSuffix}`;
-		valueWordSetEx = 0;//補足が必要な場合
-		interp.setupChild($dataCommonEvents[45].list, 0);
-		}).call(interp);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:471
-	configureActorFromVariable20_6 = function (interp) {
-		var textPrefix = `　　　　　　`;
-		var colorCode162 = `\\C[16]`;
-		var colorResetCode = `\\C[0]`;
-		var textPart2 = `はメインクラス2ndジョブ`;
-		var colorCode22 = `\\C[2]`;
-		var textPart3 = `＜`;
-		var controlCode = `\\j[25]`;
-		var textPart4 = `＞`;
-		var textSuffix = `に目覚めた！`;
-		return (function () {
-		interp.sVal(20,5);
-		var variable20Value = $gameActors.actor($gameVariables.value(20));
-		valueWordSet0 = `${textPrefix}${colorCode162}${variable20Value.name()}${colorResetCode}${textPart2}${colorCode22}${textPart3}${controlCode}${textPart4}${colorResetCode}${textSuffix}`;
-		valueWordSetEx = 0;//補足が必要な場合
-		interp.setupChild($dataCommonEvents[45].list, 0);
-		}).call(interp);
-	};
-
-	// Replaces (7x): data/CommonEvents.json:common-event:368, data/CommonEvents.json:common-event:409, data/CommonEvents.json:common-event:412, data/CommonEvents.json:common-event:414, data/CommonEvents.json:common-event:495, data/CommonEvents.json:common-event:532, …
-	selectMapMusicAndSelectMapParallax = function () {
-		setMap_musicSelect(1,22,0);//種別,id,0屋内1屋外
-		setMap_parallaxSelect(1,22,1);
-		backGraund_menuMapSelect(2,0,0,0);//右6,70表示の場合
-	};
-
-	// Replaces (4x): data/CommonEvents.json:common-event:368, data/CommonEvents.json:common-event:495, data/CommonEvents.json:common-event:532, data/CommonEvents.json:common-event:548
-	moveNpcCharacterByIdVar292_4 = function () {
-		var eventIds2 = [];
-		eventIds2.push($gameVariables.value(292)[1]);
-		eventIds2.push($gameVariables.value(292)[11]);
-		event_NpcCharaMoveId(16,0,eventIds2);
-		//1下移動16下向く39透明化
-		//event_partyCharaMove(45,"this.turnTowardCharacter($gameMap.event("+value1+"));");
-		//event_partyCharaMove(45,"UP: 10;"); //"UP: 10;"
-		//event_partyCharaMove(45,"this.requestBalloon(1);");
-		//event_partyCharaMove(45,"this.requestAnimation(617);");
-	};
-
-	// Replaces (6x): data/CommonEvents.json:common-event:368, data/CommonEvents.json:common-event:386, data/CommonEvents.json:common-event:387, data/CommonEvents.json:common-event:495, data/CommonEvents.json:common-event:532, data/CommonEvents.json:common-event:548
-	setSwitch161 = function () {
-		var constantValue = 1000000;
-		if($gameParty.gold() >= constantValue){
-		  $gameSwitches.setValue(161,true);
-		} else {
-		  $gameSwitches.setValue(161,false);
-		};
-	};
-
-	// Replaces (9x): data/CommonEvents.json:common-event:368, data/CommonEvents.json:common-event:412, data/CommonEvents.json:common-event:495, data/CommonEvents.json:common-event:507, data/CommonEvents.json:common-event:526, data/CommonEvents.json:common-event:532, …
-	setPictureLocationAndBlessStandingPicture = function (picIndex, picIndex2, pictureId, blessType) {
-		var pictureId2 = valuePic1+picIndex;
-		var pictureName2 = valueScenePic+picIndex2;
-		pic_locationSet(pictureId2-pictureId,pictureId2,pictureName2,60,1);
-		tachie_bless(pictureId2,blessType);
-	};
-
-	// Replaces (5x): data/CommonEvents.json:common-event:368, data/CommonEvents.json:common-event:412, data/CommonEvents.json:common-event:495, data/CommonEvents.json:common-event:532, data/CommonEvents.json:common-event:548
-	blessStandingPictureAndPlayHcgPiston = function () {
-		var pictureId2 = valuePic2+1;
-		var pictureName2 = valueScenePic+'01';
-		$gameScreen.showPicture(pictureId2,pictureName2,1,640+480+50,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId2,1,640+480,384,100,100,255,0,60);
-		tachie_bless(pictureId2,1);
-		var pictureId2 = valuePic1+1;
-		var pictureName2 = valueScenePic+'02';
-		$gameScreen.showPicture(pictureId2,pictureName2,1,640-128,384-20,100,100,0,0);
-		$gameScreen.movePicture(pictureId2,1,640-128,384,100,100,255,0,60);
-		hcg_piston(pictureId2,5,1,2);
-	};
-
-	// Replaces (6x): data/CommonEvents.json:common-event:368, data/CommonEvents.json:common-event:412, data/CommonEvents.json:common-event:495, data/CommonEvents.json:common-event:532, data/CommonEvents.json:common-event:548, data/CommonEvents.json:common-event:573
-	fadePicture1AndBlessStandingPicture = function () {
-		var pictureName2 = 'Screen1024Frame';//1024ﾋﾟｸ表示の際のフレーム枠、,id70
-		$gameScreen.showPicture(valuePic2,pictureName2,1,640-78,384,100,100,255,0);
-		picture_fade1(valuePic2,"fadeIn",valueWipeImg,60,5);
-		tachie_bless(value1,5);
-	};
-
-	// Replaces (4x): data/CommonEvents.json:common-event:368, data/CommonEvents.json:common-event:495, data/CommonEvents.json:common-event:532, data/CommonEvents.json:common-event:548
-	setHTextWord = function () {
-		var newValue2 = [];
-		htext_word(3);//3高2中1低
-		newValue2 = newValue2.concat(valueHtextWord);
-		//var arr1 = ['（ドキっ）','（ドキドキ）','（ドクン）','ドキッ'];//文字BGV
-		//var arr1 = ['「アッ\\I[12]」','「ンッ\\I[12]」','「ンン…\\I[12]」','「ンクっ…\\I[12]」','「ァンっ…\\I[12]」'];//文字BGV
-		//var arr1 = ['「………ァっ」','「いや…」','「ンン──……」','「ンクっ…」','「ァンっ…」'];//文字BGV
-		$gameVariables.setValue(707,newValue2);
-		$gameVariables.setValue(706,[640-128,386,1,60,0,'eromangasimaji']);
-		$gameSwitches.setValue(125,true);
-	};
-
-	// Replaces (4x): data/CommonEvents.json:common-event:368, data/CommonEvents.json:common-event:495, data/CommonEvents.json:common-event:532, data/CommonEvents.json:common-event:548
-	playHcgPistonSwitch429 = function () {
-		var pictureId2 = valuePic1+2;
-		var pictureName2 = valueScenePic+'02';
-		$gameScreen.showPicture(pictureId2,pictureName2,1,640,384,100,100,255,0);
-		pic_setArray1 = [1,pictureId2,0,-30,0,20];
-		pic_setArray2 = [1,pictureId2,0,0,3,30]; //pic_setArray2 = [1,0,0,0,0,0];
-		valueParallelPicSe1 = ['ZH_sticky4',20,60];
-		valueParallelPicSe2 = ['ZH_sticky4',20,60];
-		hcg_piston(pictureId2,7,2,1);
-		$gameSwitches.setValue(429,true);
-	};
-
-	// Replaces (7x): data/CommonEvents.json:common-event:368, data/CommonEvents.json:common-event:410, data/CommonEvents.json:common-event:495, data/CommonEvents.json:common-event:532, data/CommonEvents.json:common-event:548, data/CommonEvents.json:common-event:571, …
-	setupChildInterpreter9 = function (interp) {
-		return (function () {
-		//this.setupChild($dataCommonEvents[18].list, 0);
-		interp.setupChild($dataCommonEvents[19].list, 0);
-		}).call(interp);
-	};
-
-	// Replaces (11x): data/CommonEvents.json:common-event:368, data/CommonEvents.json:common-event:410, data/CommonEvents.json:common-event:495, data/CommonEvents.json:common-event:532, data/CommonEvents.json:common-event:536, data/CommonEvents.json:common-event:548, …
-	setStandingPictureActionZ_ClothesTakeOff = function (expressionCode, targetPicId, sourcePicId, showCostumeId) {
-		tachie_dousa(0,1,expressionCode,targetPicId,sourcePicId,showCostumeId,120,0,0);
-		var se2 = 'Z_ClothesTakeOff';//ピッチ50か100。消去ウェイトで変更
-		AudioManager.playSe({"name":se2,"volume":150,"pitch":100,"pan":0});
-		//tachie_clothReflect(1);//ｱｸﾀｰid
-	};
-
-	// Replaces (6x): data/CommonEvents.json:common-event:368, data/CommonEvents.json:common-event:495, data/CommonEvents.json:common-event:532, data/CommonEvents.json:common-event:548, data/Map041.json:map-event:7:page:1, data/Map083.json:map-event:6:page:1
-	setupChildInterpreter10 = function (interp, newValue) {
-		var controlCode = `\\v[23]`;
-		return (function (newValue) {
-		interp.sVal(23,newValue);
-		interp.sVal(172,19);//中央に一言メッセージ,何行でも良し
-		var templateText = `${controlCode}`;
-		valueTalkSet = [1,28,templateText,100];//0で消去 1で通常 2で時間経過  255で背景透明度
-		interp.setupChild($dataCommonEvents[60].list, 0);
-		}).call(interp, newValue);
-	};
-
-	// Replaces (4x): data/CommonEvents.json:common-event:370, data/CommonEvents.json:common-event:371, data/CommonEvents.json:common-event:383, data/CommonEvents.json:common-event:384
-	setSelfVariable530 = function (interp) {
-		return (function () {
-		interp.sVal(530,1);//主格キャラ
-		}).call(interp);
-	};
-
-	// Replaces (6x): data/CommonEvents.json:common-event:370, data/CommonEvents.json:common-event:371, data/CommonEvents.json:common-event:372, data/CommonEvents.json:common-event:373, data/CommonEvents.json:common-event:383, data/CommonEvents.json:common-event:384
-	showHExperienceTable1 = function (requestedPartnerWeaponId) {
-		h_keikenhyouji1(521,requestedPartnerWeaponId);//記録変数,相手ID
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:371, data/CommonEvents.json:common-event:372
-	setupChildInterpreter11 = function (interp, countValue) {
-		var messageText2 = `デイリークエスト`;
-		return (function (countValue) {
-		var constantValue = 800;valueCountSet1 = countValue;
-		if($dataItems[valueCountSet1].meta['SGカテゴリ']){
-		  if($dataItems[valueCountSet1].meta['SGカテゴリ'] == `${messageText2}`){
-		    var constantValue = 900;
-		  } else {
-		    var constantValue = 800;
-		  };
-		};
-		var templateText = `\x1bIIN[${valueCountSet1}]\n${valueQuestArray4[valueCountSet1-constantValue]}`;
-		interp.sVal(172,10);
-		valueTalkSet = [24,templateText,1];
-		interp.setupChild($dataCommonEvents[60].list, 0);
-		}).call(interp, countValue);
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:383, data/CommonEvents.json:common-event:384, data/CommonEvents.json:common-event:528
-	setupRespawnEnemyAVar292And530 = function (interp, posX, posX2) {
-		return (function (posX, posX2) {
-		interp.sVal(530,1);//主格キャラ
-		$gameVariables.setValue(292,Array(21).fill(0));
-		var variable530Value = $gameVariables.value(530);
-		event_respawnSetA(variable530Value,posX,5,1,8);
-		var variable292Value = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		variable292Value._spriteOffsetX = -24;
-		var variable530Value = 5;//$gameVariables.value(530);
-		event_respawnSetA(variable530Value,posX2,5,1,8);
-		var variable292Value = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		variable292Value._spriteOffsetX = -24;
-		}).call(interp, posX, posX2);
-	};
-
-	// Replaces (4x): data/CommonEvents.json:common-event:389, data/CommonEvents.json:common-event:507, data/CommonEvents.json:common-event:508, data/CommonEvents.json:common-event:509
-	setupRespawnEnemyAAndSetupRespawnEnemyNVar530And163Etc4 = function (interp) {
-		return (function () {
-		var variable530Value = $gameVariables.value(530);
-		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
-		event_respawnSetA(variable530Value,12,10,1,4);
-		interp._eventId = $gameVariables.value(292)[variable530Value];
-		var variable530Value = 11;
-		event_respawnSetN(variable530Value,13,10,0,'npcUnique1',0,4);
-		}).call(interp);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:389, data/CommonEvents.json:common-event:509
-	readVariable530Var292_3 = function () {
-		var variable530Value = $gameVariables.value(530);
-		var variable292Value = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		variable292Value.locate(18, 10);
-		variable292Value.setDirection(8);
-		variable292Value._spriteOffsetY = -12;
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:389, data/CommonEvents.json:common-event:509
-	showScenePictureAndFadeIn4 = function () {
-		var pictureId2 = valuePic1+3;
-		var pictureName2 = valueScenePic+'03';
-		$gameScreen.showPicture(pictureId2,pictureName2,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId2,1,640-128,384,100,100,255,0,60);
-		var pictureId2 = valuePic1+4;
-		var pictureName2 = valueScenePic+'04';
-		$gameScreen.showPicture(pictureId2,pictureName2,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId2,1,640-128,384,100,100,255,0,60);
-		//pic_move1(value1-1,0,0,100,100,0,90);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:389, data/CommonEvents.json:common-event:509
-	playHcgPiston = function () {
-		var pictureId2 = valuePic1+4;
-		hcg_piston(pictureId2,7,1,1);
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:389, data/CommonEvents.json:common-event:509
-	movePicture1AndPlayHcgPiston = function (picIndex, picIndex2, breathPresetId) {
-		var pictureId2 = valuePic1+picIndex;
-		var pictureName2 = valueScenePic+picIndex2;
-		$gameScreen.showPicture(pictureId2,pictureName2,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId2,1,640-128,384,100,100,255,0,60);
-		pic_move1(pictureId2-1,0,0,100,100,0,90);
-		hcg_piston(pictureId2,6,breathPresetId,1);
-	};
-
-	// Replaces (5x): data/CommonEvents.json:common-event:390, data/CommonEvents.json:common-event:391, data/CommonEvents.json:common-event:393, data/CommonEvents.json:common-event:399, data/CommonEvents.json:common-event:530
-	setMapSelfSwitch4 = function (key, key2) {
-		$gameSelfSwitches.setValue([$gameMap.mapId(), key, 'C'], true);
-		$gameSelfSwitches.setValue([$gameMap.mapId(), key2, 'C'], true);
-	};
-
-	// Replaces (8x): data/CommonEvents.json:common-event:391, data/CommonEvents.json:common-event:393, data/CommonEvents.json:common-event:399, data/CommonEvents.json:common-event:546, …
-	showScenePictureAndFadeIn5 = function (picIndex, picIndex2) {
-		valuePic1 = 51;
-		var pictureId2 = valuePic1+picIndex;
-		var pictureName2 = valueScenePic+picIndex2;
-		$gameScreen.showPicture(pictureId2,pictureName2,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId2,1,640-128,384,100,100,255,0,60);
-		//tachie_bless(value1,2);
-		//pic_move1(value1-1,0,0,100,100,0,90);
-	};
-
-	// Replaces (7x): data/CommonEvents.json:common-event:391, data/CommonEvents.json:common-event:393, data/CommonEvents.json:common-event:399, data/CommonEvents.json:common-event:531, data/CommonEvents.json:common-event:573, …
-	playHcgPistonAndMovePicture1 = function (picIndex, picIndex2, breathTypeId) {
-		var pictureId2 = valuePic1+picIndex;
-		var pictureName2 = valueScenePic+picIndex2;
-		$gameScreen.showPicture(pictureId2,pictureName2,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId2,1,640-128,384,100,100,255,0,60);
-		hcg_piston(pictureId2,breathTypeId,1,1);
-		pic_move1(pictureId2-1,0,0,100,100,0,90);
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:391, data/CommonEvents.json:common-event:393, data/CommonEvents.json:common-event:399
-	playHcgPiston2 = function () {
-		var pictureId2 = valuePic1+12;
-		var pictureName2 = valueScenePic+'12';
-		$gameScreen.showPicture(pictureId2,pictureName2,1,640-128,384,100,100,200,0);
-		hcg_piston(pictureId2,7,1,2);
-		//pic_move1(value1-1,0,0,100,100,0,90);
-	};
-
-	// Replaces (7x): data/CommonEvents.json:common-event:391, data/CommonEvents.json:common-event:393, data/CommonEvents.json:common-event:399, data/CommonEvents.json:common-event:530, data/CommonEvents.json:common-event:531, data/CommonEvents.json:common-event:572, …
-	movePicture1_4 = function (picIndex, scaleX, scaleY) {
-		var pictureId2 = valuePic1+picIndex;
-		pic_move1(pictureId2,0,0,scaleX,scaleY,0,90);
-	};
-
-	// Replaces (9x): data/CommonEvents.json:common-event:391, data/CommonEvents.json:common-event:393, data/CommonEvents.json:common-event:399, data/CommonEvents.json:common-event:526, data/CommonEvents.json:common-event:531, data/CommonEvents.json:common-event:545, …
-	blessStandingPictureAndMovePicture1 = function (picIndex, picIndex2, blessType) {
-		var pictureId2 = valuePic1+picIndex;
-		var pictureName2 = valueScenePic+picIndex2;
-		$gameScreen.showPicture(pictureId2,pictureName2,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId2,1,640-128,384,100,100,255,0,60);
-		tachie_bless(pictureId2,blessType);
-		pic_move1(pictureId2-1,0,0,100,100,0,90);
-	};
-
-	// Replaces (7x): data/CommonEvents.json:common-event:392, data/Map003.json:map-event:181:page:1, data/Map003.json:map-event:218:page:2, data/Map003.json:map-event:235:page:1, data/Map018.json:map-event:25:page:1, data/Map018.json:map-event:39:page:1, …
-	temporarilySaveNpc = function () {
-		Npc_TemporarilySave(0,1);//終了処理
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:393, data/CommonEvents.json:common-event:399, data/CommonEvents.json:common-event:547
-	setVariable318 = function (variableId) {
-		var newValue2 = $gameVariables.value(variableId);//文字HBGV
-		$gameVariables.setValue(318,newValue2);
-		$gameVariables.setValue(706,[640-128,386,1,80,0,'eromangasimaji']);
-		$gameSwitches.setValue(119,true);
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:401
-	setupRespawnEnemyAVar292 = function (numericValue, posX, zoomFlag, direction) {
-		var charaSlotId = numericValue;
-		event_respawnSetA(charaSlotId,posX,34,zoomFlag);
-		var variable292Value = $gameMap.event($gameVariables.value(292)[charaSlotId]);
-		variable292Value.setDirection(direction);
-	};
-
-	// Replaces (8x): data/CommonEvents.json:common-event:401, data/CommonEvents.json:common-event:414, data/CommonEvents.json:common-event:444, …
-	setMessageRowCount = function (rowCount) {
-		$gameMessage.setMessageRow(rowCount);
-	};
-
-	// Replaces (5x): data/CommonEvents.json:common-event:406, data/CommonEvents.json:common-event:496, data/CommonEvents.json:common-event:517, data/CommonEvents.json:common-event:518, data/CommonEvents.json:common-event:519
-	selectMapParallaxAndSelectMenuMapBackground = function () {
-		//setMap_musicSelect(0,21,0);
-		setMap_parallaxSelect(0,21,0);
-		backGraund_menuMapSelect(2,'Dungeon1_2',0,0);//
-	};
-
-	// Replaces (7x): data/CommonEvents.json:common-event:406, data/CommonEvents.json:common-event:496, data/CommonEvents.json:common-event:516, data/CommonEvents.json:common-event:517, data/CommonEvents.json:common-event:518, data/CommonEvents.json:common-event:519, …
-	setValuePic1 = function () {
-		valuePic1 = 51;
-	};
-
-	// Replaces (6x): data/CommonEvents.json:common-event:406, data/CommonEvents.json:common-event:496, data/CommonEvents.json:common-event:516, data/CommonEvents.json:common-event:517, data/CommonEvents.json:common-event:518, data/CommonEvents.json:common-event:519
-	fadePicture1FadeIn_2 = function (opacity) {
-		var pictureId2 = valuePic1;
-		var pictureName2 = valueScenePic+'00';
-		$gameScreen.showPicture(pictureId2,pictureName2,1,640-128,384,100,100,opacity,0);
-		picture_fade1(valuePic1,"fadeIn",valueWipeImg,60,5);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:410
-	selectMenuMapBackground = function (mapName) {
-		backGraund_menuMapSelect(2,mapName,0,0);//右6,70表示の場合
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:410, data/CommonEvents.json:common-event:546, data/CommonEvents.json:common-event:547
-	blessStandingPicture = function (picIndex, picIndex2, opacity) {
-		var pictureId2 = valuePic1+picIndex;
-		var pictureName2 = valueScenePic+picIndex2;
-		$gameScreen.showPicture(pictureId2,pictureName2,1,640-128,384,100,100,opacity,0);
-		tachie_bless(pictureId2,2);
-		//pic_move1(value1-1,0,0,100,100,0,90);
+		const pictureScaleX = $gameScreen.picture(valuePic1).scaleX();
+		picTachie_move1(valuePic1, 0, 0, -pictureScaleX * 2, 0, 255, 60);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:292, data/CommonEvents.json:common-event:338
+	startStandingPictureDialogue = function (interp, sideCount) {
+		// 「一人で立ち絵変化させる時は4」「NPC会話の時は0」
+		tachie_kaiwastart(false, false, 1, sideCount);
+		runCommonEventAsChild(interp, 18);
 	};
 
 	// Replaces (2x): data/CommonEvents.json:common-event:414, data/CommonEvents.json:common-event:451
-	startStandingPictureDialogue2 = function (numericValue) {
-		tachie_kaiwastart(false,true,numericValue,1);
-		//急ぎ,拡大,右人数,左人数
+	startStandingPictureDialogue2 = function (rightSideCount) {
+		// 急ぎ, 拡大, 右人数, 左人数
+		tachie_kaiwastart(false, true, rightSideCount, 1);
 	};
 
-	// Replaces (2x): data/CommonEvents.json:common-event:430, data/CommonEvents.json:common-event:432
-	setupRespawnEnemyAVar530And163Etc4 = function (interp) {
-		return (function () {
-		var variable530Value = $gameVariables.value(530);
-		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
-		event_respawnSetA(variable530Value,8,7,1);
-		var variable292Value = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		variable292Value.setImage(variable163Value[1], variable163Value[2]);
-		variable292Value.setDirection(6);
-		interp._eventId = $gameVariables.value(292)[variable530Value];
-		}).call(interp);
+	/* ============================================================================
+	 * Camera / weather / background
+	 * ========================================================================== */
+
+	// Replaces (4x): data/CommonEvents.json:common-event:331, :337, Map007.json:map-event:4:page:1, :6:page:1
+	zoomCamera = function (easing) {
+		zoomCameraOnEvent(easing);
 	};
 
-	// Replaces (3x): data/CommonEvents.json:common-event:431
-	showPopupMessage2Var292_3 = function (numericValue, numericValue2, numericValue3) {
-		var eventId2 = numericValue;
-		var variable292Value = $gameMap.event($gameVariables.value(292)[eventId2]);
-		variable292Value.requestBalloon(numericValue2);
-		var eventId2 = $gameVariables.value(292)[eventId2];
-		message_popup2(eventId2,0,numericValue3,1);
+	// Replaces (3x): data/CommonEvents.json:common-event:338, :361, :471
+	zoomCamera2 = function (interp) {
+		zoomCameraOnEvent(interp._eventId, 1.5);
 	};
 
-	// Replaces (2x): data/CommonEvents.json:common-event:441, data/CommonEvents.json:common-event:552
-	setupRespawnEnemyAAndSetupRespawnEnemyNVar530And163Etc5 = function () {
-		var variable530Value = $gameVariables.value(530);
-		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
-		event_respawnSetA(variable530Value,15,4,0);
-		var variable292Value = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		variable292Value.setImage(variable163Value[1], variable163Value[2]);
-		variable292Value.setDirection(6);
-		var variable530Value = 11;
-		event_respawnSetN(variable530Value,16,4,1,variable163Value[6],variable163Value[7]);
-		var variable292Value = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		variable292Value.setDirection(2);
+	// Replaces (7x): data/CommonEvents.json:common-event:331, :338, :356, :359, :536, :546, ...
+	zoomCameraVar530And292 = function (eventSlotIndex) {
+		// NOTE: the original declared `easing` twice (shadowing bug); kept verbatim.
+		let easing = eventSlotIndex;
+		easing = spawnedEventId(easing);
+		zoomCameraOnEvent(easing);
 	};
 
-	// Replaces (4x): data/CommonEvents.json:common-event:441, data/CommonEvents.json:common-event:442, data/CommonEvents.json:common-event:552
-	setupRespawnEnemyAAndSetupRespawnEnemyNVar530And292_3 = function (posX, posY, direction, posX2, posY2, imageName, imageIndex, direction2) {
-		var variable530Value = $gameVariables.value(530);
-		event_respawnSetA(variable530Value,posX,posY,1);
-		var variable292Value = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		variable292Value.setDirection(direction);
-		var variable530Value = 11;
-		event_respawnSetN(variable530Value,posX2,posY2,0,imageName,imageIndex);
-		var variable292Value = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		variable292Value.setDirection(direction2);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:442
-	setupRespawnEnemyAAndSetupRespawnEnemyNVar530And163Etc6 = function (interp, posX, posY, zoomFlag, posX2, posY2, zoomFlag2) {
-		return (function (posX, posY, zoomFlag, posX2, posY2, zoomFlag2) {
-		var variable530Value = $gameVariables.value(530);
-		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
-		event_respawnSetA(variable530Value,posX,posY,zoomFlag);
-		var variable292Value = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		variable292Value.setImage(variable163Value[1], variable163Value[2]);
-		variable292Value.setDirection(2);
-		interp._eventId = $gameVariables.value(292)[variable530Value];
-		var variable530Value = 11;
-		event_respawnSetN(variable530Value,posX2,posY2,zoomFlag2,variable163Value[6],variable163Value[7]);
-		var variable292Value = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		variable292Value.setDirection(2);
-		}).call(interp, posX, posY, zoomFlag, posX2, posY2, zoomFlag2);
-	};
-
-	// Replaces (5x): data/CommonEvents.json:common-event:442, data/CommonEvents.json:common-event:552
-	setBackgroundLine = function (numericValue) {
-		$gameSystem.setBgsLine(numericValue);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:451
-	readVariable530Var292_4 = function (interp) {
-		return (function () {
-		var constantValue = 1;//$gameVariables.value(530);
-		//event_respawnSetN(value1,16,6,0,'1_1',2);
-		interp._eventId = $gameVariables.value(292)[constantValue];
-		}).call(interp);
-	};
-
-	// Replaces (4x): data/CommonEvents.json:common-event:451, data/Map007.json:map-event:4:page:1
-	showPictureFromArgs3 = function (numericValue, textValue, opacity) {
-		var pictureId2 = numericValue;
-		var pictureName2 = textValue;
-		$gameScreen.showPicture(pictureId2,pictureName2,1,640,384,100,100,opacity,0);
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:471, data/CommonEvents.json:common-event:541
-	setupRespawnEnemyAVar530And292_7 = function (interp, posX, posY, direction) {
-		return (function (posX, posY, direction) {
-		var charaSlotId = 5;//$gameVariables.value(530);
-		event_respawnSetA(charaSlotId,posX,posY,1,direction);
-		interp._eventId = $gameVariables.value(292)[charaSlotId];
-		}).call(interp, posX, posY, direction);
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:471
-	setupRespawnEnemyNVar292_7 = function (interp, charaSlotId, posX, zoomFlag, imageIndex, direction, slotIndex) {
-		return (function (charaSlotId, posX, zoomFlag, imageIndex, direction, slotIndex) {
-		event_respawnSetN(charaSlotId,posX,12,zoomFlag,'npcUnique3',imageIndex,direction);
-		interp._eventId = $gameVariables.value(292)[slotIndex];
-		}).call(interp, charaSlotId, posX, zoomFlag, imageIndex, direction, slotIndex);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:471
-	setupChildInterpreter12 = function (interp, talkPictureId) {
-		return (function (talkPictureId) {
-		interp.sVal(172,21);
-		valueTalkSet = [talkPictureId,250,interp._eventId];//1で付与0で解除,透明度,参照ｲﾍﾞid,valueTalkSet = [0,0,0];
-		interp.setupChild($dataCommonEvents[60].list, 0);
-		}).call(interp, talkPictureId);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:471
-	speakCharacterOneLinerVar292 = function () {
-		var messageText2 = `オラァッ！！`;
-		var randomXOffsets = [0];
-		var randomYOffsets = [-50];
-		var lineCandidates = [`${messageText2}`];
-		chara_oneWord(100,$gameVariables.value(292)[11],25,120,randomXOffsets,randomYOffsets,lineCandidates,0);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:471
-	speakCharacterOneLinerVar292_2 = function () {
-		var messageText2 = `ガハッッ！？`;
-		var randomXOffsets = [0];
-		var randomYOffsets = [-50];
-		var lineCandidates = [`${messageText2}`];
-		chara_oneWord(100,$gameVariables.value(292)[5],25,120,randomXOffsets,randomYOffsets,lineCandidates,0);
-	};
-
-	// Replaces (1x): data/CommonEvents.json:common-event:471
-	speakCharacterOneLinerVar292_3 = function () {
-		var messageText2 = `フンッ！`;
-		var randomXOffsets = [0];
-		var randomYOffsets = [-50];
-		var lineCandidates = [`${messageText2}`];
-		chara_oneWord(100,$gameVariables.value(292)[11],25,180,randomXOffsets,randomYOffsets,lineCandidates,0);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:481
-	flashScreen = function () {
-		$gameScreen.startFlash([255,119,255,200], 60)
-		$gameScreen.startShake(7, 7, 20);
-		$gameScreen.startAnimation(640-256, 368, 634, false);
-	};
-
-	// Replaces (5x): data/CommonEvents.json:common-event:495, data/CommonEvents.json:common-event:532, data/CommonEvents.json:common-event:548, data/CommonEvents.json:common-event:572, data/CommonEvents.json:common-event:573
-	readVariable530Var292_5 = function (characterIndex) {
-		var variable530Value = $gameVariables.value(530);
-		var variable292Value = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		variable292Value.setImage('1_1', characterIndex);
-	};
-
-	// Replaces (4x): data/CommonEvents.json:common-event:495, data/CommonEvents.json:common-event:532, data/CommonEvents.json:common-event:548, data/CommonEvents.json:common-event:572
-	erasePictureP5 = function () {
-		var pictureId2 = valuePic1+7;
-		pic_eraseP(0,[pictureId2]);
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:495, data/CommonEvents.json:common-event:532, data/CommonEvents.json:common-event:548
-	playAdvHPartDirectAndSetSexDirection = function (interp) {
-		return (function () {
-		//絶頂射精
-		adv_HpartDirectPlay(3);
-		sex_direction(12,0,0);
-		interp.wait(valueSexWait);
-		}).call(interp);
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:495, data/CommonEvents.json:common-event:532, data/CommonEvents.json:common-event:548
-	setAdvPartDirectAndSetSexDirection = function (interp) {
-		return (function () {
-		//ピストン
-		adv_partDirectSet(1);//ピストンの時1
-		sex_direction(1,0,0);
-		interp.wait(valueSexWait);
-		}).call(interp);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:496, data/CommonEvents.json:common-event:516
-	blessStandingPicture2 = function (blessType) {
-		var pictureId2 = valuePic1+1;//非表示状態
-		var pictureName2 = valueScenePic+'01';
-		$gameScreen.showPicture(pictureId2,pictureName2,1,640-128,384+50,100,100,0,0);
-		//$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
-		tachie_bless(pictureId2,blessType);
-	};
-
-	// Replaces (5x): data/CommonEvents.json:common-event:496, data/CommonEvents.json:common-event:516, data/CommonEvents.json:common-event:517, data/CommonEvents.json:common-event:518, data/CommonEvents.json:common-event:519
-	blessStandingPicture3 = function (picIndex, picIndex2, y) {
-		var pictureId2 = valuePic1+picIndex;
-		var pictureName2 = valueScenePic+picIndex2;
-		$gameScreen.showPicture(pictureId2,pictureName2,1,640-128,384+y,100,100,0,0);
-		$gameScreen.movePicture(pictureId2,1,640-128,384,100,100,255,0,60);
-		tachie_bless(pictureId2,2);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:496
-	blessStandingPicture4 = function () {
-		var pictureId2 = valuePic1+10;
-		var pictureName2 = valueScenePic+'21';
-		$gameScreen.showPicture(pictureId2,pictureName2,1,640-128+50,384,100,100,0,0);
-		//$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
-		tachie_bless(pictureId2,2);
-	};
-
-	// Replaces (12x): data/CommonEvents.json:common-event:496, data/CommonEvents.json:common-event:516, data/CommonEvents.json:common-event:517, data/CommonEvents.json:common-event:518, data/CommonEvents.json:common-event:519, …
-	blessStandingPictureAndMovePicture1_2 = function (picIndex, picIndex2, scaleX, scaleY, duration, blessType, pictureId, waitFrames) {
-		var pictureId2 = valuePic1+picIndex;
-		var pictureName2 = valueScenePic+picIndex2;
-		$gameScreen.showPicture(pictureId2,pictureName2,1,640-128,384,scaleX,scaleY,0,0);
-		$gameScreen.movePicture(pictureId2,1,640-128,384,100,100,255,0,duration);
-		tachie_bless(pictureId2,blessType);
-		pic_move1(valuePic1+pictureId,0,0,100,100,0,waitFrames);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:496, data/CommonEvents.json:common-event:516
-	moveScenePictureAndFadeIn = function () {
-		var pictureId2 = valuePic1+1;//非表示状態
-		var pictureName2 = valueScenePic+'01';
-		//$gameScreen.showPicture(value1,value2,1,640-128,384+50,100,100,0,0);
-		$gameScreen.movePicture(pictureId2,1,640-128,384,100,100,255,0,60);
-	};
-
-	// Replaces (6x): data/CommonEvents.json:common-event:507, data/CommonEvents.json:common-event:508, data/CommonEvents.json:common-event:509, data/CommonEvents.json:common-event:541
-	showScenePictureAndFadeIn6 = function (picIndex, picIndex2, scaleY, opacity) {
-		var pictureId2 = valuePic1+picIndex;
-		var pictureName2 = valueScenePic+picIndex2;
-		$gameScreen.showPicture(pictureId2,pictureName2,1,640-128,384,100,scaleY,opacity,0);
-	};
-
-	// Replaces (6x): data/CommonEvents.json:common-event:508
-	movePicture1AndBlessStandingPicture = function (picIndex, picIndex2) {
-		var pictureId2 = valuePic1+picIndex;
-		var pictureName2 = valueScenePic+picIndex2;
-		$gameScreen.showPicture(pictureId2,pictureName2,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId2,1,640-128,384,100,100,255,0,60);
-		pic_move1(pictureId2-1,0,0,100,100,0,90);
-		tachie_bless(pictureId2,2);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:511, data/Map094.json:map-event:45:page:1
-	moveNpcCharacterByIdVar292_5 = function () {
-		var eventIds2 = [];
-		eventIds2.push($gameVariables.value(292)[1]);
-		eventIds2.push($gameVariables.value(292)[12]);
-		event_NpcCharaMoveId(16,0,eventIds2); 
-		event_NpcCharaMoveId(45,"this.requestBalloon(1);",eventIds2);
-	};
-
-	// Replaces (4x): data/CommonEvents.json:common-event:511, data/Map094.json:map-event:45:page:1
-	setEventFace = function (interp, argument1) {
-		return (function (argument1) {
-		var event2 = $gameMap.event(interp._eventId);
-		event2.setFace(argument1,true,true);
-		}).call(interp, argument1);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:511, data/Map094.json:map-event:45:page:1
-	clearEventFace = function (interp) {
-		return (function () {
-		var event2 = $gameMap.event(interp._eventId);
-		event2.removeFace();
-		}).call(interp);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:511, data/Map094.json:map-event:45:page:1
-	readVariable530Var292_6 = function () {
-		var eventId2 = 11;//$gameVariables.value(530);
-		var variable292Value = $gameMap.event($gameVariables.value(292)[eventId2]);
-		variable292Value.locate(34, 20);variable292Value.setDirection(2);
-		var eventId2 = $gameVariables.value(530);
-		var variable292Value = $gameMap.event($gameVariables.value(292)[eventId2]);
-		variable292Value.locate(34, 19);variable292Value.setDirection(2);
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:511, data/CommonEvents.json:common-event:552, data/Map094.json:map-event:45:page:1
+	// Replaces (3x): data/CommonEvents.json:common-event:511, :552, data/Map094.json:map-event:45:page:1
 	zoomCameraVar530And292_2 = function (interp) {
-		return (function () {
-		var variable530Value = $gameVariables.value(530);
-		interp._eventId = $gameVariables.value(292)[variable530Value];
-		drowsepost.camera.zoom(1, 60, interp._eventId);
-		}).call(interp);
+		interp._eventId = spawnedEventId(varValue(LEAD_ACTOR_VAR));
+		zoomCameraOnEvent(interp._eventId);
 	};
 
-	// Replaces (5x): data/CommonEvents.json:common-event:516, data/CommonEvents.json:common-event:517, data/CommonEvents.json:common-event:518, data/CommonEvents.json:common-event:519, data/CommonEvents.json:common-event:526
-	showHExperienceTable1_2 = function (interp, scenePicName, newValue, requestedPartnerWeaponId) {
-		return (function (scenePicName, newValue, requestedPartnerWeaponId) {
-		valueScenePic = scenePicName;
-		//var value2 = valueScenePic+'01';
-		interp.sVal(530,1);//主格キャラ
-		interp.sVal(535,newValue);//挿話回想の場合アイテムID。メインは0
-		h_keikenhyouji1(521,requestedPartnerWeaponId);//記録変数,相手ID,名前id21に名前と役職名
-		valueWeatherSceneSet = 0;
-		}).call(interp, scenePicName, newValue, requestedPartnerWeaponId);
+	// Replaces (3x): data/CommonEvents.json:common-event:301, data/Map007.json:map-event:4:page:1
+	setMapWeather2Var256 = function () {
+		setVar(256, 11);   // 火事
+		map_weatherSet2();
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:301
+	setMapWeather2Var256_2 = function (weatherType) {
+		setVar(256, weatherType);   // 本降り
+		map_weatherSet2();
+	};
+
+	// Replaces (7x): data/CommonEvents.json:common-event:368, :409, :412, :414, :495, :532, ...
+	selectMapMusicAndSelectMapParallax = function () {
+		setMap_musicSelect(1, 22, 0);       // 種別, id, 0屋内1屋外
+		setMap_parallaxSelect(1, 22, 1);
+		backGraund_menuMapSelect(2, 0, 0, 0);
 	};
 
 	// Replaces (2x): data/CommonEvents.json:common-event:516, data/CommonEvents.json:common-event:526
 	selectMapParallax = function (parallaxName) {
-		//setMap_musicSelect(0,21,0);
-		setMap_parallaxSelect(0,parallaxName,0);
+		setMap_parallaxSelect(0, parallaxName, 0);
 	};
 
-	// Replaces (4x): data/CommonEvents.json:common-event:516, data/CommonEvents.json:common-event:517, data/CommonEvents.json:common-event:518, data/CommonEvents.json:common-event:519
+	// Replaces (5x): data/CommonEvents.json:common-event:406, :496, :517, :518, :519
+	selectMapParallaxAndSelectMenuMapBackground = function () {
+		setMap_parallaxSelect(0, 21, 0);
+		backGraund_menuMapSelect(2, 'Dungeon1_2', 0, 0);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:410
+	selectMenuMapBackground = function (mapBackgroundName) {
+		backGraund_menuMapSelect(2, mapBackgroundName, 0, 0);
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:516, :517, :518, :519
 	selectMenuMapBackgroundDungeon1_2 = function () {
-		backGraund_menuMapSelect(2,'Dungeon1_2',0,0);//
+		backGraund_menuMapSelect(2, 'Dungeon1_2', 0, 0);
 	};
 
-	// Replaces (6x): data/CommonEvents.json:common-event:517, data/CommonEvents.json:common-event:518, data/CommonEvents.json:common-event:519
-	setValueScenePic = function (scenePicName) {
-		valueScenePic = scenePicName;
+	// Replaces (5x): data/CommonEvents.json:common-event:442, data/CommonEvents.json:common-event:552
+	setBackgroundLine = function (bgsLineId) {
+		$gameSystem.setBgsLine(bgsLineId);
 	};
 
-	// Replaces (3x): data/CommonEvents.json:common-event:517, data/CommonEvents.json:common-event:518, data/CommonEvents.json:common-event:519
-	blessStandingPicture5 = function () {
-		var pictureId2 = valuePic1+10;
-		var pictureName2 = valueScenePic+'21';
-		$gameScreen.showPicture(pictureId2,pictureName2,1,640-128+50,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId2,1,640-128,384,100,100,255,0,60);
-		tachie_bless(pictureId2,2);
+	// Replaces (2x): data/CommonEvents.json:common-event:303, data/CommonEvents.json:common-event:324
+	saveBgmAndFadeOut = function (duration) {
+		$gameSystem.saveBgm();
+		AudioManager.fadeOutBgm(duration);
 	};
 
-	// Replaces (3x): data/CommonEvents.json:common-event:517, data/CommonEvents.json:common-event:518, data/CommonEvents.json:common-event:519
-	blessStandingPictureAndPlayPictureSe1 = function () {
-		var pictureId2 = valuePic1+2;
-		var pictureName2 = valueScenePic+'02';
-		$gameScreen.showPicture(pictureId2,pictureName2,1,640-128,384,300,300,0,0);
-		$gameScreen.movePicture(pictureId2,1,640-128,384,100,100,255,0,60);
-		tachie_bless(pictureId2,2);
-		picture_se1();
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:517, data/CommonEvents.json:common-event:518, data/CommonEvents.json:common-event:519
-	setSexDirectionAndSetAdvPartDirect = function (interp, actionType) {
-		return (function (actionType) {
-		sex_direction(actionType,0,0);
-		interp.wait(valueSexWait);
-		adv_partDirectSet(1);//ピストンの時
-		}).call(interp, actionType);
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:517, data/CommonEvents.json:common-event:518, data/CommonEvents.json:common-event:519
-	fadePicture1Pic75 = function () {
-		$gameScreen.showPicture(75,'ScreenBlackOut',1,640,384,100,100,150,0);
-		picture_fade1(75,"fadeIn",valueWipeImg,60,5);
-	};
-
-	// Replaces (5x): data/CommonEvents.json:common-event:526, data/CommonEvents.json:common-event:530, data/Map083.json:map-event:6:page:1
-	fadePicture1ScreenBlackOut_3 = function (pictureId, opacity, fadePicId) {
-		var pictureName2 = 'ScreenBlackOut';
-		$gameScreen.showPicture(pictureId,pictureName2,1,640,384,100,100,opacity,0);
-		picture_fade1(fadePicId,"fadeIn",valueWipeImg,60,5);
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:526, data/CommonEvents.json:common-event:576
-	blessStandingPicture6 = function (picIndex, picIndex2, opacity) {
-		var pictureId2 = valuePic1+picIndex;
-		var pictureName2 = valueScenePic+picIndex2;
-		$gameScreen.showPicture(pictureId2,pictureName2,1,640-128,384,100,100,opacity,0);
-		tachie_bless(pictureId2,2);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:530
-	setupChildInterpreter13 = function (interp, talkPictureId) {
-		return (function (talkPictureId) {
-		interp.sVal(172,16);
-		valueTalkSet = [talkPictureId,1,60];//1で付与2で直接表示\CE[60]のみ0で解除,ｱｸﾀｰid,ﾌﾚｰﾑ60,40,20
-		interp.setupChild($dataCommonEvents[60].list, 0)
-		}).call(interp, talkPictureId);
-	};
-
-	// Replaces (4x): data/CommonEvents.json:common-event:530, data/CommonEvents.json:common-event:531, data/CommonEvents.json:common-event:536
-	blessStandingPicture7 = function (picIndex, picIndex2) {
-		valuePic1 = 51;
-		var pictureId2 = valuePic1+picIndex;
-		var pictureName2 = valueScenePic+picIndex2;
-		$gameScreen.showPicture(pictureId2,pictureName2,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId2,1,640-128,384,100,100,255,0,60);
-		tachie_bless(pictureId2,2);
-		//pic_move1(value1-1,0,0,100,100,0,90);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:530
-	showScenePictureAndFadeIn7 = function () {
-		var pictureId2 = 50;
-		var pictureName2 = valueScenePic+'02';
-		$gameScreen.showPicture(pictureId2,pictureName2,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId2,1,640-128,384,100,100,255,0,60);
-		//pic_move1(value1-1,0,0,100,100,0,90);
-	};
-
-	// Replaces (6x): data/CommonEvents.json:common-event:530, data/CommonEvents.json:common-event:531, data/CommonEvents.json:common-event:573
-	playHcgPiston3 = function (picIndex, picIndex2, breathTypeId, breathPresetId, breathLayerId) {
-		var pictureId2 = valuePic1+picIndex;
-		var pictureName2 = valueScenePic+picIndex2;
-		$gameScreen.showPicture(pictureId2,pictureName2,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId2,1,640-128,384,100,100,255,0,60);
-		hcg_piston(pictureId2,breathTypeId,breathPresetId,breathLayerId);
-		//pic_move1(value1-1,0,0,100,100,0,90);
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:530, data/Map081.json:map-event:3:page:1, data/Map083.json:map-event:6:page:1
-	setupChildInterpreter14 = function (interp) {
-		return (function () {
-		interp.sVal(14,22);//パーティ再結成コモン
-		interp.setupChild($dataCommonEvents[64].list, 0);
-		}).call(interp);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:531, data/CommonEvents.json:common-event:546
-	blessStandingPictureAndMovePicture1_3 = function (picIndex, picIndex2) {
-		valuePic1 = 51;
-		var pictureId2 = valuePic1+picIndex;
-		var pictureName2 = valueScenePic+picIndex2;
-		$gameScreen.showPicture(pictureId2,pictureName2,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId2,1,640-128,384,100,100,255,0,60);
-		tachie_bless(pictureId2,2);
-		pic_move1(pictureId2-1,0,0,100,100,0,90);
-	};
-
-	// Replaces (4x): data/CommonEvents.json:common-event:536, data/CommonEvents.json:common-event:537
-	setupRespawnEnemyNNpc = function (charaSlotId, posX, posY, direction, charaSlotId2, posX2, posY2, direction2, charaSlotId3, posX3, posY3, direction3) {
-		var imageName2 = getRandomIndex(6) + 1;
-		var imageIndex2 = getRandomIndex(7); 
-		event_respawnSetN(charaSlotId,posX,posY,0,'npc'+imageName2,imageIndex2,direction);
-		var imageName2 = getRandomIndex(6) + 1;
-		var imageIndex2 = getRandomIndex(7); 
-		event_respawnSetN(charaSlotId2,posX2,posY2,0,'npc'+imageName2,imageIndex2,direction2);
-		var imageName2 = getRandomIndex(6) + 1;
-		var imageIndex2 = getRandomIndex(7); 
-		event_respawnSetN(charaSlotId3,posX3,posY3,0,'npc'+imageName2,imageIndex2,direction3);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:536, data/CommonEvents.json:common-event:537
-	readVariable292_3 = function () {
-		for (var slotIndex2 = 12; slotIndex2 <= 17; slotIndex2++) {
-		  var variable292Value = $gameVariables.value(292)[slotIndex2]; //this._eventId
-		  if(!!$gameMap.event(variable292Value)) {
-		    var event2 = $gameMap.event(variable292Value);
-		    event2.setTransparent(true);
-		}};
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:536, data/CommonEvents.json:common-event:537
-	respawnGoodsEvent = function (numericValue, numericValue2) {
-		var goodsEventId = 18;
-		goodsEvent_respawn(goodsEventId,'food_2',4,2,0,numericValue,numericValue2);
-		var variable292Value = $gameMap.event($gameVariables.value(292)[goodsEventId]);
-		variable292Value._priorityType = 2;
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:537
-	showAndMovePicture1AndBlessStandingPicture = function (picIndex, pictureName) {
-		var pictureId2 = valuePic1+picIndex;
-		pic_showMove1(pictureId2,valueScenePic+pictureName,640-128,384,100,60,2,200);
-		tachie_bless(pictureId2,2);
-		pic_move1(pictureId2-1,0,0,100,100,0,90);
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:541, data/CommonEvents.json:common-event:543
-	blessStandingPicture8 = function (picIndex, picIndex2) {
-		var pictureId2 = valuePic1+picIndex;
-		var pictureName2 = valueScenePic+picIndex2;
-		$gameScreen.showPicture(pictureId2,pictureName2,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId2,1,640-128,384,100,100,255,0,60);
-		tachie_bless(pictureId2,2);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:541, data/CommonEvents.json:common-event:543
-	playHcgPistonSwitch429_2 = function (picIndex, picIndex2, numericValue, pictureId) {
-		pic_setArray1 = [1,valuePic1+picIndex,0,-15,0,20];
-		pic_setArray2 = [1,valuePic1+picIndex2,0,0,3,30]; //pic_setArray2 = [1,0,0,0,0,0];
-		valueParallelPicSe1 = ['ZH_sticky4',numericValue,10];
-		valueParallelPicSe2 = [0,0,0];
-		hcg_piston(valuePic1+pictureId,7,2,1);
-		$gameSwitches.setValue(429,true);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:542
-	blessStandingPictureAndMovePicture1_4 = function (picIndex, picIndex2) {
-		var pictureId2 = valuePic2+picIndex;
-		var pictureName2 = valueScenePic+picIndex2;
-		$gameScreen.showPicture(pictureId2,pictureName2,1,640+480,384-118,100,100,200,0);
-		$gameScreen.movePicture(pictureId2,1,640+480,384+50,100,100,255,0,240);
-		tachie_bless(pictureId2,2);
-		pic_move1(pictureId2-1,0,0,100,100,0,90);
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:543, data/CommonEvents.json:common-event:572, data/CommonEvents.json:common-event:573
-	startPictureAnimationFrame2 = function (picIndex) {
-		var pictureId2 = valuePic1+picIndex;
-		if($gameScreen.picture(pictureId2)){
-		  $gameScreen.picture(pictureId2).startAnimationFrame(1, true, [1,1,1,2]);
-		};
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:543, data/CommonEvents.json:common-event:546
-	setEventFaceVar530And292 = function () {
-		var variable530Value = $gameVariables.value(530);
-		var variable292Value = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		//var event = $gameMap.event(this._eventId);
-		variable292Value.setFace(11,true,true);
-		variable292Value.setStepAnime(false);
-		variable292Value.setWalkAnime(false);
-		variable292Value.setDirection(2);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:544, data/CommonEvents.json:common-event:545
-	spawnMapEventVar163And535 = function () {
-		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
-		$gameMap.spawnEvent(236,variable163Value[8], variable163Value[9], true)
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:544
-	blessStandingPicture9 = function (picIndex, picIndex2) {
-		var pictureId2 = valuePic2+picIndex;
-		var pictureName2 = valueScenePic+picIndex2;
-		$gameScreen.showPicture(pictureId2,pictureName2,1,640+480+50,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId2,1,640+480,384,100,100,255,0,60);
-		tachie_bless(pictureId2,2);
-	};
-
-	// Replaces (4x): data/CommonEvents.json:common-event:546
-	movePicture1_5 = function (picIndex, picIndex2) {
-		valuePic1 = 51;
-		var pictureId2 = valuePic1+picIndex;
-		var pictureName2 = valueScenePic+picIndex2;
-		$gameScreen.showPicture(pictureId2,pictureName2,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId2,1,640-128,384,100,100,255,0,60);
-		//tachie_bless(value1,2);
-		pic_move1(pictureId2-1,0,0,100,100,0,90);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:547
-	showScenePictureAndFadeIn8 = function (picIndex, picIndex2) {
-		var pictureId2 = valuePic1+picIndex;
-		var pictureName2 = valueScenePic+picIndex2;
-		$gameScreen.showPicture(pictureId2,pictureName2,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId2,1,640-128,384,100,100,255,0,60);
-		//tachie_bless(value1,2);
-		//pic_move1(value1-1,0,0,100,100,0,90);
-	};
-
-	// Replaces (6x): data/CommonEvents.json:common-event:547, data/CommonEvents.json:common-event:572, data/CommonEvents.json:common-event:576
-	blessStandingPicture10 = function (picIndex, picIndex2, blessType) {
-		var pictureId2 = valuePic1+picIndex;
-		var pictureName2 = valueScenePic+picIndex2;
-		$gameScreen.showPicture(pictureId2,pictureName2,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId2,1,640-128,384,100,100,255,0,60);
-		tachie_bless(pictureId2,blessType);
-		//pic_move1(value1-1,0,0,100,100,0,90);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:552
-	bindInterpreterToEventIdVar292 = function (interp, argument1) {
-		return (function (argument1) {
-		interp._eventId = argument1;//$gameVariables.value(292)[value1];
-		}).call(interp, argument1);
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:571, data/CommonEvents.json:common-event:572, data/CommonEvents.json:common-event:573
-	setupRespawnEnemyAAndSetupRespawnEnemyNVar530And163Etc7 = function (interp) {
-		return (function () {
-		var variable530Value = $gameVariables.value(530);
-		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
-		event_respawnSetA(variable530Value,10,11,1,4);
-		interp._eventId = $gameVariables.value(292)[variable530Value];
-		var variable530Value = 11;
-		event_respawnSetN(variable530Value,variable163Value[8],variable163Value[9],0,variable163Value[6],variable163Value[7],6);
-		}).call(interp);
-	};
-
-	// Replaces (3x): data/CommonEvents.json:common-event:571, data/CommonEvents.json:common-event:573
-	blessStandingPicture11 = function (picIndex, picIndex2, y, blessType) {
-		var pictureId2 = valuePic1+picIndex;
-		var pictureName2 = valueScenePic+picIndex2;
-		$gameScreen.showPicture(pictureId2,pictureName2,1,640-128,384-y,100,100,0,0);
-		$gameScreen.movePicture(pictureId2,1,640-128,384,100,100,255,0,60);
-		tachie_bless(pictureId2,blessType);
-		//pic_move1(value1-1,0,0,100,100,0,90);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:572
-	playParallelPictureSeSwitch429 = function (numericValue, numericValue2) {
-		var pictureId2 = valuePic1+7;
-		pic_setArray1 = [1,pictureId2,0,-30,5,numericValue];
-		pic_setArray2 = [1,pictureId2,0,30,3,numericValue2]; //pic_setArray2 = [1,0,0,0,0,0];
-		valueParallelPicSe1 = [0,0,0];
-		valueParallelPicSe2 = [0,0,0];
-		$gameSwitches.setValue(429,true);
-	};
-
-	// Replaces (2x): data/CommonEvents.json:common-event:572, data/CommonEvents.json:common-event:573
-	playHcgPiston4 = function (picIndex, picIndex2, breathTypeId, breathPresetId) {
-		var pictureId2 = valuePic1+picIndex;
-		var pictureName2 = valueScenePic+picIndex2;
-		$gameScreen.showPicture(pictureId2,pictureName2,1,640-128,384+50,100,100,0,0);
-		$gameScreen.movePicture(pictureId2,1,640-128,384,100,100,255,0,60);
-		hcg_piston(pictureId2,breathTypeId,breathPresetId,1);
-		//pic_move1(value1-1,0,0,100,100,0,90);
-	};
-
-	// Replaces (1x): data/Map003.json:map-event:3:page:1
-	configurePictureEasing3 = function () {
-		var easingValue = 'easeOutQuad';
-		//var value1 = 'easeInQuad';//無難すぎ？
-		picture_easingConfiguration(easingValue);
-	};
-
-	// Replaces (1x): data/Map003.json:map-event:3:page:1
-	setVariable537 = function () {
-		$gameVariables.setValue(537,[]);//エネミー
-		$gameVariables.setValue(538,[]);//Hエネミー
-	};
-
-	// Replaces (1x): data/Map003.json:map-event:3:page:2
-	removeStateFromListActorsActor20 = function () {
-		var actor3 = $gameActors.actor(20);
-		for (var loopIndex = 1; loopIndex <= $dataStates.length-1; loopIndex++) {
-		  if(actor3.isStateAffected(loopIndex)){
-		    actor3.removeState(loopIndex);
-		  };
-		};
-	};
-
-	// Replaces (4x): data/Map003.json:map-event:3:page:2, data/Map093.json:map-event:2:page:1, data/Map093.json:map-event:2:page:2
-	fadeInScreen = function (duration) {
-		$gameScreen.startFadeIn(duration);
-	};
-
-	// Replaces (2x): data/Map003.json:map-event:3:page:2, data/Map003.json:map-event:16:page:1
-	refreshMinimapCache = function () {
-		$gameMap.refreshMinimapCache();
-	};
-
-	// Replaces (4x): data/Map003.json:map-event:6:page:1, data/Map003.json:map-event:8:page:1, data/Map003.json:map-event:107:page:1, data/Map003.json:map-event:182:page:1
-	fadeOutScreen = function (interp) {
-		return (function () {
-		$gameScreen.startFadeOut(30);
-		interp.wait(30);
-		}).call(interp);
-	};
-
-	// Replaces (3x): data/Map003.json:map-event:7:page:1, data/Map046.json:map-event:9:page:1, data/Map197.json:map-event:6:page:1
-	setMapSelfSwitch5 = function (interp, itemId, itemId2) {
-		return (function (itemId, itemId2) {
-		if($gameParty.hasItem($dataItems[itemId],true) || $gameParty.hasItem($dataItems[itemId2],true)){
-		  $gameSelfSwitches.setValue([$gameMap.mapId(), interp._eventId, 'B'], false);
-		} else {
-		  $gameSelfSwitches.setValue([$gameMap.mapId(), interp._eventId, 'B'], true);
-		};
-		}).call(interp, itemId, itemId2);
-	};
-
-	// Replaces (5x): data/Map003.json:map-event:16:page:1, data/Map003.json:map-event:16:page:2, data/Map003.json:map-event:16:page:3, data/Map003.json:map-event:17:page:1, data/Map003.json:map-event:17:page:3
-	storeValueEnemyEventIdFromEvent = function (interp) {
-		return (function () {
-		valueEnemyEventId = interp.eventId();
-		}).call(interp);
-	};
-
-	// Replaces (2x): data/Map003.json:map-event:19:page:1
-	setVariable22 = function (numericValue) {
-		$gameVariables.setValue(22,0);
-		var newValue2 = numericValue;
-		$gameVariables.setValue(23,newValue2);
-	};
-
-	// Replaces (2x): data/Map003.json:map-event:20:page:1, data/Map003.json:map-event:133:page:2
-	storeValueCountSet9FromInterpreter = function (interp) {
-		return (function () {
-		valueCountSet9 = interp._eventId;
-		interp._eventId = $gameVariables.value(292)[0];
-		}).call(interp);
-	};
-
-	// Replaces (2x): data/Map003.json:map-event:20:page:1, data/Map003.json:map-event:133:page:2
-	clearScreenParticle = function (interp, argument1) {
-		return (function (argument1) {
-		var eventId2 = argument1+'-'+interp._eventId;
-		$gameScreen._particle.particleClear(eventId2);
-		}).call(interp, argument1);
-	};
-
-	// Replaces (1x): data/Map003.json:map-event:44:page:1
-	addPopupOnomatopoeia1 = function (interp) {
-		var messageText2 = `text:ﾋﾟｲｲｲ──…`;
-		return (function () {
-		interp.addPopup(["add",`${messageText2}`]);
-		}).call(interp);
-	};
-
-	// Replaces (2x): data/Map003.json:map-event:62:page:1, data/Map003.json:map-event:63:page:1
-	addPopupOnomatopoeia2 = function (interp) {
-		var messageText2 = `text:ホゥ…`;
-		return (function () {
-		interp.addPopup(["add",`${messageText2}`]);
-		}).call(interp);
-	};
-
-	// Replaces (1x): data/Map003.json:map-event:64:page:1
-	addPopupOnomatopoeia3 = function (interp) {
-		var messageText2 = `text:ペンっ`;
-		return (function () {
-		interp.addPopup(["add",`${messageText2}`]);
-		}).call(interp);
-	};
-
-	// Replaces (4x): data/Map003.json:map-event:57:page:1, data/Map003.json:map-event:58:page:1, data/Map003.json:map-event:59:page:1, data/Map126.json:map-event:4:page:1
-	selectAnimalAction = function (interp) {
-		return (function () {
-		valueanimalEvent2Id = 0;
-		animal_ActionSelect(interp._eventId);
-		if(valueanimalEvent2Id != 0){
-		  interp.addPopup(["add",`text:${valueanimalEvent2Id}`]);
-		} else {
-		  interp.wait(30);
-		};
-		}).call(interp);
-	};
-
-	// Replaces (2x): data/Map003.json:map-event:81:page:1, data/Map003.json:map-event:82:page:1
-	setSelfVariable24 = function (interp) {
-		return (function () {
-		if($gameVariables.value(23) == 6){interp.sVal(24,128)};
-		if($gameVariables.value(23) == 7){interp.sVal(24,127)};
-		if($gameVariables.value(23) == 8){interp.sVal(24,126)};
-		if($gameVariables.value(23) == 9){interp.sVal(24,125)};
-		if($gameVariables.value(23) >= 10){interp.sVal(24,124)};
-		}).call(interp);
-	};
-
-	// Replaces (2x): data/Map003.json:map-event:133:page:2
-	enableSwitchVar327 = function (switchId) {
-		var constantValue = 0;
-		for (var slotIndex2 = 1; slotIndex2 <= 100; slotIndex2++) {
-		  if($gameVariables.value(327)[slotIndex2] >= 1){
-		    constantValue += 1;
-		}};
-		if(constantValue >= 2){
-		  $gameSwitches.setValue(switchId,true);
-		};
-	};
-
-	// Replaces (2x): data/Map003.json:map-event:133:page:2
-	readVariable327 = function (numericValue, switchId, switchId2, numericValue2, switchId3, switchId4) {
-		if($gameVariables.value(327)[numericValue] >= 1){
-		  $gameSwitches.setValue(switchId,true);
-		} else {
-		  $gameSwitches.setValue(switchId2,false);
-		};
-		if($gameVariables.value(327)[numericValue2] >= 1){
-		  $gameSwitches.setValue(switchId3,true);
-		} else {
-		  $gameSwitches.setValue(switchId4,false);
-		};
-	};
-
-	// Replaces (3x): data/Map003.json:map-event:139:page:1, data/Map003.json:map-event:140:page:1, data/Map003.json:map-event:142:page:1
-	cycleSelfSwitchVariable = function (interp) {
-		return (function () {
-		$gameSelfSwitches.setVariableValue([$gameMap.mapId(), 
-		interp._eventId, 10], 10);
-		}).call(interp);
-	};
-
-	// Replaces (4x): data/Map003.json:map-event:139:page:1, data/Map003.json:map-event:140:page:1
-	readVariable69 = function () {
-		var textPrefix = `Coin: `;
-		var textSuffix = `枚`;
-		var variable69Value = `${textPrefix}${$gameVariables.value(69).toLocaleString()}${textSuffix}`;
-		var constantValue = 28;
-		$gameScreen.setDTextPicture(variable69Value, constantValue);
-		$gameScreen.dWindowFrame = 'ON';
-		var variable69Value = 99;
-		$gameScreen.showPicture(variable69Value,"",1,640+50,50,100,100,0,0);
-		$gameScreen.movePicture(variable69Value,1,640,50,100,100,255,0,60);
-	};
-
-	// Replaces (3x): data/Map003.json:map-event:139:page:1, data/Map003.json:map-event:140:page:1, data/Map003.json:map-event:142:page:1
-	cycleSelfSwitchVariable2 = function (interp) {
-		return (function () {
-		var selfSwitchValue = $gameSelfSwitches.getVariableValue([$gameMap.mapId(), interp._eventId, 10]);
-		var newValue2 = 10;
-		if(selfSwitchValue == 10){var newValue2 = 100};
-		if(selfSwitchValue == 100){var newValue2 = 1000};
-		if(selfSwitchValue == 1000){var newValue2 = 10000};
-		if(selfSwitchValue == 10000){var newValue2 = 10};
-		$gameSelfSwitches.setVariableValue([$gameMap.mapId(), 
-		interp._eventId, 10], newValue2);
-		}).call(interp);
-	};
-
-	// Replaces (2x): data/Map003.json:map-event:139:page:1, data/Map003.json:map-event:140:page:1
-	showDiceBackground = function () {
-		var pictureId2 = 98;
-		var pictureName2 = '/img/dice/background';
-		$gameScreen.showPicture(pictureId2,pictureName2,1,640+50,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId2,1,640,384,100,100,255,0,30);
-	};
-
-	// Replaces (2x): data/Map003.json:map-event:139:page:1, data/Map003.json:map-event:140:page:1
-	showInfoPopupVar801And69 = function (interp) {
-		var messageText2 = `おめでとう。`;
-		var textPart2 = `コイン+`;
-		var textPart3 = `枚`;
-		return (function () {
-		$gameVariables.setValue(801,`${messageText2}`);
-		var text3 = $gameSelfSwitches.getVariableValue([$gameMap.mapId(), interp._eventId, 10]);
-		var newValue2 = text3 * 2;
-		$gameVariables.setValue(69,$gameVariables.value(69) + newValue2);
-		var text3 = `${textPart2}${newValue2}${textPart3}`;
-		CommonPopupManager.showInfo({},text3,null);
-		}).call(interp);
-	};
-
-	// Replaces (3x): data/Map003.json:map-event:141:page:1, data/Map003.json:map-event:247:page:1, data/Map007.json:map-event:53:page:1
-	setValueBetCoinlist = function (interp) {
-		return (function () {
-		$gameSelfSwitches.setVariableValue([$gameMap.mapId(), 
-		interp._eventId, 10], 10);
-		valueBetCoinlist = [10];//ポーカー用ベットレート
-		}).call(interp);
-	};
-
-	// Replaces (3x): data/Map003.json:map-event:141:page:1, data/Map003.json:map-event:247:page:1, data/Map007.json:map-event:53:page:1
-	setValueBetCoinlist2 = function (interp) {
-		return (function () {
-		var selfSwitchValue = $gameSelfSwitches.getVariableValue([$gameMap.mapId(), interp._eventId, 10]);
-		var newValue2 = 10;
-		if(selfSwitchValue == 10){var newValue2 = 100};
-		if(selfSwitchValue == 100){var newValue2 = 1000};
-		if(selfSwitchValue == 1000){var newValue2 = 10000};
-		if(selfSwitchValue == 10000){var newValue2 = 10};
-		$gameSelfSwitches.setVariableValue([$gameMap.mapId(), 
-		interp._eventId, 10], newValue2);
-		valueBetCoinlist = [newValue2];
-		}).call(interp);
-	};
-
-	// Replaces (2x): data/Map003.json:map-event:142:page:1
-	setValueMenuBackOpacity = function (numericValue) {
-		valueMenuBackOpacity = numericValue;
-	};
-
-	// Replaces (2x): data/Map003.json:map-event:151:page:1, data/Map003.json:map-event:242:page:1
-	setSwitch380 = function (interp) {
-		return (function () {
-		$gameSwitches.setValue(380,false);
-		if(!$gameSelfSwitches.value([$gameMap.mapId(), interp._eventId, 'A'])){
-		  $gameSwitches.setValue(380,true);
-		};
-		if(!$gameSelfSwitches.value([$gameMap.mapId(), interp._eventId, 'B'])){
-		  $gameSwitches.setValue(380,true);
-		};
-		}).call(interp);
-	};
-
-	// Replaces (10x): data/Map003.json:map-event:156:page:1, data/Map003.json:map-event:157:page:1, data/Map003.json:map-event:174:page:1, data/Map035.json:map-event:20:page:1, data/Map096.json:map-event:6:page:1, data/Map096.json:map-event:6:page:2, …
-	storeValueBossIdFromInterpreter = function (interp) {
-		return (function () {
-		valueBossId = interp._eventId;
-		}).call(interp);
-	};
-
-	// Replaces (2x): data/Map003.json:map-event:157:page:1, data/Map165.json:map-event:12:page:1
-	setupPopEnemy = function () {
-		value = $dataItems[$gameVariables.value(240)];
-		popEnemy_setUp(value);
-	};
-
-	// Replaces (2x): data/Map003.json:map-event:166:page:2, data/Map003.json:map-event:243:page:2
-	setupChildInterpreter15 = function (interp) {
-		var messageText2 = `デイリークエスト`;
-		return (function () {
-		var constantValue = 800;
-		if($dataItems[valueCountSet1].meta['SGカテゴリ']){
-		  if($dataItems[valueCountSet1].meta['SGカテゴリ'] == `${messageText2}`){
-		    var constantValue = 900;
-		  } else {
-		    var constantValue = 800;
-		  };
-		};
-		var templateText = `\x1bIIN[${valueCountSet1}]\n${valueQuestArray4[valueCountSet1-constantValue]}`;
-		interp.sVal(172,10);
-		valueTalkSet = [24,templateText,0];
-		interp.setupChild($dataCommonEvents[60].list, 0);
-		}).call(interp);
-	};
-
-	// Replaces (2x): data/Map003.json:map-event:166:page:2, data/Map003.json:map-event:243:page:2
-	showTickerQuestAccepted = function () {
-		var textPrefix = `クエスト`;
-		var colorCode4 = `\\C[3]`;
-		var textPart2 = `IIN[`;
-		var colorResetCode = `\\C[0]`;
-		var textSuffix = `を受注しました。`;
-		var tickerText = `${textPrefix}${colorCode4}${textPart2}${valueCountSet1}]${colorResetCode}${textSuffix}`;
-		TickerManager.show(tickerText);
-		$gameParty.gainItem($dataItems[valueCountSet1], 1);
-	};
-
-	// Replaces (2x): data/Map003.json:map-event:166:page:3, data/Map003.json:map-event:243:page:3
-	setupChildInterpreterForQuestSet = function (interp) {
-		var messageText2 = `デイリークエスト`;
-		return (function () {
-		var constantValue = 800;valueCountSet1 = Number($gameMap.event(interp._eventId).event().meta['QuestSet']);
-		if($dataItems[valueCountSet1].meta['SGカテゴリ']){
-		  if($dataItems[valueCountSet1].meta['SGカテゴリ'] == `${messageText2}`){
-		    var constantValue = 900;
-		  } else {
-		    var constantValue = 800;
-		  };
-		};
-		var templateText = `\x1bIIN[${valueCountSet1}]\n${valueQuestArray4[valueCountSet1-constantValue]}`;
-		interp.sVal(172,10);
-		valueTalkSet = [24,templateText,1];
-		interp.setupChild($dataCommonEvents[60].list, 0);
-		}).call(interp);
-	};
-
-	// Replaces (2x): data/Map003.json:map-event:167:page:1, data/Map007.json:map-event:20:page:1
-	startParallelEventFromEvSceneSetMeta = function (interp) {
-		return (function () {
-		if ($gameMap.event(interp._eventId).event().meta['EvSceneSet']){
-		  var event2 = $gameMap.event(interp._eventId).event().meta['EvSceneSet'].split(',');
-		  var targetId2 = Number(event2[0]);
-		  event_pararelStarting(1,targetId2,interp._eventId);
-		};
-		}).call(interp);
-	};
-
-	// Replaces (3x): data/Map003.json:map-event:168:page:2, data/Map007.json:map-event:69:page:2, data/Map064.json:map-event:1:page:3
-	setupChildInterpreter16 = function (interp) {
-		var messageText2 = `デイリークエスト`;
-		return (function () {
-		var constantValue = 800;
-		if($dataItems[valueCountSet1].meta['SGカテゴリ']){
-		  if($dataItems[valueCountSet1].meta['SGカテゴリ'] == `${messageText2}`){
-		    var constantValue = 900;
-		  } else {
-		    var constantValue = 800;
-		  };
-		};
-		var templateText = `\x1bIIN[${valueCountSet1}]\n${valueQuestArray4[valueCountSet1-constantValue]}`;
-		interp.sVal(172,10);
-		valueTalkSet = [24,templateText];
-		interp.setupChild($dataCommonEvents[60].list, 0);
-		}).call(interp);
-	};
-
-	// Replaces (5x): data/Map003.json:map-event:179:page:1, data/Map003.json:map-event:194:page:1, data/Map092.json:map-event:3:page:1, data/Map139.json:map-event:4:page:1, data/Map144.json:map-event:12:page:1
-	presetEventCharacterAndRootEventCharacter = function (interp) {
-		return (function () {
-		valueBossId = interp._eventId;
-		event_charaPreset(interp._eventId);
-		event_charaRoot(interp._eventId);
-		}).call(interp);
-	};
-
-	// Replaces (7x): data/Map003.json:map-event:180:page:1, data/Map193.json:map-event:6:page:1, data/Map193.json:map-event:7:page:1, data/Map193.json:map-event:8:page:1, data/Map193.json:map-event:9:page:1, data/Map193.json:map-event:10:page:1, …
-	logDebugValue4 = function () {
-		var tempValue = $gameMap.tileId(6, 14, 1)
-		console.log(`${tempValue}`);
-	};
-
-	// Replaces (33x): data/Map003.json:map-event:181:page:1, data/Map003.json:map-event:198:page:1, data/Map003.json:map-event:209:page:1, data/Map003.json:map-event:218:page:1, data/Map003.json:map-event:234:page:1, data/Map003.json:map-event:235:page:1, …
-	gatherNearbyEvents = function (interp) {
-		return (function () {
-		//CharaNameIdが同一のイベントを一日消去
-		event_togetherSelf(interp._eventId,'B');
-		}).call(interp);
-	};
-
-	// Replaces (2x): data/Map003.json:map-event:196:page:1, data/Map018.json:map-event:31:page:1
-	setParallelEvent = function (interp) {
-		return (function () {
-		event_pararelSet(interp._eventId,0,1,8);
-		//ｲﾍﾞﾝﾄに対するx,yのズラす歩数と主人公の向き
-		}).call(interp);
-	};
-
-	// Replaces (22x): data/Map003.json:map-event:198:page:1, data/Map003.json:map-event:209:page:1, data/Map007.json:map-event:71:page:1, data/Map012.json:map-event:6:page:1, data/Map012.json:map-event:7:page:1, data/Map018.json:map-event:15:page:1, …
-	setParallelEventFromEvSceneSet = function (interp, playerDirection) {
-		return (function (playerDirection) {
-		//ｲﾝｼﾞｹｰﾀｰ等消去,帰還座標記憶,EvSceneSetでｲﾍﾞ起動ｽｲｯﾁ指定
-		//ｲﾍﾞﾝﾄに対するx,yのズラす歩数と主人公の向き
-		event_pararelSet(interp._eventId,0,1,playerDirection);
-		}).call(interp, playerDirection);
-	};
-
-	// Replaces (2x): data/Map003.json:map-event:233:page:1, data/Map022.json:map-event:9:page:1
-	spawnScreenParticleStatue_orb_c2 = function (interp) {
-		return (function () {
-		var particleName2 = 'statue_orb_c';
-		$gameScreen._particle.particleSet(interp._eventId,particleName2+'-'+interp._eventId,'this',particleName2,'above');
-		var particleName2 = 'statue_orb_c'+'-'+interp._eventId;
-		$gameScreen._particle.particleUpdate([particleName2,'color','#ff00f7','#ffffff']);
-		$gameScreen._particle.particleUpdate([particleName2,'pos',0,-35-48]);
-		}).call(interp);
-	};
-
-	// Replaces (2x): data/Map003.json:map-event:235:page:1, data/Map018.json:map-event:39:page:1
-	storeThisEventIdOrClear = function (interp) {
-		return (function () {
-		if(interp._eventId >= 1){
-		  valueThisEventId = interp._eventId;
-		} else {
-		  valueThisEventId = 0;
-		};
-		}).call(interp);
-	};
-
-	// Replaces (2x): data/Map003.json:map-event:235:page:1, data/Map018.json:map-event:39:page:1
-	setupRespawnEnemyN2 = function () {
-		var posX = valueNpcGuraTemporarilySave;
-		var charaSlotId = 11;
-		event_respawnSetN(charaSlotId,posX[8]-1,posX[9],0,posX[6],posX[7],6);
-	};
-
-	// Replaces (2x): data/Map003.json:map-event:235:page:1, data/Map018.json:map-event:39:page:1
-	bindInterpreterToValueThisEventId = function (interp) {
-		return (function () {
-		if(valueThisEventId >= 1){interp._eventId = valueThisEventId};
-		}).call(interp);
-	};
-
-	// Replaces (2x): data/Map003.json:map-event:235:page:1, data/Map018.json:map-event:39:page:1
-	readVariable292_4 = function () {
-		  for (var slotIndex2 = 0; slotIndex2 <= $gameVariables.value(292).length-1; slotIndex2++) {
-		    if($gameVariables.value(292)[slotIndex2] >= 1){
-		      if(!!$gameMap.event($gameVariables.value(292)[slotIndex2])) {
-		        if(!$gameParty.inBattle()){$gameMap.eraseEvent($gameVariables.value(292)[slotIndex2])};
-		      };
-		    };
-		  };
-	};
-
-	// Replaces (1x): data/Map003.json:map-event:237:page:1
-	setActor20NameVar400And23Etc = function () {
-		var messageText2 = `宿受付`;
-		var textPart2 = `「いらっしゃい。\nウチは一泊`;
-		var variableCode = `\\V[21]`;
-		var controlCode = `\\G`;
-		var textPart3 = `よ。\n泊まっていくのかしら？」\n`;
-		$gameActors.actor(20).setName(`${messageText2}`);
-		$gameVariables.value(400)[59] = `${$dataWeapons[421].name}`;
-		valueCountSet1 = 1231;
-		valueCountSet2 = 1232;
-		$gameVariables.setValue(23,
-		`${textPart2}${variableCode}${controlCode}${textPart3}`);
-		$gameVariables.setValue(22,'$FACE[People4, 5]');
-		//$gameScreen.setPreparePictureName($FACE[People4,5]);/解らん
-		//
-	};
-
-	// Replaces (1x): data/Map046.json:map-event:4:page:1
-	setActor20NameVar400And23Etc2 = function () {
-		var messageText2 = `宿女将`;
-		var textPart2 = `「いらっしゃい。\nウチは一泊`;
-		var variableCode = `\\V[21]`;
-		var controlCode = `\\G`;
-		var textPart3 = `よ。\n泊まっていくのかしら？」\n`;
-		$gameActors.actor(20).setName(`${messageText2}`);
-		$gameVariables.value(400)[59] = `${$dataWeapons[421].name}`;
-		valueCountSet1 = 1231;
-		valueCountSet2 = 1232;
-		$gameVariables.setValue(23,
-		`${textPart2}${variableCode}${controlCode}${textPart3}`);
-		$gameVariables.setValue(22,'$FACE[People4, 5]');
-		//$gameScreen.setPreparePictureName($FACE[People4,5]);/解らん
-		//
+	// Replaces (7x): data/CommonEvents.json:common-event:301, :304, :305, ...
+	assignSelfVariableFromSystemSwitch = function (interp, variableId, switchId) {
+		setSelfVar(interp, variableId, $dataSystem.switches[switchId]);
 	};
 
 	// Replaces (1x): data/Map005.json:map-event:2:page:1
@@ -9028,154 +7161,260 @@ ${variableCode}${textSuffix}`;
 
 	// Replaces (1x): data/Map005.json:map-event:2:page:1
 	pushLoadScene = function () {
-		SceneManager.push(Scene_Load)
+		SceneManager.push(Scene_Load);
 	};
 
-	// Replaces (3x): data/Map007.json:map-event:3:page:1
-	applyMapShockwaveFilter = function (textValue, numericValue, numericValue2, numericValue3, argument5, argument6) {
-		var textValue2 = textValue;
-		$gameMap.createFilter(textValue2,'shockwave',0,'screen');
-		$gameMap.setFilter(textValue2,[640,numericValue,-1,numericValue2,numericValue3,argument5]);
-		$gameMap.setFilterAddiTime(textValue2,argument6);
+	/* ============================================================================
+	 * Screen effects / SE
+	 * ========================================================================== */
+
+	// Replaces (2x): data/CommonEvents.json:common-event:61, data/CommonEvents.json:common-event:62
+	flashScreenVar121 = function () {
+		$gameScreen.startFlash([255, 119, 255, 200], varValue(121));
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:61, data/CommonEvents.json:common-event:62
+	shakeScreen = function () {
+		$gameScreen.startShake(7, 7, varValue(121));
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:481
+	flashScreen = function () {
+		$gameScreen.startFlash([255, 119, 255, 200], 60);
+		$gameScreen.startShake(7, 7, 20);
+		$gameScreen.startAnimation(640 - 256, 368, 634, false);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:61
+	playSeEffectVar122 = function () {
+		playPitchVariableSe('鼓動');
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:62
+	playSeEffectVar122_2 = function () {
+		playPitchVariableSe('Z_HeartBeat');
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:196
+	requestEventAnimation = function (animationId) {
+		$gameMap.event(valueEnemyEventId).requestAnimation(animationId);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:124
+	requestEventAnimationVar223 = function (interp, animationId) {
+		interp.character(varValue(223)).requestAnimation(animationId);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:105, data/CommonEvents.json:common-event:122, data/CommonEvents.json:common-event:205
+	setGlossaryText1AndSetGlossaryText2 = function () {
+		forEachDatabaseMeta($dataItems, 'SG種別', (itemId, glossaryCategory) => {
+			if (Number(glossaryCategory) == 2) {
+				scene_Glossarytext1(itemId, 218);
+				scene_Glossarytext2(itemId, 213);
+				scene_Glossarytext3(itemId, 219);
+			}
+		});
+	};
+
+	/* ============================================================================
+	 * Spawned-event movement
+	 * ========================================================================== */
+
+	// Replaces (2x): data/CommonEvents.json:common-event:322, data/CommonEvents.json:common-event:335
+	moveNpcCharacterByIdVar292 = function (moveRouteCode) {
+		moveSpawnedEvents(moveRouteCode, 0, [3, 4, 5]);
+	};
+
+	// Replaces (5x): data/CommonEvents.json:common-event:331, :337, :339, :530
+	moveNpcCharacterByIdVar292_2 = function (slotIndex, slotIndex2, moveRouteCode) {
+		moveSpawnedEvents(moveRouteCode, 0, [slotIndex, slotIndex2]);
+	};
+
+	// Replaces (6x): data/CommonEvents.json:common-event:338, :346, :361, :471, :530
+	moveNpcCharacterByIdVar292_3 = function (slotIndex, moveRouteCode, moveRouteParameters) {
+		moveSpawnedEvents(moveRouteCode, moveRouteParameters, [slotIndex]);
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:368, :495, :532, :548
+	moveNpcCharacterByIdVar292_4 = function () {
+		// 1下移動 16下向く 39透明化
+		moveSpawnedEvents(16, 0, [1, 11]);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:511, data/Map094.json:map-event:45:page:1
+	moveNpcCharacterByIdVar292_5 = function () {
+		const slotIndexes = [1, 12];
+		moveSpawnedEvents(16, 0, slotIndexes);
+		moveSpawnedEvents(45, 'this.requestBalloon(1);', slotIndexes);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:327, :332, :349
+	movePartyCharacter = function (moveRouteCode) {
+		event_partyCharaMove(moveRouteCode, 0);   // 19上を向く
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:356
+	movePartyCharacterVar530And292 = function () {
+		const targetEventId = spawnedEventId(varValue(LEAD_ACTOR_VAR));
+		event_partyCharaMove(45, `this.moveTowardCharacter($gameMap.event(${targetEventId}));`);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:536, data/CommonEvents.json:common-event:537
+	readVariable292 = function (interp, slotIndex) {
+		interp._eventId = spawnedEventId(slotIndex);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:248, data/CommonEvents.json:common-event:249
+	readVariable196 = function (interp) {
+		interp._eventId = varValue(196);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:300, data/Map007.json:map-event:3:page:1
+	setEventCharacterAfterimageVar292 = function (interp) {
+		const AFTERIMAGE_TYPE = 20;
+		event_charaZanzou(interp._eventId, AFTERIMAGE_TYPE);
+		interp._eventId = spawnedEventId(AFTERIMAGE_TYPE);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:300, data/Map007.json:map-event:3:page:1
+	setEventCharacterAfterimageVar292_2 = function (interp) {
+		const AFTERIMAGE_TYPE = 19;
+		event_charaZanzou(interp._eventId, AFTERIMAGE_TYPE);
+		interp._eventId = spawnedEventId(AFTERIMAGE_TYPE);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:318, :326, :333
+	requestEventAnimationVar292 = function () {
+		spawnedEvent(12).requestAnimation(635);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:124
+	setMapSelfSwitchVar52And223 = function () {
+		selfSwitchOn(varValue(52), varValue(223), 'D');
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:471
+	speakCharacterOneLinerVar292 = function () {
+		speakOneLiner(null, 100, 'オラァッ！！', { eventId: spawnedEventId(11), fontWeight: 120 });
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:471
+	speakCharacterOneLinerVar292_2 = function () {
+		speakOneLiner(null, 100, 'ガハッッ！？', { eventId: spawnedEventId(5), fontWeight: 120 });
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:471
+	speakCharacterOneLinerVar292_3 = function () {
+		speakOneLiner(null, 100, 'フンッ！', { eventId: spawnedEventId(11) });
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:356
+	speakCharacterOneLinerVar530And292 = function (interp, eventSlotIndex, pictureId) {
+		const spawnedId = spawnedEventId(eventSlotIndex);
+		interp._eventId = spawnedId;
+		speakOneLiner(interp, pictureId, 'ガサゴソ──', {
+			yOffsets: [-10], eventId: spawnedId, fontWeight: 180,
+		});
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:234
+	speakCharacterOneLiner = function (interp) {
+		speakOneLiner(interp, 100, '親愛なる隣人の旅路に祝福を──', { fontSize: 28, fontWeight: 240 });
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:338
+	speakCharacterOneLiner2 = function (interp) {
+		speakOneLiner(interp, 100, 'ゴクゴクっ──', { fontWeight: 240 });
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:541
+	speakCharacterOneLiner3 = function (interp) {
+		speakOneLiner(interp, 100, 'ガサゴソ…');
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:301
+	speakCharacterOneLinerSourceHanSerifHeavy = function () {
+		speakOneLiner(null, 76, '「ヒャッハァッッ！」', { eventId: 3, fontWeight: 120, fontFace: 'SourceHanSerif-Heavy' });
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:301
+	speakCharacterOneLinerGenkaiMincho = function () {
+		speakOneLiner(null, 77, '「ギャアアアアアアアアアッッ────！！」', { eventId: 3, fontFace: 'genkai-mincho' });
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:301
+	speakCharacterOneLinerTamanegiv6 = function () {
+		speakOneLiner(null, 100, 'ウオオオオォォッッ！！', { eventId: 6, fontFace: 'Tamanegiv6' });
+	};
+
+	// Replaces (3x): data/Map007.json:map-event:34:page:1
+	speakCharacterOneLiner4 = function (interp) {
+		valueSerialPictureId += 1;
+		speakOneLiner(interp, valueSerialPictureId, ['「オラッ！」', '「オラァッ！」'], {
+			fontWeight: 60,
+			xOffsets: [-50, 0, 50, -100, 100],
+			yOffsets: [-50, 0, 50, -100, 100],
+			waitFrames: 20,
+		});
+	};
+
+	/* ============================================================================
+	 * NPC placement data / world settings
+	 * ========================================================================== */
+
+	// Replaces (1x): data/CommonEvents.json:common-event:205
+	setNpcProfession = function () {
+		setNPCProfession();   // NPC役職名配列
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:205
+	setNpcFamilyName = function () {
+		setNPCFamilyName();   // NPC苗字設定
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:205
+	addAllSacredBeastParams = function () {
+		seisyoujuu_addParamsAll();   // 星晶獣強化反映
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:205
+	setTraitChangeAndSetInfoY = function () {
+		trait_changeSetting(106);   // 信仰バフステート変動設定
+		trait_changeSetting(107);   // 食事バフステート変動設定
+		info_SetY(varValue(200));   // インフォY軸補正値ミニステで変更
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:101
+	forceHomeMove = function () {
+		set_homeMoveForced();   // 拠点に強制移動
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:85
+	propagateLibido = function () {
+		seiyoku_hanei();   // 性欲度情報を更新
 	};
 
 	// Replaces (2x): data/Map007.json:map-event:3:page:1
-	setupChildInterpreter17 = function (interp, newValue) {
-		return (function (newValue) {
-		interp.sVal(20,1);
-		interp.sVal(21,newValue);
-		interp.sVal(22,-400);
-		interp.setupChild($dataCommonEvents[141].list, 0);
-		}).call(interp, newValue);
-	};
-
-	// Replaces (2x): data/Map007.json:map-event:3:page:1
-	setEnemyParams = function (numericValue) {
-		var numericValue2 = numericValue;
-		$dataEnemies[21].params[0] = numericValue2;
-		$dataEnemies[22].params[0] = numericValue2;
-		$dataEnemies[41].params[0] = numericValue2;
-		$dataEnemies[42].params[0] = numericValue2;
-		$dataEnemies[61].params[0] = numericValue2;
-		$dataEnemies[62].params[0] = numericValue2;
+	setEnemyParams = function (paramValue) {
+		[21, 22, 41, 42, 61, 62].forEach(enemyId => { $dataEnemies[enemyId].params[0] = paramValue; });
 	};
 
 	// Replaces (2x): data/Map007.json:map-event:3:page:1, data/Map007.json:map-event:7:page:1
-	gainSkillMasteryLevel = function (actorId, numericValue, numericValue2) {
-		$gameActors.actor(actorId).gainSkillMasteryLevel(numericValue, +numericValue2)
-	};
-
-	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:33:page:1
-	clearScreenParticleAll = function () {
-		$gameScreen._particle.particleClear('all');
-	};
-
-	// Replaces (2x): data/Map007.json:map-event:4:page:1
-	particleEditParticle = function (textValue) {
-		$gameScreen._particle.particleEdit(0,textValue,'picture:57','def','above');
-	};
-
-	// Replaces (2x): data/Map007.json:map-event:4:page:1
-	configurePictureEasingEaseInOutQuad = function () {
-		var easingValue = 'easeInOutQuad';
-		//var value1 = 'easeInSine';
-		picture_easingConfiguration(easingValue);
-	};
-
-	// Replaces (2x): data/Map007.json:map-event:4:page:1
-	showPicture1Xev100_00back = function () {
-		var constantValue = 53;
-		var nameValue = 'Xev100_00back';
-		pic_1(0,constantValue,nameValue,0,100,255,60,1280,768,-256,0);
-	};
-
-	// Replaces (3x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:7:page:1
-	runPluginCommandVar75And76 = function (interp, argument1) {
-		return (function (argument1) {
-		var variable75Value = $gameVariables.value(75);
-		var variable76Value = $gameVariables.value(76);
-		for (var loopIndex = variable75Value; loopIndex <= variable76Value; loopIndex++) {
-		var actor3 = $gameActors.actor(loopIndex)._classId;
-		var args3 = new Array(String(loopIndex),argument1,String(actor3));
-		interp.pluginCommand("gainJp", args3);
-		//var value1 = $gameActors.actor(i)._subclassId;
-		//var args = new Array(String(i),"50",String(value1));
-		//this.pluginCommand("gainJp", args);
-		};
-		}).call(interp, argument1);
+	gainSkillMasteryLevel = function (actorId, skillId, levelGain) {
+		$gameActors.actor(actorId).gainSkillMasteryLevel(skillId, +levelGain);
 	};
 
 	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
-	setPlayerTransparent = function () {
-		$gamePlayer.setTransparent(true);
+	gainSkillMasteryLevelActor1 = function () {
+		const actor1 = $gameActors.actor(1);   // the one actor this entry point trains
+		actor1.gainSkillMasteryLevel(101, +1);
+		actor1.gainSkillMasteryUses(201, 15);
 	};
 
-	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
-	shrinkPictureRow = function (interp) {
-		return (function () {
-		var pictureId2 = 55;
-		for (var loopIndex = 0; loopIndex <= 3; loopIndex++) {$gameScreen.movePicture(pictureId2+loopIndex,1,640,384,100,0,0,0,30)};
-		interp.wait(40);
-		}).call(interp);
-	};
-
-	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
-	erasePictureRow = function () {
-		var pictureId2 = 55;
-		for (var loopIndex = 0; loopIndex <= 3; loopIndex++) {$gameScreen.erasePicture(pictureId2+loopIndex)};
-	};
-
-	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
-	appendStateDescription = function () {
-		var messageText2 = `\nあああああ`;
-		if($dataStates[110].meta['Help Description']){
-		$dataStates[110].description = `${$dataStates[110].description}${messageText2}`
-		}
-	};
-
-	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
-	setupChildInterpreter18 = function (interp) {
-		return (function () {
-		interp.setupChild($dataCommonEvents[64].list, 0);
-		interp.sVal(14,21);//パーティ一時解散コモン
-		}).call(interp);
-	};
-
-	// Replaces (3x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1, data/Map007.json:map-event:23:page:1
-	showStandingPicture1AndGetPreviousStandingPicIdVar20Switch42 = function (interp) {
-		return (function () {
-		$gameSwitches.setValue(42,true);
-		tachie_hyouji1($gameVariables.value(20));
-		var args3 = new Array(String(getPreviousTachiePicId()),'71','2','ON')
-		interp.pluginCommand("P_CALL_CE", args3);
-		}).call(interp);
-	};
-
-	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
-	moveReserveMembersToVariable = function (interp) {
-		return (function () {
-		$gameParty.members().forEach(function(actor) {
-		if(!actor.isBattleMember()){
-		$gameVariables.value(154).push(actor._actorId);
-		$gameParty.removeActor(actor._actorId)
-		}
-		}, interp);
-		}).call(interp);
-	};
-
-	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
-	showStandingPicture1 = function () {
-		$gameSwitches.setValue(42,true);
-		tachie_hyouji1($gameVariables.value(20));
-	};
-
-	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
-	showPicture91 = function () {
-		var messageText2 = `横`;
-		var textPart2 = `画面ピンク`;
-		$gameScreen.setPicturesAnimation(2, 1, `${messageText2}`, 40);
-		$gameScreen.showPicture(91,`${textPart2}`,1,640,384,100,100,200,0);
-		$gameScreen.picture(91).startAnimationFrame(1, true, 1);
+	// Replaces (2x): data/CommonEvents.json:common-event:342
+	loadGameFont = function (interp, fontSize) {
+		Graphics.loadFont('GameFont', fontSize);
+		interp.wait(10);
 	};
 
 	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
@@ -9186,227 +7425,1049 @@ ${variableCode}${textSuffix}`;
 	};
 
 	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
+	setPlayerTransparent = function () {
+		$gamePlayer.setTransparent(true);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:161
+	hideFollowers = function () {
+		if ($gameSwitches.value(209) || $gameSwitches.value(202)) $gamePlayer.hideFollowers();
+		if ($gameSwitches.value(201) || $gameSwitches.value(205)) $gamePlayer.showFollowers();
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:161
+	resetPlayerGraphic = function () {
+		if ($gamePlayer.followers().follower(0).isVisible()) $gamePlayer.resetCustomizeGraphic();
+	};
+
+	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
+	moveReserveMembersToVariable = function (interp) {
+		$gameParty.members().forEach(reserveMember => {
+			if (!reserveMember.isBattleMember()) {
+				varValue(154).push(reserveMember._actorId);
+				$gameParty.removeActor(reserveMember._actorId);
+			}
+		});
+	};
+
+	/* ============================================================================
+	 * Popups / onomatopoeia / sub-windows
+	 * ========================================================================== */
+
+	// Replaces (4x): data/CommonEvents.json:common-event:301, data/CommonEvents.json:common-event:338
+	showPopupMessage2Var292 = function (messageId) {
+		message_popup2(messageId, 0, 2, 1);
+	};
+
+	// Replaces (8x): data/CommonEvents.json:common-event:342, :382, :511, data/Map094.json:map-event:45:page:1, ...
+	showPopupMessage2Var292_2 = function (eventSlotIndex, popupType) {
+		message_popup2(spawnedEventId(eventSlotIndex), 0, popupType, 1);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:431
+	showPopupMessage2Var292_3 = function (eventSlotIndex, balloonId, popupType) {
+		spawnedEvent(eventSlotIndex).requestBalloon(balloonId);
+		message_popup2(spawnedEventId(eventSlotIndex), 0, popupType, 1);
+	};
+
+	// Replaces (1x): data/Map003.json:map-event:44:page:1
+	addPopupOnomatopoeia1 = function (interp) {
+		interp.addPopup(['add', 'text:ﾋﾟｲｲｲ──…']);
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:62:page:1, data/Map003.json:map-event:63:page:1
+	addPopupOnomatopoeia2 = function (interp) {
+		interp.addPopup(['add', 'text:ホゥ…']);
+	};
+
+	// Replaces (1x): data/Map003.json:map-event:64:page:1
+	addPopupOnomatopoeia3 = function (interp) {
+		interp.addPopup(['add', 'text:ペンっ']);
+	};
+
+	// Replaces (4x): data/Map003.json:map-event:57:page:1, :58:page:1, :59:page:1, data/Map126.json:map-event:4:page:1
+	selectAnimalAction = function (interp) {
+		valueanimalEvent2Id = 0;
+		animal_ActionSelect(interp._eventId);
+		if (valueanimalEvent2Id != 0) interp.addPopup(['add', `text:${valueanimalEvent2Id}`]);
+		else interp.wait(30);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:301, data/CommonEvents.json:common-event:471
+	showMapCenterLabel = function (interp, switchId) {
+		const placeName = $dataSystem.switches[switchId];   // name of the switch passed as switchId
+		map_centerDispray(55, centerLabel(`【${placeName}】`));
+		interp.wait(40);
+	};
+
+	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
+	showPicture91 = function () {
+		$gameScreen.setPicturesAnimation(2, 1, '横', 40);
+		showPic(91, '画面ピンク', 640, 384, 100, 100, 200, 1);
+		$gameScreen.picture(91).startAnimationFrame(1, true, 1);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:221
+	showPicture3 = function () {
+		const pictureName = $gameSwitches.value(488) ? 'PictureBottan3a' : 'PictureBottan3';
+		showPic(3, pictureName, 255, 39, 100, 100, 255, 1);
+	};
+
+	// Replaces (6x): data/CommonEvents.json:common-event:243, data/CommonEvents.json:common-event:244
+	showPicture1 = function (pictureName) {
+		const PICTURE_ID = 100;
+		const pictureFrame = [4, 5, 6, 7][getRandomIndex(4)];
+		pic_1(2, PICTURE_ID, pictureName, pictureFrame, 100, 255, 20, 1280, 768, 0, 0);
+	};
+
+	// Replaces (2x): data/Map007.json:map-event:4:page:1
+	showPicture1Xev100_00back = function () {
+		pic_1(0, 53, 'Xev100_00back', 0, 100, 255, 60, 1280, 768, -256, 0);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:221
+	showPictureFromArgs = function (pictureId, pictureName, origin, x, y) {
+		showPic(pictureId, pictureName, x, y, 100, 100, 255, origin);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:221
+	showPictureFromArgs2 = function (pictureId, pictureName, x, secondPictureId, secondPictureName, secondX) {
+		showPic(pictureId, pictureName, x, 39, 100, 100, 255, 1);
+		showPic(secondPictureId, secondPictureName, secondX, 39, 100, 100, 255, 1);
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:451, data/Map007.json:map-event:4:page:1
+	showPictureFromArgs3 = function (pictureId, pictureName, opacity) {
+		showPic(pictureId, pictureName, 640, 384, 100, 100, opacity, 1);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:103
+	logDebugValueActor20 = function () {
+		console.log($gameActors.actor(20));
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:64
+	loadSkillPersonalSwitchAndSelectSkill = function (interp) {
+		valueChangeSkill.forEach(skillId => skill_personalonoffload(skillId, 0));
+		valueVariablesChangeSkill.forEach(skillId => skill_sentaku(skillId, 0));
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:205
+	loadSkillPersonalSwitch = function (interp) {
+		valuePersonalSkill.forEach(skillId => skill_personalonoffload(skillId, 0));
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:205
+	loadSkillPersonalSwitch2 = function (interp) {
+		valuePersonalItem.forEach(itemId => skill_personalonoffload(itemId, 1));
+	};
+
+	/* ============================================================================
+	 * Debug helpers
+	 * ========================================================================== */
+
+	// Replaces (4x): data/CommonEvents.json:common-event:53
+	logVariableValue = function (variableId) {
+		console.log(varValue(variableId));
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:53, data/CommonEvents.json:common-event:199
+	logDebugValue3 = function (value) {
+		console.log(value);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:52
+	logDebugValue = function (metaKey, metaValueIndex, picturePathPrefix) {
+		let pictureSlot = 1;
+		for (let entryId = 1; entryId < $dataItems.length; entryId += pictureSlot) {   // NOTE: original stepped by pictureSlot (kept verbatim)
+			for (let metaIndex = 1; metaIndex <= 9; metaIndex++) {
+				const metaValue = $dataItems[entryId].meta[metaKey + metaIndex];
+				if (metaValue) {
+					const pictureName = picturePathPrefix + metaValue.split(',')[metaValueIndex];
+					showDebugPicture(pictureSlot, entryId, pictureName);
+					pictureSlot += 1;
+				}
+			}
+		}
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:52
+	logDebugValue2 = function (metaKey) {
+		forEachSteppedMetaEntry($dataWeapons, metaKey, (entryId, metaValue, pictureSlot) => {
+			showDebugPicture(pictureSlot, entryId, '/img/parallaxes/' + metaValue.split(',')[0]);
+			return true;
+		});
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:52
+	playItemMusicFromMetaName = function (metaKey) {
+		forEachSteppedMetaEntry($dataItems, metaKey, (entryId, metaValue) => {
+			const bgmName = metaValue.split(',')[0];
+			if (bgmName === 'NoMusic') return false;
+			playMetaBgm(entryId, bgmName);
+			return true;
+		});
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:52
+	playItemMusicFromMetaName2 = function (metaKey) {
+		forEachSteppedMetaEntry($dataWeapons, metaKey, (entryId, metaValue) => {
+			const bgmName = metaValue.split(',')[0];
+			if (bgmName === 'NoMusic') return false;
+			playMetaBgm(entryId, bgmName);
+			return true;
+		});
+	};
+
+	// Replaces (7x): data/Map003.json:map-event:180:page:1, Map193.json events
+	logDebugValue4 = function () {
+		console.log(`${$gameMap.tileId(6, 14, 1)}`);
+	};
+
+	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
 	logDebugValue5 = function () {
-		//console.log($dataItems[7].meta['Item Recipe'].split(',')[8]);
-		//console.log($dataItems[7].recipeArmor.length);
 		console.log($dataItems[7].recipeItem[1]);
-		//console.log(value1);
 	};
 
 	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
 	logDebugValue6 = function (interp) {
-		return (function () {
 		value1 = DataManager.getSynthesisIngredient($dataItems[234], 0);
-		//value1 = DataManager.getSynthesisQuantity($dataItems[234], 1);
-		//console.log($dataItems[234].synthIngredients.length);
 		console.log(valueItemsSynth1);
-		interp.sVal(21,value1.id + 1000);
-		}).call(interp);
-	};
-
-	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
-	runPluginCommand = function (interp) {
-		var messageText2 = `testピクチャ`;
-		var textPart2 = `Ｈシーン演出`;
-		var textPart3 = `味方カットイン`;
-		return (function () {
-		interp.sVal(86,3);interp.sVal(87,3);interp.sVal(245,40);interp.sVal(246,80);
-		var newValue2 = `${messageText2}`;
-		interp.sVal(251,newValue2);
-		var args3 = new Array(`${textPart2}`);
-		interp.pluginCommand(`${textPart3}`, args3);
-		}).call(interp);
-	};
-
-	// Replaces (3x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1, data/Map007.json:map-event:23:page:1
-	runPluginCommandFadeImg = function (interp, argument1) {
-		return (function (argument1) {
-		var argument12 = argument1;
-		var args3 = new Array("FadeImg",String(argument12));
-		interp.pluginCommand("GWTrans_Setting", args3);
-		var args3 = new Array("FadeInImg",String(argument12));
-		interp.pluginCommand("GWTrans_Setting", args3);
-		var args3 = new Array("on");
-		interp.pluginCommand("GWTransition", args3);
-		}).call(interp, argument1);
-	};
-
-	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
-	setSelfVariable21_3 = function (interp) {
-		return (function () {
-		interp.sVal(21,[0,[],0,0,0,0,0,0,0]);
-		$gameVariables.value(21)[1].push(5);
-		$gameVariables.value(21)[1].push(556);
-		}).call(interp);
-	};
-
-	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
-	runCommonScript1 = function (interp) {
-		return (function () {
-		common_script1(26,interp._eventId,6,5,131,4,0,15,2,90);
-		interp.setupChild($dataCommonEvents[64].list, 0);
-		//id,ｲﾍﾞid,速度,頻度,ｱﾆid,x,y,高さ,回転数,角度
-		}).call(interp);
+		setSelfVar(interp, 21, value1.id + 1000);
 	};
 
 	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
 	logDebugValueVar20 = function () {
-		console.log(eval("valueDanjonTreasure" + $gameVariables.value(20)));
-		console.log(eval("valueDanjonTrSyurui" + $gameVariables.value(20)));
-		var variable20Value = eval("valueDanjonTreasure" + $gameVariables.value(20));
-		var variable20Value2 = eval("valueDanjonTrSyurui" + $gameVariables.value(20));
-		var randomValue4 = variable20Value[getRandomIndex(variable20Value.length)];
-		let entryIndex2 = variable20Value.findIndex(variable20Value => variable20Value === randomValue4); 
-		if(entryIndex2 >= 0){
-		variable20Value.splice(entryIndex2, 1);
-		}
-		console.log(variable20Value);
-		console.log($dataItems[randomValue4].name);
-	};
-
-	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
-	setSelfVariable21_4 = function (interp) {
-		return (function () {
-		//if($gamePlayer.followers().follower(i).isVisible() ){
-		//this.sVal(21,2);
-		//} else {
-		//this.sVal(21,1);
-		//};
-		interp.sVal(21,valueFighterStatas);
-		}).call(interp);
-	};
-
-	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
-	checkPlayerOnEventAndStoreEventId = function (interp) {
-		return (function () {
-		interp.character(0).x == interp.character(-1).x && interp.character(0).y == interp.character(-1).y
-		value2 = $gameMap.eventIdXy(9, 3)
-		$gameVariables.setValue(2, value2)
-		}).call(interp);
-	};
-
-	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
-	gainSkillMasteryLevelActor1 = function () {
-		$gameActors.actor(1).gainSkillMasteryLevel(101, +1)
-		$gameActors.actor(1).gainSkillMasteryUses(201, 15)
+		const treasurePool = eval(`valueDanjonTreasure${varValue(CURRENT_ACTOR_VAR)}`);
+		const treasureKindPool = eval(`valueDanjonTrSyurui${varValue(CURRENT_ACTOR_VAR)}`);
+		console.log(treasurePool);
+		console.log(treasureKindPool);
+		const pickedTreasureId = treasurePool[getRandomIndex(treasurePool.length)];
+		const pickedIndex = treasurePool.findIndex(treasureId => treasureId === pickedTreasureId);
+		if (pickedIndex >= 0) treasurePool.splice(pickedIndex, 1);
+		console.log(treasurePool);
+		console.log($dataItems[pickedTreasureId].name);
 	};
 
 	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
 	readActorCharacterInfo = function () {
-		$gameActors.actor(n)._characterIndex
-		$gameActors.actor(n)._characterName
+		const targetActor = $gameActors.actor(n);   // dead reads, kept verbatim
+		targetActor._characterIndex;
+		targetActor._characterName;
 	};
 
-	// Replaces (3x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1, data/Map007.json:map-event:17:page:1
-	runPluginCommand153 = function (interp) {
-		return (function () {
-		var nameValue = "153";//一刀両断102崩壊161横両断008封印054内側から153
-		var arraySize = "character";//"picture"
-		var args3 = new Array(String(arraySize),"0","fadeOut",
-		String(nameValue),"180","5");
-		interp.pluginCommand("GWFade", args3);
-		}).call(interp);
+	// Replaces (3x): data/CommonEvents.json:common-event:53, data/Map007.json:map-event:2:page:1
+	pickRandomIndexes = function () {
+		// ｱｸﾀｰID, ﾋﾟｸﾁｬ, H相手(301ﾓﾌﾞ305対象なし306ｱｲﾃﾑ), 非表示, 簡易, 過去シーンか否か
+		i1 = getRandomIndex(3) + 100;
+		const presetValues = [1, 2, 3, 4, 5];
+		i2 = presetValues[getRandomIndex(presetValues.length)];
 	};
 
-	// Replaces (3x): data/Map007.json:map-event:5:page:1
-	playHcgPiston5 = function (breathPresetId) {
-		hcg_piston(55,1,breathPresetId);
-		//ピクID,1縦2横3左斜め4右斜め,1緩め2通常3ラスト
+	// Replaces (2x): data/CommonEvents.json:common-event:49
+	dropCachedMapData = function () {
+		delete window.$dataMap2;
 	};
 
-	// Replaces (3x): data/Map007.json:map-event:5:page:1
-	setupChildInterpreter19 = function (interp, newValue) {
-		return (function (newValue) {
-		interp.sVal(14,newValue);//Ｈ効果
-		interp.setupChild($dataCommonEvents[58].list, 0);
-		}).call(interp, newValue);
+	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
+	runCommonScript1 = function (interp) {
+		// id, ｲﾍﾞid, 速度, 頻度, ｱﾆid, x, y, 高さ, 回転数, 角度
+		common_script1(26, interp._eventId, 6, 5, 131, 4, 0, 15, 2, 90);
+		runCommonEventAsChild(interp, 64);
 	};
 
-	// Replaces (3x): data/Map007.json:map-event:23:page:1
-	erasePictureById2 = function (interp, pictureId) {
-		return (function (pictureId) {
+	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
+	checkPlayerOnEventAndStoreEventId = function (interp) {
+		interp.character(0).x == interp.character(-1).x && interp.character(0).y == interp.character(-1).y;
+		value2 = $gameMap.eventIdXy(9, 3);
+		setVar(2, value2);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:18, data/CommonEvents.json:common-event:53
+	initWeaponSlotVariableArrays = function () {
+		range(541, 560).forEach(variableId => setVar(variableId, Array(43).fill(0)));
+	};
+
+	// Replaces (7x): data/CommonEvents.json:common-event:18, :66, :67, :110, :212, Map005.json:map-event:2:page:1, ...
+	showAndMovePicturePairFromArgs = function (pictureId, pictureName, scaleX, scaleY, opacity, toScaleX, toScaleY, toOpacity, duration) {
+		showPic(pictureId, pictureName, 640, 384, scaleX, scaleY, opacity, 1);
+		movePic(pictureId, 640, 384, toScaleX, toScaleY, toOpacity, duration, 1);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:19, :20, data/Map005.json:map-event:2:page:1
+	moveTwoPicturesFromArgs = function (pictureId, scaleY, duration, secondPictureId, secondScaleY, secondDuration) {
+		movePic(pictureId, 640, 384, 100, scaleY, 0, duration, 1);
+		movePic(secondPictureId, 640, 384, 100, secondScaleY, 0, secondDuration, 1);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:19, data/CommonEvents.json:common-event:20
+	configureStandingPicture2Var247And20 = function (interp) {
+		forEachHeroine(heroineId => {
+			if (!$gameParty.members().contains($gameActors.actor(heroineId))) return;
+			range(0, 42).forEach(slotIndex => {
+				varValue(heroineId + 440)[slotIndex] = varValue(heroineId + 540)[slotIndex];
+			});
+			setVar(CURRENT_ACTOR_VAR, heroineId);
+			tachie_settei2();
+		});
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:64
+	subtractVariables = function (resultVariableId, minuendVariableId, subtrahendId, subtrahend2Id) {
+		setVar(resultVariableId,
+			varValue(minuendVariableId) - varValue(subtrahendId) - varValue(subtrahend2Id));
+	};
+	/* ============================================================================
+	 * Remaining helpers and map-event utilities
+	 * ========================================================================== */
+
+	// Replaces (3x): data/CommonEvents.json:common-event:10, data/CommonEvents.json:common-event:21
+	setValueStartCommentary0 = function () {
+		valueStartCommentary0 = 1;
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:22
+	setSelfVariable539Var540 = function (interp) {
+		const restingActorName = variableText(49);   // variable 49: 名前
+		appendStoredSelfLine(interp, `${restingActorName}は傷付いた身体を休めた…。\n`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:83
+	setSelfVariable539Var540_2 = function (interp) {
+		const actorName = actor.name();
+		const fontColor27 = fontColor(27);
+		const fontColor0 = fontColor(0);
+		appendStoredSelfLine(interp, `${actorName}は${fontColor27}発情${fontColor0}した肢体を慰めている…。\n`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:83
+	setSelfVariable539Var540_3 = function (interp) {
+		const actorName = actor.name();
+		const fontColor27 = fontColor(27);
+		const fontColor0 = fontColor(0);
+		appendStoredSelfLine(interp, `${actorName}は${fontColor27}発情${fontColor0}した肢体を持て余している…。\n`);
+	};
+
+	// Replaces (11x): data/CommonEvents.json:common-event:338, :481, :503, :536, :537, :544, ...
+	setDarknessOpacity = function (opacity) {
+		$gameMap.darknessOpacity = opacity;
+	};
+
+	// Replaces (7x): data/CommonEvents.json:common-event:392, Map003.json events, Map018.json events
+	temporarilySaveNpc = function () {
+		Npc_TemporarilySave(0, 1);   // 終了処理
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:101
+	updateActorFromVariable11 = function () {
+		setVar(49, actorNameWithPartySuffix(11, '達'));
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:496, data/CommonEvents.json:common-event:516
+	updateActorFromVariable530 = function () {
+		setVar(21, actorNameWithPartySuffix(LEAD_ACTOR_VAR, '一行'));
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:72, data/Map005.json:map-event:2:page:1
+	closeGameWindow = function () {
+		window.close();
+	};
+
+	/* ============================================================================
+	 * Self switches (bulk helpers)
+	 * ========================================================================== */
+
+	// Replaces (2x): data/CommonEvents.json:common-event:11, data/CommonEvents.json:common-event:24
+	setMapSelfSwitch = function (selfSwitchKey) {
+		range(1, 500).forEach(mapId => {
+			range(1, 200).forEach(eventId => selfSwitchOff(mapId, eventId, selfSwitchKey));
+		});
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:314
+	setMapSelfSwitch2 = function (selfSwitchKey) {
+		mapSelfSwitchOn(selfSwitchKey, 'A');
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:331, :511, data/Map094.json:map-event:45:page:1
+	setMapSelfSwitch3 = function (eventId, selfSwitchKey) {
+		mapSelfSwitchOn(eventId, selfSwitchKey);
+	};
+
+	// Replaces (5x): data/CommonEvents.json:common-event:390, :391, :393, :399, :530
+	setMapSelfSwitch4 = function (firstEventId, secondEventId) {
+		mapSelfSwitchOn(firstEventId, 'C');
+		mapSelfSwitchOn(secondEventId, 'C');
+	};
+
+	// Replaces (3x): data/Map003.json:map-event:7:page:1, data/Map046.json:map-event:9:page:1, data/Map197.json:map-event:6:page:1
+	setMapSelfSwitch5 = function (interp, firstItemId, secondItemId) {
+		const hasEitherItem =
+			$gameParty.hasItem($dataItems[firstItemId], true) || $gameParty.hasItem($dataItems[secondItemId], true);
+		$gameSelfSwitches.setValue([$gameMap.mapId(), interp._eventId, 'B'], !hasEitherItem);
+	};
+
+	// Replaces (6x): data/CommonEvents.json:common-event:205, :292, :313
+	setMapSelfSwitchMapFirsttAction = function (selfSwitchKey) {
+		const mapId = $gameMap.mapId();
+		for (let eventId = 1; eventId < 100; eventId++) {
+			const mapEvent = $gameMap.event(eventId);
+			if (!mapEvent) continue;
+			if (mapEvent.event().meta['MapFirsttAction']) {
+				selfSwitchOff(mapId, eventId, selfSwitchKey);
+				break;
+			}
+		}
+	};
+
+	// Replaces (26x): data/CommonEvents.json:common-event:241, :301, :336, :337, :338, :344, ...
+	// The wide-spread alias of `setMapSelfSwitch3` — folded into that one definition.
+	enableMapSelfSwitchForEvent = setMapSelfSwitch3;
+
+	// Replaces (9x): data/CommonEvents.json:common-event:241, :292, :305, :310, :316, :336, ...
+	/* NOTE: despite the name, this one turns the switch OFF — kept as-is so the
+	   data-file calls keep working. */
+	enableMapSelfSwitchForEventAtKey = function (eventId, selfSwitchKey) {
+		mapSelfSwitchOff(eventId, selfSwitchKey);
+	};
+
+	/* ============================================================================
+	 * Picture erasing (public helpers)
+	 * ========================================================================== */
+
+	// Replaces (2x): data/CommonEvents.json:common-event:21, data/Map003.json:map-event:75:page:1
+	eraseTwoPictures = function (firstPictureId, secondPictureId) {
+		$gameScreen.erasePicture(firstPictureId);
+		$gameScreen.erasePicture(secondPictureId);
+	};
+
+	// Replaces (14x): data/CommonEvents.json:common-event:21, :111, :112, :167, :173, :183, ...
+	erasePictureRange = function (firstPictureId, lastPictureId) {
+		erasePictureRangeBetween(firstPictureId, lastPictureId);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:66, data/Map007.json:map-event:23:page:1
+	erasePictureById = function (pictureId) {
 		$gameScreen.erasePicture(pictureId);
-		interp.wait(3);
-		}).call(interp, pictureId);
 	};
 
-	// Replaces (3x): data/Map007.json:map-event:34:page:1
-	speakCharacterOneLiner4 = function (interp) {
-		var messageText2 = `「オラッ！」`;
-		var textPart2 = `「オラァッ！」`;
-		return (function () {
-		valueSerialPictureId += 1;
-		var randomXOffsets = [-50,0,50,-100,100];
-		var randomYOffsets = [-50,0,50,-100,100];
-		var lineCandidates = [`${messageText2}`,`${textPart2}`];
-		chara_oneWord(valueSerialPictureId,interp._eventId,25,60,randomXOffsets,randomYOffsets,lineCandidates);
-		interp.wait(20);
-		}).call(interp);
+	// Replaces (2x): data/CommonEvents.json:common-event:47, data/CommonEvents.json:common-event:87
+	erasePictureP = function (firstPictureId, lastPictureId, eraseStyleId) {
+		range(firstPictureId, lastPictureId).forEach(pictureId => pic_eraseP(eraseStyleId, [pictureId]));
 	};
 
-	// Replaces (4x): data/Map054.json:map-event:2:page:1, data/Map054.json:map-event:2:page:2, data/Map054.json:map-event:2:page:3, data/Map054.json:map-event:2:page:4
-	setupBoss = function (interp, newValue, bossId) {
-		return (function (newValue, bossId) {
-		interp.sVal(29,newValue);
-		boss_setup1(2,bossId);
-		}).call(interp, newValue, bossId);
+	// Replaces (2x): data/CommonEvents.json:common-event:94
+	movePictureRowAndWait = function (interp, pictureId, duration, waitFrames) {
+		const PICTURE_ROW_OFFSET = 60;
+		movePic(pictureId + 1 + PICTURE_ROW_OFFSET, 1280 / 2, 768 / 2, 100, 100, 0, duration, 1);
+		interp.wait(waitFrames);
 	};
 
-	// Replaces (4x): data/Map054.json:map-event:2:page:1, data/Map054.json:map-event:2:page:2, data/Map054.json:map-event:2:page:3, data/Map054.json:map-event:2:page:4
-	setEventFace2 = function (interp) {
-		return (function () {
-		var eventId2 = interp._eventId
-		if(!!$gameMap.event(eventId2)) {
-		    var event = $gameMap.event(eventId2);
-		    event.setStepAnime(false);event.setWalkAnime(false);
-		    event.setDirection(2);event.resetPattern();
-		    event._originalPattern = 1;event.setAngle(45);
-		    event._spriteOffsetX = -12;event._spriteOffsetY = -12;
-		    event._kageM.clear();
-		    event.setFace(6,true,true);//Child用event.setFace(6,true,true,0,6,0,6);
-		};
-		}).call(interp);
+	// Replaces (2x): data/CommonEvents.json:common-event:44, data/CommonEvents.json:common-event:45
+	movePicture1 = function () {
+		range(51, 60).forEach(pictureId => pic_move1(pictureId, -100, 0, 100, 100, 0, 60));
 	};
 
-	// Replaces (2x): data/Map085.json:map-event:2:page:1, data/Map085.json:map-event:3:page:1
-	spawnMapEvent2 = function (interp) {
-		return (function () {
-		var x4 = $gameMap.event(interp.eventId()).x;
-		var y5 = $gameMap.event(interp.eventId()).y;
-		$gameMap.spawnEvent(190, x4, y5, true);
-		}).call(interp);
+	/* ============================================================================
+	 * Ticker info fetching
+	 * ========================================================================== */
+
+	// Replaces (3x): data/CommonEvents.json:common-event:301, data/CommonEvents.json:common-event:305, data/CommonEvents.json:common-event:309
+	fetchInfoDirectVar71 = function (databaseEntryId, itemAmount) {
+		fetchInfo(0, databaseEntryId, itemAmount);
+	};
+
+	// Replaces (16x): data/CommonEvents.json:common-event:306, :310, :314, :325, :330, :336, ...
+	fetchInfoDirectVar71_2 = function (databaseTypeId, databaseEntryId, itemAmount) {
+		fetchInfo(databaseTypeId, databaseEntryId, itemAmount);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:309, data/CommonEvents.json:common-event:334
+	fetchInfoDirectVar71_3 = function (databaseTypeId, databaseEntryId, secondDatabaseEntryId, itemAmount) {
+		fetchInfoWithLeadingEntry(databaseTypeId, databaseEntryId, 0, secondDatabaseEntryId, itemAmount);
+	};
+
+	// Replaces (6x): data/CommonEvents.json:common-event:316, :319, :368, :495, :532, :548
+	fetchInfoDirectVar71_4 = function (databaseEntryId, databaseTypeId, secondDatabaseEntryId, itemAmount) {
+		fetchInfoWithLeadingEntry(0, databaseEntryId, databaseTypeId, secondDatabaseEntryId, itemAmount);
+	};
+
+	/* ============================================================================
+	 * Variable-driven flags / switches
+	 * ========================================================================== */
+
+	// Replaces (5x): data/CommonEvents.json:common-event:87, data/CommonEvents.json:common-event:256
+	flagIfAnySlotFilled = function (firstSlotIndex, lastSlotIndex, switchId) {
+		const costumeSlotValues = varValue(360 + varValue(CURRENT_ACTOR_VAR));
+		const maxSlotValue = range(firstSlotIndex, lastSlotIndex)
+			.map(slotIndex => costumeSlotValues[slotIndex])
+			.filter(slotValue => slotValue >= 1)
+			.reduce((maxValue, slotValue) => Math.max(maxValue, slotValue), 0);
+		if (maxSlotValue >= 1) enableSwitch(switchId);
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:133:page:2
+	readVariable327 = function (weaponSlotIndex, unlockedSwitchId, lockedSwitchId, secondWeaponSlotIndex, secondUnlockedSwitchId, secondLockedSwitchId) {
+		const isWeaponUnlocked = slotIndex => varValue(327)[slotIndex] >= 1;
+		applyFlagToSwitch(unlockedSwitchId, isWeaponUnlocked(weaponSlotIndex));
+		applyFlagToSwitch(lockedSwitchId, !isWeaponUnlocked(weaponSlotIndex));
+		applyFlagToSwitch(secondUnlockedSwitchId, isWeaponUnlocked(secondWeaponSlotIndex));
+		applyFlagToSwitch(secondLockedSwitchId, !isWeaponUnlocked(secondWeaponSlotIndex));
+	};
+
+	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
+	applyActorHHistory2 = function () {
+		actor_Hhennreki2(varValue(19));
+		// 選択肢番号は、実際の配列番号+1にしている。
+		// もしピクチャ表示する場合は注意。
+	};
+
+	/* ============================================================================
+	 * Spawned-event positioning / animations
+	 * ========================================================================== */
+
+	// Replaces (2x): data/CommonEvents.json:common-event:356
+	readVariable530Var292 = function (interp, x, direction, x2, y, direction2) {
+		const firstCharacter = interp.character(spawnedEventId(3));
+		firstCharacter.locate(x, 14);
+		firstCharacter.setDirection(direction);
+		const secondCharacter = interp.character(spawnedEventId(4));
+		secondCharacter.locate(x2, y);
+		secondCharacter.setDirection(direction2);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:359
+	readVariable530Var292_2 = function (firstSlotIndex, x, y, direction, secondSlotIndex, x2, y2, direction2) {
+		placeSpawnedEvent(firstSlotIndex, x, y, direction);
+		placeSpawnedEvent(secondSlotIndex, x2, y2, direction2);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:389, data/CommonEvents.json:common-event:509
+	readVariable530Var292_3 = function () {
+		const leadEvent = spawnedEvent(varValue(LEAD_ACTOR_VAR));
+		leadEvent.locate(18, 10);
+		leadEvent.setDirection(8);
+		leadEvent._spriteOffsetY = -12;
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:451
+	readVariable530Var292_4 = function (interp) {
+		interp._eventId = spawnedEventId(1);   // 主格キャラ
+	};
+
+	// Replaces (5x): data/CommonEvents.json:common-event:495, :532, :548, :572, :573
+	readVariable530Var292_5 = function (characterIndex) {
+		spawnedEvent(varValue(LEAD_ACTOR_VAR)).setImage('1_1', characterIndex);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:511, data/Map094.json:map-event:45:page:1
+	readVariable530Var292_6 = function () {
+		placeSpawnedEvent(11, 34, 20, 2);
+		placeSpawnedEvent(varValue(LEAD_ACTOR_VAR), 34, 19, 2);
 	};
 
 	// Replaces (2x): data/Map100.json:map-event:11:page:1
-	requestEventAnimationVar19 = function (interp, argument1) {
-		return (function (argument1) {
-		var variable19Value = $gameVariables.value(19);
-		var argument12 = argument1;
-		interp.character(variable19Value).requestAnimation(argument12);
-		}).call(interp, argument1);
+	requestEventAnimationVar19 = function (interp, animationId) {
+		interp.character(varValue(19)).requestAnimation(animationId);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:301, data/Map007.json:map-event:3:page:1
+	bindInterpreterToEventId = function (interp, eventId) {
+		interp._eventId = eventId;
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:552
+	// Same as `bindInterpreterToEventId` above — folded into it.
+	bindInterpreterToEventIdVar292 = bindInterpreterToEventId;
+
+	/* ============================================================================
+	 * Cut-in / GabText plugin commands
+	 * ========================================================================== */
+
+	// Replaces (1x): data/CommonEvents.json:common-event:138
+	runPluginCommandGabText = function (interp) {
+		const gabActorName = $gameActors.actor(2).name();
+		callPluginCommand(interp, 'GabText', `${gabActorName}「ああ！　我らの力、見せてやろう！！」`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:138
+	runPluginCommandGabText2 = function (interp) {
+		const gabActorName = $gameActors.actor(1).name();
+		const characterName2 = characterName(2);
+		callPluginCommand(interp, 'GabText', `${gabActorName}「はい、${characterName2}さん！」`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:138
+	configureActorFromVariable20GabText = function (interp) {
+		const speakerName = currentActor().name();
+		const defaultLine = '「行きますよ、皆さん！」';
+		const characterName2 = characterName(2);
+		const partnerCallLine = `「${characterName2}さん、行きましょう！」`;
+		const message = $gameActors.actor(2).isStateAffected(234) ? speakerName + partnerCallLine : speakerName + defaultLine;
+		callPluginCommand(interp, 'GabText', message);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:138
+	configureActorFromVariable20Actor1 = function (interp) {
+		const speakerName = currentActor().name();
+		const defaultLine = '「往くぞ！」';
+		const characterName1 = characterName(1);
+		const partnerCallLine = `「往くぞ、${characterName1}！」`;
+		const message = $gameActors.actor(1).isStateAffected(234) ? speakerName + partnerCallLine : speakerName + defaultLine;
+		callPluginCommand(interp, 'GabText', message);
+	};
+
+	/* ============================================================================
+	 * H-experience tables
+	 * ========================================================================== */
+
+	// Replaces (6x): data/CommonEvents.json:common-event:370, :371, :372, :373, :383, :384
+	showHExperienceTable1 = function (requestedPartnerWeaponId) {
+		h_keikenhyouji1(521, requestedPartnerWeaponId);   // 記録変数, 相手ID
+	};
+
+	// Replaces (11x): data/CommonEvents.json:common-event:294, :368, :370, :371, :372, :373, ...
+	showHExperienceTable2 = function (requestedPartnerWeaponId) {
+		h_keikenhyouji2(521, requestedPartnerWeaponId);   // backGraund_menuMapSelectで消去
+	};
+
+	// Replaces (5x): data/CommonEvents.json:common-event:516, :517, :518, :519, :526
+	showHExperienceTable1_2 = function (interp, scenePicName, episodeItemId, requestedPartnerWeaponId) {
+		valueScenePic = scenePicName;
+		setSelfVar(interp, LEAD_ACTOR_VAR, 1);        // 主格キャラ
+		setSelfVar(interp, NPC_PRESET_INDEX_VAR, episodeItemId);   // 挿話回想の場合アイテムID。メインは0
+		h_keikenhyouji1(521, requestedPartnerWeaponId);   // 記録変数, 相手ID, 名前id21に名前と役職名
+		valueWeatherSceneSet = 0;
+	};
+	/* ============================================================================
+	 * Child interpreters (dialogue / news tickers)
+	 * ========================================================================== */
+
+	// Replaces (1x): data/CommonEvents.json:common-event:300
+	setupChildInterpreter4 = function (interp) {
+		setSelfVar(interp, CURRENT_ACTOR_VAR, 0);
+		const fontColor16 = fontColor(16);
+		const centralPlainsName = $dataSystem.switches[252];
+		const fontColor0 = fontColor(0);
+		valueWordSet0 = `全体マップに${fontColor16}${centralPlainsName}${fontColor0}が追加されました`;
+		valueWordSetEx = 0;   // 補足が必要な場合
+		runCommonEventAsChild(interp, 45);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:350
+	setupChildInterpreter5 = function (interp) {
+		setSelfVar(interp, CURRENT_ACTOR_VAR, 0);
+		const forgottenSanctuaryName = $dataSystem.switches[259];
+		valueWordSet0 = `${forgottenSanctuaryName}からクリア後ダンジョンに行けるようになりました`;
+		valueWordSetEx = 0;   // 補足が必要な場合
+		runCommonEventAsChild(interp, 45);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:312
+	setupChildInterpreter7 = function (interp, talkPictureId) {
+		const centralPlainsName = switchName(252);   // switch 252: 中央平原
+		showOneLineTalk(interp, 19, [talkPictureId, 28, `${centralPlainsName}の出現エネミーが変化しました。`, 255]);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:471
+	setupChildInterpreter12 = function (interp, talkPictureId) {
+		showOneLineTalk(interp, 21, [talkPictureId, 250, interp._eventId]);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:530
+	setupChildInterpreter13 = function (interp, talkPictureId) {
+		// 1で付与 2で直接表示 \CE[60]のみ 0で解除, ｱｸﾀｰid, ﾌﾚｰﾑ60,40,20
+		showOneLineTalk(interp, 16, [talkPictureId, 1, 60]);
+	};
+
+	// Replaces (6x): data/CommonEvents.json:common-event:338, :368, :495, :532, :547, :548
+	setupChildInterpreterVar2 = function (interp, forgetItemId) {
+		setSelfVar(interp, CURRENT_ACTOR_VAR, varValue(2));
+		setSelfVar(interp, 19, forgetItemId);
+		setSelfVar(interp, 14, 16);   // 14ｱｲﾃﾑ称号 15ｽｷﾙ習得 16忘却, 変数19にID
+		runCommonEventAsChild(interp, 44);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:234
+	setupChildInterpreterForQuestSet = function (interp) {
+		valueCountSet1 = Number($gameMap.event(interp._eventId).event().meta['QuestSet']);
+		showOneLineTalk(interp, 10, [24, questDialogueText(valueCountSet1), 1]);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:371, data/CommonEvents.json:common-event:372
+	setupChildInterpreter11 = function (interp, questItemId) {
+		valueCountSet1 = questItemId;
+		showOneLineTalk(interp, 10, [24, questDialogueText(valueCountSet1), 1]);
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:166:page:2, data/Map003.json:map-event:243:page:2
+	setupChildInterpreter15 = function (interp) {
+		showOneLineTalk(interp, 10, [24, questDialogueText(valueCountSet1), 0]);
+	};
+
+	// Replaces (3x): data/Map003.json:map-event:168:page:2, data/Map007.json:map-event:69:page:2, data/Map064.json:map-event:1:page:3
+	setupChildInterpreter16 = function (interp) {
+		showOneLineTalk(interp, 10, [24, questDialogueText(valueCountSet1)]);
+	};
+
+	// Replaces (2x): data/Map003.json:map-event:166:page:2, data/Map003.json:map-event:243:page:2
+	showTickerQuestAccepted = function () {
+		const fontColor3 = fontColor(3);
+		const questItemIcon = itemIconName(valueCountSet1);   // the quest item (valueCountSet1)
+		const fontColor0 = fontColor(0);
+		showTicker(`クエスト${fontColor3}${questItemIcon}${fontColor0}を受注しました。`);
+		$gameParty.gainItem($dataItems[valueCountSet1], 1);
+	};
+	/* ============================================================================
+	 * Actor announcement messages (reuses the shared helpers)
+	 * ========================================================================== */
+
+	// Replaces (1x): data/CommonEvents.json:common-event:235
+	configureActorFromVariable20Var21 = function () {
+		const setString2 = setString(varValue(CURRENT_ACTOR_VAR));
+		const ruby2 = ruby('昇格', 'レアリティ・アップ');
+		setVar(21, `${setString2}は、<${valueCountSet1}>に${ruby2}した！`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:254
+	configureActorFromVariable20Var21_2 = function () {
+		setVar(21, decorateWithActorName(
+			'を初期化します。よろしいですか？\n（H履歴は影響ありませんが、\n各種開発度ランクはリセットされます。\nサブジョブのレベルは完全にはリセットされません）'));
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:254
+	configureActorFromVariable20Var21_3 = function () {
+		setVar(21, decorateWithActorName('のリセット処理が完了しました。'));
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:313
+	configureActorFromVariable20Var21_4 = function () {
+		const setString2 = setString(varValue(CURRENT_ACTOR_VAR));
+		const skillIcon405 = skillIconName(405);
+		const ruby2 = ruby('昇格', 'レアリティ・アップ');
+		setVar(21, `${setString2}は、${skillIcon405}に${ruby2}した！`);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:259
+	configureActorFromVariable20Var801And21 = function () {
+		const className = $dataClasses[varValue(21)].name;
+		setVar(801, decorateWithActorName(
+			`は[${className}]のジョブ解放条件を満たしていません…。\n`));
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:361
+	configureActorFromVariable20_2 = function (interp) {
+		setSecondJobAwakeningMessage(interp, 1, '　　');
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:361
+	configureActorFromVariable20_3 = function (interp) {
+		setSecondJobAwakeningMessage(interp, 2, '　　');
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:361
+	configureActorFromVariable20_4 = function (interp) {
+		setSecondJobAwakeningMessage(interp, 3, '　　');
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:361
+	configureActorFromVariable20_5 = function (interp) {
+		setSecondJobAwakeningMessage(interp, 4, '　　');
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:471
+	configureActorFromVariable20_6 = function (interp) {
+		setSecondJobAwakeningMessage(interp, 5, '　　　　　　');
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:301
+	setVariable21TextVar22 = function () {
+		const weaponName74 = $dataWeapons[74].name;
+		setVar(21, `空賊A ${braceRight()}${weaponName74}`);
+		setVar(22, `空賊B ${braceRight()}${weaponName74}`);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:301
+	setVariable21TextVar22_2 = function () {
+		const weaponName79 = $dataWeapons[79].name;
+		setVar(21, `少年 ${braceRight()}${weaponName79}`);
+		const weaponName74 = $dataWeapons[74].name;
+		setVar(22, `空賊C ${braceRight()}${weaponName74}`);
+	};
+
+	// Replaces (4x): data/Map054.json:map-event:2:page:1..4
+	setupBoss = function (interp, bossSlotIndex, bossId) {
+		setSelfVar(interp, 29, bossSlotIndex);
+		boss_setup1(2, bossId);
+	};
+
+	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
+	appendStateDescription = function () {
+		const STATE_ID = 110;
+		if (!$dataStates[STATE_ID].meta['Help Description']) return;
+		$dataStates[STATE_ID].description += '\nあああああ';
+	};
+
+	// Replaces (3x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:7:page:1
+	runPluginCommandVar75And76 = function (interp, levelGain) {
+		forEachDeployedActor(actorId => {
+			callPluginCommand(interp, 'gainJp', actorId, levelGain, $gameActors.actor(actorId)._classId);
+		});
+	};
+	/* ============================================================================
+	 * NPC-preset based respawns
+	 *
+	 * `respawnLeadActorFromPreset()` / `respawnSideNpcFromPreset()` (defined with
+	 * the other respawn helpers) wrap the "read 163[535], place the lead actor,
+	 * place the side NPC" pattern that this family repeated a dozen times.
+	 * ========================================================================== */
+
+	// Replaces (7x): data/CommonEvents.json:common-event:302, :304, :305, :309, :339, :382, ...
+	setupRespawnEnemyAAndSetupRespawnEnemyNVar530And163Etc = function (npcSlotIndex) {
+		respawnLeadActorFromPreset(1);
+		respawnSideNpcFromPreset(npcSlotIndex);
+	};
+
+	// Replaces (5x): data/CommonEvents.json:common-event:308, :317, :320, :327, :328
+	setupRespawnEnemyAVar530And163Etc = function () {
+		respawnLeadActorFromPreset(1);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:306, data/CommonEvents.json:common-event:336
+	setupRespawnEnemyAAndSetupRespawnEnemyNVar530And163Etc2 = function () {
+		respawnActorFacing(varValue(LEAD_ACTOR_VAR), 7, 9, 1, 4);
+		respawnSideNpcFromPreset(11, 6);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:325, data/CommonEvents.json:common-event:338
+	setupRespawnEnemyAAndSetupRespawnEnemyNVar530And163Etc3 = function (interp) {
+		respawnLeadActorFromPreset(1);
+		respawnSideNpcFromPreset(11);
+		interp._eventId = spawnedEventId(11);
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:389, :507, :508, :509
+	setupRespawnEnemyAAndSetupRespawnEnemyNVar530And163Etc4 = function (interp) {
+		const leadActorId = varValue(LEAD_ACTOR_VAR);
+		respawnActorFacing(leadActorId, 12, 10, 1, 4);
+		interp._eventId = spawnedEventId(leadActorId);
+		event_respawnSetN(11, 13, 10, 0, 'npcUnique1', 0, 4);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:441, data/CommonEvents.json:common-event:552
+	setupRespawnEnemyAAndSetupRespawnEnemyNVar530And163Etc5 = function () {
+		const npcPreset = currentNpcPreset();
+		const leadEvent = respawnActor(varValue(LEAD_ACTOR_VAR), 15, 4, 0);
+		leadEvent.setImage(npcPreset[1], npcPreset[2]);
+		leadEvent.setDirection(6);
+		respawnNpcFacing(11, 16, 4, 1, npcPreset[6], npcPreset[7], 2);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:442
+	setupRespawnEnemyAAndSetupRespawnEnemyNVar530And163Etc6 = function (interp, posX, posY, zoomFlag, posX2, posY2, zoomFlag2) {
+		const leadActorId = varValue(LEAD_ACTOR_VAR);
+		const npcPreset = currentNpcPreset();
+		const leadEvent = respawnActor(leadActorId, posX, posY, zoomFlag);
+		leadEvent.setImage(npcPreset[1], npcPreset[2]);
+		leadEvent.setDirection(2);
+		interp._eventId = spawnedEventId(leadActorId);
+		respawnNpcFacing(11, posX2, posY2, zoomFlag2, npcPreset[6], npcPreset[7], 2);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:571, data/CommonEvents.json:common-event:572, data/CommonEvents.json:common-event:573
+	setupRespawnEnemyAAndSetupRespawnEnemyNVar530And163Etc7 = function (interp) {
+		const leadActorId = varValue(LEAD_ACTOR_VAR);
+		const npcPreset = currentNpcPreset();
+		respawnActorFacing(leadActorId, 10, 11, 1, 4);
+		interp._eventId = spawnedEventId(leadActorId);
+		respawnNpcFacing(11, npcPreset[8], npcPreset[9], 0, npcPreset[6], npcPreset[7], 6);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:323, data/CommonEvents.json:common-event:332
+	setupRespawnEnemyAVar530And163Etc2 = function (interp, posX, posY, direction) {
+		const leadActorId = varValue(LEAD_ACTOR_VAR);
+		respawnActorFacing(leadActorId, posX, posY, 1, direction);
+		interp._eventId = spawnedEventId(leadActorId);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:349, data/CommonEvents.json:common-event:542
+	setupRespawnEnemyAVar530And163Etc3 = function (interp) {
+		const leadActorId = varValue(LEAD_ACTOR_VAR);
+		const npcPreset = currentNpcPreset();
+		respawnActorFacing(leadActorId, npcPreset[3], npcPreset[4], 1, npcPreset[5]);
+		interp._eventId = spawnedEventId(leadActorId);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:430, data/CommonEvents.json:common-event:432
+	setupRespawnEnemyAVar530And163Etc4 = function (interp) {
+		const leadActorId = varValue(LEAD_ACTOR_VAR);
+		const npcPreset = currentNpcPreset();
+		const leadEvent = respawnActor(leadActorId, 8, 7, 1);
+		leadEvent.setImage(npcPreset[1], npcPreset[2]);
+		leadEvent.setDirection(6);
+		interp._eventId = spawnedEventId(leadActorId);
+	};
+
+	// Replaces (6x): data/CommonEvents.json:common-event:292, :304, :325, :327, :335, :339
+	setupRespawnEnemyAVar530And292 = function () {
+		respawnActorFacing(varValue(LEAD_ACTOR_VAR), 13, 5, 0, 2);
+		respawnActorFacing(3, 14, 6, 0, 4);
+	};
+
+	// Replaces (7x): data/CommonEvents.json:common-event:292, data/CommonEvents.json:common-event:327
+	setupRespawnEnemyAVar530And292_2 = function (slotIndex, posX, posY, direction) {
+		respawnActor(slotIndex, posX, posY, 0).setDirection(direction);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:301, data/CommonEvents.json:common-event:349
+	setupRespawnEnemyAVar530And292_3 = function (interp, slotIndex, posX, posY, zoomFlag) {
+		respawnActor(slotIndex, posX, posY, zoomFlag);
+		interp._eventId = spawnedEventId(slotIndex);
+	};
+
+	// Replaces (2x): data/CommonEvents.json:common-event:341, data/CommonEvents.json:common-event:342
+	setupRespawnEnemyAAndSetupRespawnEnemyNVar530And292_2 = function (interp) {
+		respawnActorFacing(5, 13, 6, 1, 4);
+		interp._eventId = spawnedEventId(5);
+		event_respawnSetN(11, 18, 10, 0, 'npcCastle1', 2, 4);
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:441, data/CommonEvents.json:common-event:442, data/CommonEvents.json:common-event:552
+	setupRespawnEnemyAAndSetupRespawnEnemyNVar530And292_3 = function (posX, posY, direction, posX2, posY2, imageName, imageIndex, direction2) {
+		respawnActor(varValue(LEAD_ACTOR_VAR), posX, posY, 1).setDirection(direction);
+		respawnNpc(11, posX2, posY2, 0, imageName, imageIndex).setDirection(direction2);
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:370, data/CommonEvents.json:common-event:371, data/CommonEvents.json:common-event:383, data/CommonEvents.json:common-event:384
+	// Marks the calling event as the lead-actor event (self variable 530 = 1) so
+	// the respawn helpers can find it.
+	setSelfVariable530 = function (interp) {
+		setSelfVar(interp, LEAD_ACTOR_VAR, 1);
+	};
+	/* ============================================================================
+	 * Last odds and ends
+	 * ========================================================================== */
+
+	/* --- text BGV (文字BGV) lines -------------------------------------------- */
+
+	// Replaces (1x): data/CommonEvents.json:common-event:306
+	// Heavy breathing (layer preset 1, speed 120).
+	setVariable707Var706Switch125 = function () {
+		const breathingLine = '「ハァ、ハァ…」';
+		const pauseLine = '「ン………」';
+		const gaspLine = '「ハァ…」';
+		const exhaustedLine = '「ハァっ………」';
+		startTextBGVoice([breathingLine, pauseLine, gaspLine, exhaustedLine], 1, 120);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:391
+	// Moans (layer preset 0, speed 80).
+	// NOTE: the last line carries a form-feed character where the maker code
+	// `\FS[n]` was meant (the original wrote `\f` + `s[20]`) — kept exactly.
+	setVariable707Var706Switch125_2 = function () {
+		const voiceIcon = icon(12);
+		const moanLine = `「アンっ${voiceIcon}」`;
+		const secondLine = `「ヒゥンっ${voiceIcon}」`;
+		const thirdLine = `「アッ${voiceIcon}　ンン${voiceIcon}」`;
+		const fourthLine = `「ヒン\x0cs[20]ン\x0cs[28]っ${voiceIcon}」`;
+		startTextBGVoice([moanLine, secondLine, thirdLine, fourthLine], 0, 80);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:531
+	// Moans, slower cadence (layer preset 0, speed 120).
+	setVariable707Var706Switch125_3 = function () {
+		const voiceIcon = icon(12);
+		const moanLine = `「アンっ${voiceIcon}」`;
+		const secondLine = `「ヒゥンっ${voiceIcon}」`;
+		const thirdLine = `「アッ${voiceIcon}　ンン${voiceIcon}」`;
+		const fourthLine = `「ヒンンっ${voiceIcon}」`;
+		startTextBGVoice([moanLine, secondLine, thirdLine, fourthLine], 0, 120);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:338
+	// Moan sequence (layer preset 1, speed 180).
+	setVariable707Var706Switch125_4 = function () {
+		const voiceIcon = icon(12);
+		const moanLine = `「アッ${voiceIcon}」`;
+		const secondLine = `「ンッ${voiceIcon}」`;
+		const thirdLine = `「ンン…${voiceIcon}」`;
+		const fourthLine = `「ンクっ…${voiceIcon}」`;
+		const fifthLine = `「ァンっ…${voiceIcon}」`;
+		startTextBGVoice([moanLine, secondLine, thirdLine, fourthLine, fifthLine], 1, 180);
+	};
+
+	// Replaces (1x): data/CommonEvents.json:common-event:518
+	// Protest lines (layer preset 1, speed 180).
+	setVariable707Var706Switch125_5 = function () {
+		const moanLine = '「………ァっ」';
+		const secondLine = '「いや…」';
+		const thirdLine = '「ンン──……」';
+		const fourthLine = '「ンクっ…」';
+		const fifthLine = '「ァンっ…」';
+		startTextBGVoice([moanLine, secondLine, thirdLine, fourthLine, fifthLine], 1, 180);
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:368, data/CommonEvents.json:common-event:495, data/CommonEvents.json:common-event:532, data/CommonEvents.json:common-event:548
+	// Picks the 文字BGV word set (3 = high, 2 = medium, 1 = low) and displays it
+	// (layer preset 1, speed 60).
+	setHTextWord = function () {
+		htext_word(3);                          // fills valueHtextWord
+		startTextBGVoice([].concat(valueHtextWord), 1, 60);
+	};
+
+	// Replaces (3x): data/CommonEvents.json:common-event:393, data/CommonEvents.json:common-event:399, data/CommonEvents.json:common-event:547
+	setVariable318 = function (variableId) {
+		// 文字HBGV: 呼び出し側が用意したセリフ群をそのまま流し込む
+		setVar(318, varValue(variableId));
+		setVar(706, [640 - 128, 386, 1, 80, 0, 'eromangasimaji']);
+		enableSwitch(119);
+	};
+
+	// Replaces (5x): data/CommonEvents.json:common-event:292, data/CommonEvents.json:common-event:310, data/CommonEvents.json:common-event:314, data/CommonEvents.json:common-event:316
+	setupRespawnEnemyAVar530 = function () {
+		respawnActorFacing(varValue(LEAD_ACTOR_VAR), 13, 5, 0, 2);
+		respawnActorFacing(3, 14, 6, 0, 4);
+		respawnActorFacing(4, 12, 6, 0, 6);
+		respawnActorFacing(5, 13, 7, 0, 8);
+	};
+
+	// Replaces (4x): data/CommonEvents.json:common-event:307, :311, :317, :320
+	lockMonsterSymbolRoute = function () {
+		for (let eventId = 200; eventId > 0; eventId--) {
+			const mapEvent = $gameMap.event(eventId);
+			if (!mapEvent) continue;
+			if (!mapEvent.event().meta['MonsterSymbol']) continue;
+			mapEvent.forceMoveRoute({
+				list: [
+					{ code: 15, parameters: [600] },
+					{ code: 0 },
+				],
+				repeat: true,
+				skippable: true,
+			});
+		}
 	};
 
 	// Replaces (1x): data/Map100.json:map-event:11:page:1
 	spendGoldForClass3JobMaterial = function () {
-		$gameParty.loseGold(100000);
-		for (var itemId2 = 1; itemId2 <= $dataItems.length-1; itemId2++) {
-		if($dataItems[itemId2].meta['クラス3ジョブ解放素材']){
-		var item2 = itemId2;
-		break;
-		}};
-		$gameParty.loseItem($dataItems[item2], 1);
+		spendGoldForJobMaterial(100000, 'クラス3ジョブ解放素材');
 	};
 
 	// Replaces (1x): data/Map100.json:map-event:11:page:1
 	spendGoldForClass2JobMaterial = function () {
-		$gameParty.loseGold(10000);
-		for (var itemId2 = 1; itemId2 <= $dataItems.length-1; itemId2++) {
-		if($dataItems[itemId2].meta['クラス2ジョブ解放素材']){
-		var item2 = itemId2;
-		break;
-		}};
-		$gameParty.loseItem($dataItems[item2], 1);
+		spendGoldForJobMaterial(10000, 'クラス2ジョブ解放素材');
 	};
 
+	// Replaces (8x): data/CommonEvents.json:common-event:47, data/CommonEvents.json:common-event:166, data/CommonEvents.json:common-event:173, data/CommonEvents.json:common-event:174, data/CommonEvents.json:common-event:176, data/CommonEvents.json:common-event:183, …
+	// Turns the visual-novel choice window off during a cutscene.
+	disableVisualNovelChoices = function () {
+		setVisualNovelChoices(false);
+	};
+
+	// Replaces (10x): data/CommonEvents.json:common-event:66, data/CommonEvents.json:common-event:173, data/CommonEvents.json:common-event:183, data/CommonEvents.json:common-event:192, data/CommonEvents.json:common-event:203, data/CommonEvents.json:common-event:237, …
+	// Turns the visual-novel choice window back on.
+	enableVisualNovelChoices = function () {
+		setVisualNovelChoices(true);
+	};
 
 })();
