@@ -8470,4 +8470,9492 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		setVisualNovelChoices(true);
 	};
 
+
+	// Replaces (1x): CommonEvents.json:common-event:1|共通設定
+	appendToVariable250 = function () {
+		var aaa = $gameVariables.value(250);
+		aaa.push(`[11]`);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
+	configureSystem = function () {
+		$dataSystem.optSideView = true;
+		$dataSystem.optSideView = false;
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
+	spawnEvent = function () {
+		var value1 = $gamePlayer._realX;
+		var value2 = $gamePlayer._realY+10;
+		$gameMap.spawnEvent(146, value1, value2, true);
+		valueCountSet1 = $gameMap.getLastSpawnEventId();
+		var event = $gameMap.event(valueCountSet1);
+		event.startOpacity(60,255);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
+	readVariable20 = function () {
+		var actor = $gameActors.actor($gameVariables.value(20));
+		var value1 = $gamePlayer._realX;
+		var value2 = $gamePlayer._realY;
+		$gameMap.spawnEvent(147, value1, value2, true);
+		valueCountSet2 = $gameMap.getLastSpawnEventId();
+		var event = $gameMap.event(valueCountSet2);
+		event.startOpacity(100,255);
+		event.setImage(actor.characterName(), actor.characterIndex());
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
+	particleGroupSetShrineC = function (interp) {
+		return (function () {
+		var value1 = 'shrine_c';
+		$gameScreen._particle.particleGroupSet(this._eventId,value1,'this');
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
+	particlePlayMonsterCp = function (interp) {
+		return (function () {
+		var value1 = 'monster_cp';
+		$gameScreen._particle.particlePlay(this._eventId,value1,'this','def','above');
+		$gameScreen._particle.particleUpdate([value1,'color','#44ddff','ffffff']);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
+	particleClearShrineC = function (interp) {
+		return (function () {
+		var value1 = 'shrine_c';
+		$gameScreen._particle.particleClear(value1);
+		var value1 = 'chant_b3';
+		$gameScreen._particle.particleGroupPlay(this._eventId,value1,'this');
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
+	particlePlayAureoleC = function (interp) {
+		return (function () {
+		var value1 = 'aureole_c';
+		$gameScreen._particle.particlePlay(this._eventId,value1,'this','def','above');
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
+	event = function () {
+		var event = $gameMap.event(valueCountSet1);
+		event.startOpacity(60,0);
+		var event = $gameMap.event(valueCountSet2);
+		event.startOpacity(60,0);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
+	setSelfVariable20 = function (interp) {
+		return (function () {
+		this.sVal(20,1);
+		var actor = $gameActors.actor($gameVariables.value(20));
+		actor.setSubclass(42);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
+	startGabWindowNone = function () {
+		var scene = SceneManager._scene;
+		if (scene._gabWindow) scene.clearGabWindow();
+		var gabData = [`あああ`,'none','',0,'',0];
+		if (scene._gabWindow) scene.startGabWindow(gabData);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
+	readVariable121List = function (interp) {
+		return (function () {
+		this.character($gameVariables.value(121)).forceMoveRoute({
+		"list":[
+		{"code":36},{"code":37},{"code":29, "parameters":[$gameVariables.value(122)]},
+		{"code":29, "parameters":[$gameVariables.value(123)]},
+		{ "code": 45, "parameters": ["this.requestAnimation($gameVariables.value(124));"] },
+		{ "code": 45, "parameters": ["this.jumpEx($gameVariables.value(125),$gameVariables.value(126),$gameVariables.value(127),$gameVariables.value(128));"] },
+		{"code":25},{"code":32},{"code":34},{"code":35},
+		{ "code": 45, "parameters": ["this.setAngle($gameVariables.value(129));"] },
+		{"code":0}],"repeat":false,"skippable":true});
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
+	transformVariable17 = function () {
+		$gameVariables._data.map(function(v,i){return [v,i]}).
+		slice(1,5).filter(function(v){return v[0]!==undefined}).sort(function(a,b){return b[0]-a[0]})
+		//変数1~4の順番を変数17に代入した場合
+		//1位は $gameVariables.value(17)[0][1]
+		//2位は $gameVariables.value(17)[1][1]
+		//3位は $gameVariables.value(17)[2][1]
+		//4位は $gameVariables.value(17)[3][1]
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
+	split = function () {
+		const obj1 = $dataEnemies[Number(value2.split(',')[0])];
+		$dataEnemies[i+10] = Object.assign({}, obj1);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
+	setSelfVariable5223 = function (interp) {
+		return (function () {
+		var array = $dataActors[$gameVariables.value(20)].meta['戦闘3連撃時'].split(',')
+		this.sVal(522, array[getRandomIndex(array.length)]);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
+	setSelfVariable20_2 = function (interp) {
+		return (function () {
+		var battler = BattleManager._subject;
+		var action = battler._actions[0];
+		//action.isForOpponent() // 対象が敵の時true、仲間や自分など味方の時ははfalse
+		//action._targetIndex // 対象のインデックス。敵味方ともに0から始まる。-1の時はランダムターゲット
+		//action._item // 行動の種類。Game_Item クラスのオブジェクト。
+		this.sVal(20,$gameParty.members()[action._targetIndex]);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
+	iterateSkills = function () {
+		var action = BattleManager._action;
+		//if(action.isSkill()){
+		//var value1 = $dataSkills[action._item._itemId].stypeId;
+		//if(value == 1){
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
+	setSelfVariable20_3 = function (interp) {
+		return (function () {
+		var value = BattleManager._subject._lastTargetIndex;
+		this.sVal(20,$gameParty.members()[value].actorId());
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
+	configureMap = function () {
+		$dataMap.battleback1Name
+		$dataMap.displayName
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
+	traceDebugOutput = function () {
+		console.log(array[getRandomIndex(array.length)]);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
+	iterateItemsShowInfo = function (interp) {
+		return (function () {
+		value = $dataItems[$gameVariables.value(21)].name;
+		value1 = `${value}を入手した。`
+		var args = new Array( String(value1) ); 
+		this.pluginCommand("ShowInfo", args);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
+	configureMapBGM = function () {
+		var array = $dataMap.meta['BGM'].split(',');
+		AudioManager.playBgm({name:array[array.length - 4],volume:array[1],pitch:array[2],pan:array[3]})
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
+	forEachArray = function (interp) {
+		return (function () {
+		value = 460;
+		var list = [61,67,70,81,82,83,84,85,86,88];
+		list.forEach(function(id) {
+		this.sVal(value+id,0);
+		}, this);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
+	iterateMapEventsTest = function () {
+		var eventName = "test";
+		var variableId = 1;
+		var regionId = 3;
+		var num = $gameMap.events().filter(function(event){
+		    return event.event().name === eventName
+		        && event.regionId() === regionId;
+		}).length;
+		$gameVariables.setValue(variableId, num);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
+	iterateSkills2 = function () {
+		var start = 701;
+		var end = 800;
+		for (var i = start; i <= end; i++) {
+		$gameVariables.setValue($gameVariables.value(i),$dataSkills[i-600].description);
+		}
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
+	setVariable20 = function () {
+		var array = [
+		1,2,3,4,5,6];
+		$gameVariables.setValue(20, array[2]);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
+	setSelfVariable21 = function (interp) {
+		return (function () {
+		this.sVal(21,$gameParty._actors);
+		var array = $gameVariables.value(21);
+		$gameVariables.setValue(20, array[getRandomIndex(array.length)]);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
+	iteratePartyActors = function () {
+		$gameParty._actors = [];
+		$gamePlayer.refresh();
+		$gameMap.requestRefresh();
+
+		$gameParty._actors = $gameParty._lastActors;
+		$gamePlayer.refresh();
+		$gameMap.requestRefresh();
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:4|条件分岐
+	iterateItemsWarpPoint = function () {
+		var arr1 = $dataItems[$gameVariables.value(240)].meta['warpPoint' + $gameVariables.value(21)].split(',');
+		var arr2 = [Number(arr1[0]),Number(arr1[1]),Number(arr1[2])];
+		if(arr2[0] == arr3[0] && arr2[1] == arr3[1] && arr2[2] == arr3[2]){
+
+
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:4|条件分岐
+	iterateSkills3 = function (interp) {
+		return (function () {
+		var value1 = 0;
+		for (var i = 0; i < this._actor.unlockedClasses().length; ++i) {
+		if(this._actor.unlockedClasses()[i] == Number($dataSkills[skill.id].meta.SkillLearningClass)){
+		var value1 = 1;
+		break;
+		};
+		};
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:4|条件分岐
+	iterateTroopMembers = function () {
+		for (var i = 0; i < $gameTroop.members().length; i++) {
+		var enemy = $gameTroop.members()[i];
+		if (enemy.isStateAffected(234)) {
+		enemy.startAnimation(160, false, 0);
+		}};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:4|条件分岐
+	iteratePartyMembers = function () {
+		for (var i = 0; i < $gameParty.battleMembers().length; i++) {
+		var actor = $gameParty.battleMembers()[i];
+		if (actor.isStateAffected(234)) {
+		actor.startAnimation(160, false, 0);
+		}};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:4|条件分岐
+	setSelfVariable20_4 = function (interp) {
+		return (function () {
+		this.sVal(20,1);
+		var actor = $gameActors.actor($gameVariables.value(20));
+		var list = actor.actor().traits;
+		list.forEach(function(id) {
+		console.log(id);
+		}, this);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:4|条件分岐
+	iterateSkills4 = function (interp) {
+		return (function () {
+		$dataSkills[skill_Id].stypeId
+
+		if (target.result().isHit() && this.isPhysical() && this.item().stypeId !== 1) {
+		  target.startAnimation(61);
+		}
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:4|条件分岐
+	iterateSkills5 = function () {
+		var start = 1;
+		var end = $dataSkills.length-1;
+		//for (var i = start; i <= end; i++) {
+		//-1をしないとスキル上限+1まで範囲にしてしまいエラーが出る為
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:4|条件分岐
+	iterateItemsEIC = function () {
+		value = $dataItems[$gameVariables.value(19)];
+		if($gameParty.hasItem(value)){
+		    $gameParty.gainItem(value, 1);
+		};
+		value3 = Number($dataItems[i].meta['EICスイッチ']);
+		//if($gameParty.hasItem($dataItems[value7])){
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:4|条件分岐
+	setSelfSwitch = function (interp) {
+		return (function () {
+		for (var id = $gameMap.events().length; id > 0; id--) {
+		  if ($gameMap.event(id).event().note.match("[HOGE]")) {
+		    var mapID = this._mapId;
+		    $gameSelfSwitches.setValue([mapID, id, "B"], true);
+		  }
+		}
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
+	concatArray = function () {
+		var arr1 = arr1.concat(arr2);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
+	setSwitch161 = function () {
+		var value1 = 502
+		if($gameSwitches.value(value1+600-1) && !$gameSwitches.value(value1+600)){
+		  $gameSwitches.setValue(161,true);
+		  valueCountSet1 = value1;
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
+	readVariable292Goods4 = function (interp) {
+		return (function () {
+		var value2 = $gamePlayer._realX;
+		var value3 = $gamePlayer._realY;
+		if($gamePlayer.direction() == 2){value3 += 1};
+		if($gamePlayer.direction() == 4){value2 -= 1};
+		if($gamePlayer.direction() == 6){value2 += 1};
+		if($gamePlayer.direction() == 8){value3 -= 1};
+		goodsEvent_respawn(0,'Goods4',6,6,2,value2,value3);
+		this._eventId = $gameVariables.value(292)[0];
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
+	readVariable292StatueOrbC = function (interp) {
+		return (function () {
+		var value1 = 'statue_orb_c'+'-'+this._eventId;
+		$gameScreen._particle.particleClear(value1);
+		if(!!$gameMap.event(this._eventId)) {
+		  $gameMap.eraseEvent(this._eventId);
+		};
+		$gameVariables.value(292)[0] = 0;
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
+	mapArray = function () {
+		var arr1 = [...Array(100)].map((_, i) => i + 101);
+		console.log(`${arr1}`);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
+	iterateStates = function () {
+		var value2 = `${user.name()}の${$dataStates[stateId].name}が解除！ 蓄積ダメージ\\C[10]${value1}\\C[0]を受けた…`;
+		BattleManager._logWindow.push(`addText`, value2);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
+	findIndexArray = function () {
+		var value3 = array2[getRandomIndex(array2.length)];//ID
+		var index = array2.findIndex(array2 => array2 == value3); 
+		if(index >= 0){
+		  array2.splice(index, 1);
+		}
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
+	setScreenDTextPicture = function () {
+		$gameScreen.clearZoom();
+		$gameScreen.setDTextPicture(value1, 28);
+		$gameScreen.dWindowFrame = 'ON';
+		$gameScreen.dTextRealTime = 'ON';
+		$gameScreen.dTextAlign = 1;//中央
+		var value1 = 100;
+		var value2 = '';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
+	handleScriptSnippet = function (interp) {
+		return (function () {
+		this._eventId
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
+	setSelfVariable20_5 = function (interp) {
+		return (function () {
+		this.sVal(20,1);
+		var actor = $gameActors.actor($gameVariables.value(20));
+		if(actor.meetsSkillConditions($dataSkills[201])){
+		$gameVariables.setValue(22,10);
+		} else {
+		$gameVariables.setValue(22,20);
+		};
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
+	filterArray = function () {
+		//arr3から重複を削除してarr4に渡す
+		arr4 = arr3.filter(function(val, i, array){
+		  return (array.indexOf(val) === i);
+		});
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
+	max = function () {
+		var array = [1,3,5,8];
+		var value1 = Math.max(...array);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
+	setSelfVariable21_2 = function (interp) {
+		return (function () {
+		var arr1 = [1,2,3,4];
+		var arr2 = [5,6,7,8];
+		arr1.push(arr2);
+		this.sVal(21,arr1);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
+	value = function () {
+		var value3 = actor.name().length;
+		var value5 = 6 - value3;
+		if(value5 <= -1){value5 = 0};
+		for (var j = 0; j <= value5; j++) {
+		$gameVariables.value(id1)[i] += `　`;
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
+	iterateItemsValueDanjonTreasure = function () {
+		var arr1 = $dataItems[i].meta['宝箱'].split(',');
+		var arr2 = $dataItems[i].meta['宝箱種類'].split(',');
+		eval("valueDanjonTreasure" + i +" = arr1");
+		eval("valueDanjonTrSyurui" + i +" = arr2");
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
+	readVariable189PAINIT = function (interp) {
+		return (function () {
+		var args = new Array(String($gameVariables.value(189)),"1","横",String($gameVariables.value(680)));
+		this.pluginCommand("PA_INIT", args);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
+	iterateItems = function () {
+		var value1 = $dataItems[id3].meta['性欲アイテム判定'].split(',');
+		$gameVariables.setValue(Number(value1[0]),Number(value1[1]));
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
+	gainItem = function () {
+		var items = $gameTroop.makeDropItems();  //戦闘不能敵キャラのドロップ品
+		items = $gameTroop.aliveMembers().reduce(function(r, enemy) {  //生存中の敵キャラドロップの追加
+		  return r.concat(enemy.makeDropItems());
+		}, items);
+		items.forEach(function(item) {
+		  $gameParty.gainItem(item, 1);
+		});
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
+	handleScriptSnippet2 = function () {
+		var arr = [10,30,40,50];
+		var value1 = arr[getRandomIndex(arr.length)];
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
+	setSelfVariable21_3 = function (interp) {
+		return (function () {
+		var arr = [1,2,3,4,5];
+		arr.push(6,7,8,9,10);
+		var value = arr[getRandomIndex(arr.length)];
+		this.sVal(21,value);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
+	iterateItemsLV = function () {
+		var actor = $gameActors.actor($gameVariables.value(11));
+		var value = $dataItems[$gameVariables.value(240)];
+		var array = value.meta['エネミーLV'].split(',');
+		var max = array.reduce(function(a,b){  
+		var value1 = Math.max(a,b);
+		});
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:6|アップデート時に実行コモン
+	setSelfVariable326 = function (interp) {
+		return (function () {
+		//クエスト用配列
+		this.sVal(326,Array(2001).fill(0));//クエスト達成用アイテムごと表示用配列
+		this.sVal(344,Array(151).fill(0));//達成条件の内容のみ
+		for(var i = 357; i <= 360; i++){this.sVal(i,Array(151).fill(0))};
+		//357クエスト解説アイテム用358クエスト解説359クエスト発生360クエスト達成
+		//1～100が通常クエスト、101～140がデイリークエスト
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:8|ピクチャ並列3
+	shakePicture = function () {
+		valueShakeArr2 = valueShakeArr1;
+		var arr1 = [valueShakeArr2[1],valueShakeArr2[1]+0.1,valueShakeArr2[1]+0.2,valueShakeArr2[1]+0.3,valueShakeArr2[1]+0.4,valueShakeArr2[1]+0.5];
+		valueShakeArr2[1] = arr1[getRandomIndex(arr1.length)];
+		$gameScreen.shakePicture(valuePic1, valueShakeArr2[1], valueShakeArr2[2], valueShakeArr2[3], Infinity);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:8|ピクチャ並列3
+	wait = function (interp) {
+		return (function () {
+		valueShakeArr2 = valueShakeArr1;
+		if(valueShakeArr2[4] >= 1){
+		  var value1 = getRandomIndex(11) - 6;
+		  this.wait(valueShakeArr2[4] + value1);
+		};
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:9|スタート＆リセット兼用
+	iterateWeapons = function (interp) {
+		return (function () {
+		var list = $gameVariables.value(248);
+		list.forEach(function(id) {
+		    $dataWeapons[id+200].name = $gameVariables.value(id+380)[50]; 
+		}, this);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:9|スタート＆リセット兼用
+	setVariable211 = function () {
+		$gameVariables.setValue(211,Array(101).fill(0));
+		for(var i = 0; i <= 100; i++){$gameVariables.value(211)[i] = [0,0,0,0,0,0,0,0,0,0,0]};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:9|スタート＆リセット兼用
+	iterateItemsSG = function () {
+		var start = 1;
+		var end = $dataItems.length-1;
+		for (var i = start; i <= end; i++) {
+		  if($dataItems[i].meta['SG種別']){
+		    if(Number($dataItems[i].meta['SG種別']) == 2){
+		      if($dataItems[i].meta['Tchest']){
+		        $gameVariables.value(215)[i] = $dataItems[i].meta['Tchest'].split(',');
+		        $gameVariables.value(216)[i] = $dataItems[i].meta['TchestType'].split(',');
+		      } else {
+		        $gameVariables.value(215)[i] = [];
+		        $gameVariables.value(216)[i] = [];
+		}}}};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:10|初期解説コモン1
+	handleScriptSnippet3 = function () {
+		valueStartCommentary1 = 0;
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:10|初期解説コモン1
+	handleScriptSnippetDescriptionSubClass = function () {
+		var value1 = `サブジョブ毎のスタータス上昇率一覧\n`;
+		for (var i = 51; i <= 60; i++) {
+		  value1 += `${valueClassGrowStatasComparison[i]}\n`;
+		};
+		start_commentary(0,'サブジョブについて','Description_SubClass',
+		`キャラ事に存在する＜メインジョブ＞とは別に設定できるジョブ。
+		拠点に設置されている「オーブ」を利用する事で新たなサブジョブを解放できる。
+		解放にはコストが掛かる。`,
+		'Dpic',`${value1}`,'Npic','Nda');
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:10|初期解説コモン1
+	iterateStatesMenuSubComand = function (interp) {
+		return (function () {
+		var value1 = ``;
+		var list = $gameVariables.value(205);
+		list.forEach(function(id) {
+		value1 += `\x1bI[${$dataStates[id].iconIndex}]${$dataStates[id].name} `
+		}, this);
+		start_commentary(0,'一部制限について','MenuSubComand',
+		`メニュー画面から開ける「クエストリスト」「ダンジョン情報」は、
+		特定ステートが付与されている場合、開けなくなります。
+		[${value1}]`,
+		'Npic',`Nda`,'Npic',`Nda`);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:11|リセット時コモン
+	readVariable75 = function () {
+		for(var i = $gameVariables.value(75); i <= $gameVariables.value(76); i++)
+		{$gameActors.actor(i).forgetSkill(18)}
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:11|リセット時コモン
+	readVariable20_2 = function () {
+		for (var i = 101; i <= 200; i++) {
+		  $gameVariables.value(360+$gameVariables.value(20))[i] = 0
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:11|リセット時コモン
+	removeState = function (interp) {
+		return (function () {
+		var list = $gameVariables.value(205);
+		list.forEach(function(id) {
+		var actor = $gameActors.actor($gameVariables.value(20));
+		actor.removeStateCounter(id);
+		actor.removeState(id);
+		}, this);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:11|リセット時コモン
+	setVariableValue = function () {
+		for(var i = 1; i <= 200; i++){
+		$gameSelfSwitches.setVariableValue([(i), 2, 1], 0);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:12|ゲームスタート時コモン
+	readVariable75_2 = function () {
+		var start = $gameVariables.value(75);
+		var end = $gameVariables.value(76);
+		for (var i = start; i <= end; i++) {
+		actor_StartSetUp(i);
+		production_separateSetProfile(i);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:12|ゲームスタート時コモン
+	transformVariable247 = function (interp) {
+		return (function () {
+		var list = $gameVariables.value(247);
+		list.forEach(function(id) {
+		hstates_heights(id,253);
+		}, this);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:14|ピクチャ並列2
+	wait2 = function (interp) {
+		return (function () {
+		if(valuePicWait2 >= 1){
+		  var value1 = getRandomIndex(11) - 6;
+		  this.wait(valuePicWait2 + value1);
+		};
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:14|ピクチャ並列2
+	wait3 = function (interp) {
+		return (function () {
+		if(valuePicWait2 >= 1){
+		  var value1 = getRandomIndex(valuePicWait2);
+		  this.wait(valuePicWait2 - value1);
+		};
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:17|ピクチャ並列1
+	handleScriptSnippet4 = function () {
+		var arr = pic_setArray1;
+		pic_setArray(arr[0],arr[1],arr[2],arr[3],arr[4],arr[5]);
+		if(valueParallelPic1 >= 1){pic_setArrayParallel1(valueParallelPic1)};
+		if(valueParallelPic2 >= 1){pic_setArrayParallel1(valueParallelPic2)};
+		if(valueParallelPic3 >= 1){pic_setArrayParallel1(valueParallelPic3)};
+		if(valueParallelPic4 >= 1){pic_setArrayParallel1(valueParallelPic4)};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:17|ピクチャ並列1
+	handleScriptSnippet5 = function () {
+		var arr = pic_setArray2;
+		if(arr[1] >= 1){
+		  pic_setArray(arr[0],arr[1],arr[2],arr[3],arr[4],arr[5]);
+		  if(valueParallelPic1 >= 1){pic_setArrayParallel1(valueParallelPic1)};
+		  if(valueParallelPic2 >= 1){pic_setArrayParallel1(valueParallelPic2)};
+		  if(valueParallelPic3 >= 1){pic_setArrayParallel1(valueParallelPic3)};
+		  if(valueParallelPic4 >= 1){pic_setArrayParallel1(valueParallelPic4)};
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:17|ピクチャ並列1
+	playSeName = function () {
+		var arr1 = valueParallelPicSe2;
+		if(arr1[0] != 0){
+		  var value1 = getRandomIndex(11) + Number(arr1[1]);
+		  var value2 = getRandomIndex(21) + Number(arr1[2]);
+		  AudioManager.playSe({"name":arr1[0],"volume":value1,"pitch":value2,"pan":0});
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:17|ピクチャ並列1
+	wait4 = function (interp) {
+		return (function () {
+		var arr = pic_setArray2;
+		if(arr[1] >= 1){
+		  if(valuePicWait >= 1){
+		    //var value1 = getRandomIndex(10) + 1;
+		    this.wait(valuePicWait);
+		  };
+		};
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:17|ピクチャ並列1
+	movePicture = function (interp) {
+		return (function () {
+		var value1 = 53;
+		$gameScreen.movePicture(value1+2,1,640-128,384+20,100,100,240,0,120);
+		this.wait(110);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:17|ピクチャ並列1
+	movePicture2 = function (interp) {
+		return (function () {
+		var value1 = 53;
+		$gameScreen.movePicture(value1+2,1,640-128,384-20,100,100,240,0,120);
+		this.wait(110);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:17|ピクチャ並列1
+	movePicture3 = function (interp) {
+		return (function () {
+		var value2 = getRandomIndex(41) + 160;
+		var value3 = getRandomIndex(21) + 40;
+		var value1 = 53;
+		$gameScreen.movePicture(value1+2,1,640+value3-128,384,100,100,240,0,value2);
+		this.wait(value2-10);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:17|ピクチャ並列1
+	movePicture4 = function (interp) {
+		return (function () {
+		var value2 = getRandomIndex(41) + 160;
+		var value3 = getRandomIndex(21) + 40;
+		var value1 = 53;
+		$gameScreen.movePicture(value1+2,1,640-value3-128,384,100,100,240,0,value2);
+		this.wait(value2-10);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:18|イベントシーン開始
+	handleScriptSnippet6 = function () {
+		valueTachieBless = [100,100,250,0.004,0.003];//立ち絵用息遣い設定。基本状態
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:18|イベントシーン開始
+	iteratePartyMembers2 = function (interp) {
+		return (function () {
+		//現在衣装を別変数配列に一時代入
+		//統合衣装用の0も含める。（代入変数を利用しなくていい為可能）
+		var list = $gameVariables.value(247);
+		list.forEach(function(id) {
+		  var actor = $gameActors.actor(id);
+		    //if($gameParty.members().contains(actor)){
+		      var start = 0; var end = 42;
+		      for (var i = start; i <= end; i++) {
+		        $gameVariables.value(id+540)[i] = $gameVariables.value(id+440)[i]
+		    };
+		}, this);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:21|初期解説コモン2
+	readVariable19 = function () {
+		var value9 = 150+valueStartCommentary1+$gameVariables.value(19);
+		$gameScreen.erasePicture(value9);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:21|初期解説コモン2
+	showPicture201Dpic = function () {
+		if(valueStartCommentary2P[$gameVariables.value(19)] == 0){}else{
+		  if(valueStartCommentary2P[$gameVariables.value(19)] == 'Dpic'){
+		    var value9 = '';var value10 = 100;var value11 = 134;
+		    $gameScreen.setDTextPicture(valueStartCommentary2[$gameVariables.value(19)], 28);
+		    $gameScreen.dWindowFrame = 'ON';
+		  } else {
+		    var value9 = '/img/tips/' + valueStartCommentary2P[$gameVariables.value(19)];
+		    var value10 = 0;var value11 = 334;
+		  };
+		$gameScreen.showPicture(201,value9,0,value11,0+50,100,100,0,0);
+		$gameScreen.movePicture(201,0,value11,value10,100,100,255,0,30);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:21|初期解説コモン2
+	queueMessageDpic = function (interp) {
+		return (function () {
+		if(valueStartCommentary2[$gameVariables.value(19)] == 0){}else{
+		  if(valueStartCommentary2P[$gameVariables.value(19)] == 'Dpic'){
+		    var variable19Value = '';
+		  } else {
+		    var variable19Value = valueStartCommentary2[$gameVariables.value(19)];
+		  };
+		$gameMessage.newPage();
+		$gameMessage.add(variable19Value);
+		this.setWaitMode('message');
+		};
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:21|初期解説コモン2
+	showPicture202Dpic = function () {
+		if(valueStartCommentary3P[$gameVariables.value(19)] == 0){}else{
+		  if(valueStartCommentary3P[$gameVariables.value(19)] == 'Dpic'){
+		    var value9 = '';var value10 = 100;var value11 = 134;
+		    $gameScreen.setDTextPicture(valueStartCommentary3[$gameVariables.value(19)], 28);
+		    $gameScreen.dWindowFrame = 'ON';
+		  } else {
+		    var value9 = '/img/tips/' + valueStartCommentary3P[$gameVariables.value(19)];
+		    var value10 = 0;var value11 = 334;
+		  };
+		$gameScreen.showPicture(202,value9,0,value11,0+50,100,100,0,0);
+		$gameScreen.movePicture(202,0,value11,value10,100,100,255,0,30);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:21|初期解説コモン2
+	queueMessageDpic2 = function (interp) {
+		return (function () {
+		if(valueStartCommentary3[$gameVariables.value(19)] == 0){}else{
+		  if(valueStartCommentary3P[$gameVariables.value(19)] == 'Dpic'){
+		    var variable19Value = '';
+		  } else {
+		    var variable19Value = valueStartCommentary3[$gameVariables.value(19)];
+		  };
+		$gameMessage.newPage();
+		$gameMessage.add(variable19Value);
+		this.setWaitMode('message');
+		};
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:22|宿泊時コモン
+	iterateItemsBedPattern = function () {
+		var value1 = $gamePlayer._realX;
+		var value2 = $gamePlayer._realY;
+		var value3 = 148;
+		if($gameVariables.value(230) >= 1){var valueItems = $dataWeapons[$gameVariables.value(230)]};
+		if($gameVariables.value(240) >= 1){var valueItems = $dataItems[$gameVariables.value(240)]};
+		if($dataMap.meta['BedPattern']){var valueItems = $dataMap};
+		if(valueItems.meta['BedPattern']){
+		  var value3 = Number(valueItems.meta['BedPattern']);
+		};
+		$gameMap.spawnEvent(value3, value1, value2+1, true);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:22|宿泊時コモン
+	setSelfVariable539 = function (interp) {
+		return (function () {
+		var list = $gameVariables.value(247);
+		list.forEach(function(id) {
+		  var actor = $gameActors.actor(id);
+		  if([84,85,86].some(function(i){return actor.isStateAffected(i)})){
+		    if(actor.battleSkillsRaw().includes(864)){
+		      this.sVal(539,`\x1bSIN[${864}]発動！ ${actor.name()}は汚れを放置した。\n`);this.sVal(540,$gameVariables.value(540) + 1);
+		    } else {
+		      actor.removeState(84);actor.removeState(85);actor.removeState(86);
+		      this.sVal(539,`${actor.name()}は汚れを洗い流した。\n`);this.sVal(540,$gameVariables.value(540) + 1);
+		    };
+		  };
+		}, this);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:24|一日経過時コモン
+	readVariable75_3 = function () {
+		  var start = $gameVariables.value(75);
+		  var end = $gameVariables.value(76);
+		  for(var id1 = start; id1 <= end; id1++){
+		    var actor = $gameActors.actor(id1);
+		    if(actor.isLearnedSkill(18)){
+		      Profession_basicReturn(id1);
+		  }};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:24|一日経過時コモン
+	readVariable52 = function () {
+		$gameVariables.value(52)[1] =  0;//当日魔物討伐数
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:24|一日経過時コモン
+	setSelfVariable540 = function (interp) {
+		return (function () {
+		for (var j = $gameVariables.value(75); j <= $gameVariables.value(76); j++) {
+		  var actor = $gameActors.actor(j);
+		  if(actor.isStateAffected(61)){
+		    actor.removeState(61);$gameVariables.value(380+j)[2] = 0;var value1 = getRandomIndex(6) + 5;
+		    if(actor.isLearnedSkill(63)){
+		      this.sVal(540,$gameVariables.value(540) + 2);$gameVariables.value(380+j)[13] += 1;$gameVariables.value(380+j)[1] += value1;
+		      this.sVal(539,$gameVariables.value(539) + `${actor.name()}は自分を慰めた…。${$dataStates[61].name}が解除された。\n\\c[27][性欲度+${value1}] [自慰回数+1]\\C[0]`);
+		    } else {
+		      this.sVal(539,$gameVariables.value(539) + `${actor.name()}の${$dataStates[61].name}が解除された。\n`);
+		      this.sVal(540,$gameVariables.value(540) + 1);
+		}}};
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:24|一日経過時コモン
+	setSelfVariable539DayRemove = function (interp) {
+		return (function () {
+		for (var i = 1; i <= $dataStates.length-1; i++) {
+		  if($dataStates[i].meta['dayRemove']){
+		    if($gameParty.membersState(i)){
+		      for (var j = $gameVariables.value(75); j <= $gameVariables.value(76); j++) {
+		        var actor = $gameActors.actor(j);
+		        if(actor.isStateAffected(i)){
+		          actor.removeState(i);
+		      }};
+		      this.sVal(539,$gameVariables.value(539) + `${$dataStates[i].name}が解除された。\n`);
+		      this.sVal(540,$gameVariables.value(540) + 1);
+		}}};
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:24|一日経過時コモン
+	iterateSystemSwitchesDaysOnSwi = function () {
+		for (var i = 1; i <= $dataSystem.switches.length-1; i++) {
+		  if($dataSystem.switches[i].match(/daysOnSwi/)){
+		    if($gameSwitches.value(i)){
+		      var value1 = $dataSystem.switches[i].replace(/[^0-9]/g, "");
+		      $gameSwitches.setValue(value1,true);
+		  }};
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:24|一日経過時コモン
+	iterateSystemSwitchesDaysOnVal = function () {
+		for (var i = 1; i <= $dataSystem.switches.length-1; i++) {
+		  if($dataSystem.switches[i].match(/daysOnVal+/)){
+		    if($gameSwitches.value(i)){
+		      var value1 = $dataSystem.switches[i].replace(/[^0-9]/g, "");
+		      $gameVariables.setValue(value1,$gameVariables.value(value1) + 1);
+		  }};
+		  if($dataSystem.switches[i].match(/daysOnVal-/)){
+		    if($gameSwitches.value(i)){
+		      var value1 = $dataSystem.switches[i].replace(/[^0-9]/g, "");
+		      $gameVariables.setValue(value1,$gameVariables.value(value1) - 1);
+		  }};
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:24|一日経過時コモン
+	iterateSystemSwitchesDaysReset = function () {
+		for (var i = 1; i <= $dataSystem.switches.length-1; i++) {
+		  if($dataSystem.switches[i].match(/daysReset/)){
+		    $gameSwitches.setValue(i,false);
+		}};
+		for (var i = 1; i <= $dataSystem.variables.length-1; i++) {
+		  if($dataSystem.variables[i].match(/daysReset/)){
+		    $gameVariables.setValue(i,0);
+		}};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:24|一日経過時コモン
+	iterateItems2 = function () {
+		for (var i = 1001; i <= 1100; i++) {
+		  $gameParty.loseItem($dataItems[i], 9999);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:24|一日経過時コモン
+	iterateItemsExpiryDate = function () {
+		for (var i = 1; i <= $dataItems.length-1; i++) {
+		  if($dataItems[i].meta['ExpiryDate']){
+		    if($gameParty.hasItem($dataItems[i],true)){
+		      $gameParty.loseItem($dataItems[i], 9999);
+		    };
+		  };
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:24|一日経過時コモン
+	iterateItemsSkillCost1week = function () {
+		for (var i = 1; i <= $dataItems.length-1; i++) {
+		  if($dataItems[i].meta['SkillCost1week']){
+		    $gameParty.gainItem($dataItems[i], 1);
+		  };
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:24|一日経過時コモン
+	addState = function (interp) {
+		return (function () {
+		var list = $gameVariables.value(248);
+		list.forEach(function(id) {
+		  if($gameVariables.value(380 + id)[71] >= 1){
+		    if(!$gameActors.actor(id).battleSkillsRaw().includes(847)){
+		      $gameActors.actor(id).addState(67);
+		  };
+		  };
+		}, this);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:24|一日経過時コモン
+	transformVariable248 = function (interp) {
+		return (function () {
+		var list = $gameVariables.value(248);
+		list.forEach(function(id) {
+		  $gameVariables.value(380 + id)[71] =  0;
+		}, this);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:24|一日経過時コモン
+	handleScriptSnippet7 = function () {
+		$gameSystem._infoLog = [];
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:25|一日始まり時コモン
+	setSwitch474 = function () {
+		for (var i = 1; i <= $dataSystem.switches.length-1; i++) {
+		  if($dataSystem.switches[i].match(/夜自動/)){
+		    if($gameSwitches.value(i) && !$gameSwitches.value(i+2)){
+		      $gameSwitches.setValue(474,true);
+		      $gameSwitches.setValue(i+1,true);
+		      break;
+		}}};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:25|一日始まり時コモン
+	playSeChime2 = function () {
+		AudioManager.playSe({"name":'Chime2',"volume":90,"pitch":100,"pan":0});
+		var value1 = 'text_dispray2';
+		$gameScreen._particle.particleClear(value1);
+		$gameScreen._particle.particlePlay(0,value1,'screen','def','screen');
+		$gameScreen._particle.particleExceed(value1,0.3);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:25|一日始まり時コモン
+	showPicture74 = function () {
+		var value1 = `──\\V[58]日目(\\V[55]曜日)──`;
+		$gameScreen.setDTextPicture(value1, 28);
+		$gameScreen.dTextAlign = 0;
+		$gameScreen.dWindowFrame = 'ON';
+		$gameScreen.showPicture(74,"",0,-100,100,100,100,0,0);
+		$gameScreen.movePicture(74,0,50,100,100,100,255,0,60);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:25|一日始まり時コモン
+	setSelfVariable21_4 = function (interp) {
+		return (function () {
+		var value1 = `おはよう御座います。\n今日も頑張りましょうね`;
+		if($gameSwitches.value(202) && $gameSwitches.value(204)){var value1 = `──さて、行きましょうか`};
+		if($gameSwitches.value(465)){var value1 = `………行きましょう`};
+		this.sVal(21,value1);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:25|一日始まり時コモン
+	setSwitch644 = function () {
+		if($gameSwitches.value(129)){
+		  quest_jutyuu2(2);
+		$gameSwitches.setValue(644,true);
+		};
+		$gameSwitches.setValue(380,false);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:29|メニュー開く
+	handleScriptSnippet8 = function () {
+		valueCountSet1 = 0;//WindowManager.showのため
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:29|メニュー開く
+	setVariable255 = function () {
+		var actor = $gameParty.members()[0];
+		production_separateSetProfile(actor.actorId());
+		$gameVariables.setValue(255,
+		`\\fs[22]\\C[2]${actor.name()}=${$gameVariables.value(actor.actorId()+380)[50]}\\C[0]
+		\\fs[22]${actor.nickname()}\n`);
+		$gameVariables.setValue(253,`\\fs[20]${actor.profile()}`);
+		$gameVariables.setValue(255,$gameVariables.value(255) + $gameVariables.value(253));
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:29|メニュー開く
+	setVariable255_2 = function () {
+		var actor = $gameParty.members()[0];
+		$gameVariables.setValue(255,
+		`\\fs[25]\\C[2]${actor.name()}=${$gameVariables.value(actor.actorId()+380)[50]}\\C[0]
+		\\fs[25]${actor.nickname()}\n`);
+		if(isGirl(actor)){
+		  hstates_heights(actor.actorId(),253);
+		} else {
+		  $gameVariables.setValue(253,`　`);
+		};
+		$gameVariables.setValue(255,$gameVariables.value(255) + $gameVariables.value(253));
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:29|メニュー開く
+	handleScriptSnippet9 = function () {
+		$gameSystem._cursorHidden = false;
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:42|ナヴィ表示
+	handleScriptSnippet10 = function () {
+		valueWordSet1 = ``;
+		valueWordSet2 = ``;
+		valueWordSet3 = ``;
+		valueWordSet4 = ``;
+		valueWordSet5 = ``;
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:43|一日一回コモン
+	setVariable608OnSwitch = function () {
+		var variable257Value = $gameVariables.value(257);
+		var value1 = 0;
+		for (var i = 0; i < variable257Value.length; i++) {
+		  if(variable257Value[i] >= 1 && i >= 1){
+		    if($dataItems[i].meta['OnSwitch']){
+		      var arr2 = $dataItems[i].meta['OnSwitch'].split(',');
+		      for (var j = 0; j <= arr2.length-1; j++) {
+		        if(Number(arr2[j]) == 207){
+		          value1 += variable257Value[i];
+		}}}}};
+		$gameVariables.setValue(608,value1);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:44|称号パッシブ獲得
+	iteratePartyMembers3 = function () {
+		var actor = $gameActors.actor($gameVariables.value(11));
+		if(!$gameParty.inBattle()){
+		  $gamePlayer.requestAnimation($gameVariables.value(22))
+		}else{
+		  if(actor.isBattleMember()){
+		    $gameParty.members()[actor.index()].startAnimation($gameVariables.value(22), false, 0)
+		  };
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:45|一言演出用
+	setSelfVariable20_6 = function (interp) {
+		return (function () {
+		//一言演出。変数20が1以上で獲得用。0で移動ポイント増加など
+		this.sVal(20,1);
+		var actor = $gameActors.actor($gameVariables.value(20));
+		valueWordSet0 = `\\C[16]${actor.name()}\\C[0]はクラス2ndジョブ\\C[2]＜\\j[21]＞\\C[0]に目覚めた！`;
+		valueWordSetEx = 0;//補足が必要な場合
+		this.setupChild($dataCommonEvents[45].list, 0);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:48|全体図で新エリア解放時イベント
+	characterERSMAKETEMPLATE = function (interp) {
+		return (function () {
+		var value1 = this.character(0).x;
+		var value2 = this.character(0).y;
+		var args = new Array("68",String(value1),String(value2));
+		this.pluginCommand("ERS_MAKE_TEMPLATE", args);
+		var args = new Array("22");
+		this.pluginCommand("ERS_GET_LAST_SPAWN_EVENT_ID", args);
+		this.wait(20);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:49|ダンジョンワープポイント
+	fill = function () {
+		valueScriptArray1 = [];//Array(21).fill(0);
+		valueWordArray = [];
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:49|ダンジョンワープポイント
+	sliceArrayMAP = function () {
+		var arr1 = valueScriptArray1[0];
+		var mapId = Number(arr1[0]);
+		filename = 'MAP' + ('000' + mapId).slice(-3) + '.json';
+		DataManager.loadDataFile('$dataMap2', filename);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:49|ダンジョンワープポイント
+	configureMap2 = function () {
+		valueWordArray.push(`${$dataMap2.displayName}(入口)`);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:49|ダンジョンワープポイント
+	transformVariable21MAP = function () {
+		var variable21Value = valueScriptArray1[$gameVariables.value(21)];
+		var mapId = Number(variable21Value[0]);
+		filename = 'MAP' + ('000' + mapId).slice(-3) + '.json';
+		DataManager.loadDataFile('$dataMap2', filename);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:49|ダンジョンワープポイント
+	configureMap2_2 = function () {
+		valueWordArray.push($dataMap2.displayName);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:49|ダンジョンワープポイント
+	addCustomChoice = function () {
+		for (var i = 0; i <= valueScriptArray1.length-1; i++) {
+		  const id = 1; 
+		  const choiceParams = {
+		  text: `${valueWordArray[i]}`,
+		  value: i};
+		  $gameSystem.addCustomChoice(id, choiceParams);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:49|ダンジョンワープポイント
+	readVariable19_2 = function () {
+		arr1 = valueScriptArray1[$gameVariables.value(19)];
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:49|ダンジョンワープポイント
+	setSwitch380 = function (interp) {
+		return (function () {
+		var arr2 = [Number(arr1[0]),Number(arr1[1]),Number(arr1[2])];
+		var arr3 = [$gameMap.mapId(),$gameMap.event(this._eventId).x,$gameMap.event(this._eventId).y];
+		if(arr2[0] == arr3[0] && arr2[1] == arr3[1] && arr2[2] == arr3[2]){
+		  $gameSwitches.setValue(380,true);
+		} else {
+		  $gameSwitches.setValue(380,false);
+		};
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:52|ファイルチェック用スクリプト
+	iterateWeaponsBGInN = function () {
+		var value2 = 'BG_inN';
+		var valueItems = $dataWeapons;var end = valueItems.length-1;
+		var j = 1;
+		for(var i = 1; i <= end; i++){
+		  if(valueItems[i].meta[value2]){
+		    var value1 = valueItems[i].meta[value2].split(',')[0];
+		      console.log(`${i}  ${value1}`);
+		    console.log(`${value1}`);
+		    $gameScreen.showPicture(j,value1,1,640-128,384,100,100,255,0);
+		    j += 1;
+		}};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:52|ファイルチェック用スクリプト
+	traceDebugOutputEnemyEntrySe = function () {
+		var value2 = 'EnemyEntrySe';
+		var valueItems = $dataEnemies;var end = valueItems.length-1;
+		var j = 1;
+		for(var i = 1; i <= end; i++){
+		  if(valueItems[i].meta[value2]){
+		    var value1 = valueItems[i].meta[value2].split(',')[0];
+		      console.log(`${i}  ${value1}`);
+		    AudioManager.playSe({"name":value1,"volume":100,"pitch":100,"pan":0});
+		    j += 1;
+		}};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:52|ファイルチェック用スクリプト
+	iterateItems3 = function () {
+		var value2 = '';
+		var valueItems = $dataItems;var end = valueItems.length-1;
+		var j = 1;
+		for(var i = 1; i <= end; i++){
+		  if(valueItems[i].meta[value2]){
+		    var value1 = valueItems[i].meta[value2].split(',')[0];
+		    var value1 = '/img/parallaxes/' + value1;    
+		      console.log(`${i}  ${value1}`);
+		    $gameScreen.showPicture(j,value1,1,640-128,384,100,100,255,0);
+		    j += 1;
+		}};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:53|デバッグコモン
+	setSelfVariable20_7 = function (interp) {
+		return (function () {
+		this.sVal(20,3);
+		var actor = $gameActors.actor($gameVariables.value(20));
+		for (var i = 431; i < 439; i++) {
+		    actor.forgetSkill(i);
+		};
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:53|デバッグコモン
+	setSelfVariable20_8 = function (interp) {
+		return (function () {
+		this.sVal(20,3);
+		var actor = $gameActors.actor($gameVariables.value(20));
+		for (var i = 1; i < $dataSkills.length; i++) {
+		  if(!actor.isLearnedSkill(i)){
+		    actor.forgetSkill(i);
+		    actor.setSkillMasteryUses(i, 0);
+		    actor.setSkillMasteryLevel(i, 0);
+		  };
+		};
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:53|デバッグコモン
+	setSelfVariable20_9 = function (interp) {
+		return (function () {
+		this.sVal(20,1);
+		var actor = $gameActors.actor($gameVariables.value(20));
+		var value1 = actor.stateRate(62) * 100
+		console.log(`${value1}`);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:53|デバッグコモン
+	handleScriptSnippet11 = function () {
+		$gameParty._steps += 200;
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:53|デバッグコモン
+	iteratePartyMembers4 = function () {
+		for (var i = 0; i < $gameParty.battleMembers().length; i++) {
+		  var actor = $gameParty.battleMembers()[i];
+		  if($gameParty.members().contains(actor)){
+		actor.learnSkill(297);actor.gainSkillMasteryUses(297, 100);
+		actor.learnSkill(300);actor.gainSkillMasteryUses(300, 100);
+		actor.learnSkill(308);actor.gainSkillMasteryUses(308, 100);
+		actor.learnSkill(340);actor.gainSkillMasteryUses(340, 100);
+		actor.learnSkill(290);actor.gainSkillMasteryUses(290, 100);
+		}};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:53|デバッグコモン
+	traceDebugOutput2 = function () {
+		console.log($dataTroops[11].members);
+		console.log($dataTroops[12].members);
+		console.log($dataTroops[13].members);
+		console.log($dataTroops[14].members);
+		console.log($dataTroops[15].members);
+		console.log($dataTroops[16].members);
+		console.log($dataTroops[17].members);
+		console.log($dataTroops[18].members);
+		console.log($dataTroops[19].members);
+		console.log($dataTroops[20].members);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:53|デバッグコモン
+	iterateItems4 = function () {
+		var value1 = ``;
+		for(var i = 1; i <= $dataStates.length-1; i++){  value1 += `[${i}]${$dataStates[i].name}\n`};
+		for(var i = 1; i <= $dataItems.length-1; i++){value1 += `[${i}]${$dataItems[i].name}\n`};
+		for(var i = 1; i <= $dataWeapons.length-1; i++){value1 += `[${i}]${$dataWeapons[i].name}\n`};
+		for(var i = 1; i <= 500; i++){value1 += `[${i}]${$dataArmors[i].name}\n`};
+		for(var i = 1; i <= $dataSkills.length-1; i++){value1 += `[${i}]${$dataSkills[i].name}\n`};
+		console.log(value1)
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:53|デバッグコモン
+	iterateItems5 = function () {
+		for(var i = 801; i <= 810; i++){
+		if (!$dataItems[i].name == '') {
+		$gameParty.gainItem($dataItems[i], -1);
+		}};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:53|デバッグコモン
+	setVariable211_2 = function () {
+		$gameVariables.setValue(211,Array(101).fill(0));
+		for(var i = 0; i <= 100; i++){
+		$gameVariables.value(211)[i] = [];
+		for(var j = 0; j <= 10; j++){
+		$gameVariables.value(211)[i].push(0);
+		};
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:53|デバッグコモン
+	value2 = function () {
+		$gameVariables.value(1+440)[41] = 0
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:53|デバッグコモン
+	readVariable163Copy = function () {
+		//イベントの位置が変更された場合に更新。ctrl+CでSetteiのvalueLocationPresetにコピペ
+		document.addEventListener('copy', function(e) {
+		  e.preventDefault();
+		  var data = $gameVariables.value(163);
+		  delete data.comment;
+		file = JSON.stringify(data);
+		  e.clipboardData.setData('text/plain', file);
+		});
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:53|デバッグコモン
+	iterateSystemSwitches = function () {
+		var arr1 = [];
+		for(var i = 201; i <= 380; i++){
+		  arr1.push(`${i}:${$dataSystem.switches[i]}`);
+		};
+		fs.writeFileSync( "valueLocationPreset.txt" ,JSON.stringify(arr1) )
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:54|イベント場所移動コモン
+	event2 = function (interp) {
+		return (function () {
+		for (var i = 1; i < 10; i++) {
+		  if(!!$gameMap.event(i)) {
+		    this._eventId = i;
+		    break;
+		  };
+		};
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:57|セーブ前コモン
+	handleScriptSnippet12 = function () {
+		入手Ｇ累計$gameParty.gainGoldSum;
+		総合与えダメージ$gameActors.attackDamageSum;
+		消費Ｇ累計$gameParty.loseGoldSum; 
+		合計戦闘不能回数$gameActors.deadCounter;
+		最大与えダメージ$gameActors.attackDamageMax; 
+		合計与えダメージ$gameActors.attackDamageSum; 
+		最大被害ダメージ$gameActors.acceptDamageMax;
+		合計被害ダメージ$gameActors.acceptDamageSum;
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:59|会話コモン特定イベント用
+	showPictureXevS09803 = function () {
+		valuePic1 = 55;
+		var value2 = 'XevS098_03';
+		$gameScreen.showPicture(valuePic1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(valuePic1,1,640-128,384,100,100,255,0,60);
+		pic_move1(valuePic1-1,0,0,100,100,0,120);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
+	pluginCommandGabText = function (interp) {
+		return (function () {
+		var arr1 = valueTalkSet;
+		var args = new Array(String(arr1[0]));
+		this.pluginCommand("GabText", args);
+		var args = new Array(String(arr1[1]));
+		this.pluginCommand("GabFaceName", args);
+		var args = new Array(String(arr1[2]));
+		this.pluginCommand("GabFaceIndex", args);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
+	appendToVariable532 = function () {
+		var value1 = 0;
+		if($gameVariables.value(532).length != 0){
+		  for (var i = 0; i <= $gameVariables.value(532).length-1; i++) {
+		    if($gameVariables.value(532)[i] == valueTalkSet[0]){
+		      var value1 = 1;
+		      break;
+		}}};
+		if(value1 == 0){
+		  $gameVariables.value(532).push(valueTalkSet[0]);
+		  $gameVariables.value(533).push(valueTalkSet[1]);
+		  $gameVariables.value(534).push(valueTalkSet[2]);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
+	showPicture103 = function () {
+		if(valueTalkSet[1] == 0){var value2 = `Tips:${valueTalkSet[0]}`}else{var value2 = `Tips:${valueTalkSet[0]}\n${valueTalkSet[1]}`};
+		var arr1 = [value2,25];
+		$gameScreen.setDTextPicture(arr1[0], arr1[1]);
+		$gameScreen.dWindowFrame = 'ON';
+		if(valueTalkSet[2][0] != 0){
+		  var value1 = 30;
+		} else {
+		  var value1 = 50;
+		};
+		$gameScreen.showPicture(103,'',0,-80,value1,100,100,255,0);
+		$gameScreen.movePicture(103,0,50,value1,100,100,255,0,100);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
+	showPicture101ScreenBlackOut = function () {
+		if(valueTalkSet[2][0] != 0){
+		  var value2 = 'ScreenBlackOut';
+		  $gameScreen.showPicture(101,value2,1,640,384,100,100,150,0);
+		  $gameScreen.showPicture(102,valueTalkSet[2][0],valueTalkSet[2][1],
+		  valueTalkSet[2][2],valueTalkSet[2][3],
+		  valueTalkSet[2][4],valueTalkSet[2][5],valueTalkSet[2][6],0);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
+	appendToVariable532_2 = function () {
+		var value1 = 0;
+		if($gameVariables.value(532).length != 0){
+		  for (var i = 0; i <= $gameVariables.value(532).length-1; i++) {
+		    if($gameVariables.value(532) == valueTalkSet[0]){
+		      var value1 = 1;
+		      break;
+		}}};
+		if(value1 == 0){
+		  $gameVariables.value(532).push(valueTalkSet[0]);
+		  $gameVariables.value(533).push(valueTalkSet[1]);
+		  $gameVariables.value(534).push(valueTalkSet[2]);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
+	showPicture100Rubi = function () {
+		var actor = $gameActors.actor($gameVariables.value(20));
+		  var variable96Value = `\x1bSIN[${$gameVariables.value(96)}]`;
+		  if($dataSkills[$gameVariables.value(96)].meta['rubi']){
+		    var variable96Value2 = $dataSkills[$gameVariables.value(96)].meta['rubi'].replace(' ','');
+		    var variable96Value = `${variable96Value2}\n${variable96Value}`;
+		  };
+		  $gameScreen.dWindowFrame = 'ON';
+		  $gameScreen.dTextAlign = 1;
+		  $gameScreen.setDTextPicture(`${variable96Value}`, 35);
+		  $gameScreen.showPicture(100,"",1,$gameParty.getX(actor.index()+1),$gameParty.getY(actor.index()+1)-50,100,100,0,0);
+		  $gameScreen.movePicture(100,1,$gameParty.getX(actor.index()+1),$gameParty.getY(actor.index()+1)-100,100,100,255,0,30);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
+	pictureScreenBlackOut = function () {
+		var value1 = 128; var value4 = 0;
+		if($gameScreen.picture(5) || $gameScreen.picture(70)){
+		  var value1 = -128; var value4 = -128;
+		};
+		var arr1 = valueTalkSet;
+		var value2 = 'ScreenBlackOut';
+		$gameScreen.showPicture(arr1[0],value2,1,640-128+value1,384,100,100,150,0);
+		var value3 = 'Town014';　//中心から円状に表示
+		picture_fade1(arr1[0],"fadeIn",value3,arr1[2],5);
+		$gameScreen.showPicture(arr1[0]+1,arr1[1],1,640+value4+20,384,100,100,0,0);
+		$gameScreen.movePicture(arr1[0]+1,1,640+value4,384,100,100,255,0,arr1[2]);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
+	readVariable21 = function (interp) {
+		return (function () {
+		var variable21Value = $gameVariables.value(21);
+		this.character(variable21Value).requestAnimation(199);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
+	readVariable21ERSMAKETEMPLATE = function (interp) {
+		return (function () {
+		var variable21Value = $gameVariables.value(21);
+		var value5 = $gameMap.event(variable21Value).x;var value6 = $gameMap.event(variable21Value).y;
+		var args = new Array("190",String(value5),String(value6));
+		this.pluginCommand("ERS_MAKE_TEMPLATE", args);
+		this.character(variable21Value).forceMoveRoute({
+		"list":[
+		{"code":32},{"code":34},{"code":36},{"code":37},{"code":19},
+		{"code":44,"parameters":[{"name":"Z_Collaps","volume":50,"pitch":70,"pan":0}]},
+		{ "code": 45, "parameters": ["this._spriteOffsetX = -20;"] },{"code":35},
+		{ "code": 45, "parameters": ["this.setAngle(45);"] },{"code":35},
+		{"code":0}],"repeat":false,"skippable":true});
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
+	showPicture102 = function () {
+		var arr1 = valueTalkSet;
+		$gameScreen.setDTextPicture(arr1[1], arr1[0]);
+		$gameScreen.dWindowFrame = 'ON';
+		if(arr1[2] == 0){
+		  $gameScreen.showPicture(102,'',0,50,50,100,100,0,0);
+		  $gameScreen.movePicture(102,0,100,50,100,100,255,0,60);
+		} else {
+		  $gameScreen.showPicture(102,'',1,640-50,384,100,100,0,0);
+		  $gameScreen.movePicture(102,1,640,384,100,100,255,0,60);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
+	showPicture = function () {
+		var value1 = 101;
+		var value2 = '/img/talkface/99Actor99_s0';
+		$gameScreen.showPicture(value1,value2,1,640+600,384+100,0,0,0,0);
+		$gameScreen.movePicture(value1,1,640+500,384,100,100,255,0,60);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
+	playSeName2 = function () {
+		var arr1 = valueTalkSet;
+		AudioManager.playSe({"name":arr1[0],"volume":arr1[1],"pitch":arr1[2],"pan":0});
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
+	startAnimation = function () {
+		var arr1 = valueTalkSet;
+		$gameScreen.startAnimation(arr1[0],arr1[1],arr1[2],arr1[3]);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
+	actorActorHypnosisEye0 = function () {
+		var arr1 = valueTalkSet;
+		var actor = $gameActors.actor(arr1[1]);
+		if(arr1[0] == 2){
+		  $gameScreen.setPicturesAnimation(2, 10, "連番", arr1[2]);
+		  pic_locationSet(92,99,"/img/talkface/" + arr1[1] + "ActorHypnosisEye_0",60,0);
+		  $gameScreen.picture(99).startAnimationFrame(3, true, [1,1,1,2]);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
+	removeState2 = function () {
+		var arr1 = valueTalkSet;
+		var actor = $gameActors.actor(arr1[1]);
+		if(arr1[0] == 1){
+		  actor.addState(782);
+		  actor.setStateCounter(782,arr1[2]);
+		};
+		if(arr1[0] == 0){
+		  actor.removeStateCounter(782);
+		  actor.removeState(782);
+		  pic_move1(99,0,0,100,100,0,120);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
+	removeStateActorCloudyEye3 = function (interp) {
+		return (function () {
+		var arr1 = valueTalkSet;
+		var actor = $gameActors.actor(arr1[1]);
+		if(arr1[0] == 1){actor.addState(784)};
+		if(arr1[0] == 2){pic_locationSet(91,92,"/img/talkface/" + arr1[1] + "ActorCloudyEye3",120,0)};
+		if(arr1[0] == 0){
+		  actor.removeState(784);
+		  pic_move1(92,0,0,100,100,0,120);
+		  if($gameScreen.picture(91)){var value1 = $gameScreen.picture(91).x()};
+		  if($gameScreen.picture(93)){var value2 = $gameScreen.picture(93).x()};
+		  pic_move1(93,value1-value2,0,100,100,0,10);
+		  this.wait(15);
+		};
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
+	handleScriptSnippet13 = function () {
+		var arr1 = valueTalkSet;
+		if(arr1[0] == 0){
+		  pic_move1(93,0,0,100,100,255,60);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
+	showPicture102_2 = function () {
+		if($gameScreen.brightness() === 0 || !$gameScreen.picture(6) && !$gameScreen.picture(70)){
+		  var value1 = 640;
+		} else {
+		  var value1 = 640-128;
+		};
+		$gameScreen.dTextRealTime = 'ON';
+		$gameScreen.dTextAlign = 0;
+		$gameScreen.dWindowFrame = 'ON';
+		$gameScreen.setDTextPicture(valueTalkSet[2], valueTalkSet[1]);
+		$gameScreen.showPicture(102,'',1,value1-50,384,100,100,0,0);
+		$gameScreen.movePicture(102,1,value1,384,100,100,255,0,60);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
+	brightnessIlluminationW = function () {
+		var value1 = 'illumination_w';
+		$gameScreen._particle.particlePlay(0,value1,'screen','def','screen');
+		$gameScreen._particle.particleUpdate([value1,'emitterLifetime','1']);
+		if($gameScreen.brightness() === 0 || !$gameScreen.picture(6) && !$gameScreen.picture(70)){}else{
+		  $gameScreen._particle.particleUpdate([value1,'pos',-128,0]);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
+	showPicture102_3 = function () {
+		if($gameScreen.brightness() === 0 || !$gameScreen.picture(6) && !$gameScreen.picture(70)){
+		  var value1 = 640;
+		} else {
+		  var value1 = 640-128;
+		};
+		$gameScreen.dTextRealTime = 'ON';
+		$gameScreen.dTextAlign = 0;
+		$gameScreen.dWindowFrame = 'ON';
+		$gameScreen.setDTextPicture(valueTalkSet[2], valueTalkSet[1]);
+		$gameScreen.showPicture(102,'',1,value1-20,384,100,100,0,0);
+		$gameScreen.movePicture(102,1,value1,384,100,100,255,0,60);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
+	brightnessDirectScreenRing = function () {
+		var value1 = 'direct_screenRing';
+		$gameScreen._particle.particlePlay(0,value1,'screen','def','screen');
+		var value3 = '#07c5ff';
+		var value4 = '#ffffff';
+		$gameScreen._particle.particleUpdate([value1,'color',String(value3),String(value4)]);
+		if($gameScreen.brightness() === 0 || !$gameScreen.picture(6) && !$gameScreen.picture(70)){}else{
+		  $gameScreen._particle.particleUpdate([value1,'pos',-128,0]);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
+	event3 = function () {
+		var arr1 = valueTalkSet;
+		if(arr1[2] >= 1){
+		  valueCountSet1 = arr1[2];
+		} else {
+		  for (var id = 10; id > 0; id--) {
+		    if(!!$gameMap.event(id)) {
+		      valueCountSet1 = id;
+		      break;
+		  }};
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
+	event4 = function () {
+		var arr1 = valueTalkSet;
+		if(arr1[0] == 1){
+		  var value1 = $gameMap.event(valueCountSet1)._realX;
+		  var value2 = $gameMap.event(valueCountSet1)._realY;
+		  $gameMap.spawnEvent(146, value1, value2, true);
+		  valueBlackScreenId = $gameMap.getLastSpawnEventId();
+		  var event = $gameMap.event(valueBlackScreenId);
+		  event.setOpacity(arr1[1]);
+		  event._spriteOffsetY += 368;
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
+	event5 = function () {
+		var arr1 = valueTalkSet;
+		if(arr1[0] == 0){
+		  if(valueBlackScreenId >= 1){
+		    var event = $gameMap.event(valueBlackScreenId);
+		    event.setOpacity(0);
+		}};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:62|スクリプト演出コモン
+	readVariable121PAINIT = function (interp) {
+		return (function () {
+		var args = new Array(String($gameVariables.value(121)),"1","横",String($gameVariables.value(123)));
+		this.pluginCommand("PA_INIT", args);
+		$gameScreen.showPicture($gameVariables.value(124),$gameVariables.value(122),1,
+		$gameVariables.value(126),$gameVariables.value(127),100,100,255,0)
+		var args = new Array(String($gameVariables.value(124)),String($gameVariables.value(125)));
+		this.pluginCommand("PA_START_LOOP", args);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:62|スクリプト演出コモン
+	readVariable121PAINIT2 = function (interp) {
+		return (function () {
+		var array = [1,1,2,1];
+		var args = new Array(String($gameVariables.value(121)),"1","横",String($gameVariables.value(123)));
+		this.pluginCommand("PA_INIT", args);
+		$gameScreen.showPicture($gameVariables.value(124),$gameVariables.value(122),0,
+		0,0,100,100,$gameVariables.value(126),$gameVariables.value(127));
+		var args = new Array(String($gameVariables.value(124)),String($gameVariables.value(125)),String(array));
+		this.pluginCommand("PA_START_LOOP", args);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:64|スクリプトシステムコモン
+	readVariable121List2 = function (interp) {
+		return (function () {
+		this.character($gameVariables.value(121)).forceMoveRoute({
+		"list":[{"code":41, "parameters":[$gameVariables.value(125),$gameVariables.value(126)]}]
+		})
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:64|スクリプトシステムコモン
+	readVariable121 = function (interp) {
+		return (function () {
+		character = this.character($gameVariables.value(121))
+		character.locate($gameVariables.value(122), $gameVariables.value(123))
+		character.setDirection($gameVariables.value(124))
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:64|スクリプトシステムコモン
+	iteratePartyMembers5 = function () {
+		var array = $gameVariables.value(511);
+		for (var i = 0; i < array.length-1; i++) {
+		  if($gameVariables.value(512) - 1 >= i){
+		    if(!$gameParty.members().contains($gameActors.actor(array[i]))){
+		      $gameParty.addActor(array[i])
+		      $gameActors.actor(array[i]).refresh();
+		//console.log(array[i]);
+		}}};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:64|スクリプトシステムコモン
+	iteratePartyMembers6 = function () {
+		var array = $gameVariables.value(511);
+		for (var i = 0; i < array.length-1; i++) {
+		  if($gameVariables.value(512) - 1 <= i){
+		    if(!$gameParty.members().contains($gameActors.actor(array[i]))){
+		      $gameParty.addActor(array[i])
+		      $gameActors.actor(array[i]).refresh();
+		console.log(array[i]);
+		}}};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:64|スクリプトシステムコモン
+	readVariable11 = function () {
+		for(var i = 1; i <= 20; i++){$gameParty.removeActor(i)}
+		$gameParty.addActor($gameVariables.value(11))
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:64|スクリプトシステムコモン
+	readVariable20_3 = function (interp) {
+		return (function () {
+		var variable20Value = $gameVariables.value(20);
+		var args = new Array(String(variable20Value));
+		this.pluginCommand("NF_NPC削除", args);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:64|スクリプトシステムコモン
+	readVariable20_4 = function () {
+		var actor = $gameActors.actor($gameVariables.value(20));
+		var value1 = `${actor.nickname() + actor.name()}がパーティから離脱した。`
+		CommonPopupManager.showInfo({},value1,null);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:64|スクリプトシステムコモン
+	readVariable20_5 = function (interp) {
+		return (function () {
+		var variable20Value = $gameVariables.value(20);
+		var args = new Array(String(variable20Value),'1');
+		this.pluginCommand("NF_NPC追加", args);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:64|スクリプトシステムコモン
+	appendToVariable20 = function () {
+		var actor = $gameActors.actor($gameVariables.value(20));
+		$gameParty.setMenuActor(actor);
+		SceneManager.push(Scene_Status);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:64|スクリプトシステムコモン
+	addCustomChoice2 = function () {
+		for(var i=0; i < 9; i ++){
+		const id = 1; const choiceParams = {
+		text: $gameSystem.saveEquipCommandNameArray[i],
+		value: i+1};
+		$gameSystem.addCustomChoice(id, choiceParams);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:64|スクリプトシステムコモン
+	iterateWeapons2 = function (interp) {
+		return (function () {
+		//場面転換時に苗字代入
+		var list = $gameVariables.value(248);
+		list.forEach(function(id) {
+		$dataWeapons[id+200].name = $gameVariables.value(id+380)[50];
+		}, this);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:64|スクリプトシステムコモン
+	iteratePartyMembersERSMAKETEMPLATE = function (interp) {
+		return (function () {
+		var id = $gameActors.actor($gameVariables.value(121)).index();
+		if($gameParty.members().contains($gameParty.members()[id])){
+		if($gameParty.members()[id].actorId() == $gameVariables.value(11)){}else{
+		var value1 = $gameParty.members()[id].actorId() + 20;
+		var args = new Array(String(value1),String(this.character(-1).x),String(this.character(-1).y+1));
+		this.pluginCommand("ERS_MAKE_TEMPLATE", args);
+		var args = new Array("21");this.pluginCommand("ERS_GET_LAST_SPAWN_EVENT_ID", args);$gameVariables.value(342)[value1-20] = $gameVariables.value(21);
+		var args = new Array(String($gameVariables.value(342)[value1-20]),String(id));this.pluginCommand("PartyGraphics", args);
+		this.character($gameVariables.value(342)[value1-20]).forceMoveRoute({"list":[{"code":38},{"code":9},{"code":9},{"code":25},{"code":0}]});
+		this.wait(5);
+		}};
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:66|コンフィグコマンド
+	showPicture98ZXNowconditionA = function () {
+		if($gameVariables.value(312) == 'ZX_NowconditionA_'){
+		  $gameScreen.showPicture(98,$gameVariables.value(312) + $gameVariables.value(11),
+		  1,640+331+500,384,100,100,0,0);
+		  pic_move1(98,-500,0,100,100,255,40);
+		} else {
+		  //$gameScreen.showPicture(98,$gameVariables.value(312),
+		  //1,640+331+50,384+200,100,100,0,0);
+		  //pic_move1(98,0,-200,100,100,255,40);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:66|コンフィグコマンド
+	readVariable11NowconditionActor = function () {
+		var value1 = 1;
+		var value2 = "NowconditionActor" + $gameVariables.value(11) + "_" + value1;
+		picture_anime1(99,value2,2,10,'横',180,1,true,[1]);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:66|コンフィグコマンド
+	setSwitch161_2 = function () {
+		var actor = $gameActors.actor($gameVariables.value(2));
+		if(actor.isLearnedSkill(796)){
+		  $gameSwitches.setValue(161,true);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:66|コンフィグコマンド
+	setSwitch162SingleSouwaIncidence = function () {
+		var start = 1201;
+		var end = 1300;
+		for (var i = start; i <= end; i++) {
+		  if($gameSwitches.value(i) && !$gameParty.hasItem(i-800) && !$gameSwitches.value(i+100)){
+		    if($dataItems[i-800].meta['singleSouwaIncidence']){}else{
+		      $gameSwitches.setValue(162,true);
+		      break;
+		}}};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:66|コンフィグコマンド
+	setSwitch162AddEventIncidenceSwi = function () {
+		for (var i = 1; i <= $dataItems.length-1; i++) {
+		  if($dataItems[i].meta['AddEventIncidenceSwi']){
+		    if(Number($dataItems[i].meta['EICSwitch']) == 102){
+		      if($gameSwitches.value(Number($dataItems[i].meta['AddEventIncidenceSwi'])) && !$gameParty.hasItem(i) && 
+		      !$gameSwitches.value(Number($dataItems[i].meta['AddEventCompSwi']))){
+		        if($dataItems[i].meta['singleSouwaIncidence']){}else{
+		          $gameSwitches.setValue(162,true);
+		          break;
+		}}}}};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:67|現状確認
+	hide = function () {
+		WindowManager.hide(1);
+		WindowManager.hide(2);
+		WindowManager.hide(3);
+		WindowManager.hide(4);
+		WindowManager.hide(5);
+		WindowManager.hide(6);
+		WindowManager.hide(7);
+		WindowManager.hide(8);
+		WindowManager.hide(9);
+		WindowManager.hide(10);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:67|現状確認
+	readVariable11NowconditionActor2 = function (interp) {
+		return (function () {
+		var value1 = 1;
+		pic_anime1(1,2,"NowconditionActor" + $gameVariables.value(11) + "_" + value1,180,99,3,200,0);
+		this.setupChild($dataCommonEvents[62].list, 0);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:69|主人公スキル
+	appendToVariable11 = function () {
+		var actor = $gameActors.actor($gameVariables.value(11));
+		$gameParty.setMenuActor(actor);
+		SceneManager.push(Scene_Skill);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:76|エロシステム↓
+	inBattle = function () {
+		i1 = getRandomIndex(3) + 3;
+		var arr1 = [1,2,3,4,5];
+		i2 = arr1[getRandomIndex(arr1.length)];
+		if($gameParty.inBattle()){i3 = $gameTroop.aliveMembers().length};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:82|文字で効果音ＢＧＳ
+	handleScriptSnippet14 = function () {
+		var arr2 = [76,77,78,79,80,81,82,83,84,85];
+		valueSerialPictureId = arr2[getRandomIndex(arr2.length)];
+		pic_oneWord(valueSerialPictureId,valueScriptArray2[0],
+		valueScriptArray2[1],valueScriptArray2[2],valueScriptArray2[3],valueScriptArray1);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:82|文字で効果音ＢＧＳ
+	wait5 = function (interp) {
+		return (function () {
+		var array = [60,70,80,90,100,110,120,130,140,150,160];
+		var value1 = array[getRandomIndex(array.length)];
+		this.wait(value1);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:82|文字で効果音ＢＧＳ
+	wait6 = function (interp) {
+		return (function () {
+		var value1 = valueScriptArray2[3];
+		var value1 = getRandomIndex(41) + value1-20;
+		this.wait(value1);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:83|夜発情コモン
+	setSelfVariable21_5 = function (interp) {
+		return (function () {
+		var start = 63;
+		var end = 70;
+		var actor = $gameActors.actor($gameVariables.value(20));
+		for (var i = start; i <= end; i++) {
+		if(actor.isLearnedSkill(i)){
+		this.sVal(21,$gameVariables.value(21) + 1);
+		}};
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:83|夜発情コモン
+	setSelfVariable401 = function (interp) {
+		return (function () {
+		h_exp($gameVariables.value(20),'0_1_0',105,false,true,false);
+		//ｱｸﾀｰID,ﾋﾟｸﾁｬ,H相手(101ﾓﾌﾞ105対象なし106アイテム),非表示,簡易,過去シーンか否か
+		this.sVal(401,getRandomIndex(6) + 5);
+		this.sVal(413,1);
+		this.sVal(402,-100);
+		//var arr = [1,2,3,4,5];$gameVariables.setValue(401,arr[getRandomIndex(arr.length)]);
+		if($gameSwitches.value(122)){this.setupChild($dataCommonEvents[85].list, 0)};
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:83|夜発情コモン
+	setSelfVariable401_2 = function (interp) {
+		return (function () {
+		h_exp($gameVariables.value(20),'0_1_0',105,false,true,false);
+		//ｱｸﾀｰID,ﾋﾟｸﾁｬ,H相手(101ﾓﾌﾞ105対象なし106アイテム),非表示,簡易,過去シーンか否か
+		this.sVal(401,getRandomIndex(3) + 3);
+		this.sVal(402,-100);
+		//var arr = [1,2,3,4,5];$gameVariables.setValue(401,arr[getRandomIndex(arr.length)]);
+		if($gameSwitches.value(122)){this.setupChild($dataCommonEvents[85].list, 0)};
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:85|性欲度等変動表示コモン
+	handleScriptSnippetValueWordSet = function () {
+		valueCountSet1 = 0;
+		valueCountSet2 = 1;
+		var value1 = `\\C[10]H-Passive[${valueCountSet2}]\\C[0]\n`;
+		eval("valueWordSet" + valueCountSet2 +" = value1");
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:85|性欲度等変動表示コモン
+	readVariable175 = function () {
+		//シーン一行表現履歴174,175
+		$gameVariables.value(175)[$gameVariables.value(20)] += 1;
+		var variable175Value = `[${$gameVariables.value(175)[$gameVariables.value(20)]}]${$gameVariables.value(506)}\n`;
+		$gameVariables.value(174)[$gameVariables.value(20)] = $gameVariables.value(174)[$gameVariables.value(20)].concat(variable175Value);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:85|性欲度等変動表示コモン
+	readVariable175_2 = function () {
+		if($gameVariables.value(175)[$gameVariables.value(20)] >= 101){
+		$gameVariables.value(175)[$gameVariables.value(20)] -= 1;
+		$gameVariables.value(174)[$gameVariables.value(20)].shift();
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:85|性欲度等変動表示コモン
+	setSelfVariable506 = function (interp) {
+		return (function () {
+		var value4 = $gameVariables.value(340)-100;
+		if($gameVariables.value($gameVariables.value(20)+360)[value4] >= 1){
+		var value1 = `\n${$gameVariables.value(22)}との\\C[27]Ｈ回数：${$gameVariables.value($gameVariables.value(20)+360)[value4]}\\C[0]`;
+		this.sVal(506,$gameVariables.value(506) + value1);
+		};
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:85|性欲度等変動表示コモン
+	setScreenDWindowFrame = function () {
+		$gameScreen.dWindowFrame = 'ON';
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:86|性欲度等補正コモン
+	handleScriptSnippet15 = function () {
+		valueCountSet3 = 1
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:86|性欲度等補正コモン
+	handleScriptSnippet16 = function () {
+		valueCountSet3 += 1
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:87|性欲度等情報表示
+	showPicture2 = function () {
+		var value1 = 111;
+		$gameScreen.showPicture(value1+7,"",1,1024,384,100,100,255,0);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:87|性欲度等情報表示
+	erasePicture = function () {
+		var value1 = 111;
+		$gameScreen.erasePicture(value1+7);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:87|性欲度等情報表示
+	readVariable193Hscene005 = function () {
+		if($gameVariables.value(193) != 0){
+		  var value1 = 111;
+		  $gameScreen.showPicture(value1,$gameVariables.value(193),1,1024,384,100,100,255,0);
+		  var arr1 = ['Hscene005','Hscene029','Hscene061','Hscene099','Hscene105','Hscene123','Hscene183']
+		  var value1 = arr1[getRandomIndex(arr1.length)];
+		  picture_fade1(51,"fadeIn",value1,60,5);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:87|性欲度等情報表示
+	setSwitch161_3 = function (interp) {
+		return (function () {
+		var actor = $gameActors.actor($gameVariables.value(20));
+		var list = valueHstateDisplay;
+		list.forEach(function(id) {
+		if(actor.isStateAffected(id)){
+		$gameSwitches.setValue(161,true);
+		};
+		}, this);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:87|性欲度等情報表示
+	setSwitch165 = function () {
+		if($gameVariables.value(175)[$gameVariables.value(20)] >= 1){
+		$gameSwitches.setValue(165,true);
+		};
+		$gameSwitches.setValue(166,true);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:87|性欲度等情報表示
+	picture = function () {
+		for(var i = 111; i <= 125; i++){
+		  if($gameScreen.picture(i)){
+		    UTSU.PictureBreath.off([i]);
+		    UTSU.PictureBreath2.off([i]);
+		    $gameScreen.erasePicture(i);
+		}};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:87|性欲度等情報表示
+	readVariable20_6 = function () {
+		var value1 = $gameVariables.value($gameVariables.value(20)+380)[61];
+		var value2 = $gameVariables.value($gameVariables.value(20)+380)[27];
+		var value3 = $gameVariables.value($gameVariables.value(20)+380)[1];
+		var value4 = $gameVariables.value($gameVariables.value(20)+380)[64];
+		var value5 = $gameVariables.value($gameVariables.value(20)+380)[71];
+		valueWordSet0 = `本日Ｈ回数：${value1}回　`;
+		if(value5 >= 1){valueWordSet0 += `（本日中に犯されている…）`};
+		if(value2 >= 1){valueWordSet0 += `\n売春獲得総金額：${value2}\G　`};
+		if(value3 >= 500 && value4 >= 1){valueWordSet0 += `\n禁欲日数：${value4}日　`};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:88|
+	ceil = function () {
+		value1 = Math.ceil(value1);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:89|Hステ上昇時スキル習得コモン
+	handleScriptSnippetValueWordSet2 = function () {
+		valueCountSet1 = 0;//文言追加用
+		valueCountSet2 = 1;
+		var value1 = `\\FS[28]\\C[10]<H-Passive Expression!>\\FS[25]\\C[0]\n`;
+		eval("valueWordSet" + valueCountSet2 +" = value1");
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:93|自動出産コモン
+	showPictureScreenBlackOut = function () {
+		valuePic1 = 55;
+		var value2 = 'ScreenBlackOut';
+		$gameScreen.showPicture(valuePic1,value2,1,640,384,100,100,150,0);
+		picture_fade1(valuePic1,"fadeIn",valueWipeImg,60,5);
+		var value2 = 'Zev_childbirth';
+		pic_1(0,valuePic1+1,value2,0,100,255,80,1280,768,-256,0);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:93|自動出産コモン
+	readVariable75_4 = function () {
+		var start = $gameVariables.value(75);
+		var end = $gameVariables.value(76);
+		for(var j = start; j <= end; j++){
+		  actor = $gameActors.actor(j);
+		  if(actor.isStateAffected(83)){
+		    //actor.addStateCounter(83, +100);
+		    actor_pregnancyCalculation(j);
+		}};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:93|自動出産コモン
+	setSelfSwitch2 = function () {
+		for(var i = 1; i <= 20; i++){
+		  $gameSelfSwitches.setValue([$gameMap.mapId(), i, 'A'], false);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:94|受精コモン演出
+	setSelfVariable30 = function (interp) {
+		return (function () {
+		var actor = $gameActors.actor($gameVariables.value(20));
+		if(actor.isLearnedSkill(68)){
+		this.sVal(30,$gameVariables.value(30) + 1);
+		};
+		if(actor.isLearnedSkill(69)){
+		this.sVal(30,$gameVariables.value(30) + 1);
+		};
+		if(actor.isLearnedSkill(70)){
+		this.sVal(30,$gameVariables.value(30) + 1);
+		};
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:94|受精コモン演出
+	setSelfVariable94 = function (interp) {
+		return (function () {
+		var actor = $gameActors.actor($gameVariables.value(20));
+		actor.removeState(79);
+		actor.addState(82);
+		this.sVal(94,actor.name());
+		actor.setStateCounter(82, 0);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:94|受精コモン演出
+	readVariable20FertilizationActor = function () {
+		var value = 60;
+		var value1 = 'FertilizationActor'+ $gameVariables.value(20);
+		$gameScreen.showPicture(value+1,value1 +'_1',1,1280/2+50,768/2,100,100,0,0);
+		$gameScreen.movePicture(value+1,1,1280/2,768/2,100,100,255,0,60);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:94|受精コモン演出
+	startFlash = function () {
+		var value1 = getRandomIndex(41) + 180;
+		var value2 = getRandomIndex(21) + 50;
+		$gameScreen.startFlash([255,119,255,value1], value2);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:94|受精コモン演出
+	readVariable20FertilizationActor2 = function (interp) {
+		return (function () {
+		var value = 60;
+		var value1 = 'FertilizationActor'+ $gameVariables.value(20);
+		$gameScreen.showPicture(value+10,value1 +'_2',1,1280/2,768/2,100,100,0,0);
+		$gameScreen.movePicture(value+10,1,1280/2,768/2,100,100,255,0,60);
+		this.wait(60);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:94|受精コモン演出
+	showPictureFertilizationDirect = function (interp) {
+		return (function () {
+		var value = 60;
+		for (var i = 1; i <= 4; i++) {$gameScreen.showPicture(i+1+value,'FertilizationDirect'+i,1,1280/2,768/2,100,100,255,0)};
+		this.wait(120);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:94|受精コモン演出
+	movePicture5 = function (interp) {
+		return (function () {
+		var value = 60;
+		$gameScreen.movePicture(value+10,1,1280/2-300,768/2+800,1000,1000,0,0,240);
+		this.wait(240);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:94|受精コモン演出
+	movePicture4_2 = function (interp) {
+		return (function () {
+		var value = 60;
+		$gameScreen.movePicture(4+1+value,1,1280/2-300,768/2+800,1000,1000,0,0,300);
+		this.wait(300);
+		AudioManager.stopSe();
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:94|受精コモン演出
+	erasePicture2 = function () {
+		for(var i = 60; i <= 80; i++){$gameScreen.erasePicture(i)};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:95|妊娠時コモン
+	setSelfVariable94_2 = function (interp) {
+		return (function () {
+		var actor = $gameActors.actor($gameVariables.value(20));
+		actor.addStateCounter(82, +10);
+		var value1 = getRandomIndex(101);
+		var value2 = actor.getStateCounter(82) - 50;
+		if(value2 >= value1){
+		actor.removeStateCounter(82);
+		actor.removeState(82);
+		actor.addState(83);
+		actor.setStateCounter(83, 0);
+		this.sVal(94,actor.name());
+		};
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:95|妊娠時コモン
+	setSelfVariable22 = function (interp) {
+		return (function () {
+		//妊娠時の一時的なサイズ増量表現42が体重で以降スリーサイズ
+		var variable20Value = $gameVariables.value(20);
+		$gameVariables.value(variable20Value+380)[42] += [7,8,9,10,11,12][getRandomIndex(6)];
+		$gameVariables.value(variable20Value+380)[43] += [20,21,22,23,24,25][getRandomIndex(6)];
+		$gameVariables.value(variable20Value+380)[44] += [15,16,17,18,19,20][getRandomIndex(6)];
+		$gameVariables.value(variable20Value+380)[45] += [3,4,5,6,7,8][getRandomIndex(6)];
+		this.sVal(22,$gameVariables.value(variable20Value+380)[42]);
+		this.sVal(23,$gameVariables.value(variable20Value+380)[43]);
+		this.sVal(24,$gameVariables.value(variable20Value+380)[44]);
+		this.sVal(25,$gameVariables.value(variable20Value+380)[45]);
+		$gameVariables.value(variable20Value+380)[15] += 1;
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:97|出産時コモン演出用未使用
+	readVariable75_5 = function () {
+		var start = $gameVariables.value(75);
+		var end = $gameVariables.value(76);
+		for(var j = start; j <= end; j++){
+		  actor = $gameActors.actor(j);
+		  if(actor.isStateAffected(83)){
+		    actor_pregnancyCalculation(j);
+		}};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:99|コンティニュー処理
+	iteratePartyMembers7 = function () {
+		for (var i = 0; i < $gameParty.battleMembers().length-1; i++) {
+		  var actor = $gameParty.battleMembers()[i];
+		  actor.startAnimation(395, false, 0);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:99|コンティニュー処理
+	iteratePartyMembers8 = function () {
+		$gameParty.members().forEach(function(actor) {
+		  actor.removeState(24);
+		});
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:101|戦闘全滅
+	inBattle2 = function () {
+		if(!$gameParty.inBattle()){$gameTemp.stopMapPlayerMovement()}
+	};
+
+	// Replaces (2x): CommonEvents.json:common-event:101|戦闘全滅
+	showPictureScreenBlackOut2 = function () {
+		backGraund_menuMapSelect(2,0,0,0);
+		valuePic1 = 55;
+		var value2 = 'ScreenBlackOut';
+		$gameScreen.showPicture(valuePic1-2,value2,1,640,384,100,100,200,0);
+		var value2 = 'ScreenDarkCloudsH';
+		$gameScreen.showPicture(valuePic1-1,value2,1,640,384,100,100,150,0);
+		var value3 = 'Town014';　//中心から円状に表示
+		picture_fade1(valuePic1-2,"fadeIn",value3,60,5);
+		picture_fade1(valuePic1-1,"fadeIn",value3,60,5);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:101|戦闘全滅
+	setVariable21ZevBattleDefeat = function () {
+		var actor = $gameActors.actor($gameVariables.value(20));
+		var value1 = 1;
+		if(actor.isLearnedSkill(63)){var value1 = 2};
+		if(actor.isLearnedSkill(65)){var value1 = 3};
+		var value2 = 'Zev_BattleDefeat'+$gameVariables.value(20)+'_'+ value1;
+		$gameScreen.showPicture(valuePic1,value2,1,640-128,384,150,150,0,0);
+		$gameScreen.movePicture(valuePic1,1,640-128,384,100,100,255,0,60);
+		tachie_bless(valuePic1,1);
+		$gameVariables.setValue(21,`${actor.name()}は凌辱された…。`);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:101|戦闘全滅
+	setSelfVariable506_2 = function (interp) {
+		return (function () {
+		h_exp($gameVariables.value(20),0,301,false,false,false);
+		//ｱｸﾀｰID,ﾋﾟｸﾁｬ,H相手(301ﾓﾌﾞ305対象なし306アイテム),非表示,簡易,過去シーンか否か
+		this.sVal(506,`\\V[94]は凌辱された…。\n`);
+		this.sVal(401,getRandomIndex(3) + 3);
+		if($gameSwitches.value(122)){this.setupChild($dataCommonEvents[85].list, 0)};
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:101|戦闘全滅
+	inBattle3 = function () {
+		    if(!$gameParty.inBattle()){
+		      $gameTemp.allowMapPlayerMovement();
+		    };
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:102|戦闘後
+	fill2 = function () {
+		valueAttackAmplifysActorId = Array(21).fill(Array(100).fill(0));
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:102|戦闘後
+	setVariable300TachiePicId = function (interp) {
+		return (function () {
+		var list = $gameVariables.value(247);
+		list.forEach(function(id) {
+		$gameVariables.setValue(300,Number($dataActors[id].meta['tachiePicId']));
+		var args = new Array(String(getPreviousTachiePicId()));
+		this.pluginCommand("PICT_AFTERIMAGE_REMOVE", args);
+		;
+		}, this);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:102|戦闘後
+	setSwitch483 = function () {
+		for (var i = 0; i < $gameParty.battleMembers().length; i++) {
+		  var actor = $gameParty.battleMembers()[i];
+		  if($gameParty.members().contains(actor)){
+		    if([2,3,4,5,6,7].some(function(id){return actor.param(id) >= 100})){
+		      var value1 = `一部ステータスが\\C[2]100\\C[0]以上になる事で、そのステータスが上昇するbattleMembersパッシブスキルが習得できるようになります`;
+		      gab_wordParticle(value1); 
+		      $gameSwitches.setValue(483,true);
+		      break;
+		}}};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:103|戦闘開始時
+	setSelfVariable516 = function (interp) {
+		return (function () {
+		this.sVal(516,Math.round($gameParty.battleMembers().reduce(function(prev, member) {return prev + member.luk}, 0) / ($gameParty.battleMembers().length || 1)));
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:103|戦闘開始時
+	setSwitch95 = function () {
+		if($gameVariables.value(304)[valueBossEnemyId] >= 1){
+		  $gameSwitches.setValue(95,true);
+		} else {
+		  $gameSwitches.setValue(95,false);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:103|戦闘開始時
+	setSwitch95_2 = function () {
+		if($gameVariables.value(240) >= 1){
+		  if($gameParty.hasItem($dataItems[$gameVariables.value(240)])){
+		    $gameSwitches.setValue(95,true);
+		  } else {
+		    $gameSwitches.setValue(95,false);
+		  };
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:103|戦闘開始時
+	iterateTroopMembers2 = function () {
+		for (var i = 0; i < $gameTroop.members().length; i++) {
+		  var user = $gameTroop.members()[i];
+		  if(user.isAlive()){
+		    BattleManager._logWindow.push(`addText`,`\\C[16]${user.name()}\\C[0] TP\\C[6]${user.tp}%\\C[0]`);
+		  };
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:103|戦闘開始時
+	logBattleText = function () {
+		if(BattleManager.canEscape()){
+		  if($gameParty.membersState(233)){
+		    var value4 = 100;
+		  } else {
+		    var value4 = 0.8 * $gameParty.agility() / $gameTroop.agility();
+		    if(value4 >= 1){value4 = 99} else {value4 = Math.floor(value4 * 100)};
+		  };
+		  var value1 = `逃走成功確立:\\C[2]${value4}%\\C[0]`;
+		} else {
+		  var value1 = `\\C[10]逃走不可！\\C[0]`;
+		};
+		BattleManager._logWindow.push(`addText`, value1);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:104|戦闘毎ターン
+	iterateSkills6 = function () {
+		//エネミー一定レベル以上で様子を見るを別スキルに変更
+		var value1 = getRandomIndex(101);
+		if(value1 >= 40){
+		  $dataSkills[890] = $dataSkills[896];
+		} else {
+		  if($gameVariables.value(270) >= 10){
+		    $dataSkills[890] = $dataSkills[891];
+		  } else {
+		    $dataSkills[890] = $dataSkills[892];
+		  };
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:104|戦闘毎ターン
+	setVariable20_2 = function () {
+		var value1 = 42;
+		$gameVariables.setValue(20,1);
+		var actor = $gameActors.actor($gameVariables.value(20));
+		BattleManager._logWindow.push(`addText`, `${actor.name()}の${$dataStates[value1].name}耐性率:\\C[10]${actor.stateRate(value1) * 100}\\C[0]%`);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:104|戦闘毎ターン
+	picture2 = function () {
+		var value1 = 96;
+		if($gameScreen.picture(value1)){
+		$gameScreen.movePicture(value1,0,450,480,100,100,0,0,120);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:104|戦闘毎ターン
+	mapArray2 = function () {
+		var arr1 = [...Array(100)].map((_, i) => i + 101);
+		pic_eraseP(0,arr1);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:104|戦闘毎ターン
+	handleScriptSnippet17 = function () {
+		valueChainSkillId = 0;
+		valueChainElement = 0;
+		valueChainTotalStat = 0;
+		valueChainMemberCount = 0;
+		chain_skill();
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:104|戦闘毎ターン
+	iteratePartyMembers9 = function () {
+		for (var i = 0; i < $gameParty.battleMembers().length; i++) {
+		  var actor = $gameParty.battleMembers()[i];
+		    if (actor.isStateAffected(234) && !actor.isRestricted ()) {
+		      actor.startAnimation(160, false, 0);
+		      if(actor.actorId() != $gameVariables.value(20)){
+		        if(actor.elementAmplifyRate(15) != 0){
+		          valueChainAddPower += Math.round(actor.elementAmplifyRate(15) * 100);
+		}}}};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:104|戦闘毎ターン
+	iteratePartyMembers10 = function () {
+		for (var i = 0; i < $gameParty.battleMembers().length; i++) {
+		  var actor = $gameParty.battleMembers()[i];
+		  if (actor.isStateAffected(234) && !actor.isRestricted ()) {
+		    var actor1 = actor;
+		    break;
+		}};
+		if(valueChainSkillId == 0){
+		  valueChainSkillId = 98;
+		};
+		var value1 = valueChainSkillId;
+		BattleManager.queueForceAction(actor1, value1, -1);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:104|戦闘毎ターン
+	iteratePartyMembers11 = function () {
+		valueCountSet1 = 0;
+		for (var i = 0; i < $gameParty.battleMembers().length; i++) {
+		  var actor = $gameParty.battleMembers()[i];
+		  if (actor.battleSkillsRaw().contains(340)) {
+		    var value2 = `\\C[2]\\Sin[340]\\C[0]効果が発動！　（×\\C[10]${valueChainMemberCount-1}\\C[0]）`;
+		    BattleManager._logWindow.push(`addText`, value2);
+		    valueCountSet1 += 1;
+		    break;
+		}};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:104|戦闘毎ターン
+	iteratePartyMembers12 = function () {
+		if(valueCountSet1 >= 1){
+		  for (var i = 0; i < $gameParty.battleMembers().length; i++) {
+		    var actor = $gameParty.battleMembers()[i];
+		    actor.startAnimation(426, false, 0);
+		    for (var id1 = 2; id1 <= valueChainMemberCount; id1++) {
+		      for (var j = 206; j <= 211; j++) {
+		        actor.addState(j);
+		}}}};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:104|戦闘毎ターン
+	iteratePartyMembers13 = function () {
+		if($gameParty.membersState(771)){
+		  for (var i = 0; i < $gameParty.battleMembers().length; i++) {
+		    var actor = $gameParty.battleMembers()[i];
+		    if(actor.isStateAffected(771) && actor.isAlive()){
+		      var value2 = actor._stateCounter[771];
+		      if(value2 >= 1){
+		        $gameVariables.value(380+actor.actorId())[2] += value2;
+		        var value3 = $gameVariables.value(380+actor.actorId())[2];
+		        actor.setStateCounter(771, 0);
+		        var value1 = `${actor.name()}の発情度\\C[27]+${value2}\\C[0] (${value3})`;
+		        BattleManager._logWindow.push(`addText`, value1);
+		}}}};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:104|戦闘毎ターン
+	iteratePartyMembers14 = function () {
+		for (var j = 0; j < $gameParty.battleMembers().length; j++) {
+		  var actor = $gameParty.battleMembers()[j];
+		  if($gameParty.members().contains(actor) &&actor.isAlive()){
+		    if($gameSwitches.value(374)){
+		      actor_skilllearn2(actor.actorId());
+		    };
+		    if(($gameVariables.value(263) %10) == 0){
+		      actor.addState(31);
+		    };
+		}};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:104|戦闘毎ターン
+	setSwitch482 = function () {
+		for (var i = 0; i < $gameParty.battleMembers().length; i++) {
+		  var actor = $gameParty.battleMembers()[i];
+		  if($gameParty.members().contains(actor)){
+		    if([101,111,121,131,141,151,161,171,181,191].some(function(id){return actor.skillMasteryLevel(id) >= 3})){
+		      var value1 = `通常攻撃スキルが\\C[2]ランク3\\C[0]になる事で、その武器威力が上昇するパッシブスキルが習得できるようになります`;
+		      gab_wordParticle(value1); 
+		      $gameSwitches.setValue(482,true);
+		      break;
+		}}};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:104|戦闘毎ターン
+	setVariable300TachiePicId2 = function (interp) {
+		return (function () {
+		var list = $gameVariables.value(247);
+		list.forEach(function(id) {
+		$gameVariables.setValue(300,Number($dataActors[id].meta['tachiePicId']));
+		if($gameActors.actor(id).tp >= 100){
+		var value1 = $dataActors[id].meta['AfterimageRGB'].split(',')[0]; var value2 = $dataActors[id].meta['AfterimageRGB'].split(',')[1]; var value3 = $dataActors[id].meta['AfterimageRGB'].split(',')[2];
+		var args = new Array(String(getPreviousTachiePicId()),'20',String(value1),String(value2),String(value3));
+		this.pluginCommand("PICT_AFTERIMAGE_ADD", args);
+		} else {
+		var args = new Array(String(getPreviousTachiePicId()));
+		this.pluginCommand("PICT_AFTERIMAGE_REMOVE", args);
+		}}, this);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:104|戦闘毎ターン
+	iteratePartyMembers15 = function () {
+		for (var i = 0; i < $gameParty.battleMembers().length; i++) {
+		  var actor = $gameParty.battleMembers()[i];
+		  if(actor.isStateAffected(61) && actor.isAlive()){
+		    var value1 = getRandomIndex(101);
+		    seiyoku_skillProbabilityUp1(actor);
+		    value1 += valueCountSet3;
+		    if(value1 >= 90){
+		      actor.addState(65);
+		}}};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:105|戦闘マップ全滅ボーナス
+	iterateItems6 = function () {
+		valueWordSet0 = `\\C[1]<${$dataItems[$gameVariables.value(240)].name}>\\C[0]出現エネミーの殲滅が完了！`;
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:105|戦闘マップ全滅ボーナス
+	handleScriptSnippet18 = function () {
+		valueWordSet0 = 0;
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:105|戦闘マップ全滅ボーナス
+	setScreenDTextPicture2 = function () {
+		var value1 = valueWordSet1;
+		var value2 = 28;
+		$gameScreen.setDTextPicture(value1, value2);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:105|戦闘マップ全滅ボーナス
+	setVariable21FirstAnnihilationItem = function () {
+		var variable240Value = $dataItems[$gameVariables.value(240)].meta['firstAnnihilationItem'].split(',');
+		if(Number(variable240Value[0]) == 0){valueItems = $dataItems[Number(variable240Value[1])]};
+		if(Number(variable240Value[0]) == 1){valueItems = $dataWeapons[Number(variable240Value[1])]};
+		if(Number(variable240Value[0]) == 2){valueItems = $dataArmors[Number(variable240Value[1])]};
+		$gameParty.gainItem(valueItems, 1);
+		var value1 = `\\C[2]<初回殲滅特典>\\C[0]\x1bI[${valueItems.iconIndex}]${valueItems.name}を入手した！`;
+		$gameScreen.setDTextPicture(value1, 28);
+		$gameVariables.setValue(21,`${valueItems.description}`);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:106|
+	logBattleText2 = function () {
+		var actor = $gameActors.actor($gameVariables.value(20));
+		var clothes = $gameVariables.value(243);
+		BattleManager._logWindow.push(`addText`, `${actor.name()}の${clothes}が破損した！`);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:106|
+	iterateItemsSetTint = function (interp) {
+		return (function () {
+		if($dataItems[$gameVariables.value(244)].meta['色相']){
+		var value = $dataItems[$gameVariables.value(244)].meta['色相'];
+		var args = new Array("42",String(value));
+		this.pluginCommand("SetTint", args);
+		};
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:106|
+	iterateItems2_2 = function (interp) {
+		return (function () {
+		if($dataItems[$gameVariables.value(244)].meta['色相2']){
+		var value = $dataItems[$gameVariables.value(244)].meta['色相2'].split(',')[2];
+		var args = new Array("44",String(value));
+		this.pluginCommand("SetTint", args);
+		};
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:106|
+	picture3 = function () {
+		$gameScreen.picture(42)._opacity = 255;
+		if($gameScreen.picture(44)){
+		$gameScreen.picture(44)._opacity = 255;
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:109|ダメージ時破損コモン
+	setSwitch438 = function () {
+		var value1 = $gameVariables.value($gameVariables.value(20)+380)[4];
+		if(value1 <= 49){ $gameSwitches.setValue(438,true) };
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:109|ダメージ時破損コモン
+	incrementVariable703 = function () {
+		if($dataSystem.optSideView){
+		  var value1 = $gameVariables.value(92) + 1;
+		  $gameVariables.setValue(703,[$gameTroop.getX(value1),$gameTroop.getY(value1)]);
+		  var value2 = $gameActors.actor($gameVariables.value(20)).index() + 1;
+		  $gameVariables.setValue(704,[$gameParty.getX(value2),$gameParty.getY(value2)]);
+		  $gameTroop.set(value1, $gameVariables.value(704)[0]-100, $gameVariables.value(704)[1], 30);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:109|ダメージ時破損コモン
+	aliveMembers = function (interp) {
+		return (function () {
+		if($gameTroop.aliveMembers().length >= 1){
+		var value3 = $gameTroop.aliveMembers().length;
+		} else {
+		var value3 = 1;
+		};
+		h_exp3(1,value3,value3,0,0,0,0,0,0,0,0);//10
+		//0セク1乳2尻揉3失禁4潮吹5売春6妊7子8中だ9ｱﾅﾙ出し10口飲
+		this.setupChild($dataCommonEvents[85].list, 0);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:109|ダメージ時破損コモン
+	handleScriptSnippet19 = function () {
+		var arr1 = [54,61,62,63,64,65,66,67,68,69,70,71];
+		pic_eraseP(0,arr1);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:110|Ｈ攻撃時コモン
+	setVariable318 = function () {
+		var variable20Value = $gameVariables.value(20);//文字HBGV
+		$gameVariables.setValue(318,variable20Value);
+		$gameVariables.setValue(706,[640,384,1,60,0,0]);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:110|Ｈ攻撃時コモン
+	setSelfVariable401_3 = function (interp) {
+		return (function () {
+		this.sVal(401,getRandomIndex(11) + 10);
+		if($gameSwitches.value(122)){this.setupChild($dataCommonEvents[85].list, 0)};
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:110|Ｈ攻撃時コモン
+	readVariable20_7 = function () {
+		valueBattleSexCountArr[$gameVariables.value(20)] += 1;
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:110|Ｈ攻撃時コモン
+	setSwitch380_2 = function () {
+		$gameSwitches.setValue(380,false);
+		var value1 = $gameVariables.value($gameVariables.value(20)+380)[1];
+		var value1 = Math.floor(value1 / 100);
+		var value1 = value1 * 2;
+		var variable20Value = valueBattleSexCountArr[$gameVariables.value(20)];
+		var value2 = `性交回数:\\C[27]${variable20Value}\\C[0] / 性交限界回数:\\C[2]${value1}\\C[0]`;
+		BattleManager._logWindow.push(`addText`, value2);
+		if(variable20Value >= value1){
+		  $gameSwitches.setValue(380,true);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:110|Ｈ攻撃時コモン
+	setVariable21SexualBattleEndLow = function () {
+		if($dataActors[$gameVariables.value(20)].meta['SexualBattleEndLow']){
+		  var actor = $gameActors.actor($gameVariables.value(20));
+		  var value3 = 'Low';var value4 = 22;
+		  if($gameActors.actor($gameVariables.value(20)).isLearnedSkill(62)){var value3 = 'Middle';var value4 = 34};
+		  if($gameActors.actor($gameVariables.value(20)).isLearnedSkill(65)){var value3 = 'Hi';var value4 = 36};
+		  var arr1 = $dataActors[$gameVariables.value(20)].meta['SexualBattleEnd' + value3].split(',');
+		  var value1 = arr1[getRandomIndex(arr1.length)];
+		  var value2 = `${actor.name()}`;
+		  $gameVariables.setValue(21,`\\nw[${value2}]${value1}`);
+		  valueFaceSelect = value4;
+		  battle_bustUp(51,500,10,40);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:111|衣装全損
+	setVariable460 = function (interp) {
+		return (function () {
+		valueCountSet2 = [];
+		var list = [20,21,22,23,25,28];
+		list.forEach(function(id) {
+		  clothes_hason1([id],0);
+		  valueCountSet2.push($gameVariables.value(244));
+		  $gameVariables.setValue(460+id,0);
+		}, this);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:111|衣装全損
+	setVariable244 = function () {
+		var actor = $gameActors.actor($gameVariables.value(20));
+		for (var i = 0; i <= valueCountSet2.length-1; i++) {
+		  if(valueCountSet2[i] >= 1){
+		    $gameVariables.setValue(244,valueCountSet2[i]);
+		    var value2 = `${actor.name()}の${$dataItems[valueCountSet2[i]].name}が破損した！`;
+		    if($gameParty.inBattle()){
+		      BattleManager._logWindow.push(`addText`, value2);
+		    } else {
+		      CommonPopupManager.showInfo({},value2,null);
+		    };
+		    clothes_hason2(0,1);
+		}};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:112|衣装通常破損
+	logBattleText3 = function () {
+		var value1 = $gameVariables.value($gameVariables.value(20)+380)[4];
+		var actor = $gameActors.actor($gameVariables.value(20));
+		var clothes = $gameVariables.value(243);
+		var value2 = `${actor.name()}の${clothes}が破損した！　（現在露出値:${value1}）`;
+		if($gameParty.inBattle()){
+		  BattleManager._logWindow.push(`addText`, value2);
+		} else {
+		  CommonPopupManager.showInfo({},value2,null);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:113|戦闘絶頂表現
+	readVariable20_8 = function () {
+		h_BattleEcstasyDirect();
+		$gameVariables.value($gameVariables.value(20)+380)[2] = 0;
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:120|雑魚戦闘用
+	setup = function (interp) {
+		return (function () {
+		BattleManager.setup(valueCountSet1, valueCountSet2, true);
+		BattleManager.setEventCallback(function(n) {this._branch[this._indent] = n;}.bind(this));
+		$gamePlayer.makeEncounterCount();
+		SceneManager.push(Scene_Battle);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:120|雑魚戦闘用
+	iterateItemsList = function (interp) {
+		return (function () {
+		var value1 = [-45,45,-90,90][getRandomIndex(4)];
+		if(value1 == 90){var value2 = -24};if(value1 == 45){var value2 = -12};
+		if(value1 == -90){var value2 = 24};if(value1 == -45){var value2 = 12};
+		this.character(this._eventId).forceMoveRoute({
+		"list":[{"code":41,
+		"parameters":[$dataItems[$gameVariables.value(240)].meta.EnemyGraphic.split(',')[0],
+		Number($dataItems[$gameVariables.value(240)].meta.EnemyGraphic.split(',')[1])]},
+		{"code":15, "parameters":[10]},
+		{ "code": 45, "parameters": ["this.setAngle(value1);"] },
+		{ "code": 45, "parameters": ["this._spriteOffsetX = value2;"] },{ "code": 45, "parameters": ["this._spriteOffsetY = value2;"] },
+		{"code":32},{"code":34},{"code":35},{"code":37},
+		{"code":0}],"repeat":false,"skippable":true});
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:121|ボスその他戦闘用
+	battleBgmName = function () {
+		var value1 = $gameSystem.battleBgm().name;
+		var value2 = $gameSystem.battleBgm().volume;
+		var value3 = $gameSystem.battleBgm().pitch;
+		var value4 = $gameSystem.battleBgm().pan;
+		AudioManager.playBgm({"name":value1,"volume":value2,"pitch":value3,"pan":value4});
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:121|ボスその他戦闘用
+	handleScriptSnippet20 = function () {
+		valueBossId = 0;
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:121|ボスその他戦闘用
+	readVariable337Name = function () {
+		if($gameVariables.value(337) != 0){
+		  var variable337Value = $gameVariables.value(337);
+		  $gameSystem.setBattleBgm({"name":variable337Value[0],"volume":variable337Value[1],"pitch":variable337Value[2],"pan":variable337Value[3]});
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:121|ボスその他戦闘用
+	setVariable20_3 = function () {
+		for (var i = 0; i <= $gameParty.battleMembers().length-1; i++) {
+		  var actor = $gameParty.battleMembers()[i];
+		    if(isGirl(actor)){
+		      $gameVariables.setValue(20,$gameParty.battleMembers()[i].actorId());
+		      tachie_settei2();
+		}};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:121|ボスその他戦闘用
+	setup2 = function (interp) {
+		return (function () {
+		var value1 = valueTroopId;//直前に入れる戦闘グループ名
+		//逃走無効を条件分岐させる？
+		BattleManager.setup(value1, false, true);
+		BattleManager.setEventCallback(function(n) {this._branch[this._indent] = n;}.bind(this));
+		$gamePlayer.makeEncounterCount();
+		SceneManager.push(Scene_Battle);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:124|呼びエネミー生成
+	iterateItemsList2 = function (interp) {
+		return (function () {
+		this.character($gameVariables.value(223)).forceMoveRoute({
+		"list":[{"code":41,
+		"parameters":[$dataItems[$gameVariables.value(240)].meta.EnemyGraphic.split(',')[0],
+		Number($dataItems[$gameVariables.value(240)].meta.EnemyGraphic.split(',')[1])]},
+		{"code":15, "parameters":[60]},
+		{"code":29, "parameters":[getRandomIndex(4) + 2]},
+		{"code":0}]
+		});
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:124|呼びエネミー生成
+	iterateItemsList3 = function (interp) {
+		return (function () {
+		this.character($gameVariables.value(223)).forceMoveRoute({
+		"list":[{"code":41,
+		"parameters":[$dataItems[$gameVariables.value(240)].meta.EnemyGraphic.split(',')[0],
+		Number($dataItems[$gameVariables.value(240)].meta.EnemyGraphic.split(',')[1])]},
+		{"code":15, "parameters":[60]},{"code":45,"parameters":["this.setTone(50, -100, 50);"]},{"code":0}]
+		});
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:128|エネミー変身コモン
+	handleScriptSnippet21 = function () {
+		valueEnemyEntrySetId = 0;
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:128|エネミー変身コモン
+	iterateTroopMembers3 = function () {
+		var value1 = 0;
+		var enemy = $gameTroop.members()[valueWordSet10];
+		var enemy1 = enemy._enemyId;
+		if($dataEnemies[enemy1].meta[valueWordSet9]){
+		  var value1 = enemy1;
+		};
+		valueEnemyEntrySetId = value1;
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:128|エネミー変身コモン
+	iterateTroopMembers4 = function () {
+		var enemy = $gameTroop.members()[valueWordSet10];
+		var enemy1 = enemy._enemyId;
+		var arr1 = $dataEnemies[enemy1].meta[valueWordSet9].split(',');
+		valueWordSet7 = Number(arr1[4]);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:128|エネミー変身コモン
+	iterateTroopMembers5 = function (interp) {
+		return (function () {
+		var enemy = $gameTroop.members()[valueWordSet10];
+		var enemy1 = enemy._enemyId;
+		var arr1 = $dataEnemies[enemy1].meta[valueWordSet9].split(',');
+		var value1 = Number(arr1[0]);
+		enemy.startAnimation(value1, true, 0);
+		var value2 = $dataAnimations[value1].frames.length;
+		var value3 = 4;
+		if($dataAnimations[value1].name.match(/!/)){var value3 = 1};
+		if($dataAnimations[value1].name.match(/&/)){var value3 = 2};
+		if($dataAnimations[value1].name.match(/$/)){var value3 = 3};
+		this.wait(Math.ceil((value2)*value3/4));
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:128|エネミー変身コモン
+	iterateTroopMembers6 = function () {
+		var value1 = valueWordSet8;
+		var enemy = $gameTroop.members()[valueWordSet10];
+		var enemy1 = enemy._enemyId;
+		enemy.addState(value1);
+		enemy.refresh();
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:129|ボス覚醒行動
+	iterateTroopMembers7 = function () {
+		a =  $gameTroop.members()[0];
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:129|ボス覚醒行動
+	iterateSkills7 = function () {
+		var variable347Value = 0;
+		for (var i = 1; i <= 8; i++) {
+		  if($gameVariables.value(347)[i][0] == 9){
+		    if(a.hpRate() <= $gameVariables.value(347)[i][1] / 100){
+		      if(a.meetsSkillConditions($dataSkills[$gameVariables.value(347)[i][2]])){
+		        var variable347Value = $gameVariables.value(347)[i][2];
+		}}}};
+		valueCountSet1 = variable347Value;
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:129|ボス覚醒行動
+	handleScriptSnippet22 = function () {
+		valueBossAction = valueCountSet1;
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:129|ボス覚醒行動
+	handleScriptSnippetEnemyMiddleChange = function () {
+		valueWordSet7 = 0;//会話イベント指定変数
+		valueWordSet8 = 551;//付与ステートid
+		valueWordSet9 = 'EnemyMiddleChange';//meta判定
+		valueWordSet10 = 0;//変身するかしないか判定
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:129|ボス覚醒行動
+	iterateTroopMembers8 = function () {
+		var value1 = `${$gameTroop.members()[0].name()}は真の力を解放した！`;
+		BattleManager._logWindow.push(`addText`, value1);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:130|ボス行動
+	forceAction = function (interp) {
+		return (function () {
+		if(valueBossAction >= 1){
+		  var value100 = valueBossAction;
+		} else {
+		  var value100 = valueBossActionNormal;
+		};
+		attack_keisan1(BattleManager._subject,value100,1);
+		this.forceAction(BattleManager._subject, value100, -1);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:131|行動条件で設定
+	setSelfVariable21_6 = function (interp) {
+		return (function () {
+		var action = BattleManager._action;
+		this.sVal(21,BattleManager._action._item._itemId);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:140|カットインコモン
+	value3 = function () {
+		if(!$gameSwitches.value(131)){ //立ち絵禁止のスイッチで条件分岐
+		tachie_syoukyo1(getPreviousTachiePicId());
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:140|カットインコモン
+	fill3 = function () {
+		valueCutInSet1 = Array(7).fill(0);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:141|会話カットインコモン
+	setSelfVariable251 = function (interp) {
+		return (function () {
+		cutin_preparation(5,$gameVariables.value(20));
+		this.sVal(251,valueCutInSet);
+		var args = new Array(String(valueCutInSet2));
+		this.pluginCommand("味方カットイン", args);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:141|会話カットインコモン
+	readVariable22LinesSp = function () {
+		var value1 = 'lines_sp';//集中線
+		var variable22Value = $gameVariables.value(22);
+		$gameScreen._particle.particleUpdate([value1,'pos',variable22Value,0]);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:141|会話カットインコモン
+	readVariable20EaseOutBack = function () {
+		var value1 = 'easeOutBack';
+		picture_easingConfiguration(value1);
+		var value1 = 100 - valueADVCutinDirect;
+		var value2 =  'CutInCG_Actor'+$gameVariables.value(20)+'_'+$gameVariables.value(21);
+		var variable22Value = $gameVariables.value(22);
+		$gameScreen.showPicture(value1,value2,1,640+variable22Value,384,100,0,255,0);
+		$gameScreen.movePicture(value1,1,640+variable22Value,384,100,100,255,0,40);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:141|会話カットインコモン
+	handleScriptSnippet23 = function () {
+		valueADVCutinDirect += 1;
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:141|会話カットインコモン
+	pictureEaseOutBack = function () {
+		var value1 = 'easeOutBack';
+		picture_easingConfiguration(value1);
+		for (var i = 98; i <= 100; i++) {
+		if($gameScreen.picture(i)){
+		var value1 = $gameScreen.picture(i).x();
+		var value2 = $gameScreen.picture(i).y();
+		$gameScreen.movePicture(i,1,value1,value2,100,0,0,0,30);
+		}};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:141|会話カットインコモン
+	handleScriptSnippet24 = function () {
+		valueADVCutinDirect = 0;
+		adv_partDirectSet(1,2);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:142|ボスＨＰ表示
+	handleScriptSnippet25 = function () {
+		SceneManager._scene._bosshp_sprites.visible = true;
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:150|トータルダメージ表示変数
+	handleScriptSnippetEaseOutBounce = function () {
+		if(valueTotalDamageCount >= 100000){
+		var value1 = 'easeOutBounce';
+		} else {
+		var value1 = 'easeOutBack';
+		};
+		picture_easingConfiguration(value1);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:150|トータルダメージ表示変数
+	setScreenDTextPicture3 = function () {
+		var value1 =  96;
+		var value2 =  valueTotalDamageCount; var value3 =  value2.toLocaleString();
+		var value4 = 50; var value5 = 400; var value6 = 480;
+		if(valueTotalDamageCount <= 9999){ var value4 = 45 };
+		if(valueTotalDamageCount >= 100000){ var value4 = 55 };
+		if($gameVariables.value(276) == 2){
+		$gameScreen.setDTextPicture(`\\f[b]\\oc[22]\\f[i]Total${valueTotalDamageCount2}Hit,\\C[10]${value3}\\C[17]Damage!\\C[0]`, value4);
+		} else {
+		$gameScreen.setDTextPicture(`\\f[b]\\oc[2]\\f[i]Total${valueTotalDamageCount2}Hit,\\C[10]${value3}\\C[17]Damage!\\C[0]`, value4);
+		};
+		$gameScreen.showPicture(value1,"",0,value5-50,value6,100,100,100,0);
+		$gameScreen.movePicture(value1,0,value5,value6,100,100,255,0,20);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:150|トータルダメージ表示変数
+	setScreenDTextPicture4 = function () {
+		var value1 =  96;
+		var variable330Value =  $gameVariables.value(330);
+		var value3 =  variable330Value.toLocaleString();
+		var value4 = 50;
+		if($gameVariables.value(330) <= 9999){ var value4 = 45 };
+		if($gameVariables.value(330) >= 100000){ var value4 = 55 };
+		$gameScreen.setDTextPicture(`\\f[b]\\oc[22]\\f[i]Total,\\C[10]${value3}\\C[17]Damage!\\C[0]`, value4);
+		if($gameVariables.value(276) == 2){var value5 = 850;}else{var value5 = 850}
+		$gameScreen.showPicture(value1,"",0,value5-50,50,100,100,0,0);
+		$gameScreen.movePicture(value1,0,value5,50,100,100,255,0,20);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:159|露出限界判定時内部処理
+	iterateActorsTachiePicId = function () {
+		var variable20Value = Number($dataActors[$gameVariables.value(20)].meta['tachiePicId']);
+		var value2 = $gameScreen.picture(variable20Value)._x-600;
+		var value3 = $gameScreen.picture(variable20Value)._y;
+		var value4 = $gameScreen.picture(variable20Value)._scaleX;
+		var value5 = $gameScreen.picture(variable20Value)._scaleY;
+		$gameScreen.movePicture(variable20Value,1,
+		value2,value3,value4,value5,
+		$gameVariables.value(109),
+		0,120);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:159|露出限界判定時内部処理
+	setSelfVariable49Actor = function (interp) {
+		return (function () {
+		var actor = $gameActors.actor($gameVariables.value(20));
+		this.sVal(49,actor.name());
+		$gameMessage.add(`\\nw[\\V[49]]${$gameVariables.value(21)[0]}`);
+		$gameMessage.setFaceImage($gameVariables.value(20)+'Actor'+$gameVariables.value(21)[1], $gameVariables.value(21)[2]);
+		this.setWaitMode('message');
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:159|露出限界判定時内部処理
+	setVariable21 = function () {
+		var variable19Value = `\\V[49]は\x1bIIN[${$gameVariables.value(19)}]に着替えた。`;
+		//CommonPopupManager.showInfo({},variable19Value,null);
+		$gameVariables.setValue(21,variable19Value);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:160|立ち絵処理
+	pluginCommandPCALLCEREMOVE = function (interp) {
+		return (function () {
+		var args = new Array(String(getPreviousTachiePicId()))
+		this.pluginCommand("P_CALL_CE_REMOVE", args);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:161|主人公先頭グラ指定コモン
+	iterateActorsOtherCharaChip = function (interp) {
+		return (function () {
+		var variable11Value = $dataActors[$gameVariables.value(11)].meta['OtherCharaChip'].split(',')[0];
+		var variable11Value2 = Number($dataActors[$gameVariables.value(11)].meta['OtherCharaChip'].split(',')[1]);
+
+		this.character(-1).forceMoveRoute({
+		"list":[{"code":41, "parameters":[variable11Value,variable11Value2]},{"code":38},{"code":29, "parameters":[4]},
+		{"code":31},{"code":33},{"code":0}],});
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:165|装着衣装一覧
+	setSelfVariable519ClothSwitch = function (interp) {
+		return (function () {
+		//装着衣装計上1
+		var list = [37,32,35,36,29,28,26,24,17,25,23,22,21,20,11,14,7,27,18];
+		list.forEach(function(id) {
+		for(var i=1101; i < $dataItems.length; i ++){
+		if(id+460 == Number($dataItems[i].meta['ClothSwitch'])+460 &&
+		$gameVariables.value(id+460) == Number($dataItems[i].meta['ClothAllocationNumber'])){
+		if(Number($dataItems[i].meta['EICSwitch']) == 200 || $gameVariables.value(20) == Number($dataItems[i].meta['EICSwitch']) -180){
+		this.sVal(519,$gameVariables.value(519)+`${$dataItems[i].name}\n`);
+		  }};
+		}}, this);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:166|着せ替え
+	readVariable20ScreenBlackOut = function () {
+		var value1 = 6;
+		if($gameSwitches.value(204)){var value4 = 1}else{var value4 = 2};
+		if($gameActors.actor($gameVariables.value(20)).isStateAffected(61)){var value4 = 3};
+		var value2 = 'Scene_Dress up'+value4;
+		var value3 = 'ScreenBlackOut';
+		$gameScreen.showPicture(value1,value2,1,640,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640,384,100,100,220,0,60);
+		$gameScreen.showPicture(value1+4,value2,1,640,384,100,100,0,0);
+		$gameScreen.movePicture(value1+4,1,640,384,100,100,150,0,60);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:167|着せ替え中身
+	setVariable30 = function () {
+		for(var i = 1; i < 100; i ++){
+		  if(valueRandomSet[i] == $gameVariables.value(19)){
+		    $gameVariables.setValue(30,i-1);
+		}};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:167|着せ替え中身
+	iterateItemsClothType = function (interp) {
+		return (function () {
+		var value = 460;
+		var value3 = '通常'
+		for(var i=1101; i < $dataItems.length; i ++){
+		if($dataItems[i].meta['ClothType'] === value3){
+		  if ($gameVariables.value(20) + 380 == Number($dataItems[i].meta['EICSwitch']) || $gameVariables.value(20) + 180 == Number($dataItems[i].meta['EICSwitch']) || 200 == Number($dataItems[i].meta['EICSwitch'])  || 400 == Number($dataItems[i].meta['EICSwitch'])) {
+		     if($dataItems[i].meta['subCategory'] === $dataItems[$gameVariables.value(19)].meta['subCategory']){
+		var value1 = Number($dataItems[i].meta['ClothSwitch']);
+		var value2 = Number($dataItems[i].meta['ClothAllocationNumber']);
+		this.sVal(value+value1,value2);
+		  }}}};
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:167|着せ替え中身
+	iterateItemsClothType2 = function (interp) {
+		return (function () {
+		var value = 460;
+		var variable19Value = $dataItems[$gameVariables.value(19)].meta['ClothType']
+		for(var i=1101; i < $dataItems.length; i ++){
+		if($dataItems[i].meta['ClothType'] === variable19Value){
+		  if ($gameVariables.value(20) + 380 == Number($dataItems[i].meta['EICSwitch']) || $gameVariables.value(20) + 180 == Number($dataItems[i].meta['EICSwitch']) || 200 == Number($dataItems[i].meta['EICSwitch'])  || 400 == Number($dataItems[i].meta['EICSwitch'])) {
+		     if($dataItems[i].meta['subCategory'] === $dataItems[$gameVariables.value(19)].meta['subCategory']){
+		var value1 = Number($dataItems[i].meta['ClothSwitch']);
+		var value2 = Number($dataItems[i].meta['ClothAllocationNumber']);
+		this.sVal(value+value1,value2);
+		  }}}};
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:167|着せ替え中身
+	iterateItemsClothSwitch = function (interp) {
+		return (function () {
+		var value = 460;
+		var variable19Value = Number($dataItems[$gameVariables.value(19)].meta['ClothSwitch']);
+		var variable19Value2 = Number($dataItems[$gameVariables.value(19)].meta['ClothAllocationNumber']);
+		if($gameVariables.value(value+variable19Value) == variable19Value2){
+		this.sVal(value+variable19Value,0);
+		} else {
+		this.sVal(value+variable19Value,variable19Value2);
+		};
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:167|着せ替え中身
+	setVariable311TachiePicId = function () {
+		var variable20Value = Number($dataActors[$gameVariables.value(20)].meta['tachiePicId']);
+		$gameVariables.setValue(311,$gameScreen.picture(variable20Value).origin());
+		$gameVariables.setValue(312,$gameScreen.picture(variable20Value).x());
+		$gameVariables.setValue(313,$gameScreen.picture(variable20Value).y());
+		$gameVariables.setValue(314,$gameScreen.picture(variable20Value).scaleX());
+		$gameVariables.setValue(315,$gameScreen.picture(variable20Value).scaleY());
+		$gameVariables.setValue(316,$gameScreen.picture(variable20Value).opacity());
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:167|着せ替え中身
+	iterateActorsTachiePicId2 = function () {
+		var variable20Value = Number($dataActors[$gameVariables.value(20)].meta['tachiePicId']);
+		var value2 = 200;
+		if($gameVariables.value(19) == clothSlideUp){value2 = -200};
+		$gameScreen.movePicture(variable20Value,
+		$gameVariables.value(311),
+		$gameVariables.value(312),
+		$gameVariables.value(313) + value2,
+		$gameVariables.value(314),
+		$gameVariables.value(315),
+		$gameVariables.value(316), 0,60);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:167|着せ替え中身
+	showTickerMessage = function () {
+		var variable355Value = $gameVariables.value(355)[$gameVariables.value(20)][valueCountSet1][50];
+		var actor21Name = `${variable355Value}の名称を${$gameActors.actor(21).name()}に変更しました。`;
+		TickerManager.show(actor21Name);
+		$gameVariables.value(355)[$gameVariables.value(20)][valueCountSet1][50] = $gameActors.actor(21).name();
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:167|着せ替え中身
+	showTickerMessage2 = function () {
+		var start = 0; var end = 41;
+		for (var i = start; i <= end; i++) {
+		  $gameVariables.value(355)[$gameVariables.value(20)][valueCountSet1][i] = $gameVariables.value($gameVariables.value(20)+440)[i];
+		};
+		$gameVariables.value(355)[$gameVariables.value(20)][valueCountSet1][49] = 1;
+		var variable355Value = $gameVariables.value(355)[$gameVariables.value(20)][valueCountSet1][50];
+		var value1 = `現在の衣装状態を${variable355Value}に登録しました。`;
+		TickerManager.show(value1);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:167|着せ替え中身
+	setVariable21_2 = function () {
+		$gameVariables.setValue(21,$gameVariables.value(355)[$gameVariables.value(20)][1][50]);
+		$gameVariables.setValue(22,$gameVariables.value(355)[$gameVariables.value(20)][2][50]);
+		$gameVariables.setValue(23,$gameVariables.value(355)[$gameVariables.value(20)][3][50]);
+		$gameVariables.setValue(24,$gameVariables.value(355)[$gameVariables.value(20)][4][50]);
+		if($gameVariables.value(355)[$gameVariables.value(20)][1][49] == 1){$gameSwitches.setValue(161,true)};
+		if($gameVariables.value(355)[$gameVariables.value(20)][2][49] == 1){$gameSwitches.setValue(162,true)};
+		if($gameVariables.value(355)[$gameVariables.value(20)][3][49] == 1){$gameSwitches.setValue(163,true)};
+		if($gameVariables.value(355)[$gameVariables.value(20)][4][49] == 1){$gameSwitches.setValue(164,true)};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:167|着せ替え中身
+	readVariable20_9 = function () {
+		$gameVariables.value($gameVariables.value(20)+440)[41] = $gameVariables.value(355)[$gameVariables.value(20)][valueCountSet1][41];
+		$gameVariables.value(348)[$gameVariables.value(20)] = $gameVariables.value($gameVariables.value(20)+440)[41];
+		$gameVariables.value($gameVariables.value(20)+440)[0] = $gameVariables.value(355)[$gameVariables.value(20)][valueCountSet1][0];
+		//現在衣装を初期化
+		var start = 1; var end = 40;
+		for (var i = start; i <= end; i++) {
+		  $gameVariables.setValue(i+460,$gameVariables.value(355)[$gameVariables.value(20)][valueCountSet1][i]);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:167|着せ替え中身
+	setVariable12 = function () {
+		for(var i=1; i < 200; i ++){
+		  if(valueRandomSet[i] == $gameVariables.value(19)){
+		    $gameVariables.setValue(12,i-1);
+		}};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:172|星晶獣選択
+	readVariable19_3 = function () {
+		valueCountSet1 = 2;
+		valueCountSet2 = $gameVariables.value(19);
+		item_oneOffBuy(1,valueCountSet1,valueCountSet2,1);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:174|一括売却対象指定
+	show = function () {
+		  WindowManager.show(0, 0, 0, 984, 80);
+		  var value4 = ``;
+		  //var value7 = `\\FS[25]対象を選択して下さい　　　　　　　　　　　　　　　　　　　　　　　　　　　`;
+		  WindowManager.drawText(0, value4);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:174|一括売却対象指定
+	handleScriptSnippet26 = function () {
+		valueWordArray = [];
+		valueCountArray = [];
+		valueCountArray2 = [];
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:174|一括売却対象指定
+	handleScriptSnippet27 = function () {
+		valueWordArray = [];
+		valueCountArray = [];
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:174|一括売却対象指定
+	readVariable19_4 = function () {
+		var variable19Value = $gameVariables.value(19);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:174|一括売却対象指定
+	iterateItems7 = function () {
+		if(valueCountArray2[$gameVariables.value(30)] == 0){var valueItems = $dataItems};
+		if(valueCountArray2[$gameVariables.value(30)] == 1){var valueItems = $dataWeapons};
+		if(valueCountArray2[$gameVariables.value(30)] == 2){var valueItems = $dataArmors};
+		var variable19Value = `\x1bI[${valueItems[$gameVariables.value(19)].iconIndex}]${valueItems[$gameVariables.value(19)].name}`;
+		if($gameSelfSwitches.getVariableValue([4, 11+valueCountArray2[$gameVariables.value(30)], $gameVariables.value(19)]) == 1){
+		  $gameSelfSwitches.setVariableValue([4, 11+valueCountArray2[$gameVariables.value(30)], $gameVariables.value(19)],0);
+		  variable19Value += `の一括売却対象指定を解除しました`;
+		} else {
+		  $gameSelfSwitches.setVariableValue([4, 11+valueCountArray2[$gameVariables.value(30)], $gameVariables.value(19)],1);
+		  variable19Value += `を一括売却対象指定に登録しました`;
+		};
+		WindowManager.drawText(0, variable19Value);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:174|一括売却対象指定
+	iterateItems8 = function () {
+		if(valueCountSet2 == 0){var valueItems = $dataItems};
+		if(valueCountSet2 == 1){var valueItems = $dataWeapons};
+		if(valueCountSet2 == 2){var valueItems = $dataArmors};
+		var variable19Value = `\x1bI[${valueItems[$gameVariables.value(19)].iconIndex}]${valueItems[$gameVariables.value(19)].name}`;
+		if($gameSelfSwitches.getVariableValue([4, 11+valueCountSet2, $gameVariables.value(19)]) == 1){
+		  $gameSelfSwitches.setVariableValue([4, 11+valueCountSet2, $gameVariables.value(19)],0);
+		  variable19Value += `の一括売却対象指定を解除しました`;
+		} else {
+		  $gameSelfSwitches.setVariableValue([4, 11+valueCountSet2, $gameVariables.value(19)],1);
+		  variable19Value += `を一括売却対象指定に登録しました`;
+		};
+		WindowManager.drawText(0, variable19Value);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:175|一括売却実行
+	configureSystem2 = function () {
+		var id3 = valueCountSet3;//件数合計
+		var id4 = valueCountSet4.toLocaleString();//個数累計
+		var id5 = valueCountSet5.toLocaleString();//金額合計
+		var id6 = valueCountSet6.toLocaleString();//変数57合計
+		var id7 = valueCountSet7.toLocaleString();//ｱｲﾃﾑID270合計
+		valueWordSet0 = `\\C[16]<一括売却結果>\\C[0] \\C[2]${id3}種\\C[0] \\C[3]${id4}個\\C[0] \\C[10]${id5}\G\\C[0]`;
+		if(valueCountSet6 >= 1 || valueCountSet7 >= 1){
+		  valueWordSet0 += `\n`;
+		  if(valueCountSet6 >= 1){valueWordSet0 += `${$dataSystem.variables[57]}:${id6} `};
+		  if(valueCountSet7 >= 1){valueWordSet0 += `\\IIN[${270}]:${id7} `};
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:176|訓練人形設定
+	setScreenDTextPicture5 = function () {
+		$gameScreen.setDTextPicture(`ダメージ一覧<\\I[75]:${$gameVariables.value(293)[10]}>　　`, 28);
+		var value3 = 0;
+		for (var i = 1; i <= 20; i++) {
+		  if($gameVariables.value(293)[i + 10] >= 2){
+		    var actor = $gameActors.actor(i);
+		    var value2 = `${actor.name()}:${$gameVariables.value(293)[i + 10].toLocaleString()}`;
+		    $gameScreen.setDTextPicture(value2, 28);
+		    value3 += $gameVariables.value(293)[i + 10];
+		}};
+		$gameScreen.setDTextPicture(`トータル:${value3.toLocaleString()}`, 28);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:176|訓練人形設定
+	setScreenDWindowFrame2 = function () {
+		var value1 = 100;
+		$gameScreen.dWindowFrame = 'ON';
+		$gameScreen.showPicture(value1,'',0,10+50,10,100,100,0,0);
+		$gameScreen.movePicture(value1,0,10,10,100,100,255,0,20);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:176|訓練人形設定
+	setVariable20_4 = function () {
+		var value1 = 1;
+		for (var i = 1; i <= 7; i++) {
+		  if($gameVariables.value(293)[value1] == i){
+		    var variable293Value = $gameVariables.value(293)[value1];
+		    $gameVariables.setValue(20 + value1,`\x1bI[${$dataStates[variable293Value+50].iconIndex}]`);
+		}};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:176|訓練人形設定
+	setVariable20_5 = function () {
+		var value1 = 2;
+		for (var i = 1; i <= 4; i++) {
+		  if($gameVariables.value(293)[value1] == i){
+		    var variable293Value = $gameVariables.value(293)[value1];
+		    if(variable293Value == 1){$gameVariables.setValue(20 + value1,`行動しない`)};
+		    if(variable293Value == 2){$gameVariables.setValue(20 + value1,`攻撃`)};
+		    if(variable293Value == 3){$gameVariables.setValue(20 + value1,`防御`)};
+		    if(variable293Value == 4){$gameVariables.setValue(20 + value1,`命乞い`)};
+		    if(variable293Value == 1 || variable293Value == 4){$dataEnemies[51].actions[0].skillId = 892};
+		    if(variable293Value == 2){$dataEnemies[51].actions[0].skillId = 1};
+		    if(variable293Value == 3){$dataEnemies[51].actions[0].skillId = 2};
+		}};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:176|訓練人形設定
+	setVariable20_6 = function () {
+		var value1 = 3;
+		$gameVariables.setValue(20 + value1,$gameVariables.value(293)[value1]);
+		var value1 = 4;
+		$gameVariables.setValue(20 + value1,$gameVariables.value(293)[value1]);
+		var value1 = 5;
+		$gameVariables.setValue(20 + value1,$gameVariables.value(293)[value1]);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:176|訓練人形設定
+	setVariable20_7 = function () {
+		var value1 = 6;
+		  for (var i = 0; i <= 20; i++) {
+		    if($gameVariables.value(293)[value1] == i){
+		      if(i == 0){$gameVariables.setValue(20 + value1,`種族未設定`)};
+		      if(i >= 1){$gameVariables.setValue(20 + value1,`\x1bI[${$dataStates[i+420].iconIndex}]${$dataStates[i+420].name}`)};
+		  }};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:176|訓練人形設定
+	iterateItems9 = function () {
+		var value1 = 6;
+		  for (var i = 1; i <= 19; i++) {
+		    if($gameParty.hasItem($dataItems[i+340])){
+		      var value2 = `\x1bI[${$dataStates[i+420].iconIndex}]${$dataStates[i+420].name}`;
+		      var value3 = i;
+		      const id = 1; 
+		      const choiceParams = {
+		      text: `${value2}`,value: value3};
+		      $gameSystem.addCustomChoice(id, choiceParams);
+		  }};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:176|訓練人形設定
+	setVariable20_8 = function () {
+		var value1 = 6;
+		$gameVariables.value(293)[value1] = $gameVariables.value(31);
+		if($gameVariables.value(293)[value1] == 0){$gameVariables.setValue(20 + value1,`種族未設定`)};
+		if($gameVariables.value(293)[value1] >= 1){$gameVariables.setValue(20 + value1,`\x1bI[${$dataStates[i+420].iconIndex}]${$dataStates[i+420].name}`)};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:176|訓練人形設定
+	readVariable293 = function () {
+		var value1 = 6;
+		var variable293Value = $gameVariables.value(293)[value1];
+		console.log(`${variable293Value}`);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:176|訓練人形設定
+	iteratePartyMembers16 = function () {
+		valueTrialJustBeforeTP = Array(21).fill(0);
+		for (var i = 0; i < $gameParty.battleMembers().length; i++) {
+		var value1 = $gameParty.battleMembers()[i].actorId();
+		var actor = $gameActors.actor(value1);
+		valueTrialJustBeforeTP[value1] = actor.tp;
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:176|訓練人形設定
+	readVariable293_2 = function () {
+		for (var i = 11; i <= 30; i++) {
+		$gameVariables.value(293)[i] = 0;
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:176|訓練人形設定
+	iteratePartyMembers17 = function () {
+		valueTrialJustBeforeTP = Array(21).fill(0);
+		for (var i = 0; i < $gameParty.battleMembers().length; i++) {
+		var value1 = $gameParty.battleMembers()[i].actorId();
+		var actor = $gameActors.actor(value1);
+		actor.gainTp(-1000);
+		actor.gainTp(valueTrialJustBeforeTP[value1]);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:177|監禁,奴隷化コモン
+	readVariable316 = function () {
+		if($gameVariables.value(316)[0] != 0){
+		  item_confinementScript(0);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:179|タイトル効果選択コモン
+	value4 = function () {
+		var value1 = `[発動中の称号効果]\n`;var value3 = 288;
+		for (var i = 0; i <= $gameVariables.value(value3+1)-1; i++) {
+		if($gameVariables.value(value3)[i] == 0){
+		  value1 += `Empty\n`;
+		} else {
+		  value1 += `\\C[16]\x1bIIN[${$gameVariables.value(value3)[i]}]\\C[0]\n`;
+		}};
+		var value2 = $gameVariables.value(value3+1)*48+48;
+		WindowManager.show(1, 740, 96+14, 540, value2);
+		WindowManager.drawText(1, value1);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:179|タイトル効果選択コモン
+	value5 = function () {
+		var value1 = `[発動中の称号効果]\n`;var value3 = 288;
+		if($gameSwitches.value(105)){var value1 = `[発動中のＨな称号効果]\n`;var value3 = 294};
+		for (var i = 0; i <= $gameVariables.value(value3+1)-1; i++) {
+		if($gameVariables.value(value3)[i] == 0){
+		value1 += `Empty\n`;
+		} else {
+		value1 += `\\C[16]\x1bIIN[${$gameVariables.value(value3)[i]}]\\C[0]\n`;
+		}};
+		var value2 = $gameVariables.value(value3+1)*48+48;
+		WindowManager.show(1, 740, 96+14, 540, value2);
+		WindowManager.drawText(1, value1);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:179|タイトル効果選択コモン
+	iterateItemsEmpty = function () {
+		var value3 = 288;
+		for (var i = 0; i <= $gameVariables.value(value3+1)-1; i++) {
+		  const id = 1;
+		  if($gameVariables.value(value3)[i] == 0){
+		    var value1 = 'Empty';
+		  } else {
+		    var value1 = $dataItems[$gameVariables.value(value3)[i]].name;
+		  };
+		  const choiceParams = {text: value1,    value: i};
+		  $gameSystem.addCustomChoice(id, choiceParams);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:179|タイトル効果選択コモン
+	iterateItemsEmpty2 = function () {
+		var value3 = 288;
+		if($gameSwitches.value(105)){var value3 = 294};
+		for (var i = 0; i <= $gameVariables.value(value3+1)-1; i++) {
+		const id = 1;
+		if($gameVariables.value(value3)[i] == 0){
+		var value1 = 'Empty';
+		} else {
+		var value1 = $dataItems[$gameVariables.value(value3)[i]].name;
+		};
+		const choiceParams = {text: value1,    value: i};
+		$gameSystem.addCustomChoice(id, choiceParams);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:179|タイトル効果選択コモン
+	readVariable19_5 = function () {
+		var value3 = 288;
+		if($gameVariables.value(19) == 601){
+		$gameVariables.value(value3)[$gameVariables.value(21)] = 0;
+		} else {
+		$gameVariables.value(value3)[$gameVariables.value(21)] = $gameVariables.value(19);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:179|タイトル効果選択コモン
+	readVariable19_6 = function () {
+		var value3 = 288;
+		if($gameSwitches.value(105)){var value3 = 294};
+		if($gameVariables.value(19) == 601){
+		$gameVariables.value(value3)[$gameVariables.value(21)] = 0;
+		} else {
+		$gameVariables.value(value3)[$gameVariables.value(21)] = $gameVariables.value(19);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:180|種族討伐数表示
+	appendToVariable52 = function () {
+		for (var i = 0; i <= $gameVariables.value(52).length-1; i++) {
+		  if($gameVariables.value(52)[i] >= 1){
+		    var value8 = `\x1bSIM[${i}]`;
+		    if(i == 1){var value8 = `当日魔物`};
+		    if(i == 2){var value8 = `総魔物`};
+		    var variable52Value = $gameVariables.value(52)[i];
+		    valueIkkatuArray.push([value8,variable52Value,0,0,0]);
+		    valueCountSet1 += 1;
+		}};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:181|通常クエスト受注
+	handleScriptSnippet28 = function () {
+		valueWordArray = [];
+		valueCountArray = [];
+		valueCountSet1 = 0;
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:183|本屋コモン
+	handleScriptSnippet29 = function () {
+		valueScriptArray1 = [1,2];
+		valueCountSet3 = 0;
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:183|本屋コモン
+	handleScriptSnippet30 = function () {
+		valueScriptArray1 = [1];
+		valueCountSet3 = 0;
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:183|本屋コモン
+	iterateItemsShop1 = function () {
+		var variable19Value = $dataItems[$gameVariables.value(19)].price;
+		if(valueCountSet3 != 0){var variable19Value = Math.floor(variable19Value - (variable19Value * valueCountSet3 / 100))};
+		if($gameParty.gold() >= variable19Value){
+		  $gameParty.gainItem($dataItems[$gameVariables.value(19)], 1);
+		  $gameParty.loseGold(variable19Value);
+		  AudioManager.playSe({"name":'Shop1',"volume":90,"pitch":100,"pan":0});
+		  var variable19Value2 = `\\C[2]\x1bIIN[${$gameVariables.value(19)}]\\C[0]を購入しました。`;
+		} else {
+		  var variable19Value2 = `所持金が足りなかった…。`;
+		};
+		TickerManager.show(variable19Value2);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:183|本屋コモン
+	handleScriptSnippet31 = function () {
+		valueCountSet1 = 0;
+		valueCountSet2 = 0;//件数
+		valueCountSet3 = 0;//割引率
+		valueScriptArray1 = [];
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:184|水汲みコモン
+	setVariable22 = function () {
+		var value1 = 109;
+		if($gameSwitches.value(203)){var value1 = 110};
+		if($gameSwitches.value(205)){var value1 = 111};
+		if($gameSwitches.value(207)){var value1 = 112};
+		$gameVariables.setValue(22,value1);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:184|水汲みコモン
+	setVariable22GetWaterItem = function () {
+		var valueItems = 0;
+		if($gameVariables.value(230) >= 1){
+		  var valueItems = $dataWeapons[$gameVariables.value(230)];
+		};
+		if($gameVariables.value(240) >= 1){
+		  var valueItems = $dataItems[$gameVariables.value(240)];
+		};
+		if(valueItems != 0){
+		  if(valueItems.meta['getWaterItem']){
+		    $gameVariables.setValue(22,Number(valueItems.meta['getWaterItem']));
+		}};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:184|水汲みコモン
+	setVariable22GetWaterItem2 = function () {
+		if($dataMap.meta['getWaterItem']){
+		  $gameVariables.setValue(22,Number($dataMap.meta['getWaterItem']));
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:184|水汲みコモン
+	setSwitch380_3 = function () {
+		$gameSwitches.setValue(380,false);
+		event_charaDirectionPoint($gamePlayer,2);
+		if($gameMap.terrainTag(valueDirectionPointX,valueDirectionPointY) == 3){
+		  $gameSwitches.setValue(380,true);
+		};
+		if($gameMap.regionId(valueDirectionPointX,valueDirectionPointY) == 3){
+		  $gameSwitches.setValue(380,true);
+		};
+		if($gameMap.regionId(valueDirectionPointX,valueDirectionPointY) == 16){
+		  $gameSwitches.setValue(380,true);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:184|水汲みコモン
+	setVariable22_2 = function () {
+		var value1 = 1162;//中央森林
+		if($gameMap.regionId(valueDirectionPointX,valueDirectionPointY) == 101){
+		  $gameSwitches.setValue(380,true);  
+		  $gameVariables.setValue(22,value1);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:184|水汲みコモン
+	setVariable22_3 = function () {
+		var value1 = 111;
+		if($gameMap.regionId(valueDirectionPointX,valueDirectionPointY) == 102){
+		  $gameSwitches.setValue(380,true);  
+		  $gameVariables.setValue(22,value1);
+		};
+		var value1 = 111;
+		if($gameMap.regionId(valueDirectionPointX,valueDirectionPointY) == 103){
+		  $gameSwitches.setValue(380,true);  
+		  $gameVariables.setValue(22,value1);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:184|水汲みコモン
+	setVariable292Goods4 = function (interp) {
+		return (function () {
+		$gameVariables.setValue(292,Array(21).fill(0));
+		var value2 = valueDirectionPointX;
+		var value3 = valueDirectionPointY;
+		goodsEvent_respawn(0,'Goods4',4,2,0,value2,value3);
+		valueCountSet9 = this._eventId;
+		this._eventId = $gameVariables.value(292)[0];
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:184|水汲みコモン
+	iterateItems10 = function () {
+		var variable19Value = $gameVariables.value(19);
+		$gameParty.loseItem($dataItems[108], variable19Value);
+		$gameParty.gainItem($dataItems[$gameVariables.value(22)], variable19Value);
+		var value2 = `\x1bIIN[${$gameVariables.value(22)}]を\\C[3]${variable19Value}\\C[0]個獲得！（\x1bIIN[108]\\C[10]-${variable19Value}\\C[0]個）`;
+		TickerManager.show(value2);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:185|その他ショップ処理
+	handleScriptSnippet32 = function () {
+		array = [];
+		bookShop_preparert2(0,3,1);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:186|娼館処理
+	iterateActors = function () {
+		  var actor = $dataActors[id];
+		  if($gameVariables.value(id+380)[27] >= 1){
+		    var value11 = `\\fs[25]売春総獲得額:${$gameVariables.value(id+380)[27]}回${$gameVariables.value(827)}`
+		  } else{
+		    var value11 = ``
+		  };
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:187|追剥コモン
+	showInfo = function () {
+		value1 = `既に事切れているようだ…。`;
+		CommonPopupManager.showInfo({},value1,null);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:191|ギルドコモン
+	setSwitch161WalletIn = function () {
+		$gameSwitches.setValue(161,false);
+		for (var i = 1; i <= $dataItems.length-1; i++) {
+		  if($dataItems[i].meta['walletIn']){
+		    if($gameParty.hasItem($dataItems[i],true)){
+		      $gameSwitches.setValue(161,true);
+		      break;
+		}}};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:191|ギルドコモン
+	setVariable21_3 = function () {
+		if($gameSwitches.value(128)){
+		  var value1 = `デイリークエスト自動受注＜ON＞`;
+		} else {
+		  var value1 = `デイリークエスト自動受注＜OFF＞`;
+		};
+		$gameVariables.setValue(21,value1);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:191|ギルドコモン
+	setVariable22_4 = function () {
+		if($gameSwitches.value(129)){
+		  var value1 = `デイリークエスト自動達成＜ON＞`;
+		} else {
+		  var value1 = `デイリークエスト自動達成＜OFF＞`;
+		};
+		$gameVariables.setValue(22,value1);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:191|ギルドコモン
+	setSwitch162 = function () {
+		if($gameParty.hasItem($dataItems[693],true)){
+		  $gameSwitches.setValue(162,true);
+		} else {
+		  $gameSwitches.setValue(162,false);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:191|ギルドコモン
+	setVariable605WalletIn = function () {
+		var value2 = 0;
+		var value1 = `拾得物\n`;
+		for (var i = 1; i <= $dataItems.length-1; i++) {
+		  if($dataItems[i].meta['walletIn']){
+		    if($gameParty.numItems($dataItems[i]) >= 1){
+		      value2 += $gameParty.numItems($dataItems[i]);
+		      value1 += `\x1bIIN[${i}]:\\C[1]${$gameParty.numItems($dataItems[i])}\\C[0]個\n`;
+		      $gameParty.loseItem($dataItems[i], $gameParty.numItems($dataItems[i]));
+		}}};
+		$gameParty.gainItem($dataItems[10], value2);$gameVariables.setValue(605,$gameVariables.value(605)+value2);
+		value1 += `\x1bIIN[10]:\\C[2]${value2}\\C[0]個を謝礼として受け取った。\n`;
+		valueTalkSet = [28,value1];
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:191|ギルドコモン
+	setSwitch128 = function () {
+		if($gameSwitches.value(128)){
+		  $gameSwitches.setValue(128,false);
+		  var value1 = `デイリークエストの自動受注をオフにしました。`;
+		} else {
+		  $gameSwitches.setValue(128,true);
+		  var value1 = `デイリークエストの自動受注をオンにしました。`;
+		};
+		TickerManager.show(value1);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:191|ギルドコモン
+	setSwitch129 = function () {
+		if($gameSwitches.value(129)){
+		  $gameSwitches.setValue(129,false);
+		  var value1 = `デイリークエストの自動達成報告をオフにしました。`;
+		} else {
+		  $gameSwitches.setValue(129,true);
+		  var value1 = `デイリークエストの自動達成報告をオンにしました。`;
+		};
+		TickerManager.show(value1);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:192|未使用：情報屋選択肢
+	iterateItemsSetJouhouGold = function () {
+		var variable19Value = 1000;
+		if($dataItems[$gameVariables.value(19)].meta['SetJouhouGold']){
+		  var variable19Value = Number($dataItems[$gameVariables.value(19)].meta['SetJouhouGold']);
+		};
+		$gameParty.loseGold(variable19Value);
+		var value2 = `-${variable19Value}\\G`;
+		TickerManager.show(value2);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:192|未使用：情報屋選択肢
+	iterateItems11 = function () {
+		$gameParty.gainItem($dataItems[$gameVariables.value(19)], 1);
+		var variable19Value = `エリア情報:\x1bIIN[${$gameVariables.value(19)}]を購入した。`;
+		TickerManager.show(variable19Value);
+		$gamePlayer.requestAnimation(229);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:195|動物処理バックアップ
+	event6 = function () {
+		var event = $gameMap.event(valueanimalEventId);
+		event.requestAnimation(387);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:195|動物処理バックアップ
+	characterList = function (interp) {
+		return (function () {
+		if(valueanimalEventId >= 1){
+		var value1 = [-45,45,-90,90][getRandomIndex(4)];
+		if(value1 == 90){var value2 = -24};if(value1 == 45){var value2 = -12};
+		if(value1 == -90){var value2 = 24};if(value1 == -45){var value2 = 12};
+		this.character(valueanimalEventId).forceMoveRoute({
+		"list":[
+		{ "code": 45, "parameters": ["this.setAngle(value1);"] },
+		{ "code": 45, "parameters": ["this.resetPattern();"] },{ "code": 45, "parameters": ["this._originalPattern = 1;"] },{ "code": 45, "parameters": ["this._priorityType = 0;"] },
+		{ "code": 45, "parameters": ["this._spriteOffsetX += value2;"] },{ "code": 45, "parameters": ["this._spriteOffsetY += value2;"] },
+		{"code":32},{"code":34},{"code":37},{"code":17},{"code":35},
+		{"code":0}],"repeat":false,"skippable":true});
+		};
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:195|動物処理バックアップ
+	characterRoute = function (interp) {
+		return (function () {
+		this._character = this.character(valueanimalEventId);
+		this.setWaitMode('route');
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:195|動物処理バックアップ
+	characterPeople2 = function (interp) {
+		return (function () {
+		if(valueanimalEventId >= 1){
+		this.character(valueanimalEventId).forceMoveRoute({
+		"list":[
+		{ "code": 45, "parameters": ["this.setScale(100, 100);"] },
+		{"code":42, "parameters":[255]},
+		{"code":40},
+		{"code":41, "parameters":['People2',1]},
+		{"code":0}],"repeat":false,"skippable":true});
+		this._character = this.character(valueanimalEventId);
+		this.setWaitMode('route');
+		};
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:195|動物処理バックアップ
+	characterList2 = function (interp) {
+		return (function () {
+		if(valueanimalEventId >= 1){
+		this.character(valueanimalEventId).forceMoveRoute({
+		"list":[
+		{"code":15, "parameters":[600]},
+		{"code":0}],"repeat":true,"skippable":true});
+		};
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:196|ダンジョン雑魚で剥ぎ取り追いはぎコモンバックアップ
+	eventSFEnemy2 = function (interp) {
+		return (function () {
+		var id = valueEnemyEventId;
+		if(!!$gameMap.event(id)) {
+		  $gameMap.event(id).forceMoveRoute({
+		  "list":[
+		  {"code":36},{"code":16},
+		  {"code":41, "parameters":['SF_enemy2',7]},
+		  {"code":45,"parameters": ["this.setFace(6,true,true);"]},
+		  {"code":35},
+		  {"code":0}],"repeat":false,"skippable":true});
+		};
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:199|全体マップ移動選択コモン
+	setSelfSwitch3 = function () {
+		for (var id = 50; id > 0; id--) {
+		  if(!!$gameMap.event(id)) {
+		    $gameSelfSwitches.setValue([$gameMap.mapId(), id, 'C'], true);
+		}};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:199|全体マップ移動選択コモン
+	insertCallEventData = function (interp) {
+		return (function () {
+		if ($callEventMap) {
+		  this.insertCallEventData(23, 2);
+		}
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:203|熟練度アップコモン
+	show2 = function () {
+		WindowManager.show(0, 0, 700, 1280, 68);
+		WindowManager.show(1, 0, 632, 1280, 68);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:203|熟練度アップコモン
+	setSelfVariable21_7 = function (interp) {
+		return (function () {
+		var value1 = 169;//例外アイテム名
+		var actor = $gameActors.actor($gameVariables.value(20));
+		var value = $dataItems[$gameVariables.value(93)]
+		if($gameVariables.value(93) != value1){
+		this.sVal(21,Number(value.meta['熟練度アップスキルタイプ']));
+		};
+		this.sVal(22,Number(value.meta['熟練度上昇値']));
+		var variable93Value = `\x1bIIN[${$gameVariables.value(93)}]（${$gameParty.numItems(value)}）上昇値:\\C[2]${$gameVariables.value(22)}\\C[0]　対象:${actor.name()}`
+		if($gameVariables.value(203) >= 2){variable93Value += `\\C[10] * 2\\C[0]`};
+		WindowManager.drawText(0, variable93Value);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:203|熟練度アップコモン
+	readVariable19_7 = function () {
+		if(valueCountSet1 == $gameVariables.value(19)){
+		  item_skilljukurenndoup(2);
+		} else {
+		  item_skilljukurenndoup(1);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:203|熟練度アップコモン
+	iterateItems12 = function () {
+		var value = $dataItems[$gameVariables.value(93)]
+		var value1 = `${value.name}の所持数が0になった為、使用画面を終了します。`;
+		CommonPopupManager.showInfo({},value1,null);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:210|アクター選択コモン
+	readVariable20_10 = function () {
+		var value1 = $gameVariables.value(20) + 100;
+		if($gameVariables.value(20) >= 2){
+		var value1 = 101 + ($gameVariables.value(20)-1) * 7;
+		};
+		$gameScreen.movePicture(value1,1,640-500,384,100,100,0,0,20);
+		for (var i = 0; i <= 7; i++) {
+		  if($gameScreen.picture(value1+i)){
+		    $gameScreen.movePicture(value1+i,1,640-500,384,100,100,0,3,20);
+		  };
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:212|エクストラコマンド
+	setSwitch161_4 = function () {
+		if($gameVariables.value(532).length >= 1){
+		  $gameSwitches.setValue(161,true);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:212|エクストラコマンド
+	handleScriptSnippet33 = function () {
+		window.close();
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:219|収集表示アイテムコモン
+	iterateItems13 = function (interp) {
+		return (function () {
+		var start = 1;var end = 4;
+		for (var i = start; i <= end; i++) {
+		  if($gameVariables.value(284)[i] == 0){
+		    this.sVal(i + 21,'[登録なし]');
+		  } else {
+		    this.sVal(i+21,'['+$dataItems[$gameVariables.value(284)[i]].name + ':');
+		    this.sVal(i+21,$gameVariables.value(i+21) + $gameParty.numItems($dataItems[$gameVariables.value(284)[i]]) + ']');
+		}};
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:232|ショップ処理先頭で処理
+	handleScriptSnippet34 = function () {
+		valueRandomSet = 20;
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:232|ショップ処理先頭で処理
+	setVariable21_4 = function () {
+		var value1 = `\\C[2]${actor.name()}\\C[0]は\\C[27]\x1bSIN[${valueHoneyTrapSkillId}]\\C[0]を行った…。[成功率/値引き率\\C[10]${valueRandomSet}%UP\\C[0]]\n`;
+		$gameVariables.setValue(21,$gameVariables.value(21)+value1);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:234|喜捨コモン
+	showTickerMessage3 = function () {
+		var value2 = $gameVariables.value(631) / 1000;
+		var value1 = `\\SIM[106]が付与された。(\\C[10]${value2}\\C[0]%)`;
+		TickerManager.show(value1);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:235|レアリティ昇格コモン
+	setVariable21_5 = function () {
+		var value1 = valueWordSet2;
+		$gameVariables.setValue(21,`${value1}には上記の物が必要になります。
+		昇格なさいますか？`);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:235|レアリティ昇格コモン
+	setVariable292 = function () {
+		var eventId = $gameVariables.value(292)[11];
+		$gameMap.eraseEvent(eventId);
+		$gameVariables.setValue(292,Array(21).fill(0));
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:235|レアリティ昇格コモン
+	setVariable21_6 = function () {
+		var actor = $gameActors.actor($gameVariables.value(20));
+		$gameVariables.setValue(21,`${actor.name()}殿はこれ以上の昇格はできませんね`);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:237|指輪ショップ処理
+	iterateArmors = function () {
+		var value1 = 20;
+		var value2 = 160;
+		for (var i = 396; i <= 399; i++) {
+		  $gameVariables.setValue(value1+(i-395),`\x1bI[${$dataArmors[i].iconIndex}]${$dataArmors[i].name} ${$dataArmors[i].price.toLocaleString()}\G`);
+		  if($gameParty.gold() >= $dataArmors[i].price){
+		    $gameSwitches.setValue(value2+(i-395),true);
+		  } else {
+		    $gameSwitches.setValue(value2+(i-395),false);
+		  };
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:237|指輪ショップ処理
+	setSelfVariable172 = function (interp) {
+		return (function () {
+		this.sVal(172,2);//会話コモン文字ピク
+		var value1 = '指輪について';
+		var value2 = `スロットにアタッチを装着する事で性能が上昇する。
+		一度アタッチを付けると取り外し不可。指輪本体は店売りのみで、
+		アタッチはドロップや宝箱等からのみ。
+		アタッチが付くと指輪の売却額がアタッチ分上乗せされる。
+		先頭アタッチの略語が名称の末尾に付く。
+		※ 指輪本体を大量に持ち過ぎるとセーブデータの容量が増加します。
+		許容できる範囲でやりくりして下さい。`;
+		var value3 = [0,1,640+320,384,100,100,255];
+		valueTalkSet = [value1,value2,value3];
+		this.setupChild($dataCommonEvents[60].list, 0);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:238|個別アイテム鑑定店
+	show3 = function () {
+		var value8 = `鑑定料金表\n（下級：10\\G）（中級：100\\G）（上級：1000\\G）\n`;
+		WindowManager.show(0, 10, 100, 800, 100);
+		WindowManager.drawText(0, value8);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:238|個別アイテム鑑定店
+	setVariable21_7 = function () {
+		var value1 = 0; var value2 = 0; var value3 = 0;
+		if ($dataItems[$gameVariables.value(19)].meta['下級鑑定品']) {value1 = 10};
+		if ($dataItems[$gameVariables.value(19)].meta['中級鑑定品']) {value2 = 100};
+		if ($dataItems[$gameVariables.value(19)].meta['上級鑑定品']) {value3 = 1000};
+		$gameVariables.setValue(21,value1 + value2 + value3);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:240|ショップ処理
+	handleScriptSnippet35 = function () {
+		if(valueCountSet1 == 0){valueScriptArray1 = [4,5,6]};
+		if(valueCountSet1 == 1){valueScriptArray1 = [6,7]};
+		if(valueCountSet1 == 2){valueScriptArray1 = [4,5,6]};
+		if(valueCountSet1 == 3){valueScriptArray1 = [4,5,6,7]};
+		if(valueCountSet1 == 4){valueScriptArray1 = [4,5,6,7]};
+		if(valueCountSet1 == 5){valueScriptArray1 = [1]};
+		if(valueCountSet1 == 6){valueScriptArray1 = [1]};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:240|ショップ処理
+	handleScriptSnippet36 = function () {
+		if(valueCountSet1 == 0){valueScriptArray1 = [1,2,3,4,5,6,7,8,9]};
+		if(valueCountSet1 == 1){valueScriptArray1 = [1,2,3,4,5,8,9]};
+		if(valueCountSet1 == 2){valueScriptArray1 = [1,2,3,7,8,9]};
+		if(valueCountSet1 == 3){valueScriptArray1 = [1,2,3,4,5,7,8,9]};
+		if(valueCountSet1 == 4){valueScriptArray1 = [1,2,3,4,5,6,7,8,9]};
+		if(valueCountSet1 == 5){valueScriptArray1 = [1]};
+		if(valueCountSet1 == 6){valueScriptArray1 = [1,2]};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:240|ショップ処理
+	handleScriptSnippet37 = function () {
+		if(valueCountSet1 == 0){valueScriptArray1 = [1,2,3,4,5]};
+		if(valueCountSet1 == 1){valueScriptArray1 = [1,2,3,4,5]};
+		if(valueCountSet1 == 2){valueScriptArray1 = [1,2,3]};
+		if(valueCountSet1 == 3){valueScriptArray1 = [1,2,3]};
+		if(valueCountSet1 == 4){valueScriptArray1 = [1,2,3]};
+		if(valueCountSet1 == 5){valueScriptArray1 = [1]};
+		if(valueCountSet1 == 6){valueScriptArray1 = [1]};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:240|ショップ処理
+	handleScriptSnippet38 = function () {
+		array = [];
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:240|ショップ処理
+	handleScriptSnippet39 = function () {
+		var arr2 = valueScriptArray1;
+		for (var j = 0; j < arr2.length; j++) {
+		  if(arr2[j] == arr2[arr2.length - 1]){
+		    shop_preparationEI(0,arr2[j],1);
+		  } else {
+		    shop_preparationEI(0,arr2[j],0);
+		  };
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:240|ショップ処理
+	handleScriptSnippet40 = function () {
+		var arr2 = valueScriptArray1;
+		for (var j = 0; j < arr2.length; j++) {
+		  if(arr2[j] == arr2[arr2.length - 1]){
+		    shop_preparationH(0,arr2[j],1);
+		  } else {
+		    shop_preparationH(0,arr2[j],0);
+		  };
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:240|ショップ処理
+	handleScriptSnippet41 = function () {
+		var arr2 = valueScriptArray1;
+		for (var j = 0; j < arr2.length; j++) {
+		  if(arr2[j] == arr2[arr2.length - 1]){
+		    shop_preparationE(0,arr2[j],1);
+		  } else {
+		    shop_preparationE(0,arr2[j],0);
+		  };
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:240|ショップ処理
+	handleScriptSnippet42 = function () {
+		var arr2 = valueScriptArray1;
+		for (var j = 0; j < arr2.length; j++) {
+		  if(arr2[j] == arr2[arr2.length - 1]){
+		    shop_preparation1(0,arr2[j],0);
+		    shop_preparation1(1,arr2[j],0);
+		    shop_preparation1(2,arr2[j],1);
+		  } else {
+		    shop_preparation1(0,arr2[j],0);
+		    shop_preparation1(1,arr2[j],0);
+		    shop_preparation1(2,arr2[j],0);
+		  };
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:240|ショップ処理
+	handleScriptSnippet43 = function () {
+		var arr2 = valueScriptArray1;
+		for (var j = 0; j < arr2.length; j++) {
+		  if(arr2[j] == arr2[arr2.length - 1]){
+		    shop_preparation1(1,arr2[j],0);
+		    shop_preparation1(2,arr2[j],1);
+		  } else {
+		    shop_preparation1(1,arr2[j],0);
+		    shop_preparation1(2,arr2[j],0);
+		  };
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:240|ショップ処理
+	handleScriptSnippet44 = function () {
+		var arr2 = valueScriptArray1;
+		for (var j = 0; j < arr2.length; j++) {
+		  if(arr2[j] == arr2[arr2.length - 1]){
+		    shop_preparation1(valueCountSet1,arr2[j],1);
+		  } else {
+		    shop_preparation1(valueCountSet1,arr2[j],0);
+		  };
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:241|固有武器強化
+	setSwitch380_4 = function () {
+		var id = $gameVariables.value(20);
+		if($gameVariables.value(287)[id][10] >= 20){
+		  $gameSwitches.setValue(380,true);
+		} else {
+		  $gameSwitches.setValue(380,false);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:241|固有武器強化
+	setVariable21_8 = function () {
+		weapon_uniqueEnhance($gameVariables.value(20),1);
+		$gameVariables.setValue(21,valueCountSet1);
+		$gameSwitches.setValue(380,false);
+		if(valueScriptArray2[0] >= 1){
+		  var value1 = $gameParty.numItems($dataItems[valueScriptArray2[0]]) >= valueScriptArray2[1];
+		  $gameVariables.setValue(23,`（要:\\C[2]${$gameVariables.value(21).toLocaleString()}\\G\\C[0] \x1bIIN[${valueScriptArray2[0]}]×${valueScriptArray2[1]}個）\n所持数:${$gameParty.numItems($dataItems[valueScriptArray2[0]])}個`);
+		} else {
+		  var value1 = true;
+		  $gameVariables.setValue(23,`（要:\\C[2]${$gameVariables.value(21).toLocaleString()}\\G\\C[0]）`);
+		};
+		if($gameParty.gold() >= valueCountSet1 && value1){$gameSwitches.setValue(380,true)};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:241|固有武器強化
+	setSelfVariable22_2 = function (interp) {
+		return (function () {
+		if($gameSwitches.value(515)){
+		  $dataSystem.switches[515] = '鍛冶ｼｰﾝｶｯﾄ(ON)';
+		} else {
+		  $dataSystem.switches[515] = '鍛冶ｼｰﾝｶｯﾄ(OFF)';
+		};
+		this.sVal(22,$dataSystem.switches[515]);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:241|固有武器強化
+	setSelfVariable22_3 = function (interp) {
+		return (function () {
+		if($gameSwitches.value(515)){
+		  $dataSystem.switches[515] = '鍛冶ｼｰﾝｶｯﾄ(OFF)';
+		  $gameSwitches.setValue(515,false);
+		} else {
+		  $dataSystem.switches[515] = '鍛冶ｼｰﾝｶｯﾄ(ON)';
+		  $gameSwitches.setValue(515,true);
+		};
+		this.sVal(22,$dataSystem.switches[515]);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:241|固有武器強化
+	readVariable20_11 = function () {
+		var id = $gameVariables.value(20);
+		$gameVariables.value(287)[id][10] += 1;
+		var variable287Value = $gameVariables.value(287)[id][10];
+		$gameVariables.value(287)[id][variable287Value+10] = $gameVariables.value(19);
+		weapon_uniqueEnhance($gameVariables.value(20),2);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:241|固有武器強化
+	setVariable23 = function () {
+		$gameParty.loseGold($gameVariables.value(21));
+		$gameVariables.setValue(23,`${$gameVariables.value(21).toLocaleString()}\\Gを支払った。\n`);
+		if(valueScriptArray2[0] >= 1){
+		  $gameParty.gainItem($dataItems[valueScriptArray2[0]], -valueScriptArray2[1]);
+		  $gameVariables.setValue(23, $gameVariables.value(23) + `\\IIN[${valueScriptArray2[0]}]を${valueScriptArray2[1]}個消費した。`);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:245|昇格演出
+	readVariable292 = function () {
+		$gameMap.spawnEvent(146, 7, 26, true);
+		$gameVariables.value(292)[11] = $gameMap.getLastSpawnEventId();
+		var eventId = $gameVariables.value(292)[11];
+		var event = $gameMap.event(eventId);
+		event.setOpacity(255);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:245|昇格演出
+	particlePlayAureoleC2 = function (interp) {
+		return (function () {
+		var value1 = 'aureole_c';
+		$gameScreen._particle.particlePlay(this._eventId,value1+'-'+this._eventId,'this',value1);
+		var value1 = 'lifeStorm_screen';
+		$gameScreen._particle.particlePlay(this._eventId,value1+'-'+this._eventId,'this',value1);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:245|昇格演出
+	particlePlayChargeC = function () {
+		var value1 = 'charge_c';
+		$gameScreen._particle.particlePlay(0,value1,'player','def','screen');
+		$gameScreen._particle.particleUpdate([value1,'pos',0,20]);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:245|昇格演出
+	forEachArrayAureoleC = function (interp) {
+		return (function () {
+		var list = ['aureole_c'+'-'+this._eventId,'lifeStorm_screen'+'-'+this._eventId,'charge_c','direct_screenRing'];
+		list.forEach(function(id) {
+		  $gameScreen._particle.particleClear(id);
+		}, this);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:250|神掘りコモン終了
+	inBattle4 = function () {
+		  if(!$gameParty.inBattle()){
+		    $gameTemp.allowMapPlayerMovement();
+		    $gameTemp.allowMapEventMovement();
+		  };
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:251|重要アイテム入手コモン
+	setSwitch439 = function () {
+		var value1 = valueCountSet1;
+		var value2 = valueCountSet2;
+		if(value1 == 0){var valueItems = $dataItems}; 
+		if(value1 == 1){var valueItems = $dataWeapons}; 
+		if(value1 == 2){var valueItems = $dataArmors};
+		$gameParty.gainItem(valueItems[value2], 1);
+		var value3 = `\\C[29]\x1bI[${valueItems[value2].iconIndex}]${valueItems[value2].name}\\C[0]を入手した！`;
+		var value4 = 28;
+		$gameScreen.setDTextPicture(value3, value4);
+		$gameSwitches.setValue(439,true);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:253|リセット項目選択
+	readVariable19_8 = function () {
+		var variable19Value = $gameVariables.value(19);
+		if($gameVariables.value(183)[variable19Value] == 0){
+		  $gameVariables.value(183)[variable19Value] = 1;
+		} else {
+		  $gameVariables.value(183)[variable19Value] = 0;
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:254|ステータスリセット
+	readVariable20_12 = function () {
+		var actor = $gameActors.actor($gameVariables.value(20));
+		actor.setup($gameVariables.value(20));
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:254|ステータスリセット
+	iterateSkills8 = function () {
+		var actor = $gameActors.actor($gameVariables.value(20));
+		for (var i = 1; i < $dataSkills.length; i++) {
+		    actor.forgetSkill(i);
+		    actor.setSkillMasteryUses(i, 0);
+		    actor.setSkillMasteryLevel(i, 0);
+		};
+		  var equips = actor.equips();
+		  for (var i = 0; i < equips.length; i++) {
+		    if(equips[i]){
+		      actor.changeEquipById(i+1, 0);
+		    };
+		  };
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:254|ステータスリセット
+	readVariable20GainJp = function (interp) {
+		return (function () {
+		var variable20Value = $gameActors.actor($gameVariables.value(20))._classId;
+		var args = new Array(String(i),"100",String(variable20Value));
+		this.pluginCommand("gainJp", args);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:256|Ｈ相手リセット
+	readVariable19_9 = function () {
+		valueRandomSet = $gameVariables.value(19);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:256|Ｈ相手リセット
+	iterateWeapons3 = function () {
+		$gameVariables.value($gameVariables.value(20)+360)[$gameVariables.value(19) + 1] = 0;
+		var value1 = `${$dataWeapons[$gameVariables.value(19) + 1].name}とのＨ回数がリセットされました…`;
+		CommonPopupManager.showInfo({},value1,null);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:256|Ｈ相手リセット
+	iterateWeapons4 = function () {
+		$gameVariables.value($gameVariables.value(20)+360)[$gameVariables.value(19) + 200 + 1] = 0;
+		var value1 = `${$dataWeapons[$gameVariables.value(19) + 200 + 1].name}の出産履歴がリセットされました…`;
+		CommonPopupManager.showInfo({},value1,null);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:256|Ｈ相手リセット
+	readVariable20_13 = function () {
+		for (var i = 1; i <= 100; i++) {
+		  $gameVariables.value($gameVariables.value(20)+360)[i] = 0;
+		};
+		var value1 = `男性遍歴が一括リセットされました…`;
+		CommonPopupManager.showInfo({},value1,null);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:256|Ｈ相手リセット
+	readVariable20_14 = function () {
+		for (var i = 201; i <= 300; i++) {
+		  $gameVariables.value($gameVariables.value(20)+360)[i] = 0;
+		};
+		var value1 = `出産履歴が一括リセットされました…`;
+		CommonPopupManager.showInfo({},value1,null);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:259|サブジョブ解放1
+	readVariable292_2 = function (interp) {
+		return (function () {
+		$gameMap.spawnEvent(224, 15, 10, true);
+		var eventId = $gameMap.getLastSpawnEventId();
+		$gameVariables.value(292)[11] = eventId;
+		this._eventId = $gameVariables.value(292)[11];
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:259|サブジョブ解放1
+	readVariable292_3 = function () {
+		$gameMap.spawnEvent(223, 10, 10, true);
+		var eventId = $gameMap.getLastSpawnEventId();
+		$gameVariables.value(292)[12] = eventId;
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:259|サブジョブ解放1
+	fill4 = function () {
+		valueJobReleaseTorF1 = Array(81).fill(0);
+		valueJobReleaseTorF2 = Array(81).fill(0);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:259|サブジョブ解放1
+	setVariable21_9 = function () {
+		var variable19Value = valueJobReleaseTorF2[$gameVariables.value(19)];
+		if(valueJobReleaseTorF1[variable19Value] == 1){
+		$gameSwitches.setValue(380,true);
+		} else {
+		$gameSwitches.setValue(380,false);
+		};
+		$gameVariables.setValue(21,variable19Value);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:259|サブジョブ解放1
+	readVariable292Character = function (interp) {
+		return (function () {
+		var value1 = "161";//一刀両断102崩壊161横両断008封印054内側から153
+		var value2 = "character";//"picture"
+		var args = new Array(String(value2),$gameVariables.value(292)[12],"fadeOut",
+		String(value1),"180","5");
+		this.pluginCommand("GWFade", args);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:259|サブジョブ解放1
+	setVariable801ClassRank = function () {
+		var actor = $gameActors.actor($gameVariables.value(20));
+		var variable21Value = Number($dataClasses[$gameVariables.value(21)].meta['classRank']);
+		$gameVariables.setValue(801,
+		`${actor.name()}はClass${variable21Value}Job\\C[14][${$dataClasses[$gameVariables.value(21)].name}]\\C[0]を解放した！
+		`);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:261|鑑定解説文
+	iterateItemsInfoEval = function () {
+		if($gameVariables.value(19) == 0){var valueItems = $dataItems[$gameVariables.value(21)]};
+		if($gameVariables.value(19) == 1){var valueItems = $dataWeapons[$gameVariables.value(21)]};
+		if($gameVariables.value(19) == 2){var valueItems = $dataArmors[$gameVariables.value(21)]};
+		var value1 = valueItems.description;
+		//var value1 = value1.replace("\n", "");
+		var value1 = `\x1bI[${valueItems.iconIndex}]${valueItems.name}\n${value1}`;
+		var value2 = `\n`;
+		if(valueItems.meta['Info Eval']){
+		  item_priceinfo($gameVariables.value(19),$gameVariables.value(21));
+		  value2 += $gameVariables.value(801);
+		};
+		WindowManager.show(1, 0, 100, 1280, 668);WindowManager.drawText(1, `${value1}${value2}`);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:287|戦闘勝利時獲得変数等
+	iterateSystemSwitches2 = function () {
+		var switch252Name = $dataSystem.switches[252];
+		var value1 = `${switch252Name}の空賊捕縛数+1`;
+		CommonPopupManager.showInfo({},value1,null);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:287|戦闘勝利時獲得変数等
+	event7 = function () {
+		var event = $gameMap.event(valueEnemyEventId);
+		event.setOpacity(0);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:290|シーン初期処理自動実行
+	setVariable292_2 = function () {
+		if(!$gameParty.inBattle()){$gamePlayer.setThrough(true)};
+		  $gameSwitches.setValue(468,true);
+		  $gameSwitches.setValue(124,true);
+		  $gameVariables.setValue(292,Array(21).fill(0));
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:291|シーン終了処理自動実行
+	setVariable320 = function () {
+		  $gameVariables.setValue(320,0);
+		  if(!$gameParty.inBattle()){
+		    $gamePlayer.setThrough(false);
+		  };
+		  $gameSwitches.setValue(124,false);//イベント進行時onoff
+		  $gameSwitches.setValue(473,false);
+		  if(!$gameParty.inBattle()){
+		    $gameTemp.allowMapPlayerMovement();
+		    $gameTemp.allowMapEventMovement();
+		  };
+		  $gameSwitches.setValue(467,false);//NPC消滅スイッチoff
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:291|シーン終了処理自動実行
+	setVariable292_3 = function () {
+		  valueWeatherSceneSet = 0;
+		  valueSceneConditions1 = true;
+		  valueSceneConditions2 = true;
+		  valueSceneConditions3 = true;
+		  $gameVariables.setValue(292,Array(21).fill(0));
+		  $gameVariables.setValue(528,0);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:291|シーン終了処理自動実行
+	setSwitch412 = function () {
+		  if(!$gameSwitches.value(29)){
+		    $gamePlayer.setTransparent(false);
+		    if($gameSwitches.value(412)){//挿話
+		      $gameSwitches.setValue(412,false);
+		    };
+		    if($gameSwitches.value(469)){//Ｈ
+		      $gameSwitches.setValue(469,false);
+		    };
+		  };
+		  if(!$gameParty.inBattle()){
+		    drowsepost.camera.zoom(1, 60, $gamePlayer);
+		  };
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:292|※※コマンド一覧
+	addState2 = function (interp) {
+		return (function () {
+		var actor = $gameActors.actor($gameVariables.value(20));
+		actor.addState(693);
+		tachie_dousa(2,1,2,12,1,255,1323,0,0);
+		tachie_dousa(2,1,2,12,1,255,1325,0,0);
+		tachie_dousa(0,1,1,12,13,0,60,0,0);
+		//tachie_clothReflect(1);
+		this.wait(3);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:292|※※コマンド一覧
+	event8 = function (interp) {
+		return (function () {
+		event_partyCharaEntry();
+		var event = $gameMap.event(this._eventId);
+		var value1 = event.direction();
+		if(value1 = 2){var value2 = 16};
+		if(value1 = 4){var value2 = 17};
+		if(value1 = 6){var value2 = 18};
+		if(value1 = 8){var value2 = 19};
+		event_partyCharaMove(value2,0);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:294|タイトルコール
+	setSwitch380EICSwitch = function () {
+		$gameSwitches.setValue(380,false);
+		if($gameVariables.value(535) >= 1){
+		  if(Number($dataItems[$gameVariables.value(535)].meta['EICSwitch']) == 103){
+		    if(!$gameParty.hasItem($dataItems[$gameVariables.value(535)],true)){
+		      $gameSwitches.setValue(380,true);
+		    };
+		  };
+		};
+		if($gameVariables.value(535) == 0){
+		  $gameSwitches.setValue(380,true);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:294|タイトルコール
+	movePicture6 = function () {
+		var value1 = 102;
+		$gameScreen.movePicture(value1,1,640-250,384-200,100,100,0,0,300);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:294|タイトルコール
+	setVariable21_10 = function () {
+		$gameVariables.setValue(21,$gameVariables.value(142));
+		var variable21Value = $gameVariables.value(21);
+		gab_wordParticle(`～～\\C[16]${variable21Value}\\C[0]～～`);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:294|タイトルコール
+	readVariable535 = function () {
+		if($gameVariables.value(535) == 0){
+		  var start = $gameVariables.value(75);
+		  var end = $gameVariables.value(76);
+		  for(var id1 = start; id1 <= end; id1++){
+		    Profession_basicReturn(id1);
+		  };
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:295|シーン初期処理
+	iteratePartyMembers18 = function (interp) {
+		return (function () {
+		//現在衣装を別変数配列に一時代入
+		//統合衣装用の0も含める。（代入変数を利用しなくていい為可能）
+		var list = $gameVariables.value(247);
+		list.forEach(function(id) {
+		  var actor = $gameActors.actor(id);
+		    if($gameParty.members().contains(actor)){
+		      var start = 0; var end = 42;
+		      for (var i = start; i <= end; i++) {
+		        $gameVariables.value(id+540)[i] = $gameVariables.value(id+440)[i]
+		    }};
+		}, this);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:295|シーン初期処理
+	someArray = function () {
+		//並列コモンスイッチid区分けにも使用
+		valueScriptArray1 = [119,125,422,425,429,481];
+		valueScriptArray1.some(function(id){return $gameSwitches.setValue(id,false)});
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:295|シーン初期処理
+	setVariable626EICSwitch = function () {
+		$gameVariables.setValue(626,0);
+		var variable535Value = $gameVariables.value(535);
+		if(variable535Value >= 1){
+		  if(Number($dataItems[variable535Value].meta['EICSwitch']) == 102){
+		    $gameVariables.setValue(626,1);
+		  };
+		  if(Number($dataItems[variable535Value].meta['EICSwitch']) == 103){
+		    $gameVariables.setValue(626,2);
+		  };
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:295|シーン初期処理
+	setVariable529 = function () {
+		var array = $gameMap._commonEvents.filter(function (event) {
+		    return event.isActive();
+		}).map(function (event) {
+		    return event.event().id;
+		});
+		for (var i = 0; i <= array.length-1; i++) {
+		  if(array[i] >= 2 && $dataCommonEvents[array[i]].switchId){
+		      if(valueScriptArray1.some(function(id){return id == $dataCommonEvents[array[i]].switchId})){}else{
+		        $gameVariables.setValue(529,$dataCommonEvents[array[i]].switchId);
+		        $gameVariables.setValue(142,$dataCommonEvents[array[i]].name);
+		        valueCommonId = array[i];
+		}}};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:295|シーン初期処理
+	setVariable529_2 = function () {
+		if($gameVariables.value(529) == 0){
+		  var variable201Value = $gameVariables.value(201);
+		  $gameVariables.setValue(529,$dataCommonEvents[variable201Value].switchId);
+		  $gameVariables.setValue(142,$dataCommonEvents[variable201Value].name);
+		  valueCommonId = variable201Value;
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:297|シーン終了処理2
+	hideAll = function () {
+		TickerManager.hideAll();
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:298|オープニング
+	handleScriptSnippet45 = function () {
+		UTSU.PictureBreath.on([100], 10);
+	};
+
+	// Replaces (5x): CommonEvents.json:common-event:298|オープニング, CommonEvents.json:common-event:300|シナリオ↓シーン名設定コモン, CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！, CommonEvents.json:common-event:349|[49]終幕
+	particleUpdateCloudW = function () {
+		adv_partDirectSet(9);
+		var value1 = 'cloud_w';//天候:雲
+		var value2 =  getRandomIndex(201) + 1000;
+		$gameScreen._particle.particleUpdate([value1,'speed',String(value2),String(value2)]);
+		var arr1 = 0.75;//[0.40,0.45,0.50,0.55,0.60,0.65,0.70,0.75];
+		var value2 =  arr1[getRandomIndex(arr1.length)];
+		$gameScreen._particle.particleUpdate([value1,'alpha','0',value2+'@0.05',value2+'@0.9','0']);
+		$gameScreen._particle.particleUpdate([value1,'frequency','1.5']);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:298|オープニング
+	setSelfSwitch4 = function (interp) {
+		return (function () {
+		var value1 = $gameMap.mapId();
+		var value2 = 7;//this._eventId;
+		var value3 = 'D';
+		var value4 = true;//false;
+		$gameSelfSwitches.setValue([value1, value2, value3], value4);
+		var value2 = 8;//this._eventId;
+		$gameSelfSwitches.setValue([value1, value2, value3], value4);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
+	spawnEvent2 = function () {
+		var value1 = 12;//$gamePlayer._realX;
+		var value2 = 15;//$gamePlayer._realY;
+		$gameMap.spawnEvent(143, value1, value2, true);
+		valueCountSet1 = $gameMap.getLastSpawnEventId();
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
+	setSelfVariable172_2 = function (interp) {
+		return (function () {
+		this.sVal(172,10);valueTalkSet = [28,`<秩序の騎空団団長代理>を務める\\set[1]。
+		騎空挺を駆り任務先の島へと移動していた際、\n別の島で狼藉が行われている事を察知し急行する。
+		名もなき集落を襲っていた「空賊」達の討伐に成功するが、\n集落の人々は一人の少年を残し全滅していた…。
+		唯一の生き残りである少年、\\set[5]を\\N[1]は、\n騎空団で引き取り<秩序の騎空士見習い>として面倒を見る事に決める。
+
+		──それから一か月。
+		新天地での暮らしにも慣れてきた\\N[5]は、
+		\\C[2]${$dataSystem.switches[221]}\\C[0]という島にある国で
+		発生している問題の解決の為、
+		\\N[1]や先輩騎空士達と共に\\C[2]${$dataSystem.switches[221]}\\C[0]へ
+		向かうのであった…。`];
+		this.setupChild($dataCommonEvents[60].list, 0);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
+	getLastSpawnEventId = function (interp) {
+		return (function () {
+		event_respawnSetN(11,12,8,0,'$airship02',0);
+		valueCountSet1 = $gameMap.getLastSpawnEventId();
+		this._eventId = valueCountSet1;
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
+	eventOrder = function () {
+		for (var id = 100; id > 0; id--) {
+		  if(!!$gameMap.event(id)) {
+		    if ($gameMap.event(id).event().meta['Order']){
+		      var event = $gameMap.event(id);
+		      event.setDirection(6);
+		      event.requestBalloon(1);
+		}}};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
+	eventOrder2 = function () {
+		for (var id = 100; id > 0; id--) {
+		  if(!!$gameMap.event(id)) {
+		    if ($gameMap.event(id).event().meta['Order']){
+		      var event = $gameMap.event(id);
+		      event.setDirection(4);
+		}}};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
+	setSelfVariable172_3 = function (interp) {
+		return (function () {
+		this.sVal(172,18);
+		valueTalkSet = [0,1];//1で付与2で直接表示\CE[60]のみ0で解除,ｱｸﾀｰid
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
+	eventBandit = function () {
+		for (var id = 100; id > 0; id--) {
+		  if(!!$gameMap.event(id)) {
+		    if ($gameMap.event(id).event().meta['Bandit']){
+		      var event = $gameMap.event(id);
+		      event.requestBalloon(12);
+		}}};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
+	eventBandit2 = function () {
+		for (var id = 100; id > 0; id--) {
+		  if(!!$gameMap.event(id)) {
+		    if ($gameMap.event(id).event().meta['Bandit']){
+		      var event = $gameMap.event(id);
+		      //event.erase();
+		}}};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
+	eventBandit3 = function () {
+		for (var id = 100; id > 0; id--) {
+		  if(!!$gameMap.event(id)) {
+		    if ($gameMap.event(id).event().meta['Bandit']){
+		      $gameMap.event(id).forceMoveRoute({
+		      "list":[
+		      {"code":19},
+		      {"code":0}],"repeat":false,"skippable":true});
+		}}};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
+	particleSetDustWalk = function () {
+		  var value2 = 'dust_walk';
+		  $gameScreen._particle.particleSet(0,value2,'walk:event:1','def','below');
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
+	event9 = function () {
+		var event = $gameMap.event(5);
+		event.setFace(4,true,true,0,6,0,6);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
+	readVariable530 = function (interp) {
+		return (function () {
+		var variable530Value = $gameVariables.value(530);
+		event_respawnSetA(variable530Value,25,10,0);
+		this._eventId = $gameVariables.value(292)[variable530Value];
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		event.setFace(8,true,true);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
+	particleSetFlashPermanence = function () {
+		var value1 = 'flash_permanence';
+		$gameScreen._particle.particleSet(0,value1,'screen','def','screen');
+		var value2 = '#4bedff';//元がﾋﾟﾝｸ、青水'#4bedff',黄'#ffea4b',赤'#ff634b',
+		$gameScreen._particle.particleUpdate([value1,'color',value2,'#ffffff']);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
+	particleClearFlashPermanence = function () {
+		var value1 = 'flash_permanence';
+		$gameScreen._particle.particleClear(value1);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
+	readVariable292_4 = function (interp) {
+		return (function () {
+		original_main(valueCommonId,7);
+		var value1 = 19;
+		event_charaZanzou($gameVariables.value(292)[$gameVariables.value(530)],value1);
+		this._eventId = $gameVariables.value(292)[value1];
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
+	readVariable292_5 = function (interp) {
+		return (function () {
+		var value1 = 20;
+		event_charaZanzou($gameVariables.value(292)[$gameVariables.value(530)],value1);
+		this._eventId = $gameVariables.value(292)[value1];
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
+	readVariable292_6 = function (interp) {
+		return (function () {
+		this._eventId = $gameVariables.value(292)[$gameVariables.value(530)];
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
+	handleScriptSnippet46 = function (interp) {
+		return (function () {
+		var arr1 = [0];
+		var arr2 = [-50];
+		var arr3 = [`グハァァッッ！！`];
+		chara_oneWord(100,this._eventId,25,180,arr1,arr2,arr3,'genkai-mincho');
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
+	event10 = function () {
+		var event = $gameMap.event(5);
+		event.removeFace();
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
+	readVariable292_7 = function (interp) {
+		return (function () {
+		this._eventId = $gameVariables.value(292)[$gameVariables.value(530)];
+		var event = $gameMap.event(this._eventId);
+		event.removeFace();
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
+	handleScriptSnippetFadeOut = function () {
+		valuePic1 = 52;
+		picture_fade1(valuePic1,"fadeOut",'150',60,5);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
+	readVariable530Goods8 = function (interp) {
+		return (function () {
+		var variable530Value = $gameVariables.value(530);
+		event_respawnSetA(variable530Value,8,4,1);
+		this._eventId = $gameVariables.value(292)[variable530Value];
+		goodsEvent_respawn(11,'Goods8',0,4,1,8,5);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
+	showPictureScreenBlackOut3 = function () {
+		valuePic1 = 54;
+		var value2 = 'ScreenBlackOut';
+		$gameScreen.showPicture(valuePic1,value2,1,640,384,100,100,250,0);
+		var value2 = '/img/parallaxes/BlueSky';
+		$gameScreen.showPicture(valuePic1+1,value2,1,640,384,100,100,200,0);
+		var value2 = '/img/parallaxes/EV_15_0';
+		$gameScreen.showPicture(valuePic1+2,value2,1,640,384,100,100,255,0);
+		var value2 = '/img/parallaxes/EV_15_2';
+		$gameScreen.showPicture(valuePic1+3,value2,1,640,384,100,100,255,0);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
+	handleScriptSnippetFadeOut2 = function () {
+		valuePic1 = 54;
+		for (var i = 0; i <= 4; i++) {picture_fade1(valuePic1+i,"fadeOut",valueWipeImg,60,5)};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
+	handleScriptSnippet47 = function () {
+		var value1 = 3;
+		event_respawnSetA(value1,15,40,0);
+		var value1 = 4;
+		event_respawnSetA(value1,13,40,0);
+		var value1 = 5;
+		event_respawnSetA(value1,14,40,0);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:305|[5]騎空士ギルド
+	setSelfSwitchGoods9 = function (interp) {
+		return (function () {
+		$gameSelfSwitches.setValue([$gameMap.mapId(), 3, 'A'], true);
+		var value1 = 11;
+		event_respawnSetN(value1,19,4,0,'Goods9',0);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.setDirection(2);
+		this._eventId = $gameVariables.value(292)[value1];
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:306|[6]情報屋との交渉
+	showPictureZXMain006 = function () {
+		backGraund_menuMapSelect(2,0,0,0);
+		valuePic1 = 55;
+		valueScenePic = 'ZX_Main006_';
+		var value2 = 'ScreenBlackOut';
+		$gameScreen.showPicture(valuePic1,value2,1,640,384,100,100,200,0);
+		picture_fade1(valuePic1,"fadeIn",valueWipeImg,60,5);
+		var value1 = valuePic1+1;
+		var value2 = valueScenePic+'02';
+		$gameScreen.showPicture(value1,value2,1,640-128+20+50,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128+50,384,100,100,255,0,60);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:306|[6]情報屋との交渉
+	showPicture3 = function () {
+		pic_move1(valuePic1+1,0,0,100,100,0,90);
+		var value1 = valuePic1+2
+		var value2 = valueScenePic+'03';
+		$gameScreen.showPicture(value1,value2,1,640-128+50,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128+50,384,100,100,255,0,60);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:306|[6]情報屋との交渉
+	setPicturesAnimation = function () {
+		for (var i = 1; i <= 3; i++) {pic_move1(valuePic1+i,0,0,100,100,0,90)};
+		$gameScreen.setPicturesAnimation(2, 10, "連番", 20);
+		var value1 = valuePic1+4;
+		var value2 = valueScenePic+'05_00';
+		$gameScreen.showPicture(value1,value2,1,640-128+50,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128+50,384,100,100,255,0,60);
+		if($gameScreen.picture(value1)){
+		  $gameScreen.picture(value1).startAnimationFrame(1, true, [1,1,1,2]);
+		};
+		tachie_bless(value1,2);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:306|[6]情報屋との交渉
+	showPicture4 = function () {
+		sex_direction(99,0,0);
+		for (var i = 1; i <= 5; i++) {pic_move1(valuePic1+i,0,0,100,100,0,90)};
+		var value1 = valuePic1+6;
+		var value2 = valueScenePic+'07';
+		$gameScreen.showPicture(value1,value2,1,640-128+100,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128+100,384,100,100,255,0,60);
+		tachie_bless(value1,2);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:306|[6]情報屋との交渉
+	setPicturesAnimation2 = function () {
+		$gameScreen.setPicturesAnimation(2, 20, "連番", 40);
+		var value1 = valuePic1+7;
+		var value2 = valueScenePic+'08_00';
+		$gameScreen.showPicture(value1,value2,1,640-128+100,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128+100,384,100,100,255,0,60);
+		if($gameScreen.picture(value1)){
+		  $gameScreen.picture(value1).startAnimationFrame(1, true, [1,1,1,2]);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:306|[6]情報屋との交渉
+	handleScriptSnippet48 = function () {
+		var value1 = 18;
+		message_popup2(value1,0,1,1);
+		//message_popup2(0,[1024,368],1,1);
+		//ｲﾍﾞﾝﾄid,ﾌｷﾀﾞｼ位置,行数,1で有効化。\sh[5] で振動強さ指定
+		//0で座標指定,xyは中心点を指定
+		//mpp文字操作との相性が悪い
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:307|[7]少年の初陣
+	getPatternJump = function () {
+		valuePic1 = 13;
+		curveFunctions.patternX = curveFunctions.getPattern('jump', [30]);
+		picTachie_move1(valuePic1,0,0,0,0,255,30);
+		picture_motion1("smooth",[0]);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:307|[7]少年の初陣
+	handleScriptSnippet49 = function () {
+		valuePic1 = 14;
+		picture_animation1(valuePic1,0,-300,196);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:307|[7]少年の初陣
+	valueName = function (interp) {
+		return (function () {
+		picTachie_move1(13,-1000,0,0,0,255,60);
+		picTachie_move1(14,-1000,0,0,0,255,60);
+		if($gameSwitches.value(127)){
+		  AudioManager.playSe({"name":"Z_FootRun","volume":35,"pitch":100,"pan":0});
+		  var value6 = Math.floor(value6 / 2);//ウェイト
+		  this.wait(value6);
+		} else {
+		  AudioManager.playSe({"name":"Z_FootWalkShort","volume":65,"pitch":100,"pan":0});
+		};
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:308|[8]高位種との遭遇
+	readVariable292Monster = function (interp) {
+		return (function () {
+		var value1 = 11;
+		event_respawnSetN(value1,12,10,0,'Monster',2,2);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		this._eventId = $gameVariables.value(292)[value1];
+		event.setDirection(2);
+		event.setTone(-50, -200, 100);
+		var value1 = 'magic_circle_c';
+		$gameScreen._particle.particleSet(this._eventId,value1+'-'+this._eventId,'this',value1);
+		$gameScreen._particle.particleUpdate([value1,'color','#400070','#ffcdcd']);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:311|[11]中央平原で空賊捕縛
+	readVariable530_2 = function (interp) {
+		return (function () {
+		var variable530Value = $gameVariables.value(530);
+		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+		event_respawnSetA(variable530Value,variable163Value[3],variable163Value[4],1);
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		event.setImage(variable163Value[1], variable163Value[2]);
+		event.setDirection(4);
+		this._eventId = $gameVariables.value(292)[variable530Value];
+		}).call(interp);
+	};
+
+	// Replaces (3x): CommonEvents.json:common-event:312|[12]捕縛完了→引き渡しまで, CommonEvents.json:common-event:316|[16]集落の長に話を聞く, CommonEvents.json:common-event:345|[45]祭殿の隠し通路
+	readVariable530_3 = function (interp) {
+		return (function () {
+		event_partyCharaEntry();
+		var variable292Value = $gameVariables.value(530);
+		var variable292Value = $gameVariables.value(292)[variable292Value];
+		event_partyCharaMove(45,"this.turnTowardCharacter($gameMap.event("+variable292Value+"));");
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:312|[12]捕縛完了→引き渡しまで
+	eventMonsterSymbol = function (interp) {
+		return (function () {
+		for (var id = 200; id > 0; id--) {
+		  if(!!$gameMap.event(id)) {
+		    if ($gameMap.event(id).event().meta['MonsterSymbol']){
+		      $gameMap.event(id).forceMoveRoute({
+		      "list":[
+		  {"code":45,"parameters": ["this.setOpacity(0);"]},
+		  {"code":0}],"repeat":true,"skippable":true});
+		}}};
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:312|[12]捕縛完了→引き渡しまで
+	readVariable530_4 = function (interp) {
+		return (function () {
+		var variable530Value = $gameVariables.value(530);
+		event_respawnSetA(variable530Value,26,4,1,2);
+		this._eventId = $gameVariables.value(292)[variable530Value];
+		var variable530Value = 3;
+		event_respawnSetA(variable530Value,26,3,0,2);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:313|[13]昇格──格差──
+	setSelfVariable530 = function (interp) {
+		return (function () {
+		this.sVal(530,5);//主格キャラ
+		this.sVal(535,313);//挿話回想の場合アイテムID。メインは0
+		if($gameVariables.value(528) == 3){
+		  valueWeatherSceneSet = 15;
+		} else {
+		  valueWeatherSceneSet = 14;
+		};
+		h_keikenhyouji1(521,357);//記録変数,相手ID
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:313|[13]昇格──格差──
+	readVariable530People2 = function (interp) {
+		return (function () {
+		var value1 = 5;//$gameVariables.value(530);
+		event_respawnSetA(value1,10,13,1,8);
+		var value1 = 3;//$gameVariables.value(530);
+		event_respawnSetA(value1,11,13,1,8);
+		this._eventId = $gameVariables.value(292)[value1];
+		var value1 = 12;
+		event_respawnSetN(value1,10,11,0,'People2',1,2);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:313|[13]昇格──格差──
+	setVariable292_4 = function () {
+		var eventId = $gameVariables.value(292)[11];
+		$gameMap.eraseEvent(eventId);
+		//$gameVariables.setValue(292,Array(21).fill(0));
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:313|[13]昇格──格差──
+	particleSetMahoujinC = function (interp) {
+		return (function () {
+		var value1 = 'mahoujin_c';
+		$gameScreen._particle.particleSet(this._eventId,value1+'-'+this._eventId,'this',value1);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:313|[13]昇格──格差──
+	readVariable530_5 = function (interp) {
+		return (function () {
+		var value1 = 5;//$gameVariables.value(530);
+		this._eventId = $gameVariables.value(292)[value1];
+		var event = $gameMap.event(this._eventId);
+		var value1 = event.screenX();
+		var value2 = event.screenY();
+		filter_direct(9,value1,value2,60);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:313|[13]昇格──格差──
+	readVariable530_6 = function (interp) {
+		return (function () {
+		var value1 = 5;//$gameVariables.value(530);
+		event_respawnSetA(value1,20,13,1,2);
+		this._eventId = $gameVariables.value(292)[value1];
+		var value1 = 3;//$gameVariables.value(530);
+		event_respawnSetA(value1,20,14,0,4);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:313|[13]昇格──格差──
+	readVariable530_7 = function (interp) {
+		return (function () {
+		var value1 = 5;//$gameVariables.value(530);
+		event_respawnSetA(value1,8,10,1,6);
+		var value1 = 3;
+		event_respawnSetA(value1,11,10,0,4);
+		this._eventId = $gameVariables.value(292)[value1];
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:313|[13]昇格──格差──
+	setSelfVariable20_10 = function (interp) {
+		return (function () {
+		this.sVal(20,0);
+		valueWordSet0 = `教会で「昇格」が可能になりました！`;
+		valueWordSetEx = 0;//補足が必要な場合
+		this.setupChild($dataCommonEvents[45].list, 0);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:315|[15]集落到着
+	readVariable530_8 = function () {
+		var variable530Value = $gameVariables.value(530);
+		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+		event_respawnSetA(variable530Value,variable163Value[3],variable163Value[4],1);
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		event.setImage(variable163Value[1], variable163Value[2]);
+		event.setDirection(variable163Value[5]);
+		event_partyCharaEntry();
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:316|[16]集落の長に話を聞く
+	readVariable530_9 = function (interp) {
+		return (function () {
+		var variable530Value = $gameVariables.value(530);
+		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+		event_respawnSetA(variable530Value,variable163Value[3],variable163Value[4],1);
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		event.setImage(variable163Value[1], variable163Value[2]);
+		event.setDirection(variable163Value[5]);
+		this._eventId = $gameVariables.value(292)[variable530Value];
+		var variable530Value = 11;
+		event_respawnSetN(variable530Value,variable163Value[8],variable163Value[9],0,variable163Value[6],variable163Value[7]);
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		event.setDirection(variable163Value[10]);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:316|[16]集落の長に話を聞く
+	readVariable530_10 = function () {
+		var variable530Value = $gameVariables.value(530);
+		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+		event_respawnSetA(variable530Value,14,18,1,2);
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:322|[22]頭目との対峙
+	readVariable530_11 = function (interp) {
+		return (function () {
+		var variable530Value = $gameVariables.value(530);
+		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+		event_respawnSetA(variable530Value,27,19,1);
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		event.setImage(variable163Value[1], variable163Value[2]);
+		event.setDirection(variable163Value[5]);
+		this._eventId = $gameVariables.value(292)[variable530Value];
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:322|[22]頭目との対峙
+	readVariable530_12 = function () {
+		var variable530Value = $gameVariables.value(530);
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		var value2 = event._realX;
+		var value3 = event._realY;
+		event_respawnSetA(3,value2+1,value3+1,0,8);
+		event_respawnSetA(4,value2-1,value3+1,0,8);
+		event_respawnSetA(5,value2,value3+1,0,8);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:322|[22]頭目との対峙
+	appendToVariable292 = function () {
+		var arr1 = [];
+		arr1.push($gameVariables.value(292)[12]);
+		arr1.push($gameVariables.value(292)[13]);
+		arr1.push($gameVariables.value(292)[14]);
+		arr1.push($gameVariables.value(292)[15]);
+		arr1.push($gameVariables.value(292)[16]);
+		event_NpcCharaMoveId(19,0,arr1); 
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:328|[28]アウギュステ到着
+	readVariable292Goods9 = function (interp) {
+		return (function () {
+		event_respawnSetN(value1,32,9,0,'Goods9',0,2);
+		this._eventId = $gameVariables.value(292)[value1];
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:329|[29]水着購入
+	readVariable530_13 = function (interp) {
+		return (function () {
+		var variable530Value = $gameVariables.value(530);
+		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+		event_respawnSetA(variable530Value,variable163Value[3],variable163Value[4],1);
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		event.setImage(variable163Value[1], variable163Value[2]);
+		event.setDirection(variable163Value[5]);
+		this._eventId = $gameVariables.value(292)[variable530Value];
+		var variable530Value = 11;
+		event_respawnSetN(variable530Value,variable163Value[8],variable163Value[9],0,variable163Value[6],variable163Value[7]);
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		event.setDirection(variable163Value[10]);
+		event.setStepAnime(false);event.setWalkAnime(false);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:329|[29]水着購入
+	addState3 = function (interp) {
+		return (function () {
+		var actor = $gameActors.actor($gameVariables.value(20));
+		//actor.addState(693);
+		tachie_dousa(2,1,2,14,1,255,1311,0,0);
+		tachie_dousa(0,1,1,14,15,0,120,1,0);
+		//tachie_clothReflect(1);
+		this.wait(3);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:329|[29]水着購入
+	addState4 = function (interp) {
+		return (function () {
+		var actor = $gameActors.actor($gameVariables.value(20));
+		//actor.addState(693);
+		tachie_dousa(2,1,2,15,1,255,1347,0,0);
+		tachie_dousa(0,1,1,15,14,0,180,0,0);
+		tachie_clothReflect(1);
+		this.wait(3);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:330|[30]モニカ合流
+	readVariable530_14 = function (interp) {
+		return (function () {
+		var variable530Value = $gameVariables.value(530);
+		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+		event_respawnSetA(variable530Value,11,5,1,6);
+		var variable530Value = 3;//$gameVariables.value(530);
+		event_respawnSetA(variable530Value,12,4,0,2);
+		var variable530Value = 11;
+		event_respawnSetN(variable530Value,variable163Value[8],variable163Value[9],0,variable163Value[6],variable163Value[7],variable163Value[10]);
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		this._eventId = $gameVariables.value(292)[variable530Value];
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:330|[30]モニカ合流
+	readVariable292Food1 = function () {
+		var value1 = 13;
+		goodsEvent_respawn(value1,'food_1',4,6,1,13,5);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event._spriteOffsetX = 20;
+		event._spriteOffsetY = 0;
+		event._priorityType = 0;
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:330|[30]モニカ合流
+	handleScriptSnippet50 = function (interp) {
+		return (function () {
+		var arr1 = [0];
+		var arr2 = [50];
+		var arr3 = [`モグモグ──サクサク──`];
+		chara_oneWord(100,this._eventId,25,180,arr1,arr2,arr3,0);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:330|[30]モニカ合流
+	readVariable292_8 = function () {
+		var value1 = 13;
+		$gameMap.eraseEvent($gameVariables.value(292)[value1]);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:330|[30]モニカ合流
+	readVariable530_15 = function (interp) {
+		return (function () {
+		var variable530Value = $gameVariables.value(530);
+		event_respawnSetA(variable530Value,38,18,1,2);
+		var variable530Value = 2;//$gameVariables.value(530);
+		event_respawnSetA(variable530Value,38,20,0,8);
+		this._eventId = $gameVariables.value(292)[variable530Value];
+		var variable530Value = 3;//$gameVariables.value(530);
+		event_respawnSetA(variable530Value,37,17,0,2);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:330|[30]モニカ合流
+	readVariable292_9 = function () {
+		var arr1 = [0];
+		var arr2 = [-50];
+		var arr3 = [`了解！`];
+		chara_oneWord(100,$gameVariables.value(292)[1],25,180,arr1,arr2,arr3,0);
+		chara_oneWord(101,$gameVariables.value(292)[3],25,180,arr1,arr2,arr3,0);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:331|[31]秘密の入口
+	readVariable530_16 = function (interp) {
+		return (function () {
+		var variable530Value = $gameVariables.value(530);
+		event_respawnSetA(variable530Value,70,12,0,8);
+		this._eventId = $gameVariables.value(292)[variable530Value];
+		var variable530Value = 2;//$gameVariables.value(530);
+		event_respawnSetA(variable530Value,71,11,1,2);
+		var variable530Value = 3;//$gameVariables.value(530);
+		event_respawnSetA(variable530Value,70,13,0,8);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:333|[33]地底研究所
+	readVariable530_17 = function (interp) {
+		return (function () {
+		var variable292Value = 11;//$gameVariables.value(530);
+		var variable292Value = $gameVariables.value(292)[variable292Value];
+		drowsepost.camera.zoom(1, 60, variable292Value);
+		var variable292Value = 11;//$gameVariables.value(530);
+		this._eventId = $gameVariables.value(292)[variable292Value];
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:333|[33]地底研究所
+	readVariable21Researcher = function (interp) {
+		return (function () {
+		var id = $gameVariables.value(21);
+		  if(!!$gameMap.event(id)) {
+		    if ($gameMap.event(id).event().meta['Researcher']){
+		      $gameMap.event(id).forceMoveRoute({
+		      "list":[
+		      {"code":29, "parameters":[5]},
+		      {"code":45,"parameters": ["this.startOpacity(120,0);"]},
+		      {"code":45,"parameters": ["Move To: 23, 20;"]},
+		      {"code":45,"parameters": ["this.erase();"]},
+		      {"code":0}],"repeat":false,"skippable":true});
+		      this.wait(10);
+		  }};
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:334|[34]アウギュステで分散
+	readVariable530_18 = function () {
+		var variable530Value = $gameVariables.value(530);
+		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+		event_respawnSetA(variable530Value,variable163Value[3],variable163Value[4],1);
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		event.setImage(variable163Value[1], variable163Value[2]);
+		event.setDirection(variable163Value[5]);
+		var variable530Value = 2;//$gameVariables.value(530);
+		event_respawnSetA(variable530Value,19,3,0,8);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:336|[36]情報屋に話を聞く
+	readVariable530_19 = function (interp) {
+		return (function () {
+		var variable530Value = $gameVariables.value(530);
+		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+		event_respawnSetA(variable530Value,6,11,1,8);
+		this._eventId = $gameVariables.value(292)[variable530Value];
+		var variable530Value = 11;
+		event_respawnSetN(variable530Value,variable163Value[8],variable163Value[9],0,variable163Value[6],variable163Value[7]);
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		event.setDirection(2);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:337|[37]丘陵地帯からの…
+	readVariable292_10 = function (interp) {
+		return (function () {
+		var value1 = 6;//$gameVariables.value(292)[11]; //this._eventId
+		var event = $gameMap.event(value1);
+		event.setStepAnime(false);
+		event.setWalkAnime(false);
+		event.setDirection(2);
+		event.resetPattern();
+		event._originalPattern = 1;
+		event.setAngle(45);
+		event._spriteOffsetX = -12;
+		event._spriteOffsetY = -12
+		event._kageM.clear();
+		event.setFace(6,true,true,0,6,0,6);//Child用
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
+	handleScriptSnippetBBAkunin3 = function () {
+		var value1 = 11;
+		event_respawnSetN(value1,10,12,1,'BB_akunin3',5,2);
+		event_respawnSetN(value1+1,9,13,0,'BB_akunin3',6,6);
+		event_respawnSetN(value1+2,11,13,0,'BB_akunin3',6,4);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
+	readVariable292_11 = function (interp) {
+		return (function () {
+		var value1 = 20;
+		goodsEvent_respawn(value1,'!Door1',2,2,1,10,19);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event._priorityType = 0;
+		this._eventId = $gameVariables.value(292)[value1];
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
+	readVariable292_12 = function (interp) {
+		return (function () {
+		for (var i = 11; i <= 13; i++) {
+		  var variable292Value = $gameVariables.value(292)[i]; //this._eventId
+		  var event = $gameMap.event(variable292Value);
+		  event.requestBalloon(1);
+		  event.setDirection(2);
+		};
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
+	readVariable292_13 = function (interp) {
+		return (function () {
+		var value1 = 17;//
+		event_charaZanzou(this._eventId,$gameVariables.value(292)[value1]);
+		this._eventId = $gameMap.event($gameVariables.value(292)[value1]);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
+	readVariable292_14 = function (interp) {
+		return (function () {
+		for (var i = 11; i <= 13; i++) {
+		  var variable292Value = $gameVariables.value(292)[i]; //this._eventId
+		  var event = $gameMap.event(variable292Value);
+		  event.requestAnimation(371);
+		};
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
+	readVariable292_15 = function () {
+		var arr1 = [0];
+		var arr2 = [-50];
+		var arr3 = [`ギャアァッ！！`];var value1 = 11;
+		chara_oneWord(101,$gameVariables.value(292)[value1],25,180,arr1,arr2,arr3,0);
+		var arr3 = [`グエッ`];var value1 = 12;
+		chara_oneWord(102,$gameVariables.value(292)[value1],25,180,arr1,arr2,arr3,0);
+		var arr3 = [`ガッ…`];var value1 = 13;
+		chara_oneWord(103,$gameVariables.value(292)[value1],25,180,arr1,arr2,arr3,0);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
+	readVariable292ZCollaps = function (interp) {
+		return (function () {
+		for (var i = 11; i <= 13; i++) {
+		  AudioManager.playSe({"name":'Z_Collaps',"volume":50,"pitch":70,"pan":0});
+		  var variable292Value = $gameVariables.value(292)[i]; //this._eventId
+		  var event = $gameMap.event(variable292Value);
+		  event.setStepAnime(false);event.setWalkAnime(false);
+		  event.setDirection(2);event.resetPattern();
+		  event._originalPattern = 1;event.setAngle(45);
+		  event._spriteOffsetX = -12;event._spriteOffsetY = -12;
+		  event._kageM.clear();
+		  event.setFace(6,true,true);//Child用
+		};
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
+	readVariable292ZCollaps2 = function (interp) {
+		return (function () {
+		AudioManager.playSe({"name":'Z_Collaps',"volume":50,"pitch":70,"pan":0});
+		var variable292Value = $gameVariables.value(292)[5]; //this._eventId
+		var event = $gameMap.event(variable292Value);
+		event.setStepAnime(false);event.setWalkAnime(false);
+		event.setDirection(2);
+		event.resetPattern();event._originalPattern = 1;
+		event.setAngle(45);
+		event._spriteOffsetX = -12;
+		event._spriteOffsetY = -12
+		event._kageM.clear();
+		event.setFace(6,true,true,0,6,0,6);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
+	readVariable530BBAkunin3 = function (interp) {
+		return (function () {
+		var variable530Value = $gameVariables.value(530);
+		event_respawnSetA(variable530Value,10,15,1,8);
+		this._eventId = $gameVariables.value(292)[variable530Value];
+		var variable530Value = 12;
+		event_respawnSetN(variable530Value,10,12,0,'BB_akunin3',5,2);
+		event_respawnSetN(variable530Value+1,9,13,0,'BB_akunin3',6,6);
+		event_respawnSetN(variable530Value+2,11,13,0,'BB_akunin3',6,4);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
+	readVariable292_16 = function (interp) {
+		return (function () {
+		for (var i = 12; i <= 14; i++) {
+		  var variable292Value = $gameVariables.value(292)[i]; //this._eventId
+		  var event = $gameMap.event(variable292Value);
+		  event.setStepAnime(false);event.setWalkAnime(false);
+		  event.setDirection(2);event.resetPattern();
+		  event._originalPattern = 1;event.setAngle(45);
+		  event._spriteOffsetX = -12;event._spriteOffsetY = -12;
+		  event._kageM.clear();
+		  event.setFace(6,true,true);//Child用
+		};
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
+	readVariable530_20 = function () {
+		var value1 = 5;//$gameVariables.value(530);
+		event_respawnSetA(value1,8,12,1,2);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
+	readVariable530_21 = function () {
+		var value1 = 5;//$gameVariables.value(530);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.setStepAnime(false);
+		event._priorityType = 2;
+		event._spriteOffsetX = +10;
+		event._spriteOffsetY = -58;
+		event._kageM.clear();
+		event.setFace(6,true,true,0,6,0,6);//Child用
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
+	playSeZClothesTakeOff = function () {
+		var value1 = 'Z_ClothesTakeOff';//ピッチ50か100。消去ウェイトで変更
+		AudioManager.playSe({"name":value1,"volume":150,"pitch":50,"pan":0});
+		tachie_dousa(2,1,4,14,1,255,1319,0,0);
+		tachie_dousa(2,1,4,14,1,255,1320,0,0);
+		tachie_dousa(2,1,4,14,1,255,1321,0,0);
+		tachie_dousa(2,1,4,14,1,255,1322,0,0);
+		tachie_dousa(0,1,18,13,14,0,180,1,0);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
+	playSeZClothesTakeOff2 = function () {
+		var value1 = 'Z_ClothesTakeOff';//ピッチ50か100。消去ウェイトで変更
+		AudioManager.playSe({"name":value1,"volume":150,"pitch":100,"pan":0});
+		tachie_dousa(0,1,22,12,13,1318,120,0,0);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
+	setPicturesAnimationGoodsDrag1 = function () {
+		valuePic1 = 55;
+		valueScenePic = 'Goods_drag1_';
+		$gameScreen.setPicturesAnimation(2, 30, "連番", 60);
+		var value2 = valueScenePic+'00';
+		$gameScreen.showPicture(valuePic1,value2,1,640-128,384-20,100,100,0,0);
+		$gameScreen.movePicture(valuePic1,1,640-128,384,100,100,255,0,60);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
+	event11 = function (interp) {
+		return (function () {
+		var event = $gameMap.event(this._eventId);
+		var value1 = event.screenX();
+		var value2 = event.screenY();
+		filter_direct(9,value1,value2,20);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
+	showPictureZXMain037 = function () {
+		backGraund_menuMapSelect(2,0,0,0);
+		valuePic1 = 51;
+		valuePic2 = 71;
+		valueScenePic = 'ZX_Main037_';
+		var value2 = 'ScreenBlackOut';
+		$gameScreen.showPicture(valuePic1,value2,1,640,384,100,100,200,0);
+		picture_fade1(valuePic1,"fadeIn",valueWipeImg,60,5);
+		var value2 = valueScenePic+'01';
+		$gameScreen.showPicture(valuePic2+1,value2,1,640+480,384-118,100,100,200,0);
+		$gameScreen.movePicture(valuePic2+1,1,640+480,384+50,100,100,255,0,240);
+		tachie_bless(valuePic2+1,2);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
+	showPictureScreen1024Frame = function () {
+		var value2 = valueScenePic+'02';
+		$gameScreen.showPicture(valuePic1+1,value2,1,640-128,384-20,100,100,0,0);
+		$gameScreen.movePicture(valuePic1+1,1,640-128,384,100,100,255,0,60);
+		tachie_bless(valuePic1+1,2);
+		var value2 = 'Screen1024Frame';
+		$gameScreen.showPicture(valuePic2,value2,1,640-78,384,100,100,255,0);
+		picture_fade1(valuePic2,"fadeIn",valueWipeImg,60,5);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
+	showPicture5 = function () {
+		var value1 = valuePic2+2;
+		var value2 = valueScenePic+'03';
+		$gameScreen.showPicture(value1,value2,1,640+480,384+50,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640+480,384+50,100,100,255,0,60);
+		tachie_bless(value1,2);pic_move1(value1-1,0,0,100,100,0,90);
+		var value1 = valuePic1+2;
+		var value2 = valueScenePic+'04';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		tachie_bless(value1,2);pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
+	setSwitch429ZHSticky4 = function () {
+		var value1 = valuePic1+4;
+		var value2 = valueScenePic+'04a';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,150,0);
+		pic_setArray1 = [1,value1,0,5,0,30];
+		pic_setArray2 = [1,value1,0,0,3,30]; //pic_setArray2 = [1,0,0,0,0,0];
+		valueParallelPicSe1 = ['ZH_sticky4',20,60];
+		valueParallelPicSe2 = ['ZH_sticky1',20,60];
+		hcg_piston(value1,7,2,1);
+		$gameSwitches.setValue(429,true);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
+	showPicture6 = function () {
+		var value1 = valuePic1+5;
+		var value2 = valueScenePic+'06';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		tachie_bless(value1,2);pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
+	setPicturesAnimation3 = function () {
+		$gameScreen.setPicturesAnimation(2, 10, "連番", 20);
+		var value1 = valuePic1+6;
+		var value2 = valueScenePic+'05_00';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		if($gameScreen.picture(value1)){
+		  $gameScreen.picture(value1).startAnimationFrame(1, true, [1,1,1,2]);
+		};
+		tachie_bless(value1,2);pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
+	readVariable530_22 = function () {
+		var value1 = 5;//$gameVariables.value(530);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.setStepAnime(true);
+		event._priorityType = 2;
+		event._spriteOffsetX = -10;
+		event._spriteOffsetY = +58;
+		event.removeFace();
+		event.setDirection(8);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
+	readVariable292_17 = function (interp) {
+		return (function () {
+		  var variable292Value = $gameVariables.value(292)[11]; //this._eventId
+		  var event = $gameMap.event(variable292Value);
+		  event.setStepAnime(false);event.setWalkAnime(false);
+		  event.setDirection(2);event.resetPattern();
+		  event._originalPattern = 1;event.setAngle(45);
+		  event._spriteOffsetX = -12;event._spriteOffsetY = -12;
+		  event._kageM.clear();
+		  event.setFace(6,true,true);//Child用
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
+	readVariable530_23 = function () {
+		var value1 = 11;//$gameVariables.value(530);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.locate(4, 16);
+		var value1 = 12;//$gameVariables.value(530);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.locate(5, 16);
+		var value1 = 13;//$gameVariables.value(530);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.locate(4, 17);
+		var value1 = 14;//$gameVariables.value(530);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.locate(5, 17);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
+	readVariable530_24 = function () {
+		var variable530Value = 5;//$gameVariables.value(530);
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		event.locate(4, 11);
+		event.setDirection(2);
+		event.setScale(100, 90);
+		var variable530Value = $gameVariables.value(530);
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		event.locate(22, 6);
+		event.setDirection(2);
+		event._spriteOffsetX = -48;event._spriteOffsetY = -24;
+		event.setStepAnime(false);event.setWalkAnime(false);
+		event._kageM.clear();event.setFace(6,true,true);//Child用
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:339|[39]合流と分散
+	showPictureZXMain038 = function () {
+		valuePic1 = 55;
+		valueScenePic = 'ZX_Main038_';
+		var value2 = valueScenePic+'01';
+		$gameScreen.showPicture(valuePic1,value2,1,640,384,100,100,250,0);
+		picture_fade1(valuePic1,"fadeIn",valueWipeImg,60,5);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:340|[40]謁見を申し出る
+	readVariable530_25 = function () {
+		var variable530Value = $gameVariables.value(530);
+		event_respawnSetA(variable530Value,13,23,1,8);
+		event_respawnSetA(5,13,24,0,8);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:341|[41]牢獄１日目
+	readVariable530NpcCastle1 = function () {
+		var variable530Value = $gameVariables.value(530);
+		event_respawnSetA(variable530Value,12,5,1,2);
+		event_respawnSetA(5,13,6,0,4);
+		event_respawnSetN(11,18,10,0,'npcCastle1',2,4);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:341|[41]牢獄１日目
+	readVariable530NpcCastle1_2 = function (interp) {
+		return (function () {
+		var value1 = 12;//$gameVariables.value(530);
+		event_respawnSetN(value1,16,3,1,'npcCastle1',2,2);
+		this._eventId = $gameVariables.value(292)[value1];
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:341|[41]牢獄１日目
+	readVariable530NpcCastle1_3 = function () {
+		var variable530Value = $gameVariables.value(530);
+		event_respawnSetA(variable530Value,5,8,1,8);
+		event_respawnSetA(7,5,6,0,2);
+		event_respawnSetN(12,8,5,0,'npcCastle1',2,6);
+		event_respawnSetN(13,10,9,0,'npcCastle1',2,2);
+		event_respawnSetN(14,4,9,0,'npcCastle1',2,8);
+		event_respawnSetN(15,6,9,0,'npcCastle1',2,8);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:341|[41]牢獄１日目
+	showPictureDungeon12 = function () {
+		backGraund_menuMapSelect(2,0,0,0);//'Dungeon1_2'
+		valueScenePic =  'ZX_Main040_';
+		valuePic1 = 55;
+		var value2 = 'ScreenBlackOut';
+		$gameScreen.showPicture(valuePic1,value2,1,640,384,100,100,200,0);
+		picture_fade1(valuePic1,"fadeIn",valueWipeImg,60,5);
+		var value1 = valuePic1+1;
+		var value2 = valueScenePic+'01';
+		$gameScreen.showPicture(value1,value2,1,640-128,384-20,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:341|[41]牢獄１日目
+	showPicture7 = function () {
+		picture_se1();
+		var value1 = valuePic1+3;
+		var value2 = valueScenePic+'03';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:341|[41]牢獄１日目
+	handleScriptSnippet51 = function () {
+		picture_se1();
+		var value1 = valuePic1+3;
+		pic_move1(value1,0,0,100,100,0,60);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:341|[41]牢獄１日目
+	handleScriptSnippet52 = function () {
+		var value1 = 55;
+		pic_move1(value1,0,0,0,0,0,60);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:341|[41]牢獄１日目
+	handleScriptSnippet53 = function () {
+		picture_se1();
+		var value1 = valuePic1+3;
+		pic_move1(value1,0,0,100,100,255,60);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:341|[41]牢獄１日目
+	showPicture8 = function () {
+		var value1 = valuePic1+4;
+		var value2 = valueScenePic+'04';
+		$gameScreen.showPicture(value1,value2,1,640-128,384-50,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:341|[41]牢獄１日目
+	showPicture9 = function () {
+		picture_se1();
+		var value1 = valuePic1+9;
+		var value2 = valueScenePic+'13';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:341|[41]牢獄１日目
+	showPicture10 = function () {
+		picture_se1();
+		var value1 = valuePic1+10;
+		var value2 = valueScenePic+'14';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:342|[42]牢獄６日目
+	readVariable530NpcCastle1_4 = function (interp) {
+		return (function () {
+		var value1 = 12;//$gameVariables.value(530);
+		event_respawnSetN(value1,16,3,1,'npcCastle1',2,2);
+		//this._eventId = $gameVariables.value(292)[value1];
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:342|[42]牢獄６日目
+	wait7 = function (interp) {
+		return (function () {
+		var id1 = 1;
+		var id2 = 30;
+		var arr1 = [`ア`,`ア`,`ア`,`ア`,`ア`,`～`,`ン`];
+		var arr2 = [`゛`,`゛`,`゛`,`\\C[27]♥\\C[0]`,`\\C[27]♡\\C[0]`,` `];
+		var arr3 = [64,60,55,50,45,40,35,64,60,55,50,45,40,35,64,60,55,50,45,40,35,14];
+		var arr4 = [25,24,23,22,21,20,19,18,17,16,15];
+		text_randumWord(21,id1,id2,arr1,arr2,arr3,arr4);
+		this.wait(10);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:342|[42]牢獄６日目
+	showTickerMessage4 = function () {
+		var value1 = `\\N[5]は「\\c[2]魔導ディスク\\c[0]」を手に入れた。`;
+		TickerManager.show(value1);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:342|[42]牢獄６日目
+	readVariable530_26 = function (interp) {
+		return (function () {
+		var variable530Value = $gameVariables.value(530);
+		event_respawnSetA(variable530Value,11,6,1,6);
+		var variable530Value = 5;//$gameVariables.value(530);
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		event.locate(13, 6);
+		event.setDirection(4);
+		var variable530Value = 12;//$gameVariables.value(530);
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		event.locate(18, 10);
+		event.setDirection(4);
+		this._eventId = $gameVariables.value(292)[variable530Value];
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:342|[42]牢獄６日目
+	readVariable530NpcOrder1 = function () {
+		var value1 = 13;//$gameVariables.value(530);
+		event_respawnSetN(value1,12,10,0,'npcOrder1',3,8);
+		event_partyCharaMove(16,0);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:342|[42]牢獄６日目
+	readVariable530_27 = function () {
+		var variable530Value = $gameVariables.value(530);
+		event_respawnSetA(variable530Value,6,9,1,2);
+		event_respawnSetA(5,7,9,0,2);
+		event_respawnSetA(2,6,10,0,8);
+		event_respawnSetA(3,7,10,0,8);
+		event_respawnSetA(4,5,10,0,8);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:343|[43]誇りと秩序
+	readVariable530People3 = function (interp) {
+		return (function () {
+		var variable530Value = $gameVariables.value(530);
+		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+		event_respawnSetA(variable530Value,variable163Value[3],variable163Value[4],1,variable163Value[5]);
+		this._eventId = $gameVariables.value(292)[variable530Value];
+		var variable530Value = 11;
+		event_respawnSetN(variable530Value,13,13,0,'People3',6,2);
+		event_respawnSetN(12,10,17,0,'npcCastle1',2,6);
+		event_respawnSetN(13,10,18,0,'npcCastle1',2,6);
+		event_respawnSetN(14,16,17,0,'npcCastle1',2,4);
+		event_respawnSetN(15,16,18,0,'npcCastle1',2,4);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:344|[44]宰相蓄電
+	setVariable171 = function (interp) {
+		return (function () {
+		$gameVariables.setValue(171,[36,13,16]);
+		var variable530Value = $gameVariables.value(530);
+		event_respawnSetA(variable530Value,13,16,1,8);
+		this._eventId = $gameVariables.value(292)[variable530Value];
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:345|[45]祭殿の隠し通路
+	setVariable171_2 = function (interp) {
+		return (function () {
+		$gameVariables.setValue(171,[108,10,9]);
+		var variable530Value = $gameVariables.value(530);
+		event_respawnSetA(variable530Value,10,9,1,8);
+		this._eventId = $gameVariables.value(292)[variable530Value];
+		var variable530Value = 11;
+		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+		goodsEvent_respawn(variable530Value,variable163Value[6],variable163Value[7],variable163Value[10],variable163Value[11],variable163Value[8],variable163Value[9]);
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		event._priorityType = 1;
+		event._spriteOffsetX = +12;
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:346|[46]遺跡の守護者
+	readVariable292_18 = function () {
+		var variable292Value = 12;
+		var variable292Value = $gameVariables.value(292)[variable292Value];
+		message_popup2(variable292Value,0,2,1);
+		//message_popup2(0,[1024,368],1,1);
+		//ｲﾍﾞﾝﾄid,ﾌｷﾀﾞｼ位置,行数,1で有効化。\sh[5] で振動強さ指定
+		//0で座標指定,xyは中心点を指定
+		//mpp文字操作との相性が悪い
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:349|[49]終幕
+	readVariable530Goods8_2 = function (interp) {
+		return (function () {
+		var variable530Value = $gameVariables.value(530);
+		event_respawnSetA(variable530Value,8,4,1,2);
+		this._eventId = $gameVariables.value(292)[variable530Value];
+		goodsEvent_respawn(11,'Goods8',0,4,1,8,5);
+		goodsEvent_respawn(12,'Goods8',0,6,0,7,5);
+		goodsEvent_respawn(13,'Goods8',0,6,0,9,5);
+		goodsEvent_respawn(14,'Goods7',5,8,1,7,6);
+		goodsEvent_respawn(15,'Goods7',5,8,1,9,6);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:350|[50]次なる戦いへ──
+	readVariable530Goods8_3 = function (interp) {
+		return (function () {
+		var variable530Value = $gameVariables.value(530);
+		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+		event_respawnSetA(variable530Value,variable163Value[3],variable163Value[4],1);
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		event.setImage(variable163Value[1], variable163Value[2]);
+		event.setDirection(variable163Value[5]);
+		this._eventId = $gameVariables.value(292)[variable530Value];
+		var variable530Value = 2;//$gameVariables.value(530);
+		event_respawnSetA(variable530Value,variable163Value[3],variable163Value[4]+3,1,8);
+		goodsEvent_respawn(11,'Goods8',0,6,1,8,5);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:355|戦闘時台詞集
+	logBattleText4 = function () {
+		var value2 = `\\wn[351]が\\sim[331]を発動した！`
+		BattleManager._logWindow.push(`addText`, value2);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:356|ハイゴブリン勝利
+	readVariable530_28 = function (interp) {
+		return (function () {
+		var variable292Value = 5;//$gameVariables.value(530);
+		var variable292Value = $gameVariables.value(292)[variable292Value];
+		character = this.character(variable292Value);
+		character.locate(12, 11);
+		character.setDirection(8);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:356|ハイゴブリン勝利
+	readVariable530_29 = function (interp) {
+		return (function () {
+		var variable530Value = $gameVariables.value(530);
+		this._eventId = $gameVariables.value(292)[variable530Value];
+		var event = $gameMap.event(this._eventId);
+		var variable530Value = event.screenX();
+		var value2 = event.screenY();
+		filter_direct(9,variable530Value,value2,60);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:356|ハイゴブリン勝利
+	readVariable530_30 = function () {
+		var variable292Value2 = $gameVariables.value(530);
+		var variable292Value2 = $gameVariables.value(292)[variable292Value2];
+		var event = $gameMap.event(variable292Value2);
+		event.setOpacity(0);
+		var variable292Value2 = 5;//$gameVariables.value(530);
+		var variable292Value2 = $gameVariables.value(292)[variable292Value2];
+		var event = $gameMap.event(variable292Value2);
+		event.setOpacity(0);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:358|空賊ボス勝利
+	event12 = function (interp) {
+		return (function () {
+		var value1 = this._eventId; //this._eventId
+		var event = $gameMap.event(value1);
+		event.setStepAnime(false);
+		event.setWalkAnime(false);
+		event.setDirection(2);
+		event.resetPattern();
+		event._originalPattern = 1;
+		event.setAngle(45);
+		event._spriteOffsetX = -12;
+		event._spriteOffsetY = -12
+		event._kageM.clear();
+		event.setFace(6,true,true);//Child用
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:359|ガーディアン勝利
+	readVariable530_31 = function (interp) {
+		return (function () {
+		var variable530Value = $gameVariables.value(530);
+		this._eventId = $gameVariables.value(292)[variable530Value];
+		var event = $gameMap.event(this._eventId);
+		var variable530Value = event._realX;
+		var value2 = event._realY;
+		filter_direct(9,variable530Value,value2,60);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:360|ガーディアン2勝利
+	readVariable530_32 = function () {
+		var variable530Value = $gameVariables.value(530);
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		event.locate(7, 24);
+		event.setDirection(8);
+		var variable530Value = 2;//$gameVariables.value(530);
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		event.locate(6, 23);
+		event.setDirection(6);
+		var variable530Value = 3;//$gameVariables.value(530);
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		event.locate(8, 23);
+		event.setDirection(4);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:360|ガーディアン2勝利
+	showPictureGoodsBook1 = function () {
+		valuePic1 = 55;
+		var value2 = 'Goods_Book1';
+		$gameScreen.showPicture(valuePic1,value2,1,640,384-20,100,100,0,0);
+		$gameScreen.movePicture(valuePic1,1,640,384,100,100,255,0,60);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:361|騎士団長勝利
+	readVariable530People3_2 = function () {
+		var variable530Value = $gameVariables.value(530);
+		event_respawnSetA(variable530Value,13,15,1,8);
+		var variable530Value = 11;
+		event_respawnSetN(variable530Value,13,13,0,'People3',6,2);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:361|騎士団長勝利
+	readVariable530_33 = function (interp) {
+		return (function () {
+		var variable530Value = $gameVariables.value(530);
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		event._spriteOffsetY = -24;
+		var variable530Value = 11;
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		event._spriteOffsetY = +24;
+		this._eventId = $gameVariables.value(292)[variable530Value];
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:361|騎士団長勝利
+	readVariable292_19 = function (interp) {
+		return (function () {
+		var value1 = 17;//
+		event_charaZanzou(this._eventId,value1);
+		this._eventId = $gameVariables.value(292)[value1];
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:363|グドン勝利
+	readVariable530_34 = function (interp) {
+		return (function () {
+		var variable530Value = $gameVariables.value(530);
+		event_respawnSetA(variable530Value,12,10,1,8);
+		//this._eventId = $gameVariables.value(292)[variable530Value];
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:363|グドン勝利
+	eventHscene005 = function (interp) {
+		return (function () {
+		var event = $gameMap.event(this._eventId);
+		var value3 = "Hscene005";//102一刀両断 Hscene005崩壊 008横両断 054封印 153内側から
+		event._GWInfo = $gameScreen.createGWInfo(["fadeOut",value3,300,5]);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:364|\N[5]勝利
+	event13 = function () {
+		  if(!!$gameMap.event(12)) {
+		    var event = $gameMap.event(12);
+		    event.setStepAnime(false);event.setWalkAnime(false);
+		    event.setDirection(2);event.resetPattern();
+		    event._originalPattern = 1;event.setAngle(45);
+		    event._spriteOffsetX = -12;event._spriteOffsetY = -12;
+		    event._kageM.clear();
+		    event.setFace(6,true,true);//Child用event.setFace(6,true,true,0,6,0,6);
+		}
+	};
+
+	// Replaces (4x): CommonEvents.json:common-event:368|コマンド, CommonEvents.json:common-event:495|サンプル, CommonEvents.json:common-event:532|サンプル, CommonEvents.json:common-event:548|
+	showPicture11 = function () {
+		backGraund_menuMapSelect(2,0,0,0);
+		valuePic1 = 51;
+		var value1 = valuePic1+1;
+		var value2 = valueScenePic+'02';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		tachie_bless(value1,2);
+		//pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (5x): CommonEvents.json:common-event:368|コマンド, CommonEvents.json:common-event:412|, CommonEvents.json:common-event:495|サンプル, CommonEvents.json:common-event:532|サンプル, CommonEvents.json:common-event:548|
+	showPicture51ZXMain037 = function () {
+		backGraund_menuMapSelect(2,0,0,0);
+		valuePic1 = 55;
+		valuePic2 = 71;
+		valueScenePic = 'ZX_Main037_';
+		var value2 = 'ScreenBlackOut';
+		$gameScreen.showPicture(51,value2,1,640,384,100,100,150,0);
+		picture_fade1(51,"fadeIn",valueWipeImg,60,5);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:370|素体
+	setSelfVariable530_2 = function (interp) {
+		return (function () {
+		this.sVal(530,1);//主格キャラ
+		$gameVariables.setValue(292,Array(21).fill(0));
+		var variable530Value = $gameVariables.value(530);
+		event_respawnSetA(variable530Value,12,12,1,8);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:381|情報屋処理
+	setVariable21_11 = function () {
+		var variable19Value = $dataItems[$gameVariables.value(19)].price;
+		$gameVariables.setValue(21,variable19Value.toLocaleString());
+		if($gameParty.gold() >= variable19Value){
+		  $gameSwitches.setValue(161,true);
+		} else {
+		  $gameSwitches.setValue(161,false);
+		};
+		valueCountSet2 = variable19Value;
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:381|情報屋処理
+	setSwitch162_2 = function () {
+		var actor = $gameActors.actor($gameVariables.value(20));
+		if($gameSwitches.value(508)){
+		  if($gameSwitches.value(1007) && !$gameSwitches.value(1107)){
+		    $gameSwitches.setValue(162,true);
+		}};
+		if($gameSwitches.value(508)){
+		  if($gameSwitches.value(1008) && !$gameSwitches.value(1108)){
+		    $gameSwitches.setValue(162,true);
+		}};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:381|情報屋処理
+	setSwitch162_3 = function () {
+		var actor = $gameActors.actor($gameVariables.value(20));
+		if($gameSwitches.value(508)){
+		  if($gameSwitches.value(1009) && !$gameSwitches.value(1109)){
+		    $gameSwitches.setValue(162,true);
+		}};
+		if($gameSwitches.value(508)){
+		  if($gameSwitches.value(1109)){
+		    $gameSwitches.setValue(162,true);
+		}};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:381|情報屋処理
+	setSelfVariable23 = function (interp) {
+		return (function () {
+		var value1 = 507;
+		if($gameSwitches.value(1107)){var value1 = 508};
+		if($gameSwitches.value(1108)){var value1 = 509};
+		if($gameSwitches.value(1109)){var value1 = 1000};
+		if($gameSwitches.value(1110)){var value1 = 1000};
+		valueCountSet1 = value1;
+		if(valueCountSet1 == 1000){
+		  this.sVal(23,`汎用シーン発生`);$gameSwitches.setValue(162,true);
+		} else {
+		  this.sVal(23,`${$dataItems[valueCountSet1].description}`);
+		};
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:382|酔っ払いを介抱する
+	setSelfVariable530XevS006 = function (interp) {
+		return (function () {
+		valueScenePic = 'XevS006_';
+		//var value2 = valueScenePic+'01';
+		valueVariable163Set = 5;
+		this.sVal(530,1);//主格キャラ
+		this.sVal(535,502);//挿話回想の場合アイテムID。メインは0
+		valueWeatherSceneSet = 15;
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:382|酔っ払いを介抱する
+	showPictureScreenBlackOut4 = function () {
+		valuePic1 = 51;
+		var value2 = 'ScreenBlackOut';
+		$gameScreen.showPicture(valuePic1,value2,1,640,384,100,100,150,0);
+		picture_fade1(valuePic1,"fadeIn",valueWipeImg,60,5);
+		var value2 = valueScenePic+'01';
+		$gameScreen.showPicture(valuePic1+1,value2,1,640-128,384-10,100,100,255,0);
+		$gameScreen.movePicture(valuePic1+1,1,640-128,384,100,100,255,0,40);
+		hcg_piston(valuePic1+1,6,1,1);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:382|酔っ払いを介抱する
+	setSwitch428 = function (interp) {
+		return (function () {
+		var value2 = valueScenePic+'05';
+		$gameSwitches.setValue(428,true);
+		valueCutInSet1 = ['Ｈシーン演出',value2,270,1.5,1.2,25,120];
+		var args = new Array(String(valueCutInSet1[0]));
+		this.pluginCommand("味方カットイン", args);
+		$gameSwitches.setValue(428,false);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:382|酔っ払いを介抱する
+	showPicture12 = function () {
+		var value2 = valueScenePic+'04';
+		$gameScreen.showPicture(valuePic1+4,value2,1,640-128,384+100,100,100,255,0);
+		$gameScreen.movePicture(valuePic1+4,1,640-128,384,100,100,255,0,40);
+		hcg_piston(valuePic1+4,7,2,2);
+		var value2 = valueScenePic+'02';
+		pic_1(0,valuePic1+2,value2,2,100,255,40,1280,768,-256,0);
+		hcg_piston(valuePic1+2,6,1,1);
+		sex_direction(6,0);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:382|酔っ払いを介抱する
+	setSelfVariable172_4 = function (interp) {
+		return (function () {
+		this.sVal(172,13);
+		valueTalkSet = [640-128,386,200,false];
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:382|酔っ払いを介抱する
+	handleScriptSnippet54 = function () {
+		var value2 = valueScenePic+'03';
+		pic_1(0,valuePic1+3,value2,2,100,255,40,1280,768,-256,0);
+		hcg_piston(valuePic1+3,6,1,1);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:382|酔っ払いを介抱する
+	setSelfVariable172_5 = function (interp) {
+		return (function () {
+		this.sVal(172,13);
+		valueTalkSet = [640-128,386,200,false];
+		this.setupChild($dataCommonEvents[60].list, 0);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:382|酔っ払いを介抱する
+	setSwitch161_5 = function () {
+		if(eval(valueSceneConditions1)){
+		  $gameSwitches.setValue(161,true);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:387|闘技場受付2
+	setSwitch162_4 = function () {
+		if($gameSwitches.value(637)){
+		  $gameSwitches.setValue(162,false);
+		} else {
+		  $gameSwitches.setValue(162,true);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:389|情報屋汎用
+	setVariable707SexualEcstasyHi = function () {
+		var actor = $gameActors.actor($gameVariables.value(20));
+		//if(actor.meta['SexualEcstasyHi']){var arr = actor1.meta['SexualEcstasyHi'].split(',')};//SexualEcstasyLow  SexualEcstasyMiddle
+		//var arr1 = ['（ドキっ）','（ドキドキ）','（ドクン）','ドキッ'];//文字BGV
+		var arr1 = ['「アッ\\I[12]」','「ンッ\\I[12]」','「ンン…\\I[12]」','「ンクっ…\\I[12]」','「ァンっ…\\I[12]」'];//文字BGV
+		//var arr1 = ['「………ァっ」','「いや…」','「ンン──……」','「ンクっ…」','「ァンっ…」'];//文字BGV
+		htext_word(3);//3高2中1低
+		arr1 = arr1.concat(valueHtextWord);
+		$gameVariables.setValue(707,arr1);
+		$gameVariables.setValue(706,[640-128,386,1,60,0,'eromangasimaji']);
+		$gameSwitches.setValue(125,true);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:390|娼館コモン
+	floor = function () {
+		i1 = getRandomIndex(6) + 1;//人数
+		i2 = getRandomIndex(7) + 3;//膣回数
+		i3 = Math.floor( Math.random() * -2) + i1;//中だし回数
+		i4 = getRandomIndex(5) + 0;//アナル回数
+		i5 = Math.floor( Math.random() * -2) + 0;//中だし回数
+		i6 = getRandomIndex(2) + 1;//フェラ回数
+		i7 = getRandomIndex(1) + i4;//口腔回数
+		i8 = getRandomIndex(3) + 0;//失禁回数
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:392|トウロウコモン1
+	handleScriptSnippet55 = function () {
+		var value1 = valuePic1+1;
+		pic_showMove1(value1,valueScenePic+'01',
+		640-128,384,100,60,1,50);
+		tachie_bless(value1,2);
+		//pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:392|トウロウコモン1
+	handleScriptSnippet56 = function () {
+		var value1 = valuePic1+2;
+		pic_showMove1(value1,valueScenePic+'11',
+		640-128,384,100,60,1,-50);
+		hcg_piston(value1,7,1,1);
+		//pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:392|トウロウコモン1
+	handleScriptSnippet57 = function () {
+		for (var i = 0; i <= 3; i++) {pic_eraseP(0,[valuePic1+i])};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:400|↓挿話集コモン500まで
+	handleScriptSnippetXevO001 = function () {
+		valueScenePic = 'XevO001_';
+		//var value2 = valueScenePic+'01';
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:410|立ち上がる秩序
+	showPictureScreenBlackOut5 = function () {
+		valuePic1 = 51;
+		var value2 = 'ScreenBlackOut';
+		$gameScreen.showPicture(valuePic1,value2,1,640,384,100,100,200,0);
+		picture_fade1(valuePic1,"fadeIn",valueWipeImg,60,5);
+		var value1 = valuePic1+1;
+		var value2 = valueScenePic+'01';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		tachie_bless(value1,2);
+		//pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:411|無頓着な秩序
+	picture4 = function (interp) {
+		return (function () {
+		valuePic1 = 16;
+		var value1 = $gameScreen.picture(valuePic1).x();
+		var value2 = $gameScreen.picture(13).x();
+		picTachie_move1(valuePic1,value2-value1-200,0,0,0,255,30);
+		this.wait(30);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:411|無頓着な秩序
+	picture5 = function (interp) {
+		return (function () {
+		valuePic1 = 16;
+		var value1 = $gameScreen.picture(valuePic1).scaleX();
+		picTachie_move1(valuePic1,0,0,value1-value1-value1,0,255,30);
+		this.wait(30);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:411|無頓着な秩序
+	valueName2 = function (interp) {
+		return (function () {
+		picTachie_move1(16,-500,0,0,0,0,60);
+		valuePic1 = 13;
+		picTachie_move1(valuePic1,-500,0,0,0,0,60);
+		if($gameSwitches.value(127)){
+		  AudioManager.playSe({"name":"Z_FootCastle","volume":25,"pitch":140,"pan":0});
+		  var value6 = Math.floor(value6 / 2);//ウェイト
+		} else {
+		  AudioManager.playSe({"name":"Z_FootCastle","volume":25,"pitch":100,"pan":0});
+		};
+		this.wait(60);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:412|
+	showPictureScreenBlackOut6 = function () {
+		backGraund_menuMapSelect(2,0,0,0);
+		valuePic1 = 51;
+		var value2 = 'ScreenBlackOut';
+		$gameScreen.showPicture(valuePic1,value2,1,640,384,100,100,200,0);
+		picture_fade1(valuePic1,"fadeIn",valueWipeImg,60,5);
+		var value1 = valuePic1+1;
+		var value2 = valueScenePic+'02';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		tachie_bless(value1,2);
+		//pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:414|副船団長の密かな疑問
+	handleScriptSnippet58 = function () {
+		var value1 = '/img/parallaxes/BG_Town1';
+		parallax_scroll(7,value1,0,20,0.2,0,255);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:431|未必の陰謀
+	readVariable292NpcOrder1 = function (interp) {
+		return (function () {
+		  var value1 = 16;
+		  event_respawnSetN(value1,6,15,0,'npcOrder1',5);
+		  var event = $gameMap.event($gameVariables.value(292)[value1]);
+		  event.setDirection(8);
+		this._eventId = $gameVariables.value(292)[value1];
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:431|未必の陰謀
+	readVariable292NpcOrder1_2 = function (interp) {
+		return (function () {
+		var value1 = 17;
+		event_respawnSetN(value1,8,7,0,'npcOrder1',1);
+		this._eventId = $gameVariables.value(292)[value1];
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:432|休暇のすゝめ
+	readVariable530_35 = function () {
+		var variable530Value = $gameVariables.value(530);
+		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+		var variable530Value = 11;
+		event_respawnSetN(variable530Value,variable163Value[8],variable163Value[9],0,variable163Value[6],variable163Value[7],4);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:441|△人助け
+	readVariable530_36 = function () {
+		var variable530Value = $gameVariables.value(530);
+		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+		event_respawnSetA(variable530Value,variable163Value[3]-5,variable163Value[4],1);
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		event.setImage(variable163Value[1], variable163Value[2]);
+		event.setDirection(variable163Value[5]);
+		var variable530Value = 11;
+		event_respawnSetN(variable530Value,variable163Value[8],variable163Value[9],0,variable163Value[6],variable163Value[7]);
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		event.setDirection(variable163Value[10]);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:441|△人助け
+	readVariable292_20 = function (interp) {
+		return (function () {
+		var variable292Value = $gameVariables.value(292)[11]; //this._eventId
+		var event = $gameMap.event(variable292Value);
+		event.setStepAnime(false);
+		event.setWalkAnime(false);
+		event.setDirection(2);
+		event.resetPattern();
+		event._originalPattern = 1;
+		event.setAngle(45);
+		event._spriteOffsetX = -12;
+		event._spriteOffsetY = -12
+		event._kageM.clear();
+		event.setFace(6,true,true);//Child用
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:442|△人助け2
+	readVariable530_37 = function (interp) {
+		return (function () {
+		var variable530Value = $gameVariables.value(530);
+		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+		event_respawnSetA(variable530Value,variable163Value[3]-5,variable163Value[4],1);
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		event.setImage(variable163Value[1], variable163Value[2]);
+		event.setDirection(variable163Value[5]);
+		this._eventId = $gameVariables.value(292)[variable530Value];
+		var variable530Value = 11;
+		event_respawnSetN(variable530Value,variable163Value[8],variable163Value[9],0,variable163Value[6],variable163Value[7]);
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		event.setDirection(variable163Value[10]);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:442|△人助け2
+	setSwitch428XevO000 = function (interp) {
+		return (function () {
+		valueScenePic = 'XevO000_';
+		var value2 = valueScenePic+'02_00';
+		$gameSwitches.setValue(428,true);
+		valueCutInSet1 = ['カットインアクター会話',value2,-90,4.5,3.0,25,60];
+		var args = new Array(String(valueCutInSet1[0]));
+		this.pluginCommand("味方カットイン", args);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:442|△人助け2
+	readVariable530_38 = function (interp) {
+		return (function () {
+		var value1 = 11;//$gameVariables.value(530);
+		this._eventId = $gameVariables.value(292)[value1];
+		drowsepost.camera.zoom(1, 120, this._eventId);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:444|△りーしゃ人助け
+	setSelfVariable172_6 = function (interp) {
+		return (function () {
+		this.sVal(172,10);//文字ﾋﾟｸTips以外
+		var value1 = 
+		`彼女が感じた最も近い感情は、「落胆」や「失意」と言ったものだろう。
+		未だ歳若い、理想を胸に宿す少女には明確な理解が出来なかったのだ。
+		何れはそこに至るやも知れぬが、それはこの物語に措いてでは無い…。
+		`;
+		valueTalkSet = [25,actor.profile()]
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:451|雄ドラフ、驚愕する
+	readVariable530_39 = function (interp) {
+		return (function () {
+		var value1 = 1;//$gameVariables.value(530);
+		event_respawnSetN(value1,16,6,0,'1_1',2);
+		this._eventId = $gameVariables.value(292)[value1];
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:452|△露出王(上巻)を読む
+	readVariable530_40 = function (interp) {
+		return (function () {
+		var variable530Value = $gameVariables.value(530);
+		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+		event_respawnSetA(variable530Value,variable163Value[3]+1,variable163Value[4],1,2);
+		this._eventId = $gameVariables.value(292)[variable530Value];
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:452|△露出王(上巻)を読む
+	readVariable292Goods7 = function () {
+		var value1 = 11;
+		goodsEvent_respawn(value1,'Goods7',5,8,1,14,5);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event._spriteOffsetY = -20;
+		event._priorityType = 2;
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:452|△露出王(上巻)を読む
+	showPictureScreenBlackOut7 = function () {
+		backGraund_menuMapSelect(2,0,0,0);
+		valuePic1 = 55;
+		var value2 = 'ScreenBlackOut';
+		$gameScreen.showPicture(valuePic1-1,value2,1,640,384,100,100,200,0);
+		picture_fade1(valuePic1-1,"fadeIn",valueWipeImg,60,5);
+		var value2 = 'ZX_NowconditionF_2';
+		$gameScreen.showPicture(valuePic1,value2,1,640-128,384-20,100,100,0,0);
+		$gameScreen.movePicture(valuePic1,1,640-128,384,100,100,255,0,60);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:471|覚醒 ─Awaken 'B'─
+	readVariable292_21 = function (interp) {
+		return (function () {
+		this._eventId = $gameVariables.value(292)[11];
+		drowsepost.camera.zoom(1, 60, this._eventId);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:471|覚醒 ─Awaken 'B'─
+	readVariable292_22 = function (interp) {
+		return (function () {
+		var variable292Value = $gameVariables.value(292)[5]; //this._eventId
+		if(!!$gameMap.event(variable292Value)) {
+		    var event = $gameMap.event(variable292Value);
+		    event.setStepAnime(false);event.setWalkAnime(false);
+		    event.setDirection(2);event.resetPattern();
+		    event._originalPattern = 1;event.setAngle(45);
+		    event._spriteOffsetX = -12;event._spriteOffsetY = -12;
+		    event._kageM.clear();
+		    event.setFace(6,true,true,0,6,0,6);//Child用event.setFace(6,true,true,0,6,0,6);
+		};
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:471|覚醒 ─Awaken 'B'─
+	readVariable292_23 = function (interp) {
+		return (function () {
+		var variable292Value = $gameVariables.value(292)[5]; //this._eventId
+		var value5 = $gameMap.event(variable292Value).x;var value6 = $gameMap.event(variable292Value).y;
+		$gameMap.spawnEvent(190, value5, value6, true);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:471|覚醒 ─Awaken 'B'─
+	showPicture13 = function () {
+		valuePic1 = 55;
+		var value2 = "/img/parallaxes/Scene_Awaken_1";
+		$gameScreen.showPicture(valuePic1,value2,1,640,384,100,100,0,0);
+		$gameScreen.movePicture(valuePic1,1,640,384,100,100,50,0,60);
+		$gameScreen.rotatePicture(valuePic1, 0.1);
+		hcg_piston(valuePic1,7,1,2);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:471|覚醒 ─Awaken 'B'─
+	movePictureLifeStormScreen = function () {
+		$gameScreen.movePicture(valuePic1,1,640,384,100,100,100,0,60);
+		var value1 = 'lifeStorm_screen';
+		$gameScreen._particle.particleUpdate([value1,'particlesPerWave',String(10)]);
+		$gameScreen._particle.particleUpdate([value1,'speed',String(200),String(0)]);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:471|覚醒 ─Awaken 'B'─
+	movePictureLifeStormScreen2 = function () {
+		$gameScreen.movePicture(valuePic1,1,640,384,100,100,200,0,60);
+		var value1 = 'lifeStorm_screen';
+		$gameScreen._particle.particleUpdate([value1,'scale','1',0.2+'@0.15',0.05+'@0.8','0']);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:471|覚醒 ─Awaken 'B'─
+	setSelfVariable20_11 = function (interp) {
+		return (function () {
+		this.sVal(20,5);
+		var actor = $gameActors.actor($gameVariables.value(20));
+		for(var i = 401; i <= 406; i++){
+		  actor.forgetSkill(i);
+		};
+		actor.learnSkill(401);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:471|覚醒 ─Awaken 'B'─
+	readVariable292_24 = function (interp) {
+		return (function () {
+		$gameMap.darknessOpacity = 200;
+		var variable292Value = $gameVariables.value(292)[5]; //this._eventId
+		if(!!$gameMap.event(variable292Value)) {
+		 var event = $gameMap.event(variable292Value);
+		  event.setStepAnime(true);event.setWalkAnime(true);
+		  event.setAngle(0);
+		  event._spriteOffsetX = 0;event._spriteOffsetY = 0;
+		  event._kageM = new Game_KageMaster(event);  
+		  event.removeFace();
+		  event.setOpacity(0);
+		};
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:471|覚醒 ─Awaken 'B'─
+	readVariable292_25 = function (interp) {
+		return (function () {
+		var variable292Value = $gameVariables.value(292)[5]; //this._eventId
+		$gameMap.eraseMapLight(variable292Value);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:471|覚醒 ─Awaken 'B'─
+	readVariable292_26 = function (interp) {
+		return (function () {
+		event_respawnSetN(5,4,11,1,'4Child',2,6);
+		this._eventId = $gameVariables.value(292)[5];
+		original_direct(5,this._eventId,0,0,0,0);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:472|予期せぬ要請
+	readVariable530_41 = function (interp) {
+		return (function () {
+		var variable530Value = $gameVariables.value(530);
+		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+		event_respawnSetA(variable530Value,8,4,1,2);
+		this._eventId = $gameVariables.value(292)[variable530Value];
+		event_respawnSetA(2,8,7,0,8);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:473|秩序ＶＳ狂戦士
+	readVariable530_42 = function (interp) {
+		return (function () {
+		var variable530Value = $gameVariables.value(530);
+		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+		event_respawnSetA(variable530Value,variable163Value[3],variable163Value[4],1,8);
+		event_respawnSetA(2,variable163Value[3]-1,variable163Value[4],1,8);
+		this._eventId = $gameVariables.value(292)[2];
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:473|秩序ＶＳ狂戦士
+	readVariable292_27 = function (interp) {
+		return (function () {
+		for (var i = 11; i <= 13; i++) {
+		  var variable292Value = $gameVariables.value(292)[i]; //this._eventId
+		  if(!!$gameMap.event(variable292Value)) {
+		    var event = $gameMap.event(variable292Value);
+		    event.setStepAnime(false);event.setWalkAnime(false);
+		    event.setDirection(2);event.resetPattern();
+		    event._originalPattern = 1;event.setAngle(45);
+		    event._spriteOffsetX = -12;event._spriteOffsetY = -12;
+		    event._kageM.clear();
+		    event.setFace(6,true,true);//Child用event.setFace(6,true,true,0,6,0,6);
+		}};
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:481|決戦！　黒銀の翼！！
+	readVariable530_43 = function (interp) {
+		return (function () {
+		var variable530Value = $gameVariables.value(530);
+		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+		event_respawnSetA(variable530Value,variable163Value[3]-1,variable163Value[4],1,variable163Value[5]);
+		this._eventId = $gameVariables.value(292)[variable530Value];
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:481|決戦！　黒銀の翼！！
+	readVariable530_44 = function (interp) {
+		return (function () {
+		var value1 = 2;//$gameVariables.value(530);
+		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+		event_respawnSetA(value1,variable163Value[3],variable163Value[4]+1,0,variable163Value[5]);
+		this._eventId = $gameVariables.value(292)[value1];
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:496|全滅テンプレ
+	setSelfVariable530XevS016 = function (interp) {
+		return (function () {
+		valueScenePic = 'XevS016_';
+		//var value2 = valueScenePic+'01';
+		this.sVal(530,1);//主格キャラ
+		this.sVal(535,516);//挿話回想の場合アイテムID。メインは0
+		valueWeatherSceneSet = 0;
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:502|悪戯っ子世に憚る
+	readVariable530_45 = function () {
+		var variable530Value = $gameVariables.value(530);
+		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+		event_respawnSetA(variable530Value,variable163Value[3],variable163Value[4],1,4);
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		event.setImage(variable163Value[1], variable163Value[2]);
+		event.setDirection(variable163Value[5]);
+		var variable530Value = 11;
+		event_respawnSetN(variable530Value,39,15,1,'4Child',3,4);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:502|悪戯っ子世に憚る
+	showPictureScreenBlackOut8 = function () {
+		valuePic1 = 55;
+		var value2 = 'ScreenBlackOut';
+		$gameScreen.showPicture(valuePic1-1,value2,1,640,384,100,100,150,0);
+		picture_fade1(valuePic1-1,"fadeIn",valueWipeImg,60,5);
+		var value2 = valueScenePic+'01';
+		pic_1(0,valuePic1+1,value2,0,100,255,60,1280,768,-256,0);
+		//tachie_bless(valuePic1+1,1);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:502|悪戯っ子世に憚る
+	showPictureHpicture2 = function () {
+		var value2 = valueScenePic+'02';
+		$gameScreen.showPicture(valuePic1,value2,1,640-128,384,100,100,255,0);
+		tachie_bless(valuePic1,1);
+		var value3 = 'Hpicture2';
+		picture_fade1(valuePic1,"fadeIn",value3,60,5);
+		var value3 = 'Hpicture3';
+		picture_fade1(valuePic1+1,"fadeOut",value3,120,5);
+		var value2 = valueScenePic+'03';
+		$gameScreen.showPicture(valuePic1+2,value2,1,640-128,384+500,100,100,255,0);
+		$gameScreen.movePicture(valuePic1+2,1,640-128,384,100,100,0,0,120);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:502|悪戯っ子世に憚る
+	handleScriptSnippet59 = function (interp) {
+		return (function () {
+		var arr1 = [0];
+		var arr2 = [-50];
+		var arr3 = [`ハッハ──ッ♪`];
+		chara_oneWord(101,this._eventId,25,120,arr1,arr2,arr3);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:503|爺の本懐
+	showPictureScreenBlackOut9 = function () {
+		valuePic1 = 51;
+		valuePic2 = 71;
+		var value2 = 'ScreenBlackOut';
+		$gameScreen.showPicture(valuePic1,value2,1,640,384,100,100,150,0);
+		picture_fade1(valuePic1,"fadeIn",valueWipeImg,60,5);
+		var value1 = valuePic2+1;
+		var value2 = valueScenePic+'01';
+		$gameScreen.showPicture(value1,value2,1,640+480+50,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640+480,384,100,100,255,0,60);
+		tachie_bless(value1,2);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:503|爺の本懐
+	showPictureScreen1024Frame2 = function () {
+		var value2 = 'Screen1024Frame';
+		$gameScreen.showPicture(valuePic2,value2,1,640-78,384,100,100,255,0);
+		picture_fade1(valuePic2,"fadeIn",valueWipeImg,60,5);
+		var value2 = valueScenePic+'02';
+		$gameScreen.showPicture(valuePic1+1,value2,1,640-128,384-20,100,100,0,0);
+		$gameScreen.movePicture(valuePic1+1,1,640-128,384,100,100,255,0,60);
+		tachie_bless(valuePic1+1,2);
+	};
+
+	// Replaces (4x): CommonEvents.json:common-event:507|情報の代価Ⅰ, CommonEvents.json:common-event:536|メイドウェイトレス, CommonEvents.json:common-event:547|リゾート休暇で限界突破！, CommonEvents.json:common-event:576|娼婦Debut!
+	showPicture14 = function () {
+		backGraund_menuMapSelect(2,0,0,0);
+		valuePic1 = 51;
+		var value1 = valuePic1+1;
+		var value2 = valueScenePic+'01';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		//tachie_bless(value1,2);
+		//pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:507|情報の代価Ⅰ
+	showPicture15 = function () {
+		var value1 = valuePic1+2;
+		var value2 = valueScenePic+'02';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		//pic_move1(value1-1,0,0,100,100,0,90);
+		var value1 = valuePic1+3;
+		var value2 = valueScenePic+'03';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		tachie_bless(value1,2);
+	};
+
+	// Replaces (2x): CommonEvents.json:common-event:508|情報の代価Ⅱ, CommonEvents.json:common-event:509|情報の代価Ⅲ
+	showPictureXevS00702 = function () {
+		backGraund_menuMapSelect(2,0,0,0);
+		var value1 = valuePic1+1;
+		var value2 = 'XevS007_02';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		//pic_move1(value1-1,0,0,100,100,0,90);
+		var value1 = valuePic1+2;
+		var value2 = valueScenePic+'02';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		tachie_bless(value1,2);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:509|情報の代価Ⅲ
+	showPicture16 = function () {
+		var value1 = valuePic1+5;
+		var value2 = valueScenePic+'05';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		hcg_piston(value1,7,2,1);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:511|ドクター・Ｋによる診察
+	iterateWeaponsProfession1 = function () {
+		var id1 = 317;
+		var value1 = `${$dataWeapons[id1].meta['Profession1']}`;
+		Profession_CharaChange(1,id1,value1,1);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:511|ドクター・Ｋによる診察
+	setVariable707 = function () {
+		var arr1 = ['「スーっ…」','「ン………」','「ZZZ………」','「スゥ──」'];//文字BGV
+		$gameVariables.setValue(707,arr1);
+		$gameVariables.setValue(706,[640-128,386,0,240]);//最後1で横範囲縮小
+		$gameSwitches.setValue(125,true);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:516|ゴブリン姦Ⅰ
+	showPicture17 = function () {
+		var value1 = valuePic1+10;//非表示状態
+		var value2 = valueScenePic+'21';
+		$gameScreen.showPicture(value1,value2,1,640-128+50,384,100,100,0,0);
+		//$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		tachie_bless(value1,1);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:516|ゴブリン姦Ⅰ
+	showPicture18 = function () {
+		var value1 = valuePic1+10;
+		var value2 = valueScenePic+'21';
+		//$gameScreen.showPicture(value1,value2,1,640-128+50,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		tachie_bless(value1,2);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:519|ゴブリン姦Ⅳ
+	setVariable707Eromangasimaji = function () {
+		var arr1 = [];
+		htext_word(3);//3高2中1低
+		arr1 = arr1.concat(valueHtextWord);
+		$gameVariables.setValue(707,arr1);
+		$gameVariables.setValue(706,[640-128,386,1,60,0,'eromangasimaji']);
+		$gameSwitches.setValue(125,true);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:526|トロル姦
+	showPicture19 = function () {
+		backGraund_menuMapSelect(2,0,0,0);
+		valuePic1 = 51;
+		var value1 = valuePic1+1;
+		var value2 = valueScenePic+'01';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		tachie_bless(value1,2);
+		//pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:526|トロル姦
+	showPicture60ScreenBlackOut = function () {
+		var value2 = 'ScreenBlackOut';
+		$gameScreen.showPicture(60,value2,1,640,384,100,100,255,0);
+		picture_fade1(51,"fadeIn",'Town014',180,5);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:526|トロル姦
+	showPicture20 = function () {
+		backGraund_menuMapSelect(2,0,0,0);
+		valuePic1 = 51;
+		var value1 = valuePic1+1;
+		var value2 = valueScenePic+'07';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		tachie_bless(value1,2);
+		//pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:526|トロル姦
+	showPicture21 = function () {
+		backGraund_menuMapSelect(2,0,0,0);
+		valuePic1 = 51;
+		var value1 = valuePic1+2;
+		var value2 = valueScenePic+'08';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,180);
+		tachie_bless(value1,2);
+		//pic_move1(value1-1,0,0,100,100,0,240);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:530|試練の裏側
+	readVariable530_46 = function (interp) {
+		return (function () {
+		var variable530Value = $gameVariables.value(530);
+		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+		event_respawnSetA(variable530Value,variable163Value[3],variable163Value[4],1,variable163Value[5]);
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		event._spriteOffsetX = -24;
+		this._eventId = $gameVariables.value(292)[variable530Value];
+		var variable530Value = 11;
+		event_respawnSetN(variable530Value,variable163Value[3]+1,variable163Value[4],2,'4Child',1,8);
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		event._spriteOffsetX = -24;
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:530|試練の裏側
+	readVariable292_28 = function () {
+		var value1 = 12;
+		$gameMap.spawnEvent(202, 12, 12, true);
+		$gameVariables.value(292)[value1] = $gameMap.getLastSpawnEventId();
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:530|試練の裏側
+	setSwitch429ZHSticky4_2 = function () {
+		var value1 = valuePic1+6;
+		var value2 = valueScenePic+'12';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,255,0);
+		pic_setArray1 = [1,value1,0,-15,0,20];
+		pic_setArray2 = [1,value1,0,0,3,30]; //pic_setArray2 = [1,0,0,0,0,0];
+		valueParallelPicSe1 = ['ZH_sticky4',20,60];
+		valueParallelPicSe2 = ['ZH_sticky4',20,60];
+		hcg_piston(value1,7,2,1);
+		$gameSwitches.setValue(429,true);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:530|試練の裏側
+	showPicture22 = function () {
+		var value1 = valuePic1+7;
+		var value2 = valueScenePic+'13';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		tachie_bless(value1,2);
+		pic_move1(value1+4,0,0,100,100,0,90);
+		pic_move1(value1+5,0,0,100,100,0,90);
+		pic_move1(value1+6,0,0,100,100,0,90);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:531|『わからせられ』
+	setVariable171_3 = function () {
+		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+		$gameVariables.setValue(171,[40,17,8]);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:531|『わからせられ』
+	readVariable530_47 = function (interp) {
+		return (function () {
+		var variable530Value = $gameVariables.value(530);
+		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+		event_respawnSetA(variable530Value,17,8,1,8);
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+
+		var variable530Value = 11;
+		event_respawnSetN(variable530Value,17,6,0,'4Child',1,2);
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		this._eventId = $gameVariables.value(292)[variable530Value];
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:531|『わからせられ』
+	showPicture23 = function () {
+		valuePic1 = 51;
+		var value1 = valuePic1+11;
+		var value2 = valueScenePic+'11';
+		$gameScreen.showPicture(value1,value2,1,640-128-100,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		tachie_bless(value1,1);
+		//pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:531|『わからせられ』
+	readVariable530_48 = function () {
+		var variable530Value = $gameVariables.value(530);
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		event.locate(19, 4);
+		event.setDirection(2);
+		event._spriteOffsetX = +24;
+		event.setFace(11,true,true);
+		var variable530Value = 11;//$gameVariables.value(530);
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		event.locate(19, 5);
+		event.setDirection(8);
+		event._spriteOffsetX = +24;
+		event._spriteOffsetY = -24;
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:531|『わからせられ』
+	readVariable530_49 = function () {
+		var variable530Value = $gameVariables.value(530);
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		event.setImage('1_1', 1);
+		var variable530Value = 11;//$gameVariables.value(530);
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		event.setImage('4Child', 5);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:531|『わからせられ』
+	eventList = function () {
+		valueCharaWaitCount1 = 30;
+		valueCharaWaitCount2 = valuePic1+12;
+		valueCharaWaitCount3 = getRandomIndex(11) + valueCharaWaitCount1
+		if(!!$gameMap.event(1)) {
+		  $gameMap.event(1).forceMoveRoute({
+		  "list":[
+		    {"code":45,"parameters": ["if($gameScreen.picture(valueCharaWaitCount2)){$gameScreen.movePicture(valueCharaWaitCount2,1,640-128,384-15,100,100,250,0,valueCharaWaitCount3)};"]},
+		    {"code":15, "parameters":[valueCharaWaitCount3]},
+		    {"code":45,"parameters": ["if($gameScreen.picture(valueCharaWaitCount2)){$gameScreen.movePicture(valueCharaWaitCount2,1,640-128,384+5,100,100,0,0,valueCharaWaitCount3)};"]},
+		    {"code":15, "parameters":[valueCharaWaitCount3]},
+		  {"code":0}],"repeat":true,"skippable":true});
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:532|サンプル
+	eventList2 = function () {
+		valueCharaWaitCount1 = 40;
+		valueCharaWaitCount2 = valuePic1+2;
+		if(!!$gameMap.event(1)) {
+		  $gameMap.event(1).forceMoveRoute({
+		  "list":[
+		    {"code":45,"parameters": ["valueCharaWaitCount3 = getRandomIndex(11) + valueCharaWaitCount1;"]},
+		    {"code":45,"parameters": ["if($gameScreen.picture(valueCharaWaitCount2)){$gameScreen.movePicture(valueCharaWaitCount2,1,640-128,384,100,100,250,0,valueCharaWaitCount3)};"]},
+		    {"code":15, "parameters":[valueCharaWaitCount3]},
+		    {"code":45,"parameters": ["if($gameScreen.picture(valueCharaWaitCount2)){$gameScreen.movePicture(valueCharaWaitCount2,1,640-128,384,100,100,0,0,valueCharaWaitCount3)};"]},
+		    {"code":15, "parameters":[valueCharaWaitCount3]},
+		  {"code":0}],"repeat":true,"skippable":true});
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:536|メイドウェイトレス
+	playSeZClothesTakeOff3 = function () {
+		tachie_dousa(2,1,0,14,1,255,1311,0,0);
+		tachie_dousa(2,1,0,14,1,255,1385,0,0);
+		tachie_dousa(0,1,1,14,15,0,120,0,0);
+		var value1 = 'Z_ClothesTakeOff';//ピッチ50か100。消去ウェイトで変更
+		AudioManager.playSe({"name":value1,"volume":150,"pitch":100,"pan":0});
+		//tachie_clothReflect(1);//ｱｸﾀｰid
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:536|メイドウェイトレス
+	setPicturesAnimationGoodsTea1 = function () {
+		valuePic1 = 55;
+		var value2 = 'Goods_Tea1_'+'00';
+		$gameScreen.setPicturesAnimation(2, 30, "連番", 60);
+		$gameScreen.showPicture(valuePic1,value2,1,640-128,384-20,100,100,0,0);
+		$gameScreen.movePicture(valuePic1,1,640-128,384,100,100,255,0,60);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:536|メイドウェイトレス
+	readVariable530_50 = function () {
+		var value1 = 18;//$gameVariables.value(530);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.locate(19, 4);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:536|メイドウェイトレス
+	handleScriptSnippet60 = function () {
+		valuePic1 = 51;
+		var value1 = valuePic1+1;
+		pic_move1(value1,0,0,100,100,0,90);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:537|メイドウェイトレスご奉仕
+	showPictureXevS03601 = function () {
+		backGraund_menuMapSelect(2,0,0,0);
+		valuePic1 = 51;
+		var value1 = valuePic1+1;
+		var value2 = 'XevS036_01';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		//tachie_bless(value1,2);
+		//pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:537|メイドウェイトレスご奉仕
+	setSelfSwitch5 = function () {
+		$gameSelfSwitches.setValue([$gameMap.mapId(), 8, 'C'], true);
+		var variable530Value = $gameVariables.value(530);
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		event.locate(20, 10);
+		event.setDirection(8);
+		var variable530Value = 11;//$gameVariables.value(530);
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		event.locate(20, 9);
+		event.setDirection(2);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:537|メイドウェイトレスご奉仕
+	showPictureScreenBlackOut10 = function () {
+		var value2 = 'ScreenBlackOut';
+		$gameScreen.showPicture(valuePic1,value2,1,640,384,100,100,200,0);
+		picture_fade1(valuePic1,"fadeIn",valueWipeImg,60,5);
+		backGraund_menuMapSelect(2,0,0,0);
+		var value1 = valuePic1+1;
+		pic_showMove1(value1,valueScenePic+'01',640-128,384,100,60,0,0);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:537|メイドウェイトレスご奉仕
+	handleScriptSnippet61 = function () {
+		var value1 = valuePic1+2;
+		pic_showMove1(value1,valueScenePic+'02',640-128,384,100,60,2,200);
+		tachie_bless(value1,2);
+		//pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:540|
+	showPicture24 = function () {
+		var value1 = valuePic1+4;
+		var value2 = valueScenePic+'04';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		var value1 = valuePic1+5;
+		var value2 = valueScenePic+'05';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:540|
+	setSwitch429ZHSticky4_3 = function () {
+		pic_setArray1 = [1,valuePic1+5,0,-15,0,20];
+		pic_setArray2 = [1,valuePic1+5,0,0,3,30]; //pic_setArray2 = [1,0,0,0,0,0];
+		valueParallelPicSe1 = ['ZH_sticky4',80,60];
+		valueParallelPicSe2 = ['ZH_sticky4',80,60];
+		hcg_piston(valuePic1+5,7,2,1);
+		$gameSwitches.setValue(429,true);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:541|知らなかった『裏側』
+	showPictureGoodsDVD = function () {
+		valuePic1 = 55;
+		var value2 = 'Goods_DVD';
+		$gameScreen.showPicture(valuePic1,value2,1,640-128,384-20,100,100,0,0);
+		$gameScreen.movePicture(valuePic1,1,640-128,384,100,100,255,0,60);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:541|知らなかった『裏側』
+	showPictureDungeon12_2 = function () {
+		backGraund_menuMapSelect(2,0,0,0);//'Dungeon1_2'
+		valuePic1 = 51;
+		var value2 = 'ScreenBlackOut';
+		$gameScreen.showPicture(valuePic1,value2,1,640,384,100,100,200,0);
+		picture_fade1(valuePic1,"fadeIn",valueWipeImg,60,5);
+		var value1 = valuePic1+1;
+		var value2 = valueScenePic+'01';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:541|知らなかった『裏側』
+	setSwitch429 = function () {
+		pic_setArray1 = [1,valuePic1+4,0,-30,0,20];
+		pic_setArray2 = [1,valuePic1+4,0,0,3,30]; //pic_setArray2 = [1,0,0,0,0,0];
+		valueParallelPicSe1 = [0,0,0];
+		valueParallelPicSe2 = [0,0,0];
+		hcg_piston(valuePic1+4,7,2,1);
+		$gameSwitches.setValue(429,true);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:541|知らなかった『裏側』
+	handleScriptSnippet62 = function () {
+		var value1 = valuePic1+1;
+		pic_move1(value1,0,0,100,100,0,90);
+		pic_move1(value1+1,0,0,100,100,0,90);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:542|街の物陰で…
+	setVariable171_4 = function () {
+		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+		$gameVariables.setValue(171,[41,variable163Value[3],variable163Value[4]]);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:542|街の物陰で…
+	showPictureScreenBlackOut11 = function () {
+		backGraund_menuMapSelect(2,0,0,0);
+		valuePic1 = 51;
+		valuePic2 = 71;
+		var value2 = 'ScreenBlackOut';
+		$gameScreen.showPicture(valuePic1,value2,1,640,384,100,100,200,0);
+		picture_fade1(valuePic1,"fadeIn",valueWipeImg,60,5);
+		var value2 = valueScenePic+'01';
+		$gameScreen.showPicture(valuePic2+1,value2,1,640+480,384-118,100,100,200,0);
+		$gameScreen.movePicture(valuePic2+1,1,640+480,384+50,100,100,255,0,240);
+		tachie_bless(valuePic2+1,2);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:542|街の物陰で…
+	readVariable530BBAkunin1 = function (interp) {
+		return (function () {
+		event_respawnSetN(11,35,6,1,'BB_akunin1',7,6);
+		var value1 = 11;//$gameVariables.value(530);
+		this._eventId = $gameVariables.value(292)[value1];
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:542|街の物陰で…
+	showPicture69Screen1024Frame = function () {
+		var value2 = valueScenePic+'04_00';
+		$gameScreen.setPicturesAnimation(2, 10, "連番", 40);
+		$gameScreen.showPicture(valuePic1+1,value2,1,640-128,384-20,100,100,0,0);
+		$gameScreen.movePicture(valuePic1+1,1,640-128,384,100,100,255,0,60);
+		if($gameScreen.picture(valuePic1+1)){
+		  $gameScreen.picture(valuePic1+1).startAnimationFrame(3, true, [1,1,1,2]);
+		};
+		var value2 = 'Screen1024Frame';
+		$gameScreen.showPicture(69,value2,1,640-78,384,100,100,255,0);
+		picture_fade1(69,"fadeIn",valueWipeImg,60,5);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:542|街の物陰で…
+	handleScriptSnippet63 = function () {
+		var value1 = valuePic1+1;
+		pic_move1(value1,0,0,100,100,0,60);
+		var value1 = 69;
+		pic_move1(value1,0,0,100,100,0,60);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:542|街の物陰で…
+	readVariable530_51 = function (interp) {
+		return (function () {
+		var variable292Value = $gameVariables.value(530);
+		var variable292Value = $gameVariables.value(292)[variable292Value];
+		drowsepost.camera.zoom(1, 60, this._eventId);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:543|愚鈍なる再会
+	readVariable530_52 = function (interp) {
+		return (function () {
+		var variable530Value = $gameVariables.value(530);
+		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+		event_respawnSetA(variable530Value,variable163Value[3],variable163Value[4],1,variable163Value[5]);
+		var variable530Value = 11;
+		event_respawnSetN(variable530Value,variable163Value[8],variable163Value[9],0,variable163Value[6],variable163Value[7],variable163Value[10]);
+		this._eventId = $gameVariables.value(292)[variable530Value];
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:543|愚鈍なる再会
+	showPictureZXMain04006 = function () {
+		valuePic1 = 51;
+		var value2 = 'ZX_Main040_06';
+		$gameScreen.showPicture(valuePic1,value2,1,640,384,100,100,250,0);
+		picture_fade1(51,"fadeIn",'150',60,5);
+	};
+
+	// Replaces (2x): CommonEvents.json:common-event:543|愚鈍なる再会, CommonEvents.json:common-event:545|チンピラ団員達と…
+	showPictureDungeon12_3 = function () {
+		backGraund_menuMapSelect(2,0,0,0);//'Dungeon1_2'
+		valuePic1 = 51;
+		var value2 = 'ScreenBlackOut';
+		$gameScreen.showPicture(valuePic1,value2,1,640,384,100,100,200,0);
+		picture_fade1(valuePic1,"fadeIn",valueWipeImg,60,5);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:543|愚鈍なる再会
+	setPicturesAnimation4 = function () {
+		$gameScreen.setPicturesAnimation(2, 10, "連番", 20);
+		var value1 = valuePic1+1;
+		var value2 = valueScenePic+'01_00';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		if($gameScreen.picture(value1)){
+		  $gameScreen.picture(value1).startAnimationFrame(1, true, [1,1,1,2]);
+		};
+		tachie_bless(value1,2);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:543|愚鈍なる再会
+	handleScriptSnippetFadeOut3 = function () {
+		var value1 = valuePic1+1;
+		picture_fade1(value1,"fadeOut",valueWipeImg,60,5);
+		picture_fade1(51,"fadeOut",valueWipeImg,60,5);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:543|愚鈍なる再会
+	readVariable530_53 = function () {
+		var value1 = 1;//$gameVariables.value(530);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.locate(16, 7);
+		event.setDirection(8);
+		event._spriteOffsetX = +24
+		var value1 = 11;//$gameVariables.value(530);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.locate(16, 6);
+		event.setDirection(2);
+		event._spriteOffsetX = +24
+		event._spriteOffsetY = -12
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:543|愚鈍なる再会
+	showPictureDungeon12_4 = function () {
+		backGraund_menuMapSelect(2,0,0,0);//'Dungeon1_2'
+		valuePic1 = 51;
+		var value2 = 'ScreenBlackOut';
+		$gameScreen.showPicture(valuePic1,value2,1,640,384,100,100,200,0);
+		picture_fade1(valuePic1,"fadeIn",valueWipeImg,60,5);
+		var value1 = valuePic1+2;
+		var value2 = valueScenePic+'02';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:543|愚鈍なる再会
+	showPicture25 = function () {
+		var value1 = valuePic1+3;
+		var value2 = valueScenePic+'03';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		hcg_piston(valuePic1+3,7,1,2);
+		var value1 = valuePic1+5;
+		var value2 = valueScenePic+'04';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		tachie_bless(value1,2);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:543|愚鈍なる再会
+	handleScriptSnippet64 = function () {
+		var value1 = valuePic1+3;
+		pic_move1(value1,0,0,100,100,0,90);
+		var value1 = valuePic1+4;
+		pic_move1(value1,0,0,100,100,0,90);
+		var value1 = valuePic1+5;
+		pic_move1(value1,0,0,100,100,0,90);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:543|愚鈍なる再会
+	readVariable530_54 = function () {
+		var value1 = 11;//$gameVariables.value(530);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.locate(16, 6);
+		event.setDirection(4);
+		event._spriteOffsetX = -12;
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:544|チャラ団員と…
+	readVariable530_55 = function () {
+		var value1 = 1;//$gameVariables.value(530);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.locate(17, 4);
+		event.setDirection(8);
+		var value1 = 11;//$gameVariables.value(530);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.locate(17, 5);
+		event.setDirection(8);
+		event._spriteOffsetY = -24
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:544|チャラ団員と…
+	showPictureXevS044 = function () {
+		backGraund_menuMapSelect(2,0,0,0);
+		valuePic1 = 51;
+		valuePic2 = 71;
+		valueScenePic = 'XevS044_';
+		var value2 = 'ScreenBlackOut';
+		$gameScreen.showPicture(valuePic1,value2,1,640,384,100,100,150,0);
+		picture_fade1(valuePic1,"fadeIn",valueWipeImg,60,5);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:544|チャラ団員と…
+	setPicturesAnimation5 = function () {
+		var value1 = valuePic2+3;
+		var value2 = valueScenePic+'03_00';
+		$gameScreen.setPicturesAnimation(3, 10, "連番", 20);
+		$gameScreen.showPicture(value1,value2,1,640+480+50,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640+480,384,100,100,255,0,60);
+		if($gameScreen.picture(value1)){
+		  $gameScreen.picture(value1).startAnimationFrame(1, true, [1,1,1,2]);
+		};
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:544|チャラ団員と…
+	showPicture26 = function () {
+		var value1 = valuePic2+2;
+		var value2 = valueScenePic+'02';
+		$gameScreen.showPicture(value1,value2,1,640+480+50,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640+480,384,100,100,255,0,60);
+		tachie_bless(value1,2);
+		pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:544|チャラ団員と…
+	handleScriptSnippet65 = function () {
+		var value1 = valuePic2+3;
+		pic_move1(value1-1,0,0,100,100,0,90);
+		var value1 = valuePic2+2;
+		pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:544|チャラ団員と…
+	showPictureScreen1024Frame3 = function () {
+		var value2 = 'Screen1024Frame';
+		$gameScreen.showPicture(valuePic2,value2,1,640-78,384,100,100,255,0);
+		picture_fade1(valuePic2,"fadeIn",valueWipeImg,60,5);
+		var value2 = valueScenePic+'05';
+		$gameScreen.showPicture(valuePic1+1,value2,1,640-128,384-20,100,100,0,0);
+		$gameScreen.movePicture(valuePic1+1,1,640-128,384,100,100,255,0,60);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:545|チンピラ団員達と…
+	readVariable530_56 = function (interp) {
+		return (function () {
+		var variable530Value = $gameVariables.value(530);
+		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+		event_respawnSetA(variable530Value,9,12,1,8);
+		this._eventId = $gameVariables.value(292)[variable530Value];
+		var variable530Value = 11;
+		event_respawnSetN(variable530Value,9,11,0,variable163Value[6],variable163Value[7],2);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:545|チンピラ団員達と…
+	readVariable530_57 = function () {
+		var variable530Value = $gameVariables.value(530);
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		event._priorityType = 0;event._spriteOffsetY = +12;
+		event.locate(19, 5);event.setDirection(2);
+		var variable530Value = 11;
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		event._priorityType = 2;event._spriteOffsetY = -12;
+		event.locate(19, 6);event.setDirection(8);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:545|チンピラ団員達と…
+	readVariable292_29 = function () {
+		var value1 = 12;
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.locate(20, 5);event.setDirection(4);
+		var value1 = 13;
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.locate(18, 5);event.setDirection(6);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:545|チンピラ団員達と…
+	showPicture27 = function () {
+		var value1 = valuePic1+1;
+		var value2 = valueScenePic+'01';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		var value1 = valuePic1+2;
+		var value2 = valueScenePic+'02';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		tachie_bless(value1,2);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:545|チンピラ団員達と…
+	setSwitch429ZHSticky4_4 = function () {
+		var value1 = valuePic1+4;
+		var value2 = valueScenePic+'03';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,255,0);
+		pic_setArray1 = [1,value1,15,-15,0,20];
+		pic_setArray2 = [1,value1,0,0,3,30]; //pic_setArray2 = [1,0,0,0,0,0];
+		valueParallelPicSe1 = ['ZH_sticky4',10,10];
+		valueParallelPicSe2 = [0,0,0];
+		hcg_piston(value1,4,1,1);
+		$gameSwitches.setValue(429,true);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:545|チンピラ団員達と…
+	handleScriptSnippet66 = function () {
+		var value1 = valuePic1+2;
+		pic_move1(value1-1,0,0,100,100,0,90);
+		var value1 = valuePic1+3;
+		pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:546|獣欲の暴走、一生の懊悩と後悔
+	handleScriptSnippet67 = function () {
+		var value1 = valuePic1;
+		pic_move1(value1,0,0,100,100,0,90);
+		pic_move1(value1+1,0,0,100,100,0,90);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:546|獣欲の暴走、一生の懊悩と後悔
+	setSelfSwitchNpcOrder2 = function () {
+		var variable530Value = $gameVariables.value(530);
+		event_respawnSetA(variable530Value,19,5,0,2);
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		event._priorityType = 0;
+		event._spriteOffsetY = +12
+		var variable530Value = 11;
+		event_respawnSetN(variable530Value,19,6,0,'npcOrder2',4,8);
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		event._priorityType = 2;
+		event._spriteOffsetY = -12;
+		$gameSelfSwitches.setValue([$gameMap.mapId(), 2, 'C'], true);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:546|獣欲の暴走、一生の懊悩と後悔
+	spawnEventNpcOrder2 = function () {
+		event_respawnSetN(12,17,6,0,'npcOrder2',5,6);
+		event_respawnSetN(13,20,7,0,'npcOrder2',6,8);
+		event_respawnSetN(14,18,8,0,'npcOrder2',7,2);
+		$gameMap.spawnEvent(244,17, 18, true);
+		$gameMap.darknessOpacity = 150;
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:546|獣欲の暴走、一生の懊悩と後悔
+	readVariable530_58 = function () {
+		var arr1 = [0];
+		var arr2 = [-50];
+		var arr3 = [`アンっ\\I[12]`];
+		var variable292Value = 1;//$gameVariables.value(530);
+		var variable292Value = $gameVariables.value(292)[variable292Value];
+		chara_oneWord(100,variable292Value,25,180,arr1,arr2,arr3,0);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:546|獣欲の暴走、一生の懊悩と後悔
+	readVariable292_30 = function (interp) {
+		return (function () {
+		for (var i = 11; i <= 14; i++) {
+		  var variable292Value = $gameVariables.value(292)[i]; //this._eventId
+		  if(!!$gameMap.event(variable292Value)) {
+		    var event = $gameMap.event(variable292Value);
+		    event.setOpacity(0);
+		}};
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:547|リゾート休暇で限界突破！
+	handleScriptSnippet68 = function () {
+		var value1 = valuePic1;
+		pic_eraseP(0,[value1+1,value1+2,value1+3]);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:547|リゾート休暇で限界突破！
+	showPicture28 = function () {
+		backGraund_menuMapSelect(2,0,0,0);
+		var value1 = valuePic1+4;
+		var value2 = valueScenePic+'04';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		//tachie_bless(value1,2);
+		//pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:547|リゾート休暇で限界突破！
+	readVariable530NpcUnique2 = function (interp) {
+		return (function () {
+		var variable530Value = $gameVariables.value(530);
+		event_respawnSetA(variable530Value,34,6,1,2);
+		this._eventId = $gameVariables.value(292)[variable530Value];
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		this._spriteOffsetY = +12;
+		var variable530Value = 11;
+		event_respawnSetN(variable530Value,34,7,0,'npcUnique2',0,8);
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		this._spriteOffsetY = -12;
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:552|モニカ娼婦デビュー
+	readVariable530_59 = function (interp) {
+		return (function () {
+		var variable530Value = $gameVariables.value(530);
+		event_respawnSetA(variable530Value,7,9,1);
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		event.setDirection(6);
+		this._eventId = $gameVariables.value(292)[variable530Value];
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:552|モニカ娼婦デビュー
+	readVariable530_60 = function (interp) {
+		return (function () {
+		var value1 = 1;//$gameVariables.value(530);
+		event_respawnSetA(value1,35,9,1);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.setDirection(4);
+		this._eventId = $gameVariables.value(292)[value1];
+		drowsepost.camera.zoom(1, 60, this._eventId);
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:552|モニカ娼婦デビュー
+	setSelfSwitch6 = function () {
+		$gameSelfSwitches.setValue([$gameMap.mapId(), 20, 'C'], true);
+		$gameSelfSwitches.setValue([$gameMap.mapId(), 21, 'C'], true);
+		var event = $gameMap.event(20);
+		event.locate(22, 11);
+		var event = $gameMap.event(21);
+		event.locate(22, 12);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:552|モニカ娼婦デビュー
+	readVariable530_61 = function () {
+		var variable530Value = $gameVariables.value(530);
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		event.locate(3, 7);event.setDirection(6);
+		var variable530Value = 11;//$gameVariables.value(530);
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		event.locate(4, 7);event.setDirection(4);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:552|モニカ娼婦デビュー
+	showPictureScreenBlackOut12 = function () {
+		valuePic1 = 55;
+		var value2 = 'ScreenBlackOut';
+		$gameScreen.showPicture(valuePic1-1,value2,1,640,384,100,100,200,0);
+		picture_fade1(valuePic1-1,"fadeIn",valueWipeImg,60,5);
+		$gameScreen.setPicturesAnimation(2, 10, "連番", 20);
+		valueScenePic = 'XevS011_';
+		var value2 = valueScenePic+'01';
+		$gameScreen.showPicture(valuePic1,value2,1,640-128,384+50,100,100,0,0);
+		$gameScreen.movePicture(valuePic1,1,640-128,384,100,100,255,0,60);
+		hcg_piston(valuePic1,5,3,2);
+		$gameScreen.picture(valuePic1).startAnimationFrame(1, false, [1,1,1,2]);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:552|モニカ娼婦デビュー
+	readVariable292_31 = function () {
+		var value1 = 11;
+		event_respawnSetN(value1,3,11,1,'2_1',2);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.setDirection(2);
+		event_doorOpenClose(1,3);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:552|モニカ娼婦デビュー
+	readVariable292_32 = function () {
+		var value1 = 12;
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.setImage(event.characterName(), 4);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:552|モニカ娼婦デビュー
+	readVariable530_62 = function () {
+		var variable530Value = $gameVariables.value(530);
+		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+		event_respawnSetA(variable530Value,15,4,0);
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		event.setImage(variable163Value[1], variable163Value[2]);
+		event.setDirection(2);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:571|マッサージⅠ
+	showPicture29 = function () {
+		backGraund_menuMapSelect(2,0,0,0);
+		valuePic1 = 51;
+		var value1 = valuePic1+1;
+		var value2 = valueScenePic+'01';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		tachie_bless(value1,1);
+		//pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:571|マッサージⅠ
+	setSwitch429_2 = function () {
+		var value1 = valuePic1+4;
+		pic_setArray1 = [1,value1,0,-30,5,60];
+		pic_setArray2 = [1,value1,0,30,3,40]; //pic_setArray2 = [1,0,0,0,0,0];
+		valueParallelPicSe1 = [0,0,0];
+		valueParallelPicSe2 = [0,0,0];
+		hcg_piston(value1,7,2,1);
+		$gameSwitches.setValue(429,true);
+	};
+
+	// Replaces (2x): CommonEvents.json:common-event:572|マッサージⅡ, CommonEvents.json:common-event:573|マッサージⅢ
+	showPicture30 = function () {
+		backGraund_menuMapSelect(2,0,0,0);
+		valuePic1 = 51;
+		var value1 = valuePic1+1;
+		var value2 = valueScenePic+'01';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		//tachie_bless(value1,1);
+		//pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:572|マッサージⅡ
+	showPicture31 = function () {
+		var value1 = valuePic1+2;
+		var value2 = valueScenePic+'02';
+		$gameScreen.showPicture(value1,value2,1,640-128,384+50,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		tachie_bless(value1,1);
+		//pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:572|マッサージⅡ
+	showPicture32 = function () {
+		var value1 = valuePic1+4;
+		var value2 = valueScenePic+'04';
+		$gameScreen.showPicture(value1,value2,1,640-128,384+50,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		tachie_bless(value1,1);
+		pic_move1(value1-2,0,0,100,100,0,90);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:572|マッサージⅡ
+	showPicture33 = function () {
+		var value1 = valuePic1+5;
+		var value2 = valueScenePic+'05';
+		$gameScreen.showPicture(value1,value2,1,640-128,384-100,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		hcg_piston(value1,7,1,2);
+		//pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:572|マッサージⅡ
+	showPicture34 = function () {
+		var value1 = valuePic1+7;
+		var value2 = valueScenePic+'06';
+		$gameScreen.showPicture(value1,value2,1,640-128,384-100,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		hcg_piston(value1,7,1,2);
+		pic_move1(value1-2,0,0,100,100,0,90);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:572|マッサージⅡ
+	handleScriptSnippet69 = function () {
+		var value1 = valuePic1+7;
+		pic_move1(value1,0,0,100,100,0,90);
+		var value1 = valuePic1+6;
+		pic_move1(value1,0,0,100,100,0,90);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:572|マッサージⅡ
+	showPicture35 = function () {
+		var value1 = valuePic1+2;
+		var value2 = valueScenePic+'07';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		tachie_bless(value1,1);
+		pic_move1(value1+2,0,0,100,100,0,90);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:572|マッサージⅡ
+	setPicturesAnimation6 = function () {
+		$gameScreen.setPicturesAnimation(2, 10, "連番", 30);
+		var value1 = valuePic1+8;
+		var value2 = valueScenePic+'08_00';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:572|マッサージⅡ
+	showPicture36 = function () {
+		var value1 = valuePic1+1;
+		var value2 = valueScenePic+'01';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		//tachie_bless(value1,1);
+		//pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:573|マッサージⅢ
+	setPicturesAnimation7 = function () {
+		var value1 = valuePic1+4;
+		var value2 = valueScenePic+'04_00';
+		$gameScreen.setPicturesAnimation(2, 10, "連番", 20);
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		tachie_bless(value1,2);
+		pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:573|マッサージⅢ
+	handleScriptSnippet70 = function () {
+		sex_direction(99,0,0);
+		var value1 = valuePic1+4;
+		pic_eraseP(0,[value1,value1-1]);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:573|マッサージⅢ
+	showPicture51ScreenBlackOut = function () {
+		backGraund_menuMapSelect(2,0,0,0);
+		valuePic1 = 55;
+		valuePic2 = 71;
+		var value2 = 'ScreenBlackOut';
+		$gameScreen.showPicture(51,value2,1,640,384,100,100,150,0);
+		picture_fade1(51,"fadeIn",valueWipeImg,60,5);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:573|マッサージⅢ
+	showPicture37 = function () {
+		var value1 = valuePic1+1;
+		var value2 = valueScenePic+'91';
+		$gameScreen.showPicture(value1,value2,1,640-128,384-20,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		//hcg_piston(value1,5,1,2);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:573|マッサージⅢ
+	setVariable707_2 = function () {
+		var arr1 = ['（グルルゥ──）','（ググゥ…）','（グゥ～～）'];//文字BGV
+		$gameVariables.setValue(707,arr1);
+		$gameVariables.setValue(706,[640-128,386,0,180,0,0]);
+		$gameSwitches.setValue(125,true);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:573|マッサージⅢ
+	showPicture38 = function () {
+		var value1 = valuePic1+2;
+		var value2 = valueScenePic+'92';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
+		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		//hcg_piston(value1,5,1,2);
+		pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:573|マッサージⅢ
+	showPicture39 = function () {
+		var value1 = valuePic1+3;
+		var value2 = valueScenePic+'93';
+		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,250,0);
+		//hcg_piston(value1,5,1,2);
+		//pic_move1(value1-1,0,0,100,100,0,90);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:576|娼婦Debut!
+	readVariable530_63 = function () {
+		var variable530Value = $gameVariables.value(530);
+		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+		event.locate(20, 6);
+		event.setDirection(2);
+		event._spriteOffsetY = -24;
+		event._spriteOffsetX = -48;
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:576|娼婦Debut!
+	readVariable530_64 = function () {
+		var value1 = 11;//$gameVariables.value(530);
+		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		event.locate(20, 7);
+		event.setDirection(8);
+		event._spriteOffsetY = -24;
+		event._spriteOffsetX = -48;
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:576|娼婦Debut!
+	appendToVariable292_2 = function (interp) {
+		return (function () {
+		var arr1 = [];
+		arr1.push($gameVariables.value(292)[11]);
+		event_NpcCharaMoveId(39,0,arr1);
+		//1下移動16下向く39透明化
+		//event_partyCharaMove(45,"this.turnTowardCharacter($gameMap.event("+value1+"));");
+		//event_partyCharaMove(45,"UP: 10;"); //"UP: 10;"
+		//event_partyCharaMove(45,"this.requestBalloon(1);");
+		//event_partyCharaMove(45,"this.requestAnimation(617);");
+		}).call(interp);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:576|娼婦Debut!
+	floor2 = function () {
+		i1 = getRandomIndex(10) + 11;//人数
+		i2 = getRandomIndex(10) + 11;//膣回数
+		i3 = Math.floor( Math.random() * -5) + i1;//中だし回数
+		i4 = getRandomIndex(5) + 1;//アナル回数
+		i5 = getRandomIndex(1) + i4;//中だし回数
+		i6 = getRandomIndex(5) + 6;//フェラ回数
+		i7 = Math.floor( Math.random() * -2) + i4;//口腔回数
+		i8 = getRandomIndex(3) + 0;//失禁回数
+	};
+
+	// Replaces (1x): Map003.json:event:4|ドロップ宝箱|page:3
+	setScreenDTextPicture6 = function () {
+		var arr1 = [6,7,6,6,6,7,6,7,6,6,8,6,6];
+		var value2 = arr1[getRandomIndex(arr1.length)];
+		gacha_naiyou(3,value2);
+		$gameParty.gainItem(valueItems[valueGachaId], 1);
+		var value2 = `\\C[24]\x1bI[${valueItems[valueGachaId].iconIndex}]${valueItems[valueGachaId].name}\\C[0]を入手した！`
+		$gameScreen.setDTextPicture(value2, 28);
+	};
+
+	// Replaces (1x): Map003.json:event:4|ドロップ宝箱|page:4
+	setScreenDTextPicture7 = function () {
+		var arr1 = [8,9,8,9,8,8,10,9,8,8];
+		var value2 = arr1[getRandomIndex(arr1.length)];
+		gacha_naiyou(3,value2);
+		$gameParty.gainItem(valueItems[valueGachaId], 1);
+		var value2 = `\\C[24]\x1bI[${valueItems[valueGachaId].iconIndex}]${valueItems[valueGachaId].name}\\C[0]を入手した！`
+		$gameScreen.setDTextPicture(value2, 28);
+	};
+
+	// Replaces (1x): Map003.json:event:19|小銭|page:1
+	setVariable22_5 = function () {
+		$gameVariables.setValue(22,3);
+		var value = getRandomIndex(91) + 10;
+		$gameVariables.setValue(23,value);
+	};
+
+	// Replaces (1x): Map003.json:event:20|罠コモン|page:1
+	setVariable292Goods8 = function () {
+		$gameVariables.setValue(292,Array(21).fill(0));
+		var value2 = $gamePlayer._realX;
+		var value3 = $gamePlayer._realY;
+		//if($gamePlayer.direction() == 2){value3 += 1};
+		//if($gamePlayer.direction() == 4){value2 -= 1};
+		//if($gamePlayer.direction() == 6){value2 += 1};
+		//if($gamePlayer.direction() == 8){value3 -= 1};
+		goodsEvent_respawn(0,'Goods8',6,8,2,value2,value3);
+	};
+
+	// Replaces (1x): Map003.json:event:20|罠コモン|page:1
+	particleSetOrbC = function (interp) {
+		return (function () {
+		var value1 = 'orb_c';
+		$gameScreen._particle.particleSet(this._eventId,value1+'-'+this._eventId,'this',value1,'above');
+		var value1 = 'orb_c'+'-'+this._eventId;
+		$gameScreen._particle.particleUpdate([value1,'color','#ff00f7','#ffffff']);
+		//$gameScreen._particle.particleUpdate([value1,'pos',0,-35]);
+		}).call(interp);
+	};
+
+	// Replaces (1x): Map003.json:event:42|固有素材2|page:1
+	inBattle5 = function () {
+		if(!$gameParty.inBattle()){$gameTemp.stopMapPlayerMovement()};
+		if(!$gameParty.inBattle()){$gameTemp.stopMapEventMovement()};
+	};
+
+	// Replaces (1x): Map003.json:event:42|固有素材2|page:1
+	setSelfSwitch7 = function (interp) {
+		return (function () {
+		var id = 794;//匠掘りスキル
+		if($gameActors.actor($gameVariables.value(2)).isLearnedSkill(id)){
+		  var arr1 = [1,2];
+		  var value1 = arr1[getRandomIndex(arr1.length)];
+		    if(value1 == 2){
+		      $gameSelfSwitches.setValue([$gameMap.mapId(), this._eventId, 'B'], true);
+		    };
+		} else {
+		  $gameSelfSwitches.setValue([$gameMap.mapId(), this._eventId, 'B'], true);
+		};
+		}).call(interp);
+	};
+
+	// Replaces (1x): Map003.json:event:42|固有素材2|page:1
+	valueGoodsShine2 = function (interp) {
+		return (function () {
+		if($gameSelfSwitches.value([$gameMap.mapId(), this._eventId, 'B'])){
+		  var value1 = 'goods_shine2'+'-'+this._eventId;
+		  $gameScreen._particle.particleClear(value1);
+		};
+		}).call(interp);
+	};
+
+	// Replaces (1x): Map003.json:event:42|固有素材2|page:1
+	pluginCommandShowInfo = function (interp) {
+		return (function () {
+		var value1 = `採掘が出来そうな岩石だった…。`;
+		var args = new Array( String(value1) ); 
+		this.pluginCommand("ShowInfo", args);
+		}).call(interp);
+	};
+
+	// Replaces (1x): Map003.json:event:47|魚|page:1
+	setupChild = function (interp) {
+		return (function () {
+		var value1 = getRandomIndex(11) + 5;
+		var value2 = getRandomIndex(11) + 5;
+		var value3 = getRandomIndex(11) + 10;
+		var value4 = getRandomIndex(5) + 1;
+		var value5 = getRandomIndex(5) + 6;
+		common_script1(26,this._eventId,value5,5,0,value1,value2,value3,value4,255);
+		this.setupChild($dataCommonEvents[64].list, 0);
+		}).call(interp);
+	};
+
+	// Replaces (1x): Map003.json:event:47|魚|page:1
+	handleScriptSnippet71 = function () {
+		valueRandomSet = getRandomIndex(1);
+	};
+
+	// Replaces (1x): Map003.json:event:69|EV069|page:1
+	readVariable286ERSMAKETEMPLATERANDOM = function (interp) {
+		return (function () {
+		var value1 = 77;
+		var args = new Array(String(value1),"1","0","3","1","1");
+		this.pluginCommand("ERS_MAKE_TEMPLATE_RANDOM", args);
+		var args = new Array("286");
+		this.pluginCommand("ERS_GET_LAST_SPAWN_EVENT_ID", args);
+		var variable286Value = $gameVariables.value(286);
+		if($gameMap.event(variable286Value).event().meta['座標']){
+		this.character(variable286Value).locate(Number($gameMap.event(variable286Value).event().meta['座標'].split(',')[0]), Number($gameMap.event(variable286Value).event().meta['座標'].split(',')[1]));this.character(variable286Value).setDirection(0);
+		};
+		}).call(interp);
+	};
+
+	// Replaces (1x): Map003.json:event:69|EV069|page:1
+	transformVariable286ERSMAKETEMPLATERANDOM = function (interp) {
+		return (function () {
+		var list = [81,82,83];
+		list.forEach(function(id) {
+		var value1 = id;
+		var args = new Array(String(value1),"1","0","3","1","1");
+		this.pluginCommand("ERS_MAKE_TEMPLATE_RANDOM", args);
+		var args = new Array("286");
+		this.pluginCommand("ERS_GET_LAST_SPAWN_EVENT_ID", args);
+		var variable286Value = $gameVariables.value(286);
+		if($gameMap.event(variable286Value).event().meta['座標']){
+		this.character(variable286Value).locate(Number($gameMap.event(variable286Value).event().meta['座標'].split(',')[0]), Number($gameMap.event(variable286Value).event().meta['座標'].split(',')[1]));this.character(variable286Value).setDirection(0);
+		}}, this);
+		}).call(interp);
+	};
+
+	// Replaces (1x): Map003.json:event:69|EV069|page:1
+	transformVariable286ERSMAKETEMPLATERANDOM2 = function (interp) {
+		return (function () {
+		var list = [73,74,75,78];
+		list.forEach(function(id) {
+		var value1 = id;
+		var args = new Array(String(value1),"1","0","3","1","1");
+		this.pluginCommand("ERS_MAKE_TEMPLATE_RANDOM", args);
+		var args = new Array("286");
+		this.pluginCommand("ERS_GET_LAST_SPAWN_EVENT_ID", args);
+		var variable286Value = $gameVariables.value(286);
+		if($gameMap.event(variable286Value).event().meta['座標']){
+		this.character(variable286Value).locate(Number($gameMap.event(variable286Value).event().meta['座標'].split(',')[0]), Number($gameMap.event(variable286Value).event().meta['座標'].split(',')[1]));this.character(variable286Value).setDirection(0);
+		}}, this);
+		}).call(interp);
+	};
+
+	// Replaces (1x): Map003.json:event:82|EV082|page:1
+	setSelfVariable21_8 = function (interp) {
+		return (function () {
+		$gameVariables.setValue(22,`＜獲得アイテム一覧＞\n`);
+		$gameVariables.setValue(23,0);
+		$gameSwitches.setValue(380,true);
+		this.sVal(21,0);
+		for (var i = 1; i <= 10; i++) {
+		item_gacha();
+		};
+		}).call(interp);
+	};
+
+	// Replaces (1x): Map003.json:event:84|EV084|page:1
+	reservePlayerTransfer = function () {
+		var value = $gameVariables.value(204);
+		var value1 = $gameVariables.value(value)[0];
+		var value2 = $gameVariables.value(value)[1];
+		var value3 = $gameVariables.value(value)[2];
+		$gamePlayer.reserveTransfer(value1, value2, value3, 2, 2);
+	};
+
+	// Replaces (1x): Map003.json:event:113|EV113|page:1
+	setSwitch439_2 = function () {
+		var value1 = 2;//種別
+		var value2 = 21;//ID全体攻撃の腕輪
+		var arr1 = [0,0,0,value1,value2];
+		if(Number(arr1[3]) == 0){var valueItems = $dataItems}; 
+		if(Number(arr1[3]) == 1){var valueItems = $dataWeapons}; 
+		if(Number(arr1[3]) == 2){var valueItems = $dataArmors};
+		$gameParty.gainItem(valueItems[Number(arr1[4])], 1);
+		var value1 = `\\C[24]\x1bI[${valueItems[Number(arr1[4])].iconIndex}]${valueItems[Number(arr1[4])].name}\\C[0]を入手した！`;
+		var value2 = 28;
+		$gameScreen.setDTextPicture(value1, value2);
+		$gameSwitches.setValue(439,true);
+	};
+
+	// Replaces (1x): Map003.json:event:113|EV113|page:1
+	setSwitch439TchestOnly = function () {
+		var variable240Value = $dataItems[$gameVariables.value(240)].meta['TchestOnly'].split(',');
+		if(Number(variable240Value[3]) == 0){var valueItems = $dataItems}; 
+		if(Number(variable240Value[3]) == 1){var valueItems = $dataWeapons}; 
+		if(Number(variable240Value[3]) == 2){var valueItems = $dataArmors};
+		$gameParty.gainItem(valueItems[Number(variable240Value[4])], 1);
+		var value1 = `\\C[24]\x1bI[${valueItems[Number(variable240Value[4])].iconIndex}]${valueItems[Number(variable240Value[4])].name}\\C[0]を入手した！`;
+		var value2 = 28;
+		$gameScreen.setDTextPicture(value1, value2);
+		$gameSwitches.setValue(439,true);
+	};
+
+	// Replaces (1x): Map003.json:event:131|ワープスポット|page:1
+	setSelfSwitchWarpPoint = function (interp) {
+		return (function () {
+		var arr3 = [$gameMap.mapId(),$gameMap.event(this._eventId).x,$gameMap.event(this._eventId).y];
+		for (var i = 1; i <= 9; i++) {
+		  if($dataItems[$gameVariables.value(240)].meta['warpPoint' + i]){
+		    var arr1 = $dataItems[$gameVariables.value(240)].meta['warpPoint' + i].split(',');
+		    var arr2 = [Number(arr1[0]),Number(arr1[1]),Number(arr1[2])];
+		    if(arr2[0] == arr3[0] && arr2[1] == arr3[1] && arr2[2] == arr3[2]){
+		      $gameVariables.value(211)[$gameVariables.value(240)][i] = 1;
+		      $gameSelfSwitches.setValue([$gameMap.mapId(), this._eventId, 'A'], true);
+		      var value4 = `ワープポイント[${i}]がアクティベートされました。`;   
+		      $gameScreen.setDTextPicture(value4, 28);$gameSwitches.setValue(380,true);
+		      break;
+		}}};
+		}).call(interp);
+	};
+
+	// Replaces (1x): Map003.json:event:133|EV133|page:1
+	setSelfSwitch8 = function (interp) {
+		return (function () {
+		for (var i = 1; i <= 100; i++) {
+		  if($gameVariables.value(327)[i] >= 2){
+		    $gameVariables.value(327)[i] = 1;
+		}};
+		var variable230Value = $dataWeapons[$gameVariables.value(230)].name;
+		$gameVariables.value(327)[$gameVariables.value(230)] = 2;
+		$gameSelfSwitches.setValue([$gameMap.mapId(), this._eventId, 'A'], true);
+		var value4 = `<${variable230Value}>拠点がアクティベートされました。`;   
+		$gameScreen.setDTextPicture(value4, 28);
+		$gameSwitches.setValue(380,true);
+		}).call(interp);
+	};
+
+	// Replaces (1x): Map003.json:event:133|EV133|page:1
+	readVariable327 = function () {
+		var value2 = 0;
+		for (var i = 1; i <= 100; i++) {
+		  if($gameVariables.value(327)[i] == 2){
+		    var value2 = 1;
+		}};
+		if(value2 == 0){
+		  $gameVariables.value(327)[$gameVariables.value(319)] = 2;
+		};
+	};
+
+	// Replaces (1x): Map003.json:event:133|EV133|page:2
+	setVariable801 = function () {
+		for (var i = 1; i <= 100; i++) {
+		  if($gameVariables.value(327)[i] >= 2){
+		    $gameVariables.setValue(801,`帰還先:${$dataWeapons[i].name}`);
+		    break;
+		}};
+	};
+
+	// Replaces (1x): Map003.json:event:133|EV133|page:2
+	setSwitch162_5 = function () {
+		if($gameVariables.value(135) >= 1){
+		  $gameSwitches.setValue(162,true);//時間経過可能
+		};
+		if($gameSwitches.value(34)){
+		  $gameSwitches.setValue(163,true);//周回可能
+		};
+	};
+
+	// Replaces (1x): Map003.json:event:133|EV133|page:2
+	setSwitch164 = function () {
+		for (var i = 501; i <= 600; i++) {
+		  if($gameParty.hasItem($dataItems[i])){
+		    $gameSwitches.setValue(164,true);//シーン回想
+		}};
+		for (var i = 401; i <= 500; i++) {
+		  if($gameParty.hasItem($dataItems[i])){
+		    $gameSwitches.setValue(165,true);//挿話回想
+		}};
+	};
+
+	// Replaces (1x): Map003.json:event:133|EV133|page:2
+	setSwitch167 = function () {
+		var actor = $gameActors.actor($gameVariables.value(2));
+		if(actor.isLearnedSkill(791)){
+		  $gameSwitches.setValue(167,true);//錬金実行
+		};
+	};
+
+	// Replaces (1x): Map003.json:event:133|EV133|page:2
+	readVariable327_2 = function () {
+		for (var i = 1; i <= 100; i++) {
+		  if($gameVariables.value(327)[i] >= 2){
+		    var value1 = i;
+		    break;
+		}};
+		valueCountSet1 = value1;
+	};
+
+	// Replaces (1x): Map003.json:event:133|EV133|page:2
+	iterateWeapons5 = function () {
+		$gameVariables.value(327)[$gameVariables.value(230)] = 2;
+		var value1 = `帰還先拠点を\\C[2]<${$dataWeapons[$gameVariables.value(230)].name}>\\C[0]に設定しました。`;
+		TickerManager.show(value1);
+	};
+
+	// Replaces (1x): Map003.json:event:133|EV133|page:2
+	setVariable292Goods4_2 = function () {
+		$gameVariables.setValue(292,Array(21).fill(0));
+		var value2 = $gamePlayer._realX;
+		var value3 = $gamePlayer._realY;
+		if($gamePlayer.direction() == 2){value3 += 1};
+		if($gamePlayer.direction() == 4){value2 -= 1};
+		if($gamePlayer.direction() == 6){value2 += 1};
+		if($gamePlayer.direction() == 8){value3 -= 1};
+		goodsEvent_respawn(0,'Goods4',6,6,2,value2,value3);
+	};
+
+	// Replaces (1x): Map003.json:event:145|EV145教会処理|page:1
+	event14 = function (interp) {
+		return (function () {
+		var value1 = $gameMap.event(this._eventId).x;
+		var value2 = $gameMap.event(this._eventId).y;
+		var event = this.character(-1);
+		event.locate(value1, value2+2);
+		event.setDirection(8);
+		}).call(interp);
+	};
+
+	// Replaces (1x): Map003.json:event:161|EV161|page:1
+	show4 = function () {
+		WindowManager.show(0, 0, 0, 1024, 68);
+	};
+
+	// Replaces (1x): Map003.json:event:161|EV161|page:1
+	setSwitch380EICSwitch2 = function () {
+		$gameSwitches.setValue(380,false);
+		for (var i = 1; i <= $dataItems.length-1; i++) {
+		  if(!$dataItems[i].name == '') {
+		    if($dataItems[i].meta['EICSwitch']) {
+		      if(Number($dataItems[i].meta['EICSwitch']) == 108) {
+		          if($gameParty.hasItem($dataItems[i]) && !$dataItems[i].meta['singleQuestIncidence']){
+		            $gameSwitches.setValue(380,true);
+		            break;
+		}}}}};
+	};
+
+	// Replaces (1x): Map003.json:event:161|EV161|page:1
+	erasePicture3 = function () {
+		for(var i = 101; i <= 250; i++){$gameScreen.erasePicture(i)}
+	};
+
+	// Replaces (1x): Map003.json:event:166|EV166シングルクエスト受注|page:2
+	eventQuestSet = function (interp) {
+		return (function () {
+		valueCountSet1 = Number($gameMap.event(this._eventId).event().meta['QuestSet']);
+		}).call(interp);
+	};
+
+	// Replaces (1x): Map003.json:event:172|EV172召喚石戦闘|page:1
+	setSwitch380_5 = function (interp) {
+		return (function () {
+		$gameSwitches.setValue(380,false);
+		if(!$gameSelfSwitches.value([$gameMap.mapId(), this._eventId, 'A'])){
+		  $gameSwitches.setValue(380,true);
+		};
+		}).call(interp);
+	};
+
+	// Replaces (1x): Map003.json:event:185|EV185|page:1
+	setSwitch439_3 = function () {
+		var value1 = 2;//種別
+		var value2 = 21;//ID
+		if(value1 == 0){var valueItems = $dataItems}; 
+		if(value1 == 1){var valueItems = $dataWeapons}; 
+		if(value1 == 2){var valueItems = $dataArmors};
+		$gameParty.gainItem(valueItems[value2], 1);
+		var value3 = `\\C[29]\x1bI[${valueItems[value2].iconIndex}]${valueItems[value2].name}\\C[0]を入手した！`;
+		var value4 = 28;
+		$gameScreen.setDTextPicture(value3, value4);
+		$gameSwitches.setValue(439,true);
+	};
+
+	// Replaces (1x): Map003.json:event:207|EV207宿屋処理|page:1
+	setScreenDTextPicture8 = function () {
+		var value1 = 51;
+		var value2 = '';
+		$gameScreen.showPicture(value1+1,value2,0,1072,612,100,100,0,0);
+		$gameScreen.movePicture(value1+1,0,1072,612,100,100,255,0,60);
+		var value3 = `　　　　　\n　　　　　\n　　　　　\n　　　　　`;
+		$gameScreen.setDTextPicture(value3, 28);
+		$gameScreen.dWindowFrame = 'ON';
+		$gameScreen.showPicture(value1,value2,0,1072,612,100,100,0,0);
+		$gameScreen.movePicture(value1,0,1072,612,100,100,255,0,60);
+	};
+
+	// Replaces (1x): Map003.json:event:207|EV207宿屋処理|page:1
+	setVariable21_12 = function () {
+		var value1 = $dataItems[valueCountSet1].price;
+		$gameVariables.setValue(21,value1.toLocaleString());
+		if($gameParty.gold() >= value1){
+		  $gameSwitches.setValue(161,true);
+		} else {
+		  $gameSwitches.setValue(161,false);
+		};
+	};
+
+	// Replaces (1x): Map003.json:event:207|EV207宿屋処理|page:1
+	setVariable22_6 = function () {
+		var value1 = $dataItems[valueCountSet2].price;
+		$gameVariables.setValue(22,value1.toLocaleString());
+		if($gameParty.gold() >= value1){
+		  $gameSwitches.setValue(162,true);
+		} else {
+		  $gameSwitches.setValue(162,false);
+		};
+	};
+
+	// Replaces (1x): Map003.json:event:207|EV207宿屋処理|page:1
+	iterateItems14 = function () {
+		var value1 = $dataItems[valueCountSet1].price;
+		get_infoDirect(0,valueCountSet1,0,1);
+		get_infoDirect(4,-value1,0,1);
+	};
+
+	// Replaces (1x): Map003.json:event:207|EV207宿屋処理|page:1
+	iterateItems15 = function () {
+		var value1 = $dataItems[valueCountSet2].price;
+		get_infoDirect(0,valueCountSet2,0,1);
+		get_infoDirect(4,-value1,0,1);
+	};
+
+	// Replaces (1x): Map003.json:event:217|EV217回想全開放|page:1
+	iterateItemsEICSwitch = function () {
+		for (var i = 1; i < $dataItems.length; i++) {
+		  if($dataItems[i].meta['EICSwitch']) {
+		    if(Number($dataItems[i].meta['EICSwitch']) == 102) {
+		      $gameParty.gainItem($dataItems[i], 1);
+		}}};
+		var value1 = `挿話が全開放されました。`;
+		gab_wordParticle(value1);
+	};
+
+	// Replaces (1x): Map003.json:event:217|EV217回想全開放|page:1
+	iterateItemsEICSwitch2 = function () {
+		for (var i = 1; i < $dataItems.length; i++) {
+		  if($dataItems[i].meta['EICSwitch']) {
+		    if(Number($dataItems[i].meta['EICSwitch']) == 103) {
+		      $gameParty.gainItem($dataItems[i], 1);
+		}}};
+		var value1 = `Hシーンが全開放されました。`;
+		gab_wordParticle(value1);
+	};
+
+	// Replaces (1x): Map003.json:event:218|EV218|page:2
+	readVariable20_15 = function (interp) {
+		return (function () {
+		//その場に作成
+		var value1 = 1;//$gameVariables.value(20);
+		var arr1 = valueNpcGuraTemporarilySave;
+		event_respawnSetA(value1,arr1[3],arr1[4],1,arr1[5]);
+		this._eventId = $gameVariables.value(292)[value1];
+		var value1 = 11;
+		event_respawnSetN(value1,arr1[8],arr1[9],0,arr1[6],arr1[7],arr1[10]);
+		}).call(interp);
+	};
+
+	// Replaces (1x): Map003.json:event:218|EV218|page:2
+	readVariable20_16 = function (interp) {
+		return (function () {
+		//移動マップに作成。x,y入力
+		var value1 = 1;//$gameVariables.value(20);
+		var arr2 = [x,y,d];//ｱｸﾀｰ座標
+		var arr3 = [x,y,d];//NPC座標
+		var arr1 = valueNpcGuraTemporarilySave;
+		event_respawnSetA(value1,arr2[0],arr2[1],1,arr2[2]);
+		this._eventId = $gameVariables.value(292)[value1];
+		var value1 = 11;
+		event_respawnSetN(value1,arr3[0],arr3[1],0,arr1[6],arr1[7],arr3[2]);
+		}).call(interp);
+	};
+
+	// Replaces (1x): Map003.json:event:219|EV219|page:1
+	setVariable292_5 = function () {
+		$gameVariables.setValue(292,Array(21).fill(0));
+		var value1 = 11;
+		event_respawnSetN(value1,24,16,0,'$airship02',0,2);
+		var value1 = 12;
+		event_respawnSetN(value1,21,16,0,'!$VehicleHorse',0,2);
+		var value1 = 7;
+		event_respawnSetA(value1,22,16,1,6);
+	};
+
+	// Replaces (1x): Map007.json:event:2|EV002|page:1
+	setSelfVariable401Xev00199 = function (interp) {
+		return (function () {
+		h_exp($gameVariables.value(20),'Xev001_99',101,false,false,false);
+		//ｱｸﾀｰID,ﾋﾟｸﾁｬ,H相手(301ﾓﾌﾞ305対象なし306アイテム),非表示,簡易,過去シーンか否か
+		this.sVal(401,getRandomIndex(3) + 3);
+		//var arr = [1,2,3,4,5];$gameVariables.setValue(401,arr[getRandomIndex(arr.length)]);
+		//this.sVal(506,`\\V[94]は\\V[22]に情報の対価としてセクハラされた…。\n`);
+		//this.sVal(506,`\\V[94]はモブにセクハラされた…。\n`);
+		this.sVal(506,`\\V[94]は魔物達に凌辱された…。\n`);
+		if($gameSwitches.value(122)){this.setupChild($dataCommonEvents[85].list, 0)};
+		}).call(interp);
+	};
+
+	// Replaces (1x): Map007.json:event:2|EV002|page:1
+	aliveMembers2 = function (interp) {
+		return (function () {
+		var value1 = getRandomIndex(3) + 3;
+		var arr = [1,2,3,4,5];var value2 = arr[getRandomIndex(arr.length)];
+		//var value3 = $gameTroop.aliveMembers().length;
+		h_exp1(0,0,0,0,0,0);//h_exp1ex(value3*2);//6
+		//0膣1経験2フェラ3アナル4自慰5絶頂
+		h_exp2(0,0,0,0,0);//5//0和姦1強姦2異種姦3輪姦4露出
+		h_exp3(0,0,0,0,0,0,0,0,0,0,0);//10
+		//0セク1乳2尻揉3失禁4潮吹5売春6妊7子8中だ9ｱﾅﾙ出し10口飲
+		h_exp4(0,0,0,0,0,0,0,0);//9
+		//0膣1尻2口3感4露5精6性戯7奉仕8売春
+		this.setupChild($dataCommonEvents[85].list, 0);
+		}).call(interp);
+	};
+
+	// Replaces (1x): Map007.json:event:3|EV003|page:1
+	readVariable20_17 = function () {
+		var actor = $gameActors.actor($gameVariables.value(20));
+		actor.setCanChangeClass(true);
+	};
+
+	// Replaces (1x): Map007.json:event:3|EV003|page:1
+	showPictureScreenBlackOut13 = function () {
+		valuePic1 = 51;
+		var value2 = 'ScreenBlackOut';
+		$gameScreen.showPicture(valuePic1,value2,1,640,384,100,100,0,0);
+		$gameScreen.movePicture(valuePic1,1,640,384,100,100,200,0,10);
+	};
+
+	// Replaces (1x): Map007.json:event:3|EV003|page:1
+	setSwitch429Test2 = function () {
+		valuePic1 = 60;
+		var value2 = 'test2';
+		$gameScreen.showPicture(valuePic1,value2,1,640,384,100,100,255,0);
+		pic_setArray(1,valuePic1,0,50,60);
+		var value2 = 'test2a_0';
+		picture_anime1(valuePic1+1,value2,3,10,"連番",10,1,true,[1,2,1,1]);
+		pic_set(valuePic1+1,1,255,20);
+		hcg_piston(valuePic1,8,1,1);
+		hcg_piston(valuePic1+1,8,1,1);
+		$gameSwitches.setValue(429,true);
+	};
+
+	// Replaces (1x): Map007.json:event:3|EV003|page:1
+	readVariable52_2 = function () {
+		$gameVariables.value(52)[421] += 50;
+		$gameVariables.value(52)[423] += 30;
+	};
+
+	// Replaces (1x): Map007.json:event:3|EV003|page:1
+	setSwitch429Test2_2 = function () {
+		var value1 = 60;
+		var value2 = 'test2';
+		$gameScreen.showPicture(value1,value2,1,640,384,100,100,255,0);
+		pic_setArray(value1,0,20,20);
+		var value2 = 'test2a_0';
+		picture_anime1(value1+1,value2,3,10,"連番",20,1,true,[1,2,1,1]);
+		pic_set(value1+1,1,255,20);
+		hcg_piston(value1,8,1,1);
+		hcg_piston(value1-1,8,1,1);
+		$gameSwitches.setValue(429,true);
+	};
+
+	// Replaces (1x): Map007.json:event:3|EV003|page:1
+	event15 = function () {
+		var event = $gameMap.event(3);
+		event.setDirectionFix(true);
+		event.setStepAnime(false);
+		event.setWalkAnime(false);
+		event.resetPattern();
+		event._originalPattern = 1;
+	};
+
+	// Replaces (1x): Map007.json:event:3|EV003|page:1
+	handleScriptSnippet72 = function () {
+		valueWordSet0 = `あああああ`;
+		adv_partDirectPlay(18);
+	};
+
+	// Replaces (1x): Map007.json:event:3|EV003|page:1
+	handleScriptSnippet73 = function () {
+		curveFunctions.initialize();
+	};
+
+	// Replaces (1x): Map007.json:event:3|EV003|page:1
+	setSelfVariable20_12 = function (interp) {
+		return (function () {
+		valueFaceSelect = 4;
+		this.sVal(20,1);
+		this.sVal(276,1);
+		battle_bustUp(51,500,10,40);
+		}).call(interp);
+	};
+
+	// Replaces (1x): Map007.json:event:3|EV003|page:1
+	getPatternJump2 = function () {
+		curveFunctions.patternY = curveFunctions.getPattern('jump', [-100]);
+		curveFunctions.patternOpacity = curveFunctions.getPattern('jump', [400]);
+	};
+
+	// Replaces (1x): Map007.json:event:3|EV003|page:1
+	getPatternSmooth = function () {
+		curveFunctions.patternX = curveFunctions.getPattern("smooth", [10]);
+		curveFunctions.patternY = curveFunctions.getPattern("smooth", [10]);
+		curveFunctions.patternScaleX = curveFunctions.getPattern("smooth", [10]);
+		curveFunctions.patternScaleY = curveFunctions.getPattern("smooth", [10]);
+		curveFunctions.patternOpacity = curveFunctions.getPattern("smooth", [10]);
+	};
+
+	// Replaces (1x): Map007.json:event:3|EV003|page:1
+	iterateArmorsPassiveState = function () {
+		var value2 = Number($dataArmors[219].meta['Passive State'])
+		var value1 = `${value2 + 1}`;
+		CommonPopupManager.showInfo({},value1,null);
+	};
+
+	// Replaces (1x): Map007.json:event:3|EV003|page:1
+	createFilterZettyou = function () {
+		  var value10 = 'zettyou';
+		  $gameMap.createFilter(value10,'blur',0,'screen');
+		  $gameMap.setFilter(value10,[5]);
+	};
+
+	// Replaces (1x): Map007.json:event:3|EV003|page:1
+	setSwitch211 = function (interp) {
+		return (function () {
+		boss_setup1(2,56);
+		$gameSwitches.setValue(211,true);
+		valueVictoryResult1 = this._eventId;
+		this.setupChild($dataCommonEvents[121].list, 0);
+		//this.setupChild($dataCommonEvents[122].list, 0);
+		}).call(interp);
+	};
+
+	// Replaces (1x): Map007.json:event:3|EV003|page:1
+	particleEditItemGain = function (interp) {
+		return (function () {
+		var value1 = 'item_gain';
+		$gameScreen._particle.particleEdit(this._eventId,value1,'this');
+		//$gameScreen._particle.particleEdit(0,value1,'screen','def','above');
+		}).call(interp);
+	};
+
+	// Replaces (1x): Map007.json:event:3|EV003|page:1
+	particleUpdateActorParticleLight = function () {
+		var value1 = 'actor_particleLight';
+		$gameScreen._particle.particleUpdate([value1,'rect',-700,400,1300,768]);
+	};
+
+	// Replaces (1x): Map007.json:event:3|EV003|page:1
+	showPictureScreenBlackOut14 = function () {
+		var value3 = 51;
+		var value4 = 'ScreenBlackOut';
+		$gameScreen.showPicture(value3,value4,1,640,384,100,100,150,0);
+		var value1 = 'lines_width1';
+		$gameScreen._particle.particleSet(0,value1,'screen','def','above');
+		var value1 = 'lines_width2';
+		$gameScreen._particle.particleSet(0,value1,'screen','def','screen');
+		var value1 = 'lines_width3';
+		$gameScreen._particle.particleSet(0,value1,'screen','def','spriteset');
+	};
+
+	// Replaces (1x): Map007.json:event:3|EV003|page:1
+	actor = function () {
+		$gameActors.actor(1).actor().traits.push({code: 11, dataId: 11, value: 1.5});
+	};
+
+	// Replaces (1x): Map007.json:event:3|EV003|page:1
+	handleScriptSnippet74 = function () {
+		var value1 = 10000;
+		$dataEnemies[11].exp = value1;
+		$dataEnemies[12].exp = value1;
+		$dataEnemies[13].exp = value1;
+		$dataEnemies[42].exp = value1;
+		$dataEnemies[61].exp = value1;
+		$dataEnemies[62].exp = value1;
+	};
+
+	// Replaces (1x): Map007.json:event:3|EV003|page:1
+	handleScriptSnippet75 = function () {
+		var troopsId = 10; //グループIDを指定
+		$dataTroops[troopsId].name = "アレク"; //グループのメンバーを空に
+	};
+
+	// Replaces (1x): Map007.json:event:3|EV003|page:1
+	push = function () {
+		var troopsId = 10; //グループIDを指定
+		$dataTroops[troopsId].members = []; //グループのメンバーを空に
+		var enemy = {enemyId:11, x:450, y:420, hidden:false}; //追加するエネミーの設定(ID1、座標(100,100)、表示有)
+		$dataTroops[troopsId].members.push(enemy); //設定したエネミーをグループに追加
+	};
+
+	// Replaces (1x): Map007.json:event:3|EV003|page:1
+	iterateItems16 = function () {
+		var start = 1; var end = 6; for (var i = start; i <= end; i++) {
+		var value2 = $dataItems[$gameVariables.value(240)].meta['出現エネミー' + i];
+		if(Number(value2.split(',')[0]) >= 21){
+		$dataEnemies[i+10].exp = $dataEnemies[value2.split(',')[0]].exp;
+		}};
+	};
+
+	// Replaces (1x): Map007.json:event:4|EV004000|page:1
+	particleEditLightLeakS = function (interp) {
+		return (function () {
+		var value1 = 'light_leak_s'
+		$gameScreen._particle.particleEdit(this._eventId,value1,'this','def','spriteset');
+		}).call(interp);
+	};
+
+	// Replaces (1x): Map007.json:event:4|EV004000|page:1
+	particleEditGoodsShine2 = function () {
+		  var value1 = 'goods_shine2';
+		$gameScreen._particle.particleEdit(0,value1,'screen','def','spriteset');
+	};
+
+	// Replaces (1x): Map007.json:event:4|EV004000|page:1
+	concatArray2 = function () {
+		$gameScreen._tone_temp = $gameScreen.tone().concat();  
+		$gameScreen.startTint([-150,-150,-150,150], 10);
+	};
+
+	// Replaces (1x): Map007.json:event:4|EV004000|page:1
+	setScreenDTextPicture9 = function () {
+		var value1 = `パーティに加わった！`;
+		var value2 = 28;
+		$gameScreen.setDTextPicture(value1, value2);
+		adv_partDirectPlay(8);
+	};
+
+	// Replaces (1x): Map007.json:event:4|EV004000|page:1
+	setVariable33BBAkunin = function () {
+		for (var i = 1; i <= 5; i++) {
+		$gameVariables.setValue(33,'BB_akunin');//グラ名前
+		$gameVariables.setValue(35,3);//グラ番号
+		$gameVariables.setValue(37,getRandomIndex(3) + 2);//速度
+		$gameVariables.setValue(34,getRandomIndex(2) + 4);//頻度
+		map_npcRespawn(1,124);//1で任意,次にイベID
+		};
+	};
+
+	// Replaces (1x): Map007.json:event:4|EV004000|page:1
+	spawnEventRandom = function () {
+		var conditionMap         = {};
+		conditionMap.passable    = 1;
+		conditionMap.screen      = 0;
+		conditionMap.collided    = 3;
+		conditionMap.terrainTags = [0];
+		conditionMap.regionIds   = [1];
+		$gameMap.spawnEventRandom(78, conditionMap, true);
+	};
+
+	// Replaces (1x): Map007.json:event:4|EV004000|page:1
+	particleEditDappledR = function () {
+		var value1 = 'dappled_r';//木漏れ日[リージョン]
+		$gameScreen._particle.particleEdit(0,value1,'weather','def','screen');
+	};
+
+	// Replaces (1x): Map007.json:event:4|EV004000|page:1
+	particleEditRippleWalk = function (interp) {
+		return (function () {
+		var value1 = 'ripple_walk';//集中線
+		$gameScreen._particle.particleEdit(0,value1,'this._eventId','def');
+		}).call(interp);
+	};
+
+	// Replaces (1x): Map007.json:event:4|EV004000|page:1
+	setVariable192HstatesActorBody = function () {
+		var value1 = 51;
+		$gameVariables.setValue(192,1);
+		$gameScreen.showPicture(value1+6,"HstatesActorBody"+$gameVariables.value(20)+"_"+$gameVariables.value(192),1,624,400,100,100,255,0);
+	};
+
+	// Replaces (1x): Map007.json:event:4|EV004000|page:1
+	setVideoPictureNameMovie2 = function () {
+		$gameScreen.setVideoPictureName('Movie2', 'on', false);
+		var value1 = 53+2;
+		$gameScreen.showPicture(value1,'',1,640-128,384,100,100,255,0);
+	};
+
+	// Replaces (1x): Map007.json:event:4|EV004000|page:1
+	picture6 = function () {
+		var value1 = 53+2;
+		var picture = $gameScreen.picture(value1);
+		if (picture) {picture.setVideoLoop(value1)};
+		if (picture) {picture.setVideoSpeed(50)};
+	};
+
+	// Replaces (1x): Map007.json:event:4|EV004000|page:1
+	movePictureXev10001 = function () {
+		var value1 = 53;
+		var value2 = 'Xev100_01';
+		pic_1(0,value1+1,value2,0,100,255,60,1280,768,-256,0);
+		var value2 = 'Xev100_01_100';
+		picture_anime1(value1+3,value2,5,1,"連番",300,3,true,[2,4]);
+		$gameScreen.movePicture(value1+3,1,640-128,384,100,100,200,0,60);
+		picture_anime1(value1+4,value2,5,1,"連番",200,3,true,[3,1,5,1]);
+		$gameScreen.movePicture(value1+4,1,640-128,384,100,100,100,0,60);
+		for (var i = value1+1; i <= value1+4; i++) {hcg_piston(i,8,1)};
+	};
+
+	// Replaces (1x): Map007.json:event:4|EV004000|page:1
+	movePictureXev10001_2 = function () {
+		var value1 = 53;
+		var value2 = 'Xev100_01';
+		pic_1(0,value1+1,value2,0,100,255,60,1280,768,-256,0);
+		var value2 = 'Xev100_01hip2_100';
+		pic_1(2,value1+2,value2,0,100,200,1,1280,768,-256,0);
+		var value2 = 'Xev100_01_100';
+		picture_anime1(value1+3,value2,5,1,"連番",180,3,true,[2,4]);
+		$gameScreen.movePicture(value1+3,1,640-128,384,100,100,200,0,60);
+		picture_anime1(value1+4,value2,5,1,"連番",100,3,true,[3,1,5,1]);
+		$gameScreen.movePicture(value1+4,1,640-128,384,100,100,100,0,60);
+		for (var i = value1+1; i <= value1+4; i++) {hcg_piston(i,8,1)};
+	};
+
+	// Replaces (1x): Map007.json:event:4|EV004000|page:1
+	movePictureXev10001hip2100 = function () {
+		var value1 = 53;
+		var value2 = 'Xev100_01hip2_100';
+		//picture_anime1(value1+2,value2,3,1,"連番",50,3,true,[1,1,2,3,2,1]);
+		picture_anime1(value1+2,value2,3,1,"連番",50,3,true,[1,1,2,1,2,1,1]);
+		$gameScreen.movePicture(value1+3,1,640-128,384,100,100,255,0,60);
+	};
+
+	// Replaces (1x): Map007.json:event:4|EV004000|page:1
+	readVariable20_18 = function () {
+		$gameVariables.value(360 + $gameVariables.value(20))[11] = 3;
+		$gameVariables.value(360 + $gameVariables.value(20))[12] = 3;
+		$gameVariables.value(360 + $gameVariables.value(20))[211] = 1;
+		$gameVariables.value(360 + $gameVariables.value(20))[212] = 2;
+	};
+
+	// Replaces (1x): Map007.json:event:4|EV004000|page:1
+	iterateMapEventsIconDisplay = function () {
+		for (var id = $gameMap.events().length; id > 0; id--) {
+		if(!!$gameMap.event(id)) {
+		if ($gameMap.event(id).event().meta['IconDisplay']){
+		var value1 = Number($gameMap.event(id).event().meta['IconDisplay']);
+		if(value1 == 17){
+		if($gameMap.event(id).characterName() == 0){
+		console.log(`${1}`);
+		}}}}};
+	};
+
+	// Replaces (1x): Map007.json:event:4|EV004000|page:1
+	setSelfVariable21_9 = function (interp) {
+		return (function () {
+		var variable174Value = $gameVariables.value(174)[$gameVariables.value(20)].split(',');
+		this.sVal(21,variable174Value);
+		}).call(interp);
+	};
+
+	// Replaces (1x): Map007.json:event:5|EV005|page:1
+	particleUpdateMonsterC = function (interp) {
+		return (function () {
+		var value1 = 'monster_c';
+		var value3 = '#ffffff';
+		var value4 = '#460000';
+		$gameScreen._particle.particleUpdate([value1 + '-' + this._eventId,'color',String(value3),String(value4)]);
+		var value1 = 'mysterious_torch_c';
+		$gameScreen._particle.particleUpdate([value1,'alpha','0','0.7@0.5','0']);
+		}).call(interp);
+	};
+
+	// Replaces (1x): Map007.json:event:5|EV005|page:1
+	erasePictureTest2 = function (interp) {
+		return (function () {
+		var args = new Array("easeOutQuad");
+		this.pluginCommand("easing", args);
+		pic_1(0,5,'/img/parallaxes/ScreenBlackOut',0,100,200,30,1280,768,0,0);
+		pic_1(0,55,'test2',0,100,255,30,1024,768,100,0);
+		//0-0がH1が普通,1ﾋﾟｸID,2ﾌｧｲﾙ名,3表示演出0か1,4拡大率,
+		//5透明率,6ｳｪｲﾄ,7と8横縦サイズ(基本は解像度か1024)
+		//$gameScreen.erasePicture(70);
+		//'/img/parallaxes/画面暗転'
+		}).call(interp);
+	};
+
+	// Replaces (1x): Map007.json:event:7|EV007|page:1
+	setSelfVariable20_13 = function (interp) {
+		return (function () {
+		this.sVal(20,1);
+		var actor = $gameActors.actor($gameVariables.value(20));
+		actor.gainExpSubclass(1000);
+		}).call(interp);
+	};
+
+	// Replaces (1x): Map007.json:event:7|EV007|page:1
+	iteratePartyMembers19 = function () {
+		for (var i = 0; i < $gameParty.battleMembers().length; i++) {
+		  var actor = $gameParty.battleMembers()[i];
+		  if($gameParty.members().contains(actor)){
+		actor.learnSkill(297);actor.gainSkillMasteryUses(297, 100);
+		actor.learnSkill(300);actor.gainSkillMasteryUses(300, 100);
+		actor.learnSkill(308);actor.gainSkillMasteryUses(308, 100);
+		actor.learnSkill(340);actor.gainSkillMasteryUses(340, 100);
+		}};
+	};
+
+	// Replaces (1x): Map007.json:event:7|EV007|page:1
+	iterateSkills9 = function () {
+		var id = 1;
+		var start = 61;
+		var end = 64;
+		for (var i = start; i <= end; i++) {
+		  if (!$dataSkills[i].name == '') {
+		$gameActors.actor(id).learnSkill(i)
+		}};
+	};
+
+	// Replaces (1x): Map007.json:event:7|EV007|page:1
+	iterateStates2 = function () {
+		$dataStates[600].traits.push({code: 43, dataId: 682, value: 0});
+	};
+
+	// Replaces (1x): Map007.json:event:7|EV007|page:1
+	addState5 = function (interp) {
+		return (function () {
+		var actor = $gameActors.actor($gameVariables.value(20));
+		var list = valueHstateDisplay;
+		list.forEach(function(id) {
+		actor.addState(id);
+		}, this);
+		}).call(interp);
+	};
+
+	// Replaces (1x): Map007.json:event:10|EV010|page:1
+	event16 = function () {
+		var eventId = 6;
+		var character = $gameMap.event(eventId);
+		var valid = false;
+
+		character.residual().setValid(valid);
+	};
+
+	// Replaces (1x): Map007.json:event:10|EV010|page:1
+	event17 = function () {
+		var eventId = 11;
+		var character = $gameMap.event(eventId);
+		var r =   0;
+		var g = 255;
+		var b =   0;
+		var gray = 255;
+		var color = [r, g, b, gray];
+		var valid = true;
+
+		character.residual().setColorTone(color);
+		character.residual().setValid(valid);
+	};
+
+	// Replaces (1x): Map007.json:event:11|EV011|page:1
+	traceDebugOutput3 = function () {
+		var value1 = 51;
+		console.log(`${-value1+30}`);
+	};
+
+	// Replaces (1x): Map007.json:event:17|EV017|page:1
+	pluginCommandPicture = function (interp) {
+		return (function () {
+		var value1 = 71;
+		var value2 = "picture"
+		var value3 = "153";
+		//一刀両断102横から崩壊161縦から崩壊162
+		//横両断008封印054内側から153
+		var args = new Array(String(value2),String(value1),"fadeOut",
+		String(value3),"60","5");
+		this.pluginCommand("GWFade", args);
+		}).call(interp);
+	};
+
+	// Replaces (1x): Map007.json:event:22|EV022|page:2
+	iterateMapEvents = function (interp) {
+		return (function () {
+		var value1 = 0; 
+		for (var id = $gameMap.events().length-1; id > 0; id--) {
+		if(!!$gameMap.event(id)) {
+		if ($gameMap.event(id).event().meta['ベッド']){
+		var value1 = id;
+		break;
+		}}};
+		if(value1 >= 1){
+		var value2 = this.character(value1).x;var value3 = this.character(value1).y;
+		$gamePlayer.reserveTransfer($gameMap.mapId($gameVariables.value(52)), value2, value3 , 2);
+		$gamePlayer.performTransfer();
+		};
+		}).call(interp);
+	};
+
+	// Replaces (1x): Map007.json:event:22|EV022|page:2
+	iterateMapEvents2 = function (interp) {
+		return (function () {
+		var value1 = 0; 
+		for (var id = $gameMap.events().length-1; id > 0; id--) {
+		if(!!$gameMap.event(id)) {
+		if ($gameMap.event(id).event().meta['着替え']){
+		var value1 = id;
+		break;
+		}}};
+		if(value1 >= 1){
+		var value2 = this.character(value1).x;var value3 = this.character(value1).y;
+		$gamePlayer.reserveTransfer($gameMap.mapId($gameVariables.value(52)), value2, value3+1 , 8);
+		$gamePlayer.performTransfer();
+		};
+		}).call(interp);
+	};
+
+	// Replaces (1x): Map007.json:event:23|EV023|page:1
+	addState6 = function () {
+		var actor = $gameActors.actor($gameVariables.value(20));
+		actor.addState(693);
+		tachie_dousa(2,1,2,12,1,255,1323,0,0);
+		tachie_dousa(2,1,2,12,1,255,1325,0,0);
+		tachie_dousa(0,1,1,12,13,0,60,0,0);
+		//tachie_clothReflect(1);
+	};
+
+	// Replaces (1x): Map007.json:event:23|EV023|page:1
+	getPatternJump3 = function () {
+		valuePic1 = 19;
+		curveFunctions.patternX = curveFunctions.getPattern('jump', [-30]);
+		picTachie_move1(valuePic1,0,0,0,0,255,30);
+		//0id,1x,2y,3拡x,4拡y,5opa,6wait//こちらの代入は透明度とwaitのみ
+		picture_animation1(valuePic1,0,-300,200);
+		//0id,1x,2y,3animeId
+		picture_motion1("smooth",[0]);
+	};
+
+	// Replaces (1x): Map007.json:event:23|EV023|page:1
+	wait8 = function (interp) {
+		return (function () {
+		valueWordSet0 = 12;
+		tachie_clothesHason(1,25,valueWordSet0,1,1);
+		this.wait(Math.randomInt(10));
+		}).call(interp);
+	};
+
+	// Replaces (1x): Map007.json:event:23|EV023|page:1
+	setVariable20_9 = function (interp) {
+		return (function () {
+		var actor = $gameActors.actor($gameVariables.value(20));
+		actor.addState(23);
+		tachie_syoukyo1(getPreviousTachiePicId());
+		$gameVariables.setValue(20,1);
+		kisekae_tyokusetusitei(1324,23);
+		//tachie_hyouji1($gameVariables.value(20));
+		tachie_syoukyo1(getPreviousTachiePicId());
+		this.wait(60);
+		}).call(interp);
+	};
+
+	// Replaces (1x): Map007.json:event:32|EV032|page:1
+	spawnEvent3 = function () {
+		var value2 = $gamePlayer._realX;
+		var value3 = $gamePlayer._realY + 1;
+		$gameMap.spawnEvent(122, value2, value3, true);
+		valueCountSet1 = $gameMap.getLastSpawnEventId();
+	};
+
+	// Replaces (1x): Map007.json:event:32|EV032|page:1
+	eventStatueOrbC = function () {
+		var value1 = 'statue_orb_c'+'-'+valueCountSet1;
+		$gameScreen._particle.particleClear(value1);
+		if(!!$gameMap.event(valueCountSet1)) {
+		  $gameMap.eraseEvent(valueCountSet1);
+		};
+	};
+
+	// Replaces (1x): Map007.json:event:34|EV034|page:1
+	wait9 = function (interp) {
+		return (function () {
+		valueSerialPictureId = 76;
+		valueSerialPictureId += 1;
+		var arr1 = [-50,0,50,-100,100];
+		var arr2 = [-50,0,50,-100,100];
+		var arr3 = [`「オラッ！」`,`「オラァッ！」`];
+		chara_oneWord(valueSerialPictureId,this._eventId,25,60,arr1,arr2,arr3);
+		this.wait(20);
+		}).call(interp);
+	};
+
+	// Replaces (1x): Map007.json:event:54|EV054|page:1
+	setWaitModeRoute = function (interp) {
+		return (function () {
+		this._character = $gamePlayer;
+		this.setWaitMode('route');
+		}).call(interp);
+	};
+
+	// Replaces (1x): Map007.json:event:58|EV058|page:1
+	eventDomeBed = function () {
+		for (var id1 = 1; id1 <= 200; id1++) {
+		  if(!!$gameMap.event(id1)) {
+		    if($gameMap.event(id1).event().meta['DomeBed']){
+		      var event = $gameMap.event(id1);
+		      event.setDirectionFix(false);
+		      event.setDirection(2);
+		      event.setDirectionFix(true);
+		}}};
+	};
+
+	// Replaces (1x): Map018.json:event:21|EV021|page:1
+	setSelfVariable21FamilyName = function (interp) {
+		return (function () {
+		if($dataWeapons[315].meta['FamilyName']){
+		  this.sVal(21,$dataWeapons[315].meta['FamilyName']);
+		} else {
+		  this.sVal(21,`　`);
+		};
+		}).call(interp);
+	};
+
+	// Replaces (1x): Map018.json:event:25|EV025|page:1
+	setSwitch428XevS002 = function (interp) {
+		return (function () {
+		$gameSwitches.setValue(428,true);
+		valueScenePic = 'XevS002_';
+		var value2 = 'XevO002_02';
+		valueCutInSet1 = ['Ｈシーン演出',value2,270,2,1,25,60];
+		var args = new Array(String(valueCutInSet1[0]));
+		this.pluginCommand("味方カットイン", args);
+		}).call(interp);
+	};
+
+	// Replaces (1x): Map018.json:event:32|EV032|page:1
+	setSelfVariable172GoodsLetter1 = function (interp) {
+		return (function () {
+		this.sVal(172,8);
+		valueTalkSet = [101,'Goods_Letter1',60];
+		this.setupChild($dataCommonEvents[60].list, 0);
+		}).call(interp);
+	};
+
+	// Replaces (1x): Map018.json:event:39|EV039|page:1
+	readVariable399 = function () {
+		$gameActors.actor(19).setName(`青年Ａ`);
+		$gameVariables.value(399)[59] = `ネルガド住民`;
+		$gameActors.actor(20).setName(`青年Ｂ`);
+		$gameVariables.value(400)[59] = `ネルガド住民`;
+	};
+
+	// Replaces (1x): Map035.json:event:20|EV020|page:1
+	changeBattlebackDungeon141 = function () {
+		var value1 = 'Dungeon14_1';
+		$gameMap.changeBattleback(value1, value1);
+	};
+
+	// Replaces (1x): Map041.json:event:7|EV007|page:1
+	setSelfSwitch9 = function (interp) {
+		return (function () {
+		if($gameSwitches.value(1071) && !$gameSwitches.value(1171)){
+		  $gameSelfSwitches.setValue([$gameMap.mapId(), this._eventId, 'B'], false);
+		};
+		if($gameSwitches.value(1072) && !$gameSwitches.value(1172)){
+		  $gameSelfSwitches.setValue([$gameMap.mapId(), this._eventId, 'B'], false);
+		};
+		if($gameSwitches.value(1073) && !$gameSwitches.value(1173)){
+		  $gameSelfSwitches.setValue([$gameMap.mapId(), this._eventId, 'B'], false);
+		};
+		if($gameSwitches.value(1074) && !$gameSwitches.value(1174)){
+		  $gameSelfSwitches.setValue([$gameMap.mapId(), this._eventId, 'B'], false);
+		};
+		}).call(interp);
+	};
+
+	// Replaces (1x): Map041.json:event:7|EV007|page:1
+	value6 = function () {
+		var value1 = 571;
+		if($gameSwitches.value(1171)){var value1 = 572};
+		if($gameSwitches.value(1172)){var value1 = 573};
+		if($gameSwitches.value(1173)){var value1 = 574};
+		if($gameSwitches.value(1174)){var value1 = 1000};
+		valueCountSet1 = value1;
+	};
+
+	// Replaces (1x): Map068.json:event:3|EV003|page:1
+	setScreenDTextPicture10 = function () {
+		var value1 = `\\V[801]\n\\V[802]\n\\V[803]\n\\V[804]\n\\V[805]`;
+		$gameScreen.setDTextPicture(value1, 28);
+		$gameScreen.dWindowFrame = 'ON';
+		$gameScreen.dTextAlign = 1;
+		var value1 = 100;
+		var value2 = '';
+		$gameScreen.showPicture(value1,value2,0,100+50,100,100,100,0,0);
+		$gameScreen.movePicture(value1,0,100,100,100,100,255,0,60);
+	};
+
+	// Replaces (1x): Map068.json:event:3|EV003|page:1
+	readVariable75_6 = function () {
+		var start = $gameVariables.value(75);
+		var end = $gameVariables.value(76);
+		for(var j = start; j <= end; j++){
+		  var actor = $gameActors.actor(j);
+		  var equips = actor.equips();
+		  for (var i = 0; i < equips.length; i++) {
+		    if(equips[i]){
+		      actor.changeEquipById(i+1, 0);
+		    };
+		  };
+		};
+	};
+
+	// Replaces (1x): Map081.json:event:4|EV004|page:1
+	setVariable21_13 = function () {
+		var variable52Value = $gameVariables.value(52)[478];
+		$gameVariables.setValue(21,
+		`\\sim[478]を10体討伐せよ
+		現在討伐数：${variable52Value}体`
+		);
+	};
+
+	// Replaces (1x): Map100.json:event:11|EV011|page:1
+	readVariable21_2 = function () {
+		var variable21Value = $gameVariables.value(21);
+		for (var i = 1; i <= 10; i++) {
+		$dataMap.events[i].name = `${$dataClasses[i+variable21Value-10].name}→${$dataClasses[i+variable21Value].name}`;
+		};
+	};
+
+	// Replaces (1x): Map100.json:event:11|EV011|page:1
+	setSelfSwitch10 = function () {
+		for (var i = 1; i <= 10; i++) {
+		$gameSelfSwitches.setValue([$gameMap.mapId(), i, "B"], true);
+		};
+	};
+
+	// Replaces (1x): Map100.json:event:11|EV011|page:1
+	iterateItems3_2 = function () {
+		for (var i = 1; i <= $dataItems.length-1; i++) {
+		if($dataItems[i].meta['クラス3ジョブ解放素材']){
+		var value5 = i;
+		break;
+		}};
+		var value1 = `ジョブ解放条件
+		100000\\G消費（${$gameParty.gold()}\\G所持）
+		\\iin[${value5}] 1個消費（${$gameParty.numItems($dataItems[value5])}個所持）
+		パーティメンバーの誰か一人が、そのジョブの下位クラスLv30以上。`;
+		WindowManager.show(0, 250, 568, 1030, 200);
+		WindowManager.drawText(0, value1);
+	};
+
+	// Replaces (1x): Map100.json:event:11|EV011|page:1
+	iterateItems2_3 = function () {
+		for (var i = 1; i <= $dataItems.length-1; i++) {
+		if($dataItems[i].meta['クラス2ジョブ解放素材']){
+		var value5 = i;
+		break;
+		}};
+		var value1 = `ジョブ解放条件
+		10000\\G消費（${$gameParty.gold()}\\G所持）
+		\\iin[${value5}] 1個消費（${$gameParty.numItems($dataItems[value5])}個所持）
+		パーティメンバーの誰か一人が、そのジョブの下位クラスLv20以上。`;
+		WindowManager.show(0, 250, 568, 1030, 200);
+		WindowManager.drawText(0, value1);
+	};
+
+	// Replaces (1x): Map100.json:event:11|EV011|page:1
+	characterList3 = function (interp) {
+		return (function () {
+		for (var i = 1; i <= 10; i++) {
+		this.character(i).forceMoveRoute({
+		"list":[
+		{ "code": 45, "parameters": ["this.setTone(-150, -150, -150);"] },
+		{"code":0}],"repeat":false,"skippable":true});
+		};
+		}).call(interp);
+	};
+
+	// Replaces (1x): Map100.json:event:11|EV011|page:1
+	reservePlayerTransfer2 = function (interp) {
+		return (function () {
+		var variable19Value = this.character($gameVariables.value(19)).x;
+		var value2 = this.character($gameVariables.value(19)).y-1;
+		$gamePlayer.reserveTransfer($gameMap.mapId(), variable19Value, value2 , 0);
+		$gamePlayer.performTransfer();
+		}).call(interp);
+	};
+
+	// Replaces (1x): Map100.json:event:11|EV011|page:1
+	readVariable19_10 = function (interp) {
+		return (function () {
+		var variable19Value = $gameVariables.value(19);
+		var value2 = 240;
+		var variable21Value = $gameVariables.value(21);
+		$gameParty.unlockClass(variable19Value + variable21Value);
+		this.character(variable19Value).requestAnimation(value2);
+		}).call(interp);
+	};
+
+	// Replaces (1x): Map100.json:event:11|EV011|page:1
+	setSelfVariable22List = function (interp) {
+		return (function () {
+		var variable19Value = $gameVariables.value(19);
+		this.character(variable19Value).forceMoveRoute({
+		"list":[
+		{ "code": 45, "parameters": ["this.setTone(0, 0, 0);"] },
+		{"code":0}],"repeat":false,"skippable":true});
+		this.sVal(22,`${$dataClasses[variable19Value + $gameVariables.value(21)].name}`);
+		}).call(interp);
+	};
+
+	// Replaces (1x): Map100.json:event:11|EV011|page:1
+	readVariable19List = function (interp) {
+		return (function () {
+		var variable19Value = $gameVariables.value(19);
+		this.character(variable19Value).forceMoveRoute({
+		"list":[
+		{"code":37},
+		{ "code": 45, "parameters": ["this.jumpEx(0,20,14,0);"] },
+		{"code":0}],"repeat":false,"skippable":true});
+		}).call(interp);
+	};
+
+	// Replaces (1x): Map144.json:event:12|EV012|page:1
+	setSwitch161_6 = function () {
+		var value1 = 10;
+		if($gameParty.numItems($dataItems[154]) >= value1){$gameSwitches.setValue(161,true)};
+		if($gameParty.numItems($dataItems[155]) >= value1){$gameSwitches.setValue(162,true)};
+		if($gameParty.numItems($dataItems[156]) >= value1){$gameSwitches.setValue(163,true)};
+		if($gameParty.numItems($dataItems[157]) >= value1){$gameSwitches.setValue(164,true)};
+		if($gameParty.numItems($dataItems[158]) >= value1){$gameSwitches.setValue(165,true)};
+		if($gameParty.numItems($dataItems[159]) >= value1){$gameSwitches.setValue(166,true)};
+	};
+
+	// Replaces (1x): Map196.json:event:3|EV207宿屋処理|page:1
+	setVariable23_2 = function () {
+		$gameActors.actor(20).setName(`宿受付`);
+		$gameVariables.value(400)[59] = `${$dataWeapons[431].name}`;
+		valueCountSet1 = 1233;
+		valueCountSet2 = 1234;
+		$gameVariables.setValue(23,
+		`「いらっしゃいませ。
+		当ホテルにお越しくださり、誠に有難う御座います。
+		最高級の設備をご用意しておりますので、
+		ご堪能頂ければ幸いです」
+		`);
+		$gameVariables.setValue(22,'$FACE[Vxa_People2, 0]');
+	};
+
+	// Replaces (1x): Map200.json:event:11|EV011|page:1
+	setSelfVariable172_7 = function (interp) {
+		return (function () {
+		this.sVal(172,19);//中央に一言メッセージ,何行でも良し
+		var value1 = `\v[23]`;
+		valueTalkSet = [1,28,value1,100];//0で消去 1で通常 2で時間経過  255で背景透明度
+		this.setupChild($dataCommonEvents[60].list, 0);
+		}).call(interp);
+	};
+
+
 })();
