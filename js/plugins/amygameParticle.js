@@ -709,7 +709,8 @@ if(effectTypeId == 9){//仲間加入
   if($dataActors[$gameVariables.value(20)] && $dataActors[$gameVariables.value(20)].meta['NpcChara']){
     $gameScreen._particle.particleUpdate([effectName1,'color','#e59fff','#6d80ff']);
   };
-  var effectName1 = `\\V[53]\\V[49]がパーティに加わった！`;
+  const actorName = `\\V[53]\\V[49]`;
+  var effectName1 = `${actorName}がパーティに加わった！`;
   var colorValue2 = 28;
   $gameScreen.setDTextPicture(effectName1, colorValue2);
   var effectName1 = 100;
@@ -855,9 +856,18 @@ if(effectTypeId == 14 || effectTypeId == 15 || effectTypeId == 16){//アイテ�
     if(hModeLevel == 1){
       $gameScreen._particle.particleUpdate([effectName1,'color','#8fceff','#ffffff']);//通常
     };
-    if(effectTypeId == 14){var effectName1 = `\\C[16]称号\\C[0]＜\\C[2]\x1bIIN[${dbEntryId}]\\C[0]＞獲得！`};
-    if(effectTypeId == 15){var effectName1 = `\\C[16]${$dataSystem.skillTypes[valueItems[dbEntryId].stypeId]}\\C[0]＜\\C[2]\x1bSIN[${dbEntryId}]\\C[0]＞獲得！`};
-    if(effectTypeId == 16){var effectName1 = `\\C[16]${$dataSystem.skillTypes[valueItems[dbEntryId].stypeId]}\\C[0]＜\\C[2]\x1bSIN[${dbEntryId}]\\C[0]＞忘却…`};
+    const itemName = colorTaggedText(2, `\x1bIIN[${dbEntryId}]`);
+    if(effectTypeId == 14){
+      var titlePrefix = colorTaggedText(16, `称号`);
+      var effectName1 = `${titlePrefix}＜${itemName}＞獲得！`;
+    };
+    var titlePrefix = colorTaggedText(16, $dataSystem.skillTypes[valueItems[dbEntryId].stypeId]);
+    if (effectTypeId == 15) {
+      var effectName1 = `${titlePrefix}＜${itemName}＞獲得！`;
+    };
+    if (effectTypeId == 16) {
+      var effectName1 = `${titlePrefix}＜${itemName}＞忘却…`;
+    };
   var colorValue2 = 28;
   $gameScreen.setDTextPicture(effectName1, colorValue2);
   var effectName1 = 60;
@@ -1307,7 +1317,10 @@ hSkill_rankUpWordDirect = function(messageTypeId,actorIdOrMessageText,skillId,ma
 if(messageTypeId == 1){
   var actor = $gameActors.actor(actorIdOrMessageText);
   if(!$gameSwitches.value(29)){actor.setSkillMasteryLevel(skillId, masteryLevel)};
-  valueWordSet0 = `\\C[26]${actor.name()}\\C[0]の\\C[27]<\\sin[${skillId}]>\\C[0]ランクが\\C[10]${masteryLevel}\\C[0]になった…。`;
+  const actorName = colorTaggedText(26, actor.name());
+  const skillName = colorTaggedText(27, `<\\sin[${skillId}]>`);
+  const skillLevel = colorTaggedText(10, `${masteryLevel}`);
+  valueWordSet0 = `${actorName}の${skillName}ランクが${skillLevel}になった…。`;
   adv_partDirectPlay(19);
 };
 if(messageTypeId == 2){
@@ -1350,15 +1363,18 @@ if(databaseTypeId == 4){
 } else {
   if(!databaseEntries[databaseEntryId]) return;
   if(databaseEntries[databaseEntryId].meta['EICSwitch']){
-    if(Number(databaseEntries[databaseEntryId].meta['EICSwitch']) == 104){
-      var gameSwitchValue1 = `\\C[17]称号:\\C[0]`　+ gameSwitchValue1;
+    if (Number(databaseEntries[databaseEntryId].meta['EICSwitch']) == 104) {
+      const prefix = colorTaggedText(17, `称号`);
+      var gameSwitchValue1 = prefix + `:`　+ gameSwitchValue1;
     };
-    if(Number(databaseEntries[databaseEntryId].meta['EICSwitch']) == 105){
-      var gameSwitchValue1 = `\\C[27]Ｈ称号:\\C[0]`　+ gameSwitchValue1;
+    if (Number(databaseEntries[databaseEntryId].meta['EICSwitch']) == 105) {
+      const prefix = colorTaggedText(27, `Ｈ称号`);
+      var gameSwitchValue1 = prefix + `:`　+ gameSwitchValue1;
       var seParams = ['ZH_Sexy',50,150];
     };
     if(Number(databaseEntries[databaseEntryId].meta['EICSwitch']) == 108){
-      var gameSwitchValue1 = `\\C[20]クエスト:\\C[0]`　+ gameSwitchValue1;
+      const questPrefix = colorTaggedText(20, `クエスト`);
+      var gameSwitchValue1 = questPrefix + `:`　+ gameSwitchValue1;
     };
   };
   if(databaseTypeId == 3){
@@ -1370,9 +1386,9 @@ if(databaseTypeId == 4){
   };
   if(databaseTypeId == 5){
     if(databaseEntries[databaseEntryId].meta['Subclass Only']){
-      var gameVarValue4 = `\\C[17]サブジョブ \\C[0]`;
+      var gameVarValue4 = colorTaggedText(17, `サブジョブ`) + ` `;
     } else {
-      var gameVarValue4 = `\\C[20]メインジョブ \\C[0]`;
+      var gameVarValue4 = colorTaggedText(20, `メインジョブ`) + ` `;
     };
     if(databaseEntries[databaseEntryId].meta['classRank']){
       if(Number(databaseEntries[databaseEntryId].meta['classRank']) == 1){gameVarValue4 += `Class\\C[10]Ⅰ\\C[0]`};
@@ -1418,7 +1434,8 @@ TickerManager.show(gameSwitchValue3);
 if($gameSwitches.value(124)){
   if([0,1,2,3].some(function(id){return databaseTypeId == id})){
     var descriptionLines = databaseEntries[databaseEntryId].description.split("\n");
-    if(descriptionLines[0] == 0){}else{TickerManager.show(`　　　解説文:${descriptionLines[0]}`)};
+    const explanatoryTextPrefix = `解説文`;
+    if(descriptionLines[0] == 0){}else{TickerManager.show(`　　　`+`${explanatoryTextPrefix}:${descriptionLines[0]}`)};
     if(descriptionLines[1] == 0){}else{TickerManager.show(`　　　${descriptionLines[1]}`)};
   };
 };

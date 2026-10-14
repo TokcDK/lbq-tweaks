@@ -3451,17 +3451,19 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		var textPart6 = `Ｈエネミーはそのマップで敗北Ｈを経験する事で出現する。\nＨエネミーに敗北すると汎用全滅シーンが発生する。`;
 		var textPart7 = `「称号」は、条件を満たした後、「一日の始まり」か「ギルド受付」と\n話した直後に付与される。`;
 		$gameVariables.setValue(250,
-		[	`${colorCode2}[1]${colorResetCode}${messageText2}`,
-			`${colorCode2}[2]${colorResetCode}${textPart2}`,
-			`${colorCode2}[3]${colorResetCode}${textPart3}`,
-			`${colorCode2}[4]${colorResetCode}${textPart4}`,
-			`${colorCode2}[5]${colorResetCode}${textPart5}`,
-			`${colorCode2}[6]${colorResetCode}${textPart6}`,
-			`${colorCode2}[7]${colorResetCode}${textPart7}`,
-			`${colorCode2}[8]${colorResetCode}`,
-			`${colorCode2}[9]${colorResetCode}`,
-			`${colorCode2}[10]${colorResetCode}`
-		]);
+			[	
+				colorTaggetText(2, `[1]`) + `${messageText2}`,
+				colorTaggetText(2, `[2]`) + `${textPart2}`,
+				colorTaggetText(2, `[3]`) + `${textPart3}`,
+				colorTaggetText(2, `[4]`) + `${textPart4}`,
+				colorTaggetText(2, `[5]`) + `${textPart5}`,
+				colorTaggetText(2, `[6]`) + `${textPart6}`,
+				colorTaggetText(7, `[1]`) + `${textPart7}`,
+				colorTaggetText(2, `[8]`),
+				colorTaggetText(2, `[9]`),
+				colorTaggetText(2, `[10]`)
+			]
+		);
 	};
 
 	// Replaces (14x): data/CommonEvents.json:common-event:1, data/CommonEvents.json:common-event:21, data/CommonEvents.json:common-event:22, data/CommonEvents.json:common-event:47, data/CommonEvents.json:common-event:66, data/CommonEvents.json:common-event:167, …
