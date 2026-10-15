@@ -16956,7 +16956,8 @@
 		if (Number(variable240Value[3]) == 1) { var valueItems = $dataWeapons };
 		if (Number(variable240Value[3]) == 2) { var valueItems = $dataArmors };
 		$gameParty.gainItem(valueItems[Number(variable240Value[4])], 1);
-		var messageText = `\\C[24]\x1bI[${valueItems[Number(variable240Value[4])].iconIndex}]${valueItems[Number(variable240Value[4])].name}\\C[0]を入手した！`;
+		const itemName = colorTaggedText(24, `\x1bI[${valueItems[Number(variable240Value[4])].iconIndex}]${valueItems[Number(variable240Value[4])].name`);
+		var messageText = `${itemName}を入手した！`;
 		var value2 = 28;
 		$gameScreen.setDTextPicture(messageText, value2);
 		$gameSwitches.setValue(439, true);
@@ -16973,7 +16974,7 @@
 					if (array[0] == arr3[0] && array[1] == arr3[1] && array[2] == arr3[2]) {
 						$gameVariables.value(211)[$gameVariables.value(240)][i] = 1;
 						$gameSelfSwitches.setValue([$gameMap.mapId(), this._eventId, 'A'], true);
-						var value4 = `ワープポイント[${i}]がアクティベートされました。`;
+						//var value4 = `ワープポイント[${i}]がアクティベートされました。`;
 						$gameScreen.setDTextPicture(messageText, 28); $gameSwitches.setValue(380, true);
 						break;
 					}
@@ -16990,10 +16991,10 @@
 					$gameVariables.value(327)[i] = 1;
 				}
 			};
-			var variable230Value = $dataWeapons[$gameVariables.value(230)].name;
+			var weaponName = $dataWeapons[$gameVariables.value(230)].name;
 			$gameVariables.value(327)[$gameVariables.value(230)] = 2;
 			$gameSelfSwitches.setValue([$gameMap.mapId(), this._eventId, 'A'], true);
-			var messageText = `<${variable230Value}>拠点がアクティベートされました。`;
+			var messageText = `<${weaponName}>拠点がアクティベートされました。`;
 			$gameScreen.setDTextPicture(messageText, 28);
 			$gameSwitches.setValue(380, true);
 		}).call(interp);
