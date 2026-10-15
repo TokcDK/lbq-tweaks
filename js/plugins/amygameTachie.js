@@ -253,7 +253,9 @@ tachie_dousa = function (actionType, actorParameter, expressionCode, targetPicId
 function checkDollStateTachieDousa(actionType, dollStateId) {
   // Check if the actor is in a doll state for certain action types (1,3,4,5)
   let flag = 0;
-  if (actionItemIdsTachieDousa.some(function (actionItem) { return actionType === actionItem; })) {
+  // PERF: indexOf instead of .some(closure) — this is called on every
+  // tachie_dousa() (the 4th most-referenced function in the project).
+  if (actionItemIdsTachieDousa.indexOf(actionType) >= 0) {
     const actor = $gameActors.actor($gameVariables.value(20));
     if (actor && actor.isStateAffected(dollStateId)) {
       flag = 1;
@@ -394,20 +396,22 @@ function calculateScaleAndPositionTachieDousa(actorParameter, targetPicId, expre
     const { scale, y } = scaleConfigGeneral2TachieDousaMap[isScaled];
     picScaleY = picScaleX = scale;
     picY = y;
-    
-    if (String(actorParameter).match(/SS/)) {
+
+    // PERF: String(actorParameter) was rebuilt for each of the four tests below.
+    const actorParameterText = String(actorParameter);
+    if (actorParameterText.match(/SS/)) {
       const { scale, y } = scaleConfigSSTachieDousaMap[isScaled];
       picScaleY = picScaleX = scale;
       picY = y;
     }
-    if (String(actorParameter).match(/Upper/)) {
+    if (actorParameterText.match(/Upper/)) {
       picY = 384;
     }
-    if (String(actorParameter).match(/Scale/)) {
+    if (actorParameterText.match(/Scale/)) {
       picScaleX = 100;
       picY = 384;
     }
-    if (String(actorParameter).match(/State/)) {
+    if (actorParameterText.match(/State/)) {
       picScaleY = picScaleX = 100;
       picY = 384;
     }

@@ -449,7 +449,12 @@
   };
 
   Sprite_Actor.prototype.removeMaxFrame = function () {
-    delete this._maxPattern;
+    // PERF: `delete` would move this sprite onto V8's slow dictionary-mode path,
+    // and Sprite_Actor instances are long-lived (one per actor for the whole
+    // session). `undefined` is indistinguishable from the deleted state here:
+    // updateMotionCount tests `this._maxPattern !== undefined` and
+    // updatePattern/refreshMotion test it for truthiness.
+    this._maxPattern = undefined;
   };
 
   Sprite_Actor.prototype.setFrame = function (motion, num) {

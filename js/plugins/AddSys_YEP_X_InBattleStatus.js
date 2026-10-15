@@ -127,6 +127,12 @@
 	}
 	
 	Window_InBattleStateList.prototype.updateLeftRight = function() {
+		// PERF: this runs every frame. $gameParty.battleMembers() allocates a fresh
+		// array (and $gameTroop.appearingMember() a fresh unit list) on every call.
+		// Nothing below can change the selection unless a direction key repeated, so
+		// bail out before building the member list. The battle list is drawn in
+		// battleMembers() order, which is exactly the order the arrow keys walk.
+		if (!Input.isRepeated('left') && !Input.isRepeated('right')) return;
 		const isEnemy = this._parentWindow.isEnemySide
 		const member = isEnemy ? $gameTroop.appearingMember() : $gameParty.battleMembers();
 		var index = member.indexOf(this._battler);
