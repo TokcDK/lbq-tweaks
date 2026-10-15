@@ -19,17 +19,20 @@ itemGet_afterProcess = function(){
   actors_unlockedClassHit();
 
   valueQuestArrayEX = Array(201).fill(0);
-  const itemsLen = $dataItems.length;
+  // PERF: hoist the globals out of the hot loops below.
+  const dataItems = $dataItems;
+  const party = $gameParty;
+  const itemsLen = dataItems.length;
 
   for (let i = 1; i < itemsLen; i++) {
-    const item = $dataItems[i];
+    const item = dataItems[i];
 
     if (item.name === '') continue;
 
     const itemEICSwitch = item.meta['EICSwitch'];
     if (!itemEICSwitch || Number(itemEICSwitch) !== 108) continue;
-    
-    if (!$gameParty.hasItem(item)) continue;
+
+    if (!party.hasItem(item)) continue;
 
     const j = (i <= 900) ? i - 800 : i - 900;
 
@@ -39,21 +42,23 @@ itemGet_afterProcess = function(){
   }
 
   if ($gameVariables.value(203) >= 2) {
-    if ($gameParty.hasItem($dataItems[52])) {
+    if (party.hasItem(dataItems[52])) {
       $gameVariables.setValue(203, 2);
     } else {
       $gameVariables.setValue(203, 1);
     };
   };
-  
+
   var medalTotalPts = 0;
   var list = valueCasinoMedalItem;
   list.forEach(function (id) {
-    if ($gameParty.hasItem($dataItems[id])) {
-      medalTotalPts += Number($dataItems[id].meta['MedalRate']) * $gameParty.numItems($dataItems[id]);
-      $gameParty.gainItem($dataItems[id], -9999);
+    // PERF: look the item up once instead of four times.
+    var item = dataItems[id];
+    if (party.hasItem(item)) {
+      medalTotalPts += Number(item.meta['MedalRate']) * party.numItems(item);
+      party.gainItem(item, -9999);
     };
-  }, this);
+  });
   if (medalTotalPts >= 1) {
     $gameVariables.setValue(69, $gameVariables.value(69) + medalTotalPts);
   };

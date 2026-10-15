@@ -669,7 +669,10 @@ function CommonPopupManager() {
                     if (CommonPopupManager._tempCommonSprites[i].terminate){
                         var sprite = CommonPopupManager._tempCommonSprites[i].sprite;
                         this._popupContainer.removeChild(sprite);
-                        delete CommonPopupManager._tempCommonSprites[i]
+                        // PERF: null instead of delete — delete converts the live array to V8
+                        // dictionary mode; setNullPos() treats null and undefined
+                        // identically as free slots, so reuse is unaffected.
+                        CommonPopupManager._tempCommonSprites[i] = null
                     }else if (!CommonPopupManager._tempCommonSprites[i].sprite){
                         var sprite = new Sprite_Popup(i);
                         this._popupContainer.addChild(sprite);
@@ -710,7 +713,8 @@ function CommonPopupManager() {
             if (CommonPopupManager._tempCommonSprites[i]){
                 var sprite = CommonPopupManager._tempCommonSprites[i].sprite;
                 if (sprite) sprite.terminate();
-                delete CommonPopupManager._tempCommonSprites[i];
+                // PERF: same delete-to-null fix as Spriteset_Base.update above.
+                CommonPopupManager._tempCommonSprites[i] = null;
             }
         }
         CommonPopupManager._setedPopupss = [];

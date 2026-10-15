@@ -70,8 +70,10 @@
     this._goldWindow.y = this.y > 0 ? 0 : Graphics.boxHeight - this._goldWindow.height;    
     
     // Use early returns for better performance
-    if ($gameVariables.value(313) >= 1) {
-      this.x = $gameVariables.value(313);
+    // PERF: read variable 313 once instead of twice.
+    const messageX = $gameVariables.value(313);
+    if (messageX >= 1) {
+      this.x = messageX;
       return;
     }
     else {
@@ -283,13 +285,16 @@
   };
 
   Game_Map.prototype.updateEvents = function () {
-    const events = this.events();
+    // PERF: iterate the internal sparse array directly. Game_Map#events()
+    // allocates a fresh filtered array on every call, and updateEvents runs
+    // once per frame; the inline null check yields the same events in the
+    // same order with zero per-frame allocation.
+    const events = this._events;
     const len = events.length;
-    // Use direct indexing instead of forEach for better performance
     for (let i = 0; i < len; i++) {
       const event = events[i];
       // Only update events that are near the player
-      if (event.isNearThePlayer()) {
+      if (event && event.isNearThePlayer()) {
         event.update();
       }
     }

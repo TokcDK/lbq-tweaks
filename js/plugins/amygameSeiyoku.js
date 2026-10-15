@@ -2453,12 +2453,18 @@ actor_battleSekughara1 = function () {
 sex_direction = function (actionType, pistonIntensity, patternVariant) {
 
   let voicePatternNum = 0;
-  if ($gameVariables.value(530) >= 1) {
-    $gameVariables.setValue(20, $gameVariables.value(530));
-    if ($dataActors[$gameVariables.value(20)] && $dataActors[$gameVariables.value(20)].meta['HvoicePattern']) {
-      voicePatternNum = Number($dataActors[$gameVariables.value(20)].meta['HvoicePattern']);
+  // PERF: variable 530 was read four times and variable 20 four times, and
+  // $dataActors / $gameActors were looked up twice each; hoist them into
+  // locals. setValue(20, ...) stores the raw value, so value(20) === actorId.
+  const actorId = $gameVariables.value(530);
+  if (actorId >= 1) {
+    $gameVariables.setValue(20, actorId);
+    const actorData = $dataActors[actorId];
+    if (actorData && actorData.meta['HvoicePattern']) {
+      voicePatternNum = Number(actorData.meta['HvoicePattern']);
       if (pistonIntensity == 0) {
-        if ($gameActors.actor($gameVariables.value(530)).isLearnedSkill(65)) {
+        const actor = $gameActors.actor(actorId);
+        if (actor && actor.isLearnedSkill(65)) {
           pistonIntensity = 2;
         } else {
           pistonIntensity = 1;

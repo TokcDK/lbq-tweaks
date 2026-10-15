@@ -626,6 +626,11 @@ map_regionSet = function () {
 };
 
 //ADVパート演出
+// PERF: the clear-list was rebuilt as an array literal on every call; it is
+// read-only, so it is hoisted to module scope.
+const advPartDirectClearNames = ['gloom_sp', 'glitter_sp', 'hearts_sp', 'questions_sp', 'feather_sp', 'ether_sp', 'lines_sp', 'direct_screenRing',
+  'direct_screenDiffusion1', 'text_dispray1', 'direct_screenRing', 'direct_screenDiffusion2', 'direct_screenDiffusion3',
+  'direct_screenSquare'];
 adv_partDirectPlay = function (effectTypeId) {
 
   if (effectTypeId == 0) {
@@ -633,9 +638,7 @@ adv_partDirectPlay = function (effectTypeId) {
       $gameScreen.startTint($gameScreen._tone_temp, 10);
       $gameScreen._tone_temp = 0;
     };
-    var effectNameCandidates = ['gloom_sp', 'glitter_sp', 'hearts_sp', 'questions_sp', 'feather_sp', 'ether_sp', 'lines_sp', 'direct_screenRing',
-      'direct_screenDiffusion1', 'text_dispray1', 'direct_screenRing', 'direct_screenDiffusion2', 'direct_screenDiffusion3',
-      'direct_screenSquare'];
+    var effectNameCandidates = advPartDirectClearNames;
     for (var i = 0; i <= effectNameCandidates.length - 1; i++) {
       $gameScreen._particle.particleClear(effectNameCandidates[i]);
     };

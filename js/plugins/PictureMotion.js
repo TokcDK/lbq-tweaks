@@ -260,7 +260,9 @@
 				tmax = 1;
 			}
 			else if(c == 0){
-				tmax = 1 / b * Math.log(Math.abs(a * sin(d)) / delta);
+				// BUGFIX: bare `sin` was never defined — a ReferenceError on this
+				// branch. The neighbouring lines all use Math.* functions.
+				tmax = 1 / b * Math.log(Math.abs(a * Math.sin(d)) / delta);
 			}
 			else{
 				var nmax = Math.ceil(1 / Math.PI * (c / b * Math.log(Math.abs(a) / delta) + d));

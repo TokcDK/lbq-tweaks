@@ -9,11 +9,16 @@
 //picture_motion1("smooth",[0]);
 picture_motion1 = function(motionType,motionParams){
 
-curveFunctions.patternX = curveFunctions.getPattern(motionType, motionParams);
-curveFunctions.patternY = curveFunctions.getPattern(motionType, motionParams);
-curveFunctions.patternScaleX = curveFunctions.getPattern(motionType, motionParams);
-curveFunctions.patternScaleY = curveFunctions.getPattern(motionType, motionParams);
-curveFunctions.patternOpacity = curveFunctions.getPattern(motionType, motionParams);
+// PERF: the five slots used to call getPattern() five times with identical
+// arguments. Every curve function in PictureMotion.js returns a pure closure
+// over its creation-time constants (no shared state), so one lookup assigned
+// to all five slots behaves exactly the same way.
+var pattern = curveFunctions.getPattern(motionType, motionParams);
+curveFunctions.patternX = pattern;
+curveFunctions.patternY = pattern;
+curveFunctions.patternScaleX = pattern;
+curveFunctions.patternScaleY = pattern;
+curveFunctions.patternOpacity = pattern;
 
 }
 
@@ -238,32 +243,36 @@ if($gameScreen.picture(pictureId)){
 //元位置記してピクチャムーブ。pic_move1(88,-300,0,100,100,0,90);//0id,1x,2y,3拡x,4拡y,5opa,6wait
 pic_move1 = function(pictureId,x,y,scaleX,scaleY,opacity,waitFrames){
 
-if($gameScreen.picture(pictureId)){
+// PERF: hoist the single picture lookup. Game_Screen#picture() is a function
+// call plus a $gameParty.inBattle() check and an index; the old body repeated
+// it nine times.
+var picture = $gameScreen.picture(pictureId);
+if(picture){
   if(opacity == 0){
-    if($gameScreen.picture(pictureId)._breathActive){
+    if(picture._breathActive){
       UTSU.PictureBreath.off([pictureId]);
     }
-    if($gameScreen.picture(pictureId)._breathActive2){
+    if(picture._breathActive2){
       UTSU.PictureBreath2.off([pictureId]);
     }
-    if($gameScreen.picture(pictureId)._breathActive3){
+    if(picture._breathActive3){
       UTSU.PictureBreath3.off([pictureId]);
     }
-    if($gameScreen.picture(pictureId)._breathActive4){
+    if(picture._breathActive4){
       UTSU.PictureBreath4.off([pictureId]);
     }
-    if($gameScreen.picture(pictureId)._breathActive5){
+    if(picture._breathActive5){
       UTSU.PictureBreath5.off([pictureId]);
     }
-    if($gameScreen.picture(pictureId)._breathActive6){
+    if(picture._breathActive6){
       UTSU.PictureBreath6.off([pictureId]);
     }
   }
-  var targetX = $gameScreen.picture(pictureId).x() + x;
-  var targetY = $gameScreen.picture(pictureId).y() + y;
+  var targetX = picture.x() + x;
+  var targetY = picture.y() + y;
   //var scaleMultiplier = id4;//$gameScreen.picture(id1).scaleX() + id4;
   //var scaleMultiplier2 = id5;//$gameScreen.picture(id1).scaleY() + id5;
-  var pictureOrigin = $gameScreen.picture(pictureId).origin();
+  var pictureOrigin = picture.origin();
   $gameScreen.movePicture(pictureId,pictureOrigin,targetX,targetY,scaleX,scaleY,opacity,0,waitFrames);
 }
 
@@ -324,34 +333,36 @@ if($gameScreen.picture(animPicId)){
 //ピクチャフェードインアウト
 picture_fade1 = function(fadePicId,fadeType,fadeGlowA,fadeWait,fadeGlowB){
 
-if($gameScreen.picture(fadePicId)){
+// PERF: hoist the single picture lookup instead of repeating it nine times.
+var picture = $gameScreen.picture(fadePicId);
+if(picture){
   if(!$gameSwitches.value(651)){
-    $gameScreen.picture(fadePicId)._GWInfo = $gameScreen.createGWInfo([fadeType,fadeGlowA,fadeWait,fadeGlowB]);
+    picture._GWInfo = $gameScreen.createGWInfo([fadeType,fadeGlowA,fadeWait,fadeGlowB]);
   }
   if(fadeType === "fadeOut"){
-    if($gameScreen.picture(fadePicId)._breathActive){
+    if(picture._breathActive){
       UTSU.PictureBreath.off([fadePicId]);
     }
-    if($gameScreen.picture(fadePicId)._breathActive2){
+    if(picture._breathActive2){
       UTSU.PictureBreath2.off([fadePicId]);
     }
-    if($gameScreen.picture(fadePicId)._breathActive3){
+    if(picture._breathActive3){
       UTSU.PictureBreath3.off([fadePicId]);
     }
-    if($gameScreen.picture(fadePicId)._breathActive4){
+    if(picture._breathActive4){
       UTSU.PictureBreath4.off([fadePicId]);
     }
-    if($gameScreen.picture(fadePicId)._breathActive5){
+    if(picture._breathActive5){
       UTSU.PictureBreath5.off([fadePicId]);
     }
-    if($gameScreen.picture(fadePicId)._breathActive6){
+    if(picture._breathActive6){
       UTSU.PictureBreath6.off([fadePicId]);
     }
-    var fadeX = $gameScreen.picture(fadePicId).x();
-    var fadeGlowA = $gameScreen.picture(fadePicId).y();
-    var fadeScaleX = $gameScreen.picture(fadePicId).scaleX();
-    var fadeGlowB = $gameScreen.picture(fadePicId).scaleY();
-    var fadeType = $gameScreen.picture(fadePicId).origin();
+    var fadeX = picture.x();
+    var fadeGlowA = picture.y();
+    var fadeScaleX = picture.scaleX();
+    var fadeGlowB = picture.scaleY();
+    var fadeType = picture.origin();
     $gameScreen.movePicture(fadePicId,fadeType,fadeX,fadeGlowA,fadeScaleX,fadeGlowB,0,0,fadeWait);
   }
 }
@@ -362,55 +373,57 @@ if($gameScreen.picture(fadePicId)){
 pic_eraseP = function(eraseStyleId,pictureIds){
 
 picture_motion1("smooth",[0]);
+// BUGFIX: eraseWait/offsetX/offsetY stayed undefined for any eraseStyleId
+// outside 1/2, producing NaN target positions in the movePicture below.
+// Default them so out-of-range styles erase instantly like style 0.
+var eraseWait = 0;
+var offsetX = 0;
+var offsetY = 0;
 if(eraseStyleId == 1){
-  var eraseWait = getRandomIndex(21) + 40;
+  eraseWait = getRandomIndex(21) + 40;
   var randomDirectionIndex = getRandomIndex(4);
-  var offsetX = 0;
-  var offsetY = 0;
-  if(randomDirectionIndex == 0){var offsetX = 50}
-  if(randomDirectionIndex == 1){var offsetY = 50}
-  if(randomDirectionIndex == 2){var offsetX = -50}
-  if(randomDirectionIndex == 3){var offsetY = -50}
+  if(randomDirectionIndex == 0){offsetX = 50}
+  if(randomDirectionIndex == 1){offsetY = 50}
+  if(randomDirectionIndex == 2){offsetX = -50}
+  if(randomDirectionIndex == 3){offsetY = -50}
 }
 if(eraseStyleId == 2){
-  var eraseWait = 60;
-  var offsetX = 0;
-  var offsetY = 0;
+  eraseWait = 60;
 }
 var list = pictureIds;
 list.forEach(function(pictureId) {
-  if($gameScreen.picture(pictureId)){
-    if($gameScreen.picture(pictureId)._breathActive){
+  // PERF: hoist the single picture lookup instead of repeating it eight times.
+  var picture = $gameScreen.picture(pictureId);
+  if(picture){
+    if(picture._breathActive){
       UTSU.PictureBreath.off([pictureId]);
     }
-    if($gameScreen.picture(pictureId)._breathActive2){
+    if(picture._breathActive2){
       UTSU.PictureBreath2.off([pictureId]);
     }
-    if($gameScreen.picture(pictureId)._breathActive3){
+    if(picture._breathActive3){
       UTSU.PictureBreath3.off([pictureId]);
     }
-    if($gameScreen.picture(pictureId)._breathActive4){
+    if(picture._breathActive4){
       UTSU.PictureBreath4.off([pictureId]);
     }
-    if($gameScreen.picture(pictureId)._breathActive5){
+    if(picture._breathActive5){
       UTSU.PictureBreath5.off([pictureId]);
     }
-    if($gameScreen.picture(pictureId)._breathActive6){
+    if(picture._breathActive6){
       UTSU.PictureBreath6.off([pictureId]);
     }
-    if($gameScreen.picture(pictureId).isParallaxBase()){
+    if(picture.isParallaxBase()){
       $gameScreen.eraseParallax(pictureId);
     }
     if(eraseStyleId >= 1){
-      if($gameScreen.picture(pictureId)){
-      var pictureOrigin = $gameScreen.picture(pictureId).origin();
-      var pictureX = $gameScreen.picture(pictureId).x() + offsetX;
-      var pictureY = $gameScreen.picture(pictureId).y() + offsetY;
-      var scaleX = $gameScreen.picture(pictureId).scaleX();
-      var scaleY = $gameScreen.picture(pictureId).scaleY();
+      var pictureOrigin = picture.origin();
+      var pictureX = picture.x() + offsetX;
+      var pictureY = picture.y() + offsetY;
+      var scaleX = picture.scaleX();
+      var scaleY = picture.scaleY();
       //var opacity = $gameScreen.picture(id2).opacity();
       $gameScreen.movePicture(pictureId,pictureOrigin,pictureX,pictureY,scaleX,scaleY,0,0,eraseWait);
-      }
     } else {
       $gameScreen.erasePicture(pictureId);
     }
@@ -422,35 +435,44 @@ list.forEach(function(pictureId) {
 //ピクチャ一括消去
 pic_erase = function(eraseModeId){
 
-if(eraseModeId == 0){var exemptPictureIds = [0]}
+// BUGFIX: data/*.json calls pic_erase() with no argument six times
+// (Map007 events, CommonEvents 172). Neither branch matched, so
+// exemptPictureIds stayed undefined and the loop's .some() threw a TypeError
+// on the first iteration. An unknown mode now behaves like mode 0 (only
+// picture 0, which the game never shows, is exempt).
 if(eraseModeId == 1){var exemptPictureIds = [1,2,3,4,6,9,10,47,48,49,50,94,95]}
+else {var exemptPictureIds = [0]}
 for (var i = 1; i <= 250; i++) {
-  if(exemptPictureIds.some(function(id){return id == i})){} else {
-    //$gameScreen.showPicture(i,'0_1_0',1,640-128,384,1,1,50,0);
-    if($gameScreen.picture(i)){
-      if($gameScreen.picture(i)._breathActive){
+  // PERF: indexOf avoids allocating a closure per iteration like .some(fn) did.
+  if(exemptPictureIds.indexOf(i) < 0) {
+    // PERF: hoist the single picture lookup instead of repeating it eight times.
+    var picture = $gameScreen.picture(i);
+    if(picture){
+      if(picture._breathActive){
         UTSU.PictureBreath.off([i]);
       }
-      if($gameScreen.picture(i)._breathActive2){
+      if(picture._breathActive2){
         UTSU.PictureBreath2.off([i]);
       }
-      if($gameScreen.picture(i)._breathActive3){
+      if(picture._breathActive3){
         UTSU.PictureBreath3.off([i]);
       }
-      if($gameScreen.picture(i)._breathActive4){
+      if(picture._breathActive4){
         UTSU.PictureBreath4.off([i]);
       }
-      if($gameScreen.picture(i)._breathActive5){
+      if(picture._breathActive5){
         UTSU.PictureBreath5.off([i]);
       }
-      if($gameScreen.picture(i)._breathActive6){
+      if(picture._breathActive6){
         UTSU.PictureBreath6.off([i]);
       }
-      if($gameScreen.picture(i).isParallaxBase()){
+      if(picture.isParallaxBase()){
         $gameScreen.eraseParallax(i);
       }
       $gameScreen.erasePicture(i);
-}}}
+    }
+  }
+}
 
 }
 

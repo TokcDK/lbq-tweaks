@@ -406,7 +406,10 @@ if (Imported.FTKR_CSS) (function(){
         if(FTKR.CSS.DS.window.autoRefresh.enabled && !this._cssUpdateCount) {
             this.refresh();
             this._cssUpdateCount = FTKR.CSS.DS.window.autoRefresh.count;
-        } else {
+        } else if (this._cssUpdateCount > 0) {
+            // 修正: the counter kept decrementing below zero while auto-refresh
+            // was disabled, so re-enabling it delayed the next refresh by
+            // however many frames it had been off. Floor it at zero instead.
             this._cssUpdateCount--;
         }
     };

@@ -21,3 +21,4 @@ js/rmmv-pixi.d.ts
 
 /.*/
 /v8.log
+*.md

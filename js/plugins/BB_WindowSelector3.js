@@ -146,12 +146,15 @@ Scene_Boot.prototype.loadSystemWindowImage = function() {
 var _Window_Base_prototype_update = Window_Base.prototype.update;
 Window_Base.prototype.update = function() {
     Window.prototype.update.call(this);
-    if($gameVariables.value(BBWSvar) == 3){
+    // PERF: variable BBWSvar was read a second time on the fall-through path;
+    // read it once. This hook runs on every window every frame.
+    var bbwsSkinMode = $gameVariables.value(BBWSvar);
+    if(bbwsSkinMode == 3){
         this.windowskin = ImageManager.loadSystem('Window3');
         this.backOpacity = BBWS3o;
         this.contents.outlineColor = BBWS3oc;
         this.contents.outlineWidth = BBWS3ow;
-    }else if($gameVariables.value(BBWSvar) == 2){
+    }else if(bbwsSkinMode == 2){
         this.windowskin = ImageManager.loadSystem('Window2');
         this.backOpacity = BBWS2o;
         this.contents.outlineColor = BBWS2oc;

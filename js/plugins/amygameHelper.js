@@ -2828,9 +2828,22 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 
 	// Replaces (10x, classes 1-5 / 21-25): the per-actor growth curve.
 	//   <PARAM> = level * statas[i] * ceil(level / 20) * classRank + statas[i] * 2
+	// classRank is a static notetag but this formula is re-evaluated for every
+	// parameter on every level-up / status refresh, so the parsed Number is
+	// cached per classId (NaN for a class without the notetag, exactly like the
+	// previous Number(undefined) result).
+	var classRankCache = {};
+	function classRankOf(classId) {
+		var rank = classRankCache[classId];
+		if (rank === undefined) {
+			rank = Number($dataClasses[classId].meta['classRank']);
+			classRankCache[classId] = rank;
+		}
+		return rank;
+	}
 	AGH_classBaseParamActorStatas = function (user, level, statas, statIndex) {
 		var base = statas[statIndex];
-		var classRank = Number($dataClasses[user._classId].meta['classRank']);
+		var classRank = classRankOf(user._classId);
 		return level * base * Math.ceil(level / 20) * classRank + base * 2;
 	};
 
