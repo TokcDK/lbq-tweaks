@@ -18115,13 +18115,14 @@
 
 	// Replaces (1x): Map144.json:event:12|EV012|page:1
 	AGH_setSwitchEv012 = function () {
-		var value1 = 10;
-		if ($gameParty.numItems($dataItems[154]) >= value1) { $gameSwitches.setValue(161, true) };
-		if ($gameParty.numItems($dataItems[155]) >= value1) { $gameSwitches.setValue(162, true) };
-		if ($gameParty.numItems($dataItems[156]) >= value1) { $gameSwitches.setValue(163, true) };
-		if ($gameParty.numItems($dataItems[157]) >= value1) { $gameSwitches.setValue(164, true) };
-		if ($gameParty.numItems($dataItems[158]) >= value1) { $gameSwitches.setValue(165, true) };
-		if ($gameParty.numItems($dataItems[159]) >= value1) { $gameSwitches.setValue(166, true) };
+		var itemsCnt = 10;
+		// item id from 154 to 159
+		// switch id from 161 to 166
+		for(let id = 154; id < 160; id++){
+			if ($gameParty.numItems($dataItems[id]) >= itemsCnt) { 
+				$gameSwitches.setValue(id + 7, true) 
+			};
+		}
 	};
 
 	// Replaces (1x): Map196.json:event:3|EV207宿屋処理|page:1
