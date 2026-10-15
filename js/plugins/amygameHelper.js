@@ -17068,7 +17068,8 @@
 	// Replaces (1x): Map003.json:event:133|EV133|page:2
 	AGH_readVariableTownInfoItem = function () {
 		$gameVariables.value(327)[$gameVariables.value(230)] = 2;
-		var messageText = `帰還先拠点を\\C[2]<${$dataWeapons[$gameVariables.value(230)].name}>\\C[0]に設定しました。`;
+		const weaponName = colorTaggedText(2, `<${$dataWeapons[$gameVariables.value(230)].name}>`);
+		var messageText = `帰還先拠点を${weaponName}に設定しました。`;
 		TickerManager.show(messageText);
 	};
 
@@ -17142,14 +17143,14 @@
 	// Replaces (1x): Map003.json:event:185|EV185|page:1
 	AGH_gainItemChestRareSlotEv185 = function () {
 		var threshold = 2;//種別
-		var value2 = 21;//ID
+		var id = 21;//ID
 		if (threshold == 0) { var valueItems = $dataItems };
 		if (threshold == 1) { var valueItems = $dataWeapons };
 		if (threshold == 2) { var valueItems = $dataArmors };
-		$gameParty.gainItem(valueItems[value2], 1);
-		var value3 = `\\C[29]\x1bI[${valueItems[value2].iconIndex}]${valueItems[value2].name}\\C[0]を入手した！`;
-		var value4 = 28;
-		$gameScreen.setDTextPicture(messageText, value4);
+		$gameParty.gainItem(valueItems[id], 1);
+		const itemName = colorTaggedText(29, `\x1bI[${valueItems[id].iconIndex}]${valueItems[id].name}`);
+		var messageText = `${itemName}を入手した！`;
+		$gameScreen.setDTextPicture(messageText, 28);
 		$gameSwitches.setValue(439, true);
 	};
 
@@ -17236,8 +17237,7 @@
 			var arr1 = valueNpcGuraTemporarilySave;
 			event_respawnSetA(value1, arr1[3], arr1[4], 1, arr1[5]);
 			this._eventId = $gameVariables.value(292)[value1];
-			var value1 = 11;
-			event_respawnSetN(value1, arr1[8], arr1[9], 0, arr1[6], arr1[7], arr1[10]);
+			event_respawnSetN(11, arr1[8], arr1[9], 0, arr1[6], arr1[7], arr1[10]);
 		}).call(interp);
 	};
 
@@ -17259,12 +17259,9 @@
 	// Replaces (1x): Map003.json:event:219|EV219|page:1
 	AGH_setVariableDynamicEventIdEv219 = function () {
 		$gameVariables.setValue(292, Array(21).fill(0));
-		var value1 = 11;
-		event_respawnSetN(value1, 24, 16, 0, '$airship02', 0, 2);
-		var value1 = 12;
-		event_respawnSetN(value1, 21, 16, 0, '!$VehicleHorse', 0, 2);
-		var value1 = 7;
-		event_respawnSetA(value1, 22, 16, 1, 6);
+		event_respawnSetN(11, 24, 16, 0, '$airship02', 0, 2);
+		event_respawnSetN(12, 21, 16, 0, '!$VehicleHorse', 0, 2);
+		event_respawnSetA(7, 22, 16, 1, 6);
 	};
 
 	// Replaces (1x): Map007.json:event:2|EV002|page:1
@@ -17284,8 +17281,8 @@
 	// Replaces (1x): Map007.json:event:2|EV002|page:1
 	AGH_callHExp3Ev002 = function (interp) {
 		return (function () {
-			var randomIndex = getRandomIndex(3) + 3;
-			var array = [1, 2, 3, 4, 5]; var value2 = array[getRandomIndex(array.length)];
+			//var randomIndex = getRandomIndex(3) + 3;
+			//var array = [1, 2, 3, 4, 5]; var value2 = array[getRandomIndex(array.length)];
 			//var value3 = $gameTroop.aliveMembers().length;
 			h_exp1(0, 0, 0, 0, 0, 0);//h_exp1ex(value3*2);//6
 			//0膣1経験2フェラ3アナル4自慰5絶頂
@@ -17508,8 +17505,7 @@
 	// Replaces (1x): Map007.json:event:4|EV004000|page:1
 	AGH_setDTextPictureEv004000 = function () {
 		var messageText = `パーティに加わった！`;
-		var value2 = 28;
-		$gameScreen.setDTextPicture(messageText, value2);
+		$gameScreen.setDTextPicture(messageText, 28);
 		adv_partDirectPlay(8);
 	};
 
@@ -17999,10 +17995,11 @@
 
 	// Replaces (1x): Map081.json:event:4|EV004|page:1
 	AGH_setVariableRandomWork1Ev004 = function () {
-		var variable52Value = $gameVariables.value(52)[478];
+		var defeatedCnt = $gameVariables.value(52)[478];
+		const targetDefeated = `\\sim[478]`;
 		$gameVariables.setValue(21,
-			`\\sim[478]を10体討伐せよ
-		現在討伐数：${variable52Value}体`
+			`${targetDefeated}を10体討伐せよ
+		現在討伐数：${defeatedCnt}体`
 		);
 	};
 
