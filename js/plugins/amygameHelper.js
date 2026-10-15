@@ -9592,8 +9592,8 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 
 	// Replaces (1x): CommonEvents.json:common-event:29|メニュー開く
 	AGH_setVariableMenuDisplay = function () {
-		var memberIndex = $gameParty.members()[0];
-		production_separateSetProfile(memberIndex.actorId());
+		var actor = $gameParty.members()[0];
+		production_separateSetProfile(actor.actorId());
 		$gameVariables.setValue(255,
 		`\\fs[22]\\C[2]${actor.name()}=${$gameVariables.value(actor.actorId()+380)[50]}\\C[0]
 		\\fs[22]${actor.nickname()}\n`);
@@ -9603,12 +9603,12 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 
 	// Replaces (1x): CommonEvents.json:common-event:29|メニュー開く
 	AGH_setVariableMenuDisplayOpenMenu = function () {
-		var memberIndex = $gameParty.members()[0];
+		var actor = $gameParty.members()[0];
 		$gameVariables.setValue(255,
 		`\\fs[25]\\C[2]${actor.name()}=${$gameVariables.value(actor.actorId()+380)[50]}\\C[0]
 		\\fs[25]${actor.nickname()}\n`);
-		if(isGirl(memberIndex)){
-		  hstates_heights(memberIndex.actorId(),253);
+		if(isGirl(actor)){
+		  hstates_heights(actor.actorId(),253);
 		} else {
 		  $gameVariables.setValue(253,`　`);
 		};
