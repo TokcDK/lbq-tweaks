@@ -20,7 +20,7 @@
 (function () {
 
 	//内部用。変数292(スポーンID一覧)が未設定/配列でない場合の事故を防ぐ
-	function aghSpawnIdList () {
+	function aghSpawnIdList() {
 		var spawnIdList = $gameVariables.value(292);
 		return Array.isArray(spawnIdList) ? spawnIdList : [];
 	}
@@ -243,8 +243,10 @@
 	// Replaces (8x): slide out left-side standing pictures (11..20).
 	AGH_slideOutLeftPictures = function () {
 		for (var i = 11; i <= 20; i++) {
-			if ($gameScreen.picture(i)) { ;
-				if ($gameScreen.picture(i).x() >= 640) { ;
+			if ($gameScreen.picture(i)) {
+				;
+				if ($gameScreen.picture(i).x() >= 640) {
+					;
 					$gameScreen.movePicture(i, 1, 1280, $gameScreen.picture(i).y(), $gameScreen.picture(i).scaleX(), $gameScreen.picture(i).scaleY(), 0, 0, 60);
 				} else {
 					$gameScreen.movePicture(i, 1, -500, $gameScreen.picture(i).y(), $gameScreen.picture(i).scaleX(), $gameScreen.picture(i).scaleY(), 0, 0, 60);
@@ -315,7 +317,7 @@
 			$gamePlayer.reserveTransfer(14, 2, 2, 2, 2);
 		};
 	};
-	
+
 	//=============================================================================
 	// Party arrangement / return-to-scene processing (common event 54 family)
 	//=============================================================================
@@ -633,7 +635,7 @@
 		valueFaceSelect = 8;
 	};
 
-//=============================================================================
+	//=============================================================================
 	// Event Script blocks migrated out of data/CommonEvents.json + data/Map*.json
 	//----------------------------------------------------------------------------
 	// RPG Maker splits a multi-line Script command into several CONSECUTIVE
@@ -646,91 +648,91 @@
 	// the Show Picture / Move Picture commands that follow in the editor read
 	// those globals.
 	//=============================================================================
-	
+
 	// Replaces (62x): $gameSystem.vnChoices = true|false;
 	AGH_setVisualNovelChoices = function (enabled) {
 		$gameSystem.vnChoices = enabled;
 	};
-	
+
 	// Replaces (87x): event_charaPreset(id); event_charaRoot(id);
 	AGH_event_charaPrepChara = function (eventId) {
 		event_charaPreset(eventId);
 		event_charaRoot(eventId);
 	};
-	
+
 	// Replaces (25x): valueBossId = id; event_charaPreset(id); event_charaRoot(id);
 	CEH_bossMarkAndCharaPrep = function (eventId) {
 		valueBossId = eventId;
 		AGH_event_charaPrepChara(eventId);
 	};
-	
+
 	// Replaces (26x): event_charaPreset/Root + page variable -> event_pararelStarting
 	CEH_mapEventPararelStart = function (eventId) {
 		AGH_event_charaPrepChara(eventId);
 		var pageVariable = $dataMap.events[eventId].pages[0].conditions.variableValue;
 		event_pararelStarting(0, pageVariable + 301, eventId);
 	};
-	
+
 	// Replaces (18x): var value1 = `text`; CommonPopupManager.showInfo({},value1,null);
 	AGH_popupInfo = function (text) {
 		CommonPopupManager.showInfo({}, text, null);
 	};
-	
+
 	// Replaces (8x): var value1 = `text`; TickerManager.show(value1);
 	AGH_tickerInfo = function (text) {
 		TickerManager.show(text);
 	};
-	
+
 	// Replaces (21x): valueBossAddLevel = 0; valueEnemyAddLevel = 0;
 	CEH_clearBossAddLevels = function () {
 		valueBossAddLevel = 0;
 		valueEnemyAddLevel = 0;
 	};
-	
+
 	// Replaces (5x): value = $dataItems[$gameVariables.value(240)]; popEnemy_setUp(value);
 	CEH_popEnemySetUp = function () {
 		var dungeonItem = $dataItems[$gameVariables.value(240)];
 		popEnemy_setUp(dungeonItem);
 	};
-	
+
 	// Replaces (10x): valueEnemyEventId = this.eventId(); this.sVal(21,this.eventId());
 	CEH_storeEnemyEventId = function (interp) {
 		valueEnemyEventId = interp.eventId();
 		interp.sVal(21, interp.eventId());
 	};
-	
+
 	// Replaces (9x): this._eventId = valueBossId; CEH_storeThisEventId(this); pic_erase(0);
 	CEH_restoreBossEvent = function (interp) {
 		interp._eventId = valueBossId;
 		CEH_storeThisEventId(interp);
 		pic_erase(0);
 	};
-	
+
 	// Replaces (9x): self switch [mapId, eventId, 10] -> variable 21 as a grouped string
 	AGH_selfSwitchValue10ToVar21 = function (interp) {
 		var slotValue = $gameSelfSwitches.getVariableValue([$gameMap.mapId(), interp._eventId, 10]);
 		$gameVariables.setValue(21, slotValue.toLocaleString());
 	};
-	
+
 	// Replaces (6x): same self switch -> shop_priceComparison(value,1,0)
 	AGH_shopPriceComparisonFromSelfSwitch = function (interp) {
 		var priceValue = $gameSelfSwitches.getVariableValue([$gameMap.mapId(), interp._eventId, 10]);
 		shop_priceComparison(priceValue, 1, 0);
 	};
-	
+
 	// Replaces (9x): shop NPC naming + weapon reference + menu type
 	AGH_setShopNpc = function (actorId, actorName, weaponName, menuTypeId) {
 		$gameActors.actor(actorId).setName(actorName);
 		$gameVariables.value(400)[59] = weaponName;
 		valueCountSet1 = menuTypeId;
 	};
-	
+
 	// Replaces (7x): valueCountSet1 = kindId; valueCountSet2 = targetId;
 	AGH_setCountSetPair = function (kindId, targetId) {
 		valueCountSet1 = kindId;
 		valueCountSet2 = targetId;
 	};
-	
+
 	// Replaces (7x): find the weapon flagged in variable 327 and warp to its
 	// <HomePosition>. Falls back to weapon 22 when none is flagged.
 	CEH_returnHomeWeaponPosition = function (interp) {
@@ -745,12 +747,12 @@
 		$gameVariables.setValue(161, [Number(homePosition[0]), Number(homePosition[1]), Number(homePosition[2])]);
 		CEH_sceneReturnSetup(interp, $gameVariables.value(161));
 	};
-	
+
 	// Replaces (6x): $dataItems[clothPartsChoice].name = `...`;
 	AGH_setClothPartsChoiceName = function (name) {
 		$dataItems[clothPartsChoice].name = name;
 	};
-	
+
 	// Replaces (6x): valuePic1 = picId; showPicture(640,384) + picture_fade1.
 	// valuePic1 is still assigned because later commands read it.
 	AGH_setPicAndFadeIn = function (picId, imageName, opacity) {
@@ -758,13 +760,13 @@
 		$gameScreen.showPicture(picId, imageName, 1, 640, 384, 100, 100, opacity, 0);
 		picture_fade1(picId, 'fadeIn', valueWipeImg, 60, 5);
 	};
-	
+
 	// Replaces (5x): showPicture + picture_fade1 at an explicit position.
 	AGH_showPictureFadeIn = function (picId, imageName, x, y, scaleX, scaleY, opacity, fadeWait, moveWait) {
 		$gameScreen.showPicture(picId, imageName, 1, x, y, scaleX, scaleY, opacity, 0);
 		picture_fade1(picId, 'fadeIn', valueWipeImg, fadeWait, moveWait);
 	};
-	
+
 	// Replaces (6x): the one-line talk popup (common event 60).
 	// NOTE: the original assigned valueTalkSet twice, the second assignment
 	// overwriting the first with [0,0,0]. That looks like a leftover bug in the
@@ -776,32 +778,32 @@
 		valueTalkSet = [0, 0, 0];
 		interp.setupChild($dataCommonEvents[60].list, 0);
 	};
-	
+
 	// Replaces (6x): clear the particle attached to this event.
 	AGH_clearEventParticle = function (interp, particlePrefix) {
 		var particleName = particlePrefix + '-' + interp._eventId;
 		$gameScreen._particle.particleClear(particleName);
 	};
-	
+
 	// Replaces (4x): this._eventId = id; drowsepost.camera.zoom(mode, 60, this._eventId);
 	CEH_focusEventAndZoom = function (interp, eventId, zoomMode) {
 		interp._eventId = eventId;
 		drowsepost.camera.zoom(zoomMode, 60, interp._eventId);
 	};
-	
+
 	// Replaces (4x): open the quest board for the <QuestSet> item on this event.
 	AGH_openQuestSetForThisEvent = function (interp) {
 		valueCountSet1 = Number($gameMap.event(interp._eventId).event().meta['QuestSet']);
 		quest_singleJutyuu(valueCountSet1);
 	};
-	
+
 	// Replaces (4x): respawn a main NPC into a party slot, then make the
 	// interpreter act on the event that was just created.
 	CEH_respawnMainNpcAndTarget = function (interp, slot, x, y, zoomFlag, direction) {
 		event_respawnSetA(slot, x, y, zoomFlag, direction);
 		interp._eventId = $gameVariables.value(292)[slot];
 	};
-//=============================================================================
+	//=============================================================================
 	// Event Script blocks migrated out of data/CommonEvents.json + data/Map*.json
 	// (second pass: whole-run blocks that were still inline)
 	//----------------------------------------------------------------------------
@@ -809,12 +811,12 @@
 	// was a single repeatable pattern. Interpreter context is passed explicitly
 	// as `interp` because event-script `this` is the Game_Interpreter.
 	//=============================================================================
-	
+
 	// Replaces (21x): build the three one-line arrays inline, then chara_oneWord.
 	AGH_charaOneWord = function (picId, eventId, textPicId, AGH_waitFrames, randX, randY, lines) {
 		chara_oneWord(picId, eventId, textPicId, AGH_waitFrames, [randX], [randY], lines);
 	};
-	
+
 	// Replaces (5x): spawn the summons-boss event, register it in slot 12 and
 	// start the boss intro CG + animation.
 	AGH_summonBossCharaGura = function (x, y, imageName, cgWidth, cgHeight, animScale, animId) {
@@ -828,7 +830,7 @@
 		boss_charaGuraCGSet(valueBossCharaGura);
 		event.requestAnimation(animId);
 	};
-	
+
 	// Replaces (6x): rebuild both the main and the sub NPC from the scene preset
 	// held in variable 163, then wipe the screen.
 	CEH_respawnSubNpcFromScenePreset = function (interp) {
@@ -845,7 +847,7 @@
 		event.setDirection(preset[10]);
 		CEH_wipeFadeOut101();
 	};
-	
+
 	// Replaces (5x): the goods-drag sprite, whose ids and image names were fixed.
 	AGH_showGoodsDragSprite = function () {
 		valuePic1 = 55;
@@ -859,12 +861,12 @@
 			$gameScreen.picture(picId).startAnimationFrame(1, true, [1, 1, 1, 2]);
 		};
 	};
-	
+
 	// Replaces (4x): this._eventId = valueEnemyEventId;
 	CEH_setEventIdFromEnemyEvent = function (interp) {
 		interp._eventId = valueEnemyEventId;
 	};
-	
+
 	// Replaces (4x): a custom label stored in a data-system switch slot.
 	AGH_setDataSystemLabel = function (index, label) {
 		$dataSystem.switches[index] = label;
@@ -932,7 +934,7 @@
 	// family does not, which is why syncActorVariable is a parameter.
 	// Replaces (5x) the common opening sequence.
 	// --------------------------------------------------------------------------
-AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemId, recordId, weatherSceneSet, syncActorVariable) {
+	AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemId, recordId, weatherSceneSet, syncActorVariable) {
 		// The 陵辱 family never assigned valuePic1 in the original, so a null picId
 		// must leave the existing value alone rather than overwrite it with null.
 		if (picId != null) {
@@ -2950,7 +2952,7 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		if (!user.isLearnedSkill(reqSkillId)) return false;
 		if (user.mat < reqMat) return false;
 		if (reqMastery
-				&& user.skillMasteryLevel(reqSkillId) < Number($dataSkills[reqSkillId].meta['Max Mastery Level'])) {
+			&& user.skillMasteryLevel(reqSkillId) < Number($dataSkills[reqSkillId].meta['Max Mastery Level'])) {
 			return false;
 		}
 		return true;
@@ -3218,13 +3220,13 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 				treasureCount += 1;
 			}
 			if (meta['MonsterSymbol']
-					&& !$gameSelfSwitches.value([mapId, eventId, 'C'])
-					&& !$gameSelfSwitches.value([mapId, eventId, 'B'])) {
+				&& !$gameSelfSwitches.value([mapId, eventId, 'C'])
+				&& !$gameSelfSwitches.value([mapId, eventId, 'B'])) {
 				monsterSymbolCount += 1;
 			}
 			if (meta['Henemy']
-					&& !$gameSelfSwitches.value([mapId, eventId, 'C'])
-					&& !$gameSelfSwitches.value([mapId, eventId, 'B'])) {
+				&& !$gameSelfSwitches.value([mapId, eventId, 'C'])
+				&& !$gameSelfSwitches.value([mapId, eventId, 'B'])) {
 				hEnemyCount += 1;
 			}
 			if (meta['TreasureBoxW'] && !$gameSelfSwitches.value([mapId, eventId, 'A'])) {
@@ -3462,7 +3464,7 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		var textPart6 = `Ｈエネミーはそのマップで敗北Ｈを経験する事で出現する。\nＨエネミーに敗北すると汎用全滅シーンが発生する。`;
 		var textPart7 = `「称号」は、条件を満たした後、「一日の始まり」か「ギルド受付」と\n話した直後に付与される。`;
 		$gameVariables.setValue(250,
-			[	
+			[
 				colorTaggedText(2, `[1]`) + `${messageText2}`,
 				colorTaggedText(2, `[2]`) + `${textPart2}`,
 				colorTaggedText(2, `[3]`) + `${textPart3}`,
@@ -3480,19 +3482,19 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (14x): data/CommonEvents.json:common-event:1, data/CommonEvents.json:common-event:21, data/CommonEvents.json:common-event:22, data/CommonEvents.json:common-event:47, data/CommonEvents.json:common-event:66, data/CommonEvents.json:common-event:167, …
 	AGH_setPictureMotion1 = function () {
 		//picture_motion1("smooth",[0]);
-		picture_motion1("linear",[0]);
+		picture_motion1("linear", [0]);
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:1
 	AGH_setMessagePictureAnimationParams = function () {
-		$gameMessage._IZSTPicShowParam = [550+640,384+100,100,100,100];
-		$gameMessage._IZSTPicMoveParam = [500+640,384+100,100,100,255,30];
+		$gameMessage._IZSTPicShowParam = [550 + 640, 384 + 100, 100, 100, 100];
+		$gameMessage._IZSTPicMoveParam = [500 + 640, 384 + 100, 100, 100, 255, 30];
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:1
 	AGH_setHVScrollingMenuBackground = function () {
-		$gameVariables.setValue(81,0)//メニュー背景横スク
-		$gameVariables.setValue(82,0)//メニュー背景縦スク
+		$gameVariables.setValue(81, 0)//メニュー背景横スク
+		$gameVariables.setValue(82, 0)//メニュー背景縦スク
 	};
 
 	/* ============================================================================
@@ -8499,11 +8501,11 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
 	AGH_spawnEvent = function () {
 		var playerRealX = $gamePlayer._realX;
-		var playerRealY = $gamePlayer._realY+10;
+		var playerRealY = $gamePlayer._realY + 10;
 		$gameMap.spawnEvent(146, playerRealX, playerRealY, true);
 		valueCountSet1 = $gameMap.getLastSpawnEventId();
 		var event = $gameMap.event(valueCountSet1);
-		event.startOpacity(60,255);
+		event.startOpacity(60, 255);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
@@ -8514,59 +8516,59 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		$gameMap.spawnEvent(147, playerRealX, playerRealY, true);
 		valueCountSet2 = $gameMap.getLastSpawnEventId();
 		var event = $gameMap.event(valueCountSet2);
-		event.startOpacity(100,255);
+		event.startOpacity(100, 255);
 		event.setImage(actor.characterName(), actor.characterIndex());
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
 	AGH_particleGroupSetShrineC = function (interp) {
 		return (function () {
-		var shrineC = 'shrine_c';
-		$gameScreen._particle.particleGroupSet(this._eventId,shrineC,'this');
+			var shrineC = 'shrine_c';
+			$gameScreen._particle.particleGroupSet(this._eventId, shrineC, 'this');
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
 	AGH_particlePlayMonsterCp = function (interp) {
 		return (function () {
-		var monsterCp = 'monster_cp';
-		$gameScreen._particle.particlePlay(this._eventId,monsterCp,'this','def','above');
-		$gameScreen._particle.particleUpdate([monsterCp,'color','#44ddff','ffffff']);
+			var monsterCp = 'monster_cp';
+			$gameScreen._particle.particlePlay(this._eventId, monsterCp, 'this', 'def', 'above');
+			$gameScreen._particle.particleUpdate([monsterCp, 'color', '#44ddff', 'ffffff']);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
 	AGH_particleClearShrineC = function (interp) {
 		return (function () {
-		var value1 = 'shrine_c';
-		$gameScreen._particle.particleClear(value1);
-		var value1 = 'chant_b3';
-		$gameScreen._particle.particleGroupPlay(this._eventId,value1,'this');
+			var value1 = 'shrine_c';
+			$gameScreen._particle.particleClear(value1);
+			var value1 = 'chant_b3';
+			$gameScreen._particle.particleGroupPlay(this._eventId, value1, 'this');
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
 	AGH_particlePlayAureoleC = function (interp) {
 		return (function () {
-		var aureoleC = 'aureole_c';
-		$gameScreen._particle.particlePlay(this._eventId,aureoleC,'this','def','above');
+			var aureoleC = 'aureole_c';
+			$gameScreen._particle.particlePlay(this._eventId, aureoleC, 'this', 'def', 'above');
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
 	AGH_setMapEventOpacityVariousUseCommands = function () {
 		var event = $gameMap.event(valueCountSet1);
-		event.startOpacity(60,0);
+		event.startOpacity(60, 0);
 		var event = $gameMap.event(valueCountSet2);
-		event.startOpacity(60,0);
+		event.startOpacity(60, 0);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
 	AGH_setSelfVariableActorChoice = function (interp) {
 		return (function () {
-		this.sVal(20,1);
-		var actor = $gameActors.actor($gameVariables.value(20));
-		actor.setSubclass(42);
+			this.sVal(20, 1);
+			var actor = $gameActors.actor($gameVariables.value(20));
+			actor.setSubclass(42);
 		}).call(interp);
 	};
 
@@ -8574,29 +8576,30 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_startGabWindowNone = function () {
 		var scene = SceneManager._scene;
 		if (scene._gabWindow) scene.clearGabWindow();
-		var gabData = [`あああ`,'none','',0,'',0];
+		var gabData = [`あああ`, 'none', '', 0, '', 0];
 		if (scene._gabWindow) scene.startGabWindow(gabData);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
 	AGH_forceMoveRouteCharactersScriptCommonVariable1 = function (interp) {
 		return (function () {
-		this.character($gameVariables.value(121)).forceMoveRoute({
-		"list":[
-		{"code":36},{"code":37},{"code":29, "parameters":[$gameVariables.value(122)]},
-		{"code":29, "parameters":[$gameVariables.value(123)]},
-		{ "code": 45, "parameters": ["this.requestAnimation($gameVariables.value(124));"] },
-		{ "code": 45, "parameters": ["this.jumpEx($gameVariables.value(125),$gameVariables.value(126),$gameVariables.value(127),$gameVariables.value(128));"] },
-		{"code":25},{"code":32},{"code":34},{"code":35},
-		{ "code": 45, "parameters": ["this.setAngle($gameVariables.value(129));"] },
-		{"code":0}],"repeat":false,"skippable":true});
+			this.character($gameVariables.value(121)).forceMoveRoute({
+				"list": [
+					{ "code": 36 }, { "code": 37 }, { "code": 29, "parameters": [$gameVariables.value(122)] },
+					{ "code": 29, "parameters": [$gameVariables.value(123)] },
+					{ "code": 45, "parameters": ["this.requestAnimation($gameVariables.value(124));"] },
+					{ "code": 45, "parameters": ["this.jumpEx($gameVariables.value(125),$gameVariables.value(126),$gameVariables.value(127),$gameVariables.value(128));"] },
+					{ "code": 25 }, { "code": 32 }, { "code": 34 }, { "code": 35 },
+					{ "code": 45, "parameters": ["this.setAngle($gameVariables.value(129));"] },
+					{ "code": 0 }], "repeat": false, "skippable": true
+			});
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
 	AGH_transformVariableDataIconIndex12 = function () {
-		$gameVariables._data.map(function(v,i){return [v,i]}).
-		slice(1,5).filter(function(v){return v[0]!==undefined}).sort(function(a,b){return b[0]-a[0]})
+		$gameVariables._data.map(function (v, i) { return [v, i] }).
+			slice(1, 5).filter(function (v) { return v[0] !== undefined }).sort(function (a, b) { return b[0] - a[0] })
 		//変数1~4の順番を変数17に代入した場合
 		//1位は $gameVariables.value(17)[0][1]
 		//2位は $gameVariables.value(17)[1][1]
@@ -8607,26 +8610,26 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
 	AGH_iterateEnemiesVariousUseCommands = function () {
 		const obj1 = $dataEnemies[Number(value2.split(',')[0])];
-		$dataEnemies[i+10] = Object.assign({}, obj1);
+		$dataEnemies[i + 10] = Object.assign({}, obj1);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
 	AGH_setSelfVariableActorChoiceVariousUseCommands = function (interp) {
 		return (function () {
-		var array = $dataActors[$gameVariables.value(20)].meta['戦闘3連撃時'].split(',')
-		this.sVal(522, array[getRandomIndex(array.length)]);
+			var array = $dataActors[$gameVariables.value(20)].meta['戦闘3連撃時'].split(',')
+			this.sVal(522, array[getRandomIndex(array.length)]);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
 	AGH_setSelfVariableActorChoice_2 = function (interp) {
 		return (function () {
-		var battler = BattleManager._subject;
-		var action = battler._actions[0];
-		//action.isForOpponent() // 対象が敵の時true、仲間や自分など味方の時ははfalse
-		//action._targetIndex // 対象のインデックス。敵味方ともに0から始まる。-1の時はランダムターゲット
-		//action._item // 行動の種類。Game_Item クラスのオブジェクト。
-		this.sVal(20,$gameParty.members()[action._targetIndex]);
+			var battler = BattleManager._subject;
+			var action = battler._actions[0];
+			//action.isForOpponent() // 対象が敵の時true、仲間や自分など味方の時ははfalse
+			//action._targetIndex // 対象のインデックス。敵味方ともに0から始まる。-1の時はランダムターゲット
+			//action._item // 行動の種類。Game_Item クラスのオブジェクト。
+			this.sVal(20, $gameParty.members()[action._targetIndex]);
 		}).call(interp);
 	};
 
@@ -8641,8 +8644,8 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
 	AGH_setSelfVariableActorChoice_3 = function (interp) {
 		return (function () {
-		var value = BattleManager._subject._lastTargetIndex;
-		this.sVal(20,$gameParty.members()[value].actorId());
+			var value = BattleManager._subject._lastTargetIndex;
+			this.sVal(20, $gameParty.members()[value].actorId());
 		}).call(interp);
 	};
 
@@ -8660,27 +8663,27 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
 	AGH_iterateItemsShowInfo = function (interp) {
 		return (function () {
-		value = $dataItems[$gameVariables.value(21)].name;
-		value1 = `${value}を入手した。`
-		var args = new Array( String(value1) ); 
-		this.pluginCommand("ShowInfo", args);
+			value = $dataItems[$gameVariables.value(21)].name;
+			value1 = `${value}を入手した。`
+			var args = new Array(String(value1));
+			this.pluginCommand("ShowInfo", args);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
 	AGH_configureMapBGM = function () {
 		var array = $dataMap.meta['BGM'].split(',');
-		AudioManager.playBgm({name:array[array.length - 4],volume:array[1],pitch:array[2],pan:array[3]})
+		AudioManager.playBgm({ name: array[array.length - 4], volume: array[1], pitch: array[2], pan: array[3] })
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
 	AGH_forEachArray = function (interp) {
 		return (function () {
-		value = 460;
-		var list = [61,67,70,81,82,83,84,85,86,88];
-		list.forEach(function(id) {
-		this.sVal(value+id,0);
-		}, this);
+			value = 460;
+			var list = [61, 67, 70, 81, 82, 83, 84, 85, 86, 88];
+			list.forEach(function (id) {
+				this.sVal(value + id, 0);
+			}, this);
 		}).call(interp);
 	};
 
@@ -8689,9 +8692,9 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		var eventName = "test";
 		var variableId = 1;
 		var regionId = 3;
-		var mapEventList = $gameMap.events().filter(function(event){
-		    return event.event().name === eventName
-		        && event.regionId() === regionId;
+		var mapEventList = $gameMap.events().filter(function (event) {
+			return event.event().name === eventName
+				&& event.regionId() === regionId;
 		}).length;
 		$gameVariables.setValue(variableId, mapEventList);
 	};
@@ -8701,23 +8704,23 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		var start = 701;
 		var end = 800;
 		for (var i = start; i <= end; i++) {
-		$gameVariables.setValue($gameVariables.value(i),$dataSkills[i-600].description);
+			$gameVariables.setValue($gameVariables.value(i), $dataSkills[i - 600].description);
 		}
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
 	AGH_setVariableActorChoice = function () {
 		var array = [
-		1,2,3,4,5,6];
+			1, 2, 3, 4, 5, 6];
 		$gameVariables.setValue(20, array[2]);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
 	AGH_setSelfVariableRandomWork1 = function (interp) {
 		return (function () {
-		this.sVal(21,$gameParty._actors);
-		var array = $gameVariables.value(21);
-		$gameVariables.setValue(20, array[getRandomIndex(array.length)]);
+			this.sVal(21, $gameParty._actors);
+			var array = $gameVariables.value(21);
+			$gameVariables.setValue(20, array[getRandomIndex(array.length)]);
 		}).call(interp);
 	};
 
@@ -8735,8 +8738,8 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:4|条件分岐
 	AGH_iterateItemsWarpPoint = function () {
 		var itemMeta = $dataItems[$gameVariables.value(240)].meta['warpPoint' + $gameVariables.value(21)].split(',');
-		var array = [Number(itemMeta[0]),Number(itemMeta[1]),Number(itemMeta[2])];
-		if(array[0] == arr3[0] && array[1] == arr3[1] && array[2] == arr3[2]){
+		var array = [Number(itemMeta[0]), Number(itemMeta[1]), Number(itemMeta[2])];
+		if (array[0] == arr3[0] && array[1] == arr3[1] && array[2] == arr3[2]) {
 
 
 		};
@@ -8745,61 +8748,63 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:4|条件分岐
 	AGH_iterateSkillsConditionBranch = function (interp) {
 		return (function () {
-		var value1 = 0;
-		for (var i = 0; i < this._actor.unlockedClasses().length; ++i) {
-		if(this._actor.unlockedClasses()[i] == Number($dataSkills[skill.id].meta.SkillLearningClass)){
-		var value1 = 1;
-		break;
-		};
-		};
+			var value1 = 0;
+			for (var i = 0; i < this._actor.unlockedClasses().length; ++i) {
+				if (this._actor.unlockedClasses()[i] == Number($dataSkills[skill.id].meta.SkillLearningClass)) {
+					var value1 = 1;
+					break;
+				};
+			};
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:4|条件分岐
 	AGH_iterateTroopMembers = function () {
 		for (var i = 0; i < $gameTroop.members().length; i++) {
-		var troopMember = $gameTroop.members()[i];
-		if (troopMember.isStateAffected(234)) {
-		troopMember.startAnimation(160, false, 0);
-		}};
+			var troopMember = $gameTroop.members()[i];
+			if (troopMember.isStateAffected(234)) {
+				troopMember.startAnimation(160, false, 0);
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:4|条件分岐
 	AGH_iteratePartyMembers = function () {
 		for (var i = 0; i < $gameParty.battleMembers().length; i++) {
-		var battleMember = $gameParty.battleMembers()[i];
-		if (battleMember.isStateAffected(234)) {
-		battleMember.startAnimation(160, false, 0);
-		}};
+			var battleMember = $gameParty.battleMembers()[i];
+			if (battleMember.isStateAffected(234)) {
+				battleMember.startAnimation(160, false, 0);
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:4|条件分岐
 	AGH_setSelfVariableActorChoiceConditionBranch = function (interp) {
 		return (function () {
-		this.sVal(20,1);
-		var actor = $gameActors.actor($gameVariables.value(20));
-		var list = actor.actor().traits;
-		list.forEach(function(id) {
-		console.log(id);
-		}, this);
+			this.sVal(20, 1);
+			var actor = $gameActors.actor($gameVariables.value(20));
+			var list = actor.actor().traits;
+			list.forEach(function (id) {
+				console.log(id);
+			}, this);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:4|条件分岐
 	AGH_iterateSkillsConditionBranch_2 = function (interp) {
 		return (function () {
-		$dataSkills[skill_Id].stypeId
+			$dataSkills[skill_Id].stypeId
 
-		if (target.result().isHit() && this.isPhysical() && this.item().stypeId !== 1) {
-		  target.startAnimation(61);
-		}
+			if (target.result().isHit() && this.isPhysical() && this.item().stypeId !== 1) {
+				target.startAnimation(61);
+			}
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:4|条件分岐
 	AGH_runScriptConditionBranch = function () {
 		var start = 1;
-		var end = $dataSkills.length-1;
+		var end = $dataSkills.length - 1;
 		//for (var i = start; i <= end; i++) {
 		//-1をしないとスキル上限+1まで範囲にしてしまいエラーが出る為
 	};
@@ -8807,8 +8812,8 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:4|条件分岐
 	AGH_iterateItemsEIC = function () {
 		value = $dataItems[$gameVariables.value(19)];
-		if($gameParty.hasItem(value)){
-		    $gameParty.gainItem(value, 1);
+		if ($gameParty.hasItem(value)) {
+			$gameParty.gainItem(value, 1);
 		};
 		value3 = Number($dataItems[i].meta['EICスイッチ']);
 		//if($gameParty.hasItem($dataItems[value7])){
@@ -8817,12 +8822,12 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:4|条件分岐
 	AGH_setSelfSwitchConditionBranch = function (interp) {
 		return (function () {
-		for (var id = $gameMap.events().length; id > 0; id--) {
-		  if ($gameMap.event(id).event().note.match("[HOGE]")) {
-		    var mapID = this._mapId;
-		    $gameSelfSwitches.setValue([mapID, id, "B"], true);
-		  }
-		}
+			for (var id = $gameMap.events().length; id > 0; id--) {
+				if ($gameMap.event(id).event().note.match("[HOGE]")) {
+					var mapID = this._mapId;
+					$gameSelfSwitches.setValue([mapID, id, "B"], true);
+				}
+			}
 		}).call(interp);
 	};
 
@@ -8834,35 +8839,35 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
 	AGH_setSwitchFrequentlyUsed = function () {
 		var switchId = 502
-		if($gameSwitches.value(switchId+600-1) && !$gameSwitches.value(switchId+600)){
-		  $gameSwitches.setValue(161,true);
-		  valueCountSet1 = switchId;
+		if ($gameSwitches.value(switchId + 600 - 1) && !$gameSwitches.value(switchId + 600)) {
+			$gameSwitches.setValue(161, true);
+			valueCountSet1 = switchId;
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
 	AGH_readVariableDynamicEventId = function (interp) {
 		return (function () {
-		var playerRealX = $gamePlayer._realX;
-		var playerRealY = $gamePlayer._realY;
-		if($gamePlayer.direction() == 2){playerRealY += 1};
-		if($gamePlayer.direction() == 4){playerRealX -= 1};
-		if($gamePlayer.direction() == 6){playerRealX += 1};
-		if($gamePlayer.direction() == 8){playerRealY -= 1};
-		goodsEvent_respawn(0,'Goods4',6,6,2,playerRealX,playerRealY);
-		this._eventId = $gameVariables.value(292)[0];
+			var playerRealX = $gamePlayer._realX;
+			var playerRealY = $gamePlayer._realY;
+			if ($gamePlayer.direction() == 2) { playerRealY += 1 };
+			if ($gamePlayer.direction() == 4) { playerRealX -= 1 };
+			if ($gamePlayer.direction() == 6) { playerRealX += 1 };
+			if ($gamePlayer.direction() == 8) { playerRealY -= 1 };
+			goodsEvent_respawn(0, 'Goods4', 6, 6, 2, playerRealX, playerRealY);
+			this._eventId = $gameVariables.value(292)[0];
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
 	AGH_eraseMapEventDynamicEventId = function (interp) {
 		return (function () {
-		var value1 = 'statue_orb_c'+'-'+this._eventId;
-		$gameScreen._particle.particleClear(value1);
-		if(!!$gameMap.event(this._eventId)) {
-		  $gameMap.eraseEvent(this._eventId);
-		};
-		$gameVariables.value(292)[0] = 0;
+			var value1 = 'statue_orb_c' + '-' + this._eventId;
+			$gameScreen._particle.particleClear(value1);
+			if (!!$gameMap.event(this._eventId)) {
+				$gameMap.eraseEvent(this._eventId);
+			};
+			$gameVariables.value(292)[0] = 0;
 		}).call(interp);
 	};
 
@@ -8881,9 +8886,9 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
 	AGH_findIndexArray = function () {
 		var randomIndex = array2[getRandomIndex(array2.length)];//ID
-		var index = array2.findIndex(array2 => array2 == randomIndex); 
-		if(index >= 0){
-		  array2.splice(index, 1);
+		var index = array2.findIndex(array2 => array2 == randomIndex);
+		if (index >= 0) {
+			array2.splice(index, 1);
 		}
 	};
 
@@ -8896,51 +8901,51 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		$gameScreen.dTextAlign = 1;//中央
 		var pictureId = 100;
 		var value2 = '';
-		$gameScreen.showPicture(pictureId,value2,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId,1,640-128,384,100,100,255,0,60);
+		$gameScreen.showPicture(pictureId, value2, 1, 640 - 128, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
 	AGH_runScriptFrequentlyUsed = function (interp) {
 		return (function () {
-		this._eventId
+			this._eventId
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
 	AGH_setSelfVariableActorChoiceFrequentlyUsed = function (interp) {
 		return (function () {
-		this.sVal(20,1);
-		var actor = $gameActors.actor($gameVariables.value(20));
-		if(actor.meetsSkillConditions($dataSkills[201])){
-		$gameVariables.setValue(22,10);
-		} else {
-		$gameVariables.setValue(22,20);
-		};
+			this.sVal(20, 1);
+			var actor = $gameActors.actor($gameVariables.value(20));
+			if (actor.meetsSkillConditions($dataSkills[201])) {
+				$gameVariables.setValue(22, 10);
+			} else {
+				$gameVariables.setValue(22, 20);
+			};
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
 	AGH_filterArrayFrequentlyUsed = function () {
 		//arr3から重複を削除してarr4に渡す
-		arr4 = arr3.filter(function(val, i, array){
-		  return (array.indexOf(val) === i);
+		arr4 = arr3.filter(function (val, i, array) {
+			return (array.indexOf(val) === i);
 		});
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
 	AGH_computeMaxFrequentlyUsed = function () {
-		var array = [1,3,5,8];
+		var array = [1, 3, 5, 8];
 		var maxValue = Math.max(...array);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
 	AGH_setSelfVariableRandomWork1FrequentlyUsed = function (interp) {
 		return (function () {
-		var array = [1,2,3,4];
-		var arr2 = [5,6,7,8];
-		array.push(arr2);
-		this.sVal(21,array);
+			var array = [1, 2, 3, 4];
+			var arr2 = [5, 6, 7, 8];
+			array.push(arr2);
+			this.sVal(21, array);
 		}).call(interp);
 	};
 
@@ -8948,9 +8953,9 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_readVariableFrequentlyUsed = function () {
 		var nameLength = actor.name().length;
 		var threshold = 6 - nameLength;
-		if(threshold <= -1){threshold = 0};
+		if (threshold <= -1) { threshold = 0 };
 		for (var j = 0; j <= threshold; j++) {
-		$gameVariables.value(id1)[i] += `　`;
+			$gameVariables.value(id1)[i] += `　`;
 		};
 	};
 
@@ -8958,48 +8963,48 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_iterateItemsValueDanjonTreasure = function () {
 		var DungeonChestList = $dataItems[i].meta['宝箱'].split(',');
 		var DungeonChestTypeList = $dataItems[i].meta['宝箱種類'].split(',');
-		eval("valueDanjonTreasure" + i +" = arr1");
-		eval("valueDanjonTrSyurui" + i +" = DungeonChestTypeList");
+		eval("valueDanjonTreasure" + i + " = arr1");
+		eval("valueDanjonTrSyurui" + i + " = DungeonChestTypeList");
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
 	AGH_runPluginCommandItemBattleUseLimit = function (interp) {
 		return (function () {
-		var args = new Array(String($gameVariables.value(189)),"1","横",String($gameVariables.value(680)));
-		this.pluginCommand("PA_INIT", args);
+			var args = new Array(String($gameVariables.value(189)), "1", "横", String($gameVariables.value(680)));
+			this.pluginCommand("PA_INIT", args);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
 	AGH_setVariableFrequentlyUsed = function () {
 		var DesireItemCheckList = $dataItems[id3].meta['性欲アイテム判定'].split(',');
-		$gameVariables.setValue(Number(DesireItemCheckList[0]),Number(DesireItemCheckList[1]));
+		$gameVariables.setValue(Number(DesireItemCheckList[0]), Number(DesireItemCheckList[1]));
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
 	AGH_gainItemFrequentlyUsed = function () {
 		var items = $gameTroop.makeDropItems();  //戦闘不能敵キャラのドロップ品
-		items = $gameTroop.aliveMembers().reduce(function(r, enemy) {  //生存中の敵キャラドロップの追加
-		  return r.concat(enemy.makeDropItems());
+		items = $gameTroop.aliveMembers().reduce(function (r, enemy) {  //生存中の敵キャラドロップの追加
+			return r.concat(enemy.makeDropItems());
 		}, items);
-		items.forEach(function(item) {
-		  $gameParty.gainItem(item, 1);
+		items.forEach(function (item) {
+			$gameParty.gainItem(item, 1);
 		});
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
 	AGH_runScriptFrequentlyUsed_2 = function () {
-		var array = [10,30,40,50];
+		var array = [10, 30, 40, 50];
 		var randomIndex = array[getRandomIndex(array.length)];
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
 	AGH_setSelfVariableRandomWork1_2 = function (interp) {
 		return (function () {
-		var array = [1,2,3,4,5];
-		array.push(6,7,8,9,10);
-		var randomIndex = array[getRandomIndex(array.length)];
-		this.sVal(21,randomIndex);
+			var array = [1, 2, 3, 4, 5];
+			array.push(6, 7, 8, 9, 10);
+			var randomIndex = array[getRandomIndex(array.length)];
+			this.sVal(21, randomIndex);
 		}).call(interp);
 	};
 
@@ -9008,27 +9013,27 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		var actor = $gameActors.actor($gameVariables.item(11));
 		var item = $dataItems[$gameVariables.item(240)];
 		var array = item.meta['エネミーLV'].split(',');
-		var max = array.reduce(function(a,b){  
-		var maxValue = Math.max(a,b);
+		var max = array.reduce(function (a, b) {
+			var maxValue = Math.max(a, b);
 		});
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:6|アップデート時に実行コモン
 	AGH_setSelfVariableUpdateCommon = function (interp) {
 		return (function () {
-		//クエスト用配列
-		this.sVal(326,Array(2001).fill(0));//クエスト達成用アイテムごと表示用配列
-		this.sVal(344,Array(151).fill(0));//達成条件の内容のみ
-		for(var i = 357; i <= 360; i++){this.sVal(i,Array(151).fill(0))};
-		//357クエスト解説アイテム用358クエスト解説359クエスト発生360クエスト達成
-		//1～100が通常クエスト、101～140がデイリークエスト
+			//クエスト用配列
+			this.sVal(326, Array(2001).fill(0));//クエスト達成用アイテムごと表示用配列
+			this.sVal(344, Array(151).fill(0));//達成条件の内容のみ
+			for (var i = 357; i <= 360; i++) { this.sVal(i, Array(151).fill(0)) };
+			//357クエスト解説アイテム用358クエスト解説359クエスト発生360クエスト達成
+			//1～100が通常クエスト、101～140がデイリークエスト
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:8|ピクチャ並列3
 	AGH_shakePicture = function () {
 		valueShakeArr2 = valueShakeArr1;
-		var shakeArray = [valueShakeArr2[1],valueShakeArr2[1]+0.1,valueShakeArr2[1]+0.2,valueShakeArr2[1]+0.3,valueShakeArr2[1]+0.4,valueShakeArr2[1]+0.5];
+		var shakeArray = [valueShakeArr2[1], valueShakeArr2[1] + 0.1, valueShakeArr2[1] + 0.2, valueShakeArr2[1] + 0.3, valueShakeArr2[1] + 0.4, valueShakeArr2[1] + 0.5];
 		valueShakeArr2[1] = shakeArray[getRandomIndex(shakeArray.length)];
 		$gameScreen.shakePicture(valuePic1, valueShakeArr2[1], valueShakeArr2[2], valueShakeArr2[3], Infinity);
 	};
@@ -9036,44 +9041,47 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:8|ピクチャ並列3
 	AGH_waitPictureParallel3 = function (interp) {
 		return (function () {
-		valueShakeArr2 = valueShakeArr1;
-		if(valueShakeArr2[4] >= 1){
-		  var randomIndex = getRandomIndex(11) - 6;
-		  this.wait(valueShakeArr2[4] + randomIndex);
-		};
+			valueShakeArr2 = valueShakeArr1;
+			if (valueShakeArr2[4] >= 1) {
+				var randomIndex = getRandomIndex(11) - 6;
+				this.wait(valueShakeArr2[4] + randomIndex);
+			};
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:9|スタート＆リセット兼用
 	AGH_readVariableCharacterId = function (interp) {
 		return (function () {
-		var list = $gameVariables.value(248);
-		list.forEach(function(id) {
-		    $dataWeapons[id+200].name = $gameVariables.value(id+380)[50]; 
-		}, this);
+			var list = $gameVariables.value(248);
+			list.forEach(function (id) {
+				$dataWeapons[id + 200].name = $gameVariables.value(id + 380)[50];
+			}, this);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:9|スタート＆リセット兼用
 	AGH_setVariableDungeonWarpCircle = function () {
-		$gameVariables.setValue(211,Array(101).fill(0));
-		for(var i = 0; i <= 100; i++){$gameVariables.value(211)[i] = [0,0,0,0,0,0,0,0,0,0,0]};
+		$gameVariables.setValue(211, Array(101).fill(0));
+		for (var i = 0; i <= 100; i++) { $gameVariables.value(211)[i] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] };
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:9|スタート＆リセット兼用
 	AGH_iterateItemsSG = function () {
 		var start = 1;
-		var end = $dataItems.length-1;
+		var end = $dataItems.length - 1;
 		for (var i = start; i <= end; i++) {
-		  if($dataItems[i].meta['SG種別']){
-		    if(Number($dataItems[i].meta['SG種別']) == 2){
-		      if($dataItems[i].meta['Tchest']){
-		        $gameVariables.value(215)[i] = $dataItems[i].meta['Tchest'].split(',');
-		        $gameVariables.value(216)[i] = $dataItems[i].meta['TchestType'].split(',');
-		      } else {
-		        $gameVariables.value(215)[i] = [];
-		        $gameVariables.value(216)[i] = [];
-		}}}};
+			if ($dataItems[i].meta['SG種別']) {
+				if (Number($dataItems[i].meta['SG種別']) == 2) {
+					if ($dataItems[i].meta['Tchest']) {
+						$gameVariables.value(215)[i] = $dataItems[i].meta['Tchest'].split(',');
+						$gameVariables.value(216)[i] = $dataItems[i].meta['TchestType'].split(',');
+					} else {
+						$gameVariables.value(215)[i] = [];
+						$gameVariables.value(216)[i] = [];
+					}
+				}
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:10|初期解説コモン1
@@ -9085,60 +9093,59 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_handleScriptSnippetDescriptionSubClass = function () {
 		var messageText = `サブジョブ毎のスタータス上昇率一覧\n`;
 		for (var i = 51; i <= 60; i++) {
-		  messageText += `${valueClassGrowStatasComparison[i]}\n`;
+			messageText += `${valueClassGrowStatasComparison[i]}\n`;
 		};
-		start_commentary(0,'サブジョブについて','Description_SubClass',
-		`キャラ事に存在する＜メインジョブ＞とは別に設定できるジョブ。
+		start_commentary(0, 'サブジョブについて', 'Description_SubClass',
+			`キャラ事に存在する＜メインジョブ＞とは別に設定できるジョブ。
 		拠点に設置されている「オーブ」を利用する事で新たなサブジョブを解放できる。
 		解放にはコストが掛かる。`,
-		'Dpic',`${value1}`,'Npic','Nda');
+			'Dpic', `${value1}`, 'Npic', 'Nda');
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:10|初期解説コモン1
 	AGH_iterateStatesMenuSubComand = function (interp) {
 		return (function () {
-		var messageText = ``;
-		var list = $gameVariables.value(205);
-		list.forEach(function(id) {
-		messageText += `\x1bI[${$dataStates[id].iconIndex}]${$dataStates[id].name} `
-		}, this);
-		start_commentary(0,'一部制限について','MenuSubComand',
-		`メニュー画面から開ける「クエストリスト」「ダンジョン情報」は、
+			var messageText = ``;
+			var list = $gameVariables.value(205);
+			list.forEach(function (id) {
+				messageText += `\x1bI[${$dataStates[id].iconIndex}]${$dataStates[id].name} `
+			}, this);
+			start_commentary(0, '一部制限について', 'MenuSubComand',
+				`メニュー画面から開ける「クエストリスト」「ダンジョン情報」は、
 		特定ステートが付与されている場合、開けなくなります。
 		[${value1}]`,
-		'Npic',`Nda`,'Npic',`Nda`);
+				'Npic', `Nda`, 'Npic', `Nda`);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:11|リセット時コモン
 	AGH_readVariableAppearanceCharacterStart = function () {
-		for(var i = $gameVariables.value(75); i <= $gameVariables.value(76); i++)
-		{$gameActors.actor(i).forgetSkill(18)}
+		for (var i = $gameVariables.value(75); i <= $gameVariables.value(76); i++) { $gameActors.actor(i).forgetSkill(18) }
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:11|リセット時コモン
 	AGH_readVariableActorChoice = function () {
 		for (var i = 101; i <= 200; i++) {
-		  $gameVariables.value(360+$gameVariables.value(20))[i] = 0
+			$gameVariables.value(360 + $gameVariables.value(20))[i] = 0
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:11|リセット時コモン
 	AGH_removeState = function (interp) {
 		return (function () {
-		var list = $gameVariables.value(205);
-		list.forEach(function(id) {
-		var actor = $gameActors.actor($gameVariables.value(20));
-		actor.removeStateCounter(id);
-		actor.removeState(id);
-		}, this);
+			var list = $gameVariables.value(205);
+			list.forEach(function (id) {
+				var actor = $gameActors.actor($gameVariables.value(20));
+				actor.removeStateCounter(id);
+				actor.removeState(id);
+			}, this);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:11|リセット時コモン
 	AGH_resetSelfSwitchVariablesResetCommon = function () {
-		for(var i = 1; i <= 200; i++){
-		$gameSelfSwitches.setVariableValue([(i), 2, 1], 0);
+		for (var i = 1; i <= 200; i++) {
+			$gameSelfSwitches.setVariableValue([(i), 2, 1], 0);
 		};
 	};
 
@@ -9147,215 +9154,215 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		var start = $gameVariables.value(75);
 		var end = $gameVariables.value(76);
 		for (var i = start; i <= end; i++) {
-		actor_StartSetUp(i);
-		production_separateSetProfile(i);
+			actor_StartSetUp(i);
+			production_separateSetProfile(i);
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:12|ゲームスタート時コモン
 	AGH_readVariableHeroineId = function (interp) {
 		return (function () {
-		var list = $gameVariables.value(247);
-		list.forEach(function(id) {
-		hstates_heights(id,253);
-		}, this);
+			var list = $gameVariables.value(247);
+			list.forEach(function (id) {
+				hstates_heights(id, 253);
+			}, this);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:14|ピクチャ並列2
 	AGH_waitPictureParallel2 = function (interp) {
 		return (function () {
-		if(valuePicWait2 >= 1){
-		  var randomIndex = getRandomIndex(11) - 6;
-		  this.wait(valuePicWait2 + randomIndex);
-		};
+			if (valuePicWait2 >= 1) {
+				var randomIndex = getRandomIndex(11) - 6;
+				this.wait(valuePicWait2 + randomIndex);
+			};
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:14|ピクチャ並列2
 	AGH_waitPictureParallel2_2 = function (interp) {
 		return (function () {
-		if(valuePicWait2 >= 1){
-		  var randomIndex = getRandomIndex(valuePicWait2);
-		  this.wait(valuePicWait2 - randomIndex);
-		};
+			if (valuePicWait2 >= 1) {
+				var randomIndex = getRandomIndex(valuePicWait2);
+				this.wait(valuePicWait2 - randomIndex);
+			};
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:17|ピクチャ並列1
 	AGH_setPictureFromArrayPictureParallel1 = function () {
 		var pictureSetArray = pic_setArray1;
-		pic_setArray(pictureSetArray[0],pictureSetArray[1],pictureSetArray[2],pictureSetArray[3],pictureSetArray[4],pictureSetArray[5]);
-		if(valueParallelPic1 >= 1){pic_setArrayParallel1(valueParallelPic1)};
-		if(valueParallelPic2 >= 1){pic_setArrayParallel1(valueParallelPic2)};
-		if(valueParallelPic3 >= 1){pic_setArrayParallel1(valueParallelPic3)};
-		if(valueParallelPic4 >= 1){pic_setArrayParallel1(valueParallelPic4)};
+		pic_setArray(pictureSetArray[0], pictureSetArray[1], pictureSetArray[2], pictureSetArray[3], pictureSetArray[4], pictureSetArray[5]);
+		if (valueParallelPic1 >= 1) { pic_setArrayParallel1(valueParallelPic1) };
+		if (valueParallelPic2 >= 1) { pic_setArrayParallel1(valueParallelPic2) };
+		if (valueParallelPic3 >= 1) { pic_setArrayParallel1(valueParallelPic3) };
+		if (valueParallelPic4 >= 1) { pic_setArrayParallel1(valueParallelPic4) };
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:17|ピクチャ並列1
 	AGH_setPictureFromArrayPictureParallel1_2 = function () {
 		var pictureSetArray = pic_setArray2;
-		if(pictureSetArray[1] >= 1){
-		  pic_setArray(pictureSetArray[0],pictureSetArray[1],pictureSetArray[2],pictureSetArray[3],pictureSetArray[4],pictureSetArray[5]);
-		  if(valueParallelPic1 >= 1){pic_setArrayParallel1(valueParallelPic1)};
-		  if(valueParallelPic2 >= 1){pic_setArrayParallel1(valueParallelPic2)};
-		  if(valueParallelPic3 >= 1){pic_setArrayParallel1(valueParallelPic3)};
-		  if(valueParallelPic4 >= 1){pic_setArrayParallel1(valueParallelPic4)};
+		if (pictureSetArray[1] >= 1) {
+			pic_setArray(pictureSetArray[0], pictureSetArray[1], pictureSetArray[2], pictureSetArray[3], pictureSetArray[4], pictureSetArray[5]);
+			if (valueParallelPic1 >= 1) { pic_setArrayParallel1(valueParallelPic1) };
+			if (valueParallelPic2 >= 1) { pic_setArrayParallel1(valueParallelPic2) };
+			if (valueParallelPic3 >= 1) { pic_setArrayParallel1(valueParallelPic3) };
+			if (valueParallelPic4 >= 1) { pic_setArrayParallel1(valueParallelPic4) };
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:17|ピクチャ並列1
 	AGH_playSeName = function () {
 		var parallelPictureSet = valueParallelPicSe2;
-		if(parallelPictureSet[0] != 0){
-		  var randomIndex = getRandomIndex(11) + Number(parallelPictureSet[1]);
-		  var value2 = getRandomIndex(21) + Number(parallelPictureSet[2]);
-		  AudioManager.playSe({"name":parallelPictureSet[0],"volume":randomIndex,"pitch":value2,"pan":0});
+		if (parallelPictureSet[0] != 0) {
+			var randomIndex = getRandomIndex(11) + Number(parallelPictureSet[1]);
+			var value2 = getRandomIndex(21) + Number(parallelPictureSet[2]);
+			AudioManager.playSe({ "name": parallelPictureSet[0], "volume": randomIndex, "pitch": value2, "pan": 0 });
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:17|ピクチャ並列1
 	AGH_waitPictureParallel1 = function (interp) {
 		return (function () {
-		var pictureSetArray = pic_setArray2;
-		if(pictureSetArray[1] >= 1){
-		  if(valuePicWait >= 1){
-		    //var value1 = getRandomIndex(10) + 1;
-		    this.wait(valuePicWait);
-		  };
-		};
+			var pictureSetArray = pic_setArray2;
+			if (pictureSetArray[1] >= 1) {
+				if (valuePicWait >= 1) {
+					//var value1 = getRandomIndex(10) + 1;
+					this.wait(valuePicWait);
+				};
+			};
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:17|ピクチャ並列1
 	AGH_movePicturePictureParallel1 = function (interp) {
 		return (function () {
-		var pictureId = 53;
-		$gameScreen.movePicture(pictureId+2,1,640-128,384+20,100,100,240,0,120);
-		this.wait(110);
+			var pictureId = 53;
+			$gameScreen.movePicture(pictureId + 2, 1, 640 - 128, 384 + 20, 100, 100, 240, 0, 120);
+			this.wait(110);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:17|ピクチャ並列1
 	AGH_movePicturePictureParallel1_2 = function (interp) {
 		return (function () {
-		var pictureId = 53;
-		$gameScreen.movePicture(pictureId+2,1,640-128,384-20,100,100,240,0,120);
-		this.wait(110);
+			var pictureId = 53;
+			$gameScreen.movePicture(pictureId + 2, 1, 640 - 128, 384 - 20, 100, 100, 240, 0, 120);
+			this.wait(110);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:17|ピクチャ並列1
 	AGH_movePicturePictureParallel1_3 = function (interp) {
 		return (function () {
-		var randomIndex = getRandomIndex(41) + 160;
-		var value3 = getRandomIndex(21) + 40;
-		var pictureId = 53;
-		$gameScreen.movePicture(pictureId+2,1,640+value3-128,384,100,100,240,0,randomIndex);
-		this.wait(randomIndex-10);
+			var randomIndex = getRandomIndex(41) + 160;
+			var value3 = getRandomIndex(21) + 40;
+			var pictureId = 53;
+			$gameScreen.movePicture(pictureId + 2, 1, 640 + value3 - 128, 384, 100, 100, 240, 0, randomIndex);
+			this.wait(randomIndex - 10);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:17|ピクチャ並列1
 	AGH_movePicturePictureParallel1_4 = function (interp) {
 		return (function () {
-		var randomIndex = getRandomIndex(41) + 160;
-		var value3 = getRandomIndex(21) + 40;
-		var pictureId = 53;
-		$gameScreen.movePicture(pictureId+2,1,640-value3-128,384,100,100,240,0,randomIndex);
-		this.wait(randomIndex-10);
+			var randomIndex = getRandomIndex(41) + 160;
+			var value3 = getRandomIndex(21) + 40;
+			var pictureId = 53;
+			$gameScreen.movePicture(pictureId + 2, 1, 640 - value3 - 128, 384, 100, 100, 240, 0, randomIndex);
+			this.wait(randomIndex - 10);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:18|イベントシーン開始
 	AGH_initValueTachieBless = function () {
-		valueTachieBless = [100,100,250,0.004,0.003];//立ち絵用息遣い設定。基本状態
+		valueTachieBless = [100, 100, 250, 0.004, 0.003];//立ち絵用息遣い設定。基本状態
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:18|イベントシーン開始
 	AGH_readVariableHeroineIdEventSceneStart = function (interp) {
 		return (function () {
-		//現在衣装を別変数配列に一時代入
-		//統合衣装用の0も含める。（代入変数を利用しなくていい為可能）
-		var list = $gameVariables.value(247);
-		list.forEach(function(id) {
-		  var actor = $gameActors.actor(id);
-		    //if($gameParty.members().contains(actor)){
-		      var start = 0; var end = 42;
-		      for (var i = start; i <= end; i++) {
-		        $gameVariables.value(id+540)[i] = $gameVariables.value(id+440)[i]
-		    };
-		}, this);
+			//現在衣装を別変数配列に一時代入
+			//統合衣装用の0も含める。（代入変数を利用しなくていい為可能）
+			var list = $gameVariables.value(247);
+			list.forEach(function (id) {
+				var actor = $gameActors.actor(id);
+				//if($gameParty.members().contains(actor)){
+				var start = 0; var end = 42;
+				for (var i = start; i <= end; i++) {
+					$gameVariables.value(id + 540)[i] = $gameVariables.value(id + 440)[i]
+				};
+			}, this);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:21|初期解説コモン2
 	AGH_erasePictureItemProcessWork = function () {
-		var pictureId = 150+valueStartCommentary1+$gameVariables.value(19);
+		var pictureId = 150 + valueStartCommentary1 + $gameVariables.value(19);
 		$gameScreen.erasePicture(pictureId);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:21|初期解説コモン2
 	AGH_showPictureItemProcessWork = function () {
-		if(valueStartCommentary2P[$gameVariables.value(19)] == 0){}else{
-		  if(valueStartCommentary2P[$gameVariables.value(19)] == 'Dpic'){
-		    var value9 = '';var value10 = 100;var value11 = 134;
-		    $gameScreen.setDTextPicture(valueStartCommentary2[$gameVariables.value(19)], 28);
-		    $gameScreen.dWindowFrame = 'ON';
-		  } else {
-		    var value9 = '/img/tips/' + valueStartCommentary2P[$gameVariables.value(19)];
-		    var value10 = 0;var value11 = 334;
-		  };
-		$gameScreen.showPicture(201,value9,0,value11,0+50,100,100,0,0);
-		$gameScreen.movePicture(201,0,value11,value10,100,100,255,0,30);
+		if (valueStartCommentary2P[$gameVariables.value(19)] == 0) { } else {
+			if (valueStartCommentary2P[$gameVariables.value(19)] == 'Dpic') {
+				var value9 = ''; var value10 = 100; var value11 = 134;
+				$gameScreen.setDTextPicture(valueStartCommentary2[$gameVariables.value(19)], 28);
+				$gameScreen.dWindowFrame = 'ON';
+			} else {
+				var value9 = '/img/tips/' + valueStartCommentary2P[$gameVariables.value(19)];
+				var value10 = 0; var value11 = 334;
+			};
+			$gameScreen.showPicture(201, value9, 0, value11, 0 + 50, 100, 100, 0, 0);
+			$gameScreen.movePicture(201, 0, value11, value10, 100, 100, 255, 0, 30);
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:21|初期解説コモン2
 	AGH_queueMessageDpic = function (interp) {
 		return (function () {
-		if(valueStartCommentary2[$gameVariables.value(19)] == 0){}else{
-		  if(valueStartCommentary2P[$gameVariables.value(19)] == 'Dpic'){
-		    var variable19Value = '';
-		  } else {
-		    var variable19Value = valueStartCommentary2[$gameVariables.value(19)];
-		  };
-		$gameMessage.newPage();
-		$gameMessage.add(variable19Value);
-		this.setWaitMode('message');
-		};
+			if (valueStartCommentary2[$gameVariables.value(19)] == 0) { } else {
+				if (valueStartCommentary2P[$gameVariables.value(19)] == 'Dpic') {
+					var variable19Value = '';
+				} else {
+					var variable19Value = valueStartCommentary2[$gameVariables.value(19)];
+				};
+				$gameMessage.newPage();
+				$gameMessage.add(variable19Value);
+				this.setWaitMode('message');
+			};
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:21|初期解説コモン2
 	AGH_showPictureItemProcessWorkInitialGuideCommon2 = function () {
-		if(valueStartCommentary3P[$gameVariables.value(19)] == 0){}else{
-		  if(valueStartCommentary3P[$gameVariables.value(19)] == 'Dpic'){
-		    var value9 = '';var value10 = 100;var value11 = 134;
-		    $gameScreen.setDTextPicture(valueStartCommentary3[$gameVariables.value(19)], 28);
-		    $gameScreen.dWindowFrame = 'ON';
-		  } else {
-		    var value9 = '/img/tips/' + valueStartCommentary3P[$gameVariables.value(19)];
-		    var value10 = 0;var value11 = 334;
-		  };
-		$gameScreen.showPicture(202,value9,0,value11,0+50,100,100,0,0);
-		$gameScreen.movePicture(202,0,value11,value10,100,100,255,0,30);
+		if (valueStartCommentary3P[$gameVariables.value(19)] == 0) { } else {
+			if (valueStartCommentary3P[$gameVariables.value(19)] == 'Dpic') {
+				var value9 = ''; var value10 = 100; var value11 = 134;
+				$gameScreen.setDTextPicture(valueStartCommentary3[$gameVariables.value(19)], 28);
+				$gameScreen.dWindowFrame = 'ON';
+			} else {
+				var value9 = '/img/tips/' + valueStartCommentary3P[$gameVariables.value(19)];
+				var value10 = 0; var value11 = 334;
+			};
+			$gameScreen.showPicture(202, value9, 0, value11, 0 + 50, 100, 100, 0, 0);
+			$gameScreen.movePicture(202, 0, value11, value10, 100, 100, 255, 0, 30);
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:21|初期解説コモン2
 	AGH_readVariableItemProcessWork = function (interp) {
 		return (function () {
-		if(valueStartCommentary3[$gameVariables.value(19)] == 0){}else{
-		  if(valueStartCommentary3P[$gameVariables.value(19)] == 'Dpic'){
-		    var variable19Value = '';
-		  } else {
-		    var variable19Value = valueStartCommentary3[$gameVariables.value(19)];
-		  };
-		$gameMessage.newPage();
-		$gameMessage.add(variable19Value);
-		this.setWaitMode('message');
-		};
+			if (valueStartCommentary3[$gameVariables.value(19)] == 0) { } else {
+				if (valueStartCommentary3P[$gameVariables.value(19)] == 'Dpic') {
+					var variable19Value = '';
+				} else {
+					var variable19Value = valueStartCommentary3[$gameVariables.value(19)];
+				};
+				$gameMessage.newPage();
+				$gameMessage.add(variable19Value);
+				this.setWaitMode('message');
+			};
 		}).call(interp);
 	};
 
@@ -9364,170 +9371,181 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		var playerRealX = $gamePlayer._realX;
 		var playerRealY = $gamePlayer._realY;
 		var value3 = 148;
-		if($gameVariables.value(230) >= 1){var valueItems = $dataWeapons[$gameVariables.value(230)]};
-		if($gameVariables.value(240) >= 1){var valueItems = $dataItems[$gameVariables.value(240)]};
-		if($dataMap.meta['BedPattern']){var valueItems = $dataMap};
-		if(valueItems.meta['BedPattern']){
-		  var value3 = Number(valueItems.meta['BedPattern']);
+		if ($gameVariables.value(230) >= 1) { var valueItems = $dataWeapons[$gameVariables.value(230)] };
+		if ($gameVariables.value(240) >= 1) { var valueItems = $dataItems[$gameVariables.value(240)] };
+		if ($dataMap.meta['BedPattern']) { var valueItems = $dataMap };
+		if (valueItems.meta['BedPattern']) {
+			var value3 = Number(valueItems.meta['BedPattern']);
 		};
-		$gameMap.spawnEvent(value3, playerRealX, playerRealY+1, true);
+		$gameMap.spawnEvent(value3, playerRealX, playerRealY + 1, true);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:22|宿泊時コモン
 	AGH_setSelfVariableDayEndInfoText = function (interp) {
 		return (function () {
-		var list = $gameVariables.value(247);
-		list.forEach(function(id) {
-		  var actor = $gameActors.actor(id);
-		  if([84,85,86].some(function(i){return actor.isStateAffected(i)})){
-		    if(actor.battleSkillsRaw().includes(864)){
-		      this.sVal(539,`\x1bSIN[${864}]発動！ ${actor.name()}は汚れを放置した。\n`);this.sVal(540,$gameVariables.value(540) + 1);
-		    } else {
-		      actor.removeState(84);actor.removeState(85);actor.removeState(86);
-		      this.sVal(539,`${actor.name()}は汚れを洗い流した。\n`);this.sVal(540,$gameVariables.value(540) + 1);
-		    };
-		  };
-		}, this);
+			var list = $gameVariables.value(247);
+			list.forEach(function (id) {
+				var actor = $gameActors.actor(id);
+				if ([84, 85, 86].some(function (i) { return actor.isStateAffected(i) })) {
+					if (actor.battleSkillsRaw().includes(864)) {
+						this.sVal(539, `\x1bSIN[${864}]発動！ ${actor.name()}は汚れを放置した。\n`); this.sVal(540, $gameVariables.value(540) + 1);
+					} else {
+						actor.removeState(84); actor.removeState(85); actor.removeState(86);
+						this.sVal(539, `${actor.name()}は汚れを洗い流した。\n`); this.sVal(540, $gameVariables.value(540) + 1);
+					};
+				};
+			}, this);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:24|一日経過時コモン
 	AGH_readVariableAppearanceCharacterStartDayPassCommon = function () {
-		  var start = $gameVariables.value(75);
-		  var end = $gameVariables.value(76);
-		  for(var id1 = start; id1 <= end; id1++){
-		    var actor = $gameActors.actor(id1);
-		    if(actor.isLearnedSkill(18)){
-		      Profession_basicReturn(id1);
-		  }};
+		var start = $gameVariables.value(75);
+		var end = $gameVariables.value(76);
+		for (var id1 = start; id1 <= end; id1++) {
+			var actor = $gameActors.actor(id1);
+			if (actor.isLearnedSkill(18)) {
+				Profession_basicReturn(id1);
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:24|一日経過時コモン
 	AGH_readVariableRaceDefeatCount = function () {
-		$gameVariables.value(52)[1] =  0;//当日魔物討伐数
+		$gameVariables.value(52)[1] = 0;//当日魔物討伐数
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:24|一日経過時コモン
 	AGH_setSelfVariableDayEndInfoCount = function (interp) {
 		return (function () {
-		for (var j = $gameVariables.value(75); j <= $gameVariables.value(76); j++) {
-		  var actor = $gameActors.actor(j);
-		  if(actor.isStateAffected(61)){
-		    actor.removeState(61);$gameVariables.value(380+j)[2] = 0;var randomIndex = getRandomIndex(6) + 5;
-		    if(actor.isLearnedSkill(63)){
-		      this.sVal(540,$gameVariables.value(540) + 2);$gameVariables.value(380+j)[13] += 1;$gameVariables.value(380+j)[1] += randomIndex;
-		      this.sVal(539,$gameVariables.value(539) + `${actor.name()}は自分を慰めた…。${$dataStates[61].name}が解除された。\n\\c[27][性欲度+${value1}] [自慰回数+1]\\C[0]`);
-		    } else {
-		      this.sVal(539,$gameVariables.value(539) + `${actor.name()}の${$dataStates[61].name}が解除された。\n`);
-		      this.sVal(540,$gameVariables.value(540) + 1);
-		}}};
+			for (var j = $gameVariables.value(75); j <= $gameVariables.value(76); j++) {
+				var actor = $gameActors.actor(j);
+				if (actor.isStateAffected(61)) {
+					actor.removeState(61); $gameVariables.value(380 + j)[2] = 0; var randomIndex = getRandomIndex(6) + 5;
+					if (actor.isLearnedSkill(63)) {
+						this.sVal(540, $gameVariables.value(540) + 2); $gameVariables.value(380 + j)[13] += 1; $gameVariables.value(380 + j)[1] += randomIndex;
+						this.sVal(539, $gameVariables.value(539) + `${actor.name()}は自分を慰めた…。${$dataStates[61].name}が解除された。\n\\c[27][性欲度+${value1}] [自慰回数+1]\\C[0]`);
+					} else {
+						this.sVal(539, $gameVariables.value(539) + `${actor.name()}の${$dataStates[61].name}が解除された。\n`);
+						this.sVal(540, $gameVariables.value(540) + 1);
+					}
+				}
+			};
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:24|一日経過時コモン
 	AGH_setSelfVariableDayEndInfoTextDayPassCommon = function (interp) {
 		return (function () {
-		for (var i = 1; i <= $dataStates.length-1; i++) {
-		  if($dataStates[i].meta['dayRemove']){
-		    if($gameParty.membersState(i)){
-		      for (var j = $gameVariables.value(75); j <= $gameVariables.value(76); j++) {
-		        var actor = $gameActors.actor(j);
-		        if(actor.isStateAffected(i)){
-		          actor.removeState(i);
-		      }};
-		      this.sVal(539,$gameVariables.value(539) + `${$dataStates[i].name}が解除された。\n`);
-		      this.sVal(540,$gameVariables.value(540) + 1);
-		}}};
+			for (var i = 1; i <= $dataStates.length - 1; i++) {
+				if ($dataStates[i].meta['dayRemove']) {
+					if ($gameParty.membersState(i)) {
+						for (var j = $gameVariables.value(75); j <= $gameVariables.value(76); j++) {
+							var actor = $gameActors.actor(j);
+							if (actor.isStateAffected(i)) {
+								actor.removeState(i);
+							}
+						};
+						this.sVal(539, $gameVariables.value(539) + `${$dataStates[i].name}が解除された。\n`);
+						this.sVal(540, $gameVariables.value(540) + 1);
+					}
+				}
+			};
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:24|一日経過時コモン
 	AGH_iterateSystemSwitchesDaysOnSwi = function () {
-		for (var i = 1; i <= $dataSystem.switches.length-1; i++) {
-		  if($dataSystem.switches[i].match(/daysOnSwi/)){
-		    if($gameSwitches.value(i)){
-		      var switchIdText = $dataSystem.switches[i].replace(/[^0-9]/g, "");
-		      $gameSwitches.setValue(switchIdText,true);
-		  }};
+		for (var i = 1; i <= $dataSystem.switches.length - 1; i++) {
+			if ($dataSystem.switches[i].match(/daysOnSwi/)) {
+				if ($gameSwitches.value(i)) {
+					var switchIdText = $dataSystem.switches[i].replace(/[^0-9]/g, "");
+					$gameSwitches.setValue(switchIdText, true);
+				}
+			};
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:24|一日経過時コモン
 	AGH_iterateSystemSwitchesDaysOnVal = function () {
-		for (var i = 1; i <= $dataSystem.switches.length-1; i++) {
-		  if($dataSystem.switches[i].match(/daysOnVal+/)){
-		    if($gameSwitches.value(i)){
-		      var value1 = $dataSystem.switches[i].replace(/[^0-9]/g, "");
-		      $gameVariables.setValue(value1,$gameVariables.value(value1) + 1);
-		  }};
-		  if($dataSystem.switches[i].match(/daysOnVal-/)){
-		    if($gameSwitches.value(i)){
-		      var value1 = $dataSystem.switches[i].replace(/[^0-9]/g, "");
-		      $gameVariables.setValue(value1,$gameVariables.value(value1) - 1);
-		  }};
+		for (var i = 1; i <= $dataSystem.switches.length - 1; i++) {
+			if ($dataSystem.switches[i].match(/daysOnVal+/)) {
+				if ($gameSwitches.value(i)) {
+					var value1 = $dataSystem.switches[i].replace(/[^0-9]/g, "");
+					$gameVariables.setValue(value1, $gameVariables.value(value1) + 1);
+				}
+			};
+			if ($dataSystem.switches[i].match(/daysOnVal-/)) {
+				if ($gameSwitches.value(i)) {
+					var value1 = $dataSystem.switches[i].replace(/[^0-9]/g, "");
+					$gameVariables.setValue(value1, $gameVariables.value(value1) - 1);
+				}
+			};
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:24|一日経過時コモン
 	AGH_iterateSystemSwitchesDaysReset = function () {
-		for (var i = 1; i <= $dataSystem.switches.length-1; i++) {
-		  if($dataSystem.switches[i].match(/daysReset/)){
-		    $gameSwitches.setValue(i,false);
-		}};
-		for (var i = 1; i <= $dataSystem.variables.length-1; i++) {
-		  if($dataSystem.variables[i].match(/daysReset/)){
-		    $gameVariables.setValue(i,0);
-		}};
+		for (var i = 1; i <= $dataSystem.switches.length - 1; i++) {
+			if ($dataSystem.switches[i].match(/daysReset/)) {
+				$gameSwitches.setValue(i, false);
+			}
+		};
+		for (var i = 1; i <= $dataSystem.variables.length - 1; i++) {
+			if ($dataSystem.variables[i].match(/daysReset/)) {
+				$gameVariables.setValue(i, 0);
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:24|一日経過時コモン
 	AGH_loseItemDayPassCommon = function () {
 		for (var i = 1001; i <= 1100; i++) {
-		  $gameParty.loseItem($dataItems[i], 9999);
+			$gameParty.loseItem($dataItems[i], 9999);
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:24|一日経過時コモン
 	AGH_iterateItemsExpiryDate = function () {
-		for (var i = 1; i <= $dataItems.length-1; i++) {
-		  if($dataItems[i].meta['ExpiryDate']){
-		    if($gameParty.hasItem($dataItems[i],true)){
-		      $gameParty.loseItem($dataItems[i], 9999);
-		    };
-		  };
+		for (var i = 1; i <= $dataItems.length - 1; i++) {
+			if ($dataItems[i].meta['ExpiryDate']) {
+				if ($gameParty.hasItem($dataItems[i], true)) {
+					$gameParty.loseItem($dataItems[i], 9999);
+				};
+			};
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:24|一日経過時コモン
 	AGH_gainItemSkillCost1week = function () {
-		for (var i = 1; i <= $dataItems.length-1; i++) {
-		  if($dataItems[i].meta['SkillCost1week']){
-		    $gameParty.gainItem($dataItems[i], 1);
-		  };
+		for (var i = 1; i <= $dataItems.length - 1; i++) {
+			if ($dataItems[i].meta['SkillCost1week']) {
+				$gameParty.gainItem($dataItems[i], 1);
+			};
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:24|一日経過時コモン
 	AGH_addState = function (interp) {
 		return (function () {
-		var list = $gameVariables.value(248);
-		list.forEach(function(id) {
-		  if($gameVariables.value(380 + id)[71] >= 1){
-		    if(!$gameActors.actor(id).battleSkillsRaw().includes(847)){
-		      $gameActors.actor(id).addState(67);
-		  };
-		  };
-		}, this);
+			var list = $gameVariables.value(248);
+			list.forEach(function (id) {
+				if ($gameVariables.value(380 + id)[71] >= 1) {
+					if (!$gameActors.actor(id).battleSkillsRaw().includes(847)) {
+						$gameActors.actor(id).addState(67);
+					};
+				};
+			}, this);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:24|一日経過時コモン
 	AGH_readVariableCharacterIdDayPassCommon = function (interp) {
 		return (function () {
-		var list = $gameVariables.value(248);
-		list.forEach(function(id) {
-		  $gameVariables.value(380 + id)[71] =  0;
-		}, this);
+			var list = $gameVariables.value(248);
+			list.forEach(function (id) {
+				$gameVariables.value(380 + id)[71] = 0;
+			}, this);
 		}).call(interp);
 	};
 
@@ -9538,22 +9556,24 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 
 	// Replaces (1x): CommonEvents.json:common-event:25|一日始まり時コモン
 	AGH_setSwitchParallelStopDayPass = function () {
-		for (var i = 1; i <= $dataSystem.switches.length-1; i++) {
-		  if($dataSystem.switches[i].match(/夜自動/)){
-		    if($gameSwitches.value(i) && !$gameSwitches.value(i+2)){
-		      $gameSwitches.setValue(474,true);
-		      $gameSwitches.setValue(i+1,true);
-		      break;
-		}}};
+		for (var i = 1; i <= $dataSystem.switches.length - 1; i++) {
+			if ($dataSystem.switches[i].match(/夜自動/)) {
+				if ($gameSwitches.value(i) && !$gameSwitches.value(i + 2)) {
+					$gameSwitches.setValue(474, true);
+					$gameSwitches.setValue(i + 1, true);
+					break;
+				}
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:25|一日始まり時コモン
 	AGH_playParticleChime2 = function () {
-		AudioManager.playSe({"name":'Chime2',"volume":90,"pitch":100,"pan":0});
+		AudioManager.playSe({ "name": 'Chime2', "volume": 90, "pitch": 100, "pan": 0 });
 		var textDispray2 = 'text_dispray2';
 		$gameScreen._particle.particleClear(textDispray2);
-		$gameScreen._particle.particlePlay(0,textDispray2,'screen','def','screen');
-		$gameScreen._particle.particleExceed(textDispray2,0.3);
+		$gameScreen._particle.particlePlay(0, textDispray2, 'screen', 'def', 'screen');
+		$gameScreen._particle.particleExceed(textDispray2, 0.3);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:25|一日始まり時コモン
@@ -9562,27 +9582,27 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		$gameScreen.setDTextPicture(messageText, 28);
 		$gameScreen.dTextAlign = 0;
 		$gameScreen.dWindowFrame = 'ON';
-		$gameScreen.showPicture(74,"",0,-100,100,100,100,0,0);
-		$gameScreen.movePicture(74,0,50,100,100,100,255,0,60);
+		$gameScreen.showPicture(74, "", 0, -100, 100, 100, 100, 0, 0);
+		$gameScreen.movePicture(74, 0, 50, 100, 100, 100, 255, 0, 60);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:25|一日始まり時コモン
 	AGH_setSelfVariableRandomWork1DayStartCommon = function (interp) {
 		return (function () {
-		var value1 = `おはよう御座います。\n今日も頑張りましょうね`;
-		if($gameSwitches.value(202) && $gameSwitches.value(204)){var value1 = `──さて、行きましょうか`};
-		if($gameSwitches.value(465)){var value1 = `………行きましょう`};
-		this.sVal(21,value1);
+			var value1 = `おはよう御座います。\n今日も頑張りましょうね`;
+			if ($gameSwitches.value(202) && $gameSwitches.value(204)) { var value1 = `──さて、行きましょうか` };
+			if ($gameSwitches.value(465)) { var value1 = `………行きましょう` };
+			this.sVal(21, value1);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:25|一日始まり時コモン
 	AGH_setSwitchDailyOrder = function () {
-		if($gameSwitches.value(129)){
-		  quest_jutyuu2(2);
-		$gameSwitches.setValue(644,true);
+		if ($gameSwitches.value(129)) {
+			quest_jutyuu2(2);
+			$gameSwitches.setValue(644, true);
 		};
-		$gameSwitches.setValue(380,false);
+		$gameSwitches.setValue(380, false);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:29|メニュー開く
@@ -9595,24 +9615,24 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		var actor = $gameParty.members()[0];
 		production_separateSetProfile(actor.actorId());
 		$gameVariables.setValue(255,
-		`\\fs[22]\\C[2]${actor.name()}=${$gameVariables.value(actor.actorId()+380)[50]}\\C[0]
+			`\\fs[22]\\C[2]${actor.name()}=${$gameVariables.value(actor.actorId() + 380)[50]}\\C[0]
 		\\fs[22]${actor.nickname()}\n`);
-		$gameVariables.setValue(253,`\\fs[20]${actor.profile()}`);
-		$gameVariables.setValue(255,$gameVariables.value(255) + $gameVariables.value(253));
+		$gameVariables.setValue(253, `\\fs[20]${actor.profile()}`);
+		$gameVariables.setValue(255, $gameVariables.value(255) + $gameVariables.value(253));
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:29|メニュー開く
 	AGH_setVariableMenuDisplayOpenMenu = function () {
 		var actor = $gameParty.members()[0];
 		$gameVariables.setValue(255,
-		`\\fs[25]\\C[2]${actor.name()}=${$gameVariables.value(actor.actorId()+380)[50]}\\C[0]
+			`\\fs[25]\\C[2]${actor.name()}=${$gameVariables.value(actor.actorId() + 380)[50]}\\C[0]
 		\\fs[25]${actor.nickname()}\n`);
-		if(isGirl(actor)){
-		  hstates_heights(actor.actorId(),253);
+		if (isGirl(actor)) {
+			hstates_heights(actor.actorId(), 253);
 		} else {
-		  $gameVariables.setValue(253,`　`);
+			$gameVariables.setValue(253, `　`);
 		};
-		$gameVariables.setValue(255,$gameVariables.value(255) + $gameVariables.value(253));
+		$gameVariables.setValue(255, $gameVariables.value(255) + $gameVariables.value(253));
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:29|メニュー開く
@@ -9634,50 +9654,54 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		var variable257Value = $gameVariables.value(257);
 		var counter = 0;
 		for (var i = 0; i < variable257Value.length; i++) {
-		  if(variable257Value[i] >= 1 && i >= 1){
-		    if($dataItems[i].meta['OnSwitch']){
-		      var OnSwitchList = $dataItems[i].meta['OnSwitch'].split(',');
-		      for (var j = 0; j <= OnSwitchList.length-1; j++) {
-		        if(Number(OnSwitchList[j]) == 207){
-		          counter += variable257Value[i];
-		}}}}};
-		$gameVariables.setValue(608,counter);
+			if (variable257Value[i] >= 1 && i >= 1) {
+				if ($dataItems[i].meta['OnSwitch']) {
+					var OnSwitchList = $dataItems[i].meta['OnSwitch'].split(',');
+					for (var j = 0; j <= OnSwitchList.length - 1; j++) {
+						if (Number(OnSwitchList[j]) == 207) {
+							counter += variable257Value[i];
+						}
+					}
+				}
+			}
+		};
+		$gameVariables.setValue(608, counter);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:44|称号パッシブ獲得
 	AGH_readVariableRandomWork2 = function () {
 		var actor = $gameActors.actor($gameVariables.value(11));
-		if(!$gameParty.inBattle()){
-		  $gamePlayer.requestAnimation($gameVariables.value(22))
-		}else{
-		  if(actor.isBattleMember()){
-		    $gameParty.members()[actor.index()].startAnimation($gameVariables.value(22), false, 0)
-		  };
+		if (!$gameParty.inBattle()) {
+			$gamePlayer.requestAnimation($gameVariables.value(22))
+		} else {
+			if (actor.isBattleMember()) {
+				$gameParty.members()[actor.index()].startAnimation($gameVariables.value(22), false, 0)
+			};
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:45|一言演出用
 	AGH_setSelfVariableActorChoiceOneLineEffect = function (interp) {
 		return (function () {
-		//一言演出。変数20が1以上で獲得用。0で移動ポイント増加など
-		this.sVal(20,1);
-		var actor = $gameActors.actor($gameVariables.value(20));
-		valueWordSet0 = `\\C[16]${actor.name()}\\C[0]はクラス2ndジョブ\\C[2]＜\\j[21]＞\\C[0]に目覚めた！`;
-		valueWordSetEx = 0;//補足が必要な場合
-		this.setupChild($dataCommonEvents[45].list, 0);
+			//一言演出。変数20が1以上で獲得用。0で移動ポイント増加など
+			this.sVal(20, 1);
+			var actor = $gameActors.actor($gameVariables.value(20));
+			valueWordSet0 = `\\C[16]${actor.name()}\\C[0]はクラス2ndジョブ\\C[2]＜\\j[21]＞\\C[0]に目覚めた！`;
+			valueWordSetEx = 0;//補足が必要な場合
+			this.setupChild($dataCommonEvents[45].list, 0);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:48|全体図で新エリア解放時イベント
 	AGH_characterERSMAKETEMPLATE = function (interp) {
 		return (function () {
-		var value1 = this.character(0).x;
-		var value2 = this.character(0).y;
-		var args = new Array("68",String(value1),String(value2));
-		this.pluginCommand("ERS_MAKE_TEMPLATE", args);
-		var args = new Array("22");
-		this.pluginCommand("ERS_GET_LAST_SPAWN_EVENT_ID", args);
-		this.wait(20);
+			var value1 = this.character(0).x;
+			var value2 = this.character(0).y;
+			var args = new Array("68", String(value1), String(value2));
+			this.pluginCommand("ERS_MAKE_TEMPLATE", args);
+			var args = new Array("22");
+			this.pluginCommand("ERS_GET_LAST_SPAWN_EVENT_ID", args);
+			this.wait(20);
 		}).call(interp);
 	};
 
@@ -9715,12 +9739,13 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 
 	// Replaces (1x): CommonEvents.json:common-event:49|ダンジョンワープポイント
 	AGH_addCustomChoiceDungeonWarpPoint = function () {
-		for (var i = 0; i <= valueScriptArray1.length-1; i++) {
-		  const id = 1; 
-		  const choiceParams = {
-		  text: `${valueWordArray[i]}`,
-		  value: i};
-		  $gameSystem.addCustomChoice(id, choiceParams);
+		for (var i = 0; i <= valueScriptArray1.length - 1; i++) {
+			const id = 1;
+			const choiceParams = {
+				text: `${valueWordArray[i]}`,
+				value: i
+			};
+			$gameSystem.addCustomChoice(id, choiceParams);
 		};
 	};
 
@@ -9732,93 +9757,96 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:49|ダンジョンワープポイント
 	AGH_setSwitchTemporarySwitch = function (interp) {
 		return (function () {
-		var array = [Number(arr1[0]),Number(arr1[1]),Number(arr1[2])];
-		var arr3 = [$gameMap.mapId(),$gameMap.event(this._eventId).x,$gameMap.event(this._eventId).y];
-		if(array[0] == arr3[0] && array[1] == arr3[1] && array[2] == arr3[2]){
-		  $gameSwitches.setValue(380,true);
-		} else {
-		  $gameSwitches.setValue(380,false);
-		};
+			var array = [Number(arr1[0]), Number(arr1[1]), Number(arr1[2])];
+			var arr3 = [$gameMap.mapId(), $gameMap.event(this._eventId).x, $gameMap.event(this._eventId).y];
+			if (array[0] == arr3[0] && array[1] == arr3[1] && array[2] == arr3[2]) {
+				$gameSwitches.setValue(380, true);
+			} else {
+				$gameSwitches.setValue(380, false);
+			};
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:52|ファイルチェック用スクリプト
 	AGH_iterateWeaponsBGInN = function () {
 		var BGInN = 'BG_inN';
-		var valueItems = $dataWeapons;var end = valueItems.length-1;
+		var valueItems = $dataWeapons; var end = valueItems.length - 1;
 		var j = 1;
-		for(var i = 1; i <= end; i++){
-		  if(valueItems[i].meta[BGInN]){
-		    var array = valueItems[i].meta[BGInN].split(',')[0];
-		      console.log(`${i}  ${value1}`);
-		    console.log(`${value1}`);
-		    $gameScreen.showPicture(j,array,1,640-128,384,100,100,255,0);
-		    j += 1;
-		}};
+		for (var i = 1; i <= end; i++) {
+			if (valueItems[i].meta[BGInN]) {
+				var array = valueItems[i].meta[BGInN].split(',')[0];
+				console.log(`${i}  ${value1}`);
+				console.log(`${value1}`);
+				$gameScreen.showPicture(j, array, 1, 640 - 128, 384, 100, 100, 255, 0);
+				j += 1;
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:52|ファイルチェック用スクリプト
 	AGH_traceDebugOutputEnemyEntrySe = function () {
 		var EnemyEntrySe = 'EnemyEntrySe';
-		var valueItems = $dataEnemies;var end = valueItems.length-1;
+		var valueItems = $dataEnemies; var end = valueItems.length - 1;
 		var j = 1;
-		for(var i = 1; i <= end; i++){
-		  if(valueItems[i].meta[EnemyEntrySe]){
-		    var array = valueItems[i].meta[EnemyEntrySe].split(',')[0];
-		      console.log(`${i}  ${array}`);
-		    AudioManager.playSe({"name":array,"volume":100,"pitch":100,"pan":0});
-		    j += 1;
-		}};
+		for (var i = 1; i <= end; i++) {
+			if (valueItems[i].meta[EnemyEntrySe]) {
+				var array = valueItems[i].meta[EnemyEntrySe].split(',')[0];
+				console.log(`${i}  ${array}`);
+				AudioManager.playSe({ "name": array, "volume": 100, "pitch": 100, "pan": 0 });
+				j += 1;
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:52|ファイルチェック用スクリプト
 	AGH_showPictureFileCheckScript = function () {
 		var value2 = '';
-		var valueItems = $dataItems;var end = valueItems.length-1;
+		var valueItems = $dataItems; var end = valueItems.length - 1;
 		var j = 1;
-		for(var i = 1; i <= end; i++){
-		  if(valueItems[i].meta[value2]){
-		    var value1 = valueItems[i].meta[value2].split(',')[0];
-		    var value1 = '/img/parallaxes/' + value1;    
-		      console.log(`${i}  ${value1}`);
-		    $gameScreen.showPicture(j,value1,1,640-128,384,100,100,255,0);
-		    j += 1;
-		}};
+		for (var i = 1; i <= end; i++) {
+			if (valueItems[i].meta[value2]) {
+				var value1 = valueItems[i].meta[value2].split(',')[0];
+				var value1 = '/img/parallaxes/' + value1;
+				console.log(`${i}  ${value1}`);
+				$gameScreen.showPicture(j, value1, 1, 640 - 128, 384, 100, 100, 255, 0);
+				j += 1;
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:53|デバッグコモン
 	AGH_setSelfVariableActorChoiceDebugCommon = function (interp) {
 		return (function () {
-		this.sVal(20,3);
-		var actor = $gameActors.actor($gameVariables.value(20));
-		for (var i = 431; i < 439; i++) {
-		    actor.forgetSkill(i);
-		};
+			this.sVal(20, 3);
+			var actor = $gameActors.actor($gameVariables.value(20));
+			for (var i = 431; i < 439; i++) {
+				actor.forgetSkill(i);
+			};
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:53|デバッグコモン
 	AGH_setSelfVariableActorChoice_4 = function (interp) {
 		return (function () {
-		this.sVal(20,3);
-		var actor = $gameActors.actor($gameVariables.value(20));
-		for (var i = 1; i < $dataSkills.length; i++) {
-		  if(!actor.isLearnedSkill(i)){
-		    actor.forgetSkill(i);
-		    actor.setSkillMasteryUses(i, 0);
-		    actor.setSkillMasteryLevel(i, 0);
-		  };
-		};
+			this.sVal(20, 3);
+			var actor = $gameActors.actor($gameVariables.value(20));
+			for (var i = 1; i < $dataSkills.length; i++) {
+				if (!actor.isLearnedSkill(i)) {
+					actor.forgetSkill(i);
+					actor.setSkillMasteryUses(i, 0);
+					actor.setSkillMasteryLevel(i, 0);
+				};
+			};
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:53|デバッグコモン
 	AGH_setSelfVariableActorChoice_5 = function (interp) {
 		return (function () {
-		this.sVal(20,1);
-		var actor = $gameActors.actor($gameVariables.value(20));
-		var value1 = actor.stateRate(62) * 100
-		console.log(`${value1}`);
+			this.sVal(20, 1);
+			var actor = $gameActors.actor($gameVariables.value(20));
+			var value1 = actor.stateRate(62) * 100
+			console.log(`${value1}`);
 		}).call(interp);
 	};
 
@@ -9830,14 +9858,15 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:53|デバッグコモン
 	AGH_iteratePartyMembersDebugCommon = function () {
 		for (var i = 0; i < $gameParty.battleMembers().length; i++) {
-		  var battleMember = $gameParty.battleMembers()[i];
-		  if($gameParty.members().contains(battleMember)){
-		battleMember.learnSkill(297);battleMember.gainSkillMasteryUses(297, 100);
-		battleMember.learnSkill(300);battleMember.gainSkillMasteryUses(300, 100);
-		battleMember.learnSkill(308);battleMember.gainSkillMasteryUses(308, 100);
-		battleMember.learnSkill(340);battleMember.gainSkillMasteryUses(340, 100);
-		battleMember.learnSkill(290);battleMember.gainSkillMasteryUses(290, 100);
-		}};
+			var battleMember = $gameParty.battleMembers()[i];
+			if ($gameParty.members().contains(battleMember)) {
+				battleMember.learnSkill(297); battleMember.gainSkillMasteryUses(297, 100);
+				battleMember.learnSkill(300); battleMember.gainSkillMasteryUses(300, 100);
+				battleMember.learnSkill(308); battleMember.gainSkillMasteryUses(308, 100);
+				battleMember.learnSkill(340); battleMember.gainSkillMasteryUses(340, 100);
+				battleMember.learnSkill(290); battleMember.gainSkillMasteryUses(290, 100);
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:53|デバッグコモン
@@ -9857,68 +9886,69 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:53|デバッグコモン
 	AGH_iterateItemsDebugCommon = function () {
 		var messageText = ``;
-		for(var i = 1; i <= $dataStates.length-1; i++){  messageText += `[${i}]${$dataStates[i].name}\n`};
-		for(var i = 1; i <= $dataItems.length-1; i++){messageText += `[${i}]${$dataItems[i].name}\n`};
-		for(var i = 1; i <= $dataWeapons.length-1; i++){messageText += `[${i}]${$dataWeapons[i].name}\n`};
-		for(var i = 1; i <= 500; i++){messageText += `[${i}]${$dataArmors[i].name}\n`};
-		for(var i = 1; i <= $dataSkills.length-1; i++){messageText += `[${i}]${$dataSkills[i].name}\n`};
+		for (var i = 1; i <= $dataStates.length - 1; i++) { messageText += `[${i}]${$dataStates[i].name}\n` };
+		for (var i = 1; i <= $dataItems.length - 1; i++) { messageText += `[${i}]${$dataItems[i].name}\n` };
+		for (var i = 1; i <= $dataWeapons.length - 1; i++) { messageText += `[${i}]${$dataWeapons[i].name}\n` };
+		for (var i = 1; i <= 500; i++) { messageText += `[${i}]${$dataArmors[i].name}\n` };
+		for (var i = 1; i <= $dataSkills.length - 1; i++) { messageText += `[${i}]${$dataSkills[i].name}\n` };
 		console.log(messageText)
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:53|デバッグコモン
 	AGH_gainItemDebugCommon = function () {
-		for(var i = 801; i <= 810; i++){
-		if (!$dataItems[i].name == '') {
-		$gameParty.gainItem($dataItems[i], -1);
-		}};
+		for (var i = 801; i <= 810; i++) {
+			if (!$dataItems[i].name == '') {
+				$gameParty.gainItem($dataItems[i], -1);
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:53|デバッグコモン
 	AGH_setVariableDungeonWarpCircleDebugCommon = function () {
-		$gameVariables.setValue(211,Array(101).fill(0));
-		for(var i = 0; i <= 100; i++){
-		$gameVariables.value(211)[i] = [];
-		for(var j = 0; j <= 10; j++){
-		$gameVariables.value(211)[i].push(0);
-		};
+		$gameVariables.setValue(211, Array(101).fill(0));
+		for (var i = 0; i <= 100; i++) {
+			$gameVariables.value(211)[i] = [];
+			for (var j = 0; j <= 10; j++) {
+				$gameVariables.value(211)[i].push(0);
+			};
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:53|デバッグコモン
 	AGH_readVariableDebugCommon = function () {
-		$gameVariables.value(1+440)[41] = 0
+		$gameVariables.value(1 + 440)[41] = 0
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:53|デバッグコモン
 	AGH_readVariableChoiceSwitch3 = function () {
 		//イベントの位置が変更された場合に更新。ctrl+CでSetteiのvalueLocationPresetにコピペ
-		document.addEventListener('copy', function(e) {
-		  e.preventDefault();
-		  var data = $gameVariables.value(163);
-		  delete data.comment;
-		file = JSON.stringify(data);
-		  e.clipboardData.setData('text/plain', file);
+		document.addEventListener('copy', function (e) {
+			e.preventDefault();
+			var data = $gameVariables.value(163);
+			delete data.comment;
+			file = JSON.stringify(data);
+			e.clipboardData.setData('text/plain', file);
 		});
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:53|デバッグコモン
 	AGH_iterateSystemSwitches = function () {
 		var array = [];
-		for(var i = 201; i <= 380; i++){
-		  array.push(`${i}:${$dataSystem.switches[i]}`);
+		for (var i = 201; i <= 380; i++) {
+			array.push(`${i}:${$dataSystem.switches[i]}`);
 		};
-		fs.writeFileSync( "valueLocationPreset.txt" ,JSON.stringify(array) )
+		fs.writeFileSync("valueLocationPreset.txt", JSON.stringify(array))
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:54|イベント場所移動コモン
 	AGH_configureMapEventEventPlaceMoveCommon = function (interp) {
 		return (function () {
-		for (var i = 1; i < 10; i++) {
-		  if(!!$gameMap.event(i)) {
-		    this._eventId = i;
-		    break;
-		  };
-		};
+			for (var i = 1; i < 10; i++) {
+				if (!!$gameMap.event(i)) {
+					this._eventId = i;
+					break;
+				};
+			};
 		}).call(interp);
 	};
 
@@ -9926,10 +9956,10 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_runScriptBeforeSaveCommon = function () {
 		入手Ｇ累計$gameParty.gainGoldSum;
 		総合与えダメージ$gameActors.attackDamageSum;
-		消費Ｇ累計$gameParty.loseGoldSum; 
+		消費Ｇ累計$gameParty.loseGoldSum;
 		合計戦闘不能回数$gameActors.deadCounter;
-		最大与えダメージ$gameActors.attackDamageMax; 
-		合計与えダメージ$gameActors.attackDamageSum; 
+		最大与えダメージ$gameActors.attackDamageMax;
+		合計与えダメージ$gameActors.attackDamageSum;
 		最大被害ダメージ$gameActors.acceptDamageMax;
 		合計被害ダメージ$gameActors.acceptDamageSum;
 	};
@@ -9938,134 +9968,139 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_showPictureXevS09803 = function () {
 		valuePic1 = 55;
 		var XevS09803 = 'XevS098_03';
-		$gameScreen.showPicture(valuePic1,XevS09803,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(valuePic1,1,640-128,384,100,100,255,0,60);
-		pic_move1(valuePic1-1,0,0,100,100,0,120);
+		$gameScreen.showPicture(valuePic1, XevS09803, 1, 640 - 128, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(valuePic1, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
+		pic_move1(valuePic1 - 1, 0, 0, 100, 100, 0, 120);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
 	AGH_pluginCommandGabText = function (interp) {
 		return (function () {
-		var talkSet = valueTalkSet;
-		var args = new Array(String(talkSet[0]));
-		this.pluginCommand("GabText", args);
-		var args = new Array(String(talkSet[1]));
-		this.pluginCommand("GabFaceName", args);
-		var args = new Array(String(talkSet[2]));
-		this.pluginCommand("GabFaceIndex", args);
+			var talkSet = valueTalkSet;
+			var args = new Array(String(talkSet[0]));
+			this.pluginCommand("GabText", args);
+			var args = new Array(String(talkSet[1]));
+			this.pluginCommand("GabFaceName", args);
+			var args = new Array(String(talkSet[2]));
+			this.pluginCommand("GabFaceIndex", args);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
 	AGH_readVariableTipsTitle = function () {
 		var value1 = 0;
-		if($gameVariables.value(532).length != 0){
-		  for (var i = 0; i <= $gameVariables.value(532).length-1; i++) {
-		    if($gameVariables.value(532)[i] == valueTalkSet[0]){
-		      var value1 = 1;
-		      break;
-		}}};
-		if(value1 == 0){
-		  $gameVariables.value(532).push(valueTalkSet[0]);
-		  $gameVariables.value(533).push(valueTalkSet[1]);
-		  $gameVariables.value(534).push(valueTalkSet[2]);
+		if ($gameVariables.value(532).length != 0) {
+			for (var i = 0; i <= $gameVariables.value(532).length - 1; i++) {
+				if ($gameVariables.value(532)[i] == valueTalkSet[0]) {
+					var value1 = 1;
+					break;
+				}
+			}
+		};
+		if (value1 == 0) {
+			$gameVariables.value(532).push(valueTalkSet[0]);
+			$gameVariables.value(533).push(valueTalkSet[1]);
+			$gameVariables.value(534).push(valueTalkSet[2]);
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
 	AGH_showPictureConversationGabCommon = function () {
-		if(valueTalkSet[1] == 0){var value2 = `Tips:${valueTalkSet[0]}`}else{var value2 = `Tips:${valueTalkSet[0]}\n${valueTalkSet[1]}`};
-		var array = [value2,25];
+		if (valueTalkSet[1] == 0) { var value2 = `Tips:${valueTalkSet[0]}` } else { var value2 = `Tips:${valueTalkSet[0]}\n${valueTalkSet[1]}` };
+		var array = [value2, 25];
 		$gameScreen.setDTextPicture(array[0], array[1]);
 		$gameScreen.dWindowFrame = 'ON';
-		if(valueTalkSet[2][0] != 0){
-		  var value1 = 30;
+		if (valueTalkSet[2][0] != 0) {
+			var value1 = 30;
 		} else {
-		  var value1 = 50;
+			var value1 = 50;
 		};
-		$gameScreen.showPicture(103,'',0,-80,value1,100,100,255,0);
-		$gameScreen.movePicture(103,0,50,value1,100,100,255,0,100);
+		$gameScreen.showPicture(103, '', 0, -80, value1, 100, 100, 255, 0);
+		$gameScreen.movePicture(103, 0, 50, value1, 100, 100, 255, 0, 100);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
 	AGH_showPictureScreenBlackOut = function () {
-		if(valueTalkSet[2][0] != 0){
-		  var ScreenBlackOut = 'ScreenBlackOut';
-		  $gameScreen.showPicture(101,ScreenBlackOut,1,640,384,100,100,150,0);
-		  $gameScreen.showPicture(102,valueTalkSet[2][0],valueTalkSet[2][1],
-		  valueTalkSet[2][2],valueTalkSet[2][3],
-		  valueTalkSet[2][4],valueTalkSet[2][5],valueTalkSet[2][6],0);
+		if (valueTalkSet[2][0] != 0) {
+			var ScreenBlackOut = 'ScreenBlackOut';
+			$gameScreen.showPicture(101, ScreenBlackOut, 1, 640, 384, 100, 100, 150, 0);
+			$gameScreen.showPicture(102, valueTalkSet[2][0], valueTalkSet[2][1],
+				valueTalkSet[2][2], valueTalkSet[2][3],
+				valueTalkSet[2][4], valueTalkSet[2][5], valueTalkSet[2][6], 0);
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
 	AGH_readVariableTipsTitleConversationGabCommon = function () {
 		var value1 = 0;
-		if($gameVariables.value(532).length != 0){
-		  for (var i = 0; i <= $gameVariables.value(532).length-1; i++) {
-		    if($gameVariables.value(532) == valueTalkSet[0]){
-		      var value1 = 1;
-		      break;
-		}}};
-		if(value1 == 0){
-		  $gameVariables.value(532).push(valueTalkSet[0]);
-		  $gameVariables.value(533).push(valueTalkSet[1]);
-		  $gameVariables.value(534).push(valueTalkSet[2]);
+		if ($gameVariables.value(532).length != 0) {
+			for (var i = 0; i <= $gameVariables.value(532).length - 1; i++) {
+				if ($gameVariables.value(532) == valueTalkSet[0]) {
+					var value1 = 1;
+					break;
+				}
+			}
+		};
+		if (value1 == 0) {
+			$gameVariables.value(532).push(valueTalkSet[0]);
+			$gameVariables.value(533).push(valueTalkSet[1]);
+			$gameVariables.value(534).push(valueTalkSet[2]);
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
 	AGH_showPictureSkillAttackId = function () {
 		var actor = $gameActors.actor($gameVariables.value(20));
-		  var variable96Value = `\x1bSIN[${$gameVariables.value(96)}]`;
-		  if($dataSkills[$gameVariables.value(96)].meta['rubi']){
-		    var variable96Value2 = $dataSkills[$gameVariables.value(96)].meta['rubi'].replace(' ','');
-		    var variable96Value = `${variable96Value2}\n${variable96Value}`;
-		  };
-		  $gameScreen.dWindowFrame = 'ON';
-		  $gameScreen.dTextAlign = 1;
-		  $gameScreen.setDTextPicture(`${variable96Value}`, 35);
-		  $gameScreen.showPicture(100,"",1,$gameParty.getX(actor.index()+1),$gameParty.getY(actor.index()+1)-50,100,100,0,0);
-		  $gameScreen.movePicture(100,1,$gameParty.getX(actor.index()+1),$gameParty.getY(actor.index()+1)-100,100,100,255,0,30);
+		var variable96Value = `\x1bSIN[${$gameVariables.value(96)}]`;
+		if ($dataSkills[$gameVariables.value(96)].meta['rubi']) {
+			var variable96Value2 = $dataSkills[$gameVariables.value(96)].meta['rubi'].replace(' ', '');
+			var variable96Value = `${variable96Value2}\n${variable96Value}`;
+		};
+		$gameScreen.dWindowFrame = 'ON';
+		$gameScreen.dTextAlign = 1;
+		$gameScreen.setDTextPicture(`${variable96Value}`, 35);
+		$gameScreen.showPicture(100, "", 1, $gameParty.getX(actor.index() + 1), $gameParty.getY(actor.index() + 1) - 50, 100, 100, 0, 0);
+		$gameScreen.movePicture(100, 1, $gameParty.getX(actor.index() + 1), $gameParty.getY(actor.index() + 1) - 100, 100, 100, 255, 0, 30);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
 	AGH_pictureScreenBlackOut = function () {
 		var value1 = 128; var value4 = 0;
-		if($gameScreen.picture(5) || $gameScreen.picture(70)){
-		  var value1 = -128; var value4 = -128;
+		if ($gameScreen.picture(5) || $gameScreen.picture(70)) {
+			var value1 = -128; var value4 = -128;
 		};
 		var talkSet = valueTalkSet;
 		var ScreenBlackOut = 'ScreenBlackOut';
-		$gameScreen.showPicture(talkSet[0],ScreenBlackOut,1,640-128+value1,384,100,100,150,0);
+		$gameScreen.showPicture(talkSet[0], ScreenBlackOut, 1, 640 - 128 + value1, 384, 100, 100, 150, 0);
 		var Town014 = 'Town014';　//中心から円状に表示
-		picture_fade1(talkSet[0],"fadeIn",Town014,talkSet[2],5);
-		$gameScreen.showPicture(talkSet[0]+1,talkSet[1],1,640+value4+20,384,100,100,0,0);
-		$gameScreen.movePicture(talkSet[0]+1,1,640+value4,384,100,100,255,0,talkSet[2]);
+		picture_fade1(talkSet[0], "fadeIn", Town014, talkSet[2], 5);
+		$gameScreen.showPicture(talkSet[0] + 1, talkSet[1], 1, 640 + value4 + 20, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(talkSet[0] + 1, 1, 640 + value4, 384, 100, 100, 255, 0, talkSet[2]);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
 	AGH_readVariableRandomWork1ConversationGabCommon = function (interp) {
 		return (function () {
-		var variable21Value = $gameVariables.value(21);
-		this.character(variable21Value).requestAnimation(199);
+			var variable21Value = $gameVariables.value(21);
+			this.character(variable21Value).requestAnimation(199);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
 	AGH_forceMoveRouteCharactersRandomWork1 = function (interp) {
 		return (function () {
-		var variable21Value = $gameVariables.value(21);
-		var value5 = $gameMap.event(variable21Value).x;var value6 = $gameMap.event(variable21Value).y;
-		var args = new Array("190",String(value5),String(value6));
-		this.pluginCommand("ERS_MAKE_TEMPLATE", args);
-		this.character(variable21Value).forceMoveRoute({
-		"list":[
-		{"code":32},{"code":34},{"code":36},{"code":37},{"code":19},
-		{"code":44,"parameters":[{"name":"Z_Collaps","volume":50,"pitch":70,"pan":0}]},
-		{ "code": 45, "parameters": ["this._spriteOffsetX = -20;"] },{"code":35},
-		{ "code": 45, "parameters": ["this.setAngle(45);"] },{"code":35},
-		{"code":0}],"repeat":false,"skippable":true});
+			var variable21Value = $gameVariables.value(21);
+			var value5 = $gameMap.event(variable21Value).x; var value6 = $gameMap.event(variable21Value).y;
+			var args = new Array("190", String(value5), String(value6));
+			this.pluginCommand("ERS_MAKE_TEMPLATE", args);
+			this.character(variable21Value).forceMoveRoute({
+				"list": [
+					{ "code": 32 }, { "code": 34 }, { "code": 36 }, { "code": 37 }, { "code": 19 },
+					{ "code": 44, "parameters": [{ "name": "Z_Collaps", "volume": 50, "pitch": 70, "pan": 0 }] },
+					{ "code": 45, "parameters": ["this._spriteOffsetX = -20;"] }, { "code": 35 },
+					{ "code": 45, "parameters": ["this.setAngle(45);"] }, { "code": 35 },
+					{ "code": 0 }], "repeat": false, "skippable": true
+			});
 		}).call(interp);
 	};
 
@@ -10074,12 +10109,12 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		var talkSet = valueTalkSet;
 		$gameScreen.setDTextPicture(talkSet[1], talkSet[0]);
 		$gameScreen.dWindowFrame = 'ON';
-		if(talkSet[2] == 0){
-		  $gameScreen.showPicture(102,'',0,50,50,100,100,0,0);
-		  $gameScreen.movePicture(102,0,100,50,100,100,255,0,60);
+		if (talkSet[2] == 0) {
+			$gameScreen.showPicture(102, '', 0, 50, 50, 100, 100, 0, 0);
+			$gameScreen.movePicture(102, 0, 100, 50, 100, 100, 255, 0, 60);
 		} else {
-		  $gameScreen.showPicture(102,'',1,640-50,384,100,100,0,0);
-		  $gameScreen.movePicture(102,1,640,384,100,100,255,0,60);
+			$gameScreen.showPicture(102, '', 1, 640 - 50, 384, 100, 100, 0, 0);
+			$gameScreen.movePicture(102, 1, 640, 384, 100, 100, 255, 0, 60);
 		};
 	};
 
@@ -10087,30 +10122,30 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_showPictureConversationGabCommon_3 = function () {
 		var pictureId = 101;
 		var value2 = '/img/talkface/99Actor99_s0';
-		$gameScreen.showPicture(pictureId,value2,1,640+600,384+100,0,0,0,0);
-		$gameScreen.movePicture(pictureId,1,640+500,384,100,100,255,0,60);
+		$gameScreen.showPicture(pictureId, value2, 1, 640 + 600, 384 + 100, 0, 0, 0, 0);
+		$gameScreen.movePicture(pictureId, 1, 640 + 500, 384, 100, 100, 255, 0, 60);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
 	AGH_playSeConversationGabCommon = function () {
 		var talkSet = valueTalkSet;
-		AudioManager.playSe({"name":talkSet[0],"volume":talkSet[1],"pitch":talkSet[2],"pan":0});
+		AudioManager.playSe({ "name": talkSet[0], "volume": talkSet[1], "pitch": talkSet[2], "pan": 0 });
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
 	AGH_startAnimation = function () {
 		var talkSet = valueTalkSet;
-		$gameScreen.startAnimation(talkSet[0],talkSet[1],talkSet[2],talkSet[3]);
+		$gameScreen.startAnimation(talkSet[0], talkSet[1], talkSet[2], talkSet[3]);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
 	AGH_setPicturesAnimationConversationGabCommon = function () {
 		var talkSet = valueTalkSet;
 		var actor = $gameActors.actor(talkSet[1]);
-		if(talkSet[0] == 2){
-		  $gameScreen.setPicturesAnimation(2, 10, "連番", talkSet[2]);
-		  pic_locationSet(92,99,"/img/talkface/" + talkSet[1] + "ActorHypnosisEye_0",60,0);
-		  $gameScreen.picture(99).startAnimationFrame(3, true, [1,1,1,2]);
+		if (talkSet[0] == 2) {
+			$gameScreen.setPicturesAnimation(2, 10, "連番", talkSet[2]);
+			pic_locationSet(92, 99, "/img/talkface/" + talkSet[1] + "ActorHypnosisEye_0", 60, 0);
+			$gameScreen.picture(99).startAnimationFrame(3, true, [1, 1, 1, 2]);
 		};
 	};
 
@@ -10118,212 +10153,218 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_setStateCounterConversationGabCommon = function () {
 		var talkSet = valueTalkSet;
 		var actor = $gameActors.actor(talkSet[1]);
-		if(talkSet[0] == 1){
-		  actor.addState(782);
-		  actor.setStateCounter(782,talkSet[2]);
+		if (talkSet[0] == 1) {
+			actor.addState(782);
+			actor.setStateCounter(782, talkSet[2]);
 		};
-		if(talkSet[0] == 0){
-		  actor.removeStateCounter(782);
-		  actor.removeState(782);
-		  pic_move1(99,0,0,100,100,0,120);
+		if (talkSet[0] == 0) {
+			actor.removeStateCounter(782);
+			actor.removeState(782);
+			pic_move1(99, 0, 0, 100, 100, 0, 120);
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
 	AGH_waitConversationGabCommon = function (interp) {
 		return (function () {
-		var talkSet = valueTalkSet;
-		var actor = $gameActors.actor(talkSet[1]);
-		if(talkSet[0] == 1){actor.addState(784)};
-		if(talkSet[0] == 2){pic_locationSet(91,92,"/img/talkface/" + talkSet[1] + "ActorCloudyEye3",120,0)};
-		if(talkSet[0] == 0){
-		  actor.removeState(784);
-		  pic_move1(92,0,0,100,100,0,120);
-		  if($gameScreen.picture(91)){var picture = $gameScreen.picture(91).x()};
-		  if($gameScreen.picture(93)){var value2 = $gameScreen.picture(93).x()};
-		  pic_move1(93,picture-value2,0,100,100,0,10);
-		  this.wait(15);
-		};
+			var talkSet = valueTalkSet;
+			var actor = $gameActors.actor(talkSet[1]);
+			if (talkSet[0] == 1) { actor.addState(784) };
+			if (talkSet[0] == 2) { pic_locationSet(91, 92, "/img/talkface/" + talkSet[1] + "ActorCloudyEye3", 120, 0) };
+			if (talkSet[0] == 0) {
+				actor.removeState(784);
+				pic_move1(92, 0, 0, 100, 100, 0, 120);
+				if ($gameScreen.picture(91)) { var picture = $gameScreen.picture(91).x() };
+				if ($gameScreen.picture(93)) { var value2 = $gameScreen.picture(93).x() };
+				pic_move1(93, picture - value2, 0, 100, 100, 0, 10);
+				this.wait(15);
+			};
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
 	AGH_movePicture1ConversationGabCommon = function () {
 		var talkSet = valueTalkSet;
-		if(talkSet[0] == 0){
-		  pic_move1(93,0,0,100,100,255,60);
+		if (talkSet[0] == 0) {
+			pic_move1(93, 0, 0, 100, 100, 255, 60);
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
 	AGH_showPictureConversationGabCommon_4 = function () {
-		if($gameScreen.brightness() === 0 || !$gameScreen.picture(6) && !$gameScreen.picture(70)){
-		  var value1 = 640;
+		if ($gameScreen.brightness() === 0 || !$gameScreen.picture(6) && !$gameScreen.picture(70)) {
+			var value1 = 640;
 		} else {
-		  var value1 = 640-128;
+			var value1 = 640 - 128;
 		};
 		$gameScreen.dTextRealTime = 'ON';
 		$gameScreen.dTextAlign = 0;
 		$gameScreen.dWindowFrame = 'ON';
 		$gameScreen.setDTextPicture(valueTalkSet[2], valueTalkSet[1]);
-		$gameScreen.showPicture(102,'',1,value1-50,384,100,100,0,0);
-		$gameScreen.movePicture(102,1,value1,384,100,100,255,0,60);
+		$gameScreen.showPicture(102, '', 1, value1 - 50, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(102, 1, value1, 384, 100, 100, 255, 0, 60);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
 	AGH_brightnessIlluminationW = function () {
 		var illuminationW = 'illumination_w';
-		$gameScreen._particle.particlePlay(0,illuminationW,'screen','def','screen');
-		$gameScreen._particle.particleUpdate([illuminationW,'emitterLifetime','1']);
-		if($gameScreen.brightness() === 0 || !$gameScreen.picture(6) && !$gameScreen.picture(70)){}else{
-		  $gameScreen._particle.particleUpdate([illuminationW,'pos',-128,0]);
+		$gameScreen._particle.particlePlay(0, illuminationW, 'screen', 'def', 'screen');
+		$gameScreen._particle.particleUpdate([illuminationW, 'emitterLifetime', '1']);
+		if ($gameScreen.brightness() === 0 || !$gameScreen.picture(6) && !$gameScreen.picture(70)) { } else {
+			$gameScreen._particle.particleUpdate([illuminationW, 'pos', -128, 0]);
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
 	AGH_showPictureConversationGabCommon_5 = function () {
-		if($gameScreen.brightness() === 0 || !$gameScreen.picture(6) && !$gameScreen.picture(70)){
-		  var value1 = 640;
+		if ($gameScreen.brightness() === 0 || !$gameScreen.picture(6) && !$gameScreen.picture(70)) {
+			var value1 = 640;
 		} else {
-		  var value1 = 640-128;
+			var value1 = 640 - 128;
 		};
 		$gameScreen.dTextRealTime = 'ON';
 		$gameScreen.dTextAlign = 0;
 		$gameScreen.dWindowFrame = 'ON';
 		$gameScreen.setDTextPicture(valueTalkSet[2], valueTalkSet[1]);
-		$gameScreen.showPicture(102,'',1,value1-20,384,100,100,0,0);
-		$gameScreen.movePicture(102,1,value1,384,100,100,255,0,60);
+		$gameScreen.showPicture(102, '', 1, value1 - 20, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(102, 1, value1, 384, 100, 100, 255, 0, 60);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
 	AGH_brightnessDirectScreenRing = function () {
 		var directScreenRing = 'direct_screenRing';
-		$gameScreen._particle.particlePlay(0,directScreenRing,'screen','def','screen');
+		$gameScreen._particle.particlePlay(0, directScreenRing, 'screen', 'def', 'screen');
 		var value3 = '#07c5ff';
 		var value4 = '#ffffff';
-		$gameScreen._particle.particleUpdate([directScreenRing,'color',String(value3),String(value4)]);
-		if($gameScreen.brightness() === 0 || !$gameScreen.picture(6) && !$gameScreen.picture(70)){}else{
-		  $gameScreen._particle.particleUpdate([directScreenRing,'pos',-128,0]);
+		$gameScreen._particle.particleUpdate([directScreenRing, 'color', String(value3), String(value4)]);
+		if ($gameScreen.brightness() === 0 || !$gameScreen.picture(6) && !$gameScreen.picture(70)) { } else {
+			$gameScreen._particle.particleUpdate([directScreenRing, 'pos', -128, 0]);
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
 	AGH_configureMapEventConversationGabCommon = function () {
 		var talkSet = valueTalkSet;
-		if(talkSet[2] >= 1){
-		  valueCountSet1 = talkSet[2];
+		if (talkSet[2] >= 1) {
+			valueCountSet1 = talkSet[2];
 		} else {
-		  for (var id = 10; id > 0; id--) {
-		    if(!!$gameMap.event(id)) {
-		      valueCountSet1 = id;
-		      break;
-		  }};
+			for (var id = 10; id > 0; id--) {
+				if (!!$gameMap.event(id)) {
+					valueCountSet1 = id;
+					break;
+				}
+			};
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
 	AGH_spawnMapEventConversationGabCommon = function () {
 		var talkSet = valueTalkSet;
-		if(talkSet[0] == 1){
-		  var event = $gameMap.event(valueCountSet1)._realX;
-		  var value2 = $gameMap.event(valueCountSet1)._realY;
-		  $gameMap.spawnEvent(146, event, value2, true);
-		  valueBlackScreenId = $gameMap.getLastSpawnEventId();
-		  var event = $gameMap.event(valueBlackScreenId);
-		  event.setOpacity(talkSet[1]);
-		  event._spriteOffsetY += 368;
+		if (talkSet[0] == 1) {
+			var event = $gameMap.event(valueCountSet1)._realX;
+			var value2 = $gameMap.event(valueCountSet1)._realY;
+			$gameMap.spawnEvent(146, event, value2, true);
+			valueBlackScreenId = $gameMap.getLastSpawnEventId();
+			var event = $gameMap.event(valueBlackScreenId);
+			event.setOpacity(talkSet[1]);
+			event._spriteOffsetY += 368;
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
 	AGH_setMapEventOpacityConversationGabCommon = function () {
 		var talkSet = valueTalkSet;
-		if(talkSet[0] == 0){
-		  if(valueBlackScreenId >= 1){
-		    var event = $gameMap.event(valueBlackScreenId);
-		    event.setOpacity(0);
-		}};
+		if (talkSet[0] == 0) {
+			if (valueBlackScreenId >= 1) {
+				var event = $gameMap.event(valueBlackScreenId);
+				event.setOpacity(0);
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:62|スクリプト演出コモン
 	AGH_showPictureScriptCommonVariable1 = function (interp) {
 		return (function () {
-		var args = new Array(String($gameVariables.value(121)),"1","横",String($gameVariables.value(123)));
-		this.pluginCommand("PA_INIT", args);
-		$gameScreen.showPicture($gameVariables.value(124),$gameVariables.value(122),1,
-		$gameVariables.value(126),$gameVariables.value(127),100,100,255,0)
-		var args = new Array(String($gameVariables.value(124)),String($gameVariables.value(125)));
-		this.pluginCommand("PA_START_LOOP", args);
+			var args = new Array(String($gameVariables.value(121)), "1", "横", String($gameVariables.value(123)));
+			this.pluginCommand("PA_INIT", args);
+			$gameScreen.showPicture($gameVariables.value(124), $gameVariables.value(122), 1,
+				$gameVariables.value(126), $gameVariables.value(127), 100, 100, 255, 0)
+			var args = new Array(String($gameVariables.value(124)), String($gameVariables.value(125)));
+			this.pluginCommand("PA_START_LOOP", args);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:62|スクリプト演出コモン
 	AGH_showPictureScriptCommonVariable1ScriptEffectCommon = function (interp) {
 		return (function () {
-		var array = [1,1,2,1];
-		var args = new Array(String($gameVariables.value(121)),"1","横",String($gameVariables.value(123)));
-		this.pluginCommand("PA_INIT", args);
-		$gameScreen.showPicture($gameVariables.value(124),$gameVariables.value(122),0,
-		0,0,100,100,$gameVariables.value(126),$gameVariables.value(127));
-		var args = new Array(String($gameVariables.value(124)),String($gameVariables.value(125)),String(array));
-		this.pluginCommand("PA_START_LOOP", args);
+			var array = [1, 1, 2, 1];
+			var args = new Array(String($gameVariables.value(121)), "1", "横", String($gameVariables.value(123)));
+			this.pluginCommand("PA_INIT", args);
+			$gameScreen.showPicture($gameVariables.value(124), $gameVariables.value(122), 0,
+				0, 0, 100, 100, $gameVariables.value(126), $gameVariables.value(127));
+			var args = new Array(String($gameVariables.value(124)), String($gameVariables.value(125)), String(array));
+			this.pluginCommand("PA_START_LOOP", args);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:64|スクリプトシステムコモン
 	AGH_forceMoveRouteCharactersScriptCommonVariable1ScriptSystemCommon = function (interp) {
 		return (function () {
-		this.character($gameVariables.value(121)).forceMoveRoute({
-		"list":[{"code":41, "parameters":[$gameVariables.value(125),$gameVariables.value(126)]}]
-		})
+			this.character($gameVariables.value(121)).forceMoveRoute({
+				"list": [{ "code": 41, "parameters": [$gameVariables.value(125), $gameVariables.value(126)] }]
+			})
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:64|スクリプトシステムコモン
 	AGH_readVariableScriptCommonVariable1 = function (interp) {
 		return (function () {
-		character = this.character($gameVariables.value(121))
-		character.locate($gameVariables.value(122), $gameVariables.value(123))
-		character.setDirection($gameVariables.value(124))
+			character = this.character($gameVariables.value(121))
+			character.locate($gameVariables.value(122), $gameVariables.value(123))
+			character.setDirection($gameVariables.value(124))
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:64|スクリプトシステムコモン
 	AGH_readVariablePartyDisbandOrder = function () {
 		var array = $gameVariables.value(511);
-		for (var i = 0; i < array.length-1; i++) {
-		  if($gameVariables.value(512) - 1 >= i){
-		    if(!$gameParty.members().contains($gameActors.actor(array[i]))){
-		      $gameParty.addActor(array[i])
-		      $gameActors.actor(array[i]).refresh();
-		//console.log(array[i]);
-		}}};
+		for (var i = 0; i < array.length - 1; i++) {
+			if ($gameVariables.value(512) - 1 >= i) {
+				if (!$gameParty.members().contains($gameActors.actor(array[i]))) {
+					$gameParty.addActor(array[i])
+					$gameActors.actor(array[i]).refresh();
+					//console.log(array[i]);
+				}
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:64|スクリプトシステムコモン
 	AGH_readVariablePartyDisbandOrderScriptSystemCommon = function () {
 		var array = $gameVariables.value(511);
-		for (var i = 0; i < array.length-1; i++) {
-		  if($gameVariables.value(512) - 1 <= i){
-		    if(!$gameParty.members().contains($gameActors.actor(array[i]))){
-		      $gameParty.addActor(array[i])
-		      $gameActors.actor(array[i]).refresh();
-		console.log(array[i]);
-		}}};
+		for (var i = 0; i < array.length - 1; i++) {
+			if ($gameVariables.value(512) - 1 <= i) {
+				if (!$gameParty.members().contains($gameActors.actor(array[i]))) {
+					$gameParty.addActor(array[i])
+					$gameActors.actor(array[i]).refresh();
+					console.log(array[i]);
+				}
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:64|スクリプトシステムコモン
 	AGH_readVariableCurrentViewHeroId = function () {
-		for(var i = 1; i <= 20; i++){$gameParty.removeActor(i)}
+		for (var i = 1; i <= 20; i++) { $gameParty.removeActor(i) }
 		$gameParty.addActor($gameVariables.value(11))
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:64|スクリプトシステムコモン
 	AGH_runPluginCommandActorChoice = function (interp) {
 		return (function () {
-		var variable20Value = $gameVariables.value(20);
-		var args = new Array(String(variable20Value));
-		this.pluginCommand("NF_NPC削除", args);
+			var variable20Value = $gameVariables.value(20);
+			var args = new Array(String(variable20Value));
+			this.pluginCommand("NF_NPC削除", args);
 		}).call(interp);
 	};
 
@@ -10331,15 +10372,15 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_readVariableActorChoiceScriptSystemCommon = function () {
 		var actor = $gameActors.actor($gameVariables.value(20));
 		var messageText = `${actor.nickname() + actor.name()}がパーティから離脱した。`
-		CommonPopupManager.showInfo({},messageText,null);
+		CommonPopupManager.showInfo({}, messageText, null);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:64|スクリプトシステムコモン
 	AGH_runPluginCommandActorChoiceScriptSystemCommon = function (interp) {
 		return (function () {
-		var variable20Value = $gameVariables.value(20);
-		var args = new Array(String(variable20Value),'1');
-		this.pluginCommand("NF_NPC追加", args);
+			var variable20Value = $gameVariables.value(20);
+			var args = new Array(String(variable20Value), '1');
+			this.pluginCommand("NF_NPC追加", args);
 		}).call(interp);
 	};
 
@@ -10352,52 +10393,54 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 
 	// Replaces (1x): CommonEvents.json:common-event:64|スクリプトシステムコモン
 	AGH_addCustomChoiceScriptSystemCommon = function () {
-		for(var i=0; i < 9; i ++){
-		const id = 1; const choiceParams = {
-		text: $gameSystem.saveEquipCommandNameArray[i],
-		value: i+1};
-		$gameSystem.addCustomChoice(id, choiceParams);
+		for (var i = 0; i < 9; i++) {
+			const id = 1; const choiceParams = {
+				text: $gameSystem.saveEquipCommandNameArray[i],
+				value: i + 1
+			};
+			$gameSystem.addCustomChoice(id, choiceParams);
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:64|スクリプトシステムコモン
 	AGH_readVariableCharacterIdScriptSystemCommon = function (interp) {
 		return (function () {
-		//場面転換時に苗字代入
-		var list = $gameVariables.value(248);
-		list.forEach(function(id) {
-		$dataWeapons[id+200].name = $gameVariables.value(id+380)[50];
-		}, this);
+			//場面転換時に苗字代入
+			var list = $gameVariables.value(248);
+			list.forEach(function (id) {
+				$dataWeapons[id + 200].name = $gameVariables.value(id + 380)[50];
+			}, this);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:64|スクリプトシステムコモン
 	AGH_iteratePartyMembersERSMAKETEMPLATE = function (interp) {
 		return (function () {
-		var actor = $gameActors.actor($gameVariables.value(121)).index();
-		if($gameParty.members().contains($gameParty.members()[actor])){
-		if($gameParty.members()[actor].actorId() == $gameVariables.value(11)){}else{
-		var memberIndex = $gameParty.members()[actor].actorId() + 20;
-		var args = new Array(String(memberIndex),String(this.character(-1).x),String(this.character(-1).y+1));
-		this.pluginCommand("ERS_MAKE_TEMPLATE", args);
-		var args = new Array("21");this.pluginCommand("ERS_GET_LAST_SPAWN_EVENT_ID", args);$gameVariables.value(342)[memberIndex-20] = $gameVariables.value(21);
-		var args = new Array(String($gameVariables.value(342)[memberIndex-20]),String(actor));this.pluginCommand("PartyGraphics", args);
-		this.character($gameVariables.value(342)[memberIndex-20]).forceMoveRoute({"list":[{"code":38},{"code":9},{"code":9},{"code":25},{"code":0}]});
-		this.wait(5);
-		}};
+			var actor = $gameActors.actor($gameVariables.value(121)).index();
+			if ($gameParty.members().contains($gameParty.members()[actor])) {
+				if ($gameParty.members()[actor].actorId() == $gameVariables.value(11)) { } else {
+					var memberIndex = $gameParty.members()[actor].actorId() + 20;
+					var args = new Array(String(memberIndex), String(this.character(-1).x), String(this.character(-1).y + 1));
+					this.pluginCommand("ERS_MAKE_TEMPLATE", args);
+					var args = new Array("21"); this.pluginCommand("ERS_GET_LAST_SPAWN_EVENT_ID", args); $gameVariables.value(342)[memberIndex - 20] = $gameVariables.value(21);
+					var args = new Array(String($gameVariables.value(342)[memberIndex - 20]), String(actor)); this.pluginCommand("PartyGraphics", args);
+					this.character($gameVariables.value(342)[memberIndex - 20]).forceMoveRoute({ "list": [{ "code": 38 }, { "code": 9 }, { "code": 9 }, { "code": 25 }, { "code": 0 }] });
+					this.wait(5);
+				}
+			};
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:66|コンフィグコマンド
 	AGH_showPictureConfigPicture = function () {
-		if($gameVariables.value(312) == 'ZX_NowconditionA_'){
-		  $gameScreen.showPicture(98,$gameVariables.value(312) + $gameVariables.value(11),
-		  1,640+331+500,384,100,100,0,0);
-		  pic_move1(98,-500,0,100,100,255,40);
+		if ($gameVariables.value(312) == 'ZX_NowconditionA_') {
+			$gameScreen.showPicture(98, $gameVariables.value(312) + $gameVariables.value(11),
+				1, 640 + 331 + 500, 384, 100, 100, 0, 0);
+			pic_move1(98, -500, 0, 100, 100, 255, 40);
 		} else {
-		  //$gameScreen.showPicture(98,$gameVariables.value(312),
-		  //1,640+331+50,384+200,100,100,0,0);
-		  //pic_move1(98,0,-200,100,100,255,40);
+			//$gameScreen.showPicture(98,$gameVariables.value(312),
+			//1,640+331+50,384+200,100,100,0,0);
+			//pic_move1(98,0,-200,100,100,255,40);
 		};
 	};
 
@@ -10405,14 +10448,14 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_readVariableCurrentViewHeroIdConfigCommand = function () {
 		var value1 = 1;
 		var value2 = "NowconditionActor" + $gameVariables.value(11) + "_" + value1;
-		picture_anime1(99,value2,2,10,'横',180,1,true,[1]);
+		picture_anime1(99, value2, 2, 10, '横', 180, 1, true, [1]);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:66|コンフィグコマンド
 	AGH_setSwitchTrueHeroId = function () {
 		var actor = $gameActors.actor($gameVariables.value(2));
-		if(actor.isLearnedSkill(796)){
-		  $gameSwitches.setValue(161,true);
+		if (actor.isLearnedSkill(796)) {
+			$gameSwitches.setValue(161, true);
 		};
 	};
 
@@ -10421,24 +10464,30 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		var start = 1201;
 		var end = 1300;
 		for (var i = start; i <= end; i++) {
-		  if($gameSwitches.value(i) && !$gameParty.hasItem(i-800) && !$gameSwitches.value(i+100)){
-		    if($dataItems[i-800].meta['singleSouwaIncidence']){}else{
-		      $gameSwitches.setValue(162,true);
-		      break;
-		}}};
+			if ($gameSwitches.value(i) && !$gameParty.hasItem(i - 800) && !$gameSwitches.value(i + 100)) {
+				if ($dataItems[i - 800].meta['singleSouwaIncidence']) { } else {
+					$gameSwitches.setValue(162, true);
+					break;
+				}
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:66|コンフィグコマンド
 	AGH_setSwitchAddEventIncidenceSwi = function () {
-		for (var i = 1; i <= $dataItems.length-1; i++) {
-		  if($dataItems[i].meta['AddEventIncidenceSwi']){
-		    if(Number($dataItems[i].meta['EICSwitch']) == 102){
-		      if($gameSwitches.value(Number($dataItems[i].meta['AddEventIncidenceSwi'])) && !$gameParty.hasItem(i) && 
-		      !$gameSwitches.value(Number($dataItems[i].meta['AddEventCompSwi']))){
-		        if($dataItems[i].meta['singleSouwaIncidence']){}else{
-		          $gameSwitches.setValue(162,true);
-		          break;
-		}}}}};
+		for (var i = 1; i <= $dataItems.length - 1; i++) {
+			if ($dataItems[i].meta['AddEventIncidenceSwi']) {
+				if (Number($dataItems[i].meta['EICSwitch']) == 102) {
+					if ($gameSwitches.value(Number($dataItems[i].meta['AddEventIncidenceSwi'])) && !$gameParty.hasItem(i) &&
+						!$gameSwitches.value(Number($dataItems[i].meta['AddEventCompSwi']))) {
+						if ($dataItems[i].meta['singleSouwaIncidence']) { } else {
+							$gameSwitches.setValue(162, true);
+							break;
+						}
+					}
+				}
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:67|現状確認
@@ -10458,9 +10507,9 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:67|現状確認
 	AGH_readVariableCurrentViewHeroIdStatusCheck = function (interp) {
 		return (function () {
-		var value1 = 1;
-		pic_anime1(1,2,"NowconditionActor" + $gameVariables.value(11) + "_" + value1,180,99,3,200,0);
-		this.setupChild($dataCommonEvents[62].list, 0);
+			var value1 = 1;
+			pic_anime1(1, 2, "NowconditionActor" + $gameVariables.value(11) + "_" + value1, 180, 99, 3, 200, 0);
+			this.setupChild($dataCommonEvents[62].list, 0);
 		}).call(interp);
 	};
 
@@ -10474,72 +10523,73 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:76|エロシステム↓
 	AGH_inBattle = function () {
 		i1 = getRandomIndex(3) + 3;
-		var array = [1,2,3,4,5];
+		var array = [1, 2, 3, 4, 5];
 		i2 = array[getRandomIndex(array.length)];
-		if($gameParty.inBattle()){i3 = $gameTroop.aliveMembers().length};
+		if ($gameParty.inBattle()) { i3 = $gameTroop.aliveMembers().length };
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:82|文字で効果音ＢＧＳ
 	AGH_showOneWordPictureTextSoundEffectBgs = function () {
-		var array = [76,77,78,79,80,81,82,83,84,85];
+		var array = [76, 77, 78, 79, 80, 81, 82, 83, 84, 85];
 		valueSerialPictureId = array[getRandomIndex(array.length)];
-		pic_oneWord(valueSerialPictureId,valueScriptArray2[0],
-		valueScriptArray2[1],valueScriptArray2[2],valueScriptArray2[3],valueScriptArray1);
+		pic_oneWord(valueSerialPictureId, valueScriptArray2[0],
+			valueScriptArray2[1], valueScriptArray2[2], valueScriptArray2[3], valueScriptArray1);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:82|文字で効果音ＢＧＳ
 	AGH_waitTextSoundEffectBgs = function (interp) {
 		return (function () {
-		var array = [60,70,80,90,100,110,120,130,140,150,160];
-		var randomIndex = array[getRandomIndex(array.length)];
-		this.wait(randomIndex);
+			var array = [60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160];
+			var randomIndex = array[getRandomIndex(array.length)];
+			this.wait(randomIndex);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:82|文字で効果音ＢＧＳ
 	AGH_waitTextSoundEffectBgs_2 = function (interp) {
 		return (function () {
-		var value1 = valueScriptArray2[3];
-		var value1 = getRandomIndex(41) + value1-20;
-		this.wait(value1);
+			var value1 = valueScriptArray2[3];
+			var value1 = getRandomIndex(41) + value1 - 20;
+			this.wait(value1);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:83|夜発情コモン
 	AGH_setSelfVariableRandomWork1NightHeatCommon = function (interp) {
 		return (function () {
-		var start = 63;
-		var end = 70;
-		var actor = $gameActors.actor($gameVariables.value(20));
-		for (var i = start; i <= end; i++) {
-		if(actor.isLearnedSkill(i)){
-		this.sVal(21,$gameVariables.value(21) + 1);
-		}};
+			var start = 63;
+			var end = 70;
+			var actor = $gameActors.actor($gameVariables.value(20));
+			for (var i = start; i <= end; i++) {
+				if (actor.isLearnedSkill(i)) {
+					this.sVal(21, $gameVariables.value(21) + 1);
+				}
+			};
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:83|夜発情コモン
 	AGH_setSelfVariableLibido = function (interp) {
 		return (function () {
-		h_exp($gameVariables.value(20),'0_1_0',105,false,true,false);
-		//ｱｸﾀｰID,ﾋﾟｸﾁｬ,H相手(101ﾓﾌﾞ105対象なし106アイテム),非表示,簡易,過去シーンか否か
-		this.sVal(401,getRandomIndex(6) + 5);
-		this.sVal(413,1);
-		this.sVal(402,-100);
-		//var arr = [1,2,3,4,5];$gameVariables.setValue(401,arr[getRandomIndex(arr.length)]);
-		if($gameSwitches.value(122)){this.setupChild($dataCommonEvents[85].list, 0)};
+			h_exp($gameVariables.value(20), '0_1_0', 105, false, true, false);
+			//ｱｸﾀｰID,ﾋﾟｸﾁｬ,H相手(101ﾓﾌﾞ105対象なし106アイテム),非表示,簡易,過去シーンか否か
+			this.sVal(401, getRandomIndex(6) + 5);
+			this.sVal(413, 1);
+			this.sVal(402, -100);
+			//var arr = [1,2,3,4,5];$gameVariables.setValue(401,arr[getRandomIndex(arr.length)]);
+			if ($gameSwitches.value(122)) { this.setupChild($dataCommonEvents[85].list, 0) };
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:83|夜発情コモン
 	AGH_setSelfVariableLibidoNightHeatCommon = function (interp) {
 		return (function () {
-		h_exp($gameVariables.value(20),'0_1_0',105,false,true,false);
-		//ｱｸﾀｰID,ﾋﾟｸﾁｬ,H相手(101ﾓﾌﾞ105対象なし106アイテム),非表示,簡易,過去シーンか否か
-		this.sVal(401,getRandomIndex(3) + 3);
-		this.sVal(402,-100);
-		//var arr = [1,2,3,4,5];$gameVariables.setValue(401,arr[getRandomIndex(arr.length)]);
-		if($gameSwitches.value(122)){this.setupChild($dataCommonEvents[85].list, 0)};
+			h_exp($gameVariables.value(20), '0_1_0', 105, false, true, false);
+			//ｱｸﾀｰID,ﾋﾟｸﾁｬ,H相手(101ﾓﾌﾞ105対象なし106アイテム),非表示,簡易,過去シーンか否か
+			this.sVal(401, getRandomIndex(3) + 3);
+			this.sVal(402, -100);
+			//var arr = [1,2,3,4,5];$gameVariables.setValue(401,arr[getRandomIndex(arr.length)]);
+			if ($gameSwitches.value(122)) { this.setupChild($dataCommonEvents[85].list, 0) };
 		}).call(interp);
 	};
 
@@ -10548,7 +10598,7 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		valueCountSet1 = 0;
 		valueCountSet2 = 1;
 		var messageText = `\\C[10]H-Passive[${valueCountSet2}]\\C[0]\n`;
-		eval("valueWordSet" + valueCountSet2 +" = value1");
+		eval("valueWordSet" + valueCountSet2 + " = value1");
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:85|性欲度等変動表示コモン
@@ -10561,20 +10611,20 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 
 	// Replaces (1x): CommonEvents.json:common-event:85|性欲度等変動表示コモン
 	AGH_readVariableChoiceSwitch15DesireChangeDisplayCommon = function () {
-		if($gameVariables.value(175)[$gameVariables.value(20)] >= 101){
-		$gameVariables.value(175)[$gameVariables.value(20)] -= 1;
-		$gameVariables.value(174)[$gameVariables.value(20)].shift();
+		if ($gameVariables.value(175)[$gameVariables.value(20)] >= 101) {
+			$gameVariables.value(175)[$gameVariables.value(20)] -= 1;
+			$gameVariables.value(174)[$gameVariables.value(20)].shift();
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:85|性欲度等変動表示コモン
 	AGH_setSelfVariableHStatusGainText = function (interp) {
 		return (function () {
-		var value4 = $gameVariables.value(340)-100;
-		if($gameVariables.value($gameVariables.value(20)+360)[value4] >= 1){
-		var messageText = `\n${$gameVariables.value(22)}との\\C[27]Ｈ回数：${$gameVariables.value($gameVariables.value(20)+360)[value4]}\\C[0]`;
-		this.sVal(506,$gameVariables.value(506) + messageText);
-		};
+			var value4 = $gameVariables.value(340) - 100;
+			if ($gameVariables.value($gameVariables.value(20) + 360)[value4] >= 1) {
+				var messageText = `\n${$gameVariables.value(22)}との\\C[27]Ｈ回数：${$gameVariables.value($gameVariables.value(20) + 360)[value4]}\\C[0]`;
+				this.sVal(506, $gameVariables.value(506) + messageText);
+			};
 		}).call(interp);
 	};
 
@@ -10596,68 +10646,69 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:87|性欲度等情報表示
 	AGH_showPictureDesireInfoDisplay = function () {
 		var pictureId = 111;
-		$gameScreen.showPicture(pictureId+7,"",1,1024,384,100,100,255,0);
+		$gameScreen.showPicture(pictureId + 7, "", 1, 1024, 384, 100, 100, 255, 0);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:87|性欲度等情報表示
 	AGH_erasePictureDesireInfoDisplay = function () {
 		var pictureId = 111;
-		$gameScreen.erasePicture(pictureId+7);
+		$gameScreen.erasePicture(pictureId + 7);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:87|性欲度等情報表示
 	AGH_showPictureHStatusPictureTemp = function () {
-		if($gameVariables.value(193) != 0){
-		  var value1 = 111;
-		  $gameScreen.showPicture(value1,$gameVariables.value(193),1,1024,384,100,100,255,0);
-		  var array = ['Hscene005','Hscene029','Hscene061','Hscene099','Hscene105','Hscene123','Hscene183']
-		  var value1 = array[getRandomIndex(array.length)];
-		  picture_fade1(51,"fadeIn",value1,60,5);
+		if ($gameVariables.value(193) != 0) {
+			var value1 = 111;
+			$gameScreen.showPicture(value1, $gameVariables.value(193), 1, 1024, 384, 100, 100, 255, 0);
+			var array = ['Hscene005', 'Hscene029', 'Hscene061', 'Hscene099', 'Hscene105', 'Hscene123', 'Hscene183']
+			var value1 = array[getRandomIndex(array.length)];
+			picture_fade1(51, "fadeIn", value1, 60, 5);
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:87|性欲度等情報表示
 	AGH_setSwitchActorChoice = function (interp) {
 		return (function () {
-		var actor = $gameActors.actor($gameVariables.value(20));
-		var list = valueHstateDisplay;
-		list.forEach(function(id) {
-		if(actor.isStateAffected(id)){
-		$gameSwitches.setValue(161,true);
-		};
-		}, this);
+			var actor = $gameActors.actor($gameVariables.value(20));
+			var list = valueHstateDisplay;
+			list.forEach(function (id) {
+				if (actor.isStateAffected(id)) {
+					$gameSwitches.setValue(161, true);
+				};
+			}, this);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:87|性欲度等情報表示
 	AGH_setSwitchChoiceSwitch15 = function () {
-		if($gameVariables.value(175)[$gameVariables.value(20)] >= 1){
-		$gameSwitches.setValue(165,true);
+		if ($gameVariables.value(175)[$gameVariables.value(20)] >= 1) {
+			$gameSwitches.setValue(165, true);
 		};
-		$gameSwitches.setValue(166,true);
+		$gameSwitches.setValue(166, true);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:87|性欲度等情報表示
 	AGH_erasePictureDesireInfoDisplay_2 = function () {
-		for(var i = 111; i <= 125; i++){
-		  if($gameScreen.picture(i)){
-		    UTSU.PictureBreath.off([i]);
-		    UTSU.PictureBreath2.off([i]);
-		    $gameScreen.erasePicture(i);
-		}};
+		for (var i = 111; i <= 125; i++) {
+			if ($gameScreen.picture(i)) {
+				UTSU.PictureBreath.off([i]);
+				UTSU.PictureBreath2.off([i]);
+				$gameScreen.erasePicture(i);
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:87|性欲度等情報表示
 	AGH_readVariableActorChoiceDesireInfoDisplay = function () {
-		var array = $gameVariables.value($gameVariables.value(20)+380)[61];
-		var value2 = $gameVariables.value($gameVariables.value(20)+380)[27];
-		var value3 = $gameVariables.value($gameVariables.value(20)+380)[1];
-		var value4 = $gameVariables.value($gameVariables.value(20)+380)[64];
-		var value5 = $gameVariables.value($gameVariables.value(20)+380)[71];
+		var array = $gameVariables.value($gameVariables.value(20) + 380)[61];
+		var value2 = $gameVariables.value($gameVariables.value(20) + 380)[27];
+		var value3 = $gameVariables.value($gameVariables.value(20) + 380)[1];
+		var value4 = $gameVariables.value($gameVariables.value(20) + 380)[64];
+		var value5 = $gameVariables.value($gameVariables.value(20) + 380)[71];
 		valueWordSet0 = `本日Ｈ回数：${value1}回　`;
-		if(value5 >= 1){valueWordSet0 += `（本日中に犯されている…）`};
-		if(value2 >= 1){valueWordSet0 += `\n売春獲得総金額：${value2}\G　`};
-		if(value3 >= 500 && value4 >= 1){valueWordSet0 += `\n禁欲日数：${value4}日　`};
+		if (value5 >= 1) { valueWordSet0 += `（本日中に犯されている…）` };
+		if (value2 >= 1) { valueWordSet0 += `\n売春獲得総金額：${value2}\G　` };
+		if (value3 >= 500 && value4 >= 1) { valueWordSet0 += `\n禁欲日数：${value4}日　` };
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:88|
@@ -10670,155 +10721,156 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		valueCountSet1 = 0;//文言追加用
 		valueCountSet2 = 1;
 		var messageText = `\\FS[28]\\C[10]<H-Passive Expression!>\\FS[25]\\C[0]\n`;
-		eval("valueWordSet" + valueCountSet2 +" = value1");
+		eval("valueWordSet" + valueCountSet2 + " = value1");
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:93|自動出産コモン
 	AGH_showPictureScreenBlackOutAutoBirthCommon = function () {
 		valuePic1 = 55;
 		var value2 = 'ScreenBlackOut';
-		$gameScreen.showPicture(valuePic1,value2,1,640,384,100,100,150,0);
-		picture_fade1(valuePic1,"fadeIn",valueWipeImg,60,5);
+		$gameScreen.showPicture(valuePic1, value2, 1, 640, 384, 100, 100, 150, 0);
+		picture_fade1(valuePic1, "fadeIn", valueWipeImg, 60, 5);
 		var value2 = 'Zev_childbirth';
-		pic_1(0,valuePic1+1,value2,0,100,255,80,1280,768,-256,0);
+		pic_1(0, valuePic1 + 1, value2, 0, 100, 255, 80, 1280, 768, -256, 0);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:93|自動出産コモン
 	AGH_readVariableAppearanceCharacterStartAutoBirthCommon = function () {
 		var start = $gameVariables.value(75);
 		var end = $gameVariables.value(76);
-		for(var j = start; j <= end; j++){
-		  actor = $gameActors.actor(j);
-		  if(actor.isStateAffected(83)){
-		    //actor.addStateCounter(83, +100);
-		    actor_pregnancyCalculation(j);
-		}};
+		for (var j = start; j <= end; j++) {
+			actor = $gameActors.actor(j);
+			if (actor.isStateAffected(83)) {
+				//actor.addStateCounter(83, +100);
+				actor_pregnancyCalculation(j);
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:93|自動出産コモン
 	AGH_setSelfSwitchAutoBirthCommon = function () {
-		for(var i = 1; i <= 20; i++){
-		  $gameSelfSwitches.setValue([$gameMap.mapId(), i, 'A'], false);
+		for (var i = 1; i <= 20; i++) {
+			$gameSelfSwitches.setValue([$gameMap.mapId(), i, 'A'], false);
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:94|受精コモン演出
 	AGH_setSelfVariableRandomWork10 = function (interp) {
 		return (function () {
-		var actor = $gameActors.actor($gameVariables.value(20));
-		if(actor.isLearnedSkill(68)){
-		this.sVal(30,$gameVariables.value(30) + 1);
-		};
-		if(actor.isLearnedSkill(69)){
-		this.sVal(30,$gameVariables.value(30) + 1);
-		};
-		if(actor.isLearnedSkill(70)){
-		this.sVal(30,$gameVariables.value(30) + 1);
-		};
+			var actor = $gameActors.actor($gameVariables.value(20));
+			if (actor.isLearnedSkill(68)) {
+				this.sVal(30, $gameVariables.value(30) + 1);
+			};
+			if (actor.isLearnedSkill(69)) {
+				this.sVal(30, $gameVariables.value(30) + 1);
+			};
+			if (actor.isLearnedSkill(70)) {
+				this.sVal(30, $gameVariables.value(30) + 1);
+			};
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:94|受精コモン演出
 	AGH_setSelfVariableSkillUserName = function (interp) {
 		return (function () {
-		var actor = $gameActors.actor($gameVariables.value(20));
-		actor.removeState(79);
-		actor.addState(82);
-		this.sVal(94,actor.name());
-		actor.setStateCounter(82, 0);
+			var actor = $gameActors.actor($gameVariables.value(20));
+			actor.removeState(79);
+			actor.addState(82);
+			this.sVal(94, actor.name());
+			actor.setStateCounter(82, 0);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:94|受精コモン演出
 	AGH_showPictureActorChoice = function () {
 		var pictureId = 60;
-		var value1 = 'FertilizationActor'+ $gameVariables.pictureId(20);
-		$gameScreen.showPicture(pictureId+1,value1 +'_1',1,1280/2+50,768/2,100,100,0,0);
-		$gameScreen.movePicture(pictureId+1,1,1280/2,768/2,100,100,255,0,60);
+		var value1 = 'FertilizationActor' + $gameVariables.pictureId(20);
+		$gameScreen.showPicture(pictureId + 1, value1 + '_1', 1, 1280 / 2 + 50, 768 / 2, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId + 1, 1, 1280 / 2, 768 / 2, 100, 100, 255, 0, 60);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:94|受精コモン演出
 	AGH_startFlash = function () {
 		var randomIndex = getRandomIndex(41) + 180;
 		var value2 = getRandomIndex(21) + 50;
-		$gameScreen.startFlash([255,119,255,randomIndex], value2);
+		$gameScreen.startFlash([255, 119, 255, randomIndex], value2);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:94|受精コモン演出
 	AGH_showPictureActorChoiceFertilizationCommon = function (interp) {
 		return (function () {
-		var pictureId = 60;
-		var value1 = 'FertilizationActor'+ $gameVariables.pictureId(20);
-		$gameScreen.showPicture(pictureId+10,value1 +'_2',1,1280/2,768/2,100,100,0,0);
-		$gameScreen.movePicture(pictureId+10,1,1280/2,768/2,100,100,255,0,60);
-		this.wait(60);
+			var pictureId = 60;
+			var value1 = 'FertilizationActor' + $gameVariables.pictureId(20);
+			$gameScreen.showPicture(pictureId + 10, value1 + '_2', 1, 1280 / 2, 768 / 2, 100, 100, 0, 0);
+			$gameScreen.movePicture(pictureId + 10, 1, 1280 / 2, 768 / 2, 100, 100, 255, 0, 60);
+			this.wait(60);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:94|受精コモン演出
 	AGH_showPictureFertilizationDirect = function (interp) {
 		return (function () {
-		var value = 60;
-		for (var i = 1; i <= 4; i++) {$gameScreen.showPicture(i+1+value,'FertilizationDirect'+i,1,1280/2,768/2,100,100,255,0)};
-		this.wait(120);
+			var value = 60;
+			for (var i = 1; i <= 4; i++) { $gameScreen.showPicture(i + 1 + value, 'FertilizationDirect' + i, 1, 1280 / 2, 768 / 2, 100, 100, 255, 0) };
+			this.wait(120);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:94|受精コモン演出
 	AGH_movePictureFertilizationCommon = function (interp) {
 		return (function () {
-		var pictureId = 60;
-		$gameScreen.movePicture(pictureId+10,1,1280/2-300,768/2+800,1000,1000,0,0,240);
-		this.wait(240);
+			var pictureId = 60;
+			$gameScreen.movePicture(pictureId + 10, 1, 1280 / 2 - 300, 768 / 2 + 800, 1000, 1000, 0, 0, 240);
+			this.wait(240);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:94|受精コモン演出
 	AGH_movePictureFertilizationCommon_2 = function (interp) {
 		return (function () {
-		var value = 60;
-		$gameScreen.movePicture(4+1+value,1,1280/2-300,768/2+800,1000,1000,0,0,300);
-		this.wait(300);
-		AudioManager.stopSe();
+			var value = 60;
+			$gameScreen.movePicture(4 + 1 + value, 1, 1280 / 2 - 300, 768 / 2 + 800, 1000, 1000, 0, 0, 300);
+			this.wait(300);
+			AudioManager.stopSe();
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:94|受精コモン演出
 	AGH_erasePictureFertilizationCommon = function () {
-		for(var i = 60; i <= 80; i++){$gameScreen.erasePicture(i)};
+		for (var i = 60; i <= 80; i++) { $gameScreen.erasePicture(i) };
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:95|妊娠時コモン
 	AGH_setSelfVariableSkillUserNamePregnancyCommon = function (interp) {
 		return (function () {
-		var actor = $gameActors.actor($gameVariables.value(20));
-		actor.addStateCounter(82, +10);
-		var randomIndex = getRandomIndex(101);
-		var threshold = actor.getStateCounter(82) - 50;
-		if(threshold >= randomIndex){
-		actor.removeStateCounter(82);
-		actor.removeState(82);
-		actor.addState(83);
-		actor.setStateCounter(83, 0);
-		this.sVal(94,actor.name());
-		};
+			var actor = $gameActors.actor($gameVariables.value(20));
+			actor.addStateCounter(82, +10);
+			var randomIndex = getRandomIndex(101);
+			var threshold = actor.getStateCounter(82) - 50;
+			if (threshold >= randomIndex) {
+				actor.removeStateCounter(82);
+				actor.removeState(82);
+				actor.addState(83);
+				actor.setStateCounter(83, 0);
+				this.sVal(94, actor.name());
+			};
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:95|妊娠時コモン
 	AGH_setSelfVariableRandomWork2 = function (interp) {
 		return (function () {
-		//妊娠時の一時的なサイズ増量表現42が体重で以降スリーサイズ
-		var variable20Value = $gameVariables.value(20);
-		$gameVariables.value(variable20Value+380)[42] += [7,8,9,10,11,12][getRandomIndex(6)];
-		$gameVariables.value(variable20Value+380)[43] += [20,21,22,23,24,25][getRandomIndex(6)];
-		$gameVariables.value(variable20Value+380)[44] += [15,16,17,18,19,20][getRandomIndex(6)];
-		$gameVariables.value(variable20Value+380)[45] += [3,4,5,6,7,8][getRandomIndex(6)];
-		this.sVal(22,$gameVariables.value(variable20Value+380)[42]);
-		this.sVal(23,$gameVariables.value(variable20Value+380)[43]);
-		this.sVal(24,$gameVariables.value(variable20Value+380)[44]);
-		this.sVal(25,$gameVariables.value(variable20Value+380)[45]);
-		$gameVariables.value(variable20Value+380)[15] += 1;
+			//妊娠時の一時的なサイズ増量表現42が体重で以降スリーサイズ
+			var variable20Value = $gameVariables.value(20);
+			$gameVariables.value(variable20Value + 380)[42] += [7, 8, 9, 10, 11, 12][getRandomIndex(6)];
+			$gameVariables.value(variable20Value + 380)[43] += [20, 21, 22, 23, 24, 25][getRandomIndex(6)];
+			$gameVariables.value(variable20Value + 380)[44] += [15, 16, 17, 18, 19, 20][getRandomIndex(6)];
+			$gameVariables.value(variable20Value + 380)[45] += [3, 4, 5, 6, 7, 8][getRandomIndex(6)];
+			this.sVal(22, $gameVariables.value(variable20Value + 380)[42]);
+			this.sVal(23, $gameVariables.value(variable20Value + 380)[43]);
+			this.sVal(24, $gameVariables.value(variable20Value + 380)[44]);
+			this.sVal(25, $gameVariables.value(variable20Value + 380)[45]);
+			$gameVariables.value(variable20Value + 380)[15] += 1;
 		}).call(interp);
 	};
 
@@ -10826,75 +10878,76 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_readVariableAppearanceCharacterStartBirthCommonUnused = function () {
 		var start = $gameVariables.value(75);
 		var end = $gameVariables.value(76);
-		for(var j = start; j <= end; j++){
-		  actor = $gameActors.actor(j);
-		  if(actor.isStateAffected(83)){
-		    actor_pregnancyCalculation(j);
-		}};
+		for (var j = start; j <= end; j++) {
+			actor = $gameActors.actor(j);
+			if (actor.isStateAffected(83)) {
+				actor_pregnancyCalculation(j);
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:99|コンティニュー処理
 	AGH_iterateBattleMembersContinueProcessing = function () {
-		for (var i = 0; i < $gameParty.battleMembers().length-1; i++) {
-		  var battleMember = $gameParty.battleMembers()[i];
-		  battleMember.startAnimation(395, false, 0);
+		for (var i = 0; i < $gameParty.battleMembers().length - 1; i++) {
+			var battleMember = $gameParty.battleMembers()[i];
+			battleMember.startAnimation(395, false, 0);
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:99|コンティニュー処理
 	AGH_iteratePartyMembersContinueProcessing = function () {
-		$gameParty.members().forEach(function(actor) {
-		  actor.removeState(24);
+		$gameParty.members().forEach(function (actor) {
+			actor.removeState(24);
 		});
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:101|戦闘全滅
 	AGH_stopMapPlayerMovementBattleAllOut = function () {
-		if(!$gameParty.inBattle()){$gameTemp.stopMapPlayerMovement()}
+		if (!$gameParty.inBattle()) { $gameTemp.stopMapPlayerMovement() }
 	};
 
 	// Replaces (2x): CommonEvents.json:common-event:101|戦闘全滅
 	AGH_showPictureScreenBlackOutBattleAllOut = function () {
-		backGraund_menuMapSelect(2,0,0,0);
+		backGraund_menuMapSelect(2, 0, 0, 0);
 		valuePic1 = 55;
 		var value2 = 'ScreenBlackOut';
-		$gameScreen.showPicture(valuePic1-2,value2,1,640,384,100,100,200,0);
+		$gameScreen.showPicture(valuePic1 - 2, value2, 1, 640, 384, 100, 100, 200, 0);
 		var value2 = 'ScreenDarkCloudsH';
-		$gameScreen.showPicture(valuePic1-1,value2,1,640,384,100,100,150,0);
+		$gameScreen.showPicture(valuePic1 - 1, value2, 1, 640, 384, 100, 100, 150, 0);
 		var Town014 = 'Town014';　//中心から円状に表示
-		picture_fade1(valuePic1-2,"fadeIn",Town014,60,5);
-		picture_fade1(valuePic1-1,"fadeIn",Town014,60,5);
+		picture_fade1(valuePic1 - 2, "fadeIn", Town014, 60, 5);
+		picture_fade1(valuePic1 - 1, "fadeIn", Town014, 60, 5);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:101|戦闘全滅
 	AGH_showPictureRandomWork1 = function () {
 		var actor = $gameActors.actor($gameVariables.value(20));
 		var value1 = 1;
-		if(actor.isLearnedSkill(63)){var value1 = 2};
-		if(actor.isLearnedSkill(65)){var value1 = 3};
-		var value2 = 'Zev_BattleDefeat'+$gameVariables.value(20)+'_'+ value1;
-		$gameScreen.showPicture(valuePic1,value2,1,640-128,384,150,150,0,0);
-		$gameScreen.movePicture(valuePic1,1,640-128,384,100,100,255,0,60);
-		tachie_bless(valuePic1,1);
-		$gameVariables.setValue(21,`${actor.name()}は凌辱された…。`);
+		if (actor.isLearnedSkill(63)) { var value1 = 2 };
+		if (actor.isLearnedSkill(65)) { var value1 = 3 };
+		var value2 = 'Zev_BattleDefeat' + $gameVariables.value(20) + '_' + value1;
+		$gameScreen.showPicture(valuePic1, value2, 1, 640 - 128, 384, 150, 150, 0, 0);
+		$gameScreen.movePicture(valuePic1, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
+		tachie_bless(valuePic1, 1);
+		$gameVariables.setValue(21, `${actor.name()}は凌辱された…。`);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:101|戦闘全滅
 	AGH_setSelfVariableHStatusGainTextBattleAllOut = function (interp) {
 		return (function () {
-		h_exp($gameVariables.value(20),0,301,false,false,false);
-		//ｱｸﾀｰID,ﾋﾟｸﾁｬ,H相手(301ﾓﾌﾞ305対象なし306アイテム),非表示,簡易,過去シーンか否か
-		this.sVal(506,`\\V[94]は凌辱された…。\n`);
-		this.sVal(401,getRandomIndex(3) + 3);
-		if($gameSwitches.value(122)){this.setupChild($dataCommonEvents[85].list, 0)};
+			h_exp($gameVariables.value(20), 0, 301, false, false, false);
+			//ｱｸﾀｰID,ﾋﾟｸﾁｬ,H相手(301ﾓﾌﾞ305対象なし306アイテム),非表示,簡易,過去シーンか否か
+			this.sVal(506, `\\V[94]は凌辱された…。\n`);
+			this.sVal(401, getRandomIndex(3) + 3);
+			if ($gameSwitches.value(122)) { this.setupChild($dataCommonEvents[85].list, 0) };
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:101|戦闘全滅
 	AGH_allowMapPlayerMovementBattleAllOut = function () {
-		    if(!$gameParty.inBattle()){
-		      $gameTemp.allowMapPlayerMovement();
-		    };
+		if (!$gameParty.inBattle()) {
+			$gameTemp.allowMapPlayerMovement();
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:102|戦闘後
@@ -10905,78 +10958,80 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:102|戦闘後
 	AGH_runPluginCommandPortraitPictureId = function (interp) {
 		return (function () {
-		var list = $gameVariables.value(247);
-		list.forEach(function(id) {
-		$gameVariables.setValue(300,Number($dataActors[id].meta['tachiePicId']));
-		var args = new Array(String(getPreviousTachiePicId()));
-		this.pluginCommand("PICT_AFTERIMAGE_REMOVE", args);
-		;
-		}, this);
+			var list = $gameVariables.value(247);
+			list.forEach(function (id) {
+				$gameVariables.setValue(300, Number($dataActors[id].meta['tachiePicId']));
+				var args = new Array(String(getPreviousTachiePicId()));
+				this.pluginCommand("PICT_AFTERIMAGE_REMOVE", args);
+				;
+			}, this);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:102|戦闘後
 	AGH_setSwitchPassiveOnStatus = function () {
 		for (var i = 0; i < $gameParty.battleMembers().length; i++) {
-		  var battleMember = $gameParty.battleMembers()[i];
-		  if($gameParty.members().contains(battleMember)){
-		    if([2,3,4,5,6,7].some(function(id){return battleMember.param(id) >= 100})){
-		      var value1 = `一部ステータスが\\C[2]100\\C[0]以上になる事で、そのステータスが上昇するbattleMembersパッシブスキルが習得できるようになります`;
-		      gab_wordParticle(messageText); 
-		      $gameSwitches.setValue(483,true);
-		      break;
-		}}};
+			var battleMember = $gameParty.battleMembers()[i];
+			if ($gameParty.members().contains(battleMember)) {
+				if ([2, 3, 4, 5, 6, 7].some(function (id) { return battleMember.param(id) >= 100 })) {
+					var value1 = `一部ステータスが\\C[2]100\\C[0]以上になる事で、そのステータスが上昇するbattleMembersパッシブスキルが習得できるようになります`;
+					gab_wordParticle(messageText);
+					$gameSwitches.setValue(483, true);
+					break;
+				}
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:103|戦闘開始時
 	AGH_setSelfVariableBattleAverageLuk = function (interp) {
 		return (function () {
-		this.sVal(516,Math.round($gameParty.battleMembers().reduce(function(prev, member) {return prev + member.luk}, 0) / ($gameParty.battleMembers().length || 1)));
+			this.sVal(516, Math.round($gameParty.battleMembers().reduce(function (prev, member) { return prev + member.luk }, 0) / ($gameParty.battleMembers().length || 1)));
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:103|戦闘開始時
 	AGH_setSwitchEnemyStatusCheck = function () {
-		if($gameVariables.value(304)[valueBossEnemyId] >= 1){
-		  $gameSwitches.setValue(95,true);
+		if ($gameVariables.value(304)[valueBossEnemyId] >= 1) {
+			$gameSwitches.setValue(95, true);
 		} else {
-		  $gameSwitches.setValue(95,false);
+			$gameSwitches.setValue(95, false);
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:103|戦闘開始時
 	AGH_setSwitchEnemyStatusCheckBattleStart = function () {
-		if($gameVariables.value(240) >= 1){
-		  if($gameParty.hasItem($dataItems[$gameVariables.value(240)])){
-		    $gameSwitches.setValue(95,true);
-		  } else {
-		    $gameSwitches.setValue(95,false);
-		  };
+		if ($gameVariables.value(240) >= 1) {
+			if ($gameParty.hasItem($dataItems[$gameVariables.value(240)])) {
+				$gameSwitches.setValue(95, true);
+			} else {
+				$gameSwitches.setValue(95, false);
+			};
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:103|戦闘開始時
 	AGH_iterateTroopMembersAddText = function () {
 		for (var i = 0; i < $gameTroop.members().length; i++) {
-		  var user = $gameTroop.members()[i];
-		  if(user.isAlive()){
-		    BattleManager._logWindow.push(`addText`,`\\C[16]${user.name()}\\C[0] TP\\C[6]${user.tp}%\\C[0]`);
-		  };
+			var user = $gameTroop.members()[i];
+			if (user.isAlive()) {
+				BattleManager._logWindow.push(`addText`, `\\C[16]${user.name()}\\C[0] TP\\C[6]${user.tp}%\\C[0]`);
+			};
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:103|戦闘開始時
 	AGH_logBattleText = function () {
-		if(BattleManager.canEscape()){
-		  if($gameParty.membersState(233)){
-		    var value4 = 100;
-		  } else {
-		    var value4 = 0.8 * $gameParty.agility() / $gameTroop.agility();
-		    if(value4 >= 1){value4 = 99} else {value4 = Math.floor(value4 * 100)};
-		  };
-		  var value1 = `逃走成功確立:\\C[2]${value4}%\\C[0]`;
+		if (BattleManager.canEscape()) {
+			if ($gameParty.membersState(233)) {
+				var value4 = 100;
+			} else {
+				var value4 = 0.8 * $gameParty.agility() / $gameTroop.agility();
+				if (value4 >= 1) { value4 = 99 } else { value4 = Math.floor(value4 * 100) };
+			};
+			var value1 = `逃走成功確立:\\C[2]${value4}%\\C[0]`;
 		} else {
-		  var value1 = `\\C[10]逃走不可！\\C[0]`;
+			var value1 = `\\C[10]逃走不可！\\C[0]`;
 		};
 		BattleManager._logWindow.push(`addText`, value1);
 	};
@@ -10985,21 +11040,21 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_readVariableEnemyLevel = function () {
 		//エネミー一定レベル以上で様子を見るを別スキルに変更
 		var randomIndex = getRandomIndex(101);
-		if(randomIndex >= 40){
-		  $dataSkills[890] = $dataSkills[896];
+		if (randomIndex >= 40) {
+			$dataSkills[890] = $dataSkills[896];
 		} else {
-		  if($gameVariables.value(270) >= 10){
-		    $dataSkills[890] = $dataSkills[891];
-		  } else {
-		    $dataSkills[890] = $dataSkills[892];
-		  };
+			if ($gameVariables.value(270) >= 10) {
+				$dataSkills[890] = $dataSkills[891];
+			} else {
+				$dataSkills[890] = $dataSkills[892];
+			};
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:104|戦闘毎ターン
 	AGH_setVariableActorChoiceBattleEachTurn = function () {
 		var stateId = 42;
-		$gameVariables.setValue(20,1);
+		$gameVariables.setValue(20, 1);
 		var actor = $gameActors.actor($gameVariables.value(20));
 		BattleManager._logWindow.push(`addText`, `${actor.name()}の${$dataStates[value1].name}耐性率:\\C[10]${actor.stateRate(value1) * 100}\\C[0]%`);
 	};
@@ -11007,15 +11062,15 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:104|戦闘毎ターン
 	AGH_movePictureBattleEachTurn = function () {
 		var pictureId = 96;
-		if($gameScreen.picture(pictureId)){
-		$gameScreen.movePicture(pictureId,0,450,480,100,100,0,0,120);
+		if ($gameScreen.picture(pictureId)) {
+			$gameScreen.movePicture(pictureId, 0, 450, 480, 100, 100, 0, 0, 120);
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:104|戦闘毎ターン
 	AGH_erasePicturesBattleEachTurn = function () {
 		var array = [...Array(100)].map((_, i) => i + 101);
-		pic_eraseP(0,array);
+		pic_eraseP(0, array);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:104|戦闘毎ターン
@@ -11030,25 +11085,29 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:104|戦闘毎ターン
 	AGH_readVariableActorChoiceBattleEachTurn = function () {
 		for (var i = 0; i < $gameParty.battleMembers().length; i++) {
-		  var battleMember = $gameParty.battleMembers()[i];
-		    if (battleMember.isStateAffected(234) && !battleMember.isRestricted ()) {
-		      battleMember.startAnimation(160, false, 0);
-		      if(battleMember.actorId() != $gameVariables.value(20)){
-		        if(battleMember.elementAmplifyRate(15) != 0){
-		          valueChainAddPower += Math.round(battleMember.elementAmplifyRate(15) * 100);
-		}}}};
+			var battleMember = $gameParty.battleMembers()[i];
+			if (battleMember.isStateAffected(234) && !battleMember.isRestricted()) {
+				battleMember.startAnimation(160, false, 0);
+				if (battleMember.actorId() != $gameVariables.value(20)) {
+					if (battleMember.elementAmplifyRate(15) != 0) {
+						valueChainAddPower += Math.round(battleMember.elementAmplifyRate(15) * 100);
+					}
+				}
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:104|戦闘毎ターン
 	AGH_iterateBattleMembersBattleEachTurn = function () {
 		for (var i = 0; i < $gameParty.battleMembers().length; i++) {
-		  var battleMember = $gameParty.battleMembers()[i];
-		  if (battleMember.isStateAffected(234) && !battleMember.isRestricted ()) {
-		    var actor1 = battleMember;
-		    break;
-		}};
-		if(valueChainSkillId == 0){
-		  valueChainSkillId = 98;
+			var battleMember = $gameParty.battleMembers()[i];
+			if (battleMember.isStateAffected(234) && !battleMember.isRestricted()) {
+				var actor1 = battleMember;
+				break;
+			}
+		};
+		if (valueChainSkillId == 0) {
+			valueChainSkillId = 98;
 		};
 		var value1 = valueChainSkillId;
 		BattleManager.queueForceAction(actor1, value1, -1);
@@ -11058,98 +11117,111 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_iterateBattleMembersAddText = function () {
 		valueCountSet1 = 0;
 		for (var i = 0; i < $gameParty.battleMembers().length; i++) {
-		  var battleMember = $gameParty.battleMembers()[i];
-		  if (battleMember.battleSkillsRaw().contains(340)) {
-		    var value2 = `\\C[2]\\Sin[340]\\C[0]効果が発動！　（×\\C[10]${valueChainMemberCount-1}\\C[0]）`;
-		    BattleManager._logWindow.push(`addText`, messageText);
-		    valueCountSet1 += 1;
-		    break;
-		}};
+			var battleMember = $gameParty.battleMembers()[i];
+			if (battleMember.battleSkillsRaw().contains(340)) {
+				var value2 = `\\C[2]\\Sin[340]\\C[0]効果が発動！　（×\\C[10]${valueChainMemberCount - 1}\\C[0]）`;
+				BattleManager._logWindow.push(`addText`, messageText);
+				valueCountSet1 += 1;
+				break;
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:104|戦闘毎ターン
 	AGH_iterateBattleMembersBattleEachTurn_2 = function () {
-		if(valueCountSet1 >= 1){
-		  for (var i = 0; i < $gameParty.battleMembers().length; i++) {
-		    var battleMember = $gameParty.battleMembers()[i];
-		    battleMember.startAnimation(426, false, 0);
-		    for (var id1 = 2; id1 <= valueChainMemberCount; id1++) {
-		      for (var j = 206; j <= 211; j++) {
-		        battleMember.addState(j);
-		}}}};
+		if (valueCountSet1 >= 1) {
+			for (var i = 0; i < $gameParty.battleMembers().length; i++) {
+				var battleMember = $gameParty.battleMembers()[i];
+				battleMember.startAnimation(426, false, 0);
+				for (var id1 = 2; id1 <= valueChainMemberCount; id1++) {
+					for (var j = 206; j <= 211; j++) {
+						battleMember.addState(j);
+					}
+				}
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:104|戦闘毎ターン
 	AGH_readVariableActor20HCount = function () {
-		if($gameParty.membersState(771)){
-		  for (var i = 0; i < $gameParty.battleMembers().length; i++) {
-		    var battleMember = $gameParty.battleMembers()[i];
-		    if(battleMember.isStateAffected(771) && battleMember.isAlive()){
-		      var array = battleMember._stateCounter[771];
-		      if(array >= 1){
-		        $gameVariables.value(380+battleMember.actorId())[2] += array;
-		        var value3 = $gameVariables.value(380+battleMember.actorId())[2];
-		        battleMember.setStateCounter(771, 0);
-		        var value1 = `${actor.name()}の発情度\\C[27]+${array}\\C[0] (${value3})`;
-		        BattleManager._logWindow.push(`addText`, messageText);
-		}}}};
+		if ($gameParty.membersState(771)) {
+			for (var i = 0; i < $gameParty.battleMembers().length; i++) {
+				var battleMember = $gameParty.battleMembers()[i];
+				if (battleMember.isStateAffected(771) && battleMember.isAlive()) {
+					var array = battleMember._stateCounter[771];
+					if (array >= 1) {
+						$gameVariables.value(380 + battleMember.actorId())[2] += array;
+						var value3 = $gameVariables.value(380 + battleMember.actorId())[2];
+						battleMember.setStateCounter(771, 0);
+						var value1 = `${actor.name()}の発情度\\C[27]+${array}\\C[0] (${value3})`;
+						BattleManager._logWindow.push(`addText`, messageText);
+					}
+				}
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:104|戦闘毎ターン
 	AGH_readVariableBattleTurnCount = function () {
 		for (var j = 0; j < $gameParty.battleMembers().length; j++) {
-		  var battleMember = $gameParty.battleMembers()[j];
-		  if($gameParty.members().contains(battleMember) &&battleMember.isAlive()){
-		    if($gameSwitches.value(374)){
-		      actor_skilllearn2(battleMember.actorId());
-		    };
-		    if(($gameVariables.value(263) %10) == 0){
-		      battleMember.addState(31);
-		    };
-		}};
+			var battleMember = $gameParty.battleMembers()[j];
+			if ($gameParty.members().contains(battleMember) && battleMember.isAlive()) {
+				if ($gameSwitches.value(374)) {
+					actor_skilllearn2(battleMember.actorId());
+				};
+				if (($gameVariables.value(263) % 10) == 0) {
+					battleMember.addState(31);
+				};
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:104|戦闘毎ターン
 	AGH_setSwitchRank3AttackSkillNotice = function () {
 		for (var i = 0; i < $gameParty.battleMembers().length; i++) {
-		  var battleMember = $gameParty.battleMembers()[i];
-		  if($gameParty.members().contains(battleMember)){
-		    if([101,111,121,131,141,151,161,171,181,191].some(function(id){return battleMember.skillMasteryLevel(id) >= 3})){
-		      var value1 = `通常攻撃スキルが\\C[2]ランク3\\C[0]になる事で、その武器威力が上昇するパッシブスキルが習得できるようになります`;
-		      gab_wordParticle(messageText); 
-		      $gameSwitches.setValue(482,true);
-		      break;
-		}}};
+			var battleMember = $gameParty.battleMembers()[i];
+			if ($gameParty.members().contains(battleMember)) {
+				if ([101, 111, 121, 131, 141, 151, 161, 171, 181, 191].some(function (id) { return battleMember.skillMasteryLevel(id) >= 3 })) {
+					var value1 = `通常攻撃スキルが\\C[2]ランク3\\C[0]になる事で、その武器威力が上昇するパッシブスキルが習得できるようになります`;
+					gab_wordParticle(messageText);
+					$gameSwitches.setValue(482, true);
+					break;
+				}
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:104|戦闘毎ターン
 	AGH_runPluginCommandPortraitPictureIdBattleEachTurn = function (interp) {
 		return (function () {
-		var list = $gameVariables.value(247);
-		list.forEach(function(id) {
-		$gameVariables.setValue(300,Number($dataActors[id].meta['tachiePicId']));
-		if($gameActors.actor(id).tp >= 100){
-		var AfterimageRGBList = $dataActors[id].meta['AfterimageRGB'].split(',')[0]; var value2 = $dataActors[id].meta['AfterimageRGB'].split(',')[1]; var value3 = $dataActors[id].meta['AfterimageRGB'].split(',')[2];
-		var args = new Array(String(getPreviousTachiePicId()),'20',String(AfterimageRGBList),String(value2),String(value3));
-		this.pluginCommand("PICT_AFTERIMAGE_ADD", args);
-		} else {
-		var args = new Array(String(getPreviousTachiePicId()));
-		this.pluginCommand("PICT_AFTERIMAGE_REMOVE", args);
-		}}, this);
+			var list = $gameVariables.value(247);
+			list.forEach(function (id) {
+				$gameVariables.setValue(300, Number($dataActors[id].meta['tachiePicId']));
+				if ($gameActors.actor(id).tp >= 100) {
+					var AfterimageRGBList = $dataActors[id].meta['AfterimageRGB'].split(',')[0]; var value2 = $dataActors[id].meta['AfterimageRGB'].split(',')[1]; var value3 = $dataActors[id].meta['AfterimageRGB'].split(',')[2];
+					var args = new Array(String(getPreviousTachiePicId()), '20', String(AfterimageRGBList), String(value2), String(value3));
+					this.pluginCommand("PICT_AFTERIMAGE_ADD", args);
+				} else {
+					var args = new Array(String(getPreviousTachiePicId()));
+					this.pluginCommand("PICT_AFTERIMAGE_REMOVE", args);
+				}
+			}, this);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:104|戦闘毎ターン
 	AGH_iterateBattleMembersBattleEachTurn_3 = function () {
 		for (var i = 0; i < $gameParty.battleMembers().length; i++) {
-		  var battleMember = $gameParty.battleMembers()[i];
-		  if(battleMember.isStateAffected(61) && battleMember.isAlive()){
-		    var randomIndex = getRandomIndex(101);
-		    seiyoku_skillProbabilityUp1(battleMember);
-		    randomIndex += valueCountSet3;
-		    if(randomIndex >= 90){
-		      battleMember.addState(65);
-		}}};
+			var battleMember = $gameParty.battleMembers()[i];
+			if (battleMember.isStateAffected(61) && battleMember.isAlive()) {
+				var randomIndex = getRandomIndex(101);
+				seiyoku_skillProbabilityUp1(battleMember);
+				randomIndex += valueCountSet3;
+				if (randomIndex >= 90) {
+					battleMember.addState(65);
+				}
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:105|戦闘マップ全滅ボーナス
@@ -11172,13 +11244,13 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:105|戦闘マップ全滅ボーナス
 	AGH_gainItemRandomWork1 = function () {
 		var variable240Value = $dataItems[$gameVariables.value(240)].meta['firstAnnihilationItem'].split(',');
-		if(Number(variable240Value[0]) == 0){valueItems = $dataItems[Number(variable240Value[1])]};
-		if(Number(variable240Value[0]) == 1){valueItems = $dataWeapons[Number(variable240Value[1])]};
-		if(Number(variable240Value[0]) == 2){valueItems = $dataArmors[Number(variable240Value[1])]};
+		if (Number(variable240Value[0]) == 0) { valueItems = $dataItems[Number(variable240Value[1])] };
+		if (Number(variable240Value[0]) == 1) { valueItems = $dataWeapons[Number(variable240Value[1])] };
+		if (Number(variable240Value[0]) == 2) { valueItems = $dataArmors[Number(variable240Value[1])] };
 		$gameParty.gainItem(valueItems, 1);
 		var messageText = `\\C[2]<初回殲滅特典>\\C[0]\x1bI[${valueItems.iconIndex}]${valueItems.name}を入手した！`;
 		$gameScreen.setDTextPicture(messageText, 28);
-		$gameVariables.setValue(21,`${valueItems.description}`);
+		$gameVariables.setValue(21, `${valueItems.description}`);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:106|
@@ -11191,82 +11263,82 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:106|
 	AGH_iterateItemsSetTint = function (interp) {
 		return (function () {
-		if($dataItems[$gameVariables.itemMeta(244)].meta['色相']){
-		var itemMeta = $dataItems[$gameVariables.itemMeta(244)].meta['色相'];
-		var args = new Array("42",String(itemMeta));
-		this.pluginCommand("SetTint", args);
-		};
+			if ($dataItems[$gameVariables.itemMeta(244)].meta['色相']) {
+				var itemMeta = $dataItems[$gameVariables.itemMeta(244)].meta['色相'];
+				var args = new Array("42", String(itemMeta));
+				this.pluginCommand("SetTint", args);
+			};
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:106|
 	AGH_runPluginCommandDamagedPartItemId = function (interp) {
 		return (function () {
-		if($dataItems[$gameVariables.MetaList(244)].meta['色相2']){
-		var MetaList = $dataItems[$gameVariables.MetaList(244)].meta['色相2'].split(',')[2];
-		var args = new Array("44",String(MetaList));
-		this.pluginCommand("SetTint", args);
-		};
+			if ($dataItems[$gameVariables.MetaList(244)].meta['色相2']) {
+				var MetaList = $dataItems[$gameVariables.MetaList(244)].meta['色相2'].split(',')[2];
+				var args = new Array("44", String(MetaList));
+				this.pluginCommand("SetTint", args);
+			};
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:106|
 	AGH_setPictureOpacityCommonEvent106 = function () {
 		$gameScreen.picture(42)._opacity = 255;
-		if($gameScreen.picture(44)){
-		$gameScreen.picture(44)._opacity = 255;
+		if ($gameScreen.picture(44)) {
+			$gameScreen.picture(44)._opacity = 255;
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:109|ダメージ時破損コモン
 	AGH_setSwitchCostumeDamaged = function () {
-		var array = $gameVariables.value($gameVariables.value(20)+380)[4];
-		if(array <= 49){ $gameSwitches.setValue(438,true) };
+		var array = $gameVariables.value($gameVariables.value(20) + 380)[4];
+		if (array <= 49) { $gameSwitches.setValue(438, true) };
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:109|ダメージ時破損コモン
 	AGH_setVariableRestrainedEnemyMove = function () {
-		if($dataSystem.optSideView){
-		  var value1 = $gameVariables.value(92) + 1;
-		  $gameVariables.setValue(703,[$gameTroop.getX(value1),$gameTroop.getY(value1)]);
-		  var actor = $gameActors.actor($gameVariables.value(20)).index() + 1;
-		  $gameVariables.setValue(704,[$gameParty.getX(actor),$gameParty.getY(actor)]);
-		  $gameTroop.set(value1, $gameVariables.value(704)[0]-100, $gameVariables.value(704)[1], 30);
+		if ($dataSystem.optSideView) {
+			var value1 = $gameVariables.value(92) + 1;
+			$gameVariables.setValue(703, [$gameTroop.getX(value1), $gameTroop.getY(value1)]);
+			var actor = $gameActors.actor($gameVariables.value(20)).index() + 1;
+			$gameVariables.setValue(704, [$gameParty.getX(actor), $gameParty.getY(actor)]);
+			$gameTroop.set(value1, $gameVariables.value(704)[0] - 100, $gameVariables.value(704)[1], 30);
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:109|ダメージ時破損コモン
 	AGH_aliveMembers = function (interp) {
 		return (function () {
-		if($gameTroop.aliveMembers().length >= 1){
-		var value3 = $gameTroop.aliveMembers().length;
-		} else {
-		var value3 = 1;
-		};
-		h_exp3(1,value3,value3,0,0,0,0,0,0,0,0);//10
-		//0セク1乳2尻揉3失禁4潮吹5売春6妊7子8中だ9ｱﾅﾙ出し10口飲
-		this.setupChild($dataCommonEvents[85].list, 0);
+			if ($gameTroop.aliveMembers().length >= 1) {
+				var value3 = $gameTroop.aliveMembers().length;
+			} else {
+				var value3 = 1;
+			};
+			h_exp3(1, value3, value3, 0, 0, 0, 0, 0, 0, 0, 0);//10
+			//0セク1乳2尻揉3失禁4潮吹5売春6妊7子8中だ9ｱﾅﾙ出し10口飲
+			this.setupChild($dataCommonEvents[85].list, 0);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:109|ダメージ時破損コモン
 	AGH_erasePicturesDamageBreakCommon = function () {
-		var array = [54,61,62,63,64,65,66,67,68,69,70,71];
-		pic_eraseP(0,array);
+		var array = [54, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71];
+		pic_eraseP(0, array);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:110|Ｈ攻撃時コモン
 	AGH_setVariableHbgvTarget = function () {
 		var variable20Value = $gameVariables.value(20);//文字HBGV
-		$gameVariables.setValue(318,variable20Value);
-		$gameVariables.setValue(706,[640,384,1,60,0,0]);
+		$gameVariables.setValue(318, variable20Value);
+		$gameVariables.setValue(706, [640, 384, 1, 60, 0, 0]);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:110|Ｈ攻撃時コモン
 	AGH_setSelfVariableLibidoHAttackCommon = function (interp) {
 		return (function () {
-		this.sVal(401,getRandomIndex(11) + 10);
-		if($gameSwitches.value(122)){this.setupChild($dataCommonEvents[85].list, 0)};
+			this.sVal(401, getRandomIndex(11) + 10);
+			if ($gameSwitches.value(122)) { this.setupChild($dataCommonEvents[85].list, 0) };
 		}).call(interp);
 	};
 
@@ -11277,107 +11349,111 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 
 	// Replaces (1x): CommonEvents.json:common-event:110|Ｈ攻撃時コモン
 	AGH_setSwitchTemporarySwitchHAttackCommon = function () {
-		$gameSwitches.setValue(380,false);
-		var value1 = $gameVariables.value($gameVariables.value(20)+380)[1];
+		$gameSwitches.setValue(380, false);
+		var value1 = $gameVariables.value($gameVariables.value(20) + 380)[1];
 		var value1 = Math.floor(value1 / 100);
 		var value1 = value1 * 2;
 		var variable20Value = valueBattleSexCountArr[$gameVariables.value(20)];
 		var messageText = `性交回数:\\C[27]${variable20Value}\\C[0] / 性交限界回数:\\C[2]${value1}\\C[0]`;
 		BattleManager._logWindow.push(`addText`, messageText);
-		if(variable20Value >= value1){
-		  $gameSwitches.setValue(380,true);
+		if (variable20Value >= value1) {
+			$gameSwitches.setValue(380, true);
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:110|Ｈ攻撃時コモン
 	AGH_setVariableRandomWork1 = function () {
-		if($dataActors[$gameVariables.value(20)].meta['SexualBattleEndLow']){
-		  var actor = $gameActors.actor($gameVariables.value(20));
-		  var value3 = 'Low';var value4 = 22;
-		  if($gameActors.actor($gameVariables.value(20)).isLearnedSkill(62)){var value3 = 'Middle';var value4 = 34};
-		  if($gameActors.actor($gameVariables.value(20)).isLearnedSkill(65)){var value3 = 'Hi';var value4 = 36};
-		  var actorData = $dataActors[$gameVariables.value(20)].meta['SexualBattleEnd' + value3].split(',');
-		  var randomIndex = actorData[getRandomIndex(actorData.length)];
-		  var value2 = `${actor.name()}`;
-		  $gameVariables.setValue(21,`\\nw[${messageText}]${randomIndex}`);
-		  valueFaceSelect = value4;
-		  battle_bustUp(51,500,10,40);
+		if ($dataActors[$gameVariables.value(20)].meta['SexualBattleEndLow']) {
+			var actor = $gameActors.actor($gameVariables.value(20));
+			var value3 = 'Low'; var value4 = 22;
+			if ($gameActors.actor($gameVariables.value(20)).isLearnedSkill(62)) { var value3 = 'Middle'; var value4 = 34 };
+			if ($gameActors.actor($gameVariables.value(20)).isLearnedSkill(65)) { var value3 = 'Hi'; var value4 = 36 };
+			var actorData = $dataActors[$gameVariables.value(20)].meta['SexualBattleEnd' + value3].split(',');
+			var randomIndex = actorData[getRandomIndex(actorData.length)];
+			var value2 = `${actor.name()}`;
+			$gameVariables.setValue(21, `\\nw[${messageText}]${randomIndex}`);
+			valueFaceSelect = value4;
+			battle_bustUp(51, 500, 10, 40);
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:111|衣装全損
 	AGH_setVariableActor20Costume = function (interp) {
 		return (function () {
-		valueCountSet2 = [];
-		var list = [20,21,22,23,25,28];
-		list.forEach(function(id) {
-		  clothes_hason1([id],0);
-		  valueCountSet2.push($gameVariables.value(244));
-		  $gameVariables.setValue(460+id,0);
-		}, this);
+			valueCountSet2 = [];
+			var list = [20, 21, 22, 23, 25, 28];
+			list.forEach(function (id) {
+				clothes_hason1([id], 0);
+				valueCountSet2.push($gameVariables.value(244));
+				$gameVariables.setValue(460 + id, 0);
+			}, this);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:111|衣装全損
 	AGH_setVariableDamagedPartItemId = function () {
 		var actor = $gameActors.actor($gameVariables.value(20));
-		for (var i = 0; i <= valueCountSet2.length-1; i++) {
-		  if(valueCountSet2[i] >= 1){
-		    $gameVariables.setValue(244,valueCountSet2[i]);
-		    var messageText = `${actor.name()}の${$dataItems[valueCountSet2[i]].name}が破損した！`;
-		    if($gameParty.inBattle()){
-		      BattleManager._logWindow.push(`addText`, messageText);
-		    } else {
-		      CommonPopupManager.showInfo({},messageText,null);
-		    };
-		    clothes_hason2(0,1);
-		}};
+		for (var i = 0; i <= valueCountSet2.length - 1; i++) {
+			if (valueCountSet2[i] >= 1) {
+				$gameVariables.setValue(244, valueCountSet2[i]);
+				var messageText = `${actor.name()}の${$dataItems[valueCountSet2[i]].name}が破損した！`;
+				if ($gameParty.inBattle()) {
+					BattleManager._logWindow.push(`addText`, messageText);
+				} else {
+					CommonPopupManager.showInfo({}, messageText, null);
+				};
+				clothes_hason2(0, 1);
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:112|衣装通常破損
 	AGH_readVariableActorChoiceCostumeNormalDamage = function () {
-		var array = $gameVariables.value($gameVariables.value(20)+380)[4];
+		var array = $gameVariables.value($gameVariables.value(20) + 380)[4];
 		var actor = $gameActors.actor($gameVariables.value(20));
 		var clothes = $gameVariables.value(243);
 		var messageText = `${actor.name()}の${clothes}が破損した！　（現在露出値:${value1}）`;
-		if($gameParty.inBattle()){
-		  BattleManager._logWindow.push(`addText`, messageText);
+		if ($gameParty.inBattle()) {
+			BattleManager._logWindow.push(`addText`, messageText);
 		} else {
-		  CommonPopupManager.showInfo({},messageText,null);
+			CommonPopupManager.showInfo({}, messageText, null);
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:113|戦闘絶頂表現
 	AGH_readVariableActorChoiceBattleClimaxExpression = function () {
 		h_BattleEcstasyDirect();
-		$gameVariables.value($gameVariables.value(20)+380)[2] = 0;
+		$gameVariables.value($gameVariables.value(20) + 380)[2] = 0;
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:120|雑魚戦闘用
 	AGH_setup = function (interp) {
 		return (function () {
-		BattleManager.setup(valueCountSet1, valueCountSet2, true);
-		BattleManager.setEventCallback(function(n) {this._branch[this._indent] = n;}.bind(this));
-		$gamePlayer.makeEncounterCount();
-		SceneManager.push(Scene_Battle);
+			BattleManager.setup(valueCountSet1, valueCountSet2, true);
+			BattleManager.setEventCallback(function (n) { this._branch[this._indent] = n; }.bind(this));
+			$gamePlayer.makeEncounterCount();
+			SceneManager.push(Scene_Battle);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:120|雑魚戦闘用
 	AGH_forceMoveRouteCharactersDungeonInfoItem = function (interp) {
 		return (function () {
-		var randomIndex = [-45,45,-90,90][getRandomIndex(4)];
-		if(randomIndex == 90){var value2 = -24};if(randomIndex == 45){var value2 = -12};
-		if(randomIndex == -90){var value2 = 24};if(randomIndex == -45){var value2 = 12};
-		this.character(this._eventId).forceMoveRoute({
-		"list":[{"code":41,
-		"parameters":[$dataItems[$gameVariables.value(240)].meta.EnemyGraphic.split(',')[0],
-		Number($dataItems[$gameVariables.value(240)].meta.EnemyGraphic.split(',')[1])]},
-		{"code":15, "parameters":[10]},
-		{ "code": 45, "parameters": ["this.setAngle(value1);"] },
-		{ "code": 45, "parameters": ["this._spriteOffsetX = value2;"] },{ "code": 45, "parameters": ["this._spriteOffsetY = value2;"] },
-		{"code":32},{"code":34},{"code":35},{"code":37},
-		{"code":0}],"repeat":false,"skippable":true});
+			var randomIndex = [-45, 45, -90, 90][getRandomIndex(4)];
+			if (randomIndex == 90) { var value2 = -24 }; if (randomIndex == 45) { var value2 = -12 };
+			if (randomIndex == -90) { var value2 = 24 }; if (randomIndex == -45) { var value2 = 12 };
+			this.character(this._eventId).forceMoveRoute({
+				"list": [{
+					"code": 41,
+					"parameters": [$dataItems[$gameVariables.value(240)].meta.EnemyGraphic.split(',')[0],
+					Number($dataItems[$gameVariables.value(240)].meta.EnemyGraphic.split(',')[1])]
+				},
+				{ "code": 15, "parameters": [10] },
+				{ "code": 45, "parameters": ["this.setAngle(value1);"] },
+				{ "code": 45, "parameters": ["this._spriteOffsetX = value2;"] }, { "code": 45, "parameters": ["this._spriteOffsetY = value2;"] },
+				{ "code": 32 }, { "code": 34 }, { "code": 35 }, { "code": 37 },
+				{ "code": 0 }], "repeat": false, "skippable": true
+			});
 		}).call(interp);
 	};
 
@@ -11387,7 +11463,7 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		var value2 = $gameSystem.battleBgm().volume;
 		var value3 = $gameSystem.battleBgm().pitch;
 		var value4 = $gameSystem.battleBgm().pan;
-		AudioManager.playBgm({"name":value1,"volume":value2,"pitch":value3,"pan":value4});
+		AudioManager.playBgm({ "name": value1, "volume": value2, "pitch": value3, "pan": value4 });
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:121|ボスその他戦闘用
@@ -11397,57 +11473,62 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 
 	// Replaces (1x): CommonEvents.json:common-event:121|ボスその他戦闘用
 	AGH_readVariableBossBgm = function () {
-		if($gameVariables.value(337) != 0){
-		  var variable337Value = $gameVariables.value(337);
-		  $gameSystem.setBattleBgm({"name":variable337Value[0],"volume":variable337Value[1],"pitch":variable337Value[2],"pan":variable337Value[3]});
+		if ($gameVariables.value(337) != 0) {
+			var variable337Value = $gameVariables.value(337);
+			$gameSystem.setBattleBgm({ "name": variable337Value[0], "volume": variable337Value[1], "pitch": variable337Value[2], "pan": variable337Value[3] });
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:121|ボスその他戦闘用
 	AGH_setVariableActorChoiceBossBattleUse = function () {
-		for (var i = 0; i <= $gameParty.battleMembers().length-1; i++) {
-		  var battleMember = $gameParty.battleMembers()[i];
-		    if(isGirl(battleMember)){
-		      $gameVariables.setValue(20,$gameParty.battleMembers()[i].actorId());
-		      tachie_settei2();
-		}};
+		for (var i = 0; i <= $gameParty.battleMembers().length - 1; i++) {
+			var battleMember = $gameParty.battleMembers()[i];
+			if (isGirl(battleMember)) {
+				$gameVariables.setValue(20, $gameParty.battleMembers()[i].actorId());
+				tachie_settei2();
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:121|ボスその他戦闘用
 	AGH_pushToArrayBossBattleUse = function (interp) {
 		return (function () {
-		var value1 = valueTroopId;//直前に入れる戦闘グループ名
-		//逃走無効を条件分岐させる？
-		BattleManager.setup(value1, false, true);
-		BattleManager.setEventCallback(function(n) {this._branch[this._indent] = n;}.bind(this));
-		$gamePlayer.makeEncounterCount();
-		SceneManager.push(Scene_Battle);
+			var value1 = valueTroopId;//直前に入れる戦闘グループ名
+			//逃走無効を条件分岐させる？
+			BattleManager.setup(value1, false, true);
+			BattleManager.setEventCallback(function (n) { this._branch[this._indent] = n; }.bind(this));
+			$gamePlayer.makeEncounterCount();
+			SceneManager.push(Scene_Battle);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:124|呼びエネミー生成
 	AGH_forceMoveRouteCharactersDungeonInfoItemSummonEnemySpawn = function (interp) {
 		return (function () {
-		this.character($gameVariables.value(223)).forceMoveRoute({
-		"list":[{"code":41,
-		"parameters":[$dataItems[$gameVariables.value(240)].meta.EnemyGraphic.split(',')[0],
-		Number($dataItems[$gameVariables.value(240)].meta.EnemyGraphic.split(',')[1])]},
-		{"code":15, "parameters":[60]},
-		{"code":29, "parameters":[getRandomIndex(4) + 2]},
-		{"code":0}]
-		});
+			this.character($gameVariables.value(223)).forceMoveRoute({
+				"list": [{
+					"code": 41,
+					"parameters": [$dataItems[$gameVariables.value(240)].meta.EnemyGraphic.split(',')[0],
+					Number($dataItems[$gameVariables.value(240)].meta.EnemyGraphic.split(',')[1])]
+				},
+				{ "code": 15, "parameters": [60] },
+				{ "code": 29, "parameters": [getRandomIndex(4) + 2] },
+				{ "code": 0 }]
+			});
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:124|呼びエネミー生成
 	AGH_forceMoveRouteCharactersDungeonInfoItemMinionSpawnLatest = function (interp) {
 		return (function () {
-		this.character($gameVariables.value(223)).forceMoveRoute({
-		"list":[{"code":41,
-		"parameters":[$dataItems[$gameVariables.value(240)].meta.EnemyGraphic.split(',')[0],
-		Number($dataItems[$gameVariables.value(240)].meta.EnemyGraphic.split(',')[1])]},
-		{"code":15, "parameters":[60]},{"code":45,"parameters":["this.setTone(50, -100, 50);"]},{"code":0}]
-		});
+			this.character($gameVariables.value(223)).forceMoveRoute({
+				"list": [{
+					"code": 41,
+					"parameters": [$dataItems[$gameVariables.value(240)].meta.EnemyGraphic.split(',')[0],
+					Number($dataItems[$gameVariables.value(240)].meta.EnemyGraphic.split(',')[1])]
+				},
+				{ "code": 15, "parameters": [60] }, { "code": 45, "parameters": ["this.setTone(50, -100, 50);"] }, { "code": 0 }]
+			});
 		}).call(interp);
 	};
 
@@ -11461,8 +11542,8 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		var value1 = 0;
 		var troopMember = $gameTroop.members()[valueWordSet10];
 		var enemyId = troopMember._enemyId;
-		if($dataEnemies[enemyId].meta[valueWordSet9]){
-		  var value1 = enemyId;
+		if ($dataEnemies[enemyId].meta[valueWordSet9]) {
+			var value1 = enemyId;
 		};
 		valueEnemyEntrySetId = value1;
 	};
@@ -11478,17 +11559,17 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:128|エネミー変身コモン
 	AGH_waitEnemyTransformCommon = function (interp) {
 		return (function () {
-		var troopMember = $gameTroop.members()[valueWordSet10];
-		var enemyId = troopMember._enemyId;
-		var enemy = $dataEnemies[enemyId].meta[valueWordSet9].split(',');
-		var array = Number(enemy[0]);
-		troopMember.startAnimation(array, true, 0);
-		var value2 = $dataAnimations[array].frames.length;
-		var value3 = 4;
-		if($dataAnimations[array].name.match(/!/)){var value3 = 1};
-		if($dataAnimations[array].name.match(/&/)){var value3 = 2};
-		if($dataAnimations[array].name.match(/$/)){var value3 = 3};
-		this.wait(Math.ceil((value2)*value3/4));
+			var troopMember = $gameTroop.members()[valueWordSet10];
+			var enemyId = troopMember._enemyId;
+			var enemy = $dataEnemies[enemyId].meta[valueWordSet9].split(',');
+			var array = Number(enemy[0]);
+			troopMember.startAnimation(array, true, 0);
+			var value2 = $dataAnimations[array].frames.length;
+			var value3 = 4;
+			if ($dataAnimations[array].name.match(/!/)) { var value3 = 1 };
+			if ($dataAnimations[array].name.match(/&/)) { var value3 = 2 };
+			if ($dataAnimations[array].name.match(/$/)) { var value3 = 3 };
+			this.wait(Math.ceil((value2) * value3 / 4));
 		}).call(interp);
 	};
 
@@ -11503,18 +11584,21 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 
 	// Replaces (1x): CommonEvents.json:common-event:129|ボス覚醒行動
 	AGH_iterateTroopMembersBossAwakenAction = function () {
-		a =  $gameTroop.members()[0];
+		a = $gameTroop.members()[0];
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:129|ボス覚醒行動
 	AGH_readVariableBossSpecialActionPattern = function () {
 		var variable347Value = 0;
 		for (var i = 1; i <= 8; i++) {
-		  if($gameVariables.value(347)[i][0] == 9){
-		    if(a.hpRate() <= $gameVariables.value(347)[i][1] / 100){
-		      if(a.meetsSkillConditions($dataSkills[$gameVariables.value(347)[i][2]])){
-		        var variable347Value = $gameVariables.value(347)[i][2];
-		}}}};
+			if ($gameVariables.value(347)[i][0] == 9) {
+				if (a.hpRate() <= $gameVariables.value(347)[i][1] / 100) {
+					if (a.meetsSkillConditions($dataSkills[$gameVariables.value(347)[i][2]])) {
+						var variable347Value = $gameVariables.value(347)[i][2];
+					}
+				}
+			}
+		};
 		valueCountSet1 = variable347Value;
 	};
 
@@ -11540,28 +11624,28 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:130|ボス行動
 	AGH_forceAction = function (interp) {
 		return (function () {
-		if(valueBossAction >= 1){
-		  var value100 = valueBossAction;
-		} else {
-		  var value100 = valueBossActionNormal;
-		};
-		attack_keisan1(BattleManager._subject,value100,1);
-		this.forceAction(BattleManager._subject, value100, -1);
+			if (valueBossAction >= 1) {
+				var value100 = valueBossAction;
+			} else {
+				var value100 = valueBossActionNormal;
+			};
+			attack_keisan1(BattleManager._subject, value100, 1);
+			this.forceAction(BattleManager._subject, value100, -1);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:131|行動条件で設定
 	AGH_setSelfVariableRandomWork1SetByActionCondition = function (interp) {
 		return (function () {
-		var action = BattleManager._action;
-		this.sVal(21,BattleManager._action._item._itemId);
+			var action = BattleManager._action;
+			this.sVal(21, BattleManager._action._item._itemId);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:140|カットインコモン
 	AGH_checkSwitchBattlePortraitDisabled = function () {
-		if(!$gameSwitches.value(131)){ //立ち絵禁止のスイッチで条件分岐
-		tachie_syoukyo1(getPreviousTachiePicId());
+		if (!$gameSwitches.value(131)) { //立ち絵禁止のスイッチで条件分岐
+			tachie_syoukyo1(getPreviousTachiePicId());
 		};
 	};
 
@@ -11573,10 +11657,10 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:141|会話カットインコモン
 	AGH_runPluginCommandNightSpecialWeather = function (interp) {
 		return (function () {
-		cutin_preparation(5,$gameVariables.value(20));
-		this.sVal(251,valueCutInSet);
-		var args = new Array(String(valueCutInSet2));
-		this.pluginCommand("味方カットイン", args);
+			cutin_preparation(5, $gameVariables.value(20));
+			this.sVal(251, valueCutInSet);
+			var args = new Array(String(valueCutInSet2));
+			this.pluginCommand("味方カットイン", args);
 		}).call(interp);
 	};
 
@@ -11584,7 +11668,7 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_updateParticleRandomWork2 = function () {
 		var linesSp = 'lines_sp';//集中線
 		var variable22Value = $gameVariables.value(22);
-		$gameScreen._particle.particleUpdate([linesSp,'pos',variable22Value,0]);
+		$gameScreen._particle.particleUpdate([linesSp, 'pos', variable22Value, 0]);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:141|会話カットインコモン
@@ -11592,10 +11676,10 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		var value1 = 'easeOutBack';
 		picture_easingConfiguration(value1);
 		var value1 = 100 - valueADVCutinDirect;
-		var value2 =  'CutInCG_Actor'+$gameVariables.value(20)+'_'+$gameVariables.value(21);
+		var value2 = 'CutInCG_Actor' + $gameVariables.value(20) + '_' + $gameVariables.value(21);
 		var variable22Value = $gameVariables.value(22);
-		$gameScreen.showPicture(value1,value2,1,640+variable22Value,384,100,0,255,0);
-		$gameScreen.movePicture(value1,1,640+variable22Value,384,100,100,255,0,40);
+		$gameScreen.showPicture(value1, value2, 1, 640 + variable22Value, 384, 100, 0, 255, 0);
+		$gameScreen.movePicture(value1, 1, 640 + variable22Value, 384, 100, 100, 255, 0, 40);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:141|会話カットインコモン
@@ -11608,17 +11692,18 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		var value1 = 'easeOutBack';
 		picture_easingConfiguration(value1);
 		for (var i = 98; i <= 100; i++) {
-		if($gameScreen.picture(i)){
-		var value1 = $gameScreen.picture(i).x();
-		var picture = $gameScreen.picture(i).y();
-		$gameScreen.movePicture(i,1,value1,picture,100,0,0,0,30);
-		}};
+			if ($gameScreen.picture(i)) {
+				var value1 = $gameScreen.picture(i).x();
+				var picture = $gameScreen.picture(i).y();
+				$gameScreen.movePicture(i, 1, value1, picture, 100, 0, 0, 0, 30);
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:141|会話カットインコモン
 	AGH_resetValueADVCutinDirect = function () {
 		valueADVCutinDirect = 0;
-		adv_partDirectSet(1,2);
+		adv_partDirectSet(1, 2);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:142|ボスＨＰ表示
@@ -11628,65 +11713,65 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 
 	// Replaces (1x): CommonEvents.json:common-event:150|トータルダメージ表示変数
 	AGH_handleScriptSnippetEaseOutBounce = function () {
-		if(valueTotalDamageCount >= 100000){
-		var value1 = 'easeOutBounce';
+		if (valueTotalDamageCount >= 100000) {
+			var value1 = 'easeOutBounce';
 		} else {
-		var value1 = 'easeOutBack';
+			var value1 = 'easeOutBack';
 		};
 		picture_easingConfiguration(value1);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:150|トータルダメージ表示変数
 	AGH_showPictureOneLineSwitch = function () {
-		var pictureId =  96;
-		var value2 =  valueTotalDamageCount; var value3 =  value2.toLocaleString();
+		var pictureId = 96;
+		var value2 = valueTotalDamageCount; var value3 = value2.toLocaleString();
 		var value4 = 50; var value5 = 400; var value6 = 480;
-		if(valueTotalDamageCount <= 9999){ var value4 = 45 };
-		if(valueTotalDamageCount >= 100000){ var value4 = 55 };
-		if($gameVariables.value(276) == 2){
-		$gameScreen.setDTextPicture(`\\f[b]\\oc[22]\\f[i]Total${valueTotalDamageCount2}Hit,\\C[10]${value3}\\C[17]Damage!\\C[0]`, value4);
+		if (valueTotalDamageCount <= 9999) { var value4 = 45 };
+		if (valueTotalDamageCount >= 100000) { var value4 = 55 };
+		if ($gameVariables.value(276) == 2) {
+			$gameScreen.setDTextPicture(`\\f[b]\\oc[22]\\f[i]Total${valueTotalDamageCount2}Hit,\\C[10]${value3}\\C[17]Damage!\\C[0]`, value4);
 		} else {
-		$gameScreen.setDTextPicture(`\\f[b]\\oc[2]\\f[i]Total${valueTotalDamageCount2}Hit,\\C[10]${value3}\\C[17]Damage!\\C[0]`, value4);
+			$gameScreen.setDTextPicture(`\\f[b]\\oc[2]\\f[i]Total${valueTotalDamageCount2}Hit,\\C[10]${value3}\\C[17]Damage!\\C[0]`, value4);
 		};
-		$gameScreen.showPicture(pictureId,"",0,value5-50,value6,100,100,100,0);
-		$gameScreen.movePicture(pictureId,0,value5,value6,100,100,255,0,20);
+		$gameScreen.showPicture(pictureId, "", 0, value5 - 50, value6, 100, 100, 100, 0);
+		$gameScreen.movePicture(pictureId, 0, value5, value6, 100, 100, 255, 0, 20);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:150|トータルダメージ表示変数
 	AGH_showPictureTotalDamageDisplay = function () {
-		var pictureId =  96;
-		var variable330Value =  $gameVariables.value(330);
-		var value3 =  variable330Value.toLocaleString();
+		var pictureId = 96;
+		var variable330Value = $gameVariables.value(330);
+		var value3 = variable330Value.toLocaleString();
 		var value4 = 50;
-		if($gameVariables.value(330) <= 9999){ var value4 = 45 };
-		if($gameVariables.value(330) >= 100000){ var value4 = 55 };
+		if ($gameVariables.value(330) <= 9999) { var value4 = 45 };
+		if ($gameVariables.value(330) >= 100000) { var value4 = 55 };
 		$gameScreen.setDTextPicture(`\\f[b]\\oc[22]\\f[i]Total,\\C[10]${value3}\\C[17]Damage!\\C[0]`, value4);
-		if($gameVariables.value(276) == 2){var value5 = 850;}else{var value5 = 850}
-		$gameScreen.showPicture(pictureId,"",0,value5-50,50,100,100,0,0);
-		$gameScreen.movePicture(pictureId,0,value5,50,100,100,255,0,20);
+		if ($gameVariables.value(276) == 2) { var value5 = 850; } else { var value5 = 850 }
+		$gameScreen.showPicture(pictureId, "", 0, value5 - 50, 50, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 0, value5, 50, 100, 100, 255, 0, 20);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:159|露出限界判定時内部処理
 	AGH_iterateActorsTachiePicId = function () {
 		var variable20Value = Number($dataActors[$gameVariables.value(20)].meta['tachiePicId']);
-		var picture = $gameScreen.picture(variable20Value)._x-600;
+		var picture = $gameScreen.picture(variable20Value)._x - 600;
 		var value3 = $gameScreen.picture(variable20Value)._y;
 		var value4 = $gameScreen.picture(variable20Value)._scaleX;
 		var value5 = $gameScreen.picture(variable20Value)._scaleY;
-		$gameScreen.movePicture(variable20Value,1,
-		picture,value3,value4,value5,
-		$gameVariables.value(109),
-		0,120);
+		$gameScreen.movePicture(variable20Value, 1,
+			picture, value3, value4, value5,
+			$gameVariables.value(109),
+			0, 120);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:159|露出限界判定時内部処理
 	AGH_setSelfVariableEntryName = function (interp) {
 		return (function () {
-		var actor = $gameActors.actor($gameVariables.value(20));
-		this.sVal(49,actor.name());
-		$gameMessage.add(`\\nw[\\V[49]]${$gameVariables.value(21)[0]}`);
-		$gameMessage.setFaceImage($gameVariables.value(20)+'Actor'+$gameVariables.value(21)[1], $gameVariables.value(21)[2]);
-		this.setWaitMode('message');
+			var actor = $gameActors.actor($gameVariables.value(20));
+			this.sVal(49, actor.name());
+			$gameMessage.add(`\\nw[\\V[49]]${$gameVariables.value(21)[0]}`);
+			$gameMessage.setFaceImage($gameVariables.value(20) + 'Actor' + $gameVariables.value(21)[1], $gameVariables.value(21)[2]);
+			this.setWaitMode('message');
 		}).call(interp);
 	};
 
@@ -11694,135 +11779,145 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_setVariableRandomWork1ExposureLimitInternal = function () {
 		var variable19Value = `\\V[49]は\x1bIIN[${$gameVariables.value(19)}]に着替えた。`;
 		//CommonPopupManager.showInfo({},variable19Value,null);
-		$gameVariables.setValue(21,variable19Value);
+		$gameVariables.setValue(21, variable19Value);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:160|立ち絵処理
 	AGH_pluginCommandPCALLCEREMOVE = function (interp) {
 		return (function () {
-		var args = new Array(String(getPreviousTachiePicId()))
-		this.pluginCommand("P_CALL_CE_REMOVE", args);
+			var args = new Array(String(getPreviousTachiePicId()))
+			this.pluginCommand("P_CALL_CE_REMOVE", args);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:161|主人公先頭グラ指定コモン
 	AGH_iterateActorsOtherCharaChip = function (interp) {
 		return (function () {
-		var variable11Value = $dataActors[$gameVariables.value(11)].meta['OtherCharaChip'].split(',')[0];
-		var variable11Value2 = Number($dataActors[$gameVariables.value(11)].meta['OtherCharaChip'].split(',')[1]);
+			var variable11Value = $dataActors[$gameVariables.value(11)].meta['OtherCharaChip'].split(',')[0];
+			var variable11Value2 = Number($dataActors[$gameVariables.value(11)].meta['OtherCharaChip'].split(',')[1]);
 
-		this.character(-1).forceMoveRoute({
-		"list":[{"code":41, "parameters":[variable11Value,variable11Value2]},{"code":38},{"code":29, "parameters":[4]},
-		{"code":31},{"code":33},{"code":0}],});
+			this.character(-1).forceMoveRoute({
+				"list": [{ "code": 41, "parameters": [variable11Value, variable11Value2] }, { "code": 38 }, { "code": 29, "parameters": [4] },
+				{ "code": 31 }, { "code": 33 }, { "code": 0 }],
+			});
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:165|装着衣装一覧
 	AGH_setSelfVariableDressChangeCostume = function (interp) {
 		return (function () {
-		//装着衣装計上1
-		var list = [37,32,35,36,29,28,26,24,17,25,23,22,21,20,11,14,7,27,18];
-		list.forEach(function(id) {
-		for(var i=1101; i < $dataItems.length; i ++){
-		if(id+460 == Number($dataItems[i].meta['ClothSwitch'])+460 &&
-		$gameVariables.value(id+460) == Number($dataItems[i].meta['ClothAllocationNumber'])){
-		if(Number($dataItems[i].meta['EICSwitch']) == 200 || $gameVariables.value(20) == Number($dataItems[i].meta['EICSwitch']) -180){
-		this.sVal(519,$gameVariables.value(519)+`${$dataItems[i].name}\n`);
-		  }};
-		}}, this);
+			//装着衣装計上1
+			var list = [37, 32, 35, 36, 29, 28, 26, 24, 17, 25, 23, 22, 21, 20, 11, 14, 7, 27, 18];
+			list.forEach(function (id) {
+				for (var i = 1101; i < $dataItems.length; i++) {
+					if (id + 460 == Number($dataItems[i].meta['ClothSwitch']) + 460 &&
+						$gameVariables.value(id + 460) == Number($dataItems[i].meta['ClothAllocationNumber'])) {
+						if (Number($dataItems[i].meta['EICSwitch']) == 200 || $gameVariables.value(20) == Number($dataItems[i].meta['EICSwitch']) - 180) {
+							this.sVal(519, $gameVariables.value(519) + `${$dataItems[i].name}\n`);
+						}
+					};
+				}
+			}, this);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:166|着せ替え
 	AGH_showPictureActorChoiceDressUp = function () {
 		var pictureId = 6;
-		if($gameSwitches.value(204)){var value4 = 1}else{var value4 = 2};
-		if($gameActors.actor($gameVariables.value(20)).isStateAffected(61)){var value4 = 3};
-		var value2 = 'Scene_Dress up'+value4;
+		if ($gameSwitches.value(204)) { var value4 = 1 } else { var value4 = 2 };
+		if ($gameActors.actor($gameVariables.value(20)).isStateAffected(61)) { var value4 = 3 };
+		var value2 = 'Scene_Dress up' + value4;
 		var ScreenBlackOut = 'ScreenBlackOut';
-		$gameScreen.showPicture(pictureId,value2,1,640,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId,1,640,384,100,100,220,0,60);
-		$gameScreen.showPicture(pictureId+4,value2,1,640,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId+4,1,640,384,100,100,150,0,60);
+		$gameScreen.showPicture(pictureId, value2, 1, 640, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 1, 640, 384, 100, 100, 220, 0, 60);
+		$gameScreen.showPicture(pictureId + 4, value2, 1, 640, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId + 4, 1, 640, 384, 100, 100, 150, 0, 60);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:167|着せ替え中身
 	AGH_setVariableRandomWork10 = function () {
-		for(var i = 1; i < 100; i ++){
-		  if(valueRandomSet[i] == $gameVariables.value(19)){
-		    $gameVariables.setValue(30,i-1);
-		}};
+		for (var i = 1; i < 100; i++) {
+			if (valueRandomSet[i] == $gameVariables.value(19)) {
+				$gameVariables.setValue(30, i - 1);
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:167|着せ替え中身
 	AGH_iterateItemsClothType = function (interp) {
 		return (function () {
-		var value = 460;
-		var value3 = '通常'
-		for(var i=1101; i < $dataItems.length; i ++){
-		if($dataItems[i].meta['ClothType'] === value3){
-		  if ($gameVariables.value(20) + 380 == Number($dataItems[i].meta['EICSwitch']) || $gameVariables.value(20) + 180 == Number($dataItems[i].meta['EICSwitch']) || 200 == Number($dataItems[i].meta['EICSwitch'])  || 400 == Number($dataItems[i].meta['EICSwitch'])) {
-		     if($dataItems[i].meta['subCategory'] === $dataItems[$gameVariables.value(19)].meta['subCategory']){
-		var itemMeta = Number($dataItems[i].meta['ClothSwitch']);
-		var value2 = Number($dataItems[i].meta['ClothAllocationNumber']);
-		this.sVal(value+itemMeta,value2);
-		  }}}};
+			var value = 460;
+			var value3 = '通常'
+			for (var i = 1101; i < $dataItems.length; i++) {
+				if ($dataItems[i].meta['ClothType'] === value3) {
+					if ($gameVariables.value(20) + 380 == Number($dataItems[i].meta['EICSwitch']) || $gameVariables.value(20) + 180 == Number($dataItems[i].meta['EICSwitch']) || 200 == Number($dataItems[i].meta['EICSwitch']) || 400 == Number($dataItems[i].meta['EICSwitch'])) {
+						if ($dataItems[i].meta['subCategory'] === $dataItems[$gameVariables.value(19)].meta['subCategory']) {
+							var itemMeta = Number($dataItems[i].meta['ClothSwitch']);
+							var value2 = Number($dataItems[i].meta['ClothAllocationNumber']);
+							this.sVal(value + itemMeta, value2);
+						}
+					}
+				}
+			};
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:167|着せ替え中身
 	AGH_readVariableItemProcessWorkDressUpInterior = function (interp) {
 		return (function () {
-		var value = 460;
-		var variable19Value = $dataItems[$gameVariables.value(19)].meta['ClothType']
-		for(var i=1101; i < $dataItems.length; i ++){
-		if($dataItems[i].meta['ClothType'] === variable19Value){
-		  if ($gameVariables.value(20) + 380 == Number($dataItems[i].meta['EICSwitch']) || $gameVariables.value(20) + 180 == Number($dataItems[i].meta['EICSwitch']) || 200 == Number($dataItems[i].meta['EICSwitch'])  || 400 == Number($dataItems[i].meta['EICSwitch'])) {
-		     if($dataItems[i].meta['subCategory'] === $dataItems[$gameVariables.value(19)].meta['subCategory']){
-		var itemMeta = Number($dataItems[i].meta['ClothSwitch']);
-		var value2 = Number($dataItems[i].meta['ClothAllocationNumber']);
-		this.sVal(value+itemMeta,value2);
-		  }}}};
+			var value = 460;
+			var variable19Value = $dataItems[$gameVariables.value(19)].meta['ClothType']
+			for (var i = 1101; i < $dataItems.length; i++) {
+				if ($dataItems[i].meta['ClothType'] === variable19Value) {
+					if ($gameVariables.value(20) + 380 == Number($dataItems[i].meta['EICSwitch']) || $gameVariables.value(20) + 180 == Number($dataItems[i].meta['EICSwitch']) || 200 == Number($dataItems[i].meta['EICSwitch']) || 400 == Number($dataItems[i].meta['EICSwitch'])) {
+						if ($dataItems[i].meta['subCategory'] === $dataItems[$gameVariables.value(19)].meta['subCategory']) {
+							var itemMeta = Number($dataItems[i].meta['ClothSwitch']);
+							var value2 = Number($dataItems[i].meta['ClothAllocationNumber']);
+							this.sVal(value + itemMeta, value2);
+						}
+					}
+				}
+			};
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:167|着せ替え中身
 	AGH_iterateItemsClothSwitch = function (interp) {
 		return (function () {
-		var variableId = 460;
-		var variable19Value = Number($dataItems[$gameVariables.variableId(19)].meta['ClothSwitch']);
-		var variable19Value2 = Number($dataItems[$gameVariables.variableId(19)].meta['ClothAllocationNumber']);
-		if($gameVariables.variableId(variableId+variable19Value) == variable19Value2){
-		this.sVal(variableId+variable19Value,0);
-		} else {
-		this.sVal(variableId+variable19Value,variable19Value2);
-		};
+			var variableId = 460;
+			var variable19Value = Number($dataItems[$gameVariables.variableId(19)].meta['ClothSwitch']);
+			var variable19Value2 = Number($dataItems[$gameVariables.variableId(19)].meta['ClothAllocationNumber']);
+			if ($gameVariables.variableId(variableId + variable19Value) == variable19Value2) {
+				this.sVal(variableId + variable19Value, 0);
+			} else {
+				this.sVal(variableId + variable19Value, variable19Value2);
+			};
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:167|着せ替え中身
 	AGH_setVariableMessageWindowWidth = function () {
 		var variable20Value = Number($dataActors[$gameVariables.value(20)].meta['tachiePicId']);
-		$gameVariables.setValue(311,$gameScreen.picture(variable20Value).origin());
-		$gameVariables.setValue(312,$gameScreen.picture(variable20Value).x());
-		$gameVariables.setValue(313,$gameScreen.picture(variable20Value).y());
-		$gameVariables.setValue(314,$gameScreen.picture(variable20Value).scaleX());
-		$gameVariables.setValue(315,$gameScreen.picture(variable20Value).scaleY());
-		$gameVariables.setValue(316,$gameScreen.picture(variable20Value).opacity());
+		$gameVariables.setValue(311, $gameScreen.picture(variable20Value).origin());
+		$gameVariables.setValue(312, $gameScreen.picture(variable20Value).x());
+		$gameVariables.setValue(313, $gameScreen.picture(variable20Value).y());
+		$gameVariables.setValue(314, $gameScreen.picture(variable20Value).scaleX());
+		$gameVariables.setValue(315, $gameScreen.picture(variable20Value).scaleY());
+		$gameVariables.setValue(316, $gameScreen.picture(variable20Value).opacity());
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:167|着せ替え中身
 	AGH_movePictureItemProcessWork = function () {
 		var variable20Value = Number($dataActors[$gameVariables.value(20)].meta['tachiePicId']);
 		var value2 = 200;
-		if($gameVariables.value(19) == clothSlideUp){value2 = -200};
+		if ($gameVariables.value(19) == clothSlideUp) { value2 = -200 };
 		$gameScreen.movePicture(variable20Value,
-		$gameVariables.value(311),
-		$gameVariables.value(312),
-		$gameVariables.value(313) + value2,
-		$gameVariables.value(314),
-		$gameVariables.value(315),
-		$gameVariables.value(316), 0,60);
+			$gameVariables.value(311),
+			$gameVariables.value(312),
+			$gameVariables.value(313) + value2,
+			$gameVariables.value(314),
+			$gameVariables.value(315),
+			$gameVariables.value(316), 0, 60);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:167|着せ替え中身
@@ -11837,7 +11932,7 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_readVariableActorChoiceDressUpInterior = function () {
 		var start = 0; var end = 41;
 		for (var i = start; i <= end; i++) {
-		  $gameVariables.value(355)[$gameVariables.value(20)][valueCountSet1][i] = $gameVariables.value($gameVariables.value(20)+440)[i];
+			$gameVariables.value(355)[$gameVariables.value(20)][valueCountSet1][i] = $gameVariables.value($gameVariables.value(20) + 440)[i];
 		};
 		$gameVariables.value(355)[$gameVariables.value(20)][valueCountSet1][49] = 1;
 		var variable355Value = $gameVariables.value(355)[$gameVariables.value(20)][valueCountSet1][50];
@@ -11847,49 +11942,50 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 
 	// Replaces (1x): CommonEvents.json:common-event:167|着せ替え中身
 	AGH_setSwitchRandomWork1 = function () {
-		$gameVariables.setValue(21,$gameVariables.value(355)[$gameVariables.value(20)][1][50]);
-		$gameVariables.setValue(22,$gameVariables.value(355)[$gameVariables.value(20)][2][50]);
-		$gameVariables.setValue(23,$gameVariables.value(355)[$gameVariables.value(20)][3][50]);
-		$gameVariables.setValue(24,$gameVariables.value(355)[$gameVariables.value(20)][4][50]);
-		if($gameVariables.value(355)[$gameVariables.value(20)][1][49] == 1){$gameSwitches.setValue(161,true)};
-		if($gameVariables.value(355)[$gameVariables.value(20)][2][49] == 1){$gameSwitches.setValue(162,true)};
-		if($gameVariables.value(355)[$gameVariables.value(20)][3][49] == 1){$gameSwitches.setValue(163,true)};
-		if($gameVariables.value(355)[$gameVariables.value(20)][4][49] == 1){$gameSwitches.setValue(164,true)};
+		$gameVariables.setValue(21, $gameVariables.value(355)[$gameVariables.value(20)][1][50]);
+		$gameVariables.setValue(22, $gameVariables.value(355)[$gameVariables.value(20)][2][50]);
+		$gameVariables.setValue(23, $gameVariables.value(355)[$gameVariables.value(20)][3][50]);
+		$gameVariables.setValue(24, $gameVariables.value(355)[$gameVariables.value(20)][4][50]);
+		if ($gameVariables.value(355)[$gameVariables.value(20)][1][49] == 1) { $gameSwitches.setValue(161, true) };
+		if ($gameVariables.value(355)[$gameVariables.value(20)][2][49] == 1) { $gameSwitches.setValue(162, true) };
+		if ($gameVariables.value(355)[$gameVariables.value(20)][3][49] == 1) { $gameSwitches.setValue(163, true) };
+		if ($gameVariables.value(355)[$gameVariables.value(20)][4][49] == 1) { $gameSwitches.setValue(164, true) };
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:167|着せ替え中身
 	AGH_setVariableActorChoiceDressUpInterior = function () {
-		$gameVariables.value($gameVariables.value(20)+440)[41] = $gameVariables.value(355)[$gameVariables.value(20)][valueCountSet1][41];
-		$gameVariables.value(348)[$gameVariables.value(20)] = $gameVariables.value($gameVariables.value(20)+440)[41];
-		$gameVariables.value($gameVariables.value(20)+440)[0] = $gameVariables.value(355)[$gameVariables.value(20)][valueCountSet1][0];
+		$gameVariables.value($gameVariables.value(20) + 440)[41] = $gameVariables.value(355)[$gameVariables.value(20)][valueCountSet1][41];
+		$gameVariables.value(348)[$gameVariables.value(20)] = $gameVariables.value($gameVariables.value(20) + 440)[41];
+		$gameVariables.value($gameVariables.value(20) + 440)[0] = $gameVariables.value(355)[$gameVariables.value(20)][valueCountSet1][0];
 		//現在衣装を初期化
 		var start = 1; var end = 40;
 		for (var i = start; i <= end; i++) {
-		  $gameVariables.setValue(i+460,$gameVariables.value(355)[$gameVariables.value(20)][valueCountSet1][i]);
+			$gameVariables.setValue(i + 460, $gameVariables.value(355)[$gameVariables.value(20)][valueCountSet1][i]);
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:167|着せ替え中身
 	AGH_setVariableChoicePosition = function () {
-		for(var i=1; i < 200; i ++){
-		  if(valueRandomSet[i] == $gameVariables.value(19)){
-		    $gameVariables.setValue(12,i-1);
-		}};
+		for (var i = 1; i < 200; i++) {
+			if (valueRandomSet[i] == $gameVariables.value(19)) {
+				$gameVariables.setValue(12, i - 1);
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:172|星晶獣選択
 	AGH_readVariableItemProcessWorkStarBeastSelect = function () {
 		valueCountSet1 = 2;
 		valueCountSet2 = $gameVariables.value(19);
-		item_oneOffBuy(1,valueCountSet1,valueCountSet2,1);
+		item_oneOffBuy(1, valueCountSet1, valueCountSet2, 1);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:174|一括売却対象指定
 	AGH_showWindowTextBulkSellTargetSelect = function () {
-		  WindowManager.show(0, 0, 0, 984, 80);
-		  var messageText = ``;
-		  //var value7 = `\\FS[25]対象を選択して下さい　　　　　　　　　　　　　　　　　　　　　　　　　　　`;
-		  WindowManager.drawText(0, messageText);
+		WindowManager.show(0, 0, 0, 984, 80);
+		var messageText = ``;
+		//var value7 = `\\FS[25]対象を選択して下さい　　　　　　　　　　　　　　　　　　　　　　　　　　　`;
+		WindowManager.drawText(0, messageText);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:174|一括売却対象指定
@@ -11912,32 +12008,32 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 
 	// Replaces (1x): CommonEvents.json:common-event:174|一括売却対象指定
 	AGH_showWindowTextRandomWork10 = function () {
-		if(valueCountArray2[$gameVariables.value(30)] == 0){var valueItems = $dataItems};
-		if(valueCountArray2[$gameVariables.value(30)] == 1){var valueItems = $dataWeapons};
-		if(valueCountArray2[$gameVariables.value(30)] == 2){var valueItems = $dataArmors};
+		if (valueCountArray2[$gameVariables.value(30)] == 0) { var valueItems = $dataItems };
+		if (valueCountArray2[$gameVariables.value(30)] == 1) { var valueItems = $dataWeapons };
+		if (valueCountArray2[$gameVariables.value(30)] == 2) { var valueItems = $dataArmors };
 		var variable19Value = `\x1bI[${valueItems[$gameVariables.value(19)].iconIndex}]${valueItems[$gameVariables.value(19)].name}`;
-		if($gameSelfSwitches.getVariableValue([4, 11+valueCountArray2[$gameVariables.value(30)], $gameVariables.value(19)]) == 1){
-		  $gameSelfSwitches.setVariableValue([4, 11+valueCountArray2[$gameVariables.value(30)], $gameVariables.value(19)],0);
-		  variable19Value += `の一括売却対象指定を解除しました`;
+		if ($gameSelfSwitches.getVariableValue([4, 11 + valueCountArray2[$gameVariables.value(30)], $gameVariables.value(19)]) == 1) {
+			$gameSelfSwitches.setVariableValue([4, 11 + valueCountArray2[$gameVariables.value(30)], $gameVariables.value(19)], 0);
+			variable19Value += `の一括売却対象指定を解除しました`;
 		} else {
-		  $gameSelfSwitches.setVariableValue([4, 11+valueCountArray2[$gameVariables.value(30)], $gameVariables.value(19)],1);
-		  variable19Value += `を一括売却対象指定に登録しました`;
+			$gameSelfSwitches.setVariableValue([4, 11 + valueCountArray2[$gameVariables.value(30)], $gameVariables.value(19)], 1);
+			variable19Value += `を一括売却対象指定に登録しました`;
 		};
 		WindowManager.drawText(0, variable19Value);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:174|一括売却対象指定
 	AGH_showWindowTextItemProcessWork = function () {
-		if(valueCountSet2 == 0){var valueItems = $dataItems};
-		if(valueCountSet2 == 1){var valueItems = $dataWeapons};
-		if(valueCountSet2 == 2){var valueItems = $dataArmors};
+		if (valueCountSet2 == 0) { var valueItems = $dataItems };
+		if (valueCountSet2 == 1) { var valueItems = $dataWeapons };
+		if (valueCountSet2 == 2) { var valueItems = $dataArmors };
 		var variable19Value = `\x1bI[${valueItems[$gameVariables.value(19)].iconIndex}]${valueItems[$gameVariables.value(19)].name}`;
-		if($gameSelfSwitches.getVariableValue([4, 11+valueCountSet2, $gameVariables.value(19)]) == 1){
-		  $gameSelfSwitches.setVariableValue([4, 11+valueCountSet2, $gameVariables.value(19)],0);
-		  variable19Value += `の一括売却対象指定を解除しました`;
+		if ($gameSelfSwitches.getVariableValue([4, 11 + valueCountSet2, $gameVariables.value(19)]) == 1) {
+			$gameSelfSwitches.setVariableValue([4, 11 + valueCountSet2, $gameVariables.value(19)], 0);
+			variable19Value += `の一括売却対象指定を解除しました`;
 		} else {
-		  $gameSelfSwitches.setVariableValue([4, 11+valueCountSet2, $gameVariables.value(19)],1);
-		  variable19Value += `を一括売却対象指定に登録しました`;
+			$gameSelfSwitches.setVariableValue([4, 11 + valueCountSet2, $gameVariables.value(19)], 1);
+			variable19Value += `を一括売却対象指定に登録しました`;
 		};
 		WindowManager.drawText(0, variable19Value);
 	};
@@ -11950,10 +12046,10 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		var id6 = valueCountSet6.toLocaleString();//変数57合計
 		var id7 = valueCountSet7.toLocaleString();//ｱｲﾃﾑID270合計
 		valueWordSet0 = `\\C[16]<一括売却結果>\\C[0] \\C[2]${id3}種\\C[0] \\C[3]${id4}個\\C[0] \\C[10]${id5}\G\\C[0]`;
-		if(valueCountSet6 >= 1 || valueCountSet7 >= 1){
-		  valueWordSet0 += `\n`;
-		  if(valueCountSet6 >= 1){valueWordSet0 += `${$dataSystem.variables[57]}:${id6} `};
-		  if(valueCountSet7 >= 1){valueWordSet0 += `\\IIN[${270}]:${id7} `};
+		if (valueCountSet6 >= 1 || valueCountSet7 >= 1) {
+			valueWordSet0 += `\n`;
+			if (valueCountSet6 >= 1) { valueWordSet0 += `${$dataSystem.variables[57]}:${id6} ` };
+			if (valueCountSet7 >= 1) { valueWordSet0 += `\\IIN[${270}]:${id7} ` };
 		};
 	};
 
@@ -11962,12 +12058,13 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		$gameScreen.setDTextPicture(`ダメージ一覧<\\I[75]:${$gameVariables.value(293)[10]}>　　`, 28);
 		var counter = 0;
 		for (var i = 1; i <= 20; i++) {
-		  if($gameVariables.value(293)[i + 10] >= 2){
-		    var actor = $gameActors.actor(i);
-		    var messageText = `${actor.name()}:${$gameVariables.value(293)[i + 10].toLocaleString()}`;
-		    $gameScreen.setDTextPicture(messageText, 28);
-		    counter += $gameVariables.value(293)[i + 10];
-		}};
+			if ($gameVariables.value(293)[i + 10] >= 2) {
+				var actor = $gameActors.actor(i);
+				var messageText = `${actor.name()}:${$gameVariables.value(293)[i + 10].toLocaleString()}`;
+				$gameScreen.setDTextPicture(messageText, 28);
+				counter += $gameVariables.value(293)[i + 10];
+			}
+		};
 		$gameScreen.setDTextPicture(`トータル:${value3.toLocaleString()}`, 28);
 	};
 
@@ -11975,76 +12072,81 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_showPictureTrainingDollSetup = function () {
 		var pictureId = 100;
 		$gameScreen.dWindowFrame = 'ON';
-		$gameScreen.showPicture(pictureId,'',0,10+50,10,100,100,0,0);
-		$gameScreen.movePicture(pictureId,0,10,10,100,100,255,0,20);
+		$gameScreen.showPicture(pictureId, '', 0, 10 + 50, 10, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 0, 10, 10, 100, 100, 255, 0, 20);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:176|訓練人形設定
 	AGH_setVariableActorChoiceTrainingDollSetup = function () {
 		var value1 = 1;
 		for (var i = 1; i <= 7; i++) {
-		  if($gameVariables.value(293)[value1] == i){
-		    var variable293Value = $gameVariables.value(293)[value1];
-		    $gameVariables.setValue(20 + value1,`\x1bI[${$dataStates[variable293Value+50].iconIndex}]`);
-		}};
+			if ($gameVariables.value(293)[value1] == i) {
+				var variable293Value = $gameVariables.value(293)[value1];
+				$gameVariables.setValue(20 + value1, `\x1bI[${$dataStates[variable293Value + 50].iconIndex}]`);
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:176|訓練人形設定
 	AGH_setVariableActorChoice_2 = function () {
 		var value1 = 2;
 		for (var i = 1; i <= 4; i++) {
-		  if($gameVariables.value(293)[value1] == i){
-		    var variable293Value = $gameVariables.value(293)[value1];
-		    if(variable293Value == 1){$gameVariables.setValue(20 + value1,`行動しない`)};
-		    if(variable293Value == 2){$gameVariables.setValue(20 + value1,`攻撃`)};
-		    if(variable293Value == 3){$gameVariables.setValue(20 + value1,`防御`)};
-		    if(variable293Value == 4){$gameVariables.setValue(20 + value1,`命乞い`)};
-		    if(variable293Value == 1 || variable293Value == 4){$dataEnemies[51].actions[0].skillId = 892};
-		    if(variable293Value == 2){$dataEnemies[51].actions[0].skillId = 1};
-		    if(variable293Value == 3){$dataEnemies[51].actions[0].skillId = 2};
-		}};
+			if ($gameVariables.value(293)[value1] == i) {
+				var variable293Value = $gameVariables.value(293)[value1];
+				if (variable293Value == 1) { $gameVariables.setValue(20 + value1, `行動しない`) };
+				if (variable293Value == 2) { $gameVariables.setValue(20 + value1, `攻撃`) };
+				if (variable293Value == 3) { $gameVariables.setValue(20 + value1, `防御`) };
+				if (variable293Value == 4) { $gameVariables.setValue(20 + value1, `命乞い`) };
+				if (variable293Value == 1 || variable293Value == 4) { $dataEnemies[51].actions[0].skillId = 892 };
+				if (variable293Value == 2) { $dataEnemies[51].actions[0].skillId = 1 };
+				if (variable293Value == 3) { $dataEnemies[51].actions[0].skillId = 2 };
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:176|訓練人形設定
 	AGH_setVariableActorChoice_3 = function () {
 		var value1 = 3;
-		$gameVariables.setValue(20 + value1,$gameVariables.value(293)[value1]);
+		$gameVariables.setValue(20 + value1, $gameVariables.value(293)[value1]);
 		var value1 = 4;
-		$gameVariables.setValue(20 + value1,$gameVariables.value(293)[value1]);
+		$gameVariables.setValue(20 + value1, $gameVariables.value(293)[value1]);
 		var value1 = 5;
-		$gameVariables.setValue(20 + value1,$gameVariables.value(293)[value1]);
+		$gameVariables.setValue(20 + value1, $gameVariables.value(293)[value1]);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:176|訓練人形設定
 	AGH_setVariableActorChoice_4 = function () {
 		var value1 = 6;
-		  for (var i = 0; i <= 20; i++) {
-		    if($gameVariables.value(293)[value1] == i){
-		      if(i == 0){$gameVariables.setValue(20 + value1,`種族未設定`)};
-		      if(i >= 1){$gameVariables.setValue(20 + value1,`\x1bI[${$dataStates[i+420].iconIndex}]${$dataStates[i+420].name}`)};
-		  }};
+		for (var i = 0; i <= 20; i++) {
+			if ($gameVariables.value(293)[value1] == i) {
+				if (i == 0) { $gameVariables.setValue(20 + value1, `種族未設定`) };
+				if (i >= 1) { $gameVariables.setValue(20 + value1, `\x1bI[${$dataStates[i + 420].iconIndex}]${$dataStates[i + 420].name}`) };
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:176|訓練人形設定
 	AGH_iterateItemsTrainingDollSetup = function () {
 		var value1 = 6;
-		  for (var i = 1; i <= 19; i++) {
-		    if($gameParty.hasItem($dataItems[i+340])){
-		      var messageText = `\x1bI[${$dataStates[i+420].iconIndex}]${$dataStates[i+420].name}`;
-		      var value3 = i;
-		      const id = 1; 
-		      const choiceParams = {
-		      text: `${value2}`,value: value3};
-		      $gameSystem.addCustomChoice(id, choiceParams);
-		  }};
+		for (var i = 1; i <= 19; i++) {
+			if ($gameParty.hasItem($dataItems[i + 340])) {
+				var messageText = `\x1bI[${$dataStates[i + 420].iconIndex}]${$dataStates[i + 420].name}`;
+				var value3 = i;
+				const id = 1;
+				const choiceParams = {
+					text: `${value2}`, value: value3
+				};
+				$gameSystem.addCustomChoice(id, choiceParams);
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:176|訓練人形設定
 	AGH_setVariableActorChoice_5 = function () {
 		var value1 = 6;
 		$gameVariables.value(293)[value1] = $gameVariables.value(31);
-		if($gameVariables.value(293)[value1] == 0){$gameVariables.setValue(20 + value1,`種族未設定`)};
-		if($gameVariables.value(293)[value1] >= 1){$gameVariables.setValue(20 + value1,`\x1bI[${$dataStates[i+420].iconIndex}]${$dataStates[i+420].name}`)};
+		if ($gameVariables.value(293)[value1] == 0) { $gameVariables.setValue(20 + value1, `種族未設定`) };
+		if ($gameVariables.value(293)[value1] >= 1) { $gameVariables.setValue(20 + value1, `\x1bI[${$dataStates[i + 420].iconIndex}]${$dataStates[i + 420].name}`) };
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:176|訓練人形設定
@@ -12058,16 +12160,16 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_iterateBattleMembersTrainingDollSetup = function () {
 		valueTrialJustBeforeTP = Array(21).fill(0);
 		for (var i = 0; i < $gameParty.battleMembers().length; i++) {
-		var battleMember = $gameParty.battleMembers()[i].actorId();
-		var actor = $gameActors.actor(battleMember);
-		valueTrialJustBeforeTP[battleMember] = actor.tp;
+			var battleMember = $gameParty.battleMembers()[i].actorId();
+			var actor = $gameActors.actor(battleMember);
+			valueTrialJustBeforeTP[battleMember] = actor.tp;
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:176|訓練人形設定
 	AGH_readVariableTrainingDollPresetTrainingDollSetup = function () {
 		for (var i = 11; i <= 30; i++) {
-		$gameVariables.value(293)[i] = 0;
+			$gameVariables.value(293)[i] = 0;
 		};
 	};
 
@@ -12075,112 +12177,115 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_iterateBattleMembersTrainingDollSetup_2 = function () {
 		valueTrialJustBeforeTP = Array(21).fill(0);
 		for (var i = 0; i < $gameParty.battleMembers().length; i++) {
-		var battleMember = $gameParty.battleMembers()[i].actorId();
-		var actor = $gameActors.actor(battleMember);
-		actor.gainTp(-1000);
-		actor.gainTp(valueTrialJustBeforeTP[battleMember]);
+			var battleMember = $gameParty.battleMembers()[i].actorId();
+			var actor = $gameActors.actor(battleMember);
+			actor.gainTp(-1000);
+			actor.gainTp(valueTrialJustBeforeTP[battleMember]);
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:177|監禁,奴隷化コモン
 	AGH_readVariableCashInItem = function () {
-		if($gameVariables.value(316)[0] != 0){
-		  item_confinementScript(0);
+		if ($gameVariables.value(316)[0] != 0) {
+			item_confinementScript(0);
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:179|タイトル効果選択コモン
 	AGH_showWindowTextTitleEffectSelectCommon = function () {
-		var messageText = `[発動中の称号効果]\n`;var variableId = 288;
-		for (var i = 0; i <= $gameVariables.value(variableId+1)-1; i++) {
-		if($gameVariables.value(variableId)[i] == 0){
-		  messageText += `Empty\n`;
-		} else {
-		  messageText += `\\C[16]\x1bIIN[${$gameVariables.value(value3)[i]}]\\C[0]\n`;
-		}};
-		var value2 = $gameVariables.value(variableId+1)*48+48;
-		WindowManager.show(1, 740, 96+14, 540, value2);
+		var messageText = `[発動中の称号効果]\n`; var variableId = 288;
+		for (var i = 0; i <= $gameVariables.value(variableId + 1) - 1; i++) {
+			if ($gameVariables.value(variableId)[i] == 0) {
+				messageText += `Empty\n`;
+			} else {
+				messageText += `\\C[16]\x1bIIN[${$gameVariables.value(value3)[i]}]\\C[0]\n`;
+			}
+		};
+		var value2 = $gameVariables.value(variableId + 1) * 48 + 48;
+		WindowManager.show(1, 740, 96 + 14, 540, value2);
 		WindowManager.drawText(1, messageText);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:179|タイトル効果選択コモン
 	AGH_showWindowTextHNickname = function () {
-		var value1 = `[発動中の称号効果]\n`;var value3 = 288;
-		if($gameSwitches.value(105)){var value1 = `[発動中のＨな称号効果]\n`;var value3 = 294};
-		for (var i = 0; i <= $gameVariables.value(value3+1)-1; i++) {
-		if($gameVariables.value(value3)[i] == 0){
-		value1 += `Empty\n`;
-		} else {
-		value1 += `\\C[16]\x1bIIN[${$gameVariables.value(value3)[i]}]\\C[0]\n`;
-		}};
-		var value2 = $gameVariables.value(value3+1)*48+48;
-		WindowManager.show(1, 740, 96+14, 540, value2);
+		var value1 = `[発動中の称号効果]\n`; var value3 = 288;
+		if ($gameSwitches.value(105)) { var value1 = `[発動中のＨな称号効果]\n`; var value3 = 294 };
+		for (var i = 0; i <= $gameVariables.value(value3 + 1) - 1; i++) {
+			if ($gameVariables.value(value3)[i] == 0) {
+				value1 += `Empty\n`;
+			} else {
+				value1 += `\\C[16]\x1bIIN[${$gameVariables.value(value3)[i]}]\\C[0]\n`;
+			}
+		};
+		var value2 = $gameVariables.value(value3 + 1) * 48 + 48;
+		WindowManager.show(1, 740, 96 + 14, 540, value2);
 		WindowManager.drawText(1, value1);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:179|タイトル効果選択コモン
 	AGH_iterateItemsEmpty = function () {
 		var variableId = 288;
-		for (var i = 0; i <= $gameVariables.value(variableId+1)-1; i++) {
-		  const id = 1;
-		  if($gameVariables.value(variableId)[i] == 0){
-		    var value1 = 'Empty';
-		  } else {
-		    var value1 = $dataItems[$gameVariables.value(variableId)[i]].name;
-		  };
-		  const choiceParams = {text: value1,    value: i};
-		  $gameSystem.addCustomChoice(id, choiceParams);
+		for (var i = 0; i <= $gameVariables.value(variableId + 1) - 1; i++) {
+			const id = 1;
+			if ($gameVariables.value(variableId)[i] == 0) {
+				var value1 = 'Empty';
+			} else {
+				var value1 = $dataItems[$gameVariables.value(variableId)[i]].name;
+			};
+			const choiceParams = { text: value1, value: i };
+			$gameSystem.addCustomChoice(id, choiceParams);
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:179|タイトル効果選択コモン
 	AGH_readVariableHNickname = function () {
 		var value3 = 288;
-		if($gameSwitches.value(105)){var value3 = 294};
-		for (var i = 0; i <= $gameVariables.value(value3+1)-1; i++) {
-		const id = 1;
-		if($gameVariables.value(value3)[i] == 0){
-		var value1 = 'Empty';
-		} else {
-		var value1 = $dataItems[$gameVariables.value(value3)[i]].name;
-		};
-		const choiceParams = {text: value1,    value: i};
-		$gameSystem.addCustomChoice(id, choiceParams);
+		if ($gameSwitches.value(105)) { var value3 = 294 };
+		for (var i = 0; i <= $gameVariables.value(value3 + 1) - 1; i++) {
+			const id = 1;
+			if ($gameVariables.value(value3)[i] == 0) {
+				var value1 = 'Empty';
+			} else {
+				var value1 = $dataItems[$gameVariables.value(value3)[i]].name;
+			};
+			const choiceParams = { text: value1, value: i };
+			$gameSystem.addCustomChoice(id, choiceParams);
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:179|タイトル効果選択コモン
 	AGH_readVariableItemProcessWorkTitleEffectSelectCommon = function () {
 		var variableId = 288;
-		if($gameVariables.value(19) == 601){
-		$gameVariables.value(variableId)[$gameVariables.value(21)] = 0;
+		if ($gameVariables.value(19) == 601) {
+			$gameVariables.value(variableId)[$gameVariables.value(21)] = 0;
 		} else {
-		$gameVariables.value(variableId)[$gameVariables.value(21)] = $gameVariables.value(19);
+			$gameVariables.value(variableId)[$gameVariables.value(21)] = $gameVariables.value(19);
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:179|タイトル効果選択コモン
 	AGH_readVariableItemProcessWork_2 = function () {
 		var value3 = 288;
-		if($gameSwitches.value(105)){var value3 = 294};
-		if($gameVariables.value(19) == 601){
-		$gameVariables.value(value3)[$gameVariables.value(21)] = 0;
+		if ($gameSwitches.value(105)) { var value3 = 294 };
+		if ($gameVariables.value(19) == 601) {
+			$gameVariables.value(value3)[$gameVariables.value(21)] = 0;
 		} else {
-		$gameVariables.value(value3)[$gameVariables.value(21)] = $gameVariables.value(19);
+			$gameVariables.value(value3)[$gameVariables.value(21)] = $gameVariables.value(19);
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:180|種族討伐数表示
 	AGH_readVariableRaceDefeatCountRaceDefeatCountDisplay = function () {
-		for (var i = 0; i <= $gameVariables.value(52).length-1; i++) {
-		  if($gameVariables.value(52)[i] >= 1){
-		    var value8 = `\x1bSIM[${i}]`;
-		    if(i == 1){var value8 = `当日魔物`};
-		    if(i == 2){var value8 = `総魔物`};
-		    var variable52Value = $gameVariables.value(52)[i];
-		    valueIkkatuArray.push([value8,variable52Value,0,0,0]);
-		    valueCountSet1 += 1;
-		}};
+		for (var i = 0; i <= $gameVariables.value(52).length - 1; i++) {
+			if ($gameVariables.value(52)[i] >= 1) {
+				var value8 = `\x1bSIM[${i}]`;
+				if (i == 1) { var value8 = `当日魔物` };
+				if (i == 2) { var value8 = `総魔物` };
+				var variable52Value = $gameVariables.value(52)[i];
+				valueIkkatuArray.push([value8, variable52Value, 0, 0, 0]);
+				valueCountSet1 += 1;
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:181|通常クエスト受注
@@ -12192,7 +12297,7 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 
 	// Replaces (1x): CommonEvents.json:common-event:183|本屋コモン
 	AGH_resetValueScriptArray1 = function () {
-		valueScriptArray1 = [1,2];
+		valueScriptArray1 = [1, 2];
 		valueCountSet3 = 0;
 	};
 
@@ -12205,14 +12310,14 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:183|本屋コモン
 	AGH_gainItemItemProcessWork = function () {
 		var variable19Value = $dataItems[$gameVariables.value(19)].price;
-		if(valueCountSet3 != 0){var variable19Value = Math.floor(variable19Value - (variable19Value * valueCountSet3 / 100))};
-		if($gameParty.gold() >= variable19Value){
-		  $gameParty.gainItem($dataItems[$gameVariables.value(19)], 1);
-		  $gameParty.loseGold(variable19Value);
-		  AudioManager.playSe({"name":'Shop1',"volume":90,"pitch":100,"pan":0});
-		  var variable19Value2 = `\\C[2]\x1bIIN[${$gameVariables.value(19)}]\\C[0]を購入しました。`;
+		if (valueCountSet3 != 0) { var variable19Value = Math.floor(variable19Value - (variable19Value * valueCountSet3 / 100)) };
+		if ($gameParty.gold() >= variable19Value) {
+			$gameParty.gainItem($dataItems[$gameVariables.value(19)], 1);
+			$gameParty.loseGold(variable19Value);
+			AudioManager.playSe({ "name": 'Shop1', "volume": 90, "pitch": 100, "pan": 0 });
+			var variable19Value2 = `\\C[2]\x1bIIN[${$gameVariables.value(19)}]\\C[0]を購入しました。`;
 		} else {
-		  var variable19Value2 = `所持金が足りなかった…。`;
+			var variable19Value2 = `所持金が足りなかった…。`;
 		};
 		TickerManager.show(variable19Value2);
 	};
@@ -12228,81 +12333,82 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:184|水汲みコモン
 	AGH_setVariableRandomWork2 = function () {
 		var value1 = 109;
-		if($gameSwitches.value(203)){var value1 = 110};
-		if($gameSwitches.value(205)){var value1 = 111};
-		if($gameSwitches.value(207)){var value1 = 112};
-		$gameVariables.setValue(22,value1);
+		if ($gameSwitches.value(203)) { var value1 = 110 };
+		if ($gameSwitches.value(205)) { var value1 = 111 };
+		if ($gameSwitches.value(207)) { var value1 = 112 };
+		$gameVariables.setValue(22, value1);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:184|水汲みコモン
 	AGH_setVariableRandomWork2WaterDrawingCommon = function () {
 		var valueItems = 0;
-		if($gameVariables.value(230) >= 1){
-		  var valueItems = $dataWeapons[$gameVariables.value(230)];
+		if ($gameVariables.value(230) >= 1) {
+			var valueItems = $dataWeapons[$gameVariables.value(230)];
 		};
-		if($gameVariables.value(240) >= 1){
-		  var valueItems = $dataItems[$gameVariables.value(240)];
+		if ($gameVariables.value(240) >= 1) {
+			var valueItems = $dataItems[$gameVariables.value(240)];
 		};
-		if(valueItems != 0){
-		  if(valueItems.meta['getWaterItem']){
-		    $gameVariables.setValue(22,Number(valueItems.meta['getWaterItem']));
-		}};
+		if (valueItems != 0) {
+			if (valueItems.meta['getWaterItem']) {
+				$gameVariables.setValue(22, Number(valueItems.meta['getWaterItem']));
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:184|水汲みコモン
 	AGH_setVariableRandomWork2GetWaterItem = function () {
-		if($dataMap.meta['getWaterItem']){
-		  $gameVariables.setValue(22,Number($dataMap.meta['getWaterItem']));
+		if ($dataMap.meta['getWaterItem']) {
+			$gameVariables.setValue(22, Number($dataMap.meta['getWaterItem']));
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:184|水汲みコモン
 	AGH_setSwitchTemporarySwitchWaterDrawingCommon = function () {
-		$gameSwitches.setValue(380,false);
-		event_charaDirectionPoint($gamePlayer,2);
-		if($gameMap.terrainTag(valueDirectionPointX,valueDirectionPointY) == 3){
-		  $gameSwitches.setValue(380,true);
+		$gameSwitches.setValue(380, false);
+		event_charaDirectionPoint($gamePlayer, 2);
+		if ($gameMap.terrainTag(valueDirectionPointX, valueDirectionPointY) == 3) {
+			$gameSwitches.setValue(380, true);
 		};
-		if($gameMap.regionId(valueDirectionPointX,valueDirectionPointY) == 3){
-		  $gameSwitches.setValue(380,true);
+		if ($gameMap.regionId(valueDirectionPointX, valueDirectionPointY) == 3) {
+			$gameSwitches.setValue(380, true);
 		};
-		if($gameMap.regionId(valueDirectionPointX,valueDirectionPointY) == 16){
-		  $gameSwitches.setValue(380,true);
+		if ($gameMap.regionId(valueDirectionPointX, valueDirectionPointY) == 16) {
+			$gameSwitches.setValue(380, true);
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:184|水汲みコモン
 	AGH_setSwitchTemporarySwitch_2 = function () {
 		var value1 = 1162;//中央森林
-		if($gameMap.regionId(valueDirectionPointX,valueDirectionPointY) == 101){
-		  $gameSwitches.setValue(380,true);  
-		  $gameVariables.setValue(22,value1);
+		if ($gameMap.regionId(valueDirectionPointX, valueDirectionPointY) == 101) {
+			$gameSwitches.setValue(380, true);
+			$gameVariables.setValue(22, value1);
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:184|水汲みコモン
 	AGH_setSwitchTemporarySwitch_3 = function () {
 		var value1 = 111;
-		if($gameMap.regionId(valueDirectionPointX,valueDirectionPointY) == 102){
-		  $gameSwitches.setValue(380,true);  
-		  $gameVariables.setValue(22,value1);
+		if ($gameMap.regionId(valueDirectionPointX, valueDirectionPointY) == 102) {
+			$gameSwitches.setValue(380, true);
+			$gameVariables.setValue(22, value1);
 		};
 		var value1 = 111;
-		if($gameMap.regionId(valueDirectionPointX,valueDirectionPointY) == 103){
-		  $gameSwitches.setValue(380,true);  
-		  $gameVariables.setValue(22,value1);
+		if ($gameMap.regionId(valueDirectionPointX, valueDirectionPointY) == 103) {
+			$gameSwitches.setValue(380, true);
+			$gameVariables.setValue(22, value1);
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:184|水汲みコモン
 	AGH_setVariableDynamicEventId = function (interp) {
 		return (function () {
-		$gameVariables.setValue(292,Array(21).fill(0));
-		var value2 = valueDirectionPointX;
-		var value3 = valueDirectionPointY;
-		goodsEvent_respawn(0,'Goods4',4,2,0,value2,value3);
-		valueCountSet9 = this._eventId;
-		this._eventId = $gameVariables.value(292)[0];
+			$gameVariables.setValue(292, Array(21).fill(0));
+			var value2 = valueDirectionPointX;
+			var value3 = valueDirectionPointY;
+			goodsEvent_respawn(0, 'Goods4', 4, 2, 0, value2, value3);
+			valueCountSet9 = this._eventId;
+			this._eventId = $gameVariables.value(292)[0];
 		}).call(interp);
 	};
 
@@ -12318,62 +12424,64 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:185|その他ショップ処理
 	AGH_initArray = function () {
 		array = [];
-		bookShop_preparert2(0,3,1);
+		bookShop_preparert2(0, 3, 1);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:186|娼館処理
 	AGH_readVariableBrothelProcessing = function () {
-		  var actorData = $dataActors[id];
-		  if($gameVariables.value(id+380)[27] >= 1){
-		    var value11 = `\\fs[25]売春総獲得額:${$gameVariables.value(id+380)[27]}回${$gameVariables.value(827)}`
-		  } else{
-		    var value11 = ``
-		  };
+		var actorData = $dataActors[id];
+		if ($gameVariables.value(id + 380)[27] >= 1) {
+			var value11 = `\\fs[25]売春総獲得額:${$gameVariables.value(id + 380)[27]}回${$gameVariables.value(827)}`
+		} else {
+			var value11 = ``
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:187|追剥コモン
 	AGH_showInfo = function () {
 		value1 = `既に事切れているようだ…。`;
-		CommonPopupManager.showInfo({},value1,null);
+		CommonPopupManager.showInfo({}, value1, null);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:191|ギルドコモン
 	AGH_setSwitchWalletIn = function () {
-		$gameSwitches.setValue(161,false);
-		for (var i = 1; i <= $dataItems.length-1; i++) {
-		  if($dataItems[i].meta['walletIn']){
-		    if($gameParty.hasItem($dataItems[i],true)){
-		      $gameSwitches.setValue(161,true);
-		      break;
-		}}};
+		$gameSwitches.setValue(161, false);
+		for (var i = 1; i <= $dataItems.length - 1; i++) {
+			if ($dataItems[i].meta['walletIn']) {
+				if ($gameParty.hasItem($dataItems[i], true)) {
+					$gameSwitches.setValue(161, true);
+					break;
+				}
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:191|ギルドコモン
 	AGH_setVariableRandomWork1GuildCommon = function () {
-		if($gameSwitches.value(128)){
-		  var value1 = `デイリークエスト自動受注＜ON＞`;
+		if ($gameSwitches.value(128)) {
+			var value1 = `デイリークエスト自動受注＜ON＞`;
 		} else {
-		  var value1 = `デイリークエスト自動受注＜OFF＞`;
+			var value1 = `デイリークエスト自動受注＜OFF＞`;
 		};
-		$gameVariables.setValue(21,value1);
+		$gameVariables.setValue(21, value1);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:191|ギルドコモン
 	AGH_setVariableRandomWork2GuildCommon = function () {
-		if($gameSwitches.value(129)){
-		  var value1 = `デイリークエスト自動達成＜ON＞`;
+		if ($gameSwitches.value(129)) {
+			var value1 = `デイリークエスト自動達成＜ON＞`;
 		} else {
-		  var value1 = `デイリークエスト自動達成＜OFF＞`;
+			var value1 = `デイリークエスト自動達成＜OFF＞`;
 		};
-		$gameVariables.setValue(22,value1);
+		$gameVariables.setValue(22, value1);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:191|ギルドコモン
 	AGH_setSwitchGuildCommon = function () {
-		if($gameParty.hasItem($dataItems[693],true)){
-		  $gameSwitches.setValue(162,true);
+		if ($gameParty.hasItem($dataItems[693], true)) {
+			$gameSwitches.setValue(162, true);
 		} else {
-		  $gameSwitches.setValue(162,false);
+			$gameSwitches.setValue(162, false);
 		};
 	};
 
@@ -12381,38 +12489,40 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_gainItemWalletDeliveryCount = function () {
 		var counter = 0;
 		var messageText = `拾得物\n`;
-		for (var i = 1; i <= $dataItems.length-1; i++) {
-		  if($dataItems[i].meta['walletIn']){
-		    if($gameParty.numItems($dataItems[i]) >= 1){
-		      counter += $gameParty.numItems($dataItems[i]);
-		      messageText += `\x1bIIN[${i}]:\\C[1]${$gameParty.numItems($dataItems[i])}\\C[0]個\n`;
-		      $gameParty.loseItem($dataItems[i], $gameParty.numItems($dataItems[i]));
-		}}};
-		$gameParty.gainItem($dataItems[10], counter);$gameVariables.setValue(605,$gameVariables.value(605)+counter);
+		for (var i = 1; i <= $dataItems.length - 1; i++) {
+			if ($dataItems[i].meta['walletIn']) {
+				if ($gameParty.numItems($dataItems[i]) >= 1) {
+					counter += $gameParty.numItems($dataItems[i]);
+					messageText += `\x1bIIN[${i}]:\\C[1]${$gameParty.numItems($dataItems[i])}\\C[0]個\n`;
+					$gameParty.loseItem($dataItems[i], $gameParty.numItems($dataItems[i]));
+				}
+			}
+		};
+		$gameParty.gainItem($dataItems[10], counter); $gameVariables.setValue(605, $gameVariables.value(605) + counter);
 		messageText += `\x1bIIN[10]:\\C[2]${value2}\\C[0]個を謝礼として受け取った。\n`;
-		valueTalkSet = [28,messageText];
+		valueTalkSet = [28, messageText];
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:191|ギルドコモン
 	AGH_setSwitchDailyAutoOrder = function () {
-		if($gameSwitches.value(128)){
-		  $gameSwitches.setValue(128,false);
-		  var value1 = `デイリークエストの自動受注をオフにしました。`;
+		if ($gameSwitches.value(128)) {
+			$gameSwitches.setValue(128, false);
+			var value1 = `デイリークエストの自動受注をオフにしました。`;
 		} else {
-		  $gameSwitches.setValue(128,true);
-		  var value1 = `デイリークエストの自動受注をオンにしました。`;
+			$gameSwitches.setValue(128, true);
+			var value1 = `デイリークエストの自動受注をオンにしました。`;
 		};
 		TickerManager.show(value1);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:191|ギルドコモン
 	AGH_setSwitchDailyAutoComplete = function () {
-		if($gameSwitches.value(129)){
-		  $gameSwitches.setValue(129,false);
-		  var value1 = `デイリークエストの自動達成報告をオフにしました。`;
+		if ($gameSwitches.value(129)) {
+			$gameSwitches.setValue(129, false);
+			var value1 = `デイリークエストの自動達成報告をオフにしました。`;
 		} else {
-		  $gameSwitches.setValue(129,true);
-		  var value1 = `デイリークエストの自動達成報告をオンにしました。`;
+			$gameSwitches.setValue(129, true);
+			var value1 = `デイリークエストの自動達成報告をオンにしました。`;
 		};
 		TickerManager.show(value1);
 	};
@@ -12420,8 +12530,8 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:192|未使用：情報屋選択肢
 	AGH_iterateItemsSetJouhouGold = function () {
 		var variable19Value = 1000;
-		if($dataItems[$gameVariables.value(19)].meta['SetJouhouGold']){
-		  var variable19Value = Number($dataItems[$gameVariables.value(19)].meta['SetJouhouGold']);
+		if ($dataItems[$gameVariables.value(19)].meta['SetJouhouGold']) {
+			var variable19Value = Number($dataItems[$gameVariables.value(19)].meta['SetJouhouGold']);
 		};
 		$gameParty.loseGold(variable19Value);
 		var messageText = `-${variable19Value}\\G`;
@@ -12445,88 +12555,93 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:195|動物処理バックアップ
 	AGH_forceMoveRouteCharactersAnimalProcessingBackup = function (interp) {
 		return (function () {
-		if(valueanimalEventId >= 1){
-		var randomIndex = [-45,45,-90,90][getRandomIndex(4)];
-		if(randomIndex == 90){var value2 = -24};if(randomIndex == 45){var value2 = -12};
-		if(randomIndex == -90){var value2 = 24};if(randomIndex == -45){var value2 = 12};
-		this.character(valueanimalEventId).forceMoveRoute({
-		"list":[
-		{ "code": 45, "parameters": ["this.setAngle(value1);"] },
-		{ "code": 45, "parameters": ["this.resetPattern();"] },{ "code": 45, "parameters": ["this._originalPattern = 1;"] },{ "code": 45, "parameters": ["this._priorityType = 0;"] },
-		{ "code": 45, "parameters": ["this._spriteOffsetX += value2;"] },{ "code": 45, "parameters": ["this._spriteOffsetY += value2;"] },
-		{"code":32},{"code":34},{"code":37},{"code":17},{"code":35},
-		{"code":0}],"repeat":false,"skippable":true});
-		};
+			if (valueanimalEventId >= 1) {
+				var randomIndex = [-45, 45, -90, 90][getRandomIndex(4)];
+				if (randomIndex == 90) { var value2 = -24 }; if (randomIndex == 45) { var value2 = -12 };
+				if (randomIndex == -90) { var value2 = 24 }; if (randomIndex == -45) { var value2 = 12 };
+				this.character(valueanimalEventId).forceMoveRoute({
+					"list": [
+						{ "code": 45, "parameters": ["this.setAngle(value1);"] },
+						{ "code": 45, "parameters": ["this.resetPattern();"] }, { "code": 45, "parameters": ["this._originalPattern = 1;"] }, { "code": 45, "parameters": ["this._priorityType = 0;"] },
+						{ "code": 45, "parameters": ["this._spriteOffsetX += value2;"] }, { "code": 45, "parameters": ["this._spriteOffsetY += value2;"] },
+						{ "code": 32 }, { "code": 34 }, { "code": 37 }, { "code": 17 }, { "code": 35 },
+						{ "code": 0 }], "repeat": false, "skippable": true
+				});
+			};
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:195|動物処理バックアップ
 	AGH_characterRoute = function (interp) {
 		return (function () {
-		this._character = this.character(valueanimalEventId);
-		this.setWaitMode('route');
+			this._character = this.character(valueanimalEventId);
+			this.setWaitMode('route');
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:195|動物処理バックアップ
 	AGH_forceMoveRouteCharactersPeople2 = function (interp) {
 		return (function () {
-		if(valueanimalEventId >= 1){
-		this.character(valueanimalEventId).forceMoveRoute({
-		"list":[
-		{ "code": 45, "parameters": ["this.setScale(100, 100);"] },
-		{"code":42, "parameters":[255]},
-		{"code":40},
-		{"code":41, "parameters":['People2',1]},
-		{"code":0}],"repeat":false,"skippable":true});
-		this._character = this.character(valueanimalEventId);
-		this.setWaitMode('route');
-		};
+			if (valueanimalEventId >= 1) {
+				this.character(valueanimalEventId).forceMoveRoute({
+					"list": [
+						{ "code": 45, "parameters": ["this.setScale(100, 100);"] },
+						{ "code": 42, "parameters": [255] },
+						{ "code": 40 },
+						{ "code": 41, "parameters": ['People2', 1] },
+						{ "code": 0 }], "repeat": false, "skippable": true
+				});
+				this._character = this.character(valueanimalEventId);
+				this.setWaitMode('route');
+			};
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:195|動物処理バックアップ
 	AGH_forceMoveRouteCharactersAnimalProcessingBackup_2 = function (interp) {
 		return (function () {
-		if(valueanimalEventId >= 1){
-		this.character(valueanimalEventId).forceMoveRoute({
-		"list":[
-		{"code":15, "parameters":[600]},
-		{"code":0}],"repeat":true,"skippable":true});
-		};
+			if (valueanimalEventId >= 1) {
+				this.character(valueanimalEventId).forceMoveRoute({
+					"list": [
+						{ "code": 15, "parameters": [600] },
+						{ "code": 0 }], "repeat": true, "skippable": true
+				});
+			};
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:196|ダンジョン雑魚で剥ぎ取り追いはぎコモンバックアップ
 	AGH_forceMoveRouteCharactersSFEnemy2 = function (interp) {
 		return (function () {
-		var eventId = valueEnemyEventId;
-		if(!!$gameMap.event(eventId)) {
-		  $gameMap.event(eventId).forceMoveRoute({
-		  "list":[
-		  {"code":36},{"code":16},
-		  {"code":41, "parameters":['SF_enemy2',7]},
-		  {"code":45,"parameters": ["this.setFace(6,true,true);"]},
-		  {"code":35},
-		  {"code":0}],"repeat":false,"skippable":true});
-		};
+			var eventId = valueEnemyEventId;
+			if (!!$gameMap.event(eventId)) {
+				$gameMap.event(eventId).forceMoveRoute({
+					"list": [
+						{ "code": 36 }, { "code": 16 },
+						{ "code": 41, "parameters": ['SF_enemy2', 7] },
+						{ "code": 45, "parameters": ["this.setFace(6,true,true);"] },
+						{ "code": 35 },
+						{ "code": 0 }], "repeat": false, "skippable": true
+				});
+			};
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:199|全体マップ移動選択コモン
 	AGH_setSelfSwitchWorldMapMoveSelectCommon = function () {
 		for (var id = 50; id > 0; id--) {
-		  if(!!$gameMap.event(id)) {
-		    $gameSelfSwitches.setValue([$gameMap.mapId(), id, 'C'], true);
-		}};
+			if (!!$gameMap.event(id)) {
+				$gameSelfSwitches.setValue([$gameMap.mapId(), id, 'C'], true);
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:199|全体マップ移動選択コモン
 	AGH_insertCallEventData = function (interp) {
 		return (function () {
-		if ($callEventMap) {
-		  this.insertCallEventData(23, 2);
-		}
+			if ($callEventMap) {
+				this.insertCallEventData(23, 2);
+			}
 		}).call(interp);
 	};
 
@@ -12539,25 +12654,25 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:203|熟練度アップコモン
 	AGH_showWindowTextRandomWork1 = function (interp) {
 		return (function () {
-		var value1 = 169;//例外アイテム名
-		var actor = $gameActors.actor($gameVariables.item(20));
-		var item = $dataItems[$gameVariables.item(93)]
-		if($gameVariables.item(93) != value1){
-		this.sVal(21,Number(item.meta['熟練度アップスキルタイプ']));
-		};
-		this.sVal(22,Number(item.meta['熟練度上昇値']));
-		var variable93Value = `\x1bIIN[${$gameVariables.value(93)}]（${$gameParty.numItems(value)}）上昇値:\\C[2]${$gameVariables.value(22)}\\C[0]　対象:${actor.name()}`
-		if($gameVariables.item(203) >= 2){variable93Value += `\\C[10] * 2\\C[0]`};
-		WindowManager.drawText(0, variable93Value);
+			var value1 = 169;//例外アイテム名
+			var actor = $gameActors.actor($gameVariables.item(20));
+			var item = $dataItems[$gameVariables.item(93)]
+			if ($gameVariables.item(93) != value1) {
+				this.sVal(21, Number(item.meta['熟練度アップスキルタイプ']));
+			};
+			this.sVal(22, Number(item.meta['熟練度上昇値']));
+			var variable93Value = `\x1bIIN[${$gameVariables.value(93)}]（${$gameParty.numItems(value)}）上昇値:\\C[2]${$gameVariables.value(22)}\\C[0]　対象:${actor.name()}`
+			if ($gameVariables.item(203) >= 2) { variable93Value += `\\C[10] * 2\\C[0]` };
+			WindowManager.drawText(0, variable93Value);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:203|熟練度アップコモン
 	AGH_readVariableItemProcessWorkProficiencyUpCommon = function () {
-		if(valueCountSet1 == $gameVariables.value(19)){
-		  item_skilljukurenndoup(2);
+		if (valueCountSet1 == $gameVariables.value(19)) {
+			item_skilljukurenndoup(2);
 		} else {
-		  item_skilljukurenndoup(1);
+			item_skilljukurenndoup(1);
 		};
 	};
 
@@ -12565,27 +12680,27 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_readVariableSkillUseId = function () {
 		var item = $dataItems[$gameVariables.item(93)]
 		var messageText = `${value.name}の所持数が0になった為、使用画面を終了します。`;
-		CommonPopupManager.showInfo({},messageText,null);
+		CommonPopupManager.showInfo({}, messageText, null);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:210|アクター選択コモン
 	AGH_movePictureActorChoice = function () {
 		var value1 = $gameVariables.value(20) + 100;
-		if($gameVariables.value(20) >= 2){
-		var value1 = 101 + ($gameVariables.value(20)-1) * 7;
+		if ($gameVariables.value(20) >= 2) {
+			var value1 = 101 + ($gameVariables.value(20) - 1) * 7;
 		};
-		$gameScreen.movePicture(value1,1,640-500,384,100,100,0,0,20);
+		$gameScreen.movePicture(value1, 1, 640 - 500, 384, 100, 100, 0, 0, 20);
 		for (var i = 0; i <= 7; i++) {
-		  if($gameScreen.picture(value1+i)){
-		    $gameScreen.movePicture(value1+i,1,640-500,384,100,100,0,3,20);
-		  };
+			if ($gameScreen.picture(value1 + i)) {
+				$gameScreen.movePicture(value1 + i, 1, 640 - 500, 384, 100, 100, 0, 3, 20);
+			};
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:212|エクストラコマンド
 	AGH_setSwitchTipsTitle = function () {
-		if($gameVariables.value(532).length >= 1){
-		  $gameSwitches.setValue(161,true);
+		if ($gameVariables.value(532).length >= 1) {
+			$gameSwitches.setValue(161, true);
 		};
 	};
 
@@ -12597,14 +12712,15 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:219|収集表示アイテムコモン
 	AGH_checkItemCountCollectedItem = function (interp) {
 		return (function () {
-		var start = 1;var end = 4;
-		for (var i = start; i <= end; i++) {
-		  if($gameVariables.value(284)[i] == 0){
-		    this.sVal(i + 21,'[登録なし]');
-		  } else {
-		    this.sVal(i+21,'['+$dataItems[$gameVariables.value(284)[i]].name + ':');
-		    this.sVal(i+21,$gameVariables.value(i+21) + $gameParty.numItems($dataItems[$gameVariables.value(284)[i]]) + ']');
-		}};
+			var start = 1; var end = 4;
+			for (var i = start; i <= end; i++) {
+				if ($gameVariables.value(284)[i] == 0) {
+					this.sVal(i + 21, '[登録なし]');
+				} else {
+					this.sVal(i + 21, '[' + $dataItems[$gameVariables.value(284)[i]].name + ':');
+					this.sVal(i + 21, $gameVariables.value(i + 21) + $gameParty.numItems($dataItems[$gameVariables.value(284)[i]]) + ']');
+				}
+			};
 		}).call(interp);
 	};
 
@@ -12616,7 +12732,7 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:232|ショップ処理先頭で処理
 	AGH_setVariableRandomWork1ShopProcessingHead = function () {
 		var messageText = `\\C[2]${actor.name()}\\C[0]は\\C[27]\x1bSIN[${valueHoneyTrapSkillId}]\\C[0]を行った…。[成功率/値引き率\\C[10]${valueRandomSet}%UP\\C[0]]\n`;
-		$gameVariables.setValue(21,$gameVariables.value(21)+messageText);
+		$gameVariables.setValue(21, $gameVariables.value(21) + messageText);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:234|喜捨コモン
@@ -12629,7 +12745,7 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:235|レアリティ昇格コモン
 	AGH_setVariableRandomWork1RarityUpCommon = function () {
 		var wordSet = valueWordSet2;
-		$gameVariables.setValue(21,`${value1}には上記の物が必要になります。
+		$gameVariables.setValue(21, `${value1}には上記の物が必要になります。
 		昇格なさいますか？`);
 	};
 
@@ -12637,13 +12753,13 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_eraseMapEventDynamicEventIdRarityUpCommon = function () {
 		var eventId = $gameVariables.value(292)[11];
 		$gameMap.eraseEvent(eventId);
-		$gameVariables.setValue(292,Array(21).fill(0));
+		$gameVariables.setValue(292, Array(21).fill(0));
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:235|レアリティ昇格コモン
 	AGH_setVariableRandomWork1_2 = function () {
 		var actor = $gameActors.actor($gameVariables.value(20));
-		$gameVariables.setValue(21,`${actor.name()}殿はこれ以上の昇格はできませんね`);
+		$gameVariables.setValue(21, `${actor.name()}殿はこれ以上の昇格はできませんね`);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:237|指輪ショップ処理
@@ -12651,30 +12767,30 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		var variableId = 20;
 		var switchId = 160;
 		for (var i = 396; i <= 399; i++) {
-		  $gameVariables.setValue(variableId+(i-395),`\x1bI[${$dataArmors[i].iconIndex}]${$dataArmors[i].name} ${$dataArmors[i].price.toLocaleString()}\G`);
-		  if($gameParty.gold() >= $dataArmors[i].price){
-		    $gameSwitches.setValue(switchId+(i-395),true);
-		  } else {
-		    $gameSwitches.setValue(switchId+(i-395),false);
-		  };
+			$gameVariables.setValue(variableId + (i - 395), `\x1bI[${$dataArmors[i].iconIndex}]${$dataArmors[i].name} ${$dataArmors[i].price.toLocaleString()}\G`);
+			if ($gameParty.gold() >= $dataArmors[i].price) {
+				$gameSwitches.setValue(switchId + (i - 395), true);
+			} else {
+				$gameSwitches.setValue(switchId + (i - 395), false);
+			};
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:237|指輪ショップ処理
 	AGH_setSelfVariableChoiceSwitch12 = function (interp) {
 		return (function () {
-		this.sVal(172,2);//会話コモン文字ピク
-		var value1 = '指輪について';
-		var messageText = `スロットにアタッチを装着する事で性能が上昇する。
+			this.sVal(172, 2);//会話コモン文字ピク
+			var value1 = '指輪について';
+			var messageText = `スロットにアタッチを装着する事で性能が上昇する。
 		一度アタッチを付けると取り外し不可。指輪本体は店売りのみで、
 		アタッチはドロップや宝箱等からのみ。
 		アタッチが付くと指輪の売却額がアタッチ分上乗せされる。
 		先頭アタッチの略語が名称の末尾に付く。
 		※ 指輪本体を大量に持ち過ぎるとセーブデータの容量が増加します。
 		許容できる範囲でやりくりして下さい。`;
-		var array = [0,1,640+320,384,100,100,255];
-		valueTalkSet = [value1,messageText,array];
-		this.setupChild($dataCommonEvents[60].list, 0);
+			var array = [0, 1, 640 + 320, 384, 100, 100, 255];
+			valueTalkSet = [value1, messageText, array];
+			this.setupChild($dataCommonEvents[60].list, 0);
 		}).call(interp);
 	};
 
@@ -12688,43 +12804,43 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:238|個別アイテム鑑定店
 	AGH_setVariableRandomWork1IndividualItemAppraisal = function () {
 		var value1 = 0; var value2 = 0; var value3 = 0;
-		if ($dataItems[$gameVariables.value(19)].meta['下級鑑定品']) {value1 = 10};
-		if ($dataItems[$gameVariables.value(19)].meta['中級鑑定品']) {value2 = 100};
-		if ($dataItems[$gameVariables.value(19)].meta['上級鑑定品']) {value3 = 1000};
-		$gameVariables.setValue(21,value1 + value2 + value3);
+		if ($dataItems[$gameVariables.value(19)].meta['下級鑑定品']) { value1 = 10 };
+		if ($dataItems[$gameVariables.value(19)].meta['中級鑑定品']) { value2 = 100 };
+		if ($dataItems[$gameVariables.value(19)].meta['上級鑑定品']) { value3 = 1000 };
+		$gameVariables.setValue(21, value1 + value2 + value3);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:240|ショップ処理
 	AGH_initValueScriptArray1 = function () {
-		if(valueCountSet1 == 0){valueScriptArray1 = [4,5,6]};
-		if(valueCountSet1 == 1){valueScriptArray1 = [6,7]};
-		if(valueCountSet1 == 2){valueScriptArray1 = [4,5,6]};
-		if(valueCountSet1 == 3){valueScriptArray1 = [4,5,6,7]};
-		if(valueCountSet1 == 4){valueScriptArray1 = [4,5,6,7]};
-		if(valueCountSet1 == 5){valueScriptArray1 = [1]};
-		if(valueCountSet1 == 6){valueScriptArray1 = [1]};
+		if (valueCountSet1 == 0) { valueScriptArray1 = [4, 5, 6] };
+		if (valueCountSet1 == 1) { valueScriptArray1 = [6, 7] };
+		if (valueCountSet1 == 2) { valueScriptArray1 = [4, 5, 6] };
+		if (valueCountSet1 == 3) { valueScriptArray1 = [4, 5, 6, 7] };
+		if (valueCountSet1 == 4) { valueScriptArray1 = [4, 5, 6, 7] };
+		if (valueCountSet1 == 5) { valueScriptArray1 = [1] };
+		if (valueCountSet1 == 6) { valueScriptArray1 = [1] };
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:240|ショップ処理
 	AGH_initValueScriptArray1ShopProcessing = function () {
-		if(valueCountSet1 == 0){valueScriptArray1 = [1,2,3,4,5,6,7,8,9]};
-		if(valueCountSet1 == 1){valueScriptArray1 = [1,2,3,4,5,8,9]};
-		if(valueCountSet1 == 2){valueScriptArray1 = [1,2,3,7,8,9]};
-		if(valueCountSet1 == 3){valueScriptArray1 = [1,2,3,4,5,7,8,9]};
-		if(valueCountSet1 == 4){valueScriptArray1 = [1,2,3,4,5,6,7,8,9]};
-		if(valueCountSet1 == 5){valueScriptArray1 = [1]};
-		if(valueCountSet1 == 6){valueScriptArray1 = [1,2]};
+		if (valueCountSet1 == 0) { valueScriptArray1 = [1, 2, 3, 4, 5, 6, 7, 8, 9] };
+		if (valueCountSet1 == 1) { valueScriptArray1 = [1, 2, 3, 4, 5, 8, 9] };
+		if (valueCountSet1 == 2) { valueScriptArray1 = [1, 2, 3, 7, 8, 9] };
+		if (valueCountSet1 == 3) { valueScriptArray1 = [1, 2, 3, 4, 5, 7, 8, 9] };
+		if (valueCountSet1 == 4) { valueScriptArray1 = [1, 2, 3, 4, 5, 6, 7, 8, 9] };
+		if (valueCountSet1 == 5) { valueScriptArray1 = [1] };
+		if (valueCountSet1 == 6) { valueScriptArray1 = [1, 2] };
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:240|ショップ処理
 	AGH_initValueScriptArray1_2 = function () {
-		if(valueCountSet1 == 0){valueScriptArray1 = [1,2,3,4,5]};
-		if(valueCountSet1 == 1){valueScriptArray1 = [1,2,3,4,5]};
-		if(valueCountSet1 == 2){valueScriptArray1 = [1,2,3]};
-		if(valueCountSet1 == 3){valueScriptArray1 = [1,2,3]};
-		if(valueCountSet1 == 4){valueScriptArray1 = [1,2,3]};
-		if(valueCountSet1 == 5){valueScriptArray1 = [1]};
-		if(valueCountSet1 == 6){valueScriptArray1 = [1]};
+		if (valueCountSet1 == 0) { valueScriptArray1 = [1, 2, 3, 4, 5] };
+		if (valueCountSet1 == 1) { valueScriptArray1 = [1, 2, 3, 4, 5] };
+		if (valueCountSet1 == 2) { valueScriptArray1 = [1, 2, 3] };
+		if (valueCountSet1 == 3) { valueScriptArray1 = [1, 2, 3] };
+		if (valueCountSet1 == 4) { valueScriptArray1 = [1, 2, 3] };
+		if (valueCountSet1 == 5) { valueScriptArray1 = [1] };
+		if (valueCountSet1 == 6) { valueScriptArray1 = [1] };
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:240|ショップ処理
@@ -12736,11 +12852,11 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_runScriptShopProcessing = function () {
 		var scriptArray = valueScriptArray1;
 		for (var j = 0; j < scriptArray.length; j++) {
-		  if(scriptArray[j] == scriptArray[scriptArray.length - 1]){
-		    shop_preparationEI(0,scriptArray[j],1);
-		  } else {
-		    shop_preparationEI(0,scriptArray[j],0);
-		  };
+			if (scriptArray[j] == scriptArray[scriptArray.length - 1]) {
+				shop_preparationEI(0, scriptArray[j], 1);
+			} else {
+				shop_preparationEI(0, scriptArray[j], 0);
+			};
 		};
 	};
 
@@ -12748,11 +12864,11 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_runScriptShopProcessing_2 = function () {
 		var scriptArray = valueScriptArray1;
 		for (var j = 0; j < scriptArray.length; j++) {
-		  if(scriptArray[j] == scriptArray[scriptArray.length - 1]){
-		    shop_preparationH(0,scriptArray[j],1);
-		  } else {
-		    shop_preparationH(0,scriptArray[j],0);
-		  };
+			if (scriptArray[j] == scriptArray[scriptArray.length - 1]) {
+				shop_preparationH(0, scriptArray[j], 1);
+			} else {
+				shop_preparationH(0, scriptArray[j], 0);
+			};
 		};
 	};
 
@@ -12760,11 +12876,11 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_runScriptShopProcessing_3 = function () {
 		var scriptArray = valueScriptArray1;
 		for (var j = 0; j < scriptArray.length; j++) {
-		  if(scriptArray[j] == scriptArray[scriptArray.length - 1]){
-		    shop_preparationE(0,scriptArray[j],1);
-		  } else {
-		    shop_preparationE(0,scriptArray[j],0);
-		  };
+			if (scriptArray[j] == scriptArray[scriptArray.length - 1]) {
+				shop_preparationE(0, scriptArray[j], 1);
+			} else {
+				shop_preparationE(0, scriptArray[j], 0);
+			};
 		};
 	};
 
@@ -12772,15 +12888,15 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_runScriptShopProcessing_4 = function () {
 		var scriptArray = valueScriptArray1;
 		for (var j = 0; j < scriptArray.length; j++) {
-		  if(scriptArray[j] == scriptArray[scriptArray.length - 1]){
-		    shop_preparation1(0,scriptArray[j],0);
-		    shop_preparation1(1,scriptArray[j],0);
-		    shop_preparation1(2,scriptArray[j],1);
-		  } else {
-		    shop_preparation1(0,scriptArray[j],0);
-		    shop_preparation1(1,scriptArray[j],0);
-		    shop_preparation1(2,scriptArray[j],0);
-		  };
+			if (scriptArray[j] == scriptArray[scriptArray.length - 1]) {
+				shop_preparation1(0, scriptArray[j], 0);
+				shop_preparation1(1, scriptArray[j], 0);
+				shop_preparation1(2, scriptArray[j], 1);
+			} else {
+				shop_preparation1(0, scriptArray[j], 0);
+				shop_preparation1(1, scriptArray[j], 0);
+				shop_preparation1(2, scriptArray[j], 0);
+			};
 		};
 	};
 
@@ -12788,13 +12904,13 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_runScriptShopProcessing_5 = function () {
 		var scriptArray = valueScriptArray1;
 		for (var j = 0; j < scriptArray.length; j++) {
-		  if(scriptArray[j] == scriptArray[scriptArray.length - 1]){
-		    shop_preparation1(1,scriptArray[j],0);
-		    shop_preparation1(2,scriptArray[j],1);
-		  } else {
-		    shop_preparation1(1,scriptArray[j],0);
-		    shop_preparation1(2,scriptArray[j],0);
-		  };
+			if (scriptArray[j] == scriptArray[scriptArray.length - 1]) {
+				shop_preparation1(1, scriptArray[j], 0);
+				shop_preparation1(2, scriptArray[j], 1);
+			} else {
+				shop_preparation1(1, scriptArray[j], 0);
+				shop_preparation1(2, scriptArray[j], 0);
+			};
 		};
 	};
 
@@ -12802,62 +12918,62 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_runScriptShopProcessing_6 = function () {
 		var scriptArray = valueScriptArray1;
 		for (var j = 0; j < scriptArray.length; j++) {
-		  if(scriptArray[j] == scriptArray[scriptArray.length - 1]){
-		    shop_preparation1(valueCountSet1,scriptArray[j],1);
-		  } else {
-		    shop_preparation1(valueCountSet1,scriptArray[j],0);
-		  };
+			if (scriptArray[j] == scriptArray[scriptArray.length - 1]) {
+				shop_preparation1(valueCountSet1, scriptArray[j], 1);
+			} else {
+				shop_preparation1(valueCountSet1, scriptArray[j], 0);
+			};
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:241|固有武器強化
 	AGH_setSwitchTemporarySwitchUniqueWeaponEnhance = function () {
 		var id = $gameVariables.value(20);
-		if($gameVariables.value(287)[id][10] >= 20){
-		  $gameSwitches.setValue(380,true);
+		if ($gameVariables.value(287)[id][10] >= 20) {
+			$gameSwitches.setValue(380, true);
 		} else {
-		  $gameSwitches.setValue(380,false);
+			$gameSwitches.setValue(380, false);
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:241|固有武器強化
 	AGH_setSwitchTemporarySwitch_4 = function () {
-		weapon_uniqueEnhance($gameVariables.value(20),1);
-		$gameVariables.setValue(21,valueCountSet1);
-		$gameSwitches.setValue(380,false);
-		if(valueScriptArray2[0] >= 1){
-		  var value1 = $gameParty.numItems($dataItems[valueScriptArray2[0]]) >= valueScriptArray2[1];
-		  $gameVariables.setValue(23,`（要:\\C[2]${$gameVariables.value(21).toLocaleString()}\\G\\C[0] \x1bIIN[${valueScriptArray2[0]}]×${valueScriptArray2[1]}個）\n所持数:${$gameParty.numItems($dataItems[valueScriptArray2[0]])}個`);
+		weapon_uniqueEnhance($gameVariables.value(20), 1);
+		$gameVariables.setValue(21, valueCountSet1);
+		$gameSwitches.setValue(380, false);
+		if (valueScriptArray2[0] >= 1) {
+			var value1 = $gameParty.numItems($dataItems[valueScriptArray2[0]]) >= valueScriptArray2[1];
+			$gameVariables.setValue(23, `（要:\\C[2]${$gameVariables.value(21).toLocaleString()}\\G\\C[0] \x1bIIN[${valueScriptArray2[0]}]×${valueScriptArray2[1]}個）\n所持数:${$gameParty.numItems($dataItems[valueScriptArray2[0]])}個`);
 		} else {
-		  var value1 = true;
-		  $gameVariables.setValue(23,`（要:\\C[2]${$gameVariables.value(21).toLocaleString()}\\G\\C[0]）`);
+			var value1 = true;
+			$gameVariables.setValue(23, `（要:\\C[2]${$gameVariables.value(21).toLocaleString()}\\G\\C[0]）`);
 		};
-		if($gameParty.gold() >= valueCountSet1 && value1){$gameSwitches.setValue(380,true)};
+		if ($gameParty.gold() >= valueCountSet1 && value1) { $gameSwitches.setValue(380, true) };
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:241|固有武器強化
 	AGH_setSelfVariableRandomWork2UniqueWeaponEnhance = function (interp) {
 		return (function () {
-		if($gameSwitches.value(515)){
-		  $dataSystem.switches[515] = '鍛冶ｼｰﾝｶｯﾄ(ON)';
-		} else {
-		  $dataSystem.switches[515] = '鍛冶ｼｰﾝｶｯﾄ(OFF)';
-		};
-		this.sVal(22,$dataSystem.switches[515]);
+			if ($gameSwitches.value(515)) {
+				$dataSystem.switches[515] = '鍛冶ｼｰﾝｶｯﾄ(ON)';
+			} else {
+				$dataSystem.switches[515] = '鍛冶ｼｰﾝｶｯﾄ(OFF)';
+			};
+			this.sVal(22, $dataSystem.switches[515]);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:241|固有武器強化
 	AGH_setSelfVariableRandomWork2ForgeSceneCut = function (interp) {
 		return (function () {
-		if($gameSwitches.value(515)){
-		  $dataSystem.switches[515] = '鍛冶ｼｰﾝｶｯﾄ(OFF)';
-		  $gameSwitches.setValue(515,false);
-		} else {
-		  $dataSystem.switches[515] = '鍛冶ｼｰﾝｶｯﾄ(ON)';
-		  $gameSwitches.setValue(515,true);
-		};
-		this.sVal(22,$dataSystem.switches[515]);
+			if ($gameSwitches.value(515)) {
+				$dataSystem.switches[515] = '鍛冶ｼｰﾝｶｯﾄ(OFF)';
+				$gameSwitches.setValue(515, false);
+			} else {
+				$dataSystem.switches[515] = '鍛冶ｼｰﾝｶｯﾄ(ON)';
+				$gameSwitches.setValue(515, true);
+			};
+			this.sVal(22, $dataSystem.switches[515]);
 		}).call(interp);
 	};
 
@@ -12866,17 +12982,17 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		var id = $gameVariables.value(20);
 		$gameVariables.value(287)[id][10] += 1;
 		var variable287Value = $gameVariables.value(287)[id][10];
-		$gameVariables.value(287)[id][variable287Value+10] = $gameVariables.value(19);
-		weapon_uniqueEnhance($gameVariables.value(20),2);
+		$gameVariables.value(287)[id][variable287Value + 10] = $gameVariables.value(19);
+		weapon_uniqueEnhance($gameVariables.value(20), 2);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:241|固有武器強化
 	AGH_gainItemRandomWork3 = function () {
 		$gameParty.loseGold($gameVariables.value(21));
-		$gameVariables.setValue(23,`${$gameVariables.value(21).toLocaleString()}\\Gを支払った。\n`);
-		if(valueScriptArray2[0] >= 1){
-		  $gameParty.gainItem($dataItems[valueScriptArray2[0]], -valueScriptArray2[1]);
-		  $gameVariables.setValue(23, $gameVariables.value(23) + `\\IIN[${valueScriptArray2[0]}]を${valueScriptArray2[1]}個消費した。`);
+		$gameVariables.setValue(23, `${$gameVariables.value(21).toLocaleString()}\\Gを支払った。\n`);
+		if (valueScriptArray2[0] >= 1) {
+			$gameParty.gainItem($dataItems[valueScriptArray2[0]], -valueScriptArray2[1]);
+			$gameVariables.setValue(23, $gameVariables.value(23) + `\\IIN[${valueScriptArray2[0]}]を${valueScriptArray2[1]}個消費した。`);
 		};
 	};
 
@@ -12892,59 +13008,59 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:245|昇格演出
 	AGH_playParticleAureoleC = function (interp) {
 		return (function () {
-		var value1 = 'aureole_c';
-		$gameScreen._particle.particlePlay(this._eventId,value1+'-'+this._eventId,'this',value1);
-		var value1 = 'lifeStorm_screen';
-		$gameScreen._particle.particlePlay(this._eventId,value1+'-'+this._eventId,'this',value1);
+			var value1 = 'aureole_c';
+			$gameScreen._particle.particlePlay(this._eventId, value1 + '-' + this._eventId, 'this', value1);
+			var value1 = 'lifeStorm_screen';
+			$gameScreen._particle.particlePlay(this._eventId, value1 + '-' + this._eventId, 'this', value1);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:245|昇格演出
 	AGH_particlePlayChargeC = function () {
 		var chargeC = 'charge_c';
-		$gameScreen._particle.particlePlay(0,chargeC,'player','def','screen');
-		$gameScreen._particle.particleUpdate([chargeC,'pos',0,20]);
+		$gameScreen._particle.particlePlay(0, chargeC, 'player', 'def', 'screen');
+		$gameScreen._particle.particleUpdate([chargeC, 'pos', 0, 20]);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:245|昇格演出
 	AGH_forEachArrayAureoleC = function (interp) {
 		return (function () {
-		var list = ['aureole_c'+'-'+this._eventId,'lifeStorm_screen'+'-'+this._eventId,'charge_c','direct_screenRing'];
-		list.forEach(function(id) {
-		  $gameScreen._particle.particleClear(id);
-		}, this);
+			var list = ['aureole_c' + '-' + this._eventId, 'lifeStorm_screen' + '-' + this._eventId, 'charge_c', 'direct_screenRing'];
+			list.forEach(function (id) {
+				$gameScreen._particle.particleClear(id);
+			}, this);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:250|神掘りコモン終了
 	AGH_allowMapPlayerMovementGodDiggingEnd = function () {
-		  if(!$gameParty.inBattle()){
-		    $gameTemp.allowMapPlayerMovement();
-		    $gameTemp.allowMapEventMovement();
-		  };
+		if (!$gameParty.inBattle()) {
+			$gameTemp.allowMapPlayerMovement();
+			$gameTemp.allowMapEventMovement();
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:251|重要アイテム入手コモン
 	AGH_gainItemChestRareSlot = function () {
 		var threshold = valueCountSet1;
 		var value2 = valueCountSet2;
-		if(threshold == 0){var valueItems = $dataItems}; 
-		if(threshold == 1){var valueItems = $dataWeapons}; 
-		if(threshold == 2){var valueItems = $dataArmors};
+		if (threshold == 0) { var valueItems = $dataItems };
+		if (threshold == 1) { var valueItems = $dataWeapons };
+		if (threshold == 2) { var valueItems = $dataArmors };
 		$gameParty.gainItem(valueItems[value2], 1);
 		var value3 = `\\C[29]\x1bI[${valueItems[value2].iconIndex}]${valueItems[value2].name}\\C[0]を入手した！`;
 		var value4 = 28;
 		$gameScreen.setDTextPicture(messageText, value4);
-		$gameSwitches.setValue(439,true);
+		$gameSwitches.setValue(439, true);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:253|リセット項目選択
 	AGH_readVariableItemProcessWorkResetItemSelect = function () {
 		var variable19Value = $gameVariables.value(19);
-		if($gameVariables.value(183)[variable19Value] == 0){
-		  $gameVariables.value(183)[variable19Value] = 1;
+		if ($gameVariables.value(183)[variable19Value] == 0) {
+			$gameVariables.value(183)[variable19Value] = 1;
 		} else {
-		  $gameVariables.value(183)[variable19Value] = 0;
+			$gameVariables.value(183)[variable19Value] = 0;
 		};
 	};
 
@@ -12958,24 +13074,24 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_readVariableActorChoice_3 = function () {
 		var actor = $gameActors.actor($gameVariables.value(20));
 		for (var i = 1; i < $dataSkills.length; i++) {
-		    actor.forgetSkill(i);
-		    actor.setSkillMasteryUses(i, 0);
-		    actor.setSkillMasteryLevel(i, 0);
+			actor.forgetSkill(i);
+			actor.setSkillMasteryUses(i, 0);
+			actor.setSkillMasteryLevel(i, 0);
 		};
-		  var equips = actor.equips();
-		  for (var i = 0; i < equips.length; i++) {
-		    if(equips[i]){
-		      actor.changeEquipById(i+1, 0);
-		    };
-		  };
+		var equips = actor.equips();
+		for (var i = 0; i < equips.length; i++) {
+			if (equips[i]) {
+				actor.changeEquipById(i + 1, 0);
+			};
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:254|ステータスリセット
 	AGH_runPluginCommandActorChoiceStatusReset = function (interp) {
 		return (function () {
-		var variable20Value = $gameActors.actor($gameVariables.value(20))._classId;
-		var args = new Array(String(i),"100",String(variable20Value));
-		this.pluginCommand("gainJp", args);
+			var variable20Value = $gameActors.actor($gameVariables.value(20))._classId;
+			var args = new Array(String(i), "100", String(variable20Value));
+			this.pluginCommand("gainJp", args);
 		}).call(interp);
 	};
 
@@ -12986,43 +13102,43 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 
 	// Replaces (1x): CommonEvents.json:common-event:256|Ｈ相手リセット
 	AGH_readVariableItemProcessWorkActorChoice = function () {
-		$gameVariables.value($gameVariables.value(20)+360)[$gameVariables.value(19) + 1] = 0;
+		$gameVariables.value($gameVariables.value(20) + 360)[$gameVariables.value(19) + 1] = 0;
 		var messageText = `${$dataWeapons[$gameVariables.value(19) + 1].name}とのＨ回数がリセットされました…`;
-		CommonPopupManager.showInfo({},messageText,null);
+		CommonPopupManager.showInfo({}, messageText, null);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:256|Ｈ相手リセット
 	AGH_readVariableItemProcessWork_3 = function () {
-		$gameVariables.value($gameVariables.value(20)+360)[$gameVariables.value(19) + 200 + 1] = 0;
+		$gameVariables.value($gameVariables.value(20) + 360)[$gameVariables.value(19) + 200 + 1] = 0;
 		var messageText = `${$dataWeapons[$gameVariables.value(19) + 200 + 1].name}の出産履歴がリセットされました…`;
-		CommonPopupManager.showInfo({},messageText,null);
+		CommonPopupManager.showInfo({}, messageText, null);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:256|Ｈ相手リセット
 	AGH_readVariableActorChoiceHPartnerReset = function () {
 		for (var i = 1; i <= 100; i++) {
-		  $gameVariables.value($gameVariables.value(20)+360)[i] = 0;
+			$gameVariables.value($gameVariables.value(20) + 360)[i] = 0;
 		};
 		var messageText = `男性遍歴が一括リセットされました…`;
-		CommonPopupManager.showInfo({},messageText,null);
+		CommonPopupManager.showInfo({}, messageText, null);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:256|Ｈ相手リセット
 	AGH_readVariableActorChoice_4 = function () {
 		for (var i = 201; i <= 300; i++) {
-		  $gameVariables.value($gameVariables.value(20)+360)[i] = 0;
+			$gameVariables.value($gameVariables.value(20) + 360)[i] = 0;
 		};
 		var messageText = `出産履歴が一括リセットされました…`;
-		CommonPopupManager.showInfo({},messageText,null);
+		CommonPopupManager.showInfo({}, messageText, null);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:259|サブジョブ解放1
 	AGH_spawnMapEventDynamicEventIdSubJobUnlock1 = function (interp) {
 		return (function () {
-		$gameMap.spawnEvent(224, 15, 10, true);
-		var eventId = $gameMap.getLastSpawnEventId();
-		$gameVariables.value(292)[11] = eventId;
-		this._eventId = $gameVariables.value(292)[11];
+			$gameMap.spawnEvent(224, 15, 10, true);
+			var eventId = $gameMap.getLastSpawnEventId();
+			$gameVariables.value(292)[11] = eventId;
+			this._eventId = $gameVariables.value(292)[11];
 		}).call(interp);
 	};
 
@@ -13042,22 +13158,22 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:259|サブジョブ解放1
 	AGH_setSwitchTemporarySwitchSubJobUnlock1 = function () {
 		var variable19Value = valueJobReleaseTorF2[$gameVariables.value(19)];
-		if(valueJobReleaseTorF1[variable19Value] == 1){
-		$gameSwitches.setValue(380,true);
+		if (valueJobReleaseTorF1[variable19Value] == 1) {
+			$gameSwitches.setValue(380, true);
 		} else {
-		$gameSwitches.setValue(380,false);
+			$gameSwitches.setValue(380, false);
 		};
-		$gameVariables.setValue(21,variable19Value);
+		$gameVariables.setValue(21, variable19Value);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:259|サブジョブ解放1
 	AGH_runPluginCommandDynamicEventId = function (interp) {
 		return (function () {
-		var value1 = "161";//一刀両断102崩壊161横両断008封印054内側から153
-		var character = "character";//"picture"
-		var args = new Array(String(character),$gameVariables.value(292)[12],"fadeOut",
-		String(value1),"180","5");
-		this.pluginCommand("GWFade", args);
+			var value1 = "161";//一刀両断102崩壊161横両断008封印054内側から153
+			var character = "character";//"picture"
+			var args = new Array(String(character), $gameVariables.value(292)[12], "fadeOut",
+				String(value1), "180", "5");
+			this.pluginCommand("GWFade", args);
 		}).call(interp);
 	};
 
@@ -13066,31 +13182,31 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		var actor = $gameActors.actor($gameVariables.value(20));
 		var variable21Value = Number($dataClasses[$gameVariables.value(21)].meta['classRank']);
 		$gameVariables.setValue(801,
-		`${actor.name()}はClass${variable21Value}Job\\C[14][${$dataClasses[$gameVariables.value(21)].name}]\\C[0]を解放した！
+			`${actor.name()}はClass${variable21Value}Job\\C[14][${$dataClasses[$gameVariables.value(21)].name}]\\C[0]を解放した！
 		`);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:261|鑑定解説文
 	AGH_iterateItemsInfoEval = function () {
-		if($gameVariables.value(19) == 0){var valueItems = $dataItems[$gameVariables.value(21)]};
-		if($gameVariables.value(19) == 1){var valueItems = $dataWeapons[$gameVariables.value(21)]};
-		if($gameVariables.value(19) == 2){var valueItems = $dataArmors[$gameVariables.value(21)]};
+		if ($gameVariables.value(19) == 0) { var valueItems = $dataItems[$gameVariables.value(21)] };
+		if ($gameVariables.value(19) == 1) { var valueItems = $dataWeapons[$gameVariables.value(21)] };
+		if ($gameVariables.value(19) == 2) { var valueItems = $dataArmors[$gameVariables.value(21)] };
 		var value1 = valueItems.description;
 		//var value1 = value1.replace("\n", "");
 		var value1 = `\x1bI[${valueItems.iconIndex}]${valueItems.name}\n${value1}`;
 		var messageText = `\n`;
-		if(valueItems.meta['Info Eval']){
-		  item_priceinfo($gameVariables.value(19),$gameVariables.value(21));
-		  messageText += $gameVariables.value(801);
+		if (valueItems.meta['Info Eval']) {
+			item_priceinfo($gameVariables.value(19), $gameVariables.value(21));
+			messageText += $gameVariables.value(801);
 		};
-		WindowManager.show(1, 0, 100, 1280, 668);WindowManager.drawText(1, `${value1}${value2}`);
+		WindowManager.show(1, 0, 100, 1280, 668); WindowManager.drawText(1, `${value1}${value2}`);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:287|戦闘勝利時獲得変数等
 	AGH_findSystemSwitchByNameBattleVictoryVariable = function () {
 		var switch252Name = $dataSystem.switches[252];
 		var messageText = `${switch252Name}の空賊捕縛数+1`;
-		CommonPopupManager.showInfo({},messageText,null);
+		CommonPopupManager.showInfo({}, messageText, null);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:287|戦闘勝利時獲得変数等
@@ -13101,180 +13217,183 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 
 	// Replaces (1x): CommonEvents.json:common-event:290|シーン初期処理自動実行
 	AGH_setSwitchEventProgress = function () {
-		if(!$gameParty.inBattle()){$gamePlayer.setThrough(true)};
-		  $gameSwitches.setValue(468,true);
-		  $gameSwitches.setValue(124,true);
-		  $gameVariables.setValue(292,Array(21).fill(0));
+		if (!$gameParty.inBattle()) { $gamePlayer.setThrough(true) };
+		$gameSwitches.setValue(468, true);
+		$gameSwitches.setValue(124, true);
+		$gameVariables.setValue(292, Array(21).fill(0));
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:291|シーン終了処理自動実行
 	AGH_setSwitchEventProgressSceneEndAuto = function () {
-		  $gameVariables.setValue(320,0);
-		  if(!$gameParty.inBattle()){
-		    $gamePlayer.setThrough(false);
-		  };
-		  $gameSwitches.setValue(124,false);//イベント進行時onoff
-		  $gameSwitches.setValue(473,false);
-		  if(!$gameParty.inBattle()){
-		    $gameTemp.allowMapPlayerMovement();
-		    $gameTemp.allowMapEventMovement();
-		  };
-		  $gameSwitches.setValue(467,false);//NPC消滅スイッチoff
+		$gameVariables.setValue(320, 0);
+		if (!$gameParty.inBattle()) {
+			$gamePlayer.setThrough(false);
+		};
+		$gameSwitches.setValue(124, false);//イベント進行時onoff
+		$gameSwitches.setValue(473, false);
+		if (!$gameParty.inBattle()) {
+			$gameTemp.allowMapPlayerMovement();
+			$gameTemp.allowMapEventMovement();
+		};
+		$gameSwitches.setValue(467, false);//NPC消滅スイッチoff
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:291|シーン終了処理自動実行
 	AGH_setVariableDynamicEventIdSceneEndAuto = function () {
-		  valueWeatherSceneSet = 0;
-		  valueSceneConditions1 = true;
-		  valueSceneConditions2 = true;
-		  valueSceneConditions3 = true;
-		  $gameVariables.setValue(292,Array(21).fill(0));
-		  $gameVariables.setValue(528,0);
+		valueWeatherSceneSet = 0;
+		valueSceneConditions1 = true;
+		valueSceneConditions2 = true;
+		valueSceneConditions3 = true;
+		$gameVariables.setValue(292, Array(21).fill(0));
+		$gameVariables.setValue(528, 0);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:291|シーン終了処理自動実行
 	AGH_setSwitchEpisodeAutoTrigger = function () {
-		  if(!$gameSwitches.value(29)){
-		    $gamePlayer.setTransparent(false);
-		    if($gameSwitches.value(412)){//挿話
-		      $gameSwitches.setValue(412,false);
-		    };
-		    if($gameSwitches.value(469)){//Ｈ
-		      $gameSwitches.setValue(469,false);
-		    };
-		  };
-		  if(!$gameParty.inBattle()){
-		    drowsepost.camera.zoom(1, 60, $gamePlayer);
-		  };
+		if (!$gameSwitches.value(29)) {
+			$gamePlayer.setTransparent(false);
+			if ($gameSwitches.value(412)) {//挿話
+				$gameSwitches.setValue(412, false);
+			};
+			if ($gameSwitches.value(469)) {//Ｈ
+				$gameSwitches.setValue(469, false);
+			};
+		};
+		if (!$gameParty.inBattle()) {
+			drowsepost.camera.zoom(1, 60, $gamePlayer);
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:292|※※コマンド一覧
 	AGH_waitActorChoice = function (interp) {
 		return (function () {
-		var actor = $gameActors.actor($gameVariables.value(20));
-		actor.addState(693);
-		tachie_dousa(2,1,2,12,1,255,1323,0,0);
-		tachie_dousa(2,1,2,12,1,255,1325,0,0);
-		tachie_dousa(0,1,1,12,13,0,60,0,0);
-		//tachie_clothReflect(1);
-		this.wait(3);
+			var actor = $gameActors.actor($gameVariables.value(20));
+			actor.addState(693);
+			tachie_dousa(2, 1, 2, 12, 1, 255, 1323, 0, 0);
+			tachie_dousa(2, 1, 2, 12, 1, 255, 1325, 0, 0);
+			tachie_dousa(0, 1, 1, 12, 13, 0, 60, 0, 0);
+			//tachie_clothReflect(1);
+			this.wait(3);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:292|※※コマンド一覧
 	AGH_configureMapEventCommandList = function (interp) {
 		return (function () {
-		event_partyCharaEntry();
-		var event = $gameMap.event(this._eventId);
-		var value1 = event.direction();
-		if(value1 = 2){var value2 = 16};
-		if(value1 = 4){var value2 = 17};
-		if(value1 = 6){var value2 = 18};
-		if(value1 = 8){var value2 = 19};
-		event_partyCharaMove(value2,0);
+			event_partyCharaEntry();
+			var event = $gameMap.event(this._eventId);
+			var value1 = event.direction();
+			if (value1 = 2) { var value2 = 16 };
+			if (value1 = 4) { var value2 = 17 };
+			if (value1 = 6) { var value2 = 18 };
+			if (value1 = 8) { var value2 = 19 };
+			event_partyCharaMove(value2, 0);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:294|タイトルコール
 	AGH_setSwitchTemporarySwitchTitleCall = function () {
-		$gameSwitches.setValue(380,false);
-		if($gameVariables.value(535) >= 1){
-		  if(Number($dataItems[$gameVariables.value(535)].meta['EICSwitch']) == 103){
-		    if(!$gameParty.hasItem($dataItems[$gameVariables.value(535)],true)){
-		      $gameSwitches.setValue(380,true);
-		    };
-		  };
+		$gameSwitches.setValue(380, false);
+		if ($gameVariables.value(535) >= 1) {
+			if (Number($dataItems[$gameVariables.value(535)].meta['EICSwitch']) == 103) {
+				if (!$gameParty.hasItem($dataItems[$gameVariables.value(535)], true)) {
+					$gameSwitches.setValue(380, true);
+				};
+			};
 		};
-		if($gameVariables.value(535) == 0){
-		  $gameSwitches.setValue(380,true);
+		if ($gameVariables.value(535) == 0) {
+			$gameSwitches.setValue(380, true);
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:294|タイトルコール
 	AGH_movePictureTitleCall = function () {
 		var pictureId = 102;
-		$gameScreen.movePicture(pictureId,1,640-250,384-200,100,100,0,0,300);
+		$gameScreen.movePicture(pictureId, 1, 640 - 250, 384 - 200, 100, 100, 0, 0, 300);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:294|タイトルコール
 	AGH_setVariableRandomWork1TitleCall = function () {
-		$gameVariables.setValue(21,$gameVariables.value(142));
+		$gameVariables.setValue(21, $gameVariables.value(142));
 		var variable21Value = $gameVariables.value(21);
 		gab_wordParticle(`～～\\C[16]${variable21Value}\\C[0]～～`);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:294|タイトルコール
 	AGH_readVariableEpisodeRecallItemId = function () {
-		if($gameVariables.value(535) == 0){
-		  var start = $gameVariables.value(75);
-		  var end = $gameVariables.value(76);
-		  for(var id1 = start; id1 <= end; id1++){
-		    Profession_basicReturn(id1);
-		  };
+		if ($gameVariables.value(535) == 0) {
+			var start = $gameVariables.value(75);
+			var end = $gameVariables.value(76);
+			for (var id1 = start; id1 <= end; id1++) {
+				Profession_basicReturn(id1);
+			};
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:295|シーン初期処理
 	AGH_readVariableHeroineIdSceneInitProcessing = function (interp) {
 		return (function () {
-		//現在衣装を別変数配列に一時代入
-		//統合衣装用の0も含める。（代入変数を利用しなくていい為可能）
-		var list = $gameVariables.value(247);
-		list.forEach(function(id) {
-		  var actor = $gameActors.actor(id);
-		    if($gameParty.members().contains(actor)){
-		      var start = 0; var end = 42;
-		      for (var i = start; i <= end; i++) {
-		        $gameVariables.value(id+540)[i] = $gameVariables.value(id+440)[i]
-		    }};
-		}, this);
+			//現在衣装を別変数配列に一時代入
+			//統合衣装用の0も含める。（代入変数を利用しなくていい為可能）
+			var list = $gameVariables.value(247);
+			list.forEach(function (id) {
+				var actor = $gameActors.actor(id);
+				if ($gameParty.members().contains(actor)) {
+					var start = 0; var end = 42;
+					for (var i = start; i <= end; i++) {
+						$gameVariables.value(id + 540)[i] = $gameVariables.value(id + 440)[i]
+					}
+				};
+			}, this);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:295|シーン初期処理
 	AGH_someArray = function () {
 		//並列コモンスイッチid区分けにも使用
-		valueScriptArray1 = [119,125,422,425,429,481];
-		valueScriptArray1.some(function(id){return $gameSwitches.setValue(id,false)});
+		valueScriptArray1 = [119, 125, 422, 425, 429, 481];
+		valueScriptArray1.some(function (id) { return $gameSwitches.setValue(id, false) });
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:295|シーン初期処理
 	AGH_setVariableMainSceneOrEpisode = function () {
-		$gameVariables.setValue(626,0);
+		$gameVariables.setValue(626, 0);
 		var variable535Value = $gameVariables.value(535);
-		if(variable535Value >= 1){
-		  if(Number($dataItems[variable535Value].meta['EICSwitch']) == 102){
-		    $gameVariables.setValue(626,1);
-		  };
-		  if(Number($dataItems[variable535Value].meta['EICSwitch']) == 103){
-		    $gameVariables.setValue(626,2);
-		  };
+		if (variable535Value >= 1) {
+			if (Number($dataItems[variable535Value].meta['EICSwitch']) == 102) {
+				$gameVariables.setValue(626, 1);
+			};
+			if (Number($dataItems[variable535Value].meta['EICSwitch']) == 103) {
+				$gameVariables.setValue(626, 2);
+			};
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:295|シーン初期処理
 	AGH_setVariableEventStartSwitch = function () {
 		var array = $gameMap._commonEvents.filter(function (event) {
-		    return event.isActive();
+			return event.isActive();
 		}).map(function (event) {
-		    return event.event().id;
+			return event.event().id;
 		});
-		for (var i = 0; i <= array.length-1; i++) {
-		  if(array[i] >= 2 && $dataCommonEvents[array[i]].switchId){
-		      if(valueScriptArray1.some(function(id){return id == $dataCommonEvents[array[i]].switchId})){}else{
-		        $gameVariables.setValue(529,$dataCommonEvents[array[i]].switchId);
-		        $gameVariables.setValue(142,$dataCommonEvents[array[i]].name);
-		        valueCommonId = array[i];
-		}}};
+		for (var i = 0; i <= array.length - 1; i++) {
+			if (array[i] >= 2 && $dataCommonEvents[array[i]].switchId) {
+				if (valueScriptArray1.some(function (id) { return id == $dataCommonEvents[array[i]].switchId })) { } else {
+					$gameVariables.setValue(529, $dataCommonEvents[array[i]].switchId);
+					$gameVariables.setValue(142, $dataCommonEvents[array[i]].name);
+					valueCommonId = array[i];
+				}
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:295|シーン初期処理
 	AGH_setVariableEventStartSwitchSceneInitProcessing = function () {
-		if($gameVariables.value(529) == 0){
-		  var variable201Value = $gameVariables.value(201);
-		  $gameVariables.setValue(529,$dataCommonEvents[variable201Value].switchId);
-		  $gameVariables.setValue(142,$dataCommonEvents[variable201Value].name);
-		  valueCommonId = variable201Value;
+		if ($gameVariables.value(529) == 0) {
+			var variable201Value = $gameVariables.value(201);
+			$gameVariables.setValue(529, $dataCommonEvents[variable201Value].switchId);
+			$gameVariables.setValue(142, $dataCommonEvents[variable201Value].name);
+			valueCommonId = variable201Value;
 		};
 	};
 
@@ -13292,24 +13411,24 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_particleUpdateCloudW = function () {
 		adv_partDirectSet(9);
 		var cloudW = 'cloud_w';//天候:雲
-		var value2 =  getRandomIndex(201) + 1000;
-		$gameScreen._particle.particleUpdate([cloudW,'speed',String(value2),String(value2)]);
+		var value2 = getRandomIndex(201) + 1000;
+		$gameScreen._particle.particleUpdate([cloudW, 'speed', String(value2), String(value2)]);
 		var arr1 = 0.75;//[0.40,0.45,0.50,0.55,0.60,0.65,0.70,0.75];
-		var value2 =  arr1[getRandomIndex(arr1.length)];
-		$gameScreen._particle.particleUpdate([cloudW,'alpha','0',value2+'@0.05',value2+'@0.9','0']);
-		$gameScreen._particle.particleUpdate([cloudW,'frequency','1.5']);
+		var value2 = arr1[getRandomIndex(arr1.length)];
+		$gameScreen._particle.particleUpdate([cloudW, 'alpha', '0', value2 + '@0.05', value2 + '@0.9', '0']);
+		$gameScreen._particle.particleUpdate([cloudW, 'frequency', '1.5']);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:298|オープニング
 	AGH_setSelfSwitchOpening = function (interp) {
 		return (function () {
-		var value1 = $gameMap.mapId();
-		var value2 = 7;//this._eventId;
-		var positionY = 'D';
-		var value4 = true;//false;
-		$gameSelfSwitches.setValue([value1, value2, positionY], value4);
-		var value2 = 8;//this._eventId;
-		$gameSelfSwitches.setValue([value1, value2, positionY], value4);
+			var value1 = $gameMap.mapId();
+			var value2 = 7;//this._eventId;
+			var positionY = 'D';
+			var value4 = true;//false;
+			$gameSelfSwitches.setValue([value1, value2, positionY], value4);
+			var value2 = 8;//this._eventId;
+			$gameSelfSwitches.setValue([value1, value2, positionY], value4);
 		}).call(interp);
 	};
 
@@ -13324,7 +13443,7 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
 	AGH_setSelfVariableChoiceSwitch12OrderSkyKnightsAppear = function (interp) {
 		return (function () {
-		this.sVal(172,10);valueTalkSet = [28,`<秩序の騎空団団長代理>を務める\\set[1]。
+			this.sVal(172, 10); valueTalkSet = [28, `<秩序の騎空団団長代理>を務める\\set[1]。
 		騎空挺を駆り任務先の島へと移動していた際、\n別の島で狼藉が行われている事を察知し急行する。
 		名もなき集落を襲っていた「空賊」達の討伐に成功するが、\n集落の人々は一人の少年を残し全滅していた…。
 		唯一の生き残りである少年、\\set[5]を\\N[1]は、\n騎空団で引き取り<秩序の騎空士見習い>として面倒を見る事に決める。
@@ -13335,109 +13454,120 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		発生している問題の解決の為、
 		\\N[1]や先輩騎空士達と共に\\C[2]${$dataSystem.switches[221]}\\C[0]へ
 		向かうのであった…。`];
-		this.setupChild($dataCommonEvents[60].list, 0);
+			this.setupChild($dataCommonEvents[60].list, 0);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
 	AGH_getLastSpawnEventId = function (interp) {
 		return (function () {
-		event_respawnSetN(11,12,8,0,'$airship02',0);
-		valueCountSet1 = $gameMap.getLastSpawnEventId();
-		this._eventId = valueCountSet1;
+			event_respawnSetN(11, 12, 8, 0, '$airship02', 0);
+			valueCountSet1 = $gameMap.getLastSpawnEventId();
+			this._eventId = valueCountSet1;
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
 	AGH_eventOrder = function () {
 		for (var id = 100; id > 0; id--) {
-		  if(!!$gameMap.event(id)) {
-		    if ($gameMap.event(id).event().meta['Order']){
-		      var event = $gameMap.event(id);
-		      event.setDirection(6);
-		      event.requestBalloon(1);
-		}}};
+			if (!!$gameMap.event(id)) {
+				if ($gameMap.event(id).event().meta['Order']) {
+					var event = $gameMap.event(id);
+					event.setDirection(6);
+					event.requestBalloon(1);
+				}
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
 	AGH_readMapEventMetaOrder = function () {
 		for (var id = 100; id > 0; id--) {
-		  if(!!$gameMap.event(id)) {
-		    if ($gameMap.event(id).event().meta['Order']){
-		      var event = $gameMap.event(id);
-		      event.setDirection(4);
-		}}};
+			if (!!$gameMap.event(id)) {
+				if ($gameMap.event(id).event().meta['Order']) {
+					var event = $gameMap.event(id);
+					event.setDirection(4);
+				}
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
 	AGH_setSelfVariableChoiceSwitch12_2 = function (interp) {
 		return (function () {
-		this.sVal(172,18);
-		valueTalkSet = [0,1];//1で付与2で直接表示\CE[60]のみ0で解除,ｱｸﾀｰid
+			this.sVal(172, 18);
+			valueTalkSet = [0, 1];//1で付与2で直接表示\CE[60]のみ0で解除,ｱｸﾀｰid
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
 	AGH_eventBandit = function () {
 		for (var id = 100; id > 0; id--) {
-		  if(!!$gameMap.event(id)) {
-		    if ($gameMap.event(id).event().meta['Bandit']){
-		      var event = $gameMap.event(id);
-		      event.requestBalloon(12);
-		}}};
+			if (!!$gameMap.event(id)) {
+				if ($gameMap.event(id).event().meta['Bandit']) {
+					var event = $gameMap.event(id);
+					event.requestBalloon(12);
+				}
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
 	AGH_readMapEventMetaBandit = function () {
 		for (var id = 100; id > 0; id--) {
-		  if(!!$gameMap.event(id)) {
-		    if ($gameMap.event(id).event().meta['Bandit']){
-		      var event = $gameMap.event(id);
-		      //event.erase();
-		}}};
+			if (!!$gameMap.event(id)) {
+				if ($gameMap.event(id).event().meta['Bandit']) {
+					var event = $gameMap.event(id);
+					//event.erase();
+				}
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
 	AGH_readMapEventMetaBanditOrderSkyKnightsAppear = function () {
 		for (var id = 100; id > 0; id--) {
-		  if(!!$gameMap.event(id)) {
-		    if ($gameMap.event(id).event().meta['Bandit']){
-		      $gameMap.event(id).forceMoveRoute({
-		      "list":[
-		      {"code":19},
-		      {"code":0}],"repeat":false,"skippable":true});
-		}}};
+			if (!!$gameMap.event(id)) {
+				if ($gameMap.event(id).event().meta['Bandit']) {
+					$gameMap.event(id).forceMoveRoute({
+						"list": [
+							{ "code": 19 },
+							{ "code": 0 }], "repeat": false, "skippable": true
+					});
+				}
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
 	AGH_particleSetDustWalk = function () {
-		  var dustWalk = 'dust_walk';
-		  $gameScreen._particle.particleSet(0,dustWalk,'walk:event:1','def','below');
+		var dustWalk = 'dust_walk';
+		$gameScreen._particle.particleSet(0, dustWalk, 'walk:event:1', 'def', 'below');
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
 	AGH_configureMapEventOrderSkyKnightsAppear = function () {
 		var event = $gameMap.event(5);
-		event.setFace(4,true,true,0,6,0,6);
+		event.setFace(4, true, true, 0, 6, 0, 6);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
 	AGH_readVariableEventProgressHero = function (interp) {
 		return (function () {
-		var variable530Value = $gameVariables.value(530);
-		event_respawnSetA(variable530Value,25,10,0);
-		this._eventId = $gameVariables.value(292)[variable530Value];
-		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		event.setFace(8,true,true);
+			var variable530Value = $gameVariables.value(530);
+			event_respawnSetA(variable530Value, 25, 10, 0);
+			this._eventId = $gameVariables.value(292)[variable530Value];
+			var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+			event.setFace(8, true, true);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
 	AGH_particleSetFlashPermanence = function () {
 		var flashPermanence = 'flash_permanence';
-		$gameScreen._particle.particleSet(0,flashPermanence,'screen','def','screen');
+		$gameScreen._particle.particleSet(0, flashPermanence, 'screen', 'def', 'screen');
 		var value2 = '#4bedff';//元がﾋﾟﾝｸ、青水'#4bedff',黄'#ffea4b',赤'#ff634b',
-		$gameScreen._particle.particleUpdate([flashPermanence,'color',value2,'#ffffff']);
+		$gameScreen._particle.particleUpdate([flashPermanence, 'color', value2, '#ffffff']);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
@@ -13449,36 +13579,36 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
 	AGH_readVariableDynamicEventIdOrderSkyKnightsAppear = function (interp) {
 		return (function () {
-		original_main(valueCommonId,7);
-		var value1 = 19;
-		event_charaZanzou($gameVariables.value(292)[$gameVariables.value(530)],value1);
-		this._eventId = $gameVariables.value(292)[value1];
+			original_main(valueCommonId, 7);
+			var value1 = 19;
+			event_charaZanzou($gameVariables.value(292)[$gameVariables.value(530)], value1);
+			this._eventId = $gameVariables.value(292)[value1];
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
 	AGH_readVariableDynamicEventId_2 = function (interp) {
 		return (function () {
-		var value1 = 20;
-		event_charaZanzou($gameVariables.value(292)[$gameVariables.value(530)],value1);
-		this._eventId = $gameVariables.value(292)[value1];
+			var value1 = 20;
+			event_charaZanzou($gameVariables.value(292)[$gameVariables.value(530)], value1);
+			this._eventId = $gameVariables.value(292)[value1];
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
 	AGH_readVariableDynamicEventId_3 = function (interp) {
 		return (function () {
-		this._eventId = $gameVariables.value(292)[$gameVariables.value(530)];
+			this._eventId = $gameVariables.value(292)[$gameVariables.value(530)];
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
 	AGH_runScriptOrderSkyKnightsAppear = function (interp) {
 		return (function () {
-		var array = [0];
-		var arr2 = [-50];
-		var arr3 = [`グハァァッッ！！`];
-		chara_oneWord(100,this._eventId,25,180,array,arr2,arr3,'genkai-mincho');
+			var array = [0];
+			var arr2 = [-50];
+			var arr3 = [`グハァァッッ！！`];
+			chara_oneWord(100, this._eventId, 25, 180, array, arr2, arr3, 'genkai-mincho');
 		}).call(interp);
 	};
 
@@ -13491,25 +13621,25 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
 	AGH_readVariableDynamicEventId_4 = function (interp) {
 		return (function () {
-		this._eventId = $gameVariables.value(292)[$gameVariables.value(530)];
-		var event = $gameMap.event(this._eventId);
-		event.removeFace();
+			this._eventId = $gameVariables.value(292)[$gameVariables.value(530)];
+			var event = $gameMap.event(this._eventId);
+			event.removeFace();
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
 	AGH_handleScriptSnippetFadeOut = function () {
 		valuePic1 = 52;
-		picture_fade1(valuePic1,"fadeOut",'150',60,5);
+		picture_fade1(valuePic1, "fadeOut", '150', 60, 5);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
 	AGH_readVariableEventProgressHeroOrderSkyKnightsAppear = function (interp) {
 		return (function () {
-		var variable530Value = $gameVariables.value(530);
-		event_respawnSetA(variable530Value,8,4,1);
-		this._eventId = $gameVariables.value(292)[variable530Value];
-		goodsEvent_respawn(11,'Goods8',0,4,1,8,5);
+			var variable530Value = $gameVariables.value(530);
+			event_respawnSetA(variable530Value, 8, 4, 1);
+			this._eventId = $gameVariables.value(292)[variable530Value];
+			goodsEvent_respawn(11, 'Goods8', 0, 4, 1, 8, 5);
 		}).call(interp);
 	};
 
@@ -13517,107 +13647,107 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_showPictureScreenBlackOutOrderSkyKnightsAppear = function () {
 		valuePic1 = 54;
 		var value2 = 'ScreenBlackOut';
-		$gameScreen.showPicture(valuePic1,value2,1,640,384,100,100,250,0);
+		$gameScreen.showPicture(valuePic1, value2, 1, 640, 384, 100, 100, 250, 0);
 		var value2 = '/img/parallaxes/BlueSky';
-		$gameScreen.showPicture(valuePic1+1,value2,1,640,384,100,100,200,0);
+		$gameScreen.showPicture(valuePic1 + 1, value2, 1, 640, 384, 100, 100, 200, 0);
 		var value2 = '/img/parallaxes/EV_15_0';
-		$gameScreen.showPicture(valuePic1+2,value2,1,640,384,100,100,255,0);
+		$gameScreen.showPicture(valuePic1 + 2, value2, 1, 640, 384, 100, 100, 255, 0);
 		var value2 = '/img/parallaxes/EV_15_2';
-		$gameScreen.showPicture(valuePic1+3,value2,1,640,384,100,100,255,0);
+		$gameScreen.showPicture(valuePic1 + 3, value2, 1, 640, 384, 100, 100, 255, 0);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
 	AGH_initValuePic1 = function () {
 		valuePic1 = 54;
-		for (var i = 0; i <= 4; i++) {picture_fade1(valuePic1+i,"fadeOut",valueWipeImg,60,5)};
+		for (var i = 0; i <= 4; i++) { picture_fade1(valuePic1 + i, "fadeOut", valueWipeImg, 60, 5) };
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
 	AGH_runScriptOrderSkyKnightsAppear_2 = function () {
 		var value1 = 3;
-		event_respawnSetA(value1,15,40,0);
+		event_respawnSetA(value1, 15, 40, 0);
 		var value1 = 4;
-		event_respawnSetA(value1,13,40,0);
+		event_respawnSetA(value1, 13, 40, 0);
 		var value1 = 5;
-		event_respawnSetA(value1,14,40,0);
+		event_respawnSetA(value1, 14, 40, 0);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:305|[5]騎空士ギルド
 	AGH_setSelfSwitchDynamicEventId = function (interp) {
 		return (function () {
-		$gameSelfSwitches.setValue([$gameMap.mapId(), 3, 'A'], true);
-		var value1 = 11;
-		event_respawnSetN(value1,19,4,0,'Goods9',0);
-		var event = $gameMap.event($gameVariables.value(292)[value1]);
-		event.setDirection(2);
-		this._eventId = $gameVariables.value(292)[value1];
+			$gameSelfSwitches.setValue([$gameMap.mapId(), 3, 'A'], true);
+			var value1 = 11;
+			event_respawnSetN(value1, 19, 4, 0, 'Goods9', 0);
+			var event = $gameMap.event($gameVariables.value(292)[value1]);
+			event.setDirection(2);
+			this._eventId = $gameVariables.value(292)[value1];
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:306|[6]情報屋との交渉
 	AGH_showPictureZXMain006 = function () {
-		backGraund_menuMapSelect(2,0,0,0);
+		backGraund_menuMapSelect(2, 0, 0, 0);
 		valuePic1 = 55;
 		valueScenePic = 'ZX_Main006_';
 		var value2 = 'ScreenBlackOut';
-		$gameScreen.showPicture(valuePic1,value2,1,640,384,100,100,200,0);
-		picture_fade1(valuePic1,"fadeIn",valueWipeImg,60,5);
-		var pictureId = valuePic1+1;
-		var value2 = valueScenePic+'02';
-		$gameScreen.showPicture(pictureId,value2,1,640-128+20+50,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId,1,640-128+50,384,100,100,255,0,60);
+		$gameScreen.showPicture(valuePic1, value2, 1, 640, 384, 100, 100, 200, 0);
+		picture_fade1(valuePic1, "fadeIn", valueWipeImg, 60, 5);
+		var pictureId = valuePic1 + 1;
+		var value2 = valueScenePic + '02';
+		$gameScreen.showPicture(pictureId, value2, 1, 640 - 128 + 20 + 50, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 1, 640 - 128 + 50, 384, 100, 100, 255, 0, 60);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:306|[6]情報屋との交渉
 	AGH_showPictureInfoBrokerNegotiation = function () {
-		pic_move1(valuePic1+1,0,0,100,100,0,90);
-		var pictureId = valuePic1+2
-		var scenePictureName = valueScenePic+'03';
-		$gameScreen.showPicture(pictureId,scenePictureName,1,640-128+50,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId,1,640-128+50,384,100,100,255,0,60);
+		pic_move1(valuePic1 + 1, 0, 0, 100, 100, 0, 90);
+		var pictureId = valuePic1 + 2
+		var scenePictureName = valueScenePic + '03';
+		$gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128 + 50, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 1, 640 - 128 + 50, 384, 100, 100, 255, 0, 60);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:306|[6]情報屋との交渉
 	AGH_setPicturesAnimation = function () {
-		for (var i = 1; i <= 3; i++) {pic_move1(valuePic1+i,0,0,100,100,0,90)};
+		for (var i = 1; i <= 3; i++) { pic_move1(valuePic1 + i, 0, 0, 100, 100, 0, 90) };
 		$gameScreen.setPicturesAnimation(2, 10, "連番", 20);
-		var pictureId = valuePic1+4;
-		var scenePictureName = valueScenePic+'05_00';
-		$gameScreen.showPicture(pictureId,scenePictureName,1,640-128+50,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId,1,640-128+50,384,100,100,255,0,60);
-		if($gameScreen.picture(pictureId)){
-		  $gameScreen.picture(pictureId).startAnimationFrame(1, true, [1,1,1,2]);
+		var pictureId = valuePic1 + 4;
+		var scenePictureName = valueScenePic + '05_00';
+		$gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128 + 50, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 1, 640 - 128 + 50, 384, 100, 100, 255, 0, 60);
+		if ($gameScreen.picture(pictureId)) {
+			$gameScreen.picture(pictureId).startAnimationFrame(1, true, [1, 1, 1, 2]);
 		};
-		tachie_bless(pictureId,2);
+		tachie_bless(pictureId, 2);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:306|[6]情報屋との交渉
 	AGH_showPictureInfoBrokerNegotiation_2 = function () {
-		sex_direction(99,0,0);
-		for (var i = 1; i <= 5; i++) {pic_move1(valuePic1+i,0,0,100,100,0,90)};
-		var pictureId = valuePic1+6;
-		var scenePictureName = valueScenePic+'07';
-		$gameScreen.showPicture(pictureId,scenePictureName,1,640-128+100,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId,1,640-128+100,384,100,100,255,0,60);
-		tachie_bless(pictureId,2);
+		sex_direction(99, 0, 0);
+		for (var i = 1; i <= 5; i++) { pic_move1(valuePic1 + i, 0, 0, 100, 100, 0, 90) };
+		var pictureId = valuePic1 + 6;
+		var scenePictureName = valueScenePic + '07';
+		$gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128 + 100, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 1, 640 - 128 + 100, 384, 100, 100, 255, 0, 60);
+		tachie_bless(pictureId, 2);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:306|[6]情報屋との交渉
 	AGH_showPictureInfoBrokerNegotiation_3 = function () {
 		$gameScreen.setPicturesAnimation(2, 20, "連番", 40);
-		var pictureId = valuePic1+7;
-		var scenePictureName = valueScenePic+'08_00';
-		$gameScreen.showPicture(pictureId,scenePictureName,1,640-128+100,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId,1,640-128+100,384,100,100,255,0,60);
-		if($gameScreen.picture(pictureId)){
-		  $gameScreen.picture(pictureId).startAnimationFrame(1, true, [1,1,1,2]);
+		var pictureId = valuePic1 + 7;
+		var scenePictureName = valueScenePic + '08_00';
+		$gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128 + 100, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 1, 640 - 128 + 100, 384, 100, 100, 255, 0, 60);
+		if ($gameScreen.picture(pictureId)) {
+			$gameScreen.picture(pictureId).startAnimationFrame(1, true, [1, 1, 1, 2]);
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:306|[6]情報屋との交渉
 	AGH_runScriptInfoBrokerNegotiation = function () {
 		var value1 = 18;
-		message_popup2(value1,0,1,1);
+		message_popup2(value1, 0, 1, 1);
 		//message_popup2(0,[1024,368],1,1);
 		//ｲﾍﾞﾝﾄid,ﾌｷﾀﾞｼ位置,行数,1で有効化。\sh[5] で振動強さ指定
 		//0で座標指定,xyは中心点を指定
@@ -13628,118 +13758,121 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_getPatternJump = function () {
 		valuePic1 = 13;
 		curveFunctions.patternX = curveFunctions.getPattern('jump', [30]);
-		picTachie_move1(valuePic1,0,0,0,0,255,30);
-		picture_motion1("smooth",[0]);
+		picTachie_move1(valuePic1, 0, 0, 0, 0, 255, 30);
+		picture_motion1("smooth", [0]);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:307|[7]少年の初陣
 	AGH_initValuePic1BoyFirstBattle = function () {
 		valuePic1 = 14;
-		picture_animation1(valuePic1,0,-300,196);
+		picture_animation1(valuePic1, 0, -300, 196);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:307|[7]少年の初陣
 	AGH_valueName = function (interp) {
 		return (function () {
-		picTachie_move1(13,-1000,0,0,0,255,60);
-		picTachie_move1(14,-1000,0,0,0,255,60);
-		if($gameSwitches.value(127)){
-		  AudioManager.playSe({"name":"Z_FootRun","volume":35,"pitch":100,"pan":0});
-		  var floorValue = Math.floor(floorValue / 2);//ウェイト
-		  this.wait(floorValue);
-		} else {
-		  AudioManager.playSe({"name":"Z_FootWalkShort","volume":65,"pitch":100,"pan":0});
-		};
+			picTachie_move1(13, -1000, 0, 0, 0, 255, 60);
+			picTachie_move1(14, -1000, 0, 0, 0, 255, 60);
+			if ($gameSwitches.value(127)) {
+				AudioManager.playSe({ "name": "Z_FootRun", "volume": 35, "pitch": 100, "pan": 0 });
+				var floorValue = Math.floor(floorValue / 2);//ウェイト
+				this.wait(floorValue);
+			} else {
+				AudioManager.playSe({ "name": "Z_FootWalkShort", "volume": 65, "pitch": 100, "pan": 0 });
+			};
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:308|[8]高位種との遭遇
 	AGH_updateParticleDynamicEventId = function (interp) {
 		return (function () {
-		var value1 = 11;
-		event_respawnSetN(value1,12,10,0,'Monster',2,2);
-		var event = $gameMap.event($gameVariables.value(292)[value1]);
-		this._eventId = $gameVariables.value(292)[value1];
-		event.setDirection(2);
-		event.setTone(-50, -200, 100);
-		var value1 = 'magic_circle_c';
-		$gameScreen._particle.particleSet(this._eventId,value1+'-'+this._eventId,'this',value1);
-		$gameScreen._particle.particleUpdate([value1,'color','#400070','#ffcdcd']);
+			var value1 = 11;
+			event_respawnSetN(value1, 12, 10, 0, 'Monster', 2, 2);
+			var event = $gameMap.event($gameVariables.value(292)[value1]);
+			this._eventId = $gameVariables.value(292)[value1];
+			event.setDirection(2);
+			event.setTone(-50, -200, 100);
+			var value1 = 'magic_circle_c';
+			$gameScreen._particle.particleSet(this._eventId, value1 + '-' + this._eventId, 'this', value1);
+			$gameScreen._particle.particleUpdate([value1, 'color', '#400070', '#ffcdcd']);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:311|[11]中央平原で空賊捕縛
 	AGH_readVariableEventProgressHeroCentralPlainCapture = function (interp) {
 		return (function () {
-		var variable530Value = $gameVariables.value(530);
-		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
-		event_respawnSetA(variable530Value,variable163Value[3],variable163Value[4],1);
-		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		event.setImage(variable163Value[1], variable163Value[2]);
-		event.setDirection(4);
-		this._eventId = $gameVariables.value(292)[variable530Value];
+			var variable530Value = $gameVariables.value(530);
+			var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+			event_respawnSetA(variable530Value, variable163Value[3], variable163Value[4], 1);
+			var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+			event.setImage(variable163Value[1], variable163Value[2]);
+			event.setDirection(4);
+			this._eventId = $gameVariables.value(292)[variable530Value];
 		}).call(interp);
 	};
 
 	// Replaces (3x): CommonEvents.json:common-event:312|[12]捕縛完了→引き渡しまで, CommonEvents.json:common-event:316|[16]集落の長に話を聞く, CommonEvents.json:common-event:345|[45]祭殿の隠し通路
 	AGH_readVariableEventProgressHeroCaptureToHandover = function (interp) {
 		return (function () {
-		event_partyCharaEntry();
-		var variable292Value = $gameVariables.value(530);
-		var variable292Value = $gameVariables.value(292)[variable292Value];
-		event_partyCharaMove(45,"this.turnTowardCharacter($gameMap.event("+variable292Value+"));");
+			event_partyCharaEntry();
+			var variable292Value = $gameVariables.value(530);
+			var variable292Value = $gameVariables.value(292)[variable292Value];
+			event_partyCharaMove(45, "this.turnTowardCharacter($gameMap.event(" + variable292Value + "));");
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:312|[12]捕縛完了→引き渡しまで
 	AGH_eventMonsterSymbol = function (interp) {
 		return (function () {
-		for (var id = 200; id > 0; id--) {
-		  if(!!$gameMap.event(id)) {
-		    if ($gameMap.event(id).event().meta['MonsterSymbol']){
-		      $gameMap.event(id).forceMoveRoute({
-		      "list":[
-		  {"code":45,"parameters": ["this.setOpacity(0);"]},
-		  {"code":0}],"repeat":true,"skippable":true});
-		}}};
+			for (var id = 200; id > 0; id--) {
+				if (!!$gameMap.event(id)) {
+					if ($gameMap.event(id).event().meta['MonsterSymbol']) {
+						$gameMap.event(id).forceMoveRoute({
+							"list": [
+								{ "code": 45, "parameters": ["this.setOpacity(0);"] },
+								{ "code": 0 }], "repeat": true, "skippable": true
+						});
+					}
+				}
+			};
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:312|[12]捕縛完了→引き渡しまで
 	AGH_readVariableEventProgressHero_2 = function (interp) {
 		return (function () {
-		var variable530Value = $gameVariables.value(530);
-		event_respawnSetA(variable530Value,26,4,1,2);
-		this._eventId = $gameVariables.value(292)[variable530Value];
-		var variable530Value = 3;
-		event_respawnSetA(variable530Value,26,3,0,2);
+			var variable530Value = $gameVariables.value(530);
+			event_respawnSetA(variable530Value, 26, 4, 1, 2);
+			this._eventId = $gameVariables.value(292)[variable530Value];
+			var variable530Value = 3;
+			event_respawnSetA(variable530Value, 26, 3, 0, 2);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:313|[13]昇格──格差──
 	AGH_setSelfVariableEventProgressHero = function (interp) {
 		return (function () {
-		this.sVal(530,5);//主格キャラ
-		this.sVal(535,313);//挿話回想の場合アイテムID。メインは0
-		if($gameVariables.value(528) == 3){
-		  valueWeatherSceneSet = 15;
-		} else {
-		  valueWeatherSceneSet = 14;
-		};
-		h_keikenhyouji1(521,357);//記録変数,相手ID
+			this.sVal(530, 5);//主格キャラ
+			this.sVal(535, 313);//挿話回想の場合アイテムID。メインは0
+			if ($gameVariables.value(528) == 3) {
+				valueWeatherSceneSet = 15;
+			} else {
+				valueWeatherSceneSet = 14;
+			};
+			h_keikenhyouji1(521, 357);//記録変数,相手ID
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:313|[13]昇格──格差──
 	AGH_readVariableEventProgressHeroPromotionGap = function (interp) {
 		return (function () {
-		var value1 = 5;//$gameVariables.value(530);
-		event_respawnSetA(value1,10,13,1,8);
-		var value1 = 3;//$gameVariables.value(530);
-		event_respawnSetA(value1,11,13,1,8);
-		this._eventId = $gameVariables.value(292)[value1];
-		var value1 = 12;
-		event_respawnSetN(value1,10,11,0,'People2',1,2);
+			var value1 = 5;//$gameVariables.value(530);
+			event_respawnSetA(value1, 10, 13, 1, 8);
+			var value1 = 3;//$gameVariables.value(530);
+			event_respawnSetA(value1, 11, 13, 1, 8);
+			this._eventId = $gameVariables.value(292)[value1];
+			var value1 = 12;
+			event_respawnSetN(value1, 10, 11, 0, 'People2', 1, 2);
 		}).call(interp);
 	};
 
@@ -13753,52 +13886,52 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:313|[13]昇格──格差──
 	AGH_particleSetMahoujinC = function (interp) {
 		return (function () {
-		var mahoujinC = 'mahoujin_c';
-		$gameScreen._particle.particleSet(this._eventId,mahoujinC+'-'+this._eventId,'this',mahoujinC);
+			var mahoujinC = 'mahoujin_c';
+			$gameScreen._particle.particleSet(this._eventId, mahoujinC + '-' + this._eventId, 'this', mahoujinC);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:313|[13]昇格──格差──
 	AGH_readVariableEventProgressHero_3 = function (interp) {
 		return (function () {
-		var value1 = 5;//$gameVariables.value(530);
-		this._eventId = $gameVariables.value(292)[value1];
-		var event = $gameMap.event(this._eventId);
-		var value1 = event.screenX();
-		var value2 = event.screenY();
-		filter_direct(9,value1,value2,60);
+			var value1 = 5;//$gameVariables.value(530);
+			this._eventId = $gameVariables.value(292)[value1];
+			var event = $gameMap.event(this._eventId);
+			var value1 = event.screenX();
+			var value2 = event.screenY();
+			filter_direct(9, value1, value2, 60);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:313|[13]昇格──格差──
 	AGH_readVariableEventProgressHero_4 = function (interp) {
 		return (function () {
-		var value1 = 5;//$gameVariables.value(530);
-		event_respawnSetA(value1,20,13,1,2);
-		this._eventId = $gameVariables.value(292)[value1];
-		var value1 = 3;//$gameVariables.value(530);
-		event_respawnSetA(value1,20,14,0,4);
+			var value1 = 5;//$gameVariables.value(530);
+			event_respawnSetA(value1, 20, 13, 1, 2);
+			this._eventId = $gameVariables.value(292)[value1];
+			var value1 = 3;//$gameVariables.value(530);
+			event_respawnSetA(value1, 20, 14, 0, 4);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:313|[13]昇格──格差──
 	AGH_readVariableEventProgressHero_5 = function (interp) {
 		return (function () {
-		var value1 = 5;//$gameVariables.value(530);
-		event_respawnSetA(value1,8,10,1,6);
-		var value1 = 3;
-		event_respawnSetA(value1,11,10,0,4);
-		this._eventId = $gameVariables.value(292)[value1];
+			var value1 = 5;//$gameVariables.value(530);
+			event_respawnSetA(value1, 8, 10, 1, 6);
+			var value1 = 3;
+			event_respawnSetA(value1, 11, 10, 0, 4);
+			this._eventId = $gameVariables.value(292)[value1];
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:313|[13]昇格──格差──
 	AGH_setSelfVariableActorChoicePromotionGap = function (interp) {
 		return (function () {
-		this.sVal(20,0);
-		valueWordSet0 = `教会で「昇格」が可能になりました！`;
-		valueWordSetEx = 0;//補足が必要な場合
-		this.setupChild($dataCommonEvents[45].list, 0);
+			this.sVal(20, 0);
+			valueWordSet0 = `教会で「昇格」が可能になりました！`;
+			valueWordSetEx = 0;//補足が必要な場合
+			this.setupChild($dataCommonEvents[45].list, 0);
 		}).call(interp);
 	};
 
@@ -13806,7 +13939,7 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_readVariableEventProgressHeroVillageArrival = function () {
 		var variable530Value = $gameVariables.value(530);
 		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
-		event_respawnSetA(variable530Value,variable163Value[3],variable163Value[4],1);
+		event_respawnSetA(variable530Value, variable163Value[3], variable163Value[4], 1);
 		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
 		event.setImage(variable163Value[1], variable163Value[2]);
 		event.setDirection(variable163Value[5]);
@@ -13816,17 +13949,17 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:316|[16]集落の長に話を聞く
 	AGH_readVariableEventProgressHeroAskVillageChief = function (interp) {
 		return (function () {
-		var variable530Value = $gameVariables.value(530);
-		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
-		event_respawnSetA(variable530Value,variable163Value[3],variable163Value[4],1);
-		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		event.setImage(variable163Value[1], variable163Value[2]);
-		event.setDirection(variable163Value[5]);
-		this._eventId = $gameVariables.value(292)[variable530Value];
-		var variable530Value = 11;
-		event_respawnSetN(variable530Value,variable163Value[8],variable163Value[9],0,variable163Value[6],variable163Value[7]);
-		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		event.setDirection(variable163Value[10]);
+			var variable530Value = $gameVariables.value(530);
+			var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+			event_respawnSetA(variable530Value, variable163Value[3], variable163Value[4], 1);
+			var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+			event.setImage(variable163Value[1], variable163Value[2]);
+			event.setDirection(variable163Value[5]);
+			this._eventId = $gameVariables.value(292)[variable530Value];
+			var variable530Value = 11;
+			event_respawnSetN(variable530Value, variable163Value[8], variable163Value[9], 0, variable163Value[6], variable163Value[7]);
+			var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+			event.setDirection(variable163Value[10]);
 		}).call(interp);
 	};
 
@@ -13834,20 +13967,20 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_readVariableEventProgressHero_6 = function () {
 		var variable530Value = $gameVariables.value(530);
 		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
-		event_respawnSetA(variable530Value,14,18,1,2);
+		event_respawnSetA(variable530Value, 14, 18, 1, 2);
 		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:322|[22]頭目との対峙
 	AGH_readVariableEventProgressHeroBossConfrontation = function (interp) {
 		return (function () {
-		var variable530Value = $gameVariables.value(530);
-		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
-		event_respawnSetA(variable530Value,27,19,1);
-		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		event.setImage(variable163Value[1], variable163Value[2]);
-		event.setDirection(variable163Value[5]);
-		this._eventId = $gameVariables.value(292)[variable530Value];
+			var variable530Value = $gameVariables.value(530);
+			var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+			event_respawnSetA(variable530Value, 27, 19, 1);
+			var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+			event.setImage(variable163Value[1], variable163Value[2]);
+			event.setDirection(variable163Value[5]);
+			this._eventId = $gameVariables.value(292)[variable530Value];
 		}).call(interp);
 	};
 
@@ -13857,9 +13990,9 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
 		var value2 = event._realX;
 		var value3 = event._realY;
-		event_respawnSetA(3,value2+1,value3+1,0,8);
-		event_respawnSetA(4,value2-1,value3+1,0,8);
-		event_respawnSetA(5,value2,value3+1,0,8);
+		event_respawnSetA(3, value2 + 1, value3 + 1, 0, 8);
+		event_respawnSetA(4, value2 - 1, value3 + 1, 0, 8);
+		event_respawnSetA(5, value2, value3 + 1, 0, 8);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:322|[22]頭目との対峙
@@ -13870,78 +14003,78 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		array.push($gameVariables.value(292)[14]);
 		array.push($gameVariables.value(292)[15]);
 		array.push($gameVariables.value(292)[16]);
-		event_NpcCharaMoveId(19,0,array); 
+		event_NpcCharaMoveId(19, 0, array);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:328|[28]アウギュステ到着
 	AGH_readVariableDynamicEventIdAugusteArrival = function (interp) {
 		return (function () {
-		event_respawnSetN(value1,32,9,0,'Goods9',0,2);
-		this._eventId = $gameVariables.value(292)[value1];
+			event_respawnSetN(value1, 32, 9, 0, 'Goods9', 0, 2);
+			this._eventId = $gameVariables.value(292)[value1];
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:329|[29]水着購入
 	AGH_readVariableEventProgressHeroSwimsuitPurchase = function (interp) {
 		return (function () {
-		var variable530Value = $gameVariables.value(530);
-		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
-		event_respawnSetA(variable530Value,variable163Value[3],variable163Value[4],1);
-		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		event.setImage(variable163Value[1], variable163Value[2]);
-		event.setDirection(variable163Value[5]);
-		this._eventId = $gameVariables.value(292)[variable530Value];
-		var variable530Value = 11;
-		event_respawnSetN(variable530Value,variable163Value[8],variable163Value[9],0,variable163Value[6],variable163Value[7]);
-		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		event.setDirection(variable163Value[10]);
-		event.setStepAnime(false);event.setWalkAnime(false);
+			var variable530Value = $gameVariables.value(530);
+			var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+			event_respawnSetA(variable530Value, variable163Value[3], variable163Value[4], 1);
+			var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+			event.setImage(variable163Value[1], variable163Value[2]);
+			event.setDirection(variable163Value[5]);
+			this._eventId = $gameVariables.value(292)[variable530Value];
+			var variable530Value = 11;
+			event_respawnSetN(variable530Value, variable163Value[8], variable163Value[9], 0, variable163Value[6], variable163Value[7]);
+			var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+			event.setDirection(variable163Value[10]);
+			event.setStepAnime(false); event.setWalkAnime(false);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:329|[29]水着購入
 	AGH_waitActorChoiceSwimsuitPurchase = function (interp) {
 		return (function () {
-		var actor = $gameActors.actor($gameVariables.value(20));
-		//actor.addState(693);
-		tachie_dousa(2,1,2,14,1,255,1311,0,0);
-		tachie_dousa(0,1,1,14,15,0,120,1,0);
-		//tachie_clothReflect(1);
-		this.wait(3);
+			var actor = $gameActors.actor($gameVariables.value(20));
+			//actor.addState(693);
+			tachie_dousa(2, 1, 2, 14, 1, 255, 1311, 0, 0);
+			tachie_dousa(0, 1, 1, 14, 15, 0, 120, 1, 0);
+			//tachie_clothReflect(1);
+			this.wait(3);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:329|[29]水着購入
 	AGH_waitActorChoice_2 = function (interp) {
 		return (function () {
-		var actor = $gameActors.actor($gameVariables.value(20));
-		//actor.addState(693);
-		tachie_dousa(2,1,2,15,1,255,1347,0,0);
-		tachie_dousa(0,1,1,15,14,0,180,0,0);
-		tachie_clothReflect(1);
-		this.wait(3);
+			var actor = $gameActors.actor($gameVariables.value(20));
+			//actor.addState(693);
+			tachie_dousa(2, 1, 2, 15, 1, 255, 1347, 0, 0);
+			tachie_dousa(0, 1, 1, 15, 14, 0, 180, 0, 0);
+			tachie_clothReflect(1);
+			this.wait(3);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:330|[30]モニカ合流
 	AGH_readVariableEventProgressHeroMonicaJoins = function (interp) {
 		return (function () {
-		var variable530Value = $gameVariables.value(530);
-		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
-		event_respawnSetA(variable530Value,11,5,1,6);
-		var variable530Value = 3;//$gameVariables.value(530);
-		event_respawnSetA(variable530Value,12,4,0,2);
-		var variable530Value = 11;
-		event_respawnSetN(variable530Value,variable163Value[8],variable163Value[9],0,variable163Value[6],variable163Value[7],variable163Value[10]);
-		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		this._eventId = $gameVariables.value(292)[variable530Value];
+			var variable530Value = $gameVariables.value(530);
+			var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+			event_respawnSetA(variable530Value, 11, 5, 1, 6);
+			var variable530Value = 3;//$gameVariables.value(530);
+			event_respawnSetA(variable530Value, 12, 4, 0, 2);
+			var variable530Value = 11;
+			event_respawnSetN(variable530Value, variable163Value[8], variable163Value[9], 0, variable163Value[6], variable163Value[7], variable163Value[10]);
+			var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+			this._eventId = $gameVariables.value(292)[variable530Value];
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:330|[30]モニカ合流
 	AGH_readVariableDynamicEventIdMonicaJoins = function () {
 		var value1 = 13;
-		goodsEvent_respawn(value1,'food_1',4,6,1,13,5);
+		goodsEvent_respawn(value1, 'food_1', 4, 6, 1, 13, 5);
 		var event = $gameMap.event($gameVariables.value(292)[value1]);
 		event._spriteOffsetX = 20;
 		event._spriteOffsetY = 0;
@@ -13951,10 +14084,10 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:330|[30]モニカ合流
 	AGH_runScriptMonicaJoins = function (interp) {
 		return (function () {
-		var array = [0];
-		var arr2 = [50];
-		var arr3 = [`モグモグ──サクサク──`];
-		chara_oneWord(100,this._eventId,25,180,array,arr2,arr3,0);
+			var array = [0];
+			var arr2 = [50];
+			var arr3 = [`モグモグ──サクサク──`];
+			chara_oneWord(100, this._eventId, 25, 180, array, arr2, arr3, 0);
 		}).call(interp);
 	};
 
@@ -13967,13 +14100,13 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:330|[30]モニカ合流
 	AGH_readVariableEventProgressHero_8 = function (interp) {
 		return (function () {
-		var variable530Value = $gameVariables.value(530);
-		event_respawnSetA(variable530Value,38,18,1,2);
-		var variable530Value = 2;//$gameVariables.value(530);
-		event_respawnSetA(variable530Value,38,20,0,8);
-		this._eventId = $gameVariables.value(292)[variable530Value];
-		var variable530Value = 3;//$gameVariables.value(530);
-		event_respawnSetA(variable530Value,37,17,0,2);
+			var variable530Value = $gameVariables.value(530);
+			event_respawnSetA(variable530Value, 38, 18, 1, 2);
+			var variable530Value = 2;//$gameVariables.value(530);
+			event_respawnSetA(variable530Value, 38, 20, 0, 8);
+			this._eventId = $gameVariables.value(292)[variable530Value];
+			var variable530Value = 3;//$gameVariables.value(530);
+			event_respawnSetA(variable530Value, 37, 17, 0, 2);
 		}).call(interp);
 	};
 
@@ -13982,49 +14115,51 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		var array = [0];
 		var arr2 = [-50];
 		var arr3 = [`了解！`];
-		chara_oneWord(100,$gameVariables.value(292)[1],25,180,array,arr2,arr3,0);
-		chara_oneWord(101,$gameVariables.value(292)[3],25,180,array,arr2,arr3,0);
+		chara_oneWord(100, $gameVariables.value(292)[1], 25, 180, array, arr2, arr3, 0);
+		chara_oneWord(101, $gameVariables.value(292)[3], 25, 180, array, arr2, arr3, 0);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:331|[31]秘密の入口
 	AGH_readVariableEventProgressHeroSecretEntrance = function (interp) {
 		return (function () {
-		var variable530Value = $gameVariables.value(530);
-		event_respawnSetA(variable530Value,70,12,0,8);
-		this._eventId = $gameVariables.value(292)[variable530Value];
-		var variable530Value = 2;//$gameVariables.value(530);
-		event_respawnSetA(variable530Value,71,11,1,2);
-		var variable530Value = 3;//$gameVariables.value(530);
-		event_respawnSetA(variable530Value,70,13,0,8);
+			var variable530Value = $gameVariables.value(530);
+			event_respawnSetA(variable530Value, 70, 12, 0, 8);
+			this._eventId = $gameVariables.value(292)[variable530Value];
+			var variable530Value = 2;//$gameVariables.value(530);
+			event_respawnSetA(variable530Value, 71, 11, 1, 2);
+			var variable530Value = 3;//$gameVariables.value(530);
+			event_respawnSetA(variable530Value, 70, 13, 0, 8);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:333|[33]地底研究所
 	AGH_readVariableEventProgressHeroUndergroundLab = function (interp) {
 		return (function () {
-		var variable292Value = 11;//$gameVariables.value(530);
-		var variable292Value = $gameVariables.value(292)[variable292Value];
-		drowsepost.camera.zoom(1, 60, variable292Value);
-		var variable292Value = 11;//$gameVariables.value(530);
-		this._eventId = $gameVariables.value(292)[variable292Value];
+			var variable292Value = 11;//$gameVariables.value(530);
+			var variable292Value = $gameVariables.value(292)[variable292Value];
+			drowsepost.camera.zoom(1, 60, variable292Value);
+			var variable292Value = 11;//$gameVariables.value(530);
+			this._eventId = $gameVariables.value(292)[variable292Value];
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:333|[33]地底研究所
 	AGH_readMapEventMetaRandomWork1 = function (interp) {
 		return (function () {
-		var eventId = $gameVariables.value(21);
-		  if(!!$gameMap.event(eventId)) {
-		    if ($gameMap.event(eventId).event().meta['Researcher']){
-		      $gameMap.event(eventId).forceMoveRoute({
-		      "list":[
-		      {"code":29, "parameters":[5]},
-		      {"code":45,"parameters": ["this.startOpacity(120,0);"]},
-		      {"code":45,"parameters": ["Move To: 23, 20;"]},
-		      {"code":45,"parameters": ["this.erase();"]},
-		      {"code":0}],"repeat":false,"skippable":true});
-		      this.wait(10);
-		  }};
+			var eventId = $gameVariables.value(21);
+			if (!!$gameMap.event(eventId)) {
+				if ($gameMap.event(eventId).event().meta['Researcher']) {
+					$gameMap.event(eventId).forceMoveRoute({
+						"list": [
+							{ "code": 29, "parameters": [5] },
+							{ "code": 45, "parameters": ["this.startOpacity(120,0);"] },
+							{ "code": 45, "parameters": ["Move To: 23, 20;"] },
+							{ "code": 45, "parameters": ["this.erase();"] },
+							{ "code": 0 }], "repeat": false, "skippable": true
+					});
+					this.wait(10);
+				}
+			};
 		}).call(interp);
 	};
 
@@ -14032,94 +14167,94 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_readVariableEventProgressHeroAugusteDisperse = function () {
 		var variable530Value = $gameVariables.value(530);
 		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
-		event_respawnSetA(variable530Value,variable163Value[3],variable163Value[4],1);
+		event_respawnSetA(variable530Value, variable163Value[3], variable163Value[4], 1);
 		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
 		event.setImage(variable163Value[1], variable163Value[2]);
 		event.setDirection(variable163Value[5]);
 		var variable530Value = 2;//$gameVariables.value(530);
-		event_respawnSetA(variable530Value,19,3,0,8);
+		event_respawnSetA(variable530Value, 19, 3, 0, 8);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:336|[36]情報屋に話を聞く
 	AGH_readVariableEventProgressHeroAskInfoBroker = function (interp) {
 		return (function () {
-		var variable530Value = $gameVariables.value(530);
-		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
-		event_respawnSetA(variable530Value,6,11,1,8);
-		this._eventId = $gameVariables.value(292)[variable530Value];
-		var variable530Value = 11;
-		event_respawnSetN(variable530Value,variable163Value[8],variable163Value[9],0,variable163Value[6],variable163Value[7]);
-		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		event.setDirection(2);
+			var variable530Value = $gameVariables.value(530);
+			var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+			event_respawnSetA(variable530Value, 6, 11, 1, 8);
+			this._eventId = $gameVariables.value(292)[variable530Value];
+			var variable530Value = 11;
+			event_respawnSetN(variable530Value, variable163Value[8], variable163Value[9], 0, variable163Value[6], variable163Value[7]);
+			var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+			event.setDirection(2);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:337|[37]丘陵地帯からの…
 	AGH_readVariableDynamicEventIdFromHills = function (interp) {
 		return (function () {
-		var eventId = 6;//$gameVariables.value(292)[11]; //this._eventId
-		var event = $gameMap.event(eventId);
-		event.setStepAnime(false);
-		event.setWalkAnime(false);
-		event.setDirection(2);
-		event.resetPattern();
-		event._originalPattern = 1;
-		event.setAngle(45);
-		event._spriteOffsetX = -12;
-		event._spriteOffsetY = -12
-		event._kageM.clear();
-		event.setFace(6,true,true,0,6,0,6);//Child用
+			var eventId = 6;//$gameVariables.value(292)[11]; //this._eventId
+			var event = $gameMap.event(eventId);
+			event.setStepAnime(false);
+			event.setWalkAnime(false);
+			event.setDirection(2);
+			event.resetPattern();
+			event._originalPattern = 1;
+			event.setAngle(45);
+			event._spriteOffsetX = -12;
+			event._spriteOffsetY = -12
+			event._kageM.clear();
+			event.setFace(6, true, true, 0, 6, 0, 6);//Child用
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
 	AGH_runScriptBBAkunin3 = function () {
 		var value1 = 11;
-		event_respawnSetN(value1,10,12,1,'BB_akunin3',5,2);
-		event_respawnSetN(value1+1,9,13,0,'BB_akunin3',6,6);
-		event_respawnSetN(value1+2,11,13,0,'BB_akunin3',6,4);
+		event_respawnSetN(value1, 10, 12, 1, 'BB_akunin3', 5, 2);
+		event_respawnSetN(value1 + 1, 9, 13, 0, 'BB_akunin3', 6, 6);
+		event_respawnSetN(value1 + 2, 11, 13, 0, 'BB_akunin3', 6, 4);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
 	AGH_readVariableDynamicEventIdAirPirateRemnantSuppression = function (interp) {
 		return (function () {
-		var value1 = 20;
-		goodsEvent_respawn(value1,'!Door1',2,2,1,10,19);
-		var event = $gameMap.event($gameVariables.value(292)[value1]);
-		event._priorityType = 0;
-		this._eventId = $gameVariables.value(292)[value1];
+			var value1 = 20;
+			goodsEvent_respawn(value1, '!Door1', 2, 2, 1, 10, 19);
+			var event = $gameMap.event($gameVariables.value(292)[value1]);
+			event._priorityType = 0;
+			this._eventId = $gameVariables.value(292)[value1];
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
 	AGH_readVariableDynamicEventId_6 = function (interp) {
 		return (function () {
-		for (var i = 11; i <= 13; i++) {
-		  var variable292Value = $gameVariables.value(292)[i]; //this._eventId
-		  var event = $gameMap.event(variable292Value);
-		  event.requestBalloon(1);
-		  event.setDirection(2);
-		};
+			for (var i = 11; i <= 13; i++) {
+				var variable292Value = $gameVariables.value(292)[i]; //this._eventId
+				var event = $gameMap.event(variable292Value);
+				event.requestBalloon(1);
+				event.setDirection(2);
+			};
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
 	AGH_readVariableDynamicEventId_7 = function (interp) {
 		return (function () {
-		var value1 = 17;//
-		event_charaZanzou(this._eventId,$gameVariables.value(292)[value1]);
-		this._eventId = $gameMap.event($gameVariables.value(292)[value1]);
+			var value1 = 17;//
+			event_charaZanzou(this._eventId, $gameVariables.value(292)[value1]);
+			this._eventId = $gameMap.event($gameVariables.value(292)[value1]);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
 	AGH_readVariableDynamicEventId_8 = function (interp) {
 		return (function () {
-		for (var i = 11; i <= 13; i++) {
-		  var variable292Value = $gameVariables.value(292)[i]; //this._eventId
-		  var event = $gameMap.event(variable292Value);
-		  event.requestAnimation(371);
-		};
+			for (var i = 11; i <= 13; i++) {
+				var variable292Value = $gameVariables.value(292)[i]; //this._eventId
+				var event = $gameMap.event(variable292Value);
+				event.requestAnimation(371);
+			};
 		}).call(interp);
 	};
 
@@ -14127,81 +14262,81 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_readVariableDynamicEventId_9 = function () {
 		var array = [0];
 		var arr2 = [-50];
-		var arr3 = [`ギャアァッ！！`];var value1 = 11;
-		chara_oneWord(101,$gameVariables.value(292)[value1],25,180,array,arr2,arr3,0);
-		var arr3 = [`グエッ`];var value1 = 12;
-		chara_oneWord(102,$gameVariables.value(292)[value1],25,180,array,arr2,arr3,0);
-		var arr3 = [`ガッ…`];var value1 = 13;
-		chara_oneWord(103,$gameVariables.value(292)[value1],25,180,array,arr2,arr3,0);
+		var arr3 = [`ギャアァッ！！`]; var value1 = 11;
+		chara_oneWord(101, $gameVariables.value(292)[value1], 25, 180, array, arr2, arr3, 0);
+		var arr3 = [`グエッ`]; var value1 = 12;
+		chara_oneWord(102, $gameVariables.value(292)[value1], 25, 180, array, arr2, arr3, 0);
+		var arr3 = [`ガッ…`]; var value1 = 13;
+		chara_oneWord(103, $gameVariables.value(292)[value1], 25, 180, array, arr2, arr3, 0);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
 	AGH_readVariableDynamicEventId_10 = function (interp) {
 		return (function () {
-		for (var i = 11; i <= 13; i++) {
-		  AudioManager.playSe({"name":'Z_Collaps',"volume":50,"pitch":70,"pan":0});
-		  var variable292Value = $gameVariables.value(292)[i]; //this._eventId
-		  var event = $gameMap.event(variable292Value);
-		  event.setStepAnime(false);event.setWalkAnime(false);
-		  event.setDirection(2);event.resetPattern();
-		  event._originalPattern = 1;event.setAngle(45);
-		  event._spriteOffsetX = -12;event._spriteOffsetY = -12;
-		  event._kageM.clear();
-		  event.setFace(6,true,true);//Child用
-		};
+			for (var i = 11; i <= 13; i++) {
+				AudioManager.playSe({ "name": 'Z_Collaps', "volume": 50, "pitch": 70, "pan": 0 });
+				var variable292Value = $gameVariables.value(292)[i]; //this._eventId
+				var event = $gameMap.event(variable292Value);
+				event.setStepAnime(false); event.setWalkAnime(false);
+				event.setDirection(2); event.resetPattern();
+				event._originalPattern = 1; event.setAngle(45);
+				event._spriteOffsetX = -12; event._spriteOffsetY = -12;
+				event._kageM.clear();
+				event.setFace(6, true, true);//Child用
+			};
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
 	AGH_readVariableDynamicEventId_11 = function (interp) {
 		return (function () {
-		AudioManager.playSe({"name":'Z_Collaps',"volume":50,"pitch":70,"pan":0});
-		var variable292Value = $gameVariables.value(292)[5]; //this._eventId
-		var event = $gameMap.event(variable292Value);
-		event.setStepAnime(false);event.setWalkAnime(false);
-		event.setDirection(2);
-		event.resetPattern();event._originalPattern = 1;
-		event.setAngle(45);
-		event._spriteOffsetX = -12;
-		event._spriteOffsetY = -12
-		event._kageM.clear();
-		event.setFace(6,true,true,0,6,0,6);
+			AudioManager.playSe({ "name": 'Z_Collaps', "volume": 50, "pitch": 70, "pan": 0 });
+			var variable292Value = $gameVariables.value(292)[5]; //this._eventId
+			var event = $gameMap.event(variable292Value);
+			event.setStepAnime(false); event.setWalkAnime(false);
+			event.setDirection(2);
+			event.resetPattern(); event._originalPattern = 1;
+			event.setAngle(45);
+			event._spriteOffsetX = -12;
+			event._spriteOffsetY = -12
+			event._kageM.clear();
+			event.setFace(6, true, true, 0, 6, 0, 6);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
 	AGH_readVariableEventProgressHeroAirPirateRemnantSuppression = function (interp) {
 		return (function () {
-		var variable530Value = $gameVariables.value(530);
-		event_respawnSetA(variable530Value,10,15,1,8);
-		this._eventId = $gameVariables.value(292)[variable530Value];
-		var variable530Value = 12;
-		event_respawnSetN(variable530Value,10,12,0,'BB_akunin3',5,2);
-		event_respawnSetN(variable530Value+1,9,13,0,'BB_akunin3',6,6);
-		event_respawnSetN(variable530Value+2,11,13,0,'BB_akunin3',6,4);
+			var variable530Value = $gameVariables.value(530);
+			event_respawnSetA(variable530Value, 10, 15, 1, 8);
+			this._eventId = $gameVariables.value(292)[variable530Value];
+			var variable530Value = 12;
+			event_respawnSetN(variable530Value, 10, 12, 0, 'BB_akunin3', 5, 2);
+			event_respawnSetN(variable530Value + 1, 9, 13, 0, 'BB_akunin3', 6, 6);
+			event_respawnSetN(variable530Value + 2, 11, 13, 0, 'BB_akunin3', 6, 4);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
 	AGH_readVariableDynamicEventId_12 = function (interp) {
 		return (function () {
-		for (var i = 12; i <= 14; i++) {
-		  var variable292Value = $gameVariables.value(292)[i]; //this._eventId
-		  var event = $gameMap.event(variable292Value);
-		  event.setStepAnime(false);event.setWalkAnime(false);
-		  event.setDirection(2);event.resetPattern();
-		  event._originalPattern = 1;event.setAngle(45);
-		  event._spriteOffsetX = -12;event._spriteOffsetY = -12;
-		  event._kageM.clear();
-		  event.setFace(6,true,true);//Child用
-		};
+			for (var i = 12; i <= 14; i++) {
+				var variable292Value = $gameVariables.value(292)[i]; //this._eventId
+				var event = $gameMap.event(variable292Value);
+				event.setStepAnime(false); event.setWalkAnime(false);
+				event.setDirection(2); event.resetPattern();
+				event._originalPattern = 1; event.setAngle(45);
+				event._spriteOffsetX = -12; event._spriteOffsetY = -12;
+				event._kageM.clear();
+				event.setFace(6, true, true);//Child用
+			};
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
 	AGH_readVariableEventProgressHero_9 = function () {
 		var value1 = 5;//$gameVariables.value(530);
-		event_respawnSetA(value1,8,12,1,2);
+		event_respawnSetA(value1, 8, 12, 1, 2);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
@@ -14213,25 +14348,25 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		event._spriteOffsetX = +10;
 		event._spriteOffsetY = -58;
 		event._kageM.clear();
-		event.setFace(6,true,true,0,6,0,6);//Child用
+		event.setFace(6, true, true, 0, 6, 0, 6);//Child用
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
 	AGH_playSeZClothesTakeOff = function () {
 		var ZClothesTakeOff = 'Z_ClothesTakeOff';//ピッチ50か100。消去ウェイトで変更
-		AudioManager.playSe({"name":ZClothesTakeOff,"volume":150,"pitch":50,"pan":0});
-		tachie_dousa(2,1,4,14,1,255,1319,0,0);
-		tachie_dousa(2,1,4,14,1,255,1320,0,0);
-		tachie_dousa(2,1,4,14,1,255,1321,0,0);
-		tachie_dousa(2,1,4,14,1,255,1322,0,0);
-		tachie_dousa(0,1,18,13,14,0,180,1,0);
+		AudioManager.playSe({ "name": ZClothesTakeOff, "volume": 150, "pitch": 50, "pan": 0 });
+		tachie_dousa(2, 1, 4, 14, 1, 255, 1319, 0, 0);
+		tachie_dousa(2, 1, 4, 14, 1, 255, 1320, 0, 0);
+		tachie_dousa(2, 1, 4, 14, 1, 255, 1321, 0, 0);
+		tachie_dousa(2, 1, 4, 14, 1, 255, 1322, 0, 0);
+		tachie_dousa(0, 1, 18, 13, 14, 0, 180, 1, 0);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
 	AGH_playSeZClothesTakeOffAirPirateRemnantSuppression = function () {
 		var ZClothesTakeOff = 'Z_ClothesTakeOff';//ピッチ50か100。消去ウェイトで変更
-		AudioManager.playSe({"name":ZClothesTakeOff,"volume":150,"pitch":100,"pan":0});
-		tachie_dousa(0,1,22,12,13,1318,120,0,0);
+		AudioManager.playSe({ "name": ZClothesTakeOff, "volume": 150, "pitch": 100, "pan": 0 });
+		tachie_dousa(0, 1, 22, 12, 13, 1318, 120, 0, 0);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
@@ -14239,94 +14374,94 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		valuePic1 = 55;
 		valueScenePic = 'Goods_drag1_';
 		$gameScreen.setPicturesAnimation(2, 30, "連番", 60);
-		var scenePictureName = valueScenePic+'00';
-		$gameScreen.showPicture(valuePic1,scenePictureName,1,640-128,384-20,100,100,0,0);
-		$gameScreen.movePicture(valuePic1,1,640-128,384,100,100,255,0,60);
+		var scenePictureName = valueScenePic + '00';
+		$gameScreen.showPicture(valuePic1, scenePictureName, 1, 640 - 128, 384 - 20, 100, 100, 0, 0);
+		$gameScreen.movePicture(valuePic1, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
 	AGH_configureMapEventAirPirateRemnantSuppression = function (interp) {
 		return (function () {
-		var event = $gameMap.event(this._eventId);
-		var value1 = event.screenX();
-		var value2 = event.screenY();
-		filter_direct(9,value1,value2,20);
+			var event = $gameMap.event(this._eventId);
+			var value1 = event.screenX();
+			var value2 = event.screenY();
+			filter_direct(9, value1, value2, 20);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
 	AGH_showPictureZXMain037 = function () {
-		backGraund_menuMapSelect(2,0,0,0);
+		backGraund_menuMapSelect(2, 0, 0, 0);
 		valuePic1 = 51;
 		valuePic2 = 71;
 		valueScenePic = 'ZX_Main037_';
 		var value2 = 'ScreenBlackOut';
-		$gameScreen.showPicture(valuePic1,value2,1,640,384,100,100,200,0);
-		picture_fade1(valuePic1,"fadeIn",valueWipeImg,60,5);
-		var value2 = valueScenePic+'01';
-		$gameScreen.showPicture(valuePic2+1,value2,1,640+480,384-118,100,100,200,0);
-		$gameScreen.movePicture(valuePic2+1,1,640+480,384+50,100,100,255,0,240);
-		tachie_bless(valuePic2+1,2);
+		$gameScreen.showPicture(valuePic1, value2, 1, 640, 384, 100, 100, 200, 0);
+		picture_fade1(valuePic1, "fadeIn", valueWipeImg, 60, 5);
+		var value2 = valueScenePic + '01';
+		$gameScreen.showPicture(valuePic2 + 1, value2, 1, 640 + 480, 384 - 118, 100, 100, 200, 0);
+		$gameScreen.movePicture(valuePic2 + 1, 1, 640 + 480, 384 + 50, 100, 100, 255, 0, 240);
+		tachie_bless(valuePic2 + 1, 2);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
 	AGH_showPictureScreen1024Frame = function () {
-		var value2 = valueScenePic+'02';
-		$gameScreen.showPicture(valuePic1+1,value2,1,640-128,384-20,100,100,0,0);
-		$gameScreen.movePicture(valuePic1+1,1,640-128,384,100,100,255,0,60);
-		tachie_bless(valuePic1+1,2);
+		var value2 = valueScenePic + '02';
+		$gameScreen.showPicture(valuePic1 + 1, value2, 1, 640 - 128, 384 - 20, 100, 100, 0, 0);
+		$gameScreen.movePicture(valuePic1 + 1, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
+		tachie_bless(valuePic1 + 1, 2);
 		var value2 = 'Screen1024Frame';
-		$gameScreen.showPicture(valuePic2,value2,1,640-78,384,100,100,255,0);
-		picture_fade1(valuePic2,"fadeIn",valueWipeImg,60,5);
+		$gameScreen.showPicture(valuePic2, value2, 1, 640 - 78, 384, 100, 100, 255, 0);
+		picture_fade1(valuePic2, "fadeIn", valueWipeImg, 60, 5);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
 	AGH_showPictureAirPirateRemnantSuppression = function () {
-		var value1 = valuePic2+2;
-		var value2 = valueScenePic+'03';
-		$gameScreen.showPicture(value1,value2,1,640+480,384+50,100,100,0,0);
-		$gameScreen.movePicture(value1,1,640+480,384+50,100,100,255,0,60);
-		tachie_bless(value1,2);pic_move1(value1-1,0,0,100,100,0,90);
-		var value1 = valuePic1+2;
-		var value2 = valueScenePic+'04';
-		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
-		tachie_bless(value1,2);pic_move1(value1-1,0,0,100,100,0,90);
+		var value1 = valuePic2 + 2;
+		var value2 = valueScenePic + '03';
+		$gameScreen.showPicture(value1, value2, 1, 640 + 480, 384 + 50, 100, 100, 0, 0);
+		$gameScreen.movePicture(value1, 1, 640 + 480, 384 + 50, 100, 100, 255, 0, 60);
+		tachie_bless(value1, 2); pic_move1(value1 - 1, 0, 0, 100, 100, 0, 90);
+		var value1 = valuePic1 + 2;
+		var value2 = valueScenePic + '04';
+		$gameScreen.showPicture(value1, value2, 1, 640 - 128, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(value1, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
+		tachie_bless(value1, 2); pic_move1(value1 - 1, 0, 0, 100, 100, 0, 90);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
 	AGH_showPicturePictureParallelLoop = function () {
-		var pictureId = valuePic1+4;
-		var scenePictureName = valueScenePic+'04a';
-		$gameScreen.showPicture(pictureId,scenePictureName,1,640-128,384,100,100,150,0);
-		pic_setArray1 = [1,pictureId,0,5,0,30];
-		pic_setArray2 = [1,pictureId,0,0,3,30]; //pic_setArray2 = [1,0,0,0,0,0];
-		valueParallelPicSe1 = ['ZH_sticky4',20,60];
-		valueParallelPicSe2 = ['ZH_sticky1',20,60];
-		hcg_piston(pictureId,7,2,1);
-		$gameSwitches.setValue(429,true);
+		var pictureId = valuePic1 + 4;
+		var scenePictureName = valueScenePic + '04a';
+		$gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128, 384, 100, 100, 150, 0);
+		pic_setArray1 = [1, pictureId, 0, 5, 0, 30];
+		pic_setArray2 = [1, pictureId, 0, 0, 3, 30]; //pic_setArray2 = [1,0,0,0,0,0];
+		valueParallelPicSe1 = ['ZH_sticky4', 20, 60];
+		valueParallelPicSe2 = ['ZH_sticky1', 20, 60];
+		hcg_piston(pictureId, 7, 2, 1);
+		$gameSwitches.setValue(429, true);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
 	AGH_showPictureAirPirateRemnantSuppression_2 = function () {
-		var pictureId = valuePic1+5;
-		var scenePictureName = valueScenePic+'06';
-		$gameScreen.showPicture(pictureId,scenePictureName,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId,1,640-128,384,100,100,255,0,60);
-		tachie_bless(pictureId,2);pic_move1(pictureId-1,0,0,100,100,0,90);
+		var pictureId = valuePic1 + 5;
+		var scenePictureName = valueScenePic + '06';
+		$gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
+		tachie_bless(pictureId, 2); pic_move1(pictureId - 1, 0, 0, 100, 100, 0, 90);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
 	AGH_showPictureAirPirateRemnantSuppression_3 = function () {
 		$gameScreen.setPicturesAnimation(2, 10, "連番", 20);
-		var pictureId = valuePic1+6;
-		var scenePictureName = valueScenePic+'05_00';
-		$gameScreen.showPicture(pictureId,scenePictureName,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId,1,640-128,384,100,100,255,0,60);
-		if($gameScreen.picture(pictureId)){
-		  $gameScreen.picture(pictureId).startAnimationFrame(1, true, [1,1,1,2]);
+		var pictureId = valuePic1 + 6;
+		var scenePictureName = valueScenePic + '05_00';
+		$gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
+		if ($gameScreen.picture(pictureId)) {
+			$gameScreen.picture(pictureId).startAnimationFrame(1, true, [1, 1, 1, 2]);
 		};
-		tachie_bless(pictureId,2);pic_move1(pictureId-1,0,0,100,100,0,90);
+		tachie_bless(pictureId, 2); pic_move1(pictureId - 1, 0, 0, 100, 100, 0, 90);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
@@ -14344,14 +14479,14 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
 	AGH_readVariableDynamicEventId_13 = function (interp) {
 		return (function () {
-		  var variable292Value = $gameVariables.value(292)[11]; //this._eventId
-		  var event = $gameMap.event(variable292Value);
-		  event.setStepAnime(false);event.setWalkAnime(false);
-		  event.setDirection(2);event.resetPattern();
-		  event._originalPattern = 1;event.setAngle(45);
-		  event._spriteOffsetX = -12;event._spriteOffsetY = -12;
-		  event._kageM.clear();
-		  event.setFace(6,true,true);//Child用
+			var variable292Value = $gameVariables.value(292)[11]; //this._eventId
+			var event = $gameMap.event(variable292Value);
+			event.setStepAnime(false); event.setWalkAnime(false);
+			event.setDirection(2); event.resetPattern();
+			event._originalPattern = 1; event.setAngle(45);
+			event._spriteOffsetX = -12; event._spriteOffsetY = -12;
+			event._kageM.clear();
+			event.setFace(6, true, true);//Child用
 		}).call(interp);
 	};
 
@@ -14382,148 +14517,148 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
 		event.locate(22, 6);
 		event.setDirection(2);
-		event._spriteOffsetX = -48;event._spriteOffsetY = -24;
-		event.setStepAnime(false);event.setWalkAnime(false);
-		event._kageM.clear();event.setFace(6,true,true);//Child用
+		event._spriteOffsetX = -48; event._spriteOffsetY = -24;
+		event.setStepAnime(false); event.setWalkAnime(false);
+		event._kageM.clear(); event.setFace(6, true, true);//Child用
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:339|[39]合流と分散
 	AGH_showPictureZXMain038 = function () {
 		valuePic1 = 55;
 		valueScenePic = 'ZX_Main038_';
-		var scenePictureName = valueScenePic+'01';
-		$gameScreen.showPicture(valuePic1,scenePictureName,1,640,384,100,100,250,0);
-		picture_fade1(valuePic1,"fadeIn",valueWipeImg,60,5);
+		var scenePictureName = valueScenePic + '01';
+		$gameScreen.showPicture(valuePic1, scenePictureName, 1, 640, 384, 100, 100, 250, 0);
+		picture_fade1(valuePic1, "fadeIn", valueWipeImg, 60, 5);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:340|[40]謁見を申し出る
 	AGH_readVariableEventProgressHeroRequestAudience = function () {
 		var variable530Value = $gameVariables.value(530);
-		event_respawnSetA(variable530Value,13,23,1,8);
-		event_respawnSetA(5,13,24,0,8);
+		event_respawnSetA(variable530Value, 13, 23, 1, 8);
+		event_respawnSetA(5, 13, 24, 0, 8);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:341|[41]牢獄１日目
 	AGH_readVariableEventProgressHeroPrisonDay1 = function () {
 		var variable530Value = $gameVariables.value(530);
-		event_respawnSetA(variable530Value,12,5,1,2);
-		event_respawnSetA(5,13,6,0,4);
-		event_respawnSetN(11,18,10,0,'npcCastle1',2,4);
+		event_respawnSetA(variable530Value, 12, 5, 1, 2);
+		event_respawnSetA(5, 13, 6, 0, 4);
+		event_respawnSetN(11, 18, 10, 0, 'npcCastle1', 2, 4);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:341|[41]牢獄１日目
 	AGH_readVariableEventProgressHero_14 = function (interp) {
 		return (function () {
-		var value1 = 12;//$gameVariables.value(530);
-		event_respawnSetN(value1,16,3,1,'npcCastle1',2,2);
-		this._eventId = $gameVariables.value(292)[value1];
+			var value1 = 12;//$gameVariables.value(530);
+			event_respawnSetN(value1, 16, 3, 1, 'npcCastle1', 2, 2);
+			this._eventId = $gameVariables.value(292)[value1];
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:341|[41]牢獄１日目
 	AGH_readVariableEventProgressHero_15 = function () {
 		var variable530Value = $gameVariables.value(530);
-		event_respawnSetA(variable530Value,5,8,1,8);
-		event_respawnSetA(7,5,6,0,2);
-		event_respawnSetN(12,8,5,0,'npcCastle1',2,6);
-		event_respawnSetN(13,10,9,0,'npcCastle1',2,2);
-		event_respawnSetN(14,4,9,0,'npcCastle1',2,8);
-		event_respawnSetN(15,6,9,0,'npcCastle1',2,8);
+		event_respawnSetA(variable530Value, 5, 8, 1, 8);
+		event_respawnSetA(7, 5, 6, 0, 2);
+		event_respawnSetN(12, 8, 5, 0, 'npcCastle1', 2, 6);
+		event_respawnSetN(13, 10, 9, 0, 'npcCastle1', 2, 2);
+		event_respawnSetN(14, 4, 9, 0, 'npcCastle1', 2, 8);
+		event_respawnSetN(15, 6, 9, 0, 'npcCastle1', 2, 8);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:341|[41]牢獄１日目
 	AGH_showPictureDungeon12 = function () {
-		backGraund_menuMapSelect(2,0,0,0);//'Dungeon1_2'
-		valueScenePic =  'ZX_Main040_';
+		backGraund_menuMapSelect(2, 0, 0, 0);//'Dungeon1_2'
+		valueScenePic = 'ZX_Main040_';
 		valuePic1 = 55;
 		var value2 = 'ScreenBlackOut';
-		$gameScreen.showPicture(valuePic1,value2,1,640,384,100,100,200,0);
-		picture_fade1(valuePic1,"fadeIn",valueWipeImg,60,5);
-		var pictureId = valuePic1+1;
-		var value2 = valueScenePic+'01';
-		$gameScreen.showPicture(pictureId,value2,1,640-128,384-20,100,100,0,0);
-		$gameScreen.movePicture(pictureId,1,640-128,384,100,100,255,0,60);
+		$gameScreen.showPicture(valuePic1, value2, 1, 640, 384, 100, 100, 200, 0);
+		picture_fade1(valuePic1, "fadeIn", valueWipeImg, 60, 5);
+		var pictureId = valuePic1 + 1;
+		var value2 = valueScenePic + '01';
+		$gameScreen.showPicture(pictureId, value2, 1, 640 - 128, 384 - 20, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:341|[41]牢獄１日目
 	AGH_showPicturePrisonDay1 = function () {
 		picture_se1();
-		var pictureId = valuePic1+3;
-		var scenePictureName = valueScenePic+'03';
-		$gameScreen.showPicture(pictureId,scenePictureName,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId,1,640-128,384,100,100,255,0,60);
-		pic_move1(pictureId-1,0,0,100,100,0,90);
+		var pictureId = valuePic1 + 3;
+		var scenePictureName = valueScenePic + '03';
+		$gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
+		pic_move1(pictureId - 1, 0, 0, 100, 100, 0, 90);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:341|[41]牢獄１日目
 	AGH_movePicture1PrisonDay1 = function () {
 		picture_se1();
-		var pictureId = valuePic1+3;
-		pic_move1(pictureId,0,0,100,100,0,60);
+		var pictureId = valuePic1 + 3;
+		pic_move1(pictureId, 0, 0, 100, 100, 0, 60);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:341|[41]牢獄１日目
 	AGH_movePicture1PrisonDay1_2 = function () {
 		var value1 = 55;
-		pic_move1(value1,0,0,0,0,0,60);
+		pic_move1(value1, 0, 0, 0, 0, 0, 60);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:341|[41]牢獄１日目
 	AGH_movePicture1PrisonDay1_3 = function () {
 		picture_se1();
-		var pictureId = valuePic1+3;
-		pic_move1(pictureId,0,0,100,100,255,60);
+		var pictureId = valuePic1 + 3;
+		pic_move1(pictureId, 0, 0, 100, 100, 255, 60);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:341|[41]牢獄１日目
 	AGH_showPicturePrisonDay1_2 = function () {
-		var pictureId = valuePic1+4;
-		var scenePictureName = valueScenePic+'04';
-		$gameScreen.showPicture(pictureId,scenePictureName,1,640-128,384-50,100,100,0,0);
-		$gameScreen.movePicture(pictureId,1,640-128,384,100,100,255,0,60);
-		pic_move1(pictureId-1,0,0,100,100,0,90);
+		var pictureId = valuePic1 + 4;
+		var scenePictureName = valueScenePic + '04';
+		$gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128, 384 - 50, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
+		pic_move1(pictureId - 1, 0, 0, 100, 100, 0, 90);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:341|[41]牢獄１日目
 	AGH_showPicturePrisonDay1_3 = function () {
 		picture_se1();
-		var pictureId = valuePic1+9;
-		var scenePictureName = valueScenePic+'13';
-		$gameScreen.showPicture(pictureId,scenePictureName,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId,1,640-128,384,100,100,255,0,60);
-		pic_move1(pictureId-1,0,0,100,100,0,90);
+		var pictureId = valuePic1 + 9;
+		var scenePictureName = valueScenePic + '13';
+		$gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
+		pic_move1(pictureId - 1, 0, 0, 100, 100, 0, 90);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:341|[41]牢獄１日目
 	AGH_showPicturePrisonDay1_4 = function () {
 		picture_se1();
-		var pictureId = valuePic1+10;
-		var scenePictureName = valueScenePic+'14';
-		$gameScreen.showPicture(pictureId,scenePictureName,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId,1,640-128,384,100,100,255,0,60);
-		pic_move1(pictureId-1,0,0,100,100,0,90);
+		var pictureId = valuePic1 + 10;
+		var scenePictureName = valueScenePic + '14';
+		$gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
+		pic_move1(pictureId - 1, 0, 0, 100, 100, 0, 90);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:342|[42]牢獄６日目
 	AGH_readVariableEventProgressHeroPrisonDay6 = function (interp) {
 		return (function () {
-		var value1 = 12;//$gameVariables.value(530);
-		event_respawnSetN(value1,16,3,1,'npcCastle1',2,2);
-		//this._eventId = $gameVariables.value(292)[value1];
+			var value1 = 12;//$gameVariables.value(530);
+			event_respawnSetN(value1, 16, 3, 1, 'npcCastle1', 2, 2);
+			//this._eventId = $gameVariables.value(292)[value1];
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:342|[42]牢獄６日目
 	AGH_waitPrisonDay6 = function (interp) {
 		return (function () {
-		var id1 = 1;
-		var id2 = 30;
-		var array = [`ア`,`ア`,`ア`,`ア`,`ア`,`～`,`ン`];
-		var arr2 = [`゛`,`゛`,`゛`,`\\C[27]♥\\C[0]`,`\\C[27]♡\\C[0]`,` `];
-		var arr3 = [64,60,55,50,45,40,35,64,60,55,50,45,40,35,64,60,55,50,45,40,35,14];
-		var arr4 = [25,24,23,22,21,20,19,18,17,16,15];
-		text_randumWord(21,id1,id2,array,arr2,arr3,arr4);
-		this.wait(10);
+			var id1 = 1;
+			var id2 = 30;
+			var array = [`ア`, `ア`, `ア`, `ア`, `ア`, `～`, `ン`];
+			var arr2 = [`゛`, `゛`, `゛`, `\\C[27]♥\\C[0]`, `\\C[27]♡\\C[0]`, ` `];
+			var arr3 = [64, 60, 55, 50, 45, 40, 35, 64, 60, 55, 50, 45, 40, 35, 64, 60, 55, 50, 45, 40, 35, 14];
+			var arr4 = [25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15];
+			text_randumWord(21, id1, id2, array, arr2, arr3, arr4);
+			this.wait(10);
 		}).call(interp);
 	};
 
@@ -14536,76 +14671,76 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:342|[42]牢獄６日目
 	AGH_readVariableEventProgressHero_16 = function (interp) {
 		return (function () {
-		var variable530Value = $gameVariables.value(530);
-		event_respawnSetA(variable530Value,11,6,1,6);
-		var variable530Value = 5;//$gameVariables.value(530);
-		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		event.locate(13, 6);
-		event.setDirection(4);
-		var variable530Value = 12;//$gameVariables.value(530);
-		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		event.locate(18, 10);
-		event.setDirection(4);
-		this._eventId = $gameVariables.value(292)[variable530Value];
+			var variable530Value = $gameVariables.value(530);
+			event_respawnSetA(variable530Value, 11, 6, 1, 6);
+			var variable530Value = 5;//$gameVariables.value(530);
+			var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+			event.locate(13, 6);
+			event.setDirection(4);
+			var variable530Value = 12;//$gameVariables.value(530);
+			var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+			event.locate(18, 10);
+			event.setDirection(4);
+			this._eventId = $gameVariables.value(292)[variable530Value];
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:342|[42]牢獄６日目
 	AGH_readVariableEventProgressHero_17 = function () {
 		var value1 = 13;//$gameVariables.value(530);
-		event_respawnSetN(value1,12,10,0,'npcOrder1',3,8);
-		event_partyCharaMove(16,0);
+		event_respawnSetN(value1, 12, 10, 0, 'npcOrder1', 3, 8);
+		event_partyCharaMove(16, 0);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:342|[42]牢獄６日目
 	AGH_readVariableEventProgressHero_18 = function () {
 		var variable530Value = $gameVariables.value(530);
-		event_respawnSetA(variable530Value,6,9,1,2);
-		event_respawnSetA(5,7,9,0,2);
-		event_respawnSetA(2,6,10,0,8);
-		event_respawnSetA(3,7,10,0,8);
-		event_respawnSetA(4,5,10,0,8);
+		event_respawnSetA(variable530Value, 6, 9, 1, 2);
+		event_respawnSetA(5, 7, 9, 0, 2);
+		event_respawnSetA(2, 6, 10, 0, 8);
+		event_respawnSetA(3, 7, 10, 0, 8);
+		event_respawnSetA(4, 5, 10, 0, 8);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:343|[43]誇りと秩序
 	AGH_readVariableEventProgressHeroPrideAndOrder = function (interp) {
 		return (function () {
-		var variable530Value = $gameVariables.value(530);
-		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
-		event_respawnSetA(variable530Value,variable163Value[3],variable163Value[4],1,variable163Value[5]);
-		this._eventId = $gameVariables.value(292)[variable530Value];
-		var variable530Value = 11;
-		event_respawnSetN(variable530Value,13,13,0,'People3',6,2);
-		event_respawnSetN(12,10,17,0,'npcCastle1',2,6);
-		event_respawnSetN(13,10,18,0,'npcCastle1',2,6);
-		event_respawnSetN(14,16,17,0,'npcCastle1',2,4);
-		event_respawnSetN(15,16,18,0,'npcCastle1',2,4);
+			var variable530Value = $gameVariables.value(530);
+			var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+			event_respawnSetA(variable530Value, variable163Value[3], variable163Value[4], 1, variable163Value[5]);
+			this._eventId = $gameVariables.value(292)[variable530Value];
+			var variable530Value = 11;
+			event_respawnSetN(variable530Value, 13, 13, 0, 'People3', 6, 2);
+			event_respawnSetN(12, 10, 17, 0, 'npcCastle1', 2, 6);
+			event_respawnSetN(13, 10, 18, 0, 'npcCastle1', 2, 6);
+			event_respawnSetN(14, 16, 17, 0, 'npcCastle1', 2, 4);
+			event_respawnSetN(15, 16, 18, 0, 'npcCastle1', 2, 4);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:344|[44]宰相蓄電
 	AGH_setVariableChoiceSwitch11 = function (interp) {
 		return (function () {
-		$gameVariables.setValue(171,[36,13,16]);
-		var variable530Value = $gameVariables.value(530);
-		event_respawnSetA(variable530Value,13,16,1,8);
-		this._eventId = $gameVariables.value(292)[variable530Value];
+			$gameVariables.setValue(171, [36, 13, 16]);
+			var variable530Value = $gameVariables.value(530);
+			event_respawnSetA(variable530Value, 13, 16, 1, 8);
+			this._eventId = $gameVariables.value(292)[variable530Value];
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:345|[45]祭殿の隠し通路
 	AGH_setVariableChoiceSwitch11ShrineSecretPath = function (interp) {
 		return (function () {
-		$gameVariables.setValue(171,[108,10,9]);
-		var variable530Value = $gameVariables.value(530);
-		event_respawnSetA(variable530Value,10,9,1,8);
-		this._eventId = $gameVariables.value(292)[variable530Value];
-		var variable530Value = 11;
-		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
-		goodsEvent_respawn(variable530Value,variable163Value[6],variable163Value[7],variable163Value[10],variable163Value[11],variable163Value[8],variable163Value[9]);
-		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		event._priorityType = 1;
-		event._spriteOffsetX = +12;
+			$gameVariables.setValue(171, [108, 10, 9]);
+			var variable530Value = $gameVariables.value(530);
+			event_respawnSetA(variable530Value, 10, 9, 1, 8);
+			this._eventId = $gameVariables.value(292)[variable530Value];
+			var variable530Value = 11;
+			var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+			goodsEvent_respawn(variable530Value, variable163Value[6], variable163Value[7], variable163Value[10], variable163Value[11], variable163Value[8], variable163Value[9]);
+			var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+			event._priorityType = 1;
+			event._spriteOffsetX = +12;
 		}).call(interp);
 	};
 
@@ -14613,7 +14748,7 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_readVariableDynamicEventIdRuinsGuardian = function () {
 		var variable292Value = 12;
 		var variable292Value = $gameVariables.value(292)[variable292Value];
-		message_popup2(variable292Value,0,2,1);
+		message_popup2(variable292Value, 0, 2, 1);
 		//message_popup2(0,[1024,368],1,1);
 		//ｲﾍﾞﾝﾄid,ﾌｷﾀﾞｼ位置,行数,1で有効化。\sh[5] で振動強さ指定
 		//0で座標指定,xyは中心点を指定
@@ -14623,30 +14758,30 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:349|[49]終幕
 	AGH_readVariableEventProgressHeroFinale = function (interp) {
 		return (function () {
-		var variable530Value = $gameVariables.value(530);
-		event_respawnSetA(variable530Value,8,4,1,2);
-		this._eventId = $gameVariables.value(292)[variable530Value];
-		goodsEvent_respawn(11,'Goods8',0,4,1,8,5);
-		goodsEvent_respawn(12,'Goods8',0,6,0,7,5);
-		goodsEvent_respawn(13,'Goods8',0,6,0,9,5);
-		goodsEvent_respawn(14,'Goods7',5,8,1,7,6);
-		goodsEvent_respawn(15,'Goods7',5,8,1,9,6);
+			var variable530Value = $gameVariables.value(530);
+			event_respawnSetA(variable530Value, 8, 4, 1, 2);
+			this._eventId = $gameVariables.value(292)[variable530Value];
+			goodsEvent_respawn(11, 'Goods8', 0, 4, 1, 8, 5);
+			goodsEvent_respawn(12, 'Goods8', 0, 6, 0, 7, 5);
+			goodsEvent_respawn(13, 'Goods8', 0, 6, 0, 9, 5);
+			goodsEvent_respawn(14, 'Goods7', 5, 8, 1, 7, 6);
+			goodsEvent_respawn(15, 'Goods7', 5, 8, 1, 9, 6);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:350|[50]次なる戦いへ──
 	AGH_readVariableEventProgressHeroNextBattle = function (interp) {
 		return (function () {
-		var variable530Value = $gameVariables.value(530);
-		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
-		event_respawnSetA(variable530Value,variable163Value[3],variable163Value[4],1);
-		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		event.setImage(variable163Value[1], variable163Value[2]);
-		event.setDirection(variable163Value[5]);
-		this._eventId = $gameVariables.value(292)[variable530Value];
-		var variable530Value = 2;//$gameVariables.value(530);
-		event_respawnSetA(variable530Value,variable163Value[3],variable163Value[4]+3,1,8);
-		goodsEvent_respawn(11,'Goods8',0,6,1,8,5);
+			var variable530Value = $gameVariables.value(530);
+			var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+			event_respawnSetA(variable530Value, variable163Value[3], variable163Value[4], 1);
+			var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+			event.setImage(variable163Value[1], variable163Value[2]);
+			event.setDirection(variable163Value[5]);
+			this._eventId = $gameVariables.value(292)[variable530Value];
+			var variable530Value = 2;//$gameVariables.value(530);
+			event_respawnSetA(variable530Value, variable163Value[3], variable163Value[4] + 3, 1, 8);
+			goodsEvent_respawn(11, 'Goods8', 0, 6, 1, 8, 5);
 		}).call(interp);
 	};
 
@@ -14659,23 +14794,23 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:356|ハイゴブリン勝利
 	AGH_readVariableEventProgressHeroHighGoblinVictory = function (interp) {
 		return (function () {
-		var variable292Value = 5;//$gameVariables.value(530);
-		var variable292Value = $gameVariables.value(292)[variable292Value];
-		character = this.character(variable292Value);
-		character.locate(12, 11);
-		character.setDirection(8);
+			var variable292Value = 5;//$gameVariables.value(530);
+			var variable292Value = $gameVariables.value(292)[variable292Value];
+			character = this.character(variable292Value);
+			character.locate(12, 11);
+			character.setDirection(8);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:356|ハイゴブリン勝利
 	AGH_readVariableEventProgressHero_19 = function (interp) {
 		return (function () {
-		var variable530Value = $gameVariables.value(530);
-		this._eventId = $gameVariables.value(292)[variable530Value];
-		var event = $gameMap.event(this._eventId);
-		var variable530Value = event.screenX();
-		var value2 = event.screenY();
-		filter_direct(9,variable530Value,value2,60);
+			var variable530Value = $gameVariables.value(530);
+			this._eventId = $gameVariables.value(292)[variable530Value];
+			var event = $gameMap.event(this._eventId);
+			var variable530Value = event.screenX();
+			var value2 = event.screenY();
+			filter_direct(9, variable530Value, value2, 60);
 		}).call(interp);
 	};
 
@@ -14694,30 +14829,30 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:358|空賊ボス勝利
 	AGH_configureMapEventAirPirateBossVictory = function (interp) {
 		return (function () {
-		var eventId = this._eventId; //this._eventId
-		var event = $gameMap.event(eventId);
-		event.setStepAnime(false);
-		event.setWalkAnime(false);
-		event.setDirection(2);
-		event.resetPattern();
-		event._originalPattern = 1;
-		event.setAngle(45);
-		event._spriteOffsetX = -12;
-		event._spriteOffsetY = -12
-		event._kageM.clear();
-		event.setFace(6,true,true);//Child用
+			var eventId = this._eventId; //this._eventId
+			var event = $gameMap.event(eventId);
+			event.setStepAnime(false);
+			event.setWalkAnime(false);
+			event.setDirection(2);
+			event.resetPattern();
+			event._originalPattern = 1;
+			event.setAngle(45);
+			event._spriteOffsetX = -12;
+			event._spriteOffsetY = -12
+			event._kageM.clear();
+			event.setFace(6, true, true);//Child用
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:359|ガーディアン勝利
 	AGH_readVariableEventProgressHeroGuardianVictory = function (interp) {
 		return (function () {
-		var variable530Value = $gameVariables.value(530);
-		this._eventId = $gameVariables.value(292)[variable530Value];
-		var event = $gameMap.event(this._eventId);
-		var variable530Value = event._realX;
-		var value2 = event._realY;
-		filter_direct(9,variable530Value,value2,60);
+			var variable530Value = $gameVariables.value(530);
+			this._eventId = $gameVariables.value(292)[variable530Value];
+			var event = $gameMap.event(this._eventId);
+			var variable530Value = event._realX;
+			var value2 = event._realY;
+			filter_direct(9, variable530Value, value2, 60);
 		}).call(interp);
 	};
 
@@ -14741,112 +14876,112 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_showPictureGoodsBook1 = function () {
 		valuePic1 = 55;
 		var GoodsBook1 = 'Goods_Book1';
-		$gameScreen.showPicture(valuePic1,GoodsBook1,1,640,384-20,100,100,0,0);
-		$gameScreen.movePicture(valuePic1,1,640,384,100,100,255,0,60);
+		$gameScreen.showPicture(valuePic1, GoodsBook1, 1, 640, 384 - 20, 100, 100, 0, 0);
+		$gameScreen.movePicture(valuePic1, 1, 640, 384, 100, 100, 255, 0, 60);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:361|騎士団長勝利
 	AGH_readVariableEventProgressHeroKnightLeaderVictory = function () {
 		var variable530Value = $gameVariables.value(530);
-		event_respawnSetA(variable530Value,13,15,1,8);
+		event_respawnSetA(variable530Value, 13, 15, 1, 8);
 		var variable530Value = 11;
-		event_respawnSetN(variable530Value,13,13,0,'People3',6,2);
+		event_respawnSetN(variable530Value, 13, 13, 0, 'People3', 6, 2);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:361|騎士団長勝利
 	AGH_readVariableEventProgressHero_21 = function (interp) {
 		return (function () {
-		var variable530Value = $gameVariables.value(530);
-		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		event._spriteOffsetY = -24;
-		var variable530Value = 11;
-		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		event._spriteOffsetY = +24;
-		this._eventId = $gameVariables.value(292)[variable530Value];
+			var variable530Value = $gameVariables.value(530);
+			var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+			event._spriteOffsetY = -24;
+			var variable530Value = 11;
+			var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+			event._spriteOffsetY = +24;
+			this._eventId = $gameVariables.value(292)[variable530Value];
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:361|騎士団長勝利
 	AGH_readVariableDynamicEventIdKnightLeaderVictory = function (interp) {
 		return (function () {
-		var value1 = 17;//
-		event_charaZanzou(this._eventId,value1);
-		this._eventId = $gameVariables.value(292)[value1];
+			var value1 = 17;//
+			event_charaZanzou(this._eventId, value1);
+			this._eventId = $gameVariables.value(292)[value1];
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:363|グドン勝利
 	AGH_readVariableEventProgressHeroGudonVictory = function (interp) {
 		return (function () {
-		var variable530Value = $gameVariables.value(530);
-		event_respawnSetA(variable530Value,12,10,1,8);
-		//this._eventId = $gameVariables.value(292)[variable530Value];
+			var variable530Value = $gameVariables.value(530);
+			event_respawnSetA(variable530Value, 12, 10, 1, 8);
+			//this._eventId = $gameVariables.value(292)[variable530Value];
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:363|グドン勝利
 	AGH_configureMapEventGudonVictory = function (interp) {
 		return (function () {
-		var event = $gameMap.event(this._eventId);
-		var value3 = "Hscene005";//102一刀両断 Hscene005崩壊 008横両断 054封印 153内側から
-		event._GWInfo = $gameScreen.createGWInfo(["fadeOut",value3,300,5]);
+			var event = $gameMap.event(this._eventId);
+			var value3 = "Hscene005";//102一刀両断 Hscene005崩壊 008横両断 054封印 153内側から
+			event._GWInfo = $gameScreen.createGWInfo(["fadeOut", value3, 300, 5]);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:364|\N[5]勝利
 	AGH_configureMapEventActor5Victory = function () {
-		  if(!!$gameMap.event(12)) {
-		    var event = $gameMap.event(12);
-		    event.setStepAnime(false);event.setWalkAnime(false);
-		    event.setDirection(2);event.resetPattern();
-		    event._originalPattern = 1;event.setAngle(45);
-		    event._spriteOffsetX = -12;event._spriteOffsetY = -12;
-		    event._kageM.clear();
-		    event.setFace(6,true,true);//Child用event.setFace(6,true,true,0,6,0,6);
+		if (!!$gameMap.event(12)) {
+			var event = $gameMap.event(12);
+			event.setStepAnime(false); event.setWalkAnime(false);
+			event.setDirection(2); event.resetPattern();
+			event._originalPattern = 1; event.setAngle(45);
+			event._spriteOffsetX = -12; event._spriteOffsetY = -12;
+			event._kageM.clear();
+			event.setFace(6, true, true);//Child用event.setFace(6,true,true,0,6,0,6);
 		}
 	};
 
 	// Replaces (4x): CommonEvents.json:common-event:368|コマンド, CommonEvents.json:common-event:495|サンプル, CommonEvents.json:common-event:532|サンプル, CommonEvents.json:common-event:548|
 	AGH_showPictureCommand = function () {
-		backGraund_menuMapSelect(2,0,0,0);
+		backGraund_menuMapSelect(2, 0, 0, 0);
 		valuePic1 = 51;
-		var pictureId = valuePic1+1;
-		var scenePictureName = valueScenePic+'02';
-		$gameScreen.showPicture(pictureId,scenePictureName,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId,1,640-128,384,100,100,255,0,60);
-		tachie_bless(pictureId,2);
+		var pictureId = valuePic1 + 1;
+		var scenePictureName = valueScenePic + '02';
+		$gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
+		tachie_bless(pictureId, 2);
 		//pic_move1(pictureId-1,0,0,100,100,0,90);
 	};
 
 	// Replaces (5x): CommonEvents.json:common-event:368|コマンド, CommonEvents.json:common-event:412|, CommonEvents.json:common-event:495|サンプル, CommonEvents.json:common-event:532|サンプル, CommonEvents.json:common-event:548|
 	AGH_showPictureZXMain037Command = function () {
-		backGraund_menuMapSelect(2,0,0,0);
+		backGraund_menuMapSelect(2, 0, 0, 0);
 		valuePic1 = 55;
 		valuePic2 = 71;
 		valueScenePic = 'ZX_Main037_';
 		var ScreenBlackOut = 'ScreenBlackOut';
-		$gameScreen.showPicture(51,ScreenBlackOut,1,640,384,100,100,150,0);
-		picture_fade1(51,"fadeIn",valueWipeImg,60,5);
+		$gameScreen.showPicture(51, ScreenBlackOut, 1, 640, 384, 100, 100, 150, 0);
+		picture_fade1(51, "fadeIn", valueWipeImg, 60, 5);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:370|素体
 	AGH_setSelfVariableEventProgressHeroBaseBody = function (interp) {
 		return (function () {
-		this.sVal(530,1);//主格キャラ
-		$gameVariables.setValue(292,Array(21).fill(0));
-		var variable530Value = $gameVariables.value(530);
-		event_respawnSetA(variable530Value,12,12,1,8);
+			this.sVal(530, 1);//主格キャラ
+			$gameVariables.setValue(292, Array(21).fill(0));
+			var variable530Value = $gameVariables.value(530);
+			event_respawnSetA(variable530Value, 12, 12, 1, 8);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:381|情報屋処理
 	AGH_setSwitchRandomWork1InfoBrokerProcessing = function () {
 		var variable19Value = $dataItems[$gameVariables.value(19)].price;
-		$gameVariables.setValue(21,variable19Value.toLocaleString());
-		if($gameParty.gold() >= variable19Value){
-		  $gameSwitches.setValue(161,true);
+		$gameVariables.setValue(21, variable19Value.toLocaleString());
+		if ($gameParty.gold() >= variable19Value) {
+			$gameSwitches.setValue(161, true);
 		} else {
-		  $gameSwitches.setValue(161,false);
+			$gameSwitches.setValue(161, false);
 		};
 		valueCountSet2 = variable19Value;
 	};
@@ -14854,55 +14989,59 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:381|情報屋処理
 	AGH_setSwitchActorChoiceInfoBrokerProcessing = function () {
 		var actor = $gameActors.actor($gameVariables.value(20));
-		if($gameSwitches.value(508)){
-		  if($gameSwitches.value(1007) && !$gameSwitches.value(1107)){
-		    $gameSwitches.setValue(162,true);
-		}};
-		if($gameSwitches.value(508)){
-		  if($gameSwitches.value(1008) && !$gameSwitches.value(1108)){
-		    $gameSwitches.setValue(162,true);
-		}};
+		if ($gameSwitches.value(508)) {
+			if ($gameSwitches.value(1007) && !$gameSwitches.value(1107)) {
+				$gameSwitches.setValue(162, true);
+			}
+		};
+		if ($gameSwitches.value(508)) {
+			if ($gameSwitches.value(1008) && !$gameSwitches.value(1108)) {
+				$gameSwitches.setValue(162, true);
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:381|情報屋処理
 	AGH_setSwitchActorChoice_2 = function () {
 		var actor = $gameActors.actor($gameVariables.value(20));
-		if($gameSwitches.value(508)){
-		  if($gameSwitches.value(1009) && !$gameSwitches.value(1109)){
-		    $gameSwitches.setValue(162,true);
-		}};
-		if($gameSwitches.value(508)){
-		  if($gameSwitches.value(1109)){
-		    $gameSwitches.setValue(162,true);
-		}};
+		if ($gameSwitches.value(508)) {
+			if ($gameSwitches.value(1009) && !$gameSwitches.value(1109)) {
+				$gameSwitches.setValue(162, true);
+			}
+		};
+		if ($gameSwitches.value(508)) {
+			if ($gameSwitches.value(1109)) {
+				$gameSwitches.setValue(162, true);
+			}
+		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:381|情報屋処理
 	AGH_setSelfVariableRandomWork3 = function (interp) {
 		return (function () {
-		var value1 = 507;
-		if($gameSwitches.value(1107)){var value1 = 508};
-		if($gameSwitches.value(1108)){var value1 = 509};
-		if($gameSwitches.value(1109)){var value1 = 1000};
-		if($gameSwitches.value(1110)){var value1 = 1000};
-		valueCountSet1 = value1;
-		if(valueCountSet1 == 1000){
-		  this.sVal(23,`汎用シーン発生`);$gameSwitches.setValue(162,true);
-		} else {
-		  this.sVal(23,`${$dataItems[valueCountSet1].description}`);
-		};
+			var value1 = 507;
+			if ($gameSwitches.value(1107)) { var value1 = 508 };
+			if ($gameSwitches.value(1108)) { var value1 = 509 };
+			if ($gameSwitches.value(1109)) { var value1 = 1000 };
+			if ($gameSwitches.value(1110)) { var value1 = 1000 };
+			valueCountSet1 = value1;
+			if (valueCountSet1 == 1000) {
+				this.sVal(23, `汎用シーン発生`); $gameSwitches.setValue(162, true);
+			} else {
+				this.sVal(23, `${$dataItems[valueCountSet1].description}`);
+			};
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:382|酔っ払いを介抱する
 	AGH_setSelfVariableEventProgressHeroCareForDrunkard = function (interp) {
 		return (function () {
-		valueScenePic = 'XevS006_';
-		//var value2 = valueScenePic+'01';
-		valueVariable163Set = 5;
-		this.sVal(530,1);//主格キャラ
-		this.sVal(535,502);//挿話回想の場合アイテムID。メインは0
-		valueWeatherSceneSet = 15;
+			valueScenePic = 'XevS006_';
+			//var value2 = valueScenePic+'01';
+			valueVariable163Set = 5;
+			this.sVal(530, 1);//主格キャラ
+			this.sVal(535, 502);//挿話回想の場合アイテムID。メインは0
+			valueWeatherSceneSet = 15;
 		}).call(interp);
 	};
 
@@ -14910,75 +15049,75 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_showPictureScreenBlackOutCareForDrunkard = function () {
 		valuePic1 = 51;
 		var value2 = 'ScreenBlackOut';
-		$gameScreen.showPicture(valuePic1,value2,1,640,384,100,100,150,0);
-		picture_fade1(valuePic1,"fadeIn",valueWipeImg,60,5);
-		var value2 = valueScenePic+'01';
-		$gameScreen.showPicture(valuePic1+1,value2,1,640-128,384-10,100,100,255,0);
-		$gameScreen.movePicture(valuePic1+1,1,640-128,384,100,100,255,0,40);
-		hcg_piston(valuePic1+1,6,1,1);
+		$gameScreen.showPicture(valuePic1, value2, 1, 640, 384, 100, 100, 150, 0);
+		picture_fade1(valuePic1, "fadeIn", valueWipeImg, 60, 5);
+		var value2 = valueScenePic + '01';
+		$gameScreen.showPicture(valuePic1 + 1, value2, 1, 640 - 128, 384 - 10, 100, 100, 255, 0);
+		$gameScreen.movePicture(valuePic1 + 1, 1, 640 - 128, 384, 100, 100, 255, 0, 40);
+		hcg_piston(valuePic1 + 1, 6, 1, 1);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:382|酔っ払いを介抱する
 	AGH_runPluginCommandCutInNoWait = function (interp) {
 		return (function () {
-		var scenePictureName = valueScenePic+'05';
-		$gameSwitches.setValue(428,true);
-		valueCutInSet1 = ['Ｈシーン演出',scenePictureName,270,1.5,1.2,25,120];
-		var args = new Array(String(valueCutInSet1[0]));
-		this.pluginCommand("味方カットイン", args);
-		$gameSwitches.setValue(428,false);
+			var scenePictureName = valueScenePic + '05';
+			$gameSwitches.setValue(428, true);
+			valueCutInSet1 = ['Ｈシーン演出', scenePictureName, 270, 1.5, 1.2, 25, 120];
+			var args = new Array(String(valueCutInSet1[0]));
+			this.pluginCommand("味方カットイン", args);
+			$gameSwitches.setValue(428, false);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:382|酔っ払いを介抱する
 	AGH_showPictureCareForDrunkard = function () {
-		var value2 = valueScenePic+'04';
-		$gameScreen.showPicture(valuePic1+4,value2,1,640-128,384+100,100,100,255,0);
-		$gameScreen.movePicture(valuePic1+4,1,640-128,384,100,100,255,0,40);
-		hcg_piston(valuePic1+4,7,2,2);
-		var value2 = valueScenePic+'02';
-		pic_1(0,valuePic1+2,value2,2,100,255,40,1280,768,-256,0);
-		hcg_piston(valuePic1+2,6,1,1);
-		sex_direction(6,0);
+		var value2 = valueScenePic + '04';
+		$gameScreen.showPicture(valuePic1 + 4, value2, 1, 640 - 128, 384 + 100, 100, 100, 255, 0);
+		$gameScreen.movePicture(valuePic1 + 4, 1, 640 - 128, 384, 100, 100, 255, 0, 40);
+		hcg_piston(valuePic1 + 4, 7, 2, 2);
+		var value2 = valueScenePic + '02';
+		pic_1(0, valuePic1 + 2, value2, 2, 100, 255, 40, 1280, 768, -256, 0);
+		hcg_piston(valuePic1 + 2, 6, 1, 1);
+		sex_direction(6, 0);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:382|酔っ払いを介抱する
 	AGH_setSelfVariableChoiceSwitch12CareForDrunkard = function (interp) {
 		return (function () {
-		this.sVal(172,13);
-		valueTalkSet = [640-128,386,200,false];
+			this.sVal(172, 13);
+			valueTalkSet = [640 - 128, 386, 200, false];
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:382|酔っ払いを介抱する
 	AGH_runScriptCareForDrunkard = function () {
-		var scenePictureName = valueScenePic+'03';
-		pic_1(0,valuePic1+3,scenePictureName,2,100,255,40,1280,768,-256,0);
-		hcg_piston(valuePic1+3,6,1,1);
+		var scenePictureName = valueScenePic + '03';
+		pic_1(0, valuePic1 + 3, scenePictureName, 2, 100, 255, 40, 1280, 768, -256, 0);
+		hcg_piston(valuePic1 + 3, 6, 1, 1);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:382|酔っ払いを介抱する
 	AGH_setSelfVariableChoiceSwitch12_3 = function (interp) {
 		return (function () {
-		this.sVal(172,13);
-		valueTalkSet = [640-128,386,200,false];
-		this.setupChild($dataCommonEvents[60].list, 0);
+			this.sVal(172, 13);
+			valueTalkSet = [640 - 128, 386, 200, false];
+			this.setupChild($dataCommonEvents[60].list, 0);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:382|酔っ払いを介抱する
 	AGH_setSwitchCareForDrunkard = function () {
-		if(eval(valueSceneConditions1)){
-		  $gameSwitches.setValue(161,true);
+		if (eval(valueSceneConditions1)) {
+			$gameSwitches.setValue(161, true);
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:387|闘技場受付2
 	AGH_setSwitchSpecialMeasureDenied = function () {
-		if($gameSwitches.value(637)){
-		  $gameSwitches.setValue(162,false);
+		if ($gameSwitches.value(637)) {
+			$gameSwitches.setValue(162, false);
 		} else {
-		  $gameSwitches.setValue(162,true);
+			$gameSwitches.setValue(162, true);
 		};
 	};
 
@@ -14987,22 +15126,22 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		var actor = $gameActors.actor($gameVariables.value(20));
 		//if(actor.meta['SexualEcstasyHi']){var SexualEcstasyHiList = actor1.meta['SexualEcstasyHi'].split(',')};//SexualEcstasyLow  SexualEcstasyMiddle
 		//var arr1 = ['（ドキっ）','（ドキドキ）','（ドクン）','ドキッ'];//文字BGV
-		var arr1 = ['「アッ\\I[12]」','「ンッ\\I[12]」','「ンン…\\I[12]」','「ンクっ…\\I[12]」','「ァンっ…\\I[12]」'];//文字BGV
+		var arr1 = ['「アッ\\I[12]」', '「ンッ\\I[12]」', '「ンン…\\I[12]」', '「ンクっ…\\I[12]」', '「ァンっ…\\I[12]」'];//文字BGV
 		//var arr1 = ['「………ァっ」','「いや…」','「ンン──……」','「ンクっ…」','「ァンっ…」'];//文字BGV
 		htext_word(3);//3高2中1低
 		array = array.concat(valueHtextWord);
-		$gameVariables.setValue(707,array);
-		$gameVariables.setValue(706,[640-128,386,1,60,0,'eromangasimaji']);
-		$gameSwitches.setValue(125,true);
+		$gameVariables.setValue(707, array);
+		$gameVariables.setValue(706, [640 - 128, 386, 1, 60, 0, 'eromangasimaji']);
+		$gameSwitches.setValue(125, true);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:390|娼館コモン
 	AGH_floor = function () {
 		i1 = getRandomIndex(6) + 1;//人数
 		i2 = getRandomIndex(7) + 3;//膣回数
-		i3 = Math.floor( Math.random() * -2) + i1;//中だし回数
+		i3 = Math.floor(Math.random() * -2) + i1;//中だし回数
 		i4 = getRandomIndex(5) + 0;//アナル回数
-		i5 = Math.floor( Math.random() * -2) + 0;//中だし回数
+		i5 = Math.floor(Math.random() * -2) + 0;//中だし回数
 		i6 = getRandomIndex(2) + 1;//フェラ回数
 		i7 = getRandomIndex(1) + i4;//口腔回数
 		i8 = getRandomIndex(3) + 0;//失禁回数
@@ -15010,25 +15149,25 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 
 	// Replaces (1x): CommonEvents.json:common-event:392|トウロウコモン1
 	AGH_movePicture1ToroCommon1 = function () {
-		var pictureId = valuePic1+1;
-		pic_showMove1(pictureId,valueScenePic+'01',
-		640-128,384,100,60,1,50);
-		tachie_bless(pictureId,2);
+		var pictureId = valuePic1 + 1;
+		pic_showMove1(pictureId, valueScenePic + '01',
+			640 - 128, 384, 100, 60, 1, 50);
+		tachie_bless(pictureId, 2);
 		//pic_move1(pictureId-1,0,0,100,100,0,90);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:392|トウロウコモン1
 	AGH_movePicture1ToroCommon1_2 = function () {
-		var pictureId = valuePic1+2;
-		pic_showMove1(pictureId,valueScenePic+'11',
-		640-128,384,100,60,1,-50);
-		hcg_piston(pictureId,7,1,1);
+		var pictureId = valuePic1 + 2;
+		pic_showMove1(pictureId, valueScenePic + '11',
+			640 - 128, 384, 100, 60, 1, -50);
+		hcg_piston(pictureId, 7, 1, 1);
 		//pic_move1(pictureId-1,0,0,100,100,0,90);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:392|トウロウコモン1
 	AGH_erasePicturesToroCommon1 = function () {
-		for (var i = 0; i <= 3; i++) {pic_eraseP(0,[valuePic1+i])};
+		for (var i = 0; i <= 3; i++) { pic_eraseP(0, [valuePic1 + i]) };
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:400|↓挿話集コモン500まで
@@ -15041,91 +15180,91 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_showPictureScreenBlackOutRisingOrder = function () {
 		valuePic1 = 51;
 		var value2 = 'ScreenBlackOut';
-		$gameScreen.showPicture(valuePic1,value2,1,640,384,100,100,200,0);
-		picture_fade1(valuePic1,"fadeIn",valueWipeImg,60,5);
-		var pictureId = valuePic1+1;
-		var value2 = valueScenePic+'01';
-		$gameScreen.showPicture(pictureId,value2,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId,1,640-128,384,100,100,255,0,60);
-		tachie_bless(pictureId,2);
+		$gameScreen.showPicture(valuePic1, value2, 1, 640, 384, 100, 100, 200, 0);
+		picture_fade1(valuePic1, "fadeIn", valueWipeImg, 60, 5);
+		var pictureId = valuePic1 + 1;
+		var value2 = valueScenePic + '01';
+		$gameScreen.showPicture(pictureId, value2, 1, 640 - 128, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
+		tachie_bless(pictureId, 2);
 		//pic_move1(pictureId-1,0,0,100,100,0,90);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:411|無頓着な秩序
 	AGH_waitNonchalantOrder = function (interp) {
 		return (function () {
-		valuePic1 = 16;
-		var picture = $gameScreen.picture(valuePic1).x();
-		var value2 = $gameScreen.picture(13).x();
-		picTachie_move1(valuePic1,value2-picture-200,0,0,0,255,30);
-		this.wait(30);
+			valuePic1 = 16;
+			var picture = $gameScreen.picture(valuePic1).x();
+			var value2 = $gameScreen.picture(13).x();
+			picTachie_move1(valuePic1, value2 - picture - 200, 0, 0, 0, 255, 30);
+			this.wait(30);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:411|無頓着な秩序
 	AGH_waitNonchalantOrder_2 = function (interp) {
 		return (function () {
-		valuePic1 = 16;
-		var picture = $gameScreen.picture(valuePic1).scaleX();
-		picTachie_move1(valuePic1,0,0,picture-picture-picture,0,255,30);
-		this.wait(30);
+			valuePic1 = 16;
+			var picture = $gameScreen.picture(valuePic1).scaleX();
+			picTachie_move1(valuePic1, 0, 0, picture - picture - picture, 0, 255, 30);
+			this.wait(30);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:411|無頓着な秩序
 	AGH_waitPortraitTalkHurry = function (interp) {
 		return (function () {
-		picTachie_move1(16,-500,0,0,0,0,60);
-		valuePic1 = 13;
-		picTachie_move1(valuePic1,-500,0,0,0,0,60);
-		if($gameSwitches.value(127)){
-		  AudioManager.playSe({"name":"Z_FootCastle","volume":25,"pitch":140,"pan":0});
-		  var floorValue = Math.floor(floorValue / 2);//ウェイト
-		} else {
-		  AudioManager.playSe({"name":"Z_FootCastle","volume":25,"pitch":100,"pan":0});
-		};
-		this.wait(60);
+			picTachie_move1(16, -500, 0, 0, 0, 0, 60);
+			valuePic1 = 13;
+			picTachie_move1(valuePic1, -500, 0, 0, 0, 0, 60);
+			if ($gameSwitches.value(127)) {
+				AudioManager.playSe({ "name": "Z_FootCastle", "volume": 25, "pitch": 140, "pan": 0 });
+				var floorValue = Math.floor(floorValue / 2);//ウェイト
+			} else {
+				AudioManager.playSe({ "name": "Z_FootCastle", "volume": 25, "pitch": 100, "pan": 0 });
+			};
+			this.wait(60);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:412|
 	AGH_showPictureScreenBlackOutCommonEvent412 = function () {
-		backGraund_menuMapSelect(2,0,0,0);
+		backGraund_menuMapSelect(2, 0, 0, 0);
 		valuePic1 = 51;
 		var value2 = 'ScreenBlackOut';
-		$gameScreen.showPicture(valuePic1,value2,1,640,384,100,100,200,0);
-		picture_fade1(valuePic1,"fadeIn",valueWipeImg,60,5);
-		var pictureId = valuePic1+1;
-		var value2 = valueScenePic+'02';
-		$gameScreen.showPicture(pictureId,value2,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId,1,640-128,384,100,100,255,0,60);
-		tachie_bless(pictureId,2);
+		$gameScreen.showPicture(valuePic1, value2, 1, 640, 384, 100, 100, 200, 0);
+		picture_fade1(valuePic1, "fadeIn", valueWipeImg, 60, 5);
+		var pictureId = valuePic1 + 1;
+		var value2 = valueScenePic + '02';
+		$gameScreen.showPicture(pictureId, value2, 1, 640 - 128, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
+		tachie_bless(pictureId, 2);
 		//pic_move1(pictureId-1,0,0,100,100,0,90);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:414|副船団長の密かな疑問
 	AGH_runScriptViceCaptainDoubt = function () {
 		var value1 = '/img/parallaxes/BG_Town1';
-		parallax_scroll(7,value1,0,20,0.2,0,255);
+		parallax_scroll(7, value1, 0, 20, 0.2, 0, 255);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:431|未必の陰謀
 	AGH_readVariableDynamicEventIdHiddenConspiracy = function (interp) {
 		return (function () {
-		  var value1 = 16;
-		  event_respawnSetN(value1,6,15,0,'npcOrder1',5);
-		  var event = $gameMap.event($gameVariables.value(292)[value1]);
-		  event.setDirection(8);
-		this._eventId = $gameVariables.value(292)[value1];
+			var value1 = 16;
+			event_respawnSetN(value1, 6, 15, 0, 'npcOrder1', 5);
+			var event = $gameMap.event($gameVariables.value(292)[value1]);
+			event.setDirection(8);
+			this._eventId = $gameVariables.value(292)[value1];
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:431|未必の陰謀
 	AGH_readVariableDynamicEventId_14 = function (interp) {
 		return (function () {
-		var value1 = 17;
-		event_respawnSetN(value1,8,7,0,'npcOrder1',1);
-		this._eventId = $gameVariables.value(292)[value1];
+			var value1 = 17;
+			event_respawnSetN(value1, 8, 7, 0, 'npcOrder1', 1);
+			this._eventId = $gameVariables.value(292)[value1];
 		}).call(interp);
 	};
 
@@ -15134,19 +15273,19 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		var variable530Value = $gameVariables.value(530);
 		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
 		var variable530Value = 11;
-		event_respawnSetN(variable530Value,variable163Value[8],variable163Value[9],0,variable163Value[6],variable163Value[7],4);
+		event_respawnSetN(variable530Value, variable163Value[8], variable163Value[9], 0, variable163Value[6], variable163Value[7], 4);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:441|△人助け
 	AGH_readVariableEventProgressHeroHelpingHands = function () {
 		var variable530Value = $gameVariables.value(530);
 		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
-		event_respawnSetA(variable530Value,variable163Value[3]-5,variable163Value[4],1);
+		event_respawnSetA(variable530Value, variable163Value[3] - 5, variable163Value[4], 1);
 		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
 		event.setImage(variable163Value[1], variable163Value[2]);
 		event.setDirection(variable163Value[5]);
 		var variable530Value = 11;
-		event_respawnSetN(variable530Value,variable163Value[8],variable163Value[9],0,variable163Value[6],variable163Value[7]);
+		event_respawnSetN(variable530Value, variable163Value[8], variable163Value[9], 0, variable163Value[6], variable163Value[7]);
 		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
 		event.setDirection(variable163Value[10]);
 	};
@@ -15154,95 +15293,95 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:441|△人助け
 	AGH_readVariableDynamicEventIdHelpingHands = function (interp) {
 		return (function () {
-		var variable292Value = $gameVariables.value(292)[11]; //this._eventId
-		var event = $gameMap.event(variable292Value);
-		event.setStepAnime(false);
-		event.setWalkAnime(false);
-		event.setDirection(2);
-		event.resetPattern();
-		event._originalPattern = 1;
-		event.setAngle(45);
-		event._spriteOffsetX = -12;
-		event._spriteOffsetY = -12
-		event._kageM.clear();
-		event.setFace(6,true,true);//Child用
+			var variable292Value = $gameVariables.value(292)[11]; //this._eventId
+			var event = $gameMap.event(variable292Value);
+			event.setStepAnime(false);
+			event.setWalkAnime(false);
+			event.setDirection(2);
+			event.resetPattern();
+			event._originalPattern = 1;
+			event.setAngle(45);
+			event._spriteOffsetX = -12;
+			event._spriteOffsetY = -12
+			event._kageM.clear();
+			event.setFace(6, true, true);//Child用
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:442|△人助け2
 	AGH_readVariableEventProgressHeroHelpingHands2 = function (interp) {
 		return (function () {
-		var variable530Value = $gameVariables.value(530);
-		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
-		event_respawnSetA(variable530Value,variable163Value[3]-5,variable163Value[4],1);
-		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		event.setImage(variable163Value[1], variable163Value[2]);
-		event.setDirection(variable163Value[5]);
-		this._eventId = $gameVariables.value(292)[variable530Value];
-		var variable530Value = 11;
-		event_respawnSetN(variable530Value,variable163Value[8],variable163Value[9],0,variable163Value[6],variable163Value[7]);
-		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		event.setDirection(variable163Value[10]);
+			var variable530Value = $gameVariables.value(530);
+			var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+			event_respawnSetA(variable530Value, variable163Value[3] - 5, variable163Value[4], 1);
+			var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+			event.setImage(variable163Value[1], variable163Value[2]);
+			event.setDirection(variable163Value[5]);
+			this._eventId = $gameVariables.value(292)[variable530Value];
+			var variable530Value = 11;
+			event_respawnSetN(variable530Value, variable163Value[8], variable163Value[9], 0, variable163Value[6], variable163Value[7]);
+			var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+			event.setDirection(variable163Value[10]);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:442|△人助け2
 	AGH_runPluginCommandCutInNoWaitHelpingHands2 = function (interp) {
 		return (function () {
-		valueScenePic = 'XevO000_';
-		var scenePictureName = valueScenePic+'02_00';
-		$gameSwitches.setValue(428,true);
-		valueCutInSet1 = ['カットインアクター会話',scenePictureName,-90,4.5,3.0,25,60];
-		var args = new Array(String(valueCutInSet1[0]));
-		this.pluginCommand("味方カットイン", args);
+			valueScenePic = 'XevO000_';
+			var scenePictureName = valueScenePic + '02_00';
+			$gameSwitches.setValue(428, true);
+			valueCutInSet1 = ['カットインアクター会話', scenePictureName, -90, 4.5, 3.0, 25, 60];
+			var args = new Array(String(valueCutInSet1[0]));
+			this.pluginCommand("味方カットイン", args);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:442|△人助け2
 	AGH_readVariableEventProgressHero_22 = function (interp) {
 		return (function () {
-		var value1 = 11;//$gameVariables.value(530);
-		this._eventId = $gameVariables.value(292)[value1];
-		drowsepost.camera.zoom(1, 120, this._eventId);
+			var value1 = 11;//$gameVariables.value(530);
+			this._eventId = $gameVariables.value(292)[value1];
+			drowsepost.camera.zoom(1, 120, this._eventId);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:444|△りーしゃ人助け
 	AGH_setSelfVariableChoiceSwitch12LishaHelpingHands = function (interp) {
 		return (function () {
-		this.sVal(172,10);//文字ﾋﾟｸTips以外
-		var messageText = 
-		`彼女が感じた最も近い感情は、「落胆」や「失意」と言ったものだろう。
+			this.sVal(172, 10);//文字ﾋﾟｸTips以外
+			var messageText =
+				`彼女が感じた最も近い感情は、「落胆」や「失意」と言ったものだろう。
 		未だ歳若い、理想を胸に宿す少女には明確な理解が出来なかったのだ。
 		何れはそこに至るやも知れぬが、それはこの物語に措いてでは無い…。
 		`;
-		valueTalkSet = [25,actor.profile()]
+			valueTalkSet = [25, actor.profile()]
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:451|雄ドラフ、驚愕する
 	AGH_readVariableEventProgressHeroMaleDrafAstonished = function (interp) {
 		return (function () {
-		var value1 = 1;//$gameVariables.value(530);
-		event_respawnSetN(value1,16,6,0,'1_1',2);
-		this._eventId = $gameVariables.value(292)[value1];
+			var value1 = 1;//$gameVariables.value(530);
+			event_respawnSetN(value1, 16, 6, 0, '1_1', 2);
+			this._eventId = $gameVariables.value(292)[value1];
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:452|△露出王(上巻)を読む
 	AGH_readVariableEventProgressHeroReadExposureKing = function (interp) {
 		return (function () {
-		var variable530Value = $gameVariables.value(530);
-		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
-		event_respawnSetA(variable530Value,variable163Value[3]+1,variable163Value[4],1,2);
-		this._eventId = $gameVariables.value(292)[variable530Value];
+			var variable530Value = $gameVariables.value(530);
+			var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+			event_respawnSetA(variable530Value, variable163Value[3] + 1, variable163Value[4], 1, 2);
+			this._eventId = $gameVariables.value(292)[variable530Value];
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:452|△露出王(上巻)を読む
 	AGH_readVariableDynamicEventIdReadExposureKing = function () {
 		var value1 = 11;
-		goodsEvent_respawn(value1,'Goods7',5,8,1,14,5);
+		goodsEvent_respawn(value1, 'Goods7', 5, 8, 1, 14, 5);
 		var event = $gameMap.event($gameVariables.value(292)[value1]);
 		event._spriteOffsetY = -20;
 		event._priorityType = 2;
@@ -15250,46 +15389,46 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 
 	// Replaces (1x): CommonEvents.json:common-event:452|△露出王(上巻)を読む
 	AGH_showPictureScreenBlackOutReadExposureKing = function () {
-		backGraund_menuMapSelect(2,0,0,0);
+		backGraund_menuMapSelect(2, 0, 0, 0);
 		valuePic1 = 55;
 		var value2 = 'ScreenBlackOut';
-		$gameScreen.showPicture(valuePic1-1,value2,1,640,384,100,100,200,0);
-		picture_fade1(valuePic1-1,"fadeIn",valueWipeImg,60,5);
+		$gameScreen.showPicture(valuePic1 - 1, value2, 1, 640, 384, 100, 100, 200, 0);
+		picture_fade1(valuePic1 - 1, "fadeIn", valueWipeImg, 60, 5);
 		var value2 = 'ZX_NowconditionF_2';
-		$gameScreen.showPicture(valuePic1,value2,1,640-128,384-20,100,100,0,0);
-		$gameScreen.movePicture(valuePic1,1,640-128,384,100,100,255,0,60);
+		$gameScreen.showPicture(valuePic1, value2, 1, 640 - 128, 384 - 20, 100, 100, 0, 0);
+		$gameScreen.movePicture(valuePic1, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:471|覚醒 ─Awaken 'B'─
 	AGH_readVariableDynamicEventIdAwakenB = function (interp) {
 		return (function () {
-		this._eventId = $gameVariables.value(292)[11];
-		drowsepost.camera.zoom(1, 60, this._eventId);
+			this._eventId = $gameVariables.value(292)[11];
+			drowsepost.camera.zoom(1, 60, this._eventId);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:471|覚醒 ─Awaken 'B'─
 	AGH_readVariableDynamicEventId_15 = function (interp) {
 		return (function () {
-		var variable292Value = $gameVariables.value(292)[5]; //this._eventId
-		if(!!$gameMap.event(variable292Value)) {
-		    var event = $gameMap.event(variable292Value);
-		    event.setStepAnime(false);event.setWalkAnime(false);
-		    event.setDirection(2);event.resetPattern();
-		    event._originalPattern = 1;event.setAngle(45);
-		    event._spriteOffsetX = -12;event._spriteOffsetY = -12;
-		    event._kageM.clear();
-		    event.setFace(6,true,true,0,6,0,6);//Child用event.setFace(6,true,true,0,6,0,6);
-		};
+			var variable292Value = $gameVariables.value(292)[5]; //this._eventId
+			if (!!$gameMap.event(variable292Value)) {
+				var event = $gameMap.event(variable292Value);
+				event.setStepAnime(false); event.setWalkAnime(false);
+				event.setDirection(2); event.resetPattern();
+				event._originalPattern = 1; event.setAngle(45);
+				event._spriteOffsetX = -12; event._spriteOffsetY = -12;
+				event._kageM.clear();
+				event.setFace(6, true, true, 0, 6, 0, 6);//Child用event.setFace(6,true,true,0,6,0,6);
+			};
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:471|覚醒 ─Awaken 'B'─
 	AGH_spawnMapEventDynamicEventIdAwakenB = function (interp) {
 		return (function () {
-		var variable292Value = $gameVariables.value(292)[5]; //this._eventId
-		var value5 = $gameMap.event(variable292Value).x;var value6 = $gameMap.event(variable292Value).y;
-		$gameMap.spawnEvent(190, value5, value6, true);
+			var variable292Value = $gameVariables.value(292)[5]; //this._eventId
+			var value5 = $gameMap.event(variable292Value).x; var value6 = $gameMap.event(variable292Value).y;
+			$gameMap.spawnEvent(190, value5, value6, true);
 		}).call(interp);
 	};
 
@@ -15297,140 +15436,141 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_showPictureAwakenB = function () {
 		valuePic1 = 55;
 		var value2 = "/img/parallaxes/Scene_Awaken_1";
-		$gameScreen.showPicture(valuePic1,value2,1,640,384,100,100,0,0);
-		$gameScreen.movePicture(valuePic1,1,640,384,100,100,50,0,60);
+		$gameScreen.showPicture(valuePic1, value2, 1, 640, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(valuePic1, 1, 640, 384, 100, 100, 50, 0, 60);
 		$gameScreen.rotatePicture(valuePic1, 0.1);
-		hcg_piston(valuePic1,7,1,2);
+		hcg_piston(valuePic1, 7, 1, 2);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:471|覚醒 ─Awaken 'B'─
 	AGH_movePictureLifeStormScreen = function () {
-		$gameScreen.movePicture(valuePic1,1,640,384,100,100,100,0,60);
+		$gameScreen.movePicture(valuePic1, 1, 640, 384, 100, 100, 100, 0, 60);
 		var lifeStormScreen = 'lifeStorm_screen';
-		$gameScreen._particle.particleUpdate([lifeStormScreen,'particlesPerWave',String(10)]);
-		$gameScreen._particle.particleUpdate([lifeStormScreen,'speed',String(200),String(0)]);
+		$gameScreen._particle.particleUpdate([lifeStormScreen, 'particlesPerWave', String(10)]);
+		$gameScreen._particle.particleUpdate([lifeStormScreen, 'speed', String(200), String(0)]);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:471|覚醒 ─Awaken 'B'─
 	AGH_updateParticleLifeStormScreen = function () {
-		$gameScreen.movePicture(valuePic1,1,640,384,100,100,200,0,60);
+		$gameScreen.movePicture(valuePic1, 1, 640, 384, 100, 100, 200, 0, 60);
 		var lifeStormScreen = 'lifeStorm_screen';
-		$gameScreen._particle.particleUpdate([lifeStormScreen,'scale','1',0.2+'@0.15',0.05+'@0.8','0']);
+		$gameScreen._particle.particleUpdate([lifeStormScreen, 'scale', '1', 0.2 + '@0.15', 0.05 + '@0.8', '0']);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:471|覚醒 ─Awaken 'B'─
 	AGH_setSelfVariableActorChoiceAwakenB = function (interp) {
 		return (function () {
-		this.sVal(20,5);
-		var actor = $gameActors.actor($gameVariables.value(20));
-		for(var i = 401; i <= 406; i++){
-		  actor.forgetSkill(i);
-		};
-		actor.learnSkill(401);
+			this.sVal(20, 5);
+			var actor = $gameActors.actor($gameVariables.value(20));
+			for (var i = 401; i <= 406; i++) {
+				actor.forgetSkill(i);
+			};
+			actor.learnSkill(401);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:471|覚醒 ─Awaken 'B'─
 	AGH_readVariableDynamicEventId_16 = function (interp) {
 		return (function () {
-		$gameMap.darknessOpacity = 200;
-		var variable292Value = $gameVariables.value(292)[5]; //this._eventId
-		if(!!$gameMap.event(variable292Value)) {
-		 var event = $gameMap.event(variable292Value);
-		  event.setStepAnime(true);event.setWalkAnime(true);
-		  event.setAngle(0);
-		  event._spriteOffsetX = 0;event._spriteOffsetY = 0;
-		  event._kageM = new Game_KageMaster(event);  
-		  event.removeFace();
-		  event.setOpacity(0);
-		};
+			$gameMap.darknessOpacity = 200;
+			var variable292Value = $gameVariables.value(292)[5]; //this._eventId
+			if (!!$gameMap.event(variable292Value)) {
+				var event = $gameMap.event(variable292Value);
+				event.setStepAnime(true); event.setWalkAnime(true);
+				event.setAngle(0);
+				event._spriteOffsetX = 0; event._spriteOffsetY = 0;
+				event._kageM = new Game_KageMaster(event);
+				event.removeFace();
+				event.setOpacity(0);
+			};
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:471|覚醒 ─Awaken 'B'─
 	AGH_readVariableDynamicEventId_17 = function (interp) {
 		return (function () {
-		var variable292Value = $gameVariables.value(292)[5]; //this._eventId
-		$gameMap.eraseMapLight(variable292Value);
+			var variable292Value = $gameVariables.value(292)[5]; //this._eventId
+			$gameMap.eraseMapLight(variable292Value);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:471|覚醒 ─Awaken 'B'─
 	AGH_readVariableDynamicEventId_18 = function (interp) {
 		return (function () {
-		event_respawnSetN(5,4,11,1,'4Child',2,6);
-		this._eventId = $gameVariables.value(292)[5];
-		original_direct(5,this._eventId,0,0,0,0);
+			event_respawnSetN(5, 4, 11, 1, '4Child', 2, 6);
+			this._eventId = $gameVariables.value(292)[5];
+			original_direct(5, this._eventId, 0, 0, 0, 0);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:472|予期せぬ要請
 	AGH_readVariableEventProgressHeroUnexpectedRequest = function (interp) {
 		return (function () {
-		var variable530Value = $gameVariables.value(530);
-		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
-		event_respawnSetA(variable530Value,8,4,1,2);
-		this._eventId = $gameVariables.value(292)[variable530Value];
-		event_respawnSetA(2,8,7,0,8);
+			var variable530Value = $gameVariables.value(530);
+			var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+			event_respawnSetA(variable530Value, 8, 4, 1, 2);
+			this._eventId = $gameVariables.value(292)[variable530Value];
+			event_respawnSetA(2, 8, 7, 0, 8);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:473|秩序ＶＳ狂戦士
 	AGH_readVariableEventProgressHeroOrderVsBerserker = function (interp) {
 		return (function () {
-		var variable530Value = $gameVariables.value(530);
-		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
-		event_respawnSetA(variable530Value,variable163Value[3],variable163Value[4],1,8);
-		event_respawnSetA(2,variable163Value[3]-1,variable163Value[4],1,8);
-		this._eventId = $gameVariables.value(292)[2];
+			var variable530Value = $gameVariables.value(530);
+			var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+			event_respawnSetA(variable530Value, variable163Value[3], variable163Value[4], 1, 8);
+			event_respawnSetA(2, variable163Value[3] - 1, variable163Value[4], 1, 8);
+			this._eventId = $gameVariables.value(292)[2];
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:473|秩序ＶＳ狂戦士
 	AGH_readVariableDynamicEventIdOrderVsBerserker = function (interp) {
 		return (function () {
-		for (var i = 11; i <= 13; i++) {
-		  var variable292Value = $gameVariables.value(292)[i]; //this._eventId
-		  if(!!$gameMap.event(variable292Value)) {
-		    var event = $gameMap.event(variable292Value);
-		    event.setStepAnime(false);event.setWalkAnime(false);
-		    event.setDirection(2);event.resetPattern();
-		    event._originalPattern = 1;event.setAngle(45);
-		    event._spriteOffsetX = -12;event._spriteOffsetY = -12;
-		    event._kageM.clear();
-		    event.setFace(6,true,true);//Child用event.setFace(6,true,true,0,6,0,6);
-		}};
+			for (var i = 11; i <= 13; i++) {
+				var variable292Value = $gameVariables.value(292)[i]; //this._eventId
+				if (!!$gameMap.event(variable292Value)) {
+					var event = $gameMap.event(variable292Value);
+					event.setStepAnime(false); event.setWalkAnime(false);
+					event.setDirection(2); event.resetPattern();
+					event._originalPattern = 1; event.setAngle(45);
+					event._spriteOffsetX = -12; event._spriteOffsetY = -12;
+					event._kageM.clear();
+					event.setFace(6, true, true);//Child用event.setFace(6,true,true,0,6,0,6);
+				}
+			};
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:481|決戦！　黒銀の翼！！
 	AGH_readVariableEventProgressHeroDecisiveBlackSilverWing = function (interp) {
 		return (function () {
-		var variable530Value = $gameVariables.value(530);
-		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
-		event_respawnSetA(variable530Value,variable163Value[3]-1,variable163Value[4],1,variable163Value[5]);
-		this._eventId = $gameVariables.value(292)[variable530Value];
+			var variable530Value = $gameVariables.value(530);
+			var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+			event_respawnSetA(variable530Value, variable163Value[3] - 1, variable163Value[4], 1, variable163Value[5]);
+			this._eventId = $gameVariables.value(292)[variable530Value];
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:481|決戦！　黒銀の翼！！
 	AGH_readVariableEventProgressHero_23 = function (interp) {
 		return (function () {
-		var value1 = 2;//$gameVariables.value(530);
-		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
-		event_respawnSetA(value1,variable163Value[3],variable163Value[4]+1,0,variable163Value[5]);
-		this._eventId = $gameVariables.value(292)[value1];
+			var value1 = 2;//$gameVariables.value(530);
+			var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+			event_respawnSetA(value1, variable163Value[3], variable163Value[4] + 1, 0, variable163Value[5]);
+			this._eventId = $gameVariables.value(292)[value1];
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:496|全滅テンプレ
 	AGH_setSelfVariableEventProgressHeroAllOutTemplate = function (interp) {
 		return (function () {
-		valueScenePic = 'XevS016_';
-		//var value2 = valueScenePic+'01';
-		this.sVal(530,1);//主格キャラ
-		this.sVal(535,516);//挿話回想の場合アイテムID。メインは0
-		valueWeatherSceneSet = 0;
+			valueScenePic = 'XevS016_';
+			//var value2 = valueScenePic+'01';
+			this.sVal(530, 1);//主格キャラ
+			this.sVal(535, 516);//挿話回想の場合アイテムID。メインは0
+			valueWeatherSceneSet = 0;
 		}).call(interp);
 	};
 
@@ -15438,46 +15578,46 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_readVariableEventProgressHeroMischiefChildPublic = function () {
 		var variable530Value = $gameVariables.value(530);
 		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
-		event_respawnSetA(variable530Value,variable163Value[3],variable163Value[4],1,4);
+		event_respawnSetA(variable530Value, variable163Value[3], variable163Value[4], 1, 4);
 		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
 		event.setImage(variable163Value[1], variable163Value[2]);
 		event.setDirection(variable163Value[5]);
 		var variable530Value = 11;
-		event_respawnSetN(variable530Value,39,15,1,'4Child',3,4);
+		event_respawnSetN(variable530Value, 39, 15, 1, '4Child', 3, 4);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:502|悪戯っ子世に憚る
 	AGH_showPictureScreenBlackOutMischiefChildPublic = function () {
 		valuePic1 = 55;
 		var value2 = 'ScreenBlackOut';
-		$gameScreen.showPicture(valuePic1-1,value2,1,640,384,100,100,150,0);
-		picture_fade1(valuePic1-1,"fadeIn",valueWipeImg,60,5);
-		var value2 = valueScenePic+'01';
-		pic_1(0,valuePic1+1,value2,0,100,255,60,1280,768,-256,0);
+		$gameScreen.showPicture(valuePic1 - 1, value2, 1, 640, 384, 100, 100, 150, 0);
+		picture_fade1(valuePic1 - 1, "fadeIn", valueWipeImg, 60, 5);
+		var value2 = valueScenePic + '01';
+		pic_1(0, valuePic1 + 1, value2, 0, 100, 255, 60, 1280, 768, -256, 0);
 		//tachie_bless(valuePic1+1,1);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:502|悪戯っ子世に憚る
 	AGH_showPictureHpicture2 = function () {
-		var value2 = valueScenePic+'02';
-		$gameScreen.showPicture(valuePic1,value2,1,640-128,384,100,100,255,0);
-		tachie_bless(valuePic1,1);
+		var value2 = valueScenePic + '02';
+		$gameScreen.showPicture(valuePic1, value2, 1, 640 - 128, 384, 100, 100, 255, 0);
+		tachie_bless(valuePic1, 1);
 		var value3 = 'Hpicture2';
-		picture_fade1(valuePic1,"fadeIn",value3,60,5);
+		picture_fade1(valuePic1, "fadeIn", value3, 60, 5);
 		var value3 = 'Hpicture3';
-		picture_fade1(valuePic1+1,"fadeOut",value3,120,5);
-		var value2 = valueScenePic+'03';
-		$gameScreen.showPicture(valuePic1+2,value2,1,640-128,384+500,100,100,255,0);
-		$gameScreen.movePicture(valuePic1+2,1,640-128,384,100,100,0,0,120);
+		picture_fade1(valuePic1 + 1, "fadeOut", value3, 120, 5);
+		var value2 = valueScenePic + '03';
+		$gameScreen.showPicture(valuePic1 + 2, value2, 1, 640 - 128, 384 + 500, 100, 100, 255, 0);
+		$gameScreen.movePicture(valuePic1 + 2, 1, 640 - 128, 384, 100, 100, 0, 0, 120);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:502|悪戯っ子世に憚る
 	AGH_runScriptMischiefChildPublic = function (interp) {
 		return (function () {
-		var array = [0];
-		var arr2 = [-50];
-		var arr3 = [`ハッハ──ッ♪`];
-		chara_oneWord(101,this._eventId,25,120,array,arr2,arr3);
+			var array = [0];
+			var arr2 = [-50];
+			var arr3 = [`ハッハ──ッ♪`];
+			chara_oneWord(101, this._eventId, 25, 120, array, arr2, arr3);
 		}).call(interp);
 	};
 
@@ -15486,107 +15626,107 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		valuePic1 = 51;
 		valuePic2 = 71;
 		var value2 = 'ScreenBlackOut';
-		$gameScreen.showPicture(valuePic1,value2,1,640,384,100,100,150,0);
-		picture_fade1(valuePic1,"fadeIn",valueWipeImg,60,5);
-		var pictureId = valuePic2+1;
-		var value2 = valueScenePic+'01';
-		$gameScreen.showPicture(pictureId,value2,1,640+480+50,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId,1,640+480,384,100,100,255,0,60);
-		tachie_bless(pictureId,2);
+		$gameScreen.showPicture(valuePic1, value2, 1, 640, 384, 100, 100, 150, 0);
+		picture_fade1(valuePic1, "fadeIn", valueWipeImg, 60, 5);
+		var pictureId = valuePic2 + 1;
+		var value2 = valueScenePic + '01';
+		$gameScreen.showPicture(pictureId, value2, 1, 640 + 480 + 50, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 1, 640 + 480, 384, 100, 100, 255, 0, 60);
+		tachie_bless(pictureId, 2);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:503|爺の本懐
 	AGH_showPictureScreen1024FrameOldManWish = function () {
 		var value2 = 'Screen1024Frame';
-		$gameScreen.showPicture(valuePic2,value2,1,640-78,384,100,100,255,0);
-		picture_fade1(valuePic2,"fadeIn",valueWipeImg,60,5);
-		var value2 = valueScenePic+'02';
-		$gameScreen.showPicture(valuePic1+1,value2,1,640-128,384-20,100,100,0,0);
-		$gameScreen.movePicture(valuePic1+1,1,640-128,384,100,100,255,0,60);
-		tachie_bless(valuePic1+1,2);
+		$gameScreen.showPicture(valuePic2, value2, 1, 640 - 78, 384, 100, 100, 255, 0);
+		picture_fade1(valuePic2, "fadeIn", valueWipeImg, 60, 5);
+		var value2 = valueScenePic + '02';
+		$gameScreen.showPicture(valuePic1 + 1, value2, 1, 640 - 128, 384 - 20, 100, 100, 0, 0);
+		$gameScreen.movePicture(valuePic1 + 1, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
+		tachie_bless(valuePic1 + 1, 2);
 	};
 
 	// Replaces (4x): CommonEvents.json:common-event:507|情報の代価Ⅰ, CommonEvents.json:common-event:536|メイドウェイトレス, CommonEvents.json:common-event:547|リゾート休暇で限界突破！, CommonEvents.json:common-event:576|娼婦Debut!
 	AGH_showPicturePriceOfInformation1 = function () {
-		backGraund_menuMapSelect(2,0,0,0);
+		backGraund_menuMapSelect(2, 0, 0, 0);
 		valuePic1 = 51;
-		var pictureId = valuePic1+1;
-		var scenePictureName = valueScenePic+'01';
-		$gameScreen.showPicture(pictureId,scenePictureName,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId,1,640-128,384,100,100,255,0,60);
+		var pictureId = valuePic1 + 1;
+		var scenePictureName = valueScenePic + '01';
+		$gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
 		//tachie_bless(pictureId,2);
 		//pic_move1(pictureId-1,0,0,100,100,0,90);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:507|情報の代価Ⅰ
 	AGH_showPicturePriceOfInformation1_2 = function () {
-		var value1 = valuePic1+2;
-		var value2 = valueScenePic+'02';
-		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		var value1 = valuePic1 + 2;
+		var value2 = valueScenePic + '02';
+		$gameScreen.showPicture(value1, value2, 1, 640 - 128, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(value1, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
 		//pic_move1(value1-1,0,0,100,100,0,90);
-		var value1 = valuePic1+3;
-		var value2 = valueScenePic+'03';
-		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
-		tachie_bless(value1,2);
+		var value1 = valuePic1 + 3;
+		var value2 = valueScenePic + '03';
+		$gameScreen.showPicture(value1, value2, 1, 640 - 128, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(value1, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
+		tachie_bless(value1, 2);
 	};
 
 	// Replaces (2x): CommonEvents.json:common-event:508|情報の代価Ⅱ, CommonEvents.json:common-event:509|情報の代価Ⅲ
 	AGH_showPictureXevS00702 = function () {
-		backGraund_menuMapSelect(2,0,0,0);
-		var value1 = valuePic1+1;
+		backGraund_menuMapSelect(2, 0, 0, 0);
+		var value1 = valuePic1 + 1;
 		var value2 = 'XevS007_02';
-		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		$gameScreen.showPicture(value1, value2, 1, 640 - 128, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(value1, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
 		//pic_move1(value1-1,0,0,100,100,0,90);
-		var value1 = valuePic1+2;
-		var value2 = valueScenePic+'02';
-		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
-		tachie_bless(value1,2);
+		var value1 = valuePic1 + 2;
+		var value2 = valueScenePic + '02';
+		$gameScreen.showPicture(value1, value2, 1, 640 - 128, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(value1, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
+		tachie_bless(value1, 2);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:509|情報の代価Ⅲ
 	AGH_showPicturePriceOfInformation3 = function () {
-		var pictureId = valuePic1+5;
-		var scenePictureName = valueScenePic+'05';
-		$gameScreen.showPicture(pictureId,scenePictureName,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId,1,640-128,384,100,100,255,0,60);
-		hcg_piston(pictureId,7,2,1);
+		var pictureId = valuePic1 + 5;
+		var scenePictureName = valueScenePic + '05';
+		$gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
+		hcg_piston(pictureId, 7, 2, 1);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:511|ドクター・Ｋによる診察
 	AGH_iterateWeaponsProfession1 = function () {
 		var weaponId = 317;
 		var messageText = `${$dataWeapons[id1].meta['Profession1']}`;
-		Profession_CharaChange(1,weaponId,messageText,1);
+		Profession_CharaChange(1, weaponId, messageText, 1);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:511|ドクター・Ｋによる診察
 	AGH_setSwitchNonHSceneBGVStartDoctorKExamination = function () {
-		var array = ['「スーっ…」','「ン………」','「ZZZ………」','「スゥ──」'];//文字BGV
-		$gameVariables.setValue(707,array);
-		$gameVariables.setValue(706,[640-128,386,0,240]);//最後1で横範囲縮小
-		$gameSwitches.setValue(125,true);
+		var array = ['「スーっ…」', '「ン………」', '「ZZZ………」', '「スゥ──」'];//文字BGV
+		$gameVariables.setValue(707, array);
+		$gameVariables.setValue(706, [640 - 128, 386, 0, 240]);//最後1で横範囲縮小
+		$gameSwitches.setValue(125, true);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:516|ゴブリン姦Ⅰ
 	AGH_showPictureGoblinRape1 = function () {
-		var pictureId = valuePic1+10;//非表示状態
-		var scenePictureName = valueScenePic+'21';
-		$gameScreen.showPicture(pictureId,scenePictureName,1,640-128+50,384,100,100,0,0);
+		var pictureId = valuePic1 + 10;//非表示状態
+		var scenePictureName = valueScenePic + '21';
+		$gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128 + 50, 384, 100, 100, 0, 0);
 		//$gameScreen.movePicture(pictureId,1,640-128,384,100,100,255,0,60);
-		tachie_bless(pictureId,1);
+		tachie_bless(pictureId, 1);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:516|ゴブリン姦Ⅰ
 	AGH_showPictureGoblinRape1_2 = function () {
-		var pictureId = valuePic1+10;
-		var scenePictureName = valueScenePic+'21';
+		var pictureId = valuePic1 + 10;
+		var scenePictureName = valueScenePic + '21';
 		//$gameScreen.showPicture(pictureId,scenePictureName,1,640-128+50,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId,1,640-128,384,100,100,255,0,60);
-		tachie_bless(pictureId,2);
+		$gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
+		tachie_bless(pictureId, 2);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:519|ゴブリン姦Ⅳ
@@ -15594,67 +15734,67 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		var array = [];
 		htext_word(3);//3高2中1低
 		array = array.concat(valueHtextWord);
-		$gameVariables.setValue(707,array);
-		$gameVariables.setValue(706,[640-128,386,1,60,0,'eromangasimaji']);
-		$gameSwitches.setValue(125,true);
+		$gameVariables.setValue(707, array);
+		$gameVariables.setValue(706, [640 - 128, 386, 1, 60, 0, 'eromangasimaji']);
+		$gameSwitches.setValue(125, true);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:526|トロル姦
 	AGH_showPictureTrollRape = function () {
-		backGraund_menuMapSelect(2,0,0,0);
+		backGraund_menuMapSelect(2, 0, 0, 0);
 		valuePic1 = 51;
-		var pictureId = valuePic1+1;
-		var scenePictureName = valueScenePic+'01';
-		$gameScreen.showPicture(pictureId,scenePictureName,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId,1,640-128,384,100,100,255,0,60);
-		tachie_bless(pictureId,2);
+		var pictureId = valuePic1 + 1;
+		var scenePictureName = valueScenePic + '01';
+		$gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
+		tachie_bless(pictureId, 2);
 		//pic_move1(pictureId-1,0,0,100,100,0,90);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:526|トロル姦
 	AGH_showPictureScreenBlackOutTrollRape = function () {
 		var ScreenBlackOut = 'ScreenBlackOut';
-		$gameScreen.showPicture(60,ScreenBlackOut,1,640,384,100,100,255,0);
-		picture_fade1(51,"fadeIn",'Town014',180,5);
+		$gameScreen.showPicture(60, ScreenBlackOut, 1, 640, 384, 100, 100, 255, 0);
+		picture_fade1(51, "fadeIn", 'Town014', 180, 5);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:526|トロル姦
 	AGH_showPictureTrollRape_2 = function () {
-		backGraund_menuMapSelect(2,0,0,0);
+		backGraund_menuMapSelect(2, 0, 0, 0);
 		valuePic1 = 51;
-		var pictureId = valuePic1+1;
-		var scenePictureName = valueScenePic+'07';
-		$gameScreen.showPicture(pictureId,scenePictureName,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId,1,640-128,384,100,100,255,0,60);
-		tachie_bless(pictureId,2);
+		var pictureId = valuePic1 + 1;
+		var scenePictureName = valueScenePic + '07';
+		$gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
+		tachie_bless(pictureId, 2);
 		//pic_move1(pictureId-1,0,0,100,100,0,90);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:526|トロル姦
 	AGH_showPictureTrollRape_3 = function () {
-		backGraund_menuMapSelect(2,0,0,0);
+		backGraund_menuMapSelect(2, 0, 0, 0);
 		valuePic1 = 51;
-		var pictureId = valuePic1+2;
-		var scenePictureName = valueScenePic+'08';
-		$gameScreen.showPicture(pictureId,scenePictureName,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId,1,640-128,384,100,100,255,0,180);
-		tachie_bless(pictureId,2);
+		var pictureId = valuePic1 + 2;
+		var scenePictureName = valueScenePic + '08';
+		$gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 180);
+		tachie_bless(pictureId, 2);
 		//pic_move1(pictureId-1,0,0,100,100,0,240);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:530|試練の裏側
 	AGH_readVariableEventProgressHeroBehindTheTrial = function (interp) {
 		return (function () {
-		var variable530Value = $gameVariables.value(530);
-		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
-		event_respawnSetA(variable530Value,variable163Value[3],variable163Value[4],1,variable163Value[5]);
-		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		event._spriteOffsetX = -24;
-		this._eventId = $gameVariables.value(292)[variable530Value];
-		var variable530Value = 11;
-		event_respawnSetN(variable530Value,variable163Value[3]+1,variable163Value[4],2,'4Child',1,8);
-		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		event._spriteOffsetX = -24;
+			var variable530Value = $gameVariables.value(530);
+			var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+			event_respawnSetA(variable530Value, variable163Value[3], variable163Value[4], 1, variable163Value[5]);
+			var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+			event._spriteOffsetX = -24;
+			this._eventId = $gameVariables.value(292)[variable530Value];
+			var variable530Value = 11;
+			event_respawnSetN(variable530Value, variable163Value[3] + 1, variable163Value[4], 2, '4Child', 1, 8);
+			var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+			event._spriteOffsetX = -24;
 		}).call(interp);
 	};
 
@@ -15667,58 +15807,58 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 
 	// Replaces (1x): CommonEvents.json:common-event:530|試練の裏側
 	AGH_showPicturePictureParallelLoopBehindTheTrial = function () {
-		var pictureId = valuePic1+6;
-		var scenePictureName = valueScenePic+'12';
-		$gameScreen.showPicture(pictureId,scenePictureName,1,640-128,384,100,100,255,0);
-		pic_setArray1 = [1,pictureId,0,-15,0,20];
-		pic_setArray2 = [1,pictureId,0,0,3,30]; //pic_setArray2 = [1,0,0,0,0,0];
-		valueParallelPicSe1 = ['ZH_sticky4',20,60];
-		valueParallelPicSe2 = ['ZH_sticky4',20,60];
-		hcg_piston(pictureId,7,2,1);
-		$gameSwitches.setValue(429,true);
+		var pictureId = valuePic1 + 6;
+		var scenePictureName = valueScenePic + '12';
+		$gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128, 384, 100, 100, 255, 0);
+		pic_setArray1 = [1, pictureId, 0, -15, 0, 20];
+		pic_setArray2 = [1, pictureId, 0, 0, 3, 30]; //pic_setArray2 = [1,0,0,0,0,0];
+		valueParallelPicSe1 = ['ZH_sticky4', 20, 60];
+		valueParallelPicSe2 = ['ZH_sticky4', 20, 60];
+		hcg_piston(pictureId, 7, 2, 1);
+		$gameSwitches.setValue(429, true);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:530|試練の裏側
 	AGH_showPictureBehindTheTrial = function () {
-		var pictureId = valuePic1+7;
-		var scenePictureName = valueScenePic+'13';
-		$gameScreen.showPicture(pictureId,scenePictureName,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId,1,640-128,384,100,100,255,0,60);
-		tachie_bless(pictureId,2);
-		pic_move1(pictureId+4,0,0,100,100,0,90);
-		pic_move1(pictureId+5,0,0,100,100,0,90);
-		pic_move1(pictureId+6,0,0,100,100,0,90);
+		var pictureId = valuePic1 + 7;
+		var scenePictureName = valueScenePic + '13';
+		$gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
+		tachie_bless(pictureId, 2);
+		pic_move1(pictureId + 4, 0, 0, 100, 100, 0, 90);
+		pic_move1(pictureId + 5, 0, 0, 100, 100, 0, 90);
+		pic_move1(pictureId + 6, 0, 0, 100, 100, 0, 90);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:531|『わからせられ』
 	AGH_setVariableChoiceSwitch11Warakaserare = function () {
 		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
-		$gameVariables.setValue(171,[40,17,8]);
+		$gameVariables.setValue(171, [40, 17, 8]);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:531|『わからせられ』
 	AGH_readVariableEventProgressHeroWarakaserare = function (interp) {
 		return (function () {
-		var variable530Value = $gameVariables.value(530);
-		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
-		event_respawnSetA(variable530Value,17,8,1,8);
-		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+			var variable530Value = $gameVariables.value(530);
+			var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+			event_respawnSetA(variable530Value, 17, 8, 1, 8);
+			var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
 
-		var variable530Value = 11;
-		event_respawnSetN(variable530Value,17,6,0,'4Child',1,2);
-		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		this._eventId = $gameVariables.value(292)[variable530Value];
+			var variable530Value = 11;
+			event_respawnSetN(variable530Value, 17, 6, 0, '4Child', 1, 2);
+			var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+			this._eventId = $gameVariables.value(292)[variable530Value];
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:531|『わからせられ』
 	AGH_showPictureWarakaserare = function () {
 		valuePic1 = 51;
-		var pictureId = valuePic1+11;
-		var scenePictureName = valueScenePic+'11';
-		$gameScreen.showPicture(pictureId,scenePictureName,1,640-128-100,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId,1,640-128,384,100,100,255,0,60);
-		tachie_bless(pictureId,1);
+		var pictureId = valuePic1 + 11;
+		var scenePictureName = valueScenePic + '11';
+		$gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128 - 100, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
+		tachie_bless(pictureId, 1);
 		//pic_move1(pictureId-1,0,0,100,100,0,90);
 	};
 
@@ -15729,7 +15869,7 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		event.locate(19, 4);
 		event.setDirection(2);
 		event._spriteOffsetX = +24;
-		event.setFace(11,true,true);
+		event.setFace(11, true, true);
 		var variable530Value = 11;//$gameVariables.value(530);
 		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
 		event.locate(19, 5);
@@ -15751,52 +15891,54 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:531|『わからせられ』
 	AGH_movePictureWarakaserare = function () {
 		valueCharaWaitCount1 = 30;
-		valueCharaWaitCount2 = valuePic1+12;
+		valueCharaWaitCount2 = valuePic1 + 12;
 		valueCharaWaitCount3 = getRandomIndex(11) + valueCharaWaitCount1
-		if(!!$gameMap.event(1)) {
-		  $gameMap.event(1).forceMoveRoute({
-		  "list":[
-		    {"code":45,"parameters": ["if($gameScreen.picture(valueCharaWaitCount2)){$gameScreen.movePicture(valueCharaWaitCount2,1,640-128,384-15,100,100,250,0,valueCharaWaitCount3)};"]},
-		    {"code":15, "parameters":[valueCharaWaitCount3]},
-		    {"code":45,"parameters": ["if($gameScreen.picture(valueCharaWaitCount2)){$gameScreen.movePicture(valueCharaWaitCount2,1,640-128,384+5,100,100,0,0,valueCharaWaitCount3)};"]},
-		    {"code":15, "parameters":[valueCharaWaitCount3]},
-		  {"code":0}],"repeat":true,"skippable":true});
+		if (!!$gameMap.event(1)) {
+			$gameMap.event(1).forceMoveRoute({
+				"list": [
+					{ "code": 45, "parameters": ["if($gameScreen.picture(valueCharaWaitCount2)){$gameScreen.movePicture(valueCharaWaitCount2,1,640-128,384-15,100,100,250,0,valueCharaWaitCount3)};"] },
+					{ "code": 15, "parameters": [valueCharaWaitCount3] },
+					{ "code": 45, "parameters": ["if($gameScreen.picture(valueCharaWaitCount2)){$gameScreen.movePicture(valueCharaWaitCount2,1,640-128,384+5,100,100,0,0,valueCharaWaitCount3)};"] },
+					{ "code": 15, "parameters": [valueCharaWaitCount3] },
+					{ "code": 0 }], "repeat": true, "skippable": true
+			});
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:532|サンプル
 	AGH_movePictureSample = function () {
 		valueCharaWaitCount1 = 40;
-		valueCharaWaitCount2 = valuePic1+2;
-		if(!!$gameMap.event(1)) {
-		  $gameMap.event(1).forceMoveRoute({
-		  "list":[
-		    {"code":45,"parameters": ["valueCharaWaitCount3 = getRandomIndex(11) + valueCharaWaitCount1;"]},
-		    {"code":45,"parameters": ["if($gameScreen.picture(valueCharaWaitCount2)){$gameScreen.movePicture(valueCharaWaitCount2,1,640-128,384,100,100,250,0,valueCharaWaitCount3)};"]},
-		    {"code":15, "parameters":[valueCharaWaitCount3]},
-		    {"code":45,"parameters": ["if($gameScreen.picture(valueCharaWaitCount2)){$gameScreen.movePicture(valueCharaWaitCount2,1,640-128,384,100,100,0,0,valueCharaWaitCount3)};"]},
-		    {"code":15, "parameters":[valueCharaWaitCount3]},
-		  {"code":0}],"repeat":true,"skippable":true});
+		valueCharaWaitCount2 = valuePic1 + 2;
+		if (!!$gameMap.event(1)) {
+			$gameMap.event(1).forceMoveRoute({
+				"list": [
+					{ "code": 45, "parameters": ["valueCharaWaitCount3 = getRandomIndex(11) + valueCharaWaitCount1;"] },
+					{ "code": 45, "parameters": ["if($gameScreen.picture(valueCharaWaitCount2)){$gameScreen.movePicture(valueCharaWaitCount2,1,640-128,384,100,100,250,0,valueCharaWaitCount3)};"] },
+					{ "code": 15, "parameters": [valueCharaWaitCount3] },
+					{ "code": 45, "parameters": ["if($gameScreen.picture(valueCharaWaitCount2)){$gameScreen.movePicture(valueCharaWaitCount2,1,640-128,384,100,100,0,0,valueCharaWaitCount3)};"] },
+					{ "code": 15, "parameters": [valueCharaWaitCount3] },
+					{ "code": 0 }], "repeat": true, "skippable": true
+			});
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:536|メイドウェイトレス
 	AGH_playSeZClothesTakeOffMaidWaitress = function () {
-		tachie_dousa(2,1,0,14,1,255,1311,0,0);
-		tachie_dousa(2,1,0,14,1,255,1385,0,0);
-		tachie_dousa(0,1,1,14,15,0,120,0,0);
+		tachie_dousa(2, 1, 0, 14, 1, 255, 1311, 0, 0);
+		tachie_dousa(2, 1, 0, 14, 1, 255, 1385, 0, 0);
+		tachie_dousa(0, 1, 1, 14, 15, 0, 120, 0, 0);
 		var ZClothesTakeOff = 'Z_ClothesTakeOff';//ピッチ50か100。消去ウェイトで変更
-		AudioManager.playSe({"name":ZClothesTakeOff,"volume":150,"pitch":100,"pan":0});
+		AudioManager.playSe({ "name": ZClothesTakeOff, "volume": 150, "pitch": 100, "pan": 0 });
 		//tachie_clothReflect(1);//ｱｸﾀｰid
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:536|メイドウェイトレス
 	AGH_showPictureGoodsTea1 = function () {
 		valuePic1 = 55;
-		var value2 = 'Goods_Tea1_'+'00';
+		var value2 = 'Goods_Tea1_' + '00';
 		$gameScreen.setPicturesAnimation(2, 30, "連番", 60);
-		$gameScreen.showPicture(valuePic1,value2,1,640-128,384-20,100,100,0,0);
-		$gameScreen.movePicture(valuePic1,1,640-128,384,100,100,255,0,60);
+		$gameScreen.showPicture(valuePic1, value2, 1, 640 - 128, 384 - 20, 100, 100, 0, 0);
+		$gameScreen.movePicture(valuePic1, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:536|メイドウェイトレス
@@ -15809,18 +15951,18 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:536|メイドウェイトレス
 	AGH_movePicture1MaidWaitress = function () {
 		valuePic1 = 51;
-		var pictureId = valuePic1+1;
-		pic_move1(pictureId,0,0,100,100,0,90);
+		var pictureId = valuePic1 + 1;
+		pic_move1(pictureId, 0, 0, 100, 100, 0, 90);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:537|メイドウェイトレスご奉仕
 	AGH_showPictureXevS03601 = function () {
-		backGraund_menuMapSelect(2,0,0,0);
+		backGraund_menuMapSelect(2, 0, 0, 0);
 		valuePic1 = 51;
-		var pictureId = valuePic1+1;
+		var pictureId = valuePic1 + 1;
 		var XevS03601 = 'XevS036_01';
-		$gameScreen.showPicture(pictureId,XevS03601,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId,1,640-128,384,100,100,255,0,60);
+		$gameScreen.showPicture(pictureId, XevS03601, 1, 640 - 128, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
 		//tachie_bless(pictureId,2);
 		//pic_move1(pictureId-1,0,0,100,100,0,90);
 	};
@@ -15841,150 +15983,150 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:537|メイドウェイトレスご奉仕
 	AGH_showPictureScreenBlackOutMaidWaitressService = function () {
 		var ScreenBlackOut = 'ScreenBlackOut';
-		$gameScreen.showPicture(valuePic1,ScreenBlackOut,1,640,384,100,100,200,0);
-		picture_fade1(valuePic1,"fadeIn",valueWipeImg,60,5);
-		backGraund_menuMapSelect(2,0,0,0);
-		var pictureId = valuePic1+1;
-		pic_showMove1(pictureId,valueScenePic+'01',640-128,384,100,60,0,0);
+		$gameScreen.showPicture(valuePic1, ScreenBlackOut, 1, 640, 384, 100, 100, 200, 0);
+		picture_fade1(valuePic1, "fadeIn", valueWipeImg, 60, 5);
+		backGraund_menuMapSelect(2, 0, 0, 0);
+		var pictureId = valuePic1 + 1;
+		pic_showMove1(pictureId, valueScenePic + '01', 640 - 128, 384, 100, 60, 0, 0);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:537|メイドウェイトレスご奉仕
 	AGH_movePicture1MaidWaitressService = function () {
-		var pictureId = valuePic1+2;
-		pic_showMove1(pictureId,valueScenePic+'02',640-128,384,100,60,2,200);
-		tachie_bless(pictureId,2);
+		var pictureId = valuePic1 + 2;
+		pic_showMove1(pictureId, valueScenePic + '02', 640 - 128, 384, 100, 60, 2, 200);
+		tachie_bless(pictureId, 2);
 		//pic_move1(pictureId-1,0,0,100,100,0,90);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:540|
 	AGH_showPictureCommonEvent540 = function () {
-		var value1 = valuePic1+4;
-		var value2 = valueScenePic+'04';
-		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
-		var value1 = valuePic1+5;
-		var value2 = valueScenePic+'05';
-		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
+		var value1 = valuePic1 + 4;
+		var value2 = valueScenePic + '04';
+		$gameScreen.showPicture(value1, value2, 1, 640 - 128, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(value1, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
+		var value1 = valuePic1 + 5;
+		var value2 = valueScenePic + '05';
+		$gameScreen.showPicture(value1, value2, 1, 640 - 128, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(value1, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:540|
 	AGH_setSwitchPictureParallelLoop = function () {
-		pic_setArray1 = [1,valuePic1+5,0,-15,0,20];
-		pic_setArray2 = [1,valuePic1+5,0,0,3,30]; //pic_setArray2 = [1,0,0,0,0,0];
-		valueParallelPicSe1 = ['ZH_sticky4',80,60];
-		valueParallelPicSe2 = ['ZH_sticky4',80,60];
-		hcg_piston(valuePic1+5,7,2,1);
-		$gameSwitches.setValue(429,true);
+		pic_setArray1 = [1, valuePic1 + 5, 0, -15, 0, 20];
+		pic_setArray2 = [1, valuePic1 + 5, 0, 0, 3, 30]; //pic_setArray2 = [1,0,0,0,0,0];
+		valueParallelPicSe1 = ['ZH_sticky4', 80, 60];
+		valueParallelPicSe2 = ['ZH_sticky4', 80, 60];
+		hcg_piston(valuePic1 + 5, 7, 2, 1);
+		$gameSwitches.setValue(429, true);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:541|知らなかった『裏側』
 	AGH_showPictureGoodsDVD = function () {
 		valuePic1 = 55;
 		var GoodsDVD = 'Goods_DVD';
-		$gameScreen.showPicture(valuePic1,GoodsDVD,1,640-128,384-20,100,100,0,0);
-		$gameScreen.movePicture(valuePic1,1,640-128,384,100,100,255,0,60);
+		$gameScreen.showPicture(valuePic1, GoodsDVD, 1, 640 - 128, 384 - 20, 100, 100, 0, 0);
+		$gameScreen.movePicture(valuePic1, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:541|知らなかった『裏側』
 	AGH_showPictureDungeon12UnknownOtherSide = function () {
-		backGraund_menuMapSelect(2,0,0,0);//'Dungeon1_2'
+		backGraund_menuMapSelect(2, 0, 0, 0);//'Dungeon1_2'
 		valuePic1 = 51;
 		var value2 = 'ScreenBlackOut';
-		$gameScreen.showPicture(valuePic1,value2,1,640,384,100,100,200,0);
-		picture_fade1(valuePic1,"fadeIn",valueWipeImg,60,5);
-		var pictureId = valuePic1+1;
-		var value2 = valueScenePic+'01';
-		$gameScreen.showPicture(pictureId,value2,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId,1,640-128,384,100,100,255,0,60);
+		$gameScreen.showPicture(valuePic1, value2, 1, 640, 384, 100, 100, 200, 0);
+		picture_fade1(valuePic1, "fadeIn", valueWipeImg, 60, 5);
+		var pictureId = valuePic1 + 1;
+		var value2 = valueScenePic + '01';
+		$gameScreen.showPicture(pictureId, value2, 1, 640 - 128, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:541|知らなかった『裏側』
 	AGH_setSwitchPictureParallelLoopUnknownOtherSide = function () {
-		pic_setArray1 = [1,valuePic1+4,0,-30,0,20];
-		pic_setArray2 = [1,valuePic1+4,0,0,3,30]; //pic_setArray2 = [1,0,0,0,0,0];
-		valueParallelPicSe1 = [0,0,0];
-		valueParallelPicSe2 = [0,0,0];
-		hcg_piston(valuePic1+4,7,2,1);
-		$gameSwitches.setValue(429,true);
+		pic_setArray1 = [1, valuePic1 + 4, 0, -30, 0, 20];
+		pic_setArray2 = [1, valuePic1 + 4, 0, 0, 3, 30]; //pic_setArray2 = [1,0,0,0,0,0];
+		valueParallelPicSe1 = [0, 0, 0];
+		valueParallelPicSe2 = [0, 0, 0];
+		hcg_piston(valuePic1 + 4, 7, 2, 1);
+		$gameSwitches.setValue(429, true);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:541|知らなかった『裏側』
 	AGH_movePicture1UnknownOtherSide = function () {
-		var pictureId = valuePic1+1;
-		pic_move1(pictureId,0,0,100,100,0,90);
-		pic_move1(pictureId+1,0,0,100,100,0,90);
+		var pictureId = valuePic1 + 1;
+		pic_move1(pictureId, 0, 0, 100, 100, 0, 90);
+		pic_move1(pictureId + 1, 0, 0, 100, 100, 0, 90);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:542|街の物陰で…
 	AGH_setVariableChoiceSwitch11InCityShadows = function () {
 		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
-		$gameVariables.setValue(171,[41,variable163Value[3],variable163Value[4]]);
+		$gameVariables.setValue(171, [41, variable163Value[3], variable163Value[4]]);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:542|街の物陰で…
 	AGH_showPictureScreenBlackOutInCityShadows = function () {
-		backGraund_menuMapSelect(2,0,0,0);
+		backGraund_menuMapSelect(2, 0, 0, 0);
 		valuePic1 = 51;
 		valuePic2 = 71;
 		var value2 = 'ScreenBlackOut';
-		$gameScreen.showPicture(valuePic1,value2,1,640,384,100,100,200,0);
-		picture_fade1(valuePic1,"fadeIn",valueWipeImg,60,5);
-		var value2 = valueScenePic+'01';
-		$gameScreen.showPicture(valuePic2+1,value2,1,640+480,384-118,100,100,200,0);
-		$gameScreen.movePicture(valuePic2+1,1,640+480,384+50,100,100,255,0,240);
-		tachie_bless(valuePic2+1,2);
+		$gameScreen.showPicture(valuePic1, value2, 1, 640, 384, 100, 100, 200, 0);
+		picture_fade1(valuePic1, "fadeIn", valueWipeImg, 60, 5);
+		var value2 = valueScenePic + '01';
+		$gameScreen.showPicture(valuePic2 + 1, value2, 1, 640 + 480, 384 - 118, 100, 100, 200, 0);
+		$gameScreen.movePicture(valuePic2 + 1, 1, 640 + 480, 384 + 50, 100, 100, 255, 0, 240);
+		tachie_bless(valuePic2 + 1, 2);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:542|街の物陰で…
 	AGH_readVariableEventProgressHeroInCityShadows = function (interp) {
 		return (function () {
-		event_respawnSetN(11,35,6,1,'BB_akunin1',7,6);
-		var value1 = 11;//$gameVariables.value(530);
-		this._eventId = $gameVariables.value(292)[value1];
+			event_respawnSetN(11, 35, 6, 1, 'BB_akunin1', 7, 6);
+			var value1 = 11;//$gameVariables.value(530);
+			this._eventId = $gameVariables.value(292)[value1];
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:542|街の物陰で…
 	AGH_showPictureScreen1024FrameInCityShadows = function () {
-		var value2 = valueScenePic+'04_00';
+		var value2 = valueScenePic + '04_00';
 		$gameScreen.setPicturesAnimation(2, 10, "連番", 40);
-		$gameScreen.showPicture(valuePic1+1,value2,1,640-128,384-20,100,100,0,0);
-		$gameScreen.movePicture(valuePic1+1,1,640-128,384,100,100,255,0,60);
-		if($gameScreen.picture(valuePic1+1)){
-		  $gameScreen.picture(valuePic1+1).startAnimationFrame(3, true, [1,1,1,2]);
+		$gameScreen.showPicture(valuePic1 + 1, value2, 1, 640 - 128, 384 - 20, 100, 100, 0, 0);
+		$gameScreen.movePicture(valuePic1 + 1, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
+		if ($gameScreen.picture(valuePic1 + 1)) {
+			$gameScreen.picture(valuePic1 + 1).startAnimationFrame(3, true, [1, 1, 1, 2]);
 		};
 		var value2 = 'Screen1024Frame';
-		$gameScreen.showPicture(69,value2,1,640-78,384,100,100,255,0);
-		picture_fade1(69,"fadeIn",valueWipeImg,60,5);
+		$gameScreen.showPicture(69, value2, 1, 640 - 78, 384, 100, 100, 255, 0);
+		picture_fade1(69, "fadeIn", valueWipeImg, 60, 5);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:542|街の物陰で…
 	AGH_movePicture1InCityShadows = function () {
-		var value1 = valuePic1+1;
-		pic_move1(value1,0,0,100,100,0,60);
+		var value1 = valuePic1 + 1;
+		pic_move1(value1, 0, 0, 100, 100, 0, 60);
 		var value1 = 69;
-		pic_move1(value1,0,0,100,100,0,60);
+		pic_move1(value1, 0, 0, 100, 100, 0, 60);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:542|街の物陰で…
 	AGH_readVariableEventProgressHero_26 = function (interp) {
 		return (function () {
-		var variable292Value = $gameVariables.value(530);
-		var variable292Value = $gameVariables.value(292)[variable292Value];
-		drowsepost.camera.zoom(1, 60, this._eventId);
+			var variable292Value = $gameVariables.value(530);
+			var variable292Value = $gameVariables.value(292)[variable292Value];
+			drowsepost.camera.zoom(1, 60, this._eventId);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:543|愚鈍なる再会
 	AGH_readVariableEventProgressHeroFoolishReunion = function (interp) {
 		return (function () {
-		var variable530Value = $gameVariables.value(530);
-		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
-		event_respawnSetA(variable530Value,variable163Value[3],variable163Value[4],1,variable163Value[5]);
-		var variable530Value = 11;
-		event_respawnSetN(variable530Value,variable163Value[8],variable163Value[9],0,variable163Value[6],variable163Value[7],variable163Value[10]);
-		this._eventId = $gameVariables.value(292)[variable530Value];
+			var variable530Value = $gameVariables.value(530);
+			var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+			event_respawnSetA(variable530Value, variable163Value[3], variable163Value[4], 1, variable163Value[5]);
+			var variable530Value = 11;
+			event_respawnSetN(variable530Value, variable163Value[8], variable163Value[9], 0, variable163Value[6], variable163Value[7], variable163Value[10]);
+			this._eventId = $gameVariables.value(292)[variable530Value];
 		}).call(interp);
 	};
 
@@ -15992,37 +16134,37 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_showPictureZXMain04006 = function () {
 		valuePic1 = 51;
 		var ZXMain04006 = 'ZX_Main040_06';
-		$gameScreen.showPicture(valuePic1,ZXMain04006,1,640,384,100,100,250,0);
-		picture_fade1(51,"fadeIn",'150',60,5);
+		$gameScreen.showPicture(valuePic1, ZXMain04006, 1, 640, 384, 100, 100, 250, 0);
+		picture_fade1(51, "fadeIn", '150', 60, 5);
 	};
 
 	// Replaces (2x): CommonEvents.json:common-event:543|愚鈍なる再会, CommonEvents.json:common-event:545|チンピラ団員達と…
 	AGH_showPictureDungeon12FoolishReunion = function () {
-		backGraund_menuMapSelect(2,0,0,0);//'Dungeon1_2'
+		backGraund_menuMapSelect(2, 0, 0, 0);//'Dungeon1_2'
 		valuePic1 = 51;
 		var ScreenBlackOut = 'ScreenBlackOut';
-		$gameScreen.showPicture(valuePic1,ScreenBlackOut,1,640,384,100,100,200,0);
-		picture_fade1(valuePic1,"fadeIn",valueWipeImg,60,5);
+		$gameScreen.showPicture(valuePic1, ScreenBlackOut, 1, 640, 384, 100, 100, 200, 0);
+		picture_fade1(valuePic1, "fadeIn", valueWipeImg, 60, 5);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:543|愚鈍なる再会
 	AGH_showPictureFoolishReunion = function () {
 		$gameScreen.setPicturesAnimation(2, 10, "連番", 20);
-		var pictureId = valuePic1+1;
-		var scenePictureName = valueScenePic+'01_00';
-		$gameScreen.showPicture(pictureId,scenePictureName,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId,1,640-128,384,100,100,255,0,60);
-		if($gameScreen.picture(pictureId)){
-		  $gameScreen.picture(pictureId).startAnimationFrame(1, true, [1,1,1,2]);
+		var pictureId = valuePic1 + 1;
+		var scenePictureName = valueScenePic + '01_00';
+		$gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
+		if ($gameScreen.picture(pictureId)) {
+			$gameScreen.picture(pictureId).startAnimationFrame(1, true, [1, 1, 1, 2]);
 		};
-		tachie_bless(pictureId,2);
+		tachie_bless(pictureId, 2);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:543|愚鈍なる再会
 	AGH_runScriptFoolishReunion = function () {
-		var pictureId = valuePic1+1;
-		picture_fade1(pictureId,"fadeOut",valueWipeImg,60,5);
-		picture_fade1(51,"fadeOut",valueWipeImg,60,5);
+		var pictureId = valuePic1 + 1;
+		picture_fade1(pictureId, "fadeOut", valueWipeImg, 60, 5);
+		picture_fade1(51, "fadeOut", valueWipeImg, 60, 5);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:543|愚鈍なる再会
@@ -16042,39 +16184,39 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 
 	// Replaces (1x): CommonEvents.json:common-event:543|愚鈍なる再会
 	AGH_showPictureDungeon12_2 = function () {
-		backGraund_menuMapSelect(2,0,0,0);//'Dungeon1_2'
+		backGraund_menuMapSelect(2, 0, 0, 0);//'Dungeon1_2'
 		valuePic1 = 51;
 		var value2 = 'ScreenBlackOut';
-		$gameScreen.showPicture(valuePic1,value2,1,640,384,100,100,200,0);
-		picture_fade1(valuePic1,"fadeIn",valueWipeImg,60,5);
-		var pictureId = valuePic1+2;
-		var value2 = valueScenePic+'02';
-		$gameScreen.showPicture(pictureId,value2,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId,1,640-128,384,100,100,255,0,60);
+		$gameScreen.showPicture(valuePic1, value2, 1, 640, 384, 100, 100, 200, 0);
+		picture_fade1(valuePic1, "fadeIn", valueWipeImg, 60, 5);
+		var pictureId = valuePic1 + 2;
+		var value2 = valueScenePic + '02';
+		$gameScreen.showPicture(pictureId, value2, 1, 640 - 128, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:543|愚鈍なる再会
 	AGH_showPictureFoolishReunion_2 = function () {
-		var value1 = valuePic1+3;
-		var value2 = valueScenePic+'03';
-		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
-		hcg_piston(valuePic1+3,7,1,2);
-		var value1 = valuePic1+5;
-		var value2 = valueScenePic+'04';
-		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
-		tachie_bless(value1,2);
+		var value1 = valuePic1 + 3;
+		var value2 = valueScenePic + '03';
+		$gameScreen.showPicture(value1, value2, 1, 640 - 128, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(value1, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
+		hcg_piston(valuePic1 + 3, 7, 1, 2);
+		var value1 = valuePic1 + 5;
+		var value2 = valueScenePic + '04';
+		$gameScreen.showPicture(value1, value2, 1, 640 - 128, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(value1, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
+		tachie_bless(value1, 2);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:543|愚鈍なる再会
 	AGH_movePicture1FoolishReunion = function () {
-		var value1 = valuePic1+3;
-		pic_move1(value1,0,0,100,100,0,90);
-		var value1 = valuePic1+4;
-		pic_move1(value1,0,0,100,100,0,90);
-		var value1 = valuePic1+5;
-		pic_move1(value1,0,0,100,100,0,90);
+		var value1 = valuePic1 + 3;
+		pic_move1(value1, 0, 0, 100, 100, 0, 90);
+		var value1 = valuePic1 + 4;
+		pic_move1(value1, 0, 0, 100, 100, 0, 90);
+		var value1 = valuePic1 + 5;
+		pic_move1(value1, 0, 0, 100, 100, 0, 90);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:543|愚鈍なる再会
@@ -16101,64 +16243,64 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 
 	// Replaces (1x): CommonEvents.json:common-event:544|チャラ団員と…
 	AGH_showPictureXevS044 = function () {
-		backGraund_menuMapSelect(2,0,0,0);
+		backGraund_menuMapSelect(2, 0, 0, 0);
 		valuePic1 = 51;
 		valuePic2 = 71;
 		valueScenePic = 'XevS044_';
 		var ScreenBlackOut = 'ScreenBlackOut';
-		$gameScreen.showPicture(valuePic1,ScreenBlackOut,1,640,384,100,100,150,0);
-		picture_fade1(valuePic1,"fadeIn",valueWipeImg,60,5);
+		$gameScreen.showPicture(valuePic1, ScreenBlackOut, 1, 640, 384, 100, 100, 150, 0);
+		picture_fade1(valuePic1, "fadeIn", valueWipeImg, 60, 5);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:544|チャラ団員と…
 	AGH_showPictureWithGangMember = function () {
-		var pictureId = valuePic2+3;
-		var scenePictureName = valueScenePic+'03_00';
+		var pictureId = valuePic2 + 3;
+		var scenePictureName = valueScenePic + '03_00';
 		$gameScreen.setPicturesAnimation(3, 10, "連番", 20);
-		$gameScreen.showPicture(pictureId,scenePictureName,1,640+480+50,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId,1,640+480,384,100,100,255,0,60);
-		if($gameScreen.picture(pictureId)){
-		  $gameScreen.picture(pictureId).startAnimationFrame(1, true, [1,1,1,2]);
+		$gameScreen.showPicture(pictureId, scenePictureName, 1, 640 + 480 + 50, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 1, 640 + 480, 384, 100, 100, 255, 0, 60);
+		if ($gameScreen.picture(pictureId)) {
+			$gameScreen.picture(pictureId).startAnimationFrame(1, true, [1, 1, 1, 2]);
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:544|チャラ団員と…
 	AGH_showPictureWithGangMember_2 = function () {
-		var pictureId = valuePic2+2;
-		var scenePictureName = valueScenePic+'02';
-		$gameScreen.showPicture(pictureId,scenePictureName,1,640+480+50,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId,1,640+480,384,100,100,255,0,60);
-		tachie_bless(pictureId,2);
-		pic_move1(pictureId-1,0,0,100,100,0,90);
+		var pictureId = valuePic2 + 2;
+		var scenePictureName = valueScenePic + '02';
+		$gameScreen.showPicture(pictureId, scenePictureName, 1, 640 + 480 + 50, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 1, 640 + 480, 384, 100, 100, 255, 0, 60);
+		tachie_bless(pictureId, 2);
+		pic_move1(pictureId - 1, 0, 0, 100, 100, 0, 90);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:544|チャラ団員と…
 	AGH_movePicture1WithGangMember = function () {
-		var value1 = valuePic2+3;
-		pic_move1(value1-1,0,0,100,100,0,90);
-		var value1 = valuePic2+2;
-		pic_move1(value1-1,0,0,100,100,0,90);
+		var value1 = valuePic2 + 3;
+		pic_move1(value1 - 1, 0, 0, 100, 100, 0, 90);
+		var value1 = valuePic2 + 2;
+		pic_move1(value1 - 1, 0, 0, 100, 100, 0, 90);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:544|チャラ団員と…
 	AGH_showPictureScreen1024FrameWithGangMember = function () {
 		var value2 = 'Screen1024Frame';
-		$gameScreen.showPicture(valuePic2,value2,1,640-78,384,100,100,255,0);
-		picture_fade1(valuePic2,"fadeIn",valueWipeImg,60,5);
-		var value2 = valueScenePic+'05';
-		$gameScreen.showPicture(valuePic1+1,value2,1,640-128,384-20,100,100,0,0);
-		$gameScreen.movePicture(valuePic1+1,1,640-128,384,100,100,255,0,60);
+		$gameScreen.showPicture(valuePic2, value2, 1, 640 - 78, 384, 100, 100, 255, 0);
+		picture_fade1(valuePic2, "fadeIn", valueWipeImg, 60, 5);
+		var value2 = valueScenePic + '05';
+		$gameScreen.showPicture(valuePic1 + 1, value2, 1, 640 - 128, 384 - 20, 100, 100, 0, 0);
+		$gameScreen.movePicture(valuePic1 + 1, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:545|チンピラ団員達と…
 	AGH_readVariableEventProgressHeroWithPunks = function (interp) {
 		return (function () {
-		var variable530Value = $gameVariables.value(530);
-		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
-		event_respawnSetA(variable530Value,9,12,1,8);
-		this._eventId = $gameVariables.value(292)[variable530Value];
-		var variable530Value = 11;
-		event_respawnSetN(variable530Value,9,11,0,variable163Value[6],variable163Value[7],2);
+			var variable530Value = $gameVariables.value(530);
+			var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
+			event_respawnSetA(variable530Value, 9, 12, 1, 8);
+			this._eventId = $gameVariables.value(292)[variable530Value];
+			var variable530Value = 11;
+			event_respawnSetN(variable530Value, 9, 11, 0, variable163Value[6], variable163Value[7], 2);
 		}).call(interp);
 	};
 
@@ -16166,74 +16308,74 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_readVariableEventProgressHero_29 = function () {
 		var variable530Value = $gameVariables.value(530);
 		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		event._priorityType = 0;event._spriteOffsetY = +12;
-		event.locate(19, 5);event.setDirection(2);
+		event._priorityType = 0; event._spriteOffsetY = +12;
+		event.locate(19, 5); event.setDirection(2);
 		var variable530Value = 11;
 		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		event._priorityType = 2;event._spriteOffsetY = -12;
-		event.locate(19, 6);event.setDirection(8);
+		event._priorityType = 2; event._spriteOffsetY = -12;
+		event.locate(19, 6); event.setDirection(8);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:545|チンピラ団員達と…
 	AGH_readVariableDynamicEventIdWithPunks = function () {
 		var value1 = 12;
 		var event = $gameMap.event($gameVariables.value(292)[value1]);
-		event.locate(20, 5);event.setDirection(4);
+		event.locate(20, 5); event.setDirection(4);
 		var value1 = 13;
 		var event = $gameMap.event($gameVariables.value(292)[value1]);
-		event.locate(18, 5);event.setDirection(6);
+		event.locate(18, 5); event.setDirection(6);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:545|チンピラ団員達と…
 	AGH_showPictureWithPunks = function () {
-		var value1 = valuePic1+1;
-		var value2 = valueScenePic+'01';
-		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
-		var value1 = valuePic1+2;
-		var value2 = valueScenePic+'02';
-		$gameScreen.showPicture(value1,value2,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(value1,1,640-128,384,100,100,255,0,60);
-		tachie_bless(value1,2);
+		var value1 = valuePic1 + 1;
+		var value2 = valueScenePic + '01';
+		$gameScreen.showPicture(value1, value2, 1, 640 - 128, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(value1, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
+		var value1 = valuePic1 + 2;
+		var value2 = valueScenePic + '02';
+		$gameScreen.showPicture(value1, value2, 1, 640 - 128, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(value1, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
+		tachie_bless(value1, 2);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:545|チンピラ団員達と…
 	AGH_showPicturePictureParallelLoopWithPunks = function () {
-		var pictureId = valuePic1+4;
-		var scenePictureName = valueScenePic+'03';
-		$gameScreen.showPicture(pictureId,scenePictureName,1,640-128,384,100,100,255,0);
-		pic_setArray1 = [1,pictureId,15,-15,0,20];
-		pic_setArray2 = [1,pictureId,0,0,3,30]; //pic_setArray2 = [1,0,0,0,0,0];
-		valueParallelPicSe1 = ['ZH_sticky4',10,10];
-		valueParallelPicSe2 = [0,0,0];
-		hcg_piston(pictureId,4,1,1);
-		$gameSwitches.setValue(429,true);
+		var pictureId = valuePic1 + 4;
+		var scenePictureName = valueScenePic + '03';
+		$gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128, 384, 100, 100, 255, 0);
+		pic_setArray1 = [1, pictureId, 15, -15, 0, 20];
+		pic_setArray2 = [1, pictureId, 0, 0, 3, 30]; //pic_setArray2 = [1,0,0,0,0,0];
+		valueParallelPicSe1 = ['ZH_sticky4', 10, 10];
+		valueParallelPicSe2 = [0, 0, 0];
+		hcg_piston(pictureId, 4, 1, 1);
+		$gameSwitches.setValue(429, true);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:545|チンピラ団員達と…
 	AGH_movePicture1WithPunks = function () {
-		var value1 = valuePic1+2;
-		pic_move1(value1-1,0,0,100,100,0,90);
-		var value1 = valuePic1+3;
-		pic_move1(value1-1,0,0,100,100,0,90);
+		var value1 = valuePic1 + 2;
+		pic_move1(value1 - 1, 0, 0, 100, 100, 0, 90);
+		var value1 = valuePic1 + 3;
+		pic_move1(value1 - 1, 0, 0, 100, 100, 0, 90);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:546|獣欲の暴走、一生の懊悩と後悔
 	AGH_movePicture1BeastDesireRampage = function () {
 		var pictureId = valuePic1;
-		pic_move1(pictureId,0,0,100,100,0,90);
-		pic_move1(pictureId+1,0,0,100,100,0,90);
+		pic_move1(pictureId, 0, 0, 100, 100, 0, 90);
+		pic_move1(pictureId + 1, 0, 0, 100, 100, 0, 90);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:546|獣欲の暴走、一生の懊悩と後悔
 	AGH_setSelfSwitchDynamicEventIdBeastDesireRampage = function () {
 		var variable530Value = $gameVariables.value(530);
-		event_respawnSetA(variable530Value,19,5,0,2);
+		event_respawnSetA(variable530Value, 19, 5, 0, 2);
 		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
 		event._priorityType = 0;
 		event._spriteOffsetY = +12
 		var variable530Value = 11;
-		event_respawnSetN(variable530Value,19,6,0,'npcOrder2',4,8);
+		event_respawnSetN(variable530Value, 19, 6, 0, 'npcOrder2', 4, 8);
 		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
 		event._priorityType = 2;
 		event._spriteOffsetY = -12;
@@ -16242,10 +16384,10 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 
 	// Replaces (1x): CommonEvents.json:common-event:546|獣欲の暴走、一生の懊悩と後悔
 	AGH_spawnMapEventNpcOrder2 = function () {
-		event_respawnSetN(12,17,6,0,'npcOrder2',5,6);
-		event_respawnSetN(13,20,7,0,'npcOrder2',6,8);
-		event_respawnSetN(14,18,8,0,'npcOrder2',7,2);
-		$gameMap.spawnEvent(244,17, 18, true);
+		event_respawnSetN(12, 17, 6, 0, 'npcOrder2', 5, 6);
+		event_respawnSetN(13, 20, 7, 0, 'npcOrder2', 6, 8);
+		event_respawnSetN(14, 18, 8, 0, 'npcOrder2', 7, 2);
+		$gameMap.spawnEvent(244, 17, 18, true);
 		$gameMap.darknessOpacity = 150;
 	};
 
@@ -16256,34 +16398,35 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		var arr3 = [`アンっ\\I[12]`];
 		var variable292Value = 1;//$gameVariables.value(530);
 		var variable292Value = $gameVariables.value(292)[variable292Value];
-		chara_oneWord(100,variable292Value,25,180,array,arr2,arr3,0);
+		chara_oneWord(100, variable292Value, 25, 180, array, arr2, arr3, 0);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:546|獣欲の暴走、一生の懊悩と後悔
 	AGH_readVariableDynamicEventIdBeastDesireRampage = function (interp) {
 		return (function () {
-		for (var i = 11; i <= 14; i++) {
-		  var variable292Value = $gameVariables.value(292)[i]; //this._eventId
-		  if(!!$gameMap.event(variable292Value)) {
-		    var event = $gameMap.event(variable292Value);
-		    event.setOpacity(0);
-		}};
+			for (var i = 11; i <= 14; i++) {
+				var variable292Value = $gameVariables.value(292)[i]; //this._eventId
+				if (!!$gameMap.event(variable292Value)) {
+					var event = $gameMap.event(variable292Value);
+					event.setOpacity(0);
+				}
+			};
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:547|リゾート休暇で限界突破！
 	AGH_erasePicturesResortBreakthrough = function () {
 		var pictureId = valuePic1;
-		pic_eraseP(0,[pictureId+1,pictureId+2,pictureId+3]);
+		pic_eraseP(0, [pictureId + 1, pictureId + 2, pictureId + 3]);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:547|リゾート休暇で限界突破！
 	AGH_showPictureResortBreakthrough = function () {
-		backGraund_menuMapSelect(2,0,0,0);
-		var pictureId = valuePic1+4;
-		var scenePictureName = valueScenePic+'04';
-		$gameScreen.showPicture(pictureId,scenePictureName,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId,1,640-128,384,100,100,255,0,60);
+		backGraund_menuMapSelect(2, 0, 0, 0);
+		var pictureId = valuePic1 + 4;
+		var scenePictureName = valueScenePic + '04';
+		$gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
 		//tachie_bless(pictureId,2);
 		//pic_move1(pictureId-1,0,0,100,100,0,90);
 	};
@@ -16291,38 +16434,38 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:547|リゾート休暇で限界突破！
 	AGH_readVariableEventProgressHeroResortBreakthrough = function (interp) {
 		return (function () {
-		var variable530Value = $gameVariables.value(530);
-		event_respawnSetA(variable530Value,34,6,1,2);
-		this._eventId = $gameVariables.value(292)[variable530Value];
-		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		this._spriteOffsetY = +12;
-		var variable530Value = 11;
-		event_respawnSetN(variable530Value,34,7,0,'npcUnique2',0,8);
-		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		this._spriteOffsetY = -12;
+			var variable530Value = $gameVariables.value(530);
+			event_respawnSetA(variable530Value, 34, 6, 1, 2);
+			this._eventId = $gameVariables.value(292)[variable530Value];
+			var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+			this._spriteOffsetY = +12;
+			var variable530Value = 11;
+			event_respawnSetN(variable530Value, 34, 7, 0, 'npcUnique2', 0, 8);
+			var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+			this._spriteOffsetY = -12;
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:552|モニカ娼婦デビュー
 	AGH_readVariableEventProgressHeroMonicaProstituteDebut = function (interp) {
 		return (function () {
-		var variable530Value = $gameVariables.value(530);
-		event_respawnSetA(variable530Value,7,9,1);
-		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		event.setDirection(6);
-		this._eventId = $gameVariables.value(292)[variable530Value];
+			var variable530Value = $gameVariables.value(530);
+			event_respawnSetA(variable530Value, 7, 9, 1);
+			var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
+			event.setDirection(6);
+			this._eventId = $gameVariables.value(292)[variable530Value];
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:552|モニカ娼婦デビュー
 	AGH_readVariableEventProgressHero_30 = function (interp) {
 		return (function () {
-		var value1 = 1;//$gameVariables.value(530);
-		event_respawnSetA(value1,35,9,1);
-		var event = $gameMap.event($gameVariables.value(292)[value1]);
-		event.setDirection(4);
-		this._eventId = $gameVariables.value(292)[value1];
-		drowsepost.camera.zoom(1, 60, this._eventId);
+			var value1 = 1;//$gameVariables.value(530);
+			event_respawnSetA(value1, 35, 9, 1);
+			var event = $gameMap.event($gameVariables.value(292)[value1]);
+			event.setDirection(4);
+			this._eventId = $gameVariables.value(292)[value1];
+			drowsepost.camera.zoom(1, 60, this._eventId);
 		}).call(interp);
 	};
 
@@ -16340,34 +16483,34 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_readVariableEventProgressHero_31 = function () {
 		var variable530Value = $gameVariables.value(530);
 		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		event.locate(3, 7);event.setDirection(6);
+		event.locate(3, 7); event.setDirection(6);
 		var variable530Value = 11;//$gameVariables.value(530);
 		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
-		event.locate(4, 7);event.setDirection(4);
+		event.locate(4, 7); event.setDirection(4);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:552|モニカ娼婦デビュー
 	AGH_showPictureScreenBlackOutMonicaProstituteDebut = function () {
 		valuePic1 = 55;
 		var value2 = 'ScreenBlackOut';
-		$gameScreen.showPicture(valuePic1-1,value2,1,640,384,100,100,200,0);
-		picture_fade1(valuePic1-1,"fadeIn",valueWipeImg,60,5);
+		$gameScreen.showPicture(valuePic1 - 1, value2, 1, 640, 384, 100, 100, 200, 0);
+		picture_fade1(valuePic1 - 1, "fadeIn", valueWipeImg, 60, 5);
 		$gameScreen.setPicturesAnimation(2, 10, "連番", 20);
 		valueScenePic = 'XevS011_';
-		var value2 = valueScenePic+'01';
-		$gameScreen.showPicture(valuePic1,value2,1,640-128,384+50,100,100,0,0);
-		$gameScreen.movePicture(valuePic1,1,640-128,384,100,100,255,0,60);
-		hcg_piston(valuePic1,5,3,2);
-		$gameScreen.picture(valuePic1).startAnimationFrame(1, false, [1,1,1,2]);
+		var value2 = valueScenePic + '01';
+		$gameScreen.showPicture(valuePic1, value2, 1, 640 - 128, 384 + 50, 100, 100, 0, 0);
+		$gameScreen.movePicture(valuePic1, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
+		hcg_piston(valuePic1, 5, 3, 2);
+		$gameScreen.picture(valuePic1).startAnimationFrame(1, false, [1, 1, 1, 2]);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:552|モニカ娼婦デビュー
 	AGH_readVariableDynamicEventIdMonicaProstituteDebut = function () {
 		var value1 = 11;
-		event_respawnSetN(value1,3,11,1,'2_1',2);
+		event_respawnSetN(value1, 3, 11, 1, '2_1', 2);
 		var event = $gameMap.event($gameVariables.value(292)[value1]);
 		event.setDirection(2);
-		event_doorOpenClose(1,3);
+		event_doorOpenClose(1, 3);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:552|モニカ娼婦デビュー
@@ -16381,7 +16524,7 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_readVariableEventProgressHero_32 = function () {
 		var variable530Value = $gameVariables.value(530);
 		var variable163Value = $gameVariables.value(163)[$gameVariables.value(535)];
-		event_respawnSetA(variable530Value,15,4,0);
+		event_respawnSetA(variable530Value, 15, 4, 0);
 		var event = $gameMap.event($gameVariables.value(292)[variable530Value]);
 		event.setImage(variable163Value[1], variable163Value[2]);
 		event.setDirection(2);
@@ -16389,176 +16532,176 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 
 	// Replaces (1x): CommonEvents.json:common-event:571|マッサージⅠ
 	AGH_showPictureMassage1 = function () {
-		backGraund_menuMapSelect(2,0,0,0);
+		backGraund_menuMapSelect(2, 0, 0, 0);
 		valuePic1 = 51;
-		var pictureId = valuePic1+1;
-		var scenePictureName = valueScenePic+'01';
-		$gameScreen.showPicture(pictureId,scenePictureName,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId,1,640-128,384,100,100,255,0,60);
-		tachie_bless(pictureId,1);
+		var pictureId = valuePic1 + 1;
+		var scenePictureName = valueScenePic + '01';
+		$gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
+		tachie_bless(pictureId, 1);
 		//pic_move1(pictureId-1,0,0,100,100,0,90);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:571|マッサージⅠ
 	AGH_setSwitchPictureParallelLoopMassage1 = function () {
-		var pictureId = valuePic1+4;
-		pic_setArray1 = [1,pictureId,0,-30,5,60];
-		pic_setArray2 = [1,pictureId,0,30,3,40]; //pic_setArray2 = [1,0,0,0,0,0];
-		valueParallelPicSe1 = [0,0,0];
-		valueParallelPicSe2 = [0,0,0];
-		hcg_piston(pictureId,7,2,1);
-		$gameSwitches.setValue(429,true);
+		var pictureId = valuePic1 + 4;
+		pic_setArray1 = [1, pictureId, 0, -30, 5, 60];
+		pic_setArray2 = [1, pictureId, 0, 30, 3, 40]; //pic_setArray2 = [1,0,0,0,0,0];
+		valueParallelPicSe1 = [0, 0, 0];
+		valueParallelPicSe2 = [0, 0, 0];
+		hcg_piston(pictureId, 7, 2, 1);
+		$gameSwitches.setValue(429, true);
 	};
 
 	// Replaces (2x): CommonEvents.json:common-event:572|マッサージⅡ, CommonEvents.json:common-event:573|マッサージⅢ
 	AGH_showPictureMassage2 = function () {
-		backGraund_menuMapSelect(2,0,0,0);
+		backGraund_menuMapSelect(2, 0, 0, 0);
 		valuePic1 = 51;
-		var pictureId = valuePic1+1;
-		var scenePictureName = valueScenePic+'01';
-		$gameScreen.showPicture(pictureId,scenePictureName,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId,1,640-128,384,100,100,255,0,60);
+		var pictureId = valuePic1 + 1;
+		var scenePictureName = valueScenePic + '01';
+		$gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
 		//tachie_bless(pictureId,1);
 		//pic_move1(pictureId-1,0,0,100,100,0,90);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:572|マッサージⅡ
 	AGH_showPictureMassage2_2 = function () {
-		var pictureId = valuePic1+2;
-		var scenePictureName = valueScenePic+'02';
-		$gameScreen.showPicture(pictureId,scenePictureName,1,640-128,384+50,100,100,0,0);
-		$gameScreen.movePicture(pictureId,1,640-128,384,100,100,255,0,60);
-		tachie_bless(pictureId,1);
+		var pictureId = valuePic1 + 2;
+		var scenePictureName = valueScenePic + '02';
+		$gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128, 384 + 50, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
+		tachie_bless(pictureId, 1);
 		//pic_move1(pictureId-1,0,0,100,100,0,90);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:572|マッサージⅡ
 	AGH_showPictureMassage2_3 = function () {
-		var pictureId = valuePic1+4;
-		var scenePictureName = valueScenePic+'04';
-		$gameScreen.showPicture(pictureId,scenePictureName,1,640-128,384+50,100,100,0,0);
-		$gameScreen.movePicture(pictureId,1,640-128,384,100,100,255,0,60);
-		tachie_bless(pictureId,1);
-		pic_move1(pictureId-2,0,0,100,100,0,90);
+		var pictureId = valuePic1 + 4;
+		var scenePictureName = valueScenePic + '04';
+		$gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128, 384 + 50, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
+		tachie_bless(pictureId, 1);
+		pic_move1(pictureId - 2, 0, 0, 100, 100, 0, 90);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:572|マッサージⅡ
 	AGH_showPictureMassage2_4 = function () {
-		var pictureId = valuePic1+5;
-		var scenePictureName = valueScenePic+'05';
-		$gameScreen.showPicture(pictureId,scenePictureName,1,640-128,384-100,100,100,0,0);
-		$gameScreen.movePicture(pictureId,1,640-128,384,100,100,255,0,60);
-		hcg_piston(pictureId,7,1,2);
+		var pictureId = valuePic1 + 5;
+		var scenePictureName = valueScenePic + '05';
+		$gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128, 384 - 100, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
+		hcg_piston(pictureId, 7, 1, 2);
 		//pic_move1(pictureId-1,0,0,100,100,0,90);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:572|マッサージⅡ
 	AGH_showPictureMassage2_5 = function () {
-		var pictureId = valuePic1+7;
-		var scenePictureName = valueScenePic+'06';
-		$gameScreen.showPicture(pictureId,scenePictureName,1,640-128,384-100,100,100,0,0);
-		$gameScreen.movePicture(pictureId,1,640-128,384,100,100,255,0,60);
-		hcg_piston(pictureId,7,1,2);
-		pic_move1(pictureId-2,0,0,100,100,0,90);
+		var pictureId = valuePic1 + 7;
+		var scenePictureName = valueScenePic + '06';
+		$gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128, 384 - 100, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
+		hcg_piston(pictureId, 7, 1, 2);
+		pic_move1(pictureId - 2, 0, 0, 100, 100, 0, 90);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:572|マッサージⅡ
 	AGH_movePicture1Massage2 = function () {
-		var value1 = valuePic1+7;
-		pic_move1(value1,0,0,100,100,0,90);
-		var value1 = valuePic1+6;
-		pic_move1(value1,0,0,100,100,0,90);
+		var value1 = valuePic1 + 7;
+		pic_move1(value1, 0, 0, 100, 100, 0, 90);
+		var value1 = valuePic1 + 6;
+		pic_move1(value1, 0, 0, 100, 100, 0, 90);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:572|マッサージⅡ
 	AGH_showPictureMassage2_6 = function () {
-		var pictureId = valuePic1+2;
-		var scenePictureName = valueScenePic+'07';
-		$gameScreen.showPicture(pictureId,scenePictureName,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId,1,640-128,384,100,100,255,0,60);
-		tachie_bless(pictureId,1);
-		pic_move1(pictureId+2,0,0,100,100,0,90);
+		var pictureId = valuePic1 + 2;
+		var scenePictureName = valueScenePic + '07';
+		$gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
+		tachie_bless(pictureId, 1);
+		pic_move1(pictureId + 2, 0, 0, 100, 100, 0, 90);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:572|マッサージⅡ
 	AGH_showPictureMassage2_7 = function () {
 		$gameScreen.setPicturesAnimation(2, 10, "連番", 30);
-		var pictureId = valuePic1+8;
-		var scenePictureName = valueScenePic+'08_00';
-		$gameScreen.showPicture(pictureId,scenePictureName,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId,1,640-128,384,100,100,255,0,60);
+		var pictureId = valuePic1 + 8;
+		var scenePictureName = valueScenePic + '08_00';
+		$gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:572|マッサージⅡ
 	AGH_showPictureMassage2_8 = function () {
-		var pictureId = valuePic1+1;
-		var scenePictureName = valueScenePic+'01';
-		$gameScreen.showPicture(pictureId,scenePictureName,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId,1,640-128,384,100,100,255,0,60);
+		var pictureId = valuePic1 + 1;
+		var scenePictureName = valueScenePic + '01';
+		$gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
 		//tachie_bless(pictureId,1);
 		//pic_move1(pictureId-1,0,0,100,100,0,90);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:573|マッサージⅢ
 	AGH_showPictureMassage3 = function () {
-		var pictureId = valuePic1+4;
-		var scenePictureName = valueScenePic+'04_00';
+		var pictureId = valuePic1 + 4;
+		var scenePictureName = valueScenePic + '04_00';
 		$gameScreen.setPicturesAnimation(2, 10, "連番", 20);
-		$gameScreen.showPicture(pictureId,scenePictureName,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId,1,640-128,384,100,100,255,0,60);
-		tachie_bless(pictureId,2);
-		pic_move1(pictureId-1,0,0,100,100,0,90);
+		$gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
+		tachie_bless(pictureId, 2);
+		pic_move1(pictureId - 1, 0, 0, 100, 100, 0, 90);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:573|マッサージⅢ
 	AGH_erasePicturesMassage3 = function () {
-		sex_direction(99,0,0);
-		var pictureId = valuePic1+4;
-		pic_eraseP(0,[pictureId,pictureId-1]);
+		sex_direction(99, 0, 0);
+		var pictureId = valuePic1 + 4;
+		pic_eraseP(0, [pictureId, pictureId - 1]);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:573|マッサージⅢ
 	AGH_showPictureScreenBlackOutMassage3 = function () {
-		backGraund_menuMapSelect(2,0,0,0);
+		backGraund_menuMapSelect(2, 0, 0, 0);
 		valuePic1 = 55;
 		valuePic2 = 71;
 		var ScreenBlackOut = 'ScreenBlackOut';
-		$gameScreen.showPicture(51,ScreenBlackOut,1,640,384,100,100,150,0);
-		picture_fade1(51,"fadeIn",valueWipeImg,60,5);
+		$gameScreen.showPicture(51, ScreenBlackOut, 1, 640, 384, 100, 100, 150, 0);
+		picture_fade1(51, "fadeIn", valueWipeImg, 60, 5);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:573|マッサージⅢ
 	AGH_showPictureMassage3_2 = function () {
-		var pictureId = valuePic1+1;
-		var scenePictureName = valueScenePic+'91';
-		$gameScreen.showPicture(pictureId,scenePictureName,1,640-128,384-20,100,100,0,0);
-		$gameScreen.movePicture(pictureId,1,640-128,384,100,100,255,0,60);
+		var pictureId = valuePic1 + 1;
+		var scenePictureName = valueScenePic + '91';
+		$gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128, 384 - 20, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
 		//hcg_piston(pictureId,5,1,2);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:573|マッサージⅢ
 	AGH_setSwitchNonHSceneBGVStartMassage3 = function () {
-		var array = ['（グルルゥ──）','（ググゥ…）','（グゥ～～）'];//文字BGV
-		$gameVariables.setValue(707,array);
-		$gameVariables.setValue(706,[640-128,386,0,180,0,0]);
-		$gameSwitches.setValue(125,true);
+		var array = ['（グルルゥ──）', '（ググゥ…）', '（グゥ～～）'];//文字BGV
+		$gameVariables.setValue(707, array);
+		$gameVariables.setValue(706, [640 - 128, 386, 0, 180, 0, 0]);
+		$gameSwitches.setValue(125, true);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:573|マッサージⅢ
 	AGH_showPictureMassage3_3 = function () {
-		var pictureId = valuePic1+2;
-		var scenePictureName = valueScenePic+'92';
-		$gameScreen.showPicture(pictureId,scenePictureName,1,640-128,384,100,100,0,0);
-		$gameScreen.movePicture(pictureId,1,640-128,384,100,100,255,0,60);
+		var pictureId = valuePic1 + 2;
+		var scenePictureName = valueScenePic + '92';
+		$gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
 		//hcg_piston(pictureId,5,1,2);
-		pic_move1(pictureId-1,0,0,100,100,0,90);
+		pic_move1(pictureId - 1, 0, 0, 100, 100, 0, 90);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:573|マッサージⅢ
 	AGH_showPictureMassage3_4 = function () {
-		var pictureId = valuePic1+3;
-		var scenePictureName = valueScenePic+'93';
-		$gameScreen.showPicture(pictureId,scenePictureName,1,640-128,384,100,100,250,0);
+		var pictureId = valuePic1 + 3;
+		var scenePictureName = valueScenePic + '93';
+		$gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128, 384, 100, 100, 250, 0);
 		//hcg_piston(pictureId,5,1,2);
 		//pic_move1(pictureId-1,0,0,100,100,0,90);
 	};
@@ -16586,14 +16729,14 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): CommonEvents.json:common-event:576|娼婦Debut!
 	AGH_readVariableDynamicEventIdProstituteDebut = function (interp) {
 		return (function () {
-		var array = [];
-		array.push($gameVariables.value(292)[11]);
-		event_NpcCharaMoveId(39,0,array);
-		//1下移動16下向く39透明化
-		//event_partyCharaMove(45,"this.turnTowardCharacter($gameMap.event("+value1+"));");
-		//event_partyCharaMove(45,"UP: 10;"); //"UP: 10;"
-		//event_partyCharaMove(45,"this.requestBalloon(1);");
-		//event_partyCharaMove(45,"this.requestAnimation(617);");
+			var array = [];
+			array.push($gameVariables.value(292)[11]);
+			event_NpcCharaMoveId(39, 0, array);
+			//1下移動16下向く39透明化
+			//event_partyCharaMove(45,"this.turnTowardCharacter($gameMap.event("+value1+"));");
+			//event_partyCharaMove(45,"UP: 10;"); //"UP: 10;"
+			//event_partyCharaMove(45,"this.requestBalloon(1);");
+			//event_partyCharaMove(45,"this.requestAnimation(617);");
 		}).call(interp);
 	};
 
@@ -16601,19 +16744,19 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_computeFloorProstituteDebut = function () {
 		i1 = getRandomIndex(10) + 11;//人数
 		i2 = getRandomIndex(10) + 11;//膣回数
-		i3 = Math.floor( Math.random() * -5) + i1;//中だし回数
+		i3 = Math.floor(Math.random() * -5) + i1;//中だし回数
 		i4 = getRandomIndex(5) + 1;//アナル回数
 		i5 = getRandomIndex(1) + i4;//中だし回数
 		i6 = getRandomIndex(5) + 6;//フェラ回数
-		i7 = Math.floor( Math.random() * -2) + i4;//口腔回数
+		i7 = Math.floor(Math.random() * -2) + i4;//口腔回数
 		i8 = getRandomIndex(3) + 0;//失禁回数
 	};
 
 	// Replaces (1x): Map003.json:event:4|ドロップ宝箱|page:3
 	AGH_gainItemDropChest = function () {
-		var array = [6,7,6,6,6,7,6,7,6,6,8,6,6];
+		var array = [6, 7, 6, 6, 6, 7, 6, 7, 6, 6, 8, 6, 6];
 		var value2 = array[getRandomIndex(array.length)];
-		gacha_naiyou(3,value2);
+		gacha_naiyou(3, value2);
 		$gameParty.gainItem(valueItems[valueGachaId], 1);
 		var value2 = `\\C[24]\x1bI[${valueItems[valueGachaId].iconIndex}]${valueItems[valueGachaId].name}\\C[0]を入手した！`
 		$gameScreen.setDTextPicture(value2, 28);
@@ -16621,9 +16764,9 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 
 	// Replaces (1x): Map003.json:event:4|ドロップ宝箱|page:4
 	AGH_gainItemDropChest_2 = function () {
-		var array = [8,9,8,9,8,8,10,9,8,8];
+		var array = [8, 9, 8, 9, 8, 8, 10, 9, 8, 8];
 		var value2 = array[getRandomIndex(array.length)];
-		gacha_naiyou(3,value2);
+		gacha_naiyou(3, value2);
 		$gameParty.gainItem(valueItems[valueGachaId], 1);
 		var value2 = `\\C[24]\x1bI[${valueItems[valueGachaId].iconIndex}]${valueItems[valueGachaId].name}\\C[0]を入手した！`
 		$gameScreen.setDTextPicture(value2, 28);
@@ -16631,85 +16774,85 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 
 	// Replaces (1x): Map003.json:event:19|小銭|page:1
 	AGH_setVariableRandomWork2SmallChange = function () {
-		$gameVariables.setValue(22,3);
+		$gameVariables.setValue(22, 3);
 		var randomIndex = getRandomIndex(91) + 10;
-		$gameVariables.setValue(23,randomIndex);
+		$gameVariables.setValue(23, randomIndex);
 	};
 
 	// Replaces (1x): Map003.json:event:20|罠コモン|page:1
 	AGH_setVariableDynamicEventIdTrapCommon = function () {
-		$gameVariables.setValue(292,Array(21).fill(0));
+		$gameVariables.setValue(292, Array(21).fill(0));
 		var playerRealX = $gamePlayer._realX;
 		var playerRealY = $gamePlayer._realY;
 		//if($gamePlayer.direction() == 2){playerRealY += 1};
 		//if($gamePlayer.direction() == 4){playerRealX -= 1};
 		//if($gamePlayer.direction() == 6){playerRealX += 1};
 		//if($gamePlayer.direction() == 8){playerRealY -= 1};
-		goodsEvent_respawn(0,'Goods8',6,8,2,playerRealX,playerRealY);
+		goodsEvent_respawn(0, 'Goods8', 6, 8, 2, playerRealX, playerRealY);
 	};
 
 	// Replaces (1x): Map003.json:event:20|罠コモン|page:1
 	AGH_particleSetOrbC = function (interp) {
 		return (function () {
-		var value1 = 'orb_c';
-		$gameScreen._particle.particleSet(this._eventId,value1+'-'+this._eventId,'this',value1,'above');
-		var value1 = 'orb_c'+'-'+this._eventId;
-		$gameScreen._particle.particleUpdate([value1,'color','#ff00f7','#ffffff']);
-		//$gameScreen._particle.particleUpdate([value1,'pos',0,-35]);
+			var value1 = 'orb_c';
+			$gameScreen._particle.particleSet(this._eventId, value1 + '-' + this._eventId, 'this', value1, 'above');
+			var value1 = 'orb_c' + '-' + this._eventId;
+			$gameScreen._particle.particleUpdate([value1, 'color', '#ff00f7', '#ffffff']);
+			//$gameScreen._particle.particleUpdate([value1,'pos',0,-35]);
 		}).call(interp);
 	};
 
 	// Replaces (1x): Map003.json:event:42|固有素材2|page:1
 	AGH_stopMapPlayerMovementUniqueMaterial2 = function () {
-		if(!$gameParty.inBattle()){$gameTemp.stopMapPlayerMovement()};
-		if(!$gameParty.inBattle()){$gameTemp.stopMapEventMovement()};
+		if (!$gameParty.inBattle()) { $gameTemp.stopMapPlayerMovement() };
+		if (!$gameParty.inBattle()) { $gameTemp.stopMapEventMovement() };
 	};
 
 	// Replaces (1x): Map003.json:event:42|固有素材2|page:1
 	AGH_setSelfSwitchTrueHeroId = function (interp) {
 		return (function () {
-		var id = 794;//匠掘りスキル
-		if($gameActors.actor($gameVariables.value(2)).isLearnedSkill(id)){
-		  var array = [1,2];
-		  var randomIndex = array[getRandomIndex(array.length)];
-		    if(randomIndex == 2){
-		      $gameSelfSwitches.setValue([$gameMap.mapId(), this._eventId, 'B'], true);
-		    };
-		} else {
-		  $gameSelfSwitches.setValue([$gameMap.mapId(), this._eventId, 'B'], true);
-		};
+			var id = 794;//匠掘りスキル
+			if ($gameActors.actor($gameVariables.value(2)).isLearnedSkill(id)) {
+				var array = [1, 2];
+				var randomIndex = array[getRandomIndex(array.length)];
+				if (randomIndex == 2) {
+					$gameSelfSwitches.setValue([$gameMap.mapId(), this._eventId, 'B'], true);
+				};
+			} else {
+				$gameSelfSwitches.setValue([$gameMap.mapId(), this._eventId, 'B'], true);
+			};
 		}).call(interp);
 	};
 
 	// Replaces (1x): Map003.json:event:42|固有素材2|page:1
 	AGH_clearParticleGoodsShine2 = function (interp) {
 		return (function () {
-		if($gameSelfSwitches.value([$gameMap.mapId(), this._eventId, 'B'])){
-		  var value1 = 'goods_shine2'+'-'+this._eventId;
-		  $gameScreen._particle.particleClear(value1);
-		};
+			if ($gameSelfSwitches.value([$gameMap.mapId(), this._eventId, 'B'])) {
+				var value1 = 'goods_shine2' + '-' + this._eventId;
+				$gameScreen._particle.particleClear(value1);
+			};
 		}).call(interp);
 	};
 
 	// Replaces (1x): Map003.json:event:42|固有素材2|page:1
 	AGH_pluginCommandShowInfo = function (interp) {
 		return (function () {
-		var messageText = `採掘が出来そうな岩石だった…。`;
-		var args = new Array( String(messageText) ); 
-		this.pluginCommand("ShowInfo", args);
+			var messageText = `採掘が出来そうな岩石だった…。`;
+			var args = new Array(String(messageText));
+			this.pluginCommand("ShowInfo", args);
 		}).call(interp);
 	};
 
 	// Replaces (1x): Map003.json:event:47|魚|page:1
 	AGH_setupChild = function (interp) {
 		return (function () {
-		var randomIndex = getRandomIndex(11) + 5;
-		var value2 = getRandomIndex(11) + 5;
-		var value3 = getRandomIndex(11) + 10;
-		var value4 = getRandomIndex(5) + 1;
-		var value5 = getRandomIndex(5) + 6;
-		common_script1(26,this._eventId,value5,5,0,randomIndex,value2,value3,value4,255);
-		this.setupChild($dataCommonEvents[64].list, 0);
+			var randomIndex = getRandomIndex(11) + 5;
+			var value2 = getRandomIndex(11) + 5;
+			var value3 = getRandomIndex(11) + 10;
+			var value4 = getRandomIndex(5) + 1;
+			var value5 = getRandomIndex(5) + 6;
+			common_script1(26, this._eventId, value5, 5, 0, randomIndex, value2, value3, value4, 255);
+			this.setupChild($dataCommonEvents[64].list, 0);
 		}).call(interp);
 	};
 
@@ -16721,62 +16864,64 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): Map003.json:event:69|EV069|page:1
 	AGH_readMapEventMetaNpcSpawnEventId = function (interp) {
 		return (function () {
-		var value1 = 77;
-		var args = new Array(String(value1),"1","0","3","1","1");
-		this.pluginCommand("ERS_MAKE_TEMPLATE_RANDOM", args);
-		var args = new Array("286");
-		this.pluginCommand("ERS_GET_LAST_SPAWN_EVENT_ID", args);
-		var variable286Value = $gameVariables.value(286);
-		if($gameMap.event(variable286Value).event().meta['座標']){
-		this.character(variable286Value).locate(Number($gameMap.event(variable286Value).event().meta['座標'].split(',')[0]), Number($gameMap.event(variable286Value).event().meta['座標'].split(',')[1]));this.character(variable286Value).setDirection(0);
-		};
+			var value1 = 77;
+			var args = new Array(String(value1), "1", "0", "3", "1", "1");
+			this.pluginCommand("ERS_MAKE_TEMPLATE_RANDOM", args);
+			var args = new Array("286");
+			this.pluginCommand("ERS_GET_LAST_SPAWN_EVENT_ID", args);
+			var variable286Value = $gameVariables.value(286);
+			if ($gameMap.event(variable286Value).event().meta['座標']) {
+				this.character(variable286Value).locate(Number($gameMap.event(variable286Value).event().meta['座標'].split(',')[0]), Number($gameMap.event(variable286Value).event().meta['座標'].split(',')[1])); this.character(variable286Value).setDirection(0);
+			};
 		}).call(interp);
 	};
 
 	// Replaces (1x): Map003.json:event:69|EV069|page:1
 	AGH_readMapEventMetaNpcSpawnEventIdEv069 = function (interp) {
 		return (function () {
-		var list = [81,82,83];
-		list.forEach(function(id) {
-		var value1 = id;
-		var args = new Array(String(value1),"1","0","3","1","1");
-		this.pluginCommand("ERS_MAKE_TEMPLATE_RANDOM", args);
-		var args = new Array("286");
-		this.pluginCommand("ERS_GET_LAST_SPAWN_EVENT_ID", args);
-		var variable286Value = $gameVariables.value(286);
-		if($gameMap.event(variable286Value).event().meta['座標']){
-		this.character(variable286Value).locate(Number($gameMap.event(variable286Value).event().meta['座標'].split(',')[0]), Number($gameMap.event(variable286Value).event().meta['座標'].split(',')[1]));this.character(variable286Value).setDirection(0);
-		}}, this);
+			var list = [81, 82, 83];
+			list.forEach(function (id) {
+				var value1 = id;
+				var args = new Array(String(value1), "1", "0", "3", "1", "1");
+				this.pluginCommand("ERS_MAKE_TEMPLATE_RANDOM", args);
+				var args = new Array("286");
+				this.pluginCommand("ERS_GET_LAST_SPAWN_EVENT_ID", args);
+				var variable286Value = $gameVariables.value(286);
+				if ($gameMap.event(variable286Value).event().meta['座標']) {
+					this.character(variable286Value).locate(Number($gameMap.event(variable286Value).event().meta['座標'].split(',')[0]), Number($gameMap.event(variable286Value).event().meta['座標'].split(',')[1])); this.character(variable286Value).setDirection(0);
+				}
+			}, this);
 		}).call(interp);
 	};
 
 	// Replaces (1x): Map003.json:event:69|EV069|page:1
 	AGH_readMapEventMetaNpcSpawnEventIdERSMAKETEMPLATERANDOM = function (interp) {
 		return (function () {
-		var list = [73,74,75,78];
-		list.forEach(function(id) {
-		var value1 = id;
-		var args = new Array(String(value1),"1","0","3","1","1");
-		this.pluginCommand("ERS_MAKE_TEMPLATE_RANDOM", args);
-		var args = new Array("286");
-		this.pluginCommand("ERS_GET_LAST_SPAWN_EVENT_ID", args);
-		var variable286Value = $gameVariables.value(286);
-		if($gameMap.event(variable286Value).event().meta['座標']){
-		this.character(variable286Value).locate(Number($gameMap.event(variable286Value).event().meta['座標'].split(',')[0]), Number($gameMap.event(variable286Value).event().meta['座標'].split(',')[1]));this.character(variable286Value).setDirection(0);
-		}}, this);
+			var list = [73, 74, 75, 78];
+			list.forEach(function (id) {
+				var value1 = id;
+				var args = new Array(String(value1), "1", "0", "3", "1", "1");
+				this.pluginCommand("ERS_MAKE_TEMPLATE_RANDOM", args);
+				var args = new Array("286");
+				this.pluginCommand("ERS_GET_LAST_SPAWN_EVENT_ID", args);
+				var variable286Value = $gameVariables.value(286);
+				if ($gameMap.event(variable286Value).event().meta['座標']) {
+					this.character(variable286Value).locate(Number($gameMap.event(variable286Value).event().meta['座標'].split(',')[0]), Number($gameMap.event(variable286Value).event().meta['座標'].split(',')[1])); this.character(variable286Value).setDirection(0);
+				}
+			}, this);
 		}).call(interp);
 	};
 
 	// Replaces (1x): Map003.json:event:82|EV082|page:1
 	AGH_setSelfVariableRandomWork1Ev082 = function (interp) {
 		return (function () {
-		$gameVariables.setValue(22,`＜獲得アイテム一覧＞\n`);
-		$gameVariables.setValue(23,0);
-		$gameSwitches.setValue(380,true);
-		this.sVal(21,0);
-		for (var i = 1; i <= 10; i++) {
-		item_gacha();
-		};
+			$gameVariables.setValue(22, `＜獲得アイテム一覧＞\n`);
+			$gameVariables.setValue(23, 0);
+			$gameSwitches.setValue(380, true);
+			this.sVal(21, 0);
+			for (var i = 1; i <= 10; i++) {
+				item_gacha();
+			};
 		}).call(interp);
 	};
 
@@ -16793,61 +16938,64 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_gainItemChestRareSlotEv113 = function () {
 		var value1 = 2;//種別
 		var value2 = 21;//ID全体攻撃の腕輪
-		var array = [0,0,0,value1,value2];
-		if(Number(array[3]) == 0){var valueItems = $dataItems}; 
-		if(Number(array[3]) == 1){var valueItems = $dataWeapons}; 
-		if(Number(array[3]) == 2){var valueItems = $dataArmors};
+		var array = [0, 0, 0, value1, value2];
+		if (Number(array[3]) == 0) { var valueItems = $dataItems };
+		if (Number(array[3]) == 1) { var valueItems = $dataWeapons };
+		if (Number(array[3]) == 2) { var valueItems = $dataArmors };
 		$gameParty.gainItem(valueItems[Number(array[4])], 1);
 		var value1 = `\\C[24]\x1bI[${valueItems[Number(arr1[4])].iconIndex}]${valueItems[Number(arr1[4])].name}\\C[0]を入手した！`;
 		var value2 = 28;
 		$gameScreen.setDTextPicture(value1, value2);
-		$gameSwitches.setValue(439,true);
+		$gameSwitches.setValue(439, true);
 	};
 
 	// Replaces (1x): Map003.json:event:113|EV113|page:1
 	AGH_gainItemChestRareSlotTchestOnly = function () {
 		var variable240Value = $dataItems[$gameVariables.value(240)].meta['TchestOnly'].split(',');
-		if(Number(variable240Value[3]) == 0){var valueItems = $dataItems}; 
-		if(Number(variable240Value[3]) == 1){var valueItems = $dataWeapons}; 
-		if(Number(variable240Value[3]) == 2){var valueItems = $dataArmors};
+		if (Number(variable240Value[3]) == 0) { var valueItems = $dataItems };
+		if (Number(variable240Value[3]) == 1) { var valueItems = $dataWeapons };
+		if (Number(variable240Value[3]) == 2) { var valueItems = $dataArmors };
 		$gameParty.gainItem(valueItems[Number(variable240Value[4])], 1);
 		var messageText = `\\C[24]\x1bI[${valueItems[Number(variable240Value[4])].iconIndex}]${valueItems[Number(variable240Value[4])].name}\\C[0]を入手した！`;
 		var value2 = 28;
 		$gameScreen.setDTextPicture(messageText, value2);
-		$gameSwitches.setValue(439,true);
+		$gameSwitches.setValue(439, true);
 	};
 
 	// Replaces (1x): Map003.json:event:131|ワープスポット|page:1
 	AGH_setSelfSwitchWarpPoint = function (interp) {
 		return (function () {
-		var arr3 = [$gameMap.mapId(),$gameMap.event(this._eventId).x,$gameMap.event(this._eventId).y];
-		for (var i = 1; i <= 9; i++) {
-		  if($dataItems[$gameVariables.value(240)].meta['warpPoint' + i]){
-		    var itemMeta = $dataItems[$gameVariables.value(240)].meta['warpPoint' + i].split(',');
-		    var array = [Number(itemMeta[0]),Number(itemMeta[1]),Number(itemMeta[2])];
-		    if(array[0] == arr3[0] && array[1] == arr3[1] && array[2] == arr3[2]){
-		      $gameVariables.value(211)[$gameVariables.value(240)][i] = 1;
-		      $gameSelfSwitches.setValue([$gameMap.mapId(), this._eventId, 'A'], true);
-		      var value4 = `ワープポイント[${i}]がアクティベートされました。`;   
-		      $gameScreen.setDTextPicture(messageText, 28);$gameSwitches.setValue(380,true);
-		      break;
-		}}};
+			var arr3 = [$gameMap.mapId(), $gameMap.event(this._eventId).x, $gameMap.event(this._eventId).y];
+			for (var i = 1; i <= 9; i++) {
+				if ($dataItems[$gameVariables.value(240)].meta['warpPoint' + i]) {
+					var itemMeta = $dataItems[$gameVariables.value(240)].meta['warpPoint' + i].split(',');
+					var array = [Number(itemMeta[0]), Number(itemMeta[1]), Number(itemMeta[2])];
+					if (array[0] == arr3[0] && array[1] == arr3[1] && array[2] == arr3[2]) {
+						$gameVariables.value(211)[$gameVariables.value(240)][i] = 1;
+						$gameSelfSwitches.setValue([$gameMap.mapId(), this._eventId, 'A'], true);
+						var value4 = `ワープポイント[${i}]がアクティベートされました。`;
+						$gameScreen.setDTextPicture(messageText, 28); $gameSwitches.setValue(380, true);
+						break;
+					}
+				}
+			};
 		}).call(interp);
 	};
 
 	// Replaces (1x): Map003.json:event:133|EV133|page:1
 	AGH_setDTextPictureTemporarySwitch = function (interp) {
 		return (function () {
-		for (var i = 1; i <= 100; i++) {
-		  if($gameVariables.value(327)[i] >= 2){
-		    $gameVariables.value(327)[i] = 1;
-		}};
-		var variable230Value = $dataWeapons[$gameVariables.value(230)].name;
-		$gameVariables.value(327)[$gameVariables.value(230)] = 2;
-		$gameSelfSwitches.setValue([$gameMap.mapId(), this._eventId, 'A'], true);
-		var messageText = `<${variable230Value}>拠点がアクティベートされました。`;   
-		$gameScreen.setDTextPicture(messageText, 28);
-		$gameSwitches.setValue(380,true);
+			for (var i = 1; i <= 100; i++) {
+				if ($gameVariables.value(327)[i] >= 2) {
+					$gameVariables.value(327)[i] = 1;
+				}
+			};
+			var variable230Value = $dataWeapons[$gameVariables.value(230)].name;
+			$gameVariables.value(327)[$gameVariables.value(230)] = 2;
+			$gameSelfSwitches.setValue([$gameMap.mapId(), this._eventId, 'A'], true);
+			var messageText = `<${variable230Value}>拠点がアクティベートされました。`;
+			$gameScreen.setDTextPicture(messageText, 28);
+			$gameSwitches.setValue(380, true);
 		}).call(interp);
 	};
 
@@ -16855,60 +17003,65 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_readVariableBaseActivation = function () {
 		var value2 = 0;
 		for (var i = 1; i <= 100; i++) {
-		  if($gameVariables.value(327)[i] == 2){
-		    var value2 = 1;
-		}};
-		if(value2 == 0){
-		  $gameVariables.value(327)[$gameVariables.value(319)] = 2;
+			if ($gameVariables.value(327)[i] == 2) {
+				var value2 = 1;
+			}
+		};
+		if (value2 == 0) {
+			$gameVariables.value(327)[$gameVariables.value(319)] = 2;
 		};
 	};
 
 	// Replaces (1x): Map003.json:event:133|EV133|page:2
 	AGH_setVariableTextWorkEv133 = function () {
 		for (var i = 1; i <= 100; i++) {
-		  if($gameVariables.value(327)[i] >= 2){
-		    $gameVariables.setValue(801,`帰還先:${$dataWeapons[i].name}`);
-		    break;
-		}};
+			if ($gameVariables.value(327)[i] >= 2) {
+				$gameVariables.setValue(801, `帰還先:${$dataWeapons[i].name}`);
+				break;
+			}
+		};
 	};
 
 	// Replaces (1x): Map003.json:event:133|EV133|page:2
 	AGH_setSwitchMainQuestProgress = function () {
-		if($gameVariables.value(135) >= 1){
-		  $gameSwitches.setValue(162,true);//時間経過可能
+		if ($gameVariables.value(135) >= 1) {
+			$gameSwitches.setValue(162, true);//時間経過可能
 		};
-		if($gameSwitches.value(34)){
-		  $gameSwitches.setValue(163,true);//周回可能
+		if ($gameSwitches.value(34)) {
+			$gameSwitches.setValue(163, true);//周回可能
 		};
 	};
 
 	// Replaces (1x): Map003.json:event:133|EV133|page:2
 	AGH_setSwitchEv133 = function () {
 		for (var i = 501; i <= 600; i++) {
-		  if($gameParty.hasItem($dataItems[i])){
-		    $gameSwitches.setValue(164,true);//シーン回想
-		}};
+			if ($gameParty.hasItem($dataItems[i])) {
+				$gameSwitches.setValue(164, true);//シーン回想
+			}
+		};
 		for (var i = 401; i <= 500; i++) {
-		  if($gameParty.hasItem($dataItems[i])){
-		    $gameSwitches.setValue(165,true);//挿話回想
-		}};
+			if ($gameParty.hasItem($dataItems[i])) {
+				$gameSwitches.setValue(165, true);//挿話回想
+			}
+		};
 	};
 
 	// Replaces (1x): Map003.json:event:133|EV133|page:2
 	AGH_setSwitchTrueHeroIdEv133 = function () {
 		var actor = $gameActors.actor($gameVariables.value(2));
-		if(actor.isLearnedSkill(791)){
-		  $gameSwitches.setValue(167,true);//錬金実行
+		if (actor.isLearnedSkill(791)) {
+			$gameSwitches.setValue(167, true);//錬金実行
 		};
 	};
 
 	// Replaces (1x): Map003.json:event:133|EV133|page:2
 	AGH_readVariableBaseActivationEv133 = function () {
 		for (var i = 1; i <= 100; i++) {
-		  if($gameVariables.value(327)[i] >= 2){
-		    var value1 = i;
-		    break;
-		}};
+			if ($gameVariables.value(327)[i] >= 2) {
+				var value1 = i;
+				break;
+			}
+		};
 		valueCountSet1 = value1;
 	};
 
@@ -16921,24 +17074,24 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 
 	// Replaces (1x): Map003.json:event:133|EV133|page:2
 	AGH_setVariableDynamicEventIdEv133 = function () {
-		$gameVariables.setValue(292,Array(21).fill(0));
+		$gameVariables.setValue(292, Array(21).fill(0));
 		var playerRealX = $gamePlayer._realX;
 		var playerRealY = $gamePlayer._realY;
-		if($gamePlayer.direction() == 2){playerRealY += 1};
-		if($gamePlayer.direction() == 4){playerRealX -= 1};
-		if($gamePlayer.direction() == 6){playerRealX += 1};
-		if($gamePlayer.direction() == 8){playerRealY -= 1};
-		goodsEvent_respawn(0,'Goods4',6,6,2,playerRealX,playerRealY);
+		if ($gamePlayer.direction() == 2) { playerRealY += 1 };
+		if ($gamePlayer.direction() == 4) { playerRealX -= 1 };
+		if ($gamePlayer.direction() == 6) { playerRealX += 1 };
+		if ($gamePlayer.direction() == 8) { playerRealY -= 1 };
+		goodsEvent_respawn(0, 'Goods4', 6, 6, 2, playerRealX, playerRealY);
 	};
 
 	// Replaces (1x): Map003.json:event:145|EV145教会処理|page:1
 	AGH_configureMapEventEv145ChurchProcessing = function (interp) {
 		return (function () {
-		var event = $gameMap.event(this._eventId).x;
-		var value2 = $gameMap.event(this._eventId).y;
-		var event = this.character(-1);
-		event.locate(event, value2+2);
-		event.setDirection(8);
+			var event = $gameMap.event(this._eventId).x;
+			var value2 = $gameMap.event(this._eventId).y;
+			var event = this.character(-1);
+			event.locate(event, value2 + 2);
+			event.setDirection(8);
 		}).call(interp);
 	};
 
@@ -16949,36 +17102,40 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 
 	// Replaces (1x): Map003.json:event:161|EV161|page:1
 	AGH_setSwitchTemporarySwitchEv161 = function () {
-		$gameSwitches.setValue(380,false);
-		for (var i = 1; i <= $dataItems.length-1; i++) {
-		  if(!$dataItems[i].name == '') {
-		    if($dataItems[i].meta['EICSwitch']) {
-		      if(Number($dataItems[i].meta['EICSwitch']) == 108) {
-		          if($gameParty.hasItem($dataItems[i]) && !$dataItems[i].meta['singleQuestIncidence']){
-		            $gameSwitches.setValue(380,true);
-		            break;
-		}}}}};
+		$gameSwitches.setValue(380, false);
+		for (var i = 1; i <= $dataItems.length - 1; i++) {
+			if (!$dataItems[i].name == '') {
+				if ($dataItems[i].meta['EICSwitch']) {
+					if (Number($dataItems[i].meta['EICSwitch']) == 108) {
+						if ($gameParty.hasItem($dataItems[i]) && !$dataItems[i].meta['singleQuestIncidence']) {
+							$gameSwitches.setValue(380, true);
+							break;
+						}
+					}
+				}
+			}
+		};
 	};
 
 	// Replaces (1x): Map003.json:event:161|EV161|page:1
 	AGH_erasePictureEv161 = function () {
-		for(var i = 101; i <= 250; i++){$gameScreen.erasePicture(i)}
+		for (var i = 101; i <= 250; i++) { $gameScreen.erasePicture(i) }
 	};
 
 	// Replaces (1x): Map003.json:event:166|EV166シングルクエスト受注|page:2
 	AGH_eventQuestSet = function (interp) {
 		return (function () {
-		valueCountSet1 = Number($gameMap.event(this._eventId).event().meta['QuestSet']);
+			valueCountSet1 = Number($gameMap.event(this._eventId).event().meta['QuestSet']);
 		}).call(interp);
 	};
 
 	// Replaces (1x): Map003.json:event:172|EV172召喚石戦闘|page:1
 	AGH_setSwitchTemporarySwitchEv172SummonStoneBattle = function (interp) {
 		return (function () {
-		$gameSwitches.setValue(380,false);
-		if(!$gameSelfSwitches.value([$gameMap.mapId(), this._eventId, 'A'])){
-		  $gameSwitches.setValue(380,true);
-		};
+			$gameSwitches.setValue(380, false);
+			if (!$gameSelfSwitches.value([$gameMap.mapId(), this._eventId, 'A'])) {
+				$gameSwitches.setValue(380, true);
+			};
 		}).call(interp);
 	};
 
@@ -16986,72 +17143,74 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_gainItemChestRareSlotEv185 = function () {
 		var threshold = 2;//種別
 		var value2 = 21;//ID
-		if(threshold == 0){var valueItems = $dataItems}; 
-		if(threshold == 1){var valueItems = $dataWeapons}; 
-		if(threshold == 2){var valueItems = $dataArmors};
+		if (threshold == 0) { var valueItems = $dataItems };
+		if (threshold == 1) { var valueItems = $dataWeapons };
+		if (threshold == 2) { var valueItems = $dataArmors };
 		$gameParty.gainItem(valueItems[value2], 1);
 		var value3 = `\\C[29]\x1bI[${valueItems[value2].iconIndex}]${valueItems[value2].name}\\C[0]を入手した！`;
 		var value4 = 28;
 		$gameScreen.setDTextPicture(messageText, value4);
-		$gameSwitches.setValue(439,true);
+		$gameSwitches.setValue(439, true);
 	};
 
 	// Replaces (1x): Map003.json:event:207|EV207宿屋処理|page:1
 	AGH_showPictureEv207InnProcessing = function () {
 		var pictureId = 51;
 		var value2 = '';
-		$gameScreen.showPicture(pictureId+1,value2,0,1072,612,100,100,0,0);
-		$gameScreen.movePicture(pictureId+1,0,1072,612,100,100,255,0,60);
+		$gameScreen.showPicture(pictureId + 1, value2, 0, 1072, 612, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId + 1, 0, 1072, 612, 100, 100, 255, 0, 60);
 		var value3 = `　　　　　\n　　　　　\n　　　　　\n　　　　　`;
 		$gameScreen.setDTextPicture(messageText, 28);
 		$gameScreen.dWindowFrame = 'ON';
-		$gameScreen.showPicture(pictureId,value2,0,1072,612,100,100,0,0);
-		$gameScreen.movePicture(pictureId,0,1072,612,100,100,255,0,60);
+		$gameScreen.showPicture(pictureId, value2, 0, 1072, 612, 100, 100, 0, 0);
+		$gameScreen.movePicture(pictureId, 0, 1072, 612, 100, 100, 255, 0, 60);
 	};
 
 	// Replaces (1x): Map003.json:event:207|EV207宿屋処理|page:1
 	AGH_setSwitchRandomWork1Ev207InnProcessing = function () {
 		var item = $dataItems[valueCountSet1].price;
-		$gameVariables.setValue(21,item.toLocaleString());
-		if($gameParty.gold() >= item){
-		  $gameSwitches.setValue(161,true);
+		$gameVariables.setValue(21, item.toLocaleString());
+		if ($gameParty.gold() >= item) {
+			$gameSwitches.setValue(161, true);
 		} else {
-		  $gameSwitches.setValue(161,false);
+			$gameSwitches.setValue(161, false);
 		};
 	};
 
 	// Replaces (1x): Map003.json:event:207|EV207宿屋処理|page:1
 	AGH_setSwitchRandomWork2 = function () {
 		var item = $dataItems[valueCountSet2].price;
-		$gameVariables.setValue(22,item.toLocaleString());
-		if($gameParty.gold() >= item){
-		  $gameSwitches.setValue(162,true);
+		$gameVariables.setValue(22, item.toLocaleString());
+		if ($gameParty.gold() >= item) {
+			$gameSwitches.setValue(162, true);
 		} else {
-		  $gameSwitches.setValue(162,false);
+			$gameSwitches.setValue(162, false);
 		};
 	};
 
 	// Replaces (1x): Map003.json:event:207|EV207宿屋処理|page:1
 	AGH_iterateItemsEv207InnProcessing = function () {
 		var item = $dataItems[valueCountSet1].price;
-		get_infoDirect(0,valueCountSet1,0,1);
-		get_infoDirect(4,-item,0,1);
+		get_infoDirect(0, valueCountSet1, 0, 1);
+		get_infoDirect(4, -item, 0, 1);
 	};
 
 	// Replaces (1x): Map003.json:event:207|EV207宿屋処理|page:1
 	AGH_iterateItemsEv207InnProcessing_2 = function () {
 		var item = $dataItems[valueCountSet2].price;
-		get_infoDirect(0,valueCountSet2,0,1);
-		get_infoDirect(4,-item,0,1);
+		get_infoDirect(0, valueCountSet2, 0, 1);
+		get_infoDirect(4, -item, 0, 1);
 	};
 
 	// Replaces (1x): Map003.json:event:217|EV217回想全開放|page:1
 	AGH_iterateItemsEICSwitch = function () {
 		for (var i = 1; i < $dataItems.length; i++) {
-		  if($dataItems[i].meta['EICSwitch']) {
-		    if(Number($dataItems[i].meta['EICSwitch']) == 102) {
-		      $gameParty.gainItem($dataItems[i], 1);
-		}}};
+			if ($dataItems[i].meta['EICSwitch']) {
+				if (Number($dataItems[i].meta['EICSwitch']) == 102) {
+					$gameParty.gainItem($dataItems[i], 1);
+				}
+			}
+		};
 		var messageText = `挿話が全開放されました。`;
 		gab_wordParticle(messageText);
 	};
@@ -17059,10 +17218,12 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): Map003.json:event:217|EV217回想全開放|page:1
 	AGH_gainItemEICSwitch = function () {
 		for (var i = 1; i < $dataItems.length; i++) {
-		  if($dataItems[i].meta['EICSwitch']) {
-		    if(Number($dataItems[i].meta['EICSwitch']) == 103) {
-		      $gameParty.gainItem($dataItems[i], 1);
-		}}};
+			if ($dataItems[i].meta['EICSwitch']) {
+				if (Number($dataItems[i].meta['EICSwitch']) == 103) {
+					$gameParty.gainItem($dataItems[i], 1);
+				}
+			}
+		};
 		var messageText = `Hシーンが全開放されました。`;
 		gab_wordParticle(messageText);
 	};
@@ -17070,70 +17231,70 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): Map003.json:event:218|EV218|page:2
 	AGH_readVariableActorChoiceEv218 = function (interp) {
 		return (function () {
-		//その場に作成
-		var value1 = 1;//$gameVariables.value(20);
-		var arr1 = valueNpcGuraTemporarilySave;
-		event_respawnSetA(value1,arr1[3],arr1[4],1,arr1[5]);
-		this._eventId = $gameVariables.value(292)[value1];
-		var value1 = 11;
-		event_respawnSetN(value1,arr1[8],arr1[9],0,arr1[6],arr1[7],arr1[10]);
+			//その場に作成
+			var value1 = 1;//$gameVariables.value(20);
+			var arr1 = valueNpcGuraTemporarilySave;
+			event_respawnSetA(value1, arr1[3], arr1[4], 1, arr1[5]);
+			this._eventId = $gameVariables.value(292)[value1];
+			var value1 = 11;
+			event_respawnSetN(value1, arr1[8], arr1[9], 0, arr1[6], arr1[7], arr1[10]);
 		}).call(interp);
 	};
 
 	// Replaces (1x): Map003.json:event:218|EV218|page:2
 	AGH_readVariableActorChoice_5 = function (interp) {
 		return (function () {
-		//移動マップに作成。x,y入力
-		var value1 = 1;//$gameVariables.value(20);
-		var array = [x,y,d];//ｱｸﾀｰ座標
-		var arr3 = [x,y,d];//NPC座標
-		var arr1 = valueNpcGuraTemporarilySave;
-		event_respawnSetA(value1,array[0],array[1],1,array[2]);
-		this._eventId = $gameVariables.value(292)[value1];
-		var value1 = 11;
-		event_respawnSetN(value1,arr3[0],arr3[1],0,arr1[6],arr1[7],arr3[2]);
+			//移動マップに作成。x,y入力
+			var value1 = 1;//$gameVariables.value(20);
+			var array = [x, y, d];//ｱｸﾀｰ座標
+			var arr3 = [x, y, d];//NPC座標
+			var arr1 = valueNpcGuraTemporarilySave;
+			event_respawnSetA(value1, array[0], array[1], 1, array[2]);
+			this._eventId = $gameVariables.value(292)[value1];
+			var value1 = 11;
+			event_respawnSetN(value1, arr3[0], arr3[1], 0, arr1[6], arr1[7], arr3[2]);
 		}).call(interp);
 	};
 
 	// Replaces (1x): Map003.json:event:219|EV219|page:1
 	AGH_setVariableDynamicEventIdEv219 = function () {
-		$gameVariables.setValue(292,Array(21).fill(0));
+		$gameVariables.setValue(292, Array(21).fill(0));
 		var value1 = 11;
-		event_respawnSetN(value1,24,16,0,'$airship02',0,2);
+		event_respawnSetN(value1, 24, 16, 0, '$airship02', 0, 2);
 		var value1 = 12;
-		event_respawnSetN(value1,21,16,0,'!$VehicleHorse',0,2);
+		event_respawnSetN(value1, 21, 16, 0, '!$VehicleHorse', 0, 2);
 		var value1 = 7;
-		event_respawnSetA(value1,22,16,1,6);
+		event_respawnSetA(value1, 22, 16, 1, 6);
 	};
 
 	// Replaces (1x): Map007.json:event:2|EV002|page:1
 	AGH_setSelfVariableLibidoEv002 = function (interp) {
 		return (function () {
-		h_exp($gameVariables.value(20),'Xev001_99',101,false,false,false);
-		//ｱｸﾀｰID,ﾋﾟｸﾁｬ,H相手(301ﾓﾌﾞ305対象なし306アイテム),非表示,簡易,過去シーンか否か
-		this.sVal(401,getRandomIndex(3) + 3);
-		//var arr = [1,2,3,4,5];$gameVariables.setValue(401,arr[getRandomIndex(arr.length)]);
-		//this.sVal(506,`\\V[94]は\\V[22]に情報の対価としてセクハラされた…。\n`);
-		//this.sVal(506,`\\V[94]はモブにセクハラされた…。\n`);
-		this.sVal(506,`\\V[94]は魔物達に凌辱された…。\n`);
-		if($gameSwitches.value(122)){this.setupChild($dataCommonEvents[85].list, 0)};
+			h_exp($gameVariables.value(20), 'Xev001_99', 101, false, false, false);
+			//ｱｸﾀｰID,ﾋﾟｸﾁｬ,H相手(301ﾓﾌﾞ305対象なし306アイテム),非表示,簡易,過去シーンか否か
+			this.sVal(401, getRandomIndex(3) + 3);
+			//var arr = [1,2,3,4,5];$gameVariables.setValue(401,arr[getRandomIndex(arr.length)]);
+			//this.sVal(506,`\\V[94]は\\V[22]に情報の対価としてセクハラされた…。\n`);
+			//this.sVal(506,`\\V[94]はモブにセクハラされた…。\n`);
+			this.sVal(506, `\\V[94]は魔物達に凌辱された…。\n`);
+			if ($gameSwitches.value(122)) { this.setupChild($dataCommonEvents[85].list, 0) };
 		}).call(interp);
 	};
 
 	// Replaces (1x): Map007.json:event:2|EV002|page:1
 	AGH_callHExp3Ev002 = function (interp) {
 		return (function () {
-		var randomIndex = getRandomIndex(3) + 3;
-		var array = [1,2,3,4,5];var value2 = array[getRandomIndex(array.length)];
-		//var value3 = $gameTroop.aliveMembers().length;
-		h_exp1(0,0,0,0,0,0);//h_exp1ex(value3*2);//6
-		//0膣1経験2フェラ3アナル4自慰5絶頂
-		h_exp2(0,0,0,0,0);//5//0和姦1強姦2異種姦3輪姦4露出
-		h_exp3(0,0,0,0,0,0,0,0,0,0,0);//10
-		//0セク1乳2尻揉3失禁4潮吹5売春6妊7子8中だ9ｱﾅﾙ出し10口飲
-		h_exp4(0,0,0,0,0,0,0,0);//9
-		//0膣1尻2口3感4露5精6性戯7奉仕8売春
-		this.setupChild($dataCommonEvents[85].list, 0);
+			var randomIndex = getRandomIndex(3) + 3;
+			var array = [1, 2, 3, 4, 5]; var value2 = array[getRandomIndex(array.length)];
+			//var value3 = $gameTroop.aliveMembers().length;
+			h_exp1(0, 0, 0, 0, 0, 0);//h_exp1ex(value3*2);//6
+			//0膣1経験2フェラ3アナル4自慰5絶頂
+			h_exp2(0, 0, 0, 0, 0);//5//0和姦1強姦2異種姦3輪姦4露出
+			h_exp3(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);//10
+			//0セク1乳2尻揉3失禁4潮吹5売春6妊7子8中だ9ｱﾅﾙ出し10口飲
+			h_exp4(0, 0, 0, 0, 0, 0, 0, 0);//9
+			//0膣1尻2口3感4露5精6性戯7奉仕8売春
+			this.setupChild($dataCommonEvents[85].list, 0);
 		}).call(interp);
 	};
 
@@ -17147,22 +17308,22 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_showPictureScreenBlackOutEv003 = function () {
 		valuePic1 = 51;
 		var ScreenBlackOut = 'ScreenBlackOut';
-		$gameScreen.showPicture(valuePic1,ScreenBlackOut,1,640,384,100,100,0,0);
-		$gameScreen.movePicture(valuePic1,1,640,384,100,100,200,0,10);
+		$gameScreen.showPicture(valuePic1, ScreenBlackOut, 1, 640, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(valuePic1, 1, 640, 384, 100, 100, 200, 0, 10);
 	};
 
 	// Replaces (1x): Map007.json:event:3|EV003|page:1
 	AGH_showPicturePictureParallelLoopEv003 = function () {
 		valuePic1 = 60;
 		var value2 = 'test2';
-		$gameScreen.showPicture(valuePic1,value2,1,640,384,100,100,255,0);
-		pic_setArray(1,valuePic1,0,50,60);
+		$gameScreen.showPicture(valuePic1, value2, 1, 640, 384, 100, 100, 255, 0);
+		pic_setArray(1, valuePic1, 0, 50, 60);
 		var value2 = 'test2a_0';
-		picture_anime1(valuePic1+1,value2,3,10,"連番",10,1,true,[1,2,1,1]);
-		pic_set(valuePic1+1,1,255,20);
-		hcg_piston(valuePic1,8,1,1);
-		hcg_piston(valuePic1+1,8,1,1);
-		$gameSwitches.setValue(429,true);
+		picture_anime1(valuePic1 + 1, value2, 3, 10, "連番", 10, 1, true, [1, 2, 1, 1]);
+		pic_set(valuePic1 + 1, 1, 255, 20);
+		hcg_piston(valuePic1, 8, 1, 1);
+		hcg_piston(valuePic1 + 1, 8, 1, 1);
+		$gameSwitches.setValue(429, true);
 	};
 
 	// Replaces (1x): Map007.json:event:3|EV003|page:1
@@ -17175,14 +17336,14 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_showPicturePictureParallelLoop_2 = function () {
 		var pictureId = 60;
 		var value2 = 'test2';
-		$gameScreen.showPicture(pictureId,value2,1,640,384,100,100,255,0);
-		pic_setArray(pictureId,0,20,20);
+		$gameScreen.showPicture(pictureId, value2, 1, 640, 384, 100, 100, 255, 0);
+		pic_setArray(pictureId, 0, 20, 20);
 		var value2 = 'test2a_0';
-		picture_anime1(pictureId+1,value2,3,10,"連番",20,1,true,[1,2,1,1]);
-		pic_set(pictureId+1,1,255,20);
-		hcg_piston(pictureId,8,1,1);
-		hcg_piston(pictureId-1,8,1,1);
-		$gameSwitches.setValue(429,true);
+		picture_anime1(pictureId + 1, value2, 3, 10, "連番", 20, 1, true, [1, 2, 1, 1]);
+		pic_set(pictureId + 1, 1, 255, 20);
+		hcg_piston(pictureId, 8, 1, 1);
+		hcg_piston(pictureId - 1, 8, 1, 1);
+		$gameSwitches.setValue(429, true);
 	};
 
 	// Replaces (1x): Map007.json:event:3|EV003|page:1
@@ -17209,10 +17370,10 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): Map007.json:event:3|EV003|page:1
 	AGH_setSelfVariableActorChoiceEv003 = function (interp) {
 		return (function () {
-		valueFaceSelect = 4;
-		this.sVal(20,1);
-		this.sVal(276,1);
-		battle_bustUp(51,500,10,40);
+			valueFaceSelect = 4;
+			this.sVal(20, 1);
+			this.sVal(276, 1);
+			battle_bustUp(51, 500, 10, 40);
 		}).call(interp);
 	};
 
@@ -17235,58 +17396,58 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_iterateArmorsPassiveState = function () {
 		var armor = Number($dataArmors[219].meta['Passive State'])
 		var messageText = `${value2 + 1}`;
-		CommonPopupManager.showInfo({},messageText,null);
+		CommonPopupManager.showInfo({}, messageText, null);
 	};
 
 	// Replaces (1x): Map007.json:event:3|EV003|page:1
 	AGH_createFilterZettyou = function () {
-		  var zettyou = 'zettyou';
-		  $gameMap.createFilter(zettyou,'blur',0,'screen');
-		  $gameMap.setFilter(zettyou,[5]);
+		var zettyou = 'zettyou';
+		$gameMap.createFilter(zettyou, 'blur', 0, 'screen');
+		$gameMap.setFilter(zettyou, [5]);
 	};
 
 	// Replaces (1x): Map007.json:event:3|EV003|page:1
 	AGH_setSwitchBossBattleImminent = function (interp) {
 		return (function () {
-		boss_setup1(2,56);
-		$gameSwitches.setValue(211,true);
-		valueVictoryResult1 = this._eventId;
-		this.setupChild($dataCommonEvents[121].list, 0);
-		//this.setupChild($dataCommonEvents[122].list, 0);
+			boss_setup1(2, 56);
+			$gameSwitches.setValue(211, true);
+			valueVictoryResult1 = this._eventId;
+			this.setupChild($dataCommonEvents[121].list, 0);
+			//this.setupChild($dataCommonEvents[122].list, 0);
 		}).call(interp);
 	};
 
 	// Replaces (1x): Map007.json:event:3|EV003|page:1
 	AGH_particleEditItemGain = function (interp) {
 		return (function () {
-		var itemGain = 'item_gain';
-		$gameScreen._particle.particleEdit(this._eventId,itemGain,'this');
-		//$gameScreen._particle.particleEdit(0,itemGain,'screen','def','above');
+			var itemGain = 'item_gain';
+			$gameScreen._particle.particleEdit(this._eventId, itemGain, 'this');
+			//$gameScreen._particle.particleEdit(0,itemGain,'screen','def','above');
 		}).call(interp);
 	};
 
 	// Replaces (1x): Map007.json:event:3|EV003|page:1
 	AGH_particleUpdateActorParticleLight = function () {
 		var actorParticleLight = 'actor_particleLight';
-		$gameScreen._particle.particleUpdate([actorParticleLight,'rect',-700,400,1300,768]);
+		$gameScreen._particle.particleUpdate([actorParticleLight, 'rect', -700, 400, 1300, 768]);
 	};
 
 	// Replaces (1x): Map007.json:event:3|EV003|page:1
 	AGH_showPictureScreenBlackOut_2 = function () {
 		var pictureId = 51;
 		var ScreenBlackOut = 'ScreenBlackOut';
-		$gameScreen.showPicture(pictureId,ScreenBlackOut,1,640,384,100,100,150,0);
+		$gameScreen.showPicture(pictureId, ScreenBlackOut, 1, 640, 384, 100, 100, 150, 0);
 		var value1 = 'lines_width1';
-		$gameScreen._particle.particleSet(0,value1,'screen','def','above');
+		$gameScreen._particle.particleSet(0, value1, 'screen', 'def', 'above');
 		var value1 = 'lines_width2';
-		$gameScreen._particle.particleSet(0,value1,'screen','def','screen');
+		$gameScreen._particle.particleSet(0, value1, 'screen', 'def', 'screen');
 		var value1 = 'lines_width3';
-		$gameScreen._particle.particleSet(0,value1,'screen','def','spriteset');
+		$gameScreen._particle.particleSet(0, value1, 'screen', 'def', 'spriteset');
 	};
 
 	// Replaces (1x): Map007.json:event:3|EV003|page:1
 	AGH_pushToArrayEv003 = function () {
-		$gameActors.actor(1).actor().traits.push({code: 11, dataId: 11, value: 1.5});
+		$gameActors.actor(1).actor().traits.push({ code: 11, dataId: 11, value: 1.5 });
 	};
 
 	// Replaces (1x): Map007.json:event:3|EV003|page:1
@@ -17310,37 +17471,38 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_push = function () {
 		var troopsId = 10; //グループIDを指定
 		$dataTroops[troopsId].members = []; //グループのメンバーを空に
-		var enemy = {enemyId:11, x:450, y:420, hidden:false}; //追加するエネミーの設定(ID1、座標(100,100)、表示有)
+		var enemy = { enemyId: 11, x: 450, y: 420, hidden: false }; //追加するエネミーの設定(ID1、座標(100,100)、表示有)
 		$dataTroops[troopsId].members.push(enemy); //設定したエネミーをグループに追加
 	};
 
 	// Replaces (1x): Map007.json:event:3|EV003|page:1
 	AGH_readVariableDungeonInfoItemEv003 = function () {
 		var start = 1; var end = 6; for (var i = start; i <= end; i++) {
-		var itemMeta = $dataItems[$gameVariables.value(240)].meta['出現エネミー' + i];
-		if(Number(itemMeta.split(',')[0]) >= 21){
-		$dataEnemies[i+10].exp = $dataEnemies[itemMeta.split(',')[0]].exp;
-		}};
+			var itemMeta = $dataItems[$gameVariables.value(240)].meta['出現エネミー' + i];
+			if (Number(itemMeta.split(',')[0]) >= 21) {
+				$dataEnemies[i + 10].exp = $dataEnemies[itemMeta.split(',')[0]].exp;
+			}
+		};
 	};
 
 	// Replaces (1x): Map007.json:event:4|EV004000|page:1
 	AGH_particleEditLightLeakS = function (interp) {
 		return (function () {
-		var lightLeakS = 'light_leak_s'
-		$gameScreen._particle.particleEdit(this._eventId,lightLeakS,'this','def','spriteset');
+			var lightLeakS = 'light_leak_s'
+			$gameScreen._particle.particleEdit(this._eventId, lightLeakS, 'this', 'def', 'spriteset');
 		}).call(interp);
 	};
 
 	// Replaces (1x): Map007.json:event:4|EV004000|page:1
 	AGH_runScriptGoodsShine2 = function () {
-		  var goodsShine2 = 'goods_shine2';
-		$gameScreen._particle.particleEdit(0,goodsShine2,'screen','def','spriteset');
+		var goodsShine2 = 'goods_shine2';
+		$gameScreen._particle.particleEdit(0, goodsShine2, 'screen', 'def', 'spriteset');
 	};
 
 	// Replaces (1x): Map007.json:event:4|EV004000|page:1
 	AGH_concatArrayEv004000 = function () {
-		$gameScreen._tone_temp = $gameScreen.tone().concat();  
-		$gameScreen.startTint([-150,-150,-150,150], 10);
+		$gameScreen._tone_temp = $gameScreen.tone().concat();
+		$gameScreen.startTint([-150, -150, -150, 150], 10);
 	};
 
 	// Replaces (1x): Map007.json:event:4|EV004000|page:1
@@ -17354,87 +17516,87 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): Map007.json:event:4|EV004000|page:1
 	AGH_setVariableNpcSpawnRandom1 = function () {
 		for (var i = 1; i <= 5; i++) {
-		$gameVariables.setValue(33,'BB_akunin');//グラ名前
-		$gameVariables.setValue(35,3);//グラ番号
-		$gameVariables.setValue(37,getRandomIndex(3) + 2);//速度
-		$gameVariables.setValue(34,getRandomIndex(2) + 4);//頻度
-		map_npcRespawn(1,124);//1で任意,次にイベID
+			$gameVariables.setValue(33, 'BB_akunin');//グラ名前
+			$gameVariables.setValue(35, 3);//グラ番号
+			$gameVariables.setValue(37, getRandomIndex(3) + 2);//速度
+			$gameVariables.setValue(34, getRandomIndex(2) + 4);//頻度
+			map_npcRespawn(1, 124);//1で任意,次にイベID
 		};
 	};
 
 	// Replaces (1x): Map007.json:event:4|EV004000|page:1
 	AGH_spawnEventRandom = function () {
-		var conditionMap         = {};
-		conditionMap.passable    = 1;
-		conditionMap.screen      = 0;
-		conditionMap.collided    = 3;
+		var conditionMap = {};
+		conditionMap.passable = 1;
+		conditionMap.screen = 0;
+		conditionMap.collided = 3;
 		conditionMap.terrainTags = [0];
-		conditionMap.regionIds   = [1];
+		conditionMap.regionIds = [1];
 		$gameMap.spawnEventRandom(78, conditionMap, true);
 	};
 
 	// Replaces (1x): Map007.json:event:4|EV004000|page:1
 	AGH_particleEditDappledR = function () {
 		var dappledR = 'dappled_r';//木漏れ日[リージョン]
-		$gameScreen._particle.particleEdit(0,dappledR,'weather','def','screen');
+		$gameScreen._particle.particleEdit(0, dappledR, 'weather', 'def', 'screen');
 	};
 
 	// Replaces (1x): Map007.json:event:4|EV004000|page:1
 	AGH_particleEditRippleWalk = function (interp) {
 		return (function () {
-		var rippleWalk = 'ripple_walk';//集中線
-		$gameScreen._particle.particleEdit(0,rippleWalk,'this._eventId','def');
+			var rippleWalk = 'ripple_walk';//集中線
+			$gameScreen._particle.particleEdit(0, rippleWalk, 'this._eventId', 'def');
 		}).call(interp);
 	};
 
 	// Replaces (1x): Map007.json:event:4|EV004000|page:1
 	AGH_showPictureHStatusLibidoChange = function () {
 		var pictureId = 51;
-		$gameVariables.setValue(192,1);
-		$gameScreen.showPicture(pictureId+6,"HstatesActorBody"+$gameVariables.value(20)+"_"+$gameVariables.value(192),1,624,400,100,100,255,0);
+		$gameVariables.setValue(192, 1);
+		$gameScreen.showPicture(pictureId + 6, "HstatesActorBody" + $gameVariables.value(20) + "_" + $gameVariables.value(192), 1, 624, 400, 100, 100, 255, 0);
 	};
 
 	// Replaces (1x): Map007.json:event:4|EV004000|page:1
 	AGH_showPictureMovie2 = function () {
 		$gameScreen.setVideoPictureName('Movie2', 'on', false);
-		var pictureId = 53+2;
-		$gameScreen.showPicture(pictureId,'',1,640-128,384,100,100,255,0);
+		var pictureId = 53 + 2;
+		$gameScreen.showPicture(pictureId, '', 1, 640 - 128, 384, 100, 100, 255, 0);
 	};
 
 	// Replaces (1x): Map007.json:event:4|EV004000|page:1
 	AGH_runScriptEv004000 = function () {
-		var pictureId = 53+2;
+		var pictureId = 53 + 2;
 		var picture = $gameScreen.picture(pictureId);
-		if (picture) {picture.setVideoLoop(pictureId)};
-		if (picture) {picture.setVideoSpeed(50)};
+		if (picture) { picture.setVideoLoop(pictureId) };
+		if (picture) { picture.setVideoSpeed(50) };
 	};
 
 	// Replaces (1x): Map007.json:event:4|EV004000|page:1
 	AGH_movePictureXev10001 = function () {
 		var pictureId = 53;
 		var value2 = 'Xev100_01';
-		pic_1(0,pictureId+1,value2,0,100,255,60,1280,768,-256,0);
+		pic_1(0, pictureId + 1, value2, 0, 100, 255, 60, 1280, 768, -256, 0);
 		var value2 = 'Xev100_01_100';
-		picture_anime1(pictureId+3,value2,5,1,"連番",300,3,true,[2,4]);
-		$gameScreen.movePicture(pictureId+3,1,640-128,384,100,100,200,0,60);
-		picture_anime1(pictureId+4,value2,5,1,"連番",200,3,true,[3,1,5,1]);
-		$gameScreen.movePicture(pictureId+4,1,640-128,384,100,100,100,0,60);
-		for (var i = pictureId+1; i <= pictureId+4; i++) {hcg_piston(i,8,1)};
+		picture_anime1(pictureId + 3, value2, 5, 1, "連番", 300, 3, true, [2, 4]);
+		$gameScreen.movePicture(pictureId + 3, 1, 640 - 128, 384, 100, 100, 200, 0, 60);
+		picture_anime1(pictureId + 4, value2, 5, 1, "連番", 200, 3, true, [3, 1, 5, 1]);
+		$gameScreen.movePicture(pictureId + 4, 1, 640 - 128, 384, 100, 100, 100, 0, 60);
+		for (var i = pictureId + 1; i <= pictureId + 4; i++) { hcg_piston(i, 8, 1) };
 	};
 
 	// Replaces (1x): Map007.json:event:4|EV004000|page:1
 	AGH_movePictureXev10001Ev004000 = function () {
 		var pictureId = 53;
 		var value2 = 'Xev100_01';
-		pic_1(0,pictureId+1,value2,0,100,255,60,1280,768,-256,0);
+		pic_1(0, pictureId + 1, value2, 0, 100, 255, 60, 1280, 768, -256, 0);
 		var value2 = 'Xev100_01hip2_100';
-		pic_1(2,pictureId+2,value2,0,100,200,1,1280,768,-256,0);
+		pic_1(2, pictureId + 2, value2, 0, 100, 200, 1, 1280, 768, -256, 0);
 		var value2 = 'Xev100_01_100';
-		picture_anime1(pictureId+3,value2,5,1,"連番",180,3,true,[2,4]);
-		$gameScreen.movePicture(pictureId+3,1,640-128,384,100,100,200,0,60);
-		picture_anime1(pictureId+4,value2,5,1,"連番",100,3,true,[3,1,5,1]);
-		$gameScreen.movePicture(pictureId+4,1,640-128,384,100,100,100,0,60);
-		for (var i = pictureId+1; i <= pictureId+4; i++) {hcg_piston(i,8,1)};
+		picture_anime1(pictureId + 3, value2, 5, 1, "連番", 180, 3, true, [2, 4]);
+		$gameScreen.movePicture(pictureId + 3, 1, 640 - 128, 384, 100, 100, 200, 0, 60);
+		picture_anime1(pictureId + 4, value2, 5, 1, "連番", 100, 3, true, [3, 1, 5, 1]);
+		$gameScreen.movePicture(pictureId + 4, 1, 640 - 128, 384, 100, 100, 100, 0, 60);
+		for (var i = pictureId + 1; i <= pictureId + 4; i++) { hcg_piston(i, 8, 1) };
 	};
 
 	// Replaces (1x): Map007.json:event:4|EV004000|page:1
@@ -17442,8 +17604,8 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		var pictureId = 53;
 		var Xev10001hip2100 = 'Xev100_01hip2_100';
 		//picture_anime1(pictureId+2,Xev10001hip2100,3,1,"連番",50,3,true,[1,1,2,3,2,1]);
-		picture_anime1(pictureId+2,Xev10001hip2100,3,1,"連番",50,3,true,[1,1,2,1,2,1,1]);
-		$gameScreen.movePicture(pictureId+3,1,640-128,384,100,100,255,0,60);
+		picture_anime1(pictureId + 2, Xev10001hip2100, 3, 1, "連番", 50, 3, true, [1, 1, 2, 1, 2, 1, 1]);
+		$gameScreen.movePicture(pictureId + 3, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
 	};
 
 	// Replaces (1x): Map007.json:event:4|EV004000|page:1
@@ -17457,68 +17619,73 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): Map007.json:event:4|EV004000|page:1
 	AGH_iterateMapEventsIconDisplay = function () {
 		for (var id = $gameMap.events().length; id > 0; id--) {
-		if(!!$gameMap.event(id)) {
-		if ($gameMap.event(id).event().meta['IconDisplay']){
-		var value1 = Number($gameMap.event(id).event().meta['IconDisplay']);
-		if(value1 == 17){
-		if($gameMap.event(id).characterName() == 0){
-		console.log(`${1}`);
-		}}}}};
+			if (!!$gameMap.event(id)) {
+				if ($gameMap.event(id).event().meta['IconDisplay']) {
+					var value1 = Number($gameMap.event(id).event().meta['IconDisplay']);
+					if (value1 == 17) {
+						if ($gameMap.event(id).characterName() == 0) {
+							console.log(`${1}`);
+						}
+					}
+				}
+			}
+		};
 	};
 
 	// Replaces (1x): Map007.json:event:4|EV004000|page:1
 	AGH_setSelfVariableRandomWork1Ev004000 = function (interp) {
 		return (function () {
-		var variable174Value = $gameVariables.value(174)[$gameVariables.value(20)].split(',');
-		this.sVal(21,variable174Value);
+			var variable174Value = $gameVariables.value(174)[$gameVariables.value(20)].split(',');
+			this.sVal(21, variable174Value);
 		}).call(interp);
 	};
 
 	// Replaces (1x): Map007.json:event:5|EV005|page:1
 	AGH_particleUpdateMonsterC = function (interp) {
 		return (function () {
-		var value1 = 'monster_c';
-		var value3 = '#ffffff';
-		var value4 = '#460000';
-		$gameScreen._particle.particleUpdate([value1 + '-' + this._eventId,'color',String(value3),String(value4)]);
-		var value1 = 'mysterious_torch_c';
-		$gameScreen._particle.particleUpdate([value1,'alpha','0','0.7@0.5','0']);
+			var value1 = 'monster_c';
+			var value3 = '#ffffff';
+			var value4 = '#460000';
+			$gameScreen._particle.particleUpdate([value1 + '-' + this._eventId, 'color', String(value3), String(value4)]);
+			var value1 = 'mysterious_torch_c';
+			$gameScreen._particle.particleUpdate([value1, 'alpha', '0', '0.7@0.5', '0']);
 		}).call(interp);
 	};
 
 	// Replaces (1x): Map007.json:event:5|EV005|page:1
 	AGH_erasePictureEasing = function (interp) {
 		return (function () {
-		var args = new Array("easeOutQuad");
-		this.pluginCommand("easing", args);
-		pic_1(0,5,'/img/parallaxes/ScreenBlackOut',0,100,200,30,1280,768,0,0);
-		pic_1(0,55,'test2',0,100,255,30,1024,768,100,0);
-		//0-0がH1が普通,1ﾋﾟｸID,2ﾌｧｲﾙ名,3表示演出0か1,4拡大率,
-		//5透明率,6ｳｪｲﾄ,7と8横縦サイズ(基本は解像度か1024)
-		//$gameScreen.erasePicture(70);
-		//'/img/parallaxes/画面暗転'
+			var args = new Array("easeOutQuad");
+			this.pluginCommand("easing", args);
+			pic_1(0, 5, '/img/parallaxes/ScreenBlackOut', 0, 100, 200, 30, 1280, 768, 0, 0);
+			pic_1(0, 55, 'test2', 0, 100, 255, 30, 1024, 768, 100, 0);
+			//0-0がH1が普通,1ﾋﾟｸID,2ﾌｧｲﾙ名,3表示演出0か1,4拡大率,
+			//5透明率,6ｳｪｲﾄ,7と8横縦サイズ(基本は解像度か1024)
+			//$gameScreen.erasePicture(70);
+			//'/img/parallaxes/画面暗転'
 		}).call(interp);
 	};
 
 	// Replaces (1x): Map007.json:event:7|EV007|page:1
 	AGH_setSelfVariableActorChoiceEv007 = function (interp) {
 		return (function () {
-		this.sVal(20,1);
-		var actor = $gameActors.actor($gameVariables.value(20));
-		actor.gainExpSubclass(1000);
+			this.sVal(20, 1);
+			var actor = $gameActors.actor($gameVariables.value(20));
+			actor.gainExpSubclass(1000);
 		}).call(interp);
 	};
 
 	// Replaces (1x): Map007.json:event:7|EV007|page:1
 	AGH_iteratePartyMembersEv007 = function () {
 		for (var i = 0; i < $gameParty.battleMembers().length; i++) {
-		  var battleMember = $gameParty.battleMembers()[i];
-		  if($gameParty.members().contains(battleMember)){
-		battleMember.learnSkill(297);battleMember.gainSkillMasteryUses(297, 100);
-		battleMember.learnSkill(300);battleMember.gainSkillMasteryUses(300, 100);
-		battleMember.learnSkill(308);battleMember.gainSkillMasteryUses(308, 100);
-		battleMember.learnSkill(340);battleMember.gainSkillMasteryUses(340, 100);
-		}};
+			var battleMember = $gameParty.battleMembers()[i];
+			if ($gameParty.members().contains(battleMember)) {
+				battleMember.learnSkill(297); battleMember.gainSkillMasteryUses(297, 100);
+				battleMember.learnSkill(300); battleMember.gainSkillMasteryUses(300, 100);
+				battleMember.learnSkill(308); battleMember.gainSkillMasteryUses(308, 100);
+				battleMember.learnSkill(340); battleMember.gainSkillMasteryUses(340, 100);
+			}
+		};
 	};
 
 	// Replaces (1x): Map007.json:event:7|EV007|page:1
@@ -17527,24 +17694,25 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		var start = 61;
 		var end = 64;
 		for (var i = start; i <= end; i++) {
-		  if (!$dataSkills[i].name == '') {
-		$gameActors.actor(actorId).learnSkill(i)
-		}};
+			if (!$dataSkills[i].name == '') {
+				$gameActors.actor(actorId).learnSkill(i)
+			}
+		};
 	};
 
 	// Replaces (1x): Map007.json:event:7|EV007|page:1
 	AGH_iterateStatesEv007 = function () {
-		$dataStates[600].traits.push({code: 43, dataId: 682, value: 0});
+		$dataStates[600].traits.push({ code: 43, dataId: 682, value: 0 });
 	};
 
 	// Replaces (1x): Map007.json:event:7|EV007|page:1
 	AGH_readVariableActorChoiceEv007 = function (interp) {
 		return (function () {
-		var actor = $gameActors.actor($gameVariables.value(20));
-		var list = valueHstateDisplay;
-		list.forEach(function(id) {
-		actor.addState(id);
-		}, this);
+			var actor = $gameActors.actor($gameVariables.value(20));
+			var list = valueHstateDisplay;
+			list.forEach(function (id) {
+				actor.addState(id);
+			}, this);
 		}).call(interp);
 	};
 
@@ -17561,9 +17729,9 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_configureMapEventEv010_2 = function () {
 		var eventId = 11;
 		var character = $gameMap.event(eventId);
-		var r =   0;
+		var r = 0;
 		var g = 255;
-		var b =   0;
+		var b = 0;
 		var gray = 255;
 		var color = [r, g, b, gray];
 		var valid = true;
@@ -17575,56 +17743,60 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): Map007.json:event:11|EV011|page:1
 	AGH_traceDebugEv011 = function () {
 		var value1 = 51;
-		console.log(`${-value1+30}`);
+		console.log(`${-value1 + 30}`);
 	};
 
 	// Replaces (1x): Map007.json:event:17|EV017|page:1
 	AGH_pluginCommandPicture = function (interp) {
 		return (function () {
-		var value1 = 71;
-		var picture = "picture"
-		var value3 = "153";
-		//一刀両断102横から崩壊161縦から崩壊162
-		//横両断008封印054内側から153
-		var args = new Array(String(picture),String(value1),"fadeOut",
-		String(value3),"60","5");
-		this.pluginCommand("GWFade", args);
+			var value1 = 71;
+			var picture = "picture"
+			var value3 = "153";
+			//一刀両断102横から崩壊161縦から崩壊162
+			//横両断008封印054内側から153
+			var args = new Array(String(picture), String(value1), "fadeOut",
+				String(value3), "60", "5");
+			this.pluginCommand("GWFade", args);
 		}).call(interp);
 	};
 
 	// Replaces (1x): Map007.json:event:22|EV022|page:2
 	AGH_iterateMapEvents = function (interp) {
 		return (function () {
-		var value1 = 0; 
-		for (var id = $gameMap.events().length-1; id > 0; id--) {
-		if(!!$gameMap.event(id)) {
-		if ($gameMap.event(id).event().meta['ベッド']){
-		var value1 = id;
-		break;
-		}}};
-		if(value1 >= 1){
-		var value2 = this.character(value1).x;var value3 = this.character(value1).y;
-		$gamePlayer.reserveTransfer($gameMap.mapId($gameVariables.value(52)), value2, value3 , 2);
-		$gamePlayer.performTransfer();
-		};
+			var value1 = 0;
+			for (var id = $gameMap.events().length - 1; id > 0; id--) {
+				if (!!$gameMap.event(id)) {
+					if ($gameMap.event(id).event().meta['ベッド']) {
+						var value1 = id;
+						break;
+					}
+				}
+			};
+			if (value1 >= 1) {
+				var value2 = this.character(value1).x; var value3 = this.character(value1).y;
+				$gamePlayer.reserveTransfer($gameMap.mapId($gameVariables.value(52)), value2, value3, 2);
+				$gamePlayer.performTransfer();
+			};
 		}).call(interp);
 	};
 
 	// Replaces (1x): Map007.json:event:22|EV022|page:2
 	AGH_readMapEventMetaRaceDefeatCount = function (interp) {
 		return (function () {
-		var value1 = 0; 
-		for (var id = $gameMap.events().length-1; id > 0; id--) {
-		if(!!$gameMap.event(id)) {
-		if ($gameMap.event(id).event().meta['着替え']){
-		var value1 = id;
-		break;
-		}}};
-		if(value1 >= 1){
-		var value2 = this.character(value1).x;var value3 = this.character(value1).y;
-		$gamePlayer.reserveTransfer($gameMap.mapId($gameVariables.value(52)), value2, value3+1 , 8);
-		$gamePlayer.performTransfer();
-		};
+			var value1 = 0;
+			for (var id = $gameMap.events().length - 1; id > 0; id--) {
+				if (!!$gameMap.event(id)) {
+					if ($gameMap.event(id).event().meta['着替え']) {
+						var value1 = id;
+						break;
+					}
+				}
+			};
+			if (value1 >= 1) {
+				var value2 = this.character(value1).x; var value3 = this.character(value1).y;
+				$gamePlayer.reserveTransfer($gameMap.mapId($gameVariables.value(52)), value2, value3 + 1, 8);
+				$gamePlayer.performTransfer();
+			};
 		}).call(interp);
 	};
 
@@ -17632,9 +17804,9 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_readVariableActorChoiceEv023 = function () {
 		var actor = $gameActors.actor($gameVariables.value(20));
 		actor.addState(693);
-		tachie_dousa(2,1,2,12,1,255,1323,0,0);
-		tachie_dousa(2,1,2,12,1,255,1325,0,0);
-		tachie_dousa(0,1,1,12,13,0,60,0,0);
+		tachie_dousa(2, 1, 2, 12, 1, 255, 1323, 0, 0);
+		tachie_dousa(2, 1, 2, 12, 1, 255, 1325, 0, 0);
+		tachie_dousa(0, 1, 1, 12, 13, 0, 60, 0, 0);
 		//tachie_clothReflect(1);
 	};
 
@@ -17642,33 +17814,33 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_initValuePic1Ev023 = function () {
 		valuePic1 = 19;
 		curveFunctions.patternX = curveFunctions.getPattern('jump', [-30]);
-		picTachie_move1(valuePic1,0,0,0,0,255,30);
+		picTachie_move1(valuePic1, 0, 0, 0, 0, 255, 30);
 		//0id,1x,2y,3拡x,4拡y,5opa,6wait//こちらの代入は透明度とwaitのみ
-		picture_animation1(valuePic1,0,-300,200);
+		picture_animation1(valuePic1, 0, -300, 200);
 		//0id,1x,2y,3animeId
-		picture_motion1("smooth",[0]);
+		picture_motion1("smooth", [0]);
 	};
 
 	// Replaces (1x): Map007.json:event:23|EV023|page:1
 	AGH_waitEv023 = function (interp) {
 		return (function () {
-		valueWordSet0 = 12;
-		tachie_clothesHason(1,25,valueWordSet0,1,1);
-		this.wait(Math.randomInt(10));
+			valueWordSet0 = 12;
+			tachie_clothesHason(1, 25, valueWordSet0, 1, 1);
+			this.wait(Math.randomInt(10));
 		}).call(interp);
 	};
 
 	// Replaces (1x): Map007.json:event:23|EV023|page:1
 	AGH_setVariableActorChoiceEv023 = function (interp) {
 		return (function () {
-		var actor = $gameActors.actor($gameVariables.value(20));
-		actor.addState(23);
-		tachie_syoukyo1(getPreviousTachiePicId());
-		$gameVariables.setValue(20,1);
-		kisekae_tyokusetusitei(1324,23);
-		//tachie_hyouji1($gameVariables.value(20));
-		tachie_syoukyo1(getPreviousTachiePicId());
-		this.wait(60);
+			var actor = $gameActors.actor($gameVariables.value(20));
+			actor.addState(23);
+			tachie_syoukyo1(getPreviousTachiePicId());
+			$gameVariables.setValue(20, 1);
+			kisekae_tyokusetusitei(1324, 23);
+			//tachie_hyouji1($gameVariables.value(20));
+			tachie_syoukyo1(getPreviousTachiePicId());
+			this.wait(60);
 		}).call(interp);
 	};
 
@@ -17682,75 +17854,77 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 
 	// Replaces (1x): Map007.json:event:32|EV032|page:1
 	AGH_eventStatueOrbC = function () {
-		var value1 = 'statue_orb_c'+'-'+valueCountSet1;
+		var value1 = 'statue_orb_c' + '-' + valueCountSet1;
 		$gameScreen._particle.particleClear(value1);
-		if(!!$gameMap.event(valueCountSet1)) {
-		  $gameMap.eraseEvent(valueCountSet1);
+		if (!!$gameMap.event(valueCountSet1)) {
+			$gameMap.eraseEvent(valueCountSet1);
 		};
 	};
 
 	// Replaces (1x): Map007.json:event:34|EV034|page:1
 	AGH_waitEv034 = function (interp) {
 		return (function () {
-		valueSerialPictureId = 76;
-		valueSerialPictureId += 1;
-		var array = [-50,0,50,-100,100];
-		var arr2 = [-50,0,50,-100,100];
-		var arr3 = [`「オラッ！」`,`「オラァッ！」`];
-		chara_oneWord(valueSerialPictureId,this._eventId,25,60,array,arr2,arr3);
-		this.wait(20);
+			valueSerialPictureId = 76;
+			valueSerialPictureId += 1;
+			var array = [-50, 0, 50, -100, 100];
+			var arr2 = [-50, 0, 50, -100, 100];
+			var arr3 = [`「オラッ！」`, `「オラァッ！」`];
+			chara_oneWord(valueSerialPictureId, this._eventId, 25, 60, array, arr2, arr3);
+			this.wait(20);
 		}).call(interp);
 	};
 
 	// Replaces (1x): Map007.json:event:54|EV054|page:1
 	AGH_setWaitModeRoute = function (interp) {
 		return (function () {
-		this._character = $gamePlayer;
-		this.setWaitMode('route');
+			this._character = $gamePlayer;
+			this.setWaitMode('route');
 		}).call(interp);
 	};
 
 	// Replaces (1x): Map007.json:event:58|EV058|page:1
 	AGH_eventDomeBed = function () {
 		for (var id1 = 1; id1 <= 200; id1++) {
-		  if(!!$gameMap.event(id1)) {
-		    if($gameMap.event(id1).event().meta['DomeBed']){
-		      var event = $gameMap.event(id1);
-		      event.setDirectionFix(false);
-		      event.setDirection(2);
-		      event.setDirectionFix(true);
-		}}};
+			if (!!$gameMap.event(id1)) {
+				if ($gameMap.event(id1).event().meta['DomeBed']) {
+					var event = $gameMap.event(id1);
+					event.setDirectionFix(false);
+					event.setDirection(2);
+					event.setDirectionFix(true);
+				}
+			}
+		};
 	};
 
 	// Replaces (1x): Map018.json:event:21|EV021|page:1
 	AGH_setSelfVariableRandomWork1Ev021 = function (interp) {
 		return (function () {
-		if($dataWeapons[315].meta['FamilyName']){
-		  this.sVal(21,$dataWeapons[315].meta['FamilyName']);
-		} else {
-		  this.sVal(21,`　`);
-		};
+			if ($dataWeapons[315].meta['FamilyName']) {
+				this.sVal(21, $dataWeapons[315].meta['FamilyName']);
+			} else {
+				this.sVal(21, `　`);
+			};
 		}).call(interp);
 	};
 
 	// Replaces (1x): Map018.json:event:25|EV025|page:1
 	AGH_runPluginCommandCutInNoWaitEv025 = function (interp) {
 		return (function () {
-		$gameSwitches.setValue(428,true);
-		valueScenePic = 'XevS002_';
-		var XevO00202 = 'XevO002_02';
-		valueCutInSet1 = ['Ｈシーン演出',XevO00202,270,2,1,25,60];
-		var args = new Array(String(valueCutInSet1[0]));
-		this.pluginCommand("味方カットイン", args);
+			$gameSwitches.setValue(428, true);
+			valueScenePic = 'XevS002_';
+			var XevO00202 = 'XevO002_02';
+			valueCutInSet1 = ['Ｈシーン演出', XevO00202, 270, 2, 1, 25, 60];
+			var args = new Array(String(valueCutInSet1[0]));
+			this.pluginCommand("味方カットイン", args);
 		}).call(interp);
 	};
 
 	// Replaces (1x): Map018.json:event:32|EV032|page:1
 	AGH_setSelfVariableChoiceSwitch12Ev032 = function (interp) {
 		return (function () {
-		this.sVal(172,8);
-		valueTalkSet = [101,'Goods_Letter1',60];
-		this.setupChild($dataCommonEvents[60].list, 0);
+			this.sVal(172, 8);
+			valueTalkSet = [101, 'Goods_Letter1', 60];
+			this.setupChild($dataCommonEvents[60].list, 0);
 		}).call(interp);
 	};
 
@@ -17771,28 +17945,28 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): Map041.json:event:7|EV007|page:1
 	AGH_setSelfSwitchSceneTrigger1 = function (interp) {
 		return (function () {
-		if($gameSwitches.value(1071) && !$gameSwitches.value(1171)){
-		  $gameSelfSwitches.setValue([$gameMap.mapId(), this._eventId, 'B'], false);
-		};
-		if($gameSwitches.value(1072) && !$gameSwitches.value(1172)){
-		  $gameSelfSwitches.setValue([$gameMap.mapId(), this._eventId, 'B'], false);
-		};
-		if($gameSwitches.value(1073) && !$gameSwitches.value(1173)){
-		  $gameSelfSwitches.setValue([$gameMap.mapId(), this._eventId, 'B'], false);
-		};
-		if($gameSwitches.value(1074) && !$gameSwitches.value(1174)){
-		  $gameSelfSwitches.setValue([$gameMap.mapId(), this._eventId, 'B'], false);
-		};
+			if ($gameSwitches.value(1071) && !$gameSwitches.value(1171)) {
+				$gameSelfSwitches.setValue([$gameMap.mapId(), this._eventId, 'B'], false);
+			};
+			if ($gameSwitches.value(1072) && !$gameSwitches.value(1172)) {
+				$gameSelfSwitches.setValue([$gameMap.mapId(), this._eventId, 'B'], false);
+			};
+			if ($gameSwitches.value(1073) && !$gameSwitches.value(1173)) {
+				$gameSelfSwitches.setValue([$gameMap.mapId(), this._eventId, 'B'], false);
+			};
+			if ($gameSwitches.value(1074) && !$gameSwitches.value(1174)) {
+				$gameSelfSwitches.setValue([$gameMap.mapId(), this._eventId, 'B'], false);
+			};
 		}).call(interp);
 	};
 
 	// Replaces (1x): Map041.json:event:7|EV007|page:1
 	AGH_checkSwitchSceneComplete1 = function () {
 		var value1 = 571;
-		if($gameSwitches.value(1171)){var value1 = 572};
-		if($gameSwitches.value(1172)){var value1 = 573};
-		if($gameSwitches.value(1173)){var value1 = 574};
-		if($gameSwitches.value(1174)){var value1 = 1000};
+		if ($gameSwitches.value(1171)) { var value1 = 572 };
+		if ($gameSwitches.value(1172)) { var value1 = 573 };
+		if ($gameSwitches.value(1173)) { var value1 = 574 };
+		if ($gameSwitches.value(1174)) { var value1 = 1000 };
 		valueCountSet1 = value1;
 	};
 
@@ -17804,22 +17978,22 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		$gameScreen.dTextAlign = 1;
 		var value1 = 100;
 		var value2 = '';
-		$gameScreen.showPicture(value1,value2,0,100+50,100,100,100,0,0);
-		$gameScreen.movePicture(value1,0,100,100,100,100,255,0,60);
+		$gameScreen.showPicture(value1, value2, 0, 100 + 50, 100, 100, 100, 0, 0);
+		$gameScreen.movePicture(value1, 0, 100, 100, 100, 100, 255, 0, 60);
 	};
 
 	// Replaces (1x): Map068.json:event:3|EV003|page:1
 	AGH_readVariableAppearanceCharacterStartEv003 = function () {
 		var start = $gameVariables.value(75);
 		var end = $gameVariables.value(76);
-		for(var j = start; j <= end; j++){
-		  var actor = $gameActors.actor(j);
-		  var equips = actor.equips();
-		  for (var i = 0; i < equips.length; i++) {
-		    if(equips[i]){
-		      actor.changeEquipById(i+1, 0);
-		    };
-		  };
+		for (var j = start; j <= end; j++) {
+			var actor = $gameActors.actor(j);
+			var equips = actor.equips();
+			for (var i = 0; i < equips.length; i++) {
+				if (equips[i]) {
+					actor.changeEquipById(i + 1, 0);
+				};
+			};
 		};
 	};
 
@@ -17827,7 +18001,7 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_setVariableRandomWork1Ev004 = function () {
 		var variable52Value = $gameVariables.value(52)[478];
 		$gameVariables.setValue(21,
-		`\\sim[478]を10体討伐せよ
+			`\\sim[478]を10体討伐せよ
 		現在討伐数：${variable52Value}体`
 		);
 	};
@@ -17836,24 +18010,25 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	AGH_readVariableRandomWork1Ev011 = function () {
 		var variable21Value = $gameVariables.value(21);
 		for (var i = 1; i <= 10; i++) {
-		$dataMap.events[i].name = `${$dataClasses[i+variable21Value-10].name}→${$dataClasses[i+variable21Value].name}`;
+			$dataMap.events[i].name = `${$dataClasses[i + variable21Value - 10].name}→${$dataClasses[i + variable21Value].name}`;
 		};
 	};
 
 	// Replaces (1x): Map100.json:event:11|EV011|page:1
 	AGH_setSelfSwitchEv011 = function () {
 		for (var i = 1; i <= 10; i++) {
-		$gameSelfSwitches.setValue([$gameMap.mapId(), i, "B"], true);
+			$gameSelfSwitches.setValue([$gameMap.mapId(), i, "B"], true);
 		};
 	};
 
 	// Replaces (1x): Map100.json:event:11|EV011|page:1
 	AGH_showWindowTextEv011 = function () {
-		for (var i = 1; i <= $dataItems.length-1; i++) {
-		if($dataItems[i].meta['クラス3ジョブ解放素材']){
-		var itemId = i;
-		break;
-		}};
+		for (var i = 1; i <= $dataItems.length - 1; i++) {
+			if ($dataItems[i].meta['クラス3ジョブ解放素材']) {
+				var itemId = i;
+				break;
+			}
+		};
 		var messageText = `ジョブ解放条件
 		100000\\G消費（${$gameParty.gold()}\\G所持）
 		\\iin[${value5}] 1個消費（${$gameParty.numItems($dataItems[value5])}個所持）
@@ -17864,11 +18039,12 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 
 	// Replaces (1x): Map100.json:event:11|EV011|page:1
 	AGH_showWindowTextEv011_2 = function () {
-		for (var i = 1; i <= $dataItems.length-1; i++) {
-		if($dataItems[i].meta['クラス2ジョブ解放素材']){
-		var itemId = i;
-		break;
-		}};
+		for (var i = 1; i <= $dataItems.length - 1; i++) {
+			if ($dataItems[i].meta['クラス2ジョブ解放素材']) {
+				var itemId = i;
+				break;
+			}
+		};
 		var messageText = `ジョブ解放条件
 		10000\\G消費（${$gameParty.gold()}\\G所持）
 		\\iin[${value5}] 1個消費（${$gameParty.numItems($dataItems[value5])}個所持）
@@ -17880,69 +18056,72 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 	// Replaces (1x): Map100.json:event:11|EV011|page:1
 	AGH_forceMoveRouteCharactersEv011 = function (interp) {
 		return (function () {
-		for (var i = 1; i <= 10; i++) {
-		this.character(i).forceMoveRoute({
-		"list":[
-		{ "code": 45, "parameters": ["this.setTone(-150, -150, -150);"] },
-		{"code":0}],"repeat":false,"skippable":true});
-		};
+			for (var i = 1; i <= 10; i++) {
+				this.character(i).forceMoveRoute({
+					"list": [
+						{ "code": 45, "parameters": ["this.setTone(-150, -150, -150);"] },
+						{ "code": 0 }], "repeat": false, "skippable": true
+				});
+			};
 		}).call(interp);
 	};
 
 	// Replaces (1x): Map100.json:event:11|EV011|page:1
 	AGH_readVariableItemProcessWorkEv011 = function (interp) {
 		return (function () {
-		var variable19Value = this.character($gameVariables.value(19)).x;
-		var value2 = this.character($gameVariables.value(19)).y-1;
-		$gamePlayer.reserveTransfer($gameMap.mapId(), variable19Value, value2 , 0);
-		$gamePlayer.performTransfer();
+			var variable19Value = this.character($gameVariables.value(19)).x;
+			var value2 = this.character($gameVariables.value(19)).y - 1;
+			$gamePlayer.reserveTransfer($gameMap.mapId(), variable19Value, value2, 0);
+			$gamePlayer.performTransfer();
 		}).call(interp);
 	};
 
 	// Replaces (1x): Map100.json:event:11|EV011|page:1
 	AGH_unlockClassItemProcessWork = function (interp) {
 		return (function () {
-		var variable19Value = $gameVariables.value(19);
-		var value2 = 240;
-		var variable21Value = $gameVariables.value(21);
-		$gameParty.unlockClass(variable19Value + variable21Value);
-		this.character(variable19Value).requestAnimation(value2);
+			var variable19Value = $gameVariables.value(19);
+			var value2 = 240;
+			var variable21Value = $gameVariables.value(21);
+			$gameParty.unlockClass(variable19Value + variable21Value);
+			this.character(variable19Value).requestAnimation(value2);
 		}).call(interp);
 	};
 
 	// Replaces (1x): Map100.json:event:11|EV011|page:1
 	AGH_forceMoveRouteCharactersRandomWork2 = function (interp) {
 		return (function () {
-		var variable19Value = $gameVariables.value(19);
-		this.character(variable19Value).forceMoveRoute({
-		"list":[
-		{ "code": 45, "parameters": ["this.setTone(0, 0, 0);"] },
-		{"code":0}],"repeat":false,"skippable":true});
-		this.sVal(22,`${$dataClasses[variable19Value + $gameVariables.value(21)].name}`);
+			var variable19Value = $gameVariables.value(19);
+			this.character(variable19Value).forceMoveRoute({
+				"list": [
+					{ "code": 45, "parameters": ["this.setTone(0, 0, 0);"] },
+					{ "code": 0 }], "repeat": false, "skippable": true
+			});
+			this.sVal(22, `${$dataClasses[variable19Value + $gameVariables.value(21)].name}`);
 		}).call(interp);
 	};
 
 	// Replaces (1x): Map100.json:event:11|EV011|page:1
 	AGH_forceMoveRouteCharactersItemProcessWork = function (interp) {
 		return (function () {
-		var variable19Value = $gameVariables.value(19);
-		this.character(variable19Value).forceMoveRoute({
-		"list":[
-		{"code":37},
-		{ "code": 45, "parameters": ["this.jumpEx(0,20,14,0);"] },
-		{"code":0}],"repeat":false,"skippable":true});
+			var variable19Value = $gameVariables.value(19);
+			this.character(variable19Value).forceMoveRoute({
+				"list": [
+					{ "code": 37 },
+					{ "code": 45, "parameters": ["this.jumpEx(0,20,14,0);"] },
+					{ "code": 0 }], "repeat": false, "skippable": true
+			});
 		}).call(interp);
 	};
 
 	// Replaces (1x): Map144.json:event:12|EV012|page:1
 	AGH_setSwitchEv012 = function () {
 		var value1 = 10;
-		if($gameParty.numItems($dataItems[154]) >= value1){$gameSwitches.setValue(161,true)};
-		if($gameParty.numItems($dataItems[155]) >= value1){$gameSwitches.setValue(162,true)};
-		if($gameParty.numItems($dataItems[156]) >= value1){$gameSwitches.setValue(163,true)};
-		if($gameParty.numItems($dataItems[157]) >= value1){$gameSwitches.setValue(164,true)};
-		if($gameParty.numItems($dataItems[158]) >= value1){$gameSwitches.setValue(165,true)};
-		if($gameParty.numItems($dataItems[159]) >= value1){$gameSwitches.setValue(166,true)};
+		if ($gameParty.numItems($dataItems[154]) >= value1) { $gameSwitches.setValue(161, true) };
+		if ($gameParty.numItems($dataItems[155]) >= value1) { $gameSwitches.setValue(162, true) };
+		if ($gameParty.numItems($dataItems[156]) >= value1) { $gameSwitches.setValue(163, true) };
+		if ($gameParty.numItems($dataItems[157]) >= value1) { $gameSwitches.setValue(164, true) };
+		if ($gameParty.numItems($dataItems[158]) >= value1) { $gameSwitches.setValue(165, true) };
+		if ($gameParty.numItems($dataItems[159]) >= value1) { $gameSwitches.setValue(166, true) };
 	};
 
 	// Replaces (1x): Map196.json:event:3|EV207宿屋処理|page:1
@@ -17952,21 +18131,21 @@ AGH_hSceneSetup = function (interp, picId, scenePicPrefix, mainCharId, memoItemI
 		valueCountSet1 = 1233;
 		valueCountSet2 = 1234;
 		$gameVariables.setValue(23,
-		`「いらっしゃいませ。
+			`「いらっしゃいませ。
 		当ホテルにお越しくださり、誠に有難う御座います。
 		最高級の設備をご用意しておりますので、
 		ご堪能頂ければ幸いです」
 		`);
-		$gameVariables.setValue(22,'$FACE[Vxa_People2, 0]');
+		$gameVariables.setValue(22, '$FACE[Vxa_People2, 0]');
 	};
 
 	// Replaces (1x): Map200.json:event:11|EV011|page:1
 	AGH_setSelfVariableChoiceSwitch12Ev011 = function (interp) {
 		return (function () {
-		this.sVal(172,19);//中央に一言メッセージ,何行でも良し
-		var messageText = `\v[23]`;
-		valueTalkSet = [1,28,messageText,100];//0で消去 1で通常 2で時間経過  255で背景透明度
-		this.setupChild($dataCommonEvents[60].list, 0);
+			this.sVal(172, 19);//中央に一言メッセージ,何行でも良し
+			var messageText = `\v[23]`;
+			valueTalkSet = [1, 28, messageText, 100];//0で消去 1で通常 2で時間経過  255で背景透明度
+			this.setupChild($dataCommonEvents[60].list, 0);
 		}).call(interp);
 	};
 
