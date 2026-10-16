@@ -966,7 +966,9 @@
 	AGH_hSceneExperience = function (interp, exp3Args) {
 		h_exp($gameVariables.value(20), valueScenePic + '99', valueScenePartnerId, false, false, false);
 		interp.sVal(401, getRandomIndex(11) + 20);
-		interp.sVal(506, `\\V[94]は\\V[22]とセックスした…。`);
+		const actor1 = `\\V[94]`;
+		const actor2 = `\\V[22]`;
+		interp.sVal(506, `${actor1}は${actor2}とセックスした…。`);
 		h_exp1(1, 1, 0, 0, 0, 1);
 		h_exp2(1, 0, 0, 0, 0, 0);
 		h_exp3.apply(null, exp3Args);
@@ -1466,7 +1468,7 @@
 	// depends on that position.
 	AGH_stateApplyRandomDebuff = function (user, target, stateId) {
 		var debuffStateId = [212, 213, 214, 215, 216, 217][getRandomIndex(6)]
-		var unusedTurnsDraw = getRandomIndex(3) + 3; //RNG stream position
+		// var unusedTurnsDraw = getRandomIndex(3) + 3; //RNG stream position
 		target.addState(debuffStateId);
 		state_applyCommonEffect(user, target, stateId, 277);
 		target.removeState(stateId);
@@ -1654,13 +1656,14 @@
 	// number, so the reset branch was unreachable. Kept as-is: the observable
 	// behaviour (the counter always increments) is the same either way.
 	AGH_stateApplyTreasureHunt = function (user, target, stateId) {
-		if ($gameParty.inBattle()) {
-			state_applyCommonEffect(user, target, stateId, 261);
-			if (target._stateCounter[stateId] >= 1 || target._stateCounter[stateId] <= 9) {
-				target.addStateCounter(stateId, +1);
-			} else {
-				target.setStateCounter(stateId, 1);
-			};
+		if (!$gameParty.inBattle()) {
+			return;
+		};
+		state_applyCommonEffect(user, target, stateId, 261);
+		if (target._stateCounter[stateId] >= 1 || target._stateCounter[stateId] <= 9) {
+			target.addStateCounter(stateId, +1);
+		} else {
+			target.setStateCounter(stateId, 1);
 		};
 	};
 
@@ -2112,14 +2115,15 @@
 	// branch always runs. Kept verbatim so the behaviour is unchanged.
 	AGH_stateActionEndResolveCounter = function (user, target, stateId) {
 		if ($gameVariables.value(182) != 6) return;
-		if (target._stateCounter[stateId] >= 4) {
-			user.removeStateCounter(stateId);
-			user.removeState(stateId);
-			if (user._stateCounter[stateId] >= 1) {
-				user.addStateCounter(stateId, +1);
-			} else {
-				user.setStateCounter(stateId, 1);
-			}
+		if (target._stateCounter[stateId] < 4) return;
+
+		user.removeStateCounter(stateId);
+		user.removeState(stateId);
+
+		if (user._stateCounter[stateId] >= 1) {
+			user.addStateCounter(stateId, +1);
+		} else {
+			user.setStateCounter(stateId, 1);
 		}
 	};
 
@@ -2157,14 +2161,25 @@
 		if (!$dataSystem.optSideView) return;
 		if (user.isStateAffected(1) || user.isStateAffected(64)) return;
 		if (!user.isBattleMember()) return;
+		
 		var weapon = user.equips()[0];
 		if (!weapon) return;
 		var weaponData = $dataWeapons[weapon.id];
 		if (!weaponData.meta['WeaponNumber'] || !weaponData.meta['MotionType']) return;
 		var motionType = Number(weaponData.meta['MotionType']);
-		if (motionType === 0) user.addState(594);
-		if (motionType === 1) user.addState(595);
-		if (motionType === 2) user.addState(596);
+		switch (motionType) {
+			case 0:
+				user.addState(594)
+				break;
+			case 1:
+				user.addState(595)
+				break;
+			case 2:
+				user.addState(596)
+				break;
+			default:
+				break;
+		}
 	};
 
 	// Replaces (1x, state 610): rolls the starting TP, shows it as a popup, applies
