@@ -3437,7 +3437,7 @@
 		`はあらぬ方向を眺めている…。`,
 		`は故郷に想いを馳せている…。`
 	];
-	
+
 	// Replaces (1x, skill 892 様子を見る). The idle line is rolled BEFORE the
 	// state checks, exactly as in the original, so the RNG stream is unchanged.
 	AGH_afterEvalLogIdleMessage = function (target) {
@@ -3837,13 +3837,11 @@
 	/** 「はメインクラス2ndジョブ＜\j[2X]＞に目覚めた！」 + common event 45. */
 	function setSecondJobAwakeningMessage(interp, jobIndex, leadingSpaces) {
 		setSelfVar(interp, CURRENT_ACTOR_VAR, jobIndex);
-		const fontColor16 = fontColor(16);
 		const awakeningActorName = currentActor().name();   // the actor that awakens
-		const fontColor0 = fontColor(0);
-		const fontColor2 = fontColor(2);
 		const secondJobName = jobName(jobIndex + 20);
-		valueWordSet0 = `${leadingSpaces}${fontColor16}${awakeningActorName}${fontColor0}` +
-			`はメインクラス2ndジョブ${fontColor2}＜${secondJobName}＞${fontColor0}に目覚めた！`;
+		const secondJob = colorTaggedText(2, `＜${secondJobName}＞`);
+		const actorName = leadingSpaces + colorTaggedText(16, awakeningActorName) ;
+		valueWordSet0 = `${actorName}はメインクラス2ndジョブ${secondJob}に目覚めた！`;
 		valueWordSetEx = 0;   // 補足が必要な場合
 		AGH_runCommonEventAsChild(interp, 45);
 	}
