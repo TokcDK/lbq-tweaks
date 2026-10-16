@@ -16956,7 +16956,7 @@
 		if (Number(variable240Value[3]) == 1) { var valueItems = $dataWeapons };
 		if (Number(variable240Value[3]) == 2) { var valueItems = $dataArmors };
 		$gameParty.gainItem(valueItems[Number(variable240Value[4])], 1);
-		const itemName = colorTaggedText(24, `\x1bI[${valueItems[Number(variable240Value[4])].iconIndex}]${valueItems[Number(variable240Value[4])].name`);
+		const itemName = colorTaggedText(24, `\x1bI[${valueItems[Number(variable240Value[4])].iconIndex}]${valueItems[Number(variable240Value[4])].name}`);
 		var messageText = `${itemName}を入手した！`;
 		var value2 = 28;
 		$gameScreen.setDTextPicture(messageText, value2);
