@@ -19,6 +19,21 @@
 
 (function () {
 
+
+	getIWA = function (id) {
+		switch (id) {
+			case 0:
+				return $dataItems;
+			case 1:
+				return $dataWeapons;
+			case 2:
+				return $dataArmors;
+			default:
+				console.warn("getIWA: Warn, ID is not 0-2! return items");
+				return $dataItems
+		}
+	}
+
 	//内部用。変数292(スポーンID一覧)が未設定/配列でない場合の事故を防ぐ
 	function aghSpawnIdList() {
 		var spawnIdList = $gameVariables.value(292);
@@ -243,13 +258,12 @@
 	// Replaces (8x): slide out left-side standing pictures (11..20).
 	AGH_slideOutLeftPictures = function () {
 		for (var i = 11; i <= 20; i++) {
-			if ($gameScreen.picture(i)) {
-				;
-				if ($gameScreen.picture(i).x() >= 640) {
-					;
-					$gameScreen.movePicture(i, 1, 1280, $gameScreen.picture(i).y(), $gameScreen.picture(i).scaleX(), $gameScreen.picture(i).scaleY(), 0, 0, 60);
+			if (pic) {
+				const pic = $gameScreen.picture(i);
+				if (pic.x() >= 640) {
+					$gameScreen.movePicture(i, 1, 1280, pic.y(), pic.scaleX(), pic.scaleY(), 0, 0, 60);
 				} else {
-					$gameScreen.movePicture(i, 1, -500, $gameScreen.picture(i).y(), $gameScreen.picture(i).scaleX(), $gameScreen.picture(i).scaleY(), 0, 0, 60);
+					$gameScreen.movePicture(i, 1, -500, pic.y(), pic.scaleX(), pic.scaleY(), 0, 0, 60);
 				}
 			}
 		};
@@ -286,9 +300,7 @@
 	//   valueSPBuyCountSet2 = <itemId>;
 	//   item_oneOffBuy(1,valueSPBuyCountSet1,valueSPBuyCountSet2,<kind>);
 	AGH_oneOffBuy = function (count, itemId, kind) {
-		valueSPBuyCountSet1 = count;
-		valueSPBuyCountSet2 = itemId;
-		item_oneOffBuy(1, valueSPBuyCountSet1, valueSPBuyCountSet2, kind);
+		item_oneOffBuy(1, valueSPBuyCountSet1 = count, valueSPBuyCountSet2 = itemId, kind);
 	};
 
 	// Replaces (~12x):
@@ -335,10 +347,9 @@
 	//   $gameVariables.setValue(528,100);
 	//   this.setupChild($dataCommonEvents[54].list, 0);
 	CEH_sceneReturnSetup = function (interp, val171) {
-		$gameVariables.setValue(171, val171);
 		$gameVariables.setValue(528, 100);
-		interp.setupChild($dataCommonEvents[54].list, 0);
-	};
+		CEH_sceneReturnKeepCount(interp, val171);
+	}
 
 	// Replaces (11x):
 	//   $gameVariables.setValue(171,[20,5,2]);
@@ -382,11 +393,11 @@
 	CEH_eraseAllSpawnedEvents = function () {
 		var spawnIdList = aghSpawnIdList();
 		for (var i = 0; i <= spawnIdList.length - 1; i++) {
-			if (spawnIdList[i] >= 1) {
-				if (!!$gameMap.event(spawnIdList[i])) {
-					if (!$gameParty.inBattle()) { $gameMap.eraseEvent(spawnIdList[i]) };
-				};
+			const id = spawnIdList[i];
+			if (id < 1 || !$gameMap.event(id) || $gameParty.inBattle()) {
+				continue;
 			};
+			$gameMap.eraseEvent(id);
 		};
 	};
 
@@ -397,11 +408,7 @@
 	//     valueThisEventId = 0;
 	//   };
 	CEH_storeThisEventId = function (interp) {
-		if (interp._eventId >= 1) {
-			valueThisEventId = interp._eventId;
-		} else {
-			valueThisEventId = 0;
-		};
+		valueThisEventId = interp._eventId >= 1 ? interp._eventId : 0;
 	};
 
 	// Replaces (21x):
@@ -16939,6 +16946,7 @@
 		var value1 = 2;//種別
 		var value2 = 21;//ID全体攻撃の腕輪
 		var array = [0, 0, 0, value1, value2];
+
 		if (Number(array[3]) == 0) { var valueItems = $dataItems };
 		if (Number(array[3]) == 1) { var valueItems = $dataWeapons };
 		if (Number(array[3]) == 2) { var valueItems = $dataArmors };
@@ -16952,9 +16960,7 @@
 	// Replaces (1x): Map003.json:event:113|EV113|page:1
 	AGH_gainItemChestRareSlotTchestOnly = function () {
 		var variable240Value = $dataItems[$gameVariables.value(240)].meta['TchestOnly'].split(',');
-		if (Number(variable240Value[3]) == 0) { var valueItems = $dataItems };
-		if (Number(variable240Value[3]) == 1) { var valueItems = $dataWeapons };
-		if (Number(variable240Value[3]) == 2) { var valueItems = $dataArmors };
+		var valueItems = getIWA(Number(variable240Value[3]));
 		$gameParty.gainItem(valueItems[Number(variable240Value[4])], 1);
 		const itemName = colorTaggedText(24, `\x1bI[${valueItems[Number(variable240Value[4])].iconIndex}]${valueItems[Number(variable240Value[4])].name}`);
 		var messageText = `${itemName}を入手した！`;
