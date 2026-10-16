@@ -2434,7 +2434,7 @@
 		if (weaponId == 71 || weaponId == 72) {
 			shouldBreak = !!target.result().critical;
 		}
-		if (weaponId == 73) {
+		else if (weaponId == 73) {
 			shouldBreak = !target.result().critical;
 		}
 		if (shouldBreak) {
@@ -3065,7 +3065,9 @@
 		}
 		for (var i = 101; i <= 200; i++) target.removeState(i);
 		target.addState(stateId);
-		TickerManager.show(target.name() + 'の通常攻撃を' + item.name + 'に変更しました');
+		const targetName = target.name();
+		const itemName = item.name;
+		TickerManager.show(`${targetName}の通常攻撃を${itemName}に変更しました`);
 	};
 
 	// Replaces (1x, skill 26 持ち上げ＜OFF＞): flips the pickup flag and the
@@ -3073,14 +3075,16 @@
 	AGH_damageFormulaTogglePickup = function (action, user, target) {
 		if (target.actorId() !== user.actorId()) return;
 		var item = action.item();
-		if (item.name === `持ち上げ＜ON＞`) {
+		const onMsg = `持ち上げ＜ON＞`;
+		if (item.name === onMsg) {
 			$gameSystem._pickupData[0] = false;
 			item.name = '持ち上げ＜OFF＞';
 		} else {
 			$gameSystem._pickupData[0] = true;
-			item.name = '持ち上げ＜ON＞';
+			item.name = onMsg;
 		}
-		TickerManager.show(`<\x1bSIN[${item.id}]>に変更しました`);
+		const itemName = `<\x1bSIN[${item.id}]>`;
+		TickerManager.show(`${itemName}に変更しました`);
 	};
 
 	// Replaces (1x, skill 35 マップステータス).
@@ -3088,7 +3092,8 @@
 		if (target.actorId() !== user.actorId()) return;
 		var item = action.item();
 		skill_sentaku(item.id, 0);
-		TickerManager.show('＜' + item.name + '＞に変更しました');
+		const itemName = '＜' + item.name + '＞';
+		TickerManager.show(`${itemName}に変更しました`);
 		info_SetY($gameVariables.value(200));
 	};
 
@@ -3097,15 +3102,16 @@
 	AGH_damageFormulaChangeViewpoint = function (user, target) {
 		if (target.actorId() !== user.actorId()) return;
 		var currentViewpointActorId = $gameVariables.value(11);
+		const userName = user.name();
 		if (user.actorId() === currentViewpointActorId) {
-			TickerManager.show(`現在の視点は${user.name()}の為、変更はありません。`);
+			TickerManager.show(`現在の視点は${userName}の為、変更はありません。`);
 			return;
 		}
 		$gameSwitches.setValue(151, true);
 		$gameActors.actor(currentViewpointActorId).removeState(601);
 		$gameVariables.setValue(11, user.actorId());
 		$gameActors.actor($gameVariables.value(11)).addState(601);
-		TickerManager.show(`現在の視点を${user.name()}に変更しました。`);
+		TickerManager.show(`現在の視点を${userName}に変更しました。`);
 	};
 
 	// Replaces (1x, skill 45 立ち絵全裸): toggles the actor's nude flag (cell
@@ -3118,12 +3124,13 @@
 	// printed the function source instead of the actor's name.
 	AGH_damageFormulaToggleNude = function (target) {
 		var nudeFlags = $gameVariables.value(440 + target.actorId());
+		const targetName = target.name();
 		if (nudeFlags[23] === 1) {
 			nudeFlags[23] = 0;
-			TickerManager.show(`${target.name()}は着衣になりました。`);
+			TickerManager.show(`${targetName}は着衣になりました。`);
 		} else {
 			nudeFlags[23] = 1;
-			TickerManager.show(`${target.name()}は全裸になりました。`);
+			TickerManager.show(`${targetName}は全裸になりました。`);
 		}
 		$gameVariables.setValue(20, target.actorId());
 		tachie_settei2();
@@ -3147,12 +3154,21 @@
 	AGH_damageFormulaStanceCounter = function (user, target, sourceSkillId, stanceStateId) {
 		var counter = user.getStateCounter(stanceStateId);
 		if (counter === 0) {
-			BattleManager._logWindow.push(`addText`,
-				target.name() + 'の' + $dataSkills[sourceSkillId].name + 'は不発に終わった…。');
+			const targetName = target.name();
+			const skillName = $dataSkills[sourceSkillId].name;
+			BattleManager._logWindow.push(`addText`, `${targetName}の${skillName}は不発に終わった…。`);
 			return 0;
 		}
 		return counter * user.skillMasteryLevel(sourceSkillId) - target * 2;
 	};
+
+	const ROUNDED_COSTS = {
+		10000000: 1000,
+		1000000: 10000000,
+		100000: 1000000,
+		10000: 100000,
+		1000: 10000
+	}
 
 	// Replaces (1x, skill 373 ルビフリップ): in battle this is the damage
 	// formula; outside battle it steps the 消費額 variable (268) through
@@ -3165,15 +3181,13 @@
 				$attack1(Number(parts[0]), user, target, Number(parts[1])) * Number(parts[2]),
 				user.mdf / 10);
 		}
-		var nextCost = {
-			10000000: 1000,
-			1000000: 10000000,
-			100000: 1000000,
-			10000: 100000,
-			1000: 10000
-		}[$gameVariables.value(268)];
-		if (nextCost !== undefined) $gameVariables.setValue(268, nextCost);
-		TickerManager.show(`\x1bSIN[${item.id}]の消費額が\\C[10]${$gameVariables.value(268).toLocaleString()}\\C[0]に変更されました。`);
+		var nextCost = ROUNDED_COSTS[$gameVariables.value(268)];
+		if (nextCost !== undefined) 
+			$gameVariables.setValue(268, nextCost);
+
+		const itemName = `\x1bSIN[${item.id}]`;
+		const charaName = colorTaggedText(10, $gameVariables.value(268).toLocaleString());
+		TickerManager.show(`${itemName}の消費額が${charaName}に変更されました。`);
 		return 0;
 	};
 
@@ -3213,7 +3227,8 @@
 		if (!$gameSwitches.value(95)) {
 			$gameSwitches.setValue(95, true);
 			time_settei();
-			BattleManager._logWindow.push(`addText`, `${target.name()}達のStatus閲覧可能`);
+			const targetName = target.name();
+			BattleManager._logWindow.push(`addText`, `${targetName}達のStatus閲覧可能`);
 		}
 	};
 
@@ -3394,7 +3409,8 @@
 	// Replaces (1x, skill 431 経験値獲得率1000%up).
 	AGH_afterEvalLogExpRate = function (target) {
 		var rate = Math.round(target.exr * 100);
-		BattleManager._logWindow.push(`addText`, target.name() + 'の経験値獲得率が上昇し' + rate + '%になった！');
+		const targetName = target.name();
+		BattleManager._logWindow.push(`addText`, `${targetName}の経験値獲得率が上昇し${rate}%になった！`);
 	};
 
 	// Replaces (1x, skill 432 ルピ獲得率1000%up).
@@ -3405,26 +3421,35 @@
 	// Replaces (2x, skills 433 ダメージ上限撤廃 / 434 バフ上限最大値 - the
 	// database gives both the same body, so both announce a damage cap).
 	AGH_afterEvalLogDamageCapRemoved = function (target) {
-		BattleManager._logWindow.push(`addText`, target.name() + 'のダメージ上限が取り払われた！');
+		const targetName = target.name();
+		BattleManager._logWindow.push(`addText`, `${targetName}のダメージ上限が取り払われた！`);
 	};
 
 	// Replaces (1x, skill 891 仲間を呼ぶ).
 	AGH_afterEvalLogCalledAllies = function (target) {
-		BattleManager._logWindow.push(`addText`, target.name() + 'は仲間を呼んだ！');
+		const targetName = target.name();
+		BattleManager._logWindow.push(`addText`, `${targetName}は仲間を呼んだ！`);
 	};
 
+	const CHARACTER_LOOK_VARIANTS = [
+		`はこちらの様子を見ている…。`,
+		`はボーっとしている…。`,
+		`はあらぬ方向を眺めている…。`,
+		`は故郷に想いを馳せている…。`
+	];
+	
 	// Replaces (1x, skill 892 様子を見る). The idle line is rolled BEFORE the
 	// state checks, exactly as in the original, so the RNG stream is unchanged.
 	AGH_afterEvalLogIdleMessage = function (target) {
-		var lines = [
-			`はこちらの様子を見ている…。`,
-			`はボーっとしている…。`,
-			`はあらぬ方向を眺めている…。`,
-			`は故郷に想いを馳せている…。`
-		];
-		var text = lines[getRandomIndex(lines.length)];
-		if (target.isStateAffected(420)) text = '「………………」。';
-		if (target.isStateAffected(91)) text = 'は厭らしい嗤いを浮かべている…。';
+		if (target.isStateAffected(420)) {
+			text = '「………………」。';
+		}
+		else if (target.isStateAffected(91)) {
+			text = 'は厭らしい嗤いを浮かべている…。'
+		}
+		else {
+			var text = CHARACTER_LOOK_VARIANTS[getRandomIndex(CHARACTER_LOOK_VARIANTS.length)];
+		}
 		BattleManager._logWindow.push(`addText`, target.name() + text);
 	};
 
