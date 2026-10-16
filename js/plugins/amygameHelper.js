@@ -4492,16 +4492,21 @@
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:9
+	// sourceValue(value1) and targetValue(weaponId) are callbacks evaluated
+	// inside the loop: the original Script block interpolated `value1` (the
+	// weapon's SubstitutionActorId) and `i` (the loop index) per iteration,
+	// so those expressions cannot be computed at the call site.
 	AGH_nameWeaponsFromVariable = function (interp, arrayVariableId, sourceVariableId, sourceValue, metaKey, targetVariableId, targetValue) {
 		setSelfVar(interp, arrayVariableId, Array(101).fill(0));
 		range(301, 400).forEach(weaponId => {
 			const weapon = $dataWeapons[weaponId];
 			if (weapon.name !== '') {
 				if (weapon.meta['SubstitutionActorId']) {
-					varValue(sourceVariableId)[weaponId - 300] = sourceValue;
+					const value1 = Number(weapon.meta['SubstitutionActorId']);
+					varValue(sourceVariableId)[weaponId - 300] = sourceValue(value1);
 				}
 				if (weapon.meta[metaKey]) {
-					varValue(targetVariableId)[weaponId - 300] = targetValue;
+					varValue(targetVariableId)[weaponId - 300] = targetValue(weaponId);
 				}
 			}
 		});
