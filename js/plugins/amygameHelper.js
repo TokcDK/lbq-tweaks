@@ -35,7 +35,7 @@
 	}
 
 	//内部用。変数292(スポーンID一覧)が未設定/配列でない場合の事故を防ぐ
-	function aghSpawnIdList() {
+	function AGH_spawnIdList() {
 		var spawnIdList = $gameVariables.value(292);
 		return Array.isArray(spawnIdList) ? spawnIdList : [];
 	}
@@ -157,7 +157,7 @@
 		} else {
 			event_respawnSetA(spawnSlot, a, b, c);
 		}
-		interp._eventId = aghSpawnIdList()[spawnSlot] || 0;
+		interp._eventId = AGH_spawnIdList()[spawnSlot] || 0;
 	};
 
 	// Replaces (~31x):
@@ -167,7 +167,7 @@
 	//   event.setDirection(<dir>);
 	AGH_locateSpawnedNpc = function (id, x, y, dir) {
 		var spawnSlot = id;
-		var event = $gameMap.event(aghSpawnIdList()[spawnSlot]);
+		var event = $gameMap.event(AGH_spawnIdList()[spawnSlot]);
 		if (!event) return;
 		event.locate(x, y);
 		event.setDirection(dir);
@@ -178,7 +178,7 @@
 	//   arr1.push($gameVariables.value(292)[<id1>]); ...
 	//   event_NpcCharaMoveId(45,"<action>",arr1);
 	AGH_npcGroupAction = function (ids, action) {
-		var spawnIdList = aghSpawnIdList();
+		var spawnIdList = AGH_spawnIdList();
 		if (spawnIdList.length === 0) return;
 		var spawnEventIds = [];
 		ids.forEach(function (id) {
@@ -377,7 +377,7 @@
 	// `|| 0` fallback, leaving _eventId undefined for an empty slot. The single
 	// definition below keeps the guarded accessor and the fallback.
 	CEH_setEventIdFromSpawnList = function (interp, slot) {
-		interp._eventId = aghSpawnIdList()[slot] || 0;
+		interp._eventId = AGH_spawnIdList()[slot] || 0;
 	};
 
 	// Replaces (18x):
@@ -391,7 +391,7 @@
 	//     ...
 	//   };
 	CEH_eraseAllSpawnedEvents = function () {
-		var spawnIdList = aghSpawnIdList();
+		var spawnIdList = AGH_spawnIdList();
 		for (var i = 0; i <= spawnIdList.length - 1; i++) {
 			const id = spawnIdList[i];
 			if (id < 1 || !$gameMap.event(id) || $gameParty.inBattle()) {
@@ -417,12 +417,6 @@
 		if (valueThisEventId >= 1) { interp._eventId = valueThisEventId };
 	};
 
-	// Replaces (11x):
-	//   this._eventId = valueBossId;
-	CEH_setEventIdToBoss = function (interp) {
-		interp._eventId = valueBossId;
-	};
-
 	//=============================================================================
 	// Respawn presets (main NPC / sub NPC combinations)
 	//=============================================================================
@@ -436,7 +430,7 @@
 	CEH_respawnMainNpcDefault = function (interp) {
 		var spawnSlot = $gameVariables.value(530);
 		event_respawnSetA(spawnSlot, 14, 34, 1, 4);
-		interp._eventId = aghSpawnIdList()[spawnSlot] || 0;
+		interp._eventId = AGH_spawnIdList()[spawnSlot] || 0;
 		var spawnSlot = 11;
 		event_respawnSetN(spawnSlot, 16, 15, 0, 'npcUnique1', 0, 4);
 	};
@@ -472,12 +466,12 @@
 		if (!npcPreset) return;
 		var spawnSlot = $gameVariables.value(530);
 		event_respawnSetA(spawnSlot, npcPreset[3], npcPreset[4], 1);
-		var event = $gameMap.event(aghSpawnIdList()[spawnSlot]);
+		var event = $gameMap.event(AGH_spawnIdList()[spawnSlot]);
 		if (event) {
 			event.setImage(npcPreset[1], npcPreset[2]);
 			event.setDirection(npcPreset[5]);
 		}
-		interp._eventId = aghSpawnIdList()[spawnSlot] || 0;
+		interp._eventId = AGH_spawnIdList()[spawnSlot] || 0;
 	};
 
 	// Replaces (11x):
@@ -493,7 +487,7 @@
 		if (!npcPreset) return;
 		var spawnSlot = $gameVariables.value(530);
 		event_respawnSetA(spawnSlot, npcPreset[3], npcPreset[4], 1, npcPreset[5]);
-		interp._eventId = aghSpawnIdList()[spawnSlot] || 0;
+		interp._eventId = AGH_spawnIdList()[spawnSlot] || 0;
 		var spawnSlot = 11;
 		event_respawnSetN(spawnSlot, npcPreset[8], npcPreset[9], 0, npcPreset[6], npcPreset[7], npcPreset[10]);
 	};
@@ -508,7 +502,7 @@
 	//   drowsepost.camera.zoom(1, 60, value1);
 	CEH_zoomToPartySpawnedEvent = function () {
 		var spawnSlot = $gameVariables.value(530);
-		var spawnedEventId = aghSpawnIdList()[spawnSlot] || 0;
+		var spawnedEventId = AGH_spawnIdList()[spawnSlot] || 0;
 		drowsepost.camera.zoom(1, 60, spawnedEventId);
 	};
 
@@ -560,7 +554,7 @@
 
 	// Replaces (33x):
 	//   $gameVariables.setValue(20,$gameVariables.value(530));//H主体ｱｸﾀｰID
-	CEH_surrentActorId = function () {
+	CEH_currentActorId = function () {
 		$gameVariables.setValue(20, $gameVariables.value(530)); // H主体ｱｸﾀｰID
 	};
 
@@ -628,7 +622,7 @@
 	//   event_partyCharaMove(45,"this.turnTowardCharacter($gameMap.event("+value1+"));");
 	CEH_turnPartyTowardSpawnedEvent = function () {
 		var spawnSlot = $gameVariables.value(530);
-		var spawnedEventId = aghSpawnIdList()[spawnSlot] || 0;
+		var spawnedEventId = AGH_spawnIdList()[spawnSlot] || 0;
 		event_partyCharaMove(45, "this.turnTowardCharacter($gameMap.event(" + spawnedEventId + "));");
 	};
 
@@ -674,7 +668,7 @@
 	};
 
 	// Replaces (26x): event_charaPreset/Root + page variable -> event_pararelStarting
-	CEH_mapEventPararelStart = function (eventId) {
+	CEH_mapEventParallelStart = function (eventId) {
 		AGH_event_charaPrepChara(eventId);
 		var pageVariable = $dataMap.events[eventId].pages[0].conditions.variableValue;
 		event_pararelStarting(0, pageVariable + 301, eventId);
@@ -908,7 +902,6 @@
 			var metaValue = database[i].meta[metaKey];
 			if (!metaValue) continue;
 			var imageName = pathPrefix + metaValue.split(',')[fieldIndex];
-			console.log(`${i}  ${imageName}`);
 			$gameScreen.showPicture(pictureId, imageName, 1, 640 - 128, 384, 100, 100, 255, 0);
 			pictureId += 1;
 		}
@@ -2161,7 +2154,7 @@
 		if (!$dataSystem.optSideView) return;
 		if (user.isStateAffected(1) || user.isStateAffected(64)) return;
 		if (!user.isBattleMember()) return;
-		
+
 		var weapon = user.equips()[0];
 		if (!weapon) return;
 		var weaponData = $dataWeapons[weapon.id];
@@ -3182,7 +3175,7 @@
 				user.mdf / 10);
 		}
 		var nextCost = ROUNDED_COSTS[$gameVariables.value(268)];
-		if (nextCost !== undefined) 
+		if (nextCost !== undefined)
 			$gameVariables.setValue(268, nextCost);
 
 		const itemName = `\x1bSIN[${item.id}]`;
@@ -3964,12 +3957,10 @@
 	/* --- debug helpers ------------------------------------------------------- */
 
 	function showDebugPicture(pictureSlot, entryId, picturePath) {
-		console.log(`${entryId}  ${picturePath}`);
 		showPic(pictureSlot, picturePath, 640 - 128, 384, 100, 100, 255, 1);
 	}
 	function playMetaBgm(entryId, bgmName) {
 		if (bgmName === 'NoMusic') return;
-		console.log(`${entryId}  ${bgmName}`);
 		AudioManager.playBgm({ name: bgmName, volume: 100, pitch: 100, pan: 0 });
 	}
 	/* ============================================================================
@@ -7603,7 +7594,8 @@
 
 	// Replaces (1x): data/CommonEvents.json:common-event:103
 	AGH_logDebugValueActor20 = function () {
-		console.log($gameActors.actor(20));
+		// NOTE: debug console.log removed (debug output only); the helper
+		// is kept as a no-op because its call site still exists.
 	};
 
 	// Replaces (1x): data/CommonEvents.json:common-event:64
@@ -7628,12 +7620,14 @@
 
 	// Replaces (4x): data/CommonEvents.json:common-event:53
 	AGH_logVariableValue = function (variableId) {
-		console.log(varValue(variableId));
+		// NOTE: debug console.log removed (debug output only); the helper
+		// is kept as a no-op because its call site still exists.
 	};
 
 	// Replaces (2x): data/CommonEvents.json:common-event:53, data/CommonEvents.json:common-event:199
 	AGH_logDebugValue3 = function (value) {
-		console.log(value);
+		// NOTE: debug console.log removed (debug output only); the helper
+		// is kept as a no-op because its call site still exists.
 	};
 
 	// Replaces (3x): data/CommonEvents.json:common-event:52
@@ -7681,18 +7675,19 @@
 
 	// Replaces (7x): data/Map003.json:map-event:180:page:1, Map193.json events
 	AGH_logDebugValue4 = function () {
-		console.log(`${$gameMap.tileId(6, 14, 1)}`);
+		// NOTE: debug console.log removed (debug output only); the helper
+		// is kept as a no-op because its call site still exists.
 	};
 
 	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
 	AGH_logDebugValue5 = function () {
-		console.log($dataItems[7].recipeItem[1]);
+		// NOTE: debug console.log removed (debug output only); the helper
+		// is kept as a no-op because its call site still exists.
 	};
 
 	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
 	AGH_logDebugValue6 = function (interp) {
 		value1 = DataManager.getSynthesisIngredient($dataItems[234], 0);
-		console.log(valueItemsSynth1);
 		setSelfVar(interp, 21, value1.id + 1000);
 	};
 
@@ -7700,13 +7695,9 @@
 	AGH_debugLogTreasurePools = function () {
 		const treasurePool = eval(`valueDanjonTreasure${varValue(CURRENT_ACTOR_VAR)}`);
 		const treasureKindPool = eval(`valueDanjonTrSyurui${varValue(CURRENT_ACTOR_VAR)}`);
-		console.log(treasurePool);
-		console.log(treasureKindPool);
 		const pickedTreasureId = treasurePool[getRandomIndex(treasurePool.length)];
 		const pickedIndex = treasurePool.findIndex(treasureId => treasureId === pickedTreasureId);
 		if (pickedIndex >= 0) treasurePool.splice(pickedIndex, 1);
-		console.log(treasurePool);
-		console.log($dataItems[pickedTreasureId].name);
 	};
 
 	// Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
@@ -8702,7 +8693,7 @@
 
 	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
 	AGH_traceDebugOutput = function () {
-		console.log(array[getRandomIndex(array.length)]);
+		getRandomIndex(array.length); // was: console.log(...) - RNG advance kept
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
@@ -8830,7 +8821,6 @@
 			var actor = $gameActors.actor($gameVariables.value(20));
 			var list = actor.actor().traits;
 			list.forEach(function (id) {
-				console.log(id);
 			}, this);
 		}).call(interp);
 	};
@@ -8918,8 +8908,8 @@
 
 	// Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
 	AGH_mapArrayFrequentlyUsed = function () {
-		var array = [...Array(100)].map((_, i) => i + 101);
-		console.log(`${arr1}`);
+		// NOTE: debug console.log removed (debug output only); the helper
+		// is kept as a no-op because its call site still exists.
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
@@ -9820,8 +9810,6 @@
 		for (var i = 1; i <= end; i++) {
 			if (valueItems[i].meta[BGInN]) {
 				var array = valueItems[i].meta[BGInN].split(',')[0];
-				console.log(`${i}  ${value1}`);
-				console.log(`${value1}`);
 				$gameScreen.showPicture(j, array, 1, 640 - 128, 384, 100, 100, 255, 0);
 				j += 1;
 			}
@@ -9836,7 +9824,6 @@
 		for (var i = 1; i <= end; i++) {
 			if (valueItems[i].meta[EnemyEntrySe]) {
 				var array = valueItems[i].meta[EnemyEntrySe].split(',')[0];
-				console.log(`${i}  ${array}`);
 				AudioManager.playSe({ "name": array, "volume": 100, "pitch": 100, "pan": 0 });
 				j += 1;
 			}
@@ -9852,7 +9839,6 @@
 			if (valueItems[i].meta[value2]) {
 				var value1 = valueItems[i].meta[value2].split(',')[0];
 				var value1 = '/img/parallaxes/' + value1;
-				console.log(`${i}  ${value1}`);
 				$gameScreen.showPicture(j, value1, 1, 640 - 128, 384, 100, 100, 255, 0);
 				j += 1;
 			}
@@ -9891,7 +9877,6 @@
 			this.sVal(20, 1);
 			var actor = $gameActors.actor($gameVariables.value(20));
 			var value1 = actor.stateRate(62) * 100
-			console.log(`${value1}`);
 		}).call(interp);
 	};
 
@@ -9916,16 +9901,8 @@
 
 	// Replaces (1x): CommonEvents.json:common-event:53|デバッグコモン
 	AGH_iterateTroopsDebugCommon = function () {
-		console.log($dataTroops[11].members);
-		console.log($dataTroops[12].members);
-		console.log($dataTroops[13].members);
-		console.log($dataTroops[14].members);
-		console.log($dataTroops[15].members);
-		console.log($dataTroops[16].members);
-		console.log($dataTroops[17].members);
-		console.log($dataTroops[18].members);
-		console.log($dataTroops[19].members);
-		console.log($dataTroops[20].members);
+		// NOTE: debug console.log removed (debug output only); the helper
+		// is kept as a no-op because its call site still exists.
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:53|デバッグコモン
@@ -9936,7 +9913,6 @@
 		for (var i = 1; i <= $dataWeapons.length - 1; i++) { messageText += `[${i}]${$dataWeapons[i].name}\n` };
 		for (var i = 1; i <= 500; i++) { messageText += `[${i}]${$dataArmors[i].name}\n` };
 		for (var i = 1; i <= $dataSkills.length - 1; i++) { messageText += `[${i}]${$dataSkills[i].name}\n` };
-		console.log(messageText)
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:53|デバッグコモン
@@ -10392,7 +10368,6 @@
 				if (!$gameParty.members().contains($gameActors.actor(array[i]))) {
 					$gameParty.addActor(array[i])
 					$gameActors.actor(array[i]).refresh();
-					console.log(array[i]);
 				}
 			}
 		};
@@ -12198,7 +12173,6 @@
 	AGH_readVariableTrainingDollPreset = function () {
 		var value1 = 6;
 		var variable293Value = $gameVariables.value(293)[value1];
-		console.log(`${variable293Value}`);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:176|訓練人形設定
@@ -17663,11 +17637,6 @@
 			if (!!$gameMap.event(id)) {
 				if ($gameMap.event(id).event().meta['IconDisplay']) {
 					var value1 = Number($gameMap.event(id).event().meta['IconDisplay']);
-					if (value1 == 17) {
-						if ($gameMap.event(id).characterName() == 0) {
-							console.log(`${1}`);
-						}
-					}
 				}
 			}
 		};
@@ -17784,7 +17753,6 @@
 	// Replaces (1x): Map007.json:event:11|EV011|page:1
 	AGH_traceDebugEv011 = function () {
 		var value1 = 51;
-		console.log(`${-value1 + 30}`);
 	};
 
 	// Replaces (1x): Map007.json:event:17|EV017|page:1
@@ -18161,8 +18129,8 @@
 		// item id from 154 to 159
 		// switch id from 161 to 166
 		for(let id = 154; id < 160; id++){
-			if ($gameParty.numItems($dataItems[id]) >= itemsCnt) { 
-				$gameSwitches.setValue(id + 7, true) 
+			if ($gameParty.numItems($dataItems[id]) >= itemsCnt) {
+				$gameSwitches.setValue(id + 7, true)
 			};
 		}
 	};
