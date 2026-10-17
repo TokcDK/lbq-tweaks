@@ -241,8 +241,8 @@
                 };
                 if (itemMeta['annihilationTitle']) {
                     if (Number(itemMeta['annihilationTitle'].split(',')[0]) >= 20) {
-                        var target = $dataItems[Number(itemMeta['annihilationTitle'].split(',')[0])].name;
-                        item.name = `${target}を殲滅せし者`;
+                        var annihilationTargetName = $dataItems[Number(itemMeta['annihilationTitle'].split(',')[0])].name;
+                        item.name = `${annihilationTargetName}を殲滅せし者`;
                     };
                 };
                 if (itemMeta['MapSwitch']) {
@@ -326,11 +326,11 @@
         const pushItemTrait = (databaseEntry, meta, list) => {
             if (!meta) return;
 
-            const res = Number(meta);
-            const code = res == 0 ? 14 : 13;
-            const value = res == 0 ? 1 : 1 - (res / 100);
+            const resistPercent = Number(meta);
+            const code = resistPercent == 0 ? 14 : 13;
+            const resistRate = resistPercent == 0 ? 1 : 1 - (resistPercent / 100);
             list.forEach(function (id) {
-                databaseEntry.traits.push({ code: code, dataId: id, value: value });
+                databaseEntry.traits.push({ code: code, dataId: id, value: resistRate });
             }, this);
         }
 
@@ -362,19 +362,19 @@
                 pushItemTrait(databaseEntry, valueItemMeta['StateSPabNomalResist'], spResistStateIds);
                 if (valueItemMeta['elementRegist6']) {
                     const resistPercent = Number(valueItemMeta['elementRegist6']);
-                    const value = resistPercent == 0 ? 0 : 1 - (resistPercent / 100);
+                    const elementResistRate = resistPercent == 0 ? 0 : 1 - (resistPercent / 100);
                     for (let dataId = 3; dataId <= 8; dataId++) {
-                        databaseEntry.traits.push({ code: 11, dataId: dataId, value: value });
+                        databaseEntry.traits.push({ code: 11, dataId: dataId, value: elementResistRate });
                     }
                 };
                 if (valueItemMeta['elementRegist9']) {
                     const resistPercent = Number(valueItemMeta['elementRegist9']);
-                    const value = resistPercent == 0 ? 0 : 1 - (resistPercent / 100);
+                    const elementResistRate = resistPercent == 0 ? 0 : 1 - (resistPercent / 100);
                     for (let dataId = 3; dataId <= 9; dataId++) {
-                        databaseEntry.traits.push({ code: 11, dataId: dataId, value: value });
+                        databaseEntry.traits.push({ code: 11, dataId: dataId, value: elementResistRate });
                     }
-                    databaseEntry.traits.push({ code: 11, dataId: 16, value: value });
-                    databaseEntry.traits.push({ code: 11, dataId: 17, value: value });
+                    databaseEntry.traits.push({ code: 11, dataId: 16, value: elementResistRate });
+                    databaseEntry.traits.push({ code: 11, dataId: 17, value: elementResistRate });
                 };
             };
         };
@@ -893,7 +893,7 @@
     actor_skilllearn2 = function (actorId) {
 
         var learnAnimationId = 300;
-        var value = "21_SkillLearn";
+        var learnMeName = "21_SkillLearn";
         var actor = $gameActors.actor(actorId);
         var start = 101;
         var end = 200;
@@ -917,7 +917,7 @@
                 } else {
                     $gameParty.members()[actor.index()].startAnimation(learnAnimationId, false, 0);
                 };
-                AudioManager.playMe({ "name": value, "volume": 60, "pitch": 120, "pan": 0 });
+                AudioManager.playMe({ "name": learnMeName, "volume": 60, "pitch": 120, "pan": 0 });
                 var learnMessage = `${actor.name()}の\x1bSIN[${i}]がRank${masteryThreshold}に到達し、\x1bSIN[${derivedSkillId}]が派生した！`;
                 if ($gameParty.inBattle()) {
                     BattleManager._logWindow.push(`addText`, learnMessage);
@@ -1164,8 +1164,8 @@
             var clearCountRemaining = 1;
         };
         if (sourceEntries[itemId].meta['StateabNomalOnly']) {
-            var stateCategory = b.getStateCategoryAffectedCount('StateabNomal');
-            if (stateCategory == 0) {
+            var abnormalStateCount = b.getStateCategoryAffectedCount('StateabNomal');
+            if (abnormalStateCount == 0) {
                 const targetName = b.name();
                 var resultMessage = `${targetName}は基本状態異常を付与されていない為、効果が無かった。`;
                 if (a.isActor()) {
@@ -1181,8 +1181,8 @@
                 var skipOrCountFlag = 1;
             };
         } else {
-            var stateCategory = b.getStateCategoryAffectedCount('StateabNomal') + b.getStateCategoryAffectedCount('StateSPabNomal');
-            if (stateCategory == 0) {
+            var abnormalStateCount = b.getStateCategoryAffectedCount('StateabNomal') + b.getStateCategoryAffectedCount('StateSPabNomal');
+            if (abnormalStateCount == 0) {
                 const targetName = b.name();
                 var resultMessage = `${targetName}は基本特殊状態異常を付与されていない為、効果が無かった。`;
                 if (a.isActor()) {
@@ -1200,11 +1200,11 @@
         };
         if (skipOrCountFlag == 0) {
             if (sourceEntries[itemId].meta['abNomalClearCountPlus']) {
-                var stateCategory = Math.floor(a.param(4) / 300);
-                if (stateCategory >= 1) {
+                var bonusClearCount = Math.floor(a.param(4) / 300);
+                if (bonusClearCount >= 1) {
                     const targetName = a.name();
                     const magic = colorTaggedText(16, 'Magic');
-                    const amount = colorTaggedText(3, '+' + stateCategory);
+                    const amount = colorTaggedText(3, '+' + bonusClearCount);
                     var resultMessage = `${targetName}の${magic}により回復数${amount}！`;
                     if (a.isActor()) {
                         if ($gameParty.inBattle()) {
@@ -1213,7 +1213,7 @@
                             TickerManager.show(resultMessage);
                         };
                     };
-                    var clearCountRemaining = clearCountRemaining + stateCategory;
+                    var clearCountRemaining = clearCountRemaining + bonusClearCount;
                 };
             };
             var stateCategory = 'StateabNomal';
@@ -1300,8 +1300,8 @@
             } else {
                 var dispelCountRemaining = 1;
             };
-            var stateCategory = b.getStateCategoryAffectedCount('PowerUp');
-            if (stateCategory == 0) {
+            var powerUpStateCount = b.getStateCategoryAffectedCount('PowerUp');
+            if (powerUpStateCount == 0) {
                 const targetName = b.name();
                 var resultMessage = `${targetName}は強化状態を付与されていない為、効果が無かった。`;
                 if (a.isActor()) {
@@ -1317,11 +1317,11 @@
                 var skipOrCountFlag = 1;
             };
             if (sourceEntries[itemId].meta['dispelCountPlus']) {
-                var stateCategory = Math.floor(a.param(4) / 300);
-                if (stateCategory >= 1) {
+                var bonusDispelCount = Math.floor(a.param(4) / 300);
+                if (bonusDispelCount >= 1) {
                     const targetName = a.name();
                     const magic = colorTaggedText(16, `Magic`);
-                    const amount = colorTaggedText(3, '+' + stateCategory)
+                    const amount = colorTaggedText(3, '+' + bonusDispelCount)
                     var resultMessage = `${targetName}の${magic}により消去数${amount}！`;
                     if (a.isActor()) {
                         if ($gameParty.inBattle()) {
@@ -1330,7 +1330,7 @@
                             TickerManager.show(resultMessage);
                         };
                     };
-                    var dispelCountRemaining = dispelCountRemaining + stateCategory;
+                    var dispelCountRemaining = dispelCountRemaining + bonusDispelCount;
                 };
             };
             var stateCategory = 'PowerUp';
@@ -1593,15 +1593,15 @@
 
         if ($gameVariables.value(220) === 0) return; // have empty common enemy's pool
 
+        const chestItemMeta = $dataItems[$gameVariables.value(240)].meta;
         let spawnChanceOffset = 0;
         for (let troopId = 11; troopId <= 20; troopId++) {
             const enemyTroop = $dataTroops[troopId];
-            const troopMeta = $dataItems[$gameVariables.value(240)].meta;
-            enemyTroop.name = troopMeta['TroopName'];
+            enemyTroop.name = chestItemMeta['TroopName'];
             enemyTroop.members = []; //グループのメンバーを空に
 
             // get enemy count to spawn
-            enemyCountToSpawn = calculateEnemyCountToSpawnEnemyTroopPush(troopMeta);
+            const enemyCountToSpawn = calculateEnemyCountToSpawnEnemyTroopPush(chestItemMeta);
 
             // get enemy spawn pool
             const spawnResult = calculateSpawnPoolEnemyTroopPush(spawnChanceOffset);
@@ -1678,15 +1678,32 @@
 
     function getSpawnCoordinatesEnemyTroopPush(spawnIndex, enemyCountToSpawn, xOffsetOptions, yNegativeOffsetOptions, yPositiveOffsetOptions) {
         let spawnX, spawnY;
-        if (spawnIndex == 1) { spawnX = 450; spawnY = 350; }
-        if (enemyCountToSpawn == 1) { spawnX = 350; spawnY = 420; }
-        if (spawnIndex == 2) { spawnX = 400; spawnY = 500; }
-        if (spawnIndex == 3) { spawnX = 350; spawnY = 350; }
-        if (spawnIndex == 4) { spawnX = 300; spawnY = 500; }
-        if (spawnIndex == 5) { spawnX = 250; spawnY = 350; }
-        if (spawnIndex == 6) { spawnX = 200; spawnY = 500; }
-        if (spawnIndex == 7) { spawnX = 150; spawnY = 350; }
-        if (spawnIndex == 8) { spawnX = 100; spawnY = 500; }
+        switch (spawnIndex) {
+            case 1:
+                spawnX = 450; spawnY = 350;
+                break;
+            case 2:
+                spawnX = 400; spawnY = 500;
+                break;
+            case 3:
+                spawnX = 350; spawnY = 350;
+                break;
+            case 4:
+                spawnX = 300; spawnY = 500;
+                break;
+            case 5:
+                spawnX = 250; spawnY = 350;
+                break;
+            case 6:
+                spawnX = 200; spawnY = 500;
+                break;
+            case 7:
+                spawnX = 150; spawnY = 350;
+                break;
+            case 8:
+                spawnX = 100; spawnY = 500;
+                break;
+        };
 
         if (spawnIndex >= 2 && spawnIndex <= 6) {
             spawnX += Number(xOffsetOptions[getRandomIndex(xOffsetOptions.length)]);
@@ -1696,23 +1713,25 @@
         } else {
             spawnY += Number(yPositiveOffsetOptions[getRandomIndex(yPositiveOffsetOptions.length)]);
         }
-        if (enemyCountToSpawn == 2) {
-            if (spawnIndex == 2) { spawnX -= 200; }
-        }
-        if (enemyCountToSpawn == 3) {
-            if (spawnIndex == 2) { spawnX -= 100; }
-            if (spawnIndex == 3) { spawnX -= 100; }
-        }
-        if (enemyCountToSpawn == 4) {
-            if (spawnIndex == 2) { spawnX -= 100; }
-            if (spawnIndex == 3) { spawnX -= 100; }
-            if (spawnIndex == 4) { spawnX -= 200; }
-        }
-        if (enemyCountToSpawn == 5) {
-            if (spawnIndex == 3) { spawnX -= 100; spawnY += 50; }
-            if (spawnIndex == 4) { spawnX -= 200; }
-            if (spawnIndex == 5) { spawnX -= 100; }
-        }
+        switch (enemyCountToSpawn) {
+            case 2:
+                if (spawnIndex == 2) { spawnX -= 200; }
+                break;
+            case 3:
+                if (spawnIndex == 2) { spawnX -= 100; }
+                if (spawnIndex == 3) { spawnX -= 100; }
+                break;
+            case 4:
+                if (spawnIndex == 2) { spawnX -= 100; }
+                if (spawnIndex == 3) { spawnX -= 100; }
+                if (spawnIndex == 4) { spawnX -= 200; }
+                break;
+            case 5:
+                if (spawnIndex == 3) { spawnX -= 100; spawnY += 50; }
+                if (spawnIndex == 4) { spawnX -= 200; }
+                if (spawnIndex == 5) { spawnX -= 100; }
+                break;
+        };
         spawnY -= 80; // Adjust according to battle background
         return { spawnX, spawnY };
     }
@@ -1782,26 +1801,28 @@
         spawnY += Number(yOffsetOptions[getRandomIndex(yOffsetOptions.length)]);
 
         // Apply positioning adjustments based on enemy count
-        if (enemyCountToSpawn === 2) {
-            if (spawnIndex === 2) spawnX -= 200;
-        }
-        else if (enemyCountToSpawn === 3) {
-            if (spawnIndex === 2) spawnX -= 100;
-            if (spawnIndex === 3) spawnX -= 100;
-        }
-        else if (enemyCountToSpawn === 4) {
-            if (spawnIndex === 2) spawnX -= 100;
-            if (spawnIndex === 3) spawnX -= 100;
-            if (spawnIndex === 4) spawnX -= 200;
-        }
-        else if (enemyCountToSpawn === 5) {
-            if (spawnIndex === 3) {
-                spawnX -= 100;
-                spawnY += 50;
-            }
-            if (spawnIndex === 4) spawnX -= 200;
-            if (spawnIndex === 5) spawnX -= 100;
-        }
+        switch (enemyCountToSpawn) {
+            case 2:
+                if (spawnIndex === 2) spawnX -= 200;
+                break;
+            case 3:
+                if (spawnIndex === 2) spawnX -= 100;
+                if (spawnIndex === 3) spawnX -= 100;
+                break;
+            case 4:
+                if (spawnIndex === 2) spawnX -= 100;
+                if (spawnIndex === 3) spawnX -= 100;
+                if (spawnIndex === 4) spawnX -= 200;
+                break;
+            case 5:
+                if (spawnIndex === 3) {
+                    spawnX -= 100;
+                    spawnY += 50;
+                }
+                if (spawnIndex === 4) spawnX -= 200;
+                if (spawnIndex === 5) spawnX -= 100;
+                break;
+        };
 
         return { spawnX, spawnY };
     }
@@ -1889,8 +1910,8 @@
             const firstAnnihilationItemArray = itemMeta['firstAnnihilationItem'].split(',');
             const itemType = Number(firstAnnihilationItemArray[0]);
             const rewardItems = itemType === 0 ? dataItems : itemType === 1 ? $dataWeapons : $dataArmors;
-            const item = rewardItems[Number(firstAnnihilationItemArray[1])].name;
-            glossaryText.push(`\\C[16]初回殲滅報酬：\\C[0]\\C[10]${item}\\C[0]　\n`);
+            const rewardItemName = rewardItems[Number(firstAnnihilationItemArray[1])].name;
+            glossaryText.push(`\\C[16]初回殲滅報酬：\\C[0]\\C[10]${rewardItemName}\\C[0]　\n`);
         }
 
         // Add treasure chest info
@@ -1898,8 +1919,8 @@
             const treasureChestArray = itemMeta['TchestOnly'].split(',');
             const itemType = Number(treasureChestArray[3]);
             const treasureItems = itemType === 0 ? dataItems : itemType === 1 ? $dataWeapons : $dataArmors;
-            const item = treasureItems[Number(treasureChestArray[4])].name;
-            glossaryText.push(`\\C[16]白箱：\\C[0]\\C[10]${item}\\C[0]　\n`);
+            const treasureItemName = treasureItems[Number(treasureChestArray[4])].name;
+            glossaryText.push(`\\C[16]白箱：\\C[0]\\C[10]${treasureItemName}\\C[0]　\n`);
         }
 
         // Add unique materials
@@ -1944,8 +1965,8 @@
 
             const uniqueMaterialArray = itemMeta['UniqueMaterial' + i].split(',');
             if (uniqueMaterialArray[0] >= 1) {
-                const item = dataItems[Number(uniqueMaterialArray[0])].name;
-                materialTextArray.push(`【\\C[3]${item}\\C[0]】`);
+                const materialItemName = dataItems[Number(uniqueMaterialArray[0])].name;
+                materialTextArray.push(`【\\C[3]${materialItemName}\\C[0]】`);
                 materialCount += 1;
 
                 if ((materialCount % 3) === 0) {
@@ -2810,53 +2831,41 @@
     }
 
     //スイッチに応じて遠景と音楽設定スクリプト
+    //スイッチID -> メニュー背景名(parallaxesSound_switchChange用)
+    const PARALLAX_BG_BY_SWITCH_ID = [
+        { switchId: 233, backgroundName: 'BG_Temple' },
+        { switchId: 234, backgroundName: 'BG_Shop1Items' },
+        { switchId: 235, backgroundName: 'BG_Shop3Weapons' },
+        { switchId: 237, backgroundName: 'BG_Shop3Weapons' },
+    ];
+
     parallaxesSound_switchChange = function (switchStateId) {
 
-        if (switchStateId == 2) {
-            if ($gameSwitches.value(233)) {//結果を渡すためにverは付けない
-                if (!$gameSwitches.value(15)) {
-                    valueMapBGM = ['41_TownTemple', 50, 100, 0];
+        switch (switchStateId) {
+            case 2:
+                if ($gameSwitches.value(233)) {//結果を渡すためにverは付けない
+                    if (!$gameSwitches.value(15)) {
+                        valueMapBGM = ['41_TownTemple', 50, 100, 0];
+                    };
                 };
-            };
-            if ($gameSwitches.value(237)) {
-                if (!$gameSwitches.value(15)) {
-                    valueMapBGM = ['41_Guild', 50, 100, 0];
+                if ($gameSwitches.value(237)) {
+                    if (!$gameSwitches.value(15)) {
+                        valueMapBGM = ['41_Guild', 50, 100, 0];
+                    };
                 };
-            };
-        };
-        if (switchStateId == 1) {
-            if ($gameSwitches.value(233)) {
-                $gameVariables.setValue(508, 'BG_Temple');
-                $gameVariables.setValue(81, 0);
-                $gameVariables.setValue(82, 0);
-                if ($gameSwitches.value(15)) {
-                    $gameVariables.setValue(508, $gameVariables.value(508) + 'N');
+                break;
+            case 1:
+                for (const bgmEntry of PARALLAX_BG_BY_SWITCH_ID) {
+                    if ($gameSwitches.value(bgmEntry.switchId)) {
+                        $gameVariables.setValue(508, bgmEntry.backgroundName);
+                        $gameVariables.setValue(81, 0);
+                        $gameVariables.setValue(82, 0);
+                        if ($gameSwitches.value(15)) {
+                            $gameVariables.setValue(508, $gameVariables.value(508) + 'N');
+                        };
+                    };
                 };
-            };
-            if ($gameSwitches.value(234)) {
-                $gameVariables.setValue(508, 'BG_Shop1Items');
-                $gameVariables.setValue(81, 0);
-                $gameVariables.setValue(82, 0);
-                if ($gameSwitches.value(15)) {
-                    $gameVariables.setValue(508, $gameVariables.value(508) + 'N');
-                };
-            };
-            if ($gameSwitches.value(235)) {
-                $gameVariables.setValue(508, 'BG_Shop3Weapons');
-                $gameVariables.setValue(81, 0);
-                $gameVariables.setValue(82, 0);
-                if ($gameSwitches.value(15)) {
-                    $gameVariables.setValue(508, $gameVariables.value(508) + 'N');
-                };
-            };
-            if ($gameSwitches.value(237)) {
-                $gameVariables.setValue(508, 'BG_Shop3Weapons');
-                $gameVariables.setValue(81, 0);
-                $gameVariables.setValue(82, 0);
-                if ($gameSwitches.value(15)) {
-                    $gameVariables.setValue(508, $gameVariables.value(508) + 'N');
-                };
-            };
+                break;
         };
 
     };
@@ -2989,13 +2998,14 @@
     //ボス設定スクリプト  
     boss_setup1 = function (bossConfigId, bossEnemyId) {
 
-        valueSpecialBossId = 0;
         $gameSwitches.setValue(426, false);
         var bossEnemyValues = 0;
         $gameVariables.setValue(303, 0);
         $gameVariables.setValue(628, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
         $gameVariables.setValue(346, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
         $gameVariables.setValue(347, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+        const bossActionValues = $gameVariables.value(346);
+        const bossSpecialActionValues = $gameVariables.value(347);
         //ボス行動は変数346に配列で設定する。
         //特殊行動は347に2次配列
         if (bossConfigId == 1) {
@@ -3007,14 +3017,15 @@
             $gameSwitches.setValue(426, true);
             valueBossEnemyId = bossEnemyId;
         };
-        if (value.meta['BossConfirmDrop']) {
-            var bossEnemyValues = value.meta['BossConfirmDrop'].split(',');
+        const bossMeta = value.meta;
+        if (bossMeta['BossConfirmDrop']) {
+            var bossEnemyValues = bossMeta['BossConfirmDrop'].split(',');
             for (var i = 0; i <= 9; i++) {
                 $gameVariables.value(628)[i] = Number(bossEnemyValues[i]);
             };
         };
-        if (value.meta['BossEnemy']) {
-            var bossEnemyValues = value.meta['BossEnemy'].split(',');
+        if (bossMeta['BossEnemy']) {
+            var bossEnemyValues = bossMeta['BossEnemy'].split(',');
         };
         if (bossEnemyValues != 0) {
             if (bossConfigId == 2) {
@@ -3026,7 +3037,7 @@
             $dataEnemies[valueBossEnemiesId] = Object.assign({}, bossEnemySource);
             var bossEnemyData = $dataEnemies[valueBossEnemiesId];
             bossEnemyData.name = bossEnemyValues[1];
-            if (value.meta['Sideview Battler']) { } else {
+            if (bossMeta['Sideview Battler']) { } else {
                 bossEnemyData.battlerName = String(bossEnemyValues[2]);
             };
             bossEnemyData.battlerHue = Number(bossEnemyValues[3]);
@@ -3034,52 +3045,52 @@
             bossEnemyData.actions[1].skillId = 0;
             bossEnemyData.actions[2].skillId = 0;
             bossEnemyData.actions[3].skillId = 0;
-            $gameVariables.value(346)[0] = Number(bossEnemyValues[4]);//通常攻撃
-            $gameVariables.value(346)[1] = Number(bossEnemyValues[5]);//スキル
-            $gameVariables.value(346)[2] = Number(bossEnemyValues[6]);//必殺技
-            $gameVariables.value(346)[3] = Number(bossEnemyValues[7]);//ＯＤ必殺技
-            if (value.meta['BossAddAttack']) {
-                var bossMetaValues = value.meta['BossAddAttack'].split(',');
-                $gameVariables.value(346)[4] = Number(bossMetaValues[0]);
-                $gameVariables.value(346)[5] = Number(bossMetaValues[1]);
-                $gameVariables.value(346)[6] = Number(bossMetaValues[2]);
+            bossActionValues[0] = Number(bossEnemyValues[4]);//通常攻撃
+            bossActionValues[1] = Number(bossEnemyValues[5]);//スキル
+            bossActionValues[2] = Number(bossEnemyValues[6]);//必殺技
+            bossActionValues[3] = Number(bossEnemyValues[7]);//ＯＤ必殺技
+            if (bossMeta['BossAddAttack']) {
+                var bossMetaValues = bossMeta['BossAddAttack'].split(',');
+                bossActionValues[4] = Number(bossMetaValues[0]);
+                bossActionValues[5] = Number(bossMetaValues[1]);
+                bossActionValues[6] = Number(bossMetaValues[2]);
             } else {
-                $gameVariables.value(346)[4] = Number(bossEnemyValues[4]);
-                $gameVariables.value(346)[5] = Number(bossEnemyValues[4]);
-                $gameVariables.value(346)[6] = Number(bossEnemyValues[4]);
+                bossActionValues[4] = Number(bossEnemyValues[4]);
+                bossActionValues[5] = Number(bossEnemyValues[4]);
+                bossActionValues[6] = Number(bossEnemyValues[4]);
             };
-            if (value.meta['BossAddSkill']) {
-                var bossMetaValues = value.meta['BossAddSkill'].split(',');
-                $gameVariables.value(346)[7] = Number(bossMetaValues[0]);
-                $gameVariables.value(346)[8] = Number(bossMetaValues[1]);
-                $gameVariables.value(346)[9] = Number(bossMetaValues[2]);
+            if (bossMeta['BossAddSkill']) {
+                var bossMetaValues = bossMeta['BossAddSkill'].split(',');
+                bossActionValues[7] = Number(bossMetaValues[0]);
+                bossActionValues[8] = Number(bossMetaValues[1]);
+                bossActionValues[9] = Number(bossMetaValues[2]);
             } else {
-                $gameVariables.value(346)[7] = Number(bossEnemyValues[5]);
-                $gameVariables.value(346)[8] = Number(bossEnemyValues[5]);
-                $gameVariables.value(346)[9] = Number(bossEnemyValues[5]);
+                bossActionValues[7] = Number(bossEnemyValues[5]);
+                bossActionValues[8] = Number(bossEnemyValues[5]);
+                bossActionValues[9] = Number(bossEnemyValues[5]);
             };
             var start = 1;
             var end = 15;
             for (var i = start; i <= end; i++) {
-                if (value.meta['BossSpecialAction' + i]) {
-                    $gameVariables.value(347)[i] = [0, 0, 0];
-                    var bossEnemyValues = value.meta['BossSpecialAction' + i].split(',');
-                    $gameVariables.value(347)[i][0] = Number(bossEnemyValues[0]);
-                    $gameVariables.value(347)[i][1] = Number(bossEnemyValues[1]);
-                    $gameVariables.value(347)[i][2] = Number(bossEnemyValues[2]);
+                if (bossMeta['BossSpecialAction' + i]) {
+                    bossSpecialActionValues[i] = [0, 0, 0];
+                    var bossEnemyValues = bossMeta['BossSpecialAction' + i].split(',');
+                    bossSpecialActionValues[i][0] = Number(bossEnemyValues[0]);
+                    bossSpecialActionValues[i][1] = Number(bossEnemyValues[1]);
+                    bossSpecialActionValues[i][2] = Number(bossEnemyValues[2]);
                 }
             };
             $gameVariables.setValue(343, []);//付与ステートリセット$dataItems[i+100].iconIndex
             var actionSkillIdsOrXs = [];
             var specialActionSkillIdsOrXs = [];
             for (var i = 0; i <= 9; i++) {
-                if ($gameVariables.value(346)[i] >= 1) {
-                    actionSkillIdsOrXs.push($gameVariables.value(346)[i]);
+                if (bossActionValues[i] >= 1) {
+                    actionSkillIdsOrXs.push(bossActionValues[i]);
                 };
             };
             for (var i = 1; i <= 15; i++) {
-                if ($gameVariables.value(347)[i][2] >= 1) {
-                    specialActionSkillIdsOrXs.push($gameVariables.value(347)[i][2]);
+                if (bossSpecialActionValues[i][2] >= 1) {
+                    specialActionSkillIdsOrXs.push(bossSpecialActionValues[i][2]);
                 };
             };
             var bossScratch = 0;
@@ -3114,12 +3125,12 @@
                 $gameVariables.value(343).push(bossScratch + i);
             };
             //$gameVariables.setValue(343,$gameVariables.value(343).concat(arr3));
-            if (value.meta['FrontBoss']) {
+            if (bossMeta['FrontBoss']) {
                 $dataSystem.optSideView = false;
             };
             var troopsId = 21;
-            if (value.meta['BossTroop']) {
-                var bossMetaValues = value.meta['BossTroop'].split(',');
+            if (bossMeta['BossTroop']) {
+                var bossMetaValues = bossMeta['BossTroop'].split(',');
                 var troopsId = Number(bossMetaValues[0]);//グループIDを指定
                 valueTroopId = troopsId;
                 var bossScratch = $dataTroops[troopsId].members[0].y;
@@ -3133,10 +3144,10 @@
                 } else {
                     $dataTroops[troopsId].members[0].x -= 150;
                 };
-                if (value.meta['Sideview Battler']) {
+                if (bossMeta['Sideview Battler']) {
                     $dataTroops[troopsId].members[0].y -= 50;
                 };
-                if (value.meta['cloneShadow1']) {//十天用
+                if (bossMeta['cloneShadow1']) {//十天用
                     var bossScratch = 57;
                     const shadowEnemySource = $dataEnemies[Number(bossEnemyValues[0])];
                     $dataEnemies[bossScratch] = Object.assign({}, shadowEnemySource);
@@ -3170,8 +3181,8 @@
                 var specialActionSkillIdsOrXs = [150, 140, 130, 120, 110, 100, 90, 70];//後衛x
                 var displayedSkillIdsOrYs = [200, 220, 250, 400, 450, 470, 500];//y
                 for (var i = 1; i <= 7; i++) {//<EnemyEntourage1:21,0,0>21-27,0前衛1後衛,0表示1非表示
-                    if (value.meta['EnemyEntourage' + i]) {
-                        var bossMetaValues = value.meta['EnemyEntourage' + i].split(',');
+                    if (bossMeta['EnemyEntourage' + i]) {
+                        var bossMetaValues = bossMeta['EnemyEntourage' + i].split(',');
                         var bossScratch = Number(bossMetaValues[0]);
                         if (Number(bossMetaValues[1]) == 0) {
                             var enemySpawnX = actionSkillIdsOrXs[getRandomIndex(actionSkillIdsOrXs.length)];
@@ -3194,7 +3205,7 @@
             };
         };
         if (!bossEnemyData) return;//'<BossEnemy>'未有時の下部処理回避
-        var bossEnemyValues = value.meta['BossStateInformation'] ? value.meta['BossStateInformation'].split(',') : [];//
+        var bossEnemyValues = bossMeta['BossStateInformation'] ? bossMeta['BossStateInformation'].split(',') : [];//
         for (var i = 0; i <= bossEnemyValues.length - 1; i++) {
             if (Number(bossEnemyValues[i]) >= 1) {
                 if ($dataStates[Number(bossEnemyValues[i])] && $dataStates[Number(bossEnemyValues[i])].meta['valueBossBgm']) {
@@ -3278,7 +3289,7 @@
         const hintType = Number(hintTypeId);
 
         var uncollectedHeader = `${HINT_TYPE_HEADERS[hintType] || '　'}\n`;
-        eval("valueWordSet" + valueCountSet2 + " = uncollectedHeader");
+        window["valueWordSet" + valueCountSet2] = uncollectedHeader;
 
         valueCountSet1 = 0;
         valueCountSet2 = 1;
@@ -3293,11 +3304,11 @@
             };
 
             var hintLineText = `\\C[2]${item.name}\\C[0]\n${item.description}\n`;
-            eval("valueWordSet" + valueCountSet2 + " += hintLineText");
+            window["valueWordSet" + valueCountSet2] += hintLineText;
             valueCountSet1 += 1;
             if ((valueCountSet1 % 6) == 0) {
                 valueCountSet2 += 1;
-                eval("valueWordSet" + valueCountSet2 + " = uncollectedHeader");
+                window["valueWordSet" + valueCountSet2] = uncollectedHeader;
             };
         };
 
@@ -3591,8 +3602,8 @@
             $gameVariables.setValue(539, $gameVariables.value(539) + `本日獲得\\G:${gold}\n`);
             $gameVariables.setValue(540, $gameVariables.value(540) + 1);
         };
-        $gameVariables.setValue(341, $gameParty.loseGoldSum.toLocaleString());//一日の消費金額
-        $gameVariables.setValue(342, $gameParty.gainGoldSum.toLocaleString());//一日の獲得金額
+        $gameVariables.setValue(341, $gameParty.loseGoldSum);//一日の消費金額
+        $gameVariables.setValue(342, $gameParty.gainGoldSum);//一日の獲得金額
         let levelUpActorCount = 0;
         start = $gameVariables.value(75);
         end = $gameVariables.value(76);
@@ -3662,9 +3673,17 @@
             const itemIndex = RARITY_COLOR_TAG_INFOS[lotteryRarity][1];
             var rarityColorTag = colorTaggedText(colorCode, `<Rarity:\\I[${itemIndex}]`);
 
-            if (valueItems == $dataItems) { var itemTypePrefix = `\\iin`; }
-            else if (valueItems == $dataWeapons) { var itemTypePrefix = `\\win`; }
-            else if (valueItems == $dataArmors) { var itemTypePrefix = `\\ain`; };
+            switch (valueItems) {
+                case $dataItems:
+                    var itemTypePrefix = `\\iin`;
+                    break;
+                case $dataWeapons:
+                    var itemTypePrefix = `\\win`;
+                    break;
+                case $dataArmors:
+                    var itemTypePrefix = `\\ain`;
+                    break;
+            };
             var prefixGacha = colorTaggedText(16, `${itemTypePrefix}[${valueGachaId}]`);
             var gacha = rarityColorTag + prefixGacha;
             var gachaResultMessage = `${gacha}が排出されました！`;
@@ -3694,7 +3713,7 @@
 
         let chosenRarity = rarity;
         if (rarity < 1) {
-            let rarityArray = DEFAULT_RARITY_LIST;
+            let rarityArray = DEFAULT_RARITY_LIST.slice();
             for (let i = 1; i <= 50; i++) {
                 rarityArray.push(1);
                 if (i > 45) continue;
@@ -3840,19 +3859,22 @@
     //ダンジョンランダム宝箱中身処理
     danjon_treasure = function () {
 
-        var treasureIndices = $gameVariables.value(215)[$gameVariables.value(240)];
-        var entryCategoryIndices = $gameVariables.value(216)[$gameVariables.value(240)];
+        const chestId = $gameVariables.value(240);
+        const chestMeta = $dataItems[chestId].meta;
+        var treasureIndices = $gameVariables.value(215)[chestId];
+        var entryCategoryIndices = $gameVariables.value(216)[chestId];
         if (treasureIndices != 0) {
             var treasureItemIndex = treasureIndices[getRandomIndex(treasureIndices.length)];
             let index = treasureIndices.findIndex(candidateIndex => candidateIndex == treasureItemIndex);
             var sourceEntries = getItemEquipmentSource(entryCategoryIndices[index]);
-            if ($dataItems[$gameVariables.value(240)].meta['TchestRere']) {
-                if (treasureItemIndex == Number($dataItems[$gameVariables.value(240)].meta['TchestRere'])) {
+            if (chestMeta['TchestRere']) {
+                if (treasureItemIndex == Number(chestMeta['TchestRere'])) {
                     $gameSwitches.setValue(439, true);
                 }
             };
-            $gameParty.gainItem(sourceEntries[treasureItemIndex], 1);
-            var treasureMessage = `\\C[24]\x1bI[${sourceEntries[treasureItemIndex].iconIndex}]${sourceEntries[treasureItemIndex].name}\\C[0]を入手した！`;
+            const gainedItem = sourceEntries[treasureItemIndex];
+            $gameParty.gainItem(gainedItem, 1);
+            var treasureMessage = `\\C[24]\x1bI[${gainedItem.iconIndex}]${gainedItem.name}\\C[0]を入手した！`;
             if (!$gameSwitches.value(440)) {
                 if (index >= 0) {
                     treasureIndices.splice(index, 1);
@@ -3872,16 +3894,20 @@
 
     };
 
+    //ランダム表情index -> 顔グラID(actor_choicePre1用)
+    const FACE_IDS_BY_RANDOM_INDEX = [1, 2, 5, 15, 40, 39, 38, 41];
+
     //アクター選択肢準備
     actor_choicePre1 = function () {
 
+        const partyMembers = $gameParty.members();
         var choiceOrder = 0;
         var choicePictureId = 101;
         var start = 0;
-        var end = $gameParty.members().length - 1;
+        var end = partyMembers.length - 1;
         for (var i = start; i <= end; i++) {
             if (i >= 1) { choiceOrder += 1 };
-            const gameActor = $gameParty.members()[i];
+            const gameActor = partyMembers[i];
             var actorId = gameActor.actorId();
             $gameVariables.setValue(20, actorId);
             const id = 1;
@@ -3889,16 +3915,10 @@
             $gameSystem.addCustomChoice(id, choiceParams);
             if (isGirl(gameActor)) {
                 valueFaceSelect = 6;
-                var randomFaceIndex = getRandomIndex(8);
-                if (randomFaceIndex == 0) { valueFaceSelect = 1 }//通常
-                else if (randomFaceIndex == 1) { valueFaceSelect = 2 }//笑顔
-                else if (randomFaceIndex == 2) { valueFaceSelect = 5 }//真顔
-                else if (randomFaceIndex == 3) { valueFaceSelect = 15 }//目を瞑る
-                else if (gameActor.isLearnedSkill(66)) {
-                    if (randomFaceIndex == 4) { valueFaceSelect = 40 }//頬染め
-                    else if (randomFaceIndex == 5) { valueFaceSelect = 39 }//頬染めウィンク
-                    else if (randomFaceIndex == 6) { valueFaceSelect = 38 }//頬染め挑発的
-                    else if (randomFaceIndex == 7) { valueFaceSelect = 41 };//頬染め目にハート
+                const randomFaceIndex = getRandomIndex(8);
+                //index4-7はスキル66習得時のみ。習得していなければデフォルトの6
+                if (randomFaceIndex <= 3 || gameActor.isLearnedSkill(66)) {
+                    valueFaceSelect = FACE_IDS_BY_RANDOM_INDEX[randomFaceIndex];
                 };
 
                 battle_bustUp1(gameActor, choicePictureId, 0, 0, 10);
@@ -3913,6 +3933,7 @@
             };
             choicePictureId += 10;
         };
+
 
     };
 
@@ -3949,24 +3970,25 @@
         valueCountSet1 = 0;
         valueCountSet2 = 1;
         var headerText = `付与ステート一覧\n`;
-        eval("valueWordSet" + valueCountSet2 + " = headerText");
+        window["valueWordSet" + valueCountSet2] = headerText;
         var start = 1;
         var end = $dataStates.length - 1;
         for (var i = start; i <= end; i++) {
             if ($gameParty.membersState(i) && $dataStates[i].iconIndex >= 1 && $dataStates[i].name !== '' && $dataStates[i].description !== '') {
-                for (var partyMemberIndex = 0; partyMemberIndex <= $gameParty.members().length - 1; partyMemberIndex++) {
-                    if ($gameParty.members()[partyMemberIndex].isStateAffected(i)) {
-                        var actor = $gameParty.members()[partyMemberIndex];
+                const partyMembers = $gameParty.members();
+                for (var partyMemberIndex = 0; partyMemberIndex <= partyMembers.length - 1; partyMemberIndex++) {
+                    if (partyMembers[partyMemberIndex].isStateAffected(i)) {
+                        var actor = partyMembers[partyMemberIndex];
                         var stateTextPortion = `\\C[16][${actor.name()}]\\C[0]`;
-                        eval("valueWordSet" + valueCountSet2 + " += stateTextPortion");
+                        window["valueWordSet" + valueCountSet2] += stateTextPortion;
                     };
                 };
                 var stateTextPortion = `\n${$dataStates[i].description}\n`;
-                eval("valueWordSet" + valueCountSet2 + " += stateTextPortion");
+                window["valueWordSet" + valueCountSet2] += stateTextPortion;
                 valueCountSet1 += 1;
                 if ((valueCountSet1 % 6) == 0) {
                     valueCountSet2 += 1;
-                    eval("valueWordSet" + valueCountSet2 + " = headerText");
+                    window["valueWordSet" + valueCountSet2] = headerText;
                 };
             };
         };
@@ -4124,77 +4146,78 @@
     let arr2 = [];
     reality_setPromotion = function (promotionModeId, actorId) {
 
-        if (promotionModeId == 1) {
-            var promotionValue = 401;
-            var actor = $gameActors.actor(actorId);
-            arr1 = [];
-            arr2 = [];
-            for (var i = 401; i <= 406; i++) {
-                if (actor.isLearnedSkill(i)) {
-                    var promotionValue = i;
-                    break;
-                }
-            };
-            if (valueCountSet1 == 401) {
-                //最高レアのため昇格不可
-            } else {
-                for (var rank in RANK_BY_PROMOTION_DATA) {
-                    var rankData = RANK_BY_PROMOTION_DATA[rank];
-                    if (promotionValue == rankData.promotionValue) {
-                        valueWordSet2 = '<' + rankData.promotionCode + '>' + '昇格';
-                        valueWordSet1 = rankData.promotionCode + 'promotionM'; // do not translate, meta
-                        valueCountSet2 = rankData.cost;
+        switch (promotionModeId) {
+            case 1:
+                var promotionValue = 401;
+                var actor = $gameActors.actor(actorId);
+                arr1 = [];
+                arr2 = [];
+                for (var i = 401; i <= 406; i++) {
+                    if (actor.isLearnedSkill(i)) {
+                        var promotionValue = i;
                         break;
                     }
                 };
+                if (promotionValue == 401) {
+                    //最高レアのため昇格不可
+                } else {
+                    for (var rank in RANK_BY_PROMOTION_DATA) {
+                        var rankData = RANK_BY_PROMOTION_DATA[rank];
+                        if (promotionValue == rankData.promotionValue) {
+                            valueWordSet2 = '<' + rankData.promotionCode + '>' + '昇格';
+                            valueWordSet1 = rankData.promotionCode + 'promotionM'; // do not translate, meta
+                            valueCountSet2 = rankData.cost;
+                            break;
+                        }
+                    };
 
-                for (var i = 1; i <= $dataItems.length - 1; i++) {
-                    if ($dataItems[i].meta[valueWordSet1]) {
-                        arr1.push(i);
-                        arr2.push(Number($dataItems[i].meta[valueWordSet1]));
+                    for (var i = 1; i <= $dataItems.length - 1; i++) {
+                        if ($dataItems[i].meta[valueWordSet1]) {
+                            arr1.push(i);
+                            arr2.push(Number($dataItems[i].meta[valueWordSet1]));
+                        };
+                    };
+
+                    var promotionMessage = `${valueWordSet2}\n`;
+                    for (var i = 0; i <= arr1.length - 1; i++) {
+                        promotionMessage += `\x1bIIN[${arr1[i]}]:\\C[10]${arr2[i]}\\C[0]個<${$gameParty.numItems($dataItems[arr1[i]])}>\n`;
+                    };
+                    promotionMessage += `\\C[10]${valueCountSet2.toLocaleString()}\\C[0]\\G<${$gameParty.gold().toLocaleString()}\\G>`;
+                    $gameScreen.setDTextPicture(promotionMessage, 28);
+                    $gameScreen.dWindowFrame = 'ON';
+                    var promotionPictureId = 100;
+                    var promotionMessage = '';
+                    $gameScreen.showPicture(promotionPictureId, promotionMessage, 0, 50 + 100, 100, 100, 100, 0, 0);
+                    $gameScreen.movePicture(promotionPictureId, 0, 50, 100, 100, 100, 255, 0, 60);
+                };
+                valueCountSet1 = promotionValue;
+                break;
+            case 2:
+                var promotionValue = 0;
+                for (var i = 0; i <= arr1.length - 1; i++) {
+                    if ($gameParty.numItems($dataItems[arr1[i]]) < arr2[i]) {
+                        var promotionValue = 1;
                     };
                 };
-
-                var promotionMessage = `${valueWordSet2}\n`;
-                for (var i = 0; i <= arr1.length - 1; i++) {
-                    promotionMessage += `\x1bIIN[${arr1[i]}]:\\C[10]${arr2[i]}\\C[0]個<${$gameParty.numItems($dataItems[arr1[i]])}>\n`;
-                };
-                promotionMessage += `\\C[10]${valueCountSet2.toLocaleString()}\\C[0]\\G<${$gameParty.gold().toLocaleString()}\\G>`;
-                $gameScreen.setDTextPicture(promotionMessage, 28);
-                $gameScreen.dWindowFrame = 'ON';
-                var promotionPictureId = 100;
-                var promotionMessage = '';
-                $gameScreen.showPicture(promotionPictureId, promotionMessage, 0, 50 + 100, 100, 100, 100, 0, 0);
-                $gameScreen.movePicture(promotionPictureId, 0, 50, 100, 100, 100, 255, 0, 60);
-            };
-            valueCountSet1 = promotionValue;
-        };
-        if (promotionModeId == 2) {
-            var promotionValue = 0;
-            for (var i = 0; i <= arr1.length - 1; i++) {
-                if ($gameParty.numItems($dataItems[arr1[i]]) < arr2[i]) {
+                if ($gameParty.gold() < valueCountSet2) {
                     var promotionValue = 1;
                 };
-            };
-            if ($gameParty.gold() < valueCountSet2) {
-                var promotionValue = 1;
-            };
-            if (promotionValue == 0) {
-                $gameSwitches.setValue(380, true);
-            } else {
-                $gameSwitches.setValue(380, false);
-            };
-        };
-
-        if (promotionModeId == 0) {
-            for (var i = 0; i <= arr1.length - 1; i++) {
-                $gameParty.loseItem($dataItems[arr1[i]], arr2[i]);
-                var promotionValue = `\x1bIIN[${arr1[i]}]を\\C[10]${arr2[i]}\\C[0]個捧げた…`;
+                if (promotionValue == 0) {
+                    $gameSwitches.setValue(380, true);
+                } else {
+                    $gameSwitches.setValue(380, false);
+                };
+                break;
+            case 0:
+                for (var i = 0; i <= arr1.length - 1; i++) {
+                    $gameParty.loseItem($dataItems[arr1[i]], arr2[i]);
+                    var promotionValue = `\x1bIIN[${arr1[i]}]を\\C[10]${arr2[i]}\\C[0]個捧げた…`;
+                    TickerManager.show(promotionValue);
+                };
+                $gameParty.loseGold(valueCountSet2);
+                var promotionValue = `\\C[10]${valueCountSet2.toLocaleString()}\\C[0]\\G捧げた…`;
                 TickerManager.show(promotionValue);
-            };
-            $gameParty.loseGold(valueCountSet2);
-            var promotionValue = `\\C[10]${valueCountSet2.toLocaleString()}\\C[0]\\G捧げた…`;
-            TickerManager.show(promotionValue);
+                break;
         };
 
     };
@@ -4285,28 +4308,31 @@
         if (confinementModeId == 1) {
             if ($gameVariables.value(316)[0] == 0) {
                 $gameVariables.setValue(316, Array(4).fill(0));
+                const newConfinementSlots = $gameVariables.value(316);
                 for (var j = 0; j <= 3; j++) {
-                    $gameVariables.value(316)[j] = [];
+                    newConfinementSlots[j] = [];
                     for (var slotIndex = 0; slotIndex <= 2000; slotIndex++) {
-                        $gameVariables.value(316)[j].push(0);
+                        newConfinementSlots[j].push(0);
                     };
                 };
-                $gameVariables.value(316)[3] = 0;
+                newConfinementSlots[3] = 0;
             };
         };
+        const confinementSlots = $gameVariables.value(316);
         if (confinementModeId == 1) {
-            if ($gameParty.gold() >= 1) {
-                var confinementValue = `アイテム類と所持金\\C[1]${$gameParty.gold().toLocaleString()}\\C[0]を奪われた…`;
+            const partyGold = $gameParty.gold();
+            if (partyGold >= 1) {
+                var confinementValue = `アイテム類と所持金\\C[1]${partyGold.toLocaleString()}\\C[0]を奪われた…`;
                 CommonPopupManager.showInfo({}, confinementValue, null);
-                $gameVariables.value(316)[3] += $gameParty.gold();
-                $gameParty.loseGold($gameParty.gold());
+                confinementSlots[3] += partyGold;
+                $gameParty.loseGold(partyGold);
             };
         } else {
-            if ($gameVariables.value(316)[3] >= 1) {
-                var confinementValue = `アイテム類と所持金\\C[5]${$gameVariables.value(316)[3].toLocaleString()}\\C[0]を取り戻した！`;
+            if (confinementSlots[3] >= 1) {
+                var confinementValue = `アイテム類と所持金\\C[5]${confinementSlots[3].toLocaleString()}\\C[0]を取り戻した！`;
                 CommonPopupManager.showInfo({}, confinementValue, null);
-                $gameParty.gainGold($gameVariables.value(316)[3]);
-                $gameVariables.value(316)[3] = 0;
+                $gameParty.gainGold(confinementSlots[3]);
+                confinementSlots[3] = 0;
             };
         };
         for (var j = 0; j <= 2; j++) {
@@ -4317,47 +4343,50 @@
             } else {
                 var end = sourceEntries.length - 1;
             };
+            const confinementCounts = confinementSlots[j];
             for (var i = start; i <= end; i++) {
                 var databaseEntry = sourceEntries[i];
                 if (!databaseEntry) continue;
                 if (confinementModeId == 1) {
                     var confinementValue = $gameParty.hasItem(databaseEntry, true);
                 } else {
-                    var confinementValue = $gameVariables.value(316)[j][i];
+                    var confinementValue = confinementCounts[i];
                 };
                 if (confinementValue) {
-                    if (j == 0) {
-                        if (databaseEntry.meta['EICSwitch']) {
-                            if ([101, 106, 109].some(function (id) { return Number(databaseEntry.meta['EICSwitch']) == id })) {
-                                if (confinementModeId == 1) {
-                                    $gameVariables.value(316)[j][i] += $gameParty.numItems(databaseEntry);
-                                    $gameParty.loseItem(databaseEntry, $gameVariables.value(316)[j][i]);
-                                } else {
-                                    $gameParty.gainItem(databaseEntry, $gameVariables.value(316)[j][i]);
-                                    $gameVariables.value(316)[j][i] = 0;
+                    switch (j) {
+                        case 0:
+                            if (databaseEntry.meta['EICSwitch']) {
+                                if ([101, 106, 109].some(function (id) { return Number(databaseEntry.meta['EICSwitch']) == id })) {
+                                    if (confinementModeId == 1) {
+                                        confinementCounts[i] += $gameParty.numItems(databaseEntry);
+                                        $gameParty.loseItem(databaseEntry, confinementCounts[i]);
+                                    } else {
+                                        $gameParty.gainItem(databaseEntry, confinementCounts[i]);
+                                        confinementCounts[i] = 0;
+                                    };
                                 };
                             };
-                        };
-                    };
-                    if (j == 1) {
-                        if (confinementModeId == 1) {
-                            $gameVariables.value(316)[j][i] += $gameParty.numItems(databaseEntry);
-                            $gameParty.loseItem(databaseEntry, $gameVariables.value(316)[j][i]);
-                        } else {
-                            $gameParty.gainItem(databaseEntry, $gameVariables.value(316)[j][i]);
-                            $gameVariables.value(316)[j][i] = 0;
-                        };
-                    };
-                    if (j == 2) {
-                        if (databaseEntry.meta['Not Independent item']) {
+                            break;
+                        case 1:
                             if (confinementModeId == 1) {
-                                $gameVariables.value(316)[j][i] += $gameParty.numItems(databaseEntry);
-                                $gameParty.loseItem(databaseEntry, $gameVariables.value(316)[j][i]);
+                                confinementCounts[i] += $gameParty.numItems(databaseEntry);
+                                $gameParty.loseItem(databaseEntry, confinementCounts[i]);
                             } else {
-                                $gameParty.gainItem(databaseEntry, $gameVariables.value(316)[j][i]);
-                                $gameVariables.value(316)[j][i] = 0;
+                                $gameParty.gainItem(databaseEntry, confinementCounts[i]);
+                                confinementCounts[i] = 0;
                             };
-                        };
+                            break;
+                        case 2:
+                            if (databaseEntry.meta['Not Independent item']) {
+                                if (confinementModeId == 1) {
+                                    confinementCounts[i] += $gameParty.numItems(databaseEntry);
+                                    $gameParty.loseItem(databaseEntry, confinementCounts[i]);
+                                } else {
+                                    $gameParty.gainItem(databaseEntry, confinementCounts[i]);
+                                    confinementCounts[i] = 0;
+                                };
+                            };
+                            break;
                     };
                 };
             };
@@ -4386,6 +4415,7 @@
     };
 
     //右横256とメニュー背景設定 backGraund_menuMapSelect(2,'BG_Shower',0,0);
+    //右横256とメニュー背景設定 backGraund_menuMapSelect(2,'BG_Shower',0,0);
     backGraund_menuMapSelect = function (backgroundVariantId, backgroundName, horizontalScrollSpeed, verticalScrollSpeed) {
 
         h_keikenhyouji2(521, 0);
@@ -4413,23 +4443,22 @@
             $gameVariables.setValue(82, verticalScrollSpeed);//メニュー背景縦スク
         };
         if ($gameVariables.value(508) != 0) {
-            Galv.CACHE.load('parallaxes', $gameVariables.value(508));
-            $gameSystem._backgroundName = $gameVariables.value(508);
-            if ($gameVariables.value(81) != 0) { var hScrollEnabled = true } else { var hScrollEnabled = false };
-            if ($gameVariables.value(82) != 0) { var vScrollEnabled = true } else { var vScrollEnabled = false };
+            const menuBackgroundName = $gameVariables.value(508);
+            const hScrollSpeed = $gameVariables.value(81);
+            const vScrollSpeed = $gameVariables.value(82);
+            const hScrollEnabled = hScrollSpeed != 0;
+            const vScrollEnabled = vScrollSpeed != 0;
+            Galv.CACHE.load('parallaxes', menuBackgroundName);
+            $gameSystem._backgroundName = menuBackgroundName;
             if ($gameSwitches.value(468)) {
-                $gameMap.changeParallax($gameVariables.value(508), hScrollEnabled, vScrollEnabled, $gameVariables.value(81), $gameVariables.value(82));
+                $gameMap.changeParallax(menuBackgroundName, hScrollEnabled, vScrollEnabled, hScrollSpeed, vScrollSpeed);
             };
             if ($gameSwitches.value(209) || $gameSwitches.value(227)) { } else {//全体マップと艦橋ではない場合
-                if (['Dungeon2_2'].some(function (id) { return $gameVariables.value(508) == id })) {
-                    var parallaxYOffset = -355;
-                } else {
-                    var parallaxYOffset = 0;
-                };
-                $gameScreen.showPicture(6, '/img/parallaxes/' + $gameVariables.value(508), 0, 1024, parallaxYOffset + 50, 100, 100, 0, 0);
+                const parallaxYOffset = ['Dungeon2_2'].some(function (id) { return menuBackgroundName == id }) ? -355 : 0;
+                $gameScreen.showPicture(6, '/img/parallaxes/' + menuBackgroundName, 0, 1024, parallaxYOffset + 50, 100, 100, 0, 0);
                 $gameScreen.movePicture(6, 0, 1024, parallaxYOffset, 100, 100, 250, 0, 60);
                 if (backgroundVariantId == 2) {
-                    $gameScreen.showPicture(70, '/img/parallaxes/' + $gameVariables.value(508), 0, 1024, parallaxYOffset + 50, 100, 100, 0, 0);
+                    $gameScreen.showPicture(70, '/img/parallaxes/' + menuBackgroundName, 0, 1024, parallaxYOffset + 50, 100, 100, 0, 0);
                     $gameScreen.movePicture(70, 0, 1024, parallaxYOffset, 100, 100, 255, 0, 60);
                 };
             };
@@ -4438,26 +4467,32 @@
     };
 
     //遠景をアイテム武器ＩＤで指定
+    //遠景をアイテム武器ＩＤで指定
     setMap_parallaxSelect = function (databaseTypeId, paramItemId, paramInOutFlag) {
 
         var parallaxKey = 0;
-        if (databaseTypeId == 0) { var metaSource = $dataItems[paramItemId] };
-        if (databaseTypeId == 1) { var metaSource = $dataWeapons[paramItemId] };
-        if (databaseTypeId == 1) {
-            if (paramInOutFlag == 0) {
-                if (metaSource.meta['BG_in']) { var parallaxKey = 'BG_in' };
-            };
-            if (paramInOutFlag == 1) {
-                if (metaSource.meta['BG_out']) { var parallaxKey = 'BG_out' };
-            };
-            if ($gameSwitches.value(15)) {
+        var metaSource;
+        switch (databaseTypeId) {
+            case 0:
+                metaSource = $dataItems[paramItemId];
+                break;
+            case 1:
+                metaSource = $dataWeapons[paramItemId];
                 if (paramInOutFlag == 0) {
-                    if (metaSource.meta['BG_inN']) { var parallaxKey = 'BG_inN' };
+                    if (metaSource.meta['BG_in']) { var parallaxKey = 'BG_in' };
                 };
                 if (paramInOutFlag == 1) {
-                    if (metaSource.meta['BG_outN']) { var parallaxKey = 'BG_outN' };
+                    if (metaSource.meta['BG_out']) { var parallaxKey = 'BG_out' };
                 };
-            };
+                if ($gameSwitches.value(15)) {
+                    if (paramInOutFlag == 0) {
+                        if (metaSource.meta['BG_inN']) { var parallaxKey = 'BG_inN' };
+                    };
+                    if (paramInOutFlag == 1) {
+                        if (metaSource.meta['BG_outN']) { var parallaxKey = 'BG_outN' };
+                    };
+                };
+                break;
         };
         if (databaseTypeId == 0) {
             if (metaSource.meta['BG2']) { var parallaxKey = 'BG2' };
@@ -4494,10 +4529,18 @@
     };
 
     //BGMをアイテム武器ＩＤで指定
+    //BGMをアイテム武器ＩＤで指定
     setMap_musicSelect = function (databaseTypeId, paramItemId, paramInOutFlag) {
 
-        if (databaseTypeId == 0) { var metaSource = $dataItems[paramItemId] };
-        if (databaseTypeId == 1) { var metaSource = $dataWeapons[paramItemId] };
+        var metaSource;
+        switch (databaseTypeId) {
+            case 0:
+                metaSource = $dataItems[paramItemId];
+                break;
+            case 1:
+                metaSource = $dataWeapons[paramItemId];
+                break;
+        };
         if ($dataMap.meta['BGM']) { var metaSource = $dataMap };
         if (metaSource.meta['BGM']) {
             if ($gameSwitches.value(15)) {
@@ -4613,8 +4656,9 @@
         if (startSceneActor) { $gameVariables.setValue(49, startSceneActor.name()) };
         $gameVariables.setValue(525, 0); //達成スイッチid変数
         if (eventItemId >= 401) {
-            if ($dataItems[eventItemId].meta['AddEventCompSwi']) {
-                var completionSwitchId = Number($dataItems[eventItemId].meta['AddEventCompSwi']);
+            const eventItemMeta = $dataItems[eventItemId].meta;
+            if (eventItemMeta['AddEventCompSwi']) {
+                var completionSwitchId = Number(eventItemMeta['AddEventCompSwi']);
             } else {
                 if ($gameVariables.value(626) == 1) {//挿話
                     var completionSwitchId = eventItemId + 900
@@ -4627,22 +4671,13 @@
             valueCountSet1 += completionSwitchId;
             if (startEndFlag == 1 && !$gameSwitches.value(29) && !$gameSwitches.value(503) && !$gameSwitches.value(505)) {
                 var registrationFlag = 0;
-                if ($dataItems[eventItemId].meta['RegistrationC1']) {
-                    var conditionExpression = $dataItems[eventItemId].meta['RegistrationC1'];
-                    if (eval(conditionExpression)) {
-                        var registrationFlag = 1;
-                    };
-                };
-                if ($dataItems[eventItemId].meta['RegistrationC2']) {
-                    var conditionExpression = $dataItems[eventItemId].meta['RegistrationC2'];
-                    if (eval(conditionExpression)) {
-                        var registrationFlag = 1;
-                    };
-                };
-                if ($dataItems[eventItemId].meta['RegistrationC3']) {
-                    var conditionExpression = $dataItems[eventItemId].meta['RegistrationC3'];
-                    if (eval(conditionExpression)) {
-                        var registrationFlag = 1;
+                var conditionExpression;
+                for (const conditionMetaKey of ['RegistrationC1', 'RegistrationC2', 'RegistrationC3']) {
+                    conditionExpression = eventItemMeta[conditionMetaKey];
+                    if (conditionExpression) {
+                        if (eval(conditionExpression)) { //データドリブン条件式のためevalを使用(意図的)
+                            registrationFlag = 1;
+                        };
                     };
                 };
                 if (registrationFlag == 0) { $gameParty.gainItem($dataItems[eventItemId], 1) };
@@ -4681,14 +4716,15 @@
                     valueSceneConditions2 = true;
                     valueSceneConditions3 = true;
                 } else {
-                    if ($dataItems[eventItemId].meta['RegistrationC1']) {
-                        valueSceneConditions1 = $dataItems[eventItemId].meta['RegistrationC1'];
+                    const eventItemMeta = $dataItems[eventItemId].meta;
+                    if (eventItemMeta['RegistrationC1']) {
+                        valueSceneConditions1 = eventItemMeta['RegistrationC1'];
                     };
-                    if ($dataItems[eventItemId].meta['RegistrationC2']) {
-                        valueSceneConditions2 = $dataItems[eventItemId].meta['RegistrationC2'];
+                    if (eventItemMeta['RegistrationC2']) {
+                        valueSceneConditions2 = eventItemMeta['RegistrationC2'];
                     };
-                    if ($dataItems[eventItemId].meta['RegistrationC3']) {
-                        valueSceneConditions3 = $dataItems[eventItemId].meta['RegistrationC3'];
+                    if (eventItemMeta['RegistrationC3']) {
+                        valueSceneConditions3 = eventItemMeta['RegistrationC3'];
                     };
                 };
             };
@@ -4708,13 +4744,22 @@
                 $gameSwitches.setValue($gameVariables.value(320), true);
             };
             $gameVariables.setValue(320, 0);
-            if ($gameVariables.value(630) >= 1) {
+            const sceneWeatherId = $gameVariables.value(630);
+            if (sceneWeatherId >= 1) {
                 for (var i = 13; i <= 15; i++) {
                     $gameSwitches.setValue(i, false);
                 };
-                if ($gameVariables.value(630) == 1) { $gameSwitches.setValue(13, true) };
-                if ($gameVariables.value(630) == 2) { $gameSwitches.setValue(14, true) };
-                if ($gameVariables.value(630) == 3) { $gameSwitches.setValue(15, true) };
+                switch (sceneWeatherId) {
+                    case 1:
+                        $gameSwitches.setValue(13, true);
+                        break;
+                    case 2:
+                        $gameSwitches.setValue(14, true);
+                        break;
+                    case 3:
+                        $gameSwitches.setValue(15, true);
+                        break;
+                };
                 $gameVariables.setValue(630, 0);
             };
             if (!$gameParty.inBattle()) { $gamePlayer.setThrough(false) };
@@ -4728,10 +4773,12 @@
             };
             $gameSwitches.setValue(467, false);//NPC消滅スイッチoff
             $gameSwitches.setValue(506, false);//通行人消滅スイッチoff。任意
-            for (var i = 0; i <= $gameVariables.value(292).length - 1; i++) {
-                if ($gameVariables.value(292)[i] >= 1) {
-                    if (!!$gameMap.event($gameVariables.value(292)[i])) {
-                        if (!$gameParty.inBattle()) { $gameMap.eraseEvent($gameVariables.value(292)[i]) };
+            const spawnedEventIds = $gameVariables.value(292);
+            for (var i = 0; i <= spawnedEventIds.length - 1; i++) {
+                const spawnedEventId = spawnedEventIds[i];
+                if (spawnedEventId >= 1) {
+                    if (!!$gameMap.event(spawnedEventId)) {
+                        if (!$gameParty.inBattle()) { $gameMap.eraseEvent(spawnedEventId) };
                     };
                 };
             };
@@ -4796,10 +4843,11 @@
     formation_orderSelectH = function (targetVarId, listModeId) {
 
         if (listModeId == 2) {
+            const partyMembers = $gameParty.members();
             valueHeroineCoice = [];
-            for (var i = 0; i <= $gameParty.members().length - 1; i++) {
-                if (isGirl($gameParty.members()[i])) {
-                    valueHeroineCoice.push($gameParty.members()[i].actorId());
+            for (var i = 0; i <= partyMembers.length - 1; i++) {
+                if (isGirl(partyMembers[i])) {
+                    valueHeroineCoice.push(partyMembers[i].actorId());
                 };
             };
             if (valueHeroineCoice.length >= 2) {
@@ -4829,6 +4877,7 @@
             }
 
             const len = valueHeroineCoice.length;
+            const partyMembers = $gameParty.members();
             for (let i = 0; i < len; i++) {
                 const currentHeroineId = valueHeroineCoice[i];
                 if (currentHeroineId !== $gameVariables.value(targetVarId)) continue;
@@ -4844,7 +4893,7 @@
                     }
                 } else {
                     const actorIndex = $gameActors.actor(valueHeroineCoice[i]).index() + actorIndexShift;
-                    const actor = $gameParty.members()[actorIndex];
+                    const actor = partyMembers[actorIndex];
                     if (actor && isGirl(actor)) {
                         $gameVariables.setValue(targetVarId, actor.actorId());
                         break;
@@ -4983,6 +5032,19 @@
 
     };
 
+    //クラスランク -> 解放資金(job_releaseUnlockEvent/job_releaseCostEvent用)
+    const RELEASE_COST_BY_CLASS_RANK = {
+        1: 3000,
+        2: 10000,
+        3: 100000,
+    };
+
+    //クラスランク -> 要求レベル(job_releaseUnlockEvent用)
+    const REQUIRED_LEVEL_BY_CLASS_RANK = {
+        2: 20,
+        3: 30,
+    };
+
     //クラス毎ジョブ解放スクリプト。途中セーブ禁止！
     job_releaseUnlockEvent = function (startLearningIndex, endLearningIndex) {
 
@@ -5043,9 +5105,7 @@
                     }
                 };
                 var classRankValue = Number($dataClasses[currentClassId].meta['classRank']);
-                if (classRankValue == 1) { var releaseCost = 3000 };
-                if (classRankValue == 2) { var releaseCost = 10000 };
-                if (classRankValue == 3) { var releaseCost = 100000 };
+                var releaseCost = RELEASE_COST_BY_CLASS_RANK[classRankValue] || releaseCost;
                 classInfoText += `\\C[14]解放資金\\C[0]:${releaseCost.toLocaleString()}`;
                 var currentGold = $gameParty.gold();
                 if (currentGold >= releaseCost) {
@@ -5078,8 +5138,7 @@
                     classInfoText += `なし\n`;
                 };
                 if (classRankValue >= 2) {
-                    if (classRankValue == 2) { var requiredLevel = 20 };
-                    if (classRankValue == 3) { var requiredLevel = 30 };
+                    var requiredLevel = REQUIRED_LEVEL_BY_CLASS_RANK[classRankValue] || requiredLevel;
                     classInfoText += `\\C[14]解放条件\\C[0]:`;
                     classInfoText += `${$dataClasses[currentClassId - 10].name}LV:${actor.classLevel(currentClassId - 10)}`;
                     if (actor.classLevel(currentClassId - 10) >= requiredLevel) {
@@ -5119,9 +5178,7 @@
 
         var classRankIndex = Number($dataClasses[classId].meta['classRank']);
 
-        if (classRankIndex == 1) { var goldValue = 3000 }
-        else if (classRankIndex == 2) { var goldValue = 10000 }
-        else if (classRankIndex == 3) { var goldValue = 100000 };
+        var goldValue = RELEASE_COST_BY_CLASS_RANK[classRankIndex];
 
         var soundFileName = classRankIndex == 3 ? '21_ClassRelease2' : '21_ClassRelease';
         AudioManager.playMe({ "name": soundFileName, "volume": 90, "pitch": 100, "pan": 0 });
@@ -5163,7 +5220,7 @@
             var actorUnlockedClasses = actor.unlockedClasses();
             var unlockedClassCounts = unlockedClassCounts.concat(actorUnlockedClasses);
         };
-        unlockedClassCounts.filter(function (x, i, self) {
+        unlockedClassCounts = unlockedClassCounts.filter(function (x, i, self) {
             return self.indexOf(x) === i;
         });
         var groupACount = 0;
@@ -5245,19 +5302,23 @@
     //フェードインアウトワイプ演出。0消去1汎用2ワープ
     fade_wipeDirect = function (wipeTypeId) {
 
-        if (wipeTypeId == 0) {
-            $gameScreen._useGWTrans = 'off';
-        };
-        if (wipeTypeId == 1) {
-            if ($gameSwitches.value(201)) {
-                var wipeImageCandidates = ['Dunjon004', 'Dunjon008', 'Dunjon012', 'Dunjon036', 'Dunjon052', 'Dunjon100', 'Dunjon104', 'Dunjon118', 'Dunjon153', 'Dunjon999'];
-            } else {
-                var wipeImageCandidates = ['Town048', 'Town084', 'Town092', 'Town129', 'Town131', 'Town225', 'Town309', 'Town310', 'Town001', 'Town013', 'Town014', 'Town032', 'Town033', 'Town039', 'Town041', 'Town046'];
-            };
-            var wipeImageName = wipeImageCandidates[getRandomIndex(wipeImageCandidates.length)];
-        };
-        if (wipeTypeId == 2) {
-            var wipeImageName = 'Town129';
+        var wipeImageName;
+        switch (wipeTypeId) {
+            case 0:
+                $gameScreen._useGWTrans = 'off';
+                break;
+            case 1:
+                var wipeImageCandidates;
+                if ($gameSwitches.value(201)) {
+                    wipeImageCandidates = ['Dunjon004', 'Dunjon008', 'Dunjon012', 'Dunjon036', 'Dunjon052', 'Dunjon100', 'Dunjon104', 'Dunjon118', 'Dunjon153', 'Dunjon999'];
+                } else {
+                    wipeImageCandidates = ['Town048', 'Town084', 'Town092', 'Town129', 'Town131', 'Town225', 'Town309', 'Town310', 'Town001', 'Town013', 'Town014', 'Town032', 'Town033', 'Town039', 'Town041', 'Town046'];
+                };
+                wipeImageName = wipeImageCandidates[getRandomIndex(wipeImageCandidates.length)];
+                break;
+            case 2:
+                wipeImageName = 'Town129';
+                break;
         };
         if (wipeTypeId >= 1) {
             $gameScreen._GWInImg = wipeImageName;
@@ -5280,8 +5341,9 @@
                 trapEventIds.push(i);
             }
         };
-        for (var i = 0; i <= $gameParty.members().length - 1; i++) {
-            var actor = $gameParty.members()[i];
+        const partyMembers = $gameParty.members();
+        for (var i = 0; i <= partyMembers.length - 1; i++) {
+            var actor = partyMembers[i];
             for (var id = 0; id <= trapEventIds.length - 1; id++) {
                 if (actor.battleSkillsRaw().includes(trapEventIds[id])) {
                     $gameSwitches.setValue(380, true);
@@ -5327,29 +5389,37 @@
         return Math.floor(Math.random() * (baseValue * 10)) + (baseValue + 1);
     }
 
+    // トラップカテゴリ(valueCountSet1)→状態ID(valueCountSet2)対応表
+    const TRAP_STATE_IDS_BY_CATEGORY = {
+        0: 1,
+        1: 1,
+        2: 4,//毒
+        3: 5,//暗闇
+        4: 6,//沈黙
+        5: 1,//激高
+        6: 8,//混乱
+        7: 9,//魅了
+        8: 10,//睡眠
+        9: 1,//スタン
+        10: 0,//爆破。ＨＰダメージ
+        11: 0,//吸収。ＭＰダメージ
+        12: 0,//脱力。ＴＰダメージ
+        13: 0,//転移。valueCountSet2に転送先のイベID
+    };
+
     trap_starting1 = function (trapModeId, eventId) {
 
         var event = $gameMap.event(eventId);
         if (trapModeId == 1) {
             valueCountSet1 = getRandomIndex(13);
             //valueCountSet1 = 13;//テスト用
-            if (valueCountSet1 <= 1) { valueCountSet2 = 1 };
-            if (valueCountSet1 == 2) { valueCountSet2 = 4 };//毒
-            if (valueCountSet1 == 3) { valueCountSet2 = 5 };//暗闇
-            if (valueCountSet1 == 4) { valueCountSet2 = 6 };//沈黙
-            if (valueCountSet1 == 5) { valueCountSet2 = 1 };//激高
-            if (valueCountSet1 == 6) { valueCountSet2 = 8 };//混乱
-            if (valueCountSet1 == 7) { valueCountSet2 = 9 };//魅了
-            if (valueCountSet1 == 8) { valueCountSet2 = 10 };//睡眠
-            if (valueCountSet1 == 9) { valueCountSet2 = 1 };//スタン
-            if (valueCountSet1 == 10) { valueCountSet2 = 0 };//爆破。ＨＰダメージ623user.gainMp(-evasionThreshold);
-            if (valueCountSet1 == 11) { valueCountSet2 = 0 };//吸収。ＭＰダメージ625
-            if (valueCountSet1 == 12) { valueCountSet2 = 0 };//脱力。TＰダメージ626
-            if (valueCountSet1 == 13) { valueCountSet2 = 0 };//転移。valueCountSet2に転送先のイベID
+            const trapStateId = TRAP_STATE_IDS_BY_CATEGORY[valueCountSet1];
+            if (trapStateId !== undefined) { valueCountSet2 = trapStateId };
         };
         if (trapModeId == 2) {
+            const members = $gameParty.members();
             if (valueCountSet2 == 1) {
-                var actor = $gameParty.members()[0];
+                var actor = members[0];
                 if (isGirl(actor)) {
                     actor.addState(62);
                     if (actor.isStateAffected(62)) {
@@ -5365,117 +5435,130 @@
             };
             if ([4, 5, 6, 8, 9, 10].some(function (id) { return valueCountSet2 == id })) {
                 $gamePlayer.requestAnimation(valueStateAnimeArr[valueCountSet2]);
-                for (var i = 0; i <= $gameParty.members().length - 1; i++) {
-                    var actor = $gameParty.members()[i];
+                for (var i = 0; i <= members.length - 1; i++) {
+                    var actor = members[i];
                     state_addFormula1([valueCountSet2, 50, actor, actor, actor.mdf, actor.luk]);
                 };
             };
-            if (valueCountSet1 == 5 || valueCountSet1 == 9) {
-                $gamePlayer.requestBalloon(2);
-                var infoText = `しかし何も起こらなかった…。`;
-                CommonPopupManager.showInfo({}, infoText, null);
-            };
-            if (valueCountSet1 == 10) {
-                $gamePlayer.requestAnimation(623);
-                var infoText = `足元の魔法陣から爆発が発生した！`;
-                CommonPopupManager.showInfo({}, infoText, null);
-                for (var i = 0; i <= $gameParty.members().length - 1; i++) {
-                    var actor = $gameParty.members()[i];
-                    //agi,luk,actor.xparam(0)*100。Math.round((actor.agi * 2 + actor.luk /10) * (actor.xparam(0)*100))
-                    var evasionThreshold = Math.round((actor.agi * 2 + actor.luk / 10) * (actor.xparam(0)));
-                    var randomRoll = getRandomIndex(900) + 101;
-                    var damageAmount = getRandomIndex(900) + 101;
-                    if ($gameVariables.value(240) >= 1) {
-                        const enemyLevelValues = $dataItems[$gameVariables.value(240)].meta['EnemyLV'].split(',');
-                        randomRoll = getScaledTrapValue(enemyLevelValues, 10);
-                        damageAmount = getScaledTrapValue(enemyLevelValues, 10);
-                    };
-                    if (randomRoll > evasionThreshold) {
-                        $gamePlayer.requestAnimation(131);
-                        actor.gainHp(-damageAmount);
-                        var infoText = `\\C[16]${actor.name()}\\C[0]は\\C[10]${damageAmount}\\C[0]のＨＰダメージを受けた！（判定：\\C[4]${evasionThreshold}\\C[0] > \\C[10]${randomRoll}\\C[0]）`;
-                        CommonPopupManager.showInfo({}, infoText, null);
-                    } else {
-                        $gamePlayer.requestAnimation(129);
-                        var infoText = `\\C[16]${actor.name()}\\C[0]は\\C[2]回避\\C[0]に成功した！（判定：\\C[4]${evasionThreshold}\\C[0] > \\C[10]${randomRoll}\\C[0]）`;
-                        CommonPopupManager.showInfo({}, infoText, null);
-                    };
-                };
-            };
-            if (valueCountSet1 == 11) {
-                var infoText = `吸収の魔法陣が発動した！`;
-                CommonPopupManager.showInfo({}, infoText, null);
-                $gamePlayer.requestAnimation(625);
-                for (var i = 0; i <= $gameParty.members().length - 1; i++) {
-                    var actor = $gameParty.members()[i];
-                    var evasionThreshold = Math.round((actor.mat * 2 + actor.luk / 10) * (actor.xparam(0)));
-                    var randomRoll = getRandomIndex(900) + 101;
-                    var damageAmount = getRandomIndex(900) + 101;
-                    if ($gameVariables.value(240) >= 1) {
-                        const enemyLevelValues = $dataItems[$gameVariables.value(240)].meta['EnemyLV'].split(',');
-                        randomRoll = getScaledTrapValue(enemyLevelValues, 10);
-                        damageAmount = getScaledTrapValue(enemyLevelValues, 1);
-                    };
-                    if (randomRoll > evasionThreshold) {
-                        $gamePlayer.requestAnimation(58);
-                        actor.gainMp(-damageAmount);
-                        var infoText = `\\C[16]${actor.name()}\\C[0]は\\C[10]${damageAmount}\\C[0]のＭＰダメージを受けた！（判定：\\C[4]${evasionThreshold}\\C[0] > \\C[10]${randomRoll}\\C[0]）`;
-                        CommonPopupManager.showInfo({}, infoText, null);
-                    } else {
-                        $gamePlayer.requestAnimation(129);
-                        var infoText = `\\C[16]${actor.name()}\\C[0]は\\C[2]回避\\C[0]に成功した！（判定：\\C[4]${evasionThreshold}\\C[0] > \\C[10]${randomRoll}\\C[0]）`;
-                        CommonPopupManager.showInfo({}, infoText, null);
-                    };
-                };
-            };
-            if (valueCountSet1 == 12) {
-                var infoText = `脱力の魔法陣が発動した！`;
-                CommonPopupManager.showInfo({}, infoText, null);
-                event.requestAnimation(626);
-                for (var i = 0; i <= $gameParty.members().length - 1; i++) {
-                    var actor = $gameParty.members()[i];
-                    var evasionThreshold = Math.round((actor.mdf * 2 + actor.luk / 10) * (actor.xparam(0)));
-                    var randomRoll = getRandomIndex(900) + 101;
-                    var damageAmount = getRandomIndex(90) + 11;
-                    if ($gameVariables.value(240) >= 1) {
-                        const enemyLevelValues = $dataItems[$gameVariables.value(240)].meta['EnemyLV'].split(',');
-                        randomRoll = getScaledTrapValue(enemyLevelValues, 10);
-                    };
-                    if (randomRoll > evasionThreshold) {
-                        $gamePlayer.requestAnimation(58);
-                        actor.gainTp(-damageAmount);
-                        var infoText = `\\C[16]${actor.name()}\\C[0]は\\C[10]${damageAmount}\\C[0]のＴＰダメージを受けた！（判定：\\C[4]${evasionThreshold}\\C[0] > \\C[10]${randomRoll}\\C[0]）`;
-                        CommonPopupManager.showInfo({}, infoText, null);
-                    } else {
-                        $gamePlayer.requestAnimation(129);
-                        var infoText = `\\C[16]${actor.name()}\\C[0]は\\C[2]回避\\C[0]に成功した！（判定：\\C[4]${evasionThreshold}\\C[0] > \\C[10]${randomRoll}\\C[0]）`;
-                        CommonPopupManager.showInfo({}, infoText, null);
-                    };
-                };
-            };
-            if (valueCountSet1 == 13) {
-                $gameVariables.setValue(161, 0);
-                //IDの上限(100/200)で打ち切ると、それを超えるIDのイベントを取り
-                //こぼす(Map003は247イベントあり、生成イベントはさらに大きいIDを
-                //取る)。実在するイベントをIDの降順で走査し、最初に見つかった
-                //<warpTrap>を使う。event()がnullのイベントでも落ちないように
-                //データの有無を確認する。
-                const warpTrapEvents = $gameMap.events().slice().sort(function (a, b) {
-                    return b.eventId() - a.eventId();
-                });
-                for (const warpEvent of warpTrapEvents) {
-                    const warpEventData = warpEvent.event();
-                    if (!warpEventData || !warpEventData.meta['warpTrap']) continue;
-                    valueCountSet2 = warpEvent.eventId();
-                    $gameVariables.setValue(161, [$gameMap.mapId(), warpEvent.x, warpEvent.y]);
+            switch (valueCountSet1) {
+                case 5:
+                case 9:
+                    $gamePlayer.requestBalloon(2);
+                    var infoText = `しかし何も起こらなかった…。`;
+                    CommonPopupManager.showInfo({}, infoText, null);
                     break;
-                };
-                var infoText = `転送トラップが発動した！`;
-                CommonPopupManager.showInfo({}, infoText, null);
+                case 10:
+                    $gamePlayer.requestAnimation(623);
+                    var infoText = `足元の魔法陣から爆発が発生した！`;
+                    CommonPopupManager.showInfo({}, infoText, null);
+                    let enemyLevelValues = null;
+                    if ($gameVariables.value(240) >= 1) {
+                        enemyLevelValues = $dataItems[$gameVariables.value(240)].meta['EnemyLV'].split(',');
+                    };
+                    for (var i = 0; i <= members.length - 1; i++) {
+                        var actor = members[i];
+                        //agi,luk,actor.xparam(0)*100。Math.round((actor.agi * 2 + actor.luk /10) * (actor.xparam(0)*100))
+                        var evasionThreshold = Math.round((actor.agi * 2 + actor.luk / 10) * (actor.xparam(0)));
+                        var randomRoll = getRandomIndex(900) + 101;
+                        var damageAmount = getRandomIndex(900) + 101;
+                        if (enemyLevelValues) {
+                            randomRoll = getScaledTrapValue(enemyLevelValues, 10);
+                            damageAmount = getScaledTrapValue(enemyLevelValues, 10);
+                        };
+                        if (randomRoll > evasionThreshold) {
+                            $gamePlayer.requestAnimation(131);
+                            actor.gainHp(-damageAmount);
+                            var infoText = `\\C[16]${actor.name()}\\C[0]は\\C[10]${damageAmount}\\C[0]のＨＰダメージを受けた！（判定：\\C[4]${evasionThreshold}\\C[0] > \\C[10]${randomRoll}\\C[0]）`;
+                            CommonPopupManager.showInfo({}, infoText, null);
+                        } else {
+                            $gamePlayer.requestAnimation(129);
+                            var infoText = `\\C[16]${actor.name()}\\C[0]は\\C[2]回避\\C[0]に成功した！（判定：\\C[4]${evasionThreshold}\\C[0] > \\C[10]${randomRoll}\\C[0]）`;
+                            CommonPopupManager.showInfo({}, infoText, null);
+                        };
+                    };
+                    break;
+                case 11:
+                    var infoText = `吸収の魔法陣が発動した！`;
+                    CommonPopupManager.showInfo({}, infoText, null);
+                    $gamePlayer.requestAnimation(625);
+                    let mpEnemyLevelValues = null;
+                    if ($gameVariables.value(240) >= 1) {
+                        mpEnemyLevelValues = $dataItems[$gameVariables.value(240)].meta['EnemyLV'].split(',');
+                    };
+                    for (var i = 0; i <= members.length - 1; i++) {
+                        var actor = members[i];
+                        var evasionThreshold = Math.round((actor.mat * 2 + actor.luk / 10) * (actor.xparam(0)));
+                        var randomRoll = getRandomIndex(900) + 101;
+                        var damageAmount = getRandomIndex(900) + 101;
+                        if (mpEnemyLevelValues) {
+                            randomRoll = getScaledTrapValue(mpEnemyLevelValues, 10);
+                            damageAmount = getScaledTrapValue(mpEnemyLevelValues, 1);
+                        };
+                        if (randomRoll > evasionThreshold) {
+                            $gamePlayer.requestAnimation(58);
+                            actor.gainMp(-damageAmount);
+                            var infoText = `\\C[16]${actor.name()}\\C[0]は\\C[10]${damageAmount}\\C[0]のＭＰダメージを受けた！（判定：\\C[4]${evasionThreshold}\\C[0] > \\C[10]${randomRoll}\\C[0]）`;
+                            CommonPopupManager.showInfo({}, infoText, null);
+                        } else {
+                            $gamePlayer.requestAnimation(129);
+                            var infoText = `\\C[16]${actor.name()}\\C[0]は\\C[2]回避\\C[0]に成功した！（判定：\\C[4]${evasionThreshold}\\C[0] > \\C[10]${randomRoll}\\C[0]）`;
+                            CommonPopupManager.showInfo({}, infoText, null);
+                        };
+                    };
+                    break;
+                case 12:
+                    var infoText = `脱力の魔法陣が発動した！`;
+                    CommonPopupManager.showInfo({}, infoText, null);
+                    event.requestAnimation(626);
+                    let tpEnemyLevelValues = null;
+                    if ($gameVariables.value(240) >= 1) {
+                        tpEnemyLevelValues = $dataItems[$gameVariables.value(240)].meta['EnemyLV'].split(',');
+                    };
+                    for (var i = 0; i <= members.length - 1; i++) {
+                        var actor = members[i];
+                        var evasionThreshold = Math.round((actor.mdf * 2 + actor.luk / 10) * (actor.xparam(0)));
+                        var randomRoll = getRandomIndex(900) + 101;
+                        var damageAmount = getRandomIndex(90) + 11;
+                        if (tpEnemyLevelValues) {
+                            randomRoll = getScaledTrapValue(tpEnemyLevelValues, 10);
+                        };
+                        if (randomRoll > evasionThreshold) {
+                            $gamePlayer.requestAnimation(58);
+                            actor.gainTp(-damageAmount);
+                            var infoText = `\\C[16]${actor.name()}\\C[0]は\\C[10]${damageAmount}\\C[0]のＴＰダメージを受けた！（判定：\\C[4]${evasionThreshold}\\C[0] > \\C[10]${randomRoll}\\C[0]）`;
+                            CommonPopupManager.showInfo({}, infoText, null);
+                        } else {
+                            $gamePlayer.requestAnimation(129);
+                            var infoText = `\\C[16]${actor.name()}\\C[0]は\\C[2]回避\\C[0]に成功した！（判定：\\C[4]${evasionThreshold}\\C[0] > \\C[10]${randomRoll}\\C[0]）`;
+                            CommonPopupManager.showInfo({}, infoText, null);
+                        };
+                    };
+                    break;
+                case 13:
+                    $gameVariables.setValue(161, 0);
+                    //IDの上限(100/200)で打ち切ると、それを超えるIDのイベントを取り
+                    //こぼす(Map003は247イベントあり、生成イベントはさらに大きいIDを
+                    //取る)。実在するイベントをIDの降順で走査し、最初に見つかった
+                    //<warpTrap>を使う。event()がnullのイベントでも落ちないように
+                    //データの有無を確認する。
+                    const warpTrapEvents = $gameMap.events().slice().sort(function (a, b) {
+                        return b.eventId() - a.eventId();
+                    });
+                    for (const warpEvent of warpTrapEvents) {
+                        const warpEventData = warpEvent.event();
+                        if (!warpEventData || !warpEventData.meta['warpTrap']) continue;
+                        valueCountSet2 = warpEvent.eventId();
+                        $gameVariables.setValue(161, [$gameMap.mapId(), warpEvent.x, warpEvent.y]);
+                        break;
+                    };
+                    var infoText = `転送トラップが発動した！`;
+                    CommonPopupManager.showInfo({}, infoText, null);
+                    break;
             };
         };
 
     };
+
 
     //フラッシュモブ演出flashmob_wordDirect(1,55,56,100,'Tamanegiv6',`!?`);
     flashmob_wordDirect = function (displayModeId, bannerPictureId, messagePictureId, messageText, fontName, textPictureId) {
@@ -5483,9 +5566,17 @@
             $gameScreen.erasePicture(bannerPictureId);
             $gameScreen.erasePicture(messagePictureId);
         } else {
-            if (displayModeId == 1) { var pictureName = 'Screen_mobFlash' };
-            if (displayModeId == 2) { var pictureName = 'Screen_hukidasi' };
-            if (displayModeId == 3) { var pictureName = 'Screen_hukidasiIkari' };
+            switch (displayModeId) {
+                case 1:
+                    var pictureName = 'Screen_mobFlash';
+                    break;
+                case 2:
+                    var pictureName = 'Screen_hukidasi';
+                    break;
+                case 3:
+                    var pictureName = 'Screen_hukidasiIkari';
+                    break;
+            };
             var pictureId = bannerPictureId;
             if (displayModeId == 1 || displayModeId == 2) {
                 pic_1(2, pictureId, pictureName, 0, 100, 250, 60, 1280, 768, 0, 0);
@@ -5523,7 +5614,7 @@
             windowY = 250 - (valueCountSet1 * 40);
         };
         WindowManager.show(1, 0, windowY, 1280, 768 - windowY);
-        WindowManager.drawText(1, `\\fs[28]${eval("valueWordSet" + valueCountSet3)}`);
+        WindowManager.drawText(1, `\\fs[28]${window["valueWordSet" + valueCountSet3]}`);
         valueCountSet3 += 1;
 
     };
@@ -5532,7 +5623,7 @@
     get_loopListDisplay2 = function () {
 
         WindowManager.show(1, 0, 70, 1280, 698);
-        WindowManager.drawText(1, `\\fs[28]${eval("valueWordSet" + valueCountSet3)}`);
+        WindowManager.drawText(1, `\\fs[28]${window["valueWordSet" + valueCountSet3]}`);
         valueCountSet3 += 1;
 
     };
@@ -5558,7 +5649,7 @@
                     };
                     accumulatedText += `　　\\C[16]${valueIkkatuArray[i][0]}\\C[0]:\\C[2]${valueIkkatuArray[i][1]}体\\C[0] `;
                     accumulatedText += `\n`;
-                    eval((pageIndex == 1 ? "leftDisplayText" : "rightDisplayText") + " = accumulatedText");
+                    if (pageIndex == 1) { leftDisplayText = accumulatedText } else { rightDisplayText = accumulatedText };
                 };
                 if (isBulkSellFlag == 1) {//一括売却実行用
                     accumulatedText += `${valueIkkatuArray[i][0]}:${valueIkkatuArray[i][1]}個売却 `;
@@ -5579,7 +5670,7 @@
                         valueCountSet7 += valueIkkatuArray[i][4];
                     };
                     accumulatedText += `\n`;
-                    eval((pageIndex == 1 ? "leftDisplayText" : "rightDisplayText") + " = accumulatedText");
+                    if (pageIndex == 1) { leftDisplayText = accumulatedText } else { rightDisplayText = accumulatedText };
                 };
                 valueCountSet3 += 1;
                 if ((valueCountSet3 % rowsPerPage) == 0) {
@@ -5634,13 +5725,29 @@
                 var choiceText = `${valueWordArray[i]}`;
             } else {
                 if (listKindId == 3) {
-                    if (valueCountArray2[i] == 0) { var choiceText = `\x1bIIN[${valueCountArray[i]}]` };
-                    if (valueCountArray2[i] == 1) { var choiceText = `\x1bWIN[${valueCountArray[i]}]` };
-                    if (valueCountArray2[i] == 2) { var choiceText = `\x1bAIN[${valueCountArray[i]}]` };
+                    switch (valueCountArray2[i]) {
+                        case 0:
+                            var choiceText = `\x1bIIN[${valueCountArray[i]}]`;
+                            break;
+                        case 1:
+                            var choiceText = `\x1bWIN[${valueCountArray[i]}]`;
+                            break;
+                        case 2:
+                            var choiceText = `\x1bAIN[${valueCountArray[i]}]`;
+                            break;
+                    };
                 } else {
-                    if (entryCategoryId == 0) { var choiceText = `\x1bIIN[${valueCountArray[i]}]` };
-                    if (entryCategoryId == 1) { var choiceText = `\x1bWIN[${valueCountArray[i]}]` };
-                    if (entryCategoryId == 2) { var choiceText = `\x1bAIN[${valueCountArray[i]}]` };
+                    switch (entryCategoryId) {
+                        case 0:
+                            var choiceText = `\x1bIIN[${valueCountArray[i]}]`;
+                            break;
+                        case 1:
+                            var choiceText = `\x1bWIN[${valueCountArray[i]}]`;
+                            break;
+                        case 2:
+                            var choiceText = `\x1bAIN[${valueCountArray[i]}]`;
+                            break;
+                    };
                 };
             };
             if (listKindId == 1) {//クエスト
@@ -5667,10 +5774,11 @@
             $gameSystem.addCustomChoice(id, choiceParams);
             valueCountArray3.push(valueCountArray[i]);
             if (columnCount <= 2 && choiceIndex <= 240) {
-                if (columnCount == 2) { var picturePosX = 1000 };
-                if (columnCount == 1) { var picturePosX = 700 };
-                if (columnCount == 2) { var picturePosY = 10 };
-                if (columnCount == 1) { var picturePosY = 120 };
+                const columnLayout = COLUMN_LAYOUT_BY_COUNT[columnCount];
+                if (columnLayout) {
+                    var picturePosX = columnLayout.x;
+                    var picturePosY = columnLayout.y;
+                };
                 var selectPictureId = choiceIndex - 1;
                 if (listKindId == 2) { var selectPictureId = choiceIndex };
                 if (listKindId == 1 || listKindId == 2) {//クエストと一括対象選択のみ。
@@ -5686,6 +5794,12 @@
 
     };
 
+    //カラム数 -> 選択肢画像の座標(get_loopChoiceDisplay1用)
+    const COLUMN_LAYOUT_BY_COUNT = {
+        1: { x: 700, y: 120 },
+        2: { x: 1000, y: 10 },
+    };
+
     //リセット項目を表示
     reset_exeDisplay = function () {
 
@@ -5699,53 +5813,21 @@
         //6種族討伐数をリセットする
         //7マップ情報をリセットする
         //8戦績情報をクリアする
-        var entryIndex = 1;
-        if ($gameVariables.value(183)[entryIndex] == 0) {
-            $gameVariables.setValue(800 + entryIndex, `Ｈシーンフラグをリセットする`);
-        } else {
-            $gameVariables.setValue(800 + entryIndex, `Ｈシーンフラグをリセットしない`);
+        const resetFlags = $gameVariables.value(183);
+        const RESET_OPTION_LABELS = {
+            1: `Ｈシーンフラグ`,
+            2: `挿話シーンフラグ`,
+            3: `Ｈ回想履歴`,
+            4: `挿話回想履歴`,
+            5: `クエスト達成状況`,
+            6: `各種族討伐数`,
+            7: `マップ情報`,
+            8: `戦闘レコード`,
         };
-        var entryIndex = 2;
-        if ($gameVariables.value(183)[entryIndex] == 0) {
-            $gameVariables.setValue(800 + entryIndex, `挿話シーンフラグをリセットする`);
-        } else {
-            $gameVariables.setValue(800 + entryIndex, `挿話シーンフラグをリセットしない`);
-        };
-        var entryIndex = 3;
-        if ($gameVariables.value(183)[entryIndex] == 0) {
-            $gameVariables.setValue(800 + entryIndex, `Ｈ回想履歴をリセットする`);
-        } else {
-            $gameVariables.setValue(800 + entryIndex, `Ｈ回想履歴をリセットしない`);
-        };
-        var entryIndex = 4;
-        if ($gameVariables.value(183)[entryIndex] == 0) {
-            $gameVariables.setValue(800 + entryIndex, `挿話回想履歴をリセットする`);
-        } else {
-            $gameVariables.setValue(800 + entryIndex, `挿話回想履歴をリセットしない`);
-        };
-        var entryIndex = 5;
-        if ($gameVariables.value(183)[entryIndex] == 0) {
-            $gameVariables.setValue(800 + entryIndex, `クエスト達成状況をリセットする`);
-        } else {
-            $gameVariables.setValue(800 + entryIndex, `クエスト達成状況をリセットしない`);
-        };
-        var entryIndex = 6;
-        if ($gameVariables.value(183)[entryIndex] == 0) {
-            $gameVariables.setValue(800 + entryIndex, `各種族討伐数をリセットする`);
-        } else {
-            $gameVariables.setValue(800 + entryIndex, `各種族討伐数をリセットしない`);
-        };
-        var entryIndex = 7;
-        if ($gameVariables.value(183)[entryIndex] == 0) {
-            $gameVariables.setValue(800 + entryIndex, `マップ情報をリセットする`);
-        } else {
-            $gameVariables.setValue(800 + entryIndex, `マップ情報をリセットしない`);
-        };
-        var entryIndex = 8;
-        if ($gameVariables.value(183)[entryIndex] == 0) {
-            $gameVariables.setValue(800 + entryIndex, `戦闘レコードをリセットする`);
-        } else {
-            $gameVariables.setValue(800 + entryIndex, `戦闘レコードをリセットしない`);
+        for (let entryIndex = 1; entryIndex <= 8; entryIndex++) {
+            const label = RESET_OPTION_LABELS[entryIndex];
+            const optionText = resetFlags[entryIndex] == 0 ? `${label}をリセットする` : `${label}をリセットしない`;
+            $gameVariables.setValue(800 + entryIndex, optionText);
         };
 
     };
@@ -5949,13 +6031,25 @@
     };
 
     //バトルレコード一覧
+    //スキルタイプ -> 戦績レコードindex(actor_battleRecordDisplay1用)
+    const BATTLE_RECORD_INDEX_BY_STYPE_ID = {
+        2: 11,//Attack
+        5: 12,//S-Ability
+        6: 13,//A-Ability
+        7: 14,//W-Ability
+        8: 15,//R-Ability
+        12: 16,//Burst!
+        13: 17,//Chain!
+    };
+
     actor_battleRecordDisplay1 = function () {
 
         valueBattleRecordMVP = Array(11).fill(0);
         var killCounts = []; var maxAttackDamages = []; var attackDamageSums = []; var criticalHitCounts = [];
         var overKillCounts = []; var maxAcceptDamages = []; var acceptDamageSums = []; var deathCounts = [];
-        for (var i = 0; i <= $gameParty.members().length - 1; i++) {
-            var actorId = $gameParty.members()[i]._actorId;
+        const partyMembers = $gameParty.members();
+        for (var i = 0; i <= partyMembers.length - 1; i++) {
+            var actorId = partyMembers[i]._actorId;
             var actor = $gameActors.actor(actorId);
             killCounts.push(actor.getAllKillEnemyCounter());
             maxAttackDamages.push(actor.attackDamageMax);
@@ -5999,59 +6093,54 @@
         });
         valueBattleRecordMVP[8] = maxDeathCount;
 
-        var actorId = `\\C[10]☆Battle Record\\C[0]\nTotalKill\nMaxAssalt\nTotalAssalt\nCritical\nOverKill\nMaxDamage\nTotalDamage\nDefead\n`;
-        actorId += `\\C[10]☆Skill Count\\C[0]\nAttack\nS-Ability\nA-Ability\nW-Ability\nR-Ability\nBurst!\nChain!`;
+        var recordHeaderText = `\\C[10]☆Battle Record\\C[0]\nTotalKill\nMaxAssalt\nTotalAssalt\nCritical\nOverKill\nMaxDamage\nTotalDamage\nDefead\n`;
+        recordHeaderText += `\\C[10]☆Skill Count\\C[0]\nAttack\nS-Ability\nA-Ability\nW-Ability\nR-Ability\nBurst!\nChain!`;
         WindowManager.show(1, 10, 100, 250, 668);
-        WindowManager.drawText(1, actorId);
+        WindowManager.drawText(1, recordHeaderText);
         var windowId = 2;
         var windowY = 260;
         const dataSkillsCount = $dataSkills.length;
-        const gamePartyMembersCount = $gameParty.members().length;
-        const partyMembers = $gameParty.members();
+        const gamePartyMembersCount = partyMembers.length;
         for (var i = 0; i < gamePartyMembersCount; i++) {
             if (i == 4) break;
-            eval("valueBattleRecord_" + i + " = Array(21).fill(-1)");
+            window["valueBattleRecord_" + i] = Array(21).fill(-1);
             var actor = partyMembers[i];
-            const evalValueBattleRecord_i = eval("valueBattleRecord_" + i);
-            evalValueBattleRecord_i[0] = `\\C[1]${actor.name()}\\C[0]\n`;
-            evalValueBattleRecord_i[1] = actor.getAllKillEnemyCounter();
-            evalValueBattleRecord_i[2] = actor.attackDamageMax;
-            evalValueBattleRecord_i[3] = actor.attackDamageSum;
-            evalValueBattleRecord_i[4] = $gameVariables.value(380 + actor.actorId())[68];
-            evalValueBattleRecord_i[5] = $gameVariables.value(380 + actor.actorId())[67] / 2;
-            evalValueBattleRecord_i[6] = actor.acceptDamageMax;
-            evalValueBattleRecord_i[7] = actor.acceptDamageSum;
-            evalValueBattleRecord_i[8] = actor.deadCounter;
-            evalValueBattleRecord_i[10] = `────`
-            for (var j = 11; j <= 17; j++) { evalValueBattleRecord_i[j] = 0 };
+            const battleRecord = window["valueBattleRecord_" + i];
+            battleRecord[0] = `\\C[1]${actor.name()}\\C[0]\n`;
+            battleRecord[1] = actor.getAllKillEnemyCounter();
+            battleRecord[2] = actor.attackDamageMax;
+            battleRecord[3] = actor.attackDamageSum;
+            battleRecord[4] = $gameVariables.value(380 + actor.actorId())[68];
+            battleRecord[5] = $gameVariables.value(380 + actor.actorId())[67] / 2;
+            battleRecord[6] = actor.acceptDamageMax;
+            battleRecord[7] = actor.acceptDamageSum;
+            battleRecord[8] = actor.deadCounter;
+            battleRecord[10] = `────`
+            for (var j = 11; j <= 17; j++) { battleRecord[j] = 0 };
             for (var j = 1; j < dataSkillsCount; j++) {
                 if ($dataSkills[j].name !== '') {
-                    const skillStypeId = $dataSkills[j].stypeId;
-                    if (skillStypeId == 2) { evalValueBattleRecord_i[11] += actor.getSkillUseCounter(j) };
-                    if (skillStypeId == 5) { evalValueBattleRecord_i[12] += actor.getSkillUseCounter(j) };
-                    if (skillStypeId == 6) { evalValueBattleRecord_i[13] += actor.getSkillUseCounter(j) };
-                    if (skillStypeId == 7) { evalValueBattleRecord_i[14] += actor.getSkillUseCounter(j) };
-                    if (skillStypeId == 8) { evalValueBattleRecord_i[15] += actor.getSkillUseCounter(j) };
-                    if (skillStypeId == 12) { evalValueBattleRecord_i[16] += actor.getSkillUseCounter(j) };
-                    if (skillStypeId == 13) { evalValueBattleRecord_i[17] += actor.getSkillUseCounter(j) };
+                    const battleRecordIndex = BATTLE_RECORD_INDEX_BY_STYPE_ID[$dataSkills[j].stypeId];
+                    if (battleRecordIndex !== undefined) {
+                        battleRecord[battleRecordIndex] += actor.getSkillUseCounter(j);
+                    };
                 };
             };
             for (var j = 1; j <= 20; j++) {
-                if (evalValueBattleRecord_i[j] != -1) {
+                if (battleRecord[j] != -1) {
                     if (j >= 1 && j <= 8) {
-                        if (evalValueBattleRecord_i[j] >= 1 && evalValueBattleRecord_i[j] >= valueBattleRecordMVP[j]) {
-                            evalValueBattleRecord_i[0] += `\\I[676]\\C[2]`;
+                        if (battleRecord[j] >= 1 && battleRecord[j] >= valueBattleRecordMVP[j]) {
+                            battleRecord[0] += `\\I[676]\\C[2]`;
                         };
                     };
-                    if (evalValueBattleRecord_i[j] >= 1000000000) {
-                        evalValueBattleRecord_i[0] += `\\fs[22]${evalValueBattleRecord_i[j].toLocaleString()}\\C[0]\\fs[28]\n`;
+                    if (battleRecord[j] >= 1000000000) {
+                        battleRecord[0] += `\\fs[22]${battleRecord[j].toLocaleString()}\\C[0]\\fs[28]\n`;
                     } else {
-                        evalValueBattleRecord_i[0] += `${evalValueBattleRecord_i[j].toLocaleString()}\\C[0]\n`;
+                        battleRecord[0] += `${battleRecord[j].toLocaleString()}\\C[0]\n`;
                     };
                 };
             };
             WindowManager.show(windowId, windowY, 100, 250, 668);
-            WindowManager.drawText(windowId, evalValueBattleRecord_i[0]);
+            WindowManager.drawText(windowId, battleRecord[0]);
             WindowManager.show(windowId + 1, windowY + 10 + 30, 20, 170, 80);
             WindowManager.drawPicture(windowId + 1, "/img/battlehud/Face_" + actor.actorId());
             windowId += 2;
@@ -6174,68 +6263,76 @@
                     var effectValues = effectEntries[i];
                     var traitRate = Number(effectValues[2]);
                     var traitLineText = ``;
-                    if (Number(effectValues[0]) == 0) {
-                        traitLineText += TextManager.param(Number(effectValues[1]));
-                        traitLineText += `\\C[10]${Number(effectValues[2]) * 100}%\\C[0]UP!`;
-                    };
-                    if (Number(effectValues[0]) == 1) {
-                        traitLineText += FTKR.CSS.cssStatus.xparam[Number(effectValues[1])];
-                        traitLineText += `\\C[10]${Number(effectValues[2]) * 100}%\\C[0]UP!`;
-                    };
-                    if (Number(effectValues[0]) == 2) {
-                        traitLineText += FTKR.CSS.cssStatus.sparam[Number(effectValues[1])];
-                        traitLineText += `\\C[10]${Number(effectValues[2]) * 100}%\\C[0]UP!`;
-                    };
-                    if (Number(effectValues[0]) == 3) {
-                        traitLineText += `${$dataSystem.elements[Number(effectValues[1])]}威力`;
-                        if (Number(effectValues[2]) >= 0) {
-                            traitLineText += `\\C[10]${Number(effectValues[2])}%UP!\\C[0]`;
-                        } else {
-                            traitLineText += `\\C[1]${Number(effectValues[2])}%DOWN!\\C[0]`;
-                        };
-                    };
-                    if (Number(effectValues[0]) == 4) {
-                        traitLineText += `${$dataSystem.elements[Number(effectValues[1])]}`;
-                        if ([10, 11, 12, 15, 20, 38, 39, 40, 41].some(function (elementId) { return elementId == Number(effectValues[1]) })) {
-                            if (Number(effectValues[1]) == 11) {
-                                var traitText = `10`;
+        switch (Number(effectValues[0])) {
+            case 0:
+                            traitLineText += TextManager.param(Number(effectValues[1]));
+                            traitLineText += `\\C[10]${Number(effectValues[2]) * 100}%\\C[0]UP!`;
+                break;
+            case 1:
+                            traitLineText += FTKR.CSS.cssStatus.xparam[Number(effectValues[1])];
+                            traitLineText += `\\C[10]${Number(effectValues[2]) * 100}%\\C[0]UP!`;
+                break;
+            case 2:
+                            traitLineText += FTKR.CSS.cssStatus.sparam[Number(effectValues[1])];
+                            traitLineText += `\\C[10]${Number(effectValues[2]) * 100}%\\C[0]UP!`;
+                break;
+            case 3:
+                            traitLineText += `${$dataSystem.elements[Number(effectValues[1])]}威力`;
+                            if (Number(effectValues[2]) >= 0) {
+                                traitLineText += `\\C[10]${Number(effectValues[2])}%UP!\\C[0]`;
                             } else {
-                                var traitText = `100`;
+                                traitLineText += `\\C[1]${Number(effectValues[2])}%DOWN!\\C[0]`;
                             };
-                            if (traitRate >= 0) {
-                                traitLineText += `\\C[10]${Number(effectValues[2]) * traitText}%\\C[0]UP!`;
+                break;
+            case 4:
+                            traitLineText += `${$dataSystem.elements[Number(effectValues[1])]}`;
+                            if ([10, 11, 12, 15, 20, 38, 39, 40, 41].some(function (elementId) { return elementId == Number(effectValues[1]) })) {
+                                if (Number(effectValues[1]) == 11) {
+                                    var traitText = `10`;
+                                } else {
+                                    var traitText = `100`;
+                                };
+                                if (traitRate >= 0) {
+                                    traitLineText += `\\C[10]${Number(effectValues[2]) * traitText}%\\C[0]UP!`;
+                                } else {
+                                    traitLineText += `\\C[1]${Number(effectValues[2]) * traitText}%\\C[0]DOWN!`;
+                                };
                             } else {
-                                traitLineText += `\\C[1]${Number(effectValues[2]) * traitText}%\\C[0]DOWN!`;
+                                traitLineText += `耐性`;
+                                if (Number(effectValues[1]) == 11) {
+                                    var traitText = `10`;
+                                } else {
+                                    var traitText = `100`;
+                                };
+                                if (traitRate <= 0) {
+                                    var traitRate = traitRate - traitRate - traitRate;
+                                    traitLineText += `\\C[1]${Number(effectValues[2]) * traitText}%\\C[0]DOWN!`;
+                                } else {
+                                    traitLineText += `\\C[10]${Number(effectValues[2]) * traitText}%\\C[0]UP!`;
+                                };
                             };
-                        } else {
-                            traitLineText += `耐性`;
-                            if (Number(effectValues[1]) == 11) {
-                                var traitText = `10`;
-                            } else {
-                                var traitText = `100`;
-                            };
-                            if (traitRate <= 0) {
-                                var traitRate = traitRate - traitRate - traitRate;
-                                traitLineText += `\\C[1]${Number(effectValues[2]) * traitText}%\\C[0]DOWN!`;
-                            } else {
-                                traitLineText += `\\C[10]${Number(effectValues[2]) * traitText}%\\C[0]UP!`;
-                            };
-                        };
-                    };
-                    if (Number(effectValues[0]) == 0) {
-                        stateData.traits.push({ code: 21, dataId: Number(effectValues[1]), value: 1 + traitRate });
-                    };
-                    if (Number(effectValues[0]) == 1) {
-                        stateData.traits.push({ code: 22, dataId: Number(effectValues[1]), value: traitRate });
-                    };
-                    if (Number(effectValues[0]) == 2) {
-                        stateData.traits.push({ code: 23, dataId: Number(effectValues[1]), value: 1 + traitRate });
-                    };
-                    if (Number(effectValues[0]) == 3) { valueAttackAmplifysActorId[actor.actorId()][Number(effectValues[1])] += Number(effectValues[2]) };
-                    if (Number(effectValues[0]) == 4) {
-                        var traitRate = traitRate - traitRate - traitRate;
-                        stateData.traits.push({ code: 11, dataId: Number(effectValues[1]), value: 1 + traitRate });
-                    };
+                break;
+        };
+        switch (Number(effectValues[0])) {
+            case 0:
+                            stateData.traits.push({ code: 21, dataId: Number(effectValues[1]), value: 1 + traitRate });
+                break;
+            case 1:
+                            stateData.traits.push({ code: 22, dataId: Number(effectValues[1]), value: traitRate });
+                break;
+            case 2:
+                            stateData.traits.push({ code: 23, dataId: Number(effectValues[1]), value: 1 + traitRate });
+                break;
+            case 3:
+                $gameParty.members().forEach(function (partyMember) {
+                    valueAttackAmplifysActorId[partyMember.actorId()][Number(effectValues[1])] += Number(effectValues[2]);
+                });
+                break;
+            case 4:
+                            var traitRate = traitRate - traitRate - traitRate;
+                            stateData.traits.push({ code: 11, dataId: Number(effectValues[1]), value: 1 + traitRate });
+                break;
+        };
                     descBuilder += `[${traitLineText}] `;
                     traitLineCount += 1;
                     if ((traitLineCount % 5) == 0) {
@@ -6253,20 +6350,30 @@
     //ミニステでインフォＹ軸補正値変更info_SetY($gameVariables.value(200));
     info_SetY = function (positionPresetId) {
 
-        if (positionPresetId == 1) { valueInfoY = 0 }
-        else if (positionPresetId == 2) { valueInfoY = -100 }
-        else if (positionPresetId == 3) { valueInfoY = -100 }
-        else if (positionPresetId == 4) { valueInfoY = -100 }
-        else if (positionPresetId == 5) { valueInfoY = 0 };
+        switch (positionPresetId) {
+            case 1:
+                valueInfoY = 0;
+                break;
+            case 2:
+            case 3:
+            case 4:
+                valueInfoY = -100;
+                break;
+            case 5:
+                valueInfoY = 0;
+                break;
+        };
 
     };
 
     //tipsを纏めて閲覧
     tips_select = function () {
 
+        const tipNames = $gameVariables.value(532);
+        const tipDescriptions = $gameVariables.value(533);
+        const tipPictures = $gameVariables.value(534);
         var basePictureId = 101;
-        for (var i = 0; i <= $gameVariables.value(532).length - 1; i++) {
-            var tipNames = $gameVariables.value(532);
+        for (var i = 0; i <= tipNames.length - 1; i++) {
             const id = 1;
             var tipName = tipNames[i];
             if (tipName.length >= 14) {
@@ -6277,17 +6384,19 @@
                 value: i + 1
             };
             $gameSystem.addCustomChoice(id, choiceParams);
-            if ($gameVariables.value(533)[i] != 0) {
-                $gameScreen.setDTextPicture(`\\C[16]${tipNames[i]}\\C[0]:\n${$gameVariables.value(533)[i]}`, 28);
+            const tipDescription = tipDescriptions[i];
+            if (tipDescription != 0) {
+                $gameScreen.setDTextPicture(`\\C[16]${tipNames[i]}\\C[0]:\n${tipDescription}`, 28);
                 $gameScreen.dWindowFrame = 'ON';
                 $gameScreen.showPicture(i + basePictureId + 1, '', 0, 334, 10, 100, 100, 255, 0);
                 $gameMessage.setSelectPictureId(i, i + basePictureId + 1);
             };
-            if ($gameVariables.value(534)[i] && $gameVariables.value(534)[i][0] != 0) {
+            const tipPicture = tipPictures[i];
+            if (tipPicture && tipPicture[0] != 0) {
                 //$gameScreen.showPicture(i + basePictureId,$gameVariables.value(534)[i][0],$gameVariables.value(534)[i][1],
                 //$gameVariables.value(534)[i][2]+334-100-50,$gameVariables.value(534)[i][3],
                 //$gameVariables.value(534)[i][4],$gameVariables.value(534)[i][5],$gameVariables.value(534)[i][6],0);
-                $gameScreen.showPicture(i + basePictureId, $gameVariables.value(534)[i][0], 0, 334, 0, 100, 100, 255, 0);
+                $gameScreen.showPicture(i + basePictureId, tipPicture[0], 0, 334, 0, 100, 100, 255, 0);
                 $gameMessage.setSelectPictureId(i, i + basePictureId);
             };
             basePictureId += 2;
@@ -6313,26 +6422,30 @@
     town_escape = function () {
 
         $gameVariables.setValue(520, Array(21).fill(0));
-        for (var i = 0; i < $gameParty.members().length; i++) {
-            if (isGirl($gameParty.members()[i])) {
-                var escapeActorId = $gameParty.members()[i].actorId();
-                if ($gameVariables.value(230) >= 1) {
-                    if ($dataWeapons[$gameVariables.value(230)].meta['PermissionCloth']) {
-                        if ($gameVariables.value(440 + escapeActorId)[41] == Number($dataWeapons[$gameVariables.value(230)].meta['PermissionCloth'])) {
-                            if ($gameVariables.value(380 + escapeActorId)[5] > $gameVariables.value(380 + escapeActorId)[4]) {
-                                $gameVariables.value(520)[escapeActorId] = Number($dataWeapons[$gameVariables.value(230)].meta['PermissionCloth']);
+        const members = $gameParty.members();
+        for (var i = 0; i < members.length; i++) {
+            if (isGirl(members[i])) {
+                const girlActorId = members[i].actorId();
+                const permissionWeaponId = $gameVariables.value(230);
+                if (permissionWeaponId >= 1) {
+                    const permissionClothMeta = $dataWeapons[permissionWeaponId].meta['PermissionCloth'];
+                    if (permissionClothMeta) {
+                        if ($gameVariables.value(440 + girlActorId)[41] == Number(permissionClothMeta)) {
+                            if ($gameVariables.value(380 + girlActorId)[5] > $gameVariables.value(380 + girlActorId)[4]) {
+                                $gameVariables.value(520)[girlActorId] = Number(permissionClothMeta);
                             }
                         }
                     }
                 }
             }
         };
-        var escapeSourceVarId = 204;
-        var escapeActorId = $gameVariables.value(escapeSourceVarId)[0];
-        var escapeMapX = $gameVariables.value(escapeSourceVarId)[1];
-        var escapeMapY = $gameVariables.value(escapeSourceVarId)[2];
-        if (escapeActorId >= 1) {
-            $gamePlayer.reserveTransfer(escapeActorId, escapeMapX, escapeMapY, 2, 2);
+        const escapeSourceVarId = 204;
+        const escapeSource = $gameVariables.value(escapeSourceVarId);
+        const escapeMapId = escapeSource[0];
+        const escapeMapX = escapeSource[1];
+        const escapeMapY = escapeSource[2];
+        if (escapeMapId >= 1) {
+            $gamePlayer.reserveTransfer(escapeMapId, escapeMapX, escapeMapY, 2, 2);
         } else {
             $gamePlayer.reserveTransfer(14, 2, 2, 2, 2);
         };
@@ -6342,12 +6455,15 @@
     //指定衣装OKな町から出た後、次マップで露出超過なら通常衣装に戻すスクリプト。マップ最初イベントで実行
     town_startPermissionClothChange = function () {
 
+        const permissionClothActors = $gameVariables.value(520);
         var transferMapId = 0;
-        for (var i = 0; i < $gameVariables.value(520).length; i++) {
-            if ($gameVariables.value(520)[i] >= 1) {
-                if ($gameVariables.value(230) >= 1) {
-                    if ($dataWeapons[$gameVariables.value(230)].meta['PermissionCloth']) {
-                        if ($gameVariables.value(520)[i] == Number($dataWeapons[$gameVariables.value(230)].meta['PermissionCloth'])) {
+        for (var i = 0; i < permissionClothActors.length; i++) {
+            if (permissionClothActors[i] >= 1) {
+                const permissionWeaponId = $gameVariables.value(230);
+                if (permissionWeaponId >= 1) {
+                    const permissionClothMeta = $dataWeapons[permissionWeaponId].meta['PermissionCloth'];
+                    if (permissionClothMeta) {
+                        if (permissionClothActors[i] == Number(permissionClothMeta)) {
                             var transferMapId = 1;
                             break;
                         }
@@ -6356,16 +6472,16 @@
             }
         };
         if (transferMapId == 0) {
-            for (var i = 0; i < $gameVariables.value(520).length; i++) {
-                if ($gameVariables.value(520)[i] >= 1) {
-                    var transferX = $gameVariables.value(520)[i];
-                    $gameVariables.setValue(20, transferX);
-                    var actor = $gameActors.actor($gameVariables.value(20));
-                    if ($dataActors[$gameVariables.value(20)].meta['MainCloth']) {
-                        $gameVariables.setValue(19, Number($dataActors[$gameVariables.value(20)].meta['MainCloth']));
+            for (var i = 0; i < permissionClothActors.length; i++) {
+                if (permissionClothActors[i] >= 1) {
+                    const targetActorId = permissionClothActors[i];
+                    $gameVariables.setValue(20, targetActorId);
+                    const actor = $gameActors.actor(targetActorId);
+                    if ($dataActors[targetActorId].meta['MainCloth']) {
+                        $gameVariables.setValue(19, Number($dataActors[targetActorId].meta['MainCloth']));
                         kisekae_tyokusetusitei($gameVariables.value(19), 0);
-                        var transferY = `${actor.name()}は\x1bIIN[${$gameVariables.value(19)}]に着替えた。`;
-                        CommonPopupManager.showInfo({}, transferY, null);
+                        const changeMessage = `${actor.name()}はIIN[${$gameVariables.value(19)}]着替えた。`;
+                        CommonPopupManager.showInfo({}, changeMessage, null);
                     };
                 }
             }
@@ -6379,41 +6495,45 @@
 
         if (warpModeId == 1) {
             $gameSwitches.setValue(380, false);
-            if ($dataItems[$gameVariables.value(240)].meta['warpShare']) {
+            const chestId = $gameVariables.value(240);
+            const chestMeta = $dataItems[chestId].meta;
+            if (chestMeta['warpShare']) {
+                const warpShareGroupId = Number(chestMeta['warpShare']);
+                const warpPointFlags = $gameVariables.value(211);
                 for (var j = 1; j <= $dataWeapons.length - 1; j++) {
                     if ($dataItems[j].meta['warpShare']) {
-                        if (Number($dataItems[j].meta['warpShare']) == Number($dataItems[$gameVariables.value(240)].meta['warpShare'])) {
+                        if (Number($dataItems[j].meta['warpShare']) == warpShareGroupId) {
                             if ($dataItems[j].meta['warpStart']) {
                                 valueScriptArray1.push($dataItems[j].meta['warpStart'].split(','));
                             };
                             for (var i = 1; i <= 9; i++) {
                                 if ($dataItems[j].meta['warpPoint' + i]) {
-                                    if ($gameVariables.value(211)[j][i] == 1) {
+                                    if (warpPointFlags[j][i] == 1) {
                                         valueScriptArray1.push($dataItems[j].meta['warpPoint' + i].split(','));
                                         $gameSwitches.setValue(380, true);
                                     }
-                                };
-                            };
-                        };
-                    };
-                };
+                                }
+                            }
+                        }
+                    }
+                }
             } else {
-                if ($dataItems[$gameVariables.value(240)].meta['warpStart']) {
-                    valueScriptArray1.push($dataItems[$gameVariables.value(240)].meta['warpStart'].split(','));
+                if (chestMeta['warpStart']) {
+                    valueScriptArray1.push(chestMeta['warpStart'].split(','));
                 };
+                const warpPointFlags = $gameVariables.value(211)[chestId];
                 for (var i = 1; i <= 9; i++) {
-                    if ($dataItems[$gameVariables.value(240)].meta['warpPoint' + i]) {
-                        if ($gameVariables.value(211)[$gameVariables.value(240)][i] == 1) {
-                            valueScriptArray1.push($dataItems[$gameVariables.value(240)].meta['warpPoint' + i].split(','));
+                    if (chestMeta['warpPoint' + i]) {
+                        if (warpPointFlags[i] == 1) {
+                            valueScriptArray1.push(chestMeta['warpPoint' + i].split(','));
                             $gameSwitches.setValue(380, true);
                         }
-                    };
+                    }
                 };
             };
         };
 
     };
-
     function createRandomWordSegment(wordHeadCandidates, wordBodyCandidates, wordTailCandidates, shakeOffsetCandidates) {
         const wordHead = wordHeadCandidates[getRandomIndex(wordHeadCandidates.length)];
         const wordBody = wordBodyCandidates[getRandomIndex(wordBodyCandidates.length)];
@@ -6817,8 +6937,8 @@
                 $dataMap.displayName = name;
             };
 
-            const num = $gameSwitches.value(201) ? 10 : 3;
-            const infoMessage = `～～\\C[${num}]${name}\\C[0]～～`;
+            const nameColorCode = $gameSwitches.value(201) ? 10 : 3;
+            const infoMessage = `～～\\C[${nameColorCode}]${name}\\C[0]～～`;
             CommonPopupManager.showInfo({}, infoMessage, null);
         };
     }
@@ -6947,8 +7067,8 @@
         const eventIds = $gameVariables.value(292);
         for (let eventId = 11; eventId <= 13; eventId++) {
             const childEventId = eventIds[eventId]; // this._eventId
-            if ($gameMap.event(childEventId)) {
-                const mapEvent = $gameMap.event(childEventId);
+            const mapEvent = $gameMap.event(childEventId);
+            if (mapEvent) {
                 mapEvent.setStepAnime(false);
                 mapEvent.setWalkAnime(false);
                 mapEvent.setDirection(2);
@@ -6966,8 +7086,8 @@
     prepareDarknessTransition = function () {
         $gameMap.darknessOpacity = 200;
         const eventId = $gameVariables.value(292)[5]; // this._eventId
-        if ($gameMap.event(eventId)) {
-            const mapEvent = $gameMap.event(eventId);
+        const mapEvent = $gameMap.event(eventId);
+        if (mapEvent) {
             mapEvent.setStepAnime(true);
             mapEvent.setWalkAnime(true);
             mapEvent.setAngle(0);
