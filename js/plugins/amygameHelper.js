@@ -4491,25 +4491,60 @@
 		});
 	};
 
-	// Replaces (1x): data/CommonEvents.json:common-event:9
-	// sourceValue(value1) and targetValue(weaponId) are callbacks evaluated
-	// inside the loop: the original Script block interpolated `value1` (the
-	// weapon's SubstitutionActorId) and `i` (the loop index) per iteration,
-	// so those expressions cannot be computed at the call site.
-	AGH_nameWeaponsFromVariable = function (interp, arrayVariableId, sourceVariableId, sourceValue, metaKey, targetVariableId, targetValue) {
-		setSelfVar(interp, arrayVariableId, Array(101).fill(0));
-		range(301, 400).forEach(weaponId => {
-			const weapon = $dataWeapons[weaponId];
-			if (weapon.name !== '') {
-				if (weapon.meta['SubstitutionActorId']) {
-					const value1 = Number(weapon.meta['SubstitutionActorId']);
-					varValue(sourceVariableId)[weaponId - 300] = sourceValue(value1);
-				}
-				if (weapon.meta[metaKey]) {
-					varValue(targetVariableId)[weaponId - 300] = targetValue(weaponId);
+	// Replaces (2x): data/CommonEvents.json:common-event:9
+	// Registry of Actor-derived resolvers for the SubstitutionActorId fallback.
+	// Add new meta keys here without touching the event data.
+	AGH_ActorResolvers = {
+		Profession: function (actorId) {
+			var professionArray = $gameVariables.value(380 + actorId);
+			return (Array.isArray(professionArray) && professionArray[59] !== undefined) ? professionArray[59] : '';
+		},
+		FamilyName: function (actorId) {
+			var linkedWeapon = $dataWeapons[actorId + 200];
+			return linkedWeapon && linkedWeapon.name ? linkedWeapon.name : '';
+		}
+	};
+
+	// Registry of direct metadata resolvers; unknown keys fall back to the
+	// raw (trimmed) meta value.
+	AGH_DirectMetaResolvers = {
+		Profession: function (weapon) {
+			var meta = weapon.meta['Profession'];
+			return typeof meta === 'string' ? meta.trim() : (meta || '');
+		},
+		FamilyName: function (weapon) {
+			var meta = weapon.meta['FamilyName'];
+			return typeof meta === 'string' ? meta.trim() : (meta || '');
+		}
+	};
+
+	// Fills a self-variable array (size 101) with weapon metadata or
+	// substitution-actor data. Database Weapon IDs 301..400 map to array
+	// indices 1..100 (index 0 unused). Direct metadata takes priority over
+	// the SubstitutionActorId fallback, matching the original Script block.
+	AGH_nameWeaponsFromVariable = function (interp, targetVarId, metaKey) {
+		var resultArray = new Array(101).fill(0);
+		var resolveActor = AGH_ActorResolvers[metaKey];
+		var resolveDirect = AGH_DirectMetaResolvers[metaKey] || function (weapon) {
+			var metaValue = weapon.meta[metaKey];
+			return typeof metaValue === 'string' ? metaValue.trim() : (metaValue || '');
+		};
+		for (var weaponId = 301; weaponId <= 400; weaponId++) {
+			var weapon = $dataWeapons[weaponId];
+			if (!weapon || !weapon.name) continue;
+			var arrayIndex = weaponId - 300;
+			if (weapon.meta) {
+				if (weapon.meta[metaKey] !== undefined) {
+					resultArray[arrayIndex] = resolveDirect(weapon);
+				} else if (weapon.meta['SubstitutionActorId']) {
+					var actorId = Number(weapon.meta['SubstitutionActorId']);
+					if (!Number.isNaN(actorId) && resolveActor) {
+						resultArray[arrayIndex] = resolveActor(actorId);
+					}
 				}
 			}
-		});
+		}
+		setSelfVar(interp, targetVarId, resultArray);
 	};
 
 	// Replaces (2x): data/CommonEvents.json:common-event:30, data/CommonEvents.json:common-event:64
@@ -9806,6 +9841,11 @@
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:49|ダンジョンワープポイント
+	AGH_setVariableDungeonWarpPoint = function () {
+		$gameVariables.setValue(161, [Number(arr1[0]), Number(arr1[1]), Number(arr1[2])]);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:49|ダンジョンワープポイント
 	AGH_setSwitchTemporarySwitch = function (interp) {
 		return (function () {
 			var array = [Number(arr1[0]), Number(arr1[1]), Number(arr1[2])];
@@ -11671,6 +11711,14 @@
 	AGH_iterateTroopMembersAddTextBossAwakenAction = function () {
 		var messageText = `${$gameTroop.members()[0].name()}は真の力を解放した！`;
 		BattleManager._logWindow.push(`addText`, messageText);
+	};
+
+	// Replaces (1x): CommonEvents.json:common-event:129|ボス覚醒行動
+	// `a` (troop member) and `valueBossAction` are implicit globals set by the
+	// preceding helpers in the same event, like arr1 in the warp-point event.
+	AGH_runBossAwakenAttack = function (interp) {
+		attack_keisan1(a, valueBossAction, 1);
+		interp.forceAction(a, valueBossAction, -1);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:130|ボス行動
@@ -15197,6 +15245,7 @@
 		i6 = getRandomIndex(2) + 1;//フェラ回数
 		i7 = getRandomIndex(1) + i4;//口腔回数
 		i8 = getRandomIndex(3) + 0;//失禁回数
+		return { i1: i1, i2: i2, i3: i3, i4: i4, i5: i5, i6: i6, i7: i7, i8: i8 };
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:392|トウロウコモン1
@@ -16802,6 +16851,7 @@
 		i6 = getRandomIndex(5) + 6;//フェラ回数
 		i7 = Math.floor(Math.random() * -2) + i4;//口腔回数
 		i8 = getRandomIndex(3) + 0;//失禁回数
+		return { i1: i1, i2: i2, i3: i3, i4: i4, i5: i5, i6: i6, i7: i7, i8: i8 };
 	};
 
 	// Replaces (1x): Map003.json:event:4|ドロップ宝箱|page:3
