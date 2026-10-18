@@ -674,11 +674,9 @@ rosyutu_genkai1 = function (gameActor) {
 };
 
 //☆☆現在露出度計上
-const rosyutu_genzai_ids = [
-  461, 462, 463, 464, 465, 466, 467, 468, 469, 470,
-  471, 472, 473, 474, 475, 476, 477, 478, 479, 480,
-  481, 482, 483, 484, 485, 486, 487, 488, 489, 490,
-  491, 492, 493, 494, 495, 496, 497, 498, 499, 500];
+//露出度計算の対象になる衣装スイッチ変数の範囲(ClothSwitch + 460)
+const CLOTH_SWITCH_VAR_ID_MIN = 461;
+const CLOTH_SWITCH_VAR_ID_MAX = 500;
 rosyutu_genzai = function () {
   const actorId = $gameVariables.value(20);
   rosyutu_genzai1(actorId);
@@ -697,7 +695,7 @@ rosyutu_genzai1 = function (actorId) {
     const eicSwitchId = Number(itemMeta['EICSwitch']);
     if (eicSwitchId !== actorEicSwitchId1 && eicSwitchId !== actorEicSwitchId2 && eicSwitchId !== 200) continue;
     const clothSwitchVarId = Number(itemMeta['ClothSwitch']) + 460;
-    if (clothSwitchVarId < 461 || clothSwitchVarId > 500) continue;
+    if (clothSwitchVarId < CLOTH_SWITCH_VAR_ID_MIN || clothSwitchVarId > CLOTH_SWITCH_VAR_ID_MAX) continue;
     if ($gameVariables.value(clothSwitchVarId) !== Number(itemMeta['ClothAllocationNumber'])) continue;
     exposureTotal += Number(itemMeta['ClothUncoverCount']);
   }
@@ -933,8 +931,8 @@ hskill_learn2 = function () {
     const clothItem = $dataItems[itemId];
     if (!clothItem || exposureRank < rankThreshold || $gameParty.hasItem(clothItem)) return;
     $gameParty.gainItem(clothItem, 1);
-	const exposureSkill = colorTaggedText(2, ${$dataSkills[exposureSkillId].name});
-	const itemName = colorTaggedText(27, `\x1bIIN[${itemId}]`);
+    const exposureSkill = colorTaggedText(2, $dataSkills[exposureSkillId].name);
+    const itemName = colorTaggedText(27, `\x1bIIN[${itemId}]`);
     appendHStateMessage(`──${exposureSkill}が${rankThreshold}到達！　${itemName}Get!──` + `\n${clothItem.description}\\C[0]\n`, 6, H_PASSIVE_PAGE_HEADER);
   };
   grantClothItem(zenravalueId, 1);//全裸
@@ -953,8 +951,8 @@ hskill_learn2 = function () {
         if (candidateMeta['ClothType'] != clothType) continue;
         if ($gameParty.hasItem($dataItems[j])) break;
         clothes_get($gameVariables.value(20), candidateMeta['subCategory'], candidateMeta['ClothType']);
-		const exposureSkill = colorTaggedText(2, `${$dataSkills[exposureSkillId].name}:Rank${rankThreshold}`);
-		const itemName = colorTaggedText(27, `\x1bIIN[${j}]`);
+        const exposureSkill = colorTaggedText(2, `${$dataSkills[exposureSkillId].name}:Rank${rankThreshold}`);
+        const itemName = colorTaggedText(27, `\x1bIIN[${j}]`);
         appendHStateMessage(`──${exposureSkill}の効果により、${itemName}Get!──` + `\n`, 6, H_PASSIVE_PAGE_HEADER);
         break;
       };
@@ -964,8 +962,8 @@ hskill_learn2 = function () {
   grantClothByType('改', 4);
   if (!$gameSwitches.value(604) && exposureRank >= 5) {
     $gameSwitches.setValue(604, true);
-	const exposureSkill = colorTaggedText(2, ${$dataSkills[exposureSkillId].name});
-	const menuName = colorTaggedText(27, `着せ替え`);
+    const exposureSkill = colorTaggedText(2, $dataSkills[exposureSkillId].name);
+    const menuName = colorTaggedText(27, `着せ替え`);
     appendHStateMessage(`──${exposureSkill}が5到達！　メニュー画面に${menuName}出現──` + `\n\n`, 6, H_PASSIVE_PAGE_HEADER);
   };
   const allDevelopmentSkillId = 875;//９種組み合わせ
@@ -1045,7 +1043,7 @@ hStates_up1 = function (id) {
         if (activateVarId >= 1 && $gameVariables.value(activateVarId) >= 1) {
           const reflectionGain = $gameVariables.value(activateVarId) * actor.skillMasteryLevel(reflectionSkillId) * reflectionSkillRank;
           $gameVariables.setValue(reflectionVarId, $gameVariables.value(reflectionVarId) + reflectionGain);
-		  const activation = `発動`;
+      const activation = `発動`;
           appendHStateMessage(`\\C[27]<${databaseEntries[entryId].name}>\\C[0]${activation}\\C[31](+${reflectionGain})\\C[0]\\I[12]\n`, 3);
         };
       };
@@ -1054,7 +1052,7 @@ hStates_up1 = function (id) {
       if ($gameVariables.value(427) >= 1) {
         const prostitutionMoneyRate = Number(entryMeta['ProstitutionMoneyUp']);
         $gameVariables.setValue(427, $gameVariables.value(427) * prostitutionMoneyRate);
-		const activation = `発動`;
+    const activation = `発動`;
         appendHStateMessage(`\\C[27]<${databaseEntries[entryId].name}>\\C[0]${activation}\\C[31](×${prostitutionMoneyRate}\\G)\\C[0]\\I[12]\n`, 3);
       };
     };
@@ -1118,7 +1116,7 @@ hstates_rankSeigen = function () {
     const suppressionParams = suppressionMeta['HstaSuppression'].split(',');
     const suppressionTarget = Number(suppressionParams[0]);
     const suppressionParam = Number(suppressionParams[1]);
-	const skillName = `\n${$dataSkills[suppressionSkillId].name}`;
+  const skillName = `\n${$dataSkills[suppressionSkillId].name}`;
     const suppressionNote = `${skillName}の影響により`;
     //対象0は開発度431-439をまとめて判定
     const targetVarIds = suppressionTarget == 0
@@ -1294,8 +1292,8 @@ seiyoku_hosei = function () {
     $gameVariables.setValue(developmentTargetVars[devIndex], $gameVariables.value(developmentTargetVars[devIndex]) + baseDevelopmentValue);
   };
   if (reproductionAmplificationFlag == 1) {
-	const reproduction = colorTaggedText(27, '<' + `Reproduction` + '>');
-	const bonusPts = colorTaggedText(27, `+${Math.round(reproductionRate)}`);
+  const reproduction = colorTaggedText(27, '<' + `Reproduction` + '>');
+  const bonusPts = colorTaggedText(27, `+${Math.round(reproductionRate)}`);
     appendHStateMessage(`${reproduction}補正。各開発度/経験度加算値に${bonusPts}` + '\n', 3);
   };
   //ステート精液の付与
@@ -1336,10 +1334,9 @@ seiyoku_hosei = function () {
   if ($gameVariables.value(402) >= 100) {
     $gameVariables.setValue(414, $gameVariables.value(414) + 1);
     if (actor.isLearnedSkill(65)) {//スケベっこ以上で膣アナルフェラ回数に応じて絶頂回数+
-      let aggregateHCount = $gameVariables.value(406);
-      aggregateHCount += $gameVariables.value(407);
-      aggregateHCount += $gameVariables.value(408);
-      getRandomIndex(aggregateHCount); //RNG消費順を保つ為だけに残している（結果は未使用）
+      //変更: 旧来は未使用の乱数(getRandomIndex)を1回消費していた。加算値は
+      //      膣穴(406)+アナル(407)+フェラ(408)回数で、上のコメントの仕様どおり。
+      const aggregateHCount = $gameVariables.value(406) + $gameVariables.value(407) + $gameVariables.value(408);
       $gameVariables.setValue(414, $gameVariables.value(414) + aggregateHCount);
     };
   };
@@ -1399,7 +1396,7 @@ seiyoku_hanei = function () {
   };
   if (hStateValues[2] >= 51) {
     if (!actor.isStateAffected(61)) {
-	  const estrus = colorTaggedText(27, `発情`)
+    const estrus = colorTaggedText(27, `発情`)
       const calmMessage = `${actor.name()}は${estrus}している…。`;
       if ($gameSwitches.value(154)) {
         $gameVariables.setValue(539, `${calmMessage}\n`);
@@ -1411,7 +1408,7 @@ seiyoku_hanei = function () {
     actor.addState(61);
   } else {
     if (actor.isStateAffected(61)) {
-	  const estrus = colorTaggedText(27, `発情`)
+    const estrus = colorTaggedText(27, `発情`)
       const calmMessage = `${actor.name()}の${estrus}が静まった…。`;
       if ($gameSwitches.value(154)) {
         $gameVariables.setValue(539, `${calmMessage}\n`);
@@ -1520,7 +1517,7 @@ actor_Hhennreki = function (unusedArg1) {
     let stateDescText = `${$dataStates[stateId].description}`;
     const stateCounter = actor.getStateCounter(stateId);
     if (stateCounter != undefined) {
-	  const progress =  '進行度';
+    const progress =  '進行度';
       stateDescText += `\\C[27]${progress}:${stateCounter}\\C[0]`;
     };
     stateDescText += `\n`;
