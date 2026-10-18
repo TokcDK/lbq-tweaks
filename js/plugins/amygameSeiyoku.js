@@ -823,13 +823,13 @@ hstates_heights = function (id, resultVarId) {
       bodyStyleLabel += `\\C[21][${actorData.meta['BodyStyle']}]\\C[0]`;
     };
   };
-  let virginLabel = `\\C[27][処女ヒロイン]\\C[0]`
+  let virginLabel = colorTaggedText(27, '[' + `処女ヒロイン` + ']');
   if (hStateValues[6] >= 1000) {
-    virginLabel = `\\C[30][中古]\\C[0]`
+    virginLabel = colorTaggedText(30, '[' + `中古` + ']');
   } else if (hStateValues[6] >= 100) {
-    virginLabel = `\\C[31][中古ヒロイン]\\C[0]`
+    virginLabel = colorTaggedText(31, '[' + `中古ヒロイン` + ']');
   } else if (hStateValues[6] >= 1) {
-    virginLabel = `\\C[0][非処女ヒロイン]\\C[0]`
+    virginLabel = colorTaggedText(0, '[' + `非処女ヒロイン` + ']');
   };
   $gameVariables.setValue(resultVarId,
     `\\fs[25]\\C[16]HT:\\C[0]${heightCm}\\C[16]cm\\C[0]　\\C[16]WT:\\C[0]${weightKg}\\C[16]kg\\C[0]
@@ -933,7 +933,9 @@ hskill_learn2 = function () {
     const clothItem = $dataItems[itemId];
     if (!clothItem || exposureRank < rankThreshold || $gameParty.hasItem(clothItem)) return;
     $gameParty.gainItem(clothItem, 1);
-    appendHStateMessage(`──\\C[2]${$dataSkills[exposureSkillId].name}\\C[0]が${rankThreshold}到達！　\\C[27]\x1bIIN[${itemId}]\\C[0]Get!──\n${clothItem.description}\\C[0]\n`, 6, H_PASSIVE_PAGE_HEADER);
+	const exposureSkill = colorTaggedText(2, ${$dataSkills[exposureSkillId].name});
+	const itemName = colorTaggedText(27, `\x1bIIN[${itemId}]`);
+    appendHStateMessage(`──${exposureSkill}が${rankThreshold}到達！　${itemName}Get!──` + `\n${clothItem.description}\\C[0]\n`, 6, H_PASSIVE_PAGE_HEADER);
   };
   grantClothItem(zenravalueId, 1);//全裸
   grantClothItem(clothPartsChoice, 2);//パーツ指定
@@ -951,7 +953,9 @@ hskill_learn2 = function () {
         if (candidateMeta['ClothType'] != clothType) continue;
         if ($gameParty.hasItem($dataItems[j])) break;
         clothes_get($gameVariables.value(20), candidateMeta['subCategory'], candidateMeta['ClothType']);
-        appendHStateMessage(`──\\C[2]${$dataSkills[exposureSkillId].name}:Rank${rankThreshold}\\C[0]の効果により、\\C[27]\x1bIIN[${j}]\\C[0]Get!──\n`, 6, H_PASSIVE_PAGE_HEADER);
+		const exposureSkill = colorTaggedText(2, `${$dataSkills[exposureSkillId].name}:Rank${rankThreshold}`);
+		const itemName = colorTaggedText(27, `\x1bIIN[${j}]`);
+        appendHStateMessage(`──${exposureSkill}の効果により、${itemName}Get!──` + `\n`, 6, H_PASSIVE_PAGE_HEADER);
         break;
       };
     };
@@ -960,7 +964,9 @@ hskill_learn2 = function () {
   grantClothByType('改', 4);
   if (!$gameSwitches.value(604) && exposureRank >= 5) {
     $gameSwitches.setValue(604, true);
-    appendHStateMessage(`──\\C[2]${$dataSkills[exposureSkillId].name}\\C[0]が5到達！　メニュー画面に\\C[27]着せ替え\\C[0]出現──\n\n`, 6, H_PASSIVE_PAGE_HEADER);
+	const exposureSkill = colorTaggedText(2, ${$dataSkills[exposureSkillId].name});
+	const menuName = colorTaggedText(27, `着せ替え`);
+    appendHStateMessage(`──${exposureSkill}が5到達！　メニュー画面に${menuName}出現──` + `\n\n`, 6, H_PASSIVE_PAGE_HEADER);
   };
   const allDevelopmentSkillId = 875;//９種組み合わせ
   if (actor.isLearnedSkill(allDevelopmentSkillId)) return;
@@ -968,7 +974,8 @@ hskill_learn2 = function () {
     if (actor.skillMasteryLevel(rankSkillId) < 6) return;
   };
   actor.learnSkill(allDevelopmentSkillId);
-  appendHStateMessage(`──\\C[2]全開発度(経験値)\\C[0]\\C[10]Max\\C[0]！　\\C[27]\x1bSIN[${allDevelopmentSkillId}]\\C[0]Expression!──\n${$dataSkills[allDevelopmentSkillId].description}\\C[0]\n`, 6, H_PASSIVE_PAGE_HEADER);
+  const devPoints = colorTaggedText(2, `全開発度(経験値)`)
+  appendHStateMessage(`──${devPoints}\\C[10]Max\\C[0]！　\\C[27]\x1bSIN[${allDevelopmentSkillId}]\\C[0]Expression!──\n${$dataSkills[allDevelopmentSkillId].description}\\C[0]\n`, 6, H_PASSIVE_PAGE_HEADER);
 
 };
 
@@ -986,7 +993,8 @@ actor_HpassiveConditions = function (a, b, itemId) {
     return;
   };
   $gameSwitches.setValue(115, true)
-  let unlearnedText = `${actor.name()}の未収得\\C[27]<H-Passive>\\C[0]\n`
+  const h_passive = colorTaggedText(27, '<' + `H-Passive` + '>');
+  let unlearnedText = `${actor.name()}の未収得${h_passive}` + `\n`
   let unlearnedCount = 0;
   for (let skillId = 1; skillId <= $dataSkills.length - 1; skillId++) {
     const skillMeta = $dataSkills[skillId].meta;
@@ -1037,7 +1045,8 @@ hStates_up1 = function (id) {
         if (activateVarId >= 1 && $gameVariables.value(activateVarId) >= 1) {
           const reflectionGain = $gameVariables.value(activateVarId) * actor.skillMasteryLevel(reflectionSkillId) * reflectionSkillRank;
           $gameVariables.setValue(reflectionVarId, $gameVariables.value(reflectionVarId) + reflectionGain);
-          appendHStateMessage(`\\C[27]<${databaseEntries[entryId].name}>\\C[0]発動\\C[31](+${reflectionGain})\\C[0]\\I[12]\n`, 3);
+		  const activation = `発動`;
+          appendHStateMessage(`\\C[27]<${databaseEntries[entryId].name}>\\C[0]${activation}\\C[31](+${reflectionGain})\\C[0]\\I[12]\n`, 3);
         };
       };
     };
@@ -1045,7 +1054,8 @@ hStates_up1 = function (id) {
       if ($gameVariables.value(427) >= 1) {
         const prostitutionMoneyRate = Number(entryMeta['ProstitutionMoneyUp']);
         $gameVariables.setValue(427, $gameVariables.value(427) * prostitutionMoneyRate);
-        appendHStateMessage(`\\C[27]<${databaseEntries[entryId].name}>\\C[0]発動\\C[31](×${prostitutionMoneyRate}\\G)\\C[0]\\I[12]\n`, 3);
+		const activation = `発動`;
+        appendHStateMessage(`\\C[27]<${databaseEntries[entryId].name}>\\C[0]${activation}\\C[31](×${prostitutionMoneyRate}\\G)\\C[0]\\I[12]\n`, 3);
       };
     };
   };
@@ -1108,7 +1118,8 @@ hstates_rankSeigen = function () {
     const suppressionParams = suppressionMeta['HstaSuppression'].split(',');
     const suppressionTarget = Number(suppressionParams[0]);
     const suppressionParam = Number(suppressionParams[1]);
-    const suppressionNote = `\n${$dataSkills[suppressionSkillId].name}の影響により`;
+	const skillName = `\n${$dataSkills[suppressionSkillId].name}`;
+    const suppressionNote = `${skillName}の影響により`;
     //対象0は開発度431-439をまとめて判定
     const targetVarIds = suppressionTarget == 0
       ? [431, 432, 433, 434, 435, 436, 437, 438, 439]
@@ -1157,9 +1168,9 @@ seiyoku_kanniHyouji = function () {
     };
     const statName = $dataSystem.variables[statVarId].replace("　", "").replace("　", "").replace("　", "").replace(" ", "").replace(":", "");
     if (statValue >= 1) {
-      valueWordSet0 += `${actor.name()}の${statName}\\C[2]+${statValue}！\\C[0](${statDisplayValue + statValue})\n`;
+      valueWordSet0 += `${actor.name()}: ${statName}\\C[2]+${statValue}！\\C[0](${statDisplayValue + statValue})\n`;
     } else {
-      valueWordSet0 += `${actor.name()}の${statName}\\C[1]${statValue}！\\C[0](${statDisplayValue + statValue})\n`;
+      valueWordSet0 += `${actor.name()}: ${statName}\\C[1]${statValue}！\\C[0](${statDisplayValue + statValue})\n`;
     };
     if ($gameSwitches.value(475)) {
       TickerManager.show(valueWordSet0);
@@ -1283,7 +1294,9 @@ seiyoku_hosei = function () {
     $gameVariables.setValue(developmentTargetVars[devIndex], $gameVariables.value(developmentTargetVars[devIndex]) + baseDevelopmentValue);
   };
   if (reproductionAmplificationFlag == 1) {
-    appendHStateMessage(`\\C[27]<Reproduction>\\C[0]補正。各開発度/経験度加算値に\\C[27]+${Math.round(reproductionRate)}\\C[0]\n`, 3);
+	const reproduction = colorTaggedText(27, '<' + `Reproduction` + '>');
+	const bonusPts = colorTaggedText(27, `+${Math.round(reproductionRate)}`);
+    appendHStateMessage(`${reproduction}補正。各開発度/経験度加算値に${bonusPts}` + '\n', 3);
   };
   //ステート精液の付与
   const vaginalStateCheck = 411;
@@ -1386,7 +1399,8 @@ seiyoku_hanei = function () {
   };
   if (hStateValues[2] >= 51) {
     if (!actor.isStateAffected(61)) {
-      const calmMessage = `${actor.name()}は\\C[27]発情\\C[0]している…。`;
+	  const estrus = colorTaggedText(27, `発情`)
+      const calmMessage = `${actor.name()}は${estrus}している…。`;
       if ($gameSwitches.value(154)) {
         $gameVariables.setValue(539, `${calmMessage}\n`);
         $gameVariables.setValue(540, $gameVariables.value(540) + 1);
@@ -1397,7 +1411,8 @@ seiyoku_hanei = function () {
     actor.addState(61);
   } else {
     if (actor.isStateAffected(61)) {
-      const calmMessage = `${actor.name()}の\\C[27]発情\\C[0]が静まった…。`;
+	  const estrus = colorTaggedText(27, `発情`)
+      const calmMessage = `${actor.name()}の${estrus}が静まった…。`;
       if ($gameSwitches.value(154)) {
         $gameVariables.setValue(539, `${calmMessage}\n`);
         $gameVariables.setValue(540, $gameVariables.value(540) + 1);
@@ -1505,7 +1520,8 @@ actor_Hhennreki = function (unusedArg1) {
     let stateDescText = `${$dataStates[stateId].description}`;
     const stateCounter = actor.getStateCounter(stateId);
     if (stateCounter != undefined) {
-      stateDescText += `\\C[27]進行度:${stateCounter}\\C[0]`;
+	  const progress =  '進行度';
+      stateDescText += `\\C[27]${progress}:${stateCounter}\\C[0]`;
     };
     stateDescText += `\n`;
     window['valueWordSet' + wordSetIndex] += stateDescText;
