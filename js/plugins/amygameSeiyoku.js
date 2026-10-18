@@ -256,12 +256,14 @@ actor_Hstateshyouji2 = function () {
   var actor = $gameActors.actor($gameVariables.value(20));
   var displaySkillId = 50;
   var displaySkillParam = $gameVariables.value(actor.actorId() + 380)[1];
-  var statusText = `\\fs[25]性欲発展度`;
+  const status = `\\fs[25]`
+  var statusText = `${status}性欲発展度`;
 
-  if (!actor.isLearnedSkill(displaySkillId)) { statusText += `:\\C[1]皆無\\C[0]\n` };
+  const noneStatus = `皆無`;
+  if (!actor.isLearnedSkill(displaySkillId)) { statusText += `:\\C[1]${noneStatus}\\C[0]\n` };
   if (actor.isLearnedSkill(displaySkillId)) {
     if (displaySkillParam <= 100) { statusText += `\\C[4][圏外]\\C[0]`; var hRank = 0 };
-    if (displaySkillParam >= 101 && displaySkillParam <= 200) { statusText += `\\C[12][圏外]\\C[0]`; var hRank = 1 };
+    if (displaySkillParam >= 101 && displaySkillParam <= 200) { statusText += `\\C[12][${noneStatus}]\\C[0]`; var hRank = 1 };
     if (displaySkillParam >= 201 && displaySkillParam <= 300) { statusText += `\\C[4][E]\\C[0]`; var hRank = 2 };
     if (displaySkillParam >= 301 && displaySkillParam <= 400) { statusText += `\\C[12][D]\\C[0]`; var hRank = 3 };
     if (displaySkillParam >= 401 && displaySkillParam <= 500) { statusText += `\\C[5][C]\\C[0]`; var hRank = 4 };
@@ -339,17 +341,20 @@ actor_Hstateshyouji1 = function () {
     }
     eval("valueWordSet" + i + " = displayValue");
   };
+  
+  const cnt =  '回';
+	
   var displayText = `\\fs[24]`;
   var list = [6, 7, 8, 9, 10, 11, 12, 16, 13, 14, 15];
   list.forEach(function (i) {
-    displayText += `\\C[27]${$dataSystem.variables[masteryVarOffset + i]}\\C[0]${value[i]}回${eval("valueWordSet" + i)}\n`;
+    displayText += `\\C[27]${$dataSystem.variables[masteryVarOffset + i]}\\C[0]${value[i]}${cnt}${eval("valueWordSet" + i)}\n`;
   }, this);
   WindowManager.drawText(1, displayText);
 
   var stateDisplayText = `\\fs[24]`;
   var list = [17, 18, 19, 30, 20, 21, 22, 23, 24, 25, 26, 28];
   list.forEach(function (i) {
-    stateDisplayText += `\\C[27]${$dataSystem.variables[masteryVarOffset + i]}\\C[0]${value[i]}回${eval("valueWordSet" + i)}\n`;
+    stateDisplayText += `\\C[27]${$dataSystem.variables[masteryVarOffset + i]}\\C[0]${value[i]}${cnt}${eval("valueWordSet" + i)}\n`;
   }, this);
   WindowManager.drawText(2, stateDisplayText);
 
@@ -367,7 +372,8 @@ actor_Hstateshyouji1 = function () {
         var displayValue = i - 20;
         masteryTextBySlot[i - 50] = `\x1bI[${$dataSkills[i].iconIndex}]${stateDisplayText}:${actor.skillMasteryUses(i)}${eval("valueWordSet" + displayValue)}`;
       } else {
-        masteryTextBySlot[i - 50] = `\\C[1]未開発\\C[0]\\I[0] `;
+		const text = colorTaggedText(1, `未開発`);
+        masteryTextBySlot[i - 50] = `${text}\\I[0] `;
       };
     };
     if (!$gameSwitches.value(496) && !$gameSwitches.value(130) && $gameVariables.value(193) == 0) {
@@ -757,7 +763,8 @@ jusei_keisan = function () {
         var fertilizationRoll = getRandomIndex(101);
         if (fertilizationRate >= fertilizationRoll || actor.battleSkillsRaw().includes(873) || actor.isStateAffected(75)) {
           if (actor.battleSkillsRaw().includes(874) || actor.isStateAffected(76)) {
-            var rejectionMessage = `${actor.name()}は\\C[27]${$dataSkills[874].name}\\C[0]の効果により受精を退けた。`;
+			const skillName = colorTaggedText(27, ${$dataSkills[874].name});
+            var rejectionMessage = `${actor.name()}は${skillName}の効果により受精を退けた。`;
             CommonPopupManager.showInfo({}, rejectionMessage, null);
           } else {
             actor.addState(79);
