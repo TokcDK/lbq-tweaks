@@ -727,11 +727,17 @@ adv_partDirectPlay = function (effectTypeId) {
       const itemName = colorTaggedText(2, `\x1bIIN[${dbEntryId}]`);
       let messageText;
       if (effectTypeId == 14) {
-        messageText = `${colorTaggedText(16, `称号`)}＜${itemName}＞獲得！`;
+		const prefix = colorTaggedText(16, `称号`);
+		const name = `${title}＜${itemName}＞`;
+        messageText = `${name}獲得！`;
       } else if (effectTypeId == 15) {
-        messageText = `${colorTaggedText(16, $dataSystem.skillTypes[valueItems[dbEntryId].stypeId])}＜${itemName}＞獲得！`;
+		const title = colorTaggedText(16, $dataSystem.skillTypes[valueItems[dbEntryId].stypeId]);
+		const name = `${title}＜${itemName}＞`;
+        messageText = `${name}獲得！`;
       } else {
-        messageText = `${colorTaggedText(16, $dataSystem.skillTypes[valueItems[dbEntryId].stypeId])}＜${itemName}＞忘却…`;
+		const title = colorTaggedText(16, $dataSystem.skillTypes[valueItems[dbEntryId].stypeId]);
+		const name = `${title}＜${itemName}＞`;
+        messageText = `${name}忘却…`;
       };
       $gameScreen.setDTextPicture(messageText, 28);
       pictureId = 60;
@@ -757,7 +763,7 @@ adv_partDirectPlay = function (effectTypeId) {
       $gameSwitches.setValue(436, true);
       battle_bustUp(52, 550, 0, 120);
       $gameSwitches.setValue(436, false);
-      valueWordSet0 = `解説文:\n${valueItems[dbEntryId].description}`;
+      valueWordSet0 = `解説文` + `:` + `\n${valueItems[dbEntryId].description}`;
       break;
     }
     case 17: {//汎用演出。valueWordSet0に文章入れておく。
@@ -1329,7 +1335,7 @@ get_infoDirect = function (databaseTypeId, databaseEntryId, actorId, itemAmount)
   if ($gameSwitches.value(124)) {
     if (databaseTypeId <= 3) {
       const descriptionLines = databaseEntries[databaseEntryId].description.split("\n");
-      if (descriptionLines[0] != 0) { TickerManager.show(`　　　` + `解説文:${descriptionLines[0]}`) };
+      if (descriptionLines[0] != 0) { TickerManager.show(`　　　` + `解説文` + `:` + `${descriptionLines[0]}`) };
       if (descriptionLines[1] != 0) { TickerManager.show(`　　　${descriptionLines[1]}`) };
     };
   };
