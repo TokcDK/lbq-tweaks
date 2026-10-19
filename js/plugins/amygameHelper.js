@@ -5142,8 +5142,15 @@
 	 * ========================================================================== */
 
 	// Replaces (2x): data/CommonEvents.json:common-event:14
+	// window.pic_setArray3: read via the global object because the array was
+	// never defined in this codebase (the original event script read it too);
+	// a missing preset must not throw, only skip with a warning.
 	AGH_setPicture = function (presetIndex) {
-		const presetValues = pic_setArray3;
+		const presetValues = window.pic_setArray3;
+		if (!presetValues) {
+			console.warn(`AGH_setPicture: pic_setArray3 is undefined`);
+			return;
+		}
 		valuePicWait2 = presetValues[2] + Math.floor(Math.random() * (presetValues[3] * 2 + 1)) - presetValues[3];
 		pic_set(presetValues[1], presetValues[0], presetValues[presetIndex], valuePicWait2);
 	};
@@ -7154,11 +7161,12 @@
 	AGH_moveStandingPicture1_2 = function () {
 		const picId = 13;
 		valuePic1 = picId;
-		if (!valuePic){
-			console.warn(`AGH_moveStandingPicture1_2: valuePic1 is undefined`);
+		const picture = $gameScreen.picture(picId);
+		if (!picture) {
+			console.warn(`AGH_moveStandingPicture1_2: picture ${picId} is not displayed`);
+			return;
 		}
-
-		const pictureScaleX = $gameScreen.picture(picId).scaleX();
+		const pictureScaleX = picture.scaleX();
 		picTachie_move1(picId, 0, 0, -pictureScaleX * 2, 0, 255, 60);
 	};
 
@@ -8883,8 +8891,6 @@
 	// Replaces (1x): CommonEvents.json:common-event:4|条件分岐
 	AGH_iterateSkillsConditionBranch_2 = function (interp) {
 		return (function () {
-			$dataSkills[skill_Id].stypeId
-
 			if (target.result().isHit() && this.isPhysical() && this.item().stypeId !== 1) {
 				target.startAnimation(61);
 			}
@@ -10702,7 +10708,7 @@
 		valueCountSet1 = 0;
 		valueCountSet2 = 1;
 		var messageText = `\\C[10]H-Passive[${valueCountSet2}]\\C[0]\n`;
-		winddow["valueWordSet" + valueCountSet2] = messageText;
+		window["valueWordSet" + valueCountSet2] = messageText;
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:85|性欲度等変動表示コモン
@@ -11775,11 +11781,14 @@
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:141|会話カットインコモン
+	// valueCutInSet1[0] is the cut-in label set by cutin_preparation; the
+	// pluginCommand args follow the idiom used by every other call site
+	// (Troops.json / Torigoya_SkillCutIn.js consumers).
 	AGH_runPluginCommandNightSpecialWeather = function (interp) {
 		return (function () {
 			cutin_preparation(5, $gameVariables.value(20));
-			this.sVal(251, valueCutInSet);
-			var args = new Array(String(valueCutInSet2));
+			this.sVal(251, valueCutInSet1);
+			var args = new Array(String(valueCutInSet1[0]));
 			this.pluginCommand("味方カットイン", args);
 		}).call(interp);
 	};

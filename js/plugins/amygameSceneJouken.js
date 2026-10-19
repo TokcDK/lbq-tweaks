@@ -30,6 +30,7 @@ scene_joukenNakami = function (sceneGroupId, itemIndex, occurrenceSwitchOffset, 
   let cannotExecute = 0;//実行不可の場合に1
   let inBattle = 0;//戦闘中か否か
   let mainQuestProgress = 0;//メインクエスト進行度代入用
+  let mainQuestStageIndex = 0;//予約:場所による条件設定（行69コメント）。mainQuestProgress未代入で現状未使用
   let lineBreakCount = 4;//改行指定数
   let lineCount = 0;//行数カウント
   let showMapName = 0;//？？？表記の時にマップ名表示
