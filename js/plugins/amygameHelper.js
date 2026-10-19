@@ -251,8 +251,8 @@
 	AGH_showCgFadeIn = function (picId, imageName, fadeTarget, frames) {
 		valuePic1 = picId;
 		var cgImageName = imageName;
-		$gameScreen.showPicture(valuePic1, cgImageName, 1, 640, 384, 100, 100, 255, 0);
-		picture_fade1(valuePic1, "fadeIn", fadeTarget, frames, 5);
+		$gameScreen.showPicture(picId, cgImageName, 1, 640, 384, 100, 100, 255, 0);
+		picture_fade1(picId, "fadeIn", fadeTarget, frames, 5);
 	};
 
 	// Replaces (8x): slide out left-side standing pictures (11..20).
@@ -525,7 +525,7 @@
 	//   picture_fade1(valuePic1,"fadeOut",valueWipeImg,60,5);
 	CEH_wipeFadeOut101 = function () {
 		valuePic1 = 101;
-		picture_fade1(valuePic1, "fadeOut", valueWipeImg, 60, 5);
+		picture_fade1(101, "fadeOut", valueWipeImg, 60, 5);
 	};
 
 	// Replaces (16x):
@@ -855,10 +855,11 @@
 
 	// Replaces (5x): the goods-drag sprite, whose ids and image names were fixed.
 	AGH_showGoodsDragSprite = function () {
-		valuePic1 = 55;
+		let picId = 55
+		valuePic1 = picId;
 		valueScenePic = 'Goods_drag1_';
 		$gameScreen.setPicturesAnimation(2, 10, "連番", 20);
-		var picId = valuePic1 + 4;
+		picId = picId + 4;
 		var imageName = valueScenePic + '05_00';
 		$gameScreen.showPicture(picId, imageName, 1, 640 - 128, 384, 100, 100, 0, 0);
 		$gameScreen.movePicture(picId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
@@ -6151,9 +6152,10 @@
 
 	// Replaces (2x): data/CommonEvents.json:common-event:306, data/CommonEvents.json:common-event:342
 	AGH_showScenePictureAndFadeIn = function (scenePicName) {
-		valuePic1 = 55;
+		let picId = 55
+		valuePic1 = picId;
 		valueScenePic = scenePicName;
-		showScenePicture(valuePic1, valueScenePic, { y: 384 - 20 });
+		showScenePicture(picId, valueScenePic, { y: 384 - 20 });
 	};
 
 	// Replaces (2x): data/CommonEvents.json:common-event:306
@@ -7150,9 +7152,14 @@
 
 	// Replaces (2x): data/CommonEvents.json:common-event:307
 	AGH_moveStandingPicture1_2 = function () {
-		valuePic1 = 13;
-		const pictureScaleX = $gameScreen.picture(valuePic1).scaleX();
-		picTachie_move1(valuePic1, 0, 0, -pictureScaleX * 2, 0, 255, 60);
+		const picId = 13;
+		valuePic1 = picId;
+		if (!valuePic){
+			console.warn(`AGH_moveStandingPicture1_2: valuePic1 is ${valuePic1}!`);
+		}
+
+		const pictureScaleX = $gameScreen.picture(picId).scaleX();
+		picTachie_move1(picId, 0, 0, -pictureScaleX * 2, 0, 255, 60);
 	};
 
 	// Replaces (2x): data/CommonEvents.json:common-event:292, data/CommonEvents.json:common-event:338
@@ -9044,10 +9051,17 @@
 
 	// Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
 	AGH_iterateItemsValueDanjonTreasure = function () {
-		var DungeonChestList = $dataItems[i].meta['宝箱'].split(',');
-		var DungeonChestTypeList = $dataItems[i].meta['宝箱種類'].split(',');
-		eval("valueDanjonTreasure" + i + " = arr1");
-		eval("valueDanjonTrSyurui" + i + " = DungeonChestTypeList");
+		const itemIndex = i; // warn: i - is global using of general named variable, very danger, need to refactor to use input/output params fo functions
+		const item = $dataItems[itemIndex];
+		if(!item){
+			console.error(`AGH_iterateItemsValueDanjonTreasure: item is ${item}!`);
+			return;
+		}
+
+		const DungeonChestList = item.meta['宝箱'].split(',');
+		const DungeonChestTypeList = item.meta['宝箱種類'].split(',');
+		window['valueDanjonTreasure' + itemIndex] = DungeonChestList;
+		window['valueDanjonTrSyurui' + itemIndex] = DungeonChestTypeList;
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
@@ -10055,11 +10069,12 @@
 
 	// Replaces (1x): CommonEvents.json:common-event:59|会話コモン特定イベント用
 	AGH_showPictureXevS09803 = function () {
-		valuePic1 = 55;
+		const picId = 55;
+		valuePic1 = picId;
 		var XevS09803 = 'XevS098_03';
-		$gameScreen.showPicture(valuePic1, XevS09803, 1, 640 - 128, 384, 100, 100, 0, 0);
-		$gameScreen.movePicture(valuePic1, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
-		pic_move1(valuePic1 - 1, 0, 0, 100, 100, 0, 120);
+		$gameScreen.showPicture(picId, XevS09803, 1, 640 - 128, 384, 100, 100, 0, 0);
+		$gameScreen.movePicture(picId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
+		pic_move1(picId - 1, 0, 0, 100, 100, 0, 120);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
@@ -10687,7 +10702,7 @@
 		valueCountSet1 = 0;
 		valueCountSet2 = 1;
 		var messageText = `\\C[10]H-Passive[${valueCountSet2}]\\C[0]\n`;
-		eval("valueWordSet" + valueCountSet2 + " = value1");
+		winddow["valueWordSet" + valueCountSet2] = messageText;
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:85|性欲度等変動表示コモン
@@ -10809,18 +10824,18 @@
 	AGH_initValueCountSet1 = function () {
 		valueCountSet1 = 0;//文言追加用
 		valueCountSet2 = 1;
-		var messageText = `\\FS[28]\\C[10]<H-Passive Expression!>\\FS[25]\\C[0]\n`;
-		eval("valueWordSet" + valueCountSet2 + " = value1");
+		const expText = colorTaggedText(10, "<H-Passive Expression!>");
+		var messageText = `\\FS[28]${expText}\\FS[25]\n`;
+		window['valueWordSet' + valueCountSet2] = messageText
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:93|自動出産コモン
 	AGH_showPictureScreenBlackOutAutoBirthCommon = function () {
-		valuePic1 = 55;
-		var value2 = 'ScreenBlackOut';
-		$gameScreen.showPicture(valuePic1, value2, 1, 640, 384, 100, 100, 150, 0);
-		picture_fade1(valuePic1, "fadeIn", valueWipeImg, 60, 5);
-		var value2 = 'Zev_childbirth';
-		pic_1(0, valuePic1 + 1, value2, 0, 100, 255, 80, 1280, 768, -256, 0);
+		const picId = 55;
+		valuePic1 = picId;
+		$gameScreen.showPicture(picId, 'ScreenBlackOut', 1, 640, 384, 100, 100, 150, 0);
+		picture_fade1(picId, "fadeIn", valueWipeImg, 60, 5);
+		pic_1(0, picId + 1, 'Zev_childbirth', 0, 100, 255, 80, 1280, 768, -256, 0);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:93|自動出産コモン
@@ -10998,26 +11013,27 @@
 	// Replaces (2x): CommonEvents.json:common-event:101|戦闘全滅
 	AGH_showPictureScreenBlackOutBattleAllOut = function () {
 		backGraund_menuMapSelect(2, 0, 0, 0);
-		valuePic1 = 55;
-		var value2 = 'ScreenBlackOut';
-		$gameScreen.showPicture(valuePic1 - 2, value2, 1, 640, 384, 100, 100, 200, 0);
-		var value2 = 'ScreenDarkCloudsH';
-		$gameScreen.showPicture(valuePic1 - 1, value2, 1, 640, 384, 100, 100, 150, 0);
-		var Town014 = 'Town014';　//中心から円状に表示
-		picture_fade1(valuePic1 - 2, "fadeIn", Town014, 60, 5);
-		picture_fade1(valuePic1 - 1, "fadeIn", Town014, 60, 5);
+		const picId = 55;
+		valuePic1 = picId;
+		$gameScreen.showPicture(picId - 2, 'ScreenBlackOut', 1, 640, 384, 100, 100, 200, 0);
+		$gameScreen.showPicture(picId - 1, 'ScreenDarkCloudsH', 1, 640, 384, 100, 100, 150, 0);
+		const Town014 = 'Town014';　//中心から円状に表示
+		picture_fade1(picId - 2, "fadeIn", Town014, 60, 5);
+		picture_fade1(picId - 1, "fadeIn", Town014, 60, 5);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:101|戦闘全滅
 	AGH_showPictureRandomWork1 = function () {
-		var actor = $gameActors.actor($gameVariables.value(20));
-		var value1 = 1;
-		if (actor.isLearnedSkill(63)) { var value1 = 2 };
-		if (actor.isLearnedSkill(65)) { var value1 = 3 };
-		var value2 = 'Zev_BattleDefeat' + $gameVariables.value(20) + '_' + value1;
-		$gameScreen.showPicture(valuePic1, value2, 1, 640 - 128, 384, 150, 150, 0, 0);
-		$gameScreen.movePicture(valuePic1, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
-		tachie_bless(valuePic1, 1);
+		const actorId = $gameVariables.value(20);
+		var actor = $gameActors.actor(actorId);
+		let picIndex = 1;
+		if (actor.isLearnedSkill(63)) { picIndex = 2 };
+		if (actor.isLearnedSkill(65)) { picIndex = 3 };
+		var picName = 'Zev_BattleDefeat' + actorId + '_' + picIndex;
+		const picId = valuePic1; // valuePic1 is some general named global variable, need to refactor to use input param
+		$gameScreen.showPicture(picId, picName, 1, 640 - 128, 384, 150, 150, 0, 0);
+		$gameScreen.movePicture(picId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
+		tachie_bless(picId, 1);
 		$gameVariables.setValue(21, `${actor.name()}は凌辱された…。`);
 	};
 
@@ -11026,7 +11042,8 @@
 		return (function () {
 			h_exp($gameVariables.value(20), 0, 301, false, false, false);
 			//ｱｸﾀｰID,ﾋﾟｸﾁｬ,H相手(301ﾓﾌﾞ305対象なし306アイテム),非表示,簡易,過去シーンか否か
-			this.sVal(506, `\\V[94]は凌辱された…。\n`);
+			const name = '\\V[94]';
+			this.sVal(506, `${name}は凌辱された…。` + `\n`);
 			this.sVal(401, getRandomIndex(3) + 3);
 			if ($gameSwitches.value(122)) { this.setupChild($dataCommonEvents[85].list, 0) };
 		}).call(interp);
@@ -11059,16 +11076,22 @@
 
 	// Replaces (1x): CommonEvents.json:common-event:102|戦闘後
 	AGH_setSwitchPassiveOnStatus = function () {
-		for (var i = 0; i < $gameParty.battleMembers().length; i++) {
-			var battleMember = $gameParty.battleMembers()[i];
-			if ($gameParty.members().contains(battleMember)) {
-				if ([2, 3, 4, 5, 6, 7].some(function (id) { return battleMember.param(id) >= 100 })) {
-					var value1 = `一部ステータスが\\C[2]100\\C[0]以上になる事で、そのステータスが上昇するbattleMembersパッシブスキルが習得できるようになります`;
-					gab_wordParticle(messageText);
-					$gameSwitches.setValue(483, true);
-					break;
-				}
-			}
+		const partyBattleMembers = $gameParty.battleMembers();
+		const partyMembers = $gameParty.members();
+		const p100 = colorTaggedText(2, 100);
+		const skillIds = [2, 3, 4, 5, 6, 7];
+		for (var i = 0; i < partyBattleMembers.length; i++) {
+			var battleMember = partyBattleMembers[i];
+			if (!partyMembers.contains(battleMember)) continue;
+
+			const anyParamIs100orMore = skillIds.some(function (id) { return battleMember.param(id) >= 100 });
+			if (!anyParamIs100orMore) continue;
+
+			// show one time
+			var messageText = `一部ステータスが${p100}以上になる事で、そのステータスが上昇するbattleMembersパッシブスキルが習得できるようになります`;
+			gab_wordParticle(messageText);
+			$gameSwitches.setValue(483, true);
+			return;
 		};
 	};
 
@@ -13727,7 +13750,7 @@
 	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
 	AGH_handleScriptSnippetFadeOut = function () {
 		valuePic1 = 52;
-		picture_fade1(valuePic1, "fadeOut", '150', 60, 5);
+		picture_fade1(52, "fadeOut", '150', 60, 5);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
@@ -13742,42 +13765,38 @@
 
 	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
 	AGH_showPictureScreenBlackOutOrderSkyKnightsAppear = function () {
-		valuePic1 = 54;
-		var value2 = 'ScreenBlackOut';
-		$gameScreen.showPicture(valuePic1, value2, 1, 640, 384, 100, 100, 250, 0);
-		var value2 = '/img/parallaxes/BlueSky';
-		$gameScreen.showPicture(valuePic1 + 1, value2, 1, 640, 384, 100, 100, 200, 0);
-		var value2 = '/img/parallaxes/EV_15_0';
-		$gameScreen.showPicture(valuePic1 + 2, value2, 1, 640, 384, 100, 100, 255, 0);
-		var value2 = '/img/parallaxes/EV_15_2';
-		$gameScreen.showPicture(valuePic1 + 3, value2, 1, 640, 384, 100, 100, 255, 0);
+		const picId = 54;
+		valuePic1 = picId;
+		$gameScreen.showPicture(picId, 'ScreenBlackOut', 1, 640, 384, 100, 100, 250, 0);
+		$gameScreen.showPicture(picId + 1, '/img/parallaxes/BlueSky', 1, 640, 384, 100, 100, 200, 0);
+		$gameScreen.showPicture(picId + 2, '/img/parallaxes/EV_15_0', 1, 640, 384, 100, 100, 255, 0);
+		$gameScreen.showPicture(picId + 3, '/img/parallaxes/EV_15_2', 1, 640, 384, 100, 100, 255, 0);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
 	AGH_initValuePic1 = function () {
-		valuePic1 = 54;
-		for (var i = 0; i <= 4; i++) { picture_fade1(valuePic1 + i, "fadeOut", valueWipeImg, 60, 5) };
+		const picId = 54;
+		valuePic1 = picId;
+		for (var i = 0; i <= 4; i++) { picture_fade1(picId + i, "fadeOut", valueWipeImg, 60, 5) };
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
 	AGH_runScriptOrderSkyKnightsAppear_2 = function () {
-		var value1 = 3;
-		event_respawnSetA(value1, 15, 40, 0);
-		var value1 = 4;
-		event_respawnSetA(value1, 13, 40, 0);
-		var value1 = 5;
-		event_respawnSetA(value1, 14, 40, 0);
+		event_respawnSetA(3, 15, 40, 0);
+		event_respawnSetA(4, 13, 40, 0);
+		event_respawnSetA(5, 14, 40, 0);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:305|[5]騎空士ギルド
 	AGH_setSelfSwitchDynamicEventId = function (interp) {
 		return (function () {
 			$gameSelfSwitches.setValue([$gameMap.mapId(), 3, 'A'], true);
-			var value1 = 11;
-			event_respawnSetN(value1, 19, 4, 0, 'Goods9', 0);
-			var event = $gameMap.event($gameVariables.value(292)[value1]);
+			const evId = 11;
+			event_respawnSetN(evId, 19, 4, 0, 'Goods9', 0);
+			const eventIds = $gameVariables.value(292);
+			const event = $gameMap.event(eventIds[evId]);
 			event.setDirection(2);
-			this._eventId = $gameVariables.value(292)[value1];
+			this._eventId = eventIds[evId];
 		}).call(interp);
 	};
 
