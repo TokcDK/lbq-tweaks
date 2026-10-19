@@ -261,11 +261,8 @@
 			const pic = $gameScreen.picture(i);
 			if (!pic) continue;
 
-			if (pic.x() >= 640) {
-				$gameScreen.movePicture(i, 1, 1280, pic.y(), pic.scaleX(), pic.scaleY(), 0, 0, 60);
-			} else {
-				$gameScreen.movePicture(i, 1, -500, pic.y(), pic.scaleX(), pic.scaleY(), 0, 0, 60);
-			}
+			const posX = pic.x() >= 640 ? 1280 : -500;
+			$gameScreen.movePicture(i, 1, posX, pic.y(), pic.scaleX(), pic.scaleY(), 0, 0, 60);
 		};
 	};
 
