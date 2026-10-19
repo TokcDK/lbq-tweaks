@@ -7155,7 +7155,7 @@
 		const picId = 13;
 		valuePic1 = picId;
 		if (!valuePic){
-			console.warn(`AGH_moveStandingPicture1_2: valuePic1 is ${valuePic1}!`);
+			console.warn(`AGH_moveStandingPicture1_2: valuePic1 is undefined`);
 		}
 
 		const pictureScaleX = $gameScreen.picture(picId).scaleX();
