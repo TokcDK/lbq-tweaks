@@ -258,13 +258,13 @@
 	// Replaces (8x): slide out left-side standing pictures (11..20).
 	AGH_slideOutLeftPictures = function () {
 		for (var i = 11; i <= 20; i++) {
-			if (pic) {
-				const pic = $gameScreen.picture(i);
-				if (pic.x() >= 640) {
-					$gameScreen.movePicture(i, 1, 1280, pic.y(), pic.scaleX(), pic.scaleY(), 0, 0, 60);
-				} else {
-					$gameScreen.movePicture(i, 1, -500, pic.y(), pic.scaleX(), pic.scaleY(), 0, 0, 60);
-				}
+			const pic = $gameScreen.picture(i);
+			if (!pic) continue;
+
+			if (pic.x() >= 640) {
+				$gameScreen.movePicture(i, 1, 1280, pic.y(), pic.scaleX(), pic.scaleY(), 0, 0, 60);
+			} else {
+				$gameScreen.movePicture(i, 1, -500, pic.y(), pic.scaleX(), pic.scaleY(), 0, 0, 60);
 			}
 		};
 	};
@@ -3841,7 +3841,7 @@
 		const awakeningActorName = currentActor().name();   // the actor that awakens
 		const secondJobName = jobName(jobIndex + 20);
 		const secondJob = colorTaggedText(2, `＜${secondJobName}＞`);
-		const actorName = leadingSpaces + colorTaggedText(16, awakeningActorName) ;
+		const actorName = leadingSpaces + colorTaggedText(16, awakeningActorName);
 		valueWordSet0 = `${actorName}はメインクラス2ndジョブ${secondJob}に目覚めた！`;
 		valueWordSetEx = 0;   // 補足が必要な場合
 		AGH_runCommonEventAsChild(interp, 45);
@@ -8871,7 +8871,7 @@
 			var actor = $gameActors.actor($gameVariables.value(20));
 			var list = actor.actor().traits;
 			//list.forEach(function (id) {
-				//console.log(id);
+			//console.log(id);
 			//}, this);
 		}).call(interp);
 	};
@@ -18217,7 +18217,7 @@
 		var itemsCnt = 10;
 		// item id from 154 to 159
 		// switch id from 161 to 166
-		for(let id = 154; id < 160; id++){
+		for (let id = 154; id < 160; id++) {
 			if ($gameParty.numItems($dataItems[id]) >= itemsCnt) {
 				$gameSwitches.setValue(id + 7, true)
 			};
