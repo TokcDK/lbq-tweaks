@@ -9059,7 +9059,7 @@
 	AGH_iterateItemsValueDanjonTreasure = function () {
 		const itemIndex = i; // warn: i - is global using of general named variable, very danger, need to refactor to use input/output params fo functions
 		const item = $dataItems[itemIndex];
-		if(!item){
+		if (!item) {
 			console.error(`AGH_iterateItemsValueDanjonTreasure: item is ${item}!`);
 			return;
 		}
@@ -12321,99 +12321,85 @@
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:179|タイトル効果選択コモン
-	AGH_showWindowTextTitleEffectSelectCommon = function () {
-		var messageText = `[発動中の称号効果]\n`; var variableId = 288;
-		for (var i = 0; i <= $gameVariables.value(variableId + 1) - 1; i++) {
-			if ($gameVariables.value(variableId)[i] == 0) {
-				messageText += `Empty\n`;
+	AGH_showWindowTitleText = function (setH) {
+		let messageText = `[発動中の称号効果]` + `\n`;
+		let variableId = 288;
+		if (setH && $gameSwitches.value(105)) {
+			messageText = `[発動中のＨな称号効果]` + `\n`;
+			variableId = 294
+		};
+		const maxId = $gameVariables.value(variableId + 1);
+		const ids = $gameVariables.value(variableId);
+		for (let i = 0; i < maxId; i++) {
+			const titleText = ids[i];
+			if (titleText == 0) {
+				messageText += `Empty` + `\n`;
 			} else {
-				messageText += `\\C[16]\x1bIIN[${$gameVariables.value(value3)[i]}]\\C[0]\n`;
+				messageText += colorTaggedText(16, `\x1bIIN[${titleText}]`) + `\n`;
 			}
 		};
-		var value2 = $gameVariables.value(variableId + 1) * 48 + 48;
-		WindowManager.show(1, 740, 96 + 14, 540, value2);
+		const scaleY = maxId * 48 + 48;
+		WindowManager.show(1, 740, 96 + 14, 540, scaleY);
 		WindowManager.drawText(1, messageText);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:179|タイトル効果選択コモン
-	AGH_showWindowTextHNickname = function () {
-		var value1 = `[発動中の称号効果]\n`; var value3 = 288;
-		if ($gameSwitches.value(105)) { var value1 = `[発動中のＨな称号効果]\n`; var value3 = 294 };
-		for (var i = 0; i <= $gameVariables.value(value3 + 1) - 1; i++) {
-			if ($gameVariables.value(value3)[i] == 0) {
-				value1 += `Empty\n`;
-			} else {
-				value1 += `\\C[16]\x1bIIN[${$gameVariables.value(value3)[i]}]\\C[0]\n`;
-			}
-		};
-		var value2 = $gameVariables.value(value3 + 1) * 48 + 48;
-		WindowManager.show(1, 740, 96 + 14, 540, value2);
-		WindowManager.drawText(1, value1);
+	AGH_showWindowHTitleText = function () {
+		AGH_showWindowTitleText(true);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:179|タイトル効果選択コモン
-	AGH_iterateItemsEmpty = function () {
-		var variableId = 288;
-		for (var i = 0; i <= $gameVariables.value(variableId + 1) - 1; i++) {
-			const id = 1;
-			if ($gameVariables.value(variableId)[i] == 0) {
-				var value1 = 'Empty';
+	AGH_addCustomTitleChoice = function (setH) {
+		const variableId = setH && $gameSwitches.value(105)  ? 294 : 288;		
+		const maxId = $gameVariables.value(variableId + 1);
+		const ids = $gameVariables.value(variableId);
+		for (var i = 0; i < maxId; i++) {
+			const itemId = ids[i];
+			if (itemId == 0) {
+				var text = 'Empty';
 			} else {
-				var value1 = $dataItems[$gameVariables.value(variableId)[i]].name;
+				var text = $dataItems[itemId].name;
 			};
-			const choiceParams = { text: value1, value: i };
-			$gameSystem.addCustomChoice(id, choiceParams);
+			const choiceParams = { text: text, value: i };
+			$gameSystem.addCustomChoice(1, choiceParams);
 		};
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:179|タイトル効果選択コモン
-	AGH_readVariableHNickname = function () {
-		var value3 = 288;
-		if ($gameSwitches.value(105)) { var value3 = 294 };
-		for (var i = 0; i <= $gameVariables.value(value3 + 1) - 1; i++) {
-			const id = 1;
-			if ($gameVariables.value(value3)[i] == 0) {
-				var value1 = 'Empty';
-			} else {
-				var value1 = $dataItems[$gameVariables.value(value3)[i]].name;
-			};
-			const choiceParams = { text: value1, value: i };
-			$gameSystem.addCustomChoice(id, choiceParams);
-		};
+	AGH_addCustomHTitleChoice = function () {
+		AGH_addCustomTitleChoice(true);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:179|タイトル効果選択コモン
-	AGH_readVariableItemProcessWorkTitleEffectSelectCommon = function () {
-		var variableId = 288;
-		if ($gameVariables.value(19) == 601) {
-			$gameVariables.value(variableId)[$gameVariables.value(21)] = 0;
-		} else {
-			$gameVariables.value(variableId)[$gameVariables.value(21)] = $gameVariables.value(19);
-		};
+	AGH_setLeaderTitleId = function (setH) {
+		const index = $gameVariables.value(21);
+		const id = $gameVariables.value(19);
+		const variableId = setH && $gameSwitches.value(105) ? 294 : 288;
+		$gameVariables.value(variableId)[index] = id == 601 ? 0 : id;
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:179|タイトル効果選択コモン
-	AGH_readVariableItemProcessWork_2 = function () {
-		var value3 = 288;
-		if ($gameSwitches.value(105)) { var value3 = 294 };
-		if ($gameVariables.value(19) == 601) {
-			$gameVariables.value(value3)[$gameVariables.value(21)] = 0;
-		} else {
-			$gameVariables.value(value3)[$gameVariables.value(21)] = $gameVariables.value(19);
-		};
+	AGH_setLeaderHTitleId = function () {
+		AGH_setLeaderTitleId(true);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:180|種族討伐数表示
-	AGH_readVariableRaceDefeatCountRaceDefeatCountDisplay = function () {
+	AGH_setupDefeatCountDisplay = function () {
 		for (var i = 0; i <= $gameVariables.value(52).length - 1; i++) {
-			if ($gameVariables.value(52)[i] >= 1) {
-				var value8 = `\x1bSIM[${i}]`;
-				if (i == 1) { var value8 = `当日魔物` };
-				if (i == 2) { var value8 = `総魔物` };
-				var variable52Value = $gameVariables.value(52)[i];
-				valueIkkatuArray.push([value8, variable52Value, 0, 0, 0]);
-				valueCountSet1 += 1;
+			if ($gameVariables.value(52)[i] < 1) continue;
+
+			let defeatedMonstersMsg = `\x1bSIM[${i}]`;
+			switch (i) {
+				case 1:
+					defeatedMonstersMsg = `当日魔物`; 
+					break;
+				case 2:
+					defeatedMonstersMsg = `総魔物`; 
+					break;
 			}
+			const defeatedMonstersCnt = $gameVariables.value(52)[i];
+			valueIkkatuArray.push([defeatedMonstersMsg, defeatedMonstersCnt, 0, 0, 0]);
+			valueCountSet1 += 1;
 		};
 	};
 
