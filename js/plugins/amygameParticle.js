@@ -727,16 +727,16 @@ adv_partDirectPlay = function (effectTypeId) {
       const itemName = colorTaggedText(2, `\x1bIIN[${dbEntryId}]`);
       let messageText;
       if (effectTypeId == 14) {
-		const prefix = colorTaggedText(16, `称号`);
-		const name = `${title}＜${itemName}＞`;
+        const title = colorTaggedText(16, `称号`);
+		    const name = `${title}＜${itemName}＞`;
         messageText = `${name}獲得！`;
       } else if (effectTypeId == 15) {
-		const title = colorTaggedText(16, $dataSystem.skillTypes[valueItems[dbEntryId].stypeId]);
-		const name = `${title}＜${itemName}＞`;
+		    const title = colorTaggedText(16, $dataSystem.skillTypes[valueItems[dbEntryId].stypeId]);
+		    const name = `${title}＜${itemName}＞`;
         messageText = `${name}獲得！`;
       } else {
-		const title = colorTaggedText(16, $dataSystem.skillTypes[valueItems[dbEntryId].stypeId]);
-		const name = `${title}＜${itemName}＞`;
+		    const title = colorTaggedText(16, $dataSystem.skillTypes[valueItems[dbEntryId].stypeId]);
+		    const name = `${title}＜${itemName}＞`;
         messageText = `${name}忘却…`;
       };
       $gameScreen.setDTextPicture(messageText, 28);
@@ -768,7 +768,7 @@ adv_partDirectPlay = function (effectTypeId) {
     }
     case 17: {//汎用演出。valueWordSet0に文章入れておく。
       //console.log(`顔グラピクID変更の為にピクID変更の必要ありamygameParticle787行`);
-      const actor = $gameActors.actor($gameVariables.value(20));
+      //const actor = $gameActors.actor($gameVariables.value(20));
       $gameScreen.startFlash([255, 255, 255, 200], 30);
       if ($gameScreen._tone_temp == 0) {
         $gameScreen._tone_temp = $gameScreen.tone().concat();
