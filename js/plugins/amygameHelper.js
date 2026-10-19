@@ -13902,15 +13902,16 @@
 	// Replaces (1x): CommonEvents.json:common-event:308|[8]高位種との遭遇
 	AGH_updateParticleDynamicEventId = function (interp) {
 		return (function () {
-			var value1 = 11;
-			event_respawnSetN(value1, 12, 10, 0, 'Monster', 2, 2);
-			var event = $gameMap.event($gameVariables.value(292)[value1]);
-			this._eventId = $gameVariables.value(292)[value1];
+			var evId = 11;
+			event_respawnSetN(evId, 12, 10, 0, 'Monster', 2, 2);
+			const eventIds = $gameVariables.value(292);
+			var event = $gameMap.event(eventIds[evId]);
+			this._eventId = eventIds[evId];
 			event.setDirection(2);
 			event.setTone(-50, -200, 100);
-			var value1 = 'magic_circle_c';
-			$gameScreen._particle.particleSet(this._eventId, value1 + '-' + this._eventId, 'this', value1);
-			$gameScreen._particle.particleUpdate([value1, 'color', '#400070', '#ffcdcd']);
+			const picPath = 'magic_circle_c';
+			$gameScreen._particle.particleSet(this._eventId, picPath + '-' + this._eventId, 'this', picPath);
+			$gameScreen._particle.particleUpdate([picPath, 'color', '#400070', '#ffcdcd']);
 		}).call(interp);
 	};
 
@@ -13982,13 +13983,13 @@
 	// Replaces (1x): CommonEvents.json:common-event:313|[13]昇格──格差──
 	AGH_readVariableEventProgressHeroPromotionGap = function (interp) {
 		return (function () {
-			var value1 = 5;//$gameVariables.value(530);
-			event_respawnSetA(value1, 10, 13, 1, 8);
-			var value1 = 3;//$gameVariables.value(530);
-			event_respawnSetA(value1, 11, 13, 1, 8);
+			//var value1 = 5;//$gameVariables.value(530);
+			event_respawnSetA(5, 10, 13, 1, 8);
+			//var value1 = 3;//$gameVariables.value(530);
+			event_respawnSetA(3, 11, 13, 1, 8);
 			this._eventId = $gameVariables.value(292)[value1];
-			var value1 = 12;
-			event_respawnSetN(value1, 10, 11, 0, 'People2', 1, 2);
+			//var value1 = 12;
+			event_respawnSetN(12, 10, 11, 0, 'People2', 1, 2);
 		}).call(interp);
 	};
 
@@ -14010,34 +14011,34 @@
 	// Replaces (1x): CommonEvents.json:common-event:313|[13]昇格──格差──
 	AGH_readVariableEventProgressHero_3 = function (interp) {
 		return (function () {
-			var value1 = 5;//$gameVariables.value(530);
-			this._eventId = $gameVariables.value(292)[value1];
-			var event = $gameMap.event(this._eventId);
-			var value1 = event.screenX();
-			var value2 = event.screenY();
-			filter_direct(9, value1, value2, 60);
+			//var value1 = 5;//$gameVariables.value(530);
+			this._eventId = $gameVariables.value(292)[5];
+			const event = $gameMap.event(this._eventId);
+			const screenX = event.screenX();
+			const screenY = event.screenY();
+			filter_direct(9, screenX, screenY, 60);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:313|[13]昇格──格差──
 	AGH_readVariableEventProgressHero_4 = function (interp) {
 		return (function () {
-			var value1 = 5;//$gameVariables.value(530);
-			event_respawnSetA(value1, 20, 13, 1, 2);
-			this._eventId = $gameVariables.value(292)[value1];
-			var value1 = 3;//$gameVariables.value(530);
-			event_respawnSetA(value1, 20, 14, 0, 4);
+			var id = 5;//$gameVariables.value(530);
+			event_respawnSetA(id, 20, 13, 1, 2);
+			this._eventId = $gameVariables.value(292)[id];
+			//var id = 3;//$gameVariables.value(530);
+			event_respawnSetA(3, 20, 14, 0, 4);
 		}).call(interp);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:313|[13]昇格──格差──
 	AGH_readVariableEventProgressHero_5 = function (interp) {
 		return (function () {
-			var value1 = 5;//$gameVariables.value(530);
-			event_respawnSetA(value1, 8, 10, 1, 6);
-			var value1 = 3;
-			event_respawnSetA(value1, 11, 10, 0, 4);
-			this._eventId = $gameVariables.value(292)[value1];
+			//var value1 = 5;//$gameVariables.value(530);
+			event_respawnSetA(5, 8, 10, 1, 6);
+			//var value1 = 3;
+			event_respawnSetA(3, 11, 10, 0, 4);
+			this._eventId = $gameVariables.value(292)[3];
 		}).call(interp);
 	};
 
@@ -14209,8 +14210,8 @@
 
 	// Replaces (1x): CommonEvents.json:common-event:330|[30]モニカ合流
 	AGH_eraseMapEventDynamicEventIdMonicaJoins = function () {
-		var value1 = 13;
-		$gameMap.eraseEvent($gameVariables.value(292)[value1]);
+		//var value1 = 13;
+		$gameMap.eraseEvent($gameVariables.value(292)[13]);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:330|[30]モニカ合流
@@ -14325,20 +14326,20 @@
 
 	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
 	AGH_runScriptBBAkunin3 = function () {
-		var value1 = 11;
-		event_respawnSetN(value1, 10, 12, 1, 'BB_akunin3', 5, 2);
-		event_respawnSetN(value1 + 1, 9, 13, 0, 'BB_akunin3', 6, 6);
-		event_respawnSetN(value1 + 2, 11, 13, 0, 'BB_akunin3', 6, 4);
+		var id = 11;
+		event_respawnSetN(id, 10, 12, 1, 'BB_akunin3', 5, 2);
+		event_respawnSetN(id + 1, 9, 13, 0, 'BB_akunin3', 6, 6);
+		event_respawnSetN(id + 2, 11, 13, 0, 'BB_akunin3', 6, 4);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
 	AGH_readVariableDynamicEventIdAirPirateRemnantSuppression = function (interp) {
 		return (function () {
-			var value1 = 20;
-			goodsEvent_respawn(value1, '!Door1', 2, 2, 1, 10, 19);
-			var event = $gameMap.event($gameVariables.value(292)[value1]);
+			var id = 20;
+			goodsEvent_respawn(id, '!Door1', 2, 2, 1, 10, 19);
+			var event = $gameMap.event($gameVariables.value(292)[id]);
 			event._priorityType = 0;
-			this._eventId = $gameVariables.value(292)[value1];
+			this._eventId = $gameVariables.value(292)[id];
 		}).call(interp);
 	};
 
@@ -14357,9 +14358,9 @@
 	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
 	AGH_readVariableDynamicEventId_7 = function (interp) {
 		return (function () {
-			var value1 = 17;//
-			event_charaZanzou(this._eventId, $gameVariables.value(292)[value1]);
-			this._eventId = $gameMap.event($gameVariables.value(292)[value1]);
+			var id = 17;//
+			event_charaZanzou(this._eventId, $gameVariables.value(292)[id]);
+			this._eventId = $gameMap.event($gameVariables.value(292)[id]);
 		}).call(interp);
 	};
 
@@ -14378,12 +14379,12 @@
 	AGH_readVariableDynamicEventId_9 = function () {
 		var array = [0];
 		var arr2 = [-50];
-		var arr3 = [`ギャアァッ！！`]; var value1 = 11;
-		chara_oneWord(101, $gameVariables.value(292)[value1], 25, 180, array, arr2, arr3, 0);
-		var arr3 = [`グエッ`]; var value1 = 12;
-		chara_oneWord(102, $gameVariables.value(292)[value1], 25, 180, array, arr2, arr3, 0);
-		var arr3 = [`ガッ…`]; var value1 = 13;
-		chara_oneWord(103, $gameVariables.value(292)[value1], 25, 180, array, arr2, arr3, 0);
+		var arr3 = [`ギャアァッ！！`]; var id = 11;
+		chara_oneWord(101, $gameVariables.value(292)[id], 25, 180, array, arr2, arr3, 0);
+		var arr3 = [`グエッ`]; var id = 12;
+		chara_oneWord(102, $gameVariables.value(292)[id], 25, 180, array, arr2, arr3, 0);
+		var arr3 = [`ガッ…`]; var id = 13;
+		chara_oneWord(103, $gameVariables.value(292)[id], 25, 180, array, arr2, arr3, 0);
 	};
 
 	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
@@ -14457,8 +14458,8 @@
 
 	// Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
 	AGH_readVariableEventProgressHero_10 = function () {
-		var value1 = 5;//$gameVariables.value(530);
-		var event = $gameMap.event($gameVariables.value(292)[value1]);
+		var id = 5;//$gameVariables.value(530);
+		var event = $gameMap.event($gameVariables.value(292)[id]);
 		event.setStepAnime(false);
 		event._priorityType = 2;
 		event._spriteOffsetX = +10;
