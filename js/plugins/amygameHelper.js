@@ -14047,7 +14047,7 @@
   // Replaces (1x): CommonEvents.json:common-event:203|熟練度アップコモン
   AGH_readVariableSkillUseId = function () {
     const item = $dataItems[$gameVariables.value(93)];
-    const itemName = value.name;
+    const itemName = item.name;
     const messageText = `${itemName}の所持数が0になった為、使用画面を終了します。`;
     CommonPopupManager.showInfo({}, messageText, null);
   };
