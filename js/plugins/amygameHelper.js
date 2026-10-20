@@ -3671,7 +3671,7 @@
     return values;
   }
   /* `AGH_enableSwitch` / `AGH_disableSwitch` are public (called from the data files) and
-	   are defined once, further down in the switches section. */
+     are defined once, further down in the switches section. */
   function selfSwitchOn(mapId, eventId, key) {
     $gameSelfSwitches.setValue([mapId, eventId, key], true);
   }
@@ -3750,7 +3750,84 @@
   const TICKER_WAIT_FRAMES = 240;
 
   function forEachDeployedActor(callback) {
-    range(varValue(DEPLOYED_ACTOR_START_VAR), varValue(DEPLOYED_ACTOR_END_VAR)).forEach(callback);
+    const firstActorId = varValue(DEPLOYED_ACTOR_START_VAR);
+    const lastActorId = varValue(DEPLOYED_ACTOR_END_VAR);
+    if (!Number.isInteger(firstActorId) || !Number.isInteger(lastActorId)) return;
+    if (firstActorId < 1 || lastActorId < firstActorId) return;
+    // Snapshot both bounds, as the previous range(...).forEach(...) implementation did.
+    for (let actorId = firstActorId; actorId <= lastActorId; actorId++) {
+      callback(actorId);
+    }
+  }
+
+  // Actor records live in variable 380 + actorId; field meanings are confirmed in
+  // amygame.js (SecondName setup) and amygameSeiyoku.js (daily assault records).
+  const CHARACTER_H_RECORD_BASE_VARIABLE_ID = 380;
+  const CHARACTER_SURNAME_WEAPON_OFFSET = 200;
+  const CHARACTER_H_RECORD_FIELD = { SURNAME: 50, DAILY_ASSAULT_COUNT: 71 };
+  const PREGNANCY_STATE_ID = 83;
+  const PROFESSION_RETURN_SKILL_ID = 18;
+
+  function forEachCharacterHRecord(callback) {
+    const variables = $gameVariables;
+    const actorIds = variables.value(HELPER_VARIABLE.CHARACTER_ACTOR_IDS);
+    if (!Array.isArray(actorIds)) return;
+    // forEach preserves the source's sparse-array and initial-length behavior.
+    actorIds.forEach(function (actorId) {
+      if (!Number.isInteger(actorId) || actorId < 1) return;
+      const hRecords = variables.value(CHARACTER_H_RECORD_BASE_VARIABLE_ID + actorId);
+      if (!Array.isArray(hRecords)) return;
+      callback(actorId, hRecords);
+    });
+  }
+
+  function synchronizeCharacterSurnames() {
+    const weapons = $dataWeapons;
+    forEachCharacterHRecord(function (actorId, hRecords) {
+      const surnameWeapon = weapons[CHARACTER_SURNAME_WEAPON_OFFSET + actorId];
+      if (!surnameWeapon) return;
+      const surname = hRecords[CHARACTER_H_RECORD_FIELD.SURNAME];
+      if (surname === undefined) return;
+      surnameWeapon.name = surname;
+    });
+  }
+
+  function resetDailyAssaultCount(actorId, hRecords) {
+    hRecords[CHARACTER_H_RECORD_FIELD.DAILY_ASSAULT_COUNT] = 0;
+  }
+
+  function applyDailyAssaultPenalty(actorId, hRecords) {
+    if (!(hRecords[CHARACTER_H_RECORD_FIELD.DAILY_ASSAULT_COUNT] >= 1)) return;
+    const gameActor = $gameActors.actor(actorId);
+    if (!gameActor) return;
+    const battleSkillIds = gameActor.battleSkillsRaw();
+    if (battleSkillIds.indexOf(847) !== -1) return;
+    gameActor.addState(67);
+  }
+
+  function processPregnancyForDeployedActors() {
+    forEachDeployedActor(processDeployedActorPregnancy);
+  }
+
+  function processDeployedActorPregnancy(actorId) {
+    const gameActor = $gameActors.actor(actorId);
+    // Compatibility: the original event scripts publish the last visited actor.
+    // Keep that write explicit, but never use this mutable global to drive the loop.
+    // actor = gameActor; // commented global assign, will check if it will throw error somewhere later
+    if (!gameActor || !gameActor.isStateAffected(PREGNANCY_STATE_ID)) return;
+    actor_pregnancyCalculation(actorId);
+  }
+
+  function forgetProfessionReturnSkill(actorId) {
+    const gameActor = $gameActors.actor(actorId);
+    if (!gameActor) return;
+    gameActor.forgetSkill(PROFESSION_RETURN_SKILL_ID);
+  }
+
+  function returnProfessionBasicsIfLearned(actorId) {
+    const gameActor = $gameActors.actor(actorId);
+    if (!gameActor || !gameActor.isLearnedSkill(PROFESSION_RETURN_SKILL_ID)) return;
+    Profession_basicReturn(actorId);
   }
   function forEachHeroine(callback) {
     varValue(HEROINE_ID_LIST_VAR).forEach(callback);
@@ -8333,8 +8410,9 @@
 
   // Replaces (1x): data/CommonEvents.json:common-event:83
   AGH_appendEstrusLine = function (interp, isRestless = false) {
+    if (typeof actor === "undefined" || !actor) return;
     const actorName = actor.name();
-	const effectName = colorTaggedText(27, 発情);
+    const effectName = colorTaggedText(27, "発情");
     const messageText = isRestless
       ? `${actorName}は${effectName}した肢体を持て余している…。` + `\n`
       : `${actorName}は${effectName}した肢体を慰めている…。` + `\n`;
@@ -8424,7 +8502,7 @@
 
   // Replaces (9x): data/CommonEvents.json:common-event:241, :292, :305, :310, :316, :336, ...
   /* NOTE: despite the name, this one turns the switch OFF — kept as-is so the
-	   data-file calls keep working. */
+     data-file calls keep working. */
   AGH_enableMapSelfSwitchForEventAtKey = function (eventId, selfSwitchKey) {
     mapSelfSwitchOff(eventId, selfSwitchKey);
   };
@@ -8674,7 +8752,7 @@
   // Replaces (1x): data/CommonEvents.json:common-event:300
   AGH_announceCentralPlainsOnMap = function (interp) {
     setSelfVar(interp, CURRENT_ACTOR_VAR, 0);
-	const centralPlainsName = colorTaggedText(16, $dataSystem.switches[252]);
+    const centralPlainsName = colorTaggedText(16, $dataSystem.switches[252]);
     valueWordSet0 = `全体マップに${centralPlainsName}が追加されました`;
     valueWordSetEx = 0; // 補足が必要な場合
     AGH_runCommonEventAsChild(interp, 45);
@@ -8743,10 +8821,10 @@
 
   // Replaces (2x): data/Map003.json:map-event:166:page:2, data/Map003.json:map-event:243:page:2
   AGH_showTickerQuestAccepted = function () {
-	const itemIndex = valueCountSet1;
+    const itemIndex = valueCountSet1;
     const itemName = colorTaggedText(3, itemIconName(itemIndex)); // the quest item (valueCountSet1)
     showTicker(`クエスト${itemName}を受注しました。`);
-	$gameParty.gainItem($dataItems[itemIndex], 1);
+    $gameParty.gainItem($dataItems[itemIndex], 1);
   };
   /* ============================================================================
    * Actor announcement messages (reuses the shared helpers)
@@ -9009,18 +9087,15 @@
 
   // Replaces (1x): data/CommonEvents.json:common-event:391
   // Moans (layer preset 0, speed 80).
-  // NOTE: the last line carries a form-feed character where the maker code
-  // `\FS[n]` was meant (the original wrote `\f` + `s[20]`) — kept exactly.
+  // Font-size controls use real RPG Maker escapes, not the legacy form-feed.
   AGH_startMoanTextBGVoice80 = function (displayFrames = 80, useFontSizeMarkers = true) {
     const voiceIcon = icon(12);
     const moanLine = `「アンっ${voiceIcon}」`;
     const secondLine = `「ヒゥンっ${voiceIcon}」`;
     const thirdLine = `「アッ${voiceIcon}　ンン${voiceIcon}」`;
-	const nn = `\x0cs[20]`;
-	const c = `\x0cs[28]`;
-    const fourthLine = useFontSizeMarkers
-	  ? `「ヒン${nn}ン${c}っ${voiceIcon}」`
-      : `「ヒンンっ${voiceIcon}」`;
+    // Keep font controls outside the translatable sentence and restore the font size.
+    const softMoan = useFontSizeMarkers ? fontSize(20) + "ン" + fontSize(28) : "ン";
+    const fourthLine = `「ヒン${softMoan}っ${voiceIcon}」`;
     startTextBGVoice([moanLine, secondLine, thirdLine, fourthLine], 0, displayFrames);
   };
 
@@ -9682,10 +9757,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:9|スタート＆リセット兼用
   AGH_readVariableCharacterId = function (interp) {
-    const list = $gameVariables.value(HELPER_VARIABLE.CHARACTER_ACTOR_IDS);
-    list.forEach(function (id) {
-      $dataWeapons[id + 200].name = $gameVariables.value(id + 380)[50];
-    }, interp);
+    synchronizeCharacterSurnames();
   };
 
   // Replaces (1x): CommonEvents.json:common-event:9|スタート＆リセット兼用
@@ -9768,13 +9840,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:11|リセット時コモン
   AGH_readVariableAppearanceCharacterStart = function () {
-    for (
-      var i = $gameVariables.value(HELPER_VARIABLE.FIRST_DEPLOYED_ACTOR_ID);
-      i <= $gameVariables.value(HELPER_VARIABLE.LAST_DEPLOYED_ACTOR_ID);
-      i++
-    ) {
-      $gameActors.actor(i).forgetSkill(18);
-    }
+    forEachDeployedActor(forgetProfessionReturnSkill);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:11|リセット時コモン
@@ -10093,14 +10159,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:24|一日経過時コモン
   AGH_readVariableAppearanceCharacterStartDayPassCommon = function () {
-    const start = $gameVariables.value(HELPER_VARIABLE.FIRST_DEPLOYED_ACTOR_ID);
-    const end = $gameVariables.value(HELPER_VARIABLE.LAST_DEPLOYED_ACTOR_ID);
-    for (var id1 = start; id1 <= end; id1++) {
-      var actor = $gameActors.actor(id1);
-      if (actor.isLearnedSkill(18)) {
-        Profession_basicReturn(id1);
-      }
-    }
+    forEachDeployedActor(returnProfessionBasicsIfLearned);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:24|一日経過時コモン
@@ -10248,23 +10307,13 @@
 
   // Replaces (1x): CommonEvents.json:common-event:24|一日経過時コモン
   AGH_addState = function (interp) {
-    const list = $gameVariables.value(HELPER_VARIABLE.CHARACTER_ACTOR_IDS);
-    list.forEach(function (id) {
-      if (!($gameVariables.value(380 + id)[71] >= 1)) return;
-
-      const actor2 = $gameActors.actor(id);
-      if (!actor2.battleSkillsRaw().includes(847)) {
-        actor2.addState(67);
-      }
-    }, interp);
+    forEachCharacterHRecord(applyDailyAssaultPenalty);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:24|一日経過時コモン
   AGH_readVariableCharacterIdDayPassCommon = function (interp) {
-    const list = $gameVariables.value(HELPER_VARIABLE.CHARACTER_ACTOR_IDS);
-    list.forEach(function (id) {
-      $gameVariables.value(380 + id)[71] = 0;
-    }, interp);
+    // Day passage resets record 71 only; surname restoration is a separate action.
+    forEachCharacterHRecord(resetDailyAssaultCount);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:24|一日経過時コモン
@@ -11209,7 +11258,8 @@
 
   // Replaces (1x): CommonEvents.json:common-event:64|スクリプトシステムコモン
   AGH_readVariableCharacterIdScriptSystemCommon = function (interp) {
-    return AGH_readVariableCharacterId.apply(this, arguments);
+    // Scene transitions restore surnames; they must not reset daily records.
+    synchronizeCharacterSurnames();
   };
 
   // Replaces (1x): CommonEvents.json:common-event:64|スクリプトシステムコモン
@@ -11598,15 +11648,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:93|自動出産コモン
   AGH_readVariableAppearanceCharacterStartAutoBirthCommon = function () {
-    const start = $gameVariables.value(HELPER_VARIABLE.FIRST_DEPLOYED_ACTOR_ID);
-    const end = $gameVariables.value(HELPER_VARIABLE.LAST_DEPLOYED_ACTOR_ID);
-    for (var j = start; j <= end; j++) {
-      actor = $gameActors.actor(j);
-      if (actor.isStateAffected(83)) {
-        //actor.addStateCounter(83, +100);
-        actor_pregnancyCalculation(j);
-      }
-    }
+    processPregnancyForDeployedActors();
   };
 
   // Replaces (1x): CommonEvents.json:common-event:93|自動出産コモン
@@ -11760,7 +11802,8 @@
 
   // Replaces (1x): CommonEvents.json:common-event:97|出産時コモン演出用未使用
   AGH_readVariableAppearanceCharacterStartBirthCommonUnused = function () {
-    return AGH_readVariableAppearanceCharacterStartAutoBirthCommon.apply(this, arguments);
+    // Retain the legacy entry point without coupling it to the auto-birth handler.
+    processPregnancyForDeployedActors();
   };
 
   // Replaces (1x): CommonEvents.json:common-event:99|コンティニュー処理
@@ -19122,6 +19165,8 @@
 
   // Replaces (1x): Map007.json:event:4|EV004000|page:1
   AGH_iterateMapEventsIconDisplay = function () {
+	return; // return because it is the debug code and the result console log message was commented, uncomment when will need again
+
     for (var id = $gameMap.events().length; id > 0; id--) {
       const mapEvent = $gameMap.event(id);
       if (!!mapEvent) {
@@ -19129,10 +19174,10 @@
         if (eventData.meta["IconDisplay"]) {
           var iconDisplay = Number(eventData.meta["IconDisplay"]);
           /*if (value1 == 17) {
-						if ($gameMap.event(id).characterName() == 0) {
-							console.log(`${1}`);
-						}
-					}*/
+            if ($gameMap.event(id).characterName() == 0) {
+              console.log(`${1}`);
+            }
+          }*/
         }
       }
     }
