@@ -313,338 +313,314 @@ classComparisonName = function (className) {
 }
 
 //武器防具の説明文に効果に応じた文章追加
-various_description = function(databaseTypeId){
 
-Hentai380_ArrangementNameSet();
+// Weapons / armor / states / classes carry generated text; skills and items too.
+// `databaseTypeId` selects the database (see descriptionDatabase).
+const DESCRIPTION_DATABASE_ITEM = 0;
+const DESCRIPTION_DATABASE_WEAPON = 1;
+const DESCRIPTION_DATABASE_ARMOR = 2;
+const DESCRIPTION_DATABASE_SKILL = 3;
+const DESCRIPTION_DATABASE_STATE = 4;
+const DESCRIPTION_DATABASE_CLASS = 5;
 
-//value10文言 value11文言文頭 value12-14属性の付与/増加/減少 value15数字か文字列か value16ALL設定
-//value17武器攻撃補正 value18スキル属性 value19説明文改変スキップ value20十種武器装備可能時
+// The original repeated these two type tests in front of several sections; they are
+// predicates now so every guard reads the same way.
+const TRAIT_DATABASE_TYPES = [
+  DESCRIPTION_DATABASE_WEAPON, DESCRIPTION_DATABASE_ARMOR,
+  DESCRIPTION_DATABASE_STATE, DESCRIPTION_DATABASE_CLASS
+];
 
-valueItems = descriptionDatabase(databaseTypeId) || valueItems;
+function isTraitDatabaseType(databaseTypeId) {
+  return TRAIT_DATABASE_TYPES.indexOf(databaseTypeId) >= 0;
+}
 
-var start = 1;
-if(databaseTypeId == 2){
-  var end = valueArmorsLength;
-} else {
-  var end = valueItems.length-1;
+function isItemOrSkillDatabaseType(databaseTypeId) {
+  return databaseTypeId == DESCRIPTION_DATABASE_ITEM || databaseTypeId == DESCRIPTION_DATABASE_SKILL;
+}
+
+// `<HP Life Steal>` / `<MP Life Steal>`: `与Dの50%HP吸収回復`, one row per resource.
+const DRAIN_ROWS = [
+  { metaKey: 'HP Life Steal', resourceLabel: `HP` },
+  { metaKey: 'MP Life Steal', resourceLabel: `MP` }
+];
+
+function describeLifeStealRows(ctx) {
+  for (const drainRow of DRAIN_ROWS) {
+    if (!ctx.meta[drainRow.metaKey]) continue;
+    ctx.effectValue = ctx.meta[drainRow.metaKey].replace(' ', '');
+    ctx.effectValue = ctx.effectValue.replace('%', '');
+    const drainText = `${DRAIN_LABEL}${Number(ctx.effectValue)}%${drainRow.resourceLabel}${ABSORB_LABEL}`;
+    ctx.effectText += `[${colorTaggedText(ctx.colorCode, drainText)}]`;
+  }
+}
+const DESCRIPTION_DEFAULT_COLOR_CODE = 2;
+// Colour codes that the original switched to and back for a single row; they are
+// passed to colorTaggedText now, so `colorCode` no longer has to be mutated.
+const LUST_COLOR_CODE = 27;
+const SCOPE_COLOR_CODE = 14;
+const TURN_ACTION_COLOR_CODE = 13;
+const AUTO_EQUIP_LUST_SKILL_TYPE_ID = 15;
+// `<titleGetArray>` first field: the only implemented counter.
+const SUBJUGATION_CONDITION_ID = 52;
+// The H-variable block of the variable list starts 400 entries later.
+const H_VARIABLE_OFFSET = 400;
+
+various_description = function (databaseTypeId) {
+
+  Hentai380_ArrangementNameSet();
+  valueItems = descriptionDatabase(databaseTypeId) || valueItems;
+
+  const lastEntryId = lastDescriptionEntryId(databaseTypeId);
+  // One context per call: the original declared its scratch `var`s inside the
+  // function, so `fragText`/`effectValue`/`metaValues` survived from one entry to
+  // the next and some rows (see describeDamageFormula) still rely on that.
+  const ctx = createDescriptionContext();
+  for (let entryIndex = 1; entryIndex <= lastEntryId; entryIndex++) {
+    describeDatabaseEntry(ctx, valueItems[entryIndex], databaseTypeId, entryIndex);
+  }
+
 };
 
-for (var i = start; i <= end; i++) {
+// Armor is sized by `valueArmorsLength` (the array itself is longer than the
+// entries this plugin may touch); every other database runs to its last entry.
+function lastDescriptionEntryId(databaseTypeId) {
+  return databaseTypeId == DESCRIPTION_DATABASE_ARMOR ? valueArmorsLength : valueItems.length - 1;
+}
 
-// The entry being described and its parsed notetag metadata. Both were written
-// out in full at each of the ~470 use sites below.
-var item = valueItems[i];
-var itemMeta = item.meta;
+// Unnamed entries - and weapons without a weapon type - get no generated text.
+function isDescriptionSkipped(item, databaseTypeId) {
+  if (!item || !item.meta) return true;
+  if (item.name == ``) return true;
+  return databaseTypeId == DESCRIPTION_DATABASE_WEAPON && item.wtypeId == 0;
+}
 
-var effectText = ``;
-var headerText = ``;
-var statUpCount = 0;
-var skillElementText = ``;
-var skipDescFlag = 0;//追加説明するかどうか
-var tenWeaponCount = 0;//武器種計算
-var damageCutRef = 0;//物理魔法ダメージカット。数値が同一かどうか
-var damageCutCount = 0;//物理魔法ダメージカット
-var damageCutIsFirst = 0;//物理魔法ダメージカット。１個めかどうか
-var prevStateCode = 0;//スキル効果。同じ効果が連続で存在する時
-var consecStateCount = 0;//スキル効果。同じ効果が連続で存在する時。カウント用
-var colorCode = 2;//カラー設定。通常は２．変更時はその直後に２に戻す。
-var calcTmp = 0;//計算用
-var suffixText = ``;//説明文前段の後半部分に付記する文言
-var descWordText = 0;//DescriptionWord用
-var additionalSetTextByTarget = [];
-var additionalSetCountByTarget = [];
+// Cross-step scratch state. The original kept these in function-scoped `var`s, so a
+// later block could still read what an earlier one left behind (the `<titleEffectN>`
+// element rows and the `DamageFormula2` id 31 fall-through depend on it). Fields the
+// loop re-initialised per entry are reset by beginDescriptionEntry, the rest persist.
+function createDescriptionContext() {
+  return {
+    item: null,
+    meta: null,
+    databaseTypeId: 0,
+    entryIndex: 0,
+    effectText: ``,
+    headerText: ``,
+    suffixText: ``,
+    colorCode: DESCRIPTION_DEFAULT_COLOR_CODE,
+    statUpCount: 0,
+    skillElementText: ``,
+    tenWeaponCount: 0,
+    damageCutRef: 0,
+    damageCutCount: 0,
+    damageCutIsFirst: 0,
+    prevStateCode: 0,
+    consecStateCount: 0,
+    calcTmp: 0,
+    descWordText: 0,
+    additionalSetTextByTarget: [],
+    additionalSetCountByTarget: [],
+    effectValue: undefined,
+    fragText: undefined,
+    metaValues: undefined
+  };
+}
 
-if(item.name == ''){
-var skipDescFlag = 1;
+// The per-entry reset the original performed at the top of its loop body.
+function beginDescriptionEntry(ctx, item, databaseTypeId, entryIndex) {
+  ctx.item = item;
+  ctx.meta = item.meta;
+  ctx.databaseTypeId = databaseTypeId;
+  ctx.entryIndex = entryIndex;
+  ctx.effectText = ``;
+  ctx.headerText = ``;
+  ctx.suffixText = ``;
+  ctx.colorCode = DESCRIPTION_DEFAULT_COLOR_CODE;
+  ctx.statUpCount = 0;
+  ctx.skillElementText = ``;
+  ctx.tenWeaponCount = 0;
+  ctx.damageCutRef = 0;
+  ctx.damageCutCount = 0;
+  ctx.damageCutIsFirst = 0;
+  ctx.prevStateCode = 0;
+  ctx.consecStateCount = 0;
+  ctx.calcTmp = 0;
+  ctx.descWordText = 0;
+  ctx.additionalSetTextByTarget = [];
+  ctx.additionalSetCountByTarget = [];
+}
+
+function describeDatabaseEntry(ctx, item, databaseTypeId, entryIndex) {
+  if (isDescriptionSkipped(item, databaseTypeId)) return;
+  beginDescriptionEntry(ctx, item, databaseTypeId, entryIndex);
+
+  describeEntryHeader(ctx);
+  describeTenWeaponSummary(ctx);
+  describeStatUpSummary(ctx);
+  describeDamageCutSummary(ctx);
+  describeTraitList(ctx);
+  describeLearnPremises(ctx);
+  describeDescriptionWord(ctx);
+  describeFixedDamageTag(ctx);
+  describeItemAndSkillRows(ctx);
+  describeClearCountTags(ctx);
+  describePassiveTags(ctx);
+  describeBattleTags(ctx);
+  describeResistTags(ctx);
+  describeCapAndCostTags(ctx);
+  describeCooldownAndDrainTags(ctx);
+  describeTitleConditionTags(ctx);
+  describeTitleEffectTags(ctx);
+  describeStatEffectSlots(ctx);
+  describeBodyChangeTags(ctx);
+  describeQuestHeaderTags(ctx);
+  describeQuestAndRateTags(ctx);
+  describeFinalTags(ctx);
+
+  applyEntryDescription(ctx);
+  expandSealedSkillTypes(ctx);
 };
 
-if(databaseTypeId == 1 && item.wtypeId == 0){
-var skipDescFlag = 1;
-};
+// One dispatch per trait instead of nineteen `if (trait.code == n)` tests: every
+// describer ignores the codes it does not own, and they run in the original order
+// so the generated text keeps its order.
+const TRAIT_DESCRIBERS = [
+  describeElementAttackTrait,
+  describeElementResistTrait,
+  describeDebuffResistTrait,
+  describeStateResistTrait,
+  describeStateNullifyTrait,
+  describeStatUpTrait,
+  describeXparamTrait,
+  describeSparamTrait,
+  describeStateAddTrait,
+  describeAttackSpeedTrait,
+  describeSkillTypeUnlockTrait,
+  describeSkillTypeSealTrait,
+  describeSkillUnlockTrait,
+  describeSkillSealTrait,
+  describeWeaponTypeTrait,
+  describeArmorTypeTrait,
+  describeEquipFixedTrait,
+  describeEquipSealedTrait,
+  describeActionCountTrait
+];
 
-// Unnamed entries — and weapons with no weapon type — get no generated text at
-// all. This used to be an `if(skipDescFlag == 0){ … }` wrapping the next 1700
-// lines; a guard clause costs one brace and keeps the rest of the loop body one
-// level shallower.
-if(skipDescFlag != 0){
-continue;
-};
+// Everything from <Unequippable> down to the effect rows is item/skill only: the
+// original opened one `if(databaseTypeId == 3 || databaseTypeId == 0)` in front of
+// it and closed it after the effect rows.
+function describeItemAndSkillRows(ctx) {
+  if (!isItemOrSkillDatabaseType(ctx.databaseTypeId)) return;
+  describeSkillHeaderTags(ctx);
+  describeDamageFormula(ctx);
+  describePotionRecoveryTag(ctx);
+  describeSkillRowTags(ctx);
+  describeAdditionalSets(ctx);
+  describeEffectRows(ctx);
+}
 
-if(databaseTypeId == 1 || databaseTypeId == 2){
+// 武器防具ステートの特徴 (traits)。スキルは effects なので describeEffectRows。
+function describeTraitList(ctx) {
+  if (!isTraitDatabaseType(ctx.databaseTypeId)) return;
+
+  const traits = ctx.item.traits;
+  if (!traits) return;
+  for (let traitIndex = 0; traitIndex <= 19; traitIndex++) {
+    const trait = traits[traitIndex];
+    if (!trait) continue;
+    for (const describeTrait of TRAIT_DESCRIBERS) {
+      describeTrait(ctx, trait, traitIndex);
+    }
+  }
+}
+
+function describeEntryHeader(ctx) {
+if(ctx.databaseTypeId == 1 || ctx.databaseTypeId == 2){
   const categoryLabel = `分類`;//翻訳対象
   const typeLabel = `種別`;//翻訳対象
-  var headerText = `[\\C[${colorCode}]${categoryLabel}\\C[0]:${$dataSystem.equipTypes[item.etypeId]}]`;
-    if(databaseTypeId == 1 && item.wtypeId >= 1){
-      var weaponTypeName = $dataSystem.weaponTypes[item.wtypeId];
-      headerText += `[\\C[${colorCode}]${typeLabel}\\C[0]:${weaponTypeName}]`
+  ctx.headerText = `[\\C[${ctx.colorCode}]${categoryLabel}\\C[0]:${$dataSystem.equipTypes[ctx.item.etypeId]}]`;
+    if(ctx.databaseTypeId == 1 && ctx.item.wtypeId >= 1){
+      var weaponTypeName = $dataSystem.weaponTypes[ctx.item.wtypeId];
+      ctx.headerText += `[\\C[${ctx.colorCode}]${typeLabel}\\C[0]:${weaponTypeName}]`
     };
-    if(databaseTypeId == 2 && item.atypeId >= 1){headerText += `[\\C[${colorCode}]${typeLabel}\\C[0]:${$dataSystem.armorTypes[item.atypeId]}]`};
-if(databaseTypeId == 1 || databaseTypeId == 2){
-  if(itemMeta['LotteryRearity']){
-    headerText += `[\\I[517]:${Number(itemMeta['LotteryRearity'])}]`;
+    if(ctx.databaseTypeId == 2 && ctx.item.atypeId >= 1){ctx.headerText += `[\\C[${ctx.colorCode}]${typeLabel}\\C[0]:${$dataSystem.armorTypes[ctx.item.atypeId]}]`};
+if(ctx.databaseTypeId == 1 || ctx.databaseTypeId == 2){
+  if(ctx.meta['LotteryRearity']){
+    ctx.headerText += `[\\I[517]:${Number(ctx.meta['LotteryRearity'])}]`;
 }};
 };
+}
 
-if(databaseTypeId == 1 || databaseTypeId == 2 || databaseTypeId == 4 || databaseTypeId == 5){
-
+function describeTenWeaponSummary(ctx) {
+  if (!isTraitDatabaseType(ctx.databaseTypeId)) return;
   //十種武器: ten weapon-type traits on one entry are summarised as "十種武器".
   for (var traitScanIndex = 0; traitScanIndex <= 9; traitScanIndex++) {
-    var weaponTrait = item.traits[traitScanIndex];
+    var weaponTrait = ctx.item.traits[traitScanIndex];
     if(weaponTrait && weaponTrait.code == 51){
-      tenWeaponCount += 1;
+      ctx.tenWeaponCount += 1;
     };
   };
-  if(tenWeaponCount >= 10){
-    var colorTaggeredText = colorTaggedText(colorCode, `武器種:`);
-    effectText += `${colorTaggeredText}十種武器 `;
+  if(ctx.tenWeaponCount >= 10){
+    var colorTaggeredText = colorTaggedText(ctx.colorCode, `武器種:`);
+    ctx.effectText += `${colorTaggeredText}十種武器 `;
   };
+}
 
-  var effectValue = 0;
-  var calcTmp = 0;
+function describeStatUpSummary(ctx) {
+  if (!isTraitDatabaseType(ctx.databaseTypeId)) return;
+  ctx.effectValue = 0;
+  ctx.calcTmp = 0;
   //ステアップALLで纏める: count the stat-up traits and how many of them repeat
   // the same multiplier, so a full set can be collapsed to one icon below.
   for (var traitScanIndex = 0; traitScanIndex <= 7; traitScanIndex++) {
-    var statTrait = item.traits[traitScanIndex];
+    var statTrait = ctx.item.traits[traitScanIndex];
     if(statTrait && statTrait.code == 21){
-      statUpCount += 1;
-      if(effectValue == statTrait.value){
-        var effectValue = statTrait.value;
-        calcTmp += 1;
+      ctx.statUpCount += 1;
+      if(ctx.effectValue == statTrait.value){
+        ctx.effectValue = statTrait.value;
+        ctx.calcTmp += 1;
       };
     };
   };
-  if(statUpCount == 5 && item.traits[4]){
-    effectText += allStatUpText(item.traits[4].value, `\\I[658]+`, `\\I[674]-`, calcTmp >= 2);
+  if(ctx.statUpCount == 5 && ctx.item.traits[4]){
+    ctx.effectText += allStatUpText(ctx.item.traits[4].value, `\\I[658]+`, `\\I[674]-`, ctx.calcTmp >= 2);
   };
-  if(statUpCount == 8){
-    effectText += allStatUpText(item.traits[7].value, `\\I[659]+`, `\\I[675]-`, calcTmp >= 2);
+  if(ctx.statUpCount == 8){
+    ctx.effectText += allStatUpText(ctx.item.traits[7].value, `\\I[659]+`, `\\I[675]-`, ctx.calcTmp >= 2);
   };
 
   //物理魔法ダメージカット: count the physical and magical damage-cut traits, but
   // only when they carry the same multiplier (a mismatched pair is shown
-  // individually by the code-23 branch further down).
+}
+
+function describeDamageCutSummary(ctx) {
+  if (!isTraitDatabaseType(ctx.databaseTypeId)) return;
   for (var traitScanIndex = 0; traitScanIndex <= 1; traitScanIndex++) {
-    var cutTrait = item.traits[traitScanIndex];
+    var cutTrait = ctx.item.traits[traitScanIndex];
     if(cutTrait && cutTrait.code == 23 && (cutTrait.dataId == 6 || cutTrait.dataId == 7)){
-      if(damageCutIsFirst == 0){
-        var damageCutRef = cutTrait.value;
+      if(ctx.damageCutIsFirst == 0){
+        ctx.damageCutRef = cutTrait.value;
       };
-      if(damageCutIsFirst == 0 || damageCutRef == cutTrait.value){
-        damageCutCount += 1;
+      if(ctx.damageCutIsFirst == 0 || ctx.damageCutRef == cutTrait.value){
+        ctx.damageCutCount += 1;
       };
-      damageCutIsFirst += 1;
+      ctx.damageCutIsFirst += 1;
     };
   };
 
-  if(damageCutCount == 2){
-    effectText += allStatUpText(item.traits[1].value, `\\I[654]\\I[655]-`, `\\I[638]\\I[639]+`, false);
+  if(ctx.damageCutCount == 2){
+    ctx.effectText += allStatUpText(ctx.item.traits[1].value, `\\I[654]\\I[655]-`, `\\I[638]\\I[639]+`, false);
   };
+}
 
-  for (var traitIndex = 0; traitIndex <= 19; traitIndex++) {
-    var trait = item.traits[traitIndex];
-    if(trait){
-      // Every branch below used to locate its target id by looping the whole id
-      // range and comparing `trait.dataId == traitDataId`. Such a loop matches at
-      // most once, so reading the id and range-checking it is the same test with
-      // no loop and one nesting level less.
-      var traitDataId = trait.dataId;
-      var traitValue = trait.value;
-
-      if(trait.code == 31){
-        if(traitDataId >= 1 && traitDataId <= $dataSystem.elements.length-1){
-          if(!itemMeta['EnemyState']){
-            if(SPECIAL_ATTACK_ELEMENT_IDS.indexOf(traitDataId) >= 0){
-              var colorTaggeredText = colorTaggedText(colorCode, `特攻属性付与`);
-              effectText += `${colorTaggeredText}${elementLabel(traitDataId)} `;
-            } else {
-              var colorTaggeredText = colorTaggedText(colorCode, `攻撃属性付与`);
-              effectText += `${colorTaggeredText}${elementLabel(traitDataId)}\\C[${colorCode}] `;
-            };
-          };
-        };
-      };
-
-      if(trait.code == 11){
-        if(traitDataId >= 1 && traitDataId <= $dataSystem.elements.length-1){
-          // Read the descriptor once: each call allocates.
-          const elementIcon = amygame_elementIcon(traitDataId);
-          if(elementIcon[0] >= 1){
-            // A handful of element ids carry a literal label instead of an icon.
-            var fragText = `${elementIcon[1]}`;
-          } else {
-            // Element 11 is scaled by 10 rather than 100, so a "10% resist" is
-            // written as 1 in the database.
-            var effectValue = Math.round(Math.abs(traitValue - 1) * (traitDataId == 11 ? 10 : 100));
-			var pm = traitValue >= 1 ? `+` : `-`;
-			var pmName = traitValue >= 1 ? `耐性-` : `耐性+`;
-			var pmMsg = RESIST_SPECIAL_ELEMENT_IDS.indexOf(traitDataId) >= 0 ? pm : pmName;
-            var fragText = `${elementResistIcon(elementIcon)}(${pmMsg})`;
-          };
-          // Element ids 35/37/38/41 are never listed, and 41-80 are enemy-only:
-          // the latter are hidden altogether when the page is a state page.
-          if(RESIST_EXCLUDED_ELEMENT_IDS.indexOf(traitDataId) < 0
-             && !(itemMeta['EnemyState'] && traitDataId >= 41 && traitDataId <= 80)){
-            effectText += `${fragText}${effectValue}% `;
-          };
-        };
-      };
-
-      if(trait.code == 12){
-        if(traitDataId >= 0 && traitDataId <= 7){
-          if(traitValue >= 1){
-            var effectValue = Math.round((traitValue - 1) * 100);
-            var colorTaggeredText = colorTaggedText(1, `耐性-`);
-            var fragText = `${colorTaggeredText}\x1bI[${traitDataId + 48}]`;
-          } else {
-            var effectValue = Math.round((1 - traitValue) * 100);
-            var colorTaggeredText = colorTaggedText(colorCode, `耐性+`);
-            var fragText = `${colorTaggeredText}\x1bI[${traitDataId + 48}]`;
-          };
-          effectText += `${fragText}${effectValue}% `;
-        };
-      };
-
-      if(trait.code == 13){
-        if(traitDataId >= 1 && traitDataId <= $dataStates.length-1){
-          var effectValue = Math.round(Math.abs(traitValue - 1) * 100);
-          var resistColor = traitValue >= 1 ? 1 : colorCode;
-          var colorTaggeredText = colorTaggedText(resistColor, traitValue >= 1 ? `耐性-` : `耐性+`);
-          effectText += `\\C[0]${colorTaggeredText}${stateIconText(traitDataId)}${effectValue}% `;
-        };
-      };
-
-      if(trait.code == 14){
-        if(traitDataId >= 1 && traitDataId <= $dataStates.length-1){
-          var colorTaggeredText = colorTaggedText(colorCode, `無効化`);
-          effectText += `${colorTaggeredText}${stateIconText(traitDataId)} `;
-        };
-      };
-
-      // Stat-up traits that are not part of a full five/eight-stat run.
-      if((traitIndex > statUpCount || statUpCount <= 4) && trait.code == 21){
-        if(traitDataId >= 0 && traitDataId <= 7){
-          effectText += allStatUpText(traitValue, `\x1bI[${traitDataId + 32}]+`, `\x1bI[${traitDataId + 48}]-`, false);
-        };
-      };
-
-      if(trait.code == 22){
-        if(traitDataId >= 0 && traitDataId <= 9){
-          var xparamIcons = XPARAM_ICONS[traitDataId] || PARAM_ICON_DEFAULT;
-          if(traitValue >= 0.01){
-            effectText += `\x1bI[${xparamIcons[1]}]+${Math.round(traitValue * 100)}% `;
-          } else {
-            effectText += `\x1bI[${xparamIcons[2]}]${Math.round(traitValue * 100)}% `;
-          };
-        };
-      };
-
-      // A matched physical+magical damage-cut pair was already summarised above.
-      if(damageCutCount <= 1 && trait.code == 23){
-        if(traitDataId >= 0 && traitDataId <= 9){
-          var sparamIcons = SPARAM_ICONS[traitDataId] || PARAM_ICON_DEFAULT;
-          var negativeIsGood = SPARAM_ICONS_NEGATIVE_IS_GOOD.indexOf(traitDataId) >= 0;
-          var isUp = (traitValue >= 1) !== negativeIsGood;
-		  const pm = isUp ? `+` : `-`;
-          effectText += `\x1bI[${isUp ? sparamIcons[1] : sparamIcons[2]}]${pm}${Math.round(Math.abs(traitValue - 1) * 100)}% `;
-        };
-      };
-
-      if(trait.code == 32){ //31は先頭で実行済み。
-        if(traitDataId >= 1 && traitDataId <= $dataStates.length-1){
-          var colorTaggeredText = colorTaggedText(colorCode, `ステート付与`);
-          effectText += `${colorTaggeredText}${stateIconText(traitDataId)}${Math.round(traitValue * 100)}% `;
-        };
-      };
-
-      if(trait.code == 33){
-        if(traitDataId == 0){
-          var colorTaggeredText = colorTaggedText(colorCode, `AttackSpeed+`);
-          effectText += `${colorTaggeredText}${Math.round(traitValue)} `;
-        };
-      };
-
-      if(trait.code == 41){
-        if(traitDataId >= 1 && traitDataId <= $dataSystem.skillTypes.length-1){
-          var colorTaggeredText = colorTaggedText(colorCode, `使用可能`);
-          effectText += `${colorTaggeredText}<${$dataSystem.skillTypes[traitDataId]}> `;
-        };
-      };
-
-      if(trait.code == 42){
-        if(traitDataId >= 1 && traitDataId <= $dataSystem.skillTypes.length-1){
-          effectText += `\\I[626]<${$dataSystem.skillTypes[traitDataId]}> `;
-        };
-      };
-
-      if(trait.code == 43){
-        if(traitDataId >= 1 && traitDataId <= $dataSkills.length-1){
-          var skillRef = `<\x1bSIN[${traitDataId}]>`;
-          if(databaseTypeId == 1 && $dataSkills[traitDataId].stypeId == BURST_SKILL_TYPE_ID){
-            var colorTaggeredText = colorTaggedText(colorCode, `Burst`);
-            effectText += `${colorTaggeredText}${skillRef} `;
-          } else {
-            var colorTaggeredText = colorTaggedText(colorCode, `使用可能`);
-            effectText += `${colorTaggeredText}${skillRef} `;
-          };
-        };
-      };
-
-      if(trait.code == 44){
-        if(traitDataId >= 1 && traitDataId <= $dataSkills.length-1){
-          effectText += `\\I[626]<\x1bSIN[${traitDataId}]> `;
-        };
-      };
-
-      if(tenWeaponCount <= 9 && trait.code == 51){
-        if(traitDataId >= 1 && traitDataId <= $dataSystem.weaponTypes.length-1){
-          var colorTaggeredText = colorTaggedText(colorCode, `武器種`);
-          effectText += `${colorTaggeredText}<${$dataSystem.weaponTypes[traitDataId]}> `;
-        };
-      };
-
-      if(trait.code == 52){
-        if(traitDataId >= 2 && traitDataId <= $dataSystem.armorTypes.length-1){
-          var colorTaggeredText = colorTaggedText(colorCode, `防具種`);
-          effectText += `${colorTaggeredText}<${$dataSystem.armorTypes[traitDataId]}> `;
-        };
-      };
-
-      if(trait.code == 53){
-        if(traitDataId >= 1 && traitDataId <= $dataSystem.equipTypes.length-1){
-          var colorTaggeredText = colorTaggedText(1, `装備固定`);
-          effectText += `${colorTaggeredText}<${$dataSystem.equipTypes[traitDataId]}> `;
-        };
-      };
-
-      if(trait.code == 54){
-        if(traitDataId >= 1 && traitDataId <= $dataSystem.equipTypes.length-1){
-          var colorTaggeredText = colorTaggedText(1, `装備封印`);
-          effectText += `${colorTaggeredText}<${$dataSystem.equipTypes[traitDataId]}> `;
-        };
-      };
-
-      if(trait.code == 61){
-        if(traitDataId == 0){
-          var colorTaggeredText = colorTaggedText(colorCode, `行動回数追加`);
-          effectText += `${colorTaggeredText}${Math.round(traitValue * 100)}% `;
-        };
-      };
-
-    };
-  };
-
-};//ここまで特徴コード。武器防具ステート。スキルはtraitsではなくeffectsなので下で実行
-
-// `<HSkillLearn>`: up to three numbered premise tags, each of four kinds. The
-// original wrote the four kinds out twelve times and tracked "did anything
-// match" with an iconIdxGrant flag that was re-`var`d inside every branch.
-if(itemMeta['HSkillLearn']){
+function describeLearnPremises(ctx) {
+if(ctx.meta['HSkillLearn']){
   const premiseTexts = [];
   for (let premiseIndex = 1; premiseIndex <= 3; premiseIndex++) {
-    const premiseSkill = itemMeta['PremiseSkill' + premiseIndex];
-    const premiseSkillRank = itemMeta['PremiseSkillRank' + premiseIndex];
-    const premiseVariable = itemMeta['PremiseVariable' + premiseIndex];
-    const premiseArrangement = itemMeta['PremiseArrangement' + premiseIndex];
+    const premiseSkill = ctx.meta['PremiseSkill' + premiseIndex];
+    const premiseSkillRank = ctx.meta['PremiseSkillRank' + premiseIndex];
+    const premiseVariable = ctx.meta['PremiseVariable' + premiseIndex];
+    const premiseArrangement = ctx.meta['PremiseArrangement' + premiseIndex];
     if(premiseSkill){
       const learnSuffix = `習得`;//翻訳対象
       premiseTexts.push(`\\C[27]<${$dataSkills[Number(premiseSkill)].name}>\\C[0]${learnSuffix}`);
@@ -670,996 +646,1424 @@ if(itemMeta['HSkillLearn']){
   const noneLabel = `なし`;//翻訳対象
   var coloredNoneLabel = `\\C[27]${noneLabel}\\C[0]`;
   var premiseTextMerged = premiseTexts.join(``);
-  effectText += `[${CONDITION_LABEL}:${premiseTexts.length ? premiseTextMerged : coloredNoneLabel}]`;
+  ctx.effectText += `[${CONDITION_LABEL}:${premiseTexts.length ? premiseTextMerged : coloredNoneLabel}]`;
 };
+}
 
-if(itemMeta['DescriptionWord']){
-  var fragText = `${itemMeta['DescriptionWord']}`;
-    if(databaseTypeId == 3 && item.stypeId == 15){
-      var descWordText = `\\C[27][${fragText}]\\C[0] `;
+function describeDescriptionWord(ctx) {
+if(ctx.meta['DescriptionWord']){
+  ctx.fragText = `${ctx.meta['DescriptionWord']}`;
+    if(ctx.databaseTypeId == 3 && ctx.item.stypeId == 15){
+      ctx.descWordText = `\\C[27][${ctx.fragText}]\\C[0] `;
     } else {
-      var descWordText = `\\C[${colorCode}][${fragText}]\\C[0] `;
+      ctx.descWordText = `\\C[${ctx.colorCode}][${ctx.fragText}]\\C[0] `;
     };
 };//一言が必要なもののみ
+}
 
-if(itemMeta['GunDamage']){
-var effectValue = itemMeta['GunDamage'];
-effectText += `[${FIXED_VALUE_TEXT}:${effectValue}] `;
+function describeFixedDamageTag(ctx) {
+if(ctx.meta['GunDamage']){
+ctx.effectValue = ctx.meta['GunDamage'];
+ctx.effectText += `[${FIXED_VALUE_TEXT}:${ctx.effectValue}] `;
 };//銃武器の固定値
+}
 
-if(databaseTypeId == 3 || databaseTypeId == 0){
+function describeSkillHeaderTags(ctx) {
+  appendAutoEquipBadge(ctx);
+  appendSkillTierBadge(ctx);
 
-    if(EQUIPPED_SKILL_TYPE_IDS.indexOf(item.stypeId) >= 0){
-    if(itemMeta['Unequippable']){
-      var fragText = `<自動>`;
-      if(item.stypeId == 15){var colorCode = 27};
-      headerText += `\\C[${colorCode}]${fragText}\\C[0]`;
-      var colorCode = 2;
-    };
-  };
-  if(itemMeta['Skill Tier']){
-      var effectValue = itemMeta['Skill Tier'].replace(' ','');
-      effectValue = Number(effectValue);
-      if(effectValue >= 1){effectValue = `\x1bI[${Yanfly.Icon.ESTier[effectValue]}]${Yanfly.Param.ESTierName[effectValue]}>`};
-      var fragText = `<装着:${effectValue}`;
-      if(item.stypeId == 15){var colorCode = 27};
-      headerText += `\\C[${colorCode}]${fragText}\\C[0] `;
-      var colorCode = 2;
-  };
-// `occasion` -> the "where can this be used" icon pair. The two blocks below
-// were identical except that the skill database gates it on a battle skill
-// type, so the gate is the only thing left in the condition.
-if(databaseTypeId == 0 || (databaseTypeId == 3 && BATTLE_SKILL_TYPE_IDS.indexOf(item.stypeId) >= 0)){
-  if(!item.occasion || !itemMeta['BattleMapInformation']){
-    var fragText = OCCASION_ICONS[item.occasion] || OCCASION_ICONS[0];
-    headerText += `\\C[${colorCode}]${fragText}\\C[0]`;
-  };
-};
-  if(itemMeta['SaveShare']){
-    headerText += `\\I[15]`;
-  };
+  // `occasion` -> the "where can this be used" icon. Items always show it; skills
+  // only for battle skill types.
+  const showsOccasion = ctx.databaseTypeId == DESCRIPTION_DATABASE_ITEM
+    || (ctx.databaseTypeId == DESCRIPTION_DATABASE_SKILL && BATTLE_SKILL_TYPE_IDS.indexOf(ctx.item.stypeId) >= 0);
+  if (showsOccasion && (!ctx.item.occasion || !ctx.meta['BattleMapInformation'])) {
+    ctx.fragText = OCCASION_ICONS[ctx.item.occasion] || OCCASION_ICONS[0];
+    ctx.headerText += colorTaggedText(ctx.colorCode, ctx.fragText);
+  }
+  if (ctx.meta['SaveShare']) ctx.headerText += `\\I[15]`;
+  if (ctx.meta['MCharacterLearn']) ctx.headerText += `\\I[14]`;
 
-  if(itemMeta['MCharacterLearn']){
-    headerText += `\\I[14]`;
-  };
+  appendTurnActionBadge(ctx);
+  appendScopeLabel(ctx);
+  appendMultipleElements(ctx);
 
-if(databaseTypeId == 3 && TURN_ACTION_SKILL_TYPE_IDS.indexOf(item.stypeId) >= 0 && !itemMeta['Instant']){
-  var colorCode = 13;
-  const turnActionText = `ターン行動`;//翻訳対象
-  headerText += `\\C[${colorCode}]<${turnActionText}>\\C[0] `;
-  var colorCode = 2;
-};
-  if(item.scope >= 1 && BATTLE_SKILL_TYPE_IDS_WITH_SCOPE.indexOf(item.stypeId) >= 0){
-    var fragText = SCOPE_LABELS[item.scope];
-    var colorCode = 14;
-    headerText += `\\C[${colorCode}]<${fragText}>\\C[0] `;
-    var colorCode = 2;
-  };
-
-  if(itemMeta['Multiple Elements']){
-    splitMetaValues(itemMeta['Multiple Elements']).forEach(function (elementId) {
-      skillElementText += colorTaggedText(colorCode, elementLabel(elementId));
-    });
-    headerText += `[属性:${skillElementText}] `;
-  };
-
-if(itemMeta['Custom Cooldown Mastery Formula'] || itemMeta['Custom MP Cost Mastery Formula']  || itemMeta['Mastery Effect']){
-  //var value9 = `RankUpで`;
-  //value11 += `[${value9}]`;
-};
-if(itemMeta['Select Conditions']){
-  const frontGuardOnlyText = `対象前衛のみ`;//翻訳対象
-  headerText += `[\\C[${colorCode}]${frontGuardOnlyText}\\C[0]] `;
-};
-if(itemMeta['SkillLearningClass']){
-  var effectValue = `${$dataSystem.skillTypes[item.stypeId]}`;
-  var fragText = Number(itemMeta['SkillLearningClass']);
-  if(fragText != 100){
-    const learnNameCode = `\x1bJ[${fragText}]`;//名前コード。翻訳対象外
-    const learnText = `習得`;//翻訳対象
-    effectText += `[\\C[${colorCode}]${effectValue}\\C[0]] [\\C[${colorCode}]${learnNameCode}\\C[0]${learnText}] `;
-  };
-};
-if(itemMeta['Limit Uses']){
-  var fragText = Number(itemMeta['Limit Uses']);
-  if(itemMeta['Not Recover All Uses']){//<After Battle Uses Recover: 0>もセット
-    const dailyUsesText = `1日${fragText}回`;//翻訳対象
-    headerText += `[\\C[${colorCode}]${dailyUsesText}\\C[0]] `;
-  } else {
-    const battleUsesText = `戦闘中${fragText}回`;//翻訳対象
-    headerText += `[\\C[${colorCode}]${battleUsesText}\\C[0]] `;
-  };
-};
-if(databaseTypeId == 0){
-  if(item.consumable){
-    //value10 += `[\\C[${value26}]消耗品\\C[0]] `;
-  };
-};
-if(databaseTypeId == 0){
-  if(itemMeta['SeiyokuItem']){
-    var colorCode = 27;
+  // `<Custom Cooldown Mastery Formula>`, `<Custom MP Cost Mastery Formula>` and
+  // `<Mastery Effect>` have no description text (the original had an empty block
+  // with two commented-out lines here).
+  if (ctx.meta['Select Conditions']) {
+    const frontGuardOnlyText = `対象前衛のみ`;//翻訳対象
+    ctx.headerText += `[${colorTaggedText(ctx.colorCode, frontGuardOnlyText)}] `;
+  }
+  appendSkillLearningClassTag(ctx);
+  appendLimitUsesTag(ctx);
+  if (ctx.databaseTypeId == DESCRIPTION_DATABASE_ITEM && ctx.meta['SeiyokuItem']) {
     const lustItemText = `性欲品`;//翻訳対象
-    effectText += `[\\C[${colorCode}]${lustItemText}\\C[0]] `;
-  };
-};
-var colorCode = 2;
-if(itemMeta['DamageFormula2']){
-  var metaValues = splitMetaValues(itemMeta['DamageFormula2']);
-  var formulaId = Number(metaValues[0]);
+    ctx.effectText += `[${colorTaggedText(LUST_COLOR_CODE, lustItemText)}] `;
+  }
+}
+
+// `<Unequippable>` on an equippable skill type: the `<自動>` badge in the header.
+function appendAutoEquipBadge(ctx) {
+  if (!ctx.meta['Unequippable']) return;
+  if (EQUIPPED_SKILL_TYPE_IDS.indexOf(ctx.item.stypeId) < 0) return;
+  ctx.fragText = `<自動>`;
+  const autoEquipColorCode = ctx.item.stypeId == AUTO_EQUIP_LUST_SKILL_TYPE_ID ? LUST_COLOR_CODE : ctx.colorCode;
+  ctx.headerText += colorTaggedText(autoEquipColorCode, ctx.fragText);
+}
+
+// `<Skill Tier>`: equipped enchant tier, i.e. an icon plus its tier name.
+function appendSkillTierBadge(ctx) {
+  if (!ctx.meta['Skill Tier']) return;
+  ctx.effectValue = Number(ctx.meta['Skill Tier'].replace(' ', ''));
+  if (ctx.effectValue >= 1) {
+    const tierIcon = `\x1bI[${Yanfly.Icon.ESTier[ctx.effectValue]}]`;
+    ctx.effectValue = `${tierIcon}${Yanfly.Param.ESTierName[ctx.effectValue]}>`;
+  }
+  ctx.fragText = `<装着:${ctx.effectValue}`;
+  const equipColorCode = ctx.item.stypeId == AUTO_EQUIP_LUST_SKILL_TYPE_ID ? LUST_COLOR_CODE : ctx.colorCode;
+  ctx.headerText += `${colorTaggedText(equipColorCode, ctx.fragText)} `;
+}
+
+// `<scope>` for the skill types that announce their target.
+function appendScopeLabel(ctx) {
+  if (ctx.item.scope < 1) return;
+  if (BATTLE_SKILL_TYPE_IDS_WITH_SCOPE.indexOf(ctx.item.stypeId) < 0) return;
+  ctx.fragText = SCOPE_LABELS[ctx.item.scope];
+  const scopeLabelText = `<${ctx.fragText}>`;
+  ctx.headerText += `${colorTaggedText(SCOPE_COLOR_CODE, scopeLabelText)} `;
+}
+
+function appendTurnActionBadge(ctx) {
+  if (ctx.databaseTypeId != DESCRIPTION_DATABASE_SKILL) return;
+  if (TURN_ACTION_SKILL_TYPE_IDS.indexOf(ctx.item.stypeId) < 0) return;
+  if (ctx.meta['Instant']) return;
+  const turnActionText = `ターン行動`;//翻訳対象
+  ctx.headerText += `${colorTaggedText(TURN_ACTION_COLOR_CODE, `<${turnActionText}>`)} `;
+}
+
+// `<Multiple Elements>`: one element label per id, kept in `skillElementText` so
+// later rows can reuse the list.
+function appendMultipleElements(ctx) {
+  if (!ctx.meta['Multiple Elements']) return;
+  const elementIds = splitMetaValues(ctx.meta['Multiple Elements']);
+  for (const elementId of elementIds) {
+    ctx.skillElementText += colorTaggedText(ctx.colorCode, elementLabel(elementId));
+  }
+  const elementListLabel = `属性:`;//翻訳対象
+  ctx.headerText += `[${elementListLabel}${ctx.skillElementText}] `;
+}
+
+// `<SkillLearningClass>`: which class learns the skill (a name code, i.e. other
+// game text, so it stays outside the translatable string).
+function appendSkillLearningClassTag(ctx) {
+  if (!ctx.meta['SkillLearningClass']) return;
+  ctx.effectValue = `${$dataSystem.skillTypes[ctx.item.stypeId]}`;
+  ctx.fragText = Number(ctx.meta['SkillLearningClass']);
+  if (ctx.fragText == 100) return;
+  const learnNameCode = `\x1bJ[${ctx.fragText}]`;//名前コード。翻訳対象外
+  const learnText = `習得`;//翻訳対象
+  ctx.effectText += `[${colorTaggedText(ctx.colorCode, ctx.effectValue)}] [${colorTaggedText(ctx.colorCode, learnNameCode)}${learnText}] `;
+}
+
+// `<Limit Uses>`: per day, or per battle when `<Not Recover All Uses>` is set.
+function appendLimitUsesTag(ctx) {
+  if (!ctx.meta['Limit Uses']) return;
+  ctx.fragText = Number(ctx.meta['Limit Uses']);
+  const usesText = ctx.meta['Not Recover All Uses'] // <After Battle Uses Recover: 0> もセット
+    ? `1日${ctx.fragText}回`//翻訳対象
+    : `戦闘中${ctx.fragText}回`;//翻訳対象
+  ctx.headerText += `[${colorTaggedText(ctx.colorCode, usesText)}] `;
+}
+
+function describeDamageFormula(ctx) {
+ctx.colorCode = 2;
+if(ctx.meta['DamageFormula2']){
+  ctx.metaValues = splitMetaValues(ctx.meta['DamageFormula2']);
+  var formulaId = Number(ctx.metaValues[0]);
   // 8, 9, 10 and 31 are the ids that are not a fixed blurb, so they are taken
   // first and the table covers the remaining twenty-three.
-  if(formulaId == 8){var fragText = recoveryEffectMsg(36, 36);};
-  if(formulaId == 9){var fragText = recoveryEffectMsg(34, 35);};
+  if(formulaId == 8){ctx.fragText = recoveryEffectMsg(36, 36);};
+  if(formulaId == 9){ctx.fragText = recoveryEffectMsg(34, 35);};
   if(formulaId == 10){
-    var absorbNum = metaValues[1];var dmgNum = metaValues[2];
+    var absorbNum = ctx.metaValues[1];var dmgNum = ctx.metaValues[2];
     var msg = `現在HPの${absorbNum}%消費して×${dmgNum}倍の与ダメ`;
-    var fragText = `[\\C[${colorCode}]${msg}\\C[0]`;
+    ctx.fragText = `[\\C[${ctx.colorCode}]${msg}\\C[0]`;
   };
-  // Id 31 (skill 373 "ルビフリップ") has no blurb. The original let it fall
-  // through and then appended to `fragText` regardless, which is a
-  // function-scoped `var`: it still held whatever an earlier branch of the same
-  // iteration had assigned, so the note ended in a leftover fragment from an
-  // unrelated section. The guard makes "no blurb" mean "append nothing". On the
-  // current database it is a no-op (the leftover happened to be a full
-  // fragment), but it removes the dependency on evaluation order.
+  // Id 31 (skill 373 \"ルビフリップ\") has no blurb, so no branch assigns here and
+  // `fragText` still holds whatever an earlier row of this run left behind — the
+  // original behaves the same way, and the note it produces is kept as is. The
+  // guard only makes sure an id that is not in the table cannot assign a value.
   if(DAMAGE_FORMULA_TEXT[formulaId]){
-    var fragText = `[\\C[${colorCode}]${DAMAGE_FORMULA_TEXT[formulaId]}\\C[0]`;
+    ctx.fragText = `[\\C[${ctx.colorCode}]${DAMAGE_FORMULA_TEXT[formulaId]}\\C[0]`;
   };
-  if(fragText){
-    if(metaValues[2] >= 0){fragText += ` \\C[${colorCode}]×${metaValues[2]}\\C[0]] `};
-    if(metaValues[1] >= 1){fragText += `\\I[666]:${metaValues[1]}`};
-    if(databaseTypeId == 3){
-      if(item.stypeId == 12){
-        if(itemMeta['ユニーク']){//武器を特定できないため無効状態
-          fragText += `+強化段階`;
+  if(ctx.fragText){
+    if(ctx.metaValues[2] >= 0){ctx.fragText += ` \\C[${ctx.colorCode}]×${ctx.metaValues[2]}\\C[0]] `};
+    if(ctx.metaValues[1] >= 1){ctx.fragText += `\\I[666]:${ctx.metaValues[1]}`};
+    if(ctx.databaseTypeId == 3){
+      if(ctx.item.stypeId == 12){
+        if(ctx.meta['ユニーク']){//武器を特定できないため無効状態
+          ctx.fragText += `+強化段階`;
         } else {
-          fragText += `+装備レア度`;
+          ctx.fragText += `+装備レア度`;
         };
       };
     };
-    suffixText += `${fragText} `;//元文章の後に追記される。
+    ctx.suffixText += `${ctx.fragText} `;//元文章の後に追記される。
   };
-  if(itemMeta['LevelFluctuation']){
-    var levelFluctuation = itemMeta['LevelFluctuation'];
-    suffixText += `[${levelFluctuation}ﾚﾍﾞﾙ毎に威力+]`;
+  if(ctx.meta['LevelFluctuation']){
+    var levelFluctuation = ctx.meta['LevelFluctuation'];
+    ctx.suffixText += `[${levelFluctuation}ﾚﾍﾞﾙ毎に威力+]`;
   };
 };
+}
 
-if(item.damage.type >= 1){
-  if(itemMeta['PotionUsePoint']){
-    if(item.damage.type == 3){var fragText = 'HP'};//HP回復
-    if(item.damage.type == 4){var fragText = 'MP'};//MP回復
-      if(Number(itemMeta['PotionUsePoint']) >= 2){
-        var effectValue = Number(itemMeta['PotionUsePoint']);
-      } else {
-        var effectValue = `全`;
-      };
-      const recoveryText = `回復`;//翻訳対象
-      effectText += `[\\C[${colorCode}]${fragText}\\C[3]${effectValue}\\C[0]${recoveryText}]`;
-  };
-};
-if(itemMeta['SkillStateAddRemove']){
-  var fragText = Number(itemMeta['SkillStateAddRemove']);
-  const stateNameCode = `\x1bSIM[${fragText}]`;//ステート名コード。翻訳対象外
+// `<PotionUsePoint>`: the restored resource comes from the damage element of the
+// item, so one table replaces the two equality checks.
+const POTION_RECOVERY_RESOURCES = { 3: `HP`, 4: `MP` };//HP回復 / MP回復
+
+function describePotionRecoveryTag(ctx) {
+  const damageType = ctx.item.damage ? ctx.item.damage.type : 0;
+  if (damageType < 1) return;
+  if (!ctx.meta['PotionUsePoint']) return;
+
+  // A damage type that is not a healing element used to print whatever resource
+  // name the previous entry had left in `fragText`.
+  ctx.fragText = POTION_RECOVERY_RESOURCES[damageType];
+  if (!ctx.fragText) return;
+  // Anything below 2 means "all of it".
+  const usePoint = Number(ctx.meta['PotionUsePoint']);
+  ctx.effectValue = usePoint >= 2 ? usePoint : `全`;
+  const recoveryText = `回復`;//翻訳対象
+  // No colorTaggedText here: the colour of the resource name has to run into the
+  // `\\C[3]` amount, so the two codes are not a complete wrap.
+  ctx.effectText += `[\\C[${ctx.colorCode}]${ctx.fragText}\\C[3]${ctx.effectValue}\\C[0]${recoveryText}]`;
+}
+
+function describeSkillRowTags(ctx) {
+if(ctx.meta['SkillStateAddRemove']){
+  ctx.fragText = Number(ctx.meta['SkillStateAddRemove']);
+  const stateNameCode = `\x1bSIM[${ctx.fragText}]`;//ステート名コード。翻訳対象外
   const grantRemoveText = `付与/解除`;//翻訳対象
-  effectText += `[\\C[${colorCode}]${stateNameCode}\\C[0]${grantRemoveText}]`;//
+  ctx.effectText += `[\\C[${ctx.colorCode}]${stateNameCode}\\C[0]${grantRemoveText}]`;//
 };
-if(itemMeta['PotionResist']){
-  var fragText = Number(itemMeta['PotionResist']);
-  effectText += `[\\I[624]+${fragText}%]`;
+if(ctx.meta['PotionResist']){
+  ctx.fragText = Number(ctx.meta['PotionResist']);
+  ctx.effectText += `[\\I[624]+${ctx.fragText}%]`;
 };
-if(item.speed != 0){
-  var fragText = item.speed;
+if(ctx.item.speed != 0){
+  ctx.fragText = ctx.item.speed;
   const speedLabel = `Speed`;//翻訳対象
-  effectText += `\\C[${colorCode}]${speedLabel}\\C[0]:${fragText} `;
+  ctx.effectText += `\\C[${ctx.colorCode}]${speedLabel}\\C[0]:${ctx.fragText} `;
 };
-if(itemMeta['Repeat']){
-  var fragText = Number(itemMeta['Repeat']);
-  effectText += `\\I[668]:${fragText} `;
+if(ctx.meta['Repeat']){
+  ctx.fragText = Number(ctx.meta['Repeat']);
+  ctx.effectText += `\\I[668]:${ctx.fragText} `;
 };
-if(itemMeta['Warmup']){
-  var fragText = Number(itemMeta['Warmup']);
-  effectText += `\\I[662]:${fragText} `;
+if(ctx.meta['Warmup']){
+  ctx.fragText = Number(ctx.meta['Warmup']);
+  ctx.effectText += `\\I[662]:${ctx.fragText} `;
 };
-if(itemMeta['Cooldown']){
-  var fragText = Number(itemMeta['Cooldown']);
-  effectText += `\\I[663]:${fragText} `;
+if(ctx.meta['Cooldown']){
+  ctx.fragText = Number(ctx.meta['Cooldown']);
+  ctx.effectText += `\\I[663]:${ctx.fragText} `;
 };
-if(itemMeta['RankUpPoint']){
-  var fragText = Number(itemMeta['RankUpPoint']);
-  if(itemMeta['Max Mastery Level']){
-    if(Number(itemMeta['Max Mastery Level']) == 1){
-      effectText += `\\I[664]:${fragText} `;
+if(ctx.meta['RankUpPoint']){
+  ctx.fragText = Number(ctx.meta['RankUpPoint']);
+  if(ctx.meta['Max Mastery Level']){
+    if(Number(ctx.meta['Max Mastery Level']) == 1){
+      ctx.effectText += `\\I[664]:${ctx.fragText} `;
     } else {
-      effectText += `\\I[664]:${fragText}*${RANK_LABEL} `;
+      ctx.effectText += `\\I[664]:${ctx.fragText}*${RANK_LABEL} `;
     };
   };
 };
 //if(itemMeta['Max Mastery Level']){
 //  value10 += `\\I[664]:Rank*Exp `;
 //};//冗長なので使用しない。
-if(itemMeta['Max Mastery Level']){
-  var fragText = Number(itemMeta['Max Mastery Level']);
-  effectText += `\\I[665]:${fragText} `;
+if(ctx.meta['Max Mastery Level']){
+  ctx.fragText = Number(ctx.meta['Max Mastery Level']);
+  ctx.effectText += `\\I[665]:${ctx.fragText} `;
 };
-if(item.tpGain != 0){
-  var fragText = item.tpGain;
-  effectText += `\\C[${colorCode}]${TP_LABEL}\\C[0]:${fragText}\\C[10]↑\\C[0] `;
+if(ctx.item.tpGain != 0){
+  ctx.fragText = ctx.item.tpGain;
+  ctx.effectText += `\\C[${ctx.colorCode}]${TP_LABEL}\\C[0]:${ctx.fragText}\\C[10]↑\\C[0] `;
 };
+}
 
-var additionalSetTextByTarget = [
+function describeAdditionalSets(ctx) {
+ctx.additionalSetTextByTarget = [
   0,
-  `[\\C[${colorCode}]${ADDITIONAL_SET_TARGET_LABELS[1]}`,
-  `[\\C[${colorCode}]${ADDITIONAL_SET_TARGET_LABELS[2]}`,
-  `[\\C[${colorCode}]${ADDITIONAL_SET_TARGET_LABELS[3]}`,
-  `[\\C[${colorCode}]${ADDITIONAL_SET_TARGET_LABELS[4]}`,
+  `[\\C[${ctx.colorCode}]${ADDITIONAL_SET_TARGET_LABELS[1]}`,
+  `[\\C[${ctx.colorCode}]${ADDITIONAL_SET_TARGET_LABELS[2]}`,
+  `[\\C[${ctx.colorCode}]${ADDITIONAL_SET_TARGET_LABELS[3]}`,
+  `[\\C[${ctx.colorCode}]${ADDITIONAL_SET_TARGET_LABELS[4]}`,
 ];
-var additionalSetCountByTarget = [0,0,0,0,0];
+ctx.additionalSetCountByTarget = [0,0,0,0,0];
 // Nine `<additionalSetN>` slots, each `target,flag,stacks,stateId`. The state
 // icon ladder and the four-way "which target" dispatch were written out twice
 // per slot; the icon is now a helper and the target is just an index.
 for (let additionalSetSlot = 1; additionalSetSlot <= 9; additionalSetSlot++) {
-  const additionalSetMeta = itemMeta['additionalSet' + additionalSetSlot];
+  const additionalSetMeta = ctx.meta['additionalSet' + additionalSetSlot];
   if(!additionalSetMeta){ continue; };
   const additionalSetValues = splitMetaValues(additionalSetMeta);
   const targetIndex = Number(additionalSetValues[0]);
   if(targetIndex < 1 || targetIndex > 4){ continue; };
-  additionalSetCountByTarget[targetIndex] += 1;
+  ctx.additionalSetCountByTarget[targetIndex] += 1;
   if(Number(additionalSetValues[1]) == 1){
-    additionalSetTextByTarget[targetIndex] +=
+    ctx.additionalSetTextByTarget[targetIndex] +=
       additionalSetStateIcon(Number(additionalSetValues[3]), Number(additionalSetValues[2]));
   };
 };
 // A target whose slots all lacked the flag still bumps its count, so the line
 // below prints an empty "付与" for it — that is the original behaviour.
 for (let targetIndex = 1; targetIndex <= 4; targetIndex++) {
-  if(additionalSetCountByTarget[targetIndex] >= 1){
+  if(ctx.additionalSetCountByTarget[targetIndex] >= 1){
     const additionalSetGrantText = `付与`;//翻訳対象
-    effectText += `${additionalSetTextByTarget[targetIndex]}${additionalSetGrantText}\\C[0]] `;
+    ctx.effectText += `${ctx.additionalSetTextByTarget[targetIndex]}${additionalSetGrantText}\\C[0]] `;
   };
 };
+}
 
-  // Effect codes 11/12/13 are the HP/MP/TP recovery rows and 21/22 the state
-  // add/remove rows. Each was written out twice (percentage field plus flat
-  // field) or once per state id by scanning the whole state list; only one
-  // `code` can match per effect, so this is a single dispatch.
+// Effect codes 11/12/13 are the HP/MP/TP recovery rows and 21/22 the state
+// add/remove rows. Each was written out twice (percentage field plus flat field)
+// or once per state id by scanning the whole state list; only one `code` can match
+// per effect, so this is a single dispatch.
+const EFFECT_CODE_STATE_ADD = 21;
+const EFFECT_CODE_STATE_REMOVE = 22;
+const EFFECT_CODE_TP_RECOVER = 13;
+const BATTLE_STATE_ID_RANGE = { first: BATTLE_STATE_ICON_FIRST_ID, last: BATTLE_STATE_ICON_FIRST_ID + BATTLE_STATE_ICONS.length - 1 };
+
+function describeEffectRows(ctx) {
+  const effects = ctx.item.effects;
+  if (!effects) return;
   for (let effectIndex = 0; effectIndex <= 19; effectIndex++) {
-    const effect = item.effects[effectIndex];
-    if(!effect){ continue; };
-    const effectIcon = RECOVERY_EFFECT_ICONS[effect.code];
+    const effect = effects[effectIndex];
+    if (!effect) continue;
+    switch (effect.code) {
+      case EFFECT_CODE_STATE_ADD: describeStateAddEffect(ctx, effect); break;
+      case EFFECT_CODE_STATE_REMOVE: describeStateRemoveEffect(ctx, effect); break;
+      default: describeRecoveryEffect(ctx, effect); break;
+    }
+  }
+}
 
-    if(effectIcon && effect.dataId == 0){
-      const percentValue = Math.round(effect.value1 * (effect.code == 13 ? 1 : 100));
-      if(percentValue != 0){
-        effectText += recoveryEffectText(effectIcon, percentValue, `%`,
-          effect.code == 13 ? (percentValue >= 1 ? `up` : `down`) : ``);
-      };
-      // TP (13) has no flat-value field.
-      if(effect.code != 13 && effect.value2 != 0){
-        effectText += recoveryEffectText(effectIcon, effect.value2, ``, ``);
-      };
-    };
+// 11/12/13: `[C[n]\I[icon]:value%↑[C[0]]` for the percentage field and
+// `[C[n]\I[icon]:value[C[0]]` for the flat one. TP has no flat field.
+function describeRecoveryEffect(ctx, effect) {
+  const effectIcon = RECOVERY_EFFECT_ICONS[effect.code];
+  if (!effectIcon || effect.dataId != 0) return;
 
-    if(effect.code == 21 || effect.code == 22){
-      const stateId = effect.dataId;
-      if(stateId < 1 || stateId > $dataStates.length-1){ continue; };
-      const state = $dataStates[stateId];
-      const stateIcon = state.iconIndex >= 1 ? `\x1bI[${state.iconIndex}]` : `${state.name}`;
+  const isTp = effect.code == EFFECT_CODE_TP_RECOVER;
+  const percentValue = Math.round(effect.value1 * (isTp ? 1 : 100));
+  if (percentValue != 0) {
+    const direction = isTp ? (percentValue >= 1 ? `up` : `down`) : ``;
+    ctx.effectText += recoveryEffectText(effectIcon, percentValue, `%`, direction);
+  }
+  if (!isTp && effect.value2 != 0) {
+    ctx.effectText += recoveryEffectText(effectIcon, effect.value2, ``, ``);
+  }
+}
 
-      if(effect.code == 22){
-        const removePercent = Math.round(effect.value1 * 100);
-        const removalLabel = `解除`;//翻訳対象
-        effectText += removePercent == 100
-          ? `[\\C[3]${removalLabel}:\\C[0]${stateIcon}]`
-          : `[\\C[3]${removalLabel}:\\C[0]${stateIcon}${removePercent}%]`;
-        continue;
-      };
+// `<stateIcon>`: the state icon code, or the state name when it has no icon.
+function effectStateLabel(state) {
+  return state.iconIndex >= 1 ? `\x1bI[${state.iconIndex}]` : `${state.name}`;
+}
 
-      // 21: a repeat of the previous state collapses to a bare `+`.
-      if(stateId == prevStateCode){
-        consecStateCount += 1;
-        effectText += `\\C[${colorCode}]+\\C[0]`;
-        continue;
-      };
-      prevStateCode = stateId;
-      consecStateCount = 0;
-      // Battle states (206-217) draw from their own icon sheet and carry no
-      // turn counter.
-      const isBattleState = stateId >= 206 && stateId <= 217;
-      let turnText = ``;
-      if(!isBattleState && state.autoRemovalTiming >= 1){
-        turnText = state.minTurns == state.maxTurns
-          ? ` ${state.minTurns}t`
-          : ` ${state.minTurns}～${state.maxTurns}t`;
-      };
-      const grantPercent = Math.round(effect.value1 * 100);
-      const grantLabel = `付与`;//翻訳対象
-      effectText += grantPercent == 100
-        ? `[\\C[${colorCode}]${grantLabel}:\\C[0]${stateIconText(stateId)}${turnText}]`
-        : `[\\C[${colorCode}]${grantLabel}:\\C[0]${stateIconText(stateId)}${grantPercent}%${turnText}]`;
-    };
-  };
+function effectState(stateId) {
+  if (stateId < 1 || stateId > $dataStates.length - 1) return null;
+  return $dataStates[stateId];
+}
 
-};//スキルのみの処理終わり
+// 22: `[C[3]解除:C[0]state]`, with the removal chance when it is not 100%.
+function describeStateRemoveEffect(ctx, effect) {
+  const state = effectState(effect.dataId);
+  if (!state) return;
+  const removePercent = Math.round(effect.value1 * 100);
+  const removalLabel = `解除`;//翻訳対象
+  const removalChanceText = removePercent == 100 ? `` : `${removePercent}%`;
+  ctx.effectText += `[\\C[3]${removalLabel}:\\C[0]${effectStateLabel(state)}${removalChanceText}]`;
+}
 
-if(itemMeta['dispelCount']){
-  var fragText = Number(itemMeta['dispelCount']);
+// 21: a repeat of the previous state collapses to a bare `+`.
+function describeStateAddEffect(ctx, effect) {
+  const state = effectState(effect.dataId);
+  if (!state) return;
+
+  if (effect.dataId == ctx.prevStateCode) {
+    ctx.consecStateCount += 1;
+    ctx.effectText += `\\C[${ctx.colorCode}]+\\C[0]`;
+    return;
+  }
+  ctx.prevStateCode = effect.dataId;
+  ctx.consecStateCount = 0;
+
+  // Battle states draw from their own icon sheet and carry no turn counter.
+  const isBattleState = effect.dataId >= BATTLE_STATE_ID_RANGE.first && effect.dataId <= BATTLE_STATE_ID_RANGE.last;
+  const turnText = !isBattleState && state.autoRemovalTiming >= 1 ? stateTurnText(state) : ``;
+  const grantPercent = Math.round(effect.value1 * 100);
+  const grantLabel = `付与`;//翻訳対象
+  const grantChanceText = grantPercent == 100 ? `` : `${grantPercent}%`;
+  ctx.effectText += `[\\C[${ctx.colorCode}]${grantLabel}:\\C[0]${stateIconText(effect.dataId)}${grantChanceText}${turnText}]`;
+}
+
+function stateTurnText(state) {
+  return state.minTurns == state.maxTurns
+    ? ` ${state.minTurns}t`
+    : ` ${state.minTurns}～${state.maxTurns}t`;
+}
+
+function describeClearCountTags(ctx) {
+if(ctx.meta['dispelCount']){
+  ctx.fragText = Number(ctx.meta['dispelCount']);
   const dispelStateText = `強化状態`;//翻訳対象
   const dispelCountSuffix = `つ`;//翻訳対象
   const dispelActionText = `消去`;//翻訳対象
-  effectText += `[\\C[${colorCode}]${dispelStateText}\\C[3]${fragText}${dispelCountSuffix}\\C[${colorCode}]${dispelActionText}\\C[0]]`;
+  ctx.effectText += `[\\C[${ctx.colorCode}]${dispelStateText}\\C[3]${ctx.fragText}${dispelCountSuffix}\\C[${ctx.colorCode}]${dispelActionText}\\C[0]]`;
 };
-if(itemMeta['abNomalClearCount']){
-  var fragText = Number(itemMeta['abNomalClearCount']);
+if(ctx.meta['abNomalClearCount']){
+  ctx.fragText = Number(ctx.meta['abNomalClearCount']);
   const clearCountSuffix = `つ`;//翻訳対象
   const clearRecoverText = `回復`;//翻訳対象
-  if(itemMeta['StateabNomalOnly']){
-    effectText += `[\\C[${colorCode}]\\I[683]\\C[3]${fragText}${clearCountSuffix}\\C[${colorCode}]${clearRecoverText}\\C[0]]`;
+  if(ctx.meta['StateabNomalOnly']){
+    ctx.effectText += `[\\C[${ctx.colorCode}]\\I[683]\\C[3]${ctx.fragText}${clearCountSuffix}\\C[${ctx.colorCode}]${clearRecoverText}\\C[0]]`;
   } else {
-    effectText += `[\\C[${colorCode}]\\I[683]\\I[684]\\C[3]${fragText}${clearCountSuffix}\\C[${colorCode}]${clearRecoverText}\\C[0]]`;
+    ctx.effectText += `[\\C[${ctx.colorCode}]\\I[683]\\I[684]\\C[3]${ctx.fragText}${clearCountSuffix}\\C[${ctx.colorCode}]${clearRecoverText}\\C[0]]`;
   };
 };
-if(itemMeta['abNomalClearCountPlus']){
+if(ctx.meta['abNomalClearCountPlus']){
   const ailmentRecoveryText = `状態異常回復数+(Magic/300)`;//翻訳対象
-  effectText += `[\\C[${colorCode}]${ailmentRecoveryText}\\C[0]]`;
+  ctx.effectText += `[\\C[${ctx.colorCode}]${ailmentRecoveryText}\\C[0]]`;
 };
-if(itemMeta['dispelCountPlus']){
+if(ctx.meta['dispelCountPlus']){
   const buffRemovalText = `強化解除数+(Magic/300)`;//翻訳対象
-  effectText += `[\\C[${colorCode}]${buffRemovalText}\\C[0]]`;
+  ctx.effectText += `[\\C[${ctx.colorCode}]${buffRemovalText}\\C[0]]`;
 };
+}
 
-if(itemMeta['Passive State'] && !itemMeta['パッシブ隠蔽']){
-  if($dataStates[Number(itemMeta['Passive State'])] && $dataStates[Number(itemMeta['Passive State'])].meta['SpcialState']){
+function describePassiveTags(ctx) {
+if(ctx.meta['Passive State'] && !ctx.meta['パッシブ隠蔽']){
+  if($dataStates[Number(ctx.meta['Passive State'])] && $dataStates[Number(ctx.meta['Passive State'])].meta['SpcialState']){
     const specialEffectGrantText = `特殊効果付与`;//翻訳対象
-    effectText += `\\C[${colorCode}]${specialEffectGrantText}\\C[0]<\x1bSIM[${Number(itemMeta['Passive State'])}]> `;
+    ctx.effectText += `\\C[${ctx.colorCode}]${specialEffectGrantText}\\C[0]<\x1bSIM[${Number(ctx.meta['Passive State'])}]> `;
   } else {
     const passiveGrantText = `付与`;//翻訳対象
-    effectText += `\\C[${colorCode}]${passiveGrantText}\\C[0]<\x1bSIM[${Number(itemMeta['Passive State'])}]> `;
+    ctx.effectText += `\\C[${ctx.colorCode}]${passiveGrantText}\\C[0]<\x1bSIM[${Number(ctx.meta['Passive State'])}]> `;
   };
 };//パッシブステート
 
 //属性威力加算
 for (let elementId = 1; elementId <= $dataSystem.elements.length-1; elementId++) {
-  const amplifyValue = itemMeta['Element Amplify ' + elementId];
+  const amplifyValue = ctx.meta['Element Amplify ' + elementId];
   if(amplifyValue){
-    effectText += `${elementAmplifyLabel(elementId)}${amplifyValue.replace(' ','')} `;
+    ctx.effectText += `${elementAmplifyLabel(elementId)}${amplifyValue.replace(' ','')} `;
   };
 };
+}
 
-if(itemMeta['PassiveElementP']){//<Max Mastery Level: 5>
-  const metaValues = splitMetaValues(itemMeta['PassiveElementP']);
-  const amplifyValue = Number(metaValues[1]);
-  var colorCode = amplifyValue >= 1 ? 10 : 1;
-  const rankPrefix = itemMeta['Max Mastery Level'] ? `Rank*` : ``;
-  effectText += `\\C[${colorCode}]<${elementAmplifyLabel(metaValues[0])}${rankPrefix}${amplifyValue}%\\C[0]>`;
-  var colorCode = 2;
-};
-if(itemMeta['SpecialAttack']){
-  var effectValue = Number(itemMeta['SpecialAttack']);
-  var fragText = `<\x1bSIN[${effectValue}]>`;
-  const attackLabel = `Attack`;//翻訳対象
-  effectText += `\\C[${colorCode}]${attackLabel}\\C[0]${fragText} `;
-};
-if(itemMeta['AddPowerWeapon']){
-  var effectValue = itemMeta['AddPowerWeapon'];
-  effectText += `\\I[666]+${effectValue} `;
-};//スキルのパワーに加算
-if(itemMeta['Critical Multiplier']){
-  var effectValue = itemMeta['Critical Multiplier'].replace(' ','');
-  effectText += `\\I[78]${POWER_LABEL}${effectValue} `;
-};//会心威力
-if(itemMeta['Counter Skills']){
-  var effectValue = itemMeta['Counter Skills'];
+// `<…>` battle rows that read `\\C[16][label]\C[0] ` (optionally label + value).
+const BATTLE_NOTE_ROWS = [
+  { metaKey: 'CertainlyDouble', label: `必ず2連撃以上` },//翻訳対象
+  { metaKey: 'CertainlyTriple', label: `必ず3連撃` },//翻訳対象
+  { metaKey: 'NormalAttackHit', label: `通常攻撃Hit数+`, valueSuffix: `` },//翻訳対象
+  { metaKey: 'AttackAbilityHit', label: `通常/アビリティ攻撃Hit数+`, valueSuffix: `` },//翻訳対象
+  { metaKey: 'BattleAddAttackSet', label: `追撃`, valueSuffix: `%` },//翻訳対象
+  { metaKey: 'Evade Counter', label: `回避後に反撃` },//翻訳対象
+  { metaKey: 'Hit Counter', label: `攻撃受後に反撃` }//翻訳対象
+];
+// Icon-prefixed power rows: `\\I[icon]{label}{value} `.
+const BATTLE_POWER_ROWS = [
+  { metaKey: 'AddPowerWeapon', iconId: 666, label: ``, valuePrefix: `+`, valueSuffix: `` },
+  { metaKey: 'Critical Multiplier', iconId: 78, label: POWER_LABEL, valuePrefix: ``, valueSuffix: `` }//翻訳対象
+];
+
+function describeBattleTags(ctx) {
+  appendPassiveElementPower(ctx);
+  appendSpecialAttackTag(ctx);
+  describeBattlePowerRows(ctx);
+  appendCounterSkillsTag(ctx);
+  appendCounterTotalTag(ctx);
+  describeBattleNoteRows(ctx);
+  appendMaxTpTag(ctx);
+}
+
+// `<PassiveElementP:elementId,rate>`: element damage bonus, colour-coded by sign.
+function appendPassiveElementPower(ctx) {
+  if (!ctx.meta['PassiveElementP']) return;
+  ctx.metaValues = splitMetaValues(ctx.meta['PassiveElementP']);
+  const amplifyValue = Number(ctx.metaValues[1]);
+  const amplifyColorCode = amplifyValue >= 1 ? 10 : 1;
+  const rankPrefix = ctx.meta['Max Mastery Level'] ? `Rank*` : ``;
+  const powerText = `<${elementAmplifyLabel(ctx.metaValues[0])}${rankPrefix}${amplifyValue}%`;
+  ctx.effectText += `${colorTaggedText(amplifyColorCode, powerText)}>`;
+}
+
+// `<SpecialAttack:elementId>`: the attacker's element, as a name code.
+function appendSpecialAttackTag(ctx) {
+  if (!ctx.meta['SpecialAttack']) return;
+  ctx.effectValue = Number(ctx.meta['SpecialAttack']);
+  ctx.fragText = `<\x1bSIN[${ctx.effectValue}]>`;
+  const specialAttackLabel = `Attack`;//翻訳対象
+  ctx.effectText += `${colorTaggedText(ctx.colorCode, specialAttackLabel)}${ctx.fragText} `;
+}
+
+function describeBattlePowerRows(ctx) {
+  for (const powerRow of BATTLE_POWER_ROWS) {
+    if (!ctx.meta[powerRow.metaKey]) continue;
+    ctx.effectValue = ctx.meta[powerRow.metaKey].replace(' ', '');
+    const powerText = `${powerRow.label}${powerRow.valuePrefix}${ctx.effectValue}${powerRow.valueSuffix}`;
+    ctx.effectText += `\\I[${powerRow.iconId}]${powerText} `;
+  }
+}
+
+// `<Counter Skills>`: the reaction skills, as name codes.
+function appendCounterSkillsTag(ctx) {
+  if (!ctx.meta['Counter Skills']) return;
+  ctx.effectValue = ctx.meta['Counter Skills'];
   const counterSkillLabel = `反撃スキル`;//翻訳対象
-  effectText += `\\C[16]${counterSkillLabel}:\x1bSIN[${effectValue}]\\C[0] `;
-};
-if(itemMeta['Counter Total']){
-  var effectValue = itemMeta['Counter Total'];
-  var effectValue = effectValue.replace(" +", "");
-  const maxCounterText = `最大反撃回数:${Number(effectValue)+1}回`;//翻訳対象
-  effectText += `\\C[16][${maxCounterText}]\\C[0] `;
-};
-if(itemMeta['CertainlyDouble']){
-  const certainlyDoubleText = `必ず2連撃以上`;//翻訳対象
-  effectText += `\\C[16][${certainlyDoubleText}]\\C[0] `;
-};
-if(itemMeta['CertainlyTriple']){
-  const certainlyTripleText = `必ず3連撃`;//翻訳対象
-  effectText += `\\C[16][${certainlyTripleText}]\\C[0] `;
-};
-if(itemMeta['NormalAttackHit']){
-  var effectValue = itemMeta['NormalAttackHit'];
-  const normalAttackHitText = `通常攻撃Hit数+${effectValue}`;//翻訳対象
-  effectText += `\\C[16][${normalAttackHitText}]\\C[0] `;
-};
-if(itemMeta['AttackAbilityHit']){
-  var effectValue = itemMeta['AttackAbilityHit'];
-  const attackAbilityHitText = `通常/アビリティ攻撃Hit数+${effectValue}`;//翻訳対象
-  effectText += `\\C[16][${attackAbilityHitText}]\\C[0] `;
-};
-if(itemMeta['BattleAddAttackSet']){
-  var effectValue = itemMeta['BattleAddAttackSet'];
-  const pursuitText = `追撃${effectValue}%`;//翻訳対象
-  effectText += `\\C[16][${pursuitText}]\\C[0] `;
-};
-if(itemMeta['Evade Counter']){
-  const evadeCounterText = `回避後に反撃`;//翻訳対象
-  effectText += `\\C[16][${evadeCounterText}]\\C[0] `;
-};
-if(itemMeta['Hit Counter']){
-  const hitCounterText = `攻撃受後に反撃`;//翻訳対象
-  effectText += `\\C[16][${hitCounterText}]\\C[0] `;
-};
-if(itemMeta['MaxTp']){
-  var effectValue = itemMeta['MaxTp'];
+  ctx.effectText += `${colorTaggedText(16, `${counterSkillLabel}:\x1bSIN[${ctx.effectValue}]`)} `;
+}
+
+// `<Counter Total>`: the tag counts extra hits, so the shown maximum is one more.
+function appendCounterTotalTag(ctx) {
+  if (!ctx.meta['Counter Total']) return;
+  ctx.effectValue = ctx.meta['Counter Total'].replace(' +', '');
+  const maxCounterText = `最大反撃回数:${Number(ctx.effectValue) + 1}回`;//翻訳対象
+  ctx.effectText += `${colorTaggedText(16, `[${maxCounterText}]`)} `;
+}
+
+function describeBattleNoteRows(ctx) {
+  for (const noteRow of BATTLE_NOTE_ROWS) {
+    if (!ctx.meta[noteRow.metaKey]) continue;
+    ctx.effectValue = ctx.meta[noteRow.metaKey];
+    const noteText = noteRow.valueSuffix === undefined
+      ? noteRow.label
+      : `${noteRow.label}${ctx.effectValue}${noteRow.valueSuffix}`;
+    ctx.effectText += `${colorTaggedText(16, `[${noteText}]`)} `;
+  }
+}
+
+// `<MaxTp>`: `\\C[16]MaxTp\\C[0]+value `.
+function appendMaxTpTag(ctx) {
+  if (!ctx.meta['MaxTp']) return;
+  ctx.effectValue = ctx.meta['MaxTp'];
   const maxTpLabel = `MaxTp`;//翻訳対象
-  effectText += `\\C[16]${maxTpLabel}\\C[0]+${effectValue} `;
-};
-if(itemMeta['elementRegist6']){
-  var effectValue = itemMeta['elementRegist6'];
-  if(effectValue == 0){
-    const sixElementFullResistText = `六属性完全耐性`;//翻訳対象
-    effectText += `\\C[${colorCode}]${sixElementFullResistText}\\C[0] `;
-  } else {
-    const sixElementResistText = `六属性耐性`;//翻訳対象
-    effectText += `\\C[${colorCode}]${sixElementResistText}\\C[0]${effectValue}% `;
-  };
-};
-if(itemMeta['elementRegist9']){
-  var effectValue = itemMeta['elementRegist9'];
-  if(effectValue == 0){
-    const nineElementFullResistText = `九属性完全耐性`;//翻訳対象
-    effectText += `\\C[${colorCode}]${nineElementFullResistText}\\C[0] `;
-  } else {
-    const nineElementResistText = `九属性耐性`;//翻訳対象
-    effectText += `\\C[${colorCode}]${nineElementResistText}\\C[0]${effectValue}% `;
-  };
-};
-if(itemMeta['StateabNomalResist']){
-  var effectValue = itemMeta['StateabNomalResist'];
-  if(effectValue == 0){
-    const nullifyText = `無効`;//翻訳対象
-    effectText += `\\C[${colorCode}]\\I[683]${nullifyText}\\C[0] `;
-  } else {
-    const resistText = `耐性`;//翻訳対象
-    effectText += `\\C[${colorCode}]\\I[683]${resistText}\\C[0]+${effectValue}% `;
-  };
-};
-if(itemMeta['StateSPabNomalResist']){
-  var effectValue = itemMeta['StateSPabNomalResist'];
-  if(effectValue == 0){
-    const spNullifyText = `無効`;//翻訳対象
-    effectText += `\\C[${colorCode}]\\I[684]${spNullifyText}\\C[0] `;
-  } else {
-    const spResistText = `耐性`;//翻訳対象
-    effectText += `\\C[${colorCode}]\\I[684]${spResistText}\\C[0]+${effectValue}% `;
-  };
-};
-if(itemMeta['DispelGuard']){
-  const dispelGuardText = `強化消去無効`;//翻訳対象
-  effectText += `\\C[${colorCode}]${dispelGuardText}\\C[0] `;
-};
-if(itemMeta['Level Up Recover All']){
+  ctx.effectText += `${colorTaggedText(16, maxTpLabel)}+${ctx.effectValue} `;
+}
+
+// Element and state resistances: the same sentence with a different icon/wording.
+// `ratePrefix` is what the original put between the label and the number (`+` for
+// the state rows, nothing for the element rows).
+const RESIST_FULL_TEXT = `完全耐性`;//翻訳対象
+const RESIST_RATE_TEXT = `耐性`;//翻訳対象
+const RESIST_NULLIFY_TEXT = `無効`;//翻訳対象
+const RESIST_ROWS = [
+  { metaKey: 'elementRegist6', icon: ``, fullLabel: `六属性${RESIST_FULL_TEXT}`, rateLabel: `六属性${RESIST_RATE_TEXT}`, ratePrefix: `` },
+  { metaKey: 'elementRegist9', icon: ``, fullLabel: `九属性${RESIST_FULL_TEXT}`, rateLabel: `九属性${RESIST_RATE_TEXT}`, ratePrefix: `` },
+  { metaKey: 'StateabNomalResist', icon: `\\I[683]`, fullLabel: RESIST_NULLIFY_TEXT, rateLabel: RESIST_RATE_TEXT, ratePrefix: `+` },
+  { metaKey: 'StateSPabNomalResist', icon: `\\I[684]`, fullLabel: RESIST_NULLIFY_TEXT, rateLabel: RESIST_RATE_TEXT, ratePrefix: `+` }
+];
+
+// 0 means immunity, anything else is a percentage.
+function appendResistRow(ctx, resistRow, resistValue) {
+  if (resistValue == 0) {
+    ctx.effectText += `${colorTaggedText(ctx.colorCode, resistRow.icon + resistRow.fullLabel)} `;
+    return;
+  }
+  const rateText = colorTaggedText(ctx.colorCode, `${resistRow.icon}${resistRow.rateLabel}`);
+  ctx.effectText += `${rateText}${resistRow.ratePrefix}${resistValue}% `;
+}
+
+function describeResistTags(ctx) {
+  for (const resistRow of RESIST_ROWS) {
+    ctx.effectValue = ctx.meta[resistRow.metaKey];
+    if (!ctx.effectValue) continue;
+    appendResistRow(ctx, resistRow, ctx.effectValue);
+  }
+  if (ctx.meta['DispelGuard']) {
+    const dispelGuardText = `強化消去無効`;//翻訳対象
+    ctx.effectText += `${colorTaggedText(ctx.colorCode, dispelGuardText)} `;
+  }
+  if (ctx.meta['Level Up Recover All']) {
     const levelUpRecoverAllText = `LvUp時に全回復`;//翻訳対象
-    effectText += `[\\C[16]${levelUpRecoverAllText}\\C[0]]`;
-};
-if(itemMeta['Bypass Damage Cap']){
-  const bypassDamageCapText = `D.Cap無効`;//翻訳対象
-  effectText += `\\C[16]${bypassDamageCapText}\\C[0] `;
-} else {
-  if(itemMeta['Damage Cap']){
-    var effectValue = itemMeta['Damage Cap'].replace(' ','');
-    const damageCapLabel = `D.Cap`;//翻訳対象
-    effectText += `\\C[16]${damageCapLabel}:\\C[0]${effectValue} `;
-  };
-};
-if(itemMeta['Bypass Heal Cap']){
-  const bypassHealCapText = `H.Cap無効`;//翻訳対象
-  effectText += `\\C[16]${bypassHealCapText}\\C[0] `;
-} else {
-  if(itemMeta['Heal Cap']){
-    var effectValue = itemMeta['Heal Cap'].replace(' ','');
-    const healCapLabel = `H.Cap`;//翻訳対象
-    effectText += `\\C[16]${healCapLabel}:\\C[0]${effectValue} `;
-  };
-};
-if(itemMeta['HP Cost']){
-  var effectValue = itemMeta['HP Cost'].replace(' ','');
-  const hpCostText = `HP${effectValue}消費`;//翻訳対象
-  effectText += `[\\C[16]${hpCostText}\\C[0]]`;
-};
-if(itemMeta['MP Cost']){
-  var effectValue = itemMeta['MP Cost'].replace(' ','');
-  const mpCostText = `MP${effectValue}消費`;//翻訳対象
-  effectText += `[\\C[16]${mpCostText}\\C[0]]`;
-};
-if(itemMeta['SpcialState']){
-  // The two `\x1bSIM[n]` codes expand to *state names*, i.e. to other
-  // game text, so they stay outside the translatable strings.
-  const activationStateIcon = `\x1bSIM[110]`;//ステート名コード。翻訳対象外
-  const activationText = `で発動`;//翻訳対象
-  const expiryStateIcon = `\x1bSIM[109]`;//ステート名コード。翻訳対象外
-  const expiryText = `で効果消失`;//翻訳対象
-  suffixText += `[\\C[${colorCode}]${activationStateIcon}${activationText}\\C[0]][${expiryStateIcon}${expiryText}]`;
-  const activationConditionText = `行動時MP消費/消費MP未満で`;//翻訳対象
-  const grantText = `付与`;//翻訳対象
-  effectText += `[\\C[${colorCode}]${activationConditionText}\\I[252]${grantText}\\C[0]]`;
-};
-if(itemMeta['activateRate']){
-  var effectValue = Math.round(itemMeta['activateRate'] * 100);
-  const consumeMpText = `消費MP:MMP`;//翻訳対象
-  suffixText += `[${consumeMpText}\\C[10]${effectValue}%\\C[0]]`;
-};
-if(itemMeta['activatePoint']){//使ってない？
-  var effectValue = itemMeta['activatePoint'];
-  const consumeMpLabel = `消費MP:`;//翻訳対象
-  suffixText += `[${consumeMpLabel}\\C[2]${effectValue}\\C[0]]`;
-};
-if(itemMeta['Global Cooldown']){
-  var effectValue = Number(itemMeta['Global Cooldown']);
-  const allCooldownLabel = `全てのCT:`;//翻訳対象
-  suffixText += `[${allCooldownLabel}\\C[2]${effectValue}\\C[0]]`;
-};
-// `SType N Cooldown` / `SType N Warmup` for skill types 1-15: the same row with
-// a different icon, written out twice.
+    ctx.effectText += `[${colorTaggedText(16, levelUpRecoverAllText)}]`;
+  }
+}
+
+// `<Bypass Damage Cap>` wins over `<Damage Cap>`, `<Bypass Heal Cap>` over
+// `<Heal Cap>`; the two pairs only differ in their label.
+const CAP_ROWS = [
+  { bypassKey: 'Bypass Damage Cap', bypassLabel: `D.Cap無効`, valueKey: 'Damage Cap', valueLabel: `D.Cap` },//翻訳対象
+  { bypassKey: 'Bypass Heal Cap', bypassLabel: `H.Cap無効`, valueKey: 'Heal Cap', valueLabel: `H.Cap` }//翻訳対象
+];
+const COST_ROWS = [
+  { metaKey: 'HP Cost', resourceLabel: `HP` },//翻訳対象
+  { metaKey: 'MP Cost', resourceLabel: `MP` }//翻訳対象
+];
+
+function describeCapAndCostTags(ctx) {
+  describeCapTags(ctx);
+  describeCostTags(ctx);
+  describeSpecialStateTags(ctx);
+}
+
+function describeCapTags(ctx) {
+  for (const capRow of CAP_ROWS) {
+    if (ctx.meta[capRow.bypassKey]) {
+      ctx.effectText += `${colorTaggedText(16, capRow.bypassLabel)} `;
+      continue;
+    }
+    if (!ctx.meta[capRow.valueKey]) continue;
+    ctx.effectValue = ctx.meta[capRow.valueKey].replace(' ', '');
+    ctx.effectText += `${colorTaggedText(16, `${capRow.valueLabel}:`)}${ctx.effectValue} `;
+  }
+}
+
+// `[\\C[16]HP10消費\\C[0]]`
+function describeCostTags(ctx) {
+  const costSuffix = `消費`;//翻訳対象
+  for (const costRow of COST_ROWS) {
+    if (!ctx.meta[costRow.metaKey]) continue;
+    ctx.effectValue = ctx.meta[costRow.metaKey].replace(' ', '');
+    ctx.effectText += `[${colorTaggedText(16, `${costRow.resourceLabel}${ctx.effectValue}${costSuffix}`)}]`;
+  }
+}
+
+// `<SpcialState>` (activation / expiry state names), `<activateRate>`,
+// `<activatePoint>` and `<Global Cooldown>` all describe the MP trigger.
+function describeSpecialStateTags(ctx) {
+  if (ctx.meta['SpcialState']) {
+    // The two `\x1bSIM[n]` codes expand to *state names*, i.e. to other game text,
+    // so they stay outside the translatable strings.
+    const activationStateIcon = `\x1bSIM[110]`;//ステート名コード。翻訳対象外
+    const activationText = `で発動`;//翻訳対象
+    const expiryStateIcon = `\x1bSIM[109]`;//ステート名コード。翻訳対象外
+    const expiryText = `で効果消失`;//翻訳対象
+    ctx.suffixText += `[${colorTaggedText(ctx.colorCode, activationStateIcon + activationText)}][${expiryStateIcon}${expiryText}]`;
+
+    const activationConditionText = `行動時MP消費/消費MP未満で`;//翻訳対象
+    const grantText = `付与`;//翻訳対象
+    ctx.effectText += `[${colorTaggedText(ctx.colorCode, `${activationConditionText}\\I[252]${grantText}`)}]`;
+  }
+  if (ctx.meta['activateRate']) {
+    ctx.effectValue = Math.round(ctx.meta['activateRate'] * 100);
+    const consumeMpText = `消費MP:MMP`;//翻訳対象
+    ctx.suffixText += `[${consumeMpText}${colorTaggedText(10, `${ctx.effectValue}%`)}]`;
+  }
+  if (ctx.meta['activatePoint']) {//使ってない？
+    ctx.effectValue = ctx.meta['activatePoint'];
+    const consumeMpLabel = `消費MP:`;//翻訳対象
+    ctx.suffixText += `[${consumeMpLabel}${colorTaggedText(2, `${ctx.effectValue}`)}]`;
+  }
+  if (ctx.meta['Global Cooldown']) {
+    ctx.effectValue = Number(ctx.meta['Global Cooldown']);
+    const allCooldownLabel = `全てのCT:`;//翻訳対象
+    ctx.suffixText += `[${allCooldownLabel}${colorTaggedText(2, `${ctx.effectValue}`)}]`;
+  }
+}
+
+function describeCooldownAndDrainTags(ctx) {
 for (let skillTypeId = 1; skillTypeId <= 15; skillTypeId++) {
   for (const [metaSuffix, iconId] of [[`Cooldown`, 663], [`Warmup`, 662]]) {
-    const metaValue = itemMeta[`SType ${skillTypeId} ${metaSuffix}`];
+    const metaValue = ctx.meta[`SType ${skillTypeId} ${metaSuffix}`];
     if(!metaValue){ continue; };
-    var colorCode = Number(metaValue) < 0 ? 3 : 1;
-    effectText += `[${$dataSystem.skillTypes[skillTypeId]}\\C[${colorCode}]\\I[${iconId}]${Number(metaValue)}\\C[0]]`;
+    ctx.colorCode = Number(metaValue) < 0 ? 3 : 1;
+    ctx.effectText += `[${$dataSystem.skillTypes[skillTypeId]}\\C[${ctx.colorCode}]\\I[${iconId}]${Number(metaValue)}\\C[0]]`;
   };
 };
-var colorCode = 2;
-effectText += lifeStealGroupText(itemMeta, `HP`, `反動ﾀﾞﾒｰｼﾞ`);
-var colorCode = 2;
-effectText += lifeStealGroupText(itemMeta, `MP`, `消耗`);
-var colorCode = 2;
-if(itemMeta['HP Life Steal']){
-  var effectValue = itemMeta['HP Life Steal'].replace(' ','');
-  var effectValue = effectValue.replace('%','');
-  effectText += `[\\C[${colorCode}]${DRAIN_LABEL}${Number(effectValue)}%HP${ABSORB_LABEL}\\C[0]]`;
-};
-if(itemMeta['MP Life Steal']){
-  var effectValue = itemMeta['MP Life Steal'].replace(' ','');
-  var effectValue = effectValue.replace('%','');
-  effectText += `[\\C[${colorCode}]${DRAIN_LABEL}${Number(effectValue)}%HP${ABSORB_LABEL}\\C[0]]`;
-};
-if(itemMeta['RankMaxLearning']){
-  if(item.stypeId != 11){//召喚は前提スキルがあるため除外
-    if(Number(itemMeta['Max Mastery Level']) >= 2){
+ctx.colorCode = 2;
+ctx.effectText += lifeStealGroupText(ctx.meta, `HP`, `反動ﾀﾞﾒｰｼﾞ`);
+ctx.colorCode = 2;
+ctx.effectText += lifeStealGroupText(ctx.meta, `MP`, `消耗`);
+ctx.colorCode = 2;
+describeLifeStealRows(ctx);
+if(ctx.meta['RankMaxLearning']){
+  if(ctx.item.stypeId != 11){//召喚は前提スキルがあるため除外
+    if(Number(ctx.meta['Max Mastery Level']) >= 2){
       const rankMaxLearnText = `RankMaxで習得が可能になる`;//翻訳対象
-      effectText += `[\\C[${colorCode}]${rankMaxLearnText}\\C[0]]`;
+      ctx.effectText += `[\\C[${ctx.colorCode}]${rankMaxLearnText}\\C[0]]`;
     } else {
       const masteryMaxLearnText = `熟練度Maxで習得が可能になる`;//翻訳対象
-      effectText += `[\\C[${colorCode}]${masteryMaxLearnText}\\C[0]]`;
+      ctx.effectText += `[\\C[${ctx.colorCode}]${masteryMaxLearnText}\\C[0]]`;
     };
   };
 };
-if(itemMeta['trapEvasion']){
+if(ctx.meta['trapEvasion']){
   const trapEvasionText = `引っ掛かったトラップを自動で回避する`;//翻訳対象
-  effectText += `[\\C[${colorCode}]${trapEvasionText}\\C[0]]`;
+  ctx.effectText += `[\\C[${ctx.colorCode}]${trapEvasionText}\\C[0]]`;
 };
-if(itemMeta['SemenRemove']){
-  var colorCode = 27;
-  var effectValue = Number(itemMeta['SemenRemove']);
-  const semenRemoveText = `状態異常精液${effectValue}つ回復`;//翻訳対象
-  effectText += `[\\C[${colorCode}]${semenRemoveText}\\C[0]]`;
+if(ctx.meta['SemenRemove']){
+  ctx.colorCode = 27;
+  ctx.effectValue = Number(ctx.meta['SemenRemove']);
+  const semenRemoveText = `状態異常精液${ctx.effectValue}つ回復`;//翻訳対象
+  ctx.effectText += `[\\C[${ctx.colorCode}]${semenRemoveText}\\C[0]]`;
 };
-if(itemMeta['HstaSuppression']){
-  var colorCode = 27;
-  var metaValues = itemMeta['HstaSuppression'].split(',');
-  var effectValue = Number(metaValues[1]);
-  const desireLimitText = `性欲度${effectValue*100}まで`;//翻訳対象
-  const developmentLimitText = `各開発/経験度${effectValue}まで`;//翻訳対象
-  if(Number(metaValues[0]) == 0){
-    effectText += `[\\C[${colorCode}]${desireLimitText}\\C[0]][\\C[${colorCode}]${developmentLimitText}\\C[0]]`;
+if(ctx.meta['HstaSuppression']){
+  ctx.colorCode = 27;
+  ctx.metaValues = ctx.meta['HstaSuppression'].split(',');
+  ctx.effectValue = Number(ctx.metaValues[1]);
+  const desireLimitText = `性欲度${ctx.effectValue*100}まで`;//翻訳対象
+  const developmentLimitText = `各開発/経験度${ctx.effectValue}まで`;//翻訳対象
+  if(Number(ctx.metaValues[0]) == 0){
+    ctx.effectText += `[\\C[${ctx.colorCode}]${desireLimitText}\\C[0]][\\C[${ctx.colorCode}]${developmentLimitText}\\C[0]]`;
   } else {
-    const rankVariableName = $dataSystem.variables[Number(metaValues[0])];
-    const rankLimitText = `のランク${effectValue}まで`;//翻訳対象
-    effectText += `[\\C[${colorCode}]${rankVariableName}${rankLimitText}\\C[0]]`;
+    const rankVariableName = $dataSystem.variables[Number(ctx.metaValues[0])];
+    const rankLimitText = `のランク${ctx.effectValue}まで`;//翻訳対象
+    ctx.effectText += `[\\C[${ctx.colorCode}]${rankVariableName}${rankLimitText}\\C[0]]`;
   };
 };
-var colorCode = 2;
-if(itemMeta['TPGain1']){
-  var effectValue = itemMeta['TPGain1'];
-  effectText += `[\\C[${colorCode}]${TP_LABEL}${effectValue}%\\C[0]]`;
+ctx.colorCode = 2;
+if(ctx.meta['TPGain1']){
+  ctx.effectValue = ctx.meta['TPGain1'];
+  ctx.effectText += `[\\C[${ctx.colorCode}]${TP_LABEL}${ctx.effectValue}%\\C[0]]`;
 };
-if(itemMeta['gainExp']){
-  var effectValue = itemMeta['gainExp'];
+if(ctx.meta['gainExp']){
+  ctx.effectValue = ctx.meta['gainExp'];
   const gainExpLabel = `獲得Exp`;//翻訳対象
-  effectText += `[\\C[${colorCode}]${gainExpLabel}:${effectValue}%\\C[0]]`;
+  ctx.effectText += `[\\C[${ctx.colorCode}]${gainExpLabel}:${ctx.effectValue}%\\C[0]]`;
 };
 for (let tierIndex = 1; tierIndex <= 6; tierIndex++) {
-  const tierSlots = itemMeta['Skill Tier ' + tierIndex + ' Slots'];
+  const tierSlots = ctx.meta['Skill Tier ' + tierIndex + ' Slots'];
   if(tierSlots){
-    var colorCode = 16;
-    effectText += `[\\C[${colorCode}]${SKILL_TIER_SLOT_LABELS[tierIndex]}\\C[2]${tierSlots.replace(' ','')}\\C[0]]`;
+    ctx.colorCode = 16;
+    ctx.effectText += `[\\C[${ctx.colorCode}]${SKILL_TIER_SLOT_LABELS[tierIndex]}\\C[2]${tierSlots.replace(' ','')}\\C[0]]`;
   };
 };
-var colorCode = 2;
+ctx.colorCode = 2;
+}
 
-//称号関係
-if(itemMeta['titleGetSwitch']){
-  var effectValue = Number(itemMeta['titleGetSwitch']);
-  if(effectValue == 2 || itemMeta['DescriptionWord']){}else{
-    effectText += `\\C[${colorCode}][${CONDITION_LABEL}:${$dataSystem.switches[effectValue]}]\\C[0]`;
-  };
-};
-if(itemMeta['titleGetVariable']){
-  var metaValues = itemMeta['titleGetVariable'].split(',');
-  if(itemMeta['DescriptionWord']){}else{
-    effectText += `\\C[${colorCode}][${CONDITION_LABEL}:${$dataSystem.variables[Number(metaValues[0])]}:${Number(metaValues[1])}]\\C[0]`;
-  };
-};
-if(itemMeta['titleGetArray']){
-  var metaValues = itemMeta['titleGetArray'].split(',');
-  if(itemMeta['DescriptionWord']){}else{
-    if(Number(metaValues[0]) == 52){
-      const subjugationCountLabel = `体討伐`;//翻訳対象
-      effectText += `\\C[${colorCode}][${CONDITION_LABEL}:\x1bSIM[${Number(metaValues[1])}]:${Number(metaValues[2])}${subjugationCountLabel}]\\C[0]`;
-    };
-  };
-};
-if(itemMeta['titleGetItems']){
-  var metaValues = itemMeta['titleGetItems'].split(',');
-  if(itemMeta['DescriptionWord']){}else{
-    const quantityLabel = `個`;//翻訳対象
-    effectText += `\\C[${colorCode}][${CONDITION_LABEL}:\x1bIIN[${Number(metaValues[0])}]:${Number(metaValues[1])}${quantityLabel}]\\C[0]`;
-  };
-};
-if(itemMeta['titleGetSkillRank']){
-  var metaValues = itemMeta['titleGetSkillRank'].split(',');
+// 称号条件: every row renders as `[\\C[c]条件:<body>\\C[0]]` and is suppressed when
+// the title carries a `<DescriptionWord>`. The original repeated that guard as
+// `if(x){}else{ … }` seven times; it is one check here and each row only builds its
+// body.
+const TITLE_CONDITION_ROWS = [
+  { metaKey: 'titleGetSwitch', build: titleSwitchCondition },
+  { metaKey: 'titleGetVariable', build: titleVariableCondition, splitMeta: true },
+  { metaKey: 'titleGetArray', build: titleArrayCondition, splitMeta: true },
+  { metaKey: 'titleGetItems', build: titleItemCondition, splitMeta: true },
+  { metaKey: 'titleGetSkillRank', build: titleSkillRankCondition, splitMeta: true, ignoreDescriptionWord: true },
+  { metaKey: 'titleGetAchievement', build: titleAchievementCondition, splitMeta: true },
+  { metaKey: 'HtitleGetArray', build: titleHArrayCondition, splitMeta: true }
+];
+
+function describeTitleConditionTags(ctx) {
+  for (const conditionRow of TITLE_CONDITION_ROWS) {
+    const conditionMeta = ctx.meta[conditionRow.metaKey];
+    if (!conditionMeta) continue;
+    if (!conditionRow.ignoreDescriptionWord && ctx.meta['DescriptionWord']) continue;
+    if (conditionRow.splitMeta) ctx.metaValues = conditionMeta.split(',');
+    const conditionText = conditionRow.build(ctx, conditionMeta);
+    if (!conditionText) continue;
+    // `\\C[c][条件:body\\C[0]` — the bracket sits inside the colour code, so the row
+    // is not a plain colorTaggedText wrap.
+    ctx.effectText += `\\C[${ctx.colorCode}][${CONDITION_LABEL}:${conditionText}]\\C[0]`;
+  }
+}
+
+// `<titleGetSwitch>`: switch id; id 2 is the "no condition" placeholder.
+function titleSwitchCondition(ctx) {
+  ctx.effectValue = Number(ctx.meta['titleGetSwitch']);
+  if (ctx.effectValue == 2) return ``;
+  return `${$dataSystem.switches[ctx.effectValue]}`;
+}
+
+// `<titleGetVariable:variableId,value>`.
+function titleVariableCondition(ctx) {
+  const variableName = $dataSystem.variables[Number(ctx.metaValues[0])];
+  return `${variableName}:${Number(ctx.metaValues[1])}`;
+}
+
+// `<titleGetArray:52,stateId,count>`: `52` is the only counter implemented.
+function titleArrayCondition(ctx) {
+  if (Number(ctx.metaValues[0]) != SUBJUGATION_CONDITION_ID) return ``;
+  const subjugationCountLabel = `体討伐`;//翻訳対象
+  const stateNameCode = `\x1bSIM[${Number(ctx.metaValues[1])}]`;
+  return `${stateNameCode}:${Number(ctx.metaValues[2])}${subjugationCountLabel}`;
+}
+
+// `<titleGetItems:itemId,count>`.
+function titleItemCondition(ctx) {
+  const quantityLabel = `個`;//翻訳対象
+  const itemNameCode = `\x1bIIN[${Number(ctx.metaValues[0])}]`;
+  return `${itemNameCode}:${Number(ctx.metaValues[1])}${quantityLabel}`;
+}
+
+// `<titleGetSkillRank:skillId,rank>`: any party member.
+function titleSkillRankCondition(ctx) {
   const partyMemberLabel = `パーティの誰かが`;//翻訳対象
-  effectText += `\\C[${colorCode}][${CONDITION_LABEL}:${partyMemberLabel}\x1bSIN[${Number(metaValues[0])}]${RANK_LABEL}:${Number(metaValues[1])}${OR_MORE_SUFFIX}]\\C[0]`;
-};
-if(itemMeta['titleGetAchievement']){
-  var metaValues = itemMeta['titleGetAchievement'].split(',');
-  if(itemMeta['DescriptionWord']){}else{
-    const achievementName = ACHIEVEMENT_NAMES[Number(metaValues[0])];
-    const personalTagLabel = `個人`;//翻訳対象
-    const personalTag = itemMeta['KojinTitle'] ? `[${personalTagLabel}]` : ``;
-    effectText += `\\C[${colorCode}][${CONDITION_LABEL}:${achievementName}${personalTag}:${Number(metaValues[1])}]\\C[0]`;
-  };
-};
-if(itemMeta['HtitleGetArray']){
-  var metaValues = itemMeta['HtitleGetArray'].split(',');
-  if(itemMeta['DescriptionWord']){}else{
-    effectText += `\\C[${colorCode}][${CONDITION_LABEL}:${$dataSystem.variables[Number(metaValues[0]) + 400]}:${Number(metaValues[1])}]\\C[0]`;
-  };
-};
-if(itemMeta['annihilationTitle']){
-  var metaValues = itemMeta['annihilationTitle'].split(',');
+  const skillNameCode = `\x1bSIN[${Number(ctx.metaValues[0])}]`;
+  return `${partyMemberLabel}${skillNameCode}${RANK_LABEL}:${Number(ctx.metaValues[1])}${OR_MORE_SUFFIX}`;
+}
+
+// `<titleGetAchievement:counterId,value>`, plus a `<KojinTitle>` marker.
+function titleAchievementCondition(ctx) {
+  const achievementName = ACHIEVEMENT_NAMES[Number(ctx.metaValues[0])];
+  const personalTagLabel = `個人`;//翻訳対象
+  const personalTag = ctx.meta['KojinTitle'] ? `[${personalTagLabel}]` : ``;
+  return `${achievementName}${personalTag}:${Number(ctx.metaValues[1])}`;
+}
+
+// `<HtitleGetArray:variableId,value>`: H variables live 400 entries further up.
+function titleHArrayCondition(ctx) {
+  const variableName = $dataSystem.variables[Number(ctx.metaValues[0]) + H_VARIABLE_OFFSET];
+  return `${variableName}:${Number(ctx.metaValues[1])}`;
+}
+
+// `<annihilationTitle:selector,count>`: `selector` is a kill counter — 1 = all
+// maps, 2 = all dungeons, >= 20 = an item id. The original printed the selector
+// itself as the count and, when no branch matched, appended whatever
+// `effectValue` an earlier row of the same entry had left behind; both fixed.
+function describeAnnihilationTitle(ctx) {
+  const annihilationMeta = ctx.meta['annihilationTitle'];
+  if (!annihilationMeta) return;
+  ctx.metaValues = annihilationMeta.split(',');
+  const selector = Number(ctx.metaValues[0]);
+  const requiredCount = Number(ctx.metaValues[1]);
+
   const annihilationCountLabel = `殲滅回数`;//翻訳対象
   const totalAnnihilationCountLabel = `の総殲滅回数`;//翻訳対象
   const allMapsLabel = `全マップ`;//翻訳対象
   const allDungeonsLabel = `全ダンジョン`;//翻訳対象
   const timesOrMoreSuffix = `回以上`;//翻訳対象
-  if(Number(metaValues[0]) >= 20 && $dataItems[Number(metaValues[0])]){
-    var effectValue = `\\C[1]<${$dataItems[Number(metaValues[0])].name}>\\C[0]${annihilationCountLabel}:\\C[10]${Number(metaValues[1])}\\C[0]${timesOrMoreSuffix}`;
-  };
-  if(Number(metaValues[0]) == 1){
-    var effectValue = `\\C[1]<${allMapsLabel}>\\C[0]${totalAnnihilationCountLabel}:\\C[10]${Number(metaValues[0])}\\C[0]${timesOrMoreSuffix}`;
-  };
-  if(Number(metaValues[0]) == 2){
-    var effectValue = `\\C[1]<${allDungeonsLabel}>\\C[0]${totalAnnihilationCountLabel}:\\C[10]${Number(metaValues[0])}\\C[0]${timesOrMoreSuffix}`;
-  };
-    effectText += `\\C[${colorCode}][${CONDITION_LABEL}:${effectValue}\\C[${colorCode}]]\\C[0]`;
-};
-if(itemMeta['PassivePlusTrait']){
-  var metaValues = itemMeta['PassivePlusTrait'].split(',');
-  if(Number(metaValues[0]) == 11){
-    var effectValue = Number(metaValues[2]);
-    const damageResistLabel = `ダメージ耐性`;//翻訳対象
-    const elementName = $dataSystem.elements[Number(metaValues[1])];
-    if(effectValue >= 0){
-      effectText += `[\\C[${colorCode}]${elementName}\\C[0]${damageResistLabel}${Math.round(effectValue * 100)}%Down]`;
-    } else {
-      var effectValue = effectValue - effectValue - effectValue;
-      effectText += `[\\C[${colorCode}]${elementName}\\C[0]${damageResistLabel}${Math.round(effectValue * 100)}%Up]`;
-    };
-  };
-};
-if(itemMeta['PassivePlusEffect']){//PassiveCondi
-  var metaValues = itemMeta['PassivePlusEffect'].split(',');
-  if(Number(metaValues[0]) == 0){
-    var effectValue = TextManager.param(Number(metaValues[1]));
-  };
-  if(Number(metaValues[0]) == 1){
-    var effectValue = FTKR.CSS.cssStatus.xparam[Number(metaValues[1])];
-  };
-  if(Number(metaValues[0]) == 2){
-    var effectValue = FTKR.CSS.cssStatus.sparam[Number(metaValues[1])];
-  };   
-  effectText += `[\\C[${colorCode}]${effectValue}\\C[0]+${Math.round(Number(metaValues[2]) * 100)}%]`;
-};
-//称号効果
-if(itemMeta['titleEffectConfiVal']){
-  var metaValues = itemMeta['titleEffectConfiVal'].split(',');
-  if(itemMeta['DescriptionWord']){}else{
-    effectText += `[\\C[${colorCode}]${$dataSystem.variables[Number(metaValues[0])]}:+${Number(metaValues[1])}\\C[0]]`;
-  };
-};
-if(itemMeta['titleEffectConfiSwi']){
-  var effectValue = Number(itemMeta['titleEffectConfiSwi']);
-  effectText += `[\\C[${colorCode}]${$dataSystem.switches[effectValue]}\\C[0]]`;
-};
 
-if(itemMeta['titleSenkaGet']){
-  var effectValue = Number(itemMeta['titleSenkaGet']);
-  effectText += `[\\C[${colorCode}]\x1bIIN[10]+${effectValue}\\C[0]]`;
-};
-//称号効果 / 食事バフ: the same nine-slot body twice.
+  let subjectName;
+  let countLabel;
+  if (selector >= 20 && $dataItems[selector]) {
+    subjectName = `<${$dataItems[selector].name}>`;
+    countLabel = annihilationCountLabel;
+  } else if (selector == 1) {
+    subjectName = `<${allMapsLabel}>`;
+    countLabel = totalAnnihilationCountLabel;
+  } else if (selector == 2) {
+    subjectName = `<${allDungeonsLabel}>`;
+    countLabel = totalAnnihilationCountLabel;
+  } else {
+    return;
+  }
+  const subjectText = `${colorTaggedText(1, subjectName)}${countLabel}:`;
+  ctx.effectValue = `${subjectText}${colorTaggedText(10, `${requiredCount}`)}${timesOrMoreSuffix}`;
+  ctx.effectText += `\\C[${ctx.colorCode}][${CONDITION_LABEL}:${ctx.effectValue}\\C[${ctx.colorCode}]]\\C[0]`;
+}
+
+// `<PassivePlusTrait:11,elementId,rate>`: element damage taken modifier. A positive
+// rate lowers the damage taken, a negative one raises it (the original computed
+// the absolute value with `x - x - x`).
+function describePassivePlusTrait(ctx) {
+  const plusTraitMeta = ctx.meta['PassivePlusTrait'];
+  if (!plusTraitMeta) return;
+  ctx.metaValues = plusTraitMeta.split(',');
+  if (Number(ctx.metaValues[0]) != 11) return;
+
+  ctx.effectValue = Number(ctx.metaValues[2]);
+  const damageResistLabel = `ダメージ耐性`;//翻訳対象
+  const elementName = $dataSystem.elements[Number(ctx.metaValues[1])];
+  const directionText = ctx.effectValue >= 0 ? `Down` : `Up`;
+  const percentText = Math.round(Math.abs(ctx.effectValue) * 100);
+  ctx.effectText += `[${colorTaggedText(ctx.colorCode, elementName)}${damageResistLabel}${percentText}%${directionText}]`;
+}
+
+// `<PassivePlusEffect:source,index,rate>`: one stat name plus a percentage.
+function describePassivePlusEffect(ctx) {
+  const plusEffectMeta = ctx.meta['PassivePlusEffect'];
+  if (!plusEffectMeta) return;
+  ctx.metaValues = plusEffectMeta.split(',');
+  ctx.effectValue = statEffectName(ctx.metaValues);
+  // An unknown source used to print whatever `effectValue` the previous row had
+  // left behind; print nothing instead.
+  if (ctx.effectValue === undefined) return;
+  const percentText = Math.round(Number(ctx.metaValues[2]) * 100);
+  ctx.effectText += `[${colorTaggedText(ctx.colorCode, `${ctx.effectValue}`)}+${percentText}%]`;
+}
+
+function describeTitleEffectTags(ctx) {
+  describeAnnihilationTitle(ctx);
+  describePassivePlusTrait(ctx);
+  describePassivePlusEffect(ctx);
+
+  // 称号効果
+  if (ctx.meta['titleEffectConfiVal'] && !ctx.meta['DescriptionWord']) {
+    ctx.metaValues = ctx.meta['titleEffectConfiVal'].split(',');
+    const variableName = $dataSystem.variables[Number(ctx.metaValues[0])];
+    const variableIncreaseText = `+${Number(ctx.metaValues[1])}`;
+    ctx.effectText += `[${colorTaggedText(ctx.colorCode, `${variableName}:${variableIncreaseText}`)}]`;
+  }
+  if (ctx.meta['titleEffectConfiSwi']) {
+    ctx.effectValue = Number(ctx.meta['titleEffectConfiSwi']);
+    ctx.effectText += `[${colorTaggedText(ctx.colorCode, `${$dataSystem.switches[ctx.effectValue]}`)}]`;
+  }
+  if (ctx.meta['titleSenkaGet']) {
+    ctx.effectValue = Number(ctx.meta['titleSenkaGet']);
+    ctx.effectText += `[${colorTaggedText(ctx.colorCode, `\x1bIIN[10]+${ctx.effectValue}`)}]`;
+  }
+}
+
+function describeStatEffectSlots(ctx) {
 for (const statEffectPrefix of [`titleEffect`, `eatEffect`]) {
 for (let statEffectSlot = 1; statEffectSlot <= 9; statEffectSlot++) {
-  const statEffectMeta = itemMeta[statEffectPrefix + statEffectSlot];
+  const statEffectMeta = ctx.meta[statEffectPrefix + statEffectSlot];
   if(!statEffectMeta){ continue; };
-  const metaValues = splitMetaValues(statEffectMeta);
-  const statSource = Number(metaValues[0]);
+  ctx.metaValues = splitMetaValues(statEffectMeta);
+  const statSource = Number(ctx.metaValues[0]);
   if(statSource == 4){
     // Element resist: the element name goes straight to the output, and the row
     // is labelled 耐性 — except for the resist-special elements, which keep
     // whatever the previous slot left in `effectValue`.
-    effectText += `${$dataSystem.elements[Number(metaValues[1])]}`;
-    if(RESIST_SPECIAL_ELEMENT_IDS.indexOf(Number(metaValues[1])) < 0){
-      var effectValue = `耐性`;
+    ctx.effectText += `${$dataSystem.elements[Number(ctx.metaValues[1])]}`;
+    if(RESIST_SPECIAL_ELEMENT_IDS.indexOf(Number(ctx.metaValues[1])) < 0){
+      ctx.effectValue = `耐性`;
     };
   } else if(statSource >= 0 && statSource <= 3){
-    var effectValue = statEffectName(metaValues);
+    ctx.effectValue = statEffectName(ctx.metaValues);
   };
   // `x - x - x` in the original is just `-x`, i.e. the magnitude.
-  const statPercent = Math.abs(Number(metaValues[2])) * 100;
-  var colorCode = 1;
-  effectText += `[\\C[${colorCode}]${effectValue}\\C[0]+\\C[2]${statPercent}\\C[0]%]`;
-  var colorCode = 2;
+  const statPercent = Math.abs(Number(ctx.metaValues[2])) * 100;
+  ctx.colorCode = 1;
+  ctx.effectText += `[\\C[${ctx.colorCode}]${ctx.effectValue}\\C[0]+\\C[2]${statPercent}\\C[0]%]`;
+  ctx.colorCode = 2;
 };
 };
-//娼婦系説明文
-if(itemMeta['ProstitutionMoneyUp']){
-    var effectValue = itemMeta['ProstitutionMoneyUp'];
-    const prostitutionBonusText = `売春額に${effectValue}倍補正`;//翻訳対象
-    effectText += `\\C[27]${prostitutionBonusText}\\C[0] `;
-};
-if(itemMeta['BustSizeChange']){
-    var effectValue = itemMeta['BustSizeChange'];
-    const bustSizeLabel = `BustSize`;//翻訳対象
-    effectText += `\\C[27]${bustSizeLabel}+${effectValue}cm\\C[0] `;
-};
-if(itemMeta['HipSizeChange']){
-    var effectValue = itemMeta['HipSizeChange'];
-    const hipSizeLabel = `HipSize`;//翻訳対象
-    effectText += `\\C[27]${hipSizeLabel}+${effectValue}cm\\C[0] `;
-};
-if(itemMeta['BodyWeightChange']){
-    var effectValue = itemMeta['BodyWeightChange'];
-    const bodyWeightLabel = `BodyWeight`;//翻訳対象
-    effectText += `\\C[27]${bodyWeightLabel}+${effectValue}kg\\C[0] `;
-};
+}
 
-if(itemMeta['下級鑑定品'] || itemMeta['中級鑑定品'] || itemMeta['上級鑑定品']){
+// 娼婦系説明文: one row per body stat, `<tag>` -> `\\C[27]label+value unit\\C[0] `.
+const BODY_CHANGE_ROWS = [
+  { metaKey: 'BustSizeChange', label: `BustSize`, unit: `cm` },//翻訳対象
+  { metaKey: 'HipSizeChange', label: `HipSize`, unit: `cm` },//翻訳対象
+  { metaKey: 'BodyWeightChange', label: `BodyWeight`, unit: `kg` }//翻訳対象
+];
+
+function describeBodyChangeTags(ctx) {
+  if (ctx.meta['ProstitutionMoneyUp']) {
+    ctx.effectValue = ctx.meta['ProstitutionMoneyUp'];
+    const prostitutionBonusText = `売春額に${ctx.effectValue}倍補正`;//翻訳対象
+    ctx.effectText += `${colorTaggedText(27, prostitutionBonusText)} `;
+  }
+  for (const bodyChangeRow of BODY_CHANGE_ROWS) {
+    if (!ctx.meta[bodyChangeRow.metaKey]) continue;
+    ctx.effectValue = ctx.meta[bodyChangeRow.metaKey];
+    const bodyChangeText = `${bodyChangeRow.label}+${ctx.effectValue}${bodyChangeRow.unit}`;
+    ctx.effectText += `${colorTaggedText(27, bodyChangeText)} `;
+  }
+  describeAppraisalTags(ctx);
+}
+
+// `<下級鑑定品>` / `<中級鑑定品>` / `<上級鑑定品>`: one "未鑑定品" marker followed by the
+// tiers that are present.
+const APPRAISAL_GRADE_ROWS = [
+  { metaKey: '下級鑑定品', label: `下級` },//翻訳対象
+  { metaKey: '中級鑑定品', label: `中級` },//翻訳対象
+  { metaKey: '上級鑑定品', label: `上級` }//翻訳対象
+];
+
+function describeAppraisalTags(ctx) {
+  const presentGradeRows = APPRAISAL_GRADE_ROWS.filter(function (gradeRow) {
+    return ctx.meta[gradeRow.metaKey];
+  });
+  if (!presentGradeRows.length) return;
+
   const unidentifiedLabel = `未鑑定品`;//翻訳対象
-  const lowGradeLabel = `下級`;//翻訳対象
-  const midGradeLabel = `中級`;//翻訳対象
-  const highGradeLabel = `上級`;//翻訳対象
-  var fragText = `\\C[3][${unidentifiedLabel}]\\C[0]`;
-    if(itemMeta['下級鑑定品']){fragText += `\\C[${colorCode}][${lowGradeLabel}]\\C[0]`};
-    if(itemMeta['中級鑑定品']){fragText += `\\C[${colorCode}][${midGradeLabel}]\\C[0]`};
-    if(itemMeta['上級鑑定品']){fragText += `\\C[${colorCode}][${highGradeLabel}]\\C[0]`};
-      effectText += `${fragText} `;
-};
+  let appraisalText = `\\C[3][${unidentifiedLabel}]\\C[0]`;
+  for (const gradeRow of presentGradeRows) {
+    appraisalText += colorTaggedText(ctx.colorCode, `[${gradeRow.label}]`);
+  }
+  ctx.effectText += `${appraisalText} `;
+}
 
-if(itemMeta['walletIn']){
-  var effectValue = itemMeta['BodyWeightChange'];
-  const useWithLabel = `使用で`;//翻訳対象
-  const obtainLabel = `入手`;//翻訳対象
-  effectText += `\\C[${colorCode}][${useWithLabel}\\G${obtainLabel}]\\C[0] `;
-};
-if(itemMeta['QuestSetMap']){
-  if(Number(itemMeta['QuestSetMap']) == 0){
-    var effectValue = `[常設]`;
-  } else {
-    var effectValue = $dataSystem.switches[Number(itemMeta['QuestSetMap'])];
-  };
-  var colorCode = 16;
+function describeQuestHeaderTags(ctx) {
+  if (ctx.meta['walletIn']) {
+    const useWithLabel = `使用で`;//翻訳対象
+    const obtainLabel = `入手`;//翻訳対象
+    ctx.effectText += `\\C[${ctx.colorCode}][${useWithLabel}\\\G${obtainLabel}]\\C[0] `;
+  }
+  appendQuestAcceptRow(ctx);
+  appendQuestTargetRow(ctx);
+  appendQuestSuitableLevelRow(ctx);
+}
+
+// `[\\C[16]label\\C[0]:\\C[2]value\\C[0]]` plus its separator (a space, or a line break
+// after the target row).
+function appendQuestLabelRow(ctx, label, value, separator) {
+  ctx.effectText += `[${colorTaggedText(16, label)}:${colorTaggedText(2, `${value}`)}]${separator}`;
+}
+
+// `<QuestSetMap>`: the switch that unlocks the quest, or `[常設]` for 0.
+function appendQuestAcceptRow(ctx) {
+  if (!ctx.meta['QuestSetMap']) return;
+  ctx.effectValue = Number(ctx.meta['QuestSetMap']) == 0
+    ? `[常設]`//翻訳対象
+    : $dataSystem.switches[Number(ctx.meta['QuestSetMap'])];
   const acceptLabel = `受注`;//翻訳対象
-  effectText += `[\\C[${colorCode}]${acceptLabel}\\C[0]:\\C[2]${effectValue}\\C[0]] `;
-  var colorCode = 2;
-};
-if(itemMeta['QuestSubjectMap']){
-  var effectValue = $dataSystem.switches[Number(itemMeta['QuestSubjectMap'])];
-  var colorCode = 16;
+  appendQuestLabelRow(ctx, acceptLabel, ctx.effectValue, ` `);
+}
+
+// `<QuestSubjectMap>`: the map the quest takes place on.
+function appendQuestTargetRow(ctx) {
+  if (!ctx.meta['QuestSubjectMap']) return;
+  ctx.effectValue = $dataSystem.switches[Number(ctx.meta['QuestSubjectMap'])];
   const targetLabel = `対象`;//翻訳対象
-  effectText += `[\\C[${colorCode}]${targetLabel}\\C[0]:\\C[2]${effectValue}\\C[0]]\n`;
-  var colorCode = 2;
-};
-if(itemMeta['QuestSuitableLv']){
-    var effectValue = Number(itemMeta['QuestSuitableLv']);
-    var colorCode = 16;
-    effectText += `[\\C[${colorCode}]${SUITABLE_LV_LABEL}\\C[0]:\\C[2]${effectValue}\\C[0]] `;
-    var colorCode = 2;
-} else {
-  if(itemMeta['QuestSubjectMap']){
-    var effectValue = Number(itemMeta['QuestSubjectMap']);
-    for (var traitDataId = 1; traitDataId <= $dataItems.length-1; traitDataId++) {
-      if($dataItems[traitDataId].meta['MapSwitch']){
-        if(Number($dataItems[traitDataId].meta['MapSwitch']) == effectValue){
-          if($dataItems[traitDataId].meta['EnemyLV']){
-            var metaValues = $dataItems[traitDataId].meta['EnemyLV'].split(',');
-            var fragText = Math.min(...metaValues);
-            var colorCode = 16;
-            effectText += `[\\C[${colorCode}]${SUITABLE_LV_LABEL}\\C[0]:\\C[2]${fragText}\\C[0]] `;
-            var colorCode = 2;
-            break;
-    }}}};
-  };
-};
-var colorCode = 2;
-// `<QuestCompXxx1>`: eight near-identical blocks, each shown when the first
-// field is at least 1. QuestCompSkillRank1 used to put its brackets inside the
-// colour code instead of around it; that tag is unused in this database, so
-// normalising it is byte-neutral (and the golden diff proves it).
-for (const [questMetaKey, questLabel] of QUEST_OBJECTIVE_LABELS) {
-  const questMeta = itemMeta[questMetaKey];
-  if(questMeta && Number(questMeta.split(',')[0]) >= 1){
-    effectText += `[\\C[${colorCode}]${questLabel}\\C[0]] `;
-  };
-};
-if(itemMeta['CoercionQuest']){
-  const questForcedProgressText = `クエスト進行中に強制進行あり`;//翻訳対象
-  effectText += `[\\C[${colorCode}]${questForcedProgressText}\\C[0]] `;
-};
-if(itemMeta['Stuff']){
-  var effectValue = Number(itemMeta['Stuff']);
-  const satietyText = `満腹度+${effectValue}（${$gameVariables.value(16)}/${$gameVariables.value(13)}）`;//翻訳対象
-  effectText += `\\C[${colorCode}][${satietyText}]\\C[0] `;
-};
-if(itemMeta['ＴＰ']){
-  var effectValue = Number(itemMeta['ＴＰ']);
-  effectText += `\\C[${colorCode}][${TP_LABEL}+${effectValue}]\\C[0] `;
-};
-if(itemMeta['Ingredients']){
-  const ingredientLabel = `食材(換金用途)`;//翻訳対象
-  effectText += `\\C[${colorCode}][${ingredientLabel}]\\C[0] `;
-};
-if(itemMeta['Alcohol']){
-  const alcoholLabel = `アルコール`;//翻訳対象
-  effectText += `\\C[${colorCode}][${alcoholLabel}]\\C[0] `;
-};
-if(itemMeta['ExpiryDate']){
-  if(itemMeta['Menu Category']){
-    if(itemMeta['Menu Category'] == ' Food'){
-      const expirySameDayLabel = `賞味期限当日中`;//翻訳対象
-      effectText += `\\C[${colorCode}][${expirySameDayLabel}]\\C[0] `;
-    };
-  } else {
-      const expiryNextDayLabel = `翌日自動返却`;//翻訳対象
-      effectText += `\\C[${colorCode}][${expiryNextDayLabel}]\\C[0] `;
-  };
-};
-if(itemMeta['EventFactorClearReset']){
-  const questItemLabel = `クエスト関連アイテム`;//翻訳対象
-  effectText += `\\C[${colorCode}][${questItemLabel}]\\C[0] `;
-};
-if(itemMeta['AddPowerCustom']){
-  var effectValue = Number(itemMeta['AddPowerCustom']);
-    if(effectValue >= 1){
-      effectText += `\\I[666]+${effectValue} `;
-    };
-};
-if(itemMeta['RaceDropRarity']){
-  const rarityText = RACE_DROP_RARITY_TEXT[Number(itemMeta['RaceDropRarity'])];
-  if(rarityText){ effectText += rarityText; };
-};
-if(itemMeta['PartyExpRate']){
-  var effectValue = itemMeta['PartyExpRate'];
-  effectText += `\\I[296]${effectValue}${TIMES_SUFFIX} `;
-};
-if(itemMeta['PartyGoldRate']){
-  var effectValue = itemMeta['PartyGoldRate'];
-  effectText += `\\I[314]${effectValue}${TIMES_SUFFIX} `;
-};
-if(itemMeta['EnemyExpRate']){
-  var effectValue = itemMeta['EnemyExpRate'];
-  effectText += `\\I[296]${effectValue}${TIMES_SUFFIX} `;
-};
-if(itemMeta['EnemyGoldRate']){
-  var effectValue = itemMeta['EnemyGoldRate'];
-  effectText += `\\I[314]${effectValue}${TIMES_SUFFIX} `;
-};
-//↓スキル最後に付けるようにする。
+  appendQuestLabelRow(ctx, targetLabel, ctx.effectValue, `\n`);
+}
 
-if(itemMeta['Learn Require Eval']){
+// `<QuestSuitableLv>`, or — when it is missing — the lowest enemy level of the
+// items that belong to the quest map.
+function appendQuestSuitableLevelRow(ctx) {
+  if (ctx.meta['QuestSuitableLv']) {
+    // `effectValue` here, `fragText` in the fallback: the two branches keep the
+    // scratch variables the original left behind (a later row still reads them).
+    ctx.effectValue = Number(ctx.meta['QuestSuitableLv']);
+    appendQuestLabelRow(ctx, SUITABLE_LV_LABEL, ctx.effectValue, ` `);
+    return;
+  }
+  const mapEnemyLevel = questMapEnemyLevel(ctx);
+  if (mapEnemyLevel === null) return;
+  ctx.fragText = mapEnemyLevel;
+  appendQuestLabelRow(ctx, SUITABLE_LV_LABEL, ctx.fragText, ` `);
+}
+
+// The original walked the whole item list and re-read `$dataItems[id].meta` four
+// times per candidate; the entry and its meta are cached now.
+function questMapEnemyLevel(ctx) {
+  if (!ctx.meta['QuestSubjectMap']) return null;
+  ctx.effectValue = Number(ctx.meta['QuestSubjectMap']);
+  for (let itemId = 1; itemId <= $dataItems.length - 1; itemId++) {
+    const candidateItem = $dataItems[itemId];
+    const candidateMeta = candidateItem ? candidateItem.meta : null;
+    if (!candidateMeta || !candidateMeta['MapSwitch']) continue;
+    if (Number(candidateMeta['MapSwitch']) != ctx.effectValue) continue;
+    if (!candidateMeta['EnemyLV']) continue;
+    ctx.metaValues = candidateMeta['EnemyLV'].split(',');
+    return Math.min(...ctx.metaValues);
+  }
+  return null;
+}
+
+// `\\I[icon]rate× ` rows: party/enemy experience and gold bonuses.
+const RATE_ROWS = [
+  { metaKey: 'PartyExpRate', iconId: 296 },
+  { metaKey: 'PartyGoldRate', iconId: 314 },
+  { metaKey: 'EnemyExpRate', iconId: 296 },
+  { metaKey: 'EnemyGoldRate', iconId: 314 }
+];
+
+function describeQuestAndRateTags(ctx) {
+  ctx.colorCode = DESCRIPTION_DEFAULT_COLOR_CODE;
+  describeQuestObjectiveTags(ctx);
+  describeQuestItemTags(ctx);
+  describeRateTags(ctx);
+}
+
+// `<QuestComp…1>`: one `[label] ` per objective whose first field is at least 1.
+function describeQuestObjectiveTags(ctx) {
+  for (const [questMetaKey, questLabel] of QUEST_OBJECTIVE_LABELS) {
+    const questMeta = ctx.meta[questMetaKey];
+    if (!questMeta || Number(questMeta.split(',')[0]) < 1) continue;
+    ctx.effectText += `[${colorTaggedText(ctx.colorCode, questLabel)}] `;
+  }
+  if (ctx.meta['CoercionQuest']) {
+    const questForcedProgressText = `クエスト進行中に強制進行あり`;//翻訳対象
+    ctx.effectText += `[${colorTaggedText(ctx.colorCode, questForcedProgressText)}] `;
+  }
+}
+
+// Simple `[label]` / `[label+value]` item rows.
+function describeQuestItemTags(ctx) {
+  if (ctx.meta['Stuff']) {
+    ctx.effectValue = Number(ctx.meta['Stuff']);
+    const currentSatiety = $gameVariables.value(16);
+    const maxSatiety = $gameVariables.value(13);
+    const satietyText = `満腹度+${ctx.effectValue}（${currentSatiety}/${maxSatiety}）`;//翻訳対象
+    ctx.effectText += `${colorTaggedText(ctx.colorCode, `[${satietyText}]`)} `;
+  }
+  if (ctx.meta['ＴＰ']) {
+    ctx.effectValue = Number(ctx.meta['ＴＰ']);
+    ctx.effectText += `${colorTaggedText(ctx.colorCode, `[${TP_LABEL}+${ctx.effectValue}]`)} `;
+  }
+  if (ctx.meta['Ingredients']) {
+    const ingredientLabel = `食材(換金用途)`;//翻訳対象
+    ctx.effectText += `${colorTaggedText(ctx.colorCode, `[${ingredientLabel}]`)} `;
+  }
+  if (ctx.meta['Alcohol']) {
+    const alcoholLabel = `アルコール`;//翻訳対象
+    ctx.effectText += `${colorTaggedText(ctx.colorCode, `[${alcoholLabel}]`)} `;
+  }
+  describeExpiryDateTag(ctx);
+  if (ctx.meta['EventFactorClearReset']) {
+    const questItemLabel = `クエスト関連アイテム`;//翻訳対象
+    ctx.effectText += `${colorTaggedText(ctx.colorCode, `[${questItemLabel}]`)} `;
+  }
+  if (ctx.meta['AddPowerCustom']) {
+    ctx.effectValue = Number(ctx.meta['AddPowerCustom']);
+    if (ctx.effectValue >= 1) ctx.effectText += `\\I[666]+${ctx.effectValue} `;
+  }
+  if (ctx.meta['RaceDropRarity']) {
+    const rarityText = RACE_DROP_RARITY_TEXT[Number(ctx.meta['RaceDropRarity'])];
+    if (rarityText) ctx.effectText += rarityText;
+  }
+}
+
+// `<ExpiryDate>`: food expires the same day, everything else is returned the next
+// day. (A `<Menu Category>` other than ` Food` shows neither, as before.)
+function describeExpiryDateTag(ctx) {
+  if (!ctx.meta['ExpiryDate']) return;
+  const menuCategory = ctx.meta['Menu Category'];
+  if (menuCategory && menuCategory != ' Food') return;
+  const expiryLabel = menuCategory ? `賞味期限当日中` : `翌日自動返却`;//翻訳対象
+  ctx.effectText += `${colorTaggedText(ctx.colorCode, `[${expiryLabel}]`)} `;
+}
+
+function describeRateTags(ctx) {
+  for (const rateRow of RATE_ROWS) {
+    if (!ctx.meta[rateRow.metaKey]) continue;
+    ctx.effectValue = ctx.meta[rateRow.metaKey];
+    ctx.effectText += `\\I[${rateRow.iconId}]${ctx.effectValue}${TIMES_SUFFIX} `;
+  }
+}
+
+function describeFinalTags(ctx) {
+if(ctx.meta['Learn Require Eval']){
     const learnRequirementLabel = `習得条件あり`;//翻訳対象
-    headerText += `[\\C[${colorCode}]${learnRequirementLabel}\\C[0]]`;
+    ctx.headerText += `[\\C[${ctx.colorCode}]${learnRequirementLabel}\\C[0]]`;
 };
 
-if(itemMeta['SwicthOnOffUse']){
+if(ctx.meta['SwicthOnOffUse']){
     const toggleOnUseLabel = `使用でOn/Off`;//翻訳対象
-    effectText += `[\\C[${colorCode}]${toggleOnUseLabel}\\C[0]]`;
+    ctx.effectText += `[\\C[${ctx.colorCode}]${toggleOnUseLabel}\\C[0]]`;
 };
 
 //↓ステート最後に付けるようにする。
 // Each of the five `<Category>` values appends one fixed state's help text.
-const categoryStateId = CATEGORY_HELP_STATE_IDS[itemMeta['Category']];
+const categoryStateId = CATEGORY_HELP_STATE_IDS[ctx.meta['Category']];
 if(categoryStateId){
-  suffixText += `\\C[${colorCode}]${$dataStates[categoryStateId].description}\\C[0] `;
+  ctx.suffixText += `\\C[${ctx.colorCode}]${$dataStates[categoryStateId].description}\\C[0] `;
 };
-if(itemMeta['timeRemove']){
+if(ctx.meta['timeRemove']){
   const timeReleaseLabel = `時間経過で解除`;//翻訳対象
-  effectText += `[\\C[${colorCode}]${timeReleaseLabel}\\C[0]]`;
+  ctx.effectText += `[\\C[${ctx.colorCode}]${timeReleaseLabel}\\C[0]]`;
 };
 
-if(databaseTypeId == 4){
-  if(itemMeta['registUp']){
-    var effectValue = itemMeta['registUp'];
-    const resistOnApplyText = `付与時に耐性率${effectValue}%up`;//翻訳対象
-    effectText += `[\\C[${colorCode}]${resistOnApplyText}\\C[0]]`;
+if(ctx.databaseTypeId == 4){
+  if(ctx.meta['registUp']){
+    ctx.effectValue = ctx.meta['registUp'];
+    const resistOnApplyText = `付与時に耐性率${ctx.effectValue}%up`;//翻訳対象
+    ctx.effectText += `[\\C[${ctx.colorCode}]${resistOnApplyText}\\C[0]]`;
   };
-  if(item.autoRemovalTiming >= 1){
-    var fragText = `\\I[75]:${item.minTurns}`;
-      if(item.minTurns != item.maxTurns){
-        fragText += `～${item.maxTurns}`;
+  if(ctx.item.autoRemovalTiming >= 1){
+    ctx.fragText = `\\I[75]:${ctx.item.minTurns}`;
+      if(ctx.item.minTurns != ctx.item.maxTurns){
+        ctx.fragText += `～${ctx.item.maxTurns}`;
       };
-      effectText += `[${fragText}] `;
+      ctx.effectText += `[${ctx.fragText}] `;
   } else {
     // `∞` when none of the equipped passive skills / weapons / armors grants
     // this state. Three identical scan-the-whole-list loops used to decide it;
     // this short-circuits and allocates nothing.
-    const grantedByEquipment = containsState(valueEquipPassiveSkill, i)
-      || containsState(valueEquipPassiveWeapon, i)
-      || containsState(valueEquipPassiveArmor, i);
-    if(!grantedByEquipment){ effectText += `[\\I[75]:∞] `; };
+    const grantedByEquipment = containsState(valueEquipPassiveSkill, ctx.entryIndex)
+      || containsState(valueEquipPassiveWeapon, ctx.entryIndex)
+      || containsState(valueEquipPassiveArmor, ctx.entryIndex);
+    if(!grantedByEquipment){ ctx.effectText += `[\\I[75]:∞] `; };
   };
 
 };
-if(databaseTypeId == 4){var descWordText = `　${descWordText}`};
-if(databaseTypeId != 4){
-  if(item.description == undefined){
-    if(itemMeta['NoAddDescription']){
-      item.description = `解説なし`;
-    } else {
-      item.description = ``;
-    };
-  };
-};
-// `descWordText` is 0 when the entry has no `<DescriptionWord>` and the rendered
-// word otherwise. Without `NoAddDescription` the effect text always follows on a
-// new line; with it, the description word (if any) is the only thing appended,
-// and it too goes on its own line.
-const descWordPart = descWordText == 0 ? `` : descWordText;
-const descWordPart1 = descWordPart ? `\n${descWordPart}` : ``;
-const tempDesc = itemMeta['NoAddDescription']
-  ? `${headerText}${item.description}${suffixText}${descWordPart1}`
-  : `${headerText}${item.description}${suffixText}\n${descWordPart}${effectText}`;
-if(databaseTypeId == 0 || databaseTypeId == 1 || databaseTypeId == 2 || databaseTypeId == 3){
-  item.description = tempDesc;
-};
-if(databaseTypeId == 4){//ステートとジョブは解説入れてる分のみに適用するため。
-  if(itemMeta['Help Description']){
-    item.description = tempDesc;
-}};
-if(!itemMeta['NoAddDescription']){
-  if(databaseTypeId == 5){//ステートとジョブは解説入れてる分のみに適用するため。
-    if(itemMeta['Help Description']){
-      item.description = `${headerText}${item.description}${suffixText}${effectText}`;
-}}};
+}
 
-//解説では無く実際に影響のある処理。解説に反映させたくないもの。
-if(databaseTypeId == 1 || databaseTypeId == 2 || databaseTypeId == 4 || databaseTypeId == 5){//スキルタイプ4封印で5-8までまとめて封印。
-  for (var traitIndex = 0; traitIndex <= 19; traitIndex++) {
-    if(item.traits[traitIndex]){
-      if(item.traits[traitIndex].code == 42){ 
-        if(item.traits[traitIndex].dataId == 4){
-          item.traits.push({code: 42, dataId: 5, value: 1});
-          item.traits.push({code: 42, dataId: 6, value: 1});
-          item.traits.push({code: 42, dataId: 7, value: 1});
-          item.traits.push({code: 42, dataId: 8, value: 1});
-  }}}};
-};
+function describeElementAttackTrait(ctx, trait, traitIndex) {
+  const traitDataId = trait.dataId;
+  const traitValue = trait.value;
+      if(trait.code == 31){
+        if(traitDataId >= 1 && traitDataId <= $dataSystem.elements.length-1){
+          if(!ctx.meta['EnemyState']){
+            if(SPECIAL_ATTACK_ELEMENT_IDS.indexOf(traitDataId) >= 0){
+              var colorTaggeredText = colorTaggedText(ctx.colorCode, `特攻属性付与`);
+              ctx.effectText += `${colorTaggeredText}${elementLabel(traitDataId)} `;
+            } else {
+              var colorTaggeredText = colorTaggedText(ctx.colorCode, `攻撃属性付与`);
+              ctx.effectText += `${colorTaggeredText}${elementLabel(traitDataId)}\\C[${ctx.colorCode}] `;
+            };
+          };
+        };
+      };
+}
 
-};//ここまでで各種データベースのlength-1.
+function describeElementResistTrait(ctx, trait, traitIndex) {
+  const traitDataId = trait.dataId;
+  const traitValue = trait.value;
+      if(trait.code == 11){
+        if(traitDataId >= 1 && traitDataId <= $dataSystem.elements.length-1){
+          // Read the descriptor once: each call allocates.
+          const elementIcon = amygame_elementIcon(traitDataId);
+          if(elementIcon[0] >= 1){
+            // A handful of element ids carry a literal label instead of an icon.
+            ctx.fragText = `${elementIcon[1]}`;
+          } else {
+            // Element 11 is scaled by 10 rather than 100, so a "10% resist" is
+            // written as 1 in the database.
+            ctx.effectValue = Math.round(Math.abs(traitValue - 1) * (traitDataId == 11 ? 10 : 100));
+			var pm = traitValue >= 1 ? `+` : `-`;
+			var pmName = traitValue >= 1 ? `耐性-` : `耐性+`;
+			var pmMsg = RESIST_SPECIAL_ELEMENT_IDS.indexOf(traitDataId) >= 0 ? pm : pmName;
+            ctx.fragText = `${elementResistIcon(elementIcon)}(${pmMsg})`;
+          };
+          // Element ids 35/37/38/41 are never listed, and 41-80 are enemy-only:
+          // the latter are hidden altogether when the page is a state page.
+          if(RESIST_EXCLUDED_ELEMENT_IDS.indexOf(traitDataId) < 0
+             && !(ctx.meta['EnemyState'] && traitDataId >= 41 && traitDataId <= 80)){
+            ctx.effectText += `${ctx.fragText}${ctx.effectValue}% `;
+          };
+        };
+      };
+}
 
-};
+function describeDebuffResistTrait(ctx, trait, traitIndex) {
+  const traitDataId = trait.dataId;
+  const traitValue = trait.value;
+      if(trait.code == 12){
+        if(traitDataId >= 0 && traitDataId <= 7){
+          if(traitValue >= 1){
+            ctx.effectValue = Math.round((traitValue - 1) * 100);
+            var colorTaggeredText = colorTaggedText(1, `耐性-`);
+            ctx.fragText = `${colorTaggeredText}\x1bI[${traitDataId + 48}]`;
+          } else {
+            ctx.effectValue = Math.round((1 - traitValue) * 100);
+            var colorTaggeredText = colorTaggedText(ctx.colorCode, `耐性+`);
+            ctx.fragText = `${colorTaggeredText}\x1bI[${traitDataId + 48}]`;
+          };
+          ctx.effectText += `${ctx.fragText}${ctx.effectValue}% `;
+        };
+      };
+}
+
+function describeStateResistTrait(ctx, trait, traitIndex) {
+  const traitDataId = trait.dataId;
+  const traitValue = trait.value;
+      if(trait.code == 13){
+        if(traitDataId >= 1 && traitDataId <= $dataStates.length-1){
+          ctx.effectValue = Math.round(Math.abs(traitValue - 1) * 100);
+          var resistColor = traitValue >= 1 ? 1 : ctx.colorCode;
+          var colorTaggeredText = colorTaggedText(resistColor, traitValue >= 1 ? `耐性-` : `耐性+`);
+          ctx.effectText += `\\C[0]${colorTaggeredText}${stateIconText(traitDataId)}${ctx.effectValue}% `;
+        };
+      };
+}
+
+function describeStateNullifyTrait(ctx, trait, traitIndex) {
+  const traitDataId = trait.dataId;
+  const traitValue = trait.value;
+      if(trait.code == 14){
+        if(traitDataId >= 1 && traitDataId <= $dataStates.length-1){
+          var colorTaggeredText = colorTaggedText(ctx.colorCode, `無効化`);
+          ctx.effectText += `${colorTaggeredText}${stateIconText(traitDataId)} `;
+        };
+      };
+}
+
+function describeStatUpTrait(ctx, trait, traitIndex) {
+  const traitDataId = trait.dataId;
+  const traitValue = trait.value;
+      if((traitIndex > ctx.statUpCount || ctx.statUpCount <= 4) && trait.code == 21){
+        if(traitDataId >= 0 && traitDataId <= 7){
+          ctx.effectText += allStatUpText(traitValue, `\x1bI[${traitDataId + 32}]+`, `\x1bI[${traitDataId + 48}]-`, false);
+        };
+      };
+}
+
+function describeXparamTrait(ctx, trait, traitIndex) {
+  const traitDataId = trait.dataId;
+  const traitValue = trait.value;
+      if(trait.code == 22){
+        if(traitDataId >= 0 && traitDataId <= 9){
+          var xparamIcons = XPARAM_ICONS[traitDataId] || PARAM_ICON_DEFAULT;
+          if(traitValue >= 0.01){
+            ctx.effectText += `\x1bI[${xparamIcons[1]}]+${Math.round(traitValue * 100)}% `;
+          } else {
+            ctx.effectText += `\x1bI[${xparamIcons[2]}]${Math.round(traitValue * 100)}% `;
+          };
+        };
+      };
+}
+
+function describeSparamTrait(ctx, trait, traitIndex) {
+  const traitDataId = trait.dataId;
+  const traitValue = trait.value;
+      if(ctx.damageCutCount <= 1 && trait.code == 23){
+        if(traitDataId >= 0 && traitDataId <= 9){
+          var sparamIcons = SPARAM_ICONS[traitDataId] || PARAM_ICON_DEFAULT;
+          var negativeIsGood = SPARAM_ICONS_NEGATIVE_IS_GOOD.indexOf(traitDataId) >= 0;
+          var isUp = (traitValue >= 1) !== negativeIsGood;
+		  const pm = isUp ? `+` : `-`;
+          ctx.effectText += `\x1bI[${isUp ? sparamIcons[1] : sparamIcons[2]}]${pm}${Math.round(Math.abs(traitValue - 1) * 100)}% `;
+        };
+      };
+}
+
+function describeStateAddTrait(ctx, trait, traitIndex) {
+  const traitDataId = trait.dataId;
+  const traitValue = trait.value;
+      if(trait.code == 32){ //31は先頭で実行済み。
+        if(traitDataId >= 1 && traitDataId <= $dataStates.length-1){
+          var colorTaggeredText = colorTaggedText(ctx.colorCode, `ステート付与`);
+          ctx.effectText += `${colorTaggeredText}${stateIconText(traitDataId)}${Math.round(traitValue * 100)}% `;
+        };
+      };
+}
+
+function describeAttackSpeedTrait(ctx, trait, traitIndex) {
+  const traitDataId = trait.dataId;
+  const traitValue = trait.value;
+      if(trait.code == 33){
+        if(traitDataId == 0){
+          var colorTaggeredText = colorTaggedText(ctx.colorCode, `AttackSpeed+`);
+          ctx.effectText += `${colorTaggeredText}${Math.round(traitValue)} `;
+        };
+      };
+}
+
+function describeSkillTypeUnlockTrait(ctx, trait, traitIndex) {
+  const traitDataId = trait.dataId;
+  const traitValue = trait.value;
+      if(trait.code == 41){
+        if(traitDataId >= 1 && traitDataId <= $dataSystem.skillTypes.length-1){
+          var colorTaggeredText = colorTaggedText(ctx.colorCode, `使用可能`);
+          ctx.effectText += `${colorTaggeredText}<${$dataSystem.skillTypes[traitDataId]}> `;
+        };
+      };
+}
+
+function describeSkillTypeSealTrait(ctx, trait, traitIndex) {
+  const traitDataId = trait.dataId;
+  const traitValue = trait.value;
+      if(trait.code == 42){
+        if(traitDataId >= 1 && traitDataId <= $dataSystem.skillTypes.length-1){
+          ctx.effectText += `\\I[626]<${$dataSystem.skillTypes[traitDataId]}> `;
+        };
+      };
+}
+
+function describeSkillUnlockTrait(ctx, trait, traitIndex) {
+  const traitDataId = trait.dataId;
+  const traitValue = trait.value;
+      if(trait.code == 43){
+        if(traitDataId >= 1 && traitDataId <= $dataSkills.length-1){
+          var skillRef = `<\x1bSIN[${traitDataId}]>`;
+          if(ctx.databaseTypeId == 1 && $dataSkills[traitDataId].stypeId == BURST_SKILL_TYPE_ID){
+            var colorTaggeredText = colorTaggedText(ctx.colorCode, `Burst`);
+            ctx.effectText += `${colorTaggeredText}${skillRef} `;
+          } else {
+            var colorTaggeredText = colorTaggedText(ctx.colorCode, `使用可能`);
+            ctx.effectText += `${colorTaggeredText}${skillRef} `;
+          };
+        };
+      };
+}
+
+function describeSkillSealTrait(ctx, trait, traitIndex) {
+  const traitDataId = trait.dataId;
+  const traitValue = trait.value;
+      if(trait.code == 44){
+        if(traitDataId >= 1 && traitDataId <= $dataSkills.length-1){
+          ctx.effectText += `\\I[626]<\x1bSIN[${traitDataId}]> `;
+        };
+      };
+}
+
+function describeWeaponTypeTrait(ctx, trait, traitIndex) {
+  const traitDataId = trait.dataId;
+  const traitValue = trait.value;
+      if(ctx.tenWeaponCount <= 9 && trait.code == 51){
+        if(traitDataId >= 1 && traitDataId <= $dataSystem.weaponTypes.length-1){
+          var colorTaggeredText = colorTaggedText(ctx.colorCode, `武器種`);
+          ctx.effectText += `${colorTaggeredText}<${$dataSystem.weaponTypes[traitDataId]}> `;
+        };
+      };
+}
+
+function describeArmorTypeTrait(ctx, trait, traitIndex) {
+  const traitDataId = trait.dataId;
+  const traitValue = trait.value;
+      if(trait.code == 52){
+        if(traitDataId >= 2 && traitDataId <= $dataSystem.armorTypes.length-1){
+          var colorTaggeredText = colorTaggedText(ctx.colorCode, `防具種`);
+          ctx.effectText += `${colorTaggeredText}<${$dataSystem.armorTypes[traitDataId]}> `;
+        };
+      };
+}
+
+function describeEquipFixedTrait(ctx, trait, traitIndex) {
+  const traitDataId = trait.dataId;
+  const traitValue = trait.value;
+      if(trait.code == 53){
+        if(traitDataId >= 1 && traitDataId <= $dataSystem.equipTypes.length-1){
+          var colorTaggeredText = colorTaggedText(1, `装備固定`);
+          ctx.effectText += `${colorTaggeredText}<${$dataSystem.equipTypes[traitDataId]}> `;
+        };
+      };
+}
+
+function describeEquipSealedTrait(ctx, trait, traitIndex) {
+  const traitDataId = trait.dataId;
+  const traitValue = trait.value;
+      if(trait.code == 54){
+        if(traitDataId >= 1 && traitDataId <= $dataSystem.equipTypes.length-1){
+          var colorTaggeredText = colorTaggedText(1, `装備封印`);
+          ctx.effectText += `${colorTaggeredText}<${$dataSystem.equipTypes[traitDataId]}> `;
+        };
+      };
+}
+
+function describeActionCountTrait(ctx, trait, traitIndex) {
+  const traitDataId = trait.dataId;
+  const traitValue = trait.value;
+      if(trait.code == 61){
+        if(traitDataId == 0){
+          var colorTaggeredText = colorTaggedText(ctx.colorCode, `行動回数追加`);
+          ctx.effectText += `${colorTaggeredText}${Math.round(traitValue * 100)}% `;
+        };
+      };
+}
+
+// ---------------------------------------------------------------------------
+// Output assembly: header + description + effect lines, then the page-specific
+// write rules (states/classes only get text when they carry <Help Description>).
+// ---------------------------------------------------------------------------
+function applyEntryDescription(ctx) {
+  const { item, meta, databaseTypeId } = ctx;
+  if (databaseTypeId == DESCRIPTION_DATABASE_STATE) ctx.descWordText = `　${ctx.descWordText}`;
+  if (databaseTypeId != DESCRIPTION_DATABASE_STATE && item.description == undefined) {
+    item.description = meta['NoAddDescription'] ? `解説なし` : ``;
+  }
+
+  const descriptionWordPart = ctx.descWordText == 0 ? `` : ctx.descWordText;
+  const descriptionWordLine = descriptionWordPart ? `\n${descriptionWordPart}` : ``;
+  const generatedDescription = meta['NoAddDescription']
+    ? `${ctx.headerText}${item.description}${ctx.suffixText}${descriptionWordLine}`
+    : `${ctx.headerText}${item.description}${ctx.suffixText}\n${descriptionWordPart}${ctx.effectText}`;
+
+  if (databaseTypeId == DESCRIPTION_DATABASE_STATE) {
+    if (meta['Help Description']) item.description = generatedDescription;
+    return;
+  }
+  if (databaseTypeId == DESCRIPTION_DATABASE_CLASS) {
+    if (!meta['NoAddDescription'] && meta['Help Description']) {
+      item.description = `${ctx.headerText}${item.description}${ctx.suffixText}${ctx.effectText}`;
+    }
+    return;
+  }
+  item.description = generatedDescription;
+}
+
+// Trait code 42 (skill-type seal) for type 4 also seals types 5-8. This is a real
+// database change, not text, so it lives next to the write rules.
+const SEALED_SKILL_TYPE_GROUPS = { 4: [5, 6, 7, 8] };
+
+function expandSealedSkillTypes(ctx) {
+  const { item, databaseTypeId } = ctx;
+  if (databaseTypeId != DESCRIPTION_DATABASE_WEAPON && databaseTypeId != DESCRIPTION_DATABASE_ARMOR
+      && databaseTypeId != DESCRIPTION_DATABASE_STATE && databaseTypeId != DESCRIPTION_DATABASE_CLASS) return;
+  for (let traitIndex = 0; traitIndex <= 19; traitIndex++) {
+    const trait = item.traits[traitIndex];
+    if (!trait || trait.code != 42) continue;
+    const sealedTypes = SEALED_SKILL_TYPE_GROUPS[trait.dataId];
+    if (!sealedTypes) continue;
+    for (const sealedTypeId of sealedTypes) item.traits.push({ code: 42, dataId: sealedTypeId, value: 1 });
+  }
+}
 
 //通常攻撃の追加説明文にランク補正値と派生スキルの有無を表示valueAddDescriptionSkill = Array(101).fill(0);
 // Normal attacks get a rank-correction line and, optionally, the skills they
@@ -1688,30 +2092,32 @@ attackSkillRankText = function (skill, headerText) {
   };
   return descriptionText;
 }
+// `valueAddDescriptionSkill[id - offset]`: 101-200 are the plain normal attacks
+// and 901-950 the same rows with a required-mastery header, so one helper covers
+// both ranges.
 attack_addKaisetu1 = function(){
-  // 101-200: the plain normal attacks.
-  for (let skillId = 101; skillId <= 200; skillId++) {
-    const skill = $dataSkills[skillId];
-    if(skill.name != ''){
-      valueAddDescriptionSkill[skillId - 100] = attackSkillRankText(skill, ``);
-    };
-  };
-  // 901-950: the same, with a required-mastery header.
-  for (let skillId = 901; skillId <= 950; skillId++) {
-    const skill = $dataSkills[skillId];
-    if(skill.name != ''){
-      const headerText = `[必要熟練度:基礎値${Number(skill.meta.RankUpPoint)}にランク×基礎値をプラス]`;
-      valueAddDescriptionSkill[skillId - 800] = attackSkillRankText(skill, headerText);
-    };
-  };
+  fillAttackDescriptions(101, 200, 100, function () { return ``; });
+  fillAttackDescriptions(901, 950, 800, requiredMasteryHeader);
 };
 
-recoveryEffectMsg = function (ind1,ind2) {
-	const obj1 = `\\I[ind1]`;
-	const obj2 = `\\I[ind2]`;
-	const effectName = `回復`;
-	const extraEffectMsg = `対象の${obj2}も影響`;
-	return `[\\C[3]${effectName}:${obj1}100%(${extraEffectMsg})\\C[0]`;
+function requiredMasteryHeader(skill) {
+  return `[必要熟練度:基礎値${Number(skill.meta.RankUpPoint)}にランク×基礎値をプラス]`;//翻訳対象
+}
+
+function fillAttackDescriptions(firstSkillId, lastSkillId, idOffset, headerFor) {
+  for (let skillId = firstSkillId; skillId <= lastSkillId; skillId++) {
+    const skill = $dataSkills[skillId];
+    if (skill.name == '') continue;
+    valueAddDescriptionSkill[skillId - idOffset] = attackSkillRankText(skill, headerFor(skill));
+  }
+};
+
+recoveryEffectMsg = function (ind1, ind2) {
+	const recoveryEffectName = `回復`;//翻訳対象
+	const icon1 = `\\I[${ind1}]`;
+	const icon2 = `\\I[${ind2}]`;
+	const extraEffectMsg = `対象の${icon2}も影響`;//翻訳対象
+	return `[\\C[3]${recoveryEffectName}:${icon1}100%(${extraEffectMsg})\\C[0]`;
 }
 
 //ジョブの追加説明文valueAddDescriptionClass
@@ -1737,11 +2143,13 @@ class_addKaisetu1 = function(){
     const growthStatRow = growthStatText(growthStats, classRankVal);
     descriptionText += `[GrowStatas:${growthStatRow}]\n`;
     comparisonText += `:${growthStatRow}]`;
+    // Read once: the original called $gameVariables.value(6) for every slot.
+    const requiredPrimaryLevel = classMeta['Primary Only'] ? $gameVariables.value(6) : 0;
     for (let learningIndex = 0; learningIndex <= 10; learningIndex++) {
       const learning = classData.learnings[learningIndex];
       if(!learning){ continue; };
       // Main classes only list the skills the current playthrough has reached.
-      if(classMeta['Primary Only'] && learning.level < $gameVariables.value(6)){ continue; };
+      if(classMeta['Primary Only'] && learning.level < requiredPrimaryLevel){ continue; };
       const levelLabel = `Lv`;//翻訳対象
       descriptionText += `[${levelLabel}${learning.level}:\\C[2]\x1bSIN[${learning.skillId}]\\C[0]]`;
     };
