@@ -3691,8 +3691,12 @@
     $gameSwitches.setValue(switchId, !!flag);
   }
   function findItemIdByMetaKey(metaKey) {
-    const itemId = range(1, $dataItems.length - 1).find((id) => $dataItems[id].meta[metaKey]);
-    return itemId || 0;
+    const items = $dataItems;
+    for (let itemId = 1; itemId < items.length; itemId++) {
+      const item = items[itemId];
+      if (item && item.meta && item.meta[metaKey]) return itemId;
+    }
+    return 0;
   }
   function spendGoldForJobMaterial(goldAmount, materialMetaKey) {
     $gameParty.loseGold(goldAmount);
@@ -3913,11 +3917,11 @@
    * Message strings write the engine's control characters as an inline
    * placeholder instead of the raw escape, e.g.
    *
-   *     `「${characterName(2)}さん、行きましょう！」`   instead of   `「\N[2]さん、行きましょう！」`
+   *     const actorName = characterName(2); `「${actorName}さん、行きましょう！」`   instead of   `「\N[2]さん、行きましょう！」`
    *
    * Each helper expands back to the very control code the game already used, so
    * the rendered text is unchanged — a translator (or a tool that extracts the
-   * strings) sees ${whatItIs(n)} instead of a cryptic backslash pair.  The names
+   * strings) sees const objName = whatItIs(n); ${objName} instead of a cryptic backslash pair.  The names
    * follow the wording of the marker list at the top of the file; the complete
    * table is repeated right below that list.
    */
@@ -5120,10 +5124,8 @@
 
   // Replaces (1x): data/CommonEvents.json:common-event:60
   AGH_showInfoPopup = function () {
-    const fontColor3 = fontColor(3);
-    const talkSet0 = valueTalkSet[0];
-    const fontColor0 = fontColor(0);
-    showCommonInfo(`Tips:${fontColor3}${talkSet0}${fontColor0}を獲得`);
+    const itemName = colorTaggedText(3, valueTalkSet[0]);
+    showCommonInfo("Tips:" + `${itemName}を獲得`);
   };
 
   // Replaces (1x): data/Map003.json:map-event:3:page:2
@@ -7552,25 +7554,23 @@
   };
 
   // Replaces (1x): data/Map003.json:map-event:237:page:1
-  AGH_setInnReceptionistNpcNameAndDialogue = function () {
-    setNpcIdentity(20, "宿受付", $dataWeapons[421].name);
+  AGH_setInnReceptionistNpcNameAndDialogue = function (isLandlady = false) {
+    const npcRoleName = isLandlady ? "宿女将" : "宿受付";
+    setNpcIdentity(20, npcRoleName, $dataWeapons[421].name);
     valueCountSet1 = 1231;
     valueCountSet2 = 1232;
-    const innPriceText = variableText(21); // variable 21: 乱数汎用1 (here: the nightly price)
-    const displayText = goldIcon();
-    setVar(23, `「いらっしゃい。\nウチは一泊${innPriceText}${displayText}よ。\n泊まっていくのかしら？」\n`);
+    const innPriceText = variableText(21);
+    const currencyMarker = goldIcon();
+    const messageText = isLandlady
+      ? `「いらっしゃい。\nウチは一泊${innPriceText}${currencyMarker}よ。\n泊まっていくかしら？」\n`
+      : `「いらっしゃい。\nウチは一泊${innPriceText}${currencyMarker}よ。\n泊まっていくのかしら？」\n`;
+    setVar(23, messageText);
     setVar(22, "$FACE[People4, 5]");
   };
 
   // Replaces (1x): data/Map046.json:map-event:4:page:1
   AGH_setInnLandladyNpcNameAndDialogue = function () {
-    setNpcIdentity(20, "宿女将", $dataWeapons[421].name);
-    valueCountSet1 = 1231;
-    valueCountSet2 = 1232;
-    const innPriceText = variableText(21); // variable 21: 乱数汎用1 (here: the nightly price)
-    const displayText = goldIcon();
-    setVar(23, `「いらっしゃい。\nウチは一泊${innPriceText}${displayText}よ。\n泊まっていくかしら？」\n`);
-    setVar(22, "$FACE[People4, 5]");
+    return AGH_setInnReceptionistNpcNameAndDialogue(true);
   };
 
   /* ============================================================================
@@ -7836,17 +7836,14 @@
   };
 
   // Replaces (2x): data/CommonEvents.json:common-event:300, data/Map007.json:map-event:3:page:1
-  AGH_applyAfterimageType20 = function (interp) {
-    const AFTERIMAGE_TYPE = 20;
-    event_charaZanzou(interp._eventId, AFTERIMAGE_TYPE);
-    interp._eventId = spawnedEventId(AFTERIMAGE_TYPE);
+  AGH_applyAfterimageType20 = function (interp, afterimageType = 20) {
+    event_charaZanzou(interp._eventId, afterimageType);
+    interp._eventId = spawnedEventId(afterimageType);
   };
 
   // Replaces (2x): data/CommonEvents.json:common-event:300, data/Map007.json:map-event:3:page:1
   AGH_applyAfterimageType19 = function (interp) {
-    const AFTERIMAGE_TYPE = 19;
-    event_charaZanzou(interp._eventId, AFTERIMAGE_TYPE);
-    interp._eventId = spawnedEventId(AFTERIMAGE_TYPE);
+    return AGH_applyAfterimageType20(interp, 19);
   };
 
   // Replaces (3x): data/CommonEvents.json:common-event:318, :326, :333
@@ -8335,22 +8332,18 @@
   };
 
   // Replaces (1x): data/CommonEvents.json:common-event:83
-  AGH_appendEstrusLine = function (interp) {
+  AGH_appendEstrusLine = function (interp, isRestless = false) {
     const actorName = actor.name();
-    const fontColor27 = fontColor(27);
-    const fontColor0 = fontColor(0);
-    appendStoredSelfLine(interp, `${actorName}は${fontColor27}発情${fontColor0}した肢体を慰めている…。\n`);
+	const effectName = colorTaggedText(27, 発情);
+    const messageText = isRestless
+      ? `${actorName}は${effectName}した肢体を持て余している…。` + `\n`
+      : `${actorName}は${effectName}した肢体を慰めている…。` + `\n`;
+    appendStoredSelfLine(interp, messageText);
   };
 
   // Replaces (1x): data/CommonEvents.json:common-event:83
   AGH_appendEstrusLine2 = function (interp) {
-    const actorName = actor.name();
-    const fontColor27 = fontColor(27);
-    const fontColor0 = fontColor(0);
-    appendStoredSelfLine(
-      interp,
-      `${actorName}は${fontColor27}発情${fontColor0}した肢体を持て余している…。\n`
-    );
+    return AGH_appendEstrusLine(interp, true);
   };
 
   // Replaces (11x): data/CommonEvents.json:common-event:338, :481, :503, :536, :537, :544, ...
@@ -8681,10 +8674,8 @@
   // Replaces (1x): data/CommonEvents.json:common-event:300
   AGH_announceCentralPlainsOnMap = function (interp) {
     setSelfVar(interp, CURRENT_ACTOR_VAR, 0);
-    const fontColor16 = fontColor(16);
-    const centralPlainsName = $dataSystem.switches[252];
-    const fontColor0 = fontColor(0);
-    valueWordSet0 = `全体マップに${fontColor16}${centralPlainsName}${fontColor0}が追加されました`;
+	const centralPlainsName = colorTaggedText(16, $dataSystem.switches[252]);
+    valueWordSet0 = `全体マップに${centralPlainsName}が追加されました`;
     valueWordSetEx = 0; // 補足が必要な場合
     AGH_runCommonEventAsChild(interp, 45);
   };
@@ -8752,11 +8743,10 @@
 
   // Replaces (2x): data/Map003.json:map-event:166:page:2, data/Map003.json:map-event:243:page:2
   AGH_showTickerQuestAccepted = function () {
-    const fontColor3 = fontColor(3);
-    const questItemIcon = itemIconName(valueCountSet1); // the quest item (valueCountSet1)
-    const fontColor0 = fontColor(0);
-    showTicker(`クエスト${fontColor3}${questItemIcon}${fontColor0}を受注しました。`);
-    $gameParty.gainItem($dataItems[valueCountSet1], 1);
+	const itemIndex = valueCountSet1;
+    const itemName = colorTaggedText(3, itemIconName(itemIndex)); // the quest item (valueCountSet1)
+    showTicker(`クエスト${itemName}を受注しました。`);
+	$gameParty.gainItem($dataItems[itemIndex], 1);
   };
   /* ============================================================================
    * Actor announcement messages (reuses the shared helpers)
@@ -9021,24 +9011,23 @@
   // Moans (layer preset 0, speed 80).
   // NOTE: the last line carries a form-feed character where the maker code
   // `\FS[n]` was meant (the original wrote `\f` + `s[20]`) — kept exactly.
-  AGH_startMoanTextBGVoice80 = function () {
+  AGH_startMoanTextBGVoice80 = function (displayFrames = 80, useFontSizeMarkers = true) {
     const voiceIcon = icon(12);
     const moanLine = `「アンっ${voiceIcon}」`;
     const secondLine = `「ヒゥンっ${voiceIcon}」`;
     const thirdLine = `「アッ${voiceIcon}　ンン${voiceIcon}」`;
-    const fourthLine = `「ヒン\x0cs[20]ン\x0cs[28]っ${voiceIcon}」`;
-    startTextBGVoice([moanLine, secondLine, thirdLine, fourthLine], 0, 80);
+	const nn = `\x0cs[20]`;
+	const c = `\x0cs[28]`;
+    const fourthLine = useFontSizeMarkers
+	  ? `「ヒン${nn}ン${c}っ${voiceIcon}」`
+      : `「ヒンンっ${voiceIcon}」`;
+    startTextBGVoice([moanLine, secondLine, thirdLine, fourthLine], 0, displayFrames);
   };
 
   // Replaces (1x): data/CommonEvents.json:common-event:531
   // Moans, slower cadence (layer preset 0, speed 120).
   AGH_startMoanTextBGVoice120 = function () {
-    const voiceIcon = icon(12);
-    const moanLine = `「アンっ${voiceIcon}」`;
-    const secondLine = `「ヒゥンっ${voiceIcon}」`;
-    const thirdLine = `「アッ${voiceIcon}　ンン${voiceIcon}」`;
-    const fourthLine = `「ヒンンっ${voiceIcon}」`;
-    startTextBGVoice([moanLine, secondLine, thirdLine, fourthLine], 0, 120);
+    return AGH_startMoanTextBGVoice80(120, false);
   };
 
   // Replaces (1x): data/CommonEvents.json:common-event:338
@@ -11001,18 +10990,16 @@
   };
 
   // Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
-  AGH_showPictureConversationGabCommon_4 = function () {
-    if ($gameScreen.brightness() === 0 || (!$gameScreen.picture(6) && !$gameScreen.picture(70))) {
-      var pictureX = 640;
-    } else {
-      var pictureX = 640 - 128;
-    }
-    $gameScreen.dTextRealTime = "ON";
-    $gameScreen.dTextAlign = 0;
-    $gameScreen.dWindowFrame = "ON";
-    $gameScreen.setDTextPicture(valueTalkSet[2], valueTalkSet[1]);
-    $gameScreen.showPicture(102, "", 1, pictureX - 50, 384, 100, 100, 0, 0);
-    $gameScreen.movePicture(102, 1, pictureX, 384, 100, 100, 255, 0, 60);
+  AGH_showPictureConversationGabCommon_4 = function (entryXOffset = 50) {
+    const screen = $gameScreen;
+    const isCentered = screen.brightness() === 0 || (!screen.picture(6) && !screen.picture(70));
+    const pictureX = isCentered ? 640 : 512;
+    screen.dTextRealTime = "ON";
+    screen.dTextAlign = 0;
+    screen.dWindowFrame = "ON";
+    screen.setDTextPicture(valueTalkSet[2], valueTalkSet[1]);
+    screen.showPicture(102, "", 1, pictureX - entryXOffset, 384, 100, 100, 0, 0);
+    screen.movePicture(102, 1, pictureX, 384, 100, 100, 255, 0, 60);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
@@ -11028,17 +11015,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
   AGH_showPictureConversationGabCommon_5 = function () {
-    if ($gameScreen.brightness() === 0 || (!$gameScreen.picture(6) && !$gameScreen.picture(70))) {
-      var pictureX = 640;
-    } else {
-      var pictureX = 640 - 128;
-    }
-    $gameScreen.dTextRealTime = "ON";
-    $gameScreen.dTextAlign = 0;
-    $gameScreen.dWindowFrame = "ON";
-    $gameScreen.setDTextPicture(valueTalkSet[2], valueTalkSet[1]);
-    $gameScreen.showPicture(102, "", 1, pictureX - 20, 384, 100, 100, 0, 0);
-    $gameScreen.movePicture(102, 1, pictureX, 384, 100, 100, 255, 0, 60);
+    return AGH_showPictureConversationGabCommon_4(20);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
@@ -11232,11 +11209,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:64|スクリプトシステムコモン
   AGH_readVariableCharacterIdScriptSystemCommon = function (interp) {
-    //場面転換時に苗字代入
-    const list = $gameVariables.value(HELPER_VARIABLE.CHARACTER_ACTOR_IDS);
-    list.forEach(function (id) {
-      $dataWeapons[id + 200].name = $gameVariables.value(id + 380)[50];
-    }, interp);
+    return AGH_readVariableCharacterId.apply(this, arguments);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:64|スクリプトシステムコモン
@@ -11637,9 +11610,10 @@
   };
 
   // Replaces (1x): CommonEvents.json:common-event:93|自動出産コモン
-  AGH_setSelfSwitchAutoBirthCommon = function () {
-    for (var i = 1; i <= 20; i++) {
-      $gameSelfSwitches.setValue([$gameMap.mapId(), i, "A"], false);
+  AGH_setSelfSwitchAutoBirthCommon = function (lastEventId = 20, selfSwitchKey = "A", enabled = false) {
+    const mapId = $gameMap.mapId();
+    for (let eventId = 1; eventId <= lastEventId; eventId++) {
+      $gameSelfSwitches.setValue([mapId, eventId, selfSwitchKey], enabled);
     }
   };
 
@@ -11747,9 +11721,10 @@
   };
 
   // Replaces (1x): CommonEvents.json:common-event:94|受精コモン演出
-  AGH_erasePictureFertilizationCommon = function () {
-    for (var i = 60; i <= 80; i++) {
-      $gameScreen.erasePicture(i);
+  AGH_erasePictureFertilizationCommon = function (firstPictureId = 60, lastPictureId = 80) {
+    const screen = $gameScreen;
+    for (let pictureId = firstPictureId; pictureId <= lastPictureId; pictureId++) {
+      screen.erasePicture(pictureId);
     }
   };
 
@@ -11785,14 +11760,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:97|出産時コモン演出用未使用
   AGH_readVariableAppearanceCharacterStartBirthCommonUnused = function () {
-    const start = $gameVariables.value(HELPER_VARIABLE.FIRST_DEPLOYED_ACTOR_ID);
-    const end = $gameVariables.value(HELPER_VARIABLE.LAST_DEPLOYED_ACTOR_ID);
-    for (var j = start; j <= end; j++) {
-      actor = $gameActors.actor(j);
-      if (actor.isStateAffected(83)) {
-        actor_pregnancyCalculation(j);
-      }
-    }
+    return AGH_readVariableAppearanceCharacterStartAutoBirthCommon.apply(this, arguments);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:99|コンティニュー処理
@@ -12954,10 +12922,10 @@
   };
 
   // Replaces (1x): CommonEvents.json:common-event:167|着せ替え中身
-  AGH_setVariableRandomWork10 = function () {
-    for (var i = 1; i < 100; i++) {
-      if (valueRandomSet[i] == $gameVariables.value(HELPER_VARIABLE.PROCESSED_ENTRY_ID)) {
-        $gameVariables.setValue(30, i - 1);
+  AGH_setVariableRandomWork10 = function (endExclusive = 100, destinationVariableId = 30) {
+    for (let entryIndex = 1; entryIndex < endExclusive; entryIndex++) {
+      if (valueRandomSet[entryIndex] == $gameVariables.value(HELPER_VARIABLE.PROCESSED_ENTRY_ID)) {
+        $gameVariables.setValue(destinationVariableId, entryIndex - 1);
       }
     }
   };
@@ -13181,11 +13149,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:167|着せ替え中身
   AGH_setVariableChoicePosition = function () {
-    for (var i = 1; i < 200; i++) {
-      if (valueRandomSet[i] == $gameVariables.value(HELPER_VARIABLE.PROCESSED_ENTRY_ID)) {
-        $gameVariables.setValue(12, i - 1);
-      }
-    }
+    return AGH_setVariableRandomWork10(200, 12);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:172|星晶獣選択
@@ -14629,23 +14593,22 @@
   };
 
   // Replaces (1x): CommonEvents.json:common-event:256|Ｈ相手リセット
-  AGH_readVariableActorChoiceHPartnerReset = function () {
+  AGH_readVariableActorChoiceHPartnerReset = function (
+    firstHistoryIndex = 1,
+    lastHistoryIndex = 100,
+    messageText = "男性遍歴が一括リセットされました…"
+  ) {
     const selectedActorId = $gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID);
-    for (var i = 1; i <= 100; i++) {
-      $gameVariables.value(selectedActorId + 360)[i] = 0;
+    const actorHistory = $gameVariables.value(selectedActorId + 360);
+    for (let historyIndex = firstHistoryIndex; historyIndex <= lastHistoryIndex; historyIndex++) {
+      actorHistory[historyIndex] = 0;
     }
-    const messageText = `男性遍歴が一括リセットされました…`;
     CommonPopupManager.showInfo({}, messageText, null);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:256|Ｈ相手リセット
   AGH_readVariableActorChoice_4 = function () {
-    const selectedActorId = $gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID);
-    for (var i = 201; i <= 300; i++) {
-      $gameVariables.value(selectedActorId + 360)[i] = 0;
-    }
-    const messageText = `出産履歴が一括リセットされました…`;
-    CommonPopupManager.showInfo({}, messageText, null);
+    return AGH_readVariableActorChoiceHPartnerReset(201, 300, "出産履歴が一括リセットされました…");
   };
 
   // Replaces (1x): CommonEvents.json:common-event:259|サブジョブ解放1
@@ -16141,20 +16104,19 @@
   };
 
   // Replaces (1x): CommonEvents.json:common-event:341|[41]牢獄１日目
-  AGH_showPicturePrisonDay1 = function () {
+  AGH_showPicturePrisonDay1 = function (pictureOffset = 3, sceneSuffix = "03") {
     picture_se1();
-    const pictureId = valuePic1 + 3;
-    const scenePictureName = valueScenePic + "03";
-    $gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
-    $gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
+    const pictureId = valuePic1 + pictureOffset;
+    const scenePictureName = valueScenePic + sceneSuffix;
+    showScenePicture(pictureId, scenePictureName);
     pic_move1(pictureId - 1, 0, 0, 100, 100, 0, 90);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:341|[41]牢獄１日目
-  AGH_movePicture1PrisonDay1 = function () {
+  AGH_movePicture1PrisonDay1 = function (opacity = 0) {
     picture_se1();
     const pictureId = valuePic1 + 3;
-    pic_move1(pictureId, 0, 0, 100, 100, 0, 60);
+    pic_move1(pictureId, 0, 0, 100, 100, opacity, 60);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:341|[41]牢獄１日目
@@ -16165,9 +16127,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:341|[41]牢獄１日目
   AGH_movePicture1PrisonDay1_3 = function () {
-    picture_se1();
-    const pictureId = valuePic1 + 3;
-    pic_move1(pictureId, 0, 0, 100, 100, 255, 60);
+    return AGH_movePicture1PrisonDay1(255);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:341|[41]牢獄１日目
@@ -16181,22 +16141,12 @@
 
   // Replaces (1x): CommonEvents.json:common-event:341|[41]牢獄１日目
   AGH_showPicturePrisonDay1_3 = function () {
-    picture_se1();
-    const pictureId = valuePic1 + 9;
-    const scenePictureName = valueScenePic + "13";
-    $gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
-    $gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
-    pic_move1(pictureId - 1, 0, 0, 100, 100, 0, 90);
+    return AGH_showPicturePrisonDay1(9, "13");
   };
 
   // Replaces (1x): CommonEvents.json:common-event:341|[41]牢獄１日目
   AGH_showPicturePrisonDay1_4 = function () {
-    picture_se1();
-    const pictureId = valuePic1 + 10;
-    const scenePictureName = valueScenePic + "14";
-    $gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
-    $gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
-    pic_move1(pictureId - 1, 0, 0, 100, 100, 0, 90);
+    return AGH_showPicturePrisonDay1(10, "14");
   };
 
   // Replaces (1x): CommonEvents.json:common-event:342|[42]牢獄６日目
@@ -16496,15 +16446,13 @@
   };
 
   // Replaces (4x): CommonEvents.json:common-event:368|コマンド, CommonEvents.json:common-event:495|サンプル, CommonEvents.json:common-event:532|サンプル, CommonEvents.json:common-event:548|
-  AGH_showPictureCommand = function () {
+  AGH_showPictureCommand = function (sceneSuffix = "02", pictureOffset = 1, fadeFrames = 60, blessType = 2) {
     backGraund_menuMapSelect(2, 0, 0, 0);
     valuePic1 = 51;
-    const pictureId = valuePic1 + 1;
-    const scenePictureName = valueScenePic + "02";
-    $gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
-    $gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
-    tachie_bless(pictureId, 2);
-    //pic_move1(pictureId-1,0,0,100,100,0,90);
+    const pictureId = valuePic1 + pictureOffset;
+    const scenePictureName = valueScenePic + sceneSuffix;
+    showScenePicture(pictureId, scenePictureName, { duration: fadeFrames });
+    if (blessType !== null) tachie_bless(pictureId, blessType);
   };
 
   // Replaces (5x): CommonEvents.json:common-event:368|コマンド, CommonEvents.json:common-event:412|, CommonEvents.json:common-event:495|サンプル, CommonEvents.json:common-event:532|サンプル, CommonEvents.json:common-event:548|
@@ -16706,11 +16654,15 @@
   };
 
   // Replaces (1x): CommonEvents.json:common-event:392|トウロウコモン1
-  AGH_movePicture1ToroCommon1 = function () {
-    const pictureId = valuePic1 + 1;
-    pic_showMove1(pictureId, valueScenePic + "01", 640 - 128, 384, 100, 60, 1, 50);
+  AGH_movePicture1ToroCommon1 = function (
+    pictureOffset = 1,
+    sceneSuffix = "01",
+    motionType = 1,
+    motionStrength = 50
+  ) {
+    const pictureId = valuePic1 + pictureOffset;
+    pic_showMove1(pictureId, valueScenePic + sceneSuffix, 512, 384, 100, 60, motionType, motionStrength);
     tachie_bless(pictureId, 2);
-    //pic_move1(pictureId-1,0,0,100,100,0,90);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:392|トウロウコモン1
@@ -16810,10 +16762,16 @@
   };
 
   // Replaces (1x): CommonEvents.json:common-event:431|未必の陰謀
-  AGH_readVariableDynamicEventId_14 = function (interp) {
-    const charaSlotId = 17;
-    event_respawnSetN(charaSlotId, 8, 7, 0, "npcOrder1", 1);
-    interp._eventId = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId];
+  AGH_readVariableDynamicEventId_14 = function (
+    interp,
+    spawnSlot = 17,
+    spawnX = 8,
+    spawnY = 7,
+    characterName = "npcOrder1",
+    characterIndex = 1
+  ) {
+    event_respawnSetN(spawnSlot, spawnX, spawnY, 0, characterName, characterIndex);
+    interp._eventId = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[spawnSlot];
   };
 
   // Replaces (1x): CommonEvents.json:common-event:432|休暇のすゝめ
@@ -16844,18 +16802,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:441|△人助け
   AGH_readVariableDynamicEventIdHelpingHands = function (interp) {
-    const eventId = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[11]; //this._eventId
-    const event = $gameMap.event(eventId);
-    event.setStepAnime(false);
-    event.setWalkAnime(false);
-    event.setDirection(2);
-    event.resetPattern();
-    event._originalPattern = 1;
-    event.setAngle(45);
-    event._spriteOffsetX = -12;
-    event._spriteOffsetY = -12;
-    event._kageM.clear();
-    event.setFace(6, true, true); //Child用
+    return AGH_readVariableDynamicEventId_13.apply(this, arguments);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:442|△人助け2
@@ -16904,9 +16851,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:451|雄ドラフ、驚愕する
   AGH_readVariableEventProgressHeroMaleDrafAstonished = function (interp) {
-    const charaSlotId = 1; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
-    event_respawnSetN(charaSlotId, 16, 6, 0, "1_1", 2);
-    interp._eventId = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId];
+    return AGH_readVariableDynamicEventId_14(interp, 1, 16, 6, "1_1", 2);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:452|△露出王(上巻)を読む
@@ -17186,28 +17131,23 @@
 
   // Replaces (4x): CommonEvents.json:common-event:507|情報の代価Ⅰ, CommonEvents.json:common-event:536|メイドウェイトレス, CommonEvents.json:common-event:547|リゾート休暇で限界突破！, CommonEvents.json:common-event:576|娼婦Debut!
   AGH_showPicturePriceOfInformation1 = function () {
-    backGraund_menuMapSelect(2, 0, 0, 0);
-    valuePic1 = 51;
-    const pictureId = valuePic1 + 1;
-    const scenePictureName = valueScenePic + "01";
-    $gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
-    $gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
-    //tachie_bless(pictureId,2);
-    //pic_move1(pictureId-1,0,0,100,100,0,90);
+    return AGH_showPictureCommand("01", 1, 60, null);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:507|情報の代価Ⅰ
-  AGH_showPicturePriceOfInformation1_2 = function () {
-    var pictureId = valuePic1 + 2;
-    var pictureName = valueScenePic + "02";
-    $gameScreen.showPicture(pictureId, pictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
-    $gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
-    //pic_move1(value1-1,0,0,100,100,0,90);
-    var pictureId = valuePic1 + 3;
-    var pictureName = valueScenePic + "03";
-    $gameScreen.showPicture(pictureId, pictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
-    $gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
-    tachie_bless(pictureId, 2);
+  AGH_showPicturePriceOfInformation1_2 = function (
+    firstPictureOffset = 2,
+    firstSceneSuffix = "02",
+    secondPictureOffset = 3,
+    secondSceneSuffix = "03"
+  ) {
+    const firstPictureId = valuePic1 + firstPictureOffset;
+    const firstPictureName = valueScenePic + firstSceneSuffix;
+    showScenePicture(firstPictureId, firstPictureName);
+    const secondPictureId = valuePic1 + secondPictureOffset;
+    const secondPictureName = valueScenePic + secondSceneSuffix;
+    showScenePicture(secondPictureId, secondPictureName);
+    tachie_bless(secondPictureId, 2);
   };
 
   // Replaces (2x): CommonEvents.json:common-event:508|情報の代価Ⅱ, CommonEvents.json:common-event:509|情報の代価Ⅲ
@@ -17279,14 +17219,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:526|トロル姦
   AGH_showPictureTrollRape = function () {
-    backGraund_menuMapSelect(2, 0, 0, 0);
-    valuePic1 = 51;
-    const pictureId = valuePic1 + 1;
-    const scenePictureName = valueScenePic + "01";
-    $gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
-    $gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
-    tachie_bless(pictureId, 2);
-    //pic_move1(pictureId-1,0,0,100,100,0,90);
+    return AGH_showPictureCommand("01");
   };
 
   // Replaces (1x): CommonEvents.json:common-event:526|トロル姦
@@ -17298,26 +17231,12 @@
 
   // Replaces (1x): CommonEvents.json:common-event:526|トロル姦
   AGH_showPictureTrollRape_2 = function () {
-    backGraund_menuMapSelect(2, 0, 0, 0);
-    valuePic1 = 51;
-    const pictureId = valuePic1 + 1;
-    const scenePictureName = valueScenePic + "07";
-    $gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
-    $gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
-    tachie_bless(pictureId, 2);
-    //pic_move1(pictureId-1,0,0,100,100,0,90);
+    return AGH_showPictureCommand("07");
   };
 
   // Replaces (1x): CommonEvents.json:common-event:526|トロル姦
   AGH_showPictureTrollRape_3 = function () {
-    backGraund_menuMapSelect(2, 0, 0, 0);
-    valuePic1 = 51;
-    const pictureId = valuePic1 + 2;
-    const scenePictureName = valueScenePic + "08";
-    $gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
-    $gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 180);
-    tachie_bless(pictureId, 2);
-    //pic_move1(pictureId-1,0,0,100,100,0,240);
+    return AGH_showPictureCommand("08", 2, 180);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:530|試練の裏側
@@ -17562,10 +17481,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:537|メイドウェイトレスご奉仕
   AGH_movePicture1MaidWaitressService = function () {
-    const pictureId = valuePic1 + 2;
-    pic_showMove1(pictureId, valueScenePic + "02", 640 - 128, 384, 100, 60, 2, 200);
-    tachie_bless(pictureId, 2);
-    //pic_move1(pictureId-1,0,0,100,100,0,90);
+    return AGH_movePicture1ToroCommon1(2, "02", 2, 200);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:540|
@@ -17599,16 +17515,14 @@
   };
 
   // Replaces (1x): CommonEvents.json:common-event:541|知らなかった『裏側』
-  AGH_showPictureDungeon12UnknownOtherSide = function () {
-    backGraund_menuMapSelect(2, 0, 0, 0); //'Dungeon1_2'
+  AGH_showPictureDungeon12UnknownOtherSide = function (pictureOffset = 1, sceneSuffix = "01") {
+    backGraund_menuMapSelect(2, 0, 0, 0);
     valuePic1 = 51;
-    var pictureName = "ScreenBlackOut";
-    $gameScreen.showPicture(valuePic1, pictureName, 1, 640, 384, 100, 100, 200, 0);
+    showScreenBlackOut(valuePic1, 200);
     picture_fade1(valuePic1, "fadeIn", valueWipeImg, 60, 5);
-    const pictureId = valuePic1 + 1;
-    var pictureName = valueScenePic + "01";
-    $gameScreen.showPicture(pictureId, pictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
-    $gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
+    const pictureId = valuePic1 + pictureOffset;
+    const scenePictureName = valueScenePic + sceneSuffix;
+    showScenePicture(pictureId, scenePictureName);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:541|知らなかった『裏側』
@@ -17755,15 +17669,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:543|愚鈍なる再会
   AGH_showPictureDungeon12_2 = function () {
-    backGraund_menuMapSelect(2, 0, 0, 0); //'Dungeon1_2'
-    valuePic1 = 51;
-    var pictureName = "ScreenBlackOut";
-    $gameScreen.showPicture(valuePic1, pictureName, 1, 640, 384, 100, 100, 200, 0);
-    picture_fade1(valuePic1, "fadeIn", valueWipeImg, 60, 5);
-    const pictureId = valuePic1 + 2;
-    var pictureName = valueScenePic + "02";
-    $gameScreen.showPicture(pictureId, pictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
-    $gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
+    return AGH_showPictureDungeon12UnknownOtherSide(2, "02");
   };
 
   // Replaces (1x): CommonEvents.json:common-event:543|愚鈍なる再会
@@ -17909,15 +17815,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:545|チンピラ団員達と…
   AGH_showPictureWithPunks = function () {
-    var pictureId = valuePic1 + 1;
-    var pictureName = valueScenePic + "01";
-    $gameScreen.showPicture(pictureId, pictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
-    $gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
-    var pictureId = valuePic1 + 2;
-    var pictureName = valueScenePic + "02";
-    $gameScreen.showPicture(pictureId, pictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
-    $gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
-    tachie_bless(pictureId, 2);
+    return AGH_showPicturePriceOfInformation1_2(1, "01", 2, "02");
   };
 
   // Replaces (1x): CommonEvents.json:common-event:545|チンピラ団員達と…
@@ -18113,14 +18011,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:571|マッサージⅠ
   AGH_showPictureMassage1 = function () {
-    backGraund_menuMapSelect(2, 0, 0, 0);
-    valuePic1 = 51;
-    const pictureId = valuePic1 + 1;
-    const scenePictureName = valueScenePic + "01";
-    $gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
-    $gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
-    tachie_bless(pictureId, 1);
-    //pic_move1(pictureId-1,0,0,100,100,0,90);
+    return AGH_showPictureCommand("01", 1, 60, 1);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:571|マッサージⅠ
@@ -18136,14 +18027,7 @@
 
   // Replaces (2x): CommonEvents.json:common-event:572|マッサージⅡ, CommonEvents.json:common-event:573|マッサージⅢ
   AGH_showPictureMassage2 = function () {
-    backGraund_menuMapSelect(2, 0, 0, 0);
-    valuePic1 = 51;
-    const pictureId = valuePic1 + 1;
-    const scenePictureName = valueScenePic + "01";
-    $gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
-    $gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
-    //tachie_bless(pictureId,1);
-    //pic_move1(pictureId-1,0,0,100,100,0,90);
+    return AGH_showPictureCommand("01", 1, 60, null);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:572|マッサージⅡ
@@ -18733,9 +18617,7 @@
 
   // Replaces (1x): Map003.json:event:161|EV161|page:1
   AGH_erasePictureEv161 = function () {
-    for (var i = 101; i <= 250; i++) {
-      $gameScreen.erasePicture(i);
-    }
+    return AGH_erasePictureFertilizationCommon(101, 250);
   };
 
   // Replaces (1x): Map003.json:event:166|EV166シングルクエスト受注|page:2
@@ -18806,31 +18688,18 @@
   };
 
   // Replaces (1x): Map003.json:event:217|EV217回想全開放|page:1
-  AGH_iterateItemsEICSwitch = function () {
-    for (var i = 1; i < $dataItems.length; i++) {
-      const itemData = $dataItems[i];
-      if (itemData.meta["EICSwitch"]) {
-        if (Number(itemData.meta["EICSwitch"]) == 102) {
-          $gameParty.gainItem(itemData, 1);
-        }
-      }
+  AGH_iterateItemsEICSwitch = function (categorySwitchId = 102, messageText = "挿話が全開放されました。") {
+    for (let itemId = 1; itemId < $dataItems.length; itemId++) {
+      const itemData = $dataItems[itemId];
+      if (!itemData.meta.EICSwitch || Number(itemData.meta.EICSwitch) != categorySwitchId) continue;
+      $gameParty.gainItem(itemData, 1);
     }
-    const messageText = `挿話が全開放されました。`;
     gab_wordParticle(messageText);
   };
 
   // Replaces (1x): Map003.json:event:217|EV217回想全開放|page:1
   AGH_gainItemEICSwitch = function () {
-    for (var i = 1; i < $dataItems.length; i++) {
-      const itemData = $dataItems[i];
-      if (itemData.meta["EICSwitch"]) {
-        if (Number(itemData.meta["EICSwitch"]) == 103) {
-          $gameParty.gainItem(itemData, 1);
-        }
-      }
-    }
-    const messageText = `Hシーンが全開放されました。`;
-    gab_wordParticle(messageText);
+    return AGH_iterateItemsEICSwitch(103, "Hシーンが全開放されました。");
   };
 
   // Replaces (1x): Map003.json:event:218|EV218|page:2
@@ -19651,49 +19520,31 @@
 
   // Replaces (1x): Map100.json:event:11|EV011|page:1
   AGH_setSelfSwitchEv011 = function () {
-    for (var i = 1; i <= 10; i++) {
-      $gameSelfSwitches.setValue([$gameMap.mapId(), i, "B"], true);
-    }
+    return AGH_setSelfSwitchAutoBirthCommon(10, "B", true);
   };
 
   // Replaces (1x): Map100.json:event:11|EV011|page:1
-  AGH_showWindowTextEv011 = function () {
-    for (var i = 1; i <= $dataItems.length - 1; i++) {
-      if (!$dataItems[i].meta["クラス3ジョブ解放素材"]) continue;
-
-      var itemId = i;
-      break;
-    }
-    if (!itemId) return;
+  AGH_showWindowTextEv011 = function (jobTier = 3, requiredGold = 100000, minimumClassLevel = 30) {
+    const materialMetaKey = `クラス${jobTier}ジョブ解放素材`;
+    const materialItemId = findItemIdByMetaKey(materialMetaKey);
+    if (!materialItemId) return;
+    const materialItem = $dataItems[materialItemId];
     const currentGold = $gameParty.gold();
-	  const ownedItemCount = $gameParty.numItems($dataItems[itemId]);
-	  const itemName = `\\iin[${itemId}]`;
+    const ownedItemCount = $gameParty.numItems(materialItem);
+    // Retain the original escape spelling, outside the translatable message.
+    const currencyMarker = "\\G";
+    const materialName = `\\iin[${materialItemId}]`;
     const messageText = `ジョブ解放条件
-		100000\\G消費（${currentGold}\\G所持）
-		${itemName} 1個消費（${ownedItemCount}個所持）
-		パーティメンバーの誰か一人が、そのジョブの下位クラスLv30以上。`;
+\t\t${requiredGold}${currencyMarker}消費（${currentGold}${currencyMarker}所持）
+\t\t${materialName} 1個消費（${ownedItemCount}個所持）
+\t\tパーティメンバーの誰か一人が、そのジョブの下位クラスLv${minimumClassLevel}以上。`;
     WindowManager.show(0, 250, 568, 1030, 200);
     WindowManager.drawText(0, messageText);
   };
 
   // Replaces (1x): Map100.json:event:11|EV011|page:1
   AGH_showWindowTextEv011_2 = function () {
-    for (var i = 1; i <= $dataItems.length - 1; i++) {
-      if (!$dataItems[i].meta["クラス2ジョブ解放素材"]) continue;
-
-      var itemId = i;
-      break;
-    }
-    if (!itemId) return;
-    const currentGold = $gameParty.gold();
-    const ownedItemCount = $gameParty.numItems($dataItems[itemId]);
-	const itemName = `\\iin[${itemId}]`;
-    const messageText = `ジョブ解放条件
-		10000\\G消費（${currentGold}\\G所持）
-		${itemName} 1個消費（${ownedItemCount}個所持）
-		パーティメンバーの誰か一人が、そのジョブの下位クラスLv20以上。`;
-    WindowManager.show(0, 250, 568, 1030, 200);
-    WindowManager.drawText(0, messageText);
+    return AGH_showWindowTextEv011(2, 10000, 20);
   };
 
   // Replaces (1x): Map100.json:event:11|EV011|page:1
