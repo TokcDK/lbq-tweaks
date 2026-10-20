@@ -3,28 +3,29 @@
 * @author 作者名
 * @help ゲーム専用に作成された初期読み込み用プラグイン
 */
-
 //(function(){
 
 //#region original_tips
+// 書籍(Tips)の共通処理。seName / var172value の既定値はここに置き、
+// サブクラスは差分がある時だけ上書きする。
 class BookTipBase {
   constructor() {
   }
 
   seName() {
-    throw new Error("getValue2 method should be implemented");
+    return "Book2";
   }
 
   var172value() {
-    throw new Error("getValue2 method should be implemented");
+    return 2;
   }
 
   bookTitle() {
-    throw new Error("getValue1 method should be implemented");
+    throw new Error("bookTitle method should be implemented");
   }
 
   bookDescription() {
-    throw new Error("getValue2 method should be implemented");
+    throw new Error("bookDescription method should be implemented");
   }
 
   playSound() {
@@ -46,14 +47,8 @@ class BookTipBase {
     this.setValueTalkSet();
   }
 }
-class Tip1 extends BookTipBase {//
-  seName() {
-    return "Book2";
-  }
 
-  var172value() {
-    return 2;
-  }
+class Tip1 extends BookTipBase {//
   bookTitle() {
     return `朽ちた星晶獣の権能復元計画`;
   }
@@ -72,17 +67,11 @@ class Tip1 extends BookTipBase {//
 
 『朽ちた星晶獣の権能復元計画書』より抜粋`;
   }
-};
-class Tip2 extends BookTipBase {//<淫統薬>インデュ・アビス
-  seName() {
-    return "Book2";
-  }
+}
 
-  var172value() {
-    return 2;
-  }
+class Tip2 extends BookTipBase {//<淫統薬>インデュ・アビス
   bookTitle() {
-    var weaponName = $dataWeapons[452].name;
+    const weaponName = $dataWeapons[452].name;
     return `${weaponName}─その１─`;
   }
   bookDescription() {
@@ -101,17 +90,11 @@ class Tip2 extends BookTipBase {//<淫統薬>インデュ・アビス
 
 その２に続く──`;
   }
-};
-class Tip3 extends BookTipBase {//<淫統薬>インデュ・アビス
-  seName() {
-    return "Book2";
-  }
+}
 
-  var172value() {
-    return 2;
-  }
+class Tip3 extends BookTipBase {//<淫統薬>インデュ・アビス
   bookTitle() {
-    var weaponName = $dataWeapons[452].name;
+    const weaponName = $dataWeapons[452].name;
     return `${weaponName}─その３─`;
   }
   bookDescription() {
@@ -127,17 +110,11 @@ class Tip3 extends BookTipBase {//<淫統薬>インデュ・アビス
 
 『〇〇〇〇帝国研究開発部の業務月報』より抜粋`;
   }
-};
-class Tip4 extends BookTipBase {//<試薬品>インデュルゲンス・リキッド
-  seName() {
-    return "Book2";
-  }
+}
 
-  var172value() {
-    return 2;
-  }
+class Tip4 extends BookTipBase {//<試薬品>インデュルゲンス・リキッド
   bookTitle() {
-    var weaponName = $dataWeapons[453].name;
+    const weaponName = $dataWeapons[453].name;
     return `${weaponName}`;
   }
   bookDescription() {
@@ -152,17 +129,11 @@ class Tip4 extends BookTipBase {//<試薬品>インデュルゲンス・リキ�
 
 『〇〇〇〇帝国研究開発部の業務日報』より抜粋`;
   }
-};
-class Tip5 extends BookTipBase {//<淫紋>アビス・クレスト使用ずみ
-  seName() {
-    return "Book2";
-  }
+}
 
-  var172value() {
-    return 2;
-  }
+class Tip5 extends BookTipBase {//<淫紋>アビス・クレスト使用ずみ
   bookTitle() {
-    var weaponName = $dataWeapons[454].name;
+    const weaponName = $dataWeapons[454].name;
     return `${weaponName}`;
   }
   bookDescription() {
@@ -183,17 +154,15 @@ class Tip5 extends BookTipBase {//<淫紋>アビス・クレスト使用ずみ
 
 民明書房刊『魔術大家の独り言』より抜粋`;
   }
-};
+}
+
 class Tip6 extends BookTipBase {//<淫統光>HMD型インデュ・アビス.使用ずみ
   seName() {
     return "Chime2";
   }
 
-  var172value() {
-    return 2;
-  }
   bookTitle() {
-    var weaponName = $dataWeapons[457].name;
+    const weaponName = $dataWeapons[457].name;
     return `${weaponName}`;
   }
   bookDescription() {
@@ -210,17 +179,15 @@ class Tip6 extends BookTipBase {//<淫統光>HMD型インデュ・アビス.使�
 
 『エルステ帝国研究開発部の成果発表レポート』より抜粋`;
   }
-};
+}
+
 class Tip7 extends BookTipBase {//<アビス・クレスト>と<インデュ・アビス>使用ずみ
   seName() {
     return "Chime2";
   }
 
-  var172value() {
-    return 2;
-  }
   bookTitle() {
-    var weaponName = $dataWeapons[458].name;
+    const weaponName = $dataWeapons[458].name;
     return `${weaponName}`;
   }
   bookDescription() {
@@ -237,17 +204,11 @@ class Tip7 extends BookTipBase {//<アビス・クレスト>と<インデュ・�
 
 『飛び出せ！ よく解る＜りしゃぶる＞大図鑑！！』より抜粋`;
   }
-};
-class Tip8 extends BookTipBase {//使用済み
-  seName() {
-    return "Book2";
-  }
+}
 
-  var172value() {
-    return 2;
-  }
+class Tip8 extends BookTipBase {//使用済み
   bookTitle() {
-    var weaponName = $dataWeapons[80].name;
+    const weaponName = $dataWeapons[80].name;
     return `${weaponName}`;
   }
   bookDescription() {
@@ -267,17 +228,11 @@ class Tip8 extends BookTipBase {//使用済み
 
 『秩序の騎空団への状況報告書』より抜粋`;
   }
-};
-class Tip11 extends BookTipBase {//<星晶獣>インペリウム・グノーシス。使用ずみ
-  seName() {
-    return "Book2";
-  }
+}
 
-  var172value() {
-    return 2;
-  }
+class Tip11 extends BookTipBase {//<星晶獣>インペリウム・グノーシス。使用ずみ
   bookTitle() {
-    var weaponName = $dataWeapons[451].name;
+    const weaponName = $dataWeapons[451].name;
     return `${weaponName}`;
   }
   bookDescription() {
@@ -297,7 +252,8 @@ class Tip11 extends BookTipBase {//<星晶獣>インペリウム・グノーシ�
 
 『〇〇〇〇帝国研究開発部の業務年報』より抜粋`;
   }
-};
+}
+
 class Tip12 extends BookTipBase {//<星晶獣>インペリウム・グノーシス
   seName() {
     return "Chime2";
@@ -307,7 +263,7 @@ class Tip12 extends BookTipBase {//<星晶獣>インペリウム・グノーシ�
     return 3;
   }
   bookTitle() {
-    var weaponName = $dataWeapons[451].name;
+    const weaponName = $dataWeapons[451].name;
     return `${weaponName}─その２─`;
   }
   bookDescription() {
@@ -325,18 +281,16 @@ class Tip12 extends BookTipBase {//<星晶獣>インペリウム・グノーシ�
 己が<支配>の届かぬ『天』を超える者の到来を望みながら…。
 `;
   }
-};
+}
+
 class Tip13 extends BookTipBase {//「インペルの神水」使用済み
   seName() {
     return "Chime2";
   }
 
-  var172value() {
-    return 2;
-  }
   bookTitle() {
-	var itemName = $dataItems[1162].name;
-	var weaponName = $dataWeapons[460].name;
+  const itemName = $dataItems[1162].name;
+  const weaponName = $dataWeapons[460].name;
     return `${itemName} またの名を「${weaponName}」`;
   }
   bookDescription() {
@@ -357,15 +311,13 @@ class Tip13 extends BookTipBase {//「インペルの神水」使用済み
 
 `;
   }
-};
+}
+
 class Tip14 extends BookTipBase {//支配の結石使用済み
   seName() {
     return "Chime2";
   }
 
-  var172value() {
-    return 2;
-  }
   bookTitle() {
     return `${$dataItems[1163].name}`;
   }
@@ -386,7 +338,8 @@ class Tip14 extends BookTipBase {//支配の結石使用済み
 
 `;
   }
-};
+}
+
 class Tip15 extends BookTipBase {//クサンについて。ラストバトル時に使用,入手ずみ
   seName() {
     return "Chime2";
@@ -396,8 +349,8 @@ class Tip15 extends BookTipBase {//クサンについて。ラストバトル時
     return 3;
   }
   bookTitle() {
-    var actorName = $gameActors.actor(7).name();
-    var actorSecondName = $dataActors[7].meta['SecondName'].split(',')[1];
+    const actorName = $gameActors.actor(7).name();
+    const actorSecondName = $dataActors[7].meta['SecondName'].split(',')[1];
     return `${actorName}=コルド＝${actorSecondName}─その２─`;
   }
   bookDescription() {
@@ -419,19 +372,17 @@ class Tip15 extends BookTipBase {//クサンについて。ラストバトル時
 
 `;
   }
-};
+}
+
 class Tip16 extends BookTipBase {//クサンについて2。使用ずみ
   seName() {
     return "Chime2";
   }
 
-  var172value() {
-    return 2;
-  }
   //var value1 = `\\set[7]─その２─`;
   bookTitle() {
-    var actorName = $gameActors.actor(7).name();
-    var actorSecondName = $dataActors[7].meta['SecondName'].split(',')[1];
+    const actorName = $gameActors.actor(7).name();
+    const actorSecondName = $dataActors[7].meta['SecondName'].split(',')[1];
     return `${actorName}=コルド＝${actorSecondName}─その２─`;
   }
   bookDescription() {
@@ -453,7 +404,8 @@ class Tip16 extends BookTipBase {//クサンについて2。使用ずみ
 
 `;
   }
-};
+}
+
 class Tip17 extends BookTipBase {//騎士団長,入手ずみ
   seName() {
     return "Chime2";
@@ -463,7 +415,7 @@ class Tip17 extends BookTipBase {//騎士団長,入手ずみ
     return 3;
   }
   bookTitle() {
-    var weaponName = $dataWeapons[351].name;
+    const weaponName = $dataWeapons[351].name;
     return `${weaponName}=${$dataWeapons[351].meta['FamilyName']}`;
   }
   bookDescription() {
@@ -485,17 +437,15 @@ class Tip17 extends BookTipBase {//騎士団長,入手ずみ
 
 `;
   }
-};
+}
+
 class Tip18 extends BookTipBase {//国王。使用ずみ
   seName() {
     return "Chime2";
   }
 
-  var172value() {
-    return 2;
-  }
   bookTitle() {
-    var weaponName = $dataWeapons[359].name;
+    const weaponName = $dataWeapons[359].name;
     return `${weaponName}=${$dataWeapons[359].meta['FamilyName']}`;
   }
   bookDescription() {
@@ -514,17 +464,11 @@ class Tip18 extends BookTipBase {//国王。使用ずみ
 その大願の為に残りの生涯を賭した王でもあった。
 `;
   }
-};
-class Tip19 extends BookTipBase {//<淫触薬>アビス・リキッド、使用ずみ
-  seName() {
-    return "Book2";
-  }
+}
 
-  var172value() {
-    return 2;
-  }
+class Tip19 extends BookTipBase {//<淫触薬>アビス・リキッド、使用ずみ
   bookTitle() {
-    var weaponName = $dataWeapons[459].name;
+    const weaponName = $dataWeapons[459].name;
     return `${weaponName}`;
   }
   bookDescription() {
@@ -544,15 +488,9 @@ class Tip19 extends BookTipBase {//<淫触薬>アビス・リキッド、使用�
 それらは\\swi[223]の観光客相手に売り捌かれたらしい…。
 `;
   }
-};
-class Tip20 extends BookTipBase {//エネミー全滅ボーナス、使用ずみ
-  seName() {
-    return "Book2";
-  }
+}
 
-  var172value() {
-    return 2;
-  }
+class Tip20 extends BookTipBase {//エネミー全滅ボーナス、使用ずみ
   bookTitle() {
     return `エネミー全滅ボーナス`;
   }
@@ -573,15 +511,9 @@ class Tip20 extends BookTipBase {//エネミー全滅ボーナス、使用ずみ
 `;
 
   }
-};
-class Tip21 extends BookTipBase {//ダンジョンとフィールドの違い。使用ずみ
-  seName() {
-    return "Book2";
-  }
+}
 
-  var172value() {
-    return 2;
-  }
+class Tip21 extends BookTipBase {//ダンジョンとフィールドの違い。使用ずみ
   bookTitle() {
     return `ダンジョンとフィールド`;
   }
@@ -597,15 +529,9 @@ class Tip21 extends BookTipBase {//ダンジョンとフィールドの違い。
 
 `;
   }
-};
-class Tip22 extends BookTipBase {//食事について。使用済み
-  seName() {
-    return "Book2";
-  }
+}
 
-  var172value() {
-    return 2;
-  }
+class Tip22 extends BookTipBase {//食事について。使用済み
   bookTitle() {
     return `食事アイテムについて`;
   }
@@ -622,17 +548,11 @@ class Tip22 extends BookTipBase {//食事について。使用済み
 ※ 「食材」と「食事」アイテムは別物です。
 `;
   }
-};
-class Tip23 extends BookTipBase {//<淫統薬>インデュ・アビス
-  seName() {
-    return "Book2";
-  }
+}
 
-  var172value() {
-    return 2;
-  }
+class Tip23 extends BookTipBase {//<淫統薬>インデュ・アビス
   bookTitle() {
-    var weaponName = $dataWeapons[452].name;
+    const weaponName = $dataWeapons[452].name;
     return `${weaponName}─その２─`;
   }
   bookDescription() {
@@ -651,12 +571,9 @@ class Tip23 extends BookTipBase {//<淫統薬>インデュ・アビス
 
 その３に続く──`;
   }
-};
-class Tip24 extends BookTipBase {//ディヴィジョン・ベルセルク
-  seName() {
-    return "Book2";
-  }
+}
 
+class Tip24 extends BookTipBase {//ディヴィジョン・ベルセルク
   var172value() {
     return 3;
   }
@@ -679,12 +596,9 @@ class Tip24 extends BookTipBase {//ディヴィジョン・ベルセルク
 それだけを想い選んで…。
 `;
   }
-};
-class Tip25 extends BookTipBase {//ディヴィジョン・ベルセルク
-  seName() {
-    return "Book2";
-  }
+}
 
+class Tip25 extends BookTipBase {//ディヴィジョン・ベルセルク
   var172value() {
     return 3;
   }
@@ -707,12 +621,9 @@ class Tip25 extends BookTipBase {//ディヴィジョン・ベルセルク
 何故か追放された為、軍を動かし確保に赴く事となった──。
 `;
   }
-};
-class Tip26 extends BookTipBase {//ディヴィジョン・ベルセルク
-  seName() {
-    return "Book2";
-  }
+}
 
+class Tip26 extends BookTipBase {//ディヴィジョン・ベルセルク
   var172value() {
     return 3;
   }
@@ -732,12 +643,9 @@ class Tip26 extends BookTipBase {//ディヴィジョン・ベルセルク
 その答えを出すべき少年は………。
 `;
   }
-};
-class Tip27 extends BookTipBase {//ライフスト－ム
-  seName() {
-    return "Book2";
-  }
+}
 
+class Tip27 extends BookTipBase {//ライフスト－ム
   var172value() {
     return 3;
   }
@@ -761,8 +669,9 @@ class Tip27 extends BookTipBase {//ライフスト－ム
 ──歳若い\\N[5]を除いて。
 `;
   }
-};
+}
 
+// Tips ID -> クラス。本文は各クラス側にある。
 const originalTipsMap = {
   1: Tip1,
   2: Tip2,
@@ -794,7 +703,12 @@ const originalTipsMap = {
 
 //#region original_text
 
+// 固有テキスト(OriginalText1/2)の共通処理。本文は bookDescription 側にある。
 class OriginalTextBase extends BookTipBase {
+  seName() {
+    return "Chime2";
+  }
+
   var172value() {
     return 10;
   }
@@ -811,11 +725,8 @@ class OriginalText1 extends OriginalTextBase {
   _job = this._weapon.meta['Profession'];
   _subJob = this._weapon.meta['Profession1'];
 
-  seName() {
-    return "Chime2";
-  }
 
-  // Return the text for id100==1 using id101 if needed
+  // id100==1 用の本文。必要なら id101 で分岐する。
   bookDescription() {
     return `・Usopedia:${this._job}
 覇空戦争時代より続く医師の名門一族、\\NFN[317]家。
@@ -839,11 +750,7 @@ ${this._subJob}、と…。
 }
 
 class OriginalText2 extends OriginalTextBase {
-  seName() {
-    return "Chime2";
-  }
-
-  // Return the text for id100==2 using id101 if needed
+  // id100==2 用の本文。必要なら id101 で分岐する。
   bookDescription() {
     return `・Usopedia:魔導電算機について
 来訪者(コラボ勢)の一人が所持していたＰＣ(パーソナルコンピューター)を元に、
@@ -865,543 +772,808 @@ class OriginalText2 extends OriginalTextBase {
 //#endregion
 
 
+//#region gab_word
+// 喘ぎ声セット。wordSetId はイベントから変数で指定される。
+const HTEXT_WORD_SETS = {
+  3: ['「アッ\\I[12]\\I[12]\\I[12]」', '「ンッ\\I[12]」', '「ンン…\\I[12]」', '「ンクっ…\\I[12]」', '「ァンっ…\\I[12]」', '「ヒィンっ…\\I[12]」', '「アヒィっ…\\I[12]」'],
+  2: ['「………ァっ」', '「いや…」', '「ンン──……」', '「ンクっ…」', '「ァンっ…」'],
+  1: ['「イヤ…ッ」', '「ヤメ…」', '「ァァ………」', '「助けッ──」', '「ァ──」']
+};
+
 htext_word = function (wordSetId) {
-  switch (wordSetId) {
-    case 3: {
-      valueHtextWord = ['「アッ\\I[12]\\I[12]\\I[12]」', '「ンッ\\I[12]」', '「ンン…\\I[12]」', '「ンクっ…\\I[12]」', '「ァンっ…\\I[12]」', '「ヒィンっ…\\I[12]」', '「アヒィっ…\\I[12]」'];
-      break;
-    }
-    case 2: {
-      valueHtextWord = ['「………ァっ」', '「いや…」', '「ンン──……」', '「ンクっ…」', '「ァンっ…」'];
-      break;
-    }
-    case 1: {
-      valueHtextWord = ['「イヤ…ッ」', '「ヤメ…」', '「ァァ………」', '「助けッ──」', '「ァ──」'];
-      break;
-    }
-  }
+  const wordSet = HTEXT_WORD_SETS[wordSetId];
+  valueHtextWord = wordSet ? wordSet.slice() : [];
+};
+
+// Gab(一言台詞)を1つ表示する。withFace の時だけ顔グラ情報を渡す。
+function showGabLine(gabLine, withFace) {
+  const gabLineText = gabLine[0];
+  if (!$gameParty.inBattle()) $gameSystem.pushInfoLog(gabLineText);//インフォログにも残す
+
+  const scene = SceneManager._scene;
+  if (!scene || !scene._gabWindow) return;
+
+  const gabData = withFace
+    ? [gabLineText, 'face', gabLine[1], Number(gabLine[2]), '', 0]
+    : [gabLineText, '', 0, 0, '', 0];
+  scene.startGabWindow(gabData);
 }
 
+// 候補から1つ選ぶ。空なら null。
+function pickGabLine(gabLineCandidates) {
+  if (!gabLineCandidates || gabLineCandidates.length === 0) return null;
+  return gabLineCandidates[getRandomIndex(gabLineCandidates.length)];
+}
+
+// 顔グラ無しの一言。
 gabWord_exeScriptNoFace = function (gabLineCandidates) {
-
-  if (!gabLineCandidates || gabLineCandidates.length === 0) return;
-  var gabLine = gabLineCandidates[getRandomIndex(gabLineCandidates.length)];
-  var scene = SceneManager._scene;
-  var gabData = [gabLine[0], '', 0, 0, '', 0];
-  if (!$gameParty.inBattle()) { $gameSystem.pushInfoLog(gabLine[0]) };//追加。インフォログにギャブ内容を直接入れる。
-  if (scene && scene._gabWindow) scene.startGabWindow(gabData);
-
+  const gabLine = pickGabLine(gabLineCandidates);
+  if (!gabLine) return;
+  showGabLine(gabLine, false);
 };
 
+// 顔グラ付きの一言。
 gabWord_exeScript = function (gabLineCandidates) {
-
-  if (!gabLineCandidates || gabLineCandidates.length === 0) return;
-  var gabLine = gabLineCandidates[getRandomIndex(gabLineCandidates.length)];
-  var scene = SceneManager._scene;
-  var gabData = [gabLine[0], 'face', gabLine[1], Number(gabLine[2]), '', 0];
-  if (!$gameParty.inBattle()) { $gameSystem.pushInfoLog(gabLine[0]) };//追加。インフォログにギャブ内容を直接入れる。
-  if (scene && scene._gabWindow) scene.startGabWindow(gabData);
-
+  const gabLine = pickGabLine(gabLineCandidates);
+  if (!gabLine) return;
+  showGabLine(gabLine, true);
 };
 
-//戦闘開始時Gab。
+// 戦闘開始時Gab。
+const BATTLE_INTRO_GAB_GROUP_ID = 0;//変数229(グループID)
+const BATTLE_INTRO_GAB_DURATION = 80;//変数68。GAB表示時間。二言目以上の時
+const INTRO_GREETING_GAB = [`「秩序の名に措いて…、私は負けませんッ！！」`, '1Actor1', 7];
+const INTRO_CHALLENGE_GAB = [`「油断せず行きますよ──ッ！！」`, '1Actor1', 3];
+
 gabWord_setBattle = function () {
 
-  var gabLineCandidates = [];
-  var introSetFlag = 0;
-  var memberCount = $gameParty.battleMembers().length;
+  const battleMembers = $gameParty.battleMembers();
+  const memberCount = battleMembers.length;
   if (memberCount === 0) return;
-  var randomMemberIndex = getRandomIndex(memberCount);
-  var actorId = $gameParty.battleMembers()[randomMemberIndex].actorId();
-  $gameVariables.setValue(53, $gameActors.actor(actorId).nickname());
+
+  const randomMemberIndex = getRandomIndex(memberCount);
+  const actorId = battleMembers[randomMemberIndex].actorId();
+  const actor = $gameActors.actor(actorId);
+  $gameVariables.setValue(53, actor.nickname());
   $gameVariables.setValue(625, $gameVariables.value(380 + actorId)[59]);
-  if ($gameVariables.value(229) == 0) {//グループID
-    $gameVariables.setValue(68, 80)//GAB表示時間。二言目以上の時
-    var gabLineCandidates = [];
-    gabLineCandidates.push([`「秩序の名に措いて…、私は負けませんッ！！」`, '1Actor1', 7]);
-    gabWord_exeScript(gabLineCandidates);
-    var gabLineCandidates = [];
-    gabLineCandidates.push([`「油断せず行きますよ──ッ！！」`, '1Actor1', 3]);
-    var introSetFlag = 1;
-  };
-  if (introSetFlag == 0 && !$gameSwitches.value(211)) {
-    if (memberCount == 1) {
-      for (var i = 1; i <= 9; i++) {
-        if ($dataActors[actorId].meta['GabBattleTurnAlone_' + i]) {
-          gabLineCandidates.push($dataActors[actorId].meta['GabBattleTurnAlone_' + i].split(','));
-        };
-      };
-    } else {
-      for (var i = 1; i <= 9; i++) {
-        if ($dataActors[actorId].meta['GabBattleTurn_' + i]) {
-          gabLineCandidates.push($dataActors[actorId].meta['GabBattleTurn_' + i].split(','));
-        };
-      };
-    };
-    //arrNpcGab1.push([`「押し通る──ッ！！」`,'2Actor1',7]);
-    //arrNpcGab1.push([`「前進あるのみ！　行くぞ──ッッ！！」`,'2Actor1',3]);
-    //arrNpcGab1.push([`「押し通る──ッ！！」`,'NPC1',6]);
-    //arrNpcGab1.push([`「押し通る──ッ！！」`,'NPC1',7]);
-    //arrNpcGab1.push([`「押し通る──ッ！！」`,'NPC2',0]);
-  };
+
+  let gabLineCandidates = null;
+
+  if ($gameVariables.value(229) == BATTLE_INTRO_GAB_GROUP_ID) {
+    $gameVariables.setValue(68, BATTLE_INTRO_GAB_DURATION);
+    gabWord_exeScript([INTRO_GREETING_GAB]);
+    gabLineCandidates = [INTRO_CHALLENGE_GAB];
+  } else if (!$gameSwitches.value(211)) {
+    gabLineCandidates = collectBattleTurnGabLines(actorId, memberCount == 1);
+  }
+
+  if (!gabLineCandidates) return;
   gabWord_exeScript(gabLineCandidates);
 
 };
 
-//マップ移動時ＮＰＣ呟き。
+// アクターの <GabBattleTurn_N> / 単独時は <GabBattleTurnAlone_N> を読む。
+function collectBattleTurnGabLines(actorId, isAlone) {
+  const actorMeta = $dataActors[actorId].meta;
+  const metaKeyPrefix = isAlone ? 'GabBattleTurnAlone_' : 'GabBattleTurn_';
+  const gabLineCandidates = [];
+
+  for (let gabSlotId = 1; gabSlotId <= 9; gabSlotId++) {
+    const gabValue = actorMeta[metaKeyPrefix + gabSlotId];
+    if (!gabValue) continue;
+    gabLineCandidates.push(gabValue.split(','));
+  }
+  return gabLineCandidates;
+}
+
+// ---------------------------------------------------------------------------
+// マップ移動時NPC呟き
+// ---------------------------------------------------------------------------
+// スイッチ・変数135(進行度)で出現する台詞の組。評価順と push 順は元コードと同一。
+const NPC_GAB_BLOCKS = [
+  {
+    //戦貨が貯まっている
+    isActive: function () {
+      return $gameParty.numItems($dataItems[10]) >= 1000;
+    },
+    lines: function () {
+      return [
+        [`【中年男】「\\iin[10]が貯まってるじゃないか。早く交換に行きな」`, 'GabPeople4', 4],
+        [`【女性】「\\iin[10]が貯まってるじゃない。交換に行ってきたら？」`, 'GabPeople4', 3],
+        [`【少年】「\\iin[10]が貯まっていますよ？　交換に行くべきでは」`, 'GabPeople4', 0]
+      ];
+    }
+  },
+  {
+    //コルブラント屋外
+    isActive: function () {
+      return $gameSwitches.value(241) && $gameSwitches.value(203);
+    },
+    lines: function (storyProgress) {
+      if (storyProgress >= 42 && storyProgress <= 43) {
+        return [
+          [`【中年男】「何やら城の方が騒がしいな…」`, 'GabPeople1', 4],
+          [`【老婆】「何があったって言うんだい、全く…」`, 'GabPeople1', 7],
+          [`【青年】「騎士団長が何とかしてくれるさ！」`, 'GabPeople1', 2],
+          [`【少年】「ヒャ、ヒャハ～～………」`, 'GabPeople1', 0]
+        ];
+      }
+
+      const cityRumorLines = (storyProgress >= 47)
+        ? [
+          [`【中年男】「宰相が逆賊だったんだって？　オレは前から怪しいと──」`, 'GabPeople1', 4],
+          [`【老婆】「\\N[7]様がねぇ…、一体何だって………」`, 'GabPeople1', 7]
+        ]
+        : [
+          [`【中年男】「最近盗賊が暴れてるんだって？　全く騎士団は何をしてるんだよ──」`, 'GabPeople1', 4],
+          [`【老婆】「最近は物騒な話ばっかりで嫌になるねぇ──」`, 'GabPeople1', 7]
+        ];
+      return cityRumorLines.concat([
+        [`【青年】「コルブラント島は初めてかい？　この島は良い所だよ！」`, 'GabPeople1', 2],
+        [`【少年】「ヒャッハーーッ」`, 'GabPeople1', 0]
+      ]);
+    }
+  },
+  {
+    //王城、後半も
+    isActive: function () {
+      return $gameSwitches.value(242) || $gameSwitches.value(276);
+    },
+    lines: function (storyProgress) {
+      if (storyProgress >= 42) {
+        return [
+          [`【団員】「制圧完了！」`, 'GabPeople2', 4],
+          [`【団員】「異常なし！」`, 'GabActor1', 7]
+        ];
+      }
+
+      const castleLines = [
+        [`【兵士】「異常ありません！」`, 'GabPeople3', 7],
+        [`【メイド】「これはお目汚しを。失礼致しました──」`, 'GabPeople2', 5],
+        [`【貴族】「フン。平民風情が城内を闊歩するなど。身の程をしれ──」`, 'GabPeople3', 4]
+      ];
+      if (storyProgress <= 49) {
+        castleLines.push([`【兵士】「何だってよそ者に討伐なんて(ﾌﾞﾂﾌﾞﾂ…)──」`, 'GabPeople3', 7]);
+      }
+      return castleLines;
+    }
+  },
+  {
+    //秩序
+    isActive: function () {
+      return $gameSwitches.value(261);
+    },
+    lines: function (storyProgress) {
+      if (storyProgress >= 100) {
+        return [
+          [`【団員】「お、団長代理じゃねーか。相変わらずエロい身体してるぜ\\I[12]」`, 'GabEroPeople1', 1],
+          [`【団員】「ククク…──\\I[12]」`, 'GabEroPeople1', 4]
+        ];
+      }
+      return [
+        [`【団員】「全空に、秩序を──！」`, 'GabPeople2', 4],
+        [`【団員】「全空に、秩序を──！」`, 'GabActor1', 7]
+      ];
+    }
+  },
+  {
+    //アウギュステ屋外
+    isActive: function () {
+      return $gameSwitches.value(281) && $gameSwitches.value(203);
+    },
+    lines: function (storyProgress) {
+      const augysteLines = [
+        [`【青年】「ここはアウギュステ。年中観光客で賑わってる島だよ──」`, 'GabPeople4', 2],
+        [`【少年】「ウキャキャキャーーーッ♪」`, 'GabPeople1', 0],
+        [`【宗教男】「母なる海を汚す者、汝この地より立ち去るべし──」`, 'GabPeople4', 6]
+      ];
+
+      if (storyProgress >= 32) {
+        augysteLines.push([`【中年男】「例のクスリも下火になってきたみたいだな。助かる話だぜ」`, 'GabPeople4', 4]);
+      } else {
+        augysteLines.push([`【中年男】「最近この街じゃ妙なクスリが出回ってるみたいでな…。アンタも気を付けなよ──」`, 'GabPeople4', 4]);
+      }
+
+      if (storyProgress <= 32) {
+        augysteLines.push(
+          [`【青年？】「オホ…、オホホホォォォゥゥゥッッ──\\I[12]」`, 'GabEroPeople1', 0],
+          [`【老人？】「儂は…神じゃったんか…、神、神、カミカミカミカミカァッハァァ──ッ\\I[12]」`, 'GabEroPeople1', 1],
+          [`【中年？】「アヘ\\I[12] ア、ヒハヒハ\\I[12]」`, 'GabEroPeople1', 3]
+        );
+      }
+      return augysteLines;
+    }
+  },
+  {
+    //浜辺
+    isActive: function () {
+      return $gameSwitches.value(282);
+    },
+    lines: function (storyProgress) {
+      const beachLines = [
+        [`【青年】「青い海、白い砂浜。完璧だッぜッ！！」`, 'GabPeople1', 2],
+        [`【頭アウギュステ】「やっぱり年に一度は此処にリゾートに来ないとね──」`, 'GabActor2', 2]
+      ];
+      if (storyProgress <= 32) {
+        beachLines.push(
+          [`【青年？】「オホ…、オホホホォォォゥゥゥッッ──\\I[12]」`, 'GabEroPeople1', 0],
+          [`【老人？】「儂は…神じゃったんか…、神、神、カミカミカミカミカァッハァァ──ッ\\I[12]」`, 'GabEroPeople1', 1],
+          [`【中年？】「アヘ\\I[12] ア、ヒハヒハ\\I[12]」`, 'GabEroPeople1', 3]
+        );
+      }
+      return beachLines;
+    }
+  },
+  {
+    //ジュエルリゾート
+    isActive: function () {
+      return $gameSwitches.value(301);
+    },
+    lines: function () {
+      return [
+        [`【少年】「ここに来ると、お父さん達が大はしゃぎするんだよね──」`, 'GabPeople4', 0],
+        [`【中年】「カジノで今月の家賃まで溶かしちゃった。テヘペロ\\I[12]」`, 'GabPeople4', 4],
+        [`【熟女】（無言で中年男のボディをサンドバックにしている…）`, 'GabPeople4', 5]
+      ];
+    }
+  }
+  // NOTE: 犯罪都市屋外(スイッチ321 && 203)は元コードでも台詞が無い為、ブロックを持たない。
+];
+
 gabWord_setNpc = function () {
 
-  var gabLineCandidates = [];
-  if ($gameParty.numItems($dataItems[10]) >= 1000) {
-    gabLineCandidates.push([`【中年男】「\\iin[10]が貯まってるじゃないか。早く交換に行きな」`, 'GabPeople4', 4]);
-    gabLineCandidates.push([`【女性】「\\iin[10]が貯まってるじゃない。交換に行ってきたら？」`, 'GabPeople4', 3]);
-    gabLineCandidates.push([`【少年】「\\iin[10]が貯まっていますよ？　交換に行くべきでは」`, 'GabPeople4', 0]);
-  };
-  if ($gameSwitches.value(241) && $gameSwitches.value(203)) {//コルブラント屋外
-    if ($gameVariables.value(135) >= 42 && $gameVariables.value(135) <= 43) {
-      gabLineCandidates.push([`【中年男】「何やら城の方が騒がしいな…」`, 'GabPeople1', 4]);
-      gabLineCandidates.push([`【老婆】「何があったって言うんだい、全く…」`, 'GabPeople1', 7]);
-      gabLineCandidates.push([`【青年】「騎士団長が何とかしてくれるさ！」`, 'GabPeople1', 2]);
-      gabLineCandidates.push([`【少年】「ヒャ、ヒャハ～～………」`, 'GabPeople1', 0]);
-    } else {
-      if ($gameVariables.value(135) >= 47) {
-        gabLineCandidates.push([`【中年男】「宰相が逆賊だったんだって？　オレは前から怪しいと──」`, 'GabPeople1', 4]);
-        gabLineCandidates.push([`【老婆】「\\N[7]様がねぇ…、一体何だって………」`, 'GabPeople1', 7]);
-      } else {
-        gabLineCandidates.push([`【中年男】「最近盗賊が暴れてるんだって？　全く騎士団は何をしてるんだよ──」`, 'GabPeople1', 4]);
-        gabLineCandidates.push([`【老婆】「最近は物騒な話ばっかりで嫌になるねぇ──」`, 'GabPeople1', 7]);
-      };
-      gabLineCandidates.push([`【青年】「コルブラント島は初めてかい？　この島は良い所だよ！」`, 'GabPeople1', 2]);
-      gabLineCandidates.push([`【少年】「ヒャッハーーッ」`, 'GabPeople1', 0]);
-    }
-  };
-  if ($gameSwitches.value(242) || $gameSwitches.value(276)) {//王城、後半も
-    if ($gameVariables.value(135) >= 42) {
-      gabLineCandidates.push([`【団員】「制圧完了！」`, 'GabPeople2', 4]);
-      gabLineCandidates.push([`【団員】「異常なし！」`, 'GabActor1', 7]);
-    } else {
-      gabLineCandidates.push([`【兵士】「異常ありません！」`, 'GabPeople3', 7]);
-      gabLineCandidates.push([`【メイド】「これはお目汚しを。失礼致しました──」`, 'GabPeople2', 5]);
-      gabLineCandidates.push([`【貴族】「フン。平民風情が城内を闊歩するなど。身の程をしれ──」`, 'GabPeople3', 4]);
-      if ($gameVariables.value(135) <= 49) {
-        gabLineCandidates.push([`【兵士】「何だってよそ者に討伐なんて(ﾌﾞﾂﾌﾞﾂ…)──」`, 'GabPeople3', 7]);
-      };
-    };
-  };
-  if ($gameSwitches.value(261)) {//秩序
-    if ($gameVariables.value(135) >= 100) {
-      gabLineCandidates.push([`【団員】「お、団長代理じゃねーか。相変わらずエロい身体してるぜ\\I[12]」`, 'GabEroPeople1', 1]);
-      gabLineCandidates.push([`【団員】「ククク…──\\I[12]」`, 'GabEroPeople1', 4]);
-    } else {
-      gabLineCandidates.push([`【団員】「全空に、秩序を──！」`, 'GabPeople2', 4]);
-      gabLineCandidates.push([`【団員】「全空に、秩序を──！」`, 'GabActor1', 7]);
-    };
-  };
-  if ($gameSwitches.value(281) && $gameSwitches.value(203)) {//アウギュステ屋外
-    gabLineCandidates.push([`【青年】「ここはアウギュステ。年中観光客で賑わってる島だよ──」`, 'GabPeople4', 2]);
-    gabLineCandidates.push([`【少年】「ウキャキャキャーーーッ♪」`, 'GabPeople1', 0]);
-    gabLineCandidates.push([`【宗教男】「母なる海を汚す者、汝この地より立ち去るべし──」`, 'GabPeople4', 6]);
-    if ($gameVariables.value(135) >= 32) {
-      gabLineCandidates.push([`【中年男】「例のクスリも下火になってきたみたいだな。助かる話だぜ」`, 'GabPeople4', 4]);
-    } else {
-      gabLineCandidates.push([`【中年男】「最近この街じゃ妙なクスリが出回ってるみたいでな…。アンタも気を付けなよ──」`, 'GabPeople4', 4]);
-    }
-    if ($gameVariables.value(135) <= 32) {
-      gabLineCandidates.push([`【青年？】「オホ…、オホホホォォォゥゥゥッッ──\\I[12]」`, 'GabEroPeople1', 0]);
-      gabLineCandidates.push([`【老人？】「儂は…神じゃったんか…、神、神、カミカミカミカミカァッハァァ──ッ\\I[12]」`, 'GabEroPeople1', 1]);
-      gabLineCandidates.push([`【中年？】「アヘ\\I[12] ア、ヒハヒハ\\I[12]」`, 'GabEroPeople1', 3]);
-    };
-  };
-  if ($gameSwitches.value(282)) {//浜辺
-    gabLineCandidates.push([`【青年】「青い海、白い砂浜。完璧だッぜッ！！」`, 'GabPeople1', 2]);
-    gabLineCandidates.push([`【頭アウギュステ】「やっぱり年に一度は此処にリゾートに来ないとね──」`, 'GabActor2', 2]);
-    if ($gameVariables.value(135) <= 32) {
-      gabLineCandidates.push([`【青年？】「オホ…、オホホホォォォゥゥゥッッ──\\I[12]」`, 'GabEroPeople1', 0]);
-      gabLineCandidates.push([`【老人？】「儂は…神じゃったんか…、神、神、カミカミカミカミカァッハァァ──ッ\\I[12]」`, 'GabEroPeople1', 1]);
-      gabLineCandidates.push([`【中年？】「アヘ\\I[12] ア、ヒハヒハ\\I[12]」`, 'GabEroPeople1', 3]);
-    };
-  };
-  if ($gameSwitches.value(301)) {//ジュエルリゾート
-    gabLineCandidates.push([`【少年】「ここに来ると、お父さん達が大はしゃぎするんだよね──」`, 'GabPeople4', 0]);
-    gabLineCandidates.push([`【中年】「カジノで今月の家賃まで溶かしちゃった。テヘペロ\\I[12]」`, 'GabPeople4', 4]);
-    gabLineCandidates.push([`【熟女】（無言で中年男のボディをサンドバックにしている…）`, 'GabPeople4', 5]);
-  };
-  if ($gameSwitches.value(321) && $gameSwitches.value(203)) {//犯罪都市屋外
+  const storyProgress = $gameVariables.value(135);
+  const gabLineCandidates = [];
 
-  };
-  if ($gameParty.battleMembers()[0] && isGirl($gameParty.battleMembers()[0])) {//先頭キャラ女か。露出状態での発言
-    rosyutu_wordChoiceNPC($gameParty.battleMembers()[0].actorId());
-  };
+  for (const gabBlock of NPC_GAB_BLOCKS) {
+    if (!gabBlock.isActive()) continue;
+    for (const gabLine of gabBlock.lines(storyProgress)) gabLineCandidates.push(gabLine);
+  }
+
+  //先頭キャラが女なら露出状態での発言も追加する。
+  const leaderMember = $gameParty.battleMembers()[0];
+  if (leaderMember && isGirl(leaderMember)) rosyutu_wordChoiceNPC(leaderMember.actorId());
 
   gabWord_exeScript(gabLineCandidates);
 
 };
-//露出限界判定時にnpc台詞設定
+
+// 露出限界判定時のNPC台詞。露出度(変数 actorId+380 の [4])が低いほど過激になる。
+const NPC_LEER_GAB_BLOCKS = [
+  {
+    isActive: function (exposureLevel) {
+      return exposureLevel <= 90;
+    },
+    lines: function () {
+      return [
+        [`【中年男】「………………………（視線をこちらに固定しながら）」`, 'GabEroPeople1', 3]
+      ];
+    }
+  },
+  {
+    isActive: function (exposureLevel) {
+      return exposureLevel <= 50;
+    },
+    lines: function () {
+      return [
+        [`【青年】「（ニヤニヤ──\\I[12]）」`, 'GabEroPeople1', 0],
+        [`【青年】「ヒュゥ──\\I[12]」`, 'GabEroPeople1', 2]
+      ];
+    }
+  },
+  {
+    isActive: function (exposureLevel) {
+      return exposureLevel <= 25;
+    },
+    lines: function () {
+      const pocketLine = `【青年】（こちらをジっと見ながらポケットに入れた手を激しく動かしている…）`;
+      return [
+        [`【青年】「エロい格好しやがって──\\I[12]」`, 'GabEroPeople1', 1],
+        [`【青年】「ヘッヘッヘ──\\I[12]」`, 'GabEroPeople1', 4],
+        [pocketLine, 'GabEroPeople1', 5],
+        [pocketLine, 'GabEroPeople1', 6],
+        [pocketLine, 'GabEroPeople1', 7]
+      ];
+    }
+  },
+  {
+    isActive: function (exposureLevel, bustSize) {
+      return exposureLevel <= 25 && bustSize >= 500;
+    },
+    lines: function () {
+      return [
+        [`【青年】「オイオイ、あの秩序の女、また乳デカくなってんじゃねーの──\\I[12]」`, 'GabEroPeople1', 5],
+        [`【青年】「秩序秩序って、自分が一番秩序乱してんじゃね？」（←呆れ顔）`, 'GabEroPeople1', 6],
+        [`【青年】「慧漏いな…」`, 'GabEroPeople1', 7]
+      ];
+    }
+  }
+];
+
+// 露出限界判定時にnpc台詞設定
 rosyutu_wordChoiceNPC = function (actorId) {
 
-  var gabLineCandidates = [];
-  if ($gameVariables.value(actorId + 380)[4] <= 90) {
-    gabLineCandidates.push([`【中年男】「………………………（視線をこちらに固定しながら）」`, 'GabEroPeople1', 3]);
-  };
-  if ($gameVariables.value(actorId + 380)[4] <= 50) {
-    gabLineCandidates.push([`【青年】「（ニヤニヤ──\\I[12]）」`, 'GabEroPeople1', 0]);
-    gabLineCandidates.push([`【青年】「ヒュゥ──\\I[12]」`, 'GabEroPeople1', 2]);
-  };
-  if ($gameVariables.value(actorId + 380)[4] <= 25) {
-    gabLineCandidates.push([`【青年】「エロい格好しやがって──\\I[12]」`, 'GabEroPeople1', 1]);
-    gabLineCandidates.push([`【青年】「ヘッヘッヘ──\\I[12]」`, 'GabEroPeople1', 4]);
-    gabLineCandidates.push([`【青年】（こちらをジっと見ながらポケットに入れた手を激しく動かしている…）`, 'GabEroPeople1', 5]);
-    gabLineCandidates.push([`【青年】（こちらをジっと見ながらポケットに入れた手を激しく動かしている…）`, 'GabEroPeople1', 6]);
-    gabLineCandidates.push([`【青年】（こちらをジっと見ながらポケットに入れた手を激しく動かしている…）`, 'GabEroPeople1', 7]);
-  };
-  if ($gameVariables.value(actorId + 380)[4] <= 25 && $gameVariables.value(actorId + 380)[1] >= 500) {
-    gabLineCandidates.push([`【青年】「オイオイ、あの秩序の女、また乳デカくなってんじゃねーの──\\I[12]」`, 'GabEroPeople1', 5]);
-    gabLineCandidates.push([`【青年】「秩序秩序って、自分が一番秩序乱してんじゃね？」（←呆れ顔）`, 'GabEroPeople1', 6]);
-    gabLineCandidates.push([`【青年】「慧漏いな…」`, 'GabEroPeople1', 7]);
-  };
+  const actorVariables = $gameVariables.value(actorId + 380);
+  const exposureLevel = actorVariables[4];
+  const bustSize = actorVariables[1];
+  const gabLineCandidates = [];
+
+  for (const gabBlock of NPC_LEER_GAB_BLOCKS) {
+    if (!gabBlock.isActive(exposureLevel, bustSize)) continue;
+    for (const gabLine of gabBlock.lines()) gabLineCandidates.push(gabLine);
+  }
+
   gabWord_exeScript(gabLineCandidates);
 
 };
-//露出限界判定時に台詞設定
+
+// 露出限界判定時に台詞設定(操作キャラの内心)
 rosyutu_wordChoice = function (actorId) {
 
-  var actor = $gameActors.actor(actorId);
+  const actor = $gameActors.actor(actorId);
   if (!actor) return;
-  var gabLineCandidates = [];
-  if (actorId == 2) {
-    var gabLine = [`「乙女にさせる格好では無いだろうが…っ」`, 3, 2]; gabLineCandidates.push(gabLine);
-  };
-  if (actorId == 1) {
-    if ($gameVariables.value(actorId + 380)[4] >= 70) {
-      var gabLine = [`「そ、その…、早く着替えましょう………」`, 3, 7]; gabLineCandidates.push(gabLine);
-      var gabLine = [`「は、恥ずかしいんですけど………」`, 3, 4]; gabLineCandidates.push(gabLine);
-    } else {
-      var gabLine = [`「…巫山戯ないでくれませんか…！？」`, 3, 2]; gabLineCandidates.push(gabLine);
-      var gabLine = [`「………」（←変質者を見る目）`, 3, 0]; gabLineCandidates.push(gabLine);
-    };
 
-    if ($gameVariables.value(actorId + 440)[41] == 2) {
-      var gabLine = [`「…街中でする格好ではありませんよね…？」`, 4, 1]; gabLineCandidates.push(gabLine);//水着
-    };
-    if ($gameVariables.value(actorId + 440)[41] == 3) {
-      var gabLine = [`「…街中でする格好ではありませんよね…？」`, 4, 1]; gabLineCandidates.push(gabLine);//メイド
-    };
-    if ($gameVariables.value(actorId + 440)[41] == 99) {
-      var gabLine = [`「頭がおかしいんじゃ無いですか！！」`, 3, 3]; gabLineCandidates.push(gabLine);//奴隷
-      ensyutu_ikari(60, 'Thunder9');
-    };
-    if (actor.isStateAffected(70)) {
-      var gabLine = [`「早く着替えましょう…！」`, 3, 5]; gabLineCandidates.push(gabLine);//破損
-    };
-    if ($gameVariables.value(actorId + 440)[0] >= 1) {
-      const clothItem = $dataItems[$gameVariables.value($gameVariables.value(20) + 440)[0]];
-      if (clothItem && clothItem.meta['ClothType'] == '改') {
-        var gabLine = [`「こんな破廉恥な恰好、秩序として受け入れられません！！」`, 3, 3]; gabLineCandidates.push(gabLine);//改造衣装
-        ensyutu_ikari(60, 'Thunder9');
-      }
-    };
-
-    if (actor.skillMasteryLevel(55) >= 3) {
-
-    };
-    if ($gameSwitches.value(206) || $gameSwitches.value(213)) {//露出開発度などで条件分岐
-      var gabLine = [`「こんな破廉恥な恰好、秩序として受け入れられません！！」`, 3, 3]; gabLineCandidates.push(gabLine);
-    };
-  };
-  var chosenGabLine = gabLineCandidates.length > 0 ? gabLineCandidates[getRandomIndex(gabLineCandidates.length)] : 0;
+  const gabLineCandidates = collectRosyutuWordCandidates(actor, actorId);
+  const chosenGabLine = gabLineCandidates.length > 0 ? gabLineCandidates[getRandomIndex(gabLineCandidates.length)] : 0;
   $gameVariables.setValue(21, chosenGabLine);
 
 };
 
-//作品ごとで変更させる個人プロフィール
-production_separateSetProfile = function (actorId) {
+// 露出時の内心台詞。衣装状態(変数 actorId+440)と状態で出し分ける。
+function collectRosyutuWordCandidates(actor, actorId) {
+  const actorVariables = $gameVariables.value(actorId + 380);
+  const outfit = $gameVariables.value(actorId + 440);
+  const gabLineCandidates = [];
 
-  if (actorId == 1) {//リーシャ
-    var profileText =
-      `気高く尊き秩序の蒼光纏う、若き騎空団団長（代理）。
+  if (actorId == 2) {
+    gabLineCandidates.push([`「乙女にさせる格好では無いだろうが…っ」`, 3, 2]);
+  }
+
+  if (actorId == 1) {
+    if (actorVariables[4] >= 70) {
+      gabLineCandidates.push([`「そ、その…、早く着替えましょう………」`, 3, 7]);
+      gabLineCandidates.push([`「は、恥ずかしいんですけど………」`, 3, 4]);
+    } else {
+      gabLineCandidates.push([`「…巫山戯ないでくれませんか…！？」`, 3, 2]);
+      gabLineCandidates.push([`「………」（←変質者を見る目）`, 3, 0]);
+    }
+
+    const wornOutfitId = outfit[41];
+    if (wornOutfitId == 2 || wornOutfitId == 3) {//水着/メイド
+      gabLineCandidates.push([`「…街中でする格好ではありませんよね…？」`, 4, 1]);
+    }
+    if (wornOutfitId == 99) {//奴隷
+      gabLineCandidates.push([`「頭がおかしいんじゃ無いですか！！」`, 3, 3]);
+      ensyutu_ikari(60, 'Thunder9');
+    }
+    if (actor.isStateAffected(70)) {//破損
+      gabLineCandidates.push([`「早く着替えましょう…！」`, 3, 5]);
+    }
+
+    //改造衣装
+    const clothItem = $dataItems[outfit[0]];
+    if (clothItem && clothItem.meta['ClothType'] == '改') {
+      gabLineCandidates.push([`「こんな破廉恥な恰好、秩序として受け入れられません！！」`, 3, 3]);
+      ensyutu_ikari(60, 'Thunder9');
+    }
+
+    if ($gameSwitches.value(206) || $gameSwitches.value(213)) {//露出開発度などで条件分岐
+      gabLineCandidates.push([`「こんな破廉恥な恰好、秩序として受け入れられません！！」`, 3, 3]);
+    }
+  }
+
+  return gabLineCandidates;
+}
+//#endregion
+
+//#region profile
+// 作品ごとで変更させる個人プロフィール
+
+
+// 作品ごとで変更させる個人プロフィール(アクター別)。テキストはここに集約する。
+const SEPARATE_PROFILE_ACTOR1 =
+`気高く尊き秩序の蒼光纏う、若き騎空団団長（代理）。
 全空でも有数の騎士を父に持ち、
 自身も七光りでは終わらぬ才を持つ。
 生真面目な気質で、事案の類には容赦が無い。\n`;
-  };
-  if (actorId == 2) {//モニカ
-    var profileText =
-      `剛勇鮮烈な武威の閃電煌めく、（実質的に）第四船団長。
+
+const SEPARATE_PROFILE_ACTOR2 =
+`剛勇鮮烈な武威の閃電煌めく、（実質的に）第四船団長。
 一行の中では年長者であり、
 年相応の落ち着きと研鑽を積んだ甘党系武闘派騎空士。
 齢に相応しき外見になりたいが、諦めてもいる。\n`;
-  };
-  if (actorId == 3) {//雄ドラフ
-    var profileText =
-      `雄ドラフらしいマッスルが頼れるナイスガイ。
+
+const SEPARATE_PROFILE_ACTOR3 =
+`雄ドラフらしいマッスルが頼れるナイスガイ。
 秩序の騎空団創設者とも轡を並べたベテラン騎空士。
 秩序の騎空団内部でも信頼厚く、\\N[1]の
 守役のような立ち位置。嫁さん募集中。\n`;
-  };
-  if (actorId == 4) {//女ヒューマン
-    var profileText =
-      `秩序の騎空団では若手に入る、実力派騎空士。
+
+const SEPARATE_PROFILE_ACTOR4 =
+`秩序の騎空団では若手に入る、実力派騎空士。
 生きる為に汚れ仕事に手を染めていたが、
 \\N[1]父のパーティにボコられて改心する。
 以降は秩序の騎空士として優秀な戦果を挙げている。
 カレシ募集中。\n`;
-  };
-  if (actorId == 5) {//少年
-    var profileText =
-      `賊によって家族と住む場所を失った薄幸の少年エルーン。
+
+const SEPARATE_PROFILE_ACTOR5 =
+`賊によって家族と住む場所を失った薄幸の少年エルーン。
 現在は秩序の騎空士見習いとして励んでいる。
 その経緯から団長代理付きのような立場になっており、
 \\N[1]に淡い思いを抱いている。
 今作の不幸枠。\n`;
-    if ($gameVariables.value(135) >= 49) {
-      var profileText =
-        `賊によって家族と住む場所を失った薄幸の少年エルーン。
+
+const SEPARATE_PROFILE_ACTOR5_LATE =
+`賊によって家族と住む場所を失った薄幸の少年エルーン。
 現在は秩序の騎空士見習いとして励んでいる。
 その経緯から団長代理付きのような立場になっており、
 \\N[1]に淡い思いを抱いている。
 今作の不幸枠、兼、疫病神。\n`;
-    };
-  };
-  if (actorId == 6) {//糞ガキ
-    var profileText =
-      `コルブラント王国に措いて由緒正しき血脈を
-保つ名門伯爵家嫡男。\n`;
-    //profileText += //進行に応じて追加。
-  };
-  if (actorId == 7) {//大臣
-    var profileText =
-      `コルブラント王国の内政を一手に取り仕切る大臣。
-辣腕と評判。\n`;
-  };
 
-  var actor = $gameActors.actor(actorId);
+const SEPARATE_PROFILE_ACTOR6 =
+`コルブラント王国に措いて由緒正しき血脈を
+保つ名門伯爵家嫡男。\n`;
+
+const SEPARATE_PROFILE_ACTOR7 =
+`コルブラント王国の内政を一手に取り仕切る大臣。
+辣腕と評判。\n`;
+
+const SEPARATE_PROFILE_TEXTS = {
+  1: SEPARATE_PROFILE_ACTOR1,
+  2: SEPARATE_PROFILE_ACTOR2,
+  3: SEPARATE_PROFILE_ACTOR3,
+  4: SEPARATE_PROFILE_ACTOR4,
+  5: SEPARATE_PROFILE_ACTOR5,
+  6: SEPARATE_PROFILE_ACTOR6,
+  7: SEPARATE_PROFILE_ACTOR7
+};
+
+// 進行度(変数135)で差し替わるプロフィール。
+const SEPARATE_PROFILE_LATE_TEXTS = {
+  5: { requiredProgress: 49, text: SEPARATE_PROFILE_ACTOR5_LATE }
+};
+
+production_separateSetProfile = function (actorId) {
+
+  const profileText = resolveSeparateProfileText(actorId, $gameVariables.value(135));
+  const actor = $gameActors.actor(actorId);
   if (!actor || !profileText) return;
   actor.setProfile(profileText);
 
 };
 
-//作品ごとで変更させる個人プロフィール
-production_ChangeSetProfile = function () {
+// アクターIDと進行度からプロフィール本文を選ぶ。
+function resolveSeparateProfileText(actorId, storyProgress) {
+  const lateProfile = SEPARATE_PROFILE_LATE_TEXTS[actorId];
+  if (lateProfile && storyProgress >= lateProfile.requiredProgress) return lateProfile.text;
+  return SEPARATE_PROFILE_TEXTS[actorId];
+}
 
-  var actor = $gameActors.actor($gameVariables.value(20));
-  if (!actor) return;
-  if ($gameVariables.value(20) == 1) {
-    if (actor.isLearnedSkill(65)) {
-      var profileText =
-        `致命的に狂った歯車は、秩序の女を一人の雌にした。
+// 作品ごとで変更させる個人プロフィール(堕落度合い)。上から順に判定する。
+const DEGRADED_PROFILE_ACTOR1_SKILL65 =
+`致命的に狂った歯車は、秩序の女を一人の雌にした。
 あの蒼光は、最早戻る事は無い。`;
-    } else {
-      if (actor.isLearnedSkill(64)) {
-        var profileText =
-          `呵責無き凌辱の大火は、秩序に癒えぬ恥辱の痕を刻む。
+
+const DEGRADED_PROFILE_ACTOR1_SKILL64 =
+`呵責無き凌辱の大火は、秩序に癒えぬ恥辱の痕を刻む。
 不動の筈であった優先順位に僅かな瑕疵が現れ始め…。
 心身より湧き上がる肉欲の疼きは
 確実に\\set[1]を歪ませていく…。`;
-      } else {
-        if (actor.isLearnedSkill(62)) {
-          var profileText =
-            `望まぬ穢れは秩序の光を貶め始めている…。
+
+const DEGRADED_PROFILE_ACTOR1_SKILL62 =
+`望まぬ穢れは秩序の光を貶め始めている…。
 然れどその蒼光は未だ顕在なり。
 しかし、薄暗がりを照らす彼女の光は人面獣心の徒を
-惹きつけて已まないのも事実であろう…。`
-        } else {
-          var profileText =
-            `生命活動の大半を＜秩序＞に捧げている弊害か、
+惹きつけて已まないのも事実であろう…。`;
+
+const DEGRADED_PROFILE_ACTOR1_DEFAULT =
+`生命活動の大半を＜秩序＞に捧げている弊害か、
 性的な事物に疎い。男社会で育った弊害か無防備な面も。
 団内では異性としての人気も高いのだが、
 本人は気づいていない。`;
-        }
-      }
-    }
-  };
-  //サブヒロインはスイッチで設定するかも？
-  if ($gameVariables.value(20) == 2) {
-    if (actor.isLearnedSkill(65)) {
-      var profileText =
-        `堕ちた武人は、夜な夜な男を口説き部屋へと連れ込む。
+
+const DEGRADED_PROFILE_ACTOR2_SKILL65 =
+`堕ちた武人は、夜な夜な男を口説き部屋へと連れ込む。
 一夜の快楽に耽るため…。
 その肉欲に狂わされている事を自覚しながら、
 それでも抗えぬ欲求に屈するが故──。
 `;
-    } else {
-      if (actor.isLearnedSkill(63)) {
-        var profileText =
-          `淫欲に目覚めた武人は、男を欲し始める…。
+
+const DEGRADED_PROFILE_ACTOR2_SKILL63 =
+`淫欲に目覚めた武人は、男を欲し始める…。
 その欲求は、逆らう術を、彼女は持たない…。`;
-      } else {
-        if (actor.isLearnedSkill(61)) {
-          var profileText =
-            `忌まわしき呪縛は、秩序の騎空士が誇る女傑すら
+
+const DEGRADED_PROFILE_ACTOR2_SKILL61 =
+`忌まわしき呪縛は、秩序の騎空士が誇る女傑すら
 狂わせた…。
 未だ自覚こそ無いものの、
-彼女は確かに道を踏み外そうとしている…。`
-        } else {
-          var profileText =
-            `武家の出生である為か、外見に反比例して
+彼女は確かに道を踏み外そうとしている…。`;
+
+const DEGRADED_PROFILE_ACTOR2_DEFAULT =
+`武家の出生である為か、外見に反比例して
 硬い気質の持ち主。男女の由無し事からは縁遠い。
 \\N[1]と団内女性人気を二分しているが、
 彼女の場合は理解した上でスルーしている。`;
-        }
-      }
-    }
-  };
-  actor.setProfile(profileText);
+
+const DEGRADED_PROFILE_TIERS = {
+  1: [
+    { skillId: 65, text: DEGRADED_PROFILE_ACTOR1_SKILL65 },
+    { skillId: 64, text: DEGRADED_PROFILE_ACTOR1_SKILL64 },
+    { skillId: 62, text: DEGRADED_PROFILE_ACTOR1_SKILL62 }
+  ],
+  2: [
+    { skillId: 65, text: DEGRADED_PROFILE_ACTOR2_SKILL65 },
+    { skillId: 63, text: DEGRADED_PROFILE_ACTOR2_SKILL63 },
+    { skillId: 61, text: DEGRADED_PROFILE_ACTOR2_SKILL61 }
+  ]
+};
+
+const DEGRADED_PROFILE_DEFAULT_TEXTS = {
+  1: DEGRADED_PROFILE_ACTOR1_DEFAULT,
+  2: DEGRADED_PROFILE_ACTOR2_DEFAULT
+};
+
+production_ChangeSetProfile = function () {
+
+  const actorId = $gameVariables.value(20);
+  const actor = $gameActors.actor(actorId);
+  if (!actor) return;
+
+  // サブヒロインはスイッチで設定するかも？
+  actor.setProfile(resolveDegradedProfileText(actor, actorId));
 
 };
 
-//星晶獣パラメータの一律強化。MAxHPとMPが反映されない
+// 習得済みスキルのうち一番上の段階の本文を返す(該当なしは既定文)。
+function resolveDegradedProfileText(actor, actorId) {
+  const profileTiers = DEGRADED_PROFILE_TIERS[actorId];
+  if (profileTiers) {
+    for (const profileTier of profileTiers) {
+      if (actor.isLearnedSkill(profileTier.skillId)) return profileTier.text;
+    }
+  }
+  return DEGRADED_PROFILE_DEFAULT_TEXTS[actorId];
+}
+//#endregion
+
+//#region seisyoujuu
+// 星晶獣パラメータの強化
+seisyoujuu_addParams = function (armorId) {
+
+  const armor = $dataArmors[armorId];
+  if (!armor || armor.etypeId != SEISYOUJUU_ARMOR_ETYPE_ID) return;
+  if (!armor.meta['ItemPicture']) return;
+
+  const enhanceValue = $gameVariables.value(352)[armorId - valueSeisyoujuuStartId];
+  if (!(enhanceValue >= 1)) return;
+
+  // params[0] は最大HPなので 2..7 だけ上書きする。
+  for (let paramIndex = 2; paramIndex <= 7; paramIndex++) {
+    armor.params[paramIndex] = enhanceValue * 10;
+  }
+
+};
+
+// 星晶獣パラメータの一律強化。MAxHPとMPが反映されない
 seisyoujuu_addParamsAll = function () {
 
-  for (var i = 1; i <= valueArmorsLength; i++) {
-    seisyoujuu_addParams(i);
-  };
+  for (let armorId = 1; armorId <= valueArmorsLength; armorId++) {
+    seisyoujuu_addParams(armorId);
+  }
 
 };
 
-//星晶獣パラメータの強化
-seisyoujuu_addParams = function (i) {
+// 星晶獣の装備タイプ。<ItemPicture> と <itemPictureData> は別タグなので注意。
+const SEISYOUJUU_ARMOR_ETYPE_ID = 6;
 
-  if ($dataArmors[i] && $dataArmors[i].etypeId == 6) {
-    if ($dataArmors[i].meta['ItemPicture']) {
-      if ($gameVariables.value(352)[i - valueSeisyoujuuStartId] >= 1) {
-        for (var j = 2; j <= 7; j++) {
-          $dataArmors[i].params[j] = $gameVariables.value(352)[i - valueSeisyoujuuStartId] * 10;
-        }
-      }
-    }
-  };
+function isSeisyoujuuArmor(armor, pictureMetaKey) {
+  return !!armor && armor.etypeId == SEISYOUJUU_ARMOR_ETYPE_ID && !!armor.meta[pictureMetaKey];
+}
 
-};
-
-//入手した星晶獣の一覧
+// 入手した星晶獣の一覧
 seisyoujuu_select1 = function () {
 
   valueCountSet3 = 0;
   valueCountSet4 = 0;
   $gameSwitches.setValue(380, false);
-  var ownedCount = 0;
+
   valueItems = $dataArmors;
-  for (var i = 1; i <= valueArmorsLength; i++) {
-    if (valueItems[i].etypeId == 6) {
-      if (valueItems[i].meta['ItemPicture']) {
-        valueCountSet3 += 1;
-        if ($gameParty.hasItem(valueItems[i], true)) {
-          ownedCount += 1;
-          valueCountSet4 += 1;
-        }
-      }
-    }
-  };
-  if (ownedCount >= 1) { $gameSwitches.setValue(380, true) };
+  let ownedCount = 0;
+
+  for (let armorId = 1; armorId <= valueArmorsLength; armorId++) {
+    const armor = valueItems[armorId];
+    if (!isSeisyoujuuArmor(armor, 'ItemPicture')) continue;
+
+    valueCountSet3 += 1;
+    if (!$gameParty.hasItem(armor, true)) continue;
+    ownedCount += 1;
+    valueCountSet4 += 1;
+  }
+
+  if (ownedCount >= 1) $gameSwitches.setValue(380, true);
 
 };
 
-//入手した星晶獣の一覧valueCountSet1 = 0;
+// 入手した星晶獣の一覧 seisyoujuu_select2(1);
 seisyoujuu_select2 = function (selectModeId) {
 
-  if (selectModeId == 0) {
-    for (let i = 100; i <= 205; i++) { $gameScreen.erasePicture(i) };
+  switch (selectModeId) {
+    case 0:
+      eraseStarBeastPictures();
+      break;
+    case 1:
+      buildStarBeastChoiceList();
+      break;
+    default:
+      break;
   }
-  else if (selectModeId == 1) {
-    //valueItems = $dataArmors;
-    //const value0 = 0;
-    let pictureId = 101;
-    //const picturePath = 'ScreenBlackOut';
-    let choiceIndex = 0;
-    var current = valueCountSet4;
-    var max = valueCountSet3;
-    const txt = `\\I[508]星晶石入手率＜${current}/${max}＞`;
-    const choiceParams = {
-      text: txt,
-      value: 0
-    };
-    let id = 1;
-    $gameSystem.addCustomChoice(id, choiceParams);
+
+};
+
+const STAR_BEAST_PICTURE_ID_FIRST = 100;
+const STAR_BEAST_PICTURE_ID_LAST = 205;
+const STAR_BEAST_CHOICE_PICTURE_ID_FIRST = 101;
+
+function eraseStarBeastPictures() {
+  for (let pictureId = STAR_BEAST_PICTURE_ID_FIRST; pictureId <= STAR_BEAST_PICTURE_ID_LAST; pictureId++) {
+    $gameScreen.erasePicture(pictureId);
+  }
+}
+
+// 入手率の見出し + 所持している星晶獣を選択肢として並べる。
+function buildStarBeastChoiceList() {
+  addStarBeastHeaderChoice();
+
+  valueItems = $dataArmors;
+  let pictureId = STAR_BEAST_CHOICE_PICTURE_ID_FIRST;
+  let choiceIndex = 1;
+
+  for (let armorId = 1; armorId <= valueArmorsLength; armorId++) {
+    const armor = valueItems[armorId];
+    if (!isSeisyoujuuArmor(armor, 'itemPictureData')) continue;
+    if (!$gameParty.hasItem(armor, true)) continue;
+
+    addStarBeastChoice(armor, armorId, choiceIndex, pictureId);
+    pictureId += 2;
     choiceIndex += 1;
-    valueItems = $dataArmors;
-    for (let i = 1; i <= valueArmorsLength; i++) {
-      const item = valueItems[i];
-      if (item.etypeId == 6) {
-        const itemMeta = item.meta;
-        const itemPictureData = itemMeta['itemPictureData'];
-        if (itemPictureData) {
-          if ($gameParty.hasItem(item, true)) {
-            id = 1;
-            const choiceParams = {
-              text: `${item.name}:<${$gameVariables.value(352)[i - valueSeisyoujuuStartId]}>`,
-              value: i
-            };
-            $gameSystem.addCustomChoice(id, choiceParams);
-            const itemPictureDataArr = itemPictureData.split(',');
-            const pictureOffsetY = Number(itemPictureDataArr[1]);
+  }
+}
 
-            let pictureScale;
-            let extraYOffset;
-            if (pictureOffsetY >= 0) {
-              pictureScale = 50;
-              extraYOffset = 0;
-            } else {
-              pictureScale = 100;
-              extraYOffset = 200;
-            };
+// 「星晶石入手率＜x/y＞」の見出し選択肢。
+function addStarBeastHeaderChoice() {
+  const ownedRateLabel = `星晶石入手率`;//翻訳対象
+  const starBeastIcon = `\\I[508]`;
+  const rateText = `＜${valueCountSet4}/${valueCountSet3}＞`;
+  $gameSystem.addCustomChoice(1, { text: `${starBeastIcon}${ownedRateLabel}${rateText}`, value: 0 });
+}
 
-            const picturePath = `/img/sv_enemies/Summon_${itemPictureDataArr[0]}`;
-            $gameScreen.showPicture(pictureId, picturePath, 1, 640 + 200, 384 + pictureOffsetY - 150 + extraYOffset, pictureScale, pictureScale, 0, 0);
-            $gameMessage.setSelectPictureId(choiceIndex, pictureId);
-            if (itemMeta['summonDescription']) {
-              const summonDescription = itemMeta['summonDescription'];
-              $gameScreen.setDTextPicture(summonDescription, 28);
-              $gameScreen.dWindowFrame = 'ON';
-              $gameScreen.showPicture(pictureId + 1, '', 0, 10, 606, 100, 100, 0, 0);
-              $gameMessage.setSelectPictureId(choiceIndex, pictureId + 1);
-            };
-            pictureId += 2;
-            choiceIndex += 1;
-          }
-        }
-      }
-    };
-  };
+// 星晶獣1体分の選択肢・立ち絵・説明を登録する。
+function addStarBeastChoice(armor, armorId, choiceIndex, pictureId) {
+  const itemMeta = armor.meta;
+  const itemPictureValues = itemMeta['itemPictureData'].split(',');
+  const pictureOffsetY = Number(itemPictureValues[1]);
+  const enhanceValue = $gameVariables.value(352)[armorId - valueSeisyoujuuStartId];
+  const choiceText = `${armor.name}:<${enhanceValue}>`;
 
+  $gameSystem.addCustomChoice(1, { text: choiceText, value: armorId });
+
+  // 立ち絵の縦位置が正なら上半身のみ、負なら全身を縮小して表示する。
+  const isUpperBody = pictureOffsetY >= 0;
+  const pictureScale = isUpperBody ? 50 : 100;
+  const extraYOffset = isUpperBody ? 0 : 200;
+  const picturePath = `/img/sv_enemies/Summon_${itemPictureValues[0]}`;
+  $gameScreen.showPicture(pictureId, picturePath, 1, 640 + 200,
+    384 + pictureOffsetY - 150 + extraYOffset, pictureScale, pictureScale, 0, 0);
+  $gameMessage.setSelectPictureId(choiceIndex, pictureId);
+
+  if (itemMeta['summonDescription']) {
+    $gameScreen.setDTextPicture(itemMeta['summonDescription'], 28);
+    $gameScreen.dWindowFrame = 'ON';
+    $gameScreen.showPicture(pictureId + 1, '', 0, 10, 606, 100, 100, 0, 0);
+    $gameMessage.setSelectPictureId(choiceIndex, pictureId + 1);
+  }
+}
+//#endregion
+
+
+//#region outfit
+// ---------------------------------------------------------------------------
+// 衣装スロット
+// ---------------------------------------------------------------------------
+// 立ち絵の差分スロットは 変数 460 + スロットID に入っている。
+const OUTFIT_BASE_VARIABLE_ID = 460;
+
+const OUTFIT_SLOT = {
+  coatHem: 2,           //コート/サーコートの裾
+  coatLining: 3,        //裏地・腰帯の裾
+  hairStyle: 4,         //髪型
+  rightArm: 9,          //右腕(武器を含む)
+  bust: 10,             //胸差分
+  bustSub: 11,          //胸差分(サブ)
+  leftArm: 15,          //左腕
+  upperClothShadow: 16, //服上影
+  armCoverMode: 17,     //アームカバーの設定値
+  shoes: 18,            //靴
+  skinShadow: 19,       //肌影
+  bottoms: 20,          //ボトムス/下着下
+  tops: 21,             //トップス/下着上
+  skirt: 22,            //スカート
+  shirt: 23,            //上衣/インナー上
+  weaponState: 24,      //武器表示状態
+  maidApron: 25,        //メイドエプロン
+  leftArmCover: 26,     //左アームカバー
+  shoesDisplay: 27,     //靴(表示用)
+  coat: 28,             //コート/サーコート
+  rightArmCoverAlt: 30, //右腕カバー(コート用)
+  hairShadow: 31,       //髪の影
+  hat: 32,              //帽子
+  face: 33,             //表情
+  hatCondition: 35,     //帽子の条件値
+  hatDisplay: 37,       //帽子(表示用)
+  //以下は元の値を退避しておくスロット
+  hairBackup: 104,
+  armCoverBackup: 117,
+  bottomsBackup: 120,
+  topsBackup: 121,
+  shirtBackup: 123,
+  weaponStateBackup: 124,
+  maidApronBackup: 125,
+  coatBackup: 128,
+  hatBackup: 132
+};
+
+// 衣装スロットの読み書き。同じスロットを何度も $gameVariables.value で
+// 引かないよう、一度読んだ値をキャッシュする(書き込みは即時反映)。
+class OutfitSlots {
+  constructor(baseVariableId) {
+    this._baseVariableId = baseVariableId;
+    this._values = {};
+  }
+
+  get(slotId) {
+    if (!(slotId in this._values)) this._values[slotId] = $gameVariables.value(this._baseVariableId + slotId);
+    return this._values[slotId];
+  }
+
+  set(slotId, value) {
+    this._values[slotId] = value;
+    $gameVariables.setValue(this._baseVariableId + slotId, value);
+  }
+
+  // 予備スロットへ現在値を退避してから新しい値にする(元の値の保存)。
+  stash(backupSlotId, slotId) {
+    this.set(backupSlotId, this.get(slotId));
+  }
+}
+
+// 服の透過(状態71)で差し替えるスロット。上から順に判定する。
+const TOPS_PIECES = {
+  topTank: 1, topTankDiff: 4, topSwimsuit: 6,
+  bottomShorts: 1, bottomSwimsuit: 5, shirtInner: 2
+};
+
+// 他のキャラの衣装解禁フラグ(変数 440+アクターID の配列)。
+const OTHER_ACTOR_UNLOCK_FLAGS = {
+  3: { 5: 1 },                                          //身体
+  4: { 5: 1 },                                          //身体
+  5: { 5: 1, 7: 1, 23: 1, 33: 1, 37: 1 },               //身体/ペニス/衣装/表情/髪型
+  6: { 5: 1, 7: 1, 23: 1, 33: 1, 37: 0 },
+  7: { 5: 1, 7: 1, 23: 1, 33: 1, 37: 0 }
 };
 
 kobetu_isyouSetOther = function () {
 
-  const gameVariables = $gameVariables;
+  for (const actorId of [3, 4, 5, 6, 7]) {
+    $gameVariables.setValue(20, actorId);
 
-  gameVariables.setValue(20, 3);
-  gameVariables.value(443)[5] = 1; // 443 = gameVariables.value(20)+440
-  tachie_settei3($gameActors.actor(3));
+    const unlockFlags = $gameVariables.value(440 + actorId);
+    const actorUnlockFlags = OTHER_ACTOR_UNLOCK_FLAGS[actorId];
+    for (const flagSlotId of Object.keys(actorUnlockFlags)) {
+      unlockFlags[Number(flagSlotId)] = actorUnlockFlags[flagSlotId];
+    }
 
-  gameVariables.setValue(20, 4);
-  gameVariables.value(444)[5] = 1;
-  tachie_settei3($gameActors.actor(4));
-
-  gameVariables.setValue(20, 5);
-  let unlockFlags = gameVariables.value(445);
-  unlockFlags[5] = 1;//身体
-  unlockFlags[7] = 1;//ペニス
-  unlockFlags[23] = 1;//衣装
-  unlockFlags[33] = 1;//表情
-  unlockFlags[37] = 1;//髪型
-  tachie_settei3($gameActors.actor(5));
-
-  gameVariables.setValue(20, 6);
-  unlockFlags = gameVariables.value(446);
-  unlockFlags[5] = 1;
-  unlockFlags[7] = 1;
-  unlockFlags[23] = 1;
-  unlockFlags[33] = 1;
-  unlockFlags[37] = 0;
-  tachie_settei3($gameActors.actor(6));
-
-  gameVariables.setValue(20, 7);
-  unlockFlags = gameVariables.value(447);
-  unlockFlags[5] = 1;
-  unlockFlags[7] = 1;
-  unlockFlags[23] = 1;
-  unlockFlags[33] = 1;
-  unlockFlags[37] = 0;
-  tachie_settei3($gameActors.actor(7));
+    tachie_settei3($gameActors.actor(actorId));
+  }
 
 };
 
@@ -1409,691 +1581,851 @@ kobetu_isyousettei = function () {
   kobetu_isyousettei1($gameActors.actor($gameVariables.value(20)));
 }
 
+// ---------------------------------------------------------------------------
+// 個人衣装設定の本体
+// ---------------------------------------------------------------------------
 kobetu_isyousettei1 = function (actor) {
 
-  var baseVarId = 460;
-  $gameVariables.setValue(baseVarId + 5, 1);
-  //var actor = $gameActors.actor($gameVariables.value(20));
+  $gameVariables.setValue(OUTFIT_BASE_VARIABLE_ID + 5, 1);
 
-  if ($gameVariables.value(20) == 1) {
+  const actorId = $gameVariables.value(20);
+  const outfit = new OutfitSlots(OUTFIT_BASE_VARIABLE_ID);
 
-    //表情オリジナルの49ドヤ顔を追加
-    //靴を27→16に設定
-    //場合によって帽子を37に設定
-
-    //スカート破損。影
-    if ($gameVariables.value(baseVarId + 22) == 2) {
-      $gameVariables.setValue(baseVarId + 16, 3);
-    };
-    //腰帯の影
-    if ($gameVariables.value(baseVarId + 23) == 1) {
-      $gameVariables.setValue(baseVarId + 19, 3);
-    };
-    //スカートの影。靴の設定よりも前
-    if ([1, 4].some(function (id) { return $gameVariables.value(baseVarId + 22) == (id) })) {
-      $gameVariables.setValue(baseVarId + 16, 1);
-    };
-
-    if ($gameSwitches.value(97) || $gameParty.inBattle()) { } else { //立ち絵会話時と戦闘時にランダム表情変化を禁止する。
-      //平常時、確率でドヤ顔
-      if ([1, 2, 5, 6, 15].some(function (id) { return $gameVariables.value(baseVarId + 33) == (id) })) {
-        var arr = [1, 1, 1, 1, 2, 1, 1, 1];
-        var randomFaceIndex = arr[getRandomIndex(arr.length)];
-        if (randomFaceIndex == 2) {
-          $gameVariables.setValue(baseVarId + 33, 53);
-        }
-      };
-    };
-
-    //メイドエプロン＋左腕股間隠し
-
-    if ($gameVariables.value(baseVarId + 15) == 4 &&
-      $gameVariables.value(baseVarId + 25) == 1) {
-      $gameVariables.setValue(baseVarId + 15, 1);
-    };
-    //1帽子。深くかぶる。条件、未定
-    if ($gameVariables.value(baseVarId + 32) == 2 && $gameVariables.value(baseVarId + 35) == 10) {
-      $gameVariables.setValue(baseVarId + 132, $gameVariables.value(baseVarId + 32));
-      $gameVariables.setValue(baseVarId + 37, 4);
-      $gameVariables.setValue(baseVarId + 32, 0);
-      $gameVariables.setValue(baseVarId + 31, 0);
-    };
-    //2帽子。アイマスケ時に16から27へ
-    if ($gameVariables.value(baseVarId + 32) >= 1 && $gameVariables.value(baseVarId + 35) == 1) {
-      $gameVariables.setValue(baseVarId + 37, $gameVariables.value(baseVarId + 32));
-    };
-    //靴。奴隷衣装装備時に16から27へ
-    if ($gameVariables.value(baseVarId + 20) == 11 && $gameVariables.value(baseVarId + 18) >= 1) {
-      $gameVariables.setValue(baseVarId + 27, $gameVariables.value(baseVarId + 18));
-    };
-    //靴。娼婦下着装備時に16から27へ
-    if ($gameVariables.value(baseVarId + 20) == 10 && $gameVariables.value(baseVarId + 18) >= 1) {
-      $gameVariables.setValue(baseVarId + 27, $gameVariables.value(baseVarId + 18));
-    };
-    //バスタオルの肌影
-    if ($gameVariables.value(baseVarId + 23) == 6 && $gameVariables.value(baseVarId + 20) != 10 &&
-      $gameVariables.value(baseVarId + 20) != 11) {
-      $gameVariables.setValue(baseVarId + 19, 4);
-    };
-    //メイドエプロン1の肌影
-    if ($gameVariables.value(baseVarId + 25) == 1 && $gameVariables.value(baseVarId + 20) != 10 &&
-      $gameVariables.value(baseVarId + 20) != 11) {
-      $gameVariables.setValue(baseVarId + 19, 1);
-    };
-    //メイドエプロン2の肌影
-    if ($gameVariables.value(baseVarId + 25) == 2 && $gameVariables.value(baseVarId + 20) == 0) {
-      $gameVariables.setValue(baseVarId + 19, 2);
-    };
-    //メイドエプロン1が23に着用の時3に変更
-    if ($gameVariables.value(baseVarId + 25) == 1 && $gameVariables.value(baseVarId + 23) == 4 &&
-      $gameVariables.value(baseVarId + 23) == 5) {
-      $gameVariables.setValue(baseVarId + 125, $gameVariables.value(baseVarId + 25));
-      $gameVariables.setValue(baseVarId + 25, 3);
-    };
-    //左腕股間露出時。衣装によって通常に
-    if ($gameVariables.value(baseVarId + 21) == 11 || $gameVariables.value(baseVarId + 23) >= 1) {
-      $gameVariables.setValue(baseVarId + 15, 1);
-    };
-    //秩序アームカバー左手
-    if ($gameVariables.value(baseVarId + 17) == 1) {
-      $gameVariables.setValue(baseVarId + 26, 2);
-    };
-    //メイドアームカバー左手
-    if ($gameVariables.value(baseVarId + 17) == 2) {
-      $gameVariables.setValue(baseVarId + 26, 3);
-    };
-    //腰帯、破損で裾
-    if ($gameVariables.value(baseVarId + 23) == 1) {
-      $gameVariables.setValue(baseVarId + 3, 1);
-    };
-    if ($gameVariables.value(baseVarId + 23) == 2) {
-      $gameVariables.setValue(baseVarId + 3, 2);
-    };
-    //1サーコート裾
-    if ($gameVariables.value(baseVarId + 28) == 3) {
-      $gameVariables.setValue(baseVarId + 2, 1);
-    };
-    //2サーコートでロング
-    if ($gameVariables.value(baseVarId + 28) == 3 && $gameVariables.value(baseVarId + 4) == 1) {
-      $gameVariables.setValue(baseVarId + 104, $gameVariables.value(baseVarId + 4));
-      $gameVariables.setValue(baseVarId + 4, 2);
-    };
-    //3サーコートでポニテ
-    if ($gameVariables.value(baseVarId + 28) == 3 && $gameVariables.value(baseVarId + 4) == 3) {
-      $gameVariables.setValue(baseVarId + 128, $gameVariables.value(baseVarId + 28));
-      $gameVariables.setValue(baseVarId + 28, 2);
-      $gameVariables.setValue(baseVarId + 104, $gameVariables.value(baseVarId + 4));
-      $gameVariables.setValue(baseVarId + 4, 4);
-    };
-    //1破損サーコート裾
-    if ($gameVariables.value(baseVarId + 28) == 4) {
-      $gameVariables.setValue(baseVarId + 2, 2);
-    };
-    //ブラで乳房隠し1
-    if ([4, 5, 11].some(function (id) { return $gameVariables.value(baseVarId + 21) == (id) })) {
-      $gameVariables.setValue(baseVarId + 10, 0);
-    };
-    //上衣で乳房隠し1
-    if ([6].some(function (id) { return $gameVariables.value(baseVarId + 23) == (id) })) {
-      $gameVariables.setValue(baseVarId + 10, 0);
-    };
-    //左腕衣装1アームカバーで乳房露出時
-    if ($gameVariables.value(baseVarId + 15) == 4 && $gameVariables.value(baseVarId + 26) == 2) {
-      $gameVariables.setValue(baseVarId + 26, 1);
-      $gameVariables.setValue(baseVarId + 15, 0);
-    };
-    //右腕衣装1アームカバーで乳房露出時
-    if ($gameVariables.value(baseVarId + 9) == 4 && $gameVariables.value(baseVarId + 17) == 1) {
-      $gameVariables.setValue(baseVarId + 117, $gameVariables.value(baseVarId + 17));
-      $gameVariables.setValue(baseVarId + 24, 1);
-      $gameVariables.setValue(baseVarId + 17, 0);
-      $gameVariables.setValue(baseVarId + 9, 6);
-      $gameVariables.setValue(baseVarId + 10, 1);
-    };
-    //武器を表示
-    if ($gameVariables.value(baseVarId + 9) == 1) {
-      if (actor._equips[0]._itemId >= 1 && $gameSwitches.value(201) || $gameSwitches.value(239)) {
-        $gameVariables.setValue(baseVarId + 24, 0);
-        $gameVariables.setValue(baseVarId + 9, 5);
-        $gameVariables.setValue(baseVarId + 10, 1);
-      }
-    };
-    //秩序アームカバー時武器表示
-    if ($gameVariables.value(baseVarId + 9) == 5 && $gameVariables.value(baseVarId + 17) == 1) {
-      $gameVariables.setValue(baseVarId + 30, 2);
-      $gameVariables.setValue(baseVarId + 9, 6);
-      $gameVariables.setValue(baseVarId + 10, 1);
-    };
-
-    //透け条件
-    if (actor.isStateAffected(71)) {
-      //水着トップ透ける
-      if ($gameVariables.value(baseVarId + 21) == 6) {
-        $gameVariables.setValue(baseVarId + 121, $gameVariables.value(baseVarId + 21));
-        $gameVariables.setValue(baseVarId + 21, 8);
-      };
-      //秩序ショーツ透ける
-      if ($gameVariables.value(baseVarId + 20) == 1) {
-        $gameVariables.setValue(baseVarId + 120, $gameVariables.value(baseVarId + 20));
-        $gameVariables.setValue(baseVarId + 20, 2);
-      };
-      //水着ボトム透ける
-      if ($gameVariables.value(baseVarId + 20) == 5) {
-        $gameVariables.setValue(baseVarId + 120, $gameVariables.value(baseVarId + 20));
-        $gameVariables.setValue(baseVarId + 20, 7);
-      };
-      //タンクトップ透ける
-      if ($gameVariables.value(baseVarId + 21) == 4) {
-        $gameVariables.setValue(baseVarId + 121, $gameVariables.value(baseVarId + 21));
-        $gameVariables.setValue(baseVarId + 21, 5);
-      };
-      //差分タンクトップ透ける
-      if ($gameVariables.value(baseVarId + 21) == 1) {
-        $gameVariables.setValue(baseVarId + 121, $gameVariables.value(baseVarId + 21));
-        $gameVariables.setValue(baseVarId + 21, 12);
-      };
-    };
-
-  };
-
-  if ($gameVariables.value(20) == 2) {
-
-    //モニカ水着着用時局部隠し無効
-    if ($gameVariables.value(baseVarId + 15) == 4 && $gameVariables.value(baseVarId + 21) == 3) {
-      $gameVariables.setValue(baseVarId + 15, 1);
-    };
-    //モニカコート着用時局部隠し無効
-    if ($gameVariables.value(baseVarId + 9) == 4 && $gameVariables.value(baseVarId + 23) >= 1) {
-      $gameVariables.setValue(baseVarId + 9, 1);
-    };
-    //モニカコート着用時局部隠し無効
-    if ($gameVariables.value(baseVarId + 9) == 4 && $gameVariables.value(baseVarId + 28) >= 2) {
-      $gameVariables.setValue(baseVarId + 9, 1);
-      $gameVariables.setValue(baseVarId + 15, 1);
-    };
-    //モニカコート着用時局部隠し無効2
-    if ($gameVariables.value(baseVarId + 15) == 4 && $gameVariables.value(baseVarId + 28) >= 2) {
-      $gameVariables.setValue(baseVarId + 9, 1);
-      $gameVariables.setValue(baseVarId + 15, 1);
-    };
-    //腕カバー右手に反映
-    if ($gameVariables.value(baseVarId + 17) >= 1) {
-      $gameVariables.setValue(baseVarId + 26, $gameVariables.value(baseVarId + 17));
-    };
-    //腕隠し時に腕カバー消去
-    if ($gameVariables.value(baseVarId + 9) >= 2) {
-      $gameVariables.setValue(baseVarId + 117, $gameVariables.value(baseVarId + 17));
-      $gameVariables.setValue(baseVarId + 124, $gameVariables.value(baseVarId + 24));
-      $gameVariables.setValue(baseVarId + 17, 0);
-      $gameVariables.setValue(baseVarId + 24, 0);
-    };
-    if ($gameVariables.value(baseVarId + 15) >= 2) {
-      $gameVariables.setValue(baseVarId + 26, 0);
-    };
-    //モニカ解禁シャツ時にインナーありで変化
-    if ($gameVariables.value(baseVarId + 23) == 2 && [1, 2].some(function (id) { return $gameVariables.value(baseVarId + 21) == (id) })) {
-      $gameVariables.setValue(baseVarId + 123, $gameVariables.value(baseVarId + 23));
-      $gameVariables.setValue(baseVarId + 23, 4);
-    };
-    //シャツとインナー上で乳房非表示
-    if ([1, 2, 3, 4].some(function (id) { return $gameVariables.value(baseVarId + 21) == (id) }) ||
-      [1, 2].some(function (id) { return $gameVariables.value(baseVarId + 23) == (id) }) ||
-      $gameVariables.value(baseVarId + 23) == 4) {
-      $gameVariables.setValue(baseVarId + 10, 0); $gameVariables.setValue(baseVarId + 11, 0);
-    };
-    //シャツ表示でインナー上非表示
-    if ([1, 2, 4].some(function (id) { return $gameVariables.value(baseVarId + 23) == (id) }) &&
-      $gameVariables.value(baseVarId + 21) >= 1) {
-      //$gameVariables.setValue(baseVarId+121,$gameVariables.value(baseVarId+21));
-      //$gameVariables.setValue(baseVarId+21,0);
-    };
-    //帽子被り時髪型に影
-    if ($gameVariables.value(baseVarId + 32) == 2) {
-      $gameVariables.setValue(baseVarId + 31, 3);
-    };
-    //コート着用時に手袋変更
-    if ($gameVariables.value(baseVarId + 28) == 2 || $gameVariables.value(baseVarId + 28) == 3) {
-      if ($gameVariables.value(baseVarId + 17) == 1) {
-        $gameVariables.setValue(baseVarId + 117, $gameVariables.value(baseVarId + 17));
-        $gameVariables.setValue(baseVarId + 17, 2);
-        $gameVariables.setValue(baseVarId + 26, 2);
-      }
-    };
-    //コート着用時アームなしで落ち影
-    if ($gameVariables.value(baseVarId + 28) >= 2) {
-      if ($gameVariables.value(baseVarId + 17) == 0) {
-        $gameVariables.setValue(baseVarId + 117, $gameVariables.value(baseVarId + 17));
-        $gameVariables.setValue(baseVarId + 17, 4);
-      };
-      if ($gameVariables.value(baseVarId + 26) == 0) {
-        $gameVariables.setValue(baseVarId + 26, 4);
-      };
-    };
-    //コート着用時にシャツスカートインナー上下なしで乳房丸出し発情時限定
-    if ($gameVariables.value(baseVarId + 28) == 2 && $gameVariables.value(baseVarId + 21) == 0 &&
-      $gameVariables.value(baseVarId + 23) == 0) {
-      if (actor.isStateAffected(61)) {
-        $gameVariables.setValue(baseVarId + 128, $gameVariables.value(baseVarId + 28));
-        $gameVariables.setValue(baseVarId + 28, 3);
-      };
-    };
-    //コートの裏地、肌影
-    if ($gameVariables.value(baseVarId + 28) == 2 || $gameVariables.value(baseVarId + 28) == 3) {
-      $gameVariables.setValue(baseVarId + 3, 1);
-      $gameVariables.setValue(baseVarId + 16, 1);
-    };
-
-    //武器を表示
-    if ($gameVariables.value(baseVarId + 9) == 1) {
-      if (actor._equips[0]._itemId >= 1 && $gameSwitches.value(201) || $gameSwitches.value(239)) {
-        $gameVariables.setValue(baseVarId + 2, 1);
-        $gameVariables.setValue(baseVarId + 9, 5);
-      }
-    };
-
-    //服上影服なしなら消去
-    if ($gameVariables.value(baseVarId + 16) >= 1 && $gameVariables.value(baseVarId + 22) == 0) {
-      $gameVariables.setValue(baseVarId + 16, 0);
-    };
-    //透け条件
-    if (actor.isStateAffected(71)) {
-      //ボトムショーパン透ける
-      if ($gameVariables.value(baseVarId + 20) == 1) {
-        $gameVariables.setValue(baseVarId + 120, $gameVariables.value(baseVarId + 20));
-        $gameVariables.setValue(baseVarId + 20, 4);
-      };
-      //タンクトップ透ける
-      if ($gameVariables.value(baseVarId + 21) == 1) {
-        $gameVariables.setValue(baseVarId + 121, $gameVariables.value(baseVarId + 21));
-        $gameVariables.setValue(baseVarId + 21, 7);
-      };
-      //タンクトップ2透ける
-      if ($gameVariables.value(baseVarId + 21) == 2) {
-        $gameVariables.setValue(baseVarId + 121, $gameVariables.value(baseVarId + 21));
-        $gameVariables.setValue(baseVarId + 21, 8);
-      };
-      //水着透ける
-      if ($gameVariables.value(baseVarId + 21) == 3) {
-        $gameVariables.setValue(baseVarId + 121, $gameVariables.value(baseVarId + 21));
-        $gameVariables.setValue(baseVarId + 21, 9);
-      };
-      //シャツ透ける
-      if ($gameVariables.value(baseVarId + 23) == 2) {
-        $gameVariables.setValue(baseVarId + 123, $gameVariables.value(baseVarId + 23));
-        $gameVariables.setValue(baseVarId + 23, 5);
-      };
-    };
-
-  };
+  switch (actorId) {
+    case 1:
+      applyLisciaOutfitRules(actor, outfit);
+      break;
+    case 2:
+      applyMonicaOutfitRules(actor, outfit);
+      break;
+    default:
+      break;
+  }
 
 };
 
-//リーシャとモニカに露出状態でのキャラチップコート着用
+// --- リーシャ(アクター1) -------------------------------------------------
+function applyLisciaOutfitRules(actor, outfit) {
+  applyLisciaShadowRules(actor, outfit);
+  applyLisciaHatRules(outfit);
+  applyLisciaShoeRules(outfit);
+  applyLisciaApronRules(outfit);
+  applyLisciaArmRules(actor, outfit);
+  applyLisciaWeaponRules(actor, outfit);
+  applyLisciaSheerRules(actor, outfit);
+}
+
+// スカート/腰帯/服の影。靴の設定より前に行う。
+function applyLisciaShadowRules(actor, outfit) {
+  if (outfit.get(OUTFIT_SLOT.skirt) == 2) outfit.set(OUTFIT_SLOT.upperClothShadow, 3);
+  if (outfit.get(OUTFIT_SLOT.shirt) == 1) outfit.set(OUTFIT_SLOT.skinShadow, 3);
+  if ([1, 4].includes(outfit.get(OUTFIT_SLOT.skirt))) outfit.set(OUTFIT_SLOT.upperClothShadow, 1);
+
+  //平常時、確率でドヤ顔。立ち絵会話時と戦闘時には変化させない。
+  if ($gameSwitches.value(97) || $gameParty.inBattle()) return;
+  if (![1, 2, 5, 6, 15].includes(outfit.get(OUTFIT_SLOT.face))) return;
+
+  const faceChangePattern = [1, 1, 1, 1, 2, 1, 1, 1];//2 の時だけドヤ顔(53)
+  if (faceChangePattern[getRandomIndex(faceChangePattern.length)] == 2) {
+    outfit.set(OUTFIT_SLOT.face, 53);
+  }
+}
+
+// 帽子の表示。深くかぶる設定(条件値10)は専用スロットへ退避する。
+function applyLisciaHatRules(outfit) {
+  const hat = outfit.get(OUTFIT_SLOT.hat);
+  if (hat < 1) return;
+
+  const hatCondition = outfit.get(OUTFIT_SLOT.hatCondition);
+
+  if (hat == 2 && hatCondition == 10) {
+    outfit.stash(OUTFIT_SLOT.hatBackup, OUTFIT_SLOT.hat);
+    outfit.set(OUTFIT_SLOT.hatDisplay, 4);
+    outfit.set(OUTFIT_SLOT.hat, 0);
+    outfit.set(OUTFIT_SLOT.hairShadow, 0);
+    return;
+  }
+
+  if (hatCondition == 1) outfit.set(OUTFIT_SLOT.hatDisplay, hat);
+}
+
+// 奴隷衣装(11)・娼婦下着(10)の時は靴を別スロットに出す。
+function applyLisciaShoeRules(outfit) {
+  const bottoms = outfit.get(OUTFIT_SLOT.bottoms);
+  if (bottoms != 10 && bottoms != 11) return;
+
+  const shoes = outfit.get(OUTFIT_SLOT.shoes);
+  if (shoes < 1) return;
+  outfit.set(OUTFIT_SLOT.shoesDisplay, shoes);
+}
+
+// メイドエプロンとバスタオルによる肌影・股間隠しの調整。
+function applyLisciaApronRules(outfit) {
+  const maidApron = outfit.get(OUTFIT_SLOT.maidApron);
+  const bottoms = outfit.get(OUTFIT_SLOT.bottoms);
+  const shirt = outfit.get(OUTFIT_SLOT.shirt);
+  const isSlaveOrProstitute = (bottoms == 10 || bottoms == 11);
+
+  //メイドエプロン＋左腕股間隠し
+  if (outfit.get(OUTFIT_SLOT.leftArm) == 4 && maidApron == 1) {
+    outfit.set(OUTFIT_SLOT.leftArm, 1);
+  }
+
+  //バスタオルの肌影
+  if (shirt == 6 && !isSlaveOrProstitute) outfit.set(OUTFIT_SLOT.skinShadow, 4);
+  //メイドエプロン1の肌影
+  if (maidApron == 1 && !isSlaveOrProstitute) outfit.set(OUTFIT_SLOT.skinShadow, 1);
+  //メイドエプロン2の肌影
+  if (maidApron == 2 && bottoms == 0) outfit.set(OUTFIT_SLOT.skinShadow, 2);
+
+  //メイドエプロン1が上衣4/5に着用の時3に変更
+  if (maidApron == 1 && [4, 5].includes(shirt)) {
+    outfit.stash(OUTFIT_SLOT.maidApronBackup, OUTFIT_SLOT.maidApron);
+    outfit.set(OUTFIT_SLOT.maidApron, 3);
+  }
+
+  //腰帯、破損で裾
+  if (shirt == 1) outfit.set(OUTFIT_SLOT.coatLining, 1);
+  if (shirt == 2) outfit.set(OUTFIT_SLOT.coatLining, 2);
+
+  //左腕股間露出時。衣装によって通常に
+  if (outfit.get(OUTFIT_SLOT.tops) == 11 || shirt >= 1) {
+    outfit.set(OUTFIT_SLOT.leftArm, 1);
+  }
+
+  //乳房隠し(ブラ/上衣)
+  if ([4, 5, 11].includes(outfit.get(OUTFIT_SLOT.tops))) outfit.set(OUTFIT_SLOT.bust, 0);
+  if (shirt == 6) outfit.set(OUTFIT_SLOT.bust, 0);
+}
+
+// アームカバーの割り当てと、コートの裾・髪型の連動。
+function applyLisciaArmRules(actor, outfit) {
+  //秩序アームカバー左手 / メイドアームカバー左手
+  const armCoverMode = outfit.get(OUTFIT_SLOT.armCoverMode);
+  if (armCoverMode == 1) outfit.set(OUTFIT_SLOT.leftArmCover, 2);
+  if (armCoverMode == 2) outfit.set(OUTFIT_SLOT.leftArmCover, 3);
+
+  //左腕衣装1アームカバーで乳房露出時
+  if (outfit.get(OUTFIT_SLOT.leftArm) == 4 && outfit.get(OUTFIT_SLOT.leftArmCover) == 2) {
+    outfit.set(OUTFIT_SLOT.leftArmCover, 1);
+    outfit.set(OUTFIT_SLOT.leftArm, 0);
+  }
+
+  //右腕衣装1アームカバーで乳房露出時
+  if (outfit.get(OUTFIT_SLOT.rightArm) == 4 && armCoverMode == 1) {
+    outfit.stash(OUTFIT_SLOT.armCoverBackup, OUTFIT_SLOT.armCoverMode);
+    outfit.set(OUTFIT_SLOT.armCoverMode, 0);
+    outfit.set(OUTFIT_SLOT.weaponState, 1);
+    outfit.set(OUTFIT_SLOT.rightArm, 6);
+    outfit.set(OUTFIT_SLOT.bust, 1);
+  }
+
+  //サーコートの裾と髪型
+  const coat = outfit.get(OUTFIT_SLOT.coat);
+  if (coat == 3) outfit.set(OUTFIT_SLOT.coatHem, 1);
+  if (coat == 4) outfit.set(OUTFIT_SLOT.coatHem, 2);
+  if (coat != 3) return;
+
+  const hairStyle = outfit.get(OUTFIT_SLOT.hairStyle);
+  if (hairStyle == 1) {
+    outfit.stash(OUTFIT_SLOT.hairBackup, OUTFIT_SLOT.hairStyle);
+    outfit.set(OUTFIT_SLOT.hairStyle, 2);
+  }
+  if (hairStyle == 3) {
+    outfit.stash(OUTFIT_SLOT.coatBackup, OUTFIT_SLOT.coat);
+    outfit.set(OUTFIT_SLOT.coat, 2);
+    outfit.stash(OUTFIT_SLOT.hairBackup, OUTFIT_SLOT.hairStyle);
+    outfit.set(OUTFIT_SLOT.hairStyle, 4);
+  }
+}
+
+// 武器の表示状態。武器を装備していてスイッチ201/239が立っている時だけ出す。
+function applyLisciaWeaponRules(actor, outfit) {
+  const rightArm = outfit.get(OUTFIT_SLOT.rightArm);
+
+  if (rightArm == 1 && isWeaponDisplayEnabled(actor)) {
+    outfit.set(OUTFIT_SLOT.weaponState, 0);
+    outfit.set(OUTFIT_SLOT.rightArm, 5);
+    outfit.set(OUTFIT_SLOT.bust, 1);
+  }
+
+  //秩序アームカバー時武器表示
+  if (outfit.get(OUTFIT_SLOT.rightArm) == 5 && outfit.get(OUTFIT_SLOT.armCoverMode) == 1) {
+    outfit.set(OUTFIT_SLOT.rightArmCoverAlt, 2);
+    outfit.set(OUTFIT_SLOT.rightArm, 6);
+    outfit.set(OUTFIT_SLOT.bust, 1);
+  }
+}
+
+// 服が透ける状態(71)の時、衣装を透け差分に差し替える。
+const LISCIA_SHEER_RULES = [
+  { slotId: OUTFIT_SLOT.tops, fromValue: 6, toValue: 8 },
+  { slotId: OUTFIT_SLOT.bottoms, fromValue: 1, toValue: 2 },
+  { slotId: OUTFIT_SLOT.bottoms, fromValue: 5, toValue: 7 },
+  { slotId: OUTFIT_SLOT.tops, fromValue: 4, toValue: 5 },
+  { slotId: OUTFIT_SLOT.tops, fromValue: 1, toValue: 12 }
+];
+
+function applyLisciaSheerRules(actor, outfit) {
+  if (!actor.isStateAffected(71)) return;
+  applySheerRules(outfit, LISCIA_SHEER_RULES);
+}
+
+// --- モニカ(アクター2) ---------------------------------------------------
+function applyMonicaOutfitRules(actor, outfit) {
+  applyMonicaArmRules(actor, outfit);
+  applyMonicaHatRules(outfit);
+  applyMonicaCoatRules(actor, outfit);
+  applyMonicaWeaponRules(actor, outfit);
+  applyMonicaSheerRules(actor, outfit);
+}
+
+// 腕・コート・シャツの組み合わせで股間隠しと腕カバーを付け替える。
+function applyMonicaArmRules(actor, outfit) {
+  //モニカ水着着用時局部隠し無効
+  if (outfit.get(OUTFIT_SLOT.leftArm) == 4 && outfit.get(OUTFIT_SLOT.tops) == 3) {
+    outfit.set(OUTFIT_SLOT.leftArm, 1);
+  }
+
+  const rightArm = outfit.get(OUTFIT_SLOT.rightArm);
+  const coat = outfit.get(OUTFIT_SLOT.coat);
+  const leftArm = outfit.get(OUTFIT_SLOT.leftArm);
+  const armCoverMode = outfit.get(OUTFIT_SLOT.armCoverMode);
+
+  //モニカコート着用時局部隠し無効
+  if (rightArm == 4 && outfit.get(OUTFIT_SLOT.shirt) >= 1) outfit.set(OUTFIT_SLOT.rightArm, 1);
+  if (outfit.get(OUTFIT_SLOT.rightArm) == 4 && coat >= 2) {
+    outfit.set(OUTFIT_SLOT.rightArm, 1);
+    outfit.set(OUTFIT_SLOT.leftArm, 1);
+  }
+  //モニカコート着用時局部隠し無効2
+  if (outfit.get(OUTFIT_SLOT.leftArm) == 4 && coat >= 2) {
+    outfit.set(OUTFIT_SLOT.rightArm, 1);
+    outfit.set(OUTFIT_SLOT.leftArm, 1);
+  }
+
+  //腕カバー右手に反映
+  if (armCoverMode >= 1) outfit.set(OUTFIT_SLOT.leftArmCover, armCoverMode);
+
+  //腕隠し時に腕カバー消去
+  if (outfit.get(OUTFIT_SLOT.rightArm) >= 2) {
+    outfit.stash(OUTFIT_SLOT.armCoverBackup, OUTFIT_SLOT.armCoverMode);
+    outfit.stash(OUTFIT_SLOT.weaponStateBackup, OUTFIT_SLOT.weaponState);
+    outfit.set(OUTFIT_SLOT.armCoverMode, 0);
+    outfit.set(OUTFIT_SLOT.weaponState, 0);
+  }
+  if (outfit.get(OUTFIT_SLOT.leftArm) >= 2) outfit.set(OUTFIT_SLOT.leftArmCover, 0);
+
+  //モニカ解禁シャツ時にインナーありで変化
+  if (outfit.get(OUTFIT_SLOT.shirt) == 2 && [1, 2].includes(outfit.get(OUTFIT_SLOT.tops))) {
+    outfit.stash(OUTFIT_SLOT.shirtBackup, OUTFIT_SLOT.shirt);
+    outfit.set(OUTFIT_SLOT.shirt, 4);
+  }
+
+  //シャツとインナー上で乳房非表示
+  const shirt = outfit.get(OUTFIT_SLOT.shirt);
+  if ([1, 2, 3, 4].includes(outfit.get(OUTFIT_SLOT.tops)) || [1, 2].includes(shirt) || shirt == 4) {
+    outfit.set(OUTFIT_SLOT.bust, 0);
+    outfit.set(OUTFIT_SLOT.bustSub, 0);
+  }
+}
+
+// 帽子被り時は髪型に影を入れる。
+function applyMonicaHatRules(outfit) {
+  if (outfit.get(OUTFIT_SLOT.hat) == 2) outfit.set(OUTFIT_SLOT.hairShadow, 3);
+}
+
+// コート着用時の手袋・落ち影・発情差分。
+function applyMonicaCoatRules(actor, outfit) {
+  const coat = outfit.get(OUTFIT_SLOT.coat);
+
+  //コート着用時に手袋変更
+  if ((coat == 2 || coat == 3) && outfit.get(OUTFIT_SLOT.armCoverMode) == 1) {
+    outfit.stash(OUTFIT_SLOT.armCoverBackup, OUTFIT_SLOT.armCoverMode);
+    outfit.set(OUTFIT_SLOT.armCoverMode, 2);
+    outfit.set(OUTFIT_SLOT.leftArmCover, 2);
+  }
+
+  //コート着用時アームなしで落ち影
+  if (coat >= 2) {
+    if (outfit.get(OUTFIT_SLOT.armCoverMode) == 0) {
+      outfit.stash(OUTFIT_SLOT.armCoverBackup, OUTFIT_SLOT.armCoverMode);
+      outfit.set(OUTFIT_SLOT.armCoverMode, 4);
+    }
+    if (outfit.get(OUTFIT_SLOT.leftArmCover) == 0) outfit.set(OUTFIT_SLOT.leftArmCover, 4);
+  }
+
+  //コート着用時にシャツスカートインナー上下なしで乳房丸出し発情時限定
+  if (coat == 2 && outfit.get(OUTFIT_SLOT.tops) == 0 && outfit.get(OUTFIT_SLOT.shirt) == 0) {
+    if (actor.isStateAffected(61)) {
+      outfit.stash(OUTFIT_SLOT.coatBackup, OUTFIT_SLOT.coat);
+      outfit.set(OUTFIT_SLOT.coat, 3);
+    }
+  }
+
+  //コートの裏地、肌影
+  if (coat == 2 || coat == 3) {
+    outfit.set(OUTFIT_SLOT.coatLining, 1);
+    outfit.set(OUTFIT_SLOT.upperClothShadow, 1);
+  }
+
+  //服上影服なしなら消去
+  if (outfit.get(OUTFIT_SLOT.upperClothShadow) >= 1 && outfit.get(OUTFIT_SLOT.skirt) == 0) {
+    outfit.set(OUTFIT_SLOT.upperClothShadow, 0);
+  }
+}
+
+// モニカの武器表示。
+function applyMonicaWeaponRules(actor, outfit) {
+  if (outfit.get(OUTFIT_SLOT.rightArm) != 1) return;
+  if (!isWeaponDisplayEnabled(actor)) return;
+
+  outfit.set(OUTFIT_SLOT.coatHem, 1);
+  outfit.set(OUTFIT_SLOT.rightArm, 5);
+}
+
+const MONICA_SHEER_RULES = [
+  { slotId: OUTFIT_SLOT.bottoms, fromValue: 1, toValue: 4 },
+  { slotId: OUTFIT_SLOT.tops, fromValue: 1, toValue: 7 },
+  { slotId: OUTFIT_SLOT.tops, fromValue: 2, toValue: 8 },
+  { slotId: OUTFIT_SLOT.tops, fromValue: 3, toValue: 9 },
+  { slotId: OUTFIT_SLOT.shirt, fromValue: 2, toValue: 5 }
+];
+
+function applyMonicaSheerRules(actor, outfit) {
+  if (!actor.isStateAffected(71)) return;
+  applySheerRules(outfit, MONICA_SHEER_RULES);
+}
+
+// 透け差分ルールを順に適用する(現在値が fromValue の時だけ差し替え)。
+function applySheerRules(outfit, sheerRules) {
+  for (const sheerRule of sheerRules) {
+    if (outfit.get(sheerRule.slotId) != sheerRule.fromValue) continue;
+    outfit.stash(sheerBackupSlotId(sheerRule.slotId), sheerRule.slotId);
+    outfit.set(sheerRule.slotId, sheerRule.toValue);
+  }
+}
+
+// 透け差分の退避先スロット。
+function sheerBackupSlotId(slotId) {
+  switch (slotId) {
+    case OUTFIT_SLOT.bottoms: return OUTFIT_SLOT.bottomsBackup;
+    case OUTFIT_SLOT.tops: return OUTFIT_SLOT.topsBackup;
+    case OUTFIT_SLOT.shirt: return OUTFIT_SLOT.shirtBackup;
+    default: return slotId;
+  }
+}
+
+// 右手に武器を出せる状態か(装備あり + スイッチ201、またはスイッチ239)。
+function isWeaponDisplayEnabled(actor) {
+  const weaponItemId = actor._equips[0]._itemId;
+  return (weaponItemId >= 1 && $gameSwitches.value(201)) || $gameSwitches.value(239);
+}
+
+// リーシャとモニカに露出状態でのキャラチップコート着用
 // バストが存在しないコートの衣装ID(アクター別)。この衣装の時だけ下着差分を隠す
 const NO_BUST_COAT_ITEM_IDS = { 1: 3, 2: 2 };
 // 下着差分を隠す時に全て0である必要がある下着スロット
 const NO_BUST_UNDERWEAR_SLOT_IDS = [20, 21, 22, 23, 25];
+// 下着差分を隠す時の差し替え(変数22/23の値 -> 差し替え後)
+const NO_BUST_UNDERWEAR_REPLACEMENTS = [
+  { sourceValue: 2, replacedValue: 6 },
+  { sourceValue: 3, replacedValue: 7 }
+];
 
 isyou_senyouLisciaBlueOnly = function (actorId) {
 
   const noBustCoatItemId = NO_BUST_COAT_ITEM_IDS[actorId];
-  if (noBustCoatItemId !== undefined) {
-    applyNoBustCoatAdjustmentLisciaBlueOnly(actorId, noBustCoatItemId);
-  };
+  if (noBustCoatItemId !== undefined) applyNoBustCoatAdjustmentLisciaBlueOnly(actorId, noBustCoatItemId);
 
-  if ($dataActors[actorId].meta['bustBlessNo']) { valueBustUpCloth2[actorId] = -1 };//乳揺れ無いキャラ
+  //乳揺れ無いキャラ
+  if ($dataActors[actorId].meta['bustBlessNo']) valueBustUpCloth2[actorId] = -1;
 
 };
 
 // バストが存在しないコート着用時のバスト差分・下着差分調整(アクター1/2で共有)
 function applyNoBustCoatAdjustmentLisciaBlueOnly(actorId, noBustCoatItemId) {
   valueBustUpCloth2[actorId] = valueBustUpCloth[actorId];//バスト存在しない衣装がある場合ここで処理
+
   const actorClothingData = $gameVariables.value(440 + actorId);
   if (actorClothingData[28] != noBustCoatItemId) return;
 
-  if (NO_BUST_UNDERWEAR_SLOT_IDS.every(function (slotId) { return actorClothingData[slotId] == 0 })) {
-    // 下着未着用なら下着差分を消す
+  //下着未着用なら下着差分を消す
+  const hasNoUnderwear = NO_BUST_UNDERWEAR_SLOT_IDS.every(function (slotId) { return actorClothingData[slotId] == 0 });
+  if (hasNoUnderwear) {
     $gameVariables.setValue(22, 5);
     $gameVariables.setValue(23, 5);
-  } else if ($gameVariables.value(22) == 2) {
-    $gameVariables.setValue(22, 6);
-    $gameVariables.setValue(23, 6);
-  } else if ($gameVariables.value(22) == 3) {
-    $gameVariables.setValue(22, 7);
-    $gameVariables.setValue(23, 7);
-  };
+    return;
+  }
+
+  const currentUnderwearValue = $gameVariables.value(22);
+  for (const replacement of NO_BUST_UNDERWEAR_REPLACEMENTS) {
+    if (currentUnderwearValue != replacement.sourceValue) continue;
+    $gameVariables.setValue(22, replacement.replacedValue);
+    $gameVariables.setValue(23, replacement.replacedValue);
+    return;
+  }
 };
 
-//リザルト画像設定
+// リザルト画像設定
 actor_setBattleResult = function () {
 
-  var start = $gameVariables.value(73);
-  var end = $gameVariables.value(74);
-  for (var i = start; i <= end; i++) {
-    if ($gameParty.members().contains($gameActors.actor(i))) {
-      $gameVariables.value(380 + i)[66] = 0;
-      if ($gameActors.actor(i).isLearnedSkill(65)) {
-        $gameVariables.value(380 + i)[66] = 1;
-      };
-      if (i == 5 && $gameActors.actor(i)._classId == 25) {
-        $gameVariables.value(380 + i)[66] = 1;
-      };
-      if (i == 6 && $gameActors.actor(i).subclass()) {
-        if ($gameActors.actor(i)._subclassId == 49) {
-          $gameVariables.value(380 + i)[66] = 1;
-        };
-      };
-    };
-  };
+  const firstActorId = $gameVariables.value(73);
+  const lastActorId = $gameVariables.value(74);
+  const members = $gameParty.members();
+
+  for (let actorId = firstActorId; actorId <= lastActorId; actorId++) {
+    const actor = $gameActors.actor(actorId);
+    if (!members.contains(actor)) continue;
+    $gameVariables.value(380 + actorId)[66] = needsLecherousResultPicture(actorId, actor) ? 1 : 0;
+  }
 
 };
 
-//購入できる情報一覧作成
+// リザルトで堕落差分を使うか(スキル65 / アクター5のクラス25 / アクター6のサブクラス49)。
+function needsLecherousResultPicture(actorId, actor) {
+  if (actor.isLearnedSkill(65)) return true;
+  if (actorId == 5 && actor._classId == 25) return true;
+  if (actorId == 6 && actor.subclass() && actor._subclassId == 49) return true;
+  return false;
+}
+//#endregion
+
+
+//#region jouhou
+// 購入できる情報一覧作成
+const JOUHOU_CHOICE_ID = 1;
+const JOUHOU_DEFAULT_PROGRESS_VARIABLE_ID = 135;
+const JOUHOU_DEFAULT_CONDITION_SWITCH_ID = 2;
+const JOUHOU_AVAIL_HIDDEN = 0;   //条件未達で「？？？」
+const JOUHOU_AVAIL_BUYABLE = 1;  //条件達成済みで購入可
+const JOUHOU_AVAIL_OWNED = 2;    //所持済みなので一覧に出さない
+const JOUHOU_LIST_TITLE = '情報一覧';//翻訳対象
+const JOUHOU_UNKNOWN_LABEL = '？？？en(s[1])';//翻訳対象
+const JOUHOU_SHORT_OF_GOLD_LABEL = 'en(s[1])';//翻訳対象
+
 jouhou_buySetup = function () {
 
-  const id = 1;
-  const choiceParams = {
-    text: '情報一覧',
-    value: -1
-  };
-  $gameSystem.addCustomChoice(id, choiceParams);
-  for (var i = 1; i < $dataItems.length; i++) {
-    var availStatus = 0;
-    var hasGoldFlag = 0;
-    if ($dataItems[i].meta['BattleMapInformation']) {
-      if ($dataItems[i].meta['SetJouhouVal']) {
-        var setJouhouValues = $dataItems[i].meta['SetJouhouVal'].split(',');
-        if (Number(setJouhouValues[0]) == 0) { setJouhouValues[0] = 135 };
-        if ($gameVariables.value(Number(setJouhouValues[0])) >= Number(setJouhouValues[1])) {
-          var availStatus = 1;
-        }
-      };
-      if ($dataItems[i].meta['SetJouhouSwi']) {
-        var conditionSwitchId = $dataItems[i].meta['SetJouhouSwi'];
-        if (conditionSwitchId == 0) { var conditionSwitchId = 2 };
-        if ($gameSwitches.value(Number(conditionSwitchId))) {
-          var availStatus = 1;
-        }
-      };
-      if ($gameParty.hasItem($dataItems[i], true)) {
-        var availStatus = 2;
-      };
-      if ($dataItems[i].meta['SetJouhouGold']) {
-        var requiredGold = Number($dataItems[i].meta['SetJouhouGold']);
-        if ($gameParty.gold() >= requiredGold) {
-          var hasGoldFlag = 1;
-        }
-      };
-      if (availStatus == 1) {
-        var choiceText = `${$dataItems[i].name}:${$dataItems[i].meta['SetJouhouGold']}\\G`;
-        if (hasGoldFlag == 0) { choiceText += `en(s[1])` };
-        var itemId = i;
-      } else {
-        var choiceText = `？？？en(s[1])`;
-        var itemId = 0;
-      };
-      if (availStatus < 2) {
-        const id = 1;
-        const choiceParams = {
-          text: choiceText,
-          value: itemId
-        };
-        $gameSystem.addCustomChoice(id, choiceParams);
-      };
-    }
-  };
+  $gameSystem.addCustomChoice(JOUHOU_CHOICE_ID, { text: JOUHOU_LIST_TITLE, value: -1 });
+
+  for (let itemId = 1; itemId < $dataItems.length; itemId++) {
+    const infoItem = $dataItems[itemId];
+    if (!infoItem.meta['BattleMapInformation']) continue;
+
+    const availability = resolveJouhouAvailability(infoItem);
+    if (availability >= JOUHOU_AVAIL_OWNED) continue;
+
+    const choiceParams = availability == JOUHOU_AVAIL_BUYABLE
+      ? buildJouhouChoiceParams(infoItem, itemId)
+      : { text: JOUHOU_UNKNOWN_LABEL, value: 0 };
+    $gameSystem.addCustomChoice(JOUHOU_CHOICE_ID, choiceParams);
+  }
 
 };
 
+// 解放条件(変数比較 → スイッチ)を判定し、所持していれば所持済みを優先する。
+function resolveJouhouAvailability(infoItem) {
+  const isConditionMet = isJouhouConditionMet(infoItem.meta);
+  if ($gameParty.hasItem(infoItem, true)) return JOUHOU_AVAIL_OWNED;
+  return isConditionMet ? JOUHOU_AVAIL_BUYABLE : JOUHOU_AVAIL_HIDDEN;
+}
+
+// <SetJouhouVal:x,y> は「変数xがy以上」、<SetJouhouSwi:n> は「スイッチnがON」。
+function isJouhouConditionMet(infoMeta) {
+  if (infoMeta['SetJouhouVal']) {
+    const setJouhouValues = infoMeta['SetJouhouVal'].split(',');
+    const progressVariableId = Number(setJouhouValues[0]) == 0
+      ? JOUHOU_DEFAULT_PROGRESS_VARIABLE_ID
+      : Number(setJouhouValues[0]);
+    if ($gameVariables.value(progressVariableId) >= Number(setJouhouValues[1])) return true;
+  }
+
+  if (infoMeta['SetJouhouSwi']) {
+    const conditionSwitchId = infoMeta['SetJouhouSwi'] == 0
+      ? JOUHOU_DEFAULT_CONDITION_SWITCH_ID
+      : Number(infoMeta['SetJouhouSwi']);
+    if ($gameSwitches.value(conditionSwitchId)) return true;
+  }
+
+  return false;
+}
+
+// 「情報名:価格\G」+ 所持金不足なら選択不可マーカーを付ける。
+function buildJouhouChoiceParams(infoItem, itemId) {
+  const requiredGold = Number(infoItem.meta['SetJouhouGold']);
+  let choiceText = `${infoItem.name}:${infoItem.meta['SetJouhouGold']}\\G`;
+  if ($gameParty.gold() < requiredGold) choiceText += JOUHOU_SHORT_OF_GOLD_LABEL;
+  return { text: choiceText, value: itemId };
+}
+//#endregion
+
+//#region pictures
 //寝起きピクチャ。作品共通でも行けるかも？
+const WAKING_UP_PICTURE_ID_FIRST = 71;
+const WAKING_UP_POSE_VALUES = [8, 8, 8, 11, 8, 8];//この配列から1つ選ぶ
+const WAKING_UP_STATE_LECHEROUS_ID = 61;
+const WAKING_UP_STATE_EXCITED_ID = 67;
+const WAKING_UP_SWITCH_FIRST_WAKE_ID = 202;
+const WAKING_UP_SWITCH_FIRST_WAKE_SUB_ID = 204;
+const WAKING_UP_SWITCH_RANDOM_POSE_ID = 465;
+const WAKING_UP_CELL_ANIMATION = [13, 4, '連番', 8];
+
 wakingup_pic = function () {
 
-  valuePic1 = 71;
-  var actor = $gameActors.actor($gameVariables.value(2));
+  valuePic1 = WAKING_UP_PICTURE_ID_FIRST;
+  const firstPictureId = valuePic1;
+
+  const actor = $gameActors.actor($gameVariables.value(2));
   if (!actor) return;
-  if ($gameSwitches.value(202) && $gameSwitches.value(204)) {
-    var wakeVariant1 = 1;
-    var wakeVariant2 = getRandomIndex(3) + 1;
-    var poseValue1 = getRandomIndex(2) + 0;
-    var poseValue2 = 5;
-    var candidatePoseValues = [8, 8, 8, 11, 8, 8]; var poseValue3 = candidatePoseValues[getRandomIndex(candidatePoseValues.length)];
-  } else {
-    var wakeVariant1 = 2;
-    var wakeVariant2 = getRandomIndex(2) + 2;
-    var poseValue1 = 2;
-    var poseValue2 = 5;
-    var poseValue3 = 9;
-  };
-  if (actor.isStateAffected(61)) {
-    var poseValue1 = 4;
-    var poseValue2 = 6;
-    var poseValue3 = 12;
-  };
-  if (actor.isStateAffected(67)) {
-    var poseValue1 = 3;
-    var poseValue2 = 7;
-    var poseValue3 = 10;
-  };
-  if ($gameSwitches.value(465)) {
-    var poseValue1 = getRandomIndex(2) + 0;
-    var poseValue2 = 5;
-    var candidatePoseValues = [8, 8, 8, 11, 8, 8]; var poseValue3 = candidatePoseValues[getRandomIndex(candidatePoseValues.length)];
-  };
-  var wakeImageName = 'Zev_WakingUp1_' + wakeVariant1;
-  $gameScreen.showPicture(valuePic1, wakeImageName, 1, 640 + 384 + 128, 384 + 50, 100, 100, 0, 0);
-  $gameScreen.movePicture(valuePic1, 1, 640 + 384 + 128, 384, 100, 100, 255, 0, 120);
-  var wakeImageName = 'Zev_WakingUp2_' + wakeVariant2;
-  $gameScreen.showPicture(valuePic1 + 1, wakeImageName, 1, 640 + 384 + 128, 384 + 50, 100, 100, 0, 0);
-  $gameScreen.movePicture(valuePic1 + 1, 1, 640 + 384 + 128, 384, 100, 100, 255, 0, 120);
+
+  const wakePose = buildWakingUpPose(actor);
+
+  showWakingUpPicture(firstPictureId, 'Zev_WakingUp1_' + wakePose.imageVariant1);
+  showWakingUpPicture(firstPictureId + 1, 'Zev_WakingUp2_' + wakePose.imageVariant2);
+  //連番アニメーションは3枚目の表示前に登録する必要がある。
   $gameScreen.setPicturesAnimation(13, 4, "連番", 8);
-  var wakeImageName = 'Zev_WakingUp3_00';
-  $gameScreen.showPicture(valuePic1 + 2, wakeImageName, 1, 640 + 384 + 128, 384 + 50, 100, 100, 0, 0);
-  $gameScreen.movePicture(valuePic1 + 2, 1, 640 + 384 + 128, 384, 100, 100, 255, 0, 120);
-  valueScriptArray1 = [poseValue1 + 1, poseValue2 + 1, poseValue3 + 1];
-  $gameScreen.picture(valuePic1 + 2).cell = poseValue1;
+  showWakingUpPicture(firstPictureId + 2, 'Zev_WakingUp3_00');
+
+  valueScriptArray1 = [wakePose.poseValue1 + 1, wakePose.poseValue2 + 1, wakePose.poseValue3 + 1];
+  $gameScreen.picture(firstPictureId + 2).cell = wakePose.poseValue1;
 
 };
+
+// 寝起き差分の画像バリアントとポーズ値。乱数の消費順は元のまま。
+function buildWakingUpPose(actor) {
+  const isFirstWakePattern = $gameSwitches.value(202) && $gameSwitches.value(204);
+
+  let imageVariant1;
+  let imageVariant2;
+  let poseValue1;
+  let poseValue2;
+  let poseValue3;
+
+  if (isFirstWakePattern) {
+    imageVariant1 = 1;
+    imageVariant2 = getRandomIndex(3) + 1;
+    poseValue1 = getRandomIndex(2);
+    poseValue2 = 5;
+    poseValue3 = pickRandomValue(WAKING_UP_POSE_VALUES);
+  } else {
+    imageVariant1 = 2;
+    imageVariant2 = getRandomIndex(2) + 2;
+    poseValue1 = 2;
+    poseValue2 = 5;
+    poseValue3 = 9;
+  }
+
+  if (actor.isStateAffected(WAKING_UP_STATE_LECHEROUS_ID)) {
+    poseValue1 = 4;
+    poseValue2 = 6;
+    poseValue3 = 12;
+  }
+  if (actor.isStateAffected(WAKING_UP_STATE_EXCITED_ID)) {
+    poseValue1 = 3;
+    poseValue2 = 7;
+    poseValue3 = 10;
+  }
+
+  if ($gameSwitches.value(WAKING_UP_SWITCH_RANDOM_POSE_ID)) {
+    poseValue1 = getRandomIndex(2);
+    poseValue2 = 5;
+    poseValue3 = pickRandomValue(WAKING_UP_POSE_VALUES);
+  }
+
+  return { imageVariant1, imageVariant2, poseValue1, poseValue2, poseValue3 };
+}
+
+// 寝起きピクチャ1枚分の表示 + 移動(画面下から定位置へ)。
+function showWakingUpPicture(pictureId, pictureName) {
+  const pictureX = 640 + 384 + 128;
+  $gameScreen.showPicture(pictureId, pictureName, 1, pictureX, 384 + 50, 100, 100, 0, 0);
+  $gameScreen.movePicture(pictureId, 1, pictureX, 384, 100, 100, 255, 0, 120);
+}
 
 //宿泊時表示ピクチャvalue18 value21～
+const SLEEP_PICTURE_ID_FIRST = 51;
+const SLEEP_PICTURE_BASE_WIDTH = 1600;
+const SLEEP_PICTURE_BASE_HEIGHT = 1200;
+const SLEEP_PICTURE_REF_WIDTH = 1280;
+const SLEEP_PICTURE_REF_HEIGHT = 768;
+const SLEEP_PICTURE_OPACITY = 50;//特定IDだけを透明にしたいけど出来なかった
+const SLEEP_PICTURE_MOVE_OPACITY = 80;
+const SLEEP_PICTURE_MOVE_DURATION = 240;
+const SLEEP_STATE_LECHEROUS_ID = 61;
+const SLEEP_STATE_EXCITED_ID = 67;
+const SLEEP_SKILL_GROUP = [66, 67, 68, 69, 70];//習得数で差分が変わる
+const SLEEP_INN_BGM = [
+  { "name": "21_Inn1", "volume": 50, "pitch": 100, "pan": 0 },
+  { "name": "21_Inn2", "volume": 50, "pitch": 100, "pan": 0 }
+];
+
 syukuhaku_pic = function (actorSlotId) {
 
-  var actor = $gameActors.actor(actorSlotId);
+  const actor = $gameActors.actor(actorSlotId);
   if (!actor) return;
-  var exposureLevel = $gameVariables.value(actorSlotId + 380)[4];
-  var sleepPictureNames = [];
-  var locationType = 0;
-  if ($gameSwitches.value(203)) {
-    var locationType = 2;
-  } else {
-    var locationType = 1;
-  };
-  if (locationType >= 1) { sleepPictureNames.push("Zev_StaySleep0-" + locationType) };
-  sleepPictureNames.push("Zev_StaySleep1-1");
-  var sleepPose = 1;
-  if (actor.hpRate() <= 0.3) { var sleepPose = 2 };
-  if (actor.isStateAffected(61) || $gameSwitches.value(465)) { var sleepPose = 3 };
-  if (actor.isLearnedSkill(66)) {
-    for (var id = 0; id <= valueHstateDisplay.length - 1; id++) {
-      if (actor.isStateAffected(valueHstateDisplay[id])) {
-        var sleepPose = 4;
-        break;
-      };
-    };
-  };
-  if (sleepPose >= 1) { sleepPictureNames.push("Zev_StaySleep2-" + sleepPose) };
-  var sleepVariant3 = 0;
-  if (exposureLevel >= 49) {
-    var sleepRand3 = getRandomIndex(4);
-    if (sleepRand3 >= 2) { var sleepVariant3 = 1 };
-    if (sleepRand3 == 1) { var sleepVariant3 = 2 };
-    if (sleepRand3 == 0) { var sleepVariant3 = 3 };
-  };
-  if (sleepVariant3 >= 1) { sleepPictureNames.push("Zev_StaySleep3-" + sleepVariant3) };
-  var sleepVariant4 = 1;
-  if (actor.isStateAffected(67)) { var sleepVariant4 = 2 };
-  var skillBonus = getRandomIndex(10);
-  if (actor.isLearnedSkill(66)) { skillBonus += 1 };
-  if (actor.isLearnedSkill(67)) { skillBonus += 1 };
-  if (actor.isLearnedSkill(68)) { skillBonus += 1 };
-  if (actor.isLearnedSkill(69)) { skillBonus += 1 };
-  if (actor.isLearnedSkill(70)) { skillBonus += 1 };
-  if (skillBonus >= 8) { var sleepVariant4 = 0 };
-  if (sleepVariant4 >= 1) { sleepPictureNames.push("Zev_StaySleep4-" + sleepVariant4) };
-  var sleepVariant5 = getRandomIndex(3);
-  if (sleepPose >= 4) { var sleepVariant5 = 0 };
-  if (sleepVariant5 >= 1) { sleepPictureNames.push("Zev_StaySleep5-" + sleepVariant5) };
 
-  var sleepVariant6 = 0;
-  if (sleepPose >= 4) { var sleepVariant6 = 1 };//value22の判定を利用
-  if (sleepVariant6 >= 1) { sleepPictureNames.push("Zev_StaySleep6-" + sleepVariant6) };
+  const exposureLevel = $gameVariables.value(actorSlotId + 380)[4];
+  const sleepPose = resolveSleepPose(actor);
+  const sleepPictureNames = collectSleepPictureNames(actor, exposureLevel, sleepPose);
 
-  var scaleFactor = 1;
-  var positionIndex = getRandomIndex(2);//ピクチャ表示時に中央1か左上0か
-  var zoomScale = getRandomIndex(3) + 1;
-  if (zoomScale >= 2) { var scaleFactor = getRandomIndex(zoomScale) + 1 };
-  var baseWidth = 1600; var baseHeight = 1200;
-  var refWidth = 1280; var refHeight = 768;
-  var coordRand = getRandomIndex(2);
-  if (coordRand >= 1) {
-    var startX = refWidth / 2 + (baseWidth * scaleFactor - refWidth) / 2;//x始点。+で左
-    var startY = refHeight / 2 - (baseHeight * scaleFactor - refHeight) / 2;//y始点。-で下
-    var endX = refWidth / 2 - (baseWidth - refWidth) / 2;//x終点。-で右
-    var endY = refHeight / 2 + (baseHeight - refHeight) / 2;//y終点。+で上
-  } else {
-    var startX = refWidth / 2 - (baseWidth * scaleFactor - refWidth) / 2;//x始点。+で左
-    var startY = refHeight / 2 + (baseHeight * scaleFactor - refHeight) / 2;//y始点。-で下
-    var endX = refWidth / 2 + (baseWidth - refWidth) / 2;//x終点。-で右
-    var endY = refHeight / 2 - (baseHeight - refHeight) / 2;//y終点。+で上
-  };
-  var picOpacity = 50;//特定IDだけを透明にしたいけど出来なかった
-  var pictureId = 51;
-  for (var id = 0; id <= sleepPictureNames.length - 1; id++) {
-    $gameScreen.showPicture(pictureId, sleepPictureNames[id], positionIndex, startX, startY, 100 * zoomScale, 100 * zoomScale, picOpacity, 0);
-    pictureId += 1;
-  };
-  var moveOpacity = 100;
-  var moveRand = getRandomIndex(2);
-  if (moveRand >= 1) {
-    var endX = refWidth / 2;
-    var endY = refHeight / 2;
-    var moveOpacity = 80;
-  };
-  var pictureId = 51;
-  for (var id = 0; id <= sleepPictureNames.length - 1; id++) {
-    $gameScreen.movePicture(pictureId, 1, endX, endY, moveOpacity, moveOpacity, 255, 0, 240);
-    pictureId += 1;
-  };
-  if (sleepPose >= 4) {
-    AudioManager.playMe({ "name": "21_Inn1", "volume": 50, "pitch": 100, "pan": 0 });
-  } else {
-    AudioManager.playMe({ "name": "21_Inn2", "volume": 50, "pitch": 100, "pan": 0 });
-  };
+  const sleepPicturePath = buildSleepPicturePath();
+  showSleepPictures(sleepPictureNames, sleepPicturePath);
+  moveSleepPictures(sleepPictureNames, sleepPicturePath);
+
+  AudioManager.playMe(sleepPose >= 4 ? SLEEP_INN_BGM[0] : SLEEP_INN_BGM[1]);
 
 };
 
+// 寝相(1:通常 2:HP僅少 3:発情/イベント 4:発情状態あり)。
+function resolveSleepPose(actor) {
+  if (actor.isLearnedSkill(66) && isActorAffectedByAnyState(actor, valueHstateDisplay)) return 4;
+  if (actor.isStateAffected(SLEEP_STATE_LECHEROUS_ID) || $gameSwitches.value(465)) return 3;
+  if (actor.hpRate() <= 0.3) return 2;
+  return 1;
+}
+
+// 指定した状態IDのいずれかに掛かっているか。
+function isActorAffectedByAnyState(actor, stateIds) {
+  for (const stateId of stateIds) {
+    if (actor.isStateAffected(stateId)) return true;
+  }
+  return false;
+}
+
+// 表示するピクチャ名を0(下着)→6の順に積む。
+function collectSleepPictureNames(actor, exposureLevel, sleepPose) {
+  const sleepPictureNames = [];
+
+  const locationType = $gameSwitches.value(203) ? 2 : 1;
+  sleepPictureNames.push("Zev_StaySleep0-" + locationType);
+  sleepPictureNames.push("Zev_StaySleep1-1");
+
+  //sleepPose は必ず1以上。
+  sleepPictureNames.push("Zev_StaySleep2-" + sleepPose);
+
+  const sleepVariant3 = resolveSleepVariant3(exposureLevel);
+  if (sleepVariant3 >= 1) sleepPictureNames.push("Zev_StaySleep3-" + sleepVariant3);
+
+  const sleepVariant4 = resolveSleepVariant4(actor);
+  if (sleepVariant4 >= 1) sleepPictureNames.push("Zev_StaySleep4-" + sleepVariant4);
+
+  //発情寝相でも乱数は消費する(消費順を変えないため)。
+  let sleepVariant5 = getRandomIndex(3);
+  if (sleepPose >= 4) sleepVariant5 = 0;
+  if (sleepVariant5 >= 1) sleepPictureNames.push("Zev_StaySleep5-" + sleepVariant5);
+
+  //差分6は発情寝相の時だけ出す
+  const sleepVariant6 = sleepPose >= 4 ? 1 : 0;//value22の判定を利用
+  if (sleepVariant6 >= 1) sleepPictureNames.push("Zev_StaySleep6-" + sleepVariant6);
+
+  return sleepPictureNames;
+}
+
+// 露出度が高い時だけ3枚目の差分を出す(乱数は露出度に関係なく1回消費しない)。
+function resolveSleepVariant3(exposureLevel) {
+  if (exposureLevel < 49) return 0;
+  const sleepRand3 = getRandomIndex(4);
+  if (sleepRand3 >= 2) return 1;
+  if (sleepRand3 == 1) return 2;
+  return 3;
+}
+
+// 差分4は堕落スキルの習得数で変化する(状態67で2、習得数+乱数が8以上で0)。
+function resolveSleepVariant4(actor) {
+  const sleepVariant4 = actor.isStateAffected(SLEEP_STATE_EXCITED_ID) ? 2 : 1;
+  let skillBonus = getRandomIndex(10);
+  for (const skillId of SLEEP_SKILL_GROUP) {
+    if (actor.isLearnedSkill(skillId)) skillBonus += 1;
+  }
+  return skillBonus >= 8 ? 0 : sleepVariant4;
+}
+
+// 表示位置と移動先。拡大した画像の端が画面外に来る座標から中央寄りの座標へ動かす。
+function buildSleepPicturePath() {
+  const positionIndex = getRandomIndex(2);//ピクチャ表示時に中央1か左上0か
+  const zoomScale = getRandomIndex(3) + 1;
+  const scaleFactor = zoomScale >= 2 ? getRandomIndex(zoomScale) + 1 : 1;
+  const isStartOuter = getRandomIndex(2) >= 1;
+
+  //拡大後の画像のハミ出し量(scaleFactor倍)と、等倍時のハミ出し量
+  const expandedX = (SLEEP_PICTURE_BASE_WIDTH * scaleFactor - SLEEP_PICTURE_REF_WIDTH) / 2;
+  const expandedY = (SLEEP_PICTURE_BASE_HEIGHT * scaleFactor - SLEEP_PICTURE_REF_HEIGHT) / 2;
+  const trimmedX = (SLEEP_PICTURE_BASE_WIDTH - SLEEP_PICTURE_REF_WIDTH) / 2;
+  const trimmedY = (SLEEP_PICTURE_BASE_HEIGHT - SLEEP_PICTURE_REF_HEIGHT) / 2;
+
+  return {
+    positionIndex, zoomScale,
+    //+で左 / -で下 を基準に、開始位置と終了位置を反対側へ振る。
+    startX: isStartOuter ? SLEEP_PICTURE_REF_WIDTH / 2 + expandedX : SLEEP_PICTURE_REF_WIDTH / 2 - expandedX,
+    startY: isStartOuter ? SLEEP_PICTURE_REF_HEIGHT / 2 - expandedY : SLEEP_PICTURE_REF_HEIGHT / 2 + expandedY,
+    endX: isStartOuter ? SLEEP_PICTURE_REF_WIDTH / 2 - trimmedX : SLEEP_PICTURE_REF_WIDTH / 2 + trimmedX,
+    endY: isStartOuter ? SLEEP_PICTURE_REF_HEIGHT / 2 + trimmedY : SLEEP_PICTURE_REF_HEIGHT / 2 - trimmedY
+  };
+}
+
+// ピクチャを薄く表示しておく(移動は moveSleepPictures)。
+function showSleepPictures(sleepPictureNames, sleepPicturePath) {
+  let pictureId = SLEEP_PICTURE_ID_FIRST;
+  for (const sleepPictureName of sleepPictureNames) {
+    $gameScreen.showPicture(pictureId, sleepPictureName, sleepPicturePath.positionIndex,
+      sleepPicturePath.startX, sleepPicturePath.startY,
+      100 * sleepPicturePath.zoomScale, 100 * sleepPicturePath.zoomScale, SLEEP_PICTURE_OPACITY, 0);
+    pictureId += 1;
+  }
+}
+
+// 中央へ寄せる。乱数次第で画面中央に固定して少しだけ暗くする。
+function moveSleepPictures(sleepPictureNames, sleepPicturePath) {
+  const isMoveToCenter = getRandomIndex(2) >= 1;
+  const endX = isMoveToCenter ? SLEEP_PICTURE_REF_WIDTH / 2 : sleepPicturePath.endX;
+  const endY = isMoveToCenter ? SLEEP_PICTURE_REF_HEIGHT / 2 : sleepPicturePath.endY;
+  const moveOpacity = isMoveToCenter ? SLEEP_PICTURE_MOVE_OPACITY : 100;
+
+  //NOTE: 元コードでは移動倍率に moveOpacity を渡している(意図不明)。挙動を変えないためそのまま。
+  let pictureId = SLEEP_PICTURE_ID_FIRST;
+  for (let index = 0; index < sleepPictureNames.length; index++) {
+    $gameScreen.movePicture(pictureId, 1, endX, endY, moveOpacity, moveOpacity, 255, 0, SLEEP_PICTURE_MOVE_DURATION);
+    pictureId += 1;
+  }
+}
+//#endregion
+
+
+//#region direct
 //作品オリジナルの演出に使用original_direct(1,0,0,0,0,0);没original_mainに引き抜いて使用
+const DIRECT_EFFECT_PICTURE_ID_FIRST = 61;
+const DIRECT_AURA_COLORS = {
+  1: '#00eeff',//リーシャ
+  2: '#f2ff00'//モニカ
+};
+const DIRECT_BERSERK_PARTICLE_NAMES = ['magic_circle_c2', 'monster_c', 'mysterious_torch_c'];
+
 original_direct = function (effectTypeId, particleGroupId, auraColorVariantId, unusedArg4, unusedArg5, unusedArg6) {
 
-  if (effectTypeId == 1) {//バハムート登場/退場
-    var picId = 61;
-    var pictureName = "/img/parallaxes/BattleField1_1";//仮パララックス名。
-    $gameScreen.showPicture(picId, pictureName, 1, 640, 384, 100, 100, 0, 0);
-    $gameScreen.movePicture(picId, 1, 640, 384, 100, 100, 250, 0, 60);
-    hcg_piston(picId, 5, 1);
-    var pictureName = 'TachieMonster1';//仮ピクチャ名。
-    $gameScreen.showPicture(picId + 1, pictureName, 1, 640 - 400, 384 + 100, -100, 100, 0, 0);
-    $gameScreen.movePicture(picId + 1, 1, 640 - 200, 384 + 100, -100, 100, 255, 0, 60);
-    hcg_piston(picId + 1, 5, 1);
-    if ($gameParty.inBattle()) {
-      valueWordSet10 = 'battleWeather';
-    } else {
-      valueWordSet10 = 'weather';
-    };
-    var picId = 'stardust_w';
-    $gameScreen._particle.particleSet(0, picId, valueWordSet10, 'def', 'screen');
-    var picId = 'thunder_w';
-    $gameScreen._particle.particleSet(0, picId, valueWordSet10, 'def', 'screen');
-  };
-  if (effectTypeId == 2) {//バハムート登場/退場
-    var picId = 61;
-    $gameScreen.erasePicture(picId);
-    $gameScreen.erasePicture(picId + 1);
-    var picId = 'stardust_w';
-    $gameScreen._particle.particleClear(picId);
-    var picId = 'thunder_w';
-    $gameScreen._particle.particleClear(picId);
-  };
-  if (effectTypeId == 3) {//オーラ処理。original_direct(3,this._eventId,1,0,0,0);
-    var picId = 'aura_static_b';
-    $gameScreen._particle.particleSet(String(particleGroupId), picId + '-' + particleGroupId, 'this', picId, '99');
-    $gameScreen._particle.particleUpdate([picId + '-' + particleGroupId, 'alpha', '0', '0.7@0.5', '0']);
-    $gameScreen._particle.particleUpdate([picId + '-' + particleGroupId, 'blendMode', '1']);
-    $gameScreen._particle.particleUpdate([picId + '-' + particleGroupId, 'scale', '0', '0.6']);
-    $gameScreen._particle.particleUpdate([picId + '-' + particleGroupId, 'lifetime', '1.1', '1.1']);
-    if (auraColorVariantId == 1) { $gameScreen._particle.particleUpdate([picId + '-' + particleGroupId, 'color', '#ffffff', '#00eeff']) };//リーシャ
-    if (auraColorVariantId == 2) { $gameScreen._particle.particleUpdate([picId + '-' + particleGroupId, 'color', '#ffffff', '#f2ff00']) };//モニカ
-    $gameScreen._particle.particleUpdate([picId + '-' + particleGroupId, 'pos', 0, -20]);
-  };
-  if (effectTypeId == 4) {//オーラ処理終了
-    var picId = 'aura_static_b' + '-' + particleGroupId;
-    $gameScreen._particle.particleClear(picId);
-  };
-  if (effectTypeId == 5) {//少年暴走ベルセルクoriginal_direct(5,this._eventId,0,0,0,0);
-    var picId = 'magic_circle_c2';
-    var particleParams = [String(particleGroupId), 'this', '99'];
-    $gameScreen._particle.particleSet(particleParams[0], picId + '-' + particleGroupId, particleParams[1], picId, particleParams[2]);
-    var picId = 'monster_c';
-    var particleParams = [String(particleGroupId), 'this', '99'];
-    $gameScreen._particle.particleSet(particleParams[0], picId + '-' + particleGroupId, particleParams[1], picId, particleParams[2]);
-    var picId = 'mysterious_torch_c';
-    var particleParams = [String(particleGroupId), 'this', '99'];
-    $gameScreen._particle.particleSet(particleParams[0], picId + '-' + particleGroupId, particleParams[1], picId, particleParams[2]);
-  };
-  if (effectTypeId == 6) {//少年暴走ベルセルク終了
-    var picId = 'magic_circle_c2' + '-' + particleGroupId;
-    $gameScreen._particle.particleClear(picId);
-    var picId = 'monster_c' + '-' + particleGroupId;
-    $gameScreen._particle.particleClear(picId);
-    var picId = 'mysterious_torch_c' + '-' + particleGroupId;
-    $gameScreen._particle.particleClear(picId);
-  };
+  switch (effectTypeId) {
+    case 1: showBahamutEntry(particleGroupId); break;
+    case 2: hideBahamut(); break;
+    case 3: showAuraParticle(particleGroupId, auraColorVariantId); break;
+    case 4: clearAuraParticle(particleGroupId); break;
+    case 5: showBerserkParticles(particleGroupId); break;
+    case 6: clearBerserkParticles(particleGroupId); break;
+    default: break;
+  }
 
 };
 
+// バハムート登場。仮パララックス名・仮ピクチャ名を使用。
+function showBahamutEntry(particleGroupId) {
+  const picId = DIRECT_EFFECT_PICTURE_ID_FIRST;
+  const battlefieldPictureName = "/img/parallaxes/BattleField1_1";
+  $gameScreen.showPicture(picId, battlefieldPictureName, 1, 640, 384, 100, 100, 0, 0);
+  $gameScreen.movePicture(picId, 1, 640, 384, 100, 100, 250, 0, 60);
+  hcg_piston(picId, 5, 1);
+
+  const monsterPictureName = 'TachieMonster1';
+  $gameScreen.showPicture(picId + 1, monsterPictureName, 1, 640 - 400, 384 + 100, -100, 100, 0, 0);
+  $gameScreen.movePicture(picId + 1, 1, 640 - 200, 384 + 100, -100, 100, 255, 0, 60);
+  hcg_piston(picId + 1, 5, 1);
+
+  //戦闘中は天候パーティクルを切り替える。
+  valueWordSet10 = $gameParty.inBattle() ? 'battleWeather' : 'weather';
+  $gameScreen._particle.particleSet(0, 'stardust_w', valueWordSet10, 'def', 'screen');
+  $gameScreen._particle.particleSet(0, 'thunder_w', valueWordSet10, 'def', 'screen');
+}
+
+function hideBahamut() {
+  const picId = DIRECT_EFFECT_PICTURE_ID_FIRST;
+  $gameScreen.erasePicture(picId);
+  $gameScreen.erasePicture(picId + 1);
+  $gameScreen._particle.particleClear('stardust_w');
+  $gameScreen._particle.particleClear('thunder_w');
+}
+
+// オーラ処理。original_direct(3,this._eventId,1,0,0,0);
+function showAuraParticle(particleGroupId, auraColorVariantId) {
+  const particleName = 'aura_static_b';
+  const particleId = particleName + '-' + particleGroupId;
+  $gameScreen._particle.particleSet(String(particleGroupId), particleId, 'this', particleName, '99');
+  $gameScreen._particle.particleUpdate([particleId, 'alpha', '0', '0.7@0.5', '0']);
+  $gameScreen._particle.particleUpdate([particleId, 'blendMode', '1']);
+  $gameScreen._particle.particleUpdate([particleId, 'scale', '0', '0.6']);
+  $gameScreen._particle.particleUpdate([particleId, 'lifetime', '1.1', '1.1']);
+
+  const auraColor = DIRECT_AURA_COLORS[auraColorVariantId];
+  if (auraColor) $gameScreen._particle.particleUpdate([particleId, 'color', '#ffffff', auraColor]);
+
+  $gameScreen._particle.particleUpdate([particleId, 'pos', 0, -20]);
+}
+
+// オーラ処理終了
+function clearAuraParticle(particleGroupId) {
+  $gameScreen._particle.particleClear('aura_static_b' + '-' + particleGroupId);
+}
+
+// 少年暴走ベルセルク original_direct(5,this._eventId,0,0,0,0);
+function showBerserkParticles(particleGroupId) {
+  for (const particleName of DIRECT_BERSERK_PARTICLE_NAMES) {
+    $gameScreen._particle.particleSet(String(particleGroupId), particleName + '-' + particleGroupId, 'this', particleName, '99');
+  }
+}
+
+// 少年暴走ベルセルク終了
+function clearBerserkParticles(particleGroupId) {
+  for (const particleName of DIRECT_BERSERK_PARTICLE_NAMES) {
+    $gameScreen._particle.particleClear(particleName + '-' + particleGroupId);
+  }
+}
+//#endregion
+
+//#region stopMove
 //作品オリジナルの移動禁止処理
+const STOP_MOVE_SWITCH_ID = 434;
+const STOP_MOVE_STORY_VARIABLE_ID = 21;
+const STOP_MOVE_ENTRY_SWITCH_ID = 1;
+const STOP_MOVE_EXIT_SWITCH_ID = 2;
+const STOP_MOVE_BLOCKED_MESSAGE = `今は先に行くところがあります`;//翻訳対象
+//[マップID, X, Y] の周辺1マスで進行を止める。元コードは同じ内容を2回並べていたのでまとめた。
+const STOP_MOVE_AREAS = [[18, 14, 42]];
+
 original_stopMoveSwi = function () {
 
-  var entryEnabledFlags = [$gameSwitches.value(1), $gameSwitches.value(1)];
-  var exitBlockedFlags = [!$gameSwitches.value(2), !$gameSwitches.value(2)];
-  var targetPositions = [[18, 14, 42], [18, 14, 42]];
-  var variableAssignments = [[1, 1, `今は先に行くところがあります`], [1, 1, `今は先に行くところがあります`]];
-  for (var i = 0; i < entryEnabledFlags.length; i++) {
-    if (entryEnabledFlags[i] && exitBlockedFlags[i]) {
-      $gameSwitches.setValue(434, true);
-      var targetPosition = targetPositions[i];
-      var playerPosition = [$gameMap.mapId(), $gamePlayer._realX, $gamePlayer._realY];
-      if (targetPosition[0] == playerPosition[0]) {
-        if (targetPosition[1] == playerPosition[1] || targetPosition[1] == playerPosition[1] + 1 || targetPosition[1] == playerPosition[1] - 1) {
-          if (targetPosition[2] == playerPosition[2] || targetPosition[2] == playerPosition[2] + 1 || targetPosition[2] == playerPosition[2] - 1) {
-            $gameSwitches.setValue(434, false);
-            $gameVariables.setValue(21, variableAssignments[i][2]);
-          }
-        }
-      }
-    }
-  };
+  const isEntryEnabled = $gameSwitches.value(STOP_MOVE_ENTRY_SWITCH_ID);
+  const isExitBlocked = !$gameSwitches.value(STOP_MOVE_EXIT_SWITCH_ID);
+  if (!isEntryEnabled || !isExitBlocked) return;
+
+  $gameSwitches.setValue(STOP_MOVE_SWITCH_ID, true);
+
+  for (const stopArea of STOP_MOVE_AREAS) {
+    if (!isPlayerAroundStopArea(stopArea)) continue;
+    $gameSwitches.setValue(STOP_MOVE_SWITCH_ID, false);
+    $gameVariables.setValue(STOP_MOVE_STORY_VARIABLE_ID, STOP_MOVE_BLOCKED_MESSAGE);
+  }
 
 };
 
+// プレイヤーが指定座標の周辺1マス(同じマップ)にいるか。
+function isPlayerAroundStopArea(stopArea) {
+  const [stopMapId, stopX, stopY] = stopArea;
+  if (stopMapId != $gameMap.mapId()) return false;
+  if (!isWithinOneTile(stopX, $gamePlayer._realX)) return false;
+  return isWithinOneTile(stopY, $gamePlayer._realY);
+}
+
+function isWithinOneTile(targetValue, currentValue) {
+  return targetValue == currentValue || targetValue == currentValue + 1 || targetValue == currentValue - 1;
+}
+//#endregion
+
+//#region autoEventFlag
 //作品オリジナルのスイッチや変数の自動切換え。メインクエスト変数。今のところ使用しない
 original_autoEventFlag = function () {
   /*:
   if($gameVariables.value(135) == 1 && $gameMap.mapId() == 28){
    $gameSwitches.setValue(522,true);
   };
-  
+
   };
-  
+
   var actor = $gameActors.actor($gameVariables.value(20));
   if(actor.isStateAffected(61)){
   if(actor.isLearnedSkill(10)){
@@ -2104,402 +2436,344 @@ original_autoEventFlag = function () {
   $gameVariables.setValue(21,0);
   */
 };
+//#endregion
 
+//#region originalText
 //作品オリジナルのテキスト作成
+const ORIGINAL_TEXT_CLASSES = { 1: OriginalText1, 2: OriginalText2 };
+
 original_text = function (bookId, id101) {
-  let tipInstance;
-  if (bookId === 1) {
-    tipInstance = new OriginalText1();
-  } else if (bookId === 2) {
-    tipInstance = new OriginalText2();
-  }
-  if (tipInstance) {
-    tipInstance.execute(id101);
-  }
+  const OriginalTextClass = ORIGINAL_TEXT_CLASSES[bookId];
+  if (!OriginalTextClass) return;
+  new OriginalTextClass().execute(id101);
 };
 
 //作品オリジナルのtipsテキスト作成//15行まで
 original_tips = function (bookId) {
-  let TipClass = originalTipsMap[bookId];
-  if (TipClass) {
-    tip = new TipClass();
-    tip.execute();
-  }
+  const TipClass = originalTipsMap[bookId];
+  if (!TipClass) return;
+  tip = new TipClass();//NOTE: 元コード同様、暗黙のグローバル変数 tip に代入する
+  tip.execute();
 };
+//#endregion
 
+//#region originalMain
 //作品オリジナルのメインシーンピクチャやキャラグラ移動等処理。全てid直接入力
+const ORIGINAL_MAIN_ID_OFFSET = 300;
+const MAIN_SCENE_PICTURE_ID_FIRST = 51;
+const MAIN_SCENE_PICTURE_NAME_PREFIX = 'ZX_Main000_';
+
 original_main = function (id100, id101) {
 
-  id100 = id100 - 300;
-  if (id100 == 1) {//リーシャ登場。戦闘シーン
-    valuePic1 = 51;
-    valueScenePic = 'ZX_Main000_';
-    switch (id101) {
-      case 1: {
-        $gameScreen.showPicture(valuePic1, 'ScreenBlackOut', 1, 640, 384, 100, 100, 0, 0);
-        pic_1(1, valuePic1 + 2, valueScenePic + '01', 6, 100, 255, 120, 1280, 768, 0, 0);
-        $gameScreen.showPicture(valuePic1 + 3, 'ScreenBlackOut', 1, 640, 384, 100, 100, 0, 0);
-        $gameScreen.setPicturesAnimation(2, 10, "連番", 60);
-        $gameScreen.showPicture(valuePic1 + 4, valueScenePic + '02_00', 1, 640, 384 - (1390 - 768) / 2, 100, 100, 0, 0);
-        $gameScreen.showPicture(valuePic1 + 10, 'ScreenConcentratedLineWidthBackGraund', 1, 640, 384, 100, 100, 0, 0);
-        $gameScreen.showPicture(valuePic1 + 12, valueScenePic + '03', 1, (640 - (1500 - 1280) / 2) - 1000, 384, 500, 500, 0, 0);
-        $gameScreen.movePicture(valuePic1, 1, 640, 384, 100, 100, 200, 0, 60);
-        tachie_bless(valuePic1 + 4, 1);
-        break;
-      }
-      case 2: {
-        adv_partDirectSet(3);
-        pic_move1(valuePic1 + 3, 0, 0, 100, 100, 200, 10);
-        pic_move1(valuePic1 + 4, 0, 0, 100, 100, 200, 10);
-        if ($gameScreen.picture(valuePic1 + 4)) {
-          $gameScreen.picture(valuePic1 + 4).startAnimationFrame(1, true, [1, 1, 1, 2]);
-        }
-        break;
-      }
-      case 3: {
-        const picture4 = $gameScreen.picture(valuePic1 + 4);
-        if (picture4) {
-          const pictureY = picture4.y();
-          pic_move1(valuePic1 + 4, 0, (384 + (1390 - 768) / 2) - pictureY, 100, 100, 255, 600);
-        }
-        break;
-      }
-      case 4: {
-        parallax_scroll(valuePic1 + 5, 'ScreenConcentratedLineWidthBackGraund', 0, 20, 20, 0, 255);
-        break;
-      }
-      case 5: {
-        pic_move1(valuePic1 + 10, 0, 0, 100, 100, 255, 60);
-        const pictureX = $gameScreen.picture(valuePic1 + 12).x();
-        pic_move1(valuePic1 + 12, (640 + (1500 - 1280) / 2) - pictureX, 0, 100, 100, 255, 40);
-        //パララックスで4と残像で1
-        filter_direct(10, 10, 10, 20);
-        break;
-      }
-      case 6: { pic_move1(valuePic1 + 12, -200, 0, 100, 100, 0, 40); break; }
-      case 7: { //地面黒塗りと残像作成
-        $gameMap.spawnEvent(146, 25, 35, true);
-        if (!$gameVariables.value(292)) return;
-        $gameVariables.value(292)[13] = $gameMap.getLastSpawnEventId();
-        let eventId = $gameVariables.value(292)[13];
-        const event = $gameMap.event(eventId);
-        if (event) event.setOpacity(200);
-        eventId = $gameVariables.value(292)[$gameVariables.value(530)];
-        let particleName = 'monster_c';
-        $gameScreen._particle.particleSet('attach:event:' + eventId, particleName + '-' + eventId, 'this', particleName);
-        $gameScreen._particle.particleUpdate([particleName, 'color', '#007dff', '#66b1ff']);
-        particleName = 'monster_c' + '-' + eventId;
-        $gameScreen._particle.particleClear(particleName);
-        break;
-      }
-    }
+  const mainSceneId = id100 - ORIGINAL_MAIN_ID_OFFSET;
+  if (mainSceneId != 1) return;//リーシャ登場。戦闘シーン以外は現在未使用
+
+  valuePic1 = MAIN_SCENE_PICTURE_ID_FIRST;
+  valueScenePic = MAIN_SCENE_PICTURE_NAME_PREFIX;
+
+  switch (id101) {
+    case 1: setupLisciaAppearanceScene(); break;
+    case 2: startLisciaAppearanceBlessAnimation(); break;
+    case 3: moveLisciaAppearancePictureToCenter(); break;
+    case 4: scrollLisciaAppearanceParallax(); break;
+    case 5: moveLisciaAppearanceBackgroundLines(); break;
+    case 6: pic_move1(valuePic1 + 12, -200, 0, 100, 100, 0, 40); break;
+    case 7: attachLisciaAppearanceEvent(); break;
+    default: break;
   }
-  // if(id100 == 1){
-  // if(id101 == 1){
 
-  // }
-  // if(id101 == 2){
+};
 
-  // }
-  // }
-  // if(id100 == 1){
-  // if(id101 == 1){
-
-  // }
-  // if(id101 == 2){
-
-  // }
-  // }
-
+// リーシャ登場の初期配置(黒バック + 各差分 + 集中線)
+function setupLisciaAppearanceScene() {
+  $gameScreen.showPicture(valuePic1, 'ScreenBlackOut', 1, 640, 384, 100, 100, 0, 0);
+  pic_1(1, valuePic1 + 2, valueScenePic + '01', 6, 100, 255, 120, 1280, 768, 0, 0);
+  $gameScreen.showPicture(valuePic1 + 3, 'ScreenBlackOut', 1, 640, 384, 100, 100, 0, 0);
+  $gameScreen.setPicturesAnimation(2, 10, "連番", 60);
+  $gameScreen.showPicture(valuePic1 + 4, valueScenePic + '02_00', 1, 640,
+    384 - (1390 - 768) / 2, 100, 100, 0, 0);
+  $gameScreen.showPicture(valuePic1 + 10, 'ScreenConcentratedLineWidthBackGraund', 1, 640, 384, 100, 100, 0, 0);
+  $gameScreen.showPicture(valuePic1 + 12, valueScenePic + '03', 1, (640 - (1500 - 1280) / 2) - 1000, 384, 500, 500, 0, 0);
+  $gameScreen.movePicture(valuePic1, 1, 640, 384, 100, 100, 200, 0, 60);
+  tachie_bless(valuePic1 + 4, 1);
 }
 
+// 登場演出の続き(フェード + 表情の連番アニメ)
+function startLisciaAppearanceBlessAnimation() {
+  adv_partDirectSet(3);
+  pic_move1(valuePic1 + 3, 0, 0, 100, 100, 200, 10);
+  pic_move1(valuePic1 + 4, 0, 0, 100, 100, 200, 10);
+
+  const blessPicture = $gameScreen.picture(valuePic1 + 4);
+  if (!blessPicture) return;
+  blessPicture.startAnimationFrame(1, true, [1, 1, 1, 2]);
+}
+
+// 立ち絵を画面中央へ移動
+function moveLisciaAppearancePictureToCenter() {
+  const blessPicture = $gameScreen.picture(valuePic1 + 4);
+  if (!blessPicture) return;
+
+  const currentPictureY = blessPicture.y();
+  const targetPictureY = 384 + (1390 - 768) / 2;
+  pic_move1(valuePic1 + 4, 0, targetPictureY - currentPictureY, 100, 100, 255, 600);
+}
+
+// 背景のパララックス
+function scrollLisciaAppearanceParallax() {
+  parallax_scroll(valuePic1 + 5, 'ScreenConcentratedLineWidthBackGraund', 0, 20, 20, 0, 255);
+}
+
+// 集中線と残像の移動。パララックスで4、残像で1。
+function moveLisciaAppearanceBackgroundLines() {
+  pic_move1(valuePic1 + 10, 0, 0, 100, 100, 255, 60);
+
+  const linePicture = $gameScreen.picture(valuePic1 + 12);
+  const currentPictureX = linePicture.x();
+  pic_move1(valuePic1 + 12, (640 + (1500 - 1280) / 2) - currentPictureX, 0, 100, 100, 255, 40);
+
+  filter_direct(10, 10, 10, 20);
+}
+
+// 地面黒塗りと残像作成
+function attachLisciaAppearanceEvent() {
+  $gameMap.spawnEvent(146, 25, 35, true);
+  if (!$gameVariables.value(292)) return;
+
+  const spawnedEventSlots = $gameVariables.value(292);
+  spawnedEventSlots[13] = $gameMap.getLastSpawnEventId();
+
+  const spawnedEventId = spawnedEventSlots[13];
+  const spawnedEvent = $gameMap.event(spawnedEventId);
+  if (spawnedEvent) spawnedEvent.setOpacity(200);
+
+  const attachedEventId = spawnedEventSlots[$gameVariables.value(530)];
+  const monsterParticleName = 'monster_c';
+  $gameScreen._particle.particleSet('attach:event:' + attachedEventId,
+    monsterParticleName + '-' + attachedEventId, 'this', monsterParticleName);
+  $gameScreen._particle.particleUpdate([monsterParticleName, 'color', '#007dff', '#66b1ff']);
+  $gameScreen._particle.particleClear(monsterParticleName + '-' + attachedEventId);
+}
+//#endregion
+
+//#region idHelper
 get_id100_if_zero = function (id100, x) {
   if (id100 > 0) return id100;
 
-  const var535 = $gameVariables.value(535);
-  if (var535 >= x + 1 && var535 <= x + 100) {
-    return var535 - x;
+  const sceneVariableValue = $gameVariables.value(535);
+  if (sceneVariableValue >= x + 1 && sceneVariableValue <= x + 100) {
+    return sceneVariableValue - x;
   }
 
   return id100;
 }
+//#endregion
 
+//#region souwa
 //作品オリジナルのピクチャ挿話やキャラグラ移動等処理。401-600以外は直接コモンid入力
+const SOUWA_ID_BASE = 400;
+const SOUWA_EVENT_SLOT_FIRST_ID = 11;
+
 original_souwa = function (id100, id101) {
 
-  id100 = get_id100_if_zero(id100, 400);
+  const souwaId = get_id100_if_zero(id100, SOUWA_ID_BASE);
+  const souwaStepId = id101;
+  if (souwaId != 31) return;//秩序の酒場の不良団員・酒・つまみ生成以外は未使用
+  if (souwaStepId != 1) return;
 
-  if (id100 == 31) {//秩序の酒場に不良団員npc2人と酒とつまみを生成。id11-15まで使用
-    if (id101 == 1) {
-      let eventSlotId = 11;
-      event_respawnSetN(eventSlotId, 16, 15, 0, 'npcOrder2', 0);
-      let event = $gameMap.event($gameVariables.value(292)[eventSlotId]);
-      event.setDirection(4);
-
-      eventSlotId = 12;
-      event_respawnSetN(eventSlotId, 13, 15, 0, 'npcOrder2', 3);
-      event = $gameMap.event($gameVariables.value(292)[eventSlotId]);
-      event.setDirection(6);
-
-      eventSlotId = 13;
-      goodsEvent_respawn(eventSlotId, 'food_2', 1, 4, 2, 15, 15);
-      event = $gameMap.event($gameVariables.value(292)[eventSlotId]);
-      event._spriteOffsetX = 25;
-      event._spriteOffsetY = 10;
-      event._priorityType = 2;
-
-      eventSlotId = 14;
-      goodsEvent_respawn(eventSlotId, 'food_2', 3, 6, 0, 14, 15);
-      event = $gameMap.event($gameVariables.value(292)[eventSlotId]);
-      event._spriteOffsetX = -25;
-      event._spriteOffsetY = 10;
-      event._priorityType = 2;
-
-      eventSlotId = 15;
-      goodsEvent_respawn(eventSlotId, 'food_1', 0, 4, 0, 15, 15);
-      event = $gameMap.event($gameVariables.value(292)[eventSlotId]);
-      event._spriteOffsetX = -24;
-    };
-  };
-  // if(id100 == 1){
-  // if(id101 == 1){
-
-  // };
-  // if(id101 == 2){
-
-  // };
-  // };
-  // if(id100 == 1){
-  // if(id101 == 1){
-
-  // };
-  // if(id101 == 2){
-
-  // };
-  // };
+  spawnOrderTavernNpc(11, 16, 15, 0, 'npcOrder2', 0, { direction: 4 });
+  spawnOrderTavernNpc(12, 13, 15, 0, 'npcOrder2', 3, { direction: 6 });
+  spawnOrderTavernGoods(13, 'food_2', 1, 4, 2, 15, 15, { offsetX: 25, offsetY: 10, priorityType: 2 });
+  spawnOrderTavernGoods(14, 'food_2', 3, 6, 0, 14, 15, { offsetX: -25, offsetY: 10, priorityType: 2 });
+  spawnOrderTavernGoods(15, 'food_1', 0, 4, 0, 15, 15, { offsetX: -24 });
 
 };
+
+// 秩序の酒場のNPCを生成して向きを設定する。
+function spawnOrderTavernNpc(eventSlotId, ...respawnArgs) {
+  const npcOptions = respawnArgs.pop();
+  event_respawnSetN(eventSlotId, ...respawnArgs);
+  const npcEvent = $gameMap.event($gameVariables.value(292)[eventSlotId]);
+  npcEvent.setDirection(npcOptions.direction);
+}
+
+// 秩序の酒場の酒・つまみを生成し、スプライト位置とプライオリティを調整する。
+function spawnOrderTavernGoods(eventSlotId, ...respawnArgs) {
+  const goodsOptions = respawnArgs.pop();
+  goodsEvent_respawn(eventSlotId, ...respawnArgs);
+
+  const goodsEvent = $gameMap.event($gameVariables.value(292)[eventSlotId]);
+  goodsEvent._spriteOffsetX = goodsOptions.offsetX;
+  if (goodsOptions.offsetY !== undefined) goodsEvent._spriteOffsetY = goodsOptions.offsetY;
+  if (goodsOptions.priorityType !== undefined) goodsEvent._priorityType = goodsOptions.priorityType;
+}
+//#endregion
+
+//#region scene
+const SCENE_PICTURE_ID_FIRST = 51;
 
 //作品オリジナルのピクチャシーンやキャラグラ移動等処理。401-600以外は直接コモンid入力
 original_scene = function (idScene, idStep) { //original_scene(0,1);//テストの際は変数535にid入力
 
-  idScene = adjustSceneIdOriginalScene(idScene);
+  const adjustedSceneId = adjustSceneIdOriginalScene(idScene);
 
-  switch(idScene) {
-    case 11: //Ｈな診察
-      hMedicalExamination(idStep);
-      break;
-    case 100: //モニカマッサージ,id1とid2。
-      monicaMassage(idStep);
-      break;
-    default:
-      break;
+  switch (adjustedSceneId) {
+    case 11: hMedicalExamination(idStep); break;//Ｈな診察
+    case 100: monicaMassage(idStep); break;//モニカマッサージ,id1とid2。
+    default: break;
   }
 };
 
-function hMedicalExamination(idStep) {
-  valuePic1 = 51;
+// 待ち時間(valuePicWait2)を返すステップ。
+const H_MEDICAL_EXAMINATION_WAIT_STEPS = {
+  1: hMedicalExaminationStep1OriginalScene,
+  2: hMedicalExaminationStep2OriginalScene,
+  3: hMedicalExaminationStep3OriginalScene,
+  7: idScene11handleCase7OriginalScene,
+  8: hMedicalExaminationStep8OriginalScene,
+  10: hMedicalExaminationStep10OriginalScene,
+  12: hMedicalExaminationStep12OriginalScene,
+  90: hMedicalExaminationStep90OriginalScene
+};
 
-  switch (idStep) {
-    case 1: {
-      valuePicWait2 = hMedicalExaminationStep1OriginalScene(valuePic1);
-      break;
-    }
-    case 2: {
-      valuePicWait2 = hMedicalExaminationStep2OriginalScene(valuePic1); // Assuming valuePic1 remains 51 from case 1
-      break;
-    }
-    case 3: {
-      valuePicWait2 = hMedicalExaminationStep3OriginalScene(valuePic1);
-      break;
-    }
-    case 4: {
-      hMedicalExaminationStep4OriginalScene();
-      break;
-    }
-    case 5: {
-      hMedicalExaminationStep5OriginalScene(valuePic1);
-      break;
-    }
-    case 6: {
-      hMedicalExaminationStep6OriginalScene(valuePic1);
-      break;
-    }
-    case 7: {
-      valuePicWait2 = idScene11handleCase7OriginalScene(valuePic1);
-      break;
-    }
-    case 8: {
-      valuePicWait2 = hMedicalExaminationStep8OriginalScene(valuePic1);
-      break;
-    }
-    case 9: {
-      hMedicalExaminationStep9OriginalScene();
-      break;
-    }
-    case 10: {
-      valuePicWait2 = hMedicalExaminationStep10OriginalScene(valuePic1);
-      break;
-    }
-    case 11: {
-      hMedicalExaminationStep11OriginalScene(valuePic1);
-      break;
-    }
-    case 12: {
-      valuePicWait2 = hMedicalExaminationStep12OriginalScene(valuePic1);
-      break;
-    }
-    case 90: {
-      valuePicWait2 = hMedicalExaminationStep90OriginalScene(valuePic1);
-      break;
-    }
-    case 91: {
-      hMedicalExaminationStep91OriginalScene(valuePic1);
-      break;
-    }
-    default:
-      break;
+// 待ち時間を返さないステップ。
+const H_MEDICAL_EXAMINATION_VOID_STEPS = {
+  4: hMedicalExaminationStep4OriginalScene,
+  5: hMedicalExaminationStep5OriginalScene,
+  6: hMedicalExaminationStep6OriginalScene,
+  9: hMedicalExaminationStep9OriginalScene,
+  11: hMedicalExaminationStep11OriginalScene,
+  91: hMedicalExaminationStep91OriginalScene
+};
+
+function hMedicalExamination(idStep) {
+  valuePic1 = SCENE_PICTURE_ID_FIRST;
+
+  const waitStepHandler = H_MEDICAL_EXAMINATION_WAIT_STEPS[idStep];
+  if (waitStepHandler) {
+    valuePicWait2 = waitStepHandler(valuePic1);
+    return;
   }
+
+  const voidStepHandler = H_MEDICAL_EXAMINATION_VOID_STEPS[idStep];
+  if (voidStepHandler) voidStepHandler(valuePic1);
 }
+
+const MONICA_MASSAGE_STEPS = {
+  1: monicaMassageStep1OriginalScene,
+  2: monicaMassageStep2OriginalScene,
+  3: monicaMassageStep3OriginalScene,
+  //id3,id4は親関数で設定していないため固定値で渡す
+  4: function (firstPictureId) { monicaMassageStep4OriginalScene(firstPictureId, 50, 200); },
+  5: monicaMassageStep5OriginalScene,
+  6: monicaMassageStep6OriginalScene,
+  7: monicaMassageStep7OriginalScene,
+  8: monicaMassageStep8OriginalScene,
+  9: monicaMassageStep9OriginalScene
+};
 
 function monicaMassage(idStep) {
-  valuePic1 = 51;
+  valuePic1 = SCENE_PICTURE_ID_FIRST;
 
-  switch (idStep) {
-    case 1: {
-      monicaMassageStep1OriginalScene(valuePic1);
-      break;
-    }
-    case 2: {
-      monicaMassageStep2OriginalScene(valuePic1);
-      break;
-    }
-    case 3: {
-      monicaMassageStep3OriginalScene(valuePic1);
-      break;
-    }
-    case 4: {
-      monicaMassageStep4OriginalScene(valuePic1, 50, 200);
-      break;
-    }
-    case 5: {
-      monicaMassageStep5OriginalScene(valuePic1);
-      break;
-    }
-    case 6: {
-      monicaMassageStep6OriginalScene(valuePic1);
-      break;
-    }
-    case 7: {
-      monicaMassageStep7OriginalScene(valuePic1);
-      break;
-    }
-    case 8: {
-      monicaMassageStep8OriginalScene(valuePic1);
-      break;
-    }
-    case 9: {
-      monicaMassageStep9OriginalScene(valuePic1);
-      break;
-    }
-    default:
-      break;
-  }
+  const stepHandler = MONICA_MASSAGE_STEPS[idStep];
+  if (stepHandler) stepHandler(valuePic1);
+}
+//#endregion
+
+
+//#region scenes11
+// ピクチャが存在すればセル(連番コマ)を1つ進める。
+function addPictureCellCountIfExists(pictureId) {
+  const picture = $gameScreen.picture(pictureId);
+  if (!picture) return;
+  picture.addCellCount();
 }
 
-
-function hMedicalExaminationStep1OriginalScene(valuePic1) {
-  // Case 1:
-  // Setup background, dark clouds, animations and initial picture movements
+// 診察シーン step1: 背景・暗雲・各差分の初期配置と移動
+function hMedicalExaminationStep1OriginalScene(firstPictureId) {
   backGraund_menuMapSelect(2, 0, 0, 0);
-  let valueScenePic = 'XevS011_';
-  $gameScreen.showPicture(valuePic1, valueScenePic + '00', 1, 640 - 128, 384, 100, 100, 0, 0);
-  $gameScreen.showPicture(valuePic1 + 1, 'ScreenDarkCloudsH', 1, 640 - 256, 384, 100, 100, 0, 0);
+
+  const scenePictureName = 'XevS011_';
+  $gameScreen.showPicture(firstPictureId, scenePictureName + '00', 1, 640 - 128, 384, 100, 100, 0, 0);
+  $gameScreen.showPicture(firstPictureId + 1, 'ScreenDarkCloudsH', 1, 640 - 256, 384, 100, 100, 0, 0);
   $gameScreen.setPicturesAnimation(6, 30, "連番", 60);
-  $gameScreen.showPicture(valuePic1 + 2, valueScenePic + '02_00', 1, 640 - 128, 384 - 50, 100, 100, 0, 0);
-  $gameScreen.showPicture(valuePic1 + 11, valueScenePic + '11', 1, 640 - 128, 384, 100, 100, 0, 0);
+  $gameScreen.showPicture(firstPictureId + 2, scenePictureName + '02_00', 1, 640 - 128, 384 - 50, 100, 100, 0, 0);
+
+  $gameScreen.showPicture(firstPictureId + 11, scenePictureName + '11', 1, 640 - 128, 384, 100, 100, 0, 0);
   $gameScreen.setPicturesAnimation(5, 30, "連番", 60);
-  $gameScreen.showPicture(valuePic1 + 12, valueScenePic + '12_00', 1, 640 - 128, 384 + 200, 100, 100, 0, 0);
+  $gameScreen.showPicture(firstPictureId + 12, scenePictureName + '12_00', 1, 640 - 128, 384 + 200, 100, 100, 0, 0);
+
   $gameScreen.setPicturesAnimation(2, 15, "連番", 30);
-  $gameScreen.showPicture(valuePic1 + 13, valueScenePic + '13_00', 1, 640 - 128, 384 - (1732 / 2) + (768 / 2) + 100, 100, 100, 0, 0);
+  $gameScreen.showPicture(firstPictureId + 13, scenePictureName + '13_00', 1, 640 - 128,
+    384 - (1732 / 2) + (768 / 2) + 100, 100, 100, 0, 0);
+
   $gameScreen.setPicturesAnimation(2, 30, "連番", 60);
-  $gameScreen.showPicture(valuePic1 + 15, valueScenePic + '14_00', 1, 640 - 128, 384 + 50, 100, 100, 0, 0);
-  pic_move1(valuePic1, 0, 0, 100, 100, 255, 90);
-  pic_move1(valuePic1 + 11, 0, 0, 100, 100, 255, 90);
-  tachie_bless(valuePic1 + 2, 1);
-  return 60; // valuePicWait2
+  $gameScreen.showPicture(firstPictureId + 15, scenePictureName + '14_00', 1, 640 - 128, 384 + 50, 100, 100, 0, 0);
+
+  pic_move1(firstPictureId, 0, 0, 100, 100, 255, 90);
+  pic_move1(firstPictureId + 11, 0, 0, 100, 100, 255, 90);
+  tachie_bless(firstPictureId + 2, 1);
+
+  return 60;//valuePicWait2
 }
 
-function hMedicalExaminationStep2OriginalScene(valuePic1) {
-  // Case 2:
-  // Move picture (id = valuePic1+12) upward then wait
-  pic_move1(valuePic1 + 12, 0, -200, 100, 100, 255, 180);
+// step2: 差分12を上へ移動
+function hMedicalExaminationStep2OriginalScene(firstPictureId) {
+  pic_move1(firstPictureId + 12, 0, -200, 100, 100, 255, 180);
   return 120;
 }
 
-function hMedicalExaminationStep3OriginalScene(valuePic1) {
-  // Case 3:
-  // Move picture (id = valuePic1+2) downward and set wait time
-  pic_move1(valuePic1 + 2, 0, 50, 100, 100, 255, 180);
+// step3: 差分2を下へ移動
+function hMedicalExaminationStep3OriginalScene(firstPictureId) {
+  pic_move1(firstPictureId + 2, 0, 50, 100, 100, 255, 180);
   return 60;
 }
 
+// step4: 画面アニメーション(爆発/閃光)
 function hMedicalExaminationStep4OriginalScene() {
-  // Case 4:
-  // Start an animation (e.g., explosion/flash effect)
   $gameScreen.startAnimation(520, 680, 179, false);
 }
 
-function hMedicalExaminationStep5OriginalScene(valuePic1) {
-  // Case 5:
-  // Increase the cell count of picture id = valuePic1+12 if available
-  const pictureIdToAddCell = valuePic1 + 12;
-  if ($gameScreen.picture(pictureIdToAddCell)) {
-    $gameScreen.picture(pictureIdToAddCell).addCellCount();
-  }
+// step5: 差分12のセルを進める
+function hMedicalExaminationStep5OriginalScene(firstPictureId) {
+  addPictureCellCountIfExists(firstPictureId + 12);
 }
 
-function hMedicalExaminationStep6OriginalScene(valuePic1) {
-  // Case 6:
-  // Increase cell count for picture id = valuePic1+2 and perform move animations and fade.
-  const pictureIdForCellIncrease = valuePic1 + 2;
-  if ($gameScreen.picture(pictureIdForCellIncrease)) {
-    $gameScreen.picture(pictureIdForCellIncrease).addCellCount();
-  }
-  pic_move1(valuePic1 + 11, 0, 0, 100, 100, 0, 60);
-  pic_move1(valuePic1 + 12, 0, 0, 100, 100, 0, 60);
-  pic_move1(valuePic1 + 1, 0, 0, 100, 100, 200, 120);
+// step6: 差分2のセルを進め、各差分をフェードアウト
+function hMedicalExaminationStep6OriginalScene(firstPictureId) {
+  addPictureCellCountIfExists(firstPictureId + 2);
+
+  pic_move1(firstPictureId + 11, 0, 0, 100, 100, 0, 60);
+  pic_move1(firstPictureId + 12, 0, 0, 100, 100, 0, 60);
+  pic_move1(firstPictureId + 1, 0, 0, 100, 100, 200, 120);
+
   const fadeAnimationName = 'Hscene005';
-  picture_fade1(valuePic1 + 1, "fadeIn", fadeAnimationName, 120, 5);
+  picture_fade1(firstPictureId + 1, "fadeIn", fadeAnimationName, 120, 5);
 }
 
-function idScene11handleCase7OriginalScene(valuePic1) {
-  // Case 7:
-  // Move pictures for id = valuePic1+13 and valuePic1+15 and set a wait timer.
-  pic_move1(valuePic1 + 13, 0, 0, 100, 100, 255, 120);
-  pic_move1(valuePic1 + 15, 0, -50, 100, 100, 255, 120);
+// step7: 差分13/15の移動
+function idScene11handleCase7OriginalScene(firstPictureId) {
+  pic_move1(firstPictureId + 13, 0, 0, 100, 100, 255, 120);
+  pic_move1(firstPictureId + 15, 0, -50, 100, 100, 255, 120);
   return 120;
 }
 
-function hMedicalExaminationStep8OriginalScene(valuePic1) {
-  // Case 8:
-  // Set arrays for picture properties, trigger piston effect and add cell count to extra picture.
-  pic_setArray1 = [1, valuePic1 + 13, 0, 384 + (1732 / 2) - (768 / 2) + 100, 5, 1200];
+// step8: ピストン演出の開始とピクチャ配列の設定
+function hMedicalExaminationStep8OriginalScene(firstPictureId) {
+  pic_setArray1 = [1, firstPictureId + 13, 0, 384 + (1732 / 2) - (768 / 2) + 100, 5, 1200];
   pic_setArray2 = [1, 0, 0, 0, 0, 0];
   valueParallelPicSe1 = [0, 0, 0];
   valueParallelPicSe2 = [0, 0, 0];
-  hcg_piston(valuePic1 + 13, 8, 1, 2);
+
+  hcg_piston(firstPictureId + 13, 8, 1, 2);
   $gameSwitches.setValue(429, true);
-  const extraPictureId = valuePic1 + 15;
-  if ($gameScreen.picture(extraPictureId)) {
-    $gameScreen.picture(extraPictureId).addCellCount();
-  }
+
+  addPictureCellCountIfExists(firstPictureId + 15);
   return 60;
 }
 
+// step9: ピストン演出の終了
 function hMedicalExaminationStep9OriginalScene() {
-  // Case 9:
-  // Reset switch and arrays and apply smooth motion
   $gameSwitches.setValue(429, false);
   valueParallelPicSe1 = [0, 0, 0];
   valueParallelPicSe2 = [0, 0, 0];
@@ -2507,179 +2781,188 @@ function hMedicalExaminationStep9OriginalScene() {
   picture_motion1("smooth", [0]);
 }
 
-function hMedicalExaminationStep10OriginalScene(valuePic1) {
-  // Case 10:
-  // Move several pictures back to original state
-  pic_move1(valuePic1, 0, 0, 200, 200, 255, 60);
-  pic_move1(valuePic1 + 1, 0, 0, 100, 100, 0, 60);
-  pic_move1(valuePic1 + 13, 0, 0, 100, 100, 0, 60);
-  pic_move1(valuePic1 + 15, 0, 0, 100, 100, 0, 60);
+// step10: 各差分を元の状態へ戻す
+function hMedicalExaminationStep10OriginalScene(firstPictureId) {
+  pic_move1(firstPictureId, 0, 0, 200, 200, 255, 60);
+  pic_move1(firstPictureId + 1, 0, 0, 100, 100, 0, 60);
+  pic_move1(firstPictureId + 13, 0, 0, 100, 100, 0, 60);
+  pic_move1(firstPictureId + 15, 0, 0, 100, 100, 0, 60);
   return 60;
 }
 
-function hMedicalExaminationStep11OriginalScene(valuePic1) {
-  // Case 11:
-  // Add cell count to picture valuePic1+2 and adjust movements for id+11 and id+12
-  pic_move1(valuePic1, 0, 0, 100, 100, 255, 60);
-  const altPictureIdForCellIncrease = valuePic1 + 2;
-  if ($gameScreen.picture(altPictureIdForCellIncrease)) {
-    $gameScreen.picture(altPictureIdForCellIncrease).addCellCount();
-  }
-  pic_move1(valuePic1 + 11, 0, 0, 100, 100, 255, 60);
-  pic_move1(valuePic1 + 12, 0, 0, 100, 100, 255, 60);
+// step11: 差分2のセルを進め、差分11/12を戻す
+function hMedicalExaminationStep11OriginalScene(firstPictureId) {
+  pic_move1(firstPictureId, 0, 0, 100, 100, 255, 60);
+  addPictureCellCountIfExists(firstPictureId + 2);
+  pic_move1(firstPictureId + 11, 0, 0, 100, 100, 255, 60);
+  pic_move1(firstPictureId + 12, 0, 0, 100, 100, 255, 60);
 }
 
-function hMedicalExaminationStep12OriginalScene(valuePic1) {
-  // Case 12:
-  // Move picture (id = valuePic1+12) downwards and set wait timer
-  pic_move1(valuePic1 + 12, 0, +200, 100, 100, 255, 180);
+// step12: 差分12を下へ移動
+function hMedicalExaminationStep12OriginalScene(firstPictureId) {
+  pic_move1(firstPictureId + 12, 0, +200, 100, 100, 255, 180);
   return 120;
 }
 
-function hMedicalExaminationStep90OriginalScene(valuePic1) {
-  // Case 90: //2と3の間に仕様
-  // Specialized movement between cases 2 and 3
-  pic_move1(valuePic1, 0, 0, 25, 25, 150, 60);
-  pic_move1(valuePic1 + 11, 0, 0, 25, 25, 150, 60);
-  pic_move1(valuePic1 + 11, 0, 0, 25, 25, 150, 60);
+// step90: 2と3の間の仕様
+function hMedicalExaminationStep90OriginalScene(firstPictureId) {
+  pic_move1(firstPictureId, 0, 0, 25, 25, 150, 60);
+  //NOTE: 元コードでは差分11を2回移動している(11と12の取り違えと思われるが挙動を変えない)
+  pic_move1(firstPictureId + 11, 0, 0, 25, 25, 150, 60);
+  pic_move1(firstPictureId + 11, 0, 0, 25, 25, 150, 60);
   return 60;
 }
 
-function hMedicalExaminationStep91OriginalScene(valuePic1) {
-  // Case 91: //2と3の間に仕様
-  // Revert movement adjustments for pictures
-  pic_move1(valuePic1, 0, 0, 100, 100, 255, 60);
-  pic_move1(valuePic1 + 11, 0, 0, 100, 100, 255, 60);
-  pic_move1(valuePic1 + 11, 0, 0, 100, 100, 255, 60);
+// step91: 2と3の間の仕様(step90の取り消し)
+function hMedicalExaminationStep91OriginalScene(firstPictureId) {
+  pic_move1(firstPictureId, 0, 0, 100, 100, 255, 60);
+  //NOTE: step90 と同じく差分11を2回移動している。挙動を変えないためそのまま。
+  pic_move1(firstPictureId + 11, 0, 0, 100, 100, 255, 60);
+  pic_move1(firstPictureId + 11, 0, 0, 100, 100, 255, 60);
 }
+//#endregion
 
-function monicaMassageStep1OriginalScene(valuePic1) {
-  // Case 1: Initial background and face animation setup
-  AudioManager.playBgs({ "name": "21_HandyMassager1", "volume": 50, "pitch": 100, "pan": 0 });
-  let bgImage = 'XevS101_00back';
-  pic_1(0, valuePic1, bgImage, 0, 100, 255, 60, 1280, 768, -256, 0);
-  bgImage = 'XevS101_00back2';
-  pic_1(0, valuePic1 + 1, bgImage, 0, 100, 255, 60, 1280, 768, -256, 0);
-  bgImage = 'XevS101_01';
-  pic_1(0, valuePic1 + 2, bgImage, 0, 100, 255, 60, 1280, 768, -256, 0);
-  bgImage = 'XevS101_01face1';
-  pic_1(0, valuePic1 + 6, bgImage, 0, 100, 255, 60, 1280, 768, -256, 0);
-  bgImage = 'XevS101_01_100';
-  picture_anime1(valuePic1 + 7, bgImage, 5, 1, "連番", 15, 3, true, [2, 3, 4, 5]);
-  $gameScreen.picture(valuePic1 + 7)._x = 640 - 128;
-  $gameScreen.movePicture(valuePic1 + 7, 1, 640 - 128, 384, 100, 100, 200, 0, 60);
-  picture_anime1(valuePic1 + 8, bgImage, 5, 1, "連番", 20, 3, true, [4, 5, 2, 3]);
-  $gameScreen.picture(valuePic1 + 8)._x = 640 - 128;
-  $gameScreen.movePicture(valuePic1 + 8, 1, 640 - 128, 384, 100, 100, 100, 0, 60);
-  for (let pictureIndex = valuePic1 + 1; pictureIndex <= valuePic1 + 8; pictureIndex++) {
-    hcg_piston(pictureIndex, 5, 1, 2);
+//#region scenes100
+const MONICA_MASSAGE_BGS_HANDY_MASSAGER = { "name": "21_HandyMassager1", "volume": 50, "pitch": 100, "pan": 0 };
+const MONICA_MASSAGE_BGS_HANDY_MASSAGER_FASTER = { "name": "21_HandyMassager1", "volume": 60, "pitch": 120, "pan": 0 };
+//マッサージ差分は 101_xx 系のピクチャを +1 .. +10 のIDで並べる
+const MONICA_MASSAGE_PICTURE_OFFSET_FIRST = 1;
+const MONICA_MASSAGE_PICTURE_OFFSET_LAST = 8;
+
+// step1: 背景・顔差分・振動の初期化
+function monicaMassageStep1OriginalScene(firstPictureId) {
+  AudioManager.playBgs(MONICA_MASSAGE_BGS_HANDY_MASSAGER);
+
+  pic_1(0, firstPictureId, 'XevS101_00back', 0, 100, 255, 60, 1280, 768, -256, 0);
+  pic_1(0, firstPictureId + 1, 'XevS101_00back2', 0, 100, 255, 60, 1280, 768, -256, 0);
+  pic_1(0, firstPictureId + 2, 'XevS101_01', 0, 100, 255, 60, 1280, 768, -256, 0);
+  pic_1(0, firstPictureId + 6, 'XevS101_01face1', 0, 100, 255, 60, 1280, 768, -256, 0);
+
+  showMonicaMassageVibrationPictures(firstPictureId, 'XevS101_01_100', [2, 3, 4, 5], [4, 5, 2, 3], 15, 20);
+
+  for (let pictureId = firstPictureId + MONICA_MASSAGE_PICTURE_OFFSET_FIRST;
+    pictureId <= firstPictureId + MONICA_MASSAGE_PICTURE_OFFSET_LAST; pictureId++) {
+    hcg_piston(pictureId, 5, 1, 2);
   }
 }
 
-function monicaMassageStep2OriginalScene(valuePic1) {
-  // Case 2: Update expression and body vibration (piston) when already vibrating
-  AudioManager.playBgs({ "name": "21_HandyMassager1", "volume": 60, "pitch": 120, "pan": 0 });
-  let bgAniImage = 'XevS101_01';
-  pic_1(2, valuePic1 + 2, bgAniImage, 0, 100, 255, 1, 1280, 768, -256, 0);
-  bgAniImage = 'XevS101_01face2';
-  pic_1(2, valuePic1 + 6, bgAniImage, 0, 100, 255, 1, 1280, 768, -256, 0);
-  bgAniImage = 'XevS101_02_100';
-  picture_anime1(valuePic1 + 7, bgAniImage, 5, 1, "連番", 5, 3, true, [0, 2, 3, 4, 5]);
-  $gameScreen.picture(valuePic1 + 7)._x = 640 - 128;
-  $gameScreen.movePicture(valuePic1 + 7, 1, 640 - 128, 384, 100, 100, 200, 0, 60);
-  picture_anime1(valuePic1 + 8, bgAniImage, 5, 1, "連番", 10, 3, true, [0, 4, 5, 2, 3]);
-  $gameScreen.picture(valuePic1 + 8)._x = 640 - 128;
-  $gameScreen.movePicture(valuePic1 + 8, 1, 640 - 128, 384, 100, 100, 100, 0, 60);
-  for (let pictureIndex = valuePic1 + 1; pictureIndex <= valuePic1 + 8; pictureIndex++) {
-    hcg_piston(pictureIndex, 5, 3, 2);
+// step2: 表情2へ変更し振動を強める
+function monicaMassageStep2OriginalScene(firstPictureId) {
+  AudioManager.playBgs(MONICA_MASSAGE_BGS_HANDY_MASSAGER_FASTER);
+
+  pic_1(2, firstPictureId + 2, 'XevS101_01', 0, 100, 255, 1, 1280, 768, -256, 0);
+  pic_1(2, firstPictureId + 6, 'XevS101_01face2', 0, 100, 255, 1, 1280, 768, -256, 0);
+
+  showMonicaMassageVibrationPictures(firstPictureId, 'XevS101_02_100', [0, 2, 3, 4, 5], [0, 4, 5, 2, 3], 5, 10);
+
+  for (let pictureId = firstPictureId + MONICA_MASSAGE_PICTURE_OFFSET_FIRST;
+    pictureId <= firstPictureId + MONICA_MASSAGE_PICTURE_OFFSET_LAST; pictureId++) {
+    hcg_piston(pictureId, 5, 3, 2);
   }
 }
 
-function monicaMassageStep3OriginalScene(valuePic1) {
-  // Case 3: Erase part, update face, and add new animations with different piston parameters
-  pic_eraseP(2, [valuePic1 + 2]);
-  let bgAniImage = 'XevS101_02';
-  pic_1(2, valuePic1 + 3, bgAniImage, 0, 100, 255, 1, 1280, 768, -256, 0);
-  bgAniImage = 'XevS101_01face3';
-  pic_1(2, valuePic1 + 6, bgAniImage, 0, 100, 255, 1, 1280, 768, -256, 0);
-  bgAniImage = 'XevS101_03_100';
-  picture_anime1(valuePic1 + 9, bgAniImage, 4, 1, "連番", 5, 3, true, [3, 1, 5, 1]);
-  $gameScreen.picture(valuePic1 + 9)._x = 640 - 128;
-  $gameScreen.movePicture(valuePic1 + 9, 1, 640 - 128, 384, 100, 100, 255, 0, 10);
-  picture_anime1(valuePic1 + 10, bgAniImage, 4, 1, "連番", 5, 3, true, [1, 2, 1, 4]);
-  $gameScreen.picture(valuePic1 + 10)._x = 640 - 128;
-  $gameScreen.movePicture(valuePic1 + 10, 1, 640 - 128, 384, 100, 100, 255, 0, 10);
-  for (let pictureIndex = valuePic1 + 1; pictureIndex <= valuePic1 + 8; pictureIndex++) {
-    hcg_piston(pictureIndex, 5, 3, 2);
+// step3: 差分を差し替え、新しい振動差分を追加
+function monicaMassageStep3OriginalScene(firstPictureId) {
+  pic_eraseP(2, [firstPictureId + 2]);
+
+  pic_1(2, firstPictureId + 3, 'XevS101_02', 0, 100, 255, 1, 1280, 768, -256, 0);
+  pic_1(2, firstPictureId + 6, 'XevS101_01face3', 0, 100, 255, 1, 1280, 768, -256, 0);
+
+  showMonicaMassageVibrationPicture(firstPictureId + 9, 'XevS101_03_100', 4, [3, 1, 5, 1], 5, 255, 10);
+  showMonicaMassageVibrationPicture(firstPictureId + 10, 'XevS101_03_100', 4, [1, 2, 1, 4], 5, 255, 10);
+
+  for (let pictureId = firstPictureId + MONICA_MASSAGE_PICTURE_OFFSET_FIRST;
+    pictureId <= firstPictureId + MONICA_MASSAGE_PICTURE_OFFSET_LAST; pictureId++) {
+    hcg_piston(pictureId, 5, 3, 2);
   }
-  for (let pictureIndex = valuePic1 + 9; pictureIndex <= valuePic1 + 10; pictureIndex++) {
-    hcg_piston(pictureIndex, 5, 3, 1);
+  for (let pictureId = firstPictureId + 9; pictureId <= firstPictureId + 10; pictureId++) {
+    hcg_piston(pictureId, 5, 3, 1);
   }
 }
 
-function monicaMassageStep4OriginalScene(valuePic1, yOffset, scalePercent) {// id3,id4 undefined here because did not set in parent function
-  // Case 4: Move all pictures with dynamic parameters (id3 and id4)
-  for (let pictureIndex = valuePic1; pictureIndex <= valuePic1 + 10; pictureIndex++) {
-    if ($gameScreen.picture(pictureIndex)) {
-      const currentOpacity = $gameScreen.picture(pictureIndex).opacity();
-      $gameScreen.movePicture(pictureIndex, 1, 640, 384 + yOffset, scalePercent, scalePercent, currentOpacity, 0, 120);
-    }
+// step4: 全差分を画面中央へ移動
+function monicaMassageStep4OriginalScene(firstPictureId, yOffset, scalePercent) {
+  for (let pictureId = firstPictureId; pictureId <= firstPictureId + 10; pictureId++) {
+    const picture = $gameScreen.picture(pictureId);
+    if (!picture) continue;
+
+    const currentOpacity = picture.opacity();
+    $gameScreen.movePicture(pictureId, 1, 640, 384 + yOffset, scalePercent, scalePercent, currentOpacity, 0, 120);
   }
 }
 
-function monicaMassageStep5OriginalScene(valuePic1) {
-  // Case 5: Display new background with piston effect
-  let bgAniImage = 'XevS101_04back';
-  pic_1(0, valuePic1, bgAniImage, 0, 100, 255, 120, 1280, 768, 0, 0);
-  bgAniImage = 'XevS101_04';
-  pic_1(0, valuePic1 + 1, bgAniImage, 0, 100, 255, 120, 1280, 768, 0, 0);
-  hcg_piston(valuePic1 + 1, 5, 1, 2);
+// step5: 新しい背景を表示
+function monicaMassageStep5OriginalScene(firstPictureId) {
+  pic_1(0, firstPictureId, 'XevS101_04back', 0, 100, 255, 120, 1280, 768, 0, 0);
+  pic_1(0, firstPictureId + 1, 'XevS101_04', 0, 100, 255, 120, 1280, 768, 0, 0);
+  hcg_piston(firstPictureId + 1, 5, 1, 2);
 }
 
-function monicaMassageStep6OriginalScene(valuePic1) {
-  // Case 6: Erase a set of pictures
+// step6: 差分をまとめて消去
+function monicaMassageStep6OriginalScene(firstPictureId) {
   const pictureIdsToErase = [];
-  for (let picEraseIndex = valuePic1; picEraseIndex <= valuePic1 + 11; picEraseIndex++) {
-    pictureIdsToErase.push(picEraseIndex);
+  for (let pictureId = firstPictureId; pictureId <= firstPictureId + 11; pictureId++) {
+    pictureIdsToErase.push(pictureId);
   }
   pic_eraseP(0, pictureIdsToErase);
 }
 
-function monicaMassageStep7OriginalScene(valuePic1) {
-  // Case 7: Fade out background sounds and animate picture scale to zero
+// step7: BGSをフェードアウトし、差分を縮小して消す
+function monicaMassageStep7OriginalScene(firstPictureId) {
   AudioManager.fadeOutBgs(10);
-  for (let pictureIndex = valuePic1; pictureIndex <= valuePic1 + 10; pictureIndex++) {
-    if ($gameScreen.picture(pictureIndex)) {
-      pic_move1(pictureIndex, 0, 0, 300, 300, 0, 120);
-    }
+  for (let pictureId = firstPictureId; pictureId <= firstPictureId + 10; pictureId++) {
+    if (!$gameScreen.picture(pictureId)) continue;
+    pic_move1(pictureId, 0, 0, 300, 300, 0, 120);
   }
 }
 
-function monicaMassageStep8OriginalScene(valuePic1) {
-  // Case 8: Bring back background sound and scale pictures back in
-  AudioManager.playBgs({ "name": "21_HandyMassager1", "volume": 60, "pitch": 120, "pan": 0 });
-  for (let pictureIndex = valuePic1; pictureIndex <= valuePic1 + 10; pictureIndex++) {
-    if ($gameScreen.picture(pictureIndex)) {
-      pic_move1(pictureIndex, 0, 0, 300, 300, 255, 60);
-    }
+// step8: BGSを戻し、差分を元の倍率に戻す
+function monicaMassageStep8OriginalScene(firstPictureId) {
+  AudioManager.playBgs(MONICA_MASSAGE_BGS_HANDY_MASSAGER_FASTER);
+  for (let pictureId = firstPictureId; pictureId <= firstPictureId + 10; pictureId++) {
+    if (!$gameScreen.picture(pictureId)) continue;
+    pic_move1(pictureId, 0, 0, 300, 300, 255, 60);
   }
 }
 
-function monicaMassageStep9OriginalScene(valuePic1) {
-  // Case 9: Update animation and reapply piston effect on a specific picture
-  let aniImage = 'XevS101_05';
-  pic_1(0, valuePic1 + 2, aniImage, 2, 100, 255, 60, 1280, 768, 0, 0);
-  hcg_piston(valuePic1 + 2, 5, 1, 2);
+// step9: 最終差分の表示とピストン演出
+function monicaMassageStep9OriginalScene(firstPictureId) {
+  pic_1(0, firstPictureId + 2, 'XevS101_05', 2, 100, 255, 60, 1280, 768, 0, 0);
+  hcg_piston(firstPictureId + 2, 5, 1, 2);
 }
+
+// 振動差分(手前と奥の2枚)をまとめて表示する。
+function showMonicaMassageVibrationPictures(firstPictureId, animationImageName,
+  frontCellPattern, backCellPattern, frontSpeed, backSpeed) {
+  showMonicaMassageVibrationPicture(firstPictureId + 7, animationImageName, 5, frontCellPattern, frontSpeed, 200, 60);
+  showMonicaMassageVibrationPicture(firstPictureId + 8, animationImageName, 5, backCellPattern, backSpeed, 100, 60);
+}
+
+// 振動差分1枚分(連番アニメ + X座標を直接指定 + 移動)。
+function showMonicaMassageVibrationPicture(pictureId, animationImageName, cellCount,
+  cellPattern, animationSpeed, opacity, moveDuration) {
+  picture_anime1(pictureId, animationImageName, cellCount, 1, "連番", animationSpeed, 3, true, cellPattern);
+  $gameScreen.picture(pictureId)._x = 640 - 128;
+  $gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, opacity, 0, moveDuration);
+}
+//#endregion
+
+//#region adjustSceneId
+// 変数535(501-600)にシーンIDを直接入力してテストできるようにする。
+const SCENE_ID_TEST_VARIABLE_ID = 535;
+const SCENE_ID_TEST_RANGE_FIRST = 501;
+const SCENE_ID_TEST_RANGE_LAST = 600;
+const SCENE_ID_TEST_OFFSET = 500;
 
 function adjustSceneIdOriginalScene(idScene) {
-  const var535 = $gameVariables.value(535);
-  if (idScene === 0 && var535 >= 1) {
-    if (var535 >= 501 && var535 <= 600) {
-      idScene = var535 - 500;
-    }
-  }
-  return idScene;
+  if (idScene !== 0) return idScene;
+
+  const sceneIdTestValue = $gameVariables.value(SCENE_ID_TEST_VARIABLE_ID);
+  if (sceneIdTestValue < SCENE_ID_TEST_RANGE_FIRST) return idScene;
+  if (sceneIdTestValue > SCENE_ID_TEST_RANGE_LAST) return idScene;
+  return sceneIdTestValue - SCENE_ID_TEST_OFFSET;
 }
+//#endregion
 
 //}());
+
