@@ -10495,31 +10495,43 @@
     valueWordArray = [];
   };
 
+  // ワープポイント一覧のマップ表示名取得用にマップデータを読み込む。
+  // DataManager.loadDataFileは非同期で、読み出し時にwindow.$dataMap2がnullのまま
+  // になるため、ローカルファイル限定の同期読み込みで読み出し前にデータを揃える
+  AGH_loadMapDataFileSync = function (mapId) {
+    const filename = "MAP" + ("000" + mapId).slice(-3) + ".json";
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", "data/" + filename, false);
+    xhr.overrideMimeType("application/json");
+    xhr.send(null);
+    window.$dataMap2 = xhr.status < 400 ? JSON.parse(xhr.responseText) : null;
+    DataManager.onLoad(window.$dataMap2);
+  };
+
   // Replaces (1x): CommonEvents.json:common-event:49|ダンジョンワープポイント
   AGH_sliceArrayMAP = function () {
-    const scriptArray = valueScriptArray1[0];
-    const mapId = Number(scriptArray[0]);
-    filename = "MAP" + ("000" + mapId).slice(-3) + ".json";
-    DataManager.loadDataFile("$dataMap2", filename);
+    const entranceWarpEntry = valueScriptArray1[0];
+    if (!entranceWarpEntry) return;
+    AGH_loadMapDataFileSync(Number(entranceWarpEntry[0]));
   };
 
   // Replaces (1x): CommonEvents.json:common-event:49|ダンジョンワープポイント
   AGH_pushToArrayDungeonWarpPoint = function () {
-    const displayNameText = $dataMap2.displayName;
+    const displayNameText = window.$dataMap2 ? window.$dataMap2.displayName : "";
     valueWordArray.push(`${displayNameText}(入口)`);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:49|ダンジョンワープポイント
   AGH_readVariableRandomWork1 = function () {
-    const mapScriptSettings = valueScriptArray1[$gameVariables.value(HELPER_VARIABLE.RANDOM_WORK_1)];
-    const mapId = Number(mapScriptSettings[0]);
-    filename = "MAP" + ("000" + mapId).slice(-3) + ".json";
-    DataManager.loadDataFile("$dataMap2", filename);
+    const warpEntry = valueScriptArray1[$gameVariables.value(HELPER_VARIABLE.RANDOM_WORK_1)];
+    if (!warpEntry) return;
+    AGH_loadMapDataFileSync(Number(warpEntry[0]));
   };
 
   // Replaces (1x): CommonEvents.json:common-event:49|ダンジョンワープポイント
   AGH_pushToArrayDungeonWarpPoint_2 = function () {
-    valueWordArray.push($dataMap2.displayName);
+    const displayNameText = window.$dataMap2 ? window.$dataMap2.displayName : "";
+    valueWordArray.push(displayNameText);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:49|ダンジョンワープポイント
@@ -10536,19 +10548,26 @@
 
   // Replaces (1x): CommonEvents.json:common-event:49|ダンジョンワープポイント
   AGH_readVariableItemProcessWorkDungeonWarpPoint = function () {
-    arr1 = valueScriptArray1[$gameVariables.value(HELPER_VARIABLE.PROCESSED_ENTRY_ID)];
+    const warpEntry = valueScriptArray1[$gameVariables.value(HELPER_VARIABLE.PROCESSED_ENTRY_ID)];
+    // 選択されたワープポイント([mapId,x,y])は後続ヘルパーへ暗黙グローバルで受け渡す
+    selectedWarpEntry = warpEntry || null;
   };
 
   // Replaces (1x): CommonEvents.json:common-event:49|ダンジョンワープポイント
   AGH_setVariableDungeonWarpPoint = function () {
-    $gameVariables.setValue(161, [Number(arr1[0]), Number(arr1[1]), Number(arr1[2])]);
+    if (!selectedWarpEntry) return;
+    $gameVariables.setValue(161, [Number(selectedWarpEntry[0]), Number(selectedWarpEntry[1]), Number(selectedWarpEntry[2])]);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:49|ダンジョンワープポイント
   AGH_setSwitchTemporarySwitch = function (interp) {
-    const array = [Number(arr1[0]), Number(arr1[1]), Number(arr1[2])];
-    const mapEvent = $gameMap.event(interp._eventId);
-    const mapPosition = [$gameMap.mapId(), mapEvent.x, mapEvent.y];
+    if (!selectedWarpEntry) return;
+    const array = [Number(selectedWarpEntry[0]), Number(selectedWarpEntry[1]), Number(selectedWarpEntry[2])];
+    // 呼び出し元イベントがあればその位置を、無ければプレイヤー位置を現在地とする
+    const mapEvent = interp ? $gameMap.event(interp._eventId) : null;
+    const currentX = mapEvent ? mapEvent.x : $gamePlayer.x;
+    const currentY = mapEvent ? mapEvent.y : $gamePlayer.y;
+    const mapPosition = [$gameMap.mapId(), currentX, currentY];
     if (array[0] == mapPosition[0] && array[1] == mapPosition[1] && array[2] == mapPosition[2]) {
       $gameSwitches.setValue(HELPER_SWITCH.TEMPORARY_FLAG, true);
     } else {
@@ -12697,7 +12716,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:129|ボス覚醒行動
   // `a` (troop member) and `valueBossAction` are implicit globals set by the
-  // preceding helpers in the same event, like arr1 in the warp-point event.
+  // preceding helpers in the same event, like selectedWarpEntry in the warp-point event.
   AGH_runBossAwakenAttack = function (interp) {
     attack_keisan1(a, valueBossAction, 1);
     interp.forceAction(a, valueBossAction, -1);
