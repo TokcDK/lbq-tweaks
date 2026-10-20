@@ -8298,7 +8298,8 @@
   // Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
   AGH_debugLogTreasurePools = function () {
     const treasurePool = eval(`valueDanjonTreasure${varValue(CURRENT_ACTOR_VAR)}`);
-    const treasureKindPool = eval(`valueDanjonTrSyurui${varValue(CURRENT_ACTOR_VAR)}`);
+    //treasureKindPool is only read by the commented debug log below
+    //const treasureKindPool = eval(`valueDanjonTrSyurui${varValue(CURRENT_ACTOR_VAR)}`);
     //console.log(treasurePool);
     //console.log(treasureKindPool);
     const pickedTreasureId = treasurePool[getRandomIndex(treasurePool.length)];
@@ -9344,7 +9345,8 @@
 
   // Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
   AGH_iterateSkillsVariousUseCommands = function () {
-    const action = BattleManager._action;
+    //action is only referenced by the commented debug block below
+    //const action = BattleManager._action;
     //if(action.isSkill()){
     //var value1 = $dataSkills[action._item._itemId].stypeId;
     //if(value == 1){
@@ -9482,8 +9484,9 @@
   // Replaces (1x): CommonEvents.json:common-event:4|条件分岐
   AGH_setSelfVariableActorChoiceConditionBranch = function (interp) {
     interp.sVal(20, 1);
-    const actor = $gameActors.actor($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID));
-    const list = actor.actor().traits;
+    //actor/list are only referenced by the commented debug block below
+    //const actor = $gameActors.actor($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID));
+    //const list = actor.actor().traits;
     //list.forEach(function (id) {
     //console.log(id);
     //}, this);
@@ -9498,8 +9501,9 @@
 
   // Replaces (1x): CommonEvents.json:common-event:4|条件分岐
   AGH_runScriptConditionBranch = function () {
-    const start = 1;
-    const end = $dataSkills.length - 1;
+    //start/end are only referenced by the commented debug loop below
+    //const start = 1;
+    //const end = $dataSkills.length - 1;
     //for (var i = start; i <= end; i++) {
     //-1をしないとスキル上限+1まで範囲にしてしまいエラーが出る為
   };
@@ -9631,8 +9635,9 @@
 
   // Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
   AGH_computeMaxFrequentlyUsed = function () {
-    const array = [1, 3, 5, 8];
-    const maxValue = Math.max(...array);
+    //dead verbatim extraction: the computed max was never used by callers
+    //const array = [1, 3, 5, 8];
+    //const maxValue = Math.max(...array);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
@@ -9696,8 +9701,9 @@
 
   // Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
   AGH_runScriptFrequentlyUsed_2 = function () {
-    const array = [10, 30, 40, 50];
-    const randomIndex = array[getRandomIndex(array.length)];
+    //dead verbatim extraction: randomIndex was never written anywhere
+    //const array = [10, 30, 40, 50];
+    //const randomIndex = array[getRandomIndex(array.length)];
   };
 
   // Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
@@ -10018,7 +10024,8 @@
     //統合衣装用の0も含める。（代入変数を利用しなくていい為可能）
     const list = $gameVariables.value(HELPER_VARIABLE.HEROINE_ACTOR_IDS);
     list.forEach(function (id) {
-      const actor = $gameActors.actor(id);
+      //actor is only referenced by the commented debug block below
+      //const actor = $gameActors.actor(id);
       //if($gameParty.members().contains(actor)){
       const start = 0;
       const end = 42;
@@ -10628,8 +10635,9 @@
   // Replaces (1x): CommonEvents.json:common-event:53|デバッグコモン
   AGH_setSelfVariableActorChoice_5 = function (interp) {
     interp.sVal(20, 1);
-    const actor = $gameActors.actor($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID));
-    const stateResistancePercent = actor.stateRate(62) * 100;
+    //dead debug leftovers: the commented log printed value1, not these
+    //const actor = $gameActors.actor($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID));
+    //const stateResistancePercent = actor.stateRate(62) * 100;
     //console.log(`${value1}`);
   };
 
@@ -10981,7 +10989,8 @@
   // Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
   AGH_setPicturesAnimationConversationGabCommon = function () {
     const talkSet = valueTalkSet;
-    const actor = $gameActors.actor(talkSet[1]);
+    //actor is a dead verbatim leftover: nothing in this branch uses it
+    //const actor = $gameActors.actor(talkSet[1]);
     if (!(talkSet[0] == 2)) return;
 
     $gameScreen.setPicturesAnimation(2, 10, "連番", talkSet[2]);
@@ -12638,7 +12647,8 @@
   AGH_iterateTroopMembersEnemyTransformCommon_3 = function () {
     const wordSet = valueWordSet8;
     const troopMember = $gameTroop.members()[valueWordSet10];
-    const enemy1 = troopMember._enemyId;
+    //enemy1 is a dead verbatim leftover: nothing uses it
+    //const enemy1 = troopMember._enemyId;
     troopMember.addState(wordSet);
     troopMember.refresh();
   };
@@ -12706,7 +12716,8 @@
 
   // Replaces (1x): CommonEvents.json:common-event:131|行動条件で設定
   AGH_setSelfVariableRandomWork1SetByActionCondition = function (interp) {
-    const action = BattleManager._action;
+    //action is a dead verbatim leftover: the line below re-reads it
+    //const action = BattleManager._action;
     interp.sVal(21, BattleManager._action._item._itemId);
   };
 
@@ -12957,7 +12968,8 @@
       var outfitPictureVariant = 3;
     }
     const pictureName = "Scene_Dress up" + outfitPictureVariant;
-    const ScreenBlackOut = "ScreenBlackOut";
+    //ScreenBlackOut is a dead verbatim leftover: nothing uses it here
+    //const ScreenBlackOut = "ScreenBlackOut";
     $gameScreen.showPicture(pictureId, pictureName, 1, 640, 384, 100, 100, 0, 0);
     $gameScreen.movePicture(pictureId, 1, 640, 384, 100, 100, 220, 0, 60);
     $gameScreen.showPicture(pictureId + 4, pictureName, 1, 640, 384, 100, 100, 0, 0);
@@ -13225,7 +13237,8 @@
 
   // Replaces (1x): CommonEvents.json:common-event:174|一括売却対象指定
   AGH_readVariableItemProcessWorkBulkSellTargetSelect = function () {
-    const processedEntryId = $gameVariables.value(HELPER_VARIABLE.PROCESSED_ENTRY_ID);
+    //verbatim dead extraction: the local was never read by this event
+    //const processedEntryId = $gameVariables.value(HELPER_VARIABLE.PROCESSED_ENTRY_ID);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:174|一括売却対象指定
@@ -13438,7 +13451,8 @@
 
   // Replaces (1x): CommonEvents.json:common-event:176|訓練人形設定
   AGH_iterateItemsTrainingDollSetup = function () {
-    const trainingPresetIndex = 6;
+    //trainingPresetIndex is a dead verbatim leftover: the loop uses i
+    //const trainingPresetIndex = 6;
     for (var i = 1; i <= 19; i++) {
       if ($gameParty.hasItem($dataItems[i + 340])) {
         const stateData = $dataStates[i + 420];
@@ -13470,10 +13484,11 @@
 
   // Replaces (1x): CommonEvents.json:common-event:176|訓練人形設定
   AGH_readVariableTrainingDollPreset = function () {
-    const trainingPresetIndex = 6;
-    const trainingPresetValue = $gameVariables.value(HELPER_VARIABLE.TRAINING_DOLL_SETTINGS)[
-      trainingPresetIndex
-    ];
+    //trainingPresetIndex/trainingPresetValue are only read by the commented debug log below
+    //const trainingPresetIndex = 6;
+    //const trainingPresetValue = $gameVariables.value(HELPER_VARIABLE.TRAINING_DOLL_SETTINGS)[
+    //  trainingPresetIndex
+    //];
     //console.log(`${variable293Value}`);
   };
 
@@ -13754,15 +13769,14 @@
 
   // Replaces (1x): CommonEvents.json:common-event:186|娼館処理
   AGH_readVariableBrothelProcessing = function () {
-    const actorData = $dataActors[id];
-    const gameVariableValue = $gameVariables.value(id + 380);
-    if (gameVariableValue[27] >= 1) {
-      const displayedAmount = gameVariableValue[27];
-      const earningsUnit = $gameVariables.value(827);
-      var messageText = fontSize(25) + `売春総獲得額:${displayedAmount}回${earningsUnit}`;
-    } else {
-      var messageText = ``;
-    }
+    const actorId = $gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID);
+    const gameVariableValue = $gameVariables.value(actorId + 380);
+    if (!gameVariableValue || gameVariableValue[27] < 1) return;
+
+    const displayedAmount = gameVariableValue[27];
+    const earningsUnit = $gameVariables.value(827);
+    const messageText = fontSize(25) + `売春総獲得額:${displayedAmount}回${earningsUnit}`;
+    TickerManager.show(messageText);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:187|追剥コモン
@@ -15096,7 +15110,8 @@
       const mapEvent = $gameMap.event(id);
       if (!!mapEvent) {
         if (mapEvent.event().meta["Bandit"]) {
-          var event = mapEvent;
+          //event is only referenced by the commented debug call below
+          //var event = mapEvent;
           //event.erase();
         }
       }
@@ -15526,11 +15541,12 @@
   // Replaces (1x): CommonEvents.json:common-event:316|[16]集落の長に話を聞く
   AGH_readVariableEventProgressHero_6 = function () {
     const charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
-    const npcPreset = $gameVariables.value(HELPER_VARIABLE.EVENT_WORK_VALUES)[
-      $gameVariables.value(HELPER_VARIABLE.EPISODE_ITEM_ID)
-    ];
+    //npcPreset/event are dead verbatim leftovers: the respawn call below uses fixed coords
+    //const npcPreset = $gameVariables.value(HELPER_VARIABLE.EVENT_WORK_VALUES)[
+    //  $gameVariables.value(HELPER_VARIABLE.EPISODE_ITEM_ID)
+    //];
     event_respawnSetA(charaSlotId, 14, 18, 1, 2);
-    const event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId]);
+    //const event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId]);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:322|[22]頭目との対峙
@@ -15596,7 +15612,8 @@
 
   // Replaces (1x): CommonEvents.json:common-event:329|[29]水着購入
   AGH_waitActorChoiceSwimsuitPurchase = function (interp) {
-    const actor = $gameActors.actor($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID));
+    //actor is only referenced by the commented debug call below
+    //const actor = $gameActors.actor($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID));
     //actor.addState(693);
     tachie_dousa(2, 1, 2, 14, 1, 255, 1311, 0, 0);
     tachie_dousa(0, 1, 1, 14, 15, 0, 120, 1, 0);
@@ -15606,7 +15623,8 @@
 
   // Replaces (1x): CommonEvents.json:common-event:329|[29]水着購入
   AGH_waitActorChoice_2 = function (interp) {
-    const actor = $gameActors.actor($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID));
+    //actor is only referenced by the commented debug call below
+    //const actor = $gameActors.actor($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID));
     //actor.addState(693);
     tachie_dousa(2, 1, 2, 15, 1, 255, 1347, 0, 0);
     tachie_dousa(0, 1, 1, 15, 14, 0, 180, 0, 0);
@@ -15625,7 +15643,8 @@
     event_respawnSetA(charaSlotId, 12, 4, 0, 2);
     var charaSlotId = 11;
     event_respawnSetN(charaSlotId, npcPreset[8], npcPreset[9], 0, npcPreset[6], npcPreset[7], npcPreset[10]);
-    const event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId]);
+    //event is a dead verbatim leftover: only _eventId is transferred below
+    //const event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId]);
     interp._eventId = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId];
   };
 
@@ -16531,7 +16550,8 @@
 
   // Replaces (1x): CommonEvents.json:common-event:381|情報屋処理
   AGH_setSwitchActorChoiceInfoBrokerProcessing = function () {
-    const actor = $gameActors.actor($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID));
+    //actor is a dead verbatim leftover: switch checks below do not use it
+    //const actor = $gameActors.actor($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID));
     if ($gameSwitches.value(508)) {
       if ($gameSwitches.value(1007) && !$gameSwitches.value(1107)) {
         $gameSwitches.setValue(HELPER_SWITCH.CHOICE_2_ENABLED, true);
@@ -16546,7 +16566,8 @@
 
   // Replaces (1x): CommonEvents.json:common-event:381|情報屋処理
   AGH_setSwitchActorChoice_2 = function () {
-    const actor = $gameActors.actor($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID));
+    //actor is a dead verbatim leftover: switch checks below do not use it
+    //const actor = $gameActors.actor($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID));
     if ($gameSwitches.value(508)) {
       if ($gameSwitches.value(1009) && !$gameSwitches.value(1109)) {
         $gameSwitches.setValue(HELPER_SWITCH.CHOICE_2_ENABLED, true);
@@ -16665,7 +16686,8 @@
 
   // Replaces (1x): CommonEvents.json:common-event:389|情報屋汎用
   AGH_setSwitchNonHSceneBGVStart = function () {
-    const actor = $gameActors.actor($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID));
+    //actor is only referenced by the commented debug block below
+    //const actor = $gameActors.actor($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID));
     //if(actor.meta['SexualEcstasyHi']){var SexualEcstasyHiList = actor1.meta['SexualEcstasyHi'].split(',')};//SexualEcstasyLow  SexualEcstasyMiddle
     //var arr1 = ['（ドキっ）','（ドキドキ）','（ドクン）','ドキッ'];//文字BGV
     const textCandidates = [
@@ -17030,9 +17052,10 @@
   // Replaces (1x): CommonEvents.json:common-event:472|予期せぬ要請
   AGH_readVariableEventProgressHeroUnexpectedRequest = function (interp) {
     const charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
-    const npcPreset = $gameVariables.value(HELPER_VARIABLE.EVENT_WORK_VALUES)[
-      $gameVariables.value(HELPER_VARIABLE.EPISODE_ITEM_ID)
-    ];
+    //npcPreset is a dead verbatim leftover: the respawn call below uses fixed coords
+    //const npcPreset = $gameVariables.value(HELPER_VARIABLE.EVENT_WORK_VALUES)[
+    //  $gameVariables.value(HELPER_VARIABLE.EPISODE_ITEM_ID)
+    //];
     event_respawnSetA(charaSlotId, 8, 4, 1, 2);
     interp._eventId = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId];
     event_respawnSetA(2, 8, 7, 0, 8);
@@ -17244,7 +17267,8 @@
   // Replaces (1x): CommonEvents.json:common-event:516|ゴブリン姦Ⅰ
   AGH_showPictureGoblinRape1_2 = function () {
     const pictureId = valuePic1 + 10;
-    const scenePictureName = valueScenePic + "21";
+    //scenePictureName is only referenced by the commented debug call below
+    //const scenePictureName = valueScenePic + "21";
     //$gameScreen.showPicture(pictureId,scenePictureName,1,640-128+50,384,100,100,0,0);
     $gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
     tachie_bless(pictureId, 2);
@@ -17332,24 +17356,26 @@
 
   // Replaces (1x): CommonEvents.json:common-event:531|『わからせられ』
   AGH_setVariableChoiceSwitch11Warakaserare = function () {
-    const npcPreset = $gameVariables.value(HELPER_VARIABLE.EVENT_WORK_VALUES)[
-      $gameVariables.value(HELPER_VARIABLE.EPISODE_ITEM_ID)
-    ];
+    //npcPreset is a dead verbatim leftover: only the destination is set below
+    //const npcPreset = $gameVariables.value(HELPER_VARIABLE.EVENT_WORK_VALUES)[
+    //  $gameVariables.value(HELPER_VARIABLE.EPISODE_ITEM_ID)
+    //];
     $gameVariables.setValue(HELPER_VARIABLE.EVENT_DESTINATION, [40, 17, 8]);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:531|『わからせられ』
   AGH_readVariableEventProgressHeroWarakaserare = function (interp) {
     var charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
-    const npcPreset = $gameVariables.value(HELPER_VARIABLE.EVENT_WORK_VALUES)[
-      $gameVariables.value(HELPER_VARIABLE.EPISODE_ITEM_ID)
-    ];
+    //npcPreset/event are dead verbatim leftovers: only _eventId is transferred below
+    //const npcPreset = $gameVariables.value(HELPER_VARIABLE.EVENT_WORK_VALUES)[
+    //  $gameVariables.value(HELPER_VARIABLE.EPISODE_ITEM_ID)
+    //];
     event_respawnSetA(charaSlotId, 17, 8, 1, 8);
-    var event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId]);
+    //var event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId]);
 
     var charaSlotId = 11;
     event_respawnSetN(charaSlotId, 17, 6, 0, "4Child", 1, 2);
-    var event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId]);
+    //var event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId]);
     interp._eventId = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId];
   };
 
@@ -19172,7 +19198,8 @@
       if (!!mapEvent) {
         const eventData = mapEvent.event();
         if (eventData.meta["IconDisplay"]) {
-          var iconDisplay = Number(eventData.meta["IconDisplay"]);
+          //iconDisplay is a dead verbatim leftover: the commented debug block reads value1
+          //var iconDisplay = Number(eventData.meta["IconDisplay"]);
           /*if (value1 == 17) {
             if ($gameMap.event(id).characterName() == 0) {
               console.log(`${1}`);
