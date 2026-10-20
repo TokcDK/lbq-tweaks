@@ -142,13 +142,4 @@
 })();
 
 // todo
-// - job points for subclass was set to 25% of main class jp get,
-// calculate and add missing job points for subclass, maybe will be not possible precise
-//
-// - goblins is not disappear after quest of subjugation completed
-//  and instead each next battle not only raises max level
-// of monsters but completes new subjugation quest,
-// need to find and fix the source function
-// check annihilationItem_bonus();
-//
 // fix crash on missing image path in line :"/img/tachies/" + actorParameter, in AmygameTachie.js
