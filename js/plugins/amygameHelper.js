@@ -15106,6 +15106,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
   AGH_readMapEventMetaBandit = function () {
+    /*
     for (var id = 100; id > 0; id--) {
       const mapEvent = $gameMap.event(id);
       if (!!mapEvent) {
@@ -15116,6 +15117,7 @@
         }
       }
     }
+    */
   };
 
   // Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
