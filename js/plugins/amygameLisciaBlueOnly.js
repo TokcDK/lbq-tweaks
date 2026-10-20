@@ -1729,45 +1729,39 @@ kobetu_isyousettei1 = function (actor) {
 };
 
 //リーシャとモニカに露出状態でのキャラチップコート着用
+// バストが存在しないコートの衣装ID(アクター別)。この衣装の時だけ下着差分を隠す
+const NO_BUST_COAT_ITEM_IDS = { 1: 3, 2: 2 };
+// 下着差分を隠す時に全て0である必要がある下着スロット
+const NO_BUST_UNDERWEAR_SLOT_IDS = [20, 21, 22, 23, 25];
+
 isyou_senyouLisciaBlueOnly = function (actorId) {
 
-  if (actorId == 1) {
-    valueBustUpCloth2[actorId] = valueBustUpCloth[actorId];//バスト存在しない衣装がある場合ここで処理
-    if ($gameVariables.value(440 + actorId)[28] == 3) {
-      if ([20, 21, 22, 23, 25].every(function (id) { return $gameVariables.value(440 + actorId)[id] == 0 })) {
-        $gameVariables.setValue(22, 5);
-        $gameVariables.setValue(23, 5);
-      };
-      if ($gameVariables.value(22) == 2) {
-        $gameVariables.setValue(22, 6);
-        $gameVariables.setValue(23, 6);
-      };
-      if ($gameVariables.value(22) == 3) {
-        $gameVariables.setValue(22, 7);
-        $gameVariables.setValue(23, 7);
-      };
-    };
-  };
-  if (actorId == 2) {
-    valueBustUpCloth2[actorId] = valueBustUpCloth[actorId];
-    if ($gameVariables.value(440 + actorId)[28] == 2) {
-      if ([20, 21, 22, 23, 25].every(function (id) { return $gameVariables.value(440 + actorId)[id] == 0 })) {
-        $gameVariables.setValue(22, 5);
-        $gameVariables.setValue(23, 5);
-      };
-      if ($gameVariables.value(22) == 2) {
-        $gameVariables.setValue(22, 6);
-        $gameVariables.setValue(23, 6);
-      };
-      if ($gameVariables.value(22) == 3) {
-        $gameVariables.setValue(22, 7);
-        $gameVariables.setValue(23, 7);
-      };
-    };
+  const noBustCoatItemId = NO_BUST_COAT_ITEM_IDS[actorId];
+  if (noBustCoatItemId !== undefined) {
+    applyNoBustCoatAdjustmentLisciaBlueOnly(actorId, noBustCoatItemId);
   };
 
   if ($dataActors[actorId].meta['bustBlessNo']) { valueBustUpCloth2[actorId] = -1 };//乳揺れ無いキャラ
 
+};
+
+// バストが存在しないコート着用時のバスト差分・下着差分調整(アクター1/2で共有)
+function applyNoBustCoatAdjustmentLisciaBlueOnly(actorId, noBustCoatItemId) {
+  valueBustUpCloth2[actorId] = valueBustUpCloth[actorId];//バスト存在しない衣装がある場合ここで処理
+  const actorClothingData = $gameVariables.value(440 + actorId);
+  if (actorClothingData[28] != noBustCoatItemId) return;
+
+  if (NO_BUST_UNDERWEAR_SLOT_IDS.every(function (slotId) { return actorClothingData[slotId] == 0 })) {
+    // 下着未着用なら下着差分を消す
+    $gameVariables.setValue(22, 5);
+    $gameVariables.setValue(23, 5);
+  } else if ($gameVariables.value(22) == 2) {
+    $gameVariables.setValue(22, 6);
+    $gameVariables.setValue(23, 6);
+  } else if ($gameVariables.value(22) == 3) {
+    $gameVariables.setValue(22, 7);
+    $gameVariables.setValue(23, 7);
+  };
 };
 
 //リザルト画像設定

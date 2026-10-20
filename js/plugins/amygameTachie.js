@@ -665,6 +665,11 @@ kisekae_naibusyori1 = function () {
 };
 
 //☆☆立ち絵設定。本体
+// 立ち絵パーツ変数の基準ID(衣装パーツ1..40は460+スロット、人形用の一時保存は560+スロット)
+const CLOTHING_PART_VAR_BASE_ID = 460;
+const CLOTHING_TEMP_VAR_BASE_ID = 560;
+const CLOTHING_PART_SLOT_COUNT = 40;
+
 tachie_settei2 = function () {
 
   // Get actor information and datas
@@ -684,39 +689,27 @@ tachie_settei3 = function (gameActor) {
   //   return;
   // }
   const actorId = gameActor.actorId();
-  const actorClothingDataId = actorId + 440;
-  const actorClothingData = $gameVariables.value(actorClothingDataId);
+  const actorClothingData = $gameVariables.value(actorId + 440);
+  const actorExposureData = $gameVariables.value(actorId + 380);
+  if (!actorClothingData || !actorExposureData) return;
 
   // Reset temporary clothing variables (561-600)
-  for (let variableIndex = 561; variableIndex <= 600; variableIndex++) {
-    $gameVariables.setValue(variableIndex, 0);
-  }
+  resetTemporaryClothingSlots();
 
   // Load current clothing data from actor to working variables (461-500)
-  for (let clothingIndex = 1; clothingIndex <= 40; clothingIndex++) {
-    $gameVariables.setValue(clothingIndex + 460, actorClothingData[clothingIndex]);
-  }
+  copyClothingSlotsToWorkVariables(actorClothingData);
 
   // Only process further for female characters
   if (isGirl(gameActor)) {
 
     // Handle doll state - store current clothing in temp variables and clear current
     if (gameActor.isStateAffected(valueDollStateId)) {
-
-      // Save clothing to temporary storage (561-600)
-      for (let clothingIndex = 1; clothingIndex <= 40; clothingIndex++) {
-        $gameVariables.setValue(clothingIndex + 560, $gameVariables.value(clothingIndex + 460));
-      }
-
-      // Clear current clothing except setting body to type 3
-      for (let clothingIndex = 1; clothingIndex <= 40; clothingIndex++) {
-        $gameVariables.setValue(clothingIndex + 460, 0);
-      }
-      $gameVariables.setValue(1 + 460, 3); // Set body type
+      saveWorkClothingToTemporarySlots();
+      clearWorkClothingSlotsWithBodyType();
     }
     else { // Normal character processing
       rosyutu_genkai1(gameActor); // Calculate exposure limits
-      rosyutu_genzai1(gameActor.actorId()); // Calculate current exposure
+      rosyutu_genzai1(actorId); // Calculate current exposure
 
       // Apply custom pose/expression settings if not in specified state
       if (!gameActor.isStateAffected(23)) {
@@ -729,31 +722,77 @@ tachie_settei3 = function (gameActor) {
   tachie_naibusyori2(gameActor);
 
   // Restore any temporary clothing that was saved
-  for (let clothingIndex = 1; clothingIndex <= 40; clothingIndex++) {
-    const temporaryClothingData = $gameVariables.value(clothingIndex + 560);
-    if (temporaryClothingData >= 1) {
-      $gameVariables.setValue(clothingIndex + 460, temporaryClothingData);
-    }
-  }
+  restoreTemporaryClothingSlots();
 
   // Update actor's clothing data from working variables
-  for (let clothingIndex = 1; clothingIndex <= 40; clothingIndex++) {
-    actorClothingData[clothingIndex] = $gameVariables.value(clothingIndex + 460);
-  }
+  writeBackClothingData(actorClothingData);
 
   // Update character graphics
   charagra_henkou1(actorId);
 
   // Update clothing-related global values for female characters
   if (isGirl(gameActor)) {
-    valueLiningCloth[actorId] = actorClothingData[2];
-    valueBackHairCloth[actorId] = gameActor.isStateAffected(23) ? 1 : actorClothingData[4];
-    valueCoatCloth[actorId] = actorClothingData[28];
-    valueFrontHairCloth[actorId] = actorClothingData[32];
-    valueBustUpCloth[actorId] = actorClothingData[41];
-    valueBustUpCloth2[actorId] = valueBustUpCloth[actorId];
+    updateClothingGlobals(gameActor, actorClothingData);
   }
 };
+
+// 人形用の一時衣装変数(561-600)を初期化する
+function resetTemporaryClothingSlots() {
+  for (let variableId = CLOTHING_TEMP_VAR_BASE_ID + 1; variableId <= CLOTHING_TEMP_VAR_BASE_ID + CLOTHING_PART_SLOT_COUNT; variableId++) {
+    $gameVariables.setValue(variableId, 0);
+  }
+}
+
+// 現在衣装を作業変数(461-500)に読み出す
+function copyClothingSlotsToWorkVariables(actorClothingData) {
+  for (let clothingIndex = 1; clothingIndex <= CLOTHING_PART_SLOT_COUNT; clothingIndex++) {
+    $gameVariables.setValue(CLOTHING_PART_VAR_BASE_ID + clothingIndex, actorClothingData[clothingIndex]);
+  }
+}
+
+// 人形用に作業中の衣装を一時変数(561-600)に退避する
+function saveWorkClothingToTemporarySlots() {
+  for (let clothingIndex = 1; clothingIndex <= CLOTHING_PART_SLOT_COUNT; clothingIndex++) {
+    $gameVariables.setValue(CLOTHING_TEMP_VAR_BASE_ID + clothingIndex, $gameVariables.value(CLOTHING_PART_VAR_BASE_ID + clothingIndex));
+  }
+}
+
+// 作業中の衣装をクリアし、体型だけ3に設定する
+function clearWorkClothingSlotsWithBodyType() {
+  for (let clothingIndex = 1; clothingIndex <= CLOTHING_PART_SLOT_COUNT; clothingIndex++) {
+    $gameVariables.setValue(CLOTHING_PART_VAR_BASE_ID + clothingIndex, 0);
+  }
+  $gameVariables.setValue(CLOTHING_PART_VAR_BASE_ID + 1, 3); // Set body type
+}
+
+// 一時変数に退避した衣装を作業変数に戻す
+function restoreTemporaryClothingSlots() {
+  for (let clothingIndex = 1; clothingIndex <= CLOTHING_PART_SLOT_COUNT; clothingIndex++) {
+    const temporaryClothingData = $gameVariables.value(CLOTHING_TEMP_VAR_BASE_ID + clothingIndex);
+    if (temporaryClothingData >= 1) {
+      $gameVariables.setValue(CLOTHING_PART_VAR_BASE_ID + clothingIndex, temporaryClothingData);
+    }
+  }
+}
+
+// 作業変数の内容でアクターの衣装情報を更新する
+function writeBackClothingData(actorClothingData) {
+  for (let clothingIndex = 1; clothingIndex <= CLOTHING_PART_SLOT_COUNT; clothingIndex++) {
+    actorClothingData[clothingIndex] = $gameVariables.value(CLOTHING_PART_VAR_BASE_ID + clothingIndex);
+  }
+}
+
+// 衣装関連のグローバル値を更新する(女性キャラのみ)
+function updateClothingGlobals(gameActor, actorClothingData) {
+  const actorId = gameActor.actorId();
+  valueLiningCloth[actorId] = actorClothingData[2];
+  valueBackHairCloth[actorId] = gameActor.isStateAffected(23) ? 1 : actorClothingData[4];
+  valueCoatCloth[actorId] = actorClothingData[28];
+  valueFrontHairCloth[actorId] = actorClothingData[32];
+  const bustUpClothValue = actorClothingData[41];
+  valueBustUpCloth[actorId] = bustUpClothValue;
+  valueBustUpCloth2[actorId] = bustUpClothValue;
+}
 
 //☆☆キャラグラ変更。
 charagra_henkou1 = function (actorId) {
@@ -797,16 +836,23 @@ set_charachip_graphics = function (itemMeta) {
 }
 
 //☆☆キャラチップ決定用計算
+// キャラチップ判定の対象となる衣装アイテムの最小ID
+const CHARACHIP_ITEM_SEARCH_START_ID = 1331;
+// 露出度集計時の部位スロット数(subCategoryのindex)
+const EXPOSURE_PART_SLOT_COUNT = 21;
+
 charagra_choice1 = function (actorId) {
 
   const actor = $gameActors.actor(actorId);
   if (!actor) return;
 
   if (actor.isStateAffected(23)) {
-    const currentItem = $dataItems[$gameVariables.value(actorId + 440)[0]];
+    // 衣装固定状態: 現在設定されている衣装アイテムのキャラチップをそのまま使う
+    const fixedCostumeData = $gameVariables.value(actorId + 440);
+    if (!fixedCostumeData) return;
+    const currentItem = $dataItems[fixedCostumeData[0]];
     if (currentItem) {
-      const itemMeta = currentItem.meta;
-      set_charachip_graphics(itemMeta);
+      set_charachip_graphics(currentItem.meta);
     }
 
   } else {
@@ -827,61 +873,9 @@ charagra_choice1 = function (actorId) {
     };
     if (currentCostumeItemId == 0 && exposureValue >= 26) {
       //現在衣装を呼び出し
-      for (let i = 1; i <= 40; i++) {
-        $gameVariables.setValue(i + 460, i);
-      };
-      let exposureByClothPart = Array(21).fill(0);//21
-      const itemsCount = $dataItems.length;
-      for (let id = 461; id <= 500; id++) {
-        for (let i = 1331; i < itemsCount; i++) {
-          const itemMeta = $dataItems[i].meta;
-          if (itemMeta['TotalCloth']) continue;
-
-          const itemEICSwitchNum = Number(itemMeta['EICSwitch']);
-          let isBreak = false;
-          switch (itemEICSwitchNum) {
-            case 200:
-            case actorId + 180:
-            case actorId + 380: {
-              if (id == Number(itemMeta['ClothSwitch']) + 460) break;
-              if ($gameVariables.value(id) != Number(itemMeta['ClothAllocationNumber'])) break;
-
-              //if(itemMeta['SingleCloth']){}else{
-              exposureByClothPart[Number(itemMeta['subCategory'])] += Number(itemMeta['ClothUncoverCount']);//露出度で加算
-              isBreak = true;
-            }
-          }
-          if (isBreak) break;
-        }
-      }
-      const max = exposureByClothPart.reduce(function (a, b) {
-        return Math.max(a, b);
-      });
-      let index = exposureByClothPart.findIndex(partExposure => partExposure === max);
-      if (index >= 0) {
-        const itemsCount = $dataItems.length;
-        for (let i = 1331; i < itemsCount; i++) {
-          const itemMeta = $dataItems[i].meta;
-          if (!itemMeta['TotalCloth']) continue;
-
-          const itemEICSwitchNum = Number(itemMeta['EICSwitch']);
-          let isBreak = false;
-          switch (itemEICSwitchNum) {
-            case 400:
-            case actorId + 380: {
-              if (index != Number(itemMeta['subCategory'])) break;
-
-              set_charachip_graphics(itemMeta);
-
-              $gameVariables.value(actorId + 440)[0] = i;
-              $gameVariables.value(actorId + 440)[41] = Number(itemMeta['TotalCloth']);
-              isBreak = true;
-            }
-          }
-          if (isBreak) break;
-        }
-      }
-    }
+      reloadCurrentCostumeSlots(charachipDataArr);
+      selectTotalClothByExposure(actorId, charachipDataArr);
+    };
 
     if (currentCostumeItemId >= 1 && $dataItems[currentCostumeItemId]) {
       set_charachip_graphics($dataItems[currentCostumeItemId].meta);
@@ -890,6 +884,74 @@ charagra_choice1 = function (actorId) {
   tachie_switchOnOff();
 
 };
+
+// 現在衣装を作業変数(461-500)に読み出す
+function reloadCurrentCostumeSlots(charachipDataArr) {
+  for (let clothingIndex = 1; clothingIndex <= CLOTHING_PART_SLOT_COUNT; clothingIndex++) {
+    $gameVariables.setValue(CLOTHING_PART_VAR_BASE_ID + clothingIndex, charachipDataArr[clothingIndex]);
+  }
+}
+
+// 露出度が最も高い部位の統合衣装を探し、キャラチップと衣装情報に反映する
+function selectTotalClothByExposure(actorId, charachipDataArr) {
+  // 通常衣装(非統合)の露出度を部位別に集計する。各スロットでは最初に一致した
+  // アイテムだけが有効(v1.46の内側breakと同じ結果を得るため消費済みスロットで管理する)
+  const exposureByClothPart = Array(EXPOSURE_PART_SLOT_COUNT).fill(0);//21
+  const consumedSlots = new Set();
+  for (const singleClothItem of collectClothItemsForCharachip(actorId, false)) {
+    const itemMeta = singleClothItem.meta;
+    const clothSwitchVarId = Number(itemMeta['ClothSwitch']) + CLOTHING_PART_VAR_BASE_ID;
+    if (clothSwitchVarId < CLOTHING_PART_VAR_BASE_ID + 1 || clothSwitchVarId > CLOTHING_PART_VAR_BASE_ID + CLOTHING_PART_SLOT_COUNT) continue;
+    if (consumedSlots.has(clothSwitchVarId)) continue;
+    if ($gameVariables.value(clothSwitchVarId) != Number(itemMeta['ClothAllocationNumber'])) continue;
+
+    consumedSlots.add(clothSwitchVarId);
+    exposureByClothPart[Number(itemMeta['subCategory'])] += Number(itemMeta['ClothUncoverCount']);//露出度で加算
+  }
+
+  const max = exposureByClothPart.reduce(function (a, b) {
+    return Math.max(a, b);
+  });
+  const index = exposureByClothPart.findIndex(partExposure => partExposure === max);
+  // BUGFIX: v1.46 was skipping the selection scan when index == 0 (露出部位なし)
+  if (index <= 0) return;
+
+  const totalClothItem = findTotalClothItemForPart(actorId, index);
+  if (!totalClothItem) return;
+  set_charachip_graphics(totalClothItem.meta);
+  charachipDataArr[0] = totalClothItem.itemId;
+  charachipDataArr[41] = Number(totalClothItem.meta['TotalCloth']);
+}
+
+// キャラチップ判定対象の衣装アイテムを集める(requireTotalClothで統合衣装のみに絞る)
+function collectClothItemsForCharachip(actorId, requireTotalCloth) {
+  const clothItems = [];
+  const items = $dataItems;
+  const itemsCount = items.length;
+  const actorEicSwitchId = actorId + 380;
+  for (let itemId = CHARACHIP_ITEM_SEARCH_START_ID; itemId < itemsCount; itemId++) {
+    const item = items[itemId];
+    const itemMeta = item.meta;
+    if (requireTotalCloth ? !itemMeta['TotalCloth'] : itemMeta['TotalCloth']) continue;
+    const itemEICSwitchNum = Number(itemMeta['EICSwitch']);
+    if (requireTotalCloth) {
+      if (itemEICSwitchNum !== 400 && itemEICSwitchNum !== actorEicSwitchId) continue;
+    } else {
+      if (itemEICSwitchNum !== 200 && itemEICSwitchNum !== actorId + 180 && itemEICSwitchNum !== actorEicSwitchId) continue;
+    }
+    clothItems.push(item);
+  }
+  return clothItems;
+}
+
+// 統合衣装から指定部位のものを探す(先頭一致)
+function findTotalClothItemForPart(actorId, partIndex) {
+  for (const totalClothItem of collectClothItemsForCharachip(actorId, true)) {
+    if (partIndex !== Number(totalClothItem.meta['subCategory'])) continue;
+    return { itemId: totalClothItem.id, meta: totalClothItem.meta };
+  }
+  return null;
+}
 
 // tachie_clear is not defined anywhere, warn only once instead of on every refresh
 let warnedMissingTachieClearTachieNaibusyori2 = false;
@@ -901,26 +963,29 @@ function warnMissingTachieClearTachieNaibusyori2() {
 
 //☆☆立ち絵内部処理。本体
 tachie_naibusyori2 = function (gameActor) {
-  // Cache frequently used variables
-  const actorId = gameActor.actorId();// $gameVariables.value(20);
-  const actorCharName = 'actor' + actorId;
-  const dataActor = gameActor.actor(); // $dataActors[actorId];
+  if (!gameActor) return;
+  const dataActor = gameActor.actor();
   if (!dataActor) return;
+
+  const actorId = gameActor.actorId();
+  const actorCharName = 'actor' + actorId;
 
   // Set character name for standing image
   $gameVariables.setValue(118, actorCharName);
 
   // Determine the picture ID to use
+  // NOTE: v1.46 used the conversation picture id (var 300) while switch 90 was on;
+  // the current build always resolves the picture id from the actor database.
   //const isSwitch90On = $gameSwitches.value(90); // 立ち絵会話時自動on
   //const actorPicId = getPreviousTachiePicId(); // 立ち絵表示時ﾋﾟｸﾁｬ指定ID
-  // const picId = isSwitch90On 
-  //   ? actorPicId 
+  // const picId = isSwitch90On
+  //   ? actorPicId
   //   : Number(dataActor.meta['tachiePicId']);
   const picId = Number(dataActor.meta['tachiePicId']); // after input gameActor added we get picId only from dataActor
   $gameVariables.setValue(117, picId);
 
   // Calculate the zero-based tachie number
-  const tachieIndex = Math.max(-1, picId - 1);
+  const tachieIndex = picId > 0 ? picId - 1 : -1;
 
   // Get references to avoid repeated lookups
   const tachieData = $TKMvar.tachie;
@@ -928,13 +993,10 @@ tachie_naibusyori2 = function (gameActor) {
   const picData = tachieData.PicData;
 
   // Initialize character parts if switch 20 is ON
-  if ($gameSwitches.value(20)) {
+  const isPartsInitSwitchOn = $gameSwitches.value(20);
+  if (isPartsInitSwitchOn) {
     // Process each clothing part
-    runTachieLoop(1, 40, j => {
-      return $gameVariables.value(j + 460);
-    }, j => {
-      return $gameVariables.value(j + 460) >= 0;
-    });
+    runTachieLoop(partSlot => $gameVariables.value(partSlot + CLOTHING_PART_VAR_BASE_ID), partSlot => $gameVariables.value(partSlot + CLOTHING_PART_VAR_BASE_ID) >= 0);
 
     // Clear previous picture if it exists
     if (tachieIndex !== -1 && tachieIndex < picData.length) {
@@ -949,14 +1011,10 @@ tachie_naibusyori2 = function (gameActor) {
   if (gameActor.isStateAffected(19)) {
     //tachie_clear(picId); // undefined function
     warnMissingTachieClearTachieNaibusyori2();
-    runTachieLoop(1, 40, () => {
-      return "0";
-    });
+    runTachieLoop(() => 0);
   } else {
     // Normal case: apply clothing parts
-    runTachieLoop(1, 40, j => {
-      return $gameVariables.value(j + 460);
-    });
+    runTachieLoop(partSlot => $gameVariables.value(partSlot + CLOTHING_PART_VAR_BASE_ID));
   }
 
   // Check if we need to change the character's standing image
@@ -981,17 +1039,12 @@ tachie_naibusyori2 = function (gameActor) {
   }
 };
 
-// Helper function to execute tachie_naibusyori1 in a loop, from tachie_naibusyori2
-function runTachieLoop(start, end, getThirdArg, condition = () => true) {
-  for (let j = start; j <= end; j++) {
-    if (condition(j)) {
-      const args = [
-        String($gameVariables.value(118)),
-        String(j),
-        String(getThirdArg(j))
-      ];
-      tachie_naibusyori1(args);
-    }
+// Helper function to apply one clothing part per call to tachie_naibusyori1, from tachie_naibusyori2
+function runTachieLoop(getPartNumber, condition) {
+  const characterName = $gameVariables.value(118);
+  for (let partSlot = 1; partSlot <= CLOTHING_PART_SLOT_COUNT; partSlot++) {
+    if (condition && !condition(partSlot)) continue;
+    tachie_naibusyori1(characterName, partSlot, getPartNumber(partSlot));
   }
 }
 
@@ -999,13 +1052,14 @@ function runTachieLoop(start, end, getThirdArg, condition = () => true) {
 /**
 * Handles internal processing for character parts in the tachie (standing image) system.
 * Updates a specific part of a character's standing image and manages its bitmap resources.
-* @param {Array} args - [characterName, partName, partNumber]
+* @param {string} characterName - standing image character name (e.g. 'actor1')
+* @param {number} partSlot - clothing part slot number (1-40)
+* @param {number} partValue - part number to apply (0 clears the part)
 */
-tachie_naibusyori1 = function (args) {
+tachie_naibusyori1 = function (characterName, partSlot, partValue) {
   // Extract parameters for clarity
-  const characterName = args[0];
-  const partName = args[1];
-  const partNumber = parseInt(args[2], 10) || 0;
+  const partName = String(partSlot);
+  const partNumber = Number(partValue) || 0;
 
   // Early exit if character doesn't exist
   if (!(characterName in $TKMvar.tachie.CharList)) {
@@ -1291,31 +1345,29 @@ function getOffsetAdjustment(clothSwitchId) {
 const standingPictureSlotOffsetsTo0 = [1, 2, 3, 5, 6, 8, 9, 10, 12, 13, 15, 16, 19, 24, 26, 30, 34, 37, 38, 39, 40];
 const standingPictureSlotOffsetsTo1 = [5, 9, 10, 15, 31, 33];
 const baseFaceExpressions = [1, 1, 1, 1, 1, 2, 5, 6, 15]; // 基本表情
-const baseFaceExpressionsLength = baseFaceExpressions.length;
 const excitedFaceExpressions = [4, 4, 4, 4, 5, 4, 4, 4, 4, 8]; // 興奮表情
-const excitedFaceExpressionsLength = excitedFaceExpressions.length;
 const damageFaceExpressionsMap = {
   1: 9, // 被ダメージ表情変化
   2: 8  // 与ダメージ表情変化
 };
 const EFFECT_STATE_IDS = [61, 65, 84, 85, 86]; // 発情、自慰、精液
-const HIGHEST_FACE_OPTIONS = [29, 30, 31, 32, 37, 38, 39, 40, 41, 42, 43, 44];  // For intensity >= 900
-const HIGHER_FACE_OPTIONS = [29, 30, 31, 32, 37, 38, 39, 40];
-const MODERATE_FACE_OPTIONS = [25, 26, 27, 28, 29, 30, 31, 32];                    // For intensity >= 700
-const MILD_FACE_OPTIONS = [21, 22, 23, 24, 25, 26, 27, 28];                    // For intensity >= 500
-const LOW_FACE_OPTIONS = [17, 18, 19, 20, 21, 22, 23, 24];                    // For intensity >= 300
+// 発情等の強度(380+actorId[1])別の表情候補。上から順に最初に一致した段階を採用する
+const FACE_EXPRESSION_INTENSITY_LEVELS = [
+  { minIntensity: 900, options: [29, 30, 31, 32, 37, 38, 39, 40, 41, 42, 43, 44] }, // highest
+  { minIntensity: 700, options: [25, 26, 27, 28, 29, 30, 31, 32] },                 // moderate
+  { minIntensity: 500, options: [21, 22, 23, 24, 25, 26, 27, 28] },                 // mild
+  { minIntensity: 300, options: [17, 18, 19, 20, 21, 22, 23, 24] }                  // low
+];
 const SIMPLE_FACE_OPTIONS = [17, 18, 19, 20];                                   // Else simple face options
+const LOW_FACE_OPTIONS = [17, 18, 19, 20, 21, 22, 23, 24];                     // For intensity >= 300 and low exposure
+const HIGHER_FACE_OPTIONS = [29, 30, 31, 32, 37, 38, 39, 40];
 const RESTRAINED_FACE_OPTIONS = [37, 38, 39, 40, 41, 42, 43, 44];
 const PREGNANCY_FACE_OPTIONS = [21, 22, 23, 24, 25, 26, 27, 28];
-const highestFaceOptionLen = HIGHEST_FACE_OPTIONS.length;
-const higherFaceOptionLen = HIGHER_FACE_OPTIONS.length;
-const moderateFaceOptionsLen = MODERATE_FACE_OPTIONS.length;
-const mildFaceOptionsLen = MILD_FACE_OPTIONS.length;
-const lowFaceOptionsLen = LOW_FACE_OPTIONS.length;
-const simpleFaceOptionsLen = SIMPLE_FACE_OPTIONS.length;
-const restrainedFaceOptionsLen = RESTRAINED_FACE_OPTIONS.length;
-const pregnancyFaceOptionsLen = PREGNANCY_FACE_OPTIONS.length;
-const TACHIE_SETTEI1_BASE_VAR_ID = 460; // Common base ID for variables
+// 表情差分の熟練度に使うスキルと閾値
+const FACE_MASTERY_SKILL_ID = 50;
+const RESTRAINT_MASTERY_LEVEL = 7; // 拘束表情の熟練度閾値
+const SWEAT_MASTERY_LEVEL = 5;     // 発汗差分の熟練度閾値
+const TACHIE_SETTEI1_BASE_VAR_ID = CLOTHING_PART_VAR_BASE_ID; // 460: tachie_settei1 works on the clothing part variables
 const PREGNANCY_PART_IDS = [16, 17, 19, 20, 21, 22, 23, 24, 25, 26, 28];
 const BUKKAKE_FACE_EXPRESSIONS = [2, 3, 4];
 //#endregion
@@ -1334,7 +1386,7 @@ tachie_settei1 = function (gameActor) {
   setModestPoseTachieSettei1(gameActor);
 
   // 発情＆性欲高い＆戦闘以外＆露出高いで腕グラビアポーズ
-  applyGlamourPoseForArousalTachieSettei1();
+  applyGlamourPoseForArousalTachieSettei1(gameActor);
 
   //☆☆個別衣装設定↓☆☆
   kobetu_isyousettei1(gameActor);
@@ -1420,7 +1472,7 @@ function handlePregnancyStateTachieSettei1(gameActor) {
   setPregnancyPoseTachieSettei1();
 
   // Handle clothing adjustments for pregnancy
-  handlePregnancyClothingTachieSettei1();
+  handlePregnancyClothingTachieSettei1(gameActor);
 
   // Handle navel piercing during pregnancy
   handleNavelPiercingDuringPregnancyTachieSettei1();
@@ -1444,9 +1496,8 @@ function setPregnancyPoseTachieSettei1() {
 }
 
 // Handle clothing adjustment based on exposure during pregnancy
-function handlePregnancyClothingTachieSettei1() {
-  const actorId = $gameVariables.value(20);
-  if ($gameVariables.value(380 + actorId)[4] >= 5) {
+function handlePregnancyClothingTachieSettei1(gameActor) {
+  if ($gameVariables.value(380 + gameActor.actorId())[4] >= 5) {
     $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 28, 1); // Apply coat
     $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 12, 1); // Change belly appearance
   }
@@ -1489,8 +1540,10 @@ function applyTemporaryStateEffectsTachieSettei1(actor) {
     const newPartValue = Number(tachieChangeTempArr[1]);
 
     // Apply the change to the target part
+    // NOTE: v1.46 first wrote the variable to itself (a redundant no-op
+    // assignment) before overwriting it with the new value; only the new
+    // value matters, so the self-assignment is dropped here.
     const targetVariableId = TACHIE_SETTEI1_BASE_VAR_ID + targetPartId;
-    $gameVariables.setValue(targetVariableId + 100, $gameVariables.value(targetVariableId)); // Store original value
     $gameVariables.setValue(targetVariableId, newPartValue); // Set new value
   }
 }
@@ -1498,12 +1551,11 @@ function applyTemporaryStateEffectsTachieSettei1(actor) {
 
 //#region tachie_settei1 set modest pose
 // Apply special arm pose for aroused characters with high exposure
-function applyGlamourPoseForArousalTachieSettei1() {
-  const actor = $gameActors.actor($gameVariables.value(20));
-  const isAroused = actor.isStateAffected(61) || actor.isStateAffected(694);
-  const hasConfidenceSkill = actor.isLearnedSkill(66);
+function applyGlamourPoseForArousalTachieSettei1(gameActor) {
+  const isAroused = gameActor.isStateAffected(61) || gameActor.isStateAffected(694);
+  const hasConfidenceSkill = gameActor.isLearnedSkill(66);
   const notInBattle = !$gameSwitches.value(30);
-  const currentExposure = $gameVariables.value($gameVariables.value(20) + 380)[4];
+  const currentExposure = $gameVariables.value(gameActor.actorId() + 380)[4];
   const hasHighExposure = currentExposure <= 9;
 
   if (isAroused && hasConfidenceSkill && notInBattle && hasHighExposure) {
@@ -1527,9 +1579,8 @@ function shouldCoverLowerBodyTachieSettei1() {
 
 function setModestPoseTachieSettei1(gameActor) {
   // Apply modest pose for characters not in special states
-  if (gameActor.isStateAffected(22) || gameActor.isLearnedSkill(66)) {
-    // Skip pose adjustment for characters with special states or skills
-    // (State 22 or Skill 66 overrides the default modest pose)
+  if (gameActor.isStateAffected(22)) {
+    // Skip pose adjustment for characters in state 22
     return;
   }
 
@@ -1657,94 +1708,123 @@ function applySexualFluidsVisualEffectsTachieSettei1(gameActor) {
 
 //#region tachie_settei1 expression setup
 
-// Main function to determine face expression based on priority
+// Main function to determine face expression.
+// v1.46 evaluated every check in sequence and later matches overwrote earlier ones,
+// while the side effects (sweat switch 100, sweat face part 473) run on every call
+// regardless of which expression wins - the order below keeps that behavior.
 function determineFaceExpressionTachieSettei1(gameActor, $gameVariables, $gameSwitches) {
-  // Check for highest priority states first
-  if ($gameSwitches.value(97)) {
-    return $gameVariables.value(151); // Use predefined expression from conversation
-  }
+  let faceExpression = getDefaultExpressionTachieSettei1($gameVariables, $gameSwitches);
 
-  // Check for special state effects that override other expressions
-  const stateBasedExpression = getStateBasedExpressionTachieSettei1(gameActor, $gameVariables, $gameSwitches);
-  if (stateBasedExpression !== null) {
-    return stateBasedExpression;
-  }
+  // 露出状態による衣装クリア(下で露出差分を見るために先に実行)
+  handleExposureStateTachieSettei1(gameActor, $gameVariables);
 
-  // Check battle-specific conditions
-  if ($gameSwitches.value(30) && gameActor.tp >= 100) {
-    return $gameSwitches.value(100) ? 48 : 47;
-  }
-
-  // Check for arousal/emotional states
-  const emotionalExpression = getEmotionalExpressionTachieSettei1(gameActor, $gameVariables, $gameSwitches);
-  if (emotionalExpression !== null) {
-    return emotionalExpression;
-  }
-
-  // Check clothing and exposure related expressions
   const exposureExpression = getExposureBasedExpressionTachieSettei1(gameActor, $gameVariables, $gameSwitches);
   if (exposureExpression !== null) {
-    return exposureExpression;
+    faceExpression = exposureExpression;
   }
 
-  // Default expressions based on situation
-  return getDefaultExpressionTachieSettei1($gameVariables, $gameSwitches);
+  // 発情、自慰、精液
+  const emotionalExpression = getEmotionalExpressionTachieSettei1(gameActor, $gameVariables);
+  if (emotionalExpression !== null) {
+    faceExpression = emotionalExpression;
+  }
+
+  // 拘束
+  const restraintExpression = getRestraintExpressionTachieSettei1(gameActor);
+  if (restraintExpression !== null) {
+    faceExpression = restraintExpression;
+  }
+
+  // 妊娠でボテ腹
+  const pregnancyExpression = getPregnancyExpressionTachieSettei1(gameActor, $gameSwitches);
+  if (pregnancyExpression !== null) {
+    faceExpression = pregnancyExpression;
+  }
+
+  // 激情
+  if (!$gameSwitches.value(143) && gameActor.isStateAffected(68)) {
+    $gameSwitches.setValue(100, true);
+  }
+
+  // 戦闘中TP100以上
+  if (!$gameSwitches.value(143) && $gameSwitches.value(30) && gameActor.tp >= 100) {
+    faceExpression = $gameSwitches.value(100) ? 48 : 47;
+  }
+
+  // 発汗
+  if (gameActor.isStateAffected(693)) {
+    $gameSwitches.setValue(100, false);
+  }
+  if ($gameSwitches.value(100)) {
+    // 発汗差分(熟練度で段差)
+    $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 13,
+      gameActor.skillMasteryLevel(FACE_MASTERY_SKILL_ID) >= SWEAT_MASTERY_LEVEL ? 2 : 1);
+  }
+
+  // 立ち絵会話時
+  if ($gameSwitches.value(97)) {
+    faceExpression = $gameVariables.value(151);
+  }
+
+  // ステート固定表情(最後に適用されたものが勝つ)
+  const stateFaceExpression = getStateFaceChangeExpressionTachieSettei1(gameActor);
+  if (stateFaceExpression !== null) {
+    faceExpression = stateFaceExpression;
+  }
+
+  $gameSwitches.setValue(100, false);
+  return faceExpression;
 }
 
-// Function to get expression based on special states
-function getStateBasedExpressionTachieSettei1(gameActor, $gameVariables, $gameSwitches) {
-  // Check for special state effects first (highest priority)
-  for (const stateId of valueTachieChangeState) {
-    if (gameActor.isStateAffected(stateId) && $dataStates[stateId].meta['FaceChange']) {
-      const faceChangeArr = $dataStates[stateId].meta['FaceChange'].split(',');
-      return Number(faceChangeArr[getRandomIndex(faceChangeArr.length)]);
-    }
-  }
+// Function to get expression based on restraint state
+function getRestraintExpressionTachieSettei1(gameActor) {
+  if (!gameActor.isStateAffected(63)) return null;
 
-  // Check for restraint state
-  if (gameActor.isStateAffected(63)) {
-    const constantVal50 = 50, constantVal7 = 7;
-    if (gameActor.skillMasteryLevel(constantVal50) >= constantVal7) {
-      return RESTRAINED_FACE_OPTIONS[getRandomIndex(RESTRAINED_FACE_OPTIONS.length)];
-    } else {
-      return SIMPLE_FACE_OPTIONS[getRandomIndex(SIMPLE_FACE_OPTIONS.length)];
-    }
+  if (gameActor.skillMasteryLevel(FACE_MASTERY_SKILL_ID) >= RESTRAINT_MASTERY_LEVEL) {
+    return RESTRAINED_FACE_OPTIONS[getRandomIndex(RESTRAINED_FACE_OPTIONS.length)];
   }
+  return SIMPLE_FACE_OPTIONS[getRandomIndex(SIMPLE_FACE_OPTIONS.length)];
+}
 
-  // Check for pregnancy state
+// Function to get expression based on pregnancy state
+function getPregnancyExpressionTachieSettei1(gameActor, $gameSwitches) {
   if ((!$gameSwitches.value(143) && gameActor.isStateAffected(83)) || gameActor.isStateAffected(696)) {
-    const constantVal50 = 50, constantVal7 = 7;
-    if (gameActor.skillMasteryLevel(constantVal50) >= constantVal7) {
-      // Do nothing, return null to continue checks
+    if (gameActor.skillMasteryLevel(FACE_MASTERY_SKILL_ID) >= RESTRAINT_MASTERY_LEVEL) {
+      // 熟練度が高い場合ここでは何もしない(後続の判定に任せる)
       return null;
-    } else {
-      return PREGNANCY_FACE_OPTIONS[getRandomIndex(PREGNANCY_FACE_OPTIONS.length)];
     }
+    return PREGNANCY_FACE_OPTIONS[getRandomIndex(PREGNANCY_FACE_OPTIONS.length)];
   }
-
-  // Handle sweating effect
-  handleSweatEffectTachieSettei1(gameActor, $gameVariables, $gameSwitches);
-
   return null;
 }
 
+// Function to get expression from the state-fixed face list (later states override earlier ones)
+function getStateFaceChangeExpressionTachieSettei1(gameActor) {
+  let faceExpression = null;
+  for (const stateId of valueTachieChangeState) {
+    if (!gameActor.isStateAffected(stateId)) continue;
+    const faceChangeMeta = $dataStates[stateId].meta['FaceChange'];
+    if (!faceChangeMeta) continue;
+
+    const faceChangeArr = faceChangeMeta.split(',');
+    faceExpression = Number(faceChangeArr[getRandomIndex(faceChangeArr.length)]);
+  }
+  return faceExpression;
+}
+
 // Function to get expression based on emotional arousal
-function getEmotionalExpressionTachieSettei1(gameActor, $gameVariables, $gameSwitches) {
+function getEmotionalExpressionTachieSettei1(gameActor, $gameVariables) {
   // Check for states related to arousal, etc.
   if (EFFECT_STATE_IDS.some(stateId => gameActor.isStateAffected(stateId))) {
-    const intensity = $gameVariables.value($gameVariables.value(20) + 380)[1];
+    const exposureData = $gameVariables.value(gameActor.actorId() + 380);
+    const intensity = exposureData ? exposureData[1] : 0;
 
-    if (intensity >= 900) {
-      return HIGHEST_FACE_OPTIONS[getRandomIndex(HIGHEST_FACE_OPTIONS.length)];
-    } else if (intensity >= 700) {
-      return MODERATE_FACE_OPTIONS[getRandomIndex(MODERATE_FACE_OPTIONS.length)];
-    } else if (intensity >= 500) {
-      return MILD_FACE_OPTIONS[getRandomIndex(MILD_FACE_OPTIONS.length)];
-    } else if (intensity >= 300) {
-      return LOW_FACE_OPTIONS[getRandomIndex(LOW_FACE_OPTIONS.length)];
-    } else {
-      return SIMPLE_FACE_OPTIONS[getRandomIndex(SIMPLE_FACE_OPTIONS.length)];
+    for (const level of FACE_EXPRESSION_INTENSITY_LEVELS) {
+      if (intensity >= level.minIntensity) {
+        return level.options[getRandomIndex(level.options.length)];
+      }
     }
+    return SIMPLE_FACE_OPTIONS[getRandomIndex(SIMPLE_FACE_OPTIONS.length)];
   }
 
   return null;
@@ -1752,77 +1832,63 @@ function getEmotionalExpressionTachieSettei1(gameActor, $gameVariables, $gameSwi
 
 // Function to handle exposure-based expressions
 function getExposureBasedExpressionTachieSettei1(gameActor, $gameVariables, $gameSwitches) {
-  handleExposureStateTachieSettei1(gameActor, $gameVariables);
-
   // Skip if special condition
+  const clothingData = $gameVariables.value(gameActor.actorId() + 440);
   if ($gameVariables.value(207) === 101 ||
     ($gameVariables.value(207) >= 1 &&
-      $gameVariables.value(207) === $gameVariables.value($gameVariables.value(20) + 440)[41])) {
+      clothingData && $gameVariables.value(207) === clothingData[41])) {
     return null;
   }
 
-  if (!$gameSwitches.value(206)) {
-    // Check exposure level against tolerance
-    if ($gameVariables.value($gameVariables.value(20) + 380)[4] <
-      $gameVariables.value($gameVariables.value(20) + 380)[5]) {
-      $gameSwitches.setValue(100, true);
-      return LOW_FACE_OPTIONS[getRandomIndex(LOW_FACE_OPTIONS.length)];
-    }
+  if ($gameSwitches.value(206)) return null;
 
-    // Check for low clothing value
-    if ($gameVariables.value($gameVariables.value(20) + 380)[4] <= 49) {
-      const tempClothesValue = $gameVariables.value($gameVariables.value(20) + 380)[1];
-      const masteryLevel = gameActor.skillMasteryLevel(55);
+  const exposureData = $gameVariables.value(gameActor.actorId() + 380);
+  if (!exposureData) return null;
 
-      $gameSwitches.setValue(100, true);
-      if (tempClothesValue >= 500 && masteryLevel >= 4) {
-        return HIGHER_FACE_OPTIONS[getRandomIndex(HIGHER_FACE_OPTIONS.length)];
-      }
+  let faceExpression = null;
+  // Check exposure level against tolerance
+  if (exposureData[4] < exposureData[5]) {
+    faceExpression = LOW_FACE_OPTIONS[getRandomIndex(LOW_FACE_OPTIONS.length)];
+    $gameSwitches.setValue(100, true);
+  }
+
+  // Check for low clothing value
+  if (exposureData[4] <= 49) {
+    const tempClothesValue = exposureData[1];
+    const masteryLevel = gameActor.skillMasteryLevel(55);
+
+    $gameSwitches.setValue(100, true);
+    if (tempClothesValue >= 500 && masteryLevel >= 4) {
+      faceExpression = HIGHER_FACE_OPTIONS[getRandomIndex(HIGHER_FACE_OPTIONS.length)];
     }
   }
 
-  return null;
+  return faceExpression;
 }
 
 // Function to get default expressions based on situation
 function getDefaultExpressionTachieSettei1($gameVariables, $gameSwitches) {
-  if ($gameSwitches.value(30)) { // In battle
-    return damageFaceExpressionsMap[$gameVariables.value(276)] || 4;
-  } else if ($gameSwitches.value(201) || $gameSwitches.value(239)) { // Excited
-    return excitedFaceExpressions[getRandomIndex(excitedFaceExpressions.length)];
-  } else { // Normal
-    return baseFaceExpressions[getRandomIndex(baseFaceExpressions.length)];
+  // v1.46 drew the base pool first and re-drew for the excited state
+  let faceExpression = baseFaceExpressions[getRandomIndex(baseFaceExpressions.length)];
+  if ($gameSwitches.value(201) || $gameSwitches.value(239)) { // Excited
+    faceExpression = excitedFaceExpressions[getRandomIndex(excitedFaceExpressions.length)];
   }
+  if ($gameSwitches.value(30)) { // In battle
+    faceExpression = damageFaceExpressionsMap[$gameVariables.value(276)] || 4;
+  }
+  return faceExpression;
 }
 
 // Helper function to handle exposure state
 function handleExposureStateTachieSettei1(gameActor, $gameVariables) {
-  if (gameActor.isStateAffected(70)) {
-    const currentClothesId = $gameVariables.value($gameVariables.value(20) + 440)[0];
-    const exposureValue = $gameVariables.value($gameVariables.value(20) + 380)[4];
-    if (currentClothesId >= 1 && exposureValue <= 9) {
-      $gameVariables.value($gameVariables.value(20) + 440)[0] = 0;
-    }
-  }
-}
+  if (!gameActor.isStateAffected(70)) return;
 
-// Helper function to handle sweat effect
-function handleSweatEffectTachieSettei1(gameActor, $gameVariables, $gameSwitches) {
-  if (gameActor.isStateAffected(693)) {
-    $gameSwitches.setValue(100, false);
+  const clothingData = $gameVariables.value(gameActor.actorId() + 440);
+  const exposureData = $gameVariables.value(gameActor.actorId() + 380);
+  if (!clothingData || !exposureData) return;
+  if (clothingData[0] >= 1 && exposureData[4] <= 9) {
+    clothingData[0] = 0;
   }
-
-  if ($gameSwitches.value(100)) {
-    const constantVal50 = 50, constantVal5 = 5;
-    if (gameActor.skillMasteryLevel(constantVal50) >= constantVal5) {
-      $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 13, 2);
-    } else {
-      $gameVariables.setValue(TACHIE_SETTEI1_BASE_VAR_ID + 13, 1);
-    }
-  }
-
-  // Reset switch after processing
-  $gameSwitches.setValue(100, false);
 }
 //#endregion
 
