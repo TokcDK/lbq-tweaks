@@ -6,1336 +6,1573 @@
 
 //(function(){
 
+//---------------------------------------------------------------------------
+// 共通定数
+//---------------------------------------------------------------------------
+const SCENE_CONDITION_PREFIX = `発生条件:`;
+const SCENE_STATUS_ON = `\\C[14]〇\\C[0]`;
+const SCENE_STATUS_OFF = `\\C[12]×\\C[0]`;
+const SCENE_LINE_BREAK_COUNT = 4;          //この数に達したら改行
+const SCENE_CONDITION_SLOT_COUNT = 9;      //EventSet*1..9 の上限
+const SCENE_UNKNOWN_NAME = `？？？`;
+const SCENE_PENDING_MARK = `\u3000`;        //発生保留シーンの表示(全角スペース)
+const SCENE_UNKNOWN_DESCRIPTION = `？？？？？？？？？？？？\n`;
+const SCENE_WORD_SET_CHUNK_LIMIT = 10;     // valueWordSetN 1個あたりの表示数
+
+//条件メタで使う番号
+const SCENE_VAR_CURRENT_ACTOR = 2;         //基準となるアクター
+const SCENE_VAR_ANY_ACTOR = 11;            //誰でもいいアクターの変数
+const SCENE_ITEM_ANY_ACTOR_ID = 11;        //EventSetItem の既定アイテムID
+const SCENE_VAR_MAIN_QUEST = 135;          //メインクエスト進行
+const SCENE_VAR_ANY_PARTY_ACTOR = 0;       //EventSetActor の 0 は上記の誰でも可
+const SCENE_PARTY_ACTOR_VAR_FIRST = 621;   //621〜624: パーティ1〜4人目のアクターID
+const SCENE_PARTY_ACTOR_COUNT_VAR = 54;    //パーティ人数(1で[単独行動])
+const SCENE_SUBJUGATION_COUNT_VAR = 52;    //討伐数配列
+const SCENE_ACTOR_ARRAY_OFFSET = 380;      //アクター毎の状態配列
+const SCENE_ACTOR_CLOTH_OFFSET = 440;      //アクター毎の現在衣装配列
+const SCENE_CONDITION_LABEL_VAR_OFFSET = 400; //条件表示名の変数
+const SCENE_CLOTH_SLOT_LABEL_VAR_OFFSET = 460; //衣装部位名のスイッチ
+const SCENE_EXPOSURE_PARAM = 4;            //露出度パラメータ(比較が以下になる)
+const SCENE_CLOTH_TOTAL_PARAM = 41;        //統合衣装指定パラメータ
+const SCENE_MAX_INACTIVE_ACTOR = 20;       //存在しないアクター
+
+//スイッチ
+const SCENE_SWITCH_ALL_DEFEATED = 83;      //全滅スイッチ
+const SCENE_SWITCH_HINT_MAP_FREE = 433;    //ヒント提示で場所区分けを無くす
+const SCENE_SWITCH_HIDE_UNKNOWN = 435;     //特定名を伏せる
+const SCENE_SWITCH_MAP_START = 477;        //マップ最初の並列イベント
+const SCENE_SWITCH_MORNING_START = 472;    //朝の並列イベント
+const SCENE_SWITCH_PARALLEL_FIRED = 474;   //並列イベント起動済み
+const SCENE_SWITCH_SOUWA_NAVI = 367;       //挿話ナヴィ発生
+const SCENE_SWITCH_HSCENE_NAVI = 369;      //シーンナヴィ発生
+const SCENE_SWITCH_SOUWA_GROUP = 479;      //挿話グループ発生
+const SCENE_SWITCH_HSCENE_GROUP = 480;     //シーングループ発生
+const SCENE_SWITCH_MEMORY = 29;            //回想中
+
+//アイテムカテゴリ(EICSwitch値)
+const SCENE_EIC_SOUWA = 102;
+const SCENE_EIC_SCENE = 103;
+const SCENE_EIC_TITLE = 104;
+const SCENE_EIC_HTITLE = 105;
+const SCENE_SG_QUEST = 1;                  //<SG種別>がクエスト
+
+const SCENE_SKILL_ID_DEFAULT = 18;         //既定スキル(習得済み判定)
+const SCENE_SKILL_ID_HIDDEN_NAME = 407;    //このスキル未習得＝未加入キャラ
+const SCENE_JOB_LEARNED_SKILL = 18;
+
+//---------------------------------------------------------------------------
+// 表示用の作業変数(旧: 代入だけで宣言されていなかった暗黙のグローバル)
+// 他のプラグインからも状態を参照できるよう、従来どおりグローバルに置く
+//---------------------------------------------------------------------------
+var valueCountSet1 = 0;            //書き込み済みシーン数(変数195にも入れる)
+var valueCountSet2 = 1;            //現在書き込み中の valueWordSetN の番号
+var initialWordSetText = ` `;      //各 valueWordSetN の初期値
+var mapSceneOccurrenceCount = 0;   //そのマップで発生するシーン数
+var valueCountDefeadSwitche2 = 0;  //全滅スイッチ時に成立したシーンのアイテムID
+var valueParallelEventId = 0;      //並列イベントの発生元イベントID
+var j = 0;                         //シーンを番号順に扱うための記録用カウンタ
+
+//---------------------------------------------------------------------------
+// 小さな共通ヘルパ
+//---------------------------------------------------------------------------
+//内部用。$gameActors.actor(id) は未加入/未設定で undefined を返す
+function nakamiActor(id) {
+  return $gameActors.actor(Number(id));
+}
+
+//内部用。変数が未設定/配列でない場合に index アクセスで落ちないためのヘルパ
+function nakamiArrayValue(varId, index) {
+  const arr = $gameVariables.value(varId);
+  if (!Array.isArray(arr)) return undefined;
+  return arr[index];
+}
+
+//現在のアクターID(条件の基準)
+function sceneCurrentActorId() {
+  return $gameVariables.value(SCENE_VAR_CURRENT_ACTOR);
+}
+
+//アクターが加入済み(条件を満たせる)か
+function isSceneActorAvailable(actor) {
+  return actor.isLearnedSkill(SCENE_SKILL_ID_DEFAULT) && !actor.isStateAffected(valueDollStateId);
+}
+
+//未加入キャラ(名前を伏せるべきアクター)か
+function isSceneActorNotJoined(actor) {
+  return !actor.isLearnedSkill(SCENE_SKILL_ID_HIDDEN_NAME);
+}
+
+//EventSet*1..9 の連番メタを順に処理する
+function forEachSceneConditionSlot(dataItem, metaPrefix, callback) {
+  for (let slot = 1; slot <= SCENE_CONDITION_SLOT_COUNT; slot++) {
+    const metaValue = dataItem.meta[metaPrefix + slot];
+    if (!metaValue) continue;
+    callback(metaValue.split(','), slot);
+  }
+}
+
+//条件1件分の成否をカウントし、状態マーカーを追記する
+function appendConditionStatus(state, isMet) {
+  state.unmetConditionCount += 1;
+  if (isMet) {
+    state.metConditionCount += 1;
+    state.messageText += SCENE_STATUS_ON;
+  } else {
+    state.messageText += SCENE_STATUS_OFF;
+  }
+}
+
+//発生条件の本文を追記する(行数も加算)
+function appendSceneText(state, text, lineCountToAdd) {
+  state.messageText += text;
+  state.lineCount += (lineCountToAdd === undefined ? 1 : lineCountToAdd);
+}
+
+//指定行数に達していたら改行してカウンタを戻す
+function breakSceneLineIfNeeded(state) {
+  if (state.lineCount < SCENE_LINE_BREAK_COUNT) return;
+  state.messageText += `\n`;
+  state.lineCount = 0;
+}
+
+//条件テキストに色付きアクター名を入れる
+function tagSceneActorName(actor) {
+  return colorTaggedText(27, actor.name());
+}
+
+//---------------------------------------------------------------------------
+// 発生条件の状態(旧: scene_joukenNakami のローカル変数群)
+//---------------------------------------------------------------------------
+function createSceneConditionState(dataItem, itemIndex, sceneGroupId, occurrenceSwitchOffset, checkSwitchOffset, occurrenceCountVarId, unmetCountVarId) {
+  return {
+    dataItem,
+    itemIndex,
+    sceneGroupId,
+    occurrenceSwitchOffset,
+    checkSwitchOffset,
+    occurrenceCountVarId,
+    unmetCountVarId,
+    messageText: ``,
+    lineCount: 0,
+    unmetConditionCount: 0,   //発生条件。未成立でも加算
+    metConditionCount: 0,     //発生条件。成立で加算
+    marGenScene1: 0,          //1でマップ発生シーン
+    eventSceneMissing: 1,     //0でEventSetSceneが存在しない/メイン進行不足/アクター不在
+    eventSceneNotExists: 0,   //EventSetSceneが存在しない場合に1
+    insufficientMainQuest: 0, //メインクエスト進行が足りない場合に1
+    cannotExecute: 0,         //実行不可の場合に1
+    inBattle: 0,              //戦闘中か否か
+    showMapName: 0,           //？？？表記の時にマップ名表示
+    actorNotJoined: 0,        //アクターが加入していない
+    defeatedSwitchItemId: 0   //全滅スイッチ判定に使ったアイテムID
+  };
+}
+
 //中身スクリプト
 scene_joukenNakami = function (sceneGroupId, itemIndex, occurrenceSwitchOffset, checkSwitchOffset, occurrenceCountVarId, unmetCountVarId) {
 
   const dataItem = $dataItems[itemIndex];
   if (!dataItem || !dataItem.name) return;
 
-  //console.warn(`Debug. Run scene_joukenNakami`)
+  const state = createSceneConditionState(dataItem, itemIndex, sceneGroupId,
+    occurrenceSwitchOffset, checkSwitchOffset, occurrenceCountVarId, unmetCountVarId);
 
-  //let actor = $gameActors.actor($gameVariables.value(2));
-  let conditionPrefixText = `発生条件:`;
-  //let conditionCount = 0;//条件成立回数。使わない？
-  let unmetConditionCount = 0;//発生条件。未成立でも加算
-  let metConditionCount = 0;//発生条件。成立で加算
-  let messageText = ``;
-  let requirement = 0;//条件用
-  let textSubst = 0;//一時代入用
-  let marGenScene1 = 0;//1でマップ発生シーン
-  let eventSceneMissing = 1;//0でEventSetSceneが存在しないかメインクエスト進行が足りないかアクターが存在しない
-  let tempAssignSceneOccurText = `　`;//発生シーン表示の一時代入
-  let eventSceneNotExists = 0;//EventSetSceneが存在しない場合に1
-  let insufficientMainQuest = 0;//メインクエスト進行が足りない場合に1
-  let cannotExecute = 0;//実行不可の場合に1
-  let inBattle = 0;//戦闘中か否か
-  let mainQuestProgress = 0;//メインクエスト進行度代入用
-  let mainQuestStageIndex = 0;//予約:場所による条件設定（行69コメント）。mainQuestProgress未代入で現状未使用
-  let lineBreakCount = 4;//改行指定数
-  let lineCount = 0;//行数カウント
-  let showMapName = 0;//？？？表記の時にマップ名表示
-  let actorNotJoined = 0;//アクターが加入していない
-  var valueCountDefeadSwitche1 = 0;//全滅スイッチ判定
+  //☆☆発生条件の組み立て(この順序でテキストが積まれる)
+  appendBattleCondition(state);
+  appendMapCondition(state);
+  appendAutoStartConditions(state);
+  appendOccurrenceMainCondition(state);
+  appendNoteWordCondition(state);
 
-  const onStatusString = `\\C[14]〇\\C[0]`;
-  const offStatusString = `\\C[12]×\\C[0]`;
+  if (!appendPerspectiveCondition(state)) return;   //視点アクターが存在しない場合は中断
+  appendSwitchConditions(state);
+  appendActorCondition(state);
+  appendSceneItemCondition(state);
+  appendSkillRankConditions(state);
+  appendSkillConditions(state);
+  appendSkillEquipConditions(state);
+  appendStateConditions(state);
+  appendJobConditions(state);
+  appendSubjugationConditions(state);
+  appendRegistrationCondition(state);
+  appendMoneyCondition(state);
+  appendHexpConditions(state);
+  appendClothConditions(state);
+  appendMainRootCondition(state);
+  appendValConditions(state);
+  appendItemCountConditions(state);
 
-  //内部用。$gameActors.actor(id) は未加入/未設定で undefined を返す
-  function nakamiActor (id) {
-    return $gameActors.actor(Number(id));
-  }
+  //☆☆発生不可条件
+  appendEraseActorCondition(state);
+  appendEraseSwitchCondition(state);
+  appendEraseMainCondition(state);
+  appendEraseValCondition(state);
 
-  //内部用。変数が未設定/配列でない場合に index アクセスで落ちないためのヘルパ
-  function nakamiArrayValue (varId, index) {
-    const arr = $gameVariables.value(varId);
-    if (!Array.isArray(arr)) return undefined;
-    return arr[index];
-  }
+  //☆☆判定と表示用テキストの確定
+  finalizeSceneEntry(state);
+};
 
-  //行数超過する場合にここでid毎に対応
-  //if(i == 401){let completionSwitchId2 = 4};
+//[戦闘] 戦闘中に発生するシーンか
+function appendBattleCondition(state) {
+  const battleMeta = state.dataItem.meta['EventSetBattle'];
+  if (!battleMeta) return;
 
-  let dataItemMeta = dataItem.meta['EventSetBattle'];
-  if (dataItemMeta) {
-    inBattle = Number(dataItemMeta);
-    if (inBattle == 1) {
-      //conditionCount += 1;
-      messageText += `[戦闘]`;
-      marGenScene1 += 1;//1でマップ発生シーン
-      unmetConditionCount += 1;
-      metConditionCount += 1;
-    }
-  }
+  state.inBattle = Number(battleMeta);
+  if (state.inBattle != 1) return;
 
-  //場所による条件設定mainQuestStageIndex
-  dataItemMeta = dataItem.meta['EventSetMap'];
-  if (dataItemMeta) {
-    let itemEventSetMapNum = Number(dataItemMeta);
-    if (itemEventSetMapNum == 0) {
-      itemEventSetMapNum = 2;//EventSetMapが0の場合の代替スイッチ。変更の可能性あり？？？
-      showMapName = `[何処でも]`;
-      messageText += showMapName;
-    } else {
-      //conditionCount += 1;
-      const itemMetaEventSetMapNum = $dataSystem.switches[Number(dataItem.meta['EventSetMap'])];
-      messageText += `[${itemMetaEventSetMapNum}]`;
-      showMapName = `[${itemMetaEventSetMapNum}]`;
-    }
-    lineCount += 1;
-    if ($gameSwitches.value(Number(dataItem.meta['EventSetMap']))) {
-      marGenScene1 += 1;//1でマップ発生シーン
-      unmetConditionCount += 1;
-      metConditionCount += 1;
-    } else {
-      unmetConditionCount += 1;
-    }
-    if ($gameSwitches.value(433)) {
-      marGenScene1 += 1;//ヒント提示のために場所での区分けを無くしている。
-    }
-  }
-
-  //自動起動かどうか
-  dataItemMeta = dataItem.meta['AutoStart'];
-  if (dataItemMeta) {
-    const dataItemAutoStartNum = Number(dataItemMeta);
-    if (dataItemAutoStartNum == 1) {
-      messageText += `[自動発生]`;
-      lineCount += 1;
-    }
-    else if (dataItemAutoStartNum == 2) {
-      messageText += `[朝自動発生]`;
-      lineCount += 1;
-    }
-    else if (dataItemAutoStartNum == 3) {
-      messageText += `[宿泊時に自動発生]`;
-      lineCount += 1;
-    }
-  }
-
-  //メインクエスト中に発生
-  dataItemMeta = dataItem.meta['EventSetOccurrenceMain'];
-  if (dataItemMeta) {
-    if (Number(dataItemMeta) >= 1) {
-      messageText += `[メイン[${dataItemMeta}]進行中に発生]`;
-      lineCount += 1;
-    }
-  }
-  dataItemMeta = dataItem.meta['NoteWord'];
-  if (dataItemMeta) {
-    messageText += `[${dataItemMeta}]`;
-    lineCount += 1;
-  }
-  if (lineCount >= lineBreakCount) { messageText += `\n`; lineCount = 0 };
-
-  //視点が誰か441
-  dataItemMeta = dataItem.meta['EventSetPerspective'];
-  if (dataItemMeta) {
-    const itemEventSetPerspectiveNum = Number(dataItemMeta);
-    if (itemEventSetPerspectiveNum >= 1) {
-      //conditionCount += 1;
-      const perspectiveActor = nakamiActor(itemEventSetPerspectiveNum);
-      if (!perspectiveActor) return;
-      if (itemEventSetPerspectiveNum == $gameVariables.value(2)) { } else {
-        messageText += `[${perspectiveActor.name()}視点`;
-        lineCount += 1;
-      }
-    }
-    if ($gameSwitches.value(itemEventSetPerspectiveNum + 440)) {
-      unmetConditionCount += 1;
-      metConditionCount += 1;
-      if (itemEventSetPerspectiveNum == $gameVariables.value(2)) { } else { messageText += onStatusString };
-    } else {
-      unmetConditionCount += 1;
-      if (itemEventSetPerspectiveNum == $gameVariables.value(2)) { } else { messageText += offStatusString };
-      const perspectiveActor = nakamiActor(itemEventSetPerspectiveNum);
-      if (perspectiveActor && !perspectiveActor.isLearnedSkill(407)) {
-        eventSceneMissing = 0;
-        //completionSwitchId1 += `[要:未加入キャラ]`;
-        actorNotJoined = 1;
-      }
-    }
-  }
-  if (lineCount >= lineBreakCount) { messageText += `\n`; lineCount = 0 };
-
-  // merged code of 2 code blocks EventSetSwi and EventNotSetSwi
-  event_set_swi = function (metaName, num1, prefix, isSet) {
-    if (dataItem.meta[metaName]) {
-      const arr = dataItem.meta[metaName].split(',');
-      const switchIdValuesLength = arr.length;
-      for (let id = 0; id < switchIdValuesLength; id++) {
-        if (arr[id] == 0) {
-          arr[id] = num1;
-        } else {
-          ////conditionCount += 1;
-          textSubst = $dataSystem.switches[Number(arr[id])];
-          textSubst = scene_joukenNakami_clean_prefixes(textSubst);
-          messageText += `[${prefix}${textSubst}`;
-          lineCount += 1;
-        }
-        const switchId = Number(arr[id]);
-        const isSwitch = $gameSwitches.value(switchId);
-        if ((isSet && isSwitch) || (!isSet && !isSwitch)) {
-          if (isSet && switchId == 83) {//全滅スイッチ
-            valueCountDefeadSwitche1 = itemIndex;
-          };
-          unmetConditionCount += 1;
-          metConditionCount += 1;
-          messageText += onStatusString;
-        } else {
-          unmetConditionCount += 1;
-          messageText += offStatusString;
-        }
-      }
-    }
-    if (lineCount >= lineBreakCount) { messageText += `\n`; lineCount = 0; }
-  }
-
-  for (const swiData of [['EventSetSwi', 2, ``, true]/*スイッチ条件*/, ['EventNotSetSwi', 1, `不可:`, false]/*スイッチoff条件。記述はスイッチを使うつど*/]) {
-    event_set_swi(swiData[0], swiData[1], swiData[2], swiData[3]);
-  }
-
-  //アクターが存在するか
-  dataItemMeta = dataItem.meta['EventSetActor'];
-  if (dataItemMeta) {
-    const arr = dataItemMeta.split(',');
-    for (let id = 0; id <= arr.length - 1; id++) {
-      if (Number(arr[id]) == 0) {
-        arr[id] = $gameVariables.value(11);//誰でもいいアクター
-      } else {
-        //conditionCount += 1;
-        const listActor = nakamiActor(arr[id]);
-        if (!listActor) continue;
-        messageText += `[${listActor.name()}]`;
-        lineCount += 1;
-      };
-      const actor = nakamiActor(arr[id]);
-      if (!actor) continue;
-      requirement = actor.isLearnedSkill(18) && !actor.isStateAffected(valueDollStateId);
-      if (requirement) {
-        unmetConditionCount += 1;
-        metConditionCount += 1;
-        messageText += onStatusString;
-      } else {
-        unmetConditionCount += 1;
-        messageText += offStatusString;
-        if (!actor.isLearnedSkill(407)) {
-          eventSceneMissing = 0;
-          //completionSwitchId1 += `[要:未加入キャラ]`;
-          actorNotJoined = 1;
-        }
-      }
-    }
-  }
-  if (lineCount >= lineBreakCount) { messageText += `\n`; lineCount = 0 };
-
-  //アイテムが存在するか
-  dataItemMeta = dataItem.meta['ItemSetScene'];
-  if (dataItemMeta) {
-    const arr = dataItemMeta.split(',');
-    for (let id = 0; id <= arr.length - 1; id++) {
-      if (!arr[id]) continue;
-
-      //conditionCount += 1;
-      const sceneItemId = Number(arr[id]);
-      const item = $dataItems[sceneItemId];
-      if (!item) continue;
-      const itemMetaEICSwitch = item.meta['EICSwitch'];
-      if (itemMetaEICSwitch) {
-        const itemMetaEICSwitchNum = Number(itemMetaEICSwitch);
-        if (itemMetaEICSwitchNum == 102) {
-          messageText += `[挿話集:`;
-        }
-        else if (itemMetaEICSwitchNum == 103) {
-          messageText += `[シーン:`;
-        }
-        else if (itemMetaEICSwitchNum == 104) {
-          messageText += `[タイトル:`;
-        }
-        else if (itemMetaEICSwitchNum == 105) {
-          messageText += `[H'タイトル:`;
-        }
-      } else {
-        if (item.meta['SG種別']) {
-          if (Number(item.meta['SG種別']) == 1) {
-            messageText += `[クエスト達成:`;
-          };
-        } else {
-          messageText += `[`;
-        };
-      };
-      messageText += `\x1bIIN[${sceneItemId}]`;
-      lineCount += 1;
-      textSubst = $gameParty.hasItem(item);
-      if (itemMetaEICSwitch) {
-        const itemMetaEICSwitchNum = Number(itemMetaEICSwitch);
-        if (itemMetaEICSwitchNum == 103) {
-          textSubst = $gameSwitches.value(sceneItemId + 600);
-        }
-        else if (itemMetaEICSwitchNum == 102) {
-          textSubst = $gameSwitches.value(sceneItemId + 900);
-        }
-      }
-      if (textSubst) {
-        unmetConditionCount += 1;
-        metConditionCount += 1;
-        messageText += onStatusString;
-      } else {
-        unmetConditionCount += 1;
-        messageText += offStatusString;
-        eventSceneMissing = 0;
-        eventSceneNotExists = 1;
-      }
-    }
-  }
-  if (lineCount >= lineBreakCount) { messageText += `\n`; lineCount = 0 };
-
-  //スキルランクが条件
-  for (let id = 1; id < 10; id++) {
-    dataItemMeta = dataItem.meta['EventSetSkillRank' + id];
-    if (dataItemMeta) {
-      const arr = dataItemMeta.split(',');
-      if (!arr[1]) { arr[1] = 18 };
-      if (!arr[0]) {
-        arr[0] = $gameVariables.value(2);//基準となるアクター
-      }
-      const actor = nakamiActor(arr[0]);
-      const skillId = Number(arr[1]);
-      const rankNum = Number(arr[2]);
-      if (!actor) continue;
-      //conditionCount += 1;
-      if (!$gameSwitches.value(435) && !actor.isLearnedSkill(skillId)) {
-        messageText += `[${actor.name()}が特定スキルランク${rankNum}↑]`;
-      } else {
-        const skill = $dataSkills[skillId];
-        if (!skill) continue;
-        if (arr[0] == $gameVariables.value(2)) {
-          messageText += `[${skill.name}:Rank${rankNum}↑`;
-        } else {
-          messageText += `[${actor.name()}が${skill.name}:Rank${rankNum}↑`;
-        };
-      }
-      lineCount += 1;
-      if (actor.isLearnedSkill(skillId) && actor.skillMasteryLevel(skillId) >= rankNum) {
-        unmetConditionCount += 1;
-        metConditionCount += 1;
-        messageText += onStatusString;
-      } else {
-        unmetConditionCount += 1;
-        messageText += offStatusString;
-      }
-    }
-  }
-  if (lineCount >= lineBreakCount) { messageText += `\n`; lineCount = 0 };
-
-  //スキルが条件
-  for (let id = 1; id < 10; id++) {
-    dataItemMeta = dataItem.meta['EventSetSkill' + id];
-    if (dataItemMeta) {
-      const arr = dataItemMeta.split(',');
-      if (!arr[1]) { arr[1] = 18 };
-      if (!arr[0]) {
-        arr[0] = $gameVariables.value(2);//基準となるアクター
-      }
-      const actorId = Number(arr[0]);
-      const skillId = Number(arr[1]);
-      const actor = nakamiActor(actorId);
-      if (!actor) continue;
-      //conditionCount += 1;
-      if (!$gameSwitches.value(435) && !actor.isLearnedSkill(skillId)) {
-        messageText += `[${actor.name()}が特定スキル習得`;
-      } else {
-        const skill = $dataSkills[skillId];
-        if (!skill) continue;
-        if (arr[0] == $gameVariables.value(2)) {
-          messageText += `[${skill.name}習得`;
-        } else {
-          messageText += `[${actor.name()}が${skill.name}習得`;
-        }
-      }
-      lineCount += 1;
-      if (actor.isLearnedSkill(skillId)) {
-        unmetConditionCount += 1;
-        metConditionCount += 1;
-        messageText += onStatusString;
-      } else {
-        unmetConditionCount += 1;
-        messageText += offStatusString;
-      }
-    }
-  }
-  if (lineCount >= lineBreakCount) { messageText += `\n`; lineCount = 0 };
-
-  //スキル装着が条件
-  for (let id = 1; id < 10; id++) {
-    dataItemMeta = dataItem.meta['EventSetSkillEquip' + id];
-    if (dataItemMeta) {
-      const arr = dataItemMeta.split(',');
-      if (arr[0] == 0) { arr[0] = $gameVariables.value(2) };
-      const actorId = Number(arr[0]);
-      const skillId = Number(arr[1]);
-      const actor = nakamiActor(actorId);
-      if (!actor) continue;
-      //conditionCount += 1;
-      if (!$gameSwitches.value(435) && !actor.isLearnedSkill(skillId)) {
-        messageText += `[${actor.name()}が特定スキル装着`;
-      } else {
-        const skill = $dataSkills[skillId];
-        if (!skill) continue;
-        if (arr[0] == $gameVariables.value(2)) {
-          messageText += `[${skill.name}装着`;
-        } else {
-          messageText += `[${actor.name()}が${skill.name}装着`;
-        }
-      }
-      lineCount += 1;
-      if (actor.battleSkillsRaw().includes(skillId)) {
-        unmetConditionCount += 1;
-        metConditionCount += 1;
-        messageText += onStatusString;
-      } else {
-        unmetConditionCount += 1;
-        messageText += offStatusString;
-      }
-    }
-  }
-  if (lineCount >= lineBreakCount) { messageText += `\n`; lineCount = 0 };
-
-  //ステート付与が条件
-  for (let id = 1; id < 10; id++) {
-    dataItemMeta = dataItem.meta['EventSetState' + id];
-    if (dataItemMeta) {
-      const arr = dataItemMeta.split(',');
-      if (arr[0] == 0) { arr[0] = $gameVariables.value(2) };
-      const actorId = Number(arr[0]);
-      const skillId = Number(arr[1]);
-      const actor = nakamiActor(actorId);
-      if (!actor) continue;
-      //conditionCount += 1;
-      if (arr[0] == $gameVariables.value(2)) {
-        messageText += `State:[\x1bSIM[${skillId}]`;
-      } else {
-        messageText += `[${actor.name()}がステート:\x1bSIM[${skillId}]`;
-      }
-      lineCount += 1;
-      if (actor.isStateAffected(skillId)) {
-        unmetConditionCount += 1;
-        metConditionCount += 1;
-        messageText += onStatusString;
-      } else {
-        unmetConditionCount += 1;
-        messageText += offStatusString;
-      }
-    }
-  }
-  if (lineCount >= lineBreakCount) { messageText += `\n`; lineCount = 0 };
-
-  //ジョブが条件
-  for (let id = 1; id < 10; id++) {
-    dataItemMeta = dataItem.meta['EventSetJob' + id];
-    if (dataItemMeta) {
-      const arr = dataItemMeta.split(',');
-      if (arr[0] == 0) { arr[0] = $gameVariables.value(2) };
-      const actorId = Number(arr[0]);
-      const skillId = Number(arr[1]);
-      const actor = nakamiActor(actorId);
-      if (!actor) continue;
-      //conditionCount += 1;
-      requirement = 18;
-      const unlockedClasses = actor._unlockedClasses || [];
-      if (!$gameSwitches.value(435) && !unlockedClasses.contains(skillId)) {
-        messageText += `[${actor.name()}が特定ジョブ`;
-      } else {
-        messageText += `[${actor.name()}がジョブ:\x1bJ[${skillId}]`;
-      }
-      lineCount += 1;
-      if (actor.subclass()) {
-        if (actor._subclassId == skillId) {
-          unmetConditionCount += 1;
-          metConditionCount += 1;
-          messageText += onStatusString;
-        } else {
-          unmetConditionCount += 1;
-          messageText += offStatusString;
-        }
-      } else {
-        unmetConditionCount += 1;
-      }
-    }
-  }
-  if (lineCount >= lineBreakCount) { messageText += `\n`; lineCount = 0 };
-
-  //討伐数が条件
-  for (let id = 1; id < 10; id++) {
-    dataItemMeta = dataItem.meta['EventSetSubjugation' + id];
-    if (dataItemMeta) {
-      const arr = dataItemMeta.split(',');
-      const actorId = Number(arr[0]);
-      const skillId = Number(arr[1]);
-      const subjugationCount = nakamiArrayValue(52, actorId);
-      messageText += `[\\C[2]\x1bSIM[${actorId}]\\C[0]:\\C[10]${subjugationCount}\\C[0]/${skillId}`;
-      lineCount += 1;
-      if (subjugationCount >= skillId) {
-        unmetConditionCount += 1;
-        metConditionCount += 1;
-        messageText += onStatusString;
-      } else {
-        unmetConditionCount += 1;
-        messageText += offStatusString;
-      }
-    }
-  }
-  if (lineCount >= lineBreakCount) { messageText += `\n`; lineCount = 0 };
-
-  if (dataItem.meta['RegistrationC1']) {
-    messageText += `[条件付き選択肢を選ぶ事で回想登録]`;
-    lineCount += 1;
-  }
-
-  //EventSetMoney
-  dataItemMeta = dataItem.meta['EventSetMoney'];
-  if (dataItemMeta) {
-    const gold = Number(dataItemMeta);
-    if (gold != 0) {
-      //conditionCount += 1;
-      messageText += `[${gold}\\G`;
-      if ($gameParty.gold() >= gold) {
-        unmetConditionCount += 1;
-        metConditionCount += 1;
-        messageText += onStatusString;
-      } else {
-        unmetConditionCount += 1;
-        messageText += offStatusString;
-      }
-    }
-  }
-  //if(completionSwitchId3 >= completionSwitchId2){choiceDescriptionText += `\n`;completionSwitchId3 = 0};
-
-  for (let id = 1; id < 10; id++) {
-    dataItemMeta = dataItem.meta['EventSetHexpArr' + id];
-    if (dataItemMeta) {
-      const arr = dataItemMeta.split(',');
-      const actorId = Number(arr[0]);
-      const skillId = Number(arr[1]);
-      const rankNum = Number(arr[2]);
-      const actor = nakamiActor(actorId);
-      if (!actor) continue;
-      //conditionCount += 1;
-      const skillName = $dataSystem.variables[skillId + 400];
-      if (skillId == 4) {//露出度
-        textSubst = nakamiArrayValue(actorId + 380, skillId) <= rankNum
-        messageText += `[\\C[27]${actor.name()}\\C[0]${skillName}${rankNum}以下`;
-      } else {
-        textSubst = nakamiArrayValue(actorId + 380, skillId) >= rankNum
-        messageText += `[\\C[27]${actor.name()}\\C[0]${skillName}${rankNum}以上`;
-      };
-      lineCount += 1;
-      if (textSubst) {
-        unmetConditionCount += 1;
-        metConditionCount += 1;
-        messageText += onStatusString;
-      } else {
-        unmetConditionCount += 1;
-        messageText += offStatusString;
-      }
-    }
-  }
-  if (lineCount >= lineBreakCount) { messageText += `\n`; lineCount = 0 };
-
-  for (let id = 1; id < 10; id++) {
-    dataItemMeta = dataItem.meta['EventSetClothArr' + id];
-    if (dataItemMeta) {
-      const arr = dataItemMeta.split(',');
-      const actorId = Number(arr[0]);
-      const skillId = Number(arr[1]);
-      const rankNum = Number(arr[2]);
-      const actor = nakamiActor(actorId);
-      if (!actor) continue;
-      //conditionCount += 1;
-      if (skillId == 41) {
-        for (let j = 1; j <= $dataItems.length - 1; j++) {
-          const item = $dataItems[j];
-          if (!item) continue;
-          if (item.meta['TotalCloth']) {
-            if (Number(item.meta['TotalCloth']) == rankNum) {
-              if (Number(item.meta['EICSwitch']) == 380 + actorId) {
-                messageText += `[${actor.name()}が${item.name}着用`;
-                break;
-              }
-            }
-          }
-        }
-      } else {
-        if (skillId == 0) {
-          const clothItem = $dataItems[rankNum];
-          if (!clothItem) continue;
-          messageText += `[${actor.name()}が${clothItem.name}着用`;
-        } else {
-          messageText += `[${actor.name()}の${$dataSystem.switches[skillId + 460]}に特定衣装`;
-        };
-      }
-      lineCount += 2;
-      if (nakamiArrayValue(actorId + 440, skillId) == rankNum) {
-        unmetConditionCount += 1;
-        metConditionCount += 1;
-        messageText += onStatusString;
-      } else {
-        unmetConditionCount += 1;
-        messageText += offStatusString;
-      }
-    }
-  }
-  if (lineCount >= lineBreakCount) { messageText += `\n`; lineCount = 0 };
-
-  //EventSetMainRoot
-  dataItemMeta = dataItem.meta['EventSetMainRoot'];
-  if (dataItemMeta) {
-    const arr = dataItemMeta.split(',');
-    const actorId = Number(arr[0]);
-    const skillId = Number(arr[1]);
-    if (arr[1] != 0) {
-      if (arr[0] == 0) {
-        arr[0] = 135;
-      } else {
-        //conditionCount += 1;
-        if (skillId == 49) {
-          messageText += `[メインクエスト完了後`;
-        } else {
-          messageText += `[メイン進行[${skillId}]↑`;
-        };
-        lineCount += 1;
-      }
-      if ($gameVariables.value(actorId) >= skillId) {
-        unmetConditionCount += 1;
-        metConditionCount += 1;
-        messageText += onStatusString;
-      } else {
-        unmetConditionCount += 1;
-        messageText += offStatusString;
-        eventSceneMissing = 0;
-        insufficientMainQuest = 1;
-        //completionSwitchId1 += `[メイン進行${skillId}↑]`;
-      }
-    }
-  }
-  //if(completionSwitchId3 >= completionSwitchId2){choiceDescriptionText += `\n`;let completionSwitchId3 = 0};
-
-  //変数条件
-  for (let id = 1; id < 10; id++) {
-    dataItemMeta = dataItem.meta['EventSetVal' + id];
-    if (dataItemMeta) {
-      const arr = dataItemMeta.split(',');
-      const actorId = Number(arr[0]);
-      const skillId = Number(arr[1]);
-      if (arr[0] == 0) {
-        arr[0] = 2;
-      } else {
-        //conditionCount += 1;
-        if (54 == actorId || 1 == skillId) {
-          messageText += `[単独行動`;
-        } else {
-          if (621 <= actorId && actorId <= 624) {//621からパーティ一人目のアクターID
-            const partyActor = nakamiActor(skillId);
-            if (!partyActor) continue;
-            messageText += `[${actorId - 620}番目:${partyActor.name()}`;
-          } else {
-            textSubst = $dataSystem.variables[actorId];
-            textSubst = scene_joukenNakami_clean_prefixes(textSubst);
-            messageText += `[${textSubst}:${skillId}↑`;
-          }
-        }
-      }
-      lineCount += 1;
-      if ($gameVariables.value(actorId) >= skillId) {
-        unmetConditionCount += 1;
-        metConditionCount += 1;
-        messageText += onStatusString;
-      } else {
-        unmetConditionCount += 1;
-        messageText += offStatusString;
-      }
-    }
-  }
-  if (lineCount >= lineBreakCount) { messageText += `\n`; lineCount = 0 };
-
-  //アイテム数
-  for (let id = 1; id < 10; id++) {
-    dataItemMeta = dataItem.meta['EventSetItem' + id];
-    if (dataItemMeta) {
-      const arr = dataItemMeta.split(',');
-      const actorId = Number(arr[0]);
-      const skillId = Number(arr[1]);
-      if (arr[0] == 0) {
-        arr[0] = 11;
-      } else {
-        //conditionCount += 1;
-      };
-      lineCount += 1;
-      const countItem = $dataItems[actorId];
-      if (!countItem) continue;
-      messageText += `\x1bIIN[${actorId}:\\C[2]${skillId}\\C[0]]`;
-      if ($gameParty.numItems(countItem) >= skillId) {
-        unmetConditionCount += 1;
-        metConditionCount += 1;
-        messageText += onStatusString;
-      } else {
-        unmetConditionCount += 1;
-        messageText += offStatusString;
-      }
-    }
-  }
-  if (lineCount >= lineBreakCount) { messageText += `\n`; lineCount = 0 };
-
-  //アクターが存在するか
-  dataItemMeta = dataItem.meta['EventEraseActor'];
-  if (dataItemMeta) {
-    const arr = dataItemMeta.split(',');
-    textSubst = ` `;
-    for (let id = 0; id <= arr.length - 1; id++) {
-      if (Number(arr[id]) == 0) {
-        arr[id] = 20;//存在しないアクター
-      } else {
-        const eraseActor = nakamiActor(arr[id]);
-        if (eraseActor && eraseActor.isLearnedSkill(407)) {
-          textSubst = `${eraseActor.name()}`;
-        } else {
-          textSubst = `？？？`;
-        };
-        //conditionCount += 1;
-      };
-      const eraseCheckActor = nakamiActor(arr[id]);
-      if (!eraseCheckActor) continue;
-      requirement = eraseCheckActor.isLearnedSkill(18) && !eraseCheckActor.isStateAffected(valueDollStateId);
-      if (arr[id] != 20) {
-        if (requirement) {
-          cannotExecute = 1;
-          messageText += `[＜${textSubst}＞が仲間のため発生不可]`;
-        } else {
-          messageText += `[＜${textSubst}＞が仲間の場合に発生不可]`;;
-        }
-        lineCount += 1;
-      }
-    }
-  }
-  if (lineCount >= lineBreakCount) { messageText += `\n`; lineCount = 0 };
-
-  dataItemMeta = dataItem.meta['EventEraseSwi'];
-  if (dataItemMeta) {
-    requirement = Number(dataItemMeta);
-    if (requirement >= 1) {
-      textSubst = $dataSystem.switches[requirement];
-      textSubst = scene_joukenNakami_clean_prefixes(textSubst);
-      if ($gameSwitches.value(requirement)) {
-        cannotExecute = 1;
-        messageText += `[${textSubst}につき発生不可]`;
-      } else {
-        messageText += `[${textSubst}で発生不可]`;
-      }
-      lineCount += 1;
-    }
-  }
-  if (lineCount >= lineBreakCount) { messageText += `\n`; lineCount = 0 };
-
-  dataItemMeta = dataItem.meta['EventEraseMain'];
-  if (dataItemMeta) {
-    const dataItemMetaArray = dataItemMeta.split(',');
-    const mainQuestVarId = Number(dataItemMetaArray[0]);
-const requiredMainQuestProgress = Number(dataItemMetaArray[1]);
-    if (requiredMainQuestProgress >= 1) {
-      if ($gameVariables.value(mainQuestVarId) > requiredMainQuestProgress) {
-        cannotExecute = 1;
-        messageText += `[メインクエスト進行につき発生不可]`;
-      } else {
-        messageText += `[メインクエスト進行＜${mainQuestProgress}＞で発生不可]`;
-      }
-      lineCount += 1;
-    }
-  }
-  if (lineCount >= lineBreakCount) { messageText += `\n`; lineCount = 0 };
-
-  dataItemMeta = dataItem.meta['EventEraseVal'];
-  if (dataItemMeta) {
-    const dataItemMetaArray = dataItemMeta.split(',');
-    const targetVarId = Number(dataItemMetaArray[0]);
-    const targetVarValue = Number(dataItemMetaArray[1]);
-    if (targetVarId >= 1) {
-      textSubst = $dataSystem.variables[targetVarId];
-      textSubst = scene_joukenNakami_clean_prefixes(textSubst);
-      if ($gameVariables.value(targetVarId) > targetVarValue) {
-        cannotExecute = 1;
-        messageText += `[${textSubst}一定につき発生不可]`;
-      } else {
-        messageText += `[${textSubst}一定で発生不可]`;
-      };
-      lineCount += 1;
-    }
-  }
-
-  conditionPrefixText += `${messageText}`;
-  if (dataItem.meta['NoAddDescription']) { } else {
-    dataItem.description = `${conditionPrefixText}`;
-  }
-  j += 1;
-  valueSceneName1 = `${dataItem.name}`;
-  let valueSceneDescription1 = `${dataItem.description}`;
-  if (unmetConditionCount != metConditionCount) {
-    valueSceneName1 = `？？？`;
-  }
-  if (eventSceneNotExists >= 1 || insufficientMainQuest >= 1 || eventSceneMissing == 0) {
-    valueSceneDescription1 = `？？？？？？？？？？？？\n`;
-    if (showMapName != 0) {
-      valueSceneDescription1 += `${showMapName}`;
-    }
-  }
-  if (eventSceneNotExists >= 1) {
-    valueSceneDescription1 += `[要:前提シーン] `;
-  }
-  if (insufficientMainQuest >= 1) {
-    valueSceneDescription1 += `[要:メインクエスト一定進行] `;
-  }
-  if (actorNotJoined >= 1) {
-    valueSceneDescription1 += `[要:未加入キャラ] `;
-  }
-  if (mainQuestProgress != 0) {
-    if ($gameVariables.value(356)[mainQuestStageIndex] != 0 || mainQuestStageIndex == 2) {
-      valueSceneDescription1 += `${mainQuestProgress}`;
-    } else {
-      valueSceneDescription1 += `[未到達マップ]`;
-    }
-  } else {
-
-    if ($gameSwitches.value(checkSwitchOffset + itemIndex)) {// || $gameSwitches.value(435) && !$gameParty.hasItem($dataItems[i])
-      mapSceneOccurrenceCount += 1;
-
-    } else {
-
-      if (marGenScene1 >= 1 && cannotExecute == 0) {
-
-        if (marGenScene1 >= 1) {
-          if (sceneGroupId == 1) { $gameSwitches.setValue(479, true) };
-          if (sceneGroupId == 2) { $gameSwitches.setValue(480, true) };
-        }
-        if (inBattle == 1 && $gameParty.inBattle()) {
-          BattleManager._logWindow.push(`addText`, conditionPrefixText);
-        }
-
-        mapSceneOccurrenceCount += 1;
-        let sceneTextBlock = `${valueSceneName1}\n${valueSceneDescription1}\n`;
-        /*   let sceneItemId5 = 1; //WARN not using? temp commented
-          if (mapSceneOccurrenceCount >= 81) { sceneItemId5 = 10 }
-          else if (mapSceneOccurrenceCount >= 71) { sceneItemId5 = 9 }
-          else if (mapSceneOccurrenceCount >= 61) { sceneItemId5 = 8 }
-          else if (mapSceneOccurrenceCount >= 51) { sceneItemId5 = 7 }
-          else if (mapSceneOccurrenceCount >= 41) { sceneItemId5 = 6 }
-          else if (mapSceneOccurrenceCount >= 31) { sceneItemId5 = 4 }
-          else if (mapSceneOccurrenceCount >= 21) { sceneItemId5 = 3 }
-          else if (mapSceneOccurrenceCount >= 11) { sceneItemId5 = 2 } */
-        if (unmetConditionCount == metConditionCount) {
-          var sceneWordChunk = `${sceneTextBlock}`;
-          eval("valueWordSet" + valueCountSet2 + " += sceneWordChunk");
-          valueCountSet1 += 1;
-          if ((valueCountSet1 % 10) == 0) {
-            valueCountSet2 += 1;
-            eval("valueWordSet" + valueCountSet2 + " = initialWordSetText");
-          };
-          $gameSwitches.setValue(itemIndex + occurrenceSwitchOffset, true);//発生用スイッチ
-          if (valueCountDefeadSwitche1 >= 1) {
-            valueCountDefeadSwitche2 = itemIndex;
-          };
-          dataItemMeta = dataItem.meta['AutoStart'];
-          if (dataItemMeta) {//自動起動かどうか
-            if (Number(dataItemMeta) == 1 && $gameSwitches.value(477)) {//マップ最初並列イベコモン時にオンオフ自動
-              $gameSwitches.setValue(474, true);
-              valueCountDefeadSwitche2 = itemIndex;
-            };
-            if (Number(dataItemMeta) == 2 && $gameSwitches.value(472)) {//朝並列スイッチ
-              $gameSwitches.setValue(474, true);
-              valueCountDefeadSwitche2 = itemIndex;
-            };
-          };
-          if ($gameParty.inBattle()) {
-            if (inBattle == 1) {
-              $gameVariables.setValue(occurrenceCountVarId, $gameVariables.value(occurrenceCountVarId) + 1);
-            };
-          } else {
-            $gameVariables.setValue(occurrenceCountVarId, $gameVariables.value(occurrenceCountVarId) + 1);
-          };
-        } else {
-          var sceneWordChunk = `\\C[5]${sceneTextBlock}\\C[0]`;
-          eval("valueWordSet" + valueCountSet2 + " += sceneWordChunk");
-          valueCountSet1 += 1;
-          if ((valueCountSet1 % 10) == 0) {
-            valueCountSet2 += 1;
-            eval("valueWordSet" + valueCountSet2 + " = initialWordSetText");
-          };
-          $gameSwitches.setValue(itemIndex + occurrenceSwitchOffset, false);//発生用スイッチ
-
-          if ($gameParty.inBattle()) {
-            if (inBattle == 1) {
-              $gameVariables.setValue(unmetCountVarId, $gameVariables.value(unmetCountVarId) + 1);
-            }
-          } else {
-            $gameVariables.setValue(unmetCountVarId, $gameVariables.value(unmetCountVarId) + 1);
-          };
-
-        };
-
-      } else {
-        var sceneWordChunk = `\\C[1]${tempAssignSceneOccurText}\\C[0]`;
-        eval("valueWordSet" + valueCountSet2 + " += sceneWordChunk");
-        valueCountSet1 += 1;
-        if ((valueCountSet1 % 10) == 0) {
-          valueCountSet2 += 1;
-          eval("valueWordSet" + valueCountSet2 + " = initialWordSetText");
-        };
-        if (!dataItem.meta['RepeatScene']) {
-          $gameSwitches.setValue(itemIndex + occurrenceSwitchOffset, false);//発生用スイッチ
-        }
-      }
-    }
-  }
-
+  //NOTE: 戦闘条件はラベルだけで状態マーカーを出さない
+  appendSceneText(state, `[戦闘]`, 0);
+  state.marGenScene1 += 1;
+  state.unmetConditionCount += 1;
+  state.metConditionCount += 1;
 }
 
+//[場所] 発生マップ
+function appendMapCondition(state) {
+  const mapMeta = state.dataItem.meta['EventSetMap'];
+  if (!mapMeta) return;
+
+  const mapSwitchId = Number(mapMeta);
+
+  if (mapSwitchId == 0) {
+    //EventSetMapが0の場合は代替スイッチ(2)を判定する
+    state.showMapName = `[何処でも]`;
+    state.messageText += state.showMapName;
+  } else {
+    const mapName = $dataSystem.switches[mapSwitchId];
+    state.showMapName = `[${mapName}]`;
+    state.messageText += state.showMapName;
+  }
+
+  state.lineCount += 1;
+
+  //NOTE: 場所条件はカウントのみで状態マーカーを出さない。
+  //      0(何処でも)の場合も従来通りスイッチ0を判定する(常にfalse)
+  state.unmetConditionCount += 1;
+  if ($gameSwitches.value(mapSwitchId)) {
+    state.marGenScene1 += 1;
+    state.metConditionCount += 1;
+  }
+
+  //ヒント提示のため場所での区切りを無くしている
+  if ($gameSwitches.value(SCENE_SWITCH_HINT_MAP_FREE)) {
+    state.marGenScene1 += 1;
+  }
+
+  breakSceneLineIfNeeded(state);
+}
+
+//[自動発生]/[朝自動発生]/[宿泊時に自動発生]
+function appendAutoStartConditions(state) {
+  const autoStartMeta = state.dataItem.meta['AutoStart'];
+  if (!autoStartMeta) return;
+
+  const autoStartLabelText = SCENE_AUTO_START_LABELS[Number(autoStartMeta)];
+  if (!autoStartLabelText) return;
+
+  appendSceneText(state, autoStartLabelText, 1);
+}
+
+const SCENE_AUTO_START_LABELS = {
+  1: `[自動発生]`,
+  2: `[朝自動発生]`,
+  3: `[宿泊時に自動発生]`
+};
+
+//[メイン[2]進行中に発生]
+function appendOccurrenceMainCondition(state) {
+  const occurrenceMainMeta = state.dataItem.meta['EventSetOccurrenceMain'];
+  if (!occurrenceMainMeta) return;
+  if (Number(occurrenceMainMeta) < 1) return;
+
+  appendSceneText(state, `[メイン[${occurrenceMainMeta}]進行中に発生]`, 1);
+}
+
+//[メモ] 注記(この直後が最初の改行判定)
+function appendNoteWordCondition(state) {
+  const noteWordMeta = state.dataItem.meta['NoteWord'];
+  if (noteWordMeta) {
+    appendSceneText(state, `[${noteWordMeta}]`, 1);
+  }
+
+  breakSceneLineIfNeeded(state);
+}
+
+//[◯◯視点] 視点スイッチ(441以降)の条件。falseを返すと全体を中断
+function appendPerspectiveCondition(state) {
+  const perspectiveMeta = state.dataItem.meta['EventSetPerspective'];
+  if (!perspectiveMeta) {
+    breakSceneLineIfNeeded(state);
+    return true;
+  }
+
+  const perspectiveActorId = Number(perspectiveMeta);
+  const isCurrentActor = perspectiveActorId == sceneCurrentActorId();
+
+  if (perspectiveActorId >= 1 && !isCurrentActor) {
+    const perspectiveActor = nakamiActor(perspectiveActorId);
+    if (!perspectiveActor) return false;
+
+    appendSceneText(state, `[${perspectiveActor.name()}視点`, 1);
+  }
+
+  const isPerspectiveMet = $gameSwitches.value(perspectiveActorId + SCENE_PERSPECTIVE_SWITCH_OFFSET);
+  if (isPerspectiveMet) {
+    state.unmetConditionCount += 1;
+    state.metConditionCount += 1;
+    if (!isCurrentActor) state.messageText += SCENE_STATUS_ON;
+  } else {
+    state.unmetConditionCount += 1;
+    if (!isCurrentActor) state.messageText += SCENE_STATUS_OFF;
+
+    const perspectiveActor = nakamiActor(perspectiveActorId);
+    if (perspectiveActor && isSceneActorNotJoined(perspectiveActor)) {
+      state.eventSceneMissing = 0;
+      state.actorNotJoined = 1;
+    }
+  }
+
+  breakSceneLineIfNeeded(state);
+  return true;
+}
+
+const SCENE_PERSPECTIVE_SWITCH_OFFSET = 440;
+
+//EventSetSwi / EventNotSetSwi (スイッチ条件)。旧: 2つのほぼ同一コードブロック
+function appendSwitchConditions(state) {
+  appendSwitchConditionGroup(state, {
+    metaName: 'EventSetSwi',
+    defaultSwitchId: 2,
+    labelPrefix: ``,
+    isSetRequired: true
+  });
+  appendSwitchConditionGroup(state, {
+    metaName: 'EventNotSetSwi',
+    defaultSwitchId: 1,
+    labelPrefix: `不可:`,
+    isSetRequired: false
+  });
+}
+
+function appendSwitchConditionGroup(state, options) {
+  const switchMeta = state.dataItem.meta[options.metaName];
+  if (switchMeta) {
+    const switchIdValues = switchMeta.split(',');
+
+    for (let index = 0; index < switchIdValues.length; index++) {
+      const rawSwitchId = switchIdValues[index];
+      let switchId;
+
+      if (rawSwitchId == 0) {
+        switchId = options.defaultSwitchId;
+      } else {
+        const switchName = scene_joukenNakami_clean_prefixes($dataSystem.switches[Number(rawSwitchId)]);
+        appendSceneText(state, `[${options.labelPrefix}${switchName}`, 1);
+        switchId = Number(rawSwitchId);
+      }
+
+      const isSwitchOn = $gameSwitches.value(switchId);
+      const isMet = options.isSetRequired ? isSwitchOn : !isSwitchOn;
+
+      if (isMet && options.isSetRequired && switchId == SCENE_SWITCH_ALL_DEFEATED) {
+        //全滅スイッチ
+        state.defeatedSwitchItemId = state.itemIndex;
+      }
+
+      appendConditionStatus(state, isMet);
+    }
+  }
+
+  breakSceneLineIfNeeded(state);
+}
+
+//[アクター名] アクターが加入しているか
+function appendActorCondition(state) {
+  const actorMeta = state.dataItem.meta['EventSetActor'];
+  if (!actorMeta) {
+    breakSceneLineIfNeeded(state);
+    return;
+  }
+
+  const actorIdValues = actorMeta.split(',');
+
+  for (let index = 0; index <= actorIdValues.length - 1; index++) {
+    const rawActorId = actorIdValues[index];
+    const isAnyActor = Number(rawActorId) == 0;
+
+    if (isAnyActor) {
+      //誰でもいいアクター(変数11のアクター)
+      actorIdValues[index] = $gameVariables.value(SCENE_VAR_ANY_ACTOR);
+    } else {
+      const listedActor = nakamiActor(rawActorId);
+      if (listedActor) appendSceneText(state, `[${listedActor.name()}]`, 1);
+    }
+
+    const actor = nakamiActor(actorIdValues[index]);
+    if (!actor) continue;
+
+    const isAvailable = isSceneActorAvailable(actor);
+    appendConditionStatus(state, isAvailable);
+
+    if (!isAvailable && isSceneActorNotJoined(actor)) {
+      state.eventSceneMissing = 0;
+      state.actorNotJoined = 1;
+    }
+  }
+
+  breakSceneLineIfNeeded(state);
+}
+
+//[挿話集:アイテム] 前提シーン(アイテム)の条件
+function appendSceneItemCondition(state) {
+  const itemSetMeta = state.dataItem.meta['ItemSetScene'];
+  if (!itemSetMeta) {
+    breakSceneLineIfNeeded(state);
+    return;
+  }
+
+  const sceneItemIdValues = itemSetMeta.split(',');
+
+  for (let index = 0; index <= sceneItemIdValues.length - 1; index++) {
+    if (!sceneItemIdValues[index]) continue;
+
+    const sceneItemId = Number(sceneItemIdValues[index]);
+    const sceneItem = $dataItems[sceneItemId];
+    if (!sceneItem) continue;
+
+    appendSceneText(state, `${readSceneItemCategoryLabel(sceneItem)}\x1bIIN[${sceneItemId}]`, 1);
+
+    const isMet = isSceneItemConditionMet(sceneItem, sceneItemId);
+    appendConditionStatus(state, isMet);
+
+    if (!isMet) {
+      state.eventSceneMissing = 0;
+      state.eventSceneNotExists = 1;
+    }
+  }
+
+  breakSceneLineIfNeeded(state);
+}
+
+//アイテムのカテゴリ見出し
+function readSceneItemCategoryLabel(sceneItem) {
+  const eicSwitchMeta = sceneItem.meta['EICSwitch'];
+  if (eicSwitchMeta) {
+    return SCENE_ITEM_CATEGORY_LABELS[Number(eicSwitchMeta)] || ``;
+  }
+  if (sceneItem.meta['SG種別']) {
+    //<SG種別>がクエスト以外なら見出しなし
+    return Number(sceneItem.meta['SG種別']) == SCENE_SG_QUEST ? `[クエスト達成:` : ``;
+  }
+  return `[`;
+}
+
+const SCENE_ITEM_CATEGORY_LABELS = {
+  [SCENE_EIC_SOUWA]: `[挿話集:`,
+  [SCENE_EIC_SCENE]: `[シーン:`,
+  [SCENE_EIC_TITLE]: `[タイトル:`,
+  [SCENE_EIC_HTITLE]: `[H'タイトル:`
+};
+
+//前提シーンの成立判定(シーン/挿話は所持ではなく専用スイッチで判定)
+function isSceneItemConditionMet(sceneItem, sceneItemId) {
+  const eicSwitchMeta = sceneItem.meta['EICSwitch'];
+  if (eicSwitchMeta) {
+    const eicSwitchId = Number(eicSwitchMeta);
+    if (eicSwitchId == SCENE_EIC_SCENE) return $gameSwitches.value(sceneItemId + 600);
+    if (eicSwitchId == SCENE_EIC_SOUWA) return $gameSwitches.value(sceneItemId + 900);
+  }
+  return $gameParty.hasItem(sceneItem);
+}
+
+//[スキル名:Rank5↑] スキルランク条件
+function appendSkillRankConditions(state) {
+  forEachSceneConditionSlot(state.dataItem, 'EventSetSkillRank', function(rankValues) {
+    if (!rankValues[1]) rankValues[1] = SCENE_SKILL_ID_DEFAULT;
+    if (!rankValues[0]) rankValues[0] = sceneCurrentActorId();
+
+    const actor = nakamiActor(rankValues[0]);
+    if (!actor) return;
+
+    const skillId = Number(rankValues[1]);
+    const rankNum = Number(rankValues[2]);
+
+    if (!appendHiddenSkillLabel(state, actor, skillId, `特定スキルランク${rankNum}↑]`)) {
+      const skill = $dataSkills[skillId];
+      if (!skill) return;
+      appendSkillLabel(state, actor, rankValues[0], skill, `:Rank${rankNum}↑`);
+    }
+
+    appendConditionStatus(state, actor.isLearnedSkill(skillId) && actor.skillMasteryLevel(skillId) >= rankNum);
+  });
+
+  breakSceneLineIfNeeded(state);
+}
+
+//[スキル名習得] スキル習得条件
+function appendSkillConditions(state) {
+  forEachSceneConditionSlot(state.dataItem, 'EventSetSkill', function(skillValues) {
+    if (!skillValues[1]) skillValues[1] = SCENE_SKILL_ID_DEFAULT;
+    if (!skillValues[0]) skillValues[0] = sceneCurrentActorId();
+
+    const actor = nakamiActor(skillValues[0]);
+    if (!actor) return;
+
+    const skillId = Number(skillValues[1]);
+
+    if (!appendHiddenSkillLabel(state, actor, skillId, `特定スキル習得`)) {
+      const skill = $dataSkills[skillId];
+      if (!skill) return;
+      appendSkillLabel(state, actor, skillValues[0], skill, `習得`);
+    }
+
+    appendConditionStatus(state, actor.isLearnedSkill(skillId));
+  });
+
+  breakSceneLineIfNeeded(state);
+}
+
+//[スキル名装着] スキル装着条件
+function appendSkillEquipConditions(state) {
+  forEachSceneConditionSlot(state.dataItem, 'EventSetSkillEquip', function(equipValues) {
+    const actorId = Number(equipValues[0]) == 0 ? sceneCurrentActorId() : Number(equipValues[0]);
+    const skillId = Number(equipValues[1]);
+
+    const actor = nakamiActor(actorId);
+    if (!actor) return;
+
+    if (!appendHiddenSkillLabel(state, actor, skillId, `特定スキル装着`)) {
+      const skill = $dataSkills[skillId];
+      if (!skill) return;
+      appendSkillLabel(state, actor, actorId, skill, `装着`);
+    }
+
+    appendConditionStatus(state, actor.battleSkillsRaw().includes(skillId));
+  });
+
+  breakSceneLineIfNeeded(state);
+}
+
+//名前置換スイッチがONでスキル未習得なら伏せた表記を追記する(trueを返す)
+function appendHiddenSkillLabel(state, actor, skillId, hiddenHeaderText) {
+  if ($gameSwitches.value(SCENE_SWITCH_HIDE_UNKNOWN)) return false;
+  if (actor.isLearnedSkill(skillId)) return false;
+
+  appendSceneText(state, `[${actor.name()}が${hiddenHeaderText}`, 1);
+  return true;
+}
+
+//スキル条件の見出し(基準アクター以外は名前を前置)
+function appendSkillLabel(state, actor, rawActorId, skill, headerText) {
+  const actorPrefix = rawActorId == sceneCurrentActorId() ? `` : `${actor.name()}が`;
+  appendSceneText(state, `[${actorPrefix}${skill.name}${headerText}`, 1);
+}
+
+//State:[◯◯] ステート付与条件
+function appendStateConditions(state) {
+  forEachSceneConditionSlot(state.dataItem, 'EventSetState', function(stateValues) {
+    const actorId = Number(stateValues[0]) == 0 ? sceneCurrentActorId() : Number(stateValues[0]);
+    const stateId = Number(stateValues[1]);
+
+    const actor = nakamiActor(actorId);
+    if (!actor) return;
+
+    const stateLabel = `State:[\x1bSIM[${stateId}]`;
+    if (Number(stateValues[0]) == sceneCurrentActorId()) {
+      appendSceneText(state, stateLabel, 1);
+    } else {
+      appendSceneText(state, `[${actor.name()}がステート:\x1bSIM[${stateId}]`, 1);
+    }
+
+    appendConditionStatus(state, actor.isStateAffected(stateId));
+  });
+
+  breakSceneLineIfNeeded(state);
+}
+
+//[ジョブ名] サブクラス条件
+function appendJobConditions(state) {
+  forEachSceneConditionSlot(state.dataItem, 'EventSetJob', function(jobValues) {
+    const actorId = Number(jobValues[0]) == 0 ? sceneCurrentActorId() : Number(jobValues[0]);
+    const jobId = Number(jobValues[1]);
+
+    const actor = nakamiActor(actorId);
+    if (!actor) return;
+
+    const unlockedClasses = actor._unlockedClasses || [];
+    if (!$gameSwitches.value(SCENE_SWITCH_HIDE_UNKNOWN) && !unlockedClasses.contains(jobId)) {
+      appendSceneText(state, `[${actor.name()}が特定ジョブ`, 1);
+    } else {
+      appendSceneText(state, `[${actor.name()}がジョブ:\x1bJ[${jobId}]`, 1);
+    }
+
+    if (!actor.subclass()) return;
+    if (actor._subclassId == jobId) {
+      appendConditionStatus(state, true);
+    } else {
+      appendConditionStatus(state, false);
+    }
+  });
+
+  breakSceneLineIfNeeded(state);
+}
+
+//[討伐数] 討伐数条件
+function appendSubjugationConditions(state) {
+  forEachSceneConditionSlot(state.dataItem, 'EventSetSubjugation', function(subjugationValues) {
+    const monsterId = Number(subjugationValues[0]);
+    const requiredCount = Number(subjugationValues[1]);
+    const currentCount = nakamiArrayValue(SCENE_SUBJUGATION_COUNT_VAR, monsterId);
+
+    const monsterName = colorTaggedText(2, `\x1bSIM[${monsterId}]`);
+    const requiredText = colorTaggedText(10, currentCount);
+    appendSceneText(state, `[${monsterName}:${requiredText}/${requiredCount}`, 1);
+
+    appendConditionStatus(state, currentCount >= requiredCount);
+  });
+
+  breakSceneLineIfNeeded(state);
+}
+
+//[条件付き選択肢を選ぶ事で回想登録]
+function appendRegistrationCondition(state) {
+  if (!state.dataItem.meta['RegistrationC1']) return;
+
+  appendSceneText(state, `[条件付き選択肢を選ぶ事で回想登録]`, 1);
+}
+
+//[1000\G] 所持金条件
+function appendMoneyCondition(state) {
+  const moneyMeta = state.dataItem.meta['EventSetMoney'];
+  if (!moneyMeta) return;
+
+  const requiredGold = Number(moneyMeta);
+  if (requiredGold == 0) return;
+
+  appendSceneText(state, `[${requiredGold}\\G`, 0);
+  appendConditionStatus(state, $gameParty.gold() >= requiredGold);
+}
+
+//[露出度20以下]/[感度300以上] H経験値配列条件
+function appendHexpConditions(state) {
+  forEachSceneConditionSlot(state.dataItem, 'EventSetHexpArr', function(hexpValues) {
+    const actorId = Number(hexpValues[0]);
+    const paramType = Number(hexpValues[1]);
+    const targetValue = Number(hexpValues[2]);
+
+    const actor = nakamiActor(actorId);
+    if (!actor) return;
+
+    const paramName = $dataSystem.variables[paramType + SCENE_CONDITION_LABEL_VAR_OFFSET];
+    const currentValue = nakamiArrayValue(actorId + SCENE_ACTOR_ARRAY_OFFSET, paramType);
+    const actorName = tagSceneActorName(actor);
+
+    if (paramType == SCENE_EXPOSURE_PARAM) {
+      //露出度だけは「以下」
+      appendSceneText(state, `[${actorName}${paramName}${targetValue}以下`, 1);
+      appendConditionStatus(state, currentValue <= targetValue);
+      return;
+    }
+
+    appendSceneText(state, `[${actorName}${paramName}${targetValue}以上`, 1);
+    appendConditionStatus(state, currentValue >= targetValue);
+  });
+
+  breakSceneLineIfNeeded(state);
+}
+
+//[アクター名が衣装名着用] 衣装条件
+function appendClothConditions(state) {
+  forEachSceneConditionSlot(state.dataItem, 'EventSetClothArr', function(clothValues) {
+    const actorId = Number(clothValues[0]);
+    const paramType = Number(clothValues[1]);
+    const targetValue = Number(clothValues[2]);
+
+    const actor = nakamiActor(actorId);
+    if (!actor) return;
+
+    const clothLabel = readClothConditionLabel(actor, actorId, paramType, targetValue);
+    if (clothLabel === null) return;
+
+    appendSceneText(state, clothLabel, 2);
+
+    const currentCloth = nakamiArrayValue(actorId + SCENE_ACTOR_CLOTH_OFFSET, paramType);
+    appendConditionStatus(state, currentCloth == targetValue);
+  });
+
+  breakSceneLineIfNeeded(state);
+}
+
+//衣装条件の表示名。統合衣装(41)は衣装一覧から該当アイテム名を探す
+function readClothConditionLabel(actor, actorId, paramType, targetValue) {
+  if (paramType == SCENE_CLOTH_TOTAL_PARAM) {
+    return `[${actor.name()}が${findTotalClothName(actorId, targetValue)}着用`;
+  }
+  if (paramType == 0) {
+    const clothItem = $dataItems[targetValue];
+    if (!clothItem) return null;
+    return `[${actor.name()}が${clothItem.name}着用`;
+  }
+  return `[${actor.name()}の${$dataSystem.switches[paramType + SCENE_CLOTH_SLOT_LABEL_VAR_OFFSET]}に特定衣装`;
+}
+
+//統合衣装ID(targetValue)に一致するアクター専用衣装の名前
+//$dataItems は読み込み後に変化しないので、初回だけ索引を作って以降は参照する
+function findTotalClothName(actorId, totalClothNumber) {
+  const clothKey = `${actorId}:${totalClothNumber}`;
+  if (!SCENE_TOTAL_CLOTH_NAME_INDEX) buildTotalClothNameIndex();
+
+  const clothName = SCENE_TOTAL_CLOTH_NAME_INDEX.get(clothKey);
+  return clothName === undefined ? `` : clothName;
+}
+
+let SCENE_TOTAL_CLOTH_NAME_INDEX = null;
+
+//衣装一覧を1回だけ走査して「アクターID:統合衣装ID → アイテム名」を作る
+function buildTotalClothNameIndex() {
+  SCENE_TOTAL_CLOTH_NAME_INDEX = new Map();
+
+  const itemCount = $dataItems.length - 1;
+  for (let itemId = 1; itemId <= itemCount; itemId++) {
+    const item = $dataItems[itemId];
+    if (!item) continue;
+
+    const totalClothMeta = item.meta['TotalCloth'];
+    if (!totalClothMeta) continue;
+    if (!item.meta['EICSwitch']) continue;
+
+    const actorId = Number(item.meta['EICSwitch']) - SCENE_ACTOR_ARRAY_OFFSET;
+    const clothKey = `${actorId}:${Number(totalClothMeta)}`;
+    //同じ組み合わせは最初に見つかったアイテム名を使う(従来の break と同じ)
+    if (SCENE_TOTAL_CLOTH_NAME_INDEX.has(clothKey)) continue;
+
+    SCENE_TOTAL_CLOTH_NAME_INDEX.set(clothKey, item.name);
+  }
+}
+
+//[メイン進行[2]↑] メインクエスト進行条件
+function appendMainRootCondition(state) {
+  const mainRootMeta = state.dataItem.meta['EventSetMainRoot'];
+  if (!mainRootMeta) return;
+
+  const mainRootValues = mainRootMeta.split(',');
+  const mainQuestVarId = Number(mainRootValues[0]);
+  const requiredProgress = Number(mainRootValues[1]);
+  if (mainRootValues[1] == 0) return;
+
+  if (mainRootValues[0] == 0) {
+    mainRootValues[0] = SCENE_VAR_MAIN_QUEST;
+  } else {
+    if (requiredProgress == 49) {
+      appendSceneText(state, `[メインクエスト完了後`, 1);
+    } else {
+      appendSceneText(state, `[メイン進行[${requiredProgress}]↑`, 1);
+    }
+  }
+
+  const isMet = $gameVariables.value(mainQuestVarId) >= requiredProgress;
+  appendConditionStatus(state, isMet);
+
+  if (!isMet) {
+    state.eventSceneMissing = 0;
+    state.insufficientMainQuest = 1;
+  }
+}
+
+//[単独行動]/[変数名:3↑] 変数条件
+function appendValConditions(state) {
+  forEachSceneConditionSlot(state.dataItem, 'EventSetVal', function(valValues) {
+    const varId = Number(valValues[0]);
+    const requiredValue = Number(valValues[1]);
+
+    if (valValues[0] == 0) {
+      valValues[0] = SCENE_VAR_CURRENT_ACTOR;
+    } else if (!appendValConditionLabel(state, varId, requiredValue)) {
+      //表示できない条件(アクター未解決)はその条件だけを飛ばす
+      return;
+    }
+
+    appendConditionStatus(state, $gameVariables.value(varId) >= requiredValue);
+  });
+
+  breakSceneLineIfNeeded(state);
+}
+
+//変数条件の表示名(単独行動 / パーティn番目 / 変数名)
+function appendValConditionLabel(state, varId, requiredValue) {
+  if (varId == SCENE_PARTY_ACTOR_COUNT_VAR || requiredValue == 1) {
+    appendSceneText(state, `[単独行動`, 1);
+    return true;
+  }
+
+  if (varId >= SCENE_PARTY_ACTOR_VAR_FIRST && varId <= SCENE_PARTY_ACTOR_VAR_FIRST + 3) {
+    const partyActor = nakamiActor(requiredValue);
+    if (!partyActor) return false;
+
+    appendSceneText(state, `[${varId - SCENE_PARTY_ACTOR_VAR_FIRST + 1}番目:${partyActor.name()}`, 1);
+    return true;
+  }
+
+  const varName = scene_joukenNakami_clean_prefixes($dataSystem.variables[varId]);
+  appendSceneText(state, `[${varName}:${requiredValue}↑`, 1);
+  return true;
+}
+
+//[アイテム] 所持数条件
+function appendItemCountConditions(state) {
+  forEachSceneConditionSlot(state.dataItem, 'EventSetItem', function(itemValues) {
+    const itemId = Number(itemValues[0]);
+    const requiredCount = Number(itemValues[1]);
+
+    if (itemValues[0] == 0) itemValues[0] = SCENE_ITEM_ANY_ACTOR_ID;
+
+    state.lineCount += 1;
+
+    const countItem = $dataItems[itemId];
+    if (!countItem) return;
+
+    const requiredText = colorTaggedText(2, requiredCount);
+    state.messageText += `\x1bIIN[${itemId}:${requiredText}]`;
+    appendConditionStatus(state, $gameParty.numItems(countItem) >= requiredCount);
+  });
+
+  breakSceneLineIfNeeded(state);
+}
+
+//[＜アクター名＞が仲間の場合に発生不可]
+function appendEraseActorCondition(state) {
+  const eraseActorMeta = state.dataItem.meta['EventEraseActor'];
+  if (!eraseActorMeta) {
+    breakSceneLineIfNeeded(state);
+    return;
+  }
+
+  const eraseActorIdValues = eraseActorMeta.split(',');
+  let eraseActorLabel = ` `;
+
+  for (let index = 0; index <= eraseActorIdValues.length - 1; index++) {
+    if (Number(eraseActorIdValues[index]) == 0) {
+      //存在しないアクター
+      eraseActorIdValues[index] = SCENE_MAX_INACTIVE_ACTOR;
+    } else {
+      const eraseActor = nakamiActor(eraseActorIdValues[index]);
+      eraseActorLabel = (eraseActor && !isSceneActorNotJoined(eraseActor)) ? `${eraseActor.name()}` : `？？？`;
+    }
+
+    const eraseCheckActor = nakamiActor(eraseActorIdValues[index]);
+    if (!eraseCheckActor) continue;
+    if (eraseActorIdValues[index] == SCENE_MAX_INACTIVE_ACTOR) continue;
+
+    if (isSceneActorAvailable(eraseCheckActor)) {
+      state.cannotExecute = 1;
+      appendSceneText(state, `[＜${eraseActorLabel}＞が仲間のため発生不可]`, 1);
+    } else {
+      appendSceneText(state, `[＜${eraseActorLabel}＞が仲間の場合に発生不可]`, 1);
+    }
+  }
+
+  breakSceneLineIfNeeded(state);
+}
+
+//[スイッチ名につき発生不可]
+function appendEraseSwitchCondition(state) {
+  const eraseSwitchMeta = state.dataItem.meta['EventEraseSwi'];
+  if (!eraseSwitchMeta) {
+    breakSceneLineIfNeeded(state);
+    return;
+  }
+
+  const eraseSwitchId = Number(eraseSwitchMeta);
+  if (eraseSwitchId >= 1) {
+    const eraseSwitchName = scene_joukenNakami_clean_prefixes($dataSystem.switches[eraseSwitchId]);
+    if ($gameSwitches.value(eraseSwitchId)) {
+      state.cannotExecute = 1;
+      appendSceneText(state, `[${eraseSwitchName}につき発生不可]`, 1);
+    } else {
+      appendSceneText(state, `[${eraseSwitchName}で発生不可]`, 1);
+    }
+  }
+
+  breakSceneLineIfNeeded(state);
+}
+
+//[メインクエスト進行につき発生不可]
+function appendEraseMainCondition(state) {
+  const eraseMainMeta = state.dataItem.meta['EventEraseMain'];
+  if (!eraseMainMeta) {
+    breakSceneLineIfNeeded(state);
+    return;
+  }
+
+  const eraseMainValues = eraseMainMeta.split(',');
+  const mainQuestVarId = Number(eraseMainValues[0]);
+  const requiredMainQuestProgress = Number(eraseMainValues[1]);
+  if (requiredMainQuestProgress < 1) {
+    breakSceneLineIfNeeded(state);
+    return;
+  }
+
+  if ($gameVariables.value(mainQuestVarId) > requiredMainQuestProgress) {
+    state.cannotExecute = 1;
+    appendSceneText(state, `[メインクエスト進行につき発生不可]`, 1);
+  } else {
+    //BUGFIX: 従来は常に0のmainQuestProgressを表示していた
+    appendSceneText(state, `[メインクエスト進行＜${requiredMainQuestProgress}＞で発生不可]`, 1);
+  }
+
+  breakSceneLineIfNeeded(state);
+}
+
+//[変数名一定で発生不可]
+function appendEraseValCondition(state) {
+  const eraseValMeta = state.dataItem.meta['EventEraseVal'];
+  if (!eraseValMeta) return;
+
+  const eraseValValues = eraseValMeta.split(',');
+  const targetVarId = Number(eraseValValues[0]);
+  const targetVarValue = Number(eraseValValues[1]);
+  if (targetVarId < 1) return;
+
+  const targetVarName = scene_joukenNakami_clean_prefixes($dataSystem.variables[targetVarId]);
+  if ($gameVariables.value(targetVarId) > targetVarValue) {
+    state.cannotExecute = 1;
+    appendSceneText(state, `[${targetVarName}一定につき発生不可]`, 1);
+  } else {
+    appendSceneText(state, `[${targetVarName}一定で発生不可]`, 1);
+  }
+}
+
+//---------------------------------------------------------------------------
+// 判定結果の確定と表示用テキストの生成
+//---------------------------------------------------------------------------
+function finalizeSceneEntry(state) {
+  const dataItem = state.dataItem;
+
+  //発生条件テキストを説明に反映(NoAddDescription指定時は除く)
+  const conditionText = SCENE_CONDITION_PREFIX + state.messageText;
+  if (!dataItem.meta['NoAddDescription']) {
+    dataItem.description = conditionText;
+  }
+
+  j += 1;
+  state.sceneName = dataItem.name;
+  state.sceneDescription = dataItem.description;
+  if (state.unmetConditionCount != state.metConditionCount) {
+    state.sceneName = SCENE_UNKNOWN_NAME;
+  }
+  //amygameSettei.js が初期化しているグローバル。互換のため同じ値を残す
+  valueSceneName1 = state.sceneName;
+
+  //前提シーン/メインクエスト/未加入キャラのいずれかが不足していれば内容を伏せる
+  state.sceneDescription = buildHiddenSceneDescription(state) + buildUnmetRequirementText(state);
+
+  if ($gameSwitches.value(state.checkSwitchOffset + state.itemIndex)) {
+    //判定済み。表示のみで発生処理は行わない
+    mapSceneOccurrenceCount += 1;
+    return;
+  }
+
+  if (state.marGenScene1 >= 1 && state.cannotExecute == 0) {
+    registerOccurredScene(state, conditionText);
+    return;
+  }
+
+  registerPendingScene(state);
+}
+
+//条件が揃わない場合の説明文(？？？表記)。伏せる必要がなければ通常の説明を返す
+function buildHiddenSceneDescription(state) {
+  const mustHide = state.eventSceneNotExists >= 1 || state.insufficientMainQuest >= 1 || state.eventSceneMissing == 0;
+  if (!mustHide) return state.sceneDescription;
+
+  let hiddenDescription = SCENE_UNKNOWN_DESCRIPTION;
+  if (state.showMapName != 0) hiddenDescription += `${state.showMapName}`;
+  return hiddenDescription;
+}
+
+//不足している前提の説明
+function buildUnmetRequirementText(state) {
+  let requirementText = ``;
+  if (state.eventSceneNotExists >= 1) requirementText += `[要:前提シーン] `;
+  if (state.insufficientMainQuest >= 1) requirementText += `[要:メインクエスト一定進行] `;
+  if (state.actorNotJoined >= 1) requirementText += `[要:未加入キャラ] `;
+  return requirementText;
+}
+
+//条件を満たして発生するシーン
+function registerOccurredScene(state, conditionText) {
+  markSceneGroupOccurrence(state);
+  logSceneOccurrenceInBattle(state, conditionText);
+  mapSceneOccurrenceCount += 1;
+
+  const sceneTextBlock = `${state.sceneName}\n${state.sceneDescription}\n`;
+  if (state.unmetConditionCount == state.metConditionCount) {
+    appendSceneWordChunk(sceneTextBlock);
+    applyMetSceneSwitches(state);
+    return;
+  }
+
+  appendSceneWordChunk(`\\C[5]${sceneTextBlock}\\C[0]`);
+  $gameSwitches.setValue(state.itemIndex + state.occurrenceSwitchOffset, false);//発生用スイッチ
+  incrementSceneCounter(state, state.unmetCountVarId);
+}
+
+//条件はあるが今は発生できない/しないシーン
+function registerPendingScene(state) {
+  appendSceneWordChunk(`\\C[1]${SCENE_PENDING_MARK}\\C[0]`);
+  if (!state.dataItem.meta['RepeatScene']) {
+    $gameSwitches.setValue(state.itemIndex + state.occurrenceSwitchOffset, false);//発生用スイッチ
+  }
+}
+
+//成立シーンの発生スイッチ/自動起動スイッチ/カウンタ
+function applyMetSceneSwitches(state) {
+  $gameSwitches.setValue(state.itemIndex + state.occurrenceSwitchOffset, true);//発生用スイッチ
+
+  if (state.defeatedSwitchItemId >= 1) {
+    valueCountDefeadSwitche2 = state.itemIndex;
+  }
+
+  applyAutoStartSwitch(state);
+  incrementSceneCounter(state, state.occurrenceCountVarId);
+}
+
+//グループ発生スイッチ(挿話/シーン)
+function markSceneGroupOccurrence(state) {
+  if (state.sceneGroupId == 1) $gameSwitches.setValue(SCENE_SWITCH_SOUWA_GROUP, true);
+  if (state.sceneGroupId == 2) $gameSwitches.setValue(SCENE_SWITCH_HSCENE_GROUP, true);
+}
+
+//戦闘中に発生するシーンは戦闘ログにも出す
+function logSceneOccurrenceInBattle(state, conditionText) {
+  if (state.inBattle != 1) return;
+  if (!$gameParty.inBattle()) return;
+
+  BattleManager._logWindow.push(`addText`, conditionText);
+}
+
+//自動起動シーンの起動スイッチ
+function applyAutoStartSwitch(state) {
+  const autoStartMeta = state.dataItem.meta['AutoStart'];
+  if (!autoStartMeta) return;
+
+  const autoStartType = Number(autoStartMeta);
+  //マップ最初の並列イベントの時にオンオフ自動
+  if (autoStartType == 1 && $gameSwitches.value(SCENE_SWITCH_MAP_START)) {
+    $gameSwitches.setValue(SCENE_SWITCH_PARALLEL_FIRED, true);
+    valueCountDefeadSwitche2 = state.itemIndex;
+  }
+  //朝の並列スイッチ
+  if (autoStartType == 2 && $gameSwitches.value(SCENE_SWITCH_MORNING_START)) {
+    $gameSwitches.setValue(SCENE_SWITCH_PARALLEL_FIRED, true);
+    valueCountDefeadSwitche2 = state.itemIndex;
+  }
+}
+
+//成立/未成立カウンタの加算。戦闘中の戦闘シーン以外は戦闘中でも加算しない
+function incrementSceneCounter(state, counterVarId) {
+  if ($gameParty.inBattle() && state.inBattle != 1) return;
+
+  $gameVariables.setValue(counterVarId, $gameVariables.value(counterVarId) + 1);
+}
+
+//valueWordSetN へ1シーン分のテキストを追記する
+function appendSceneWordChunk(textChunk) {
+  globalThis[sceneWordSetKey()] += textChunk;
+
+  valueCountSet1 += 1;
+  if ((valueCountSet1 % SCENE_WORD_SET_CHUNK_LIMIT) == 0) {
+    valueCountSet2 += 1;
+    resetWordSet();
+  }
+}
+
+//現在書き込み先の valueWordSetN のプロパティ名
+function sceneWordSetKey() {
+  return `valueWordSet` + valueCountSet2;
+}
+
+//書き込み先の valueWordSetN を初期テキストで初期化する
+function resetWordSet() {
+  globalThis[sceneWordSetKey()] = initialWordSetText;
+}
+
+//---------------------------------------------------------------------------
+// グループ単位の発生条件設定
+//---------------------------------------------------------------------------
+//シーンのアイテム範囲と、その発生/達成スイッチのオフセット
+const SCENE_ITEM_RANGES = {
+  1: { firstItemId: 401, lastItemId: 500, occurrenceSwitchOffset: 800, checkSwitchOffset: 900 },
+  2: { firstItemId: 501, lastItemId: 600, occurrenceSwitchOffset: 500, checkSwitchOffset: 600 }
+};
+
 //回想挿話発生条件式。回想scene_jouken(2);。挿話scene_jouken(1);
+const SCENE_GROUP_CONFIGS = {
+  1: {
+    ...SCENE_ITEM_RANGES[1],
+    resetSwitchId: SCENE_SWITCH_SOUWA_NAVI,
+    occurrenceGroupSwitchId: SCENE_SWITCH_SOUWA_GROUP,
+    occurrenceCountVarId: 517,
+    unmetCountVarId: 518,
+    addItemIdSource: () => valueSouwasceneAddId
+  },
+  2: {
+    ...SCENE_ITEM_RANGES[2],
+    resetSwitchId: SCENE_SWITCH_HSCENE_NAVI,
+    occurrenceGroupSwitchId: SCENE_SWITCH_HSCENE_GROUP,
+    occurrenceCountVarId: 504,
+    unmetCountVarId: 505,
+    addItemIdSource: () => valueHsceneAddId
+  }
+};
+
 //☆☆☆条件追加。<EventSetVal1:0,0>
 scene_joukensettei = function (sceneGroupId) {
 
   $gameVariables.setValue(195, 0);//表示時の個数を入れる事でコモンイベントのウィンド数を抑制
 
-  for (let i = 621; i <= 624; i++) { $gameVariables.setValue(i, 0) };
+  resetPartyActorVariables();
+  applySceneGroupSettings(sceneGroupId);
+
+  const groupConfig = SCENE_GROUP_CONFIGS[sceneGroupId];
+  if (!groupConfig) return;
+
+  //追加分のID配列が無い場合はここで打ち切る(従来動作)
+  if (!processSceneGroupItems(sceneGroupId, groupConfig)) return;
+
+  $gameVariables.setValue(195, valueCountSet1);//表示時の個数を入れる事でコモンイベントのウィンド数を抑制
+
+  applySceneNaviSwitches();
+};
+
+//621-624にパーティ1-4人目のアクターID、54に人数を入れる(表記用)
+function resetPartyActorVariables() {
+  for (let partySlot = 0; partySlot < 4; partySlot++) {
+    $gameVariables.setValue(SCENE_PARTY_ACTOR_VAR_FIRST + partySlot, 0);
+  }
 
   const battlers = $gameParty.battleMembers();
   const battlersCount = battlers.length;
-  for (let i = 0; i < battlersCount; i++) { //621-624のみ表記を変更。`${n-620}番目:${$gameActors.actor(n).name()}`
-    let battlerId = battlers[i].actorId();
-    $gameVariables.setValue(621 + i, battlerId);
-  };
-  $gameVariables.setValue(54, battlersCount);//パーティ人数。1の時は[単独行動]表記
+  for (let index = 0; index < battlersCount; index++) {
+    $gameVariables.setValue(SCENE_PARTY_ACTOR_VAR_FIRST + index, battlers[index].actorId());
+  }
+  $gameVariables.setValue(SCENE_PARTY_ACTOR_COUNT_VAR, battlersCount);//1の時は[単独行動]表記
+}
+
+//表示用グローバルとカウンタの初期化
+function applySceneGroupSettings(sceneGroupId) {
+  const groupConfig = SCENE_GROUP_CONFIGS[sceneGroupId];
 
   valueCountSet1 = 0;
   valueCountSet2 = 1;
   initialWordSetText = ` `;
-  eval("valueWordSet" + valueCountSet2 + " = initialWordSetText");
+  resetWordSet();
   mapSceneOccurrenceCount = 0;//そのマップで発生するシーン数
-  //sceneItemId5 = 1;//変数800+sceneItemId5で表示するための変数
   j = 0;//配列を番号順に居れるため
 
-  let start, end, occurrenceSwitchOffset, checkSwitchOffset, occurrenceCountVarId, unmetCountVarId;
-  const setValuesById = (varId1, varId2, s, e, v23, v24, v25, v26, varId3, varId4) => {
-    $gameSwitches.setValue(varId1, false);
-    $gameSwitches.setValue(varId2, false);
-    start = s;
-    end = e;
-    occurrenceSwitchOffset = v23;
-    checkSwitchOffset = v24;
-    occurrenceCountVarId = v25;//成立数変数
-    unmetCountVarId = v26;//未成立数変数
-    $gameVariables.setValue(varId3, 0);
-    $gameVariables.setValue(varId4, 0);
-  }
-
-  if (sceneGroupId == 1) {
-    setValuesById(479, 367, 401, 500, 800, 900, 517, 518, 517, 518);
-  }
-  else if (sceneGroupId == 2) {
-    setValuesById(480, 369, 501, 600, 500, 600, 504, 505, 504, 505);
-  }
-  else {
+  if (!groupConfig) {
     console.warn(`id1 is ${sceneGroupId}! must be 1 or 2!`);
+    return;
   }
 
-  for (let i = start; i <= end; i++) {
-    scene_joukenNakami(sceneGroupId, i, occurrenceSwitchOffset, checkSwitchOffset, occurrenceCountVarId, unmetCountVarId);
+  $gameSwitches.setValue(groupConfig.occurrenceGroupSwitchId, false);
+  $gameSwitches.setValue(groupConfig.resetSwitchId, false);
+  $gameVariables.setValue(groupConfig.occurrenceCountVarId, 0);
+  $gameVariables.setValue(groupConfig.unmetCountVarId, 0);
+}
+
+//範囲内のシーンを全て判定する。追加分が無い場合は false
+function processSceneGroupItems(sceneGroupId, groupConfig) {
+  for (let itemIndex = groupConfig.firstItemId; itemIndex <= groupConfig.lastItemId; itemIndex++) {
+    scene_joukenNakami(sceneGroupId, itemIndex, groupConfig.occurrenceSwitchOffset,
+      groupConfig.checkSwitchOffset, groupConfig.occurrenceCountVarId, groupConfig.unmetCountVarId);
   }
 
-  const setValuesById1 = (v25, v26, arrVal) => {
-    occurrenceCountVarId = v25;//成立数変数
-    unmetCountVarId = v26;//未成立数変数
-    insertableItemIds = arrVal;
-  }
-  let insertableItemIds;
-  if (sceneGroupId == 1) {
-    setValuesById1(517, 518, valueSouwasceneAddId);
-  }
-  else if (sceneGroupId == 2) {
-    setValuesById1(504, 505, valueHsceneAddId);
-  }
-  else {
-    console.warn(`id1 is ${sceneGroupId}! must be 1 or 2!`);
-  }
+  return processAddableSceneItems(sceneGroupId, groupConfig);
+}
 
-  //アイテムID<HsceneItem><SouwaItem>
-  if (!Array.isArray(insertableItemIds)) return;
-  for (const id of insertableItemIds) {
-    const item = $dataItems[id];
+//アイテムID<HsceneItem><SouwaItem>で追加されるシーン
+function processAddableSceneItems(sceneGroupId, groupConfig) {
+  const insertableItemIds = groupConfig.addItemIdSource();
+  if (!Array.isArray(insertableItemIds)) return false;
+
+  for (const itemId of insertableItemIds) {
+    const item = $dataItems[itemId];
     if (!item) continue;
+
     const itemMeta = item.meta;
-    const addEventIncidenceSwiNum = Number(itemMeta['AddEventIncidenceSwi']);//発生スイッチ。リセットなしの1601-1700の間に実行。
+    //発生スイッチ。リセットなしの1601-1700の間に実行
+    const addEventIncidenceSwiNum = Number(itemMeta['AddEventIncidenceSwi']);
     const addEventCompSwiNum = Number(itemMeta['AddEventCompSwi']);//達成スイッチ
-    const addAddEventCommonIdNum = Number(itemMeta['AddAddEventCommonId']);//コモID。並列スイッチも逆算して代入。スクリプト内では使わない
-    const addEventParallelSwiNum = Number(itemMeta['AddEventParallelSwi']);//並列スイッチ
-    scene_joukenNakami(sceneGroupId, id, addEventIncidenceSwiNum, addEventCompSwiNum, occurrenceCountVarId, unmetCountVarId, addAddEventCommonIdNum, addEventParallelSwiNum);
+
+    scene_joukenNakami(sceneGroupId, itemId, addEventIncidenceSwiNum, addEventCompSwiNum,
+      groupConfig.occurrenceCountVarId, groupConfig.unmetCountVarId);
   }
 
-  $gameVariables.setValue(195, valueCountSet1);//表示時の個数を入れる事でコモンイベントのウィンド数を抑制
+  return true;
+}
 
-  if ($gameVariables.value(517) >= 1) {
-    $gameSwitches.setValue(367, true);//挿話ナヴィ発生スイッチ
+//成立数が1以上なら挿話/シーンのナヴィスイッチを立てる(グループに関わらず両方を見る)
+const SCENE_SOUWA_COUNT_VAR_ID = SCENE_GROUP_CONFIGS[1].occurrenceCountVarId;
+const SCENE_HSCENE_COUNT_VAR_ID = SCENE_GROUP_CONFIGS[2].occurrenceCountVarId;
+
+function applySceneNaviSwitches() {
+  if ($gameVariables.value(SCENE_SOUWA_COUNT_VAR_ID) >= 1) {
+    $gameSwitches.setValue(SCENE_SWITCH_SOUWA_NAVI, true);
   }
-  if ($gameVariables.value(504) >= 1) {
-    $gameSwitches.setValue(369, true);//シーンナヴィ発生スイッチ
+  if ($gameVariables.value(SCENE_HSCENE_COUNT_VAR_ID) >= 1) {
+    $gameSwitches.setValue(SCENE_SWITCH_HSCENE_NAVI, true);
   }
-
-
 }
 
 //☆☆☆条件追加。<EventSetVal1:0,0>
 scene_commonIdRec = function (itemId) {
-
   const sceneItem = $dataItems[itemId];
   if (!sceneItem) return;
-  const itemAddAddEventCommonId = sceneItem.meta['AddAddEventCommonId'];
-  let addAddEventCommonId = itemAddAddEventCommonId ? Number(itemAddAddEventCommonId) : itemId;
 
+  const itemAddAddEventCommonId = sceneItem.meta['AddAddEventCommonId'];
+  const addAddEventCommonId = itemAddAddEventCommonId ? Number(itemAddAddEventCommonId) : itemId;
   if (addAddEventCommonId >= 2) {
     event_pararelStarting(1, itemId, 1);
-  } else {
-    if ($gameSwitches.value(29)) {
-      TickerManager.show('無効なIDが選択されました。ホームに帰還します。');
-      for (let i = 101; i <= 110; i++) $gameSwitches.setValue(i, false);
-      set_playerPosition2(168);
-    } else {
-      TickerManager.show('無効なIDが選択されました。処理を中断します。');
-    }
+    return;
   }
-}
+
+  if ($gameSwitches.value(SCENE_SWITCH_MEMORY)) {
+    TickerManager.show('無効なIDが選択されました。ホームに帰還します。');
+    for (let switchId = 101; switchId <= 110; switchId++) {
+      $gameSwitches.setValue(switchId, false);
+    }
+    set_playerPosition2(168);
+    return;
+  }
+
+  TickerManager.show('無効なIDが選択されました。処理を中断します。');
+};
 
 //イベントから挿話シーン発生event_pararelSet(this._eventId,0,1,8);
 event_pararelSet = function (eventId, offsetX, offsetY, playerDirection) {
 
   event_charaPreset(eventId);
   event_charaRoot(eventId);
+
   const event = $gameMap.event(eventId);
   if (!event) return;
+
   $gameVariables.setValue(161, [$gameMap.mapId(), event._realX + offsetX, event._realY + offsetY]);
   set_playerPosition2(161);
-  if (playerDirection >= 1) { $gamePlayer.setDirection(playerDirection) };
-  if (event.event().meta['EvSceneSet']) {
-    const sceneItemId = Number(event.event().meta['EvSceneSet'].split(',')[0]);
-    event_pararelStarting(1, sceneItemId, eventId);
-  }
 
-}
+  if (playerDirection >= 1) $gamePlayer.setDirection(playerDirection);
+
+  if (!event.event().meta['EvSceneSet']) return;
+
+  const sceneItemId = Number(event.event().meta['EvSceneSet'].split(',')[0]);
+  event_pararelStarting(1, sceneItemId, eventId);
+};
 
 var event_pararelStartingCEventIdsArray = [119, 125, 429, 481];
+
 //並列イベントスイッチオン。id1が0でﾒｲﾝ1でｼｰﾝ挿話,event_pararelStarting(1,501,this._eventId);
 event_pararelStarting = function (isCommonEventTarget, targetId, sourceEventId) {
 
   valueCountDefeadSwitche2 = 0;//全滅スイッチオン時に成立判定
-  //本体では0に出来ないためここでやっている
-  const activeCommonEventIds = $gameMap._commonEvents.filter(function (event) {
-    return event.isActive();
-  }).map(function (event) {
-    return event.event().id;
-  });
 
-  let isFound = false;
-  for (let i = 0; i < activeCommonEventIds.length; i++) {
-    const eventId = activeCommonEventIds[i];
-    if (eventId < 2) continue;
-    const cEventSwitchId = $dataCommonEvents[eventId].switchId;
-    if (!cEventSwitchId) continue;
-    if (event_pararelStartingCEventIdsArray.some(function (id) { return id == cEventSwitchId })) continue;
-
-    isFound = true;
-    break;
-  }
-  if (!isFound) {
+  if (!hasActiveParallelEvent()) {
     valueParallelEventId = sourceEventId;
-    if (isCommonEventTarget == 0 || (targetId >= 401 && targetId <= 600)) {
-      const targetCommonEvent = $dataCommonEvents[targetId];
-      if (targetCommonEvent) $gameSwitches.setValue(targetCommonEvent.switchId, true);
-    } else {
-      const parallelTargetItem = $dataItems[targetId];
-      const itemAddEventParallelSwi = parallelTargetItem ? parallelTargetItem.meta['AddEventParallelSwi'] : null;
-      if (itemAddEventParallelSwi) {
-        const parallelCommonEvent = $dataCommonEvents[Number(itemAddEventParallelSwi)];
-        if (parallelCommonEvent) $gameSwitches.setValue(parallelCommonEvent.switchId, true);
-      }
+    activateParallelTarget(isCommonEventTarget, targetId);
+  }
+
+  if (!$gameSwitches.value(SCENE_SWITCH_MEMORY)) {
+    const sceneRestoreData = $gameVariables.value(SCENE_VAR_SCENE_RESTORE_DATA);
+    if (Array.isArray(sceneRestoreData)) {
+      sceneRestoreData[targetId] = writeSceneSnapshot(Array(12).fill(0), sourceEventId);
     }
   }
 
-  if (!$gameSwitches.value(29)) {
-    const gameVar163 = $gameVariables.value(163);
-    if (Array.isArray(gameVar163)) {
-      gameVar163[targetId] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-      const gameVar163Id2 = gameVar163[targetId];
-      gameVar163Id2[0] = $gameMap.mapId();
-      gameVar163Id2[1] = $gamePlayer.characterName();
-      gameVar163Id2[2] = $gamePlayer.characterIndex();
-      gameVar163Id2[3] = $gamePlayer._realX;
-      gameVar163Id2[4] = $gamePlayer._realY;
-      gameVar163Id2[5] = $gamePlayer.direction();
-      if (sourceEventId) {
-        if (!!$gameMap.event(sourceEventId)) {
-          const event = $gameMap.event(sourceEventId);
-          gameVar163Id2[6] = event.characterName();
-          gameVar163Id2[7] = event.characterIndex();
-          gameVar163Id2[8] = event._realX;
-          gameVar163Id2[9] = event._realY;
-          gameVar163Id2[10] = event.direction();
-          gameVar163Id2[11] = event.pattern();
-        }
-      }
-    }
-  }
   $gameVariables.setValue(171, [$gameMap.mapId(), $gamePlayer._realX, $gamePlayer._realY]);
+};
 
+const SCENE_VAR_SCENE_RESTORE_DATA = 163;
+
+//対象外の並列コモンイベントが既に動いているか
+function hasActiveParallelEvent() {
+  const activeCommonEventIds = $gameMap._commonEvents
+    .filter(function (commonEvent) { return commonEvent.isActive(); })
+    .map(function (commonEvent) { return commonEvent.event().id; });
+
+  for (let index = 0; index < activeCommonEventIds.length; index++) {
+    const eventId = activeCommonEventIds[index];
+    if (eventId < 2) continue;
+
+    const commonEventSwitchId = $dataCommonEvents[eventId].switchId;
+    if (!commonEventSwitchId) continue;
+    if (event_pararelStartingCEventIdsArray.some(function (id) { return id == commonEventSwitchId; })) continue;
+
+    return true;
+  }
+  return false;
+}
+
+//並列イベント(コモンイベント)のスイッチをONにする
+function activateParallelTarget(isCommonEventTarget, targetId) {
+  if (isCommonEventTarget == 0 || findSceneItemRange(targetId)) {
+    const targetCommonEvent = $dataCommonEvents[targetId];
+    if (targetCommonEvent) $gameSwitches.setValue(targetCommonEvent.switchId, true);
+    return;
+  }
+
+  const parallelTargetItem = $dataItems[targetId];
+  const itemAddEventParallelSwi = parallelTargetItem ? parallelTargetItem.meta['AddEventParallelSwi'] : null;
+  if (!itemAddEventParallelSwi) return;
+
+  const parallelCommonEvent = $dataCommonEvents[Number(itemAddEventParallelSwi)];
+  if (parallelCommonEvent) $gameSwitches.setValue(parallelCommonEvent.switchId, true);
+}
+
+//プレイヤーとイベントの位置/グラフィックを1つの配列に記録する
+//[0]マップID [1-5]プレイヤー [6-11]イベント
+function writeSceneSnapshot(snapshot, eventId) {
+  snapshot[0] = $gameMap.mapId();
+  snapshot[1] = $gamePlayer.characterName();
+  snapshot[2] = $gamePlayer.characterIndex();
+  snapshot[3] = $gamePlayer._realX;
+  snapshot[4] = $gamePlayer._realY;
+  snapshot[5] = $gamePlayer.direction();
+
+  const event = eventId ? $gameMap.event(eventId) : null;
+  if (!event) return snapshot;
+
+  snapshot[6] = event.characterName();
+  snapshot[7] = event.characterIndex();
+  snapshot[8] = event._realX;
+  snapshot[9] = event._realY;
+  snapshot[10] = event.direction();
+  snapshot[11] = event.pattern();
+
+  return snapshot;
 }
 
 //一時的にキャラグラ記憶ともろもろ設定,id2が0でスタート。1で終了
 Npc_TemporarilySave = function (eventId, saveMode) {
 
   if (saveMode == 0) {
-    valueNpcGuraTemporarilySave = Array(12).fill(0);
-    valueNpcGuraTemporarilySave[0] = $gameMap.mapId();
-    valueNpcGuraTemporarilySave[1] = $gamePlayer.characterName();
-    valueNpcGuraTemporarilySave[2] = $gamePlayer.characterIndex();
-    valueNpcGuraTemporarilySave[3] = $gamePlayer._realX;
-    valueNpcGuraTemporarilySave[4] = $gamePlayer._realY;
-    valueNpcGuraTemporarilySave[5] = $gamePlayer.direction();
-    if (!!$gameMap.event(eventId)) {
-      const event = $gameMap.event(eventId);
-      valueNpcGuraTemporarilySave[6] = event.characterName();
-      valueNpcGuraTemporarilySave[7] = event.characterIndex();
-      valueNpcGuraTemporarilySave[8] = event._realX;
-      valueNpcGuraTemporarilySave[9] = event._realY;
-      valueNpcGuraTemporarilySave[10] = event.direction();
-      valueNpcGuraTemporarilySave[11] = event.pattern();
-    };
+    valueNpcGuraTemporarilySave = writeSceneSnapshot(Array(12).fill(0), eventId);
     $gameVariables.setValue(292, Array(21).fill(0));
-    for (let i = 13; i <= 15; i++) {
-      if ($gameSwitches.value(i)) { $gameVariables.setValue(320, i) };
-    };
-  }
-  else if (saveMode == 1) {
-    if ($gameVariables.value(320) >= 1) {
-      for (let i = 13; i <= 15; i++) { $gameSwitches.setValue(i, false) };
-      $gameSwitches.setValue($gameVariables.value(320), true);
-    };
-    $gameVariables.setValue(320, 0);
-    $gameVariables.setValue(292, Array(21).fill(0));
+
+    for (let switchId = 13; switchId <= 15; switchId++) {
+      if ($gameSwitches.value(switchId)) $gameVariables.setValue(320, switchId);
+    }
+    return;
   }
 
-}
+  if (saveMode != 1) return;
+
+  if ($gameVariables.value(320) >= 1) {
+    for (let switchId = 13; switchId <= 15; switchId++) {
+      $gameSwitches.setValue(switchId, false);
+    }
+    $gameSwitches.setValue($gameVariables.value(320), true);
+  }
+  $gameVariables.setValue(320, 0);
+  $gameVariables.setValue(292, Array(21).fill(0));
+};
 
 //段階シーンを選択肢で表示
 scene_choiceDecision = function (choiceItemIds, choiceSwitchId) {//scene_choiceDecision([503,502,501],161);
 
   $gameSwitches.setValue(choiceSwitchId, false);
+
   let selectedItemId = 0;
   let choiceDescriptionText = ` `;
+
   for (const sceneItemId of choiceItemIds) {
     const sceneItem = $dataItems[sceneItemId];
     if (!sceneItem) continue;
-    let completionSwitchId = 0; // hope it will be set
-    let incidenceSwitchId = 0; // hope it will be set
-    if (sceneItemId >= 401 && sceneItemId <= 500) {
-      incidenceSwitchId = sceneItemId + 800;
-      completionSwitchId = sceneItemId + 900;
-    }
-    else if (sceneItemId >= 501 && sceneItemId <= 600) {
-      incidenceSwitchId = sceneItemId + 500;
-      completionSwitchId = sceneItemId + 600;
-    }
-    if (sceneItem.meta['AddEventIncidenceSwi']) {
-      incidenceSwitchId = Number(sceneItem.meta['AddEventIncidenceSwi']);
-    }
-    if (sceneItem.meta['AddEventCompSwi']) {
-      completionSwitchId = Number(sceneItem.meta['AddEventCompSwi']);
-    }
-    if (!completionSwitchId || !incidenceSwitchId) console.warn(`One of value3 or value4 was not set! Code can work incorrect! value3:${incidenceSwitchId},value4:${completionSwitchId}`);
 
-    if (!$gameSwitches.value(completionSwitchId)) {
+    const switchIds = readSceneChoiceSwitchIds(sceneItemId, sceneItem);
+
+    if (!$gameSwitches.value(switchIds.completionSwitchId)) {
       choiceDescriptionText = `\x1bIIN[${sceneItemId}]\n${sceneItem.description}`;
     }
-    if ($gameSwitches.value(incidenceSwitchId) && !$gameSwitches.value(completionSwitchId)) {
+    if ($gameSwitches.value(switchIds.incidenceSwitchId) && !$gameSwitches.value(switchIds.completionSwitchId)) {
       $gameSwitches.setValue(choiceSwitchId, true);
       selectedItemId = sceneItemId;
     }
   }
+
   valueCountSet1 = selectedItemId;
   $gameVariables.setValue(22, choiceDescriptionText);
 
 };
 
+//アイテムIDが属するシーン範囲(挿話/シーン)を返す。範囲外は null
+function findSceneItemRange(itemId) {
+  const numericItemId = Number(itemId);
+  for (const range of Object.values(SCENE_ITEM_RANGES)) {
+    if (numericItemId < range.firstItemId) continue;
+    if (numericItemId > range.lastItemId) continue;
+    return range;
+  }
+  return null;
+}
+
+//選択肢用の発生/達成スイッチID(アイテム範囲かメタで決まる)
+function readSceneChoiceSwitchIds(sceneItemId, sceneItem) {
+  let incidenceSwitchId = 0;
+  let completionSwitchId = 0;
+
+  const itemRange = findSceneItemRange(sceneItemId);
+  if (itemRange) {
+    incidenceSwitchId = sceneItemId + itemRange.occurrenceSwitchOffset;
+    completionSwitchId = sceneItemId + itemRange.checkSwitchOffset;
+  }
+
+  if (sceneItem.meta['AddEventIncidenceSwi']) {
+    incidenceSwitchId = Number(sceneItem.meta['AddEventIncidenceSwi']);
+  }
+  if (sceneItem.meta['AddEventCompSwi']) {
+    completionSwitchId = Number(sceneItem.meta['AddEventCompSwi']);
+  }
+
+  if (!completionSwitchId || !incidenceSwitchId) {
+    console.warn(`One of value3 or value4 was not set! Code can work incorrect! value3:${incidenceSwitchId},value4:${completionSwitchId}`);
+  }
+
+  return { incidenceSwitchId, completionSwitchId };
+}
+
 //#region scene_choiceSouwa
 //挿話選択肢発生スクリプト
 scene_choiceSouwa = function () {
-  // Reset the Souwa choice flag
+  //挿話選択肢フラグをリセット
   $gameVariables.setValue(19, 0);
-  
-  // Get available Souwa choices
-  const availableSouwaChoices = getAvailableSouwaChoices();
-  
-  if (availableSouwaChoices.length === 0) return;
-  
-  // Activate the Souwa event flag
-  $gameVariables.setValue(19, 1);
-  
-  // Add choices to the game system
-  addSouwaChoicesToGameSystem(availableSouwaChoices);
-}
 
-/**
- * Get all available Souwa choices from both switch ranges and data items
- * @returns {Array} Array of available Souwa item IDs
- */
+  const availableSouwaChoices = getAvailableSouwaChoices();
+  if (availableSouwaChoices.length === 0) return;
+
+  $gameVariables.setValue(19, 1);
+  addSouwaChoicesToGameSystem(availableSouwaChoices);
+};
+
+//利用可能な挿話のアイテムID一覧(スイッチ範囲とメタ指定の両方)
 function getAvailableSouwaChoices() {
-  
-  // Collect choices from both sources
   const switchBasedChoices = getSwitchBasedSouwaChoices();
   const metaBasedChoices = getMetaBasedSouwaChoices();
-  
-  // using global variable valueScriptArray1 looking here redundant but we set it anyway because it using in other places
-  // using global variables may break(many things) encapsulation and make the code less maintainable
+
+  //他プラグインも参照するグローバル(valueScriptArray1)に結果を残す
   valueScriptArray1 = [...switchBasedChoices, ...metaBasedChoices];
 
   return valueScriptArray1;
 }
 
-/**
- * Get Souwa choices from switch range 1201-1300
- * @returns {Array} Array of available Souwa item IDs from switches
- */
+//スイッチ範囲(1201-1300)由来の挿話
 function getSwitchBasedSouwaChoices() {
   const choices = [];
-  
+
   for (let switchId = 1201; switchId <= 1300; switchId++) {
     const itemId = switchId - 800;
-    
     if (!isSwitchBasedSouwaAvailable(switchId, itemId)) continue;
-    
+
     choices.push(itemId);
   }
-  
+
   return choices;
 }
 
-/**
- * Check if a switch-based Souwa choice is available
- * @param {Number} switchId - The switch ID to check
- * @param {Number} itemId - The corresponding item ID
- * @returns {Boolean} Whether the Souwa choice is available
- */
+//スイッチ範囲由来の挿話が選択可能か
 function isSwitchBasedSouwaAvailable(switchId, itemId) {
   if (!$gameSwitches.value(switchId)) return false;
+
   const item = $dataItems[itemId];
   if (!item) return false;
   if ($gameParty.hasItem(item)) return false;
   if ($gameSwitches.value(switchId + 100)) return false;
   if (item.meta['singleSouwaIncidence']) return false;
-  
+
   return true;
 }
 
-/**
- * Get Souwa choices from data items with relevant metadata
- * @returns {Array} Array of available Souwa item IDs from metadata
- */
+//メタ(AddEventIncidenceSwi)指定の挿話
 function getMetaBasedSouwaChoices() {
   const choices = [];
-  
+
   for (let itemId = 1; itemId < $dataItems.length; itemId++) {
     const currentItem = $dataItems[itemId];
     if (!currentItem) continue;
-    
-    if (!isMetaBasedSouwaAvailable(currentItem, itemId)) continue;
-    
+    if (!isMetaBasedSouwaAvailable(currentItem)) continue;
+
     choices.push(itemId);
   }
-  
+
   return choices;
 }
 
-/**
- * Check if a meta-based Souwa choice is available
- * @param {Object} item - The item object to check
- * @param {Number} itemId - The item ID
- * @returns {Boolean} Whether the Souwa choice is available
- */
-function isMetaBasedSouwaAvailable(item, itemId) {
+//メタ指定の挿話が選択可能か
+function isMetaBasedSouwaAvailable(item) {
   if (!item.meta['AddEventIncidenceSwi']) return false;
-  if (Number(item.meta['EICSwitch']) !== 102) return false;
+  if (Number(item.meta['EICSwitch']) !== SCENE_EIC_SOUWA) return false;
   if (!$gameSwitches.value(Number(item.meta['AddEventIncidenceSwi']))) return false;
   if ($gameParty.hasItem(item)) return false;
   if ($gameSwitches.value(Number(item.meta['AddEventCompSwi']))) return false;
   if (item.meta['singleSouwaIncidence']) return false;
-  
+
   return true;
 }
 
-/**
- * Add Souwa choices to the game system
- * @param {Array} choices - Array of Souwa item IDs to add as choices
- */
+//挿話をカスタム選択肢として登録する
 function addSouwaChoicesToGameSystem(choices) {
   for (let index = 0; index < choices.length; index++) {
     const chosenItemId = choices[index];
     const chosenItem = $dataItems[chosenItemId];
     if (!chosenItem) continue;
-    const chosenItemName = chosenItem.name;
-    
-    const choiceParams = {
-      text: `${chosenItemName}`,
-      value: chosenItemId
-    };
 
-    $gameSystem.addCustomChoice(1, choiceParams);
+    $gameSystem.addCustomChoice(1, { text: chosenItem.name, value: chosenItemId });
   }
 }
 
 //#endregion
 
 //オールナビスクリプト
+const SCENE_NAVI_PICTURE_ID_START = 101;
+const SCENE_NAVI_DESCRIPTION_FONT_SIZE = 28;
+
 scene_allNavigation = function () {
 
   valueScriptArray1 = [];
-  let itemEICSwitchId = 103;
-  if ($gameVariables.value(19) == 1) itemEICSwitchId = 102;
 
-  for (let i = 1; i < $dataItems.length; i++) {
-    const item = $dataItems[i];
-    if (!item) continue;
-    if (item.meta['EICSwitch']) {
-      if (Number(item.meta['EICSwitch']) == itemEICSwitchId) {
-        valueScriptArray1.push(i);
-      }
-    }
+  const itemEICSwitchId = $gameVariables.value(19) == 1 ? SCENE_EIC_SOUWA : SCENE_EIC_SCENE;
+  collectNavigationItemIds(itemEICSwitchId);
+
+  if (valueScriptArray1.length === 0) return;
+
+  let pictureId = SCENE_NAVI_PICTURE_ID_START;
+  for (let index = 0; index < valueScriptArray1.length; index++) {
+    const navigationItem = $dataItems[valueScriptArray1[index]];
+
+    $gameSystem.addCustomChoice(1, { text: navigationItem.name, value: 0 });
+    showNavigationDescriptionPicture(navigationItem, pictureId);
+
+    $gameMessage.setSelectPictureId(index, pictureId);
+    pictureId += 1;
   }
-  if (valueScriptArray1.length > 0) {
-    let picId = 101;
-    for (var i = 0; i < valueScriptArray1.length; i++) {
-      const itemId = valueScriptArray1[i];
-      const itemName = $dataItems[itemId].name;
-      const choiceParams = {
-        text: `${itemName}`,
-        value: 0
-      };
-
-      //const id = 1; 
-      $gameSystem.addCustomChoice(1, choiceParams);
-
-      var descriptionText = `${$dataItems[itemId].description}`;
-      $gameScreen.setDTextPicture(descriptionText, 28);
-      $gameScreen.dWindowFrame = 'ON';
-      $gameScreen.showPicture(picId, '', 0, 10, 606, 100, 100, 0, 0);
-      $gameMessage.setSelectPictureId(i, picId);
-      picId += 1;
-    }
-  }
-
 
 };
+
+//指定カテゴリ(EICSwitch)のアイテムIDを集める
+function collectNavigationItemIds(itemEICSwitchId) {
+  for (let itemId = 1; itemId < $dataItems.length; itemId++) {
+    const item = $dataItems[itemId];
+    if (!item || !item.meta['EICSwitch']) continue;
+    if (Number(item.meta['EICSwitch']) != itemEICSwitchId) continue;
+
+    valueScriptArray1.push(itemId);
+  }
+}
+
+//ナビの説明文とウィンドウ枠を表示する
+function showNavigationDescriptionPicture(navigationItem, pictureId) {
+  $gameScreen.setDTextPicture(navigationItem.description, SCENE_NAVI_DESCRIPTION_FONT_SIZE);
+  $gameScreen.dWindowFrame = 'ON';
+  $gameScreen.showPicture(pictureId, '', 0, 10, 606, 100, 100, 0, 0);
+}
 
 //}());
