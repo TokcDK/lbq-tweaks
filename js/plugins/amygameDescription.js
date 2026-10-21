@@ -22,10 +22,6 @@
 // globals, so a top-level table would capture undefined.
 // ---------------------------------------------------------------------------
 
-// `[\C[n]label\C[0]] ` — the shape shared by most single-value effect notes.
-colorTaggedText = function (colorCode, text) {
-  return `\\C[${colorCode}]${text}\\C[0]`;
-}
 
 // databaseTypeId -> the database to rewrite. Resolved per call for the reason
 // above. An unknown id keeps the previous selection, as the original did.
