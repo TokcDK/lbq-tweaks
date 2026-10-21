@@ -27,13 +27,15 @@ Imported['BugFix_SkillType'] = 1.01;
 
 (function(){
 	
-  var _BF_GBBase_addedSkillTypes = Game_BattlerBase.prototype.addedSkillTypes;
+  const _BF_GBBase_addedSkillTypes = Game_BattlerBase.prototype.addedSkillTypes;
   Game_BattlerBase.prototype.addedSkillTypes = function() {
-  	var types = _BF_GBBase_addedSkillTypes.call(this);
-  	var result = [];
-  	for (var i=0;i<types.length;i++){
-  		if (!result.contains(types[i])){
-  			result.push(types[i]);
+  	const types = _BF_GBBase_addedSkillTypes.call(this);
+  	const result = [];
+	const typesLength = types.length;
+  	for (let i=0;i<typesLength;i++){
+		const type = types[i];
+  		if (!result.contains(type)){
+  			result.push(type);
   		}
   	}
   	return result;
