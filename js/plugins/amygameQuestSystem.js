@@ -51,12 +51,58 @@ var QuestSystem = (function() {
     2: { start: 1001, end: 1050, offset: 900, initArray: false }
   };
 
+  // ---- condition scopes ----------------------------------------
+  var SCOPE_START = 'start';
+  var SCOPE_COMPLETION = 'completion';
+
+  // ---- variable / switch offsets used by the condition metas ----
+  var PERSPECTIVE_SWITCH_OFFSET = 440;      // 視点スイッチ = perspectiveId + 440
+  var ACTOR_EXPOSURE_VAR_OFFSET = 380;      // アクター露出度配列 = actorId + 380
+  var CONDITION_LABEL_VAR_OFFSET = 400;     // 条件表示名の変数 = paramType + 400
+  var SUBJUGATION_COUNT_VAR_ID = 52;        // 討伐数配列
+  var MAX_NUMBERED_CONDITION = 9;           // QuestSetVal1..9 / QuestComp*1..9 の上限
+  var RANK_ITEM_IDS = [693, 694, 695];      // ランク制限アイテム(1以上/2以上/3以上)
+  var EXPOSURE_PARAM_TYPE = 4;              // 露出度パラメータ種別(以下の比較になる)
+
+  // ---- item collection types (condition meta 2nd value) --------
+  var ITEM_TYPE_ITEM = 0;
+  var ITEM_TYPE_WEAPON = 1;
+  var ITEM_TYPE_ARMOR = 2;
+
+  // ---- valueQuestArray1 index offsets per collection type ------
+  var QUEST_ARRAY_WEAPON_OFFSET = 2000;
+  var QUEST_ARRAY_ARMOR_OFFSET = 3000;
+  var QUEST_ARRAY_TYPE_ITEM = 1;
+  var QUEST_ARRAY_TYPE_WEAPON = 2;
+  var QUEST_ARRAY_TYPE_ARMOR = 3;
+
+  // ---- text fragments -----------------------------------------
+  var NO_START_CONDITION_SUFFIX = '【なし】\n';
+  var QUEST_SUPPLEMENT_META_KEY = 'QuestSupplement';
+  var START_CONDITION_HEADER_RANK = colorTaggedText(10, '【ランク制限】');
+  var PERSPECTIVE_VIEW_SUFFIX = '視点';
+  var SUBJUGATION_TODAY_LABEL = colorTaggedText(2, '当日魔物討伐数');
+  var SUBJUGATION_TOTAL_LABEL = colorTaggedText(2, '総魔物討伐数');
+  var SUBJUGATION_BODY_SUFFIX = '体討伐';
+
+  // 挿話/シーン/称号/H称号/クエストの見出し(EICSwitch値とSG種別で決まる)
+  var EIC_SWITCH_CATEGORY_MARKERS = {
+    102: '【挿話:',
+    103: '【シーン:',
+    104: '【称号:',
+    105: '【H称号:'
+  };
+  var EIC_SWITCH_QUEST_CATEGORY = 1;        // <SG種別>がクエストを意味する値
+  var QUEST_CATEGORY_MARKER = '【クエスト:';
+  var DEFAULT_CATEGORY_MARKER = '【';
+
   // ============================================================
   // UTILITY FUNCTIONS
   // ============================================================
   
   function cleanSystemName(name) {
     if (!name) return '';
+
     var result = name;
     SYSTEM_NAME_CLEANUP_PATTERNS.forEach(function(pattern) {
       result = result.replace(pattern, "");
@@ -65,17 +111,24 @@ var QuestSystem = (function() {
   }
 
   function getCurrentActorId() {
-    return $gameVariables.value(2);
+    return $gameVariables.value(DEFAULT_VALUES.VARIABLE_ID);
   }
 
   function getCurrentActor() {
     return $gameActors.actor(getCurrentActorId());
   }
 
-  function getActorById(actorId) {
+  // actorId が 0(未指定)なら現在のアクターを使う
+  function resolveConditionActor(actorId) {
     var id = Number(actorId);
-    if (id === 0) id = getCurrentActorId();
-    return $gameActors.actor(id);
+    if (id >= 1) return $gameActors.actor(id);
+    return getCurrentActor();
+  }
+
+  // 現在のアクター以外なら「名前が」を前置する
+  function buildActorPrefix(actorId, actor) {
+    if (Number(actorId) === getCurrentActorId()) return '';
+    return actor.name() + 'が';
   }
 
   function parseMetaArray(metaValue) {
@@ -84,14 +137,14 @@ var QuestSystem = (function() {
 
   function getItemsCollection(type) {
     var typeNum = Number(type);
-    if (typeNum === 1) return $dataWeapons;
-    if (typeNum === 2) return $dataArmors;
+    if (typeNum === ITEM_TYPE_WEAPON) return $dataWeapons;
+    if (typeNum === ITEM_TYPE_ARMOR) return $dataArmors;
     return $dataItems;
   }
 
   function isActorAvailable(actor) {
     if (!actor) return false;
-    return actor.isLearnedSkill(18) && !actor.isStateAffected(valueDollStateId);
+    return actor.isLearnedSkill(DEFAULT_VALUES.SKILL_ID) && !actor.isStateAffected(valueDollStateId);
   }
 
   //変数が未設定/配列でない場合に index アクセスで落ちないためのヘルパ
@@ -100,6 +153,42 @@ var QuestSystem = (function() {
     var arr = $gameVariables.value(varId);
     if (!Array.isArray(arr)) return undefined;
     return arr[index];
+  }
+
+  // QuestSetVal1..9 / QuestComp*1..9 のような連番メタを走査する
+  function forEachNumberedMeta(item, metaPrefix, callback) {
+    for (var id = 1; id <= MAX_NUMBERED_CONDITION; id++) {
+      var metaValue = item.meta[metaPrefix + id];
+      if (!metaValue) continue;
+      callback(parseMetaArray(metaValue), id);
+    }
+  }
+
+  // 条件の成否を該当スコープのカウンタへ反映する
+  function recordCondition(ctx, scope, isMet) {
+    if (scope === SCOPE_START) {
+      ctx.startTotal++;
+      if (isMet) ctx.startMet++;
+      return;
+    }
+    ctx.completionTotal++;
+    if (isMet) ctx.completionMet++;
+  }
+
+  // 条件の表示テキストを該当スコープへ追記する
+  function appendConditionText(ctx, scope, text) {
+    if (scope === SCOPE_START) {
+      ctx.startText += text;
+      return;
+    }
+    ctx.completionText += text;
+  }
+
+  // 条件1件分の「本文 + 成否マーカー + 閉じ」をまとめて出力する
+  function appendConditionLine(ctx, scope, bodyText, isMet, metMarker, unmetMarker, closingText) {
+    appendConditionText(ctx, scope, bodyText);
+    recordCondition(ctx, scope, isMet);
+    appendConditionText(ctx, scope, (isMet ? metMarker : unmetMarker) + closingText);
   }
 
   function createConditionContext(item, index, offset) {
@@ -114,825 +203,711 @@ var QuestSystem = (function() {
       startText: HEADERS.START,
       completionText: HEADERS.COMPLETION,
       startTextInitial: HEADERS.START,
-      completionTextInitial: HEADERS.COMPLETION,
-      tempValue13: 0,
-      tempValue14: 0
+      completionTextInitial: HEADERS.COMPLETION
     };
   }
 
-  function appendConditionResult(ctx, type, isMet, text) {
-    if (type === 'start') {
-      ctx.startText += text;
-      ctx.startTotal++;
-      if (isMet) ctx.startMet++;
-    } else {
-      ctx.completionText += text;
-      ctx.completionTotal++;
-      if (isMet) ctx.completionMet++;
-    }
-  }
-
   // ============================================================
-  // START CONDITION HANDLERS REGISTRY
+  // START CONDITION HANDLERS
   // ============================================================
   
   var startConditionHandlers = [];
 
   // Handler: Adventurer Rank (QuestSetRank)
-  startConditionHandlers.push({
-    name: 'QuestSetRank',
-    process: function(item, ctx) {
-      if (!item.meta['QuestSetRank']) return;
+  function processQuestSetRankCondition(item, ctx) {
+    if (!item.meta['QuestSetRank']) return;
 
-      var rankValue = Number(item.meta['QuestSetRank']);
-      if (rankValue < 1) return;
-      
-      ctx.startText += '\\C[10]【ランク制限】\\C[0]';
-      
-      var itemId = 693;
-      if (rankValue >= 2) itemId = 694;
-      if (rankValue >= 3) itemId = 695;
-      
-      var rankItem = $dataItems[itemId];
-      if (!rankItem) return;
-      var isMet = $gameParty.hasItem(rankItem, true);
-      ctx.startTotal++;
-      if (isMet) ctx.startMet++;
-      ctx.startText += isMet ? MARKERS.SUCCESS + '\n' : MARKERS.FAILURE + '\n';
+    var rankValue = Number(item.meta['QuestSetRank']);
+    if (rankValue < 1) return;
+
+    appendConditionText(ctx, SCOPE_START, START_CONDITION_HEADER_RANK);
+
+    var rankItem = $dataItems[getRankRestrictionItemId(rankValue)];
+    if (!rankItem) return;
+
+    var isMet = $gameParty.hasItem(rankItem, true);
+    appendConditionLine(ctx, SCOPE_START, '', isMet, MARKERS.SUCCESS, MARKERS.FAILURE, '\n');
+  }
+
+  // ランク制限値(1以上/2以上/3以上)に対応するアイテムID
+  function getRankRestrictionItemId(rankValue) {
+    for (var rankLevel = RANK_ITEM_IDS.length; rankLevel >= 1; rankLevel--) {
+      if (rankValue >= rankLevel) return RANK_ITEM_IDS[rankLevel - 1];
     }
-  });
+    return RANK_ITEM_IDS[0];
+  }
 
   // Handler: Perspective (QuestSetPerspective)
-  startConditionHandlers.push({
-    name: 'QuestSetPerspective',
-    process: function(item, ctx) {
-      if (!item.meta['QuestSetPerspective']) return;
-      
-      var perspectiveId = Number(item.meta['QuestSetPerspective']);
-      var perspectiveActor = perspectiveId >= 1 ? $gameActors.actor(perspectiveId) : null;
-      if (perspectiveId >= 1 && perspectiveId !== getCurrentActorId() && perspectiveActor) {
-        ctx.startText += '[' + perspectiveActor.name() + '視点]\n';
-      }
-      
-      var isMet = $gameSwitches.value(perspectiveId + 440);
-      ctx.startTotal++;
-      if (isMet) ctx.startMet++;
+  function processQuestSetPerspectiveCondition(item, ctx) {
+    if (!item.meta['QuestSetPerspective']) return;
+
+    var perspectiveId = Number(item.meta['QuestSetPerspective']);
+    var perspectiveActor = perspectiveId >= 1 ? $gameActors.actor(perspectiveId) : null;
+    if (perspectiveId >= 1 && perspectiveId !== getCurrentActorId() && perspectiveActor) {
+      appendConditionText(ctx, SCOPE_START, '[' + perspectiveActor.name() + PERSPECTIVE_VIEW_SUFFIX + ']\n');
     }
-  });
+
+    var isMet = $gameSwitches.value(perspectiveId + PERSPECTIVE_SWITCH_OFFSET);
+    recordCondition(ctx, SCOPE_START, isMet);
+  }
 
   // Handler: Note Word (NoteWord)
-  startConditionHandlers.push({
-    name: 'NoteWord',
-    process: function(item, ctx) {
-      if (!item.meta['NoteWord']) return;
-      ctx.startText += '[' + item.meta['NoteWord'] + ']';
-    }
-  });
+  function processNoteWordCondition(item, ctx) {
+    if (!item.meta['NoteWord']) return;
+
+    appendConditionText(ctx, SCOPE_START, '[' + item.meta['NoteWord'] + ']');
+  }
 
   // Handler: Actor Exists (QuestSetActor)
-  startConditionHandlers.push({
-    name: 'QuestSetActor',
-    process: function(item, ctx) {
-      if (!item.meta['QuestSetActor']) return;
-      
-      var arr = parseMetaArray(item.meta['QuestSetActor']);
-      var hasExternalActor = false;
-      
-      for (var id = 0; id < arr.length; id++) {
-        var actorId = Number(arr[id]);
-        if (actorId === 0) actorId = getCurrentActorId();
-        
-        var actor = $gameActors.actor(actorId);
-        if (!actor) continue;
-        
-        if (actorId !== getCurrentActorId()) {
-          ctx.startText += '[' + actor.name() + ']';
-          hasExternalActor = true;
-        }
-        
-        var isMet = isActorAvailable(actor);
-        ctx.startTotal++;
-        if (isMet) ctx.startMet++;
-        ctx.startText += isMet ? MARKERS.SUCCESS : MARKERS.FAILURE;
+  function processQuestSetActorCondition(item, ctx) {
+    if (!item.meta['QuestSetActor']) return;
+
+    var actorIds = parseMetaArray(item.meta['QuestSetActor']);
+    var currentActorId = getCurrentActorId();
+    var hasExternalActor = false;
+
+    for (var index = 0; index < actorIds.length; index++) {
+      var actorId = Number(actorIds[index]);
+      if (actorId === 0) actorId = currentActorId;
+
+      var actor = $gameActors.actor(actorId);
+      if (!actor) continue;
+
+      if (actorId !== currentActorId) {
+        appendConditionText(ctx, SCOPE_START, '[' + actor.name() + ']');
+        hasExternalActor = true;
       }
-      
-      if (hasExternalActor) ctx.startText += '\n';
-      ctx.tempValue14 = 0;
+
+      var isMet = isActorAvailable(actor);
+      recordCondition(ctx, SCOPE_START, isMet);
+      appendConditionText(ctx, SCOPE_START, isMet ? MARKERS.SUCCESS : MARKERS.FAILURE);
     }
-  });
+
+    if (hasExternalActor) appendConditionText(ctx, SCOPE_START, '\n');
+  }
 
   // Handler: Map Condition (QuestSetMap)
-  startConditionHandlers.push({
-    name: 'QuestSetMap',
-    process: function(item, ctx) {
-      if (!item.meta['QuestSetMap']) return;
-      
-      var mapId = Number(item.meta['QuestSetMap']);
-      if (mapId === 0) mapId = DEFAULT_VALUES.SWITCH_ID;
-      
-      var isMet = $gameSwitches.value(mapId);
-      ctx.startTotal++;
-      if (isMet) ctx.startMet++;
-    }
-  });
+  function processQuestSetMapCondition(item, ctx) {
+    if (!item.meta['QuestSetMap']) return;
+
+    var switchId = Number(item.meta['QuestSetMap']);
+    if (switchId === 0) switchId = DEFAULT_VALUES.SWITCH_ID;
+
+    recordCondition(ctx, SCOPE_START, $gameSwitches.value(switchId));
+  }
 
   // Handler: Switch Condition (QuestSetSwi)
-  startConditionHandlers.push({
-    name: 'QuestSetSwi',
-    process: function(item, ctx) {
-      if (!item.meta['QuestSetSwi']) return;
-      
-      var switchId = Number(item.meta['QuestSetSwi']);
-      if (switchId === 0) switchId = DEFAULT_VALUES.SWITCH_ID;
-      
-      if (switchId !== DEFAULT_VALUES.SWITCH_ID) {
-        var switchName = cleanSystemName($dataSystem.switches[switchId]);
-        ctx.startText += '【' + switchName;
-      }
-      
-      var isMet = $gameSwitches.value(switchId);
-      ctx.startTotal++;
-      if (isMet) ctx.startMet++;
-      ctx.startText += isMet ? MARKERS.SUCCESS + '】\n' : MARKERS.FAILURE + '】\n';
+  function processQuestSetSwiCondition(item, ctx) {
+    if (!item.meta['QuestSetSwi']) return;
+
+    var switchId = Number(item.meta['QuestSetSwi']);
+    if (switchId === 0) switchId = DEFAULT_VALUES.SWITCH_ID;
+
+    //既定スイッチ(2)は説明を出さないが、閉じ括弧だけは従来通り出力する
+    if (switchId !== DEFAULT_VALUES.SWITCH_ID) {
+      var switchName = cleanSystemName($dataSystem.switches[switchId]);
+      appendConditionText(ctx, SCOPE_START, '【' + switchName);
     }
-  });
+
+    appendConditionLine(ctx, SCOPE_START, '', $gameSwitches.value(switchId),
+      MARKERS.SUCCESS, MARKERS.FAILURE, '】\n');
+  }
 
   // Handler: Main Quest Progress (QuestSetMainRoot)
-  startConditionHandlers.push({
-    name: 'QuestSetMainRoot',
-    process: function(item, ctx) {
-      if (!item.meta['QuestSetMainRoot']) return;
-      
-      var arr = parseMetaArray(item.meta['QuestSetMainRoot']);
-      var varId = Number(arr[0]) || DEFAULT_VALUES.MAIN_ROOT_VAR;
-      var targetValue = Number(arr[1]);
-      
-      if (targetValue !== 0) {
-        ctx.startText += '【メインクエスト進行[' + targetValue + ']以上';
-      }
-      
-      var isMet = $gameVariables.value(varId) >= targetValue;
-      ctx.startTotal++;
-      if (isMet) ctx.startMet++;
-      ctx.startText += isMet ? MARKERS.SUCCESS + '】\n' : MARKERS.FAILURE + '】\n';
+  function processQuestSetMainRootCondition(item, ctx) {
+    if (!item.meta['QuestSetMainRoot']) return;
+
+    var mainRootMeta = parseMetaArray(item.meta['QuestSetMainRoot']);
+    var varId = Number(mainRootMeta[0]) || DEFAULT_VALUES.MAIN_ROOT_VAR;
+    var targetValue = Number(mainRootMeta[1]);
+
+    var progressHeader = '';
+    if (targetValue !== 0) {
+      progressHeader = '【メインクエスト進行[' + targetValue + ']以上';
     }
-  });
+
+    appendConditionLine(ctx, SCOPE_START, progressHeader, $gameVariables.value(varId) >= targetValue,
+      MARKERS.SUCCESS, MARKERS.FAILURE, '】\n');
+  }
 
   // Handler: Variable Conditions (QuestSetVal1-9)
-  startConditionHandlers.push({
-    name: 'QuestSetVal',
-    process: function(item, ctx) {
-      for (var id = 1; id <= 9; id++) {
-        var metaKey = 'QuestSetVal' + id;
-        if (!item.meta[metaKey]) continue;
-        
-        var arr = parseMetaArray(item.meta[metaKey]);
-        var varId = Number(arr[0]) || DEFAULT_VALUES.VARIABLE_ID;
-        var targetValue = Number(arr[1]);
-        
-        if (varId !== DEFAULT_VALUES.VARIABLE_ID) {
-          var varName = cleanSystemName($dataSystem.variables[varId]);
-          ctx.startText += '【' + varName + ' ' + $gameVariables.value(varId) + '/' + targetValue;
-          
-          var isMet = $gameVariables.value(varId) >= targetValue;
-          ctx.startTotal++;
-          if (isMet) ctx.startMet++;
-          ctx.startText += isMet ? MARKERS.SUCCESS + '】\n' : MARKERS.FAILURE + '】\n';
-        }
-      }
-    }
-  });
+  function processQuestSetValCondition(item, ctx) {
+    forEachNumberedMeta(item, 'QuestSetVal', function(valMeta) {
+      var varId = Number(valMeta[0]) || DEFAULT_VALUES.VARIABLE_ID;
+      if (varId === DEFAULT_VALUES.VARIABLE_ID) return;
+
+      var targetValue = Number(valMeta[1]);
+      var currentValue = $gameVariables.value(varId);
+      var varName = cleanSystemName($dataSystem.variables[varId]);
+      var condText = '【' + varName + ' ' + currentValue + '/' + targetValue;
+
+      appendConditionLine(ctx, SCOPE_START, condText, currentValue >= targetValue,
+        MARKERS.SUCCESS, MARKERS.FAILURE, '】\n');
+    });
+  }
 
   // Handler: H-Exp Array Conditions (QuestSetHexpArr1-9)
-  startConditionHandlers.push({
-    name: 'QuestSetHexpArr',
-    process: function(item, ctx) {
-      for (var id = 1; id <= 9; id++) {
-        var metaKey = 'QuestSetHexpArr' + id;
-        if (!item.meta[metaKey]) continue;
-        
-        var arr = parseMetaArray(item.meta[metaKey]);
-        var actorId = Number(arr[0]);
-        var paramType = Number(arr[1]);
-        var targetValue = Number(arr[2]);
-        var actor = $gameActors.actor(actorId);
-        if (!actor) continue;
-        var currentValue = getArrayValue(actorId + 380, paramType);
-        var isMet;
-        
-        if (paramType === 4) { // 露出度 - less than or equal
-          isMet = currentValue <= targetValue;
-          ctx.startText += '[\\C[27]' + actor.name() + '\\C[0]' + $dataSystem.variables[paramType + 400] + targetValue + '以下';
-        } else {
-          isMet = currentValue >= targetValue;
-          ctx.startText += '[\\C[27]' + actor.name() + '\\C[0]' + $dataSystem.variables[paramType + 400] + targetValue + '以上';
-        }
-        
-        ctx.startTotal++;
-        if (isMet) ctx.startMet++;
-        ctx.startText += isMet ? MARKERS.SUCCESS + '】\n' : MARKERS.FAILURE + '】\n';
-      }
-    }
-  });
+  function processQuestSetHexpArrCondition(item, ctx) {
+    forEachNumberedMeta(item, 'QuestSetHexpArr', function(hexpMeta) {
+      var actorId = Number(hexpMeta[0]);
+      var paramType = Number(hexpMeta[1]);
+      var targetValue = Number(hexpMeta[2]);
+
+      var actor = $gameActors.actor(actorId);
+      if (!actor) return;
+
+      var currentValue = getArrayValue(actorId + ACTOR_EXPOSURE_VAR_OFFSET, paramType);
+      var isExposure = paramType === EXPOSURE_PARAM_TYPE;
+      var isMet = isExposure ? currentValue <= targetValue : currentValue >= targetValue;
+      var comparisonSuffix = isExposure ? '以下' : '以上';
+
+      var actorName = colorTaggedText(27, actor.name());
+      var paramName = $dataSystem.variables[paramType + CONDITION_LABEL_VAR_OFFSET];
+      var condText = '[' + actorName + paramName + targetValue + comparisonSuffix;
+
+      appendConditionLine(ctx, SCOPE_START, condText, isMet, MARKERS.SUCCESS, MARKERS.FAILURE, '】\n');
+    });
+  }
+
+  // スキル系条件の共通部分(アクターとスキルの解決)
+  function readSkillConditionTarget(actorId, skillId) {
+    var actor = resolveConditionActor(actorId);
+    if (!actor) return null;
+
+    var skill = $dataSkills[skillId];
+    if (!skill) return null;
+
+    return { actor: actor, skill: skill, prefix: buildActorPrefix(actorId, actor) };
+  }
 
   // Handler: Skill Condition (QuestSetSkill)
-  startConditionHandlers.push({
-    name: 'QuestSetSkill',
-    process: function(item, ctx) {
-      if (!item.meta['QuestSetSkill']) return;
-      
-      var arr = parseMetaArray(item.meta['QuestSetSkill']);
-      var actorId = Number(arr[0]);
-      var skillId = Number(arr[1]) || DEFAULT_VALUES.SKILL_ID;
-      var actor = actorId >= 1 ? $gameActors.actor(actorId) : getCurrentActor();
-      if (!actor) return;
-      var skill = $dataSkills[skillId];
-      if (!skill) return;
-      
-      if (skillId !== DEFAULT_VALUES.SKILL_ID) {
-        var prefix = (actorId === getCurrentActorId()) ? '' : actor.name() + 'が';
-        ctx.startText += '【' + prefix + skill.name + '習得';
-      }
-      
-      var isMet = actor.isLearnedSkill(skillId);
-      ctx.startTotal++;
-      if (isMet) ctx.startMet++;
-      ctx.startText += isMet ? MARKERS.SUCCESS + '】\n' : MARKERS.FAILURE + '】\n';
+  function processQuestSetSkillCondition(item, ctx) {
+    if (!item.meta['QuestSetSkill']) return;
+
+    var meta = parseMetaArray(item.meta['QuestSetSkill']);
+    var actorId = Number(meta[0]);
+    var skillId = Number(meta[1]) || DEFAULT_VALUES.SKILL_ID;
+
+    var target = readSkillConditionTarget(actorId, skillId);
+    if (!target) return;
+
+    var condText = '';
+    if (skillId !== DEFAULT_VALUES.SKILL_ID) {
+      condText = '【' + target.prefix + target.skill.name + '習得';
     }
-  });
+
+    appendConditionLine(ctx, SCOPE_START, condText, target.actor.isLearnedSkill(skillId),
+      MARKERS.SUCCESS, MARKERS.FAILURE, '】\n');
+  }
 
   // Handler: Skill Equip Condition (QuestSetSkillEquip)
-  startConditionHandlers.push({
-    name: 'QuestSetSkillEquip',
-    process: function(item, ctx) {
-      if (!item.meta['QuestSetSkillEquip']) return;
-      
-      var arr = parseMetaArray(item.meta['QuestSetSkillEquip']);
-      var actorId = Number(arr[0]) || getCurrentActorId();
-      var skillId = Number(arr[1]) || DEFAULT_VALUES.SKILL_ID;
-      var actor = $gameActors.actor(actorId);
-      if (!actor) return;
-      var skill = $dataSkills[skillId];
-      if (!skill) return;
-      
-      if (skillId !== DEFAULT_VALUES.SKILL_ID) {
-        var prefix = (actorId === getCurrentActorId()) ? '' : actor.name() + 'が';
-        ctx.startText += '【' + prefix + skill.name + '装着';
-      }
-      
-      var isMet = actor.battleSkillsRaw().includes(skillId);
-      ctx.startTotal++;
-      if (isMet) ctx.startMet++;
-      ctx.startText += isMet ? MARKERS.SUCCESS + '】\n' : MARKERS.FAILURE + '】\n';
+  function processQuestSetSkillEquipCondition(item, ctx) {
+    if (!item.meta['QuestSetSkillEquip']) return;
+
+    var meta = parseMetaArray(item.meta['QuestSetSkillEquip']);
+    var actorId = Number(meta[0]) || getCurrentActorId();
+    var skillId = Number(meta[1]) || DEFAULT_VALUES.SKILL_ID;
+
+    var target = readSkillConditionTarget(actorId, skillId);
+    if (!target) return;
+
+    var condText = '';
+    if (skillId !== DEFAULT_VALUES.SKILL_ID) {
+      condText = '【' + target.prefix + target.skill.name + '装着';
     }
-  });
+
+    appendConditionLine(ctx, SCOPE_START, condText,
+      target.actor.battleSkillsRaw().includes(skillId), MARKERS.SUCCESS, MARKERS.FAILURE, '】\n');
+  }
 
   // Handler: Skill Rank Condition (QuestSetSkillRank)
-  startConditionHandlers.push({
-    name: 'QuestSetSkillRank',
-    process: function(item, ctx) {
-      if (!item.meta['QuestSetSkillRank']) return;
-      
-      var arr = parseMetaArray(item.meta['QuestSetSkillRank']);
-      var actorId = Number(arr[0]);
-      var skillId = Number(arr[1]) || DEFAULT_VALUES.SKILL_ID;
-      var requiredRank = Number(arr[2]);
-      var actor = actorId >= 1 ? $gameActors.actor(actorId) : getCurrentActor();
-      if (!actor) return;
-      var skill = $dataSkills[skillId];
-      if (!skill) return;
-      
-      if (skillId !== DEFAULT_VALUES.SKILL_ID) {
-        var prefix = (actorId === getCurrentActorId()) ? '' : actor.name() + 'が';
-        ctx.startText += '【' + prefix + skill.name + 'ランク' + requiredRank + '以上';
-      }
-      
-      var isMet = actor.isLearnedSkill(skillId) && actor.skillMasteryLevel(skillId) >= requiredRank;
-      ctx.startTotal++;
-      if (isMet) ctx.startMet++;
-      ctx.startText += isMet ? MARKERS.SUCCESS + '】\n' : MARKERS.FAILURE + '】\n';
+  function processQuestSetSkillRankCondition(item, ctx) {
+    if (!item.meta['QuestSetSkillRank']) return;
+
+    var meta = parseMetaArray(item.meta['QuestSetSkillRank']);
+    var actorId = Number(meta[0]);
+    var skillId = Number(meta[1]) || DEFAULT_VALUES.SKILL_ID;
+    var requiredRank = Number(meta[2]);
+
+    var target = readSkillConditionTarget(actorId, skillId);
+    if (!target) return;
+
+    var condText = '';
+    if (skillId !== DEFAULT_VALUES.SKILL_ID) {
+      condText = '【' + target.prefix + target.skill.name + 'ランク' + requiredRank + '以上';
     }
-  });
+
+    var isMet = target.actor.isLearnedSkill(skillId) &&
+      target.actor.skillMasteryLevel(skillId) >= requiredRank;
+
+    appendConditionLine(ctx, SCOPE_START, condText, isMet, MARKERS.SUCCESS, MARKERS.FAILURE, '】\n');
+  }
 
   // Handler: State Condition (QuestSetState)
-  startConditionHandlers.push({
-    name: 'QuestSetState',
-    process: function(item, ctx) {
-      if (!item.meta['QuestSetState']) return;
-      
-      var arr = parseMetaArray(item.meta['QuestSetState']);
-      var actorId = Number(arr[0]) || getCurrentActorId();
-      var stateId = Number(arr[1]) || DEFAULT_VALUES.STATE_ID;
-      var actor = $gameActors.actor(actorId);
-      if (!actor) return;
-      
-      if (stateId !== DEFAULT_VALUES.STATE_ID) {
-        var prefix = (actorId === getCurrentActorId()) ? '' : actor.name() + 'が';
-        ctx.startText += '【' + prefix + '\\x1bSIM[' + stateId + ']';
-      }
-      
-      var isMet = actor.isStateAffected(stateId);
-      ctx.startTotal++;
-      if (isMet) ctx.startMet++;
-      ctx.startText += isMet ? MARKERS.SUCCESS + '】\n' : MARKERS.FAILURE + '】\n';
+  function processQuestSetStateCondition(item, ctx) {
+    if (!item.meta['QuestSetState']) return;
+
+    var meta = parseMetaArray(item.meta['QuestSetState']);
+    var actorId = Number(meta[0]) || getCurrentActorId();
+    var stateId = Number(meta[1]) || DEFAULT_VALUES.STATE_ID;
+
+    var actor = $gameActors.actor(actorId);
+    if (!actor) return;
+
+    var condText = '';
+    if (stateId !== DEFAULT_VALUES.STATE_ID) {
+      condText = '【' + buildActorPrefix(actorId, actor) + '\\x1bSIM[' + stateId + ']';
     }
-  });
+
+    appendConditionLine(ctx, SCOPE_START, condText, actor.isStateAffected(stateId),
+      MARKERS.SUCCESS, MARKERS.FAILURE, '】\n');
+  }
 
   // Handler: Item Condition (QuestSetItem)
-  startConditionHandlers.push({
-    name: 'QuestSetItem',
-    process: function(item, ctx) {
-      if (!item.meta['QuestSetItem']) return;
-      
-      var arr = parseMetaArray(item.meta['QuestSetItem']);
-      var itemType = Number(arr[0]);
-      var itemId = Number(arr[1]) || DEFAULT_VALUES.ITEM_ID;
-      var requiredAmount = Number(arr[2]);
-      var itemsCollection = getItemsCollection(itemType);
-      var targetItem = itemsCollection[itemId];
-      if (!targetItem) return;
-      
-      if (itemId !== DEFAULT_VALUES.ITEM_ID) {
-        ctx.startText += '【' + targetItem.name + '所持';
-      }
-      
-      var isMet = $gameParty.numItems(targetItem) >= requiredAmount;
-      ctx.startTotal++;
-      if (isMet) ctx.startMet++;
-      ctx.startText += isMet ? MARKERS.SUCCESS + '】\n' : MARKERS.FAILURE + '】\n';
+  function processQuestSetItemCondition(item, ctx) {
+    if (!item.meta['QuestSetItem']) return;
+
+    var meta = parseMetaArray(item.meta['QuestSetItem']);
+    var itemType = Number(meta[0]);
+    var itemId = Number(meta[1]) || DEFAULT_VALUES.ITEM_ID;
+    var requiredAmount = Number(meta[2]);
+
+    var targetItem = getItemsCollection(itemType)[itemId];
+    if (!targetItem) return;
+
+    var condText = '';
+    if (itemId !== DEFAULT_VALUES.ITEM_ID) {
+      condText = '【' + targetItem.name + '所持';
     }
-  });
+
+    appendConditionLine(ctx, SCOPE_START, condText, $gameParty.numItems(targetItem) >= requiredAmount,
+      MARKERS.SUCCESS, MARKERS.FAILURE, '】\n');
+  }
 
   // Handler: Subjugation Condition (QuestSetSubjugation)
-  startConditionHandlers.push({
-    name: 'QuestSetSubjugation',
-    process: function(item, ctx) {
-      if (!item.meta['QuestSetSubjugation']) return;
-      
-      var arr = parseMetaArray(item.meta['QuestSetSubjugation']);
-      var subjugationId = Number(arr[0]) || DEFAULT_VALUES.SUBJUGATION_VAR;
-      var targetCount = Number(arr[1]);
-      var currentCount = getArrayValue(52, subjugationId);
-      
-      if (subjugationId >= 3) {
-        ctx.startText += '【\\x1bSIM[' + subjugationId + ']\\C[10]' + targetCount + '\\C[0]体討伐';
-      } else if (subjugationId === 1) {
-        ctx.startText += '【\\C[2]当日魔物討伐数\\C[0]:' + currentCount + '/' + targetCount;
-      } else if (subjugationId === 2) {
-        ctx.startText += '【\\C[2]総魔物討伐数\\C[0]:' + currentCount + '/' + targetCount;
-      }
-      
-      var isMet = currentCount >= targetCount;
-      ctx.startTotal++;
-      if (isMet) ctx.startMet++;
-      ctx.startText += isMet ? MARKERS.SUCCESS + '】\n' : MARKERS.FAILURE + '】\n';
+  function processQuestSetSubjugationCondition(item, ctx) {
+    if (!item.meta['QuestSetSubjugation']) return;
+
+    var meta = parseMetaArray(item.meta['QuestSetSubjugation']);
+    var subjugationId = Number(meta[0]) || DEFAULT_VALUES.SUBJUGATION_VAR;
+    var targetCount = Number(meta[1]);
+    var currentCount = getArrayValue(SUBJUGATION_COUNT_VAR_ID, subjugationId);
+
+    appendConditionLine(ctx, SCOPE_START,
+      buildSubjugationConditionText(subjugationId, targetCount, currentCount),
+      currentCount >= targetCount, MARKERS.SUCCESS, MARKERS.FAILURE, '】\n');
+  }
+
+  // 討伐条件の見出し(魔物ID指定 / 当日 / 総数)
+  function buildSubjugationConditionText(subjugationId, targetCount, currentCount) {
+    if (subjugationId === 1) {
+      return '【' + SUBJUGATION_TODAY_LABEL + ':' + currentCount + '/' + targetCount;
     }
-  });
+    if (subjugationId === 2) {
+      return '【' + SUBJUGATION_TOTAL_LABEL + ':' + currentCount + '/' + targetCount;
+    }
+    if (subjugationId >= 3) {
+      return '【\\x1bSIM[' + subjugationId + ']' + colorTaggedText(10, targetCount) + SUBJUGATION_BODY_SUFFIX;
+    }
+    return '';
+  }
 
   // Handler: Item Array Condition (QuestSetItemArr)
-  startConditionHandlers.push({
-    name: 'QuestSetItemArr',
-    process: function(item, ctx) {
-      if (!item.meta['QuestSetItemArr']) return;
-      
-      var arr = parseMetaArray(item.meta['QuestSetItemArr']);
-      
-      for (var id = 0; id < arr.length; id++) {
-        var itemId = Number(arr[id]) || DEFAULT_VALUES.ITEM_ID;
-        if (itemId === DEFAULT_VALUES.ITEM_ID) continue;
-        
-        var targetItem = $dataItems[itemId];
-        if (!targetItem) continue;
-        
-        if (targetItem.meta['EICSwitch']) {
-          var eicSwitch = Number(targetItem.meta['EICSwitch']);
-          if (eicSwitch === 102) ctx.startText += '【挿話:';
-          else if (eicSwitch === 103) ctx.startText += '【シーン:';
-          else if (eicSwitch === 104) ctx.startText += '【称号:';
-          else if (eicSwitch === 105) ctx.startText += '【H称号:';
-        } else if (targetItem.meta['SG種別'] && Number(targetItem.meta['SG種別']) === 1) {
-          ctx.startText += '【クエスト:';
-        } else {
-          ctx.startText += '【';
-        }
-        
-        ctx.startText += '\\x1bIIN[' + itemId + ']';
-        
-        var isMet = $gameParty.hasItem(targetItem, true);
-        ctx.startTotal++;
-        if (isMet) ctx.startMet++;
-        ctx.startText += isMet ? MARKERS.SUCCESS + '】\n' : MARKERS.FAILURE + '】\n';
-      }
+  function processQuestSetItemArrCondition(item, ctx) {
+    if (!item.meta['QuestSetItemArr']) return;
+
+    var itemIds = parseMetaArray(item.meta['QuestSetItemArr']);
+
+    for (var index = 0; index < itemIds.length; index++) {
+      var itemId = Number(itemIds[index]) || DEFAULT_VALUES.ITEM_ID;
+      if (itemId === DEFAULT_VALUES.ITEM_ID) continue;
+
+      var targetItem = $dataItems[itemId];
+      if (!targetItem) continue;
+
+      var condText = getItemCategoryMarker(targetItem) + '\\x1bIIN[' + itemId + ']';
+      appendConditionLine(ctx, SCOPE_START, condText, $gameParty.hasItem(targetItem, true),
+        MARKERS.SUCCESS, MARKERS.FAILURE, '】\n');
     }
-  });
+  }
+
+  // アイテムのカテゴリ見出し(挿話/シーン/称号/H称号/クエスト/その他)
+  function getItemCategoryMarker(targetItem) {
+    if (targetItem.meta['EICSwitch']) {
+      var eicSwitch = Number(targetItem.meta['EICSwitch']);
+      //対象外のEICSwitch(200等)は見出しを付けない(従来通り)
+      return EIC_SWITCH_CATEGORY_MARKERS[eicSwitch] || '';
+    }
+    if (targetItem.meta['SG種別'] && Number(targetItem.meta['SG種別']) === EIC_SWITCH_QUEST_CATEGORY) {
+      return QUEST_CATEGORY_MARKER;
+    }
+    return DEFAULT_CATEGORY_MARKER;
+  }
+
+  startConditionHandlers.push({ name: 'QuestSetRank', process: processQuestSetRankCondition });
+  startConditionHandlers.push({ name: 'QuestSetPerspective', process: processQuestSetPerspectiveCondition });
+  startConditionHandlers.push({ name: 'NoteWord', process: processNoteWordCondition });
+  startConditionHandlers.push({ name: 'QuestSetActor', process: processQuestSetActorCondition });
+  startConditionHandlers.push({ name: 'QuestSetMap', process: processQuestSetMapCondition });
+  startConditionHandlers.push({ name: 'QuestSetSwi', process: processQuestSetSwiCondition });
+  startConditionHandlers.push({ name: 'QuestSetMainRoot', process: processQuestSetMainRootCondition });
+  startConditionHandlers.push({ name: 'QuestSetVal', process: processQuestSetValCondition });
+  startConditionHandlers.push({ name: 'QuestSetHexpArr', process: processQuestSetHexpArrCondition });
+  startConditionHandlers.push({ name: 'QuestSetSkill', process: processQuestSetSkillCondition });
+  startConditionHandlers.push({ name: 'QuestSetSkillEquip', process: processQuestSetSkillEquipCondition });
+  startConditionHandlers.push({ name: 'QuestSetSkillRank', process: processQuestSetSkillRankCondition });
+  startConditionHandlers.push({ name: 'QuestSetState', process: processQuestSetStateCondition });
+  startConditionHandlers.push({ name: 'QuestSetItem', process: processQuestSetItemCondition });
+  startConditionHandlers.push({ name: 'QuestSetSubjugation', process: processQuestSetSubjugationCondition });
+  startConditionHandlers.push({ name: 'QuestSetItemArr', process: processQuestSetItemArrCondition });
 
   // ============================================================
-  // COMPLETION CONDITION HANDLERS REGISTRY
+  // COMPLETION CONDITION HANDLERS
   // ============================================================
   
   var completionConditionHandlers = [];
 
   // Handler: Perspective (QuestCompPerspective)
-  completionConditionHandlers.push({
-    name: 'QuestCompPerspective',
-    process: function(item, ctx) {
-      if (!item.meta['QuestCompPerspective']) return;
-      
-      var perspectiveId = Number(item.meta['QuestCompPerspective']);
-      var perspectiveActor = perspectiveId >= 1 ? $gameActors.actor(perspectiveId) : null;
-      if (perspectiveId >= 1 && perspectiveId !== getCurrentActorId() && perspectiveActor) {
-        ctx.completionText += '[' + perspectiveActor.name() + '視点';
-      }
-      
-      var isMet = $gameSwitches.value(perspectiveId + 440);
-      ctx.completionTotal++;
-      if (isMet) ctx.completionMet++;
-      ctx.completionText += isMet ? MARKERS.SUCCESS + ']\n' : MARKERS.FAILURE + ']\n';
+  function processQuestCompPerspectiveCondition(item, ctx) {
+    if (!item.meta['QuestCompPerspective']) return;
+
+    var perspectiveId = Number(item.meta['QuestCompPerspective']);
+    var perspectiveActor = perspectiveId >= 1 ? $gameActors.actor(perspectiveId) : null;
+
+    var condText = '';
+    if (perspectiveId >= 1 && perspectiveId !== getCurrentActorId() && perspectiveActor) {
+      condText = '[' + perspectiveActor.name() + PERSPECTIVE_VIEW_SUFFIX;
     }
-  });
+
+    appendConditionLine(ctx, SCOPE_COMPLETION, condText,
+      $gameSwitches.value(perspectiveId + PERSPECTIVE_SWITCH_OFFSET),
+      MARKERS.SUCCESS, MARKERS.FAILURE, ']\n');
+  }
 
   // Handler: Actor Exists (QuestCompActor)
-  completionConditionHandlers.push({
-    name: 'QuestCompActor',
-    process: function(item, ctx) {
-      if (!item.meta['QuestCompActor']) return;
-      
-      var arr = parseMetaArray(item.meta['QuestCompActor']);
-      var hasExternalActor = false;
-      
-      for (var id = 0; id < arr.length; id++) {
-        var actorId = Number(arr[id]) || getCurrentActorId();
-        var actor = $gameActors.actor(actorId);
-        if (!actor) continue;
-        
-        ctx.completionText += '[' + actor.name();
-        hasExternalActor = true;
-        
-        var isMet = isActorAvailable(actor);
-        ctx.completionTotal++;
-        if (isMet) ctx.completionMet++;
-        ctx.completionText += isMet ? MARKERS.SUCCESS + ']' : MARKERS.FAILURE + ']';
-      }
-      
-      if (hasExternalActor) ctx.startText += '\n';
+  function processQuestCompActorCondition(item, ctx) {
+    if (!item.meta['QuestCompActor']) return;
+
+    var actorIds = parseMetaArray(item.meta['QuestCompActor']);
+    var hasExternalActor = false;
+
+    for (var index = 0; index < actorIds.length; index++) {
+      var actorId = Number(actorIds[index]) || getCurrentActorId();
+
+      var actor = $gameActors.actor(actorId);
+      if (!actor) continue;
+
+      appendConditionText(ctx, SCOPE_COMPLETION, '[' + actor.name());
+      hasExternalActor = true;
+
+      var isMet = isActorAvailable(actor);
+      recordCondition(ctx, SCOPE_COMPLETION, isMet);
+      appendConditionText(ctx, SCOPE_COMPLETION, isMet ? MARKERS.SUCCESS + ']' : MARKERS.FAILURE + ']');
     }
-  });
+
+    //BUGFIX: 改行は達成条件側へ入れる(従来は発生条件側に入っていた)
+    if (hasExternalActor) appendConditionText(ctx, SCOPE_COMPLETION, '\n');
+  }
 
   // Handler: Subjugation Completion (QuestCompSubjugation1-9)
-  completionConditionHandlers.push({
-    name: 'QuestCompSubjugation',
-    process: function(item, ctx) {
-      for (var id = 1; id <= 9; id++) {
-        var metaKey = 'QuestCompSubjugation' + id;
-        if (!item.meta[metaKey]) continue;
-        
-        var arr = parseMetaArray(item.meta[metaKey]);
-        var subjugationId = Number(arr[0]);
-        var targetCount = Number(arr[1]);
-        var currentCount = getArrayValue(52, subjugationId);
-        
-        if (subjugationId <= 5) {
-          if (subjugationId === 1) {
-            ctx.completionText += '【\\C[2]当日魔物討伐数\\C[0]:' + currentCount + '/' + targetCount;
-          } else if (subjugationId === 2) {
-            ctx.completionText += '【\\C[2]総魔物討伐数\\C[0]:' + currentCount + '/' + targetCount;
-          }
-        } else {
-          ctx.completionText += '【\\C[2]\\x1bSIM[' + subjugationId + ']\\C[0]:' + currentCount + '/' + targetCount;
-        }
-        
-        var isMet = currentCount >= targetCount;
-        ctx.completionTotal++;
-        if (isMet) ctx.completionMet++;
-        ctx.completionText += isMet ? MARKERS.ACHIEVED + '】\n' : MARKERS.NOT_ACHIEVED + '】\n';
-      }
-    }
-  });
+  function processQuestCompSubjugationCondition(item, ctx) {
+    forEachNumberedMeta(item, 'QuestCompSubjugation', function(subjugationMeta) {
+      var subjugationId = Number(subjugationMeta[0]);
+      var targetCount = Number(subjugationMeta[1]);
+      var currentCount = getArrayValue(SUBJUGATION_COUNT_VAR_ID, subjugationId);
 
-  // Handler: Item Collection (QuestCompcollect1-9)
-  completionConditionHandlers.push({
-    name: 'QuestCompcollect',
-    process: function(item, ctx) {
-      for (var id = 1; id <= 9; id++) {
-        var metaKey = 'QuestCompcollect' + id;
-        if (!item.meta[metaKey]) continue;
-        
-        var arr = parseMetaArray(item.meta[metaKey]);
-        var itemId = Number(arr[0]) || DEFAULT_VALUES.ITEM_ID;
-        var itemType = Number(arr[1]);
-        var requiredAmount = Number(arr[2]);
-        var itemsCollection = getItemsCollection(itemType);
-        
-        // Update global quest array
-        if (itemType === 0) valueQuestArray1[itemId] = [1, ctx.index];
-        else if (itemType === 1) valueQuestArray1[itemId + 2000] = [2, ctx.index];
-        else if (itemType === 2) valueQuestArray1[itemId + 3000] = [3, ctx.index];
-        
-        if (itemId === DEFAULT_VALUES.ITEM_ID) continue;
-        
-        var collectItem = itemsCollection[itemId];
-        if (!collectItem) continue;
-        var currentAmount = $gameParty.numItems(collectItem);
-        ctx.completionText += '【\\C[2]' + collectItem.name + '\\C[0]:' + currentAmount + '/' + requiredAmount;
-        
-        var isMet = currentAmount >= requiredAmount;
-        ctx.completionTotal++;
-        if (isMet) ctx.completionMet++;
-        ctx.completionText += isMet ? MARKERS.ACHIEVED + '】\n' : MARKERS.NOT_ACHIEVED + '】\n';
-      }
-    }
-  });
+      var condText = buildSubjugationCompletionText(subjugationId, targetCount, currentCount);
+      appendConditionLine(ctx, SCOPE_COMPLETION, condText, currentCount >= targetCount,
+        MARKERS.ACHIEVED, MARKERS.NOT_ACHIEVED, '】\n');
+    });
+  }
 
-  // Handler: Item Delivery (QuestCompDelivery1-9)
-  completionConditionHandlers.push({
-    name: 'QuestCompDelivery',
-    process: function(item, ctx) {
-      for (var id = 1; id <= 9; id++) {
-        var metaKey = 'QuestCompDelivery' + id;
-        if (!item.meta[metaKey]) continue;
-        
-        var arr = parseMetaArray(item.meta[metaKey]);
-        var itemId = Number(arr[0]) || DEFAULT_VALUES.ITEM_ID;
-        var itemType = Number(arr[1]);
-        var requiredAmount = Number(arr[2]);
-        var itemsCollection = getItemsCollection(itemType);
-        
-        // Update global quest array
-        if (itemType === 0) valueQuestArray1[itemId] = [1, ctx.index];
-        else if (itemType === 1) valueQuestArray1[itemId + 2000] = [2, ctx.index];
-        else if (itemType === 2) valueQuestArray1[itemId + 3000] = [3, ctx.index];
-        
-        if (itemId === DEFAULT_VALUES.ITEM_ID) continue;
-        
-        var deliveryItem = itemsCollection[itemId];
-        if (!deliveryItem) continue;
-        var currentAmount = $gameParty.numItems(deliveryItem);
-        ctx.completionText += '【\\C[2]' + deliveryItem.name + '\\C[0]:' + currentAmount + '/' + requiredAmount;
-        
-        var isMet = currentAmount >= requiredAmount;
-        ctx.completionTotal++;
-        if (isMet) ctx.completionMet++;
-        ctx.completionText += isMet ? MARKERS.CAN_DELIVER + '】\n' : MARKERS.CANNOT_DELIVER + '】\n';
+  // 討伐達成条件の見出し(当日/総数/魔物ID指定)
+  function buildSubjugationCompletionText(subjugationId, targetCount, currentCount) {
+    if (subjugationId <= 5) {
+      if (subjugationId === 1) {
+        return '【' + SUBJUGATION_TODAY_LABEL + ':' + currentCount + '/' + targetCount;
       }
+      if (subjugationId === 2) {
+        return '【' + SUBJUGATION_TOTAL_LABEL + ':' + currentCount + '/' + targetCount;
+      }
+      //3〜5は本文なし(従来通り件数だけ数える)
+      return '';
     }
-  });
+    return '【' + colorTaggedText(2, '\\x1bSIM[' + subjugationId + ']') +
+      ':' + currentCount + '/' + targetCount;
+  }
+
+  // 個数系達成条件(収集/納品)の共通処理。marker だけが異なる
+  function processItemCountCompletionCondition(item, ctx, metaPrefix, metMarker, unmetMarker) {
+    forEachNumberedMeta(item, metaPrefix, function(collectMeta) {
+      var itemId = Number(collectMeta[0]) || DEFAULT_VALUES.ITEM_ID;
+      var itemType = Number(collectMeta[1]);
+      var requiredAmount = Number(collectMeta[2]);
+      var itemsCollection = getItemsCollection(itemType);
+
+      // アイテム図鑑用にクエスト番号を登録(既定アイテムIDでも登録する)
+      registerQuestItemReference(itemId, itemType, ctx.index);
+
+      if (itemId === DEFAULT_VALUES.ITEM_ID) return;
+
+      var targetItem = itemsCollection[itemId];
+      if (!targetItem) return;
+
+      var currentAmount = $gameParty.numItems(targetItem);
+      var condText = '【' + colorTaggedText(2, targetItem.name) + ':' + currentAmount + '/' + requiredAmount;
+
+      appendConditionLine(ctx, SCOPE_COMPLETION, condText, currentAmount >= requiredAmount,
+        metMarker, unmetMarker, '】\n');
+    });
+  }
+
+  // valueQuestArray1[アイテムID(+種別オフセット)] = [種別, クエストID]
+  function registerQuestItemReference(itemId, itemType, questIndex) {
+    if (itemType === ITEM_TYPE_ITEM) {
+      valueQuestArray1[itemId] = [QUEST_ARRAY_TYPE_ITEM, questIndex];
+      return;
+    }
+    if (itemType === ITEM_TYPE_WEAPON) {
+      valueQuestArray1[itemId + QUEST_ARRAY_WEAPON_OFFSET] = [QUEST_ARRAY_TYPE_WEAPON, questIndex];
+      return;
+    }
+    if (itemType === ITEM_TYPE_ARMOR) {
+      valueQuestArray1[itemId + QUEST_ARRAY_ARMOR_OFFSET] = [QUEST_ARRAY_TYPE_ARMOR, questIndex];
+    }
+  }
+
+  // 収集/納品の達成条件ハンドラは成否マーカーだけが違うので共通生成する
+  function createItemCountCompletionHandler(handlerName, metaPrefix, metMarker, unmetMarker) {
+    return {
+      name: handlerName,
+      process: function(item, ctx) {
+        processItemCountCompletionCondition(item, ctx, metaPrefix, metMarker, unmetMarker);
+      }
+    };
+  }
 
   // Handler: Variable Completion (QuestCompVal1-9)
-  completionConditionHandlers.push({
-    name: 'QuestCompVal',
-    process: function(item, ctx) {
-      for (var id = 1; id <= 9; id++) {
-        var metaKey = 'QuestCompVal' + id;
-        if (!item.meta[metaKey]) continue;
-        
-        var arr = parseMetaArray(item.meta[metaKey]);
-        var varId = Number(arr[0]) || DEFAULT_VALUES.VARIABLE_ID;
-        var targetValue = Number(arr[1]);
-        
-        if (varId === DEFAULT_VALUES.VARIABLE_ID) continue;
-        
-        var varName = cleanSystemName($dataSystem.variables[varId]);
-        var currentValue = $gameVariables.value(varId);
-        ctx.completionText += '【\\C[2]' + varName + '\\C[0]:' + currentValue + '/' + targetValue;
-        
-        var isMet = currentValue >= targetValue;
-        ctx.completionTotal++;
-        if (isMet) ctx.completionMet++;
-        ctx.completionText += isMet ? MARKERS.ACHIEVED + '】\n' : MARKERS.NOT_ACHIEVED + '】\n';
-      }
-    }
-  });
+  function processQuestCompValCondition(item, ctx) {
+    forEachNumberedMeta(item, 'QuestCompVal', function(valMeta) {
+      var varId = Number(valMeta[0]) || DEFAULT_VALUES.VARIABLE_ID;
+      if (varId === DEFAULT_VALUES.VARIABLE_ID) return;
+
+      var targetValue = Number(valMeta[1]);
+      var currentValue = $gameVariables.value(varId);
+      var varName = cleanSystemName($dataSystem.variables[varId]);
+
+      appendConditionLine(ctx, SCOPE_COMPLETION, buildVariableConditionText(varName, currentValue, targetValue),
+        currentValue >= targetValue, MARKERS.ACHIEVED, MARKERS.NOT_ACHIEVED, '】\n');
+    });
+  }
+
+  // 【名前:現在値/目標値
+  function buildVariableConditionText(displayName, currentValue, targetValue) {
+    return '【' + colorTaggedText(2, displayName) + ':' + currentValue + '/' + targetValue;
+  }
 
   // Handler: Array Variable Completion (QuestCompArray1-9)
-  completionConditionHandlers.push({
-    name: 'QuestCompArray',
-    process: function(item, ctx) {
-      for (var id = 1; id <= 9; id++) {
-        var metaKey = 'QuestCompArray' + id;
-        if (!item.meta[metaKey]) continue;
-        
-        var arr = parseMetaArray(item.meta[metaKey]);
-        var varId = Number(arr[0]) || DEFAULT_VALUES.VARIABLE_ID;
-        var arrayIndex = Number(arr[1]);
-        var targetValue = Number(arr[2]);
-        
-        if (varId === DEFAULT_VALUES.VARIABLE_ID) continue;
-        
-        var currentValue = getArrayValue(varId, arrayIndex);
-        ctx.completionText += '【\\C[2]' + $dataSystem.variables[varId] + '\\C[0]:' + currentValue + '/' + targetValue;
-        
-        var isMet = currentValue >= targetValue;
-        ctx.completionTotal++;
-        if (isMet) ctx.completionMet++;
-        ctx.completionText += isMet ? MARKERS.ACHIEVED + '】\n' : MARKERS.NOT_ACHIEVED + '】\n';
-      }
-    }
-  });
+  function processQuestCompArrayCondition(item, ctx) {
+    forEachNumberedMeta(item, 'QuestCompArray', function(arrayMeta) {
+      var varId = Number(arrayMeta[0]) || DEFAULT_VALUES.VARIABLE_ID;
+      if (varId === DEFAULT_VALUES.VARIABLE_ID) return;
+
+      var arrayIndex = Number(arrayMeta[1]);
+      var targetValue = Number(arrayMeta[2]);
+      var currentValue = getArrayValue(varId, arrayIndex);
+
+      //NOTE: 配列版は従来通り変数名のクリーニングを行わない(表示テキスト維持のため)
+      var condText = buildVariableConditionText($dataSystem.variables[varId], currentValue, targetValue);
+
+      appendConditionLine(ctx, SCOPE_COMPLETION, condText, currentValue >= targetValue,
+        MARKERS.ACHIEVED, MARKERS.NOT_ACHIEVED, '】\n');
+    });
+  }
+
+  // 達成条件のスキル見出し(【アクターが[色]スキル名[色] + 接尾辞)
+  function buildSkillConditionText(target, headerSuffix) {
+    return '【' + target.prefix + colorTaggedText(2, target.skill.name) + headerSuffix;
+  }
 
   // Handler: Skill Learning Completion (QuestCompSkill1-9)
-  completionConditionHandlers.push({
-    name: 'QuestCompSkill',
-    process: function(item, ctx) {
-      for (var id = 1; id <= 9; id++) {
-        var metaKey = 'QuestCompSkill' + id;
-        if (!item.meta[metaKey]) continue;
-        
-        var arr = parseMetaArray(item.meta[metaKey]);
-        var actorId = Number(arr[0]);
-        var skillId = Number(arr[1]) || DEFAULT_VALUES.SKILL_ID;
-        var actor = actorId >= 1 ? $gameActors.actor(actorId) : getCurrentActor();
-        if (!actor) continue;
-        var skill = $dataSkills[skillId];
-        if (!skill) continue;
-        
-        if (skillId === DEFAULT_VALUES.SKILL_ID) continue;
-        
-        var prefix = (actorId === getCurrentActorId()) ? '' : actor.name() + 'が';
-        ctx.completionText += '【' + prefix + '\\C[2]' + skill.name + '\\C[0]:';
-        
-        var isMet = actor.isLearnedSkill(skillId);
-        ctx.completionTotal++;
-        if (isMet) ctx.completionMet++;
-        ctx.completionText += isMet ? MARKERS.LEARNED + '】\n' : MARKERS.NOT_LEARNED + '】\n';
-      }
-    }
-  });
+  function processQuestCompSkillCondition(item, ctx) {
+    forEachNumberedMeta(item, 'QuestCompSkill', function(skillMeta) {
+      var actorId = Number(skillMeta[0]);
+      var skillId = Number(skillMeta[1]) || DEFAULT_VALUES.SKILL_ID;
+      if (skillId === DEFAULT_VALUES.SKILL_ID) return;
+
+      var target = readSkillConditionTarget(actorId, skillId);
+      if (!target) return;
+
+      var condText = buildSkillConditionText(target, ':');
+      appendConditionLine(ctx, SCOPE_COMPLETION, condText, target.actor.isLearnedSkill(skillId),
+        MARKERS.LEARNED, MARKERS.NOT_LEARNED, '】\n');
+    });
+  }
 
   // Handler: Skill Equip Completion (QuestCompSkillEquip1-9)
-  completionConditionHandlers.push({
-    name: 'QuestCompSkillEquip',
-    process: function(item, ctx) {
-      for (var id = 1; id <= 9; id++) {
-        var metaKey = 'QuestCompSkillEquip' + id;
-        if (!item.meta[metaKey]) continue;
-        
-        var arr = parseMetaArray(item.meta[metaKey]);
-        var actorId = Number(arr[0]);
-        var skillId = Number(arr[1]) || DEFAULT_VALUES.SKILL_ID;
-        var actor = actorId >= 1 ? $gameActors.actor(actorId) : getCurrentActor();
-        if (!actor) continue;
-        var skill = $dataSkills[skillId];
-        if (!skill) continue;
-        
-        if (skillId === DEFAULT_VALUES.SKILL_ID) continue;
-        
-        var prefix = (actorId === getCurrentActorId()) ? '' : actor.name() + 'が';
-        ctx.completionText += '【' + prefix + '\\C[2]' + skill.name + '\\C[0]:';
-        
-        var isMet = actor.battleSkillsRaw().includes(skillId);
-        ctx.completionTotal++;
-        if (isMet) ctx.completionMet++;
-        ctx.completionText += isMet ? MARKERS.EQUIPPED + '】\n' : MARKERS.NOT_EQUIPPED + '】\n';
-      }
-    }
-  });
+  function processQuestCompSkillEquipCondition(item, ctx) {
+    forEachNumberedMeta(item, 'QuestCompSkillEquip', function(skillMeta) {
+      var actorId = Number(skillMeta[0]);
+      var skillId = Number(skillMeta[1]) || DEFAULT_VALUES.SKILL_ID;
+      if (skillId === DEFAULT_VALUES.SKILL_ID) return;
+
+      var target = readSkillConditionTarget(actorId, skillId);
+      if (!target) return;
+
+      var condText = buildSkillConditionText(target, ':');
+      appendConditionLine(ctx, SCOPE_COMPLETION, condText,
+        target.actor.battleSkillsRaw().includes(skillId),
+        MARKERS.EQUIPPED, MARKERS.NOT_EQUIPPED, '】\n');
+    });
+  }
 
   // Handler: Skill Rank Completion (QuestCompSkillRank1-9)
-  completionConditionHandlers.push({
-    name: 'QuestCompSkillRank',
-    process: function(item, ctx) {
-      for (var id = 1; id <= 9; id++) {
-        var metaKey = 'QuestCompSkillRank' + id;
-        if (!item.meta[metaKey]) continue;
-        
-        var arr = parseMetaArray(item.meta[metaKey]);
-        var actorId = Number(arr[0]);
-        var skillId = Number(arr[1]) || DEFAULT_VALUES.SKILL_ID;
-        var requiredRank = Number(arr[2]);
-        var actor = actorId >= 1 ? $gameActors.actor(actorId) : getCurrentActor();
-        if (!actor) continue;
-        var skill = $dataSkills[skillId];
-        if (!skill) continue;
-        
-        if (skillId === DEFAULT_VALUES.SKILL_ID) continue;
-        
-        var prefix = (actorId === getCurrentActorId()) ? '' : actor.name() + 'が';
-        ctx.completionText += '【' + prefix + '\\C[2]' + skill.name + '\\C[0]ランク' + requiredRank + ':';
-        
-        var isMet = actor.skillMasteryLevel(skillId) >= requiredRank;
-        ctx.completionTotal++;
-        if (isMet) ctx.completionMet++;
-        ctx.completionText += isMet ? MARKERS.ACHIEVED + '】\n' : MARKERS.NOT_ACHIEVED + '】\n';
-      }
-    }
-  });
+  function processQuestCompSkillRankCondition(item, ctx) {
+    forEachNumberedMeta(item, 'QuestCompSkillRank', function(skillMeta) {
+      var actorId = Number(skillMeta[0]);
+      var skillId = Number(skillMeta[1]) || DEFAULT_VALUES.SKILL_ID;
+      var requiredRank = Number(skillMeta[2]);
+      if (skillId === DEFAULT_VALUES.SKILL_ID) return;
+
+      var target = readSkillConditionTarget(actorId, skillId);
+      if (!target) return;
+
+      var condText = buildSkillConditionText(target, 'ランク' + requiredRank + ':');
+      appendConditionLine(ctx, SCOPE_COMPLETION, condText,
+        target.actor.skillMasteryLevel(skillId) >= requiredRank,
+        MARKERS.ACHIEVED, MARKERS.NOT_ACHIEVED, '】\n');
+    });
+  }
 
   // Handler: State Completion (QuestCompState1-9)
-  completionConditionHandlers.push({
-    name: 'QuestCompState',
-    process: function(item, ctx) {
-      for (var id = 1; id <= 9; id++) {
-        var metaKey = 'QuestCompState' + id;
-        if (!item.meta[metaKey]) continue;
-        
-        var arr = parseMetaArray(item.meta[metaKey]);
-        var actorId = Number(arr[0]);
-        var stateId = Number(arr[1]) || DEFAULT_VALUES.STATE_ID;
-        var actor = actorId >= 1 ? $gameActors.actor(actorId) : getCurrentActor();
-        if (!actor) continue;
-        
-        if (stateId === DEFAULT_VALUES.STATE_ID) continue;
-        
-        var prefix = (actorId === getCurrentActorId()) ? '' : actor.name() + 'が';
-        ctx.completionText += '【' + prefix + '\\C[2]\\x1bSIM[' + stateId + ']\\C[0]:';
-        
-        var isMet = actor.isStateAffected(stateId);
-        ctx.completionTotal++;
-        if (isMet) ctx.completionMet++;
-        ctx.completionText += isMet ? MARKERS.GRANTED + '】\n' : MARKERS.NOT_GRANTED + '】\n';
-      }
-    }
-  });
+  function processQuestCompStateCondition(item, ctx) {
+    forEachNumberedMeta(item, 'QuestCompState', function(stateMeta) {
+      var actorId = Number(stateMeta[0]);
+      var stateId = Number(stateMeta[1]) || DEFAULT_VALUES.STATE_ID;
+      if (stateId === DEFAULT_VALUES.STATE_ID) return;
+
+      var actor = resolveConditionActor(actorId);
+      if (!actor) return;
+
+      var condText = '【' + buildActorPrefix(actorId, actor) +
+        colorTaggedText(2, '\\x1bSIM[' + stateId + ']') + ':';
+      appendConditionLine(ctx, SCOPE_COMPLETION, condText, actor.isStateAffected(stateId),
+        MARKERS.GRANTED, MARKERS.NOT_GRANTED, '】\n');
+    });
+  }
 
   // Handler: Switch Completion (QuestCompSwi)
-  completionConditionHandlers.push({
-    name: 'QuestCompSwi',
-    process: function(item, ctx) {
-      if (!item.meta['QuestCompSwi']) return;
-      
-      var switchId = Number(item.meta['QuestCompSwi']);
-      if (switchId === 0) switchId = DEFAULT_VALUES.SWITCH_ID;
-      if (switchId === DEFAULT_VALUES.SWITCH_ID) return;
-      
-      var switchName = cleanSystemName($dataSystem.switches[switchId]);
-      ctx.completionText += '【\\C[2]' + switchName + '\\C[0]:';
-      
-      var isMet = $gameSwitches.value(switchId);
-      ctx.completionTotal++;
-      if (isMet) ctx.completionMet++;
-      ctx.completionText += isMet ? MARKERS.ACHIEVED + '】\n' : MARKERS.NOT_ACHIEVED + '】\n';
-    }
-  });
+  function processQuestCompSwiCondition(item, ctx) {
+    if (!item.meta['QuestCompSwi']) return;
+
+    var switchId = Number(item.meta['QuestCompSwi']);
+    if (switchId === 0) switchId = DEFAULT_VALUES.SWITCH_ID;
+    if (switchId === DEFAULT_VALUES.SWITCH_ID) return;
+
+    var switchName = cleanSystemName($dataSystem.switches[switchId]);
+    var condText = '【' + colorTaggedText(2, switchName) + ':';
+
+    appendConditionLine(ctx, SCOPE_COMPLETION, condText, $gameSwitches.value(switchId),
+      MARKERS.ACHIEVED, MARKERS.NOT_ACHIEVED, '】\n');
+  }
 
   // Handler: Money/Donation (QuestCompMoney) - Processed at the end
-  completionConditionHandlers.push({
-    name: 'QuestCompMoney',
-    process: function(item, ctx) {
-      if (!item.meta['QuestCompMoney']) return;
-      
-      var requiredMoney = Number(item.meta['QuestCompMoney']);
-      if (requiredMoney < 1) return;
-      
-      ctx.completionText += '【\\C[2]' + requiredMoney + '\\G';
-      
-      var isMet = $gameParty.gold() >= requiredMoney;
-      ctx.completionTotal++;
-      if (isMet) ctx.completionMet++;
-      ctx.completionText += isMet ? MARKERS.SUCCESS + '】\n' : MARKERS.FAILURE + '】\n';
-    }
-  });
+  function processQuestCompMoneyCondition(item, ctx) {
+    if (!item.meta['QuestCompMoney']) return;
+
+    var requiredMoney = Number(item.meta['QuestCompMoney']);
+    if (requiredMoney < 1) return;
+
+    //NOTE: 金額は色タグを閉じない従来の書式を維持する
+    var condText = '【\\C[2]' + requiredMoney + '\\G';
+    appendConditionLine(ctx, SCOPE_COMPLETION, condText, $gameParty.gold() >= requiredMoney,
+      MARKERS.SUCCESS, MARKERS.FAILURE, '】\n');
+  }
+
+  completionConditionHandlers.push({ name: 'QuestCompPerspective', process: processQuestCompPerspectiveCondition });
+  completionConditionHandlers.push({ name: 'QuestCompActor', process: processQuestCompActorCondition });
+  completionConditionHandlers.push({ name: 'QuestCompSubjugation', process: processQuestCompSubjugationCondition });
+  completionConditionHandlers.push(createItemCountCompletionHandler(
+    'QuestCompcollect', 'QuestCompcollect', MARKERS.ACHIEVED, MARKERS.NOT_ACHIEVED));
+  completionConditionHandlers.push(createItemCountCompletionHandler(
+    'QuestCompDelivery', 'QuestCompDelivery', MARKERS.CAN_DELIVER, MARKERS.CANNOT_DELIVER));
+  completionConditionHandlers.push({ name: 'QuestCompVal', process: processQuestCompValCondition });
+  completionConditionHandlers.push({ name: 'QuestCompArray', process: processQuestCompArrayCondition });
+  completionConditionHandlers.push({ name: 'QuestCompSkill', process: processQuestCompSkillCondition });
+  completionConditionHandlers.push({ name: 'QuestCompSkillEquip', process: processQuestCompSkillEquipCondition });
+  completionConditionHandlers.push({ name: 'QuestCompSkillRank', process: processQuestCompSkillRankCondition });
+  completionConditionHandlers.push({ name: 'QuestCompState', process: processQuestCompStateCondition });
+  completionConditionHandlers.push({ name: 'QuestCompSwi', process: processQuestCompSwiCondition });
+  completionConditionHandlers.push({ name: 'QuestCompMoney', process: processQuestCompMoneyCondition });
 
   // ============================================================
   // MAIN PROCESSING FUNCTION
   // ============================================================
   
+  // クエストID範囲を1件ずつ処理する
   function processQuests(rangeConfigId) {
     var config = RANGE_CONFIGS[rangeConfigId];
     if (!config) return;
-    
-    // Initialize global array if needed
+
     if (config.initArray) {
-      valueQuestArray1 = Array(config.arraySize).fill([]);
+      initializeQuestItemReferenceArray(config.arraySize);
     }
-    
-    var start = config.start;
-    var end = config.end;
-    var offset = config.offset;
-    
-    for (var i = start; i <= end; i++) {
-      if (!$dataItems[i] || $dataItems[i].name === '') continue;
-      
-      var item = $dataItems[i];
-      var ctx = createConditionContext(item, i, offset);
-      
-      // Process all start conditions
-      startConditionHandlers.forEach(function(handler) {
-        handler.process(item, ctx);
-      });
-      
-      // Process all completion conditions
-      completionConditionHandlers.forEach(function(handler) {
-        handler.process(item, ctx);
-      });
-      
-      // Finalize texts
-      if (ctx.completionText === ctx.completionTextInitial) {
-        ctx.completionText = HEADERS.NO_COMPLETION;
-      }
-      
-      if (ctx.startText === ctx.startTextInitial) {
-        ctx.startText += '【なし】\n';
-      }
-      
-      // Set global arrays
-      valueQuestArray7[i - offset] = ctx.startText;
-      valueQuestArray4[i - offset] = $dataItems[i].description + '\n';
-      
-      // Add supplement if exists
-      if (item.meta['QuestSupplement']) {
-        valueQuestArray4[i - offset] += item.meta['QuestSupplement'];
-      }
+
+    for (var itemIndex = config.start; itemIndex <= config.end; itemIndex++) {
+      var questItem = $dataItems[itemIndex];
+      if (!questItem || questItem.name === '') continue;
+
+      processQuestItem(questItem, itemIndex, config.offset);
     }
+  }
+
+  // アイテム図鑑参照用の配列を初期化する(各要素が独立した配列になるようにする)
+  function initializeQuestItemReferenceArray(arraySize) {
+    valueQuestArray1 = new Array(arraySize);
+    for (var slotIndex = 0; slotIndex < arraySize; slotIndex++) {
+      valueQuestArray1[slotIndex] = [];
+    }
+  }
+
+  // 1クエスト分の発生/達成条件を組み立ててグローバル配列へ格納する
+  function processQuestItem(questItem, itemIndex, offset) {
+    var ctx = createConditionContext(questItem, itemIndex, offset);
+
+    runConditionHandlers(startConditionHandlers, questItem, ctx);
+    runConditionHandlers(completionConditionHandlers, questItem, ctx);
+
+    var questSlotIndex = itemIndex - offset;
+    valueQuestArray7[questSlotIndex] = finalizeStartConditionText(ctx);
+    valueQuestArray4[questSlotIndex] = buildQuestDescriptionText(questItem);
+  }
+
+  // ハンドラ登録簿を順に実行する
+  function runConditionHandlers(handlers, questItem, ctx) {
+    for (var handlerIndex = 0; handlerIndex < handlers.length; handlerIndex++) {
+      handlers[handlerIndex].process(questItem, ctx);
+    }
+  }
+
+  function finalizeStartConditionText(ctx) {
+    if (ctx.completionText === ctx.completionTextInitial) {
+      ctx.completionText = HEADERS.NO_COMPLETION;
+    }
+
+    if (ctx.startText === ctx.startTextInitial) {
+      return ctx.startText + NO_START_CONDITION_SUFFIX;
+    }
+    return ctx.startText;
+  }
+
+  // クエスト解説(説明 + 補足)
+  function buildQuestDescriptionText(questItem) {
+    var descriptionText = questItem.description + '\n';
+    if (questItem.meta[QUEST_SUPPLEMENT_META_KEY]) {
+      descriptionText += questItem.meta[QUEST_SUPPLEMENT_META_KEY];
+    }
+    return descriptionText;
   }
 
   // ============================================================
@@ -964,14 +939,14 @@ var QuestSystem = (function() {
     
     // Allow removing handlers by name
     removeStartConditionHandler: function(name) {
-      startConditionHandlers = startConditionHandlers.filter(function(h) {
-        return h.name !== name;
+      startConditionHandlers = startConditionHandlers.filter(function(handler) {
+        return handler.name !== name;
       });
     },
     
     removeCompletionConditionHandler: function(name) {
-      completionConditionHandlers = completionConditionHandlers.filter(function(h) {
-        return h.name !== name;
+      completionConditionHandlers = completionConditionHandlers.filter(function(handler) {
+        return handler.name !== name;
       });
     },
     
