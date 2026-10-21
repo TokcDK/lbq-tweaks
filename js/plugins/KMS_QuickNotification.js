@@ -1,11 +1,11 @@
-﻿//=============================================================================
+//=============================================================================
 // KMS_QuickNotification.js
-//   Last update: 2017/09/18
+//   Last update: 2020/02/01
 //=============================================================================
 
 /*:
  * @plugindesc
- * [v0.1.0] Show popup notification.
+ * [v0.1.1] Show popup notification.
  * 
  * @author Kameo (Kamesoft)
  *
@@ -64,7 +64,7 @@
 
 /*:ja
  * @plugindesc
- * [v0.1.0] ポップアップ通知を表示する機能を追加します。
+ * [v0.1.1] ポップアップ通知を表示する機能を追加します。
  * 
  * @author かめお (Kamesoft)
  *
@@ -166,11 +166,11 @@ Params.fadeFrameCount       = Math.max(parseIntWithDefault(pluginParams['Fade fr
 Params.fontSize             = Math.max(parseIntWithDefault(pluginParams['Font size'], 18), 1);
 Params.notificationCountMax = Math.max(parseIntWithDefault(pluginParams['Max notification count'], 4), 1);
 Params.notificationSkin     = pluginParams['Notification skin'] || 'QuickNotificationSkin';
-Params.displayPosition      = 
+Params.displayPosition      =
     Math.min(
         Math.max(
             parseIntWithDefault(pluginParams['Display position'], Const.displayPosition.topLeft),
-           Const.displayPosition.topLeft),
+            Const.displayPosition.topLeft),
         Const.displayPosition.bottomRight
     );
 
@@ -338,7 +338,6 @@ Game_System.prototype.setQuickNotificationEnabled = function(enabled)
 var _Game_Interpreter_command101 = Game_Interpreter.prototype.command101;
 Game_Interpreter.prototype.command101 = function()
 {
-Params.displayPosition      = $gameVariables.value(133);//変更。
     if (!$gameMessage.isBusy() &&
         $gameTemp.isQuickNotificationRegistrationMode())
     {
@@ -576,7 +575,7 @@ Window_QuickNotification.prototype.display = function(notification)
         text:  this.convertEscapeCharacters(notification.text)
     };
     this._allTextWidth = 0;
-    this._duration     = $gameVariables.value(65);//変更
+    this._duration     = Params.displayDuration;
     this._faceName     = notification.faceName || '';
     this._faceIndex    = notification.faceIndex;
     this._faceBitmap   = null;
@@ -835,7 +834,10 @@ Scene_Base.prototype.createQuickNotificationWindow = function()
  */
 Scene_Base.prototype.isQuickNotificationAvailable = function()
 {
-    return this._quickNotificationWindowLayer != null;
+    // ゲーム起動時は $gameTemp と $gameSystem が生成されていない可能性があるのでチェック
+    return this._quickNotificationWindowLayer != null &&
+        $gameTemp != null &&
+        $gameSystem != null;
 };
 
 var _Scene_Base_update = Scene_Base.prototype.update;
