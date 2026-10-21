@@ -7,6 +7,7 @@
  *
  * @help
  * 【更新履歴】
+ * 2.31 2022/01/22 Ctrl+Shift+Sで別名で一度だけ保存する機能の追加
  * 2.24 2022/06/24 アニメーション画像の自動キャッシュクリア
  * 2.23 2022/06/04 可変タイルサイズに対応
  * 2.22 2022/05/26 アニメーション画像使用時の不具合修正
@@ -518,6 +519,7 @@ ParticleEditor.prototype.initialize = function(particle,id,exData){
 		subData = null;
 	}
 	var config = Game_Particle.configData(targetData);
+	config = JsonEx.makeDeepCopy(config);
 
     if(targetData.image){
     	this.checkImageExists(targetData);
@@ -727,6 +729,7 @@ ParticleEditor.prototype.removeEventListeners = function(){
 	}
 };
 
+
 ParticleEditor.prototype._onKeyDown = function(event){
 	if((event.ctrlKey||event.metaKey) && event.keyCode===KEY_CODE.g){
 		this.processHide();
@@ -737,9 +740,11 @@ ParticleEditor.prototype._onKeyDown = function(event){
 		return;
 	}
 
-	if(event.ctrlKey||event.metaKey){
+	var isEscapeKey = (event.code==='intlYen'||event.key==='\\');
+	
+	if((event.ctrlKey||event.metaKey) && !isEscapeKey){
 		this._onControlKeyDown(event);
-	}else if(!event.ctrlKey && !event.altKey) {
+	}else if((!event.ctrlKey && !event.altKey)||isEscapeKey){
 		this._keyCode = event.keyCode;
 		this._key = event.key;
     }
@@ -748,7 +753,15 @@ ParticleEditor.prototype._onKeyDown = function(event){
 ParticleEditor.prototype._onControlKeyDown = function(event){
 	if(event.keyCode===KEY_CODE.s){
 		//save
-		this.processSave();
+		var name;
+		if(event.shiftKey){
+			name = this.tryProcessAliasSave();
+			if(!name){
+				SoundManager.playBuzzer();
+				return;
+			}
+		}
+		this.processSave(name);
 	}else if(event.keyCode===KEY_CODE.i){
 		if(parameters.imageNames&&parameters.imageNames.length>0){
 			this.processPickImage();
@@ -770,6 +783,24 @@ ParticleEditor.prototype._onControlKeyDown = function(event){
 	}
 }
 
+ParticleEditor.prototype.tryProcessAliasSave = function(){
+	var targetName = this.targetData().name;
+	if(targetName.contains('_auto')||targetName.contains('_sub')){
+		return null;
+	}
+
+	if($gameSystem && $gameSystem.isJapanese()){
+		name = window.prompt('別名で一度だけ保存：設定名を入力\n(元の設定名も保存されます)',targetName);
+	}else{
+		name = window.prompt('Save once under a different name: Enter a setting name\n(The original configuration name is also saved.)',targetName);
+	}
+	if(!name){
+		SoundManager.playCancel();
+		return;
+	}
+	name = name.trim();
+	return name;
+};
 ParticleEditor.prototype._onKeyUp = function(event){
 	// this._keyCode = 0;
 };
@@ -1493,11 +1524,13 @@ ParticleEditor.prototype.processMenuCommand = function(i){
 	this[this._menuCommands[i]]();
 };
 
-ParticleEditor.prototype.processSave = function(){
+ParticleEditor.prototype.processSave = function(name){
 	if(this._saveButton.opacity<255)return;
-	this.executeSave();
+	this.executeSave(name);
 	SoundManager.playSave();
-	this._saveButton.opacity = 100;
+	if(!name){
+		this._saveButton.opacity = 100;
+	}
 };
 ParticleEditor.prototype.processQuit = function(){
 	this.executeQuit();
@@ -1911,7 +1944,7 @@ ParticleEditor.prototype.showGuideWithTitle = function(title){
 
 /* save
 ===================================*/
-ParticleEditor.prototype.executeSave = function(){
+ParticleEditor.prototype.executeSave = function(name=this.targetData().name){
 	var data = this.editingDataObject();
 	if(saveAsArray){
     	data = Game_Particle.compressConfigDataToArray(data);
@@ -1924,7 +1957,6 @@ ParticleEditor.prototype.executeSave = function(){
 	data.comment = year+month+day;
 
 	//register to config
-	var name = this.targetData().name;
     $dataTrpParticles[name] = data;
 
     var file;
@@ -2396,6 +2428,7 @@ ParticleParam.prototype.titleColor = function(){
 		return 'rgb(100,200,255)';
 	}
 };
+
 ParticleParam.prototype.partsColor = function(){
 	if(this._isSpawnParam){
 		return 'rgb(255,255,200)';
@@ -4945,7 +4978,7 @@ AnimationPicker.prototype.bitmap = function(){
 AnimationPicker.prototype.tryReleaseAnimationImageCache = function(){
 	var url = this._autoReleaseURL;
 	if(url && ImageManager._cache[url]){
-		ImageManager._cache[url].destroy;
+		ImageManager._cache[url].destroy();
 		delete ImageManager._cache[url];
 	}
 };
