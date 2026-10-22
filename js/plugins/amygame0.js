@@ -7,9 +7,8 @@
 (function () {
   'use strict';
 
-  Game_Interpreter.prototype.sVal = function (a, b) {
-    $gameVariables.setValue(a, b);
-    return $gameVariables.value(a);
+  Game_Interpreter.prototype.sVal = function (variableId, variableNewValue) {
+    $gameVariables.setValue(variableId, variableNewValue);
   };
 
   //rpg_windows.js
