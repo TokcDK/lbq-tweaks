@@ -18750,6 +18750,7 @@
     const eventPosition = [mapId, mapEvent.x, mapEvent.y];
     const dungeonInfoItemId = $gameVariables.value(HELPER_VARIABLE.DUNGEON_INFO_ITEM_ID);
     const warpPointMeta = $dataItems[dungeonInfoItemId].meta;
+    const warpPoints = $gameVariables.value(HELPER_VARIABLE.DUNGEON_WARP_POINTS);
 
     for (let warpPointIndex = 1; warpPointIndex <= LAST_WARP_POINT_INDEX; warpPointIndex++) {
       const warpPointPosition = warpPointMeta["warpPoint" + warpPointIndex];
@@ -18760,11 +18761,19 @@
         Number(position[1]) == eventPosition[1] &&
         Number(position[2]) == eventPosition[2];
       if (!isSamePosition) continue;
-      $gameVariables.value(HELPER_VARIABLE.DUNGEON_WARP_POINTS)[dungeonInfoItemId][warpPointIndex] = 1;
+      //変更: ワープスポットは実行時に動的生成されるため、同一座標に二重生成
+      // されることがある。その場合、同一タイルの両イベントが連続して
+      // 実行されてお知らせとアクティベートエフェクトが二重に表示されて
+      // いた。初回(0→1)のみお知らせとエフェクトを出し、各スポットの
+      // セルフスイッチAは毎回設定する(二重生成分もメニュー頁へ移行する)
+      const isAlreadyActivated = warpPoints[dungeonInfoItemId][warpPointIndex] == 1;
+      warpPoints[dungeonInfoItemId][warpPointIndex] = 1;
       $gameSelfSwitches.setValue([mapId, interp._eventId, "A"], true);
-      const messageText = `ワープポイント[${warpPointIndex}]がアクティベートされました。`;
-      $gameScreen.setDTextPicture(messageText, 28);
-      $gameSwitches.setValue(HELPER_SWITCH.TEMPORARY_FLAG, true);
+      if (!isAlreadyActivated) {
+        const messageText = `ワープポイント[${warpPointIndex}]がアクティベートされました。`;
+        $gameScreen.setDTextPicture(messageText, 28);
+        $gameSwitches.setValue(HELPER_SWITCH.TEMPORARY_FLAG, true);
+      }
       break;
     }
   };
