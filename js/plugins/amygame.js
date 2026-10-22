@@ -6210,7 +6210,9 @@ item_gacha = function () {
     ) {
       const warpPointMeta = itemMeta["warpPoint" + warpPointIndex];
       if (!warpPointMeta) continue;
-      if (pointFlags[warpPointIndex] != 1) continue;
+      //変更: フラグ配列(変数211)は0～100行しか確保されていないため、
+      // 範囲外IDはクラッシュせずスキップする
+      if (!pointFlags || pointFlags[warpPointIndex] != 1) continue;
 
       valueScriptArray1.push(warpPointMeta.split(","));
       hasUnlockedWarpPoint = true;
@@ -6219,8 +6221,11 @@ item_gacha = function () {
   }
 
   // Warp entries of the whole share group: every item with the same "<warpShare>".
+  //変更: v1.46からループ上限が$dataWeapons.lengthのままだったが、走査対象は
+  // $dataItemsなので$dataItems.lengthに修正(ID501～1500のアイテムが
+  // 共有グループの対象外になっていた)
   function collectSharedWarpEntries(warpShareGroupId, warpPoints) {
-    for (let itemId = 1; itemId <= $dataWeapons.length - 1; itemId++) {
+    for (let itemId = 1; itemId < $dataItems.length; itemId++) {
       const itemData = $dataItems[itemId];
       if (!itemData || !itemData.meta["warpShare"]) continue;
       if (Number(itemData.meta["warpShare"]) != warpShareGroupId) continue;
