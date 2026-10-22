@@ -7,15 +7,15 @@
 //(function(){
 
 // ---------------------------------------------------------------------------
-// 共通ヘルパー
+// Shared helpers
 // ---------------------------------------------------------------------------
 
-// データベース種別ID。0 がアイテム、1 が武器、2 が防具。
+// Database type ids: 0 items, 1 weapons, 2 armors.
 const ITEM_SHOP_DB_ITEM = 0;
 const ITEM_SHOP_DB_WEAPON = 1;
 const ITEM_SHOP_DB_ARMOR = 2;
 
-// databaseTypeId -> データベース配列。範囲外は undefined(元コードの「該当なし」と同じ)。
+// databaseTypeId -> database array. Out of range gives undefined, as the original did.
 function itemShopDatabase(databaseTypeId) {
   switch (databaseTypeId) {
     case ITEM_SHOP_DB_ITEM: return $dataItems;
@@ -25,12 +25,12 @@ function itemShopDatabase(databaseTypeId) {
   }
 }
 
-// 走査する末尾ID。防具だけは上限が別変数で管理されている。
+// Last id to scan. Armors keep their upper bound in a separate variable.
 function itemShopDatabaseEnd(databaseTypeId, entries) {
   return databaseTypeId === ITEM_SHOP_DB_ARMOR ? valueArmorsLength : entries.length - 1;
 }
 
-// Scene_Shop に渡す品揃えの1行。template は元コードが使っていた4要素の形。
+// One line of the shop goods list handed to Scene_Shop; template keeps the original 4-element shape.
 function itemShopEntry(databaseTypeId, itemId, template) {
   const entry = (template || [0, 0, 0, 0]).slice();
   entry[0] = databaseTypeId;
@@ -38,8 +38,8 @@ function itemShopEntry(databaseTypeId, itemId, template) {
   return entry;
 }
 
-// 品揃えを組み立て終えた後の共通処理(グローバル goods への代入とシーン遷移)。
-// prepareFlag は Scene_Shop へ渡す第2引数(shop_preparation1 だけ false)。
+// Common tail of every shop builder: publish goods and enter Scene_Shop.
+// prepareFlag is the second Scene_Shop argument (false only for shop_preparation1).
 function itemShopOpen(goodsEntries, sortFlag, prepareFlag) {
   if (sortFlag != 1) return;
   goods = goodsEntries;
@@ -47,7 +47,7 @@ function itemShopOpen(goodsEntries, sortFlag, prepareFlag) {
   SceneManager.prepareNextScene(goods, prepareFlag !== false);
 }
 
-// 条件に合う品目を集める。collectShopEntries は 6 つのショップ関数の共通部分。
+// Collects the entries matching the predicate; shared by all six shop builders.
 function collectShopEntries(databaseTypeIds, matches, template, reportedDatabaseTypeId) {
   const shopEntries = [];
   for (const databaseTypeId of databaseTypeIds) {
@@ -58,7 +58,7 @@ function collectShopEntries(databaseTypeIds, matches, template, reportedDatabase
       const item = entries[itemId];
       if (!item) continue;
       if (matches(item, databaseTypeId) === false) continue;
-      // reportedDatabaseTypeId を渡した場合は、走査した種別ではなくその値を記録する。
+      // With reportedDatabaseTypeId the recorded type is that value, not the scanned one.
       const entryTypeId = (reportedDatabaseTypeId === undefined) ? databaseTypeId : reportedDatabaseTypeId;
       shopEntries.push(itemShopEntry(entryTypeId, itemId, template));
     }
@@ -66,63 +66,128 @@ function collectShopEntries(databaseTypeIds, matches, template, reportedDatabase
   return shopEntries;
 }
 
-// 売却系メタタグ。item_priceinfo / item_ikkatu / ikkatu_sellChoice で同じ並びを使う。
+// Game variables this plugin shares with the event code. The project keeps their ids
+// in the database only, so they are named here after what they carry.
+const ITEM_SHOP_VARIABLE = {
+  TRUE_PROTAGONIST_ACTOR_ID: 2,
+  CURRENT_VIEWPOINT_ACTOR_ID: 11,
+  PROCESSED_ITEM_ID: 19, // item being used or appraised
+  SELECTED_ACTOR_ID: 20,
+  TEMPORARY_TEXT: 21, // shop window text buffer
+  TEMPORARY_VALUE: 22, // purchase price, also the mastery multiplier of a book
+  PREVIOUS_MASTERY_LEVEL: 23,
+  VARIABLE_57_CURRENCY: 57,
+  COIN_COUNT: 69,
+  USED_ITEM_ID: 93,
+  MAP_STATUS_DISPLAY_MODE: 200,
+  SKILL_MASTERY_GAIN: 203,
+  WEAPON_ID: 230, // weapon referenced by the gathering and bounty code
+  BOUNTY_PAID_COUNT: 231,
+  DUNGEON_INFO_ITEM_ID: 240,
+  ACTOR_WEAPON_PARAMETERS: 287,
+  TITLE_SLOT_COUNT: 289,
+  H_TITLE_SLOT_COUNT: 295,
+  RETURN_ITEM_SLOTS: 327,
+  STAT_ORB_STACKS: 352,
+  BOUNTY_TOTALS: 501,
+  MENU_BACKGROUND_NAME: 508,
+  PRICE_INFO_TEXT: 801
+};
+
+// Game switches this plugin shares with the event code.
+const ITEM_SHOP_SWITCH = {
+  SCENE_SKIP: 29,
+  APPRAISAL_BULK_START: 69, // both flags are raised for the whole bulk appraisal
+  APPRAISAL_BULK_END: 114,
+  APPRAISAL_EMPTY: 116,
+  DAILY_QUEST_ENABLED: 129,
+  SKILL_RANK_UP: 133,
+  COMMERCE_ENABLED: 138,
+  SHOP_NEGOTIATION: 380, // negotiation still available / purchase result
+  DAILY_QUEST_REWARD: 518, // raised only while the reward event runs
+  EAT_INFO_WINDOW: 603,
+  GATHER_PINNED_MATERIAL: 605
+};
+
+// Font size tag of the bulk sale lists; kept out of the translatable lines.
+const BULK_SELL_FONT_TAG = `\\FS[25]`;
+
+// Sell price note tags, in the order shared by item_priceinfo, item_ikkatu and ikkatu_sellChoice.
 const ITEM_SHOP_SELL_VARIABLE_TAGS = ['Variable 57 Sell Price', 'Variable 69 Sell Price'];
 const ITEM_SHOP_SELL_ITEM_TAGS = ['Item 270 Sell Price', 'Item 147 Sell Price', 'Item 152 Sell Price'];
 const ITEM_SHOP_SELL_TAGS = ['Sell Price'].concat(ITEM_SHOP_SELL_VARIABLE_TAGS, ITEM_SHOP_SELL_ITEM_TAGS);
 
-// 売却価格を1つでも持っているか(売却不可判定に使う)。
+// True when the entry carries at least one sell price tag.
 function hasSellPriceTag(entry) {
   const meta = entry.meta;
   return ITEM_SHOP_SELL_TAGS.some(function (key) { return !!meta[key]; });
 }
 
-// アイテム/武器/防具の表示名。アイコン付きの \\x1bI[n] マーカーは文字列の外で作る。
+// Display name of an item/weapon/armor; the \\x1bI[n] icon marker stays outside the text.
 function itemShopIconName(entry) {
   return `\x1bI[${entry.iconIndex}]${entry.name}`;
 }
 
-// 食べ物を食べた時の動詞。飲み物→呑み物(酒)→食べ物の順で判定する。
+// Verb of an eaten entry: drink, then alcohol, then food.
 function eatOutcomeText(meta) {
-  if (meta['Drink']) return `飲んだ！`;//翻訳対象
-  if (meta['Alcohol']) return `呑んだ！`;//翻訳対象
-  return `食べた！`;//翻訳対象
+  if (meta['Drink']) return `飲んだ！`;
+  if (meta['Alcohol']) return `呑んだ！`;
+  return `食べた！`;
 }
 
 // ---------------------------------------------------------------------------
-// アイテム入手後の処理
+// Post-acquisition processing
 // ---------------------------------------------------------------------------
-itemGet_afterProcess = function(){
+// Counters reset on every acquisition: the usable title slots and the satiety cap.
+function resetAcquisitionCounters() {
+  $gameVariables.setValue(ITEM_SHOP_VARIABLE.TITLE_SLOT_COUNT, 4);// Number of usable title slots
+  $gameVariables.setValue(ITEM_SHOP_VARIABLE.H_TITLE_SLOT_COUNT, 0);// Number of usable H title slots
+  $gameVariables.setValue(EAT_SATIETY_MAX_VARIABLE_ID, 5);// Satiety cap
+}
 
-  if ($gameSwitches.value(29)) return;
-
-  $gameVariables.setValue(289, 4);//タイトル設定可能数
-  $gameVariables.setValue(295, 0);//Hタイトル設定可能数
-  $gameVariables.setValue(13, 5);//満腹度上限
-
-  title_EffectConfi();
-  actors_unlockedClassHit();
-
+// Quest lists, collection flags and medals refreshed after an acquisition.
+function refreshQuestRecords() {
   rebuildQuestExArray();
   syncCollectBookFlag203();
   collectCasinoMedals();
-
   quest_settei(1);
   quest_settei(2);
   time_settei();
+}
 
-  const mapStatusMode = $gameVariables.value(200);//1非表示2簡易ステ3簡易Ｈステ4収集アイテム5ミニマップ
-  if (mapStatusMode == 3) actor_miniHstatusList1(283);
-  if (mapStatusMode == 4) item_collectList1(284);
+// Map status window of the current display mode: 3 simple H status, 4 collected items.
+function refreshMapStatusDisplay() {
+  const mapStatusMode = $gameVariables.value(ITEM_SHOP_VARIABLE.MAP_STATUS_DISPLAY_MODE);
+  switch (mapStatusMode) {
+    // 1 hidden, 2 simple status, 3 simple H status, 4 collected items, 5 minimap
+    case 3:
+      actor_miniHstatusList1(283);
+      break;
+    case 4:
+      item_collectList1(284);
+      break;
+  }
+}
+
+itemGet_afterProcess = function(){
+
+  if ($gameSwitches.value(ITEM_SHOP_SWITCH.SCENE_SKIP)) return;
+
+  resetAcquisitionCounters();
+  title_EffectConfi();
+  actors_unlockedClassHit();
+
+  refreshQuestRecords();
+  refreshMapStatusDisplay();
 
   showQuestProgressPopups();
   processDailyQuestItems();
   chargeSeisyoujuuParams();
 
-  $gameSwitches.setValue(380, false);
-};
+  $gameSwitches.setValue(ITEM_SHOP_SWITCH.SHOP_NEGOTIATION, false);
+}
 
-// クエスト対象アイテム(<EICSwitch:108>)の所持状況を valueQuestArrayEX へ写す。
+// Copies the owned state of the quest items (<EICSwitch:108>) into valueQuestArrayEX.
 function rebuildQuestExArray() {
   valueQuestArrayEX = Array(201).fill(0);
 
@@ -136,7 +201,7 @@ function rebuildQuestExArray() {
     if (Number(item.meta['EICSwitch']) !== 108) continue;
     if (!party.hasItem(item)) continue;
 
-    // 101-900 は 101-100 の位置、901-1000 は 1-100 の位置に対応する。
+    // 101-900 maps to slots 1-100 and 901-1000 maps to slots 1-100 of the daily array.
     const questIndex = (itemId <= 900) ? itemId - 800 : itemId - 900;
     if (valueQuestArray6[questIndex] === 0) {
       valueQuestArrayEX[questIndex] = valueQuestArray2[questIndex];
@@ -144,14 +209,14 @@ function rebuildQuestExArray() {
   }
 }
 
-// 収集帳の "2冊目" フラグ(変数203)。全冊所持なら 2、そうでなければ 1。
+// "Second volume" flag of the collection book (variable 203): 2 when every book is owned, else 1.
 function syncCollectBookFlag203() {
-  if (!($gameVariables.value(203) >= 2)) return;
+  if (!($gameVariables.value(ITEM_SHOP_VARIABLE.SKILL_MASTERY_GAIN) >= 2)) return;
   const hasAllBooks = $gameParty.hasItem($dataItems[52]);
-  $gameVariables.setValue(203, hasAllBooks ? 2 : 1);
+  $gameVariables.setValue(ITEM_SHOP_VARIABLE.SKILL_MASTERY_GAIN, hasAllBooks ? 2 : 1);
 }
 
-// カジノメダルアイテムを全て換金する(所持分は -9999 で消す)。
+// Cashes in every casino medal item; the owned amount is cleared with -9999.
 function collectCasinoMedals() {
   const party = $gameParty;
   const dataItems = $dataItems;
@@ -165,11 +230,36 @@ function collectCasinoMedals() {
   }
 
   if (medalTotalPts >= 1) {
-    $gameVariables.setValue(69, $gameVariables.value(69) + medalTotalPts);
+    $gameVariables.setValue(ITEM_SHOP_VARIABLE.COIN_COUNT, $gameVariables.value(ITEM_SHOP_VARIABLE.COIN_COUNT) + medalTotalPts);
   }
 }
 
-// クエスト進捗のポップアップ。前回値と現在値で変化した行だけを表示する。
+// Quest progress popups: only the lines whose value changed since the last run are shown.
+// Shows the lines of a quest record that changed since the last run and plays the
+// quest clear effect on the not yet seen ones.
+function showQuestChangedLines(questIndex, previousValue, currentValue, isInBattle) {
+  const itemLabelId = (questIndex <= 100) ? questIndex + 800 : questIndex + 900;
+  CommonPopupManager.showInfo({}, `\x1bIIN[${itemLabelId}]`, null);
+
+  const previousValueLines = previousValue.split("\n");
+  const currentValueLines = currentValue.split("\n");
+
+  for (let lineIndex = 0; lineIndex < previousValueLines.length; lineIndex++) {
+    if (previousValueLines[lineIndex] === currentValueLines[lineIndex]) continue;
+
+    CommonPopupManager.showInfo({}, currentValueLines[lineIndex], null);
+    if (valueQuestArray6[questIndex] !== 1) continue;
+
+    const achievedLabel = colorTaggedText(10, `条件達成`);
+    const achievedText = `\x1bIIN[${itemLabelId}]:[${achievedLabel}]`;
+    CommonPopupManager.showInfo({}, achievedText, null);
+
+    if (isInBattle) continue;
+    const particleName = (questIndex >= 101) ? 'cracker_min_r' : 'cracker_min_l';
+    $gameScreen._particle.particlePlay(0, particleName, 'player', 'def', 'above');
+  }
+}
+
 function showQuestProgressPopups() {
   const isInBattle = $gameParty.inBattle();
 
@@ -178,31 +268,13 @@ function showQuestProgressPopups() {
     const currentValue = valueQuestArray2[questIndex];
     if (previousValue === 0 || previousValue === currentValue) continue;
 
-    const itemLabelId = (questIndex <= 100) ? questIndex + 800 : questIndex + 900;
-    CommonPopupManager.showInfo({}, `\x1bIIN[${itemLabelId}]`, null);
-
-    const previousValueLines = previousValue.split("\n");
-    const currentValueLines = currentValue.split("\n");
-
-    for (let lineIndex = 0; lineIndex < previousValueLines.length; lineIndex++) {
-      if (previousValueLines[lineIndex] === currentValueLines[lineIndex]) continue;
-
-      CommonPopupManager.showInfo({}, currentValueLines[lineIndex], null);
-      if (valueQuestArray6[questIndex] !== 1) continue;
-
-      const achievedText = `\x1bIIN[${itemLabelId}]:[${colorTaggedText(10, `条件達成`)}]`;//翻訳対象
-      CommonPopupManager.showInfo({}, achievedText, null);
-
-      if (isInBattle) continue;
-      const particleName = (questIndex >= 101) ? 'cracker_min_r' : 'cracker_min_l';
-      $gameScreen._particle.particlePlay(0, particleName, 'player', 'def', 'above');
-    }
+    showQuestChangedLines(questIndex, previousValue, currentValue, isInBattle);
   }
 }
 
-// デイリークエスト(<SGカテゴリ>)を達成済みの所持アイテムから報酬処理する。
+// Completes the daily quests (SG category note) of the owned items.
 function processDailyQuestItems() {
-  if (!$gameSwitches.value(129)) return;
+  if (!$gameSwitches.value(ITEM_SHOP_SWITCH.DAILY_QUEST_ENABLED)) return;
 
   const dailyQuestName = 'デイリークエスト';
   const dataItems = $dataItems;
@@ -217,51 +289,59 @@ function processDailyQuestItems() {
     if (!party.hasItem(item)) continue;
     if (valueQuestArray6[itemId - 900] !== 1) continue;
 
-    $gameSwitches.setValue(518, true);
+    $gameSwitches.setValue(ITEM_SHOP_SWITCH.DAILY_QUEST_REWARD, true);
     quest_housyuu(itemId, 2);
-    $gameSwitches.setValue(518, false);
+    $gameSwitches.setValue(ITEM_SHOP_SWITCH.DAILY_QUEST_REWARD, false);
   }
 }
 
-// 性消珠(装備タイプ6 + <ItemPicture>)を重ねて使った分をパラメータへ変換する。
-function chargeSeisyoujuuParams() {
-  const variable352Values = $gameVariables.value(352);
+// Converts the stacked use of stat orbs (equip type 6 + <ItemPicture>) into parameters.
+// Stacked use of one stat orb: the surplus pieces are converted into parameters and
+// the player is told about it. Returns true when the orb was charged.
+function chargeStatOrbStack(armor, armorId, statOrbStacks) {
   const party = $gameParty;
+  if (!armor || armor.etypeId !== 6 || !armor.meta['ItemPicture']) return false;
+  if (!party.hasItem(armor, true)) return false;
+
+  let itemCount = party.numItems(armor);
+  if (party.membersEqArmor(armorId)) itemCount += 1;
+  if (itemCount < 2) return false;
+
+  const seisyoujuuIndex = armorId - valueSeisyoujuuStartId;
+  const initialParamValue = statOrbStacks[seisyoujuuIndex];
+  if (initialParamValue === undefined) return false;
+
+  itemCount -= 1;
+  statOrbStacks[seisyoujuuIndex] = initialParamValue + itemCount;
+  party.loseItem(armor, itemCount);
+  seisyoujuu_addParams(armorId);
+
+  AudioManager.playSe({ name: "Magic2", volume: 100, pitch: 130, pan: 0 });
+  playSeisyoujuuParticle();
+
+  const armorName = colorTaggedText(2, `\x1bAIN[${armorId}]`);
+  const addedValueText = colorTaggedText(10, `+${itemCount}`);
+  const enhanceValueText = `[強化値:${initialParamValue}${addedValueText}]`;
+  const parameterUpLabel = `<パラメータアップ！>`;
+  const popupMessage = `${armorName} ${enhanceValueText}${parameterUpLabel}`;
+  CommonPopupManager.showInfo({}, popupMessage, null);
+  return true;
+}
+
+function chargeSeisyoujuuParams() {
+  const statOrbStacks = $gameVariables.value(ITEM_SHOP_VARIABLE.STAT_ORB_STACKS);
   let hasParameterIncrease = false;
 
   for (let armorId = 1; armorId <= valueArmorsLength; armorId++) {
-    const armor = $dataArmors[armorId];
-    if (!armor || armor.etypeId !== 6 || !armor.meta['ItemPicture']) continue;
-    if (!party.hasItem(armor, true)) continue;
-
-    let itemCount = party.numItems(armor);
-    if (party.membersEqArmor(armorId)) itemCount += 1;
-    if (itemCount < 2) continue;
-
-    const seisyoujuuIndex = armorId - valueSeisyoujuuStartId;
-    if (variable352Values[seisyoujuuIndex] === undefined) continue;
-
-    itemCount -= 1;
-    const initialParamValue = variable352Values[seisyoujuuIndex];
-    variable352Values[seisyoujuuIndex] += itemCount;
-    party.loseItem(armor, itemCount);
-    seisyoujuu_addParams(armorId);
-
-    AudioManager.playSe({ "name": "Magic2", "volume": 100, "pitch": 130, "pan": 0 });
-    playSeisyoujuuParticle();
-
-    const armorName = colorTaggedText(2, `\x1bAIN[${armorId}]`);
-    const addedValueText = colorTaggedText(10, `+${itemCount}`);
-    const popupMessage = `${armorName} [強化値:${initialParamValue}${addedValueText}]<パラメータアップ！>`;//翻訳対象
-    CommonPopupManager.showInfo({}, popupMessage, null);
-
-    hasParameterIncrease = true;
+    if (chargeStatOrbStack($dataArmors[armorId], armorId, statOrbStacks)) {
+      hasParameterIncrease = true;
+    }
   }
 
   if (hasParameterIncrease) refreshBattleMembers();
 }
 
-// 性消珠の吸い込みパーティクル。名前は元コードのまま。
+// Absorb particle of a stat orb; the picture name is the original one.
 function playSeisyoujuuParticle() {
   const particleName = `charge_c`;
   $gameScreen._particle.particlePlay(0, particleName, 'player', 'def', 'above');
@@ -277,57 +357,76 @@ function refreshBattleMembers() {
 }
 
 // ---------------------------------------------------------------------------
-// ポーション
+// Potions
 // ---------------------------------------------------------------------------
-// アイテムのHPMPポーション効果
+// HP / MP potion effect of an item
+// Resistance gain of a potion: none while state 291 is active, otherwise the note value.
+function resolvePotionResistDelta(targetItem, itemMeta) {
+  return targetItem.isStateAffected(291) ? 0 : Number(itemMeta['PotionResist']);
+}
+
+// Potion amount before the resistance is applied. PotionUsePoint 1 means a full
+// recovery, any other value is a flat amount.
+function resolvePotionBaseAmount(targetItem, potionUsePoint, restoresHp) {
+  if (potionUsePoint != 1) return potionUsePoint;
+  return restoresHp ? targetItem.mhp : targetItem.mmp;
+}
+
+// Potion effect: resistance bookkeeping plus the resulting HP / MP amount and message.
+// Applies a potion to the target: the resistance value is raised and the restored
+// amount is published in valuePotion1, then the outcome is reported.
 item_Potion1 = function(usedItem,targetItem,itemId){
 
   const itemMeta = $dataItems[itemId].meta;
-  const potionResistDelta = targetItem.isStateAffected(291) ? 0 : Number(itemMeta['PotionResist']);
+  const isResistDisabled = targetItem.isStateAffected(291);
+  const potionResistDelta = resolvePotionResistDelta(targetItem, itemMeta);
   const potionUsePoint = Number(itemMeta['PotionUsePoint']);
   const resistVariableId = 380 + targetItem.actorId();
   const resistValues = $gameVariables.value(resistVariableId);
   const currentResist = resistValues[58];
 
-  if (!targetItem.isStateAffected(291)) targetItem.addState(39);
+  if (!isResistDisabled) targetItem.addState(39);
 
-  // damage.type 3 は HP 回復、それ以外は MP 回復。
+  // damage.type 3 restores HP, every other type restores MP.
   const restoresHp = $dataItems[itemId].damage.type == 3;
-  const baseAmount = potionUsePoint == 1
-    ? (restoresHp ? targetItem.mhp : targetItem.mmp)//1 は全回復
-    : potionUsePoint;//それ以外は固定値
+  const baseAmount = resolvePotionBaseAmount(targetItem, potionUsePoint, restoresHp);
   valuePotion1 = Math.round(baseAmount * (100 - currentResist) / 100);
 
   resistValues[58] += potionResistDelta;
 
+  // The resistance array is read again after the gain, so the message shows the new value.
+  reportPotionOutcome(targetItem, restoresHp, isResistDisabled, potionResistDelta, resistValues[58]);
+}
+
+// Potion result: battle log inside a battle, ticker on the map.
+function reportPotionOutcome(targetItem, restoresHp, isResistDisabled, potionResistDelta, currentResist) {
   const resourceLabel = restoresHp ? `HP` : `MP`;
   const actorName = targetItem.name();
-  const newResist = $gameVariables.value(resistVariableId)[58];
-  const potionMessage = targetItem.isStateAffected(291)
-    ? buildPotionMessageSuppressed(actorName, resourceLabel, valuePotion1, newResist)
-    : buildPotionMessageApplied(actorName, resourceLabel, valuePotion1, potionResistDelta, newResist);
+  const potionMessage = isResistDisabled
+    ? buildPotionMessageSuppressed(actorName, resourceLabel, valuePotion1, currentResist)
+    : buildPotionMessageApplied(actorName, resourceLabel, valuePotion1, potionResistDelta, currentResist);
 
   if ($gameParty.inBattle()) {
     BattleManager._logWindow.push(`addText`, potionMessage);
-  } else {
-    TickerManager.show(potionMessage);
+    return;
   }
-};
+  TickerManager.show(potionMessage);
+}
 
-// 耐性値上昇が無効化されている時のメッセージ。
+// Message used while the resistance gain is disabled.
 function buildPotionMessageSuppressed(actorName, resourceLabel, amount, currentResist) {
-  return `${actorName}の${resourceLabel}が${amount}回復！ 耐性値上昇は無効化されている。[${currentResist}%]`;//翻訳対象
+  return `${actorName}の${resourceLabel}が${amount}回復！ 耐性値上昇は無効化されている。[${currentResist}%]`;
 }
 
-// 通常時のメッセージ。
+// Message of the regular case.
 function buildPotionMessageApplied(actorName, resourceLabel, amount, resistDelta, currentResist) {
-  return `${actorName}の${resourceLabel}が${amount}回復！ 耐性値が${resistDelta}%上昇し${currentResist}%になった。`;//翻訳対象
+  return `${actorName}の${resourceLabel}が${amount}回復！ 耐性値が${resistDelta}%上昇し${currentResist}%になった。`;
 }
 
 // ---------------------------------------------------------------------------
-// アイテム収集率
+// Item collection rates
 // ---------------------------------------------------------------------------
-// value321-325 に [所持数, 総数] を入れる。範囲は 100 件ずつ。
+// Writes [owned, total] into variables 321-325, one range of 100 entries each.
 const COLLECT_RATE_RANGES = [
   { variableId: 321, first: 401, last: 500, countsOwned: true },
   { variableId: 322, first: 501, last: 600, countsOwned: true },
@@ -336,16 +435,16 @@ const COLLECT_RATE_RANGES = [
   { variableId: 325, first: 901, last: 1000, countsOwned: true }
 ];
 
-// 各アイテム収集率
+// Collection rate of every item category
 collect_keisan1 = function(){
   for (const range of COLLECT_RATE_RANGES) {
     $gameVariables.setValue(range.variableId, countCollectedItems(range.first, range.last, range.countsOwned));
   }
 };
 
-// [所持数, 総数]。元コードの 801-900 の走査は結果を上書きされて捨てられており、
-// さらに 901-1000 の走査で ownedItemCount をリセットし忘れていた為、
-// value325 の所持数に 701-800 の件数が混ざっていた。ここでは範囲ごとに数え直す。
+// [owned, total]. The original 801-900 scan was overwritten and thrown away, and the
+// 901-1000 scan forgot to reset ownedItemCount, so counts of 701-800 leaked into
+// the variable 325 count. Every range is counted from scratch here.
 function countCollectedItems(first, last, countsOwned) {
   const dataItems = $dataItems;
   const party = $gameParty;
@@ -363,12 +462,12 @@ function countCollectedItems(first, last, countsOwned) {
 }
 
 // ---------------------------------------------------------------------------
-// 鑑定
+// Appraisal
 // ---------------------------------------------------------------------------
-// 鑑定実行中身
+// Appraisal body
 kantei_nakami = function(){
 
-  const appraisalEntry = $dataItems[$gameVariables.value(19)];
+  const appraisalEntry = $dataItems[$gameVariables.value(ITEM_SHOP_VARIABLE.PROCESSED_ITEM_ID)];
   if (!appraisalEntry) return;
   const appraisalMeta = appraisalEntry.meta;
 
@@ -380,18 +479,25 @@ kantei_nakami = function(){
   const appraisalItem = appraisalTarget.entries[appraisalTarget.index];
   if (!appraisalItem) return;
 
-  $gameParty.gainItem(appraisalItem, 1);
-  const acquiredItemMessage = `${colorTaggedText(16, itemShopIconName(appraisalItem))}を入手した。`;//翻訳対象
-
-  if (!$gameSwitches.value(114)) {
-    TickerManager.show(acquiredItemMessage);
-  } else {
-    CommonPopupManager.showInfo({}, acquiredItemMessage, null);
-  }
+  deliverAppraisedItem(appraisalItem);
 };
 
-// 鑑定で出てくる品を決める。候補の作り方が 4 パターンあるだけなので、
-// 「どのデータベースを」「どの条件で」絞るかだけを切り替える。
+// Hands the appraised entry over and reports it in the window matching the bulk mode.
+function deliverAppraisedItem(appraisalItem) {
+  $gameParty.gainItem(appraisalItem, 1);
+
+  const appraisalItemLabel = colorTaggedText(16, itemShopIconName(appraisalItem));
+  const acquiredItemMessage = `${appraisalItemLabel}を入手した。`;
+
+  if (!$gameSwitches.value(ITEM_SHOP_SWITCH.APPRAISAL_BULK_END)) {
+    TickerManager.show(acquiredItemMessage);
+    return;
+  }
+  CommonPopupManager.showInfo({}, acquiredItemMessage, null);
+}
+
+// Picks the appraised entry. There are only four ways to build the candidates, so
+// only "which database" and "which condition" are switched here.
 function resolveAppraisalTarget(appraisalEntry) {
   const appraisalMeta = appraisalEntry.meta;
 
@@ -399,8 +505,8 @@ function resolveAppraisalTarget(appraisalEntry) {
   if (!entries) return null;
   const end = itemShopDatabaseEnd(appraisalDatabaseForId(appraisalMeta), entries);
 
-  // 決定順は元コードと同じ。<鑑定> → <鑑定カテゴリ> → <鑑定レアリティ版> の順に
-  // 上書きしていくので、複数付いている場合は後ろのタグが優先される。
+  // Same order as the original: the plain, then the category, then the rarity note,
+  // so the last tag wins when an entry carries several of them.
   let index;
   if (appraisalMeta['鑑定']) {
     index = pickRandomIdFrom(appraisalMeta['鑑定'].split(','), $dataItems);
@@ -420,13 +526,14 @@ function resolveAppraisalTarget(appraisalEntry) {
   return { entries, index };
 }
 
-// 候補から1件抽選する。空なら undefined を返す。
+// Draws one candidate; returns undefined when the list is empty.
+// `entries` is unused; it is kept so the helper keeps its original signature.
 function pickRandomIdFrom(candidateIds, entries) {
   if (!candidateIds.length) return undefined;
   return candidateIds[getRandomIndex(candidateIds.length)];
 }
 
-// <鑑定道具> / <鑑定武器> / <鑑定防具> のどれが付いているかで対象データベースが決まる。
+// The item / weapon / armor appraisal note decides which database is scanned.
 function appraisalDatabaseFor(appraisalMeta) {
   if (appraisalMeta['鑑定道具']) return $dataItems;
   if (appraisalMeta['鑑定武器']) return $dataWeapons;
@@ -440,7 +547,7 @@ function appraisalDatabaseForId(appraisalMeta) {
   return ITEM_SHOP_DB_ITEM;
 }
 
-// <鑑定カテゴリ> の一致判定。武器は wtypeId、防具は etypeId、道具はメニューカテゴリ。
+// Category note match: wtypeId for weapons, etypeId for armors, menu category for items.
 function appraisalCategoryMatches(item, entries, categoryValue) {
   if (!item || !item.meta['LotteryRearity']) return false;
   if (entries === $dataWeapons) return item.wtypeId == Number(categoryValue);
@@ -448,7 +555,7 @@ function appraisalCategoryMatches(item, entries, categoryValue) {
   return !!item.meta['Menu Category'] && item.meta['Menu Category'] == categoryValue;
 }
 
-// ランク(レアリティ)候補ごとに対象データベースを1回ずつ走査する。
+// Scans the target database once per rarity candidate.
 function collectRarityCandidates(entries, end, rarityValues, matches) {
   const candidateIndices = [];
   for (const rarityValue of rarityValues) {
@@ -463,42 +570,49 @@ function collectRarityCandidates(entries, end, rarityValues, matches) {
   return candidateIndices;
 }
 
-// 鑑定アイテム版
+// Appraisal of a single item
+// Refusal messages of the appraisal skill; returns false when the appraisal must stop.
+function checkAppraisalRequirements(actor, actorName, appraisalSkill, targetItemData, appraisalSkillId) {
+  if (actor.mp < appraisalSkill.mpCost) {
+    TickerManager.show(`${actorName}のMPが足りません…。`);
+    return false;
+  }
+  if (!actor.isLearnedSkill(appraisalSkillId)) {
+    const skillName = colorTaggedText(3, `\x1bSIN[${appraisalSkillId}]`);
+    TickerManager.show(`パーソナルスキル＜${skillName}＞が必要です…。`);
+    return false;
+  }
+  if (!canAppraise(actor, targetItemData, appraisalSkillId)) {
+    const skillName = `\x1bSIN[${appraisalSkillId}]`;
+    const requiredRankLabel = colorTaggedText(1, `${skillName}ランク`);
+    TickerManager.show(`${requiredRankLabel}が足りません…。`);
+    return false;
+  }
+  return true;
+}
+
 kantei_item = function(usedItem,targetItem,itemId){
 
   if (targetItem.actorId() != usedItem.actorId()) return;
 
-  $gameVariables.setValue(19, itemId);
+  $gameVariables.setValue(ITEM_SHOP_VARIABLE.PROCESSED_ITEM_ID, itemId);
   const actor = usedItem;
   const targetItemData = $dataItems[itemId];
   const appraisalSkillId = valueAppraisalSkillId;
   const appraisalSkill = $dataSkills[appraisalSkillId];
 
-  if (actor.mp < appraisalSkill.mpCost) {
-    TickerManager.show(`${actor.name()}のMPが足りません…。`);//翻訳対象
-    return;
-  }
-  if (!actor.isLearnedSkill(appraisalSkillId)) {
-    const skillName = `\x1bSIN[${appraisalSkillId}]`;
-    TickerManager.show(`パーソナルスキル＜${colorTaggedText(3, skillName)}＞が必要です…。`);//翻訳対象
-    return;
-  }
-  if (!canAppraise(actor, targetItemData, appraisalSkillId)) {
-    const skillName = `\x1bSIN[${appraisalSkillId}]`;
-    const rankLabel = `ランク`;//翻訳対象
-    TickerManager.show(`${colorTaggedText(1, skillName + rankLabel)}が足りません…。`);//翻訳対象
-    return;
-  }
+  if (!checkAppraisalRequirements(actor, actor.name(), appraisalSkill, targetItemData, appraisalSkillId)) return;
 
   kantei_nakami();
+  // From mastery rank 4 on the skill costs nothing and gains nothing.
   if (actor.skillMasteryLevel(appraisalSkillId) > 3) return;
 
   actor.gainMp(-appraisalSkill.mpCost);
-  actor.gainSkillMasteryUses(appraisalSkillId, $gameVariables.value(203));//変更熟練度
+  actor.gainSkillMasteryUses(appraisalSkillId, $gameVariables.value(ITEM_SHOP_VARIABLE.SKILL_MASTERY_GAIN));// mastery gain
   showAppraisalMasteryMessage(actor, appraisalSkillId);
-};
+}
 
-// <下級鑑定品>/<中級鑑定品>/<上級鑑定品> と熟練度ランクの比較。
+// Compares the owned low / mid / high grade appraisal notes with the mastery rank.
 function canAppraise(actor, targetItemData, appraisalSkillId) {
   const masteryLevel = actor.skillMasteryLevel(appraisalSkillId);
   if (targetItemData.meta['下級鑑定品'] && masteryLevel >= 1) return true;
@@ -507,24 +621,29 @@ function canAppraise(actor, targetItemData, appraisalSkillId) {
   return false;
 }
 
-// 熟練度獲得メッセージ。スキル名は <\x1bSIN[id]> の技術マーカーなので外に出す。
+// Mastery gain message; the <\x1bSIN[id]> skill marker is kept outside the text.
 function showAppraisalMasteryMessage(actor, appraisalSkillId) {
   const actorName = actor.name();
   const skillName = colorTaggedText(3, `\x1bSIN[${appraisalSkillId}]`);
-  const gainedMastery = $gameVariables.value(203);
   const currentUses = actor.skillMasteryUses(appraisalSkillId);
   const maxUses = actor.skillMasteryUsageMax(appraisalSkillId);
   const mpState = `${actor.mp}/${actor.param(1)}`;
+  const masteryGainText = `\\V[203]`;
   TickerManager.show(
-    `${actorName}のMPが5消費された。【現在MP${mpState}】＜${skillName}＞熟練度\\V[203]獲得！（${currentUses}/${maxUses}）`//翻訳対象
+    `${actorName}のMPが5消費された。【現在MP${mpState}】＜${skillName}＞熟練度${masteryGainText}獲得！（${currentUses}/${maxUses}）`
   );
 }
 
-// 鑑定一括
+// The two switches the appraisal events read while a bulk appraisal runs.
+function setBulkAppraisalSwitches(isRunning) {
+  $gameSwitches.setValue(ITEM_SHOP_SWITCH.APPRAISAL_BULK_START, isRunning);
+  $gameSwitches.setValue(ITEM_SHOP_SWITCH.APPRAISAL_BULK_END, isRunning);
+}
+
+// Bulk appraisal
 kantei_ikkatu = function(unusedArg1,unusedArg2,itemId){
 
-  $gameSwitches.setValue(69,true);
-  $gameSwitches.setValue(114,true);
+  setBulkAppraisalSwitches(true);
 
   const dataItems = $dataItems;
   const party = $gameParty;
@@ -536,14 +655,13 @@ kantei_ikkatu = function(unusedArg1,unusedArg2,itemId){
     if (!isAppraisalItem(item)) continue;
     if (!party.hasItem(item)) continue;
 
-    $gameVariables.setValue(19, itemId);
+    $gameVariables.setValue(ITEM_SHOP_VARIABLE.PROCESSED_ITEM_ID, itemId);
     kantei_nakami();
-    // 鑑定結果が同じIDの鑑定品だった場合は、その枠をもう一度処理する。
+    // An appraisal that returns the same id is processed again in the same slot.
     if (party.hasItem(item)) itemId -= 1;
   }
 
-  $gameSwitches.setValue(114,false);
-  $gameSwitches.setValue(69,false);
+  setBulkAppraisalSwitches(false);
 };
 
 function isAppraisalItem(item) {
@@ -551,21 +669,21 @@ function isAppraisalItem(item) {
   return !!(item.meta['下級鑑定品'] || item.meta['中級鑑定品'] || item.meta['上級鑑定品']);
 }
 
-// 店で鑑定一括
+// Bulk appraisal in the shop
 kantei_shopikkatu1 = function(){
 
   const counts = countAppraisalItems();
   const totalCount = counts.low + counts.mid + counts.high;
 
   if (totalCount == 0) {
-    $gameSwitches.setValue(116,true);
+    $gameSwitches.setValue(ITEM_SHOP_SWITCH.APPRAISAL_EMPTY,true);
     return;
   }
 
-  // NOTE: 表示している料金表は 100/500/1000 だが、実際の計算は 10/100/1000。
-  // 元コードのまま(表示と計算が食い違っている)。
+  // NOTE: the fee table shows 100/500/1000 while the calculation uses 10/100/1000,
+  // exactly as the original did (display and calculation disagree).
   const fee = counts.low * APPRAISAL_FEES.low + counts.mid * APPRAISAL_FEES.mid + counts.high * APPRAISAL_FEES.high;
-  $gameVariables.setValue(21, fee);
+  $gameVariables.setValue(ITEM_SHOP_VARIABLE.TEMPORARY_TEXT, fee);
 
   WindowManager.show(0, 10, 100, 800, 300);
   WindowManager.drawText(0, buildAppraisalFeeText(counts, fee));
@@ -574,12 +692,12 @@ kantei_shopikkatu1 = function(){
 const APPRAISAL_FEES = { low: 10, mid: 100, high: 1000 };
 
 const APPRAISAL_ITEM_ROWS = [
-  { metaKey: '下級鑑定品', countKey: 'low', label: `下級鑑定品` },//翻訳対象
-  { metaKey: '中級鑑定品', countKey: 'mid', label: `中級鑑定品` },//翻訳対象
-  { metaKey: '上級鑑定品', countKey: 'high', label: `上級鑑定品` }//翻訳対象
+  { metaKey: '下級鑑定品', countKey: 'low', label: `下級鑑定品` },
+  { metaKey: '中級鑑定品', countKey: 'mid', label: `中級鑑定品` },
+  { metaKey: '上級鑑定品', countKey: 'high', label: `上級鑑定品` }
 ];
 
-// 所持している鑑定品の個数を種類別に数える。
+// Counts the owned appraisal entries per grade.
 function countAppraisalItems() {
   const counts = { low: 0, mid: 0, high: 0 };
   const dataItems = $dataItems;
@@ -597,28 +715,30 @@ function countAppraisalItems() {
   return counts;
 }
 
-// 鑑定料金の表示テキスト。
+// Fee table text of the bulk appraisal.
 function buildAppraisalFeeText(counts, fee) {
-  const headerText = `鑑定料金表\n（下級：100\\G）（中級：500\\G）（上級：1000\\G）\n`;//翻訳対象
-  let feeDisplayText = headerText;
+  const feeTableHeader = `鑑定料金表` + '\n' + `（下級：100\\G）（中級：500\\G）（上級：1000\\G）` + '\n';
+  let feeDisplayText = feeTableHeader;
 
   for (const row of APPRAISAL_ITEM_ROWS) {
     const count = counts[row.countKey];
     if (count < 1) continue;
-    feeDisplayText += `${row.label}：${colorTaggedText(1, `${count}`)}個\n`;//翻訳対象
+    const countText = colorTaggedText(1, `${count}`);
+    feeDisplayText += `${row.label}：${countText}個` + '\n';
   }
 
-  feeDisplayText += `合計鑑定料金${colorTaggedText(10, `${fee}`)}\\G\\$`;//翻訳対象
+  const totalFeeText = colorTaggedText(10, `${fee}`);
+  feeDisplayText += `合計鑑定料金${totalFeeText}\\G\\$`;
   return feeDisplayText;
 }
 // ---------------------------------------------------------------------------
-// 採取時の拾得物と熟練度
+// Gathering findings and mastery
 // ---------------------------------------------------------------------------
-// 採取/採掘で得た固有素材。gatherModeId 0=採取 1=採掘。
+// Unique material found while gathering. gatherModeId 0 gathers, 1 mines.
 item_getScript1 = function(gatherModeId,materialSlotId){
 
-  const collectedVariableId = $gameVariables.value(240);//1以上ならアイテム、0なら武器IDを参照
-  const item = collectedVariableId >= 1 ? $dataItems[collectedVariableId] : $dataWeapons[$gameVariables.value(230)];
+  const collectedVariableId = $gameVariables.value(ITEM_SHOP_VARIABLE.DUNGEON_INFO_ITEM_ID);// 1 or more reads an item, 0 reads a weapon id
+  const item = collectedVariableId >= 1 ? $dataItems[collectedVariableId] : $dataWeapons[$gameVariables.value(ITEM_SHOP_VARIABLE.WEAPON_ID)];
   if (!item) return;
 
   const uniqueMaterialTag = 'UniqueMaterial' + materialSlotId;
@@ -626,8 +746,8 @@ item_getScript1 = function(gatherModeId,materialSlotId){
   if (uniqueMaterialValue === undefined || uniqueMaterialValue === null) return;
 
   const materialCandidates = uniqueMaterialValue.split(',');
-  // スイッチ605が立っている時は先頭の素材に固定。
-  const materialId = $gameSwitches.value(605)
+  // Switch 605 pins the result to the first material.
+  const materialId = $gameSwitches.value(ITEM_SHOP_SWITCH.GATHER_PINNED_MATERIAL)
     ? Number(materialCandidates[0])
     : materialCandidates[getRandomIndex(materialCandidates.length)];
 
@@ -635,10 +755,18 @@ item_getScript1 = function(gatherModeId,materialSlotId){
   item_getSkillLevel(gatherSkillId, 0, materialId);
 };
 
-// 熟練度上昇拾得物。itemType 0=お金 1=アイテム 2=武器 3=防具。
+// Mastery raising finding. itemType 0 gold, 1 item, 2 weapon, 3 armor.
+// valueScriptArray1 payload of a gathering use: actor id, mastery level and skill.
+// Without the skill the mastery is reported as 0, as the original did.
+function publishGatherSkillResult(viewpointActorId, isLearnedSkill, gainResult, skillId) {
+  if (!isLearnedSkill) return [viewpointActorId, 0, 0];
+  return [viewpointActorId, gainResult.skillLevel, skillId];
+}
+
 item_getSkillLevel = function(skillId,itemType,rewardId){
 
-  const actor = $gameActors.actor($gameVariables.value(11));
+  const viewpointActorId = $gameVariables.value(ITEM_SHOP_VARIABLE.CURRENT_VIEWPOINT_ACTOR_ID);
+  const actor = $gameActors.actor(viewpointActorId);
   const skill = $dataSkills[skillId];
   if (!actor || !skill) return;
 
@@ -651,34 +779,31 @@ item_getSkillLevel = function(skillId,itemType,rewardId){
 
   CommonPopupManager.showInfo({}, rewardText + gainResult.text, null);
 
-  // 熟練度が上がらなかった場合は「上昇前の熟練度」も 0 として渡す(元コードどおり)。
-  valueScriptArray1 = isLearnedSkill
-    ? [$gameVariables.value(11), gainResult.skillLevel, skillId]
-    : [$gameVariables.value(11), 0, 0];
-};
+  valueScriptArray1 = publishGatherSkillResult(viewpointActorId, isLearnedSkill, gainResult, skillId);
+}
 
-// 熟練度を加算し、表示用テキストと加算前の熟練度を返す。
-// 最大ランク到達済みなどで加算しない場合は text = '　'(見えない1文字)を返す。
+// Adds the mastery gain and returns the display text plus the pre-gain mastery.
+// When nothing is added (max rank reached) the text is one invisible ideographic space.
 function gainGatherSkillMastery(actor, skill, skillId, isLearnedSkill, skillMasteryLevel) {
   const noGain = { text: '　', skillLevel: 0 };
 
   if (skillMasteryLevel == Number(skill.meta['Max Mastery Level'])) return noGain;
   if (!isLearnedSkill || skillMasteryLevel < 0) return noGain;
 
-  actor.gainSkillMasteryUses(skillId, $gameVariables.value(203));//変更熟練度
+  actor.gainSkillMasteryUses(skillId, $gameVariables.value(ITEM_SHOP_VARIABLE.SKILL_MASTERY_GAIN));// mastery gain
 
-  const skillName = colorTaggedText(1, `＜${stripSkillStateSuffix(skill.name)}＞`);
-  const masteryLabel = `熟練度`;//翻訳対象
-  const obtainedLabel = `獲得！`;//翻訳対象
-  return { text: `${skillName}${masteryLabel}${colorTaggedText(10, `\\V[203]`)}${obtainedLabel}`, skillLevel: skillMasteryLevel };
+  const baseSkillName = stripSkillStateSuffix(skill.name);
+  const skillName = colorTaggedText(1, `＜${baseSkillName}＞`);
+  const masteryGainText = colorTaggedText(10, `\\V[203]`);
+  return { text: `${skillName}熟練度${masteryGainText}獲得！`, skillLevel: skillMasteryLevel };
 }
 
-// スキル名に付く ＜ON＞ / ＜OFF＞ を落とす。
+// Drops the ＜ON＞ / ＜OFF＞ suffix of a skill name.
 function stripSkillStateSuffix(skillName) {
   return skillName.replace("＜ON＞", "").replace("＜OFF＞", "");
 }
 
-// 拾得物の獲得量。熟練度0なら1個、素材ID 10/141 は「幸運」系スキルで10倍。
+// Amount of a finding: one at mastery 0, and material ids 10/141 give ten times more with the luck skill.
 function computeGatherRewardAmount(actor, skillMasteryLevel, rewardId) {
   if (skillMasteryLevel != 0) {
     if ((rewardId == 10 || rewardId == 141) && actor.isLearnedSkill(799)) return skillMasteryLevel * 10;
@@ -687,7 +812,7 @@ function computeGatherRewardAmount(actor, skillMasteryLevel, rewardId) {
   return 1;
 }
 
-// 拾得物本体(お金 or アイテム)を付与し、その報告文を返す。
+// Grants the finding (gold or item) and returns its report line.
 function grantGatherReward(itemType, rewardId, rewardAmount) {
   const notFoundText = '　';
   if (rewardId < 1) return notFoundText;
@@ -695,9 +820,11 @@ function grantGatherReward(itemType, rewardId, rewardAmount) {
   if (itemType == 3) {
     const goldAmount = rewardId * rewardAmount;
     $gameParty.gainGold(goldAmount);
-    // 元コードと同じく、色タグは「小銭を拾った。（+」で開いて金額の後で閉じる。
-    const goldLabel = `\\C[3]小銭を拾った。（+`;//翻訳対象
-    return `${goldLabel}${colorTaggedText(10, `${goldAmount}`)}\\G）`;
+    // As in the original the colour tag opens before the gold line and closes after the amount.
+    const goldColorTag = `\\C[3]`;
+    const goldGainLabel = `小銭を拾った。（+`;
+    const goldAmountText = colorTaggedText(10, `${goldAmount}`);
+    return `${goldColorTag}${goldGainLabel}${goldAmountText}\\G）`;
   }
 
   const entries = itemShopDatabase(itemType);
@@ -705,12 +832,12 @@ function grantGatherReward(itemType, rewardId, rewardAmount) {
   if (!rewardItem) return notFoundText;
 
   $gameParty.gainItem(rewardItem, rewardAmount);
-  const gainItemLabel = `を`;//翻訳対象
-  const gainCountLabel = `個入手した。`;//翻訳対象
-  return `${colorTaggedText(3, itemShopIconName(rewardItem))}${gainItemLabel}${colorTaggedText(10, `${rewardAmount}`)}${gainCountLabel}`;
+  const rewardItemLabel = colorTaggedText(3, itemShopIconName(rewardItem));
+  const rewardAmountLabel = colorTaggedText(10, `${rewardAmount}`);
+  return `${rewardItemLabel}を${rewardAmountLabel}個入手した。`;
 }
 
-// 熟練度上昇拾得物。後半。直前に item_getSkillLevel が入れた valueScriptArray1 を消費する。
+// Second half of the mastery finding: consumes valueScriptArray1 filled by item_getSkillLevel.
 item_getSkillLevel2 = function(){
 
   const skillId = valueScriptArray1 ? valueScriptArray1[2] : 0;
@@ -732,11 +859,11 @@ item_getSkillLevel2 = function(){
   if (!(lastSkillMasteryLevel >= 1)) return;
   if (!(skillMasteryLevel > lastSkillMasteryLevel)) return;
 
-  $gameSwitches.setValue(133, true);
+  $gameSwitches.setValue(ITEM_SHOP_SWITCH.SKILL_RANK_UP, true);
   valueWordSet1 = buildSkillRankUpWord(actor, skill, skillRarity, skillMasteryLevel, maxSkillMasteryLevel);
 };
 
-// 熟練度の使用回数とランクを1行で表示する。
+// Shows the mastery uses and the rank on one line.
 function showSkillMasteryInfo(actor, skill, skillId, skillMasteryLevel, maxSkillMasteryLevel, skillRarity) {
   const skillRarityName = skill.name + skillRarity;
   const usesText = colorTaggedText(2, `${actor.skillMasteryUses(skillId)}`);
@@ -749,16 +876,17 @@ function showSkillMasteryInfo(actor, skill, skillId, skillMasteryLevel, maxSkill
   CommonPopupManager.showInfo({}, infoMessageText, null);
 }
 
-// ランクアップ/カンストの実況文(valueWordSet1 に入る)。
+// Rank up / max rank narration, stored in valueWordSet1.
 function buildSkillRankUpWord(actor, skill, skillRarity, skillMasteryLevel, maxSkillMasteryLevel) {
   const actorName = actor.name();
-  const skillName = colorTaggedText(1, `＜${stripSkillStateSuffix(skill.name)}＞`);
+  const baseSkillName = stripSkillStateSuffix(skill.name);
+  const skillName = colorTaggedText(1, `＜${baseSkillName}＞`);
   return skillMasteryLevel == maxSkillMasteryLevel
-    ? `${actorName}の${skillName}がカンストした！`//翻訳対象
-    : `${actorName}の${skillName}が${skillRarity}にランクアップ！`;//翻訳対象
+    ? `${actorName}の${skillName}がカンストした！`
+    : `${actorName}の${skillName}が${skillRarity}にランクアップ！`;
 }
 
-// 熟練度ランク表記。最大ランクが 5 未満のスキルは 1 段階上の表記から始まる。
+// Mastery rank mark; skills with a max rank below 5 start one step higher.
 const skillMasteryLevelRarityMarks = [
   colorTaggedText(4, `[E]`), colorTaggedText(4, `[E]`), colorTaggedText(12, `[D]`),
   colorTaggedText(5, `[C]`), colorTaggedText(13, `[B]`), colorTaggedText(27, `[A]`),
@@ -772,16 +900,16 @@ get_skill_rarity = function (skillMasteryLevel, maxSkillMasteryLevel){
   return skillMasteryLevelRarityMarks[skillRarityIndex];
 };
 
-// アイテム使用でスキル熟練度アップ。selectionModeId 2 で確定、それ以外は選択表示のみ。
+// Skill mastery from an item use. selectionModeId 2 confirms, anything else only shows the choice.
 item_skilljukurenndoup = function(selectionModeId){
 
-  const actor = $gameActors.actor($gameVariables.value(20));
-  const usedItem = $dataItems[$gameVariables.value(93)];
-  const skillId = $gameVariables.value(19);
+  const actor = $gameActors.actor($gameVariables.value(ITEM_SHOP_VARIABLE.SELECTED_ACTOR_ID));
+  const usedItem = $dataItems[$gameVariables.value(ITEM_SHOP_VARIABLE.USED_ITEM_ID)];
+  const skillId = $gameVariables.value(ITEM_SHOP_VARIABLE.PROCESSED_ITEM_ID);
   const skill = $dataSkills[skillId];
   if (!actor || !skill) return;
 
-  const masteryGain = $gameVariables.value(22) * $gameVariables.value(203);//変更熟練度
+  const masteryGain = $gameVariables.value(ITEM_SHOP_VARIABLE.TEMPORARY_VALUE) * $gameVariables.value(ITEM_SHOP_VARIABLE.SKILL_MASTERY_GAIN);// mastery gain
   const skillType = skill.stypeId;
   valueCountSet1 = 0;
 
@@ -790,7 +918,7 @@ item_skilljukurenndoup = function(selectionModeId){
     return;
   }
 
-  $gameVariables.setValue(23, actor.skillMasteryLevel(skillId));//使用前の熟練度
+  $gameVariables.setValue(ITEM_SHOP_VARIABLE.PREVIOUS_MASTERY_LEVEL, actor.skillMasteryLevel(skillId));// mastery before the use
 
   const infoMessageText = (selectionModeId == 2)
     ? useSkillMasteryBook(actor, usedItem, skillId, skillType, masteryGain)
@@ -798,18 +926,18 @@ item_skilljukurenndoup = function(selectionModeId){
   WindowManager.drawText(1, infoMessageText);
 };
 
-// スキル名を色付きで <\x1bSIN[id]> 表記にする。
+// Skill name as a coloured <\x1bSIN[id]> label.
 function skillColoredName(skillId, skillType, brackets) {
   const skillName = `\x1bSIN[${skillId}]`;
   return colorTaggedText(valueSkillColorArr[skillType], brackets === false ? skillName : `＜${skillName}＞`);
 }
 
 function buildSkillNoRankText(skillId, skillType) {
-  const suffix = `はランクが存在しないスキルのため使用できない…。`;//翻訳対象
+  const suffix = `はランクが存在しないスキルのため使用できない…。`;
   return `${skillColoredName(skillId, skillType)}${suffix}`;
 }
 
-// 確定使用。熟練度を加算し、ランクアップしたらログを2行追加する。
+// Confirmed use: adds the mastery and appends two log lines on a rank up.
 function useSkillMasteryBook(actor, usedItem, skillId, skillType, masteryGain) {
   const beforeMasteryLevel = actor.skillMasteryLevel(skillId);
   actor.gainSkillMasteryUses(skillId, masteryGain);
@@ -817,51 +945,49 @@ function useSkillMasteryBook(actor, usedItem, skillId, skillType, masteryGain) {
 
   const playerName = actor.name();
   const skillName = skillColoredName(skillId, skillType);
-  const masteryLabel = `熟練度が`;//翻訳対象
-  const masteryUpLabel = `上昇した！`;//翻訳対象
   const usesLabel = `${actor.skillMasteryUses(skillId)}/${actor.skillMasteryUsageMax(skillId)}`;
-  const infoMessageText = `${playerName}の${skillName}${masteryLabel}${masteryGain}${masteryUpLabel}（${usesLabel}）`;
+  const infoMessageText = `${playerName}の${skillName}熟練度が${masteryGain}上昇した！（${usesLabel}）`;
 
   const currentMasteryLevel = actor.skillMasteryLevel(skillId);
-  if (currentMasteryLevel > beforeMasteryLevel) {
+  const hasRankedUp = currentMasteryLevel > beforeMasteryLevel;
+  let rankUpText;
+  if (hasRankedUp) {
     if (!$gameParty.inBattle()) $gamePlayer.requestAnimation(300);
-    const rankUpText = `${playerName}の${skillName}が${colorTaggedText(2, `${currentMasteryLevel}`)}にランクアップ！`;//翻訳対象
+    const masteryLevelText = colorTaggedText(2, `${currentMasteryLevel}`);
+    rankUpText = `${playerName}の${skillName}が${masteryLevelText}にランクアップ！`;
     gab_wordParticle(rankUpText);
-    $gameSystem.pushInfoLog(infoMessageText);
-    $gameSystem.pushInfoLog(rankUpText);
-    return infoMessageText;
   }
 
   $gameSystem.pushInfoLog(infoMessageText);
+  if (hasRankedUp) $gameSystem.pushInfoLog(rankUpText);
   return infoMessageText;
 }
 
-// 選択中の表示。使用可能なら valueCountSet1 にスキルIDを入れて「もう一度選択」を促す。
+// Choice display; a usable skill stores its id in valueCountSet1 and asks for a second selection.
 function buildSkillMasteryBookChoiceText(actor, skillId, skillType) {
   const skill = $dataSkills[skillId];
-  const cannotUseLabel = `は対象に選べない…。`;//翻訳対象
   const skillName = skillColoredName(skillId, skillType);
 
-  if (skill.meta['NoJpBook']) return `${skillName}${cannotUseLabel}`;
+  if (skill.meta['NoJpBook']) return `${skillName}は対象に選べない…。`;
 
   const skillMasteryLevel = actor.skillMasteryLevel(skillId);
   if (skillMasteryLevel >= Number(skill.meta['Max Mastery Level'])) {
-    const maxedLabel = `は最大ランクに達しているため使用できない。`;//翻訳対象
-    return `${actor.name()}の${skillName}${maxedLabel}`;
+    const actorName = actor.name();
+    return `${actorName}の${skillName}は最大ランクに達しているため使用できない。`;
   }
 
   valueCountSet1 += skillId;
-  const usesLabel = `熟練度:`;
   const usesText = `${actor.skillMasteryUses(skillId)}/${actor.skillMasteryUsageMax(skillId)}`;
-  const promptLabel = `（もう一度選択で使用されます）`;//翻訳対象
-  return `${skillColoredName(skillId, skillType, false)} ${usesLabel}${usesText}　${colorTaggedText(10, promptLabel)}`;
+  const promptText = colorTaggedText(10, `（もう一度選択で使用されます）`);
+  const plainSkillName = skillColoredName(skillId, skillType, false);
+  return `${plainSkillName} 熟練度:${usesText}　${promptText}`;
 }
 
 // ---------------------------------------------------------------------------
-// アイテム価格等説明
+// Item price and description
 // ---------------------------------------------------------------------------
 
-// 買取/売却価格の表示。売却タグは後ろのものが優先される(元コードの上書き順)。
+// Buy back / sell price display; the last sell tag wins, as in the original.
 const PRICE_INFO_SELL_TAGS = [
   { metaKey: 'Sell Price', kind: 'gold' },
   { metaKey: 'Variable 57 Sell Price', kind: 'variable', variableId: 57 },
@@ -871,7 +997,7 @@ const PRICE_INFO_SELL_TAGS = [
   { metaKey: 'Item 152 Sell Price', kind: 'item', itemId: 152 }
 ];
 
-// 武器種別ごとの通常攻撃説明。value は [英語名, スキルID, 説明]。
+// Normal attack description per weapon type: [english name, skill id, description].
 const WEAPON_BASE_ATTACK_TEXTS = {
   '剣': ['Sword', 101, `与D*1.0倍/対象前衛のみ`],
   '短剣': ['Dagger', 111, `与D*0.5倍/2Hit/対象前衛のみ`],
@@ -890,7 +1016,7 @@ const WEAPON_BASE_ATTACK_TEXTS = {
   '牙': ['Fang', 921, `与D*1.0倍/対象前衛のみ`]
 };
 
-// レアリティ昇格素材のタグ。表示順は元コードと同じ。
+// Rarity promotion material tags, in the original display order.
 const RARITY_PROMOTION_TAGS = [
   { metaKey: 'LRpromotionM', label: `[RarelityLR解放素材]` },
   { metaKey: 'URpromotionM', label: `[RarelityUR解放素材]` },
@@ -899,40 +1025,55 @@ const RARITY_PROMOTION_TAGS = [
   { metaKey: 'RpromotionM', label: `[RarelityR解放素材]` }
 ];
 
+// Steps of the price info window, in display order. Every step gets the same context,
+// so a new line is a new entry here.
+const PRICE_INFO_STEPS = [
+  function (context) { return buildPriceInfoSellText(context.item, context.itemPrice); },
+  function (context) { return buildPriceInfoRankText(context.itemMeta); },
+  function (context) { return buildPriceInfoShopStateText(context.databaseTypeId, context.itemId, context.itemMeta); },
+  function (context) { return buildPriceInfoBaseAttackText(context.databaseTypeId, context.item); },
+  function (context) { return buildPriceInfoEquipStateText(context.itemMeta); },
+  function (context) { return buildPriceInfoRarityPromotionText(context.itemMeta); },
+  function (context) { return buildPriceInfoReturnItemText(context.itemMeta); },
+  function (context) { return buildPriceInfoAbilityLearnText(context.itemMeta); },
+  function (context) { return buildPriceInfoSynthesisMaterialText(context.databaseTypeId, context.itemId, context.item, context.itemMeta); },
+  function (context) { return buildPriceInfoSingleAlchemyText(context.databaseEntries, context.itemId, context.item, context.itemMeta); },
+  function (context) { return buildPriceInfoQuestMaterialText(context.databaseTypeId, context.itemId); },
+  function (context) { return buildPriceInfoSeisyoujuuText(context.databaseTypeId, context.itemId, context.item); },
+  function (context) { return context.itemMeta['GatchaHasRange'] ? `[所持でガチャ排出品に追加]` + '\n' : ``; }
+];
+
+// Builds the description text of one entry and stores it in variable 801.
 item_priceinfo = function(databaseTypeId,itemId){
 
   const databaseEntries = itemShopDatabase(databaseTypeId);
   if (!databaseEntries || !databaseEntries[itemId]) return;
 
   const item = databaseEntries[itemId];
-  const itemMeta = item.meta;
-  const itemPrice = Number(item.price);
+  const context = {
+    databaseTypeId: databaseTypeId,
+    itemId: itemId,
+    databaseEntries: databaseEntries,
+    item: item,
+    itemMeta: item.meta,
+    itemPrice: Number(item.price)
+  };
 
-  let priceInfoText = buildPriceInfoSellText(item, itemPrice);
-  priceInfoText += buildPriceInfoRankText(itemMeta);
-  priceInfoText += buildPriceInfoShopStateText(databaseTypeId, itemId, itemMeta);
-  priceInfoText += buildPriceInfoBaseAttackText(databaseTypeId, item);
-  priceInfoText += buildPriceInfoEquipStateText(itemMeta);
-  priceInfoText += buildPriceInfoRarityPromotionText(itemMeta);
-  priceInfoText += buildPriceInfoReturnItemText(itemMeta);
-  priceInfoText += buildPriceInfoAbilityLearnText(itemMeta);
-  priceInfoText += buildPriceInfoSynthesisMaterialText(databaseTypeId, itemId, item, itemMeta);
-  priceInfoText += buildPriceInfoSingleAlchemyText(databaseEntries, itemId, item, itemMeta);
-  priceInfoText += buildPriceInfoQuestMaterialText(databaseTypeId, itemId);
-  priceInfoText += buildPriceInfoSeisyoujuuText(databaseTypeId, itemId, item);
+  let priceInfoText = ``;
+  for (const priceInfoStep of PRICE_INFO_STEPS) {
+    priceInfoText += priceInfoStep(context);
+  }
 
-  if (itemMeta['GatchaHasRange']) priceInfoText += `[所持でガチャ排出品に追加]\n`;//翻訳対象
+  $gameVariables.setValue(ITEM_SHOP_VARIABLE.PRICE_INFO_TEXT, priceInfoText);
+}
 
-  $gameVariables.setValue(801, priceInfoText);
-};
-
-// 買取価格/売却価格。price/2 が既定で、売却タグがあればその表示で置き換わる。
+// Buy back price is price/2 by default and is replaced by the sell tag display when present.
 function buildPriceInfoSellText(item, itemPrice) {
   let sellText = null;
 
   if (itemPrice >= 1) {
     const buyBackPrice = Math.floor(itemPrice / 2);
-    sellText = `買取価格:` + colorTaggedText(2, buyBackPrice.toLocaleString()) + `\\G\n`;//翻訳対象
+    sellText = `買取価格:` + colorTaggedText(2, buyBackPrice.toLocaleString()) + `\\G` + '\n';
   }
 
   for (const sellTag of PRICE_INFO_SELL_TAGS) {
@@ -941,95 +1082,96 @@ function buildPriceInfoSellText(item, itemPrice) {
     sellText = buildSellTagText(sellTag, tagValue);
   }
 
-  // 元コードどおり、売却タグも価格も無い品は [売却不可] で上書きされる。
-  if (itemPrice == 0 && !hasSellPriceTag(item)) return colorTaggedText(1, `[売却不可]`) + `\n`;
+  // As in the original an entry without tags and without a price is shown as not sellable.
+  if (itemPrice == 0 && !hasSellPriceTag(item)) return colorTaggedText(1, `[売却不可]`) + '\n';
   return sellText || ``;
 }
 
-// 1つの売却タグから表示文を作る。
+// Display line of a single sell tag.
 function buildSellTagText(sellTag, tagValue) {
   const formattedValue = Number(tagValue).toLocaleString();
 
   switch (sellTag.kind) {
     case 'gold':
-      return `買取価格:` + colorTaggedText(2, formattedValue) + `\n`;//翻訳対象
+      return `買取価格:` + colorTaggedText(2, formattedValue) + '\n';
     case 'variable': {
       const currencyName = $dataSystem.variables[sellTag.variableId];
-      return `売却pt:` + colorTaggedText(2, formattedValue + currencyName) + `\n`;//翻訳対象
+      return `売却pt:` + colorTaggedText(2, formattedValue + currencyName) + '\n';
     }
     default: {
       const priceItemName = $dataItems[sellTag.itemId].name;
-      const countLabel = `個`;//翻訳対象
-      return `売却:` + colorTaggedText(2, priceItemName + formattedValue + countLabel) + `\n`;//翻訳対象
+      const priceItemLabel = colorTaggedText(2, `${priceItemName}${formattedValue}個`);
+      return `売却:` + priceItemLabel + '\n';
     }
   }
 }
 
-// 抽選ランクの表示。
+// Lottery rarity line.
 function buildPriceInfoRankText(itemMeta) {
-  if (!itemMeta['LotteryRearity']) return `ランク:──\n`;//翻訳対象
+  if (!itemMeta['LotteryRearity']) return `ランク:──` + '\n';
   const rarityValue = Number(itemMeta['LotteryRearity']);
-  return `ランク:` + colorTaggedText(14, `${rarityValue}`) + `\n`;//翻訳対象
+  return `ランク:` + colorTaggedText(14, `${rarityValue}`) + '\n';
 }
 
-// 販売状態(非売品/販売のみ/一括売却対象)の表示。
+// Sale state line: not for sale, sale only, or bulk sale target.
 function buildPriceInfoShopStateText(databaseTypeId, itemId, itemMeta) {
   let shopStateText = ``;
 
   if (!itemMeta.ShopRank) {
-    shopStateText += colorTaggedText(29, `[非売品]`) + `\n`;
+    shopStateText += colorTaggedText(29, `[非売品]`) + '\n';
   } else if (!itemMeta['LotteryRearity']) {
-    shopStateText += colorTaggedText(29, `[販売のみ]`) + `\n`;
+    shopStateText += colorTaggedText(29, `[販売のみ]`) + '\n';
   }
 
   if ($gameSelfSwitches.getVariableValue([4, 11 + databaseTypeId, itemId]) == 1) {
-    shopStateText += colorTaggedText(10, `[一括売却対象]`) + `\n`;
+    shopStateText += colorTaggedText(10, `[一括売却対象]`) + '\n';
   }
 
   return shopStateText;
 }
 
-// 武器種別の通常攻撃説明。
+// Normal attack description of the weapon type.
 function buildPriceInfoBaseAttackText(databaseTypeId, item) {
   if (databaseTypeId != ITEM_SHOP_DB_WEAPON) return ``;
   if (!(item.wtypeId >= 1)) return ``;
 
   const weaponTypeName = $dataSystem.weaponTypes[item.wtypeId];
   const baseAttack = WEAPON_BASE_ATTACK_TEXTS[weaponTypeName];
-  const heading = `基本通常攻撃:`;//翻訳対象
+  const heading = `基本通常攻撃:`;
   if (!baseAttack) return heading;
 
   const [attackName, attackSkillId, attackNote] = baseAttack;
+  const attackNameText = colorTaggedText(2, attackName);
   const skillMarker = `<\\SIN[${attackSkillId}]>`;
-  return `${heading}${colorTaggedText(2, attackName)}${skillMarker}\n[${attackNote}]\n`;
+  return `${heading}${attackNameText}${skillMarker}` + '\n' + `[${attackNote}]` + '\n';
 }
 
-// セットボーナス/装備条件の表示。
+// Set bonus / equip requirement line.
 function buildPriceInfoEquipStateText(itemMeta) {
   let equipStateText = ``;
-  if (itemMeta['SetBonus']) equipStateText += colorTaggedText(14, `[セットボーナス効果]`) + `\n`;
+  if (itemMeta['SetBonus']) equipStateText += colorTaggedText(14, `[セットボーナス効果]`) + '\n';
   if (itemMeta['Custom Equip Requirement Text'] || itemMeta['Equip Requirement']) {
-    equipStateText += colorTaggedText(10, `[装備条件あり]`) + `\n`;
+    equipStateText += colorTaggedText(10, `[装備条件あり]`) + '\n';
   }
   return equipStateText;
 }
 
-// レアリティ昇格素材/ジョブ解放素材の表示。
+// Rarity promotion / job release material line.
 function buildPriceInfoRarityPromotionText(itemMeta) {
   let promotionText = ``;
   for (const promotionTag of RARITY_PROMOTION_TAGS) {
     if (!itemMeta[promotionTag.metaKey]) continue;
-    promotionText += colorTaggedText(28, promotionTag.label) + `\n`;
+    promotionText += colorTaggedText(28, promotionTag.label) + '\n';
   }
-  if (itemMeta['class2JobReleaseM']) promotionText += colorTaggedText(20, `[Class2ndJob解放素材]`) + `\n`;
+  if (itemMeta['class2JobReleaseM']) promotionText += colorTaggedText(20, `[Class2ndJob解放素材]`) + '\n';
   return promotionText;
 }
 
-// 帰還アイテム(<returnItem>)の現在の帰還先。変数327の配列で 2 が入っている枠。
+// Return target of a <returnItem>; the slot of the variable 327 array that holds 2.
 function buildPriceInfoReturnItemText(itemMeta) {
   if (!itemMeta['returnItem']) return ``;
 
-  const returnSlotValues = $gameVariables.value(327);
+  const returnSlotValues = $gameVariables.value(ITEM_SHOP_VARIABLE.RETURN_ITEM_SLOTS);
   let returnWeaponId = 22;
   for (let slotId = 1; slotId <= 100; slotId++) {
     if (returnSlotValues[slotId] != 2) continue;
@@ -1037,19 +1179,29 @@ function buildPriceInfoReturnItemText(itemMeta) {
     break;
   }
 
-  return colorTaggedText(20, `[現在の帰還先]`) + `\n` + `${$dataWeapons[returnWeaponId].name}\n`;
+  const returnWeaponName = $dataWeapons[returnWeaponId].name;
+  return colorTaggedText(20, `[現在の帰還先]`) + '\n' + returnWeaponName + '\n';
 }
 
-// アビリティ習得コスト素材の表示。
+// Ability learn cost material line.
 function buildPriceInfoAbilityLearnText(itemMeta) {
   if (!itemMeta['AbilityLearnM']) return ``;
   const classId = Number(itemMeta['AbilityLearnM']);
-  const classSeriesLabel = `系列`;//翻訳対象
-  return colorTaggedText(3, `[アビリティ習得コスト素材]`) + `\n`
-    + colorTaggedText(21, `${$dataClasses[classId].name}${classSeriesLabel}`) + `\n`;
+  const className = $dataClasses[classId].name;
+  const classNameText = colorTaggedText(21, `${className}系列`);
+  return colorTaggedText(3, `[アビリティ習得コスト素材]`) + '\n' + classNameText + '\n';
 }
 
-// 錬金素材かどうか。valueItemsSynth1 は 0=アイテム 2000+=武器 3000+=防具 の通し番号。
+// Synthesis material check; valueItemsSynth1 uses 0 items, 2000+ weapons, 3000+ armors.
+// Rarity 8 and above stay hidden while the protagonist is below synthesis rank 4.
+function isHiddenByAlchemyRank(itemMeta) {
+  if (!itemMeta['LotteryRearity']) return false;
+  if (Number(itemMeta['LotteryRearity']) < 8) return false;
+  const protagonist = $gameActors.actor($gameVariables.value(ITEM_SHOP_VARIABLE.TRUE_PROTAGONIST_ACTOR_ID));
+  return protagonist.skillMasteryLevel(valueAlchemySkillId) <= 3;
+}
+
+// `item` is unused; it is kept so the helper keeps its original signature.
 function buildPriceInfoSynthesisMaterialText(databaseTypeId, itemId, item, itemMeta) {
   let synthItemId = itemId;
   if (databaseTypeId == ITEM_SHOP_DB_WEAPON) synthItemId = itemId + 2000;
@@ -1058,21 +1210,17 @@ function buildPriceInfoSynthesisMaterialText(databaseTypeId, itemId, item, itemM
   const synthesisSourceText = valueItemsSynth1[synthItemId];
   if (synthesisSourceText == 0) return ``;
 
-  let materialText = `[錬金素材元対象]\n`;//翻訳対象
-  if (synthesisSourceText.length >= 40) return materialText + colorTaggedText(14, `[多岐に渡る錬金素材元]`) + `\n`;
+  let materialText = `[錬金素材元対象]` + '\n';
+  if (synthesisSourceText.length >= 40) return materialText + colorTaggedText(14, `[多岐に渡る錬金素材元]`) + '\n';
 
-  // レアリティ8以上は錬金Rank4未満だと伏せる。
-  const isLockedByAlchemyRank = itemMeta['LotteryRearity']
-    && $gameActors.actor($gameVariables.value(2)).skillMasteryLevel(valueAlchemySkillId) <= 3
-    && Number(itemMeta['LotteryRearity']) >= 8;
-
-  materialText += isLockedByAlchemyRank
-    ? colorTaggedText(10, `錬金Rank4以上で表示`) + `\n`
-    : colorTaggedText(3, synthesisSourceText) + `\n`;
+  materialText += isHiddenByAlchemyRank(itemMeta)
+    ? colorTaggedText(10, `錬金Rank4以上で表示`) + '\n'
+    : colorTaggedText(3, synthesisSourceText) + '\n';
   return materialText;
 }
 
-// 単一アイテム錬金の情報。<単一アイテム錬金> は 素材ID,必要Rank,完成品ID,個数。
+// Single item synthesis info: material id, required rank, result id, count.
+// `itemId` is unused; it is kept so the helper keeps its original signature.
 function buildPriceInfoSingleAlchemyText(databaseEntries, itemId, item, itemMeta) {
   const singleAlchemyValue = itemMeta['単一アイテム錬金'];
   if (!singleAlchemyValue) return ``;
@@ -1080,36 +1228,38 @@ function buildPriceInfoSingleAlchemyText(databaseEntries, itemId, item, itemMeta
   const singleItemAlchemyValues = singleAlchemyValue.split(',');
   const resultItemName = databaseEntries[Number(singleItemAlchemyValues[2])].name;
   const alchemySkillName = $dataSkills[valueAlchemySkillId].name;
-  const alchemyRankLabel = `Rank`;//翻訳対象
-  const requireLabel = `[要]`;//翻訳対象
-  const countLabel = `個`;//翻訳対象
+  const requiredRank = singleItemAlchemyValues[1];
+  const materialQuantity = singleItemAlchemyValues[3];
+  const resultItemText = colorTaggedText(14, resultItemName);
+  const requiredRankText = colorTaggedText(2, `${alchemySkillName}Rank${requiredRank}`);
+  const materialNameText = colorTaggedText(1, item.name);
 
-  return `[可]` + colorTaggedText(14, resultItemName) + `\n`
-    + requireLabel + colorTaggedText(2, `${alchemySkillName}${alchemyRankLabel}${singleItemAlchemyValues[1]}`) + `\n`
-    + colorTaggedText(1, item.name) + `×${singleItemAlchemyValues[3]}${countLabel}\n`;
+  return `[可]` + resultItemText + '\n'
+    + `[要]` + requiredRankText + '\n'
+    + `${materialNameText}×${materialQuantity}個` + '\n';
 }
 
-// クエスト指定素材の表示。デイリークエスト(901-1000)は 801-900 の達成状況を見る。
-// NOTE: 元コードは武器/防具でも判定に使った側(+2000/+3000)ではなく
-// valueQuestArray1[itemId] を読んでおり、武器/防具では undefined 参照で落ちていた。
-// ここでは判定に使った側の情報をそのまま使う。
+// Quest material line; daily quests (901-1000) read the state of 801-900.
+// NOTE: the original read valueQuestArray1[itemId] for weapons and armors instead of
+// the +2000/+3000 side it tested, which crashed on weapons and armors. The tested
+// side is used here.
 function buildPriceInfoQuestMaterialText(databaseTypeId, itemId) {
   const questEntry = findQuestMaterialEntry(databaseTypeId, itemId);
   if (!questEntry) return ``;
 
   const questItemId = questEntry[1];
-  const questMaterialLabel = colorTaggedText(14, `[クエスト指定素材]`);//翻訳対象
+  const questMaterialLabel = colorTaggedText(14, `[クエスト指定素材]`);
 
   if (!(questItemId >= 801 && questItemId <= 900)) {
-    return questMaterialLabel + colorTaggedText(11, `(ﾃﾞｲﾘｰ)`) + `\n`;//翻訳対象
+    return questMaterialLabel + colorTaggedText(11, `(ﾃﾞｲﾘｰ)`) + '\n';
   }
 
   const isDelivered = $gameParty.hasItem($dataItems[questItemId + 100], true);
   const deliveredLabel = isDelivered ? colorTaggedText(2, `(済)`) : colorTaggedText(10, `(未)`);
-  return questMaterialLabel + deliveredLabel + `\n`;
+  return questMaterialLabel + deliveredLabel + '\n';
 }
 
-// databaseTypeId と itemId に対応するクエスト素材情報を返す。
+// Quest material info of one database type and item id.
 function findQuestMaterialEntry(databaseTypeId, itemId) {
   const questOffset = (databaseTypeId == ITEM_SHOP_DB_WEAPON) ? 2000 : (databaseTypeId == ITEM_SHOP_DB_ARMOR) ? 3000 : 0;
   const questEntry = valueQuestArray1[itemId + questOffset];
@@ -1117,20 +1267,59 @@ function findQuestMaterialEntry(databaseTypeId, itemId) {
   return questEntry[0] == databaseTypeId + 1 ? questEntry : null;
 }
 
-// 性消珠(装備タイプ6 + <ItemPicture>)の強化値表示。
+// Enhancement value line of a stat orb (equip type 6 + <ItemPicture>).
 function buildPriceInfoSeisyoujuuText(databaseTypeId, itemId, item) {
   if (databaseTypeId != ITEM_SHOP_DB_ARMOR) return ``;
   if (item.etypeId != 6) return ``;
   if (!item.meta['ItemPicture']) return ``;
 
-  const enhanceValue = $gameVariables.value(352)[itemId - valueSeisyoujuuStartId];
-  const enhanceLabel = `強化値:`;//翻訳対象
+  const enhanceValue = $gameVariables.value(ITEM_SHOP_VARIABLE.STAT_ORB_STACKS)[itemId - valueSeisyoujuuStartId];
+  const enhanceLabel = `強化値:`;
   return `${enhanceLabel}${colorTaggedText(10, `${enhanceValue}`)}\n`;
 }
 // ---------------------------------------------------------------------------
-// 単一アイテム錬金
+// Single item synthesis
 // ---------------------------------------------------------------------------
-// アイテム使用時の単一合成パターン。使用アイテムを素材にする場合。
+// Synthesis from an item use: the used item is the material.
+// True when the alchemy skill reaches the required rank and the materials suffice;
+// the failing case is reported to the ticker and the synthesis is skipped.
+function canRunItemSynthesis(actor, synthesisItem, requiredRank, materialCount) {
+  if (!actor.isLearnedSkill(valueAlchemySkillId) || actor.skillMasteryLevel(valueAlchemySkillId) < requiredRank) {
+    const alchemySkillLabel = `\x1bSIN[${valueAlchemySkillId}]`;
+    TickerManager.show(`主人公の${alchemySkillLabel}ランクが必要値に達していません。`);
+    return false;
+  }
+  if ($gameParty.numItems(synthesisItem) < materialCount) {
+    TickerManager.show(`必要素材が足りません。`);
+    return false;
+  }
+  return true;
+}
+
+// Success message: how many materials were used and how many items were produced.
+function showSynthesisSuccessMessage(itemId, materialLabel, materialCount, resultItemId, resultLabel, craftAmount) {
+  const craftSuccessMessage = `${materialLabel}を${materialCount}個消費して${resultLabel}を${craftAmount}個制作した！`;
+  TickerManager.show(craftSuccessMessage);
+
+  const remainingMaterial = $gameParty.numItems($dataItems[itemId]);
+  const remainingResult = $gameParty.numItems($dataItems[resultItemId]);
+  const remainingMaterialText = colorTaggedText(1, `${remainingMaterial}`);
+  const remainingResultText = colorTaggedText(10, `${remainingResult}`);
+  const resultIconMarker = `\x1bIIN[${resultItemId}]`;
+  const craftInfoMessage = `${materialLabel}${remainingMaterialText}個/${resultIconMarker}${remainingResultText}個`;
+  TickerManager.show(craftInfoMessage);
+}
+
+// Reads the `単一アイテム錬金` tag: required rank, result item id and material count.
+function readSingleAlchemyRecipe(synthesisItem) {
+  const alchemyValues = synthesisItem.meta['単一アイテム錬金'].split(',');
+  return {
+    requiredRank: Number(alchemyValues[1]),
+    resultItemId: Number(alchemyValues[2]),
+    materialCount: Number(alchemyValues[3])
+  };
+}
+
 item_synthesis = function(usedItem,targetItem,itemId){
 
   if (targetItem.actorId() != usedItem.actorId()) return;
@@ -1138,60 +1327,43 @@ item_synthesis = function(usedItem,targetItem,itemId){
   const synthesisItem = $dataItems[itemId];
   if (!synthesisItem.meta['単一アイテム錬金']) return;
 
-  const singleItemAlchemyValues = synthesisItem.meta['単一アイテム錬金'].split(',');
-  const requiredRank = Number(singleItemAlchemyValues[1]);
-  const materialCount = Number(singleItemAlchemyValues[3]);
-  const resultItemId = Number(singleItemAlchemyValues[2]);
+  const { requiredRank, materialCount, resultItemId } = readSingleAlchemyRecipe(synthesisItem);
   const resultItem = $dataItems[resultItemId];
-  const actor = $gameActors.actor($gameVariables.value(2));
+  const actor = $gameActors.actor($gameVariables.value(ITEM_SHOP_VARIABLE.TRUE_PROTAGONIST_ACTOR_ID));
 
-  // 錬金増加スキル(792)を持っていれば2個できる。
+  // The synthesis boost skill (792) produces two items. The count is published before
+  // the checks run, so the global is set even when the synthesis is refused.
   craftAmount = actor.isLearnedSkill(ALCHEMY_BOOST_SKILL_ID) ? 2 : 1;
 
-  if (!actor.isLearnedSkill(valueAlchemySkillId) || actor.skillMasteryLevel(valueAlchemySkillId) < requiredRank) {
-    TickerManager.show(`主人公の\x1bSIN[${valueAlchemySkillId}]ランクが必要値に達していません。`);//翻訳対象
-    return;
-  }
+  if (!canRunItemSynthesis(actor, synthesisItem, requiredRank, materialCount)) return;
 
-  if ($gameParty.numItems(synthesisItem) < materialCount) {
-    TickerManager.show(`必要素材が足りません。`);//翻訳対象
-    return;
-  }
-
-  AudioManager.playSe({ "name": "Z11_AlchemySuccess", "volume": 80, "pitch": 110, "pan": 0 });
+  AudioManager.playSe({ name: "Z11_AlchemySuccess", volume: 80, pitch: 110, pan: 0 });
   $gameParty.loseItem(synthesisItem, materialCount);
   $gameParty.gainItem(resultItem, craftAmount);
 
   const materialLabel = `\x1bIIN[${itemId}]`;
   const resultLabel = colorTaggedText(10, `\x1bIIN[${resultItemId}]`);
-  const craftSuccessMessage = `${materialLabel}を${materialCount}個消費して${resultLabel}を${craftAmount}個制作した！`;//翻訳対象
-  TickerManager.show(craftSuccessMessage);
-
-  const remainingMaterial = $gameParty.numItems(synthesisItem);
-  const remainingResult = $gameParty.numItems(resultItem);
-  const craftInfoMessage = `${materialLabel}` + colorTaggedText(1, `${remainingMaterial}`)
-    + `個/` + `\x1bIIN[${resultItemId}]` + colorTaggedText(10, `${remainingResult}`) + `個`;
-  TickerManager.show(craftInfoMessage);
-};
+  showSynthesisSuccessMessage(itemId, materialLabel, materialCount, resultItemId, resultLabel, craftAmount);
+}
 
 const ALCHEMY_BOOST_SKILL_ID = 792;
 
 // ---------------------------------------------------------------------------
-// 錬金アイテムの素材説明
+// Material description of a synthesis item
 // ---------------------------------------------------------------------------
-// レシピ種別ごとの定義。レシピ配列名・参照データベース・アイコン表記が違うだけ。
+// Recipe kinds: recipe array name, database and icon marker are the only differences.
 const SYNTHESIS_RECIPE_KINDS = [
   { recipeKey: 'Item Recipe', recipeListKey: 'recipeItem', databaseTypeId: ITEM_SHOP_DB_ITEM, iconMarker: 'II' },
   { recipeKey: 'Weapon Recipe', recipeListKey: 'recipeWeapon', databaseTypeId: ITEM_SHOP_DB_WEAPON, iconMarker: 'WI' },
   { recipeKey: 'Armor Recipe', recipeListKey: 'recipeArmor', databaseTypeId: ITEM_SHOP_DB_ARMOR, iconMarker: 'AI' }
 ];
 
-// 錬金アイテムの素材となるアイテムへの説明追加分
+// Extra description added to the materials of a synthesis item
 item_addSynthesisHelp = function(){
 
   valueItemsSynth1 = Array(4001).fill(0);
 
-  const actor = $gameActors.actor($gameVariables.value(2));
+  const actor = $gameActors.actor($gameVariables.value(ITEM_SHOP_VARIABLE.TRUE_PROTAGONIST_ACTOR_ID));
   if (!actor) return;
 
   const dataItems = $dataItems;
@@ -1208,7 +1380,7 @@ item_addSynthesisHelp = function(){
   }
 };
 
-// レシピ1件分の素材を valueItemsSynth1 へ登録する(同じ素材は説明文を連結)。
+// Registers the materials of one recipe in valueItemsSynth1, merging repeated materials.
 function registerSynthesisSources(recipeIds, recipeKind, knowsAlchemy) {
   const entries = itemShopDatabase(recipeKind.databaseTypeId);
 
@@ -1216,37 +1388,36 @@ function registerSynthesisSources(recipeIds, recipeKind, knowsAlchemy) {
     const recipeTarget = entries[recipeId];
     if (!recipeTarget) continue;
     const ingredients = recipeTarget.synthIngredients;
+    // The same line is registered for every ingredient of this recipe.
+    const ingredientDisplayText = knowsAlchemy
+      ? `\x1b${recipeKind.iconMarker}N[${recipeId}]` + '\n'
+      : `？？？` + '\n';
 
     for (let ingredientIndex = 0; ingredientIndex < ingredients.length; ingredientIndex++) {
       const synthIngredient = DataManager.getSynthesisIngredient(recipeTarget, ingredientIndex);
       const sourceId = synthIngredient.id + synthesisSlotOffset(synthIngredient);
-      const ingredientDisplayText = knowsAlchemy
-        ? `\x1b${recipeKind.iconMarker}N[${recipeId}]\n`
-        : `？？？\n`;//翻訳対象
-
-      if (valueItemsSynth1[sourceId] == 0) {
-        valueItemsSynth1[sourceId] = ingredientDisplayText;
-      } else {
-        valueItemsSynth1[sourceId] += ingredientDisplayText;
-      }
+      const registeredText = valueItemsSynth1[sourceId];
+      valueItemsSynth1[sourceId] = registeredText == 0
+        ? ingredientDisplayText
+        : registeredText + ingredientDisplayText;
     }
   }
 }
 
-// 強化枠持ちの素材は武器/防具で別枠として扱う(<No Augment Slots>)。
+// Materials with augment slots are kept apart for weapons and armors (<No Augment Slots>).
 function synthesisSlotOffset(synthIngredient) {
   if (!synthIngredient.meta['No Augment Slots']) return 0;
   return synthIngredient.etypeId == 1 ? 2000 : 3000;
 }
 
 // ---------------------------------------------------------------------------
-// 固有武器
+// Unique weapons
 // ---------------------------------------------------------------------------
-// 強化段階(変数287の[10])に応じた武器名の接頭辞。<EnhanceName1..9: 必要段階,接頭辞>
+// Weapon name prefix by enhancement stage (variable 287 [10]): required stage, prefix.
 function applyUniqueWeaponName(uniqueWeapon, empowerLevel) {
   let isEnhanced = false;
 
-  // 条件を満たす接頭辞が複数ある場合は、一番後ろのものが残る(元コードの上書き順)。
+  // When several prefixes qualify, the last one wins, as in the original.
   for (let enhanceIndex = 1; enhanceIndex <= 9; enhanceIndex++) {
     const enhanceNameValue = uniqueWeapon.meta['EnhanceName' + enhanceIndex];
     if (!enhanceNameValue) continue;
@@ -1260,7 +1431,7 @@ function applyUniqueWeaponName(uniqueWeapon, empowerLevel) {
   return isEnhanced;
 }
 
-// 強化段階で追加される特性(変数287の[11..30])。値 -> [code, dataId]。
+// Traits added by the enhancement stage (variable 287 [11..30]): value -> [code, dataId].
 const UNIQUE_WEAPON_TRAITS = {
   1: [22, 0], 2: [22, 1], 3: [22, 2], 4: [22, 7], 5: [22, 8], 6: [22, 9],
   7: [21, 0], 8: [21, 1], 9: [21, 2], 10: [21, 3],
@@ -1268,35 +1439,40 @@ const UNIQUE_WEAPON_TRAITS = {
 };
 const UNIQUE_WEAPON_TRAIT_VALUE = { 22: 0.01, 21: 1 + 0.05 };
 
-// 固有武器拡張要素設定
+// Unique weapon extra elements
+// Traits of a unique weapon: the ultimate skill plus one trait per stored value.
+function buildUniqueWeaponTraits(weaponStateValues, uniqueSkillId) {
+  const traits = [{ code: 43, dataId: uniqueSkillId, value: 0.00 }];
+  for (let traitSlot = 11; traitSlot <= 30; traitSlot++) {
+    if (!(weaponStateValues[traitSlot] >= 1)) continue;
+    const trait = UNIQUE_WEAPON_TRAITS[weaponStateValues[traitSlot]];
+    if (!trait) continue;
+    traits.push({ code: trait[0], dataId: trait[1], value: UNIQUE_WEAPON_TRAIT_VALUE[trait[0]] });
+  }
+  return traits;
+}
+
 weapon_uniqueSet = function(weaponSlotId){
 
   const uniqueWeapon = $dataWeapons[weaponSlotId + 80];
-  if (!uniqueWeapon || uniqueWeapon.name !== '') {
+  // Entries without a name are not unique weapons yet.
+  if (uniqueWeapon && uniqueWeapon.name === '') return;
 
-    const weaponStateValues = $gameVariables.value(287)[weaponSlotId];
-    const empowerLevel = weaponStateValues[10];
-    const isEnhanced = applyUniqueWeaponName(uniqueWeapon, empowerLevel);
+  const weaponStateValues = $gameVariables.value(ITEM_SHOP_VARIABLE.ACTOR_WEAPON_PARAMETERS)[weaponSlotId];
+  const empowerLevel = weaponStateValues[10];
+  const isEnhanced = applyUniqueWeaponName(uniqueWeapon, empowerLevel);
 
-    if (!isEnhanced) uniqueWeapon.name = uniqueWeapon.meta['BasicName'];
+  if (!isEnhanced) uniqueWeapon.name = uniqueWeapon.meta['BasicName'];
 
-    // 奥義スキル。強化済みなら1段階上を使う。
-    const uniqueSkillId = Number(uniqueWeapon.meta['UniqueOugi']) + (isEnhanced ? 1 : 0);
-    weaponStateValues[9] = uniqueSkillId;
+  // Ultimate skill; an enhanced weapon uses the next stage.
+  const uniqueSkillId = Number(uniqueWeapon.meta['UniqueOugi']) + (isEnhanced ? 1 : 0);
+  weaponStateValues[9] = uniqueSkillId;
+  uniqueWeapon.traits = buildUniqueWeaponTraits(weaponStateValues, uniqueSkillId);
 
-    uniqueWeapon.traits = [{ code: 43, dataId: uniqueSkillId, value: 0.00 }];
-    for (let traitSlot = 11; traitSlot <= 30; traitSlot++) {
-      if (!(weaponStateValues[traitSlot] >= 1)) continue;
-      const trait = UNIQUE_WEAPON_TRAITS[weaponStateValues[traitSlot]];
-      if (!trait) continue;
-      uniqueWeapon.traits.push({ code: trait[0], dataId: trait[1], value: UNIQUE_WEAPON_TRAIT_VALUE[trait[0]] });
-    }
+  $gamePlayer.refresh();
+}
 
-    $gamePlayer.refresh();
-  }
-};
-
-// 固有武器追加説明。valueCountSet3 = 1行あたりの表示数(3 or 5)。
+// Unique weapon extra description; valueCountSet3 is the entries per line (3 or 5).
 const UNIQUE_WEAPON_PARAM_ICONS = [32, 33, 34, 35, 36, 37, 38, 39];
 const UNIQUE_WEAPON_EFFECT_TEXTS = {
   1: `\\I[630]+1%`, 2: `\\I[632]+1%`, 3: `\\I[631]+1%`,
@@ -1307,30 +1483,29 @@ const UNIQUE_WEAPON_EFFECT_TEXTS = {
 
 weapon_uniqueAdd = function(itemId){
 
-  const weaponStateValues = $gameVariables.value(287)[itemId - 80];
+  const weaponStateValues = $gameVariables.value(ITEM_SHOP_VARIABLE.ACTOR_WEAPON_PARAMETERS)[itemId - 80];
   const empowerLevel = weaponStateValues[10];
   const passiveStateData = $dataStates[Number($dataWeapons[itemId].meta['Passive State'])];
 
-  const empowerLabel = `強化段階:`;//翻訳対象
-  let enhanceInfoText = colorTaggedText(14, `${empowerLabel}${empowerLevel}/20`) + `\n`;
+  let enhanceInfoText = colorTaggedText(14, `強化段階:${empowerLevel}/20`) + '\n';
 
-  if (empowerLevel >= 5 && passiveStateData && passiveStateData.meta['PassiveAddDescription']) {
-    const passiveLabel = `付与効果:`;//翻訳対象
-    enhanceInfoText += `${passiveLabel}${passiveStateData.meta['PassiveAddDescription']}\n`;
+  const passiveDescription = passiveStateData ? passiveStateData.meta['PassiveAddDescription'] : undefined;
+  if (empowerLevel >= 5 && passiveDescription) {
+    enhanceInfoText += `付与効果:${passiveDescription}` + '\n';
   }
 
   enhanceInfoText += buildUniqueWeaponParamText(weaponStateValues, UNIQUE_WEAPON_PARAM_ICONS, 0, 7);
-  enhanceInfoText += `\n`;
+  enhanceInfoText += '\n';
   enhanceInfoText += buildUniqueWeaponEffectText(weaponStateValues, 11, 30);
 
-  if (valueCountSet3 == 3) {
-    $gameVariables.setValue(801, $gameVariables.value(801) + enhanceInfoText);
-  } else {
-    $gameVariables.setValue(801, enhanceInfoText);
-  }
+  // valueCountSet3 3 appends to the line built by item_priceinfo, anything else replaces it.
+  const currentInfoText = valueCountSet3 == 3
+    ? $gameVariables.value(ITEM_SHOP_VARIABLE.PRICE_INFO_TEXT)
+    : ``;
+  $gameVariables.setValue(ITEM_SHOP_VARIABLE.PRICE_INFO_TEXT, currentInfoText + enhanceInfoText);
 };
 
-// パラメータ上昇(変数287の[0..7])を「アイコン+値」で並べる。
+// Parameter gains (variable 287 [0..7]) as icon plus value.
 function buildUniqueWeaponParamText(weaponStateValues, paramIcons, firstIndex, lastIndex) {
   let paramText = ``;
   let effectCount = 0;
@@ -1340,12 +1515,12 @@ function buildUniqueWeaponParamText(weaponStateValues, paramIcons, firstIndex, l
 
     paramText += `\\I[${paramIcons[paramIndex]}]` + colorTaggedText(2, `+${weaponStateValues[paramIndex]}`) + ` `;
     effectCount += 1;
-    if (effectCount % valueCountSet3 == 0) paramText += `\n`;
+    if (effectCount % valueCountSet3 == 0) paramText += '\n';
   }
   return paramText;
 }
 
-// 付加効果(変数287の[11..30]の値)を「[アイコン+効果]」で並べる。
+// Added effects (variable 287 [11..30]) as bracketed icon plus effect.
 function buildUniqueWeaponEffectText(weaponStateValues, firstIndex, lastIndex) {
   let effectText = ``;
   let effectCount = 0;
@@ -1356,18 +1531,18 @@ function buildUniqueWeaponEffectText(weaponStateValues, firstIndex, lastIndex) {
     if (!(effectValue >= 1)) continue;
 
     const effectCandidateText = UNIQUE_WEAPON_EFFECT_TEXTS[effectValue];
-    // 15以上の値はテーブルに無いので、直前の表示がそのまま残る(元コードの挙動)。
+    // Values of 15 and above are not in the table, so the previous display stays, as in the original.
     if (effectCandidateText !== undefined) effectIconText = effectCandidateText;
 
     effectCount += 1;
     effectText += `[${effectIconText}]`;
-    if (effectCount % valueCountSet3 == 0) effectText += `\n`;
+    if (effectCount % valueCountSet3 == 0) effectText += '\n';
   }
   return effectText;
 }
 
-// 固有武器強化過程 weapon_uniqueEnhance($gameVariables.value(20)); 2,3,4,5,6,7
-// 強化段階ごとの [必要額, 上昇値配列, 付与スキル]。上から順に上書きされる。
+// Unique weapon enhancement steps, weapon_uniqueEnhance($gameVariables.value(20)) 2..7
+// Per stage [cost, gain array, granted skill], overwritten from top to bottom.
 const UNIQUE_WEAPON_ENHANCE_TIERS = [
   { minLevel: 0, costPerLevel: 0, flatCost: 1500, statGains: [30, 0, 0, 0, 0, 0], skillIds: [0, 0] },
   { minLevel: 1, costPerLevel: 3000, flatCost: 0, statGains: [30, 0, 0, 0, 0, 0], skillIds: [0, 0] },
@@ -1376,65 +1551,102 @@ const UNIQUE_WEAPON_ENHANCE_TIERS = [
   { minLevel: 15, costPerLevel: 100000, flatCost: 0, statGains: [100, 0, 50, 50, 50, 50], skillIds: [1208, 'level'] }
 ];
 
+// Enhancement tier of the current empowerment level: the last tier whose minimum is
+// reached, which is the first tier when none is.
+function resolveUniqueEnhanceTier(empowerLevel) {
+  return UNIQUE_WEAPON_ENHANCE_TIERS.reduce(function (selectedTier, candidateTier) {
+    return empowerLevel >= candidateTier.minLevel ? candidateTier : selectedTier;
+  }, UNIQUE_WEAPON_ENHANCE_TIERS[0]);
+}
+
+// Publishes the cost, the stat gains and the skills of the next enhancement step.
+function publishUniqueEnhanceStep(empowerLevel) {
+  const tier = resolveUniqueEnhanceTier(empowerLevel);
+  valueCountSet1 = tier.flatCost || tier.costPerLevel * empowerLevel;
+  valueScriptArray1 = tier.statGains.slice();
+  valueScriptArray2 = tier.skillIds.map(function (skillId) {
+    return skillId === 'level' ? empowerLevel : skillId;
+  });
+}
+
+// Applies the stat gains prepared by the first mode to the weapon parameters.
+function applyUniqueEnhanceStatGains(weaponStateValues) {
+  const uniqueStatGainList = valueScriptArray1;
+  for (let statIndex = 0; statIndex <= 5; statIndex++) {
+    if (!(uniqueStatGainList[statIndex] >= 1)) continue;
+    weaponStateValues[statIndex + 2] += uniqueStatGainList[statIndex];
+  }
+}
+
 weapon_uniqueEnhance = function(id,enhanceModeId){
 
+  const weaponStateValues = $gameVariables.value(ITEM_SHOP_VARIABLE.ACTOR_WEAPON_PARAMETERS)[id];
+
+  // Mode 1 prepares the next step, mode 2 commits the gains prepared before.
   if (enhanceModeId == 1) {
-    const empowerLevel = $gameVariables.value(287)[id][10];
-    const tier = UNIQUE_WEAPON_ENHANCE_TIERS.reduce(function (selectedTier, candidateTier) {
-      return empowerLevel >= candidateTier.minLevel ? candidateTier : selectedTier;
-    }, UNIQUE_WEAPON_ENHANCE_TIERS[0]);
-
-    valueCountSet1 = tier.flatCost || tier.costPerLevel * empowerLevel;
-    valueScriptArray1 = tier.statGains.slice();
-    valueScriptArray2 = tier.skillIds.map(function (skillId) {
-      return skillId === 'level' ? empowerLevel : skillId;
-    });
+    publishUniqueEnhanceStep(weaponStateValues[10]);
+    return;
   }
-
   if (enhanceModeId == 2) {
-    const weaponStateValues = $gameVariables.value(287)[id];
-    const uniqueStatGainList = valueScriptArray1;
-    for (let statIndex = 0; statIndex <= 5; statIndex++) {
-      if (!(uniqueStatGainList[statIndex] >= 1)) continue;
-      weaponStateValues[statIndex + 2] += uniqueStatGainList[statIndex];
-    }
+    applyUniqueEnhanceStatGains(weaponStateValues);
   }
-};
+}
 
 // ---------------------------------------------------------------------------
-// 収集表示・簡易Hステータス
+// Collection list and simple H status
 // ---------------------------------------------------------------------------
-// 収集表示アイテムリスト表示 item_collectList1(284);
-// NOTE: 元コードは $gameVariables.value(id1) と未定義変数を参照して必ず落ちていた。
-// また eval() で collectSlot1..4 を作っていたが、添字付き配列に置き換えた。
-item_collectList1 = function(varId){
+// Collected item list, item_collectList1(284)
+// NOTE: the original read the undefined variable id1 and always crashed; the eval()
+// built collectSlot1..4 is replaced by an indexed array.
+// One slot of the collected item list: "[name:count]" or the empty marker.
+function buildCollectSlotText(collectedItemId, party) {
+  const collectedItem = $dataItems[collectedItemId];
+  if (collectedItemId == 0 || !collectedItem) return `[登録なし]`;
+  return `[${collectedItem.name}:${party.numItems(collectedItem)}]`;
+}
 
-  const collectedItemIds = $gameVariables.value(varId);
-  const dataItems = $dataItems;
-  const party = $gameParty;
-  const collectSlotTexts = [];
-
-  for (let slotIndex = 1; slotIndex <= 4; slotIndex++) {
-    const collectedItemId = collectedItemIds[slotIndex];
-    if (collectedItemId == 0) {
-      collectSlotTexts[slotIndex] = `[登録なし]`;//翻訳対象
-      continue;
-    }
-    const collectedItem = dataItems[collectedItemId];
-    if (!collectedItem) {
-      collectSlotTexts[slotIndex] = `[登録なし]`;//翻訳対象
-      continue;
-    }
-    collectSlotTexts[slotIndex] = `[${collectedItem.name}:${party.numItems(collectedItem)}]`;
-  }
-
+// Two text lines and the framed window of the collected item list.
+function showCollectListLines(collectSlotTexts) {
   $gameScreen.setDTextPicture(collectSlotTexts[1] + collectSlotTexts[2], 22);
   $gameScreen.setDTextPicture(collectSlotTexts[3] + collectSlotTexts[4], 22);
   $gameScreen.dWindowFrame = 'ON';
   $gameScreen.showPicture(48, "", 0, 10, 698, 100, 100, 255, 0);
-};
+}
 
-// 収集表示アイテムリスト表示 actor_miniHstatusList1(283);
+item_collectList1 = function(varId){
+
+  const collectedItemIds = $gameVariables.value(varId);
+  const party = $gameParty;
+  const collectSlotTexts = [];
+
+  for (let slotIndex = 1; slotIndex <= 4; slotIndex++) {
+    collectSlotTexts[slotIndex] = buildCollectSlotText(collectedItemIds[slotIndex], party);
+  }
+
+  showCollectListLines(collectSlotTexts);
+}
+
+// Simple H status list, actor_miniHstatusList1(283)
+// Icon (or bracketed name) plus HP / MP of one girl.
+function buildMiniHstatusText(actor, memberActorId) {
+  const girlIconName = $dataActors[memberActorId].meta['IconGura'];
+  const memberText = girlIconName
+    ? `\x1bI[${Number(girlIconName)}]`
+    : `[${actor.name()}]`;
+
+  const actorRecords = $gameVariables.value(memberActorId + 380);
+  const hpLabel = `\\I[12]:${actorRecords[1]}`;
+  const mpLabel = `\\I[376]:${actorRecords[2]}`;
+  return memberText + ` ${hpLabel} ${mpLabel}` + buildActorStateIconsText(actor);
+}
+
+// Status window of the girl members: one text picture per member plus the frame.
+function showMiniHstatusWindow(girlMemberCount) {
+  const iconOffsetValue = 758 + (girlMemberCount * -30);
+  $gameScreen.dWindowFrame = 'ON';
+  $gameScreen.showPicture(48, "", 0, 10, iconOffsetValue, 100, 100, 255, 0);
+}
+
 actor_miniHstatusList1 = function(varId){
 
   const battleMembers = $gameParty.battleMembers();
@@ -1450,25 +1662,15 @@ actor_miniHstatusList1 = function(varId){
     if (!isGirl(actor)) continue;
 
     girlMemberCount += 1;
-    const girlIconName = $dataActors[memberActorId].meta['IconGura'];
-    const memberText = girlIconName
-      ? `\x1bI[${Number(girlIconName)}]`
-      : `[${actor.name()}]`;
-
-    const hpLabel = `\\I[12]:${$gameVariables.value(memberActorId + 380)[1]}`;
-    const mpLabel = `\\I[376]:${$gameVariables.value(memberActorId + 380)[2]}`;
-    statusList[memberIndex] = memberText + ` ${hpLabel} ${mpLabel}` + buildActorStateIconsText(actor);
+    statusList[memberIndex] = buildMiniHstatusText(actor, memberActorId);
     $gameScreen.setDTextPicture(statusList[memberIndex], 22);
   }
 
   if (girlMemberCount < 1) return;
+  showMiniHstatusWindow(girlMemberCount);
+}
 
-  const iconOffsetValue = 758 + (girlMemberCount * -30);
-  $gameScreen.dWindowFrame = 'ON';
-  $gameScreen.showPicture(48, "", 0, 10, iconOffsetValue, 100, 100, 255, 0);
-};
-
-// 表示対象のステート(valueHstateDisplay)をアイコンで並べる。
+// Listed states (valueHstateDisplay) as icons.
 function buildActorStateIconsText(actor) {
   let stateIconsText = ``;
   for (const stateId of valueHstateDisplay) {
@@ -1479,9 +1681,21 @@ function buildActorStateIconsText(actor) {
 }
 
 // ---------------------------------------------------------------------------
-// ショップ品揃え
+// Shop goods
 // ---------------------------------------------------------------------------
-// ショップの品目指定。shop_preparation1(1,1,0);//種類/ランク/0読み込みのみ1ショップ処理実行
+// Shop goods selection, shop_preparation1(1,1,0): type / rarity / 0 load only, 1 run the shop.
+// Shop goods entry: ranked and not a lust item, of the requested rarity and, for
+// weapons and armors, of the current equip type (valueCountSet3).
+function isShopPreparationEntry(item, databaseTypeId, targetRarity) {
+  const itemMeta = item.meta;
+  if (!itemMeta['ShopRank'] || !itemMeta['LotteryRearity']) return false;
+  if (itemMeta['SeiyokuItem']) return false;
+
+  const isEquipTypeMatched = databaseTypeId == ITEM_SHOP_DB_ITEM || valueCountSet3 == item.etypeId;
+  if (!isEquipTypeMatched) return false;
+  return Number(itemMeta['LotteryRearity']) == targetRarity;
+}
+
 shop_preparation1 = function(databaseTypeId,targetRarity,sortFlag){
 
   const entries = itemShopDatabase(databaseTypeId);
@@ -1494,64 +1708,59 @@ shop_preparation1 = function(databaseTypeId,targetRarity,sortFlag){
   for (let itemId = 1; itemId <= itemsEnd; itemId++) {
     const item = entries[itemId];
     if (!item) continue;
-    const itemMeta = item.meta;
-    if (!itemMeta['ShopRank'] || !itemMeta['LotteryRearity']) continue;
-    if (itemMeta['SeiyokuItem']) continue;
-
-    // 武器/防具は装備タイプ(valueCountSet3)が一致するものだけ。アイテムは常に対象。
-    const isRankMatched = databaseTypeId == ITEM_SHOP_DB_ITEM || valueCountSet3 == item.etypeId;
-    if (!isRankMatched) continue;
-    if (Number(itemMeta['LotteryRearity']) != targetRarity) continue;
+    if (!isShopPreparationEntry(item, databaseTypeId, targetRarity)) continue;
 
     shopEntries.push(itemShopEntry(databaseTypeId, itemId));
   }
 
-  // この関数だけ Scene_Shop へ false を渡す(元コードのまま)。
+  // Only this builder passes false to Scene_Shop, as the original did.
   itemShopOpen(shopEntries, sortFlag, false);
-};
+}
 
-// 性欲品ショップ。shop_preparationH(0,1,1);
+// Lust item shop, shop_preparationH(0,1,1)
 shop_preparationH = function(unusedArg1,seiyokuItemId,sortFlag){
 
   const shopEntries = collectShopEntries([ITEM_SHOP_DB_ITEM, ITEM_SHOP_DB_WEAPON, ITEM_SHOP_DB_ARMOR], function (item) {
     return !!item.meta['SeiyokuItem'] && Number(item.meta['SeiyokuItem']) == seiyokuItemId;
   });
-  valueItems = $dataArmors;//元コードは防具を最後に参照するため
+  valueItems = $dataArmors;// the original reads the armor database last
   itemShopOpen(shopEntries, sortFlag);
 };
 
-// 食品ショップ。shop_preparationE(0,1,1);
+// Goods of one item database note tag, e.g. <EatShop:n>; every builder below only
+// names the tag it filters on. The three wrappers keep their public names and
+// arguments, and databaseTypeId is passed straight to the recorded entry type.
+function openItemDatabaseShopByTag(metaKey, tagValue, databaseTypeId, sortFlag) {
+  const shopEntries = collectFromItemDatabase(function (item) {
+    return !!item.meta[metaKey] && Number(item.meta[metaKey]) == tagValue;
+  }, databaseTypeId);
+  itemShopOpen(shopEntries, sortFlag);
+}
+
+// Food shop, shop_preparationE(0,1,1)
 shop_preparationE = function(databaseTypeId,eatShopId,sortFlag){
-
-  const shopEntries = collectFromItemDatabase(function (item) {
-    return !!item.meta['EatShop'] && Number(item.meta['EatShop']) == eatShopId;
-  }, databaseTypeId);
-  itemShopOpen(shopEntries, sortFlag);
+  openItemDatabaseShopByTag('EatShop', eatShopId, databaseTypeId, sortFlag);
 };
 
-// 食材ショップ。shop_preparationEI(0,1,1);
+// Ingredient shop, shop_preparationEI(0,1,1)
 shop_preparationEI = function(databaseTypeId,ingredientsShopId,sortFlag){
-
-  const shopEntries = collectFromItemDatabase(function (item) {
-    return !!item.meta['IngredientsShop'] && Number(item.meta['IngredientsShop']) == ingredientsShopId;
-  }, databaseTypeId);
-  itemShopOpen(shopEntries, sortFlag);
+  openItemDatabaseShopByTag('IngredientsShop', ingredientsShopId, databaseTypeId, sortFlag);
 };
 
-// アイテムデータベースだけを対象にした品揃え。品揃えの種別だけ引数の値で記録する
-// (shop_preparationE/EI, bookShop_preparert2 は databaseTypeId を素通ししている)。
+// Goods built from the item database only; the recorded type is the argument itself
+// (shop_preparationE/EI and bookShop_preparert2 pass databaseTypeId straight through).
 function collectFromItemDatabase(matches, databaseTypeId) {
   valueItems = $dataItems;
   return collectShopEntries([ITEM_SHOP_DB_ITEM], matches, [0, 0, 0, 0], databaseTypeId);
 }
 
-// カジノ"Variable 69 Buy Price"、ブースト薬"Variable 57 Buy Price" otherShop_preparation1(57,0,1);
+// Casino "Variable 69 Buy Price", boost potion "Variable 57 Buy Price", otherShop_preparation1(57,0,1)
 otherShop_preparation1 = function(buyPriceVarId,lotteryRarity,sortFlag){
 
   const buyPriceTag = 'Variable ' + buyPriceVarId + ' Buy Price';
   const shopEntries = collectShopEntries([ITEM_SHOP_DB_ITEM, ITEM_SHOP_DB_WEAPON, ITEM_SHOP_DB_ARMOR], function (item) {
     if (!item.meta[buyPriceTag]) return false;
-    // lotteryRarity 0 は全ランク、1以上は抽選ランク一致、その間の値は対象なし(元コードどおり)。
+    // lotteryRarity 0 means every rarity, 1 and above must match; other values select nothing.
     if (lotteryRarity == 0) return true;
     if (lotteryRarity >= 1) return Number(item.meta['LotteryRearity']) == lotteryRarity;
     return false;
@@ -1559,16 +1768,13 @@ otherShop_preparation1 = function(buyPriceVarId,lotteryRarity,sortFlag){
   itemShopOpen(shopEntries, sortFlag);
 };
 
-// 書店(選択肢を作らず品揃えだけ作る版)
+// Book shop, goods only (no choices)
+// Book shop, goods only (no choices)
 bookShop_preparert2 = function(databaseTypeId,bookShopId,sortFlag){
-
-  const shopEntries = collectFromItemDatabase(function (item) {
-    return !!item.meta['bookShop'] && Number(item.meta['bookShop']) == bookShopId;
-  }, databaseTypeId);
-  itemShopOpen(shopEntries, sortFlag);
+  openItemDatabaseShopByTag('bookShop', bookShopId, databaseTypeId, sortFlag);
 };
 
-// 書店(選択肢を作る版)。valueCountSet1=ピクチャID, valueCountSet2=選択値 を進めながら並べる。
+// Book shop with choices; valueCountSet1 is the picture id and valueCountSet2 the choice value.
 bookShop_preparert = function(bookShopId){
 
   const dataItems = $dataItems;
@@ -1582,7 +1788,7 @@ bookShop_preparert = function(bookShopId){
     if (!bookMeta['bookShop']) continue;
     if (Number(bookMeta['bookShop']) != bookShopId) continue;
 
-    // <Max Item:1> の書物は未所持の時だけ並べる。
+    // Books with <Max Item:1> are listed only while they are not owned.
     const isBookOwned = Number(bookMeta['Max Item']) == 1 ? party.numItems(bookItem) != 0 : false;
     if (isBookOwned) continue;
 
@@ -1590,7 +1796,7 @@ bookShop_preparert = function(bookShopId){
   }
 };
 
-// 書物1冊分の選択肢・説明・ピクチャを登録する。
+// Registers the choice, the description and the picture of one book.
 function addBookChoice(bookItem, itemId) {
   const bookPrice = applyShopDiscount(bookItem.price);
   const ownedCount = $gameParty.numItems(bookItem);
@@ -1608,7 +1814,7 @@ function addBookChoice(bookItem, itemId) {
   valueScriptArray2.push(itemId);
 }
 
-// valueCountSet3 は割引率(%)。
+// valueCountSet3 is the discount rate in percent.
 function applyShopDiscount(price) {
   if (valueCountSet3 == 0) return price;
   return Math.floor(price - (price * valueCountSet3 / 100));
@@ -1619,7 +1825,7 @@ function buildBookOwnedLabel(ownedCount) {
   return colorTaggedText(10, `[${ownedCount}冊所持]`) + ` `;
 }
 
-// 書名を全角スペースで 21 文字分に揃える。
+// Pads the book title to 21 characters with ideographic spaces.
 function padBookName(bookName) {
   let paddedName = bookName;
   if (paddedName.length > 19) return paddedName;
@@ -1627,7 +1833,7 @@ function padBookName(bookName) {
   return paddedName;
 }
 
-// <ADDescription:\sin[788]:\SD[788]> からスキルIDを抜き出して説明文に足す。
+// Extracts the skill id from <ADDescription:\sin[788]:\SD[788]> and appends it to the description.
 function buildBookDescriptionText(bookItem) {
   const bookDescriptionText = `${bookItem.description}`;
   const adDescriptionValue = bookItem.meta['ADDescription'];
@@ -1639,7 +1845,7 @@ function buildBookDescriptionText(bookItem) {
   return `${bookDescriptionText}\n${adSkill.name}:${adSkill.description}`;
 }
 
-// "[788]" の閉じ括弧までの数字を読む(最大3桁)。
+// Reads up to three digits up to the closing bracket of "[788]".
 function extractSkillIdFromDescription(adDescription) {
   let adSkillId = `${adDescription.charAt(0)}${adDescription.charAt(1)}`;
   if (adDescription.charAt(2) != ']') adSkillId += adDescription.charAt(2);
@@ -1647,41 +1853,53 @@ function extractSkillIdFromDescription(adDescription) {
 }
 
 // <jouhouBuyVariable:135,1><jouhouBuySwitche:135><jouhouBuyItem:100,101>
+// One informant slot driven by <jouhouBuyVariable: id, needed value>; an unreached
+// variable lists the dummy item instead.
+function collectJouhouVariableSlot(infoItemMeta, itemId, buyInfoItemId, buyItemIds) {
+  if (!infoItemMeta['jouhouBuyVariable']) return;
+  const jouhouBuyValues = infoItemMeta['jouhouBuyVariable'].split(',');
+  const jouhouVariableId = Number(jouhouBuyValues[0]);
+  if (!(jouhouVariableId >= 1)) return;
+
+  const isVariableReached = $gameVariables.value(jouhouVariableId) >= Number(jouhouBuyValues[1]);
+  buyItemIds.push(isVariableReached ? itemId : buyInfoItemId);
+}
+
+// One informant slot driven by <jouhouBuySwitche>; the switch must be on to sell.
+function collectJouhouSwitchSlot(infoItemMeta, itemId, buyInfoItemId, buyItemIds) {
+  const jouhouSwitchMeta = infoItemMeta['jouhouBuySwitche'];
+  if (!jouhouSwitchMeta || !(Number(jouhouSwitchMeta) >= 1)) return;
+
+  const isSwitchOn = $gameSwitches.value(Number(jouhouSwitchMeta));
+  buyItemIds.push(isSwitchOn ? itemId : buyInfoItemId);
+}
+
+// One informant slot driven by <jouhouBuyItem>, which needs one of the listed items.
+function collectJouhouItemSlot(infoItemMeta, itemId, buyInfoItemId, buyItemIds) {
+  if (!infoItemMeta['jouhouBuyItem']) return;
+  buyItemIds.push(resolveJouhouBuyItemId(itemId, infoItemMeta['jouhouBuyItem'], buyInfoItemId));
+}
+
 jouhouShop_preparert = function(){
 
   const dataItems = $dataItems;
-  const buyInfoItemId = 6;//条件を満たさない枠に出すダミーアイテム
+  const buyInfoItemId = 6;// Dummy item shown in the slots whose condition is not met
   const itemsEnd = dataItems.length - 1;
   const buyItemIds = [];
 
   for (let itemId = 1; itemId <= itemsEnd; itemId++) {
     const infoItemMeta = dataItems[itemId].meta;
-
-    if (infoItemMeta['jouhouBuyVariable']) {
-      const jouhouBuyValues = infoItemMeta['jouhouBuyVariable'].split(',');
-      const jouhouVariableId = Number(jouhouBuyValues[0]);
-      if (jouhouVariableId >= 1) {
-        const isVariableReached = $gameVariables.value(jouhouVariableId) >= Number(jouhouBuyValues[1]);
-        buyItemIds.push(isVariableReached ? itemId : buyInfoItemId);
-      }
-    }
-
-    if (infoItemMeta['jouhouBuySwitche'] && Number(infoItemMeta['jouhouBuySwitche']) >= 1) {
-      const isSwitchOn = $gameSwitches.value(Number(infoItemMeta['jouhouBuySwitche']));
-      buyItemIds.push(isSwitchOn ? itemId : buyInfoItemId);
-    }
-
-    if (infoItemMeta['jouhouBuyItem']) {
-      buyItemIds.push(resolveJouhouBuyItemId(itemId, infoItemMeta['jouhouBuyItem'], buyInfoItemId));
-    }
+    collectJouhouVariableSlot(infoItemMeta, itemId, buyInfoItemId, buyItemIds);
+    collectJouhouSwitchSlot(infoItemMeta, itemId, buyInfoItemId, buyItemIds);
+    collectJouhouItemSlot(infoItemMeta, itemId, buyInfoItemId, buyItemIds);
   }
 
   for (const infoItemId of buyItemIds) {
     $gameSystem.addCustomChoice(1, { text: buildJouhouChoiceText(infoItemId, buyInfoItemId), value: infoItemId });
   }
-};
+}
 
-// <jouhouBuyItem:100,101> のいずれかを持っていればその情報を買える。
+// The information is sold when the party owns one of the <jouhouBuyItem:100,101> entries.
 function resolveJouhouBuyItemId(itemId, jouhouBuyItemValue, buyInfoItemId) {
   const jouhouBuyValues = jouhouBuyItemValue.split(',');
   for (const jouhouBuyItemId of jouhouBuyValues) {
@@ -1692,38 +1910,37 @@ function resolveJouhouBuyItemId(itemId, jouhouBuyItemValue, buyInfoItemId) {
   return buyInfoItemId;
 }
 
-// 情報屋の選択肢テキスト。ダミー枠(6)は名前だけ。
+// Informant choice text; the dummy slot (6) shows the name only.
 function buildJouhouChoiceText(infoItemId, buyInfoItemId) {
   const infoItem = $dataItems[infoItemId];
   if (infoItemId == buyInfoItemId) return infoItem.name;
 
-  let infoItemNameText = infoItem.name;
-  const priceLabel = `(`;
-  infoItemNameText += ` ` + colorTaggedText(2, `${priceLabel}${infoItem.price.toLocaleString()}\\G)`);//翻訳対象
+  const infoItemPriceText = colorTaggedText(2, `(${infoItem.price.toLocaleString()}\\G)`);
+  let infoItemNameText = `${infoItem.name} ${infoItemPriceText}`;
   if ($gameParty.hasItem(infoItem, true)) infoItemNameText += colorTaggedText(10, `[購入済み]`);
   return infoItemNameText;
 }
 // ---------------------------------------------------------------------------
-// 食事
+// Eating
 // ---------------------------------------------------------------------------
-// 満腹度(変数16)の上限は変数13。食べた効果は変数620の配列に積む。
+// Satiety is variable 16 with its cap in variable 13; eaten effects are pushed to variable 620.
 const EAT_SATIETY_VARIABLE_ID = 16;
 const EAT_SATIETY_MAX_VARIABLE_ID = 13;
 const EAT_EFFECT_ARRAY_VARIABLE_ID = 620;
 const EAT_EFFECT_STATE_ID = 107;
 const EAT_EFFECT_SLOT_MAX = 9;
 
-// 満腹度が上限に達しているか(item_eatEvent2 は「上限<=現在」で判定する)。
+// Whether the satiety cap is reached (item_eatEvent2 tests cap <= current).
 function isFullStomach() {
   return !($gameVariables.value(EAT_SATIETY_MAX_VARIABLE_ID) > $gameVariables.value(EAT_SATIETY_VARIABLE_ID));
 }
 
-// item_eatEvent(没版)は「現在 > 上限」で判定する(元コードで判定式が異なる)。
+// The unused item_eatEvent tests current > cap, which is the original condition.
 function isFullStomachOver() {
   return $gameVariables.value(EAT_SATIETY_VARIABLE_ID) > $gameVariables.value(EAT_SATIETY_MAX_VARIABLE_ID);
 }
 
-// <eatEffect1..9: 種類,値,時間> を変数620の配列へ積む。
+// Pushes the <eatEffect1..9: kind,value,time> entries into the variable 620 array.
 function pushEatEffectEntries(itemMeta) {
   const eatEffectArray = $gameVariables.value(EAT_EFFECT_ARRAY_VARIABLE_ID);
 
@@ -1735,60 +1952,86 @@ function pushEatEffectEntries(itemMeta) {
   }
 }
 
-// 食事イベント
-item_eatEvent2 = function(usedItem,targetItem,itemId){
+// Eating event
+// Second stage of item_eatEvent2: the confirm press only closes the window again.
+function closeEatInfoWindow() {
+  WindowManager.hide(0);
+  valueCountSet1 = 0;
+  $gameSwitches.setValue(ITEM_SHOP_SWITCH.EAT_INFO_WINDOW, false);
+}
 
-  if (targetItem.actorId() != usedItem.actorId()) return;
+// Refusal message when the satiety cap is already reached.
+function showFullStomachMessage() {
+  const satietyMax = $gameVariables.value(EAT_SATIETY_MAX_VARIABLE_ID);
+  const satietyMaxText = colorTaggedText(10, `${satietyMax}`);
+  TickerManager.show(`満腹でこれ以上は食べられない…。（満腹上限:${satietyMaxText}）`);
+}
 
-  // スイッチ603が立っている間は、決定でウィンドウを閉じる2段目。
-  if ($gameSwitches.value(603)) {
-    WindowManager.hide(0);
-    valueCountSet1 = 0;
-    $gameSwitches.setValue(603, false);
-    return;
-  }
-
-  if (isFullStomach()) {
-    const satietyMaxLabel = `満腹でこれ以上は食べられない…。（満腹上限:`;//翻訳対象
-    TickerManager.show(`${satietyMaxLabel}${colorTaggedText(10, `${$gameVariables.value(EAT_SATIETY_MAX_VARIABLE_ID)}`)}）`);
-    return;
-  }
-
-  const eatItem = $dataItems[itemId];
-  const eatItemMeta = eatItem.meta;
-
+// Applies one eaten entry: effect slots, satiety, party state, inventory and sound.
+function applyEatenItem(eatItem, eatItemMeta) {
   pushEatEffectEntries(eatItemMeta);
   $gameVariables.setValue(EAT_SATIETY_VARIABLE_ID, $gameVariables.value(EAT_SATIETY_VARIABLE_ID) + 1);
 
   $gameParty.members().forEach(function (actor) { actor.addState(EAT_EFFECT_STATE_ID); });
   trait_changeSetting(EAT_EFFECT_STATE_ID);
   $gameParty.gainItem(eatItem, -1);
-  AudioManager.playSe({ "name": "Z_Eat", "volume": 100, "pitch": 100, "pan": 0 });
+  AudioManager.playSe({ name: "Z_Eat", volume: 100, pitch: 100, pan: 0 });
+}
 
+// Opens the confirmation window with the eaten entry description.
+function showEatInfoWindow(itemId, eatItemMeta) {
   const windowWidth = 1280;
   const windowHeight = 290;
   WindowManager.show(0, 0, 0, windowWidth, windowHeight);
   WindowManager.drawText(0, buildEatInfoMessage(itemId, eatItemMeta));
   valueCountSet1 = 1;
+}
 
-  $gameSwitches.setValue(603, true);
+item_eatEvent2 = function(usedItem,targetItem,itemId){
+
+  if (targetItem.actorId() != usedItem.actorId()) return;
+
+  // While switch 603 is on, the confirm press closes the window (second stage).
+  if ($gameSwitches.value(ITEM_SHOP_SWITCH.EAT_INFO_WINDOW)) {
+    closeEatInfoWindow();
+    return;
+  }
+
+  if (isFullStomach()) {
+    showFullStomachMessage();
+    return;
+  }
+
+  const eatItem = $dataItems[itemId];
+  const eatItemMeta = eatItem.meta;
+
+  applyEatenItem(eatItem, eatItemMeta);
+  showEatInfoWindow(itemId, eatItemMeta);
+
+  $gameSwitches.setValue(ITEM_SHOP_SWITCH.EAT_INFO_WINDOW, true);
   activateEatEventSwitch(eatItemMeta);
-};
+}
 
-// 満腹度と食べた動詞を出すメッセージ。
+// Message with the satiety values and the eaten verb.
 function buildEatInfoMessage(itemId, eatItemMeta) {
   const satietyNow = $gameVariables.value(EAT_SATIETY_VARIABLE_ID);
   const satietyMax = $gameVariables.value(EAT_SATIETY_MAX_VARIABLE_ID);
-  const itemLabel = `\x1bIIN[${itemId}]`;
 
-  const eatInfoMessage = `${itemLabel}を${eatOutcomeText(eatItemMeta)}。（満腹度:`
-    + colorTaggedText(3, `${satietyNow}`) + `/` + colorTaggedText(10, `${satietyMax}`) + `）\n`
-    + `${$dataStates[EAT_EFFECT_STATE_ID].description}\n\n`
-    + `※ ` + colorTaggedText(10, `ウィンドウ消去はカーソルをそのままで決定ボタンorマウス左クリック。`) + `\n`;
+  const itemLabel = `\x1bIIN[${itemId}]`;
+  const eatVerb = eatOutcomeText(eatItemMeta);
+  const satietyNowText = colorTaggedText(3, `${satietyNow}`);
+  const satietyMaxText = colorTaggedText(10, `${satietyMax}`);
+  const effectDescription = $dataStates[EAT_EFFECT_STATE_ID].description;
+  const closeHintText = colorTaggedText(10, `ウィンドウ消去はカーソルをそのままで決定ボタンorマウス左クリック。`);
+
+  const eatInfoMessage = `${itemLabel}を${eatVerb}。（満腹度:`
+    + `${satietyNowText}/${satietyMaxText}）` + '\n'
+    + effectDescription + '\n\n'
+    + `※ ${closeHintText}` + '\n';
   return eatInfoMessage;
 }
 
-// <EventOnSwitch:n> の 2 以上ならイベントスイッチとして立てる。
+// An <EventOnSwitch:n> of 2 or more is raised as an event switch.
 function activateEatEventSwitch(eatItemMeta) {
   const eventOnSwitchValue = eatItemMeta['EventOnSwitch'];
   if (!eventOnSwitchValue) return;
@@ -1799,35 +2042,42 @@ function activateEatEventSwitch(eatItemMeta) {
   $gameSwitches.setValue(eventSwitchId, true);
 }
 
-// 食事イベント、没
-item_eatEvent = function(unusedArg1,unusedArg2,itemId){
-
-  if (isFullStomachOver()) {
-    TickerManager.show(`満腹でこれ以上は食べられない…。`);//翻訳対象
-    return;
-  }
-
-  const eatItem = $dataItems[itemId];
-  const eatItemMeta = eatItem.meta;
+// Eating event, unused version
+// Satiety, TP and sound of the unused eat event.
+function applyLegacyEatEffects(eatItemMeta) {
   const eatStuffValue = Number(eatItemMeta['Stuff']);
   const eatTpValue = Number(eatItemMeta['ＴＰ']);
 
   $gameVariables.setValue(EAT_SATIETY_VARIABLE_ID, $gameVariables.value(EAT_SATIETY_VARIABLE_ID) + eatStuffValue);
   $gameParty.members().forEach(function (actor) { actor.gainTp(eatTpValue); });
-  AudioManager.playSe({ "name": "Z_Eat", "volume": 100, "pitch": 100, "pan": 0 });
+  AudioManager.playSe({ name: "Z_Eat", volume: 100, pitch: 100, pan: 0 });
+  return { eatStuffValue: eatStuffValue, eatTpValue: eatTpValue };
+}
 
+// Ticker line of the unused eat event: TP gain, satiety gain and the satiety values.
+function buildLegacyEatMessage(itemId, eatItemMeta, eatStuffValue, eatTpValue) {
   const itemLabel = colorTaggedText(24, `\x1bIIN[${itemId}]`);
   const satietyNow = `\\V[16]`;
   const satietyMax = `\\V[13]`;
-  const tpLabel = `TP`;
-  const percentLabel = `%UP! `;
-  const satietyLabel = `満腹度`;//翻訳対象
-  const increaseLabel = `上昇`;//翻訳対象
-  TickerManager.show(
-    `${itemLabel}を${eatOutcomeText(eatItemMeta)} ${tpLabel}${colorTaggedText(2, `${eatTpValue}`)}${percentLabel}`
-    + `${satietyLabel}${colorTaggedText(2, `${eatStuffValue}`)}${increaseLabel}(${satietyNow}/${satietyMax})`//翻訳対象
-  );
+  const eatVerb = eatOutcomeText(eatItemMeta);
+  const eatTpText = colorTaggedText(2, `${eatTpValue}`);
+  const eatStuffText = colorTaggedText(2, `${eatStuffValue}`);
+  return `${itemLabel}を${eatVerb} TP${eatTpText}%UP! `
+    + `満腹度${eatStuffText}上昇(${satietyNow}/${satietyMax})`;
+}
 
+item_eatEvent = function(unusedArg1,unusedArg2,itemId){
+
+  if (isFullStomachOver()) {
+    TickerManager.show(`満腹でこれ以上は食べられない…。`);
+    return;
+  }
+
+  const eatItem = $dataItems[itemId];
+  const eatItemMeta = eatItem.meta;
+  const eatValues = applyLegacyEatEffects(eatItemMeta);
+
+  TickerManager.show(buildLegacyEatMessage(itemId, eatItemMeta, eatValues.eatStuffValue, eatValues.eatTpValue));
   $gameParty.loseItem(eatItem, 1);
 
   const onSwitchValue = eatItemMeta['OnSwitch'];
@@ -1836,12 +2086,12 @@ item_eatEvent = function(unusedArg1,unusedArg2,itemId){
   if (!(onSwitchId >= 1) || $gameSwitches.value(onSwitchId)) return;
   $gameSwitches.setValue(onSwitchId, true);
   time_settei();
-};
+}
 
 // ---------------------------------------------------------------------------
-// 財布アイテム
+// Wallet items
 // ---------------------------------------------------------------------------
-// アイテム財布からルビ入手。<walletIn: 最小,幅>
+// Ruby from a wallet item, <walletIn: minimum,width>
 wallet_insideGet = function(usedItem,targetItem,itemId,databaseTypeId){
 
   if (targetItem.actorId() != usedItem.actorId()) return;
@@ -1857,48 +2107,55 @@ wallet_insideGet = function(usedItem,targetItem,itemId,databaseTypeId){
   const walletGainAmount = Math.floor(Math.random() * walletRange + 1) + walletMin;
 
   const walletItemLabel = colorTaggedText(2, `\x1bIIN[${itemId}]`);
-  const walletAmountLabel = `には`;//翻訳対象
-  const walletFoundLabel = `入っていた！`;//翻訳対象
-  TickerManager.show(
-    `${walletItemLabel}${walletAmountLabel}${colorTaggedText(14, `${walletGainAmount}\\G`)}${walletFoundLabel}`
-  );
+  const walletAmountText = colorTaggedText(14, `${walletGainAmount}\\G`);
+  TickerManager.show(`${walletItemLabel}には${walletAmountText}入っていた！`);
 
   $gameParty.gainGold(walletGainAmount);
   $gameParty.gainItem(walletItem, -1);
 };
 
 // ---------------------------------------------------------------------------
-// 一括売却
+// Bulk sale
 // ---------------------------------------------------------------------------
-// 売却対象の選択肢を作る。damageTypeId 0=アイテム 1=武器 2=防具。
-ikkatu_sellChoice = function(databaseTypeId,menuCategoryId){
-
+// Builds the bulk sale choices; damageTypeId 0 items, 1 weapons, 2 armors.
+// Walks the shop database and keeps the rows `selectRow` accepts. `selectRow` returns
+// the display line of an entry, or null to skip it. The original loops of both bulk
+// sale choices only differed in that predicate and in what they published afterwards.
+function collectBulkSellRows(databaseTypeId, selectRow) {
+  const rows = [];
   const entries = itemShopDatabase(databaseTypeId);
-  if (!entries) return;
+  if (!entries) return rows;
 
-  const party = $gameParty;
   const itemsEnd = itemShopDatabaseEnd(databaseTypeId, entries);
-  const sellChoiceTexts = [];
-  const sellItemIds = [];
-
   for (let itemId = 1; itemId <= itemsEnd; itemId++) {
     const item = entries[itemId];
     if (!item) continue;
-    if (!canBulkSell(item, databaseTypeId, menuCategoryId)) continue;
-    if (!party.hasItem(item)) continue;
 
-    // セルフスイッチ(一括売却対象)が立っていれば色を変える。
-    const isMarkedForBulkSell = $gameSelfSwitches.getVariableValue([4, databaseTypeId + 11, itemId]) != 0;
-    sellChoiceTexts.push(buildBulkSellChoiceText(item, party, isMarkedForBulkSell));
-    sellItemIds.push(itemId);
+    const line = selectRow(item, itemId);
+    if (line === null) continue;
+    rows.push({ itemId, line });
   }
+  return rows;
+}
 
-  if (sellChoiceTexts.length < 1) return;
-  valueWordArray = sellChoiceTexts;
-  valueCountArray = sellItemIds;
-};
+ikkatu_sellChoice = function(databaseTypeId,menuCategoryId){
 
-// 一括売却の対象になり得るか(名前・売却価格・カテゴリ・装備タイプ・所持)。
+  const party = $gameParty;
+  const rows = collectBulkSellRows(databaseTypeId, (item, itemId) => {
+    if (!canBulkSell(item, databaseTypeId, menuCategoryId)) return null;
+    if (!party.hasItem(item)) return null;
+
+    // The colour changes when the bulk sale self switch is on.
+    return buildBulkSellChoiceText(item, party, bulkSellMark(databaseTypeId, itemId) != 0);
+  });
+
+  if (rows.length < 1) return;
+  valueWordArray = rows.map((row) => row.line);
+  valueCountArray = rows.map((row) => row.itemId);
+}
+
+
+// Whether an entry can be sold in bulk: name, sell price, category, equip type, owned.
 function canBulkSell(item, databaseTypeId, menuCategoryId) {
   if (item.name === '') return false;
   if (!(item.price >= 1 || hasSellPriceTag(item))) return false;
@@ -1907,42 +2164,41 @@ function canBulkSell(item, databaseTypeId, menuCategoryId) {
   return true;
 }
 
-// 一括売却の選択肢1行。
+// One bulk sale choice line.
+// Self switch mark of the bulk sale target list: map 4, the type group and the item id.
+function bulkSellMark(databaseTypeId, itemId) {
+  return $gameSelfSwitches.getVariableValue([4, 11 + databaseTypeId, itemId]);
+}
+
 function buildBulkSellChoiceText(item, party, isMarkedForBulkSell) {
-  const fontSizeTag = `\\FS[25]`;
+  const fontSizeTag = BULK_SELL_FONT_TAG;
   const nameAndCount = `\x1bI[${item.iconIndex}]${item.name}:${party.numItems(item)}`;
   return `${fontSizeTag}${colorTaggedText(isMarkedForBulkSell ? 10 : 0, nameAndCount)}`;
 }
 
-// アイテム一括売却対象選択(セルフスイッチ版)
+// Bulk sale target selection, self switch version
+// Choice line of the bulk sale confirmation list: font size, icon, name and count.
+function buildBulkSellListLine(item, party) {
+  const itemLabel = `\x1bI[${item.iconIndex}]${item.name}`;
+  return BULK_SELL_FONT_TAG + `${itemLabel}:${party.numItems(item)}`;
+}
+
 ikkatu_sellChoice2 = function(databaseTypeId){
 
-  const entries = itemShopDatabase(databaseTypeId);
-  if (!entries) return;
-
   const party = $gameParty;
-  const itemsEnd = itemShopDatabaseEnd(databaseTypeId, entries);
-  const sellItemLines = [];
-  const sellItemIds = [];
-  const databaseTypeIds = [];
+  const rows = collectBulkSellRows(databaseTypeId, (item, itemId) => {
+    if (bulkSellMark(databaseTypeId, itemId) == 0) return null;
+    return buildBulkSellListLine(item, party);
+  });
 
-  for (let itemId = 1; itemId <= itemsEnd; itemId++) {
-    const item = entries[itemId];
-    if (!item) continue;
-    if ($gameSelfSwitches.getVariableValue([4, databaseTypeId + 11, itemId]) != 1) continue;
+  if (rows.length < 1) return;
+  valueWordArray = rows.map((row) => row.line);
+  valueCountArray = rows.map((row) => row.itemId);
+  valueCountArray2 = rows.map(() => databaseTypeId);
+}
 
-    sellItemLines.push(`\\FS[25]\x1bI[${item.iconIndex}]${item.name}:${party.numItems(item)}`);
-    sellItemIds.push(itemId);
-    databaseTypeIds.push(databaseTypeId);
-  }
 
-  if (sellItemLines.length < 1) return;
-  valueWordArray = sellItemLines;
-  valueCountArray = sellItemIds;
-  valueCountArray2 = databaseTypeIds;
-};
-
-// アイテム一括売却実行内部計算
+// Bulk sale arithmetic
 item_ikkatu = function(databaseTypeId){
 
   const entries = itemShopDatabase(databaseTypeId);
@@ -1955,15 +2211,14 @@ item_ikkatu = function(databaseTypeId){
     const item = entries[itemId];
     if (!item) continue;
     if (!party.hasItem(item)) continue;
-    //セルフスイッチ(一括売却対象)が立っている品だけ売る
-    const bulkSellMark = $gameSelfSwitches.getVariableValue([4, 11 + databaseTypeId, itemId]);
-    if (!(bulkSellMark >= 1)) continue;
+    // only the entries whose bulk sale self switch is on are sold
+    if (!(bulkSellMark(databaseTypeId, itemId) >= 1)) continue;
 
     sellBulkItem(item);
   }
 };
 
-// 1品目分の一括売却。売却額は通貨別(所持金/変数57/変数69/アイテム)に振り分ける。
+// Sells one entry, splitting the amount per currency: gold, variable 57, variable 69, items.
 function sellBulkItem(item) {
   const itemMeta = item.meta;
   const sellItemCount = $gameParty.numItems(item);
@@ -1976,12 +2231,16 @@ function sellBulkItem(item) {
   $gameParty.loseItem(item, sellItemCount);
   if (goldPrices.total >= 1) $gameParty.gainGold(goldPrices.total);
 
-  // NOTE: 変数69の加算にも変数57側の計算値が使われている(元コードのまま)。
-  if (itemMeta['Variable 57 Sell Price'] && variablePrice >= 1) {
-    $gameVariables.setValue(57, $gameVariables.value(57) + variablePrice);
-  }
-  if (itemMeta['Variable 69 Sell Price'] && variablePrice >= 1) {
-    $gameVariables.setValue(69, $gameVariables.value(69) + variablePrice);
+  // NOTE: variable 69 is increased with the amount computed for variable 57, as in the original.
+  if (variablePrice >= 1) {
+    if (itemMeta['Variable 57 Sell Price']) {
+      const currencyCount = $gameVariables.value(ITEM_SHOP_VARIABLE.VARIABLE_57_CURRENCY);
+      $gameVariables.setValue(ITEM_SHOP_VARIABLE.VARIABLE_57_CURRENCY, currencyCount + variablePrice);
+    }
+    if (itemMeta['Variable 69 Sell Price']) {
+      const coinCount = $gameVariables.value(ITEM_SHOP_VARIABLE.COIN_COUNT);
+      $gameVariables.setValue(ITEM_SHOP_VARIABLE.COIN_COUNT, coinCount + variablePrice);
+    }
   }
 
   if (itemPrice >= 1) {
@@ -1997,7 +2256,7 @@ function sellBulkItem(item) {
   valueCountSet1 += 1;
 }
 
-// 所持金売却額。<Price> は半額、<Sell Price> が優先。
+// Gold payout: <Price> is halved and <Sell Price> wins.
 function resolveBulkSellGoldPrices(item) {
   const itemMeta = item.meta;
   let baseSellPrice = 0;
@@ -2013,7 +2272,7 @@ function resolveBulkSellGoldPrices(item) {
   return { total: itemBasePrice + baseSellPrice };
 }
 
-// 変数通貨の売却額(変数57/69のタグは同じ変数に上書きされる)。
+// Variable currency payout; the variable 57/69 tags overwrite the same value.
 function resolveBulkSellVariablePrice(itemMeta) {
   let variablePrice = 0;
   for (const sellTag of ITEM_SHOP_SELL_VARIABLE_TAGS) {
@@ -2023,7 +2282,7 @@ function resolveBulkSellVariablePrice(itemMeta) {
   return variablePrice;
 }
 
-// アイテム通貨の売却額(270/147/152 のタグは同じ変数に上書きされる)。
+// Item currency payout; the 270/147/152 tags overwrite the same value.
 function resolveBulkSellItemPrice(itemMeta) {
   let itemPrice = 0;
   for (const sellTag of ITEM_SHOP_SELL_ITEM_TAGS) {
@@ -2034,19 +2293,23 @@ function resolveBulkSellItemPrice(itemMeta) {
 }
 
 // ---------------------------------------------------------------------------
-// ショップの購入レート設定
+// Shop purchase rate
 // ---------------------------------------------------------------------------
 // shop_taxDecision1(this._eventId);
-// 値引き率はセルフスイッチ(10)の変数値。負値が値引き。
+// The discount rate is the self switch (10) variable value; negative means a discount.
+// Purchase rate of the shop event: the discount comes from the self switch (10)
+// variable value, a negative value being a discount. The negotiation flag (self
+// switch B) and the seduction state (self switch A) are reported through the
+// valueCountSet globals, as the following common events expect them.
 shop_taxDecision1 = function(eventId){
 
   valueCountSet1 = 0;
   valueCountSet2 = 0;
   valueCountSet3 = 0;
   valueRandomSet = 0;
-  $gameSwitches.setValue(380, false);
+  $gameSwitches.setValue(ITEM_SHOP_SWITCH.SHOP_NEGOTIATION, false);
 
-  const actor = $gameActors.actor($gameVariables.value(11));
+  const actor = $gameActors.actor($gameVariables.value(ITEM_SHOP_VARIABLE.CURRENT_VIEWPOINT_ACTOR_ID));
   const shopEvent = $gameMap.event(eventId);
   if (!actor || !shopEvent) return;
 
@@ -2058,39 +2321,61 @@ shop_taxDecision1 = function(eventId){
   $gameSystem.setBuyTaxTo(isNegotiated ? taxRate : 0);
   if (isHoneyTrapped) valueCountSet1 += 1;
 
-  if ($gameSwitches.value(138)) {//商業on
-    const shopEventMeta = shopEvent.event().meta || {};
-    if (shopEventMeta['Man'] && actor.battleSkillsRaw().contains(valueHoneyTrapSkillId)) {
-      valueCountSet2 += 1;
-    }
-    //交渉は一日一回
-    if (!isNegotiated) $gameSwitches.setValue(380, true);
+  if ($gameSwitches.value(ITEM_SHOP_SWITCH.COMMERCE_ENABLED)) {// commerce on
+    markShopNegotiationState(shopEvent, actor, isNegotiated);
   }
 
   if (taxRate > -1) return;
-  const negotiableLabel = `値段交渉済み：`;//翻訳対象
-  const discountLabel = `の値引きが行われます。`;//翻訳対象
-  const taxInfoText = `${negotiableLabel}${colorTaggedText(10, `${-taxRate}%`)}${discountLabel}`;
-  CommonPopupManager.showInfo({}, taxInfoText, null);
-};
+  showNegotiatedDiscount(taxRate);
+}
 
-// ショップの購入レート設定。順番にコモンでウェイトを挟んでいる shop_taxDecision2(this._eventId,1);
+// Commerce switch branch: the shop keeper offers a negotiation and, unless it was
+// already used, the negotiation switch (380) is raised.
+function markShopNegotiationState(shopEvent, actor, isNegotiated) {
+  const shopEventMeta = shopEvent.event().meta || {};
+  if (shopEventMeta['Man'] && actor.battleSkillsRaw().contains(valueHoneyTrapSkillId)) {
+    valueCountSet2 += 1;
+  }
+  // Negotiation is allowed once a day.
+  if (!isNegotiated) $gameSwitches.setValue(ITEM_SHOP_SWITCH.SHOP_NEGOTIATION, true);
+}
+
+// Discount line shown when the shop is already negotiated with.
+function showNegotiatedDiscount(taxRate) {
+  const discountText = colorTaggedText(10, `${-taxRate}%`);
+  const taxInfoText = `値段交渉済み：${discountText}の値引きが行われます。`;
+  CommonPopupManager.showInfo({}, taxInfoText, null);
+}
+
+// Shop purchase rate steps, spaced by common events: shop_taxDecision2(this._eventId,1)
+// Shop negotiation steps, spaced by common events:
+// 1 shows the window, 2 plays the seduction scene, 3 rolls the outcome, 4 shows the result.
 shop_taxDecision2 = function(eventId,decisionModeId){
 
-  $gameSwitches.setValue(380, false);
+  $gameSwitches.setValue(ITEM_SHOP_SWITCH.SHOP_NEGOTIATION, false);
 
-  const actor = $gameActors.actor($gameVariables.value(11));
+  const actor = $gameActors.actor($gameVariables.value(ITEM_SHOP_VARIABLE.CURRENT_VIEWPOINT_ACTOR_ID));
   if (!actor) return;
 
-  if (decisionModeId == 1) startTaxDecisionWindow();
-  if (decisionModeId == 2) playHoneyTrapScene(actor);
-  if (decisionModeId == 3) rollTaxDecision(eventId, actor);
-  if (decisionModeId == 4) finishTaxDecision(eventId);
-};
+  switch (decisionModeId) {
+    case 1:
+      startTaxDecisionWindow();
+      break;
+    case 2:
+      playHoneyTrapScene(actor);
+      break;
+    case 3:
+      rollTaxDecision(eventId, actor);
+      break;
+    case 4:
+      finishTaxDecision(eventId);
+      break;
+  }
+}
 
-// 1: 交渉中ウィンドウを出す。
+// 1: show the negotiation window.
 function startTaxDecisionWindow() {
-  $gameVariables.setValue(21, `値引き交渉を行っています…。\n`);//翻訳対象
+  $gameVariables.setValue(ITEM_SHOP_VARIABLE.TEMPORARY_TEXT, `値引き交渉を行っています…。` + '\n');
   $gameScreen.dTextRealTime = 'ON';
   $gameScreen.dWindowFrame = 'ON';
   $gameScreen.setDTextPicture(`\\V[21]`, 28);
@@ -2100,7 +2385,7 @@ function startTaxDecisionWindow() {
   $gameScreen.movePicture(negotiationPictureId, 0, 10, 100, 100, 100, 255, 0, 60);
 }
 
-// 2: 色仕掛け演出。ピクチャは variant ごとに [ID, 画像, 開始X, 終了X, 不透明度] で並べる。
+// 2: seduction animation; each variant lists [id, picture, start x, end x, opacity].
 const HONEY_TRAP_PICTURE_SETS = {
   1: [
     [55, 'ScreenBlackOut', 640 - 100, 640, 200],
@@ -2111,7 +2396,7 @@ const HONEY_TRAP_PICTURE_SETS = {
     [55, 'Screen_Width512Black', 1024 - 100, 1024 - 50, 200],
     [56, 'Zev_HoneyTrap1_2', 1024 + 128, 1024, 255]
   ],
-  // variant 3 は抽選対象([1,2])に含まれないため実際には使われない。
+  // Variant 3 is not part of the [1,2] draw, so it never runs.
   3: [
     [55, 'ScreenBlackOut', 640 - 100, 640, 200],
     [56, 'Zev_HoneyTrap1_3', 640 + 50, 640, 250]
@@ -2122,7 +2407,7 @@ function playHoneyTrapScene() {
   valueRandomSet = 10;
   const honeyTrapParticle = 'hStates_hexpUp';
   $gameScreen._particle.particleSet(0, honeyTrapParticle, 'screen', 'def', 'spriteset');
-  AudioManager.playSe({ "name": 'ZH_Sexy', "volume": 40, "pitch": 130, "pan": 0 });
+  AudioManager.playSe({ name: 'ZH_Sexy', volume: 40, pitch: 130, pan: 0 });
   $gameScreen.startFlash([255, 119, 255, 200], 60);
 
   const trapVariantCandidates = [1, 2];
@@ -2132,7 +2417,7 @@ function playHoneyTrapScene() {
   }
 }
 
-// 1枚分のピクチャ表示(右から中央へスライド)。
+// Shows one picture sliding from the right to the centre.
 function showHoneyTrapPicture(trapPicture) {
   const [pictureId, pictureName, startX, endX, opacity] = trapPicture;
   const pictureY = 384;
@@ -2141,7 +2426,7 @@ function showHoneyTrapPicture(trapPicture) {
   $gameScreen.movePicture(pictureId, 1, endX, pictureY, 100, 100, opacity, 0, moveDuration);
 }
 
-// 3: 交渉の成否抽選。しきい値は <NoDiscount> で変化する。
+// 3: negotiation roll; the threshold changes with <NoDiscount>.
 const TAX_SUCCESS_THRESHOLDS = { normal: 60, noDiscount: 1000 };
 
 function rollTaxDecision(eventId, actor) {
@@ -2150,9 +2435,10 @@ function rollTaxDecision(eventId, actor) {
   const eventMeta = $gameMap.event(eventId).event().meta || {};
   const successThreshold = eventMeta['NoDiscount'] ? TAX_SUCCESS_THRESHOLDS.noDiscount : TAX_SUCCESS_THRESHOLDS.normal;
 
-  const formulaLabel = `成功計算式：`;//翻訳対象
-  const formulaText = `${formulaLabel}${colorTaggedText(2, `${rollScore}`)} >= ${colorTaggedText(1, `${successThreshold}`)} \n`;
-  $gameVariables.setValue(21, $gameVariables.value(21) + formulaText);
+  const rollScoreText = colorTaggedText(2, `${rollScore}`);
+  const thresholdText = colorTaggedText(1, `${successThreshold}`);
+  const formulaText = `成功計算式：${rollScoreText} >= ${thresholdText} ` + '\n';
+  $gameVariables.setValue(ITEM_SHOP_VARIABLE.TEMPORARY_TEXT, $gameVariables.value(ITEM_SHOP_VARIABLE.TEMPORARY_TEXT) + formulaText);
 
   if (rollScore < successThreshold) return;
 
@@ -2161,71 +2447,97 @@ function rollTaxDecision(eventId, actor) {
   valueCountSet3 = 1;
 }
 
-// 4: 結果表示。成功していればセルフAを立てる。
-function finishTaxDecision(eventId) {
-  const mapId = $gameMap.mapId();
+// 4: result display; a success raises self switch A.
+// Appends a line to the negotiation window text (variable 21).
+function appendNegotiationText(lineText) {
+  const currentText = $gameVariables.value(ITEM_SHOP_VARIABLE.TEMPORARY_TEXT);
+  $gameVariables.setValue(ITEM_SHOP_VARIABLE.TEMPORARY_TEXT, currentText + lineText);
+}
 
-  if (valueCountSet3 != 1) {
-    $gamePlayer.requestBalloon(6);
-    AudioManager.playSe({ "name": 'Down1', "volume": 90, "pitch": 100, "pan": 0 });
-    $gameVariables.setValue(21, $gameVariables.value(21) + `交渉失敗…。`);//翻訳対象
-    $gameSelfSwitches.setValue([mapId, eventId, 'B'], true);
-    return;
-  }
+// Failed negotiation: the shop keeps its price and the negotiation is used up.
+function finishFailedTaxDecision(mapId, eventId) {
+  $gamePlayer.requestBalloon(6);
+  AudioManager.playSe({ name: 'Down1', volume: 90, pitch: 100, pan: 0 });
+  appendNegotiationText(`交渉失敗…。`);
+  $gameSelfSwitches.setValue([mapId, eventId, 'B'], true);
+}
 
-  AudioManager.playSe({ "name": 'Z11_QuestClear', "volume": 50, "pitch": 130, "pan": 0 });
+// Successful negotiation: the discount line is shown and the negotiation is used up.
+// Self switch A is raised as well when the seduction discount succeeded.
+function finishSucceededTaxDecision(mapId, eventId) {
+  AudioManager.playSe({ name: 'Z11_QuestClear', volume: 50, pitch: 130, pan: 0 });
   const discountRate = $gameSelfSwitches.getVariableValue([mapId, eventId, 10]);
-  const successLabel = `交渉成功！ `;//翻訳対象
-  const discountLabel = `%の値引きが行われます。\n`;//翻訳対象
-  $gameVariables.setValue(21,
-    $gameVariables.value(21) + `${successLabel}${colorTaggedText(10, `${discountRate}${discountLabel}`)}`);
+  const discountText = colorTaggedText(10, `${discountRate}%の値引きが行われます。` + '\n');
+  appendNegotiationText(`交渉成功！ ${discountText}`);
 
-  //色仕掛け使用時に値引き成功でセルフAオン
   if (valueCountSet2 == 1) $gameSelfSwitches.setValue([mapId, eventId, 'A'], true);
   $gameSelfSwitches.setValue([mapId, eventId, 'B'], true);
 }
 
+function finishTaxDecision(eventId) {
+  const mapId = $gameMap.mapId();
+
+  if (valueCountSet3 != 1) {
+    finishFailedTaxDecision(mapId, eventId);
+    return;
+  }
+  finishSucceededTaxDecision(mapId, eventId);
+}
+
 // ---------------------------------------------------------------------------
-// 価格と所持金の比較
+// Price versus owned amount
 // ---------------------------------------------------------------------------
 // shop_priceComparison(10000,0,0);
-// costAmount 0 なら品物から価格を引く。currencyTypeId 0=所持金 1=コイン(変数69) 2=戦貨(アイテム10)。
+// costAmount 0 reads the price of the entry; currencyTypeId 0 gold, 1 coins (variable 69), 2 war medals (item 10).
+// Price comparison line of the shop: "label:owned unit - price unit = change unit".
+function buildShortageText(currency, costAmount, ownedAmount) {
+  const ownedText = ownedAmount.toLocaleString();
+  const costText = costAmount.toLocaleString();
+  return `${currency.label}:${ownedText}${currency.unit} < `
+    + `支払額:${costText}${currency.unit}　所持金が足りなかった…`;
+}
+
+// Change line of the shop when the party can pay.
+function buildChangeText(currency, costAmount, ownedAmount) {
+  const priceDifference = ownedAmount - costAmount;
+  const ownedText = ownedAmount.toLocaleString();
+  const costText = costAmount.toLocaleString();
+  const changeText = colorTaggedText(14, `${priceDifference.toLocaleString()}${currency.unit}`);
+  return `${currency.label}:${ownedText}${currency.unit} - `
+    + `支払額:${costText}${currency.unit} = `
+    + changeText + `…`;
+}
+
+// Compares the price with the owned amount and pays it when the party can afford it.
+// costAmount 0 reads the price of the entry; currencyTypeId 0 gold, 1 coins, 2 war medals.
 shop_priceComparison = function(costAmount,currencyTypeId,itemId){
 
   valuePriceSet1 = costAmount;
-  let ownedAmount = $gameParty.gold();
-
   if (costAmount == 0) {
     valuePriceSet1 = resolvePurchasePrice(currencyTypeId, itemId);
   }
 
   const currency = purchaseCurrency(currencyTypeId, costAmount);
-  ownedAmount = currency.ownedAmount;
+  const ownedAmount = currency.ownedAmount;
 
   if (ownedAmount < costAmount) {
-    const priceComparisonText = `${currency.label}:${ownedAmount.toLocaleString()}${currency.unit} < `
-      + `支払額:${costAmount.toLocaleString()}${currency.unit}　所持金が足りなかった…`;//翻訳対象
-    CommonPopupManager.showInfo({}, priceComparisonText, null);
-    $gameSwitches.setValue(380, false);
+    CommonPopupManager.showInfo({}, buildShortageText(currency, costAmount, ownedAmount), null);
+    $gameSwitches.setValue(ITEM_SHOP_SWITCH.SHOP_NEGOTIATION, false);
     return;
   }
 
-  const priceDifference = ownedAmount - costAmount;
-  const priceComparisonText = `${currency.label}:${ownedAmount.toLocaleString()}${currency.unit} - `
-    + `支払額:${costAmount.toLocaleString()}${currency.unit} = `
-    + colorTaggedText(14, `${priceDifference.toLocaleString()}${currency.unit}`) + `…`;
-  CommonPopupManager.showInfo({}, priceComparisonText, null);
-  AudioManager.playSe({ "name": 'Shop', "volume": 90, "pitch": 100, "pan": 0 });
+  CommonPopupManager.showInfo({}, buildChangeText(currency, costAmount, ownedAmount), null);
+  AudioManager.playSe({ name: 'Shop', volume: 90, pitch: 100, pan: 0 });
 
   payPurchaseCost(costAmount, currencyTypeId);
-  $gameSwitches.setValue(380, true);
-};
+  $gameSwitches.setValue(ITEM_SHOP_SWITCH.SHOP_NEGOTIATION, true);
+}
 
-// 品物の価格(<Buy Price> 優先)。
+// Price of an entry, <Buy Price> first.
 function resolvePurchasePrice(currencyTypeId, itemId) {
   const entries = itemShopDatabase(currencyTypeId);
   if (!entries) return 0;
-  valueItems = entries;//元コードと同じくグローバルにも残す
+  valueItems = entries;// kept as a global, as the original did
 
   const purchaseItem = entries[itemId];
   let comparedPrice = 0;
@@ -2234,21 +2546,21 @@ function resolvePurchasePrice(currencyTypeId, itemId) {
   return comparedPrice;
 }
 
-// 通貨ごとの表示名・単位・所持量。costAmount 0 の時は所持金のまま(元コードどおり)。
+// Label, unit and owned amount per currency; costAmount 0 keeps gold, as the original did.
 function purchaseCurrency(currencyTypeId, costAmount) {
   if (costAmount >= 1 && currencyTypeId == 1) {
-    return { label: `コイン`, unit: `枚`, ownedAmount: $gameVariables.value(69) };//翻訳対象
+    return { label: `コイン`, unit: `枚`, ownedAmount: $gameVariables.value(ITEM_SHOP_VARIABLE.COIN_COUNT) };
   }
   if (costAmount >= 1 && currencyTypeId == 2) {
-    return { label: `戦貨`, unit: `枚`, ownedAmount: $gameParty.numItems($dataItems[10]) };//翻訳対象
+    return { label: `戦貨`, unit: `枚`, ownedAmount: $gameParty.numItems($dataItems[10]) };
   }
-  return { label: `所持金`, unit: `\\G`, ownedAmount: $gameParty.gold() };//翻訳対象
+  return { label: `所持金`, unit: `\\G`, ownedAmount: $gameParty.gold() };
 }
 
-// 支払い。コインは変数69、戦貨はアイテム10、それ以外は所持金。
+// Payment: coins use variable 69, war medals item 10, everything else gold.
 function payPurchaseCost(costAmount, currencyTypeId) {
   if (costAmount >= 1 && currencyTypeId == 1) {
-    $gameVariables.setValue(69, $gameVariables.value(69) - costAmount);
+    $gameVariables.setValue(ITEM_SHOP_VARIABLE.COIN_COUNT, $gameVariables.value(ITEM_SHOP_VARIABLE.COIN_COUNT) - costAmount);
     return;
   }
   if (costAmount >= 1 && currencyTypeId == 2) {
@@ -2259,11 +2571,56 @@ function payPurchaseCost(costAmount, currencyTypeId) {
 }
 
 // ---------------------------------------------------------------------------
-// ワンオフアイテム購入
+// One-off item purchase
 // ---------------------------------------------------------------------------
-// buyModeId 1=表示準備 2=購入 3=戦闘勝利 0=後片付け
+// buyModeId 1 prepares the display, 2 buys, 3 is a battle reward, 0 cleans up
 const ONE_OFF_BUY_PICTURE_ID = 101;
 const ONE_OFF_BUY_SUMMON_ICON_INDEX = 508;
+
+// One-off purchase modes: 1 prepares the window, 2 buys, 3 is a battle reward and
+// 0 removes the window again.
+const ONE_OFF_BUY_MODE_CLEANUP = 0;
+const ONE_OFF_BUY_MODE_PREPARE = 1;
+const ONE_OFF_BUY_MODE_PURCHASE = 2;
+const ONE_OFF_BUY_MODE_REWARD = 3;
+
+// Prepare mode: background, portrait and the weapon animation that goes with them.
+function showOneOffBuyPreview(purchaseItem, databaseTypeId, buyFlag) {
+  const passiveStateId = showOneOffBuyPictures(purchaseItem, buyFlag);
+  const pictureYOffset = showOneOffBuyItemPicture(purchaseItem, passiveStateId);
+  playOneOffBuyWeaponAnimation(purchaseItem, databaseTypeId, pictureYOffset);
+}
+
+// Purchase mode: the item is granted and the price stored in variable 22 is paid.
+function confirmOneOffBuyPurchase(purchaseItem) {
+  // Variable 22 holds the price prepared by the display mode.
+  const purchasePrice = $gameVariables.value(ITEM_SHOP_VARIABLE.TEMPORARY_VALUE);
+  $gameParty.gainItem(purchaseItem, 1);
+  $gameParty.loseGold(purchasePrice);
+
+  const itemLabel = `\x1bI[${purchaseItem.iconIndex}]` + colorTaggedText(16, purchaseItem.name);
+  const paidAmountText = colorTaggedText(1, `(-${purchasePrice}\\G)`);
+  CommonPopupManager.showInfo({}, `${itemLabel}を購入した。${paidAmountText}`, null);
+  AudioManager.playSe({ name: 'Shop1', volume: 90, pitch: 100, pan: 0 });
+}
+
+// Battle reward mode: the item is granted and its name is published for the ticker.
+function grantOneOffBuyReward(purchaseItem) {
+  $gameParty.gainItem(purchaseItem, 1);
+  const itemLabel = `\x1bI[${purchaseItem.iconIndex}]` + colorTaggedText(16, purchaseItem.name);
+  valueWordSet0 = `${itemLabel}を入手した！`;
+  AudioManager.playSe({ name: 'Z11_RareTreasureBox', volume: 50, pitch: 120, pan: 0 });
+  adv_partDirectPlay(18);
+}
+
+// Cleanup mode: the window pictures are erased again. The state and y offset are only
+// ever filled by the prepare mode, so the cleanup always runs with 0 / undefined here,
+// exactly like the original.
+function cleanupOneOffBuyPreview() {
+  pic_eraseP(0, [ONE_OFF_BUY_PICTURE_ID - 3, ONE_OFF_BUY_PICTURE_ID - 2]);
+  picture_fade1(ONE_OFF_BUY_PICTURE_ID, "fadeOut", 'Hscene005', 60, 5);
+  element_particleSet(0, ONE_OFF_BUY_PICTURE_ID, 0, undefined);
+}
 
 item_oneOffBuy = function(buyModeId,databaseTypeId,dbEntryId,buyFlag){
 
@@ -2274,50 +2631,27 @@ item_oneOffBuy = function(buyModeId,databaseTypeId,dbEntryId,buyFlag){
   const purchaseItem = valueItems;
   if (!purchaseItem) return;
 
-  // NOTE: 元コードは pictureYOffset を <ItemPicture> がある時だけ定義していたため、
-  // 無い場合は undefined(と NaN)が後続へ渡る。その挙動は変えていない。
-  let pictureYOffset;
-  let passiveStateId = 0;
-
-  if (buyModeId == 1) {
-    passiveStateId = showOneOffBuyPictures(purchaseItem, buyFlag);
-    pictureYOffset = showOneOffBuyItemPicture(purchaseItem, passiveStateId);
-    playOneOffBuyWeaponAnimation(purchaseItem, databaseTypeId, pictureYOffset);
-    return;
-  }
-
-  if (buyModeId == 2) {
-    $gameParty.gainItem(purchaseItem, 1);
-    $gameParty.loseGold($gameVariables.value(22));
-
-    const itemLabel = `\x1bI[${purchaseItem.iconIndex}]` + colorTaggedText(16, purchaseItem.name);
-    const paidAmount = `(-${$gameVariables.value(22)}\\G)`;
-    CommonPopupManager.showInfo({}, `${itemLabel}を購入した。${colorTaggedText(1, paidAmount)}`, null);//翻訳対象
-    AudioManager.playSe({ "name": 'Shop1', "volume": 90, "pitch": 100, "pan": 0 });
-    return;
-  }
-
-  if (buyModeId == 3) {//戦闘で勝利
-    $gameParty.gainItem(purchaseItem, 1);
-    const itemLabel = `\x1bI[${purchaseItem.iconIndex}]` + colorTaggedText(16, purchaseItem.name);
-    valueWordSet0 = `${itemLabel}を入手した！`;//翻訳対象
-    AudioManager.playSe({ "name": 'Z11_RareTreasureBox', "volume": 50, "pitch": 120, "pan": 0 });
-    adv_partDirectPlay(18);
-    return;
-  }
-
-  if (buyModeId == 0) {
-    pic_eraseP(0, [ONE_OFF_BUY_PICTURE_ID - 3, ONE_OFF_BUY_PICTURE_ID - 2]);
-    picture_fade1(ONE_OFF_BUY_PICTURE_ID, "fadeOut", 'Hscene005', 60, 5);
-    element_particleSet(0, ONE_OFF_BUY_PICTURE_ID, passiveStateId, pictureYOffset);
+  switch (buyModeId) {
+    case ONE_OFF_BUY_MODE_PREPARE:
+      showOneOffBuyPreview(purchaseItem, databaseTypeId, buyFlag);
+      break;
+    case ONE_OFF_BUY_MODE_PURCHASE:
+      confirmOneOffBuyPurchase(purchaseItem);
+      break;
+    case ONE_OFF_BUY_MODE_REWARD:
+      grantOneOffBuyReward(purchaseItem);
+      break;
+    case ONE_OFF_BUY_MODE_CLEANUP:
+      cleanupOneOffBuyPreview();
+      break;
   }
 };
 
-// 背景と立ち絵を出し、説明文(変数21)と価格(変数22)を設定する。
+// Shows the background and the portrait and sets the description (variable 21) and price (variable 22).
 function showOneOffBuyPictures(purchaseItem, buyFlag) {
   const backgroundPath = (buyFlag == 0)
     ? "/img/parallaxes/Scene_ItemsBuy"
-    : "/img/parallaxes/" + $gameVariables.value(508);
+    : "/img/parallaxes/" + $gameVariables.value(ITEM_SHOP_VARIABLE.MENU_BACKGROUND_NAME);
   $gameScreen.showPicture(ONE_OFF_BUY_PICTURE_ID - 3, backgroundPath, 1, 640, 384, 100, 100, 0, 0);
   $gameScreen.movePicture(ONE_OFF_BUY_PICTURE_ID - 3, 1, 640, 384, 100, 100, 250, 0, 40);
 
@@ -2331,20 +2665,20 @@ function showOneOffBuyPictures(purchaseItem, buyFlag) {
     element_particleSet(1, ONE_OFF_BUY_PICTURE_ID, passiveStateId, 0);
   }
 
-  // NOTE: 変数22 は購入価格の一時保管として使われている(既存変数の流用)。
-  $gameVariables.setValue(22, purchaseItem.price);
+  // NOTE: variable 22 doubles as the temporary purchase price, as the original did.
+  $gameVariables.setValue(ITEM_SHOP_VARIABLE.TEMPORARY_VALUE, purchaseItem.price);
 
   const ownedLabel = $gameParty.hasItem(purchaseItem, true)
-    ? colorTaggedText(3, `所持済み`)//翻訳対象
+    ? colorTaggedText(3, `所持済み`)
     : `　`;
   const itemLabel = `\\$` + `\x1bI[${purchaseItem.iconIndex}]` + colorTaggedText(16, purchaseItem.name);
-  const priceLabel = `価格:`;//翻訳対象
-  $gameVariables.setValue(21,
-    `${itemLabel} ${priceLabel}${colorTaggedText(2, `${purchaseItem.price}\\G`)} ${ownedLabel}\n${purchaseItem.description}`);
+  const priceText = colorTaggedText(2, `${purchaseItem.price}\\G`);
+  $gameVariables.setValue(ITEM_SHOP_VARIABLE.TEMPORARY_TEXT,
+    `${itemLabel} 価格:${priceText} ${ownedLabel}` + '\n' + purchaseItem.description);
   return passiveStateId;
 }
 
-// <ItemPicture:x,y> の立ち絵を出す。戻り値は Y オフセット。
+// Shows the <ItemPicture:x,y> portrait and returns the y offset.
 function showOneOffBuyItemPicture(purchaseItem, passiveStateId) {
   const itemPictureValue = purchaseItem.meta['ItemPicture'];
   if (!itemPictureValue) return undefined;
@@ -2357,7 +2691,7 @@ function showOneOffBuyItemPicture(purchaseItem, passiveStateId) {
     const summonPath = `/img/sv_enemies/Summon_${itemPictureValues[0]}`;
     $gameScreen.showPicture(ONE_OFF_BUY_PICTURE_ID, summonPath, 1, 640, pictureY, 100, 100, 255, 0);
     picture_fade1(ONE_OFF_BUY_PICTURE_ID, "fadeIn", '162', 60, 5);
-    valueTachieBless = [100, 100, 250, 0.004, 0.003];//立ち絵用息遣い設定。基本状態
+    valueTachieBless = [100, 100, 250, 0.004, 0.003];// portrait breathing setup, base state
     tachie_bless(ONE_OFF_BUY_PICTURE_ID, 0);
     element_particleSet(2, ONE_OFF_BUY_PICTURE_ID, passiveStateId, pictureYOffset);
     return pictureYOffset;
@@ -2368,7 +2702,7 @@ function showOneOffBuyItemPicture(purchaseItem, passiveStateId) {
   return pictureYOffset;
 }
 
-// 武器/防具で特性43(アニメーション)を持つ場合の演出。
+// Animation used when a weapon or armor carries trait 43.
 function playOneOffBuyWeaponAnimation(purchaseItem, databaseTypeId, pictureYOffset) {
   if (databaseTypeId != ITEM_SHOP_DB_WEAPON && databaseTypeId != ITEM_SHOP_DB_ARMOR) return;
   if (!purchaseItem.traits[0] || purchaseItem.traits[0].code != 43) return;
@@ -2378,9 +2712,9 @@ function playOneOffBuyWeaponAnimation(purchaseItem, databaseTypeId, pictureYOffs
 }
 
 // ---------------------------------------------------------------------------
-// 経験値
+// Experience
 // ---------------------------------------------------------------------------
-// databaseTypeId 1 はスキル扱い(元コードのまま)。
+// databaseTypeId 1 is treated as a skill, as in the original.
 gain_itemGainExp1 = function(unusedArg1,actor,itemId,databaseTypeId){
 
   const gainExpSource = (databaseTypeId == ITEM_SHOP_DB_ITEM) ? $dataItems[itemId] : $dataSkills[itemId];
@@ -2389,20 +2723,20 @@ gain_itemGainExp1 = function(unusedArg1,actor,itemId,databaseTypeId){
   const gainExpAmount = gainExpSource.meta['gainExp'] ? Number(gainExpSource.meta['gainExp']) : 100;
   actor.changeExp(actor.currentExp() + gainExpAmount, false);
   if (actor.subclass()) actor.gainExpSubclass(gainExpAmount);
-  // NOTE: 元コードは表示用の文字列(gainExpMessage)を作るだけで使っていなかったため削除。
+  // NOTE: the original built an unused gainExpMessage string; it was removed.
 };
 
 // ---------------------------------------------------------------------------
-// 盗み
+// Stealing
 // ---------------------------------------------------------------------------
-const STEAL_BASE_SKILL_ID = 1;//盗みの極意
+const STEAL_BASE_SKILL_ID = 1;// mastery of stealing
 const STEAL_WITNESS_RATE_STEP = 10;
 const STEAL_DEFAULT_BOUNTY_CASH_RATE = 1000;
 
-// 盗み処理。steal_direction1(0,51,1);
+// Stealing, steal_direction1(0,51,1)
 steal_direction1 = function(databaseTypeId,dbEntryId,stealCount){
 
-  const actor = $gameActors.actor($gameVariables.value(2));
+  const actor = $gameActors.actor($gameVariables.value(ITEM_SHOP_VARIABLE.TRUE_PROTAGONIST_ACTOR_ID));
   if (!actor) return;
 
   const stealSuccessFlag = scanForStealWitness(actor);
@@ -2412,7 +2746,9 @@ steal_direction1 = function(databaseTypeId,dbEntryId,stealCount){
   valueItems = entries;
 
   const stolenItem = entries[dbEntryId];
-  const stealMessage = `\x1bI[${stolenItem.iconIndex}]${stolenItem.name}を${colorTaggedText(2, `${stealCount}個`)}盗んだ！`;//翻訳対象
+  const stolenItemLabel = `\x1bI[${stolenItem.iconIndex}]${stolenItem.name}`;
+  const stealCountText = colorTaggedText(2, `${stealCount}個`);
+  const stealMessage = `${stolenItemLabel}を${stealCountText}盗んだ！`;
   CommonPopupManager.showInfo({}, stealMessage, null);
   $gameParty.gainItem(stolenItem, stealCount);
 
@@ -2420,10 +2756,10 @@ steal_direction1 = function(databaseTypeId,dbEntryId,stealCount){
   reportStealBounty(stolenItem);
 };
 
-// 周囲のNPCが盗みを目撃するか調べる。目撃した人数分の吹き出しを出す。
+// Checks whether nearby NPCs witness the theft and shows one balloon per witness.
 function scanForStealWitness(actor) {
   const player = $gamePlayer;
-  // スキル1(盗みの極意)を覚えていれば探索範囲が狭くなる。
+  // Knowing skill 1 (mastery of stealing) narrows the search radius.
   const searchRadius = actor.isLearnedSkill(STEAL_BASE_SKILL_ID) ? 3 : 5;
   let stealSuccessFlag = 0;
 
@@ -2441,20 +2777,21 @@ function scanForStealWitness(actor) {
         stealSuccessFlag = 1;
         break;
       }
-      foundEvent.requestBalloon(2);//?ふきだし
+      foundEvent.requestBalloon(2);// balloon
     }
   }
   return stealSuccessFlag;
 }
 
-// 目撃候補は「不透明なNPC」。
+// Only opaque NPCs can witness the theft.
+// The scan origin is unused; it is kept so the helper keeps its original signature.
 function isWitnessCandidate(targetEvent, scanX, scanY) {
   const eventMeta = targetEvent.event().meta || {};
   if (!eventMeta['NPC']) return false;
   return targetEvent.opacity() >= 100;
 }
 
-// プレイヤーに背を向けているか(その場から見て逆方向を向いている)。
+// Whether the event faces away from the player.
 function isFacingAwayFromPlayer(targetEvent, scanX, scanY) {
   const player = $gamePlayer;
   const eventDirection = targetEvent.direction();
@@ -2464,10 +2801,10 @@ function isFacingAwayFromPlayer(targetEvent, scanX, scanY) {
     || (scanX >= player.x + 1 && eventDirection == 4);
 }
 
-// 目撃判定。スキル1の熟練度×10% の確率で目撃される。
+// Witness roll: mastery of skill 1 times ten percent.
 function rollStealWitness(actor) {
   const witnessRandom = getRandomIndex(101);
-  // スキル未習得時はしきい値0のまま比較する(出目0のときだけ目撃される)。
+  // Without the skill the threshold stays 0, so only a roll of 0 witnesses the theft.
   const witnessThreshold = actor.isLearnedSkill(STEAL_BASE_SKILL_ID)
     ? actor.skillMasteryLevel(STEAL_BASE_SKILL_ID) * STEAL_WITNESS_RATE_STEP
     : 0;
@@ -2477,25 +2814,35 @@ function rollStealWitness(actor) {
   return witnessThreshold >= witnessRandom;
 }
 
-// 盗みを目撃された時の賞金加算と表示。
+// Bounty increase and display when the theft was witnessed.
+// Bounty line shown to the player when the theft was witnessed.
+function buildStealBountyMessage(bountyPrice, bountyCashRate, bountyTotal) {
+  const bountyAmountText = colorTaggedText(10, `+${bountyPrice + bountyCashRate}(${bountyTotal})\\G`);
+  const karmaAmountText = colorTaggedText(10, `+1(\\V[231])`);
+  return `盗みを目撃された！　<賞金額:${bountyAmountText} カルマ値:${karmaAmountText}>`;
+}
+
+// Adds the bounty of a witnessed theft to the weapon it is bound to.
 function reportStealBounty(stolenItem) {
-  const bountyPrice = stolenItem.meta['Buy Price'] ? Number(stolenItem.meta['Buy Price']) : stolenItem.price;
-  const bountyWeapon = $dataWeapons[$gameVariables.value(230)];
-  const bountyCashRate = (bountyWeapon && bountyWeapon.meta['bountyCashRate'])
-    ? Number(bountyWeapon.meta['bountyCashRate'])
+  const stolenItemMeta = stolenItem.meta;
+  const bountyPriceNote = stolenItemMeta['Buy Price'];
+  const bountyPrice = bountyPriceNote ? Number(bountyPriceNote) : stolenItem.price;
+  const bountyWeaponId = $gameVariables.value(ITEM_SHOP_VARIABLE.WEAPON_ID);
+  const bountyWeapon = $dataWeapons[bountyWeaponId];
+  const bountyWeaponMeta = bountyWeapon ? bountyWeapon.meta : {};
+  const bountyCashRateNote = bountyWeaponMeta['bountyCashRate'];
+  const bountyCashRate = bountyCashRateNote
+    ? Number(bountyCashRateNote)
     : STEAL_DEFAULT_BOUNTY_CASH_RATE;
 
-  const bountyIndex = $gameVariables.value(230);
-  $gameVariables.value(501)[bountyIndex] += bountyPrice + bountyCashRate;
-  const bountyTotal = $gameVariables.value(501)[bountyIndex];
+  const bountyTotals = $gameVariables.value(ITEM_SHOP_VARIABLE.BOUNTY_TOTALS);
+  bountyTotals[bountyWeaponId] += bountyPrice + bountyCashRate;
+  const bountyTotal = bountyTotals[bountyWeaponId];
 
-  $gameVariables.setValue(231, $gameVariables.value(231) + 1);
-  const bountyLabel = `盗みを目撃された！　<賞金額:`;//翻訳対象
-  const karmaLabel = ` カルマ値:`;//翻訳対象
-  const karmaAmount = `+1(\\V[231])`;
-  const stealMessage = `${bountyLabel}${colorTaggedText(10, `+${bountyPrice + bountyCashRate}(${bountyTotal})\\G`)}`
-    + `${karmaLabel}${colorTaggedText(10, karmaAmount)}>`;
-  CommonPopupManager.showInfo({}, stealMessage, null);
+  const bountyPaidCount = $gameVariables.value(ITEM_SHOP_VARIABLE.BOUNTY_PAID_COUNT);
+  $gameVariables.setValue(ITEM_SHOP_VARIABLE.BOUNTY_PAID_COUNT, bountyPaidCount + 1);
+
+  CommonPopupManager.showInfo({}, buildStealBountyMessage(bountyPrice, bountyCashRate, bountyTotal), null);
 }
 
 //}());
