@@ -288,7 +288,7 @@
     if (!$gameSwitches.value(GAME_SWITCH.RECOLLECTION_SKIP)) {
       let actorName = "";
       if (targetTypeId == 0) {
-        $gameVariables.value(380 + targetId)[59] = `${professionName}`;
+        $gameVariables.value(GAME_VARIABLE.ACTOR_RECORD_BASE + targetId)[59] = `${professionName}`;
         actorName = $gameActors.actor(targetId).name();
       } else {
         $gameVariables.value(GAME_VARIABLE.NPC_PROFESSIONS)[targetId - 300] =
@@ -312,7 +312,7 @@
 
     const dataActor = $dataActors[actorId];
     if (!dataActor) return;
-    const actorRecords = $gameVariables.value(380 + actorId);
+    const actorRecords = $gameVariables.value(GAME_VARIABLE.ACTOR_RECORD_BASE + actorId);
     if (!Array.isArray(actorRecords)) return;
     //const actor = $dataActors[actorId]; // was set by default
     let defaultProfession = `${dataActor.meta["Profession"]}`;
@@ -1346,6 +1346,65 @@
   const yNegativeOffsetOptions = [-30, -25, -20, -10, -5, 0];
   const yPositiveOffsetOptions = [30, 25, 20, 10, 5, 0];
   //エネミーグループ設定$gameVariables.value(270)//$gameVariables.value(232)
+  // One member of a generated troop: enemy id, position and hide flag.
+  function buildTroopMember(enemyId, spawnX, spawnY, isHidden) {
+    return { enemyId: enemyId, x: spawnX, y: spawnY, hidden: isHidden };
+  }
+
+  // The last spawned enemy is hidden as a spare slot, unless it is the only one.
+  function isSpareSpawnHidden(spawnIndex, enemyCountToSpawn) {
+    return spawnIndex >= enemyCountToSpawn && enemyCountToSpawn != 1;
+  }
+
+  // Fills one troop with the enemies of the spawn pool.
+  function pushSpawnTroopMembers(enemyTroop, enemyCountToSpawn, spawnPool) {
+    const spawnPoolLength = spawnPool.length;
+    const spawnTracker = { hasSpawned27: false, hasSpawned28: false };
+    for (let spawnIndex = 1; spawnIndex <= enemyCountToSpawn; spawnIndex++) {
+      const enemySpawnId = resolveEnemySpawnIdEnemyTroopPush(
+        spawnPool,
+        spawnPoolLength,
+        spawnTracker
+      );
+      const { spawnX, spawnY } = getSpawnCoordinatesEnemyTroopPush(
+        spawnIndex,
+        enemyCountToSpawn,
+        xOffsetOptions,
+        yNegativeOffsetOptions,
+        yPositiveOffsetOptions
+      );
+      enemyTroop.members.push(
+        buildTroopMember(
+          enemySpawnId,
+          spawnX,
+          spawnY,
+          isSpareSpawnHidden(spawnIndex, enemyCountToSpawn)
+        )
+      );
+    }
+  }
+
+  // Random enemy of the H spawn pool, picked once per member.
+  function resolveHEnemySpawnId(spawnPoolH) {
+    return Number(spawnPoolH[getRandomIndex(spawnPoolH.length)]) || 0; //出現エネミースポーン
+  }
+
+  // Fills the H troop with members of the H spawn pool; the members are never hidden.
+  function pushHEnemyTroopMembers(enemyTroopH, enemyCountToSpawn, spawnPoolH) {
+    for (let spawnIndex = 1; spawnIndex <= enemyCountToSpawn; spawnIndex++) {
+      const { spawnX, spawnY } = getSpawnCoordinatesHEnemyTroopPush(
+        spawnIndex,
+        enemyCountToSpawn,
+        xOffsetOptions,
+        yNegativeOffsetOptions,
+        yPositiveOffsetOptions
+      );
+      enemyTroopH.members.push(
+        buildTroopMember(resolveHEnemySpawnId(spawnPoolH), spawnX, spawnY, false)
+      );
+    }
+  }
+
   enemy_troopPush = function () {
     if ($gameVariables.value(GAME_VARIABLE.ENEMY_SPAWN_POOL) === 0) return; // have empty common enemy's pool
 
@@ -1363,40 +1422,10 @@
 
       // get enemy spawn pool
       const spawnResult = calculateSpawnPoolEnemyTroopPush(spawnChanceOffset);
-      let spawnPool = spawnResult.pool;
       spawnChanceOffset = spawnResult.spawnChanceOffset;
 
       // add enemies to enemy troop
-      const spawnPoolLength = spawnPool.length;
-      const spawnTracker = { hasSpawned27: false, hasSpawned28: false };
-      for (let spawnIndex = 1; spawnIndex <= enemyCountToSpawn; spawnIndex++) {
-        // get enemy data
-        const enemySpawnId = resolveEnemySpawnIdEnemyTroopPush(
-          spawnPool,
-          spawnPoolLength,
-          spawnTracker
-        );
-        const { spawnX, spawnY } = getSpawnCoordinatesEnemyTroopPush(
-          spawnIndex,
-          enemyCountToSpawn,
-          xOffsetOptions,
-          yNegativeOffsetOptions,
-          yPositiveOffsetOptions
-        );
-        let isHidden =
-          spawnIndex >= enemyCountToSpawn && enemyCountToSpawn != 1
-            ? true
-            : false; //ラスト一人を隠している。エネミー一人の時は除外
-
-        // add enemy
-        const enemy = {
-          enemyId: enemySpawnId,
-          x: spawnX,
-          y: spawnY,
-          hidden: isHidden
-        }; //追加するエネミーの設定(ID1、座標(100,100)、表示有)
-        enemyTroop.members.push(enemy); //設定したエネミーをグループに追加
-      }
+      pushSpawnTroopMembers(enemyTroop, enemyCountToSpawn, spawnResult.pool);
     }
     $gameSwitches.setValue(GAME_SWITCH.ENEMY_POPUP_SETTING, true);
   };
@@ -1608,7 +1637,6 @@
     // H専用メタを持たないダンジョンもあるため、通常版のキーへフォールバックする
     enemyTroopH.name = troopMeta["TroopNameH"] || troopMeta["TroopName"];
     enemyTroopH.members = []; //グループのメンバーを空に
-    const spawnPoolHLength = spawnPoolH.length;
 
     // add enemies to enemy troop
     const battleEnemyPopHOptions = (
@@ -1617,28 +1645,8 @@
     const enemyCountToSpawn = Number(
       battleEnemyPopHOptions[getRandomIndex(battleEnemyPopHOptions.length)]
     );
-    for (let spawnIndex = 1; spawnIndex <= enemyCountToSpawn; spawnIndex++) {
-      // get enemy data
-      let enemySpawnId =
-        Number(spawnPoolH[getRandomIndex(spawnPoolHLength)]) || 0; //出現エネミースポーン
-      const { spawnX, spawnY } = getSpawnCoordinatesHEnemyTroopPush(
-        spawnIndex,
-        enemyCountToSpawn,
-        xOffsetOptions,
-        yNegativeOffsetOptions,
-        yPositiveOffsetOptions
-      );
-
-      // add enemy
-      // 元コードでも hidden は常に false 固定(算出していた value5 はコメントアウトされていた)
-      const enemy = {
-        enemyId: enemySpawnId,
-        x: spawnX,
-        y: spawnY,
-        hidden: false
-      }; //追加するエネミーの設定(ID1、座標(100,100)、表示有)
-      enemyTroopH.members.push(enemy); //設定したエネミーをグループに追加
-    }
+    // 元コードでも hidden は常に false 固定(算出していた value5 はコメントアウトされていた)
+    pushHEnemyTroopMembers(enemyTroopH, enemyCountToSpawn, spawnPoolH);
   };
 
   // Base position mapping for spawn indexes
@@ -2261,41 +2269,35 @@
     37, 81, 82, 197, 207, 222, 224, 226, 227, 232, 230, 235, 236, 240, 241, 251,
     256, 260, 266, 329, 507, 508
   ];
-  jouhou_map = function () {
-    // Run on every map loading
-
-    const gameVariables = $gameVariables;
-    const gameSwitches = $gameSwitches;
-    const dataMap = $dataMap;
-
-    // Reset map-related switches and variables
-    for (let i = 201; i <= 377; i++) {
-      gameSwitches.setValue(i, false);
+  // Clears every map related switch and variable before the new map is read.
+  function resetMapInfoState(gameSwitches, gameVariables) {
+    for (let switchId = 201; switchId <= 377; switchId++) {
+      gameSwitches.setValue(switchId, false);
     }
-
-    jouhouMapResetVariableIds.forEach((varId) => {
-      gameVariables.setValue(varId, 0);
+    jouhouMapResetVariableIds.forEach((variableId) => {
+      gameVariables.setValue(variableId, 0);
     });
+  }
 
-    // Process conditional map switches
-    const conditionalMapSwitches = gameVariables.value(356);
-    const foundMapSwitch = processMapConditionalSwitches(
-      dataMap,
-      gameSwitches,
-      gameVariables,
-      conditionalMapSwitches
-    );
+  // Applies the "MapSwi" default switches, unless a conditional map switch won.
+  function applyDefaultMapSwitches(dataMap, gameSwitches, foundMapSwitch) {
+    if (foundMapSwitch !== 0 || !dataMap.meta["MapSwi"]) return;
+    const switchIds = dataMap.meta["MapSwi"].split(",").map(Number);
+    switchIds.forEach((switchId) => {
+      if (switchId !== 0) {
+        gameSwitches.setValue(switchId, true);
+      }
+    });
+  }
 
-    // Apply default map switches if no conditions matched
-    if (foundMapSwitch === 0 && dataMap.meta["MapSwi"]) {
-      const switchIds = dataMap.meta["MapSwi"].split(",").map(Number);
-      switchIds.forEach((switchId) => {
-        if (switchId !== 0) {
-          gameSwitches.setValue(switchId, true);
-        }
-      });
-    }
-
+  // Map type, location and background setup of one map: everything that only needs
+  // the map notes and the map metadata.
+  function setupMapInfoSources(
+    dataMap,
+    gameVariables,
+    gameSwitches,
+    mapInfo
+  ) {
     // Extract map metadata
     const mapMeta = extractMapMetadata(dataMap);
 
@@ -2304,13 +2306,6 @@
 
     // Set town and battle map info
     setMapLocationInfo(gameSwitches, gameVariables);
-
-    // Determine current map info source
-    const mapInfo = determineMapInfoSource(
-      dataMap,
-      gameVariables,
-      gameSwitches
-    );
 
     // Play start sound effect
     mapPlayStartSoundEffect(mapInfo, gameSwitches);
@@ -2338,6 +2333,34 @@
 
     // Configure BGS and BGM
     setupMapBackgroundAudio(mapInfo, dataMap, gameVariables, gameSwitches);
+  }
+
+  jouhou_map = function () {
+    // Run on every map loading
+
+    const gameVariables = $gameVariables;
+    const gameSwitches = $gameSwitches;
+    const dataMap = $dataMap;
+
+    // Reset map-related switches and variables
+    resetMapInfoState(gameSwitches, gameVariables);
+
+    // Process conditional map switches
+    const conditionalMapSwitches = gameVariables.value(356);
+    const foundMapSwitch = processMapConditionalSwitches(
+      dataMap,
+      gameSwitches,
+      gameVariables,
+      conditionalMapSwitches
+    );
+
+    // Apply default map switches if no conditions matched
+    applyDefaultMapSwitches(dataMap, gameSwitches, foundMapSwitch);
+
+    // Determine current map info source
+    const mapInfo = determineMapInfoSource(dataMap, gameVariables, gameSwitches);
+
+    setupMapInfoSources(dataMap, gameVariables, gameSwitches, mapInfo);
   };
 
   // Helper Functions
@@ -3319,61 +3342,97 @@
   };
 
   //戦闘マップ殲滅回数による称号獲得
-  title_battleMapannihilation = function () {
-    const gameVar257 = $gameVariables.value(GAME_VARIABLE.DUNGEON_ANNIHILATION_COUNTS);
-    for (var itemId = 1; itemId <= $dataItems.length - 1; itemId++) {
-      const item = $dataItems[itemId];
-      if (item.meta["annihilationTitle"]) {
-        if (!$gameParty.hasItem(item, true)) {
-          var annihilationTitleValues =
-            item.meta["annihilationTitle"].split(",");
-          if (Number(annihilationTitleValues[0]) >= 20) {
-            if (gameVar257[Number(annihilationTitleValues[0])] >= 1) {
-              $gameVariables.setValue(GAME_VARIABLE.PROCESSED_ITEM_ID, itemId);
-            }
-          }
-          if (Number(annihilationTitleValues[0]) == 1) {
-            var annihilationCount = 0;
-            for (var itemId2 = 1; itemId2 <= 100; itemId2++) {
-              annihilationCount += gameVar257[itemId2];
-            }
-            if (annihilationCount >= Number(annihilationTitleValues[1])) {
-              $gameVariables.setValue(GAME_VARIABLE.PROCESSED_ITEM_ID, itemId);
-            }
-          }
-          if (Number(annihilationTitleValues[0]) == 2) {
-            var annihilationCount = 0;
-            for (var itemId2 = 1; itemId2 <= 100; itemId2++) {
-              const itemJ = $dataItems[itemId2];
-              if (!itemJ.meta["OnSwitch"]) {
-                continue;
-              }
-              var onSwitchValues = itemJ.meta["OnSwitch"].split(",");
-              for (
-                var switchIndex = 0;
-                switchIndex <= onSwitchValues.length - 1;
-                switchIndex++
-              ) {
-                if (!(Number(onSwitchValues[switchIndex]) == 207)) continue;
+  // Annihilation counters are read for item ids 1..100.
+  const ANNIHILATION_COUNT_RANGE_END = 100;
+  // Dungeon items are recognised by this switch inside their "OnSwitch" note.
+  const DUNGEON_CATEGORY_SWITCH_ID = 207;
 
-                annihilationCount += gameVar257[itemId2];
-                break;
-              }
-            }
-            if (annihilationCount >= Number(annihilationTitleValues[1])) {
-              $gameVariables.setValue(GAME_VARIABLE.PROCESSED_ITEM_ID, itemId);
-              $gameParty.gainItem(item, 1);
-            }
-          }
-        }
-      }
-    }
-    if (
-      $gameParty.hasItem(
-        $dataItems[$gameVariables.value(GAME_VARIABLE.PROCESSED_ITEM_ID)],
-        true
-      )
+  // Remembers the title item the checks have just awarded.
+  function markProcessedItem(itemId) {
+    $gameVariables.setValue(GAME_VARIABLE.PROCESSED_ITEM_ID, itemId);
+  }
+
+  // Total annihilation count of every dungeon.
+  function sumAnnihilationCounts(annihilationCounts) {
+    let annihilationCount = 0;
+    for (
+      let counterIndex = 1;
+      counterIndex <= ANNIHILATION_COUNT_RANGE_END;
+      counterIndex++
     ) {
+      annihilationCount += annihilationCounts[counterIndex];
+    }
+    return annihilationCount;
+  }
+
+  // Total annihilation count of the dungeon items only, that is the items whose
+  // "OnSwitch" note contains the dungeon category switch.
+  function sumDungeonAnnihilationCounts(annihilationCounts) {
+    let annihilationCount = 0;
+    for (
+      let itemId = 1;
+      itemId <= ANNIHILATION_COUNT_RANGE_END;
+      itemId++
+    ) {
+      const itemData = $dataItems[itemId];
+      const onSwitchMeta = itemData && itemData.meta["OnSwitch"];
+      if (!onSwitchMeta) continue;
+      if (!hasOnSwitchId(onSwitchMeta, DUNGEON_CATEGORY_SWITCH_ID)) continue;
+
+      annihilationCount += annihilationCounts[itemId];
+    }
+    return annihilationCount;
+  }
+
+  // True when the comma separated "OnSwitch" note lists the given switch id.
+  function hasOnSwitchId(onSwitchMeta, switchId) {
+    for (const switchField of onSwitchMeta.split(",")) {
+      if (Number(switchField) == switchId) return true;
+    }
+    return false;
+  }
+
+  // "<annihilationTitle>source,required" check of one title item: the source is a
+  // dungeon id (20+), the total count (1) or the dungeon item count (2).
+  function applyAnnihilationTitle(titleItem, itemId, annihilationCounts) {
+    const titleValues = titleItem.meta["annihilationTitle"].split(",");
+    const titleSourceId = Number(titleValues[0]);
+    const requiredCount = Number(titleValues[1]);
+
+    if (titleSourceId >= 20) {
+      if (annihilationCounts[titleSourceId] >= 1) markProcessedItem(itemId);
+      return;
+    }
+    if (titleSourceId == 1) {
+      if (sumAnnihilationCounts(annihilationCounts) >= requiredCount) {
+        markProcessedItem(itemId);
+      }
+      return;
+    }
+    if (titleSourceId != 2) return;
+    if (sumDungeonAnnihilationCounts(annihilationCounts) < requiredCount) return;
+
+    markProcessedItem(itemId);
+    $gameParty.gainItem(titleItem, 1);
+  }
+
+  title_battleMapannihilation = function () {
+    const annihilationCounts = $gameVariables.value(
+      GAME_VARIABLE.DUNGEON_ANNIHILATION_COUNTS
+    );
+    const itemCount = $dataItems.length;
+    for (let itemId = 1; itemId < itemCount; itemId++) {
+      const titleItem = $dataItems[itemId];
+      if (!titleItem || !titleItem.meta["annihilationTitle"]) continue;
+      if ($gameParty.hasItem(titleItem, true)) continue;
+
+      applyAnnihilationTitle(titleItem, itemId, annihilationCounts);
+    }
+
+    const processedItem = $dataItems[
+      $gameVariables.value(GAME_VARIABLE.PROCESSED_ITEM_ID)
+    ];
+    if ($gameParty.hasItem(processedItem, true)) {
       $gameVariables.setValue(GAME_VARIABLE.PROCESSED_ITEM_ID, 0);
     }
   };
@@ -3685,8 +3744,8 @@ item_gacha = function () {
     }
 
     // The label is built first: no function call inside the translatable sentence.
-    const gachaItemLabel = buildGachaItemLabel(lotteryRarity, valueGachaId);
-    const gachaResultMessage = gachaItemLabel + "が排出されました！";
+    const gachaItemName = buildGachaItemLabel(lotteryRarity, valueGachaId);
+    const gachaResultMessage = `${gachaItemName}が排出されました！`;
     if (!$gameSwitches.value(GAME_SWITCH.TEMPORARY_RESULT)) {
       $gameVariables.setValue(GAME_VARIABLE.RANDOM_WORK_2, gachaResultMessage);
       return;
@@ -4333,45 +4392,78 @@ item_gacha = function () {
   };
 
   //換金時にアイテム没収/解放時に放出スクリプト.1で実行 2で解除
+  // Confinement record layout: 0-2 item id lists per category, 3 the stored gold.
+  const CONFINEMENT_CATEGORY_COUNT = 3;
+  const CONFINEMENT_GOLD_SLOT = 3;
+  const CONFINEMENT_CATEGORY_LENGTH = 2001;
+
+  // Fresh confinement record: one id list per category plus the gold total. The
+  // record is stored first and then filled, as the engine keeps the array by
+  // reference and the transfer code expects that shape.
+  function initializeConfinementSlots() {
+    $gameVariables.setValue(GAME_VARIABLE.CASH_IN_ITEM_MEMORY, Array(4).fill(0));
+    const confinementSlots = $gameVariables.value(
+      GAME_VARIABLE.CASH_IN_ITEM_MEMORY
+    );
+    for (
+      let categoryId = 0;
+      categoryId < CONFINEMENT_CATEGORY_COUNT;
+      categoryId++
+    ) {
+      confinementSlots[categoryId] = Array(CONFINEMENT_CATEGORY_LENGTH).fill(0);
+    }
+    confinementSlots[CONFINEMENT_GOLD_SLOT] = 0;
+    return confinementSlots;
+  }
+
+  // Confiscates the party gold and adds it to the confinement record.
+  function confiscatePartyGold(confinementSlots) {
+    const partyGold = $gameParty.gold();
+    if (!(partyGold >= 1)) return;
+
+    const partyGoldText = colorTaggedText(1, partyGold.toLocaleString());
+    const confinementMessage = `アイテム類と所持金${partyGoldText}を奪われた…`;
+    CommonPopupManager.showInfo({}, confinementMessage, null);
+    confinementSlots[CONFINEMENT_GOLD_SLOT] += partyGold;
+    $gameParty.loseGold(partyGold);
+  }
+
+  // Gives the stored gold back and clears the gold slot.
+  function restoreConfinementGold(confinementSlots) {
+    const storedGold = confinementSlots[CONFINEMENT_GOLD_SLOT];
+    if (!(storedGold >= 1)) return;
+
+    const storedGoldText = colorTaggedText(5, storedGold.toLocaleString());
+    const confinementMessage = `アイテム類と所持金${storedGoldText}を取り戻した！`;
+    CommonPopupManager.showInfo({}, confinementMessage, null);
+    $gameParty.gainGold(storedGold);
+    confinementSlots[CONFINEMENT_GOLD_SLOT] = 0;
+  }
+
   item_confinementScript = function (confinementModeId) {
-    if (confinementModeId == 1) {
-      if ($gameVariables.value(GAME_VARIABLE.CASH_IN_ITEM_MEMORY)[0] == 0) {
-        $gameVariables.setValue(GAME_VARIABLE.CASH_IN_ITEM_MEMORY, Array(4).fill(0));
-        const newConfinementSlots = $gameVariables.value(GAME_VARIABLE.CASH_IN_ITEM_MEMORY);
-        for (var j = 0; j <= 3; j++) {
-          newConfinementSlots[j] = Array(2001).fill(0);
-        }
-        newConfinementSlots[3] = 0;
-      }
+    const isConfiscating = confinementModeId == 1;
+    if (
+      isConfiscating &&
+      $gameVariables.value(GAME_VARIABLE.CASH_IN_ITEM_MEMORY)[0] == 0
+    ) {
+      initializeConfinementSlots();
     }
+
     const confinementSlots = $gameVariables.value(GAME_VARIABLE.CASH_IN_ITEM_MEMORY);
-    if (confinementModeId == 1) {
-      const partyGold = $gameParty.gold();
-      if (partyGold >= 1) {
-        const partyGoldText = partyGold.toLocaleString();
-        const effectName = colorTaggedText(1, partyGoldText);
-        var confinementValue = `アイテム類と所持金${effectName}を奪われた…`;
-        CommonPopupManager.showInfo({}, confinementValue, null);
-        confinementSlots[3] += partyGold;
-        $gameParty.loseGold(partyGold);
-      }
+    if (isConfiscating) {
+      confiscatePartyGold(confinementSlots);
     } else {
-      if (confinementSlots[3] >= 1) {
-        const storedGold = confinementSlots[3];
-        const storedGoldText = storedGold.toLocaleString();
-        const effectName2 = colorTaggedText(5, storedGoldText);
-        var confinementValue = `アイテム類と所持金${effectName2}を取り戻した！`;
-        CommonPopupManager.showInfo({}, confinementValue, null);
-        $gameParty.gainGold(confinementSlots[3]);
-        confinementSlots[3] = 0;
-      }
+      restoreConfinementGold(confinementSlots);
     }
-    for (let categoryId = 0; categoryId <= 2; categoryId++)
-      transferConfinementCategory(
-        confinementSlots,
-        categoryId,
-        confinementModeId == 1
-      );
+
+    for (
+      let categoryId = 0;
+      categoryId < CONFINEMENT_CATEGORY_COUNT;
+      categoryId++
+    ) {
+      transferConfinementCategory(confinementSlots, categoryId, isConfiscating);
+    }
+
     if (confinementModeId == 0) {
       $gameVariables.setValue(GAME_VARIABLE.CASH_IN_ITEM_MEMORY, Array(4).fill(0));
     }
@@ -4488,53 +4580,45 @@ item_gacha = function () {
   }
 
   // Menu background selection (variant 0 = plain, 2 = double layer).
-  backGraund_menuMapSelect = function (
-    backgroundVariantId,
+  // Menu background sources of one menu call: the default sky, the home preset and
+  // the explicitly requested background, in ascending priority.
+  function applyMenuBackgroundSources(
+    gameVariables,
     backgroundName,
     horizontalScrollSpeed,
     verticalScrollSpeed
   ) {
-    const gameVariables = $gameVariables;
-    h_keikenhyouji2(521, 0);
-    $gameScreen.erasePicture(MENU_BACKGROUND_PICTURE_ID);
-    $gameScreen.erasePicture(MENU_BACKGROUND_SUB_PICTURE_ID);
-
     if (gameVariables.value(GAME_VARIABLE.MENU_BACKGROUND_NAME) == 0) {
       setMenuBackground(gameVariables, "BlueSky", 0.3, 0);
     }
     applyHomeBackgroundPreset(gameVariables);
 
-    if (backgroundName != 0) {
-      setMenuBackground(
-        gameVariables,
-        backgroundName,
-        horizontalScrollSpeed,
-        verticalScrollSpeed
-      );
-    }
-
-    const menuBackgroundName = gameVariables.value(
-      GAME_VARIABLE.MENU_BACKGROUND_NAME
+    if (backgroundName == 0) return;
+    setMenuBackground(
+      gameVariables,
+      backgroundName,
+      horizontalScrollSpeed,
+      verticalScrollSpeed
     );
-    if (menuBackgroundName == 0) return;
+  }
 
-    const hScrollSpeed = gameVariables.value(GAME_VARIABLE.BACKGROUND_SCROLL_X);
-    const vScrollSpeed = gameVariables.value(GAME_VARIABLE.BACKGROUND_SCROLL_Y);
-    Galv.CACHE.load("parallaxes", menuBackgroundName);
-    $gameSystem._backgroundName = menuBackgroundName;
+  // Parallax of the menu background, applied to the map when the event progress
+  // blocker owns the screen.
+  function applyMenuBackgroundParallax(menuBackgroundName, isEventProgressBlocked) {
+    if (!isEventProgressBlocked) return;
+    const hScrollSpeed = $gameVariables.value(GAME_VARIABLE.BACKGROUND_SCROLL_X);
+    const vScrollSpeed = $gameVariables.value(GAME_VARIABLE.BACKGROUND_SCROLL_Y);
+    $gameMap.changeParallax(
+      menuBackgroundName,
+      hScrollSpeed != 0,
+      vScrollSpeed != 0,
+      hScrollSpeed,
+      vScrollSpeed
+    );
+  }
 
-    if ($gameSwitches.value(GAME_SWITCH.EVENT_PROGRESS_BLOCKER)) {
-      $gameMap.changeParallax(
-        menuBackgroundName,
-        hScrollSpeed != 0,
-        vScrollSpeed != 0,
-        hScrollSpeed,
-        vScrollSpeed
-      );
-    }
-
-    if (isMenuBackgroundSuppressed()) return;
-
+  // Background picture layers; the sub layer is only used by the wide variant (2).
+  function showMenuBackgroundLayers(backgroundVariantId, menuBackgroundName) {
     const parallaxYOffset = getMenuBackgroundYOffset(menuBackgroundName);
     showMenuBackgroundLayer(
       MENU_BACKGROUND_PICTURE_ID,
@@ -4551,6 +4635,41 @@ item_gacha = function () {
       255,
       60
     );
+  }
+
+  backGraund_menuMapSelect = function (
+    backgroundVariantId,
+    backgroundName,
+    horizontalScrollSpeed,
+    verticalScrollSpeed
+  ) {
+    const gameVariables = $gameVariables;
+    h_keikenhyouji2(521, 0);
+    $gameScreen.erasePicture(MENU_BACKGROUND_PICTURE_ID);
+    $gameScreen.erasePicture(MENU_BACKGROUND_SUB_PICTURE_ID);
+
+    applyMenuBackgroundSources(
+      gameVariables,
+      backgroundName,
+      horizontalScrollSpeed,
+      verticalScrollSpeed
+    );
+
+    const menuBackgroundName = gameVariables.value(
+      GAME_VARIABLE.MENU_BACKGROUND_NAME
+    );
+    if (menuBackgroundName == 0) return;
+
+    Galv.CACHE.load("parallaxes", menuBackgroundName);
+    $gameSystem._backgroundName = menuBackgroundName;
+
+    applyMenuBackgroundParallax(
+      menuBackgroundName,
+      $gameSwitches.value(GAME_SWITCH.EVENT_PROGRESS_BLOCKER)
+    );
+    if (isMenuBackgroundSuppressed()) return;
+
+    showMenuBackgroundLayers(backgroundVariantId, menuBackgroundName);
   };
 
   //遠景をアイテム武器ＩＤで指定
@@ -4693,6 +4812,13 @@ item_gacha = function () {
       gameSwitches.setValue(timeSwitchId, false);
     });
     gameSwitches.setValue(savedTimeSwitchId, true);
+  }
+
+  // Turns every time-of-day switch off, so exactly one of them can be set after.
+  function clearTimeOfDaySwitches() {
+    for (const switchId of TIME_OF_DAY_SWITCH_IDS) {
+      $gameSwitches.setValue(switchId, false);
+    }
   }
 
   // Remembers which time-of-day switch was active before the scene took over.
@@ -4985,69 +5111,69 @@ item_gacha = function () {
   };
 
   //隊列順で次のヒロインを決定formation_orderSelectH(20,0);//formation_orderSelectH(167,2);
+  // Heroine ids of the current party, in party order.
+  function collectPartyHeroineIds() {
+    const heroineIds = [];
+    for (const partyMember of $gameParty.members()) {
+      if (isGirl(partyMember)) heroineIds.push(partyMember.actorId());
+    }
+    return heroineIds;
+  }
+
+  // Wraps the selection around the end of the heroine list: forwards from the first
+  // heroine for list mode 0, backwards from the last one for list mode 1.
+  function wrapHeroineSelection(targetVarId, listModeId) {
+    const heroineIds = valueHeroineCoice;
+    const isForwardWrap = listModeId == 0;
+    for (let step = 0; step < heroineIds.length; step++) {
+      const heroineIndex = isForwardWrap ? step : heroineIds.length - 1 - step;
+      const heroineId = heroineIds[heroineIndex];
+      if (!isGirl($gameActors.actor(heroineId))) continue;
+
+      $gameVariables.setValue(targetVarId, heroineId);
+      return true;
+    }
+    return false;
+  }
+
+  // Moves the selection to the next heroine of the list: backwards for list mode 0,
+  // forwards for list mode 1. The value is only set when the neighbour is a girl.
+  function selectNextHeroine(targetVarId, listModeId) {
+    const heroineIds = valueHeroineCoice;
+    const heroineCount = heroineIds.length;
+    const isBackwardList = listModeId == 0;
+    const edgeActorId = heroineIds[isBackwardList ? heroineCount - 1 : 0];
+    const actorIndexShift = isBackwardList ? 1 : -1;
+    const currentActorId = $gameVariables.value(targetVarId);
+    const partyMembers = $gameParty.members();
+
+    for (let heroineIndex = 0; heroineIndex < heroineCount; heroineIndex++) {
+      const heroineId = heroineIds[heroineIndex];
+      if (heroineId !== currentActorId) continue;
+
+      // The current heroine sits at the edge of the list: wrap around.
+      if (heroineId == edgeActorId) {
+        wrapHeroineSelection(targetVarId, listModeId);
+        return;
+      }
+      const nextActor =
+        partyMembers[$gameActors.actor(heroineId).index() + actorIndexShift];
+      if (!nextActor || !isGirl(nextActor)) return;
+
+      $gameVariables.setValue(targetVarId, nextActor.actorId());
+      return;
+    }
+  }
+
   formation_orderSelectH = function (targetVarId, listModeId) {
-    if (listModeId == 2) {
-      const partyMembers = $gameParty.members();
-      valueHeroineCoice = [];
-      for (
-        var memberIndex = 0;
-        memberIndex <= partyMembers.length - 1;
-        memberIndex++
-      ) {
-        if (isGirl(partyMembers[memberIndex])) {
-          valueHeroineCoice.push(partyMembers[memberIndex].actorId());
-        }
-      }
-      if (valueHeroineCoice.length >= 2) {
-        $gameSwitches.setValue(targetVarId, true);
-      }
-    } else {
-      let actorIndex1;
-      let actorIndexShift;
-      if (listModeId == 0) {
-        actorIndex1 = valueHeroineCoice.length - 1;
-        //var value4 = 0;
-        actorIndexShift = 1;
-      } else {
-        actorIndex1 = 0;
-        //var value4 = valueHeroineCoice.length-1;
-        actorIndexShift = -1;
-      }
-
-      const trySetActorIndex = (index) => {
-        const actorIndex = valueHeroineCoice[index];
-        const actor = $gameActors.actor(actorIndex);
-        if (isGirl(actor)) {
-          $gameVariables.setValue(targetVarId, actorIndex);
-          return true;
-        }
-        return false;
-      };
-
-      const len = valueHeroineCoice.length;
-      const partyMembers = $gameParty.members();
-      for (let i = 0; i < len; i++) {
-        const currentHeroineId = valueHeroineCoice[i];
-        if (currentHeroineId !== $gameVariables.value(targetVarId)) continue;
-        if (currentHeroineId == valueHeroineCoice[actorIndex1]) {
-          if (listModeId == 0) {
-            for (var j = 0; j < len; j++) if (trySetActorIndex(j)) break;
-            break;
-          } else if (listModeId == 1) {
-            const maxIndex = valueHeroineCoice.length - 1;
-            for (var j = maxIndex; j >= 0; j--) if (trySetActorIndex(j)) break;
-            break;
-          }
-        } else {
-          const actorIndex =
-            $gameActors.actor(valueHeroineCoice[i]).index() + actorIndexShift;
-          const actor = partyMembers[actorIndex];
-          if (actor && isGirl(actor)) {
-            $gameVariables.setValue(targetVarId, actor.actorId());
-            break;
-          }
-        }
-      }
+    // Mode 2 only refreshes the heroine list and reports whether it has two entries.
+    if (listModeId != 2) {
+      selectNextHeroine(targetVarId, listModeId);
+      return;
+    }
+    valueHeroineCoice = collectPartyHeroineIds();
+    if (valueHeroineCoice.length >= 2) {
+      $gameSwitches.setValue(targetVarId, true);
     }
   };
 
@@ -5553,6 +5679,41 @@ item_gacha = function () {
   };
 
   //選択肢でアイテム表示item_price()合わせて3面表示//選択肢のvalueは1からで選択肢ﾋﾟｸﾁｬは0からvalueWordArray
+  // Indent that keeps the quest board title on the right of the window.
+  const QUEST_BOARD_TITLE_INDENT = "　　　　　　　　　　　　　　　　　　　";
+  // Indent that keeps the quest board prompt below the title.
+  const QUEST_BOARD_PROMPT_INDENT = "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　";
+  const SELECTION_PROMPT_FONT = "\\FS[25]";
+  const SELECTION_PROMPT_TEXT = "対象を選択して下さい　　　　　　　　　　　　　　　　　　　　　　　　　　　";
+
+  // Header of the list: the quest board window (1) or the bulk sale prompt (2, 3).
+  // Returns the choice text of the list prompt.
+  function setupLoopChoiceHeader(listKindId) {
+    if (listKindId == 1) {
+      //クエスト掲示
+      WindowManager.show(0, 0, 0, 1280, 110);
+      WindowManager.drawText(0, QUEST_BOARD_TITLE_INDENT + QUEST_BOARD_TITLE);
+      return QUEST_BOARD_PROMPT_INDENT;
+    }
+    //一括売却
+    return SELECTION_PROMPT_FONT + SELECTION_PROMPT_TEXT;
+  }
+
+  // Label of one list entry: the caller prepared word list wins over the entry name.
+  function resolveLoopChoiceLabel(
+    listKindId,
+    entryCategoryId,
+    entryIndex,
+    entryId,
+    runningLabel
+  ) {
+    if (valueWordArray != 0) return `${valueWordArray[entryIndex]}`;
+
+    const categoryId =
+      listKindId == 3 ? valueCountArray2[entryIndex] : entryCategoryId;
+    return loopChoiceEntryLabel(entryId, categoryId, runningLabel);
+  }
+
   get_loopChoiceDisplay1 = function (listKindId, entryCategoryId, columnCount) {
     //get_loopChoiceDisplay1(1,0,1);//クエストid1は種類 id2が0道具1武器2防具 id3が列数WindowManager.hide(0);
     //get_loopChoiceDisplay1(2,0,2);//一括売却
@@ -5560,22 +5721,10 @@ item_gacha = function () {
 
     //picture_motion1("linear",[0]);
     $gameVariables.setValue(GAME_VARIABLE.CHOICE_COLUMN_COUNT, columnCount);
-    if (listKindId == 1) {
-      //クエスト掲示
-      WindowManager.show(0, 0, 0, 1280, 110);
-      var titleText = "　　　　　　　　　　　　　　　　　　　" + QUEST_BOARD_TITLE;
-      WindowManager.drawText(0, titleText);
-      var choicePromptText = "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　";
-    }
-    if (listKindId == 2 || listKindId == 3) {
-      //一括売却
-      const selectionPromptFont = "\\FS[25]";
-      const selectionPromptText =
-        "対象を選択して下さい　　　　　　　　　　　　　　　　　　　　　　　　　　　";
-      var choicePromptText = selectionPromptFont + selectionPromptText;
-    }
-    let choiceIndex = 1;
-    if (listKindId == 2 || listKindId == 3) {
+    const choicePromptText = setupLoopChoiceHeader(listKindId);
+
+    const isBulkSaleList = listKindId == 2 || listKindId == 3;
+    if (isBulkSaleList) {
       const customChoiceId = 1;
       const choiceParams = {
         text: choicePromptText,
@@ -5583,6 +5732,8 @@ item_gacha = function () {
       };
       $gameSystem.addCustomChoice(customChoiceId, choiceParams);
     }
+
+    let choiceIndex = 1;
     let choiceText = "";
     let detailsText = "";
     valueCountArray3 = [];
@@ -5590,12 +5741,13 @@ item_gacha = function () {
     const columnLayout = COLUMN_LAYOUT_BY_COUNT[columnCount];
     for (let entryIndex = 0; entryIndex < entryIds.length; entryIndex++) {
       const entryId = entryIds[entryIndex];
-      if (valueWordArray != 0) choiceText = `${valueWordArray[entryIndex]}`;
-      else {
-        const categoryId =
-          listKindId == 3 ? valueCountArray2[entryIndex] : entryCategoryId;
-        choiceText = loopChoiceEntryLabel(entryId, categoryId, choiceText);
-      }
+      choiceText = resolveLoopChoiceLabel(
+        listKindId,
+        entryCategoryId,
+        entryIndex,
+        entryId,
+        choiceText
+      );
       const details = loopChoiceEntryDetails(
         listKindId,
         entryCategoryId,
@@ -5654,7 +5806,7 @@ item_gacha = function () {
         resetFlags[entryIndex] == 0
           ? `${label}をリセットする`
           : `${label}をリセットしない`;
-      $gameVariables.setValue(800 + entryIndex, optionText);
+      $gameVariables.setValue(GAME_VARIABLE.OPTION_TEXT_BASE + entryIndex, optionText);
     }
   };
 
@@ -5995,10 +6147,10 @@ item_gacha = function () {
             $dataWeapons[permissionWeaponId].meta["PermissionCloth"];
           if (permissionClothMeta) {
             if (
-              $gameVariables.value(440 + girlActorId)[41] ==
+              $gameVariables.value(GAME_VARIABLE.ACTOR_NUDE_FLAGS_BASE + girlActorId)[41] ==
               Number(permissionClothMeta)
             ) {
-              const actorRecords = $gameVariables.value(380 + girlActorId);
+              const actorRecords = $gameVariables.value(GAME_VARIABLE.ACTOR_RECORD_BASE + girlActorId);
               if (actorRecords[5] > actorRecords[4]) {
                 $gameVariables.value(GAME_VARIABLE.OUTFIT_PERMISSION_FLAGS)[girlActorId] =
                   Number(permissionClothMeta);
@@ -6040,48 +6192,62 @@ item_gacha = function () {
   };
 
   //ダンジョンワプ機能スクリプト<warpShare:1>
-  dungeon_warpscript = function (warpModeId) {
-    if (warpModeId == 1) {
-      $gameSwitches.setValue(GAME_SWITCH.TEMPORARY_RESULT, false);
-      const chestId = $gameVariables.value(GAME_VARIABLE.DUNGEON_INFO_ITEM_ID);
-      const chestMeta = $dataItems[chestId].meta;
-      if (chestMeta["warpShare"]) {
-        const warpShareGroupId = Number(chestMeta["warpShare"]);
-        const warpPointFlags = $gameVariables.value(GAME_VARIABLE.DUNGEON_WARP_POINTS);
-        for (var itemId = 1; itemId <= $dataWeapons.length - 1; itemId++) {
-          const itemData = $dataItems[itemId];
-          if (itemData.meta["warpShare"]) {
-            if (Number(itemData.meta["warpShare"]) == warpShareGroupId) {
-              if (itemData.meta["warpStart"]) {
-                valueScriptArray1.push(itemData.meta["warpStart"].split(","));
-              }
-              for (var i = 1; i <= 9; i++) {
-                if (itemData.meta["warpPoint" + i]) {
-                  if (warpPointFlags[itemId][i] == 1) {
-                    valueScriptArray1.push(
-                      itemData.meta["warpPoint" + i].split(",")
-                    );
-                    $gameSwitches.setValue(GAME_SWITCH.TEMPORARY_RESULT, true);
-                  }
-                }
-              }
-            }
-          }
-        }
-      } else {
-        if (chestMeta["warpStart"]) {
-          valueScriptArray1.push(chestMeta["warpStart"].split(","));
-        }
-        const warpPointFlags = $gameVariables.value(GAME_VARIABLE.DUNGEON_WARP_POINTS)[chestId];
-        for (var i = 1; i <= 9; i++) {
-          if (chestMeta["warpPoint" + i]) {
-            if (warpPointFlags[i] == 1) {
-              valueScriptArray1.push(chestMeta["warpPoint" + i].split(","));
-              $gameSwitches.setValue(GAME_SWITCH.TEMPORARY_RESULT, true);
-            }
-          }
-        }
+  // Warp points of a dungeon item note: "warpPoint1".."warpPoint9".
+  const WARP_POINT_NOTE_COUNT = 9;
+
+  // Pushes the warp start and every unlocked warp point of one item meta block.
+  // Returns true when at least one warp point was unlocked.
+  function pushWarpEntries(itemMeta, pointFlags) {
+    if (itemMeta["warpStart"]) {
+      valueScriptArray1.push(itemMeta["warpStart"].split(","));
+    }
+
+    let hasUnlockedWarpPoint = false;
+    for (
+      let warpPointIndex = 1;
+      warpPointIndex <= WARP_POINT_NOTE_COUNT;
+      warpPointIndex++
+    ) {
+      const warpPointMeta = itemMeta["warpPoint" + warpPointIndex];
+      if (!warpPointMeta) continue;
+      if (pointFlags[warpPointIndex] != 1) continue;
+
+      valueScriptArray1.push(warpPointMeta.split(","));
+      hasUnlockedWarpPoint = true;
+    }
+    return hasUnlockedWarpPoint;
+  }
+
+  // Warp entries of the whole share group: every item with the same "<warpShare>".
+  function collectSharedWarpEntries(warpShareGroupId, warpPoints) {
+    for (let itemId = 1; itemId <= $dataWeapons.length - 1; itemId++) {
+      const itemData = $dataItems[itemId];
+      if (!itemData || !itemData.meta["warpShare"]) continue;
+      if (Number(itemData.meta["warpShare"]) != warpShareGroupId) continue;
+
+      if (pushWarpEntries(itemData.meta, warpPoints[itemId])) {
+        $gameSwitches.setValue(GAME_SWITCH.TEMPORARY_RESULT, true);
       }
+    }
+  }
+
+  dungeon_warpscript = function (warpModeId) {
+    if (warpModeId != 1) return;
+
+    $gameSwitches.setValue(GAME_SWITCH.TEMPORARY_RESULT, false);
+    const dungeonInfoItemId = $gameVariables.value(
+      GAME_VARIABLE.DUNGEON_INFO_ITEM_ID
+    );
+    const dungeonMeta = $dataItems[dungeonInfoItemId].meta;
+    const warpPoints = $gameVariables.value(GAME_VARIABLE.DUNGEON_WARP_POINTS);
+
+    if (dungeonMeta["warpShare"]) {
+      collectSharedWarpEntries(Number(dungeonMeta["warpShare"]), warpPoints);
+      return;
+    }
+    // Single dungeon: its own warp point flags.
+    if (pushWarpEntries(dungeonMeta, warpPoints[dungeonInfoItemId])) {
+      $gameSwitches.setValue(GAME_SWITCH.TEMPORARY_RESULT, true);
     }
   };
   function createRandomWordSegment(
@@ -6792,7 +6958,7 @@ item_gacha = function () {
     const actorIds = $gameVariables.value(GAME_VARIABLE.CHARACTER_ACTOR_IDS);
     actorIds.forEach(function (actorId) {
       $gameActors.actor(actorId).removeState(39);
-      $gameVariables.value(380 + actorId)[58] = 0;
+      $gameVariables.value(GAME_VARIABLE.ACTOR_RECORD_BASE + actorId)[58] = 0;
     }, parent);
   };
 
@@ -8306,7 +8472,7 @@ item_gacha = function () {
       const actor = $gameActors.actor(actorId);
       if (!actor) continue;
       const actorRecordId = actor.actorId();
-      const actorRecords = $gameVariables.value(380 + actorRecordId);
+      const actorRecords = $gameVariables.value(GAME_VARIABLE.ACTOR_RECORD_BASE + actorRecordId);
       updateTitleAchievementLeader(
         criticalHitRecord,
         actorRecordId,
@@ -8351,7 +8517,7 @@ item_gacha = function () {
 
     const partyOverkillRecord = [4, 0, 0]; //全員のオーバーキル回数
     for (var itemId = firstActorId; itemId <= lastActorId; itemId++) {
-      partyOverkillRecord[2] += $gameVariables.value(380 + itemId)[67];
+      partyOverkillRecord[2] += $gameVariables.value(GAME_VARIABLE.ACTOR_RECORD_BASE + itemId)[67];
     }
 
     return {
@@ -8414,7 +8580,7 @@ item_gacha = function () {
       titleCheckThreshold = Number(htitleGetArrayValues[1]);
       titleCheckResult =
         $gameVariables.value(
-          380 + $gameVariables.value(GAME_VARIABLE.TRUE_PROTAGONIST_ACTOR_ID)
+          GAME_VARIABLE.ACTOR_RECORD_BASE + $gameVariables.value(GAME_VARIABLE.TRUE_PROTAGONIST_ACTOR_ID)
         )[titleCheckVarId] >= titleCheckThreshold;
     }
     if (itemMeta["titleGetSkillRank"]) {
@@ -9118,7 +9284,7 @@ item_gacha = function () {
     const killCount = actor.getAllKillEnemyCounter();
     const attackDamageMax = actor.attackDamageMax;
     const attackDamageSum = actor.attackDamageSum;
-    const actorRecords = $gameVariables.value(380 + actorId);
+    const actorRecords = $gameVariables.value(GAME_VARIABLE.ACTOR_RECORD_BASE + actorId);
     return [
       killCount,
       attackDamageMax,
@@ -9439,39 +9605,29 @@ item_gacha = function () {
     valueJobReleaseTorF2[choiceIndex] = classId;
   }
 
+  // "Scene end time advance" value -> the switch of the resulting time of day.
+  const TIME_OF_DAY_SWITCH_BY_ADVANCE = {
+    1: GAME_SWITCH.MORNING,
+    2: GAME_SWITCH.DAYTIME,
+    3: GAME_SWITCH.NIGHT
+  };
+
   function restoreRegisteredSceneTime() {
-    if (
-      $gameVariables.value(GAME_VARIABLE.SCENE_PREVIOUS_TIME_SWITCH_ID) >= 1
-    ) {
-      for (var i = 13; i <= 15; i++) {
-        $gameSwitches.setValue(i, false);
-      }
-      $gameSwitches.setValue(
-        $gameVariables.value(GAME_VARIABLE.SCENE_PREVIOUS_TIME_SWITCH_ID),
-        true
-      );
-    }
+    // Puts back the time of day the scene interrupted, unless none was saved.
+    restoreSavedTimeSwitch($gameVariables, $gameSwitches);
     $gameVariables.setValue(GAME_VARIABLE.SCENE_PREVIOUS_TIME_SWITCH_ID, 0);
+
     const sceneTimeAdvance = $gameVariables.value(
       GAME_VARIABLE.SCENE_END_TIME_ADVANCE
     );
-    if (sceneTimeAdvance >= 1) {
-      for (var i = 13; i <= 15; i++) {
-        $gameSwitches.setValue(i, false);
-      }
-      switch (sceneTimeAdvance) {
-        case 1:
-          $gameSwitches.setValue(GAME_SWITCH.MORNING, true);
-          break;
-        case 2:
-          $gameSwitches.setValue(GAME_SWITCH.DAYTIME, true);
-          break;
-        case 3:
-          $gameSwitches.setValue(GAME_SWITCH.NIGHT, true);
-          break;
-      }
-      $gameVariables.setValue(GAME_VARIABLE.SCENE_END_TIME_ADVANCE, 0);
+    if (!(sceneTimeAdvance >= 1)) return;
+
+    clearTimeOfDaySwitches();
+    const nextTimeSwitchId = TIME_OF_DAY_SWITCH_BY_ADVANCE[sceneTimeAdvance];
+    if (nextTimeSwitchId !== undefined) {
+      $gameSwitches.setValue(nextTimeSwitchId, true);
     }
+    $gameVariables.setValue(GAME_VARIABLE.SCENE_END_TIME_ADVANCE, 0);
   }
 
   function eraseRegisteredSceneEvents() {
