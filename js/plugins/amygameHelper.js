@@ -13818,22 +13818,26 @@
     }
   };
 
+  const ON_MARK = "ON";
+  const OFF_MARK = "OFF";
   // Replaces (1x): CommonEvents.json:common-event:191|ギルドコモン
   AGH_setVariableRandomWork1GuildCommon = function () {
+    const autoDailyQuestAcceptText = "デイリークエスト自動受注";
     if ($gameSwitches.value(HELPER_SWITCH.DAILY_AUTO_ACCEPT)) {
-      var randomWorkValue = `デイリークエスト自動受注＜ON＞`;
+      var randomWorkValue = `${autoDailyQuestAcceptText}＜${ON_MARK}＞`;
     } else {
-      var randomWorkValue = `デイリークエスト自動受注＜OFF＞`;
+      var randomWorkValue = `${autoDailyQuestAcceptText}＜${OFF_MARK}＞`;
     }
     $gameVariables.setValue(HELPER_VARIABLE.RANDOM_WORK_1, randomWorkValue);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:191|ギルドコモン
   AGH_setVariableRandomWork2GuildCommon = function () {
+    const autoDailyQuestCompleteText = "デイリークエスト自動達成";
     if ($gameSwitches.value(HELPER_SWITCH.DAILY_AUTO_COMPLETE)) {
-      var secondaryWorkValue = `デイリークエスト自動達成＜ON＞`;
+      var secondaryWorkValue = `${autoDailyQuestCompleteText}＜${ON_MARK}＞`;
     } else {
-      var secondaryWorkValue = `デイリークエスト自動達成＜OFF＞`;
+      var secondaryWorkValue = `${autoDailyQuestCompleteText}＜${OFF_MARK}＞`;
     }
     $gameVariables.setValue(HELPER_VARIABLE.RANDOM_WORK_2, secondaryWorkValue);
   };
