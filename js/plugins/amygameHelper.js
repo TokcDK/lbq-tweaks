@@ -26,6 +26,7 @@
     RANDOM_WORK_1: 21, // 乱数汎用1
     RANDOM_WORK_2: 22, // 乱数汎用2
     RANDOM_WORK_3: 23, // 乱数汎用3
+    RANDOM_WORK_4: 24, // 乱数汎用4
     FIRST_DEPLOYED_ACTOR_ID: 75, // 登場キャラ指定変数始点
     LAST_DEPLOYED_ACTOR_ID: 76, // 登場キャラ指定変数終点
     QUEST_HINT: 134, // クエスト進行毎のヒント変数
@@ -70,6 +71,9 @@
     RANK_3_ATTACK_NOTICE: 482, // [NoReset]通常攻撃スキルランク3で習得スキル増加お知らせ
     SENSE_MAP_WINDOW_OPEN: 603 // スキルアイテムでウィンドウ切換えスイッチonoff自動
   };
+  
+  const ON_MARK = "ON";
+  const OFF_MARK = "OFF";
 
   getIWA = function (id) {
     switch (id) {
@@ -98,9 +102,16 @@
   // Replaces (~90x):
   //   $gameVariables.setValue(HELPER_VARIABLE.EVENT_DESTINATION,[x,y,z]);        <- position array or expression
   //   this.setupChild($dataCommonEvents[54].list, 0);
-  AGH_sceneReturnSetup = function (interp, eventDestination) {
+    // Common event 54 restores the scene from the destination array in variable 171.
+  const SCENE_RETURN_COMMON_EVENT_ID = 54;
+
+  function startSceneReturn(interp, eventDestination) {
     $gameVariables.setValue(HELPER_VARIABLE.EVENT_DESTINATION, eventDestination);
-    interp.setupChild($dataCommonEvents[54].list, 0);
+    interp.setupChild($dataCommonEvents[SCENE_RETURN_COMMON_EVENT_ID].list, 0);
+  }
+
+AGH_sceneReturnSetup = function (interp, eventDestination) {
+    startSceneReturn(interp, eventDestination);
   };
 
   //=============================================================================
@@ -315,7 +326,7 @@
 
   // Replaces (8x): slide out left-side standing pictures (11..20).
   AGH_slideOutLeftPictures = function () {
-    for (var i = 11; i <= 20; i++) {
+    for (let i = 11; i <= 20; i++) {
       const pic = $gameScreen.picture(i);
       if (!pic) continue;
 
@@ -331,8 +342,8 @@
   // Replaces (8x): refresh whole party with passive/title re-application.
   AGH_partyBattleRefresh = function () {
     const members2 = $gameParty.members();
-    for (var i = 0; i < members2.length; i++) {
-      var actor = members2[i];
+    for (let i = 0; i < members2.length; i++) {
+      const actor = members2[i];
       passive_addCondition(actor);
       title_battleUp(actor);
       actor.refresh();
@@ -412,8 +423,7 @@
   //   this.setupChild($dataCommonEvents[54].list, 0);
   // Same as CEH_sceneReturnSetup but without resetting variable 528.
   CEH_sceneReturnKeepCount = function (interp, val171) {
-    $gameVariables.setValue(HELPER_VARIABLE.EVENT_DESTINATION, val171);
-    interp.setupChild($dataCommonEvents[54].list, 0);
+    startSceneReturn(interp, val171);
   };
 
   //=============================================================================
@@ -448,7 +458,7 @@
   //   };
   CEH_eraseAllSpawnedEvents = function () {
     const spawnIdList = AGH_spawnIdList();
-    for (var i = 0; i <= spawnIdList.length - 1; i++) {
+    for (let i = 0; i <= spawnIdList.length - 1; i++) {
       const id = spawnIdList[i];
       if (id < 1 || !$gameMap.event(id) || $gameParty.inBattle()) {
         continue;
@@ -493,10 +503,11 @@
   //   var value1 = 11;
   //   event_respawnSetN(value1,16,15,0,'npcUnique1',0,4);
   CEH_respawnMainNpcDefault = function (interp) {
-    var spawnSlot = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    let spawnSlot;
+    spawnSlot = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     event_respawnSetA(spawnSlot, 14, 34, 1, 4);
     interp._eventId = AGH_spawnIdList()[spawnSlot] || 0;
-    var spawnSlot = 11;
+    spawnSlot = 11;
     event_respawnSetN(spawnSlot, 16, 15, 0, "npcUnique1", 0, 4);
   };
 
@@ -508,14 +519,15 @@
   //   var value1 = 11;
   //   event_respawnSetN(value1,16,4,1,arr1[6],arr1[7],2);
   CEH_respawnSubNpcWithPreset = function (interp) {
+    let spawnSlot;
     const presetList = $gameVariables.value(HELPER_VARIABLE.EVENT_WORK_VALUES);
     const npcPreset = Array.isArray(presetList)
       ? presetList[$gameVariables.value(HELPER_VARIABLE.EPISODE_ITEM_ID)]
       : null;
     if (!npcPreset) return;
-    var spawnSlot = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    spawnSlot = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     event_respawnSetA(spawnSlot, 15, 4, 0, 6);
-    var spawnSlot = 11;
+    spawnSlot = 11;
     event_respawnSetN(spawnSlot, 16, 4, 1, npcPreset[6], npcPreset[7], 2);
   };
 
@@ -551,15 +563,16 @@
   //   var value1 = 11;
   //   event_respawnSetN(value1,arr1[8],arr1[9],0,arr1[6],arr1[7],arr1[10]);
   CEH_respawnSubNpcWithPresetArr = function (interp) {
+    let spawnSlot;
     const presetList = $gameVariables.value(HELPER_VARIABLE.EVENT_WORK_VALUES);
     const npcPreset = Array.isArray(presetList)
       ? presetList[$gameVariables.value(HELPER_VARIABLE.EPISODE_ITEM_ID)]
       : null;
     if (!npcPreset) return;
-    var spawnSlot = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    spawnSlot = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     event_respawnSetA(spawnSlot, npcPreset[3], npcPreset[4], 1, npcPreset[5]);
     interp._eventId = AGH_spawnIdList()[spawnSlot] || 0;
-    var spawnSlot = 11;
+    spawnSlot = 11;
     event_respawnSetN(spawnSlot, npcPreset[8], npcPreset[9], 0, npcPreset[6], npcPreset[7], npcPreset[10]);
   };
 
@@ -815,7 +828,7 @@
   CEH_returnHomeWeaponPosition = function (interp) {
     let weaponId = 22;
     const baseActivationRecords = $gameVariables.value(HELPER_VARIABLE.BASE_ACTIVATION_RECORDS);
-    for (var i = 1; i <= 100; i++) {
+    for (let i = 1; i <= 100; i++) {
       if (!(baseActivationRecords[i] == 2)) continue;
 
       weaponId = i;
@@ -979,10 +992,10 @@
   AGH_previewMetaTaggedPictures = function (database, metaKey, fieldIndex, pathPrefix) {
     const end = database.length - 1;
     let pictureId = 1;
-    for (var i = 1; i <= end; i++) {
-      var metaValue = database[i].meta[metaKey];
+    for (let i = 1; i <= end; i++) {
+      const metaValue = database[i].meta[metaKey];
       if (!metaValue) continue;
-      var imageName = pathPrefix + metaValue.split(",")[fieldIndex];
+      const imageName = pathPrefix + metaValue.split(",")[fieldIndex];
       //console.log(`${i}  ${imageName}`);
       $gameScreen.showPicture(pictureId, imageName, 1, 640 - 128, 384, 100, 100, 255, 0);
       pictureId += 1;
@@ -1169,9 +1182,9 @@
   AGH_stateApplyCollapse = function (user, target, stateId) {
     if (user.isStateAffected(390) && user.mpRate() >= 0.3) {
       user.removeState(stateId);
-      var reviveHp = Math.ceil(user.mmp * 0.3);
+      const reviveHp = Math.ceil(user.mmp * 0.3);
       user.gainHp(reviveHp);
-      var reviveMpCost = Math.ceil(user.mmp * 0.3);
+      const reviveMpCost = Math.ceil(user.mmp * 0.3);
       user.gainMp(-reviveMpCost);
       user.startDamagePopup();
       user.clearResult();
@@ -1199,7 +1212,7 @@
     state_applyCommonEffect(user, target, stateId, 260);
     const targetName = target.name();
     const stateName = $dataStates[stateId].name;
-    BattleManager._logWindow.push(`addText`, `${targetName}に${stateName}が発動した！`);
+    BattleManager._logWindow.push("addText", `${targetName}に${stateName}が発動した！`);
     target.gainHp(-999999);
     target.addState(1);
   };
@@ -1314,7 +1327,7 @@
   // (3 / 2 / 1 for 44 / 45 / 46).
   AGH_stateApplyEscalatingTier = function (user, target, stateId, higherTierCount) {
     const higherTierIds = [];
-    for (var tier = 1; tier <= higherTierCount; tier++) {
+    for (let tier = 1; tier <= higherTierCount; tier++) {
       higherTierIds.push(stateId + tier);
     }
     if (
@@ -1348,7 +1361,7 @@
   // being swallowed by an escalation. higherTierCount is 3 / 2 / 1.
   AGH_stateRemoveEscalatingTier = function (user, target, stateId, higherTierCount) {
     const higherTierIds = [];
-    for (var tier = 1; tier <= higherTierCount; tier++) {
+    for (let tier = 1; tier <= higherTierCount; tier++) {
       higherTierIds.push(stateId + tier);
     }
     if (
@@ -1364,7 +1377,7 @@
   // abnormal-state tiers below this one and re-registers the normal-abnormal
   // class. lowerTierCount is 1 / 2 for 402 / 403.
   AGH_stateApplyAwakeningTier = function (user, target, stateId, lowerTierCount) {
-    for (var tier = 1; tier <= lowerTierCount; tier++) {
+    for (let tier = 1; tier <= lowerTierCount; tier++) {
       if (target.isStateAffected(stateId - tier)) {
         target.removeState(stateId - tier);
       }
@@ -1432,7 +1445,7 @@
     user.addMdf(statBonus);
     user.addAgi(statBonus);
     user.addLuk(statBonus);
-    const popupText = `Atk/Def/Dex/Agi/Luk20%up!`;
+    const popupText = "Atk/Def/Dex/Agi/Luk20%up!";
     target.startMessagePopup(popupText, [255, 0, 0, 255, 0, 256]);
     state_applyCommonEffect(user, target, stateId, 271);
   };
@@ -1440,13 +1453,13 @@
   // Replaces (1x, state 157 魔装): gives the stored bonus back.
   AGH_stateRemoveMagicArmor = function (user, target, stateId) {
     if (user.getStateCounter(stateId) >= 1) {
-      var statBonus = user.getStateCounter(stateId);
+      const statBonus = user.getStateCounter(stateId);
       user.minusAtk(statBonus);
       user.minusDef(statBonus);
       user.minusMdf(statBonus);
       user.minusAgi(statBonus);
       user.minusLuk(statBonus);
-      var popupText = `Atk/Def/Dex/Agi/Luk20%Down…`;
+      const popupText = "Atk/Def/Dex/Agi/Luk20%Down…";
       target.startMessagePopup(popupText, [255, 0, 187, 189, 0, 256]);
     }
     user.removeStateCounter(stateId);
@@ -1466,7 +1479,7 @@
   // Replaces (1x, state 895 デストロイ・フォーム): moves the DEF back.
   AGH_stateRemoveDestroyForm = function (user, target, stateId) {
     if (user.getStateCounter(stateId) >= 1) {
-      var convertedDef = user.getStateCounter(stateId);
+      const convertedDef = user.getStateCounter(stateId);
       user.minusAtk(convertedDef);
       user.addDef(convertedDef);
     }
@@ -1493,7 +1506,7 @@
     const stateName = $dataStates[stateId].name;
     const damage = `\\C[10]${accumulatedDamage}\\C[0]`;
     const logText = `${userName}の${stateName}が解除！ 蓄積ダメージ${damage}を受けた…`;
-    BattleManager._logWindow.push(`addText`, logText);
+    BattleManager._logWindow.push("addText", logText);
     user.removeStateCounter(stateId);
     user.removeState(stateId);
   };
@@ -1507,34 +1520,42 @@
   // ReferenceError or dealt NaN damage. The accumulated count is used instead.
   // If the intent was a flat 1 damage per hit, change the one line to
   // `user.gainHp(-1)`.
-  AGH_stateApplyTwoKingsFeud = function (user, target, stateId) {
+    // TwoKingsFeud punishes the user for every abnormal state it carries, then clears
+  // itself.
+  const ABNORMAL_STATE_META_KEYS = [
+    "StateabNomal",
+    "StateSPabNomal",
+    "StateUnique"
+  ];
+
+  // Counts the states flagged as abnormal in the database.
+  function countAbnormalStates(user) {
+    let abnormalStateCount = 0;
+    for (let stateId = 1; stateId <= $dataStates.length - 1; stateId++) {
+      const stateData = $dataStates[stateId];
+      const isAbnormal = ABNORMAL_STATE_META_KEYS.some(function (metaKey) {
+        return stateData.meta[metaKey];
+      });
+      if (isAbnormal && user.isStateAffected(stateId)) abnormalStateCount += 1;
+    }
+    return abnormalStateCount;
+  }
+
+  // Deals one point of damage per abnormal state, stopping if the user dies first.
+  function damageUserForAbnormalStates(user, abnormalStateCount) {
+    for (let hitIndex = 1; hitIndex <= abnormalStateCount; hitIndex++) {
+      if (!user.isAlive()) return;
+      user.gainHp(-abnormalStateCount);
+      user.startDamagePopup();
+      user.clearResult();
+    }
+  }
+
+AGH_stateApplyTwoKingsFeud = function (user, target, stateId) {
     state_applyCommonEffect(user, target, stateId, 271);
     if (!user.isAlive()) return;
-
-    let abnormalStateCount = 0;
-    for (var i = 1; i <= $dataStates.length - 1; i++) {
-      const stateData = $dataStates[i];
-      if (
-        stateData.meta["StateabNomal"] ||
-        stateData.meta["StateSPabNomal"] ||
-        stateData.meta["StateUnique"]
-      ) {
-        if (user.isStateAffected(i)) {
-          abnormalStateCount += 1;
-        }
-      }
-    }
-    if (abnormalStateCount >= 1) {
-      for (var i = 1; i <= abnormalStateCount; i++) {
-        if (user.isAlive()) {
-          user.gainHp(-abnormalStateCount);
-          user.startDamagePopup();
-          user.clearResult();
-        } else {
-          break;
-        }
-      }
-    }
+    const abnormalStateCount = countAbnormalStates(user);
+    if (abnormalStateCount >= 1) damageUserForAbnormalStates(user, abnormalStateCount);
     user.removeState(stateId);
   };
 
@@ -1571,40 +1592,52 @@
   // Replaces (1x, state 320 属性弱体): on a 6-in-11 roll, applies the
   // resistance-down state matching the attacker's own element tag, then removes
   // the marker. No element tag means no effect.
-  AGH_stateApplyElementBreak = function (user, target, stateId) {
-    if (target.isAlive()) {
-      var weaknessStateId = 0;
-      var elementRoll = getRandomIndex(11);
-      if (elementRoll >= 6) {
-        if (user.isStateAffected(51)) {
-          weaknessStateId = 311;
-        }
-        if (user.isStateAffected(52)) {
-          weaknessStateId = 312;
-        }
-        if (user.isStateAffected(53)) {
-          weaknessStateId = 313;
-        }
-        if (user.isStateAffected(54)) {
-          weaknessStateId = 314;
-        }
-        if (user.isStateAffected(55) || user.isStateAffected(58)) {
-          weaknessStateId = 315;
-        }
-        if (user.isStateAffected(56) || user.isStateAffected(59)) {
-          weaknessStateId = 316;
-        }
-        if (user.isStateAffected(49)) {
-          weaknessStateId = 318;
-        }
-        if (user.isStateAffected(50)) {
-          weaknessStateId = 319;
-        }
-        if (weaknessStateId >= 1) {
-          state_addFormula1([weaknessStateId, 50, user, target, user.mdf, target.luk]);
-        }
-      }
-    }
+    // ElementBreak turns one of the user's element states into the matching weakness
+  // state on the target. The table keeps the order of the original if chain, so the
+  // last matching rule still wins.
+  const ELEMENT_BREAK_ROLL_RANGE = 11;
+  const ELEMENT_BREAK_SUCCESS_ROLL = 6;
+  const ELEMENT_BREAK_FORMULA_ID = 50;
+  const ELEMENT_BREAK_STATE_RULES = [
+    { triggerStateIds: [51], weaknessStateId: 311 },
+    { triggerStateIds: [52], weaknessStateId: 312 },
+    { triggerStateIds: [53], weaknessStateId: 313 },
+    { triggerStateIds: [54], weaknessStateId: 314 },
+    { triggerStateIds: [55, 58], weaknessStateId: 315 },
+    { triggerStateIds: [56, 59], weaknessStateId: 316 },
+    { triggerStateIds: [49], weaknessStateId: 318 },
+    { triggerStateIds: [50], weaknessStateId: 319 }
+  ];
+
+  // Weakness state that matches the user's current element states (0 = none).
+  function resolveElementBreakStateId(user) {
+    let weaknessStateId = 0;
+    ELEMENT_BREAK_STATE_RULES.forEach(function (rule) {
+      const hasTriggerState = rule.triggerStateIds.some(function (triggerStateId) {
+        return user.isStateAffected(triggerStateId);
+      });
+      if (hasTriggerState) weaknessStateId = rule.weaknessStateId;
+    });
+    return weaknessStateId;
+  }
+
+  // Applies the weakness state when the roll and the user's states allow it.
+  function applyElementBreakWeakness(user, target) {
+    if (getRandomIndex(ELEMENT_BREAK_ROLL_RANGE) < ELEMENT_BREAK_SUCCESS_ROLL) return;
+    const weaknessStateId = resolveElementBreakStateId(user);
+    if (!(weaknessStateId >= 1)) return;
+    state_addFormula1([
+      weaknessStateId,
+      ELEMENT_BREAK_FORMULA_ID,
+      user,
+      target,
+      user.mdf,
+      target.luk
+    ]);
+  }
+
+AGH_stateApplyElementBreak = function (user, target, stateId) {
+    if (target.isAlive()) applyElementBreakWeakness(user, target);
     target.removeState(stateId);
   };
 
@@ -1651,13 +1684,13 @@
   // 極大 tier (533-538) called it unconditionally, which is why the guard is
   // conditional on the tier here.
   AGH_stateApplyElementGuard = function (user, target, stateId, tier, animationId) {
-    for (var up = 1; up <= 3 - tier; up++) {
+    for (let up = 1; up <= 3 - tier; up++) {
       if (!user.isStateAffected(stateId + 6 * up)) continue;
 
       user.removeState(stateId);
       break;
     }
-    for (var down = 1; down <= tier; down++) {
+    for (let down = 1; down <= tier; down++) {
       if (user.isStateAffected(stateId - 6 * down)) {
         user.removeState(stateId - 6 * down);
       }
@@ -1686,13 +1719,13 @@
     if (effectFirst) {
       state_applyCommonEffect(user, target, stateId, animationId);
     }
-    for (var up = 0; up < upgradeOffsets.length; up++) {
+    for (let up = 0; up < upgradeOffsets.length; up++) {
       if (!user.isStateAffected(stateId + upgradeOffsets[up])) continue;
 
       user.removeState(stateId);
       break;
     }
-    for (var down = 0; down < downgradeOffsets.length; down++) {
+    for (let down = 0; down < downgradeOffsets.length; down++) {
       if (user.isStateAffected(stateId - downgradeOffsets[down])) {
         user.removeState(stateId - downgradeOffsets[down]);
       }
@@ -1734,7 +1767,7 @@
   // Replaces (1x, state 64 放心): recovery log line plus the opacity restore.
   AGH_stateRemoveRelief = function (user, target, stateId) {
     const targetName = target.name();
-    BattleManager._logWindow.push(`addText`, `${targetName}は立ち直った！`);
+    BattleManager._logWindow.push("addText", `${targetName}は立ち直った！`);
     target.spriteOpacity(255, 20);
   };
 
@@ -1764,7 +1797,7 @@
     if (braveSoulStacks <= 1) {
       braveSoulStacks = 1;
     }
-    for (var i = 1; i <= braveSoulStacks; i++) {
+    for (let i = 1; i <= braveSoulStacks; i++) {
       user.addState(201);
     }
     user.removeState(stateId);
@@ -1795,9 +1828,10 @@
   // state. Preserved on purpose; hoisting the declaration would change which
   // battler is affected.
   AGH_stateApplyTremaRound = function (user, target, stateId) {
+    let actor;
     const battleMembers2 = $gameParty.battleMembers();
-    for (var i = 0; i < battleMembers2.length; i++) {
-      var actor = battleMembers2[i];
+    for (let i = 0; i < battleMembers2.length; i++) {
+      actor = battleMembers2[i];
       actor.addState(206);
       actor.addState(207);
     }
@@ -1806,7 +1840,7 @@
 
   // Replaces (2x, states 266 連撃ボーナス / 267 三連撃ボーナス): battle-log banner.
   AGH_stateApplyStrikeBonus = function (user, target, stateId, logText) {
-    BattleManager._logWindow.push(`addText`, logText);
+    BattleManager._logWindow.push("addText", logText);
   };
 
   // Replaces (1x, state 292 浄眼): re-runs the boss action pattern when the lead
@@ -1832,9 +1866,9 @@
   // gauge while break mode is up, then removes the marker.
   AGH_stateApplyModeGaugeDown = function (user, target, stateId) {
     if (target.isStateAffected(stateId - 2)) {
-      var targetName = target.name();
-      const coloredText = colorTaggedText(10, `モードゲージ`);
-      BattleManager._logWindow.push(`addText`, `${targetName}の${coloredText}が20減少した！`);
+      const targetName = target.name();
+      const coloredText = colorTaggedText(10, "モードゲージ");
+      BattleManager._logWindow.push("addText", `${targetName}の${coloredText}が20減少した！`);
       state_applyCommonEffect(user, target, stateId, 261);
       $gameTroop.losePartyLimitGauge(20);
     }
@@ -1845,9 +1879,9 @@
   // break-mode state instead of letting it expire, then removes the marker.
   AGH_stateApplyBreakModeKeep = function (user, target, stateId) {
     if (target.isStateAffected(stateId - 2)) {
-      var targetName = target.name();
-      var stateName = `\\C[1]＜${$dataStates[stateId - 2].name}＞\\C[0]`;
-      BattleManager._logWindow.push(`addText`, `${targetName}の${stateName}のターンが初期化された！`);
+      const targetName = target.name();
+      const stateName = `\\C[1]＜${$dataStates[stateId - 2].name}＞\\C[0]`;
+      BattleManager._logWindow.push("addText", `${targetName}の${stateName}のターンが初期化された！`);
       state_applyCommonEffect(user, target, stateId - 2, 261);
     }
     target.removeState(stateId);
@@ -1863,14 +1897,14 @@
   AGH_stateApplyBegForLife = function (user, target, stateId) {
     const targetName = target.name();
     const stateName = `\\sim[427]`;
-    BattleManager._logWindow.push(`addText`, `${targetName}は${stateName}を始めた！`);
+    BattleManager._logWindow.push("addText", `${targetName}は${stateName}を始めた！`);
     const pleaStateIds = [421, 436];
     pleaStateIds.forEach(function (id) {
       if (!target.isStateAffected(id)) return;
 
       const pleaLines = $dataStates[stateId].meta["inotigoi" + id].split(",");
       const pleaLine = pleaLines[getRandomIndex(pleaLines.length)];
-      BattleManager._logWindow.push(`addText`, pleaLine);
+      BattleManager._logWindow.push("addText", pleaLine);
     }, this);
   };
 
@@ -1995,11 +2029,11 @@
   AGH_stateTurnEndFleeOrTaunt = function (user, target, stateId) {
     if ($gameParty.aliveMembers().length === 1) {
       user.addState(1);
-    } else {
-      var userName = `\\C[16]${user.name()}\\C[0]`;
-      BattleManager._logWindow.push(`addText`, `${userName}「は、早く倒してしまえっ！」`);
-      user.spriteOpacity(0, 30);
+      return;
     }
+    const userName = colorTaggedText(16, user.name());
+    BattleManager._logWindow.push("addText", `${userName}「は、早く倒してしまえっ！」`);
+    user.spriteOpacity(0, 30);
   };
 
   // Replaces (1x, state 154): once the stored counter is non-zero, forces skillId
@@ -2017,18 +2051,18 @@
   // target._stateCounter[stateId] twice; it is read once here.
   AGH_stateTurnEndDamageTroop = function (user, target, stateId) {
     if (user.isAlive()) {
-      var accumulatedDamage = target._stateCounter[stateId];
+      const accumulatedDamage = target._stateCounter[stateId];
       if (accumulatedDamage >= 1) {
-        var troopMembers = $gameTroop.members();
-        var troopCount = troopMembers.length;
+        const troopMembers = $gameTroop.members();
+        const troopCount = troopMembers.length;
         if (troopCount >= 1) {
-          var targetName = target.name();
-          var stateName = `\\SIM[${stateId}]`;
-          BattleManager._logWindow.push(`addText`, `${targetName}の${stateName}が発動！`);
+          const targetName = target.name();
+          const stateName = `\\SIM[${stateId}]`;
+          BattleManager._logWindow.push("addText", `${targetName}の${stateName}が発動！`);
           user.startAnimation(509, true, 0);
-          for (var i = 0; i < troopCount; i++) {
+          for (let i = 0; i < troopCount; i++) {
             troopMembers[i].startAnimation(132, true, 10);
-            var damagePerMember = Math.round((accumulatedDamage * 2) / troopCount);
+            const damagePerMember = Math.round((accumulatedDamage * 2) / troopCount);
             target.gainHp(-damagePerMember);
             target.startDamagePopup();
           }
@@ -2125,46 +2159,52 @@
   AGH_stateTurnEndInotigoiMessage = function (user, target, stateId, simStateId, watchedStateIds) {
     const targetName = target.name();
     const stateName = `\\sim[${simStateId}]`;
-    BattleManager._logWindow.push(`addText`, `${targetName}は${stateName}をしている…。`);
+    BattleManager._logWindow.push("addText", `${targetName}は${stateName}をしている…。`);
     watchedStateIds.forEach(function (id) {
       if (!target.isStateAffected(id)) return;
       const lines = $dataStates[stateId].meta["inotigoi" + id].split(",");
-      BattleManager._logWindow.push(`addText`, lines[getRandomIndex(lines.length)]);
+      BattleManager._logWindow.push("addText", lines[getRandomIndex(lines.length)]);
     });
   };
 
   // Replaces (1x, state 600): reports the damage taken during the turn and then
   // re-requests the equipped weapon's motion so the actor keeps animating.
-  AGH_stateTurnEndReportCounterDamageAndMotion = function (user, target, stateId) {
-    if (!user.isAlive()) return;
+    // Weapon motions used by the side-view battle display, indexed by MotionType.
+  const WEAPON_MOTION_NAMES = ["thrust", "swing", "missile"];
+  const STATE_COUNTER_HIGHLIGHT_COLOR_ID = 10;
+
+  // Reports the damage the state counter accumulated and resets it.
+  function reportStateCounterDamage(target, stateId) {
     const counterDamage = target._stateCounter[stateId];
-    if (counterDamage >= 1) {
-      var targetName = target.name();
-      var damage = `\\C[10]${counterDamage}\\C[0]`;
-      BattleManager._logWindow.push(`addText`, `${targetName}はターン中に${damage}のダメージを受けた！`);
-      target.setStateCounter(stateId, 0);
-    }
-    const actor = $gameActors.actor(user.actorId());
-    const weapon = actor.equips()[0];
-    if (!$dataSystem.optSideView || user.isStateAffected(1) || user.isStateAffected(64) || !weapon) return;
+    // Negated comparison keeps the original "not a number >= 1" behaviour.
+    if (!(counterDamage >= 1)) return;
+    const targetName = target.name();
+    const damage = colorTaggedText(STATE_COUNTER_HIGHLIGHT_COLOR_ID, counterDamage);
+    BattleManager._logWindow.push(
+      "addText",
+      `${targetName}はターン中に${damage}のダメージを受けた！`
+    );
+    target.setStateCounter(stateId, 0);
+  }
+
+  // Plays the weapon motion of the attacker's equip slot, when the database asks for it.
+  function playWeaponMotion(user) {
+    const weapon = $gameActors.actor(user.actorId()).equips()[0];
+    if (!$dataSystem.optSideView) return;
+    if (user.isStateAffected(1) || user.isStateAffected(64)) return;
+    if (!weapon) return;
     const weaponData = $dataWeapons[weapon.id];
     if (!weaponData.meta["WeaponNumber"] || !weaponData.meta["MotionType"]) return;
-    const weaponNumber = Number(weaponData.meta["WeaponNumber"]);
-    const motionType = Number(weaponData.meta["MotionType"]);
-    let motionName = "";
-    switch (motionType) {
-      case 0:
-        motionName = "thrust";
-        break;
-      case 1:
-        motionName = "swing";
-        break;
-      case 2:
-        motionName = "missile";
-        break;
-    }
+    // An unknown type keeps the original empty motion name.
+    const motionName = WEAPON_MOTION_NAMES[Number(weaponData.meta["MotionType"])] || "";
     user.requestMotion(motionName);
-    user.startWeaponAnimation(weaponNumber);
+    user.startWeaponAnimation(Number(weaponData.meta["WeaponNumber"]));
+  }
+
+AGH_stateTurnEndReportCounterDamageAndMotion = function (user, target, stateId) {
+    if (!user.isAlive()) return;
+    reportStateCounterDamage(target, stateId);
+    playWeaponMotion(user);
   };
 
   // Replaces (1x, state 610): reports the damage taken during the turn together
@@ -2173,16 +2213,16 @@
     if (!user.isAlive()) return;
     const counterDamage = target._stateCounter[stateId];
     const targetName = target.name();
-    const tpValue = `\\C[6]` + target.tp + `\\C[0]`;
+    const tpValue = colorTaggedText(6, target.tp);
     if (counterDamage >= 1) {
-      var damage = `\\C[10]` + counterDamage + `\\C[0]`;
+      const damage = colorTaggedText(10, counterDamage);
       BattleManager._logWindow.push(
-        `addText`,
+        "addText",
         `${targetName}のTP${tpValue}% ターン中に${damage}のダメージを受けた！`
       );
       target.setStateCounter(stateId, 0);
     } else {
-      BattleManager._logWindow.push(`addText`, `${targetName}のTP${tpValue}%`);
+      BattleManager._logWindow.push("addText", `${targetName}のTP${tpValue}%`);
     }
   };
 
@@ -2263,9 +2303,9 @@
 
   // Replaces (1x, state 94): the "runs away" battle start.
   AGH_stateBattleFlee = function (user, target, stateId) {
-    const userName = `\\C[16]${user.name()}\\C[0]`;
-    BattleManager._logWindow.push(`addText`, `${userName}「ヒィィ～～っ！」`);
-    BattleManager._logWindow.push(`addText`, `${userName}は逃げ出した！`);
+    const userName = colorTaggedText(16, user.name());
+    BattleManager._logWindow.push("addText", `${userName}「ヒィィ～～っ！」`);
+    BattleManager._logWindow.push("addText", `${userName}は逃げ出した！`);
     AudioManager.playSe({ name: "Z_FootRun", volume: 90, pitch: 150, pan: 0 });
     user.spriteOpacity(0, 60);
     $gameParty.move(user.index() + 1, 400, 0, 60);
@@ -2514,7 +2554,7 @@
       $gameVariables.value(258)[$gameVariables.value(HELPER_VARIABLE.DUNGEON_INFO_ITEM_ID)] += 1;
     }
     if (!target.isAlive() && valueCollapseAnime == 0) {
-      var collapseAnimationId = 598;
+      let collapseAnimationId = 598;
       if ($gameSwitches.value(207)) collapseAnimationId = 0;
       if (target.isStateAffected(435)) collapseAnimationId = 591; //機械種,爆発
       if (target.isStateAffected(436)) collapseAnimationId = 599; //人種、流血小さめ
@@ -2592,10 +2632,10 @@
     if (!user.isAlive() || !target.isAlive() || !target.isActor()) return;
     if (getRandomIndex(11) < threshold) return;
     let formulaSkillId = 0;
-    for (var i = 0; i < stateSkillGroups.length; i++) {
-      var group = stateSkillGroups[i];
-      var matched = false;
-      for (var j = 0; j < group[0].length; j++) {
+    for (let i = 0; i < stateSkillGroups.length; i++) {
+      const group = stateSkillGroups[i];
+      let matched = false;
+      for (let j = 0; j < group[0].length; j++) {
         if (!user.isStateAffected(group[0][j])) continue;
 
         matched = true;
@@ -2913,7 +2953,7 @@
 
   // Replaces (1x, skill 90): writes each [variableId, value] pair.
   AGH_skillExecutionSetVariables = function (user, item, pairs) {
-    for (var i = 0; i < pairs.length; i++) {
+    for (let i = 0; i < pairs.length; i++) {
       $gameVariables.setValue(pairs[i][0], pairs[i][1]);
     }
   };
@@ -2939,8 +2979,8 @@
   // Replaces (1x, skill 17): every living foe whose level is a multiple of 3.
   AGH_targetEvalFoesLevelMultipleOf3 = function (targets, foes) {
     const aliveFoes = foes.aliveMembers();
-    for (var i = 0; i < aliveFoes.length; ++i) {
-      var member = aliveFoes[i];
+    for (let i = 0; i < aliveFoes.length; ++i) {
+      const member = aliveFoes[i];
       if (member.level % 3 === 0) targets.push(member);
     }
   };
@@ -2952,7 +2992,7 @@
   // try/catch swallowed it and the skill/item silently targeted nothing at all.
   AGH_targetEvalAllPartyBattleMembers = function (targets) {
     const members = $gameParty.battleMembers();
-    for (var i = 0; i < members.length; ++i) {
+    for (let i = 0; i < members.length; ++i) {
       targets.push(members[i]);
     }
   };
@@ -2961,7 +3001,7 @@
   // BUGFIX: same `target` -> `targets` mistake as the party version above.
   AGH_targetEvalAllTroopMembers = function (targets) {
     const members = $gameTroop.members();
-    for (var i = 0; i < members.length; ++i) {
+    for (let i = 0; i < members.length; ++i) {
       targets.push(members[i]);
     }
   };
@@ -3026,7 +3066,7 @@
   // Replaces (20x, armors 81-100): equippable once at least one of skillIds has
   // been learned.
   AGH_equipReqConditionLearnedAny = function (user, item, skillIds) {
-    for (var i = 0; i < skillIds.length; i++) {
+    for (let i = 0; i < skillIds.length; i++) {
       if (user.isLearnedSkill(skillIds[i])) return true;
     }
     return false;
@@ -3194,13 +3234,15 @@
     const item = action.item();
     const stateId = item.id - 400;
     if (target.isStateAffected(stateId)) {
-      TickerManager.show(target.name() + "の通常攻撃は" + item.name + "です");
+      const targetName = target.name();
+      const itemName = item.name;
+      TickerManager.show(`${targetName}の通常攻撃は${itemName}です`);
       return;
     }
-    for (var i = 101; i <= 200; i++) target.removeState(i);
-    target.addState(stateId);
     const targetName = target.name();
     const itemName = item.name;
+    for (let stateIndex = 101; stateIndex <= 200; stateIndex++) target.removeState(stateIndex);
+    target.addState(stateId);
     TickerManager.show(`${targetName}の通常攻撃を${itemName}に変更しました`);
   };
 
@@ -3209,7 +3251,7 @@
   AGH_damageFormulaTogglePickup = function (action, user, target) {
     if (target.actorId() !== user.actorId()) return;
     const item = action.item();
-    const onMsg = `持ち上げ＜ON＞`;
+    const onMsg = "持ち上げ＜ON＞";
     if (item.name === onMsg) {
       $gameSystem._pickupData[0] = false;
       item.name = "持ち上げ＜OFF＞";
@@ -3290,7 +3332,7 @@
     if (counter === 0) {
       const targetName = target.name();
       const skillName = $dataSkills[sourceSkillId].name;
-      BattleManager._logWindow.push(`addText`, `${targetName}の${skillName}は不発に終わった…。`);
+      BattleManager._logWindow.push("addText", `${targetName}の${skillName}は不発に終わった…。`);
       return 0;
     }
     return counter * user.skillMasteryLevel(sourceSkillId) - target * 2;
@@ -3310,7 +3352,7 @@
   AGH_damageFormulaRubyFlip = function (action, user, target) {
     const item = action.item();
     if ($gameParty.inBattle()) {
-      var parts = String($dataSkills[item.id].meta["DamageFormula2"]).split(",");
+      const parts = String($dataSkills[item.id].meta["DamageFormula2"]).split(",");
       return Math.max(
         $attack1(Number(parts[0]), user, target, Number(parts[1])) * Number(parts[2]),
         user.mdf / 10
@@ -3333,28 +3375,30 @@
   AGH_damageFormulaDominate = function (target) {
     if ($dataActors[target.actorId()].meta["Mcharacter"]) {
       target.learnSkill(687);
-      const coloredText = colorTaggedText(27, `${target.name()}`);
-      const skillName = "\u001bSIN[687]";
-      TickerManager.show(`${coloredText}は${skillName}を付与された！`);
-    } else {
-      const coloredText2 = colorTaggedText(2, `${target.name()}`);
-      TickerManager.show(`${coloredText2}には効果が無かった…。`);
+      const targetName = target.name();
+      const skillName = colorTaggedText(27, "\x1bSIN[687]");
+      TickerManager.show(`${targetName}は${skillName}を付与された！`);
+      return;
     }
+    const targetName = target.name();
+    const failedTargetName = colorTaggedText(2, targetName);
+    TickerManager.show(`${failedTargetName}には効果が無かった…。`);
   };
 
   // Replaces (1x, skill 787 隠形): toggles the map stealth mode.
   AGH_damageFormulaToggleStealth = function (user, target) {
     if (target.actorId() !== user.actorId()) return;
     if ($gameSwitches.value(HELPER_SWITCH.TOWN)) {
-      TickerManager.show(`このマップでは使用できません。`);
+      TickerManager.show("このマップでは使用できません。");
       return;
     }
+    const stealthModeName = "ステルス・モード";
     if (!$gamePlayer.isStealthMode()) {
       $gamePlayer.setStealthTimer(10800);
-      TickerManager.show(`＜ステルス・モード＞がオンになりました。`);
+      TickerManager.show(`＜${stealthModeName}＞${ON_MARK}`);
     } else {
       $gamePlayer.setStealthMode(false);
-      TickerManager.show(`＜ステルス・モード＞がオフになりました。`);
+      TickerManager.show(`＜${stealthModeName}＞${OFF_MARK}`);
     }
   };
 
@@ -3365,7 +3409,7 @@
       $gameSwitches.setValue(HELPER_SWITCH.ENEMY_STATUS_VISIBLE, true);
       time_settei();
       const targetName = target.name();
-      BattleManager._logWindow.push(`addText`, `${targetName}達のStatus閲覧可能`);
+      BattleManager._logWindow.push("addText", `${targetName}達のStatus閲覧可能`);
     }
   };
 
@@ -3375,7 +3419,7 @@
   AGH_damageFormulaSenseMap = function (user, target) {
     if (target.actorId() !== user.actorId()) return;
     if ($gameSwitches.value(HELPER_SWITCH.TOWN)) {
-      TickerManager.show(`このマップでは使用できません。`);
+      TickerManager.show("このマップでは使用できません。");
       return;
     }
     if ($gameSwitches.value(HELPER_SWITCH.SENSE_MAP_WINDOW_OPEN)) {
@@ -3463,7 +3507,7 @@
   AGH_afterEvalInstrumentStateFormulaLogged = function (user, target, stateId) {
     if (!user.isActor()) return;
     if (!user.isWtypeEquipped(10)) return;
-    BattleManager._logWindow.push(`addText`, `楽器装備による追加効果！`);
+    BattleManager._logWindow.push("addText", "楽器装備による追加効果！");
     state_addFormula1([stateId, 50, user, target, user.mdf, target.luk]);
   };
 
@@ -3497,7 +3541,7 @@
     if (!user.isActor()) return;
     if (!user.isWtypeEquipped(10)) return;
     const members = $gameParty.battleMembers();
-    for (var i = 0; i < members.length; i++) {
+    for (let i = 0; i < members.length; i++) {
       members[i].addState(stateId);
     }
   };
@@ -3506,45 +3550,50 @@
   AGH_afterEvalLogExpRate = function (target) {
     const rate = Math.round(target.exr * 100);
     const targetName = target.name();
-    BattleManager._logWindow.push(`addText`, `${targetName}の経験値獲得率が上昇し${rate}%になった！`);
+    BattleManager._logWindow.push("addText", `${targetName}の経験値獲得率が上昇し${rate}%になった！`);
   };
 
   // Replaces (1x, skill 432 ルピ獲得率1000%up).
   AGH_afterEvalLogGoldRate = function () {
-    BattleManager._logWindow.push(`addText`, "パーティの獲得\\Gレートが10倍になった！");
+    BattleManager._logWindow.push("addText", "パーティの獲得\\Gレートが10倍になった！");
   };
 
   // Replaces (2x, skills 433 ダメージ上限撤廃 / 434 バフ上限最大値 - the
   // database gives both the same body, so both announce a damage cap).
-  AGH_afterEvalLogDamageCapRemoved = function (target) {
+    // Both after-evaluation notices are "<name><sentence>"; only the sentence differs.
+  function logTargetSentence(target, sentence) {
     const targetName = target.name();
-    BattleManager._logWindow.push(`addText`, `${targetName}のダメージ上限が取り払われた！`);
+    BattleManager._logWindow.push("addText", `${targetName}${sentence}`);
+  }
+
+AGH_afterEvalLogDamageCapRemoved = function (target) {
+    logTargetSentence(target, "のダメージ上限が取り払われた！");
   };
 
   // Replaces (1x, skill 891 仲間を呼ぶ).
   AGH_afterEvalLogCalledAllies = function (target) {
-    const targetName = target.name();
-    BattleManager._logWindow.push(`addText`, `${targetName}は仲間を呼んだ！`);
+    logTargetSentence(target, "は仲間を呼んだ！");
   };
 
   const CHARACTER_LOOK_VARIANTS = [
-    `はこちらの様子を見ている…。`,
-    `はボーっとしている…。`,
-    `はあらぬ方向を眺めている…。`,
-    `は故郷に想いを馳せている…。`
+    "はこちらの様子を見ている…。",
+    "はボーっとしている…。",
+    "はあらぬ方向を眺めている…。",
+    "は故郷に想いを馳せている…。"
   ];
 
   // Replaces (1x, skill 892 様子を見る). The idle line is rolled BEFORE the
   // state checks, exactly as in the original, so the RNG stream is unchanged.
   AGH_afterEvalLogIdleMessage = function (target) {
+    let text;
     if (target.isStateAffected(420)) {
       text = "「………………」。";
     } else if (target.isStateAffected(91)) {
       text = "は厭らしい嗤いを浮かべている…。";
     } else {
-      var text = CHARACTER_LOOK_VARIANTS[getRandomIndex(CHARACTER_LOOK_VARIANTS.length)];
+      text = CHARACTER_LOOK_VARIANTS[getRandomIndex(CHARACTER_LOOK_VARIANTS.length)];
     }
-    BattleManager._logWindow.push(`addText`, target.name() + text);
+    BattleManager._logWindow.push("addText", target.name() + text);
   };
 
   // Replaces (1x, skill 893 Ｈ攻撃).
@@ -3565,9 +3614,11 @@
         valueTotalgold -= Number(stateData.meta["EnemyGoldRate"]);
       }
     });
-    BattleManager._logWindow.push(`addText`, target.name() + "は逃げ出した！");
-    BattleManager._logWindow.push(`addText`, `経験値レート:${valueTotalexp}`);
-    BattleManager._logWindow.push(`addText`, `\\Gレート:${valueTotalgold}`);
+    logTargetSentence(target, "は逃げ出した！");
+    const expRateText = valueTotalexp;
+    const goldRateText = valueTotalgold;
+    BattleManager._logWindow.push("addText", `経験値レート:${expRateText}`);
+    BattleManager._logWindow.push("addText", `\\Gレート:${goldRateText}`);
   };
   //=============================================================================
   // Event Script (355/655) migration
@@ -3598,24 +3649,24 @@
   //    exactly like the original snippets; this file is not strict mode.
   // Replaces (1x): data/CommonEvents.json:common-event:1
   AGH_setVariable250GameplayTips = function () {
-    const messageText2 = `シーンの多くは、メインクエスト終了後に開放される。`;
-    const textPart2 = `本作には多様な強化システムを採用しているが、\nメインクエストとシーン回収だけを考えれば、\n極論レベルを上げて剣と杖で殴っていれば問題ない。`;
-    const textPart3 = `「朝昼」と「夜」では発生するイベントに変化がある。\nこれはメインクエストに措いても同様。\n進行条件が「〇〇に会いに行く」などの場合、\n夜では会えない事が多い。日を改めて日中に会いに行こう`;
-    const textPart4 = `シーンや挿話には「同一人物のシーンは同日に発生しない」という\n縛りが存在する場合がある。\n日数経過をさせる事で発生するようになる。`;
-    const textPart5 = `メインクエスト進行時の戦闘に、敗北Ｈはない`;
-    const textPart6 = `Ｈエネミーはそのマップで敗北Ｈを経験する事で出現する。\nＨエネミーに敗北すると汎用全滅シーンが発生する。`;
-    const textPart7 = `「称号」は、条件を満たした後、「一日の始まり」か「ギルド受付」と\n話した直後に付与される。`;
+    const messageText2 = "シーンの多くは、メインクエスト終了後に開放される。";
+    const textPart2 = "本作には多様な強化システムを採用しているが、\nメインクエストとシーン回収だけを考えれば、\n極論レベルを上げて剣と杖で殴っていれば問題ない。";
+    const textPart3 = "「朝昼」と「夜」では発生するイベントに変化がある。\nこれはメインクエストに措いても同様。\n進行条件が「〇〇に会いに行く」などの場合、\n夜では会えない事が多い。日を改めて日中に会いに行こう";
+    const textPart4 = "シーンや挿話には「同一人物のシーンは同日に発生しない」という\n縛りが存在する場合がある。\n日数経過をさせる事で発生するようになる。";
+    const textPart5 = "メインクエスト進行時の戦闘に、敗北Ｈはない";
+    const textPart6 = "Ｈエネミーはそのマップで敗北Ｈを経験する事で出現する。\nＨエネミーに敗北すると汎用全滅シーンが発生する。";
+    const textPart7 = "「称号」は、条件を満たした後、「一日の始まり」か「ギルド受付」と\n話した直後に付与される。";
     $gameVariables.setValue(250, [
-      colorTaggedText(2, `[1]`) + `${messageText2}`,
-      colorTaggedText(2, `[2]`) + `${textPart2}`,
-      colorTaggedText(2, `[3]`) + `${textPart3}`,
-      colorTaggedText(2, `[4]`) + `${textPart4}`,
-      colorTaggedText(2, `[5]`) + `${textPart5}`,
-      colorTaggedText(2, `[6]`) + `${textPart6}`,
-      colorTaggedText(7, `[1]`) + `${textPart7}`,
-      colorTaggedText(2, `[8]`),
-      colorTaggedText(2, `[9]`),
-      colorTaggedText(2, `[10]`)
+      colorTaggedText(2, "[1]") + `${messageText2}`,
+      colorTaggedText(2, "[2]") + `${textPart2}`,
+      colorTaggedText(2, "[3]") + `${textPart3}`,
+      colorTaggedText(2, "[4]") + `${textPart4}`,
+      colorTaggedText(2, "[5]") + `${textPart5}`,
+      colorTaggedText(2, "[6]") + `${textPart6}`,
+      colorTaggedText(7, "[1]") + `${textPart7}`,
+      colorTaggedText(2, "[8]"),
+      colorTaggedText(2, "[9]"),
+      colorTaggedText(2, "[10]")
     ]);
   };
 
@@ -4215,7 +4266,8 @@
     range(1, 40).forEach(callback);
   }
   function decorateWithActorName(message) {
-    return `${currentActor().name()}${message}`;
+    const actorName = currentActor().name();
+    return `${actorName}${message}`;
   }
   /** 「はメインクラス2ndジョブ＜\j[2X]＞に目覚めた！」 + common event 45. */
   function setSecondJobAwakeningMessage(interp, jobIndex, leadingSpaces) {
@@ -4302,7 +4354,9 @@
     // NOTE: this is the quest-list line, not a message window: its renderer wants
     //       the ESC spelling (0x1b + `IIN[n]`) the original used, which is what
     //       itemIconNameEsc() emits.
-    return `${itemIconNameEsc(itemId)}\n${valueQuestArray4[itemId - baseItemId]}`;
+    const itemIconName = itemIconNameEsc(itemId);
+    const questSummary = valueQuestArray4[itemId - baseItemId];
+    return itemIconName + "\n" + questSummary;
   }
 
   /* --- spawned map events -------------------------------------------------- */
@@ -4930,15 +4984,15 @@
         const metaValue = weapon.meta[metaKey];
         return typeof metaValue === "string" ? metaValue.trim() : metaValue || "";
       };
-    for (var weaponId = 301; weaponId <= 400; weaponId++) {
-      var weapon = $dataWeapons[weaponId];
+    for (let weaponId = 301; weaponId <= 400; weaponId++) {
+      const weapon = $dataWeapons[weaponId];
       if (!weapon || !weapon.name) continue;
-      var arrayIndex = weaponId - 300;
+      const arrayIndex = weaponId - 300;
       if (weapon.meta) {
         if (weapon.meta[metaKey] !== undefined) {
           resultArray[arrayIndex] = resolveDirect(weapon);
         } else if (weapon.meta["SubstitutionActorId"]) {
-          var actorId = Number(weapon.meta["SubstitutionActorId"]);
+          const actorId = Number(weapon.meta["SubstitutionActorId"]);
           if (!Number.isNaN(actorId) && resolveActor) {
             resultArray[arrayIndex] = resolveActor(actorId);
           }
@@ -5422,7 +5476,8 @@
   AGH_appendCurrentActorProfileMessage = function (interp) {
     $gameMessage.newPage();
     const actorProfile = currentActor().profile();
-    $gameMessage.add(`${instantText()}${actorProfile}`);
+    const profileText = instantText() + actorProfile;
+    $gameMessage.add(profileText);
     interp.setWaitMode("message");
   };
 
@@ -5441,17 +5496,22 @@
   };
 
   // Replaces (1x): data/CommonEvents.json:common-event:23
-  AGH_drawWindowText = function () {
-    const fontSize22 = fontSize(22);
-    const endOfDayInfoText = variableText(539); // variable 539: 一日終了時情報表示文字列変数
-    WindowManager.drawText(1, `${fontSize22}${endOfDayInfoText}`);
+    // Variable 539 holds the end-of-day information line(s); only the font size differs.
+  const END_OF_DAY_INFO_VARIABLE_ID = 539;
+
+  function drawEndOfDayInfoText(fontSizeValue) {
+    const fontTag = fontSize(fontSizeValue);
+    const endOfDayInfoText = variableText(END_OF_DAY_INFO_VARIABLE_ID);
+    WindowManager.drawText(1, fontTag + endOfDayInfoText);
+  }
+
+AGH_drawWindowText = function () {
+    drawEndOfDayInfoText(22);
   };
 
   // Replaces (1x): data/CommonEvents.json:common-event:23
   AGH_drawWindowText2 = function () {
-    const fontSize28 = fontSize(28);
-    const endOfDayInfoText = variableText(539); // variable 539: 一日終了時情報表示文字列変数
-    WindowManager.drawText(1, `${fontSize28}${endOfDayInfoText}`);
+    drawEndOfDayInfoText(28);
   };
 
   // Replaces (1x): data/Map003.json:map-event:161:page:1
@@ -5554,7 +5614,7 @@
   AGH_setPicture = function (presetIndex) {
     const presetValues = window.pic_setArray3;
     if (!presetValues) {
-      console.warn(`AGH_setPicture: pic_setArray3 is undefined`);
+      console.warn("AGH_setPicture: pic_setArray3 is undefined");
       return;
     }
     valuePicWait2 = presetValues[2] + Math.floor(Math.random() * (presetValues[3] * 2 + 1)) - presetValues[3];
@@ -5580,17 +5640,25 @@
   };
 
   // Replaces (2x): data/CommonEvents.json:common-event:17
-  AGH_slidePictureInFromRightAndWait = function (interp, duration, AGH_waitFrames) {
-    const SLIDE_PICTURE_ID = 55; // 53 + 2
-    movePic(SLIDE_PICTURE_ID, 640 + 50 - 128, 384, 100, 100, 240, duration, 1);
-    interp.wait(AGH_waitFrames);
+    // The slide helpers move the same scene picture in from either side.
+  const SCENE_SLIDE_PICTURE_ID = 55; // 53 + 2
+  const SCENE_SLIDE_DISTANCE_PIXELS = 50;
+
+  // direction is +1 for "from the right", -1 for "from the left".
+  function slidePictureInAndWait(interp, duration, waitFrames, direction) {
+    const targetX =
+      640 + direction * SCENE_SLIDE_DISTANCE_PIXELS - 128;
+    movePic(SCENE_SLIDE_PICTURE_ID, targetX, 384, 100, 100, 240, duration, 1);
+    interp.wait(waitFrames);
+  }
+
+AGH_slidePictureInFromRightAndWait = function (interp, duration, AGH_waitFrames) {
+    slidePictureInAndWait(interp, duration, AGH_waitFrames, 1);
   };
 
   // Replaces (2x): data/CommonEvents.json:common-event:17
   AGH_slidePictureInFromLeftAndWait = function (interp, duration, AGH_waitFrames) {
-    const SLIDE_PICTURE_ID = 55; // 53 + 2
-    movePic(SLIDE_PICTURE_ID, 640 - 50 - 128, 384, 100, 100, 240, duration, 1);
-    interp.wait(AGH_waitFrames);
+    slidePictureInAndWait(interp, duration, AGH_waitFrames, -1);
   };
 
   // Replaces (1x): data/CommonEvents.json:common-event:60
@@ -7574,10 +7642,17 @@
   };
 
   // Replaces (2x): data/Map003.json:map-event:155:page:1, data/Map022.json:map-event:6:page:1
-  AGH_setGuildReceptionistNpcName = function () {
-    const weaponName76 = $dataWeapons[76].name;
-    const weaponName22 = $dataWeapons[22].name;
-    setNpcIdentity(20, "受付嬢", `${weaponName76}${weaponName22}支部`);
+    // Guild staff share one identity: role label + "<city><branch>支部".
+  // The two weapon ids hold the city name and the branch name respectively.
+  function setGuildNpcIdentity(roleLabel, cityWeaponId, branchWeaponId) {
+    const cityName = $dataWeapons[cityWeaponId].name;
+    const branchName = $dataWeapons[branchWeaponId].name;
+    const guildBranchLabel = cityName + branchName + "支部";
+    setNpcIdentity(20, roleLabel, guildBranchLabel);
+  }
+
+AGH_setGuildReceptionistNpcName = function () {
+    setGuildNpcIdentity("受付嬢", 76, 22);
   };
 
   // Replaces (1x): data/Map003.json:map-event:164:page:1
@@ -7588,9 +7663,7 @@
 
   // Replaces (4x): data/Map003.json:map-event:188:page:1, data/Map024.json:map-event:2:page:1, ...
   AGH_setGuildPriestNpcName = function () {
-    const weaponName77 = $dataWeapons[77].name;
-    const weaponName22 = $dataWeapons[22].name;
-    setNpcIdentity(20, "神官", `${weaponName77}${weaponName22}支部`);
+    setGuildNpcIdentity("神官", 77, 22);
   };
 
   // Replaces (2x): data/Map003.json:map-event:229:page:1, data/Map023.json:map-event:3:page:1
@@ -7625,9 +7698,7 @@
 
   // Replaces (1x): data/Map048.json:map-event:3:page:1
   AGH_setGuildBranchClerkNpcName = function () {
-    const weaponName76 = $dataWeapons[76].name;
-    const weaponName41 = $dataWeapons[41].name;
-    setNpcIdentity(20, "受付", `${weaponName76}${weaponName41}支部`);
+    setGuildNpcIdentity("受付", 76, 41);
   };
 
   // Replaces (1x): data/Map003.json:map-event:237:page:1
@@ -8259,23 +8330,24 @@
   };
 
   // Replaces (2x): data/CommonEvents.json:common-event:52
-  AGH_playItemMusicFromMetaName = function (metaKey) {
-    forEachSteppedMetaEntry($dataItems, metaKey, (entryId, metaValue) => {
+    // Plays the BGM named by one metadata column for every entry that has one;
+  // "NoMusic" entries are skipped. Items and weapons share this scan.
+  function playDatabaseBgmFromMetaName(database, metaKey) {
+    forEachSteppedMetaEntry(database, metaKey, (entryId, metaValue) => {
       const bgmName = metaValue.split(",")[0];
       if (bgmName === "NoMusic") return false;
       playMetaBgm(entryId, bgmName);
       return true;
     });
+  }
+
+AGH_playItemMusicFromMetaName = function (metaKey) {
+    playDatabaseBgmFromMetaName($dataItems, metaKey);
   };
 
   // Replaces (2x): data/CommonEvents.json:common-event:52
   AGH_playItemMusicFromMetaName2 = function (metaKey) {
-    forEachSteppedMetaEntry($dataWeapons, metaKey, (entryId, metaValue) => {
-      const bgmName = metaValue.split(",")[0];
-      if (bgmName === "NoMusic") return false;
-      playMetaBgm(entryId, bgmName);
-      return true;
-    });
+    playDatabaseBgmFromMetaName($dataWeapons, metaKey);
   };
 
   // Replaces (7x): data/Map003.json:map-event:180:page:1, Map193.json events
@@ -8415,8 +8487,8 @@
     const actorName = actor.name();
     const effectName = colorTaggedText(27, "発情");
     const messageText = isRestless
-      ? `${actorName}は${effectName}した肢体を持て余している…。` + `\n`
-      : `${actorName}は${effectName}した肢体を慰めている…。` + `\n`;
+      ? `${actorName}は${effectName}した肢体を持て余している…。` + "\n"
+      : `${actorName}は${effectName}した肢体を慰めている…。` + "\n";
     appendStoredSelfLine(interp, messageText);
   };
 
@@ -8701,27 +8773,33 @@
   };
 
   // Replaces (1x): data/CommonEvents.json:common-event:138
-  AGH_setPartyLeaderGabText = function (interp) {
+    // Both battle cries use the current actor's line, optionally calling a partner by
+  // name when the partner state is active.
+  const PARTNER_CALL_STATE_ID = 234;
+
+  function setActorBattleCry(interp, partnerActorId, defaultLine, partnerCallLineBuilder) {
     const speakerName = currentActor().name();
-    const defaultLine = "「行きますよ、皆さん！」";
-    const characterName2 = characterName(2);
-    const partnerCallLine = `「${characterName2}さん、行きましょう！」`;
-    const message = $gameActors.actor(2).isStateAffected(234)
-      ? speakerName + partnerCallLine
-      : speakerName + defaultLine;
+    const isPartnerCalled = $gameActors.actor(partnerActorId).isStateAffected(
+      PARTNER_CALL_STATE_ID
+    );
+    const line = isPartnerCalled
+      ? partnerCallLineBuilder(characterName(partnerActorId))
+      : defaultLine;
+    const message = speakerName + line;
     callPluginCommand(interp, "GabText", message);
+  }
+
+AGH_setPartyLeaderGabText = function (interp) {
+    setActorBattleCry(interp, 2, "「行きますよ、皆さん！」", function (partnerName) {
+      return `「${partnerName}さん、行きましょう！」`;
+    });
   };
 
   // Replaces (1x): data/CommonEvents.json:common-event:138
   AGH_setActor1BattleCry = function (interp) {
-    const speakerName = currentActor().name();
-    const defaultLine = "「往くぞ！」";
-    const characterName1 = characterName(1);
-    const partnerCallLine = `「往くぞ、${characterName1}！」`;
-    const message = $gameActors.actor(1).isStateAffected(234)
-      ? speakerName + partnerCallLine
-      : speakerName + defaultLine;
-    callPluginCommand(interp, "GabText", message);
+    setActorBattleCry(interp, 1, "「往くぞ！」", function (partnerName) {
+      return `「往くぞ、${partnerName}！」`;
+    });
   };
 
   /* ============================================================================
@@ -9192,7 +9270,7 @@
   // Replaces (1x): CommonEvents.json:common-event:1|共通設定
   appendToVariable250 = function () {
     const aaa = $gameVariables.value(250);
-    aaa.push(`[11]`);
+    aaa.push("[11]");
   };
 
   // Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
@@ -9238,9 +9316,10 @@
 
   // Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
   AGH_particleClearShrineC = function (interp) {
-    var particleName = "shrine_c";
+    let particleName;
+    particleName = "shrine_c";
     $gameScreen._particle.particleClear(particleName);
-    var particleName = "chant_b3";
+    particleName = "chant_b3";
     $gameScreen._particle.particleGroupPlay(interp._eventId, particleName, "this");
   };
 
@@ -9252,9 +9331,10 @@
 
   // Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
   AGH_setMapEventOpacityVariousUseCommands = function () {
-    var event = $gameMap.event(valueCountSet1);
+    let event;
+    event = $gameMap.event(valueCountSet1);
     event.startOpacity(60, 0);
-    var event = $gameMap.event(valueCountSet2);
+    event = $gameMap.event(valueCountSet2);
     event.startOpacity(60, 0);
   };
 
@@ -9269,7 +9349,7 @@
   AGH_startGabWindowNone = function () {
     const scene = SceneManager._scene;
     if (scene._gabWindow) scene.clearGabWindow();
-    const gabData = [`あああ`, "none", "", 0, "", 0];
+    const gabData = ["あああ", "none", "", 0, "", 0];
     if (scene._gabWindow) scene.startGabWindow(gabData);
   };
 
@@ -9407,7 +9487,7 @@
   AGH_setVariableVariousUseCommands = function () {
     const start = 701;
     const end = 800;
-    for (var i = start; i <= end; i++) {
+    for (let i = start; i <= end; i++) {
       $gameVariables.setValue($gameVariables.value(i), $dataSkills[i - 600].description);
     }
   };
@@ -9449,12 +9529,13 @@
 
   // Replaces (1x): CommonEvents.json:common-event:4|条件分岐
   AGH_iterateSkillsConditionBranch = function (interp) {
-    var isClassUnlocked = 0;
-    for (var i = 0; i < interp._actor.unlockedClasses().length; ++i) {
+    let isClassUnlocked;
+    isClassUnlocked = 0;
+    for (let i = 0; i < interp._actor.unlockedClasses().length; ++i) {
       if (!(interp._actor.unlockedClasses()[i] == Number($dataSkills[skill.id].meta.SkillLearningClass)))
         continue;
 
-      var isClassUnlocked = 1;
+      isClassUnlocked = 1;
       break;
     }
   };
@@ -9462,8 +9543,8 @@
   // Replaces (1x): CommonEvents.json:common-event:4|条件分岐
   AGH_iterateTroopMembers = function () {
     const members2 = $gameTroop.members();
-    for (var i = 0; i < members2.length; i++) {
-      var troopMember = members2[i];
+    for (let i = 0; i < members2.length; i++) {
+      const troopMember = members2[i];
       if (troopMember.isStateAffected(234)) {
         troopMember.startAnimation(160, false, 0);
       }
@@ -9473,8 +9554,8 @@
   // Replaces (1x): CommonEvents.json:common-event:4|条件分岐
   AGH_iteratePartyMembers = function () {
     const battleMembers2 = $gameParty.battleMembers();
-    for (var i = 0; i < battleMembers2.length; i++) {
-      var battleMember = battleMembers2[i];
+    for (let i = 0; i < battleMembers2.length; i++) {
+      const battleMember = battleMembers2[i];
       if (battleMember.isStateAffected(234)) {
         battleMember.startAnimation(160, false, 0);
       }
@@ -9520,10 +9601,10 @@
 
   // Replaces (1x): CommonEvents.json:common-event:4|条件分岐
   AGH_setSelfSwitchConditionBranch = function (interp) {
-    for (var id = $gameMap.events().length; id > 0; id--) {
+    for (let id = $gameMap.events().length; id > 0; id--) {
       if (!$gameMap.event(id).event().note.match("[HOGE]")) continue;
 
-      var mapID = interp._mapId;
+      const mapID = interp._mapId;
       $gameSelfSwitches.setValue([mapID, id, "B"], true);
     }
   };
@@ -9584,7 +9665,7 @@
     const stateName = $dataStates[stateId].name;
     const coloredText = colorTaggedText(10, `${value1}`);
     const messageText = `${userName}の${stateName}が解除！ 蓄積ダメージ${coloredText}を受けた…`;
-    BattleManager._logWindow.push(`addText`, messageText);
+    BattleManager._logWindow.push("addText", messageText);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
@@ -9598,12 +9679,13 @@
 
   // Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
   AGH_setScreenDTextPicture = function () {
+    let pictureId;
     $gameScreen.clearZoom();
     $gameScreen.setDTextPicture(pictureId, 28);
     $gameScreen.dWindowFrame = "ON";
     $gameScreen.dTextRealTime = "ON";
     $gameScreen.dTextAlign = 1; //中央
-    var pictureId = 100;
+    pictureId = 100;
     const pictureName = "";
     $gameScreen.showPicture(pictureId, pictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
     $gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
@@ -9655,8 +9737,8 @@
     if (threshold <= -1) {
       threshold = 0;
     }
-    for (var j = 0; j <= threshold; j++) {
-      $gameVariables.value(id1)[i] += `　`;
+    for (let j = 0; j <= threshold; j++) {
+      $gameVariables.value(id1)[i] += "　";
     }
   };
 
@@ -9730,7 +9812,7 @@
     //クエスト用配列
     interp.sVal(326, Array(2001).fill(0)); //クエスト達成用アイテムごと表示用配列
     interp.sVal(344, Array(151).fill(0)); //達成条件の内容のみ
-    for (var i = 357; i <= 360; i++) {
+    for (let i = 357; i <= 360; i++) {
       interp.sVal(i, Array(151).fill(0));
     }
     //357クエスト解説アイテム用358クエスト解説359クエスト発生360クエスト達成
@@ -9770,7 +9852,7 @@
   AGH_setVariableDungeonWarpCircle = function () {
     $gameVariables.setValue(HELPER_VARIABLE.DUNGEON_WARP_POINTS, Array(101).fill(0));
     const dungeonWarpPoints = $gameVariables.value(HELPER_VARIABLE.DUNGEON_WARP_POINTS);
-    for (var i = 0; i <= 100; i++) {
+    for (let i = 0; i <= 100; i++) {
       dungeonWarpPoints[i] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     }
   };
@@ -9779,7 +9861,7 @@
   AGH_iterateItemsSG = function () {
     const start = 1;
     const end = $dataItems.length - 1;
-    for (var i = start; i <= end; i++) {
+    for (let i = start; i <= end; i++) {
       const itemData = $dataItems[i];
       if (itemData.meta["SG種別"]) {
         if (Number(itemData.meta["SG種別"]) == 2) {
@@ -9804,8 +9886,8 @@
 
   // Replaces (1x): CommonEvents.json:common-event:10|初期解説コモン1
   AGH_handleScriptSnippetDescriptionSubClass = function () {
-    let messageText = `サブジョブ毎のスタータス上昇率一覧\n`;
-    for (var i = 51; i <= 60; i++) {
+    let messageText = "サブジョブ毎のスタータス上昇率一覧\n";
+    for (let i = 51; i <= 60; i++) {
       messageText += `${valueClassGrowStatasComparison[i]}\n`;
     }
     start_commentary(
@@ -9824,7 +9906,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:10|初期解説コモン1
   AGH_iterateStatesMenuSubComand = function (interp) {
-    let messageText = ``;
+    let messageText = "";
     const list = $gameVariables.value(HELPER_VARIABLE.RESTRICTED_MENU_STATE_IDS);
     list.forEach(function (id) {
       const stateData = $dataStates[id];
@@ -9838,9 +9920,9 @@
 		特定ステートが付与されている場合、開けなくなります。
 		[${messageText}]`,
       "Npic",
-      `Nda`,
+      "Nda",
       "Npic",
-      `Nda`
+      "Nda"
     );
   };
 
@@ -9852,7 +9934,7 @@
   // Replaces (1x): CommonEvents.json:common-event:11|リセット時コモン
   AGH_readVariableActorChoice = function () {
     const selectedActorId = $gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID);
-    for (var i = 101; i <= 200; i++) {
+    for (let i = 101; i <= 200; i++) {
       $gameVariables.value(360 + selectedActorId)[i] = 0;
     }
   };
@@ -9869,7 +9951,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:11|リセット時コモン
   AGH_resetSelfSwitchVariablesResetCommon = function () {
-    for (var i = 1; i <= 200; i++) {
+    for (let i = 1; i <= 200; i++) {
       $gameSelfSwitches.setVariableValue([i, 2, 1], 0);
     }
   };
@@ -9878,7 +9960,7 @@
   AGH_readVariableAppearanceCharacterStartGameStartCommon = function () {
     const start = $gameVariables.value(HELPER_VARIABLE.FIRST_DEPLOYED_ACTOR_ID);
     const end = $gameVariables.value(HELPER_VARIABLE.LAST_DEPLOYED_ACTOR_ID);
-    for (var i = start; i <= end; i++) {
+    for (let i = start; i <= end; i++) {
       actor_StartSetUp(i);
       production_separateSetProfile(i);
     }
@@ -9982,35 +10064,67 @@
   };
 
   // Replaces (1x): CommonEvents.json:common-event:17|ピクチャ並列1
-  AGH_movePicturePictureParallel1 = function (interp) {
-    const pictureId = 53;
-    $gameScreen.movePicture(pictureId + 2, 1, 640 - 128, 384 + 20, 100, 100, 240, 0, 120);
+    // Picture 53 is shown twice (53 + 2) while the camera shakes, so the shake
+  // helpers nudge id 55 only. Kept as one constant so both variants stay in sync.
+  const SHAKE_PICTURE_ID = 53;
+  const SHAKE_PICTURE_BASE_X = 640 - 128;
+  const SHAKE_PICTURE_SETTLE_FRAMES = 120;
+
+  // Vertical shake: the picture jumps up/down by verticalOffset pixels and returns.
+  function nudgeShakePictureVertically(interp, verticalOffset) {
+    const shakePictureId = SHAKE_PICTURE_ID + 2;
+    const targetY = 384 + verticalOffset;
+    $gameScreen.movePicture(
+      shakePictureId,
+      1,
+      SHAKE_PICTURE_BASE_X,
+      targetY,
+      100,
+      100,
+      240,
+      0,
+      SHAKE_PICTURE_SETTLE_FRAMES
+    );
     interp.wait(110);
+  }
+
+  // Horizontal shake with a random distance and a random, longer duration.
+  function nudgeShakePictureHorizontally(interp, horizontalDirection) {
+    const durationFrames = getRandomIndex(41) + 160;
+    const offsetPixels = getRandomIndex(21) + 40;
+    const shakePictureId = SHAKE_PICTURE_ID + 2;
+    const targetX = SHAKE_PICTURE_BASE_X + horizontalDirection * offsetPixels;
+    $gameScreen.movePicture(
+      shakePictureId,
+      1,
+      targetX,
+      384,
+      100,
+      100,
+      240,
+      0,
+      durationFrames
+    );
+    interp.wait(durationFrames - 10);
+  }
+
+AGH_movePicturePictureParallel1 = function (interp) {
+    nudgeShakePictureVertically(interp, 20);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:17|ピクチャ並列1
   AGH_movePicturePictureParallel1_2 = function (interp) {
-    const pictureId = 53;
-    $gameScreen.movePicture(pictureId + 2, 1, 640 - 128, 384 - 20, 100, 100, 240, 0, 120);
-    interp.wait(110);
+    nudgeShakePictureVertically(interp, -20);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:17|ピクチャ並列1
   AGH_movePicturePictureParallel1_3 = function (interp) {
-    const randomIndex = getRandomIndex(41) + 160;
-    const randomOffset = getRandomIndex(21) + 40;
-    const pictureId = 53;
-    $gameScreen.movePicture(pictureId + 2, 1, 640 + randomOffset - 128, 384, 100, 100, 240, 0, randomIndex);
-    interp.wait(randomIndex - 10);
+    nudgeShakePictureHorizontally(interp, 1);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:17|ピクチャ並列1
   AGH_movePicturePictureParallel1_4 = function (interp) {
-    const randomIndex = getRandomIndex(41) + 160;
-    const randomOffset = getRandomIndex(21) + 40;
-    const pictureId = 53;
-    $gameScreen.movePicture(pictureId + 2, 1, 640 - randomOffset - 128, 384, 100, 100, 240, 0, randomIndex);
-    interp.wait(randomIndex - 10);
+    nudgeShakePictureHorizontally(interp, -1);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:18|イベントシーン開始
@@ -10029,7 +10143,7 @@
       //if($gameParty.members().contains(actor)){
       const start = 0;
       const end = 42;
-      for (var i = start; i <= end; i++) {
+      for (let i = start; i <= end; i++) {
         $gameVariables.value(id + 540)[i] = $gameVariables.value(id + 440)[i];
       }
     }, interp);
@@ -10042,97 +10156,107 @@
   };
 
   // Replaces (1x): CommonEvents.json:common-event:21|初期解説コモン2
-  AGH_showPictureItemProcessWork = function () {
-    const processedEntryId = $gameVariables.value(HELPER_VARIABLE.PROCESSED_ENTRY_ID);
-    if (valueStartCommentary2P[processedEntryId] == 0) {
+    // Shows the commentary picture of the processed entry. A "Dpic" marker means the
+  // entry carries text instead of an image, so the window text picture is used.
+  // pictureId is 201 for the first commentary slot and 202 for the follow-up one.
+  const COMMENTARY_PICTURE_TEXT_Y = 100;
+  const COMMENTARY_PICTURE_TEXT_X = 134;
+  const COMMENTARY_PICTURE_IMAGE_X = 334;
+  const COMMENTARY_PICTURE_FADE_FRAMES = 30;
+  const COMMENTARY_PICTURE_SLOT_1 = 201;
+  const COMMENTARY_PICTURE_SLOT_2 = 202;
+
+  function showCommentaryPicture(pictureId, commentaryArray, pictureMarkerArray) {
+    const processedEntryId = $gameVariables.value(
+      HELPER_VARIABLE.PROCESSED_ENTRY_ID
+    );
+    const pictureMarker = pictureMarkerArray[processedEntryId];
+    if (pictureMarker == 0) return;
+
+    let pictureName, pictureX, pictureY;
+    if (pictureMarker == "Dpic") {
+      pictureName = "";
+      pictureY = COMMENTARY_PICTURE_TEXT_Y;
+      pictureX = COMMENTARY_PICTURE_TEXT_X;
+      $gameScreen.setDTextPicture(commentaryArray[processedEntryId], 28);
+      $gameScreen.dWindowFrame = "ON";
     } else {
-      if (valueStartCommentary2P[processedEntryId] == "Dpic") {
-        var pictureName = "";
-        var pictureY = 100;
-        var pictureX = 134;
-        $gameScreen.setDTextPicture(valueStartCommentary2[processedEntryId], 28);
-        $gameScreen.dWindowFrame = "ON";
-      } else {
-        var pictureName = "/img/tips/" + valueStartCommentary2P[processedEntryId];
-        var pictureY = 0;
-        var pictureX = 334;
-      }
-      $gameScreen.showPicture(201, pictureName, 0, pictureX, 0 + 50, 100, 100, 0, 0);
-      $gameScreen.movePicture(201, 0, pictureX, pictureY, 100, 100, 255, 0, 30);
+      pictureName = "/img/tips/" + pictureMarker;
+      pictureY = 0;
+      pictureX = COMMENTARY_PICTURE_IMAGE_X;
     }
+    $gameScreen.showPicture(pictureId, pictureName, 0, pictureX, 50, 100, 100, 0, 0);
+    $gameScreen.movePicture(
+      pictureId,
+      0,
+      pictureX,
+      pictureY,
+      100,
+      100,
+      255,
+      0,
+      COMMENTARY_PICTURE_FADE_FRAMES
+    );
+  }
+
+AGH_showPictureItemProcessWork = function () {
+    showCommentaryPicture(
+      COMMENTARY_PICTURE_SLOT_1,
+      valueStartCommentary2,
+      valueStartCommentary2P
+    );
   };
 
   // Replaces (1x): CommonEvents.json:common-event:21|初期解説コモン2
-  AGH_queueMessageDpic = function (interp) {
+    // Queues the stored commentary line of the processed entry as a new message page.
+  // Entries whose picture slot is marked "Dpic" only show the picture, not the text.
+  function queueCommentaryMessage(interp, commentaryArray, pictureMarkerArray) {
     const processedEntryId = $gameVariables.value(HELPER_VARIABLE.PROCESSED_ENTRY_ID);
-    if (valueStartCommentary2[processedEntryId] == 0) {
-    } else {
-      if (valueStartCommentary2P[processedEntryId] == "Dpic") {
-        var commentaryText = "";
-      } else {
-        var commentaryText = valueStartCommentary2[processedEntryId];
-      }
-      $gameMessage.newPage();
-      $gameMessage.add(commentaryText);
-      interp.setWaitMode("message");
-    }
+    if (commentaryArray[processedEntryId] == 0) return;
+    const isPictureOnly = pictureMarkerArray[processedEntryId] == "Dpic";
+    const commentaryText = isPictureOnly ? "" : commentaryArray[processedEntryId];
+    $gameMessage.newPage();
+    $gameMessage.add(commentaryText);
+    interp.setWaitMode("message");
+  }
+
+AGH_queueMessageDpic = function (interp) {
+    queueCommentaryMessage(interp, valueStartCommentary2, valueStartCommentary2P);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:21|初期解説コモン2
   AGH_showPictureItemProcessWorkInitialGuideCommon2 = function () {
-    const processedEntryId = $gameVariables.value(HELPER_VARIABLE.PROCESSED_ENTRY_ID);
-    if (valueStartCommentary3P[processedEntryId] == 0) {
-    } else {
-      if (valueStartCommentary3P[processedEntryId] == "Dpic") {
-        var pictureName = "";
-        var pictureY = 100;
-        var pictureX = 134;
-        $gameScreen.setDTextPicture(valueStartCommentary3[processedEntryId], 28);
-        $gameScreen.dWindowFrame = "ON";
-      } else {
-        var pictureName = "/img/tips/" + valueStartCommentary3P[processedEntryId];
-        var pictureY = 0;
-        var pictureX = 334;
-      }
-      $gameScreen.showPicture(202, pictureName, 0, pictureX, 0 + 50, 100, 100, 0, 0);
-      $gameScreen.movePicture(202, 0, pictureX, pictureY, 100, 100, 255, 0, 30);
-    }
+    showCommentaryPicture(
+      COMMENTARY_PICTURE_SLOT_2,
+      valueStartCommentary3,
+      valueStartCommentary3P
+    );
   };
 
   // Replaces (1x): CommonEvents.json:common-event:21|初期解説コモン2
   AGH_readVariableItemProcessWork = function (interp) {
-    const processedEntryId = $gameVariables.value(HELPER_VARIABLE.PROCESSED_ENTRY_ID);
-    if (valueStartCommentary3[processedEntryId] == 0) {
-    } else {
-      if (valueStartCommentary3P[processedEntryId] == "Dpic") {
-        var commentaryText = "";
-      } else {
-        var commentaryText = valueStartCommentary3[processedEntryId];
-      }
-      $gameMessage.newPage();
-      $gameMessage.add(commentaryText);
-      interp.setWaitMode("message");
-    }
+    queueCommentaryMessage(interp, valueStartCommentary3, valueStartCommentary3P);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:22|宿泊時コモン
   AGH_iterateItemsBedPattern = function () {
+    let bedTemplateEventId, valueItems;
     const playerRealX = $gamePlayer._realX;
     const playerRealY = $gamePlayer._realY;
-    var bedTemplateEventId = 148;
+    bedTemplateEventId = 148;
     const gameVariableValue = $gameVariables.value(HELPER_VARIABLE.TOWN_INFO_ITEM_ID);
     if (gameVariableValue >= 1) {
-      var valueItems = $dataWeapons[gameVariableValue];
+      valueItems = $dataWeapons[gameVariableValue];
     }
     const dungeonInfoItemId = $gameVariables.value(HELPER_VARIABLE.DUNGEON_INFO_ITEM_ID);
     if (dungeonInfoItemId >= 1) {
-      var valueItems = $dataItems[dungeonInfoItemId];
+      valueItems = $dataItems[dungeonInfoItemId];
     }
     if ($dataMap.meta["BedPattern"]) {
-      var valueItems = $dataMap;
+      valueItems = $dataMap;
     }
     if (valueItems.meta["BedPattern"]) {
-      var bedTemplateEventId = Number(valueItems.meta["BedPattern"]);
+      bedTemplateEventId = Number(valueItems.meta["BedPattern"]);
     }
     $gameMap.spawnEvent(bedTemplateEventId, playerRealX, playerRealY + 1, true);
   };
@@ -10175,55 +10299,82 @@
   };
 
   // Replaces (1x): CommonEvents.json:common-event:24|一日経過時コモン
-  AGH_setSelfVariableDayEndInfoCount = function (interp) {
-    for (
-      var j = $gameVariables.value(HELPER_VARIABLE.FIRST_DEPLOYED_ACTOR_ID);
-      j <= $gameVariables.value(HELPER_VARIABLE.LAST_DEPLOYED_ACTOR_ID);
-      j++
-    ) {
-      var actor = $gameActors.actor(j);
-      if (actor.isStateAffected(61)) {
-        actor.removeState(61);
-        $gameVariables.value(380 + j)[2] = 0;
-        var randomIndex = getRandomIndex(6) + 5;
-        if (actor.isLearnedSkill(63)) {
-          interp.sVal(540, $gameVariables.value(HELPER_VARIABLE.DAY_END_INFO_LINE_COUNT) + 2);
-          $gameVariables.value(380 + j)[13] += 1;
-          $gameVariables.value(380 + j)[1] += randomIndex;
-          const actorName = actor.name();
-          const stateName = $dataStates[61].name;
-          const coloredText = colorTaggedText(27, `[性欲度+${randomIndex}] [自慰回数+1]`);
-          interp.sVal(
-            539,
-            $gameVariables.value(HELPER_VARIABLE.DAY_END_INFO_TEXT) +
-              `${actorName}は自分を慰めた…。${stateName}が解除された。\n${coloredText}`
-          );
-        } else {
-          const actorName2 = actor.name();
-          const stateName2 = $dataStates[61].name;
-          interp.sVal(
-            539,
-            $gameVariables.value(HELPER_VARIABLE.DAY_END_INFO_TEXT) +
-              `${actorName2}の${stateName2}が解除された。\n`
-          );
-          interp.sVal(540, $gameVariables.value(HELPER_VARIABLE.DAY_END_INFO_LINE_COUNT) + 1);
-        }
-      }
+    // State 61 (自慰) is cleared at the end of the day and logged into the day-end
+  // report lines.
+  const SELF_RELIEF_STATE_ID = 61;
+  const SELF_RELIEF_SKILL_ID = 63;
+  const SELF_RELIEF_LIBIDO_ROLL_RANGE = 6;
+  const SELF_RELIEF_LIBIDO_ROLL_BASE = 5;
+  const DAY_END_INFO_LINE_VARIABLE_ID = 540;
+  const DAY_END_INFO_TEXT_VARIABLE_ID = 539;
+  const LIBIDO_HIGHLIGHT_COLOR_ID = 27;
+  const ACTOR_RECORD_VARIABLE_BASE = 380;
+  const ACTOR_RECORD_LIBIDO_INDEX = 1;
+  const ACTOR_RECORD_STATE_FLAG_INDEX = 2;
+  const ACTOR_RECORD_SELF_RELIEF_COUNT_INDEX = 13;
+
+  // Clears the state and appends the matching day-end report line.
+  function clearSelfReliefState(interp, actor, actorId) {
+    actor.removeState(SELF_RELIEF_STATE_ID);
+    const actorRecord = $gameVariables.value(ACTOR_RECORD_VARIABLE_BASE + actorId);
+    actorRecord[ACTOR_RECORD_STATE_FLAG_INDEX] = 0;
+    const libidoGain = getRandomIndex(SELF_RELIEF_LIBIDO_ROLL_RANGE) + SELF_RELIEF_LIBIDO_ROLL_BASE;
+    const actorName = actor.name();
+    const stateName = $dataStates[SELF_RELIEF_STATE_ID].name;
+
+    if (actor.isLearnedSkill(SELF_RELIEF_SKILL_ID)) {
+      interp.sVal(
+        DAY_END_INFO_LINE_VARIABLE_ID,
+        $gameVariables.value(HELPER_VARIABLE.DAY_END_INFO_LINE_COUNT) + 2
+      );
+      actorRecord[ACTOR_RECORD_SELF_RELIEF_COUNT_INDEX] += 1;
+      actorRecord[ACTOR_RECORD_LIBIDO_INDEX] += libidoGain;
+      const effectText = colorTaggedText(
+        LIBIDO_HIGHLIGHT_COLOR_ID,
+        `[性欲度+${libidoGain}] [自慰回数+1]`
+      );
+      interp.sVal(
+        DAY_END_INFO_TEXT_VARIABLE_ID,
+        $gameVariables.value(HELPER_VARIABLE.DAY_END_INFO_TEXT) +
+          `${actorName}は自分を慰めた…。${stateName}が解除された。\n` +
+          effectText
+      );
+      return;
+    }
+    interp.sVal(
+      DAY_END_INFO_TEXT_VARIABLE_ID,
+      $gameVariables.value(HELPER_VARIABLE.DAY_END_INFO_TEXT) +
+        `${actorName}の${stateName}が解除された。\n`
+    );
+    interp.sVal(
+      DAY_END_INFO_LINE_VARIABLE_ID,
+      $gameVariables.value(HELPER_VARIABLE.DAY_END_INFO_LINE_COUNT) + 1
+    );
+  }
+
+AGH_setSelfVariableDayEndInfoCount = function (interp) {
+    const firstActorId = $gameVariables.value(HELPER_VARIABLE.FIRST_DEPLOYED_ACTOR_ID);
+    const lastActorId = $gameVariables.value(HELPER_VARIABLE.LAST_DEPLOYED_ACTOR_ID);
+    for (let actorId = firstActorId; actorId <= lastActorId; actorId++) {
+      const actor = $gameActors.actor(actorId);
+      if (!actor.isStateAffected(SELF_RELIEF_STATE_ID)) continue;
+      clearSelfReliefState(interp, actor, actorId);
     }
   };
 
   // Replaces (1x): CommonEvents.json:common-event:24|一日経過時コモン
   AGH_setSelfVariableDayEndInfoTextDayPassCommon = function (interp) {
-    for (var i = 1; i <= $dataStates.length - 1; i++) {
+    let actor;
+    for (let i = 1; i <= $dataStates.length - 1; i++) {
       const stateData = $dataStates[i];
       if (stateData.meta["dayRemove"]) {
         if ($gameParty.membersState(i)) {
           for (
-            var j = $gameVariables.value(HELPER_VARIABLE.FIRST_DEPLOYED_ACTOR_ID);
+            let j = $gameVariables.value(HELPER_VARIABLE.FIRST_DEPLOYED_ACTOR_ID);
             j <= $gameVariables.value(HELPER_VARIABLE.LAST_DEPLOYED_ACTOR_ID);
             j++
           ) {
-            var actor = $gameActors.actor(j);
+            actor = $gameActors.actor(j);
             if (actor.isStateAffected(i)) {
               actor.removeState(i);
             }
@@ -10241,10 +10392,10 @@
 
   // Replaces (1x): CommonEvents.json:common-event:24|一日経過時コモン
   AGH_iterateSystemSwitchesDaysOnSwi = function () {
-    for (var i = 1; i <= $dataSystem.switches.length - 1; i++) {
+    for (let i = 1; i <= $dataSystem.switches.length - 1; i++) {
       if ($dataSystem.switches[i].match(/daysOnSwi/)) {
         if ($gameSwitches.value(i)) {
-          var switchIdText = $dataSystem.switches[i].replace(/[^0-9]/g, "");
+          const switchIdText = $dataSystem.switches[i].replace(/[^0-9]/g, "");
           $gameSwitches.setValue(switchIdText, true);
         }
       }
@@ -10253,16 +10404,17 @@
 
   // Replaces (1x): CommonEvents.json:common-event:24|一日経過時コモン
   AGH_iterateSystemSwitchesDaysOnVal = function () {
-    for (var i = 1; i <= $dataSystem.switches.length - 1; i++) {
+    let variableId;
+    for (let i = 1; i <= $dataSystem.switches.length - 1; i++) {
       if ($dataSystem.switches[i].match(/daysOnVal+/)) {
         if ($gameSwitches.value(i)) {
-          var variableId = $dataSystem.switches[i].replace(/[^0-9]/g, "");
+          variableId = $dataSystem.switches[i].replace(/[^0-9]/g, "");
           $gameVariables.setValue(variableId, $gameVariables.value(variableId) + 1);
         }
       }
       if ($dataSystem.switches[i].match(/daysOnVal-/)) {
         if ($gameSwitches.value(i)) {
-          var variableId = $dataSystem.switches[i].replace(/[^0-9]/g, "");
+          variableId = $dataSystem.switches[i].replace(/[^0-9]/g, "");
           $gameVariables.setValue(variableId, $gameVariables.value(variableId) - 1);
         }
       }
@@ -10271,12 +10423,13 @@
 
   // Replaces (1x): CommonEvents.json:common-event:24|一日経過時コモン
   AGH_iterateSystemSwitchesDaysReset = function () {
-    for (var i = 1; i <= $dataSystem.switches.length - 1; i++) {
+    let i;
+    for (i = 1; i <= $dataSystem.switches.length - 1; i++) {
       if ($dataSystem.switches[i].match(/daysReset/)) {
         $gameSwitches.setValue(i, false);
       }
     }
-    for (var i = 1; i <= $dataSystem.variables.length - 1; i++) {
+    for (i = 1; i <= $dataSystem.variables.length - 1; i++) {
       if ($dataSystem.variables[i].match(/daysReset/)) {
         $gameVariables.setValue(i, 0);
       }
@@ -10285,14 +10438,14 @@
 
   // Replaces (1x): CommonEvents.json:common-event:24|一日経過時コモン
   AGH_loseItemDayPassCommon = function () {
-    for (var i = 1001; i <= 1100; i++) {
+    for (let i = 1001; i <= 1100; i++) {
       $gameParty.loseItem($dataItems[i], 9999);
     }
   };
 
   // Replaces (1x): CommonEvents.json:common-event:24|一日経過時コモン
   AGH_iterateItemsExpiryDate = function () {
-    for (var i = 1; i <= $dataItems.length - 1; i++) {
+    for (let i = 1; i <= $dataItems.length - 1; i++) {
       const itemData = $dataItems[i];
       if (!itemData.meta["ExpiryDate"]) continue;
 
@@ -10304,7 +10457,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:24|一日経過時コモン
   AGH_gainItemSkillCost1week = function () {
-    for (var i = 1; i <= $dataItems.length - 1; i++) {
+    for (let i = 1; i <= $dataItems.length - 1; i++) {
       const itemData = $dataItems[i];
       if (itemData.meta["SkillCost1week"]) {
         $gameParty.gainItem(itemData, 1);
@@ -10330,7 +10483,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:25|一日始まり時コモン
   AGH_setSwitchParallelStopDayPass = function () {
-    for (var i = 1; i <= $dataSystem.switches.length - 1; i++) {
+    for (let i = 1; i <= $dataSystem.switches.length - 1; i++) {
       if ($dataSystem.switches[i].match(/夜自動/)) {
         if ($gameSwitches.value(i) && !$gameSwitches.value(i + 2)) {
           $gameSwitches.setValue(474, true);
@@ -10364,12 +10517,15 @@
 
   // Replaces (1x): CommonEvents.json:common-event:25|一日始まり時コモン
   AGH_setSelfVariableRandomWork1DayStartCommon = function (interp) {
-    var randomWorkValue = `おはよう御座います。\n今日も頑張りましょうね`;
-    if ($gameSwitches.value(HELPER_SWITCH.TOWN) && $gameSwitches.value(204)) {
-      var randomWorkValue = `──さて、行きましょうか`;
-    }
+    let randomWorkValue;
     if ($gameSwitches.value(465)) {
-      var randomWorkValue = `………行きましょう`;
+      randomWorkValue = "………行きましょう";
+    }
+    else if ($gameSwitches.value(HELPER_SWITCH.TOWN) && $gameSwitches.value(204)) {
+      randomWorkValue = "──さて、行きましょうか";
+    }
+    else {
+      randomWorkValue = "おはよう御座います。\n今日も頑張りましょうね";
     }
     interp.sVal(21, randomWorkValue);
   };
@@ -10389,32 +10545,49 @@
   };
 
   // Replaces (1x): CommonEvents.json:common-event:29|メニュー開く
-  AGH_setVariableMenuDisplay = function () {
+    // Variable 255 keeps the menu header block, variable 253 the profile block that is
+  // appended to it. Both menu entry points only differ in the header font size.
+  const MENU_HEADER_VARIABLE = 255;
+  const MENU_PROFILE_VARIABLE = 253;
+  const ACTOR_RECORD_PROFILE_SLOT = 50;
+
+  function buildMenuHeaderText(actor, fontSizeValue) {
+    const actorRecord = $gameVariables.value(actor.actorId() + 380);
+    const actorName = actor.name();
+    const actorNickname = actor.nickname();
+    const headerLine = colorTaggedText(2, actorName + "=" + actorRecord[ACTOR_RECORD_PROFILE_SLOT]);
+    return (
+      "\\fs[" + fontSizeValue + "]" + headerLine + "\n" +
+      "\t\t\\fs[" + fontSizeValue + "]" + actorNickname + "\n"
+    );
+  }
+
+  // Appends the profile block (variable 253) to the header block (variable 255).
+  function appendMenuProfileBlock() {
+    const headerText = $gameVariables.value(MENU_HEADER_VARIABLE);
+    const profileText = $gameVariables.value(MENU_PROFILE_VARIABLE);
+    $gameVariables.setValue(MENU_HEADER_VARIABLE, headerText + profileText);
+  }
+
+AGH_setVariableMenuDisplay = function () {
     const actor = $gameParty.members()[0];
     production_separateSetProfile(actor.actorId());
-    $gameVariables.setValue(
-      255,
-      `\\fs[22]\\C[2]${actor.name()}=${$gameVariables.value(actor.actorId() + 380)[50]}\\C[0]
-		\\fs[22]${actor.nickname()}\n`
-    );
-    $gameVariables.setValue(253, `\\fs[20]${actor.profile()}`);
-    $gameVariables.setValue(255, $gameVariables.value(255) + $gameVariables.value(253));
+    $gameVariables.setValue(MENU_HEADER_VARIABLE, buildMenuHeaderText(actor, 22));
+    const actorProfile = actor.profile();
+    $gameVariables.setValue(MENU_PROFILE_VARIABLE, "\\fs[20]" + actorProfile);
+    appendMenuProfileBlock();
   };
 
   // Replaces (1x): CommonEvents.json:common-event:29|メニュー開く
   AGH_setVariableMenuDisplayOpenMenu = function () {
     const actor = $gameParty.members()[0];
-    $gameVariables.setValue(
-      255,
-      `\\fs[25]\\C[2]${actor.name()}=${$gameVariables.value(actor.actorId() + 380)[50]}\\C[0]
-		\\fs[25]${actor.nickname()}\n`
-    );
+    $gameVariables.setValue(MENU_HEADER_VARIABLE, buildMenuHeaderText(actor, 25));
     if (isGirl(actor)) {
-      hstates_heights(actor.actorId(), 253);
+      hstates_heights(actor.actorId(), MENU_PROFILE_VARIABLE);
     } else {
-      $gameVariables.setValue(253, `　`);
+      $gameVariables.setValue(MENU_PROFILE_VARIABLE, "　");
     }
-    $gameVariables.setValue(255, $gameVariables.value(255) + $gameVariables.value(253));
+    appendMenuProfileBlock();
   };
 
   // Replaces (1x): CommonEvents.json:common-event:29|メニュー開く
@@ -10424,23 +10597,23 @@
 
   // Replaces (1x): CommonEvents.json:common-event:42|ナヴィ表示
   AGH_initValueWordSet1 = function () {
-    valueWordSet1 = ``;
-    valueWordSet2 = ``;
-    valueWordSet3 = ``;
-    valueWordSet4 = ``;
-    valueWordSet5 = ``;
+    valueWordSet1 = "";
+    valueWordSet2 = "";
+    valueWordSet3 = "";
+    valueWordSet4 = "";
+    valueWordSet5 = "";
   };
 
   // Replaces (1x): CommonEvents.json:common-event:43|一日一回コモン
   AGH_setVariableDungeonWipeOutCount = function () {
     const dungeonWipeBonusCounts = $gameVariables.value(257);
     let counter = 0;
-    for (var i = 0; i < dungeonWipeBonusCounts.length; i++) {
+    for (let i = 0; i < dungeonWipeBonusCounts.length; i++) {
       if (dungeonWipeBonusCounts[i] >= 1 && i >= 1) {
         const itemData = $dataItems[i];
         if (itemData.meta["OnSwitch"]) {
-          var OnSwitchList = itemData.meta["OnSwitch"].split(",");
-          for (var j = 0; j <= OnSwitchList.length - 1; j++) {
+          const OnSwitchList = itemData.meta["OnSwitch"].split(",");
+          for (let j = 0; j <= OnSwitchList.length - 1; j++) {
             if (Number(OnSwitchList[j]) == 207) {
               counter += dungeonWipeBonusCounts[i];
             }
@@ -10469,22 +10642,24 @@
   AGH_setSelfVariableActorChoiceOneLineEffect = function (interp) {
     //一言演出。変数20が1以上で獲得用。0で移動ポイント増加など
     interp.sVal(20, 1);
-    const actor = $gameActors.actor($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID));
-    const coloredText = colorTaggedText(16, `${actor.name()}`);
-    const coloredText2 = colorTaggedText(2, `＜${"\\j[21]"}＞`);
-    valueWordSet0 = `${coloredText}はクラス2ndジョブ${coloredText2}に目覚めた！`;
+    const selectedActorId = $gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID);
+    const actor = $gameActors.actor(selectedActorId);
+    const actorName = colorTaggedText(16, actor.name());
+    const jobNameLabel = colorTaggedText(2, "＜\\j[21]＞");
+    valueWordSet0 = `${actorName}はクラス2ndジョブ${jobNameLabel}に目覚めた！`;
     valueWordSetEx = 0; //補足が必要な場合
     interp.setupChild($dataCommonEvents[45].list, 0);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:48|全体図で新エリア解放時イベント
   AGH_characterERSMAKETEMPLATE = function (interp) {
+    let args;
     const character2 = interp.character(0);
     const positionX = character2.x;
     const positionY = character2.y;
-    var args = new Array("68", String(positionX), String(positionY));
+    args = new Array("68", String(positionX), String(positionY));
     interp.pluginCommand("ERS_MAKE_TEMPLATE", args);
-    var args = new Array("22");
+    args = new Array("22");
     interp.pluginCommand("ERS_GET_LAST_SPAWN_EVENT_ID", args);
     interp.wait(20);
   };
@@ -10536,7 +10711,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:49|ダンジョンワープポイント
   AGH_addCustomChoiceDungeonWarpPoint = function () {
-    for (var i = 0; i <= valueScriptArray1.length - 1; i++) {
+    for (let i = 0; i <= valueScriptArray1.length - 1; i++) {
       const id = 1;
       const choiceParams = {
         text: `${valueWordArray[i]}`,
@@ -10581,11 +10756,11 @@
     const valueItems = $dataWeapons;
     const end = valueItems.length - 1;
     let j = 1;
-    for (var i = 1; i <= end; i++) {
+    for (let i = 1; i <= end; i++) {
       const databaseEntry = valueItems[i];
       if (!databaseEntry.meta[BGInN]) continue;
 
-      var array = databaseEntry.meta[BGInN].split(",")[0];
+      const array = databaseEntry.meta[BGInN].split(",")[0];
       //console.log(`${i}  ${value1}`);
       //console.log(`${value1}`);
       $gameScreen.showPicture(j, array, 1, 640 - 128, 384, 100, 100, 255, 0);
@@ -10599,11 +10774,11 @@
     const valueItems = $dataEnemies;
     const end = valueItems.length - 1;
     let j = 1;
-    for (var i = 1; i <= end; i++) {
+    for (let i = 1; i <= end; i++) {
       const databaseEntry = valueItems[i];
       if (!databaseEntry.meta[EnemyEntrySe]) continue;
 
-      var array = databaseEntry.meta[EnemyEntrySe].split(",")[0];
+      const array = databaseEntry.meta[EnemyEntrySe].split(",")[0];
       //console.log(`${i}  ${value1}`);
       //console.log(`${value1}`);
       AudioManager.playSe({ name: array, volume: 100, pitch: 100, pan: 0 });
@@ -10613,16 +10788,17 @@
 
   // Replaces (1x): CommonEvents.json:common-event:52|ファイルチェック用スクリプト
   AGH_showPictureFileCheckScript = function () {
+    let pictureName;
     const metadataKey = "";
     const valueItems = $dataItems;
     const end = valueItems.length - 1;
     let j = 1;
-    for (var i = 1; i <= end; i++) {
+    for (let i = 1; i <= end; i++) {
       const databaseEntry = valueItems[i];
       if (!databaseEntry.meta[metadataKey]) continue;
 
-      var pictureName = databaseEntry.meta[metadataKey].split(",")[0];
-      var pictureName = "/img/parallaxes/" + pictureName;
+      pictureName = databaseEntry.meta[metadataKey].split(",")[0];
+      pictureName = "/img/parallaxes/" + pictureName;
       //console.log(`${i}  ${value1}`);
       $gameScreen.showPicture(j, pictureName, 1, 640 - 128, 384, 100, 100, 255, 0);
       j += 1;
@@ -10633,7 +10809,7 @@
   AGH_setSelfVariableActorChoiceDebugCommon = function (interp) {
     interp.sVal(20, 3);
     const actor = $gameActors.actor($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID));
-    for (var i = 431; i < 439; i++) {
+    for (let i = 431; i < 439; i++) {
       actor.forgetSkill(i);
     }
   };
@@ -10642,7 +10818,7 @@
   AGH_setSelfVariableActorChoice_4 = function (interp) {
     interp.sVal(20, 3);
     const actor = $gameActors.actor($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID));
-    for (var i = 1; i < $dataSkills.length; i++) {
+    for (let i = 1; i < $dataSkills.length; i++) {
       if (!!actor.isLearnedSkill(i)) continue;
 
       actor.forgetSkill(i);
@@ -10668,8 +10844,8 @@
   // Replaces (1x): CommonEvents.json:common-event:53|デバッグコモン
   AGH_iteratePartyMembersDebugCommon = function () {
     const battleMembers2 = $gameParty.battleMembers();
-    for (var i = 0; i < battleMembers2.length; i++) {
-      var battleMember = battleMembers2[i];
+    for (let i = 0; i < battleMembers2.length; i++) {
+      const battleMember = battleMembers2[i];
       if ($gameParty.members().contains(battleMember)) {
         battleMember.learnSkill(297);
         battleMember.gainSkillMasteryUses(297, 100);
@@ -10701,20 +10877,21 @@
 
   // Replaces (1x): CommonEvents.json:common-event:53|デバッグコモン
   AGH_iterateItemsDebugCommon = function () {
-    let messageText = ``;
-    for (var i = 1; i <= $dataStates.length - 1; i++) {
+    let i;
+    let messageText = "";
+    for (i = 1; i <= $dataStates.length - 1; i++) {
       messageText += `[${i}]${$dataStates[i].name}\n`;
     }
-    for (var i = 1; i <= $dataItems.length - 1; i++) {
+    for (i = 1; i <= $dataItems.length - 1; i++) {
       messageText += `[${i}]${$dataItems[i].name}\n`;
     }
-    for (var i = 1; i <= $dataWeapons.length - 1; i++) {
+    for (i = 1; i <= $dataWeapons.length - 1; i++) {
       messageText += `[${i}]${$dataWeapons[i].name}\n`;
     }
-    for (var i = 1; i <= 500; i++) {
+    for (i = 1; i <= 500; i++) {
       messageText += `[${i}]${$dataArmors[i].name}\n`;
     }
-    for (var i = 1; i <= $dataSkills.length - 1; i++) {
+    for (i = 1; i <= $dataSkills.length - 1; i++) {
       messageText += `[${i}]${$dataSkills[i].name}\n`;
     }
     //console.log(messageText)
@@ -10722,7 +10899,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:53|デバッグコモン
   AGH_gainItemDebugCommon = function () {
-    for (var i = 801; i <= 810; i++) {
+    for (let i = 801; i <= 810; i++) {
       const itemData = $dataItems[i];
       if (!itemData.name == "") {
         $gameParty.gainItem(itemData, -1);
@@ -10734,10 +10911,10 @@
   AGH_setVariableDungeonWarpCircleDebugCommon = function () {
     $gameVariables.setValue(HELPER_VARIABLE.DUNGEON_WARP_POINTS, Array(101).fill(0));
     const dungeonWarpPoints2 = $gameVariables.value(HELPER_VARIABLE.DUNGEON_WARP_POINTS);
-    for (var i = 0; i <= 100; i++) {
+    for (let i = 0; i <= 100; i++) {
       const dungeonWarpPoints = dungeonWarpPoints2;
       dungeonWarpPoints[i] = [];
-      for (var j = 0; j <= 10; j++) {
+      for (let j = 0; j <= 10; j++) {
         dungeonWarpPoints[i].push(0);
       }
     }
@@ -10763,7 +10940,7 @@
   // Replaces (1x): CommonEvents.json:common-event:53|デバッグコモン
   AGH_iterateSystemSwitches = function () {
     const array = [];
-    for (var i = 201; i <= 380; i++) {
+    for (let i = 201; i <= 380; i++) {
       array.push(`${i}:${$dataSystem.switches[i]}`);
     }
     fs.writeFileSync("valueLocationPreset.txt", JSON.stringify(array));
@@ -10771,7 +10948,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:54|イベント場所移動コモン
   AGH_configureMapEventEventPlaceMoveCommon = function (interp) {
-    for (var i = 1; i < 10; i++) {
+    for (let i = 1; i < 10; i++) {
       if (!!!$gameMap.event(i)) continue;
 
       interp._eventId = i;
@@ -10803,24 +10980,26 @@
 
   // Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
   AGH_pluginCommandGabText = function (interp) {
+    let args;
     const talkSet = valueTalkSet;
-    var args = new Array(String(talkSet[0]));
+    args = new Array(String(talkSet[0]));
     interp.pluginCommand("GabText", args);
-    var args = new Array(String(talkSet[1]));
+    args = new Array(String(talkSet[1]));
     interp.pluginCommand("GabFaceName", args);
-    var args = new Array(String(talkSet[2]));
+    args = new Array(String(talkSet[2]));
     interp.pluginCommand("GabFaceIndex", args);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
   AGH_readVariableTipsTitle = function () {
-    var hasStoredTip = 0;
+    let hasStoredTip;
+    hasStoredTip = 0;
     const tipsTitles = $gameVariables.value(532);
     if (tipsTitles.length != 0) {
-      for (var i = 0; i <= tipsTitles.length - 1; i++) {
+      for (let i = 0; i <= tipsTitles.length - 1; i++) {
         if (!(tipsTitles[i] == valueTalkSet[0])) continue;
 
-        var hasStoredTip = 1;
+        hasStoredTip = 1;
         break;
       }
     }
@@ -10833,18 +11012,19 @@
 
   // Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
   AGH_showPictureConversationGabCommon = function () {
+    let tipText, pictureY;
     if (valueTalkSet[1] == 0) {
-      var tipText = `Tips:${valueTalkSet[0]}`;
+      tipText = `Tips:${valueTalkSet[0]}`;
     } else {
-      var tipText = `Tips:${valueTalkSet[0]}\n${valueTalkSet[1]}`;
+      tipText = `Tips:${valueTalkSet[0]}\n${valueTalkSet[1]}`;
     }
     const array = [tipText, 25];
     $gameScreen.setDTextPicture(array[0], array[1]);
     $gameScreen.dWindowFrame = "ON";
     if (valueTalkSet[2][0] != 0) {
-      var pictureY = 30;
+      pictureY = 30;
     } else {
-      var pictureY = 50;
+      pictureY = 50;
     }
     $gameScreen.showPicture(103, "", 0, -80, pictureY, 100, 100, 255, 0);
     $gameScreen.movePicture(103, 0, 50, pictureY, 100, 100, 255, 0, 100);
@@ -10875,49 +11055,68 @@
   };
 
   // Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
-  AGH_showPictureSkillAttackId = function () {
-    const actor = $gameActors.actor($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID));
-    const gameVariableValue = $gameVariables.value(96);
-    var skillNameText = `\x1bSIN[${gameVariableValue}]`;
-    const skillData = $dataSkills[gameVariableValue];
-    if (skillData.meta["rubi"]) {
-      var variable96Value2 = skillData.meta["rubi"].replace(" ", "");
-      var skillNameText = `${variable96Value2}\n${skillNameText}`;
-    }
-    $gameScreen.dWindowFrame = "ON";
-    $gameScreen.dTextAlign = 1;
-    $gameScreen.setDTextPicture(`${skillNameText}`, 35);
+    // Skill name picture shown above the acting party member when a skill is used.
+  const SKILL_ATTACK_PICTURE_ID = 100;
+  const SKILL_ATTACK_PICTURE_FONT_SIZE = 35;
+  const SKILL_ATTACK_PICTURE_START_OFFSET_Y = 50;
+  const SKILL_ATTACK_PICTURE_END_OFFSET_Y = 100;
+  const SKILL_ATTACK_PICTURE_FRAMES = 30;
+
+  // Skill name with its ruby line on top, when the database entry has one.
+  function buildSkillNameText(skillId) {
+    const skillNameEscaped = `\x1bSIN[${skillId}]`;
+    const rubyText = $dataSkills[skillId].meta["rubi"];
+    if (!rubyText) return skillNameEscaped;
+    return `${rubyText.replace(" ", "")}\n${skillNameEscaped}`;
+  }
+
+  // Slides an empty picture upwards to reveal the text picture drawn on top of it.
+  function slideSkillAttackPicture(pictureX, pictureY) {
     $gameScreen.showPicture(
-      100,
+      SKILL_ATTACK_PICTURE_ID,
       "",
       1,
-      $gameParty.getX(actor.index() + 1),
-      $gameParty.getY(actor.index() + 1) - 50,
+      pictureX,
+      pictureY - SKILL_ATTACK_PICTURE_START_OFFSET_Y,
       100,
       100,
       0,
       0
     );
     $gameScreen.movePicture(
-      100,
+      SKILL_ATTACK_PICTURE_ID,
       1,
-      $gameParty.getX(actor.index() + 1),
-      $gameParty.getY(actor.index() + 1) - 100,
+      pictureX,
+      pictureY - SKILL_ATTACK_PICTURE_END_OFFSET_Y,
       100,
       100,
       255,
       0,
-      30
+      SKILL_ATTACK_PICTURE_FRAMES
     );
+  }
+
+AGH_showPictureSkillAttackId = function () {
+    const actor = $gameActors.actor($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID));
+    const skillId = $gameVariables.value(96);
+    const skillNameText = buildSkillNameText(skillId);
+    const partySlot = actor.index() + 1;
+    const pictureX = $gameParty.getX(partySlot);
+    const pictureY = $gameParty.getY(partySlot);
+    $gameScreen.dWindowFrame = "ON";
+    $gameScreen.dTextAlign = 1;
+    $gameScreen.setDTextPicture(skillNameText, SKILL_ATTACK_PICTURE_FONT_SIZE);
+    slideSkillAttackPicture(pictureX, pictureY);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
   AGH_pictureScreenBlackOut = function () {
-    var backgroundXOffset = 128;
-    var textXOffset = 0;
+    let backgroundXOffset, textXOffset;
+    backgroundXOffset = 128;
+    textXOffset = 0;
     if ($gameScreen.picture(5) || $gameScreen.picture(70)) {
-      var backgroundXOffset = -128;
-      var textXOffset = -128;
+      backgroundXOffset = -128;
+      textXOffset = -128;
     }
     const talkSet = valueTalkSet;
     const ScreenBlackOut = "ScreenBlackOut";
@@ -11034,6 +11233,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
   AGH_waitConversationGabCommon = function (interp) {
+    let picture, pictureX;
     const talkSet = valueTalkSet;
     const actor = $gameActors.actor(talkSet[1]);
     if (talkSet[0] == 1) {
@@ -11048,11 +11248,11 @@
     pic_move1(92, 0, 0, 100, 100, 0, 120);
     const picture2 = $gameScreen.picture(91);
     if (picture2) {
-      var picture = picture2.x();
+      picture = picture2.x();
     }
     const picture3 = $gameScreen.picture(93);
     if (picture3) {
-      var pictureX = picture3.x();
+      pictureX = picture3.x();
     }
     pic_move1(93, picture - pictureX, 0, 100, 100, 0, 10);
     interp.wait(15);
@@ -11114,7 +11314,7 @@
     if (talkSet[2] >= 1) {
       valueCountSet1 = talkSet[2];
     } else {
-      for (var id = 10; id > 0; id--) {
+      for (let id = 10; id > 0; id--) {
         if (!!!$gameMap.event(id)) continue;
 
         valueCountSet1 = id;
@@ -11125,24 +11325,26 @@
 
   // Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
   AGH_spawnMapEventConversationGabCommon = function () {
+    let event;
     const talkSet = valueTalkSet;
     if (!(talkSet[0] == 1)) return;
 
-    var event = $gameMap.event(valueCountSet1)._realX;
+    event = $gameMap.event(valueCountSet1)._realX;
     const eventY = $gameMap.event(valueCountSet1)._realY;
     $gameMap.spawnEvent(146, event, eventY, true);
     valueBlackScreenId = $gameMap.getLastSpawnEventId();
-    var event = $gameMap.event(valueBlackScreenId);
+    event = $gameMap.event(valueBlackScreenId);
     event.setOpacity(talkSet[1]);
     event._spriteOffsetY += 368;
   };
 
   // Replaces (1x): CommonEvents.json:common-event:60|会話コモンGabなど
   AGH_setMapEventOpacityConversationGabCommon = function () {
+    let event;
     const talkSet = valueTalkSet;
     if (talkSet[0] == 0) {
       if (valueBlackScreenId >= 1) {
-        var event = $gameMap.event(valueBlackScreenId);
+        event = $gameMap.event(valueBlackScreenId);
         event.setOpacity(0);
       }
     }
@@ -11150,7 +11352,8 @@
 
   // Replaces (1x): CommonEvents.json:common-event:62|スクリプト演出コモン
   AGH_showPictureScriptCommonVariable1 = function (interp) {
-    var args = new Array(String($gameVariables.value(121)), "1", "横", String($gameVariables.value(123)));
+    let args;
+    args = new Array(String($gameVariables.value(121)), "1", "横", String($gameVariables.value(123)));
     interp.pluginCommand("PA_INIT", args);
     const gameVariableValue = $gameVariables.value(124);
     $gameScreen.showPicture(
@@ -11164,14 +11367,15 @@
       255,
       0
     );
-    var args = new Array(String(gameVariableValue), String($gameVariables.value(125)));
+    args = new Array(String(gameVariableValue), String($gameVariables.value(125)));
     interp.pluginCommand("PA_START_LOOP", args);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:62|スクリプト演出コモン
   AGH_showPictureScriptCommonVariable1ScriptEffectCommon = function (interp) {
+    let args;
     const array = [1, 1, 2, 1];
-    var args = new Array(String($gameVariables.value(121)), "1", "横", String($gameVariables.value(123)));
+    args = new Array(String($gameVariables.value(121)), "1", "横", String($gameVariables.value(123)));
     interp.pluginCommand("PA_INIT", args);
     const gameVariableValue = $gameVariables.value(124);
     $gameScreen.showPicture(
@@ -11185,7 +11389,7 @@
       $gameVariables.value(126),
       $gameVariables.value(127)
     );
-    var args = new Array(String(gameVariableValue), String($gameVariables.value(125)), String(array));
+    args = new Array(String(gameVariableValue), String($gameVariables.value(125)), String(array));
     interp.pluginCommand("PA_START_LOOP", args);
   };
 
@@ -11204,40 +11408,39 @@
   };
 
   // Replaces (1x): CommonEvents.json:common-event:64|スクリプトシステムコモン
-  AGH_readVariablePartyDisbandOrder = function () {
-    const array = $gameVariables.value(511);
-    const loopVariableValue = $gameVariables.value(512);
-    for (var i = 0; i < array.length - 1; i++) {
-      if (loopVariableValue - 1 >= i) {
-        const actor2 = $gameActors.actor(array[i]);
-        if (!$gameParty.members().contains(actor2)) {
-          $gameParty.addActor(array[i]);
-          actor2.refresh();
-          //console.log(array[i]);
-        }
-      }
+    const PARTY_DISBAND_ORDER_VARIABLE = 511;
+  const PARTY_DISBAND_MARKER_VARIABLE = 512;
+  // Variable 511 lists the party order, variable 512 marks the disband position.
+  // Before the marker the members are re-added on the way back, after it on the way out.
+  function addDisbandedPartyMembers(addBeforeMarker) {
+    const partyActorIds = $gameVariables.value(PARTY_DISBAND_ORDER_VARIABLE);
+    const markerPosition = $gameVariables.value(PARTY_DISBAND_MARKER_VARIABLE) - 1;
+    // The last slot of the list is a terminator and must not be added.
+    for (let listIndex = 0; listIndex < partyActorIds.length - 1; listIndex++) {
+      const isWanted = addBeforeMarker
+        ? markerPosition >= listIndex
+        : markerPosition <= listIndex;
+      if (!isWanted) continue;
+      const partyActorId = partyActorIds[listIndex];
+      const partyActor = $gameActors.actor(partyActorId);
+      if ($gameParty.members().contains(partyActor)) continue;
+      $gameParty.addActor(partyActorId);
+      partyActor.refresh();
     }
+  }
+
+AGH_readVariablePartyDisbandOrder = function () {
+    addDisbandedPartyMembers(true);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:64|スクリプトシステムコモン
   AGH_readVariablePartyDisbandOrderScriptSystemCommon = function () {
-    const array = $gameVariables.value(511);
-    const loopVariableValue = $gameVariables.value(512);
-    for (var i = 0; i < array.length - 1; i++) {
-      if (loopVariableValue - 1 <= i) {
-        const actor2 = $gameActors.actor(array[i]);
-        if (!$gameParty.members().contains(actor2)) {
-          $gameParty.addActor(array[i]);
-          actor2.refresh();
-          //console.log(array[i]);
-        }
-      }
-    }
+    addDisbandedPartyMembers(false);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:64|スクリプトシステムコモン
   AGH_readVariableCurrentViewHeroId = function () {
-    for (var i = 1; i <= 20; i++) {
+    for (let i = 1; i <= 20; i++) {
       $gameParty.removeActor(i);
     }
     $gameParty.addActor($gameVariables.value(HELPER_VARIABLE.VIEWPOINT_ACTOR_ID));
@@ -11274,7 +11477,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:64|スクリプトシステムコモン
   AGH_addCustomChoiceScriptSystemCommon = function () {
-    for (var i = 0; i < 9; i++) {
+    for (let i = 0; i < 9; i++) {
       const id = 1;
       const choiceParams = {
         text: $gameSystem.saveEquipCommandNameArray[i],
@@ -11292,23 +11495,24 @@
 
   // Replaces (1x): CommonEvents.json:common-event:64|スクリプトシステムコモン
   AGH_iteratePartyMembersERSMAKETEMPLATE = function (interp) {
+    let args;
     const actor = $gameActors.actor($gameVariables.value(121)).index();
     const members2 = $gameParty.members();
     if (members2.contains(members2[actor])) {
       if (members2[actor].actorId() == $gameVariables.value(HELPER_VARIABLE.VIEWPOINT_ACTOR_ID)) {
       } else {
-        var memberIndex = members2[actor].actorId() + 20;
-        var args = new Array(
+        const memberIndex = members2[actor].actorId() + 20;
+        args = new Array(
           String(memberIndex),
           String(interp.character(-1).x),
           String(interp.character(-1).y + 1)
         );
         interp.pluginCommand("ERS_MAKE_TEMPLATE", args);
-        var args = new Array("21");
+        args = new Array("21");
         interp.pluginCommand("ERS_GET_LAST_SPAWN_EVENT_ID", args);
         const gameVariableValue = $gameVariables.value(342);
         gameVariableValue[memberIndex - 20] = $gameVariables.value(HELPER_VARIABLE.RANDOM_WORK_1);
-        var args = new Array(String(gameVariableValue[memberIndex - 20]), String(actor));
+        args = new Array(String(gameVariableValue[memberIndex - 20]), String(actor));
         interp.pluginCommand("PartyGraphics", args);
         interp
           .character(gameVariableValue[memberIndex - 20])
@@ -11364,7 +11568,7 @@
   AGH_setSwitchSingleSouwaIncidence = function () {
     const start = 1201;
     const end = 1300;
-    for (var i = start; i <= end; i++) {
+    for (let i = start; i <= end; i++) {
       if ($gameSwitches.value(i) && !$gameParty.hasItem(i - 800) && !$gameSwitches.value(i + 100)) {
         if ($dataItems[i - 800].meta["singleSouwaIncidence"]) {
         } else {
@@ -11377,7 +11581,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:66|コンフィグコマンド
   AGH_setSwitchAddEventIncidenceSwi = function () {
-    for (var i = 1; i <= $dataItems.length - 1; i++) {
+    for (let i = 1; i <= $dataItems.length - 1; i++) {
       const itemData = $dataItems[i];
       if (itemData.meta["AddEventIncidenceSwi"]) {
         if (Number(itemData.meta["EICSwitch"]) == 102) {
@@ -11470,8 +11674,9 @@
 
   // Replaces (1x): CommonEvents.json:common-event:82|文字で効果音ＢＧＳ
   AGH_waitTextSoundEffectBgs_2 = function (interp) {
-    var waitFrames = valueScriptArray2[3];
-    var waitFrames = getRandomIndex(41) + waitFrames - 20;
+    let waitFrames;
+    waitFrames = valueScriptArray2[3];
+    waitFrames = getRandomIndex(41) + waitFrames - 20;
     interp.wait(waitFrames);
   };
 
@@ -11480,7 +11685,7 @@
     const start = 63;
     const end = 70;
     const actor = $gameActors.actor($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID));
-    for (var i = start; i <= end; i++) {
+    for (let i = start; i <= end; i++) {
       if (actor.isLearnedSkill(i)) {
         interp.sVal(21, $gameVariables.value(HELPER_VARIABLE.RANDOM_WORK_1) + 1);
       }
@@ -11524,11 +11729,17 @@
   AGH_readVariableChoiceSwitch15 = function () {
     //シーン一行表現履歴174,175
     const selectedActorId = $gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID);
-    const gameVariableValue = $gameVariables.value(HELPER_VARIABLE.SCENE_SUMMARY_COUNTS);
-    gameVariableValue[selectedActorId] += 1;
-    const sceneSummary = `[${gameVariableValue[selectedActorId]}]${$gameVariables.value(506)}\n`;
-    const gameVariableValue2 = $gameVariables.value(174);
-    gameVariableValue2[selectedActorId] = gameVariableValue2[selectedActorId].concat(sceneSummary);
+    const sceneSummaryCounts = $gameVariables.value(
+      HELPER_VARIABLE.SCENE_SUMMARY_COUNTS
+    );
+    sceneSummaryCounts[selectedActorId] += 1;
+    const summaryCount = sceneSummaryCounts[selectedActorId];
+    const sceneTitle = $gameVariables.value(506);
+    const sceneSummary = "[" + summaryCount + "]" + sceneTitle + "\n";
+    const sceneSummaryHistory = $gameVariables.value(174);
+    sceneSummaryHistory[selectedActorId] = sceneSummaryHistory[
+      selectedActorId
+    ].concat(sceneSummary);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:85|性欲度等変動表示コモン
@@ -11591,13 +11802,14 @@
 
   // Replaces (1x): CommonEvents.json:common-event:87|性欲度等情報表示
   AGH_showPictureHStatusPictureTemp = function () {
+    let pictureId;
     const gameVariableValue = $gameVariables.value(193);
     if (!(gameVariableValue != 0)) return;
 
-    var pictureId = 111;
+    pictureId = 111;
     $gameScreen.showPicture(pictureId, gameVariableValue, 1, 1024, 384, 100, 100, 255, 0);
     const array = ["Hscene005", "Hscene029", "Hscene061", "Hscene099", "Hscene105", "Hscene123", "Hscene183"];
-    var pictureId = array[getRandomIndex(array.length)];
+    pictureId = array[getRandomIndex(array.length)];
     picture_fade1(51, "fadeIn", pictureId, 60, 5);
   };
 
@@ -11626,7 +11838,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:87|性欲度等情報表示
   AGH_erasePictureDesireInfoDisplay_2 = function () {
-    for (var i = 111; i <= 125; i++) {
+    for (let i = 111; i <= 125; i++) {
       if (!$gameScreen.picture(i)) continue;
 
       UTSU.PictureBreath.off([i]);
@@ -11646,7 +11858,7 @@
     const abstinenceDays = actorHStats[64];
     const wasAssaultedToday = actorHStats[71] >= 1;
     valueWordSet0 = `本日Ｈ回数：${dailyEncounterCount}回　`;
-    if (wasAssaultedToday) valueWordSet0 += `（本日中に犯されている…）`;
+    if (wasAssaultedToday) valueWordSet0 += "（本日中に犯されている…）";
     if (prostitutionEarnings >= 1) valueWordSet0 += `\n売春獲得総金額：${prostitutionEarnings}` + "\\G　";
     if (desireLevel >= 500 && abstinenceDays >= 1) valueWordSet0 += `\n禁欲日数：${abstinenceDays}日　`;
   };
@@ -11759,7 +11971,7 @@
   // Replaces (1x): CommonEvents.json:common-event:94|受精コモン演出
   AGH_showPictureFertilizationDirect = function (interp) {
     const value = 60;
-    for (var i = 1; i <= 4; i++) {
+    for (let i = 1; i <= 4; i++) {
       $gameScreen.showPicture(
         i + 1 + value,
         "FertilizationDirect" + i,
@@ -11837,8 +12049,8 @@
   // Replaces (1x): CommonEvents.json:common-event:99|コンティニュー処理
   AGH_iterateBattleMembersContinueProcessing = function () {
     const battleMembers2 = $gameParty.battleMembers();
-    for (var i = 0; i < battleMembers2.length - 1; i++) {
-      var battleMember = battleMembers2[i];
+    for (let i = 0; i < battleMembers2.length - 1; i++) {
+      const battleMember = battleMembers2[i];
       battleMember.startAnimation(395, false, 0);
     }
   };
@@ -11894,7 +12106,7 @@
     h_exp($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID), 0, 301, false, false, false);
     //ｱｸﾀｰID,ﾋﾟｸﾁｬ,H相手(301ﾓﾌﾞ305対象なし306アイテム),非表示,簡易,過去シーンか否か
     const name = "\\V[94]";
-    interp.sVal(506, `${name}は凌辱された…。` + `\n`);
+    interp.sVal(506, `${name}は凌辱された…。` + "\n");
     interp.sVal(401, getRandomIndex(3) + 3);
     if ($gameSwitches.value(122)) {
       interp.setupChild($dataCommonEvents[85].list, 0);
@@ -11929,8 +12141,8 @@
     const partyMembers = $gameParty.members();
     const p100 = colorTaggedText(2, 100);
     const skillIds = [2, 3, 4, 5, 6, 7];
-    for (var i = 0; i < partyBattleMembers.length; i++) {
-      var battleMember = partyBattleMembers[i];
+    for (let i = 0; i < partyBattleMembers.length; i++) {
+      const battleMember = partyBattleMembers[i];
       if (!partyMembers.contains(battleMember)) continue;
 
       const anyParamIs100orMore = skillIds.some(function (id) {
@@ -11939,7 +12151,7 @@
       if (!anyParamIs100orMore) continue;
 
       // show one time
-      var messageText = `一部ステータスが${p100}以上になる事で、そのステータスが上昇するbattleMembersパッシブスキルが習得できるようになります`;
+      const messageText = `一部ステータスが${p100}以上になる事で、そのステータスが上昇するbattleMembersパッシブスキルが習得できるようになります`;
       gab_wordParticle(messageText);
       $gameSwitches.setValue(483, true);
       return;
@@ -11981,34 +12193,36 @@
 
   // Replaces (1x): CommonEvents.json:common-event:103|戦闘開始時
   AGH_iterateTroopMembersAddText = function () {
-    const members2 = $gameTroop.members();
-    for (var i = 0; i < members2.length; i++) {
-      var user = members2[i];
-      if (user.isAlive()) {
-        BattleManager._logWindow.push(`addText`, `\\C[16]${user.name()}\\C[0] TP\\C[6]${user.tp}%\\C[0]`);
-      }
-    }
+    const troopMembers = $gameTroop.members();
+    troopMembers.forEach(function (member) {
+      if (!member.isAlive()) return;
+      const memberName = colorTaggedText(16, member.name());
+      const tpLabel = colorTaggedText(6, member.tp + "%");
+      BattleManager._logWindow.push("addText", `${memberName} TP${tpLabel}`);
+    });
   };
 
   // Replaces (1x): CommonEvents.json:common-event:103|戦闘開始時
-  AGH_logBattleText = function () {
-    if (BattleManager.canEscape()) {
-      if ($gameParty.membersState(233)) {
-        var maxDesireChange = 100;
-      } else {
-        var maxDesireChange = (0.8 * $gameParty.agility()) / $gameTroop.agility();
-        if (maxDesireChange >= 1) {
-          maxDesireChange = 99;
-        } else {
-          maxDesireChange = Math.floor(maxDesireChange * 100);
-        }
-      }
-      const coloredText = colorTaggedText(2, `${maxDesireChange}%`);
-      var messageText = `逃走成功確立:${coloredText}`;
-    } else {
-      var messageText = `${colorTaggedText(10, `逃走不可！`)}`;
+    // Escape odds shown before a flee attempt: one state pins it to 100%, otherwise
+  // the party/troop agility ratio decides (capped at 99%).
+  const ESCAPE_ALWAYS_STATE_ID = 233;
+  const ESCAPE_MAX_PERCENT = 99;
+
+  function escapeChancePercent() {
+    if ($gameParty.membersState(ESCAPE_ALWAYS_STATE_ID)) return 100;
+    const agilityRatio = (0.8 * $gameParty.agility()) / $gameTroop.agility();
+    if (agilityRatio >= 1) return ESCAPE_MAX_PERCENT;
+    return Math.floor(agilityRatio * 100);
+  }
+
+AGH_logBattleText = function () {
+    if (!BattleManager.canEscape()) {
+      const blockedText = colorTaggedText(10, "逃走不可！");
+      BattleManager._logWindow.push("addText", `${blockedText}`);
+      return;
     }
-    BattleManager._logWindow.push(`addText`, messageText);
+    const escapeText = colorTaggedText(2, escapeChancePercent() + "%");
+    BattleManager._logWindow.push("addText", `逃走成功確立:${escapeText}`);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:104|戦闘毎ターン
@@ -12030,11 +12244,13 @@
   AGH_setVariableActorChoiceBattleEachTurn = function () {
     const stateId = 42;
     $gameVariables.setValue(HELPER_VARIABLE.SELECTED_ACTOR_ID, 1);
-    const actor = $gameActors.actor($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID));
+    const selectedActorId = $gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID);
+    const actor = $gameActors.actor(selectedActorId);
     const actorName = actor.name();
     const stateName = $dataStates[stateId].name;
-    const coloredText = colorTaggedText(10, `${actor.stateRate(stateId) * 100}`);
-    BattleManager._logWindow.push(`addText`, `${actorName}の${stateName}耐性率:${coloredText}%`);
+    const stateRatePercent = actor.stateRate(stateId) * 100;
+    const coloredRate = colorTaggedText(10, `${stateRatePercent}`);
+    BattleManager._logWindow.push("addText", `${actorName}の${stateName}耐性率:${coloredRate}%`);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:104|戦闘毎ターン
@@ -12063,8 +12279,8 @@
   // Replaces (1x): CommonEvents.json:common-event:104|戦闘毎ターン
   AGH_readVariableActorChoiceBattleEachTurn = function () {
     const battleMembers2 = $gameParty.battleMembers();
-    for (var i = 0; i < battleMembers2.length; i++) {
-      var battleMember = battleMembers2[i];
+    for (let i = 0; i < battleMembers2.length; i++) {
+      const battleMember = battleMembers2[i];
       if (battleMember.isStateAffected(234) && !battleMember.isRestricted()) {
         battleMember.startAnimation(160, false, 0);
         if (battleMember.actorId() != $gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID)) {
@@ -12078,11 +12294,12 @@
 
   // Replaces (1x): CommonEvents.json:common-event:104|戦闘毎ターン
   AGH_iterateBattleMembersBattleEachTurn = function () {
+    let actor1;
     const battleMembers2 = $gameParty.battleMembers();
-    for (var i = 0; i < battleMembers2.length; i++) {
-      var battleMember = battleMembers2[i];
+    for (let i = 0; i < battleMembers2.length; i++) {
+      const battleMember = battleMembers2[i];
       if (battleMember.isStateAffected(234) && !battleMember.isRestricted()) {
-        var actor1 = battleMember;
+        actor1 = battleMember;
         break;
       }
     }
@@ -12097,13 +12314,13 @@
   AGH_iterateBattleMembersAddText = function () {
     valueCountSet1 = 0;
     const battleMembers2 = $gameParty.battleMembers();
-    for (var i = 0; i < battleMembers2.length; i++) {
-      var battleMember = battleMembers2[i];
+    for (let i = 0; i < battleMembers2.length; i++) {
+      const battleMember = battleMembers2[i];
       if (battleMember.battleSkillsRaw().contains(340)) {
         const coloredText = colorTaggedText(2, `\\Sin[340]`);
         const coloredText2 = colorTaggedText(10, `${valueChainMemberCount - 1}`);
-        var messageText = `${coloredText}効果が発動！　（×${coloredText2}）`;
-        BattleManager._logWindow.push(`addText`, messageText);
+        const messageText = `${coloredText}効果が発動！　（×${coloredText2}）`;
+        BattleManager._logWindow.push("addText", messageText);
         valueCountSet1 += 1;
         break;
       }
@@ -12114,11 +12331,11 @@
   AGH_iterateBattleMembersBattleEachTurn_2 = function () {
     if (valueCountSet1 >= 1) {
       const battleMembers2 = $gameParty.battleMembers();
-      for (var i = 0; i < battleMembers2.length; i++) {
-        var battleMember = battleMembers2[i];
+      for (let i = 0; i < battleMembers2.length; i++) {
+        const battleMember = battleMembers2[i];
         battleMember.startAnimation(426, false, 0);
-        for (var id1 = 2; id1 <= valueChainMemberCount; id1++) {
-          for (var j = 206; j <= 211; j++) {
+        for (let id1 = 2; id1 <= valueChainMemberCount; id1++) {
+          for (let j = 206; j <= 211; j++) {
             battleMember.addState(j);
           }
         }
@@ -12150,8 +12367,8 @@
   // Replaces (1x): CommonEvents.json:common-event:104|戦闘毎ターン
   AGH_readVariableBattleTurnCount = function () {
     const battleMembers2 = $gameParty.battleMembers();
-    for (var j = 0; j < battleMembers2.length; j++) {
-      var battleMember = battleMembers2[j];
+    for (let j = 0; j < battleMembers2.length; j++) {
+      const battleMember = battleMembers2[j];
       if ($gameParty.members().contains(battleMember) && battleMember.isAlive()) {
         if ($gameSwitches.value(374)) {
           actor_skilllearn2(battleMember.actorId());
@@ -12166,16 +12383,16 @@
   // Replaces (1x): CommonEvents.json:common-event:104|戦闘毎ターン
   AGH_setSwitchRank3AttackSkillNotice = function () {
     const battleMembers2 = $gameParty.battleMembers();
-    for (var i = 0; i < battleMembers2.length; i++) {
-      var battleMember = battleMembers2[i];
+    for (let i = 0; i < battleMembers2.length; i++) {
+      const battleMember = battleMembers2[i];
       if ($gameParty.members().contains(battleMember)) {
         if (
           [101, 111, 121, 131, 141, 151, 161, 171, 181, 191].some(function (id) {
             return battleMember.skillMasteryLevel(id) >= 3;
           })
         ) {
-          const coloredText = colorTaggedText(2, `ランク3`);
-          var messageText = `通常攻撃スキルが${coloredText}になる事で、その武器威力が上昇するパッシブスキルが習得できるようになります`;
+          const coloredText = colorTaggedText(2, "ランク3");
+          const messageText = `通常攻撃スキルが${coloredText}になる事で、その武器威力が上昇するパッシブスキルが習得できるようになります`;
           gab_wordParticle(messageText);
           $gameSwitches.setValue(HELPER_SWITCH.RANK_3_ATTACK_NOTICE, true);
           break;
@@ -12188,13 +12405,14 @@
   AGH_runPluginCommandPortraitPictureIdBattleEachTurn = function (interp) {
     const list = $gameVariables.value(HELPER_VARIABLE.HEROINE_ACTOR_IDS);
     list.forEach(function (id) {
+    let args;
       const actorData = $dataActors[id];
       $gameVariables.setValue(300, Number(actorData.meta["tachiePicId"]));
       if ($gameActors.actor(id).tp >= 100) {
-        var AfterimageRGBList = actorData.meta["AfterimageRGB"].split(",")[0];
-        var afterimageGreen = actorData.meta["AfterimageRGB"].split(",")[1];
-        var afterimageBlue = actorData.meta["AfterimageRGB"].split(",")[2];
-        var args = new Array(
+        const AfterimageRGBList = actorData.meta["AfterimageRGB"].split(",")[0];
+        const afterimageGreen = actorData.meta["AfterimageRGB"].split(",")[1];
+        const afterimageBlue = actorData.meta["AfterimageRGB"].split(",")[2];
+        args = new Array(
           String(getPreviousTachiePicId()),
           "20",
           String(AfterimageRGBList),
@@ -12203,7 +12421,7 @@
         );
         this.pluginCommand("PICT_AFTERIMAGE_ADD", args);
       } else {
-        var args = new Array(String(getPreviousTachiePicId()));
+        args = new Array(String(getPreviousTachiePicId()));
         this.pluginCommand("PICT_AFTERIMAGE_REMOVE", args);
       }
     }, interp);
@@ -12212,10 +12430,10 @@
   // Replaces (1x): CommonEvents.json:common-event:104|戦闘毎ターン
   AGH_iterateBattleMembersBattleEachTurn_3 = function () {
     const battleMembers2 = $gameParty.battleMembers();
-    for (var i = 0; i < battleMembers2.length; i++) {
-      var battleMember = battleMembers2[i];
+    for (let i = 0; i < battleMembers2.length; i++) {
+      const battleMember = battleMembers2[i];
       if (battleMember.isStateAffected(61) && battleMember.isAlive()) {
-        var randomIndex = getRandomIndex(101);
+        let randomIndex = getRandomIndex(101);
         seiyoku_skillProbabilityUp1(battleMember);
         randomIndex += valueCountSet3;
         if (randomIndex >= 90) {
@@ -12227,11 +12445,13 @@
 
   // Replaces (1x): CommonEvents.json:common-event:105|戦闘マップ全滅ボーナス
   AGH_readVariableDungeonInfoItem = function () {
-    const coloredText = colorTaggedText(
-      1,
-      `<${$dataItems[$gameVariables.value(HELPER_VARIABLE.DUNGEON_INFO_ITEM_ID)].name}>`
+    const dungeonInfoItemId = $gameVariables.value(
+      HELPER_VARIABLE.DUNGEON_INFO_ITEM_ID
     );
-    valueWordSet0 = `${coloredText}出現エネミーの殲滅が完了！`;
+    const dungeonInfoItem = $dataItems[dungeonInfoItemId];
+    const dungeonNameLabel = `<${dungeonInfoItem.name}>`;
+    const dungeonName = colorTaggedText(1, dungeonNameLabel);
+    valueWordSet0 = `${dungeonName}出現エネミーの殲滅が完了！`;
   };
 
   // Replaces (1x): CommonEvents.json:common-event:105|戦闘マップ全滅ボーナス
@@ -12262,7 +12482,7 @@
       valueItems = $dataArmors[Number(firstAnnihilationItemParameters[1])];
     }
     $gameParty.gainItem(valueItems, 1);
-    const coloredText = colorTaggedText(2, `<初回殲滅特典>`);
+    const coloredText = colorTaggedText(2, "<初回殲滅特典>");
     const iconIndexText = valueItems.iconIndex;
     const itemName = valueItems.name;
     const messageText = `${coloredText}\x1bI[${iconIndexText}]${itemName}を入手した！`;
@@ -12275,7 +12495,7 @@
     const actor = $gameActors.actor($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID));
     const clothes = $gameVariables.value(HELPER_VARIABLE.DAMAGED_CLOTHES_NAME);
     const actorName = actor.name();
-    BattleManager._logWindow.push(`addText`, `${actorName}の${clothes}が破損した！`);
+    BattleManager._logWindow.push("addText", `${actorName}の${clothes}が破損した！`);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:106|
@@ -12330,10 +12550,11 @@
 
   // Replaces (1x): CommonEvents.json:common-event:109|ダメージ時破損コモン
   AGH_aliveMembers = function (interp) {
+    let entryCount;
     if ($gameTroop.aliveMembers().length >= 1) {
-      var entryCount = $gameTroop.aliveMembers().length;
+      entryCount = $gameTroop.aliveMembers().length;
     } else {
-      var entryCount = 1;
+      entryCount = 1;
     }
     h_exp3(1, entryCount, entryCount, 0, 0, 0, 0, 0, 0, 0, 0); //10
     //0セク1乳2尻揉3失禁4潮吹5売春6妊7子8中だ9ｱﾅﾙ出し10口飲
@@ -12368,16 +12589,17 @@
 
   // Replaces (1x): CommonEvents.json:common-event:110|Ｈ攻撃時コモン
   AGH_setSwitchTemporarySwitchHAttackCommon = function () {
+    let desireLevel;
     $gameSwitches.setValue(HELPER_SWITCH.TEMPORARY_FLAG, false);
-    var desireLevel = $gameVariables.value($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID) + 380)[1];
-    var desireLevel = Math.floor(desireLevel / 100);
-    var desireLevel = desireLevel * 2;
+    desireLevel = $gameVariables.value($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID) + 380)[1];
+    desireLevel = Math.floor(desireLevel / 100);
+    desireLevel = desireLevel * 2;
     const actorBattleEncounterCount =
       valueBattleSexCountArr[$gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID)];
     const coloredText = colorTaggedText(27, `${actorBattleEncounterCount}`);
     const coloredText2 = colorTaggedText(2, `${desireLevel}`);
     const messageText = `性交回数:${coloredText} / 性交限界回数:${coloredText2}`;
-    BattleManager._logWindow.push(`addText`, messageText);
+    BattleManager._logWindow.push("addText", messageText);
     if (actorBattleEncounterCount >= desireLevel) {
       $gameSwitches.setValue(HELPER_SWITCH.TEMPORARY_FLAG, true);
     }
@@ -12385,28 +12607,30 @@
 
   // Replaces (1x): CommonEvents.json:common-event:110|Ｈ攻撃時コモン
   AGH_setVariableRandomWork1 = function () {
-    if (!$dataActors[$gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID)].meta["SexualBattleEndLow"])
-      return;
+    const selectedActorId = $gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID);
+    if (!$dataActors[selectedActorId].meta["SexualBattleEndLow"]) return;
 
-    const actor2 = $gameActors.actor($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID));
-    const actor = actor2;
-    var quoteIntensity = "Low";
-    var faceIndex = 22;
-    if (actor2.isLearnedSkill(62)) {
-      var quoteIntensity = "Middle";
-      var faceIndex = 34;
+    const actor = $gameActors.actor(selectedActorId);
+    // Learned skills raise the quote intensity and pick the matching face.
+    let quoteIntensity = "Low";
+    let faceIndex = 22;
+    if (actor.isLearnedSkill(62)) {
+      quoteIntensity = "Middle";
+      faceIndex = 34;
     }
-    if (actor2.isLearnedSkill(65)) {
-      var quoteIntensity = "Hi";
-      var faceIndex = 36;
+    if (actor.isLearnedSkill(65)) {
+      quoteIntensity = "Hi";
+      faceIndex = 36;
     }
-    const actorData =
-      $dataActors[$gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID)].meta[
-        "SexualBattleEnd" + quoteIntensity
-      ].split(",");
-    const randomIndex = actorData[getRandomIndex(actorData.length)];
-    const actorName = `${actor.name()}`;
-    $gameVariables.setValue(HELPER_VARIABLE.RANDOM_WORK_1, `\\nw[${actorName}]${randomIndex}`);
+    const quoteCandidates = $dataActors[selectedActorId].meta[
+      "SexualBattleEnd" + quoteIntensity
+    ].split(",");
+    const randomIndex = quoteCandidates[getRandomIndex(quoteCandidates.length)];
+    const actorName = actor.name();
+    $gameVariables.setValue(
+      HELPER_VARIABLE.RANDOM_WORK_1,
+      `\\nw[${actorName}]${randomIndex}`
+    );
     valueFaceSelect = faceIndex;
     battle_bustUp(51, 500, 10, 40);
   };
@@ -12425,15 +12649,15 @@
   // Replaces (1x): CommonEvents.json:common-event:111|衣装全損
   AGH_setVariableDamagedPartItemId = function () {
     const actor = $gameActors.actor($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID));
-    for (var i = 0; i <= valueCountSet2.length - 1; i++) {
+    for (let i = 0; i <= valueCountSet2.length - 1; i++) {
       if (!(valueCountSet2[i] >= 1)) continue;
 
       $gameVariables.setValue(244, valueCountSet2[i]);
       const actorName = actor.name();
       const itemName = $dataItems[valueCountSet2[i]].name;
-      var messageText = `${actorName}の${itemName}が破損した！`;
+      const messageText = `${actorName}の${itemName}が破損した！`;
       if ($gameParty.inBattle()) {
-        BattleManager._logWindow.push(`addText`, messageText);
+        BattleManager._logWindow.push("addText", messageText);
       } else {
         CommonPopupManager.showInfo({}, messageText, null);
       }
@@ -12477,50 +12701,57 @@
   };
 
   // Replaces (1x): CommonEvents.json:common-event:120|雑魚戦闘用
-  AGH_forceMoveRouteCharactersDungeonInfoItem = function (interp) {
-    const randomIndex = [-45, 45, -90, 90][getRandomIndex(4)];
-    switch (numericCaseValue(randomIndex)) {
+    // Both handlers below roll a random sprite angle offset that no caller ever used; the
+  // roll is kept so the random sequence (and therefore later rolls) stays identical.
+  function rollUnusedSpriteAngleOffset() {
+    const angle = [-45, 45, -90, 90][getRandomIndex(4)];
+    switch (numericCaseValue(angle)) {
       case 90:
-        {
-          var verticalOffset = -24;
-        }
-        break;
+        return -24;
       case 45:
-        {
-          var verticalOffset = -12;
-        }
-        break;
+        return -12;
     }
-    if (randomIndex == -90) {
-      var verticalOffset = 24;
-    }
-    if (randomIndex == -45) {
-      var verticalOffset = 12;
-    }
-    const dungeonInfoItemId = $gameVariables.value(HELPER_VARIABLE.DUNGEON_INFO_ITEM_ID);
-    const itemData = $dataItems[dungeonInfoItemId];
-    interp.character(interp._eventId).forceMoveRoute({
-      list: [
-        {
-          code: 41,
-          parameters: [
-            itemData.meta.EnemyGraphic.split(",")[0],
-            Number(itemData.meta.EnemyGraphic.split(",")[1])
-          ]
-        },
-        { code: 15, parameters: [10] },
-        { code: 45, parameters: ["this.setAngle(value1);"] },
-        { code: 45, parameters: ["this._spriteOffsetX = value2;"] },
-        { code: 45, parameters: ["this._spriteOffsetY = value2;"] },
-        { code: 32 },
-        { code: 34 },
-        { code: 35 },
-        { code: 37 },
-        { code: 0 }
-      ],
+    if (angle == -90) return 24;
+    if (angle == -45) return 12;
+    return undefined;
+  }
+
+  // Runs a forced move route that ends with the usual "end of list" command.
+  function forceMoveRoute(character, commands) {
+    character.forceMoveRoute({
+      list: commands.concat([{ code: 0 }]),
       repeat: false,
       skippable: true
     });
+  }
+
+  const MOVE_COMMAND_SET_GRAPHIC = 41;
+  const MOVE_COMMAND_WAIT = 15;
+  const MOVE_COMMAND_SCRIPT = 45;
+  const MOVE_COMMAND_TURN_DOWN = 32;
+  const MOVE_COMMAND_TURN_LEFT = 34;
+  const MOVE_COMMAND_STEP_LEFT = 35;
+  const MOVE_COMMAND_TURN_RIGHT = 37;
+  const MOVE_COMMAND_STEP_UP = 17;
+
+AGH_forceMoveRouteCharactersDungeonInfoItem = function (interp) {
+    rollUnusedSpriteAngleOffset();
+    const dungeonInfoItemId = $gameVariables.value(HELPER_VARIABLE.DUNGEON_INFO_ITEM_ID);
+    const enemyGraphic = $dataItems[dungeonInfoItemId].meta.EnemyGraphic.split(",");
+    forceMoveRoute(interp.character(interp._eventId), [
+      {
+        code: MOVE_COMMAND_SET_GRAPHIC,
+        parameters: [enemyGraphic[0], Number(enemyGraphic[1])]
+      },
+      { code: MOVE_COMMAND_WAIT, parameters: [10] },
+      { code: MOVE_COMMAND_SCRIPT, parameters: ["this.setAngle(value1);"] },
+      { code: MOVE_COMMAND_SCRIPT, parameters: ["this._spriteOffsetX = value2;"] },
+      { code: MOVE_COMMAND_SCRIPT, parameters: ["this._spriteOffsetY = value2;"] },
+      { code: MOVE_COMMAND_TURN_DOWN },
+      { code: MOVE_COMMAND_TURN_LEFT },
+      { code: MOVE_COMMAND_STEP_LEFT },
+      { code: MOVE_COMMAND_TURN_RIGHT }
+    ]);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:121|ボスその他戦闘用
@@ -12554,8 +12785,8 @@
   // Replaces (1x): CommonEvents.json:common-event:121|ボスその他戦闘用
   AGH_setVariableActorChoiceBossBattleUse = function () {
     const battleMembers2 = $gameParty.battleMembers();
-    for (var i = 0; i <= battleMembers2.length - 1; i++) {
-      var battleMember = battleMembers2[i];
+    for (let i = 0; i <= battleMembers2.length - 1; i++) {
+      const battleMember = battleMembers2[i];
       if (isGirl(battleMember)) {
         $gameVariables.setValue(HELPER_VARIABLE.SELECTED_ACTOR_ID, battleMembers2[i].actorId());
         tachie_settei2();
@@ -12624,11 +12855,12 @@
 
   // Replaces (1x): CommonEvents.json:common-event:128|エネミー変身コモン
   AGH_iterateTroopMembersEnemyTransformCommon = function () {
-    var transformEnemyId = 0;
+    let transformEnemyId;
+    transformEnemyId = 0;
     const troopMember = $gameTroop.members()[valueWordSet10];
     const enemyId = troopMember._enemyId;
     if ($dataEnemies[enemyId].meta[valueWordSet9]) {
-      var transformEnemyId = enemyId;
+      transformEnemyId = enemyId;
     }
     valueEnemyEntrySetId = transformEnemyId;
   };
@@ -12643,21 +12875,22 @@
 
   // Replaces (1x): CommonEvents.json:common-event:128|エネミー変身コモン
   AGH_waitEnemyTransformCommon = function (interp) {
+    let animationRate;
     const troopMember = $gameTroop.members()[valueWordSet10];
     const enemyId = troopMember._enemyId;
     const enemy = $dataEnemies[enemyId].meta[valueWordSet9].split(",");
     const array = Number(enemy[0]);
     troopMember.startAnimation(array, true, 0);
     const entryCount = $dataAnimations[array].frames.length;
-    var animationRate = 4;
+    animationRate = 4;
     if ($dataAnimations[array].name.match(/!/)) {
-      var animationRate = 1;
+      animationRate = 1;
     }
     if ($dataAnimations[array].name.match(/&/)) {
-      var animationRate = 2;
+      animationRate = 2;
     }
     if ($dataAnimations[array].name.match(/\$/)) {
-      var animationRate = 3;
+      animationRate = 3;
     }
     interp.wait(Math.ceil((entryCount * animationRate) / 4));
   };
@@ -12679,14 +12912,15 @@
 
   // Replaces (1x): CommonEvents.json:common-event:129|ボス覚醒行動
   AGH_readVariableBossSpecialActionPattern = function () {
-    var selectedBossSkillId = 0;
+    let selectedBossSkillId;
+    selectedBossSkillId = 0;
     const loopVariableValue = $gameVariables.value(347);
-    for (var i = 1; i <= 8; i++) {
+    for (let i = 1; i <= 8; i++) {
       const gameVariableValue = loopVariableValue;
       if (gameVariableValue[i][0] == 9) {
         if (a.hpRate() <= gameVariableValue[i][1] / 100) {
           if (a.meetsSkillConditions($dataSkills[gameVariableValue[i][2]])) {
-            var selectedBossSkillId = gameVariableValue[i][2];
+            selectedBossSkillId = gameVariableValue[i][2];
           }
         }
       }
@@ -12711,7 +12945,7 @@
   AGH_iterateTroopMembersAddTextBossAwakenAction = function () {
     const entryName = $gameTroop.members()[0].name();
     const messageText = `${entryName}は真の力を解放した！`;
-    BattleManager._logWindow.push(`addText`, messageText);
+    BattleManager._logWindow.push("addText", messageText);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:129|ボス覚醒行動
@@ -12724,10 +12958,11 @@
 
   // Replaces (1x): CommonEvents.json:common-event:130|ボス行動
   AGH_forceAction = function (interp) {
+    let skillId;
     if (valueBossAction >= 1) {
-      var skillId = valueBossAction;
+      skillId = valueBossAction;
     } else {
-      var skillId = valueBossActionNormal;
+      skillId = valueBossActionNormal;
     }
     attack_keisan1(BattleManager._subject, skillId, 1);
     interp.forceAction(BattleManager._subject, skillId, -1);
@@ -12773,9 +13008,10 @@
 
   // Replaces (1x): CommonEvents.json:common-event:141|会話カットインコモン
   AGH_showPictureActorChoiceConversationCutInCommon = function () {
-    var easingValue = "easeOutBack";
+    let easingValue;
+    easingValue = "easeOutBack";
     picture_easingConfiguration(easingValue);
-    var easingValue = 100 - valueADVCutinDirect;
+    easingValue = 100 - valueADVCutinDirect;
     const pictureName =
       "CutInCG_Actor" +
       $gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID) +
@@ -12793,14 +13029,15 @@
 
   // Replaces (1x): CommonEvents.json:common-event:141|会話カットインコモン
   AGH_pictureEaseOutBack = function () {
-    var easingValue = "easeOutBack";
+    let easingValue, picture;
+    easingValue = "easeOutBack";
     picture_easingConfiguration(easingValue);
-    for (var i = 98; i <= 100; i++) {
+    for (let i = 98; i <= 100; i++) {
       const picture2 = $gameScreen.picture(i);
       if (!picture2) continue;
 
-      var easingValue = picture2.x();
-      var picture = picture2.y();
+      easingValue = picture2.x();
+      picture = picture2.y();
       $gameScreen.movePicture(i, 1, easingValue, picture, 100, 0, 0, 0, 30);
     }
   };
@@ -12818,36 +13055,38 @@
 
   // Replaces (1x): CommonEvents.json:common-event:150|トータルダメージ表示変数
   AGH_handleScriptSnippetEaseOutBounce = function () {
+    let easingValue;
     if (valueTotalDamageCount >= 100000) {
-      var easingValue = "easeOutBounce";
+      easingValue = "easeOutBounce";
     } else {
-      var easingValue = "easeOutBack";
+      easingValue = "easeOutBack";
     }
     picture_easingConfiguration(easingValue);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:150|トータルダメージ表示変数
   AGH_showPictureOneLineSwitch = function () {
+    let fontSize2;
     const pictureId = 96;
     const valueTotalDamageCount3 = valueTotalDamageCount;
     const damageText = valueTotalDamageCount3.toLocaleString();
-    var fontSize2 = 50;
+    fontSize2 = 50;
     const pictureX = 400;
     const pictureY = 480;
     if (valueTotalDamageCount <= 9999) {
-      var fontSize2 = 45;
+      fontSize2 = 45;
     }
     if (valueTotalDamageCount >= 100000) {
-      var fontSize2 = 55;
+      fontSize2 = 55;
     }
     if ($gameVariables.value(276) == 2) {
       $gameScreen.setDTextPicture(
-        `\\f[b]\\oc[22]\\f[i]Total${valueTotalDamageCount2}Hit,\\C[10]${damageText}\\C[17]Damage!\\C[0]`,
+        `\\f[b]\\oc[22]\\f[i]Total ${valueTotalDamageCount2} hits,\\C[10]${damageText}\\C[17] damage!\\C[0]`,
         fontSize2
       );
     } else {
       $gameScreen.setDTextPicture(
-        `\\f[b]\\oc[2]\\f[i]Total${valueTotalDamageCount2}Hit,\\C[10]${damageText}\\C[17]Damage!\\C[0]`,
+        `\\f[b]\\oc[2]\\f[i]Total ${valueTotalDamageCount2} hits,\\C[10]${damageText}\\C[17] damage!\\C[0]`,
         fontSize2
       );
     }
@@ -12857,25 +13096,26 @@
 
   // Replaces (1x): CommonEvents.json:common-event:150|トータルダメージ表示変数
   AGH_showPictureTotalDamageDisplay = function () {
+    let fontSize2, pictureX;
     const pictureId = 96;
     const gameVariableValue = $gameVariables.value(330);
     const totalDamage = gameVariableValue;
     const totalDamageText = totalDamage.toLocaleString();
-    var fontSize2 = 50;
+    fontSize2 = 50;
     if (gameVariableValue <= 9999) {
-      var fontSize2 = 45;
+      fontSize2 = 45;
     }
     if (gameVariableValue >= 100000) {
-      var fontSize2 = 55;
+      fontSize2 = 55;
     }
     $gameScreen.setDTextPicture(
       `\\f[b]\\oc[22]\\f[i]Total,\\C[10]${totalDamageText}\\C[17]Damage!\\C[0]`,
       fontSize2
     );
     if ($gameVariables.value(276) == 2) {
-      var pictureX = 850;
+      pictureX = 850;
     } else {
-      var pictureX = 850;
+      pictureX = 850;
     }
     $gameScreen.showPicture(pictureId, "", 0, pictureX - 50, 50, 100, 100, 0, 0);
     $gameScreen.movePicture(pictureId, 0, pictureX, 50, 100, 100, 255, 0, 20);
@@ -12906,15 +13146,14 @@
 
   // Replaces (1x): CommonEvents.json:common-event:159|露出限界判定時内部処理
   AGH_setSelfVariableEntryName = function (interp) {
-    const actor = $gameActors.actor($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID));
+    const selectedActorId = $gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID);
+    const actor = $gameActors.actor(selectedActorId);
     interp.sVal(49, actor.name());
-    $gameMessage.add(`\\nw[\\V[49]]${$gameVariables.value(HELPER_VARIABLE.RANDOM_WORK_1)[0]}`);
-    $gameMessage.setFaceImage(
-      $gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID) +
-        "Actor" +
-        $gameVariables.value(HELPER_VARIABLE.RANDOM_WORK_1)[1],
-      $gameVariables.value(HELPER_VARIABLE.RANDOM_WORK_1)[2]
-    );
+    const randomWork = $gameVariables.value(HELPER_VARIABLE.RANDOM_WORK_1);
+    const nameWord = randomWork[0];
+    $gameMessage.add(`\\nw[\\V[49]]${nameWord}`);
+    const faceFileName = selectedActorId + "Actor" + randomWork[1];
+    $gameMessage.setFaceImage(faceFileName, randomWork[2]);
     interp.setWaitMode("message");
   };
 
@@ -12957,7 +13196,7 @@
     //装着衣装計上1
     const list = [37, 32, 35, 36, 29, 28, 26, 24, 17, 25, 23, 22, 21, 20, 11, 14, 7, 27, 18];
     list.forEach(function (id) {
-      for (var i = 1101; i < $dataItems.length; i++) {
+      for (let i = 1101; i < $dataItems.length; i++) {
         const itemData = $dataItems[i];
         if (
           id + 460 == Number(itemData.meta["ClothSwitch"]) + 460 &&
@@ -12977,14 +13216,15 @@
 
   // Replaces (1x): CommonEvents.json:common-event:166|着せ替え
   AGH_showPictureActorChoiceDressUp = function () {
+    let outfitPictureVariant;
     const pictureId = 6;
     if ($gameSwitches.value(204)) {
-      var outfitPictureVariant = 1;
+      outfitPictureVariant = 1;
     } else {
-      var outfitPictureVariant = 2;
+      outfitPictureVariant = 2;
     }
     if ($gameActors.actor($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID)).isStateAffected(61)) {
-      var outfitPictureVariant = 3;
+      outfitPictureVariant = 3;
     }
     const pictureName = "Scene_Dress up" + outfitPictureVariant;
     //ScreenBlackOut is a dead verbatim leftover: nothing uses it here
@@ -13008,7 +13248,7 @@
   AGH_iterateItemsClothType = function (interp) {
     const value = 460;
     const messageText = "通常";
-    for (var i = 1101; i < $dataItems.length; i++) {
+    for (let i = 1101; i < $dataItems.length; i++) {
       const itemData = $dataItems[i];
       if (itemData.meta["ClothType"] === messageText) {
         if (
@@ -13023,8 +13263,8 @@
             itemData.meta["subCategory"] ===
             $dataItems[$gameVariables.value(HELPER_VARIABLE.PROCESSED_ENTRY_ID)].meta["subCategory"]
           ) {
-            var itemMeta = Number(itemData.meta["ClothSwitch"]);
-            var clothAllocationNumber = Number(itemData.meta["ClothAllocationNumber"]);
+            const itemMeta = Number(itemData.meta["ClothSwitch"]);
+            const clothAllocationNumber = Number(itemData.meta["ClothAllocationNumber"]);
             interp.sVal(value + itemMeta, clothAllocationNumber);
           }
         }
@@ -13036,7 +13276,7 @@
   AGH_readVariableItemProcessWorkDressUpInterior = function (interp) {
     const value = 460;
     const clothType = $dataItems[$gameVariables.value(HELPER_VARIABLE.PROCESSED_ENTRY_ID)].meta["ClothType"];
-    for (var i = 1101; i < $dataItems.length; i++) {
+    for (let i = 1101; i < $dataItems.length; i++) {
       const itemData = $dataItems[i];
       if (itemData.meta["ClothType"] === clothType) {
         if (
@@ -13051,8 +13291,8 @@
             itemData.meta["subCategory"] ===
             $dataItems[$gameVariables.value(HELPER_VARIABLE.PROCESSED_ENTRY_ID)].meta["subCategory"]
           ) {
-            var itemMeta = Number(itemData.meta["ClothSwitch"]);
-            var clothAllocationNumber = Number(itemData.meta["ClothAllocationNumber"]);
+            const itemMeta = Number(itemData.meta["ClothSwitch"]);
+            const clothAllocationNumber = Number(itemData.meta["ClothAllocationNumber"]);
             interp.sVal(value + itemMeta, clothAllocationNumber);
           }
         }
@@ -13130,7 +13370,7 @@
     const end = 41;
     const selectedActorId = $gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID);
     const outfitPresets = $gameVariables.value(HELPER_VARIABLE.OUTFIT_PRESETS);
-    for (var i = start; i <= end; i++) {
+    for (let i = start; i <= end; i++) {
       outfitPresets[selectedActorId][valueCountSet1][i] = $gameVariables.value(selectedActorId + 440)[i];
     }
     outfitPresets[selectedActorId][valueCountSet1][49] = 1;
@@ -13140,59 +13380,36 @@
   };
 
   // Replaces (1x): CommonEvents.json:common-event:167|着せ替え中身
-  AGH_setSwitchRandomWork1 = function () {
-    $gameVariables.setValue(
-      HELPER_VARIABLE.RANDOM_WORK_1,
-      $gameVariables.value(HELPER_VARIABLE.OUTFIT_PRESETS)[
-        $gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID)
-      ][1][50]
-    );
-    $gameVariables.setValue(
-      HELPER_VARIABLE.RANDOM_WORK_2,
-      $gameVariables.value(HELPER_VARIABLE.OUTFIT_PRESETS)[
-        $gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID)
-      ][2][50]
-    );
-    $gameVariables.setValue(
-      HELPER_VARIABLE.RANDOM_WORK_3,
-      $gameVariables.value(HELPER_VARIABLE.OUTFIT_PRESETS)[
-        $gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID)
-      ][3][50]
-    );
-    $gameVariables.setValue(
-      24,
-      $gameVariables.value(HELPER_VARIABLE.OUTFIT_PRESETS)[
-        $gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID)
-      ][4][50]
-    );
-    if (
-      $gameVariables.value(HELPER_VARIABLE.OUTFIT_PRESETS)[
-        $gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID)
-      ][1][49] == 1
-    ) {
-      $gameSwitches.setValue(HELPER_SWITCH.CHOICE_1_ENABLED, true);
-    }
-    if (
-      $gameVariables.value(HELPER_VARIABLE.OUTFIT_PRESETS)[
-        $gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID)
-      ][2][49] == 1
-    ) {
-      $gameSwitches.setValue(HELPER_SWITCH.CHOICE_2_ENABLED, true);
-    }
-    if (
-      $gameVariables.value(HELPER_VARIABLE.OUTFIT_PRESETS)[
-        $gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID)
-      ][3][49] == 1
-    ) {
-      $gameSwitches.setValue(163, true);
-    }
-    if (
-      $gameVariables.value(HELPER_VARIABLE.OUTFIT_PRESETS)[
-        $gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID)
-      ][4][49] == 1
-    ) {
-      $gameSwitches.setValue(164, true);
-    }
+    // OUTFIT_PRESETS[actorId][slot] keeps the worn outfit id at index 50 and the
+  // "already unlocked" flag at index 49. Slots 1..4 map to work variables 21..24 and
+  // to four separate choice switches (the first two have named constants).
+  const OUTFIT_SLOT_WEAR_INDEX = 50;
+  const OUTFIT_SLOT_UNLOCKED_INDEX = 49;
+  const OUTFIT_SLOT_3_SWITCH_ID = 163;
+  const OUTFIT_SLOT_4_SWITCH_ID = 164;
+
+AGH_setSwitchRandomWork1 = function () {
+    const selectedActorId = $gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID);
+    const outfitSlots = $gameVariables.value(
+      HELPER_VARIABLE.OUTFIT_PRESETS
+    )[selectedActorId];
+    const slotTargets = [
+      { slot: 1, variableId: HELPER_VARIABLE.RANDOM_WORK_1, switchId: HELPER_SWITCH.CHOICE_1_ENABLED },
+      { slot: 2, variableId: HELPER_VARIABLE.RANDOM_WORK_2, switchId: HELPER_SWITCH.CHOICE_2_ENABLED },
+      { slot: 3, variableId: HELPER_VARIABLE.RANDOM_WORK_3, switchId: OUTFIT_SLOT_3_SWITCH_ID },
+      { slot: 4, variableId: HELPER_VARIABLE.RANDOM_WORK_4, switchId: OUTFIT_SLOT_4_SWITCH_ID }
+    ];
+
+    // The original wrote the four work variables first and turned the switches on
+    // afterwards, so the two passes are kept apart.
+    slotTargets.forEach(function (target) {
+      const wornOutfitId = outfitSlots[target.slot][OUTFIT_SLOT_WEAR_INDEX];
+      $gameVariables.setValue(target.variableId, wornOutfitId);
+    });
+    slotTargets.forEach(function (target) {
+      const isUnlocked = outfitSlots[target.slot][OUTFIT_SLOT_UNLOCKED_INDEX] == 1;
+      if (isUnlocked) $gameSwitches.setValue(target.switchId, true);
+    });
   };
 
   // Replaces (1x): CommonEvents.json:common-event:167|着せ替え中身
@@ -13211,7 +13428,7 @@
     //現在衣装を初期化
     const start = 1;
     const end = 40;
-    for (var i = start; i <= end; i++) {
+    for (let i = start; i <= end; i++) {
       $gameVariables.setValue(
         i + 460,
         $gameVariables.value(HELPER_VARIABLE.OUTFIT_PRESETS)[
@@ -13236,7 +13453,7 @@
   // Replaces (1x): CommonEvents.json:common-event:174|一括売却対象指定
   AGH_showWindowTextBulkSellTargetSelect = function () {
     WindowManager.show(0, 0, 0, 984, 80);
-    const messageText = ``;
+    const messageText = "";
     //var value7 = `\\FS[25]対象を選択して下さい　　　　　　　　　　　　　　　　　　　　　　　　　　　`;
     WindowManager.drawText(0, messageText);
   };
@@ -13262,15 +13479,16 @@
 
   // Replaces (1x): CommonEvents.json:common-event:174|一括売却対象指定
   AGH_showWindowTextRandomWork10 = function () {
+    let valueItems;
     const gameVariableValue = $gameVariables.value(30);
     if (valueCountArray2[gameVariableValue] == 0) {
-      var valueItems = $dataItems;
+      valueItems = $dataItems;
     }
     if (valueCountArray2[gameVariableValue] == 1) {
-      var valueItems = $dataWeapons;
+      valueItems = $dataWeapons;
     }
     if (valueCountArray2[gameVariableValue] == 2) {
-      var valueItems = $dataArmors;
+      valueItems = $dataArmors;
     }
     const processedEntryId = $gameVariables.value(HELPER_VARIABLE.PROCESSED_ENTRY_ID);
     const databaseEntry = valueItems[processedEntryId];
@@ -13279,62 +13497,81 @@
       $gameSelfSwitches.getVariableValue([4, 11 + valueCountArray2[gameVariableValue], processedEntryId]) == 1
     ) {
       $gameSelfSwitches.setVariableValue([4, 11 + valueCountArray2[gameVariableValue], processedEntryId], 0);
-      messageText += `の一括売却対象指定を解除しました`;
+      messageText += "の一括売却対象指定を解除しました";
     } else {
       $gameSelfSwitches.setVariableValue([4, 11 + valueCountArray2[gameVariableValue], processedEntryId], 1);
-      messageText += `を一括売却対象指定に登録しました`;
+      messageText += "を一括売却対象指定に登録しました";
     }
     WindowManager.drawText(0, messageText);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:174|一括売却対象指定
-  AGH_showWindowTextItemProcessWork = function () {
-    switch (numericCaseValue(valueCountSet2)) {
-      case 0:
-        {
-          var valueItems = $dataItems;
-        }
-        break;
-      case 1:
-        {
-          var valueItems = $dataWeapons;
-        }
-        break;
-      case 2:
-        {
-          var valueItems = $dataArmors;
-        }
-        break;
+    // The bulk-sell toggle works on one of three database lists, picked by
+  // valueCountSet2 (0 = items, 1 = weapons, 2 = armors).
+  const BULK_SELL_DATABASE_GETTERS = [
+    function () {
+      return $dataItems;
+    },
+    function () {
+      return $dataWeapons;
+    },
+    function () {
+      return $dataArmors;
     }
+  ];
+  const BULK_SELL_SELF_SWITCH_ID = 4;
+  const BULK_SELL_SELF_SWITCH_FIRST_ENTRY = 11;
+
+  // Flips the "sell in bulk" registration of one database entry and reports whether
+  // it was registered before the call.
+  function toggleBulkSellRegistration(processedEntryId) {
+    const selfSwitchKey = [
+      BULK_SELL_SELF_SWITCH_ID,
+      BULK_SELL_SELF_SWITCH_FIRST_ENTRY + valueCountSet2,
+      processedEntryId
+    ];
+    const wasRegistered = $gameSelfSwitches.getVariableValue(selfSwitchKey) == 1;
+    $gameSelfSwitches.setVariableValue(selfSwitchKey, wasRegistered ? 0 : 1);
+    return wasRegistered;
+  }
+
+AGH_showWindowTextItemProcessWork = function () {
     const processedEntryId = $gameVariables.value(HELPER_VARIABLE.PROCESSED_ENTRY_ID);
-    const databaseEntry = valueItems[processedEntryId];
-    let messageText = `\x1bI[${databaseEntry.iconIndex}]${databaseEntry.name}`;
-    if ($gameSelfSwitches.getVariableValue([4, 11 + valueCountSet2, processedEntryId]) == 1) {
-      $gameSelfSwitches.setVariableValue([4, 11 + valueCountSet2, processedEntryId], 0);
-      messageText += `の一括売却対象指定を解除しました`;
-    } else {
-      $gameSelfSwitches.setVariableValue([4, 11 + valueCountSet2, processedEntryId], 1);
-      messageText += `を一括売却対象指定に登録しました`;
-    }
-    WindowManager.drawText(0, messageText);
+    // An unknown list id keeps the original failure: the getter is missing.
+    const databaseList = BULK_SELL_DATABASE_GETTERS[numericCaseValue(valueCountSet2)]();
+    const databaseEntry = databaseList[processedEntryId];
+    const itemLabel = `\x1bI[${databaseEntry.iconIndex}]${databaseEntry.name}`;
+    const wasRegistered = toggleBulkSellRegistration(processedEntryId);
+    const resultText = wasRegistered
+      ? "の一括売却対象指定を解除しました"
+      : "を一括売却対象指定に登録しました";
+    WindowManager.drawText(0, itemLabel + resultText);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:175|一括売却実行
   AGH_initValueWordSet0 = function () {
-    const id3 = valueCountSet3; //件数合計
-    const id4 = valueCountSet4.toLocaleString(); //個数累計
-    const id5 = valueCountSet5.toLocaleString(); //金額合計
-    const id6 = valueCountSet6.toLocaleString(); //変数57合計
-    const id7 = valueCountSet7.toLocaleString(); //ｱｲﾃﾑID270合計
-    valueWordSet0 = `${colorTaggedText(16, `<一括売却結果>`)} ${colorTaggedText(2, `${id3}種`)} ${colorTaggedText(3, `${id4}個`)} ${colorTaggedText(10, `${id5}\G`)}`;
+    const soldKindCount = valueCountSet3; //件数合計
+    const soldItemCount = valueCountSet4.toLocaleString(); //個数累計
+    const soldGoldTotal = valueCountSet5.toLocaleString(); //金額合計
+    const weaponTotalLabel = valueCountSet6.toLocaleString(); //変数57合計
+    const itemTotalLabel = valueCountSet7.toLocaleString(); //ｱｲﾃﾑID270合計
+
+    const resultHeading = colorTaggedText(16, "<一括売却結果>");
+    const kindCountText = colorTaggedText(2, `${soldKindCount}種`);
+    const itemCountText = colorTaggedText(3, `${soldItemCount}個`);
+    // NOTE: the original wrote "\\G" inside a template literal, which evaluates to a
+    // plain "G"; the rendered text is kept byte-identical on purpose. Replace with
+    // the gold marker only after checking every consumer of valueWordSet0.
+    const goldTotalText = colorTaggedText(10, soldGoldTotal + "G");
+    valueWordSet0 = `${resultHeading} ${kindCountText} ${itemCountText} ${goldTotalText}`;
     if (!(valueCountSet6 >= 1 || valueCountSet7 >= 1)) return;
 
-    valueWordSet0 += `\n`;
+    valueWordSet0 += "\n";
     if (valueCountSet6 >= 1) {
-      valueWordSet0 += `${$dataSystem.variables[57]}:${id6} `;
+      valueWordSet0 += `${$dataSystem.variables[57]}:${weaponTotalLabel} `;
     }
     if (valueCountSet7 >= 1) {
-      valueWordSet0 += `\\IIN[${270}]:${id7} `;
+      valueWordSet0 += `\\IIN[270]:${itemTotalLabel} `;
     }
   };
 
@@ -13371,10 +13608,10 @@
   // Replaces (1x): CommonEvents.json:common-event:176|訓練人形設定
   AGH_setVariableActorChoiceTrainingDollSetup = function () {
     const trainingPresetIndex = 1;
-    for (var i = 1; i <= 7; i++) {
+    for (let i = 1; i <= 7; i++) {
       if (!($gameVariables.value(HELPER_VARIABLE.TRAINING_DOLL_SETTINGS)[trainingPresetIndex] == i)) continue;
 
-      var trainingPresetValue = $gameVariables.value(HELPER_VARIABLE.TRAINING_DOLL_SETTINGS)[
+      const trainingPresetValue = $gameVariables.value(HELPER_VARIABLE.TRAINING_DOLL_SETTINGS)[
         trainingPresetIndex
       ];
       $gameVariables.setValue(
@@ -13385,67 +13622,42 @@
   };
 
   // Replaces (1x): CommonEvents.json:common-event:176|訓練人形設定
-  AGH_setVariableActorChoice_2 = function () {
-    const trainingPresetIndex = 2;
-    for (var i = 1; i <= 4; i++) {
-      if (!($gameVariables.value(HELPER_VARIABLE.TRAINING_DOLL_SETTINGS)[trainingPresetIndex] == i)) continue;
+    // Training doll presets: the label written into the actor-choice variable and the
+  // skill the doll uses. Values outside this table leave the doll untouched.
+  const TRAINING_DOLL_ENEMY_ID = 51;
+  const TRAINING_DOLL_ACTIONS = {
+    1: { label: "行動しない", skillId: 892 },
+    2: { label: "攻撃", skillId: 1 },
+    3: { label: "防御", skillId: 2 },
+    4: { label: "命乞い", skillId: 892 }
+  };
 
-      var trainingPresetValue = $gameVariables.value(HELPER_VARIABLE.TRAINING_DOLL_SETTINGS)[
-        trainingPresetIndex
-      ];
-      switch (numericCaseValue(trainingPresetValue)) {
-        case 1:
-          {
-            $gameVariables.setValue(20 + trainingPresetIndex, `行動しない`);
-          }
-          break;
-        case 2:
-          {
-            $gameVariables.setValue(20 + trainingPresetIndex, `攻撃`);
-          }
-          break;
-        case 3:
-          {
-            $gameVariables.setValue(20 + trainingPresetIndex, `防御`);
-          }
-          break;
-        case 4:
-          {
-            $gameVariables.setValue(20 + trainingPresetIndex, `命乞い`);
-          }
-          break;
-      }
-      if (trainingPresetValue == 1 || trainingPresetValue == 4) {
-        $dataEnemies[51].actions[0].skillId = 892;
-      }
-      switch (numericCaseValue(trainingPresetValue)) {
-        case 2:
-          {
-            $dataEnemies[51].actions[0].skillId = 1;
-          }
-          break;
-        case 3:
-          {
-            $dataEnemies[51].actions[0].skillId = 2;
-          }
-          break;
-      }
-    }
+AGH_setVariableActorChoice_2 = function () {
+    const trainingPresetIndex = 2;
+    const trainingPresetValue = $gameVariables.value(
+      HELPER_VARIABLE.TRAINING_DOLL_SETTINGS
+    )[trainingPresetIndex];
+    const dollAction = TRAINING_DOLL_ACTIONS[numericCaseValue(trainingPresetValue)];
+    // The original loop let values outside 1..4 fall through without changing anything.
+    if (!dollAction) return;
+    $gameVariables.setValue(20 + trainingPresetIndex, dollAction.label);
+    $dataEnemies[TRAINING_DOLL_ENEMY_ID].actions[0].skillId = dollAction.skillId;
   };
 
   // Replaces (1x): CommonEvents.json:common-event:176|訓練人形設定
   AGH_setVariableActorChoice_3 = function () {
-    var trainingPresetIndex = 3;
+    let trainingPresetIndex;
+    trainingPresetIndex = 3;
     $gameVariables.setValue(
       20 + trainingPresetIndex,
       $gameVariables.value(HELPER_VARIABLE.TRAINING_DOLL_SETTINGS)[trainingPresetIndex]
     );
-    var trainingPresetIndex = 4;
+    trainingPresetIndex = 4;
     $gameVariables.setValue(
       20 + trainingPresetIndex,
       $gameVariables.value(HELPER_VARIABLE.TRAINING_DOLL_SETTINGS)[trainingPresetIndex]
     );
-    var trainingPresetIndex = 5;
+    trainingPresetIndex = 5;
     $gameVariables.setValue(
       20 + trainingPresetIndex,
       $gameVariables.value(HELPER_VARIABLE.TRAINING_DOLL_SETTINGS)[trainingPresetIndex]
@@ -13455,11 +13667,11 @@
   // Replaces (1x): CommonEvents.json:common-event:176|訓練人形設定
   AGH_setVariableActorChoice_4 = function () {
     const trainingPresetIndex = 6;
-    for (var i = 0; i <= 20; i++) {
+    for (let i = 0; i <= 20; i++) {
       if (!($gameVariables.value(HELPER_VARIABLE.TRAINING_DOLL_SETTINGS)[trainingPresetIndex] == i)) continue;
 
       if (i == 0) {
-        $gameVariables.setValue(20 + trainingPresetIndex, `種族未設定`);
+        $gameVariables.setValue(20 + trainingPresetIndex, "種族未設定");
       }
       if (i >= 1) {
         const stateData = $dataStates[i + 420];
@@ -13472,11 +13684,11 @@
   AGH_iterateItemsTrainingDollSetup = function () {
     //trainingPresetIndex is a dead verbatim leftover: the loop uses i
     //const trainingPresetIndex = 6;
-    for (var i = 1; i <= 19; i++) {
+    for (let i = 1; i <= 19; i++) {
       if ($gameParty.hasItem($dataItems[i + 340])) {
         const stateData = $dataStates[i + 420];
-        var messageText = `\x1bI[${stateData.iconIndex}]${stateData.name}`;
-        var choiceValue = i;
+        const messageText = `\x1bI[${stateData.iconIndex}]${stateData.name}`;
+        const choiceValue = i;
         const id = 1;
         const choiceParams = {
           text: messageText,
@@ -13493,7 +13705,7 @@
     $gameVariables.value(HELPER_VARIABLE.TRAINING_DOLL_SETTINGS)[trainingPresetIndex] =
       $gameVariables.value(31);
     if ($gameVariables.value(HELPER_VARIABLE.TRAINING_DOLL_SETTINGS)[trainingPresetIndex] == 0) {
-      $gameVariables.setValue(20 + trainingPresetIndex, `種族未設定`);
+      $gameVariables.setValue(20 + trainingPresetIndex, "種族未設定");
     }
     if ($gameVariables.value(HELPER_VARIABLE.TRAINING_DOLL_SETTINGS)[trainingPresetIndex] >= 1) {
       const stateData = $dataStates[i + 420];
@@ -13513,11 +13725,12 @@
 
   // Replaces (1x): CommonEvents.json:common-event:176|訓練人形設定
   AGH_iterateBattleMembersTrainingDollSetup = function () {
+    let actor;
     valueTrialJustBeforeTP = Array(21).fill(0);
     const battleMembers2 = $gameParty.battleMembers();
-    for (var i = 0; i < battleMembers2.length; i++) {
-      var battleMember = battleMembers2[i].actorId();
-      var actor = $gameActors.actor(battleMember);
+    for (let i = 0; i < battleMembers2.length; i++) {
+      const battleMember = battleMembers2[i].actorId();
+      actor = $gameActors.actor(battleMember);
       valueTrialJustBeforeTP[battleMember] = actor.tp;
     }
   };
@@ -13525,18 +13738,19 @@
   // Replaces (1x): CommonEvents.json:common-event:176|訓練人形設定
   AGH_readVariableTrainingDollPresetTrainingDollSetup = function () {
     const trainingDollSettings = $gameVariables.value(HELPER_VARIABLE.TRAINING_DOLL_SETTINGS);
-    for (var i = 11; i <= 30; i++) {
+    for (let i = 11; i <= 30; i++) {
       trainingDollSettings[i] = 0;
     }
   };
 
   // Replaces (1x): CommonEvents.json:common-event:176|訓練人形設定
   AGH_iterateBattleMembersTrainingDollSetup_2 = function () {
+    let actor;
     valueTrialJustBeforeTP = Array(21).fill(0);
     const battleMembers2 = $gameParty.battleMembers();
-    for (var i = 0; i < battleMembers2.length; i++) {
-      var battleMember = battleMembers2[i].actorId();
-      var actor = $gameActors.actor(battleMember);
+    for (let i = 0; i < battleMembers2.length; i++) {
+      const battleMember = battleMembers2[i].actorId();
+      actor = $gameActors.actor(battleMember);
       actor.gainTp(-1000);
       actor.gainTp(valueTrialJustBeforeTP[battleMember]);
     }
@@ -13551,10 +13765,10 @@
 
   // Replaces (1x): CommonEvents.json:common-event:179|タイトル効果選択コモン
   AGH_showWindowTitleText = function (setH) {
-    let messageText = `[発動中の称号効果]` + `\n`;
+    let messageText = "[発動中の称号効果]" + "\n";
     let variableId = 288;
     if (setH && $gameSwitches.value(105)) {
-      messageText = `[発動中のＨな称号効果]` + `\n`;
+      messageText = "[発動中のＨな称号効果]" + "\n";
       variableId = 294;
     }
     const maxId = $gameVariables.value(variableId + 1);
@@ -13562,9 +13776,9 @@
     for (let i = 0; i < maxId; i++) {
       const titleText = ids[i];
       if (titleText == 0) {
-        messageText += `Empty` + `\n`;
+        messageText += "Empty" + "\n";
       } else {
-        messageText += colorTaggedText(16, `\x1bIIN[${titleText}]`) + `\n`;
+        messageText += colorTaggedText(16, `\x1bIIN[${titleText}]`) + "\n";
       }
     }
     const scaleY = maxId * 48 + 48;
@@ -13579,15 +13793,16 @@
 
   // Replaces (1x): CommonEvents.json:common-event:179|タイトル効果選択コモン
   AGH_addCustomTitleChoice = function (setH) {
+    let text;
     const variableId = setH && $gameSwitches.value(105) ? 294 : 288;
     const maxId = $gameVariables.value(variableId + 1);
     const ids = $gameVariables.value(variableId);
-    for (var i = 0; i < maxId; i++) {
+    for (let i = 0; i < maxId; i++) {
       const itemId = ids[i];
       if (itemId == 0) {
-        var text = "Empty";
+        text = "Empty";
       } else {
-        var text = $dataItems[itemId].name;
+        text = $dataItems[itemId].name;
       }
       const choiceParams = { text: text, value: i };
       $gameSystem.addCustomChoice(1, choiceParams);
@@ -13615,16 +13830,16 @@
   // Replaces (1x): CommonEvents.json:common-event:180|種族討伐数表示
   AGH_setupDefeatCountDisplay = function () {
     const gameVariableValue = $gameVariables.value(52);
-    for (var i = 0; i <= gameVariableValue.length - 1; i++) {
+    for (let i = 0; i <= gameVariableValue.length - 1; i++) {
       if (gameVariableValue[i] < 1) continue;
 
       let defeatedMonstersMsg = `\x1bSIM[${i}]`;
       switch (i) {
         case 1:
-          defeatedMonstersMsg = `当日魔物`;
+          defeatedMonstersMsg = "当日魔物";
           break;
         case 2:
-          defeatedMonstersMsg = `総魔物`;
+          defeatedMonstersMsg = "総魔物";
           break;
       }
       const defeatedMonstersCnt = gameVariableValue[i];
@@ -13656,20 +13871,24 @@
   AGH_gainItemItemProcessWork = function () {
     const processedEntryId = $gameVariables.value(HELPER_VARIABLE.PROCESSED_ENTRY_ID);
     const itemData = $dataItems[processedEntryId];
-    var goldAmount = itemData.price;
-    if (valueCountSet3 != 0) {
-      var goldAmount = Math.floor(goldAmount - (goldAmount * valueCountSet3) / 100);
-    }
+    const discountRate = valueCountSet3;
+    const basePrice = itemData.price;
+    const goldAmount =
+      discountRate != 0
+        ? Math.floor(basePrice - (basePrice * discountRate) / 100)
+        : basePrice;
+    let resultMessage;
     if ($gameParty.gold() >= goldAmount) {
       $gameParty.gainItem(itemData, 1);
       $gameParty.loseGold(goldAmount);
       AudioManager.playSe({ name: "Shop1", volume: 90, pitch: 100, pan: 0 });
-      const coloredText = colorTaggedText(2, `${`\x1bIIN[${processedEntryId}]`}`);
-      var variable19Value2 = `${coloredText}を購入しました。`;
+      const itemIconName = `\x1bIIN[${processedEntryId}]`;
+      const itemLabel = colorTaggedText(2, itemIconName);
+      resultMessage = `${itemLabel}を購入しました。`;
     } else {
-      var variable19Value2 = `所持金が足りなかった…。`;
+      resultMessage = "所持金が足りなかった…。";
     }
-    TickerManager.show(variable19Value2);
+    TickerManager.show(resultMessage);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:183|本屋コモン
@@ -13682,27 +13901,29 @@
 
   // Replaces (1x): CommonEvents.json:common-event:184|水汲みコモン
   AGH_setVariableRandomWork2 = function () {
-    var secondaryWorkValue = 109;
+    let secondaryWorkValue;
+    secondaryWorkValue = 109;
     if ($gameSwitches.value(203)) {
-      var secondaryWorkValue = 110;
+      secondaryWorkValue = 110;
     }
     if ($gameSwitches.value(205)) {
-      var secondaryWorkValue = 111;
+      secondaryWorkValue = 111;
     }
     if ($gameSwitches.value(207)) {
-      var secondaryWorkValue = 112;
+      secondaryWorkValue = 112;
     }
     $gameVariables.setValue(HELPER_VARIABLE.RANDOM_WORK_2, secondaryWorkValue);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:184|水汲みコモン
   AGH_setVariableRandomWork2WaterDrawingCommon = function () {
-    var valueItems = 0;
+    let valueItems;
+    valueItems = 0;
     if ($gameVariables.value(HELPER_VARIABLE.TOWN_INFO_ITEM_ID) >= 1) {
-      var valueItems = $dataWeapons[$gameVariables.value(HELPER_VARIABLE.TOWN_INFO_ITEM_ID)];
+      valueItems = $dataWeapons[$gameVariables.value(HELPER_VARIABLE.TOWN_INFO_ITEM_ID)];
     }
     if ($gameVariables.value(HELPER_VARIABLE.DUNGEON_INFO_ITEM_ID) >= 1) {
-      var valueItems = $dataItems[$gameVariables.value(HELPER_VARIABLE.DUNGEON_INFO_ITEM_ID)];
+      valueItems = $dataItems[$gameVariables.value(HELPER_VARIABLE.DUNGEON_INFO_ITEM_ID)];
     }
     if (valueItems != 0) {
       if (valueItems.meta["getWaterItem"]) {
@@ -13744,12 +13965,13 @@
 
   // Replaces (1x): CommonEvents.json:common-event:184|水汲みコモン
   AGH_setSwitchTemporarySwitch_3 = function () {
-    var secondaryWorkValue = 111;
+    let secondaryWorkValue;
+    secondaryWorkValue = 111;
     if ($gameMap.regionId(valueDirectionPointX, valueDirectionPointY) == 102) {
       $gameSwitches.setValue(HELPER_SWITCH.TEMPORARY_FLAG, true);
       $gameVariables.setValue(HELPER_VARIABLE.RANDOM_WORK_2, secondaryWorkValue);
     }
-    var secondaryWorkValue = 111;
+    secondaryWorkValue = 111;
     if (!($gameMap.regionId(valueDirectionPointX, valueDirectionPointY) == 103)) return;
 
     $gameSwitches.setValue(HELPER_SWITCH.TEMPORARY_FLAG, true);
@@ -13800,14 +14022,14 @@
 
   // Replaces (1x): CommonEvents.json:common-event:187|追剥コモン
   AGH_showInfo = function () {
-    value1 = `既に事切れているようだ…。`;
+    value1 = "既に事切れているようだ…。";
     CommonPopupManager.showInfo({}, value1, null);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:191|ギルドコモン
   AGH_setSwitchWalletIn = function () {
     $gameSwitches.setValue(HELPER_SWITCH.CHOICE_1_ENABLED, false);
-    for (var i = 1; i <= $dataItems.length - 1; i++) {
+    for (let i = 1; i <= $dataItems.length - 1; i++) {
       const itemData = $dataItems[i];
       if (itemData.meta["walletIn"]) {
         if ($gameParty.hasItem(itemData, true)) {
@@ -13818,28 +14040,29 @@
     }
   };
 
-  const ON_MARK = "ON";
-  const OFF_MARK = "OFF";
   // Replaces (1x): CommonEvents.json:common-event:191|ギルドコモン
-  AGH_setVariableRandomWork1GuildCommon = function () {
-    const autoDailyQuestAcceptText = "デイリークエスト自動受注";
-    if ($gameSwitches.value(HELPER_SWITCH.DAILY_AUTO_ACCEPT)) {
-      var randomWorkValue = `${autoDailyQuestAcceptText}＜${ON_MARK}＞`;
-    } else {
-      var randomWorkValue = `${autoDailyQuestAcceptText}＜${OFF_MARK}＞`;
-    }
-    $gameVariables.setValue(HELPER_VARIABLE.RANDOM_WORK_1, randomWorkValue);
+    // Both guild helpers write "<label>＜ON|OFF＞" into a scratch work variable; they
+  // only differ in the label, the switch they read and the variable they write.
+  function writeAutoDailyQuestLabel(variableId, labelText, switchId) {
+    const stateMark = $gameSwitches.value(switchId) ? ON_MARK : OFF_MARK;
+    $gameVariables.setValue(variableId, `${labelText}＜${stateMark}＞`);
+  }
+
+AGH_setVariableRandomWork1GuildCommon = function () {
+    writeAutoDailyQuestLabel(
+      HELPER_VARIABLE.RANDOM_WORK_1,
+      "デイリークエスト自動受注",
+      HELPER_SWITCH.DAILY_AUTO_ACCEPT
+    );
   };
 
   // Replaces (1x): CommonEvents.json:common-event:191|ギルドコモン
   AGH_setVariableRandomWork2GuildCommon = function () {
-    const autoDailyQuestCompleteText = "デイリークエスト自動達成";
-    if ($gameSwitches.value(HELPER_SWITCH.DAILY_AUTO_COMPLETE)) {
-      var secondaryWorkValue = `${autoDailyQuestCompleteText}＜${ON_MARK}＞`;
-    } else {
-      var secondaryWorkValue = `${autoDailyQuestCompleteText}＜${OFF_MARK}＞`;
-    }
-    $gameVariables.setValue(HELPER_VARIABLE.RANDOM_WORK_2, secondaryWorkValue);
+    writeAutoDailyQuestLabel(
+      HELPER_VARIABLE.RANDOM_WORK_2,
+      "デイリークエスト自動達成",
+      HELPER_SWITCH.DAILY_AUTO_COMPLETE
+    );
   };
 
   // Replaces (1x): CommonEvents.json:common-event:191|ギルドコモン
@@ -13854,7 +14077,7 @@
   // Replaces (1x): CommonEvents.json:common-event:191|ギルドコモン
   AGH_gainItemWalletDeliveryCount = function () {
     let deliveredWalletCount = 0;
-    let messageText = `拾得物\n`;
+    let messageText = "拾得物\n";
     for (let itemId = 1; itemId < $dataItems.length; itemId++) {
       const item = $dataItems[itemId];
       if (!item || !item.meta || !item.meta.walletIn) continue;
@@ -13871,7 +14094,7 @@
       HELPER_VARIABLE.WALLET_DELIVERY_COUNT,
       $gameVariables.value(HELPER_VARIABLE.WALLET_DELIVERY_COUNT) + deliveredWalletCount
     );
-    const rewardItemName = `\x1bIIN[10]`;
+    const rewardItemName = "\x1bIIN[10]";
     const rewardQuantity = colorTaggedText(2, String(deliveredWalletCount));
     messageText += `${rewardItemName}:${rewardQuantity}個を謝礼として受け取った。\n`;
     valueTalkSet = [28, messageText];
@@ -13879,35 +14102,38 @@
 
   // Replaces (1x): CommonEvents.json:common-event:191|ギルドコモン
   AGH_setSwitchDailyAutoOrder = function () {
+    let messageText;
     if ($gameSwitches.value(HELPER_SWITCH.DAILY_AUTO_ACCEPT)) {
       $gameSwitches.setValue(HELPER_SWITCH.DAILY_AUTO_ACCEPT, false);
-      var messageText = `デイリークエストの自動受注をオフにしました。`;
+      messageText = "デイリークエストの自動受注をオフにしました。";
     } else {
       $gameSwitches.setValue(HELPER_SWITCH.DAILY_AUTO_ACCEPT, true);
-      var messageText = `デイリークエストの自動受注をオンにしました。`;
+      messageText = "デイリークエストの自動受注をオンにしました。";
     }
     TickerManager.show(messageText);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:191|ギルドコモン
   AGH_setSwitchDailyAutoComplete = function () {
+    let messageText;
     if ($gameSwitches.value(HELPER_SWITCH.DAILY_AUTO_COMPLETE)) {
       $gameSwitches.setValue(HELPER_SWITCH.DAILY_AUTO_COMPLETE, false);
-      var messageText = `デイリークエストの自動達成報告をオフにしました。`;
+      messageText = "デイリークエストの自動達成報告をオフにしました。";
     } else {
       $gameSwitches.setValue(HELPER_SWITCH.DAILY_AUTO_COMPLETE, true);
-      var messageText = `デイリークエストの自動達成報告をオンにしました。`;
+      messageText = "デイリークエストの自動達成報告をオンにしました。";
     }
     TickerManager.show(messageText);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:192|未使用：情報屋選択肢
   AGH_iterateItemsSetJouhouGold = function () {
-    var goldAmount = 1000;
+    let goldAmount;
+    goldAmount = 1000;
     const processedEntryId = $gameVariables.value(HELPER_VARIABLE.PROCESSED_ENTRY_ID);
     const itemData = $dataItems[processedEntryId];
     if (itemData.meta["SetJouhouGold"]) {
-      var goldAmount = Number(itemData.meta["SetJouhouGold"]);
+      goldAmount = Number(itemData.meta["SetJouhouGold"]);
     }
     $gameParty.loseGold(goldAmount);
     const messageText = `-${goldAmount}\\G`;
@@ -13933,44 +14159,20 @@
   // Replaces (1x): CommonEvents.json:common-event:195|動物処理バックアップ
   AGH_forceMoveRouteCharactersAnimalProcessingBackup = function (interp) {
     if (!(valueanimalEventId >= 1)) return;
-
-    const randomIndex = [-45, 45, -90, 90][getRandomIndex(4)];
-    switch (numericCaseValue(randomIndex)) {
-      case 90:
-        {
-          var verticalOffset = -24;
-        }
-        break;
-      case 45:
-        {
-          var verticalOffset = -12;
-        }
-        break;
-    }
-    if (randomIndex == -90) {
-      var verticalOffset = 24;
-    }
-    if (randomIndex == -45) {
-      var verticalOffset = 12;
-    }
-    interp.character(valueanimalEventId).forceMoveRoute({
-      list: [
-        { code: 45, parameters: ["this.setAngle(value1);"] },
-        { code: 45, parameters: ["this.resetPattern();"] },
-        { code: 45, parameters: ["this._originalPattern = 1;"] },
-        { code: 45, parameters: ["this._priorityType = 0;"] },
-        { code: 45, parameters: ["this._spriteOffsetX += value2;"] },
-        { code: 45, parameters: ["this._spriteOffsetY += value2;"] },
-        { code: 32 },
-        { code: 34 },
-        { code: 37 },
-        { code: 17 },
-        { code: 35 },
-        { code: 0 }
-      ],
-      repeat: false,
-      skippable: true
-    });
+    rollUnusedSpriteAngleOffset();
+    forceMoveRoute(interp.character(valueanimalEventId), [
+      { code: MOVE_COMMAND_SCRIPT, parameters: ["this.setAngle(value1);"] },
+      { code: MOVE_COMMAND_SCRIPT, parameters: ["this.resetPattern();"] },
+      { code: MOVE_COMMAND_SCRIPT, parameters: ["this._originalPattern = 1;"] },
+      { code: MOVE_COMMAND_SCRIPT, parameters: ["this._priorityType = 0;"] },
+      { code: MOVE_COMMAND_SCRIPT, parameters: ["this._spriteOffsetX += value2;"] },
+      { code: MOVE_COMMAND_SCRIPT, parameters: ["this._spriteOffsetY += value2;"] },
+      { code: MOVE_COMMAND_TURN_DOWN },
+      { code: MOVE_COMMAND_TURN_LEFT },
+      { code: MOVE_COMMAND_TURN_RIGHT },
+      { code: MOVE_COMMAND_STEP_UP },
+      { code: MOVE_COMMAND_STEP_LEFT }
+    ]);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:195|動物処理バックアップ
@@ -14032,7 +14234,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:199|全体マップ移動選択コモン
   AGH_setSelfSwitchWorldMapMoveSelectCommon = function () {
-    for (var id = 50; id > 0; id--) {
+    for (let id = 50; id > 0; id--) {
       if (!!$gameMap.event(id)) {
         $gameSelfSwitches.setValue([$gameMap.mapId(), id, "C"], true);
       }
@@ -14055,17 +14257,20 @@
   // Replaces (1x): CommonEvents.json:common-event:203|熟練度アップコモン
   AGH_showWindowTextRandomWork1 = function (interp) {
     const descriptionWindowWidth = 169; //例外アイテム名
-    const actor = $gameActors.actor($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID));
-    const item = $dataItems[$gameVariables.value(93)];
-    if ($gameVariables.value(93) != descriptionWindowWidth) {
+    const selectedActorId = $gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID);
+    const actor = $gameActors.actor(selectedActorId);
+    const itemId = $gameVariables.value(93);
+    const item = $dataItems[itemId];
+    if (itemId != descriptionWindowWidth) {
       interp.sVal(21, Number(item.meta["熟練度アップスキルタイプ"]));
     }
     interp.sVal(22, Number(item.meta["熟練度上昇値"]));
-    const variableText = $gameVariables.value(93);
     const ownedItemCount = $gameParty.numItems(value);
-    const coloredText = colorTaggedText(2, `${$gameVariables.value(HELPER_VARIABLE.RANDOM_WORK_2)}`);
+    const gainedStat = $gameVariables.value(HELPER_VARIABLE.RANDOM_WORK_2);
+    const coloredStat = colorTaggedText(2, `${gainedStat}`);
     const actorName = actor.name();
-    let messageText = `\x1bIIN[${variableText}]（${ownedItemCount}）上昇値:${coloredText}　対象:${actorName}`;
+    const itemIconName = `\x1bIIN[${itemId}]`;
+    let messageText = `${itemIconName}（${ownedItemCount}）上昇値:${coloredStat}　対象:${actorName}`;
     if ($gameVariables.value(203) >= 2) {
       messageText += `\\C[10] * 2\\C[0]`;
     }
@@ -14091,13 +14296,14 @@
 
   // Replaces (1x): CommonEvents.json:common-event:210|アクター選択コモン
   AGH_movePictureActorChoice = function () {
+    let pictureId;
     const selectedActorId = $gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID);
-    var pictureId = selectedActorId + 100;
+    pictureId = selectedActorId + 100;
     if (selectedActorId >= 2) {
-      var pictureId = 101 + (selectedActorId - 1) * 7;
+      pictureId = 101 + (selectedActorId - 1) * 7;
     }
     $gameScreen.movePicture(pictureId, 1, 640 - 500, 384, 100, 100, 0, 0, 20);
-    for (var i = 0; i <= 7; i++) {
+    for (let i = 0; i <= 7; i++) {
       if ($gameScreen.picture(pictureId + i)) {
         $gameScreen.movePicture(pictureId + i, 1, 640 - 500, 384, 100, 100, 0, 3, 20);
       }
@@ -14120,7 +14326,7 @@
   AGH_checkItemCountCollectedItem = function (interp) {
     const start = 1;
     const end = 4;
-    for (var i = start; i <= end; i++) {
+    for (let i = start; i <= end; i++) {
       if ($gameVariables.value(284)[i] == 0) {
         interp.sVal(i + 21, "[登録なし]");
       } else {
@@ -14140,13 +14346,15 @@
 
   // Replaces (1x): CommonEvents.json:common-event:232|ショップ処理先頭で処理
   AGH_setVariableRandomWork1ShopProcessingHead = function () {
-    const coloredText = colorTaggedText(2, `${actor.name()}`);
-    const coloredText2 = colorTaggedText(27, `${`\x1bSIN[${valueHoneyTrapSkillId}]`}`);
-    const coloredText3 = colorTaggedText(10, `${valueRandomSet}%UP`);
-    const messageText = `${coloredText}は${coloredText2}を行った…。[成功率/値引き率${coloredText3}]\n`;
+    const actorName = colorTaggedText(2, actor.name());
+    const honeyTrapSkillMarker = "\x1bSIN[" + valueHoneyTrapSkillId + "]";
+    const honeyTrapSkillName = colorTaggedText(27, honeyTrapSkillMarker);
+    const successRateText = colorTaggedText(10, valueRandomSet + "%UP");
+    const effectText = `${actorName}は${honeyTrapSkillName}を行った…。[成功率/値引き率${successRateText}]`;
+    const previousWorkText = $gameVariables.value(HELPER_VARIABLE.RANDOM_WORK_1);
     $gameVariables.setValue(
       HELPER_VARIABLE.RANDOM_WORK_1,
-      $gameVariables.value(HELPER_VARIABLE.RANDOM_WORK_1) + messageText
+      previousWorkText + effectText + "\n"
     );
   };
 
@@ -14184,19 +14392,23 @@
 
   // Replaces (1x): CommonEvents.json:common-event:237|指輪ショップ処理
   AGH_setSwitchRingShopProcessing = function () {
-    const variableId = 20;
-    const switchId = 160;
-    for (var i = 396; i <= 399; i++) {
-      const armorData = $dataArmors[i];
+    const firstRingVariableId = 20;
+    const firstRingSwitchId = 160;
+    const firstRingArmorId = 396;
+    // Each ring occupies the variable/switch right after the previous one.
+    for (let armorId = firstRingArmorId; armorId <= 399; armorId++) {
+      const ringIndex = armorId - firstRingArmorId + 1;
+      const ringData = $dataArmors[armorId];
+      const priceText = ringData.price.toLocaleString();
+      // NOTE: the original wrote "\\G" inside a template literal, which renders as a
+      // plain "G"; the produced text is kept identical on purpose.
+      const itemLabel = "\x1bI[" + ringData.iconIndex + "]" + ringData.name;
       $gameVariables.setValue(
-        variableId + (i - 395),
-        `\x1bI[${armorData.iconIndex}]${armorData.name} ${armorData.price.toLocaleString()}\G`
+        firstRingVariableId + ringIndex,
+        itemLabel + " " + priceText + "G"
       );
-      if ($gameParty.gold() >= armorData.price) {
-        $gameSwitches.setValue(switchId + (i - 395), true);
-      } else {
-        $gameSwitches.setValue(switchId + (i - 395), false);
-      }
+      const canAfford = $gameParty.gold() >= ringData.price;
+      $gameSwitches.setValue(firstRingSwitchId + ringIndex, canAfford);
     }
   };
 
@@ -14244,126 +14456,55 @@
   };
 
   // Replaces (1x): CommonEvents.json:common-event:240|ショップ処理
-  AGH_initValueScriptArray1 = function () {
-    switch (numericCaseValue(valueCountSet1)) {
-      case 0:
-        {
-          valueScriptArray1 = [4, 5, 6];
-        }
-        break;
-      case 1:
-        {
-          valueScriptArray1 = [6, 7];
-        }
-        break;
-      case 2:
-        {
-          valueScriptArray1 = [4, 5, 6];
-        }
-        break;
-      case 3:
-        {
-          valueScriptArray1 = [4, 5, 6, 7];
-        }
-        break;
-      case 4:
-        {
-          valueScriptArray1 = [4, 5, 6, 7];
-        }
-        break;
-      case 5:
-        {
-          valueScriptArray1 = [1];
-        }
-        break;
-      case 6:
-        {
-          valueScriptArray1 = [1];
-        }
-        break;
-    }
+    // valueScriptArray1 presets for the shop / crafting handlers, selected by the value
+  // of valueCountSet1 (the switch is the case label of the original code).
+  const SCRIPT_ARRAY1_PRESETS = [
+    [4, 5, 6],
+    [6, 7],
+    [4, 5, 6],
+    [4, 5, 6, 7],
+    [4, 5, 6, 7],
+    [1],
+    [1]
+  ];
+  const SCRIPT_ARRAY1_SHOP_PRESETS = [
+    [1, 2, 3, 4, 5, 6, 7, 8, 9],
+    [1, 2, 3, 4, 5, 8, 9],
+    [1, 2, 3, 7, 8, 9],
+    [1, 2, 3, 4, 5, 7, 8, 9],
+    [1, 2, 3, 4, 5, 6, 7, 8, 9],
+    [1],
+    [1, 2]
+  ];
+  const SCRIPT_ARRAY1_BOOK_PRESETS = [
+    [1, 2, 3, 4, 5],
+    [1, 2, 3, 4, 5],
+    [1, 2, 3],
+    [1, 2, 3],
+    [1, 2, 3],
+    [1],
+    [1]
+  ];
+
+  // Copies the preset so every caller gets its own array, like the literals did.
+  function setScriptArrayFromPresets(presets) {
+    const preset = presets[numericCaseValue(valueCountSet1)];
+    if (!preset) return;
+    valueScriptArray1 = preset.slice();
+  }
+
+AGH_initValueScriptArray1 = function () {
+    setScriptArrayFromPresets(SCRIPT_ARRAY1_PRESETS);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:240|ショップ処理
   AGH_initValueScriptArray1ShopProcessing = function () {
-    switch (numericCaseValue(valueCountSet1)) {
-      case 0:
-        {
-          valueScriptArray1 = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-        }
-        break;
-      case 1:
-        {
-          valueScriptArray1 = [1, 2, 3, 4, 5, 8, 9];
-        }
-        break;
-      case 2:
-        {
-          valueScriptArray1 = [1, 2, 3, 7, 8, 9];
-        }
-        break;
-      case 3:
-        {
-          valueScriptArray1 = [1, 2, 3, 4, 5, 7, 8, 9];
-        }
-        break;
-      case 4:
-        {
-          valueScriptArray1 = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-        }
-        break;
-      case 5:
-        {
-          valueScriptArray1 = [1];
-        }
-        break;
-      case 6:
-        {
-          valueScriptArray1 = [1, 2];
-        }
-        break;
-    }
+    setScriptArrayFromPresets(SCRIPT_ARRAY1_SHOP_PRESETS);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:240|ショップ処理
   AGH_initValueScriptArray1_2 = function () {
-    switch (numericCaseValue(valueCountSet1)) {
-      case 0:
-        {
-          valueScriptArray1 = [1, 2, 3, 4, 5];
-        }
-        break;
-      case 1:
-        {
-          valueScriptArray1 = [1, 2, 3, 4, 5];
-        }
-        break;
-      case 2:
-        {
-          valueScriptArray1 = [1, 2, 3];
-        }
-        break;
-      case 3:
-        {
-          valueScriptArray1 = [1, 2, 3];
-        }
-        break;
-      case 4:
-        {
-          valueScriptArray1 = [1, 2, 3];
-        }
-        break;
-      case 5:
-        {
-          valueScriptArray1 = [1];
-        }
-        break;
-      case 6:
-        {
-          valueScriptArray1 = [1];
-        }
-        break;
-    }
+    setScriptArrayFromPresets(SCRIPT_ARRAY1_BOOK_PRESETS);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:240|ショップ処理
@@ -14372,45 +14513,36 @@
   };
 
   // Replaces (1x): CommonEvents.json:common-event:240|ショップ処理
-  AGH_runScriptShopProcessing = function () {
+    // Feeds valueScriptArray1 into one shop preparation handler. The last array entry
+  // is flagged with 1 so the handler knows the list is finished.
+  function runShopPreparation(prepareEntry) {
     const scriptArray = valueScriptArray1;
-    for (var j = 0; j < scriptArray.length; j++) {
-      if (scriptArray[j] == scriptArray[scriptArray.length - 1]) {
-        shop_preparationEI(0, scriptArray[j], 1);
-      } else {
-        shop_preparationEI(0, scriptArray[j], 0);
-      }
+    const lastEntryId = scriptArray[scriptArray.length - 1];
+    for (let scriptIndex = 0; scriptIndex < scriptArray.length; scriptIndex++) {
+      const entryId = scriptArray[scriptIndex];
+      const isLastEntry = entryId == lastEntryId ? 1 : 0;
+      prepareEntry(0, entryId, isLastEntry);
     }
+  }
+
+AGH_runScriptShopProcessing = function () {
+    runShopPreparation(shop_preparationEI);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:240|ショップ処理
   AGH_runScriptShopProcessing_2 = function () {
-    const scriptArray = valueScriptArray1;
-    for (var j = 0; j < scriptArray.length; j++) {
-      if (scriptArray[j] == scriptArray[scriptArray.length - 1]) {
-        shop_preparationH(0, scriptArray[j], 1);
-      } else {
-        shop_preparationH(0, scriptArray[j], 0);
-      }
-    }
+    runShopPreparation(shop_preparationH);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:240|ショップ処理
   AGH_runScriptShopProcessing_3 = function () {
-    const scriptArray = valueScriptArray1;
-    for (var j = 0; j < scriptArray.length; j++) {
-      if (scriptArray[j] == scriptArray[scriptArray.length - 1]) {
-        shop_preparationE(0, scriptArray[j], 1);
-      } else {
-        shop_preparationE(0, scriptArray[j], 0);
-      }
-    }
+    runShopPreparation(shop_preparationE);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:240|ショップ処理
   AGH_runScriptShopProcessing_4 = function () {
     const scriptArray = valueScriptArray1;
-    for (var j = 0; j < scriptArray.length; j++) {
+    for (let j = 0; j < scriptArray.length; j++) {
       if (scriptArray[j] == scriptArray[scriptArray.length - 1]) {
         shop_preparation1(0, scriptArray[j], 0);
         shop_preparation1(1, scriptArray[j], 0);
@@ -14426,7 +14558,7 @@
   // Replaces (1x): CommonEvents.json:common-event:240|ショップ処理
   AGH_runScriptShopProcessing_5 = function () {
     const scriptArray = valueScriptArray1;
-    for (var j = 0; j < scriptArray.length; j++) {
+    for (let j = 0; j < scriptArray.length; j++) {
       if (scriptArray[j] == scriptArray[scriptArray.length - 1]) {
         shop_preparation1(1, scriptArray[j], 0);
         shop_preparation1(2, scriptArray[j], 1);
@@ -14440,7 +14572,7 @@
   // Replaces (1x): CommonEvents.json:common-event:240|ショップ処理
   AGH_runScriptShopProcessing_6 = function () {
     const scriptArray = valueScriptArray1;
-    for (var j = 0; j < scriptArray.length; j++) {
+    for (let j = 0; j < scriptArray.length; j++) {
       if (scriptArray[j] == scriptArray[scriptArray.length - 1]) {
         shop_preparation1(valueCountSet1, scriptArray[j], 1);
       } else {
@@ -14460,31 +14592,41 @@
   };
 
   // Replaces (1x): CommonEvents.json:common-event:241|固有武器強化
-  AGH_setSwitchTemporarySwitch_4 = function () {
+    // Gold amount of the current enhance job, coloured red and followed by the usual
+  // currency escape.
+  function currentEnhanceCostText() {
+    const costAmount = $gameVariables.value(HELPER_VARIABLE.RANDOM_WORK_1).toLocaleString();
+    return colorTaggedText(2, `${costAmount}\\G`);
+  }
+
+  // Requirement line of an enhance job that also needs materials. Returns whether the
+  // party owns enough of the material.
+  function writeEnhanceRequirementLine() {
+    const materialItemId = valueScriptArray2[0];
+    const requiredMaterialCount = valueScriptArray2[1];
+    const materialItem = $dataItems[materialItemId];
+    const ownedMaterialCount = $gameParty.numItems(materialItem);
+    const costText = currentEnhanceCostText();
+    const requirementText =
+      `（要:${costText} \x1bIIN[${materialItemId}]×${requiredMaterialCount}個）\n` +
+      `所持数:${ownedMaterialCount}個`;
+    $gameVariables.setValue(HELPER_VARIABLE.RANDOM_WORK_3, requirementText);
+    return ownedMaterialCount >= requiredMaterialCount;
+  }
+
+AGH_setSwitchTemporarySwitch_4 = function () {
+    let hasRequiredMaterials;
     weapon_uniqueEnhance($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID), 1);
     $gameVariables.setValue(HELPER_VARIABLE.RANDOM_WORK_1, valueCountSet1);
     $gameSwitches.setValue(HELPER_SWITCH.TEMPORARY_FLAG, false);
     if (valueScriptArray2[0] >= 1) {
-      const itemData = $dataItems[valueScriptArray2[0]];
-      var hasRequiredMaterials = $gameParty.numItems(itemData) >= valueScriptArray2[1];
-      const coloredText = colorTaggedText(
-        2,
-        `${$gameVariables.value(HELPER_VARIABLE.RANDOM_WORK_1).toLocaleString()}\\G`
-      );
-      const displayedAmount = valueScriptArray2[0];
-      const displayedAmount2 = valueScriptArray2[1];
-      const ownedItemCount = $gameParty.numItems(itemData);
+      hasRequiredMaterials = writeEnhanceRequirementLine();
+    } else {
+      hasRequiredMaterials = true;
       $gameVariables.setValue(
         HELPER_VARIABLE.RANDOM_WORK_3,
-        `（要:${coloredText} \x1bIIN[${displayedAmount}]×${displayedAmount2}個）\n所持数:${ownedItemCount}個`
+        `（要:${currentEnhanceCostText()}）`
       );
-    } else {
-      var hasRequiredMaterials = true;
-      const coloredText2 = colorTaggedText(
-        2,
-        `${$gameVariables.value(HELPER_VARIABLE.RANDOM_WORK_1).toLocaleString()}\\G`
-      );
-      $gameVariables.setValue(HELPER_VARIABLE.RANDOM_WORK_3, `（要:${coloredText2}）`);
     }
     if ($gameParty.gold() >= valueCountSet1 && hasRequiredMaterials) {
       $gameSwitches.setValue(HELPER_SWITCH.TEMPORARY_FLAG, true);
@@ -14555,14 +14697,15 @@
 
   // Replaces (1x): CommonEvents.json:common-event:245|昇格演出
   AGH_playParticleAureoleC = function (interp) {
-    var particleName = "aureole_c";
+    let particleName;
+    particleName = "aureole_c";
     $gameScreen._particle.particlePlay(
       interp._eventId,
       particleName + "-" + interp._eventId,
       "this",
       particleName
     );
-    var particleName = "lifeStorm_screen";
+    particleName = "lifeStorm_screen";
     $gameScreen._particle.particlePlay(
       interp._eventId,
       particleName + "-" + interp._eventId,
@@ -14624,14 +14767,15 @@
 
   // Replaces (1x): CommonEvents.json:common-event:254|ステータスリセット
   AGH_readVariableActorChoice_3 = function () {
+    let i;
     const actor = $gameActors.actor($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID));
-    for (var i = 1; i < $dataSkills.length; i++) {
+    for (i = 1; i < $dataSkills.length; i++) {
       actor.forgetSkill(i);
       actor.setSkillMasteryUses(i, 0);
       actor.setSkillMasteryLevel(i, 0);
     }
     const equips = actor.equips();
-    for (var i = 0; i < equips.length; i++) {
+    for (i = 0; i < equips.length; i++) {
       if (equips[i]) {
         actor.changeEquipById(i + 1, 0);
       }
@@ -14759,20 +14903,21 @@
 
   // Replaces (1x): CommonEvents.json:common-event:261|鑑定解説文
   AGH_iterateItemsInfoEval = function () {
+    let valueItems, descriptionText;
     const processedEntryId = $gameVariables.value(HELPER_VARIABLE.PROCESSED_ENTRY_ID);
     if (processedEntryId == 0) {
-      var valueItems = $dataItems[$gameVariables.value(HELPER_VARIABLE.RANDOM_WORK_1)];
+      valueItems = $dataItems[$gameVariables.value(HELPER_VARIABLE.RANDOM_WORK_1)];
     }
     if (processedEntryId == 1) {
-      var valueItems = $dataWeapons[$gameVariables.value(HELPER_VARIABLE.RANDOM_WORK_1)];
+      valueItems = $dataWeapons[$gameVariables.value(HELPER_VARIABLE.RANDOM_WORK_1)];
     }
     if (processedEntryId == 2) {
-      var valueItems = $dataArmors[$gameVariables.value(HELPER_VARIABLE.RANDOM_WORK_1)];
+      valueItems = $dataArmors[$gameVariables.value(HELPER_VARIABLE.RANDOM_WORK_1)];
     }
-    var descriptionText = valueItems.description;
+    descriptionText = valueItems.description;
     //var value1 = value1.replace("\n", "");
-    var descriptionText = `\x1bI[${valueItems.iconIndex}]${valueItems.name}\n${descriptionText}`;
-    let messageText = `\n`;
+    descriptionText = `\x1bI[${valueItems.iconIndex}]${valueItems.name}\n${descriptionText}`;
+    let messageText = "\n";
     if (valueItems.meta["Info Eval"]) {
       item_priceinfo(processedEntryId, $gameVariables.value(HELPER_VARIABLE.RANDOM_WORK_1));
       messageText += $gameVariables.value(801);
@@ -14920,7 +15065,7 @@
 
     const start = $gameVariables.value(HELPER_VARIABLE.FIRST_DEPLOYED_ACTOR_ID);
     const end = $gameVariables.value(HELPER_VARIABLE.LAST_DEPLOYED_ACTOR_ID);
-    for (var id1 = start; id1 <= end; id1++) {
+    for (let id1 = start; id1 <= end; id1++) {
       Profession_basicReturn(id1);
     }
   };
@@ -14936,7 +15081,7 @@
 
       const start = 0;
       const end = 42;
-      for (var i = start; i <= end; i++) {
+      for (let i = start; i <= end; i++) {
         $gameVariables.value(id + 540)[i] = $gameVariables.value(id + 440)[i];
       }
     }, interp);
@@ -14975,7 +15120,7 @@
       .map(function (event) {
         return event.event().id;
       });
-    for (var i = 0; i <= array.length - 1; i++) {
+    for (let i = 0; i <= array.length - 1; i++) {
       if (array[i] >= 2 && $dataCommonEvents[array[i]].switchId) {
         if (
           valueScriptArray1.some(function (id) {
@@ -15013,12 +15158,13 @@
 
   // Replaces (5x): CommonEvents.json:common-event:298|オープニング, CommonEvents.json:common-event:300|シナリオ↓シーン名設定コモン, CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！, CommonEvents.json:common-event:349|[49]終幕
   AGH_particleUpdateCloudW = function () {
+    let randomOffset;
     adv_partDirectSet(9);
     const cloudW = "cloud_w"; //天候:雲
-    var randomOffset = getRandomIndex(201) + 1000;
+    randomOffset = getRandomIndex(201) + 1000;
     $gameScreen._particle.particleUpdate([cloudW, "speed", String(randomOffset), String(randomOffset)]);
     const cloudAlpha = 0.75; //[0.40,0.45,0.50,0.55,0.60,0.65,0.70,0.75];
-    var randomOffset = cloudAlpha[getRandomIndex(cloudAlpha.length)];
+    randomOffset = cloudAlpha[getRandomIndex(cloudAlpha.length)];
     $gameScreen._particle.particleUpdate([
       cloudW,
       "alpha",
@@ -15032,12 +15178,13 @@
 
   // Replaces (1x): CommonEvents.json:common-event:298|オープニング
   AGH_setSelfSwitchOpening = function (interp) {
+    let eventId;
     const mapId2 = $gameMap.mapId();
-    var eventId = 7; //this._eventId;
+    eventId = 7; //this._eventId;
     const positionY = "D";
     const selfSwitchEnabled = true; //false;
     $gameSelfSwitches.setValue([mapId2, eventId, positionY], selfSwitchEnabled);
-    var eventId = 8; //this._eventId;
+    eventId = 8; //this._eventId;
     $gameSelfSwitches.setValue([mapId2, eventId, positionY], selfSwitchEnabled);
   };
 
@@ -15083,11 +15230,12 @@
 
   // Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
   AGH_eventOrder = function () {
-    for (var id = 100; id > 0; id--) {
+    let event;
+    for (let id = 100; id > 0; id--) {
       const mapEvent = $gameMap.event(id);
       if (!!mapEvent) {
         if (mapEvent.event().meta["Order"]) {
-          var event = mapEvent;
+          event = mapEvent;
           event.setDirection(6);
           event.requestBalloon(1);
         }
@@ -15097,11 +15245,12 @@
 
   // Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
   AGH_readMapEventMetaOrder = function () {
-    for (var id = 100; id > 0; id--) {
+    let event;
+    for (let id = 100; id > 0; id--) {
       const mapEvent = $gameMap.event(id);
       if (!!mapEvent) {
         if (mapEvent.event().meta["Order"]) {
-          var event = mapEvent;
+          event = mapEvent;
           event.setDirection(4);
         }
       }
@@ -15116,11 +15265,12 @@
 
   // Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
   AGH_eventBandit = function () {
-    for (var id = 100; id > 0; id--) {
+    let event;
+    for (let id = 100; id > 0; id--) {
       const mapEvent = $gameMap.event(id);
       if (!!mapEvent) {
         if (mapEvent.event().meta["Bandit"]) {
-          var event = mapEvent;
+          event = mapEvent;
           event.requestBalloon(12);
         }
       }
@@ -15145,7 +15295,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
   AGH_readMapEventMetaBanditOrderSkyKnightsAppear = function () {
-    for (var id = 100; id > 0; id--) {
+    for (let id = 100; id > 0; id--) {
       const mapEvent = $gameMap.event(id);
       if (!!mapEvent) {
         if (mapEvent.event().meta["Bandit"]) {
@@ -15228,7 +15378,7 @@
   AGH_runScriptOrderSkyKnightsAppear = function (interp) {
     const array = [0];
     const randomYOffsets = [-50];
-    const lineCandidates = [`グハァァッッ！！`];
+    const lineCandidates = ["グハァァッッ！！"];
     chara_oneWord(100, interp._eventId, 25, 180, array, randomYOffsets, lineCandidates, "genkai-mincho");
   };
 
@@ -15275,7 +15425,7 @@
   AGH_initValuePic1 = function () {
     const pictureId = 54;
     valuePic1 = pictureId;
-    for (var i = 0; i <= 4; i++) {
+    for (let i = 0; i <= 4; i++) {
       picture_fade1(pictureId + i, "fadeOut", valueWipeImg, 60, 5);
     }
   };
@@ -15300,14 +15450,15 @@
 
   // Replaces (1x): CommonEvents.json:common-event:306|[6]情報屋との交渉
   AGH_showPictureZXMain006 = function () {
+    let pictureName;
     backGraund_menuMapSelect(2, 0, 0, 0);
     valuePic1 = 55;
     valueScenePic = "ZX_Main006_";
-    var pictureName = "ScreenBlackOut";
+    pictureName = "ScreenBlackOut";
     $gameScreen.showPicture(valuePic1, pictureName, 1, 640, 384, 100, 100, 200, 0);
     picture_fade1(valuePic1, "fadeIn", valueWipeImg, 60, 5);
     const pictureId = valuePic1 + 1;
-    var pictureName = valueScenePic + "02";
+    pictureName = valueScenePic + "02";
     $gameScreen.showPicture(pictureId, pictureName, 1, 640 - 128 + 20 + 50, 384, 100, 100, 0, 0);
     $gameScreen.movePicture(pictureId, 1, 640 - 128 + 50, 384, 100, 100, 255, 0, 60);
   };
@@ -15323,7 +15474,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:306|[6]情報屋との交渉
   AGH_setPicturesAnimation = function () {
-    for (var i = 1; i <= 3; i++) {
+    for (let i = 1; i <= 3; i++) {
       pic_move1(valuePic1 + i, 0, 0, 100, 100, 0, 90);
     }
     $gameScreen.setPicturesAnimation(2, 10, "連番", 20);
@@ -15341,7 +15492,7 @@
   // Replaces (1x): CommonEvents.json:common-event:306|[6]情報屋との交渉
   AGH_showPictureInfoBrokerNegotiation_2 = function () {
     sex_direction(99, 0, 0);
-    for (var i = 1; i <= 5; i++) {
+    for (let i = 1; i <= 5; i++) {
       pic_move1(valuePic1 + i, 0, 0, 100, 100, 0, 90);
     }
     const pictureId = valuePic1 + 6;
@@ -15390,11 +15541,12 @@
 
   // Replaces (1x): CommonEvents.json:common-event:307|[7]少年の初陣
   AGH_valueName = function (interp) {
+    let floorValue;
     picTachie_move1(13, -1000, 0, 0, 0, 255, 60);
     picTachie_move1(14, -1000, 0, 0, 0, 255, 60);
     if ($gameSwitches.value(127)) {
       AudioManager.playSe({ name: "Z_FootRun", volume: 35, pitch: 100, pan: 0 });
-      var floorValue = Math.floor(floorValue / 2); //ウェイト
+      floorValue = Math.floor(floorValue / 2); //ウェイト
       interp.wait(floorValue);
     } else {
       AudioManager.playSe({ name: "Z_FootWalkShort", volume: 65, pitch: 100, pan: 0 });
@@ -15430,15 +15582,16 @@
 
   // Replaces (3x): CommonEvents.json:common-event:312|[12]捕縛完了→引き渡しまで, CommonEvents.json:common-event:316|[16]集落の長に話を聞く, CommonEvents.json:common-event:345|[45]祭殿の隠し通路
   AGH_readVariableEventProgressHeroCaptureToHandover = function (interp) {
+    let eventSubjectIndex;
     event_partyCharaEntry();
-    var eventSubjectIndex = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
-    var eventSubjectIndex = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[eventSubjectIndex];
+    eventSubjectIndex = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    eventSubjectIndex = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[eventSubjectIndex];
     event_partyCharaMove(45, "this.turnTowardCharacter($gameMap.event(" + eventSubjectIndex + "));");
   };
 
   // Replaces (1x): CommonEvents.json:common-event:312|[12]捕縛完了→引き渡しまで
   AGH_eventMonsterSymbol = function (interp) {
-    for (var id = 200; id > 0; id--) {
+    for (let id = 200; id > 0; id--) {
       const mapEvent = $gameMap.event(id);
       if (!!mapEvent) {
         if (mapEvent.event().meta["MonsterSymbol"]) {
@@ -15454,10 +15607,11 @@
 
   // Replaces (1x): CommonEvents.json:common-event:312|[12]捕縛完了→引き渡しまで
   AGH_readVariableEventProgressHero_2 = function (interp) {
-    var charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    let charaSlotId;
+    charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     event_respawnSetA(charaSlotId, 26, 4, 1, 2);
     interp._eventId = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId];
-    var charaSlotId = 3;
+    charaSlotId = 3;
     event_respawnSetA(charaSlotId, 26, 3, 0, 2);
   };
 
@@ -15528,7 +15682,7 @@
   // Replaces (1x): CommonEvents.json:common-event:313|[13]昇格──格差──
   AGH_setSelfVariableActorChoicePromotionGap = function (interp) {
     interp.sVal(20, 0);
-    valueWordSet0 = `教会で「昇格」が可能になりました！`;
+    valueWordSet0 = "教会で「昇格」が可能になりました！";
     valueWordSetEx = 0; //補足が必要な場合
     interp.setupChild($dataCommonEvents[45].list, 0);
   };
@@ -15548,18 +15702,19 @@
 
   // Replaces (1x): CommonEvents.json:common-event:316|[16]集落の長に話を聞く
   AGH_readVariableEventProgressHeroAskVillageChief = function (interp) {
-    var charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    let charaSlotId, event;
+    charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     const npcPreset = $gameVariables.value(HELPER_VARIABLE.EVENT_WORK_VALUES)[
       $gameVariables.value(HELPER_VARIABLE.EPISODE_ITEM_ID)
     ];
     event_respawnSetA(charaSlotId, npcPreset[3], npcPreset[4], 1);
-    var event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId]);
+    event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId]);
     event.setImage(npcPreset[1], npcPreset[2]);
     event.setDirection(npcPreset[5]);
     interp._eventId = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId];
-    var charaSlotId = 11;
+    charaSlotId = 11;
     event_respawnSetN(charaSlotId, npcPreset[8], npcPreset[9], 0, npcPreset[6], npcPreset[7]);
-    var event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId]);
+    event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId]);
     event.setDirection(npcPreset[10]);
   };
 
@@ -15618,18 +15773,19 @@
 
   // Replaces (1x): CommonEvents.json:common-event:329|[29]水着購入
   AGH_readVariableEventProgressHeroSwimsuitPurchase = function (interp) {
-    var charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    let charaSlotId, event;
+    charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     const npcPreset = $gameVariables.value(HELPER_VARIABLE.EVENT_WORK_VALUES)[
       $gameVariables.value(HELPER_VARIABLE.EPISODE_ITEM_ID)
     ];
     event_respawnSetA(charaSlotId, npcPreset[3], npcPreset[4], 1);
-    var event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId]);
+    event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId]);
     event.setImage(npcPreset[1], npcPreset[2]);
     event.setDirection(npcPreset[5]);
     interp._eventId = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId];
-    var charaSlotId = 11;
+    charaSlotId = 11;
     event_respawnSetN(charaSlotId, npcPreset[8], npcPreset[9], 0, npcPreset[6], npcPreset[7]);
-    var event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId]);
+    event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId]);
     event.setDirection(npcPreset[10]);
     event.setStepAnime(false);
     event.setWalkAnime(false);
@@ -15659,14 +15815,15 @@
 
   // Replaces (1x): CommonEvents.json:common-event:330|[30]モニカ合流
   AGH_readVariableEventProgressHeroMonicaJoins = function (interp) {
-    var charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    let charaSlotId;
+    charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     const npcPreset = $gameVariables.value(HELPER_VARIABLE.EVENT_WORK_VALUES)[
       $gameVariables.value(HELPER_VARIABLE.EPISODE_ITEM_ID)
     ];
     event_respawnSetA(charaSlotId, 11, 5, 1, 6);
-    var charaSlotId = 3; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    charaSlotId = 3; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     event_respawnSetA(charaSlotId, 12, 4, 0, 2);
-    var charaSlotId = 11;
+    charaSlotId = 11;
     event_respawnSetN(charaSlotId, npcPreset[8], npcPreset[9], 0, npcPreset[6], npcPreset[7], npcPreset[10]);
     //event is a dead verbatim leftover: only _eventId is transferred below
     //const event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId]);
@@ -15687,7 +15844,7 @@
   AGH_runScriptMonicaJoins = function (interp) {
     const array = [0];
     const randomYOffsets = [50];
-    const lineCandidates = [`モグモグ──サクサク──`];
+    const lineCandidates = ["モグモグ──サクサク──"];
     chara_oneWord(100, interp._eventId, 25, 180, array, randomYOffsets, lineCandidates, 0);
   };
 
@@ -15699,12 +15856,13 @@
 
   // Replaces (1x): CommonEvents.json:common-event:330|[30]モニカ合流
   AGH_readVariableEventProgressHero_8 = function (interp) {
-    var charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    let charaSlotId;
+    charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     event_respawnSetA(charaSlotId, 38, 18, 1, 2);
-    var charaSlotId = 2; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    charaSlotId = 2; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     event_respawnSetA(charaSlotId, 38, 20, 0, 8);
     interp._eventId = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId];
-    var charaSlotId = 3; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    charaSlotId = 3; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     event_respawnSetA(charaSlotId, 37, 17, 0, 2);
   };
 
@@ -15712,7 +15870,7 @@
   AGH_readVariableDynamicEventId_5 = function () {
     const array = [0];
     const randomYOffsets = [-50];
-    const lineCandidates = [`了解！`];
+    const lineCandidates = ["了解！"];
     const spawnedEventIds = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS);
     chara_oneWord(100, spawnedEventIds[1], 25, 180, array, randomYOffsets, lineCandidates, 0);
     chara_oneWord(101, spawnedEventIds[3], 25, 180, array, randomYOffsets, lineCandidates, 0);
@@ -15720,22 +15878,24 @@
 
   // Replaces (1x): CommonEvents.json:common-event:331|[31]秘密の入口
   AGH_readVariableEventProgressHeroSecretEntrance = function (interp) {
-    var charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    let charaSlotId;
+    charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     event_respawnSetA(charaSlotId, 70, 12, 0, 8);
     interp._eventId = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId];
-    var charaSlotId = 2; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    charaSlotId = 2; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     event_respawnSetA(charaSlotId, 71, 11, 1, 2);
-    var charaSlotId = 3; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    charaSlotId = 3; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     event_respawnSetA(charaSlotId, 70, 13, 0, 8);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:333|[33]地底研究所
   AGH_readVariableEventProgressHeroUndergroundLab = function (interp) {
-    var spawnSlot = 11; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    let spawnSlot;
+    spawnSlot = 11; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     const spawnedEventIds = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS);
-    var spawnSlot = spawnedEventIds[spawnSlot];
+    spawnSlot = spawnedEventIds[spawnSlot];
     drowsepost.camera.zoom(1, 60, spawnSlot);
-    var spawnSlot = 11; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    spawnSlot = 11; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     interp._eventId = spawnedEventIds[spawnSlot];
   };
 
@@ -15763,7 +15923,8 @@
 
   // Replaces (1x): CommonEvents.json:common-event:334|[34]アウギュステで分散
   AGH_readVariableEventProgressHeroAugusteDisperse = function () {
-    var charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    let charaSlotId;
+    charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     const npcPreset = $gameVariables.value(HELPER_VARIABLE.EVENT_WORK_VALUES)[
       $gameVariables.value(HELPER_VARIABLE.EPISODE_ITEM_ID)
     ];
@@ -15771,19 +15932,20 @@
     const event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId]);
     event.setImage(npcPreset[1], npcPreset[2]);
     event.setDirection(npcPreset[5]);
-    var charaSlotId = 2; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    charaSlotId = 2; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     event_respawnSetA(charaSlotId, 19, 3, 0, 8);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:336|[36]情報屋に話を聞く
   AGH_readVariableEventProgressHeroAskInfoBroker = function (interp) {
-    var charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    let charaSlotId;
+    charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     const npcPreset = $gameVariables.value(HELPER_VARIABLE.EVENT_WORK_VALUES)[
       $gameVariables.value(HELPER_VARIABLE.EPISODE_ITEM_ID)
     ];
     event_respawnSetA(charaSlotId, 6, 11, 1, 8);
     interp._eventId = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId];
-    var charaSlotId = 11;
+    charaSlotId = 11;
     event_respawnSetN(charaSlotId, npcPreset[8], npcPreset[9], 0, npcPreset[6], npcPreset[7]);
     const event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId]);
     event.setDirection(2);
@@ -15825,10 +15987,11 @@
 
   // Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
   AGH_readVariableDynamicEventId_6 = function (interp) {
+    let event;
     const dynamicEventIds = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS);
-    for (var i = 11; i <= 13; i++) {
-      var eventId = dynamicEventIds[i]; //this._eventId
-      var event = $gameMap.event(eventId);
+    for (let i = 11; i <= 13; i++) {
+      const eventId = dynamicEventIds[i]; //this._eventId
+      event = $gameMap.event(eventId);
       event.requestBalloon(1);
       event.setDirection(2);
     }
@@ -15844,37 +16007,40 @@
 
   // Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
   AGH_readVariableDynamicEventId_8 = function (interp) {
+    let event;
     const dynamicEventIds = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS);
-    for (var i = 11; i <= 13; i++) {
-      var eventId = dynamicEventIds[i]; //this._eventId
-      var event = $gameMap.event(eventId);
+    for (let i = 11; i <= 13; i++) {
+      const eventId = dynamicEventIds[i]; //this._eventId
+      event = $gameMap.event(eventId);
       event.requestAnimation(371);
     }
   };
 
   // Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
   AGH_readVariableDynamicEventId_9 = function () {
+    let lineCandidates, id;
     const array = [0];
     const randomYOffsets = [-50];
-    var lineCandidates = [`ギャアァッ！！`];
-    var id = 11;
+    lineCandidates = ["ギャアァッ！！"];
+    id = 11;
     const spawnedEventIds = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS);
     chara_oneWord(101, spawnedEventIds[id], 25, 180, array, randomYOffsets, lineCandidates, 0);
-    var lineCandidates = [`グエッ`];
-    var id = 12;
+    lineCandidates = ["グエッ"];
+    id = 12;
     chara_oneWord(102, spawnedEventIds[id], 25, 180, array, randomYOffsets, lineCandidates, 0);
-    var lineCandidates = [`ガッ…`];
-    var id = 13;
+    lineCandidates = ["ガッ…"];
+    id = 13;
     chara_oneWord(103, spawnedEventIds[id], 25, 180, array, randomYOffsets, lineCandidates, 0);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
   AGH_readVariableDynamicEventId_10 = function (interp) {
+    let event;
     const dynamicEventIds = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS);
-    for (var i = 11; i <= 13; i++) {
+    for (let i = 11; i <= 13; i++) {
       AudioManager.playSe({ name: "Z_Collaps", volume: 50, pitch: 70, pan: 0 });
-      var eventId = dynamicEventIds[i]; //this._eventId
-      var event = $gameMap.event(eventId);
+      const eventId = dynamicEventIds[i]; //this._eventId
+      event = $gameMap.event(eventId);
       event.setStepAnime(false);
       event.setWalkAnime(false);
       event.setDirection(2);
@@ -15907,10 +16073,11 @@
 
   // Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
   AGH_readVariableEventProgressHeroAirPirateRemnantSuppression = function (interp) {
-    var charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    let charaSlotId;
+    charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     event_respawnSetA(charaSlotId, 10, 15, 1, 8);
     interp._eventId = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId];
-    var charaSlotId = 12;
+    charaSlotId = 12;
     event_respawnSetN(charaSlotId, 10, 12, 0, "BB_akunin3", 5, 2);
     event_respawnSetN(charaSlotId + 1, 9, 13, 0, "BB_akunin3", 6, 6);
     event_respawnSetN(charaSlotId + 2, 11, 13, 0, "BB_akunin3", 6, 4);
@@ -15918,10 +16085,11 @@
 
   // Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
   AGH_readVariableDynamicEventId_12 = function (interp) {
+    let event;
     const dynamicEventIds = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS);
-    for (var i = 12; i <= 14; i++) {
-      var eventId = dynamicEventIds[i]; //this._eventId
-      var event = $gameMap.event(eventId);
+    for (let i = 12; i <= 14; i++) {
+      const eventId = dynamicEventIds[i]; //this._eventId
+      event = $gameMap.event(eventId);
       event.setStepAnime(false);
       event.setWalkAnime(false);
       event.setDirection(2);
@@ -15991,14 +16159,15 @@
 
   // Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
   AGH_showPictureZXMain037 = function () {
+    let pictureName;
     backGraund_menuMapSelect(2, 0, 0, 0);
     valuePic1 = 51;
     valuePic2 = 71;
     valueScenePic = "ZX_Main037_";
-    var pictureName = "ScreenBlackOut";
+    pictureName = "ScreenBlackOut";
     $gameScreen.showPicture(valuePic1, pictureName, 1, 640, 384, 100, 100, 200, 0);
     picture_fade1(valuePic1, "fadeIn", valueWipeImg, 60, 5);
-    var pictureName = valueScenePic + "01";
+    pictureName = valueScenePic + "01";
     $gameScreen.showPicture(valuePic2 + 1, pictureName, 1, 640 + 480, 384 - 118, 100, 100, 200, 0);
     $gameScreen.movePicture(valuePic2 + 1, 1, 640 + 480, 384 + 50, 100, 100, 255, 0, 240);
     tachie_bless(valuePic2 + 1, 2);
@@ -16006,25 +16175,27 @@
 
   // Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
   AGH_showPictureScreen1024Frame = function () {
-    var pictureName = valueScenePic + "02";
+    let pictureName;
+    pictureName = valueScenePic + "02";
     $gameScreen.showPicture(valuePic1 + 1, pictureName, 1, 640 - 128, 384 - 20, 100, 100, 0, 0);
     $gameScreen.movePicture(valuePic1 + 1, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
     tachie_bless(valuePic1 + 1, 2);
-    var pictureName = "Screen1024Frame";
+    pictureName = "Screen1024Frame";
     $gameScreen.showPicture(valuePic2, pictureName, 1, 640 - 78, 384, 100, 100, 255, 0);
     picture_fade1(valuePic2, "fadeIn", valueWipeImg, 60, 5);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
   AGH_showPictureAirPirateRemnantSuppression = function () {
-    var pictureId = valuePic2 + 2;
-    var pictureName = valueScenePic + "03";
+    let pictureId, pictureName;
+    pictureId = valuePic2 + 2;
+    pictureName = valueScenePic + "03";
     $gameScreen.showPicture(pictureId, pictureName, 1, 640 + 480, 384 + 50, 100, 100, 0, 0);
     $gameScreen.movePicture(pictureId, 1, 640 + 480, 384 + 50, 100, 100, 255, 0, 60);
     tachie_bless(pictureId, 2);
     pic_move1(pictureId - 1, 0, 0, 100, 100, 0, 90);
-    var pictureId = valuePic1 + 2;
-    var pictureName = valueScenePic + "04";
+    pictureId = valuePic1 + 2;
+    pictureName = valueScenePic + "04";
     $gameScreen.showPicture(pictureId, pictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
     $gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
     tachie_bless(pictureId, 2);
@@ -16045,13 +16216,18 @@
   };
 
   // Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
-  AGH_showPictureAirPirateRemnantSuppression_2 = function () {
-    const pictureId = valuePic1 + 5;
-    const scenePictureName = valueScenePic + "06";
-    $gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
+    // Shows a scene picture at opacity 0, fades it in and moves its companion layer.
+  function showFadedScenePicture(pictureId, pictureName, blessLevel, companionPictureId) {
+    $gameScreen.showPicture(pictureId, pictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
     $gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
-    tachie_bless(pictureId, 2);
-    pic_move1(pictureId - 1, 0, 0, 100, 100, 0, 90);
+    tachie_bless(pictureId, blessLevel);
+    pic_move1(companionPictureId, 0, 0, 100, 100, 0, 90);
+  }
+
+AGH_showPictureAirPirateRemnantSuppression_2 = function () {
+    const pictureId = valuePic1 + 5;
+    const pictureName = valueScenePic + "06";
+    showFadedScenePicture(pictureId, pictureName, 2, pictureId - 1);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
@@ -16099,31 +16275,33 @@
 
   // Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
   AGH_readVariableEventProgressHero_12 = function () {
-    var spawnSlot = 11; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    let spawnSlot, event;
+    spawnSlot = 11; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     const spawnedEventIds = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS);
-    var event = $gameMap.event(spawnedEventIds[spawnSlot]);
+    event = $gameMap.event(spawnedEventIds[spawnSlot]);
     event.locate(4, 16);
-    var spawnSlot = 12; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
-    var event = $gameMap.event(spawnedEventIds[spawnSlot]);
+    spawnSlot = 12; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    event = $gameMap.event(spawnedEventIds[spawnSlot]);
     event.locate(5, 16);
-    var spawnSlot = 13; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
-    var event = $gameMap.event(spawnedEventIds[spawnSlot]);
+    spawnSlot = 13; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    event = $gameMap.event(spawnedEventIds[spawnSlot]);
     event.locate(4, 17);
-    var spawnSlot = 14; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
-    var event = $gameMap.event(spawnedEventIds[spawnSlot]);
+    spawnSlot = 14; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    event = $gameMap.event(spawnedEventIds[spawnSlot]);
     event.locate(5, 17);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:338|[38]空賊残党制圧
   AGH_readVariableEventProgressHero_13 = function () {
-    var spawnSlot = 5; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    let spawnSlot, event;
+    spawnSlot = 5; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     const spawnedEventIds = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS);
-    var event = $gameMap.event(spawnedEventIds[spawnSlot]);
+    event = $gameMap.event(spawnedEventIds[spawnSlot]);
     event.locate(4, 11);
     event.setDirection(2);
     event.setScale(100, 90);
-    var spawnSlot = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
-    var event = $gameMap.event(spawnedEventIds[spawnSlot]);
+    spawnSlot = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    event = $gameMap.event(spawnedEventIds[spawnSlot]);
     event.locate(22, 6);
     event.setDirection(2);
     event._spriteOffsetX = -48;
@@ -16178,14 +16356,15 @@
 
   // Replaces (1x): CommonEvents.json:common-event:341|[41]牢獄１日目
   AGH_showPictureDungeon12 = function () {
+    let pictureName;
     backGraund_menuMapSelect(2, 0, 0, 0); //'Dungeon1_2'
     valueScenePic = "ZX_Main040_";
     valuePic1 = 55;
-    var pictureName = "ScreenBlackOut";
+    pictureName = "ScreenBlackOut";
     $gameScreen.showPicture(valuePic1, pictureName, 1, 640, 384, 100, 100, 200, 0);
     picture_fade1(valuePic1, "fadeIn", valueWipeImg, 60, 5);
     const pictureId = valuePic1 + 1;
-    var pictureName = valueScenePic + "01";
+    pictureName = valueScenePic + "01";
     $gameScreen.showPicture(pictureId, pictureName, 1, 640 - 128, 384 - 20, 100, 100, 0, 0);
     $gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
   };
@@ -16247,8 +16426,8 @@
   AGH_waitPrisonDay6 = function (interp) {
     const id1 = 1;
     const id2 = 30;
-    const array = [`ア`, `ア`, `ア`, `ア`, `ア`, `～`, `ン`];
-    const wordBodyCandidates = [`゛`, `゛`, `゛`, `\\C[27]♥\\C[0]`, `\\C[27]♡\\C[0]`, ` `];
+    const array = ["ア", "ア", "ア", "ア", "ア", "～", "ン"];
+    const wordBodyCandidates = ["゛", "゛", "゛", `\\C[27]♥\\C[0]`, `\\C[27]♡\\C[0]`, " "];
     const wordTailCandidates = [
       64, 60, 55, 50, 45, 40, 35, 64, 60, 55, 50, 45, 40, 35, 64, 60, 55, 50, 45, 40, 35, 14
     ];
@@ -16260,21 +16439,22 @@
   // Replaces (1x): CommonEvents.json:common-event:342|[42]牢獄６日目
   AGH_runScriptPrisonDay6 = function () {
     const actorName = "\\N[5]";
-    const coloredText = colorTaggedText(2, `魔導ディスク`);
+    const coloredText = colorTaggedText(2, "魔導ディスク");
     const messageText = `${actorName}は「${coloredText}」を手に入れた。`;
     TickerManager.show(messageText);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:342|[42]牢獄６日目
   AGH_readVariableEventProgressHero_16 = function (interp) {
-    var charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    let charaSlotId, event;
+    charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     event_respawnSetA(charaSlotId, 11, 6, 1, 6);
-    var charaSlotId = 5; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
-    var event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId]);
+    charaSlotId = 5; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId]);
     event.locate(13, 6);
     event.setDirection(4);
-    var charaSlotId = 12; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
-    var event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId]);
+    charaSlotId = 12; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId]);
     event.locate(18, 10);
     event.setDirection(4);
     interp._eventId = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId];
@@ -16299,13 +16479,14 @@
 
   // Replaces (1x): CommonEvents.json:common-event:343|[43]誇りと秩序
   AGH_readVariableEventProgressHeroPrideAndOrder = function (interp) {
-    var charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    let charaSlotId;
+    charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     const npcPreset = $gameVariables.value(HELPER_VARIABLE.EVENT_WORK_VALUES)[
       $gameVariables.value(HELPER_VARIABLE.EPISODE_ITEM_ID)
     ];
     event_respawnSetA(charaSlotId, npcPreset[3], npcPreset[4], 1, npcPreset[5]);
     interp._eventId = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId];
-    var charaSlotId = 11;
+    charaSlotId = 11;
     event_respawnSetN(charaSlotId, 13, 13, 0, "People3", 6, 2);
     event_respawnSetN(12, 10, 17, 0, "npcCastle1", 2, 6);
     event_respawnSetN(13, 10, 18, 0, "npcCastle1", 2, 6);
@@ -16323,11 +16504,12 @@
 
   // Replaces (1x): CommonEvents.json:common-event:345|[45]祭殿の隠し通路
   AGH_setVariableChoiceSwitch11ShrineSecretPath = function (interp) {
+    let charaSlotId;
     $gameVariables.setValue(HELPER_VARIABLE.EVENT_DESTINATION, [108, 10, 9]);
-    var charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     event_respawnSetA(charaSlotId, 10, 9, 1, 8);
     interp._eventId = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId];
-    var charaSlotId = 11;
+    charaSlotId = 11;
     const npcPreset = $gameVariables.value(HELPER_VARIABLE.EVENT_WORK_VALUES)[
       $gameVariables.value(HELPER_VARIABLE.EPISODE_ITEM_ID)
     ];
@@ -16347,8 +16529,9 @@
 
   // Replaces (1x): CommonEvents.json:common-event:346|[46]遺跡の守護者
   AGH_readVariableDynamicEventIdRuinsGuardian = function () {
-    var popupEventId = 12;
-    var popupEventId = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[popupEventId];
+    let popupEventId;
+    popupEventId = 12;
+    popupEventId = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[popupEventId];
     message_popup2(popupEventId, 0, 2, 1);
     //message_popup2(0,[1024,368],1,1);
     //ｲﾍﾞﾝﾄid,ﾌｷﾀﾞｼ位置,行数,1で有効化。\sh[5] で振動強さ指定
@@ -16370,7 +16553,8 @@
 
   // Replaces (1x): CommonEvents.json:common-event:350|[50]次なる戦いへ──
   AGH_readVariableEventProgressHeroNextBattle = function (interp) {
-    var charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    let charaSlotId;
+    charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     const npcPreset = $gameVariables.value(HELPER_VARIABLE.EVENT_WORK_VALUES)[
       $gameVariables.value(HELPER_VARIABLE.EPISODE_ITEM_ID)
     ];
@@ -16379,7 +16563,7 @@
     event.setImage(npcPreset[1], npcPreset[2]);
     event.setDirection(npcPreset[5]);
     interp._eventId = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId];
-    var charaSlotId = 2; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    charaSlotId = 2; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     event_respawnSetA(charaSlotId, npcPreset[3], npcPreset[4] + 3, 1, 8);
     goodsEvent_respawn(11, "Goods8", 0, 6, 1, 8, 5);
   };
@@ -16387,13 +16571,14 @@
   // Replaces (1x): CommonEvents.json:common-event:355|戦闘時台詞集
   AGH_pushToArrayAddText = function () {
     const messageText = `\\wn[351]が\\sim[331]を発動した！`;
-    BattleManager._logWindow.push(`addText`, messageText);
+    BattleManager._logWindow.push("addText", messageText);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:356|ハイゴブリン勝利
   AGH_readVariableEventProgressHeroHighGoblinVictory = function (interp) {
-    var characterId = 5; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
-    var characterId = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[characterId];
+    let characterId;
+    characterId = 5; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    characterId = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[characterId];
     character = interp.character(characterId);
     character.locate(12, 11);
     character.setDirection(8);
@@ -16401,24 +16586,26 @@
 
   // Replaces (1x): CommonEvents.json:common-event:356|ハイゴブリン勝利
   AGH_readVariableEventProgressHero_19 = function (interp) {
-    var xValue = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    let xValue;
+    xValue = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     interp._eventId = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[xValue];
     const event = $gameMap.event(interp._eventId);
-    var xValue = event.screenX();
+    xValue = event.screenX();
     const yValue = event.screenY();
     filter_direct(9, xValue, yValue, 60);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:356|ハイゴブリン勝利
   AGH_readVariableEventProgressHero_20 = function () {
-    var variable292Value2 = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    let variable292Value2, event;
+    variable292Value2 = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     const spawnedEventIds = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS);
-    var variable292Value2 = spawnedEventIds[variable292Value2];
-    var event = $gameMap.event(variable292Value2);
+    variable292Value2 = spawnedEventIds[variable292Value2];
+    event = $gameMap.event(variable292Value2);
     event.setOpacity(0);
-    var variable292Value2 = 5; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
-    var variable292Value2 = spawnedEventIds[variable292Value2];
-    var event = $gameMap.event(variable292Value2);
+    variable292Value2 = 5; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    variable292Value2 = spawnedEventIds[variable292Value2];
+    event = $gameMap.event(variable292Value2);
     event.setOpacity(0);
   };
 
@@ -16440,27 +16627,29 @@
 
   // Replaces (1x): CommonEvents.json:common-event:359|ガーディアン勝利
   AGH_readVariableEventProgressHeroGuardianVictory = function (interp) {
-    var xValue = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    let xValue;
+    xValue = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     interp._eventId = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[xValue];
     const event = $gameMap.event(interp._eventId);
-    var xValue = event._realX;
+    xValue = event._realX;
     const yValue = event._realY;
     filter_direct(9, xValue, yValue, 60);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:360|ガーディアン2勝利
   AGH_readVariableEventProgressHeroGuardian2Victory = function () {
-    var eventSubjectIndex = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    let eventSubjectIndex, event;
+    eventSubjectIndex = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     const spawnedEventIds = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS);
-    var event = $gameMap.event(spawnedEventIds[eventSubjectIndex]);
+    event = $gameMap.event(spawnedEventIds[eventSubjectIndex]);
     event.locate(7, 24);
     event.setDirection(8);
-    var eventSubjectIndex = 2; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
-    var event = $gameMap.event(spawnedEventIds[eventSubjectIndex]);
+    eventSubjectIndex = 2; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    event = $gameMap.event(spawnedEventIds[eventSubjectIndex]);
     event.locate(6, 23);
     event.setDirection(6);
-    var eventSubjectIndex = 3; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
-    var event = $gameMap.event(spawnedEventIds[eventSubjectIndex]);
+    eventSubjectIndex = 3; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    event = $gameMap.event(spawnedEventIds[eventSubjectIndex]);
     event.locate(8, 23);
     event.setDirection(4);
   };
@@ -16475,20 +16664,22 @@
 
   // Replaces (1x): CommonEvents.json:common-event:361|騎士団長勝利
   AGH_readVariableEventProgressHeroKnightLeaderVictory = function () {
-    var charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    let charaSlotId;
+    charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     event_respawnSetA(charaSlotId, 13, 15, 1, 8);
-    var charaSlotId = 11;
+    charaSlotId = 11;
     event_respawnSetN(charaSlotId, 13, 13, 0, "People3", 6, 2);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:361|騎士団長勝利
   AGH_readVariableEventProgressHero_21 = function (interp) {
-    var eventSubjectIndex = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    let eventSubjectIndex, event;
+    eventSubjectIndex = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     const spawnedEventIds = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS);
-    var event = $gameMap.event(spawnedEventIds[eventSubjectIndex]);
+    event = $gameMap.event(spawnedEventIds[eventSubjectIndex]);
     event._spriteOffsetY = -24;
-    var eventSubjectIndex = 11;
-    var event = $gameMap.event(spawnedEventIds[eventSubjectIndex]);
+    eventSubjectIndex = 11;
+    event = $gameMap.event(spawnedEventIds[eventSubjectIndex]);
     event._spriteOffsetY = +24;
     interp._eventId = spawnedEventIds[eventSubjectIndex];
   };
@@ -16607,22 +16798,23 @@
 
   // Replaces (1x): CommonEvents.json:common-event:381|情報屋処理
   AGH_setSelfVariableRandomWork3 = function (interp) {
-    var animationId = 507;
+    let animationId;
+    animationId = 507;
     if ($gameSwitches.value(1107)) {
-      var animationId = 508;
+      animationId = 508;
     }
     if ($gameSwitches.value(1108)) {
-      var animationId = 509;
+      animationId = 509;
     }
     if ($gameSwitches.value(1109)) {
-      var animationId = 1000;
+      animationId = 1000;
     }
     if ($gameSwitches.value(1110)) {
-      var animationId = 1000;
+      animationId = 1000;
     }
     valueCountSet1 = animationId;
     if (valueCountSet1 == 1000) {
-      interp.sVal(23, `汎用シーン発生`);
+      interp.sVal(23, "汎用シーン発生");
       $gameSwitches.setValue(HELPER_SWITCH.CHOICE_2_ENABLED, true);
     } else {
       interp.sVal(23, `${$dataItems[valueCountSet1].description}`);
@@ -16641,11 +16833,12 @@
 
   // Replaces (1x): CommonEvents.json:common-event:382|酔っ払いを介抱する
   AGH_showPictureScreenBlackOutCareForDrunkard = function () {
+    let pictureName;
     valuePic1 = 51;
-    var pictureName = "ScreenBlackOut";
+    pictureName = "ScreenBlackOut";
     $gameScreen.showPicture(valuePic1, pictureName, 1, 640, 384, 100, 100, 150, 0);
     picture_fade1(valuePic1, "fadeIn", valueWipeImg, 60, 5);
-    var pictureName = valueScenePic + "01";
+    pictureName = valueScenePic + "01";
     $gameScreen.showPicture(valuePic1 + 1, pictureName, 1, 640 - 128, 384 - 10, 100, 100, 255, 0);
     $gameScreen.movePicture(valuePic1 + 1, 1, 640 - 128, 384, 100, 100, 255, 0, 40);
     hcg_piston(valuePic1 + 1, 6, 1, 1);
@@ -16663,11 +16856,12 @@
 
   // Replaces (1x): CommonEvents.json:common-event:382|酔っ払いを介抱する
   AGH_showPictureCareForDrunkard = function () {
-    var pictureName = valueScenePic + "04";
+    let pictureName;
+    pictureName = valueScenePic + "04";
     $gameScreen.showPicture(valuePic1 + 4, pictureName, 1, 640 - 128, 384 + 100, 100, 100, 255, 0);
     $gameScreen.movePicture(valuePic1 + 4, 1, 640 - 128, 384, 100, 100, 255, 0, 40);
     hcg_piston(valuePic1 + 4, 7, 2, 2);
-    var pictureName = valueScenePic + "02";
+    pictureName = valueScenePic + "02";
     pic_1(0, valuePic1 + 2, pictureName, 2, 100, 255, 40, 1280, 768, -256, 0);
     hcg_piston(valuePic1 + 2, 6, 1, 1);
     sex_direction(6, 0);
@@ -16765,7 +16959,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:392|トウロウコモン1
   AGH_erasePicturesToroCommon1 = function () {
-    for (var i = 0; i <= 3; i++) {
+    for (let i = 0; i <= 3; i++) {
       pic_eraseP(0, [valuePic1 + i]);
     }
   };
@@ -16778,12 +16972,13 @@
 
   // Replaces (1x): CommonEvents.json:common-event:410|立ち上がる秩序
   AGH_showPictureScreenBlackOutRisingOrder = function () {
+    let pictureName;
     valuePic1 = 51;
-    var pictureName = "ScreenBlackOut";
+    pictureName = "ScreenBlackOut";
     $gameScreen.showPicture(valuePic1, pictureName, 1, 640, 384, 100, 100, 200, 0);
     picture_fade1(valuePic1, "fadeIn", valueWipeImg, 60, 5);
     const pictureId = valuePic1 + 1;
-    var pictureName = valueScenePic + "01";
+    pictureName = valueScenePic + "01";
     $gameScreen.showPicture(pictureId, pictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
     $gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
     tachie_bless(pictureId, 2);
@@ -16809,12 +17004,13 @@
 
   // Replaces (1x): CommonEvents.json:common-event:411|無頓着な秩序
   AGH_waitPortraitTalkHurry = function (interp) {
+    let floorValue;
     picTachie_move1(16, -500, 0, 0, 0, 0, 60);
     valuePic1 = 13;
     picTachie_move1(valuePic1, -500, 0, 0, 0, 0, 60);
     if ($gameSwitches.value(127)) {
       AudioManager.playSe({ name: "Z_FootCastle", volume: 25, pitch: 140, pan: 0 });
-      var floorValue = Math.floor(floorValue / 2); //ウェイト
+      floorValue = Math.floor(floorValue / 2); //ウェイト
     } else {
       AudioManager.playSe({ name: "Z_FootCastle", volume: 25, pitch: 100, pan: 0 });
     }
@@ -16823,13 +17019,14 @@
 
   // Replaces (1x): CommonEvents.json:common-event:412|
   AGH_showPictureScreenBlackOutCommonEvent412 = function () {
+    let pictureName;
     backGraund_menuMapSelect(2, 0, 0, 0);
     valuePic1 = 51;
-    var pictureName = "ScreenBlackOut";
+    pictureName = "ScreenBlackOut";
     $gameScreen.showPicture(valuePic1, pictureName, 1, 640, 384, 100, 100, 200, 0);
     picture_fade1(valuePic1, "fadeIn", valueWipeImg, 60, 5);
     const pictureId = valuePic1 + 1;
-    var pictureName = valueScenePic + "02";
+    pictureName = valueScenePic + "02";
     $gameScreen.showPicture(pictureId, pictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
     $gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
     tachie_bless(pictureId, 2);
@@ -16866,27 +17063,29 @@
 
   // Replaces (1x): CommonEvents.json:common-event:432|休暇のすゝめ
   AGH_readVariableEventProgressHeroRecommendVacation = function () {
-    var charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    let charaSlotId;
+    charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     const npcPreset = $gameVariables.value(HELPER_VARIABLE.EVENT_WORK_VALUES)[
       $gameVariables.value(HELPER_VARIABLE.EPISODE_ITEM_ID)
     ];
-    var charaSlotId = 11;
+    charaSlotId = 11;
     event_respawnSetN(charaSlotId, npcPreset[8], npcPreset[9], 0, npcPreset[6], npcPreset[7], 4);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:441|△人助け
   AGH_readVariableEventProgressHeroHelpingHands = function () {
-    var charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    let charaSlotId, event;
+    charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     const npcPreset = $gameVariables.value(HELPER_VARIABLE.EVENT_WORK_VALUES)[
       $gameVariables.value(HELPER_VARIABLE.EPISODE_ITEM_ID)
     ];
     event_respawnSetA(charaSlotId, npcPreset[3] - 5, npcPreset[4], 1);
-    var event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId]);
+    event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId]);
     event.setImage(npcPreset[1], npcPreset[2]);
     event.setDirection(npcPreset[5]);
-    var charaSlotId = 11;
+    charaSlotId = 11;
     event_respawnSetN(charaSlotId, npcPreset[8], npcPreset[9], 0, npcPreset[6], npcPreset[7]);
-    var event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId]);
+    event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId]);
     event.setDirection(npcPreset[10]);
   };
 
@@ -16897,18 +17096,19 @@
 
   // Replaces (1x): CommonEvents.json:common-event:442|△人助け2
   AGH_readVariableEventProgressHeroHelpingHands2 = function (interp) {
-    var charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    let charaSlotId, event;
+    charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     const npcPreset = $gameVariables.value(HELPER_VARIABLE.EVENT_WORK_VALUES)[
       $gameVariables.value(HELPER_VARIABLE.EPISODE_ITEM_ID)
     ];
     event_respawnSetA(charaSlotId, npcPreset[3] - 5, npcPreset[4], 1);
-    var event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId]);
+    event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId]);
     event.setImage(npcPreset[1], npcPreset[2]);
     event.setDirection(npcPreset[5]);
     interp._eventId = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId];
-    var charaSlotId = 11;
+    charaSlotId = 11;
     event_respawnSetN(charaSlotId, npcPreset[8], npcPreset[9], 0, npcPreset[6], npcPreset[7]);
-    var event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId]);
+    event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId]);
     event.setDirection(npcPreset[10]);
   };
 
@@ -16965,12 +17165,13 @@
 
   // Replaces (1x): CommonEvents.json:common-event:452|△露出王(上巻)を読む
   AGH_showPictureScreenBlackOutReadExposureKing = function () {
+    let pictureName;
     backGraund_menuMapSelect(2, 0, 0, 0);
     valuePic1 = 55;
-    var pictureName = "ScreenBlackOut";
+    pictureName = "ScreenBlackOut";
     $gameScreen.showPicture(valuePic1 - 1, pictureName, 1, 640, 384, 100, 100, 200, 0);
     picture_fade1(valuePic1 - 1, "fadeIn", valueWipeImg, 60, 5);
-    var pictureName = "ZX_NowconditionF_2";
+    pictureName = "ZX_NowconditionF_2";
     $gameScreen.showPicture(valuePic1, pictureName, 1, 640 - 128, 384 - 20, 100, 100, 0, 0);
     $gameScreen.movePicture(valuePic1, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
   };
@@ -17037,7 +17238,7 @@
   AGH_setSelfVariableActorChoiceAwakenB = function (interp) {
     interp.sVal(20, 5);
     const actor = $gameActors.actor($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID));
-    for (var i = 401; i <= 406; i++) {
+    for (let i = 401; i <= 406; i++) {
       actor.forgetSkill(i);
     }
     actor.learnSkill(401);
@@ -17099,12 +17300,13 @@
 
   // Replaces (1x): CommonEvents.json:common-event:473|秩序ＶＳ狂戦士
   AGH_readVariableDynamicEventIdOrderVsBerserker = function (interp) {
+    let event;
     const dynamicEventIds = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS);
-    for (var i = 11; i <= 13; i++) {
-      var eventId = dynamicEventIds[i]; //this._eventId
+    for (let i = 11; i <= 13; i++) {
+      const eventId = dynamicEventIds[i]; //this._eventId
       const mapEvent = $gameMap.event(eventId);
       if (!!mapEvent) {
-        var event = mapEvent;
+        event = mapEvent;
         event.setStepAnime(false);
         event.setWalkAnime(false);
         event.setDirection(2);
@@ -17150,7 +17352,8 @@
 
   // Replaces (1x): CommonEvents.json:common-event:502|悪戯っ子世に憚る
   AGH_readVariableEventProgressHeroMischiefChildPublic = function () {
-    var charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    let charaSlotId;
+    charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     const npcPreset = $gameVariables.value(HELPER_VARIABLE.EVENT_WORK_VALUES)[
       $gameVariables.value(HELPER_VARIABLE.EPISODE_ITEM_ID)
     ];
@@ -17158,31 +17361,33 @@
     const event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId]);
     event.setImage(npcPreset[1], npcPreset[2]);
     event.setDirection(npcPreset[5]);
-    var charaSlotId = 11;
+    charaSlotId = 11;
     event_respawnSetN(charaSlotId, 39, 15, 1, "4Child", 3, 4);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:502|悪戯っ子世に憚る
   AGH_showPictureScreenBlackOutMischiefChildPublic = function () {
+    let pictureName;
     valuePic1 = 55;
-    var pictureName = "ScreenBlackOut";
+    pictureName = "ScreenBlackOut";
     $gameScreen.showPicture(valuePic1 - 1, pictureName, 1, 640, 384, 100, 100, 150, 0);
     picture_fade1(valuePic1 - 1, "fadeIn", valueWipeImg, 60, 5);
-    var pictureName = valueScenePic + "01";
+    pictureName = valueScenePic + "01";
     pic_1(0, valuePic1 + 1, pictureName, 0, 100, 255, 60, 1280, 768, -256, 0);
     //tachie_bless(valuePic1+1,1);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:502|悪戯っ子世に憚る
   AGH_showPictureHpicture2 = function () {
-    var pictureName = valueScenePic + "02";
+    let pictureName, fadeGlowA;
+    pictureName = valueScenePic + "02";
     $gameScreen.showPicture(valuePic1, pictureName, 1, 640 - 128, 384, 100, 100, 255, 0);
     tachie_bless(valuePic1, 1);
-    var fadeGlowA = "Hpicture2";
+    fadeGlowA = "Hpicture2";
     picture_fade1(valuePic1, "fadeIn", fadeGlowA, 60, 5);
-    var fadeGlowA = "Hpicture3";
+    fadeGlowA = "Hpicture3";
     picture_fade1(valuePic1 + 1, "fadeOut", fadeGlowA, 120, 5);
-    var pictureName = valueScenePic + "03";
+    pictureName = valueScenePic + "03";
     $gameScreen.showPicture(valuePic1 + 2, pictureName, 1, 640 - 128, 384 + 500, 100, 100, 255, 0);
     $gameScreen.movePicture(valuePic1 + 2, 1, 640 - 128, 384, 100, 100, 0, 0, 120);
   };
@@ -17191,19 +17396,20 @@
   AGH_runScriptMischiefChildPublic = function (interp) {
     const array = [0];
     const randomYOffsets = [-50];
-    const lineCandidates = [`ハッハ──ッ♪`];
+    const lineCandidates = ["ハッハ──ッ♪"];
     chara_oneWord(101, interp._eventId, 25, 120, array, randomYOffsets, lineCandidates);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:503|爺の本懐
   AGH_showPictureScreenBlackOutOldManWish = function () {
+    let pictureName;
     valuePic1 = 51;
     valuePic2 = 71;
-    var pictureName = "ScreenBlackOut";
+    pictureName = "ScreenBlackOut";
     $gameScreen.showPicture(valuePic1, pictureName, 1, 640, 384, 100, 100, 150, 0);
     picture_fade1(valuePic1, "fadeIn", valueWipeImg, 60, 5);
     const pictureId = valuePic2 + 1;
-    var pictureName = valueScenePic + "01";
+    pictureName = valueScenePic + "01";
     $gameScreen.showPicture(pictureId, pictureName, 1, 640 + 480 + 50, 384, 100, 100, 0, 0);
     $gameScreen.movePicture(pictureId, 1, 640 + 480, 384, 100, 100, 255, 0, 60);
     tachie_bless(pictureId, 2);
@@ -17211,10 +17417,11 @@
 
   // Replaces (1x): CommonEvents.json:common-event:503|爺の本懐
   AGH_showPictureScreen1024FrameOldManWish = function () {
-    var pictureName = "Screen1024Frame";
+    let pictureName;
+    pictureName = "Screen1024Frame";
     $gameScreen.showPicture(valuePic2, pictureName, 1, 640 - 78, 384, 100, 100, 255, 0);
     picture_fade1(valuePic2, "fadeIn", valueWipeImg, 60, 5);
-    var pictureName = valueScenePic + "02";
+    pictureName = valueScenePic + "02";
     $gameScreen.showPicture(valuePic1 + 1, pictureName, 1, 640 - 128, 384 - 20, 100, 100, 0, 0);
     $gameScreen.movePicture(valuePic1 + 1, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
     tachie_bless(valuePic1 + 1, 2);
@@ -17243,14 +17450,15 @@
 
   // Replaces (2x): CommonEvents.json:common-event:508|情報の代価Ⅱ, CommonEvents.json:common-event:509|情報の代価Ⅲ
   AGH_showPictureXevS00702 = function () {
+    let pictureId, pictureName;
     backGraund_menuMapSelect(2, 0, 0, 0);
-    var pictureId = valuePic1 + 1;
-    var pictureName = "XevS007_02";
+    pictureId = valuePic1 + 1;
+    pictureName = "XevS007_02";
     $gameScreen.showPicture(pictureId, pictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
     $gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
     //pic_move1(value1-1,0,0,100,100,0,90);
-    var pictureId = valuePic1 + 2;
-    var pictureName = valueScenePic + "02";
+    pictureId = valuePic1 + 2;
+    pictureName = valueScenePic + "02";
     $gameScreen.showPicture(pictureId, pictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
     $gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
     tachie_bless(pictureId, 2);
@@ -17333,17 +17541,18 @@
 
   // Replaces (1x): CommonEvents.json:common-event:530|試練の裏側
   AGH_readVariableEventProgressHeroBehindTheTrial = function (interp) {
-    var charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    let charaSlotId, event;
+    charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     const npcPreset = $gameVariables.value(HELPER_VARIABLE.EVENT_WORK_VALUES)[
       $gameVariables.value(HELPER_VARIABLE.EPISODE_ITEM_ID)
     ];
     event_respawnSetA(charaSlotId, npcPreset[3], npcPreset[4], 1, npcPreset[5]);
-    var event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId]);
+    event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId]);
     event._spriteOffsetX = -24;
     interp._eventId = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId];
-    var charaSlotId = 11;
+    charaSlotId = 11;
     event_respawnSetN(charaSlotId, npcPreset[3] + 1, npcPreset[4], 2, "4Child", 1, 8);
-    var event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId]);
+    event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId]);
     event._spriteOffsetX = -24;
   };
 
@@ -17390,7 +17599,8 @@
 
   // Replaces (1x): CommonEvents.json:common-event:531|『わからせられ』
   AGH_readVariableEventProgressHeroWarakaserare = function (interp) {
-    var charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    let charaSlotId;
+    charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     //npcPreset/event are dead verbatim leftovers: only _eventId is transferred below
     //const npcPreset = $gameVariables.value(HELPER_VARIABLE.EVENT_WORK_VALUES)[
     //  $gameVariables.value(HELPER_VARIABLE.EPISODE_ITEM_ID)
@@ -17398,7 +17608,7 @@
     event_respawnSetA(charaSlotId, 17, 8, 1, 8);
     //var event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId]);
 
-    var charaSlotId = 11;
+    charaSlotId = 11;
     event_respawnSetN(charaSlotId, 17, 6, 0, "4Child", 1, 2);
     //var event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId]);
     interp._eventId = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId];
@@ -17417,15 +17627,16 @@
 
   // Replaces (1x): CommonEvents.json:common-event:531|『わからせられ』
   AGH_readVariableEventProgressHero_24 = function () {
-    var eventSubjectIndex = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    let eventSubjectIndex, event;
+    eventSubjectIndex = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     const spawnedEventIds = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS);
-    var event = $gameMap.event(spawnedEventIds[eventSubjectIndex]);
+    event = $gameMap.event(spawnedEventIds[eventSubjectIndex]);
     event.locate(19, 4);
     event.setDirection(2);
     event._spriteOffsetX = +24;
     event.setFace(11, true, true);
-    var eventSubjectIndex = 11; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
-    var event = $gameMap.event(spawnedEventIds[eventSubjectIndex]);
+    eventSubjectIndex = 11; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    event = $gameMap.event(spawnedEventIds[eventSubjectIndex]);
     event.locate(19, 5);
     event.setDirection(8);
     event._spriteOffsetX = +24;
@@ -17434,12 +17645,13 @@
 
   // Replaces (1x): CommonEvents.json:common-event:531|『わからせられ』
   AGH_readVariableEventProgressHero_25 = function () {
-    var eventSubjectIndex = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    let eventSubjectIndex, event;
+    eventSubjectIndex = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     const spawnedEventIds = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS);
-    var event = $gameMap.event(spawnedEventIds[eventSubjectIndex]);
+    event = $gameMap.event(spawnedEventIds[eventSubjectIndex]);
     event.setImage("1_1", 1);
-    var eventSubjectIndex = 11; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
-    var event = $gameMap.event(spawnedEventIds[eventSubjectIndex]);
+    eventSubjectIndex = 11; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    event = $gameMap.event(spawnedEventIds[eventSubjectIndex]);
     event.setImage("4Child", 5);
   };
 
@@ -17552,13 +17764,14 @@
 
   // Replaces (1x): CommonEvents.json:common-event:537|メイドウェイトレスご奉仕
   AGH_setSelfSwitchEventProgressHero = function () {
+    let eventSubjectIndex, event;
     $gameSelfSwitches.setValue([$gameMap.mapId(), 8, "C"], true);
-    var eventSubjectIndex = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
-    var event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[eventSubjectIndex]);
+    eventSubjectIndex = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[eventSubjectIndex]);
     event.locate(20, 10);
     event.setDirection(8);
-    var eventSubjectIndex = 11; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
-    var event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[eventSubjectIndex]);
+    eventSubjectIndex = 11; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[eventSubjectIndex]);
     event.locate(20, 9);
     event.setDirection(2);
   };
@@ -17580,12 +17793,13 @@
 
   // Replaces (1x): CommonEvents.json:common-event:540|
   AGH_showPictureCommonEvent540 = function () {
-    var pictureId = valuePic1 + 4;
-    var pictureName = valueScenePic + "04";
+    let pictureId, pictureName;
+    pictureId = valuePic1 + 4;
+    pictureName = valueScenePic + "04";
     $gameScreen.showPicture(pictureId, pictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
     $gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
-    var pictureId = valuePic1 + 5;
-    var pictureName = valueScenePic + "05";
+    pictureId = valuePic1 + 5;
+    pictureName = valueScenePic + "05";
     $gameScreen.showPicture(pictureId, pictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
     $gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
   };
@@ -17646,13 +17860,14 @@
 
   // Replaces (1x): CommonEvents.json:common-event:542|街の物陰で…
   AGH_showPictureScreenBlackOutInCityShadows = function () {
+    let pictureName;
     backGraund_menuMapSelect(2, 0, 0, 0);
     valuePic1 = 51;
     valuePic2 = 71;
-    var pictureName = "ScreenBlackOut";
+    pictureName = "ScreenBlackOut";
     $gameScreen.showPicture(valuePic1, pictureName, 1, 640, 384, 100, 100, 200, 0);
     picture_fade1(valuePic1, "fadeIn", valueWipeImg, 60, 5);
-    var pictureName = valueScenePic + "01";
+    pictureName = valueScenePic + "01";
     $gameScreen.showPicture(valuePic2 + 1, pictureName, 1, 640 + 480, 384 - 118, 100, 100, 200, 0);
     $gameScreen.movePicture(valuePic2 + 1, 1, 640 + 480, 384 + 50, 100, 100, 255, 0, 240);
     tachie_bless(valuePic2 + 1, 2);
@@ -17667,7 +17882,8 @@
 
   // Replaces (1x): CommonEvents.json:common-event:542|街の物陰で…
   AGH_showPictureScreen1024FrameInCityShadows = function () {
-    var pictureName = valueScenePic + "04_00";
+    let pictureName;
+    pictureName = valueScenePic + "04_00";
     $gameScreen.setPicturesAnimation(2, 10, "連番", 40);
     $gameScreen.showPicture(valuePic1 + 1, pictureName, 1, 640 - 128, 384 - 20, 100, 100, 0, 0);
     $gameScreen.movePicture(valuePic1 + 1, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
@@ -17675,34 +17891,37 @@
     if (picture2) {
       picture2.startAnimationFrame(3, true, [1, 1, 1, 2]);
     }
-    var pictureName = "Screen1024Frame";
+    pictureName = "Screen1024Frame";
     $gameScreen.showPicture(69, pictureName, 1, 640 - 78, 384, 100, 100, 255, 0);
     picture_fade1(69, "fadeIn", valueWipeImg, 60, 5);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:542|街の物陰で…
   AGH_movePicture1InCityShadows = function () {
-    var pictureId = valuePic1 + 1;
+    let pictureId;
+    pictureId = valuePic1 + 1;
     pic_move1(pictureId, 0, 0, 100, 100, 0, 60);
-    var pictureId = 69;
+    pictureId = 69;
     pic_move1(pictureId, 0, 0, 100, 100, 0, 60);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:542|街の物陰で…
   AGH_readVariableEventProgressHero_26 = function (interp) {
-    var eventSubjectIndex = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
-    var eventSubjectIndex = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[eventSubjectIndex];
+    let eventSubjectIndex;
+    eventSubjectIndex = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    eventSubjectIndex = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[eventSubjectIndex];
     drowsepost.camera.zoom(1, 60, interp._eventId);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:543|愚鈍なる再会
   AGH_readVariableEventProgressHeroFoolishReunion = function (interp) {
-    var charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    let charaSlotId;
+    charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     const npcPreset = $gameVariables.value(HELPER_VARIABLE.EVENT_WORK_VALUES)[
       $gameVariables.value(HELPER_VARIABLE.EPISODE_ITEM_ID)
     ];
     event_respawnSetA(charaSlotId, npcPreset[3], npcPreset[4], 1, npcPreset[5]);
-    var charaSlotId = 11;
+    charaSlotId = 11;
     event_respawnSetN(charaSlotId, npcPreset[8], npcPreset[9], 0, npcPreset[6], npcPreset[7], npcPreset[10]);
     interp._eventId = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId];
   };
@@ -17747,14 +17966,15 @@
 
   // Replaces (1x): CommonEvents.json:common-event:543|愚鈍なる再会
   AGH_readVariableEventProgressHero_27 = function () {
-    var spawnSlot = 1; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    let spawnSlot, event;
+    spawnSlot = 1; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     const spawnedEventIds = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS);
-    var event = $gameMap.event(spawnedEventIds[spawnSlot]);
+    event = $gameMap.event(spawnedEventIds[spawnSlot]);
     event.locate(16, 7);
     event.setDirection(8);
     event._spriteOffsetX = +24;
-    var spawnSlot = 11; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
-    var event = $gameMap.event(spawnedEventIds[spawnSlot]);
+    spawnSlot = 11; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    event = $gameMap.event(spawnedEventIds[spawnSlot]);
     event.locate(16, 6);
     event.setDirection(2);
     event._spriteOffsetX = +24;
@@ -17768,13 +17988,14 @@
 
   // Replaces (1x): CommonEvents.json:common-event:543|愚鈍なる再会
   AGH_showPictureFoolishReunion_2 = function () {
-    var pictureId = valuePic1 + 3;
-    var pictureName = valueScenePic + "03";
+    let pictureId, pictureName;
+    pictureId = valuePic1 + 3;
+    pictureName = valueScenePic + "03";
     $gameScreen.showPicture(pictureId, pictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
     $gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
     hcg_piston(valuePic1 + 3, 7, 1, 2);
-    var pictureId = valuePic1 + 5;
-    var pictureName = valueScenePic + "04";
+    pictureId = valuePic1 + 5;
+    pictureName = valueScenePic + "04";
     $gameScreen.showPicture(pictureId, pictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
     $gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
     tachie_bless(pictureId, 2);
@@ -17782,11 +18003,12 @@
 
   // Replaces (1x): CommonEvents.json:common-event:543|愚鈍なる再会
   AGH_movePicture1FoolishReunion = function () {
-    var pictureId = valuePic1 + 3;
+    let pictureId;
+    pictureId = valuePic1 + 3;
     pic_move1(pictureId, 0, 0, 100, 100, 0, 90);
-    var pictureId = valuePic1 + 4;
+    pictureId = valuePic1 + 4;
     pic_move1(pictureId, 0, 0, 100, 100, 0, 90);
-    var pictureId = valuePic1 + 5;
+    pictureId = valuePic1 + 5;
     pic_move1(pictureId, 0, 0, 100, 100, 0, 90);
   };
 
@@ -17801,13 +18023,14 @@
 
   // Replaces (1x): CommonEvents.json:common-event:544|チャラ団員と…
   AGH_readVariableEventProgressHeroWithGangMember = function () {
-    var spawnSlot = 1; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    let spawnSlot, event;
+    spawnSlot = 1; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     const spawnedEventIds = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS);
-    var event = $gameMap.event(spawnedEventIds[spawnSlot]);
+    event = $gameMap.event(spawnedEventIds[spawnSlot]);
     event.locate(17, 4);
     event.setDirection(8);
-    var spawnSlot = 11; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
-    var event = $gameMap.event(spawnedEventIds[spawnSlot]);
+    spawnSlot = 11; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    event = $gameMap.event(spawnedEventIds[spawnSlot]);
     event.locate(17, 5);
     event.setDirection(8);
     event._spriteOffsetY = -24;
@@ -17848,46 +18071,54 @@
   };
 
   // Replaces (1x): CommonEvents.json:common-event:544|チャラ団員と…
-  AGH_movePicture1WithGangMember = function () {
-    var secondaryPictureId = valuePic2 + 3;
-    pic_move1(secondaryPictureId - 1, 0, 0, 100, 100, 0, 90);
-    var secondaryPictureId = valuePic2 + 2;
-    pic_move1(secondaryPictureId - 1, 0, 0, 100, 100, 0, 90);
+    // Moves one picture per offset that follows basePictureId (offsets keep their order,
+  // because the move order matters for the picture z-order).
+  function moveCompanionPictures(basePictureId, pictureOffsets) {
+    pictureOffsets.forEach((pictureOffset) => {
+      pic_move1(basePictureId + pictureOffset - 1, 0, 0, 100, 100, 0, 90);
+    });
+  }
+
+AGH_movePicture1WithGangMember = function () {
+    moveCompanionPictures(valuePic2, [3, 2]);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:544|チャラ団員と…
   AGH_showPictureScreen1024FrameWithGangMember = function () {
-    var pictureName = "Screen1024Frame";
+    let pictureName;
+    pictureName = "Screen1024Frame";
     $gameScreen.showPicture(valuePic2, pictureName, 1, 640 - 78, 384, 100, 100, 255, 0);
     picture_fade1(valuePic2, "fadeIn", valueWipeImg, 60, 5);
-    var pictureName = valueScenePic + "05";
+    pictureName = valueScenePic + "05";
     $gameScreen.showPicture(valuePic1 + 1, pictureName, 1, 640 - 128, 384 - 20, 100, 100, 0, 0);
     $gameScreen.movePicture(valuePic1 + 1, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:545|チンピラ団員達と…
   AGH_readVariableEventProgressHeroWithPunks = function (interp) {
-    var charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    let charaSlotId;
+    charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     const npcPreset = $gameVariables.value(HELPER_VARIABLE.EVENT_WORK_VALUES)[
       $gameVariables.value(HELPER_VARIABLE.EPISODE_ITEM_ID)
     ];
     event_respawnSetA(charaSlotId, 9, 12, 1, 8);
     interp._eventId = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId];
-    var charaSlotId = 11;
+    charaSlotId = 11;
     event_respawnSetN(charaSlotId, 9, 11, 0, npcPreset[6], npcPreset[7], 2);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:545|チンピラ団員達と…
   AGH_readVariableEventProgressHero_29 = function () {
-    var eventSubjectIndex = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    let eventSubjectIndex, event;
+    eventSubjectIndex = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     const spawnedEventIds = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS);
-    var event = $gameMap.event(spawnedEventIds[eventSubjectIndex]);
+    event = $gameMap.event(spawnedEventIds[eventSubjectIndex]);
     event._priorityType = 0;
     event._spriteOffsetY = +12;
     event.locate(19, 5);
     event.setDirection(2);
-    var eventSubjectIndex = 11;
-    var event = $gameMap.event(spawnedEventIds[eventSubjectIndex]);
+    eventSubjectIndex = 11;
+    event = $gameMap.event(spawnedEventIds[eventSubjectIndex]);
     event._priorityType = 2;
     event._spriteOffsetY = -12;
     event.locate(19, 6);
@@ -17896,13 +18127,14 @@
 
   // Replaces (1x): CommonEvents.json:common-event:545|チンピラ団員達と…
   AGH_readVariableDynamicEventIdWithPunks = function () {
-    var spawnSlot = 12;
+    let spawnSlot, event;
+    spawnSlot = 12;
     const spawnedEventIds = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS);
-    var event = $gameMap.event(spawnedEventIds[spawnSlot]);
+    event = $gameMap.event(spawnedEventIds[spawnSlot]);
     event.locate(20, 5);
     event.setDirection(4);
-    var spawnSlot = 13;
-    var event = $gameMap.event(spawnedEventIds[spawnSlot]);
+    spawnSlot = 13;
+    event = $gameMap.event(spawnedEventIds[spawnSlot]);
     event.locate(18, 5);
     event.setDirection(6);
   };
@@ -17927,10 +18159,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:545|チンピラ団員達と…
   AGH_movePicture1WithPunks = function () {
-    var pictureId = valuePic1 + 2;
-    pic_move1(pictureId - 1, 0, 0, 100, 100, 0, 90);
-    var pictureId = valuePic1 + 3;
-    pic_move1(pictureId - 1, 0, 0, 100, 100, 0, 90);
+    moveCompanionPictures(valuePic1, [2, 3]);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:546|獣欲の暴走、一生の懊悩と後悔
@@ -17942,14 +18171,15 @@
 
   // Replaces (1x): CommonEvents.json:common-event:546|獣欲の暴走、一生の懊悩と後悔
   AGH_setSelfSwitchDynamicEventIdBeastDesireRampage = function () {
-    var charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    let charaSlotId, event;
+    charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     event_respawnSetA(charaSlotId, 19, 5, 0, 2);
-    var event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId]);
+    event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId]);
     event._priorityType = 0;
     event._spriteOffsetY = +12;
-    var charaSlotId = 11;
+    charaSlotId = 11;
     event_respawnSetN(charaSlotId, 19, 6, 0, "npcOrder2", 4, 8);
-    var event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId]);
+    event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId]);
     event._priorityType = 2;
     event._spriteOffsetY = -12;
     $gameSelfSwitches.setValue([$gameMap.mapId(), 2, "C"], true);
@@ -17966,22 +18196,24 @@
 
   // Replaces (1x): CommonEvents.json:common-event:546|獣欲の暴走、一生の懊悩と後悔
   AGH_readVariableEventProgressHeroBeastDesireRampage = function () {
+    let eventId;
     const array = [0];
     const randomYOffsets = [-50];
     const lineCandidates = [`アンっ\\I[12]`];
-    var eventId = 1; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
-    var eventId = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[eventId];
+    eventId = 1; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    eventId = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[eventId];
     chara_oneWord(100, eventId, 25, 180, array, randomYOffsets, lineCandidates, 0);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:546|獣欲の暴走、一生の懊悩と後悔
   AGH_readVariableDynamicEventIdBeastDesireRampage = function (interp) {
+    let event;
     const dynamicEventIds = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS);
-    for (var i = 11; i <= 14; i++) {
-      var eventId = dynamicEventIds[i]; //this._eventId
+    for (let i = 11; i <= 14; i++) {
+      const eventId = dynamicEventIds[i]; //this._eventId
       const mapEvent = $gameMap.event(eventId);
       if (!!mapEvent) {
-        var event = mapEvent;
+        event = mapEvent;
         event.setOpacity(0);
       }
     }
@@ -18006,14 +18238,15 @@
 
   // Replaces (1x): CommonEvents.json:common-event:547|リゾート休暇で限界突破！
   AGH_readVariableEventProgressHeroResortBreakthrough = function (interp) {
-    var charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    let charaSlotId, event;
+    charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     event_respawnSetA(charaSlotId, 34, 6, 1, 2);
     interp._eventId = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId];
-    var event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId]);
+    event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId]);
     interp._spriteOffsetY = +12;
-    var charaSlotId = 11;
+    charaSlotId = 11;
     event_respawnSetN(charaSlotId, 34, 7, 0, "npcUnique2", 0, 8);
-    var event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId]);
+    event = $gameMap.event($gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId]);
     interp._spriteOffsetY = -12;
   };
 
@@ -18038,37 +18271,40 @@
 
   // Replaces (1x): CommonEvents.json:common-event:552|モニカ娼婦デビュー
   AGH_setSelfSwitchMonicaProstituteDebut = function () {
+    let event;
     const mapId2 = $gameMap.mapId();
     $gameSelfSwitches.setValue([mapId2, 20, "C"], true);
     $gameSelfSwitches.setValue([mapId2, 21, "C"], true);
-    var event = $gameMap.event(20);
+    event = $gameMap.event(20);
     event.locate(22, 11);
-    var event = $gameMap.event(21);
+    event = $gameMap.event(21);
     event.locate(22, 12);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:552|モニカ娼婦デビュー
   AGH_readVariableEventProgressHero_31 = function () {
-    var eventSubjectIndex = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    let eventSubjectIndex, event;
+    eventSubjectIndex = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     const spawnedEventIds = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS);
-    var event = $gameMap.event(spawnedEventIds[eventSubjectIndex]);
+    event = $gameMap.event(spawnedEventIds[eventSubjectIndex]);
     event.locate(3, 7);
     event.setDirection(6);
-    var eventSubjectIndex = 11; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
-    var event = $gameMap.event(spawnedEventIds[eventSubjectIndex]);
+    eventSubjectIndex = 11; //$gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
+    event = $gameMap.event(spawnedEventIds[eventSubjectIndex]);
     event.locate(4, 7);
     event.setDirection(4);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:552|モニカ娼婦デビュー
   AGH_showPictureScreenBlackOutMonicaProstituteDebut = function () {
+    let pictureName;
     valuePic1 = 55;
-    var pictureName = "ScreenBlackOut";
+    pictureName = "ScreenBlackOut";
     $gameScreen.showPicture(valuePic1 - 1, pictureName, 1, 640, 384, 100, 100, 200, 0);
     picture_fade1(valuePic1 - 1, "fadeIn", valueWipeImg, 60, 5);
     $gameScreen.setPicturesAnimation(2, 10, "連番", 20);
     valueScenePic = "XevS011_";
-    var pictureName = valueScenePic + "01";
+    pictureName = valueScenePic + "01";
     $gameScreen.showPicture(valuePic1, pictureName, 1, 640 - 128, 384 + 50, 100, 100, 0, 0);
     $gameScreen.movePicture(valuePic1, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
     hcg_piston(valuePic1, 5, 3, 2);
@@ -18166,20 +18402,18 @@
 
   // Replaces (1x): CommonEvents.json:common-event:572|マッサージⅡ
   AGH_movePicture1Massage2 = function () {
-    var pictureId = valuePic1 + 7;
+    let pictureId;
+    pictureId = valuePic1 + 7;
     pic_move1(pictureId, 0, 0, 100, 100, 0, 90);
-    var pictureId = valuePic1 + 6;
+    pictureId = valuePic1 + 6;
     pic_move1(pictureId, 0, 0, 100, 100, 0, 90);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:572|マッサージⅡ
   AGH_showPictureMassage2_6 = function () {
     const pictureId = valuePic1 + 2;
-    const scenePictureName = valueScenePic + "07";
-    $gameScreen.showPicture(pictureId, scenePictureName, 1, 640 - 128, 384, 100, 100, 0, 0);
-    $gameScreen.movePicture(pictureId, 1, 640 - 128, 384, 100, 100, 255, 0, 60);
-    tachie_bless(pictureId, 1);
-    pic_move1(pictureId + 2, 0, 0, 100, 100, 0, 90);
+    const pictureName = valueScenePic + "07";
+    showFadedScenePicture(pictureId, pictureName, 1, pictureId + 2);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:572|マッサージⅡ
@@ -18312,25 +18546,27 @@
 
   // Replaces (1x): Map003.json:event:4|ドロップ宝箱|page:3
   AGH_gainItemDropChest = function () {
+    let rarity;
     const array = [6, 7, 6, 6, 6, 7, 6, 7, 6, 6, 8, 6, 6];
-    var rarity = array[getRandomIndex(array.length)];
+    rarity = array[getRandomIndex(array.length)];
     gacha_naiyou(3, rarity);
     const databaseEntry = valueItems[valueGachaId];
     $gameParty.gainItem(databaseEntry, 1);
     const coloredText = colorTaggedText(24, `\x1bI[${databaseEntry.iconIndex}]${databaseEntry.name}`);
-    var rarity = `${coloredText}を入手した！`;
+    rarity = `${coloredText}を入手した！`;
     $gameScreen.setDTextPicture(rarity, 28);
   };
 
   // Replaces (1x): Map003.json:event:4|ドロップ宝箱|page:4
   AGH_gainItemDropChest_2 = function () {
+    let rarity;
     const array = [8, 9, 8, 9, 8, 8, 10, 9, 8, 8];
-    var rarity = array[getRandomIndex(array.length)];
+    rarity = array[getRandomIndex(array.length)];
     gacha_naiyou(3, rarity);
     const databaseEntry = valueItems[valueGachaId];
     $gameParty.gainItem(databaseEntry, 1);
     const coloredText = colorTaggedText(24, `\x1bI[${databaseEntry.iconIndex}]${databaseEntry.name}`);
-    var rarity = `${coloredText}を入手した！`;
+    rarity = `${coloredText}を入手した！`;
     $gameScreen.setDTextPicture(rarity, 28);
   };
 
@@ -18355,7 +18591,8 @@
 
   // Replaces (1x): Map003.json:event:20|罠コモン|page:1
   AGH_particleSetOrbC = function (interp) {
-    var particleName = "orb_c";
+    let particleName;
+    particleName = "orb_c";
     $gameScreen._particle.particleSet(
       interp._eventId,
       particleName + "-" + interp._eventId,
@@ -18363,7 +18600,7 @@
       particleName,
       "above"
     );
-    var particleName = "orb_c" + "-" + interp._eventId;
+    particleName = "orb_c" + "-" + interp._eventId;
     $gameScreen._particle.particleUpdate([particleName, "color", "#ff00f7", "#ffffff"]);
     //$gameScreen._particle.particleUpdate([value1,'pos',0,-35]);
   };
@@ -18382,8 +18619,8 @@
   AGH_setSelfSwitchTrueHeroId = function (interp) {
     const id = 794; //匠掘りスキル
     if ($gameActors.actor($gameVariables.value(HELPER_VARIABLE.PROTAGONIST_ACTOR_ID)).isLearnedSkill(id)) {
-      var array = [1, 2];
-      var randomIndex = array[getRandomIndex(array.length)];
+      const array = [1, 2];
+      const randomIndex = array[getRandomIndex(array.length)];
       if (randomIndex == 2) {
         $gameSelfSwitches.setValue([$gameMap.mapId(), interp._eventId, "B"], true);
       }
@@ -18402,7 +18639,7 @@
 
   // Replaces (1x): Map003.json:event:42|固有素材2|page:1
   AGH_pluginCommandShowInfo = function (interp) {
-    const messageText = `採掘が出来そうな岩石だった…。`;
+    const messageText = "採掘が出来そうな岩石だった…。";
     const args = new Array(String(messageText));
     interp.pluginCommand("ShowInfo", args);
   };
@@ -18436,10 +18673,11 @@
 
   // Replaces (1x): Map003.json:event:69|EV069|page:1
   AGH_readMapEventMetaNpcSpawnEventId = function (interp) {
+    let args;
     const templateEventId = 77;
-    var args = new Array(String(templateEventId), "1", "0", "3", "1", "1");
+    args = new Array(String(templateEventId), "1", "0", "3", "1", "1");
     interp.pluginCommand("ERS_MAKE_TEMPLATE_RANDOM", args);
-    var args = new Array("286");
+    args = new Array("286");
     interp.pluginCommand("ERS_GET_LAST_SPAWN_EVENT_ID", args);
     const eventId = $gameVariables.value(286);
     const mapEvent = $gameMap.event(eventId);
@@ -18458,10 +18696,11 @@
   AGH_readMapEventMetaNpcSpawnEventIdEv069 = function (interp) {
     const list = [81, 82, 83];
     list.forEach(function (id) {
+    let args;
       const templateEventId = id;
-      var args = new Array(String(templateEventId), "1", "0", "3", "1", "1");
+      args = new Array(String(templateEventId), "1", "0", "3", "1", "1");
       this.pluginCommand("ERS_MAKE_TEMPLATE_RANDOM", args);
-      var args = new Array("286");
+      args = new Array("286");
       this.pluginCommand("ERS_GET_LAST_SPAWN_EVENT_ID", args);
       const eventId = $gameVariables.value(286);
       const mapEvent = $gameMap.event(eventId);
@@ -18481,10 +18720,11 @@
   AGH_readMapEventMetaNpcSpawnEventIdERSMAKETEMPLATERANDOM = function (interp) {
     const list = [73, 74, 75, 78];
     list.forEach(function (id) {
+    let args;
       const templateEventId = id;
-      var args = new Array(String(templateEventId), "1", "0", "3", "1", "1");
+      args = new Array(String(templateEventId), "1", "0", "3", "1", "1");
       this.pluginCommand("ERS_MAKE_TEMPLATE_RANDOM", args);
-      var args = new Array("286");
+      args = new Array("286");
       this.pluginCommand("ERS_GET_LAST_SPAWN_EVENT_ID", args);
       const eventId = $gameVariables.value(286);
       const mapEvent = $gameMap.event(eventId);
@@ -18502,11 +18742,11 @@
 
   // Replaces (1x): Map003.json:event:82|EV082|page:1
   AGH_setSelfVariableRandomWork1Ev082 = function (interp) {
-    $gameVariables.setValue(HELPER_VARIABLE.RANDOM_WORK_2, `＜獲得アイテム一覧＞\n`);
+    $gameVariables.setValue(HELPER_VARIABLE.RANDOM_WORK_2, "＜獲得アイテム一覧＞\n");
     $gameVariables.setValue(HELPER_VARIABLE.RANDOM_WORK_3, 0);
     $gameSwitches.setValue(HELPER_SWITCH.TEMPORARY_FLAG, true);
     interp.sVal(21, 0);
-    for (var i = 1; i <= 10; i++) {
+    for (let i = 1; i <= 10; i++) {
       item_gacha();
     }
   };
@@ -18538,13 +18778,13 @@
     const mapId2 = $gameMap.mapId();
     const mapEvent = $gameMap.event(interp._eventId);
     const mapPosition = [mapId2, mapEvent.x, mapEvent.y];
-    for (var i = 1; i <= 9; i++) {
+    for (let i = 1; i <= 9; i++) {
       if ($dataItems[$gameVariables.value(HELPER_VARIABLE.DUNGEON_INFO_ITEM_ID)].meta["warpPoint" + i]) {
-        var itemMeta =
+        const itemMeta =
           $dataItems[$gameVariables.value(HELPER_VARIABLE.DUNGEON_INFO_ITEM_ID)].meta["warpPoint" + i].split(
             ","
           );
-        var array = [Number(itemMeta[0]), Number(itemMeta[1]), Number(itemMeta[2])];
+        const array = [Number(itemMeta[0]), Number(itemMeta[1]), Number(itemMeta[2])];
         if (array[0] == mapPosition[0] && array[1] == mapPosition[1] && array[2] == mapPosition[2]) {
           $gameVariables.value(HELPER_VARIABLE.DUNGEON_WARP_POINTS)[
             $gameVariables.value(HELPER_VARIABLE.DUNGEON_INFO_ITEM_ID)
@@ -18562,7 +18802,7 @@
   // Replaces (1x): Map003.json:event:133|EV133|page:1
   AGH_setDTextPictureTemporarySwitch = function (interp) {
     const baseActivationRecords = $gameVariables.value(HELPER_VARIABLE.BASE_ACTIVATION_RECORDS);
-    for (var i = 1; i <= 100; i++) {
+    for (let i = 1; i <= 100; i++) {
       if (baseActivationRecords[i] >= 2) {
         $gameVariables.value(HELPER_VARIABLE.BASE_ACTIVATION_RECORDS)[i] = 1;
       }
@@ -18579,11 +18819,12 @@
 
   // Replaces (1x): Map003.json:event:133|EV133|page:1
   AGH_readVariableBaseActivation = function () {
-    var hasActiveBase = 0;
+    let hasActiveBase;
+    hasActiveBase = 0;
     const baseActivationRecords = $gameVariables.value(HELPER_VARIABLE.BASE_ACTIVATION_RECORDS);
-    for (var i = 1; i <= 100; i++) {
+    for (let i = 1; i <= 100; i++) {
       if (baseActivationRecords[i] == 2) {
-        var hasActiveBase = 1;
+        hasActiveBase = 1;
       }
     }
     if (hasActiveBase == 0) {
@@ -18593,7 +18834,7 @@
 
   // Replaces (1x): Map003.json:event:133|EV133|page:2
   AGH_setVariableTextWorkEv133 = function () {
-    for (var i = 1; i <= 100; i++) {
+    for (let i = 1; i <= 100; i++) {
       if (!($gameVariables.value(HELPER_VARIABLE.BASE_ACTIVATION_RECORDS)[i] >= 2)) continue;
 
       const weaponName = $dataWeapons[i].name;
@@ -18614,12 +18855,13 @@
 
   // Replaces (1x): Map003.json:event:133|EV133|page:2
   AGH_setSwitchEv133 = function () {
-    for (var i = 501; i <= 600; i++) {
+    let i;
+    for (i = 501; i <= 600; i++) {
       if ($gameParty.hasItem($dataItems[i])) {
         $gameSwitches.setValue(164, true); //シーン回想
       }
     }
-    for (var i = 401; i <= 500; i++) {
+    for (i = 401; i <= 500; i++) {
       if ($gameParty.hasItem($dataItems[i])) {
         $gameSwitches.setValue(165, true); //挿話回想
       }
@@ -18636,11 +18878,12 @@
 
   // Replaces (1x): Map003.json:event:133|EV133|page:2
   AGH_readVariableBaseActivationEv133 = function () {
+    let activeBaseId;
     const baseActivationRecords = $gameVariables.value(HELPER_VARIABLE.BASE_ACTIVATION_RECORDS);
-    for (var i = 1; i <= 100; i++) {
+    for (let i = 1; i <= 100; i++) {
       if (!(baseActivationRecords[i] >= 2)) continue;
 
-      var activeBaseId = i;
+      activeBaseId = i;
       break;
     }
     valueCountSet1 = activeBaseId;
@@ -18694,7 +18937,7 @@
   // Replaces (1x): Map003.json:event:161|EV161|page:1
   AGH_setSwitchTemporarySwitchEv161 = function () {
     $gameSwitches.setValue(HELPER_SWITCH.TEMPORARY_FLAG, false);
-    for (var i = 1; i <= $dataItems.length - 1; i++) {
+    for (let i = 1; i <= $dataItems.length - 1; i++) {
       const itemData = $dataItems[i];
       if (!itemData.name == "") {
         if (itemData.meta["EICSwitch"]) {
@@ -18738,7 +18981,7 @@
     const pictureName = "";
     $gameScreen.showPicture(pictureId + 1, pictureName, 0, 1072, 612, 100, 100, 0, 0);
     $gameScreen.movePicture(pictureId + 1, 0, 1072, 612, 100, 100, 255, 0, 60);
-    const messageText = `　　　　　\n　　　　　\n　　　　　\n　　　　　`;
+    const messageText = "　　　　　\n　　　　　\n　　　　　\n　　　　　";
     $gameScreen.setDTextPicture(messageText, 28);
     $gameScreen.dWindowFrame = "ON";
     $gameScreen.showPicture(pictureId, pictureName, 0, 1072, 612, 100, 100, 0, 0);
@@ -18768,17 +19011,20 @@
   };
 
   // Replaces (1x): Map003.json:event:207|EV207宿屋処理|page:1
-  AGH_iterateItemsEv207InnProcessing = function () {
-    const item = $dataItems[valueCountSet1].price;
-    get_infoDirect(0, valueCountSet1, 0, 1);
-    get_infoDirect(4, -item, 0, 1);
+    // Inn accounting: get_infoDirect(0, id) records the stay, (4, -price) pays it.
+  function processInnItemPrice(itemId) {
+    const itemPrice = $dataItems[itemId].price;
+    get_infoDirect(0, itemId, 0, 1);
+    get_infoDirect(4, -itemPrice, 0, 1);
+  }
+
+AGH_iterateItemsEv207InnProcessing = function () {
+    processInnItemPrice(valueCountSet1);
   };
 
   // Replaces (1x): Map003.json:event:207|EV207宿屋処理|page:1
   AGH_iterateItemsEv207InnProcessing_2 = function () {
-    const item = $dataItems[valueCountSet2].price;
-    get_infoDirect(0, valueCountSet2, 0, 1);
-    get_infoDirect(4, -item, 0, 1);
+    processInnItemPrice(valueCountSet2);
   };
 
   // Replaces (1x): Map003.json:event:217|EV217回想全開放|page:1
@@ -18822,14 +19068,15 @@
 
   // Replaces (1x): Map003.json:event:218|EV218|page:2
   AGH_readVariableActorChoice_5 = function (interp) {
+    let charaSlotId;
     //移動マップに作成。x,y入力
-    var charaSlotId = 1; //$gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID);
+    charaSlotId = 1; //$gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID);
     const array = [x, y, d]; //ｱｸﾀｰ座標
     const candidateValues = [x, y, d]; //NPC座標
     const valueNpcGuraTemporarilySave2 = valueNpcGuraTemporarilySave;
     event_respawnSetA(charaSlotId, array[0], array[1], 1, array[2]);
     interp._eventId = $gameVariables.value(HELPER_VARIABLE.DYNAMIC_EVENT_IDS)[charaSlotId];
-    var charaSlotId = 11;
+    charaSlotId = 11;
     event_respawnSetN(
       charaSlotId,
       candidateValues[0],
@@ -18895,11 +19142,12 @@
 
   // Replaces (1x): Map007.json:event:3|EV003|page:1
   AGH_showPicturePictureParallelLoopEv003 = function () {
+    let pictureName;
     valuePic1 = 60;
-    var pictureName = "test2";
+    pictureName = "test2";
     $gameScreen.showPicture(valuePic1, pictureName, 1, 640, 384, 100, 100, 255, 0);
     pic_setArray(1, valuePic1, 0, 50, 60);
-    var pictureName = "test2a_0";
+    pictureName = "test2a_0";
     picture_anime1(valuePic1 + 1, pictureName, 3, 10, "連番", 10, 1, true, [1, 2, 1, 1]);
     pic_set(valuePic1 + 1, 1, 255, 20);
     hcg_piston(valuePic1, 8, 1, 1);
@@ -18916,11 +19164,12 @@
 
   // Replaces (1x): Map007.json:event:3|EV003|page:1
   AGH_showPicturePictureParallelLoop_2 = function () {
+    let pictureName;
     const pictureId = 60;
-    var pictureName = "test2";
+    pictureName = "test2";
     $gameScreen.showPicture(pictureId, pictureName, 1, 640, 384, 100, 100, 255, 0);
     pic_setArray(pictureId, 0, 20, 20);
-    var pictureName = "test2a_0";
+    pictureName = "test2a_0";
     picture_anime1(pictureId + 1, pictureName, 3, 10, "連番", 20, 1, true, [1, 2, 1, 1]);
     pic_set(pictureId + 1, 1, 255, 20);
     hcg_piston(pictureId, 8, 1, 1);
@@ -18940,7 +19189,7 @@
 
   // Replaces (1x): Map007.json:event:3|EV003|page:1
   AGH_initValueWordSet0Ev003 = function () {
-    valueWordSet0 = `あああああ`;
+    valueWordSet0 = "あああああ";
     adv_partDirectPlay(18);
   };
 
@@ -19011,14 +19260,15 @@
 
   // Replaces (1x): Map007.json:event:3|EV003|page:1
   AGH_showPictureScreenBlackOut_2 = function () {
+    let particleName;
     const pictureId = 51;
     const ScreenBlackOut = "ScreenBlackOut";
     $gameScreen.showPicture(pictureId, ScreenBlackOut, 1, 640, 384, 100, 100, 150, 0);
-    var particleName = "lines_width1";
+    particleName = "lines_width1";
     $gameScreen._particle.particleSet(0, particleName, "screen", "def", "above");
-    var particleName = "lines_width2";
+    particleName = "lines_width2";
     $gameScreen._particle.particleSet(0, particleName, "screen", "def", "screen");
-    var particleName = "lines_width3";
+    particleName = "lines_width3";
     $gameScreen._particle.particleSet(0, particleName, "screen", "def", "spriteset");
   };
 
@@ -19057,8 +19307,8 @@
     const start = 1;
     const end = 6;
     const dungeonInfoItemId = $gameVariables.value(HELPER_VARIABLE.DUNGEON_INFO_ITEM_ID);
-    for (var i = start; i <= end; i++) {
-      var itemMeta = $dataItems[dungeonInfoItemId].meta["出現エネミー" + i];
+    for (let i = start; i <= end; i++) {
+      const itemMeta = $dataItems[dungeonInfoItemId].meta["出現エネミー" + i];
       if (Number(itemMeta.split(",")[0]) >= 21) {
         $dataEnemies[i + 10].exp = $dataEnemies[itemMeta.split(",")[0]].exp;
       }
@@ -19085,14 +19335,14 @@
 
   // Replaces (1x): Map007.json:event:4|EV004000|page:1
   AGH_setDTextPictureEv004000 = function () {
-    const messageText = `パーティに加わった！`;
+    const messageText = "パーティに加わった！";
     $gameScreen.setDTextPicture(messageText, 28);
     adv_partDirectPlay(8);
   };
 
   // Replaces (1x): Map007.json:event:4|EV004000|page:1
   AGH_setVariableNpcSpawnRandom1 = function () {
-    for (var i = 1; i <= 5; i++) {
+    for (let i = 1; i <= 5; i++) {
       $gameVariables.setValue(33, "BB_akunin"); //グラ名前
       $gameVariables.setValue(35, 3); //グラ番号
       $gameVariables.setValue(37, getRandomIndex(3) + 2); //速度
@@ -19165,32 +19415,34 @@
 
   // Replaces (1x): Map007.json:event:4|EV004000|page:1
   AGH_movePictureXev10001 = function () {
+    let pictureName;
     const pictureId = 53;
-    var pictureName = "Xev100_01";
+    pictureName = "Xev100_01";
     pic_1(0, pictureId + 1, pictureName, 0, 100, 255, 60, 1280, 768, -256, 0);
-    var pictureName = "Xev100_01_100";
+    pictureName = "Xev100_01_100";
     picture_anime1(pictureId + 3, pictureName, 5, 1, "連番", 300, 3, true, [2, 4]);
     $gameScreen.movePicture(pictureId + 3, 1, 640 - 128, 384, 100, 100, 200, 0, 60);
     picture_anime1(pictureId + 4, pictureName, 5, 1, "連番", 200, 3, true, [3, 1, 5, 1]);
     $gameScreen.movePicture(pictureId + 4, 1, 640 - 128, 384, 100, 100, 100, 0, 60);
-    for (var i = pictureId + 1; i <= pictureId + 4; i++) {
+    for (let i = pictureId + 1; i <= pictureId + 4; i++) {
       hcg_piston(i, 8, 1);
     }
   };
 
   // Replaces (1x): Map007.json:event:4|EV004000|page:1
   AGH_movePictureXev10001Ev004000 = function () {
+    let pictureName;
     const pictureId = 53;
-    var pictureName = "Xev100_01";
+    pictureName = "Xev100_01";
     pic_1(0, pictureId + 1, pictureName, 0, 100, 255, 60, 1280, 768, -256, 0);
-    var pictureName = "Xev100_01hip2_100";
+    pictureName = "Xev100_01hip2_100";
     pic_1(2, pictureId + 2, pictureName, 0, 100, 200, 1, 1280, 768, -256, 0);
-    var pictureName = "Xev100_01_100";
+    pictureName = "Xev100_01_100";
     picture_anime1(pictureId + 3, pictureName, 5, 1, "連番", 180, 3, true, [2, 4]);
     $gameScreen.movePicture(pictureId + 3, 1, 640 - 128, 384, 100, 100, 200, 0, 60);
     picture_anime1(pictureId + 4, pictureName, 5, 1, "連番", 100, 3, true, [3, 1, 5, 1]);
     $gameScreen.movePicture(pictureId + 4, 1, 640 - 128, 384, 100, 100, 100, 0, 60);
-    for (var i = pictureId + 1; i <= pictureId + 4; i++) {
+    for (let i = pictureId + 1; i <= pictureId + 4; i++) {
       hcg_piston(i, 8, 1);
     }
   };
@@ -19218,7 +19470,7 @@
   AGH_iterateMapEventsIconDisplay = function () {
 	return; // return because it is the debug code and the result console log message was commented, uncomment when will need again
 
-    for (var id = $gameMap.events().length; id > 0; id--) {
+    for (let id = $gameMap.events().length; id > 0; id--) {
       const mapEvent = $gameMap.event(id);
       if (!!mapEvent) {
         const eventData = mapEvent.event();
@@ -19245,7 +19497,8 @@
 
   // Replaces (1x): Map007.json:event:5|EV005|page:1
   AGH_particleUpdateMonsterC = function (interp) {
-    var particleName = "monster_c";
+    let particleName;
+    particleName = "monster_c";
     const startColor = "#ffffff";
     const endColor = "#460000";
     $gameScreen._particle.particleUpdate([
@@ -19254,7 +19507,7 @@
       String(startColor),
       String(endColor)
     ]);
-    var particleName = "mysterious_torch_c";
+    particleName = "mysterious_torch_c";
     $gameScreen._particle.particleUpdate([particleName, "alpha", "0", "0.7@0.5", "0"]);
   };
 
@@ -19280,8 +19533,8 @@
   // Replaces (1x): Map007.json:event:7|EV007|page:1
   AGH_iteratePartyMembersEv007 = function () {
     const battleMembers2 = $gameParty.battleMembers();
-    for (var i = 0; i < battleMembers2.length; i++) {
-      var battleMember = battleMembers2[i];
+    for (let i = 0; i < battleMembers2.length; i++) {
+      const battleMember = battleMembers2[i];
       if ($gameParty.members().contains(battleMember)) {
         battleMember.learnSkill(297);
         battleMember.gainSkillMasteryUses(297, 100);
@@ -19300,7 +19553,7 @@
     const actorId = 1;
     const start = 61;
     const end = 64;
-    for (var i = start; i <= end; i++) {
+    for (let i = start; i <= end; i++) {
       if (!$dataSkills[i].name == "") {
         $gameActors.actor(actorId).learnSkill(i);
       }
@@ -19364,12 +19617,13 @@
 
   // Replaces (1x): Map007.json:event:22|EV022|page:2
   AGH_iterateMapEvents = function (interp) {
-    var characterId = 0;
-    for (var id = $gameMap.events().length - 1; id > 0; id--) {
+    let characterId;
+    characterId = 0;
+    for (let id = $gameMap.events().length - 1; id > 0; id--) {
       const mapEvent = $gameMap.event(id);
       if (!!mapEvent) {
         if (mapEvent.event().meta["ベッド"]) {
-          var characterId = id;
+          characterId = id;
           break;
         }
       }
@@ -19385,12 +19639,13 @@
 
   // Replaces (1x): Map007.json:event:22|EV022|page:2
   AGH_readMapEventMetaRaceDefeatCount = function (interp) {
-    var characterId = 0;
-    for (var id = $gameMap.events().length - 1; id > 0; id--) {
+    let characterId;
+    characterId = 0;
+    for (let id = $gameMap.events().length - 1; id > 0; id--) {
       const mapEvent = $gameMap.event(id);
       if (!!mapEvent) {
         if (mapEvent.event().meta["着替え"]) {
-          var characterId = id;
+          characterId = id;
           break;
         }
       }
@@ -19467,7 +19722,7 @@
     valueSerialPictureId += 1;
     const array = [-50, 0, 50, -100, 100];
     const randomYOffsets = [-50, 0, 50, -100, 100];
-    const lineCandidates = [`「オラッ！」`, `「オラァッ！」`];
+    const lineCandidates = ["「オラッ！」", "「オラァッ！」"];
     chara_oneWord(valueSerialPictureId, interp._eventId, 25, 60, array, randomYOffsets, lineCandidates);
     interp.wait(20);
   };
@@ -19480,11 +19735,12 @@
 
   // Replaces (1x): Map007.json:event:58|EV058|page:1
   AGH_eventDomeBed = function () {
-    for (var id1 = 1; id1 <= 200; id1++) {
+    let event;
+    for (let id1 = 1; id1 <= 200; id1++) {
       const mapEvent = $gameMap.event(id1);
       if (!!mapEvent) {
         if (mapEvent.event().meta["DomeBed"]) {
-          var event = mapEvent;
+          event = mapEvent;
           event.setDirectionFix(false);
           event.setDirection(2);
           event.setDirectionFix(true);
@@ -19499,7 +19755,7 @@
     if (weaponData.meta["FamilyName"]) {
       interp.sVal(21, weaponData.meta["FamilyName"]);
     } else {
-      interp.sVal(21, `　`);
+      interp.sVal(21, "　");
     }
   };
 
@@ -19522,10 +19778,10 @@
 
   // Replaces (1x): Map018.json:event:39|EV039|page:1
   AGH_readVariableActor19HStatus = function () {
-    $gameActors.actor(19).setName(`青年Ａ`);
-    $gameVariables.value(399)[59] = `ネルガド住民`;
-    $gameActors.actor(20).setName(`青年Ｂ`);
-    $gameVariables.value(400)[59] = `ネルガド住民`;
+    $gameActors.actor(19).setName("青年Ａ");
+    $gameVariables.value(399)[59] = "ネルガド住民";
+    $gameActors.actor(20).setName("青年Ｂ");
+    $gameVariables.value(400)[59] = "ネルガド住民";
   };
 
   // Replaces (1x): Map035.json:event:20|EV020|page:1
@@ -19552,29 +19808,31 @@
 
   // Replaces (1x): Map041.json:event:7|EV007|page:1
   AGH_checkSwitchSceneComplete1 = function () {
-    var nextSceneItemId = 571;
+    let nextSceneItemId;
+    nextSceneItemId = 571;
     if ($gameSwitches.value(1171)) {
-      var nextSceneItemId = 572;
+      nextSceneItemId = 572;
     }
     if ($gameSwitches.value(1172)) {
-      var nextSceneItemId = 573;
+      nextSceneItemId = 573;
     }
     if ($gameSwitches.value(1173)) {
-      var nextSceneItemId = 574;
+      nextSceneItemId = 574;
     }
     if ($gameSwitches.value(1174)) {
-      var nextSceneItemId = 1000;
+      nextSceneItemId = 1000;
     }
     valueCountSet1 = nextSceneItemId;
   };
 
   // Replaces (1x): Map068.json:event:3|EV003|page:1
   AGH_showPictureEv003 = function () {
-    var pictureId = `\\V[801]\n\\V[802]\n\\V[803]\n\\V[804]\n\\V[805]`;
+    let pictureId;
+    pictureId = `\\V[801]\n\\V[802]\n\\V[803]\n\\V[804]\n\\V[805]`;
     $gameScreen.setDTextPicture(pictureId, 28);
     $gameScreen.dWindowFrame = "ON";
     $gameScreen.dTextAlign = 1;
-    var pictureId = 100;
+    pictureId = 100;
     const pictureName = "";
     $gameScreen.showPicture(pictureId, pictureName, 0, 100 + 50, 100, 100, 100, 0, 0);
     $gameScreen.movePicture(pictureId, 0, 100, 100, 100, 100, 255, 0, 60);
@@ -19582,12 +19840,13 @@
 
   // Replaces (1x): Map068.json:event:3|EV003|page:1
   AGH_readVariableAppearanceCharacterStartEv003 = function () {
+    let actor, equips;
     const start = $gameVariables.value(HELPER_VARIABLE.FIRST_DEPLOYED_ACTOR_ID);
     const end = $gameVariables.value(HELPER_VARIABLE.LAST_DEPLOYED_ACTOR_ID);
-    for (var j = start; j <= end; j++) {
-      var actor = $gameActors.actor(j);
-      var equips = actor.equips();
-      for (var i = 0; i < equips.length; i++) {
+    for (let j = start; j <= end; j++) {
+      actor = $gameActors.actor(j);
+      equips = actor.equips();
+      for (let i = 0; i < equips.length; i++) {
         if (equips[i]) {
           actor.changeEquipById(i + 1, 0);
         }
@@ -19609,7 +19868,7 @@
   // Replaces (1x): Map100.json:event:11|EV011|page:1
   AGH_readVariableRandomWork1Ev011 = function () {
     const randomWorkValue = $gameVariables.value(HELPER_VARIABLE.RANDOM_WORK_1);
-    for (var i = 1; i <= 10; i++) {
+    for (let i = 1; i <= 10; i++) {
       $dataMap.events[i].name =
         `${$dataClasses[i + randomWorkValue - 10].name}→${$dataClasses[i + randomWorkValue].name}`;
     }
@@ -19646,7 +19905,7 @@
 
   // Replaces (1x): Map100.json:event:11|EV011|page:1
   AGH_forceMoveRouteCharactersEv011 = function (interp) {
-    for (var i = 1; i <= 10; i++) {
+    for (let i = 1; i <= 10; i++) {
       interp.character(i).forceMoveRoute({
         list: [{ code: 45, parameters: ["this.setTone(-150, -150, -150);"] }, { code: 0 }],
         repeat: false,
@@ -19684,10 +19943,9 @@
       repeat: false,
       skippable: true
     });
-    interp.sVal(
-      22,
-      `${$dataClasses[characterId + $gameVariables.value(HELPER_VARIABLE.RANDOM_WORK_1)].name}`
-    );
+    const classNameIndex = characterId + $gameVariables.value(HELPER_VARIABLE.RANDOM_WORK_1);
+    const className = $dataClasses[classNameIndex].name;
+    interp.sVal(22, className);
   };
 
   // Replaces (1x): Map100.json:event:11|EV011|page:1
@@ -19714,7 +19972,7 @@
 
   // Replaces (1x): Map196.json:event:3|EV207宿屋処理|page:1
   AGH_setVariableRandomWork3 = function () {
-    $gameActors.actor(20).setName(`宿受付`);
+    $gameActors.actor(20).setName("宿受付");
     $gameVariables.value(400)[59] = `${$dataWeapons[431].name}`;
     valueCountSet1 = 1233;
     valueCountSet2 = 1234;
