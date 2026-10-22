@@ -1571,9 +1571,10 @@
       `${colorTaggedText(16, `＜${locationType}マップ情報＞`)}\n`
     );
     glossaryText.push(`${itemData.description}\n`);
-    glossaryText.push(
-      `${colorTaggedText(16, `エネミーLV：`)}${colorTaggedText(10, `${minEnemyLevel}`)}～${colorTaggedText(10, `${maxEnemyLevel}`)}　`
-    );
+    const enemyLv = colorTaggedText(16, `エネミーLV：`);
+    const minLv = colorTaggedText(10, `${minEnemyLevel}`);
+    const maxLv = colorTaggedText(10, `${maxEnemyLevel}`);
+    glossaryText.push(`${enemyLv}${minLv}～${maxLv}　`);
 
     // Add element info
     glossaryText.push(`　　${colorTaggedText(16, `属性：`)}`);
@@ -1590,9 +1591,9 @@
     // Add annihilation count
     const annCount = gameVariables.value(257)[itemId];
     if (annCount >= 1) {
-      glossaryText.push(
-        `${colorTaggedText(16, `殲滅回数：`)}${colorTaggedText(10, `${annCount}`)}　\n`
-      );
+      const annihilated = colorTaggedText(16, `殲滅回数：`);
+      const cnt = colorTaggedText(10, `${annCount}`);
+      glossaryText.push(`${annihilated}${cnt}　\n);
     } else {
       glossaryText.push(`\n`);
     }
