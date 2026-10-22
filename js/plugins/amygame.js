@@ -1593,7 +1593,7 @@
     if (annCount >= 1) {
       const annihilated = colorTaggedText(16, `殲滅回数：`);
       const cnt = colorTaggedText(10, `${annCount}`);
-      glossaryText.push(`${annihilated}${cnt}　\n);
+      glossaryText.push(`${annihilated}${cnt}　\n`);
     } else {
       glossaryText.push(`\n`);
     }
