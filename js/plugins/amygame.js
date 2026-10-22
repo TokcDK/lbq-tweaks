@@ -2848,9 +2848,9 @@
 
   //簡易戦闘報酬設定スクリプト
   actor1_setup1 = function (mapInfo, enemyLevel) {
-    const actor20 = $gameActors.actor(20);
-    if (!actor20) return;
-    actor20.addState(610);
+    const selectedActor = $gameActors.actor(GAME_VARIABLE.SELECTED_ACTOR_ID);
+    if (!selectedActor) return;
+    selectedActor.addState(610);
     if (!mapInfo || !mapInfo.meta) return;
     let stateIdValues = [];
     for (let j = 1; j <= 10; j++) {
@@ -2875,7 +2875,7 @@
 
     if (passiveStateIds != 0) {
       for (let j = 0; j < passiveStateIds.length; j++) {
-        actor20.addState(passiveStateIds[j]);
+        selectedActor.addState(passiveStateIds[j]);
       }
     }
     const enemyPresetStates = $gameVariables.value(
@@ -2885,13 +2885,13 @@
       const firstEnemyPresetStates = enemyPresetStates[1] || [];
       for (let i = 0; i <= firstEnemyPresetStates.length - 1; i++) {
         if (firstEnemyPresetStates[i] >= 1) {
-          actor20.addState(firstEnemyPresetStates[i]);
+          selectedActor.addState(firstEnemyPresetStates[i]);
         }
       }
       const secondEnemyPresetStates = enemyPresetStates[2] || [];
       for (let i = 0; i <= secondEnemyPresetStates.length - 1; i++) {
         if (secondEnemyPresetStates[i] >= 1) {
-          actor20.addState(secondEnemyPresetStates[i]);
+          selectedActor.addState(secondEnemyPresetStates[i]);
         }
       }
     }
@@ -2907,9 +2907,9 @@
           else if (enemyLevel >= 61) stateIdMult = 31;
 
           stateId = getRandomIndex(stateIdMult) + 885;
-          actor20.addState(stateId);
+          selectedActor.addState(stateId);
         } else {
-          actor20.addState(stateId);
+          selectedActor.addState(stateId);
         }
       }
     }
@@ -2918,7 +2918,7 @@
       const stateId = Number(
         enemyElementValues[getRandomIndex(enemyElementValues.length)]
       );
-      actor20.addState(stateId);
+      selectedActor.addState(stateId);
     }
     //console.log($gameActors.actor(20));
   };
