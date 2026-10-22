@@ -124,7 +124,7 @@
   //   $gameVariables.setValue(HELPER_VARIABLE.SELECTED_ACTOR_ID,<actorId>);
   //   valueFaceSelect = <faceNo>;
   AGH_faceSelectMidTalk = function (interp, actorId, faceIndex) {
-    interp.sVal(172, 7); //会話途中顔グラ。
+    $gameVariables.setValue(172, 7); //会話途中顔グラ。
     $gameVariables.setValue(HELPER_VARIABLE.SELECTED_ACTOR_ID, actorId);
     valueFaceSelect = faceIndex;
   };
@@ -139,8 +139,8 @@
   //   valueWeatherSceneSet = <weather>;
   //   h_keikenhyouji1(521,<partnerId>);//記録変数,相手ID
   AGH_recallSceneSetup = function (interp, eventSubjectIndex, episodeItemId, sceneWeather, partnerId) {
-    interp.sVal(530, eventSubjectIndex); //主格キャラ
-    interp.sVal(535, episodeItemId); //挿話回想の場合アイテムID。メインは0
+    $gameVariables.setValue(530, eventSubjectIndex); //主格キャラ
+    $gameVariables.setValue(535, episodeItemId); //挿話回想の場合アイテムID。メインは0
     valueWeatherSceneSet = sceneWeather;
     h_keikenhyouji1(521, partnerId); //記録変数,相手ID
   };
@@ -156,8 +156,8 @@
   AGH_xevSceneIntro = function (interp, scenePic, eventSubjectIndex, episodeItemId, partnerId, sceneWeather) {
     valueScenePic = scenePic;
     //var value2 = valueScenePic+'01';
-    interp.sVal(530, eventSubjectIndex); //主格キャラ
-    interp.sVal(535, episodeItemId); //挿話回想の場合アイテムID。メインは0
+    $gameVariables.setValue(530, eventSubjectIndex); //主格キャラ
+    $gameVariables.setValue(535, episodeItemId); //挿話回想の場合アイテムID。メインは0
     h_keikenhyouji1(521, partnerId); //記録変数,相手ID
     valueWeatherSceneSet = sceneWeather;
     $gameVariables.setValue(
@@ -262,7 +262,7 @@
 
   // Replaces (~24x): region/map unlock notification popup (common event 45).
   AGH_regionUnlockNotice = function (interp, entrySwitchId, regionSwitchId) {
-    interp.sVal(20, 0);
+    $gameVariables.setValue(20, 0);
     const newEntryName = $dataSystem.switches[entrySwitchId];
     const regionName = $dataSystem.switches[regionSwitchId];
     const coloredText = colorTaggedText(16, `${newEntryName}`);
@@ -275,9 +275,9 @@
   //   this.sVal(14,<mode14>);this.sVal(20,<mode20>);this.sVal(121,0);
   //   this.setupChild($dataCommonEvents[64].list, 0);
   AGH_partyJoinLeaveCommon = function (interp, mode14, mode20) {
-    interp.sVal(14, mode14);
-    interp.sVal(20, mode20);
-    interp.sVal(121, 0);
+    $gameVariables.setValue(14, mode14);
+    $gameVariables.setValue(20, mode20);
+    $gameVariables.setValue(121, 0);
     interp.setupChild($dataCommonEvents[64].list, 0);
   };
 
@@ -286,7 +286,7 @@
   //   valueTalkSet = [<give>,<actorId>,<frames>];
   //   this.setupChild($dataCommonEvents[60].list, 0);
   AGH_talkSetCall = function (interp, give, actorId, frames) {
-    interp.sVal(172, 16);
+    $gameVariables.setValue(172, 16);
     valueTalkSet = [give, actorId, frames]; //1で付与2で直接表示\CE[60]のみ0で解除,ｱｸﾀｰid,ﾌﾚｰﾑ60,40,20
     interp.setupChild($dataCommonEvents[60].list, 0);
   };
@@ -721,7 +721,7 @@
   //   $gameVariables.setValue(HELPER_VARIABLE.SELECTED_ACTOR_ID,1);
   //   valueFaceSelect = 8;
   CEH_faceSelectMidTalk = function (interp) {
-    interp.sVal(172, 7); //会話途中顔グラ。
+    $gameVariables.setValue(172, 7); //会話途中顔グラ。
     $gameVariables.setValue(HELPER_VARIABLE.SELECTED_ACTOR_ID, 1);
     valueFaceSelect = 8;
   };
@@ -789,7 +789,7 @@
   // Replaces (10x): valueEnemyEventId = this.eventId(); this.sVal(21,this.eventId());
   CEH_storeEnemyEventId = function (interp) {
     valueEnemyEventId = interp.eventId();
-    interp.sVal(21, interp.eventId());
+    $gameVariables.setValue(21, interp.eventId());
   };
 
   // Replaces (9x): this._eventId = valueBossId; CEH_storeThisEventId(this); pic_erase(0);
@@ -865,7 +865,7 @@
   // event data, but it is preserved here on purpose so behaviour is identical;
   // if the intent was [mode, 250, eventId], delete the second line.
   AGH_openTalkWindow = function (interp, mode) {
-    interp.sVal(172, 21);
+    $gameVariables.setValue(172, 21);
     valueTalkSet = [mode, 250, interp._eventId];
     valueTalkSet = [0, 0, 0];
     interp.setupChild($dataCommonEvents[60].list, 0);
@@ -1017,8 +1017,8 @@
   //   $gameVariables.setValue(HELPER_VARIABLE.DYNAMIC_EVENT_IDS, Array(21).fill(0));
   //   $gameVariables.setValue(HELPER_VARIABLE.QUEST_HINT, `<objective text>`);
   AGH_bossVictoryAftermath = function (interp, memoItemId, objectiveText) {
-    interp.sVal(530, 1);
-    interp.sVal(535, memoItemId);
+    $gameVariables.setValue(530, 1);
+    $gameVariables.setValue(535, memoItemId);
     valueWeatherSceneSet = 0;
     $gameVariables.setValue(HELPER_VARIABLE.DYNAMIC_EVENT_IDS, Array(21).fill(0));
     $gameVariables.setValue(HELPER_VARIABLE.QUEST_HINT, objectiveText);
@@ -1046,8 +1046,8 @@
       valuePic1 = pictureId;
     }
     valueScenePic = scenePicPrefix;
-    interp.sVal(530, mainCharId);
-    interp.sVal(535, memoItemId);
+    $gameVariables.setValue(530, mainCharId);
+    $gameVariables.setValue(535, memoItemId);
     h_keikenhyouji1(521, recordId);
     valueWeatherSceneSet = weatherSceneSet;
     if (syncActorVariable) {
@@ -1073,10 +1073,10 @@
       false,
       false
     );
-    interp.sVal(401, getRandomIndex(11) + 20);
+    $gameVariables.setValue(401, getRandomIndex(11) + 20);
     const actor1 = `\\V[94]`;
     const actor2 = `\\V[22]`;
-    interp.sVal(506, `${actor1}は${actor2}とセックスした…。`);
+    $gameVariables.setValue(506, `${actor1}は${actor2}とセックスした…。`);
     h_exp1(1, 1, 0, 0, 0, 1);
     h_exp2(1, 0, 0, 0, 0, 0);
     h_exp3.apply(null, exp3Args);
@@ -1108,7 +1108,7 @@
   // Replaces (2x) in the prologue-end common event.
   // --------------------------------------------------------------------------
   AGH_showTipPopup = function (interp, title, pictureLayout) {
-    interp.sVal(172, 2);
+    $gameVariables.setValue(172, 2);
     const mode = 0;
     valueTalkSet = [title, mode, pictureLayout];
     interp.setupChild($dataCommonEvents[60].list, 0);
@@ -3724,7 +3724,7 @@
     $gameVariables.setValue(variableId, value);
   }
   function setSelfVar(interp, variableId, value) {
-    interp.sVal(variableId, value);
+    $gameVariables.setValue(variableId, value);
   }
   function clearSelfVarRange(interp, firstId, lastId) {
     range(firstId, lastId).forEach((variableId) => setSelfVar(interp, variableId, 0));
@@ -9368,7 +9368,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
   AGH_setSelfVariableActorChoice = function (interp) {
-    interp.sVal(20, 1);
+    $gameVariables.setValue(20, 1);
     const actor = $gameActors.actor($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID));
     actor.setSubclass(42);
   };
@@ -9438,7 +9438,7 @@
   AGH_setSelfVariableActorChoiceVariousUseCommands = function (interp) {
     const array =
       $dataActors[$gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID)].meta["戦闘3連撃時"].split(",");
-    interp.sVal(522, array[getRandomIndex(array.length)]);
+    $gameVariables.setValue(522, array[getRandomIndex(array.length)]);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
@@ -9448,7 +9448,7 @@
     //action.isForOpponent() // 対象が敵の時true、仲間や自分など味方の時ははfalse
     //action._targetIndex // 対象のインデックス。敵味方ともに0から始まる。-1の時はランダムターゲット
     //action._item // 行動の種類。Game_Item クラスのオブジェクト。
-    interp.sVal(20, $gameParty.members()[action._targetIndex]);
+    $gameVariables.setValue(20, $gameParty.members()[action._targetIndex]);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
@@ -9463,7 +9463,7 @@
   // Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
   AGH_setSelfVariableActorChoice_3 = function (interp) {
     const value = BattleManager._subject._lastTargetIndex;
-    interp.sVal(20, $gameParty.members()[value].actorId());
+    $gameVariables.setValue(20, $gameParty.members()[value].actorId());
   };
 
   // Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
@@ -9528,7 +9528,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:3|各種使用コマンド
   AGH_setSelfVariableRandomWork1 = function (interp) {
-    interp.sVal(21, $gameParty._actors);
+    $gameVariables.setValue(21, $gameParty._actors);
     const array = $gameVariables.value(HELPER_VARIABLE.RANDOM_WORK_1);
     $gameVariables.setValue(HELPER_VARIABLE.SELECTED_ACTOR_ID, array[getRandomIndex(array.length)]);
   };
@@ -9592,7 +9592,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:4|条件分岐
   AGH_setSelfVariableActorChoiceConditionBranch = function (interp) {
-    interp.sVal(20, 1);
+    $gameVariables.setValue(20, 1);
     //actor/list are only referenced by the commented debug block below
     //const actor = $gameActors.actor($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID));
     //const list = actor.actor().traits;
@@ -9734,7 +9734,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
   AGH_setSelfVariableActorChoiceFrequentlyUsed = function (interp) {
-    interp.sVal(20, 1);
+    $gameVariables.setValue(20, 1);
     const actor = $gameActors.actor($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID));
     if (actor.meetsSkillConditions($dataSkills[201])) {
       $gameVariables.setValue(HELPER_VARIABLE.RANDOM_WORK_2, 10);
@@ -9763,7 +9763,7 @@
     const array = [1, 2, 3, 4];
     const candidateValues = [5, 6, 7, 8];
     array.push(candidateValues);
-    interp.sVal(21, array);
+    $gameVariables.setValue(21, array);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
@@ -9829,7 +9829,7 @@
     const array = [1, 2, 3, 4, 5];
     array.push(6, 7, 8, 9, 10);
     const randomIndex = array[getRandomIndex(array.length)];
-    interp.sVal(21, randomIndex);
+    $gameVariables.setValue(21, randomIndex);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
@@ -9846,10 +9846,10 @@
   // Replaces (1x): CommonEvents.json:common-event:6|アップデート時に実行コモン
   AGH_setSelfVariableUpdateCommon = function (interp) {
     //クエスト用配列
-    interp.sVal(326, Array(2001).fill(0)); //クエスト達成用アイテムごと表示用配列
-    interp.sVal(344, Array(151).fill(0)); //達成条件の内容のみ
+    $gameVariables.setValue(326, Array(2001).fill(0)); //クエスト達成用アイテムごと表示用配列
+    $gameVariables.setValue(344, Array(151).fill(0)); //達成条件の内容のみ
     for (let i = 357; i <= 360; i++) {
-      interp.sVal(i, Array(151).fill(0));
+      $gameVariables.setValue(i, Array(151).fill(0));
     }
     //357クエスト解説アイテム用358クエスト解説359クエスト発生360クエスト達成
     //1～100が通常クエスト、101～140がデイリークエスト
@@ -10351,7 +10351,7 @@
     const stateName = $dataStates[SELF_RELIEF_STATE_ID].name;
 
     if (actor.isLearnedSkill(SELF_RELIEF_SKILL_ID)) {
-      interp.sVal(
+      $gameVariables.setValue(
         DAY_END_INFO_LINE_VARIABLE_ID,
         $gameVariables.value(HELPER_VARIABLE.DAY_END_INFO_LINE_COUNT) + 2
       );
@@ -10361,7 +10361,7 @@
         LIBIDO_HIGHLIGHT_COLOR_ID,
         `[性欲度+${libidoGain}] [自慰回数+1]`
       );
-      interp.sVal(
+      $gameVariables.setValue(
         DAY_END_INFO_TEXT_VARIABLE_ID,
         $gameVariables.value(HELPER_VARIABLE.DAY_END_INFO_TEXT) +
           `${actorName}は自分を慰めた…。${stateName}が解除された。\n` +
@@ -10369,12 +10369,12 @@
       );
       return;
     }
-    interp.sVal(
+    $gameVariables.setValue(
       DAY_END_INFO_TEXT_VARIABLE_ID,
       $gameVariables.value(HELPER_VARIABLE.DAY_END_INFO_TEXT) +
         `${actorName}の${stateName}が解除された。\n`
     );
-    interp.sVal(
+    $gameVariables.setValue(
       DAY_END_INFO_LINE_VARIABLE_ID,
       $gameVariables.value(HELPER_VARIABLE.DAY_END_INFO_LINE_COUNT) + 1
     );
@@ -10408,11 +10408,11 @@
             }
           }
           const stateName = stateData.name;
-          interp.sVal(
+          $gameVariables.setValue(
             539,
             $gameVariables.value(HELPER_VARIABLE.DAY_END_INFO_TEXT) + `${stateName}が解除された。\n`
           );
-          interp.sVal(540, $gameVariables.value(HELPER_VARIABLE.DAY_END_INFO_LINE_COUNT) + 1);
+          $gameVariables.setValue(540, $gameVariables.value(HELPER_VARIABLE.DAY_END_INFO_LINE_COUNT) + 1);
         }
       }
     }
@@ -10555,7 +10555,7 @@
     else {
       randomWorkValue = "おはよう御座います。\n今日も頑張りましょうね";
     }
-    interp.sVal(21, randomWorkValue);
+    $gameVariables.setValue(21, randomWorkValue);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:25|一日始まり時コモン
@@ -10669,7 +10669,7 @@
   // Replaces (1x): CommonEvents.json:common-event:45|一言演出用
   AGH_setSelfVariableActorChoiceOneLineEffect = function (interp) {
     //一言演出。変数20が1以上で獲得用。0で移動ポイント増加など
-    interp.sVal(20, 1);
+    $gameVariables.setValue(20, 1);
     const selectedActorId = $gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID);
     const actor = $gameActors.actor(selectedActorId);
     const actorName = colorTaggedText(16, actor.name());
@@ -10835,7 +10835,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:53|デバッグコモン
   AGH_setSelfVariableActorChoiceDebugCommon = function (interp) {
-    interp.sVal(20, 3);
+    $gameVariables.setValue(20, 3);
     const actor = $gameActors.actor($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID));
     for (let i = 431; i < 439; i++) {
       actor.forgetSkill(i);
@@ -10844,7 +10844,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:53|デバッグコモン
   AGH_setSelfVariableActorChoice_4 = function (interp) {
-    interp.sVal(20, 3);
+    $gameVariables.setValue(20, 3);
     const actor = $gameActors.actor($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID));
     for (let i = 1; i < $dataSkills.length; i++) {
       if (!!actor.isLearnedSkill(i)) continue;
@@ -10857,7 +10857,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:53|デバッグコモン
   AGH_setSelfVariableActorChoice_5 = function (interp) {
-    interp.sVal(20, 1);
+    $gameVariables.setValue(20, 1);
     //dead debug leftovers: the commented log printed value1, not these
     //const actor = $gameActors.actor($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID));
     //const stateResistancePercent = actor.stateRate(62) * 100;
@@ -11703,7 +11703,7 @@
     const actor = $gameActors.actor($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID));
     for (let i = start; i <= end; i++) {
       if (actor.isLearnedSkill(i)) {
-        interp.sVal(21, $gameVariables.value(HELPER_VARIABLE.RANDOM_WORK_1) + 1);
+        $gameVariables.setValue(21, $gameVariables.value(HELPER_VARIABLE.RANDOM_WORK_1) + 1);
       }
     }
   };
@@ -11712,9 +11712,9 @@
   AGH_setSelfVariableLibido = function (interp) {
     h_exp($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID), "0_1_0", 105, false, true, false);
     //ｱｸﾀｰID,ﾋﾟｸﾁｬ,H相手(101ﾓﾌﾞ105対象なし106アイテム),非表示,簡易,過去シーンか否か
-    interp.sVal(401, getRandomIndex(6) + 5);
-    interp.sVal(413, 1);
-    interp.sVal(402, -100);
+    $gameVariables.setValue(401, getRandomIndex(6) + 5);
+    $gameVariables.setValue(413, 1);
+    $gameVariables.setValue(402, -100);
     //var arr = [1,2,3,4,5];$gameVariables.setValue(401,arr[getRandomIndex(arr.length)]);
     if ($gameSwitches.value(122)) {
       interp.setupChild($dataCommonEvents[85].list, 0);
@@ -11725,8 +11725,8 @@
   AGH_setSelfVariableLibidoNightHeatCommon = function (interp) {
     h_exp($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID), "0_1_0", 105, false, true, false);
     //ｱｸﾀｰID,ﾋﾟｸﾁｬ,H相手(101ﾓﾌﾞ105対象なし106アイテム),非表示,簡易,過去シーンか否か
-    interp.sVal(401, getRandomIndex(3) + 3);
-    interp.sVal(402, -100);
+    $gameVariables.setValue(401, getRandomIndex(3) + 3);
+    $gameVariables.setValue(402, -100);
     //var arr = [1,2,3,4,5];$gameVariables.setValue(401,arr[getRandomIndex(arr.length)]);
     if ($gameSwitches.value(122)) {
       interp.setupChild($dataCommonEvents[85].list, 0);
@@ -11786,7 +11786,7 @@
     const secondaryWorkText = $gameVariables.value(HELPER_VARIABLE.RANDOM_WORK_2);
     const coloredText = colorTaggedText(27, `Ｈ回数：${displayedAmount}`);
     const messageText = `\n${secondaryWorkText}との${coloredText}`;
-    interp.sVal(506, $gameVariables.value(506) + messageText);
+    $gameVariables.setValue(506, $gameVariables.value(506) + messageText);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:85|性欲度等変動表示コモン
@@ -11919,13 +11919,13 @@
   AGH_setSelfVariableRandomWork10 = function (interp) {
     const actor = $gameActors.actor($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID));
     if (actor.isLearnedSkill(68)) {
-      interp.sVal(30, $gameVariables.value(30) + 1);
+      $gameVariables.setValue(30, $gameVariables.value(30) + 1);
     }
     if (actor.isLearnedSkill(69)) {
-      interp.sVal(30, $gameVariables.value(30) + 1);
+      $gameVariables.setValue(30, $gameVariables.value(30) + 1);
     }
     if (actor.isLearnedSkill(70)) {
-      interp.sVal(30, $gameVariables.value(30) + 1);
+      $gameVariables.setValue(30, $gameVariables.value(30) + 1);
     }
   };
 
@@ -11934,7 +11934,7 @@
     const actor = $gameActors.actor($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID));
     actor.removeState(79);
     actor.addState(82);
-    interp.sVal(94, actor.name());
+    $gameVariables.setValue(94, actor.name());
     actor.setStateCounter(82, 0);
   };
 
@@ -12038,7 +12038,7 @@
     actor.removeState(82);
     actor.addState(83);
     actor.setStateCounter(83, 0);
-    interp.sVal(94, actor.name());
+    $gameVariables.setValue(94, actor.name());
   };
 
   // Actor record arrays: 380 + actorId keeps the H counter record, 440 + actorId the
@@ -12070,10 +12070,10 @@
     actorRecord[44] += [15, 16, 17, 18, 19, 20][getRandomIndex(6)];
     actorRecord[45] += [3, 4, 5, 6, 7, 8][getRandomIndex(6)];
     // 乱数汎用2..5 hold the four values the scene reads afterwards
-    interp.sVal(22, actorRecord[42]);
-    interp.sVal(23, actorRecord[43]);
-    interp.sVal(24, actorRecord[44]);
-    interp.sVal(25, actorRecord[45]);
+    $gameVariables.setValue(22, actorRecord[42]);
+    $gameVariables.setValue(23, actorRecord[43]);
+    $gameVariables.setValue(24, actorRecord[44]);
+    $gameVariables.setValue(25, actorRecord[45]);
     actorRecord[15] += 1;
   };
 
@@ -12143,8 +12143,8 @@
     h_exp($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID), 0, 301, false, false, false);
     //ｱｸﾀｰID,ﾋﾟｸﾁｬ,H相手(301ﾓﾌﾞ305対象なし306アイテム),非表示,簡易,過去シーンか否か
     const name = "\\V[94]";
-    interp.sVal(506, `${name}は凌辱された…。` + "\n");
-    interp.sVal(401, getRandomIndex(3) + 3);
+    $gameVariables.setValue(506, `${name}は凌辱された…。` + "\n");
+    $gameVariables.setValue(401, getRandomIndex(3) + 3);
     if ($gameSwitches.value(122)) {
       interp.setupChild($dataCommonEvents[85].list, 0);
     }
@@ -12198,7 +12198,7 @@
   // Replaces (1x): CommonEvents.json:common-event:103|戦闘開始時
   AGH_setSelfVariableBattleAverageLuk = function (interp) {
     const battleMembers2 = $gameParty.battleMembers();
-    interp.sVal(
+    $gameVariables.setValue(
       516,
       Math.round(
         battleMembers2.reduce(function (prev, member) {
@@ -12602,7 +12602,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:110|Ｈ攻撃時コモン
   AGH_setSelfVariableLibidoHAttackCommon = function (interp) {
-    interp.sVal(401, getRandomIndex(11) + 10);
+    $gameVariables.setValue(401, getRandomIndex(11) + 10);
     if ($gameSwitches.value(122)) {
       interp.setupChild($dataCommonEvents[85].list, 0);
     }
@@ -12998,7 +12998,7 @@
   AGH_setSelfVariableRandomWork1SetByActionCondition = function (interp) {
     //action is a dead verbatim leftover: the line below re-reads it
     //const action = BattleManager._action;
-    interp.sVal(21, BattleManager._action._item._itemId);
+    $gameVariables.setValue(21, BattleManager._action._item._itemId);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:140|カットインコモン
@@ -13020,7 +13020,7 @@
   // (Troops.json / Torigoya_SkillCutIn.js consumers).
   AGH_runPluginCommandNightSpecialWeather = function (interp) {
     cutin_preparation(5, $gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID));
-    interp.sVal(251, valueCutInSet1);
+    $gameVariables.setValue(251, valueCutInSet1);
     const args = new Array(String(valueCutInSet1[0]));
     interp.pluginCommand("味方カットイン", args);
   };
@@ -13174,7 +13174,7 @@
   AGH_setSelfVariableEntryName = function (interp) {
     const selectedActorId = $gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID);
     const actor = $gameActors.actor(selectedActorId);
-    interp.sVal(49, actor.name());
+    $gameVariables.setValue(49, actor.name());
     const randomWork = $gameVariables.value(HELPER_VARIABLE.RANDOM_WORK_1);
     const nameWord = randomWork[0];
     $gameMessage.add(`\\nw[\\V[49]]${nameWord}`);
@@ -13291,7 +13291,7 @@
           ) {
             const itemMeta = Number(itemData.meta["ClothSwitch"]);
             const clothAllocationNumber = Number(itemData.meta["ClothAllocationNumber"]);
-            interp.sVal(value + itemMeta, clothAllocationNumber);
+            $gameVariables.setValue(value + itemMeta, clothAllocationNumber);
           }
         }
       }
@@ -13320,7 +13320,7 @@
       if (itemData.meta["subCategory"] !== clothSubCategory) continue;
       const clothSwitch = Number(itemData.meta["ClothSwitch"]);
       const clothAllocationNumber = Number(itemData.meta["ClothAllocationNumber"]);
-      interp.sVal(CURRENT_OUTFIT_VARIABLE_BASE + clothSwitch, clothAllocationNumber);
+      $gameVariables.setValue(CURRENT_OUTFIT_VARIABLE_BASE + clothSwitch, clothAllocationNumber);
     }
   };
 
@@ -13334,9 +13334,9 @@
       $dataItems[$gameVariables.value(HELPER_VARIABLE.PROCESSED_ENTRY_ID)].meta["ClothAllocationNumber"]
     );
     if ($gameVariables.value(variableId + clothSwitch) == variable19Value2) {
-      interp.sVal(variableId + clothSwitch, 0);
+      $gameVariables.setValue(variableId + clothSwitch, 0);
     } else {
-      interp.sVal(variableId + clothSwitch, variable19Value2);
+      $gameVariables.setValue(variableId + clothSwitch, variable19Value2);
     }
   };
 
@@ -14275,9 +14275,9 @@
     const itemId = $gameVariables.value(93);
     const item = $dataItems[itemId];
     if (itemId != descriptionWindowWidth) {
-      interp.sVal(21, Number(item.meta["熟練度アップスキルタイプ"]));
+      $gameVariables.setValue(21, Number(item.meta["熟練度アップスキルタイプ"]));
     }
-    interp.sVal(22, Number(item.meta["熟練度上昇値"]));
+    $gameVariables.setValue(22, Number(item.meta["熟練度上昇値"]));
     const ownedItemCount = $gameParty.numItems(value);
     const gainedStat = $gameVariables.value(HELPER_VARIABLE.RANDOM_WORK_2);
     const coloredStat = colorTaggedText(2, `${gainedStat}`);
@@ -14341,10 +14341,10 @@
     const end = 4;
     for (let i = start; i <= end; i++) {
       if ($gameVariables.value(284)[i] == 0) {
-        interp.sVal(i + 21, "[登録なし]");
+        $gameVariables.setValue(i + 21, "[登録なし]");
       } else {
-        interp.sVal(i + 21, "[" + $dataItems[$gameVariables.value(284)[i]].name + ":");
-        interp.sVal(
+        $gameVariables.setValue(i + 21, "[" + $dataItems[$gameVariables.value(284)[i]].name + ":");
+        $gameVariables.setValue(
           i + 21,
           $gameVariables.value(i + 21) + $gameParty.numItems($dataItems[$gameVariables.value(284)[i]]) + "]"
         );
@@ -14427,7 +14427,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:237|指輪ショップ処理
   AGH_setSelfVariableChoiceSwitch12 = function (interp) {
-    interp.sVal(172, 2); //会話コモン文字ピク
+    $gameVariables.setValue(172, 2); //会話コモン文字ピク
     const messageText2 = "指輪について";
     const messageText = `スロットにアタッチを装着する事で性能が上昇する。
 		一度アタッチを付けると取り外し不可。指輪本体は店売りのみで、
@@ -14650,7 +14650,7 @@
     } else {
       $dataSystem.switches[515] = "鍛冶ｼｰﾝｶｯﾄ(OFF)";
     }
-    interp.sVal(22, $dataSystem.switches[515]);
+    $gameVariables.setValue(22, $dataSystem.switches[515]);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:241|固有武器強化
@@ -14662,7 +14662,7 @@
       $dataSystem.switches[515] = "鍛冶ｼｰﾝｶｯﾄ(ON)";
       $gameSwitches.setValue(515, true);
     }
-    interp.sVal(22, $dataSystem.switches[515]);
+    $gameVariables.setValue(22, $dataSystem.switches[515]);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:241|固有武器強化
@@ -15205,7 +15205,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
   AGH_setSelfVariableChoiceSwitch12OrderSkyKnightsAppear = function (interp) {
-    interp.sVal(172, 10);
+    $gameVariables.setValue(172, 10);
     const actorName = "\\N[1]";
     const actorName2 = "\\N[5]";
     const coloredText = colorTaggedText(2, `${$dataSystem.switches[221]}`);
@@ -15266,7 +15266,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:301|[1]秩序の騎空団、参上！
   AGH_setSelfVariableChoiceSwitch12_2 = function (interp) {
-    interp.sVal(172, 18);
+    $gameVariables.setValue(172, 18);
     valueTalkSet = [0, 1]; //1で付与2で直接表示\CE[60]のみ0で解除,ｱｸﾀｰid
   };
 
@@ -15624,8 +15624,8 @@
 
   // Replaces (1x): CommonEvents.json:common-event:313|[13]昇格──格差──
   AGH_setSelfVariableEventProgressHero = function (interp) {
-    interp.sVal(530, 5); //主格キャラ
-    interp.sVal(535, 313); //挿話回想の場合アイテムID。メインは0
+    $gameVariables.setValue(530, 5); //主格キャラ
+    $gameVariables.setValue(535, 313); //挿話回想の場合アイテムID。メインは0
     if ($gameVariables.value(528) == 3) {
       valueWeatherSceneSet = 15;
     } else {
@@ -15688,7 +15688,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:313|[13]昇格──格差──
   AGH_setSelfVariableActorChoicePromotionGap = function (interp) {
-    interp.sVal(20, 0);
+    $gameVariables.setValue(20, 0);
     valueWordSet0 = "教会で「昇格」が可能になりました！";
     valueWordSetEx = 0; //補足が必要な場合
     interp.setupChild($dataCommonEvents[45].list, 0);
@@ -16755,7 +16755,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:370|素体
   AGH_setSelfVariableEventProgressHeroBaseBody = function (interp) {
-    interp.sVal(530, 1); //主格キャラ
+    $gameVariables.setValue(530, 1); //主格キャラ
     $gameVariables.setValue(HELPER_VARIABLE.DYNAMIC_EVENT_IDS, Array(21).fill(0));
     const charaSlotId = $gameVariables.value(HELPER_VARIABLE.EVENT_SUBJECT_INDEX);
     event_respawnSetA(charaSlotId, 12, 12, 1, 8);
@@ -16823,10 +16823,10 @@
     }
     valueCountSet1 = animationId;
     if (valueCountSet1 == 1000) {
-      interp.sVal(23, "汎用シーン発生");
+      $gameVariables.setValue(23, "汎用シーン発生");
       $gameSwitches.setValue(HELPER_SWITCH.CHOICE_2_ENABLED, true);
     } else {
-      interp.sVal(23, `${$dataItems[valueCountSet1].description}`);
+      $gameVariables.setValue(23, `${$dataItems[valueCountSet1].description}`);
     }
   };
 
@@ -16835,8 +16835,8 @@
     valueScenePic = "XevS006_";
     //var value2 = valueScenePic+'01';
     valueVariable163Set = 5;
-    interp.sVal(530, 1); //主格キャラ
-    interp.sVal(535, 502); //挿話回想の場合アイテムID。メインは0
+    $gameVariables.setValue(530, 1); //主格キャラ
+    $gameVariables.setValue(535, 502); //挿話回想の場合アイテムID。メインは0
     valueWeatherSceneSet = 15;
   };
 
@@ -16878,7 +16878,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:382|酔っ払いを介抱する
   AGH_setSelfVariableChoiceSwitch12CareForDrunkard = function (interp) {
-    interp.sVal(172, 13);
+    $gameVariables.setValue(172, 13);
     valueTalkSet = [640 - 128, 386, 200, false];
   };
 
@@ -16891,7 +16891,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:382|酔っ払いを介抱する
   AGH_setSelfVariableChoiceSwitch12_3 = function (interp) {
-    interp.sVal(172, 13);
+    $gameVariables.setValue(172, 13);
     valueTalkSet = [640 - 128, 386, 200, false];
     interp.setupChild($dataCommonEvents[60].list, 0);
   };
@@ -17118,7 +17118,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:444|△りーしゃ人助け
   AGH_setSelfVariableChoiceSwitch12LishaHelpingHands = function (interp) {
-    interp.sVal(172, 10); //文字ﾋﾟｸTips以外
+    $gameVariables.setValue(172, 10); //文字ﾋﾟｸTips以外
     const messageText = `彼女が感じた最も近い感情は、「落胆」や「失意」と言ったものだろう。
 		未だ歳若い、理想を胸に宿す少女には明確な理解が出来なかったのだ。
 		何れはそこに至るやも知れぬが、それはこの物語に措いてでは無い…。
@@ -17223,7 +17223,7 @@
 
   // Replaces (1x): CommonEvents.json:common-event:471|覚醒 ─Awaken 'B'─
   AGH_setSelfVariableActorChoiceAwakenB = function (interp) {
-    interp.sVal(20, 5);
+    $gameVariables.setValue(20, 5);
     const actor = $gameActors.actor($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID));
     for (let i = 401; i <= 406; i++) {
       actor.forgetSkill(i);
@@ -17332,8 +17332,8 @@
   AGH_setSelfVariableEventProgressHeroAllOutTemplate = function (interp) {
     valueScenePic = "XevS016_";
     //var value2 = valueScenePic+'01';
-    interp.sVal(530, 1); //主格キャラ
-    interp.sVal(535, 516); //挿話回想の場合アイテムID。メインは0
+    $gameVariables.setValue(530, 1); //主格キャラ
+    $gameVariables.setValue(535, 516); //挿話回想の場合アイテムID。メインは0
     valueWeatherSceneSet = 0;
   };
 
@@ -18712,7 +18712,7 @@
     $gameVariables.setValue(HELPER_VARIABLE.RANDOM_WORK_2, "＜獲得アイテム一覧＞\n");
     $gameVariables.setValue(HELPER_VARIABLE.RANDOM_WORK_3, 0);
     $gameSwitches.setValue(HELPER_SWITCH.TEMPORARY_FLAG, true);
-    interp.sVal(21, 0);
+    $gameVariables.setValue(21, 0);
     for (let i = 1; i <= 10; i++) {
       item_gacha();
     }
@@ -19057,12 +19057,12 @@
   AGH_setSelfVariableLibidoEv002 = function (interp) {
     h_exp($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID), "Xev001_99", 101, false, false, false);
     //ｱｸﾀｰID,ﾋﾟｸﾁｬ,H相手(301ﾓﾌﾞ305対象なし306アイテム),非表示,簡易,過去シーンか否か
-    interp.sVal(401, getRandomIndex(3) + 3);
+    $gameVariables.setValue(401, getRandomIndex(3) + 3);
     //var arr = [1,2,3,4,5];$gameVariables.setValue(401,arr[getRandomIndex(arr.length)]);
     //this.sVal(506,`\\V[94]は\\V[22]に情報の対価としてセクハラされた…。\n`);
     //this.sVal(506,`\\V[94]はモブにセクハラされた…。\n`);
     const variableText = "\\V[94]";
-    interp.sVal(506, `${variableText}は魔物達に凌辱された…。\n`);
+    $gameVariables.setValue(506, `${variableText}は魔物達に凌辱された…。\n`);
     if ($gameSwitches.value(122)) {
       interp.setupChild($dataCommonEvents[85].list, 0);
     }
@@ -19158,8 +19158,8 @@
   // Replaces (1x): Map007.json:event:3|EV003|page:1
   AGH_setSelfVariableActorChoiceEv003 = function (interp) {
     valueFaceSelect = 4;
-    interp.sVal(20, 1);
-    interp.sVal(276, 1);
+    $gameVariables.setValue(20, 1);
+    $gameVariables.setValue(276, 1);
     battle_bustUp(51, 500, 10, 40);
   };
 
@@ -19457,7 +19457,7 @@
     const randomWorkValue = $gameVariables
       .value(174)
       [$gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID)].split(",");
-    interp.sVal(21, randomWorkValue);
+    $gameVariables.setValue(21, randomWorkValue);
   };
 
   // Replaces (1x): Map007.json:event:5|EV005|page:1
@@ -19490,7 +19490,7 @@
 
   // Replaces (1x): Map007.json:event:7|EV007|page:1
   AGH_setSelfVariableActorChoiceEv007 = function (interp) {
-    interp.sVal(20, 1);
+    $gameVariables.setValue(20, 1);
     const actor = $gameActors.actor($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID));
     actor.gainExpSubclass(1000);
   };
@@ -19718,9 +19718,9 @@
   AGH_setSelfVariableRandomWork1Ev021 = function (interp) {
     const weaponData = $dataWeapons[315];
     if (weaponData.meta["FamilyName"]) {
-      interp.sVal(21, weaponData.meta["FamilyName"]);
+      $gameVariables.setValue(21, weaponData.meta["FamilyName"]);
     } else {
-      interp.sVal(21, "　");
+      $gameVariables.setValue(21, "　");
     }
   };
 
@@ -19736,7 +19736,7 @@
 
   // Replaces (1x): Map018.json:event:32|EV032|page:1
   AGH_setSelfVariableChoiceSwitch12Ev032 = function (interp) {
-    interp.sVal(172, 8);
+    $gameVariables.setValue(172, 8);
     valueTalkSet = [101, "Goods_Letter1", 60];
     interp.setupChild($dataCommonEvents[60].list, 0);
   };
@@ -19912,7 +19912,7 @@
     });
     const classNameIndex = characterId + $gameVariables.value(HELPER_VARIABLE.RANDOM_WORK_1);
     const className = $dataClasses[classNameIndex].name;
-    interp.sVal(22, className);
+    $gameVariables.setValue(22, className);
   };
 
   // Replaces (1x): Map100.json:event:11|EV011|page:1
@@ -19956,7 +19956,7 @@
 
   // Replaces (1x): Map200.json:event:11|EV011|page:1
   AGH_setSelfVariableChoiceSwitch12Ev011 = function (interp) {
-    interp.sVal(172, 19); //中央に一言メッセージ,何行でも良し
+    $gameVariables.setValue(172, 19); //中央に一言メッセージ,何行でも良し
     const messageText = `\\V[23]`;
     valueTalkSet = [1, 28, messageText, 100]; //0で消去 1で通常 2で時間経過  255で背景透明度
     interp.setupChild($dataCommonEvents[60].list, 0);
