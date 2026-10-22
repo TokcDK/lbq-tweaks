@@ -452,93 +452,131 @@
   };
 
   //時計表示
+  // Neutral status icon: reused whenever no navi condition is pending.
+  const NEUTRAL_STATUS_ICON = "\\I[16]";
+
+  // Icon of a navi condition: met, unmet, or nothing pending.
+  function naviStatusIconText(metVariableId, unmetVariableId, metIconIndex, unmetIconIndex) {
+    if ($gameVariables.value(metVariableId) >= 1) return `\\I[${metIconIndex}]`;
+    if ($gameVariables.value(unmetVariableId) >= 1) return `\\I[${unmetIconIndex}]`;
+    return NEUTRAL_STATUS_ICON;
+  }
+
+  // Morning / daytime / night icon.
+  function buildTimeOfDayIconText() {
+    if ($gameSwitches.value(GAME_SWITCH.NIGHT)) return "\\I[418]";
+    if ($gameSwitches.value(GAME_SWITCH.DAYTIME)) return "\\I[417]";
+    return "\\I[416]";
+  }
+
+  // H-navi icon plus, in battle, the enemy status and continue icons, or, on the map,
+  // the episode navi icon; the time of day icon closes the line in both cases.
+  function buildStatusIconText(isInBattle) {
+    let statusIconText = naviStatusIconText(
+      GAME_VARIABLE.H_NAVI_CONDITION_MET,
+      GAME_VARIABLE.H_NAVI_CONDITION_UNMET,
+      383,
+      382
+    );
+    if (isInBattle) {
+      const enemyStatusIconIndex = $gameSwitches.value(GAME_SWITCH.ENEMY_STATUS_DISPLAY)
+        ? 427
+        : 317;
+      const continueIconIndex = $gameSwitches.value(GAME_SWITCH.CONTINUE_ENABLED)
+        ? 126
+        : 16;
+      statusIconText += `\\I[${enemyStatusIconIndex}]`;
+      statusIconText += `\\I[${continueIconIndex}]`;
+    } else {
+      statusIconText += naviStatusIconText(
+        GAME_VARIABLE.EPISODE_NAVI_CONDITION_MET,
+        GAME_VARIABLE.EPISODE_NAVI_CONDITION_UNMET,
+        535,
+        625
+      );
+    }
+    return statusIconText + buildTimeOfDayIconText();
+  }
+
+  // Battle line: party stats, then one row per heroine and, unless a boss fight is
+  // imminent, the enemy state rows. Returns the text and the y of the picture top.
+  function buildBattleStatusMessage(statusIconText) {
+    let messageText =
+      `${statusIconText}:+\\V[290,3]\\I[75]:\\V[263]\n` +
+      `\\I[176]:\\V[190]/\\V[189]\\V[332]\\I[127]:${valueMaxEnemyLv}\n`;
+    const heroineStatus = buildBattleHeroineStatus($gameParty.battleMembers());
+    messageText += heroineStatus.text;
+    let pictureY = 680 - heroineStatus.rowCount * 28;
+    if ($gameSwitches.value(GAME_SWITCH.BOSS_BATTLE_IMMINENT)) {
+      return { messageText: messageText, pictureY: pictureY };
+    }
+    const enemyStatus = buildEnemyStateIconRows($gameTroop.members());
+    messageText += enemyStatus.text;
+    pictureY -= enemyStatus.rowCount * 28;
+    return { messageText: messageText, pictureY: pictureY };
+  }
+
+  // Map line: money, plus the enemy party window on battle maps.
+  function buildMapStatusMessage(statusIconText) {
+    const messageText = `${statusIconText}:\\V[56,3]`;
+    if (!$gameSwitches.value(GAME_SWITCH.BATTLE_MAP)) return messageText;
+    return (
+      messageText +
+      " [" +
+      colorTaggedText(10, "\\V[335,2]") +
+      "/" +
+      colorTaggedText(1, "\\V[334,2]") +
+      "]"
+    );
+  }
+
+  // Battle status picture: bottom right, framed, left aligned.
+  function drawBattleStatusPicture(pictureY) {
+    $gameScreen.dTextAlign = 0;
+    $gameScreen.dWindowFrame = "ON";
+    $gameScreen.showPicture(50, "", 0, 1010, pictureY, 80, 80, 250, 0);
+    /*       if($gameSwitches.value(GAME_SWITCH.BOSS_BATTLE_IMMINENT)){
+    \t\t\t\t
+                     } else {
+                       //$gameScreen.showPicture(50,"",0,10,10,80,80,250,0);
+                     }; */
+  }
+
+  // Map status picture: bottom bar plus its button, battle maps use the other pair.
+  function drawMapStatusPictures() {
+    $gameScreen.dTextAlign = 1;
+    const isBattleMap = $gameSwitches.value(GAME_SWITCH.BATTLE_MAP);
+    $gameScreen.showPicture(50, "", 0, isBattleMap ? 760 : 860, 10, 100, 100, 255, 0);
+    const pictureName = isBattleMap ? "PictureBottan49d" : "PictureBottan49";
+    $gameScreen.showPicture(49, pictureName, 0, 0, -5, 100, 100, 250, 0);
+  }
+
   time_settei = function () {
     scene_joukensettei(1);
     scene_joukensettei(2);
     const isInBattle = $gameParty.inBattle();
-    let statusIconText =
-      $gameVariables.value(GAME_VARIABLE.H_NAVI_CONDITION_MET) >= 1
-        ? "\\I[383]"
-        : $gameVariables.value(GAME_VARIABLE.H_NAVI_CONDITION_UNMET) >= 1
-          ? "\\I[382]"
-          : "\\I[16]";
+    const statusIconText = buildStatusIconText(isInBattle);
 
-    if (isInBattle) {
-      if ($gameSwitches.value(GAME_SWITCH.ENEMY_STATUS_DISPLAY)) {
-        statusIconText += "\\I[427]";
-      } else {
-        statusIconText += "\\I[317]";
-      }
-    } else {
-      if ($gameVariables.value(GAME_VARIABLE.EPISODE_NAVI_CONDITION_MET) >= 1) {
-        statusIconText += "\\I[535]";
-      } else {
-        if ($gameVariables.value(GAME_VARIABLE.EPISODE_NAVI_CONDITION_UNMET) >= 1) {
-          statusIconText += "\\I[625]";
-        } else {
-          statusIconText += "\\I[16]";
-        }
-      }
-    }
-    if (isInBattle) {
-      if ($gameSwitches.value(GAME_SWITCH.CONTINUE_ENABLED)) {
-        statusIconText += "\\I[126]";
-      } else {
-        statusIconText += "\\I[16]";
-      }
-    }
-    if ($gameSwitches.value(GAME_SWITCH.NIGHT)) {
-      statusIconText += "\\I[418]";
-    } else {
-      if ($gameSwitches.value(GAME_SWITCH.DAYTIME)) {
-        statusIconText += "\\I[417]";
-      } else {
-        statusIconText += "\\I[416]";
-      }
-    }
+    if ($gameSwitches.value(GAME_SWITCH.WORLD_MAP)) return;
+    //全体マップ以外で表示10
     let messageText = "";
     let pictureY = 680;
 
-    if (!$gameSwitches.value(GAME_SWITCH.WORLD_MAP)) {
-      //全体マップ以外で表示10
-      if (isInBattle) {
-        messageText = `${statusIconText}:+\\V[290,3]\\I[75]:\\V[263]\n\\I[176]:\\V[190]/\\V[189]\\V[332]\\I[127]:${valueMaxEnemyLv}\n`;
-        const battleMembers2 = $gameParty.battleMembers();
-        const heroineStatus = buildBattleHeroineStatus(battleMembers2);
-        messageText += heroineStatus.text;
-        pictureY -= heroineStatus.rowCount * 28;
-        if (!$gameSwitches.value(GAME_SWITCH.BOSS_BATTLE_IMMINENT)) {
-          const enemyStatus = buildEnemyStateIconRows($gameTroop.members());
-          messageText += enemyStatus.text;
-          pictureY -= enemyStatus.rowCount * 28;
-        }
-      } else {
-        messageText = `${statusIconText}:\\V[56,3]`;
-        if (!isInBattle && $gameSwitches.value(GAME_SWITCH.BATTLE_MAP)) {
-          messageText += " [\\C[10]\\V[335,2]\\C[0]/\\C[1]\\V[334,2]\\C[0]]";
-        }
-      }
-      $gameScreen.setDTextPicture(messageText, 25);
-      if ($gameSwitches.value(GAME_SWITCH.BATTLE_MAP) && !isInBattle) {
-        $gameScreen.dTextRealTime = "ON";
-      }
-      if (isInBattle) {
-        $gameScreen.dTextAlign = 0;
-        $gameScreen.dWindowFrame = "ON";
-        $gameScreen.showPicture(50, "", 0, 1010, pictureY, 80, 80, 250, 0);
-        /*       if($gameSwitches.value(GAME_SWITCH.BOSS_BATTLE_IMMINENT)){
-                       
-                     } else {
-                       //$gameScreen.showPicture(50,"",0,10,10,80,80,250,0);
-                     }; */
-      } else {
-        $gameScreen.dTextAlign = 1;
-        const isBattleMap = $gameSwitches.value(GAME_SWITCH.BATTLE_MAP);
-        const picId = isBattleMap ? 760 : 860;
-        $gameScreen.showPicture(50, "", 0, picId, 10, 100, 100, 255, 0);
-        const picName = isBattleMap ? "PictureBottan49d" : "PictureBottan49";
-        $gameScreen.showPicture(49, picName, 0, 0, -5, 100, 100, 250, 0);
-      }
+    if (isInBattle) {
+      const battleStatus = buildBattleStatusMessage(statusIconText);
+      messageText = battleStatus.messageText;
+      pictureY = battleStatus.pictureY;
+    } else {
+      messageText = buildMapStatusMessage(statusIconText);
+    }
+    $gameScreen.setDTextPicture(messageText, 25);
+    if ($gameSwitches.value(GAME_SWITCH.BATTLE_MAP) && !isInBattle) {
+      $gameScreen.dTextRealTime = "ON";
+    }
+    if (isInBattle) {
+      drawBattleStatusPicture(pictureY);
+    } else {
+      drawMapStatusPictures();
     }
   };
 
@@ -685,6 +723,61 @@
   };
 
   //主人公がパーソナルスキルを道具で習得
+  // Coloured actor and skill labels of the personal skill messages.
+  function buildPersonalSkillLabels(actor, skillId) {
+    return {
+      actorName: colorTaggedText(16, actor.name()),
+      skillName: colorTaggedText(2, `\x1bSIN[${skillId}]`)
+    };
+  }
+
+  // "Rank:n /熟練度 used (max)" line shown after a mastery gain.
+  function showSkillMasteryRank(actor, skillId) {
+    const skillMasteryLevel = actor.skillMasteryLevel(skillId);
+    const skillMasteryUses = actor.skillMasteryUses(skillId);
+    const skillMasteryUsageMax = actor.skillMasteryUsageMax(skillId);
+    // One colored "used (max)" value instead of a tag split over two strings.
+    const skillMasteryCount = colorTaggedText(
+      2,
+      `${skillMasteryUses}(${skillMasteryUsageMax})`
+    );
+    TickerManager.show(`Rank:${skillMasteryLevel} /熟練度${skillMasteryCount}`);
+  }
+
+  // Mastery gain of a skill the protagonist already knows.
+  function raiseSkillMastery(actor, itemId, skillId, skillLabels) {
+    const maxMasteryLevel = Number($dataSkills[skillId].meta["Max Mastery Level"]);
+    if (actor.skillMasteryLevel(skillId) >= maxMasteryLevel) {
+      TickerManager.show(
+        `${skillLabels.actorName}の${skillLabels.skillName}は最高ランクに到達しています…。`
+      );
+      return;
+    }
+    const skillRankNum = 10 * $gameVariables.value(GAME_VARIABLE.SKILL_MASTERY_GAIN);
+    actor.gainSkillMasteryUses(skillId, skillRankNum); //変更熟練度
+    const skillRank = colorTaggedText(3, `${skillRankNum}`);
+    TickerManager.show(
+      `${skillLabels.actorName}の${skillLabels.skillName}熟練度を${skillRank}獲得した！`
+    );
+    showSkillMasteryRank(actor, skillId);
+    $gameParty.loseItem($dataItems[itemId], 1);
+  }
+
+  // First learn of a personal skill: skill, mastery 1, fanfare and message.
+  function learnPersonalSkill(actor, itemId, skillId) {
+    actor.learnSkill(skillId);
+    actor.setSkillMasteryLevel(skillId, 1);
+    AudioManager.playMe({
+      name: "21_SkillLearn",
+      volume: 60,
+      pitch: 120,
+      pan: 0
+    });
+    const skillLabels = buildPersonalSkillLabels(actor, skillId);
+    TickerManager.show(`${skillLabels.actorName}は${skillLabels.skillName}を習得した！`);
+    $gameParty.loseItem($dataItems[itemId], 1);
+  }
+
   actor_personalskilllearn = function (
     sourceActor,
     targetActor,
@@ -695,59 +788,24 @@
     const actor = $gameActors.actor(
       $gameVariables.value(GAME_VARIABLE.TRUE_PROTAGONIST_ACTOR_ID)
     );
-    if (targetActor.actorId() == sourceActor.actorId()) {
-      if (actor.isLearnedSkill(skillId)) {
-        const actorName = colorTaggedText(16, actor.name());
-        const skillName = colorTaggedText(2, `\x1bSIN[${skillId}]`);
-        switch (numericCaseValue(itemOrSkillTypeId)) {
-          case 2:
-            {
-              TickerManager.show(
-                `${actorName}は既に${skillName}を習得済みのため効果は無かった。`
-              );
-            }
-            break;
-          case 1:
-            {
-              if (
-                actor.skillMasteryLevel(skillId) >=
-                Number($dataSkills[skillId].meta["Max Mastery Level"])
-              ) {
-                TickerManager.show(
-                  `${actorName}の${skillName}は最高ランクに到達しています…。`
-                );
-              } else {
-                const skillRankNum = 10 * $gameVariables.value(GAME_VARIABLE.SKILL_MASTERY_GAIN);
-                actor.gainSkillMasteryUses(skillId, skillRankNum); //変更熟練度
-                const skillRank = colorTaggedText(3, `${skillRankNum}`);
-                TickerManager.show(
-                  `${actorName}の${skillName}熟練度を${skillRank}獲得した！`
-                );
-                const skillMasteryLevel = actor.skillMasteryLevel(skillId);
-                const skillMasteryUses = actor.skillMasteryUses(skillId);
-                const skillMasteryUsageMax = actor.skillMasteryUsageMax(skillId);
-                // One colored "used (max)" value instead of a tag split over two strings.
-                const skillMasteryCount = colorTaggedText(2,`${skillMasteryUses}(${skillMasteryUsageMax})`);
-                TickerManager.show(`Rank:${skillMasteryLevel} /熟練度${skillMasteryCount}`);
-                $gameParty.loseItem($dataItems[itemId], 1);
-              }
-            }
-            break;
-        }
-      } else {
-        actor.learnSkill(skillId);
-        actor.setSkillMasteryLevel(skillId, 1);
-        AudioManager.playMe({
-          name: "21_SkillLearn",
-          volume: 60,
-          pitch: 120,
-          pan: 0
-        });
-        const actorName = colorTaggedText(16, actor.name());
-        const skillName = colorTaggedText(2, `\x1bSIN[${skillId}]`);
-        TickerManager.show(`${actorName}は${skillName}を習得した！`);
-        $gameParty.loseItem($dataItems[itemId], 1);
-      }
+    if (targetActor.actorId() != sourceActor.actorId()) return;
+
+    if (!actor.isLearnedSkill(skillId)) {
+      learnPersonalSkill(actor, itemId, skillId);
+      return;
+    }
+    const skillLabels = buildPersonalSkillLabels(actor, skillId);
+    switch (numericCaseValue(itemOrSkillTypeId)) {
+      // Skill item of an already known skill has no effect.
+      case 2:
+        TickerManager.show(
+          `${skillLabels.actorName}は既に${skillLabels.skillName}を習得済みのため効果は無かった。`
+        );
+        break;
+      // Skill book: raises the mastery of the skill.
+      case 1:
+        raiseSkillMastery(actor, itemId, skillId, skillLabels);
+        break;
     }
   };
 
@@ -2021,106 +2079,112 @@
   }
 
   //図鑑のテキスト代入ボス分$gameVariables.value(305)[id]
+  // Icon + name label of a database skill, as used by the glossary lines.
+  function glossarySkillLabel(skill) {
+    return `\x1bI[${skill.iconIndex}]${skill.name}`;
+  }
+
+  // Drops the "[戦闘中1回]" marker of a skill description; the glossary hides it.
+  function stripOncePerBattleMarker(description) {
+    const oncePerBattleText = "[" + colorTaggedText(2, "戦闘中1回") + "]";
+    return description.replace(oncePerBattleText, "");
+  }
+
+  // Name, level and defeat count of a defeated boss.
+  function appendBossHeaderLines(glossaryText, itemData, bossName, defeatCount) {
+    const bossLevel = Number(itemData.meta["BossLV"]);
+    const bossNameLabel = colorTaggedText(16, "名前：");
+    glossaryText.push(`${bossNameLabel}${bossName}\u3000ＬＶ：${bossLevel}\u3000`);
+    const defeatCountLabel = colorTaggedText(16, "討伐回数：");
+    const defeatCountText = colorTaggedText(10, `${defeatCount}`);
+    glossaryText.push(`${defeatCountLabel}${defeatCountText} \n`);
+  }
+
+  // Normal attack skill plus the additional attack skills, then a line break.
+  function appendBossAttackLines(glossaryText, itemData, bossInfo) {
+    const normalAttackSkill = $dataSkills[Number(bossInfo[4])];
+    glossaryText.push(
+      colorTaggedText(16, "通常攻撃") + glossarySkillLabel(normalAttackSkill) + " "
+    );
+    const additionalAttackMeta = itemData.meta["BossAddAttack"];
+    if (additionalAttackMeta) {
+      for (const additionalAttack of additionalAttackMeta.split(",")) {
+        const attackSkill = $dataSkills[Number(additionalAttack)];
+        glossaryText.push(`\\I[${attackSkill.iconIndex}]${attackSkill.name} `);
+      }
+    }
+    glossaryText.push("\n");
+  }
+
+  // Ability skill and its description.
+  function appendBossAbilityLines(glossaryText, bossInfo) {
+    const abilitySkill = $dataSkills[Number(bossInfo[5])];
+    glossaryText.push(
+      colorTaggedText(16, "アビリティ") + glossarySkillLabel(abilitySkill) + "\n"
+    );
+    glossaryText.push(stripOncePerBattleMarker(abilitySkill.description) + "\n");
+  }
+
+  // Additional skills of the boss, one name per line.
+  function appendBossAdditionalSkillLines(glossaryText, itemData) {
+    const additionalSkillMeta = itemData.meta["BossAddSkill"];
+    if (!additionalSkillMeta) return;
+    for (const additionalSkill of additionalSkillMeta.split(",")) {
+      const skill = $dataSkills[Number(additionalSkill)];
+      glossaryText.push(`\\I[${skill.iconIndex}]${skill.name}\n`);
+    }
+  }
+
+  // Ultimate skill and its description.
+  function appendBossUltimateLines(glossaryText, bossInfo) {
+    const ultimateSkill = $dataSkills[Number(bossInfo[6])];
+    glossaryText.push(
+      colorTaggedText(16, "奥義") + glossarySkillLabel(ultimateSkill) + "\n"
+    );
+    glossaryText.push(stripOncePerBattleMarker(ultimateSkill.description) + "\n");
+  }
+
+  // State descriptions; only the first one is printed without the zero / NaN guard.
+  function appendBossStateLines(glossaryText, itemData) {
+    const stateInformationMeta = itemData.meta["BossStateInformation"];
+    if (!stateInformationMeta) return;
+    glossaryText.push("\n");
+    const stateInfos = stateInformationMeta.split(",");
+
+    const primaryStateId = Number(stateInfos[0]);
+    if (!isNaN(primaryStateId)) {
+      glossaryText.push(`${$dataStates[primaryStateId].description}\n`);
+    }
+
+    for (let stateIndex = 1; stateIndex < stateInfos.length; stateIndex++) {
+      if (!stateInfos[stateIndex]) continue;
+      const stateId = Number(stateInfos[stateIndex]);
+      if (isNaN(stateId) || stateId === 0) continue;
+      glossaryText.push(`${$dataStates[stateId].description}\n`);
+    }
+  }
+
   scene_Glossarytext2 = function (itemId, variableId) {
     const itemData = $dataItems[itemId];
-    const bossInfoHeading = colorTaggedText(16, "＜ボス情報＞");
-    const glossaryText = [bossInfoHeading + "\n"];
+    const glossaryText = [colorTaggedText(16, "＜ボス情報＞") + "\n"];
+    const bossEnemyMeta = itemData.meta["BossEnemy"];
+    const bossDefeatCount =
+      $gameVariables.value(GAME_VARIABLE.DUNGEON_BOSS_DEFEAT_COUNTS)[itemId];
 
-    if (itemData.meta["BossEnemy"]) {
-      const bossInfo = itemData.meta["BossEnemy"].split(",");
-      const bossName = bossInfo[1];
-      const bossDefeated = $gameVariables.value(GAME_VARIABLE.DUNGEON_BOSS_DEFEAT_COUNTS)[itemId] >= 1;
-
-      if (bossDefeated) {
-        const bossLevel = Number(itemData.meta["BossLV"]);
-        const defeatedCount = $gameVariables.value(GAME_VARIABLE.DUNGEON_BOSS_DEFEAT_COUNTS)[itemId];
-
-        const bossNameLabel = colorTaggedText(16, "名前：");
-        glossaryText.push(`${bossNameLabel}${bossName}\u3000ＬＶ：${bossLevel}\u3000`);
-        const defeatCountLabel = colorTaggedText(16, "討伐回数：");
-        const defeatCountText = colorTaggedText(10, `${defeatedCount}`);
-        glossaryText.push(`${defeatCountLabel}${defeatCountText} \n`);
-
-        const normalAttackId = Number(bossInfo[4]);
-        const normalAttackSkill = $dataSkills[normalAttackId];
-        const normalAttackLabel = colorTaggedText(16, "通常攻撃");
-        const normalAttackName = `\x1bI[${normalAttackSkill.iconIndex}]${normalAttackSkill.name}`;
-        glossaryText.push(`${normalAttackLabel}${normalAttackName} `);
-
-        if (itemData.meta["BossAddAttack"]) {
-          const additionalAttacks = itemData.meta["BossAddAttack"].split(",");
-
-          for (let i = 0; i < additionalAttacks.length; i++) {
-            const skillId = Number(additionalAttacks[i]);
-            const attackSkill = $dataSkills[skillId];
-            glossaryText.push(
-              `\\I[${attackSkill.iconIndex}]${attackSkill.name} `
-            );
-          }
-        }
-
-        glossaryText.push("\n");
-
-        const abilityId = Number(bossInfo[5]);
-        const abilitySkill = $dataSkills[abilityId];
-        const abilityLabel = colorTaggedText(16, "アビリティ");
-        const abilitySkillName = `\x1bI[${abilitySkill.iconIndex}]${abilitySkill.name}`;
-        glossaryText.push(`${abilityLabel}${abilitySkillName}\n`);
-
-        let abilityDescription = abilitySkill.description;
-        const onceperBattleTextToRemove = "[" + colorTaggedText(2, "戦闘中1回") + "]";
-        abilityDescription = abilityDescription.replace(
-          onceperBattleTextToRemove,
-          ""
-        );
-        glossaryText.push(`${abilityDescription}\n`);
-
-        if (itemData.meta["BossAddSkill"]) {
-          const additionalSkills = itemData.meta["BossAddSkill"].split(",");
-
-          for (let i = 0; i < additionalSkills.length; i++) {
-            const skillId = Number(additionalSkills[i]);
-            const skill = $dataSkills[skillId];
-            glossaryText.push(`\\I[${skill.iconIndex}]${skill.name}\n`);
-          }
-        }
-
-        const ultimateId = Number(bossInfo[6]);
-        const ultimateSkill = $dataSkills[ultimateId];
-        const ultimateLabel = colorTaggedText(16, "奥義");
-        const ultimateSkillName = `\x1bI[${ultimateSkill.iconIndex}]${ultimateSkill.name}`;
-        glossaryText.push(`${ultimateLabel}${ultimateSkillName}\n`);
-
-        let ultimateDescription = ultimateSkill.description;
-        ultimateDescription = ultimateDescription.replace(
-          "[\\C[2]戦闘中1回\\C[0]]",
-          ""
-        );
-        glossaryText.push(`${ultimateDescription}\n`);
-
-        if (itemData.meta["BossStateInformation"]) {
-          glossaryText.push("\n");
-          const stateInfos = itemData.meta["BossStateInformation"].split(",");
-
-          const primaryStateId = Number(stateInfos[0]);
-          if (!isNaN(primaryStateId)) {
-            glossaryText.push(`${$dataStates[primaryStateId].description}\n`);
-          }
-
-          for (let i = 1; i < stateInfos.length; i++) {
-            if (stateInfos[i]) {
-              const stateId = Number(stateInfos[i]);
-              if (!isNaN(stateId) && stateId !== 0) {
-                glossaryText.push(`${$dataStates[stateId].description}\n`);
-              }
-            }
-          }
-        }
-      } else {
-        glossaryText.push("情報なし。討伐後に情報更新。");
-      }
-    } else {
+    if (!bossEnemyMeta) {
       glossaryText.push("※ ボス不在。");
+    } else if (!(bossDefeatCount >= 1)) {
+      glossaryText.push("情報なし。討伐後に情報更新。");
+    } else {
+      const bossInfo = bossEnemyMeta.split(",");
+      const bossName = bossInfo[1];
+
+      appendBossHeaderLines(glossaryText, itemData, bossName, bossDefeatCount);
+      appendBossAttackLines(glossaryText, itemData, bossInfo);
+      appendBossAbilityLines(glossaryText, bossInfo);
+      appendBossAdditionalSkillLines(glossaryText, itemData);
+      appendBossUltimateLines(glossaryText, bossInfo);
+      appendBossStateLines(glossaryText, itemData);
     }
 
     $gameVariables.value(variableId)[itemId] = glossaryText.join("");
@@ -2376,33 +2440,51 @@
     return mapMeta;
   };
 
+  // Switches and variables filled from the map notes by setMapTypeSwitches().
+  const MAP_TYPE_SWITCH_IDS = {
+    INDOOR_FLOOR: 203, // outInFloorType >= 1
+    OUTDOOR_FLOOR: 204, // outInFloorType == 0
+    HOME_TYPES: { 1: 206, 2: 231 },
+    ANIMAL: 208 // animalType >= 1
+  };
+  const MAP_TYPE_VARIABLE_IDS = {
+    FLOOR_VALUE: 232, // outInFloorValue
+    NPC_TYPE: 241, // npcType
+    MAP_SIZE: 238 // (width + height) / 20
+  };
+
   setMapTypeSwitches = function (mapMeta, gameSwitches, gameVariables) {
     // Set indoor/outdoor switch
     if (mapMeta.outInFloorType >= 1) {
-      gameSwitches.setValue(203, true);
+      gameSwitches.setValue(MAP_TYPE_SWITCH_IDS.INDOOR_FLOOR, true);
     } else {
-      gameSwitches.setValue(204, true);
+      gameSwitches.setValue(MAP_TYPE_SWITCH_IDS.OUTDOOR_FLOOR, true);
     }
 
     // Set floor value if available
     if (mapMeta.outInFloorValue >= 1) {
-      gameVariables.setValue(232, mapMeta.outInFloorValue);
+      gameVariables.setValue(MAP_TYPE_VARIABLE_IDS.FLOOR_VALUE, mapMeta.outInFloorValue);
     }
 
     // Set NPC type if available
     if (mapMeta.npcType >= 1) {
-      gameVariables.setValue(241, mapMeta.npcType);
+      gameVariables.setValue(MAP_TYPE_VARIABLE_IDS.NPC_TYPE, mapMeta.npcType);
     }
 
     // Set home switches if applicable
-    if (mapMeta.homeType === 1) gameSwitches.setValue(206, true);
-    if (mapMeta.homeType === 2) gameSwitches.setValue(231, true);
+    const homeTypeSwitchId = MAP_TYPE_SWITCH_IDS.HOME_TYPES[mapMeta.homeType];
+    if (homeTypeSwitchId) gameSwitches.setValue(homeTypeSwitchId, true);
 
     // Calculate map size variable
-    gameVariables.setValue(238, (mapMeta.mapHeight + mapMeta.mapWidth) / 20);
+    gameVariables.setValue(
+      MAP_TYPE_VARIABLE_IDS.MAP_SIZE,
+      (mapMeta.mapHeight + mapMeta.mapWidth) / 20
+    );
 
     // Set animal switch if applicable
-    if (mapMeta.animalType >= 1) gameSwitches.setValue(208, true);
+    if (mapMeta.animalType >= 1) {
+      gameSwitches.setValue(MAP_TYPE_SWITCH_IDS.ANIMAL, true);
+    }
   };
 
   setMapLocationInfo = function (gameSwitches, gameVariables) {
@@ -2481,40 +2563,65 @@
     });
   };
 
+  // Map note driven variables written by setupMapEnemyVariables().
+  const MAP_NOTE_VARIABLE_IDS = {
+    WATER_ITEM: 266, // getWaterItem
+    WEATHER: 256, // weatherSetP
+    WEATHER_NIGHT: 251, // weatherSetPN, the map note wins over the map meta
+    ENEMY_LEVEL: 270 // EnemyLV, first field
+  };
+
+  // Positive ids of a comma separated note list.
+  function collectPositiveNoteIds(noteValue) {
+    const noteIds = [];
+    for (const noteField of noteValue.split(",")) {
+      const noteId = Number(noteField);
+      if (noteId >= 1) noteIds.push(noteId);
+    }
+    return noteIds;
+  }
+
+  // "<EnemySpecialState>" note of the map, as state ids.
+  function setupMapSpecialStates(gameVariables, mapInfoMeta) {
+    const enemySpecialStateMeta = mapInfoMeta["EnemySpecialState"];
+    gameVariables.setValue(
+      GAME_VARIABLE.MAP_ENEMY_SPECIAL_STATES,
+      enemySpecialStateMeta ? collectPositiveNoteIds(enemySpecialStateMeta) : []
+    );
+  }
+
+  // Night weather of the map: the map note wins over the map meta.
+  function resolveMapWeatherNightId(mapInfoMeta) {
+    const noteValue = mapInfoMeta["weatherSetPN"] || $dataMap.meta["weatherSetPN"];
+    if (!noteValue) return undefined;
+    return Number(noteValue);
+  }
+
   setupMapEnemyVariables = function (mapInfo, gameVariables) {
     // Cache map meta data
     const mapInfoMeta = mapInfo.meta;
 
     // Initialize special state array
-    gameVariables.setValue(GAME_VARIABLE.MAP_ENEMY_SPECIAL_STATES, []);
-    const specialStates = gameVariables.value(
-      GAME_VARIABLE.MAP_ENEMY_SPECIAL_STATES
-    );
-
-    // Add enemy special states if available
-    if (mapInfoMeta["EnemySpecialState"]) {
-      const stateIds = mapInfoMeta["EnemySpecialState"].split(",").map(Number);
-      stateIds.forEach((stateId) => {
-        if (stateId >= 1) {
-          specialStates.push(stateId);
-        }
-      });
-    }
+    setupMapSpecialStates(gameVariables, mapInfoMeta);
 
     // Set various map-specific variables
     if (mapInfoMeta["getWaterItem"]) {
-      gameVariables.setValue(266, Number(mapInfoMeta["getWaterItem"]));
+      gameVariables.setValue(
+        MAP_NOTE_VARIABLE_IDS.WATER_ITEM,
+        Number(mapInfoMeta["getWaterItem"])
+      );
     }
 
     if (mapInfoMeta["weatherSetP"]) {
-      gameVariables.setValue(256, Number(mapInfoMeta["weatherSetP"]));
+      gameVariables.setValue(
+        MAP_NOTE_VARIABLE_IDS.WEATHER,
+        Number(mapInfoMeta["weatherSetP"])
+      );
     }
 
-    const weatherKey = "weatherSetPN";
-    if (mapInfoMeta[weatherKey]) {
-      gameVariables.setValue(251, Number(mapInfoMeta[weatherKey]));
-    } else if ($dataMap.meta[weatherKey]) {
-      gameVariables.setValue(251, Number($dataMap.meta[weatherKey]));
+    const weatherNightId = resolveMapWeatherNightId(mapInfoMeta);
+    if (weatherNightId !== undefined) {
+      gameVariables.setValue(MAP_NOTE_VARIABLE_IDS.WEATHER_NIGHT, weatherNightId);
     }
 
     applyNumericMetadataVariables(mapInfoMeta, gameVariables, [
@@ -2527,18 +2634,18 @@
     ]);
     // Set enemy level variable
     if (mapInfoMeta["EnemyLV"]) {
-      gameVariables.setValue(270, Number(mapInfoMeta["EnemyLV"].split(",")[0]));
+      gameVariables.setValue(
+        MAP_NOTE_VARIABLE_IDS.ENEMY_LEVEL,
+        Number(mapInfoMeta["EnemyLV"].split(",")[0])
+      );
     }
 
     // Set switches from OnSwitch metadata
-    const gameSwitches = $gameSwitches;
-    if (mapInfoMeta["OnSwitch"]) {
-      const switchIds = mapInfoMeta["OnSwitch"].split(",").map(Number);
-      switchIds.forEach((switchId) => {
-        if (switchId >= 1) {
-          gameSwitches.setValue(switchId, true);
-        }
-      });
+    const onSwitchMeta = mapInfoMeta["OnSwitch"];
+    if (onSwitchMeta) {
+      for (const switchId of collectPositiveNoteIds(onSwitchMeta)) {
+        $gameSwitches.setValue(switchId, true);
+      }
     }
   };
 
@@ -2637,6 +2744,76 @@
     applyMapMetadataParallax(dataMap.meta, gameVariables, gameMap);
   };
 
+  // "name,volume,pitch,pan" audio note -> [name, volume, pitch, pan].
+  function parseAudioNote(audioNote) {
+    const [audioName, audioVolume, audioPitch, audioPan] = audioNote.split(",");
+    return [audioName, Number(audioVolume), Number(audioPitch), Number(audioPan)];
+  }
+
+  // Map BGS of the current map; it keeps playing while the same track is requested.
+  function setupMapBgs(mapInfo, dataMap, gameVariables, gameSwitches) {
+    const bgsKey = gameSwitches.value(GAME_SWITCH.NIGHT) ? "BGSN" : "BGS";
+    const bgsSource = determineAudioMapInfoSource(
+      mapInfo,
+      dataMap,
+      gameVariables,
+      bgsKey
+    );
+
+    if (!bgsSource.meta[bgsKey]) {
+      AudioManager.fadeOutBgs(1);
+      valueMapBGS = [0, 0, 0, 0];
+      return;
+    }
+
+    const bgsValues = parseAudioNote(bgsSource.meta[bgsKey]);
+    if (bgsValues[0] === valueMapBGS[0]) return;
+
+    valueMapBGS = bgsValues;
+    AudioManager.playBgs({
+      name: valueMapBGS[0],
+      volume: valueMapBGS[1],
+      pitch: valueMapBGS[2],
+      pan: valueMapBGS[3]
+    });
+  }
+
+  // Map BGM of the current map; "NoMusic" and the music mute switch both fade out.
+  function setupMapBgm(mapInfo, dataMap, gameVariables, gameSwitches) {
+    const bgmKey = gameSwitches.value(GAME_SWITCH.NIGHT) ? "BGMN" : "BGM";
+    const bgmSource = determineAudioMapInfoSource(
+      mapInfo,
+      dataMap,
+      gameVariables,
+      bgmKey
+    );
+
+    if (!bgmSource.meta[bgmKey]) {
+      AudioManager.stopBgm();
+      return;
+    }
+
+    valueMapBGM = parseAudioNote(bgmSource.meta[bgmKey]);
+    parallaxesSound_switchChange(2);
+
+    // While an event owns the progress the map music is faded, not switched.
+    if (gameSwitches.value(GAME_SWITCH.EVENT_PROGRESS_ACTIVE)) {
+      AudioManager.fadeOutBgm(3);
+      return;
+    }
+    if (valueMapBGM[0] === "NoMusic") {
+      AudioManager.fadeOutBgm(10);
+      return;
+    }
+    if (AudioManager.saveBgm().name === valueMapBGM[0]) return;
+    AudioManager.playBgm({
+      name: valueMapBGM[0],
+      volume: valueMapBGM[1],
+      pitch: valueMapBGM[2],
+      pan: valueMapBGM[3]
+    });
+  }
+
   setupMapBackgroundAudio = function (
     mapInfo,
     dataMap,
@@ -2644,76 +2821,10 @@
     gameSwitches
   ) {
     // Set up BGS (background sound)
-    const bgsKey = gameSwitches.value(GAME_SWITCH.NIGHT) ? "BGSN" : "BGS";
-    let currentMapInfo = determineAudioMapInfoSource(
-      mapInfo,
-      dataMap,
-      gameVariables,
-      bgsKey
-    );
-
-    if (currentMapInfo.meta[bgsKey]) {
-      const [bgsName, bgsVolume, bgsPitch, bgsPan] =
-        currentMapInfo.meta[bgsKey].split(",");
-
-      if (bgsName !== valueMapBGS[0]) {
-        valueMapBGS = [
-          bgsName,
-          Number(bgsVolume),
-          Number(bgsPitch),
-          Number(bgsPan)
-        ];
-
-        AudioManager.playBgs({
-          name: valueMapBGS[0],
-          volume: valueMapBGS[1],
-          pitch: valueMapBGS[2],
-          pan: valueMapBGS[3]
-        });
-      }
-    } else {
-      AudioManager.fadeOutBgs(1);
-      valueMapBGS = [0, 0, 0, 0];
-    }
+    setupMapBgs(mapInfo, dataMap, gameVariables, gameSwitches);
 
     // Set up BGM (background music)
-    const bgmKey = gameSwitches.value(GAME_SWITCH.NIGHT) ? "BGMN" : "BGM";
-    currentMapInfo = determineAudioMapInfoSource(
-      mapInfo,
-      dataMap,
-      gameVariables,
-      bgmKey
-    );
-
-    if (currentMapInfo.meta[bgmKey]) {
-      const [bgmName, bgmVolume, bgmPitch, bgmPan] =
-        currentMapInfo.meta[bgmKey].split(",");
-      valueMapBGM = [
-        bgmName,
-        Number(bgmVolume),
-        Number(bgmPitch),
-        Number(bgmPan)
-      ];
-
-      parallaxesSound_switchChange(2);
-
-      if (!gameSwitches.value(124)) {
-        if (bgmName === "NoMusic") {
-          AudioManager.fadeOutBgm(10);
-        } else if (AudioManager.saveBgm().name !== bgmName) {
-          AudioManager.playBgm({
-            name: valueMapBGM[0],
-            volume: valueMapBGM[1],
-            pitch: valueMapBGM[2],
-            pan: valueMapBGM[3]
-          });
-        }
-      } else {
-        AudioManager.fadeOutBgm(3);
-      }
-    } else {
-      AudioManager.stopBgm();
-    }
+    setupMapBgm(mapInfo, dataMap, gameVariables, gameSwitches);
   };
 
   determineAudioMapInfoSource = function (
@@ -2847,87 +2958,107 @@
   };
 
   //簡易戦闘報酬設定スクリプト
+  // Spawn pool entries of a map: "PopEnemy1".."PopEnemy10", first field is the enemy id.
+  const MAP_POP_ENEMY_NOTE_COUNT = 10;
+  // "Passive State" is shared with the enemy, "885" is the levelled state group.
+  const SCALED_ENEMY_STATE_ID = 885;
+  const ENEMY_STATE_LEVEL_BREAKPOINTS = [30, 60];
+
+  // Random enemy id of the map spawn pool.
+  function pickRandomPopEnemyId(mapInfo) {
+    const popEnemyIds = [];
+    for (let popIndex = 1; popIndex <= MAP_POP_ENEMY_NOTE_COUNT; popIndex++) {
+      const popEnemyMeta = mapInfo.meta["PopEnemy" + popIndex];
+      if (popEnemyMeta) popEnemyIds.push(Number(popEnemyMeta.split(",")[0]));
+    }
+    return popEnemyIds[getRandomIndex(popEnemyIds.length)];
+  }
+
+  // "<Passive State>" note of the picked enemy, as state ids.
+  function collectPassiveStateIds(enemyData) {
+    const passiveStateIds = [];
+    const passiveStateMeta = enemyData.meta["Passive State"];
+    if (!passiveStateMeta) return passiveStateIds;
+
+    for (const stateId of passiveStateMeta.split(",")) {
+      passiveStateIds.push(Number(stateId));
+    }
+    return passiveStateIds;
+  }
+
+  // States 885+ are levelled: the roll range widens with the enemy level.
+  function resolveScaledEnemyStateId(stateId, enemyLevel) {
+    if (stateId != SCALED_ENEMY_STATE_ID) return stateId;
+
+    let rollRange = 11;
+    if (enemyLevel >= ENEMY_STATE_LEVEL_BREAKPOINTS[0] && enemyLevel <= ENEMY_STATE_LEVEL_BREAKPOINTS[1]) {
+      rollRange = 21;
+    } else if (enemyLevel >= ENEMY_STATE_LEVEL_BREAKPOINTS[1]) {
+      rollRange = 31;
+    }
+    return getRandomIndex(rollRange) + SCALED_ENEMY_STATE_ID;
+  }
+
+  // Preset states 1 and 2 of the map: the "enemy preset state" records.
+  function applyPresetStates(actor, enemyPresetStates) {
+    if (!Array.isArray(enemyPresetStates)) return;
+    for (const presetIndex of [1, 2]) {
+      const presetStateIds = enemyPresetStates[presetIndex] || [];
+      for (let stateIndex = 0; stateIndex < presetStateIds.length; stateIndex++) {
+        if (!(presetStateIds[stateIndex] >= 1)) continue;
+        actor.addState(presetStateIds[stateIndex]);
+      }
+    }
+  }
+
+  // Special states of the map, with the levelled group resolved per entry.
+  function applyMapEnemySpecialStates(actor, enemyLevel) {
+    const mapEnemySpecialStates = $gameVariables.value(
+      GAME_VARIABLE.MAP_ENEMY_SPECIAL_STATES
+    );
+    if (!mapEnemySpecialStates) return;
+    for (let stateIndex = 0; stateIndex < mapEnemySpecialStates.length; stateIndex++) {
+      actor.addState(
+        resolveScaledEnemyStateId(mapEnemySpecialStates[stateIndex], enemyLevel)
+      );
+    }
+  }
+
+  // "<EnemyElement>" note: one random element state of the map.
+  function applyRandomEnemyElementState(actor, mapInfo) {
+    const enemyElementMeta = mapInfo.meta["EnemyElement"];
+    if (!enemyElementMeta) return;
+    const enemyElementValues = enemyElementMeta.split(",");
+    actor.addState(
+      Number(enemyElementValues[getRandomIndex(enemyElementValues.length)])
+    );
+  }
+
   actor1_setup1 = function (mapInfo, enemyLevel) {
     const selectedActor = $gameActors.actor(GAME_VARIABLE.SELECTED_ACTOR_ID);
     if (!selectedActor) return;
     selectedActor.addState(610);
     if (!mapInfo || !mapInfo.meta) return;
-    let stateIdValues = [];
-    for (let j = 1; j <= 10; j++) {
-      if (mapInfo.meta["PopEnemy" + j]) {
-        stateIdValues.push(Number(mapInfo.meta["PopEnemy" + j].split(",")[0]));
-      }
-    }
-    let enemyId = stateIdValues[getRandomIndex(stateIdValues.length)];
-    const enemyData = $dataEnemies[enemyId];
+
+    const enemyData = $dataEnemies[pickRandomPopEnemyId(mapInfo)];
     if (!enemyData) return;
-    const passiveStateIds = [];
-    if (enemyData.meta["Passive State"]) {
-      stateIdValues = enemyData.meta["Passive State"].split(",");
-      for (
-        let stateIndex = 0;
-        stateIndex < stateIdValues.length;
-        stateIndex++
-      ) {
-        passiveStateIds.push(Number(stateIdValues[stateIndex]));
-      }
-    }
 
-    if (passiveStateIds != 0) {
-      for (let j = 0; j < passiveStateIds.length; j++) {
-        selectedActor.addState(passiveStateIds[j]);
-      }
+    for (const passiveStateId of collectPassiveStateIds(enemyData)) {
+      selectedActor.addState(passiveStateId);
     }
-    const enemyPresetStates = $gameVariables.value(
-      GAME_VARIABLE.ENEMY_PRESET_STATES
+    applyPresetStates(
+      selectedActor,
+      $gameVariables.value(GAME_VARIABLE.ENEMY_PRESET_STATES)
     );
-    if (Array.isArray(enemyPresetStates)) {
-      const firstEnemyPresetStates = enemyPresetStates[1] || [];
-      for (let i = 0; i <= firstEnemyPresetStates.length - 1; i++) {
-        if (firstEnemyPresetStates[i] >= 1) {
-          selectedActor.addState(firstEnemyPresetStates[i]);
-        }
-      }
-      const secondEnemyPresetStates = enemyPresetStates[2] || [];
-      for (let i = 0; i <= secondEnemyPresetStates.length - 1; i++) {
-        if (secondEnemyPresetStates[i] >= 1) {
-          selectedActor.addState(secondEnemyPresetStates[i]);
-        }
-      }
-    }
-    const mapEnemySpecialStates = $gameVariables.value(
-      GAME_VARIABLE.MAP_ENEMY_SPECIAL_STATES
-    );
-    if (mapEnemySpecialStates) {
-      for (let i = 0; i < mapEnemySpecialStates.length; i++) {
-        let stateId = mapEnemySpecialStates[i];
-        if (stateId == 885) {
-          let stateIdMult = 11;
-          if (enemyLevel >= 30 && enemyLevel <= 60) stateIdMult = 21;
-          else if (enemyLevel >= 61) stateIdMult = 31;
-
-          stateId = getRandomIndex(stateIdMult) + 885;
-          selectedActor.addState(stateId);
-        } else {
-          selectedActor.addState(stateId);
-        }
-      }
-    }
-    if (mapInfo.meta["EnemyElement"]) {
-      const enemyElementValues = mapInfo.meta["EnemyElement"].split(",");
-      const stateId = Number(
-        enemyElementValues[getRandomIndex(enemyElementValues.length)]
-      );
-      selectedActor.addState(stateId);
-    }
+    applyMapEnemySpecialStates(selectedActor, enemyLevel);
+    applyRandomEnemyElementState(selectedActor, mapInfo);
     //console.log($gameActors.actor(20));
   };
 
   //ボス設定スクリプト
-  boss_setup1 = function (bossConfigId, bossEnemyId) {
-    if (bossConfigId != 1 && bossConfigId != 2) return;
+  // Clears the boss records a previous fight may have left behind.
+  function resetBossRecords() {
     $gameSwitches.setValue(GAME_SWITCH.DIRECT_ENEMY_BOSS, false);
-    var bossEnemyValues = 0;
     $gameVariables.setValue(GAME_VARIABLE.BOSS_SOURCE_ID, 0);
     $gameVariables.setValue(
       GAME_VARIABLE.BOSS_GUARANTEED_DROPS,
@@ -2941,12 +3072,10 @@
       GAME_VARIABLE.BOSS_SPECIAL_ACTIONS,
       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     );
-    const bossActionValues = $gameVariables.value(GAME_VARIABLE.BOSS_ACTIONS);
-    const bossSpecialActionValues = $gameVariables.value(
-      GAME_VARIABLE.BOSS_SPECIAL_ACTIONS
-    );
-    //ボス行動は変数346に配列で設定する。
-    //特殊行動は347に2次配列
+  }
+
+  // Note source of the fight: the dungeon info item (1) or the enemy itself (2).
+  function selectBossSource(bossConfigId, bossEnemyId) {
     switch (numericCaseValue(bossConfigId)) {
       case 1:
         {
@@ -2965,40 +3094,68 @@
         }
         break;
     }
+  }
+
+  // Enemy id the boss is copied from: the enemy itself, or the first field of
+  // "<BossEnemy>".
+  function resolveBossSourceId(bossConfigId, bossEnemyId, bossEnemyValues) {
+    if (bossConfigId == 2) return bossEnemyId;
+    return Number(bossEnemyValues[0]);
+  }
+
+  // The boss fights its own copy of the enemy entry, so the database stays clean.
+  function copyBossEnemyEntry(bossEnemySource) {
+    $dataEnemies[valueBossEnemiesId] = copyEnemySpawnData(bossEnemySource);
+    return $dataEnemies[valueBossEnemiesId];
+  }
+
+  boss_setup1 = function (bossConfigId, bossEnemyId) {
+    if (bossConfigId != 1 && bossConfigId != 2) return;
+    resetBossRecords();
+    const bossActionValues = $gameVariables.value(GAME_VARIABLE.BOSS_ACTIONS);
+    const bossSpecialActionValues = $gameVariables.value(
+      GAME_VARIABLE.BOSS_SPECIAL_ACTIONS
+    );
+    //ボス行動は変数346に配列で設定する。
+    //特殊行動は347に2次配列
+    selectBossSource(bossConfigId, bossEnemyId);
     if (!value || !value.meta) return;
+
     const bossMeta = value.meta;
     configureBossGuaranteedDrops(bossMeta);
+    let bossEnemyValues = 0;
     if (bossMeta["BossEnemy"]) {
-      var bossEnemyValues = bossMeta["BossEnemy"].split(",");
+      bossEnemyValues = bossMeta["BossEnemy"].split(",");
     }
-    if (bossEnemyValues != 0) {
-      if (bossConfigId == 2) {
-        $gameVariables.setValue(GAME_VARIABLE.BOSS_SOURCE_ID, bossEnemyId);
-      } else {
-        $gameVariables.setValue(GAME_VARIABLE.BOSS_SOURCE_ID, Number(bossEnemyValues[0]));
-      }
-      const bossEnemySource = $dataEnemies[$gameVariables.value(GAME_VARIABLE.BOSS_SOURCE_ID)];
-      if (!bossEnemySource) return;
-      $dataEnemies[valueBossEnemiesId] = copyEnemySpawnData(bossEnemySource);
-      var bossEnemyData = $dataEnemies[valueBossEnemiesId];
-      configureBossActionData(
-        bossEnemyData,
-        bossMeta,
-        bossEnemyValues,
-        bossActionValues,
-        bossSpecialActionValues
-      );
-      configureBossActionDisplay(
-        bossConfigId,
-        bossActionValues,
-        bossSpecialActionValues
-      );
-      if (bossMeta["FrontBoss"]) {
-        $dataSystem.optSideView = false;
-      }
-      configureBossTroop(bossMeta, bossEnemyData, bossEnemyValues);
+    //'<BossEnemy>'未有時の下部処理回避
+    if (bossEnemyValues == 0) return;
+
+    $gameVariables.setValue(
+      GAME_VARIABLE.BOSS_SOURCE_ID,
+      resolveBossSourceId(bossConfigId, bossEnemyId, bossEnemyValues)
+    );
+    const bossEnemySource = $dataEnemies[
+      $gameVariables.value(GAME_VARIABLE.BOSS_SOURCE_ID)
+    ];
+    if (!bossEnemySource) return;
+
+    const bossEnemyData = copyBossEnemyEntry(bossEnemySource);
+    configureBossActionData(
+      bossEnemyData,
+      bossMeta,
+      bossEnemyValues,
+      bossActionValues,
+      bossSpecialActionValues
+    );
+    configureBossActionDisplay(
+      bossConfigId,
+      bossActionValues,
+      bossSpecialActionValues
+    );
+    if (bossMeta["FrontBoss"]) {
+      $dataSystem.optSideView = false;
     }
-    if (!bossEnemyData) return; //'<BossEnemy>'未有時の下部処理回避
+    configureBossTroop(bossMeta, bossEnemyData, bossEnemyValues);
     applyBossInformationStates.call(this, bossMeta, bossEnemyData);
   };
 
@@ -3414,96 +3571,147 @@
     advanceWeekday(gameVariables, gameSwitches);
   };
   //ガチャスクリプト
-  item_gacha = function () {
-    const RARITY_COLOR_TAG_INFOS = {
-      1: [0, 473],
-      2: [2, 473],
-      3: [22, 473],
-      4: [21, 473],
-      5: [29, 473],
-      6: [28, 474],
-      7: [24, 475],
-      8: [26, 476],
-      9: [27, 477],
-      10: [25, 478]
-    };
+  // Gacha rarity -> [text colour, item icon used in the "<Rarity:...>" tag].
+  const RARITY_COLOR_TAG_INFOS = {
+    1: [0, 473],
+    2: [2, 473],
+    3: [22, 473],
+    4: [21, 473],
+    5: [29, 473],
+    6: [28, 474],
+    7: [24, 475],
+    8: [26, 476],
+    9: [27, 477],
+    10: [25, 478]
+  };
 
+  // Database list -> the name tag that prints an icon plus the entry name.
+  function gachaNameTagFor(database) {
+    switch (database) {
+      case $dataItems:
+        return "\\iin";
+      case $dataWeapons:
+        return "\\win";
+      case $dataArmors:
+        return "\\ain";
+    }
+    return undefined;
+  }
+
+  // Loot entries that must not be drawn: out-of-range entries, "max 1" entries the
+  // party already owns, and ranged entries it does not own yet.
+  function isGachaItemExcluded(databaseEntry) {
+    if (databaseEntry.meta["GatchaOutOfRange"]) return true;
+    if (databaseEntry.meta["Max Item"]) {
+      if (Number(databaseEntry.meta["Max Item"]) == 1) return $gameParty.hasItem(databaseEntry);
+    }
+    if (databaseEntry.meta["GatchaHasRange"]) return !$gameParty.hasItem(databaseEntry);
+    return false;
+  }
+
+  // Indices of valueItems whose rarity equals the wanted one.
+  function collectGachaItemIndicesByRarity(wantedRarity) {
+    const eligibleItemIndices = [];
+    const itemCount = valueItems.length;
+    for (let itemIndex = 1; itemIndex < itemCount; itemIndex++) {
+      const databaseEntry = valueItems[itemIndex];
+      if (!databaseEntry) continue;
+      if (isGachaItemExcluded(databaseEntry)) continue;
+      const entryRarity = databaseEntry.meta["LotteryRearity"];
+      if (!entryRarity) continue;
+      if (Number(entryRarity) !== wantedRarity) continue;
+      eligibleItemIndices.push(itemIndex);
+    }
+    return eligibleItemIndices;
+  }
+
+  // The rarity-1 fallback also accepts ranged entries the party already owns; the
+  // "max 1" rule is not applied there.
+  function collectRarityOneFallbackIndices() {
+    const eligibleItemIndices = [];
+    const itemCount = valueItems.length;
+    for (let itemIndex = 1; itemIndex < itemCount; itemIndex++) {
+      const databaseEntry = valueItems[itemIndex];
+      if (!databaseEntry) continue;
+      if (databaseEntry.meta["GatchaOutOfRange"]) continue;
+      if (databaseEntry.meta["GatchaHasRange"] && !$gameParty.hasItem(databaseEntry)) continue;
+      const entryRarity = databaseEntry.meta["LotteryRearity"];
+      if (!entryRarity) continue;
+      if (Number(entryRarity) !== 1) continue;
+      eligibleItemIndices.push(itemIndex);
+    }
+    return eligibleItemIndices;
+  }
+
+  // Database list of one draw: an explicit 0..2 type is used as given, anything else
+  // rolls a random list (11 rolls, values above 1 mean armors).
+  function pickGachaDatabase(valueItemsType) {
+    const hasExplicitType =
+      (valueItemsType || valueItemsType === 0) && valueItemsType > -1 && valueItemsType < 3;
+    if (hasExplicitType) return getItemEquipmentSource(valueItemsType);
+    const randomValueItemsType = getRandomIndex(11);
+    return getItemEquipmentSource(randomValueItemsType > 1 ? 2 : randomValueItemsType);
+  }
+
+  // Weighted rarity draw: ten base entries, one extra "1" per round and the bonus
+  // entries of addRarityCheckValues for the first 45 rounds.
+  function drawGachaRarity() {
+    const rarityArray = DEFAULT_RARITY_LIST.slice();
+    for (let round = 1; round <= 50; round++) {
+      rarityArray.push(1);
+      if (round > 45) continue;
+      addRarityCheckValues(rarityArray, round);
+    }
+    return rarityArray[getRandomIndex(rarityArray.length)];
+  }
+
+  // "<Rarity:icon>" tag followed by the "<icon tag[id]>" name tag of the drawn entry.
+  function buildGachaItemLabel(lotteryRarity, gachaItemId) {
+    const rarityInfo = RARITY_COLOR_TAG_INFOS[lotteryRarity];
+    const rarityColorTag = colorTaggedText(rarityInfo[0], `<Rarity:\\I[${rarityInfo[1]}]`);
+    const nameTag = gachaNameTagFor(valueItems);
+    return rarityColorTag + colorTaggedText(16, `${nameTag}[${gachaItemId}]`);
+  }
+item_gacha = function () {
     //内容のほうで開始時点ではレアリティを8に制限
     gacha_naiyou(3, 0);
-    if (valueGachaId >= 1) {
-      const databaseEntry = valueItems[valueGachaId];
-      $gameParty.gainItem(databaseEntry, 1);
-      var lotteryRarity = Number(databaseEntry.meta["LotteryRearity"]);
-      if ($gameVariables.value(GAME_VARIABLE.RANDOM_WORK_3) < lotteryRarity) {
-        $gameVariables.setValue(GAME_VARIABLE.RANDOM_WORK_3, lotteryRarity);
-      }
+    if (!(valueGachaId >= 1)) return;
 
-      const colorCode = RARITY_COLOR_TAG_INFOS[lotteryRarity][0];
-      const itemIndex = RARITY_COLOR_TAG_INFOS[lotteryRarity][1];
-      var rarityColorTag = colorTaggedText(
-        colorCode,
-        `<Rarity:\\I[${itemIndex}]`
-      );
-
-      switch (valueItems) {
-        case $dataItems:
-          var itemTypePrefix = "\\iin";
-          break;
-        case $dataWeapons:
-          var itemTypePrefix = "\\win";
-          break;
-        case $dataArmors:
-          var itemTypePrefix = "\\ain";
-          break;
-      }
-      var prefixGacha = colorTaggedText(
-        16,
-        `${itemTypePrefix}[${valueGachaId}]`
-      );
-      var gacha = rarityColorTag + prefixGacha;
-      var gachaResultMessage = `${gacha}が排出されました！`;
-
-      if ($gameSwitches.value(GAME_SWITCH.TEMPORARY_RESULT)) {
-        $gameVariables.setValue(GAME_VARIABLE.RANDOM_WORK_1, $gameVariables.value(GAME_VARIABLE.RANDOM_WORK_1) + 1);
-        const previousResultText = $gameVariables.value(
-          GAME_VARIABLE.RANDOM_WORK_2
-        );
-        const appendedResultText =
-          previousResultText + gachaResultMessage + "\n";
-        $gameVariables.setValue(22, appendedResultText);
-      } else {
-        $gameVariables.setValue(GAME_VARIABLE.RANDOM_WORK_2, gachaResultMessage);
-      }
+    const databaseEntry = valueItems[valueGachaId];
+    $gameParty.gainItem(databaseEntry, 1);
+    const lotteryRarity = Number(databaseEntry.meta["LotteryRearity"]);
+    if ($gameVariables.value(GAME_VARIABLE.RANDOM_WORK_3) < lotteryRarity) {
+      $gameVariables.setValue(GAME_VARIABLE.RANDOM_WORK_3, lotteryRarity);
     }
+
+    // The label is built first: no function call inside the translatable sentence.
+    const gachaItemLabel = buildGachaItemLabel(lotteryRarity, valueGachaId);
+    const gachaResultMessage = gachaItemLabel + "が排出されました！";
+    if (!$gameSwitches.value(GAME_SWITCH.TEMPORARY_RESULT)) {
+      $gameVariables.setValue(GAME_VARIABLE.RANDOM_WORK_2, gachaResultMessage);
+      return;
+    }
+    // 乱数汎用1 counts the draws, 乱数汎用2 keeps the accumulated result text.
+    $gameVariables.setValue(
+      GAME_VARIABLE.RANDOM_WORK_1,
+      $gameVariables.value(GAME_VARIABLE.RANDOM_WORK_1) + 1
+    );
+    const previousResultText = $gameVariables.value(GAME_VARIABLE.RANDOM_WORK_2);
+    $gameVariables.setValue(
+      GAME_VARIABLE.RANDOM_WORK_2,
+      previousResultText + gachaResultMessage + "\n"
+    );
   };
 
   //アイテム武器防具抽選スクリプト。id12アイテム1武器2防具3all
   //id13がall。10まで。value1としてid決定
   const DEFAULT_RARITY_LIST = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-  gacha_naiyou = function (valueItemsType, rarity) {
-    if (
-      (valueItemsType || valueItemsType === 0) &&
-      valueItemsType > -1 &&
-      valueItemsType < 3
-    ) {
-      valueItems = getItemEquipmentSource(valueItemsType);
-    } else {
-      const randomValueItemsType = getRandomIndex(11);
-      valueItems = getItemEquipmentSource(
-        randomValueItemsType > 1 ? 2 : randomValueItemsType
-      );
-    }
+    gacha_naiyou = function (valueItemsType, rarity) {
+    valueItems = pickGachaDatabase(valueItemsType);
 
     let chosenRarity = rarity;
     if (rarity < 1) {
-      let rarityArray = DEFAULT_RARITY_LIST.slice();
-      for (let i = 1; i <= 50; i++) {
-        rarityArray.push(1);
-        if (i > 45) continue;
-
-        addRarityCheckValues(rarityArray, i);
-      }
-      chosenRarity = rarityArray[getRandomIndex(rarityArray.length)];
+      chosenRarity = drawGachaRarity();
       //ガチャ称号取得でＵＲ，ＬＲ解放
       if (!$gameParty.hasItem($dataItems[657], true) && chosenRarity >= 9) {
         chosenRarity = 8;
@@ -3513,56 +3721,21 @@
       }
     }
 
-    let selectedItemIndex;
     if ($gameParty.inBattle()) {
-      selectedItemIndex = 71; //仮指定。ポーションのみ
-    } else {
-      let eligibleItemIndices = [0];
-      const itemsLength = valueItems.length;
-      for (let i = 1; i < itemsLength; i++) {
-        const currentItem = valueItems[i];
-        if (!currentItem) continue;
-
-        if (currentItem.meta["GatchaOutOfRange"]) continue;
-        if ($gameParty.hasItem(currentItem)) {
-          const maxItemLimit = currentItem.meta["Max Item"];
-          if (maxItemLimit && Number(maxItemLimit) == 1) continue;
-        } else if (currentItem.meta["GatchaHasRange"]) continue;
-
-        const lotteryRearity = currentItem.meta["LotteryRearity"];
-        if (!lotteryRearity) continue;
-        if (Number(lotteryRearity) !== chosenRarity) continue;
-
-        eligibleItemIndices.push(i);
-      }
-      selectedItemIndex =
-        eligibleItemIndices[getRandomIndex(eligibleItemIndices.length)];
-      if (selectedItemIndex === 0) {
-        //レアリティ1でmax1アイテムを作らない。
-        eligibleItemIndices = [];
-        chosenRarity = 1;
-        for (let i = 1; i < itemsLength; i++) {
-          const currentItem = valueItems[i];
-          if (!currentItem) continue;
-          if (currentItem.meta["GatchaOutOfRange"]) continue;
-          if (
-            currentItem.meta["GatchaHasRange"] &&
-            !$gameParty.hasItem(currentItem)
-          )
-            continue;
-
-          const lotteryRearity = currentItem.meta["LotteryRearity"];
-          if (!lotteryRearity) continue;
-          if (Number(lotteryRearity) !== chosenRarity) continue;
-
-          eligibleItemIndices.push(i);
-        }
-        valueGachaId =
-          eligibleItemIndices[getRandomIndex(eligibleItemIndices.length)];
-        return;
-      }
+      valueGachaId = 71; //仮指定。ポーションのみ
+      return;
     }
 
+    // The leading 0 keeps the original "nothing eligible" chance: drawing it runs the
+    // rarity-1 fallback below.
+    const eligibleItemIndices = [0].concat(collectGachaItemIndicesByRarity(chosenRarity));
+    const selectedItemIndex = eligibleItemIndices[getRandomIndex(eligibleItemIndices.length)];
+    if (selectedItemIndex === 0) {
+      //レアリティ1でmax1アイテムを作らない。
+      const fallbackIndices = collectRarityOneFallbackIndices();
+      valueGachaId = fallbackIndices[getRandomIndex(fallbackIndices.length)];
+      return;
+    }
     valueGachaId = selectedItemIndex;
   };
 
@@ -3584,83 +3757,62 @@
     });
   }
 
+  // One loot choice of the gacha list: the icon+name choice plus the two picture
+  // placeholders that carry the entry description and the shared "詳細情報" block.
+  function addGachaListChoice(databaseTypeId, itemIndex, databaseEntry, choiceIndex, pictureSlot) {
+    const detailInfoText = $gameVariables.value(GAME_VARIABLE.TEMPORARY_TEXT);
+    item_priceinfo(databaseTypeId, itemIndex);
+    $gameSystem.addCustomChoice(1, {
+      text: `\x1bI[${databaseEntry.iconIndex}]${databaseEntry.name}`,
+      value: choiceIndex
+    });
+    showGachaListPicture(
+      pictureSlot + 100,
+      20,
+      10,
+      databaseEntry.description
+    );
+    showGachaListPicture(
+      pictureSlot + 101,
+      640,
+      110,
+      DETAIL_INDENT_LEFT +
+        colorTaggedText(14, "──詳細情報──") +
+        DETAIL_INDENT_RIGHT +
+        "\n" +
+        detailInfoText
+    );
+    $gameMessage.setSelectPictureId(choiceIndex, pictureSlot + 100);
+    $gameMessage.setSelectPictureId(choiceIndex, pictureSlot + 101);
+  }
+
+  // Plain text picture drawn without a name at the given position; 28 is the text size.
+  function showGachaListPicture(pictureId, pictureX, pictureY, text) {
+    $gameScreen.setDTextPicture(text, 28);
+    $gameScreen.dWindowFrame = "ON";
+    $gameScreen.showPicture(pictureId, "", 0, pictureX, pictureY, 100, 100, 0, 0);
+  }
+
+  //レアリティ一覧作成
   //レアリティ一覧作成
   item_gachaitiran1 = function (lotteryRarity) {
     let choiceIndex = 1;
     let pictureSlot = 1;
 
-    const info = $gameVariables.value(GAME_VARIABLE.TEMPORARY_TEXT);
-    for (var j = 0; j <= 2; j++) {
-      valueItems = j == 0 ? $dataItems : j == 1 ? $dataWeapons : $dataArmors; // 2=armors
-      const start = 1;
-      const end = valueItems.length;
-      for (var i = start; i < end; i++) {
-        let isItemExcluded = 0;
-        const databaseEntry = valueItems[i];
+    // Item / weapon / armor databases, in the order the price helper expects them.
+    const gachaDatabases = [$dataItems, $dataWeapons, $dataArmors];
+    for (let databaseTypeId = 0; databaseTypeId <= 2; databaseTypeId++) {
+      valueItems = gachaDatabases[databaseTypeId];
+      const itemCount = valueItems.length;
+      for (let itemIndex = 1; itemIndex < itemCount; itemIndex++) {
+        const databaseEntry = valueItems[itemIndex];
         if (!databaseEntry) continue;
-        if (!databaseEntry.meta["LotteryRearity"]) continue;
+        const entryRarity = databaseEntry.meta["LotteryRearity"];
+        if (!entryRarity) continue;
+        if (Number(entryRarity) !== lotteryRarity) continue;
+        if (isGachaItemExcluded(databaseEntry)) continue;
 
-        if (Number(databaseEntry.meta["LotteryRearity"]) !== lotteryRarity)
-          continue;
-
-        if (databaseEntry.meta["Max Item"]) {
-          if (
-            Number(databaseEntry.meta["Max Item"]) == 1 &&
-            $gameParty.hasItem(databaseEntry)
-          ) {
-            isItemExcluded = 1;
-          }
-        }
-        if (databaseEntry.meta["GatchaHasRange"]) {
-          if (!$gameParty.hasItem(databaseEntry)) {
-            isItemExcluded = 1;
-          }
-        }
-        if (databaseEntry.meta["GatchaOutOfRange"]) {
-          isItemExcluded = 1;
-        }
-        if (isItemExcluded !== 0) continue;
-
-        const descriptionText = `${databaseEntry.description}`;
-        item_priceinfo(j, i);
-        const customChoiceId = 1;
-        const itemName = `\x1bI[${databaseEntry.iconIndex}]${databaseEntry.name}`;
-        const choiceParams = {
-          text: `${itemName}`,
-          value: choiceIndex
-        };
-        $gameSystem.addCustomChoice(customChoiceId, choiceParams);
-        $gameScreen.setDTextPicture(descriptionText, 28);
-        $gameScreen.dWindowFrame = "ON";
-        $gameScreen.showPicture(
-          pictureSlot + 100,
-          "",
-          0,
-          20,
-          10,
-          100,
-          100,
-          0,
-          0
-        );
-        $gameMessage.setSelectPictureId(choiceIndex, pictureSlot + 100);
-        const detailHeading = colorTaggedText(14, "──詳細情報──");
-        const message =
-          DETAIL_INDENT_LEFT + detailHeading + DETAIL_INDENT_RIGHT + "\n" + info;
-        $gameScreen.setDTextPicture(message, 28);
-        $gameScreen.dWindowFrame = "ON";
-        $gameScreen.showPicture(
-          pictureSlot + 100 + 1,
-          "",
-          0,
-          640,
-          110,
-          100,
-          100,
-          0,
-          0
-        );
-        $gameMessage.setSelectPictureId(choiceIndex, pictureSlot + 100 + 1);
+        addGachaListChoice(databaseTypeId, itemIndex, databaseEntry, choiceIndex, pictureSlot);
         choiceIndex += 1;
         pictureSlot += 2;
       }
@@ -3817,82 +3969,121 @@
   };
 
   //キャラ初期セットアップ。ＬＶリセットにも実行。この後レアリティコモン実行。
-  actor_StartSetUp = function (actorId) {
-    const actor2 = $gameActors.actor(actorId);
-    const actor = actor2;
+  // Armour notes of an actor: "JoinEquipArmors1".."JoinEquipArmors9".
+  const INITIAL_ARMOR_NOTE_IDS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+  // Weapon mastery skills every actor starts with.
+  const INITIAL_ATTACK_SKILL_IDS = [101, 111, 121, 131, 141, 151, 161, 171, 181, 191];
+  // Skills of the true protagonist: 407 存在フラグ, 18 レベルフラグ.
+  const PROTAGONIST_START_SKILL_IDS = [407, 18];
+  const PROTAGONIST_STATE_ID = 601; //主人公確定
+  const HEROINE_STATE_ID = 602; //女
+  const MALE_STATE_ID = 603; //男
+  const NUDE_SKILL_ID = 45; //立ち絵変更あり男に全裸スキル
+  const PERSONAL_WEAPON_ID_OFFSET = 200; //actor id + 200 holds the personal weapon
+  const ACTOR_RECORD_SECOND_NAME_INDEX = 50;
+  const INITIAL_JP = 100;
+
+  // Gives and equips the weapon of the "<JoinEquipWeapons>" note.
+  function equipInitialWeapon(actor, actorData) {{
+    const weaponMeta = actorData.meta["JoinEquipWeapons"];
+    if (!weaponMeta) return;
+    const weaponId = Number(weaponMeta);
+    $gameParty.gainItem($dataWeapons[weaponId], 1, false);
+    actor.changeEquipById(1, weaponId);
+  }}
+
+  // Gives the armours of the "<JoinEquipArmorsN>" notes; the original code always
+  // equips them into body slot 3, which is kept as is.
+  function equipInitialArmors(actor, actorData) {{
+    for (const armorNoteId of INITIAL_ARMOR_NOTE_IDS) {{
+      const armorMeta = actorData.meta["JoinEquipArmors" + armorNoteId];
+      if (!armorMeta) continue;
+
+      const armorId = Number(armorMeta);
+      $gameParty.gainItem($dataArmors[armorId], 1, false);
+      actor.changeEquipById(3, armorId);
+    }}
+  }}
+
+  // Learns the skills of the "<JoinSkillLearn>" note.
+  function learnNoteSkills(actor, actorData) {{
+    const joinSkillMeta = actorData.meta["JoinSkillLearn"];
+    if (!joinSkillMeta) return;
+    for (const skillId of joinSkillMeta.split(",")) {{
+      actor.learnSkill(Number(skillId));
+    }}
+  }}
+
+  // Protagonist flag and heroine / male state of the actor notes.
+  function applyActorIdentityStates(actor, actorData) {{
+    //主人公確定
+    if (actorData.meta["Mcharacter"]) {{
+      actor.addState(PROTAGONIST_STATE_ID);
+    }} else {{
+      actor.removeState(PROTAGONIST_STATE_ID);
+    }}
+    //主人公と女・男用ステート↓
+    if (actorData.meta["Heroine"]) {{
+      actor.addState(HEROINE_STATE_ID);
+    }} else {{
+      actor.addState(MALE_STATE_ID);
+    }}
+  }}
+
+  // Every actor learns the ten basic attack skills and the nude skill of the actors
+  // whose portrait changes.
+  function learnInitialSkills(actor, actorData) {{
+    for (const skillId of INITIAL_ATTACK_SKILL_IDS) {{
+      actor.learnSkill(skillId);
+    }}
+    if (!actorData.meta["MultipleTachie"]) return;
+    actor.learnSkill(NUDE_SKILL_ID);
+  }}
+
+  // "<SecondName>" note: renames the personal weapon copy and the actor record entry.
+  function applySecondName(actorId, actorData) {{
+    const secondNameMeta = actorData.meta["SecondName"];
+    if (!secondNameMeta) return;
+    const secondNameValues = secondNameMeta.split(",");
+    const weaponData = $dataWeapons[actorId + PERSONAL_WEAPON_ID_OFFSET];
+    weaponData.name = secondNameValues[1];
+    $gameVariables.value(GAME_VARIABLE.ACTOR_RECORD_BASE + actorId)[
+      ACTOR_RECORD_SECOND_NAME_INDEX
+    ] = weaponData.name;
+  }}
+
+  actor_StartSetUp = function (actorId) {{
+    const actor = $gameActors.actor(actorId);
+    const actorData = $dataActors[actorId];
     //主人公にタイトルセットと存在フラグとレベルフラグと視点変更スキル
     if (
       actorId == $gameVariables.value(GAME_VARIABLE.TRUE_PROTAGONIST_ACTOR_ID)
-    ) {
+    ) {{
       //actor.learnSkill(23);//タイトルセット。不要
       //actor.learnSkill(24);//性欲度関連に合わせて習得させる。性欲度ランク1で習得
       //actor.learnSkill(42);//視点変更
-      actor.learnSkill(407);
-      actor.learnSkill(18);
-    }
+      for (const skillId of PROTAGONIST_START_SKILL_IDS) {{
+        actor.learnSkill(skillId);
+      }}
+    }}
     //デバッグ時に全員に存在フラグとレベルフラグ
-    //if($gameSwitches.value(53)){
+    //if($gameSwitches.value(53)){{
     //actor.learnSkill(407);
     //actor.learnSkill(18);
-    //};
+    //}};
     //初期装備とスキル付与
-    const actorData = $dataActors[actorId];
-    if (actorData.meta["JoinEquipWeapons"]) {
-      var metaFlagValue = Number(actorData.meta["JoinEquipWeapons"]);
-      $gameParty.gainItem($dataWeapons[metaFlagValue], 1, false);
-      actor.changeEquipById(1, metaFlagValue);
-    }
-    var list = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-    list.forEach(function (id) {
-      const actorData = $dataActors[actorId];
-      if (!actorData.meta["JoinEquipArmors" + id]) return;
-
-      const metaFlagValue = Number(actorData.meta["JoinEquipArmors" + id]);
-      $gameParty.gainItem($dataArmors[metaFlagValue], 1, false);
-      actor.changeEquipById(3, metaFlagValue);
-    }, this);
-    if (actorData.meta["JoinSkillLearn"]) {
-      var joinSkillValues = actorData.meta["JoinSkillLearn"].split(",");
-      for (var j = 0; j <= joinSkillValues.length - 1; j++) {
-        actor2.learnSkill(Number(joinSkillValues[j]));
-      }
-    }
+    equipInitialWeapon(actor, actorData);
+    equipInitialArmors(actor, actorData);
+    learnNoteSkills(actor, actorData);
     //初期レアリティ設定。スキルとしてはJoinSkillLearnで付与
     reality_setUp(actorId);
-    //主人公確定
-    var metaFlagValue = actorData.meta["Mcharacter"];
-    if (metaFlagValue) {
-      actor.addState(601);
-    } else {
-      actor.removeState(601);
-    }
-    //主人公と女・男用ステート↓
-    var metaFlagValue = actorData.meta["Heroine"];
-    if (metaFlagValue) {
-      actor.addState(602);
-    } else {
-      actor.addState(603);
-    }
-    //立ち絵変更あり男に全裸スキル
-    var metaFlagValue = actorData.meta["MultipleTachie"];
-    if (metaFlagValue) {
-      actor.learnSkill(45);
-    }
-    //全員に通常攻撃十種基本スキル付与。
-    var list = [101, 111, 121, 131, 141, 151, 161, 171, 181, 191];
-    list.forEach(function (id) {
-      actor.learnSkill(id);
-    }, this);
+    applyActorIdentityStates(actor, actorData);
+    learnInitialSkills(actor, actorData);
     //初期JP
-    actor.gainJp(100);
+    actor.gainJp(INITIAL_JP);
     //苗字代入
-    if (actorData.meta["SecondName"]) {
-      var joinSkillValues = actorData.meta["SecondName"].split(",");
-      const weaponData = $dataWeapons[actorId + 200];
-      weaponData.name = joinSkillValues[1];
-      $gameVariables.value(actorId + 380)[50] = weaponData.name;
-    }
-  };
+    applySecondName(actorId, actorData);
+  }};
 
   const ACTOR_RARITY_RANK_DATA = {
     // rarityRank: [skillId, rankLv, code, maxLevel]
@@ -3994,93 +4185,148 @@
   };
 
   //監禁、奴隷化時にレアリティと装備を記憶。レアリティダウンを実行するかはid3が1で実行
+  // Equipment slots 1-10 are stored in the confiscation record; 11-13 hold the
+  // rarity skill, the experience and the subclass.
+  const CONFISCATED_EQUIP_SLOT_COUNT = 10;
+  const CONFISCATED_SKILL_RECORD = 11;
+  const CONFISCATED_EXP_RECORD = 12;
+  const CONFISCATED_SUBCLASS_RECORD = 13;
+  const FIRST_RARITY_SKILL_ID = 401;
+  const LAST_RARITY_SKILL_ID = 406;
+  const RARITY_DOWN_STATE_ID = 93;
+  const CONFISCATED_SUBCLASS_ID = 42;
+
+  // Forgets every rarity skill; a confiscated actor then knows only one of them.
+  function forgetRaritySkills(actor) {
+    for (
+      let skillId = FIRST_RARITY_SKILL_ID;
+      skillId <= LAST_RARITY_SKILL_ID;
+      skillId++
+    ) {
+      actor.forgetSkill(skillId);
+    }
+  }
+
+  // Highest learned rarity skill, or the first one when nothing is learned.
+  function highestLearnedRaritySkillId(actor) {
+    let learnedSkillId = FIRST_RARITY_SKILL_ID;
+    for (
+      let skillId = FIRST_RARITY_SKILL_ID;
+      skillId <= LAST_RARITY_SKILL_ID;
+      skillId++
+    ) {
+      if (actor.isLearnedSkill(skillId)) learnedSkillId = skillId;
+    }
+    return learnedSkillId;
+  }
+
+  // Record of one actor: cleared equipment plus its rarity skill, exp and subclass.
+  function buildEmptyConfiscationRecord() {
+    return [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; // 0-10: 装備, 11: レアリティスキル, 12: 経験値, 13: サブジョブ
+  }
+
+  // Puts every recorded piece of equipment back and clears the equipment slots.
+  function restoreConfiscatedEquipment(actor, equipData, actorName) {
+    for (let slotIndex = 0; slotIndex < CONFISCATED_EQUIP_SLOT_COUNT; slotIndex++) {
+      if (!(equipData[slotIndex] >= 1)) continue;
+
+      actor.changeEquipById(slotIndex + 1, equipData[slotIndex]);
+      equipData[slotIndex] = 0;
+    }
+    const recoverMessage = `${actorName}は装備を取り戻した！`;
+    CommonPopupManager.showInfo({}, recoverMessage, null);
+  }
+
+  // Removes every piece of equipment and stores its id in the record.
+  function confiscateEquipment(actor, equipData, actorName) {
+    const equips = actor.equips();
+    for (let slotIndex = 0; slotIndex < equips.length; slotIndex++) {
+      if (!equips[slotIndex]) continue;
+
+      equipData[slotIndex] = equips[slotIndex].id;
+      actor.changeEquipById(slotIndex + 1, 0);
+    }
+    const stealMessage = `${actorName}は装備を奪われた…`;
+    CommonPopupManager.showInfo({}, stealMessage, null);
+  }
+
+  // Clears the rarity down state: skill, exp and subclass come back from the record.
+  function restoreConfiscatedState(actor, equipData, actorName, stateData) {
+    forgetRaritySkills(actor);
+    actor.learnSkill(equipData[CONFISCATED_SKILL_RECORD]);
+    reality_setUp(actor.actorId());
+    actor.removeState(RARITY_DOWN_STATE_ID);
+    const stateRemoveMessage = `${actorName}の\\x1bI[${stateData.iconIndex}]${stateData.name}が解除された！`;
+    CommonPopupManager.showInfo({}, stateRemoveMessage, null);
+    actor.changeExp(equipData[CONFISCATED_EXP_RECORD] + actor.currentExp(), false);
+
+    if (equipData[CONFISCATED_SUBCLASS_RECORD] >= 1) {
+      restoreConfiscatedSubclass(
+        actor,
+        equipData[CONFISCATED_SUBCLASS_RECORD],
+        actorName
+      );
+    }
+    equipData[CONFISCATED_SKILL_RECORD] = 0;
+    equipData[CONFISCATED_EXP_RECORD] = 0;
+    equipData[CONFISCATED_SUBCLASS_RECORD] = 0;
+  }
+
+  // Subclass restored after the state removal.
+  function restoreConfiscatedSubclass(actor, subclassId, actorName) {
+    actor.changeSubclass(subclassId);
+    const restoredClassName = $dataClasses[subclassId].name;
+    const effectName = colorTaggedText(14, restoredClassName);
+    const subclassMessage = `${actorName}のサブジョブが${effectName}に戻った！`;
+    CommonPopupManager.showInfo({}, subclassMessage, null);
+  }
+
+  // Applies the rarity down state: only the last rarity skill is kept, the subclass is
+  // replaced by the temporary one and exp is stored in the record.
+  function applyConfiscatedState(actor, equipData, actorName, stateData) {
+    equipData[CONFISCATED_EXP_RECORD] = actor.currentExp();
+    forgetRaritySkills(actor);
+    actor.learnSkill(LAST_RARITY_SKILL_ID);
+    reality_setUp(actor.actorId());
+    actor.addState(RARITY_DOWN_STATE_ID);
+    const stateApplyMessage = `${actorName}は\\x1bI[${stateData.iconIndex}]${stateData.name}を受けた…`;
+    CommonPopupManager.showInfo({}, stateApplyMessage, null);
+
+    equipData[CONFISCATED_SUBCLASS_RECORD] = actor._subclassId;
+    actor.changeSubclass(CONFISCATED_SUBCLASS_ID);
+    // Read after the change, so the message names the temporary subclass (as before).
+    const appliedClassName = $dataClasses[actor._subclassId].name;
+    const effectName = colorTaggedText(27, appliedClassName);
+    const subclassAppliedMessage = `${actorName}のサブジョブが${effectName}になった…`;
+    CommonPopupManager.showInfo({}, subclassAppliedMessage, null);
+  }
+
   reality_setRelegation = function (rarityModeId, actorId, isRarityDownFlag) {
     const actor = $gameActors.actor(actorId);
-    const stateData93 = $dataStates[93];
-    let equipData = $gameVariables.value(GAME_VARIABLE.CONFINED_ACTOR_RECORDS)[
-      actorId
-    ];
+    const confinedActorRecords = $gameVariables.value(
+      GAME_VARIABLE.CONFINED_ACTOR_RECORDS
+    );
     const actorName = actor.name();
-    const stateName = stateData93.name;
-    const stateIcon = stateData93.iconIndex;
+    const stateData = $dataStates[RARITY_DOWN_STATE_ID];
+    let equipData = confinedActorRecords[actorId];
 
     switch (rarityModeId) {
+      // Lift the relegation.
       case 0:
-        {
-          for (let i = 0; i < 10; i++) {
-            if (!(equipData[i] >= 1)) continue;
-
-            actor.changeEquipById(i + 1, equipData[i]);
-            equipData[i] = 0;
-          }
-          const recoverMessage = `${actorName}は装備を取り戻した！`;
-          CommonPopupManager.showInfo({}, recoverMessage, null);
-
-          if (actor.isStateAffected(93) && equipData[11] >= 1) {
-            for (let i = 401; i <= 406; i++) {
-              actor.forgetSkill(i);
-            }
-            actor.learnSkill(equipData[11]);
-            reality_setUp(actorId);
-            actor.removeState(93);
-            const stateRemoveMessage = `${actorName}の\x1bI[${stateIcon}]${stateName}が解除された！`;
-            CommonPopupManager.showInfo({}, stateRemoveMessage, null);
-            actor.changeExp(equipData[12] + actor.currentExp(), false);
-            if (equipData[13] >= 1) {
-              actor.changeSubclass(equipData[13]);
-              const restoredClassName = $dataClasses[equipData[13]].name;
-              const effectName = colorTaggedText(14, `${restoredClassName}`);
-              const subclassMessage = `${actorName}のサブジョブが${effectName}に戻った！`;
-              CommonPopupManager.showInfo({}, subclassMessage, null);
-            }
-            equipData[11] = 0;
-            equipData[12] = 0;
-            equipData[13] = 0;
-          }
+        restoreConfiscatedEquipment(actor, equipData, actorName);
+        const hasStoredSkillRecord = equipData[CONFISCATED_SKILL_RECORD] >= 1;
+        if (actor.isStateAffected(RARITY_DOWN_STATE_ID) && hasStoredSkillRecord) {
+          restoreConfiscatedState(actor, equipData, actorName, stateData);
         }
         break;
+      // Enforce the relegation.
       case 1:
-        {
-          $gameVariables.value(GAME_VARIABLE.CONFINED_ACTOR_RECORDS)[actorId] =
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; // 0-10: 装備, 11: レアリティスキル, 12: 経験値, 13: サブジョブ
-          equipData = $gameVariables.value(
-            GAME_VARIABLE.CONFINED_ACTOR_RECORDS
-          )[actorId];
-          let learnedSkill = 401;
-          for (let i = 401; i <= 406; i++) {
-            if (actor.isLearnedSkill(i)) {
-              learnedSkill = i;
-            }
-          }
-          equipData[11] = learnedSkill;
-
-          const equips = actor.equips();
-          for (let i = 0; i < equips.length; i++) {
-            if (!equips[i]) continue;
-
-            equipData[i] = equips[i].id;
-            actor.changeEquipById(i + 1, 0);
-          }
-          const stealMessage = `${actorName}は装備を奪われた…`;
-          CommonPopupManager.showInfo({}, stealMessage, null);
-
-          if (isRarityDownFlag === 1 && !actor.isStateAffected(93)) {
-            equipData[12] = actor.currentExp();
-            for (let i = 401; i <= 406; i++) {
-              actor.forgetSkill(i);
-            }
-            actor.learnSkill(406);
-            reality_setUp(actorId);
-            actor.addState(93);
-            const stateApplyMessage = `${actorName}は\x1bI[${stateIcon}]${stateName}を受けた…`;
-            CommonPopupManager.showInfo({}, stateApplyMessage, null);
-            equipData[13] = actor._subclassId;
-            actor.changeSubclass(42);
-            const dataClass = $dataClasses[actor._subclassId];
-            const effectName2 = colorTaggedText(27, `${dataClass.name}`);
-            const subclassAppliedMessage = `${actorName}のサブジョブが${effectName2}になった…`;
-            CommonPopupManager.showInfo({}, subclassAppliedMessage, null);
-          }
+        confinedActorRecords[actorId] = buildEmptyConfiscationRecord();
+        equipData = confinedActorRecords[actorId];
+        equipData[CONFISCATED_SKILL_RECORD] = highestLearnedRaritySkillId(actor);
+        confiscateEquipment(actor, equipData, actorName);
+        if (isRarityDownFlag === 1 && !actor.isStateAffected(RARITY_DOWN_STATE_ID)) {
+          applyConfiscatedState(actor, equipData, actorName, stateData);
         }
         break;
     }
@@ -4309,85 +4555,73 @@
 
   //遠景をアイテム武器ＩＤで指定
   //遠景をアイテム武器ＩＤで指定
+  // Parallax key of a map meta block: the night variant wins over the day one.
+  function resolveParallaxKey(metaSource, databaseTypeId, isNight, inOutFlag) {
+    let parallaxKey = 0;
+    if (databaseTypeId == 1) {
+      if (inOutFlag == 0 && metaSource.meta["BG_in"]) parallaxKey = "BG_in";
+      if (inOutFlag == 1 && metaSource.meta["BG_out"]) parallaxKey = "BG_out";
+      if (isNight) {
+        switch (numericCaseValue(inOutFlag)) {
+          case 0:
+            if (metaSource.meta["BG_inN"]) parallaxKey = "BG_inN";
+            break;
+          case 1:
+            if (metaSource.meta["BG_outN"]) parallaxKey = "BG_outN";
+            break;
+        }
+      }
+    }
+    if (databaseTypeId == 0) {
+      if (metaSource.meta["BG2"]) parallaxKey = "BG2";
+      if (isNight && metaSource.meta["BGN2"]) parallaxKey = "BGN2";
+    }
+    return parallaxKey;
+  }
+
+  // "name,scrollX,scrollY" parallax note -> map parallax plus the menu background copy.
+  function applyParallaxNote(parallaxNote) {
+    const parallaxValues = parallaxNote.split(",");
+    const scrollX = Number(parallaxValues[1]);
+    const scrollY = Number(parallaxValues[2]);
+    $gameMap.changeParallax(
+      parallaxValues[0],
+      scrollX != 0,
+      scrollY != 0,
+      scrollX,
+      scrollY
+    );
+    $gameVariables.setValue(GAME_VARIABLE.MENU_BACKGROUND_NAME, parallaxValues[0]);
+    $gameVariables.setValue(GAME_VARIABLE.BACKGROUND_SCROLL_X, 0); //メニュー背景横スク
+    $gameVariables.setValue(GAME_VARIABLE.BACKGROUND_SCROLL_Y, 0); //メニュー背景縦スク
+  }
+
   setMap_parallaxSelect = function (
     databaseTypeId,
     paramItemId,
     paramInOutFlag
   ) {
-    var parallaxKey = 0;
-    var metaSource;
+    let metaSource;
     switch (databaseTypeId) {
       case 0:
         metaSource = $dataItems[paramItemId];
         break;
       case 1:
         metaSource = $dataWeapons[paramItemId];
-        if (paramInOutFlag == 0) {
-          if (metaSource.meta["BG_in"]) {
-            var parallaxKey = "BG_in";
-          }
-        }
-        if (paramInOutFlag == 1) {
-          if (metaSource.meta["BG_out"]) {
-            var parallaxKey = "BG_out";
-          }
-        }
-        if ($gameSwitches.value(GAME_SWITCH.NIGHT)) {
-          switch (numericCaseValue(paramInOutFlag)) {
-            case 0:
-              {
-                if (metaSource.meta["BG_inN"]) {
-                  var parallaxKey = "BG_inN";
-                }
-              }
-              break;
-            case 1:
-              {
-                if (metaSource.meta["BG_outN"]) {
-                  var parallaxKey = "BG_outN";
-                }
-              }
-              break;
-          }
-        }
         break;
+      default:
+        return;
     }
-    if (databaseTypeId == 0) {
-      if (metaSource.meta["BG2"]) {
-        var parallaxKey = "BG2";
-      }
-      if ($gameSwitches.value(GAME_SWITCH.NIGHT)) {
-        if (metaSource.meta["BGN2"]) {
-          var parallaxKey = "BGN2";
-        }
-      }
-    }
+
+    const parallaxKey = resolveParallaxKey(
+      metaSource,
+      databaseTypeId,
+      $gameSwitches.value(GAME_SWITCH.NIGHT),
+      paramInOutFlag
+    );
     if (!(parallaxKey != 0)) return;
 
-    const parallaxValues = metaSource.meta[parallaxKey].split(",");
-    if (Number(parallaxValues[1]) == 0) {
-      var hScrollEnabled = false;
-    } else {
-      var hScrollEnabled = true;
-    }
-    if (Number(parallaxValues[2]) == 0) {
-      var vScrollEnabled = false;
-    } else {
-      var vScrollEnabled = true;
-    }
-    $gameMap.changeParallax(
-      parallaxValues[0],
-      hScrollEnabled,
-      vScrollEnabled,
-      Number(parallaxValues[1]),
-      Number(parallaxValues[2])
-    );
-    $gameVariables.setValue(
-      GAME_VARIABLE.MENU_BACKGROUND_NAME,
-      parallaxValues[0]
-    );
-    $gameVariables.setValue(GAME_VARIABLE.BACKGROUND_SCROLL_X, 0); //メニュー背景横スク
-    $gameVariables.setValue(GAME_VARIABLE.BACKGROUND_SCROLL_Y, 0); //メニュー背景縦スク
+    applyParallaxNote(metaSource.meta[parallaxKey]);
   };
 
   //BGMをjouhouで設定した配列で指定。BGMの保存も実行
@@ -4597,6 +4831,61 @@
     }
   };
   //イベント開始と終了時スクリプト
+  // Main quest counters advanced by a finished scene, in the order of the quest ids.
+  const MAIN_QUEST_PROGRESS_ENTRIES = [
+    { switchId: GAME_SWITCH.RISHABLE, variableId: GAME_VARIABLE.MAIN_QUEST_PROGRESS_1 },
+    { switchId: GAME_SWITCH.GEKIDEN_EX1, variableId: GAME_VARIABLE.MAIN_QUEST_PROGRESS_2 },
+    { switchId: GAME_SWITCH.GEKIDEN_EX2, variableId: GAME_VARIABLE.MAIN_QUEST_PROGRESS_3 },
+    { switchId: GAME_SWITCH.GEKIDEN_1, variableId: GAME_VARIABLE.MAIN_QUEST_PROGRESS_4 },
+    { switchId: GAME_SWITCH.GEKIDEN_2, variableId: GAME_VARIABLE.MAIN_QUEST_PROGRESS_5 },
+    { switchId: GAME_SWITCH.GEKIDEN_3, variableId: GAME_VARIABLE.MAIN_QUEST_PROGRESS_6 }
+  ];
+
+  // Completion switch of a scene item: its "AddEventCompSwi" note, otherwise derived
+  // from the scene kind (episode 901+, H scene 601+).
+  function resolveEpisodeCompletionSwitchId(eventItemMeta, eventItemId) {
+    if (eventItemMeta["AddEventCompSwi"]) {
+      return Number(eventItemMeta["AddEventCompSwi"]);
+    }
+    switch ($gameVariables.value(GAME_VARIABLE.SCENE_KIND)) {
+      //挿話
+      case 1:
+        return eventItemId + 900;
+      //Ｈ
+      case 2:
+        return eventItemId + 600;
+    }
+    return undefined;
+  }
+
+  // Recording only happens on a real scene end: not while skipping, not after an
+  // annihilation, not for an already seen scene and, for trials, not while the main
+  // quest progress is suppressed.
+  function isSceneCompletionRecordingAllowed(startEndFlag, checksTrialSuppression) {
+    if (startEndFlag != 1) return false;
+    if ($gameSwitches.value(GAME_SWITCH.RECOLLECTION_SKIP)) return false;
+    if ($gameSwitches.value(GAME_SWITCH.ANNIHILATION)) return false;
+    if ($gameSwitches.value(GAME_SWITCH.SCENE_CONTINUE_SELECTED)) return false;
+    if (
+      checksTrialSuppression &&
+      $gameSwitches.value(GAME_SWITCH.TRIAL_MAIN_PROGRESS_SUPPRESSED)
+    ) {
+      return false;
+    }
+    return true;
+  }
+
+  // Advances the counter of every main quest the finished trial belongs to.
+  function advanceMainQuestProgress() {
+    for (const questEntry of MAIN_QUEST_PROGRESS_ENTRIES) {
+      if (!$gameSwitches.value(questEntry.switchId)) continue;
+      $gameVariables.setValue(
+        questEntry.variableId,
+        $gameVariables.value(questEntry.variableId) + 1
+      );
+    }
+  }
+
   eventScene_StartEnd = function (
     startEndFlag,
     selectionSwitchId,
@@ -4605,33 +4894,28 @@
   ) {
     var i; // Preserve the legacy eval-visible binding after moving the phase loops.
     valueCountSet1 = 0;
-    const startSceneActor = $gameActors.actor($gameVariables.value(GAME_VARIABLE.CURRENT_VIEWPOINT_ACTOR_ID));
+    const startSceneActor = $gameActors.actor(
+      $gameVariables.value(GAME_VARIABLE.CURRENT_VIEWPOINT_ACTOR_ID)
+    );
     if (startSceneActor) {
       $gameVariables.setValue(GAME_VARIABLE.ACTOR_NAME_TEXT, startSceneActor.name());
     }
     $gameVariables.setValue(GAME_VARIABLE.EPISODE_COMPLETION_SWITCH, 0); //達成スイッチid変数
+
     if (eventItemId >= 401) {
       const eventItemMeta = $dataItems[eventItemId].meta;
-      if (eventItemMeta["AddEventCompSwi"]) {
-        var completionSwitchId = Number(eventItemMeta["AddEventCompSwi"]);
-      } else {
-        if ($gameVariables.value(GAME_VARIABLE.SCENE_KIND) == 1) {
-          //挿話
-          var completionSwitchId = eventItemId + 900;
-        }
-        if ($gameVariables.value(GAME_VARIABLE.SCENE_KIND) == 2) {
-          //Ｈ
-          var completionSwitchId = eventItemId + 600;
-        }
-      }
-      $gameVariables.setValue(GAME_VARIABLE.EPISODE_COMPLETION_SWITCH, completionSwitchId);
+      const completionSwitchId = resolveEpisodeCompletionSwitchId(
+        eventItemMeta,
+        eventItemId
+      );
+      $gameVariables.setValue(
+        GAME_VARIABLE.EPISODE_COMPLETION_SWITCH,
+        completionSwitchId
+      );
       valueCountSet1 += completionSwitchId;
-      if (
-        startEndFlag == 1 &&
-        !$gameSwitches.value(GAME_SWITCH.RECOLLECTION_SKIP) &&
-        !$gameSwitches.value(GAME_SWITCH.ANNIHILATION) &&
-        !$gameSwitches.value(GAME_SWITCH.SCENE_CONTINUE_SELECTED)
-      ) {
+      if (isSceneCompletionRecordingAllowed(startEndFlag, false)) {
+        // The registration conditions are data driven expressions evaluated in this
+        // scope on purpose, so they can read the scene parameters.
         let registrationFlag = 0;
         var conditionExpression;
         for (const conditionMetaKey of [
@@ -4640,11 +4924,10 @@
           "RegistrationC3"
         ]) {
           conditionExpression = eventItemMeta[conditionMetaKey];
-          if (conditionExpression) {
-            if (eval(conditionExpression)) {
-              //データドリブン条件式のためevalを使用(意図的)
-              registrationFlag = 1;
-            }
+          if (!conditionExpression) continue;
+          if (eval(conditionExpression)) {
+            //データドリブン条件式のためevalを使用(意図的)
+            registrationFlag = 1;
           }
         }
         if (registrationFlag == 0) {
@@ -4653,37 +4936,13 @@
         $gameSwitches.setValue(completionSwitchId, true);
       }
     } else {
-      if (
-        startEndFlag == 1 &&
-        !$gameSwitches.value(GAME_SWITCH.RECOLLECTION_SKIP) &&
-        !$gameSwitches.value(GAME_SWITCH.ANNIHILATION) &&
-        !$gameSwitches.value(GAME_SWITCH.TRIAL_MAIN_PROGRESS_SUPPRESSED) &&
-        !$gameSwitches.value(GAME_SWITCH.SCENE_CONTINUE_SELECTED)
-      ) {
-        //135-140
-        if ($gameSwitches.value(GAME_SWITCH.RISHABLE)) {
-          $gameVariables.setValue(GAME_VARIABLE.MAIN_QUEST_PROGRESS_1, $gameVariables.value(GAME_VARIABLE.MAIN_QUEST_PROGRESS_1) + 1);
-        }
-        if ($gameSwitches.value(GAME_SWITCH.GEKIDEN_EX1)) {
-          $gameVariables.setValue(GAME_VARIABLE.MAIN_QUEST_PROGRESS_2, $gameVariables.value(GAME_VARIABLE.MAIN_QUEST_PROGRESS_2) + 1);
-        }
-        if ($gameSwitches.value(GAME_SWITCH.GEKIDEN_EX2)) {
-          $gameVariables.setValue(GAME_VARIABLE.MAIN_QUEST_PROGRESS_3, $gameVariables.value(GAME_VARIABLE.MAIN_QUEST_PROGRESS_3) + 1);
-        }
-        if ($gameSwitches.value(GAME_SWITCH.GEKIDEN_1)) {
-          $gameVariables.setValue(GAME_VARIABLE.MAIN_QUEST_PROGRESS_4, $gameVariables.value(GAME_VARIABLE.MAIN_QUEST_PROGRESS_4) + 1);
-        }
-        if ($gameSwitches.value(GAME_SWITCH.GEKIDEN_2)) {
-          $gameVariables.setValue(GAME_VARIABLE.MAIN_QUEST_PROGRESS_5, $gameVariables.value(GAME_VARIABLE.MAIN_QUEST_PROGRESS_5) + 1);
-        }
-        if ($gameSwitches.value(GAME_SWITCH.GEKIDEN_3)) {
-          $gameVariables.setValue(GAME_VARIABLE.MAIN_QUEST_PROGRESS_6, $gameVariables.value(GAME_VARIABLE.MAIN_QUEST_PROGRESS_6) + 1);
-        }
+      //135-140
+      if (isSceneCompletionRecordingAllowed(startEndFlag, true)) {
+        advanceMainQuestProgress();
       }
       $gameSwitches.setValue(GAME_SWITCH.TRIAL_MAIN_PROGRESS_SUPPRESSED, false);
     }
-    if (startEndFlag == 0)
-      beginRegisteredEventScene(sceneParamValue, eventItemId);
+    if (startEndFlag == 0) beginRegisteredEventScene(sceneParamValue, eventItemId);
     else finishRegisteredEventScene(selectionSwitchId);
   };
 
@@ -5121,6 +5380,9 @@
     13: 0 //転移。valueCountSet2に転送先のイベID
   };
 
+  // Party state trap states, applied to every member at once.
+  const PARTY_STATE_TRAP_STATE_IDS = [4, 5, 6, 8, 9, 10];
+
   trap_starting1 = function (trapModeId, eventId) {
     const event = $gameMap.event(eventId);
     if (trapModeId == 1) {
@@ -5131,7 +5393,7 @@
     if (trapModeId != 2) return;
     const members = $gameParty.members();
     if (valueCountSet2 == 1) showClothingDamageTrap(members[0]);
-    if ([4, 5, 6, 8, 9, 10].some((stateId) => valueCountSet2 == stateId))
+    if (PARTY_STATE_TRAP_STATE_IDS.some((stateId) => valueCountSet2 == stateId))
       applyPartyStateTrap(members, valueCountSet2);
     switch (valueCountSet1) {
       case 5:
@@ -5153,6 +5415,74 @@
   };
 
   //フラッシュモブ演出flashmob_wordDirect(1,55,56,100,'Tamanegiv6',`!?`);
+  // Banner picture of each flash message mode, with its y and inner width.
+  const FLASHMOB_BANNER_MODES = {
+    1: { pictureName: "Screen_mobFlash", pictureY: 250, innerWidth: 60 },
+    2: { pictureName: "Screen_hukidasi", pictureY: 250, innerWidth: 60 },
+    3: { pictureName: "Screen_hukidasiIkari", pictureY: 255, innerWidth: 40 }
+  };
+  const FLASHMOB_EFFECT_BANNER_HEIGHT = 1280;
+  const FLASHMOB_BANNER_CANVAS = [768, 0, 0];
+  const FLASHMOB_ANGER_EFFECT_ARGUMENTS = [60, "Thunder9"];
+
+  // Message banner of the current flash mode.
+  function showFlashmobBanner(displayModeId, bannerPictureId) {
+    const bannerMode = FLASHMOB_BANNER_MODES[displayModeId];
+    pic_1(
+     2,
+     bannerPictureId,
+     bannerMode.pictureName,
+     0,
+     100,
+     bannerMode.pictureY,
+     bannerMode.innerWidth,
+     FLASHMOB_EFFECT_BANNER_HEIGHT,
+     FLASHMOB_BANNER_CANVAS[0],
+     FLASHMOB_BANNER_CANVAS[1],
+     FLASHMOB_BANNER_CANVAS[2]
+    );
+  }
+
+  // Flash text picture: the id is drawn as a time code so the text can be animated.
+  function showFlashmobTextPicture(messageText, fontName, textPictureId) {
+    $gameScreen.setDTextPicture(`\\oc[15]\\C[15]${textPictureId}`, messageText); //\\f[b]
+    $gameScreen.setDtextFont(fontName);
+  }
+
+  // The text slides in from the right for the plain modes, and is scaled up for the
+  // angry mode.
+  function showFlashmobMessagePicture(displayModeId, messagePictureId) {
+    if (displayModeId === 3) {
+      adv_partDirectPlay(7);
+      $gameScreen.dTextAlign = 1;
+      $gameScreen.showPicture(messagePictureId, "", 1, 640, 384, 300, 300, 0, 0);
+      $gameScreen.movePicture(messagePictureId, 1, 640, 384, 100, 100, 255, 0, 40);
+      return;
+    }
+    $gameScreen.showPicture(
+      messagePictureId,
+      "",
+      1,
+      640 - 240 + 60,
+      384 - 80,
+      100,
+      100,
+      0,
+      0
+    );
+    $gameScreen.movePicture(
+      messagePictureId,
+      1,
+      640 - 240,
+      384 - 80,
+      100,
+      100,
+      255,
+      0,
+      60
+    );
+  }
+
   flashmob_wordDirect = function (
     displayModeId,
     bannerPictureId,
@@ -5164,63 +5494,18 @@
     if (displayModeId == 0) {
       $gameScreen.erasePicture(bannerPictureId);
       $gameScreen.erasePicture(messagePictureId);
-    } else {
-      switch (displayModeId) {
-        case 1:
-          var pictureName = "Screen_mobFlash";
-          break;
-        case 2:
-          var pictureName = "Screen_hukidasi";
-          break;
-        case 3:
-          var pictureName = "Screen_hukidasiIkari";
-          break;
-      }
-      var pictureId = bannerPictureId;
-      if (displayModeId == 1 || displayModeId == 2) {
-        pic_1(2, pictureId, pictureName, 0, 100, 250, 60, 1280, 768, 0, 0);
-      }
-      if (displayModeId == 3) {
-        pic_1(2, pictureId, pictureName, 0, 100, 255, 40, 1280, 768, 0, 0);
-      }
-      var pictureId = textPictureId;
-      var pictureName = messageText;
-      $gameScreen.setDTextPicture(`\\oc[15]\\C[15]${pictureId}`, pictureName); //\\f[b]
-      $gameScreen.setDtextFont(fontName);
-      var pictureId = messagePictureId;
-      if (displayModeId == 1 || displayModeId == 2) {
-        $gameScreen.showPicture(
-          pictureId,
-          "",
-          1,
-          640 - 240 + 60,
-          384 - 80,
-          100,
-          100,
-          0,
-          0
-        );
-        $gameScreen.movePicture(
-          pictureId,
-          1,
-          640 - 240,
-          384 - 80,
-          100,
-          100,
-          255,
-          0,
-          60
-        );
-      }
-      if (displayModeId == 3) {
-        adv_partDirectPlay(7);
-        $gameScreen.dTextAlign = 1;
-        $gameScreen.showPicture(pictureId, "", 1, 640, 384, 300, 300, 0, 0);
-        $gameScreen.movePicture(pictureId, 1, 640, 384, 100, 100, 255, 0, 40);
-      }
-      if (displayModeId == 1 || displayModeId == 3) {
-        ensyutu_ikari(60, "Thunder9");
-      }
+      return;
+    }
+    if (!FLASHMOB_BANNER_MODES[displayModeId]) return;
+
+    showFlashmobBanner(displayModeId, bannerPictureId);
+    showFlashmobTextPicture(messageText, fontName, textPictureId);
+    showFlashmobMessagePicture(displayModeId, messagePictureId);
+    if (displayModeId !== 2) {
+      ensyutu_ikari(
+        FLASHMOB_ANGER_EFFECT_ARGUMENTS[0],
+        FLASHMOB_ANGER_EFFECT_ARGUMENTS[1]
+      );
     }
   };
 
@@ -5441,58 +5726,42 @@
   };
 
   //コンフィグ時に全般情報表示
-  config_display = function () {
-    const variableText = "\\V[58]";
-    const variableText2 = "\\V[55]";
-    const variableText3 = "\\V[141]";
-    const partyRecordText = `${variableText}日目<${variableText2}> ${variableText3}\n`;
-    const partyRecordTitle = colorTaggedText(16, "Party Record");
-    let partyInfoText = `${partyRecordTitle}\n`;
-    partyInfoText += "\\I[266]\\V[16]/\\V[13]\n";
-    partyInfoText += "F.Seed   :\\V[57]\n";
-    let cur = $gameVariables.value(GAME_VARIABLE.EPISODE_COLLECTION_RATES)[0];
-    let max = $gameVariables.value(GAME_VARIABLE.EPISODE_COLLECTION_RATES)[1];
-    partyInfoText += `S.Scene  :${cur}/${max}\n`;
-    cur = $gameVariables.value(GAME_VARIABLE.SCENE_COLLECTION_RATES)[0];
-    max = $gameVariables.value(GAME_VARIABLE.SCENE_COLLECTION_RATES)[1];
-    partyInfoText += `H.Scene  :${cur}/${max}\n`;
-    cur = $gameVariables.value(GAME_VARIABLE.TITLE_COLLECTION_RATES)[0];
-    max = $gameVariables.value(GAME_VARIABLE.TITLE_COLLECTION_RATES)[1];
-    partyInfoText += `Title    :${cur}/${max}\n`;
-    cur = $gameVariables.value(GAME_VARIABLE.H_TITLE_COLLECTION_RATES)[0];
-    max = $gameVariables.value(GAME_VARIABLE.H_TITLE_COLLECTION_RATES)[1];
-    partyInfoText += `H.Title  :${cur}/${max}\n`;
-    cur = $gameVariables.value(GAME_VARIABLE.QUEST_COLLECTION_RATES)[0];
-    max = $gameVariables.value(GAME_VARIABLE.QUEST_COLLECTION_RATES)[1];
-    partyInfoText += `Quest    :${cur}/${max}\n`;
-    partyInfoText += "PartySize:\\V[54]\n";
-    partyInfoText += "Battle   :\\V[46]\n";
-    partyInfoText += "Victory  :\\V[47]\n";
-    partyInfoText += "Defeat   :\\V[48]\n";
-    cur = $gameSystem.escapeCount();
-    partyInfoText += `Escape   :${cur}\n`;
-    partyInfoText += "TotalKill:\\V[43]\n\n";
+  // Collection rate lines of the party record: label plus the variable holding
+  // [collected, total].
+  const COLLECTION_RATE_ENTRIES = [
+    { label: "S.Scene  :", variableId: GAME_VARIABLE.EPISODE_COLLECTION_RATES },
+    { label: "H.Scene  :", variableId: GAME_VARIABLE.SCENE_COLLECTION_RATES },
+    { label: "Title    :", variableId: GAME_VARIABLE.TITLE_COLLECTION_RATES },
+    { label: "H.Title  :", variableId: GAME_VARIABLE.H_TITLE_COLLECTION_RATES },
+    { label: "Quest    :", variableId: GAME_VARIABLE.QUEST_COLLECTION_RATES }
+  ];
 
+  // "Label    :collected/total" line of one collection rate variable.
+  function collectionRateLine(label, variableId) {
+    const rateValues = $gameVariables.value(variableId);
+    return `${label}${rateValues[0]}/${rateValues[1]}\n`;
+  }
+
+  // "[発動中の称号効果]" block: one line per title slot, "Empty" for an empty slot.
+  function buildActiveTitleEffectText() {
     const activeTitleHeading = colorTaggedText(16, "[発動中の称号効果]");
     let miscInfoText = activeTitleHeading + "\n";
-    const itemIndexesCount = $gameVariables.value(GAME_VARIABLE.TITLE_SLOT_COUNT);
-    const ItemIndexes = $gameVariables.value(GAME_VARIABLE.TITLE_EFFECT_IDS);
-    for (let i = 0; i < itemIndexesCount; i++) {
-      const itemIndex = ItemIndexes[i];
-      if (itemIndex == 0) {
+    const titleSlotCount = $gameVariables.value(GAME_VARIABLE.TITLE_SLOT_COUNT);
+    const titleEffectIds = $gameVariables.value(GAME_VARIABLE.TITLE_EFFECT_IDS);
+    for (let slotIndex = 0; slotIndex < titleSlotCount; slotIndex++) {
+      const titleItemId = titleEffectIds[slotIndex];
+      if (titleItemId == 0) {
         miscInfoText += "Empty\n";
-      } else {
-        const itemName = $dataItems[itemIndex].name;
-        const activeTitleName = colorTaggedText(2, itemName);
-        miscInfoText += `${activeTitleName}\n`;
+        continue;
       }
+      const activeTitleName = colorTaggedText(2, $dataItems[titleItemId].name);
+      miscInfoText += `${activeTitleName}\n`;
     }
+    return miscInfoText;
+  }
 
-    WindowManager.show(1, 0, 0, 800, 68);
-    WindowManager.drawText(1, `\\fs[25]${partyRecordText}`);
-    WindowManager.show(2, 410, 68, 390, 520);
-    WindowManager.drawText(2, miscInfoText);
-
+  // Party record picture on the right edge; the message window links to it.
+  function showPartyRecordPicture(partyInfoText) {
     const partyInfoPictureId = 101;
     $gameScreen.setDTextPicture(partyInfoText, 25);
     $gameScreen.dWindowFrame = "ON";
@@ -5507,7 +5776,37 @@
       255,
       0
     );
-    $gameMessage.setSelectPictureId(0, 101);
+    $gameMessage.setSelectPictureId(0, partyInfoPictureId);
+  }
+
+  config_display = function () {
+    const variableText = "\\V[58]";
+    const variableText2 = "\\V[55]";
+    const variableText3 = "\\V[141]";
+    const partyRecordText = `${variableText}日目<${variableText2}> ${variableText3}\n`;
+    const partyRecordTitle = colorTaggedText(16, "Party Record");
+    let partyInfoText = `${partyRecordTitle}\n`;
+    partyInfoText += "\\I[266]\\V[16]/\\V[13]\n";
+    partyInfoText += "F.Seed   :\\V[57]\n";
+    for (const rateEntry of COLLECTION_RATE_ENTRIES) {
+      partyInfoText += collectionRateLine(rateEntry.label, rateEntry.variableId);
+    }
+    partyInfoText += "PartySize:\\V[54]\n";
+    partyInfoText += "Battle   :\\V[46]\n";
+    partyInfoText += "Victory  :\\V[47]\n";
+    partyInfoText += "Defeat   :\\V[48]\n";
+    const escapeCount = $gameSystem.escapeCount();
+    partyInfoText += `Escape   :${escapeCount}\n`;
+    partyInfoText += "TotalKill:\\V[43]\n\n";
+
+    const miscInfoText = buildActiveTitleEffectText();
+
+    WindowManager.show(1, 0, 0, 800, 68);
+    WindowManager.drawText(1, `\\fs[25]${partyRecordText}`);
+    WindowManager.show(2, 410, 68, 390, 520);
+    WindowManager.drawText(2, miscInfoText);
+
+    showPartyRecordPicture(partyInfoText);
   };
 
   //会話時に実行
@@ -8895,7 +9194,19 @@
     WindowManager.drawPicture(windowId + 1, faceFileName);
   }
 
-  function showCommentaryChoice(
+    // Plain text picture used by the commentary choices.
+  function showCommentaryTextPicture(commentaryText, pictureId, pictureX, pictureY) {
+    $gameScreen.setDTextPicture(commentaryText, 28);
+    $gameScreen.dWindowFrame = "ON";
+    showCommentaryPicture("", pictureId, pictureX, pictureY);
+  }
+
+  // Picture slot of the commentary screen; an empty name means "text only".
+  function showCommentaryPicture(pictureName, pictureId, pictureX, pictureY) {
+    $gameScreen.showPicture(pictureId, pictureName, 0, pictureX, pictureY, 100, 100, 0, 0);
+  }
+
+  showCommentaryChoice = function (
     choiceText,
     displayType,
     displayText,
@@ -8907,57 +9218,29 @@
       value: valueStartCommentary0
     };
     $gameSystem.addCustomChoice(customChoiceId, choiceParams);
-    if (displayType == "Dpic") {
-    } else {
-      if (firstTextData == "Nda") {
-      } else {
-        displayText += "\\I[535]";
+
+    // Detail pictures carry the description themselves, so the text picture is only
+    // drawn for tips.
+    const isDetailPicture = displayType == "Dpic";
+    if (!isDetailPicture) {
+      let commentaryText = displayText;
+      if (firstTextData != "Nda") {
+        commentaryText += "\\I[535]";
       }
-      $gameScreen.setDTextPicture(displayText, 28);
-      $gameScreen.dWindowFrame = "ON";
-      var pictureId = 150 + valueStartCommentary1 + valueStartCommentary0;
-      var pictureName = "";
-      $gameScreen.showPicture(
-        pictureId,
-        pictureName,
-        0,
-        10,
-        606,
-        100,
-        100,
-        0,
-        0
-      );
-      $gameMessage.setSelectPictureId(valueStartCommentary0 - 1, pictureId);
+      const commentaryPictureId = 150 + valueStartCommentary1 + valueStartCommentary0;
+      showCommentaryTextPicture(commentaryText, commentaryPictureId, 10, 606);
+      $gameMessage.setSelectPictureId(valueStartCommentary0 - 1, commentaryPictureId);
     }
-    if (displayType == "Npic") {
+    if (displayType == "Npic") return;
+
+    const pictureId = 100 + valueStartCommentary1 + valueStartCommentary0;
+    if (isDetailPicture) {
+      showCommentaryTextPicture(displayText, pictureId, 334, 100);
     } else {
-      if (displayType == "Dpic") {
-        var pictureName = "";
-        $gameScreen.setDTextPicture(displayText, 28);
-        $gameScreen.dWindowFrame = "ON";
-        var pictureY = 100;
-        var pictureX = 334;
-      } else {
-        var pictureName = "/img/tips/" + displayType;
-        var pictureY = 0;
-        var pictureX = 334;
-      }
-      var pictureId = 100 + valueStartCommentary1 + valueStartCommentary0;
-      $gameScreen.showPicture(
-        pictureId,
-        pictureName,
-        0,
-        pictureX,
-        pictureY,
-        100,
-        100,
-        0,
-        0
-      );
-      $gameMessage.setSelectPictureId(valueStartCommentary0 - 1, pictureId);
+      showCommentaryPicture("/img/tips/" + displayType, pictureId, 334, 0);
     }
-  }
+    $gameMessage.setSelectPictureId(valueStartCommentary0 - 1, pictureId);
+  };
 
   function unlockCommentaryEntry(
     switchId,
