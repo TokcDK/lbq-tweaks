@@ -467,38 +467,60 @@ function buildPotionMessageApplied(actorName, resourceLabel, amount, resistDelta
 // Item collection rates
 // ---------------------------------------------------------------------------
 // Writes [owned, total] into variables 321-325, one range of 100 entries each.
+// NOTE: the original counted the total of variable 325 from items 801-900 but the owned
+// count from items 901-1000 (its 801-900 loop never counted owned items), so the two
+// halves of that one entry come from different ranges. Kept as in the original.
 const COLLECT_RATE_RANGES = [
-  { variableId: 321, first: 401, last: 500, countsOwned: true },
-  { variableId: 322, first: 501, last: 600, countsOwned: true },
-  { variableId: 323, first: 601, last: 700, countsOwned: true },
-  { variableId: 324, first: 701, last: 800, countsOwned: true },
-  { variableId: 325, first: 901, last: 1000, countsOwned: true }
+  { variableId: 321, first: 401, last: 500 },
+  { variableId: 322, first: 501, last: 600 },
+  { variableId: 323, first: 601, last: 700 },
+  { variableId: 324, first: 701, last: 800 },
+  { variableId: 325, first: 801, last: 900, ownedFirst: 901, ownedLast: 1000 }
 ];
 
 // Collection rate of every item category
 collect_keisan1 = function(){
   for (const range of COLLECT_RATE_RANGES) {
-    $gameVariables.setValue(range.variableId, countCollectedItems(range.first, range.last, range.countsOwned));
+    $gameVariables.setValue(range.variableId, countCollectedItems(range.first, range.last, range.ownedFirst, range.ownedLast));
   }
 };
 
-// [owned, total]. The original 801-900 scan was overwritten and thrown away, and the
-// 901-1000 scan forgot to reset ownedItemCount, so counts of 701-800 leaked into
-// the variable 325 count. Every range is counted from scratch here.
-function countCollectedItems(first, last, countsOwned) {
+// [owned, total]. ownedFirst / ownedLast override the range the owned count is taken
+// from, for the entry whose owned and total ranges differ in the original.
+function countCollectedItems(first, last, ownedFirst, ownedLast) {
+  const ownedRangeFirst = ownedFirst || first;
+  const ownedRangeLast = ownedLast || last;
+  return [countOwnedItems(ownedRangeFirst, ownedRangeLast), countNamedItems(first, last)];
+}
+
+// Number of entries of a range that have a name.
+function countNamedItems(first, last) {
   const dataItems = $dataItems;
-  const party = $gameParty;
-  let totalItemCount = 0;
-  let ownedItemCount = 0;
+  let itemCount = 0;
 
   for (let itemId = first; itemId <= last; itemId++) {
     const item = dataItems[itemId];
     if (!item || item.name === '') continue;
-    totalItemCount += 1;
-    if (countsOwned && party.hasItem(item)) ownedItemCount += 1;
+    itemCount += 1;
   }
 
-  return [ownedItemCount, totalItemCount];
+  return itemCount;
+}
+
+// Number of named entries of a range the party owns.
+function countOwnedItems(first, last) {
+  const dataItems = $dataItems;
+  const party = $gameParty;
+  let itemCount = 0;
+
+  for (let itemId = first; itemId <= last; itemId++) {
+    const item = dataItems[itemId];
+    if (!item || item.name === '') continue;
+    if (!party.hasItem(item)) continue;
+    itemCount += 1;
+  }
+
+  return itemCount;
 }
 
 // ---------------------------------------------------------------------------
@@ -902,11 +924,16 @@ item_getSkillLevel2 = function(){
 
   const maxSkillMasteryLevel = Number(skill.meta['Max Mastery Level']);
   const skillMasteryLevel = actor.skillMasteryLevel(skillId);
-  const skillRarity = actor.isLearnedSkill(skillId) && skillMasteryLevel >= 0
+  // The original assigned the rank mark only for a learned skill with mastery >= 0, so
+  // the mark stayed unset otherwise (and for a mastery level no branch covered, like
+  // max rank 10 skills at mastery 6..10). The unset mark was concatenated into the text
+  // as the literal "undefined", which get_skill_rarity reproduces by returning undefined.
+  const canShowMasteryInfo = actor.isLearnedSkill(skillId) && skillMasteryLevel >= 0;
+  const skillRarity = canShowMasteryInfo
     ? get_skill_rarity(skillMasteryLevel, maxSkillMasteryLevel)
-    : ``;
+    : undefined;
 
-  if (skillRarity) showSkillMasteryInfo(actor, skill, skillId, skillMasteryLevel, maxSkillMasteryLevel, skillRarity);
+  if (canShowMasteryInfo) showSkillMasteryInfo(actor, skill, skillId, skillMasteryLevel, maxSkillMasteryLevel, skillRarity);
 
   const lastSkillMasteryLevel = valueScriptArray1[1];
   if (!(lastSkillMasteryLevel >= 1)) return;
@@ -922,13 +949,12 @@ function showSkillMasteryInfo(actor, skill, skillId, skillMasteryLevel, maxSkill
   const masteryUses = actor.skillMasteryUses(skillId);
   const masteryUsageMax = actor.skillMasteryUsageMax(skillId);
   const usesText = colorTaggedText(2, `${masteryUses}`);
-  const usesMaxText = colorTaggedText(2, `${masteryUsageMax}`);
   const usesLabel = `Uses:`;
 
   const completeLabel = colorTaggedText(10, `Complete!`);
   const infoMessageText = skillMasteryLevel == maxSkillMasteryLevel
     ? `${skillRarityName} ${completeLabel}`
-    : `${skillRarityName}　${usesLabel}${usesText}／${usesMaxText}`;
+    : `${skillRarityName}　${usesLabel}${usesText}／${masteryUsageMax}`;
   CommonPopupManager.showInfo({}, infoMessageText, null);
 }
 
@@ -942,18 +968,25 @@ function buildSkillRankUpWord(actor, skill, skillRarity, skillMasteryLevel, maxS
     : `${actorName}の${skillName}が${skillRarity}にランクアップ！`;
 }
 
-// Mastery rank mark; skills with a max rank below 5 start one step higher.
-const skillMasteryLevelRarityMarks = [
+// Mastery rank marks, indexed by the mastery level.
+// NOTE: the original assigned the mark inside per-level branches, so a level no branch
+// covered (max rank 10 skills at mastery 6..10) left the mark unset and the unset value
+// was concatenated into the text as the literal "undefined". That is kept here: an
+// out-of-range level returns undefined and the callers concatenate it as the original did.
+const SKILL_RARITY_MARKS_MAX6 = [
   colorTaggedText(4, `[E]`), colorTaggedText(4, `[E]`), colorTaggedText(12, `[D]`),
   colorTaggedText(5, `[C]`), colorTaggedText(13, `[B]`), colorTaggedText(27, `[A]`),
   colorTaggedText(30, `[S]`)
 ];
+// Skills whose max rank is not 6 start one rank higher and have no [S].
+const SKILL_RARITY_MARKS = [
+  colorTaggedText(4, `[D]`), colorTaggedText(4, `[D]`), colorTaggedText(12, `[C]`),
+  colorTaggedText(5, `[B]`), colorTaggedText(13, `[A]`), colorTaggedText(27, `[S]`)
+];
 
 get_skill_rarity = function (skillMasteryLevel, maxSkillMasteryLevel){
-  let skillRarityIndex = skillMasteryLevel;
-  if (maxSkillMasteryLevel < 6) skillRarityIndex++;
-  if (skillRarityIndex >= skillMasteryLevelRarityMarks.length) skillRarityIndex = skillMasteryLevelRarityMarks.length - 1;
-  return skillMasteryLevelRarityMarks[skillRarityIndex];
+  const skillRarityMarks = maxSkillMasteryLevel == 6 ? SKILL_RARITY_MARKS_MAX6 : SKILL_RARITY_MARKS;
+  return skillRarityMarks[skillMasteryLevel];
 };
 
 // Skill mastery from an item use. selectionModeId 2 confirms, anything else only shows the choice.
@@ -1085,11 +1118,14 @@ const WEAPON_BASE_ATTACK_TEXTS = {
 };
 
 // Rarity promotion material tags, in the original display order.
+// NOTE: the original tested RpromotionM twice, so a material with that tag prints its
+// line twice. The duplicate entry keeps that.
 const RARITY_PROMOTION_TAGS = [
   { metaKey: 'LRpromotionM', label: `[RarelityLR解放素材]` },
   { metaKey: 'URpromotionM', label: `[RarelityUR解放素材]` },
   { metaKey: 'SSRpromotionM', label: `[RarelitySSR解放素材]` },
   { metaKey: 'SRpromotionM', label: `[RarelitySR解放素材]` },
+  { metaKey: 'RpromotionM', label: `[RarelityR解放素材]` },
   { metaKey: 'RpromotionM', label: `[RarelityR解放素材]` }
 ];
 
@@ -1724,7 +1760,7 @@ function buildMiniHstatusText(actor, memberActorId) {
   const actorRecords = $gameVariables.value(memberActorId + 380);
   const hpLabel = `\\I[12]:${actorRecords[1]}`;
   const mpLabel = `\\I[376]:${actorRecords[2]}`;
-  return memberText + ` ${hpLabel} ${mpLabel}` + buildActorStateIconsText(actor);
+  return memberText + hpLabel + ` ${mpLabel}` + buildActorStateIconsText(actor);
 }
 
 // Status window of the girl members: one text picture per member plus the frame.
@@ -2279,17 +2315,15 @@ function canBulkSell(item, databaseTypeId, menuCategoryId) {
   return true;
 }
 
-// One bulk sale choice line.
 // Self switch mark of the bulk sale target list: map 4, the type group and the item id.
 function bulkSellMark(databaseTypeId, itemId) {
   return $gameSelfSwitches.getVariableValue([4, 11 + databaseTypeId, itemId]);
 }
 
+// One bulk sale choice line: font size, colour (10 when marked, else 0), entry text.
 function buildBulkSellChoiceText(item, party, isMarkedForBulkSell) {
-  if (isMarkedForBulkSell) {
-    return colorTaggedText(10, buildBulkSellListLine(item, party));
-  }
-  return buildBulkSellListLine(item, party);
+  const markColorCode = isMarkedForBulkSell ? 10 : 0;
+  return BULK_SELL_FONT_TAG + colorTaggedText(markColorCode, buildBulkSellItemText(item, party));
 }
 
 // Icon, name and owned count of one bulk sale entry; the two lists above only add styling.
@@ -2387,13 +2421,15 @@ function applyBulkSellVariablePrice(itemMeta, variablePrice) {
 }
 
 // Pays the "item sell price" tags: the number after the tag name is the paid item id.
+// NOTE: the v1.49 original called $gameParty.getItem, a method that does not exist in
+// this project (Game_Party only has gainItem), so every bulk sale of a tagged item
+// threw a TypeError. The plain gainItem the original intended is used here.
 function grantBulkSellItemPrices(itemMeta, itemPrice) {
   if (itemPrice < 1) return;
 
   for (const sellItemTag of ITEM_SHOP_SELL_ITEM_TAGS) {
     if (!itemMeta[sellItemTag]) continue;
-    // The original used $gameParty.getItem here (the project aliases it to gainItem).
-    $gameParty.getItem($dataItems[Number(sellItemTag.split(' ')[1])], itemPrice);
+    $gameParty.gainItem($dataItems[Number(sellItemTag.split(' ')[1])], itemPrice);
   }
 }
 
@@ -2613,10 +2649,11 @@ function finishFailedTaxDecision(mapId, eventId) {
 // Successful negotiation: the discount line is shown and the negotiation is used up.
 // Self switch A is raised as well when the seduction discount succeeded.
 function finishSucceededTaxDecision(mapId, eventId) {
+  $gamePlayer.requestBalloon(3);
   AudioManager.playSe({ name: 'Z11_QuestClear', volume: 50, pitch: 130, pan: 0 });
   const discountRate = $gameSelfSwitches.getVariableValue([mapId, eventId, 10]);
-  const discountText = colorTaggedText(10, `${discountRate}%の値引きが行われます。` + '\n');
-  appendNegotiationText(`交渉成功！ ${discountText}`);
+  const discountRateText = colorTaggedText(10, `${discountRate}%`);
+  appendNegotiationText(`交渉成功！ ${discountRateText}の値引きが行われます。` + '\n');
 
   if (valueCountSet2 == 1) $gameSelfSwitches.setValue([mapId, eventId, 'A'], true);
   $gameSelfSwitches.setValue([mapId, eventId, 'B'], true);
@@ -2987,11 +3024,10 @@ function isFacingAwayFromPlayer(targetEvent, scanX, scanY) {
 function rollStealWitness(actor) {
   const witnessRandom = getRandomIndex(101);
   // Without the skill the threshold stays 0, so only a roll of 0 witnesses the theft.
-  const witnessThreshold = actor.isLearnedSkill(STEAL_BASE_SKILL_ID)
-    ? actor.skillMasteryLevel(STEAL_BASE_SKILL_ID) * STEAL_WITNESS_RATE_STEP
-    : 0;
-  if (witnessThreshold < 1) return witnessThreshold >= witnessRandom;
+  if (!actor.isLearnedSkill(STEAL_BASE_SKILL_ID)) return 0 >= witnessRandom;
 
+  // The original shows the popup as soon as the skill is known, even at mastery 0.
+  const witnessThreshold = actor.skillMasteryLevel(STEAL_BASE_SKILL_ID) * STEAL_WITNESS_RATE_STEP;
   CommonPopupManager.showInfo({}, `目撃確率:${witnessThreshold} >=- ${witnessRandom}`, null);
   return witnessThreshold >= witnessRandom;
 }
