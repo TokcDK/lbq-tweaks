@@ -219,12 +219,19 @@ function cleanVariableLabel(variableName) {
 }
 
 // Notifications go either to the ticker or into a variable, so they are funnelled through one place.
+// Returns true when the message was accumulated for a later display instead of shown now.
+function stackMessageForDisplay(messageText) {
+  if (!$gameSwitches.value(SW_MESSAGE_STACK_MODE)) return false;
+
+  $gameVariables.setValue(VAR_MESSAGE_STACK_ALT, `${messageText}\n`);
+  $gameVariables.setValue(VAR_MESSAGE_STACK_COUNT, $gameVariables.value(VAR_MESSAGE_STACK_COUNT) + 1);
+  return true;
+}
+
+// Shows a one-line notice in the ticker (or stacks it).
 function showHStateNotice(messageText) {
-  if ($gameSwitches.value(SW_MESSAGE_STACK_MODE)) {
-    $gameVariables.setValue(VAR_MESSAGE_STACK_ALT, `${messageText}\n`);
-    $gameVariables.setValue(VAR_MESSAGE_STACK_COUNT, $gameVariables.value(VAR_MESSAGE_STACK_COUNT) + 1);
-    return;
-  }
+  if (stackMessageForDisplay(messageText)) return;
+
   TickerManager.show(messageText);
 }
 
@@ -416,10 +423,10 @@ function applyPartnerNameOverride(partnerActor, partnerWeapon, partnerWeaponId) 
 // Combines the H count, the number of children and the pregnancy chance into one message.
 function buildPartnerInfoText(partnerWeapon, partnerHRecords, partnerWeaponId, partnerName, partnerHCount) {
   const partnerDescription = partnerWeapon.description;
-  let partnerInfoText = partnerDescription == 0 ? `\n` : `${partnerDescription}\n`;
+  let partnerInfoText = partnerDescription == 0 ? '\n' : partnerDescription + '\n';
 
   const hCountText = colorTaggedText(27, `Ｈ回数：${partnerHCount}`);
-  partnerInfoText += `\n` + `${partnerName}との${hCountText}`;
+  partnerInfoText += '\n' + `${partnerName}との${hCountText}`;
 
   const childCount = partnerHRecords[partnerWeaponId + PARTNER_CHILD_SLOT_OFFSET];
   if (childCount >= 1) {
@@ -550,9 +557,10 @@ h_exp = function (actorId, pictureName, partnerWeaponId, hideFlag, simpleFlag, p
   if (!partnerWeapon) return;
 
   $gameVariables.setValue(VAR_PARTNER_NAME, partnerWeapon.name);
-  const partnerHeadCount = readMetaNumber(partnerWeapon.meta, 'NumberOfPeople', 0);
-  if (partnerHeadCount >= 1) {
-    $gameVariables.setValue(VAR_LAST_H_COUNT, partnerHeadCount);
+  // A raw '0' keeps the value written above; any other truthy value is converted.
+  const partnerHeadCountRaw = partnerWeapon.meta['NumberOfPeople'];
+  if (partnerHeadCountRaw) {
+    $gameVariables.setValue(VAR_LAST_H_COUNT, Number(partnerHeadCountRaw));
   };
 
 };
@@ -1318,7 +1326,6 @@ const PHYSIQUE_CHANGE_TAGS = [
   { metaKey: 'HipSizeChange', sizeKey: 'hipCm' }
 ];
 
-// Adds the physique change skill bonuses (valuePhysiquUp) and returns how many values changed.
 // Adds every physique change tag of one skill to the body size; returns how many tags applied.
 function applyPhysiqueChangeTags(bodySize, physiqueMeta) {
   let changedTagCount = 0;
@@ -1334,6 +1341,7 @@ function applyPhysiqueChangeTags(bodySize, physiqueMeta) {
   return changedTagCount;
 }
 
+// Adds the physique change skill bonuses (valuePhysiquUp) and returns how many values changed.
 function applyPhysiqueSkillBonuses(gameActor, bodySize) {
   const physiqueSkills = gameActor.battleSkillsRaw();
   let physiqueChangeCount = 0;// number of values changed by the physique bonuses
@@ -1578,7 +1586,7 @@ function grantClothItemByExposureRank(actor, exposureSkillName, exposureRank, it
   const exposureSkill = colorTaggedText(2, exposureSkillName);
   const itemIconName = colorTaggedText(27, `\x1bIIN[${itemId}]`);
   const clothDescription = clothItem.description;
-  appendHStateMessage(`──${exposureSkill}が${rankThreshold}到達！　Got ${itemIconName}!──` + `\n${clothDescription}\n`, H_PASSIVE_PAGE_LINES, H_PASSIVE_PAGE_HEADER);
+  appendHStateMessage(`──${exposureSkill}が${rankThreshold}到達！　${itemIconName}Get!──` + `\n${clothDescription}` + `\\C[0]` + `\n`, H_PASSIVE_PAGE_LINES, H_PASSIVE_PAGE_HEADER);
 }
 
 // Indexes the clothing items by kind (subCategory / ClothType).
@@ -1658,7 +1666,7 @@ function collectOwnedClothSubCategories() {
 function appendClothGrantedByTypeMessage(exposureSkillName, rankThreshold, candidateItemId) {
   const exposureSkill = colorTaggedText(2, `${exposureSkillName}:Rank${rankThreshold}`);
   const itemIconName = colorTaggedText(27, `\x1bIIN[${candidateItemId}]`);
-  appendHStateMessage(`──${exposureSkill}の効果により、Got ${itemIconName}!──` + `\n`, H_PASSIVE_PAGE_LINES, H_PASSIVE_PAGE_HEADER);
+  appendHStateMessage(`──${exposureSkill}の効果により、${itemIconName}Get!──` + `\n`, H_PASSIVE_PAGE_LINES, H_PASSIVE_PAGE_HEADER);
 }
 
 // Exposure development 5 unlocks the dress-up menu.
@@ -1813,7 +1821,8 @@ function readMetaNumber(meta, metaKey, fallbackValue) {
 function appendActivatedMessage(entry, gainDisplayText) {
   const entryName = colorTaggedText(27, `<${entry.name}>`);
   const gainText = colorTaggedText(31, gainDisplayText);
-  appendHStateMessage(`${entryName}${H_ACTIVATED_WORD}${gainText}${EXP_ICON_MARKER}` + '\n', 3);
+  // The icon marker is appended outside the translatable text.
+  appendHStateMessage(entryName + H_ACTIVATED_WORD + gainText + EXP_ICON_MARKER + '\n', 3);
 }
 
 // HexpReflectionSkill: adds the variable value to another variable according to the skill rank.
@@ -1890,7 +1899,8 @@ function appendJobExpMessage(subclassId, jobExp) {
   const jobMarker = `\x1bJ[${subclassId}]`;
   const jobLabel = colorTaggedText(27, `[${jobMarker}]`);
   const expText = colorTaggedText(31, `${jobExp}`);
-  appendHStateMessage(`ジョブ:${jobLabel}に${expText}expを取得${EXP_ICON_MARKER}` + '\n', 3);
+  // The icon marker is appended outside the translatable text.
+  appendHStateMessage(`ジョブ:${jobLabel}に${expText}expを取得` + EXP_ICON_MARKER + '\n', 3);
 }
 
 //---------------------------------------------------------------------------
@@ -2074,11 +2084,8 @@ function buildLibidoStatLine(actor, hStateValues, statVarId) {
 
 // Output of the compact display (accumulated text or DTextPicture).
 function outputLibidoStatSummary() {
-  if ($gameSwitches.value(SW_MESSAGE_STACK_MODE)) {
-    $gameVariables.setValue(VAR_MESSAGE_STACK_ALT, `${valueWordSet0}\n`);
-    $gameVariables.setValue(VAR_MESSAGE_STACK_COUNT, $gameVariables.value(VAR_MESSAGE_STACK_COUNT) + 1);
-    return;
-  };
+  if (stackMessageForDisplay(valueWordSet0)) return;
+
   $gameScreen.setDTextPicture(valueWordSet0, 28);
 }
 
@@ -2459,11 +2466,8 @@ function notifyEstrusCalmed(actor) {
 
 // Estrus messages; accumulated text or ticker.
 function notifyEstrusChange(estrusMessage) {
-  if ($gameSwitches.value(SW_MESSAGE_STACK_MODE)) {
-    $gameVariables.setValue(VAR_MESSAGE_STACK_ALT, `${estrusMessage}\n`);
-    $gameVariables.setValue(VAR_MESSAGE_STACK_COUNT, $gameVariables.value(VAR_MESSAGE_STACK_COUNT) + 1);
-    return;
-  };
+  if (stackMessageForDisplay(estrusMessage)) return;
+
   TickerManager.show(estrusMessage);
 }
 
