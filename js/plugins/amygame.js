@@ -3799,8 +3799,8 @@ item_gacha = function () {
     }
 
     // The label is built first: no function call inside the translatable sentence.
-    const gachaItemLabel = buildGachaItemLabel(lotteryRarity, valueGachaId);
-    const gachaResultMessage = gachaItemLabel + "が排出されました！";
+    const gachaItem = buildGachaItemLabel(lotteryRarity, valueGachaId);
+    const gachaResultMessage = `${gachaItem}が排出されました！`;
     if (!$gameSwitches.value(GAME_SWITCH.TEMPORARY_RESULT)) {
       $gameVariables.setValue(GAME_VARIABLE.RANDOM_WORK_2, gachaResultMessage);
       return;
@@ -4440,7 +4440,8 @@ item_gacha = function () {
     actor.learnSkill(LAST_RARITY_SKILL_ID);
     reality_setUp(actor.actorId());
     actor.addState(RARITY_DOWN_STATE_ID);
-    const stateApplyMessage = `${actorName}は\x1bI[${stateData.iconIndex}]${stateData.name}を受けた…`;
+	const stateName = `\x1bI[${stateData.iconIndex}]${stateData.name}`;
+    const stateApplyMessage = `${actorName}は${stateName}を受けた…`;
     CommonPopupManager.showInfo({}, stateApplyMessage, null);
 
     equipData[CONFISCATED_SUBCLASS_RECORD] = actor._subclassId;
