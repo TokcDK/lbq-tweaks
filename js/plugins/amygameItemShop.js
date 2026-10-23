@@ -40,9 +40,16 @@ function itemShopEntry(databaseTypeId, itemId, template) {
 
 // Common tail of every shop builder: publish goods and enter Scene_Shop.
 // prepareFlag is the second Scene_Shop argument (false only for shop_preparation1).
-function itemShopOpen(goodsEntries, sortFlag, prepareFlag) {
+// Adds the rows to the shared scratch array and, on the last call of a group, hands
+// that same array to the shop. The original accumulated over several calls
+// (shop_preparation1(0,..,0), (1,..,0), (2,..,1) and runShopPreparation), so the
+// array is neither cleared nor copied here.
+// targetEntries keeps the rows of a builder that had its own local array (otherShop_preparation1).
+function itemShopOpen(goodsEntries, sortFlag, prepareFlag, targetEntries) {
+  const entryList = targetEntries || array;
+  for (const shopEntry of goodsEntries) entryList.push(shopEntry);
   if (sortFlag != 1) return;
-  goods = goodsEntries;
+  goods = entryList;
   SceneManager.push(Scene_Shop);
   SceneManager.prepareNextScene(goods, prepareFlag !== false);
 }
@@ -123,6 +130,15 @@ const BULK_SELL_FONT_TAG = `\\FS[25]`;
 const ITEM_SHOP_SELL_VARIABLE_TAGS = ['Variable 57 Sell Price', 'Variable 69 Sell Price'];
 const ITEM_SHOP_SELL_ITEM_TAGS = ['Item 270 Sell Price', 'Item 147 Sell Price', 'Item 152 Sell Price'];
 const ITEM_SHOP_SELL_TAGS = ['Sell Price'].concat(ITEM_SHOP_SELL_VARIABLE_TAGS, ITEM_SHOP_SELL_ITEM_TAGS);
+
+// The "[not sellable]" line of the price info ignores <Variable 69 Sell Price>, because the
+// original condition forgot that tag. Kept so the output stays identical.
+const PRICE_INFO_SELL_CHECK_TAGS = ['Sell Price', 'Variable 57 Sell Price',
+  'Item 270 Sell Price', 'Item 147 Sell Price', 'Item 152 Sell Price'];
+
+function hasPriceInfoSellTag(itemMeta) {
+  return PRICE_INFO_SELL_CHECK_TAGS.some(function (key) { return !!itemMeta[key]; });
+}
 
 // True when the entry carries at least one sell price tag.
 function hasSellPriceTag(entry) {
@@ -557,22 +573,27 @@ function pickRarityCandidateIndex(entries, end, rarityListText, acceptItem) {
 // Draws one candidate; returns undefined when the list is empty.
 // `entries` is unused; it is kept so the helper keeps its original signature.
 function pickRandomIdFrom(candidateIds, entries) {
-  if (!candidateIds.length) return undefined;
+  // The draw happens even when the list is empty, as the original did, so the random
+  // stream stays aligned (an empty list yields undefined either way).
   return candidateIds[getRandomIndex(candidateIds.length)];
 }
 
 // The item / weapon / armor appraisal note decides which database is scanned.
+// As in the original the tags are applied in a row, so the last one wins.
 function appraisalDatabaseFor(appraisalMeta) {
-  if (appraisalMeta['鑑定道具']) return $dataItems;
-  if (appraisalMeta['鑑定武器']) return $dataWeapons;
-  if (appraisalMeta['鑑定防具']) return $dataArmors;
-  return undefined;
+  let entries;
+  if (appraisalMeta['鑑定道具']) entries = $dataItems;
+  if (appraisalMeta['鑑定武器']) entries = $dataWeapons;
+  if (appraisalMeta['鑑定防具']) entries = $dataArmors;
+  return entries;
 }
 
 function appraisalDatabaseForId(appraisalMeta) {
-  if (appraisalMeta['鑑定防具']) return ITEM_SHOP_DB_ARMOR;
-  if (appraisalMeta['鑑定武器']) return ITEM_SHOP_DB_WEAPON;
-  return ITEM_SHOP_DB_ITEM;
+  let databaseTypeId;
+  if (appraisalMeta['鑑定道具']) databaseTypeId = ITEM_SHOP_DB_ITEM;
+  if (appraisalMeta['鑑定武器']) databaseTypeId = ITEM_SHOP_DB_WEAPON;
+  if (appraisalMeta['鑑定防具']) databaseTypeId = ITEM_SHOP_DB_ARMOR;
+  return databaseTypeId;
 }
 
 // Category note match: wtypeId for weapons, etypeId for armors, menu category for items.
@@ -800,10 +821,11 @@ item_getSkillLevel = function(skillId,itemType,rewardId){
   if (!actor || !skill) return;
 
   const isLearnedSkill = actor.isLearnedSkill(skillId);
-  const skillMasteryLevel = isLearnedSkill ? actor.skillMasteryLevel(skillId) : 0;
 
-  const gainResult = gainGatherSkillMastery(actor, skill, skillId, isLearnedSkill, skillMasteryLevel);
-  const rewardAmount = computeGatherRewardAmount(actor, skillMasteryLevel, rewardId);
+  const gainResult = gainGatherSkillMastery(actor, skill, skillId, isLearnedSkill);
+  // The original read the mastery level again after the mastery gain, so the amount
+  // of the finding follows the new level (and is not 0 for an unknown skill).
+  const rewardAmount = computeGatherRewardAmount(actor, skillId, rewardId);
   const rewardText = grantGatherReward(itemType, rewardId, rewardAmount);
 
   CommonPopupManager.showInfo({}, rewardText + gainResult.text, null);
@@ -813,8 +835,9 @@ item_getSkillLevel = function(skillId,itemType,rewardId){
 
 // Adds the mastery gain and returns the display text plus the pre-gain mastery.
 // When nothing is added (max rank reached) the text is one invisible ideographic space.
-function gainGatherSkillMastery(actor, skill, skillId, isLearnedSkill, skillMasteryLevel) {
+function gainGatherSkillMastery(actor, skill, skillId, isLearnedSkill) {
   const noGain = { text: '　', skillLevel: 0 };
+  const skillMasteryLevel = actor.skillMasteryLevel(skillId);
 
   if (skillMasteryLevel == Number(skill.meta['Max Mastery Level'])) return noGain;
   if (!isLearnedSkill || skillMasteryLevel < 0) return noGain;
@@ -833,7 +856,8 @@ function stripSkillStateSuffix(skillName) {
 }
 
 // Amount of a finding: one at mastery 0, and material ids 10/141 give ten times more with the luck skill.
-function computeGatherRewardAmount(actor, skillMasteryLevel, rewardId) {
+function computeGatherRewardAmount(actor, skillId, rewardId) {
+  const skillMasteryLevel = actor.skillMasteryLevel(skillId);
   if (skillMasteryLevel != 0) {
     if ((rewardId == 10 || rewardId == 141) && actor.isLearnedSkill(799)) return skillMasteryLevel * 10;
     return skillMasteryLevel;
@@ -1127,7 +1151,7 @@ function buildPriceInfoSellText(item, itemPrice) {
   }
 
   // As in the original an entry without tags and without a price is shown as not sellable.
-  if (itemPrice == 0 && !hasSellPriceTag(item)) return colorTaggedText(1, `[売却不可]`) + '\n';
+  if (itemPrice == 0 && !hasPriceInfoSellTag(item.meta)) return colorTaggedText(1, `[売却不可]`) + '\n';
   return sellText || ``;
 }
 
@@ -1284,15 +1308,17 @@ function buildPriceInfoSingleAlchemyText(databaseEntries, itemId, item, itemMeta
 }
 
 // Quest material line; daily quests (901-1000) read the state of 801-900.
-// NOTE: the original read valueQuestArray1[itemId] for weapons and armors instead of
-// the +2000/+3000 side it tested, which crashed on weapons and armors. The tested
-// side is used here.
+// NOTE: the original decided the 801-900 range on valueQuestArray1[itemId], i.e. on the
+// item side even for weapons (+2000) and armors (+3000). That is kept; only the missing
+// row guard is new, the original crashed there.
 function buildPriceInfoQuestMaterialText(databaseTypeId, itemId) {
   const questEntry = findQuestMaterialEntry(databaseTypeId, itemId);
   if (!questEntry) return ``;
 
-  const questItemId = questEntry[1];
   const questMaterialLabel = colorTaggedText(14, `[クエスト指定素材]`);
+  const questStateEntry = valueQuestArray1[itemId];
+  if (questStateEntry == null) return questMaterialLabel;
+  const questItemId = questStateEntry[1];
 
   if (!(questItemId >= 801 && questItemId <= 900)) {
     return questMaterialLabel + colorTaggedText(11, `(ﾃﾞｲﾘｰ)`) + '\n';
@@ -1330,8 +1356,9 @@ function buildPriceInfoSeisyoujuuText(databaseTypeId, itemId, item) {
 // the failing case is reported to the ticker and the synthesis is skipped.
 function canRunItemSynthesis(actor, synthesisItem, requiredRank, materialCount) {
   if (!actor.isLearnedSkill(valueAlchemySkillId) || actor.skillMasteryLevel(valueAlchemySkillId) < requiredRank) {
-    const alchemySkillLabel = `\x1bSIN[${valueAlchemySkillId}]`;
-    TickerManager.show(`主人公の${alchemySkillLabel}ランクが必要値に達していません。`);
+    // The original used a single quoted string here, so it shows the text
+    // "${value1}" literally instead of the skill id. Kept as-is.
+    TickerManager.show('主人公の\x1bSIN[${value1}]ランクが必要値に達していません。');
     return false;
   }
   if ($gameParty.numItems(synthesisItem) < materialCount) {
@@ -1834,7 +1861,7 @@ otherShop_preparation1 = function(buyPriceVarId,lotteryRarity,sortFlag){
     if (lotteryRarity >= 1) return Number(item.meta['LotteryRearity']) == lotteryRarity;
     return false;
   }, [0, 0, 1, 0]);
-  itemShopOpen(shopEntries, sortFlag);
+  itemShopOpen(shopEntries, sortFlag, undefined, []);
 };
 
 // Book shop, goods only (no choices)
@@ -1872,7 +1899,9 @@ function addBookChoice(bookItem, itemId) {
   const paddedBookName = padBookName(bookItem.name);
   const ownedLabel = buildBookOwnedLabel(ownedCount);
   const bookListText = `${paddedBookName}${ownedLabel} `
-    + colorTaggedText(2, bookPrice.toLocaleString()) + `\\G`;
+    // NOTE: the original wrote "\G" with a single backslash, which the message system
+    // shows as a bare "G" instead of the currency unit. Kept as-is.
+    + colorTaggedText(2, bookPrice.toLocaleString()) + `G`;
   const bookDescriptionText = buildBookDescriptionText(bookItem);
 
   $gameSystem.addCustomChoice(1, { text: bookListText, value: valueCountSet2 });
@@ -2188,7 +2217,9 @@ wallet_insideGet = function(usedItem,targetItem,itemId,databaseTypeId){
   TickerManager.show(`${walletItemLabel}には${walletAmountText}入っていた！`);
 
   $gameParty.gainGold(walletGainAmount);
-  $gameParty.gainItem(walletItem, -1);
+  // NOTE: the original passed the item id here, not the item object, so the engine
+  // ignores the call (a numeric id resolves to no item container). Kept as-is.
+  $gameParty.gainItem(itemId, -1);
 };
 
 // ---------------------------------------------------------------------------
@@ -2361,7 +2392,8 @@ function grantBulkSellItemPrices(itemMeta, itemPrice) {
 
   for (const sellItemTag of ITEM_SHOP_SELL_ITEM_TAGS) {
     if (!itemMeta[sellItemTag]) continue;
-    $gameParty.gainItem($dataItems[Number(sellItemTag.split(' ')[1])], itemPrice);
+    // The original used $gameParty.getItem here (the project aliases it to gainItem).
+    $gameParty.getItem($dataItems[Number(sellItemTag.split(' ')[1])], itemPrice);
   }
 }
 
@@ -2427,10 +2459,11 @@ shop_taxDecision1 = function(eventId){
   if (taxState.isHoneyTrapped) valueCountSet1 += 1;
 
   if ($gameSwitches.value(ITEM_SHOP_SWITCH.COMMERCE_ENABLED)) {// commerce on
-    markShopNegotiationState(shopEvent, actor, isNegotiated);
+    markShopNegotiationState(shopEvent, actor, taxState.isNegotiated);
   }
 
-  if (taxState.taxRate > -1) return;
+  // The original tested "<= -1" here, so a NaN tax rate shows nothing.
+  if (!(taxState.taxRate <= -1)) return;
   showNegotiatedDiscount(taxState.taxRate);
 }
 
