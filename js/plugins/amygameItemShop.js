@@ -897,9 +897,9 @@ function grantGatherReward(itemType, rewardId, rewardAmount) {
     $gameParty.gainGold(goldAmount);
     // As in the original the colour tag opens before the gold line and closes after the amount.
     const goldColorTag = `\\C[3]`;
-    const goldGainLabel = `小銭を拾った。（+`;
+    const goldGainLabel = `小銭を拾った。`;
     const goldAmountText = colorTaggedText(10, `${goldAmount}`);
-    return `${goldColorTag}${goldGainLabel}${goldAmountText}\\G）`;
+    return `${goldColorTag}${goldGainLabel}（+${goldAmountText}\\G）`;
   }
 
   const entries = itemShopDatabase(itemType);
@@ -1394,7 +1394,9 @@ function canRunItemSynthesis(actor, synthesisItem, requiredRank, materialCount) 
   if (!actor.isLearnedSkill(valueAlchemySkillId) || actor.skillMasteryLevel(valueAlchemySkillId) < requiredRank) {
     // The original used a single quoted string here, so it shows the text
     // "${value1}" literally instead of the skill id. Kept as-is.
-    TickerManager.show('主人公の\x1bSIN[${value1}]ランクが必要値に達していません。');
+	// but in refactored we see here is skill id is more correct!
+	const skillName = `\x1bSIN[${valueAlchemySkillId}]`;
+    TickerManager.show(`主人公の${skillName}ランクが必要値に達していません。`);
     return false;
   }
   if ($gameParty.numItems(synthesisItem) < materialCount) {
