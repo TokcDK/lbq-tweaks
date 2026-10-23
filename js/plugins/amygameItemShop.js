@@ -51,19 +51,26 @@ function itemShopOpen(goodsEntries, sortFlag, prepareFlag) {
 function collectShopEntries(databaseTypeIds, matches, template, reportedDatabaseTypeId) {
   const shopEntries = [];
   for (const databaseTypeId of databaseTypeIds) {
-    const entries = itemShopDatabase(databaseTypeId);
-    if (!entries) continue;
-    const end = itemShopDatabaseEnd(databaseTypeId, entries);
-    for (let itemId = 1; itemId <= end; itemId++) {
-      const item = entries[itemId];
-      if (!item) continue;
-      if (matches(item, databaseTypeId) === false) continue;
-      // With reportedDatabaseTypeId the recorded type is that value, not the scanned one.
-      const entryTypeId = (reportedDatabaseTypeId === undefined) ? databaseTypeId : reportedDatabaseTypeId;
-      shopEntries.push(itemShopEntry(entryTypeId, itemId, template));
-    }
+    collectShopEntriesOfType(shopEntries, databaseTypeId, matches, template, reportedDatabaseTypeId);
   }
   return shopEntries;
+}
+
+// Adds the matching entries of one database type to the shop entry list.
+function collectShopEntriesOfType(shopEntries, databaseTypeId, matches, template, reportedDatabaseTypeId) {
+  const entries = itemShopDatabase(databaseTypeId);
+  if (!entries) return;
+
+  const end = itemShopDatabaseEnd(databaseTypeId, entries);
+  for (let itemId = 1; itemId <= end; itemId++) {
+    const item = entries[itemId];
+    if (!item) continue;
+    if (matches(item, databaseTypeId) === false) continue;
+
+    // With reportedDatabaseTypeId the recorded type is that value, not the scanned one.
+    const entryTypeId = (reportedDatabaseTypeId === undefined) ? databaseTypeId : reportedDatabaseTypeId;
+    shopEntries.push(itemShopEntry(entryTypeId, itemId, template));
+  }
 }
 
 // Game variables this plugin shares with the event code. The project keeps their ids
@@ -247,17 +254,22 @@ function showQuestChangedLines(questIndex, previousValue, currentValue, isInBatt
   for (let lineIndex = 0; lineIndex < previousValueLines.length; lineIndex++) {
     if (previousValueLines[lineIndex] === currentValueLines[lineIndex]) continue;
 
-    CommonPopupManager.showInfo({}, currentValueLines[lineIndex], null);
-    if (valueQuestArray6[questIndex] !== 1) continue;
-
-    const achievedLabel = colorTaggedText(10, `条件達成`);
-    const achievedText = `\x1bIIN[${itemLabelId}]:[${achievedLabel}]`;
-    CommonPopupManager.showInfo({}, achievedText, null);
-
-    if (isInBattle) continue;
-    const particleName = (questIndex >= 101) ? 'cracker_min_r' : 'cracker_min_l';
-    $gameScreen._particle.particlePlay(0, particleName, 'player', 'def', 'above');
+    showQuestLineChange(questIndex, itemLabelId, currentValueLines[lineIndex], isInBattle);
   }
+}
+
+// Shows one changed quest line, plus the "condition met" popup and its cracker particle.
+function showQuestLineChange(questIndex, itemLabelId, currentLine, isInBattle) {
+  CommonPopupManager.showInfo({}, currentLine, null);
+  if (valueQuestArray6[questIndex] !== 1) return;
+
+  const achievedLabel = colorTaggedText(10, `条件達成`);
+  const achievedText = `\x1bIIN[${itemLabelId}]:[${achievedLabel}]`;
+  CommonPopupManager.showInfo({}, achievedText, null);
+
+  if (isInBattle) return;
+  const particleName = (questIndex >= 101) ? 'cracker_min_r' : 'cracker_min_l';
+  $gameScreen._particle.particlePlay(0, particleName, 'player', 'def', 'above');
 }
 
 function showQuestProgressPopups() {
@@ -289,10 +301,15 @@ function processDailyQuestItems() {
     if (!party.hasItem(item)) continue;
     if (valueQuestArray6[itemId - 900] !== 1) continue;
 
-    $gameSwitches.setValue(ITEM_SHOP_SWITCH.DAILY_QUEST_REWARD, true);
-    quest_housyuu(itemId, 2);
-    $gameSwitches.setValue(ITEM_SHOP_SWITCH.DAILY_QUEST_REWARD, false);
+    payDailyQuestReward(itemId);
   }
+}
+
+// Pays one daily quest; switch 518 is raised only while the reward event runs.
+function payDailyQuestReward(itemId) {
+  $gameSwitches.setValue(ITEM_SHOP_SWITCH.DAILY_QUEST_REWARD, true);
+  quest_housyuu(itemId, 2);
+  $gameSwitches.setValue(ITEM_SHOP_SWITCH.DAILY_QUEST_REWARD, false);
 }
 
 // Converts the stacked use of stat orbs (equip type 6 + <ItemPicture>) into parameters.
@@ -318,14 +335,18 @@ function chargeStatOrbStack(armor, armorId, statOrbStacks) {
 
   AudioManager.playSe({ name: "Magic2", volume: 100, pitch: 130, pan: 0 });
   playSeisyoujuuParticle();
+  reportStatOrbCharged(armorId, initialParamValue, itemCount);
+  return true;
+}
 
+// "<armor> [enhance: base +added]<parameter up!>" popup of the charged stat orb.
+function reportStatOrbCharged(armorId, initialParamValue, addedCount) {
   const armorName = colorTaggedText(2, `\x1bAIN[${armorId}]`);
-  const addedValueText = colorTaggedText(10, `+${itemCount}`);
+  const addedValueText = colorTaggedText(10, `+${addedCount}`);
   const enhanceValueText = `[強化値:${initialParamValue}${addedValueText}]`;
   const parameterUpLabel = `<パラメータアップ！>`;
   const popupMessage = `${armorName} ${enhanceValueText}${parameterUpLabel}`;
   CommonPopupManager.showInfo({}, popupMessage, null);
-  return true;
 }
 
 function chargeSeisyoujuuParams() {
@@ -377,7 +398,10 @@ function resolvePotionBaseAmount(targetItem, potionUsePoint, restoresHp) {
 // amount is published in valuePotion1, then the outcome is reported.
 item_Potion1 = function(usedItem,targetItem,itemId){
 
-  const itemMeta = $dataItems[itemId].meta;
+  // BUGFIX: the metadata lookup crashed when the item id had no database entry.
+  const potionItem = $dataItems[itemId];
+  if (!potionItem) return;
+  const itemMeta = potionItem.meta;
   const isResistDisabled = targetItem.isStateAffected(291);
   const potionResistDelta = resolvePotionResistDelta(targetItem, itemMeta);
   const potionUsePoint = Number(itemMeta['PotionUsePoint']);
@@ -513,17 +537,21 @@ function resolveAppraisalTarget(appraisalEntry) {
   }
   if (appraisalMeta['鑑定カテゴリ']) {
     const categoryValue = appraisalMeta['鑑定カテゴリ'];
-    const candidateIndices = collectRarityCandidates(entries, end, appraisalMeta['鑑定カテゴリランク'].split(','),
+    index = pickRarityCandidateIndex(entries, end, appraisalMeta['鑑定カテゴリランク'],
       function (item) { return appraisalCategoryMatches(item, entries, categoryValue); });
-    index = pickRandomIdFrom(candidateIndices, entries);
   }
   if (appraisalMeta['鑑定レアリティ版']) {
-    const candidateIndices = collectRarityCandidates(entries, end, appraisalMeta['鑑定レアリティ版'].split(','),
+    index = pickRarityCandidateIndex(entries, end, appraisalMeta['鑑定レアリティ版'],
       function () { return true; });
-    index = pickRandomIdFrom(candidateIndices, entries);
   }
 
   return { entries, index };
+}
+
+// Collects the entries of the listed rarities that pass `acceptItem`, then draws one.
+function pickRarityCandidateIndex(entries, end, rarityListText, acceptItem) {
+  const candidateIndices = collectRarityCandidates(entries, end, rarityListText.split(','), acceptItem);
+  return pickRandomIdFrom(candidateIndices, entries);
 }
 
 // Draws one candidate; returns undefined when the list is empty.
@@ -627,7 +655,8 @@ function showAppraisalMasteryMessage(actor, appraisalSkillId) {
   const skillName = colorTaggedText(3, `\x1bSIN[${appraisalSkillId}]`);
   const currentUses = actor.skillMasteryUses(appraisalSkillId);
   const maxUses = actor.skillMasteryUsageMax(appraisalSkillId);
-  const mpState = `${actor.mp}/${actor.param(1)}`;
+  const actorMaxMp = actor.param(1);
+  const mpState = `${actor.mp}/${actorMaxMp}`;
   const masteryGainText = `\\V[203]`;
   TickerManager.show(
     `${actorName}のMPが5消費された。【現在MP${mpState}】＜${skillName}＞熟練度${masteryGainText}獲得！（${currentUses}/${maxUses}）`
@@ -866,13 +895,15 @@ item_getSkillLevel2 = function(){
 // Shows the mastery uses and the rank on one line.
 function showSkillMasteryInfo(actor, skill, skillId, skillMasteryLevel, maxSkillMasteryLevel, skillRarity) {
   const skillRarityName = skill.name + skillRarity;
-  const usesText = colorTaggedText(2, `${actor.skillMasteryUses(skillId)}`);
-  const usesMaxText = colorTaggedText(2, `${actor.skillMasteryUsageMax(skillId)}`);
+  const masteryUses = actor.skillMasteryUses(skillId);
+  const masteryUsageMax = actor.skillMasteryUsageMax(skillId);
+  const usesText = colorTaggedText(2, `${masteryUses}`);
+  const usesMaxText = colorTaggedText(2, `${masteryUsageMax}`);
   const usesLabel = `Uses:`;
 
-  const completeText = colorTaggedText(10, `Complete!`);
+  const completeLabel = colorTaggedText(10, `Complete!`);
   const infoMessageText = skillMasteryLevel == maxSkillMasteryLevel
-    ? `${skillRarityName} ${completeText}`
+    ? `${skillRarityName} ${completeLabel}`
     : `${skillRarityName}　${usesLabel}${usesText}／${usesMaxText}`;
   CommonPopupManager.showInfo({}, infoMessageText, null);
 }
@@ -933,9 +964,16 @@ function skillColoredName(skillId, skillType, brackets) {
   return colorTaggedText(valueSkillColorArr[skillType], brackets === false ? skillName : `＜${skillName}＞`);
 }
 
+// "uses/max" of a skill, the form both the gain message and the prompt use.
+function buildMasteryUsesLabel(actor, skillId) {
+  const masteryUses = actor.skillMasteryUses(skillId);
+  const masteryUsageMax = actor.skillMasteryUsageMax(skillId);
+  return `${masteryUses}/${masteryUsageMax}`;
+}
+
 function buildSkillNoRankText(skillId, skillType) {
-  const suffix = `はランクが存在しないスキルのため使用できない…。`;
-  return `${skillColoredName(skillId, skillType)}${suffix}`;
+  const skillName = skillColoredName(skillId, skillType);
+  return `${skillName}はランクが存在しないスキルのため使用できない…。`;
 }
 
 // Confirmed use: adds the mastery and appends two log lines on a rank up.
@@ -946,22 +984,27 @@ function useSkillMasteryBook(actor, usedItem, skillId, skillType, masteryGain) {
 
   const playerName = actor.name();
   const skillName = skillColoredName(skillId, skillType);
-  const usesLabel = `${actor.skillMasteryUses(skillId)}/${actor.skillMasteryUsageMax(skillId)}`;
+  const usesLabel = buildMasteryUsesLabel(actor, skillId);
   const infoMessageText = `${playerName}の${skillName}熟練度が${masteryGain}上昇した！（${usesLabel}）`;
 
   const currentMasteryLevel = actor.skillMasteryLevel(skillId);
-  const hasRankedUp = currentMasteryLevel > beforeMasteryLevel;
-  let rankUpText;
-  if (hasRankedUp) {
-    if (!$gameParty.inBattle()) $gamePlayer.requestAnimation(300);
-    const masteryLevelText = colorTaggedText(2, `${currentMasteryLevel}`);
-    rankUpText = `${playerName}の${skillName}が${masteryLevelText}にランクアップ！`;
-    gab_wordParticle(rankUpText);
-  }
+  const rankUpText = currentMasteryLevel > beforeMasteryLevel
+    ? announceMasteryRankUp(playerName, skillName, currentMasteryLevel)
+    : undefined;
 
   $gameSystem.pushInfoLog(infoMessageText);
-  if (hasRankedUp) $gameSystem.pushInfoLog(rankUpText);
+  if (rankUpText) $gameSystem.pushInfoLog(rankUpText);
   return infoMessageText;
+}
+
+// Animation, particle and message of a rank up; returns the log text.
+function announceMasteryRankUp(playerName, skillName, currentMasteryLevel) {
+  if (!$gameParty.inBattle()) $gamePlayer.requestAnimation(300);
+
+  const masteryLevel = colorTaggedText(2, `${currentMasteryLevel}`);
+  const rankUpText = `${playerName}の${skillName}が${masteryLevel}にランクアップ！`;
+  gab_wordParticle(rankUpText);
+  return rankUpText;
 }
 
 // Choice display; a usable skill stores its id in valueCountSet1 and asks for a second selection.
@@ -978,7 +1021,7 @@ function buildSkillMasteryBookChoiceText(actor, skillId, skillType) {
   }
 
   valueCountSet1 += skillId;
-  const usesText = `${actor.skillMasteryUses(skillId)}/${actor.skillMasteryUsageMax(skillId)}`;
+  const usesText = buildMasteryUsesLabel(actor, skillId);
   const promptText = colorTaggedText(10, `（もう一度選択で使用されます）`);
   const plainSkillName = skillColoredName(skillId, skillType, false);
   return `${plainSkillName} 熟練度:${usesText}　${promptText}`;
@@ -1274,9 +1317,10 @@ function buildPriceInfoSeisyoujuuText(databaseTypeId, itemId, item) {
   if (item.etypeId != 6) return ``;
   if (!item.meta['ItemPicture']) return ``;
 
-  const enhanceValue = colorTaggedText(10, $gameVariables.value(ITEM_SHOP_VARIABLE.STAT_ORB_STACKS)[itemId - valueSeisyoujuuStartId]);
+  const enhanceValue = $gameVariables.value(ITEM_SHOP_VARIABLE.STAT_ORB_STACKS)[itemId - valueSeisyoujuuStartId];
   const enhanceLabel = `強化値:`;
-  return `${enhanceLabel}${enhanceValue}\n`;
+  const enhanceValueText = colorTaggedText(10, `${enhanceValue}`);
+  return `${enhanceLabel}${enhanceValueText}\n`;
 }
 // ---------------------------------------------------------------------------
 // Single item synthesis
@@ -1395,14 +1439,21 @@ function registerSynthesisSources(recipeIds, recipeKind, knowsAlchemy) {
       : `？？？` + '\n';
 
     for (let ingredientIndex = 0; ingredientIndex < ingredients.length; ingredientIndex++) {
-      const synthIngredient = DataManager.getSynthesisIngredient(recipeTarget, ingredientIndex);
-      const sourceId = synthIngredient.id + synthesisSlotOffset(synthIngredient);
-      const registeredText = valueItemsSynth1[sourceId];
-      valueItemsSynth1[sourceId] = registeredText == 0
-        ? ingredientDisplayText
-        : registeredText + ingredientDisplayText;
+      registerRecipeIngredientLine(recipeTarget, ingredientIndex, ingredientDisplayText);
     }
   }
+}
+
+// Appends the recipe line to the slot of one ingredient (slots accumulate several lines).
+function registerRecipeIngredientLine(recipeTarget, ingredientIndex, ingredientDisplayText) {
+  const synthIngredient = DataManager.getSynthesisIngredient(recipeTarget, ingredientIndex);
+  const sourceId = synthIngredient.id + synthesisSlotOffset(synthIngredient);
+  const synthSlot = valueItemsSynth1;
+  const registeredText = synthSlot[sourceId];
+  // Slots accumulate: an empty slot takes the line, a filled one gets it appended.
+  synthSlot[sourceId] = registeredText == 0
+    ? ingredientDisplayText
+    : registeredText + ingredientDisplayText;
 }
 
 // Materials with augment slots are kept apart for weapons and armors (<No Augment Slots>).
@@ -1603,7 +1654,10 @@ weapon_uniqueEnhance = function(id,enhanceModeId){
 function buildCollectSlotText(collectedItemId, party) {
   const collectedItem = $dataItems[collectedItemId];
   if (collectedItemId == 0 || !collectedItem) return `[登録なし]`;
-  return `[${collectedItem.name}:${party.numItems(collectedItem)}]`;
+
+  const collectedName = collectedItem.name;
+  const collectedCount = party.numItems(collectedItem);
+  return `[${collectedName}:${collectedCount}]`;
 }
 
 // Two text lines and the framed window of the collected item list.
@@ -1631,9 +1685,14 @@ item_collectList1 = function(varId){
 // Icon (or bracketed name) plus HP / MP of one girl.
 function buildMiniHstatusText(actor, memberActorId) {
   const girlIconName = $dataActors[memberActorId].meta['IconGura'];
-  const memberText = girlIconName
-    ? `\x1bI[${Number(girlIconName)}]`
-    : `[${actor.name()}]`;
+  let memberText;
+  if (girlIconName) {
+    const girlIconIndex = Number(girlIconName);
+    memberText = `\x1bI[${girlIconIndex}]`;
+  } else {
+    const actorName = actor.name();
+    memberText = `[${actorName}]`;
+  }
 
   const actorRecords = $gameVariables.value(memberActorId + 380);
   const hpLabel = `\\I[12]:${actorRecords[1]}`;
@@ -1647,6 +1706,17 @@ function showMiniHstatusWindow(girlMemberCount) {
   $gameScreen.dWindowFrame = 'ON';
   $gameScreen.showPicture(48, "", 0, 10, iconOffsetValue, 100, 100, 255, 0);
 }
+
+// One party slot: the member text is stored in the list and shown as a text picture.
+function publishMiniHstatusEntry(statusList, memberIndex, actor, memberActorId) {
+  statusList[memberIndex] = buildMiniHstatusText(actor, memberActorId);
+  // NOTE: the value is read back from the list, as the original did (it may stay empty
+  // when the variables array is a copy), so the quirk is kept.
+  $gameScreen.setDTextPicture(statusList[memberIndex], MINI_H_STATUS_FONT_SIZE);
+}
+
+// Font size of the mini H status text pictures.
+const MINI_H_STATUS_FONT_SIZE = 22;
 
 actor_miniHstatusList1 = function(varId){
 
@@ -1663,8 +1733,7 @@ actor_miniHstatusList1 = function(varId){
     if (!isGirl(actor)) continue;
 
     girlMemberCount += 1;
-    statusList[memberIndex] = buildMiniHstatusText(actor, memberActorId);
-    $gameScreen.setDTextPicture(statusList[memberIndex], 22);
+    publishMiniHstatusEntry(statusList, memberIndex, actor, memberActorId);
   }
 
   if (girlMemberCount < 1) return;
@@ -1699,9 +1768,8 @@ function isShopPreparationEntry(item, databaseTypeId, targetRarity) {
 
 shop_preparation1 = function(databaseTypeId,targetRarity,sortFlag){
 
-  const entries = itemShopDatabase(databaseTypeId);
+  const entries = prepareItemShopDatabase(databaseTypeId);
   if (!entries) return;
-  valueItems = entries;
 
   const itemsEnd = itemShopDatabaseEnd(databaseTypeId, entries);
   const shopEntries = [];
@@ -1801,7 +1869,9 @@ bookShop_preparert = function(bookShopId){
 function addBookChoice(bookItem, itemId) {
   const bookPrice = applyShopDiscount(bookItem.price);
   const ownedCount = $gameParty.numItems(bookItem);
-  const bookListText = `${padBookName(bookItem.name)}${buildBookOwnedLabel(ownedCount)} `
+  const paddedBookName = padBookName(bookItem.name);
+  const ownedLabel = buildBookOwnedLabel(ownedCount);
+  const bookListText = `${paddedBookName}${ownedLabel} `
     + colorTaggedText(2, bookPrice.toLocaleString()) + `\\G`;
   const bookDescriptionText = buildBookDescriptionText(bookItem);
 
@@ -1848,8 +1918,11 @@ function buildBookDescriptionText(bookItem) {
 
 // Reads up to three digits up to the closing bracket of "[788]".
 function extractSkillIdFromDescription(adDescription) {
-  let adSkillId = `${adDescription.charAt(0)}${adDescription.charAt(1)}`;
-  if (adDescription.charAt(2) != ']') adSkillId += adDescription.charAt(2);
+  const firstChar = adDescription.charAt(0);
+  const secondChar = adDescription.charAt(1);
+  const thirdChar = adDescription.charAt(2);
+  let adSkillId = `${firstChar}${secondChar}`;
+  if (thirdChar != ']') adSkillId += thirdChar;
   return adSkillId;
 }
 
@@ -1916,8 +1989,10 @@ function buildJouhouChoiceText(infoItemId, buyInfoItemId) {
   const infoItem = $dataItems[infoItemId];
   if (infoItemId == buyInfoItemId) return infoItem.name;
 
-  const infoItemPriceText = colorTaggedText(2, `(${infoItem.price.toLocaleString()}\\G)`);
-  let infoItemNameText = `${infoItem.name} ${infoItemPriceText}`;
+  const infoItemPrice = infoItem.price.toLocaleString();
+  const infoItemPriceText = colorTaggedText(2, `(${infoItemPrice}\\G)`);
+  const infoItemName = infoItem.name;
+  let infoItemNameText = `${infoItemName} ${infoItemPriceText}`;
   if ($gameParty.hasItem(infoItem, true)) infoItemNameText += colorTaggedText(10, `[購入済み]`);
   return infoItemNameText;
 }
@@ -2097,11 +2172,12 @@ wallet_insideGet = function(usedItem,targetItem,itemId,databaseTypeId){
 
   if (targetItem.actorId() != usedItem.actorId()) return;
 
-  const entries = itemShopDatabase(databaseTypeId);
+  const entries = prepareItemShopDatabase(databaseTypeId);
   if (!entries) return;
-  valueItems = entries;
 
+  // BUGFIX: the metadata lookup crashed when the item id had no database entry.
   const walletItem = entries[itemId];
+  if (!walletItem) return;
   const walletInValues = walletItem.meta['walletIn'].split(',');
   const walletMin = Number(walletInValues[0]);
   const walletRange = Number(walletInValues[1]);
@@ -2139,6 +2215,15 @@ function collectBulkSellRows(databaseTypeId, selectRow) {
   return rows;
 }
 
+// Publishes the collected bulk sale rows to the choice list arrays; false when empty.
+function publishBulkSellRows(rows) {
+  if (rows.length < 1) return false;
+
+  valueWordArray = rows.map((row) => row.line);
+  valueCountArray = rows.map((row) => row.itemId);
+  return true;
+}
+
 ikkatu_sellChoice = function(databaseTypeId,menuCategoryId){
 
   const party = $gameParty;
@@ -2150,9 +2235,7 @@ ikkatu_sellChoice = function(databaseTypeId,menuCategoryId){
     return buildBulkSellChoiceText(item, party, bulkSellMark(databaseTypeId, itemId) != 0);
   });
 
-  if (rows.length < 1) return;
-  valueWordArray = rows.map((row) => row.line);
-  valueCountArray = rows.map((row) => row.itemId);
+  publishBulkSellRows(rows);
 }
 
 
@@ -2172,18 +2255,24 @@ function bulkSellMark(databaseTypeId, itemId) {
 }
 
 function buildBulkSellChoiceText(item, party, isMarkedForBulkSell) {
-  let itemNameAndCount = `\x1bI[${item.iconIndex}]${item.name}:${party.numItems(item)}`;
-  if (isMarkedForBulkSell){
-    itemNameAndCount = colorTaggedText(isMarkedForBulkSell ? 10 : 0, itemNameAndCount);
+  if (isMarkedForBulkSell) {
+    return colorTaggedText(10, buildBulkSellListLine(item, party));
   }
-  return BULK_SELL_FONT_TAG + itemNameAndCount;
+  return buildBulkSellListLine(item, party);
+}
+
+// Icon, name and owned count of one bulk sale entry; the two lists above only add styling.
+function buildBulkSellItemText(item, party) {
+  const itemIconIndex = item.iconIndex;
+  const itemName = item.name;
+  const ownedCount = party.numItems(item);
+  return `\x1bI[${itemIconIndex}]${itemName}:${ownedCount}`;
 }
 
 // Bulk sale target selection, self switch version
 // Choice line of the bulk sale confirmation list: font size, icon, name and count.
 function buildBulkSellListLine(item, party) {
-  const itemName = `\x1bI[${item.iconIndex}]${item.name}`;
-  return BULK_SELL_FONT_TAG + `${itemName}:${party.numItems(item)}`;
+  return BULK_SELL_FONT_TAG + buildBulkSellItemText(item, party);
 }
 
 ikkatu_sellChoice2 = function(databaseTypeId){
@@ -2194,9 +2283,8 @@ ikkatu_sellChoice2 = function(databaseTypeId){
     return buildBulkSellListLine(item, party);
   });
 
-  if (rows.length < 1) return;
-  valueWordArray = rows.map((row) => row.line);
-  valueCountArray = rows.map((row) => row.itemId);
+  if (!publishBulkSellRows(rows)) return;
+  // The confirmation list also remembers the database type of every row.
   valueCountArray2 = rows.map(() => databaseTypeId);
 }
 
@@ -2222,6 +2310,15 @@ item_ikkatu = function(databaseTypeId){
 };
 
 // Sells one entry, splitting the amount per currency: gold, variable 57, variable 69, items.
+// Shop database of the type and, as the callers expect, the shared valueItems pointer.
+function prepareItemShopDatabase(databaseTypeId) {
+  const entries = itemShopDatabase(databaseTypeId);
+  if (!entries) return null;
+
+  valueItems = entries;
+  return entries;
+}
+
 function sellBulkItem(item) {
   const itemMeta = item.meta;
   const sellItemCount = $gameParty.numItems(item);
@@ -2234,29 +2331,38 @@ function sellBulkItem(item) {
   $gameParty.loseItem(item, sellItemCount);
   if (goldPrices.total >= 1) $gameParty.gainGold(goldPrices.total);
 
-  // NOTE: variable 69 is increased with the amount computed for variable 57, as in the original.
-  if (variablePrice >= 1) {
-    if (itemMeta['Variable 57 Sell Price']) {
-      const currencyCount = $gameVariables.value(ITEM_SHOP_VARIABLE.VARIABLE_57_CURRENCY);
-      $gameVariables.setValue(ITEM_SHOP_VARIABLE.VARIABLE_57_CURRENCY, currencyCount + variablePrice);
-    }
-    if (itemMeta['Variable 69 Sell Price']) {
-      const coinCount = $gameVariables.value(ITEM_SHOP_VARIABLE.COIN_COUNT);
-      $gameVariables.setValue(ITEM_SHOP_VARIABLE.COIN_COUNT, coinCount + variablePrice);
-    }
-  }
-
-  if (itemPrice >= 1) {
-    for (const sellItemTag of ITEM_SHOP_SELL_ITEM_TAGS) {
-      if (!itemMeta[sellItemTag]) continue;
-      $gameParty.gainItem($dataItems[Number(sellItemTag.split(' ')[1])], itemPrice);
-    }
-  }
+  applyBulkSellVariablePrice(itemMeta, variablePrice);
+  grantBulkSellItemPrices(itemMeta, itemPrice);
 
   valueIkkatuArray.push([
     `\x1bI[${item.iconIndex}]${item.name}`, sellItemCount, goldPrices.total, variablePrice, itemPrice
   ]);
   valueCountSet1 += 1;
+}
+
+// Adds the "variable sell price" amount to the two currencies of the item tags.
+// NOTE: variable 69 is increased with the amount computed for variable 57, as in the original.
+function applyBulkSellVariablePrice(itemMeta, variablePrice) {
+  if (variablePrice < 1) return;
+
+  if (itemMeta['Variable 57 Sell Price']) {
+    const currencyCount = $gameVariables.value(ITEM_SHOP_VARIABLE.VARIABLE_57_CURRENCY);
+    $gameVariables.setValue(ITEM_SHOP_VARIABLE.VARIABLE_57_CURRENCY, currencyCount + variablePrice);
+  }
+  if (itemMeta['Variable 69 Sell Price']) {
+    const coinCount = $gameVariables.value(ITEM_SHOP_VARIABLE.COIN_COUNT);
+    $gameVariables.setValue(ITEM_SHOP_VARIABLE.COIN_COUNT, coinCount + variablePrice);
+  }
+}
+
+// Pays the "item sell price" tags: the number after the tag name is the paid item id.
+function grantBulkSellItemPrices(itemMeta, itemPrice) {
+  if (itemPrice < 1) return;
+
+  for (const sellItemTag of ITEM_SHOP_SELL_ITEM_TAGS) {
+    if (!itemMeta[sellItemTag]) continue;
+    $gameParty.gainItem($dataItems[Number(sellItemTag.split(' ')[1])], itemPrice);
+  }
 }
 
 // Gold payout: <Price> is halved and <Sell Price> wins.
@@ -2316,20 +2422,26 @@ shop_taxDecision1 = function(eventId){
   const shopEvent = $gameMap.event(eventId);
   if (!actor || !shopEvent) return;
 
-  const mapId = $gameMap.mapId();
-  const taxRate = $gameSelfSwitches.getVariableValue([mapId, eventId, 10]);
-  const isNegotiated = $gameSelfSwitches.value([mapId, eventId, 'B']);
-  const isHoneyTrapped = $gameSelfSwitches.value([mapId, eventId, 'A']);
-
-  $gameSystem.setBuyTaxTo(isNegotiated ? taxRate : 0);
-  if (isHoneyTrapped) valueCountSet1 += 1;
+  const taxState = readShopTaxState(eventId);
+  $gameSystem.setBuyTaxTo(taxState.isNegotiated ? taxState.taxRate : 0);
+  if (taxState.isHoneyTrapped) valueCountSet1 += 1;
 
   if ($gameSwitches.value(ITEM_SHOP_SWITCH.COMMERCE_ENABLED)) {// commerce on
     markShopNegotiationState(shopEvent, actor, isNegotiated);
   }
 
-  if (taxRate > -1) return;
-  showNegotiatedDiscount(taxRate);
+  if (taxState.taxRate > -1) return;
+  showNegotiatedDiscount(taxState.taxRate);
+}
+
+// Per-shop self switches: 10 holds the tax rate, B "negotiated", A "honey trapped".
+function readShopTaxState(eventId) {
+  const mapId = $gameMap.mapId();
+  return {
+    taxRate: $gameSelfSwitches.getVariableValue([mapId, eventId, 10]),
+    isNegotiated: $gameSelfSwitches.value([mapId, eventId, 'B']),
+    isHoneyTrapped: $gameSelfSwitches.value([mapId, eventId, 'A'])
+  };
 }
 
 // Commerce switch branch: the shop keeper offers a negotiation and, unless it was
@@ -2505,7 +2617,8 @@ function buildChangeText(currency, costAmount, ownedAmount) {
   const priceDifference = ownedAmount - costAmount;
   const ownedText = ownedAmount.toLocaleString();
   const costText = costAmount.toLocaleString();
-  const changeText = colorTaggedText(14, `${priceDifference.toLocaleString()}${currency.unit}`);
+  const priceDifferenceText = priceDifference.toLocaleString();
+  const changeText = colorTaggedText(14, `${priceDifferenceText}${currency.unit}`);
   return `${currency.label}:${ownedText}${currency.unit} - `
     + `支払額:${costText}${currency.unit} = `
     + changeText + `…`;
@@ -2651,16 +2764,24 @@ item_oneOffBuy = function(buyModeId,databaseTypeId,dbEntryId,buyFlag){
 };
 
 // Shows the background and the portrait and sets the description (variable 21) and price (variable 22).
+// Shows a picture at zero opacity and moves it to the target opacity (the usual
+// "fade in" pair of these scenes).
+function fadeInPicture(pictureId, picturePath, targetOpacity, fadeTime) {
+  $gameScreen.showPicture(pictureId, picturePath, 1, 640, 384, 100, 100, 0, 0);
+  $gameScreen.movePicture(pictureId, 1, 640, 384, 100, 100, targetOpacity, 0, fadeTime);
+}
+
+// Overlay and duration shared by the one-off buy backdrop pictures.
+const ONE_OFF_BUY_BLACK_OUT = 'ScreenBlackOut';
+const ONE_OFF_BUY_FADE_TIME = 40;
+
 function showOneOffBuyPictures(purchaseItem, buyFlag) {
   const backgroundPath = (buyFlag == 0)
     ? "/img/parallaxes/Scene_ItemsBuy"
     : "/img/parallaxes/" + $gameVariables.value(ITEM_SHOP_VARIABLE.MENU_BACKGROUND_NAME);
-  $gameScreen.showPicture(ONE_OFF_BUY_PICTURE_ID - 3, backgroundPath, 1, 640, 384, 100, 100, 0, 0);
-  $gameScreen.movePicture(ONE_OFF_BUY_PICTURE_ID - 3, 1, 640, 384, 100, 100, 250, 0, 40);
-
-  const blackOutPath = 'ScreenBlackOut';
-  $gameScreen.showPicture(ONE_OFF_BUY_PICTURE_ID - 2, blackOutPath, 1, 640, 384, 100, 100, 0, 0);
-  $gameScreen.movePicture(ONE_OFF_BUY_PICTURE_ID - 2, 1, 640, 384, 100, 100, 200, 0, 40);
+  // Backdrop and the black overlay fade in to different opacities.
+  fadeInPicture(ONE_OFF_BUY_PICTURE_ID - 3, backgroundPath, 250, ONE_OFF_BUY_FADE_TIME);
+  fadeInPicture(ONE_OFF_BUY_PICTURE_ID - 2, ONE_OFF_BUY_BLACK_OUT, 200, ONE_OFF_BUY_FADE_TIME);
 
   let passiveStateId = 0;
   if (purchaseItem.meta['Passive State']) {
@@ -2691,18 +2812,28 @@ function showOneOffBuyItemPicture(purchaseItem, passiveStateId) {
   const pictureY = 384 + pictureYOffset;
 
   if (purchaseItem.iconIndex == ONE_OFF_BUY_SUMMON_ICON_INDEX) {
-    const summonPath = `/img/sv_enemies/Summon_${itemPictureValues[0]}`;
-    $gameScreen.showPicture(ONE_OFF_BUY_PICTURE_ID, summonPath, 1, 640, pictureY, 100, 100, 255, 0);
-    picture_fade1(ONE_OFF_BUY_PICTURE_ID, "fadeIn", '162', 60, 5);
-    valueTachieBless = [100, 100, 250, 0.004, 0.003];// portrait breathing setup, base state
-    tachie_bless(ONE_OFF_BUY_PICTURE_ID, 0);
-    element_particleSet(2, ONE_OFF_BUY_PICTURE_ID, passiveStateId, pictureYOffset);
+    showSummonItemPicture(itemPictureValues, pictureY, passiveStateId, pictureYOffset);
     return pictureYOffset;
   }
 
+  showPlainItemPicture(itemPictureValues, pictureY);
+  return pictureYOffset;
+}
+
+// Summon entries show their sv_enemies picture, breathe like a portrait and carry particles.
+function showSummonItemPicture(itemPictureValues, pictureY, passiveStateId, pictureYOffset) {
+  const summonPath = `/img/sv_enemies/Summon_${itemPictureValues[0]}`;
+  $gameScreen.showPicture(ONE_OFF_BUY_PICTURE_ID, summonPath, 1, 640, pictureY, 100, 100, 255, 0);
+  picture_fade1(ONE_OFF_BUY_PICTURE_ID, "fadeIn", '162', 60, 5);
+  valueTachieBless = [100, 100, 250, 0.004, 0.003];// portrait breathing setup, base state
+  tachie_bless(ONE_OFF_BUY_PICTURE_ID, 0);
+  element_particleSet(2, ONE_OFF_BUY_PICTURE_ID, passiveStateId, pictureYOffset);
+}
+
+// Regular item picture; the fade in uses a different frame set.
+function showPlainItemPicture(itemPictureValues, pictureY) {
   $gameScreen.showPicture(ONE_OFF_BUY_PICTURE_ID, itemPictureValues[0], 1, 640, pictureY, 100, 100, 255, 0);
   picture_fade1(ONE_OFF_BUY_PICTURE_ID, "157", '162', 60, 5);
-  return pictureYOffset;
 }
 
 // Animation used when a weapon or armor carries trait 43.
@@ -2744,11 +2875,13 @@ steal_direction1 = function(databaseTypeId,dbEntryId,stealCount){
 
   const stealSuccessFlag = scanForStealWitness(actor);
 
-  const entries = itemShopDatabase(databaseTypeId);
+  const entries = prepareItemShopDatabase(databaseTypeId);
   if (!entries) return;
-  valueItems = entries;
 
+  // BUGFIX: the name lookup crashed when the stolen id had no database entry.
   const stolenItem = entries[dbEntryId];
+  if (!stolenItem) return;
+
   const stolenItemLabel = `\x1bI[${stolenItem.iconIndex}]${stolenItem.name}`;
   const stealCountText = colorTaggedText(2, `${stealCount}個`);
   const stealMessage = `${stolenItemLabel}を${stealCountText}盗んだ！`;
@@ -2759,6 +2892,16 @@ steal_direction1 = function(databaseTypeId,dbEntryId,stealCount){
   reportStealBounty(stolenItem);
 };
 
+// Balloon 1 ends the scan (the theft was noticed), balloon 2 marks an unaware witness.
+function reactToWitness(witnessEvent, actor) {
+  if (rollStealWitness(actor)) {
+    witnessEvent.requestBalloon(1);
+    return true;
+  }
+  witnessEvent.requestBalloon(2);
+  return false;
+}
+
 // Checks whether nearby NPCs witness the theft and shows one balloon per witness.
 function scanForStealWitness(actor) {
   const player = $gamePlayer;
@@ -2768,22 +2911,25 @@ function scanForStealWitness(actor) {
 
   for (let scanY = player.y - searchRadius; scanY <= player.y + searchRadius; scanY++) {
     for (let scanX = player.x - searchRadius; scanX <= player.x + searchRadius; scanX++) {
-      const foundEventId = $gameMap.eventIdXy(scanX, scanY);
-      if (foundEventId < 1) continue;
-
-      const foundEvent = $gameMap.event(foundEventId);
-      if (!isWitnessCandidate(foundEvent, scanX, scanY)) continue;
-      if (!isFacingAwayFromPlayer(foundEvent, scanX, scanY)) continue;
-
-      if (rollStealWitness(actor)) {
-        foundEvent.requestBalloon(1);
+      if (isStealWitnessAt(scanX, scanY, actor)) {
         stealSuccessFlag = 1;
         break;
       }
-      foundEvent.requestBalloon(2);// balloon
     }
   }
   return stealSuccessFlag;
+}
+
+// Handles the event standing on one scanned tile; true when it noticed the theft.
+function isStealWitnessAt(scanX, scanY, actor) {
+  const foundEventId = $gameMap.eventIdXy(scanX, scanY);
+  if (foundEventId < 1) return false;
+
+  const foundEvent = $gameMap.event(foundEventId);
+  if (!isWitnessCandidate(foundEvent, scanX, scanY)) return false;
+  if (!isFacingAwayFromPlayer(foundEvent, scanX, scanY)) return false;
+
+  return reactToWitness(foundEvent, actor);
 }
 
 // Only opaque NPCs can witness the theft.
