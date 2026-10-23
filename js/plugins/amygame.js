@@ -1432,6 +1432,9 @@ abNomal_Clear = function (
   // Fills the H troop with members of the H spawn pool; the members are never hidden.
   function pushHEnemyTroopMembers(enemyTroopH, enemyCountToSpawn, spawnPoolH) {
     for (let spawnIndex = 1; spawnIndex <= enemyCountToSpawn; spawnIndex++) {
+      // The spawn id is rolled before the position; keeping this order keeps the
+      // random draws identical to the original loop.
+      const enemySpawnId = resolveHEnemySpawnId(spawnPoolH);
       const { spawnX, spawnY } = getSpawnCoordinatesHEnemyTroopPush(
         spawnIndex,
         enemyCountToSpawn,
@@ -1440,7 +1443,7 @@ abNomal_Clear = function (
         yPositiveOffsetOptions
       );
       enemyTroopH.members.push(
-        buildTroopMember(resolveHEnemySpawnId(spawnPoolH), spawnX, spawnY, false)
+        buildTroopMember(enemySpawnId, spawnX, spawnY, false)
       );
     }
   }
@@ -2286,12 +2289,7 @@ abNomal_Clear = function (
 
   // Map type, location and background setup of one map: everything that only needs
   // the map notes and the map metadata.
-  function setupMapInfoSources(
-    dataMap,
-    gameVariables,
-    gameSwitches,
-    mapInfo
-  ) {
+  function setupMapInfoSources(dataMap, gameVariables, gameSwitches) {
     // Extract map metadata
     const mapMeta = extractMapMetadata(dataMap);
 
@@ -2300,6 +2298,15 @@ abNomal_Clear = function (
 
     // Set town and battle map info
     setMapLocationInfo(gameSwitches, gameVariables);
+
+    // Determine current map info source
+    // NOTE: this must stay after setMapLocationInfo; it reads variable 230 and
+    // DUNGEON_INFO_ITEM_ID which setMapLocationInfo writes.
+    const mapInfo = determineMapInfoSource(
+      dataMap,
+      gameVariables,
+      gameSwitches
+    );
 
     // Play start sound effect
     mapPlayStartSoundEffect(mapInfo, gameSwitches);
@@ -2351,10 +2358,7 @@ abNomal_Clear = function (
     // Apply default map switches if no conditions matched
     applyDefaultMapSwitches(dataMap, gameSwitches, foundMapSwitch);
 
-    // Determine current map info source
-    const mapInfo = determineMapInfoSource(dataMap, gameVariables, gameSwitches);
-
-    setupMapInfoSources(dataMap, gameVariables, gameSwitches, mapInfo);
+    setupMapInfoSources(dataMap, gameVariables, gameSwitches);
   };
 
   // Helper Functions
@@ -2607,11 +2611,16 @@ abNomal_Clear = function (
 
   // "<EnemySpecialState>" note of the map, as state ids.
   function setupMapSpecialStates(gameVariables, mapInfoMeta) {
-    const enemySpecialStateMeta = mapInfoMeta["EnemySpecialState"];
-    gameVariables.setValue(
-      GAME_VARIABLE.MAP_ENEMY_SPECIAL_STATES,
-      enemySpecialStateMeta ? collectPositiveNoteIds(enemySpecialStateMeta) : []
+    // The stored array is filled in place, like the original block did.
+    gameVariables.setValue(GAME_VARIABLE.MAP_ENEMY_SPECIAL_STATES, []);
+    const specialStates = gameVariables.value(
+      GAME_VARIABLE.MAP_ENEMY_SPECIAL_STATES
     );
+    const enemySpecialStateMeta = mapInfoMeta["EnemySpecialState"];
+    if (!enemySpecialStateMeta) return;
+    for (const stateId of collectPositiveNoteIds(enemySpecialStateMeta)) {
+      specialStates.push(stateId);
+    }
   }
 
   // Night weather of the map: the map note wins over the map meta.
@@ -3864,8 +3873,14 @@ item_gacha = function () {
 
   // One loot choice of the gacha list: the icon+name choice plus the two picture
   // placeholders that carry the entry description and the shared "詳細情報" block.
-  function addGachaListChoice(databaseTypeId, itemIndex, databaseEntry, choiceIndex, pictureSlot) {
-    const detailInfoText = $gameVariables.value(GAME_VARIABLE.TEMPORARY_TEXT);
+  function addGachaListChoice(
+    detailInfoText,
+    databaseTypeId,
+    itemIndex,
+    databaseEntry,
+    choiceIndex,
+    pictureSlot
+  ) {
     item_priceinfo(databaseTypeId, itemIndex);
     $gameSystem.addCustomChoice(1, {
       text: `\x1bI[${databaseEntry.iconIndex}]${databaseEntry.name}`,
@@ -3875,8 +3890,9 @@ item_gacha = function () {
       pictureSlot + 100,
       20,
       10,
-      databaseEntry.description
+      `${databaseEntry.description}`
     );
+    $gameMessage.setSelectPictureId(choiceIndex, pictureSlot + 100);
     showGachaListPicture(
       pictureSlot + 101,
       640,
@@ -3887,7 +3903,6 @@ item_gacha = function () {
         "\n" +
         detailInfoText
     );
-    $gameMessage.setSelectPictureId(choiceIndex, pictureSlot + 100);
     $gameMessage.setSelectPictureId(choiceIndex, pictureSlot + 101);
   }
 
@@ -3904,6 +3919,9 @@ item_gacha = function () {
     let choiceIndex = 1;
     let pictureSlot = 1;
 
+    // Read once for the whole list, like the original block did.
+    const detailInfoText = $gameVariables.value(GAME_VARIABLE.TEMPORARY_TEXT);
+
     // Item / weapon / armor databases, in the order the price helper expects them.
     const gachaDatabases = [$dataItems, $dataWeapons, $dataArmors];
     for (let databaseTypeId = 0; databaseTypeId <= 2; databaseTypeId++) {
@@ -3917,7 +3935,14 @@ item_gacha = function () {
         if (Number(entryRarity) !== lotteryRarity) continue;
         if (isGachaItemExcluded(databaseEntry)) continue;
 
-        addGachaListChoice(databaseTypeId, itemIndex, databaseEntry, choiceIndex, pictureSlot);
+        addGachaListChoice(
+          detailInfoText,
+          databaseTypeId,
+          itemIndex,
+          databaseEntry,
+          choiceIndex,
+          pictureSlot
+        );
         choiceIndex += 1;
         pictureSlot += 2;
       }
@@ -4110,64 +4135,64 @@ item_gacha = function () {
   const INITIAL_JP = 100;
 
   // Gives and equips the weapon of the "<JoinEquipWeapons>" note.
-  function equipInitialWeapon(actor, actorData) {{
+  function equipInitialWeapon(actor, actorData) {
     const weaponMeta = actorData.meta["JoinEquipWeapons"];
     if (!weaponMeta) return;
     const weaponId = Number(weaponMeta);
     $gameParty.gainItem($dataWeapons[weaponId], 1, false);
     actor.changeEquipById(1, weaponId);
-  }}
+  }
 
   // Gives the armours of the "<JoinEquipArmorsN>" notes; the original code always
   // equips them into body slot 3, which is kept as is.
-  function equipInitialArmors(actor, actorData) {{
-    for (const armorNoteId of INITIAL_ARMOR_NOTE_IDS) {{
+  function equipInitialArmors(actor, actorData) {
+    for (const armorNoteId of INITIAL_ARMOR_NOTE_IDS) {
       const armorMeta = actorData.meta["JoinEquipArmors" + armorNoteId];
       if (!armorMeta) continue;
 
       const armorId = Number(armorMeta);
       $gameParty.gainItem($dataArmors[armorId], 1, false);
       actor.changeEquipById(3, armorId);
-    }}
-  }}
+    }
+  }
 
   // Learns the skills of the "<JoinSkillLearn>" note.
-  function learnNoteSkills(actor, actorData) {{
+  function learnNoteSkills(actor, actorData) {
     const joinSkillMeta = actorData.meta["JoinSkillLearn"];
     if (!joinSkillMeta) return;
-    for (const skillId of joinSkillMeta.split(",")) {{
+    for (const skillId of joinSkillMeta.split(",")) {
       actor.learnSkill(Number(skillId));
-    }}
-  }}
+    }
+  }
 
   // Protagonist flag and heroine / male state of the actor notes.
-  function applyActorIdentityStates(actor, actorData) {{
+  function applyActorIdentityStates(actor, actorData) {
     //主人公確定
-    if (actorData.meta["Mcharacter"]) {{
+    if (actorData.meta["Mcharacter"]) {
       actor.addState(PROTAGONIST_STATE_ID);
-    }} else {{
+    } else {
       actor.removeState(PROTAGONIST_STATE_ID);
-    }}
+    }
     //主人公と女・男用ステート↓
-    if (actorData.meta["Heroine"]) {{
+    if (actorData.meta["Heroine"]) {
       actor.addState(HEROINE_STATE_ID);
-    }} else {{
+    } else {
       actor.addState(MALE_STATE_ID);
-    }}
-  }}
+    }
+  }
 
   // Every actor learns the ten basic attack skills and the nude skill of the actors
   // whose portrait changes.
-  function learnInitialSkills(actor, actorData) {{
-    for (const skillId of INITIAL_ATTACK_SKILL_IDS) {{
+  function learnInitialSkills(actor, actorData) {
+    // The nude skill is learned before the ten attack skills, in the original order.
+    if (actorData.meta["MultipleTachie"]) actor.learnSkill(NUDE_SKILL_ID);
+    for (const skillId of INITIAL_ATTACK_SKILL_IDS) {
       actor.learnSkill(skillId);
-    }}
-    if (!actorData.meta["MultipleTachie"]) return;
-    actor.learnSkill(NUDE_SKILL_ID);
-  }}
+    }
+  }
 
   // "<SecondName>" note: renames the personal weapon copy and the actor record entry.
-  function applySecondName(actorId, actorData) {{
+  function applySecondName(actorId, actorData) {
     const secondNameMeta = actorData.meta["SecondName"];
     if (!secondNameMeta) return;
     const secondNameValues = secondNameMeta.split(",");
@@ -4176,27 +4201,27 @@ item_gacha = function () {
     $gameVariables.value(GAME_VARIABLE.ACTOR_RECORD_BASE + actorId)[
       ACTOR_RECORD_SECOND_NAME_INDEX
     ] = weaponData.name;
-  }}
+  }
 
-  actor_StartSetUp = function (actorId) {{
+  actor_StartSetUp = function (actorId) {
     const actor = $gameActors.actor(actorId);
     const actorData = $dataActors[actorId];
     //主人公にタイトルセットと存在フラグとレベルフラグと視点変更スキル
     if (
       actorId == $gameVariables.value(GAME_VARIABLE.TRUE_PROTAGONIST_ACTOR_ID)
-    ) {{
+    ) {
       //actor.learnSkill(23);//タイトルセット。不要
       //actor.learnSkill(24);//性欲度関連に合わせて習得させる。性欲度ランク1で習得
       //actor.learnSkill(42);//視点変更
-      for (const skillId of PROTAGONIST_START_SKILL_IDS) {{
+      for (const skillId of PROTAGONIST_START_SKILL_IDS) {
         actor.learnSkill(skillId);
-      }}
-    }}
+      }
+    }
     //デバッグ時に全員に存在フラグとレベルフラグ
-    //if($gameSwitches.value(53)){{
+    //if($gameSwitches.value(53)){
     //actor.learnSkill(407);
     //actor.learnSkill(18);
-    //}};
+    //};
     //初期装備とスキル付与
     equipInitialWeapon(actor, actorData);
     equipInitialArmors(actor, actorData);
@@ -4209,7 +4234,7 @@ item_gacha = function () {
     actor.gainJp(INITIAL_JP);
     //苗字代入
     applySecondName(actorId, actorData);
-  }};
+  };
 
   const ACTOR_RARITY_RANK_DATA = {
     // rarityRank: [skillId, rankLv, code, maxLevel]
@@ -4382,7 +4407,7 @@ item_gacha = function () {
     actor.learnSkill(equipData[CONFISCATED_SKILL_RECORD]);
     reality_setUp(actor.actorId());
     actor.removeState(RARITY_DOWN_STATE_ID);
-    const stateRemoveMessage = `${actorName}の\\x1bI[${stateData.iconIndex}]${stateData.name}が解除された！`;
+    const stateRemoveMessage = `${actorName}の\x1bI[${stateData.iconIndex}]${stateData.name}が解除された！`;
     CommonPopupManager.showInfo({}, stateRemoveMessage, null);
     actor.changeExp(equipData[CONFISCATED_EXP_RECORD] + actor.currentExp(), false);
 
@@ -4415,7 +4440,7 @@ item_gacha = function () {
     actor.learnSkill(LAST_RARITY_SKILL_ID);
     reality_setUp(actor.actorId());
     actor.addState(RARITY_DOWN_STATE_ID);
-    const stateApplyMessage = `${actorName}は\\x1bI[${stateData.iconIndex}]${stateData.name}を受けた…`;
+    const stateApplyMessage = `${actorName}は\x1bI[${stateData.iconIndex}]${stateData.name}を受けた…`;
     CommonPopupManager.showInfo({}, stateApplyMessage, null);
 
     equipData[CONFISCATED_SUBCLASS_RECORD] = actor._subclassId;
@@ -5680,12 +5705,12 @@ fade_wipeDirect = function (wipeTypeId) {
       $gameScreen.erasePicture(messagePictureId);
       return;
     }
-    if (!FLASHMOB_BANNER_MODES[displayModeId]) return;
-
-    showFlashmobBanner(displayModeId, bannerPictureId);
+    // A mode without a banner definition only refreshes the text picture.
+    const bannerMode = FLASHMOB_BANNER_MODES[displayModeId];
+    if (bannerMode) showFlashmobBanner(displayModeId, bannerPictureId);
     showFlashmobTextPicture(messageText, fontName, textPictureId);
-    showFlashmobMessagePicture(displayModeId, messagePictureId);
-    if (displayModeId !== 2) {
+    if (bannerMode) showFlashmobMessagePicture(displayModeId, messagePictureId);
+    if (displayModeId == 1 || displayModeId == 3) {
       ensyutu_ikari(
         FLASHMOB_ANGER_EFFECT_ARGUMENTS[0],
         FLASHMOB_ANGER_EFFECT_ARGUMENTS[1]
@@ -9610,7 +9635,7 @@ function evaluateTitleCandidate(item, achievementRecords) {
     $gameScreen.showPicture(pictureId, pictureName, 0, pictureX, pictureY, 100, 100, 0, 0);
   }
 
-  showCommentaryChoice = function (
+  function showCommentaryChoice(
     choiceText,
     displayType,
     displayText,
