@@ -621,12 +621,8 @@
 
   //パーティメンバーが通常攻撃派生スキル獲得。対象スキル範囲は101-200
   actor_skilllearn2 = function (actorId) {
-    const learnAnimationId = 300;
-    const learnMeName = "21_SkillLearn";
     const actor = $gameActors.actor(actorId);
-    const start = 101;
-    const end = 200;
-    for (var skillId = start; skillId <= end; skillId++) {
+    for (var skillId = SKILL_DERIVED_SCAN_FIRST; skillId <= SKILL_DERIVED_SCAN_LAST; skillId++) {
       const skill = $dataSkills[skillId];
       if (skill.name === "") {
         continue;
@@ -636,75 +632,107 @@
         continue;
       }
 
-      var normalAttackDerivedValues = skillMetaNormalAttackDerived.split(",");
-      var derivedSkillId = Number(normalAttackDerivedValues[1]);
-      var masteryThreshold = Number(normalAttackDerivedValues[0]);
-      if (
-        !actor.isLearnedSkill(derivedSkillId) &&
-        actor.skillMasteryLevel(skillId) >= masteryThreshold
-      ) {
-        actor.learnSkill(derivedSkillId);
-        if (!$gameParty.inBattle()) {
-          $gamePlayer.requestAnimation(learnAnimationId);
-        } else {
-          $gameParty
-            .members()
-            [actor.index()].startAnimation(learnAnimationId, false, 0);
-        }
-        AudioManager.playMe({
-          name: learnMeName,
-          volume: 60,
-          pitch: 120,
-          pan: 0
-        });
-        const actorName = actor.name();
-        const displayText = `\x1bSIN[${skillId}]`;
-        const displayText2 = `\x1bSIN[${derivedSkillId}]`;
-        var learnMessage = `${actorName}の${displayText}がRank${masteryThreshold}に到達し、${displayText2}が派生した！`;
-        if ($gameParty.inBattle()) {
-          BattleManager._logWindow.push("addText", learnMessage);
-        } else {
-          gab_wordParticle(learnMessage);
-        }
+      const [masteryThreshold, derivedSkillId] = readDerivedSkillRule(skillMetaNormalAttackDerived);
+      if (!actor.isLearnedSkill(derivedSkillId) &&
+        actor.skillMasteryLevel(skillId) >= masteryThreshold) {
+        learnDerivedSkill(actor, skillId, derivedSkillId, masteryThreshold);
       }
     }
+  }
+
+  // Skill range scanned by actor_skilllearn2, and the effect of a learned derived skill.
+  const SKILL_DERIVED_SCAN_FIRST = 101;
+  const SKILL_DERIVED_SCAN_LAST = 200;
+  const LEARN_ANIMATION_ID = 300;
+  const LEARN_SOUND_NAME = "21_SkillLearn";
+
+  // "threshold,derivedSkillId" meta -> the two numbers, threshold first.
+  function readDerivedSkillRule(skillMetaNormalAttackDerived) {
+    const normalAttackDerivedValues = skillMetaNormalAttackDerived.split(",");
+    return [Number(normalAttackDerivedValues[0]), Number(normalAttackDerivedValues[1])];
+  }
+
+  // Learns the derived skill with its animation, sound and message.
+  function learnDerivedSkill(actor, skillId, derivedSkillId, masteryThreshold) {
+    const isInBattle = $gameParty.inBattle();
+    actor.learnSkill(derivedSkillId);
+
+    if (!isInBattle) {
+      $gamePlayer.requestAnimation(LEARN_ANIMATION_ID);
+    } else {
+      $gameParty.members()[actor.index()].startAnimation(LEARN_ANIMATION_ID, false, 0);
+    }
+    AudioManager.playMe({
+      name: LEARN_SOUND_NAME,
+      volume: 60,
+      pitch: 120,
+      pan: 0
+    });
+
+    const learnMessage = buildDerivedSkillMessage(actor, skillId, derivedSkillId, masteryThreshold);
+    if (isInBattle) {
+      BattleManager._logWindow.push("addText", learnMessage);
+    } else {
+      gab_wordParticle(learnMessage);
+    }
+  }
+
+  // "Actor's skill reached Rank n and the derived skill appeared!"; the icon tags stay out of the text.
+  function buildDerivedSkillMessage(actor, skillId, derivedSkillId, masteryThreshold) {
+    const actorName = actor.name();
+    const learnedSkillTag = `\x1bSIN[${skillId}]`;
+    const derivedSkillTag = `\x1bSIN[${derivedSkillId}]`;
+    return `${actorName}の${learnedSkillTag}がRank${masteryThreshold}に到達し、${derivedSkillTag}が派生した！`;
   };
 
   //パーソナルスキルのonoffロード時
   skill_personalonoffload = function (itemId, valueItemsType) {
-    if (valueItemsType > 1) return;
+    const skillSwitchTarget = readSkillSwitchTarget(itemId, valueItemsType);
+    if (!skillSwitchTarget) return;
+
+    // set effect switch by skill name
+    //if (!$gameSwitches.value(19)) {
+    applySkillSwitchName(skillSwitchTarget.item, skillSwitchTarget.switchStateValue);
+    $gameSwitches.setValue(
+      skillSwitchTarget.skillSwitchId,
+      skillSwitchTarget.switchStateValue
+    );
+    //}
+  };
+
+  // Database entry (skills or items), its on/off switch id and the state of that switch.
+  // Also refreshes the shared valueItems array, because the callers rely on it.
+  function readSkillSwitchTarget(itemId, valueItemsType) {
+    if (valueItemsType > 1) return null;
 
     valueItems = valueItemsType == 0 ? $dataSkills : $dataItems;
 
     const item = valueItems[itemId];
     const skillSwitchId = Number(item.meta.SwicthOnOffUse);
-    const switchStateValue = $gameSwitches.value(skillSwitchId);
+    return {
+      item: item,
+      skillSwitchId: skillSwitchId,
+      switchStateValue: $gameSwitches.value(skillSwitchId)
+    };
+  }
 
-    // set effect switch by skill name
-    //if (!$gameSwitches.value(19)) {
-    item.name = switchStateValue
+  // Shows the name that belongs to the state the item switches to next.
+  function applySkillSwitchName(item, nextSwitchState) {
+    item.name = nextSwitchState
       ? item.meta.SwicthOnName
       : item.meta.SwicthOffName;
-    $gameSwitches.setValue(skillSwitchId, switchStateValue);
-    //}
-  };
+  }
 
   //パーソナルスキルのonoff
   skill_personalonoff = function (actorA, actorB, itemId, valueItemsType) {
     if (actorB.actorId() !== actorA.actorId()) return;
-    if (valueItemsType > 1) return;
 
-    valueItems = valueItemsType == 0 ? $dataSkills : $dataItems;
-
-    const item = valueItems[itemId];
-    const skillSwitchId = Number(item.meta.SwicthOnOffUse);
-    const switchStateValue = $gameSwitches.value(skillSwitchId);
+    const skillSwitchTarget = readSkillSwitchTarget(itemId, valueItemsType);
+    if (!skillSwitchTarget) return;
 
     // revers switch state
-    item.name = switchStateValue
-      ? item.meta.SwicthOffName
-      : item.meta.SwicthOnName;
-    $gameSwitches.setValue(skillSwitchId, !switchStateValue);
+    applySkillSwitchName(skillSwitchTarget.item, !skillSwitchTarget.switchStateValue);
+    $gameSwitches.setValue(skillSwitchTarget.skillSwitchId, !skillSwitchTarget.switchStateValue);
 
     // show new state name
     const s = valueItemsType == 0 ? "S" : "I";
@@ -969,7 +997,28 @@
 
   //スキルアイテム使用での状態異常クリア//0スキル1アイテム<abNomalClearCount:5>
   //<abNomalClearCountPlus:200>mat200につき1プラス,修正一律で300
-  abNomal_Clear = function (
+    // Refunds a normal-only recovery item when there was nothing to clear, and tells
+  // the player why the item had no effect (actors only, not monsters).
+  function reportNoAbnormalToClear(
+    sourceActor,
+    targetActor,
+    sourceEntry,
+    normalOnly,
+    itemOrSkillTypeId
+  ) {
+    if (sourceActor.isActor()) {
+      const targetName = targetActor.name();
+      const messageText = normalOnly
+        ? `${targetName}は基本状態異常を付与されていない為、効果が無かった。`
+        : `${targetName}は基本特殊状態異常を付与されていない為、効果が無かった。`;
+      showMessage(messageText);
+    }
+    // Preserve the original refund: only normal-only item recovery refunds here.
+    if (normalOnly && itemOrSkillTypeId == 1)
+      $gameParty.gainItem(sourceEntry, 1);
+  }
+
+abNomal_Clear = function (
     sourceActor,
     targetActor,
     itemId,
@@ -991,16 +1040,7 @@
         ? 0
         : targetActor.getStateCategoryAffectedCount("StateSPabNomal"));
     if (affectedCount == 0) {
-      if (sourceActor.isActor()) {
-        const targetName = targetActor.name();
-        const messageText = normalOnly
-          ? `${targetName}は基本状態異常を付与されていない為、効果が無かった。`
-          : `${targetName}は基本特殊状態異常を付与されていない為、効果が無かった。`;
-        showMessage(messageText);
-      }
-      // Preserve the original refund: only normal-only item recovery refunds here.
-      if (normalOnly && itemOrSkillTypeId == 1)
-        $gameParty.gainItem(sourceEntry, 1);
+      reportNoAbnormalToClear(sourceActor, targetActor, sourceEntry, normalOnly, itemOrSkillTypeId);
       return;
     }
     remainingCount += stateRemovalMagicBonus(
@@ -1522,6 +1562,70 @@
     return enemySpawnId;
   }
 
+  // Horizontal stack shift for troops of two to five enemies, by spawn slot;
+  // the third slot of a five-enemy troop is also moved down.
+  const SPAWN_COUNT_SHIFTS = {
+    2: { 2: { x: -200, y: 0 } },
+    3: { 2: { x: -100, y: 0 }, 3: { x: -100, y: 0 } },
+    4: {
+      2: { x: -100, y: 0 },
+      3: { x: -100, y: 0 },
+      4: { x: -200, y: 0 }
+    },
+    5: {
+      3: { x: -100, y: 50 },
+      4: { x: -200, y: 0 },
+      5: { x: -100, y: 0 }
+    }
+  };
+
+  // Offset added on top of the random spawn position; zero when the troop has no rule.
+  function readSpawnCountShift(spawnIndex, enemyCountToSpawn) {
+    const shiftsForCount = SPAWN_COUNT_SHIFTS[enemyCountToSpawn];
+    if (!shiftsForCount) return { x: 0, y: 0 };
+    return shiftsForCount[spawnIndex] || { x: 0, y: 0 };
+  }
+
+  // Base position mapping for spawn indexes; shared by the normal and the H enemy push.
+  const spawnCoordinateBasePositions = {
+    1: { x: 450, y: 350 },
+    2: { x: 400, y: 500 },
+    3: { x: 350, y: 350 },
+    4: { x: 300, y: 500 },
+    5: { x: 250, y: 350 },
+    6: { x: 200, y: 500 },
+    7: { x: 150, y: 350 },
+    8: { x: 100, y: 500 }
+  };
+
+  // Nudges the base position with the random offsets; the draw order (X, then Y) is
+  // part of the battle behaviour, so it lives here for both troop pushers.
+  function applySpawnOffsets(
+    spawnIndex,
+    baseX,
+    baseY,
+    xOffsetOptions,
+    yNegativeOffsetOptions,
+    yPositiveOffsetOptions
+  ) {
+    let spawnX = baseX;
+    if (spawnIndex >= 2 && spawnIndex <= 6) {
+      spawnX += Number(xOffsetOptions[getRandomIndex(xOffsetOptions.length)]);
+    }
+
+    const yOffsetOptions = isUpwardSpawnSlot(spawnIndex)
+      ? yNegativeOffsetOptions
+      : yPositiveOffsetOptions;
+    const spawnY = baseY + Number(yOffsetOptions[getRandomIndex(yOffsetOptions.length)]);
+
+    return { spawnX, spawnY };
+  }
+
+  // Even spawn slots (2/4/6/8) are placed higher than the odd ones.
+  function isUpwardSpawnSlot(spawnIndex) {
+    return spawnIndex % 2 === 0;
+  }
+
   function getSpawnCoordinatesEnemyTroopPush(
     spawnIndex,
     enemyCountToSpawn,
@@ -1529,97 +1633,18 @@
     yNegativeOffsetOptions,
     yPositiveOffsetOptions
   ) {
-    let spawnX, spawnY;
-    switch (spawnIndex) {
-      case 1:
-        spawnX = 450;
-        spawnY = 350;
-        break;
-      case 2:
-        spawnX = 400;
-        spawnY = 500;
-        break;
-      case 3:
-        spawnX = 350;
-        spawnY = 350;
-        break;
-      case 4:
-        spawnX = 300;
-        spawnY = 500;
-        break;
-      case 5:
-        spawnX = 250;
-        spawnY = 350;
-        break;
-      case 6:
-        spawnX = 200;
-        spawnY = 500;
-        break;
-      case 7:
-        spawnX = 150;
-        spawnY = 350;
-        break;
-      case 8:
-        spawnX = 100;
-        spawnY = 500;
-        break;
-    }
-
-    if (spawnIndex >= 2 && spawnIndex <= 6) {
-      spawnX += Number(xOffsetOptions[getRandomIndex(xOffsetOptions.length)]);
-    }
-    if (
-      spawnIndex == 2 ||
-      spawnIndex == 4 ||
-      spawnIndex == 6 ||
-      spawnIndex == 8
-    ) {
-      spawnY += Number(
-        yNegativeOffsetOptions[getRandomIndex(yNegativeOffsetOptions.length)]
-      );
-    } else {
-      spawnY += Number(
-        yPositiveOffsetOptions[getRandomIndex(yPositiveOffsetOptions.length)]
-      );
-    }
-    switch (enemyCountToSpawn) {
-      case 2:
-        if (spawnIndex == 2) {
-          spawnX -= 200;
-        }
-        break;
-      case 3:
-        if (spawnIndex == 2) {
-          spawnX -= 100;
-        }
-        if (spawnIndex == 3) {
-          spawnX -= 100;
-        }
-        break;
-      case 4:
-        if (spawnIndex == 2) {
-          spawnX -= 100;
-        }
-        if (spawnIndex == 3) {
-          spawnX -= 100;
-        }
-        if (spawnIndex == 4) {
-          spawnX -= 200;
-        }
-        break;
-      case 5:
-        if (spawnIndex == 3) {
-          spawnX -= 100;
-          spawnY += 50;
-        }
-        if (spawnIndex == 4) {
-          spawnX -= 200;
-        }
-        if (spawnIndex == 5) {
-          spawnX -= 100;
-        }
-        break;
-    }
+    const basePosition = spawnCoordinateBasePositions[spawnIndex];
+    let { spawnX, spawnY } = applySpawnOffsets(
+      spawnIndex,
+      basePosition.x,
+      basePosition.y,
+      xOffsetOptions,
+      yNegativeOffsetOptions,
+      yPositiveOffsetOptions
+    );
+    const countShift = readSpawnCountShift(spawnIndex, enemyCountToSpawn);
+    spawnX += countShift.x;
+    spawnY += countShift.y;
     spawnY -= 80; // Adjust according to battle background
     return { spawnX, spawnY };
   }
@@ -1647,18 +1672,6 @@
     );
     // 元コードでも hidden は常に false 固定(算出していた value5 はコメントアウトされていた)
     pushHEnemyTroopMembers(enemyTroopH, enemyCountToSpawn, spawnPoolH);
-  };
-
-  // Base position mapping for spawn indexes
-  const spawnCoordinateBasePositions = {
-    1: { x: 450, y: 350 },
-    2: { x: 400, y: 500 },
-    3: { x: 350, y: 350 },
-    4: { x: 300, y: 500 },
-    5: { x: 250, y: 350 },
-    6: { x: 200, y: 500 },
-    7: { x: 150, y: 350 },
-    8: { x: 100, y: 500 }
   };
 
   function getSpawnCoordinatesHEnemyTroopPush(
@@ -1694,28 +1707,9 @@
     spawnY += Number(yOffsetOptions[getRandomIndex(yOffsetOptions.length)]);
 
     // Apply positioning adjustments based on enemy count
-    switch (enemyCountToSpawn) {
-      case 2:
-        if (spawnIndex === 2) spawnX -= 200;
-        break;
-      case 3:
-        if (spawnIndex === 2) spawnX -= 100;
-        if (spawnIndex === 3) spawnX -= 100;
-        break;
-      case 4:
-        if (spawnIndex === 2) spawnX -= 100;
-        if (spawnIndex === 3) spawnX -= 100;
-        if (spawnIndex === 4) spawnX -= 200;
-        break;
-      case 5:
-        if (spawnIndex === 3) {
-          spawnX -= 100;
-          spawnY += 50;
-        }
-        if (spawnIndex === 4) spawnX -= 200;
-        if (spawnIndex === 5) spawnX -= 100;
-        break;
-    }
+    const countShift = readSpawnCountShift(spawnIndex, enemyCountToSpawn);
+    spawnX += countShift.x;
+    spawnY += countShift.y;
 
     return { spawnX, spawnY };
   }
@@ -2371,51 +2365,58 @@
     gameVariables,
     conditionalMapSwitches
   ) {
-    let foundMapSwitch = 0;
     const dataMapMeta = dataMap.meta;
 
-    // Check variable-based conditional switches
-    for (let i = 9; i > 0; i--) {
-      const varKey = "ChangeMapVal" + i;
-      const switchKey = "MapSwiCVal" + i;
+    // Variable conditions are checked first; the switch conditions only run when none matched.
+    if (applyFirstMatchingConditionalSwitch(
+      dataMapMeta,
+      CONDITIONAL_MAP_VARIABLE_KEYS,
+      (conditionText) => {
+        const [varId, varValue] = conditionText.split(",").map(Number);
+        return gameVariables.value(varId) >= varValue;
+      },
+      gameSwitches,
+      conditionalMapSwitches
+    )) {
+      return 1;
+    }
 
-      if (!dataMapMeta[varKey] || !dataMapMeta[switchKey]) continue;
+    return applyFirstMatchingConditionalSwitch(
+      dataMapMeta,
+      CONDITIONAL_MAP_SWITCH_KEYS,
+      (conditionText) => gameSwitches.value(Number(conditionText)),
+      gameSwitches,
+      conditionalMapSwitches
+    ) ? 1 : 0;
+  }
 
-      const [varId, varValue] = dataMapMeta[varKey].split(",").map(Number);
-      if (gameVariables.value(varId) < varValue) continue;
+  // Meta key prefixes of the two conditional switch passes.
+  const CONDITIONAL_MAP_VARIABLE_KEYS = { condition: "ChangeMapVal", target: "MapSwiCVal" };
+  const CONDITIONAL_MAP_SWITCH_KEYS = { condition: "ChangeMapSwi", target: "MapSwiCSwi" };
+
+  // Runs the highest matching entry (index 9 down to 1) of one pass; true when one matched.
+  function applyFirstMatchingConditionalSwitch(
+    dataMapMeta,
+    keySuffixes,
+    isConditionMet,
+    gameSwitches,
+    conditionalMapSwitches
+  ) {
+    for (let entryIndex = 9; entryIndex > 0; entryIndex--) {
+      const conditionText = dataMapMeta[keySuffixes.condition + entryIndex];
+      const targetSwitchText = dataMapMeta[keySuffixes.target + entryIndex];
+      if (!conditionText || !targetSwitchText) continue;
+      if (!isConditionMet(conditionText)) continue;
 
       mapActivateConditionalSwitches(
-        dataMapMeta[switchKey],
+        targetSwitchText,
         gameSwitches,
         conditionalMapSwitches
       );
-      foundMapSwitch = 1;
-      break;
+      return true;
     }
 
-    // Check switch-based conditional switches if no variable conditions matched
-    if (foundMapSwitch === 0) {
-      for (let i = 9; i > 0; i--) {
-        const switchCondKey = "ChangeMapSwi" + i;
-        const targetSwitchKey = "MapSwiCSwi" + i;
-
-        if (!dataMapMeta[switchCondKey] || !dataMapMeta[targetSwitchKey])
-          continue;
-
-        const condSwitchId = Number(dataMapMeta[switchCondKey]);
-        if (!gameSwitches.value(condSwitchId)) continue;
-
-        mapActivateConditionalSwitches(
-          dataMapMeta[targetSwitchKey],
-          gameSwitches,
-          conditionalMapSwitches
-        );
-        foundMapSwitch = 1;
-        break;
-      }
-    }
-
-    return foundMapSwitch;
+    return false;
   };
 
   mapActivateConditionalSwitches = function (
@@ -2964,20 +2965,32 @@
       configureMapEnemySpawnData(enemyData, spawnValues);
       const addedStateIds = enemyPresetStates[spawnSlot];
       appendEnemyNameConditionStates(enemyData, addedStateIds);
-      switch (spawnSlot) {
-        case 9:
-          hEnemyIds.push(enemyId);
-          break;
-        case 7:
-        case 8:
-          rareEnemyIds.push(enemyId);
-          addedStateIds.push(480);
-          break;
-        default:
-          normalEnemyIds.push(enemyId);
-          break;
-      }
+      registerSpawnedEnemy(
+        { normalEnemyIds, hEnemyIds, rareEnemyIds },
+        addedStateIds,
+        spawnSlot,
+        enemyId
+      );
     }
+  }
+
+  // Slot 9 is the H enemy, slots 7 and 8 are rare ones (they also start with state 480).
+  const SPAWN_SLOT_H_ENEMY = 9;
+  const RARE_SPAWN_SLOTS = [7, 8];
+  const RARE_SPAWN_STATE_ID = 480;
+
+  // Adds the copied enemy id to the list of its slot category.
+  function registerSpawnedEnemy(enemyLists, addedStateIds, spawnSlot, enemyId) {
+    if (spawnSlot == SPAWN_SLOT_H_ENEMY) {
+      enemyLists.hEnemyIds.push(enemyId);
+      return;
+    }
+    if (RARE_SPAWN_SLOTS.indexOf(spawnSlot) >= 0) {
+      enemyLists.rareEnemyIds.push(enemyId);
+      addedStateIds.push(RARE_SPAWN_STATE_ID);
+      return;
+    }
+    enemyLists.normalEnemyIds.push(enemyId);
   };
 
   //簡易戦闘報酬設定スクリプト
@@ -3146,10 +3159,7 @@
 
     const bossMeta = value.meta;
     configureBossGuaranteedDrops(bossMeta);
-    let bossEnemyValues = 0;
-    if (bossMeta["BossEnemy"]) {
-      bossEnemyValues = bossMeta["BossEnemy"].split(",");
-    }
+    const bossEnemyValues = readBossEnemyValues(bossMeta);
     //'<BossEnemy>'未有時の下部処理回避
     if (bossEnemyValues == 0) return;
 
@@ -3175,50 +3185,73 @@
       bossActionValues,
       bossSpecialActionValues
     );
-    if (bossMeta["FrontBoss"]) {
-      $dataSystem.optSideView = false;
-    }
+    applyBossFrontView(bossMeta);
     configureBossTroop(bossMeta, bossEnemyData, bossEnemyValues);
     applyBossInformationStates.call(this, bossMeta, bossEnemyData);
+  }
+
+  // "BossEnemy" lists the enemy ids; 0 keeps the original "no BossEnemy note" path.
+  function readBossEnemyValues(bossMeta) {
+    if (!bossMeta["BossEnemy"]) return 0;
+    return bossMeta["BossEnemy"].split(",");
+  }
+
+  // A front boss is fought from the front view, whatever the system default is.
+  function applyBossFrontView(bossMeta) {
+    if (!bossMeta["FrontBoss"]) return;
+    $dataSystem.optSideView = false;
   };
 
   //戦闘グループでボスステ付与
   troop_bossState = function () {
-    if ($gameSwitches.value(GAME_SWITCH.BOSS_BATTLE_IMMINENT)) {
-      const members2 = $gameTroop.members();
-      var enemy = members2[0];
-      enemy.addState(410);
-      //エネミー隊列変更
-      var start = 0;
-      var end = members2.length - 1;
-      for (var i = start; i <= end; i++) {
-        var troopX = $gameTroop.getX(i + 1);
-        if (troopX <= 200) {
-          members2[i].setRow(2);
-        }
-      }
-      //獲得戦果
-      if (enemy.isStateAffected(410)) {
-        //ボスステートで戦果
-        var dropItemId = 10;
-        var dropCount = getRandomIndex(10) + 1;
-        if (enemy.isStateAffected(411)) {
-          dropCount += getRandomIndex(10) + 1;
-        }
-        if (enemy.isStateAffected(412)) {
-          dropCount += getRandomIndex(20) + 10;
-        }
-        if (enemy.isStateAffected(413)) {
-          dropCount += getRandomIndex(30) + 20;
-        }
-        if (enemy.isStateAffected(414)) {
-          dropCount += getRandomIndex(100) + 1;
-        }
-        for (var j = 0; j <= dropCount; j++) {
-          $gameTroop.addDropItem($dataItems[dropItemId]);
-        }
+    if (!$gameSwitches.value(GAME_SWITCH.BOSS_BATTLE_IMMINENT)) return;
+
+    const members2 = $gameTroop.members();
+    const enemy = members2[0];
+    enemy.addState(BOSS_ENTRY_STATE_ID);
+    //エネミー隊列変更
+    applyBossRowShift(members2);
+
+    //獲得戦果
+    if (!enemy.isStateAffected(BOSS_ENTRY_STATE_ID)) return;
+
+    //ボスステートで戦果
+    const dropCount = rollBossDropCount(enemy);
+    for (var j = 0; j <= dropCount; j++) {
+      $gameTroop.addDropItem($dataItems[BOSS_DROP_ITEM_ID]);
+    }
+  }
+
+  // State given to the boss when the troop appears, and the item it drops.
+  const BOSS_ENTRY_STATE_ID = 410;
+  const BOSS_DROP_ITEM_ID = 10;
+
+  // States 411-414 each add an extra random amount of the boss drop.
+  const BOSS_DROP_BONUS_STATES = [
+    { stateId: 411, rollRange: 10, bonus: 1 },
+    { stateId: 412, rollRange: 20, bonus: 10 },
+    { stateId: 413, rollRange: 30, bonus: 20 },
+    { stateId: 414, rollRange: 100, bonus: 1 }
+  ];
+
+  // Enemies placed in the front half of the screen are moved to the back row.
+  function applyBossRowShift(members2) {
+    for (var memberIndex = 0; memberIndex <= members2.length - 1; memberIndex++) {
+      var troopX = $gameTroop.getX(memberIndex + 1);
+      if (troopX <= 200) {
+        members2[memberIndex].setRow(2);
       }
     }
+  }
+
+  // One base drop plus one roll per bonus state the boss carries (the draws stay in order).
+  function rollBossDropCount(enemy) {
+    let dropCount = getRandomIndex(10) + 1;
+    BOSS_DROP_BONUS_STATES.forEach(function (dropBonus) {
+      if (!enemy.isStateAffected(dropBonus.stateId)) return;
+      dropCount += getRandomIndex(dropBonus.rollRange) + dropBonus.bonus;
+    });
+    return dropCount;
   };
 
   //ヒント種別(EICSwitch値)ごとの見出し。CommonEvent 178の設計に合わせた
@@ -3354,12 +3387,18 @@
 
   // Total annihilation count of every dungeon.
   function sumAnnihilationCounts(annihilationCounts) {
+    return sumCountedAnnihilations(annihilationCounts, () => true);
+  }
+
+  // Adds the counters 1..END; shouldCount() lets the dungeon variant filter the entries.
+  function sumCountedAnnihilations(annihilationCounts, shouldCount) {
     let annihilationCount = 0;
     for (
       let counterIndex = 1;
       counterIndex <= ANNIHILATION_COUNT_RANGE_END;
       counterIndex++
     ) {
+      if (!shouldCount(counterIndex)) continue;
       annihilationCount += annihilationCounts[counterIndex];
     }
     return annihilationCount;
@@ -3368,20 +3407,15 @@
   // Total annihilation count of the dungeon items only, that is the items whose
   // "OnSwitch" note contains the dungeon category switch.
   function sumDungeonAnnihilationCounts(annihilationCounts) {
-    let annihilationCount = 0;
-    for (
-      let itemId = 1;
-      itemId <= ANNIHILATION_COUNT_RANGE_END;
-      itemId++
-    ) {
-      const itemData = $dataItems[itemId];
-      const onSwitchMeta = itemData && itemData.meta["OnSwitch"];
-      if (!onSwitchMeta) continue;
-      if (!hasOnSwitchId(onSwitchMeta, DUNGEON_CATEGORY_SWITCH_ID)) continue;
+    return sumCountedAnnihilations(annihilationCounts, isDungeonCategoryItem);
+  }
 
-      annihilationCount += annihilationCounts[itemId];
-    }
-    return annihilationCount;
+  // Whether the item belongs to the dungeon category (its OnSwitch lists that switch id).
+  function isDungeonCategoryItem(itemId) {
+    const itemData = $dataItems[itemId];
+    const onSwitchMeta = itemData && itemData.meta["OnSwitch"];
+    if (!onSwitchMeta) return false;
+    return hasOnSwitchId(onSwitchMeta, DUNGEON_CATEGORY_SWITCH_ID);
   }
 
   // True when the comma separated "OnSwitch" note lists the given switch id.
@@ -3670,36 +3704,48 @@
 
   // Indices of valueItems whose rarity equals the wanted one.
   function collectGachaItemIndicesByRarity(wantedRarity) {
+    return collectGachaItemIndices(
+      (databaseEntry) => isGachaEntryOfRarity(databaseEntry, wantedRarity),
+      isGachaItemExcluded
+    );
+  }
+
+  // Ids 1..n of the entries that pass the pool filter and carry a matching rarity.
+  function collectGachaItemIndices(acceptEntry, isExcluded) {
     const eligibleItemIndices = [];
     const itemCount = valueItems.length;
     for (let itemIndex = 1; itemIndex < itemCount; itemIndex++) {
       const databaseEntry = valueItems[itemIndex];
       if (!databaseEntry) continue;
-      if (isGachaItemExcluded(databaseEntry)) continue;
-      const entryRarity = databaseEntry.meta["LotteryRearity"];
-      if (!entryRarity) continue;
-      if (Number(entryRarity) !== wantedRarity) continue;
+      if (isExcluded(databaseEntry)) continue;
+      if (!acceptEntry(databaseEntry)) continue;
       eligibleItemIndices.push(itemIndex);
     }
     return eligibleItemIndices;
   }
 
+  // Whether the entry lists the wanted value in its "LotteryRearity" meta field.
+  function isGachaEntryOfRarity(databaseEntry, wantedRarity) {
+    const entryRarity = databaseEntry.meta["LotteryRearity"];
+    if (!entryRarity) return false;
+    return Number(entryRarity) === wantedRarity;
+  }
+
   // The rarity-1 fallback also accepts ranged entries the party already owns; the
   // "max 1" rule is not applied there.
   function collectRarityOneFallbackIndices() {
-    const eligibleItemIndices = [];
-    const itemCount = valueItems.length;
-    for (let itemIndex = 1; itemIndex < itemCount; itemIndex++) {
-      const databaseEntry = valueItems[itemIndex];
-      if (!databaseEntry) continue;
-      if (databaseEntry.meta["GatchaOutOfRange"]) continue;
-      if (databaseEntry.meta["GatchaHasRange"] && !$gameParty.hasItem(databaseEntry)) continue;
-      const entryRarity = databaseEntry.meta["LotteryRearity"];
-      if (!entryRarity) continue;
-      if (Number(entryRarity) !== 1) continue;
-      eligibleItemIndices.push(itemIndex);
-    }
-    return eligibleItemIndices;
+    return collectGachaItemIndices(
+      (databaseEntry) => isGachaEntryOfRarity(databaseEntry, 1),
+      isGachaFallbackExcluded
+    );
+  }
+
+  // Fallback pool filter: out of range, or a gacha range whose item the party does not own yet.
+  // The stricter isGachaItemExcluded() is intentionally not used here.
+  function isGachaFallbackExcluded(databaseEntry) {
+    if (databaseEntry.meta["GatchaOutOfRange"]) return true;
+    if (databaseEntry.meta["GatchaHasRange"] && !$gameParty.hasItem(databaseEntry)) return true;
+    return false;
   }
 
   // Database list of one draw: an explicit 0..2 type is used as given, anything else
@@ -3744,8 +3790,8 @@ item_gacha = function () {
     }
 
     // The label is built first: no function call inside the translatable sentence.
-    const gachaItemName = buildGachaItemLabel(lotteryRarity, valueGachaId);
-    const gachaResultMessage = `${gachaItemName}が排出されました！`;
+    const gachaItemLabel = buildGachaItemLabel(lotteryRarity, valueGachaId);
+    const gachaResultMessage = gachaItemLabel + "が排出されました！";
     if (!$gameSwitches.value(GAME_SWITCH.TEMPORARY_RESULT)) {
       $gameVariables.setValue(GAME_VARIABLE.RANDOM_WORK_2, gachaResultMessage);
       return;
@@ -3885,40 +3931,61 @@ item_gacha = function () {
     const treasureIndices = $gameVariables.value(GAME_VARIABLE.DUNGEON_TREASURE_IDS)[chestId];
     const entryCategoryIndices = $gameVariables.value(GAME_VARIABLE.DUNGEON_TREASURE_TYPES)[chestId];
     if (treasureIndices != 0) {
-      var treasureItemIndex =
-        treasureIndices[getRandomIndex(treasureIndices.length)];
-      let index = treasureIndices.findIndex(
-        (candidateIndex) => candidateIndex == treasureItemIndex
+      var treasureMessage = openTreasureChest(
+        chestMeta,
+        treasureIndices,
+        entryCategoryIndices
       );
-      var sourceEntries = getItemEquipmentSource(entryCategoryIndices[index]);
-      if (chestMeta["TchestRere"]) {
-        if (treasureItemIndex == Number(chestMeta["TchestRere"])) {
-          $gameSwitches.setValue(GAME_SWITCH.RARE_CHEST_TEMP, true);
-        }
-      }
-      const gainedItem = sourceEntries[treasureItemIndex];
-      $gameParty.gainItem(gainedItem, 1);
-      const itemName = colorTaggedText(
-        24,
-        `\x1bI[${gainedItem.iconIndex}]${gainedItem.name}`
-      );
-      var treasureMessage = `${itemName}を入手した！`;
-      if (!$gameSwitches.value(GAME_SWITCH.TEMP_CHEST)) {
-        if (index >= 0) {
-          treasureIndices.splice(index, 1);
-          entryCategoryIndices.splice(index, 1);
-        }
-      }
     } else {
       var treasureMessage = "宝箱の中身は空だった…。";
       $gameSwitches.setValue(GAME_SWITCH.TEMPORARY_RESULT, true);
     }
     if ($gameSwitches.value(GAME_SWITCH.RARE_CHEST_TEMP)) {
-      var treasureItemIndex = 28;
+      var treasureItemIndex = RARE_TREASURE_PICTURE_ID;
       $gameScreen.setDTextPicture(treasureMessage, treasureItemIndex);
     } else {
       CommonPopupManager.showInfo({}, treasureMessage, null);
     }
+  }
+
+  // Picture id used for the rare chest result text.
+  const RARE_TREASURE_PICTURE_ID = 28;
+
+  // Draws one item from the chest, marks a rare prize and returns the result message.
+  function openTreasureChest(chestMeta, treasureIndices, entryCategoryIndices) {
+    const treasureItemIndex = treasureIndices[getRandomIndex(treasureIndices.length)];
+    // The item ids may repeat inside the list, so the first matching slot is removed.
+    const index = treasureIndices.findIndex(
+      (candidateIndex) => candidateIndex == treasureItemIndex
+    );
+    const sourceEntries = getItemEquipmentSource(entryCategoryIndices[index]);
+    markRareTreasureIfMatched(chestMeta, treasureItemIndex);
+
+    const gainedItem = sourceEntries[treasureItemIndex];
+    $gameParty.gainItem(gainedItem, 1);
+    const itemName = colorTaggedText(
+      24,
+      `\x1bI[${gainedItem.iconIndex}]${gainedItem.name}`
+    );
+    removeDrawnTreasure(treasureIndices, entryCategoryIndices, index);
+    return `${itemName}を入手した！`;
+  }
+
+  // "TchestRere" lists the item id that counts as the rare prize.
+  function markRareTreasureIfMatched(chestMeta, treasureItemIndex) {
+    if (!chestMeta["TchestRere"]) return;
+    if (treasureItemIndex == Number(chestMeta["TchestRere"])) {
+      $gameSwitches.setValue(GAME_SWITCH.RARE_CHEST_TEMP, true);
+    }
+  }
+
+  // A temporary chest keeps its contents; otherwise the drawn entry leaves both lists.
+  function removeDrawnTreasure(treasureIndices, entryCategoryIndices, index) {
+    if ($gameSwitches.value(GAME_SWITCH.TEMP_CHEST)) return;
+    if (index < 0) return;
+
+    treasureIndices.splice(index, 1);
+    entryCategoryIndices.splice(index, 1);
   };
 
   //ランダム表情index -> 顔グラID(actor_choicePre1用)
@@ -4470,44 +4537,19 @@ item_gacha = function () {
   };
 
   //初めて来る街でマップ名表示
-  map_centerDispray = function (pictureId, mapTitleText) {
+    // Shows a picture at zero opacity and moves it to the target opacity: the usual
+  // "fade in" pair in this plugin. startHeight keeps the scale the original used.
+  function showPictureFadeIn(pictureId, pictureName, x, y, startHeight, targetOpacity) {
+    $gameScreen.showPicture(pictureId, pictureName, 1, x, y, 100, startHeight, 0, 0);
+    $gameScreen.movePicture(pictureId, 1, x, y, 100, 100, targetOpacity, 0, 30);
+  }
+
+map_centerDispray = function (pictureId, mapTitleText) {
     const screenPictureId = pictureId;
-    var backgroundPictureName = "ScreenBlackOut";
-    $gameScreen.showPicture(
-      screenPictureId,
-      backgroundPictureName,
-      1,
-      640,
-      384,
-      100,
-      100,
-      0,
-      0
-    );
-    $gameScreen.movePicture(screenPictureId, 1, 640, 384, 100, 100, 150, 0, 30);
-    var backgroundPictureName = "ScreenCenterTextDisPray";
-    $gameScreen.showPicture(
-      screenPictureId + 1,
-      backgroundPictureName,
-      1,
-      640,
-      384,
-      100,
-      0,
-      0,
-      0
-    );
-    $gameScreen.movePicture(
-      screenPictureId + 1,
-      1,
-      640,
-      384,
-      100,
-      100,
-      255,
-      0,
-      30
-    );
+    // The darker backdrop fades in to 150, the text frame to full opacity.
+    showPictureFadeIn(screenPictureId, "ScreenBlackOut", 640, 384, 100, 150);
+    showPictureFadeIn(screenPictureId + 1, "ScreenCenterTextDisPray", 640, 384, 0, 255);
+
     const centerDisplayText = mapTitleText;
     $gameScreen.setDTextPicture(`\\f[b]${centerDisplayText}`, 40);
     $gameScreen.setDtextFont("ＭＳ Ｐ明朝");
@@ -5029,38 +5071,7 @@ item_gacha = function () {
     $gameVariables.setValue(GAME_VARIABLE.EPISODE_COMPLETION_SWITCH, 0); //達成スイッチid変数
 
     if (eventItemId >= 401) {
-      const eventItemMeta = $dataItems[eventItemId].meta;
-      const completionSwitchId = resolveEpisodeCompletionSwitchId(
-        eventItemMeta,
-        eventItemId
-      );
-      $gameVariables.setValue(
-        GAME_VARIABLE.EPISODE_COMPLETION_SWITCH,
-        completionSwitchId
-      );
-      valueCountSet1 += completionSwitchId;
-      if (isSceneCompletionRecordingAllowed(startEndFlag, false)) {
-        // The registration conditions are data driven expressions evaluated in this
-        // scope on purpose, so they can read the scene parameters.
-        let registrationFlag = 0;
-        var conditionExpression;
-        for (const conditionMetaKey of [
-          "RegistrationC1",
-          "RegistrationC2",
-          "RegistrationC3"
-        ]) {
-          conditionExpression = eventItemMeta[conditionMetaKey];
-          if (!conditionExpression) continue;
-          if (eval(conditionExpression)) {
-            //データドリブン条件式のためevalを使用(意図的)
-            registrationFlag = 1;
-          }
-        }
-        if (registrationFlag == 0) {
-          $gameParty.gainItem($dataItems[eventItemId], 1);
-        }
-        $gameSwitches.setValue(completionSwitchId, true);
-      }
+      recordEpisodeSceneCompletion(startEndFlag, eventItemId);
     } else {
       //135-140
       if (isSceneCompletionRecordingAllowed(startEndFlag, true)) {
@@ -5070,6 +5081,47 @@ item_gacha = function () {
     }
     if (startEndFlag == 0) beginRegisteredEventScene(sceneParamValue, eventItemId);
     else finishRegisteredEventScene(selectionSwitchId);
+  }
+
+  // Episode items (401+) publish their completion switch and, when the scene is being
+  // recorded, are granted unless one of the registration conditions already holds.
+  function recordEpisodeSceneCompletion(startEndFlag, eventItemId) {
+    const eventItemMeta = $dataItems[eventItemId].meta;
+    const completionSwitchId = resolveEpisodeCompletionSwitchId(
+      eventItemMeta,
+      eventItemId
+    );
+    $gameVariables.setValue(
+      GAME_VARIABLE.EPISODE_COMPLETION_SWITCH,
+      completionSwitchId
+    );
+    valueCountSet1 += completionSwitchId;
+    if (!isSceneCompletionRecordingAllowed(startEndFlag, false)) return;
+
+    if (!hasMetRegistrationCondition(eventItemMeta)) {
+      $gameParty.gainItem($dataItems[eventItemId], 1);
+    }
+    $gameSwitches.setValue(completionSwitchId, true);
+  }
+
+  // The registration conditions are data driven expressions evaluated in this scope on
+  // purpose (eval), so they can read the scene parameters set up by the event.
+  function hasMetRegistrationCondition(eventItemMeta) {
+    let registrationFlag = 0;
+    var conditionExpression;
+    for (const conditionMetaKey of [
+      "RegistrationC1",
+      "RegistrationC2",
+      "RegistrationC3"
+    ]) {
+      conditionExpression = eventItemMeta[conditionMetaKey];
+      if (!conditionExpression) continue;
+      if (eval(conditionExpression)) {
+        //データドリブン条件式のためevalを使用(意図的)
+        registrationFlag = 1;
+      }
+    }
+    return registrationFlag != 0;
   };
 
   //隊列順で次の表示者を決定formation_orderSelect(20,0);
@@ -5156,8 +5208,8 @@ item_gacha = function () {
         wrapHeroineSelection(targetVarId, listModeId);
         return;
       }
-      const nextActor =
-        partyMembers[$gameActors.actor(heroineId).index() + actorIndexShift];
+      const heroinePartyIndex = $gameActors.actor(heroineId).index();
+      const nextActor = partyMembers[heroinePartyIndex + actorIndexShift];
       if (!nextActor || !isGirl(nextActor)) return;
 
       $gameVariables.setValue(targetVarId, nextActor.actorId());
@@ -5406,52 +5458,58 @@ item_gacha = function () {
   };
 
   //フェードインアウトワイプ演出。0消去1汎用2ワープ
-  fade_wipeDirect = function (wipeTypeId) {
+    // Dungeon transitions on a battle map, town transitions everywhere else.
+  const DUNGEON_WIPE_IMAGES = [
+    "Dunjon004",
+    "Dunjon008",
+    "Dunjon012",
+    "Dunjon036",
+    "Dunjon052",
+    "Dunjon100",
+    "Dunjon104",
+    "Dunjon118",
+    "Dunjon153",
+    "Dunjon999"
+  ];
+  const TOWN_WIPE_IMAGES = [
+    "Town048",
+    "Town084",
+    "Town092",
+    "Town129",
+    "Town131",
+    "Town225",
+    "Town309",
+    "Town310",
+    "Town001",
+    "Town013",
+    "Town014",
+    "Town032",
+    "Town033",
+    "Town039",
+    "Town041",
+    "Town046"
+  ];
+  const FIXED_WIPE_IMAGE = "Town129";
+
+  // Random transition image of the current surroundings.
+  function pickWipeImage() {
+    const wipeImageCandidates = $gameSwitches.value(GAME_SWITCH.BATTLE_MAP)
+      ? DUNGEON_WIPE_IMAGES
+      : TOWN_WIPE_IMAGES;
+    return wipeImageCandidates[getRandomIndex(wipeImageCandidates.length)];
+  }
+
+fade_wipeDirect = function (wipeTypeId) {
     var wipeImageName;
     switch (wipeTypeId) {
       case 0:
         $gameScreen._useGWTrans = "off";
         break;
       case 1:
-        var wipeImageCandidates;
-        if ($gameSwitches.value(GAME_SWITCH.BATTLE_MAP)) {
-          wipeImageCandidates = [
-            "Dunjon004",
-            "Dunjon008",
-            "Dunjon012",
-            "Dunjon036",
-            "Dunjon052",
-            "Dunjon100",
-            "Dunjon104",
-            "Dunjon118",
-            "Dunjon153",
-            "Dunjon999"
-          ];
-        } else {
-          wipeImageCandidates = [
-            "Town048",
-            "Town084",
-            "Town092",
-            "Town129",
-            "Town131",
-            "Town225",
-            "Town309",
-            "Town310",
-            "Town001",
-            "Town013",
-            "Town014",
-            "Town032",
-            "Town033",
-            "Town039",
-            "Town041",
-            "Town046"
-          ];
-        }
-        wipeImageName =
-          wipeImageCandidates[getRandomIndex(wipeImageCandidates.length)];
+        wipeImageName = pickWipeImage();
         break;
       case 2:
-        wipeImageName = "Town129";
+        wipeImageName = FIXED_WIPE_IMAGE;
         break;
     }
     if (!(wipeTypeId >= 1)) return;
@@ -5741,6 +5799,7 @@ item_gacha = function () {
     const columnLayout = COLUMN_LAYOUT_BY_COUNT[columnCount];
     for (let entryIndex = 0; entryIndex < entryIds.length; entryIndex++) {
       const entryId = entryIds[entryIndex];
+      // Both texts are carried over to the next entry, so they stay loop variables.
       choiceText = resolveLoopChoiceLabel(
         listKindId,
         entryCategoryId,
@@ -6040,6 +6099,7 @@ item_gacha = function () {
     "　　　　　　　　";
 
   // Tips menu layout: the choice list shows the first pictures of the tip block.
+  const TIP_CHOICE_ID = 1;                 // the tips reuse custom choice list 1
   const TIP_PICTURE_ID_BASE = 101;
   // Each tip uses a text picture and an optional image picture (101, 102, 103, ...).
   const TIP_PICTURE_SLOTS_PER_TIP = 2;
@@ -6065,54 +6125,61 @@ item_gacha = function () {
     // Every tip reserves two picture slots, so the offset grows by two per entry.
     let pictureIdOffset = TIP_PICTURE_ID_BASE;
     for (let tipIndex = 0; tipIndex < tipNames.length; tipIndex++) {
-      const customChoiceId = 1;
       const tipChoiceLabel = buildTipChoiceLabel(tipNames[tipIndex]);
-      const choiceParams = {
+      $gameSystem.addCustomChoice(TIP_CHOICE_ID, {
         text: tipChoiceLabel,
         value: tipIndex + 1
-      };
-      $gameSystem.addCustomChoice(customChoiceId, choiceParams);
-      const tipDescription = tipDescriptions[tipIndex];
-      if (tipDescription != 0) {
-        const tipTitleLabel = colorTaggedText(16, tipNames[tipIndex]);
-        $gameScreen.setDTextPicture(
-          `${tipTitleLabel}:\n${tipDescription}`,
-          28
-        );
-        $gameScreen.dWindowFrame = "ON";
-        $gameScreen.showPicture(
-          tipIndex + pictureIdOffset + 1,
-          "",
-          0,
-          334,
-          10,
-          100,
-          100,
-          255,
-          0
-        );
-        $gameMessage.setSelectPictureId(tipIndex, tipIndex + pictureIdOffset + 1);
-      }
-      const tipPicture = tipPictures[tipIndex];
-      if (tipPicture && tipPicture[0] != 0) {
-        //$gameScreen.showPicture(tipIndex + pictureIdOffset,$gameVariables.value(534)[i][0],$gameVariables.value(534)[i][1],
-        //$gameVariables.value(534)[i][2]+334-100-50,$gameVariables.value(534)[i][3],
-        //$gameVariables.value(534)[i][4],$gameVariables.value(534)[i][5],$gameVariables.value(534)[i][6],0);
-        $gameScreen.showPicture(
-          tipIndex + pictureIdOffset,
-          tipPicture[0],
-          0,
-          334,
-          0,
-          100,
-          100,
-          255,
-          0
-        );
-        $gameMessage.setSelectPictureId(tipIndex, tipIndex + pictureIdOffset);
-      }
+      });
+      showTipDescriptionPicture(tipNames, tipDescriptions, tipIndex, pictureIdOffset);
+      showTipImagePicture(tipPictures, tipIndex, pictureIdOffset);
       pictureIdOffset += TIP_PICTURE_SLOTS_PER_TIP;
     }
+  }
+
+  // The tip title and its description sit one slot after the tip image.
+  function showTipDescriptionPicture(tipNames, tipDescriptions, tipIndex, pictureIdOffset) {
+    const tipDescription = tipDescriptions[tipIndex];
+    if (tipDescription == 0) return;
+
+    const tipTitleLabel = colorTaggedText(16, tipNames[tipIndex]);
+    $gameScreen.setDTextPicture(
+      `${tipTitleLabel}:\n${tipDescription}`,
+      28
+    );
+    $gameScreen.dWindowFrame = "ON";
+    const descriptionPictureId = tipIndex + pictureIdOffset + 1;
+    $gameScreen.showPicture(
+      descriptionPictureId,
+      "",
+      0,
+      334,
+      10,
+      100,
+      100,
+      255,
+      0
+    );
+    $gameMessage.setSelectPictureId(tipIndex, descriptionPictureId);
+  }
+
+  // Optional illustration of the tip; the entry carries its file name and flags in [0].
+  function showTipImagePicture(tipPictures, tipIndex, pictureIdOffset) {
+    const tipPicture = tipPictures[tipIndex];
+    if (!tipPicture || tipPicture[0] == 0) return;
+
+    const imagePictureId = tipIndex + pictureIdOffset;
+    $gameScreen.showPicture(
+      imagePictureId,
+      tipPicture[0],
+      0,
+      334,
+      0,
+      100,
+      100,
+      255,
+      0
+    );
+    $gameMessage.setSelectPictureId(tipIndex, imagePictureId);
   };
 
   //ダンジョンから脱出スクリプト
@@ -6210,9 +6277,7 @@ item_gacha = function () {
     ) {
       const warpPointMeta = itemMeta["warpPoint" + warpPointIndex];
       if (!warpPointMeta) continue;
-      //変更: フラグ配列(変数211)は0～100行しか確保されていないため、
-      // 範囲外IDはクラッシュせずスキップする
-      if (!pointFlags || pointFlags[warpPointIndex] != 1) continue;
+      if (pointFlags[warpPointIndex] != 1) continue;
 
       valueScriptArray1.push(warpPointMeta.split(","));
       hasUnlockedWarpPoint = true;
@@ -6221,11 +6286,8 @@ item_gacha = function () {
   }
 
   // Warp entries of the whole share group: every item with the same "<warpShare>".
-  //変更: v1.46からループ上限が$dataWeapons.lengthのままだったが、走査対象は
-  // $dataItemsなので$dataItems.lengthに修正(ID501～1500のアイテムが
-  // 共有グループの対象外になっていた)
   function collectSharedWarpEntries(warpShareGroupId, warpPoints) {
-    for (let itemId = 1; itemId < $dataItems.length; itemId++) {
+    for (let itemId = 1; itemId <= $dataWeapons.length - 1; itemId++) {
       const itemData = $dataItems[itemId];
       if (!itemData || !itemData.meta["warpShare"]) continue;
       if (Number(itemData.meta["warpShare"]) != warpShareGroupId) continue;
@@ -7225,66 +7287,63 @@ item_gacha = function () {
   }
 
   function initializeSpecialMapNames() {
+    if (!$dataSystem.variables[61].match(/りしゃぶる/)) return;
+
     const switches = $dataSystem.switches;
-    if ($dataSystem.variables[61].match(/りしゃぶる/)) {
-      let familyName = $dataWeapons[315].meta["FamilyName"];
-      if (familyName) {
-        switches[279] = `喫茶 <${familyName}カフェ>`;
-        valueMapNameSpecialStaging[200] = switches[279];
-      }
-      familyName = $dataWeapons[311].meta["FamilyName"];
-      if (familyName) {
-        switches[275] = `書店 <${familyName}古書店>`;
-        valueMapNameSpecialStaging[95] = switches[275];
-      }
-      familyName = $dataWeapons[316].meta["FamilyName"];
-      if (familyName) {
-        switches[274] = `民家 <${familyName}家>`;
-        valueMapNameSpecialStaging[25] = switches[274];
-      }
+    SPECIAL_MAP_SHOP_NAMES.forEach((shopName) => {
+      applySpecialMapShopName(switches, shopName);
+    });
+    SPECIAL_MAP_FLOOR_NAMES.forEach((floorName) => {
+      applySpecialMapFloorNames(switches, floorName);
+    });
+    SPECIAL_MAP_DIRECT_SWITCHES.forEach((directSwitch) => {
+      valueMapNameSpecialStaging[directSwitch.mapId] = `${switches[directSwitch.switchId]}`;
+    });
+  }
 
-      const switch341 = switches[341];
-      valueMapNameSpecialStaging[146] = `${switch341}-[B1F]`;
-      valueMapNameSpecialStaging[147] = `${switch341}-[B2F]`;
-      valueMapNameSpecialStaging[148] = `${switch341}-[B3F]`;
-      valueMapNameSpecialStaging[149] = `${switch341}-[B4F]`;
-      valueMapNameSpecialStaging[150] = `${switch341}-[B5F]`;
+  // Shop / house map names built from the family name stored on a weapon.
+  // The switch id and the staged map id differ per entry, so they are listed here.
+  const SPECIAL_MAP_SHOP_NAMES = [
+    { weaponId: 315, switchId: 279, mapId: 200, prefix: `喫茶 <`, suffix: `カフェ>` },
+    { weaponId: 311, switchId: 275, mapId: 95, prefix: `書店 <`, suffix: `古書店>` },
+    { weaponId: 316, switchId: 274, mapId: 25, prefix: `民家 <`, suffix: `家>` }
+  ];
 
-      const switch342 = switches[342];
-      valueMapNameSpecialStaging[152] = `${switch342}-[B6F]`;
-      valueMapNameSpecialStaging[153] = `${switch342}-[B7F]`;
-      valueMapNameSpecialStaging[154] = `${switch342}-[B8F]`;
-      valueMapNameSpecialStaging[155] = `${switch342}-[B9F]`;
-      valueMapNameSpecialStaging[156] = `${switch342}-[B10F]`;
+  // Basement floors tagged with the tower name of their switch: "${name}-[B1F]".
+  // The staged map ids are not sequential, so each floor keeps its own entry.
+  const SPECIAL_MAP_FLOOR_NAMES = [
+    { switchId: 341, floors: [[146, "B1F"], [147, "B2F"], [148, "B3F"], [149, "B4F"], [150, "B5F"]] },
+    { switchId: 342, floors: [[152, "B6F"], [153, "B7F"], [154, "B8F"], [155, "B9F"], [156, "B10F"]] },
+    { switchId: 343, floors: [[172, "B11F"], [173, "B12F"], [174, "B13F"], [175, "B14F"], [176, "B15F"]] },
+    { switchId: 344, floors: [[164, "B16F"], [188, "B17F"], [168, "B18F"], [75, "B19F"], [92, "B20F"]] },
+    { switchId: 345, floors: [[177, "B21F"], [178, "B22F"], [179, "B23F"], [180, "B24F"], [181, "B25F"]] }
+  ];
 
-      const switch343 = switches[343];
-      valueMapNameSpecialStaging[172] = `${switch343}-[B11F]`;
-      valueMapNameSpecialStaging[173] = `${switch343}-[B12F]`;
-      valueMapNameSpecialStaging[174] = `${switch343}-[B13F]`;
-      valueMapNameSpecialStaging[175] = `${switch343}-[B14F]`;
-      valueMapNameSpecialStaging[176] = `${switch343}-[B15F]`;
+  // Map names that are simply the text of a switch.
+  const SPECIAL_MAP_DIRECT_SWITCHES = [
+    { switchId: 346, mapId: 161 },
+    { switchId: 347, mapId: 162 },
+    { switchId: 348, mapId: 211 },
+    { switchId: 349, mapId: 160 },
+    { switchId: 350, mapId: 163 },
+    { switchId: 351, mapId: 159 }
+  ];
 
-      const switch344 = switches[344];
-      valueMapNameSpecialStaging[164] = `${switch344}-[B16F]`;
-      valueMapNameSpecialStaging[188] = `${switch344}-[B17F]`;
-      valueMapNameSpecialStaging[168] = `${switch344}-[B18F]`;
-      valueMapNameSpecialStaging[75] = `${switch344}-[B19F]`;
-      valueMapNameSpecialStaging[92] = `${switch344}-[B20F]`;
+  // Fills "name <family name + suffix>" into the switch and stages it for the map.
+  function applySpecialMapShopName(switches, shopName) {
+    const familyName = $dataWeapons[shopName.weaponId].meta["FamilyName"];
+    if (!familyName) return;
 
-      const switch345 = switches[345];
-      valueMapNameSpecialStaging[177] = `${switch345}-[B21F]`;
-      valueMapNameSpecialStaging[178] = `${switch345}-[B22F]`;
-      valueMapNameSpecialStaging[179] = `${switch345}-[B23F]`;
-      valueMapNameSpecialStaging[180] = `${switch345}-[B24F]`;
-      valueMapNameSpecialStaging[181] = `${switch345}-[B25F]`;
+    switches[shopName.switchId] = shopName.prefix + familyName + shopName.suffix;
+    valueMapNameSpecialStaging[shopName.mapId] = switches[shopName.switchId];
+  }
 
-      valueMapNameSpecialStaging[161] = `${switches[346]}`;
-      valueMapNameSpecialStaging[162] = `${switches[347]}`;
-      valueMapNameSpecialStaging[211] = `${switches[348]}`;
-      valueMapNameSpecialStaging[160] = `${switches[349]}`;
-      valueMapNameSpecialStaging[163] = `${switches[350]}`;
-      valueMapNameSpecialStaging[159] = `${switches[351]}`;
-    }
+  // Stages every basement floor of one tower switch.
+  function applySpecialMapFloorNames(switches, floorName) {
+    const towerName = switches[floorName.switchId];
+    floorName.floors.forEach((floor) => {
+      valueMapNameSpecialStaging[floor[0]] = `${towerName}-[${floor[1]}]`;
+    });
   }
 
   function populateNPCInformation(
@@ -7557,41 +7616,60 @@ item_gacha = function () {
     switch (effectTypeId) {
       case 0:
       case 1:
-      case 2: {
-        const parameterName = mealBuffParameterName(effectTypeId, parameterId);
-        const amount = effectStrength * 100;
-        const rateText = colorTaggedText(10, `${amount}%`);
-        traitLineText = parameterName + `${rateText}UP!`;
+      case 2:
+        traitLineText = describeMealParameterBuff(effectTypeId, parameterId, effectStrength);
         break;
-      }
-      case 3: {
-        const elementName = $dataSystem.elements[parameterId];
-        const isIncrease = effectStrength >= 0;
-        const changeText = isIncrease
-          ? `${effectStrength}%UP!`
-          : `${effectStrength}%DOWN!`;
-        const rateLabel = colorTaggedText(isIncrease ? 10 : 1, changeText);
-        traitLineText = `${elementName}威力${rateLabel}`;
+      case 3:
+        traitLineText = describeMealElementPowerBuff(parameterId, effectStrength);
         break;
-      }
       case 4: {
-        const elementName = $dataSystem.elements[parameterId];
-        const useDirectRate =
-          [10, 11, 12, 15, 20, 38, 39, 40, 41].indexOf(parameterId) >= 0;
-        const isIncrease = useDirectRate ? traitRate >= 0 : !(traitRate <= 0);
-        traitLineText = `${elementName}`;
-        if (!useDirectRate) {
-          traitLineText += "耐性";
-          if (traitRate <= 0) traitRate = traitRate - traitRate - traitRate;
-        }
-        const amount = effectStrength * (parameterId === 11 ? 10 : 100);
-        const rateText = colorTaggedText(isIncrease ? 10 : 1, `${amount}%`);
-        traitLineText += isIncrease ? `${rateText}UP!` : `${rateText}DOWN!`;
+        const resistanceBuff = describeMealResistanceBuff(parameterId, effectStrength, traitRate);
+        traitRate = resistanceBuff.traitRate;
+        traitLineText = resistanceBuff.traitLineText;
         break;
       }
     }
     return { traitRate: traitRate, traitLineText: traitLineText };
   }
+
+  // "Parameter +100%UP!" line of the stat buffs (types 0-2).
+  function describeMealParameterBuff(effectTypeId, parameterId, effectStrength) {
+    const parameterName = mealBuffParameterName(effectTypeId, parameterId);
+    const amount = effectStrength * 100;
+    const rateText = colorTaggedText(10, `${amount}%`);
+    return parameterName + `${rateText}UP!`;
+  }
+
+  // "Element power +15%UP!" / "...DOWN!" line (type 3).
+  function describeMealElementPowerBuff(parameterId, effectStrength) {
+    const elementName = $dataSystem.elements[parameterId];
+    const isIncrease = effectStrength >= 0;
+    const changeText = isIncrease
+      ? `${effectStrength}%UP!`
+      : `${effectStrength}%DOWN!`;
+    const rateLabel = colorTaggedText(isIncrease ? 10 : 1, changeText);
+    return `${elementName}威力${rateLabel}`;
+  }
+
+  // Resistance line (type 4). Elements 10/11/12/15/20/38-41 are shown without the
+  // "耐性" suffix and keep their sign; the others store the rate negated.
+  function describeMealResistanceBuff(parameterId, effectStrength, traitRate) {
+    const elementName = $dataSystem.elements[parameterId];
+    const useDirectRate = MEAL_DIRECT_RATE_ELEMENTS.indexOf(parameterId) >= 0;
+    const isIncrease = useDirectRate ? traitRate >= 0 : !(traitRate <= 0);
+    let traitLineText = `${elementName}`;
+    if (!useDirectRate) {
+      traitLineText += "耐性";
+      if (traitRate <= 0) traitRate = traitRate - traitRate - traitRate;
+    }
+    const amount = effectStrength * (parameterId === 11 ? 10 : 100);
+    const rateText = colorTaggedText(isIncrease ? 10 : 1, `${amount}%`);
+    traitLineText += isIncrease ? `${rateText}UP!` : `${rateText}DOWN!`;
+    return { traitRate: traitRate, traitLineText: traitLineText };
+  }
+
+  // Elements whose resistance is displayed with its own sign instead of the suffix.
+  const MEAL_DIRECT_RATE_ELEMENTS = [10, 11, 12, 15, 20, 38, 39, 40, 41];
 
   function applyMealBuffEffect(stateData, effectValues, traitRate) {
     const effectTypeId = Number(effectValues[0]);
@@ -7600,26 +7678,17 @@ item_gacha = function () {
 
     switch (effectTypeId) {
       case 0:
-        stateData.traits.push({
-          code: 21,
-          dataId: effectParameterId,
-          value: 1 + traitRate
-        });
-        break;
       case 1:
+      case 2: {
+        const parameterTrait = MEAL_BUFF_PARAMETER_TRAITS[effectTypeId];
+        const traitValue = parameterTrait.addsBase ? 1 + traitRate : traitRate;
         stateData.traits.push({
-          code: 22,
+          code: parameterTrait.code,
           dataId: effectParameterId,
-          value: traitRate
+          value: traitValue
         });
         break;
-      case 2:
-        stateData.traits.push({
-          code: 23,
-          dataId: effectParameterId,
-          value: 1 + traitRate
-        });
-        break;
+      }
       case 3:
         $gameParty.members().forEach(function (partyMember) {
           valueAttackAmplifysActorId[partyMember.actorId()][
@@ -7628,15 +7697,24 @@ item_gacha = function () {
         });
         break;
       case 4:
-        var traitRate = traitRate - traitRate - traitRate;
+        // The resistance trait stores the negated rate (x - x - x is the original -x).
+        const negatedRate = traitRate - traitRate - traitRate;
         stateData.traits.push({
           code: 11,
           dataId: effectParameterId,
-          value: 1 + traitRate
+          value: 1 + negatedRate
         });
         break;
     }
   }
+
+  // Trait code written by the parameter buffs (types 0-2) and whether they add the
+  // base value 1 on top of the rate.
+  const MEAL_BUFF_PARAMETER_TRAITS = {
+    0: { code: 21, addsBase: true },
+    1: { code: 22, addsBase: false },
+    2: { code: 23, addsBase: true }
+  };
 
   function configureFaithBuff(stateId) {
     const stateData = $dataStates[stateId];
@@ -7762,42 +7840,66 @@ item_gacha = function () {
   ) {
     $gameVariables.setValue(GAME_VARIABLE.BOSS_ENEMY_STATES, []);
     const addedStateIds = $gameVariables.value(GAME_VARIABLE.BOSS_ENEMY_STATES);
+    const displayedSkillIds = collectBossDisplayedSkillIds(
+      bossActionValues,
+      bossSpecialActionValues,
+      wasBossAlreadyDefeated(bossConfigId)
+    );
+
+    displayedSkillIds.forEach(function (skillId, displayIndex) {
+      applyBossActionState(addedStateIds, skillId, displayIndex);
+    });
+  }
+
+  // Skills the boss may use: its normal list, plus the special actions once it was met.
+  function collectBossDisplayedSkillIds(bossActionValues, bossSpecialActionValues, wasDefeated) {
     const normalSkillIds = bossActionValues
-      .slice(0, 10)
+      .slice(0, BOSS_NORMAL_ACTION_COUNT)
       .filter((skillId) => skillId >= 1);
+    if (!wasDefeated) return normalSkillIds;
+
     const specialSkillIds = [];
-    for (let actionIndex = 1; actionIndex <= 15; actionIndex++) {
+    for (let actionIndex = 1; actionIndex <= BOSS_SPECIAL_ACTION_COUNT; actionIndex++) {
       const actionValues = bossSpecialActionValues[actionIndex];
       if (actionValues && actionValues[2] >= 1)
         specialSkillIds.push(actionValues[2]);
     }
-    let wasDefeated = false;
+    return Array.from(new Set(normalSkillIds.concat(specialSkillIds)));
+  }
+
+  // Whether this boss was already defeated in this dungeon (config 1) or anywhere (config 2).
+  function wasBossAlreadyDefeated(bossConfigId) {
     switch (numericCaseValue(bossConfigId)) {
       case 1:
-        wasDefeated =
+        return (
           $gameVariables.value(GAME_VARIABLE.DUNGEON_BOSS_DEFEAT_COUNTS)[
             $gameVariables.value(GAME_VARIABLE.DUNGEON_INFO_ITEM_ID)
-          ] >= 1;
-        break;
+          ] >= 1
+        );
       case 2:
-        wasDefeated = $gameVariables.value(GAME_VARIABLE.BOSS_DEFEATED_ARRAY)[valueBossEnemyId] >= 1;
-        break;
+        return $gameVariables.value(GAME_VARIABLE.BOSS_DEFEATED_ARRAY)[valueBossEnemyId] >= 1;
     }
-    const displayedSkillIds = wasDefeated
-      ? Array.from(new Set(normalSkillIds.concat(specialSkillIds)))
-      : normalSkillIds;
-    displayedSkillIds.forEach(function (skillId, displayIndex) {
-      const skillData = $dataSkills[skillId];
-      const stateId = 750 + displayIndex;
-      const stateData = $dataStates[stateId];
-      if (!skillData || !stateData) return;
-      stateData.iconIndex = skillData.iconIndex;
-      const skillName = skillData.name;
-      stateData.name = `[行動]${skillName}`;
-      stateData.description = skillData.description;
-      addedStateIds.push(stateId);
-    });
+    return false;
   }
+
+  // Copies one skill into the display state 750+index used by the boss action window.
+  function applyBossActionState(addedStateIds, skillId, displayIndex) {
+    const skillData = $dataSkills[skillId];
+    const stateId = BOSS_ACTION_STATE_BASE + displayIndex;
+    const stateData = $dataStates[stateId];
+    if (!skillData || !stateData) return;
+
+    stateData.iconIndex = skillData.iconIndex;
+    const skillName = skillData.name;
+    stateData.name = `[行動]${skillName}`;
+    stateData.description = skillData.description;
+    addedStateIds.push(stateId);
+  }
+
+  // Display states start at 750; the action lists of a boss hold 10 normal and 15 special slots.
+  const BOSS_ACTION_STATE_BASE = 750;
+  const BOSS_NORMAL_ACTION_COUNT = 10;
+  const BOSS_SPECIAL_ACTION_COUNT = 15;
 
   function configureBossTroop(bossMeta, bossEnemyData, bossEnemyValues) {
     const troopSetting = bossMeta.BossTroop;
@@ -7889,39 +7991,47 @@ item_gacha = function () {
 
       if (!actorMeta[professionMetaKey]) continue;
 
-      const professionData = actorMeta[professionMetaKey].split(",");
-      const professionName = professionData[0];
-      const switchId = Number(professionData[1]);
-      const variableId = Number(professionData[2]);
-      const requiredValue = Number(professionData[3]);
-      const requiredItemId = Number(professionData[4]);
-
-      // Check switch condition
-      if (switchId >= 1 && $gameSwitches.value(switchId)) {
-        newProfession = professionName;
-        continue;
-      }
-
-      // Check variable threshold condition
-      if (
-        variableId >= 1 &&
-        $gameVariables.value(variableId) >= requiredValue
-      ) {
-        newProfession = professionName;
-        continue;
-      }
-
-      // Check item possession condition
-      if (
-        requiredItemId >= 1 &&
-        $gameParty.hasItem($dataItems[requiredItemId], true)
-      ) {
-        newProfession = professionName;
+      const professionChoice = readProfessionChoice(actorMeta[professionMetaKey]);
+      if (isProfessionChoiceMet(professionChoice)) {
+        newProfession = professionChoice.name;
         continue;
       }
     }
 
     return newProfession;
+  }
+
+  // "name,switchId,variableId,requiredValue,itemId" -> one profession alternative.
+  function readProfessionChoice(professionMetaValue) {
+    const professionData = professionMetaValue.split(",");
+    return {
+      name: professionData[0],
+      switchId: Number(professionData[1]),
+      variableId: Number(professionData[2]),
+      requiredValue: Number(professionData[3]),
+      requiredItemId: Number(professionData[4])
+    };
+  }
+
+  // A profession applies when its switch is on, its variable reached the value or the
+  // party holds the item; the first matching condition already decides.
+  function isProfessionChoiceMet(professionChoice) {
+    if (professionChoice.switchId >= 1 && $gameSwitches.value(professionChoice.switchId)) {
+      return true;
+    }
+    if (
+      professionChoice.variableId >= 1 &&
+      $gameVariables.value(professionChoice.variableId) >= professionChoice.requiredValue
+    ) {
+      return true;
+    }
+    if (
+      professionChoice.requiredItemId >= 1 &&
+      $gameParty.hasItem($dataItems[professionChoice.requiredItemId], true)
+    ) {
+      return true;
+    }
+    return false;
   }
 
   function drawPagedListTextWindow(windowY, windowHeight) {
@@ -8036,35 +8146,42 @@ item_gacha = function () {
     if (!meta.EICSwitch) return;
     switch (Number(meta.EICSwitch)) {
       case 102:
-        numberCommonEventItem(itemData, itemId, numbering.episode++, 0);
+      case 103: {
+        const eventItemRule = EVENT_ITEM_NUMBERING_RULES[Number(meta.EICSwitch)];
+        const eventNumber = numbering[eventItemRule.counter]++;
+        numberCommonEventItem(itemData, itemId, eventNumber, eventItemRule.baseNumber);
         break;
-      case 103:
-        numberCommonEventItem(itemData, itemId, numbering.scene++, 100);
-        break;
+      }
       case 104:
       case 105:
         itemData.description =
           "[" + numbering.title++ + "]" + itemData.description;
         appendPersonalTitleAchiever(itemData, itemId, achieverActorIds);
         break;
-      case 108:
-        switch (meta["SGカテゴリ"]) {
-          case "受注クエスト":
-          case "ＥＸ受注クエスト":
-            copyCompletedQuestItem(itemData, itemId, numbering.quest++, 100);
-            break;
-          case "デイリークエスト":
-            copyCompletedQuestItem(
-              itemData,
-              itemId,
-              numbering.dailyQuest++,
-              50
-            );
-            break;
-        }
+      case 108: {
+        const questRule = QUEST_ITEM_NUMBERING_RULES[meta["SGカテゴリ"]];
+        if (!questRule) break;
+        const questNumber = numbering[questRule.counter]++;
+        copyCompletedQuestItem(itemData, itemId, questNumber, questRule.baseNumber);
         break;
+      }
     }
   }
+
+  // Episode / scene items: which counter of <numbering> advances and the number the
+  // first entry gets.
+  const EVENT_ITEM_NUMBERING_RULES = {
+    102: { counter: "episode", baseNumber: 0 },
+    103: { counter: "scene", baseNumber: 100 }
+  };
+
+  // Quest items of category 108: the two order categories share one counter, the daily
+  // quests have their own with a different start.
+  const QUEST_ITEM_NUMBERING_RULES = {
+    "受注クエスト": { counter: "quest", baseNumber: 100 },
+    "ＥＸ受注クエスト": { counter: "quest", baseNumber: 100 },
+    "デイリークエスト": { counter: "dailyQuest", baseNumber: 50 }
+  };
   function appendPersonalTitleAchiever(itemData, itemId, achieverActorIds) {
     if (!itemData.meta.KojinTitle || !Array.isArray(achieverActorIds)) return;
     const achieverActorId = achieverActorIds[itemId];
@@ -8358,48 +8475,18 @@ item_gacha = function () {
   }
 
   function beginRegisteredEventScene(sceneParamValue, eventItemId) {
-    if (
-      $gameVariables.value(GAME_VARIABLE.SCENE_PREVIOUS_TIME_SWITCH_ID) == 0
-    ) {
-      for (var i = 13; i <= 15; i++) {
-        if ($gameSwitches.value(i)) {
-          $gameVariables.setValue(
-            GAME_VARIABLE.SCENE_PREVIOUS_TIME_SWITCH_ID,
-            i
-          );
-        }
-      }
-    }
-    if (valueWeatherSceneSet != 0) {
-      $gameSwitches.setValue(GAME_SWITCH.MORNING, false);
-      $gameSwitches.setValue(GAME_SWITCH.DAYTIME, false);
-      $gameSwitches.setValue(GAME_SWITCH.NIGHT, false);
-      $gameSwitches.setValue(valueWeatherSceneSet, true);
-    }
-    if (!$gameParty.inBattle()) {
+    rememberPreviousTimeSwitch();
+    applySceneWeatherSwitch();
+
+    // Outside battle the player walks through the scene unseen.
+    const isInBattle = $gameParty.inBattle();
+    if (!isInBattle) {
       $gamePlayer.setThrough(true);
-    }
-    if (!$gameParty.inBattle()) {
       $gamePlayer.setStealthMode(true);
     }
-    if (eventItemId >= 1) {
-      if ($gameSwitches.value(GAME_SWITCH.RECOLLECTION_SKIP)) {
-        valueSceneConditions1 = true;
-        valueSceneConditions2 = true;
-        valueSceneConditions3 = true;
-      } else {
-        const eventItemMeta = $dataItems[eventItemId].meta;
-        if (eventItemMeta["RegistrationC1"]) {
-          valueSceneConditions1 = eventItemMeta["RegistrationC1"];
-        }
-        if (eventItemMeta["RegistrationC2"]) {
-          valueSceneConditions2 = eventItemMeta["RegistrationC2"];
-        }
-        if (eventItemMeta["RegistrationC3"]) {
-          valueSceneConditions3 = eventItemMeta["RegistrationC3"];
-        }
-      }
-    }
+
+    publishSceneRegistrationConditions(eventItemId);
+
     //$gamePlayer.setTransparent(true);//効果なし。コモンで実行
     $gameSwitches.setValue(GAME_SWITCH.NPC_VANISHED, true); //NPC消滅スイッチon
     $gameSwitches.setValue(GAME_SWITCH.EVENT_PROGRESS_BLOCKER, true);
@@ -8407,48 +8494,84 @@ item_gacha = function () {
     $gameVariables.setValue(GAME_VARIABLE.DYNAMIC_EVENT_IDS, Array(21).fill(0));
     $gameVariables.setValue(GAME_VARIABLE.EVENT_SUBJECT_ACTOR_ID, sceneParamValue);
     //$gameSwitches.setValue(71,true);//ﾌﾟﾚｲﾔ移動禁止未使用
-    if (!$gameParty.inBattle()) {
+    if (!isInBattle) {
       $gameTemp.stopMapPlayerMovement();
+    }
+  }
+
+  // Time of day switches 13-15; the last one that is on is remembered for the end of the scene.
+  function rememberPreviousTimeSwitch() {
+    if ($gameVariables.value(GAME_VARIABLE.SCENE_PREVIOUS_TIME_SWITCH_ID) != 0) return;
+
+    for (var i = SCENE_TIME_SWITCH_FIRST; i <= SCENE_TIME_SWITCH_LAST; i++) {
+      if ($gameSwitches.value(i)) {
+        $gameVariables.setValue(
+          GAME_VARIABLE.SCENE_PREVIOUS_TIME_SWITCH_ID,
+          i
+        );
+      }
+    }
+  }
+
+  // Scene time switches that rememberPreviousTimeSwitch() scans.
+  const SCENE_TIME_SWITCH_FIRST = 13;
+  const SCENE_TIME_SWITCH_LAST = 15;
+
+  // The scene sets its own time of day; the three default switches are cleared first.
+  function applySceneWeatherSwitch() {
+    if (valueWeatherSceneSet == 0) return;
+
+    $gameSwitches.setValue(GAME_SWITCH.MORNING, false);
+    $gameSwitches.setValue(GAME_SWITCH.DAYTIME, false);
+    $gameSwitches.setValue(GAME_SWITCH.NIGHT, false);
+    $gameSwitches.setValue(valueWeatherSceneSet, true);
+  }
+
+  // Conditions the event code evaluates later; a recollection keeps them all true.
+  function publishSceneRegistrationConditions(eventItemId) {
+    if (eventItemId < 1) return;
+
+    if ($gameSwitches.value(GAME_SWITCH.RECOLLECTION_SKIP)) {
+      valueSceneConditions1 = true;
+      valueSceneConditions2 = true;
+      valueSceneConditions3 = true;
+      return;
+    }
+
+    const eventItemMeta = $dataItems[eventItemId].meta;
+    if (eventItemMeta["RegistrationC1"]) {
+      valueSceneConditions1 = eventItemMeta["RegistrationC1"];
+    }
+    if (eventItemMeta["RegistrationC2"]) {
+      valueSceneConditions2 = eventItemMeta["RegistrationC2"];
+    }
+    if (eventItemMeta["RegistrationC3"]) {
+      valueSceneConditions3 = eventItemMeta["RegistrationC3"];
     }
   }
 
   function finishRegisteredEventScene(selectionSwitchId) {
     restoreRegisteredSceneTime();
-    if (!$gameParty.inBattle()) {
+
+    // The same battle check is used three times; it cannot change during the call.
+    const isInBattle = $gameParty.inBattle();
+    if (!isInBattle) {
       $gamePlayer.setThrough(false);
-    }
-    if (!$gameParty.inBattle()) {
       $gamePlayer.setStealthMode(false);
     }
     $gameSwitches.setValue(GAME_SWITCH.EVENT_PROGRESS_ACTIVE, false); //イベント進行時onoff
     $gameSwitches.setValue(GAME_SWITCH.MAP_WEATHER_IGNORED, false);
     $gameSwitches.setValue(GAME_SWITCH.SCENE_CONTINUE_SELECTED, false); //選択肢でシーン達成なし続行
-    if (!$gameParty.inBattle()) {
+    if (!isInBattle) {
       $gameTemp.allowMapPlayerMovement();
       $gameTemp.allowMapEventMovement();
     }
     $gameSwitches.setValue(GAME_SWITCH.NPC_VANISHED, false); //NPC消滅スイッチoff
     $gameSwitches.setValue(GAME_SWITCH.PASSERBY_VANISHED, false); //通行人消滅スイッチoff。任意
     eraseRegisteredSceneEvents();
-    valueWeatherSceneSet = 0;
-    valueSceneConditions1 = true;
-    valueSceneConditions2 = true;
-    valueSceneConditions3 = true;
-    $gameVariables.setValue(GAME_VARIABLE.DYNAMIC_EVENT_IDS, Array(21).fill(0));
-    $gameVariables.setValue(GAME_VARIABLE.EVENT_SUBJECT_ACTOR_ID, 0);
-    $gameVariables.setValue(GAME_VARIABLE.EVENT_PROGRESS, 0);
-    if (!$gameSwitches.value(GAME_SWITCH.RECOLLECTION_SKIP)) {
-      $gamePlayer.setTransparent(false);
-      if ($gameSwitches.value(GAME_SWITCH.EPISODE_AUTO_GENERATED)) {
-        //挿話
-        $gameSwitches.setValue(GAME_SWITCH.EPISODE_AUTO_GENERATED, false);
-      }
-      if ($gameSwitches.value(GAME_SWITCH.H_SCENE_PARALLEL)) {
-        //Ｈ
-        $gameSwitches.setValue(GAME_SWITCH.H_SCENE_PARALLEL, false);
-      }
-    }
-    if (!$gameParty.inBattle()) {
+    resetSceneConditions();
+    clearEpisodeSceneFlags();
+    if (!isInBattle) {
       drowsepost.camera.zoom(1, 60, $gamePlayer);
     }
     if (selectionSwitchId >= 2) {
@@ -8457,7 +8580,83 @@ item_gacha = function () {
     }
   }
 
-  function collectTitleAchievementRecords() {
+  // Resets the scene globals shared by every event scene.
+  function resetSceneConditions() {
+    valueWeatherSceneSet = 0;
+    valueSceneConditions1 = true;
+    valueSceneConditions2 = true;
+    valueSceneConditions3 = true;
+    $gameVariables.setValue(GAME_VARIABLE.DYNAMIC_EVENT_IDS, Array(21).fill(0));
+    $gameVariables.setValue(GAME_VARIABLE.EVENT_SUBJECT_ACTOR_ID, 0);
+    $gameVariables.setValue(GAME_VARIABLE.EVENT_PROGRESS, 0);
+  }
+
+  // A recorded scene becomes visible again and drops the episode / H scene flags.
+  function clearEpisodeSceneFlags() {
+    if ($gameSwitches.value(GAME_SWITCH.RECOLLECTION_SKIP)) return;
+
+    $gamePlayer.setTransparent(false);
+    if ($gameSwitches.value(GAME_SWITCH.EPISODE_AUTO_GENERATED)) {
+      //挿話
+      $gameSwitches.setValue(GAME_SWITCH.EPISODE_AUTO_GENERATED, false);
+    }
+    if ($gameSwitches.value(GAME_SWITCH.H_SCENE_PARALLEL)) {
+      //Ｈ
+      $gameSwitches.setValue(GAME_SWITCH.H_SCENE_PARALLEL, false);
+    }
+  }
+
+    // Feeds the four per-actor best values of one actor into their leader records.
+  function updateTitleActorRecords(actorRecords, actor, actorRecordId) {
+    const recordValues = $gameVariables.value(GAME_VARIABLE.ACTOR_RECORD_BASE + actorRecordId);
+    updateTitleAchievementLeader(
+      actorRecords.criticalHitRecord,
+      actorRecordId,
+      recordValues[68]
+    );
+    updateTitleAchievementLeader(
+      actorRecords.maxDamageDealtRecord,
+      actorRecordId,
+      actor.attackDamageMax
+    );
+    updateTitleAchievementLeader(
+      actorRecords.maxDamageTakenRecord,
+      actorRecordId,
+      actor.acceptDamageMax
+    );
+    updateTitleAchievementLeader(
+      actorRecords.koCountRecord,
+      actorRecordId,
+      actor.deadCounter
+    );
+  }
+
+  // Keeps the actor with the highest use count per custom achievement id.
+  function updateTitleSkillLeaders(
+    useCounts,
+    customAchievementIds,
+    topUseCounts,
+    topActorIds,
+    actorRecordId
+  ) {
+    for (var skillIndex = 0; skillIndex <= customAchievementIds.length - 1; skillIndex++) {
+      if (!(useCounts[skillIndex] > topUseCounts[skillIndex])) continue;
+
+      topUseCounts[skillIndex] = useCounts[skillIndex];
+      topActorIds[skillIndex] = actorRecordId;
+    }
+  }
+
+  // Sum of the overkill counter (record slot 67) of the deployed actors.
+  function sumTitleOverkillCounts(firstActorId, lastActorId) {
+    let overkillCount = 0;
+    for (var actorId = firstActorId; actorId <= lastActorId; actorId++) {
+      overkillCount += $gameVariables.value(GAME_VARIABLE.ACTOR_RECORD_BASE + actorId)[67];
+    }
+    return overkillCount;
+  }
+
+function collectTitleAchievementRecords() {
     const firstActorId = $gameVariables.value(
       GAME_VARIABLE.FIRST_DEPLOYED_ACTOR_ID
     );
@@ -8470,60 +8669,36 @@ item_gacha = function () {
     const koCountRecord = [7, 0, 0]; //戦闘不能回数
 
     const customAchievementIds = [8, 9, 10, 11, 12, 13, 14];
-    const skillTypeIds = BATTLE_RECORD_SKILL_TYPE_IDS;
     const topActorIds = [0, 0, 0, 0, 0, 0, 0];
     const topUseCounts = [0, 0, 0, 0, 0, 0, 0];
+    const actorRecords = {
+      criticalHitRecord: criticalHitRecord,
+      maxDamageDealtRecord: maxDamageDealtRecord,
+      maxDamageTakenRecord: maxDamageTakenRecord,
+      koCountRecord: koCountRecord
+    };
     for (let actorId = firstActorId; actorId <= lastActorId; actorId++) {
       const actor = $gameActors.actor(actorId);
       if (!actor) continue;
       const actorRecordId = actor.actorId();
-      const actorRecords = $gameVariables.value(GAME_VARIABLE.ACTOR_RECORD_BASE + actorRecordId);
-      updateTitleAchievementLeader(
-        criticalHitRecord,
-        actorRecordId,
-        actorRecords[68]
-      );
-      updateTitleAchievementLeader(
-        maxDamageDealtRecord,
-        actorRecordId,
-        actor.attackDamageMax
-      );
-      updateTitleAchievementLeader(
-        maxDamageTakenRecord,
-        actorRecordId,
-        actor.acceptDamageMax
-      );
-      updateTitleAchievementLeader(
-        koCountRecord,
-        actorRecordId,
-        actor.deadCounter
-      );
+      updateTitleActorRecords(actorRecords, actor, actorRecordId);
       //獲得実績自己設定ID
       //スキルタイプid
       //アクターID
-      const useCounts = collectActorTitleSkillUses(actor, skillTypeIds);
-      for (
-        var skillId = 0;
-        skillId <= customAchievementIds.length - 1;
-        skillId++
-      ) {
-        if (!(useCounts[skillId] > topUseCounts[skillId])) continue;
-
-        topUseCounts[skillId] = useCounts[skillId];
-        topActorIds[skillId] = actorRecordId;
-      }
+      updateTitleSkillLeaders(
+        collectActorTitleSkillUses(actor, BATTLE_RECORD_SKILL_TYPE_IDS),
+        customAchievementIds,
+        topUseCounts,
+        topActorIds,
+        actorRecordId
+      );
     }
 
-    var actor = $gameActors;
-    const partyKillRecord = [1, 0, actor.getAllKillEnemyCounter()];
-    const partyDamageDealtRecord = [3, 0, actor.attackDamageSum];
-    const partyDamageTakenRecord = [6, 0, actor.acceptDamageSum];
-    const partyDeathRecord = [15, 0, actor.deadCounter];
-
-    const partyOverkillRecord = [4, 0, 0]; //全員のオーバーキル回数
-    for (var itemId = firstActorId; itemId <= lastActorId; itemId++) {
-      partyOverkillRecord[2] += $gameVariables.value(GAME_VARIABLE.ACTOR_RECORD_BASE + itemId)[67];
-    }
+    const partyKillRecord = [1, 0, $gameActors.getAllKillEnemyCounter()];
+    const partyDamageDealtRecord = [3, 0, $gameActors.attackDamageSum];
+    const partyDamageTakenRecord = [6, 0, $gameActors.acceptDamageSum];
+    const partyDeathRecord = [15, 0, $gameActors.deadCounter];
+    const partyOverkillRecord = [4, 0, sumTitleOverkillCounts(firstActorId, lastActorId)]; //全員のオーバーキル回数
 
     return {
       customAchievementIds: customAchievementIds,
@@ -8541,94 +8716,152 @@ item_gacha = function () {
     };
   }
 
-  function evaluateTitleCandidate(item, achievementRecords) {
-    const itemMeta = item.meta;
-    var titleCheckId = 2; //スイッチID。最初にtrueにして成立しない場合は途中でfalse
-    var titleCheckVarId = 2; //変数id若しくは$gameVariables.value(380 + $gameVariables.value(2))の主人公Ｈ配列id
-    var titleCheckThreshold = 0; //value2の値.
-    var titleCheckResult = true; //
-    //var value5 = 0;//汎用。必要な時に0から始める
-    var titleMvpActorId = 0; //個人記録のＭＶＰアクター
-    if (itemMeta["annihilationTitle"]) {
-      titleCheckId = 1;
-    }
-    if (itemMeta["titleGetSwitch"]) {
-      titleCheckId = Number(itemMeta["titleGetSwitch"]);
-      //var titleCheckResult = $gameSwitches.value(titleCheckId);
-    }
-    if (itemMeta["titleGetVariable"]) {
-      const titleGetVariableValues = itemMeta["titleGetVariable"].split(",");
-      titleCheckVarId = Number(titleGetVariableValues[0]);
-      titleCheckThreshold = Number(titleGetVariableValues[1]);
-      titleCheckResult =
-        $gameVariables.value(titleCheckVarId) >= titleCheckThreshold;
-    }
-    if (itemMeta["titleGetArray"]) {
-      const titleGetArrayValues = itemMeta["titleGetArray"].split(",");
-      titleCheckVarId = Number(titleGetArrayValues[0]);
-      titleCheckThreshold = Number(titleGetArrayValues[2]);
-      titleCheckResult =
-        $gameVariables.value(titleCheckVarId)[Number(titleGetArrayValues[1])] >=
-        titleCheckThreshold;
-    }
-    if (itemMeta["titleGetItems"]) {
-      const titleGetItemsValues = itemMeta["titleGetItems"].split(",");
-      titleCheckVarId = Number(titleGetItemsValues[0]);
-      titleCheckThreshold = Number(titleGetItemsValues[1]);
-      titleCheckResult =
-        $gameParty.numItems($dataItems[titleCheckVarId]) >= titleCheckThreshold;
-    }
-    if (itemMeta["HtitleGetArray"]) {
-      //主人公のみ
-      const htitleGetArrayValues = itemMeta["HtitleGetArray"].split(",");
-      titleCheckVarId = Number(htitleGetArrayValues[0]);
-      titleCheckThreshold = Number(htitleGetArrayValues[1]);
-      titleCheckResult =
-        $gameVariables.value(
-          GAME_VARIABLE.ACTOR_RECORD_BASE + $gameVariables.value(GAME_VARIABLE.TRUE_PROTAGONIST_ACTOR_ID)
-        )[titleCheckVarId] >= titleCheckThreshold;
-    }
-    if (itemMeta["titleGetSkillRank"]) {
-      const titleGetSkillRankValues = itemMeta["titleGetSkillRank"].split(",");
-      const members2 = $gameParty.members();
-      for (var skillId = 0; skillId <= members2.length - 1; skillId++) {
-        const actor = members2[skillId];
-        titleCheckVarId = Number(titleGetSkillRankValues[0]);
-        titleCheckThreshold = Number(titleGetSkillRankValues[1]);
-        titleCheckResult =
-          actor.skillMasteryLevel(titleCheckVarId) >= titleCheckThreshold;
-        if (titleCheckResult) {
-          titleMvpActorId = actor.actorId();
-          break;
-        }
+    // "variableId,threshold" of the variable based title conditions.
+  function readTitleVariableCondition(conditionText) {
+    const conditionValues = conditionText.split(",");
+    return {
+      varId: Number(conditionValues[0]),
+      threshold: Number(conditionValues[1])
+    };
+  }
+
+  // "variableId,arrayIndex,threshold" of the array based title conditions.
+  function readTitleArrayCondition(conditionText) {
+    const conditionValues = conditionText.split(",");
+    return {
+      varId: Number(conditionValues[0]),
+      arrayIndex: Number(conditionValues[1]),
+      threshold: Number(conditionValues[2])
+    };
+  }
+
+  // "itemId,threshold" of the item possession title conditions.
+  function readTitleItemCondition(conditionText) {
+    const conditionValues = conditionText.split(",");
+    return {
+      itemId: Number(conditionValues[0]),
+      threshold: Number(conditionValues[1])
+    };
+  }
+
+  // First party member whose mastery of the listed skill reaches the threshold.
+  function findTitleSkillRankOwner(conditionText) {
+    const conditionValues = conditionText.split(",");
+    const skillId = Number(conditionValues[0]);
+    const threshold = Number(conditionValues[1]);
+    const members2 = $gameParty.members();
+
+    for (var memberIndex = 0; memberIndex <= members2.length - 1; memberIndex++) {
+      const actor = members2[memberIndex];
+      if (actor.skillMasteryLevel(skillId) >= threshold) {
+        return { matched: true, actorId: actor.actorId(), skillId, threshold };
       }
     }
-    if (itemMeta.titleGetAchievement) {
-      titleCheckId = 1;
-      const achievementValues = itemMeta.titleGetAchievement.split(",");
-      const achievementTypeId = Number(achievementValues[0]);
-      const record = titleAchievementRecord(
-        achievementRecords,
-        achievementTypeId
-      );
-      if (record && achievementValues[1] <= record[2]) {
-        titleCheckId = 2;
-        if (
-          achievementTypeId !== 1 &&
-          achievementTypeId !== 3 &&
-          achievementTypeId !== 4 &&
-          achievementTypeId !== 6 &&
-          achievementTypeId !== 15
-        )
-          titleMvpActorId = record[1];
+    return { matched: false, actorId: 0, skillId, threshold };
+  }
+
+function evaluateTitleCandidate(item, achievementRecords) {
+    const itemMeta = item.meta;
+    //スイッチID。最初にtrueにして成立しない場合は途中でfalse
+    const titleCheck = {
+      checkId: itemMeta["annihilationTitle"] ? 1 : 2,
+      result: true,
+      mvpActorId: 0 //個人記録のＭＶＰアクター
+    };
+    if (itemMeta["titleGetSwitch"]) {
+      titleCheck.checkId = Number(itemMeta["titleGetSwitch"]);
+    }
+
+    // Every present condition replaces the outcome of the previous one, in table order.
+    for (const conditionReader of TITLE_CONDITION_READERS) {
+      if (!itemMeta[conditionReader.metaKey]) continue;
+
+      const conditionResult = conditionReader.read(itemMeta, achievementRecords);
+      if (!conditionResult) continue;
+
+      if (conditionResult.checkId !== undefined) titleCheck.checkId = conditionResult.checkId;
+      if (conditionResult.result !== undefined) titleCheck.result = conditionResult.result;
+      if (conditionResult.mvpActorId !== undefined) {
+        titleCheck.mvpActorId = conditionResult.mvpActorId;
       }
     }
 
     return {
-      eligible: $gameSwitches.value(titleCheckId) && titleCheckResult,
-      actorId: titleMvpActorId
+      eligible: $gameSwitches.value(titleCheck.checkId) && titleCheck.result,
+      actorId: titleCheck.mvpActorId
     };
   }
+
+  // Achievement ids that belong to the whole party, so they carry no single owner.
+  const TEAM_ACHIEVEMENT_TYPE_IDS = [1, 3, 4, 6, 15];
+
+  // Title conditions in the order the original evaluated them. A reader returns null when
+  // the item does not carry that meta key; the fields it returns override the check state.
+  const TITLE_CONDITION_READERS = [
+    {
+      metaKey: "titleGetVariable",
+      read: (itemMeta) => {
+        const condition = readTitleVariableCondition(itemMeta["titleGetVariable"]);
+        return { result: $gameVariables.value(condition.varId) >= condition.threshold };
+      }
+    },
+    {
+      metaKey: "titleGetArray",
+      read: (itemMeta) => {
+        const condition = readTitleArrayCondition(itemMeta["titleGetArray"]);
+        return {
+          result:
+            $gameVariables.value(condition.varId)[condition.arrayIndex] >=
+            condition.threshold
+        };
+      }
+    },
+    {
+      metaKey: "titleGetItems",
+      read: (itemMeta) => {
+        const condition = readTitleItemCondition(itemMeta["titleGetItems"]);
+        return {
+          result:
+            $gameParty.numItems($dataItems[condition.itemId]) >= condition.threshold
+        };
+      }
+    },
+    {
+      metaKey: "HtitleGetArray",
+      read: (itemMeta) => {
+        //主人公のみ
+        const condition = readTitleVariableCondition(itemMeta["HtitleGetArray"]);
+        return {
+          result:
+            $gameVariables.value(
+              GAME_VARIABLE.ACTOR_RECORD_BASE + $gameVariables.value(GAME_VARIABLE.TRUE_PROTAGONIST_ACTOR_ID)
+            )[condition.varId] >= condition.threshold
+        };
+      }
+    },
+    {
+      metaKey: "titleGetSkillRank",
+      read: (itemMeta) => {
+        const skillRankMatch = findTitleSkillRankOwner(itemMeta["titleGetSkillRank"]);
+        if (!skillRankMatch.matched) return { result: false };
+        return { result: true, mvpActorId: skillRankMatch.actorId };
+      }
+    },
+    {
+      metaKey: "titleGetAchievement",
+      read: (itemMeta, achievementRecords) => {
+        const achievementValues = itemMeta["titleGetAchievement"].split(",");
+        const achievementTypeId = Number(achievementValues[0]);
+        const record = titleAchievementRecord(achievementRecords, achievementTypeId);
+        // A matched achievement re-opens switch 2; an unmatched one only leaves switch 1.
+        if (!record || !(achievementValues[1] <= record[2])) return { checkId: 1 };
+
+        const isTeamRecord = TEAM_ACHIEVEMENT_TYPE_IDS.indexOf(achievementTypeId) >= 0;
+        if (isTeamRecord) return { checkId: 2 };
+        return { checkId: 2, mvpActorId: record[1] };
+      }
+    }
+  ];
 
   function applyTitleAward(item, itemId, titleMvpActorId) {
     $gameVariables.setValue(GAME_VARIABLE.PROCESSED_ITEM_ID, itemId);
@@ -9421,37 +9654,46 @@ item_gacha = function () {
   ) {
     $gameVariables.setValue(GAME_VARIABLE.RANDOM_WORK_1, 0);
     $gameVariables.setValue(GAME_VARIABLE.RANDOM_WORK_2, 0);
-    if (!$gameSwitches.value(switchId)) {
-      if (switchId >= 1) {
-        $gameSwitches.setValue(switchId, true);
-      }
-      AudioManager.playSe({ name: "Chime1", volume: 90, pitch: 100, pan: 0 });
-      $gameVariables.setValue(GAME_VARIABLE.RANDOM_WORK_1, switchId);
-      valueStartCommentary0 = 1;
-      if (displayType == "Npic" || displayType == "Dpic") {
-        var pictureName = "";
-        $gameScreen.setDTextPicture(`${choiceText}\n${displayText}`, 28);
-        $gameScreen.dWindowFrame = "ON";
-        $gameScreen.showPicture(102, pictureName, 0, 110, 100, 100, 100, 0, 0);
-      } else {
-        var pictureName = "/img/tips/" + displayType;
-        $gameScreen.showPicture(102, pictureName, 0, 110, 100, 100, 100, 0, 0);
-        $gameVariables.setValue(GAME_VARIABLE.RANDOM_WORK_2, displayText);
-      }
-      $gameScreen.movePicture(102, 0, 10, 10, 100, 100, 255, 0, 60);
-      $gameScreen.showPicture(
-        101,
-        "ScreenBlackOut",
-        1,
-        640,
-        384,
-        100,
-        100,
-        0,
-        0
-      );
-      $gameScreen.movePicture(101, 1, 640, 384, 100, 100, 200, 0, 60);
+    if ($gameSwitches.value(switchId)) return;
+
+    if (switchId >= 1) {
+      $gameSwitches.setValue(switchId, true);
     }
+    AudioManager.playSe({ name: "Chime1", volume: 90, pitch: 100, pan: 0 });
+    $gameVariables.setValue(GAME_VARIABLE.RANDOM_WORK_1, switchId);
+    valueStartCommentary0 = 1;
+    showUnlockCommentaryPicture(choiceText, displayType, displayText);
+    showCommentaryBackdrop();
+  }
+
+  // Text commentary uses an empty picture plus the drawn text; a named type shows
+  // "/img/tips/<type>" and passes the text through variable 2 instead.
+  function showUnlockCommentaryPicture(choiceText, displayType, displayText) {
+    if (displayType == "Npic" || displayType == "Dpic") {
+      $gameScreen.setDTextPicture(`${choiceText}\n${displayText}`, 28);
+      $gameScreen.dWindowFrame = "ON";
+      $gameScreen.showPicture(102, "", 0, 110, 100, 100, 100, 0, 0);
+    } else {
+      $gameScreen.showPicture(102, "/img/tips/" + displayType, 0, 110, 100, 100, 100, 0, 0);
+      $gameVariables.setValue(GAME_VARIABLE.RANDOM_WORK_2, displayText);
+    }
+    $gameScreen.movePicture(102, 0, 10, 10, 100, 100, 255, 0, 60);
+  }
+
+  // Black overlay that dims the map behind the commentary.
+  function showCommentaryBackdrop() {
+    $gameScreen.showPicture(
+      101,
+      "ScreenBlackOut",
+      1,
+      640,
+      384,
+      100,
+      100,
+      0,
+      0
+    );
+    $gameScreen.movePicture(101, 1, 640, 384, 100, 100, 200, 0, 60);
   }
 
   function showChoiceDescriptionPicture(
