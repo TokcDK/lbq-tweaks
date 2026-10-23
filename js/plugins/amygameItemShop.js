@@ -1125,7 +1125,7 @@ const RARITY_PROMOTION_TAGS = [
   { metaKey: 'URpromotionM', label: `[RarelityUR解放素材]` },
   { metaKey: 'SSRpromotionM', label: `[RarelitySSR解放素材]` },
   { metaKey: 'SRpromotionM', label: `[RarelitySR解放素材]` },
-  { metaKey: 'RpromotionM', label: `[RarelityR解放素材]` },
+//  { metaKey: 'RpromotionM', label: `[RarelityR解放素材]` }, // commented, looks logical incorrect to have RpromotionM twice
   { metaKey: 'RpromotionM', label: `[RarelityR解放素材]` }
 ];
 
