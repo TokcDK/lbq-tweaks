@@ -870,8 +870,9 @@ function showSkillMasteryInfo(actor, skill, skillId, skillMasteryLevel, maxSkill
   const usesMaxText = colorTaggedText(2, `${actor.skillMasteryUsageMax(skillId)}`);
   const usesLabel = `Uses:`;
 
+  const completeText = colorTaggedText(10, `Complete!`);
   const infoMessageText = skillMasteryLevel == maxSkillMasteryLevel
-    ? `${skillRarityName} ${colorTaggedText(10, `Complete!`)}`
+    ? `${skillRarityName} ${completeText}`
     : `${skillRarityName}　${usesLabel}${usesText}／${usesMaxText}`;
   CommonPopupManager.showInfo({}, infoMessageText, null);
 }
@@ -1273,9 +1274,9 @@ function buildPriceInfoSeisyoujuuText(databaseTypeId, itemId, item) {
   if (item.etypeId != 6) return ``;
   if (!item.meta['ItemPicture']) return ``;
 
-  const enhanceValue = $gameVariables.value(ITEM_SHOP_VARIABLE.STAT_ORB_STACKS)[itemId - valueSeisyoujuuStartId];
+  const enhanceValue = colorTaggedText(10, $gameVariables.value(ITEM_SHOP_VARIABLE.STAT_ORB_STACKS)[itemId - valueSeisyoujuuStartId]);
   const enhanceLabel = `強化値:`;
-  return `${enhanceLabel}${colorTaggedText(10, `${enhanceValue}`)}\n`;
+  return `${enhanceLabel}${enhanceValue}\n`;
 }
 // ---------------------------------------------------------------------------
 // Single item synthesis
@@ -2171,16 +2172,18 @@ function bulkSellMark(databaseTypeId, itemId) {
 }
 
 function buildBulkSellChoiceText(item, party, isMarkedForBulkSell) {
-  const fontSizeTag = BULK_SELL_FONT_TAG;
-  const nameAndCount = `\x1bI[${item.iconIndex}]${item.name}:${party.numItems(item)}`;
-  return `${fontSizeTag}${colorTaggedText(isMarkedForBulkSell ? 10 : 0, nameAndCount)}`;
+  let itemNameAndCount = `\x1bI[${item.iconIndex}]${item.name}:${party.numItems(item)}`;
+  if (isMarkedForBulkSell){
+    itemNameAndCount = colorTaggedText(isMarkedForBulkSell ? 10 : 0, itemNameAndCount);
+  }
+  return BULK_SELL_FONT_TAG + itemNameAndCount;
 }
 
 // Bulk sale target selection, self switch version
 // Choice line of the bulk sale confirmation list: font size, icon, name and count.
 function buildBulkSellListLine(item, party) {
-  const itemLabel = `\x1bI[${item.iconIndex}]${item.name}`;
-  return BULK_SELL_FONT_TAG + `${itemLabel}:${party.numItems(item)}`;
+  const itemName = `\x1bI[${item.iconIndex}]${item.name}`;
+  return BULK_SELL_FONT_TAG + `${itemName}:${party.numItems(item)}`;
 }
 
 ikkatu_sellChoice2 = function(databaseTypeId){
