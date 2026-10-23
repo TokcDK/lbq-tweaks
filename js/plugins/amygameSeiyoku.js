@@ -472,7 +472,7 @@ h_hennreki = function () {
 
   const partnerHRecords = readPartnerRecords($gameVariables.value(VAR_CURRENT_ACTOR_ID));
   let listVarId = PARTNER_HISTORY_VAR_FIRST;
-  let pageText = `一覧` + `\n`;
+  let pageText = '一覧' + '\n';
   let entryCount = 0;
 
   for (let partnerIndex = PARTNER_SCAN_FIRST; partnerIndex <= PARTNER_SCAN_LAST; partnerIndex++) {
@@ -505,7 +505,7 @@ function buildPartnerHistoryLine(partnerHRecords, partnerIndex, hCount) {
     entryLineText += `【${childCount}人】`;
   };
 
-  return entryLineText + `\n`;
+  return entryLineText + '\n';
 }
 
 // h_partnerFullName(22,$gameVariables.value(340)); // target variable id, partner id variable
@@ -530,7 +530,10 @@ function buildPartnerNameText(partnerWeapon, partnerMeta) {
   if (familyName) partnerNameText += colorTaggedText(23, `=${familyName}`);
 
   const familyNameKanji = partnerMeta['FamilyNameKanji'];
-  if (familyNameKanji) partnerNameText = `${colorTaggedText(23, familyNameKanji)} ${partnerNameText}`;
+  if (familyNameKanji) {
+    const familyNameKanjiLabel = colorTaggedText(23, familyNameKanji);
+    partnerNameText = `${familyNameKanjiLabel} ${partnerNameText}`;
+  };
 
   // A stand-in actor always wins over the name built above.
   const substitutionActorId = readMetaNumber(partnerMeta, 'SubstitutionActorId', 0);
@@ -622,11 +625,12 @@ function buildDevelopmentRankText(actor, developmentRate) {
   };
 
   const hRank = readDevelopmentRank(developmentRate);
-  if (hRank < 1) return `${DEVELOPMENT_RANK_LABELS[hRank]}\n`;
+  const rankStepLabel = DEVELOPMENT_RANK_LABELS[hRank];
+  if (hRank < 1) return rankStepLabel + '\n';
 
   const rankSkillName = $dataSkills[hRank + 60].name;
   const rankSkillLabel = colorTaggedText(27, `<${rankSkillName}>`);
-  return `${DEVELOPMENT_RANK_LABELS[hRank]}:${rankSkillLabel}\n`;
+  return `${rankStepLabel}:${rankSkillLabel}` + '\n';
 }
 
 // Development rank (0-9); one rank per 100 points.
@@ -655,13 +659,17 @@ function buildHSkillStatusLine(actor, skillId) {
     return `${skill.name}:${undevelopedLabel}\n`;
   };
 
-  let skillLineText = `${skill.name}${masteryRankLabel(masteryLevel)}`;
+  const masteryRankText = masteryRankLabel(masteryLevel);
+  let skillLineText = `${skill.name}${masteryRankText}`;
   if (isHSkillRankLimited(actor, skillId, masteryLevel)) {
-    skillLineText += `[ランク制限]`;
+    skillLineText += '[ランク制限]';
   };
 
-  skillLineText += `(${actor.skillMasteryUses(skillId)}/${actor.skillMasteryUsageMax(skillId)}):`;
-  return skillLineText + `${skill.meta['RankSetWord' + masteryLevel]}\n`;
+  const masteryUses = actor.skillMasteryUses(skillId);
+  const masteryUsageMax = actor.skillMasteryUsageMax(skillId);
+  const rankSetWord = skill.meta['RankSetWord' + masteryLevel];
+  skillLineText += `(${masteryUses}/${masteryUsageMax}):`;
+  return skillLineText + rankSetWord + '\n';
 }
 
 // Whether the suppression skills currently block the rank gain of this skill.
@@ -744,7 +752,9 @@ function buildHStateCountColumn(hStateValues, indexes) {
   for (const index of indexes) {
     const statName = $dataSystem.variables[400 + index];
     const statNameLabel = colorTaggedText(27, statName);
-    displayText += `${statNameLabel}${hStateValues[index]}${HSTATE_COUNT_WORD}${window['valueWordSet' + index]}\n`;
+    const statCount = hStateValues[index];
+    const gainText = window['valueWordSet' + index];
+    displayText += `${statNameLabel}${statCount}${HSTATE_COUNT_WORD}${gainText}` + '\n';
   };
   return displayText;
 }
@@ -752,19 +762,35 @@ function buildHStateCountColumn(hStateValues, indexes) {
 // Grid display of the development skills 51-59 (icon + rank + uses).
 function buildMasteryGridText(actor) {
   const masteryTextBySlot = [];
+
   for (const skillId of buildHSkillRange(SKILL_H_DEV_FIRST, SKILL_H_DEV_LAST)) {
     const masteryLevel = actor.skillMasteryLevel(skillId);
     if (masteryLevel >= 1 && actor.isLearnedSkill(skillId)) {
-      const iconMarker = `\x1bI[${$dataSkills[skillId].iconIndex}]`;
+      const skillIconIndex = $dataSkills[skillId].iconIndex;
+      const skillIconMarker = `\x1bI[${skillIconIndex}]`;
       const rankLabel = masteryRankLabel(masteryLevel);
-      masteryTextBySlot[skillId - 50] = `${iconMarker}${rankLabel}:${actor.skillMasteryUses(skillId)}${window['valueWordSet' + (skillId - 20)]}`;
+      const masteryUses = actor.skillMasteryUses(skillId);
+      const gainText = window['valueWordSet' + (skillId - 20)];
+      masteryTextBySlot[skillId - 50] = `${skillIconMarker}${rankLabel}:${masteryUses}${gainText}`;
       continue;
     }
-    masteryTextBySlot[skillId - 50] = `${colorTaggedText(1, `未開発`)}\\I[0] `;
+
+    // Undeveloped slot: colour tagged label, an empty icon and the separator space.
+    const undevelopedLabel = colorTaggedText(1, '未開発');
+    masteryTextBySlot[skillId - 50] = undevelopedLabel + '\\I[0] ';
   };
 
-  const masteryGridHeader = FONT_SIZE_22 + `[開発度]` + `\\I[0]`;
-  return masteryGridHeader + `${masteryTextBySlot[1]}\n${masteryTextBySlot[2]} ${masteryTextBySlot[3]}\n${masteryTextBySlot[4]} ${masteryTextBySlot[5]}\n${masteryTextBySlot[6]} ${masteryTextBySlot[7]}\n${masteryTextBySlot[8]} ${masteryTextBySlot[9]}`;
+  const masteryGridTitle = '[開発度]';
+  const masteryGridIcon = '\\I[0]';
+  const masteryGridHeader = FONT_SIZE_22 + masteryGridTitle + masteryGridIcon;
+  const masteryGridRow = (leftSlot, rightSlot) => `${masteryTextBySlot[leftSlot]} ${masteryTextBySlot[rightSlot]}`;
+
+  return masteryGridHeader
+    + masteryTextBySlot[1] + '\n'
+    + masteryGridRow(2, 3) + '\n'
+    + masteryGridRow(4, 5) + '\n'
+    + masteryGridRow(6, 7) + '\n'
+    + masteryGridRow(8, 9);
 }
 
 // For the MVP calculation.
@@ -830,8 +856,9 @@ function setupMvpIndicatorActorStateshyouji(value, actorValue, isMvp) {
 // Nickname and SET icon, plus the H state text and the icon lookups for girls.
 function buildActorInfoText(actor, actorStateValues) {
   const actorNickname = colorTaggedText(1, actor.nickname());
-  let actorInfoText = FONT_SIZE_24 + actorNickname + `\n`;
-  actorInfoText += `\x1bSET[${actor.actorId()}]\n`;
+  let actorInfoText = FONT_SIZE_24 + actorNickname + '\n';
+  const actorIdValue = actor.actorId();
+  actorInfoText += `\x1bSET[${actorIdValue}]` + '\n';
   if (!isGirl(actor)) return actorInfoText;
 
   actorInfoText += buildGirlHStateText(actor, actorStateValues);
@@ -952,10 +979,11 @@ function buildBattleRecordText(mvpRows, mvpIndicators) {
 
 // One "label + coloured value + MVP / worst mark" line.
 function buildBattleRecordLine(recordRow, recordValue, mvpIndicator) {
-  return `${recordRow.label}${colorTaggedText(recordRow.colorCode, recordValue)}${mvpIndicator}` + '\n';
+  const recordValueLabel = colorTaggedText(recordRow.colorCode, recordValue);
+  return `${recordRow.label}${recordValueLabel}${mvpIndicator}` + '\n';
 }
 
-// New function to display the skill record
+// Skill stype ids of the skill record and the summary key each one adds to.
 const SKILL_RECORD_STYPE_KEYS = {
   2: 'attack', 5: 'sAbility', 6: 'aAbility', 7: 'wAbility', 8: 'rAbility', 12: 'burst', 13: 'chain'
 };
@@ -971,10 +999,13 @@ const SKILL_RECORD_ROWS = [
   { label: 'Chain!   :', usageKey: 'chain' }
 ];
 
-// Body of the skill record window.
+// New function to display the skill record
 function buildSkillRecordText(usageTotals) {
-  const headerLine = colorTaggedText(16, `<Skill Record!>`) + '\n';
-  const recordLines = SKILL_RECORD_ROWS.map((row) => `${row.label}${usageTotals[row.usageKey]}` + '\n');
+  const headerLine = colorTaggedText(16, '<Skill Record!>') + '\n';
+  const recordLines = SKILL_RECORD_ROWS.map((recordRow) => {
+    const usageTotal = usageTotals[recordRow.usageKey];
+    return `${recordRow.label}${usageTotal}` + '\n';
+  });
   return headerLine + recordLines.join('');
 }
 
@@ -1247,7 +1278,8 @@ function readBodySize(actorData) {
 function readReproductionLabel(gameActor) {
   const reproductionRate = gameActor.elementRate(ELEMENT_REPRODUCTION);
   if (reproductionRate < 1.1) return ``;
-  return FONT_SIZE_25 + `Reproduction:${Math.round(reproductionRate)}%`;
+  const reproductionPercent = Math.round(reproductionRate) + '%';
+  return FONT_SIZE_25 + 'Reproduction:' + reproductionPercent;
 }
 
 hstates_heights = function (id, resultVarId) {
@@ -1313,7 +1345,8 @@ function writeBodySizeToHState(hStateValues, bodySize, cupSize) {
 // Body label for non-female actors or missing data.
 function readBodyStyleLabelText(actorData) {
   if (actorData && actorData.meta['BodyStyle']) {
-    return colorTaggedText(21, `[${actorData.meta['BodyStyle']}]`);
+    const bodyStyleMeta = actorData.meta['BodyStyle'];
+    return colorTaggedText(21, `[${bodyStyleMeta}]`);
   }
   return `NoData`;
 }
@@ -1399,7 +1432,8 @@ function readBodyStyleLabel(actorId, actorData, physiqueChangeCount) {
     if (isMainActor) {
       $gameVariables.setValue(styleTier.mainActorVarId, physiqueUpCount * styleTier.countMultiplier);
     };
-    return colorTaggedText(27, `[${readItemName(styleTier.labelItemId)}]`);
+    const bodyStyleItemName = readItemName(styleTier.labelItemId);
+    return colorTaggedText(27, `[${bodyStyleItemName}]`);
   };
 
   if (physiqueChangeCount >= physiqueUpCount / 2) {
@@ -1586,7 +1620,7 @@ function grantClothItemByExposureRank(actor, exposureSkillName, exposureRank, it
   const exposureSkill = colorTaggedText(2, exposureSkillName);
   const itemIconName = colorTaggedText(27, `\x1bIIN[${itemId}]`);
   const clothDescription = clothItem.description;
-  appendHStateMessage(`──${exposureSkill}が${rankThreshold}到達！　${itemIconName}Get!──` + `\n${clothDescription}` + `\\C[0]` + `\n`, H_PASSIVE_PAGE_LINES, H_PASSIVE_PAGE_HEADER);
+  appendHStateMessage(`──${exposureSkill}が${rankThreshold}到達！　${itemIconName}Get!──` + `\n${clothDescription}` + `\\C[0]` + '\n', H_PASSIVE_PAGE_LINES, H_PASSIVE_PAGE_HEADER);
 }
 
 // Indexes the clothing items by kind (subCategory / ClothType).
@@ -1743,15 +1777,17 @@ function showHPassiveWindow(actor) {
 function buildUnlearnedHSkillText(actor) {
   const hPassiveLabel = colorTaggedText(27, `<H-Passive>`);
   const actorName = actor.name();
-  let unlearnedText = `${actorName}の未収得${hPassiveLabel}` + `\n`;
+  let unlearnedText = `${actorName}の未収得${hPassiveLabel}` + '\n';
   let unlearnedCount = 0;
 
   for (let skillId = 1; skillId <= $dataSkills.length - 1; skillId++) {
     const skill = $dataSkills[skillId];
     if (!skill || !skill.meta['HSkillLearn'] || actor.isLearnedSkill(skillId)) continue;
 
-    unlearnedText += `${colorTaggedText(27, skill.name)}\n`;
-    unlearnedText += `${skill.meta['ADDescription']}\n`;
+    const skillNameLabel = colorTaggedText(27, skill.name);
+    const skillDescription = skill.meta['ADDescription'];
+    unlearnedText += skillNameLabel + '\n';
+    unlearnedText += skillDescription + '\n';
     unlearnedCount += 1;
   };
   return { unlearnedText, unlearnedCount };
@@ -1976,7 +2012,8 @@ hstates_rankSeigen = function () {
 
     const limitedCount = applyRankSuppression(actor, hStateValues, suppressionEntry.target,
       suppressionEntry.param, (limitedSkillId) => {
-        suppressionResult += colorTaggedText(1, `[${$dataSkills[limitedSkillId].name}]`);
+        const limitedSkillName = $dataSkills[limitedSkillId].name;
+        suppressionResult += colorTaggedText(1, `[${limitedSkillName}]`);
       });
     if (limitedCount < 1) continue;
 
@@ -2029,7 +2066,8 @@ seiyoku_kanniHyouji = function () {
 
   const useTicker = $gameSwitches.value(SW_TICKER_MESSAGE);
   if (!useTicker) {
-    valueWordSet0 = `${$gameVariables.value(VAR_MESSAGE_STACK)}\n`;
+    const stackedMessageText = $gameVariables.value(VAR_MESSAGE_STACK);
+    valueWordSet0 = stackedMessageText + '\n';
   };
 
   const { actorId, actor } = readCurrentActor();
@@ -2246,9 +2284,10 @@ function applyDevelopmentTable(actor) {
 }
 
 function notifyReproductionBonus(reproductionRate) {
-  const reproduction = colorTaggedText(27, '<' + `Reproduction` + '>');
-  const bonusPts = colorTaggedText(27, `+${Math.round(reproductionRate)}`);
-  appendHStateMessage(`${reproduction}補正。各開発度/経験度加算値に${bonusPts}` + '\n', 3);
+  const reproductionLabel = colorTaggedText(27, '<Reproduction>');
+  const bonusPoints = '+' + Math.round(reproductionRate);
+  const bonusPtsLabel = colorTaggedText(27, bonusPoints);
+  appendHStateMessage(`${reproductionLabel}補正。各開発度/経験度加算値に${bonusPtsLabel}` + '\n', 3);
 }
 
 // Applies the semen state.
@@ -2504,7 +2543,8 @@ const ITEM_USE_PARTNER_WEAPON_ID = 306;
 function rejectItemUseWithMessage(actor, entry, refusalText, refusalReasonText) {
   rejectItemUse(actor, entry);
   const actorName = actor.name();
-  TickerManager.show(`${refusalReasonText || ''}${actorName}${refusalText}`);
+  const refusalReasonPrefix = refusalReasonText || '';
+  TickerManager.show(`${refusalReasonPrefix}${actorName}${refusalText}`);
 }
 
 // Libido items require the skill returned by resolveLibidoUseLimitSkill; a refusal also drops the ticker switch.
@@ -2644,13 +2684,13 @@ actor_Hhennreki = function (unusedArg1) {
 
 // One history line of an H state (description + progress).
 function buildHStateHistoryLine(actor, stateId) {
-  let stateDescText = `${$dataStates[stateId].description}`;
+  let stateDescText = $dataStates[stateId].description;
   const stateCounter = actor.getStateCounter(stateId);
   if (stateCounter != undefined) {
-    const progress = '進行度';
-    stateDescText += `\\C[27]${progress}:${stateCounter}\\C[0]`;
+    const progressLabel = '進行度';
+    stateDescText += colorTaggedText(27, progressLabel + ':' + stateCounter);
   };
-  return stateDescText + `\n`;
+  return stateDescText + '\n';
 }
 
 // Actor history pre-pass 2, actor_Hhennreki2Before(4,5,6);
@@ -2672,7 +2712,8 @@ actor_Hhennreki2Before = function (displayTypeId) {
   if (!actor) return;
 
   const hStateValues = readHStateValues(actorId);
-  $gameSystem.addCustomChoice(1, { text: `\\FS[25]${HISTORY_HEADERS[displayTypeId]}`, value: 0 });
+  const historyHeader = HISTORY_HEADERS[displayTypeId];
+  $gameSystem.addCustomChoice(1, { text: '\\FS[25]' + historyHeader, value: 0 });
 
   if (displayTypeId == 4 && hStateValues[HSTATE_INDEX_FIRST_PARTNER] != 0) {// 41 holds a name
     addCustomChoice(buildFirstPartnerChoice(actor, hStateValues));
@@ -2692,7 +2733,8 @@ function buildFirstPartnerChoice(actor, hStateValues) {
   const knowsPartner = actor.isLearnedSkill(SKILL_PARTNER_KNOWN);
   const firstPartnerText = knowsPartner ? `初体験の相手:` : `処女を奪った相手:`;
   const firstPartnerLabel = colorTaggedText(knowsPartner ? 27 : 30, firstPartnerText);
-  return `${firstPartnerLabel}${hStateValues[HSTATE_INDEX_FIRST_PARTNER]}`;
+  const firstPartnerValue = hStateValues[HSTATE_INDEX_FIRST_PARTNER];
+  return `${firstPartnerLabel}${firstPartnerValue}`;
 }
 
 // Father of the first child (the wording changes with skill 67).
@@ -2700,7 +2742,9 @@ function buildFirstChildChoice(actor, hStateValues) {
   const knowsPartner = actor.isLearnedSkill(SKILL_PARTNER_KNOWN);
   const firstChildText = knowsPartner ? `初子の父親:` : `初子を産んだ男:`;
   const firstChildLabel = colorTaggedText(knowsPartner ? 27 : 30, firstChildText);
-  return `${firstChildLabel}${$dataWeapons[hStateValues[HSTATE_INDEX_FIRST_CHILD_PARTNER]].name}`;
+  const firstChildPartnerId = hStateValues[HSTATE_INDEX_FIRST_CHILD_PARTNER];
+  const firstChildFatherName = $dataWeapons[firstChildPartnerId].name;
+  return `${firstChildLabel}${firstChildFatherName}`;
 }
 
 // Actor history 2, actor_Hhennreki2(4,5,6);
@@ -2775,7 +2819,8 @@ function appendSceneHistoryChoices() {
   if (!sceneHistory || sceneHistory.length <= 0) return;
 
   for (let index = sceneHistory.length - 1; index >= 1; index--) {
-    $gameSystem.addCustomChoice(1, { text: `\\FS[25]${sceneHistory[index]}`, value: index + 1 });
+    const sceneText = sceneHistory[index];
+    $gameSystem.addCustomChoice(1, { text: '\\FS[25]' + sceneText, value: index + 1 });
   };
 }
 
@@ -2784,11 +2829,12 @@ function appendSceneHistoryChoices() {
 //---------------------------------------------------------------------------
 
 // Generic H scene text BGV, <generic scene arousal low:>scene_textBgv($gameVariables.value(318),640,384);
-const MOAN_ICON_MARKER = `\\I[12]`;
-const defaultSexualEcstasyHi = [`「アッ…」`, `「ンっ…」`, `「ンンっ…」`, `（ピクっ…` + MOAN_ICON_MARKER + `）`];
+// Moan icon; it sits inside the moan strings because the icon belongs mid-sentence.
+const moanIcon = `\\I[12]`;
+const defaultSexualEcstasyHi = [`「アッ…」`, `「ンっ…」`, `「ンンっ…」`, `（ピクっ…${moanIcon}）`];
 const defaultSexualEcstasyMiddle = [
-  `「アッ…` + MOAN_ICON_MARKER + `」`, `「ンっ…」`, `「ンンっ…` + MOAN_ICON_MARKER + `」`,
-  `（ピクっ…` + MOAN_ICON_MARKER + `）`
+  `「アッ…${moanIcon}」`, `「ンっ…」`, `「ンンっ…${moanIcon}」`,
+  `（ピクっ…${moanIcon}）`
 ];
 const defaultSexualEcstasyLow = ['「ヤァッ…！」', '「ダメっ…！」', '「ヤメッ…！」',
   '「アっ…、ァァ…」', '（ビクンッ）'];
@@ -3264,7 +3310,9 @@ function addResetCustomChoices() {
   $gameSystem.addCustomChoice(1, { text: `一括で未経験に変更　　　　　　　　　　　　　　　　　　`, value: 0 });
   for (let varId = VAR_HSTATE_PENDING_FIRST; varId <= VAR_SUPPRESSION_TARGET_LAST; varId++) {// experience values 431-439
     if (RESET_SKIPPED_VAR_IDS.includes(varId)) continue;
-    $gameSystem.addCustomChoice(1, { text: `${$dataSystem.variables[varId]}${$gameVariables.value(varId)}`, value: varId });
+    const statName = $dataSystem.variables[varId];
+    const statValue = $gameVariables.value(varId);
+    $gameSystem.addCustomChoice(1, { text: `${statName}${statValue}`, value: varId });
   };
 }
 
