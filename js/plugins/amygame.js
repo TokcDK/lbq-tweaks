@@ -117,6 +117,7 @@
     SCRIPT_COMMON_VALUE_8: 128,
     SCRIPT_COMMON_VALUE_9: 129,
     MAP_STATUS_DISPLAY_MODE: 200,
+    WORLD_MAP_LAST_DESTINATION: 610, // 全体マップ移動選択で最後に選んだ移動先イベントID
   };
   const GAME_SWITCH = {
     MORNING: 13, // 朝

@@ -274,6 +274,10 @@ function HzChoiceEvent(){}
             window.setHandler('select', this.processWindowSelect.bind(this));
         }
         this._decided = false;
+        //変更 マウス選択用の状態初期化（初回フレームは判定しない）
+        this._mouseSelectStarted = false;
+        this._mouseX = TouchInput.x;
+        this._mouseY = TouchInput.y;
     };
 
     // 更新処理（終了時はfalseを返す）
@@ -306,6 +310,11 @@ function HzChoiceEvent(){}
         var down   = false;
 
 
+        if(this._type === TYPE_LIST) {
+            //変更 マウスオーバーで選択先を切り替え、左クリックで決定する
+            this.updateMouseSelect();
+        }
+
         if(this._type === TYPE_CURSOR) {
             // カーソル選択の場合
 
@@ -329,6 +338,8 @@ function HzChoiceEvent(){}
                 });
                 if(choiceEvents.length > 0) {
                     // イベントをタッチした場合、そのイベントを選択してOKボタン押下時処理実施
+                    //変更 マップクリックでのプレイヤー移動をキャンセルする
+                    $gameTemp.clearDestination();
                     this._selectedEvent = choiceEvents[0];
                     ok = true;
                 } else {
@@ -534,6 +545,83 @@ function HzChoiceEvent(){}
         var window = SceneManager._scene._hzChoiceEventWindow;
         this._selectedEvent = this._choiceEvents[window._index];
         this.startScroll(this._selectedEvent,1);
+    };
+
+    //変更 マウスカーソル下の対象イベントを返す（一覧ウインドウ上は除く）
+    HzChoiceEvent.prototype.getHoverEvent = function() {
+        var mx = TouchInput.x;
+        var my = TouchInput.y;
+        var window = SceneManager._scene._hzChoiceEventWindow;
+        if(window && window.visible &&
+           mx >= window.x && mx < window.x + window.width &&
+           my >= window.y && my < window.y + window.height) {
+            // 一覧ウインドウ上はウインドウ側の操作に任せる
+            return null;
+        }
+        //変更 DP_MapZoom 対応：スプライトの拡大率と拡大中心を取得する
+        // （Spriteset_Base.updatePosition と同じ visual = zoom + (screen - zoom) * scale）
+        var zoom  = $gameScreen.zoomScale ? $gameScreen.zoomScale() : 1;
+        var zoomX = $gameScreen.zoomX ? $gameScreen.zoomX() : 0;
+        var zoomY = $gameScreen.zoomY ? $gameScreen.zoomY() : 0;
+        var hoverEvent = null;
+        var minDist = 0;
+        for(var i = 0; i < this._choiceEvents.length; i++) {
+            var ev = this._choiceEvents[i];
+            // screenX/screenY はズーム前の座標なので、ズーム後の見た目の位置に変換する
+            var evx = zoomX + (ev.screenX() - zoomX) * zoom;
+            var evy = zoomY + (ev.screenY() - zoomY) * zoom;
+            var dx = Math.abs(mx - evx);
+            var dy = my - (evy - 32 * zoom);
+            if(dx <= 64 * zoom && dy >= -80 * zoom && dy <= 64 * zoom) {
+                var dist = dx + Math.abs(dy);
+                if(!hoverEvent || dist < minDist) {
+                    minDist = dist;
+                    hoverEvent = ev;
+                }
+            }
+        }
+        return hoverEvent;
+    };
+
+    //変更 マウスオーバーで選択・左クリックで決定（一覧モード）
+    HzChoiceEvent.prototype.updateMouseSelect = function() {
+        if(this._cancelCount >= 0) return;
+        var window = SceneManager._scene._hzChoiceEventWindow;
+        if(!window) return;
+
+        if(!this._mouseSelectStarted) {
+            // 初回フレームは判定しない（起動クリックの誤判定防止）
+            this._mouseSelectStarted = true;
+            this._mouseX = TouchInput.x;
+            this._mouseY = TouchInput.y;
+            return;
+        }
+
+        var mx = TouchInput.x;
+        var my = TouchInput.y;
+        var mouseMoved = (mx !== this._mouseX || my !== this._mouseY);
+        this._mouseX = mx;
+        this._mouseY = my;
+
+        var hoverEvent = this.getHoverEvent();
+        if(mouseMoved && hoverEvent && hoverEvent !== this._selectedEvent) {
+            // 左の一覧でも選択状態を合わせる
+            for(var i = 0; i < this._choiceEvents.length; i++) {
+                if(this._choiceEvents[i].eventId() == hoverEvent.eventId()) {
+                    window.select(i);
+                    SoundManager.playCursor();
+                    break;
+                }
+            }
+        }
+
+        if(TouchInput.isTriggered() && hoverEvent) {
+            // マップクリックでのプレイヤー移動をキャンセルして決定扱いにする
+            $gameTemp.clearDestination();
+            window.deactivate();
+            window.hide();
+            this.processOk();
+        }
     };
 
      // 終了処理
