@@ -235,12 +235,18 @@ containsState = function (passiveList, stateId) {
 splitMetaValues = function (metaValue) {
   return String(metaValue).split(',').map(function (part) { return part.trim(); });
 }
+const GROWTH_STAT_LABEL_COLOR_CODE = 16;
+const GROWTH_STAT_VALUE_COLOR_CODE = 10;
 // Growth-stat row for a class, e.g. `\C[16]Mhp\C[10]120\C[0],…`. Built once and
 // reused: the original pasted this 8-stat expression into two long templates.
 growthStatText = function (growthStats, rankValue) {
-  return GROWTH_STAT_LABELS.map(function (label, index) {
-    return `\\C[16]${label}\\C[10]${Number(growthStats[index]) * rankValue}\\C[0]`;
-  }).join(',');
+  const statRows = GROWTH_STAT_LABELS.map(function (label, index) {
+    const statValue = Number(growthStats[index]) * rankValue;
+    const statLabelText = colorTaggedText(GROWTH_STAT_LABEL_COLOR_CODE, label);
+    const statValueText = colorTaggedText(GROWTH_STAT_VALUE_COLOR_CODE, statValue);
+    return `${statLabelText}${statValueText}`;
+  });
+  return statRows.join(',');
 }
 // The "all stats up" note. `traitValue` is the RM multiplier, so 1 is neutral
 // and above/below 1 selects the up or down icon. `isUniform` is true when every
@@ -258,17 +264,28 @@ allStatUpText = function (traitValue, upIcon, downIcon, isUniform) {
 // The icon table is a module-scope constant: it was previously rebuilt inside
 // the per-entry loop, which allocated the same object once per database entry.
 const RECOVERY_EFFECT_ICONS = { 11: 627, 12: 628, 13: 629 };
+const RECOVERY_GAIN_COLOR_CODE = 3;
+const RECOVERY_LOSS_COLOR_CODE = 4;
 recoveryEffectText = function (iconId, value, unit, direction) {
-  return `[\\C[${value >= 1 ? 3 : 4}]\\I[${iconId}]:${value}${unit}${direction}\\C[0]]`;
+  const effectColorCode = value >= 1 ? RECOVERY_GAIN_COLOR_CODE : RECOVERY_LOSS_COLOR_CODE;
+  const recoveryLabel = `\\I[${iconId}]:${value}${unit}${direction}`;
+  const recoveryText = colorTaggedText(effectColorCode, recoveryLabel);
+  return `[${recoveryText}]`;
 }
 // `<HP|MP Life Steal Physical|Magical>`: four near-identical blocks. The value
 // comes from the physical tag when both are present, and the prefix names
 // whichever tags are in play. `lossSuffix` differs between HP (反動ﾀﾞﾒｰｼﾞ) and
 // MP (消耗); a value below 1 means the skill costs rather than drains.
+const LIFE_STEAL_GAIN_COLOR_CODE = 2;
+const LIFE_STEAL_LOSS_COLOR_CODE = 10;
 lifeStealText = function (prefix, rawValue, resource, lossSuffix) {
   const value = Number(String(rawValue).replace(' ', '').replace('%', ''));
   const isGain = value >= 1;
-  return `[\\C[${isGain ? 2 : 10}]${prefix}${DRAIN_LABEL}${value}%${resource}${isGain ? ABSORB_LABEL : lossSuffix}\\C[0]]`;
+  const effectColorCode = isGain ? LIFE_STEAL_GAIN_COLOR_CODE : LIFE_STEAL_LOSS_COLOR_CODE;
+  const directionSuffix = isGain ? ABSORB_LABEL : lossSuffix;
+  const drainLabel = `${prefix}${DRAIN_LABEL}${value}%${resource}${directionSuffix}`;
+  const drainText = colorTaggedText(effectColorCode, drainLabel);
+  return `[${drainText}]`;
 }
 lifeStealGroupText = function (meta, resource, lossSuffix) {
   const physical = meta[resource + ' Life Steal Physical'];
@@ -355,11 +372,14 @@ const DRAIN_ROWS = [
 
 function describeLifeStealRows(ctx) {
   for (const drainRow of DRAIN_ROWS) {
-    if (!ctx.meta[drainRow.metaKey]) continue;
-    ctx.effectValue = ctx.meta[drainRow.metaKey].replace(' ', '');
-    ctx.effectValue = ctx.effectValue.replace('%', '');
-    const drainText = `${DRAIN_LABEL}${Number(ctx.effectValue)}%${drainRow.resourceLabel}${ABSORB_LABEL}`;
-    ctx.effectText += `[${colorTaggedText(ctx.colorCode, drainText)}]`;
+    const drainMeta = ctx.meta[drainRow.metaKey];
+    if (!drainMeta) continue;
+
+    ctx.effectValue = drainMeta.replace(' ', '').replace('%', '');
+    const drainAmount = Number(ctx.effectValue);
+    const drainText = `${DRAIN_LABEL}${drainAmount}%${drainRow.resourceLabel}${ABSORB_LABEL}`;
+    const drainTaggedText = colorTaggedText(ctx.colorCode, drainText);
+    ctx.effectText += `[${drainTaggedText}]`;
   }
 }
 const DESCRIPTION_DEFAULT_COLOR_CODE = 2;
@@ -531,26 +551,36 @@ function describeEntryHeader(ctx) {
 
   const categoryLabel = `分類`;
   const typeLabel = `種別`;
-  const categoryText = `[\\C[${ctx.colorCode}]${categoryLabel}\\C[0]:${$dataSystem.equipTypes[ctx.item.etypeId]}]`;
-  ctx.headerText = categoryText + entryTypeText(ctx, typeLabel);
+  const categoryName = $dataSystem.equipTypes[ctx.item.etypeId];
+  const categoryNameText = colorTaggedText(ctx.colorCode, categoryLabel);
+  ctx.headerText = `[${categoryNameText}:${categoryName}]` + entryTypeText(ctx, typeLabel);
   appendLotteryRarityBadge(ctx);
 }
 
+// Weapon type on a weapon page, armor type on an armor page; id 0 means "none",
+// which prints no `種別` row at all.
 // Weapon type on a weapon page, armor type on an armor page; id 0 means "none",
 // which prints no `種別` row at all.
 function entryTypeText(ctx, typeLabel) {
   const isWeaponPage = ctx.databaseTypeId == DESCRIPTION_DATABASE_WEAPON;
   const typeId = isWeaponPage ? ctx.item.wtypeId : ctx.item.atypeId;
   if (!(typeId >= 1)) return ``;
+
   const typeName = isWeaponPage ? $dataSystem.weaponTypes[typeId] : $dataSystem.armorTypes[typeId];
-  return `[\\C[${ctx.colorCode}]${typeLabel}\\C[0]:${typeName}]`;
+  const typeLabelText = colorTaggedText(ctx.colorCode, typeLabel);
+  return `[${typeLabelText}:${typeName}]`;
 }
 
 // `<LotteryRearity>`: the lottery rarity badge.
+// `<LotteryRearity>`: the lottery rarity badge.
+const LOTTERY_RARITY_ICON_TEXT = `\\I[517]`;
+
 function appendLotteryRarityBadge(ctx) {
   const lotteryRarity = ctx.meta['LotteryRearity'];
   if (!lotteryRarity) return;
-  ctx.headerText += `[\\I[517]:${Number(lotteryRarity)}]`;
+
+  const rarityValue = Number(lotteryRarity);
+  ctx.headerText += `[${LOTTERY_RARITY_ICON_TEXT}:${rarityValue}]`;
 }
 
 //十種武器: ten weapon-type traits on one entry are summarised as `十種武器`.
@@ -624,8 +654,8 @@ function describeDamageCutSummary(ctx) {
   ctx.effectText += allStatUpText(traits[1].value, `\\I[654]\\I[655]-`, `\\I[638]\\I[639]+`, false);
 }
 
-// `<HSkillLearn>`: the learning conditions, one `[条件:…]` row per entry.
 const PREMISE_SLOT_COUNT = 3;
+const PREMISE_COLOR_CODE = 27;
 
 function describeLearnPremises(ctx) {
   if (!ctx.meta['HSkillLearn']) return;
@@ -635,18 +665,18 @@ function describeLearnPremises(ctx) {
     appendPremiseText(ctx, premiseTexts, premiseIndex);
   }
   const noneLabel = `なし`;
-  const coloredNoneLabel = `\\C[27]${noneLabel}\\C[0]`;
-  const premiseText = premiseTexts.length ? premiseTexts.join(``) : coloredNoneLabel;
+  const noneText = colorTaggedText(PREMISE_COLOR_CODE, noneLabel);
+  const premiseText = premiseTexts.length ? premiseTexts.join(``) : noneText;
   ctx.effectText += `[${CONDITION_LABEL}:${premiseText}]`;
 }
 
-// The four `<Premise…N>` tags of one slot: skill, skill rank, variable,
-// arrangement. Several can be set at once and they print in that order.
 function appendPremiseText(ctx, premiseTexts, premiseIndex) {
   const premiseSkillId = ctx.meta['PremiseSkill' + premiseIndex];
   if (premiseSkillId) {
+    const premiseSkillName = $dataSkills[Number(premiseSkillId)].name;
     const learnSuffix = `習得`;
-    premiseTexts.push(`\\C[27]<${$dataSkills[Number(premiseSkillId)].name}>\\C[0]${learnSuffix}`);
+    const skillText = colorTaggedText(PREMISE_COLOR_CODE, `<${premiseSkillName}>`);
+    premiseTexts.push(`${skillText}${learnSuffix}`);
   }
 
   const premiseSkillRank = ctx.meta['PremiseSkillRank' + premiseIndex];
@@ -654,21 +684,30 @@ function appendPremiseText(ctx, premiseTexts, premiseIndex) {
     const rankValues = splitMetaValues(premiseSkillRank);
     const reachSuffix = `到達`;
     const rankSkillName = $dataSkills[Number(rankValues[0])].name;
-    premiseTexts.push(`\\C[27]<${rankSkillName}>\\C[0]${RANK_LABEL}:\\C[27]${Number(rankValues[1])}\\C[0]${reachSuffix}`);
+    const reachRank = Number(rankValues[1]);
+    const rankSkillText = colorTaggedText(PREMISE_COLOR_CODE, `<${rankSkillName}>`);
+    const reachRankText = colorTaggedText(PREMISE_COLOR_CODE, reachRank);
+    premiseTexts.push(`${rankSkillText}${RANK_LABEL}:${reachRankText}${reachSuffix}`);
   }
 
   const premiseVariable = ctx.meta['PremiseVariable' + premiseIndex];
   if (premiseVariable) {
     const variableValues = splitMetaValues(premiseVariable);
     const variableName = premiseVariableName(Number(variableValues[0]));
-    premiseTexts.push(`\\C[27]${variableName}\\C[0]:\\C[27]${Number(variableValues[1])}\\C[0]${OR_MORE_SUFFIX}`);
+    const requiredValue = Number(variableValues[1]);
+    const variableNameText = colorTaggedText(PREMISE_COLOR_CODE, variableName);
+    const requiredValueText = colorTaggedText(PREMISE_COLOR_CODE, requiredValue);
+    premiseTexts.push(`${variableNameText}:${requiredValueText}${OR_MORE_SUFFIX}`);
   }
 
   const premiseArrangement = ctx.meta['PremiseArrangement' + premiseIndex];
   if (premiseArrangement) {
     const arrangementValues = splitMetaValues(premiseArrangement);
     const arrangementName = valueHentaiArrangement[Number(arrangementValues[0])];
-    premiseTexts.push(`\\C[27]${arrangementName}\\C[0]:\\C[27]${Number(arrangementValues[1])}\\C[0]${OR_MORE_SUFFIX}`);
+    const requiredValue = Number(arrangementValues[1]);
+    const arrangementNameText = colorTaggedText(PREMISE_COLOR_CODE, arrangementName);
+    const requiredValueText = colorTaggedText(PREMISE_COLOR_CODE, requiredValue);
+    premiseTexts.push(`${arrangementNameText}:${requiredValueText}${OR_MORE_SUFFIX}`);
   }
 }
 
@@ -687,12 +726,15 @@ function premiseVariableName(variableId) {
 function describeDescriptionWord(ctx) {
   const descriptionWord = ctx.meta['DescriptionWord'];
   if (!descriptionWord) return;
-  ctx.fragText = `${descriptionWord}`;
+
+  ctx.fragText = descriptionWord;
   const isLustSkill = ctx.databaseTypeId == DESCRIPTION_DATABASE_SKILL
     && ctx.item.stypeId == AUTO_EQUIP_LUST_SKILL_TYPE_ID;
   const colorCode = isLustSkill ? LUST_COLOR_CODE : ctx.colorCode;
   // `[` / `]` sit inside the colour span, so this is a plain colorTaggedText wrap.
-  ctx.descWordText = `${colorTaggedText(colorCode, `[${ctx.fragText}]`)} `;
+  const wordLabel = `[${ctx.fragText}]`;
+  const wordText = colorTaggedText(colorCode, wordLabel);
+  ctx.descWordText = `${wordText} `;
 }
 
 // `<GunDamage>`: the fixed damage value of gun weapons.
@@ -728,12 +770,16 @@ function badgeColorCode(ctx) {
   return ctx.item.stypeId == AUTO_EQUIP_LUST_SKILL_TYPE_ID ? LUST_COLOR_CODE : ctx.colorCode;
 }
 
+const AUTO_EQUIP_BADGE_TEXT = `<自動>`;
+
 // `<Unequippable>` on an equippable skill type: the `<自動>` badge in the header.
 function appendAutoEquipBadge(ctx) {
   if (!ctx.meta['Unequippable']) return;
   if (EQUIPPED_SKILL_TYPE_IDS.indexOf(ctx.item.stypeId) < 0) return;
-  ctx.fragText = `<自動>`;
-  ctx.headerText += colorTaggedText(badgeColorCode(ctx), ctx.fragText);
+
+  ctx.fragText = AUTO_EQUIP_BADGE_TEXT;
+  const badgeText = colorTaggedText(badgeColorCode(ctx), ctx.fragText);
+  ctx.headerText += badgeText;
 }
 
 // `<Skill Tier>`: equipped enchant tier, i.e. an icon plus its tier name.
@@ -744,10 +790,12 @@ function appendSkillTierBadge(ctx) {
   ctx.effectValue = Number(skillTier.replace(' ', ''));
   if (ctx.effectValue >= 1) {
     const tierIcon = `\x1bI[${Yanfly.Icon.ESTier[ctx.effectValue]}]`;
-    ctx.effectValue = `${tierIcon}${Yanfly.Param.ESTierName[ctx.effectValue]}>`;
+    const tierName = Yanfly.Param.ESTierName[ctx.effectValue];
+    ctx.effectValue = `${tierIcon}${tierName}>`;
   }
   ctx.fragText = `<装着:${ctx.effectValue}`;
-  ctx.headerText += `${colorTaggedText(badgeColorCode(ctx), ctx.fragText)} `;
+  const badgeText = colorTaggedText(badgeColorCode(ctx), ctx.fragText);
+  ctx.headerText += `${badgeText} `;
 }
 
 // `occasion` -> the "where can this be used" icon. Items always show it, skills
@@ -768,9 +816,11 @@ function appendOccasionBadge(ctx) {
 function appendScopeLabel(ctx) {
   if (ctx.item.scope < 1) return;
   if (BATTLE_SKILL_TYPE_IDS_WITH_SCOPE.indexOf(ctx.item.stypeId) < 0) return;
+
   ctx.fragText = SCOPE_LABELS[ctx.item.scope];
-  const scopeLabelText = `<${ctx.fragText}>`;
-  ctx.headerText += `${colorTaggedText(SCOPE_COLOR_CODE, scopeLabelText)} `;
+  const scopeText = `<${ctx.fragText}>`;
+  const scopeTaggedText = colorTaggedText(SCOPE_COLOR_CODE, scopeText);
+  ctx.headerText += `${scopeTaggedText} `;
 }
 
 // `<Turn Action>`: the skill resolves at the end of the turn, unless `<Instant>`.
@@ -778,8 +828,11 @@ function appendTurnActionBadge(ctx) {
   if (ctx.databaseTypeId != DESCRIPTION_DATABASE_SKILL) return;
   if (TURN_ACTION_SKILL_TYPE_IDS.indexOf(ctx.item.stypeId) < 0) return;
   if (ctx.meta['Instant']) return;
-  const turnActionText = `ターン行動`;
-  ctx.headerText += `${colorTaggedText(TURN_ACTION_COLOR_CODE, `<${turnActionText}>`)} `;
+
+  const turnActionLabel = `ターン行動`;
+  const turnActionText = `<${turnActionLabel}>`;
+  const turnActionTaggedText = colorTaggedText(TURN_ACTION_COLOR_CODE, turnActionText);
+  ctx.headerText += `${turnActionTaggedText} `;
 }
 
 // `<Multiple Elements>`: one element label per id, collected in `skillElementText`
@@ -799,24 +852,29 @@ function appendMultipleElements(ctx) {
 // `<Select Conditions>`: the skill only targets the front row.
 function appendSelectConditionTag(ctx) {
   if (!ctx.meta['Select Conditions']) return;
-  const frontGuardOnlyText = `対象前衛のみ`;
-  ctx.headerText += `[${colorTaggedText(ctx.colorCode, frontGuardOnlyText)}] `;
+  const frontGuardOnlyLabel = `対象前衛のみ`;
+  const frontGuardOnlyText = colorTaggedText(ctx.colorCode, frontGuardOnlyLabel);
+  ctx.headerText += `[${frontGuardOnlyText}] `;
 }
 
 // `<SkillLearningClass>`: the class name (a name code, i.e. other game text, so it
 // stays outside the translatable string) followed by `習得`. Class id 100 means
 // "no class" and prints nothing.
+const NO_LEARNING_CLASS_ID = 100;
+
 function appendSkillLearningClassTag(ctx) {
   const learningClassId = ctx.meta['SkillLearningClass'];
   if (!learningClassId) return;
 
   ctx.effectValue = `${$dataSystem.skillTypes[ctx.item.stypeId]}`;
   ctx.fragText = Number(learningClassId);
-  if (ctx.fragText == 100) return;
+  if (ctx.fragText == NO_LEARNING_CLASS_ID) return;
 
   const learnNameCode = `\x1bJ[${ctx.fragText}]`;//名前コード。翻訳対象外
-  const learnText = `習得`;
-  ctx.effectText += `[${colorTaggedText(ctx.colorCode, ctx.effectValue)}] [${colorTaggedText(ctx.colorCode, learnNameCode)}${learnText}] `;
+  const learnSuffix = `習得`;
+  const skillTypeText = colorTaggedText(ctx.colorCode, ctx.effectValue);
+  const learnNameText = colorTaggedText(ctx.colorCode, learnNameCode);
+  ctx.effectText += `[${skillTypeText}] [${learnNameText}${learnSuffix}] `;
 }
 
 // `<Limit Uses>`: per day, or per battle when `<Not Recover All Uses>` is set.
@@ -829,14 +887,16 @@ function appendLimitUsesTag(ctx) {
   const usesText = ctx.meta['Not Recover All Uses']
     ? `1日${ctx.fragText}回`
     : `戦闘中${ctx.fragText}回`;
-  ctx.headerText += `[${colorTaggedText(ctx.colorCode, usesText)}] `;
+  const usesTaggedText = colorTaggedText(ctx.colorCode, usesText);
+  ctx.headerText += `[${usesTaggedText}] `;
 }
 
 // `<SeiyokuItem>`: the lust-item badge, items only.
 function appendLustItemTag(ctx) {
   if (ctx.databaseTypeId != DESCRIPTION_DATABASE_ITEM || !ctx.meta['SeiyokuItem']) return;
-  const lustItemText = `性欲品`;
-  ctx.effectText += `[${colorTaggedText(LUST_COLOR_CODE, lustItemText)}] `;
+  const lustItemLabel = `性欲品`;
+  const lustItemText = colorTaggedText(LUST_COLOR_CODE, lustItemLabel);
+  ctx.effectText += `[${lustItemText}] `;
 }
 
 
@@ -854,15 +914,17 @@ function describeDamageFormula(ctx) {
     case 8: ctx.fragText = recoveryEffectMsg(36, 36); break;
     case 9: ctx.fragText = recoveryEffectMsg(34, 35); break;
     case 10: ctx.fragText = hpCostDamageFormulaText(ctx); break;
-    default:
+    default: {
       // Id 31 (skill 373 "ルビフリップ") is in no table: no branch assigns, so
       // `fragText` still holds whatever an earlier row of this run left behind.
       // The original behaves the same way and the note it produces is kept as is;
       // the lookup only makes sure an unknown id cannot assign a value.
-      if (DAMAGE_FORMULA_TEXT[formulaId]) {
-        ctx.fragText = `[\\C[${ctx.colorCode}]${DAMAGE_FORMULA_TEXT[formulaId]}\\C[0]`;
-      }
+      const formulaBlurb = DAMAGE_FORMULA_TEXT[formulaId];
+      if (!formulaBlurb) break;
+      const formulaBlurbText = colorTaggedText(ctx.colorCode, formulaBlurb);
+      ctx.fragText = `[${formulaBlurbText}`;
       break;
+    }
   }
   appendDamageFormulaSuffix(ctx);
 
@@ -873,19 +935,28 @@ function describeDamageFormula(ctx) {
 }
 
 // Id 10: `[現在HPの<n>%消費して×<m>倍の与ダメ`.
+// Id 10: `[現在HPの<n>%消費して×<m>倍の与ダメ`.
 function hpCostDamageFormulaText(ctx) {
   const absorbPercent = ctx.metaValues[1];
   const damageMultiplier = ctx.metaValues[2];
-  const hpCostText = `現在HPの${absorbPercent}%消費して×${damageMultiplier}倍の与ダメ`;
-  return `[\\C[${ctx.colorCode}]${hpCostText}\\C[0]`;
+  const hpCostLabel = `現在HPの${absorbPercent}%消費して×${damageMultiplier}倍の与ダメ`;
+  // The row's `]` follows in appendDamageFormulaSuffix, outside the wrap.
+  const hpCostText = colorTaggedText(ctx.colorCode, hpCostLabel);
+  return `[${hpCostText}`;
 }
 
+// The multiplier, the flat bonus and the unique-skill note, closed with `]` unless
+// one of the branches already did that.
 // The multiplier, the flat bonus and the unique-skill note, closed with `]` unless
 // one of the branches already did that.
 function appendDamageFormulaSuffix(ctx) {
   if (!ctx.fragText) return;
 
-  if (ctx.metaValues[2] >= 0) { ctx.fragText += ` \\C[${ctx.colorCode}]×${ctx.metaValues[2]}\\C[0]] `; }
+  const damageMultiplier = ctx.metaValues[2];
+  if (damageMultiplier >= 0) {
+    const multiplierText = colorTaggedText(ctx.colorCode, `×${damageMultiplier}`);
+    ctx.fragText += ` ${multiplierText}] `;
+  }
   if (ctx.metaValues[1] >= 1) { ctx.fragText += `\\I[666]:${ctx.metaValues[1]}`; }
   // Unique skills (type 12) scale with the equipped weapon, which cannot be
   // identified from here, so the weapon row is marked invalid.
@@ -898,6 +969,8 @@ function appendDamageFormulaSuffix(ctx) {
 // `<PotionUsePoint>`: the restored resource comes from the damage element of the
 // entry, so one table replaces the two equality checks.
 const POTION_RECOVERY_RESOURCES = { 3: `HP`, 4: `MP` };//HP回復 / MP回復
+const POTION_AMOUNT_COLOR_CODE = 3;
+
 function describePotionRecoveryTag(ctx) {
   const damageType = ctx.item.damage ? ctx.item.damage.type : 0;
   if (damageType < 1) return;
@@ -911,10 +984,10 @@ function describePotionRecoveryTag(ctx) {
   // Anything below 2 means "all of it".
   const usePoint = Number(ctx.meta['PotionUsePoint']);
   ctx.effectValue = usePoint >= 2 ? usePoint : `全`;
-  const recoveryText = `回復`;
-  // No colorTaggedText here: the colour of the resource name has to run into the
-  // `\C[3]` amount, so the two codes are not a complete wrap.
-  ctx.effectText += `[\\C[${ctx.colorCode}]${ctx.fragText}\\C[3]${ctx.effectValue}\\C[0]${recoveryText}]`;
+  const recoverySuffix = `回復`;
+  const resourceText = colorTaggedText(ctx.colorCode, ctx.fragText);
+  const amountText = colorTaggedText(POTION_AMOUNT_COLOR_CODE, ctx.effectValue);
+  ctx.effectText += `[${resourceText}${amountText}${recoverySuffix}]`;
 }
 
 // `<Repeat>` / `<Warmup>` / `<Cooldown>`: `\I[icon]:value `.
@@ -942,10 +1015,12 @@ function describeSkillRowTags(ctx) {
 function appendSkillStateTag(ctx) {
   const stateId = ctx.meta['SkillStateAddRemove'];
   if (!stateId) return;
+
   ctx.fragText = Number(stateId);
   const stateNameCode = `\x1bSIM[${ctx.fragText}]`;//ステート名コード。翻訳対象外
   const grantRemoveText = `付与/解除`;
-  ctx.effectText += `[\\C[${ctx.colorCode}]${stateNameCode}\\C[0]${grantRemoveText}]`;
+  const stateNameText = colorTaggedText(ctx.colorCode, stateNameCode);
+  ctx.effectText += `[${stateNameText}${grantRemoveText}]`;
 }
 
 // `<PotionResist>`: the potion resistance percentage.
@@ -959,9 +1034,11 @@ function appendPotionResistTag(ctx) {
 // `speed` is a core field, not a notetag.
 function appendSpeedRow(ctx) {
   if (ctx.item.speed == 0) return;
+
   ctx.fragText = ctx.item.speed;
   const speedLabel = `Speed`;
-  ctx.effectText += `\\C[${ctx.colorCode}]${speedLabel}\\C[0]:${ctx.fragText} `;
+  const speedLabelText = colorTaggedText(ctx.colorCode, speedLabel);
+  ctx.effectText += `${speedLabelText}:${ctx.fragText} `;
 }
 
 // Generic `\I[icon]:value ` row.
@@ -986,11 +1063,16 @@ function appendRankUpPointRow(ctx) {
   ctx.effectText += `\\I[${MASTERY_RANK_ICON_ID}]:${ctx.fragText}${rankSuffix} `;
 }
 
+const TP_GAIN_COLOR_CODE = 10;
+
 // `tpGain` is a core field.
 function appendTpGainRow(ctx) {
   if (ctx.item.tpGain == 0) return;
+
   ctx.fragText = ctx.item.tpGain;
-  ctx.effectText += `\\C[${ctx.colorCode}]${TP_LABEL}\\C[0]:${ctx.fragText}\\C[10]↑\\C[0] `;
+  const tpLabelText = colorTaggedText(ctx.colorCode, TP_LABEL);
+  const upArrowText = colorTaggedText(TP_GAIN_COLOR_CODE, `↑`);
+  ctx.effectText += `${tpLabelText}:${ctx.fragText}${upArrowText} `;
 }
 
 const ADDITIONAL_SET_SLOT_COUNT = 9;
@@ -1005,15 +1087,13 @@ const ADDITIONAL_SET_META_KEYS = (function () {
 })();
 
 function describeAdditionalSets(ctx) {
-  // One open-ended prefix per target index: the row is closed by the `付与` line
-  // further down.
-  ctx.additionalSetTextByTarget = [
-    0,
-    `[\\C[${ctx.colorCode}]${ADDITIONAL_SET_TARGET_LABELS[1]}`,
-    `[\\C[${ctx.colorCode}]${ADDITIONAL_SET_TARGET_LABELS[2]}`,
-    `[\\C[${ctx.colorCode}]${ADDITIONAL_SET_TARGET_LABELS[3]}`,
-    `[\\C[${ctx.colorCode}]${ADDITIONAL_SET_TARGET_LABELS[4]}`,
-  ];
+  // One row per target index: the target label is collected here, the state icons
+  // are appended to it, and the `付与` line further down prints the whole body.
+  const targetLabels = [``, ``, ``, ``, ``];
+  for (let targetIndex = 1; targetIndex <= ADDITIONAL_SET_TARGET_COUNT; targetIndex++) {
+    targetLabels[targetIndex] = ADDITIONAL_SET_TARGET_LABELS[targetIndex];
+  }
+  ctx.additionalSetTextByTarget = targetLabels;
   ctx.additionalSetCountByTarget = [0, 0, 0, 0, 0];
 
   // Nine `<additionalSetN>` slots, each `target,flag,stacks,stateId`. The state
@@ -1039,7 +1119,10 @@ function describeAdditionalSets(ctx) {
   for (let targetIndex = 1; targetIndex <= ADDITIONAL_SET_TARGET_COUNT; targetIndex++) {
     if (ctx.additionalSetCountByTarget[targetIndex] < 1) continue;
     const additionalSetGrantText = `付与`;
-    ctx.effectText += `${ctx.additionalSetTextByTarget[targetIndex]}${additionalSetGrantText}\\C[0]] `;
+    const targetText = ctx.additionalSetTextByTarget[targetIndex];
+    const targetLabel = `${targetText}${additionalSetGrantText}`;
+    const targetRowText = colorTaggedText(ctx.colorCode, targetLabel);
+    ctx.effectText += `[${targetRowText}] `;
   }
 }
 
@@ -1097,25 +1180,34 @@ function effectState(stateId) {
   return $dataStates[stateId];
 }
 
-// 22: `[\\C[3]解除:\\C[0]state]`, with the removal chance when it is not 100%.
+// 22: `[\C[3]解除:\C[0]state]`, with the removal chance when it is not 100%.
+const STATE_REMOVE_COLOR_CODE = 3;
+const FULL_CHANCE_PERCENT = 100;
+
 function describeStateRemoveEffect(ctx, effect) {
   const state = effectState(effect.dataId);
   if (!state) return;
 
   const removePercent = Math.round(effect.value1 * 100);
   const removalLabel = `解除`;
-  const removalChanceText = removePercent == 100 ? `` : `${removePercent}%`;
-  ctx.effectText += `[\\C[3]${removalLabel}:\\C[0]${effectStateLabel(state)}${removalChanceText}]`;
+  const removalChanceText = removePercent == FULL_CHANCE_PERCENT ? `` : `${removePercent}%`;
+  const removedStateLabel = effectStateLabel(state);
+  // The colour covers the label and its colon, nothing else.
+  const removalPrefix = colorTaggedText(STATE_REMOVE_COLOR_CODE, `${removalLabel}:`);
+  ctx.effectText += `[${removalPrefix}${removedStateLabel}${removalChanceText}]`;
 }
 
 // 21: a repeat of the previous state collapses to a bare `+`.
+const FULL_GRANT_PERCENT = 100;
+
 function describeStateAddEffect(ctx, effect) {
   const state = effectState(effect.dataId);
   if (!state) return;
 
   if (effect.dataId == ctx.prevStateCode) {
     ctx.consecStateCount += 1;
-    ctx.effectText += `\\C[${ctx.colorCode}]+\\C[0]`;
+    const plusText = colorTaggedText(ctx.colorCode, `+`);
+    ctx.effectText += plusText;
     return;
   }
   ctx.prevStateCode = effect.dataId;
@@ -1127,8 +1219,11 @@ function describeStateAddEffect(ctx, effect) {
   const turnText = !isBattleState && state.autoRemovalTiming >= 1 ? stateTurnText(state) : ``;
   const grantPercent = Math.round(effect.value1 * 100);
   const grantLabel = `付与`;
-  const grantChanceText = grantPercent == 100 ? `` : `${grantPercent}%`;
-  ctx.effectText += `[\\C[${ctx.colorCode}]${grantLabel}:\\C[0]${stateIconText(effect.dataId)}${grantChanceText}${turnText}]`;
+  const grantChanceText = grantPercent == FULL_GRANT_PERCENT ? `` : `${grantPercent}%`;
+  // The colour covers the label and its colon, nothing else.
+  const grantPrefix = colorTaggedText(ctx.colorCode, `${grantLabel}:`);
+  const stateIcon = stateIconText(effect.dataId);
+  ctx.effectText += `[${grantPrefix}${stateIcon}${grantChanceText}${turnText}]`;
 }
 
 // `<minTurns>t` or `<minTurns>～<maxTurns>t`.
@@ -1146,42 +1241,56 @@ function describeClearCountTags(ctx) {
 }
 
 // `<dispelCount>`: `強化状態<n>つ消去`.
+const DISPEL_COUNT_COLOR_CODE = 3;
+
 function appendDispelCountTag(ctx) {
   const dispelCount = ctx.meta['dispelCount'];
   if (!dispelCount) return;
 
-  ctx.fragText = Number(dispelCount);
-  const dispelStateText = `強化状態`;
+  const dispelStateLabel = `強化状態`;
   const dispelCountSuffix = `つ`;
-  const dispelActionText = `消去`;
-  ctx.effectText += `[\\C[${ctx.colorCode}]${dispelStateText}\\C[3]${ctx.fragText}${dispelCountSuffix}`
-    + `\\C[${ctx.colorCode}]${dispelActionText}\\C[0]]`;
+  const dispelActionLabel = `消去`;
+  const dispelCountValue = Number(dispelCount);
+  const dispelStateText = colorTaggedText(ctx.colorCode, dispelStateLabel);
+  const dispelAmountLabel = `${dispelCountValue}${dispelCountSuffix}`;
+  const dispelAmountText = colorTaggedText(DISPEL_COUNT_COLOR_CODE, dispelAmountLabel);
+  const dispelActionText = colorTaggedText(ctx.colorCode, dispelActionLabel);
+  ctx.effectText += `[${dispelStateText}${dispelAmountText}${dispelActionText}]`;
 }
 
 // `<abNomalClearCount>`: the ailment recovery count. `<StateabNomalOnly>` drops
 // the second icon, i.e. the "special" ailment sheet.
+const AILMENT_CLEAR_COLOR_CODE = 3;
+const NORMAL_AILMENT_CLEAR_ICONS = `\\I[683]`;
+const SPECIAL_AILMENT_CLEAR_ICONS = `\\I[683]\\I[684]`;
+
 function appendAilmentClearTag(ctx) {
   const clearCount = ctx.meta['abNomalClearCount'];
   if (!clearCount) return;
 
-  ctx.fragText = Number(clearCount);
+  const clearCountValue = Number(clearCount);
   const clearCountSuffix = `つ`;
-  const clearRecoverText = `回復`;
-  const clearIcons = ctx.meta['StateabNomalOnly'] ? `\\I[683]` : `\\I[683]\\I[684]`;
-  ctx.effectText += `[\\C[${ctx.colorCode}]${clearIcons}\\C[3]${ctx.fragText}${clearCountSuffix}`
-    + `\\C[${ctx.colorCode}]${clearRecoverText}\\C[0]]`;
+  const clearRecoverLabel = `回復`;
+  const clearIcons = ctx.meta['StateabNomalOnly'] ? NORMAL_AILMENT_CLEAR_ICONS : SPECIAL_AILMENT_CLEAR_ICONS;
+  const stateText = colorTaggedText(ctx.colorCode, clearIcons);
+  const clearAmountLabel = `${clearCountValue}${clearCountSuffix}`;
+  const amountText = colorTaggedText(AILMENT_CLEAR_COLOR_CODE, clearAmountLabel);
+  const recoverText = colorTaggedText(ctx.colorCode, clearRecoverLabel);
+  ctx.effectText += `[${stateText}${amountText}${recoverText}]`;
 }
 
 // `<abNomalClearCountPlus>` / `<dispelCountPlus>`: the two "scaled by Magic/300"
 // rows.
 function appendClearCountPlusTags(ctx) {
   if (ctx.meta['abNomalClearCountPlus']) {
-    const ailmentRecoveryText = `状態異常回復数+(Magic/300)`;
-    ctx.effectText += `[\\C[${ctx.colorCode}]${ailmentRecoveryText}\\C[0]]`;
+    const ailmentRecoveryLabel = `状態異常回復数+(Magic/300)`;
+    const ailmentRecoveryText = colorTaggedText(ctx.colorCode, ailmentRecoveryLabel);
+    ctx.effectText += `[${ailmentRecoveryText}]`;
   }
   if (ctx.meta['dispelCountPlus']) {
-    const buffRemovalText = `強化解除数+(Magic/300)`;
-    ctx.effectText += `[\\C[${ctx.colorCode}]${buffRemovalText}\\C[0]]`;
+    const buffRemovalLabel = `強化解除数+(Magic/300)`;
+    const buffRemovalText = colorTaggedText(ctx.colorCode, buffRemovalLabel);
+    ctx.effectText += `[${buffRemovalText}]`;
   }
 }
 
@@ -1196,9 +1305,12 @@ function appendPassiveStateTag(ctx) {
   const passiveStateId = ctx.meta['Passive State'];
   if (!passiveStateId || ctx.meta['パッシブ隠蔽']) return;
 
-  const passiveState = $dataStates[Number(passiveStateId)];
+  const passiveStateNumber = Number(passiveStateId);
+  const passiveState = $dataStates[passiveStateNumber];
   const grantLabel = passiveState && passiveState.meta['SpcialState'] ? `特殊効果付与` : `付与`;
-  ctx.effectText += `\\C[${ctx.colorCode}]${grantLabel}\\C[0]<\x1bSIM[${Number(passiveStateId)}]> `;
+  const grantText = colorTaggedText(ctx.colorCode, grantLabel);
+  const stateNameCode = `<\x1bSIM[${passiveStateNumber}]>`;
+  ctx.effectText += `${grantText}${stateNameCode} `;
 }
 
 //属性威力加算: `<Element Amplify N>` -> `…威力<value> `, one row per element.
@@ -1216,12 +1328,19 @@ function elementAmplifyMetaKeys() {
   return elementAmplifyKeys;
 }
 
+// The trait/passive element name and its rate, e.g. `炎威力150% `.
+function appendElementAmplifyRow(ctx, elementId, amplifyValue) {
+  const amplifyLabel = elementAmplifyLabel(elementId);
+  const amplifyRateText = amplifyValue.replace(' ', '');
+  ctx.effectText += `${amplifyLabel}${amplifyRateText} `;
+}
+
 function appendElementAmplifyRows(ctx) {
   const amplifyKeys = elementAmplifyMetaKeys();
   for (let keyIndex = 0; keyIndex < amplifyKeys.length; keyIndex++) {
     const amplifyValue = ctx.meta[amplifyKeys[keyIndex]];
     if (!amplifyValue) continue;
-    ctx.effectText += `${elementAmplifyLabel(keyIndex + 1)}${amplifyValue.replace(' ', '')} `;
+    appendElementAmplifyRow(ctx, keyIndex + 1, amplifyValue);
   }
 }
 
@@ -1252,23 +1371,33 @@ function describeBattleTags(ctx) {
 }
 
 // `<PassiveElementP:elementId,rate>`: element damage bonus, colour-coded by sign.
+const ELEMENT_POWER_GAIN_COLOR_CODE = 10;
+const ELEMENT_POWER_LOSS_COLOR_CODE = 1;
+
 function appendPassiveElementPower(ctx) {
-  if (!ctx.meta['PassiveElementP']) return;
-  ctx.metaValues = splitMetaValues(ctx.meta['PassiveElementP']);
+  const passiveElementPower = ctx.meta['PassiveElementP'];
+  if (!passiveElementPower) return;
+
+  ctx.metaValues = splitMetaValues(passiveElementPower);
   const amplifyValue = Number(ctx.metaValues[1]);
-  const amplifyColorCode = amplifyValue >= 1 ? 10 : 1;
+  const amplifyColorCode = amplifyValue >= 1 ? ELEMENT_POWER_GAIN_COLOR_CODE : ELEMENT_POWER_LOSS_COLOR_CODE;
+  const amplifyLabel = elementAmplifyLabel(ctx.metaValues[0]);
   const rankPrefix = ctx.meta['Max Mastery Level'] ? `Rank*` : ``;
-  const powerText = `<${elementAmplifyLabel(ctx.metaValues[0])}${rankPrefix}${amplifyValue}%`;
-  ctx.effectText += `${colorTaggedText(amplifyColorCode, powerText)}>`;
+  const powerLabel = `<${amplifyLabel}${rankPrefix}${amplifyValue}%`;
+  const powerText = colorTaggedText(amplifyColorCode, powerLabel);
+  ctx.effectText += `${powerText}>`;
 }
 
 // `<SpecialAttack:elementId>`: the attacker's element, as a name code.
 function appendSpecialAttackTag(ctx) {
-  if (!ctx.meta['SpecialAttack']) return;
-  ctx.effectValue = Number(ctx.meta['SpecialAttack']);
+  const specialAttack = ctx.meta['SpecialAttack'];
+  if (!specialAttack) return;
+
+  ctx.effectValue = Number(specialAttack);
   ctx.fragText = `<\x1bSIN[${ctx.effectValue}]>`;
   const specialAttackLabel = `Attack`;
-  ctx.effectText += `${colorTaggedText(ctx.colorCode, specialAttackLabel)}${ctx.fragText} `;
+  const specialAttackText = colorTaggedText(ctx.colorCode, specialAttackLabel);
+  ctx.effectText += `${specialAttackText}${ctx.fragText} `;
 }
 
 function describeBattlePowerRows(ctx) {
@@ -1281,38 +1410,58 @@ function describeBattlePowerRows(ctx) {
 }
 
 // `<Counter Skills>`: the reaction skills, as name codes.
+const COUNTER_COLOR_CODE = 16;
+
 function appendCounterSkillsTag(ctx) {
-  if (!ctx.meta['Counter Skills']) return;
-  ctx.effectValue = ctx.meta['Counter Skills'];
+  const counterSkills = ctx.meta['Counter Skills'];
+  if (!counterSkills) return;
+
+  ctx.effectValue = counterSkills;
   const counterSkillLabel = `反撃スキル`;
-  ctx.effectText += `${colorTaggedText(16, `${counterSkillLabel}:\x1bSIN[${ctx.effectValue}]`)} `;
+  const counterSkillNameCode = `\x1bSIN[${ctx.effectValue}]`;
+  const counterSkillText = `${counterSkillLabel}:${counterSkillNameCode}`;
+  const counterSkillsText = colorTaggedText(COUNTER_COLOR_CODE, counterSkillText);
+  ctx.effectText += `${counterSkillsText} `;
 }
 
 // `<Counter Total>`: the tag counts extra hits, so the shown maximum is one more.
+// `<Counter Total>`: the tag counts extra hits, so the shown maximum is one more.
 function appendCounterTotalTag(ctx) {
-  if (!ctx.meta['Counter Total']) return;
-  ctx.effectValue = ctx.meta['Counter Total'].replace(' +', '');
-  const maxCounterText = `最大反撃回数:${Number(ctx.effectValue) + 1}回`;
-  ctx.effectText += `${colorTaggedText(16, `[${maxCounterText}]`)} `;
+  const counterTotal = ctx.meta['Counter Total'];
+  if (!counterTotal) return;
+
+  ctx.effectValue = counterTotal.replace(' +', '');
+  const extraHitCount = Number(ctx.effectValue);
+  const maxCounterCount = extraHitCount + 1;
+  const maxCounterLabel = `[最大反撃回数:${maxCounterCount}回]`;
+  const maxCounterText = colorTaggedText(COUNTER_COLOR_CODE, maxCounterLabel);
+  ctx.effectText += `${maxCounterText} `;
 }
 
 function describeBattleNoteRows(ctx) {
   for (const noteRow of BATTLE_NOTE_ROWS) {
-    if (!ctx.meta[noteRow.metaKey]) continue;
-    ctx.effectValue = ctx.meta[noteRow.metaKey];
-    const noteText = noteRow.valueSuffix === undefined
+    const noteValue = ctx.meta[noteRow.metaKey];
+    if (!noteValue) continue;
+
+    ctx.effectValue = noteValue;
+    const noteLabel = noteRow.valueSuffix === undefined
       ? noteRow.label
       : `${noteRow.label}${ctx.effectValue}${noteRow.valueSuffix}`;
-    ctx.effectText += `${colorTaggedText(16, `[${noteText}]`)} `;
+    const noteRowLabel = `[${noteLabel}]`;
+    const noteText = colorTaggedText(COUNTER_COLOR_CODE, noteRowLabel);
+    ctx.effectText += `${noteText} `;
   }
 }
 
-// `<MaxTp>`: `\\C[16]MaxTp\\C[0]+value `.
+// `<MaxTp>`: `\C[16]MaxTp\C[0]+value `.
 function appendMaxTpTag(ctx) {
-  if (!ctx.meta['MaxTp']) return;
-  ctx.effectValue = ctx.meta['MaxTp'];
+  const maxTp = ctx.meta['MaxTp'];
+  if (!maxTp) return;
+
+  ctx.effectValue = maxTp;
   const maxTpLabel = `MaxTp`;
-  ctx.effectText += `${colorTaggedText(16, maxTpLabel)}+${ctx.effectValue} `;
+  const maxTpText = colorTaggedText(COUNTER_COLOR_CODE, maxTpLabel);
+  ctx.effectText += `${maxTpText}+${ctx.effectValue} `;
 }
 
 // Element and state resistances: the same sentence with a different icon/wording.
@@ -1330,11 +1479,14 @@ const RESIST_ROWS = [
 
 // 0 means immunity, anything else is a percentage.
 function appendResistRow(ctx, resistRow, resistValue) {
+  const resistName = resistRow.icon + resistRow.fullLabel;
   if (resistValue == 0) {
-    ctx.effectText += `${colorTaggedText(ctx.colorCode, resistRow.icon + resistRow.fullLabel)} `;
+    const immuneText = colorTaggedText(ctx.colorCode, resistName);
+    ctx.effectText += `${immuneText} `;
     return;
   }
-  const rateText = colorTaggedText(ctx.colorCode, `${resistRow.icon}${resistRow.rateLabel}`);
+  const resistRateLabel = resistRow.icon + resistRow.rateLabel;
+  const rateText = colorTaggedText(ctx.colorCode, resistRateLabel);
   ctx.effectText += `${rateText}${resistRow.ratePrefix}${resistValue}% `;
 }
 
@@ -1352,15 +1504,19 @@ function describeResistTags(ctx) {
 // `<DispelGuard>`: the buff removal immunity.
 function appendDispelGuardTag(ctx) {
   if (!ctx.meta['DispelGuard']) return;
-  const dispelGuardText = `強化消去無効`;
-  ctx.effectText += `${colorTaggedText(ctx.colorCode, dispelGuardText)} `;
+  const dispelGuardLabel = `強化消去無効`;
+  const dispelGuardText = colorTaggedText(ctx.colorCode, dispelGuardLabel);
+  ctx.effectText += `${dispelGuardText} `;
 }
 
 // `<Level Up Recover All>`: full recovery on level up.
+const LEVEL_UP_RECOVER_COLOR_CODE = 16;
+
 function appendLevelUpRecoverAllTag(ctx) {
   if (!ctx.meta['Level Up Recover All']) return;
-  const levelUpRecoverAllText = `LvUp時に全回復`;
-  ctx.effectText += `[${colorTaggedText(16, levelUpRecoverAllText)}]`;
+  const levelUpRecoverAllLabel = `LvUp時に全回復`;
+  const levelUpRecoverAllText = colorTaggedText(LEVEL_UP_RECOVER_COLOR_CODE, levelUpRecoverAllLabel);
+  ctx.effectText += `[${levelUpRecoverAllText}]`;
 }
 
 // `<Bypass Damage Cap>` wins over `<Damage Cap>`, `<Bypass Heal Cap>` over
@@ -1380,25 +1536,36 @@ function describeCapAndCostTags(ctx) {
   describeSpecialStateTags(ctx);
 }
 
+const CAP_ROW_COLOR_CODE = 16;
+
 function describeCapTags(ctx) {
   for (const capRow of CAP_ROWS) {
     if (ctx.meta[capRow.bypassKey]) {
-      ctx.effectText += `${colorTaggedText(16, capRow.bypassLabel)} `;
+      const bypassText = colorTaggedText(CAP_ROW_COLOR_CODE, capRow.bypassLabel);
+      ctx.effectText += `${bypassText} `;
       continue;
     }
-    if (!ctx.meta[capRow.valueKey]) continue;
-    ctx.effectValue = ctx.meta[capRow.valueKey].replace(' ', '');
-    ctx.effectText += `${colorTaggedText(16, `${capRow.valueLabel}:`)}${ctx.effectValue} `;
+    const capValue = ctx.meta[capRow.valueKey];
+    if (!capValue) continue;
+
+    ctx.effectValue = capValue.replace(' ', '');
+    const capLabel = `${capRow.valueLabel}:`;
+    const capText = colorTaggedText(CAP_ROW_COLOR_CODE, capLabel);
+    ctx.effectText += `${capText}${ctx.effectValue} `;
   }
 }
 
-// `[\\C[16]HP10消費\\C[0]]`
+// `[\C[16]HP10消費\C[0]]`
 function describeCostTags(ctx) {
   const costSuffix = `消費`;
   for (const costRow of COST_ROWS) {
-    if (!ctx.meta[costRow.metaKey]) continue;
-    ctx.effectValue = ctx.meta[costRow.metaKey].replace(' ', '');
-    ctx.effectText += `[${colorTaggedText(16, `${costRow.resourceLabel}${ctx.effectValue}${costSuffix}`)}]`;
+    const costValue = ctx.meta[costRow.metaKey];
+    if (!costValue) continue;
+
+    ctx.effectValue = costValue.replace(' ', '');
+    const costLabel = `${costRow.resourceLabel}${ctx.effectValue}${costSuffix}`;
+    const costText = colorTaggedText(CAP_ROW_COLOR_CODE, costLabel);
+    ctx.effectText += `[${costText}]`;
   }
 }
 
@@ -1413,45 +1580,59 @@ function describeSpecialStateTags(ctx) {
   appendGlobalCooldownTag(ctx);
 }
 
+const MP_TRIGGER_VALUE_COLOR_CODE = 10;
+const MP_TRIGGER_POINT_COLOR_CODE = 2;
+
 // `<SpcialState>`: the state that switches the effect on, and the one that ends
 // it. The two `\x1bSIM[n]` codes expand to *state names*, i.e. to other game
 // text, so they stay outside the translatable strings.
 function appendSpecialStateTrigger(ctx) {
   if (!ctx.meta['SpcialState']) return;
 
-  const activationStateIcon = `\x1bSIM[110]`;//ステート名コード。翻訳対象外
-  const activationText = `で発動`;
-  const expiryStateIcon = `\x1bSIM[109]`;//ステート名コード。翻訳対象外
-  const expiryText = `で効果消失`;
-  ctx.suffixText += `[${colorTaggedText(ctx.colorCode, activationStateIcon + activationText)}][${expiryStateIcon}${expiryText}]`;
+  const activationStateCode = `\x1bSIM[110]`;//ステート名コード。翻訳対象外
+  const activationLabel = `で発動`;
+  const expiryStateCode = `\x1bSIM[109]`;//ステート名コード。翻訳対象外
+  const expiryLabel = `で効果消失`;
+  const activationText = colorTaggedText(ctx.colorCode, activationStateCode + activationLabel);
+  const expiryText = `[${expiryStateCode}${expiryLabel}]`;
+  ctx.suffixText += `[${activationText}]${expiryText}`;
 
-  const activationConditionText = `行動時MP消費/消費MP未満で`;
-  const grantText = `付与`;
-  ctx.effectText += `[${colorTaggedText(ctx.colorCode, `${activationConditionText}\\I[252]${grantText}`)}]`;
+  const activationConditionLabel = `行動時MP消費/消費MP未満で`;
+  const grantLabel = `付与`;
+  const mpGrantLabel = `${activationConditionLabel}\\I[252]${grantLabel}`;
+  const mpGrantText = colorTaggedText(ctx.colorCode, mpGrantLabel);
+  ctx.effectText += `[${mpGrantText}]`;
 }
 
 // `<activateRate>`: the MP trigger chance.
 function appendActivateRateTag(ctx) {
   if (!ctx.meta['activateRate']) return;
+
   ctx.effectValue = Math.round(ctx.meta['activateRate'] * 100);
-  const consumeMpText = `消費MP:MMP`;
-  ctx.suffixText += `[${consumeMpText}${colorTaggedText(10, `${ctx.effectValue}%`)}]`;
+  const consumeMpLabel = `消費MP:MMP`;
+  const rateLabel = `${ctx.effectValue}%`;
+  const rateText = colorTaggedText(MP_TRIGGER_VALUE_COLOR_CODE, rateLabel);
+  ctx.suffixText += `[${consumeMpLabel}${rateText}]`;
 }
 
 // `<activatePoint>`: unused in this database, kept for compatibility.
 function appendActivatePointTag(ctx) {
   if (!ctx.meta['activatePoint']) return;
+
   ctx.effectValue = ctx.meta['activatePoint'];
   const consumeMpLabel = `消費MP:`;
-  ctx.suffixText += `[${consumeMpLabel}${colorTaggedText(2, `${ctx.effectValue}`)}]`;
+  const pointText = colorTaggedText(MP_TRIGGER_POINT_COLOR_CODE, ctx.effectValue);
+  ctx.suffixText += `[${consumeMpLabel}${pointText}]`;
 }
 
 // `<Global Cooldown>`: the cooldown applied to every skill.
 function appendGlobalCooldownTag(ctx) {
   if (!ctx.meta['Global Cooldown']) return;
+
   ctx.effectValue = Number(ctx.meta['Global Cooldown']);
   const allCooldownLabel = `全てのCT:`;
-  ctx.suffixText += `[${allCooldownLabel}${colorTaggedText(2, `${ctx.effectValue}`)}]`;
+  const cooldownText = colorTaggedText(MP_TRIGGER_POINT_COLOR_CODE, ctx.effectValue);
+  ctx.suffixText += `[${allCooldownLabel}${cooldownText}]`;
 }
 
 function describeCooldownAndDrainTags(ctx) {
@@ -1481,14 +1662,23 @@ const COOLDOWN_ROWS = (function () {
   return cooldownRows;
 })();
 
+// `<SType N Cooldown|Warmup>`: one row per skill type, red when negative.
+const COOLDOWN_NEGATIVE_COLOR_CODE = 3;
+const COOLDOWN_NEGATIVE_THRESHOLD = 0;
+
 function appendSkillTypeCooldownRows(ctx) {
   const skillTypes = $dataSystem.skillTypes;
   for (const cooldownRow of COOLDOWN_ROWS) {
     const cooldownValue = ctx.meta[cooldownRow.metaKey];
     if (!cooldownValue) continue;
-    const cooldownColorCode = Number(cooldownValue) < 0 ? 3 : 1;
-    ctx.effectText += `[${skillTypes[cooldownRow.skillTypeId]}\\C[${cooldownColorCode}]`
-      + `\\I[${cooldownRow.iconId}]${Number(cooldownValue)}\\C[0]]`;
+
+    const cooldown = Number(cooldownValue);
+    const isNegative = cooldown < COOLDOWN_NEGATIVE_THRESHOLD;
+    const cooldownColorCode = isNegative ? COOLDOWN_NEGATIVE_COLOR_CODE : RESIST_NEGATIVE_COLOR_CODE;
+    const skillTypeName = skillTypes[cooldownRow.skillTypeId];
+    const cooldownLabel = `\\I[${cooldownRow.iconId}]${cooldown}`;
+    const cooldownText = colorTaggedText(cooldownColorCode, cooldownLabel);
+    ctx.effectText += `[${skillTypeName}${cooldownText}]`;
   }
 }
 
@@ -1511,8 +1701,9 @@ function appendRankMaxLearningTag(ctx) {
   if (ctx.item.stypeId == SUMMON_SKILL_TYPE_ID) return;
 
   const hasRanks = Number(ctx.meta['Max Mastery Level']) >= MASTERY_LEVEL_FOR_RANK_TEXT;
-  const learnText = hasRanks ? `RankMaxで習得が可能になる` : `熟練度Maxで習得が可能になる`;
-  ctx.effectText += `[\\C[${ctx.colorCode}]${learnText}\\C[0]]`;
+  const learnLabel = hasRanks ? `RankMaxで習得が可能になる` : `熟練度Maxで習得が可能になる`;
+  const learnText = colorTaggedText(ctx.colorCode, learnLabel);
+  ctx.effectText += `[${learnText}]`;
 }
 
 // `<trapEvasion>` and `<SemenRemove>`, both in the lust colour.
@@ -1520,20 +1711,23 @@ const SEMEN_REMOVE_COLOR_CODE = 27;
 
 function appendTrapAndSemenTags(ctx) {
   if (ctx.meta['trapEvasion']) {
-    const trapEvasionText = `引っ掛かったトラップを自動で回避する`;
-    ctx.effectText += `[\\C[${ctx.colorCode}]${trapEvasionText}\\C[0]]`;
+    const trapEvasionLabel = `引っ掛かったトラップを自動で回避する`;
+    const trapEvasionText = colorTaggedText(ctx.colorCode, trapEvasionLabel);
+    ctx.effectText += `[${trapEvasionText}]`;
   }
   const semenRemove = ctx.meta['SemenRemove'];
   if (!semenRemove) return;
 
   ctx.colorCode = SEMEN_REMOVE_COLOR_CODE;
   ctx.effectValue = Number(semenRemove);
-  const semenRemoveText = `状態異常精液${ctx.effectValue}つ回復`;
-  ctx.effectText += `[\\C[${ctx.colorCode}]${semenRemoveText}\\C[0]]`;
+  const semenRemoveLabel = `状態異常精液${ctx.effectValue}つ回復`;
+  const semenRemoveText = colorTaggedText(ctx.colorCode, semenRemoveLabel);
+  ctx.effectText += `[${semenRemoveText}]`;
 }
 
-// `<HstaSuppression:0|variableId,value>`: the lust-stat ceiling. Field 0 selects
-// the fixed desire/development text, anything else a rank variable's name.
+const NO_RANK_VARIABLE_ID = 0;
+const DESIRE_VALUE_SCALE = 100;
+
 function appendHstaSuppressionTag(ctx) {
   const hstaSuppression = ctx.meta['HstaSuppression'];
   if (!hstaSuppression) return;
@@ -1541,16 +1735,19 @@ function appendHstaSuppressionTag(ctx) {
   ctx.colorCode = SEMEN_REMOVE_COLOR_CODE;
   ctx.metaValues = hstaSuppression.split(',');
   ctx.effectValue = Number(ctx.metaValues[1]);
-  const desireValue = ctx.effectValue * 100;
-  const desireLimitText = `性欲度${desireValue}まで`;
-  const developmentLimitText = `各開発/経験度${ctx.effectValue}まで`;
-  if (Number(ctx.metaValues[0]) == 0) {
-    ctx.effectText += `[\\C[${ctx.colorCode}]${desireLimitText}\\C[0]][\\C[${ctx.colorCode}]${developmentLimitText}\\C[0]]`;
+  const desireValue = ctx.effectValue * DESIRE_VALUE_SCALE;
+  if (Number(ctx.metaValues[0]) == NO_RANK_VARIABLE_ID) {
+    const desireLimitLabel = `性欲度${desireValue}まで`;
+    const developmentLimitLabel = `各開発/経験度${ctx.effectValue}まで`;
+    const desireLimitText = colorTaggedText(ctx.colorCode, desireLimitLabel);
+    const developmentLimitText = colorTaggedText(ctx.colorCode, developmentLimitLabel);
+    ctx.effectText += `[${desireLimitText}][${developmentLimitText}]`;
     return;
   }
   const rankVariableName = $dataSystem.variables[Number(ctx.metaValues[0])];
-  const rankLimitText = `のランク${ctx.effectValue}まで`;
-  ctx.effectText += `[\\C[${ctx.colorCode}]${rankVariableName}${rankLimitText}\\C[0]]`;
+  const rankLimitLabel = `${rankVariableName}のランク${ctx.effectValue}まで`;
+  const rankLimitText = colorTaggedText(ctx.colorCode, rankLimitLabel);
+  ctx.effectText += `[${rankLimitText}]`;
 }
 
 // `<TPGain1>` and `<gainExp>`.
@@ -1559,14 +1756,17 @@ function appendGainRows(ctx) {
   const tpGain = ctx.meta['TPGain1'];
   if (tpGain) {
     ctx.effectValue = tpGain;
-    ctx.effectText += `[\\C[${ctx.colorCode}]${TP_LABEL}${ctx.effectValue}%\\C[0]]`;
+    const tpGainLabel = `${TP_LABEL}${ctx.effectValue}%`;
+    const tpGainText = colorTaggedText(ctx.colorCode, tpGainLabel);
+    ctx.effectText += `[${tpGainText}]`;
   }
   const gainExp = ctx.meta['gainExp'];
   if (!gainExp) return;
 
   ctx.effectValue = gainExp;
-  const gainExpLabel = `獲得Exp`;
-  ctx.effectText += `[\\C[${ctx.colorCode}]${gainExpLabel}:${ctx.effectValue}%\\C[0]]`;
+  const gainExpLabel = `獲得Exp:${ctx.effectValue}%`;
+  const gainExpText = colorTaggedText(ctx.colorCode, gainExpLabel);
+  ctx.effectText += `[${gainExpText}]`;
 }
 
 // `<Skill Tier N Slots>`: how many enchant slots the entry uses per tier.
@@ -1576,11 +1776,18 @@ const SKILL_TIER_SLOT_META_KEYS = [``, `Skill Tier 1 Slots`, `Skill Tier 2 Slots
   `Skill Tier 3 Slots`, `Skill Tier 4 Slots`, `Skill Tier 5 Slots`, `Skill Tier 6 Slots`];
 const SKILL_TIER_SLOT_COLOR_CODE = 16;
 
+const SKILL_TIER_SLOT_VALUE_COLOR_CODE = 2;
+
 function appendSkillTierSlotRows(ctx) {
   for (let tierIndex = 1; tierIndex <= SKILL_TIER_SLOT_COUNT; tierIndex++) {
     const tierSlots = ctx.meta[SKILL_TIER_SLOT_META_KEYS[tierIndex]];
     if (!tierSlots) continue;
-    ctx.effectText += `[\\C[${SKILL_TIER_SLOT_COLOR_CODE}]${SKILL_TIER_SLOT_LABELS[tierIndex]}\\C[2]${tierSlots.replace(' ', '')}\\C[0]]`;
+
+    const tierLabel = SKILL_TIER_SLOT_LABELS[tierIndex];
+    const tierSlotCount = tierSlots.replace(' ', '');
+    const tierLabelText = colorTaggedText(SKILL_TIER_SLOT_COLOR_CODE, tierLabel);
+    const tierSlotText = colorTaggedText(SKILL_TIER_SLOT_VALUE_COLOR_CODE, tierSlotCount);
+    ctx.effectText += `[${tierLabelText}${tierSlotText}]`;
   }
 }
 
@@ -1598,6 +1805,13 @@ const TITLE_CONDITION_ROWS = [
   { metaKey: 'HtitleGetArray', build: titleHArrayCondition, splitMeta: true }
 ];
 
+// 称号条件: every row renders as `[\C[c]条件:<body>\C[0]]` and is suppressed when
+// the title carries a `<DescriptionWord>`. The original repeated that guard as
+// `if(x){}else{ … }` seven times; it is one check here and each row only builds its
+// body.
+const TITLE_CONDITION_LABEL_COLOR_CODE = 1;
+const TITLE_CONDITION_VALUE_COLOR_CODE = 10;
+
 function describeTitleConditionTags(ctx) {
   for (const conditionRow of TITLE_CONDITION_ROWS) {
     const conditionMeta = ctx.meta[conditionRow.metaKey];
@@ -1605,11 +1819,11 @@ function describeTitleConditionTags(ctx) {
     if (!conditionRow.ignoreDescriptionWord && ctx.meta['DescriptionWord']) continue;
 
     const conditionValues = conditionRow.splitMeta ? splitConditionValues(ctx, conditionMeta) : null;
-    const conditionText = conditionRow.build(ctx, conditionValues);
-    if (!conditionText) continue;
-    // `\\C[c][条件:body\\C[0]` — the bracket sits inside the colour code, so the row
-    // is not a plain colorTaggedText wrap.
-    ctx.effectText += `\\C[${ctx.colorCode}][${CONDITION_LABEL}:${conditionText}]\\C[0]`;
+    const conditionBody = conditionRow.build(ctx, conditionValues);
+    if (!conditionBody) continue;
+    // The brackets sit inside the colour span.
+    const conditionText = colorTaggedText(ctx.colorCode, `[${CONDITION_LABEL}:${conditionBody}]`);
+    ctx.effectText += conditionText;
   }
 }
 
@@ -1633,29 +1847,37 @@ function titleSwitchCondition(ctx, conditionValues) {
 // `<titleGetVariable:variableId,value>`.
 function titleVariableCondition(ctx, conditionValues) {
   const variableName = $dataSystem.variables[Number(conditionValues[0])];
-  return `${variableName}:${Number(conditionValues[1])}`;
+  const requiredValue = Number(conditionValues[1]);
+  return `${variableName}:${requiredValue}`;
 }
 
 // `<titleGetArray:52,stateId,count>`: `52` is the only counter implemented.
 function titleArrayCondition(ctx, conditionValues) {
   if (Number(conditionValues[0]) != SUBJUGATION_CONDITION_ID) return ``;
+
   const subjugationCountLabel = `体討伐`;
-  const stateNameCode = `\x1bSIM[${Number(conditionValues[1])}]`;
-  return `${stateNameCode}:${Number(conditionValues[2])}${subjugationCountLabel}`;
+  const stateId = Number(conditionValues[1]);
+  const subjugationCount = Number(conditionValues[2]);
+  const stateNameCode = `\x1bSIM[${stateId}]`;
+  return `${stateNameCode}:${subjugationCount}${subjugationCountLabel}`;
 }
 
 // `<titleGetItems:itemId,count>`.
 function titleItemCondition(ctx, conditionValues) {
   const quantityLabel = `個`;
-  const itemNameCode = `\x1bIIN[${Number(conditionValues[0])}]`;
-  return `${itemNameCode}:${Number(conditionValues[1])}${quantityLabel}`;
+  const itemId = Number(conditionValues[0]);
+  const requiredCount = Number(conditionValues[1]);
+  const itemNameCode = `\x1bIIN[${itemId}]`;
+  return `${itemNameCode}:${requiredCount}${quantityLabel}`;
 }
 
 // `<titleGetSkillRank:skillId,rank>`: any party member.
 function titleSkillRankCondition(ctx, conditionValues) {
   const partyMemberLabel = `パーティの誰かが`;
-  const skillNameCode = `\x1bSIN[${Number(conditionValues[0])}]`;
-  return `${partyMemberLabel}${skillNameCode}${RANK_LABEL}:${Number(conditionValues[1])}${OR_MORE_SUFFIX}`;
+  const skillId = Number(conditionValues[0]);
+  const requiredRank = Number(conditionValues[1]);
+  const skillNameCode = `\x1bSIN[${skillId}]`;
+  return `${partyMemberLabel}${skillNameCode}${RANK_LABEL}:${requiredRank}${OR_MORE_SUFFIX}`;
 }
 
 // `<titleGetAchievement:counterId,value>`, plus a `<KojinTitle>` marker.
@@ -1663,13 +1885,16 @@ function titleAchievementCondition(ctx, conditionValues) {
   const achievementName = ACHIEVEMENT_NAMES[Number(conditionValues[0])];
   const personalTagLabel = `個人`;
   const personalTag = ctx.meta['KojinTitle'] ? `[${personalTagLabel}]` : ``;
-  return `${achievementName}${personalTag}:${Number(conditionValues[1])}`;
+  const requiredValue = Number(conditionValues[1]);
+  return `${achievementName}${personalTag}:${requiredValue}`;
 }
 
 // `<HtitleGetArray:variableId,value>`: H variables live 400 entries further up.
 function titleHArrayCondition(ctx, conditionValues) {
-  const variableName = $dataSystem.variables[Number(conditionValues[0]) + H_VARIABLE_OFFSET];
-  return `${variableName}:${Number(conditionValues[1])}`;
+  const variableId = Number(conditionValues[0]) + H_VARIABLE_OFFSET;
+  const variableName = $dataSystem.variables[variableId];
+  const requiredValue = Number(conditionValues[1]);
+  return `${variableName}:${requiredValue}`;
 }
 
 
@@ -1695,9 +1920,13 @@ function describeAnnihilationTitle(ctx) {
 
   const requiredCount = Number(ctx.metaValues[1]);
   const timesOrMoreSuffix = `回以上`;
-  const subjectText = `${colorTaggedText(1, target.subjectName)}${target.countLabel}:`;
-  ctx.effectValue = `${subjectText}${colorTaggedText(10, `${requiredCount}`)}${timesOrMoreSuffix}`;
-  ctx.effectText += `\\C[${ctx.colorCode}][${CONDITION_LABEL}:${ctx.effectValue}\\C[${ctx.colorCode}]]\\C[0]`;
+  const subjectText = colorTaggedText(TITLE_CONDITION_LABEL_COLOR_CODE, target.subjectName);
+  const requiredCountText = colorTaggedText(TITLE_CONDITION_VALUE_COLOR_CODE, requiredCount);
+  ctx.effectValue = `${subjectText}${target.countLabel}:${requiredCountText}${timesOrMoreSuffix}`;
+  const conditionBody = `[${CONDITION_LABEL}:${ctx.effectValue}`;
+  const conditionText = colorTaggedText(ctx.colorCode, conditionBody);
+  const conditionCloseText = colorTaggedText(ctx.colorCode, `]`);
+  ctx.effectText += `${conditionText}${conditionCloseText}`;
 }
 
 // What the row counts: a named item, all maps or all dungeons. An unknown selector
@@ -1722,31 +1951,38 @@ function annihilationTitleTarget(selector) {
 // `<PassivePlusTrait:11,elementId,rate>`: element damage taken modifier. A positive
 // rate lowers the damage taken, a negative one raises it (the original computed
 // the absolute value with `x - x - x`).
+const PASSIVE_PLUS_TRAIT_CODE = 11;
+
 function describePassivePlusTrait(ctx) {
   const plusTraitMeta = ctx.meta['PassivePlusTrait'];
   if (!plusTraitMeta) return;
+
   ctx.metaValues = plusTraitMeta.split(',');
-  if (Number(ctx.metaValues[0]) != 11) return;
+  if (Number(ctx.metaValues[0]) != PASSIVE_PLUS_TRAIT_CODE) return;
 
   ctx.effectValue = Number(ctx.metaValues[2]);
   const damageResistLabel = `ダメージ耐性`;
   const elementName = $dataSystem.elements[Number(ctx.metaValues[1])];
-  const directionText = ctx.effectValue >= 0 ? `Down` : `Up`;
-  const percentText = Math.round(Math.abs(ctx.effectValue) * 100);
-  ctx.effectText += `[${colorTaggedText(ctx.colorCode, elementName)}${damageResistLabel}${percentText}%${directionText}]`;
+  const directionLabel = ctx.effectValue >= 0 ? `Down` : `Up`;
+  const percentValue = Math.round(Math.abs(ctx.effectValue) * 100);
+  const elementNameText = colorTaggedText(ctx.colorCode, elementName);
+  ctx.effectText += `[${elementNameText}${damageResistLabel}${percentValue}%${directionLabel}]`;
 }
 
 // `<PassivePlusEffect:source,index,rate>`: one stat name plus a percentage.
 function describePassivePlusEffect(ctx) {
   const plusEffectMeta = ctx.meta['PassivePlusEffect'];
   if (!plusEffectMeta) return;
+
   ctx.metaValues = plusEffectMeta.split(',');
   ctx.effectValue = statEffectName(ctx.metaValues);
   // An unknown source used to print whatever `effectValue` the previous row had
   // left behind; print nothing instead.
   if (ctx.effectValue === undefined) return;
-  const percentText = Math.round(Number(ctx.metaValues[2]) * 100);
-  ctx.effectText += `[${colorTaggedText(ctx.colorCode, `${ctx.effectValue}`)}+${percentText}%]`;
+
+  const percentValue = Math.round(Number(ctx.metaValues[2]) * 100);
+  const statNameText = colorTaggedText(ctx.colorCode, ctx.effectValue);
+  ctx.effectText += `[${statNameText}+${percentValue}%]`;
 }
 
 function describeTitleEffectTags(ctx) {
@@ -1759,14 +1995,17 @@ function describeTitleEffectTags(ctx) {
 }
 
 //称号効果: `<titleEffectConfiVal:variableId,value>` -> the variable and its increase.
+//称号効果: `<titleEffectConfiVal:variableId,value>` -> the variable and its increase.
 function appendTitleEffectVariableTag(ctx) {
   const titleEffectValue = ctx.meta['titleEffectConfiVal'];
   if (!titleEffectValue || ctx.meta['DescriptionWord']) return;
 
   ctx.metaValues = titleEffectValue.split(',');
   const variableName = $dataSystem.variables[Number(ctx.metaValues[0])];
-  const variableIncreaseText = `+${Number(ctx.metaValues[1])}`;
-  ctx.effectText += `[${colorTaggedText(ctx.colorCode, `${variableName}:${variableIncreaseText}`)}]`;
+  const variableIncrease = Number(ctx.metaValues[1]);
+  const variableLabel = `${variableName}:+${variableIncrease}`;
+  const variableText = colorTaggedText(ctx.colorCode, variableLabel);
+  ctx.effectText += `[${variableText}]`;
 }
 
 // `<titleEffectConfiSwi>`: a switch the title turns on.
@@ -1775,7 +2014,9 @@ function appendTitleEffectSwitchTag(ctx) {
   if (!titleEffectSwitchId) return;
 
   ctx.effectValue = Number(titleEffectSwitchId);
-  ctx.effectText += `[${colorTaggedText(ctx.colorCode, `${$dataSystem.switches[ctx.effectValue]}`)}]`;
+  const switchName = $dataSystem.switches[ctx.effectValue];
+  const switchText = colorTaggedText(ctx.colorCode, switchName);
+  ctx.effectText += `[${switchText}]`;
 }
 
 // `<titleSenkaGet>`: the senka currency (item code 10) plus the amount.
@@ -1786,7 +2027,9 @@ function appendTitleSenkaTag(ctx) {
   if (!senkaAmount) return;
 
   ctx.effectValue = Number(senkaAmount);
-  ctx.effectText += `[${colorTaggedText(ctx.colorCode, `\x1bIIN[${SENKA_ITEM_CODE_ID}]+${ctx.effectValue}`)}]`;
+  const senkaLabel = `\x1bIIN[${SENKA_ITEM_CODE_ID}]+${ctx.effectValue}`;
+  const senkaText = colorTaggedText(ctx.colorCode, senkaLabel);
+  ctx.effectText += `[${senkaText}]`;
 }
 
 const STAT_EFFECT_PREFIXES = [`titleEffect`, `eatEffect`];
@@ -1815,20 +2058,28 @@ function describeStatEffectSlots(ctx) {
 // goes straight to the output and the row is labelled 耐性 — except for the
 // resist-special elements, which keep whatever the previous slot left in
 // `effectValue`.
+const STAT_PERCENT_COLOR_CODE = 2;
+const STAT_EFFECT_ELEMENT_SOURCE = 4;
+const STAT_EFFECT_NAME_SOURCE_MAX = 3;
+
 function appendStatEffectSlotRow(ctx, statEffectMeta) {
   ctx.metaValues = splitMetaValues(statEffectMeta);
   const statSource = Number(ctx.metaValues[0]);
   const statIndex = Number(ctx.metaValues[1]);
-  if (statSource == 4) {
-    ctx.effectText += `${$dataSystem.elements[statIndex]}`;
+  if (statSource == STAT_EFFECT_ELEMENT_SOURCE) {
+    const statElementName = $dataSystem.elements[statIndex];
+    ctx.effectText += `${statElementName}`;
     if (RESIST_SPECIAL_ELEMENT_IDS.indexOf(statIndex) < 0) ctx.effectValue = RESIST_RATE_TEXT;
-  } else if (statSource >= 0 && statSource <= 3) {
+  } else if (statSource >= 0 && statSource <= STAT_EFFECT_NAME_SOURCE_MAX) {
     ctx.effectValue = statEffectName(ctx.metaValues);
   }
+
   // `x - x - x` in the original is just `-x`, i.e. the magnitude.
   const statPercent = Math.abs(Number(ctx.metaValues[2])) * 100;
+  const statLabelText = colorTaggedText(STAT_ROW_COLOR_CODE, ctx.effectValue);
+  const statPercentText = colorTaggedText(STAT_PERCENT_COLOR_CODE, statPercent);
   ctx.colorCode = STAT_ROW_COLOR_CODE;
-  ctx.effectText += `[\\C[${ctx.colorCode}]${ctx.effectValue}\\C[0]+\\C[2]${statPercent}\\C[0]%]`;
+  ctx.effectText += `[${statLabelText}+${statPercentText}%]`;
   ctx.colorCode = DESCRIPTION_DEFAULT_COLOR_CODE;
 }
 
@@ -1839,17 +2090,24 @@ const BODY_CHANGE_ROWS = [
   { metaKey: 'BodyWeightChange', label: `BodyWeight`, unit: `kg` }
 ];
 
+const BODY_CHANGE_COLOR_CODE = 27;
+
 function describeBodyChangeTags(ctx) {
-  if (ctx.meta['ProstitutionMoneyUp']) {
-    ctx.effectValue = ctx.meta['ProstitutionMoneyUp'];
-    const prostitutionBonusText = `売春額に${ctx.effectValue}倍補正`;
-    ctx.effectText += `${colorTaggedText(27, prostitutionBonusText)} `;
+  const prostitutionMoneyUp = ctx.meta['ProstitutionMoneyUp'];
+  if (prostitutionMoneyUp) {
+    ctx.effectValue = prostitutionMoneyUp;
+    const prostitutionBonusLabel = `売春額に${ctx.effectValue}倍補正`;
+    const prostitutionBonusText = colorTaggedText(BODY_CHANGE_COLOR_CODE, prostitutionBonusLabel);
+    ctx.effectText += `${prostitutionBonusText} `;
   }
   for (const bodyChangeRow of BODY_CHANGE_ROWS) {
-    if (!ctx.meta[bodyChangeRow.metaKey]) continue;
-    ctx.effectValue = ctx.meta[bodyChangeRow.metaKey];
-    const bodyChangeText = `${bodyChangeRow.label}+${ctx.effectValue}${bodyChangeRow.unit}`;
-    ctx.effectText += `${colorTaggedText(27, bodyChangeText)} `;
+    const bodyChangeValue = ctx.meta[bodyChangeRow.metaKey];
+    if (!bodyChangeValue) continue;
+
+    ctx.effectValue = bodyChangeValue;
+    const bodyChangeLabel = `${bodyChangeRow.label}+${ctx.effectValue}${bodyChangeRow.unit}`;
+    const bodyChangeText = colorTaggedText(BODY_CHANGE_COLOR_CODE, bodyChangeLabel);
+    ctx.effectText += `${bodyChangeText} `;
   }
   describeAppraisalTags(ctx);
 }
@@ -1862,16 +2120,21 @@ const APPRAISAL_GRADE_ROWS = [
   { metaKey: '上級鑑定品', label: `上級` }
 ];
 
+// `<下級鑑定品>` / `<中級鑑定品>` / `<上級鑑定品>`: one "未鑑定品" marker followed by the
+// tiers that are present.
+const APPRAISAL_MARKER_COLOR_CODE = 3;
+
 function describeAppraisalTags(ctx) {
   const presentGradeRows = APPRAISAL_GRADE_ROWS.filter(function (gradeRow) {
     return ctx.meta[gradeRow.metaKey];
   });
   if (!presentGradeRows.length) return;
 
-  const unidentifiedLabel = `未鑑定品`;
-  let appraisalText = `\\C[3][${unidentifiedLabel}]\\C[0]`;
+  const unidentifiedLabel = `[未鑑定品]`;
+  let appraisalText = colorTaggedText(APPRAISAL_MARKER_COLOR_CODE, unidentifiedLabel);
   for (const gradeRow of presentGradeRows) {
-    appraisalText += colorTaggedText(ctx.colorCode, `[${gradeRow.label}]`);
+    const gradeLabel = `[${gradeRow.label}]`;
+    appraisalText += colorTaggedText(ctx.colorCode, gradeLabel);
   }
   ctx.effectText += `${appraisalText} `;
 }
@@ -1880,17 +2143,24 @@ function describeQuestHeaderTags(ctx) {
   if (ctx.meta['walletIn']) {
     const useWithLabel = `使用で`;
     const obtainLabel = `入手`;
-    ctx.effectText += `\\C[${ctx.colorCode}][${useWithLabel}\\\G${obtainLabel}]\\C[0] `;
+    const walletInLabel = `[${useWithLabel}\\G${obtainLabel}]`;
+    const walletInText = colorTaggedText(ctx.colorCode, walletInLabel);
+    ctx.effectText += `${walletInText} `;
   }
   appendQuestAcceptRow(ctx);
   appendQuestTargetRow(ctx);
   appendQuestSuitableLevelRow(ctx);
 }
 
-// `[\\C[16]label\\C[0]:\\C[2]value\\C[0]]` plus its separator (a space, or a line break
+// `[\C[16]label\C[0]:\C[2]value\C[0]]` plus its separator (a space, or a line break
 // after the target row).
+const QUEST_LABEL_COLOR_CODE = 16;
+const QUEST_VALUE_COLOR_CODE = 2;
+
 function appendQuestLabelRow(ctx, label, value, separator) {
-  ctx.effectText += `[${colorTaggedText(16, label)}:${colorTaggedText(2, `${value}`)}]${separator}`;
+  const labelText = colorTaggedText(QUEST_LABEL_COLOR_CODE, label);
+  const valueText = colorTaggedText(QUEST_VALUE_COLOR_CODE, value);
+  ctx.effectText += `[${labelText}:${valueText}]${separator}`;
 }
 
 // `<QuestSetMap>`: the switch that unlocks the quest, or `[常設]` for 0.
@@ -1964,11 +2234,13 @@ function describeQuestObjectiveTags(ctx) {
   for (const [questMetaKey, questLabel] of QUEST_OBJECTIVE_LABELS) {
     const questMeta = ctx.meta[questMetaKey];
     if (!questMeta || Number(questMeta.split(',')[0]) < 1) continue;
-    ctx.effectText += `[${colorTaggedText(ctx.colorCode, questLabel)}] `;
+    const questText = colorTaggedText(ctx.colorCode, questLabel);
+    ctx.effectText += `[${questText}] `;
   }
   if (ctx.meta['CoercionQuest']) {
-    const questForcedProgressText = `クエスト進行中に強制進行あり`;
-    ctx.effectText += `[${colorTaggedText(ctx.colorCode, questForcedProgressText)}] `;
+    const questForcedProgressLabel = `クエスト進行中に強制進行あり`;
+    const questForcedProgressText = colorTaggedText(ctx.colorCode, questForcedProgressLabel);
+    ctx.effectText += `[${questForcedProgressText}] `;
   }
 }
 
@@ -2005,8 +2277,9 @@ function appendSatietyRow(ctx) {
   ctx.effectValue = Number(stuff);
   const currentSatiety = $gameVariables.value(STUFF_SATIETY_VARIABLE_ID);
   const maxSatiety = $gameVariables.value(SATIETY_MAX_VARIABLE_ID);
-  const satietyText = `満腹度+${ctx.effectValue}（${currentSatiety}/${maxSatiety}）`;
-  ctx.effectText += `${colorTaggedText(ctx.colorCode, `[${satietyText}]`)} `;
+  const satietyLabel = `[満腹度+${ctx.effectValue}（${currentSatiety}/${maxSatiety}）]`;
+  const satietyText = colorTaggedText(ctx.colorCode, satietyLabel);
+  ctx.effectText += `${satietyText} `;
 }
 
 // `<ＴＰ>`: a TP gain. The tag is full-width in the database on purpose.
@@ -2015,13 +2288,17 @@ function appendQuestTpRow(ctx) {
   if (!tpValue) return;
 
   ctx.effectValue = Number(tpValue);
-  ctx.effectText += `${colorTaggedText(ctx.colorCode, `[${TP_LABEL}+${ctx.effectValue}]`)} `;
+  const tpGainLabel = `[${TP_LABEL}+${ctx.effectValue}]`;
+  const tpGainText = colorTaggedText(ctx.colorCode, tpGainLabel);
+  ctx.effectText += `${tpGainText} `;
 }
 
 // One `[label] ` row for a flag that is set.
 function appendQuestFlagRow(ctx, metaKey, label) {
   if (!ctx.meta[metaKey]) return;
-  ctx.effectText += `${colorTaggedText(ctx.colorCode, `[${label}]`)} `;
+  const flagLabel = `[${label}]`;
+  const flagText = colorTaggedText(ctx.colorCode, flagLabel);
+  ctx.effectText += `${flagText} `;
 }
 
 // `<AddPowerCustom>`: the extra weapon power.
@@ -2044,12 +2321,20 @@ function appendRaceDropRarityRow(ctx) {
 
 // `<ExpiryDate>`: food expires the same day, everything else is returned the next
 // day. (A `<Menu Category>` other than ` Food` shows neither, as before.)
+// `<ExpiryDate>`: food expires the same day, everything else is returned the next
+// day. (A `<Menu Category>` other than ` Food` shows neither, as before.)
+const SAME_DAY_EXPIRY_LABEL = `賞味期限当日中`;
+const NEXT_DAY_RETURN_LABEL = `翌日自動返却`;
+
 function describeExpiryDateTag(ctx) {
   if (!ctx.meta['ExpiryDate']) return;
+
   const menuCategory = ctx.meta['Menu Category'];
   if (menuCategory && menuCategory != ' Food') return;
-  const expiryLabel = menuCategory ? `賞味期限当日中` : `翌日自動返却`;
-  ctx.effectText += `${colorTaggedText(ctx.colorCode, `[${expiryLabel}]`)} `;
+  const expiryName = menuCategory ? SAME_DAY_EXPIRY_LABEL : NEXT_DAY_RETURN_LABEL;
+  const expiryLabel = `[${expiryName}]`;
+  const expiryText = colorTaggedText(ctx.colorCode, expiryLabel);
+  ctx.effectText += `${expiryText} `;
 }
 
 function describeRateTags(ctx) {
@@ -2072,14 +2357,16 @@ function describeFinalTags(ctx) {
 function appendLearnRequirementHeader(ctx) {
   if (!ctx.meta['Learn Require Eval']) return;
   const learnRequirementLabel = `習得条件あり`;
-  ctx.headerText += `[\\C[${ctx.colorCode}]${learnRequirementLabel}\\C[0]]`;
+  const learnRequirementText = colorTaggedText(ctx.colorCode, learnRequirementLabel);
+  ctx.headerText += `[${learnRequirementText}]`;
 }
 
 // `<SwicthOnOffUse>`: using the item toggles a switch.
 function appendSwitchToggleTag(ctx) {
   if (!ctx.meta['SwicthOnOffUse']) return;
   const toggleOnUseLabel = `使用でOn/Off`;
-  ctx.effectText += `[\\C[${ctx.colorCode}]${toggleOnUseLabel}\\C[0]]`;
+  const toggleOnUseText = colorTaggedText(ctx.colorCode, toggleOnUseLabel);
+  ctx.effectText += `[${toggleOnUseText}]`;
 }
 
 //↓ステート最後に付けるようにする。
@@ -2087,14 +2374,18 @@ function appendSwitchToggleTag(ctx) {
 function appendCategoryHelpText(ctx) {
   const categoryStateId = CATEGORY_HELP_STATE_IDS[ctx.meta['Category']];
   if (!categoryStateId) return;
-  ctx.suffixText += `\\C[${ctx.colorCode}]${$dataStates[categoryStateId].description}\\C[0] `;
+
+  const categoryHelpText = $dataStates[categoryStateId].description;
+  const categoryHelpLine = colorTaggedText(ctx.colorCode, categoryHelpText);
+  ctx.suffixText += `${categoryHelpLine} `;
 }
 
 // `<timeRemove>`: the state expires with time.
 function appendTimeRemovalTag(ctx) {
   if (!ctx.meta['timeRemove']) return;
   const timeReleaseLabel = `時間経過で解除`;
-  ctx.effectText += `[\\C[${ctx.colorCode}]${timeReleaseLabel}\\C[0]]`;
+  const timeReleaseText = colorTaggedText(ctx.colorCode, timeReleaseLabel);
+  ctx.effectText += `[${timeReleaseText}]`;
 }
 
 // State page only: `<registUp>` and the turn counter.
@@ -2110,8 +2401,9 @@ function appendResistOnApplyTag(ctx) {
   if (!registUp) return;
 
   ctx.effectValue = registUp;
-  const resistOnApplyText = `付与時に耐性率${ctx.effectValue}%up`;
-  ctx.effectText += `[\\C[${ctx.colorCode}]${resistOnApplyText}\\C[0]]`;
+  const resistOnApplyLabel = `付与時に耐性率${ctx.effectValue}%up`;
+  const resistOnApplyText = colorTaggedText(ctx.colorCode, resistOnApplyLabel);
+  ctx.effectText += `[${resistOnApplyText}]`;
 }
 
 // `\\I[75]:n` for a timed state; `∞` when none of the equipped passive skills,
@@ -2232,10 +2524,14 @@ function describeElementAttackTrait(ctx, trait, traitIndex) {
 
   const isSpecialAttackElement = SPECIAL_ATTACK_ELEMENT_IDS.indexOf(elementId) >= 0;
   const grantLabel = isSpecialAttackElement ? `特攻属性付与` : `攻撃属性付与`;
-  // The plain row re-applies the entry colour because the element label may end
-  // with a name code that moves the colour elsewhere.
-  const colorReset = isSpecialAttackElement ? `` : `\\C[${ctx.colorCode}]`;
-  ctx.effectText += `${colorTaggedText(ctx.colorCode, grantLabel)}${elementLabel(elementId)}${colorReset} `;
+  const grantText = colorTaggedText(ctx.colorCode, grantLabel);
+  const elementName = elementLabel(elementId);
+  // Kept exactly as the upload wrote it: the colour start here is not closed on
+  // purpose — it re-applies the entry colour after the element's name code so the
+  // rows that follow stay in it. A colorTaggedText wrap would close the colour
+  // again and change how the rest of the description renders.
+  const colorStartText = isSpecialAttackElement ? `` : `\\C[${ctx.colorCode}]`;
+  ctx.effectText += `${grantText}${elementName}${colorStartText} `;
 }
 
 // The two element groups read the sign from opposite ends of the same rate. The
@@ -2257,6 +2553,12 @@ function resistRateText(ctx, isNegative) {
 
 // 11: element resist. `amygame_elementIcon` allocates a fresh array on every
 // call, so the descriptor is read once here.
+const ELEMENT_RESIST_TENTH_SCALE_ID = 11;
+const ELEMENT_RESIST_FULL_SCALE = 100;
+const ELEMENT_RESIST_TENTH_SCALE = 10;
+const ENEMY_ONLY_ELEMENT_FIRST_ID = 41;
+const ENEMY_ONLY_ELEMENT_LAST_ID = 80;
+
 function describeElementResistTrait(ctx, trait, traitIndex) {
   const elementId = trait.dataId;
   if (!isElementId(elementId)) return;
@@ -2264,20 +2566,27 @@ function describeElementResistTrait(ctx, trait, traitIndex) {
   const elementIcon = amygame_elementIcon(elementId);
   if (elementIcon[0] >= 1) {
     // A handful of element ids carry a literal label instead of an icon.
-    ctx.fragText = `${elementIcon[1]}`;
+    const elementName = elementIcon[1];
+    ctx.fragText = `${elementName}`;
   } else {
-    // Element 11 is scaled by 10 rather than 100, so a "10% resist" is written
-    // as 1 in the database.
-    ctx.effectValue = Math.round(Math.abs(trait.value - 1) * (elementId == 11 ? 10 : 100));
-    ctx.fragText = `${elementResistIcon(elementIcon)}${elementResistPolarity(elementId, trait.value)}`;
+    // Element 11 is scaled by 10 rather than 100, so a "10% resist" is written as
+    // 1 in the database.
+    const resistScale = elementId == ELEMENT_RESIST_TENTH_SCALE_ID ? ELEMENT_RESIST_TENTH_SCALE : ELEMENT_RESIST_FULL_SCALE;
+    ctx.effectValue = Math.round(Math.abs(trait.value - 1) * resistScale);
+    const resistIcon = elementResistIcon(elementIcon);
+    const resistPolarity = elementResistPolarity(elementId, trait.value);
+    ctx.fragText = `${resistIcon}${resistPolarity}`;
   }
   // Element ids 35/37/38/41 are never listed, and 41-80 are enemy-only: the
   // latter are hidden altogether on a state page.
-  const isHiddenEnemyElement = ctx.meta['EnemyState'] && elementId >= 41 && elementId <= 80;
-  if (RESIST_EXCLUDED_ELEMENT_IDS.indexOf(elementId) >= 0 || isHiddenEnemyElement) return;
+  const isEnemyOnlyElement = elementId >= ENEMY_ONLY_ELEMENT_FIRST_ID && elementId <= ENEMY_ONLY_ELEMENT_LAST_ID;
+  if (RESIST_EXCLUDED_ELEMENT_IDS.indexOf(elementId) >= 0) return;
+  if (ctx.meta['EnemyState'] && isEnemyOnlyElement) return;
   ctx.effectText += `${ctx.fragText}${ctx.effectValue}% `;
 }
 
+// 12: debuff rate. A rate above 1 makes the debuff land more often, which is the
+// negative (red) direction — the same reading as the state resist row below.
 // 12: debuff rate. A rate above 1 makes the debuff land more often, which is the
 // negative (red) direction — the same reading as the state resist row below.
 function describeDebuffResistTrait(ctx, trait, traitIndex) {
@@ -2285,8 +2594,11 @@ function describeDebuffResistTrait(ctx, trait, traitIndex) {
   if (!isParamRateId(paramId)) return;
 
   const isNegative = trait.value >= 1;
-  ctx.effectValue = Math.round(Math.abs(trait.value - 1) * 100);
-  ctx.fragText = `${resistRateText(ctx, isNegative)}\x1bI[${paramId + DEBUFF_ICON_OFFSET}]`;
+  ctx.effectValue = Math.round(Math.abs(trait.value - 1) * RATE_PERCENT_SCALE);
+  const rateText = resistRateText(ctx, isNegative);
+  const paramIconId = paramId + DEBUFF_ICON_OFFSET;
+  const paramIcon = `\x1bI[${paramIconId}]`;
+  ctx.fragText = `${rateText}${paramIcon}`;
   ctx.effectText += `${ctx.fragText}${ctx.effectValue}% `;
 }
 
@@ -2298,109 +2610,154 @@ function describeStateResistTrait(ctx, trait, traitIndex) {
 
   const isNegative = trait.value >= 1;
   ctx.effectValue = Math.round(Math.abs(trait.value - 1) * 100);
-  ctx.effectText += `\\C[0]${resistRateText(ctx, isNegative)}${stateIconText(stateId)}${ctx.effectValue}% `;
+  const rateText = resistRateText(ctx, isNegative);
+  const stateIcon = stateIconText(stateId);
+  ctx.effectText += `${rateText}${stateIcon}${ctx.effectValue}% `;
 }
 
 // 14: `無効化` plus the state icon.
+const STATE_NULLIFY_LABEL = `無効化`;
+
 function describeStateNullifyTrait(ctx, trait, traitIndex) {
   const stateId = trait.dataId;
   if (!isStateId(stateId)) return;
-  const nullifyText = colorTaggedText(ctx.colorCode, `無効化`);
-  ctx.effectText += `${nullifyText}${stateIconText(stateId)} `;
+
+  const nullifyText = colorTaggedText(ctx.colorCode, STATE_NULLIFY_LABEL);
+  const stateIcon = stateIconText(stateId);
+  ctx.effectText += `${nullifyText}${stateIcon} `;
 }
 
 // 21: parameter rate. Rows are skipped once the summary above collapsed a full
 // five- or eight-stat run into a single line.
+const PARAM_UP_ICON_OFFSET = 32;
+const PARAM_DOWN_ICON_OFFSET = 48;
+
 function describeStatUpTrait(ctx, trait, traitIndex) {
   if (traitIndex <= ctx.statUpCount && ctx.statUpCount > STAT_UP_SINGLE_ROW_MAX_COUNT) return;
   if (!isParamRateId(trait.dataId)) return;
-  ctx.effectText += allStatUpText(trait.value,
-    `\x1bI[${trait.dataId + 32}]+`, `\x1bI[${trait.dataId + 48}]-`, false);
+
+  const upIconId = trait.dataId + PARAM_UP_ICON_OFFSET;
+  const downIconId = trait.dataId + PARAM_DOWN_ICON_OFFSET;
+  const upLabel = `\x1bI[${upIconId}]+`;
+  const downLabel = `\x1bI[${downIconId}]-`;
+  ctx.effectText += allStatUpText(trait.value, upLabel, downLabel, false);
 }
 
 // 22: xparam rate.
+const XPARAM_UP_THRESHOLD = 0.01;
+const RATE_PERCENT_SCALE = 100;
+
 function describeXparamTrait(ctx, trait, traitIndex) {
   if (!isParamIconId(trait.dataId)) return;
+
   const xparamIcons = XPARAM_ICONS[trait.dataId] || PARAM_ICON_DEFAULT;
-  const isUp = trait.value >= 0.01;
-  const percentText = `${Math.round(trait.value * 100)}%`;
-  ctx.effectText += isUp
-    ? `\x1bI[${xparamIcons[1]}]+${percentText} `
-    : `\x1bI[${xparamIcons[2]}]${percentText} `;
+  const isUp = trait.value >= XPARAM_UP_THRESHOLD;
+  const percentValue = Math.round(trait.value * RATE_PERCENT_SCALE);
+  const percentText = `${percentValue}%`;
+  const xparamIcon = isUp ? xparamIcons[1] : xparamIcons[2];
+  const signText = isUp ? `+` : ``;
+  ctx.effectText += `\x1bI[${xparamIcon}]${signText}${percentText} `;
 }
 
 // 23: sparam rate. Suppressed when the damage-cut summary above already covers
 // the entry.
+const DAMAGE_CUT_SUMMARY_COUNT_LIMIT = 1;
+
 function describeSparamTrait(ctx, trait, traitIndex) {
-  if (ctx.damageCutCount > 1) return;
+  if (ctx.damageCutCount > DAMAGE_CUT_SUMMARY_COUNT_LIMIT) return;
   if (!isParamIconId(trait.dataId)) return;
 
   const sparamIcons = SPARAM_ICONS[trait.dataId] || PARAM_ICON_DEFAULT;
   const negativeIsGood = SPARAM_ICONS_NEGATIVE_IS_GOOD.indexOf(trait.dataId) >= 0;
   const isUp = (trait.value >= 1) !== negativeIsGood;
-  const percentValue = Math.round(Math.abs(trait.value - 1) * 100);
-  ctx.effectText += `\x1bI[${isUp ? sparamIcons[1] : sparamIcons[2]}]${isUp ? `+` : `-`}${percentValue}% `;
+  const percentValue = Math.round(Math.abs(trait.value - 1) * RATE_PERCENT_SCALE);
+  const sparamIcon = isUp ? sparamIcons[1] : sparamIcons[2];
+  const signText = isUp ? `+` : `-`;
+  ctx.effectText += `\x1bI[${sparamIcon}]${signText}${percentValue}% `;
 }
 
 // 32: state add, i.e. the state icon plus the chance.
+const STATE_ADD_LABEL = `ステート付与`;
+
 function describeStateAddTrait(ctx, trait, traitIndex) {
   const stateId = trait.dataId;
   if (!isStateId(stateId)) return;
-  const grantText = colorTaggedText(ctx.colorCode, `ステート付与`);
-  ctx.effectText += `${grantText}${stateIconText(stateId)}${Math.round(trait.value * 100)}% `;
+
+  const grantText = colorTaggedText(ctx.colorCode, STATE_ADD_LABEL);
+  const stateIcon = stateIconText(stateId);
+  const chancePercent = Math.round(trait.value * RATE_PERCENT_SCALE);
+  ctx.effectText += `${grantText}${stateIcon}${chancePercent}% `;
 }
 
 // 33: attack speed, a flat value rather than a rate.
+const ATTACK_SPEED_LABEL = `AttackSpeed+`;
+
 function describeAttackSpeedTrait(ctx, trait, traitIndex) {
   if (trait.dataId != 0) return;
-  const speedText = colorTaggedText(ctx.colorCode, `AttackSpeed+`);
-  ctx.effectText += `${speedText}${Math.round(trait.value)} `;
+
+  const speedText = colorTaggedText(ctx.colorCode, ATTACK_SPEED_LABEL);
+  const speedValue = Math.round(trait.value);
+  ctx.effectText += `${speedText}${speedValue} `;
 }
 
 // `<label><name> ` — the shape shared by the skill-type, weapon-type, armor-type
 // and equip-type rows. `headText` is the already coloured label or an icon.
 function appendBracketedName(ctx, headText, name) {
-  ctx.effectText += `${headText}<${name}> `;
+  ctx.effectText += headText + `<${name}> `;
 }
 
 // 41: a skill type the entry can use.
+const SKILL_TYPE_UNLOCK_LABEL = `使用可能`;
+
 function describeSkillTypeUnlockTrait(ctx, trait, traitIndex) {
   if (!isSkillTypeId(trait.dataId)) return;
-  const unlockText = colorTaggedText(ctx.colorCode, `使用可能`);
+
+  const unlockText = colorTaggedText(ctx.colorCode, SKILL_TYPE_UNLOCK_LABEL);
   appendBracketedName(ctx, unlockText, $dataSystem.skillTypes[trait.dataId]);
 }
 
 // 42: a sealed skill type. Type 4 also seals types 5-8 (see
 // SEALED_SKILL_TYPE_GROUPS at the end of the file).
+const SEALED_ICON_TEXT = `\\I[626]`;
 function describeSkillTypeSealTrait(ctx, trait, traitIndex) {
   if (!isSkillTypeId(trait.dataId)) return;
-  appendBracketedName(ctx, `\\I[626]`, $dataSystem.skillTypes[trait.dataId]);
+  appendBracketedName(ctx, SEALED_ICON_TEXT, $dataSystem.skillTypes[trait.dataId]);
 }
 
 // 43: a usable skill. Weapons name the Burst skills by effect instead.
+const BURST_UNLOCK_LABEL = `Burst`;
+
 function describeSkillUnlockTrait(ctx, trait, traitIndex) {
   const skillId = trait.dataId;
   if (!isSkillId(skillId)) return;
+
   const isBurst = ctx.databaseTypeId == DESCRIPTION_DATABASE_WEAPON
     && $dataSkills[skillId].stypeId == BURST_SKILL_TYPE_ID;
-  const unlockLabel = isBurst ? `Burst` : `使用可能`;
-  appendBracketedName(ctx, colorTaggedText(ctx.colorCode, unlockLabel), `\x1bSIN[${skillId}]`);
+  const unlockLabel = isBurst ? BURST_UNLOCK_LABEL : SKILL_TYPE_UNLOCK_LABEL;
+  const unlockText = colorTaggedText(ctx.colorCode, unlockLabel);
+  const skillNameCode = `\x1bSIN[${skillId}]`;
+  appendBracketedName(ctx, unlockText, skillNameCode);
 }
 
 // 44: a sealed skill.
 function describeSkillSealTrait(ctx, trait, traitIndex) {
   const skillId = trait.dataId;
   if (!isSkillId(skillId)) return;
-  appendBracketedName(ctx, `\\I[626]`, `\x1bSIN[${skillId}]`);
+  const skillNameCode = `\x1bSIN[${skillId}]`;
+  appendBracketedName(ctx, SEALED_ICON_TEXT, skillNameCode);
 }
+
+const WEAPON_TYPE_LABEL = `武器種`;
 
 // 51: a weapon type the entry counts as. A full ten-weapon entry is already
 // summarised as `十種武器`, so the individual rows stop at the tenth.
 const TEN_WEAPON_ROW_LIMIT = 9;
+
 function describeWeaponTypeTrait(ctx, trait, traitIndex) {
   if (ctx.tenWeaponCount > TEN_WEAPON_ROW_LIMIT) return;
   if (!isWeaponTypeId(trait.dataId)) return;
-  const weaponTypeText = colorTaggedText(ctx.colorCode, `武器種`);
+
+  const weaponTypeText = colorTaggedText(ctx.colorCode, WEAPON_TYPE_LABEL);
   appendBracketedName(ctx, weaponTypeText, $dataSystem.weaponTypes[trait.dataId]);
 }
 
@@ -2425,10 +2782,15 @@ function describeEquipSealedTrait(ctx, trait, traitIndex) {
 }
 
 // 61: an extra action per turn.
+// 61: an extra action per turn.
+const EXTRA_ACTION_LABEL = `行動回数追加`;
+
 function describeActionCountTrait(ctx, trait, traitIndex) {
   if (trait.dataId != 0) return;
-  const actionCountText = colorTaggedText(ctx.colorCode, `行動回数追加`);
-  ctx.effectText += `${actionCountText}${Math.round(trait.value * 100)}% `;
+
+  const actionCountText = colorTaggedText(ctx.colorCode, EXTRA_ACTION_LABEL);
+  const extraActionPercent = Math.round(trait.value * RATE_PERCENT_SCALE);
+  ctx.effectText += `${actionCountText}${extraActionPercent}% `;
 }
 
 
@@ -2501,12 +2863,24 @@ function expandSealedSkillTypes(ctx) {
 // derive into. The 101-200 and 901-950 blocks were the same body with a
 // different header and output slot; 901-950 has no `<NormalAttackDerivedSuper>`
 // tag in this database, so handling it in the shared body is a no-op there.
+//通常攻撃の追加説明文にランク補正値と派生スキルの有無を表示valueAddDescriptionSkill = Array(101).fill(0);
+// Normal attacks get a rank-correction line and, optionally, the skills they
+// derive into. The 101-200 and 901-950 blocks were the same body with a
+// different header and output slot; 901-950 has no `<NormalAttackDerivedSuper>`
+// tag in this database, so handling it in the shared body is a no-op there.
+const DAMAGE_PER_LEVEL_SUFFIX = ` Damage Per Level`;
+
 attackSkillRankText = function (skill, headerText) {
   const masteryEffect = skill.meta['Mastery Effect'];
   const rankCorrectionLabel = `ランク補正`;
   const damagePerRankLabel = `ダメージ値にランク毎`;
+  // ` Damage Per Level` is the trailing unit of the database value; the request
+  // drops it and any remaining space.
+  const masteryEffectValue = masteryEffect
+    ? masteryEffect.replace(DAMAGE_PER_LEVEL_SUFFIX, '').replace(' ', '')
+    : ``;
   const rankCorrectionText = masteryEffect
-    ? `[${rankCorrectionLabel}:${damagePerRankLabel}${masteryEffect.replace(' Damage Per Level', '').replace(' ', '')}]`
+    ? `[${rankCorrectionLabel}:${damagePerRankLabel}${masteryEffectValue}]`
     : ``;
   let descriptionText = `${headerText}${rankCorrectionText}\n`;
   for (const derivedTag of NORMAL_ATTACK_DERIVED_TAGS) {
@@ -2521,16 +2895,21 @@ attackSkillRankText = function (skill, headerText) {
 // the skill a normal attack turns into, and the rank it needs.
 const NORMAL_ATTACK_DERIVED_TAGS = [`NormalAttackDerived`, `NormalAttackDerivedSuper`];
 
+const DERIVED_SKILL_COLOR_CODE = 2;
+
 function normalAttackDerivedText(derivedTag, derivedMeta) {
   const metaValues = derivedMeta.split(',');
-  const derivedSkillName = $dataSkills[Number(metaValues[1])].name;
-  const derivedRankLabel = `ランク${metaValues[0]}で`;
-  const derivedRankConditionLabel = `ランク${metaValues[0]}と特殊条件を満たす事で`;
+  const derivedSkillId = Number(metaValues[1]);
+  const derivedSkillName = $dataSkills[derivedSkillId].name;
+  const derivedRank = metaValues[0];
+  const derivedRankLabel = `ランク${derivedRank}で`;
+  const derivedRankConditionLabel = `ランク${derivedRank}と特殊条件を満たす事で`;
   const derivedSkillSuffix = `が派生発生`;
   const conditionLabel = derivedTag == NORMAL_ATTACK_DERIVED_TAGS[0]
     ? derivedRankLabel
     : derivedRankConditionLabel;
-  return `[${conditionLabel}\\C[2]${derivedSkillName}\\C[0]${derivedSkillSuffix}]`;
+  const derivedSkillText = colorTaggedText(DERIVED_SKILL_COLOR_CODE, derivedSkillName);
+  return `[${conditionLabel}${derivedSkillText}${derivedSkillSuffix}]`;
 }
 // `valueAddDescriptionSkill[id - offset]`: 101-200 are the plain normal attacks
 // and 901-950 the same rows with a required-mastery header, so one helper covers
@@ -2540,8 +2919,11 @@ attack_addKaisetu1 = function () {
   fillAttackDescriptions(901, 950, 800, requiredMasteryHeader);
 };
 
+const REQUIRED_MASTERY_LABEL = `必要熟練度`;
+
 function requiredMasteryHeader(skill) {
-  return `[必要熟練度:基礎値${Number(skill.meta.RankUpPoint)}にランク×基礎値をプラス]`;
+  const baseRankUpPoint = Number(skill.meta.RankUpPoint);
+  return `[${REQUIRED_MASTERY_LABEL}:基礎値${baseRankUpPoint}にランク×基礎値をプラス]`;
 }
 
 function fillAttackDescriptions(firstSkillId, lastSkillId, idOffset, headerFor) {
@@ -2552,12 +2934,17 @@ function fillAttackDescriptions(firstSkillId, lastSkillId, idOffset, headerFor) 
   }
 }
 
+const RECOVERY_EFFECT_MSG_COLOR_CODE = 3;
+
 recoveryEffectMsg = function (ind1, ind2) {
   const recoveryEffectName = `回復`;
   const icon1 = `\\I[${ind1}]`;
   const icon2 = `\\I[${ind2}]`;
   const extraEffectMsg = `対象の${icon2}も影響`;
-  return `[\\C[3]${recoveryEffectName}:${icon1}100%(${extraEffectMsg})\\C[0]`;
+  const recoveryLabel = `${recoveryEffectName}:${icon1}100%(${extraEffectMsg})`;
+  // The row's closing bracket is the caller's.
+  const recoveryText = colorTaggedText(RECOVERY_EFFECT_MSG_COLOR_CODE, recoveryLabel);
+  return `[${recoveryText}`;
 }
 
 //ジョブの追加説明文valueAddDescriptionClass
@@ -2565,6 +2952,16 @@ recoveryEffectMsg = function (ind1, ind2) {
 // `valueClassGrowStatasComparison` the side-by-side list. The name-padding
 // ladder, the seventeen-branch growth-stat lookup and the twice-pasted
 // eight-stat expression are all data or one helper now.
+//ジョブの追加説明文valueAddDescriptionClass
+// Job description: `valueAddDescriptionClass` feeds the class screen and
+// `valueClassGrowStatasComparison` the side-by-side list. The name-padding
+// ladder, the seventeen-branch growth-stat lookup and the twice-pasted
+// eight-stat expression are all data or one helper now.
+const CLASS_PRIMARY_COLOR_CODE = 1;
+const CLASS_SECONDARY_COLOR_CODE = 5;
+const CLASS_SKILL_COLOR_CODE = 2;
+const CLASS_LEARNING_COUNT = 10;
+
 class_addKaisetu1 = function () {
   for (let classId = 1; classId < $dataClasses.length; classId++) {
     const classData = $dataClasses[classId];
@@ -2578,24 +2975,31 @@ class_addKaisetu1 = function () {
     const classRankVal = rawRank == 0 ? 1 : rawRank;
     const primaryClassLabel = `メイン`;
     const secondaryClassLabel = `サブ`;
-    let descriptionText = classMeta['Primary Only'] ? `[\\C[1]${primaryClassLabel}\\C[0]]` : `[\\C[5]${secondaryClassLabel}\\C[0]]`;
+    const classScopeText = classMeta['Primary Only']
+      ? colorTaggedText(CLASS_PRIMARY_COLOR_CODE, primaryClassLabel)
+      : colorTaggedText(CLASS_SECONDARY_COLOR_CODE, secondaryClassLabel);
+    let descriptionText = `[${classScopeText}]`;
     descriptionText += `[Class${CLASS_RANK_NUMERALS[classRankVal]}]`;
     const growthStatRow = growthStatText(growthStats, classRankVal);
     descriptionText += `[GrowStatas:${growthStatRow}]\n`;
     comparisonText += `:${growthStatRow}]`;
     // Read once: the original called $gameVariables.value(6) for every slot.
     const requiredPrimaryLevel = classMeta['Primary Only'] ? $gameVariables.value(6) : 0;
-    for (let learningIndex = 0; learningIndex <= 10; learningIndex++) {
+    for (let learningIndex = 0; learningIndex <= CLASS_LEARNING_COUNT; learningIndex++) {
       const learning = classData.learnings[learningIndex];
       if (!learning) { continue; }
       // Main classes only list the skills the current playthrough has reached.
       if (classMeta['Primary Only'] && learning.level < requiredPrimaryLevel) { continue; }
       const levelLabel = `Lv`;
-      descriptionText += `[${levelLabel}${learning.level}:\\C[2]\x1bSIN[${learning.skillId}]\\C[0]]`;
+      const learningLevel = learning.level;
+      const learningSkillCode = `\x1bSIN[${learning.skillId}]`;
+      const learningSkillText = colorTaggedText(CLASS_SKILL_COLOR_CODE, learningSkillCode);
+      descriptionText += `[${levelLabel}${learningLevel}:${learningSkillText}]`;
     }
     valueAddDescriptionClass[classId] = descriptionText;
     valueClassGrowStatasComparison[classId] = comparisonText;
   }
 };
+
 
 //}());
