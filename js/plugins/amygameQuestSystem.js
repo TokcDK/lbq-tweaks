@@ -76,6 +76,11 @@ var QuestSystem = (function() {
   var QUEST_ARRAY_TYPE_WEAPON = 2;
   var QUEST_ARRAY_TYPE_ARMOR = 3;
 
+  // ---- rank reward text (kept identical to the pre-refactor strings) ----
+  var REWARD_COIN_ITEM_ID = 10;                 // 戦貨アイテムID
+  var RANK_REWARD_HEADER = '\\C[16]●規定ランク報酬\\C[0]\n';
+  var EXTRA_REWARD_HEADER = '\n\\C[16]●追加報酬\\C[0]\n';
+
   // ---- text fragments -----------------------------------------
   var NO_START_CONDITION_SUFFIX = '【なし】\n';
   var QUEST_SUPPLEMENT_META_KEY = 'QuestSupplement';
@@ -456,7 +461,7 @@ var QuestSystem = (function() {
 
     var condText = '';
     if (stateId !== DEFAULT_VALUES.STATE_ID) {
-      condText = '【' + buildActorPrefix(actorId, actor) + '\\x1bSIM[' + stateId + ']';
+      condText = '【' + buildActorPrefix(actorId, actor) + '\x1bSIM[' + stateId + ']';
     }
 
     appendConditionLine(ctx, SCOPE_START, condText, actor.isStateAffected(stateId),
@@ -507,7 +512,7 @@ var QuestSystem = (function() {
       return '【' + SUBJUGATION_TOTAL_LABEL + ':' + currentCount + '/' + targetCount;
     }
     if (subjugationId >= 3) {
-      return '【\\x1bSIM[' + subjugationId + ']' + colorTaggedText(10, targetCount) + SUBJUGATION_BODY_SUFFIX;
+      return '【\x1bSIM[' + subjugationId + ']' + colorTaggedText(10, targetCount) + SUBJUGATION_BODY_SUFFIX;
     }
     return '';
   }
@@ -525,7 +530,7 @@ var QuestSystem = (function() {
       var targetItem = $dataItems[itemId];
       if (!targetItem) continue;
 
-      var condText = getItemCategoryMarker(targetItem) + '\\x1bIIN[' + itemId + ']';
+      var condText = getItemCategoryMarker(targetItem) + '\x1bIIN[' + itemId + ']';
       appendConditionLine(ctx, SCOPE_START, condText, $gameParty.hasItem(targetItem, true),
         MARKERS.SUCCESS, MARKERS.FAILURE, '】\n');
     }
@@ -634,7 +639,7 @@ var QuestSystem = (function() {
       //3〜5は本文なし(従来通り件数だけ数える)
       return '';
     }
-    return '【' + colorTaggedText(2, '\\x1bSIM[' + subjugationId + ']') +
+    return '【' + colorTaggedText(2, '\x1bSIM[' + subjugationId + ']') +
       ':' + currentCount + '/' + targetCount;
   }
 
@@ -792,7 +797,7 @@ var QuestSystem = (function() {
       if (!actor) return;
 
       var condText = '【' + buildActorPrefix(actorId, actor) +
-        colorTaggedText(2, '\\x1bSIM[' + stateId + ']') + ':';
+        colorTaggedText(2, '\x1bSIM[' + stateId + ']') + ':';
       appendConditionLine(ctx, SCOPE_COMPLETION, condText, actor.isStateAffected(stateId),
         MARKERS.GRANTED, MARKERS.NOT_GRANTED, '】\n');
     });
@@ -879,8 +884,21 @@ var QuestSystem = (function() {
     runConditionHandlers(completionConditionHandlers, questItem, ctx);
 
     var questSlotIndex = itemIndex - offset;
-    valueQuestArray7[questSlotIndex] = finalizeStartConditionText(ctx);
-    valueQuestArray4[questSlotIndex] = buildQuestDescriptionText(questItem);
+    var startText = finalizeStartConditionText(ctx);
+    var completionText = finalizeCompletionConditionText(ctx);
+    var rankReward = buildRankRewardText(itemIndex);
+
+    // 掲示板/図鑑/達成報告が参照する配列は従来通り全て書き換える
+    valueQuestArray7[questSlotIndex] = startText;
+    valueQuestArray2[questSlotIndex] = completionText;
+    valueQuestArray4[questSlotIndex] =
+      buildQuestDescriptionText(questItem) + rankReward.colored + '\n' +
+      startText + completionText;
+    valueQuestArray3[questSlotIndex] =
+      '\\FS[22]' + rankReward.plain + '\n' + startText + completionText;
+    // 発生条件/達成条件が全て満たされているか(1=満たす, 0=未達)
+    valueQuestArray5[questSlotIndex] = ctx.startTotal === ctx.startMet ? 1 : 0;
+    valueQuestArray6[questSlotIndex] = ctx.completionTotal === ctx.completionMet ? 1 : 0;
   }
 
   // ハンドラ登録簿を順に実行する
@@ -891,14 +909,48 @@ var QuestSystem = (function() {
   }
 
   function finalizeStartConditionText(ctx) {
-    if (ctx.completionText === ctx.completionTextInitial) {
-      ctx.completionText = HEADERS.NO_COMPLETION;
-    }
-
     if (ctx.startText === ctx.startTextInitial) {
       return ctx.startText + NO_START_CONDITION_SUFFIX;
     }
     return ctx.startText;
+  }
+
+  // 達成条件が1件も無い場合のみ「達成条件なし」へ置き換える
+  function finalizeCompletionConditionText(ctx) {
+    if (ctx.completionText === ctx.completionTextInitial) {
+      return HEADERS.NO_COMPLETION;
+    }
+    return ctx.completionText;
+  }
+
+  // 規定ランク報酬/追加報酬のグローバル値を最新化する。
+  // quest_housyuukeisan()はamygameQuest.js側の公開関数なので、
+  // 未読み込み時は従来と同じ空の追加報酬見出しで初期化する。
+  function refreshQuestRewardValues(itemIndex) {
+    if (typeof quest_housyuukeisan === 'function') quest_housyuukeisan(itemIndex);
+  }
+
+  // valueCountSet1..3 はamygameSettei.jsが初期化するゲーム共通変数
+  function readQuestRewardValues() {
+    return {
+      gold: typeof valueCountSet1 === 'number' ? valueCountSet1 : 0,
+      coin: typeof valueCountSet2 === 'number' ? valueCountSet2 : 0,
+      extra: typeof valueCountSet3 === 'string' ? valueCountSet3 : EXTRA_REWARD_HEADER
+    };
+  }
+
+  // 一覧用(色付き)と達成報告用(色なし)の規定ランク報酬テキストを作る
+  function buildRankRewardText(itemIndex) {
+    refreshQuestRewardValues(itemIndex);
+    var values = readQuestRewardValues();
+    var coinItem = $dataItems[REWARD_COIN_ITEM_ID];
+    var coinName = coinItem ? coinItem.name : '';
+    return {
+      plain: RANK_REWARD_HEADER + '[' + values.gold + '\\G][' +
+        values.coin + coinName + ']' + values.extra,
+      colored: RANK_REWARD_HEADER + '[\\C[2]' + values.gold + '\\C[0]\\G][' +
+        '\\C[2]' + values.coin + '\\C[0]' + coinName + ']' + values.extra
+    };
   }
 
   // クエスト解説(説明 + 補足)
