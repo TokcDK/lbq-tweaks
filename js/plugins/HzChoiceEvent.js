@@ -207,6 +207,9 @@ function HzChoiceEvent(){}
         this._forceCancel = false;
         if(this._choiceEvents.length == 0) {
             this._forceCancel = true;
+            //変更 選択先が無い場合はキャンセルと同じく結果変数を0にする
+            // （CE199 等は結果変数==0 を「選択なし」として判定する）
+            if(this._resultVarNo > 0) $gameVariables.setValue(this._resultVarNo, 0);
             return;
         }
 
