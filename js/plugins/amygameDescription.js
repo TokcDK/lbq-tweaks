@@ -1803,8 +1803,13 @@ function describeElementResistTrait(ctx, trait, traitIndex) {
         // Element 11 is scaled by 10 rather than 100, so a "10% resist" is
         // written as 1 in the database.
         ctx.effectValue = Math.round(Math.abs(traitValue - 1) * (traitDataId == 11 ? 10 : 100));
+        // The two element groups read the sign from opposite ends of the same rate.
+        // The resist-special ids are mechanic rates (Burst!, 連撃率, 回復率, Chain,
+        // Ability, 汎用, 背水, 渾身, 状態異常数), so a rate above 1 is a plain `+`.
+        // For the damage elements a rate above 1 is a weakness, i.e. `耐性-`.
         const pm = traitValue >= 1 ? `+` : `-`;
-        const pmName = RESIST_RATE_TEXT + pm;
+        const resistPm = traitValue >= 1 ? `-` : `+`;
+        const pmName = RESIST_RATE_TEXT + resistPm;
         const pmMsg = RESIST_SPECIAL_ELEMENT_IDS.indexOf(traitDataId) >= 0 ? pm : pmName;
         ctx.fragText = `${elementResistIcon(elementIcon)}${pmMsg}`;
       };
@@ -1823,10 +1828,13 @@ function describeDebuffResistTrait(ctx, trait, traitIndex) {
   const traitValue = trait.value;
   if (trait.code == 12) {
     if (traitDataId >= 0 && traitDataId <= 7) {
-
+      // Debuff rate: a rate above 1 means the debuff lands more often, which is
+      // the negative (red) direction — the same reading as describeStateResistTrait.
       const isMinus = traitValue >= 1;
       ctx.effectValue = Math.round((isMinus ? (traitValue - 1) : (1 - traitValue)) * 100);
-      const pmName = colorTaggedText(1, RESIST_RATE_TEXT + isMinus ? "-" : "+");
+      const resistColor = isMinus ? 1 : ctx.colorCode;
+      const pm = isMinus ? `-` : `+`;
+      const pmName = colorTaggedText(resistColor, RESIST_RATE_TEXT + pm);
       ctx.fragText = `${pmName}\x1bI[${traitDataId + 48}]`;
       ctx.effectText += `${ctx.fragText}${ctx.effectValue}% `;
     };
