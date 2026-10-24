@@ -58,7 +58,7 @@ const PARAM_ICON_DEFAULT = [16, 16, 16];
 const SPARAM_ICONS_NEGATIVE_IS_GOOD = [6, 7];
 
 // `<additionalSetN>` target index 1-4 -> the "to whom" prefix label.
-const ADDITIONAL_SET_TARGET_LABELS = [``, `使用者に`, `味方全体に`, `対象敵に`, `敵全体に`];//翻訳対象
+const ADDITIONAL_SET_TARGET_LABELS = [``, `使用者に`, `味方全体に`, `対象敵に`, `敵全体に`];
 
 // `<Skill Tier N Slots>` -> the label shown for slot N.
 const SKILL_TIER_SLOT_LABELS = [``, `Ability装着数`, `Main装着数`, `Job装着数`,
@@ -144,7 +144,7 @@ const BURST_SKILL_TYPE_ID = 12;
 // ---------------------------------------------------------------------------
 // Translatable labels
 //
-// A `//翻訳対象` marker means the literal's *value* is human-readable text that
+// A `` marker means the literal's *value* is human-readable text that
 // has to reach a translator. Everything around it — `\C[n]`, `\I[n]`, the
 // `\x1b*` name codes, wrapper brackets, and pure-ASCII tokens such as `Rank:`,
 // `TP`, `%` — stays in the template literal. The string a translator edits then
@@ -154,18 +154,18 @@ const BURST_SKILL_TYPE_ID = 12;
 // Only labels shared by more than one site live here; a label used once is a
 // local `const` immediately above the statement that consumes it.
 // ---------------------------------------------------------------------------
-const CONDITION_LABEL = `条件`;//翻訳対象
-const POWER_LABEL = `威力`;//翻訳対象
-const DRAIN_LABEL = `与Dの`;//翻訳対象
-const ABSORB_LABEL = `吸収回復`;//翻訳対象
-const OR_MORE_SUFFIX = `以上`;//翻訳対象
-const TIMES_SUFFIX = `倍`;//翻訳対象
-const SUITABLE_LV_LABEL = `適正Lv`;//翻訳対象
-const TP_LABEL = `TP`;//翻訳対象
-const RANK_LABEL = `Rank`;//翻訳対象
+const CONDITION_LABEL = `条件`;
+const POWER_LABEL = `威力`;
+const DRAIN_LABEL = `与Dの`;
+const ABSORB_LABEL = `吸収回復`;
+const OR_MORE_SUFFIX = `以上`;
+const TIMES_SUFFIX = `倍`;
+const SUITABLE_LV_LABEL = `適正Lv`;
+const TP_LABEL = `TP`;
+const RANK_LABEL = `Rank`;
 // Entry 18 of the damage-formula table is the only entry carrying text; the
 // `GunDamage` tag further down the item section reuses the same word.
-const FIXED_VALUE_TEXT = `固定値`;//翻訳対象
+const FIXED_VALUE_TEXT = `固定値`;
 
 // `DamageFormula2` first field -> the blurb shown for it. Every entry is the
 // body of `[\C[${colorCode}]…\C[0]`. Ids 8, 9 and 10 are built from the
@@ -294,7 +294,7 @@ statEffectName = function (metaValues) {
     case 1: return FTKR.CSS.cssStatus.xparam[statIndex];
     case 2: return FTKR.CSS.cssStatus.sparam[statIndex];
     case 3:
-      const specialAttackLabel = `特攻`;//翻訳対象
+      const specialAttackLabel = `特攻`;
       return `${$dataSystem.elements[statIndex]}`
         + (ATTACK_AMPLIFY_ELEMENT_IDS.indexOf(statIndex) >= 0 ? specialAttackLabel : ``) + POWER_LABEL;
     default: return undefined;
@@ -542,8 +542,8 @@ function describeTraitList(ctx) {
 
 function describeEntryHeader(ctx) {
   if (ctx.databaseTypeId == 1 || ctx.databaseTypeId == 2) {
-    const categoryLabel = `分類`;//翻訳対象
-    const typeLabel = `種別`;//翻訳対象
+    const categoryLabel = `分類`;
+    const typeLabel = `種別`;
     ctx.headerText = `[\\C[${ctx.colorCode}]${categoryLabel}\\C[0]:${$dataSystem.equipTypes[ctx.item.etypeId]}]`;
     if (ctx.databaseTypeId == 1 && ctx.item.wtypeId >= 1) {
       var weaponTypeName = $dataSystem.weaponTypes[ctx.item.wtypeId];
@@ -629,12 +629,12 @@ function describeLearnPremises(ctx) {
       const premiseVariable = ctx.meta['PremiseVariable' + premiseIndex];
       const premiseArrangement = ctx.meta['PremiseArrangement' + premiseIndex];
       if (premiseSkill) {
-        const learnSuffix = `習得`;//翻訳対象
+        const learnSuffix = `習得`;
         premiseTexts.push(`\\C[27]<${$dataSkills[Number(premiseSkill)].name}>\\C[0]${learnSuffix}`);
       };
       if (premiseSkillRank) {
         const rankValues = splitMetaValues(premiseSkillRank);
-        const reachSuffix = `到達`;//翻訳対象
+        const reachSuffix = `到達`;
         premiseTexts.push(`\\C[27]<${$dataSkills[Number(rankValues[0])].name}>\\C[0]${RANK_LABEL}:\\C[27]${Number(rankValues[1])}\\C[0]${reachSuffix}`);
       };
       if (premiseVariable) {
@@ -650,7 +650,7 @@ function describeLearnPremises(ctx) {
         premiseTexts.push(`\\C[27]${valueHentaiArrangement[Number(arrangementValues[0])]}\\C[0]:\\C[27]${Number(arrangementValues[1])}\\C[0]${OR_MORE_SUFFIX}`);
       };
     };
-    const noneLabel = `なし`;//翻訳対象
+    const noneLabel = `なし`;
     var coloredNoneLabel = `\\C[27]${noneLabel}\\C[0]`;
     var premiseTextMerged = premiseTexts.join(``);
     ctx.effectText += `[${CONDITION_LABEL}:${premiseTexts.length ? premiseTextMerged : coloredNoneLabel}]`;
@@ -698,13 +698,13 @@ function describeSkillHeaderTags(ctx) {
   // `<Mastery Effect>` have no description text (the original had an empty block
   // with two commented-out lines here).
   if (ctx.meta['Select Conditions']) {
-    const frontGuardOnlyText = `対象前衛のみ`;//翻訳対象
+    const frontGuardOnlyText = `対象前衛のみ`;
     ctx.headerText += `[${colorTaggedText(ctx.colorCode, frontGuardOnlyText)}] `;
   }
   appendSkillLearningClassTag(ctx);
   appendLimitUsesTag(ctx);
   if (ctx.databaseTypeId == DESCRIPTION_DATABASE_ITEM && ctx.meta['SeiyokuItem']) {
-    const lustItemText = `性欲品`;//翻訳対象
+    const lustItemText = `性欲品`;
     ctx.effectText += `[${colorTaggedText(LUST_COLOR_CODE, lustItemText)}] `;
   }
 }
@@ -744,7 +744,7 @@ function appendTurnActionBadge(ctx) {
   if (ctx.databaseTypeId != DESCRIPTION_DATABASE_SKILL) return;
   if (TURN_ACTION_SKILL_TYPE_IDS.indexOf(ctx.item.stypeId) < 0) return;
   if (ctx.meta['Instant']) return;
-  const turnActionText = `ターン行動`;//翻訳対象
+  const turnActionText = `ターン行動`;
   ctx.headerText += `${colorTaggedText(TURN_ACTION_COLOR_CODE, `<${turnActionText}>`)} `;
 }
 
@@ -756,7 +756,7 @@ function appendMultipleElements(ctx) {
   for (const elementId of elementIds) {
     ctx.skillElementText += colorTaggedText(ctx.colorCode, elementLabel(elementId));
   }
-  const elementListLabel = `属性:`;//翻訳対象
+  const elementListLabel = `属性:`;
   ctx.headerText += `[${elementListLabel}${ctx.skillElementText}] `;
 }
 
@@ -768,7 +768,7 @@ function appendSkillLearningClassTag(ctx) {
   ctx.fragText = Number(ctx.meta['SkillLearningClass']);
   if (ctx.fragText == 100) return;
   const learnNameCode = `\x1bJ[${ctx.fragText}]`;//名前コード。翻訳対象外
-  const learnText = `習得`;//翻訳対象
+  const learnText = `習得`;
   ctx.effectText += `[${colorTaggedText(ctx.colorCode, ctx.effectValue)}] [${colorTaggedText(ctx.colorCode, learnNameCode)}${learnText}] `;
 }
 
@@ -777,8 +777,8 @@ function appendLimitUsesTag(ctx) {
   if (!ctx.meta['Limit Uses']) return;
   ctx.fragText = Number(ctx.meta['Limit Uses']);
   const usesText = ctx.meta['Not Recover All Uses'] // <After Battle Uses Recover: 0> もセット
-    ? `1日${ctx.fragText}回`//翻訳対象
-    : `戦闘中${ctx.fragText}回`;//翻訳対象
+    ? `1日${ctx.fragText}回`
+    : `戦闘中${ctx.fragText}回`;
   ctx.headerText += `[${colorTaggedText(ctx.colorCode, usesText)}] `;
 }
 
@@ -840,7 +840,7 @@ function describePotionRecoveryTag(ctx) {
   // Anything below 2 means "all of it".
   const usePoint = Number(ctx.meta['PotionUsePoint']);
   ctx.effectValue = usePoint >= 2 ? usePoint : `全`;
-  const recoveryText = `回復`;//翻訳対象
+  const recoveryText = `回復`;
   // No colorTaggedText here: the colour of the resource name has to run into the
   // `\\C[3]` amount, so the two codes are not a complete wrap.
   ctx.effectText += `[\\C[${ctx.colorCode}]${ctx.fragText}\\C[3]${ctx.effectValue}\\C[0]${recoveryText}]`;
@@ -850,7 +850,7 @@ function describeSkillRowTags(ctx) {
   if (ctx.meta['SkillStateAddRemove']) {
     ctx.fragText = Number(ctx.meta['SkillStateAddRemove']);
     const stateNameCode = `\x1bSIM[${ctx.fragText}]`;//ステート名コード。翻訳対象外
-    const grantRemoveText = `付与/解除`;//翻訳対象
+    const grantRemoveText = `付与/解除`;
     ctx.effectText += `[\\C[${ctx.colorCode}]${stateNameCode}\\C[0]${grantRemoveText}]`;//
   };
   if (ctx.meta['PotionResist']) {
@@ -859,7 +859,7 @@ function describeSkillRowTags(ctx) {
   };
   if (ctx.item.speed != 0) {
     ctx.fragText = ctx.item.speed;
-    const speedLabel = `Speed`;//翻訳対象
+    const speedLabel = `Speed`;
     ctx.effectText += `\\C[${ctx.colorCode}]${speedLabel}\\C[0]:${ctx.fragText} `;
   };
   if (ctx.meta['Repeat']) {
@@ -925,7 +925,7 @@ function describeAdditionalSets(ctx) {
   // below prints an empty "付与" for it — that is the original behaviour.
   for (let targetIndex = 1; targetIndex <= 4; targetIndex++) {
     if (ctx.additionalSetCountByTarget[targetIndex] >= 1) {
-      const additionalSetGrantText = `付与`;//翻訳対象
+      const additionalSetGrantText = `付与`;
       ctx.effectText += `${ctx.additionalSetTextByTarget[targetIndex]}${additionalSetGrantText}\\C[0]] `;
     };
   };
@@ -986,7 +986,7 @@ function describeStateRemoveEffect(ctx, effect) {
   const state = effectState(effect.dataId);
   if (!state) return;
   const removePercent = Math.round(effect.value1 * 100);
-  const removalLabel = `解除`;//翻訳対象
+  const removalLabel = `解除`;
   const removalChanceText = removePercent == 100 ? `` : `${removePercent}%`;
   ctx.effectText += `[\\C[3]${removalLabel}:\\C[0]${effectStateLabel(state)}${removalChanceText}]`;
 }
@@ -1008,7 +1008,7 @@ function describeStateAddEffect(ctx, effect) {
   const isBattleState = effect.dataId >= BATTLE_STATE_ID_RANGE.first && effect.dataId <= BATTLE_STATE_ID_RANGE.last;
   const turnText = !isBattleState && state.autoRemovalTiming >= 1 ? stateTurnText(state) : ``;
   const grantPercent = Math.round(effect.value1 * 100);
-  const grantLabel = `付与`;//翻訳対象
+  const grantLabel = `付与`;
   const grantChanceText = grantPercent == 100 ? `` : `${grantPercent}%`;
   ctx.effectText += `[\\C[${ctx.colorCode}]${grantLabel}:\\C[0]${stateIconText(effect.dataId)}${grantChanceText}${turnText}]`;
 }
@@ -1022,15 +1022,15 @@ function stateTurnText(state) {
 function describeClearCountTags(ctx) {
   if (ctx.meta['dispelCount']) {
     ctx.fragText = Number(ctx.meta['dispelCount']);
-    const dispelStateText = `強化状態`;//翻訳対象
-    const dispelCountSuffix = `つ`;//翻訳対象
-    const dispelActionText = `消去`;//翻訳対象
+    const dispelStateText = `強化状態`;
+    const dispelCountSuffix = `つ`;
+    const dispelActionText = `消去`;
     ctx.effectText += `[\\C[${ctx.colorCode}]${dispelStateText}\\C[3]${ctx.fragText}${dispelCountSuffix}\\C[${ctx.colorCode}]${dispelActionText}\\C[0]]`;
   };
   if (ctx.meta['abNomalClearCount']) {
     ctx.fragText = Number(ctx.meta['abNomalClearCount']);
-    const clearCountSuffix = `つ`;//翻訳対象
-    const clearRecoverText = `回復`;//翻訳対象
+    const clearCountSuffix = `つ`;
+    const clearRecoverText = `回復`;
     if (ctx.meta['StateabNomalOnly']) {
       ctx.effectText += `[\\C[${ctx.colorCode}]\\I[683]\\C[3]${ctx.fragText}${clearCountSuffix}\\C[${ctx.colorCode}]${clearRecoverText}\\C[0]]`;
     } else {
@@ -1038,11 +1038,11 @@ function describeClearCountTags(ctx) {
     };
   };
   if (ctx.meta['abNomalClearCountPlus']) {
-    const ailmentRecoveryText = `状態異常回復数+(Magic/300)`;//翻訳対象
+    const ailmentRecoveryText = `状態異常回復数+(Magic/300)`;
     ctx.effectText += `[\\C[${ctx.colorCode}]${ailmentRecoveryText}\\C[0]]`;
   };
   if (ctx.meta['dispelCountPlus']) {
-    const buffRemovalText = `強化解除数+(Magic/300)`;//翻訳対象
+    const buffRemovalText = `強化解除数+(Magic/300)`;
     ctx.effectText += `[\\C[${ctx.colorCode}]${buffRemovalText}\\C[0]]`;
   };
 }
@@ -1050,10 +1050,10 @@ function describeClearCountTags(ctx) {
 function describePassiveTags(ctx) {
   if (ctx.meta['Passive State'] && !ctx.meta['パッシブ隠蔽']) {
     if ($dataStates[Number(ctx.meta['Passive State'])] && $dataStates[Number(ctx.meta['Passive State'])].meta['SpcialState']) {
-      const specialEffectGrantText = `特殊効果付与`;//翻訳対象
+      const specialEffectGrantText = `特殊効果付与`;
       ctx.effectText += `\\C[${ctx.colorCode}]${specialEffectGrantText}\\C[0]<\x1bSIM[${Number(ctx.meta['Passive State'])}]> `;
     } else {
-      const passiveGrantText = `付与`;//翻訳対象
+      const passiveGrantText = `付与`;
       ctx.effectText += `\\C[${ctx.colorCode}]${passiveGrantText}\\C[0]<\x1bSIM[${Number(ctx.meta['Passive State'])}]> `;
     };
   };//パッシブステート
@@ -1069,18 +1069,18 @@ function describePassiveTags(ctx) {
 
 // `<…>` battle rows that read `\\C[16][label]\C[0] ` (optionally label + value).
 const BATTLE_NOTE_ROWS = [
-  { metaKey: 'CertainlyDouble', label: `必ず2連撃以上` },//翻訳対象
-  { metaKey: 'CertainlyTriple', label: `必ず3連撃` },//翻訳対象
-  { metaKey: 'NormalAttackHit', label: `通常攻撃Hit数+`, valueSuffix: `` },//翻訳対象
-  { metaKey: 'AttackAbilityHit', label: `通常/アビリティ攻撃Hit数+`, valueSuffix: `` },//翻訳対象
-  { metaKey: 'BattleAddAttackSet', label: `追撃`, valueSuffix: `%` },//翻訳対象
-  { metaKey: 'Evade Counter', label: `回避後に反撃` },//翻訳対象
-  { metaKey: 'Hit Counter', label: `攻撃受後に反撃` }//翻訳対象
+  { metaKey: 'CertainlyDouble', label: `必ず2連撃以上` },
+  { metaKey: 'CertainlyTriple', label: `必ず3連撃` },
+  { metaKey: 'NormalAttackHit', label: `通常攻撃Hit数+`, valueSuffix: `` },
+  { metaKey: 'AttackAbilityHit', label: `通常/アビリティ攻撃Hit数+`, valueSuffix: `` },
+  { metaKey: 'BattleAddAttackSet', label: `追撃`, valueSuffix: `%` },
+  { metaKey: 'Evade Counter', label: `回避後に反撃` },
+  { metaKey: 'Hit Counter', label: `攻撃受後に反撃` }
 ];
 // Icon-prefixed power rows: `\\I[icon]{label}{value} `.
 const BATTLE_POWER_ROWS = [
   { metaKey: 'AddPowerWeapon', iconId: 666, label: ``, valuePrefix: `+`, valueSuffix: `` },
-  { metaKey: 'Critical Multiplier', iconId: 78, label: POWER_LABEL, valuePrefix: ``, valueSuffix: `` }//翻訳対象
+  { metaKey: 'Critical Multiplier', iconId: 78, label: POWER_LABEL, valuePrefix: ``, valueSuffix: `` }
 ];
 
 function describeBattleTags(ctx) {
@@ -1109,7 +1109,7 @@ function appendSpecialAttackTag(ctx) {
   if (!ctx.meta['SpecialAttack']) return;
   ctx.effectValue = Number(ctx.meta['SpecialAttack']);
   ctx.fragText = `<\x1bSIN[${ctx.effectValue}]>`;
-  const specialAttackLabel = `Attack`;//翻訳対象
+  const specialAttackLabel = `Attack`;
   ctx.effectText += `${colorTaggedText(ctx.colorCode, specialAttackLabel)}${ctx.fragText} `;
 }
 
@@ -1126,7 +1126,7 @@ function describeBattlePowerRows(ctx) {
 function appendCounterSkillsTag(ctx) {
   if (!ctx.meta['Counter Skills']) return;
   ctx.effectValue = ctx.meta['Counter Skills'];
-  const counterSkillLabel = `反撃スキル`;//翻訳対象
+  const counterSkillLabel = `反撃スキル`;
   ctx.effectText += `${colorTaggedText(16, `${counterSkillLabel}:\x1bSIN[${ctx.effectValue}]`)} `;
 }
 
@@ -1134,7 +1134,7 @@ function appendCounterSkillsTag(ctx) {
 function appendCounterTotalTag(ctx) {
   if (!ctx.meta['Counter Total']) return;
   ctx.effectValue = ctx.meta['Counter Total'].replace(' +', '');
-  const maxCounterText = `最大反撃回数:${Number(ctx.effectValue) + 1}回`;//翻訳対象
+  const maxCounterText = `最大反撃回数:${Number(ctx.effectValue) + 1}回`;
   ctx.effectText += `${colorTaggedText(16, `[${maxCounterText}]`)} `;
 }
 
@@ -1153,16 +1153,16 @@ function describeBattleNoteRows(ctx) {
 function appendMaxTpTag(ctx) {
   if (!ctx.meta['MaxTp']) return;
   ctx.effectValue = ctx.meta['MaxTp'];
-  const maxTpLabel = `MaxTp`;//翻訳対象
+  const maxTpLabel = `MaxTp`;
   ctx.effectText += `${colorTaggedText(16, maxTpLabel)}+${ctx.effectValue} `;
 }
 
 // Element and state resistances: the same sentence with a different icon/wording.
 // `ratePrefix` is what the original put between the label and the number (`+` for
 // the state rows, nothing for the element rows).
-const RESIST_FULL_TEXT = `完全耐性`;//翻訳対象
-const RESIST_RATE_TEXT = `耐性`;//翻訳対象
-const RESIST_NULLIFY_TEXT = `無効`;//翻訳対象
+const RESIST_FULL_TEXT = `完全耐性`;
+const RESIST_RATE_TEXT = `耐性`;
+const RESIST_NULLIFY_TEXT = `無効`;
 const RESIST_ROWS = [
   { metaKey: 'elementRegist6', icon: ``, fullLabel: `六属性${RESIST_FULL_TEXT}`, rateLabel: `六属性${RESIST_RATE_TEXT}`, ratePrefix: `` },
   { metaKey: 'elementRegist9', icon: ``, fullLabel: `九属性${RESIST_FULL_TEXT}`, rateLabel: `九属性${RESIST_RATE_TEXT}`, ratePrefix: `` },
@@ -1187,11 +1187,11 @@ function describeResistTags(ctx) {
     appendResistRow(ctx, resistRow, ctx.effectValue);
   }
   if (ctx.meta['DispelGuard']) {
-    const dispelGuardText = `強化消去無効`;//翻訳対象
+    const dispelGuardText = `強化消去無効`;
     ctx.effectText += `${colorTaggedText(ctx.colorCode, dispelGuardText)} `;
   }
   if (ctx.meta['Level Up Recover All']) {
-    const levelUpRecoverAllText = `LvUp時に全回復`;//翻訳対象
+    const levelUpRecoverAllText = `LvUp時に全回復`;
     ctx.effectText += `[${colorTaggedText(16, levelUpRecoverAllText)}]`;
   }
 }
@@ -1199,12 +1199,12 @@ function describeResistTags(ctx) {
 // `<Bypass Damage Cap>` wins over `<Damage Cap>`, `<Bypass Heal Cap>` over
 // `<Heal Cap>`; the two pairs only differ in their label.
 const CAP_ROWS = [
-  { bypassKey: 'Bypass Damage Cap', bypassLabel: `D.Cap無効`, valueKey: 'Damage Cap', valueLabel: `D.Cap` },//翻訳対象
-  { bypassKey: 'Bypass Heal Cap', bypassLabel: `H.Cap無効`, valueKey: 'Heal Cap', valueLabel: `H.Cap` }//翻訳対象
+  { bypassKey: 'Bypass Damage Cap', bypassLabel: `D.Cap無効`, valueKey: 'Damage Cap', valueLabel: `D.Cap` },
+  { bypassKey: 'Bypass Heal Cap', bypassLabel: `H.Cap無効`, valueKey: 'Heal Cap', valueLabel: `H.Cap` }
 ];
 const COST_ROWS = [
-  { metaKey: 'HP Cost', resourceLabel: `HP` },//翻訳対象
-  { metaKey: 'MP Cost', resourceLabel: `MP` }//翻訳対象
+  { metaKey: 'HP Cost', resourceLabel: `HP` },
+  { metaKey: 'MP Cost', resourceLabel: `MP` }
 ];
 
 function describeCapAndCostTags(ctx) {
@@ -1227,7 +1227,7 @@ function describeCapTags(ctx) {
 
 // `[\\C[16]HP10消費\\C[0]]`
 function describeCostTags(ctx) {
-  const costSuffix = `消費`;//翻訳対象
+  const costSuffix = `消費`;
   for (const costRow of COST_ROWS) {
     if (!ctx.meta[costRow.metaKey]) continue;
     ctx.effectValue = ctx.meta[costRow.metaKey].replace(' ', '');
@@ -1242,28 +1242,28 @@ function describeSpecialStateTags(ctx) {
     // The two `\x1bSIM[n]` codes expand to *state names*, i.e. to other game text,
     // so they stay outside the translatable strings.
     const activationStateIcon = `\x1bSIM[110]`;//ステート名コード。翻訳対象外
-    const activationText = `で発動`;//翻訳対象
+    const activationText = `で発動`;
     const expiryStateIcon = `\x1bSIM[109]`;//ステート名コード。翻訳対象外
-    const expiryText = `で効果消失`;//翻訳対象
+    const expiryText = `で効果消失`;
     ctx.suffixText += `[${colorTaggedText(ctx.colorCode, activationStateIcon + activationText)}][${expiryStateIcon}${expiryText}]`;
 
-    const activationConditionText = `行動時MP消費/消費MP未満で`;//翻訳対象
-    const grantText = `付与`;//翻訳対象
+    const activationConditionText = `行動時MP消費/消費MP未満で`;
+    const grantText = `付与`;
     ctx.effectText += `[${colorTaggedText(ctx.colorCode, `${activationConditionText}\\I[252]${grantText}`)}]`;
   }
   if (ctx.meta['activateRate']) {
     ctx.effectValue = Math.round(ctx.meta['activateRate'] * 100);
-    const consumeMpText = `消費MP:MMP`;//翻訳対象
+    const consumeMpText = `消費MP:MMP`;
     ctx.suffixText += `[${consumeMpText}${colorTaggedText(10, `${ctx.effectValue}%`)}]`;
   }
   if (ctx.meta['activatePoint']) {//使ってない？
     ctx.effectValue = ctx.meta['activatePoint'];
-    const consumeMpLabel = `消費MP:`;//翻訳対象
+    const consumeMpLabel = `消費MP:`;
     ctx.suffixText += `[${consumeMpLabel}${colorTaggedText(2, `${ctx.effectValue}`)}]`;
   }
   if (ctx.meta['Global Cooldown']) {
     ctx.effectValue = Number(ctx.meta['Global Cooldown']);
-    const allCooldownLabel = `全てのCT:`;//翻訳対象
+    const allCooldownLabel = `全てのCT:`;
     ctx.suffixText += `[${allCooldownLabel}${colorTaggedText(2, `${ctx.effectValue}`)}]`;
   }
 }
@@ -1286,35 +1286,36 @@ function describeCooldownAndDrainTags(ctx) {
   if (ctx.meta['RankMaxLearning']) {
     if (ctx.item.stypeId != 11) {//召喚は前提スキルがあるため除外
       if (Number(ctx.meta['Max Mastery Level']) >= 2) {
-        const rankMaxLearnText = `RankMaxで習得が可能になる`;//翻訳対象
+        const rankMaxLearnText = `RankMaxで習得が可能になる`;
         ctx.effectText += `[\\C[${ctx.colorCode}]${rankMaxLearnText}\\C[0]]`;
       } else {
-        const masteryMaxLearnText = `熟練度Maxで習得が可能になる`;//翻訳対象
+        const masteryMaxLearnText = `熟練度Maxで習得が可能になる`;
         ctx.effectText += `[\\C[${ctx.colorCode}]${masteryMaxLearnText}\\C[0]]`;
       };
     };
   };
   if (ctx.meta['trapEvasion']) {
-    const trapEvasionText = `引っ掛かったトラップを自動で回避する`;//翻訳対象
+    const trapEvasionText = `引っ掛かったトラップを自動で回避する`;
     ctx.effectText += `[\\C[${ctx.colorCode}]${trapEvasionText}\\C[0]]`;
   };
   if (ctx.meta['SemenRemove']) {
     ctx.colorCode = 27;
     ctx.effectValue = Number(ctx.meta['SemenRemove']);
-    const semenRemoveText = `状態異常精液${ctx.effectValue}つ回復`;//翻訳対象
+    const semenRemoveText = `状態異常精液${ctx.effectValue}つ回復`;
     ctx.effectText += `[\\C[${ctx.colorCode}]${semenRemoveText}\\C[0]]`;
   };
   if (ctx.meta['HstaSuppression']) {
     ctx.colorCode = 27;
     ctx.metaValues = ctx.meta['HstaSuppression'].split(',');
     ctx.effectValue = Number(ctx.metaValues[1]);
-    const desireLimitText = `性欲度${ctx.effectValue * 100}まで`;//翻訳対象
-    const developmentLimitText = `各開発/経験度${ctx.effectValue}まで`;//翻訳対象
+	const desireValue = ctx.effectValue * 100;
+    const desireLimitText = `性欲度${desireValue}まで`;
+    const developmentLimitText = `各開発/経験度${ctx.effectValue}まで`;
     if (Number(ctx.metaValues[0]) == 0) {
       ctx.effectText += `[\\C[${ctx.colorCode}]${desireLimitText}\\C[0]][\\C[${ctx.colorCode}]${developmentLimitText}\\C[0]]`;
     } else {
       const rankVariableName = $dataSystem.variables[Number(ctx.metaValues[0])];
-      const rankLimitText = `のランク${ctx.effectValue}まで`;//翻訳対象
+      const rankLimitText = `のランク${ctx.effectValue}まで`;
       ctx.effectText += `[\\C[${ctx.colorCode}]${rankVariableName}${rankLimitText}\\C[0]]`;
     };
   };
@@ -1325,7 +1326,7 @@ function describeCooldownAndDrainTags(ctx) {
   };
   if (ctx.meta['gainExp']) {
     ctx.effectValue = ctx.meta['gainExp'];
-    const gainExpLabel = `獲得Exp`;//翻訳対象
+    const gainExpLabel = `獲得Exp`;
     ctx.effectText += `[\\C[${ctx.colorCode}]${gainExpLabel}:${ctx.effectValue}%\\C[0]]`;
   };
   for (let tierIndex = 1; tierIndex <= 6; tierIndex++) {
@@ -1382,21 +1383,21 @@ function titleVariableCondition(ctx) {
 // `<titleGetArray:52,stateId,count>`: `52` is the only counter implemented.
 function titleArrayCondition(ctx) {
   if (Number(ctx.metaValues[0]) != SUBJUGATION_CONDITION_ID) return ``;
-  const subjugationCountLabel = `体討伐`;//翻訳対象
+  const subjugationCountLabel = `体討伐`;
   const stateNameCode = `\x1bSIM[${Number(ctx.metaValues[1])}]`;
   return `${stateNameCode}:${Number(ctx.metaValues[2])}${subjugationCountLabel}`;
 }
 
 // `<titleGetItems:itemId,count>`.
 function titleItemCondition(ctx) {
-  const quantityLabel = `個`;//翻訳対象
+  const quantityLabel = `個`;
   const itemNameCode = `\x1bIIN[${Number(ctx.metaValues[0])}]`;
   return `${itemNameCode}:${Number(ctx.metaValues[1])}${quantityLabel}`;
 }
 
 // `<titleGetSkillRank:skillId,rank>`: any party member.
 function titleSkillRankCondition(ctx) {
-  const partyMemberLabel = `パーティの誰かが`;//翻訳対象
+  const partyMemberLabel = `パーティの誰かが`;
   const skillNameCode = `\x1bSIN[${Number(ctx.metaValues[0])}]`;
   return `${partyMemberLabel}${skillNameCode}${RANK_LABEL}:${Number(ctx.metaValues[1])}${OR_MORE_SUFFIX}`;
 }
@@ -1404,7 +1405,7 @@ function titleSkillRankCondition(ctx) {
 // `<titleGetAchievement:counterId,value>`, plus a `<KojinTitle>` marker.
 function titleAchievementCondition(ctx) {
   const achievementName = ACHIEVEMENT_NAMES[Number(ctx.metaValues[0])];
-  const personalTagLabel = `個人`;//翻訳対象
+  const personalTagLabel = `個人`;
   const personalTag = ctx.meta['KojinTitle'] ? `[${personalTagLabel}]` : ``;
   return `${achievementName}${personalTag}:${Number(ctx.metaValues[1])}`;
 }
@@ -1426,11 +1427,11 @@ function describeAnnihilationTitle(ctx) {
   const selector = Number(ctx.metaValues[0]);
   const requiredCount = Number(ctx.metaValues[1]);
 
-  const annihilationCountLabel = `殲滅回数`;//翻訳対象
-  const totalAnnihilationCountLabel = `の総殲滅回数`;//翻訳対象
-  const allMapsLabel = `全マップ`;//翻訳対象
-  const allDungeonsLabel = `全ダンジョン`;//翻訳対象
-  const timesOrMoreSuffix = `回以上`;//翻訳対象
+  const annihilationCountLabel = `殲滅回数`;
+  const totalAnnihilationCountLabel = `の総殲滅回数`;
+  const allMapsLabel = `全マップ`;
+  const allDungeonsLabel = `全ダンジョン`;
+  const timesOrMoreSuffix = `回以上`;
 
   let subjectName;
   let countLabel;
@@ -1461,7 +1462,7 @@ function describePassivePlusTrait(ctx) {
   if (Number(ctx.metaValues[0]) != 11) return;
 
   ctx.effectValue = Number(ctx.metaValues[2]);
-  const damageResistLabel = `ダメージ耐性`;//翻訳対象
+  const damageResistLabel = `ダメージ耐性`;
   const elementName = $dataSystem.elements[Number(ctx.metaValues[1])];
   const directionText = ctx.effectValue >= 0 ? `Down` : `Up`;
   const percentText = Math.round(Math.abs(ctx.effectValue) * 100);
@@ -1532,15 +1533,15 @@ function describeStatEffectSlots(ctx) {
 
 // 娼婦系説明文: one row per body stat, `<tag>` -> `\\C[27]label+value unit\\C[0] `.
 const BODY_CHANGE_ROWS = [
-  { metaKey: 'BustSizeChange', label: `BustSize`, unit: `cm` },//翻訳対象
-  { metaKey: 'HipSizeChange', label: `HipSize`, unit: `cm` },//翻訳対象
-  { metaKey: 'BodyWeightChange', label: `BodyWeight`, unit: `kg` }//翻訳対象
+  { metaKey: 'BustSizeChange', label: `BustSize`, unit: `cm` },
+  { metaKey: 'HipSizeChange', label: `HipSize`, unit: `cm` },
+  { metaKey: 'BodyWeightChange', label: `BodyWeight`, unit: `kg` }
 ];
 
 function describeBodyChangeTags(ctx) {
   if (ctx.meta['ProstitutionMoneyUp']) {
     ctx.effectValue = ctx.meta['ProstitutionMoneyUp'];
-    const prostitutionBonusText = `売春額に${ctx.effectValue}倍補正`;//翻訳対象
+    const prostitutionBonusText = `売春額に${ctx.effectValue}倍補正`;
     ctx.effectText += `${colorTaggedText(27, prostitutionBonusText)} `;
   }
   for (const bodyChangeRow of BODY_CHANGE_ROWS) {
@@ -1555,9 +1556,9 @@ function describeBodyChangeTags(ctx) {
 // `<下級鑑定品>` / `<中級鑑定品>` / `<上級鑑定品>`: one "未鑑定品" marker followed by the
 // tiers that are present.
 const APPRAISAL_GRADE_ROWS = [
-  { metaKey: '下級鑑定品', label: `下級` },//翻訳対象
-  { metaKey: '中級鑑定品', label: `中級` },//翻訳対象
-  { metaKey: '上級鑑定品', label: `上級` }//翻訳対象
+  { metaKey: '下級鑑定品', label: `下級` },
+  { metaKey: '中級鑑定品', label: `中級` },
+  { metaKey: '上級鑑定品', label: `上級` }
 ];
 
 function describeAppraisalTags(ctx) {
@@ -1566,7 +1567,7 @@ function describeAppraisalTags(ctx) {
   });
   if (!presentGradeRows.length) return;
 
-  const unidentifiedLabel = `未鑑定品`;//翻訳対象
+  const unidentifiedLabel = `未鑑定品`;
   let appraisalText = `\\C[3][${unidentifiedLabel}]\\C[0]`;
   for (const gradeRow of presentGradeRows) {
     appraisalText += colorTaggedText(ctx.colorCode, `[${gradeRow.label}]`);
@@ -1576,8 +1577,8 @@ function describeAppraisalTags(ctx) {
 
 function describeQuestHeaderTags(ctx) {
   if (ctx.meta['walletIn']) {
-    const useWithLabel = `使用で`;//翻訳対象
-    const obtainLabel = `入手`;//翻訳対象
+    const useWithLabel = `使用で`;
+    const obtainLabel = `入手`;
     ctx.effectText += `\\C[${ctx.colorCode}][${useWithLabel}\\\G${obtainLabel}]\\C[0] `;
   }
   appendQuestAcceptRow(ctx);
@@ -1595,9 +1596,9 @@ function appendQuestLabelRow(ctx, label, value, separator) {
 function appendQuestAcceptRow(ctx) {
   if (!ctx.meta['QuestSetMap']) return;
   ctx.effectValue = Number(ctx.meta['QuestSetMap']) == 0
-    ? `[常設]`//翻訳対象
+    ? `[常設]`
     : $dataSystem.switches[Number(ctx.meta['QuestSetMap'])];
-  const acceptLabel = `受注`;//翻訳対象
+  const acceptLabel = `受注`;
   appendQuestLabelRow(ctx, acceptLabel, ctx.effectValue, ` `);
 }
 
@@ -1605,7 +1606,7 @@ function appendQuestAcceptRow(ctx) {
 function appendQuestTargetRow(ctx) {
   if (!ctx.meta['QuestSubjectMap']) return;
   ctx.effectValue = $dataSystem.switches[Number(ctx.meta['QuestSubjectMap'])];
-  const targetLabel = `対象`;//翻訳対象
+  const targetLabel = `対象`;
   appendQuestLabelRow(ctx, targetLabel, ctx.effectValue, `\n`);
 }
 
@@ -1665,7 +1666,7 @@ function describeQuestObjectiveTags(ctx) {
     ctx.effectText += `[${colorTaggedText(ctx.colorCode, questLabel)}] `;
   }
   if (ctx.meta['CoercionQuest']) {
-    const questForcedProgressText = `クエスト進行中に強制進行あり`;//翻訳対象
+    const questForcedProgressText = `クエスト進行中に強制進行あり`;
     ctx.effectText += `[${colorTaggedText(ctx.colorCode, questForcedProgressText)}] `;
   }
 }
@@ -1676,7 +1677,7 @@ function describeQuestItemTags(ctx) {
     ctx.effectValue = Number(ctx.meta['Stuff']);
     const currentSatiety = $gameVariables.value(16);
     const maxSatiety = $gameVariables.value(13);
-    const satietyText = `満腹度+${ctx.effectValue}（${currentSatiety}/${maxSatiety}）`;//翻訳対象
+    const satietyText = `満腹度+${ctx.effectValue}（${currentSatiety}/${maxSatiety}）`;
     ctx.effectText += `${colorTaggedText(ctx.colorCode, `[${satietyText}]`)} `;
   }
   if (ctx.meta['ＴＰ']) {
@@ -1684,16 +1685,16 @@ function describeQuestItemTags(ctx) {
     ctx.effectText += `${colorTaggedText(ctx.colorCode, `[${TP_LABEL}+${ctx.effectValue}]`)} `;
   }
   if (ctx.meta['Ingredients']) {
-    const ingredientLabel = `食材(換金用途)`;//翻訳対象
+    const ingredientLabel = `食材(換金用途)`;
     ctx.effectText += `${colorTaggedText(ctx.colorCode, `[${ingredientLabel}]`)} `;
   }
   if (ctx.meta['Alcohol']) {
-    const alcoholLabel = `アルコール`;//翻訳対象
+    const alcoholLabel = `アルコール`;
     ctx.effectText += `${colorTaggedText(ctx.colorCode, `[${alcoholLabel}]`)} `;
   }
   describeExpiryDateTag(ctx);
   if (ctx.meta['EventFactorClearReset']) {
-    const questItemLabel = `クエスト関連アイテム`;//翻訳対象
+    const questItemLabel = `クエスト関連アイテム`;
     ctx.effectText += `${colorTaggedText(ctx.colorCode, `[${questItemLabel}]`)} `;
   }
   if (ctx.meta['AddPowerCustom']) {
@@ -1712,7 +1713,7 @@ function describeExpiryDateTag(ctx) {
   if (!ctx.meta['ExpiryDate']) return;
   const menuCategory = ctx.meta['Menu Category'];
   if (menuCategory && menuCategory != ' Food') return;
-  const expiryLabel = menuCategory ? `賞味期限当日中` : `翌日自動返却`;//翻訳対象
+  const expiryLabel = menuCategory ? `賞味期限当日中` : `翌日自動返却`;
   ctx.effectText += `${colorTaggedText(ctx.colorCode, `[${expiryLabel}]`)} `;
 }
 
@@ -1726,12 +1727,12 @@ function describeRateTags(ctx) {
 
 function describeFinalTags(ctx) {
   if (ctx.meta['Learn Require Eval']) {
-    const learnRequirementLabel = `習得条件あり`;//翻訳対象
+    const learnRequirementLabel = `習得条件あり`;
     ctx.headerText += `[\\C[${ctx.colorCode}]${learnRequirementLabel}\\C[0]]`;
   };
 
   if (ctx.meta['SwicthOnOffUse']) {
-    const toggleOnUseLabel = `使用でOn/Off`;//翻訳対象
+    const toggleOnUseLabel = `使用でOn/Off`;
     ctx.effectText += `[\\C[${ctx.colorCode}]${toggleOnUseLabel}\\C[0]]`;
   };
 
@@ -1742,14 +1743,14 @@ function describeFinalTags(ctx) {
     ctx.suffixText += `\\C[${ctx.colorCode}]${$dataStates[categoryStateId].description}\\C[0] `;
   };
   if (ctx.meta['timeRemove']) {
-    const timeReleaseLabel = `時間経過で解除`;//翻訳対象
+    const timeReleaseLabel = `時間経過で解除`;
     ctx.effectText += `[\\C[${ctx.colorCode}]${timeReleaseLabel}\\C[0]]`;
   };
 
   if (ctx.databaseTypeId == 4) {
     if (ctx.meta['registUp']) {
       ctx.effectValue = ctx.meta['registUp'];
-      const resistOnApplyText = `付与時に耐性率${ctx.effectValue}%up`;//翻訳対象
+      const resistOnApplyText = `付与時に耐性率${ctx.effectValue}%up`;
       ctx.effectText += `[\\C[${ctx.colorCode}]${resistOnApplyText}\\C[0]]`;
     };
     if (ctx.item.autoRemovalTiming >= 1) {
@@ -2086,8 +2087,8 @@ function expandSealedSkillTypes(ctx) {
 attackSkillRankText = function (skill, headerText) {
   let descriptionText = headerText;
   const masteryEffect = skill.meta['Mastery Effect'];
-  const rankCorrectionLabel = `ランク補正`;//翻訳対象
-  const damagePerRankLabel = `ダメージ値にランク毎`;//翻訳対象
+  const rankCorrectionLabel = `ランク補正`;
+  const damagePerRankLabel = `ダメージ値にランク毎`;
   descriptionText += masteryEffect
     ? `[${rankCorrectionLabel}:${damagePerRankLabel}${masteryEffect.replace(' Damage Per Level', '').replace(' ', '')}]\n`
     : `\n`;
@@ -2096,9 +2097,9 @@ attackSkillRankText = function (skill, headerText) {
     if (!derivedMeta) { continue; };
     const metaValues = derivedMeta.split(',');
     const derivedSkillName = $dataSkills[Number(metaValues[1])].name;
-    const derivedRankLabel = `ランク${metaValues[0]}で`;//翻訳対象
-    const derivedRankConditionLabel = `ランク${metaValues[0]}と特殊条件を満たす事で`;//翻訳対象
-    const derivedSkillSuffix = `が派生発生`;//翻訳対象
+    const derivedRankLabel = `ランク${metaValues[0]}で`;
+    const derivedRankConditionLabel = `ランク${metaValues[0]}と特殊条件を満たす事で`;
+    const derivedSkillSuffix = `が派生発生`;
     descriptionText += derivedTag == `NormalAttackDerived`
       ? `[${derivedRankLabel}\\C[2]${derivedSkillName}\\C[0]${derivedSkillSuffix}]`
       : `[${derivedRankConditionLabel}\\C[2]${derivedSkillName}\\C[0]${derivedSkillSuffix}]`;
@@ -2114,7 +2115,7 @@ attack_addKaisetu1 = function () {
 };
 
 function requiredMasteryHeader(skill) {
-  return `[必要熟練度:基礎値${Number(skill.meta.RankUpPoint)}にランク×基礎値をプラス]`;//翻訳対象
+  return `[必要熟練度:基礎値${Number(skill.meta.RankUpPoint)}にランク×基礎値をプラス]`;
 }
 
 function fillAttackDescriptions(firstSkillId, lastSkillId, idOffset, headerFor) {
@@ -2126,10 +2127,10 @@ function fillAttackDescriptions(firstSkillId, lastSkillId, idOffset, headerFor) 
 };
 
 recoveryEffectMsg = function (ind1, ind2) {
-  const recoveryEffectName = `回復`;//翻訳対象
+  const recoveryEffectName = `回復`;
   const icon1 = `\\I[${ind1}]`;
   const icon2 = `\\I[${ind2}]`;
-  const extraEffectMsg = `対象の${icon2}も影響`;//翻訳対象
+  const extraEffectMsg = `対象の${icon2}も影響`;
   return `[\\C[3]${recoveryEffectName}:${icon1}100%(${extraEffectMsg})\\C[0]`;
 }
 
@@ -2149,8 +2150,8 @@ class_addKaisetu1 = function () {
     // tag yields NaN and stays NaN, as before.
     const rawRank = Number(classMeta['classRank']);
     const classRankVal = rawRank == 0 ? 1 : rawRank;
-    const primaryClassLabel = `メイン`;//翻訳対象
-    const secondaryClassLabel = `サブ`;//翻訳対象
+    const primaryClassLabel = `メイン`;
+    const secondaryClassLabel = `サブ`;
     let descriptionText = classMeta['Primary Only'] ? `[\\C[1]${primaryClassLabel}\\C[0]]` : `[\\C[5]${secondaryClassLabel}\\C[0]]`;
     descriptionText += `[Class${CLASS_RANK_NUMERALS[classRankVal]}]`;
     const growthStatRow = growthStatText(growthStats, classRankVal);
@@ -2163,7 +2164,7 @@ class_addKaisetu1 = function () {
       if (!learning) { continue; };
       // Main classes only list the skills the current playthrough has reached.
       if (classMeta['Primary Only'] && learning.level < requiredPrimaryLevel) { continue; };
-      const levelLabel = `Lv`;//翻訳対象
+      const levelLabel = `Lv`;
       descriptionText += `[${levelLabel}${learning.level}:\\C[2]\x1bSIN[${learning.skillId}]\\C[0]]`;
     };
     valueAddDescriptionClass[classId] = descriptionText;
