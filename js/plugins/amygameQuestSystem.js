@@ -324,14 +324,14 @@ var QuestSystem = (function() {
 
     var mainRootMeta = parseMetaArray(item.meta['QuestSetMainRoot']);
     var varId = Number(mainRootMeta[0]) || DEFAULT_VALUES.MAIN_ROOT_VAR;
-    var targetValue = Number(mainRootMeta[1]);
+    var mainQuestProgressStage = Number(mainRootMeta[1]);
 
     var progressHeader = '';
-    if (targetValue !== 0) {
-      progressHeader = '【メインクエスト進行[' + targetValue + ']以上';
+    if (mainQuestProgressStage !== 0) {
+      progressHeader = `【メインクエスト進行[${mainQuestProgressStage}]以上`;
     }
 
-    appendConditionLine(ctx, SCOPE_START, progressHeader, $gameVariables.value(varId) >= targetValue,
+    appendConditionLine(ctx, SCOPE_START, progressHeader, $gameVariables.value(varId) >= mainQuestProgressStage,
       MARKERS.SUCCESS, MARKERS.FAILURE, '】' + '\n');
   }
 
