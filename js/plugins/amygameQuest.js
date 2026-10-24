@@ -24,6 +24,7 @@
   const QUEST_ITEM_CATEGORY_ID = 108;
   const WAR_COIN_ITEM_ID = 10;
   const DELIVERY_PLACEHOLDER_ITEM_ID = 5;
+  const SPECIAL_REWARD_COUNT = 9; // QuestSpcialPrice1..9
 
   function questTypeConfig(questTypeId) {
     if (questTypeId == null) return null;
@@ -84,13 +85,14 @@
     const fields = metadata.split(",");
     const categoryId = Number(fields[0]);
     const amount = validQuantity(fields[2]);
-    if (amount === null || amount === 0) return null;
-    if (categoryId === 3) return { item: null, amount: amount };
-    const database =
-      categoryId === 4 ? $dataItems : itemEquipmentDatabase(categoryId);
-    const itemId = categoryId === 4 ? WAR_COIN_ITEM_ID : Number(fields[1]);
-    const item = database && database[itemId];
-    return item ? { item: item, amount: amount } : null;
+    if (amount === null) return null;
+    // 3 = 所持金, 4 = 戦貨(アイテムID固定)
+    if (categoryId === 3) return { categoryId: categoryId, item: null, amount: amount };
+    if (categoryId === 4)
+      return { categoryId: categoryId, item: $dataItems[WAR_COIN_ITEM_ID], amount: amount };
+    const database = itemEquipmentDatabase(categoryId);
+    const item = database && database[Number(fields[1])];
+    return item ? { categoryId: categoryId, item: item, amount: amount } : null;
   }
 
   function applySpecialReward(reward, party) {
@@ -98,48 +100,55 @@
     else party.gainGold(reward.amount);
   }
 
+  // 追加報酬1件分の表示。従来のアイコン制御文字表記をそのまま使う
   function specialRewardText(reward) {
-    if (!reward.item) {
-      const amountText = colorTaggedText(2, reward.amount);
-      return `[${amountText}\\G] `;
+    if (reward.categoryId === 3) {
+      return `[${colorTaggedText(2, reward.amount)}\\G] `;
     }
-    const itemName = reward.item.name;
-    const amountText = colorTaggedText(2, `+${reward.amount}`);
-    return `[${itemName}:${amountText}] `;
+    if (reward.categoryId === 4) {
+      return `[${reward.item.name}:${colorTaggedText(2, `+${reward.amount}`)}] `;
+    }
+    const iconMark = reward.categoryId === 0 ? "\x1bIIN" : reward.categoryId === 1 ? "\x1bWIN" : "\x1bAIN";
+    return `[${iconMark}[${reward.item.id}]+${reward.amount}] `;
   }
 
   function collectSpecialRewards(meta, applyRewards) {
-    const lines = [];
+    // 追加報酬が無い場合も見出しだけは従来通り入る
+    let text = `\n${colorTaggedText(16, "●追加報酬")}\n`;
     const party = $gameParty;
-    for (const key of Object.keys(meta)) {
-      // Keep the database's historical spelling and metadata enumeration order.
-      if (key.indexOf("QuestSpcialPrice") !== 0) continue;
-      const reward = parseSpecialReward(meta[key]);
+    let lineCount = 0;
+    // 従来通り 1..9 の連番順に処理する(メタデータの列挙順には依存しない)
+    for (let rewardIndex = 1; rewardIndex <= SPECIAL_REWARD_COUNT; rewardIndex++) {
+      const reward = parseSpecialReward(meta["QuestSpcialPrice" + rewardIndex]);
       if (!reward) continue;
       if (applyRewards) applySpecialReward(reward, party);
-      lines.push(specialRewardText(reward));
-      if (lines.length % 3 === 0) lines[lines.length - 1] += "\n";
+      text += specialRewardText(reward);
+      lineCount += 1;
+      if (lineCount % 3 === 0) text += "\n";
     }
-    if (!lines.length) return " "; // The public completion routine's no-extra sentinel.
-    const heading = colorTaggedText(16, "●追加報酬");
-    return `\n${heading}\n` + lines.join("");
+    return text;
   }
 
   quest_housyuukeisan = function (questItemId) {
-    // These three globals are read by quest_housyuu and external event scripts.
-    rewardGoldAmount = 0;
-    rewardItemAmount = 0;
-    additionalCompletionText = " ";
+    // valueCountSet1..3 keep their historical meaning: they are read by
+    // quest_housyuu below, by amygameItemShop and by event scripts.
+    valueCountSet1 = 0;
+    valueCountSet2 = 0;
+    valueCountSet3 = "";
     const item = $dataItems[questItemId];
-    if (!item) return;
+    if (!item) {
+      valueCountSet3 = collectSpecialRewards({}, false);
+      return;
+    }
     const rank = questRankRewards(item.iconIndex);
-    rewardGoldAmount = validQuantity(rank && rank[1]) || 0;
-    rewardItemAmount = validQuantity(rank && rank[2]) || 0;
+    valueCountSet1 += validQuantity(rank && rank[1]) || 0;
+    valueCountSet2 += validQuantity(rank && rank[2]) || 0;
     const applyRewards = $gameSwitches.value(QUEST_SWITCH.APPLY_REWARDS);
-    additionalCompletionText = collectSpecialRewards(
-      item.meta || {},
-      applyRewards
-    );
+    valueCountSet3 = collectSpecialRewards(item.meta || {}, applyRewards);
+    // Descriptive aliases kept for the callers inside this plugin.
+    rewardGoldAmount = valueCountSet1;
+    rewardItemAmount = valueCountSet2;
+    additionalCompletionText = valueCountSet3;
   };
 
   quest_settei_getItemEquipmentSource = function (deliveryValues, questIndex) {
@@ -275,8 +284,7 @@
     const questName = colorTaggedText(2, questItem.name);
     WindowManager.drawText(0, `クエスト${questName}を達成報告した。`);
     appendCompletionText(report, questRewardSummary(questItem));
-    if (additionalCompletionText !== " ")
-      appendCompletionText(report, additionalCompletionText + "\n");
+    appendCompletionText(report, additionalCompletionText + "\n");
     $gameSwitches.setValue(QUEST_SWITCH.TEMPORARY_RESULT, true);
     if (report.applyRewards)
       incrementQuestCompletionCount(questItem.meta["SGカテゴリ"]);
