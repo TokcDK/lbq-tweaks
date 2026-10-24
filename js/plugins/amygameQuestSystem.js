@@ -11,24 +11,24 @@ var QuestSystem = (function() {
   // ============================================================
   
   var MARKERS = {
-    SUCCESS: '\\C[14]〇\\C[0]',
-    FAILURE: '\\C[12]×\\C[0]',
-    ACHIEVED: '\\C[10]達成\\C[0]',
-    NOT_ACHIEVED: '\\C[1]未達成\\C[0]',
-    CAN_DELIVER: '\\C[10]納品可能\\C[0]',
-    CANNOT_DELIVER: '\\C[1]納品不可\\C[0]',
-    LEARNED: '\\C[10]習得\\C[0]',
-    NOT_LEARNED: '\\C[1]未習得\\C[0]',
-    EQUIPPED: '\\C[10]装着\\C[0]',
-    NOT_EQUIPPED: '\\C[1]未装着\\C[0]',
-    GRANTED: '\\C[10]付与\\C[0]',
-    NOT_GRANTED: '\\C[1]未付与\\C[0]'
+    SUCCESS: colorTaggedText(14, "〇"),
+    FAILURE: colorTaggedText(12, "×"),
+    ACHIEVED: colorTaggedText(10, "達成"),
+    NOT_ACHIEVED: colorTaggedText(1, "未達成"),
+    CAN_DELIVER: colorTaggedText(10, "納品可能"),
+    CANNOT_DELIVER: colorTaggedText(1, "納品不可"),
+    LEARNED: colorTaggedText(10, "習得"),
+    NOT_LEARNED: colorTaggedText(1, "未習得"),
+    EQUIPPED: colorTaggedText(10, "装着"),
+    NOT_EQUIPPED: colorTaggedText(1, "未装着"),
+    GRANTED: colorTaggedText(10, "付与"),
+    NOT_GRANTED: colorTaggedText(1, "未付与")
   };
 
   var HEADERS = {
-    COMPLETION: '\\C[16]●達成条件\\C[0]\n',
-    START: '\\C[16]●発生条件\\C[0]\n',
-    NO_COMPLETION: '\\C[16]●達成条件なし\\C[0]'
+    COMPLETION: colorTaggedText(16, "●達成条件") + '\n',
+    START: colorTaggedText(16, "●発生条件") + '\n',
+    NO_COMPLETION: colorTaggedText(16, "●達成条件なし")
   };
 
   var DEFAULT_VALUES = {
@@ -78,11 +78,11 @@ var QuestSystem = (function() {
 
   // ---- rank reward text (kept identical to the pre-refactor strings) ----
   var REWARD_COIN_ITEM_ID = 10;                 // 戦貨アイテムID
-  var RANK_REWARD_HEADER = '\\C[16]●規定ランク報酬\\C[0]\n';
-  var EXTRA_REWARD_HEADER = '\n\\C[16]●追加報酬\\C[0]\n';
+  var RANK_REWARD_HEADER = colorTaggedText(16, "●規定ランク報酬") + '\n';
+  var EXTRA_REWARD_HEADER = '\n' + colorTaggedText(16, '●追加報酬') + '\n';
 
   // ---- text fragments -----------------------------------------
-  var NO_START_CONDITION_SUFFIX = '【なし】\n';
+  var NO_START_CONDITION_SUFFIX = '【なし】' + '\n';
   var QUEST_SUPPLEMENT_META_KEY = 'QuestSupplement';
   var START_CONDITION_HEADER_RANK = colorTaggedText(10, '【ランク制限】');
   var PERSPECTIVE_VIEW_SUFFIX = '視点';
@@ -249,7 +249,7 @@ var QuestSystem = (function() {
     var perspectiveId = Number(item.meta['QuestSetPerspective']);
     var perspectiveActor = perspectiveId >= 1 ? $gameActors.actor(perspectiveId) : null;
     if (perspectiveId >= 1 && perspectiveId !== getCurrentActorId() && perspectiveActor) {
-      appendConditionText(ctx, SCOPE_START, '[' + perspectiveActor.name() + PERSPECTIVE_VIEW_SUFFIX + ']\n');
+      appendConditionText(ctx, SCOPE_START, '[' + perspectiveActor.name() + PERSPECTIVE_VIEW_SUFFIX + ']' + '\n');
     }
 
     var isMet = $gameSwitches.value(perspectiveId + PERSPECTIVE_SWITCH_OFFSET);
@@ -315,7 +315,7 @@ var QuestSystem = (function() {
     }
 
     appendConditionLine(ctx, SCOPE_START, '', $gameSwitches.value(switchId),
-      MARKERS.SUCCESS, MARKERS.FAILURE, '】\n');
+      MARKERS.SUCCESS, MARKERS.FAILURE, '】' + '\n');
   }
 
   // Handler: Main Quest Progress (QuestSetMainRoot)
@@ -332,7 +332,7 @@ var QuestSystem = (function() {
     }
 
     appendConditionLine(ctx, SCOPE_START, progressHeader, $gameVariables.value(varId) >= targetValue,
-      MARKERS.SUCCESS, MARKERS.FAILURE, '】\n');
+      MARKERS.SUCCESS, MARKERS.FAILURE, '】' + '\n');
   }
 
   // Handler: Variable Conditions (QuestSetVal1-9)
@@ -347,7 +347,7 @@ var QuestSystem = (function() {
       var condText = '【' + varName + ' ' + currentValue + '/' + targetValue;
 
       appendConditionLine(ctx, SCOPE_START, condText, currentValue >= targetValue,
-        MARKERS.SUCCESS, MARKERS.FAILURE, '】\n');
+        MARKERS.SUCCESS, MARKERS.FAILURE, '】' + '\n');
     });
   }
 
@@ -370,7 +370,7 @@ var QuestSystem = (function() {
       var paramName = $dataSystem.variables[paramType + CONDITION_LABEL_VAR_OFFSET];
       var condText = '[' + actorName + paramName + targetValue + comparisonSuffix;
 
-      appendConditionLine(ctx, SCOPE_START, condText, isMet, MARKERS.SUCCESS, MARKERS.FAILURE, '】\n');
+      appendConditionLine(ctx, SCOPE_START, condText, isMet, MARKERS.SUCCESS, MARKERS.FAILURE, '】' + '\n');
     });
   }
 
@@ -402,7 +402,7 @@ var QuestSystem = (function() {
     }
 
     appendConditionLine(ctx, SCOPE_START, condText, target.actor.isLearnedSkill(skillId),
-      MARKERS.SUCCESS, MARKERS.FAILURE, '】\n');
+      MARKERS.SUCCESS, MARKERS.FAILURE, '】' + '\n');
   }
 
   // Handler: Skill Equip Condition (QuestSetSkillEquip)
@@ -422,7 +422,7 @@ var QuestSystem = (function() {
     }
 
     appendConditionLine(ctx, SCOPE_START, condText,
-      target.actor.battleSkillsRaw().includes(skillId), MARKERS.SUCCESS, MARKERS.FAILURE, '】\n');
+      target.actor.battleSkillsRaw().includes(skillId), MARKERS.SUCCESS, MARKERS.FAILURE, '】' + '\n');
   }
 
   // Handler: Skill Rank Condition (QuestSetSkillRank)
@@ -445,7 +445,7 @@ var QuestSystem = (function() {
     var isMet = target.actor.isLearnedSkill(skillId) &&
       target.actor.skillMasteryLevel(skillId) >= requiredRank;
 
-    appendConditionLine(ctx, SCOPE_START, condText, isMet, MARKERS.SUCCESS, MARKERS.FAILURE, '】\n');
+    appendConditionLine(ctx, SCOPE_START, condText, isMet, MARKERS.SUCCESS, MARKERS.FAILURE, '】' + '\n');
   }
 
   // Handler: State Condition (QuestSetState)
@@ -465,7 +465,7 @@ var QuestSystem = (function() {
     }
 
     appendConditionLine(ctx, SCOPE_START, condText, actor.isStateAffected(stateId),
-      MARKERS.SUCCESS, MARKERS.FAILURE, '】\n');
+      MARKERS.SUCCESS, MARKERS.FAILURE, '】' + '\n');
   }
 
   // Handler: Item Condition (QuestSetItem)
@@ -486,7 +486,7 @@ var QuestSystem = (function() {
     }
 
     appendConditionLine(ctx, SCOPE_START, condText, $gameParty.numItems(targetItem) >= requiredAmount,
-      MARKERS.SUCCESS, MARKERS.FAILURE, '】\n');
+      MARKERS.SUCCESS, MARKERS.FAILURE, '】' + '\n');
   }
 
   // Handler: Subjugation Condition (QuestSetSubjugation)
@@ -500,7 +500,7 @@ var QuestSystem = (function() {
 
     appendConditionLine(ctx, SCOPE_START,
       buildSubjugationConditionText(subjugationId, targetCount, currentCount),
-      currentCount >= targetCount, MARKERS.SUCCESS, MARKERS.FAILURE, '】\n');
+      currentCount >= targetCount, MARKERS.SUCCESS, MARKERS.FAILURE, '】' + '\n');
   }
 
   // 討伐条件の見出し(魔物ID指定 / 当日 / 総数)
@@ -532,7 +532,7 @@ var QuestSystem = (function() {
 
       var condText = getItemCategoryMarker(targetItem) + '\x1bIIN[' + itemId + ']';
       appendConditionLine(ctx, SCOPE_START, condText, $gameParty.hasItem(targetItem, true),
-        MARKERS.SUCCESS, MARKERS.FAILURE, '】\n');
+        MARKERS.SUCCESS, MARKERS.FAILURE, '】' + '\n');
     }
   }
 
@@ -586,7 +586,7 @@ var QuestSystem = (function() {
 
     appendConditionLine(ctx, SCOPE_COMPLETION, condText,
       $gameSwitches.value(perspectiveId + PERSPECTIVE_SWITCH_OFFSET),
-      MARKERS.SUCCESS, MARKERS.FAILURE, ']\n');
+      MARKERS.SUCCESS, MARKERS.FAILURE, ']' + '\n');
   }
 
   // Handler: Actor Exists (QuestCompActor)
@@ -623,7 +623,7 @@ var QuestSystem = (function() {
 
       var condText = buildSubjugationCompletionText(subjugationId, targetCount, currentCount);
       appendConditionLine(ctx, SCOPE_COMPLETION, condText, currentCount >= targetCount,
-        MARKERS.ACHIEVED, MARKERS.NOT_ACHIEVED, '】\n');
+        MARKERS.ACHIEVED, MARKERS.NOT_ACHIEVED, '】' + '\n');
     });
   }
 
@@ -663,7 +663,7 @@ var QuestSystem = (function() {
       var condText = '【' + colorTaggedText(2, targetItem.name) + ':' + currentAmount + '/' + requiredAmount;
 
       appendConditionLine(ctx, SCOPE_COMPLETION, condText, currentAmount >= requiredAmount,
-        metMarker, unmetMarker, '】\n');
+        metMarker, unmetMarker, '】' + '\n');
     });
   }
 
@@ -703,7 +703,7 @@ var QuestSystem = (function() {
       var varName = cleanSystemName($dataSystem.variables[varId]);
 
       appendConditionLine(ctx, SCOPE_COMPLETION, buildVariableConditionText(varName, currentValue, targetValue),
-        currentValue >= targetValue, MARKERS.ACHIEVED, MARKERS.NOT_ACHIEVED, '】\n');
+        currentValue >= targetValue, MARKERS.ACHIEVED, MARKERS.NOT_ACHIEVED, '】' + '\n');
     });
   }
 
@@ -726,7 +726,7 @@ var QuestSystem = (function() {
       var condText = buildVariableConditionText($dataSystem.variables[varId], currentValue, targetValue);
 
       appendConditionLine(ctx, SCOPE_COMPLETION, condText, currentValue >= targetValue,
-        MARKERS.ACHIEVED, MARKERS.NOT_ACHIEVED, '】\n');
+        MARKERS.ACHIEVED, MARKERS.NOT_ACHIEVED, '】' + '\n');
     });
   }
 
@@ -747,7 +747,7 @@ var QuestSystem = (function() {
 
       var condText = buildSkillConditionText(target, ':');
       appendConditionLine(ctx, SCOPE_COMPLETION, condText, target.actor.isLearnedSkill(skillId),
-        MARKERS.LEARNED, MARKERS.NOT_LEARNED, '】\n');
+        MARKERS.LEARNED, MARKERS.NOT_LEARNED, '】' + '\n');
     });
   }
 
@@ -764,7 +764,7 @@ var QuestSystem = (function() {
       var condText = buildSkillConditionText(target, ':');
       appendConditionLine(ctx, SCOPE_COMPLETION, condText,
         target.actor.battleSkillsRaw().includes(skillId),
-        MARKERS.EQUIPPED, MARKERS.NOT_EQUIPPED, '】\n');
+        MARKERS.EQUIPPED, MARKERS.NOT_EQUIPPED, '】' + '\n');
     });
   }
 
@@ -782,7 +782,7 @@ var QuestSystem = (function() {
       var condText = buildSkillConditionText(target, 'ランク' + requiredRank + ':');
       appendConditionLine(ctx, SCOPE_COMPLETION, condText,
         target.actor.skillMasteryLevel(skillId) >= requiredRank,
-        MARKERS.ACHIEVED, MARKERS.NOT_ACHIEVED, '】\n');
+        MARKERS.ACHIEVED, MARKERS.NOT_ACHIEVED, '】' + '\n');
     });
   }
 
@@ -799,7 +799,7 @@ var QuestSystem = (function() {
       var condText = '【' + buildActorPrefix(actorId, actor) +
         colorTaggedText(2, '\x1bSIM[' + stateId + ']') + ':';
       appendConditionLine(ctx, SCOPE_COMPLETION, condText, actor.isStateAffected(stateId),
-        MARKERS.GRANTED, MARKERS.NOT_GRANTED, '】\n');
+        MARKERS.GRANTED, MARKERS.NOT_GRANTED, '】' + '\n');
     });
   }
 
@@ -815,7 +815,7 @@ var QuestSystem = (function() {
     var condText = '【' + colorTaggedText(2, switchName) + ':';
 
     appendConditionLine(ctx, SCOPE_COMPLETION, condText, $gameSwitches.value(switchId),
-      MARKERS.ACHIEVED, MARKERS.NOT_ACHIEVED, '】\n');
+      MARKERS.ACHIEVED, MARKERS.NOT_ACHIEVED, '】' + '\n');
   }
 
   // Handler: Money/Donation (QuestCompMoney) - Processed at the end
@@ -826,9 +826,9 @@ var QuestSystem = (function() {
     if (requiredMoney < 1) return;
 
     //NOTE: 金額は色タグを閉じない従来の書式を維持する
-    var condText = '【\\C[2]' + requiredMoney + '\\G';
+    var condText = '【' + colorTaggedText(2, requiredMoney) + '\\G';
     appendConditionLine(ctx, SCOPE_COMPLETION, condText, $gameParty.gold() >= requiredMoney,
-      MARKERS.SUCCESS, MARKERS.FAILURE, '】\n');
+      MARKERS.SUCCESS, MARKERS.FAILURE, '】' + '\n');
   }
 
   completionConditionHandlers.push({ name: 'QuestCompPerspective', process: processQuestCompPerspectiveCondition });
@@ -948,8 +948,8 @@ var QuestSystem = (function() {
     return {
       plain: RANK_REWARD_HEADER + '[' + values.gold + '\\G][' +
         values.coin + coinName + ']' + values.extra,
-      colored: RANK_REWARD_HEADER + '[\\C[2]' + values.gold + '\\C[0]\\G][' +
-        '\\C[2]' + values.coin + '\\C[0]' + coinName + ']' + values.extra
+      colored: RANK_REWARD_HEADER + '[' + colorTaggedText(2, values.gold) + '\\G][' +
+        colorTaggedText(2, values.coin) + coinName + ']' + values.extra
     };
   }
 
