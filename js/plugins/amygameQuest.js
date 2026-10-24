@@ -146,9 +146,14 @@
     const applyRewards = $gameSwitches.value(QUEST_SWITCH.APPLY_REWARDS);
     valueCountSet3 = collectSpecialRewards(item.meta || {}, applyRewards);
     // Descriptive aliases kept for the callers inside this plugin.
-    rewardGoldAmount = valueCountSet1;
-    rewardItemAmount = valueCountSet2;
-    additionalCompletionText = valueCountSet3;
+    const rewardSummaryData = {
+      rewardGoldAmount: valueCountSet1,
+      rewardItemAmount: valueCountSet2,
+      additionalCompletionText: valueCountSet3
+    }
+
+    // using the rewardSummaryData as input\output parameter between functions instead of global vars
+    return rewardSummaryData;
   };
 
   quest_settei_getItemEquipmentSource = function (deliveryValues, questIndex) {
@@ -241,24 +246,24 @@
     appendCompletionText(report, `${moneyAmount}を納めました。\n`);
   }
 
-  function awardQuestBaseRewards(questItem, completionMarker) {
+  function awardQuestBaseRewards(questItem, completionMarker, rewardSummaryData) {
     const party = $gameParty;
-    if (rewardGoldAmount >= 1) party.gainGold(rewardGoldAmount);
-    if (rewardItemAmount >= 1)
-      party.gainItem($dataItems[WAR_COIN_ITEM_ID], rewardItemAmount);
+    if (rewardSummaryData.rewardGoldAmount >= 1) party.gainGold(rewardSummaryData.rewardGoldAmount);
+    if (rewardSummaryData.rewardItemAmount >= 1)
+      party.gainItem($dataItems[WAR_COIN_ITEM_ID], rewardSummaryData.rewardItemAmount);
     party.loseItem(questItem, 1);
     party.gainItem(completionMarker, 1);
   }
 
-  function questRewardSummary(questItem) {
+  function questRewardSummary(questItem, rewardSummaryData) {
     const questName = colorTaggedText(2, questItem.name);
     let text = `クエスト${questName}を達成した！＜報酬:`;
-    if (rewardGoldAmount >= 1)
-      text += colorTaggedText(14, rewardGoldAmount) + "\\G ";
-    if (rewardItemAmount >= 1) {
+    if (rewardSummaryData.rewardGoldAmount >= 1)
+      text += colorTaggedText(14, rewardSummaryData.rewardGoldAmount) + "\\G ";
+    if (rewardSummaryData.rewardItemAmount >= 1) {
       const coin = $dataItems[WAR_COIN_ITEM_ID];
       const coinName = coin ? coin.name : "";
-      const amountText = colorTaggedText(14, rewardItemAmount);
+      const amountText = colorTaggedText(14, rewardSummaryData.rewardItemAmount);
       text += `${amountText}${coinName} `;
     }
     return text + "＞\n";
@@ -280,11 +285,11 @@
     $gameScreen.movePicture(102, 1, 640, 384, 100, 100, 255, 0, 60);
   }
 
-  function finishQuestReport(report, questItem, completionType) {
+  function finishQuestReport(report, questItem, completionType, rewardSummaryData) {
     const questName = colorTaggedText(2, questItem.name);
     WindowManager.drawText(0, `クエスト${questName}を達成報告した。`);
-    appendCompletionText(report, questRewardSummary(questItem));
-    appendCompletionText(report, additionalCompletionText + "\n");
+    appendCompletionText(report, questRewardSummary(questItem, rewardSummaryData));
+    appendCompletionText(report, rewardSummaryData.additionalCompletionText + "\n");
     $gameSwitches.setValue(QUEST_SWITCH.TEMPORARY_RESULT, true);
     if (report.applyRewards)
       incrementQuestCompletionCount(questItem.meta["SGカテゴリ"]);
@@ -317,9 +322,9 @@
     };
     processQuestPayments(report, plan);
     // Keep this public call as an extension point, and its shared reward globals.
-    quest_housyuukeisan(questId);
-    if (applyRewards) awardQuestBaseRewards(questItem, completionMarker);
-    finishQuestReport(report, questItem, completionType);
+    const rewardSummaryData = quest_housyuukeisan(questId);
+    if (applyRewards) awardQuestBaseRewards(questItem, completionMarker, rewardSummaryData);
+    finishQuestReport(report, questItem, completionType, rewardSummaryData);
   };
 
   function questRewardDataAvailable(questItem, completionMarker) {
