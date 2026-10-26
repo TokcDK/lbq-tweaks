@@ -3464,6 +3464,74 @@
   };
 
   // =====================================================================
+  // Item damage formulas (data/Items.json)
+  //
+  // Items are evaluated by the same evalDamageFormula, so the scope is the one
+  // documented above: the action comes in as the first argument (`this` at the
+  // call site) and the answer still goes in `value`.
+  // =====================================================================
+
+  // Replaces (1x, item 102 エリクシール＜OFF＞): flips the continue switch through
+  // the shared on/off toggle, then turns state 25 (コンティニュー有効) on or off
+  // for every party member to match.
+  //
+  // BUGFIX: the body read meta['スイッチ'] / meta['オン名称'] / meta['オフ名称'],
+  // but the item carries <SwicthOnOffUse:146> / <SwicthOnName> / <SwicthOffName> -
+  // the keys skill_personalonoff() and continue_settei() read. All three lookups
+  // were undefined, so Number(undefined) = NaN made the switch test always false:
+  // the item could only ever switch ON, renamed itself to "undefined" and
+  // announced ＜undefined＞に変更しました.
+  //
+  // Rename + switch + announcement is skill_personalonoff's job (valueItemsType 1
+  // selects $dataItems); only the state-25 sync is item-specific. Its message
+  // carries the item icon and half-width brackets like every other on/off entry.
+  AGH_damageFormulaToggleContinueItem = function (action, user, target) {
+    if (target.actorId() !== user.actorId()) return;
+    const item = action.item();
+    skill_personalonoff(user, target, item.id, 1);
+    const continueEnabled = $gameSwitches.value(Number(item.meta.SwicthOnOffUse));
+    $gameParty.members().forEach((actor) => {
+      if (continueEnabled) actor.addState(25);
+      else actor.removeState(25);
+    });
+  };
+
+  const ALCHEMY_SKILL_ID = 768;
+
+  // Replaces (1x, item 177 ＜錬金＞の技術書): teaches alchemy through the shared
+  // personal-skill book path, then rebuilds the synthesis material lists so the
+  // recipes show their ingredients right away.
+  //
+  // BUGFIX: the database guarded the rebuild with
+  //     if(a.isLearnedSkill(768)){}else{ item_addSynthesisHelp(); };
+  // which runs it only while the user does NOT know alchemy - but the learn call
+  // on the line above has already granted it, so for the actor who just learned
+  // it the guard is always true and the rebuild never ran, which is the one case
+  // the item exists for (the note says レシピ表示の更新のために). The call is
+  // unconditional now: it only rebuilds valueItemsSynth1, it is idempotent, and
+  // the day-start common event already runs it the same way.
+  AGH_damageFormulaLearnAlchemyBook = function (action, user, target) {
+    actor_personalskilllearn(user, target, action.item().id, 1, ALCHEMY_SKILL_ID);
+    item_addSynthesisHelp();
+  };
+
+  // Replaces (1x, item 1142 流出画像): switches the config picture name held in
+  // variable 312 between the default (ZX_NowconditionA_) and the one this item
+  // selects (ZX_NowconditionF_<photoNumber>).
+  AGH_damageFormulaToggleConfigPicture = function (action, user, target) {
+    if (target.actorId() !== user.actorId()) return;
+    const item = action.item();
+    const configPictureName = `ZX_NowconditionF_${Number(item.meta["photoNumber"])}`;
+    if ($gameVariables.value(312) === configPictureName) {
+      $gameVariables.setValue(312, "ZX_NowconditionA_");
+      TickerManager.show("コンフィグピクチャーをデフォルトに戻しました。");
+      return;
+    }
+    $gameVariables.setValue(312, configPictureName);
+    TickerManager.show(`コンフィグピクチャーを\\iin[${item.id}]に変更しました`);
+  };
+
+  // =====================================================================
   // Skill after-effects (data/Skills.json)
   //
   // <After Eval> is evaluated by Game_Action.prototype.applyAfterEval
@@ -3633,6 +3701,41 @@
     BattleManager._logWindow.push("addText", `経験値レート:${expRateText}`);
     BattleManager._logWindow.push("addText", `\\Gレート:${goldRateText}`);
   };
+
+  // =====================================================================
+  // Item after-effects (data/Items.json)
+  //
+  // Same scope as the skill bodies above. Every battle-usable item bumps
+  // variable 190, which <Enable Requirements> then caps with
+  // "Variable 189 > $gameVariables.value(190)".
+  // =====================================================================
+
+  const BATTLE_ITEM_USE_COUNT = 190;
+
+  // Replaces (25x, items 71-73 / 75-77 / 79-81 / 83-94 / 96-99).
+  AGH_afterEvalItemBattleUseCount = function () {
+    if (!$gameParty.inBattle()) return;
+    const count = $gameVariables.value(BATTLE_ITEM_USE_COUNT) + 1;
+    $gameVariables.setValue(BATTLE_ITEM_USE_COUNT, count);
+  };
+
+  // Replaces (1x, item 95 オール・ディスペル・キット): counts the use and plays
+  // the effect animation on the target, both only inside battle.
+  AGH_afterEvalItemBattleUseCountWithAnimation = function (target, animationId, waitFrames) {
+    if (!$gameParty.inBattle()) return;
+    AGH_afterEvalItemBattleUseCount();
+    target.startAnimation(animationId, true, waitFrames);
+  };
+
+  // Replaces (5x, items 101 清めの塩 / 115-116 爆発ポーション / 117-118 魔封瓶):
+  // counts the use in battle but plays the animation unconditionally, the way
+  // the database has it. Outside battle the queued entry is simply never
+  // consumed, because no battle sprite is showing.
+  AGH_afterEvalItemUseAnimation = function (target, animationId, waitFrames) {
+    AGH_afterEvalItemBattleUseCount();
+    target.startAnimation(animationId, true, waitFrames);
+  };
+
   //=============================================================================
   // Event Script (355/655) migration
   //=============================================================================
