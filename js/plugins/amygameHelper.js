@@ -3528,7 +3528,8 @@
       return;
     }
     $gameVariables.setValue(312, configPictureName);
-    TickerManager.show(`コンフィグピクチャーを\\iin[${item.id}]に変更しました`);
+    const itemName = `\\iin[${item.id}]`;
+    TickerManager.show(`コンフィグピクチャーを${itemName}に変更しました`);
   };
 
   // =====================================================================
