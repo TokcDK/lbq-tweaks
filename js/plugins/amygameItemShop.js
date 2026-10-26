@@ -436,6 +436,8 @@ item_Potion1 = function(usedItem,targetItem,itemId){
 
   // The resistance array is read again after the gain, so the message shows the new value.
   reportPotionOutcome(targetItem, restoresHp, isResistDisabled, potionResistDelta, resistValues[58]);
+  
+  return valuePotion1; //before there was no return and the referenced place was read the valuePotion1 in path to avoiding use global variables, changed to return value instead and remove re-read code, mayve valuePotion1 dont need anymore
 }
 
 // Potion result: battle log inside a battle, ticker on the map.
