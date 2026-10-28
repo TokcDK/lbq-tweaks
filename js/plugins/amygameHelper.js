@@ -3139,7 +3139,7 @@
   // be learned. The two sentences are concatenated with no line break, exactly
   // as the original bodies did.
   AGH_equipReqTextAllSoulsLearned = function (tierLabel) {
-    return `十種${tierLabel}サブジョブソウルを全て習得` + "重複装備不可";
+    return `十種${tierLabel}サブジョブソウルを全て習得重複装備不可`;
   };
 
   // Replaces (33x, armors 69-100 / 107-108): "wear a skill of this series, or
@@ -3149,19 +3149,24 @@
   AGH_equipReqTextSkillOrJob = function (skillId, skillLabel, jobId, jobLabel, learnedSkillIds) {
     let lines = "";
     learnedSkillIds.forEach((learnedSkillId) => {
-      lines += `\\C[2]<\\sin[${learnedSkillId}]>\\C[0]習得\n`;
+      const learnedSkillName = colorTaggedText(2, `<\\sin[${learnedSkillId}]>`);
+      lines += `${learnedSkillName}習得` + `\n`;
     });
-    lines += `\\C[2]\\sin[${skillId}]\\C[0]\n`;
-    lines += `${skillLabel}\n`;
+
+    const skillName = colorTaggedText(2, `\\sin[${skillId}]`);
+    lines += skillName + '\n';
+    lines += skillLabel +'\n';
     lines += "　　　　　or\n";
-    lines += `\\C[16]\\J[${jobId}]\\C[0]${jobLabel}\n`;
+    const jobName = colorTaggedText(16, `\\J[${jobId}]`);
+    lines += `${jobName}${jobLabel}\n`;
     lines += "をサブジョブにセット";
     return lines;
   };
 
   // Replaces (2x, weapons 81 / 82): the weapon belongs to a single actor.
   AGH_equipReqTextExclusiveToActor = function (actorId) {
-    return `\x1bset[${actorId}]専用`;
+    const actorName = `\x1bset[${actorId}]`;
+    return `${actorName}専用`;
   };
 
   // =====================================================================
