@@ -3074,6 +3074,12 @@
   // with maxhp/maxmp/atk/def/mat/mdf/agi/luk/all pre-declared and `user` bound to
   // the actor. Each line assigns one of those locals, so again only the
   // right-hand side moves.
+  //
+  // <Custom Equip Requirement Text> is eval'd by
+  // Window_EquipRequirement.prototype.drawCustomText (YEP_X_EquipRequirements.js
+  // :948) as `var text = ''; ... eval(code); ... this.drawTextEx(text, ...)`.
+  // `text` is a local of that method, so a helper cannot write it: the body
+  // must assign the result (`text = AGH_...(..)`).
   //=============================================================================
 
   // Replaces (20x, armors 81-100): equippable once at least one of skillIds has
@@ -3112,6 +3118,50 @@
   // variable row, addressed by the weapon's own id.
   AGH_equipParamFromVariableRow = function (user, item, variableId, idOffset, statIndex) {
     return $gameVariables.value(variableId)[item.id - idOffset][statIndex];
+  };
+
+  // --- <Custom Equip Requirement Text> ---------------------------------------
+
+  // Replaces (28x, armors 104 / 301-309 / 351-360 / 381-390): only one copy
+  // may be worn (paired with "unique only" in <Equip Requirement>).
+  AGH_equipReqTextUniqueOnly = function () {
+    return "重複装備不可";
+  };
+
+  // Replaces (6x, armors 310-315): unique, and female characters only.
+  // BUGFIX: armor 315 carried a stray leading space (' 女性のみ'); the other
+  // five have none, so the text is now the same for all six.
+  AGH_equipReqTextUniqueOnlyFemale = function () {
+    return "重複装備不可\n女性のみ";
+  };
+
+  // Replaces (3x, armors 101-103): every soul of the given sub-job tier must
+  // be learned. The two sentences are concatenated with no line break, exactly
+  // as the original bodies did.
+  AGH_equipReqTextAllSoulsLearned = function (tierLabel) {
+    return `十種${tierLabel}サブジョブソウルを全て習得` + "重複装備不可";
+  };
+
+  // Replaces (33x, armors 69-100 / 107-108): "wear a skill of this series, or
+  // set this job as the sub-job". The skill and its label sit on two lines, the
+  // job and its label on one. Each id in learnedSkillIds adds an extra
+  // "<skill>習得" line above (empty for most).
+  AGH_equipReqTextSkillOrJob = function (skillId, skillLabel, jobId, jobLabel, learnedSkillIds) {
+    let lines = "";
+    learnedSkillIds.forEach((learnedSkillId) => {
+      lines += `\\C[2]<\\sin[${learnedSkillId}]>\\C[0]習得\n`;
+    });
+    lines += `\\C[2]\\sin[${skillId}]\\C[0]\n`;
+    lines += `${skillLabel}\n`;
+    lines += "　　　　　or\n";
+    lines += `\\C[16]\\J[${jobId}]\\C[0]${jobLabel}\n`;
+    lines += "をサブジョブにセット";
+    return lines;
+  };
+
+  // Replaces (2x, weapons 81 / 82): the weapon belongs to a single actor.
+  AGH_equipReqTextExclusiveToActor = function (actorId) {
+    return `\x1bset[${actorId}]専用`;
   };
 
   // =====================================================================
