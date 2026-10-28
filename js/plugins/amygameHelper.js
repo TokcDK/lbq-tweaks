@@ -3146,7 +3146,17 @@
   // set this job as the sub-job". The skill and its label sit on two lines, the
   // job and its label on one. Each id in learnedSkillIds adds an extra
   // "<skill>習得" line above (empty for most).
-  AGH_equipReqTextSkillOrJob = function (skillId, skillLabel, jobId, jobLabel, learnedSkillIds) {
+  //
+  // The series wording is the default. The three rings that name one skill
+  // instead (93 "スキル装着", 107-108 "のスキル装着") pass their own label and
+  // leave the job line unlabelled.
+  AGH_equipReqTextSkillOrJob = function (
+    skillId,
+    jobId,
+    learnedSkillIds = [],
+    skillLabel = "系列のスキル装着",
+    jobLabel = "系列のジョブ"
+  ) {
     let lines = "";
     learnedSkillIds.forEach((learnedSkillId) => {
       const learnedSkillName = colorTaggedText(2, `<\\sin[${learnedSkillId}]>`);
