@@ -215,7 +215,10 @@ Game_Event.prototype.clearChaseSettings = function() {
 Yanfly.ECP.Game_Event_updateSelfMovement =
     Game_Event.prototype.updateSelfMovement;
 Game_Event.prototype.updateSelfMovement = function() {
-    if (Imported.YEP_StopAllMove && $gameSystem.isEventMoveStopped()) return;
+    // BUGFIX: dropped `if (Imported.YEP_StopAllMove && $gameSystem.isEventMoveStopped()) return;`.
+    // Neither name exists - the plugin is YEP_StopMapMovement, which blocks self movement in
+    // its own wrapper around this method (preventSelfMovement) - so the guard was dead code
+    // that would throw a TypeError the moment Imported.YEP_StopAllMove was ever set.
     this.updateChaseDistance();
     this.updateFleeDistance();
     this.updateChaseMovement();
