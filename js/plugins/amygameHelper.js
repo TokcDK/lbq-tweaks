@@ -9803,9 +9803,10 @@
   };
 
   // Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
-  AGH_concatArrayFrequentlyUsed = function () {
-    array = array.concat(arr2);
-  };
+  //
+  // NOTE: demo snippet (`array = array.concat(arr2)`) - `array` and `arr2` are
+  // placeholders that are declared nowhere, so it could only throw. No-op.
+  AGH_concatArrayFrequentlyUsed = function () {};
 
   // Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
   AGH_setSwitchFrequentlyUsed = function () {
@@ -9909,12 +9910,11 @@
   };
 
   // Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
-  AGH_filterArrayFrequentlyUsed = function () {
-    //arr3から重複を削除してarr4に渡す
-    arr4 = arr3.filter(function (val, i, array) {
-      return array.indexOf(val) === i;
-    });
-  };
+  //
+  // NOTE: demo snippet ("drop the duplicates of arr3 into arr4") - `arr3` and
+  // `arr4` are placeholders that are declared nowhere, so it could only throw.
+  // No-op; the dedupe itself is `array.filter((v, i) => array.indexOf(v) === i)`.
+  AGH_filterArrayFrequentlyUsed = function () {};
 
   // Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
   AGH_computeMaxFrequentlyUsed = function () {
@@ -9965,9 +9965,20 @@
   };
 
   // Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
+  //
+  // BUGFIX: the original snippet read `$dataItems[id3]`, but `id3` is a
+  // placeholder from the notes that is defined nowhere, so it only ever threw
+  // ReferenceError. The item being processed is variable 19 - the same source
+  // the neighbouring item helpers (AGH_iterateItemsEIC, ...) read.
   AGH_setVariableFrequentlyUsed = function () {
-    const DesireItemCheckList = $dataItems[id3].meta["性欲アイテム判定"].split(",");
-    $gameVariables.setValue(Number(DesireItemCheckList[0]), Number(DesireItemCheckList[1]));
+    const item = $dataItems[$gameVariables.value(HELPER_VARIABLE.PROCESSED_ENTRY_ID)];
+    const desireItemCheck = item && item.meta["性欲アイテム判定"];
+    if (!desireItemCheck) return; // no such item, or the item has no such tag
+
+    const desireItemCheckList = desireItemCheck.split(",");
+    if (desireItemCheckList.length < 2) return;
+
+    $gameVariables.setValue(Number(desireItemCheckList[0]), Number(desireItemCheckList[1]));
   };
 
   // Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
