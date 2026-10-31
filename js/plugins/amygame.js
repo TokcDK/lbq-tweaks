@@ -1450,7 +1450,10 @@ abNomal_Clear = function (
   }
 
   enemy_troopPush = function () {
-    if ($gameVariables.value(GAME_VARIABLE.ENEMY_SPAWN_POOL) === 0) return; // have empty common enemy's pool
+    // 出現プールが空配列のままのダンジョンでは通常版メタを持たないため split が落ちる。
+    // 旧ガード(=== 0)は空配列を素通りするので、henemy_troopPush と同じ判定にそろえる。
+    const spawnPool = $gameVariables.value(GAME_VARIABLE.ENEMY_SPAWN_POOL);
+    if (!spawnPool || spawnPool.length === 0) return;
 
     const chestItemMeta =
       $dataItems[$gameVariables.value(GAME_VARIABLE.DUNGEON_INFO_ITEM_ID)].meta;

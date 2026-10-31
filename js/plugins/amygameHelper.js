@@ -9714,15 +9714,11 @@
   };
 
   // Replaces (1x): CommonEvents.json:common-event:4|条件分岐
-  AGH_iterateItemsWarpPoint = function () {
-    const itemMeta =
-      $dataItems[$gameVariables.value(HELPER_VARIABLE.DUNGEON_INFO_ITEM_ID)].meta[
-        "warpPoint" + $gameVariables.value(HELPER_VARIABLE.RANDOM_WORK_1)
-      ].split(",");
-    const array = [Number(itemMeta[0]), Number(itemMeta[1]), Number(itemMeta[2])];
-    if (array[0] == arr3[0] && array[1] == arr3[1] && array[2] == arr3[2]) {
-    }
-  };
+  //
+  // NOTE: the original block compared the warp point against an `arr3` that is
+  // declared nowhere and had an empty body, so calling it only threw
+  // ReferenceError. Nothing to port - it stays a no-op.
+  AGH_iterateItemsWarpPoint = function () {};
 
   // Replaces (1x): CommonEvents.json:common-event:4|条件分岐
   AGH_iterateSkillsConditionBranch = function (interp) {

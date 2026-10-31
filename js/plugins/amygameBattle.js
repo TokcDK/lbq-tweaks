@@ -2478,7 +2478,9 @@ function tbcsProcessElementTrait(stateData, code, dataId, value, absoluteValue) 
     const modifier = value >= 0.01 ? `\\C[1]-` : `\\C[2]+`;
     const elementName = $dataSystem.elements[dataId];
     const resistancePercent = absoluteValue * 100;
-    return ':' + colorTaggedValue(16, `[${elementName}${modifier}${resistancePercent}%耐性]`);
+    // BUGFIX: `colorTaggedValue` never existed (only colorTaggedText does), so this
+    // branch threw a ReferenceError and the resistance line was dropped.
+    return ':' + colorTaggedText(16, `[${elementName}${modifier}${resistancePercent}%耐性]`);
   }
 
   const modifier = value >= 0.01 ? `\\C[2]+` : `\\C[1]-`;
