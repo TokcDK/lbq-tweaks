@@ -93,15 +93,18 @@ Galv.CI = Galv.CI || {};        // Galv's stuff
 
 (function() {
 
-Galv.CI.initHidden = PluginManager.parameters('Galv_CursorImage')["Start Hidden"].toLowerCase() === 'true' ? true : false;
+// BUGFIX: these lookups used 'Galv_CursorImage', but the plugin is registered as
+// "GALV_CursorImage" in plugins.js. They only resolved because the core lowercases
+// the name in PluginManager.parameters - use the registered name.
+Galv.CI.initHidden = PluginManager.parameters('GALV_CursorImage')["Start Hidden"].toLowerCase() === 'true' ? true : false;
 
-Galv.CI.image = PluginManager.parameters('Galv_CursorImage')["Cursor Image"];
-Galv.CI.frames = Number(PluginManager.parameters('Galv_CursorImage')["Image Frames"]);
-Galv.CI.animSpeed = Number(PluginManager.parameters('Galv_CursorImage')["Animation Speed"]);
-Galv.CI.center = PluginManager.parameters('Galv_CursorImage')["Position Centered"].toLowerCase() == 'true' ? true : false;
-Galv.CI.cIndent = Number(PluginManager.parameters('Galv_CursorImage')["Command Indent"]);
-Galv.CI.iIndent = Number(PluginManager.parameters('Galv_CursorImage')["Item Indent"]);
-var tmp = PluginManager.parameters('Galv_CursorImage')["Position Offset"].split(",");
+Galv.CI.image = PluginManager.parameters('GALV_CursorImage')["Cursor Image"];
+Galv.CI.frames = Number(PluginManager.parameters('GALV_CursorImage')["Image Frames"]);
+Galv.CI.animSpeed = Number(PluginManager.parameters('GALV_CursorImage')["Animation Speed"]);
+Galv.CI.center = PluginManager.parameters('GALV_CursorImage')["Position Centered"].toLowerCase() == 'true' ? true : false;
+Galv.CI.cIndent = Number(PluginManager.parameters('GALV_CursorImage')["Command Indent"]);
+Galv.CI.iIndent = Number(PluginManager.parameters('GALV_CursorImage')["Item Indent"]);
+var tmp = PluginManager.parameters('GALV_CursorImage')["Position Offset"].split(",");
 Galv.CI.offset = {x: Number(tmp[0]), y: Number(tmp[1])};
 tmp = null;
 

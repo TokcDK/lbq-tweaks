@@ -307,7 +307,11 @@
     // Game_Interpreter
     //  プラグインコマンド[D_TEXT]を追加定義します。
     //=============================================================================
-    if (PluginManager.parameters('NRP_EvalPluginCommand')) {
+    // BUGFIX: `PluginManager.parameters('X')` returns {} for a plugin that is not
+    // loaded, so `if (PluginManager.parameters('NRP_EvalPluginCommand'))` was always
+    // true and command356 got patched even without that plugin. Test the loaded
+    // plugin list instead.
+    if (PluginManager._scripts.indexOf('NRP_EvalPluginCommand') >= 0) {
         var _Game_Interpreter_command356 = Game_Interpreter.prototype.command356;
         Game_Interpreter.prototype.command356 = function() {
             this._argClone = this._params[0].split(" ");
