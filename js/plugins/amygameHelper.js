@@ -9804,8 +9804,11 @@
 
   // Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
   //
-  // NOTE: demo snippet (`array = array.concat(arr2)`) - `array` and `arr2` are
-  // placeholders that are declared nowhere, so it could only throw. No-op.
+  // NOTE: cheat-sheet snippet, extracted verbatim as `var arr1 = arr1.concat(arr2)`
+  // (a later rename made it `array`/`arr2`). Neither name is assigned anywhere, and
+  // `var` in a 355 block is local to that eval, so `arr1` was read before it was
+  // initialised: it always threw and could never concat or store anything. No-op,
+  // and common event 5 has no caller in data/.
   AGH_concatArrayFrequentlyUsed = function () {};
 
   // Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
