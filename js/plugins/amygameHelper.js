@@ -5630,9 +5630,12 @@
 
   // Replaces (3x): data/CommonEvents.json:common-event:5, data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
   AGH_setSelfVariableToCharacterPool = function (interp) {
-    // NOTE: `arr` is the shared pool in global scope, and variable 21 holds the
-    //       *same array reference*.  The trailing reset is kept verbatim — an
-    //       array is never == 0, so it is dead code in the original as well.
+    // BUGFIX: the snippet read a bare global `arr`, which is defined nowhere in
+    // this project, so it always threw ReferenceError - and an uncaught Script
+    // error stops the game loop (SceneManager.stop). Its only callers are the
+    // Map007 sample events, which overwrite variable 21 on the very next command,
+    // so bailing out loses nothing; the body is kept for when `arr` exists.
+    if (typeof arr === "undefined") return;
     const pickedCharacterId = arr[getRandomIndex(arr.length)];
     const pickedIndex = arr.findIndex((poolId) => poolId === pickedCharacterId);
     if (pickedIndex >= 0) arr.splice(pickedIndex, 1);
@@ -7525,8 +7528,11 @@
 
   // Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
   AGH_initSelfVariableCharacterPool = function (interp) {
-    const sharedPoolArray = varValue(21); // variable 21: 乱数汎用1 (the shared character pool)
     setSelfVar(interp, 21, [0, [], 0, 0, 0, 0, 0, 0, 0]);
+    // BUGFIX: the extraction hoisted this read above the assignment, so both pushes
+    // went into the array that had just been replaced (and threw when variable 21
+    // was still 0). The original read $gameVariables.value(21) *after* setting it.
+    const sharedPoolArray = varValue(21); // variable 21: 乱数汎用1 (the shared character pool)
     sharedPoolArray[1].push(5);
     sharedPoolArray[1].push(556);
   };
@@ -8566,7 +8572,12 @@
 
   // Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
   AGH_debugLogTreasurePools = function () {
-    const treasurePool = eval(`valueDanjonTreasure${varValue(CURRENT_ACTOR_VAR)}`);
+    // NOTE: dev debug helper - all of its output is commented out. The
+    // `valueDanjonTreasure<n>` globals are only written by
+    // AGH_iterateItemsValueDanjonTreasure, which no event calls, so the original
+    // eval threw ReferenceError; look the pool up on window and bail out instead.
+    const treasurePool = window[`valueDanjonTreasure${varValue(CURRENT_ACTOR_VAR)}`];
+    if (!Array.isArray(treasurePool)) return;
     //treasureKindPool is only read by the commented debug log below
     //const treasureKindPool = eval(`valueDanjonTrSyurui${varValue(CURRENT_ACTOR_VAR)}`);
     //console.log(treasurePool);
@@ -9865,6 +9876,12 @@
   };
 
   // Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
+  //
+  // NOTE: cheat-sheet snippet - the battle-log line for a state that pays out its
+  // accumulated counter as damage when it is removed. `user`, `stateId` and
+  // `value1` are the author's placeholders and nothing sets them, so the CE5 call
+  // (no arguments) can only throw. Shipped version: AGH_stateRemoveFalSasGuard
+  // (state 155), which passes all three.
   AGH_iterateStatesAddText = function () {
     const userName = user.name();
     const stateName = $dataStates[stateId].name;
@@ -9874,6 +9891,11 @@
   };
 
   // Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
+  //
+  // NOTE: cheat-sheet snippet - "take a random id out of a pool, then drop it from
+  // the pool". `array2` is the author's placeholder for the pool and nothing sets
+  // it, so the CE5 call (no arguments) can only throw. The same recipe fed a real
+  // pool: AGH_debugLogTreasurePools.
   AGH_findIndexArray = function () {
     const randomIndex = array2[getRandomIndex(array2.length)]; //ID
     const index = array2.findIndex((array2) => array2 == randomIndex);
@@ -9935,6 +9957,11 @@
   };
 
   // Replaces (1x): CommonEvents.json:common-event:5|用途の多いもの
+  //
+  // NOTE: cheat-sheet snippet - pads an actor name stored in a variable array with
+  // full-width spaces up to 6 columns, for column alignment in a menu. `actor`,
+  // `id1` and `i` are the author's placeholders and nothing sets them, so the CE5
+  // call (no arguments) can only throw. Nothing else in the project uses it.
   AGH_readVariableFrequentlyUsed = function () {
     const nameLength = actor.name().length;
     let threshold = 6 - nameLength;
