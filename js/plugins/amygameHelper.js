@@ -9119,9 +9119,9 @@
 
   // Replaces (1x): data/CommonEvents.json:common-event:235
   AGH_setCurrentActorRankUpMessage = function () {
-    const setString2 = setString(varValue(CURRENT_ACTOR_VAR));
-    const ruby2 = ruby("昇格", "レアリティ・アップ");
-    setVar(21, `${setString2}は、<${valueCountSet1}>に${ruby2}した！`);
+    const actorName = setString(varValue(CURRENT_ACTOR_VAR));
+    const rarityup = ruby("昇格", "レアリティ・アップ");
+    setVar(21, `${actorName}は、<${valueCountSet1}>に${rarityup}した！`);
   };
 
   // Replaces (1x): data/CommonEvents.json:common-event:254
