@@ -1,4 +1,4 @@
-﻿/*:
+/*:
 * @plugindesc このゲーム専用プラグイン
 * @author 作者名
 * @help ゲーム専用に作成された初期読み込み用プラグイン
@@ -13,95 +13,35 @@ var yShiftCoordsEnemyDropSelection = [-50, -40, -30, -20, -10, 0, 10, 20];
 var durationsEnemyDropSelection = [80, 85, 90, 95, 100];
 //エネミー戦闘不能時にドロップ計算
 enemy_dropSelection = function (user) {
-
   const isDuringStripping = $gameSwitches.value(607);
   const isDuringRipping = $gameSwitches.value(608);
   const isInBattle = $gameParty.inBattle();
   if (!isDuringStripping && !isDuringRipping) {
-    const tribalSubjugationIds = $gameVariables.value(52);
-    const valueWordSet3Array = [];
-    for (let i = 1; i < valueSubjugationPoint.length; i++) {//討伐数カウント
-      const stateId = valueSubjugationPoint[i];
-      if (!user.isStateAffected(stateId)) continue;
-
-      tribalSubjugationIds[stateId] += 1;
-      if (isInBattle) continue;
-
-      const name = `\x1bSIM[${stateId}]`;
-      const num = `\\C[10]+1\\C[0]`;
-      const messageText = `${name}：討伐数${num}\n`;
-      valueWordSet3Array.push(messageText);
-      $gameSystem.pushInfoLog(messageText);
-      //CommonPopupManager.showInfo({},value1,null);
-    }
-
-    valueWordSet3 += valueWordSet3Array.join('');
-
-    if (!user.isStateAffected(436)) {
-      tribalSubjugationIds[1] += 1;//ヒューマン以外の魔物当日討伐数
-      tribalSubjugationIds[2] += 1;//ヒューマン以外の魔物総合討伐数
-    }
-  };
-
-  const itemDropDataArray = get_item_drop_data(user);
-  const itemDropDataArrayLength = itemDropDataArray.length;
-  const itemsSourceKinds = [$dataItems, $dataWeapons, $dataArmors];
-  const xShiftCoordsLength = xShiftCoordsEnemyDropSelection.length;
-  const yShiftCoordsLength = yShiftCoordsEnemyDropSelection.length;
-  const durationsLength = durationsEnemyDropSelection.length;
-  const userIndex = user.index() + 1;
-  const coordinateX = $gameTroop.getX(userIndex);
-  const coordinateY = $gameTroop.getY(userIndex);
+    recordSubjugationBattleRefactor(user, isInBattle);
+  }
+  const drops = get_item_drop_data(user);
+  const sources = [$dataItems, $dataWeapons, $dataArmors];
   const dropUpItem = $dataItems[valueItemDropUpItem];
-  const valueWordSet1Array = [];
-  for (let i = 0; i < itemDropDataArrayLength; i++) {
-    const itemDropData = itemDropDataArray[i];
-    if (!itemDropData) continue;
-
-    valueDropCount1 = drop_probabilityCalculation2(user, Number(itemDropData[0]), dropUpItem);
+  const messages = [];
+  const origin = isInBattle && drops.length ? getDropOriginBattleRefactor(user) : null;
+  for (const drop of drops) {
+    if (!drop) continue;
+    valueDropCount1 = drop_probabilityCalculation2(user, Number(drop[0]), dropUpItem);
     if (valueDropCount1 != 1) continue;
-
-    const itemDropDataKindNum = Number(itemDropData[1]);
-    const valueItems = itemsSourceKinds[itemDropDataKindNum];
-    const valueItem = valueItems[Number(itemDropData[2])];
-    const picName = itemsSourceKindPicNamesEnemyDropSelection[itemDropDataKindNum];
+    const sourceKind = Number(drop[1]);
+    const itemId = Number(drop[2]);
+    const source = sources[sourceKind];
+    const item = source && source[itemId];
+    if (!item) continue;
     if (isInBattle) {
-      $gameTroop.addDropItem(valueItem);
-      //var value1 = `\x1bI[${valueItems[Number(arr1[i][2])].iconIndex}]`;
-      //var arr7 = [-50,-60,-70,-80,-90,-100,-110,-120,-130,-140,-150,-160,-170,-180,-190,-200];
-      const shiftX = xShiftCoordsEnemyDropSelection[getRandomIndex(xShiftCoordsLength)];//x
-      const shiftY = yShiftCoordsEnemyDropSelection[getRandomIndex(yShiftCoordsLength)];//y
-      const duration = durationsEnemyDropSelection[getRandomIndex(durationsLength)];//wait
-      //var value7 = arr7[getRandomIndex(arr7.length)];//jump
-      picture_motion1("smooth", [0]);
-      //$gameScreen.setDTextPicture(value1, 32);//元から
-      $gameScreen.showPicture(valueDropEnemyPicId, picName, 1, coordinateX, coordinateY, 100, 100, 255, 0);
-      //curveFunctions.patternY = curveFunctions.getPattern('jump', [value7]);
-      //curveFunctions.patternOpacity = curveFunctions.getPattern('jump', [200]);
-      $gameScreen.movePicture(valueDropEnemyPicId, 1, coordinateX + shiftX, coordinateY + shiftY, 100, 100, 0, 0, duration);
-      valueDropEnemyPicId += 1;
-    } else {
-      if (isDuringStripping || isDuringRipping) {
-        $gameVariables.setValue(22, itemDropDataKindNum);
-        $gameVariables.setValue(23, Number(itemDropData[2]));
-        item_getSkillLevel(valueFootpadSkillId, $gameVariables.value(22), $gameVariables.value(23));
-      } else {
-        if (Number(itemDropData[2]) >= 1) {
-          $gameParty.gainItem(valueItem, 1);
-          const itemIcon = `\x1bI[${valueItem.iconIndex}]`;
-          const itemName = `\\C[2]${valueItem.name}\\C[0]`;
-          const item = `${itemIcon}${itemName}`;
-          const num = `\\C[2]1\\C[0]`;
-          const messageText = `${item}を${num}個入手！\n`;
-          valueWordSet1Array.push(messageText);
-          $gameSystem.pushInfoLog(messageText);
-          //CommonPopupManager.showInfo({},value11,null);
-        }
-      }
+      showBattleDropBattleRefactor(item, sourceKind, origin);
+    } else if (isDuringStripping || isDuringRipping) {
+      grantFootpadDropBattleRefactor(sourceKind, itemId);
+    } else if (itemId >= 1) {
+      recordPlainDropBattleRefactor(item, messages);
     }
   }
-  valueWordSet1 += valueWordSet1Array.join('');
-
+  valueWordSet1 += messages.join('');
 };
 
 
@@ -117,171 +57,20 @@ const getItemDropDataStateIds = [851, 852, 853, 854, 855, 856, 857, 858, 859, 86
 ];
 
 get_item_drop_data = function (user) {
-
-  valueDropEnemyLevel = $gameParty.inBattle() ? user.level : Math.ceil($gameActors.actor($gameVariables.value(11)).level / 2);
-
-  const itemDropDataArray = [];
-  let stateAddPowerCustomCount = 0;
-  for (let i = 0; i < valueAddPowerCustomState.length; i++) {
-    if (user.isStateAffected(valueAddPowerCustomState[i])) {
-      stateAddPowerCustomCount += Number($dataStates[valueAddPowerCustomState[i]].meta['AddPowerCustom']);
+  if (!setDropEnemyLevelBattleRefactor(user)) return [];
+  const drops = [];
+  appendPowerAndElementDropsBattleRefactor(user, drops);
+  for (const group of battleRefactorStateDropGroups) {
+    const stateId = group[0];
+    appendStateDropCopiesBattleRefactor(user, stateId, group[1], drops);
+    if (stateId === 454 && user.isStateAffected(454)) {
+      appendStateDropCopiesBattleRefactor(user, 465, [[3, 0, 1289]], drops);
     }
-  };
-  if (stateAddPowerCustomCount >= 1) {
-    for (let i = 0; i < stateAddPowerCustomCount.length; i++) {
-      itemDropDataArray.push([6, 0, 153]);
-    };
-  };
-  for (let i = 51; i <= 56; i++) {
-    if (user.isStateAffected(i)) itemDropDataArray.push([4, 0, i + 103]);
-  };
-
-  addDropIfStateAffected(user, 610, itemDropDataArray, [
-    [0, 0, 10],
-    [1, 0, 196],
-    [3, 0, 197],
-    [5, 0, 198],
-    [9, 0, 199],
-    [6, 0, 190],
-    [7, 0, 147],
-    [10, 0, 148],
-    [8, 0, 152],
-    [8, 0, 153],
-    [10, 0, 170]
-  ]);
-
-  // Combine both drops for state 451
-  addDropIfStateAffected(user, 451, itemDropDataArray, [
-    [6, 0, 191],
-    [6, 0, 161],
-    [6, 0, 163]
-  ]);
-
-  addDropIfStateAffected(user, 452, itemDropDataArray, [
-    [7, 0, 192],
-    [6, 0, 162],
-    [6, 0, 164]
-  ]);
-
-  addDropIfStateAffected(user, 453, itemDropDataArray, [
-    [8, 0, 193],
-    [10, 0, 169]
-  ]);
-
-  addDropIfStateAffected(user, 454, itemDropDataArray, [
-    [10, 0, 194],
-    [10, 0, 169]
-  ]);
-  if (user.isStateAffected(454) && user.isStateAffected(465)) {
-    // Separate nested check for state 465 when 454 is active
-    addDropIfStateAffected(user, 465, itemDropDataArray, [
-      [3, 0, 1289]
-    ]);
+    if (stateId === 448) appendArmorAndLevelDropsBattleRefactor(user, drops);
   }
-
-  addDropIfStateAffected(user, 441, itemDropDataArray, [
-    [6, 0, 165]
-  ]);
-  addDropIfStateAffected(user, 442, itemDropDataArray, [
-    [6, 0, 165]
-  ]);
-  addDropIfStateAffected(user, 443, itemDropDataArray, [
-    [6, 0, 166]
-  ]);
-  addDropIfStateAffected(user, 446, itemDropDataArray, [
-    [6, 0, 167]
-  ]);
-  addDropIfStateAffected(user, 455, itemDropDataArray, [
-    [6, 0, 168]
-  ]);
-  addDropIfStateAffected(user, 448, itemDropDataArray, [
-    [10, 0, 169]
-  ]);
-
-  getItemDropDataStateIds.forEach(function (id) {
-    addDropIfStateAffected(user, id, itemDropDataArray, [
-      [6, 0, 170],
-      [6, 2, id - 780]
-    ]);
-  });
-
-  if (user.isStateAffected(410)) {
-    addDropIfStateAffected(user, 410, itemDropDataArray, [
-      [6, 0, 185],
-      [7, 0, 186],
-      [8, 0, 187],
-      [10, 0, 188],
-      [5, 0, 1115],
-      [8, 0, 1117]
-    ]);
-    if (valueDropEnemyLevel >= 1 && valueDropEnemyLevel <= 20) {
-      addDropIfStateAffected(user, 410, itemDropDataArray, [
-        [2, 0, 1118],
-        [3, 0, 1119],
-        [4, 0, 1120],
-        [5, 0, 1121]
-      ]);
-    }
-    if (valueDropEnemyLevel >= 11) {
-      addDropIfStateAffected(user, 410, itemDropDataArray, [
-        [6, 0, 1122],
-        [7, 0, 1123],
-        [8, 0, 1124],
-        [10, 0, 1125]
-      ]);
-    }
-  }
-
-  addDropIfStateAffected(user, 440, itemDropDataArray, [
-    [5, 0, 220],
-    [8, 0, 240]
-  ]);
-
-  addDropIfStateAffected(user, 461, itemDropDataArray, [
-    [5, 0, 251]
-  ]);
-  addDropIfStateAffected(user, 462, itemDropDataArray, [
-    [5, 0, 252]
-  ]);
-  addDropIfStateAffected(user, 463, itemDropDataArray, [
-    [5, 0, 253]
-  ]);
-  addDropIfStateAffected(user, 464, itemDropDataArray, [
-    [5, 0, 254]
-  ]);
-  addDropIfStateAffected(user, 465, itemDropDataArray, [
-    [5, 0, 255],
-    [3, 0, 1287]
-  ]);
-  addDropIfStateAffected(user, 466, itemDropDataArray, [
-    [5, 0, 256]
-  ]);
-  addDropIfStateAffected(user, 467, itemDropDataArray, [
-    [5, 0, 257]
-  ]);
-  addDropIfStateAffected(user, 479, itemDropDataArray, [
-    [6, 0, 270],
-    [5, 0, 269]
-  ]);
-
-  if (user.isStateAffected(475)) { itemDropDataArray.push([6, 0, 151]); };
-  for (let i = 421; i <= 439; i++) {
-    if (user.isStateAffected(i)) {
-      const stateRaceDropKind = $dataStates[i].meta['RaceDropKind'];
-      if (stateRaceDropKind) {
-        const stateRaceDropKinds = stateRaceDropKind.split(',');
-        for (let id1 = 0; id1 <= stateRaceDropKinds.length - 1; id1++) {
-          const stateRaceDropKindIndex = Number(stateRaceDropKinds[id1]);
-          const itemRaceDropRarity = $dataItems[stateRaceDropKindIndex].meta['RaceDropRarity'];
-          if (itemRaceDropRarity) {
-            itemDropDataArray.push([Number(itemRaceDropRarity), 0, stateRaceDropKindIndex]);
-          };
-        };
-      };
-    };
-  };
-
-  return itemDropDataArray;
+  if (user.isStateAffected(475)) drops.push([6, 0, 151]);
+  appendRaceDropsBattleRefactor(user, drops);
+  return drops;
 }
 
 allAnimeattack_move1 = function () { allAnimeattack_moveBase(false); }
@@ -291,9 +80,9 @@ allAnimeattack_move2 = function () { allAnimeattack_moveBase(true); }
 allAnimeattack_moveBase = function (isMove2) {
 
   const max = !$gameSwitches.value(464) ? 8 : 4;
-  const shift1 = max == 8 ? (isMove2 ? -100 : 100) : (isMove2 ? 350 : -350);
-  const shift2 = max == 8 ? (isMove2 ? -350 : 350) : (isMove2 ? 200 : -200);
-  const shift = $gameVariables.value(182) == 11 ? shift1 : shift2;
+  const stepShift = max == 8 ? (isMove2 ? -100 : 100) : (isMove2 ? 350 : -350);
+  const dashShift = max == 8 ? (isMove2 ? -350 : 350) : (isMove2 ? 200 : -200);
+  const shift = $gameVariables.value(182) == 11 ? stepShift : dashShift;
   for (let i = 1; i <= max; i++) {
     $gameTroop.move(i, shift, 0, 20);
   }
@@ -309,126 +98,33 @@ damage_keisan1 = function (user, target, action, damageAmount, critAnimationId, 
     const isValid = action && damageAmount > 0 && valueSkillDamageType == 1;
     if (!isValid) continue;
 
-    let flashOpacity = 50;
-    let shakeIntensity = 0;
-    let shakeSpeed = 4;
-    let duration = 10;
-
-    let flashColorData;
-    if (!$gameVariables.value(331)) {
-      flashColorData = [200, 0, 0, flashOpacity];
-      $gameVariables.setValue(331, flashColorData);
-    } else {
-      flashColorData = $gameVariables.value(331);
-      flashColorData[3] = flashOpacity;
-    };
-    flashColorData[3] = flashOpacity;
+    // Flash/shake parameters. `hitIndex == 1` computes them; `hitIndex == 2`
+    // reuses whatever they hold (the initial values) for its own flash/shake.
+    const fx = { shakeIntensity: 0, shakeSpeed: 4, duration: 10 };
+    const flashColorData = getFlashColorDataDamageKeisan1();
+    flashColorData[3] = FLASH_OPACITY_DAMAGE_KEISAN1;
 
     if (hitIndex == 1) {
-      if (target.result().critical) {
-        if (user.isActor()) {
-          $gameVariables.value(380 + user.actorId())[68] += 1;
-        }
-        if (target.hp <= 0 && valueCollapseAnime >= 1) { } else {
-          target.startAnimation(critAnimationId, true, 0);
-        }
-      }
-      if (target.hp != 0 && valueTotalDamageCount2 == 0) {
-        battle_stateAnime1(target);
-      }
-
-      if (target.isActor()) {
-        if (damageAmount >= target.mhp / 2) {
-          state_addFormula1([41, 25, user, target, user.mdf, target.luk]);//負傷ステート
-        };
-      };
-      if (damageAmount >= target.mhp / 10) {
-        let targetGroup;
-        let positionYOffset;
-        if (target.isActor()) {
-          targetGroup = $gameParty;
-          positionYOffset = -24;
-        } else {
-          targetGroup = $gameTroop;
-          positionYOffset = -100;
-        };
-        const targetIndex = target.index();
-        let filterId = 'wave_' + targetIndex;
-        let filterX = targetGroup.getX(targetIndex + 1);
-        let filterY = targetGroup.getY(targetIndex + 1) + positionYOffset;
-        let shockwaveIntensity = 50;
-        let shockwaveRadius = 30;
-        let shockwaveDurationMultiplier = 0.05;
-        if (damageAmount >= target.mhp / 10 * 3) {
-          shockwaveIntensity = 100;
-          shockwaveRadius = 40;
-        };
-        if (damageAmount >= target.mhp / 2) {
-          shockwaveIntensity = 150;
-          shockwaveRadius = 50;
-        };
-        if (damageAmount >= target.mhp) {
-          shockwaveIntensity = 200;
-          shockwaveDurationMultiplier = 0.06;
-        };
-        $gameMap.createFilter(filterId, 'shockwave', 0, 'screen');
-        $gameMap.setFilter(filterId, [filterX, filterY, -1, shockwaveRadius, shockwaveIntensity, 1]);
-        $gameMap.setFilterAddiTime(filterId, shockwaveDurationMultiplier);
-      }
-      duration = 10;
-      if (target.mhp / 100 >= damageAmount) {
-        shakeIntensity = 130;
-        flashOpacity -= 50;
-        duration -= 5;
-        shakeSpeed -= 3;
-      }
-      else if (target.mhp <= damageAmount) {
-        shakeIntensity += 1;
-        flashOpacity += 25;
-        duration += 5;
-        shakeSpeed += 2;
-      }
-
-      if (damageHitCount >= 2) {
-        duration += damageHitCount * 3;
-      };
-      $gameScreen.startFlash(flashColorData, duration);
-      $gameScreen.startShake(shakeIntensity, shakeSpeed, duration);
+      applyFirstHitEffectsDamageKeisan1(user, target, critAnimationId, damageAmount, flashColorData, damageHitCount, fx);
     }
-    let animDelay = 0;
-    if (animationId >= 1) {
-      if (hitIndex >= 2) {
-        const animation = $dataAnimations[animationId];
-        const animFramesLength = animation.frames.length;
-        let maxAnimationDelay = 4;
-        if (animation.name.match(/!/)) { maxAnimationDelay = 1 }
-        else if (animation.name.match(/&/)) { maxAnimationDelay = 2 }
-        else if (animation.name.match(/$/)) { maxAnimationDelay = 3 };
-
-        animDelay = Math.ceil((animFramesLength * 4 / 5) * maxAnimationDelay / 4) * (hitIndex - 1);
-      } else {
-        animDelay = 0;
-      }
-    }
-    /*
-       if(valueBattleAddAttack >= 1){//<BattleAddAttackSet:50>未使用	
-         let value1 = Math.round(damageAmount * valueBattleAddAttack / 100);
-         target.gainHp(-value1);
-         target.startDamagePopup();
-       };
-    */
+    // A missing animation id aborts this hit before any damage is applied.
+    const animDelay = (animationId >= 1 && hitIndex >= 2)
+      ? resolveAnimDelayDamageKeisan1(animationId, hitIndex)
+      : 0;
+    if (animDelay === null) continue;
+    // NOTE: the <BattleAddAttackSet:50> bonus block that used to sit here was dead
+    // — nothing ever set valueBattleAddAttackSet — so it has been removed rather
+    // than left commented out.
     if (hitIndex >= 2) {
       let randomOffset = getRandomIndex(41) - 20;
       randomOffset = Math.round(damageAmount * randomOffset / 100);
       target.gainHp(-damageAmount - randomOffset);
       target.startDamagePopup();
-
-      if (hitIndex == 2) {
-        //if(target.hp <= 0 && valueCollapseAnime >= 1){}else{
-        $gameScreen.startFlash(flashColorData, duration);
-        $gameScreen.startShake(shakeIntensity, shakeSpeed, duration);
-        //};
-      }
+    }
+    // hitIndex == 2 implies hitIndex >= 2, so this stays after the damage above.
+    if (hitIndex == 2) {
+      $gameScreen.startFlash(flashColorData, fx.duration);
+      $gameScreen.startShake(fx.shakeIntensity, fx.shakeSpeed, fx.duration);
     }
     if (animationId >= 1) {
       //if(target.hp <= 0 && valueCollapseAnime >= 1){}else{
@@ -441,69 +137,163 @@ damage_keisan1 = function (user, target, action, damageAmount, critAnimationId, 
   }
 }
 
-//スキルパワー加算計算skill_addPowerSet(user,$dataSkills,1,1);
-skill_addPowerSet = function (user, valueItems, id1, id2) {
+// The animation delay for a repeated hit, or null when the animation id is set
+// but missing from the database (the caller then skips the whole hit).
+// The delay tier comes from a marker character in the animation name.
+function resolveAnimDelayDamageKeisan1(animationId, hitIndex) {
+  const animation = $dataAnimations[animationId];
+  if (!animation) return null;
+  const animFramesLength = animation.frames.length;
+  let maxAnimationDelay = 4;
+  if (animation.name.match(/!/)) { maxAnimationDelay = 1 }
+  else if (animation.name.match(/&/)) { maxAnimationDelay = 2 }
+  else if (animation.name.match(/$/)) { maxAnimationDelay = 3 };
+  return Math.ceil((animFramesLength * 4 / 5) * maxAnimationDelay / 4) * (hitIndex - 1);
+}
 
-  valueAddPowerCustom = 0;
-  if (user.isActor()) {
-    var arr1 = valueAddPowerCustomSkill;
-    if (arr1 != 0) {
-      for (var i = 0; i <= arr1.length - 1; i++) {
-        if (user.isLearnedSkill(arr1[i]) && user.battleSkillsRaw().includes(arr1[i])) {
-          valueAddPowerCustom += Number($dataSkills[arr1[i]].meta['AddPowerCustom']);
-          if ($dataSkills[arr1[i]].meta['Max Mastery Level']) {
-            valueAddPowerCustom += user.skillMasteryLevel(arr1[i]);
-          };
-        };
-      }
-    };
-    var arr1 = valueAddPowerCustomWeapon;
-    if (arr1 != 0) {
-      for (var i = 0; i <= arr1.length - 1; i++) {
-        if (user.hasWeapon($dataWeapons[arr1[i]])) { valueAddPowerCustom += Number($dataWeapons[Number(arr1[i])].meta['AddPowerCustom']) };
-      }
-    };
-    var arr1 = valueAddPowerCustomArmor;
-    if (arr1 != 0) {
-      for (var i = 0; i <= arr1.length - 1; i++) {
-        if (user.hasArmor($dataArmors[arr1[i]])) { valueAddPowerCustom += Number($dataArmors[arr1[i]].meta['AddPowerCustom']) };
-      }
-    };
-  };
-  var arr1 = valueAddPowerCustomState;
-  if (arr1 != 0) {
-    for (var i = 0; i <= arr1.length - 1; i++) {
-      if (user.isStateAffected(arr1[i])) { valueAddPowerCustom += Number($dataStates[arr1[i]].meta['AddPowerCustom']) };
+const FLASH_OPACITY_DAMAGE_KEISAN1 = 50;
+
+// Returns the flash colour array stored in game variable 331 (creating it on the
+// first hit). The caller overwrites index 3 with FLASH_OPACITY_DAMAGE_KEISAN1.
+function getFlashColorDataDamageKeisan1() {
+  if ($gameVariables.value(331)) return $gameVariables.value(331);
+  const flashColorData = [200, 0, 0, FLASH_OPACITY_DAMAGE_KEISAN1];
+  $gameVariables.setValue(331, flashColorData);
+  return flashColorData;
+}
+
+// The `hitIndex == 1` branch of damage_keisan1: crit animation, the state-damage
+// formula, the shockwave filter and the closing screen flash/shake. The shake
+// values are written into `fx` because the `hitIndex == 2` branch reads them.
+//
+// NOTE: v1.46 also tracked a local `flashOpacity` here and decremented /
+// incremented it, but never copied it back into flashColorData[3], so the flash
+// opacity has always been a constant. The dead writes are not reproduced.
+function applyFirstHitEffectsDamageKeisan1(user, target, critAnimationId, damageAmount, flashColorData, damageHitCount, fx) {
+  if (target.result().critical) {
+    if (user.isActor()) {
+      $gameVariables.value(380 + user.actorId())[68] += 1;
     }
+    if (!(target.hp <= 0 && valueCollapseAnime >= 1)) {
+      target.startAnimation(critAnimationId, true, 0);
+    }
+  }
+  if (target.hp != 0 && valueTotalDamageCount2 == 0) {
+    battle_stateAnime1(target);
+  }
+  if (target.isActor() && damageAmount >= target.mhp / 2) {
+    state_addFormula1([41, 25, user, target, user.mdf, target.luk]);//負傷ステート
+  }
+  if (damageAmount >= target.mhp / 10) {
+    applyShockwaveFilterDamageKeisan1(target, damageAmount);
+  }
+
+  fx.duration = 10;
+  if (target.mhp / 100 >= damageAmount) {
+    fx.shakeIntensity = 130;
+    fx.duration -= 5;
+    fx.shakeSpeed -= 3;
+  } else if (target.mhp <= damageAmount) {
+    fx.shakeIntensity += 1;
+    fx.duration += 5;
+    fx.shakeSpeed += 2;
+  }
+  if (damageHitCount >= 2) {
+    fx.duration += damageHitCount * 3;
+  }
+  $gameScreen.startFlash(flashColorData, fx.duration);
+  $gameScreen.startShake(fx.shakeIntensity, fx.shakeSpeed, fx.duration);
+}
+
+// The >= mhp/10 shockwave filter, with its intensity/radius tiers.
+function applyShockwaveFilterDamageKeisan1(target, damageAmount) {
+  const isActor = target.isActor();
+  const targetGroup = isActor ? $gameParty : $gameTroop;
+  const positionYOffset = isActor ? -24 : -100;
+  const targetIndex = target.index();
+  const filterId = 'wave_' + targetIndex;
+  const filterX = targetGroup.getX(targetIndex + 1);
+  const filterY = targetGroup.getY(targetIndex + 1) + positionYOffset;
+  let shockwaveIntensity = 50;
+  let shockwaveRadius = 30;
+  let shockwaveDurationMultiplier = 0.05;
+  if (damageAmount >= target.mhp / 10 * 3) {
+    shockwaveIntensity = 100;
+    shockwaveRadius = 40;
+  }
+  if (damageAmount >= target.mhp / 2) {
+    shockwaveIntensity = 150;
+    shockwaveRadius = 50;
+  }
+  if (damageAmount >= target.mhp) {
+    shockwaveIntensity = 200;
+    shockwaveDurationMultiplier = 0.06;
+  }
+  $gameMap.createFilter(filterId, 'shockwave', 0, 'screen');
+  $gameMap.setFilter(filterId, [filterX, filterY, -1, shockwaveRadius, shockwaveIntensity, 1]);
+  $gameMap.setFilterAddiTime(filterId, shockwaveDurationMultiplier);
+}
+
+//スキルパワー加算計算skill_addPowerSet(user,$dataSkills,1,1);
+// Returns the total skill-power bonus in percent.
+//
+// The total is also published as valueAddPowerCustom because js/plugins/SkillFormula.js
+// adds it to the level inside its damage formula, and the stats text builders read it
+// right after calling this. The accumulation itself uses a local, so a re-entrant call
+// can no longer corrupt a partially built total.
+skill_addPowerSet = function (user, dbEntries, dbEntryId, powerCategoryId) {
+
+  let addPowerCustom = 0;
+  if (user.isActor()) {
+    const equippedSkillIds = new Set(user.battleSkillsRaw());
+    addPowerCustom += sumAddPowerCustomSkillAddPowerSet(valueAddPowerCustomSkill,
+      (id) => user.isLearnedSkill(id) && equippedSkillIds.has(id),
+      (id) => $dataSkills[id],
+      (id) => ($dataSkills[id].meta['Max Mastery Level'] ? user.skillMasteryLevel(id) : 0));
+    addPowerCustom += sumAddPowerCustomSkillAddPowerSet(valueAddPowerCustomWeapon,
+      (id) => user.hasWeapon($dataWeapons[id]),
+      (id) => $dataWeapons[Number(id)]);
+    addPowerCustom += sumAddPowerCustomSkillAddPowerSet(valueAddPowerCustomArmor,
+      (id) => user.hasArmor($dataArmors[id]),
+      (id) => $dataArmors[id]);
   };
-  if (id2 == 2) { } else {
-    if (valueItems[id1].stypeId == 12) {
-      if (user.isActor()) {
-        if (valueItems[id1].meta['ユニーク']) {
-          if ($gameVariables.value(287)[user.actorId()][10] >= 1) {
-            valueAddPowerCustom += $gameVariables.value(287)[user.actorId()][10];
-          };
-        } else {
-          if ($dataWeapons[user.equips()[0].id].meta['LotteryRearity']) {
-            valueAddPowerCustom += Number($dataWeapons[user.equips()[0].id].meta['LotteryRearity']);
-          };
-        };
-      } else {
-        valueAddPowerCustom += Math.round(user.level / 10);
-      };
-    };
-  };
-  /*
-  valueBattleAddAttack = 0;//<BattleAddAttackSet:50>未使用	
-  var arr1 = valueBattleAddAttackSet;
-  for (var i = 0; i <= arr1.length-1; i++) {
-   if(user.isStateAffected(arr1[i])){
-     valueBattleAddAttack += Number($dataStates[arr1[i]].meta['BattleAddAttackSet']);
-   };
-  };
-  */
+  addPowerCustom += sumAddPowerCustomSkillAddPowerSet(valueAddPowerCustomState,
+    (id) => user.isStateAffected(id),
+    (id) => $dataStates[id]);
+
+  const entry = dbEntries[dbEntryId];
+  if (powerCategoryId != 2 && entry && entry.stypeId == 12) {
+    addPowerCustom += burstEquipmentPowerBattleRefactor(user, entry);
+  }
+  // NOTE: <BattleAddAttackSet:50> is an unused tag — the block that summed it into
+  // valueBattleAddAttack was removed rather than left commented out.
+  valueAddPowerCustom = addPowerCustom;
+  return addPowerCustom;
 
 };
+
+// The bonus stored for a <ユニーク> skill in variable 287, or 0 when it is below
+// 1 (the original simply added nothing in that case).
+function uniqueBonusSkillAddPowerSet(user) {
+  const bonus = $gameVariables.value(287)[user.actorId()][10];
+  return bonus >= 1 ? bonus : 0;
+}
+
+// Sums <AddPowerCustom> over `ids`. `isEligible` decides whether an id counts,
+// `entryOf` resolves the database entry holding the meta, and `bonusOf`
+// optionally adds a per-id mastery bonus.
+function sumAddPowerCustomSkillAddPowerSet(ids, isEligible, entryOf, bonusOf) {
+  let total = 0;
+  for (let i = 0; i <= ids.length - 1; i++) {
+    const id = ids[i];
+    if (!isEligible(id)) continue;
+    const entry = entryOf(id);
+    if (!entry) continue;
+    total += Number(entry.meta['AddPowerCustom']);
+    if (bonusOf) total += bonusOf(id);
+  }
+  return total;
+}
 
 //攻撃時に連撃計算とスキルID代入
 const ak1PicIdsToErase = [51, 52, 53, 54, 55, 56, 57, 58, 86, 87, 88, 89, 90, 91, 92, 93, 98, 99];
@@ -513,38 +303,45 @@ const ak1DamageFlashDesignationData = [255, 255, 255, 0];
 // uses globals like valueCertainlyDouble, valueCertainlyTriple, valueNormalAttackHit, and valueAttackAbilityHit without explicit declaration
 // 
 attack_keisan1 = function (user, skillId, sourceTypeId) {
-  // Initialize attack variables and clean up UI
-  ak1InitializeAttackVariables(user, skillId, sourceTypeId);
+  // Initialize attack variables and clean up UI. The database the skill lives in
+  // is resolved once here and handed to every step below, so no step has to
+  // reach for a global to find it.
+  const sourceDatabase = ak1InitializeAttackVariables(user, skillId, sourceTypeId);
   ak1CleanupPreviousAttackUI();
 
   // Set up the skill and its properties
-  ak1SetupSkillProperties(user, skillId, sourceTypeId);
+  ak1SetupSkillProperties(user, sourceDatabase, skillId, sourceTypeId);
 
-  // Calculate multi-attack count
+  // Calculate multi-attack count.
+  // The result is not consumed anywhere today (the executed hit count comes from
+  // game variable 526) and is deliberately left unused so the calculation and its
+  // random draws stay exactly as they were.
   ak1CalculateMultiAttackCount(user);
 
   // Configure animation settings
-  ak1ConfigureAnimationSettings(skillId);
+  ak1ConfigureAnimationSettings(sourceDatabase, skillId);
 
   // Set up attack states and elements
-  ak1SetupAttackStatesAndElements(user, skillId);
+  const attackElements = ak1SetupAttackStatesAndElements(user, sourceDatabase, skillId);
 
   // Handle damage visualization and special effects
-  ak1ConfigureDamageVisualization(user, skillId);
+  ak1ConfigureDamageVisualization(user, sourceDatabase, skillId, attackElements);
 
   // Process skill-specific movement and projectile settings
-  ak1ProcessSkillSpecialSettings(user, skillId);
+  ak1ProcessSkillSpecialSettings(user, sourceDatabase, skillId);
 
   // Handle mastery progression and brave command
   ak1ProcessSkillMasteryAndBraveCommand(user, skillId);
 
   // Apply final skill customization
-  ak1ApplyFinalSkillCustomization(user, skillId);
+  ak1ApplyFinalSkillCustomization(user, sourceDatabase, skillId);
 };
 
 // Initialize attack variables and set source
+// Returns the database the current skill lives in ($dataItems or $dataSkills), so
+// the rest of the setup pipeline receives it instead of reading the implicit
+// global `sourceItems` this function used to assign.
 function ak1InitializeAttackVariables(user, skillId, sourceTypeId) {
-  sourceItems = sourceTypeId == 2 ? $dataItems : $dataSkills;
   valueSkillSpecialDispel35 = 0;
   totalDamageCountDuringAction = 0;
   valueDropEnemyPicId = 101;
@@ -559,6 +356,8 @@ function ak1InitializeAttackVariables(user, skillId, sourceTypeId) {
   valueAttackCount = 0;
   valueTotalDamageCount = 0; // Total damage variable for this action
   $gameVariables.setValue(331, []); // Array for damage flash configuration
+
+  return sourceTypeId == 2 ? $dataItems : $dataSkills;
 }
 
 // Clean up UI from previous attacks
@@ -582,17 +381,21 @@ function ak1CleanupPreviousAttackUI() {
 }
 
 // Set up skill properties and basic settings
-function ak1SetupSkillProperties(user, skillId, sourceTypeId) {
-  skill_addPowerSet(user, sourceItems, skillId, sourceTypeId);
-  const currentItem = sourceItems[skillId];
+function ak1SetupSkillProperties(user, sourceDatabase, skillId, sourceTypeId) {
+  // skill_addPowerSet's total is consumed through the valueAddPowerCustom global
+  // (js/plugins/SkillFormula.js and the stats text builders read it), so it is not
+  // threaded through here.
+  skill_addPowerSet(user, sourceDatabase, skillId, sourceTypeId);
+  const currentItem = sourceDatabase[skillId];
 
   $gameVariables.setValue(182, currentItem.stypeId);
   valueSkillDamageType = currentItem.damage.type;
 }
 
 // Calculate how many attacks will be performed
+// Returns the multi-attack count (previously accumulated into a leaked global).
 function ak1CalculateMultiAttackCount(user) {
-  multiAttackCount = 1;
+  let multiAttackCount = 1;
   const elementAttackRate = user.elementRate(11) * 10;
 
   // Use a single random calculation to determine both checks
@@ -610,11 +413,11 @@ function ak1CalculateMultiAttackCount(user) {
   }
 
   // Apply guaranteed multi-attacks from states
-  ak1ApplyGuaranteedMultiAttacks(user);
+  return ak1ApplyGuaranteedMultiAttacks(user, multiAttackCount);
 }
 
 // Apply guaranteed double and triple attacks from states
-function ak1ApplyGuaranteedMultiAttacks(user) {
+function ak1ApplyGuaranteedMultiAttacks(user, multiAttackCount) {
   // Check for guaranteed double attack
   // Define constant arrays with state IDs and corresponding attack counts to add
   const multiAttackStates = [
@@ -628,20 +431,37 @@ function ak1ApplyGuaranteedMultiAttacks(user) {
     if (multiAttackCount >= attackType.maxAttacks) continue;
 
     // Check if user has any of the states that grant this multi-attack
-    for (let i = 0; i < attackType.states.length; i++) {
-      if (user.isStateAffected(attackType.states[i])) {
-        multiAttackCount += attackType.addCount;
-        break; // Stop checking once we find a matching state
-      }
+    if (isAnyStateAffected(attackType.states, user)) {
+      multiAttackCount += attackType.addCount;
     }
   }
+  return multiAttackCount;
+}
+
+// True when `battler` is affected by any of `stateIds`. A plain loop rather than
+// Array#some, so that no closure is allocated per call inside the loops above.
+function isAnyStateAffected(stateIds, battler) {
+  for (const stateId of stateIds) {
+    if (battler.isStateAffected(stateId)) return true;
+  }
+  return false;
+}
+
+// True when the comma-split `list` contains `value` as a number. Same reason as
+// isAnyStateAffected: no per-iteration closure.
+function listContainsNumber(list, value) {
+  for (const entry of list) {
+    if (Number(entry) === value) return true;
+  }
+  return false;
 }
 
 // Configure animation settings for the skill
-function ak1ConfigureAnimationSettings(skillId) {
-  const currentItem = sourceItems[skillId];
+function ak1ConfigureAnimationSettings(sourceDatabase, skillId) {
+  const currentItem = sourceDatabase[skillId];
   $gameVariables.setValue(181, currentItem.animationId);
   const animation = $dataAnimations[currentItem.animationId];
+  if (!animation) return;
   const frameCount = animation.frames.length;
 
   if (currentItem.stypeId == 12) {
@@ -660,19 +480,23 @@ function ak1ConfigureAnimationSettings(skillId) {
 }
 
 // Set up attack states and elements
-function ak1SetupAttackStatesAndElements(user, skillId) {
-  const currentItem = sourceItems[skillId];
+// Returns the list of attack element ids (see ak1SetupAttackElements).
+function ak1SetupAttackStatesAndElements(user, sourceDatabase, skillId) {
+  const currentItem = sourceDatabase[skillId];
 
-  // Get attack states and add skill effect states
-  valueAttackStates = user.attackStates();
+  // Get attack states and add skill effect states. The array is also published as
+  // valueAttackStates, which the state-application step further down reads.
+  const attackStates = user.attackStates();
   for (let i = 0; i <= 19; i++) {
     const effect = currentItem.effects[i];
     if (effect && effect.code == 21 && effect.dataId >= 2) {
-      valueAttackStates.push(effect.dataId);
+      attackStates.push(effect.dataId);
     }
   }
+  valueAttackStates = attackStates;
 
-  // Handle level fluctuation
+  // Handle level fluctuation. Published as a global because js/plugins/
+  // SkillFormula.js reads valueLevelFluctuation from inside its damage formula.
   if (user.isStateAffected(410)) {
     if (currentItem.meta['LevelFluctuation']) {
       valueLevelFluctuation = Number(currentItem.meta['LevelFluctuation']);
@@ -682,12 +506,13 @@ function ak1SetupAttackStatesAndElements(user, skillId) {
   }
 
   // Set up attack elements
-  ak1SetupAttackElements(user, currentItem);
+  return ak1SetupAttackElements(user, currentItem);
 }
 
 // Set up attack elements from skill and user properties
+// Returns the assembled element id list (previously leaked as a global).
 function ak1SetupAttackElements(user, currentItem) {
-  attackElementsList = [];
+  const attackElementsList = [];
 
   // Add elements from skill metadata
   if (currentItem.meta['Multiple Elements']) {
@@ -701,11 +526,13 @@ function ak1SetupAttackElements(user, currentItem) {
 
   // Add user's innate attack elements
   attackElementsList.push(...user.attackElements());
+
+  return attackElementsList;
 }
 
 // Configure damage visualization based on elements and skill properties
-function ak1ConfigureDamageVisualization(user, skillId) {
-  const currentItem = sourceItems[skillId];
+function ak1ConfigureDamageVisualization(user, sourceDatabase, skillId, attackElementsList) {
+  const currentItem = sourceDatabase[skillId];
   $gameVariables.setValue(93, 131); // Default damage visualization
   $gameVariables.setValue(526, 1); // Default hit count
 
@@ -713,7 +540,7 @@ function ak1ConfigureDamageVisualization(user, skillId) {
   ak1ConfigureElementDamageVisualization(currentItem);
 
   // Configure special flash effect based on elements
-  ak1ConfigureElementFlashEffect(user);
+  ak1ConfigureElementFlashEffect(user, attackElementsList);
 }
 
 // Configure damage visualization based on elements in the skill
@@ -731,17 +558,16 @@ function ak1ConfigureElementDamageVisualization(currentItem) {
   if (selectedElementId >= 1) {
     const elementIdsCount = ak1ElementIds.length;
     for (let i = 0; i < elementIdsCount; i++) {
-      if (selectedElementId == ak1ElementIds[i]) {
-        $gameVariables.setValue(93, ak1ElementDisplayValues[i]);
-        $gameVariables.setValue(331, ak1DamageFlashDesignationData);
-      }
+      if (selectedElementId != ak1ElementIds[i]) continue;
+      $gameVariables.setValue(93, ak1ElementDisplayValues[i]);
+      $gameVariables.setValue(331, ak1DamageFlashDesignationData);
     }
   }
 }
 
 // Configure flash effect based on the user's elemental affinities
 const testIds = new Set([3, 4, 5, 6, 7, 8, 9]);
-function ak1ConfigureElementFlashEffect(user) {
+function ak1ConfigureElementFlashEffect(user, attackElementsList) {
   const candidateElements = [0];
 
   const len = attackElementsList.length;
@@ -763,8 +589,8 @@ function ak1ConfigureElementFlashEffect(user) {
 }
 
 // Process skill-specific movement and projectile settings
-function ak1ProcessSkillSpecialSettings(user, skillId) {
-  const currentItem = sourceItems[skillId];
+function ak1ProcessSkillSpecialSettings(user, sourceDatabase, skillId) {
+  const currentItem = sourceDatabase[skillId];
 
   const meta = currentItem.meta;
   $gameVariables.setValue(349, meta['moveReaction'] ? Number(meta['moveReaction']) : 0);
@@ -779,7 +605,6 @@ function ak1ProcessSkillSpecialSettings(user, skillId) {
 
 // Process skill mastery progression and brave command effects
 function ak1ProcessSkillMasteryAndBraveCommand(user, skillId) {
-  //const currentItem = sourceItems[skillId];
   const abilityUsageDistinction = $gameVariables.value(182);
 
   // Handle skill mastery progression
@@ -808,40 +633,33 @@ const ak1SubclassWeaponMastery = {
 
 // Process skill mastery progression for subclasses
 function ak1ProcessSkillMasteryProgression(user, skillId) {
-  if (user.isActor() && $gameVariables.value(182) == 2) {
-    const subclass = user.subclass();
-    if (subclass && user.equips()[0]) {
-      const subclassIcon = Number($dataClasses[subclass.id].meta['Icon']);
-      const weaponType = Number($dataWeapons[user.equips()[0].id].wtypeId);
-
-      if (ak1SubclassWeaponMastery[subclassIcon] &&
-        ak1SubclassWeaponMastery[subclassIcon].weaponTypes.includes(weaponType)) {
-        const value3 = ak1SubclassWeaponMastery[subclassIcon].value;
-        const classRankNum = Number($dataClasses[subclass.id].meta['classRank']);
-        user.gainSkillMasteryUses(skillId, value3 * classRankNum);
-      }
-    }
-  }
+  if (!user.isActor() || $gameVariables.value(182) != 2) return;
+  const subclass = user.subclass();
+  if (!subclass || !user.equips()[0]) return;
+  const subclassIcon = Number($dataClasses[subclass.id].meta['Icon']);
+  const weaponType = Number($dataWeapons[user.equips()[0].id].wtypeId);
+  const mastery = ak1SubclassWeaponMastery[subclassIcon];
+  if (!mastery || !mastery.weaponTypes.includes(weaponType)) return;
+  const classRankNum = Number($dataClasses[subclass.id].meta['classRank']);
+  user.gainSkillMasteryUses(skillId, mastery.value * classRankNum);
 }
 
 // Process brave command state updates for Lisha (actor 1)
 function ak1ProcessBraveCommandState(abilityUsageDistinction) {
   const actor1 = $gameActors.actor(1);
+  if (!$gameParty.members().contains(actor1) || !actor1.isStateAffected(662)) return;
 
-  if ($gameParty.members().contains(actor1) && actor1.isStateAffected(662)) {
-    const stateCounter = actor1._stateCounter[662];
-
-    for (let i = 0; i < 4; i++) {
-      if (abilityUsageDistinction == i + 5 && stateCounter[i] >= 0 && stateCounter[i] <= 4) {
-        stateCounter[i] += 1;
-      }
-    }
+  const stateCounter = actor1._stateCounter[662];
+  for (let i = 0; i < 4; i++) {
+    if (abilityUsageDistinction != i + 5) continue;
+    if (stateCounter[i] < 0 || stateCounter[i] > 4) continue;
+    stateCounter[i] += 1;
   }
 }
 
 // Apply final skill customization based on metadata and skill type
-function ak1ApplyFinalSkillCustomization(user, skillId) {
-  const currentItem = sourceItems[skillId];
+function ak1ApplyFinalSkillCustomization(user, sourceDatabase, skillId) {
+  const currentItem = sourceDatabase[skillId];
   const currentItemName = currentItem.name;
   const abilityUsageDistinction = $gameVariables.value(182);
 
@@ -980,204 +798,175 @@ ak1ApplyValueAttackHit = function (user, stateArray, stateMetaName) {
 }
 
 //属性耐性ダウン付与
-Element_DebuffRateA = function (target, stateId) {
-
-  if (target._stateCounter[stateId] < 0.001) {
-    target.setStateCounter(stateId, 0);
-  };
-  var code = 11;
-  var stateElementId = Number($dataStates[stateId].meta['ElementId']);
-  var stateDebuffRate = Number($dataStates[stateId].meta['DebuffRate']);
-  const target1 = $dataStates[(target.isEnemy() ? 490 : 486) + target.index()];
-  target1.traits.push({ code: code, dataId: stateElementId, value: 1 + (stateDebuffRate / 100) });
-  target.addStateCounter(stateId, +(stateDebuffRate / 100));
-
+// Renamed from Element_DebuffRateA: the A/R suffix carried no meaning and the
+// function is only ever called from a <Custom Apply Effect> notetag. See
+// state_removeElementDebuffRate below for the removal counterpart.
+state_applyElementDebuffRate = function (target, stateId) {
+  const state = $dataStates[stateId];
+  const resistanceState = resistanceStateBattleRefactor(target);
+  if (!state || !resistanceState) return;
+  const elementId = Number(state.meta.ElementId);
+  const debuffRate = Number(state.meta.DebuffRate) / 100;
+  if (!Number.isFinite(elementId) || !Number.isFinite(debuffRate) || debuffRate < -1) return;
+  const counter = Number(target._stateCounter[stateId]);
+  if (!Number.isFinite(counter)) target.setStateCounter(stateId, 0);
+  resistanceState.traits.push({ code: 11, dataId: elementId, value: 1 + debuffRate, amygameElementDebuffStateId: stateId });
+  target.addStateCounter(stateId, debuffRate);
 };
 
 //属性耐性ダウン解除
-Element_DebuffRateR = function (target, stateId) {
-
-  if (target._stateCounter[stateId] >= 1) {
-    const code = 11;
-    const dataId = Number($dataStates[stateId].meta['ElementId']);
-    const dataStateId = target.isEnemy() ? 490 : 486;
-    const target1 = $dataStates[dataStateId + target.index()];
-    target1.traits.push({ code: code, dataId: dataId, value: 1 - target.getStateCounter[stateId] });
-    target.removeStateCounter(stateId);
-  };
+// Renamed from Element_DebuffRateR (see state_applyElementDebuffRate above).
+state_removeElementDebuffRate = function (target, stateId) {
+  const resistanceState = resistanceStateBattleRefactor(target);
+  if (resistanceState) {
+    const traits = resistanceState.traits;
+    for (let index = traits.length - 1; index >= 0; index--) {
+      if (traits[index].amygameElementDebuffStateId === stateId) traits.splice(index, 1);
+    }
+  }
+  target.removeStateCounter(stateId);
 };
 
 //ステート付与時のアクション
+//
+// Renamed from state_addEffect1. This is the shared "<Custom Apply Effect>"
+// entry point referenced by ~200 states in data/states.json: it registers the
+// state in the per-battler resistance slot, chains the <stateAddState:...>
+// reactions and plays the animation / name popup. The trailing "1" was a
+// meaningless copy-paste index, so it was dropped; every call site in
+// data/states.json was renamed with it.
 const defaultPopupColorArray = [255, 128, 0, 255, 256];
 const alternativePopupColorArray = [255, 0, 187, 189, 256];
-state_addEffect1 = function (user, target, stateId, animationId) {
-
-  if (!$gameTroop.isAllDead() && $gameParty.inBattle()) {
-    const stateData = $dataStates[stateId];
-    const stateMeta = stateData.meta;
-    let resistanceFactor;
-    resistanceFactor = target.isStateAffected(289) ? 0.2 : 0.1;
-    if (stateMeta['registUp']) {
-      resistanceFactor = Math.ceil(Number(stateMeta['registUp']) / 100);
-    }
-    const stateObject = target.isEnemy() ? $dataStates[490 + target.index()] : $dataStates[486 + target.index()];
-    let popupColorArray = defaultPopupColorArray;
-    if (stateMeta['Category']) {
-      if (stateMeta['Category'] === ' StateabNomal' || stateMeta['Category'] === ' StateSPabNomal') { //耐性付与。強化は除外
-        stateObject.traits.push({ code: 13, dataId: stateId, value: 1 - resistanceFactor });
-        popupColorArray = alternativePopupColorArray;
-      }
-    } else {
-      stateObject.traits.push({ code: 13, dataId: stateId, value: 1 - resistanceFactor });
-    }
-    const additionalStateConfig = valueStateAddState; //<stateAddState:5,201,2>//反応するｽｷﾙﾀｲﾌﾟ,追加ｽﾃｰﾄ,追加回数
-    for (let configIndex = 0; configIndex <= additionalStateConfig.length - 1; configIndex++) {
-      if (target.isStateAffected(additionalStateConfig[configIndex])) {
-        const configStateMeta = $dataStates[additionalStateConfig[configIndex]].meta;
-        if (Number(configStateMeta['stateAddState'].split(',')[0]) === $gameVariables.value(182)) {
-          for (let repIndex = 1; repIndex <= Number(configStateMeta['stateAddState'].split(',')[2]); repIndex++) {
-            target.addState(Number(configStateMeta['stateAddState'].split(',')[1]));
-          }
-        }
-      }
-    }
-    if (ConfigManager.battleAniSpeed >= 3) {
-      target.startAnimation(animationId, false, $gameVariables.value(279));
-      $gameVariables.setValue(279, $gameVariables.value(279) + $gameVariables.value(280));
-      target.startMessagePopup(stateData.name, popupColorArray);
-    }
-  }
-
+state_applyCommonEffect = function (user, target, stateId, animationId) {
+  if ($gameTroop.isAllDead() || !$gameParty.inBattle()) return;
+  const state = $dataStates[stateId];
+  if (!state) return;
+  const category = normalizedStateCategoryBattleRefactor(state);
+  const isAbnormal = category === 'StateabNomal' || category === 'StateSPabNomal';
+  if (!category || isAbnormal) addAccumulatedStateResistanceBattleRefactor(target, stateId, state);
+  applyReactiveStatesBattleRefactor(target);
+  if (ConfigManager.battleAniSpeed < 3) return;
+  playStateAnimationBattleRefactor(target, animationId);
+  target.startMessagePopup(state.name, isAbnormal ? alternativePopupColorArray : defaultPopupColorArray);
 };
 
 //ステート解除時のアクション
-state_removeEffect1 = function (user, target, stateId, animationId) {
-
-  user.removeStateCounter(stateId);
-  if (!$gameTroop.isAllDead() && $gameParty.inBattle()) {
-    if (ConfigManager.battleAniSpeed >= 3) {
-      let colorIndex = 0;
-      let s = ` `;
-      const state = $dataStates[stateId];
-      if (state.meta['Category']) {
-        if (state.meta['Category'] == ' PowerUp') {
-          colorIndex = 2;
-        } else {
-          colorIndex = 1;
-          s = `…`;
-        };
-      }
-      target.startAnimation(animationId, false, $gameVariables.value(279));
-      $gameVariables.setValue(279, $gameVariables.value(279) + $gameVariables.value(280));
-      const actorName = target.name();
-      const stateName = `\\C[${colorIndex}]${state.name}\\C[0]`;
-      BattleManager._logWindow.push(`addText`, `${actorName}の${stateName}が解除された${s}`);
-    }
-  };
-
+//
+// Renamed from state_removeEffect1: the removal counterpart of
+// state_applyCommonEffect above (animation + "was removed" battle-log line).
+state_removeCommonEffect = function (user, target, stateId, animationId) {
+  target.removeStateCounter(stateId);
+  if ($gameTroop.isAllDead() || !$gameParty.inBattle() || ConfigManager.battleAniSpeed < 3) return;
+  const state = $dataStates[stateId];
+  if (!state) return;
+  const category = normalizedStateCategoryBattleRefactor(state);
+  const colorId = category === 'PowerUp' ? 2 : category ? 1 : 0;
+  const ending = category && category !== 'PowerUp' ? '…' : ' ';
+  playStateAnimationBattleRefactor(target, animationId);
+  const actorName = target.name();
+  const stateName = colorTaggedText(colorId, state.name);
+  BattleManager._logWindow.push('addText', `${actorName}の${stateName}が解除された${ending}`);
 };
 
 //特殊効果ステート発動時のアクション
-activate_spcialState = function (user, id1) {
+activate_specialState = function (user, stateId) {
 
-  if ($dataStates[id1].meta['activateRate']) {
-    if (user.isLearnedSkill(746) && user.skillMasteryLevel(746) >= 1) {
-      var value1 = Number($dataStates[id1].meta['activateRate']) - ((Number($dataStates[id1].meta['activateRate']) * user.skillMasteryLevel(746) / 10));
-    } else {
-      var value1 = Number($dataStates[id1].meta['activateRate']);
-    };
-    if (user.battleSkillsRaw().includes(747)) {
-      var value1 = value1 - (value1 * 2 / 10);
-    };
-    if (user.battleSkillsRaw().includes(748)) {
-      var value1 = value1 - (value1 * 49 / 100);
-    };
-    if (user.mpRate() >= value1) {
-      user.startAnimation(615, true, 0)
-      var dmg = Math.ceil(user.mmp * value1);
-      user.gainMp(-dmg);
-      user.startDamagePopup();
-      user.clearResult();
-    } else {
-      var value2 = `${user.name()}はMPが足らず\\SIM[109]になった…`;
-      BattleManager._logWindow.push(`addText`, value2);
-      user.startAnimation(275, true, 0);
-      user.addState(109);
-    };
+  const stateMeta = $dataStates[stateId].meta;
+  // Both tags gate the same way; only the pool they test and the message differ.
+  if (stateMeta['activateRate']) {
+    const rate = buildActivationThresholdActivateSpecialState(user, Number(stateMeta['activateRate']));
+    applyActivationActivateSpecialState(user, user.mpRate() >= rate, Math.ceil(user.mmp * rate), 109);
   };
-  if ($dataStates[id1].meta['activatePoint']) {
-    if (user.isLearnedSkill(746) && user.skillMasteryLevel(746) >= 1) {
-      var value1 = Number($dataStates[id1].meta['activatePoint']) - (Number($dataStates[id1].meta['activatePoint']) * user.skillMasteryLevel(746) / 10);
-    } else {
-      var value1 = Number($dataStates[id1].meta['activatePoint']);
-    };
-    if (user.battleSkillsRaw().includes(747)) {
-      var value1 = value1 - (value1 * 2 / 10);
-    };
-    if (user.battleSkillsRaw().includes(748)) {
-      var value1 = value1 - (value1 * 49 / 100);
-    };
-    if (user.mp >= value1) {
-      user.startAnimation(615, true, 0)
-      var dmg = Math.ceil(value1);
-      user.gainMp(-dmg);
-      user.startDamagePopup();
-      user.clearResult();
-    } else {
-      var value2 = `${user.name()}はMPが足らず\\SIM[19]になった…`;
-      BattleManager._logWindow.push(`addText`, value2);
-      user.startAnimation(275, true, 0);
-      user.addState(109);
-    };
+  if (stateMeta['activatePoint']) {
+    const point = buildActivationThresholdActivateSpecialState(user, Number(stateMeta['activatePoint']));
+    applyActivationActivateSpecialState(user, user.mp >= point, Math.ceil(point), 19);
   };
 
 };
+
+// The tag's base value, reduced by the mastery level of skill 746 and by 747/748.
+function buildActivationThresholdActivateSpecialState(user, baseValue) {
+  let threshold = baseValue;
+  if (user.isLearnedSkill(746) && user.skillMasteryLevel(746) >= 1) {
+    threshold -= baseValue * user.skillMasteryLevel(746) / 10;
+  }
+  if (user.battleSkillsRaw().includes(747)) threshold -= threshold * 2 / 10;
+  if (user.battleSkillsRaw().includes(748)) threshold -= threshold * 49 / 100;
+  return threshold;
+}
+
+// Pays `cost` MP and plays the activation animation, or flags the user as out of
+// MP. `insufficientMpStateId` only picks which \SIM[n] icon the message shows.
+function applyActivationActivateSpecialState(user, canActivate, cost, insufficientMpStateId) {
+  if (!canActivate) {
+    const userName = user.name();
+    const stateName = `\\SIM[${insufficientMpStateId}]`;
+    const insufficientMpMessage = `${userName}はMPが足らず${stateName}になった…`;
+    BattleManager._logWindow.push(`addText`, insufficientMpMessage);
+    user.startAnimation(275, true, 0);
+    user.addState(109);
+    return;
+  }
+  user.startAnimation(615, true, 0)
+  user.gainMp(-cost);
+  user.startDamagePopup();
+  user.clearResult();
+}
 
 //チェインスキル実行267valueChainTotalStat,268valueChainMemberCount,30valueChainElement,29valueChainSkillId
 chain_skill = function () {
 
-  for (var i = 0; i < $gameParty.battleMembers().length; i++) {
-    if ($gameParty.battleMembers()[i].isStateAffected(234) && !$gameParty.battleMembers()[i].isRestricted()) {
-      valueChainMemberCount += 1;
-      valueChainTotalStat += $gameParty.members()[i].atk;
-      valueChainTotalStat += $gameParty.members()[i].mat;
-    };
-  };
-  if (valueChainMemberCount >= 2) {
-    for (var i = 0; i < $gameParty.battleMembers().length; i++) {
-      var actor = $gameParty.battleMembers()[i];
-      if (actor.isStateAffected(234)) {
-        $gameVariables.setValue(20, actor.actorId());
-        break;
-      }
-    };
-    for (var i = 49; i < 57; i++) {
-      var actor = $gameActors.actor($gameVariables.value(20));
-      if (actor.isStateAffected(i)) {
-        valueChainElement = i;
-        break;
-      }
-    };
-    if (valueChainElement == 0) {
-      valueChainSkillId = 98;
-    } else {
-      valueChainSkillId = Number($dataStates[valueChainElement].meta['ChainID']);
-    };
-    if ($dataSkills[valueChainSkillId].meta['2rdChain'] || $dataSkills[valueChainSkillId].meta['3rdChain'] || $dataSkills[valueChainSkillId].meta['4thChain']) {
-      if (valueChainMemberCount == 2) {
-        $dataSkills[valueChainSkillId].name = $dataSkills[valueChainSkillId].meta['2rdChain'];
-      };
-      if (valueChainMemberCount == 3) {
-        $dataSkills[valueChainSkillId].name = $dataSkills[valueChainSkillId].meta['3rdChain'];
-      };
-      if (valueChainMemberCount >= 4) {
-        $dataSkills[valueChainSkillId].name = $dataSkills[valueChainSkillId].meta['4thChain'];
-      };
-    };
-    $gameVariables.setValue(267, value1 + value2);
+  // Hoisted out of the loop: neither the party nor its states change in here.
+  const battleMembers = $gameParty.battleMembers();
+  for (let i = 0; i < battleMembers.length; i++) {
+    if (!battleMembers[i].isStateAffected(234) || battleMembers[i].isRestricted()) continue;
+    valueChainMemberCount += 1;
+    // NOTE: battleMembers() and members() are not the same list — with a reserve
+    // member parked in the middle the two index differently. Kept verbatim.
+    valueChainTotalStat += $gameParty.members()[i].atk;
+    valueChainTotalStat += $gameParty.members()[i].mat;
   };
 
+  if (valueChainMemberCount < 2) return;
+
+  const chainMember = findChainMemberChainSkill();
+  if (chainMember) $gameVariables.setValue(20, chainMember.actorId());
+  // Only assign on a match: valueChainElement is not reset here, so a stale
+  // non-zero value must survive a call that finds no element.
+  const chainElement = findChainElementChainSkill($gameActors.actor($gameVariables.value(20)));
+  if (chainElement) valueChainElement = chainElement;
+  valueChainSkillId = (valueChainElement == 0)
+    ? 98
+    : Number($dataStates[valueChainElement].meta['ChainID']);
+  if (!$dataSkills[valueChainSkillId]) return;
+
+  const chainSkill = $dataSkills[valueChainSkillId];
+  // The skill is renamed to the variant matching how many members are chained.
+  const chainNameKeys = { 2: '2rdChain', 3: '3rdChain' };
+  const chainNameKey = chainNameKeys[valueChainMemberCount] || '4thChain';
+  const hasChainName = chainSkill.meta['2rdChain'] || chainSkill.meta['3rdChain'] || chainSkill.meta['4thChain'];
+  if (hasChainName) chainSkill.name = chainSkill.meta[chainNameKey];
+
+  $gameVariables.setValue(267, valueChainTotalStat);
 };
+
+// The first chain-element state (49..56) the given actor is affected by, or 0.
+function findChainElementChainSkill(actor) {
+  for (let i = 49; i < 57; i++) {
+    if (actor.isStateAffected(i)) return i;
+  }
+  return 0;
+}
+
+// The first battle member affected by the chain state (234), or null. The caller
+// stores its actor id in variable 20.
+function findChainMemberChainSkill() {
+  const members = $gameParty.battleMembers();
+  for (let i = 0; i < members.length; i++) {
+    if (members[i].isStateAffected(234)) return members[i];
+  }
+  return null;
+}
 
 //攻撃防御時バストアップ表示$gameVariables.setValue(20,1); $gameVariables.setValue(520, [1,7]); 520→valueFaceSelect = 1;
 battle_bustUp = function (basePictureId, baseMoveX, baseMoveY, baseDurationOffset) {
@@ -1186,6 +975,9 @@ battle_bustUp = function (basePictureId, baseMoveX, baseMoveY, baseDurationOffse
   battle_bustUp1(actor, basePictureId, baseMoveX, baseMoveY, baseDurationOffset);
 }
 battle_bustUp1 = function (gameActor, basePictureId, baseMoveX, baseMoveY, baseDurationOffset) {
+  if (!gameActor) {
+    return;
+  };
   // Get the acting actor's ID from the game variables
   if (!isGirl(gameActor)) {
     return;
@@ -1302,17 +1094,7 @@ function processFaceImageBattleBustUpBattleBustUp(basePictureId, actorId, faceIm
       0
     );
     if (!$gameSwitches.value(471)) {
-      $gameScreen.movePicture(
-        basePictureId + index,
-        1,
-        640 + moveOffsetX,
-        384 + moveOffsetY,
-        100,
-        100,
-        255,
-        0,
-        extraMoveDuration + 10
-      );
+      movePicturePartBattleBustUp(basePictureId + index, 640 + moveOffsetX, 384 + moveOffsetY, extraMoveDuration);
     }
     if (index == 3) {
       hcg_piston(basePictureId + index, 10, $gameParty.inBattle()  ? 2 : 1, 4);
@@ -1320,6 +1102,12 @@ function processFaceImageBattleBustUpBattleBustUp(basePictureId, actorId, faceIm
       tachie_bless(basePictureId + index, 3);
     }
   }
+}
+
+// Moves one battle-bust picture part. Every part shares the same mode, zoom
+// (100), opacity (255) and blend (0), and runs 10 frames longer than the offset.
+function movePicturePartBattleBustUp(pictureId, x, y, extraMoveDuration) {
+  $gameScreen.movePicture(pictureId, 1, x, y, 100, 100, 255, 0, extraMoveDuration + 10);
 }
 
 //---------------------------------------------------------------------
@@ -1333,7 +1121,7 @@ function processHypnosisEffectBattleBustUpBattleBustUp(basePictureId, gameActor,
 
   // Cache values to reduce property lookups
   const hypnosisCount = gameActor.getStateCounter(782);
-  const hypnosisImageName = `${actorId}ActorHypnosisEye_0`;
+  const hypnosisImageName = `${gameActor.actorId()}ActorHypnosisEye_0`;
   
   // Set animation parameters once
   $gameScreen.setPicturesAnimation(2, 10, "連番", hypnosisCount);
@@ -1357,17 +1145,7 @@ function processHypnosisEffectBattleBustUpBattleBustUp(basePictureId, gameActor,
     0
   );
   
-  $gameScreen.movePicture(
-    99,
-    1,
-    targetX,
-    targetY,
-    100,
-    100,
-    255,
-    0,
-    extraMoveDuration + 10
-  );
+  movePicturePartBattleBustUp(99, targetX, targetY, extraMoveDuration);
   
   // Start the animation frame with fixed parameters
   $gameScreen.picture(99).startAnimationFrame(3, true, [1, 1, 1, 2]);
@@ -1414,38 +1192,37 @@ function getFaceImageNameBattleBustUp(actorId, index, baseFaceImageName) {
     case 5:
       baseFaceImageName = actorId + 'Actor_' + valueFaceSelect;
       break;
-    case 6: {
-      const actor = $gameActors.actor(actorId);
-      if (actor.isStateAffected(781) || actor.isStateAffected(783)) {
-        if (actor.isStateAffected(781)) {
-          baseFaceImageName = actorId + 'Actor' + "CloudyEye1";
-        }
-        if (actor.isStateAffected(783)) {
-          baseFaceImageName = actorId + 'Actor' + "CloudyEye2";
-        }
-        if (actor.isStateAffected(785)) {
-          baseFaceImageName = actorId + 'Actor' + "CloudyEye4";
-        }
-      } else {
-        showPictureFlag = false;
-      }
-      break;
-    }
-    case 7: {
-      const actor = $gameActors.actor(actorId);
-      if (actor.isStateAffected(784)) {
-        baseFaceImageName = actorId + 'Actor' + "CloudyEye3";
-      } else {
-        if (valueFrontHairCloth[actorId] >= 0) {
-          baseFaceImageName = actorId + 'Actor' + "FrontHair" + valueFrontHairCloth[actorId];
-        } else {
-          showPictureFlag = false;
-        }
-      }
-      break;
-    }
+    case 6:
+      return resolveCloudyEyeFaceImageNameBattleBustUp($gameActors.actor(actorId), actorId, baseFaceImageName);
+    case 7:
+      return resolveFrontHairFaceImageNameBattleBustUp($gameActors.actor(actorId), actorId, baseFaceImageName);
   }
   return { faceImageName: baseFaceImageName, showPictureFlag };
+}
+
+// Face index 6: states 781/783/785 select the "CloudyEye" 1/2/4 face, otherwise
+// the picture is hidden. Returns the same shape as getFaceImageNameBattleBustUp.
+function resolveCloudyEyeFaceImageNameBattleBustUp(actor, actorId, baseFaceImageName) {
+  // BUGFIX: state 785 is handled below but was missing from this guard, so an
+  // actor carrying only 785 fell through and hid the picture instead of showing
+  // "CloudyEye4".
+  const hasCloudyEye = actor.isStateAffected(781) || actor.isStateAffected(783) || actor.isStateAffected(785);
+  if (!hasCloudyEye) return { faceImageName: baseFaceImageName, showPictureFlag: false };
+  if (actor.isStateAffected(781)) baseFaceImageName = actorId + 'Actor' + "CloudyEye1";
+  if (actor.isStateAffected(783)) baseFaceImageName = actorId + 'Actor' + "CloudyEye2";
+  if (actor.isStateAffected(785)) baseFaceImageName = actorId + 'Actor' + "CloudyEye4";
+  return { faceImageName: baseFaceImageName, showPictureFlag: true };
+}
+
+// Face index 7: state 784 selects "CloudyEye3", otherwise the front-hair face.
+function resolveFrontHairFaceImageNameBattleBustUp(actor, actorId, baseFaceImageName) {
+  if (actor.isStateAffected(784)) {
+    return { faceImageName: actorId + 'Actor' + "CloudyEye3", showPictureFlag: true };
+  }
+  if (valueFrontHairCloth[actorId] < 0) {
+    return { faceImageName: baseFaceImageName, showPictureFlag: false };
+  }
+  return { faceImageName: actorId + 'Actor' + "FrontHair" + valueFrontHairCloth[actorId], showPictureFlag: true };
 }
 
 //オーラ表現
@@ -1458,6 +1235,7 @@ tachie_aura = function () {
 tachie_aura1 = function (gameActor) {
   // Early exits for most common cases to avoid unnecessary processing
   if (!$gameParty.inBattle()) return;
+  if (!gameActor) return;
   
   // Combine conditions for better performance
   if (gameActor.tp < 100 || !isGirl(gameActor)) return;
@@ -1540,6 +1318,7 @@ actor_kousokukaijo1 = function (boundActorId) {
 actor_kousokukaijo2 = function (boundActorId) {
   const battleMembers = $gameParty.battleMembers();
   const boundActor = $gameActors.actor(boundActorId);
+  if (!boundActor) return;
   
   // Check if there are any party members with state 89 (rescue state)
   for (let i = 0; i < battleMembers.length; i++) {
@@ -1558,7 +1337,9 @@ actor_kousokukaijo2 = function (boundActorId) {
     $gameVariables.setValue(525, randomMessage);
     
     // Display battle log message
-    const logMessage = `${partyMember.name()}は${boundActor.name()}の拘束を解きに掛かった！`;
+    const actorName = partyMember.name();
+    const boundActorName = boundActor.name()
+    const logMessage = `${actorName}は${boundActorName}の拘束を解きに掛かった！`;
     BattleManager._logWindow.push('addText', logMessage);
     
     // Remove the bind state from the bound actor
@@ -1570,64 +1351,29 @@ actor_kousokukaijo2 = function (boundActorId) {
 };
 
 //パーティメンバーが居る時に拘束解除時の反応。
-actor_kousokukaijo3 = function(actorId) {
-  // Cache frequently used data and perform early exit if no rescue state found
+actor_kousokukaijo3 = function (actorId) {
   const battleMembers = $gameParty.battleMembers();
-  let rescuingMemberIndex = -1;
-  
-  // Find the first party member with state 89 (rescue state)
-  for (let i = 0; i < battleMembers.length; i++) {
-    if (battleMembers[i].isStateAffected(89)) {
-      rescuingMemberIndex = i;
-      break;
-    }
-  }
-  
-  // Early exit if no rescuing member found
+  const rescuingMemberIndex = findRescuingMemberIndexBattleRefactor(battleMembers);
   if (rescuingMemberIndex === -1) return;
-  
-  // Get rescuing party member and bound actor
-  const partyMember = battleMembers[rescuingMemberIndex];
   const actor = $gameActors.actor(actorId);
+  if (!actor) return;
+  const partyMember = battleMembers[rescuingMemberIndex];
   const actorData = actor.actor();
-  
-  // Handle state changes
   partyMember.removeState(89);
   actor.removeState(69);
-  
-  // Handle positioning in side view battles
   if ($dataSystem.optSideView) {
-    const enemyMovementData = $gameVariables.value(703);
-    if (enemyMovementData) {
-      const troopMemberIndex = $gameVariables.value(92) + 1;
-      const partyMemberIndex = rescuingMemberIndex + 1;
-      
-      $gameTroop.set(troopMemberIndex, enemyMovementData[0], enemyMovementData[1], 30);
-      $gameParty.set(partyMemberIndex, enemyMovementData[0], enemyMovementData[1], 30);
-    }
+    placeRescueBattlersBattleRefactor(rescuingMemberIndex, $gameVariables.value(703));
   }
-  
-  // Handle success messages and face display
-  const meta = actorData.meta;
-  const bindRemoveSuccessFaceData = meta['BindRemoveSuccessFace'].split(',');
-  const faceImageCode = Number(bindRemoveSuccessFaceData[0]);
-  const faceImageFrame = Number(bindRemoveSuccessFaceData[1]);
-  
-  // Get a random success message
-  const bindRemoveSuccessMessages = meta['BindRemoveSuccess'].split(',');
-  const randomMessageIndex = getRandomIndex(bindRemoveSuccessMessages.length);
-  const successMessage = bindRemoveSuccessMessages[randomMessageIndex];
-  
-  // Set variables and display messages
+  const actorMeta = actorData.meta;
+  const faceConfig = actorMeta.BindRemoveSuccessFace.split(',');
+  const successMessages = actorMeta.BindRemoveSuccess.split(',');
+  const successMessage = successMessages[getRandomIndex(successMessages.length)];
+  const actorName = actor.name();
   $gameVariables.setValue(525, successMessage);
-  BattleManager._logWindow.push('addText', `${actor.name()}は拘束から助け出された！`);
-  
-  // Show face and message
+  BattleManager._logWindow.push('addText', `${actorName}は拘束から助け出された！`);
   $gameMessage.newPage();
-  $gameMessage.setFaceImage(`${actorId}Actor${faceImageCode}`, faceImageFrame);
+  $gameMessage.setFaceImage(`${actorId}Actor${Number(faceConfig[0])}`, Number(faceConfig[1]));
   $gameMessage.add('\\V[525]');
-  
-  // Reset movement data
   $gameVariables.setValue(703, 0);
 };
 
@@ -1667,12 +1413,16 @@ overkill_count = function () {
 const elemIdsBattleXsarStatas = [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 16, 17];
 const attackElementIdsBattleXsarStatas = [18, 19, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80];
 battle_xsarStatas = function (battlerActorId) {
-  const isEnemy = battlerActorId > 20;
+  // Slot 20 is the party actor, every other slot is a troop member, so the enemy
+  // flag is "anything but 20". The previous `battlerActorId > 20` mislabelled the
+  // troop members at indexes 0..19 as party actors, which then reached
+  // actor-only code paths (passive_addCondition, title_battleUp).
   const user = (battlerActorId === 20)
     ? $gameActors.actor($gameVariables.value(20))
     : $gameTroop.members()[battlerActorId];
+  if (!user) return;
 
-  battle_xsarStatas1(user, isEnemy);
+  battle_xsarStatas1(user, battlerActorId !== 20);
 }
 battle_xsarStatas1 = function (user, isEnemy) {
 
@@ -1711,7 +1461,7 @@ battle_xsarStatas1 = function (user, isEnemy) {
 
   // Draw header text in window 0 based on actor type
   {
-    const headerText = buildHeaderTextBattleXsarStatas(user, IsEnemy);
+    const headerText = buildHeaderTextBattleXsarStatas(user, isEnemy);
     WindowManager.show(0, 0, 0, 0, 105);
     WindowManager.drawText(0, `\\fs[25]${headerText}`);
   }
@@ -1726,6 +1476,18 @@ function calcSParamBattleXsarStatas(user, index) {
 function calcElementRateBattleXsarStatas(user, index) {
   return Math.floor(user.elementRate(index) * 100);
 }
+//連撃率 is element 11, and is shown at one tenth of the rate the other
+//element lines use (see 詳細能力値[1]).
+function calcChainRateBattleXsarStatas(user) {
+  return Math.floor(user.elementRate(11) * 10);
+}
+// Variable 380+actorId holds the per-actor stat array. Enemies have no
+// actorId(); the page is drawn for the currently acting actor, whose id sits in
+// variable 20 - which is what the pre-refactor code read here too.
+function actorStatSlotBattleXsarStatas(user) {
+  const actorId = user.isActor() ? user.actorId() : $gameVariables.value(20);
+  return $gameVariables.value(380 + actorId) || [];
+}
 function calcCritMultBonusBattleXsarStatas(user) {
   return user.criticalMultiplierBonus() * 100;
 }
@@ -1733,9 +1495,13 @@ function calcStateRate(user, index) {
   return Math.floor(user.stateRate(index) * 100);
 }
 
+// `valueAttackAmplifysActorId` is indexed by the acting actor, which lives in
+// variable 20. It is deliberately NOT `user.actorId()`: an enemy battler has no
+// actorId(), and the pre-refactor code read variable 20 for the enemy page too.
 function calcElementAmplifyBattleXsarStatas(user, index, includeBonus) {
-  let base = Math.floor(user.elementAmplifyRate(index) * 100);
-  return includeBonus ? base + valueAttackAmplifysActorId[user.actorId()][index] : base;
+  const base = Math.floor(user.elementAmplifyRate(index) * 100);
+  if (!includeBonus) return base;
+  return base + valueAttackAmplifysActorId[$gameVariables.value(20)][index];
 }
 
 function buildStatsTextPart1BattleXsarStatas(user) {  
@@ -1744,8 +1510,7 @@ function buildStatsTextPart1BattleXsarStatas(user) {
   let statsTextPart1 = `\\C[2]${headerText}[1]\\C[0]\n`;
   
   // Add each stat line using the helper function
-  // Note: The "n" value for 連撃率 (Chain Rate) appears to be a placeholder - should be replaced with actual calculation
-  statsTextPart1 += formatStatLine(636, "連撃率　  　", "n");
+  statsTextPart1 += formatStatLine(636, "連撃率　  　", calcChainRateBattleXsarStatas(user));
   statsTextPart1 += formatStatLine(637, "回復率　　  ", calcElementRateBattleXsarStatas(user, 12));
   statsTextPart1 += formatStatLine(630, "命中率　　　", calcXParamBattleXsarStatas(user, 0));
   statsTextPart1 += formatStatLine(632, "回避率　　　", calcXParamBattleXsarStatas(user, 1));
@@ -1759,7 +1524,7 @@ function buildStatsTextPart1BattleXsarStatas(user) {
   statsTextPart1 += formatStatLine(638, "物理ﾀﾞﾒｶｯﾄ率", calcSParamBattleXsarStatas(user, 6));
   statsTextPart1 += formatStatLine(639, "魔法ﾀﾞﾒｶｯﾄ率", calcSParamBattleXsarStatas(user, 7));
   statsTextPart1 += formatStatLine(656, "経験獲得率　", calcSParamBattleXsarStatas(user, 9));
-  statsTextPart1 += formatStatLine(624, "ﾎﾟｰｼｮﾝ耐性率", $gameVariables.value(380 + user.actorId())[58]);
+  statsTextPart1 += formatStatLine(624, "ﾎﾟｰｼｮﾝ耐性率", actorStatSlotBattleXsarStatas(user)[58]);
   statsTextPart1 += formatStatLine(683, "通常異常耐性", calcStateRate(user, 15));
   statsTextPart1 += formatStatLine(684, "特殊異常耐性", calcStateRate(user, 30));
   
@@ -1770,15 +1535,15 @@ function buildStatsTextPart2BattleXsarStatas(user, isEnemy) {
   let statsTextPart2 = "";
   statsTextPart2 += `\\C[2]詳細能力値[2]\\C[0]\n`;
   for (let i = 1; i <= 9; i++) {
-    amygame_elementIcon(i);
-    const elementAmplifyValue = calcElementAmplifyBattleXsarStatas(user, i, isEnemy);
+    const elementIcon = amygame_elementIcon(i);
+    const elementAmplifyValue = calcElementAmplifyBattleXsarStatas(user, i, true);
     let amplifyLabel = (i === 1 || i === 2) ? `威力率　` : `属性威力率`;
-    statsTextPart2 += `\\C[16]\x1bI[${valueElementIconArr[1]}]${$dataSystem.elements[i]}${amplifyLabel}:\\C[0]${elementAmplifyValue}%\n`;
+    statsTextPart2 += `\\C[16]\x1bI[${elementIcon[1]}]${$dataSystem.elements[i]}${amplifyLabel}:\\C[0]${elementAmplifyValue}%\n`;
   }
   for (let i = 1; i <= 9; i++) {
-    amygame_elementIcon(i);
+    const elementIcon = amygame_elementIcon(i);
     let resistanceLabel = (i === 1 || i === 2) ? `耐性率　` : `属性耐性率`;
-    statsTextPart2 += `\\C[16]\x1bI[${valueElementIconArr[1]}]${$dataSystem.elements[i]}${resistanceLabel}:\\C[0]${calcElementRateBattleXsarStatas(user, i)}%\n`;
+    statsTextPart2 += `\\C[16]\x1bI[${elementIcon[1]}]${$dataSystem.elements[i]}${resistanceLabel}:\\C[0]${calcElementRateBattleXsarStatas(user, i)}%\n`;
   }
   return statsTextPart2;
 }
@@ -1793,561 +1558,299 @@ function buildStatsTextPart3BattleXsarStatas(user, isEnemy) {
   if (isEnemy) {
     skill_addPowerSet(user, $dataSkills, 1, 1);
     if (valueAddPowerCustom >= 1) {
-      statsTextPart3 += `\\C[16]\\I[666]スキル威力率:\\C[0]+${valueAddPowerCustom}\n`;
+      const skillName = `\\I[666]`;
+      const skillMsgPrefix = colorTaggedText(16, `${skillName}スキル威力率`);
+      statsTextPart3 += `${skillMsgPrefix}:+${valueAddPowerCustom}\n`;
     }
   }
-  statsTextPart3 += formatStatLine(31, "奥義威力率　", calcElementAmplifyBattleXsarStatas(user, 10, isEnemy));
-  statsTextPart3 += formatStatLine(673, "ｱﾋﾞﾘﾃｨ威力率", calcElementAmplifyBattleXsarStatas(user, 20, isEnemy));
+  statsTextPart3 += formatStatLine(31, "奥義威力率　", calcElementAmplifyBattleXsarStatas(user, 10, true));
+  statsTextPart3 += formatStatLine(673, "ｱﾋﾞﾘﾃｨ威力率", calcElementAmplifyBattleXsarStatas(user, 20, true));
   statsTextPart3 += formatStatLine(78, "会心威力率　", calcCritMultBonusBattleXsarStatas(user));
-  statsTextPart3 += formatStatLine(480, "剣威力率　　", calcElementAmplifyBattleXsarStatas(user, 21, isEnemy));
-  statsTextPart3 += formatStatLine(481, "短剣威力率　", calcElementAmplifyBattleXsarStatas(user, 22, isEnemy));
-  statsTextPart3 += formatStatLine(482, "刀威力率　　", calcElementAmplifyBattleXsarStatas(user, 23, isEnemy));
-  statsTextPart3 += formatStatLine(483, "杖威力率　　", calcElementAmplifyBattleXsarStatas(user, 24, isEnemy));
-  statsTextPart3 += formatStatLine(484, "拳威力率　　", calcElementAmplifyBattleXsarStatas(user, 25, isEnemy));
-  statsTextPart3 += formatStatLine(485, "槍威力率　　", calcElementAmplifyBattleXsarStatas(user, 26, isEnemy));
-  statsTextPart3 += formatStatLine(486, "斧威力率　　", calcElementAmplifyBattleXsarStatas(user, 27, isEnemy));
-  statsTextPart3 += formatStatLine(487, "銃威力率　　", calcElementAmplifyBattleXsarStatas(user, 28, isEnemy));
-  statsTextPart3 += formatStatLine(488, "弓威力率　　", calcElementAmplifyBattleXsarStatas(user, 29, isEnemy));
-  statsTextPart3 += formatStatLine(489, "楽器威力率　", calcElementAmplifyBattleXsarStatas(user, 30, isEnemy));
+  statsTextPart3 += formatStatLine(480, "剣威力率　　", calcElementAmplifyBattleXsarStatas(user, 21, true));
+  statsTextPart3 += formatStatLine(481, "短剣威力率　", calcElementAmplifyBattleXsarStatas(user, 22, true));
+  statsTextPart3 += formatStatLine(482, "刀威力率　　", calcElementAmplifyBattleXsarStatas(user, 23, true));
+  statsTextPart3 += formatStatLine(483, "杖威力率　　", calcElementAmplifyBattleXsarStatas(user, 24, true));
+  statsTextPart3 += formatStatLine(484, "拳威力率　　", calcElementAmplifyBattleXsarStatas(user, 25, true));
+  statsTextPart3 += formatStatLine(485, "槍威力率　　", calcElementAmplifyBattleXsarStatas(user, 26, true));
+  statsTextPart3 += formatStatLine(486, "斧威力率　　", calcElementAmplifyBattleXsarStatas(user, 27, true));
+  statsTextPart3 += formatStatLine(487, "銃威力率　　", calcElementAmplifyBattleXsarStatas(user, 28, true));
+  statsTextPart3 += formatStatLine(488, "弓威力率　　", calcElementAmplifyBattleXsarStatas(user, 29, true));
+  statsTextPart3 += formatStatLine(489, "楽器威力率　", calcElementAmplifyBattleXsarStatas(user, 30, true));
   // 神聖邪悪耐性率表示 (if needed)
   // if (false) { ... }
   return statsTextPart3;
 }
 
-function buildStatsTextPart4BattleXsarStatas(user, isEnemy) {
-  let statsTextPart4 = "";
-  statsTextPart4 += `\\C[2]詳細能力値[4]\\C[0]\n`;
-  const start = 1;
-  const end = $dataStates.length - 1;
+const NORMAL_STATE_CATEGORY_JP = ' StateabNomal';
+const SPECIAL_STATE_CATEGORY_JP = ' StateSPabNomal';
+// The state whose rate counts as the "default" for each listed category; a state
+// whose rate equals its category default is not worth listing.
+const DEFAULT_STATE_ID_NORMAL = 15;
+const DEFAULT_STATE_ID_SPECIAL = 30;
+
+// State resistances that differ from the category default, one line each.
+function buildStateResistanceLinesBattleXsarStatas(user) {
   const resistanceJP = "耐性率";
-  for (let i = start; i <= end; i++) {
-    const stateMeta = $dataStates[i].meta;
-    if (stateMeta['Category']) {
-      if (stateMeta['Category'] === ' StateabNomal' || stateMeta['Category'] === ' StateSPabNomal') {
-        if (user.isStateResist(i)) {
-          const nullifyJP = "無効化";
-          statsTextPart4 += `\x1bI[${$dataStates[i].iconIndex}]${$dataStates[i].name}:\\C[2][${nullifyJP}]\\C[0]\n`;
-        } else {
-          if (user.stateRate(i) !== 1.0) {
-            if ((stateMeta['Category'] === ' StateabNomal' && user.stateRate(i) === user.stateRate(15)) ||
-                (stateMeta['Category'] === ' StateSPabNomal' && user.stateRate(i) === user.stateRate(30))) {
-              // Do nothing when equal to default state rate.
-            } else {
-              statsTextPart4 += `\x1bI[${$dataStates[i].iconIndex}]${$dataStates[i].name}${resistanceJP}:${calcStateRate(user, i)}%\n`;
-            }
-          }
-        }
-      }
+  const nullifyJP = "無効化";
+  let lines = "";
+  for (let i = 1; i <= $dataStates.length - 1; i++) {
+    const state = $dataStates[i];
+    if (!state || !state.meta) continue;
+    const category = state.meta['Category'];
+    const isNormalCategory = category === NORMAL_STATE_CATEGORY_JP;
+    const isSpecialCategory = category === SPECIAL_STATE_CATEGORY_JP;
+    if (!isNormalCategory && !isSpecialCategory) continue;
+
+    if (user.isStateResist(i)) {
+      lines += `\x1bI[${state.iconIndex}]${state.name}:\\C[2][${nullifyJP}]\\C[0]\n`;
+      continue;
     }
+    if (user.stateRate(i) === 1.0) continue;
+    const defaultStateId = isNormalCategory ? DEFAULT_STATE_ID_NORMAL : DEFAULT_STATE_ID_SPECIAL;
+    if (user.stateRate(i) === user.stateRate(defaultStateId)) continue;
+    lines += `\x1bI[${state.iconIndex}]${state.name}${resistanceJP}:${calcStateRate(user, i)}%\n`;
   }
-  if (isEnemy) {
-    const elementList = attackElementIdsBattleXsarStatas;
-    elementList.forEach(function (elementId) {
-      if (user.elementAmplifyRate(elementId) !== 0) {
-        amygame_elementIcon(elementId);
-        statsTextPart4 += `\\C[16]\x1bI[${valueElementIconArr[0]}]${resistanceJP}:\\C[0]${calcElementAmplifyBattleXsarStatas(user, elementId, false)}%\n`;
-      }
-    });
-  } else {
-    for (let i = 1, endE = $dataSystem.elements.length - 1; i <= endE; i++) {
-      if (elemIdsBattleXsarStatas.some(function (elem) { return elem === i; })) {
-        // Skip if in the array
-      } else {
-        if (user.elementRate(i) !== 1) {
-          amygame_elementIcon(i);
-          let resistanceText;
-          const icon = valueElementIconArr[0] === 1 ? `${$dataSystem.elements[i]}` : `\x1bI[${valueElementIconArr[3]}]`;
-          resistanceText = `\\C[16]${icon}${resistanceJP}\\C[0]:`;
-          statsTextPart4 += `${resistanceText}${calcElementRateBattleXsarStatas(user, i)}%\n`;
-        }
-      }
-    }
-  }
-  return statsTextPart4;
+  return lines;
 }
 
-function buildHeaderTextBattleXsarStatas(user, IsEnemy) {
-  let headerText = "";
-  if (!IsEnemy) {
-    let classInfo;
-    if (user.subclass()) {
-      classInfo = `[${$dataClasses[user._classId].name}/${$dataClasses[user._subclassId].name}]`;
-    } else {
-      classInfo = `${$dataClasses[user._classId].name}`;
-    }
-    let additionalInfo;
-    if ($gameParty.inBattle()) {
-      additionalInfo = `\\C[16]BuffLimit:\\C[0]${user.maxBuffLimit(2)} \\C[16]D.cap:\\C[0]${user.maximumDamage()} \\C[16]H.cap:\\C[0]${user.maximumHealing() - user.maximumHealing() - user.maximumHealing()}`;
-    } else {
-      const headerJP = "役職:";
-      additionalInfo = `${headerJP}${$gameVariables.value(380 + user.actorId())[59]}`;
-    }
-    headerText = `${classInfo}${user.nickname()}\\set[${user.actorId()}]\n${additionalInfo}`;
-  } else {
-    headerText = `${user.name()}`;
-  }
-  return headerText;
+// Elements the enemy amplifies: the 特攻率 list.
+function buildSpecialAttackLinesBattleXsarStatas(user) {
+  const specialAttackJP = "特攻率";
+  let lines = "";
+  attackElementIdsBattleXsarStatas.forEach(function (elementId) {
+    if (user.elementAmplifyRate(elementId) === 0) return;
+    // Column 0 of the icon table is a flag (1 = use the element name instead of
+    // an icon); the icon itself is in column 1. Using column 0 here drew icon
+    // 0/1 instead of the element icon.
+    const elementIcon = amygame_elementIcon(elementId);
+    lines += `\\C[16]\x1bI[${elementIcon[1]}]${specialAttackJP}:\\C[0]${calcElementAmplifyBattleXsarStatas(user, elementId, false)}%\n`;
+  });
+  return lines;
 }
+
+// Element rates the party member resists, excluding the nine shown in [2].
+function buildElementResistanceLinesBattleXsarStatas(user) {
+  const resistanceJP = "耐性率";
+  let lines = "";
+  for (let i = 1, endE = $dataSystem.elements.length - 1; i <= endE; i++) {
+    if (elemIdsBattleXsarStatas.indexOf(i) >= 0) continue;
+    if (user.elementRate(i) === 1) continue;
+    const elementIcon = amygame_elementIcon(i);
+    const icon = elementIcon[0] === 1 ? `${$dataSystem.elements[i]}` : `\x1bI[${elementIcon[3]}]`;
+    lines += `\\C[16]${icon}${resistanceJP}\\C[0]:${calcElementRateBattleXsarStatas(user, i)}%\n`;
+  }
+  return lines;
+}
+
+function buildStatsTextPart4BattleXsarStatas(user, isEnemy) {
+  const body = isEnemy
+    ? buildSpecialAttackLinesBattleXsarStatas(user)
+    : buildElementResistanceLinesBattleXsarStatas(user);
+  const resistanceLines = buildStateResistanceLinesBattleXsarStatas(user);
+  return `\\C[2]詳細能力値[4]\\C[0]\n${resistanceLines}${body}`;
+}
+
+function buildHeaderTextBattleXsarStatas(user, isEnemy) {
+  if (isEnemy) return user.name();
+
+  const classInfo = user.subclass()
+    ? `[${$dataClasses[user._classId].name}/${$dataClasses[user._subclassId].name}]`
+    : `${$dataClasses[user._classId].name}`;
+
+  let additionalInfo;
+  if ($gameParty.inBattle()) {
+    // BUGFIX: v1.46 read `user.maximumHealing() - user.maximumHealing() - user.maximumHealing()`,
+    // i.e. the negated cap, so H.cap rendered as "-5000" next to a positive D.cap.
+    // YEP_DamageCore's maximumHealing() already returns the positive cap.
+    additionalInfo = `\\C[16]BuffLimit:\\C[0]${user.maxBuffLimit(2)} \\C[16]D.cap:\\C[0]${user.maximumDamage()} \\C[16]H.cap:\\C[0]${user.maximumHealing()}`;
+  } else {
+    const headerJP = "役職:";
+    additionalInfo = `${headerJP}${$gameVariables.value(380 + user.actorId())[59]}`;
+  }
+  return `${classInfo}${user.nickname()}\\set[${user.actorId()}]\n${additionalInfo}`;
+}
+
+// Tile offsets tried around the source event when hunting for a free chest tile.
+const CHEST_SEARCH_OFFSETS_ENEMYWIN_TREASUREBOX2 = [-2, -1, 0, 1, 2];
 
 //エネミー撃破時にドロップボックス設定
-enemywin_treasurebox1 = function (id1) {
+enemywin_treasurebox1 = function (unusedArg1) {
 
-  $gameVariables.value(160)[4] = 0;
-  $gameVariables.value(160)[7] = 0;
-  var value1 = getRandomIndex(101);
-  var value2 = 0;
-  var value3 = 0;
-  if ($gameVariables.value(270) >= 1) {
-    var value3 = $gameVariables.value(270);
-  };
-  if ($gameSwitches.value(211)) {
-    value2 += 20;
-  };
-  value1 += Math.round(value2 + ($gameVariables.value(270) / 10));
-  if (value1 >= 100 && value3 >= 40) {
-    $gameVariables.value(160)[4] = 3;
-    $gameVariables.value(160)[5] = 21;
-    $gameVariables.value(160)[6] = 5;
-    $gameVariables.value(160)[7] = 1;
-  } else {
-    if (value1 >= 95 && value3 >= 20) {
-      $gameVariables.value(160)[4] = 2;
-      $gameVariables.value(160)[5] = 18;
-      $gameVariables.value(160)[6] = 3;
-      $gameVariables.value(160)[7] = 1;
-    } else {
-      if (value1 >= 85) {
-        $gameVariables.value(160)[4] = 1;
-        $gameVariables.value(160)[5] = 15;
-        $gameVariables.value(160)[6] = 1;
-        $gameVariables.value(160)[7] = 1;
-      }
-    }
-  };
+  const treasureBoxPosition = $gameVariables.value(160);
+  treasureBoxPosition[4] = 0;
+  treasureBoxPosition[7] = 0;
+  let treasureScore = getRandomIndex(101);
+  let scoreBonus = 0;
+  let treasureThreshold = 0;
+  if ($gameVariables.value(270) >= 1) treasureThreshold = $gameVariables.value(270);
+  if ($gameSwitches.value(211)) scoreBonus += 20;
+  treasureScore += Math.round(scoreBonus + ($gameVariables.value(270) / 10));
 
-  //テストプレイ用
-  //$gameVariables.value(160)[4] = 1;
-  //$gameVariables.value(160)[5] = 15;
-  //$gameVariables.value(160)[6] = 1;
-  //$gameVariables.value(160)[7] = 1;
+  // The tier fills slots 4..7 of variable 160: chest rank, level, item count, flag.
+  if (treasureScore >= 100 && treasureThreshold >= 40) {
+    treasureBoxPosition[4] = 3;
+    treasureBoxPosition[5] = 21;
+    treasureBoxPosition[6] = 5;
+    treasureBoxPosition[7] = 1;
+  } else if (treasureScore >= 95 && treasureThreshold >= 20) {
+    treasureBoxPosition[4] = 2;
+    treasureBoxPosition[5] = 18;
+    treasureBoxPosition[6] = 3;
+    treasureBoxPosition[7] = 1;
+  } else if (treasureScore >= 85) {
+    treasureBoxPosition[4] = 1;
+    treasureBoxPosition[5] = 15;
+    treasureBoxPosition[6] = 1;
+    treasureBoxPosition[7] = 1;
+  };
 
 };
 
 //エネミー撃破時にドロップボックス設定
-enemywin_treasurebox2 = function (id1) {
-
-  for (var i = 1; i <= 100; i++) {
-    var value0 = 0;
-    var value1 = $gameMap.event(id1).x;
-    var value2 = $gameMap.event(id1).y;
-    var value3 = $gamePlayer.x;//プレイヤー座標
-    var value4 = $gamePlayer.y;
-    var value6 = [-2, -1, 0, 1, 2][getRandomIndex(5)];
-    var value7 = [-2, -1, 0, 1, 2][getRandomIndex(5)];
-    value1 += value6;
-    value2 += value7;
-    value0 = $gameMap.eventIdXy(value1, value2);
-    var value5 = $gameMap.terrainTag(value1, value2);
-    if (value5 == 0) { value0 = 1 }
-    if (value1 == value3 && value2 == value4) { value0 = 1 };
-    if (value0 >= 1) {
-      $gameVariables.value(160)[1] = 0;
-      $gameVariables.value(160)[2] = 0;
-    } else {
-      $gameVariables.value(160)[1] = value6;
-      $gameVariables.value(160)[2] = value7;
-    };
-    if ($gameVariables.value(160)[1] != 0) {
-      break;
-    }
-  };
-
-  var value1 = 4;
-  if ($gameVariables.value(160)[1] == 0) {
-    var conditionMap = {};
-    conditionMap.passable = 1;
-    conditionMap.screen = 0;
-    conditionMap.collided = 3;
-    conditionMap.terrainTags = [1];
-    conditionMap.regionIds = [1];
-    $gameMap.spawnEventRandom(value1, conditionMap, true);
-  } else {
-    $gameMap.spawnEvent(value1, $gameMap.event(id1).x, $gameMap.event(id1).y, true);
-  };
-  var value2 = $gameMap.getLastSpawnEventId();
-  var event = $gameMap.event(value2);
-  var value1 = 'chest_c3';
-  $gameScreen._particle.particlePlay(value2, value1, 'attach:this', 'def', 'above');
-  $gameScreen._particle.particleExceed(value1, 0.5);
-  AudioManager.playSe({ "name": "Sound1", "volume": 75, "pitch": 150, "pan": 0 });
-  event.jumpEx($gameVariables.value(160)[1], $gameVariables.value(160)[2], $gameVariables.value(160)[5], $gameVariables.value(160)[6]);
-  event.controlSelfVariable(1, 0, $gameVariables.value(160)[4], true);
-
+enemywin_treasurebox2 = function (eventId) {
+  const sourceEvent = $gameMap.event(eventId);
+  if (!sourceEvent) return;
+  const treasureBoxPosition = $gameVariables.value(160);
+  findFreeChestOffsetEnemywinTreasurebox2(sourceEvent, treasureBoxPosition);
+  const chestEventId = spawnChestEnemywinTreasurebox2(sourceEvent, treasureBoxPosition);
+  if (!chestEventId) return;
+  const chestEvent = $gameMap.event(chestEventId);
+  if (!chestEvent) return;
+  presentChestEnemywinTreasurebox2(chestEventId, chestEvent, treasureBoxPosition);
 };
+
+// Resolves which `<BGn>` key a layer uses: the plain key by default, overridden
+// by the switch-15 "night" variant `<BGnN>` when both exist. 0 means "no layer".
+function resolveBattlebackKeyBattlebackChange2(value, baseKey) {
+  const nightKey = baseKey + 'N';
+  if ($gameSwitches.value(15) && value.meta[nightKey]) return nightKey;
+  if (value.meta[baseKey]) return baseKey;
+  return 0;
+}
+
+// Draws the layer's scroll speeds. The second draw was already unused in the
+// original (it fed a variable nothing ever read), but dropping it would remove a
+// Math.random() call and shift every later random value in the battle, so it is
+// kept deliberately. `getRandomIndex` consumes exactly one draw whatever its
+// argument, which is why the original's 56/101 mismatch is unobservable.
+function drawBattlebackScrollSpeedsBattlebackChange2(scrollSpeedCandidates) {
+  const speedX = scrollSpeedCandidates[getRandomIndex(scrollSpeedCandidates.length)];
+  getRandomIndex(101);
+  const speedY = scrollSpeedCandidates[getRandomIndex(scrollSpeedCandidates.length)];
+  return { speedX, speedY };
+}
+
+// Applies `<BGn:x,y,...>` field 1 as the X speed and field 2 as the Y speed:
+// 0 = leave alone, 1 = the drawn speed, 2+ = that literal speed (set twice, the
+// literal overwriting the drawn value — preserved as-is).
+function applyBattlebackScrollSpeedBattlebackChange2(spriteset, level, arr, speedX, speedY) {
+  if (Number(arr[1]) != 0) spriteset.setBattlebackScrollSpeedX(level, speedX);
+  if (Number(arr[1]) >= 2) spriteset.setBattlebackScrollSpeedX(level, Number(arr[1]));
+  if (Number(arr[2]) != 0) spriteset.setBattlebackScrollSpeedY(level, speedY);
+  if (Number(arr[2]) >= 2) spriteset.setBattlebackScrollSpeedY(level, Number(arr[2]));
+}
+
+// Loads and configures one of the extra battleback layers 3..6. Layer 1 is not
+// routed through here: it sets scroll speeds only and never loads artwork.
+function applyBattlebackLayerBattlebackChange2(spriteset, level, value, baseKey, scrollSpeedCandidates, battlebackDuration) {
+  const selectedBgKey = resolveBattlebackKeyBattlebackChange2(value, baseKey);
+  if (selectedBgKey == 0) return;
+  const arr = value.meta[selectedBgKey].split(',');
+  const speeds = drawBattlebackScrollSpeedsBattlebackChange2(scrollSpeedCandidates);
+  const bitmap = ImageManager.loadBitmap("img/parallaxes/", arr[0], Number(arr[4]), true);
+  spriteset.addNewBattleback(level, bitmap, 0, battlebackDuration);
+  applyBattlebackScrollSpeedBattlebackChange2(spriteset, level, arr, speeds.speedX, speeds.speedY);
+  spriteset.battlebackOpacity(level, Number(arr[3]));
+  spriteset.battlebackFadeIn(level, battlebackDuration);
+}
 
 //戦闘背景をコントロール
 battleback_change2 = function () {
 
   //戦闘中パーティクル
-  var value1 = 'fog_battle_front';
-  $gameScreen._particle.particleSet(0, value1, 'battleWeather', 'def', 'above');
-  var value2 = valueWeather[28];
-  $gameScreen._particle.particleUpdate([value1, 'alpha', '0', value2 + '@0.05', value2 + '@0.9', '0']);
-  var value2 = valueWeather[29];
-  $gameScreen._particle.particleUpdate([value1, 'speed', String(value2), String(value2)]);
+  if (!SceneManager._scene || !SceneManager._scene._spriteset) return;
+  // Hoisted: the BG3..BG6 layers below need it too, and BG1 may not run at all.
+  const spriteset = SceneManager._scene._spriteset;
+  // NOTE: `battlebackDuration` is declared here but only ever assigned inside the
+  // BG1 branch far below. When BG1 is absent this function therefore passes
+  // `undefined` to addNewBattleback/battlebackFadeIn, and
+  // YEP_ImprovedBattlebacks falls back to its own 20-frame default. Preserved
+  // verbatim: hoisting the assignment to 120 would change BG3..BG6 fade timing.
+  var battlebackDuration;
+  const scrollSpeedX = 'fog_battle_front';
+  $gameScreen._particle.particleSet(0, scrollSpeedX, 'battleWeather', 'def', 'above');
+  const scrollAlphaRange = valueWeather[28];
+  $gameScreen._particle.particleUpdate([scrollSpeedX, 'alpha', '0', scrollAlphaRange + '@0.05', scrollAlphaRange + '@0.9', '0']);
+  const scrollSpeedRange = valueWeather[29];
+  $gameScreen._particle.particleUpdate([scrollSpeedX, 'speed', String(scrollSpeedRange), String(scrollSpeedRange)]);
 
   if ($gameVariables.value(230) >= 1 && $gameVariables.value(240) == 0) {
-    var spriteset = SceneManager._scene._spriteset;
     var bitmap = ImageManager.loadBitmap("img/parallaxes/", "BG_TownBattle3", 0, true);
-    spriteset.addNewBattleback(3, bitmap, 0, value4);
+    spriteset.addNewBattleback(3, bitmap, 0, battlebackDuration);
     spriteset.battlebackOpacity(3, 255);
   };
 
-  var value10 = 0;
-  if ($gameVariables.value(240) >= 1) {
-    var arr1 = [-0.1, -0.2, -0.3, -0.4, -0.5, 0.1, 0.2, 0.3, 0.4, 0.5];
-    var value = $dataItems[$gameVariables.value(240)];
-    if (value.meta['BG1']) { var value10 = 'BG1' };
-    if ($gameSwitches.value(15) && value.meta['BG1N']) {
-      if (value.meta['BG1N']) { var value10 = 'BG1N' };
-    };
-  } else {
-    var value = $dataMap;
-  };
-  if (value10 != 0) {
-    var arr = value.meta[value10].split(',');
-    var value1 = arr1[getRandomIndex(arr1.length)];
-    var value2 = getRandomIndex(56) + 200;
-    var value3 = arr1[getRandomIndex(arr1.length)];
-    var value4 = 120;
-    var spriteset = SceneManager._scene._spriteset;
-    if (Number(arr[1]) == 0) { } else {
-      spriteset.setBattlebackScrollSpeedX(1, value1);
-    };
-    if (Number(arr[1]) >= 2) {
-      spriteset.setBattlebackScrollSpeedX(1, Number(arr[1]));
-    };
-    if (Number(arr[2]) == 0) { } else {
-      spriteset.setBattlebackScrollSpeedY(1, value3);
-    };
-    if (Number(arr[2]) >= 2) {
-      spriteset.setBattlebackScrollSpeedX(1, Number(arr[2]));
-    };
+  const scrollSpeedCandidates = [-0.1, -0.2, -0.3, -0.4, -0.5, 0.1, 0.2, 0.3, 0.4, 0.5];
+  const value = ($gameVariables.value(240) >= 1) ? $dataItems[$gameVariables.value(240)] : $dataMap;
+  if (!value) return;
+
+  // Layer 1 only sets scroll speeds; it never loads artwork of its own.
+  const bg1Key = resolveBattlebackKeyBattlebackChange2(value, 'BG1');
+  if (bg1Key != 0) {
+    battlebackDuration = 120;
+    const bg1Arr = value.meta[bg1Key].split(',');
+    const bg1Speeds = drawBattlebackScrollSpeedsBattlebackChange2(scrollSpeedCandidates);
+    applyBattlebackScrollSpeedBattlebackChange2(spriteset, 1, bg1Arr, bg1Speeds.speedX, bg1Speeds.speedY);
     //spriteset.battlebackOpacity(1, value2);
-  };
+  }
 
-  var value10 = 0;
-  if (value.meta['BG3']) { var value10 = 'BG3' };
-  if ($gameSwitches.value(15) && value.meta['BG3N']) {
-    if (value.meta['BG3N']) { var value10 = 'BG3N' };
-  };
-  if (value10 != 0) {
-    if (value.meta[value10]) {
-      var arr = value.meta[value10].split(',');
-      var value1 = arr1[getRandomIndex(arr1.length)];
-      var value2 = getRandomIndex(101) + 100;
-      var value3 = arr1[getRandomIndex(arr1.length)];
-      var bitmap = ImageManager.loadBitmap("img/parallaxes/", arr[0], Number(arr[4]), true);
-      spriteset.addNewBattleback(3, bitmap, 0, value4);
-      if (Number(arr[1]) == 0) { } else {
-        spriteset.setBattlebackScrollSpeedX(3, value1);
-      };
-      if (Number(arr[1]) >= 2) {
-        spriteset.setBattlebackScrollSpeedX(3, Number(arr[1]));
-      };
-      if (Number(arr[2]) == 0) { } else {
-        spriteset.setBattlebackScrollSpeedY(3, value3);
-      };
-      if (Number(arr[2]) >= 2) {
-        spriteset.setBattlebackScrollSpeedX(3, Number(arr[2]));
-      };
-      spriteset.battlebackOpacity(3, Number(arr[3]));
-      spriteset.battlebackFadeIn(3, value4);
-    };
-  };
+  applyBattlebackLayerBattlebackChange2(spriteset, 3, value, 'BG3', scrollSpeedCandidates, battlebackDuration);
 
-  var value10 = 0;
-  if (value.meta['BG4']) { var value10 = 'BG4' };
-  if ($gameSwitches.value(15) && value.meta['BG4N']) {
-    if (value.meta['BG4N']) { var value10 = 'BG4N' };
-  };
-  if (value10 != 0) {
-    if (value.meta[value10]) {
-      var arr = value.meta[value10].split(',');
-      var value1 = arr1[getRandomIndex(arr1.length)];
-      var value2 = getRandomIndex(101) + 100;
-      var value3 = arr1[getRandomIndex(arr1.length)];
-      var bitmap = ImageManager.loadBitmap("img/parallaxes/", arr[0], Number(arr[4]), true);
-      spriteset.addNewBattleback(4, bitmap, 0, value4);
-      if (Number(arr[1]) == 0) { } else {
-        spriteset.setBattlebackScrollSpeedX(4, value1);
-      };
-      if (Number(arr[1]) >= 2) {
-        spriteset.setBattlebackScrollSpeedX(4, Number(arr[1]));
-      };
-      if (Number(arr[2]) == 0) { } else {
-        spriteset.setBattlebackScrollSpeedY(4, value3);
-      };
-      if (Number(arr[2]) >= 2) {
-        spriteset.setBattlebackScrollSpeedX(4, Number(arr[2]));
-      };
-      spriteset.battlebackOpacity(4, Number(arr[3]));
-      spriteset.battlebackFadeIn(4, value4);
-    };
-  };
+  applyBattlebackLayerBattlebackChange2(spriteset, 4, value, 'BG4', scrollSpeedCandidates, battlebackDuration);
 
-  var value10 = 0;
-  if (value.meta['BG5']) { var value10 = 'BG5' };
-  if ($gameSwitches.value(15) && value.meta['BG5N']) {
-    if (value.meta['BG5N']) { var value10 = 'BG5N' };
-  };
-  if (value10 != 0) {
-    if (value.meta[value10]) {
-      var arr = value.meta[value10].split(',');
-      var value1 = arr1[getRandomIndex(arr1.length)];
-      var value2 = getRandomIndex(101) + 100;
-      var value3 = arr1[getRandomIndex(arr1.length)];
-      var bitmap = ImageManager.loadBitmap("img/parallaxes/", arr[0], Number(arr[4]), true);
-      spriteset.addNewBattleback(5, bitmap, 0, value4);
-      if (Number(arr[1]) == 0) { } else {
-        spriteset.setBattlebackScrollSpeedX(5, value1);
-      };
-      if (Number(arr[1]) >= 2) {
-        spriteset.setBattlebackScrollSpeedX(5, Number(arr[1]));
-      };
-      if (Number(arr[2]) == 0) { } else {
-        spriteset.setBattlebackScrollSpeedY(5, value3);
-      };
-      if (Number(arr[2]) >= 2) {
-        spriteset.setBattlebackScrollSpeedX(5, Number(arr[2]));
-      };
-      spriteset.battlebackOpacity(5, Number(arr[3]));
-      spriteset.battlebackFadeIn(5, value4);
-    };
-  };
+  applyBattlebackLayerBattlebackChange2(spriteset, 5, value, 'BG5', scrollSpeedCandidates, battlebackDuration);
 
-  var value10 = 0;
-  if (value.meta['BG6']) { var value10 = 'BG6' };
-  if ($gameSwitches.value(15) && value.meta['BG6N']) {
-    if (value.meta['BG6N']) { var value10 = 'BG6N' };
-  };
-  if (value10 != 0) {
-    if (value.meta[value10]) {
-      var arr = value.meta[value10].split(',');
-      var value1 = arr1[getRandomIndex(arr1.length)];
-      var value2 = getRandomIndex(101) + 100;
-      var value3 = arr1[getRandomIndex(arr1.length)];
-      var bitmap = ImageManager.loadBitmap("img/parallaxes/", arr[0], Number(arr[4]), true);
-      spriteset.addNewBattleback(6, bitmap, 0, value4);
-      if (Number(arr[1]) == 0) { } else {
-        spriteset.setBattlebackScrollSpeedX(6, value1);
-      };
-      if (Number(arr[1]) >= 2) {
-        spriteset.setBattlebackScrollSpeedX(6, Number(arr[1]));
-      };
-      if (Number(arr[2]) == 0) { } else {
-        spriteset.setBattlebackScrollSpeedY(6, value3);
-      };
-      if (Number(arr[2]) >= 2) {
-        spriteset.setBattlebackScrollSpeedX(6, Number(arr[2]));
-      };
-      spriteset.battlebackOpacity(6, Number(arr[3]));
-      spriteset.battlebackFadeIn(6, value4);
-    };
-  };
-
-
+  applyBattlebackLayerBattlebackChange2(spriteset, 6, value, 'BG6', scrollSpeedCandidates, battlebackDuration);
 };
 
 //戦闘時一言集
-battle_wordset = function (id1) {
+battle_wordset = function (wordSetId) {
 
   if (ConfigManager.battleAniSpeed < 3) return;
 
-  let array0 = 0;
-  let array1 = 0;
-  let array2 = 0;
+  let statusWordCandidates = 0;
+  let damageWordCandidates = 0;
+  let attackWordCandidates = 0;
   let actorId = $gameVariables.value(20);
   const gameTroopMembers = $gameTroop.members();
   const gameVar276 = $gameVariables.value(276);
-  if (id1 == 1) {
-    if (gameVar276 == 1) {
-      if ($gameSwitches.value(464)) {
-        $gameVariables.setValue(20, $gameParty.battleMembers()[actorId].actorId());
-      } else {
-        //var enemy1 = gameTroopMembers[actorId]; // not using
-        //var enemy2 = $dataEnemies[gameTroopMembers[actorId].enemyId()]; // not using
-        $gameVariables.setValue(20, $gameVariables.value(11));
-      };
-      actorId = $gameVariables.value(20);
-    };
-  }
+  actorId = resolveSpeakingActorIdBattleRefactor(wordSetId, gameVar276, actorId);
 
   $gameVariables.setValue(277, 0);//二言目台詞用。現在未使用
-  $gameVariables.setValue(53, $gameActors.actor(actorId).nickname());
+  const actor = $gameActors.actor(actorId);
+  if (!actor) return;
+  $gameVariables.setValue(53, actor.nickname());
   $gameVariables.setValue(625, $gameVariables.value(380 + actorId)[59]);
 
-  const actor = $gameActors.actor(actorId);
   const actorName = actor.name();
   const actorMeta = $dataActors[actorId].meta;
-  if (gameVar276 == 2) {
-
-    valueFaceSelect = 8;
-    if (actor.tp >= 100) {
-      valueFaceSelect = 48;
-
-    };
-    array2 = actorMeta['BattleAttack'].split(',');
-    if (actor.isStateAffected(61)) {
-      const arr2 = [21, 22, 23, 24];
-      valueFaceSelect = arr2[getRandomIndex(arr2.length)];
-    };
-    if (actor.isStateAffected(68)) {
-      const arr1 = [17, 18, 19, 20];
-      valueFaceSelect = arr1[getRandomIndex(arr1.length)];
-    };
-    const gameVar182 = $gameVariables.value(182);
-    if (gameVar182 == 5) {
-      //var array1 = actorMeta['S-AbilityUse'].split(',');
-      array2 = actorMeta['S-AbilityUse'].split(',');
-      valueFaceSelect = 15;
-    }
-    else if (gameVar182 == 6) {
-      //var array1 = actorMeta['A-AbilityUse'].split(',');
-      array2 = actorMeta['A-AbilityUse'].split(',');
-      //フェイスは通常攻撃を流用
-    }
-    else if (gameVar182 == 7) {
-      //var array1 = actorMeta['W-AbilityUse'].split(',');
-      array2 = actorMeta['W-AbilityUse'].split(',');
-      valueFaceSelect = 13;
-    }
-    else if (gameVar182 == 8) {
-      //var array1 = actorMeta['R-AbilityUse'].split(',');
-      array2 = actorMeta['R-AbilityUse'].split(',');
-      valueFaceSelect = 6;
-    };
-
+  const words = { statusWordCandidates, damageWordCandidates, attackWordCandidates };
+  switch (Number(gameVar276)) {
+    case 2: selectAttackWordsBattleRefactor(actor, actorMeta, words); break;
+    case 1: selectDamageWordsBattleRefactor(actor, actorMeta, words); break;
+    case 0: selectStatusWordsBattleRefactor(actor, actorMeta, words); break;
   }
-  else if (gameVar276 == 1) {
+  statusWordCandidates = words.statusWordCandidates;
+  damageWordCandidates = words.damageWordCandidates;
+  attackWordCandidates = words.attackWordCandidates;
 
-    valueFaceSelect = 9;
-    const value1 = $gameVariables.value(514);
-    const value2 = actor.hpRate() * 100;
-    array1 = actorMeta['BattleDamage'].split(',');
-    if (value1 - value2 >= 50) {
-      array1 = actorMeta['BattleBigDamage'].split(',');
-      valueFaceSelect = 45;
-    }
-    else if (value1 - value2 <= 2) {
-      array1 = actorMeta['BattleSmallDamage'].split(',');
-      valueFaceSelect = 4;
-    }
-    else if (value1 == value2) {
-      array1 = actorMeta['Battle0Damage'].split(',');
-      valueFaceSelect = 6;
-    }
-  }
-  else if (gameVar276 == 0) {
-    if ($gameVariables.value(263) >= 3) { //ターン数 
-      array0 = actorMeta['BattleTurn2'].split(',');
-    }
-    if ([34, 35, 36].some(function (id) { return actor.isStateAffected(id) })) {  //疲労時
-      array0 = actorMeta['BattleFatigue'].split(',');
-    }
-    if (actor.isStateAffected(37)) {  //ブラック
-      array0 = actorMeta['BattleFatigueBlack'].split(',');
-      array2 = actorMeta['BattleFatigueBlackAttack'].split(',');
-      array1 = actorMeta['BattleFatigueBlackDamage'].split(',');
-    }
-    if (actor.hpRate() <= 0.3) {  //瀕死  
-      array0 = actorMeta['BattleDying'].split(',');
-    }
-    if ($gameParty.battleMembers().length >= 2 && $gameParty.aliveMembers().length <= 1) {  //最後の一人
-      array0 = actorMeta['BattleLastOne'].split(',');
-    }
-
-    if (actor.isStateAffected(61) && isGirl(actor)) {  //発情
-      if (actor.isLearnedSkill(65)) {
-        array0 = actorMeta['BattleSexualExcitementMax'].split(',');
-        array2 = actorMeta['BattleSexualExcitementMaxAttack'].split(',');//攻撃
-        array1 = actorMeta['BattleSexualExcitementMaxDamage'].split(',');//ダメージ
-      } else {
-        array0 = actorMeta['BattleSexualExcitement'].split(',');
-        array2 = actorMeta['BattleSexualExcitementAttack'].split(',');//攻撃
-        array1 = actorMeta['BattleSexualExcitementDamage'].split(',');//ダメージ
-      };
-    }
-    if (actor.isStateAffected(63) && isGirl(actor)) {
-      if (actor.isLearnedSkill(65)) {//拘束
-        array0 = actorMeta['BattleBindMax'].split(',');
-      } else {
-        array0 = actorMeta['BattleBind'].split(',');
-      };
-    };
-    if (actor.isStateAffected(68) && isGirl(actor)) {    //激情
-      array0 = actorMeta['BattlePassion'].split(',');
-    };
-    if (actor.isStateAffected(64) && isGirl(actor)) {    //放心
-      if (actor.isLearnedSkill(65)) {
-        array0 = actorMeta['BattleAbsentlyMax'].split(',');
-      } else {
-        array0 = actorMeta['BattleAbsently'].split(',');
-      };
-    };
-  }
-
-  let messageText = ``;
   const enemy1 = gameTroopMembers[$gameVariables.value(92)];
-  const enemyName = enemy1.name();
-  if (id1 == 0) {
-    if (array0) {
-      messageText = actorName + array0[getRandomIndex(array0.length)];
-    }
-  }
-  else if (id1 == 1) {
-    if (gameVar276 == 2) {
-      if (array2) {
-        let array = actorMeta['BattleAttack2Conbo'].split(',');
-        let num = array[getRandomIndex(array.length)];
-        valueWordSet9 = `${actor.name()}の\\C[2]2連撃\\C[0]！ ${num}`;
-        array = actorMeta['BattleAttack3Conbo'].split(',');
-        num = array[getRandomIndex(array.length)];
-        valueWordSet10 = `${actor.name()}の\\C[2]3連撃\\C[0]！ ${num}`;
-        messageText = actorName + array2[getRandomIndex(array2.length)];
-        battle_bustUp1(actor, 86, 500, 10, 20);
-      };
-    }
-    else if (gameVar276 == 1) {
-      const skillName = `\\C[3]＜${$dataSkills[$gameVariables.value(96)].name}＞\\C[0]`;
-      messageText = `${enemyName}の${skillName}！`;
-      valueWordSet9 = `${enemyName}の\\C[2]2連撃\\C[0]！`;
-      valueWordSet10 = `${enemyName}の\\C[2]3連撃\\C[0]！`;
-    };
-  }
-  else if (id1 == 2) {
-    const gameVar464 = $gameSwitches.value(464);
-    if (gameVar276 == 2 && !gameVar464) {
-      const enemy2 = $dataEnemies[enemy1.enemyId()];
-      if (enemy2.meta['EnemyDamageWord']) {
-        const array = enemy2.meta['EnemyDamageWord'].split(',');
-        messageText = `${enemyName}${array[getRandomIndex(array.length)]}`;
-      } else {
-        messageText = `${enemyName}は攻撃を受けた！`;
-      };
-    }
-    else if (gameVar276 == 1) {
-      if (gameVar464) {
-        if (array1) {
-          messageText = actorName + array1[getRandomIndex(array1.length)];
-          battle_bustUp1(actor, 86, 500, 10, 40);
-        }
-      }
-      else /*if (!gameVar464)*/ {
-        const skillName = `${$dataSkills[$gameVariables.value(96)].name}`
-        messageText = `${enemyName}は${skillName}を受けた！`;//攻撃時だが使用不可
-      }
-    }
+  const enemyName = enemy1 ? enemy1.name() : '';
+  let messageText = ``;
+  switch (Number(wordSetId)) {
+    case 0: messageText = buildStatusWordBattleWordset(statusWordCandidates, actorName); break;
+    case 1: messageText = buildAttackWordBattleWordset(gameVar276, attackWordCandidates, actorMeta, actor, actorName, enemyName); break;
+    case 2: messageText = buildDamageWordBattleWordset(gameVar276, damageWordCandidates, actorName, enemyName, enemy1, actor); break;
   }
 
   if (messageText) {
@@ -2357,136 +1860,211 @@ battle_wordset = function (id1) {
     BattleManager._logWindow.push(`addText`, `\\V[277]`);
   }
 
-  //if(gameVar276 == 2){
-  // gameTroopMembers[$gameVariables.value(92)].hpRate()*100;
-  //} else {
-  // $gameActors.actor(actorId).hpRate()*100;
-  //};
-
 }
 
+// Picks one entry out of a face-select candidate list.
+function pickFaceSelectBattleWordset(faceCandidates) {
+  return faceCandidates[getRandomIndex(faceCandidates.length)];
+}
+
+// Maps the ability selector in variable 182 to the actor-meta key holding its
+// word list and the face it selects. `face` is null when the face is unchanged
+// (6 / A-AbilityUse reuses the normal-attack face).
+const ABILITY_WORD_BATTLE_WORDSET = {
+  5: { meta: 'S-AbilityUse', face: 15 },
+  6: { meta: 'A-AbilityUse', face: null },
+  7: { meta: 'W-AbilityUse', face: 13 },
+  8: { meta: 'R-AbilityUse', face: 6 },
+};
+
+function selectAbilityWordBattleWordset(gameVar182) {
+  return ABILITY_WORD_BATTLE_WORDSET[gameVar182] || null;
+}
+
+// wordSetId 0 — the actor's status line (turn count, fatigue, dying, arousal...).
+function buildStatusWordBattleWordset(statusWordCandidates, actorName) {
+  if (!statusWordCandidates) return '';
+  return actorName + statusWordCandidates[getRandomIndex(statusWordCandidates.length)];
+}
+
+// wordSetId 1 — the actor's attack line, plus the 2/3-hit combo lines.
+function buildAttackWordBattleWordset(gameVar276, attackWordCandidates, actorMeta, actor, actorName, enemyName) {
+  if (gameVar276 == 2) {
+    if (!attackWordCandidates) return '';
+    let comboWordCandidates = actorMeta['BattleAttack2Conbo'].split(',');
+    let num = comboWordCandidates[getRandomIndex(comboWordCandidates.length)];
+    valueWordSet9 = `${actorName}の\\C[2]2連撃\\C[0]！ ${num}`;
+    comboWordCandidates = actorMeta['BattleAttack3Conbo'].split(',');
+    num = comboWordCandidates[getRandomIndex(comboWordCandidates.length)];
+    valueWordSet10 = `${actorName}の\\C[2]3連撃\\C[0]！ ${num}`;
+    battle_bustUp1(actor, 86, 500, 10, 20);
+    return actorName + attackWordCandidates[getRandomIndex(attackWordCandidates.length)];
+  }
+  if (gameVar276 == 1) {
+    const skillName = `\\C[3]＜${$dataSkills[$gameVariables.value(96)].name}＞\\C[0]`;
+    valueWordSet9 = `${enemyName}の\\C[2]2連撃\\C[0]！`;
+    valueWordSet10 = `${enemyName}の\\C[2]3連撃\\C[0]！`;
+    return `${enemyName}の${skillName}！`;
+  }
+  return '';
+}
+
+// wordSetId 2 — the "took damage" line, for either side.
+function buildDamageWordBattleWordset(gameVar276, damageWordCandidates, actorName, enemyName, enemy1, actor) {
+  const gameVar464 = $gameSwitches.value(464);
+  if (gameVar276 == 2 && !gameVar464) {
+    const enemy2 = enemy1 && $dataEnemies[enemy1.enemyId()];
+    if (!enemy2 || !enemy2.meta['EnemyDamageWord']) {
+      return `${enemyName}は攻撃を受けた！`;
+    }
+    const enemyWordCandidates = enemy2.meta['EnemyDamageWord'].split(',');
+    return `${enemyName}${enemyWordCandidates[getRandomIndex(enemyWordCandidates.length)]}`;
+  }
+  if (gameVar276 != 1) return '';
+  if (!gameVar464) {
+    const skillName = `${$dataSkills[$gameVariables.value(96)].name}`
+    return `${enemyName}は${skillName}を受けた！`;//攻撃時だが使用不可
+  }
+  if (!damageWordCandidates) return '';
+  const word = actorName + damageWordCandidates[getRandomIndex(damageWordCandidates.length)];
+  battle_bustUp1(actor, 86, 500, 10, 40);
+  return word;
+}
+
+// Elements whose resistance is written as a plain "UP!"/"DOWN!" rather than
+// "耐性…". Shared by the title effects and the pacond/tbcs trait descriptions.
+const RESIST_SPECIAL_ELEMENT_IDS = [10, 11, 12, 15, 20, 38, 39, 40, 41]; // also was declared in amygameDescription.js
+
 //戦闘開始時に称号効果
+const TITLE_RESIST_ELEMENT_IDS_TITLE_BATTLE_UP = RESIST_SPECIAL_ELEMENT_IDS;
+
 title_battleUp = function (actor) {
+  const titleItemIdArray = $gameVariables.value(288);
+  if (!titleItemIdArray || titleItemIdArray.length === 0) return;
+
+  // Switch 375 off = apply the title effects for real; on = only describe them.
+  const applyTraits = !$gameSwitches.value(375);
   let titleCount = 0;
   const titleEffects = [];
 
-  const variable288Length = $gameVariables.value(288).length;
+  for (let itemId = 0; itemId < titleItemIdArray.length; itemId++) {
+    const currentItemId = titleItemIdArray[itemId];
+    if (currentItemId === 0) continue;
+    const currentItem = $dataItems[currentItemId];
+    if (!currentItem) continue;
+    const titleEffect = currentItem.meta['titleEffect1'];
+    if (!titleEffect) continue;
 
-  if (variable288Length === 0) {
-    return;
-  }
-
-  let currentItem = $dataItems;
-
-  for (let itemId = 0; itemId < variable288Length; itemId++) {
-    const currentItemId = $gameVariables.value(288)[itemId];
-
-    if (currentItemId === 0) {
+    const effectParams = titleEffect.split(',');
+    if (applyTraits) {
+      applyTitleEffectTraitTitleBattleUp(actor, effectParams);
       continue;
     }
-
-    currentItem = $dataItems[currentItemId];
-
-    if (!currentItem.meta['titleEffect1']) {
-      continue;
-    }
-
-    const effectParams = currentItem.meta['titleEffect1'].split(',');
-    const effectValue = Number(effectParams[2]);
-
-    if (!$gameSwitches.value(375)) {
-      // Handle conditions when the switch is not active
-      switch (Number(effectParams[0])) {
-        case 0:
-          actor.actor().traits.push({ code: 21, dataId: Number(effectParams[1]), value: 1 + effectValue });
-          break;
-        case 1:
-          actor.actor().traits.push({ code: 22, dataId: Number(effectParams[1]), value: effectValue });
-          break;
-        case 2:
-          actor.actor().traits.push({ code: 23, dataId: Number(effectParams[1]), value: 1 + effectValue });
-          break;
-        case 3:
-          valueAttackAmplifysActorId[actor.actorId()][Number(effectParams[1])] += Number(effectParams[2]);
-          break;
-        case 4:
-          actor.actor().traits.push({ code: 11, dataId: Number(effectParams[1]), value: 1 + effectValue });
-          break;
-        default:
-          break;
-      }
-    } else {
-      // Handle conditions when the switch is active
-      let titleEffectText = `\\C[6]【称号効果】\\C[0]\\C[2]${currentItem.name}\\C[0]:`;
-      titleCount += 1;
-
-      switch (Number(effectParams[0])) {
-        case 0:
-          titleEffectText += TextManager.param(Number(effectParams[1]));
-          titleEffectText += `\\C[10]${Number(effectParams[2]) * 100}%\\C[0]UP!`;
-          break;
-        case 1:
-          titleEffectText += FTKR.CSS.cssStatus.xparam[Number(effectParams[1])];
-          titleEffectText += `\\C[10]${Number(effectParams[2]) * 100}%\\C[0]UP!`;
-          break;
-        case 2:
-          titleEffectText += FTKR.CSS.cssStatus.sparam[Number(effectParams[1])];
-          titleEffectText += `\\C[10]${Number(effectParams[2]) * 100}%\\C[0]UP!`;
-          break;
-        case 3:
-          titleEffectText += `${$dataSystem.elements[Number(effectParams[1])]}威力`;
-          if (Number(effectParams[2]) >= 0) {
-            titleEffectText += `\\C[10]${Number(effectParams[2])}%UP!\\C[0]`;
-          } else {
-            titleEffectText += `\\C[1]${Number(effectParams[2])}%DOWN!\\C[0]`;
-          }
-          break;
-        case 4:
-          titleEffectText += `${$dataSystem.elements[Number(effectParams[1])]}`;
-
-          if ([10, 11, 12, 15, 20, 38, 39, 40, 41].some(id => id === Number(effectParams[1]))) {
-            const resistValue = (Number(effectParams[1]) === 11) ? 10 : 100;
-            if (effectValue >= 0) {
-              titleEffectText += `\\C[10]${Number(effectParams[2]) * resistValue}%\\C[0]UP!`;
-            } else {
-              titleEffectText += `\\C[1]${Number(effectParams[2]) * resistValue}%\\C[0]DOWN!`;
-            }
-          } else {
-            titleEffectText += '耐性';
-            const resistValue = (Number(effectParams[1]) === 11) ? 10 : 100;
-            if (effectValue <= 0) {
-              effectValue = -effectValue;
-              titleEffectText += `\\C[1]${Number(effectParams[2]) * resistValue}%\\C[0]DOWN!`;
-            } else {
-              titleEffectText += `\\C[10]${Number(effectParams[2]) * resistValue}%\\C[0]UP!`;
-            }
-          }
-          break;
-        default:
-          break;
-      }
-
-      titleEffects.push(titleEffectText);
-      break;
-    }
+    titleEffects.push(buildTitleEffectTextTitleBattleUp(currentItem, effectParams));
+    titleCount += 1;
   }
 
   if (!$gameSwitches.value(375) || titleCount < 1) return;
   if ($gameParty.inBattle()) {
-    for (let i = 0, len = $gameParty.battleMembers().length; i < len; i++) {
-      const user = $gameParty.battleMembers()[i];
-      const partyIndex = user.index() + 1;
-      $gameScreen._particle.particlePlay(0, 'aura_bp', `attachParty:${partyIndex}`, 'def', 'above');
+    for (const user of $gameParty.battleMembers()) {
+      $gameScreen._particle.particlePlay(0, 'aura_bp', `attachParty:${user.index() + 1}`, 'def', 'above');
     }
   }
-  for (let i = 0, len = titleEffects.length; i < len; i++) {
+  for (const titleEffect of titleEffects) {
     valueGetInfoPointX = 900;
-    CommonPopupManager.showInfo({}, titleEffects[i], null);
-    BattleManager._logWindow.push(addText, titleEffects[i]);
+    CommonPopupManager.showInfo({}, titleEffect, null);
+    BattleManager._logWindow.push('addText', titleEffect);
   }
 
   valueGetInfoPointX = 0;
 };
+
+// <titleEffect1:kind,id,value> applied as a real trait on the actor's data.
+function applyTitleEffectTraitTitleBattleUp(actor, effectParams) {
+  const effectValue = Number(effectParams[2]);
+  switch (Number(effectParams[0])) {
+    case 0:
+      actor.actor().traits.push({ code: 21, dataId: Number(effectParams[1]), value: 1 + effectValue });
+      break;
+    case 1:
+      actor.actor().traits.push({ code: 22, dataId: Number(effectParams[1]), value: effectValue });
+      break;
+    case 2:
+      actor.actor().traits.push({ code: 23, dataId: Number(effectParams[1]), value: 1 + effectValue });
+      break;
+    case 3:
+      valueAttackAmplifysActorId[actor.actorId()][Number(effectParams[1])] += Number(effectParams[2]);
+      break;
+    case 4:
+      actor.actor().traits.push({ code: 11, dataId: Number(effectParams[1]), value: 1 + effectValue });
+      break;
+    default:
+      break;
+  }
+}
+
+// The battle-log line describing one <titleEffect1:...> entry.
+function buildTitleEffectTextTitleBattleUp(currentItem, effectParams) {
+  let titleEffectText = `\\C[6]【称号効果】\\C[0]\\C[2]${currentItem.name}\\C[0]:`;
+  const effectValue = Number(effectParams[2]);
+  const resistValue = (Number(effectParams[1]) === 11) ? 10 : 100;
+
+  switch (Number(effectParams[0])) {
+    case 0:
+      titleEffectText += TextManager.param(Number(effectParams[1]));
+      titleEffectText += `\\C[10]${effectValue * 100}%\\C[0]UP!`;
+      break;
+    case 1:
+      titleEffectText += FTKR.CSS.cssStatus.xparam[Number(effectParams[1])];
+      titleEffectText += `\\C[10]${effectValue * 100}%\\C[0]UP!`;
+      break;
+    case 2:
+      titleEffectText += FTKR.CSS.cssStatus.sparam[Number(effectParams[1])];
+      titleEffectText += `\\C[10]${effectValue * 100}%\\C[0]UP!`;
+      break;
+    case 3:
+      const effectElementName = $dataSystem.elements[Number(effectParams[1])];
+      titleEffectText += `${effectElementName}威力`;
+      if (effectValue >= 0) {
+        titleEffectText += `\\C[10]${effectValue}%UP!\\C[0]`;
+      } else {
+        titleEffectText += `\\C[1]${effectValue}%DOWN!\\C[0]`;
+      }
+      break;
+    case 4:
+      titleEffectText += buildElementTitleEffectTextTitleBattleUp(effectParams);
+      break;
+    default:
+      break;
+  }
+  return titleEffectText;
+}
+
+// The <titleEffect4:...> clause: an element resistance/amplification. `dataId` 11
+// (HP absorb) is scaled per-mille, everything else per-cent.
+function buildElementTitleEffectTextTitleBattleUp(effectParams) {
+  const dataId = Number(effectParams[1]);
+  const effectValue = Number(effectParams[2]);
+  const resistValue = (dataId === 11) ? 10 : 100;
+  const elementName = $dataSystem.elements[dataId];
+
+  if (TITLE_RESIST_ELEMENT_IDS_TITLE_BATTLE_UP.indexOf(dataId) >= 0) {
+    const color = effectValue >= 0 ? `\\C[10]` : `\\C[1]`;
+    const direction = effectValue >= 0 ? `UP!` : `DOWN!`;
+    return `${elementName}${color}${effectValue * resistValue}%\\C[0]${direction}`;
+  }
+
+  // NOTE: the old code negated effectValue here, but then printed
+  // Number(effectParams[2]) anyway - the negation was dead. The negative case
+  // therefore renders "-50%DOWN!" (the sign is not folded away). That matches the
+  // duplicate of this logic in amygame.js (~line 6201), so it is preserved rather
+  // than "fixed". Note also that 0 lands in the DOWN branch here but the UP branch
+  // above, so the two cannot share one sign test.
+  const color = effectValue <= 0 ? `\\C[1]` : `\\C[10]`;
+  const direction = effectValue <= 0 ? `DOWN!` : `UP!`;
+  const resistancePercent = effectValue * resistValue;
+  return `${elementName}耐性${color}${resistancePercent}%\\C[0]${direction}`;
+}
 
 //パッシブ付与
 //#region passive_addCondition
@@ -2559,64 +2137,76 @@ function pacondProcessRegularPassiveSkill(user, skillId, skillCondition, hideSki
   }
 }
 
+// Display-mode log accumulator shared by the pacond passes. `header` seeds the
+// first line (the G-Passive list opens with a "発動G-Passive" title).
+function pacondCreatePassiveLog(header) {
+  return { messages: header ? [header] : [], count: 0 };
+}
+
+// Records one display-mode line. The appliers return null when they applied the
+// effect for real instead of describing it.
+function pacondRecordPassiveMessage(log, message) {
+  if (!message) return;
+  log.count += 1;
+  log.messages.push(message);
+}
+
 function pacondApplyPassiveSkillEffects(user, passiveSkillArray) {
   if (passiveSkillArray.length === 0) return;
 
-  const passiveLogMessages = [`\\C[10]${user.name()}\\C[0]発動G-Passive`];
-  let passiveLogCount = 0;
+  const userName = colorTaggedText(10, user.name());
+  const log = pacondCreatePassiveLog(`${userName}発動G-Passive`);
 
   passiveSkillArray.forEach(function (skillId) {
     const skill = $dataSkills[skillId];
     const skillMeta = skill.meta;
     const isDisplayMode = $gameSwitches.value(375);
-    const hasMasteryLevels = !!skillMeta['Max Mastery Level'];
 
-    if (hasMasteryLevels) {
-      pacondApplyMasteryPassive(user, skill, skillMeta, isDisplayMode, passiveLogMessages, passiveLogCount);
-    } else {
-      pacondApplyRegularPassive(user, skill, skillMeta, isDisplayMode, passiveLogMessages, passiveLogCount);
-    }
+    // BUGFIX: `passiveLogCount` used to be passed by value into the two appliers
+    // below, so their `passiveLogCount += 1` incremented a dead local. The count
+    // stayed 0 and pacondDisplayPassiveMessages bailed out on `count === 0`,
+    // which meant the G-Passive list never displayed at all. The appliers now
+    // return their message and the caller owns the count.
+    pacondRecordPassiveMessage(log, skillMeta['Max Mastery Level']
+      ? pacondApplyMasteryPassive(user, skill, skillMeta, isDisplayMode)
+      : pacondApplyRegularPassive(user, skill, skillMeta, isDisplayMode));
   });
 
-  pacondDisplayPassiveMessages(user, passiveLogMessages, passiveLogCount);
+  pacondDisplayPassiveMessages(user, log.messages, log.count);
 }
 
-function pacondApplyMasteryPassive(user, skill, skillMeta, isDisplayMode, passiveLogMessages, passiveLogCount) {
-  if (isDisplayMode) {
-    let passiveLogMessage = `\\C[2]${skill.name}\\C[0]:`;
-    passiveLogCount += 1;
-
-    if (skillMeta['PassiveLogDisplay']) {
-      const displayParams = skillMeta['PassiveLogDisplay'].split(',');
-      passiveLogMessage += `${displayParams[0]}\\C[10]${Number(displayParams[1]) * user.skillMasteryLevel(skill.id)}%\\C[0]UP!`;
-    } else {
-      passiveLogMessage += `発動中`;
-    }
-
-    passiveLogMessages.push(passiveLogMessage);
-  } else {
+// Returns the display-mode message for the skill, or null when applying for real.
+function pacondApplyMasteryPassive(user, skill, skillMeta, isDisplayMode) {
+  if (!isDisplayMode) {
     const stateBaseId = Number(skillMeta['PassiveCondi'].split(',')[2]);
-    const stateId = stateBaseId + user.skillMasteryLevel(skill.id) - 1;
-    user.addState(stateId);
+    user.addState(stateBaseId + user.skillMasteryLevel(skill.id) - 1);
+    return null;
   }
+
+  let passiveLogMessage = `\\C[2]${skill.name}\\C[0]:`;
+  if (skillMeta['PassiveLogDisplay']) {
+    const displayParams = skillMeta['PassiveLogDisplay'].split(',');
+    passiveLogMessage += `${displayParams[0]}\\C[10]${Number(displayParams[1]) * user.skillMasteryLevel(skill.id)}%\\C[0]UP!`;
+  } else {
+    passiveLogMessage += `発動中`;
+  }
+  return passiveLogMessage;
 }
 
-function pacondApplyRegularPassive(user, skill, skillMeta, isDisplayMode, passiveLogMessages, passiveLogCount) {
-  if (isDisplayMode) {
-    let passiveLogMessage = `\\C[2]${skill.name}\\C[0]:`;
-    passiveLogCount += 1;
-
-    if (skillMeta['PassiveLogDisplay']) {
-      passiveLogMessage += `\\C[10]${skillMeta['PassiveLogDisplay'].split(',')[0]}\\C[0]!`;
-    } else {
-      passiveLogMessage += `発動中`;
-    }
-
-    passiveLogMessages.push(passiveLogMessage);
-  } else {
-    const stateId = Number(skillMeta['PassiveCondi'].split(',')[2]);
-    user.addState(stateId);
+// Returns the display-mode message for the skill, or null when applying for real.
+function pacondApplyRegularPassive(user, skill, skillMeta, isDisplayMode) {
+  if (!isDisplayMode) {
+    user.addState(Number(skillMeta['PassiveCondi'].split(',')[2]));
+    return null;
   }
+
+  let passiveLogMessage = `\\C[2]${skill.name}\\C[0]:`;
+  if (skillMeta['PassiveLogDisplay']) {
+    passiveLogMessage += `\\C[10]${skillMeta['PassiveLogDisplay'].split(',')[0]}\\C[0]!`;
+  } else {
+    passiveLogMessage += `発動中`;
+  }
+  return passiveLogMessage;
 }
 
 function pacondProcessPlusTraitPassives(user) {
@@ -2629,8 +2219,7 @@ function pacondProcessPlusTraitPassives(user) {
 
 function pacondProcessPlusTraitSkills(user, skillList, metaKey) {
   const isDisplayMode = $gameSwitches.value(375);
-  const passiveLogMessages = [];
-  let passiveLogCount = 0;
+  const log = pacondCreatePassiveLog();
 
   skillList.forEach(function (skillId) {
     const skill = $dataSkills[skillId];
@@ -2640,48 +2229,38 @@ function pacondProcessPlusTraitSkills(user, skillList, metaKey) {
     const isSkillEquipped = user.battleSkillsRaw().includes(skillId);
     const isSkillValid = metaKey === 'PassivePlusEffect' ||
       (user.isLearnedSkill(skillId) && !user.isLearnedSkill(hideSkillId));
+    if (!isSkillEquipped || !isSkillValid) return;
 
-    if (isSkillEquipped && isSkillValid) {
-      const traitParams = skillMeta[metaKey].split(',');
-      let traitValue = Number(traitParams[2]);
+    const traitParams = skillMeta[metaKey].split(',');
+    let traitValue = Number(traitParams[2]);
+    if (skillMeta['Max Mastery Level']) traitValue *= user.skillMasteryLevel(skillId);
 
-      if (skillMeta['Max Mastery Level']) {
-        traitValue *= user.skillMasteryLevel(skillId);
-      }
-
-      pacondApplyTraitEffect(user, skill, traitParams, traitValue, isDisplayMode, passiveLogMessages, passiveLogCount, metaKey);
-    }
+    // BUGFIX: see pacondApplyPassiveSkillEffects — the count was passed by value,
+    // so `passiveLogCount += 1` inside pacondApplyTraitEffect was dead and the
+    // plus-trait list never displayed. The message is now returned to the caller.
+    pacondRecordPassiveMessage(log, pacondApplyTraitEffect(user, skill, traitParams, traitValue, isDisplayMode, metaKey));
   });
 
-  pacondDisplayPassiveMessages(user, passiveLogMessages, passiveLogCount);
+  pacondDisplayPassiveMessages(user, log.messages, log.count);
 }
 
-function pacondApplyTraitEffect(user, skill, traitParams, traitValue, isDisplayMode, passiveLogMessages, passiveLogCount, metaKey) {
+// Returns the display-mode message for the trait, or null when applying for real
+// (or when the metaKey/type pair has no description).
+function pacondApplyTraitEffect(user, skill, traitParams, traitValue, isDisplayMode, metaKey) {
   const paramType = Number(traitParams[0]);
-  let actualTraitCode;
+  // PassivePlusEffect stores a 0/1/2 stat kind; PassivePlusTrait stores the raw
+  // trait code (e.g. 11 for elements).
+  const actualTraitCode = (metaKey === 'PassivePlusEffect') ? [21, 22, 23][paramType] : paramType;
 
-  // Map trait code based on metaKey
-  if (metaKey === 'PassivePlusEffect') {
-    actualTraitCode = [21, 22, 23][paramType]; // Map 0->21, 1->22, 2->23
-  } else {
-    actualTraitCode = paramType; // For 'PassivePlusTrait', use the raw trait code (e.g., 11)
-  }
+  if (isDisplayMode) return pacondBuildTraitMessage(skill.name, metaKey, traitParams, traitValue);
 
   const dataId = Number(traitParams[1]);
-
-  if (isDisplayMode) {
-    let message = pacondBuildTraitMessage(skill.name, metaKey, traitParams, traitValue);
-    if (message) {
-      passiveLogCount += 1;
-      passiveLogMessages.push(message);
-    }
-  } else {
-    if (actualTraitCode === 11) {
-      user.actor().traits.push({ code: actualTraitCode, dataId: dataId, value: 1 + traitValue });
-    } else if ([21, 22, 23].includes(actualTraitCode)) {
-      pacondApplyStatTrait(user, actualTraitCode, dataId, traitValue);
-    }
+  if (actualTraitCode === 11) {
+    user.actor().traits.push({ code: actualTraitCode, dataId: dataId, value: 1 + traitValue });
+  } else if ([21, 22, 23].includes(actualTraitCode)) {
+    pacondApplyStatTrait(user, actualTraitCode, dataId, traitValue);
   }
+  return null;
 }
 
 function pacondApplyStatTrait(user, traitCode, dataId, traitValue) {
@@ -2710,32 +2289,32 @@ function pacondBuildTraitMessage(skillName, metaKey, traitParams, traitValue) {
       message += FTKR.CSS.cssStatus.sparam[dataId];
     }
     message += `\\C[10]${traitValue * 100}%\\C[0]UP!`;
-  } else if (metaKey === 'PassivePlusTrait' && type === 11) {
-    message += `${$dataSystem.elements[dataId]}`;
-    const isSpecialElement = [10, 11, 12, 15, 20, 38, 39, 40, 41].includes(dataId);
-    const multiplier = isSpecialElement ? (dataId == 11 ? 10 : 100) : 100;
-    if (isSpecialElement) {
-      if (traitValue >= 0) {
-        message += `\\C[10]${traitValue * multiplier}%\\C[0]UP!`;
-      } else {
-        message += `\\C[1]${traitValue * multiplier}%\\C[0]DOWN!`;
-      }
-    } else {
-      let resistanceValue = traitValue;
-      let color = traitValue <= 0 ? '\\C[1]' : '\\C[10]';
-      if (traitValue > 0) resistanceValue = -traitValue;
-      message += `耐性${color}${resistanceValue * 100}%\\C[0]`;
-    }
-  } else {
-    return null;
+    return message;
   }
-  return message;
+
+  if (metaKey !== 'PassivePlusTrait' || type !== 11) return null;
+
+  message += $dataSystem.elements[dataId];
+  const isSpecialElement = RESIST_SPECIAL_ELEMENT_IDS.includes(dataId);
+  // Element 11 (HP absorb) is printed per-mille, everything else per-cent.
+  const multiplier = (isSpecialElement && dataId == 11) ? 10 : 100;
+  if (isSpecialElement) {
+    const color = traitValue >= 0 ? `\\C[10]` : `\\C[1]`;
+    const direction = traitValue >= 0 ? `UP!` : `DOWN!`;
+    return `${message}${color}${traitValue * multiplier}%\\C[0]${direction}`;
+  }
+
+  // A non-special element is described as a resistance, so a positive stored
+  // value reads as a negative resistance and vice versa.
+  const resistanceValue = traitValue > 0 ? -traitValue : traitValue;
+  const color = traitValue <= 0 ? `\\C[1]` : `\\C[10]`;
+  const resistancePercent = colorTaggedText(traitValue <= 0 ? 1: 10, resistanceValue * 100);
+  return `${message}耐性${resistancePercent}%`;
 }
 
 function pacondProcessElementPassives(user) {
   const isDisplayMode = $gameSwitches.value(375);
-  const passiveLogMessages = [];
-  let passiveLogCount = 0;
+  const log = pacondCreatePassiveLog();
 
   // Process element power passives
   valuePassiveElementP.forEach(function (skillId) {
@@ -2744,79 +2323,70 @@ function pacondProcessElementPassives(user) {
     const hideSkillId = Number(skillMeta['Hide if Learned Skill'] || -1);
 
     if (!skill.meta['PassiveElementP']) return;
+    if (!user.isLearnedSkill(skillId) ||
+      !user.battleSkillsRaw().includes(skillId) ||
+      user.isLearnedSkill(hideSkillId)) return;
 
-    if (user.isLearnedSkill(skillId) &&
-      user.battleSkillsRaw().includes(skillId) &&
-      !user.isLearnedSkill(hideSkillId)) {
+    const elementParams = skillMeta['PassiveElementP'].split(',');
+    const elementId = Number(elementParams[0]);
+    let elementValue = Number(elementParams[1]);
+    if (skillMeta['Max Mastery Level']) elementValue *= user.skillMasteryLevel(skillId);
 
-      const elementParams = skillMeta['PassiveElementP'].split(',');
-      const elementId = Number(elementParams[0]);
-      let elementValue = Number(elementParams[1]);
-
-      if (skillMeta['Max Mastery Level']) {
-        elementValue *= user.skillMasteryLevel(skillId);
-      }
-
-      if (isDisplayMode) {
-        let message = `\\C[2]${skill.name}\\C[0]:${$dataSystem.elements[elementId]}威力`;
-        const updown = elementValue >= 1 ? `UP` : `DOWN`;
-        message += `\\C[10]${elementValue}%${updown}!\\C[0]`;
-
-        passiveLogCount += 1;
-        passiveLogMessages.push(message);
-      } else {
-        valueAttackAmplifysActorId[user.actorId()][elementId] += elementValue;
-      }
+    if (!isDisplayMode) {
+      valueAttackAmplifysActorId[user.actorId()][elementId] += elementValue;
+      return;
     }
+
+    pacondRecordPassiveMessage(log, pacondBuildElementPowerMessage(skill.name, elementId, elementValue));
   });
 
-  // Process power custom skills
+  // Process power custom skills. These are display-only: the AddPowerCustom
+  // total is collected elsewhere (skill_addPowerSet).
   valueAddPowerCustomSkill.forEach(function (skillId) {
     const skill = $dataSkills[skillId];
     const skillMeta = skill.meta;
     const hideSkillId = Number(skillMeta['Hide if Learned Skill'] || -1);
 
-    if (user.isLearnedSkill(skillId) &&
-      user.battleSkillsRaw().includes(skillId) &&
-      !user.isLearnedSkill(hideSkillId)) {
+    if (!user.isLearnedSkill(skillId) ||
+      !user.battleSkillsRaw().includes(skillId) ||
+      user.isLearnedSkill(hideSkillId)) return;
+    if (!isDisplayMode) return;
 
-      let powerValue = Number(skillMeta['AddPowerCustom'] || 0);
+    let powerValue = Number(skillMeta['AddPowerCustom'] || 0);
+    if (skillMeta['Max Mastery Level']) powerValue += user.skillMasteryLevel(skillId);
 
-      if (skillMeta['Max Mastery Level']) {
-        powerValue += user.skillMasteryLevel(skillId);
-      }
-
-      if (isDisplayMode) {
-        let message = `\\C[2]${skill.name}\\C[0]:\\I[666]`;
-        const updown = powerValue >= 1 ? `+` : `-`;
-        message += `\\C[10]${updown}${powerValue}!\\C[0]`;
-
-        passiveLogCount += 1;
-        passiveLogMessages.push(message);
-      }
-    }
+    pacondRecordPassiveMessage(log, pacondBuildAddPowerMessage(skill.name, powerValue));
   });
 
-  pacondDisplayPassiveMessages(user, passiveLogMessages, passiveLogCount);
+  pacondDisplayPassiveMessages(user, log.messages, log.count);
+}
+
+function pacondBuildElementPowerMessage(skillName, elementId, elementValue) {
+  let updown = elementValue >= 1 ? `UP` : `DOWN`;
+  const elementName = $dataSystem.elements[elementId];
+  skillName = colorTaggedText(2, skillName);
+  elementValue = colorTaggedText(10, elementValue);
+  updown = colorTaggedText(10, updown);
+  return `${skillName}:${elementName}威力${elementValue}%${updown}!`;
+}
+
+function pacondBuildAddPowerMessage(skillName, powerValue) {
+  const sign = powerValue >= 1 ? `+` : `-`;
+  return `\\C[2]${skillName}\\C[0]:\\I[666]\\C[10]${sign}${powerValue}!\\C[0]`;
 }
 
 function pacondProcessDamageResistanceForGuardians(user) {
-  // Add damage resistance for guardians with skill 61
-  if (user.isLearnedSkill(61)) {
-    let damageRate = 10;
+  if (!user.isLearnedSkill(61)) return;
 
-    // Add 10% per level of guardian skills
-    for (let skillId = 62; skillId <= 70; skillId++) {
-      if (user.isLearnedSkill(skillId)) {
-        damageRate += 10;
-      }
-    }
-
-    // Apply resistance traits
-    const actorTraits = user.actor().traits;
-    actorTraits.push({ code: 13, dataId: 62, value: 1 + damageRate });
-    actorTraits.push({ code: 13, dataId: 63, value: 1 + damageRate });
+  // Guardian skills 62..70 each add another 10% on top of the base 10%.
+  let damageRate = 10;
+  for (let skillId = 62; skillId <= 70; skillId++) {
+    if (user.isLearnedSkill(skillId)) damageRate += 10;
   }
+
+  const actorTraits = user.actor().traits;
+  actorTraits.push({ code: 13, dataId: 62, value: 1 + damageRate });
+  actorTraits.push({ code: 13, dataId: 63, value: 1 + damageRate });
 }
 
 function pacondDisplayPassiveMessages(user, messages, count) {
@@ -2865,424 +2435,266 @@ traitBattle_changeSetting = function (user, stateId, multiplier) {
 
   // Process all trait bases
   for (let i = 1; i <= 9; i++) {
-    if (stateData.meta['traitBase' + i]) {
-      const traitParts = stateData.meta['traitBase' + i].split(',');
-      const traitCode = Number(traitParts[0]);
-      const traitDataId = Number(traitParts[1]);
-      const traitValue = Math.round(Number(traitParts[2]) * multiplier);
-      const absoluteValue = Math.abs(traitValue);
+    if (!stateData.meta['traitBase' + i]) continue;
 
-      // Process trait based on its code and add to description
-      const traitDescription = tbcsProcessTraitByCode(traitCode, traitDataId, traitValue, absoluteValue);
+    const traitParts = stateData.meta['traitBase' + i].split(',');
+    const traitCode = Number(traitParts[0]);
+    const traitDataId = Number(traitParts[1]);
+    const traitValue = Math.round(Number(traitParts[2]) * multiplier);
+    const absoluteValue = Math.abs(traitValue);
 
-      description += traitDescription;
-      traitCount++;
-      if (traitCount >= 3) {
-        description += '\n';
-        traitCount = 0;
-      }
-    }
+    // Process trait based on its code and add to description
+    description += tbcsProcessTraitByCode(stateData, traitCode, traitDataId, traitValue, absoluteValue);
+
+    // Break the description every third trait.
+    traitCount++;
+    if (traitCount >= 3) { description += '\n'; traitCount = 0; }
   }
 
   // Finalize description with category info if available
-  tbcsFinalizeDescription();
+  description = tbcsFinalizeDescription(stateData, description);
 
   user.refresh();
 };
 
 // Helper function to process trait based on code
-function tbcsProcessTraitByCode(code, dataId, value, absoluteValue) {
+function tbcsProcessTraitByCode(stateData, code, dataId, value, absoluteValue) {
   switch (code) {
-    case 11: return tbcsProcessElementTrait(code, dataId, value, absoluteValue);
-    case 13: return tbcsProcessStateResistanceTrait(code, dataId, value, absoluteValue);
-    case 14: return tbcsProcessStateImmunityTrait(code, dataId);
-    case 21: return tbcsProcessParameterTrait(code, dataId, value, absoluteValue);
-    case 22: return tbcsProcessExParameterTrait(code, dataId, value, absoluteValue);
-    case 23: return tbcsProcessSpParameterTrait(code, dataId, value, absoluteValue);
+    case 11: return tbcsProcessElementTrait(stateData, code, dataId, value, absoluteValue);
+    case 13: return tbcsProcessStateResistanceTrait(stateData, code, dataId, value, absoluteValue);
+    case 14: return tbcsProcessStateImmunityTrait(stateData, code, dataId);
+    case 21: return tbcsProcessParameterTrait(stateData, code, dataId, value, absoluteValue);
+    case 22: return tbcsProcessExParameterTrait(stateData, code, dataId, value, absoluteValue);
+    case 23: return tbcsProcessSpParameterTrait(stateData, code, dataId, value, absoluteValue);
     default: return '';
   }
 }
 
 // Process element trait
-function tbcsProcessElementTrait(code, dataId, value, absoluteValue) {
+function tbcsProcessElementTrait(stateData, code, dataId, value, absoluteValue) {
   stateData.traits.push({ code: code, dataId: dataId, value: 1 + value });
 
-  if ([10, 11, 12, 15, 20, 38, 39, 40, 41].some(function (id) { return id == dataId })) {
-    const modifier = value >= 0.01 ? `\\C[2]+` : `\\C[1]-`;
-    const percentage = dataId == 11 ? absoluteValue * 10 : absoluteValue * 100;
-    return `:\\C[16][${$dataSystem.elements[dataId]}${modifier}${percentage}%]\\C[0]`;
-  } else {
+  if (!RESIST_SPECIAL_ELEMENT_IDS.includes(dataId)) {
     const modifier = value >= 0.01 ? `\\C[1]-` : `\\C[2]+`;
-    return `:\\C[16][${$dataSystem.elements[dataId]}${modifier}${absoluteValue * 100}%耐性]\\C[0]`;
+    const elementName = $dataSystem.elements[dataId];
+    const resistancePercent = absoluteValue * 100;
+    // BUGFIX: `colorTaggedValue` never existed (only colorTaggedText does), so this
+    // branch threw a ReferenceError and the resistance line was dropped.
+    return ':' + colorTaggedText(16, `[${elementName}${modifier}${resistancePercent}%耐性]`);
   }
+
+  const modifier = value >= 0.01 ? `\\C[2]+` : `\\C[1]-`;
+  const percentage = dataId == 11 ? absoluteValue * 10 : absoluteValue * 100;
+  const elementName = $dataSystem.elements[dataId];
+  return `:\\C[16][${elementName}${modifier}${percentage}%]\\C[0]`;
 }
 
 // Process state resistance trait
-function tbcsProcessStateResistanceTrait(code, dataId, value, absoluteValue) {
+function tbcsProcessStateResistanceTrait(stateData, code, dataId, value, absoluteValue) {
   const modifier = value >= 0.01 ? `\\C[1]-` : `\\C[2]+`;
 
   // Add state resistance traits for matching states
-  tbcsAddStateTraits(code, dataId, value);
+  tbcsAddStateTraits(stateData, code, dataId, value);
 
   // Return description based on dataId
   const percent = absoluteValue * 100;
   switch (dataId) {
     case 0:
-      return `:\\C[16][基本特殊固有状態異常耐性${modifier}${percent}]\\C[0]`;
+      const baseResToUniqueStatus = colorTaggedText(16, `基本特殊固有状態異常耐性${modifier}${percent}`);
+      return `:[${baseResToUniqueStatus}]`;
     case 1:
-      return `:\\C[16][基本状態異常耐性${modifier}${percent}]\\C[0]`;
+      const baseResToStatus = colorTaggedText(16, `基本状態異常耐性${modifier}${percent}`);
+      return `:[${baseResToStatus}]`;
     case 2:
-      return `:\\C[16][特殊状態異常耐性${modifier}${percent}]\\C[0]`;
+      const baseResToSpecStatus = colorTaggedText(16, `特殊状態異常耐性${modifier}${percent}`);
+      return `:[${baseResToSpecStatus}]`;
     default:
       return '';
   }
 }
 
 // Process state immunity trait
-function tbcsProcessStateImmunityTrait(code, dataId) {
+function tbcsProcessStateImmunityTrait(stateData, code, dataId) {
   // Add state immunity traits for matching states
-  tbcsAddStateTraits(code, dataId, 0, true);
+  tbcsAddStateTraits(stateData, code, dataId, 0, true);
 
   // Return description based on dataId
   switch (dataId) {
     case 0:
-      return `:\\C[16][基本特殊固有状態異常無効]\\C[0]`;
+      const baseImmToUniqueStatus = colorTaggedText(16, `基本特殊固有状態異常無効`);
+      return `:[${baseImmToUniqueStatus}]`;
     case 1:
-      return `:\\C[16][基本状態異常耐性無効]\\C[0]`;
+      const baseImmToStatus = colorTaggedText(16, `基本状態異常無効`);
+      return `:[${baseImmToStatus}]`;
     case 2:
-      return `:\\C[16][特殊状態異常耐性無効]\\C[0]`;
+      const baseImmToSpecStatus = colorTaggedText(16, `特殊状態異常耐性無効`);
+      return `:[${baseImmToSpecStatus}]`;
     default:
       return '';
   }
 }
 
+// Builds one state-resistance/immunity trait entry.
+function tbcsBuildStateTrait(code, dataId, value) {
+  return { code: code, dataId: dataId, value: value };
+}
+
 // Helper to add state traits
-function tbcsAddStateTraits(code, dataId, value, isImmunity) {
+function tbcsAddStateTraits(stateData, code, dataId, value, isImmunity) {
+  const traitValue = isImmunity ? 0 : 1 + value;
   for (let j = 1; j <= $dataStates.length - 1; j++) {
-    if (tbcsShouldAddStateTrait(dataId, j)) {
-      stateData.traits.push({
-        code: code,
-        dataId: j,
-        value: isImmunity ? 0 : 1 + value  // Changed from 0.1 to 0 for immunity
-      });
-    }
+    if (tbcsShouldAddStateTrait(dataId, j)) stateData.traits.push(tbcsBuildStateTrait(code, j, traitValue));
   }
 }
 
 // Helper to check if state trait should be added
 function tbcsShouldAddStateTrait(dataId, stateId) {
+  const state = $dataStates[stateId];
+  if (!state) return false;
+  // The database spells these tags with a leading space; accept both forms.
+  const meta = state.meta;
+  const isNormal = meta[' StateabNomal'] || meta['StateabNomal'];
+  const isSpecial = meta[' StateSPabNomal'] || meta['StateSPabNomal'];
   switch (dataId) {
-    case 0:
-      const meta = $dataStates[stateId].meta;
-      return meta[' StateabNomal'] ||
-        meta[' StateSPabNomal'] ||
-        meta[' StateUnique'];
-    case 1:
-      return $dataStates[stateId].meta[' StateabNomal'];
-    case 2:
-      return $dataStates[stateId].meta[' StateSPabNomal'];
-    default:
-      return false;
+    case 0: return isNormal || isSpecial || meta[' StateUnique'];
+    case 1: return isNormal;
+    case 2: return isSpecial;
+    default: return false;
   }
 }
 
 // Process parameter trait
-function tbcsProcessParameterTrait(code, dataId, value, absoluteValue) {
+function tbcsProcessParameterTrait(stateData, code, dataId, value, absoluteValue) {
   const modifier = value >= 0.01 ? `\\C[2]+` : `\\C[1]-`;
   stateData.traits.push({ code: code, dataId: dataId, value: 1 + value });
   return `:\\C[16][${TextManager.param(dataId)}${modifier}${absoluteValue * 100}%]\\C[0]`;
 }
 
 // Process ex-parameter trait
-function tbcsProcessExParameterTrait(code, dataId, value, absoluteValue) {
+function tbcsProcessExParameterTrait(stateData, code, dataId, value, absoluteValue) {
   const modifier = value >= 0.01 ? `\\C[2]+` : `\\C[1]-`;
   stateData.traits.push({ code: code, dataId: dataId, value: value });
   return `:\\C[16][${FTKR.CSS.cssStatus.xparam[dataId]}${modifier}${absoluteValue * 100}%]\\C[0]`;
 }
 
 // Process sp-parameter trait
-function tbcsProcessSpParameterTrait(code, dataId, value, absoluteValue) {
+function tbcsProcessSpParameterTrait(stateData, code, dataId, value, absoluteValue) {
   const modifier = value >= 0.01 ? `\\C[2]+` : `\\C[1]-`;
   stateData.traits.push({ code: code, dataId: dataId, value: 1 + value });
   return `:\\C[16][${FTKR.CSS.cssStatus.sparam[dataId]}${modifier}${absoluteValue * 100}%]\\C[0]`;
 }
 
 // Helper to finalize description
-function tbcsFinalizeDescription() {
+function tbcsFinalizeDescription(stateData, description) {
   if (stateData.meta['Help Description']) {
     if (stateData.meta['DescriptionWord']) {
       description = `[${stateData.meta['DescriptionWord']}]${description}`;
     }
 
     if (stateData.meta['Category']) {
-      tbcsAddCategoryDescription();
+      description += tbcsAddCategoryDescription(stateData);
     }
 
     stateData.description = description;
   }
+  return description;
 }
 
 // Add category description if needed
-function tbcsAddCategoryDescription() {
+function tbcsAddCategoryDescription(stateData) {
   const category = stateData.meta['Category'];
 
   switch (category) {
     case ' InvalidDispel':
-      description += `[${$dataStates[201].description}]`;
-      break;
+      return `[${$dataStates[201].description}]`;
     case ' PowerUp':
-      description += `[${$dataStates[202].description}]`;
-      break;
+      return `[${$dataStates[202].description}]`;
     case ' StateSPabNomal':
-      description += `[${$dataStates[30].description}]`;
-      break;
+      return `[${$dataStates[30].description}]`;
     case ' StateUnique':
-      description += `[${$dataStates[40].description}]`;
-      break;
+      return `[${$dataStates[40].description}]`;
   }
+  return '';
 }
 //#endregion
 
+// Bosses (enemy 30) take the global boss bonus plus a per-troop bonus; ordinary
+// enemies below the level gate roll a random extra level instead.
+function applyLevelBonusEnemyBattleSetting(level, enemyId) {
+  if (enemyId == 30) {
+    if (valueBossAddLevel >= 1) level += valueBossAddLevel;
+    if ($gameSwitches.value(426)) {
+      return level + $gameVariables.value(304)[valueBossEnemyId] * 10;
+    }
+    return level + $gameVariables.value(305)[$gameVariables.value(240)] * 5;
+  }
+
+  if ($gameVariables.value(232) < 2) return level;
+  level += Math.floor(Math.random() * $gameVariables.value(232));
+  // getRandomIndex() must stay inside the short-circuit: it is only drawn once
+  // the level passed 11.
+  if (level >= 11 && level >= getRandomIndex(101)) level += 1;
+  return level;
+}
+
+// Variable 350 lists states to stamp on the enemy. The marker 885 means "roll one
+// of the 885..915 attribute states, scaled by the enemy's level".
+function applyEnemyStateIdsEnemyBattleSetting(gameTroopMember, stateIds, level) {
+  for (let i = 0; i <= stateIds.length - 1; i++) {
+    if (stateIds[i] != 885) {
+      gameTroopMember.addState(stateIds[i]);
+      continue;
+    }
+    let extraLevelMult = 11;
+    if (level >= 30 && level <= 60) { extraLevelMult = 21 }
+    else if (level >= 61) { extraLevelMult = 31 }
+    gameTroopMember.addState(getRandomIndex(extraLevelMult) + 885);
+  };
+}
+
+// Rolls once for a generic drop and adds it to the troop's drop list.
+function rollGenericDropEnemyBattleSetting() {
+  const itemsToDrop = [];
+  const valueDropItemIndex = drop_genericDropRate(0, itemsToDrop);
+  const item = $dataItems[valueDropItemIndex];
+  if (item) $gameTroop.addDropItem(item);
+}
+
 //エネミーに様々なセッティング
-enemy_battleSetting = function (id10) {
-
+enemy_battleSetting = function (troopIndex) {
   const gameTroopMembers = $gameTroop.members();
-  const gameTroopMember = gameTroopMembers[id10];
+  const gameTroopMember = gameTroopMembers[troopIndex];
+  if (!gameTroopMember) return;
   const enemyId = gameTroopMember._enemyId;
-  const target = $gameSwitches.value(426) ? $dataEnemies[$gameTroop.members()[0]._enemyId] : $dataItems[$gameVariables.value(240)];
-  const targetEnemyLV = target.meta['EnemyLV'];
-  const targetEnemyLVDataArray = targetEnemyLV ? targetEnemyLV.split(',') : [1, 1];
-  const targetEnemyElement = target.meta['EnemyElement'];
-  const targetEnemyElementDataArray = targetEnemyElement ? targetEnemyElement.split(',') : [0, 0];
-  let level = Number(targetEnemyLVDataArray[getRandomIndex(targetEnemyLVDataArray.length)]);
-
-  if (enemyId == 30) {
-    const targetMetaBossLV = target.meta['BossLV'];
-    if (targetMetaBossLV) level = Number(targetMetaBossLV);
-    if (level >= 30) gameTroopMember.addState(310);//属性の極み
-  };
-  if (level >= 1) {
-    if (enemyId == 30) {
-      if (valueBossAddLevel >= 1) level += valueBossAddLevel;
-      level += $gameSwitches.value(426) ? $gameVariables.value(304)[valueBossEnemyId] * 10 : $gameVariables.value(305)[$gameVariables.value(240)] * 5;
-      if ($gameSwitches.value(426)) {
-        level += $gameVariables.value(304)[valueBossEnemyId] * 10;
-      } else {
-        level += $gameVariables.value(305)[$gameVariables.value(240)] * 5;
-      };
-    } else {
-      if ($gameVariables.value(232) >= 2) {
-        const extraLevel = Math.floor(Math.random() * $gameVariables.value(232));
-        level += extraLevel;
-        if (level >= 11) {
-          const randomLevel = getRandomIndex(101);
-          if (level >= randomLevel) {
-            level += 1;
-          };
-        };
-      };
-    };
-    if (valueEnemyAddLevel >= 1) level += valueEnemyAddLevel;
-    const gameVar240 = $gameVariables.value(240);
-    if (gameVar240 >= 1) level += $gameVariables.value(257)[gameVar240];
-    level = Math.round(level);
-    gameTroopMember.changeLevel(level);
-  };
-  if (targetEnemyLV) {
-    if (Number(targetEnemyLV) == 0) {
-      level = $gameActors.actor($gameVariables.value(2)).level;
-      gameTroopMember.changeLevel(level);
-    };
-  }
-  const gameVar350 = $gameVariables.value(350);
-  if (gameVar350 != 0) {
-    for (let i = 0; i <= gameVar350.length - 1; i++) {
-      if (gameVar350[i] == 885) {
-        let extraLevelMult = 11;
-        if (level >= 30 && level <= 60) { extraLevelMult = 21 }
-        else if (level >= 61) { extraLevelMult = 31 }
-        const extraLevel = getRandomIndex(extraLevelMult) + 885;
-        gameTroopMember.addState(extraLevel);
-      } else {
-        gameTroopMember.addState($gameVariables.value(350)[i]);
-      };
-    };
-  };
-  let extraLevel = Number(targetEnemyElementDataArray[getRandomIndex(targetEnemyElementDataArray.length)]);
-  if (enemyId == 30) {
-    if (target.meta['BossElement']) {
-      extraLevel = Number(target.meta['BossElement'])
-    };
-  };
-  const enemy = $dataEnemies[enemyId];
-  if (extraLevel != 0) {
-    const enemyDefaultState = enemy.meta['defaultState'];
-    if (enemyDefaultState) {
-      if (Number(enemyDefaultState) != extraLevel) {
-        gameTroopMember.removeState(Number(enemyDefaultState));
-      };
-    }
-    gameTroopMember.addState(extraLevel);
-  };
-  if (enemyId <= 29) {
-    const arr2 = $gameVariables.value(345)[enemyId - 20];
-    for (let j = 0; j <= arr2.length - 1; j++) {
-      gameTroopMember.addState(arr2[j]);
-    };
-  };
-  if (enemyId == 30 && $gameVariables.value(343) != 0) {//ボスステート処理
-    let arr2 = $gameVariables.value(343);
-    for (let j = 0; j <= arr2.length - 1; j++) {
-      gameTroopMember.addState(arr2[j]);
-    };
-    if (target.meta['BossDrop1']) {
-      for (var j = 1; j <= 9; j++) {
-        if (target.meta['BossDrop' + j]) {
-          arr2 = target.meta['BossDrop' + j].split(',');
-          valueItems = getItemEquipmentSource(Number(arr2[0]));
-
-          if (Number(arr2[2]) >= getRandomIndex(101)) {
-            $gameTroop.addDropItem(valueItems[Number(arr2[1])]);
-          };
-        }
-      }
-    };
-  };
-  if (enemy.meta['Man'] || enemy.meta['Woman']) {
-    if (enemy.meta['Man']) { gameTroopMember.addState(459) };
-    if (enemy.meta['Woman']) { gameTroopMember.addState(460) };
-  } else {
-    if (!enemy.meta['Nonsexual']) {
-      if (!isHEnemyOrNonAuto() && getRandomIndex(11) == 7) {
-        gameTroopMember.addState(460);//雌
-      } else {
-        gameTroopMember.addState(459);//雄
-      };
-    };
-  };
-  if (gameTroopMember.level >= 60 && !gameTroopMember.isStateAffected(436)) {//人種以外
-    gameTroopMember.addState(406);//魔性心威
-  };
-  if (enemyId != 30) {
-    if (gameTroopMember.level >= 40 && $gameTroop.aliveMembers().length == 1) {
-      gameTroopMember.addState(475);//孤高
-    };
-  };
-  /*//パッシブオーラで実行
-  if(enemy.isStateAffected(443)){//指揮官
-   for (var j = 0; j <= $gameTroop.members().length-1; j++) {
-     var enemy2 = $gameTroop.members()[j];
-     if(!enemy2.isStateAffected(443) && enemy2.isStateAffected(441)){
-       enemy2.addState(444);//揮下戦士
-     };
-     if(!enemy2.isStateAffected(443) && enemy2.isStateAffected(442)){
-       enemy2.addState(445);//揮下魔導士
-  }}};
-  if(enemy.isStateAffected(446)){//将器
-   for (var j = 0; j <= $gameTroop.members().length-1; j++) {
-     var enemy2 = $gameTroop.members()[j];
-     var value1 = enemy._enemyId;
-     var value2 = enemy2._enemyId;
-     if(!enemy2.isStateAffected(446) && Number(dataEnemies[value1].meta['Passive State']) == Number(dataEnemies[value2].meta['Passive State'])){
-       enemy2.addState(447);//将軍号令
-  }}};
-  if(enemy.isStateAffected(448)){//王権
-   for (var j = 0; j <= $gameTroop.members().length-1; j++) {
-     var enemy2 = $gameTroop.members()[j];
-     var value1 = enemy._enemyId;
-     var value2 = enemy2._enemyId;
-     if(!enemy2.isStateAffected(448)){
-       if(Number(dataEnemies[value1].meta['Passive State']) == Number(dataEnemies[value2].meta['Passive State'])){
-         enemy2.addState(449);//王卒兵
-       } else {
-         enemy2.addState(450);//魔軍兵
-  }}}};
-  */
-  if (gameTroopMember.isStateAffected(455)) {//捕食者
-    gameTroopMember.appear();//非捕食者は常に出現させる。
-
-    for (let j = 0; j < $gameTroop.members().length; j++) {
-      const enemyJ = gameTroopMembers[j];
-      if (!enemyJ.isStateAffected(455)) {
-        if (gameTroopMember.level + 10 >= enemyJ.level) {
-          enemyJ.addState(456);//被捕食者
-        };
-      };
-    };
-    const gamePartyBattleMembers = $gameParty.battleMembers();
-    for (let j = 0; j < gamePartyBattleMembers.length; j++) {
-      const actor = gamePartyBattleMembers[j];
-      if (!actor.isStateAffected(455)) {
-        if (gameTroopMember.level + 10 >= actor.level) {
-          actor.addState(456);//被捕食者
-        }
-      }
-    };
-  };
-  const gameVar628 = $gameVariables.value(628);
-  if (enemyId == 30 && gameVar628 != 0) {//ボス確定ドロップ
-    for (let j = 0; j < gameVar628.length; j++) {
-      if (gameVar628[j] >= 1) {
-        const itemId = gameVar628[j];
-        $gameTroop.addDropItem($dataItems[itemId]);
-      }
-    }
-  };
-  for (let j = 0; j < valueStateGetItems.length; j++) {
-    if (gameTroopMember.isStateAffected(valueStateGetItems[j])) {
-      const itemId = Number($dataStates[valueStateGetItems[j]].meta['SubjugationPointItem']);
-      $gameTroop.addDropItem($dataItems[itemId]);
-    }
-  };
-  //var value11 = 1;
-  let arr4 = valueStateEnemyExpRate;
-  for (let j = 0; j < arr4.length; j++) {
-    if (gameTroopMember.isStateAffected(arr4[j]) && gameTroopMember.isAlive()) {
-      if ($dataStates[arr4[j]].meta['EnemyExpRate']) {
-        valueTotalexp += Number($dataStates[arr4[j]].meta['EnemyExpRate']);
-      };
-    };
-  };
-  //var value11 = 1;
-  arr4 = valueStateEnemyGoldRate;
-  for (let j = 0; j < arr4.length; j++) {
-    if (gameTroopMember.isStateAffected(arr4[j]) && gameTroopMember.isAlive()) {
-      if ($dataStates[arr4[j]].meta['EnemyGoldRate']) {
-        valueTotalgold += Number($dataStates[arr4[j]].meta['EnemyGoldRate']);
-      };
-    };
-  };
-  const dropUpItem = $dataItems[valueItemDropUpItem];
-  const dropCount = getRandomIndex(4);
-  if (dropCount >= 1) {
-    let gameTroopMemberLevel = gameTroopMember.level;
-    for (let j = 1; j <= dropCount; j++) {
-      const drop_probability = drop_probabilityCalculation(gameTroopMemberLevel, dropUpItem);
-      if (drop_probability >= 90) {
-        const arr6 = [];
-        drop_genericDropRate(0, arr6);
-        $gameTroop.addDropItem($dataItems[valueDropItems]);
-      };
-    };
-  };
-  const drop_probability = drop_probabilityCalculation(gameTroopMember.level, dropUpItem);
-  if (drop_probability >= 90) {
-    let stateId = 0;
-    for (const id11 of valueClassStateA) {
-      if (gameTroopMember.isStateAffected(id11)) { stateId = id11 };
-    }
-    if (stateId >= 1) {
-      valueClassState = $dataStates[stateId].meta['classStateDrop'].split(',');
-      valueEnemyLevel = gameTroopMember.level;
-      drop_JobStateWAget(1, 10);
-      drop_JobStateWAget(2, 10);
-    };
-  };
-  if (gameTroopMember.level >= valueMaxEnemyLv) {
-    valueMaxEnemyLv = gameTroopMember.level;
-  }
-
+  const target = $gameSwitches.value(426)
+    ? $dataEnemies[gameTroopMembers[0]._enemyId]
+    : $dataItems[$gameVariables.value(240)];
+  if (!target) return;
+  const level = resolveEnemyBattleLevelBattleRefactor(gameTroopMember, target, enemyId);
+  applyEnemyElementStateBattleRefactor(gameTroopMember, target, enemyId);
+  applyEnemySlotStatesBattleRefactor(gameTroopMember, enemyId, target);
+  applyEnemySexStatesBattleRefactor(gameTroopMember, $dataEnemies[enemyId]);
+  applyPredatorStatesBattleRefactor(gameTroopMember, gameTroopMembers);
+  addEnemyDropsBattleRefactor(gameTroopMember, enemyId);
+  addEnemyRewardRatesBattleRefactor(gameTroopMember);
+  rollEnemyGenericDropsBattleRefactor(gameTroopMember);
+  if (gameTroopMember.level >= valueMaxEnemyLv) valueMaxEnemyLv = gameTroopMember.level;
 };
+
+// <BossDrop1..9:sourceKind,index,percent> - each slot rolls once, and only the
+// slots from the first one present are considered. valueItems is the shared
+// scratch global the item-source lookup writes into.
+function applyBossDropsEnemyBattleSetting(target) {
+  if (!target.meta['BossDrop1']) return;
+  for (let j = 1; j <= 9; j++) {
+    const bossDrop = target.meta['BossDrop' + j];
+    if (!bossDrop) continue;
+    const bossDropValues = bossDrop.split(',');
+    valueItems = getItemEquipmentSource(Number(bossDropValues[0]));
+    if (Number(bossDropValues[2]) < getRandomIndex(101)) continue;
+    $gameTroop.addDropItem(valueItems[Number(bossDropValues[1])]);
+  }
+}
 
 //エネミー簡易討伐
 // Constants for calculation
@@ -3291,102 +2703,32 @@ const INSTAWIN_EXP_FLAT_BONUS = 20;
 const INSTAWIN_GOLD_RATE_MULTIPLIER = 0.6;
 const INSTAWIN_GOLD_FLAT_BONUS = 10;
 enemy_instantwin = function () {
-  // Cache frequently used variables to reduce property lookups
-  const gameVariables = $gameVariables;
-  const item240 = $dataItems[gameVariables.value(240)];
-  const actor20 = $gameActors.actor(20);
-  
-  // Initialize counters and arrays
-  let expCount = 0;
-  let goldCount = 0;
-  const valueWordSet1Array = [];
-  const dropResultAccumulator = [];
+  const dungeonItem = $dataItems[$gameVariables.value(240)];
+  const dropActor = $gameActors.actor(20);
+  if (!dungeonItem || !dropActor || !dungeonItem.meta.EnemyLV || !dungeonItem.meta.BattleEnemyPopC) return;
   valueWordSet1 = '';
   valueWordSet3 = '';
-  
-  // Parse enemy level data once
-  const enemyLevelArray = item240.meta['EnemyLV'].split(',');
-  actor1_setup1(item240, enemyLevelArray[getRandomIndex(enemyLevelArray.length)]);
-  
-  // Get cached values used in the loop
-  const enemyIdArray = gameVariables.value(220);
-  const dropUpItem = $dataItems[valueItemDropUpItem];
-  const enemyPopChanceArray = item240.meta['BattleEnemyPopC'].split(',');
-  const popEnemyCount = Number(enemyPopChanceArray[getRandomIndex(enemyPopChanceArray.length)]);
-  
-  // Process each enemy
-  for (let popIndex = 1; popIndex <= popEnemyCount; popIndex++) {
-    // Get enemy level
-    let selectedEnemyLevel = Number(enemyLevelArray[getRandomIndex(enemyLevelArray.length)]) || 1;
-    const enemyLevelOffset = selectedEnemyLevel - 1;
-    
-    // Get random enemy data
-    const enemyId = Number(enemyIdArray[getRandomIndex(enemyIdArray.length)]);
-    const enemy = $dataEnemies[enemyId];
-    
-    // Calculate rewards
-    expCount += Math.round(enemy.exp * (1 + enemyLevelOffset * INSTAWIN_EXP_RATE_MULTIPLIER) + (INSTAWIN_EXP_FLAT_BONUS * enemyLevelOffset));
-    goldCount += Math.round(enemy.gold * (1 + enemyLevelOffset * INSTAWIN_GOLD_RATE_MULTIPLIER) + (INSTAWIN_GOLD_FLAT_BONUS * enemyLevelOffset));
-
-    // Process drops
-    enemy_dropSelection(actor20);
-    
-    if (drop_probabilityCalculation(selectedEnemyLevel, dropUpItem) >= 90) {
-      // Calculate drop items
-      dropResultAccumulator.length = 0; // Clear array without creating a new one
-      drop_enemyDropRate(0, dropResultAccumulator);
-      drop_genericDropRate(0, dropResultAccumulator);
-      
-      // Process dropped item
-      const itemToDrop = $dataItems[valueDropItems];
-      if (itemToDrop) {
-        const item = `\\C[24]\x1bI[${itemToDrop.iconIndex}]${itemToDrop.name}\\C[0]`;
-        const itemMessage = `${item}を獲得した。\n`;
-        valueWordSet1Array.push(itemMessage);
-        $gameSystem.pushInfoLog(itemMessage);
-        $gameParty.gainItem(itemToDrop, 1);
-      }
-    }
-  }
-  
-  // Combine all item drop messages
-  valueWordSet1 = valueWordSet1Array.join('');
-
-  // Format and display battle results
-  const result = `\\C[2]BattleResult!\\C[0]`;
-  const exp = `\\C[10]${expCount}\\C[0]`;
-  const gold = `\\C[14]${goldCount}\\C[0]`;
-  const battleResultMessage = `${result}\n経験値${exp}、${gold}\\Gを入手！ JPを1獲得した。`;
-  $gameSystem.pushInfoLog(battleResultMessage);
-  valueWordSet2 = `${battleResultMessage}\n`;
-  
-  // Award experience and gold to the party
-  const partyMembers = $gameParty.battleMembers();
-  for (let i = 0, len = partyMembers.length; i < len; i++) {
-    const actor = partyMembers[i];
-    actor.changeExp(actor.currentExp() + expCount, false);
-    if (actor.subclass()) actor.gainExpSubclass(expCount);
-  }
-  $gameParty.gainGold(goldCount);
-  
-  // Count newlines for drop and defeat messages
-  const dropCount = countNewlines(valueWordSet1);
-  const defeatsCount = countNewlines(valueWordSet3);
-  
-  // Format final result message
-  if (dropCount + defeatsCount <= 6) {
-    gameVariables.setValue(701, `${valueWordSet2}${valueWordSet1}${valueWordSet3}`);
-  } else {
-    let resultMessage = valueWordSet2;
-    if (dropCount >= 1) {
-      resultMessage += `ドロップ(\\C[2]+${dropCount}\\C[0])\n`;
-    }
-    if (defeatsCount >= 1) {
-      resultMessage += `討伐カウント(\\C[2]+${defeatsCount}\\C[0])`;
-    }
-    gameVariables.setValue(701, resultMessage);
-  }
+  const enemyLevels = dungeonItem.meta.EnemyLV.split(',');
+  actor1_setup1(dungeonItem, enemyLevels[getRandomIndex(enemyLevels.length)]);
+  const enemyIds = $gameVariables.value(220);
+  if (!enemyIds || !enemyIds.length) return;
+  const popCounts = dungeonItem.meta.BattleEnemyPopC.split(',');
+  const enemyCount = Number(popCounts[getRandomIndex(popCounts.length)]);
+  const rewards = accumulateInstantwinRewardsBattleRefactor(dropActor, enemyLevels, enemyIds, enemyCount);
+  displayInstantwinRewardsBattleRefactor(rewards);
+  grantInstantwinRewardsBattleRefactor(rewards);
+  publishInstantwinSummaryBattleRefactor();
 };
+
+// Appends the "obtained X" line for a dropped item, if there is one.
+function recordInstantwinDropEnemyInstantwin(itemToDrop, valueWordSet1Array) {
+  if (!itemToDrop) return;
+  const item = `\\C[24]\x1bI[${itemToDrop.iconIndex}]${itemToDrop.name}\\C[0]`;
+  const itemMessage = `${item}を獲得した。\n`;
+  valueWordSet1Array.push(itemMessage);
+  $gameSystem.pushInfoLog(itemMessage);
+  $gameParty.gainItem(itemToDrop, 1);
+}
 
 // Helper function to count newlines in a string
 function countNewlines(str) {
@@ -3448,312 +2790,122 @@ const dropModifierMapDropProbabilityCalculation2 = {
   10: 1
 };
 drop_probabilityCalculation2 = function (user, dropCategory, dropUpItem) {
-
-  let dropCount = 0;
-
-  let canDrop;
-  if (dropCategory >= 5) {
-    let calculatedLevelLimit = dropCategory * 20;
-    if (calculatedLevelLimit == 0) { calculatedLevelLimit = 999 } //0はレベル制限しない汎用ドロップ
-    else if (calculatedLevelLimit >= 51) { calculatedLevelLimit = 999 };//レアリティが6以上なら制限なし
-
-    if (dropCategory < 7) { calculatedLevelLimit = 20 }
-    else if (dropCategory == 7) { calculatedLevelLimit = 30 }
-    else if (dropCategory == 8) { calculatedLevelLimit = 40 }
-    if (dropCategory > 8) { calculatedLevelLimit = 50 };
-
-    canDrop = calculatedLevelLimit < valueDropEnemyLevel;
-  } else {
-    canDrop = true;
-  };
-
-  //var value14 = true;//dropCategory > valueDropEnemyLevel;//高レベルでドロップ制限はなし
-  if (canDrop /*&& value14*/) {
-    let dropModifier = 5;
-    //if(dropCategory == 0){...};
-    dropModifier = dropModifierMapDropProbabilityCalculation2[dropCategory] || dropModifier;
-
-    let modifierIncrement = dropModifier / 3;
-    dropModifier += modifierIncrement + (valueDropEnemyLevel / 10);
-    if ($gameTroop.turnCount() <= 1) { dropModifier += modifierIncrement * 3 };
-    if ($gameVariables.value(54) == 1) { dropModifier += modifierIncrement * 5 };//パーティが一人の場合確率アップ
-
-    const dropVariable = $gameVariables.value(516);
-    if (dropVariable >= 100) { dropModifier += modifierIncrement };
-    if (dropVariable >= 300) { dropModifier += modifierIncrement };
-    if (dropVariable >= 500) { dropModifier += modifierIncrement };
-    if (dropVariable >= 1000) { dropModifier += modifierIncrement };
-    if (dropVariable >= 1500) { dropModifier += modifierIncrement };
-    if (dropVariable >= 2000) { dropModifier += modifierIncrement };
-
-    if ($gameParty.hasItem(dropUpItem)) { dropModifier += modifierIncrement * 3 };
-    if ($gameParty.membersState(296)) { dropModifier += modifierIncrement * 2 };
-    if ($gameParty.membersState(297)) { dropModifier += modifierIncrement * 2 };
-    if ($gameParty.membersState(298)) { dropModifier += modifierIncrement * 2 };
-    if (user.isStateAffected(186)) {
-      if (user._stateCounter[186] >= 1) {
-        dropModifier += modifierIncrement * user._stateCounter[186];
-      };
-    };
-
-    const randomChance = getRandomIndex(100) + 1;
-    if (dropModifier >= randomChance) { dropCount += 1 };
-
-    return dropCount;
-  };
-
+  if (dropCategory >= 5 && valueDropEnemyLevel <= minimumStateDropLevelBattleRefactor(dropCategory)) return;
+  const baseModifier = dropModifierMapDropProbabilityCalculation2[dropCategory] || 5;
+  const modifierIncrement = baseModifier / 3;
+  let modifier = baseModifier + modifierIncrement + valueDropEnemyLevel / 10;
+  if ($gameTroop.turnCount() <= 1) modifier += modifierIncrement * 3;
+  if ($gameVariables.value(54) == 1) modifier += modifierIncrement * 5;
+  const averageBattleLuck = $gameVariables.value(516);
+  for (const threshold of [100, 300, 500, 1000, 1500, 2000]) {
+    if (averageBattleLuck >= threshold) modifier += modifierIncrement;
+  }
+  if ($gameParty.hasItem(dropUpItem)) modifier += modifierIncrement * 3;
+  for (const stateId of [296, 297, 298]) {
+    if ($gameParty.membersState(stateId)) modifier += modifierIncrement * 2;
+  }
+  if (user.isStateAffected(186) && user._stateCounter[186] >= 1) {
+    modifier += modifierIncrement * user._stateCounter[186];
+  }
+  return modifier >= getRandomIndex(100) + 1 ? 1 : 0;
 };
 
 //採取物の設定
 harvesting_itemSelect = function () {
 
-  var arr4 = [];
+  var itemsToDrop = [];
   //var value1 = 0; 
-  drop_genericDropRate(1, arr4);
-  $gameVariables.setValue(23, valueDropItems);
-  if (valueDropItems == 0) {
+  const valueDropItemIndex = drop_genericDropRate(1, itemsToDrop);
+  $gameVariables.setValue(23, valueDropItemIndex);
+  if (valueDropItemIndex == 0) {
     $gameVariables.setValue(23, 1191);//1191は石ころ
   };
 
 };
 
 //汎用財布ドロップ設定
-drop_walletItemBoxGet = function (value12, id12) {
-  const value3 = valueFootpadSkillId;
+drop_walletItemBoxGet = function (fallbackDropCategory, isWallet) {
+  const footpadSkillId = valueFootpadSkillId;
   const actor = $gameActors.actor($gameVariables.value(11));
-  if (!actor.isLearnedSkill(value3) || actor.skillMasteryLevel(value3) < 1) {
-    return;
-  }
-
-  let drop_probability = 100;
+  if (!actor || !actor.isLearnedSkill(footpadSkillId)) return;
+  const masteryLevel = actor.skillMasteryLevel(footpadSkillId);
+  if (masteryLevel < 1) return;
   const dropUpItem = $dataItems[valueItemDropUpItem];
-  drop_probability = drop_probabilityCalculation(drop_probability, dropUpItem);
-
-  drop_probability += actor.skillMasteryLevel(value3) * 3;
-
-  if (drop_probability < 90) {
-    return;
-  }
-
-  const arr12 = [];
-  const gameVariable240 = $gameVariables.value(240);
-  const value = $dataItems[gameVariable240];
-  const arr11 = value.meta.GenericDropRate.split(',');
-  let value11 = (gameVariable240 >= 1)
-    ? Number(arr11[getRandomIndex(arr11.length)]) || 1
-    : value12;
-
-  const listType = (id12 === 1) ? 'walletIn' : 'ItemBag';
-  const dataItemsLength = $dataItems.length;
-
-  for (let i = 1; i < dataItemsLength; i++) {
-    const item = $dataItems[i];
-    if (!item.meta[listType]) {
-      continue;
-    }
-
-    const list = item.meta.DropRate.split(',');
-
-    if (list.some(id11 => Number(id11) === value11)) {
-      arr12.push(i);
-    }
-  }
-
-  const arr12Length = arr12.length;
-  if (arr12Length === 0) {
-    return;
-  }
-
-  const numItemsToGain = getRandomIndex(3) + 1;
-
-  for (let i = 1; i <= numItemsToGain; i++) {
-    const randomIndex = getRandomIndex(arr12Length);
-    const value1 = arr12[randomIndex];
-    const item = $dataItems[value1];
-    const itemInfo = `\\C[24]\x1bI[${item.iconIndex}]${item.name}\\C[0]を獲得した。`;
-
-    CommonPopupManager.showInfo({}, itemInfo, null);
-    $gameParty.gainItem(item, 1);
+  if (drop_probabilityCalculation(100, dropUpItem) + masteryLevel * 3 < 90) return;
+  const category = selectGenericDropCategoryBattleRefactor(fallbackDropCategory, true);
+  const candidates = collectWalletCandidatesBattleRefactor(category, isWallet === 1 ? 'walletIn' : 'ItemBag');
+  if (!candidates.length) return;
+  const itemCount = getRandomIndex(3) + 1;
+  for (let index = 0; index < itemCount; index++) {
+    const itemId = candidates[getRandomIndex(candidates.length)];
+    grantPopupItemBattleRefactor($dataItems[itemId]);
   }
 };
 
 //汎用ドロップ設定
 drop_genericDropRate = function (battleDrop, itemsToDrop) {
-  const itemId = $gameVariables.value(240);
-  let genericDropRate = 1;
-
-  if (itemId >= 1) {
-    const dropItemData = $dataItems[itemId];
-    if (dropItemData.meta.GenericDropRate) {
-      const genericDropRateArray = dropItemData.meta.GenericDropRate.split(',');
-      genericDropRate = Number(genericDropRateArray[getRandomIndex(genericDropRateArray.length)]);
-    }
-  }
-
-  const itemDropRateArrayLength = valueItemDropRate1.length;
-  const allItems = $dataItems;
-  const gameSwitch2State = $gameSwitches.value(2);
+  const genericDropRate = selectGenericDropCategoryBattleRefactor(1, false);
+  const candidates = itemsToDrop == null ? [] : itemsToDrop;
   const isBattle = battleDrop !== 0;
-  for (let i = 0; i < itemDropRateArrayLength; i++) {
-    const currentDropItemId = valueItemDropRate1[i];
-    let dropLotteryValue = 1;
-
-    if (isBattle && !gameSwitch2State) continue;
-
-    const item = allItems[currentDropItemId];
-    const itemDropRate = item.meta['DropRate'];
-    const isBattleDrop = isBattle || !item.meta['NoBattleDrop'];
-    if (!isBattleDrop || !itemDropRate) continue;
-
-    const dropRateList = itemDropRate.split(',');
-
-    for (let dropRateOption of dropRateList) {
-      if (dropRateOption != genericDropRate) continue;
-
-      const itemDropLottery = item.meta['DropLottery'];
-      if (itemDropLottery) {
-        dropLotteryValue = Number(itemDropLottery);
-      }
-
-      for (let count = 1; count <= dropLotteryValue; count++) {
-        itemsToDrop.push(currentDropItemId);
-      }
+  if (!isBattle || $gameSwitches.value(2)) {
+    for (const itemId of valueItemDropRate1) {
+      appendGenericDropTicketsBattleRefactor(itemId, genericDropRate, isBattle, candidates);
     }
   }
-
-  valueDropItems = Number(itemsToDrop[getRandomIndex(itemsToDrop.length)]);
+  // Empty pools must produce the established 0/no-item sentinel, never NaN.
+  valueDropItems = candidates.length ? Number(candidates[getRandomIndex(candidates.length)]) : 0;
+  return valueDropItems;
 };
 
 //汎用ドロップエネミー対象設定ダンジョンのみ。計算のみ計算結果はarr4に蓄積。簡易討伐時
 function drop_enemyDropRate(unusedParam, eligibleDropItems) {
-
-  const item = $dataItems[$gameVariables.value(240)];
-  const enemyLevelData = item.meta['EnemyLV'].split(',');
-  const enemyIdArray = $gameVariables.value(220);
-  const selectedEnemyLevel = Number(enemyLevelData[getRandomIndex(enemyLevelData.length)]);
-  const selectedEnemyIndex = Number(enemyIdArray[getRandomIndex(enemyIdArray.length)]);
-  const enemyMeta = $dataEnemies[selectedEnemyIndex].meta;
-
-  const itemsLength = $dataItems.length;
-  for (let itemIndex = 1; itemIndex < itemsLength; itemIndex++) {
-    const conditionalItemDrop = enemyMeta['Conditional Item ' + itemIndex + ' Drop'];
-    if (!conditionalItemDrop) {
-      continue;
-    }
-
-    const lotteryRarity = $dataItems[itemIndex].meta['LotteryRearity'];
-    if (!lotteryRarity) {
-      continue;
-    }
-
-    let rarityThreshold;
-
-    switch (Number(lotteryRarity)) {
-      case 1:
-      case 2:
-        rarityThreshold = 1;
-        break;
-      case 3:
-        rarityThreshold = 10;
-        break;
-      case 4:
-        rarityThreshold = 20;
-        break;
-      case 5:
-      case 6:
-        rarityThreshold = 30;
-        break;
-      case 7:
-      case 8:
-        rarityThreshold = 40;
-        break;
-      case 9:
-      case 10:
-        rarityThreshold = 50;
-        break;
-    }
-
-    if (selectedEnemyLevel >= rarityThreshold) {
-      eligibleDropItems.push(itemIndex);
-    }
+  const dungeonItem = $dataItems[$gameVariables.value(240)];
+  if (!dungeonItem || !dungeonItem.meta.EnemyLV) return;
+  const enemyIds = $gameVariables.value(220);
+  if (!enemyIds || !enemyIds.length) return;
+  const enemyLevels = dungeonItem.meta.EnemyLV.split(',');
+  const enemyLevel = Number(enemyLevels[getRandomIndex(enemyLevels.length)]);
+  const enemyId = Number(enemyIds[getRandomIndex(enemyIds.length)]);
+  const enemyData = $dataEnemies[enemyId];
+  if (!enemyData) return;
+  const candidates = eligibleDropItems == null ? [] : eligibleDropItems;
+  for (let itemId = 1; itemId < $dataItems.length; itemId++) {
+    if (!enemyData.meta['Conditional Item ' + itemId + ' Drop']) continue;
+    const item = $dataItems[itemId];
+    if (!item || !item.meta.LotteryRearity) continue;
+    const minimumLevel = minimumEnemyDropLevelBattleRefactor(Number(item.meta.LotteryRearity));
+    if (enemyLevel >= minimumLevel) candidates.push(itemId);
   }
+  return candidates;
 }
 
 //ジョブステートエネミーorジョブ持ち追いはぎスクリプト
 //drop_JobStateWAget(1,10);//1武器2防具ダンジョン外の場合の想定レベル
 drop_JobStateWAget = function (equipmentType, unusedParam) {
-  const DEFAULT_ENEMY_LEVEL = 30;
-  const LEVEL_DIVISOR = 10;
-  const MIN_REARITY = 1;
-  const MAX_REARITY = 10;
-
-  let eligibleItemIndices = [0];
-  let classStateDropData = 0;
-  let enemyLevel;
-
-  if (!$gameParty.inBattle()) {
-    if ($gameMap.event(valueEnemyEventId).event().meta['classStateDrop']) {
-      classStateDropData = $gameMap.event(valueEnemyEventId).event().meta['classStateDrop'].split(',');
-
-      const targetItemId = $gameVariables.value(240);
-      if (targetItemId === 0) {
-        enemyLevel = DEFAULT_ENEMY_LEVEL;
-      } else {
-        const enemyLevelArray = $dataItems[targetItemId].meta['EnemyLV'].split(',');
-        enemyLevel = Number(enemyLevelArray[getRandomIndex(enemyLevelArray.length)]);
-      }
-    }
-  }
-
-  if (!classStateDropData) return;
-
-  let calculatedLotteryRarity = Math.round(enemyLevel / LEVEL_DIVISOR);
-  calculatedLotteryRarity = Math.max(MIN_REARITY, Math.min(calculatedLotteryRarity, MAX_REARITY));
-  let startIndex = 1;
-  const isArmors = equipmentType === 2;
-  let equipmentData, endIndex, requiredEquipmentTypeId;
-
-  if (isArmors) {
-    equipmentData = $dataArmors;
-    endIndex = valueArmorsLength;
-    requiredEquipmentTypeId = Number(classStateDropData[2]);
-  } else {
-    equipmentData = $dataWeapons;
-    endIndex = $dataWeapons.length - 1;
-    requiredEquipmentTypeId = Number(classStateDropData[1]);
-  }
-
-  for (let index = startIndex; index <= endIndex; index++) {
-    const equipmentItem = equipmentData[index];
-    const equipmentItemLotteryRarity = equipmentItem.meta['LotteryRearity'];
-    if (equipmentItemLotteryRarity && !equipmentItem.meta['GatchaOutOfRange']) {
-      const equipmentItemTypeId = isArmors ? equipmentItem.atypeId : equipmentItem.wtypeId;
-      if (requiredEquipmentTypeId === equipmentItemTypeId && calculatedLotteryRarity >= Number(equipmentItemLotteryRarity)) {
-        eligibleItemIndices.push(index);
-      }
-    }
-  }
-
-  const selectedDropItemIndex = eligibleItemIndices[getRandomIndex(eligibleItemIndices.length)];
-  if (selectedDropItemIndex !== 0) {
-    if ($gameParty.inBattle()) {
-      $gameTroop.addDropItem(equipmentData[selectedDropItemIndex]);
-    } else {
-      const equipmentItem = equipmentData[selectedDropItemIndex];
-      const itemName = `\\C[24]\x1bI[${equipmentItem.iconIndex}]${equipmentItem.name}\\C[0]`;
-      CommonPopupManager.showInfo({}, `${itemName}を獲得した。`, null);
-      $gameParty.gainItem(equipmentItem, 1);
-    }
-  }
+  const context = resolveClassDropContextBattleRefactor();
+  if (!context) return;
+  const isArmor = equipmentType === 2;
+  const equipmentData = isArmor ? $dataArmors : $dataWeapons;
+  const lastIndex = isArmor ? Math.min(valueArmorsLength, equipmentData.length - 1) : equipmentData.length - 1;
+  const requiredType = Number(context.dropData[isArmor ? 2 : 1]);
+  const maximumRarity = Math.max(1, Math.min(Math.round(context.enemyLevel / 10), 10));
+  const candidates = collectClassEquipmentBattleRefactor(equipmentData, lastIndex, isArmor, requiredType, maximumRarity);
+  const selectedId = candidates[getRandomIndex(candidates.length)];
+  if (selectedId === 0) return;
+  const item = equipmentData[selectedId];
+  if ($gameParty.inBattle()) $gameTroop.addDropItem(item);
+  else grantPopupItemBattleRefactor(item);
 }
 
 //追いはぎ時の確率と武器防具入手
-footpad_probabilityUp = function (id1) {
+footpad_probabilityUp = function (equipmentType) {
 
   const actor = $gameActors.actor($gameVariables.value(11));
+  if (!actor) return;
   let enemyDropChance = 10;
   if ($gameVariables.value(240) >= 1) {
     const item = $dataItems[$gameVariables.value(240)];
+    if (!item || !item.meta['EnemyLV']) return;
     const itemEnemyLVData = item.meta['EnemyLV'].split(',');
     enemyDropChance = Number(itemEnemyLVData[getRandomIndex(itemEnemyLVData.length)]);
   };
@@ -3764,95 +2916,113 @@ footpad_probabilityUp = function (id1) {
     drop_probability += actor.skillMasteryLevel(skillId) * 3;
   };
   if (drop_probability >= 90) {
-    drop_JobStateWAget(id1, enemyDropChance);
+    drop_JobStateWAget(equipmentType, enemyDropChance);
   };
 };
 
 //アイテムボックス開封
 item_itemBoxOpen = function (a, b, itemId) {
 
-  if (b.actorId() == a.actorId()) {
-    if ($gameSwitches.value(115)) {
-      $gameSwitches.setValue(115, false)
-      WindowManager.hide(0);
-    } else {
-      $gameSwitches.setValue(115, true);
-      $gameParty.loseItem($dataItems[itemId], 1);
+  const boxItem = $dataItems[itemId];
+  if (!boxItem) return;
+  if (b.actorId() != a.actorId()) return;
 
-      valueItemBoxOpen = `${$dataItems[itemId].name}の内訳（もう一度使用でウィンドウ閉じる）\n`;
-      let value17 = 0;
-      //var value18 = 0;
-      let value20 = !$dataItems[itemId].meta['SeiyokuItem'];
-      const itemTypeId = [0, 0, 0, 1, 0, 0, 2, 0];
+  // Using the box a second time closes the window again.
+  if ($gameSwitches.value(115)) {
+    $gameSwitches.setValue(115, false);
+    WindowManager.hide(0);
+    return;
+  }
 
+  $gameSwitches.setValue(115, true);
+  $gameParty.loseItem($dataItems[itemId], 1);
 
-      const arr2 = $dataItems[itemId].meta['ItemBag'].split(',');
-      const id2 = arr2[getRandomIndex(arr2.length)];
-      for (let id3 = 0; id3 <= id2; id3++) {
-        const id12 = itemTypeId[getRandomIndex(itemTypeId.length)];
-        valueItems = getItemEquipmentSource(id12);
+  if (!boxItem.meta['ItemBag']) return;
 
-        if ($dataItems[itemId].meta['HentaiBox']) {
-          valueItems = $dataItems;
-          value20 = $dataItems[itemId].meta['SeiyokuItem'];
-        };
-        const end = valueItems == $dataArmors ? valueArmorsLength : valueItems.length - 1;
-        const arr12 = [0];
-        for (let i = 1; i <= end; i++) {
-          let value19 = 0;
-          valueItem = valueItems[i];
-          if (valueItem.meta['GatchaOutOfRange']) {
-            value19 += 1;
-          };
-          const valueItemMaxItem = valueItem.meta['Max Item'];
-          if (valueItemMaxItem) {
-            if (Number(valueItemMaxItem) == 1 && $gameParty.hasItem(valueItem)) {
-              value19 += 1;
-            }
-          };
-          if (value19 == 0) {
-            if ($dataItems[itemId].meta['HentaiBox']) {
-              value20 = $dataItems[i].meta['SeiyokuItem'];
-            };
-            const valueItemLotteryRearity = valueItem.meta['LotteryRearity'];
-            if (valueItemLotteryRearity && value20) {
-              const valueItemLotteryRearityNum = Number(valueItemLotteryRearity);
-              const list = $dataItems[itemId].meta['ItemBagRearity'].split(',');
-              for (const id11 of list) {
-                if (id11 == valueItemLotteryRearityNum) {
-                  for (let j = 10; j >= valueItemLotteryRearityNum; j--) {
-                    arr12.push(i);
-                  };
-                };
-              }
-            };
-          };
-        };
-        valueDropItems = Number(arr12[getRandomIndex(arr12.length)]);
-        if (valueDropItems >= 1) {
-          let value16 = 1;
-          const valueItem = valueItems[valueDropItems];
-          if (id12 == 0) {
-            if (valueItem.price == 0) { value16 = 1 }
-            else if (valueItem.price <= 1000) { value16 = getRandomIndex(6) + 1 }
-            else if (valueItem.price <= 10000) { value16 = getRandomIndex(3) + 1 }
-          };
-          $gameParty.gainItem(valueItem, value16);
-          valueItemBoxOpen += `[\x1bI[${valueItem.iconIndex}]${valueItem.name}×${value16}]`;
-          value17 += 1;
-          if ((value17 % 3) == 0) { valueItemBoxOpen += `\n` };
-        };
-      };
-      WindowManager.show(0, 0, 0, 1280, 290);
-      if (value17 == 0) {
-        WindowManager.drawText(0, `${valueItemBoxOpen}中身は空だった…。`);
-      } else {
-        WindowManager.drawText(0, `${valueItemBoxOpen}`);
-      };
-    };
-  };
+  valueItemBoxOpen = `${boxItem.name}の内訳（もう一度使用でウィンドウ閉じる）\n`;
+  const openedItemCount = drawItemBoxContentsItemBoxOpen(boxItem);
 
+  WindowManager.show(0, 0, 0, 1280, 290);
+  if (openedItemCount == 0) {
+    WindowManager.drawText(0, `${valueItemBoxOpen}中身は空だった…。`);
+  } else {
+    WindowManager.drawText(0, `${valueItemBoxOpen}`);
+  }
 };
+
+// Draws the box contents into the valueItemBoxOpen global and returns how many
+// items the party actually gained.
+function drawItemBoxContentsItemBoxOpen(boxItem) {
+  const itemTypeId = [0, 0, 0, 1, 0, 0, 2, 0];
+  const itemBagValues = boxItem.meta['ItemBag'].split(',');
+  const drawCount = itemBagValues[getRandomIndex(itemBagValues.length)];
+  // Carried across draws on purpose: a HentaiBox rewrites it per candidate item.
+  let isSeiyokuItem = !boxItem.meta['SeiyokuItem'];
+  let openedItemCount = 0;
+
+  for (let drawIndex = 0; drawIndex <= drawCount; drawIndex++) {
+    const entryCategoryId = itemTypeId[getRandomIndex(itemTypeId.length)];
+    valueItems = getItemEquipmentSource(entryCategoryId);
+    if (boxItem.meta['HentaiBox']) {
+      valueItems = $dataItems;
+      isSeiyokuItem = boxItem.meta['SeiyokuItem'];
+    }
+
+    const end = valueItems == $dataArmors ? valueArmorsLength : valueItems.length - 1;
+    const candidates = collectItemBoxCandidatesItemBoxOpen(boxItem, valueItems, end, isSeiyokuItem);
+    isSeiyokuItem = candidates.isSeiyokuItem;
+
+    valueDropItems = Number(candidates.weightedItemIds[getRandomIndex(candidates.weightedItemIds.length)]);
+    if (valueDropItems < 1) continue;
+
+    const gainedItem = valueItems[valueDropItems];
+    let itemGainCount = 1;
+    if (entryCategoryId == 0) {
+      if (gainedItem.price <= 0) { itemGainCount = 1 }
+      else if (gainedItem.price <= 1000) { itemGainCount = getRandomIndex(6) + 1 }
+      else if (gainedItem.price <= 10000) { itemGainCount = getRandomIndex(3) + 1 }
+    }
+    $gameParty.gainItem(gainedItem, itemGainCount);
+    valueItemBoxOpen += `[\x1bI[${gainedItem.iconIndex}]${gainedItem.name}×${itemGainCount}]`;
+    openedItemCount += 1;
+    if ((openedItemCount % 3) == 0) { valueItemBoxOpen += `\n` };
+  }
+  return openedItemCount;
+}
+
+// Candidate item ids for one draw, weighted by <LotteryRearity>. The list always
+// starts with a 0, which is the "nothing dropped" outcome. NOTE: the caller
+// passes the cross-file `valueItems` scratch global; it is renamed here so the
+// parameter does not shadow it.
+function collectItemBoxCandidatesItemBoxOpen(boxItem, candidateItems, end, isSeiyokuItem) {
+  const weightedItemIds = [0];
+  for (let i = 1; i <= end; i++) {
+    const valueItem = candidateItems[i];
+    if (!valueItem) continue;
+    if (isExcludedItemBoxEntryItemBoxOpen(valueItem)) continue;
+    if (boxItem.meta['HentaiBox']) isSeiyokuItem = $dataItems[i].meta['SeiyokuItem'];
+
+    const lotteryRearity = valueItem.meta['LotteryRearity'];
+    if (!lotteryRearity || !isSeiyokuItem) continue;
+    const rarityNum = Number(lotteryRearity);
+    // A rarity named more than once in the list weights the entry more heavily,
+    // so each match pushes its own copy.
+    const rarityList = boxItem.meta['ItemBagRearity'].split(',');
+    for (const rarityValue of rarityList) {
+      if (rarityValue != rarityNum) continue;
+      for (let j = 10; j >= rarityNum; j--) weightedItemIds.push(i);
+    }
+  }
+  return { weightedItemIds, isSeiyokuItem };
+}
+
+// <GatchaOutOfRange> entries never drop, and <Max Item:1> entries are skipped
+// once the party already owns one.
+function isExcludedItemBoxEntryItemBoxOpen(valueItem) {
+  if (valueItem.meta['GatchaOutOfRange']) return true;
+  const maxItem = valueItem.meta['Max Item'];
+  return Number(maxItem) == 1 && $gameParty.hasItem(valueItem);
+}
 
 //アクターステートに応じて経験値Ｇレート設定
 actor_stateExpGoldRate = function () {
@@ -3867,11 +3037,11 @@ actor_stateExpGoldRate = function () {
       const rate = valueStatePartyRate[id];
       if (!$gameParty.membersState(rate)) continue;
       const stateRate = $dataStates[rate].meta[metaName];
-      if (stateRate) {
-        // here is using isExp boolean because int value like valueTotalgold is not reference type and if set them to array it will be new int objects 
-        if (isExp) valueTotalexp += Number(stateRate);
-        else valueTotalgold + Number(stateRate);
-      };
+      if (!stateRate) continue;
+      // NOTE: isExp is a boolean because valueTotalgold is a primitive — routing it
+      // through an array would box it into a fresh Number object.
+      if (isExp) valueTotalexp += Number(stateRate);
+      else valueTotalgold += Number(stateRate);
     };
   }
 };
@@ -3913,73 +3083,86 @@ party_SoroCombiAddRemove = function () {
 };
 
 //特殊なステートの時にダメージの計算式をバトルログに出力。
-attack_DamageFormula = function (user, target, id1) {
+attack_DamageFormula = function (user, target, skillId) {
 
-  const skill = $dataSkills[id1];
-  if ($gameSwitches.value(141)) {
-    const skillDamageFormulaData = skill.meta['DamageFormula2'].split(',');
-    damage = Math.max($attack1(Number(skillDamageFormulaData[0]), user, target,
-      Number(skillDamageFormulaData[1])) *
-      Number(skillDamageFormulaData[2]), user.mdf / 10);
-    const dmg = `\\C[10]${damage}\\C[0]`;
-    let text = `基礎ダメージ値:${dmg}`;
-    BattleManager._logWindow.push(`addText`, text);
-    let userAttackElements = user.attackElements();
-    if (skill.meta['Multiple Elements']) {
-      userAttackElements.push(...skill.meta['Multiple Elements'].split(','));
-    };
-    const skillDamageElementId = $dataSkills[1].damage.elementId;
-    if (skillDamageElementId >= 1) {
-      userAttackElements.push(skillDamageElementId);
-    };
+  if (!$gameSwitches.value(141)) return;
+  const skill = $dataSkills[skillId];
 
-    const prefix = `[属性] `
-    text = prefix;
-    for (let i = 0; i < userAttackElements.length; i++) {
-      const userAttackElement = userAttackElements[i];
-      let value3 = Math.round(valueAttackAmplifysActorId[user.actorId()][userAttackElement]);
-      value3 = value3 + Math.round(user.elementAmplifyRate(userAttackElement) * 100 + 100);
-      const value4 = Math.round(target.elementRate(userAttackElement) * 100);
-      amygame_elementIcon(userAttackElement);
-      if (value3 != 100 || value4 != 100) {
-        if (valueElementIconArr[1] != 1 || valueElementIconArr[1] != 16) {
-          text += `\x1bI[${valueElementIconArr[1]}]:${value3}-${value4} `;
-        }
-      };
-    };
-    if (text != prefix) {
-      BattleManager._logWindow.push(`addText`, text);
-    };
-    if (target.result().critical) {
-      text = `[会心発生！] 倍率${user.criticalMultiplierBonus() * 100}%`;
-      BattleManager._logWindow.push(`addText`, text);
-    };
-    text = `[分散値] ${$dataSkills[id1].damage.variance}`;
+  const skillDamageFormulaData = skill.meta['DamageFormula2'].split(',');
+  // BUGFIX: `damage` was assigned without a declaration, leaking a global.
+  const damage = Math.max($attack1(Number(skillDamageFormulaData[0]), user, target,
+    Number(skillDamageFormulaData[1])) *
+    Number(skillDamageFormulaData[2]), user.mdf / 10);
+  const dmg = `\\C[10]${damage}\\C[0]`;
+  let text = `基礎ダメージ値:${dmg}`;
+  BattleManager._logWindow.push(`addText`, text);
+
+  const userAttackElements = user.attackElements().slice();
+  if (skill.meta['Multiple Elements']) {
+    userAttackElements.push(...skill.meta['Multiple Elements'].split(','));
+  };
+  const skillDamageElementId = skill.damage.elementId;
+  if (skillDamageElementId >= 1) {
+    userAttackElements.push(skillDamageElementId);
+  };
+
+  const prefix = `[属性] `
+  text = prefix;
+  for (let i = 0; i < userAttackElements.length; i++) {
+    text += buildDamageElementTextAttackDamageFormula(user, target, userAttackElements[i]);
+  };
+  if (text != prefix) {
     BattleManager._logWindow.push(`addText`, text);
   };
+  if (target.result().critical) {
+    const critPercent = user.criticalMultiplierBonus() * 100;
+    text = `[会心発生！] 倍率${critPercent}%`;
+    BattleManager._logWindow.push(`addText`, text);
+  };
+  const skillDamageVar = $dataSkills[skillId].damage.variance;
+  text = `[分散値] ${skillDamageVar}`;
+  BattleManager._logWindow.push(`addText`, text);
 
 };
 
+// The "[属性] \x1bI[icon]:attackRate-targetRate " fragment for one element, or ''
+// when both rates are exactly 100.
+function buildDamageElementTextAttackDamageFormula(user, target, userAttackElement) {
+  let attackElementRatePct = Math.round(valueAttackAmplifysActorId[user.actorId()][userAttackElement]);
+  attackElementRatePct = attackElementRatePct + Math.round(user.elementAmplifyRate(userAttackElement) * 100 + 100);
+  const targetElementRatePct = Math.round(target.elementRate(userAttackElement) * 100);
+  // NOTE: amygame_elementIcon also assigns the global valueElementIconArr, so it
+  // is called unconditionally, exactly as the original did.
+  const elementIcon = amygame_elementIcon(userAttackElement);
+  if (attackElementRatePct == 100 && targetElementRatePct == 100) return '';
+  // NOTE: `!= 1 || != 16` can never be false, so this guard is inert. Kept as-is
+  // (see commit message) rather than guess which operator was meant.
+  if (elementIcon[1] != 1 || elementIcon[1] != 16) {
+    return `\x1bI[${elementIcon[1]}]:${attackElementRatePct}-${targetElementRatePct} `;
+  }
+  return '';
+}
+
 //ボス行動パターン設定
 boss_actionPattarn1 = function (a) {
+  const bossActionPattern = $gameVariables.value(346);
+  if (!bossActionPattern) return;
+  const isPredictionOn = $gameSwitches.value(470);
+  const triggers = scanBossActionTriggersBossActionPattarn1(a, isPredictionOn);
+  const selectedSkillId = resolveBossSelectedSkillBattleRefactor(a, bossActionPattern, triggers.selectedSkillId);
+  const bossActionId = chooseBossNormalActionBattleRefactor(a, bossActionPattern, triggers.chosenSkillId);
+  valueBossAction = selectedSkillId;
+  valueBossActionNormal = bossActionId;
+  if (!isPredictionOn) return;
+  if (valueBossAction >= 1) boss_actionPredict(valueBossAction, 1);
+  else boss_actionPredict(valueBossActionNormal, 2);
+};
 
-  const gameVar346 = $gameVariables.value(346);
-
-  let value11 = 0;
-  let value4 = 0;
-  let value2 = 0;
-
-  if (a.tp >= 100) {
-    if (a.isStateAffected(416)) {
-      value2 = gameVar346[3];
-    } else {
-      if (a.meetsSkillConditions($dataSkills[gameVar346[2]])) {
-        value11 = gameVar346[2];
-      }
-    }
-  }
-
-  const gameVar470 = $gameSwitches.value(470);
+// Scans the 15 boss-action trigger slots in variable 347. Returns the skill id
+// selected by an HP / MP / turn / state trigger and the one chosen by a
+// normal-attack change (type 4). Only the first match of each wins.
+function scanBossActionTriggersBossActionPattarn1(a, gameVar470) {
+  const result = { selectedSkillId: 0, chosenSkillId: 0 };
   for (let i = 1; i <= 15; i++) {//$dataSkills[id].tpCost
     const gameVar347i = $gameVariables.value(347)[i];
     if (!gameVar347i) continue;
@@ -3988,164 +3171,102 @@ boss_actionPattarn1 = function (a) {
     const stateId = gameVar347i[1];
     const skillId = gameVar347i[2];
     const skill = $dataSkills[skillId];
-    if (typeId == 0) {//HPトリガー
-      if (899 != skillId && a.hpRate() <= stateId / 100) {
-        if (!gameVar470 && skill.tpCost == 100) { a.gainTp(100) };
-        if (a.meetsSkillConditions(skill)) {
-          value11 = skillId;
-          break;
-        };
-      }
+    if (!skill) continue;
+
+    // type 4 swaps the normal attack and never grants TP.
+    if (typeId == 4 && a.hpRate() <= stateId / 100 && a.meetsSkillConditions(skill)) {//ＨＰによる通常攻撃変化
+      result.chosenSkillId = skillId;
+      break;
     }
-    else if (typeId == 1) {//MPトリガー
-      if (a.mpRate() <= stateId / 100) {
-        if (!gameVar470 && skill.tpCost == 100) { a.gainTp(100) };
-        if (a.meetsSkillConditions(skill)) {
-          value11 = skillId;
-          break;
-        };
-      }
-    }
-    else if (typeId == 2) {//ターン
-      if (($gameVariables.value(263) % stateId) == 0) {
-        if (!gameVar470 && skill.tpCost == 100) { a.gainTp(100) };
-        if (a.meetsSkillConditions(skill)) {
-          value11 = skillId;
-          break;
-        };
-      }
-    }
-    else if (typeId == 3) {//オーバードライブなどステートによる変化
-      if (a.isStateAffected(stateId)) {
-        if (!gameVar470 && skill.tpCost == 100) { a.gainTp(100) };
-        if (a.meetsSkillConditions(skill)) {
-          value11 = skillId;
-          break;
-        };
-      }
-    }
-    else if (typeId == 4) {//ＨＰによる通常攻撃変化
-      if (a.hpRate() <= stateId / 100) {
-        if (a.meetsSkillConditions(skill)) {
-          value4 = skillId;
-          break;
-        };
-      }
-    }
+    if (typeId == 4) continue;
+
+    if (!isBossActionTriggeredBossActionPattarn1(a, typeId, stateId, skillId)) continue;
+    if (!gameVar470 && skill.tpCost == 100) a.gainTp(100);
+    if (!a.meetsSkillConditions(skill)) continue;
+    result.selectedSkillId = skillId;
+    break;
   }
+  return result;
+}
 
-  let arr1 = [gameVar346[0], gameVar346[3], gameVar346[4], gameVar346[5], gameVar346[6]];
-  value2 = arr1[getRandomIndex(arr1.length)];
-  if (value2 == 0) {
-    value2 = gameVar346[0];
-  };
-  if (value4 >= 1) {
-    value2 = value4;
-  };
-  const value3 = value2;
-  let value1 = getRandomIndex(11);
-  if (a.isStateAffected(29) && $dataSkills[gameVar346[0]].meta['Select Conditions']) {
-    value1 += 2;//前衛アタック持ちが後衛の時にアビリティ使用確立アップ
-  };
-  if (value1 >= 5) {
-    arr1 = [gameVar346[1], gameVar346[7], gameVar346[8], gameVar346[9]];
-    for (let i = 1; i <= 10; i++) {
-      value2 = arr1[getRandomIndex(arr1.length)];
-      if (value2 == 0) {
-        value2 = gameVar346[1];
-      };
-      if (a.meetsSkillConditions($dataSkills[value2])) {
-        break;
-      };
-    };
+// The per-type trigger test: 0 HP, 1 MP, 2 turn count, 3 state.
+function isBossActionTriggeredBossActionPattarn1(a, typeId, stateId, skillId) {
+  switch (typeId) {
+    case 0: return 899 != skillId && a.hpRate() <= stateId / 100;//HPトリガー
+    case 1: return a.mpRate() <= stateId / 100;//MPトリガー
+    case 2: return ($gameVariables.value(263) % stateId) == 0;//ターン
+    case 3: return a.isStateAffected(stateId);//オーバードライブなどステートによる変化
   }
+  return false;
+}
 
-  let value12 = value2;
-  if (value11 >= 1) {
-    if (!a.meetsSkillConditions($dataSkills[value11])) {
-      value11 = 0;
-    };
-  };
-  if (!a.meetsSkillConditions($dataSkills[value12])) {
-    value12 = value3;
-  };
-  if ([101, 111, 121, 131, 141, 151, 161, 171, 181, 191, 901, 911, 921].some(function (id) { return value12 == id })) {
-    value1 = getRandomIndex(101);
-    if (a.level >= 30 && value1 >= 51) { value12 += 1 };
-    value1 = getRandomIndex(101);
-    if (a.level >= 50 && value1 >= 51) { value12 += 1 };
-    value1 = getRandomIndex(101);
-    if (a.level >= 100 && value1 >= 51) { value12 += 1 };
-  };
-
-  valueBossAction = value11;
-  valueBossActionNormal = value12;
-  if (gameVar470) {
-    if (valueBossAction >= 1) {
-      boss_actionPredict(valueBossAction, 1);
-    } else {
-      boss_actionPredict(valueBossActionNormal, 2);
-    };
-  };
-};
+// Rolls up to 10 times for a candidate whose skill conditions are met. When none
+// matches, the last roll is kept (which is what the original loop did too).
+function pickBossActionSkillBossActionPattarn1(a, candidateSkillIds, fallbackId) {
+  let candidateSkillId = 0;
+  for (let i = 1; i <= 10; i++) {
+    candidateSkillId = candidateSkillIds[getRandomIndex(candidateSkillIds.length)];
+    if (candidateSkillId == 0) candidateSkillId = fallbackId;
+    if ($dataSkills[candidateSkillId] && a.meetsSkillConditions($dataSkills[candidateSkillId])) break;
+  }
+  return candidateSkillId;
+}
 
 //ボス行動コモン内予測計算
-boss_actionPredict = function (value1, id1) {
+boss_actionPredict = function (predictedSkillId, predictionModeId) {
 
-  var value3 = 777;//
+  var masteryCheckSkillId = 777;//
   var enemy1 = $gameTroop.members()[0];
+  if (!enemy1) return;
   var actor = $gameActors.actor($gameVariables.value(2));
-  var value5 = actor.skillMasteryLevel(value3) * 10;
-  var value2 = 1;
-  if (id1 == 1) {
-    if (actor.isStateAffected(292)) {
-      if (value5 + actor.level > enemy1.level) {
-        //if(true){
-        var value2 = `${enemy1.name()}は\x1bSIN[${value1}]を発動するようだ…。`;
-      } else {
-        var value2 = `${enemy1.name()}の力が強大な為、行動を予測する事が出来ない…。`;
-      };
-    } else {
-      var value2 = `${enemy1.name()}から大きな力の予兆を感じる…。。`;
-    };
-    if (value2 == 1) { } else {
-      BattleManager._logWindow.push(`addText`, value2);
-    };
+  if (!actor) return;
+  var masteryBonus = actor.skillMasteryLevel(masteryCheckSkillId) * 10;
+  let predictionMessage = 1;
+  var enemyName = enemy1.name();
+  if (predictionModeId == 1) {
+    predictionMessage = buildActionPredictionMessageBossActionPredict(
+      actor, enemy1, enemyName, predictedSkillId, masteryBonus,
+      '発動するようだ', `${enemyName}から大きな力の予兆を感じる…。。`);
+    if (predictionMessage != 1) BattleManager._logWindow.push(`addText`, predictionMessage);
   };
-  if (id1 == 2) {
-    if (actor.isStateAffected(292)) {
-      if (value5 + actor.level > enemy1.level) {
-        //if(true){
-        var value2 = `${enemy1.name()}は\x1bSIN[${value1}]を使用するようだ…。`;
-      } else {
-        var value2 = `${enemy1.name()}の力が強大な為、行動を予測する事が出来ない…。`;
-      };
-      if (value2 == 1) { } else {
-        BattleManager._logWindow.push(`addText`, value2);
-      };
-    };
+  if (predictionModeId == 2) {
+    // Mode 2 stays silent when the actor is not affected by state 292, which is
+    // expressed here by leaving predictionMessage at its 1 sentinel.
+    predictionMessage = buildActionPredictionMessageBossActionPredict(
+      actor, enemy1, enemyName, predictedSkillId, masteryBonus, '使用するようだ', 1);
+    if (predictionMessage != 1) BattleManager._logWindow.push(`addText`, predictionMessage);
   };
 };
+
+// Builds the boss-action prediction line, or returns `unaffectedMessage` when the
+// actor lacks state 292. Callers pass the sentinel 1 to mean "say nothing".
+function buildActionPredictionMessageBossActionPredict(actor, enemy, enemyName, predictedSkillId, masteryBonus, verbPhrase, unaffectedMessage) {
+  if (!actor.isStateAffected(292)) return unaffectedMessage;
+  if (masteryBonus + actor.level > enemy.level) {
+    const skillName = `\x1bSIN[${predictedSkillId}]`;
+    return `${enemyName}は${skillName}を${verbPhrase}…。`;
+  }
+  return `${enemyName}の力が強大な為、行動を予測する事が出来ない…。`;
+}
 
 //エネミー仲間呼びスキル
 enemy_reinforcement = function () {
 
-  let value1 = false;
-  let value2 = 0;
+  let reinforcementFound = false;
+  let reinforcementIndex = 0;
   const enemies = $gameTroop.members();
   for (let i = 0, size = enemies.length; i < size; i++) {
-    if (!enemies[i].isAppeared()) {
-      this.iterateEnemyIndex(i, function (enemy) {
-        enemy.appear();
-        $gameTroop.makeUniqueNames();
-      });
-      value1 = true;
-      value2 = i;
-      break;
-    }
+    if (enemies[i].isAppeared()) continue;
+    this.iterateEnemyIndex(i, function (enemy) {
+      enemy.appear();
+      $gameTroop.makeUniqueNames();
+    });
+    reinforcementFound = true;
+    reinforcementIndex = i;
+    break;
   }
-  if (value1 == true) {
-    const enemyId = $gameTroop.members()[value2]._enemyId;
+  if (reinforcementFound == true) {
+    const enemyId = $gameTroop.members()[reinforcementIndex]._enemyId;
     $gameVariables.setValue(21, $dataEnemies[enemyId].name);
     if ($gameVariables.value(240) >= 1) {
       enemy_battleSetting($gameVariables.value(334));
@@ -4161,191 +3282,174 @@ enemy_reinforcement = function () {
 skill_additionalSet = function (user, target) {
 
   //<additionalSet1:1,1,2,206,651>
-  if ($gameTroop.aliveMembers().length >= 1 && target.isAlive()) {
-    var list = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-    list.forEach(function (id) {
-      if ($dataSkills[$gameVariables.value(96)].meta['additionalSet' + id]) {
-        var arr1 = $dataSkills[$gameVariables.value(96)].meta['additionalSet' + id].split(',');
-        if (Number(arr1[4]) >= 1) {
-          if (Number(arr1[1]) == 1) {
-            var actor = $gameActors.actor($gameVariables.value(20));
-            actor.startAnimation(Number(arr1[4]), true, 1);
-          };
-          if (Number(arr1[1]) == 2) {
-            var actor = $gameActors.actor($gameVariables.value(20));
-            if ($dataAnimations[Number(arr1[4])].position() == 3) {
-              actor.startAnimation(Number(arr1[4]), true, 1);
-            } else {
-              for (var i = 0; i < $gameParty.battleMembers().length; i++) {
-                var actor = $gameParty.battleMembers()[i];
-                if (actor.isAlive()) {
-                  actor.startAnimation(Number(arr1[4]), true, 1);
-                };
-              };
-            };
-          };
-          if (Number(arr1[1]) == 3) {
-            var target1 = $gameTroop.members()[$gameVariables.value(92)];
-            target1.startAnimation(Number(arr1[4]), true, 1);
-          };
-          if (Number(arr1[1]) == 4) {
-            var target1 = $gameTroop.members()[$gameVariables.value(92)];
-            if ($dataAnimations[Number(arr1[4])].position() == 3) {
-              target1.startAnimation(Number(arr1[4]), true, 1);
-            } else {
-              for (var i = 0; i < $gameTroop.members().length; i++) {
-                var target1 = $gameTroop.members()[i];
-                target1.startAnimation(Number(arr1[4]), true, 1);
-              };
-            };
-          };
-        };
-        if (Number(arr1[1]) == 1) {//ステート付与
-          if (Number(arr1[0]) == 1) {
-            var actor = $gameActors.actor($gameVariables.value(20));
-            for (var i = 1; i <= Number(arr1[2]); i++) {
-              if (Number(arr1[3]) == 201) {
-                for (var j = 206; j <= 211; j++) {
-                  actor.addState(j);
-                };
-              } else {
-                actor.addState(Number(arr1[3]));
-              };
-            };
-          };
-          if (Number(arr1[0]) == 2) {
-            for (var i = 0; i < $gameParty.battleMembers().length; i++) {
-              var actor = $gameParty.battleMembers()[i];
-              if (actor.isAlive()) {
-                if (Number(arr1[3]) == 201) {
-                  for (var j = 206; j <= 211; j++) {
-                    actor.addState(j);
-                  };
-                } else {
-                  actor.addState(Number(arr1[3]));
-                };
-              };
-            };
-          };
-          if (Number(arr1[0]) == 3) {
-            var target1 = $gameTroop.members()[$gameVariables.value(92)];
-            if (target1.isAlive()) {
-              for (var i = 1; i <= Number(arr1[2]); i++) {
-                if (Number(arr1[3]) == 201) {
-                  for (var j = 206; j <= 211; j++) {
-                    state_addFormula1([j, 50, user, target1, user.mdf, target1.luk]);
-                  };
-                } else {
-                  state_addFormula1([Number(arr1[3]), 50, user, target1, user.mdf, target1.luk]);
-                };
-              };
-            };
-          };
-          if (Number(arr1[0]) == 4) {
-            for (var i = 0; i < $gameTroop.members().length; i++) {
-              var target1 = $gameTroop.members()[i];
-              if (target1.isAlive()) {
-                if (Number(arr1[3]) == 201) {
-                  for (var j = 206; j <= 210; j++) {
-                    state_addFormula1([j, 50, user, target1, user.mdf, target1.luk]);
-                  };
-                } else {
-                  state_addFormula1([Number(arr1[3]), 50, user, target1, user.mdf, target1.luk]);
-                };
-              };
-            };
-          };
-        };
-      };
-    }, this);
-  };
+  if ($gameTroop.aliveMembers().length < 1 || !target.isAlive()) return;
+
+  const skillMeta = $dataSkills[$gameVariables.value(96)].meta;
+  for (let id = 1; id <= 9; id++) {
+    const additionalSet = skillMeta['additionalSet' + id];
+    if (!additionalSet) continue;
+    applyAdditionalSetEntrySkillAdditionalSet(user, additionalSet.split(','));
+  }
 
 };
 
-//スキル名表示。id2はid1が2の場合のみ名前を入れておく
-skillWord_direction = function (id1, id2) {
+// One <additionalSetN:...> entry. [1] selects the animation recipients, [4] the
+// animation; the state grant only happens when [1] is 1, and is then routed by
+// [0].
+function applyAdditionalSetEntrySkillAdditionalSet(user, values) {
+  const recipientSelector = Number(values[1]);
+  const animationId = Number(values[4]);
+  if (animationId >= 1) playAdditionalSetAnimationSkillAdditionalSet(user, recipientSelector, animationId);
+  if (recipientSelector != 1) return;//ステート付与
+  grantAdditionalSetStateSkillAdditionalSet(user, Number(values[0]), Number(values[2]), Number(values[3]));
+}
 
-  let value3 = 384 - 310;
-  if (id1 == 2) {
-    if ($gameParty.inBattle()) {
-      if ($gameSwitches.value(211)) {
-        $gameTemp._battler_bhp_temp[2] = true;
-      } //else {
-      //$gameSystem.setTurnOrderDisplaySettings(false);
-      //BattleManager.updateTurnOrderDisplayX();
-      //};
-    };
+// Recipients: 1 = user only, 2 = all allies, 3 = the enemy in variable 92,
+// 4 = all enemies. Positions of 3 mean "on the target", so the whole side is hit.
+function playAdditionalSetAnimationSkillAdditionalSet(user, recipientSelector, animationId) {
+  if (recipientSelector == 1) {
+    $gameActors.actor($gameVariables.value(20)).startAnimation(animationId, true, 1);
+    return;
+  }
+  if (recipientSelector == 2) {
+    const actor = $gameActors.actor($gameVariables.value(20));
+    if ($dataAnimations[animationId].position == 3) {
+      actor.startAnimation(animationId, true, 1);
+      return;
+    }
+    for (const member of $gameParty.battleMembers()) {
+      if (member.isAlive()) member.startAnimation(animationId, true, 1);
+    }
+    return;
+  }
+  if (recipientSelector == 3) {
+    $gameTroop.members()[$gameVariables.value(92)].startAnimation(animationId, true, 1);
+    return;
+  }
+  if (recipientSelector == 4) {
+    const battler = $gameTroop.members()[$gameVariables.value(92)];
+    if ($dataAnimations[animationId].position == 3) {
+      battler.startAnimation(animationId, true, 1);
+      return;
+    }
+    for (const member of $gameTroop.members()) {
+      member.startAnimation(animationId, true, 1);
+    }
+  }
+}
+
+// State grant. `recipient` is values[0] (1 user / 2 all allies / 3 one enemy /
+// 4 all enemies), `grantCount` is values[2] and `stateId` is values[3]. State id
+// 201 is shorthand for the 206..211 range. Note the four branches differ on
+// purpose: 2 and 4 grant once per battler, and 4 uses the shorter 206..210 range.
+function grantAdditionalSetStateSkillAdditionalSet(user, recipient, grantCount, stateId) {
+  if (recipient == 1) {
+    const actor = $gameActors.actor($gameVariables.value(20));
+    for (let i = 1; i <= grantCount; i++) {
+      if (stateId == 201) { for (let j = 206; j <= 211; j++) actor.addState(j); }
+      else actor.addState(stateId);
+    }
+    return;
+  }
+  if (recipient == 2) {
+    for (const actor of $gameParty.battleMembers()) {
+      if (!actor.isAlive()) continue;
+      if (stateId == 201) { for (let j = 206; j <= 211; j++) actor.addState(j); }
+      else actor.addState(stateId);
+    }
+    return;
+  }
+  if (recipient == 3) {
+    const battler = $gameTroop.members()[$gameVariables.value(92)];
+    if (!battler.isAlive()) return;
+    for (let i = 1; i <= grantCount; i++) {
+      if (stateId == 201) { for (let j = 206; j <= 211; j++) state_addFormula1([j, 50, user, battler, user.mdf, battler.luk]); }
+      else state_addFormula1([stateId, 50, user, battler, user.mdf, battler.luk]);
+    }
+    return;
+  }
+  if (recipient == 4) {
+    for (const battler of $gameTroop.members()) {
+      if (!battler.isAlive()) continue;
+      if (stateId == 201) { for (let j = 206; j <= 210; j++) state_addFormula1([j, 50, user, battler, user.mdf, battler.luk]); }
+      else state_addFormula1([stateId, 50, user, battler, user.mdf, battler.luk]);
+    }
+  }
+}
+
+//スキル名表示。id2はid1が2の場合のみ名前を入れておく
+skillWord_direction = function (displayModeId, messageText) {
+
+  let pictureY = 384 - 310;
+  if (displayModeId == 2) {
+    setBattlerBhpTempSkillWordDirection(true);
     $gameScreen.dWindowFrame = 'ON';
     $gameScreen.dTextAlign = 1;
-    $gameScreen.setDTextPicture(`${id2}`, 28);
-    $gameScreen.showPicture(100, "", 1, 640 + 50, value3, 100, 100, 0, 0);
-    $gameScreen.movePicture(100, 1, 640, value3, 100, 100, 255, 0, 30);
+    $gameScreen.setDTextPicture(`${messageText}`, 28);
+    $gameScreen.showPicture(100, "", 1, 640 + 50, pictureY, 100, 100, 0, 0);
+    $gameScreen.movePicture(100, 1, 640, pictureY, 100, 100, 255, 0, 30);
   };
-  if (id1 == 0) {
-    if ($gameParty.inBattle()) {
-      if ($gameSwitches.value(211)) {
-        $gameTemp._battler_bhp_temp[2] = true;
-      } else {
-        //$gameSystem.setTurnOrderDisplaySettings(false);
-        //BattleManager.updateTurnOrderDisplayX();
-      };
-    };
-    let skill96Ruby = $dataSkills[$gameVariables.value(96)].meta['rubi'];
+  if (displayModeId == 0) {
+    setBattlerBhpTempSkillWordDirection(true);
+    const skill96Ruby = stripSpacesSkillWordDirection($dataSkills[$gameVariables.value(96)].meta['rubi']);
     if (skill96Ruby) {
-      for (let i = 1; i <= 10; i++) {
-        if (skill96Ruby.match(/ /)) {
-          skill96Ruby = skill96Ruby.replace(' ', '');
-        };
-      };
-      value3 += 40;
+      pictureY += 40;
       $gameScreen.setDTextPicture(`${skill96Ruby}`, 20);
     };
     $gameScreen.dWindowFrame = 'ON';
     $gameScreen.dTextAlign = 1;
     $gameScreen.setDTextPicture(`${$gameVariables.value(527)}`, 28);
-    $gameScreen.showPicture(100, "", 1, 640 + 50, value3, 100, 100, 0, 0);
-    $gameScreen.movePicture(100, 1, 640, value3, 100, 100, 255, 0, 30);
+    $gameScreen.showPicture(100, "", 1, 640 + 50, pictureY, 100, 100, 0, 0);
+    $gameScreen.movePicture(100, 1, 640, pictureY, 100, 100, 255, 0, 30);
   } else {
-    if ($gameParty.inBattle()) {
-      if ($gameSwitches.value(211)) {
-        $gameTemp._battler_bhp_temp[2] = false;
-      } //else {
-      //$gameSystem.setTurnOrderDisplaySettings(true);
-      //};
-    };
-    if ($gameScreen.picture(100)) $gameScreen.movePicture(100, 1, 640 - 50, value3, 100, 100, 0, 0, 60);
+    // NOTE: displayModeId 2 also lands here, so its picture is moved out again
+    // immediately after being shown above. Preserved as-is.
+    setBattlerBhpTempSkillWordDirection(false);
+    if ($gameScreen.picture(100)) $gameScreen.movePicture(100, 1, 640 - 50, pictureY, 100, 100, 0, 0, 60);
   };
 
 };
 
-//奥義名表示
-ougiWord_direction = function (id1) {
+// Strips up to 10 spaces out of a <rubi:...> meta value. The loop is bounded, so
+// a longer run keeps its tail spaces - matching the original.
+function stripSpacesSkillWordDirection(text) {
+  if (!text) return text;
+  for (let i = 1; i <= 10; i++) {
+    if (text.match(/ /)) text = text.replace(' ', '');
+  }
+  return text;
+}
 
-  if (id1 == 0) {
-    if (BattleManager._subject.isActor()) {
-      var user = $gameActors.actor($gameVariables.value(20)).index();
-    } else {
-      var user = $gameVariables.value(92);
-    };
-    var value1 = `\x1bSIN[${$gameVariables.value(96)}]`;
+// Toggles the turn-order flag the skill-name picture depends on.
+function setBattlerBhpTempSkillWordDirection(value) {
+  if (!$gameParty.inBattle()) return;
+  if (!$gameSwitches.value(211)) return;
+  $gameTemp._battler_bhp_temp[2] = value;
+}
+
+//奥義名表示
+ougiWord_direction = function (displayModeId) {
+
+  if (displayModeId == 0) {
+    if (!BattleManager._subject) return;
+    // Actor subjects are indexed by their party position, enemies by variable 92.
+    const user = BattleManager._subject.isActor()
+      ? $gameActors.actor($gameVariables.value(20)).index()
+      : $gameVariables.value(92);
+    let skillDisplayName = `\x1bSIN[${$gameVariables.value(96)}]`;
     if (valueAddPowerCustom >= 1) {
-      value1 += `＜\\I[666]\\C[10]+${valueAddPowerCustom}\\C[0]＞`
+      skillDisplayName += `＜\\I[666]\\C[10]+${valueAddPowerCustom}\\C[0]＞`
     };
     if (valueChainAddPower >= 1) {
-      value1 += `＜\\C[10]Chain+${valueChainAddPower}\\C[0]＞`
+      skillDisplayName += `＜\\C[10]Chain+${valueChainAddPower}\\C[0]＞`
     };
-    if ($dataSkills[$gameVariables.value(96)].meta['rubi']) {
-      var value2 = $dataSkills[$gameVariables.value(96)].meta['rubi'];
-      for (var i = 1; i <= 10; i++) {
-        if (value2.match(/ /)) {
-          var value2 = value2.replace(' ', '');
-        };
-      };
-      $gameScreen.setDTextPicture(`${value2}`, 20);
+    const skillRubiText = stripSpacesSkillWordDirection($dataSkills[$gameVariables.value(96)].meta['rubi']);
+    if (skillRubiText) {
+      $gameScreen.setDTextPicture(`${skillRubiText}`, 20);
     };
     $gameScreen.dWindowFrame = 'ON';
     $gameScreen.dTextAlign = 1;
-    $gameScreen.setDTextPicture(`${value1}`, 28);
+    $gameScreen.setDTextPicture(`${skillDisplayName}`, 28);
     if (BattleManager._subject.isActor()) {
       $gameScreen.showPicture(100, "", 1, $gameParty.getX(user + 1), $gameParty.getY(user + 1) - 200, 100, 100, 0, 0);
       $gameScreen.movePicture(100, 1, $gameParty.getX(user + 1), $gameParty.getY(user + 1) - 250, 100, 100, 255, 0, 20);
@@ -4367,21 +3471,6 @@ cutin_preparation = function (cutinCategory, actorId) {
   //スキル90
   //チェイン180
   //会話-90
-  //if (actorId >= 1) {
-  //  const actor = $gameActors.actor(actorId);
-  //};
-  //if (cutinCategory == 0) {
-    //const action = BattleManager._action;
-    //const itemId = BattleManager._action._item._itemId;
-    //if ($dataSkills[itemId].meta["CutInSkillSet"]) {
-      //const enemyId = $gameTroop.members()[$gameVariables.value(92)]._enemyId;
-      //if ($dataEnemies[enemyId].meta[`Passive State`]) {
-        //const passiveStateId = Number($dataEnemies[enemyId].meta[`Passive State`]) - 420;
-      //};
-      //const cgAssetName = 'CutInCG_EnemyEntry' + passiveStateId; 
-      //valueCutInSet1 = ["カットインエネミースキル", cgAssetName, 0, 4.5, 4.5, 25, 40];
-    //};
-  //};
 
   // Modified switch block using the helper functions with "CutinPreparation" suffix
   switch (cutinCategory) {
@@ -4425,86 +3514,14 @@ const cutinSettingsMap = {
   5: cutinSettingsV4V5
 };
 function handleCutinCategory1CutinPreparation(actorId) {
-  // Cache references and values to reduce property lookups
   const actor = $gameActors.actor(actorId);
-  const abilityUsageDistinction = $gameVariables.value(182);
-  const dataActor = actor.actor();
-  
-  // Initialize with defaults
-  let cutinType = 0;
-  let skillId;
-  
-  // Determine skill ID and cutin type based on ability usage distinction
-  if (abilityUsageDistinction == 13) {
-    skillId = 91;
-    cutinType = 4;
-  } else {
-    skillId = BattleManager._action._item._itemId;
-  }
-
-  if (abilityUsageDistinction == 12) {
-    // Check for special cutin settings in skill metadata
-    const skill = $dataSkills[skillId];
-    if (skill && skill.meta["CutInSkillSet"]) {
-      cutinType = 2;
-    }
-    else {
-      cutinType = 1;
-    }
-  }
-  //else{
-    //if (skill && skill.meta["CutInSkillSet"] && [5, 6, 7, 8].some(function(id) { return abilityUsageDistinction == id; })) {
-    //  $gameVariables.setValue(21, 2);
-    //}
-  //}
-  
-  
-  // Exit early if no cutin needed
+  if (!actor) return;
+  const actorData = actor.actor();
+  const cutinType = resolveCutinTypeBattleRefactor($gameVariables.value(182));
   if (cutinType < 1) return;
-  
-  // Play background music for special cutin types
-  if (cutinType === 2) {
-    const bgmName = $dataSkills[$gameVariables.value(96)].meta['HiQualityBurst'] ? 
-                    "21_BattleOugiBest" : "21_BattleOugi";
-    AudioManager.playBgm({ name: bgmName, volume: 50, pitch: 110, pan: 0 });
-  }
-  
-  // Display character dialogue if available
-  const ougiUseMeta = dataActor.meta['OugiUse'];
-  if (ougiUseMeta) {
-    const ougiUseOptions = ougiUseMeta.split(',');
-    const selectedOption = ougiUseOptions[getRandomIndex(ougiUseOptions.length)];
-    gabWord_exeScriptNoFace([[`${actor.name()}${selectedOption}`, 0, 0]]);
-  }
-  
-  // Apply heroine-specific modifications
-  if (dataActor.meta['Heroine']) {
-    const heroineExposure = $gameVariables.value(actorId + 380)[4];
-    
-    // Adjust cutinType based on exposure level
-    if (heroineExposure <= 5) {
-      if (cutinType === 2) cutinType = 3;
-      else if (cutinType === 4) cutinType = 5;
-    }
-    
-    // Define cutin settings based on type - use lookup table for better performance
-    const cutinSettings = cutinSettingsMap[cutinType];    
-    if (cutinSettings) {
-      const actorCgAsset = 'CutInCG_Actor' + actorId + '_' + cutinType;
-      const actorCutinLabel = 'カットインアクター' + cutinSettings.name;
-      
-      // Set the global cutin parameters in a single operation
-      valueCutInSet1 = [
-        actorCutinLabel,
-        actorCgAsset,
-        cutinSettings.angle,
-        cutinSettings.scaleX,
-        cutinSettings.scaleY,
-        cutinSettings.opacity,
-        cutinSettings.duration
-      ];
-    }
-  }
+  if (cutinType === 2) playOugiBgmCutinPreparation(actorData);
+  speakOugiUseLineCutinPreparation(actor, actorData);
+  if (actorData.meta.Heroine) applyHeroineCutinCutinPreparation(actorId, cutinType);
 }
 
 function handleCutinCategory2CutinPreparation() {
@@ -4619,11 +3636,13 @@ function sdp1ClearSummonParticles() {
 
 // Animates the summon picture fading out
 function sdp1AnimateSummonPictureFadeOut(pictureId) {
-  const picOrigin = $gameScreen.picture(pictureId).origin();
-  const picX = $gameScreen.picture(pictureId).x();
-  const picY = $gameScreen.picture(pictureId).y();
-  const picScaleX = $gameScreen.picture(pictureId).scaleX();
-  const picScaleY = $gameScreen.picture(pictureId).scaleY();
+  const picture = $gameScreen.picture(pictureId);
+  if (!picture) return;
+  const picOrigin = picture.origin();
+  const picX = picture.x();
+  const picY = picture.y();
+  const picScaleX = picture.scaleX();
+  const picScaleY = picture.scaleY();
 
   $gameScreen.movePicture(pictureId, picOrigin, picX, picY, picScaleX, picScaleY + 100, 0, 0, 60);
   picture_fade1(pictureId, "fadeOut", 'Hscene005', 60, 5);
@@ -4666,6 +3685,7 @@ function sdp1PlaySummonAppearanceEffects() {
 
 // Shows the summon picture with appropriate positioning and animation
 function sdp1ShowSummonPicture(pictureId, skill) {
+  if (!skill || !skill.meta['picSize']) return;
   const picSizeArr = skill.meta['picSize'].split(',');
   const picturePath = "/img/sv_enemies/Summon_" + Number(picSizeArr[0]);
   const offsetX = Number(picSizeArr[1]);
@@ -4678,6 +3698,7 @@ function sdp1ShowSummonPicture(pictureId, skill) {
 
 // Configures particle effects for the summon based on skill properties
 function sdp1ConfigureSummonParticles(skill) {
+  if (!skill || !skill.meta['picSize']) return;
   const particle = $gameScreen._particle;
   const picSizeArr = skill.meta['picSize'].split(',');
 
@@ -4739,8 +3760,10 @@ function sdp1ApplySummonElementColors(particle, skill) {
 
 // Handles displaying the skill name for a summon
 function sdp1HandleSummonSkillDisplay(pictureId) {
-  const picX2 = $gameScreen.picture(pictureId).x();
-  const picY2 = $gameScreen.picture(pictureId).y();
+  const picture = $gameScreen.picture(pictureId);
+  if (!picture) return;
+  const picX2 = picture.x();
+  const picY2 = picture.y();
 
   // Play animation at the picture's position
   $gameScreen.startAnimation(picX2, picY2, 301, false);
@@ -4752,6 +3775,7 @@ function sdp1HandleSummonSkillDisplay(pictureId) {
 // Displays the skill name with optional ruby text above it
 function sdp1DisplaySummonSkillName(pictureId, xPosition) {
   const currentSkill = $dataSkills[$gameVariables.value(96)];
+  if (!currentSkill) return;
   const displayText = `\x1bSIN[${$gameVariables.value(96)}]`;
 
   // Set up optional ruby text if available
@@ -4769,7 +3793,7 @@ function sdp1DisplaySummonSkillName(pictureId, xPosition) {
 
 // Prepares ruby text for a skill if available
 function sdp1SetupSummonRubyText(skill) {
-  if (!skill.meta['rubi']) return;
+  if (!skill || !skill.meta['rubi']) return;
 
   let rubiText = skill.meta['rubi'];
   // Remove spaces from ruby text
@@ -4824,10 +3848,7 @@ enemy_preSetup1 = function (eventId) {
   if ($gameVariables.value(329) == 0) {
     if ($gameSwitches.value(41) || $gameSwitches.value(99)) {
       battle_simpleSubjugation(eventId);
-      if ($gameSwitches.value(98)) {
-        valueVictoryResult = 0;
-        $gameSwitches.setValue(98, false);
-      }
+      if ($gameSwitches.value(98)) { valueVictoryResult = 0; $gameSwitches.setValue(98, false); }
     }
     if ($gamePlayer.isFacingAway($gameMap.event(eventId)) && $gameMap.event(eventId).isPositionBackOf($gamePlayer)) {
       BattleManager._forceAdvantage = 'Player';
@@ -4854,6 +3875,7 @@ battle_simpleSubjugation = function (subjugationId) {
   // Skip level check if force subjugation is active
   if (!isForceSubjugation) {
     const battleItem = $dataItems[$gameVariables.value(240)];
+    if (!battleItem || !battleItem.meta['EnemyLV']) return;
     const enemyLvArray = battleItem.meta['EnemyLV'].split(',');
     
     // Find max level in a single pass
@@ -4864,7 +3886,9 @@ battle_simpleSubjugation = function (subjugationId) {
     }
     
     // Early return if actor level is insufficient
-    const actorLevel = $gameActors.actor($gameVariables.value(11)).level;
+    const levelActor = $gameActors.actor($gameVariables.value(11));
+    if (!levelActor) return;
+    const actorLevel = levelActor.level;
     if (actorLevel < maxEnemyLv) return;
   }
   
@@ -4879,43 +3903,46 @@ battle_simpleSubjugation = function (subjugationId) {
   }
 };
 
-//state_addbuffdebuff(1,2,user,target,stateId,271);
-state_addbuffdebuff = function (id5, id6, id1, id2, id3, id4) {
+// Renamed from state_addbuffdebuff (and state_removebuffdebuff /
+// state_turnEndbuffdebuff below) so the compound words are readable. Called
+// from the <Custom Apply Effect> / <Custom Remove Effect> notetags of the
+// 206-217 stat-up/down states in data/states.json.
+//state_addBuffDebuff(1,2,user,target,stateId,271);
+state_addBuffDebuff = function (isBuff, requestedBuffParamId, user, target, stateId, animationId) {
 
-  var value1 = id6;
+  var buffParamId = requestedBuffParamId;
   var turns = getRandomIndex(3) + 3;
-  if (id5 == 1) {
-    id2.addBuff(value1, turns);
+  if (isBuff == 1) {
+    target.addBuff(buffParamId, turns);
   } else {
-    id2.addDebuff(value1, turns);
+    target.addDebuff(buffParamId, turns);
   };
-  if (id2._stateCounter[id3] >= 5) { } else {
-    state_addEffect1(id1, id2, id3, id4);
-  };
-  if (id2._stateCounter[id3] >= 1) {
-    id2.addStateCounter(id3, +1);
+  if (target._stateCounter[stateId] < 5) state_applyCommonEffect(user, target, stateId, animationId);
+  if (target._stateCounter[stateId] >= 1) {
+    target.addStateCounter(stateId, +1);
   } else {
-    id2.setStateCounter(id3, 1);
+    target.setStateCounter(stateId, 1);
   };
 
 };
 
-//state_removebuffdebuff(1,2,user,target,stateId,271);
-state_removebuffdebuff = function (id, buffId, user, target, stateId, animationId) {
-
-  if ($gameTroop.isAllDead() || target._buffs[buffId] < 1) { } else {
-    target.removeState(stateId);
-    target.removeBuff(buffId);
-    //BattleManager._logWindow.push(`addText`, id2.name() + `の`+$dataStates[id3].name+`が解除された`);
-    state_removeEffect1(user, target, stateId, animationId);
-  };
-
+//state_removeBuffDebuff(1,2,user,target,stateId,271);
+state_removeBuffDebuff = function (id, buffId, user, target, stateId, animationId) {
+  if ($gameTroop.isAllDead()) return;
+  // Retained rule: only a positive buff level removes the linked state.
+  const buffLevel = target._buffs[buffId];
+  if (!(buffLevel >= 1)) return;
+  target.removeState(stateId);
+  target.removeBuff(buffId);
+  state_removeCommonEffect(user, target, stateId, animationId);
 };
 
-//state_turnEndbuffdebuff(1,2,user,target,stateId,271);
-state_turnEndbuffdebuff = function (mode, buffId, user, target, stateId, animationId) {
+//state_turnEndBuffDebuff(1,2,user,target,stateId,271);
+// NOTE: not referenced by any notetag in the data files; kept for parity with
+// the add/remove pair above.
+state_turnEndBuffDebuff = function (mode, buffId, user, target, stateId, animationId) {
 
-  user.removeStateCounter(stateId);
+  target.removeStateCounter(stateId);
   let removeEffect
   if (mode == 1) {
     removeEffect = target._buffs[buffId] < 0;
@@ -4925,142 +3952,76 @@ state_turnEndbuffdebuff = function (mode, buffId, user, target, stateId, animati
   if (removeEffect) {
     target.removeState(stateId);
     //id2.removeBuff(value1);
-    state_removeEffect1(user, target, stateId, animationId);
+    state_removeCommonEffect(user, target, stateId, animationId);
   };
 
 };
 
 //装備スキルの操作
 skill_equipOperation = function (actor, actor2, itemId) {
-
-  if (actor2.actorId() !== actor.actorId()) return;
-
-  const gameVar351Arr = $gameVariables.value(351);
-  const actorId = actor.actorId();
-  const actorName = `\\C[2]${actor.name()}\\C[0]`;
-  if (itemId == 427) {//記憶
-    const arr1 = actor.battleSkillsRaw();
-    gameVar351Arr[actorId] = arr1.clone();
-    TickerManager.show(`${actorName}のスキル装備状態を記録しました`);
-  }
-  else if (itemId == 428) {//復元
-    if (gameVar351Arr[actorId] == 0) {
-      TickerManager.show(`\\C[2]${actor.name()}\\C[0]はスキル装備状態を記録していません`);
-    } else {
+  if (!actor || !actor2 || actor2.actorId() !== actor.actorId()) return;
+  const actorName = colorTaggedText(2, actor.name());
+  switch (Number(itemId)) {
+    case 427: return rememberEquippedSkillsBattleRefactor(actor, actorName);
+    case 428: return restoreEquippedSkillsBattleRefactor(actor, actorName);
+    case 429:
       actor.clearEquipBattleSkills();
-      for (let i = 0; i <= gameVar351Arr[actorId].length - 1; i++) {
-        actor.equipSkill(gameVar351Arr[actorId][i], i);
-      };
-      TickerManager.show(`${actorName}のスキル装備状態を復元しました`);
-    };
-  }
-  else if (itemId == 429) {//一括解除
-    actor.clearEquipBattleSkills();
-    TickerManager.show(`${actorName}のスキル装備状態を全て解除しました`);
-  }
-  else if (itemId == 430) {//一括装着
-    const skillIds = Array(actor.battleSkillsRaw().length).fill(0);
-    let id1 = 0;
-    let id2 = actor.battleSkillsRaw().length - isGirl(actor) ? 200 : 100;//10Ｇパッシブ
-    let id3 = actor.battleSkillsRaw().length - 100;//15Hパッシブ
-    let id4 = 0;
-    for (let i = 1; i < $dataSkills.length; i++) {
-      const skill = $dataSkills[i];
-      if (skill.name === '') continue;
-
-      const isValid = skill.meta['Skill Tier'] && (actor.isLearnedSkill(i) || actor.addedSkills().contains(i));
-      if (!isValid) continue;
-
-      id4 += 1;
-      if (skill.stypeId == 10) {
-        skillIds[id2] = i;
-        id2 += 1;
-      } else if (skill.stypeId == 15) {
-        skillIds[id3] = i;
-        id3 += 1;
-      } else {
-        skillIds[id1] = i;
-        id1 += 1;
-      }
-    }
-    if (id4 >= 1) {
-      actor.clearEquipBattleSkills();
-      for (let i = 0; i < skillIds.length; i++) {
-        const skillId = skillIds[i];
-        if (skillId) {
-          const skillTierId = Number($dataSkills[skillId].meta['Skill Tier']);
-          if (actor.getEquipSkillTierCount(skillTierId) < actor.getEquipSkillTierMax(skillTierId)) {
-            if (i <= actor.battleSkillsRaw().length) {
-              actor.equipSkill(skillIds[i], i);
-            }
-          }
-        }
-      }
-      TickerManager.show(`${actorName}は装備可能なスキルを全て装着しました。`);
-    } else {
-      TickerManager.show(`${actorName}は装備可能なスキルを保有していません。`);
-    }
+      TickerManager.show(`${actorName}のスキル装備状態を全て解除しました`);
+      return;
+    case 430: return equipAvailableSkillsBattleRefactor(actor, actorName);
   }
 }
 
-//ステータス表示非表示
-battleStatus_showHide = function (id1) {
+// Places skillId in the slot band its stype maps to: 10 = G-passive, 15 =
+// H-passive, anything else = normal. Mirrors YEP_EquipBattleSkills.learnSkill.
+function assignSkillSlotSkillEquipOperation(skillIds, slotIndex, skillId, stypeId) {
+  const band = stypeId == 10 ? 'gPassive' : stypeId == 15 ? 'hPassive' : 'normal';
+  const slotCount = skillIds.length;
+  const slot = slotIndex[band];
+  // In this project the final 200 slots are two reserved passive bands.
+  const bandEnd = band === 'gPassive' ? slotCount - 100 : band === 'hPassive' ? slotCount : slotCount >= 200 ? slotCount - 200 : slotCount;
+  if (slot < 0 || slot >= bandEnd) return;
+  skillIds[slot] = skillId;
+  slotIndex[band] += 1;
+}
 
-  const on = id1 == 0;
+//ステータス表示非表示
+battleStatus_showHide = function (hideFlag) {
+
+  const on = hideFlag == 0;
   if (Imported.MOG_BattleHud) {
     $gameSystem._bhud_visible = on;
   } else {
     if (on) BattleManager._statusWindow.show(); else BattleManager._statusWindow.hide();
   };
-  if ($gameSwitches.value(211)) {
-    if (SceneManager._scene._bosshp_sprites === undefined) {
-      console.warn('SceneManager._scene._bosshp_sprites is undefined!');
-    }
-    else SceneManager._scene._bosshp_sprites.visible = on;
+  if ($gameSwitches.value(211) && SceneManager._scene && SceneManager._scene._bosshp_sprites) {
+    SceneManager._scene._bosshp_sprites.visible = on;
   }
 
 }
 
 //確率でステート付与state_addFormula1([4,50,user,target,user.mdf,target.luk]);
-state_addFormula1 = function(params) {
-  // Extract parameters (destructuring for readability)
+state_addFormula1 = function (params) {
   const [stateId, baseChance, user, target, userMDF, targetLUK] = params;
-  
-  // Cache state data
   const stateData = $dataStates[stateId];
-  
-  // Skip processing if target is immune
-  const targetName = `\\C[16]${target.name()}\\C[0]`;
-  const stateName = `\\C[10]${stateData.name}\\C[0]`;
+  if (!stateData) return;
+  const targetName = colorTaggedText(16, target.name());
+  const stateName = colorTaggedText(10, stateData.name);
   if (target.isStateResist(stateId)) {
-    showMessage(`${targetName}は${stateName}を無効化した！。（\\C[10]完全耐性\\C[0]）`);
+    const immunityText = colorTaggedText(10, '完全耐性');
+    showMessage(`${targetName}は${stateName}を無効化した！。（${immunityText}）`);
     return;
   }
-  
-  // Show initial message only when user isn't targeting self
-  const userName = `\\C[2]${user.name()}\\C[0]`;
   if (user !== target) {
+    const userName = colorTaggedText(2, user.name());
     showMessage(`${userName}が${stateName}を付与した！　`);
   }
-  
-  // Calculate once for both conditionals
-  const activationChance = Math.floor((1.0 + (userMDF - targetLUK) * 0.01) * baseChance);
-  const resistanceRoll = Math.floor(Math.random() * target.stateRate(stateId) * 100);
+  const baseActivationChance = Math.floor((1 + (userMDF - targetLUK) * 0.01) * baseChance);
+  const activationChance = Math.max(0, Math.min(100, Math.floor(baseActivationChance * target.stateRate(stateId))));
+  const resistanceRoll = Math.floor(Math.random() * 100);
   const isStateApplied = activationChance > resistanceRoll;
-  
-  // Apply state if check passed
-  if (isStateApplied) {
-    target.addState(stateId);
-  }
-  
-  // Show appropriate result message
-  const resultMessage = isStateApplied
-    ? `${targetName}は${stateName}を付与された…。`
-    : `${targetName}は${stateName}を無効化した！`;
-  
-  const resist = `\\C[4]${resistanceRoll}\\C[0]`;
-  const chance = `\\C[10]${activationChance}\\C[0]`;
-  showMessage(`${resultMessage}（判定：${resist} > ${chance}）`);
+  if (isStateApplied) target.addState(stateId);
+  showStateRollResultBattleRefactor(targetName, stateName, isStateApplied, resistanceRoll, activationChance);
 };
 
 //トータルダメージ表示
@@ -5100,178 +4061,202 @@ battle_totalDamage = function() {
 //ステート付与攻撃時にアニメ
 battle_stateAnime1 = function (target) {
 
-  if (valueAttackStates.length > 0) {
-    let value1 = 0;
-    for (let i = 0; i < valueAttackStates.length; i++) {
-      const valueAttackState = valueAttackStates[i];
-      if (valueAttackState >= 1 && valueStateAnimeArr[valueAttackState] >= 1) {
-        target.startAnimation(valueStateAnimeArr[valueAttackState], true, value1);
-        value1 += 1;
-      }
-    }
+  if (valueAttackStates.length == 0) return;
+
+  let animationLoopIndex = 0;
+  for (let i = 0; i < valueAttackStates.length; i++) {
+    const valueAttackState = valueAttackStates[i];
+    if (valueAttackState < 1 || valueStateAnimeArr[valueAttackState] < 1) continue;
+    target.startAnimation(valueStateAnimeArr[valueAttackState], true, animationLoopIndex);
+    animationLoopIndex += 1;
   }
 }
 
 //パーティレベルを一時記憶/呼び出し
-party_levelSaveLoad = function (id1) {
+party_levelSaveLoad = function (modeId) {
 
-  if (id1 == 0) {
+  if (modeId == 0) {
     valuePartyMainLv = Array(21).fill(0);
     valuePartySubLv = Array(21).fill(0);
-    var start = $gameVariables.value(75);
-    var end = $gameVariables.value(76);
-    for (var i = start; i <= end; i++) {
-      actor = $gameActors.actor(i);
-      if ($gameParty.members().contains(actor)) {
-        valuePartyMainLv[i] = actor.level;
-        if (actor.subclass()) {
-          valuePartySubLv[i] = actor.classLevel(actor._subclassId);
-        };
-      };
-    };
-  };
-  if (id1 == 1) {
-    var value2 = 0;
-    for (var i = 0; i <= valuePartyMainLv.length - 1; i++) {
-      if (valuePartyMainLv[i] >= 1) {
-        actor = $gameActors.actor(i);
-        if (actor.level > valuePartyMainLv[i]) {
-          var value1 = `\\C[2]${actor.name()}\\C[0]のメインジョブ\\C[14]<${$dataClasses[actor._classId].name}>\\C[0]Lvが\\C[10]${actor.level - valuePartyMainLv[i]}\\C[0]上がった！ (${actor.level})`;
-          CommonPopupManager.showInfo({}, value1, null);
-          var value2 = 1;
-        };
-      };
-    };
-    if (value2 == 1) {
-      $gamePlayer.requestAnimation(297);
-    };
-  };
-  if (id1 == 2) {
-    var value2 = 0;
-    for (var i = 0; i <= valuePartyMainLv.length - 1; i++) {
-      if (valuePartySubLv[i] >= 1) {
-        actor = $gameActors.actor(i);
-        if (actor.classLevel(actor._subclassId) > valuePartySubLv[i]) {
-          var value1 = `\\C[2]${actor.name()}\\C[0]のサブジョブ\\C[14]<${$dataClasses[actor._subclassId].name}>\\C[0]Lvが\\C[10]${actor.classLevel(actor._subclassId) - valuePartySubLv[i]}\\C[0]上がった！ (${actor.classLevel(actor._subclassId)})`;
-          CommonPopupManager.showInfo({}, value1, null);
-          var value2 = 1;
-        };
-      };
-    };
-    if (value2 == 1) {
-      $gamePlayer.requestAnimation(297);
-    };
-  };
+    const start = $gameVariables.value(75);
+    const end = $gameVariables.value(76);
+    for (let i = start; i <= end; i++) {
+      const actor = $gameActors.actor(i);
+      if (!actor || !$gameParty.members().contains(actor)) continue;
+      valuePartyMainLv[i] = actor.level;
+      if (actor.subclass()) valuePartySubLv[i] = actor.classLevel(actor._subclassId);
+    }
+    return;
+  }
+  if (modeId == 1) {
+    announceLevelUpsPartyLevelSaveLoad(valuePartyMainLv, "メインジョブ",
+      (actor) => actor.level,
+      (actor) => $dataClasses[actor._classId]);
+    return;
+  }
+  if (modeId == 2) {
+    announceLevelUpsPartyLevelSaveLoad(valuePartySubLv, "サブジョブ",
+      (actor) => actor.classLevel(actor._subclassId),
+      (actor) => $dataClasses[actor._subclassId]);
+  }
 
 };
 
-actor_custom_replace_attack = function (user, id1, id2) {
+// Shared level-up announcement for party_levelSaveLoad modes 1 (main job) and
+// 2 (sub job). `savedLevels[i]` is the level recorded for actor i, `levelOf`
+// reads that actor's live level, `jobJP` names the job kind and `classOf`
+// resolves the class whose name is shown.
+function announceLevelUpsPartyLevelSaveLoad(savedLevels, jobJP, levelOf, classOf) {
+  let levelUpFlag = 0;
+  for (let i = 0; i <= savedLevels.length - 1; i++) {
+    if (savedLevels[i] < 1) continue;
+    const actor = $gameActors.actor(i);
+    if (!actor) continue;
+    const currentLevel = levelOf(actor);
+    if (currentLevel <= savedLevels[i]) continue;
+    const classNameBase = classOf(actor).name;
+    const actorName = colorTaggedText(2, actor.name());
+    const className = colorTaggedText(14, `<${classNameBase}>`);
+    const jpbonusCnt = colorTaggedText(19, `${currentLevel - savedLevels[i]}`);
+    const levelUpMessage = `${actorName}の${jobJP}${className}Lvが${jpbonusCnt}上がった！ (${currentLevel})`;
+    CommonPopupManager.showInfo({}, levelUpMessage, null);
+    levelUpFlag = 1;
+  }
+  if (levelUpFlag == 1) $gamePlayer.requestAnimation(297);
+}
+
+//=============================================================================
+//=============================================================================
+// Weapon-unleash replacement skills
+//   backs the <Custom Replace Attack> / <Custom Replace Guard> note blocks in
+//   data/Actors.json, data/Weapons.json and data/Armors.json, which used to hold
+//   a copy-pasted eval snippet per entry. The notes now only call the functions
+//   below, so the logic lives here once. Every note still passes its own numbers.
+//=============================================================================
+
+// Attack id per equipped weapon type: 1 -> 101, 2 -> 111, ... 10 -> 191.
+const attackIdsMapAcraSub = {
+  1: 101, 2: 111, 3: 121, 4: 131, 5: 141,
+  6: 151, 7: 161, 8: 171, 9: 181, 10: 191
+};
+
+// Guard id per equipped weapon type: 1 -> 501, 2 -> 502, ... 10 -> 510.
+const guardIdsMapAcraSub = {
+  1: 501, 2: 502, 3: 503, 4: 504, 5: 505,
+  6: 506, 7: 507, 8: 508, 9: 509, 10: 510
+};
+
+// Weapon in the actor's first weapon slot, or null when that slot is empty or
+// its id no longer exists in the database. The old note code read
+// user._equips[0]._itemId and then $dataWeapons[id] without checking either.
+function replaceFirstSlotWeapon(user) {
+  const slot = user._equips && user._equips[0];
+  if (!slot || slot._itemId < 1) return null;
+  // Game_Item exposes _dataClass; an armour in slot 0 must not resolve as a weapon.
+  if (slot._dataClass && slot._dataClass !== 'weapon') return null;
+  return $dataWeapons[slot._itemId] || null;
+}
+
+// First equipped weapon type (1..10), or 0 when the actor carries none.
+function replaceEquippedWeaponType(user) {
+  for (let typeId = 1; typeId <= 10; typeId++) {
+    if (user.isWtypeEquipped(typeId)) return typeId;
+  }
+  return 0;
+}
+
+// Base attack id from the weapon type; 1 (plain attack) when unarmed.
+function replaceBaseAttackId(user) {
+  const typeId = replaceEquippedWeaponType(user);
+  return typeId ? (attackIdsMapAcraSub[typeId] || 1) : 1;
+}
+
+// Base guard id from the weapon type; 0 when the actor carries no weapon.
+function replaceBaseGuardId(user) {
+  const typeId = replaceEquippedWeaponType(user);
+  return typeId ? (guardIdsMapAcraSub[typeId] || 0) : 0;
+}
+
+// Bonus every attack replacement shares: only the FIRST match applies. The
+// earliest version of this code summed all of them, so an actor with state 282
+// *and* an extra learned skill got +7 instead of +5.
+function replaceAttackBonusId(user, attackId) {
+  if (user.isStateAffected(283)) return attackId + 6;
+  if (user.isStateAffected(282)) return attackId + 5;
+  if (user.isLearnedSkill(attackId + 4)) return attackId + 4;
+  if (user.isLearnedSkill(attackId + 3)) return attackId + 3;
+  if (user.isLearnedSkill(attackId + 2)) return attackId + 2;
+  if (user.isLearnedSkill(attackId + 1)) return attackId + 1;
+  return attackId;
+}
+
+// <UniqueOugi> resolves to variable 287[actorId][9]; 0 when that is not set.
+function replaceUniqueOugiId(user) {
+  const uniqueData = $gameVariables.value(287);
+  if (!Array.isArray(uniqueData)) return 0;
+  const actorData = uniqueData[user.actorId()];
+  if (!Array.isArray(actorData)) return 0;
+  return Number(actorData[9]) || 0;
+}
+
+// States 63/64 (plus skill 66) short-circuit to the actor's special attacks.
+// Actors without that state pair call actor_custom_replace_attack_sub directly.
+actor_custom_replace_attack = function (user, attackWhenArmed, attackWhenUnarmed) {
   const userStateAffected64 = user.isStateAffected(64);
   return (userStateAffected64 || user.isStateAffected(63))
-    ? (userStateAffected64 || user.isLearnedSkill(66) ? id1 : id2)
+    ? (userStateAffected64 || user.isLearnedSkill(66) ? attackWhenArmed : attackWhenUnarmed)
     : actor_custom_replace_attack_sub(user);
 };
 
-const attackIdsMapAcraSub = {
-  1: 101,
-  2: 111,
-  3: 121,
-  4: 131,
-  5: 141,
-  6: 151,
-  7: 161,
-  8: 171,
-  9: 181,
-  10: 191
-};
+// Weapon driven attack replacement; returns 1 (plain attack) when unarmed.
 actor_custom_replace_attack_sub = function(user) {
-  // Early return if no weapon equipped
-  const firstEquippedItemId = user._equips[0]._itemId;
-  if (firstEquippedItemId < 1) {
-    return 1;
-  }
-  
-  // Get the weapon data once
-  const firstWeapon = $dataWeapons[firstEquippedItemId];
-  
-  // Check for special attack override from weapon metadata
+  const firstWeapon = replaceFirstSlotWeapon(user);
+  if (!firstWeapon) return 1;
+
+  // <SpecialAttack> on the weapon overrides everything below.
   const specialAttackMeta = firstWeapon.meta['SpecialAttack'];
   if (specialAttackMeta) {
     const specialAttackId = Number(specialAttackMeta);
-    if (specialAttackId >= 1) {
-      return specialAttackId;
-    }
+    if (specialAttackId >= 1) return specialAttackId;
   }
-  
-  // Find base attack ID from equipped weapon type
-  let attackId = 1;
-  for (let typeId = 1; typeId <= 10; typeId++) {
-    if (user.isWtypeEquipped(typeId)) {
-      attackId = attackIdsMapAcraSub[typeId] || 1;
-      break;
-    }
-  }
-  
-  // Apply state and skill modifiers
-  // Using addition instead of multiple increments for better performance
-  attackId += (user.isStateAffected(283) ? 6 : 0) +
-              (user.isStateAffected(282) ? 5 : 0) +
-              (user.isLearnedSkill(attackId + 4) ? 4 : 0) +
-              (user.isLearnedSkill(attackId + 3) ? 3 : 0) +
-              (user.isLearnedSkill(attackId + 2) ? 2 : 0) +
-              (user.isLearnedSkill(attackId + 1) ? 1 : 0);
-              
-  return attackId;
+  return replaceAttackBonusId(user, replaceBaseAttackId(user));
 };
 
-actor_custom_replace_guard = function (user) {
-  const userEquips0ItemId = user._equips[0]._itemId;
-  if (userEquips0ItemId >= 1 && user.tp >= 100) {
-
-    const weapon0 = $dataWeapons[userEquips0ItemId];
-    const weapon0trait0 = weapon0.traits[0];
-    if (weapon0trait0 !== undefined) return weapon0trait0.dataId;
-
-    const weapon0MetaSpecialOugi = weapon0.meta['SpecialOugi'];
-    if (weapon0MetaSpecialOugi) {
-      const weapon0MetaSpecialOugiNum = Number(weapon0MetaSpecialOugi);
-      if (weapon0MetaSpecialOugiNum >= 1) {
-        return weapon0MetaSpecialOugiNum;
-      };
-    };
-
-    if (weapon0.meta['UniqueOugi']) {
-      var gameVariablesValue287UserActorId9 = $gameVariables.value(287)[user.actorId()][9];
-      if (gameVariablesValue287UserActorId9 >= 1) {
-        return gameVariablesValue287UserActorId9;
-      };
-    };
-  };
-
-  return 2;
+// A weapon note that pins one attack id for whoever carries it, ignoring
+// equipment and TP (data/Weapons.json, id 1 = sword -> 101).
+actor_custom_replace_attack_fixed = function (user, baseSkillId) {
+  return replaceAttackBonusId(user, baseSkillId);
 };
 
-actor_custom_replace_guard1 = function (user) {
-  const userEquips0ItemId = user._equips[0]._itemId;
-  if (userEquips0ItemId >= 1 && user.tp >= 100) {
-    if (user.isWtypeEquipped(1)) { return 501 }
-    else if (user.isWtypeEquipped(2)) { return 502 }
-    else if (user.isWtypeEquipped(3)) { return 503 }
-    else if (user.isWtypeEquipped(4)) { return 504 }
-    else if (user.isWtypeEquipped(5)) { return 505 }
-    else if (user.isWtypeEquipped(6)) { return 506 }
-    else if (user.isWtypeEquipped(7)) { return 507 }
-    else if (user.isWtypeEquipped(8)) { return 508 }
-    else if (user.isWtypeEquipped(9)) { return 509 }
-    else if (user.isWtypeEquipped(10)) { return 510 };
+// An armour note that shifts the weapon-type attack id while TP is still below
+// tpLimit (data/Armors.json, id 23 = +2 below full TP). When the condition is
+// not met it hands back fallbackSkillId so the caller leaves its own id alone.
+actor_custom_replace_attack_shifted = function (user, offset, tpLimit, fallbackSkillId) {
+  if (user.tp >= tpLimit) return fallbackSkillId;
+  const typeId = replaceEquippedWeaponType(user);
+  if (!typeId) return fallbackSkillId;
+  return (attackIdsMapAcraSub[typeId] || 0) + offset;
+};
 
-    const weapon0MetaSpecialOugi = $dataWeapons[userEquips0ItemId].meta['SpecialOugi'];
-    if (weapon0MetaSpecialOugi) {
-      return Number(weapon0MetaSpecialOugi)
-    };
-  };
+// Guard replacement derived from the weapon's first trait (code 43 = add skill),
+// then overridden by <SpecialOugi> and finally by <UniqueOugi>.
+// activeOnly: true  -> when there is no weapon in slot 1 or TP is below 100,
+//                     hand back fallbackSkillId so the caller can keep its own
+//                     id untouched (actors that only replace at full TP).
+// activeOnly: false -> fall back to the plain guard id 2 instead.
+actor_custom_replace_guard = function (user, activeOnly, fallbackSkillId) {
+  const weapon = replaceFirstSlotWeapon(user);
+  if (!weapon || user.tp < 100) return activeOnly ? fallbackSkillId : 2;
+  return resolveGuardSkillBattleRefactor(user, weapon);
+};
 
-  return 2;
+// Guard replacement derived from the weapon type (501 .. 510), with
+// <SpecialOugi> overriding it. Same activeOnly handling as above.
+actor_custom_replace_guard1 = function (user, activeOnly, fallbackSkillId) {
+  const weapon = replaceFirstSlotWeapon(user);
+  if (!weapon || user.tp < 100) return activeOnly ? fallbackSkillId : 2;
+  const baseGuardId = replaceBaseGuardId(user) || 2;
+  return applyGuardOverridesBattleRefactor(user, weapon, baseGuardId);
 };
 
 //ボス行動コモン内予測計算
@@ -5280,3 +4265,1031 @@ actor_custom_replace_guard1 = function (user) {
 //};
 
 //})();
+
+
+// Named implementation helpers; original global entry points remain available.
+const battleRefactorStateDropGroups = [
+  [
+    610,
+    [
+      [
+        0,
+        0,
+        10
+      ],
+      [
+        1,
+        0,
+        196
+      ],
+      [
+        3,
+        0,
+        197
+      ],
+      [
+        5,
+        0,
+        198
+      ],
+      [
+        9,
+        0,
+        199
+      ],
+      [
+        6,
+        0,
+        190
+      ],
+      [
+        7,
+        0,
+        147
+      ],
+      [
+        10,
+        0,
+        148
+      ],
+      [
+        8,
+        0,
+        152
+      ],
+      [
+        8,
+        0,
+        153
+      ],
+      [
+        10,
+        0,
+        170
+      ]
+    ]
+  ],
+  [
+    451,
+    [
+      [
+        6,
+        0,
+        191
+      ],
+      [
+        6,
+        0,
+        161
+      ],
+      [
+        6,
+        0,
+        163
+      ]
+    ]
+  ],
+  [
+    452,
+    [
+      [
+        7,
+        0,
+        192
+      ],
+      [
+        6,
+        0,
+        162
+      ],
+      [
+        6,
+        0,
+        164
+      ]
+    ]
+  ],
+  [
+    453,
+    [
+      [
+        8,
+        0,
+        193
+      ],
+      [
+        10,
+        0,
+        169
+      ]
+    ]
+  ],
+  [
+    454,
+    [
+      [
+        10,
+        0,
+        194
+      ],
+      [
+        10,
+        0,
+        169
+      ]
+    ]
+  ],
+  [
+    441,
+    [
+      [
+        6,
+        0,
+        165
+      ]
+    ]
+  ],
+  [
+    442,
+    [
+      [
+        6,
+        0,
+        165
+      ]
+    ]
+  ],
+  [
+    443,
+    [
+      [
+        6,
+        0,
+        166
+      ]
+    ]
+  ],
+  [
+    446,
+    [
+      [
+        6,
+        0,
+        167
+      ]
+    ]
+  ],
+  [
+    455,
+    [
+      [
+        6,
+        0,
+        168
+      ]
+    ]
+  ],
+  [
+    448,
+    [
+      [
+        10,
+        0,
+        169
+      ]
+    ]
+  ],
+  [
+    440,
+    [
+      [
+        5,
+        0,
+        220
+      ],
+      [
+        8,
+        0,
+        240
+      ]
+    ]
+  ],
+  [
+    461,
+    [
+      [
+        5,
+        0,
+        251
+      ]
+    ]
+  ],
+  [
+    462,
+    [
+      [
+        5,
+        0,
+        252
+      ]
+    ]
+  ],
+  [
+    463,
+    [
+      [
+        5,
+        0,
+        253
+      ]
+    ]
+  ],
+  [
+    464,
+    [
+      [
+        5,
+        0,
+        254
+      ]
+    ]
+  ],
+  [
+    465,
+    [
+      [
+        5,
+        0,
+        255
+      ],
+      [
+        3,
+        0,
+        1287
+      ]
+    ]
+  ],
+  [
+    466,
+    [
+      [
+        5,
+        0,
+        256
+      ]
+    ]
+  ],
+  [
+    467,
+    [
+      [
+        5,
+        0,
+        257
+      ]
+    ]
+  ],
+  [
+    479,
+    [
+      [
+        6,
+        0,
+        270
+      ],
+      [
+        5,
+        0,
+        269
+      ]
+    ]
+  ]
+];
+
+function setDropEnemyLevelBattleRefactor(user) {
+  if ($gameParty.inBattle()) {
+    valueDropEnemyLevel = user.level;
+    return true;
+  }
+  const viewpointActor = $gameActors.actor($gameVariables.value(11));
+  const levelReference = viewpointActor || $gameParty.leader();
+  if (!levelReference) return false;
+  valueDropEnemyLevel = Math.ceil(levelReference.level / 2);
+  return true;
+}
+function appendStateDropCopiesBattleRefactor(user, stateId, entries, drops) {
+  if (!user.isStateAffected(stateId)) return;
+  for (const entry of entries) drops.push(entry.slice());
+}
+function appendPowerAndElementDropsBattleRefactor(user, drops) {
+  let powerDropCount = 0;
+  for (const stateId of valueAddPowerCustomState) {
+    if (!user.isStateAffected(stateId)) continue;
+    const stateData = $dataStates[stateId];
+    if (stateData) powerDropCount += Number(stateData.meta.AddPowerCustom) || 0;
+  }
+  for (let count = 0; count < powerDropCount; count++) drops.push([6, 0, 153]);
+  for (let stateId = 51; stateId <= 56; stateId++) {
+    if (user.isStateAffected(stateId)) drops.push([4, 0, stateId + 103]);
+  }
+}
+function appendArmorAndLevelDropsBattleRefactor(user, drops) {
+  for (const stateId of getItemDropDataStateIds) {
+    appendStateDropCopiesBattleRefactor(user, stateId, [[6, 0, 170], [6, 2, stateId - 780]], drops);
+  }
+  appendStateDropCopiesBattleRefactor(user, 410, [
+    [6, 0, 185], [7, 0, 186], [8, 0, 187], [10, 0, 188], [5, 0, 1115], [8, 0, 1117]
+  ], drops);
+  if (valueDropEnemyLevel >= 1 && valueDropEnemyLevel <= 20) {
+    appendStateDropCopiesBattleRefactor(user, 410, [
+      [2, 0, 1118], [3, 0, 1119], [4, 0, 1120], [5, 0, 1121]
+    ], drops);
+  }
+  if (valueDropEnemyLevel >= 11) {
+    appendStateDropCopiesBattleRefactor(user, 410, [
+      [6, 0, 1122], [7, 0, 1123], [8, 0, 1124], [10, 0, 1125]
+    ], drops);
+  }
+}
+function appendRaceDropsBattleRefactor(user, drops) {
+  for (let stateId = 421; stateId <= 439; stateId++) {
+    if (!user.isStateAffected(stateId)) continue;
+    const stateData = $dataStates[stateId];
+    const raceDropKind = stateData && stateData.meta.RaceDropKind;
+    if (!raceDropKind) continue;
+    for (const itemIdText of raceDropKind.split(',')) {
+      const itemId = Number(itemIdText);
+      const itemData = $dataItems[itemId];
+      const rarity = itemData && itemData.meta.RaceDropRarity;
+      if (rarity) drops.push([Number(rarity), 0, itemId]);
+    }
+  }
+}
+
+function recordSubjugationBattleRefactor(user, isInBattle) {
+  const subjugationCounts = $gameVariables.value(52);
+  const messages = [];
+  for (let index = 1; index < valueSubjugationPoint.length; index++) {
+    const stateId = valueSubjugationPoint[index];
+    if (!user.isStateAffected(stateId)) continue;
+    subjugationCounts[stateId] += 1;
+    if (isInBattle) continue;
+    const tribeName = `\x1bSIM[${stateId}]`;
+    const countText = colorTaggedText(10, '+1');
+    const message = `${tribeName}：討伐数${countText}\n`;
+    messages.push(message);
+    $gameSystem.pushInfoLog(message);
+  }
+  valueWordSet3 += messages.join('');
+  if (user.isStateAffected(436)) return;
+  subjugationCounts[1] += 1;
+  subjugationCounts[2] += 1;
+}
+function getDropOriginBattleRefactor(user) {
+  const memberIndex = user.index() + 1;
+  return { x: $gameTroop.getX(memberIndex), y: $gameTroop.getY(memberIndex) };
+}
+function showBattleDropBattleRefactor(item, sourceKind, origin) {
+  $gameTroop.addDropItem(item);
+  const shiftX = xShiftCoordsEnemyDropSelection[getRandomIndex(xShiftCoordsEnemyDropSelection.length)];
+  const shiftY = yShiftCoordsEnemyDropSelection[getRandomIndex(yShiftCoordsEnemyDropSelection.length)];
+  const duration = durationsEnemyDropSelection[getRandomIndex(durationsEnemyDropSelection.length)];
+  const pictureName = itemsSourceKindPicNamesEnemyDropSelection[sourceKind];
+  picture_motion1('smooth', [0]);
+  $gameScreen.showPicture(valueDropEnemyPicId, pictureName, 1, origin.x, origin.y, 100, 100, 255, 0);
+  $gameScreen.movePicture(valueDropEnemyPicId, 1, origin.x + shiftX, origin.y + shiftY, 100, 100, 0, 0, duration);
+  valueDropEnemyPicId += 1;
+}
+function grantFootpadDropBattleRefactor(sourceKind, itemId) {
+  // Event scratch variables are part of the footpad/event contract.
+  $gameVariables.setValue(22, sourceKind);
+  $gameVariables.setValue(23, itemId);
+  item_getSkillLevel(valueFootpadSkillId, $gameVariables.value(22), $gameVariables.value(23));
+}
+function recordPlainDropBattleRefactor(item, messages) {
+  $gameParty.gainItem(item, 1);
+  const itemName = colorTaggedText(2, item.name);
+  const itemIcon = `\x1bI[${item.iconIndex}]`;
+  const itemTitle = `${itemIcon}${itemName}`;
+  const countText = colorTaggedText(2, '1');
+  const message = `${itemTitle}を${countText}個入手！\n`;
+  messages.push(message);
+  $gameSystem.pushInfoLog(message);
+}
+
+function selectGenericDropCategoryBattleRefactor(fallbackCategory, useWalletFallback) {
+  const dungeonItemId = $gameVariables.value(240);
+  const dungeonItem = $dataItems[dungeonItemId];
+  const categories = dungeonItem && dungeonItem.meta.GenericDropRate;
+  if (dungeonItemId < 1 || !categories) return fallbackCategory;
+  const choices = categories.split(',');
+  const selectedCategory = Number(choices[getRandomIndex(choices.length)]);
+  return useWalletFallback ? selectedCategory || 1 : selectedCategory;
+}
+function appendGenericDropTicketsBattleRefactor(itemId, category, isBattle, candidates) {
+  const item = $dataItems[itemId];
+  if (!item || (!isBattle && item.meta.NoBattleDrop) || !item.meta.DropRate) return;
+  const lotteryWeight = item.meta.DropLottery ? Number(item.meta.DropLottery) : 1;
+  if (!Number.isFinite(lotteryWeight)) return;
+  // Duplicate matching categories intentionally multiply the weight.
+  for (const dropCategory of item.meta.DropRate.split(',')) {
+    if (dropCategory != category) continue;
+    for (let ticket = 1; ticket <= lotteryWeight; ticket++) candidates.push(itemId);
+  }
+}
+
+function collectWalletCandidatesBattleRefactor(category, listType) {
+  const candidates = [];
+  for (let itemId = 1; itemId < $dataItems.length; itemId++) {
+    const item = $dataItems[itemId];
+    if (!item || !item.meta[listType] || !item.meta.DropRate) continue;
+    if (listContainsNumber(item.meta.DropRate.split(','), category)) candidates.push(itemId);
+  }
+  return candidates;
+}
+function grantPopupItemBattleRefactor(item) {
+  if (!item) return;
+  const itemName = colorTaggedText(24, `\x1bI[${item.iconIndex}]${item.name}`);
+  CommonPopupManager.showInfo({}, `${itemName}を獲得した。`, null);
+  $gameParty.gainItem(item, 1);
+}
+
+function minimumEnemyDropLevelBattleRefactor(rarity) {
+  switch (rarity) {
+    case 1: case 2: return 1;
+    case 3: return 10;
+    case 4: return 20;
+    case 5: case 6: return 30;
+    case 7: case 8: return 40;
+    case 9: case 10: return 50;
+    default: return Infinity;
+  }
+}
+
+function resolveClassDropContextBattleRefactor() {
+  if ($gameParty.inBattle()) {
+    if (typeof valueClassState === 'undefined' || !Array.isArray(valueClassState)) return null;
+    return { dropData: valueClassState, enemyLevel: valueEnemyLevel };
+  }
+  const mapEvent = $gameMap.event(valueEnemyEventId);
+  const eventData = mapEvent && mapEvent.event();
+  if (!eventData || !eventData.meta.classStateDrop) return null;
+  const dungeonItemId = $gameVariables.value(240);
+  const dungeonItem = $dataItems[dungeonItemId];
+  const levels = dungeonItem && dungeonItem.meta.EnemyLV ? dungeonItem.meta.EnemyLV.split(',') : [];
+  // No dungeon selection means no level lottery draw (the existing event contract).
+  const enemyLevel = dungeonItemId !== 0 && levels.length ? Number(levels[getRandomIndex(levels.length)]) : 30;
+  return { dropData: eventData.meta.classStateDrop.split(','), enemyLevel: enemyLevel };
+}
+function collectClassEquipmentBattleRefactor(entries, lastIndex, isArmor, requiredType, maximumRarity) {
+  const candidates = [0]; // The original lottery intentionally includes a no-drop ticket.
+  for (let itemId = 1; itemId <= lastIndex; itemId++) {
+    const item = entries[itemId];
+    if (!item || !item.meta.LotteryRearity || item.meta.GatchaOutOfRange) continue;
+    const equipmentType = isArmor ? item.atypeId : item.wtypeId;
+    if (equipmentType === requiredType && maximumRarity >= Number(item.meta.LotteryRearity)) candidates.push(itemId);
+  }
+  return candidates;
+}
+
+function minimumStateDropLevelBattleRefactor(category) {
+  if (category < 7) return 20;
+  switch (category) {
+    case 7: return 30;
+    case 8: return 40;
+    default: return 50;
+  }
+}
+
+function burstEquipmentPowerBattleRefactor(user, skill) {
+  if (!user.isActor()) return Math.round(user.level / 10);
+  if (skill.meta['ユニーク']) return uniqueBonusSkillAddPowerSet(user);
+  const weapon = replaceFirstSlotWeapon(user);
+  return weapon && weapon.meta.LotteryRearity ? Number(weapon.meta.LotteryRearity) : 0;
+}
+
+function rememberEquippedSkillsBattleRefactor(actor, actorName) {
+  const rememberedLoadouts = $gameVariables.value(351);
+  rememberedLoadouts[actor.actorId()] = actor.battleSkillsRaw().slice();
+  TickerManager.show(`${actorName}のスキル装備状態を記録しました`);
+}
+function restoreEquippedSkillsBattleRefactor(actor, actorName) {
+  const rememberedLoadouts = $gameVariables.value(351);
+  const rememberedSkills = rememberedLoadouts[actor.actorId()];
+  if (!Array.isArray(rememberedSkills) || rememberedSkills.length === 0) {
+    TickerManager.show(`${actorName}はスキル装備状態を記録していません`);
+    return;
+  }
+  actor.clearEquipBattleSkills();
+  for (let slot = 0; slot < rememberedSkills.length; slot++) actor.equipSkill(rememberedSkills[slot], slot);
+  TickerManager.show(`${actorName}のスキル装備状態を復元しました`);
+}
+function collectAvailableSkillsBattleRefactor(actor) {
+  const slotCount = actor.battleSkillsRaw().length;
+  const skillIds = Array(slotCount).fill(0);
+  const slotIndex = { normal: 0, gPassive: slotCount - 200, hPassive: slotCount - 100 };
+  const addedSkillIds = new Set(actor.addedSkills());
+  for (let skillId = 1; skillId < $dataSkills.length; skillId++) {
+    const skill = $dataSkills[skillId];
+    if (!skill || !skill.name || !skill.meta['Skill Tier']) continue;
+    if (!actor.isLearnedSkill(skillId) && !addedSkillIds.has(skillId)) continue;
+    assignSkillSlotSkillEquipOperation(skillIds, slotIndex, skillId, skill.stypeId);
+  }
+  return skillIds;
+}
+function equipAvailableSkillsBattleRefactor(actor, actorName) {
+  const skillIds = collectAvailableSkillsBattleRefactor(actor);
+  if (!skillIds.some(skillId => skillId > 0)) {
+    TickerManager.show(`${actorName}は装備可能なスキルを保有していません。`);
+    return;
+  }
+  actor.clearEquipBattleSkills();
+  for (let slot = 0; slot < skillIds.length; slot++) {
+    const skillId = skillIds[slot];
+    if (!skillId) continue;
+    const tier = Number($dataSkills[skillId].meta['Skill Tier']);
+    if (actor.getEquipSkillTierCount(tier) >= actor.getEquipSkillTierMax(tier)) continue;
+    actor.equipSkill(skillId, slot);
+  }
+  TickerManager.show(`${actorName}は装備可能なスキルを全て装着しました。`);
+}
+
+function showStateRollResultBattleRefactor(targetName, stateName, applied, roll, chance) {
+  const resultMessage = applied ? `${targetName}は${stateName}を付与された…。` : `${targetName}は${stateName}を無効化した！`;
+  const rollText = colorTaggedText(4, roll);
+  const chanceText = colorTaggedText(10, chance);
+  const comparison = applied ? '<' : '>=';
+  showMessage(`${resultMessage}（判定：${rollText} ${comparison} ${chanceText}）`);
+}
+
+function resistanceStateBattleRefactor(target) {
+  return $dataStates[(target.isEnemy() ? 490 : 486) + target.index()];
+}
+function normalizedStateCategoryBattleRefactor(state) {
+  return state.meta.Category ? String(state.meta.Category).trim() : '';
+}
+
+function addAccumulatedStateResistanceBattleRefactor(target, stateId, state) {
+  let resistanceFactor = target.isStateAffected(289) ? 0.2 : 0.1;
+  if (state.meta.registUp) {
+    const configuredRate = Number(state.meta.registUp) / 100;
+    if (Number.isFinite(configuredRate)) resistanceFactor = Math.max(0, Math.min(1, configuredRate));
+  }
+  const resistanceState = resistanceStateBattleRefactor(target);
+  if (resistanceState) resistanceState.traits.push({ code: 13, dataId: stateId, value: 1 - resistanceFactor });
+}
+function applyReactiveStatesBattleRefactor(target) {
+  const abilityType = $gameVariables.value(182);
+  for (const stateId of valueStateAddState) {
+    if (!target.isStateAffected(stateId)) continue;
+    const state = $dataStates[stateId];
+    if (!state || !state.meta.stateAddState) continue;
+    const config = state.meta.stateAddState.split(',');
+    if (Number(config[0]) !== abilityType) continue;
+    const additionalStateId = Number(config[1]);
+    const repetitions = Number(config[2]);
+    for (let repeat = 1; repeat <= repetitions; repeat++) target.addState(additionalStateId);
+  }
+}
+function playStateAnimationBattleRefactor(target, animationId) {
+  const delay = $gameVariables.value(279);
+  target.startAnimation(animationId, false, delay);
+  $gameVariables.setValue(279, delay + $gameVariables.value(280));
+}
+
+function resolveGuardSkillBattleRefactor(user, firstWeapon) {
+  const firstTrait = firstWeapon.traits && firstWeapon.traits[0];
+  const baseGuardId = firstTrait === undefined ? 2 : firstTrait.dataId;
+  return applyGuardOverridesBattleRefactor(user, firstWeapon, baseGuardId, true);
+}
+// <SpecialOugi> overrides the base id, then <UniqueOugi> overrides both. Slot 9
+// of the actor array is the unique-ougi id (see replaceUniqueOugiId).
+function applyGuardOverridesBattleRefactor(user, firstWeapon, baseGuardId, includeUniqueOugi) {
+  let guardSkillId = baseGuardId;
+  if (firstWeapon.meta.SpecialOugi) {
+    const specialOugiId = Number(firstWeapon.meta.SpecialOugi);
+    if (specialOugiId >= 1) guardSkillId = specialOugiId;
+  }
+  if (includeUniqueOugi && firstWeapon.meta.UniqueOugi) {
+    const uniqueOugiId = replaceUniqueOugiId(user);
+    if (uniqueOugiId >= 1) guardSkillId = uniqueOugiId;
+  }
+  return guardSkillId;
+}
+
+function accumulateInstantwinRewardsBattleRefactor(dropActor, enemyLevels, enemyIds, enemyCount) {
+  const rewards = { exp: 0, gold: 0 };
+  const dropUpItem = $dataItems[valueItemDropUpItem];
+  const dropCandidates = [];
+  for (let popIndex = 1; popIndex <= enemyCount; popIndex++) {
+    const enemyLevel = Number(enemyLevels[getRandomIndex(enemyLevels.length)]) || 1;
+    const levelOffset = enemyLevel - 1;
+    const enemyId = Number(enemyIds[getRandomIndex(enemyIds.length)]);
+    const enemy = $dataEnemies[enemyId];
+    if (!enemy) continue;
+    rewards.exp += Math.round(enemy.exp * (1 + levelOffset * INSTAWIN_EXP_RATE_MULTIPLIER) + INSTAWIN_EXP_FLAT_BONUS * levelOffset);
+    rewards.gold += Math.round(enemy.gold * (1 + levelOffset * INSTAWIN_GOLD_RATE_MULTIPLIER) + INSTAWIN_GOLD_FLAT_BONUS * levelOffset);
+    enemy_dropSelection(dropActor);
+    if (drop_probabilityCalculation(enemyLevel, dropUpItem) < 90) continue;
+    dropCandidates.length = 0;
+    drop_enemyDropRate(0, dropCandidates);
+    const itemId = drop_genericDropRate(0, dropCandidates);
+    const messages = [];
+    recordInstantwinDropEnemyInstantwin($dataItems[itemId], messages);
+    valueWordSet1 += messages.join('');
+  }
+  return rewards;
+}
+function displayInstantwinRewardsBattleRefactor(rewards) {
+  const resultTitle = colorTaggedText(2, 'BattleResult!');
+  const experienceText = colorTaggedText(10, rewards.exp);
+  const goldText = colorTaggedText(14, rewards.gold) + '\\G';
+  const rewardsMessage = `経験値${experienceText}、${goldText}を入手！ JPを1獲得した。`;
+  const resultMessage = `${resultTitle}\n${rewardsMessage}`;
+  $gameSystem.pushInfoLog(resultMessage);
+  valueWordSet2 = `${resultMessage}\n`;
+}
+function grantInstantwinRewardsBattleRefactor(rewards) {
+  for (const actor of $gameParty.battleMembers()) {
+    actor.changeExp(actor.currentExp() + rewards.exp, false);
+    if (actor.subclass()) actor.gainExpSubclass(rewards.exp);
+  }
+  $gameParty.gainGold(rewards.gold);
+}
+function publishInstantwinSummaryBattleRefactor() {
+  const dropCount = countNewlines(valueWordSet1);
+  const defeatCount = countNewlines(valueWordSet3);
+  if (dropCount + defeatCount <= 6) {
+    $gameVariables.setValue(701, `${valueWordSet2}${valueWordSet1}${valueWordSet3}`);
+    return;
+  }
+  let message = valueWordSet2;
+  if (dropCount >= 1) {
+    const dropCountText = colorTaggedText(2, `+${dropCount}`);
+    message += `ドロップ(${dropCountText})\n`;
+  }
+  if (defeatCount >= 1) {
+    const defeatCountText = colorTaggedText(2, `+${defeatCount}`);
+    message += `討伐カウント(${defeatCountText})`;
+  }
+  $gameVariables.setValue(701, message);
+}
+
+function selectAttackWordsBattleRefactor(actor, actorMeta, words) {
+
+    valueFaceSelect = 8;
+    if (actor.tp >= 100) {
+      valueFaceSelect = 48;
+
+    };
+    words.attackWordCandidates = actorMeta['BattleAttack'].split(',');
+    if (actor.isStateAffected(61)) {
+      valueFaceSelect = pickFaceSelectBattleWordset([21, 22, 23, 24]);
+    };
+    if (actor.isStateAffected(68)) {
+      valueFaceSelect = pickFaceSelectBattleWordset([17, 18, 19, 20]);
+    };
+    const abilityWord = selectAbilityWordBattleWordset($gameVariables.value(182));
+    if (abilityWord) {
+      words.attackWordCandidates = actorMeta[abilityWord.meta].split(',');
+      // 6 (A-AbilityUse) reuses the normal-attack face, hence face === null.
+      if (abilityWord.face !== null) valueFaceSelect = abilityWord.face;
+    }
+
+}
+
+function selectDamageWordsBattleRefactor(actor, actorMeta, words) {
+
+    valueFaceSelect = 9;
+    const damageThresholdVar514 = $gameVariables.value(514);
+    const currentHpPercent = actor.hpRate() * 100;
+    words.damageWordCandidates = actorMeta['BattleDamage'].split(',');
+    if (damageThresholdVar514 - currentHpPercent >= 50) {
+      words.damageWordCandidates = actorMeta['BattleBigDamage'].split(',');
+      valueFaceSelect = 45;
+    }
+    else if (damageThresholdVar514 == currentHpPercent) {
+      words.damageWordCandidates = actorMeta['Battle0Damage'].split(',');
+      valueFaceSelect = 6;
+    }
+    else if (damageThresholdVar514 - currentHpPercent <= 2) {
+      words.damageWordCandidates = actorMeta['BattleSmallDamage'].split(',');
+      valueFaceSelect = 4;
+    }
+}
+
+function selectStatusWordsBattleRefactor(actor, actorMeta, words) {
+    if ($gameVariables.value(263) >= 3) { //ターン数 
+      words.statusWordCandidates = actorMeta['BattleTurn2'].split(',');
+    }
+    if ([34, 35, 36].some(function (id) { return actor.isStateAffected(id) })) {  //疲労時
+      words.statusWordCandidates = actorMeta['BattleFatigue'].split(',');
+    }
+    if (actor.isStateAffected(37)) {  //ブラック
+      words.statusWordCandidates = actorMeta['BattleFatigueBlack'].split(',');
+      words.attackWordCandidates = actorMeta['BattleFatigueBlackAttack'].split(',');
+      words.damageWordCandidates = actorMeta['BattleFatigueBlackDamage'].split(',');
+    }
+    if (actor.hpRate() <= 0.3) {  //瀕死  
+      words.statusWordCandidates = actorMeta['BattleDying'].split(',');
+    }
+    if ($gameParty.battleMembers().length >= 2 && $gameParty.aliveMembers().length <= 1) {  //最後の一人
+      words.statusWordCandidates = actorMeta['BattleLastOne'].split(',');
+    }
+
+    // Skill 65 turns several of these states into their "Max" variant.
+    const maxed = actor.isLearnedSkill(65);
+    if (actor.isStateAffected(61) && isGirl(actor)) {  //発情
+      words.statusWordCandidates = actorMeta[maxed ? 'BattleSexualExcitementMax' : 'BattleSexualExcitement'].split(',');
+      words.attackWordCandidates = actorMeta[maxed ? 'BattleSexualExcitementMaxAttack' : 'BattleSexualExcitementAttack'].split(',');//攻撃
+      words.damageWordCandidates = actorMeta[maxed ? 'BattleSexualExcitementMaxDamage' : 'BattleSexualExcitementDamage'].split(',');//ダメージ
+    }
+    if (actor.isStateAffected(63) && isGirl(actor)) {    //拘束
+      words.statusWordCandidates = actorMeta[maxed ? 'BattleBindMax' : 'BattleBind'].split(',');
+    };
+    if (actor.isStateAffected(68) && isGirl(actor)) {    //激情
+      words.statusWordCandidates = actorMeta['BattlePassion'].split(',');
+    };
+    if (actor.isStateAffected(64) && isGirl(actor)) {    //放心
+      words.statusWordCandidates = actorMeta[maxed ? 'BattleAbsentlyMax' : 'BattleAbsently'].split(',');
+    };
+}
+
+function findRescuingMemberIndexBattleRefactor(battleMembers) {
+  for (let index = 0; index < battleMembers.length; index++) {
+    if (battleMembers[index].isStateAffected(89)) return index;
+  }
+  return -1;
+}
+function placeRescueBattlersBattleRefactor(rescuingMemberIndex, enemyMovementData) {
+  if (!enemyMovementData) return;
+  const troopMemberIndex = $gameVariables.value(92) + 1;
+  $gameTroop.set(troopMemberIndex, enemyMovementData[0], enemyMovementData[1], 30);
+  $gameParty.set(rescuingMemberIndex + 1, enemyMovementData[0], enemyMovementData[1], 30);
+}
+
+// Level lottery, boss level handling, troop/global bonuses and the "copy the
+// protagonist's level" case (EnemyLV 0).
+function resolveEnemyBattleLevelBattleRefactor(gameTroopMember, target, enemyId) {
+  const enemyLevelMeta = target.meta.EnemyLV;
+  const enemyLevelChoices = enemyLevelMeta ? enemyLevelMeta.split(',') : [1, 1];
+  let level = Number(enemyLevelChoices[getRandomIndex(enemyLevelChoices.length)]);
+  if (enemyId == 30) {
+    if (target.meta.BossLV) level = Number(target.meta.BossLV);
+    if (level >= 30) gameTroopMember.addState(310);
+  }
+  if (level >= 1) {
+    level = applyLevelBonusEnemyBattleSetting(level, enemyId);
+    if (valueEnemyAddLevel >= 1) level += valueEnemyAddLevel;
+    const dungeonItemId = $gameVariables.value(240);
+    if (dungeonItemId >= 1) level += $gameVariables.value(257)[dungeonItemId];
+    level = Math.round(level);
+    gameTroopMember.changeLevel(level);
+  }
+  if (enemyLevelMeta && Number(enemyLevelMeta) == 0) {
+    const protagonist = $gameActors.actor($gameVariables.value(2));
+    if (protagonist) {
+      level = protagonist.level;
+      gameTroopMember.changeLevel(level);
+    }
+  }
+  return level;
+}
+// Element state from <EnemyElement> (or <BossElement> for enemy 30): the
+// enemy's own <defaultState> is removed first when it differs.
+function applyEnemyElementStateBattleRefactor(gameTroopMember, target, enemyId) {
+  const elementMeta = target.meta.EnemyElement;
+  const elementChoices = elementMeta ? elementMeta.split(',') : [0, 0];
+  let elementStateId = Number(elementChoices[getRandomIndex(elementChoices.length)]);
+  if (enemyId == 30 && target.meta.BossElement) elementStateId = Number(target.meta.BossElement);
+  if (elementStateId == 0) return;
+  const enemy = $dataEnemies[enemyId];
+  const defaultState = enemy && enemy.meta.defaultState;
+  if (defaultState && Number(defaultState) != elementStateId) gameTroopMember.removeState(Number(defaultState));
+  gameTroopMember.addState(elementStateId);
+}
+// Variable 350 holds map-wide extra states; 345 is indexed by troop slot
+// (enemy 20..29) and 343 holds boss-only states plus the boss drop table.
+function applyEnemySlotStatesBattleRefactor(gameTroopMember, enemyId, target) {
+  const mapStateIds = $gameVariables.value(350);
+  if (mapStateIds != 0) applyEnemyStateIdsEnemyBattleSetting(gameTroopMember, mapStateIds, gameTroopMember.level);
+  if (enemyId >= 20 && enemyId <= 29) {
+    const slotStates = $gameVariables.value(345)[enemyId - 20];
+    if (slotStates) for (const stateId of slotStates) gameTroopMember.addState(stateId);
+  }
+  if (enemyId == 30 && $gameVariables.value(343) != 0) {
+    for (const stateId of $gameVariables.value(343)) gameTroopMember.addState(stateId);
+    applyBossDropsEnemyBattleSetting(target);
+  }
+}
+function applyEnemySexStatesBattleRefactor(gameTroopMember, enemy) {
+  const meta = enemy.meta;
+  if (meta.Man || meta.Woman) {
+    if (meta.Man) gameTroopMember.addState(459);
+    if (meta.Woman) gameTroopMember.addState(460);
+  } else if (!meta.Nonsexual) {
+    gameTroopMember.addState(!isHEnemyOrNonAuto() && getRandomIndex(11) == 7 ? 460 : 459);
+  }
+  if (gameTroopMember.level >= 60 && !gameTroopMember.isStateAffected(436)) gameTroopMember.addState(406);
+  if (gameTroopMember._enemyId != 30 && gameTroopMember.level >= 40 && $gameTroop.aliveMembers().length == 1) {
+    gameTroopMember.addState(475);
+  }
+}
+// 捕食者 (455) appears immediately and marks weaker allies as 被捕食者 (456).
+function applyPredatorStatesBattleRefactor(gameTroopMember, gameTroopMembers) {
+  if (!gameTroopMember.isStateAffected(455)) return;
+  gameTroopMember.appear();
+  const threshold = gameTroopMember.level + 10;
+  for (const enemy of gameTroopMembers) {
+    if (enemy.isStateAffected(455)) continue;
+    if (threshold >= enemy.level) enemy.addState(456);
+  }
+  for (const actor of $gameParty.battleMembers()) {
+    if (actor.isStateAffected(455)) continue;
+    if (threshold >= actor.level) actor.addState(456);
+  }
+}
+function addEnemyDropsBattleRefactor(gameTroopMember, enemyId) {
+  if (enemyId == 30) {
+    const fixedBossDrops = $gameVariables.value(628);
+    if (fixedBossDrops != 0) {
+      for (const itemId of fixedBossDrops) {
+        if (itemId < 1) continue;
+        $gameTroop.addDropItem($dataItems[itemId]);
+      }
+    }
+  }
+  for (const stateId of valueStateGetItems) {
+    if (!gameTroopMember.isStateAffected(stateId)) continue;
+    const state = $dataStates[stateId];
+    const itemId = Number(state.meta.SubjugationPointItem);
+    $gameTroop.addDropItem($dataItems[itemId]);
+  }
+}
+function addEnemyRewardRatesBattleRefactor(gameTroopMember) {
+  if (!gameTroopMember.isAlive()) return;
+  addStateMetaTotalBattleRefactor(gameTroopMember, valueStateEnemyExpRate, 'EnemyExpRate', 'exp');
+  addStateMetaTotalBattleRefactor(gameTroopMember, valueStateEnemyGoldRate, 'EnemyGoldRate', 'gold');
+}
+function addStateMetaTotalBattleRefactor(gameTroopMember, stateIds, metaKey, rewardKind) {
+  for (const stateId of stateIds) {
+    if (!gameTroopMember.isStateAffected(stateId)) continue;
+    const state = $dataStates[stateId];
+    const rate = state && state.meta[metaKey];
+    if (!rate) continue;
+    if (rewardKind === 'exp') valueTotalexp += Number(rate);
+    else valueTotalgold += Number(rate);
+  }
+}
+function rollEnemyGenericDropsBattleRefactor(gameTroopMember) {
+  const dropUpItem = $dataItems[valueItemDropUpItem];
+  const dropRolls = getRandomIndex(4);
+  for (let roll = 1; roll <= dropRolls; roll++) {
+    if (drop_probabilityCalculation(gameTroopMember.level, dropUpItem) >= 90) rollGenericDropEnemyBattleSetting();
+  }
+  if (drop_probabilityCalculation(gameTroopMember.level, dropUpItem) < 90) return;
+  const classStateId = firstAffectedStateBattleRefactor(gameTroopMember, valueClassStateA);
+  if (classStateId < 1 || !$dataStates[classStateId].meta.classStateDrop) return;
+  valueClassState = $dataStates[classStateId].meta.classStateDrop.split(',');
+  valueEnemyLevel = gameTroopMember.level;
+  drop_JobStateWAget(1, 10);
+  drop_JobStateWAget(2, 10);
+}
+function firstAffectedStateBattleRefactor(battler, stateIds) {
+  let matchedStateId = 0;
+  for (const stateId of stateIds) {
+    if (battler.isStateAffected(stateId)) matchedStateId = stateId;
+  }
+  return matchedStateId;
+}
+
+// 182 = 13 is the dedicated ougi cut-in (skill 91); otherwise the current
+// action item decides, and 12 upgrades a <CutInSkillSet> entry to type 2.
+function resolveCutinTypeBattleRefactor(abilityUsageDistinction) {
+  let cutinType = 0;
+  let skillId;
+  if (abilityUsageDistinction == 13) {
+    cutinType = 4;
+    skillId = 91;
+  } else {
+    const action = BattleManager._action;
+    skillId = action && action._item ? action._item._itemId : 0;
+  }
+  if (abilityUsageDistinction == 12) {
+    const skill = $dataSkills[skillId];
+    cutinType = skill && skill.meta.CutInSkillSet ? 2 : 1;
+  }
+  return cutinType;
+}
+function playOugiBgmCutinPreparation(actorData) {
+  const currentSkill = $dataSkills[$gameVariables.value(96)];
+  const isHighQualityBurst = actorData && currentSkill && currentSkill.meta.HiQualityBurst;
+  const bgmName = isHighQualityBurst ? '21_BattleOugiBest' : '21_BattleOugi';
+  AudioManager.playBgm({ name: bgmName, volume: 50, pitch: 110, pan: 0 });
+}
+function speakOugiUseLineCutinPreparation(actor, actorData) {
+  const ougiUseMeta = actorData.meta.OugiUse;
+  if (!ougiUseMeta) return;
+  const ougiUseOptions = ougiUseMeta.split(',');
+  const selectedOption = ougiUseOptions[getRandomIndex(ougiUseOptions.length)];
+  gabWord_exeScriptNoFace([[`${actor.name()}${selectedOption}`, 0, 0]]);
+}
+// Low exposure hides the ougi CG, so type 2/4 fall back to 3/5.
+function applyHeroineCutinCutinPreparation(actorId, cutinType) {
+  let resolvedType = cutinType;
+  const exposure = $gameVariables.value(actorId + 380)[4];
+  if (exposure <= 5 && resolvedType === 2) resolvedType = 3;
+  else if (exposure <= 5 && resolvedType === 4) resolvedType = 5;
+  const settings = cutinSettingsMap[resolvedType];
+  if (!settings) return;
+  const label = 'カットインアクター' + settings.name;
+  const asset = 'CutInCG_Actor' + actorId + '_' + resolvedType;
+  valueCutInSet1 = [label, asset, settings.angle, settings.scaleX, settings.scaleY, settings.opacity, settings.duration];
+}
+
+// TP-100 special skill slots (416 = the pattern's 4th slot, otherwise slot 2
+// when its conditions pass). A trigger scan can override the slot.
+function resolveBossSelectedSkillBattleRefactor(a, bossActionPattern, triggerSkillId) {
+  let selectedSkillId = 0;
+  if (a.tp >= 100 && !a.isStateAffected(416)) {
+    const tpSkillId = bossActionPattern[2];
+    if ($dataSkills[tpSkillId] && a.meetsSkillConditions($dataSkills[tpSkillId])) selectedSkillId = tpSkillId;
+  }
+  return triggerSkillId >= 1 ? triggerSkillId : selectedSkillId;
+}
+function chooseBossNormalActionBattleRefactor(a, bossActionPattern, triggerSkillId) {
+  const fallbackCandidates = [bossActionPattern[0], bossActionPattern[3], bossActionPattern[4], bossActionPattern[5], bossActionPattern[6]];
+  let candidateSkillId = fallbackCandidates[getRandomIndex(fallbackCandidates.length)] || bossActionPattern[0];
+  if (triggerSkillId >= 1) candidateSkillId = triggerSkillId;
+  const fallbackSkillId = candidateSkillId;
+  let randomRoll = getRandomIndex(11);
+  const frontAttackSkill = $dataSkills[bossActionPattern[0]];
+  if (a.isStateAffected(29) && frontAttackSkill && frontAttackSkill.meta['Select Conditions']) randomRoll += 2;
+  if (randomRoll >= 5) {
+    const abilityCandidates = [bossActionPattern[1], bossActionPattern[7], bossActionPattern[8], bossActionPattern[9]];
+    candidateSkillId = pickBossActionSkillBossActionPattarn1(a, abilityCandidates, bossActionPattern[1]);
+  }
+  let bossActionId = candidateSkillId;
+  if (!$dataSkills[bossActionId] || !a.meetsSkillConditions($dataSkills[bossActionId])) bossActionId = fallbackSkillId;
+  return escalateBossAttackIdBattleRefactor(a, bossActionId);
+}
+// Weapon attack ids escalate at level 30/50/100 with a 50% roll each.
+const BOSS_WEAPON_ATTACK_IDS_BATTLE_REFACTOR = [101, 111, 121, 131, 141, 151, 161, 171, 181, 191, 901, 911, 921];
+function escalateBossAttackIdBattleRefactor(a, bossActionId) {
+  if (BOSS_WEAPON_ATTACK_IDS_BATTLE_REFACTOR.indexOf(bossActionId) < 0) return bossActionId;
+  let escalatedId = bossActionId;
+  for (const requiredLevel of [30, 50, 100]) {
+    const roll = getRandomIndex(101);
+    if (a.level >= requiredLevel && roll >= 51) escalatedId += 1;
+  }
+  return escalatedId;
+}
+
+const CHEST_SPAWN_EVENT_ID_ENEMYWIN_TREASUREBOX2 = 4;
+// Up to 100 tries for an offset near the source event that is neither the player
+// nor a zero-terrain tile. A zero offset in [1] means "spawn on a random tile".
+function findFreeChestOffsetEnemywinTreasurebox2(sourceEvent, treasureBoxPosition) {
+  const playerX = $gamePlayer.x;
+  const playerY = $gamePlayer.y;
+  for (let attempt = 1; attempt <= 100; attempt++) {
+    const offsetX = CHEST_SEARCH_OFFSETS_ENEMYWIN_TREASUREBOX2[getRandomIndex(5)];
+    const offsetY = CHEST_SEARCH_OFFSETS_ENEMYWIN_TREASUREBOX2[getRandomIndex(5)];
+    const targetX = sourceEvent.x + offsetX;
+    const targetY = sourceEvent.y + offsetY;
+    const isFree = $gameMap.eventIdXy(targetX, targetY) < 1 &&
+      $gameMap.terrainTag(targetX, targetY) != 0 &&
+      !(targetX == playerX && targetY == playerY);
+    treasureBoxPosition[1] = isFree ? offsetX : 0;
+    treasureBoxPosition[2] = isFree ? offsetY : 0;
+    if (treasureBoxPosition[1] != 0) break;
+  }
+}
+function spawnChestEnemywinTreasurebox2(sourceEvent, treasureBoxPosition) {
+  if (treasureBoxPosition[1] == 0) {
+    const conditionMap = { passable: 1, screen: 0, collided: 3, terrainTags: [1], regionIds: [1] };
+    return $gameMap.spawnEventRandom(CHEST_SPAWN_EVENT_ID_ENEMYWIN_TREASUREBOX2, conditionMap, true);
+  }
+  $gameMap.spawnEvent(CHEST_SPAWN_EVENT_ID_ENEMYWIN_TREASUREBOX2, sourceEvent.x, sourceEvent.y, true);
+  return $gameMap.getLastSpawnEventId();
+}
+function presentChestEnemywinTreasurebox2(chestEventId, chestEvent, treasureBoxPosition) {
+  const particleName = 'chest_c3';
+  $gameScreen._particle.particlePlay(chestEventId, particleName, 'attach:this', 'def', 'above');
+  $gameScreen._particle.particleExceed(particleName, 0.5);
+  AudioManager.playSe({ name: 'Sound1', volume: 75, pitch: 150, pan: 0 });
+  chestEvent.jumpEx(treasureBoxPosition[1], treasureBoxPosition[2], treasureBoxPosition[5], treasureBoxPosition[6]);
+  chestEvent.controlSelfVariable(1, 0, treasureBoxPosition[4], true);
+}
+
+
+// Resolves who speaks: wordSetId 1 while the actor is hit uses variable 11,
+// or the current battle member (indexed by the same variable) under switch 464.
+function resolveSpeakingActorIdBattleRefactor(wordSetId, gameVar276, actorId) {
+  if (wordSetId != 1 || gameVar276 != 1) return actorId;
+  if ($gameSwitches.value(464)) {
+    $gameVariables.setValue(20, $gameParty.battleMembers()[actorId].actorId());
+  } else {
+    $gameVariables.setValue(20, $gameVariables.value(11));
+  }
+  return $gameVariables.value(20);
+}

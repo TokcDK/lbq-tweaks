@@ -506,9 +506,10 @@ if (opt3valid) {
   //
   const _Spriteset_Map_update = Spriteset_Map.prototype.update;
   Spriteset_Map.prototype.update = function() {
-    if ($gameMap.spriteRequest()) {
-      const eventIds = $gameMap.spriteRequest();
-      for (eventId of eventIds) {
+    // PERF: spriteRequest() was called twice per frame; read it once.
+    const eventIds = $gameMap.spriteRequest();
+    if (eventIds) {
+      for (const eventId of eventIds) {
         this.addVisibleEvent($gameMap.event(eventId));
       }
       $gameMap.resetSpriteRequest();

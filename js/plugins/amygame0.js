@@ -7,9 +7,8 @@
 (function () {
   'use strict';
 
-  Game_Interpreter.prototype.sVal = function (a, b) {
-    $gameVariables.setValue(a, b);
-    return $gameVariables.value(a);
+  Game_Interpreter.prototype.sVal = function (variableId, variableNewValue) {
+    $gameVariables.setValue(variableId, variableNewValue);
   };
 
   //rpg_windows.js
@@ -70,8 +69,10 @@
     this._goldWindow.y = this.y > 0 ? 0 : Graphics.boxHeight - this._goldWindow.height;    
     
     // Use early returns for better performance
-    if ($gameVariables.value(313) >= 1) {
-      this.x = $gameVariables.value(313);
+    // PERF: read variable 313 once instead of twice.
+    const messageX = $gameVariables.value(313);
+    if (messageX >= 1) {
+      this.x = messageX;
       return;
     }
     else {
@@ -125,27 +126,26 @@
 
   Scene_Status.prototype.refreshActor = function () {
     WindowManager.hideAll();
-    valueStatusSet1 = 0;
+    window.valueStatusSet1 = 0;
     var actor = this.actor();
     this._statusWindow.setActor(actor);
   };
 
   Scene_Status.prototype.onActorChange = function () {
     WindowManager.hideAll();
-    valueStatusSet1 = 0;
     this.refreshActor();
     this._statusWindow.activate();
   };
 
   Scene_Status.prototype.nextPageOpenok = function () {
-    if (valueStatusSet1 == 0) {
+    if (window.valueStatusSet1 == 0) {
       var actor = this.actor();
       $gameVariables.setValue(20, actor.actorId());
       battle_xsarStatas1(actor, false);
-      valueStatusSet1 = 1;
+      window.valueStatusSet1 = 1;
     } else {
       WindowManager.hideAll();
-      valueStatusSet1 = 0;
+      window.valueStatusSet1 = 0;
     };
     this._statusWindow.activate();
   };
@@ -153,51 +153,34 @@
   //rpg_scenes.js
   Scene_Battle.prototype.startActorCommandSelection = function () {
     const actor = BattleManager.actor();
-    console.debug("startActorCommandSelection called. Actor:", actor);
+    if (!actor) return;
 
-    // Only perform tachie operations if needed (improved conditionals)
-    if (!Input.isRepeated("ok") && ConfigManager.battleAniSpeed >= 3 && !$gameSwitches.value(131)) {
-      console.debug("Tachie operations condition met:",
-                    "Input isRepeated('ok'):", Input.isRepeated("ok"),
-                    "BattleAniSpeed:", ConfigManager.battleAniSpeed,
-                    "Switch 131:", $gameSwitches.value(131));
+    const isOkRepeated = Input.isRepeated("ok");
 
+    // Only perform tachie operations if needed
+    if (!isOkRepeated && ConfigManager.battleAniSpeed >= 3 && !$gameSwitches.value(131)) {
       // Remove tachie
       tachie_syoukyo1(getPreviousTachiePicId());
-      console.debug("tachie_syoukyo1 invoked with variable 300:",
-        getPreviousTachiePicId());
-      console.debug("tachie_syoukyo1 actor.actor().meta['tachiePicId']:",
-        actor.actor().meta['tachiePicId']);
 
       // Set variable directly with actor ID
       $gameVariables.setValue(20, actor.actorId());
-      console.debug("Game variable 20 set to actor ID:", actor.actorId());
 
       // Only call tachie_settei3 if necessary
       if ($gameVariables.value(263) >= 2) {
-        console.debug("tachie_settei3 condition met with variable 263:",
-                      $gameVariables.value(263));
         tachie_settei3(actor);
       }
 
-      // Show tachie using cached actor
+      // Show tachie
       tachie_hyouji2(actor);
-      console.debug("tachie_hyouji2 invoked for actor:", actor);
-    } else {
-      console.debug("Tachie operations skipped.");
     }
 
     // Cache the current actor for status window
     this._statusWindow.select(actor.index());
-    console.debug("Status window actor selected with index:", actor.index());
     this._partyCommandWindow.close();
-    console.debug("Party command window closed.");
     this._actorCommandWindow.setup(actor);
-    console.debug("Actor command window set up for actor:", actor);
 
     // Check Imported.MOG_BattleHud with direct property access
     if (Imported.MOG_BattleHud && !this._hudField) {
-      console.debug("MOG_BattleHud detected and HUD field is missing. Creating HUD field.");
       this.createHudField();
       this.createBattleHudSB();
     }
@@ -222,7 +205,7 @@
             gameScreen.erasePicture(50);
           }
           const scene = SceneManager._scene;
-          if (scene._gabWindow) {
+          if (scene && scene._gabWindow) {
             scene.clearGabWindow();
           }
           this.startTurn();
@@ -289,15 +272,10 @@
     this._statusWindow.refresh();
   };
 
+  const DataManager_makeSavefileInfo = DataManager.makeSavefileInfo;
   DataManager.makeSavefileInfo = function () {
-    const info = {};
-    info.globalId = this._globalId;
-    info.title = $dataSystem.gameTitle;
-    info.characters = $gameParty.charactersForSavefile();
-    info.faces = $gameParty.facesForSavefile();
-    info.playtime = $gameSystem.playtimeText();
-    info.timestamp = Date.now();
-    info.saveString = $gameVariables.value(87);
+    const info = DataManager_makeSavefileInfo.call(this);
+    info.saveString = $gameVariables ? $gameVariables.value(87) : '';
     return info;
   };
 
@@ -306,13 +284,16 @@
   };
 
   Game_Map.prototype.updateEvents = function () {
-    const events = this.events();
+    // PERF: iterate the internal sparse array directly. Game_Map#events()
+    // allocates a fresh filtered array on every call, and updateEvents runs
+    // once per frame; the inline null check yields the same events in the
+    // same order with zero per-frame allocation.
+    const events = this._events;
     const len = events.length;
-    // Use direct indexing instead of forEach for better performance
     for (let i = 0; i < len; i++) {
       const event = events[i];
       // Only update events that are near the player
-      if (event.isNearThePlayer()) {
+      if (event && event.isNearThePlayer()) {
         event.update();
       }
     }
@@ -332,7 +313,7 @@
   const ARRAY_1to15 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
   Window_SkillType.prototype.updateHelp = function () {
     const itemdata = $dataWeapons[ARRAY_1to15[this.currentExt() - 1]]; //アイテムIDのデータを拾って
-    this._helpWindow.setItem(itemdata) //ヘルプウィンドウに表示させる
+    this._helpWindow.setItem(itemdata); //ヘルプウィンドウに表示させる
   };
 
   Scene_Skill.prototype.createSkillTypeWindow = function () {
@@ -344,7 +325,7 @@
     this._skillTypeWindow.setHandler('pagedown', this.nextActor.bind(this));
     this._skillTypeWindow.setHandler('pageup', this.previousActor.bind(this));
     this.addWindow(this._skillTypeWindow);
-    this._skillTypeWindow.updateHelp; //実際に処理に加える
+    // NOTE: help window is refreshed automatically via setHelpWindow + Window_Selectable.callUpdateHelp
   };
 
   Game_CharacterBase.prototype.realMoveSpeed = function () {
@@ -378,9 +359,13 @@
     windowEventItemStart.call(this);
   };
 
+  // Switch ids controlling the event-item "choose item" window layout.
+  const EVENT_ITEM_LAYOUT_HALF_WIDTH_SWITCH_ID = 111;
+  const EVENT_ITEM_SINGLE_COLUMN_SWITCH_ID = 400;
+
   Window_EventItem.prototype.initializeWidth = function () {
     const isDefaultWidth = this.isDefaultSize();
-    const switchOn = $gameSwitches.value(111);
+    const switchOn = $gameSwitches.value(EVENT_ITEM_LAYOUT_HALF_WIDTH_SWITCH_ID);
 
     if (isDefaultWidth && switchOn) {
       this.width = this.defaultWidth() / 2 - $gameVariables.value(338);
@@ -390,7 +375,7 @@
   };
 
   Window_EventItem.prototype.maxCols = function () {
-    return $gameSwitches.value(400) ? 1 : 2;
+    return $gameSwitches.value(EVENT_ITEM_SINGLE_COLUMN_SWITCH_ID) ? 1 : 2;
   };
 
   Window_EventItem.prototype.defaultWidth = function () {
@@ -442,7 +427,7 @@
     }
   };
 
-  const updatePatternAlias = Sprite_Weapon.prototype.updatePattern
+  const updatePatternAlias = Sprite_Weapon.prototype.updatePattern;
   Sprite_Weapon.prototype.updatePattern = function () {
     if (this.parent._maxPattern && this._pattern === this.parent._maxPattern) {
       return;
@@ -450,21 +435,26 @@
     updatePatternAlias.call(this);
   };
 
-  const refreshMotionAlias = Sprite_Actor.prototype.refreshMotion
+  const refreshMotionAlias = Sprite_Actor.prototype.refreshMotion;
   Sprite_Actor.prototype.refreshMotion = function () {
     if (this._actor && this._maxPattern && this._pattern === this._maxPattern) {
       return;
     }
-    refreshMotionAlias.call(this)
-  }
+    refreshMotionAlias.call(this);
+  };
 
   Sprite_Actor.prototype.setMaxFrame = function (num) {
     this._maxPattern = num;
-  }
+  };
 
   Sprite_Actor.prototype.removeMaxFrame = function () {
-    delete this._maxPattern
-  }
+    // PERF: `delete` would move this sprite onto V8's slow dictionary-mode path,
+    // and Sprite_Actor instances are long-lived (one per actor for the whole
+    // session). `undefined` is indistinguishable from the deleted state here:
+    // updateMotionCount tests `this._maxPattern !== undefined` and
+    // updatePattern/refreshMotion test it for truthiness.
+    this._maxPattern = undefined;
+  };
 
   Sprite_Actor.prototype.setFrame = function (motion, num) {
     // Use direct comparison instead of loose equality
@@ -487,7 +477,7 @@
     this._pattern = num;
     this._motionCount = 0;
     this.setMaxFrame(num);
-  }
+  };
 
-})()
+})();
 

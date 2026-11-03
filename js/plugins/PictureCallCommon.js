@@ -6,6 +6,7 @@
 // http://opensource.org/licenses/mit-license.php
 // ----------------------------------------------------------------------------
 // Version
+// 1.14.6 2024/09/07 競合回避用のコードを追加
 // 1.14.5 2023/02/20 ピクチャの紐付けがされていない状態でもマウスオーバー判定が裏で動作してしまう問題を修正
 // 1.14.4 2021/08/22 「並列処理として実行」のパラメータが戦闘画面には適用されない問題を修正
 // 1.14.3 2021/05/01 紐付け解除の際の設定値を変更
@@ -582,12 +583,17 @@
     };
 
     Game_Map.prototype.updatePictureCommonEvents = function() {
-        this._pictureCommonEvents.forEach(function(event) {
+        // Called from Game_Map.updateEvents every frame, and the list lives on
+        // $gameMap, so rebuilding it with filter() allocated a fresh array (plus two
+        // closures) every frame and churned the save graph. Compact in place instead.
+        var list = this._pictureCommonEvents;
+        var kept = 0;
+        for (var i = 0; i < list.length; i++) {
+            var event = list[i];
             event.update();
-        });
-        this._pictureCommonEvents = this._pictureCommonEvents.filter(function(event) {
-            return event.isRunning();
-        })
+            if (event.isRunning()) list[kept++] = event;
+        }
+        list.length = kept;
     };
 
     //=============================================================================
@@ -737,7 +743,7 @@
     Scene_Base.prototype.getPictureSprite = function(pictureId) {
         var result = null;
         this._spriteset.iteratePictures(function(picture) {
-            if (picture.isIdEquals(pictureId)) {
+            if (picture instanceof Sprite_Picture && picture.isIdEquals(pictureId)) {
                 result = picture;
                 return false;
             }
@@ -1094,16 +1100,21 @@
         this._updateBindKeyState();
     };
 
+    // Hoisted so the callback is allocated once at load rather than on every
+    // Input.update frame. Map.forEach still drives it, so deleting entries during
+    // the walk behaves exactly as before.
+    function updateBindKeyStateEntry(frame, keyName) {
+        frame--;
+        if (frame === 0 || !this._currentState[keyName]) {
+            this._currentState[keyName] = false;
+            this._bindKeyStateFrames.delete(keyName);
+        } else {
+            this._bindKeyStateFrames.set(keyName, frame);
+        }
+    }
+
     Input._updateBindKeyState = function() {
-        this._bindKeyStateFrames.forEach(function(frame, keyName) {
-            frame--;
-            if (frame === 0 || !this._currentState[keyName]) {
-                this._currentState[keyName] = false;
-                this._bindKeyStateFrames.delete(keyName);
-            } else {
-                this._bindKeyStateFrames.set(keyName, frame);
-            }
-        }, this);
+        this._bindKeyStateFrames.forEach(updateBindKeyStateEntry, this);
     };
 
     //=============================================================================

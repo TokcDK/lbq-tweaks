@@ -1104,7 +1104,11 @@ function Filter_Controller() {
     };
 
     Game_Map.prototype.updateFilterConArr = function() {
-        this._filterConArr.forEach(function(FC, key, map) {
+        // Runs every frame. Most maps have no active filters, so bail out before
+        // allocating the callback and walking the Map.
+        var map = this._filterConArr;
+        if (!map || map.size === 0) return;
+        map.forEach(function(FC, key, m) {
             if( FC.isMapEventOnly() && $gameParty.inBattle() ) return;
             FC.update();
         });
@@ -1480,7 +1484,10 @@ function Filter_Controller() {
     };
     
     Scene_Map.prototype.updateTKMfilters = function() {
-        $gameMap._filterConArr.forEach(function(FC, key, map) {
+        // Runs every frame; skip the callback allocation when nothing is filtered.
+        var conArr = $gameMap._filterConArr;
+        if (!conArr || conArr.size === 0) return;
+        conArr.forEach(function(FC, key, map) {
             var filter = this._TKMFilters.get(FC._id);
             if(FC._erase) {
                 if(filter) {
@@ -1507,7 +1514,10 @@ function Filter_Controller() {
     };
     
     Scene_Battle.prototype.updateTKMfilters = function() {
-        $gameMap._filterConArr.forEach(function(FC, key, map) {
+        // Runs every frame; skip the callback allocation when nothing is filtered.
+        var conArr = $gameMap._filterConArr;
+        if (!conArr || conArr.size === 0) return;
+        conArr.forEach(function(FC, key, map) {
             if(FC.isMapEventOnly()) return;
             var filter = this._TKMFilters.get(FC._id);
             if(FC._erase) {

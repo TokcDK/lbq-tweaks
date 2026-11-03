@@ -1426,21 +1426,25 @@ Scene_Map.prototype.updateActiveMessageDisplay = function()
         // メッセージを表示できないときは非表示にしつつ各種フラグを解除
         $gameTemp.clearMapActiveMessage();
         $gameMap.clearActiveMessageShownFlags();
-        this._activeMessageWindowLayer.children.forEach(function(child)
-        {
-            child.fadeOut();
-        });
+        // Runs every frame, so the children array is walked in place instead of
+        // through forEach, which allocated a closure per frame.
+        var fading = this._activeMessageWindowLayer.children;
+        for (var f = 0; f < fading.length; f++) {
+            fading[f].fadeOut();
+        }
         return;
     }
 
     // 表示が完了したものを削除
-    this._activeMessageWindowLayer.children.filter(function(child)
-    {
-        return !child.isDisplaying();
-    }).forEach(function(item)
-    {
-        this._activeMessageWindowLayer.removeChild(item);
-    }, this);
+    // Reverse order so removal during iteration cannot skip an entry. The set of
+    // removed children is identical to the old filter().forEach() pair, which
+    // allocated an array and two closures every frame.
+    var children = this._activeMessageWindowLayer.children;
+    for (var i = children.length - 1; i >= 0; i--) {
+        if (!children[i].isDisplaying()) {
+            this._activeMessageWindowLayer.removeChild(children[i]);
+        }
+    }
 
     // 要求されているメッセージを表示できるだけ表示
     while ($gameTemp.isMapActiveMessageReady())

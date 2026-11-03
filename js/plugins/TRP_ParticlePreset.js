@@ -3,6 +3,10 @@
 //=============================================================================
 /*:
  * @help
+ * 【更新履歴】
+ * 1.08 2022/09/04 漂う光系グループプリセット32種追加
+ * 1.00
+ *
  * aura_bp <対象:character> ＠キャラ_play:青白い粒子と集中線拡散
  * aura_bp2 <対象:character> ＠キャラ_play:青白いサークル拡大
  * aura_static_b <対象:character> ＠キャラ:もやもやのオーラ(アニメ画像使用)
@@ -83,39 +87,89 @@
  * warp_red_c <対象:character> ＠キャラ:赤魔法陣ワープの集中線
  * warp_red_cp <対象:character> ＠キャラ:ワープ直後の幾何学エフェクト
  *
- * @requiredAssets img/particles/snow_particle2g
- * @requiredAssets img/particles/line_oval3
- * @requiredAssets img/particles/circle3g
- * @requiredAssets img/particles/ANIM:Darkness2:12:M
+ * 【パーティクルグループ】
+ * commet <対象:weather> ＠星空と彗星
+ * firefly <対象:region> ＠蛍
+ * fireworks <対象:character> ＠打ち上げ花火
+ * light_green_w1 <対象:weather> ＠天候:漂う光<緑/森_1>
+ * light_green_w2 <対象:weather> ＠天候:漂う光<緑/森_2>
+ * light_green_w3 <対象:weather> ＠天候:漂う光<緑/森_3>
+ * light_black_w1 <対象:weather> ＠天候:漂う光<黒/闇_1>
+ * light_black_w2 <対象:weather> ＠天候:漂う光<黒/闇_2>
+ * light_black_w3 <対象:weather> ＠天候:漂う光<黒/闇_3>
+ * light_ash_w1 <対象:weather> ＠天候:漂う光<灰_1>
+ * light_ash_w2 <対象:weather> ＠天候:漂う光<灰_2>
+ * light_ice_w1 <対象:weather> ＠天候:漂う光<氷_1>
+ * light_ice_w2 <対象:weather> ＠天候:漂う光<氷_2>
+ * light_ice_w3 <対象:weather> ＠天候:漂う光<氷_3>
+ * light_red_w1 <対象:weather> ＠天候:漂う光<赤/炎_1>
+ * light_red_w2 <対象:weather> ＠天候:漂う光<赤/炎_2>
+ * light_red_w3 <対象:weather> ＠天候:漂う光<赤/炎_3>
+ * light_blue_w1 <対象:weather> ＠天候:漂う光<青/水_1>
+ * light_blue_w2 <対象:weather> ＠天候:漂う光<青/水_2>
+ * light_blue_w3 <対象:weather> ＠天候:漂う光<青/水_3>
+ * light_white_w1 <対象:weather> ＠天候:漂う光<白/光_1>
+ * light_white_w2 <対象:weather> ＠天候:漂う光<白/光_2>
+ * light_white_w3 <対象:weather> ＠天候:漂う光<白/光_3>
+ * light_purple_w1 <対象:weather> ＠天候:漂う光<紫/魔_1>
+ * light_purple_w2 <対象:weather> ＠天候:漂う光<紫/魔_2>
+ * light_purple_w3 <対象:weather> ＠天候:漂う光<紫/魔_3>
+ * light_gold_w1 <対象:weather> ＠天候:漂う光<金_1>
+ * light_gold_w2 <対象:weather> ＠天候:漂う光<金_2>
+ * light_gold_w3 <対象:weather> ＠天候:漂う光<金_3>
+ * light_monochrome_w1 <対象:weather> ＠天候:漂う光<白黒/陰陽_1>
+ * light_monochrome_w2 <対象:weather> ＠天候:漂う光<白黒/陰陽_2>
+ * light_monochrome_w3 <対象:weather> ＠天候:漂う光<白黒/陰陽_3>
+ * light_rainbow_w1 <対象:weather> ＠天候:漂う光<虹_1>
+ * light_rainbow_w2 <対象:weather> ＠天候:漂う光<虹_2>
+ * light_rainbow_w3 <対象:weather> ＠天候:漂う光<虹_3>
+ *
+ * @requiredAssets img/particles/dust4
+ * @requiredAssets img/particles/dust2
+ * @requiredAssets img/particles/dust3
+ * @requiredAssets img/particles/dust1
+ * @requiredAssets img/particles/dust4g
+ * @requiredAssets img/particles/dust2g
+ * @requiredAssets img/particles/dust1g
+ * @requiredAssets img/particles/dust3g
+ * @requiredAssets img/particles/particle7
+ * @requiredAssets img/particles/particle9
  * @requiredAssets img/particles/particle8
+ * @requiredAssets img/particles/particle1
+ * @requiredAssets img/particles/leaf1g
+ * @requiredAssets img/particles/shine2
+ * @requiredAssets img/particles/shine_thin1g
+ * @requiredAssets img/particles/shine_thin3
+ * @requiredAssets img/particles/flare
+ * @requiredAssets img/particles/line_ray2
  * @requiredAssets img/particles/particle5
+ * @requiredAssets img/particles/line_oval1
+ * @requiredAssets img/particles/shine3
+ * @requiredAssets img/particles/line_oval3
+ * @requiredAssets img/particles/snow_particle2g
+ * @requiredAssets img/particles/circle3g
+ * @requiredAssets img/particles/cloud3
  * @requiredAssets img/particles/snow_particle2
  * @requiredAssets img/particles/snow_particle1
  * @requiredAssets img/particles/bubble1
  * @requiredAssets img/particles/heart4g
- * @requiredAssets img/particles/particle1
  * @requiredAssets img/particles/circle
- * @requiredAssets img/particles/cloud3
  * @requiredAssets img/particles/cloud2
  * @requiredAssets img/particles/cloud1
- * @requiredAssets img/particles/shine2
  * @requiredAssets img/particles/smoke2
  * @requiredAssets img/particles/cloud2s
- * @requiredAssets img/particles/shine_thin3
  * @requiredAssets img/particles/particle2
  * @requiredAssets img/particles/smog1
  * @requiredAssets img/particles/circle2
  * @requiredAssets img/particles/smog2
  * @requiredAssets img/particles/smoke1
- * @requiredAssets img/particles/flare
+ * @requiredAssets img/particles/flame1g
  * @requiredAssets img/particles/fish1
  * @requiredAssets img/particles/flare2
  * @requiredAssets img/particles/cartoon_fuss2
  * @requiredAssets img/particles/cartoon_fuss1
  * @requiredAssets img/particles/flame1
  * @requiredAssets img/particles/particle4
- * @requiredAssets img/particles/shine3
- * @requiredAssets img/particles/line_oval1
  * @requiredAssets img/particles/hexagon_line3
  * @requiredAssets img/particles/hexagon1
  * @requiredAssets img/particles/line2
@@ -131,7 +185,16 @@
  * @requiredAssets img/particles/thunder2
  * @requiredAssets img/particles/square_line1
  */
-var $dataTrpParticlePreset = {
+
+var $dataTrpParticlePreset,$dataTrpParticleGroupsPreset;
+
+
+(()=>{
+'use strict';
+
+function LC(text){return text;}
+
+$dataTrpParticlePreset = {
 	//システム用
 	click:[[[0,1,0.85,0.5,1,0],0,0],[[0,1.5,0.5,1,1,0],0.5,0,0],[[0,200,1,200],0.5,0,0],[[0,"#0031ff",0.25,"#eaff00",0.5,"#00ff04",0.75,"#7b00ff",1,"#ff0000"],0,0],1,[0,300],0,[0,360],[0,0],0,0,[0.4,0.6],1,0.001,1,1,0.01,1000,[0,0],0,[0,0],null,null,0,0,"particle1",12,"click:マウスクリック/タップ用1"],
     click2:[[[0,0.2,1,0],0,0],[[0,0,0.25,0.75,1,1.5],1,0,0],[[0,0,1,0],1,0,0],[[0,"#ffffff",1,"#ffffff"],0,0],0,[0,0],0,[0,360],[0,0],0,0,[0.35,0.35],null,0.001,1,1,0.0011,10000,[0,0],0,[0,0],null,null,0,0,"circle",12,"click:マウスクリック/タップ用2"],
@@ -316,5 +379,185 @@ var $dataTrpParticlePreset = {
 
 	//テスト用
     particle:[[[0,0,0.5,1,1,0],0,0],[[0,0,0.5,1,1,0],0.5,0,0],[[0,300,1,100],1,0,0],[[0,"#ffffff",1,"#ffffff"],0,0],0,[0,0],0,[0,360],[0,0],0,0,[1,1],1,0.01,1,1,-1,10000,[0,0],0,[0,0],null,null,0,0,"particle1",0,"テスト用"],
-    light_r:[[[0,1,0.5,1,1,0],0,0],[[0,0,0.5,1,1,0],0.2,0,0],[[0,10,1,100],0.5,0,0],[[0,"#14ff1f",1,"#ffef9d"],0,0],1,[0,0],0,[-90,-90],[0,0],0,0,[1,2],0,0.2,1,1,-1,10000,[0,0],0,[0,0],null,null,0,0,"particle4",7,"region:テスト用1"]
+    light_r:[[[0,1,0.5,1,1,0],0,0],[[0,0,0.5,1,1,0],0.2,0,0],[[0,10,1,100],0.5,0,0],[[0,"#14ff1f",1,"#ffef9d"],0,0],1,[0,0],0,[-90,-90],[0,0],0,0,[1,2],0,0.2,1,1,-1,10000,[0,0],0,[0,0],null,null,0,0,"particle4",7,"region:テスト用1"],
+
+
+
+    //サブ用
+    "commet/h":[4,[[0,0.8,1,0]],[[0,0.4,1,0.4],0.8],[[0,200,0.9,200,1,400],0.25],[[0,"#fffedf",1,"#feffef"]],0,[0,0],null,[140,140],[-300,0],0,0,0,[1.5,2],1,0.5,0.6,1,-1,10000,[0,0],1,[0,0],[-404,-308,808,200],0,0,"shine2",0,""],
+    "_sub:0:commet/h":[4,[[0,1,1,0]],[[0,0.2,1,0.2],0.5],[[0,0,1,0],0.5],[[0,"#ffe2c4",1,"#ffffff"]],0,[0,0],null,[170,190],[150,150],0,0,0,[0.5,0.8],1,0.03,0.2,5,-1,10000,[0,0],2,[0,0],[0,0,10,0],0,0,"particle9",0,""],
+    "_sub:1:commet/h":[4,[[0,0,0.5,1,1,0]],[[0,1.2,1,0],0.5],[[0,100,1,1],1],[[0,"#f8aaaa",1,"#ffffff"]],0,[0,0],null,[180,180],[0,0],0,0,0,[1,1],1,0.1,1,1,-1,10000,[0,0],2,[0,0],[0,0,7,0],0,0,"line_oval3",0,""],
+    "starry_sky/h":[4,[[0,0,0.2,1,0.25,0.7,0.3,1,0.35,0.7,0.4,1,0.45,0.7,0.5,1,0.55,0.7,0.6,1,0.65,0.7,0.7,1,0.75,0.7,0.8,1,0.85,0.5,0.9,0.65,1,0]],[[0,0.2,1,0.2],0.3],[[0,0,1,0],1],[[0,"#ffffff",1,"#ffffff"]],0,[0,0],null,[0,360],[0,0],0,0,0,[4,6],1,0.05,1,1,-1,10000,[0,0],1,[0,0],[-404,-308,808,500],0,0,"particle9,particle8,particle7",0,""],
+    "firefly/h":[4,[[0,0,0.2,1,0.4,0.5,0.5,1,0.6,0.5,0.8,1,1,0]],[[0,0.3,1,0.3],0.35],[[0,50,1,50],0.3],[[0,"#a4fb7b",1,"#a4fb7b"]],0,[0,0],null,[0,360],[0,0],0,0,0,[3,6],1,30,0.5,1,-1,10000,[5,0.3],1,[0,0],[0,0,0,0],0,0,"particle8",0,""],
+    "_sub:0:firefly/h":[4,[[0,1,1,0]],[[0,0.05,1,0.05],0.5],[[0,10,1,0],1],[[0,"#b3ff86",1,"#ffffff"]],0,[0,0],null,[180,180],[0,0],0,0,0,[1.5,2],1,0.15,1,1,-1,10000,[0,0],0,[0,0],null,0,0,"line_ray2,particle7",0,""],
+    "fireworks_shot/h":[4,[[0,1,0.8,1,1,0]],[[0,0.15,1,0.15],0.5],[[0,800,0.5,300,0.8,100,1,0],0.7],[[0,"#ffffff",1,"#ffffff"]],0,[0,0],null,[-90,-90],[0,0],0,0,0,[1,1],1,0.5,0.5,1,-1,10000,[0,0],1,[0,0],[-312,0,624,0],0,0,"particle9",0,""],
+    "_sub:0:fireworks/h":[4,[[0,0,0.11,1,0.5,1,1,0]],[[0,0.1,0.15,0.1,0.8,0.05,1,0],0.8],[[0,1200,0.1,200,0.2,50,1,1],0.1],[[0,"#ff8d8d",0.4,"#ffffff",1,"#ffa83e"]],1,[0,0],null,[0,360],[50,-50],0,0,0,[2,2],1,0.1,1,200,0.11,10000,[0,0],1,[0,0],[0,0,0,0],0,0,"flare",0,""],
+    "_sub:1:fireworks/h":[4,[[0,0.2,1,0]],[[0,0.5,1,0],0.5],[[0,0,1,0],1],[[0,"#ffd6c1",1,"#ffffff"]],0,[0,0],null,[175,185],[0,0],0,0,0,[0.4,0.6],1,0.01,1,1,0.9,10000,[1,0.01],0,[0,0],null,0,0,"particle9",0,""],
+
+
+    //漂う光(サブ)
+    "_auto:0:light_green_w1/h":[4,[[0,0,0.33,1,0.5,0.5,0.67,1,1,0]],[[0,0,0.25,0.25,1,0.25],0.5],[[0,1,0.2,25,1,25],0.2],[[0,"#85ff76",1,"#76ffe6"]],1,[0,0],null,[0,360],[0,0],0,0,0,[2,4],1,0.2,1,1,-1,10000,[10,0.05],1,[0,0],[-408,-312,816,624],0,0,"particle9",6,""],
+	"_auto:0:light_green_w2/h":[4,[[0,0,0.25,1,0.5,0.5,0.75,1,1,0]],[[0,0,0.25,0.5,1,0.5],0.5],[[0,30,1,30],0.2],[[0,"#85ff76",1,"#85ff76"]],0,[0,0],null,[0,360],[0,0],0,0,0,[2,3],1,0.2,1,1,-1,10000,[10,0.05],1,[0,0],[-408,-312,816,624],0,0,"particle8",6,""],
+	"_sub:0:light_green_w2/h":[4,[[0,0,0.5,0.15,1,0]],[[0,1,1,1],0.5],[[0,0,1,0],1],[[0,"#b7ff8d",1,"#b7ff8d"]],0,[0,0],null,[0,360],[0,0],0,0,0,[1,2],1,0.25,0.2,1,-1,10000,[0,0],0,[0,0],null,0,0,"flare",0,""],
+	"_auto:0:light_green_w3/h":[4,[[0,0,0.5,1,1,0]],[[0,0,0.5,0.5,1,0],0.1],[[0,20,1,20],0.5],[[0,"#7bffae",1,"#ccff7b"]],1,[0,-25],null,[-60,-120],[0,0],0,0,0,[2,4],1,0.2,1,1,-1,10000,[10,0.05],1,[0,0],[-408,-312,816,624],0,0,"particle9",6,""],
+	"_sub:0:light_green_w3/h":[4,[[0,1,1,0]],[[0,0,0.2,0.4,1,0],0.5],[[0,0,1,0],1],[[0,"#a2fff1",1,"#9dff9f"]],1,[0,0],null,[0,360],[0,0],0,0,0,[1.5,2],1,0.1,0.25,1,-1,10000,[0,0],0,[0,0],null,0,0,"particle9",0,""],
+
+	"_auto:0:light_black_w1/h":[4,[[0,0,0.25,0.9,0.75,0.9,1,0]],[[0,0,0.25,0.2,1,0.2],0.5],[[0,30,1,30],0.2],[[0,"#2542bf",1,"#9125bf"]],0,[0,0],null,[0,360],[0,0],0,0,0,[2,3],2,0.07,1,1,-1,10000,[10,0.05],1,[0,0],[-408,-312,816,624],0,0,"particle7",6,""],
+	"_auto:0:light_black_w2/h":[4,[[0,0,0.25,1,0.5,0.5,0.75,1,1,0]],[[0,0,0.25,0.5,1,0.7],0.5],[[0,40,1,40],0.3],[[0,"#491cb8",1,"#143c88"]],0,[0,0],null,[0,360],[0,0],0,0,0,[2,3],2,0.2,1,1,-1,10000,[10,0.05],1,[0,0],[-408,-312,816,624],0,0,"particle9",6,""],
+	"_sub:0:light_black_w2/h":[4,[[0,1,1,0]],[[0,0.5,1,0],0.4],[[0,40,1,10],0.2],[[0,"#6c52ff",1,"#6c52ff"]],0,[0,0],null,[0,360],[0,0],0,0,0,[1,1],2,0.05,0.25,1,-1,10000,[10,0.05],0,[0,0],null,0,0,"particle9",0,""],
+	"_auto:0:light_black_w3/h":[4,[[0,0,0.25,0.9,0.75,0.9,1,0]],[[0,0,0.25,0.2,1,0.2],0.5],[[0,60,1,60],0.1],[[0,"#2542bf",1,"#9125bf"]],0,[0,0],null,[0,360],[0,0],0,0,0,[2,3],2,0.125,1,1,-1,10000,[10,0.05],1,[0,0],[-408,-312,816,624],0,0,"particle7",6,""],
+	"_sub:0:light_black_w3/h":[4,[[0,1,1,0]],[[0,0,0.2,0.4,1,0],0.5],[[0,0,1,0],1],[[0,"#781eff",1,"#2b2fff"]],1,[0,0],null,[0,360],[0,0],0,0,0,[1,2.5],2,0.1,0.25,1,-1,10000,[0,0],0,[0,0],null,0,0,"particle9",0,""],
+	"_sub:1:light_black_w3/h":[4,[[0,0,0.1,0.1,1,0]],[[0,0.7,1,0.7],0.1],[[0,0,1,0],1],[[0,"#3630df",1,"#131162"]],0,[0,0],null,[0,360],[0,0],0,0,0,[1,1],2,0.2,0.15,1,-1,10000,[0,0],0,[0,0],null,0,0,"flare",0,""],
+
+	"_auto:0:light_ash_w1/h":[4,[[0,0,0.25,0.9,0.5,0.8,0.75,0.9,1,0]],[[0,0.35,1,0.35],0.3],[[0,20,1,20],0.2],[[0,"#d4d4d4",1,"#8d8d8d"]],1,[0,0],null,[0,360],[90,-90],0,0,0,[4,6],0,0.05,1,1,-1,10000,[10,0.05],1,[0,0],[-408,-312,816,624],0,0,"dust4,dust2,dust3,dust1",6,""],
+	"_auto:0:light_ash_w2/h":[4,[[0,0,0.25,0.9,0.5,0.8,0.75,0.9,1,0]],[[0,0.35,1,0.35],0.3],[[0,20,1,20],0.2],[[0,"#ff9e8d",1,"#ffc988"]],1,[0,0],null,[0,360],[90,-90],0,0,0,[4,6],1,0.2,1,1,-1,10000,[10,0.05],1,[0,0],[-408,-312,816,624],0,0,"dust4g,dust2g,dust1g,dust3g",6,""],
+	"_sub:0:light_ash_w2/h":[4,[[0,0,0.2,0.15,1,0]],[[0,0.4,1,0.4],0],[[0,1,1,1],1],[[0,"#ff9940",1,"#ff6f6f"]],1,[0,0],null,[0,360],[0,0],0,0,0,[2,2],1,0.5,0.5,1,-1,10000,[0,0],0,[0,0],null,0,0,"flare",0,""],
+
+	"_auto:0:light_ice_w1/h":[4,[[0,0,0.25,1,0.5,0.5,0.75,1,1,0]],[[0,0,0.25,0.35,1,0.35],0.2],[[0,20,1,20],0.2],[[0,"#8be1ff",1,"#b9bcff"]],1,[0,0],null,[0,360],[0,0],0,0,0,[3,6],1,0.2,1,1,-1,10000,[5,0.02],1,[0,0],[-408,-312,816,624],0,0,"particle8",6,""],
+	"_auto:0:light_ice_w2/h":[4,[[0,0,0.5,1,1,0]],[[0,1,1,1],0.5],[[0,30,1,30],0.2],[[0,"#76ffea",1,"#c1e1ff"]],0,[0,0],null,[-90,-90],[90,-90],0,0,0,[1.5,3],1,0.35,1,1,-1,10000,[5,0.01],1,[0,0],[-408,-312,816,624],0,0,"dust1g",6,""],
+	"_sub:0:light_ice_w2/h":[4,[[0,0.15,1,0]],[[0,0.7,1,0.7],0.15],[[0,0,1,0],1],[[0,"#72e5ff",1,"#6b97ff"]],1,[0,0],null,[0,360],[0,0],0,0,0,[1,1],1,0.2,0.5,1,-1,10000,[0,0],0,[0,0],null,0,0,"flare",0,""],
+	"_auto:0:light_ice_w3/h":[4,[[0,0,1,0]],[[0,0,1,0],0.5],[[0,80,1,80],0.3],[[0,"#add5ff",1,"#76a6ff"]],0,[0,0],null,[-100,-80],[0,0],0,0,0,[2,3],1,0.25,1,1,-1,10000,[10,0.05],1,[0,0],[-408,-312,816,624],0,0,"shine2,shine_thin1g,shine_thin3,particle9",6,""],
+	"_sub:0:light_ice_w3/h":[4,[[0,0,0.19,0,0.2,1,0.49,1,0.5,0,0.51,1,0.69,1,1,0]],[[0,0.5,0.1,0.4,1,0],0.2],[[0,0,1,0],1],[[0,"#8bfffd",1,"#7291ff"]],1,[0,0],null,[0,360],[90,-90],0,0,0,[0.5,1],1,0.2,0.5,1,-1,10000,[0,0],0,[0,0],null,0,0,"shine_thin3,shine3,shine_thin1g",0,""],
+	"_sub:1:light_ice_w3/h":[4,[[0,0,0.2,1,1,0]],[[0,0.5,1,0],0.2],[[0,10,1,10],1],[[0,"#8bfffd",1,"#7291ff"]],1,[0,0],null,[0,360],[90,-90],0,0,0,[1,2],1,0.1,0.5,1,-1,10000,[0,0],0,[0,0],null,0,0,"particle9",0,""],
+
+	"_auto:0:light_red_w1/h":[4,[[0,0,0.25,1,0.5,0.5,0.75,1,1,0]],[[0,0,0.25,0.5,1,0.5],0.5],[[0,30,1,30],0.2],[[0,"#ffb9af",1,"#ff1b1b"]],1,[0,-5],null,[-90,-90],[0,0],0,0,0,[2,3],1,0.04,1,1,-1,10000,[10,0.05],1,[0,0],[-408,-312,816,624],0,0,"dust4g,dust3g,dust1g,dust2g",6,""],
+	"_auto:0:light_red_w2/h":[4,[[0,0,1,0]],[[0,0,1,0],0.5],[[0,50,1,50],0.2],[[0,"#ffffff",1,"#ffffff"]],1,[0,0],null,[0,360],[0,0],0,0,0,[0.1,0.1],1,0.07,1,1,-1,10000,[10,0.05],1,[0,0],[-408,-312,816,624],0,0,"particle9",6,""],
+	"_sub:0:light_red_w2/h":[4,[[0,0,0.1,1,1,0]],[[0,0.5,0.5,0.4,1,0],0.5],[[0,300,0.15,50,1,0],0.2],[[0,"#ff9e3e",1,"#ffd5d1"]],0,[0,-20],null,[0,360],[0,0],0,0,0,[0.5,1],1,0.01,0.5,10,0.011,10000,[0,0],0,[0,0],null,0,0,"dust2g,dust4g,dust1g,dust3g",0,""],
+	"_auto:0:light_red_w3/h":[4,[[0,0,0.5,1,1,0]],[[0,0,0.1,1,0.5,1,1,0],0.1],[[0,50,0.5,100,1,50],0.5],[[0,"#ffa77b",1,"#ffb27b"]],1,[0,-1],null,[0,360],[0,0],0,0,0,[2,3],1,0.35,1,1,-1,10000,[10,0.05],1,[0,0],[-408,-312,816,624],0,0,"particle9",6,""],
+	"_sub:0:light_red_w3/h":[4,[[0,0,0.2,1,1,0]],[[0,0.5,1,0],0.5],[[0,0,1,0],1],[[0,"#ff8e77",1,"#ff9756"]],1,[0,0],null,[0,360],[0,0],0,0,0,[0.5,1.5],1,0.035,0.5,1,-1,10000,[0,0],0,[0,0],null,0,0,"particle9",0,""],
+
+	"_auto:0:light_blue_w1/h":[4,[[0,0,0.25,1,0.5,0.75,0.75,1,1,0]],[[0,0,0.25,0.4,1,0.4],0.2],[[0,30,1,30],0.2],[[0,"#76daff",1,"#769bff"]],0,[0,0],null,[0,360],[0,0],0,0,0,[3,4],1,0.2,1,1,-1,10000,[3,0.02],1,[0,0],[-408,-312,816,624],0,0,"particle8",6,""],
+	"_sub:0:light_blue_w1/h":[4,[[0,0,0.5,0.25,1,0]],[[0,1.2,1,1.2],0.5],[[0,0,1,0],1],[[0,"#76fffc",1,"#76a6ff"]],1,[0,0],null,[0,360],[0,0],0,0,0,[2,2],1,0.5,0.25,1,-1,10000,[0,0],0,[0,0],null,0,0,"flare",0,""],
+	"_auto:0:light_blue_w2/h":[4,[[0,1,0.5,1,1,1]],[[0,0,0.5,0.4,1,0],0.5],[[0,75,1,75],0.5],[[0,"#80fffc",1,"#80fffc"]],0,[0,0],null,[0,360],[0,0],0,0,0,[2,3.5],1,0.3,0.5,1,-1,10000,[10,0.05],1,[0,0],[-408,-312,816,624],0,0,"particle9",6,""],
+	"_sub:0:light_blue_w2/h":[4,[[0,0,0.5,1,1,0]],[[0,0.3,1,0],0.1],[[0,75,1,0],1],[[0,"#96ddff",1,"#a0a0ff"]],1,[0,10],null,[0,360],[0,0],0,0,0,[0.5,1],1,0.15,1,3,-1,10000,[0,0],3,[0,0],[0,0,0,0],0,0,"particle9",0,""],
+	"_auto:0:light_blue_w3/h":[4,[[0,0,0.25,1,0.5,0.5,0.75,1,1,0]],[[0,0,0.25,0.5,1,0.5],0.2],[[0,50,1,50],0.2],[[0,"#7b9dfb",1,"#77d4ff"]],0,[0,0],null,[0,360],[0,0],0,0,0,[2,3],1,0.4,0.6,1,-1,10000,[10,0.05],1,[0,0],[-408,-312,816,624],0,0,"particle8",6,""],
+	"_sub:0:light_blue_w3/h":[4,[[0,0,0.5,1,1,0]],[[0,2,0.2,1,1,0],0],[[0,10,1,10],1],[[0,"#4ce6f1",1,"#527cef"]],0,[0,0],null,[0,360],[0,0],0,0,0,[1,1.5],1,0.1,1,1,-1,10000,[0,0],0,[0,0],null,0,0,"particle5",0,""],
+
+	"_auto:0:light_white_w1/h":[4,[[0,0,0.5,1,1,0]],[[0,0,0.25,0.4,0.75,0.4,1,0],0.5],[[0,10,1,10],0.2],[[0,"#ffffff",1,"#ffffff"]],0,[0,0],null,[0,360],[0,0],0,0,0,[3,5],1,0.15,1,1,-1,10000,[10,0.05],1,[0,0],[-408,-312,816,624],0,0,"particle8",6,""],
+	"_auto:0:light_white_w2/h":[4,[[0,0,0.5,1,1,0]],[[0,0.3,1,0.3],0],[[0,70,1,70],0.25],[[0,"#ffffff",1,"#ffffff"]],0,[0,-10],null,[-120,-60],[0,0],0,0,0,[3,4],1,0.5,1,1,-1,10000,[0,0],1,[0,0],[-408,-312,816,624],0,0,"particle8",6,""],
+	"_sub:0:light_white_w2/h":[4,[[0,0,0.2,1,1,0]],[[0,0.5,1,0.5],0],[[0,10,1,10],0],[[0,"#ffffff",1,"#ffffff"]],0,[0,0],null,[-90,-90],[0,0],0,0,0,[3,4],1,0.1,0.25,1,-1,10000,[0,0],0,[0,0],null,0,0,"particle9",0,""],
+	"_auto:0:light_white_w3/h":[4,[[0,0,0.5,1,1,0]],[[0,0.5,1,0.5],0],[[0,20,1,20],1],[[0,"#ffffff",1,"#ffffff"]],0,[0,0],null,[-90,-90],[0,0],0,0,0,[2,3],1,0.1,1,1,-1,10000,[1,0.01],1,[0,0],[-408,-312,816,624],0,0,"particle9",6,""],
+
+	"_auto:0:light_purple_w1/h":[4,[[0,0,0.25,1,0.75,1,1,0]],[[0,0.3,1,0.3],0.1],[[0,40,1,40],0.2],[[0,"#c5bdff",1,"#ae8dff"]],1,[0,0],null,[-90,-90],[0,0],0,0,0,[3,5],1,0.1,1,1,-1,10000,[10,0.05],1,[0,0],[-408,-250,816,600],0,0,"particle9",6,""],
+	"_auto:0:light_purple_w2/h":[4,[[0,0,0.5,0,1,0]],[[0,0,0.5,0,1,0],0.5],[[0,600,0.2,360,1,300],0.3],[[0,"#ffffff",1,"#ffffff"]],0,[0,0],null,[-90,-90],[0,0],0,0,0,[2,2.5],1,0.5,0.5,1,-1,10000,[5,0.1],1,[0,0],[-408,0,816,500],0,0,"particle1",6,""],
+	"_sub:0:light_purple_w2/h":[4,[[0,0,0.25,1,0.5,0,0.75,1,1,0]],[[0,0.3,1,0],1],[[0,5,1,5],1],[[0,"#24fffb",1,"#ac27ff"]],1,[0,0],null,[0,360],[0,0],0,0,0,[1,2.5],1,0.04,1,1,-1,10000,[0,0],0,[0,0],null,0,0,"particle8",0,""],
+	"_auto:0:light_purple_w3/h":[4,[[0,0,0.5,0,1,0]],[[0,0,0.5,0,1,0],0.5],[[0,800,0.2,500,1,400],0.5],[[0,"#ffffff",1,"#ffffff"]],0,[0,0],null,[-90,-90],[0,0],0,0,0,[2,2.5],1,0.5,0.5,1,-1,10000,[5,0.1],1,[0,0],[-408,0,816,500],0,0,"particle1",6,""],
+	"_sub:0:light_purple_w3/h":[4,[[0,0,0.5,0.7,1,0]],[[0,0.2,1,0.2],0.5],[[0,0,1,0],1],[[0,"#69b7ff",1,"#ac27ff"]],1,[0,0],null,[0,360],[0,0],0,0,0,[1,1.5],1,0.03,1,1,-1,10000,[0,0],0,[0,0],null,0,0,"flare",0,""],
+
+	"_auto:0:light_gold_w1/h":[4,[[0,0,0.25,1,0.5,0.5,0.75,1,1,0]],[[0,0,0.25,0.45,1,0.45],0.3],[[0,50,1,50],0.2],[[0,"#fff849",1,"#fffdbd"]],1,[20,-15],null,[0,360],[50,-50],0,0,0,[2,3],1,0.1,1,1,-1,10000,[10,0.05],1,[0,0],[-408,-312,816,624],0,0,"dust2g,dust4g,dust3g,dust1g",0,""],
+	"_auto:0:light_gold_w2/h":[4,[[0,1,1,1]],[[0,0,1,0],0.5],[[0,500,1,500],1],[[0,"#ffffff",1,"#ffffff"]],0,[150,-250],null,[20,35],[0,0],0,0,0,[1.5,1.5],1,0.7,0.7,1,-1,1000,[10,0.03],1,[0,0],[-450,-350,100,400],0,0,"particle1",6,""],
+	"_sub:0:light_gold_w2/h":[4,[[0,0.1,1,0]],[[0,0.5,1,0.3],1],[[0,0,1,0],1],[[0,"#f6ff8d",1,"#f9ff8d"]],0,[0,0],null,[0,0],[0,0],0,0,0,[0.4,0.6],1,0.0075,1,1,-1,10000,[0,0],0,[0,0],null,0,0,"line_oval1",0,""],
+	"_sub:1:light_gold_w2/h":[4,[[0,0,0.5,0.1,1,0]],[[0,1.5,1,0],0.75],[[0,0,1,0],0],[[0,"#fff4a0",1,"#ffe737"]],1,[0,-10],null,[-60,-120],[0,0],0,0,0,[0.5,0.5],1,0.1,0.5,1,-1,10000,[0,0],0,[0,0],null,0,0,"flare",0,""],
+	"_auto:0:light_gold_w3/h":[4,[[0,0.8,0.8,0.8,1,0]],[[0,0.2,1,0.1],0.1],[[0,250,0.5,125,1,250],0.3],[[0,"#ffeea8",1,"#ffeba6"]],1,[1,-0.5],null,[30,30],[-240,240],-1,0,0,[4.5,9],1,0.075,1,1,-1,10000,[5,0.2],1,[0,0],[-500,-450,0,650],0,0,"leaf1g",6,""],
+
+	"_auto:0:light_monochrome_w1/h":[4,[[0,0,0.25,1,0.5,0.5,0.75,1,1,0]],[[0,0,0.25,0.1,1,0.1],0],[[0,25,1,25],0.2],[[0,"#ffffff",1,"#ffffff"]],0,[0,0],null,[0,360],[0,0],0,0,0,[2,4],0,0.125,1,1,-1,10000,[10,0.05],1,[0,0],[-408,-312,816,624],0,0,"particle8",6,""],
+	"_auto:1:light_monochrome_w1/h":[4,[[0,0,0.25,1,0.5,0.5,0.75,1,1,0]],[[0,0,0.25,0.1,1,0.1],0],[[0,25,1,25],0.2],[[0,"#000000",1,"#000000"]],1,[0,0],null,[0,360],[0,0],0,0,0,[2,4],0,0.125,1,1,-1,10000,[10,0.05],1,[0,0],[-408,-312,816,624],0,0,"particle8",6,""],
+	"_auto:0:light_monochrome_w2/h":[4,[[0,0,0.25,1,0.5,0.5,0.75,1,1,0]],[[0,0,0.25,0,1,0],0.5],[[0,250,1,250],0.3],[[0,"#ffffff",1,"#ffffff"]],1,["0",0],null,[0,360],[0,0],0,0,0,[0.3,0.5],1,0.3,0.5,1,-1,10000,[20,0.05],1,[0,0],[-408,-312,816,624],0,0,"particle8",6,""],
+	"_sub:0:light_monochrome_w2/h":[4,[[0,0,0.2,0.5,1,0]],[[0,0.2,0.2,0.13,1,0],0.1],[[0,0,1,0],0.2],[[0,"#ffffff",1,"#ffffff"]],1,[0,-20],null,[0,360],[0,0],0,0,0,[0.3,1],0,0.003,0.5,1,-1,10000,[10,0.05],0,[0,0],null,0,0,"particle5",0,""],
+	"_auto:0:light_monochrome_w2/h":[4,[[0,0,0.25,1,0.5,0.5,0.75,1,1,0]],[[0,0,0.25,0,1,0],0.5],[[0,250,1,250],0.3],[[0,"#ffffff",1,"#ffffff"]],1,["0",0],null,[0,360],[0,0],0,0,0,[0.3,0.5],1,0.3,0.5,1,-1,10000,[20,0.05],1,[0,0],[-408,-312,816,624],0,0,"particle8",6,""],
+	"_sub:1:light_monochrome_w2/h":[4,[[0,0,0.2,0.5,1,0]],[[0,0.2,0.2,0.13,1,0],0.1],[[0,0,1,0],0.2],[[0,"#000000",1,"#000000"]],1,[0,-20],null,[0,360],[0,0],0,0,0,[0.3,1],0,0.003,0.5,1,-1,10000,[10,0.05],0,[0,0],null,0,0,"particle5",0,""],
+	"_auto:0:light_monochrome_w3/h":[4,[[0,0,0.25,1,0.75,1,1,0]],[[0,0.3,1,0.3],0.5],[[0,30,1,30],0.2],[[0,"#ffffff",1,"#ffffff"]],0,[0,0],null,[0,360],[0,0],0,0,0,[8,16],1,2,1,1,-1,10000,[10,0.05],1,[0,0],[-408,-312,816,624],0,0,"particle8",6,""],
+	"_sub:0:light_monochrome_w3/h":[4,[[0,0,0.5,0.2,1,0]],[[0,0,0.5,1,1,0],0.5],[[0,0,1,0],1],[[0,"#ffffff",1,"#ffffff"]],0,[0,0],null,[0,360],[0,0],0,0,0,[1,1],1,0.3,1,1,-1,10000,[0,0],0,[0,0],null,0,0,"flare",0,""],
+	"_auto:1:light_monochrome_w3/h":[4,[[0,0,0.25,1,0.75,1,1,0]],[[0,0.3,1,0.3],0.5],[[0,30,1,30],0.2],[[0,"#000000",1,"#000000"]],0,[0,0],null,[0,360],[0,0],0,0,0,[8,16],2,2,1,1,-1,10000,[10,0.05],1,[0,0],[-408,-312,816,624],0,0,"particle8",6,""],
+	"_sub:1:light_monochrome_w3/h":[4,[[0,0,0.5,0.2,1,0]],[[0,0,0.5,1,1,0],0.5],[[0,0,1,0],1],[[0,"#000000",1,"#000000"]],0,[0,0],null,[0,360],[0,0],0,0,0,[1,1],2,0.3,1,1,-1,10000,[0,0],0,[0,0],null,0,0,"flare",0,""],
+
+	"_auto:0:light_rainbow_w1/h":[4,[[0,0,0.2,1,0.8,1,1,0]],[[0,0.2,1,0.2],0.2],[[0,20,1,20],0.2],[[0,"#a6ff9b",0.2,"#4d65ff",0.25,"#ffd044",0.4,"#ff76e4",0.5,"#76ffda",0.75,"#a876ff",1,"#ff76dd"]],1,[0,0],null,[0,360],[0,0],0,0,0,[1,1],1,1,1,25,-1,10000,[10,0.05],1,[0,0],[-408,-312,816,624],0,0,"particle8",6,""],
+	"_auto:0:light_rainbow_w2/h":[4,[[0,0,1,0]],[[0,0.2,1,0.2],0.2],[[0,100,1,100],0.2],[[0,"#a6ff9b",0.2,"#4d65ff",0.25,"#ffd044",0.4,"#ff76e4",0.5,"#76ffda",0.75,"#a876ff",1,"#ff76dd"]],1,[0,0],null,["180","180"],[0,0],0,0,0,[1,1],1,2,1,10,-1,10000,[0,0],1,[0,0],[-408,-312,816,624],0,0,"particle8",6,""],
+	"_sub:0:light_rainbow_w2/h":[4,[[0,0,0.2,1,0.8,1,1,0]],[[0,0.2,1,0.2],0.2],[[0,0,1,0],0.2],[[0,"#a6ff9b",0.2,"#4d65ff",0.25,"#ffd044",0.4,"#ff76e4",0.5,"#76ffda",0.75,"#a876ff",1,"#ff76dd"]],1,[0,0],null,[0,360],[0,0],0,0,0,[0.2,0.2],1,0.1,1,1,-1,10000,[10,0.05],0,[0,0],null,0,0,"particle9",0,""],
+	"_auto:0:light_rainbow_w2/h":[4,[[0,0,1,0]],[[0,0.2,1,0.2],0.2],[[0,100,1,100],0.2],[[0,"#a6ff9b",0.2,"#4d65ff",0.25,"#ffd044",0.4,"#ff76e4",0.5,"#76ffda",0.75,"#a876ff",1,"#ff76dd"]],1,[0,0],null,["180","180"],[0,0],0,0,0,[1,1],1,2,1,10,-1,10000,[0,0],1,[0,0],[-408,-312,816,624],0,0,"particle8",6,""],
+	"_sub:0:light_rainbow_w2/h":[4,[[0,0,0.2,1,0.8,1,1,0]],[[0,0.2,1,0.2],0.2],[[0,0,1,0],0.2],[[0,"#a6ff9b",0.2,"#4d65ff",0.25,"#ffd044",0.4,"#ff76e4",0.5,"#76ffda",0.75,"#a876ff",1,"#ff76dd"]],1,[0,0],null,[0,360],[0,0],0,0,0,[0.2,0.2],1,0.1,1,1,-1,10000,[10,0.05],0,[0,0],null,0,0,"particle9",0,""],
+	"_auto:0:light_rainbow_w2/h":[4,[[0,0,1,0]],[[0,0.2,1,0.2],0.2],[[0,100,1,100],0.2],[[0,"#a6ff9b",0.2,"#4d65ff",0.25,"#ffd044",0.4,"#ff76e4",0.5,"#76ffda",0.75,"#a876ff",1,"#ff76dd"]],1,[0,0],null,["180","180"],[0,0],0,0,0,[1,1],1,2,1,10,-1,10000,[0,0],1,[0,0],[-408,-312,816,624],0,0,"particle8",6,""],
+	"_sub:0:light_rainbow_w2/h":[4,[[0,0,0.2,1,0.8,1,1,0]],[[0,0.2,1,0.2],0.2],[[0,0,1,0],0.2],[[0,"#a6ff9b",0.2,"#4d65ff",0.25,"#ffd044",0.4,"#ff76e4",0.5,"#76ffda",0.75,"#a876ff",1,"#ff76dd"]],1,[0,0],null,[0,360],[0,0],0,0,0,[0.2,0.2],1,0.1,1,1,-1,10000,[10,0.05],0,[0,0],null,0,0,"particle9",0,""],
+	"_auto:0:light_rainbow_w2/h":[4,[[0,0,1,0]],[[0,0.2,1,0.2],0.2],[[0,100,1,100],0.2],[[0,"#a6ff9b",0.2,"#4d65ff",0.25,"#ffd044",0.4,"#ff76e4",0.5,"#76ffda",0.75,"#a876ff",1,"#ff76dd"]],1,[0,0],null,["180","180"],[0,0],0,0,0,[1,1],1,2,1,10,-1,10000,[0,0],1,[0,0],[-408,-312,816,624],0,0,"particle8",6,""],
+	"_sub:0:light_rainbow_w2/h":[4,[[0,0,0.2,1,0.8,1,1,0]],[[0,0.2,1,0.2],0.2],[[0,0,1,0],0.2],[[0,"#a6ff9b",0.2,"#4d65ff",0.25,"#ffd044",0.4,"#ff76e4",0.5,"#76ffda",0.75,"#a876ff",1,"#ff76dd"]],1,[0,0],null,[0,360],[0,0],0,0,0,[0.2,0.2],1,0.1,1,1,-1,10000,[10,0.05],0,[0,0],null,0,0,"particle9",0,""],
+	"_auto:0:light_rainbow_w3/h":[4,[[0,0,0.2,0.5,0.8,0.5,1,0]],[[0,0.5,1,0.5],0.2],[[0,30,1,30],0.2],[[0,"#a6ff9b",0.2,"#4d65ff",0.25,"#ffd044",0.4,"#ff76e4",0.5,"#76ffda",0.75,"#a876ff",1,"#ff76dd"]],1,[0,0],null,[0,360],[0,0],0,0,0,[1,1],1,1,1,10,-1,10000,[10,0.05],1,[0,0],[-408,-312,816,624],0,0,"particle9",6,""],
+	"_auto:1:light_rainbow_w3/h":[4,[[0,0,0.2,0.2,0.8,0.2,1,0]],[[0,1,1,1],1],[[0,0,1,0],0.2],[[0,"#a6ff9b",0.2,"#4d65ff",0.25,"#ffd044",0.4,"#ff76e4",0.5,"#76ffda",0.75,"#a876ff",1,"#ff76dd"]],1,[0,0],null,[0,360],[0,0],0,0,0,[1,1],1,1,1,5,-1,10000,[10,0.05],1,[0,0],[-408,-312,816,624],0,0,"flare",6,""],
 };
+
+
+
+$dataTrpParticleGroupsPreset = {
+	"commet":{"repeat":-1,"list":["set starry_sky/h screen def back","exceed starry_sky/h 1","set commet/h weather def back","sub set commet/h _sub:0 0 -1 0.1 1","sub set commet/h _sub:1 0 -1 0.2 1"],"targetType":6,"comment":LC("星空と彗星",83)},
+	"firefly":{"repeat":-1,"list":["set firefly/h target","sub set firefly/h _sub:0 0 -1 0.3 1"],"targetType":7,"comment":LC("蛍",84)},
+	"fireworks":{"repeat":-1,"list":["set fireworks_shot/h this def back","sub set fireworks_shot/h _sub:0 1 -1 0 0","sub set fireworks_shot/h _sub:1 0 0.75 0.5 1"],"targetType":0,"comment":LC("打ち上げ花火",85)},
+
+
+	//漂う光
+	"light_green_w1":{"repeat":-1,"list":["play _auto:0 target","loop _auto:0"],"targetType":6,
+		"comment":"天候:漂う光<緑/森_1>"},
+	"light_green_w2":{"repeat":-1,"list":["play _auto:0 target","sub play _auto:0 _sub:0 0 0.5 0 0 0","loop _auto:0"],"targetType":6,
+		"comment":"天候:漂う光<緑/森_2>"},
+	"light_green_w3":{"repeat":-1,"list":["play _auto:0 target","sub play _auto:0 _sub:0 0.1 0.9 0.2 0 0","loop _auto:0"],"targetType":6,
+		"comment":"天候:漂う光<緑/森_3>"},
+
+	"light_black_w1":{"repeat":-1,"list":["play _auto:0 target","loop _auto:0"],"targetType":6,
+		"comment":"天候:漂う光<黒/闇_1>"},
+	"light_black_w2":{"repeat":-1,"list":["play _auto:0 target","sub play _auto:0 _sub:0 0.15 0.85 0.1 0 0","loop _auto:0:light_green_w1/h"],"targetType":6,
+		"comment":"天候:漂う光<黒/闇_2>"},
+	"light_black_w3":{"repeat":-1,"list":["play _auto:0 target","sub play _auto:0 _sub:0 0 -1 0.1 0 0","sub play _auto:0 _sub:1 0 -1 0.15 0 0","loop _auto:0"],"targetType":6,
+		"comment":"天候:漂う光<黒/闇_3>"},
+
+	"light_ash_w1":{"repeat":-1,"list":["play _auto:0 target","loop _auto:0"],"targetType":6,
+		"comment":"天候:漂う光<灰_1>"},
+	"light_ash_w2":{"repeat":-1,"list":["play _auto:0 target","sub play _auto:0 _sub:0 0.1 0.8 1 0 1"],"targetType":6,
+		"comment":"天候:漂う光<灰_2>"},
+
+	"light_ice_w1":{"repeat":-1,"list":["play _auto:0 target def","loop _auto:0"],"targetType":6,
+		"comment":"天候:漂う光<氷_1>"},
+	"light_ice_w2":{"repeat":-1,"list":["play _auto:0 target def","sub play _auto:0 _sub:0 0.15 0.85 0 0 0"],"targetType":6,
+		"comment":"天候:漂う光<氷_2>"},
+	"light_ice_w3":{"repeat":-1,"list":["play _auto:0 target def","sub play _auto:0 _sub:0 0.1 -1 0 0 0","sub play _auto:0 _sub:1 0 -1 0.1 0 0","loop _auto:0"],"targetType":6,
+		"comment":"天候:漂う光<氷_3>"},
+
+	"light_red_w1":{"repeat":-1,"list":["play _auto:0 target","loop _auto:0"],"targetType":6,
+		"comment":"天候:漂う光<赤/炎_1>"},
+	"light_red_w2":{"repeat":-1,"list":["play _auto:0 target","sub play _auto:0 _sub:0 0 -1 0 0 0","loop _auto:0"],"targetType":6,
+		"comment":"天候:漂う光<赤/炎_>"},
+	"light_red_w3":{"repeat":-1,"list":["play _auto:0 target","sub play _auto:0 _sub:0 0.1 0.6 0.2 0 0","loop _auto:0"],"targetType":6,
+		"comment":"天候:漂う光<赤/炎_1>"},
+
+	"light_blue_w1":{"repeat":-1,"list":["play _auto:0 target def","sub play _auto:0 _sub:0 0.25 0.75 1 0 1","loop _auto:0"],"targetType":6,
+		"comment":"天候:漂う光<青/水_1>"},
+	"light_blue_w2":{"repeat":-1,"list":["play _auto:0 target def","sub play _auto:0 _sub:0 0.2 0.8 0.1 0 0","loop _auto:0"],"targetType":6,
+		"comment":"天候:漂う光<青/水_2>"},
+	"light_blue_w3":{"repeat":-1,"list":["play _auto:0 target def","sub play _auto:0 _sub:0 0 -1 0 0 1"],"targetType":6,
+		"comment":"天候:漂う光<青/水_3>"},
+
+	"light_white_w1":{"repeat":-1,"list":["play _auto:0 target","loop _auto:0"],"targetType":6,
+		"comment":"天候:漂う光<白/光_1>"},
+	"light_white_w2":{"repeat":-1,"list":["play _auto:0 target","sub play _auto:0 _sub:0 0 -1 0.1 0 0","loop _auto:0"],"targetType":6,
+		"comment":"天候:漂う光<白/光_2>"},
+	"light_white_w3":{"repeat":-1,"list":["play _auto:0 target","loop _auto:0"],"targetType":6,
+		"comment":"天候:漂う光<白/光_3>"},
+	
+	"light_purple_w1":{"repeat":-1,"list":["play _auto:0 target","loop _auto:0"],"targetType":6,
+		"comment":"天候:漂う光<紫/魔_1>"},
+	"light_purple_w2":{"repeat":-1,"list":["play _auto:0 target","sub play _auto:0 _sub:0 0 -1 0.1 0 0","loop _auto:0 50 50"],"targetType":6,
+		"comment":"天候:漂う光<紫/魔_2>"},
+	"light_purple_w3":{"repeat":-1,"list":["play _auto:0 target","sub play _auto:0 _sub:0 0 -1 0 0 0","loop _auto:0 50 50"],"targetType":6,
+		"comment":"天候:漂う光<紫/魔_3>"},
+
+	"light_gold_w1":{"repeat":-1,"list":["play _auto:0 targete","loop _auto:0"],"targetType":6,
+		"comment":"天候:漂う光<金_1>"},
+	"light_gold_w2":{"repeat":-1,"list":["play _auto:0 target","sub play _auto:0 _sub:0 0 -1 0 1 1","sub play _auto:0 _sub:1 0 0.8 0.1 0 0","loop _auto:0 0 3"],"targetType":6,
+		"comment":"天候:漂う光<金_2>"},
+	"light_gold_w3":{"repeat":-1,"list":["play _auto:0 target","loop _auto:0"],"targetType":6,
+		"comment":"天候:漂う光<金_3>"},
+
+	"light_monochrome_w1":{"repeat":-1,"list":["play _auto:0 target","play _auto:1 target","loop _auto:0","loop _auto:1"],"targetType":6,
+		"comment":"天候:漂う光<白黒/陰陽_1>"},
+	"light_monochrome_w2":{"repeat":-1,"list":["play _auto:0 target","sub play _auto:0 _sub:0 0 -1 0.05 0 0","play _auto:1 target _auto:0","sub play _auto:1 _sub:1 0 -1 0 0 1","loop _auto:0","loop _auto:1"],"targetType":6,
+		"comment":"天候:漂う光<白黒/陰陽_2>"},
+	"light_monochrome_w3":{"repeat":-1,"list":["play _auto:0 target","sub play _auto:0 _sub:0 0 -1 0 0 1","play _auto:1 target","sub play _auto:1 _sub:1 0 -1 0 0 1","loop _auto:0","loop _auto:1"],"targetType":6,
+		"comment":"天候:漂う光<白黒/陰陽_3>"},
+
+	"light_rainbow_w1":{"repeat":-1,"list":["play _auto:0 target def spriteset","loop _auto:0"],"targetType":6,
+		"comment":"天候:漂う光<虹_1>"},
+	"light_rainbow_w2":{"repeat":-1,"list":["play _auto:0 target def spriteset","sub play _auto:0 _sub:0 0 0.9 0 0 0","loop _auto:0","play _auto:1 target _auto:0 spriteset","update _auto:1 startRotation 180 180","sub play _auto:1 _sub:0 0 0.9 0 0 0","loop _auto:1","wait 60","play _auto:2 target _auto:0 spriteset","update _auto:2 startRotation 90 90","sub play _auto:2 _sub:0 0 0.9 0 0 0","loop _auto:2","play _auto:3 target _auto:0 spriteset","update _auto:3 startRotation -90 -90","sub play _auto:3 _sub:0 0 0.9 0 0 0","loop _auto:3","wait 60"],"targetType":6,
+		"comment":"天候:漂う光<虹_2>"},
+	"light_rainbow_w3":{"repeat":-1,"list":["play _auto:0 target def spriteset","play _auto:1 target def spriteset","loop _auto:0","loop _auto:1"],"targetType":6,
+		"comment":"天候:漂う光<虹_3>"},
+};
+
+
+})();

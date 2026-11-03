@@ -503,6 +503,7 @@ Window_Gab.prototype.initialize = function(battle) {
 
 Window_Gab.prototype.clear = function() {
     this._gabLoaded = false;
+    this._gabDrawn = false;
     this._graphicLoading = false;
     this.opacity = 0;
     this.contentsOpacity = 0;
@@ -528,7 +529,14 @@ Window_Gab.prototype.update = function() {
       this.hide();
     } else if (this._gabLoaded) {
       if (this._graphicLoading && this._graphicBitmap.width <= 0) return;
-      this.refresh();
+      // Draw the gab once instead of every frame. refresh() re-runs
+      // startCountdown() and playSound(), so refreshing per frame re-drew the whole
+      // window and called AudioManager.playSe 60 times a second for as long as any
+      // gab was on screen. Nothing refresh() draws changes between frames.
+      if (!this._gabDrawn) {
+        this._gabDrawn = true;
+        this.refresh();
+      }
     } else if (this._showCount > 0) {
       this.updateFadeIn();
       --this._showCount;

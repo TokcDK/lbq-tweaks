@@ -199,7 +199,7 @@ Spriteset_Battle.prototype.createBattlebacks = function() {
 //==============================
 Spriteset_Battle.prototype.addBattleback = function(sprite,index) {
     var margin = 0;//変更32;
-    var x = -this._battleField.x - margin-360://;
+    var x = -this._battleField.x - margin-360;//;
     var y = -this._battleField.y - margin-216;//;
     var width = Graphics.width + margin * 2+720;//;
     var height = Graphics.height + margin * 2+432;//;	

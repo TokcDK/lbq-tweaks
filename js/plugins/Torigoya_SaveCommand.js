@@ -226,6 +226,10 @@
      */
     SaveCommand.runCommandRemove = function (_, slotId) {
         StorageManager.remove(slotId);
+        // BUGFIX: 本体ファイルだけでは .bak が残り、後でそのスロットへのセーブが
+        // 失敗するとロールバックで削除済みデータが復活する。YEP_SaveCore の
+        // 削除コマンドと同じく、バックアップも削除する。
+        if (StorageManager.cleanBackup) StorageManager.cleanBackup(slotId);
     };
 
     // -------------------------------------------------------------------------

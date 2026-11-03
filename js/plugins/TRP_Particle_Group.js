@@ -6,6 +6,8 @@
  * @author Thirop
  * @help
  * 【更新履歴】
+ * 2.27 2022/09/07 グループ機能追加時のセーブデータ互換性の対応
+ * 2.25 2022/07/31 set直後にアップデートするように仕様変更
  * 2.24 2022/06/24 displayObjectの内部登録が削除されない不具合修正
  * 2.21 2022/05/02 制御文字が反映されない不具合の修正
  * 2.19 2022/02/14 ロード時のエラー修正
@@ -130,6 +132,19 @@ Game_Particle.prototype.initialize = function() {
 	this._groupKeys = [];
 };
 
+var _Game_Particle_ensureVariables = Game_Particle.prototype.ensureVariables;
+Game_Particle.prototype.ensureVariables = function(){
+	_Game_Particle_ensureVariables.call(this);
+
+	if(!this._groups){
+		this._groups = {};
+	}
+	if(!this._groupKeys){
+		this._groupKeys = [];
+	}
+};
+
+
 var _Game_Particle_pluginCommand= Game_Particle.prototype.pluginCommand;
 Game_Particle.prototype.pluginCommand = function(interpreter,args,eventId){
 	var sub = args[0].toLowerCase();
@@ -160,7 +175,14 @@ Game_Particle.prototype.processGroupCommand = function(interpreter,args,eventId)
 		var targetId = '';
 		if(sub==='set'||sub==='play'){
 			args.unshift(eventId);
-			Game_Particle.prototype.particleGroupSet.apply(this,args);
+			var group = Game_Particle.prototype.particleGroupSet.apply(this,args);
+			if(group){
+				var suffix = this._suffix;
+				this._suffix = '';
+				group.update(this);
+				this._suffix = suffix;
+			}
+
 			targetId = args[1];
 		}else if(sub==='edit'){
 
@@ -182,9 +204,8 @@ Game_Particle.prototype.particleGroupSet = function(eventId,id,target,tag,name,x
 	id = this.idWithSuffix(id);
 
 	if(!!this._groups[id]){
-		return;
+		return this._groups[id];
 	}
-
 
 	x = Number(x)||0;
 	y = Number(y)||0;
@@ -320,6 +341,8 @@ ParticleGroup.prototype.initialize = function(eventId,id,target,tag,name,x,y){
 	this._index = -1;
 	this._wait = 0;
 
+
+
 	this.applyData();
 };
 ParticleGroup.prototype.applyData = function(){
@@ -393,7 +416,7 @@ ParticleGroup.processParticleSubCommand = function(args){
 	return args[0];
 }
 
-ParticleGroup.prototype.update = function(particle){
+ParticleGroup.prototype.update = function(particle=$gameScreen._particle){
 	if(this._wait>0){
 		this._wait -= 1;
 		return;
@@ -465,9 +488,18 @@ ParticleGroup.prototype.update = function(particle){
 		case 'screenLoop':
 		case 'loop':
 		case 'filter':
+		case 'attract':
 		case 'max':
 			if(/^_auto:[0-9]+$/.test(args[1])){
 				args[1] += ':'+this.replacedName+'/h';
+			}
+
+			if(args[0]==='attract'&& args[2]==='target'){
+				if(this.target==='displayObject'){
+					args[2] = Game_Particle.displayObjects[this.id];
+				}else{
+					args[2] = this.target;
+				}
 			}
 			break;
 
@@ -542,6 +574,7 @@ ParticleGroup.isCommandValid = function(command,id,groupName,args=null){
 	case 'screenLoop':
 	case 'loop':
 	case 'filter':
+	case 'attract':
 	case 'max':
 		if(!this.isCommandTargetIdValid(id,groupName,args[1])){
 			return false;

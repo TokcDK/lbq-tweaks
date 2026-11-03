@@ -1181,9 +1181,10 @@
         // 不透明度　　　─影スプライトの更新
         if (baras[0]) {
             var maxOpa = 0;
-            baras.forEach(function(bara) {
+            for (var b = 0; b < baras.length; b++) {
+                var bara = baras[b];
                 if (bara && bara.opacity > maxOpa) { maxOpa = bara.opacity; }
-            }, this);
+            }
             this.opacity = Math.min(maxOpa * (keke_kageOpacity / 255), keke_kageOpacity);
         // MOG_CollapseEffects 対応
         } else if (this._oriSprite._spriteCol) {

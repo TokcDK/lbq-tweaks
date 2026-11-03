@@ -173,20 +173,46 @@ DataManager.checkError = function() {
     }
 };
 
+// PERF: isBattleTest()/isEventTest() are called from very hot paths (the passive
+// state rebuild calls isBattleTest() once per skill per battler, and it runs on
+// every battler refresh). The answer is fixed for the lifetime of the process, so
+// it is memoized instead of re-parsing the query string each time. The cached
+// value is returned verbatim, so callers that relied on 1/0 still see 1/0.
 DataManager.isBattleTest = function() {
-    return Utils.isOptionValid('btest');
+    if (this._isBattleTest === undefined) {
+        this._isBattleTest = Utils.isOptionValid('btest');
+    }
+    return this._isBattleTest;
 };
 
 DataManager.isEventTest = function() {
-    return Utils.isOptionValid('etest');
+    if (this._isEventTest === undefined) {
+        this._isEventTest = Utils.isOptionValid('etest');
+    }
+    return this._isEventTest;
 };
 
+// PERF: these did a linear Array#indexOf over the whole database on every call.
+// The lookup set is rebuilt whenever $dataSkills / $dataItems is replaced or
+// resized (battle test / new game / load), so membership stays exact.
 DataManager.isSkill = function(item) {
-    return item && $dataSkills.contains(item);
+    if (!item) return item;
+    if (this._skillSetSource !== $dataSkills || this._skillSetLength !== $dataSkills.length) {
+        this._skillSet = new Set($dataSkills);
+        this._skillSetSource = $dataSkills;
+        this._skillSetLength = $dataSkills.length;
+    }
+    return this._skillSet.has(item);
 };
 
 DataManager.isItem = function(item) {
-    return item && $dataItems.contains(item);
+    if (!item) return item;
+    if (this._itemSetSource !== $dataItems || this._itemSetLength !== $dataItems.length) {
+        this._itemSet = new Set($dataItems);
+        this._itemSetSource = $dataItems;
+        this._itemSetLength = $dataItems.length;
+    }
+    return this._itemSet.has(item);
 };
 
 DataManager.isWeapon = function(item) {

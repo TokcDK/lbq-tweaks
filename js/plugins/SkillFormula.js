@@ -17,110 +17,117 @@ function $attack1(value1, a, b, level) {
 
 var user = a;
     // 変数を移し替え
-if(value1 == 1){//物理
-    var atk = a.atk * 2;
-    var def = b.def;
-};
-if(value1 == 2){//魔法
-    var atk = a.mat * 2;
-    var def = b.mat;
-};
-if(value1 == 3){//器用
-    var atk = a.mdf * 2;
-    var def = b.def;
-};
-if(value1 == 4){//幸運
-    var atk = a.luk * 2;
-    var def = b.def;
-};
-if(value1 == 5){//防御
-    var atk = a.def * 2;
-    var def = b.def;
-};
-if(value1 == 6){//器用と敏捷
-    var atk = a.mdf + a.agi;
-    var def = b.def;
-};
-if(value1 == 7){//攻撃と器用
-    var atk = a.atk + a.mdf;
-    var def = b.def;
-};
-if(value1 == 8){//回復
-    var atk = a.mat;
-    var def = b.mat;
-};
-if(value1 == 9){//物理回復
-    var atk = a.atk;
-    var def = b.def;
-};
-if(value1 == 10){//HP変換ダメージ
-    var atk = a.hp;
-    var def = b.def;
-};
-if(value1 == 11){//剣
-    var atk = Math.round((a.atk*7 + a.mdf*2 + a.agi*1) / 5);
-    var def = b.def;
-};
-if(value1 == 12){//短剣
-    var atk = Math.round((a.atk*2 + a.mdf*4 + a.agi*4) / 5);
-    var def = b.def;
-};
-if(value1 == 13){//刀
-    var atk = Math.round((a.atk*7 + a.mdf*3) / 5);
-    var def = b.def;
-};
-if(value1 == 14){//杖
-    var atk = a.mat * 2;
-    var def = b.mat;
-};
-if(value1 == 15){//拳
-    var atk = Math.round((a.atk*4 + a.mdf*3 + a.agi*3) / 5);
-    var def = b.def;
-};
-if(value1 == 16){//槍
-    var atk = Math.round((a.atk*8 + a.mdf*2) / 5);
-    var def = b.def;
-};
-if(value1 == 17){//斧
-    var atk = a.atk * 2;
-    var def = b.def;
-};
-if(value1 == 18){//銃
-    var atk = a.mdf * 1;
-    var def = b.def;
-};
-if(value1 == 19){//弓
-    var atk = Math.round((a.atk*2 + a.mdf*8) / 5);
-    var def = b.def;
-};
-if(value1 == 20){//楽器
-    var atk = Math.round((a.mat*5 + a.mdf*5) / 5);
-    var def = b.def;
-};
-if(value1 == 24){//針
-    var atk = Math.round((a.mdf*5 + a.luk*5) / 5);
-    var def = b.def;
-};
-if(value1 == 25){//鞭
-    var atk = a.mdf;
-    var def = b.def;
-};
-if(value1 == 28){//鈍器
-    var atk = a.atk * 2;
-    var def = b.def;
-};
-if(value1 == 29){//爪
-    var atk = Math.round((a.atk*8 + a.mdf*1 + a.agi*1) / 5);
-    var def = b.def;
-};
-if(value1 == 30){//牙
-    var atk = Math.round((a.atk*7 + a.mdf*1 + a.agi*2) / 5);
-    var def = b.def;
-};
-if(value1 == 31){//ゴールド消費
-    var atk = $gameVariables.value(268);
-    var def = b.def;
-};
+// PERF: this is the damage formula for ~289 skills, so it runs for every hit of
+// every one of them. The original was a chain of 26 `if (value1 == N)` tests that
+// fell through in order; the values are mutually exclusive, so V8 is now free to
+// compile this into a jump table instead of doing up to 26 comparisons per hit.
+var atk, def;
+switch (value1) {
+case 1://物理
+    atk = a.atk * 2;
+    def = b.def;
+    break;
+case 2://魔法
+    atk = a.mat * 2;
+    def = b.mat;
+    break;
+case 3://器用
+    atk = a.mdf * 2;
+    def = b.def;
+    break;
+case 4://幸運
+    atk = a.luk * 2;
+    def = b.def;
+    break;
+case 5://防御
+    atk = a.def * 2;
+    def = b.def;
+    break;
+case 6://器用と敏捷
+    atk = a.mdf + a.agi;
+    def = b.def;
+    break;
+case 7://攻撃と器用
+    atk = a.atk + a.mdf;
+    def = b.def;
+    break;
+case 8://回復
+    atk = a.mat;
+    def = b.mat;
+    break;
+case 9://物理回復
+    atk = a.atk;
+    def = b.def;
+    break;
+case 10://HP変換ダメージ
+    atk = a.hp;
+    def = b.def;
+    break;
+case 11://剣
+    atk = Math.round((a.atk*7 + a.mdf*2 + a.agi*1) / 5);
+    def = b.def;
+    break;
+case 12://短剣
+    atk = Math.round((a.atk*2 + a.mdf*4 + a.agi*4) / 5);
+    def = b.def;
+    break;
+case 13://刀
+    atk = Math.round((a.atk*7 + a.mdf*3) / 5);
+    def = b.def;
+    break;
+case 14://杖
+    atk = a.mat * 2;
+    def = b.mat;
+    break;
+case 15://拳
+    atk = Math.round((a.atk*4 + a.mdf*3 + a.agi*3) / 5);
+    def = b.def;
+    break;
+case 16://槍
+    atk = Math.round((a.atk*8 + a.mdf*2) / 5);
+    def = b.def;
+    break;
+case 17://斧
+    atk = a.atk * 2;
+    def = b.def;
+    break;
+case 18://銃
+    atk = a.mdf * 1;
+    def = b.def;
+    break;
+case 19://弓
+    atk = Math.round((a.atk*2 + a.mdf*8) / 5);
+    def = b.def;
+    break;
+case 20://楽器
+    atk = Math.round((a.mat*5 + a.mdf*5) / 5);
+    def = b.def;
+    break;
+case 24://針
+    atk = Math.round((a.mdf*5 + a.luk*5) / 5);
+    def = b.def;
+    break;
+case 25://鞭
+    atk = a.mdf;
+    def = b.def;
+    break;
+case 28://鈍器
+    atk = a.atk * 2;
+    def = b.def;
+    break;
+case 29://爪
+    atk = Math.round((a.atk*8 + a.mdf*1 + a.agi*1) / 5);
+    def = b.def;
+    break;
+case 30://牙
+    atk = Math.round((a.atk*7 + a.mdf*1 + a.agi*2) / 5);
+    def = b.def;
+    break;
+case 31://ゴールド消費
+    atk = $gameVariables.value(268);
+    def = b.def;
+    break;
+}
 if(valueLevelFluctuation >= 1){
   //var atk = atk + Math.floor(a.level / valueLevelFluctuation);
 };

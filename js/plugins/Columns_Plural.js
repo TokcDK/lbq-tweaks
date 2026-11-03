@@ -68,9 +68,18 @@ const _Window_ChoiceList_updatePlacement = Window_ChoiceList.prototype.updatePla
 Window_ChoiceList.prototype.updatePlacement = function() {
     _Window_ChoiceList_updatePlacement.call(this);
     //console.log('updatePlacement')
-    if ( $gameVariables.value(_columns_Quantity) >= 1 ) {
-        this.width = this.width * $gameVariables.value(_columns_Quantity) - ( this.padding * 2)
-        this.height = this.itemHeight() * Math.ceil( $gameMessage.choices().length / $gameVariables.value(_columns_Quantity) +1);
+    // PERF: updatePlacement runs on every choice window, every frame. Read the
+    // column count once instead of three times per frame.
+    //
+    // NOTE: `this.width = this.width * columns` is idempotent here only because
+    // the captured alias (amygame0.js, load order 17 < Columns_Plural's 88) resets
+    // `this.width = this.windowWidth()` at the top of every call. Do not "fix" the
+    // multiply without checking that reset still happens first, or the width will
+    // compound every frame.
+    const columns = $gameVariables.value(_columns_Quantity);
+    if ( columns >= 1 ) {
+        this.width = this.width * columns - ( this.padding * 2)
+        this.height = this.itemHeight() * Math.ceil( $gameMessage.choices().length / columns +1);
         if (this.x + this.width >= Graphics.boxWidth) { // 選択肢ウィンドウが画面からはみ出たら
             switch ($gameMessage.choicePositionType()) {
             case 0:
@@ -103,8 +112,11 @@ if(columns_initOnClose){
 }
 
 Window_ChoiceList.prototype.maxCols = function() {
-    if ( $gameVariables.value(_columns_Quantity) >= 1 ){
-        return Number( $gameVariables.value(_columns_Quantity) );
+    // PERF: called from refresh()/updatePlacement on every choice window rebuild.
+    // Read the variable once instead of twice.
+    const columns = $gameVariables.value(_columns_Quantity);
+    if ( columns >= 1 ){
+        return Number( columns );
     }else{
         return 1;
     };

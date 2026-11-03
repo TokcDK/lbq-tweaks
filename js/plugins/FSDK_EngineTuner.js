@@ -146,12 +146,39 @@ ProgressWatcher.truncateProgress = function () {
     }
 };
 
+// PERF: the option list is a pure function of the query string, but this function
+// is called millions of times while a save file loads (DataManager.isBattleTest()
+// alone runs it once per skill per battler inside the passive-state rebuild).
+// Re-running .slice().split() plus a linear .contains() on every call was 54% of
+// the load-time profile. The parsed sets are cached, keyed on the source strings,
+// so a change to location.search or nw.App.argv still invalidates them. The
+// returned values are unchanged: true when the name is in the query string,
+// otherwise the same boolean the old && chain produced.
+Utils._isOptionValid_optionSet = function (query) {
+    var set = new Set();
+    var parts = query.split('&');
+    for (var i = 0; i < parts.length; i++) {
+        set.add(parts[i]);
+    }
+    return set;
+};
+
 Utils.isOptionValid = function (name) {
 
-    if (location.search.slice(1).split('&').contains(name)) {
+    var search = location.search;
+    if (search !== Utils._isOptionValid_search) {
+        Utils._isOptionValid_search = search;
+        Utils._isOptionValid_searchOptions = Utils._isOptionValid_optionSet(search.slice(1));
+    }
+    if (Utils._isOptionValid_searchOptions.has(name)) {
         return true;
     }
-    return typeof nw !== "undefined" && nw.App.argv.length > 0 && nw.App.argv[0].split('&').contains(name);
+    var argv0 = (typeof nw !== "undefined" && nw.App.argv.length > 0) ? nw.App.argv[0] : null;
+    if (argv0 !== Utils._isOptionValid_argv) {
+        Utils._isOptionValid_argv = argv0;
+        Utils._isOptionValid_argvOptions = argv0 === null ? new Set() : Utils._isOptionValid_optionSet(argv0);
+    }
+    return argv0 !== null && Utils._isOptionValid_argvOptions.has(name);
 }
 
 SceneManager.preferableRendererType = function () {
@@ -181,7 +208,13 @@ Bitmap.prototype._createCanvas = function (width, height) {
         var h = Math.max(this._image.height || 0, 1);
         this.__canvas.width = w;
         this.__canvas.height = h;
-        this._createBaseTexture(this._canvas);
+        // BUGFIX: this passed this._canvas, but this override only ever creates
+        // __canvas (the MZ 1.6 property), so the base texture was built from
+        // undefined and every later update() logged
+        // "BaseTexture update error: 'source' is undefined".
+        // Read only __canvas here: `this._canvas` is a lazy getter that calls
+        // _createCanvas() again, which would recurse into this method.
+        this._createBaseTexture(this.__canvas);
 
         this.__context.drawImage(this._image, 0, 0);
     }
@@ -285,11 +318,18 @@ Bitmap.prototype.drawText = function(text, x, y, maxWidth, lineHeight, align) {
     var alpha = context.globalAlpha;
     
     // Handle text alignment
-    if (align === 'center') {
-        tx += maxWidth / 2;
-    } else if (align === 'right') {
-        tx += maxWidth;
-    }
+	switch (align) {
+		case 'center':
+			tx += maxWidth / 2;
+			break;
+		case 'right':
+			tx += maxWidth;
+			break;
+		case 'left':
+			break;
+		default:
+			align = 'left'; // asdf default is left
+	}
     
     // Draw text efficiently with minimal context changes
     context.save();
@@ -337,15 +377,56 @@ Bitmap.prototype.drawSmallText = function (text, x, y, maxWidth, lineHeight, ali
     bitmap.clear();
 };
 
+// Resolve the base texture WITHOUT triggering Bitmap.prototype._baseTexture,
+// which rpg_core.js defines as a lazy getter:
+//     _baseTexture: { get: function(){
+//         if (!this.__baseTexture) this._createBaseTexture(this._image || this.__canvas);
+//         return this.__baseTexture; } }
+// Merely reading it can therefore *create* a texture - and once the bitmap has
+// been torn down (_clearImgInstance() clears _image, and __canvas can be gone)
+// it builds one from null and Bitmap._createBaseTexture throws on
+// `source.width`. So read the real storage (__baseTexture) and only fall back to
+// a plain own-property _baseTexture, as set by the older
+// YEP_X_CoreUpdatesOpt Bitmap.initialize.
+function fsdkBitmapBaseTexture(bitmap) {
+    if (!bitmap) return null;
+    if (bitmap.__baseTexture) return bitmap.__baseTexture;
+    var own = Object.getOwnPropertyDescriptor(bitmap, '_baseTexture');
+    if (own && Object.prototype.hasOwnProperty.call(own, 'value')) return own.value;
+    return null;
+}
+
+// A texture can become unusable between frames: BaseTexture.destroy() nulls
+// `source`, and PIXI's update() then logs "BaseTexture update error: 'source'
+// is undefined". Never call update() on such a texture.
+function fsdkBaseTextureIsAlive(baseTexture) {
+    if (!baseTexture) return false;
+    if (baseTexture.destroyed || baseTexture._destroyed) return false;
+    return !!baseTexture.source;
+}
+
 Bitmap.prototype.checkDirty = function () {
-    if (this._dirty) {
-        this._baseTexture.update();
-        var baseTexture = this._baseTexture;
-        setTimeout(function () {
-            baseTexture.update();
-        }, 0);
-        this._dirty = false;
+    if (!this._dirty) return;
+    var baseTexture = fsdkBitmapBaseTexture(this);
+    if (fsdkBaseTextureIsAlive(baseTexture)) {
+        baseTexture.update();
     }
+    this._dirty = false;
+
+    // A second update is needed after the render, but it must not fire against
+    // a texture that was replaced or destroyed in the meantime, otherwise PIXI
+    // logs the "'source' is undefined" warning on a stale texture.
+    if (this._fsdkUpdateTimer) {
+        clearTimeout(this._fsdkUpdateTimer);
+        this._fsdkUpdateTimer = null;
+    }
+    var self = this;
+    this._fsdkUpdateTimer = setTimeout(function () {
+        self._fsdkUpdateTimer = null;
+        if (fsdkBitmapBaseTexture(self) !== baseTexture) return;
+        if (!fsdkBaseTextureIsAlive(baseTexture)) return;
+        baseTexture.update();
+    }, 0);
 };
 
 Bitmap.prototype._requestImage = function (url) {

@@ -3259,7 +3259,7 @@ for (Yanfly.i = 1; Yanfly.i < Yanfly.Param.ETPMax + 1; ++Yanfly.i) {
     takeMpDmg: String(Yanfly.Parameters['Mode ' + Yanfly.i + ' Take MP DMG']),
     dealMpDmg: String(Yanfly.Parameters['Mode ' + Yanfly.i + ' Deal MP DMG']),
     healMpDmg: String(Yanfly.Parameters['Mode ' + Yanfly.i + ' Heal MP DMG']),
-    allyMpDmg: String(Yanfly.Parameters['Mode ' + Yanfly.i + ' Ally MP DMG']),
+    // BUGFIX: allyMpDmg was defined twice with the same value; the duplicate is dropped.
     allyMpDmg: String(Yanfly.Parameters['Mode ' + Yanfly.i + ' Ally MP DMG']),
     dealState: String(Yanfly.Parameters['Mode ' + Yanfly.i + ' Deal State']),
     gainState: String(Yanfly.Parameters['Mode ' + Yanfly.i + ' Gain State']),

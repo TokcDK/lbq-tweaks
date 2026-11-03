@@ -1,4 +1,4 @@
-﻿/*:
+/*:
 * @plugindesc このゲーム専用プラグイン
 * @author 作者名
 * @help ゲーム専用に作成された初期読み込み用プラグイン
@@ -6,436 +6,840 @@
 
 //(function(){
 
-//380-400の変数配列に名称設定。
+//---------------------------------------------------------------------------
+// Game variable / switch IDs used by this plugin (named after their meaning)
+//---------------------------------------------------------------------------
+const VAR_CURRENT_ACTOR_ID = 20;          // actor id currently being processed
+const VAR_MAIN_ACTOR_ID = 2;              // main character actor id
+const VAR_PARTNER_WEAPON_ID = 340;        // partner weapon id (301 is the generic partner)
+const VAR_PARTNER_NAME = 22;              // display variable for the partner name
+const VAR_ACTOR_NAME_MIRROR = 94;         // temporary copy of an actor name
+const VAR_H_PICTURE_NAME = 193;           // standing picture name of the H CG
+const VAR_H_STAGE_STATE = 191;            // stage of the standing picture (1-6)
+const VAR_H_STAGE_VARIANT = 192;          // expression variant of the standing picture
+const VAR_H_STAGE_MESSAGE = 194;          // BGS line number
+const VAR_MESSAGE_STACK = 506;            // accumulated suppression / cap messages
+const VAR_MESSAGE_STACK_COUNT = 540;
+const VAR_MESSAGE_STACK_ALT = 539;
+const VAR_PENDING_HSTATE_INPUT = 19;      // variable id picked in the choice window
+const VAR_CHOICE_RESULT = 18;             // unused / reserved
+const VAR_HSTATE_SELECTED_VALUE = 641;    // temporary copy of the H count with the partner
+const VAR_LAST_H_COUNT = 339;             // explicit head count (NumberOfPeople)
+const VAR_HISTORY_TEXT_VAR = 253;
+const VAR_HISTORY_SCENE_ARRAY = 174;      // scene history, per actor
+const VAR_HEROINE_ID_ARRAY = 247;         // list of heroine ids
+const VAR_H_STATE_DISPLAY_TEXT = 643;     // current H state icons
+const VAR_PARTNER_NAME_OVERRIDE = 353;    // overrides of the partner name
+const VAR_SCENE_PARTNER = 340;            // same as above, alias for readability at the call site
+const VAR_H_SCENE_ACTOR = 530;            // actor the H scene is played for
+const VAR_H_SCENE_TEXT_X = 318;           // actor of the text BGV
+const VAR_COMPACT_WINDOW_OFFSET = 313;    // window offset of the compact H status
+const VAR_H_SCENE_PICTURE_PARAMS = 706;
+const VAR_H_SCENE_PICTURE_SLOTS = 299;    // picture ids that may be used
+const VAR_H_SCENE_SPOKEN_TEXT = 21;       // ecstasy line (already carries the name marker)
+const VAR_H_SCENE_PHRASES = 707;          // extra moaning lines
+const VAR_BATTLE_MVP = 350;               // MVP record array
+const VAR_BATTLE_KILL = 351;              // kill count array
+const VAR_BATTLE_DAMAGE = 298;            // dealt damage array
+const VAR_HSTATE_PENDING_DEVELOPMENT_BASE = 430; // pending development gain (431-439)
+const VAR_SUPPRESSION_TARGET_FIRST = 431; // development suppression targets (431-439)
+const VAR_SUPPRESSION_TARGET_LAST = 439;
+const RANK_SUPPRESSION_SUFFIX = `上昇抑制`;
+const VAR_SUPPRESSION_TARGET_IDS = [431, 432, 433, 434, 435, 436, 437, 438, 439];
+
+const VAR_HSTATE_PENDING_FIRST = 401;     // pending H state gain (401-440)
+const VAR_HSTATE_PENDING_LAST = 440;
+const VAR_HSTATE_EXPOSURE_LIMIT = 405;    // exposure limit
+const VAR_HSTATE_CURRENT_EXPOSURE = 404;  // current exposure (scratch for the calculation)
+const VAR_HSTATE_AROUSAL = 402;           // arousal value
+const VAR_HSTATE_AROUSAL_GAIN = 401;      // arousal gain of this call
+const VAR_HSTATE_PLEASURE_GAIN = 403;
+const VAR_HSTATE_FERTILITY = 403;
+const VAR_HSTATE_PROSTITUTION_MONEY = 427;
+const VAR_HSTATE_PREGNANCY_PARTNER = 49;
+const VAR_PHYSIQUE_VAR_FIRST = 611;       // physique change record (611/612)
+const VAR_PHYSIQUE_VAR_SECOND = 612;
+
+// offsets into the per-actor arrays
+const HSTATE_ARRAY_VAR_OFFSET = 380;      // variable (actorId + 380) holds the H state array
+const PARTNER_RECORD_VAR_OFFSET = 360;    // variable (actorId + 360) holds the per-partner record
+const PARTNER_BODY_VAR_OFFSET = 440;      // variable (actorId + 440) holds the physique / outfit deltas
+const PARTNER_RECORD_SLOT_OFFSET = 100;   // per-partner record slot offset (101-200)
+const PARTNER_CHILD_SLOT_OFFSET = 200;    // child count of the partner
+const PARTNER_WIFE_SLOT_OFFSET = 100;
+const HSTATE_BODY_INDEX_HEAD_VARIANT = 32; // head variant flag inside the physique array
+const HSTATE_BODY_INDEX_BUST_FLAG = 18;   // bust flag inside the physique array (+100)
+
+// H status array indexes
+const HSTATE_INDEX_AROUSAL = 1;           // libido
+const HSTATE_INDEX_AROUSAL_CAP = 0;       // libido cap
+const HSTATE_INDEX_ESTRUS = 2;            // arousal (estrus) value
+const HSTATE_INDEX_FERTILITY = 3;         // fertility of the day
+const HSTATE_INDEX_EXPOSURE = 4;          // current exposure
+const HSTATE_INDEX_EXPOSURE_LIMIT = 5;    // exposure limit
+const HSTATE_INDEX_SEX_COUNT = 6;         // intercourse count
+const HSTATE_INDEX_FIRST_PARTNER = 41;    // first partner
+const HSTATE_INDEX_PREGNANCY_SWELL = 42;  // weight / size gain while pregnant
+const HSTATE_INDEX_FIRST_CHILD_PARTNER = 49; // father of the first child
+const HSTATE_INDEX_TODAY_COUNT = 61;      // H count of the day
+const HSTATE_INDEX_DAILY_LIMIT_DAYS = 62; // consecutive days with 10 or more rounds
+const HSTATE_INDEX_LIBIDO_DRUG = 63;      // libido drug uses
+const HSTATE_INDEX_ZERO_COUNT_DAYS = 64;  // consecutive days with zero rounds while libido is 499 or more
+const HSTATE_INDEX_RAPE_TODAY = 71;       // rape count of the day
+const HSTATE_INDEX_HEIGHT = 51;           // the following entries are results of hstates_heights
+const HSTATE_INDEX_WEIGHT = 52;
+const HSTATE_INDEX_BUST = 53;
+const HSTATE_INDEX_WAIST = 54;
+const HSTATE_INDEX_HIP = 55;
+const HSTATE_INDEX_CUP = 56;
+
+// game switches
+const SW_H_SCENE_DISPLAY_HIDDEN = 121;    // hide the status window during an H scene
+const SW_H_SCENE_SIMPLE = 122;            // simple display with libido / arousal only
+const SW_H_SCENE_PAST = 123;              // past scene
+const SW_BATTLE_RECORD_VISIBLE = 130;     // show the battle record
+const SW_TICKER_MESSAGE = 475;            // announce through the ticker
+const SW_MESSAGE_STACK_MODE = 154;        // accumulate messages in a variable
+const SW_H_PASSIVE_WINDOW = 115;          // open the uncollected H passive window
+const SW_HISTORY_DETAIL = 164;            // detailed history display
+const SW_ECSTASY_VOICE = 119;             // ecstasy voice
+const SW_GOBLIN_ENEMY = 248;              // the enemy is a goblin
+const SW_CLOTH_MENU_RELEASED = 604;       // dress-up menu already released
+const SW_COMPACT_H_STATUS = 496;          // compact H status display
+
+// skills / database ids
+const SKILL_LIBIDO_UNLOCK = 18;           // base skill that unlocks the libido value
+const SKILL_H_EXPOSURE = 55;              // exposure development skill
+const SKILL_H_SEXUAL_DEV = 54;            // sexual development skill
+const SKILL_H_SKILLED = 65;               // skebe-ko skill (unlocks fertilisation / climax handling)
+const SKILL_PARTNER_KNOWN = 67;           // the partner's information is known
+const SKILL_ALL_DEVELOPMENT = 875;        // skill of nine combined developments
+const SKILL_H_DEV_FIRST = 51;             // development skills (51-59)
+const SKILL_H_DEV_LAST = 59;
+const SKILL_SUPPRESSION_FIRST = 61;       // estrus calming skills (61-69)
+const ELEMENT_REPRODUCTION = 37;          // element of the breeding bonus
+const STATE_PREGNANT = 83;                // pregnant
+const STATE_FERTILIZED = 79;              // fertilised (previous stage of pregnant)
+const STATE_BIRTHED = 82;                 // already gave birth
+const STATE_ESTRUS = 61;                  // estrus
+const STATE_HARASSMENT = 81;              // harassment (before restraint)
+const HCG_PISTON_PICTURE_ID = 57;
+
+// misc limits
+const PARTNER_ACTOR_ID = 21;              // actor id used to display the partner name
+const VAR_HSTATE_ECSTASY_BASE = 400;      // base variable id of the climax slots
+const ACTOR_SCAN_FIRST = 1;               // first actor id scanned by the isGirl check
+const ACTOR_SCAN_LAST = 20;
+const VAR_H_VAGINAL_COUNT = 406;          // vaginal intercourse count
+const VAR_H_ANAL_COUNT = 407;             // anal intercourse count
+const VAR_H_FELLATION_COUNT = 408;        // fellatio count
+const VAR_H_CLIMAX_COUNT = 414;           // climax count
+const VAR_H_SQUIRT_COUNT = 425;           // squirting count
+const VAR_H_INCONTINENCE_COUNT = 424;     // incontinence count
+const VAR_GROUP_H_COUNT = 409;            // partner count (group sex from two upwards)
+const VAR_HSTATE_PENDING_DISTINCT_PARTNERS = 409; // pending distinct partner gain
+const VAR_HSTATE_PENDING_VAGINAL_INTERNAL = 411; // vaginal internal (creampie) count
+const VAR_HSTATE_PENDING_ANAL_INTERNAL = 412; // anal internal count
+const VAR_HSTATE_PENDING_FELLATION_INTERNAL = 416; // oral internal count
+const VAR_HSTATE_PENDING_GROUP_RAPE = 419; // group rape flag
+const VAR_HSTATE_PENDING_MONSTER_H = 420; // monster intercourse flag
+const VAR_HSTATE_PENDING_RAPE = 418;      // rape count
+
+const PARTNER_SCAN_FIRST = 1;             // scan range of the per-partner history
+const PARTNER_SCAN_LAST = 100;
+const PARTNER_RECORD_SLOT_FIRST_INDEX = 101; // first slot of the per-partner records (101-200)
+const PARTNER_RECORD_SLOT_LAST_INDEX = 200;
+const EXPOSURE_ITEM_SCAN_FIRST = 1201;   // first item id scanned by the exposure calculation
+const CLOTH_SWITCH_VAR_ID_MIN = 461;     // clothing switch variables, lower bound
+const CLOTH_SWITCH_VAR_ID_MAX = 500;
+const CLOTH_SWITCH_VAR_OFFSET = 460;     // ClothSwitch + 460 gives the variable id
+const EIC_SWITCH_ACTOR_OFFSET = 180;     // EICSwitch of actor n is n + 180
+const EIC_SWITCH_SHARED_ACTOR = 200;     // wearer id shared by the whole party
+
+//---------------------------------------------------------------------------
+// Small shared helpers
+//---------------------------------------------------------------------------
+
+// Development rank (1-6) as a coloured label; rank 6 and above are all S.
+const MASTERY_RANK_LABELS = [`\\C[4][E]\\C[0]`, `\\C[12][D]\\C[0]`, `\\C[5][C]\\C[0]`, `\\C[13][B]\\C[0]`, `\\C[27][A]\\C[0]`, `\\C[30][S]\\C[0]`];
+masteryRankLabel = function (masteryLevel) {
+  return MASTERY_RANK_LABELS[Math.max(0, Math.min(masteryLevel, 6) - 1)];
+};
+
+// Adds one line to the libido text and moves to the next valueWordSet when the page is full.
+appendHStateMessage = function (messageText, linesPerPage, pageHeaderText) {
+  window['valueWordSet' + valueCountSet2] += messageText;
+  valueCountSet1 += 1;
+  if ((valueCountSet1 % linesPerPage) != 0) return;
+  valueCountSet2 += 1;
+  window['valueWordSet' + valueCountSet2] = pageHeaderText || `\\C[10]H-Passive[${valueCountSet2}]\\C[0]\n`;
+};
+
+// Returns the index-th number of a "a,b" meta value; without an index the whole value is converted.
+metaNumberAt = function (meta, key, index, fallback) {
+  const raw = meta[key];
+  if (!raw) return fallback;
+  if (index === undefined) return Number(raw);
+  return Number(raw.split(',')[index]);
+};
+
+// Actor currently being processed ($gameVariables.value(20)).
+// Actor id and actor of variable 20; the caller decides what to do without an actor.
+function readCurrentActor() {
+  const actorId = $gameVariables.value(VAR_CURRENT_ACTOR_ID);
+  return { actorId: actorId, actor: $gameActors.actor(actorId) };
+}
+
+function currentHStateActor() {
+  return $gameActors.actor($gameVariables.value(VAR_CURRENT_ACTOR_ID));
+}
+
+// H state array of variable (actorId + 380).
+function readHStateValues(actorId) {
+  return $gameVariables.value(actorId + HSTATE_ARRAY_VAR_OFFSET);
+}
+
+// Per-partner H record array of variable (actorId + 360).
+function readPartnerRecords(actorId) {
+  return $gameVariables.value(actorId + PARTNER_RECORD_VAR_OFFSET);
+}
+
+// Physique / outfit delta array of variable (actorId + 440).
+function readPartnerBodyValues(actorId) {
+  return $gameVariables.value(actorId + PARTNER_BODY_VAR_OFFSET);
+}
+
+// Strips the display padding and separator from a variable name ("Libido　：" -> "Libido").
+function cleanVariableLabel(variableName) {
+  // NOTE: the original removed at most three full-width spaces, one half-width space
+  //       and one colon, so the same counts are used here to keep the output identical.
+  return String(variableName)
+    .replace("　", ``).replace("　", ``).replace("　", ``)
+    .replace(" ", ``).replace(":", ``);
+}
+
+// Notifications go either to the ticker or into a variable, so they are funnelled through one place.
+// Returns true when the message was accumulated for a later display instead of shown now.
+function stackMessageForDisplay(messageText) {
+  if (!$gameSwitches.value(SW_MESSAGE_STACK_MODE)) return false;
+
+  $gameVariables.setValue(VAR_MESSAGE_STACK_ALT, `${messageText}\n`);
+  $gameVariables.setValue(VAR_MESSAGE_STACK_COUNT, $gameVariables.value(VAR_MESSAGE_STACK_COUNT) + 1);
+  return true;
+}
+
+// Shows a one-line notice in the ticker (or stacks it).
+function showHStateNotice(messageText) {
+  if (stackMessageForDisplay(messageText)) return;
+
+  TickerManager.show(messageText);
+}
+
+// Append the message to variable 506 or show it in the ticker.
+function appendMessageStack(messageText) {
+  $gameVariables.setValue(VAR_MESSAGE_STACK, $gameVariables.value(VAR_MESSAGE_STACK) + messageText);
+}
+
+// Reset the "gain of this call" H states 401-440 back to zero.
+function resetPendingHStateVariables() {
+  for (let varId = VAR_HSTATE_PENDING_FIRST; varId <= VAR_HSTATE_PENDING_LAST; varId++) {
+    $gameVariables.setValue(varId, 0);
+  }
+}
+
+// Assigns values to a list of variable ids in order (shared by h_exp1-h_exp4).
+function assignGameVariableList(varIds, values) {
+  for (let index = 0; index < varIds.length; index++) {
+    $gameVariables.setValue(varIds[index], values[index]);
+  }
+}
+
+//---------------------------------------------------------------------------
+// H experience counters
+//---------------------------------------------------------------------------
+
+// Coin toss for the creampie decision (1 means internal).
+const COIN_FLIP_VALUES = [1, 0, 1, 0, 1, 1];
+
+// Name the variables of the 380-400 array.
+const HENTAI_ARRANGEMENT_NAMES = {
+  1: `性欲度`,
+  41: `初体験相手`,
+  49: `初出産相手`,
+  61: `当日Ｈ回数`,
+  62: `一日のＨ回数が10回以上`,
+  63: `性欲薬使用回数`,
+  64: `性欲499以上でＨ回数0の連続日数`,
+  71: `当日強姦回数`
+};
+
 Hentai380_ArrangementNameSet = function () {
 
   valueHentaiArrangement = Array(71).fill(`H回数`);
-  valueHentaiArrangement[1] = `性欲度`;
-  valueHentaiArrangement[41] = `初体験相手`;
-  valueHentaiArrangement[49] = `初出産相手`;
-  valueHentaiArrangement[61] = `当日Ｈ回数`;
-  valueHentaiArrangement[62] = `一日のＨ回数が10回以上`;
-  valueHentaiArrangement[63] = `性欲薬使用回数`;
-  valueHentaiArrangement[64] = `性欲499以上でＨ回数0の連続日数`;
-  valueHentaiArrangement[71] = `当日強姦回数`;
+  for (const index in HENTAI_ARRANGEMENT_NAMES) {
+    valueHentaiArrangement[index] = HENTAI_ARRANGEMENT_NAMES[index];
+  }
 
 };
 
-//Ｈ経験値１日経過時更新
+// Daily refresh of the H experience values.
 weeks_toggleOtherH = function () {
 
-  //61は当日Ｈ回数、62は当日Ｈ回数10以上の時に記録。64は性欲499以上でＨ回数0の連続日数
-  for (var i = 1; i <= 20; i++) {
-    if (isGirl($gameActors.actor(i))) {
-      var actor = $gameActors.actor(i);
-      if ($gameVariables.value(i + 380)[61] >= 10) {
-        $gameVariables.value(i + 380)[62] += 1;//1日Ｈ回数１０回以上
-      };
-      if ($gameVariables.value(i + 380)[1] >= 499) {
-        if ($gameVariables.value(i + 380)[61] == 0) {
-          $gameVariables.value(i + 380)[64] += 1;
-        } else {
-          $gameVariables.value(i + 380)[64] = 0;
-        };
-      };
-      $gameVariables.value(i + 380)[61] = 0;//H回数リセット
-    };
+  // 61 is the H count of the day, 62 the streak with 10 or more, 64 the streak of zero rounds while libido is 499 or more.
+  for (let actorId = ACTOR_SCAN_FIRST; actorId <= ACTOR_SCAN_LAST; actorId++) {
+    const actor = $gameActors.actor(actorId);
+    if (!isGirl(actor)) continue;
+    updateDailyHRecords(readHStateValues(actorId));
   };
 
 };
 
+// Updates one actor daily H record and resets the count of the day.
+function updateDailyHRecords(hStateValues) {
+  const todayCount = hStateValues[HSTATE_INDEX_TODAY_COUNT];
+  if (todayCount >= 10) {
+    hStateValues[HSTATE_INDEX_DAILY_LIMIT_DAYS] += 1;// 10 or more H rounds in one day
+  }
+  if (hStateValues[HSTATE_INDEX_AROUSAL] >= 499) {
+    hStateValues[HSTATE_INDEX_ZERO_COUNT_DAYS] = todayCount == 0
+      ? hStateValues[HSTATE_INDEX_ZERO_COUNT_DAYS] + 1
+      : 0;
+  }
+  hStateValues[HSTATE_INDEX_TODAY_COUNT] = 0;// reset the H count
+}
+
+// Stores the libido experience (development) in variables; h_exp1-h_exp4 only differ by the variable ids.
+const HEXP_VARIABLES = {
+  encounter: [406, 409, 408, 407, 413, 414],// vaginal / head count / fellatio / anal / masturbation / climax
+  relation: [417, 418, 420, 419, 430, 410],// consensual / rape / monster / group / orgy / exposure
+  act: [421, 422, 423, 424, 425, 426, 415, 428, 411, 412, 416],
+  development: [431, 432, 433, 434, 435, 436, 437, 438, 427]
+};
+
+h_exp1 = function (vaginalCount, partnerCount, fellatioCount, analCount, masturbationCount, orgasmCount) {
+  assignGameVariableList(HEXP_VARIABLES.encounter,
+    [vaginalCount, partnerCount, fellatioCount, analCount, masturbationCount, orgasmCount]);
+};
+
+h_exp2 = function (consensualCount, rapeCount, interspeciesCount, gangRapeCount, orgyCount, exposureCount) {
+  assignGameVariableList(HEXP_VARIABLES.relation,
+    [consensualCount, rapeCount, interspeciesCount, gangRapeCount, orgyCount, exposureCount]);
+};
+
+h_exp3 = function (harassmentCount, breastKneadCount, buttKneadCount, incontinenceCount, squirtingCount, prostitutionCount, pregnancyCount, childCount, vaginalEjaculationCount, analEjaculationCount, oralDrinkCount) {
+  assignGameVariableList(HEXP_VARIABLES.act,
+    [harassmentCount, breastKneadCount, buttKneadCount, incontinenceCount, squirtingCount,
+      prostitutionCount, pregnancyCount, childCount, vaginalEjaculationCount,
+      analEjaculationCount, oralDrinkCount]);
+};
+
+h_exp4 = function (vaginalDevelopment, analDevelopment, oralDevelopment, sensualityDevelopment, exposureDevelopment, semenExp, sexualPlayExp, serviceExp, prostitutionEarnings) {
+  assignGameVariableList(HEXP_VARIABLES.development,
+    [vaginalDevelopment, analDevelopment, oralDevelopment, sensualityDevelopment,
+      exposureDevelopment, semenExp, sexualPlayExp, serviceExp, prostitutionEarnings]);
+};
+
+// Adds a random amount to the climax-related variables (one of 6-8).
+const ECSTASY_SLOT_CANDIDATES = [6, 6, 6, 6, 7, 8, 8];
+h_exp1ex = function (id) {
+
+  for (let count = 1; count <= id; count++) {
+    const ecstasySlot = ECSTASY_SLOT_CANDIDATES[getRandomIndex(ECSTASY_SLOT_CANDIDATES.length)];
+    const targetVarId = VAR_HSTATE_ECSTASY_BASE + ecstasySlot;
+    $gameVariables.setValue(targetVarId, $gameVariables.value(targetVarId) + 1);
+  };
+
+};
+
+//---------------------------------------------------------------------------
+// Partner (weapon id 301+) related helpers
+//---------------------------------------------------------------------------
+
+// Picks the ecstasy line and picture from the H count with the partner.
 h_BattleEcstasyDirect = function () {
 
   adv_HpartDirectPlay(3);
-  if ($dataActors[$gameVariables.value(20)].meta['SexualZettyouLow']) {
-    var actor = $gameActors.actor($gameVariables.value(20));
-    var value3 = 'Low'; var value4 = 1;
-    //if($gameActors.actor($gameVariables.value(20)).isLearnedSkill(62)){var value3 = 'Middle';var value4 = 2};
-    //if($gameActors.actor($gameVariables.value(20)).isLearnedSkill(65)){var value3 = 'Hi';var value4 = 3};
-    var arr1 = $dataActors[$gameVariables.value(20)].meta['SexualZettyou' + value3].split(',');
-    var value1 = arr1[getRandomIndex(arr1.length)];
-    var value2 = `${actor.name()}`;
-    $gameVariables.setValue(21, `\\nw[${value2}]${value1}`);
-    var value1 = 'Zev_BattleEcstasy' + $gameVariables.value(20) + '_' + value4;
-    pic_1(0, 57, value1, 0, 100, 255, 60, 1280, 768, 0, 0);
-    var value1 = 51;
-    var value2 = 'ScreenBattleEcstasySell5';
-    picture_anime1(value1, value2, 5, 1, "横", 10, 1, true, [1, 2]);
-    $gameScreen.movePicture(value1, 1, 640, 384, 100, 100, 150, 0, 30);
+  const actorId = $gameVariables.value(VAR_CURRENT_ACTOR_ID);
+  const actorData = $dataActors[actorId];
+  if (!actorData || !actorData.meta['SexualZettyouLow']) return;
+
+  const actor = $gameActors.actor(actorId);
+  const ecstasyRank = 1;
+  const ecstasyCandidates = actorData.meta['SexualZettyouLow'].split(',');
+  const ecstasyValue = ecstasyCandidates[getRandomIndex(ecstasyCandidates.length)];
+  const actorNameMarker = `\\nw[${actor.name()}]`;
+  $gameVariables.setValue(VAR_H_SCENE_SPOKEN_TEXT, `${actorNameMarker}${ecstasyValue}`);
+
+  showBattleEcstasyPictures(actorId, ecstasyRank);
+};
+
+// Picture used for the climax effect; the image name follows the actor id and the rank.
+function showBattleEcstasyPictures(actorId, ecstasyRank) {
+  const ecstasyPictureName = 'Zev_BattleEcstasy' + actorId + '_' + ecstasyRank;
+  pic_1(0, 57, ecstasyPictureName, 0, 100, 255, 60, 1280, 768, 0, 0);
+
+  const ecstasyPictureId = 51;
+  const ecstasyPictureBaseName = 'ScreenBattleEcstasySell5';
+  picture_anime1(ecstasyPictureId, ecstasyPictureBaseName, 5, 1, "横", 10, 1, true, [1, 2]);
+  $gameScreen.movePicture(ecstasyPictureId, 1, 640, 384, 100, 100, 150, 0, 30);
+}
+
+// Script used to display the partner when the H already happened.
+h_keikenhyouji1 = function (resultVarId, partnerWeaponId) {
+
+  const partnerWeapon = $dataWeapons[partnerWeaponId];
+  const partnerActor = $gameActors.actor(PARTNER_ACTOR_ID);
+  if (!partnerWeapon || !partnerActor) return;
+
+  applyPartnerNameOverride(partnerActor, partnerWeapon, partnerWeaponId);
+  valueScenePartnerId = partnerWeaponId;
+
+  const partnerHRecords = readPartnerRecords($gameVariables.value(VAR_CURRENT_ACTOR_ID));
+  const partnerHCount = partnerHRecords[partnerWeaponId - PARTNER_RECORD_SLOT_OFFSET];
+  if (!(partnerHCount >= 1)) {
+    $gameVariables.setValue(resultVarId, 0);
+    return;
   };
+
+  h_partnerFullName(VAR_PARTNER_NAME, partnerWeaponId);
+  const partnerName = $gameVariables.value(VAR_PARTNER_NAME);
+  const partnerInfoText = buildPartnerInfoText(partnerWeapon, partnerHRecords, partnerWeaponId, partnerName, partnerHCount);
+  $gameVariables.setValue(resultVarId, `【${partnerInfoText}】`);
 
 };
 
-//相手とＨ済みの場合に表示するためのスクリプト
-h_keikenhyouji1 = function (id2, id1) {
+// Display name of the partner actor (21), taken from the override variable or the weapon name.
+function applyPartnerNameOverride(partnerActor, partnerWeapon, partnerWeaponId) {
+  const nameOverrideValues = $gameVariables.value(VAR_PARTNER_NAME_OVERRIDE);
+  const nameOverride = nameOverrideValues[partnerWeaponId - 300];
 
-  var value1 = id1;
-  if ($gameVariables.value(353)[id1 - 300] != 0) {
-    $gameActors.actor(21).setName(`\x1bnnp[${id1}]`);
-  } else {
-    $gameActors.actor(21).setName($dataWeapons[id1].name);
+  if (nameOverride != 0) {
+    partnerActor.setName(`\x1bnnp[${partnerWeaponId}]`);
+    return;
+  }
+  partnerActor.setName(partnerWeapon.name);
+}
+
+// Combines the H count, the number of children and the pregnancy chance into one message.
+function buildPartnerInfoText(partnerWeapon, partnerHRecords, partnerWeaponId, partnerName, partnerHCount) {
+  const partnerDescription = partnerWeapon.description;
+  let partnerInfoText = partnerDescription == 0 ? '\n' : partnerDescription + '\n';
+
+  const hCountText = colorTaggedText(27, `Ｈ回数：${partnerHCount}`);
+  partnerInfoText += '\n' + `${partnerName}との${hCountText}`;
+
+  const childCount = partnerHRecords[partnerWeaponId + PARTNER_CHILD_SLOT_OFFSET];
+  if (childCount >= 1) {
+    partnerInfoText += `　${partnerName}との子${childCount}人`;
   };
-  valueScenePartnerId = id1;
-  if ($gameVariables.value($gameVariables.value(20) + 360)[value1 - 100] >= 1) {
-    h_partnerFullName(22, value1);
-    var value3 = $dataWeapons[id1].description;
-    if (value3 == 0) {
-      var value2 = `\n`;
-    } else {
-      var value2 = `${$dataWeapons[id1].description}\n`;
-    };
-    var value4 = $gameVariables.value(22);
-    value2 += `\n${value4}との\\C[27]Ｈ回数：${$gameVariables.value($gameVariables.value(20) + 360)[value1 - 100]}\\C[0]`
-    if ($gameVariables.value($gameVariables.value(20) + 360)[value1 + 100] >= 1) {
-      value2 += `　${value4}との子${$gameVariables.value($gameVariables.value(20) + 360)[value1 + 100]}人`
-    };
-    if ($gameVariables.value($gameVariables.value(20) + 360)[value1] >= 1) {
-      value2 += `　${value4}の子を宿しているかも知れない…。`
-    };
-    $gameVariables.setValue(id2, `【${value2}】`);
-  } else {
-    $gameVariables.setValue(id2, 0);
+
+  if (partnerHRecords[partnerWeaponId] >= 1) {
+    partnerInfoText += `　${partnerName}の子を宿しているかも知れない…。`;
   };
+  return partnerInfoText;
+}
+
+// Script used to display the partner when the H already happened.
+h_keikenhyouji2 = function (textVarId, showFlag) {
+
+  changePartnerInfoWindow(textVarId, showFlag);
 
 };
 
-//相手とＨ済みの場合に表示するためのスクリプト
-h_keikenhyouji2 = function (id2, id1) {
-
-  if (id2 != 0) {
-    if (id1 == 1) {
-      if ($gameVariables.value(id2) != 0) {
-        $gameScreen.dWindowFrame = 'ON';
-        $gameScreen.setDTextPicture($gameVariables.value(id2), 25);
-        $gameScreen.showPicture(150, "", 0, 100, 100, 100, 100, 0, 0);
-        $gameScreen.movePicture(150, 0, 10, 100, 100, 100, 255, 0, 30);
-      };
-    };
+// Show / dismiss the text window (picture 150).
+function changePartnerInfoWindow(textVarId, showFlag) {
+  if (textVarId != 0 && showFlag == 1 && $gameVariables.value(textVarId) != 0) {
+    $gameScreen.dWindowFrame = 'ON';
+    $gameScreen.setDTextPicture($gameVariables.value(textVarId), 25);
+    $gameScreen.showPicture(150, "", 0, 100, 100, 100, 100, 0, 0);
+    $gameScreen.movePicture(150, 0, 10, 100, 100, 100, 255, 0, 30);
   };
-  if (id1 == 0) {
+  if (showFlag == 0) {
     pic_move1(150, -100, 100, 100, 100, 0, 60);
   };
+}
 
+// List of the H counts with the unique partners.
+const PARTNER_HISTORY_VAR_FIRST = 801;
+const PARTNER_HISTORY_VAR_LAST = 810;
+const PARTNER_HISTORY_PAGE_LINES = 10;
 
-};
-
-//固有相手とのＨ経験回数リスト
 h_hennreki = function () {
 
-  for (var i = 801; i <= 810; i++) { $gameVariables.setValue(i, 0) };
-  var value1 = 0;
-  var value3 = 801;
-  $gameVariables.setValue(value3, `一覧\n`);
-  var start = 1;
-  var end = 100;
-  for (var i = start; i <= end; i++) {
-    if ($gameVariables.value($gameVariables.value(20) + 360)[i] >= 1) {
-      var value2 = ` `
-      value2 += `${$dataWeapons[i + 300].name}：`
-      value2 += `${$gameVariables.value($gameVariables.value(20) + 360)[i]}回`
-      if ($gameVariables.value($gameVariables.value(20) + 360)[i + 200] >= 1) {
-        value2 += `【${$gameVariables.value($gameVariables.value(20) + 360)[i + 200]}人】`
-      };
-      value2 += `\n`
-      $gameVariables.setValue(value3, $gameVariables.value(value3) + value2);
-      value1 += 1;
-      if ((value1 % 10) == 0) {
-        value3 += 1;
-        $gameVariables.setValue(value3, `　\n`);
-      };
-    }
+  for (let varId = PARTNER_HISTORY_VAR_FIRST; varId <= PARTNER_HISTORY_VAR_LAST; varId++) {
+    $gameVariables.setValue(varId, 0);
+  };
+
+  const partnerHRecords = readPartnerRecords($gameVariables.value(VAR_CURRENT_ACTOR_ID));
+  let listVarId = PARTNER_HISTORY_VAR_FIRST;
+  let pageText = '一覧' + '\n';
+  let entryCount = 0;
+
+  for (let partnerIndex = PARTNER_SCAN_FIRST; partnerIndex <= PARTNER_SCAN_LAST; partnerIndex++) {
+    const hCount = partnerHRecords[partnerIndex];
+    if (hCount < 1) continue;
+
+    pageText += buildPartnerHistoryLine(partnerHRecords, partnerIndex, hCount);
+    entryCount += 1;
+
+    if ((entryCount % PARTNER_HISTORY_PAGE_LINES) != 0) continue;
+    $gameVariables.setValue(listVarId, pageText);
+    listVarId += 1;
+    pageText = `　\n`;
+  };
+
+  $gameVariables.setValue(listVarId, pageText);
+
+};
+
+// One "partner name: n times [children]" line.
+function buildPartnerHistoryLine(partnerHRecords, partnerIndex, hCount) {
+  const partnerWeapon = $dataWeapons[partnerIndex + 300];
+  const partnerName = partnerWeapon ? partnerWeapon.name : ``;
+
+  let entryLineText = ` ${partnerName}：`;
+  entryLineText += `${hCount}回`;
+
+  const childCount = partnerHRecords[partnerIndex + PARTNER_CHILD_SLOT_OFFSET];
+  if (childCount >= 1) {
+    entryLineText += `【${childCount}人】`;
+  };
+
+  return entryLineText + '\n';
+}
+
+// h_partnerFullName(22,$gameVariables.value(340)); // target variable id, partner id variable
+h_partnerFullName = function (resultVarId, partnerWeaponId) {
+
+  const partnerWeapon = $dataWeapons[partnerWeaponId];
+  // BUGFIX: the metadata lookup crashed when the weapon id did not exist.
+  if (!partnerWeapon) return;
+
+  const partnerMeta = partnerWeapon.meta;
+  const partnerNameText = buildPartnerNameText(partnerWeapon, partnerMeta);
+  $gameVariables.setValue(resultVarId, partnerNameText);
+
+};
+
+// Partner name built from the family name, the kanji family name and the stand-in actor id.
+// Order: weapon name -> (= family name) -> kanji family name in front -> replaced by the stand-in actor.
+function buildPartnerNameText(partnerWeapon, partnerMeta) {
+  let partnerNameText = colorTaggedText(23, partnerWeapon.name);
+
+  const familyName = partnerMeta['FamilyName'];
+  if (familyName) partnerNameText += colorTaggedText(23, `=${familyName}`);
+
+  const familyNameKanji = partnerMeta['FamilyNameKanji'];
+  if (familyNameKanji) {
+    const familyNameKanjiLabel = colorTaggedText(23, familyNameKanji);
+    partnerNameText = `${familyNameKanjiLabel} ${partnerNameText}`;
+  };
+
+  // A stand-in actor always wins over the name built above.
+  const substitutionActorId = readMetaNumber(partnerMeta, 'SubstitutionActorId', 0);
+  if (substitutionActorId >= 1) partnerNameText = `\x1bSET[${substitutionActorId}]`;
+  return partnerNameText;
+}
+
+// H experience refresh.
+h_exp = function (actorId, pictureName, partnerWeaponId, hideFlag, simpleFlag, pastSceneFlag) {
+
+  $gameVariables.setValue(VAR_LAST_H_COUNT, 0);
+  $gameVariables.setValue(VAR_CURRENT_ACTOR_ID, actorId);
+  $gameVariables.setValue(VAR_H_PICTURE_NAME, pictureName);
+  readHStateValues(actorId)[46] = pictureName;
+  $gameSwitches.setValue(SW_H_SCENE_DISPLAY_HIDDEN, hideFlag);// hidden
+  $gameSwitches.setValue(SW_H_SCENE_SIMPLE, simpleFlag);// libido and arousal only, mostly used on item use
+  $gameSwitches.setValue(SW_H_SCENE_PAST, pastSceneFlag);// on for a past scene
+  $gameVariables.setValue(VAR_PARTNER_WEAPON_ID, partnerWeaponId);// 301 is the generic partner
+  $gameVariables.setValue(VAR_ACTOR_NAME_MIRROR, $gameActors.actor(actorId).name());
+  // NOTE: the mirror above is read back by the later Show Picture / text commands.
+
+  const partnerWeapon = $dataWeapons[partnerWeaponId];
+  // BUGFIX: the name lookup crashed when the weapon id did not exist.
+  if (!partnerWeapon) return;
+
+  $gameVariables.setValue(VAR_PARTNER_NAME, partnerWeapon.name);
+  // A raw '0' keeps the value written above; any other truthy value is converted.
+  const partnerHeadCountRaw = partnerWeapon.meta['NumberOfPeople'];
+  if (partnerHeadCountRaw) {
+    $gameVariables.setValue(VAR_LAST_H_COUNT, Number(partnerHeadCountRaw));
   };
 
 };
 
-//h_partnerFullName(22,$gameVariables.value(340)); //代入変数id,相手id指定変数
-h_partnerFullName = function (id3, id4) {
+//---------------------------------------------------------------------------
+// Actor H status windows
+//---------------------------------------------------------------------------
+const H_EXPOSURE_SKILL_ID = 50;           // libido development skill
+const H_EXPOSURE_RANK_STEP = 100;         // one rank per 100 development points
+const HSTATE_WINDOW_COLUMN_A = [6, 7, 8, 9, 10, 11, 12, 16, 13, 14, 15];
+const HSTATE_WINDOW_COLUMN_B = [17, 18, 19, 30, 20, 21, 22, 23, 24, 25, 26, 28];
+const HSTATE_COUNT_WORD = `回`;
+//Engine font-size tags, kept outside of the translatable strings.
+const FONT_SIZE_22 = `\\fs[22]`;
+const FONT_SIZE_24 = `\\fs[24]`;
+const FONT_SIZE_25 = `\\fs[25]`;
+const FONT_SIZE_28 = `\\fs[28]`;
 
-  var value4 = `\\C[23]${$dataWeapons[id4].name}\\C[0]`;
-  if ($dataWeapons[id4].meta['FamilyName']) {
-    value4 += `\\C[23]=${$dataWeapons[id4].meta['FamilyName']}\\C[0]`;
-  };
-  if ($dataWeapons[id4].meta['FamilyNameKanji']) {
-    var value4 = `\\C[23]${$dataWeapons[id4].meta['FamilyNameKanji']}\\C[0] ${value4}`;
-  };
-  if ($dataWeapons[id4].meta['SubstitutionActorId']) {
-    var value5 = Number($dataWeapons[id4].meta['SubstitutionActorId']);
-    var value4 = `\x1bSET[${value5}]`;
-  };
-  $gameVariables.setValue(id3, value4);
-
-};
-
-//Ｈ経験値更新
-h_exp = function (id1, picname, id2, value1, value2, value3) {
-
-  $gameVariables.setValue(339, 0);
-  $gameVariables.setValue(20, id1);
-  $gameVariables.setValue(193, picname);
-  $gameVariables.value($gameVariables.value(20) + 380)[46] = $gameVariables.value(193);
-  $gameSwitches.setValue(121, value1);//非表示
-  $gameSwitches.setValue(122, value2);//性欲性感のみ簡易主にアイテム使用時
-  $gameSwitches.setValue(123, value3);//過去シーンならオン
-  $gameVariables.setValue(340, id2);//301汎用
-  $gameVariables.setValue(94, $gameActors.actor($gameVariables.value(20)).name());
-  $gameVariables.setValue(22, $dataWeapons[$gameVariables.value(340)].name);
-  if ($dataWeapons[$gameVariables.value(340)].meta['NumberOfPeople']) {
-    $gameVariables.setValue(339, Number($dataWeapons[$gameVariables.value(340)].meta['NumberOfPeople']));
-  };
-
-};
-
-//性経験値加算式
-h_exp1 = function (id0, id1, id2, id3, id4, id5) {
-
-  $gameVariables.setValue(406, id0);
-  $gameVariables.setValue(409, id1);
-  $gameVariables.setValue(408, id2);
-  $gameVariables.setValue(407, id3);
-  $gameVariables.setValue(413, id4);
-  $gameVariables.setValue(414, id5);
-
-};
-
-h_exp1ex = function (id) {
-
-  for (var i = 1; i <= id; i++) {
-    var arr1 = [6, 6, 6, 6, 7, 8, 8];
-    var value1 = arr1[getRandomIndex(arr1.length)];
-    $gameVariables.setValue(400 + value1, $gameVariables.value(400 + value1) + 1);
-  };
-
-};
-
-h_exp2 = function (id0, id1, id2, id3, id5, id4) {
-
-  $gameVariables.setValue(417, id0);
-  $gameVariables.setValue(418, id1);
-  $gameVariables.setValue(420, id2);
-  $gameVariables.setValue(419, id3);
-  $gameVariables.setValue(430, id5);
-  $gameVariables.setValue(410, id4);
-
-};
-
-h_exp3 = function (id0, id1, id2, id3, id4, id5, id6, id7, id8, id9, id10) {
-
-  $gameVariables.setValue(421, id0);
-  $gameVariables.setValue(422, id1);
-  $gameVariables.setValue(423, id2);
-  $gameVariables.setValue(424, id3);
-  $gameVariables.setValue(425, id4);
-  $gameVariables.setValue(426, id5);
-  $gameVariables.setValue(415, id6);
-  $gameVariables.setValue(428, id7);
-  $gameVariables.setValue(411, id8);
-  $gameVariables.setValue(412, id9);
-  $gameVariables.setValue(416, id10);
-
-};
-
-h_exp4 = function (id0, id1, id2, id3, id4, id5, id6, id7, id8) {
-
-  $gameVariables.setValue(431, id0);
-  $gameVariables.setValue(432, id1);
-  $gameVariables.setValue(433, id2);
-  $gameVariables.setValue(434, id3);
-  $gameVariables.setValue(435, id4);
-  $gameVariables.setValue(436, id5);
-  $gameVariables.setValue(437, id6);
-  $gameVariables.setValue(438, id7);
-  $gameVariables.setValue(427, id8);
-
-};
-
-//☆☆アクター変数20の開発度表示2
+// Development display 2 of the actor in variable 20.
 actor_Hstateshyouji2 = function () {
 
-  var actor = $gameActors.actor($gameVariables.value(20));
-  var value1 = 50;
-  var value2 = $gameVariables.value(actor.actorId() + 380)[1];
-  var value5 = `\\fs[25]性欲発展度`;
+  const { actorId, actor } = readCurrentActor();
+  if (!actor) return;
 
-  if (!actor.isLearnedSkill(value1)) { value5 += `:\\C[1]皆無\\C[0]\n` };
-  if (actor.isLearnedSkill(value1)) {
-    if (value2 <= 100) { value5 += `\\C[4][圏外]\\C[0]`; var value3 = 0 };
-    if (value2 >= 101 && value2 <= 200) { value5 += `\\C[12][圏外]\\C[0]`; var value3 = 1 };
-    if (value2 >= 201 && value2 <= 300) { value5 += `\\C[4][E]\\C[0]`; var value3 = 2 };
-    if (value2 >= 301 && value2 <= 400) { value5 += `\\C[12][D]\\C[0]`; var value3 = 3 };
-    if (value2 >= 401 && value2 <= 500) { value5 += `\\C[5][C]\\C[0]`; var value3 = 4 };
-    if (value2 >= 501 && value2 <= 600) { value5 += `\\C[13][B]\\C[0]`; var value3 = 5 };
-    if (value2 >= 601 && value2 <= 700) { value5 += `\\C[27][A]\\C[0]`; var value3 = 6 };
-    if (value2 >= 701 && value2 <= 800) { value5 += `\\C[30][S]\\C[0]`; var value3 = 7 };
-    if (value2 >= 801 && value2 <= 900) { value5 += `\\C[30][SS]\\C[0]`; var value3 = 8 };
-    if (value2 >= 901) { value5 += `\\C[31][SSS]\\C[0]`; var value3 = 9 };
-    if (value3 >= 1) {
-      value5 += `:\\C[27]<${$dataSkills[value3 + 60].name}>\\C[0]\n`;
-    } else {
-      value5 += `\n`;
-    };
+  const hStateValues = readHStateValues(actorId);
+  const developmentRankTitle = `性欲発展度`;
+  let statusText = FONT_SIZE_25 + developmentRankTitle;
+  statusText += buildDevelopmentRankText(actor, hStateValues[HSTATE_INDEX_AROUSAL]);
+
+  const skillRange = buildHSkillRange(SKILL_H_DEV_FIRST, SKILL_H_DEV_LAST);
+  for (const skillId of skillRange) {
+    statusText += buildHSkillStatusLine(actor, skillId);
   };
-  var start = 51; var end = 59;
-  for (var i = start; i <= end; i++) {
-    value5 += `${$dataSkills[i].name}`;
-    if (!actor.isLearnedSkill(i)) { value5 += `:\\C[1]未開発\\C[0]\n` };
-    if (actor.isLearnedSkill(i)) {
-      if (actor.skillMasteryLevel(i) <= 1) { value5 += `\\C[4][E]\\C[0]` };
-      if (actor.skillMasteryLevel(i) == 2) { value5 += `\\C[12][D]\\C[0]` };
-      if (actor.skillMasteryLevel(i) == 3) { value5 += `\\C[5][C]\\C[0]` };
-      if (actor.skillMasteryLevel(i) == 4) { value5 += `\\C[13][B]\\C[0]` };
-      if (actor.skillMasteryLevel(i) == 5) { value5 += `\\C[27][A]\\C[0]` };
-      if (actor.skillMasteryLevel(i) >= 6) { value5 += `\\C[30][S]\\C[0]` };
-      var list = valueHstaSuppression;
-      list.forEach(function (id) {
-        if (actor.isLearnedSkill(id) && !actor.isLearnedSkill(Number($dataSkills[id].meta['Hide if Learned Skill']))) {
-          var value1 = Number($dataSkills[id].meta['HstaSuppression'].split(',')[0]);
-          var value2 = Number($dataSkills[id].meta['HstaSuppression'].split(',')[1]);
-          if (value1 == 0) {
-            for (var value1 = 431; value1 <= 439; value1++) {
-              if (value1 - 380 == id && actor.skillMasteryLevel(i) == value2) {
-                value5 += `[ランク制限]`;
-              };
-            };
-          };
-          if (value1 >= 431 && value1 <= 439) {
-            if (value1 - 380 == id && actor.skillMasteryLevel(i) == value2) {
-              value5 += `[ランク制限]`;
-            };
-          };
-        };
-      }, this);
-      value5 += `(${actor.skillMasteryUses(i)}/${actor.skillMasteryUsageMax(i)}):`;
-      value5 += `${$dataSkills[i].meta['RankSetWord' + actor.skillMasteryLevel(i)]}\n`;
-    };
-  };
+
   WindowManager.show(1, 0, 200, 768, 386);
-  WindowManager.drawText(1, value5);
+  WindowManager.drawText(1, statusText);
 
 };
 
-//☆☆アクター変数20のＨステータス表示1
+// Development rank labels from [out of range] to [SSS].
+const DEVELOPMENT_RANK_LABELS = [
+  colorTaggedText(4, "[圏外]"), 
+  colorTaggedText(12, "[皆無]"), 
+  colorTaggedText(4, "[E]"), 
+  colorTaggedText(12, "[D]"),
+  colorTaggedText(5, "[C]"), 
+  colorTaggedText(13, "[B]"), 
+  colorTaggedText(27, "[A]"),
+  colorTaggedText(30, "[S]"),
+  colorTaggedText(30, "[SS]"),
+  colorTaggedText(31, "[SSS]")
+];
+
+function buildDevelopmentRankText(actor, developmentRate) {
+  const noneStatus = `皆無`;
+  if (!actor.isLearnedSkill(H_EXPOSURE_SKILL_ID)) {
+    const noneLabel = colorTaggedText(1, noneStatus);
+    return `:${noneLabel}\n`;
+  };
+
+  const hRank = readDevelopmentRank(developmentRate);
+  const rankStepLabel = DEVELOPMENT_RANK_LABELS[hRank];
+  if (hRank < 1) return rankStepLabel + '\n';
+
+  const rankSkillName = $dataSkills[hRank + 60].name;
+  const rankSkillLabel = colorTaggedText(27, `<${rankSkillName}>`);
+  return `${rankStepLabel}:${rankSkillLabel}` + '\n';
+}
+
+// Development rank (0-9); one rank per 100 points.
+function readDevelopmentRank(developmentRate) {
+  let hRank = 0;
+  for (let rank = 1; rank <= 9; rank++) {
+    if (developmentRate >= rank * H_EXPOSURE_RANK_STEP + 1) hRank = rank;
+  };
+  return hRank;
+}
+
+// Sequential development skill list such as [51..59].
+function buildHSkillRange(firstSkillId, lastSkillId) {
+  const skillIds = [];
+  for (let skillId = firstSkillId; skillId <= lastSkillId; skillId++) skillIds.push(skillId);
+  return skillIds;
+}
+
+// One "name + rank + uses + description" line of a development skill.
+function buildHSkillStatusLine(actor, skillId) {
+  const skill = $dataSkills[skillId];
+  const masteryLevel = actor.skillMasteryLevel(skillId);
+
+  if (!actor.isLearnedSkill(skillId)) {
+    const undevelopedLabel = colorTaggedText(1, `未開発`);
+    return `${skill.name}:${undevelopedLabel}\n`;
+  };
+
+  const masteryRankText = masteryRankLabel(masteryLevel);
+  let skillLineText = `${skill.name}${masteryRankText}`;
+  if (isHSkillRankLimited(actor, skillId, masteryLevel)) {
+    skillLineText += '[ランク制限]';
+  };
+
+  const masteryUses = actor.skillMasteryUses(skillId);
+  const masteryUsageMax = actor.skillMasteryUsageMax(skillId);
+  const rankSetWord = skill.meta['RankSetWord' + masteryLevel];
+  skillLineText += `(${masteryUses}/${masteryUsageMax}):`;
+  return skillLineText + rankSetWord + '\n';
+}
+
+// Whether the suppression skills currently block the rank gain of this skill.
+function isHSkillRankLimited(actor, skillId, masteryLevel) {
+  for (const suppressionSkillId of valueHstaSuppression) {
+    if (!actor.isLearnedSkill(suppressionSkillId)) continue;
+
+    const suppressionMeta = $dataSkills[suppressionSkillId].meta;
+    if (actor.isLearnedSkill(Number(suppressionMeta['Hide if Learned Skill']))) continue;
+
+    if (isSuppressionEntryHit(suppressionSkillId, masteryLevel, suppressionMeta)) return true;
+  };
+  return false;
+}
+
+// Whether one suppression entry blocks this skill at the given mastery level.
+// Target 0 (or 401) stands for the whole 431-439 development range of that skill.
+function isSuppressionEntryHit(suppressionSkillId, masteryLevel, suppressionMeta) {
+  const suppressionParams = suppressionMeta['HstaSuppression'].split(',');
+  const suppressionTarget = Number(suppressionParams[0]);
+  const suppressionThreshold = Number(suppressionParams[1]);
+
+  if (suppressionTarget == 0) {
+    return suppressionSkillId >= VAR_SUPPRESSION_TARGET_FIRST
+      && suppressionSkillId <= VAR_SUPPRESSION_TARGET_LAST
+      && masteryLevel == suppressionThreshold;
+  }
+  return suppressionTarget - HSTATE_ARRAY_VAR_OFFSET == suppressionSkillId
+    && masteryLevel == suppressionThreshold;
+}
+
+// H status display 1 of the actor in variable 20.
+// Window shift used by the compact H status layout.
+const COMPACT_WINDOW_Y_OFFSET = 128;
+
+// The compact layout is used outside battle records and without a standing picture.
+function isCompactHStateDisplay() {
+  if ($gameSwitches.value(SW_COMPACT_H_STATUS)) return false;
+  if ($gameSwitches.value(SW_BATTLE_RECORD_VISIBLE)) return false;
+  return $gameVariables.value(VAR_H_PICTURE_NAME) == 0;
+}
+
 actor_Hstateshyouji1 = function () {
 
-  if (!$gameSwitches.value(496) && !$gameSwitches.value(130) && $gameVariables.value(193) == 0) {
-    var value1 = 0 + 128; var value2 = 379 + 128;
-    $gameVariables.setValue(313, 128);
-  } else {
-    var value1 = 0; var value2 = 379;
-  };
-  WindowManager.show(1, value1, 200, 379, 390);
-  WindowManager.show(2, value2, 200, 389, 390);
-  var actor = $gameActors.actor($gameVariables.value(20));
-  var value = $gameVariables.value($gameVariables.value(20) + 380);
-  var id1 = 400;
-  //性欲度表示用情報を書き込み
-  var start = 1; var end = 40;
-  for (var i = start; i <= end; i++) {
-    if ($gameVariables.value(id1 + i) >= 1) {
-      var value1 = `\\C[2]+${$gameVariables.value(id1 + i)}\\C[0]`;
-    } else {
-      var value1 = '　';
-    }
-    eval("valueWordSet" + i + " = value1");
-  };
-  var value3 = `\\fs[24]`;
-  var list = [6, 7, 8, 9, 10, 11, 12, 16, 13, 14, 15];
-  list.forEach(function (i) {
-    value3 += `\\C[27]${$dataSystem.variables[id1 + i]}\\C[0]${value[i]}回${eval("valueWordSet" + i)}\n`;
-  }, this);
-  WindowManager.drawText(1, value3);
+  const isCompactDisplay = isCompactHStateDisplay();
+  const windowYOffset = isCompactDisplay ? COMPACT_WINDOW_Y_OFFSET : 0;
+  if (isCompactDisplay) { $gameVariables.setValue(VAR_COMPACT_WINDOW_OFFSET, COMPACT_WINDOW_Y_OFFSET); };
 
-  var value4 = `\\fs[24]`;
-  var list = [17, 18, 19, 30, 20, 21, 22, 23, 24, 25, 26, 28];
-  list.forEach(function (i) {
-    value4 += `\\C[27]${$dataSystem.variables[id1 + i]}\\C[0]${value[i]}回${eval("valueWordSet" + i)}\n`;
-  }, this);
-  WindowManager.drawText(2, value4);
+  WindowManager.show(1, windowYOffset, 200, 379, 390);
+  WindowManager.show(2, 379 + windowYOffset, 200, 389, 390);
 
-  if (!$gameSwitches.value(130)) {
-    var arr1 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];//開発度ランク0では未開発表示
-    var start = 51; var end = 59;
-    for (var i = start; i <= end; i++) {
-      if (actor.skillMasteryLevel(i) >= 1 && actor.isLearnedSkill(i)) {
-        if (actor.skillMasteryLevel(i) <= 1) { var value4 = `\\C[4][E]\\C[0]` };
-        if (actor.skillMasteryLevel(i) == 2) { var value4 = `\\C[12][D]\\C[0]` };
-        if (actor.skillMasteryLevel(i) == 3) { var value4 = `\\C[5][C]\\C[0]` };
-        if (actor.skillMasteryLevel(i) == 4) { var value4 = `\\C[13][B]\\C[0]` };
-        if (actor.skillMasteryLevel(i) == 5) { var value4 = `\\C[27][A]\\C[0]` };
-        if (actor.skillMasteryLevel(i) >= 6) { var value4 = `\\C[30][S]\\C[0]` };
-        var value1 = i - 20;
-        arr1[i - 50] = `\x1bI[${$dataSkills[i].iconIndex}]${value4}:${actor.skillMasteryUses(i)}${eval("valueWordSet" + value1)}`;
-      } else {
-        arr1[i - 50] = `\\C[1]未開発\\C[0]\\I[0] `;
-      };
-    };
-    if (!$gameSwitches.value(496) && !$gameSwitches.value(130) && $gameVariables.value(193) == 0) {
-      var value3 = 430 + 128;
-    } else {
-      var value3 = 430;
-    };
-    WindowManager.show(3, value3, 0, 338, 202);
-    WindowManager.drawText(3, `\\fs[22][開発度]\\I[0]${arr1[1]}
-${arr1[2]} ${arr1[3]}
-${arr1[4]} ${arr1[5]}
-${arr1[6]} ${arr1[7]}
-${arr1[8]} ${arr1[9]}`);
-  };
+  const { actorId, actor } = readCurrentActor();
+  if (!actor) return;
+
+  const hStateValues = readHStateValues(actorId);
+  fillHStateWordSets();
+
+  WindowManager.drawText(1, buildHStateCountColumn(hStateValues, HSTATE_WINDOW_COLUMN_A));
+  WindowManager.drawText(2, buildHStateCountColumn(hStateValues, HSTATE_WINDOW_COLUMN_B));
+
+  if ($gameSwitches.value(SW_BATTLE_RECORD_VISIBLE)) return;
+
+  const masteryWindowY = isCompactDisplay ? 430 + COMPACT_WINDOW_Y_OFFSET : 430;
+  WindowManager.show(3, masteryWindowY, 0, 338, 202);
+  WindowManager.drawText(3, buildMasteryGridText(actor));
+
 };
 
-//MVP計算用
+// Writes the "+n" display of every H state into valueWordSet1-40 (used by the later line assembly).
+function fillHStateWordSets() {
+  for (let index = 1; index <= 40; index++) {
+    const statValue = $gameVariables.value(400 + index);
+    window['valueWordSet' + index] = statValue >= 1 ? colorTaggedText(2, `+${statValue}`) : '　';
+  };
+}
+
+// Turns the listed H states into "name + count + gain" lines.
+function buildHStateCountColumn(hStateValues, indexes) {
+  let displayText = FONT_SIZE_24;
+  for (const index of indexes) {
+    const statName = $dataSystem.variables[400 + index];
+    const statNameLabel = colorTaggedText(27, statName);
+    const statCount = hStateValues[index];
+    const gainText = window['valueWordSet' + index];
+    displayText += `${statNameLabel}${statCount}${HSTATE_COUNT_WORD}${gainText}` + '\n';
+  };
+  return displayText;
+}
+
+// Grid display of the development skills 51-59 (icon + rank + uses).
+function buildMasteryGridText(actor) {
+  const masteryTextBySlot = [];
+
+  for (const skillId of buildHSkillRange(SKILL_H_DEV_FIRST, SKILL_H_DEV_LAST)) {
+    const masteryLevel = actor.skillMasteryLevel(skillId);
+    if (masteryLevel >= 1 && actor.isLearnedSkill(skillId)) {
+      const skillIconIndex = $dataSkills[skillId].iconIndex;
+      const skillIconMarker = `\x1bI[${skillIconIndex}]`;
+      const rankLabel = masteryRankLabel(masteryLevel);
+      const masteryUses = actor.skillMasteryUses(skillId);
+      const gainText = window['valueWordSet' + (skillId - 20)];
+      masteryTextBySlot[skillId - 50] = `${skillIconMarker}${rankLabel}:${masteryUses}${gainText}`;
+      continue;
+    }
+
+    // Undeveloped slot: colour tagged label, an empty icon and the separator space.
+    const undevelopedLabel = colorTaggedText(1, '未開発');
+    masteryTextBySlot[skillId - 50] = undevelopedLabel + '\\I[0] ';
+  };
+
+  const masteryGridTitle = '[開発度]';
+  const masteryGridIcon = '\\I[0]';
+  const masteryGridHeader = FONT_SIZE_22 + masteryGridTitle + masteryGridIcon;
+  const masteryGridRow = (leftSlot, rightSlot) => `${masteryTextBySlot[leftSlot]} ${masteryTextBySlot[rightSlot]}`;
+
+  return masteryGridHeader
+    + masteryTextBySlot[1] + '\n'
+    + masteryGridRow(2, 3) + '\n'
+    + masteryGridRow(4, 5) + '\n'
+    + masteryGridRow(6, 7) + '\n'
+    + masteryGridRow(8, 9);
+}
+
+// For the MVP calculation.
+const MVP_RECORD_SOURCES = [
+  { mvpIndex: 1, read: (actor) => actor.getAllKillEnemyCounter() },
+  { mvpIndex: 2, read: (actor) => actor.attackDamageMax },
+  { mvpIndex: 3, read: (actor) => actor.attackDamageSum },
+  { mvpIndex: 4, read: (actor, actorId, var351, var298) => var351[actorId] },
+  { mvpIndex: 5, read: (actor) => actor.acceptDamageMax },
+  { mvpIndex: 6, read: (actor) => actor.acceptDamageSum },
+  { mvpIndex: 7, read: (actor) => actor.deadCounter },
+  { mvpIndex: 8, read: (actor, actorId, var351, var298) => var298[actorId] }
+];
+
 battlerecord_mvp = function (unusedParam) {
 
-  const killEnemyCounters = [];
-  const maxAttackDamageArr = [];
-  const totalAttackDamageArr = [];
-  const skillAcquisitionSequenceValues = [];
-  const maxAcceptedDamageArr = [];
-  const totalAcceptedDamageArr = [];
-  const deadCounters = [];
-  const gameVar298Values = [];
   const partyMembers = $gameParty.members();
-  const skillAcquisitionSequence = $gameVariables.value(351);
-  const var298Array = $gameVariables.value(298);
-  for (let index = 0, lastIndex = partyMembers.length - 1; index <= lastIndex; index++) {
-    const actorId = partyMembers[index]._actorId;
-    const actor = $gameActors.actor(actorId);
+  if (partyMembers.length === 0) return;
 
-    killEnemyCounters.push(actor.getAllKillEnemyCounter());
-    maxAttackDamageArr.push(actor.attackDamageMax);
-    totalAttackDamageArr.push(actor.attackDamageSum);
-    skillAcquisitionSequenceValues.push(skillAcquisitionSequence[actorId]);
-    maxAcceptedDamageArr.push(actor.acceptDamageMax);
-    totalAcceptedDamageArr.push(actor.acceptDamageSum);
-    deadCounters.push(actor.deadCounter);
-    gameVar298Values.push(var298Array[actorId]);
+  const skillAcquisitionSequence = $gameVariables.value(VAR_BATTLE_KILL);
+  const damageRecordValues = $gameVariables.value(VAR_BATTLE_DAMAGE);
+  const mvp = $gameVariables.value(VAR_BATTLE_MVP);
+
+  const mvpCandidates = MVP_RECORD_SOURCES.map(() => []);
+  for (const member of partyMembers) {
+    pushMemberMvpRecords(mvpCandidates, member, skillAcquisitionSequence, damageRecordValues);
   };
 
-  const mvpKillCounter = killEnemyCounters.reduce(function (acc, val) {
-    return Math.max(acc, val);
+  mvpCandidates.forEach((sourceCandidates, sourceIndex) => {
+    mvp[MVP_RECORD_SOURCES[sourceIndex].mvpIndex] = Math.max.apply(null, sourceCandidates);
   });
-  const mvp = $gameVariables.value(350);
-  mvp[1] = mvpKillCounter;
-  const mvpMaxAttackDamage = maxAttackDamageArr.reduce((acc, val) => Math.max(acc, val));
-  mvp[2] = mvpMaxAttackDamage;
-  const mvpTotalAttackDamage = totalAttackDamageArr.reduce((acc, val) => Math.max(acc, val));
-  mvp[3] = mvpTotalAttackDamage;
-  const mvpGameVar351 = skillAcquisitionSequenceValues.reduce((acc, val) => Math.max(acc, val));
-  mvp[4] = mvpGameVar351;
-  const mvpMaxAcceptedDamage = maxAcceptedDamageArr.reduce((acc, val) => Math.max(acc, val));
-  mvp[5] = mvpMaxAcceptedDamage;
-  const mvpTotalAcceptedDamage = totalAcceptedDamageArr.reduce((acc, val) => Math.max(acc, val));
-  mvp[6] = mvpTotalAcceptedDamage;
-  const mvpDeadCounter = deadCounters.reduce((acc, val) => Math.max(acc, val));
-  mvp[7] = mvpDeadCounter;
-  const mvpGameVar298 = gameVar298Values.reduce((acc, val) => Math.max(acc, val));
-  mvp[8] = mvpGameVar298;
 
+}
+
+// Collects the record values of one party member, one list per record source.
+function pushMemberMvpRecords(mvpCandidates, member, skillAcquisitionSequence, damageRecordValues) {
+  const actorId = member.actorId();
+  const actor = $gameActors.actor(actorId);
+
+  MVP_RECORD_SOURCES.forEach((recordSource, sourceIndex) => {
+    mvpCandidates[sourceIndex].push(
+      recordSource.read(actor, actorId, skillAcquisitionSequence, damageRecordValues));
+  });
 };
 
-//☆☆アクター変数20の通常ステータス表示,0と4ウィンド使用
+// Normal status display of the actor in variable 20, used by windows 0 and 4.
 actor_stateshyouji = function () {
-  const actorId = $gameVariables.value(20);
-  const actor = $gameActors.actor(actorId);
+  const { actorId, actor } = readCurrentActor();
+  if (!actor) return;
 
   updateActorHStateDisplayActorStateshyouji(actor, actorId);
   displayBattleRecordActorStateshyouji(actor, actorId);
@@ -445,1620 +849,2183 @@ actor_stateshyouji = function () {
 // Process MVP indicators for battle statistics
 function setupMvpIndicatorActorStateshyouji(value, actorValue, isMvp) {
   if (value === 0) return '';
-  if (value === actorValue) {
-    return isMvp ? '\\C[17][MVP!]\\C[0]' : '\\C[10][WORST…]\\C[0]';
-  }
-  return '';
+  if (value !== actorValue) return '';
+  return isMvp ? colorTaggedText(17, '[MVP!]') : colorTaggedText(10, '[WORST…]');
+}
+
+// Nickname and SET icon, plus the H state text and the icon lookups for girls.
+function buildActorInfoText(actor, actorStateValues) {
+  const actorNickname = colorTaggedText(1, actor.nickname());
+  let actorInfoText = FONT_SIZE_24 + actorNickname + '\n';
+  const actorIdValue = actor.actorId();
+  actorInfoText += `\x1bSET[${actorIdValue}]` + '\n';
+  if (!isGirl(actor)) return actorInfoText;
+
+  actorInfoText += buildGirlHStateText(actor, actorStateValues);
+  actorInfoText += `\\V[${VAR_H_STATE_DISPLAY_TEXT}]`;
+  return actorInfoText;
 }
 
 function updateActorHStateDisplayActorStateshyouji(actor, actorId) {
-  let windowYOffset;
-  if (!$gameSwitches.value(496) && !$gameSwitches.value(130) && $gameVariables.value(193) === 0) {
-    windowYOffset = 128;
-  } else {
-    windowYOffset = 0;
-  }
+  const isCompactDisplay = isCompactHStateDisplay();
+  const windowYOffset = isCompactDisplay ? COMPACT_WINDOW_Y_OFFSET : 0;
   WindowManager.show(0, windowYOffset, 0, 430, 202);
-  actorId = actorId || actor.actorId();
 
+  const targetActorId = actorId || actor.actorId();
   seiyoku_jougenn1(actor);
 
-  const actorStateValues = $gameVariables.value(actorId + 380);
-  const baseIndex = 400;
+  const actorStateValues = readHStateValues(targetActorId);
+  fillHStateWordSets();
+  $gameVariables.setValue(VAR_H_STATE_DISPLAY_TEXT, buildActiveHStateIconText(actor));
 
-  // 性欲度表示用情報を書き込み
-  const displayStart = 1, displayEnd = 40;
-  for (let i = displayStart; i <= displayEnd; i++) {
-    let statDisplay;
-    if ($gameVariables.value(baseIndex + i) >= 1) {
-      statDisplay = `\\C[2]+${$gameVariables.value(baseIndex + i)}\\C[0]`;
-    } else {
-      statDisplay = '　';
-    }
-    eval("valueWordSet" + i + " = statDisplay");
-  }
+  WindowManager.drawText(0, buildActorInfoText(actor, actorStateValues));
+}
 
-  // 現在のＨステートを変数643に代入
-  $gameVariables.setValue(643, `\\I[16]`);
-  const stateDisplayList = valueHstateDisplay; // assumed defined globally
-  stateDisplayList.forEach(function (stateId) {
-    if (actor.isStateAffected(stateId)) {
-      $gameVariables.setValue(643, $gameVariables.value(643) + `\\I[${$dataStates[stateId].iconIndex}]`);
-    }
-  });
+// Assigned H states as an icon string.
+function buildActiveHStateIconText(actor) {
+  let iconText = `\\I[16]`;
+  for (const stateId of valueHstateDisplay) {
+    if (!actor.isStateAffected(stateId)) continue;
+    iconText += `\\I[${$dataStates[stateId].iconIndex}]`;
+  };
+  return iconText;
+}
 
-  let stateThreshold;
-  if (actor.isLearnedSkill(74)) {
-    stateThreshold = 500;
-  } else if (actor.isLearnedSkill(72)) {
-    stateThreshold = 200;
-  }
+// Turns a variable name (the in-game label) into a coloured label.
+function buildVariableNameLabel(varId) {
+  return colorTaggedText(27, $dataSystem.variables[varId]);
+}
 
-  let actorInfoText = `\\fs[24]\\C[1]${actor.nickname()}\\C[0]\n`;
-  actorInfoText += `\x1bSET[${actor.actorId()}]\n`;
-  if (isGirl(actor)) {
-    let firstStateDisplay;
-    if (actorStateValues[0] === 0) {
-      firstStateDisplay = ` `;
-    } else {
-      firstStateDisplay = `<${actorStateValues[0]}>`;
-    }
-    actorInfoText += `\\C[27]${$dataSystem.variables[baseIndex + 1]}\\C[0]${actorStateValues[1]}${firstStateDisplay}${eval("valueWordSet" + 1)}`;
-    actorInfoText += `\\C[27]${$dataSystem.variables[baseIndex + 2]}\\C[0]${actorStateValues[2]}${eval("valueWordSet" + 2)}\n`;
-    actorInfoText += `\\C[27]${$dataSystem.variables[baseIndex + 4]}\\C[0]${actorStateValues[4]}<${actorStateValues[5]}>`;
-    if (actor.isLearnedSkill(65)) {
-      actorInfoText += `\\C[27]${$dataSystem.variables[baseIndex + 3]}\\C[0]${actorStateValues[3]}%　\n`;
-    } else {
-      actorInfoText += `\\C[27]${$dataSystem.variables[baseIndex + 3]}\\C[0]───%　\n`;
-    }
-    actorInfoText += `\\V[643]`;
-  }
-  WindowManager.drawText(0, actorInfoText);
+// One block of the libido / arousal values of a female actor.
+// Fertility line; the value stays hidden until the skebe-ko skill is learned.
+function buildFertilityLine(actor, fertilityLabel, fertilityValue) {
+  const fertilityText = actor.isLearnedSkill(SKILL_H_SKILLED) ? `${fertilityValue}%` : `───%`;
+  return `${fertilityLabel}${fertilityText}　` + '\n';
+}
+
+function buildGirlHStateText(actor, actorStateValues) {
+  const firstPartnerText = actorStateValues[0] === 0 ? ` ` : `<${actorStateValues[0]}>`;
+  const arousalLabel = buildVariableNameLabel(VAR_HSTATE_ECSTASY_BASE + 1);
+  const estrusLabel = buildVariableNameLabel(VAR_HSTATE_ECSTASY_BASE + 2);
+  const fertilityLabel = buildVariableNameLabel(VAR_HSTATE_ECSTASY_BASE + 3);
+  const exposureLabel = buildVariableNameLabel(VAR_HSTATE_ECSTASY_BASE + 4);
+  let actorInfoText = ``;
+
+  actorInfoText += `${arousalLabel}${actorStateValues[1]}${firstPartnerText}${window['valueWordSet' + 1]}`;
+  actorInfoText += `${estrusLabel}${actorStateValues[2]}${window['valueWordSet' + 2]}\n`;
+  actorInfoText += `${exposureLabel}${actorStateValues[4]}<${actorStateValues[5]}>`;
+
+  actorInfoText += buildFertilityLine(actor, fertilityLabel, actorStateValues[3]);
+  return actorInfoText;
+}
+
+// Window rows of the battle record in display order; mvpIndex is the slot of the MVP record array.
+const BATTLE_RECORD_ROW_SOURCES = [
+  { mvpIndex: 1, isMvp: true, read: (actor) => actor.getAllKillEnemyCounter() },
+  { mvpIndex: 2, isMvp: true, read: (actor) => actor.attackDamageMax },
+  { mvpIndex: 3, isMvp: true, read: (actor) => actor.attackDamageSum },
+  { mvpIndex: 8, isMvp: true, read: (actor, totals) => totals.damage },
+  // OverKill records the dealt damage array divided by two
+  { mvpIndex: 4, isMvp: true, read: (actor, totals) => totals.kill / 2 },
+  { mvpIndex: 5, isMvp: true, read: (actor) => actor.acceptDamageMax },
+  { mvpIndex: 6, isMvp: true, read: (actor) => actor.acceptDamageSum },
+  { mvpIndex: 7, isMvp: false, read: (actor) => actor.deadCounter }
+];
+
+// Values of the current actor, ready for buildBattleRecordText.
+function buildBattleRecordRows(actor, actorId) {
+  const killTotals = $gameVariables.value(VAR_BATTLE_KILL);
+  const damageTotals = $gameVariables.value(VAR_BATTLE_DAMAGE);
+  const mvpStats = $gameVariables.value(VAR_BATTLE_MVP);
+  const totals = { kill: killTotals[actorId], damage: damageTotals[actorId] };
+
+  return BATTLE_RECORD_ROW_SOURCES.map((recordRow) => ({
+    value: mvpStats[recordRow.mvpIndex],
+    actorValue: recordRow.read(actor, totals),
+    isMvp: recordRow.isMvp
+  }));
 }
 
 function displayBattleRecordActorStateshyouji(actor, actorId) {
-  if (!$gameSwitches.value(130)) {
-    return;
-  }
+  if (!$gameSwitches.value(SW_BATTLE_RECORD_VISIBLE)) return;
 
-  const totalKillValue = $gameVariables.value(351)[actorId];
-  const totalDamageValue = $gameVariables.value(298)[actorId];
+  const mvpRows = buildBattleRecordRows(actor, actorId);
+  const mvpIndicators = mvpRows.map((row) => setupMvpIndicatorActorStateshyouji(row.value, row.actorValue, row.isMvp));
 
-  const mvpStats = $gameVariables.value(350);
-  let mvpKill = mvpStats[1];
-  let mvpAttackMax = mvpStats[2];
-  let mvpAttackSum = mvpStats[3];
-  let mvpCritical = mvpStats[4];
-  let mvpAcceptMax = mvpStats[5];
-  let mvpAcceptSum = mvpStats[6];
-  let mvpDead = mvpStats[7];
-  let mvpDefeatValue = mvpStats[8];
-
-  // Set MVP indicators for each stat
-  mvpKill = setupMvpIndicatorActorStateshyouji(mvpKill, actor.getAllKillEnemyCounter(), true);
-  mvpAttackMax = setupMvpIndicatorActorStateshyouji(mvpAttackMax, actor.attackDamageMax, true);
-  mvpAttackSum = setupMvpIndicatorActorStateshyouji(mvpAttackSum, actor.attackDamageSum, true);
-  mvpDefeatValue = setupMvpIndicatorActorStateshyouji(mvpDefeatValue, totalDamageValue, true);
-  mvpCritical = setupMvpIndicatorActorStateshyouji(mvpCritical, totalKillValue / 2, true); // using totalKillValue/2 for OverKill
-  mvpAcceptMax = setupMvpIndicatorActorStateshyouji(mvpAcceptMax, actor.acceptDamageMax, true);
-  mvpAcceptSum = setupMvpIndicatorActorStateshyouji(mvpAcceptSum, actor.acceptDamageSum, true);
-  mvpDead = setupMvpIndicatorActorStateshyouji(mvpDead, actor.deadCounter, false);
-
-  const battleRecordText = `\\C[16]<Battle Record!>\\C[0]
-TotalKill  :\\C[10]${actor.getAllKillEnemyCounter()}\\C[0]${mvpKill}
-MaxAssalt  :\\C[10]${actor.attackDamageMax}\\C[0]${mvpAttackMax}
-TotalAssalt:\\C[10]${actor.attackDamageSum}\\C[0]${mvpAttackSum}
-Critical   :\\C[10]${totalDamageValue}\\C[0]${mvpDefeatValue}
-OverKill   :\\C[10]${totalKillValue / 2}\\C[0]${mvpCritical}
-MaxDamage  :\\C[1]${actor.acceptDamageMax}\\C[0]${mvpAcceptMax}
-TotalDamage:\\C[1]${actor.acceptDamageSum}\\C[0]${mvpAcceptSum}
-Defead     :\\C[1]${actor.deadCounter}\\C[0]${mvpDead}
-`;
+  const battleRecordText = buildBattleRecordText(mvpRows, mvpIndicators);
   WindowManager.show(1, 0, 200, 500, 389);
   WindowManager.drawText(1, battleRecordText);
 }
 
+// Rows of the battle record (label / colour / value source); the values follow the mvpRows order.
+const BATTLE_RECORD_ROWS = [
+  { label: 'TotalKill  :', colorCode: 10, rowIndex: 0 },
+  { label: 'MaxAssalt  :', colorCode: 10, rowIndex: 1 },
+  { label: 'TotalAssalt:', colorCode: 10, rowIndex: 2 },
+  { label: 'Critical   :', colorCode: 10, rowIndex: 3 },
+  { label: 'OverKill   :', colorCode: 10, rowIndex: 4 },
+  { label: 'MaxDamage  :', colorCode: 1, rowIndex: 5 },
+  { label: 'TotalDamage:', colorCode: 1, rowIndex: 6 },
+  { label: 'Defead     :', colorCode: 1, rowIndex: 7 }
+];
+
+// Body of the battle record window.
+function buildBattleRecordText(mvpRows, mvpIndicators) {
+  const headerLine = colorTaggedText(16, `<Battle Record!>`) + '\n';
+  const recordLines = BATTLE_RECORD_ROWS.map((row) => buildBattleRecordLine(row,
+    mvpRows[row.rowIndex].actorValue, mvpIndicators[row.rowIndex]));
+  return headerLine + recordLines.join('');
+}
+
+// One "label + coloured value + MVP / worst mark" line.
+function buildBattleRecordLine(recordRow, recordValue, mvpIndicator) {
+  const recordValueLabel = colorTaggedText(recordRow.colorCode, recordValue);
+  return `${recordRow.label}${recordValueLabel}${mvpIndicator}` + '\n';
+}
+
+// Skill stype ids of the skill record and the summary key each one adds to.
+const SKILL_RECORD_STYPE_KEYS = {
+  2: 'attack', 5: 'sAbility', 6: 'aAbility', 7: 'wAbility', 8: 'rAbility', 12: 'burst', 13: 'chain'
+};
+
+// Rows of the skill record (label and summary key).
+const SKILL_RECORD_ROWS = [
+  { label: 'Attack   :', usageKey: 'attack' },
+  { label: 'S-Ability:', usageKey: 'sAbility' },
+  { label: 'A-Ability:', usageKey: 'aAbility' },
+  { label: 'W-Ability:', usageKey: 'wAbility' },
+  { label: 'R-Ability:', usageKey: 'rAbility' },
+  { label: 'Burst!   :', usageKey: 'burst' },
+  { label: 'Chain!   :', usageKey: 'chain' }
+];
+
 // New function to display the skill record
-function displaySkillRecordActorStateshyouji(actor) {
-  let attackUsageTotal = 0,
-    sAbilityUsageTotal = 0,
-    aAbilityUsageTotal = 0,
-    wAbilityUsageTotal = 0,
-    rAbilityUsageTotal = 0,
-    burstUsageTotal = 0,
-    chainUsageTotal = 0;
+function buildSkillRecordText(usageTotals) {
+  const headerLine = colorTaggedText(16, '<Skill Record!>') + '\n';
+  const recordLines = SKILL_RECORD_ROWS.map((recordRow) => {
+    const usageTotal = usageTotals[recordRow.usageKey];
+    return `${recordRow.label}${usageTotal}` + '\n';
+  });
+  return headerLine + recordLines.join('');
+}
 
-  for (let skillId = 1; skillId <= $dataSkills.length - 1; skillId++) {
-    if ($dataSkills[skillId].name === '') { // Skip skills with empty names
-      continue;
-    }
+// Zeroed usage counter per row of the skill record.
+function createSkillUsageTotals() {
+  const usageTotals = {};
+  for (const recordRow of SKILL_RECORD_ROWS) usageTotals[recordRow.usageKey] = 0;
+  return usageTotals;
+}
 
-    switch ($dataSkills[skillId].stypeId) {
-      case 2:
-        attackUsageTotal += actor.getSkillUseCounter(skillId);
-        break;
-      case 5:
-        sAbilityUsageTotal += actor.getSkillUseCounter(skillId);
-        break;
-      case 6:
-        aAbilityUsageTotal += actor.getSkillUseCounter(skillId);
-        break;
-      case 7:
-        wAbilityUsageTotal += actor.getSkillUseCounter(skillId);
-        break;
-      case 8:
-        rAbilityUsageTotal += actor.getSkillUseCounter(skillId);
-        break;
-      case 12:
-        burstUsageTotal += actor.getSkillUseCounter(skillId);
-        break;
-      case 13:
-        chainUsageTotal += actor.getSkillUseCounter(skillId);
-        break;
-      default:
-        break;
-    }
+// Adds the usage counter of every skill to the row of its skill type.
+function countSkillUsageTotals(actor) {
+  const usageTotals = createSkillUsageTotals();
+  const skills = $dataSkills;
+  const lastSkillId = skills.length - 1;
+
+  for (let skillId = 1; skillId <= lastSkillId; skillId++) {
+    const skill = skills[skillId];
+    if (!skill || skill.name === '') continue; // Skip skills with empty names
+
+    const usageKey = SKILL_RECORD_STYPE_KEYS[skill.stypeId];
+    if (!usageKey) continue;
+
+    usageTotals[usageKey] += actor.getSkillUseCounter(skillId);
   }
+  return usageTotals;
+}
 
-  const skillRecordText = `\\C[16]<Skill Record!>\\C[0]
-Attack   :${attackUsageTotal}
-S-Ability:${sAbilityUsageTotal}
-A-Ability:${aAbilityUsageTotal}
-W-Ability:${wAbilityUsageTotal}
-R-Ability:${rAbilityUsageTotal}
-Burst!   :${burstUsageTotal}
-Chain!   :${chainUsageTotal}
-`;
+function displaySkillRecordActorStateshyouji(actor) {
+  const skillRecordText = buildSkillRecordText(countSkillUsageTotals(actor));
 
   WindowManager.show(2, 500, 200, 268, 389);
   WindowManager.drawText(2, skillRecordText);
 
-  if ($gameSwitches.value(130)) {
-    WindowManager.show(4, 430, 0, 340, 202);
-    hstates_heights($gameVariables.value(20), 253);
-    WindowManager.drawText(4, `\\V[253]`);
-  }
+  if (!$gameSwitches.value(SW_BATTLE_RECORD_VISIBLE)) return;
+
+  WindowManager.show(4, 430, 0, 340, 202);
+  hstates_heights($gameVariables.value(VAR_CURRENT_ACTOR_ID), 253);
+  WindowManager.drawText(4, `\\V[253]`);
 }
 
-//☆☆性欲度上限計算。露出計算時とＨプロフ表示時に一緒にやっておく
+//---------------------------------------------------------------------------
+// Derived H values: libido cap, exposure limit / current exposure, pregnancy
+//---------------------------------------------------------------------------
+
+// Libido cap calculation; run together with the exposure calculation and the H profile display.
 seiyoku_jougenn = function () {
-  const actorId = $gameVariables.value(20);
-  const gameActor = $gameActors.actor(actorId);
-  seiyoku_jougenn1(gameActor);
+  seiyoku_jougenn1(currentHStateActor());
+};
+
+// Cap threshold of one suppression skill, or null when the skill does not apply here.
+function readArousalCapLimit(gameActor, requiredSkillId) {
+  if (!gameActor.isLearnedSkill(requiredSkillId)) return null;
+
+  const suppressionMeta = $dataSkills[requiredSkillId].meta;
+  const hideIfLearnedSkillId = suppressionMeta['Hide if Learned Skill'];
+  if (hideIfLearnedSkillId && gameActor.isLearnedSkill(Number(hideIfLearnedSkillId))) return null;
+
+  const suppressionParamsRaw = suppressionMeta['HstaSuppression'];
+  if (!suppressionParamsRaw) return null;
+
+  const suppressionParams = suppressionParamsRaw.split(',');
+  const suppressionType = Number(suppressionParams[0]);
+  // Only the entries that lower the cap itself are handled here.
+  if (suppressionType != 0 && suppressionType != 401) return null;
+
+  return Number(suppressionParams[1]) * H_EXPOSURE_RANK_STEP;
 }
+
 seiyoku_jougenn1 = function (gameActor) {
 
-  const actorVariableIndex = gameActor.actorId() + 380;
-  const actorSuppressionValues = $gameVariables.value(actorVariableIndex);
-  actorSuppressionValues[0] = 0;
-  for (const requiredSkillId of valueHstaSuppression) {
-    if (!gameActor.isLearnedSkill(requiredSkillId)) continue;
-    const suppressionSkill = $dataSkills[requiredSkillId];
-    const hideIfLearnedSkillId = suppressionSkill.meta['Hide if Learned Skill']; // 'Hide if Learned Skill' is missing in meta
-    if (hideIfLearnedSkillId && gameActor.isLearnedSkill(Number(hideIfLearnedSkillId))) continue;
+  if (!gameActor) return;
 
-    const suppressionParams = suppressionSkill.meta['HstaSuppression'].split(',');
-    const suppressionType = Number(suppressionParams[0]);
-    if (suppressionType == 0 || suppressionType == 401) {
-      const suppressionThreshold = Number(suppressionParams[1]) * 100;
-      if (actorSuppressionValues[0] == 0 || suppressionThreshold <= actorSuppressionValues[0]) {
-        actorSuppressionValues[0] = suppressionThreshold - 1;
-      }
+  const actorSuppressionValues = readHStateValues(gameActor.actorId());
+  actorSuppressionValues[HSTATE_INDEX_AROUSAL_CAP] = 0;
+  // The cap is lowered by every matching suppression skill, so it is worked on locally.
+  let arousalCapValue = 0;
+
+  for (const requiredSkillId of valueHstaSuppression) {
+    const suppressionThreshold = readArousalCapLimit(gameActor, requiredSkillId);
+    if (suppressionThreshold === null) continue;
+
+    if (arousalCapValue == 0 || suppressionThreshold <= arousalCapValue) {
+      arousalCapValue = suppressionThreshold - 1;
     }
   }
 
+  actorSuppressionValues[HSTATE_INDEX_AROUSAL_CAP] = arousalCapValue;
 };
 
-//☆☆限界露出値計算
-//const rosyutu_genkai_id1 = 400
-//const rosyutu_genkai_id2 = 55;
+// Limit exposure value calculation.
 rosyutu_genkai = function () {
-  const actorId = $gameVariables.value(20);
-  const gameActor = $gameActors.actor(actorId);
-  rosyutu_genkai1(gameActor);
-}
+  rosyutu_genkai1(currentHStateActor());
+};
+
+// Computes the per-rank cap of the exposure development skill (55) into the array and the variables.
 rosyutu_genkai1 = function (gameActor) {
 
-  const id = 405; // 400 + 5
-  $gameVariables.setValue(id, 100);
-  const actorSkillLevel = gameActor.skillMasteryLevel(55);
-  switch (actorSkillLevel) {
-    case 1:
-      $gameVariables.setValue(id, 90);
-      break;
-    case 2:
-      $gameVariables.setValue(id, 70);
-      break;
-    case 3:
-      $gameVariables.setValue(id, 50);
-      break;
-    case 4:
-      $gameVariables.setValue(id, 30);
-      break;
-    case 5:
-      $gameVariables.setValue(id, 10);
-      break;
-    case 6:
-      $gameVariables.setValue(id, 0);
-      break;
-    default:
-      break;
-  }
-  $gameVariables.value(gameActor.actorId() + 380)[5] = $gameVariables.value(id);
-  $gameVariables.setValue(id, 0);
+  if (!gameActor) return;
+  const exposureLimit = EXPOSURE_LIMIT_BY_RANK[Math.min(gameActor.skillMasteryLevel(SKILL_H_EXPOSURE), 6)];
+
+  $gameVariables.setValue(VAR_HSTATE_EXPOSURE_LIMIT, exposureLimit);
+  readHStateValues(gameActor.actorId())[HSTATE_INDEX_EXPOSURE_LIMIT] = exposureLimit;
+  $gameVariables.setValue(VAR_HSTATE_EXPOSURE_LIMIT, 0);
 
   seiyoku_jougenn1(gameActor);
 
 };
 
-//☆☆現在露出度計上
-const rosyutu_genzai_ids = [
-  461, 462, 463, 464, 465, 466, 467, 468, 469, 470,
-  471, 472, 473, 474, 475, 476, 477, 478, 479, 480,
-  481, 482, 483, 484, 485, 486, 487, 488, 489, 490,
-  491, 492, 493, 494, 495, 496, 497, 498, 499, 500];
+// Rank caps of the exposure development skill.
+const EXPOSURE_LIMIT_BY_RANK = [100, 90, 70, 50, 30, 10, 0];
+
+// Current exposure accounting.
 rosyutu_genzai = function () {
-  const actorId = $gameVariables.value(20);
-  rosyutu_genzai1(actorId);
-}
+  rosyutu_genzai1($gameVariables.value(VAR_CURRENT_ACTOR_ID));
+};
+
 rosyutu_genzai1 = function (actorId) {
 
-  $gameVariables.setValue(404, 0);
-  const actorId_180 = actorId + 180;
-  const actorId_380 = actorId + 380;
-  const itemsLen = $dataItems.length;
-  for (var i = 1201; i < itemsLen; i++) {
-    const item = $dataItems[i];
-    if (item.meta['TotalCloth']) continue;
+  // The scratch variable is zeroed, filled for the cloth scan and zeroed again, which is
+  // the state the original leaves behind.
+  $gameVariables.setValue(VAR_HSTATE_CURRENT_EXPOSURE, 0);
+  const exposureTotal = sumWornClothExposure(actorId);
 
-    const itemMetaEICSwitchNum = Number(item.meta['EICSwitch']);
-    const itemMetaClothSwitchNum_460 = Number(item.meta['ClothSwitch']) + 460;
-    const itemMetaClothAllocationNumberNum = Number(item.meta['ClothAllocationNumber']);
-    const itemMetaClothUncoverCountNum = Number(item.meta['ClothUncoverCount']);
-    for (const id of rosyutu_genzai_ids) {
-      switch (itemMetaEICSwitchNum) {
-        case actorId_180:
-        case actorId_380:
-        case 200:
-          break;
-        default:
-          continue;
-      }
+  $gameVariables.setValue(VAR_HSTATE_CURRENT_EXPOSURE, exposureTotal);
+  readHStateValues(actorId)[HSTATE_INDEX_EXPOSURE] = exposureTotal;
+  $gameVariables.setValue(VAR_HSTATE_CURRENT_EXPOSURE, 0);
+};
 
-      if (id !== itemMetaClothSwitchNum_460
-        || $gameVariables.value(id) !== itemMetaClothAllocationNumberNum) continue;
+// Exposure total of the worn clothes (those whose clothing switch matches).
+function sumWornClothExposure(actorId) {
+  // The two per-actor wearer ids plus the one shared by the party.
+  const wornSwitchIds = [
+    actorId + EIC_SWITCH_ACTOR_OFFSET,
+    actorId + HSTATE_ARRAY_VAR_OFFSET,
+    EIC_SWITCH_SHARED_ACTOR
+  ];
+  const items = $dataItems;
+  const lastItemId = items.length - 1;
+  let exposureTotal = 0;
 
-      $gameVariables.setValue(404, $gameVariables.value(404) + itemMetaClothUncoverCountNum);
-    }
+  for (let itemId = EXPOSURE_ITEM_SCAN_FIRST; itemId <= lastItemId; itemId++) {
+    const item = items[itemId];
+    // BUGFIX: the metadata lookup crashed when the item array had holes.
+    if (!item) continue;
+
+    exposureTotal += readWornClothExposure(item.meta, wornSwitchIds);
   }
 
-  $gameVariables.value(actorId_380)[4] = $gameVariables.value(404);
-  $gameVariables.setValue(404, 0);
-};
+  return exposureTotal;
+}
 
-//受精するかどうかの計算
+// Exposure of one clothing item: 0 unless the actor wears it and the switch matches.
+function readWornClothExposure(itemMeta, wornSwitchIds) {
+  if (itemMeta['TotalCloth']) return 0;// whole outfits are counted separately
+
+  // Only items worn by the actor herself (EICSwitch) or shared ones (200) count.
+  if (!wornSwitchIds.includes(Number(itemMeta['EICSwitch']))) return 0;
+
+  const clothSwitchVarId = Number(itemMeta['ClothSwitch']) + CLOTH_SWITCH_VAR_OFFSET;
+  if (clothSwitchVarId < CLOTH_SWITCH_VAR_ID_MIN || clothSwitchVarId > CLOTH_SWITCH_VAR_ID_MAX) return 0;
+  if ($gameVariables.value(clothSwitchVarId) !== Number(itemMeta['ClothAllocationNumber'])) return 0;
+
+  return Number(itemMeta['ClothUncoverCount']);
+}
+
+// Fertilisation calculation.
 jusei_keisan = function () {
 
-  var value1 = 11;
-  var actor = $gameActors.actor($gameVariables.value(20));
-  if (!actor.isStateAffected(83) && actor.isLearnedSkill(65)) {
-    if ($gameVariables.value(400 + value1) >= 1) {
-      var value2 = $gameVariables.value($gameVariables.value(20) + 380)[3];
-      if (value2 >= 1) {
-        var value3 = getRandomIndex(101);
-        if (value2 >= value3 || actor.battleSkillsRaw().includes(873) || actor.isStateAffected(75)) {
-          if (actor.battleSkillsRaw().includes(874) || actor.isStateAffected(76)) {
-            var value5 = `${actor.name()}は\\C[27]${$dataSkills[874].name}\\C[0]の効果により受精を退けた。`;
-            CommonPopupManager.showInfo({}, value5, null);
-          } else {
-            actor.addState(79);
-            if ($gameVariables.value(340) >= 1) {
-              var value4 = $gameVariables.value(340) - 200;//101-200の間
-              $gameVariables.value($gameVariables.value(20) + 360)[value4] += 1;
-            };
-          };
-        }
-      }
-    }
+  const fertilizationBase = 11;
+  const { actorId, actor } = readCurrentActor();
+  if (!actor) return;
+  if (actor.isStateAffected(STATE_PREGNANT) || !actor.isLearnedSkill(SKILL_H_SKILLED)) return;
+  if (!($gameVariables.value(VAR_HSTATE_ECSTASY_BASE + fertilizationBase) >= 1)) return;
+
+  const fertilizationRate = readHStateValues(actorId)[HSTATE_INDEX_FERTILITY];
+  if (!(fertilizationRate >= 1)) return;
+
+  const battleSkills = actor.battleSkillsRaw();
+  if (!isFertilizationAccepted(actor, battleSkills, fertilizationRate)) return;
+  if (isFertilizationRepelled(actor, battleSkills)) {
+    showFertilizationRepelledMessage(actor);
+    return;
   };
 
+  actor.addState(STATE_FERTILIZED);
+  recordPregnancyPartner(actorId);
 };
 
-//受精してるキャラ以外の受精相手記録を消滅
+// Fertilisation roll; skills and states can force or block it.
+function isFertilizationAccepted(actor, battleSkills, fertilizationRate) {
+  const fertilizationRoll = getRandomIndex(101);
+  if (fertilizationRate >= fertilizationRoll) return true;
+  if (battleSkills.includes(873)) return true;
+  return actor.isStateAffected(75);
+}
+
+// Whether a skill or state rejects the fertilisation.
+function isFertilizationRepelled(actor, battleSkills) {
+  return battleSkills.includes(874) || actor.isStateAffected(76);
+}
+
+function showFertilizationRepelledMessage(actor) {
+  const skillName = colorTaggedText(27, $dataSkills[874].name);
+  const actorName = actor.name();
+  CommonPopupManager.showInfo({}, `${actorName}は${skillName}の効果により受精を退けた。`, null);
+}
+
+// Runs the callback for every heroine id of variable 247; does nothing without a list.
+function forEachHeroineId(visitHeroine) {
+  const heroineIds = $gameVariables.value(VAR_HEROINE_ID_ARRAY);
+  if (!heroineIds) return;
+  for (const actorId of heroineIds) visitHeroine(actorId);
+}
+
+// Records the fertilising partner (slots 101-200).
+function recordPregnancyPartner(actorId) {
+  const partnerWeaponId = $gameVariables.value(VAR_PARTNER_WEAPON_ID);
+  if (partnerWeaponId < 1) return;
+
+  const pregnancyPartnerSlot = partnerWeaponId - PARTNER_CHILD_SLOT_OFFSET;// inside 101-200
+  readPartnerRecords(actorId)[pregnancyPartnerSlot] += 1;
+}
+
+// Clears the fertilisation record of everyone except the fertilised actor.
 jusei_clear = function () {
 
-  var list = $gameVariables.value(247);
-  list.forEach(function (id) {
-    $gameVariables.setValue(20, id);
-    var actor = $gameActors.actor(id);
-    actor.removeState(79);//受精前段階ステート消滅
-    if (!actor.isStateAffected(82)) {
-      for (var i = 101; i <= 200; i++) {
-        if ($gameVariables.value($gameVariables.value(20) + 360)[i] >= 1) {
-          $gameVariables.value($gameVariables.value(20) + 360)[i] = 0;
-        }
-      }
-    };
-  }, this);
+  forEachHeroineId((actorId) => {
+    $gameVariables.setValue(VAR_CURRENT_ACTOR_ID, actorId);
+    clearActorFertilization(actorId);
+  });
 
 };
 
-//☆☆Ｈステのうち、身長等
-hstates_heights = function (id, id2) {
+// Clears one fertilisation record; does nothing (returns false) while pregnant.
+function clearActorFertilization(actorId) {
+  const actor = $gameActors.actor(actorId);
+  if (!actor) return false;
 
-  if (isGirl($gameActors.actor(id))) {
-    var actor = $dataActors[id];
-    var actor1 = $gameActors.actor(id);
-    if (actor1.elementRate(37) >= 1.1) {
-      var value11 = `\\fs[25]Reproduction:${Math.round(actor1.elementRate(37))}%`;
-    } else {
-      var value11 = ``;
-    };
-    var value1 = Number(actor.meta['HeightEtc'].split(',')[0]);//身長
-    var value2 = Number(actor.meta['HeightEtc'].split(',')[1]);//体重
-    var value3 = Number(actor.meta['HeightEtc'].split(',')[2]);//バスト
-    var value4 = Number(actor.meta['HeightEtc'].split(',')[3]);//ウェスト
-    var value5 = Number(actor.meta['HeightEtc'].split(',')[4]);//ヒップ
-    var value9 = 0;//体型変化による影響数値
-    //スキルによる増加valuePhysiquUp
-    var list = valuePhysiquUp;
-    list.forEach(function (i) {
-      if ($dataSkills[i].meta['BodyWeightChange'] && $gameActors.actor(id).battleSkillsRaw().includes(i)) {
-        value2 += Number($dataSkills[i].meta['BodyWeightChange']);
-        value9 += 1;
-      };
-      if ($dataSkills[i].meta['BustSizeChange'] && $gameActors.actor(id).battleSkillsRaw().includes(i)) {
-        value3 += Number($dataSkills[i].meta['BustSizeChange']);
-        value9 += 1;
-      };
-      if ($dataSkills[i].meta['WaistSizeChange'] && $gameActors.actor(id).battleSkillsRaw().includes(i)) {
-        value4 += Number($dataSkills[i].meta['WaistSizeChange']);
-        value9 += 1;
-      };
-      if ($dataSkills[i].meta['HipSizeChange'] && $gameActors.actor(id).battleSkillsRaw().includes(i)) {
-        value5 += Number($dataSkills[i].meta['HipSizeChange']);
-        value9 += 1;
-      };
-    }, this);
-    //妊娠時の増加
-    value2 += $gameVariables.value(id + 380)[42];
-    value3 += $gameVariables.value(id + 380)[43];
-    value4 += $gameVariables.value(id + 380)[44];
-    value5 += $gameVariables.value(id + 380)[45];
-    var value6 = (value3 - (value1 * 0.435 - (value1 * 0.38 - value4))) + 2;//カップサイズ測定。最後に+2を独自挿入
-    //カップ測定
-    if (value6 <= 2.49) { value6 = `AAAAA` };
-    if (value6 <= 4.99) { value6 = `AAAA` };
-    if (value6 <= 7.49) { value6 = `AAA` };
-    if (value6 <= 9.99) { value6 = `AA` };
-    if (value6 <= 12.49) { value6 = `A` };
-    if (value6 <= 14.99) { value6 = `B` };
-    if (value6 <= 17.49) { value6 = `C` };
-    if (value6 <= 19.99) { value6 = `D` };
-    if (value6 <= 22.49) { value6 = `E` };
-    if (value6 <= 24.99) { value6 = `F` };
-    if (value6 <= 27.49) { value6 = `G` };
-    if (value6 <= 29.99) { value6 = `H` };
-    if (value6 <= 32.49) { value6 = `I` };
-    if (value6 <= 34.99) { value6 = `J` };
-    if (value6 <= 37.49) { value6 = `K` };
-    if (value6 <= 39.99) { value6 = `L` };
-    if (value6 <= 42.49) { value6 = `M` };
-    if (value6 <= 44.99) { value6 = `N` };
-    if (value6 <= 47.49) { value6 = `O` };
-    if (value6 <= 49.99) { value6 = `P` };
-    if (value6 <= 52.49) { value6 = `Q` };
-    if (value6 <= 54.99) { value6 = `R` };
-    if (value6 <= 57.49) { value6 = `S` };
-    if (value6 <= 59.99) { value6 = `T` };
-    if (value6 >= 60) { value6 = `──` };
-    var value8 = ``;
-    var value10 = valuePhysiquUp.length;
-    if ($dataActors[id].meta['BodyStyle']) {
-      if (value9 >= value10 * 2) {
-        value8 += `\\C[27][${$dataItems[742].name}]\\C[0]`;
-        if (id == $gameVariables.value(2)) { $gameVariables.setValue(612, value10 * 2) };
-      } else {
-        if (value9 >= value10) {
-          value8 += `\\C[27][${$dataItems[741].name}]\\C[0]`;
-          if (id == $gameVariables.value(2)) { $gameVariables.setValue(611, value10) };
-        } else {
-          if (value9 >= value10 / 2) {
-            //value8 += `\\V[27][Ｈな${$dataActors[id].meta['BodyStyle']}]\\C[0]`;
-            value8 += `\\C[21][${$dataActors[id].meta['BodyStyle']}]\\C[0]`;
-          } else {
-            value8 += `\\C[21][${$dataActors[id].meta['BodyStyle']}]\\C[0]`;
-          }
-        }
-      }
-    };
-    var value7 = `\\C[27][処女ヒロイン]\\C[0]`
-    if ($gameVariables.value(id + 380)[6] >= 1) {
-      var value7 = `\\C[0][非処女ヒロイン]\\C[0]`
-    };
-    if ($gameVariables.value(id + 380)[6] >= 100) {
-      var value7 = `\\C[31][中古ヒロイン]\\C[0]`
-    };
-    if ($gameVariables.value(id + 380)[6] >= 1000) {
-      var value7 = `\\C[30][中古]\\C[0]`
-    };
-    $gameVariables.setValue(id2,
-      `\\fs[25]\\C[16]HT:\\C[0]${value1}\\C[16]cm\\C[0]　\\C[16]WT:\\C[0]${value2}\\C[16]kg\\C[0]
-\\C[16]Cup:\\C[0][${value6}] \\C[16]B:\\C[0]${value3} \\C[16]W:\\C[0]${value4} \\C[16]H:\\C[0]${value5}
-${value8}
-${value7}
-${value11}`);
-    $gameVariables.value(id + 380)[51] = value1;
-    $gameVariables.value(id + 380)[52] = value2;
-    $gameVariables.value(id + 380)[53] = value3;
-    $gameVariables.value(id + 380)[54] = value4;
-    $gameVariables.value(id + 380)[55] = value5;
-    $gameVariables.value(id + 380)[56] = value6;
-  } else {
-    if ($dataActors[id].meta['BodyStyle']) {
-      $gameVariables.setValue(id2, `\\C[21][${$dataActors[id].meta['BodyStyle']}]\\C[0]`);
-    } else {
-      $gameVariables.setValue(id2, `NoData`);
+  actor.removeState(STATE_FERTILIZED);// the fertilised pre-stage state disappears
+  if (actor.isStateAffected(STATE_BIRTHED)) return false;
+
+  const partnerHRecords = readPartnerRecords(actorId);
+  for (let slot = PARTNER_RECORD_SLOT_FIRST_INDEX; slot <= PARTNER_RECORD_SLOT_LAST_INDEX; slot++) {
+    if (partnerHRecords[slot] >= 1) {
+      partnerHRecords[slot] = 0;
     };
   };
+  return true;
+}
+
+
+// Physique related H states such as the height.
+const CUP_SIZE_LABELS = [`AAAAA`, `AAAA`, `AAA`, `AA`, `A`, `B`, `C`, `D`, `E`, `F`, `G`, `H`, `I`, `J`, `K`, `L`, `M`, `N`, `O`, `P`, `Q`, `R`, `S`, `T`];
+const CUP_SIZE_STEP = 2.5;                // cup size step
+
+// Base body size from the <HeightEtc:a,b,c,d,e> tag.
+function readBodySize(actorData) {
+  const heightEtc = actorData.meta['HeightEtc'].split(',');
+  return {
+    heightCm: Number(heightEtc[0]),
+    weightKg: Number(heightEtc[1]),
+    bustCm: Number(heightEtc[2]),
+    waistCm: Number(heightEtc[3]),
+    hipCm: Number(heightEtc[4])
+  };
+}
+
+// Breeding element bonus shown above the body size (empty below +10%).
+function readReproductionLabel(gameActor) {
+  const reproductionRate = gameActor.elementRate(ELEMENT_REPRODUCTION);
+  if (reproductionRate < 1.1) return ``;
+  const reproductionPercent = Math.round(reproductionRate) + '%';
+  return FONT_SIZE_25 + 'Reproduction:' + reproductionPercent;
+}
+
+hstates_heights = function (id, resultVarId) {
+
+  const gameActor = $gameActors.actor(id);
+  if (!gameActor || !isGirl(gameActor)) {
+    $gameVariables.setValue(resultVarId, readBodyStyleLabelText($dataActors[id]));
+    return;
+  };
+
+  const actorData = $dataActors[id];
+  if (!actorData || !actorData.meta['HeightEtc']) return;
+
+  const reproductionLabel = readReproductionLabel(gameActor);
+
+  const bodySize = readBodySize(actorData);
+  const physiqueChangeCount = applyPhysiqueSkillBonuses(gameActor, bodySize);
+  applyPregnancySwell(id, bodySize);
+
+  const hStateValues = readHStateValues(id);
+  const cupSize = computeCupSizeLabel(bodySize.bustCm, bodySize.heightCm, bodySize.waistCm);
+  const bodyStyleLabel = readBodyStyleLabel(id, actorData, physiqueChangeCount);
+
+  const virginLabel = readVirginLabel(hStateValues[HSTATE_INDEX_SEX_COUNT]);
+  $gameVariables.setValue(resultVarId,
+    buildHeightEtcText(bodySize, cupSize, bodyStyleLabel, virginLabel, reproductionLabel));
+
+  writeBodySizeToHState(hStateValues, bodySize, cupSize);
 
 };
 
-//☆☆Hスキル習得通常パターン
-hskill_learn = function (id1) {
+// Physique display block; numbers and tags only, so nothing has to be translated.
+function buildHeightEtcText(bodySize, cupSize, bodyStyleLabel, virginLabel, reproductionLabel) {
+  // The labels are technical abbreviations, so they are built outside of any message.
+  const heightLabel = colorTaggedText(16, `HT:`);
+  const centimetreLabel = colorTaggedText(16, `cm`);
+  const weightLabel = colorTaggedText(16, `WT:`);
+  const kilogramLabel = colorTaggedText(16, `kg`);
+  const cupLabel = colorTaggedText(16, `Cup:`);
+  const bustLabel = colorTaggedText(16, `B:`);
+  const waistLabel = colorTaggedText(16, `W:`);
+  const hipLabel = colorTaggedText(16, `H:`);
 
-  var actor = $gameActors.actor($gameVariables.value(20));
-  var list = valueGetHskillLearn;
-  list.forEach(function (i) {
-    if (id1 == 1) { var valueLearn = !actor.isLearnedSkill(i) };
-    if (id1 == 2) { var valueLearn = actor.isLearnedSkill(i) };
-    if (valueLearn) {
-      $gameVariables.setValue(641, 0);
-      if ($gameVariables.value(340) >= 1) {
-        var value1 = $gameVariables.value(340) - 300;
-        var value2 = $gameVariables.value($gameVariables.value(20) + 360)[value1];
-        $gameVariables.setValue(641, value2);
-      };
-      $gameVariables.value($gameVariables.value(20) + 380)[63] = $gameVariables.value($gameVariables.value(20) + 360)[6];//武器ID306の性欲薬使用回数を計上
-      if ($dataSkills[i].meta['PremiseSkill1']) { var value1 = Number($dataSkills[i].meta['PremiseSkill1']) } else { var value1 = 407 };
-      if ($dataSkills[i].meta['PremiseSkill2']) { var value2 = Number($dataSkills[i].meta['PremiseSkill2']) } else { var value2 = 407 };
-      if ($dataSkills[i].meta['PremiseSkill3']) { var value3 = Number($dataSkills[i].meta['PremiseSkill3']) } else { var value3 = 407 };
-      if ($dataSkills[i].meta['PremiseSkillRank1']) { var value4 = Number($dataSkills[i].meta['PremiseSkillRank1'].split(',')[0]) } else { var value4 = 407 };
-      if ($dataSkills[i].meta['PremiseSkillRank2']) { var value5 = Number($dataSkills[i].meta['PremiseSkillRank2'].split(',')[0]) } else { var value5 = 407 };
-      if ($dataSkills[i].meta['PremiseSkillRank3']) { var value6 = Number($dataSkills[i].meta['PremiseSkillRank3'].split(',')[0]) } else { var value6 = 407 };
-      if ($dataSkills[i].meta['PremiseSkillRank1']) { var value7 = Number($dataSkills[i].meta['PremiseSkillRank1'].split(',')[1]) } else { var value7 = 0 };
-      if ($dataSkills[i].meta['PremiseSkillRank2']) { var value8 = Number($dataSkills[i].meta['PremiseSkillRank2'].split(',')[1]) } else { var value8 = 0 };
-      if ($dataSkills[i].meta['PremiseSkillRank3']) { var value9 = Number($dataSkills[i].meta['PremiseSkillRank3'].split(',')[1]) } else { var value9 = 0 };
-      if ($dataSkills[i].meta['PremiseVariable1']) { var value10 = Number($dataSkills[i].meta['PremiseVariable1'].split(',')[0]) } else { var value10 = 2 };
-      if ($dataSkills[i].meta['PremiseVariable2']) { var value11 = Number($dataSkills[i].meta['PremiseVariable2'].split(',')[0]) } else { var value11 = 2 };
-      if ($dataSkills[i].meta['PremiseVariable3']) { var value12 = Number($dataSkills[i].meta['PremiseVariable3'].split(',')[0]) } else { var value12 = 2 };
-      if ($dataSkills[i].meta['PremiseVariable1']) { var value13 = Number($dataSkills[i].meta['PremiseVariable1'].split(',')[1]) } else { var value13 = 0 };
-      if ($dataSkills[i].meta['PremiseVariable2']) { var value14 = Number($dataSkills[i].meta['PremiseVariable2'].split(',')[1]) } else { var value14 = 0 };
-      if ($dataSkills[i].meta['PremiseVariable3']) { var value15 = Number($dataSkills[i].meta['PremiseVariable3'].split(',')[1]) } else { var value15 = 0 };
-      if ($dataSkills[i].meta['PremiseArrangement1']) { var value16 = Number($dataSkills[i].meta['PremiseArrangement1'].split(',')[0]) } else { var value16 = 0 };
-      if ($dataSkills[i].meta['PremiseArrangement2']) { var value17 = Number($dataSkills[i].meta['PremiseArrangement2'].split(',')[0]) } else { var value17 = 0 };
-      if ($dataSkills[i].meta['PremiseArrangement3']) { var value18 = Number($dataSkills[i].meta['PremiseArrangement3'].split(',')[0]) } else { var value18 = 0 };
-      if ($dataSkills[i].meta['PremiseArrangement1']) { var value19 = Number($dataSkills[i].meta['PremiseArrangement1'].split(',')[1]) } else { var value19 = 0 };
-      if ($dataSkills[i].meta['PremiseArrangement2']) { var value20 = Number($dataSkills[i].meta['PremiseArrangement2'].split(',')[1]) } else { var value20 = 0 };
-      if ($dataSkills[i].meta['PremiseArrangement3']) { var value21 = Number($dataSkills[i].meta['PremiseArrangement3'].split(',')[1]) } else { var value21 = 0 };
-      if ($dataSkills[i].meta['MainCharaPremise']) { var value22 = $gameVariables.value(2) } else { var value22 = 0 };
-      if ($dataSkills[i].meta['SkillLearningClass']) { var value22 = 100 };//あったらここでは習得させない
-      if (value22 == 0 || value22 == $gameVariables.value(20)) {
-        if (actor.isLearnedSkill(value1) &&
-          actor.isLearnedSkill(value2) &&
-          actor.isLearnedSkill(value3) &&
-          actor.skillMasteryLevel(value4) >= value7 &&
-          actor.skillMasteryLevel(value5) >= value8 &&
-          actor.skillMasteryLevel(value6) >= value9 &&
-          $gameVariables.value(value10) >= value13 &&
-          $gameVariables.value(value11) >= value14 &&
-          $gameVariables.value(value12) >= value15 &&
-          $gameVariables.value(380 + $gameVariables.value(20))[value16] >= value19 &&
-          $gameVariables.value(380 + $gameVariables.value(20))[value17] >= value20 &&
-          $gameVariables.value(380 + $gameVariables.value(20))[value18] >= value21
-        ) {
-          actor.learnSkill(i);
-          var value0 = `──\\C[2]H-Passive\\C[0]\\C[27]\x1bSIN[${i}]\\C[0]Expression…──\n`;
-          value0 += `${$dataSkills[i].description}\\C[0]\n`;
-          eval("valueWordSet" + valueCountSet2 + " += value0");
-          valueCountSet1 += 1;
-          if ((valueCountSet1 % 6) == 0) {
-            valueCountSet2 += 1;
-            var value1 = `\\FS[28]\\C[10]<H-Passive Expression!>\\FS[25]\\C[0]\n`;
-            eval("valueWordSet" + valueCountSet2 + " = value1");
-          };
-        } else {
-          //リセット時のみ実行。スキル忘却
-          if (id1 == 2) {
-            actor.forgetSkill(i);
-            var value1 = `──${$dataSkills[i].name}忘却…──`;
-            CommonPopupManager.showInfo({}, value1, null);
-          };
-        };
-      };
-    } else {
-      if ($dataSkills[i].meta['LostHSkill']) {
-        if ($dataSkills[i].meta['PremiseVariable1']) {
-          if ($gameVariables.value(Number($dataSkills[i].meta['PremiseVariable1'].split(',')[0])) < Number($dataSkills[i].meta['PremiseVariable1'].split(',')[1])) {
-            actor.forgetSkill(i);
-          };
-        };
-      };
+  return FONT_SIZE_25
+    + `${heightLabel}${bodySize.heightCm}${centimetreLabel}　${weightLabel}${bodySize.weightKg}${kilogramLabel}` + '\n'
+    + `${cupLabel}[${cupSize}] ${bustLabel}${bodySize.bustCm} `
+    + `${waistLabel}${bodySize.waistCm} ${hipLabel}${bodySize.hipCm}` + '\n'
+    + bodyStyleLabel + '\n'
+    + virginLabel + '\n'
+    + reproductionLabel;
+}
+
+// Stores the results in the H state array (51-56).
+function writeBodySizeToHState(hStateValues, bodySize, cupSize) {
+  hStateValues[HSTATE_INDEX_HEIGHT] = bodySize.heightCm;
+  hStateValues[HSTATE_INDEX_WEIGHT] = bodySize.weightKg;
+  hStateValues[HSTATE_INDEX_BUST] = bodySize.bustCm;
+  hStateValues[HSTATE_INDEX_WAIST] = bodySize.waistCm;
+  hStateValues[HSTATE_INDEX_HIP] = bodySize.hipCm;
+  hStateValues[HSTATE_INDEX_CUP] = cupSize;
+}
+
+// Body label for non-female actors or missing data.
+function readBodyStyleLabelText(actorData) {
+  if (actorData && actorData.meta['BodyStyle']) {
+    const bodyStyleMeta = actorData.meta['BodyStyle'];
+    return colorTaggedText(21, `[${bodyStyleMeta}]`);
+  }
+  return `NoData`;
+}
+
+// Physique change tags: metadata key -> property of the bodySize object.
+const PHYSIQUE_CHANGE_TAGS = [
+  { metaKey: 'BodyWeightChange', sizeKey: 'weightKg' },
+  { metaKey: 'BustSizeChange', sizeKey: 'bustCm' },
+  { metaKey: 'WaistSizeChange', sizeKey: 'waistCm' },
+  { metaKey: 'HipSizeChange', sizeKey: 'hipCm' }
+];
+
+// Adds every physique change tag of one skill to the body size; returns how many tags applied.
+function applyPhysiqueChangeTags(bodySize, physiqueMeta) {
+  let changedTagCount = 0;
+
+  for (const changeTag of PHYSIQUE_CHANGE_TAGS) {
+    const changeValue = physiqueMeta[changeTag.metaKey];
+    if (!changeValue) continue;
+
+    bodySize[changeTag.sizeKey] += Number(changeValue);
+    changedTagCount += 1;
+  };
+
+  return changedTagCount;
+}
+
+// Adds the physique change skill bonuses (valuePhysiquUp) and returns how many values changed.
+function applyPhysiqueSkillBonuses(gameActor, bodySize) {
+  const physiqueSkills = gameActor.battleSkillsRaw();
+  let physiqueChangeCount = 0;// number of values changed by the physique bonuses
+
+  for (const physiqueSkillId of valuePhysiquUp) {
+    const physiqueSkill = $dataSkills[physiqueSkillId];
+    // BUGFIX: the metadata lookup crashed when the skill id did not exist.
+    if (!physiqueSkill) continue;
+    if (!physiqueSkills.includes(physiqueSkillId)) continue;
+
+    physiqueChangeCount += applyPhysiqueChangeTags(bodySize, physiqueSkill.meta);
+  };
+  return physiqueChangeCount;
+}
+
+// Reflects the pregnancy gain (array 42-45) in the physique.
+function applyPregnancySwell(actorId, bodySize) {
+  const hStateValues = readHStateValues(actorId);
+  bodySize.weightKg += hStateValues[HSTATE_INDEX_PREGNANCY_SWELL];
+  bodySize.bustCm += hStateValues[HSTATE_INDEX_PREGNANCY_SWELL + 1];
+  bodySize.waistCm += hStateValues[HSTATE_INDEX_PREGNANCY_SWELL + 2];
+  bodySize.hipCm += hStateValues[HSTATE_INDEX_PREGNANCY_SWELL + 3];
+}
+
+// Cup size measurement in steps of 2.5 from A to T; out of table gives "--".
+function computeCupSizeLabel(bustCm, heightCm, waistCm) {
+  const cupSizeValue = (bustCm - (heightCm * 0.435 - (heightCm * 0.38 - waistCm))) + 2;// the original adds 2 here on purpose
+  const cupIndex = Math.max(1, Math.floor(cupSizeValue / CUP_SIZE_STEP) + 1);
+  return cupIndex > CUP_SIZE_LABELS.length ? `──` : CUP_SIZE_LABELS[cupIndex - 1];
+}
+
+// Item name (empty for a missing id; the original crashed).
+function readItemName(itemId) {
+  const item = $dataItems[itemId];
+  return item ? item.name : ``;
+}
+
+// Strongest style tier first: the multiplier is applied to the physique skill count.
+const BODY_STYLE_TIERS = [
+  { countMultiplier: 2, labelItemId: 742, mainActorVarId: VAR_PHYSIQUE_VAR_SECOND },
+  { countMultiplier: 1, labelItemId: 741, mainActorVarId: VAR_PHYSIQUE_VAR_FIRST }
+];
+
+// Style label from the physique change stage; also updates variables 611/612 for the main character.
+function readBodyStyleLabel(actorId, actorData, physiqueChangeCount) {
+  const bodyStyleMeta = actorData.meta['BodyStyle'];
+  if (!bodyStyleMeta) return ``;
+
+  const physiqueUpCount = valuePhysiquUp.length;
+  const isMainActor = actorId == $gameVariables.value(VAR_MAIN_ACTOR_ID);
+
+  for (const styleTier of BODY_STYLE_TIERS) {
+    if (physiqueChangeCount < physiqueUpCount * styleTier.countMultiplier) continue;
+
+    if (isMainActor) {
+      $gameVariables.setValue(styleTier.mainActorVarId, physiqueUpCount * styleTier.countMultiplier);
     };
-  }, this);
-  if (valueHskillLearnArr != 0 && id1 == 1) {
-    for (var i = 0; i <= valueHskillLearnArr.length - 1; i++) {
-      var value0 = `──\\C[2]H-Passive\\C[0]\\C[27]\x1bSIN[${valueHskillLearnArr[i]}]\\C[0]RankUp!──\n`;
-      value0 += `${$dataSkills[valueHskillLearnArr[i]].description}\\C[0]\n`;
-      eval("valueWordSet" + valueCountSet2 + " += value0");
-      valueCountSet1 += 1;
-      if ((valueCountSet1 % 6) == 0) {
-        valueCountSet2 += 1;
-        var value1 = `\\FS[28]\\C[10]<H-Passive Expression!>\\FS[25]\\C[0]\n`;
-        eval("valueWordSet" + valueCountSet2 + " = value1");
-      };
+    const bodyStyleItemName = readItemName(styleTier.labelItemId);
+    return colorTaggedText(27, `[${bodyStyleItemName}]`);
+  };
+
+  if (physiqueChangeCount >= physiqueUpCount / 2) {
+    return colorTaggedText(21, `[${bodyStyleMeta}]`);
+  };
+  return ``;
+}
+
+// Virgin / non-virgin label from the intercourse count.
+function readVirginLabel(sexCount) {
+  if (sexCount >= 1000) return colorTaggedText(30, `[中古]`);
+  if (sexCount >= 100) return colorTaggedText(31, `[中古ヒロイン]`);
+  if (sexCount >= 1) return colorTaggedText(0, `[非処女ヒロイン]`);
+  return colorTaggedText(27, `[処女ヒロイン]`);
+}
+
+//---------------------------------------------------------------------------
+// H passive skill learning
+//---------------------------------------------------------------------------
+const H_PASSIVE_PAGE_HEADER = `\\FS[28]` + colorTaggedText(10, `<` + `H-Passive Expression!` + `>`) + `\\FS[25]\n`;
+const H_PASSIVE_PAGE_LINES = 6;
+const H_PASSIVE_PREFIX = colorTaggedText(2, `H-Passive`) + `\\C[27]`;
+const PREMISE_ENTRY_COUNT = 3;            // number of PremiseSkill1-3 entries and the like
+const PREMISE_SKILL_ID_DEFAULT = 407;     // default premise skill when none is given
+const PREMISE_VAR_ID_DEFAULT = 2;
+
+// Reads one premise entry (skill / rank / variable / array).
+// One premise list per field; `metaIndex` is the position inside the "a,b" meta value.
+const HSKILL_PREMISE_FIELDS = [
+  { targetKey: 'skillIds', metaKey: 'PremiseSkill', metaIndex: undefined, fallback: PREMISE_SKILL_ID_DEFAULT },
+  { targetKey: 'rankSkillIds', metaKey: 'PremiseSkillRank', metaIndex: 0, fallback: PREMISE_SKILL_ID_DEFAULT },
+  { targetKey: 'rankThresholds', metaKey: 'PremiseSkillRank', metaIndex: 1, fallback: 0 },
+  { targetKey: 'varIds', metaKey: 'PremiseVariable', metaIndex: 0, fallback: PREMISE_VAR_ID_DEFAULT },
+  { targetKey: 'varThresholds', metaKey: 'PremiseVariable', metaIndex: 1, fallback: 0 },
+  { targetKey: 'arrangementIndexes', metaKey: 'PremiseArrangement', metaIndex: 0, fallback: 0 },
+  { targetKey: 'arrangementThresholds', metaKey: 'PremiseArrangement', metaIndex: 1, fallback: 0 }
+];
+
+function readHSkillPremise(skillMeta) {
+  const premise = {};
+  for (const premiseField of HSKILL_PREMISE_FIELDS) premise[premiseField.targetKey] = [];
+
+  for (let entry = 1; entry <= PREMISE_ENTRY_COUNT; entry++) {
+    for (const premiseField of HSKILL_PREMISE_FIELDS) {
+      premise[premiseField.targetKey].push(
+        metaNumberAt(skillMeta, premiseField.metaKey + entry, premiseField.metaIndex, premiseField.fallback));
     };
   };
-  if (id1 == 1) {
+  return premise;
+}
+
+// Regular H skill learning path.
+hskill_learn = function (learnModeId) {
+
+  const { actorId, actor } = readCurrentActor();
+  if (!actor) return;
+
+  for (const skillId of valueGetHskillLearn) {
+    processHSkillLearnEntry(actor, actorId, skillId, learnModeId);
+  };
+
+  if (valueHskillLearnArr.length > 0 && learnModeId == 1) {
+    for (const learnedSkillId of valueHskillLearnArr) {
+      appendHStateMessage(buildHSkillMessage(learnedSkillId, `RankUp!`), H_PASSIVE_PAGE_LINES, H_PASSIVE_PAGE_HEADER);
+    };
+  };
+  if (learnModeId == 1) {
     hskill_learn2();
   };
 
 };
 
-//☆☆Hスキル習得やアイテム入手特殊パターン
+// Learn / forget decision for one skill.
+// Publishes the H count with the current partner (641) and the drug uses (63) before the premise test.
+function publishPartnerHStateValues(actorId) {
+  const partnerWeaponId = $gameVariables.value(VAR_PARTNER_WEAPON_ID);
+  const partnerHRecords = readPartnerRecords(actorId);
+  const hStateValues = readHStateValues(actorId);
+
+  // Two writes on purpose: the variable is cleared first and filled only for a known partner.
+  $gameVariables.setValue(VAR_HSTATE_SELECTED_VALUE, 0);
+  if (partnerWeaponId >= 1) {
+    $gameVariables.setValue(VAR_HSTATE_SELECTED_VALUE, partnerHRecords[partnerWeaponId - 300]);
+  };
+  hStateValues[HSTATE_INDEX_LIBIDO_DRUG] = partnerHRecords[6];// libido drug uses of weapon id 306
+  return hStateValues;
+}
+
+function processHSkillLearnEntry(actor, actorId, skillId, learnModeId) {
+  const skillMeta = $dataSkills[skillId].meta;
+  const isLearned = actor.isLearnedSkill(skillId);
+  const shouldLearn = learnModeId == 1 ? !isLearned : (learnModeId == 2 ? isLearned : false);
+
+  if (!shouldLearn) {
+    forgetHSkillIfPremiseLost(actor, skillId, skillMeta);
+    return;
+  };
+
+  const hStateValues = publishPartnerHStateValues(actorId);
+
+  if (!isHSkillTargetActor(skillMeta, actorId)) return;
+  if (!meetsHSkillPremise(actor, hStateValues, readHSkillPremise(skillMeta))) {
+    forgetHSkillOnPremiseFailure(actor, skillId, learnModeId);
+    return;
+  };
+
+  actor.learnSkill(skillId);
+  appendHStateMessage(buildHSkillMessage(skillId, `Expression…`), H_PASSIVE_PAGE_LINES, H_PASSIVE_PAGE_HEADER);
+}
+
+// Whether the skill may be learned by this actor (MainCharaPremise / SkillLearningClass).
+function isHSkillTargetActor(skillMeta, actorId) {
+  let mainCharaId = skillMeta['MainCharaPremise'] ? $gameVariables.value(VAR_MAIN_ACTOR_ID) : 0;
+  if (skillMeta['SkillLearningClass']) mainCharaId = 100;// when present the skill is not learned here
+  return mainCharaId == 0 || mainCharaId == actorId;
+}
+
+// Whether every premise (learned skill, rank, variable, array) is satisfied.
+function meetsHSkillPremise(actor, hStateValues, premise) {
+  for (let entry = 0; entry < PREMISE_ENTRY_COUNT; entry++) {
+    if (!actor.isLearnedSkill(premise.skillIds[entry])) return false;
+    if (!(actor.skillMasteryLevel(premise.rankSkillIds[entry]) >= premise.rankThresholds[entry])) return false;
+    if (!($gameVariables.value(premise.varIds[entry]) >= premise.varThresholds[entry])) return false;
+    if (!(hStateValues[premise.arrangementIndexes[entry]] >= premise.arrangementThresholds[entry])) return false;
+  };
+  return true;
+}
+
+// Forgets the skills whose premise variable dropped below the requirement (only meaningful on reset).
+function forgetHSkillIfPremiseLost(actor, skillId, skillMeta) {
+  if (!skillMeta['LostHSkill'] || !skillMeta['PremiseVariable1']) return;
+
+  const premiseParams = skillMeta['PremiseVariable1'].split(',');
+  const premiseVarId = Number(premiseParams[0]);
+  const premiseThreshold = Number(premiseParams[1]);
+  if ($gameVariables.value(premiseVarId) < premiseThreshold) {
+    actor.forgetSkill(skillId);
+  };
+}
+
+// In reset mode (2) forgets the skills whose premise is no longer met and reports them.
+function forgetHSkillOnPremiseFailure(actor, skillId, learnModeId) {
+  if (learnModeId != 2) return;
+
+  actor.forgetSkill(skillId);
+  const skillName = $dataSkills[skillId].name;
+  CommonPopupManager.showInfo({}, `──${skillName}忘却…──`, null);
+}
+
+// H passive learn message; the suffix is either "Expression..." or "RankUp!".
+function buildHSkillMessage(skillId, suffix) {
+  const skillMarker = `${H_PASSIVE_PREFIX}\x1bSIN[${skillId}]\\C[0]`;
+  const skillDescription = $dataSkills[skillId].description;
+  return `──${skillMarker}${suffix}──\n${skillDescription}\\C[0]\n`;
+}
+
+// Special path for H skill learning and item acquisition.
 hskill_learn2 = function () {
 
-  var actor = $gameActors.actor($gameVariables.value(20));
-  var value2 = 55;//露出開発度
-  var value1 = zenravalueId;//全裸
-  var value3 = 1;
-  if (actor.skillMasteryLevel(value2) >= value3 && !$gameParty.hasItem($dataItems[value1])) {
-    $gameParty.gainItem($dataItems[value1], 1);
-    var value0 = `──\\C[2]${$dataSkills[value2].name}\\C[0]が${value3}到達！　\\C[27]\x1bIIN[${value1}]\\C[0]Get!──\n`;
-    value0 += `${$dataItems[value1].description}\\C[0]\n`;
-    eval("valueWordSet" + valueCountSet2 + " += value0");
-    valueCountSet1 += 1;
-    if ((valueCountSet1 % 6) == 0) {
-      valueCountSet2 += 1;
-      var value1 = `\\FS[28]\\C[10]<H-Passive Expression!>\\FS[25]\\C[0]\n`;
-      eval("valueWordSet" + valueCountSet2 + " = value1");
-    };
-  };
-  var value1 = clothPartsChoice;//パーツ指定
-  var value3 = 2;
-  if (actor.skillMasteryLevel(value2) >= value3 && !$gameParty.hasItem($dataItems[value1])) {
-    $gameParty.gainItem($dataItems[value1], 1);
-    var value0 = `──\\C[2]${$dataSkills[value2].name}\\C[0]が${value3}到達！　\\C[27]\x1bIIN[${value1}]\\C[0]Get!──\n`;
-    value0 += `${$dataItems[value1].description}\\C[0]\n`;
-    eval("valueWordSet" + valueCountSet2 + " += value0");
-    valueCountSet1 += 1;
-    if ((valueCountSet1 % 6) == 0) {
-      valueCountSet2 += 1;
-      var value1 = `\\FS[28]\\C[10]<H-Passive Expression!>\\FS[25]\\C[0]\n`;
-      eval("valueWordSet" + valueCountSet2 + " = value1");
-    };
-  };
-  var value1 = 'ClothBreakage';//ClothType指定
-  var value3 = 3;
-  if (actor.skillMasteryLevel(value2) >= value3) {
-    for (var i = 1; i <= $dataItems.length - 1; i++) {
-      if ($dataItems[i].meta['subCategory'] && $dataItems[i].meta['ClothType'] && $dataItems[i].meta['TotalCloth']) {
-        if ($gameParty.hasItem($dataItems[i])) {
-          for (var j = 1; j <= $dataItems.length - 1; j++) {
-            if ($dataItems[j].meta['subCategory'] && $dataItems[j].meta['ClothType']) {
-              if ($dataItems[i].meta['subCategory'] == $dataItems[j].meta['subCategory']) {
-                if ($dataItems[j].meta['ClothType'] == value1) {
-                  if (!$gameParty.hasItem($dataItems[j])) {
-                    clothes_get($gameVariables.value(20), $dataItems[j].meta['subCategory'], $dataItems[j].meta['ClothType']);
-                    var value0 = `──\\C[2]${$dataSkills[value2].name}:Rank${value3}\\C[0]の効果により、\\C[27]\x1bIIN[${j}]\\C[0]Get!──\n`;
-                    eval("valueWordSet" + valueCountSet2 + " += value0");
-                    valueCountSet1 += 1;
-                    if ((valueCountSet1 % 6) == 0) {
-                      valueCountSet2 += 1;
-                      var value1 = `\\FS[28]\\C[10]<H-Passive Expression!>\\FS[25]\\C[0]\n`;
-                      eval("valueWordSet" + valueCountSet2 + " = value1");
-                    };
-                    break;
-                  } else {
-                    break;
-                  };
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  };
-  var value1 = '改';//ClothType指定
-  var value3 = 4;
-  if (actor.skillMasteryLevel(value2) >= value3) {
-    for (var i = 1; i <= $dataItems.length - 1; i++) {
-      if ($dataItems[i].meta['subCategory'] && $dataItems[i].meta['ClothType'] && $dataItems[i].meta['TotalCloth']) {
-        if ($gameParty.hasItem($dataItems[i])) {
-          for (var j = 1; j <= $dataItems.length - 1; j++) {
-            if ($dataItems[j].meta['subCategory'] && $dataItems[j].meta['ClothType']) {
-              if ($dataItems[i].meta['subCategory'] == $dataItems[j].meta['subCategory']) {
-                if ($dataItems[j].meta['ClothType'] == value1) {
-                  if (!$gameParty.hasItem($dataItems[j])) {
-                    clothes_get($gameVariables.value(20), $dataItems[j].meta['subCategory'], $dataItems[j].meta['ClothType']);
-                    var value0 = `──\\C[2]${$dataSkills[value2].name}:Rank${value3}\\C[0]の効果により、\\C[27]\x1bIIN[${j}]\\C[0]Get!──\n`;
-                    eval("valueWordSet" + valueCountSet2 + " += value0");
-                    valueCountSet1 += 1;
-                    if ((valueCountSet1 % 6) == 0) {
-                      valueCountSet2 += 1;
-                      var value1 = `\\FS[28]\\C[10]<H-Passive Expression!>\\FS[25]\\C[0]\n`;
-                      eval("valueWordSet" + valueCountSet2 + " = value1");
-                    };
-                    break;
-                  } else {
-                    break;
-                  };
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  };
-  var value3 = 5;
-  if (!$gameSwitches.value(604)) {
-    if (actor.skillMasteryLevel(value2) >= value3) {
-      $gameSwitches.setValue(604, true);
-      var value0 = `──\\C[2]${$dataSkills[value2].name}\\C[0]が${value3}到達！　メニュー画面に\\C[27]着せ替え\\C[0]出現──\n`;
-      value0 += `\n`;
-      eval("valueWordSet" + valueCountSet2 + " += value0");
-      valueCountSet1 += 1;
-      if ((valueCountSet1 % 6) == 0) {
-        valueCountSet2 += 1;
-        var value1 = `\\FS[28]\\C[10]<H-Passive Expression!>\\FS[25]\\C[0]\n`;
-        eval("valueWordSet" + valueCountSet2 + " = value1");
-      };
-    };
-  };
+  const actor = currentHStateActor();
+  if (!actor) return;
 
-  var value1 = 875;//９種組み合わせ
-  if (!actor.isLearnedSkill(value1)) {
-    if (actor.skillMasteryLevel(51) >= 6 &&
-      actor.skillMasteryLevel(52) >= 6 &&
-      actor.skillMasteryLevel(53) >= 6 &&
-      actor.skillMasteryLevel(54) >= 6 &&
-      actor.skillMasteryLevel(55) >= 6 &&
-      actor.skillMasteryLevel(56) >= 6 &&
-      actor.skillMasteryLevel(57) >= 6 &&
-      actor.skillMasteryLevel(58) >= 6 &&
-      actor.skillMasteryLevel(59) >= 6) {
-      actor.learnSkill(value1);
-      var value0 = `──\\C[2]全開発度(経験値)\\C[0]\\C[10]Max\\C[0]！　\\C[27]\x1bSIN[${value1}]\\C[0]Expression!──\n`;
-      value0 += `${$dataSkills[value1].description}\\C[0]\n`;
-      eval("valueWordSet" + valueCountSet2 + " += value0");
-      valueCountSet1 += 1;
-      if ((valueCountSet1 % 6) == 0) {
-        valueCountSet2 += 1;
-        var value1 = `\\FS[28]\\C[10]<H-Passive Expression!>\\FS[25]\\C[0]\n`;
-        eval("valueWordSet" + valueCountSet2 + " = value1");
-      };
-    };
-  };
+  const exposureRank = actor.skillMasteryLevel(SKILL_H_EXPOSURE);
+  const exposureSkillName = $dataSkills[SKILL_H_EXPOSURE].name;
 
+  grantClothItemByExposureRank(actor, exposureSkillName, exposureRank, zenravalueId, 1);// fully naked
+  grantClothItemByExposureRank(actor, exposureSkillName, exposureRank, clothPartsChoice, 2);// single body part
+
+  // Takes exactly one piece of clothing of the same ClothType category (rank 3: ClothBreakage / rank 4: modified)
+  grantClothByType(exposureSkillName, exposureRank, 'ClothBreakage', 3);
+  grantClothByType(exposureSkillName, exposureRank, '改', 4);
+
+  releaseClothMenuByExposureRank(exposureSkillName, exposureRank);
+  learnAllDevelopmentSkill(actor);
 };
 
-//☆☆Ｈパッシブ未収得分の条件提示
-actor_HpassiveConditions = function (a, b, itemId) {
+// Grants exactly one clothing item when the given rank is reached.
+function grantClothItemByExposureRank(actor, exposureSkillName, exposureRank, itemId, rankThreshold) {
+  const clothItem = $dataItems[itemId];
+  if (!clothItem || exposureRank < rankThreshold || $gameParty.hasItem(clothItem)) return;
 
-  if ($gameSwitches.value(115)) {
-    $gameSwitches.setValue(115, false)
-    WindowManager.hide(1);
-  } else {
-    if (isGirl($gameActors.actor(b.actorId()))) {
-      $gameSwitches.setValue(115, true)
-      var actor = $gameActors.actor(b.actorId());
-      var value = `${actor.name()}の未収得\\C[27]<H-Passive>\\C[0]\n`
-      var value1 = 120;
-      var value2 = 0;
-      var value3 = 0;
-      var start = 1;
-      var end = $dataSkills.length - 1;
-      for (var i = start; i <= end; i++) {
-        if ($dataSkills[i].meta['HSkillLearn'] && !actor.isLearnedSkill(i)) {
-          value += `\\C[27]${$dataSkills[i].name}\\C[0]\n`;
-          value += `${$dataSkills[i].meta['ADDescription']}\n`;
-          value2 += 1;
-        };
-      };
-      if (value2 >= 1) {
-        value3 += value2 * 60;
-        WindowManager.show(1, 0, 0, 1280, value3);
-        WindowManager.drawText(1, `\\fs[28]${value}`);
-      } else {
-        WindowManager.show(1, 0, 100, 1024, 180);
-        WindowManager.drawText(1, `\\C[27]\\fs[28]H-Passive Complete!\\C[0]`);
-      };
-    } else {
-      TickerManager.show(`${$gameActors.actor(b.actorId()).name()}は対象キャラではありません…。`);
+  $gameParty.gainItem(clothItem, 1);
+
+  const exposureSkill = colorTaggedText(2, exposureSkillName);
+  const itemIconName = colorTaggedText(27, `\x1bIIN[${itemId}]`);
+  const clothDescription = clothItem.description;
+  appendHStateMessage(`──${exposureSkill}が${rankThreshold}到達！　${itemIconName}Get!──` + `\n${clothDescription}` + `\\C[0]` + '\n', H_PASSIVE_PAGE_LINES, H_PASSIVE_PAGE_HEADER);
+}
+
+// Indexes the clothing items by kind (subCategory / ClothType).
+// $dataItems does not grow after loading, so the index is built once per kind.
+const clothTypeIndexCache = new Map();
+
+function readClothTypeIndex(clothType) {
+  if (clothTypeIndexCache.has(clothType)) return clothTypeIndexCache.get(clothType);
+
+  const indexBySubCategory = new Map();
+  forEachClothItem((item, itemMeta, itemId) => {
+    if (itemMeta['ClothType'] != clothType) return;
+
+    // Keep the candidates in ascending item id order (the scan order of the original)
+    const subCategoryIds = indexBySubCategory.get(itemMeta['subCategory']);
+    if (subCategoryIds) { subCategoryIds.push(itemId); return; }
+    indexBySubCategory.set(itemMeta['subCategory'], [itemId]);
+  });
+
+  clothTypeIndexCache.set(clothType, indexBySubCategory);
+  return indexBySubCategory;
+}
+
+// Visits every clothing item (an item with <subCategory> and <ClothType>) in id order.
+function forEachClothItem(visitClothItem) {
+  const items = $dataItems;
+  const lastItemId = items.length - 1;
+
+  for (let itemId = 1; itemId <= lastItemId; itemId++) {
+    const item = items[itemId];
+    if (!item) continue;
+
+    const itemMeta = item.meta;
+    if (!itemMeta['subCategory'] || !itemMeta['ClothType']) continue;
+    visitClothItem(item, itemMeta, itemId);
+  }
+}
+
+// Takes exactly one piece of clothing of the same ClothType category.
+function grantClothByType(exposureSkillName, exposureRank, clothType, rankThreshold) {
+  if (exposureRank < rankThreshold) return;
+
+  const indexBySubCategory = readClothTypeIndex(clothType);
+  const ownedClothSubCategories = collectOwnedClothSubCategories();
+
+  for (const subCategory of ownedClothSubCategories) {
+    const candidateItemIds = indexBySubCategory.get(subCategory);
+    if (!candidateItemIds) continue;
+
+    // The original stops as soon as it meets an owned candidate, so break is kept
+    for (const candidateItemId of candidateItemIds) {
+      if ($gameParty.hasItem($dataItems[candidateItemId])) break;
+
+      clothes_get($gameVariables.value(VAR_CURRENT_ACTOR_ID), subCategory, clothType);
+      appendClothGrantedByTypeMessage(exposureSkillName, rankThreshold, candidateItemId);
+      break;
     };
   };
+}
 
+// Collects the subCategories of the owned items that carry a whole outfit (TotalCloth), without duplicates.
+function collectOwnedClothSubCategories() {
+  const subCategories = [];
+  const seen = new Set();
+
+  forEachClothItem((item, itemMeta) => {
+    if (!itemMeta['TotalCloth']) return;
+    if (!$gameParty.hasItem(item)) return;
+    if (seen.has(itemMeta['subCategory'])) return;
+
+    seen.add(itemMeta['subCategory']);
+    subCategories.push(itemMeta['subCategory']);
+  });
+  return subCategories;
+}
+
+function appendClothGrantedByTypeMessage(exposureSkillName, rankThreshold, candidateItemId) {
+  const exposureSkill = colorTaggedText(2, `${exposureSkillName}:Rank${rankThreshold}`);
+  const itemIconName = colorTaggedText(27, `\x1bIIN[${candidateItemId}]`);
+  appendHStateMessage(`──${exposureSkill}の効果により、${itemIconName}Get!──` + `\n`, H_PASSIVE_PAGE_LINES, H_PASSIVE_PAGE_HEADER);
+}
+
+// Exposure development 5 unlocks the dress-up menu.
+function releaseClothMenuByExposureRank(exposureSkillName, exposureRank) {
+  if ($gameSwitches.value(SW_CLOTH_MENU_RELEASED) || exposureRank < 5) return;
+
+  $gameSwitches.setValue(SW_CLOTH_MENU_RELEASED, true);
+  const exposureSkill = colorTaggedText(2, exposureSkillName);
+  const menuName = colorTaggedText(27, `着せ替え`);
+  appendHStateMessage(`──${exposureSkill}が5到達！　メニュー画面に${menuName}出現──` + `\n\n`, H_PASSIVE_PAGE_LINES, H_PASSIVE_PAGE_HEADER);
+}
+
+// All development skills at 6 unlock the nine-combination skill.
+function learnAllDevelopmentSkill(actor) {
+  if (actor.isLearnedSkill(SKILL_ALL_DEVELOPMENT)) return;
+
+  for (const skillId of buildHSkillRange(SKILL_H_DEV_FIRST, SKILL_H_DEV_LAST)) {
+    if (actor.skillMasteryLevel(skillId) < 6) return;
+  };
+
+  actor.learnSkill(SKILL_ALL_DEVELOPMENT);
+  const devPoints = colorTaggedText(2, `全開発度(経験値)`);
+  const skillMarker = `\\C[27]\x1bSIN[${SKILL_ALL_DEVELOPMENT}]\\C[0]`;
+  const description = $dataSkills[SKILL_ALL_DEVELOPMENT].description;
+  const maxLabel = colorTaggedText(10, `Max`);
+  const maxHeaderText = `──${devPoints}${maxLabel}！　${skillMarker}Expression!──`;
+  appendHStateMessage(maxHeaderText + '\n' + description + `\\C[0]` + '\n', H_PASSIVE_PAGE_LINES, H_PASSIVE_PAGE_HEADER);
+}
+
+// Shows the conditions of the uncollected H passives.
+// Header of the window when every H passive is learned, and the row height of the list.
+const H_PASSIVE_COMPLETE_TEXT = `H-Passive Complete!`;
+const H_PASSIVE_ROW_HEIGHT = 60;
+
+actor_HpassiveConditions = function (unusedArg1, sourceActor, unusedItemId) {
+
+  if (closeHPassiveWindow()) return;
+
+  const actor = $gameActors.actor(sourceActor.actorId());
+  if (!isGirl(actor)) {
+    const actorName = actor.name();
+    TickerManager.show(`${actorName}は対象キャラではありません…。`);
+    return;
+  };
+
+  $gameSwitches.setValue(SW_H_PASSIVE_WINDOW, true);
+  showHPassiveWindow(actor);
+
+}
+
+// Closes an already open H passive window; true when the window was open.
+function closeHPassiveWindow() {
+  if (!$gameSwitches.value(SW_H_PASSIVE_WINDOW)) return false;
+
+  $gameSwitches.setValue(SW_H_PASSIVE_WINDOW, false);
+  WindowManager.hide(1);
+  return true;
+}
+
+// Draws the unlearned H skills, or the "nothing left" text when every skill is known.
+function showHPassiveWindow(actor) {
+  const unlearnedSkillText = buildUnlearnedHSkillText(actor);
+  if (unlearnedSkillText.unlearnedCount < 1) {
+    WindowManager.show(1, 0, 100, 1024, 180);
+    WindowManager.drawText(1, colorTaggedText(27, FONT_SIZE_28 + H_PASSIVE_COMPLETE_TEXT));
+    return;
+  };
+
+  WindowManager.show(1, 0, 0, 1280, unlearnedSkillText.unlearnedCount * H_PASSIVE_ROW_HEIGHT);
+  WindowManager.drawText(1, FONT_SIZE_28 + unlearnedSkillText.unlearnedText);
 };
 
-//☆スキルアイテムステート性経験値補正
+// Lists the H passives that are not learned yet.
+function buildUnlearnedHSkillText(actor) {
+  const hPassiveLabel = colorTaggedText(27, `<H-Passive>`);
+  const actorName = actor.name();
+  let unlearnedText = `${actorName}の未収得${hPassiveLabel}` + '\n';
+  let unlearnedCount = 0;
+
+  for (let skillId = 1; skillId <= $dataSkills.length - 1; skillId++) {
+    const skill = $dataSkills[skillId];
+    if (!skill || !skill.meta['HSkillLearn'] || actor.isLearnedSkill(skillId)) continue;
+
+    const skillNameLabel = colorTaggedText(27, skill.name);
+    const skillDescription = skill.meta['ADDescription'];
+    unlearnedText += skillNameLabel + '\n';
+    unlearnedText += skillDescription + '\n';
+    unlearnedCount += 1;
+  };
+  return { unlearnedText, unlearnedCount };
+}
+
+// Skill / item / state experience bonus.
+// Activation tags of the H experience lists and the handler of each one.
+const HEXP_ACTIVATION_EFFECTS = [
+  { metaKey: 'HexpReflectionSkill', apply: applyHexpReflection },
+  { metaKey: 'ProstitutionMoneyUp', apply: applyProstitutionMoneyUp }
+];
+
+// Every activation tag of the list is applied independently, in table order.
+function applyHexpActivationEffects(entry) {
+  const entryMeta = entry.meta;
+
+  for (const activationEffect of HEXP_ACTIVATION_EFFECTS) {
+    if (!entryMeta[activationEffect.metaKey]) continue;
+    activationEffect.apply(entry, entryMeta);
+  };
+}
+
 hStates_up1 = function (id) {
 
-  if (id == 1) { var value = $dataSkills; var value10 = valueHStatesUp1 };
-  if (id == 2) { var value = $dataItems; var value10 = valueHStatesUp2 };
-  if (id == 3) { var value = $dataStates; var value10 = valueHStatesUp3 };
-  var actor = $gameActors.actor($gameVariables.value(20));
-  var list = value10;
-  list.forEach(function (i) {
-    if (value[i].meta['HexpReflectionSkill'] && actor.battleSkillsRaw().includes(i)) {
-      if (value[i].meta['HexpActivateSwi']) {
-        var value11 = Number(value[i].meta['HexpActivateSwi']);
-      } else {
-        var value11 = 2;
-      };
-      if ($gameSwitches.value(value11)) {
-        var value1 = 0;
-        var value2 = 0;
-        var value3 = 0;
-        var value6 = 0;
-        if (value[i].meta['HexpReflectionSkill']) { var value1 = Number(value[i].meta['HexpReflectionSkill']) };
-        if (value[i].meta['HexpActivateVal']) { var value2 = Number(value[i].meta['HexpActivateVal']) };
-        if (value[i].meta['HexpReflectionVal']) { var value3 = Number(value[i].meta['HexpReflectionVal']) };
-        if (value[i].meta['HexpReflectionSkillRank']) { var value6 = Number(value[i].meta['HexpReflectionSkillRank']) };
-        if (value2 >= 1 && $gameVariables.value(value2) >= 1) {
-          var value4 = $gameVariables.value(value2) * actor.skillMasteryLevel(value1) * value6;
-          $gameVariables.setValue(value3, $gameVariables.value(value3) + value4);
-          var value8 = `\\C[27]<${value[i].name}>\\C[0]発動\\C[31](+${value4})\\C[0]\\I[12]\n`;
-          eval("valueWordSet" + valueCountSet2 + " += value8");
-          valueCountSet1 += 1;
-          if ((valueCountSet1 % 3) == 0) {
-            valueCountSet2 += 1
-            var value1 = `\\C[10]H-Passive[${valueCountSet2}]\\C[0]\n`;
-            eval("valueWordSet" + valueCountSet2 + " = value1");
-          };
-        };
-      };
-    };
-    if (value[i].meta['ProstitutionMoneyUp'] && actor.battleSkillsRaw().includes(i)) {
-      if ($gameVariables.value(427) >= 1) {
-        var value7 = Number(value[i].meta['ProstitutionMoneyUp']);
-        $gameVariables.setValue(427, $gameVariables.value(427) * value7);
-        var value8 = `\\C[27]<${value[i].name}>\\C[0]発動\\C[31](×${value7}\\G)\\C[0]\\I[12]\n`;
-        eval("valueWordSet" + valueCountSet2 + " += value8");
-        valueCountSet1 += 1;
-        if ((valueCountSet1 % 3) == 0) {
-          valueCountSet2 += 1
-          var value1 = `\\C[10]H-Passive[${valueCountSet2}]\\C[0]\n`;
-          eval("valueWordSet" + valueCountSet2 + " = value1");
-        };
-      };
-    };
-  }, this);
+  const databaseEntries = readHexpDatabase(id);
+  if (!databaseEntries) return;
+
+  const actor = currentHStateActor();
+  if (!actor) return;
+
+  const battleSkills = actor.battleSkillsRaw();
+  const metaList = databaseEntries.metaList;
+
+  for (const entryId of metaList) {
+    const entry = databaseEntries.entries[entryId];
+    if (!battleSkills.includes(entryId)) continue;
+
+    applyHexpActivationEffects(entry);
+  };
+
   if (id == 3) {
-    //売春額一時記憶と娼婦ジョブ経験値取得
-    valueProstitutionMoney = $gameVariables.value(427);
-    if (valueProstitutionMoney >= 1) {
-      if (actor.subclass()) {
-        if (actor._subclassId == 41) {
-          actor.gainExpSubclass(Math.ceil(valueProstitutionMoney / 10));
-          var value8 = `ジョブ:\\C[27][\x1bJ[41]]\\C[0]に\\C[31]${Math.ceil(valueProstitutionMoney / 10)}\\C[0]expを取得\\I[12]\n`;
-          eval("valueWordSet" + valueCountSet2 + " += value8");
-          valueCountSet1 += 1;
-          if ((valueCountSet1 % 3) == 0) {
-            valueCountSet2 += 1
-            var value1 = `\\C[10]H-Passive[${valueCountSet2}]\\C[0]\n`;
-            eval("valueWordSet" + valueCountSet2 + " = value1");
-          };
-        };
-      };
-    };
-    //奴隷ジョブの時に奴隷ジョブ経験値取得
-    if (actor.subclass()) {
-      if (actor._subclassId == 42) {
-        var value1 = 0;
-        for (var i = 401; i <= 440; i++) {
-          if ($gameVariables.value(i) >= 1) {
-            value1 += $gameVariables.value(i);
-          };
-        };
-        actor.gainExpSubclass(Math.ceil(value1));
-        var value8 = `ジョブ:\\C[27][\x1bJ[42]]\\C[0]に\\C[31]${Math.ceil(value1)}\\C[0]expを取得\\I[12]\n`;
-        eval("valueWordSet" + valueCountSet2 + " += value8");
-        valueCountSet1 += 1;
-        if ((valueCountSet1 % 3) == 0) {
-          valueCountSet2 += 1
-          var value1 = `\\C[10]H-Passive[${valueCountSet2}]\\C[0]\n`;
-          eval("valueWordSet" + valueCountSet2 + " = value1");
-        };
-      };
-    };
+    grantProstitutionJobExp(actor);
   };
 
 };
 
-//☆☆性欲度上限比較
+// Database and metadata targets per id (1: skill, 2: item, 3: state).
+const HEXP_DATABASE_SETTINGS = {
+  1: { database: () => $dataSkills, metaList: () => valueHStatesUp1 },
+  2: { database: () => $dataItems, metaList: () => valueHStatesUp2 },
+  3: { database: () => $dataStates, metaList: () => valueHStatesUp3 }
+};
+
+function readHexpDatabase(id) {
+  const settings = HEXP_DATABASE_SETTINGS[id];
+  if (!settings) return null;
+  return { entries: settings.database(), metaList: settings.metaList() };
+}
+
+// Numeric meta value with a fallback; the metadata of MV is always a string.
+function readMetaNumber(meta, metaKey, fallbackValue) {
+  const rawValue = meta[metaKey];
+  return rawValue ? Number(rawValue) : fallbackValue;
+}
+
+// "<entry> activated (gain)" line shared by the passive reflection handlers.
+function appendActivatedMessage(entry, gainDisplayText) {
+  const entryName = colorTaggedText(27, `<${entry.name}>`);
+  const gainText = colorTaggedText(31, gainDisplayText);
+  // The icon marker is appended outside the translatable text.
+  appendHStateMessage(entryName + H_ACTIVATED_WORD + gainText + EXP_ICON_MARKER + '\n', 3);
+}
+
+// HexpReflectionSkill: adds the variable value to another variable according to the skill rank.
+function applyHexpReflection(entry, entryMeta) {
+  const activateSwitchId = readMetaNumber(entryMeta, 'HexpActivateSwi', 2);
+  if (!$gameSwitches.value(activateSwitchId)) return;
+
+  const activateVarId = readMetaNumber(entryMeta, 'HexpActivateVal', 0);
+  if (activateVarId < 1) return;
+
+  const activateValue = $gameVariables.value(activateVarId);
+  if (activateValue < 1) return;
+
+  const reflectionSkillId = readMetaNumber(entryMeta, 'HexpReflectionSkill', 0);
+  const reflectionVarId = readMetaNumber(entryMeta, 'HexpReflectionVal', 0);
+  const reflectionSkillRank = readMetaNumber(entryMeta, 'HexpReflectionSkillRank', 0);
+
+  const actor = currentHStateActor();
+  const reflectionGain = activateValue * actor.skillMasteryLevel(reflectionSkillId) * reflectionSkillRank;
+  $gameVariables.setValue(reflectionVarId, $gameVariables.value(reflectionVarId) + reflectionGain);
+
+  appendActivatedMessage(entry, `(+${reflectionGain})`);
+}
+
+// ProstitutionMoneyUp: multiplies the prostitution income.
+function applyProstitutionMoneyUp(entry, entryMeta) {
+  const prostitutionMoney = $gameVariables.value(VAR_HSTATE_PROSTITUTION_MONEY);
+  if (prostitutionMoney < 1) return;
+
+  const prostitutionMoneyRate = Number(entryMeta['ProstitutionMoneyUp']);
+  $gameVariables.setValue(VAR_HSTATE_PROSTITUTION_MONEY, prostitutionMoney * prostitutionMoneyRate);
+
+  appendActivatedMessage(entry, `(×${prostitutionMoneyRate}\\G)`);
+}
+
+const H_ACTIVATED_WORD = `発動`;
+
+// Temporary copy of the prostitution income and the experience of the prostitute / slave jobs.
+const SUBCLASS_PROSTITUTE = 41;
+const SUBCLASS_SLAVE = 42;
+const PROSTITUTION_EXP_DIVISOR = 10;
+
+function grantProstitutionJobExp(actor) {
+  valueProstitutionMoney = $gameVariables.value(VAR_HSTATE_PROSTITUTION_MONEY);
+
+  if (valueProstitutionMoney >= 1 && actor.subclass() && actor._subclassId == SUBCLASS_PROSTITUTE) {
+    const jobExp = Math.ceil(valueProstitutionMoney / PROSTITUTION_EXP_DIVISOR);
+    actor.gainExpSubclass(jobExp);
+    appendJobExpMessage(SUBCLASS_PROSTITUTE, jobExp);
+  };
+
+  if (actor.subclass() && actor._subclassId == SUBCLASS_SLAVE) {
+    const slaveExp = sumPendingHStateVariables();
+    actor.gainExpSubclass(Math.ceil(slaveExp));
+    appendJobExpMessage(SUBCLASS_SLAVE, Math.ceil(slaveExp));
+  };
+}
+
+// Icon that closes the job experience line.
+const EXP_ICON_MARKER = `\\I[12]`;
+
+// Sums the gains of this call stored in 401-440 (experience of the slave job).
+function sumPendingHStateVariables() {
+  let total = 0;
+  for (let varId = VAR_HSTATE_PENDING_FIRST; varId <= VAR_HSTATE_PENDING_LAST; varId++) {
+    if ($gameVariables.value(varId) >= 1) {
+      total += $gameVariables.value(varId);
+    };
+  };
+  return total;
+}
+
+function appendJobExpMessage(subclassId, jobExp) {
+  const jobMarker = `\x1bJ[${subclassId}]`;
+  const jobLabel = colorTaggedText(27, `[${jobMarker}]`);
+  const expText = colorTaggedText(31, `${jobExp}`);
+  // The icon marker is appended outside the translatable text.
+  appendHStateMessage(`ジョブ:${jobLabel}に${expText}expを取得` + EXP_ICON_MARKER + '\n', 3);
+}
+
+//---------------------------------------------------------------------------
+// Libido cap enforcement / suppression display
+//---------------------------------------------------------------------------
+
+// Libido cap handling; the gain is discarded once the cap is reached.
 seiyoku_genkai = function () {
 
   seiyoku_jougenn();
-  //var actor = $gameActors.actor($gameVariables.value(20));
-  if ($gameVariables.value(401) + $gameVariables.value($gameVariables.value(20) + 380)[1] >= $gameVariables.value($gameVariables.value(20) + 380)[0] && $gameVariables.value($gameVariables.value(20) + 380)[0] >= 1) {
-    if ($gameSwitches.value(475)) {
-      TickerManager.show(`性欲度上限のため、性欲度上昇が抑制された。`);
-    } else {
-      $gameVariables.setValue(506, $gameVariables.value(506) + `\n性欲度上限のため、性欲度上昇が抑制された。`);
-    };
-    $gameVariables.value($gameVariables.value(20) + 380)[1] = $gameVariables.value($gameVariables.value(20) + 380)[0];
-    $gameVariables.setValue(401, 0);
+
+  const actorId = $gameVariables.value(VAR_CURRENT_ACTOR_ID);
+  const hStateValues = readHStateValues(actorId);
+  const libidoGain = $gameVariables.value(VAR_HSTATE_PENDING_FIRST);
+
+  if (isLibidoCapped(libidoGain, hStateValues)) {
+    notifyLibidoSuppressed();
+    hStateValues[HSTATE_INDEX_AROUSAL] = hStateValues[HSTATE_INDEX_AROUSAL_CAP];
+    $gameVariables.setValue(VAR_HSTATE_PENDING_FIRST, 0);
   };
-  if ($gameVariables.value(402) >= 100) {
-    $gameVariables.value($gameVariables.value(20) + 380)[2] = 100;
-    $gameVariables.setValue(402, 0);
+
+  if ($gameVariables.value(VAR_HSTATE_AROUSAL) >= 100) {
+    hStateValues[HSTATE_INDEX_ESTRUS] = 100;
+    $gameVariables.setValue(VAR_HSTATE_AROUSAL, 0);
   };
 
 };
 
-//☆☆性欲度以外のランク制限を実施
+// Whether the libido value after the gain reaches the cap.
+function isLibidoCapped(libidoGain, hStateValues) {
+  const libidoAfterGain = libidoGain + hStateValues[HSTATE_INDEX_AROUSAL];
+  const arousalCap = hStateValues[HSTATE_INDEX_AROUSAL_CAP];
+  return libidoAfterGain >= arousalCap && arousalCap >= 1;
+}
+
+// Cap message (ticker or message window).
+function notifyLibidoSuppressed() {
+  const suppressedMessage = `性欲度上限のため、性欲度上昇が抑制された。`;
+  if ($gameSwitches.value(SW_TICKER_MESSAGE)) {
+    TickerManager.show(suppressedMessage);
+    return;
+  };
+  appendMessageStack(`\n${suppressedMessage}`);
+}
+
+// Target, threshold and message prefix of one suppression skill; null when it does not apply.
+function readSuppressionEntry(actor, suppressionSkillId) {
+  if (!actor.isLearnedSkill(suppressionSkillId)) return null;
+
+  const suppressionSkill = $dataSkills[suppressionSkillId];
+  if (actor.isLearnedSkill(Number(suppressionSkill.meta['Hide if Learned Skill']))) return null;
+
+  const suppressionParams = suppressionSkill.meta['HstaSuppression'].split(',');
+  return {
+    target: Number(suppressionParams[0]),
+    param: Number(suppressionParams[1]),
+    note: '\n' + suppressionSkill.name + `の影響により`
+  };
+}
+
+// Rank limits of the values other than libido.
 hstates_rankSeigen = function () {
 
-  var actor = $gameActors.actor($gameVariables.value(20));
-  var value6 = `　`;
-  var list = valueHstaSuppression;
-  list.forEach(function (id) {
-    if (actor.isLearnedSkill(id) && !actor.isLearnedSkill(Number($dataSkills[id].meta['Hide if Learned Skill']))) {
-      var value5 = 0;
-      var value1 = Number($dataSkills[id].meta['HstaSuppression'].split(',')[0]);
-      var value2 = Number($dataSkills[id].meta['HstaSuppression'].split(',')[1]);
-      var value4 = `\n${$dataSkills[id].name}の影響により`;
-      if (value1 == 0) {
-        for (var value1 = 431; value1 <= 439; value1++) {
-          if ($gameVariables.value(value1) >= 1 && actor.skillMasteryLevel(value1 - 380) == value2) {
-            var value3 = $gameVariables.value(value1) + $gameVariables.value($gameVariables.value(20) + 380)[value1 - 400];
-            if (value3 >= actor.skillMasteryUsageMax(value1 - 380)) {
-              $gameVariables.setValue(value1, 0);
-              value6 += `\\C[1][${$dataSkills[value1 - 380].name}]\\C[0]`;
-              value5 += 1;
-            };
-          };
-        };
-        if (value5 >= 1) {
-          var value7 = `上昇抑制`;
-          if ($gameSwitches.value(122)) {
-            TickerManager.show(value4 + value6 + value7);
-          } else {
-            $gameVariables.setValue(506, $gameVariables.value(506) + value4 + value6 + value7);
-          };
-        };
-      } else {
-        if ($gameVariables.value(value1) >= 1 && actor.skillMasteryLevel(value1 - 380) == value2) {
-          var value3 = $gameVariables.value(value1) + $gameVariables.value($gameVariables.value(20) + 380)[value1 - 400];
-          if (value3 >= actor.skillMasteryUsageMax(value1 - 380)) {
-            $gameVariables.setValue(value1, 0);
-            value6 += `\\C[1][${$dataSkills[value1 - 380].name}]\\C[0]`;
-            value5 += 1;
-          };
-          if (value5 >= 1) {
-            var value7 = `上昇抑制`;
-            if ($gameSwitches.value(122)) {
-              TickerManager.show(value4 + value6 + value7);
-            } else {
-              $gameVariables.setValue(506, $gameVariables.value(506) + value4 + value6 + value7);
-            };
-          };
-        };
-      };
-    };
-  }, this);
+  const { actorId, actor } = readCurrentActor();
+  if (!actor) return;
+
+  const hStateValues = readHStateValues(actorId);
+  let suppressionResult = `　`;
+
+  for (const suppressionSkillId of valueHstaSuppression) {
+    const suppressionEntry = readSuppressionEntry(actor, suppressionSkillId);
+    if (!suppressionEntry) continue;
+
+    const limitedCount = applyRankSuppression(actor, hStateValues, suppressionEntry.target,
+      suppressionEntry.param, (limitedSkillId) => {
+        const limitedSkillName = $dataSkills[limitedSkillId].name;
+        suppressionResult += colorTaggedText(1, `[${limitedSkillName}]`);
+      });
+    if (limitedCount < 1) continue;
+
+    notifyRankSuppressed(suppressionEntry.note + suppressionResult + RANK_SUPPRESSION_SUFFIX);
+  };
 
 };
 
-//☆☆性欲上昇簡易表示
+// Target 0 checks the development values 431-439 as a whole; returns how many were limited.
+function applyRankSuppression(actor, hStateValues, suppressionTarget, suppressionParam, onLimited) {
+  // The 431-439 case (development values as a whole) versus a single value
+  const targetVarIds = suppressionTarget == 0
+    ? VAR_SUPPRESSION_TARGET_IDS
+    : [suppressionTarget];
+  let limitedCount = 0;
+
+  for (const targetVarId of targetVarIds) {
+    if (!($gameVariables.value(targetVarId) >= 1)) continue;
+    if (actor.skillMasteryLevel(targetVarId - HSTATE_ARRAY_VAR_OFFSET) != suppressionParam) continue;
+
+    const usageTotal = $gameVariables.value(targetVarId) + hStateValues[targetVarId - VAR_HSTATE_PENDING_FIRST];
+    if (!(usageTotal >= actor.skillMasteryUsageMax(targetVarId - HSTATE_ARRAY_VAR_OFFSET))) continue;
+
+    $gameVariables.setValue(targetVarId, 0);
+    onLimited(targetVarId - HSTATE_ARRAY_VAR_OFFSET);
+    limitedCount += 1;
+  };
+  return limitedCount;
+}
+
+function notifyRankSuppressed(suppressionMessage) {
+  if ($gameSwitches.value(SW_H_SCENE_SIMPLE)) {
+    TickerManager.show(suppressionMessage);
+    return;
+  };
+  appendMessageStack(suppressionMessage);
+}
+
+// Compact libido gain display.
+// Adds every changed H state of this call to the accumulated display text.
+function appendLibidoStatLines(actor, hStateValues) {
+  for (let statVarId = VAR_HSTATE_PENDING_FIRST; statVarId <= VAR_HSTATE_PENDING_LAST; statVarId++) {
+    const statLine = buildLibidoStatLine(actor, hStateValues, statVarId);
+    if (statLine === null) continue;
+    valueWordSet0 += statLine;
+  };
+}
+
 seiyoku_kanniHyouji = function () {
 
-  if (!$gameSwitches.value(475)) {
-    valueWordSet0 = `${$gameVariables.value(506)}\n`;
+  const useTicker = $gameSwitches.value(SW_TICKER_MESSAGE);
+  if (!useTicker) {
+    const stackedMessageText = $gameVariables.value(VAR_MESSAGE_STACK);
+    valueWordSet0 = stackedMessageText + '\n';
   };
-  var actor = $gameActors.actor($gameVariables.value(20));
-  var start = 401; var end = 440;
-  for (var i = start; i <= end; i++) {
-    var value4 = 0;
-    if (i != 405) {
-      if (!$gameVariables.value(i) == 0) {
-        if (i >= 401 && i <= 430) {
-          var value2 = $gameVariables.value($gameVariables.value(20) + 380)[i - 400];
-        } else {
-          var value2 = actor.skillMasteryUses(i - 380);
-          if (!actor.isLearnedSkill(i - 380)) { var value4 = 1 };
-        };
-        if (value4 == 0) {
-          var value3 = $dataSystem.variables[i];
-          var value3 = value3.replace("　", "");
-          var value3 = value3.replace("　", "");
-          var value3 = value3.replace("　", "");
-          var value3 = value3.replace(" ", "");
-          var value3 = value3.replace(":", "");
-          if ($gameVariables.value(i) >= 1) {
-            valueWordSet0 += `${actor.name()}の${value3}\\C[2]+${$gameVariables.value(i)}！\\C[0](${value2 + $gameVariables.value(i)})\n`;
-          } else {
-            valueWordSet0 += `${actor.name()}の${value3}\\C[1]${$gameVariables.value(i)}！\\C[0](${value2 + $gameVariables.value(i)})\n`;
-          };
-          if ($gameSwitches.value(475)) {
-            TickerManager.show(valueWordSet0);
-          };
-        };
-      }
-    }
+
+  const { actorId, actor } = readCurrentActor();
+  if (!actor) return;
+
+  appendLibidoStatLines(actor, readHStateValues(actorId));
+
+  // CHANGED: the original called TickerManager.show inside the loop every time (only the
+  //          last call was visible), so the text is now shown once after it is final.
+  if (useTicker) {
+    TickerManager.show(valueWordSet0);
+  } else {
+    outputLibidoStatSummary();
   };
-  if (!$gameSwitches.value(475)) {
-    if ($gameSwitches.value(154)) {
-      $gameVariables.setValue(539, `${valueWordSet0}\n`);
-      $gameVariables.setValue(540, $gameVariables.value(540) + 1);
-    } else {
-      $gameScreen.setDTextPicture(valueWordSet0, 28);
-    };
-  };
-  $gameSwitches.setValue(122, false);
+  $gameSwitches.setValue(SW_H_SCENE_SIMPLE, false);
 
 };
 
-//☆☆性欲度補正
-seiyoku_hosei = function () {
-  const actorId = $gameVariables.value(20);
-  const actor = $gameActors.actor(actorId);
+// Current total of a stat: the 401-440 block reads the H state array, the rest the skill masteries.
+function readStatDisplayValue(actor, hStateValues, statVarId) {
+  if (statVarId >= VAR_HSTATE_PENDING_FIRST && statVarId <= VAR_SUPPRESSION_TARGET_LAST) {
+    return hStateValues[statVarId - VAR_HSTATE_ECSTASY_BASE];
+  };
 
-  //現在。限界露出度設定
+  const statSkillId = statVarId - HSTATE_ARRAY_VAR_OFFSET;
+  if (!actor.isLearnedSkill(statSkillId)) return null;
+  return actor.skillMasteryUses(statSkillId);
+}
+
+// The gain as a coloured "+n！" (red) or "-n！" (blue) fragment.
+function buildStatGainText(statValue) {
+  const statGainSign = statValue >= 1 ? '+' : '';
+  return colorTaggedText(statValue >= 1 ? 2 : 1, `${statGainSign}${statValue}！`);
+}
+
+// One libido gain display line; null when the value is skipped or did not rise.
+function buildLibidoStatLine(actor, hStateValues, statVarId) {
+  if (statVarId == VAR_HSTATE_EXPOSURE_LIMIT) return null;// 405 is never displayed
+
+  const statValue = $gameVariables.value(statVarId);
+  if (statValue == 0) return null;
+
+  const statDisplayValue = readStatDisplayValue(actor, hStateValues, statVarId);
+  if (statDisplayValue === null) return null;
+
+  const statName = cleanVariableLabel($dataSystem.variables[statVarId]);
+  const statGainText = buildStatGainText(statValue);
+  const statTotalValue = statDisplayValue + statValue;
+  const actorName = actor.name();
+  return `${actorName}: ${statName}${statGainText}(${statTotalValue})` + '\n';
+}
+
+// Output of the compact display (accumulated text or DTextPicture).
+function outputLibidoStatSummary() {
+  if (stackMessageForDisplay(valueWordSet0)) return;
+
+  $gameScreen.setDTextPicture(valueWordSet0, 28);
+}
+
+// Libido bonuses.
+seiyoku_hosei = function () {
+
+  const { actorId, actor } = readCurrentActor();
+  if (!actor) return;
+
+  // Current value; sets the exposure limit
   rosyutu_genkai1(actor);
   rosyutu_genzai1(actor.actorId());
 
-  //発情値を設定
-  $gameVariables.setValue(402, $gameVariables.value(401));
+  // sets the arousal value
+  $gameVariables.setValue(VAR_HSTATE_AROUSAL, $gameVariables.value(VAR_HSTATE_PENDING_FIRST));
 
-  //初体験時の相手をＨステ配列41に記録
-  const initialExperienceIndex = 6;
-  const recordPartnerIndex = 41;
-  if ($gameVariables.value(actorId + 380)[initialExperienceIndex] == 0 && $gameVariables.value(400 + initialExperienceIndex) >= 1) {
-    $gameVariables.value(actorId + 380)[recordPartnerIndex] = $gameVariables.value(22);
+  // records the first partner in H state array 41
+  recordInitialExperiencePartner(actorId);
+
+  // counts a monster encounter when the partner is a monster
+  recordMonsterPartnerCount();
+
+  // when a head count is given it sits in 339, so it is added to the partner count
+  // suppresses the partner count gain for the same person
+  recordDistinctPartnerCount(actorId);
+
+  // records the H count with every partner
+  recordPartnerHCount(actorId);
+
+  // creampie decision
+  rollInternalEjaculation(actor);
+
+  // group rape from two partners upwards
+  if ($gameVariables.value(VAR_GROUP_H_COUNT) >= 2) {
+    $gameVariables.setValue(VAR_HSTATE_PENDING_GROUP_RAPE, 1);
   };
 
-  //相手が魔物場合に魔物姦回数+1.事前に数字が入っている場合は無視。
-  if ($gameVariables.value(420) == 0) {
-    if ($dataWeapons[$gameVariables.value(340)].meta['monster']) {
-      $gameVariables.setValue(420, 1);
-    };
-  };
-
-  //人数が指定されている場合、339に数が格納されているので経験人数に反映
-  //同一人物の場合に経験人数上昇を抑制
-  const partyMemberIndex = $gameVariables.value(340) - 300;
-  if ($gameVariables.value(actorId + 360)[partyMemberIndex] == 0) {
-    const experienceCountId = 9;
-    $gameVariables.setValue(400 + experienceCountId, $gameVariables.value(400 + experienceCountId) + $gameVariables.value(339));
-  };
-
-  //各相手とのＨ回数を記録。
-  const hCountIndex1 = 6;
-  const hCountIndex2 = 7;
-  const hCountIndex3 = 8;
-  if ($gameVariables.value(400 + hCountIndex1) >= 1 ||
-    $gameVariables.value(400 + hCountIndex2) >= 1 ||
-    $gameVariables.value(400 + hCountIndex3) >= 1) {
-    const partyMemberHIndex = $gameVariables.value(340) - 300;
-    $gameVariables.value(actorId + 360)[partyMemberHIndex] += 1;
-  };
-
-  //膣姦の時に中だしか否か。膣射回数に数字を入れている場合はその数字をそのまま採用。
-  const vaginalHCount = $gameVariables.value(406);
-  const vaginalCounterVar = 411;
-  let computedVaginalInternal = 0;
-  if (vaginalHCount >= 1 && $gameVariables.value(vaginalCounterVar) == 0) {
-    for (let vaginalIteration = 1; vaginalIteration <= vaginalHCount; vaginalIteration++) {
-      const coinFlipArray = [1, 0, 1, 0, 1, 1];
-      const coinFlipResult = coinFlipArray[getRandomIndex(coinFlipArray.length)];
-      if (coinFlipResult == 1) {
-        computedVaginalInternal += 1;
-      };
-    };
-    if (actor.battleSkillsRaw().includes(871) || actor.isStateAffected(73)) {
-      computedVaginalInternal = vaginalHCount;
-    };
-    if (actor.battleSkillsRaw().includes(872) || actor.isStateAffected(74)) {
-      computedVaginalInternal = 0;
-    };
-    if (computedVaginalInternal >= 1) {
-      $gameVariables.setValue(vaginalCounterVar, $gameVariables.value(vaginalCounterVar) + computedVaginalInternal);
-    };
-  };
-
-  const actorBattleSkillRaw = actor.battleSkillsRaw();
-
-  //尻姦の時に中だしか否か
-  const analHCount = $gameVariables.value(407);
-  const analCounterVar = 412;
-  let computedAnalInternal = 0;
-  if (analHCount >= 1 && $gameVariables.value(analCounterVar) == 0) {
-    for (let analIteration = 1; analIteration <= analHCount; analIteration++) {
-      const coinFlipArray = [1, 0, 1, 0, 1, 1];
-      const coinFlipResult = coinFlipArray[getRandomIndex(coinFlipArray.length)];
-      if (coinFlipResult == 1) {
-        computedAnalInternal += 1;
-      };
-    };
-    if (actorBattleSkillRaw.includes(871) || actor.isStateAffected(73)) {
-      computedAnalInternal = analHCount;
-    };
-    if (actorBattleSkillRaw.includes(872) || actor.isStateAffected(74)) {
-      computedAnalInternal = 0;
-    };
-    if (computedAnalInternal >= 1) {
-      $gameVariables.setValue(analCounterVar, $gameVariables.value(analCounterVar) + computedAnalInternal);
-    };
-  };
-  //フェラの時に中だしか否か
-  const fellationCount = $gameVariables.value(408);
-  const fellationCounterVar = 416;
-  let computedFellationInternal = 0;
-  if (fellationCount >= 1 && $gameVariables.value(fellationCounterVar) == 0) {
-    for (let fellationIteration = 1; fellationIteration <= fellationCount; fellationIteration++) {
-      const coinFlipArray = [1, 0, 1, 0, 1, 1];
-      const coinFlipResult = coinFlipArray[getRandomIndex(coinFlipArray.length)];
-      if (coinFlipResult == 1) {
-        computedFellationInternal += 1;
-      };
-    };
-    if (actorBattleSkillRaw.includes(871) || actor.isStateAffected(73)) {
-      computedFellationInternal = fellationCount;
-    };
-    if (actorBattleSkillRaw.includes(872) || actor.isStateAffected(74)) {
-      computedFellationInternal = 0;
-    };
-    if (computedFellationInternal >= 1) {
-      $gameVariables.setValue(fellationCounterVar, $gameVariables.value(fellationCounterVar) + computedFellationInternal);
-    };
-  };
-  //経験人数二人以上で輪姦
-  const experienceThresholdVar = 409;
-  const groupRapeVar = 419;
-  if ($gameVariables.value(experienceThresholdVar) >= 2) {
-    $gameVariables.setValue(groupRapeVar, 1);
-  };
-
-  //受精するかどうか
+  // fertilisation check
   jusei_keisan();
 
-  //回数に応じて各開発度に＋
-  const developmentSourceVars = [406, 407, 408, 410, 408, 408, 411, 412, 416, 413, 421, 426, 414];
-  const developmentTargetVars = [431, 432, 433, 435, 438, 437, 436, 436, 436, 434, 434, 439, 434];
-  const devStartIdx = 0;
-  const devEndIdx = 12; //配列の数に応じて変更
-  let reproductionAmplificationFlag = 0;
-  for (let devIndex = devStartIdx; devIndex <= devEndIdx; devIndex++) {
-    if ($gameVariables.value(developmentSourceVars[devIndex]) >= 1) {
-      let baseDevelopmentValue = $gameVariables.value(developmentSourceVars[devIndex]);
-      if (actor.elementRate(37) >= 1.1) {
-        baseDevelopmentValue = $gameVariables.value(developmentSourceVars[devIndex]) + Math.round(actor.elementRate(37));
-        reproductionAmplificationFlag = 1;
-      };
-      $gameVariables.setValue(developmentTargetVars[devIndex], $gameVariables.value(developmentTargetVars[devIndex]) + baseDevelopmentValue);
-    };
-  };
-  if (reproductionAmplificationFlag == 1) {
-    const reproductionMessage = `\\C[27]<Reproduction>\\C[0]補正。各開発度/経験度加算値に\\C[27]+${Math.round(actor.elementRate(37))}\\C[0]\n`;
-    eval("valueWordSet" + valueCountSet2 + " += reproductionMessage");
-    valueCountSet1 += 1;
-    if ((valueCountSet1 % 3) == 0) {
-      valueCountSet2 += 1;
-      const passiveMessage = `\\C[10]H-Passive[${valueCountSet2}]\\C[0]\n`;
-      eval("valueWordSet" + valueCountSet2 + " = passiveMessage");
-    };
-  };
-  //ステート精液の付与
-  const vaginalStateCheck = 411;
-  if ($gameVariables.value(vaginalStateCheck) >= 1) { actor.addState(84); }
-  const fellationStateCheck = 408;
-  if ($gameVariables.value(fellationStateCheck) >= 1) { actor.addState(85); }
-  const groupRapeStateCheck = 419;
-  if ($gameVariables.value(groupRapeStateCheck) >= 1) { actor.addState(86); }
-  //各開発度のランクに応じて回数上昇の時に開発度に補正
-  const devSourceArray = [406, 407, 408, 410, 411, 412, 413, 413, 418, 419, 420];
-  const devSkillIndices = [51, 52, 53, 55, 56, 56, 51, 52, 54, 54, 54];
-  const devTargetArray = [434, 434, 434, 434, 434, 434, 431, 432, 434, 434, 434];
-  const devSkillThresholds = [2, 3, 3, 2, 3, 4, 2, 4, 4, 5, 5];
-  const devStartIdx2 = 0;
-  const devEndIdx2 = 10;
-  for (let j = devStartIdx2; j <= devEndIdx2; j++) {
-    if (actor.skillMasteryLevel(devSkillIndices[j]) >= Number(devSkillThresholds[j]) && $gameVariables.value(devSourceArray[j]) >= 1) {
-      const developmentAdjustment = $gameVariables.value(devSourceArray[j]) * actor.skillMasteryLevel(devSkillIndices[j]);
-      $gameVariables.setValue(devTargetArray[j], $gameVariables.value(devTargetArray[j]) + developmentAdjustment);
-    };
-  };
-  //開発度ランクに応じて回数上昇の時に乗算。スキル51-59。最後に実行
-  const multiplyStartIdx = 1;
-  const multiplyEndIdx = 9;
-  for (let k = multiplyStartIdx; k <= multiplyEndIdx; k++) {
-    if (actor.skillMasteryLevel(k + 50) >= 1 && $gameVariables.value(k + 430) >= 2) {
-      const multipliedValue = $gameVariables.value(k + 430) * actor.skillMasteryLevel(k + 50);
-      $gameVariables.setValue(k + 430, multipliedValue);
-    };
-  };
-  //発情値を性感開発値で増幅
-  if (actor.skillMasteryLevel(54) >= 1 && $gameVariables.value(402) >= 1) {
-    const passionAmplification = $gameVariables.value(402) * actor.skillMasteryLevel(54);
-    $gameVariables.setValue(402, $gameVariables.value(402) + passionAmplification);
-  };
-  //発情値100で絶頂回数+
-  if ($gameVariables.value(402) >= 100) {
-    $gameVariables.setValue(414, $gameVariables.value(414) + 1);
-    if (actor.isLearnedSkill(65)) {//スケベっこ以上で膣アナルフェラ回数に応じて絶頂回数+
-      let aggregateHCount = $gameVariables.value(406);
-      aggregateHCount += $gameVariables.value(407);
-      aggregateHCount += $gameVariables.value(408);
-      const extraClimax = getRandomIndex(aggregateHCount); // maybe in the value below mast be append the extraClimax value instead of aggregateHCount
-      $gameVariables.setValue(414, $gameVariables.value(414) + aggregateHCount);
-    };
-  };
-  //性感開発度に応じて絶頂時に潮吹きと失禁回数+
-  if (actor.skillMasteryLevel(54) >= 3) {
-    if ($gameVariables.value(414) >= 1) {
-      {
-        let randomClimaxModifier = getRandomIndex(101);
-        randomClimaxModifier = randomClimaxModifier + (actor.skillMasteryLevel(54) * 10);
-        if (randomClimaxModifier >= 80) {
-          $gameVariables.setValue(425, $gameVariables.value(425) + 1);
-        };
-      }
-      {
-        let randomClimaxModifier = getRandomIndex(101);
-        randomClimaxModifier = randomClimaxModifier + (actor.skillMasteryLevel(54) * 10);
-        if (randomClimaxModifier >= 110) {
-          $gameVariables.setValue(424, $gameVariables.value(424) + 1);
-        };
-      }
-    };
+  // adds to each development value according to the count
+  const reproductionRate = applyDevelopmentTable(actor);
+  if (reproductionRate >= 1.1) {
+    notifyReproductionBonus(reproductionRate);
   };
 
+  applyBodyFluidStates(actor);
+  applyDevelopmentRankBonus(actor);
+  applyDevelopmentRankMultiplier(actor);
+  applyEstrusAmplification(actor);
+  applyClimaxCountIncrements(actor);
 };
 
-//☆☆性欲度情報を更新
+// Records the first partner in H state array 41.
+function recordInitialExperiencePartner(actorId) {
+  const hStateValues = readHStateValues(actorId);
+  const sexCount = hStateValues[HSTATE_INDEX_SEX_COUNT];
+  if (sexCount != 0) return;
+  if (!($gameVariables.value(VAR_HSTATE_ECSTASY_BASE + HSTATE_INDEX_SEX_COUNT) >= 1)) return;
+
+  hStateValues[HSTATE_INDEX_FIRST_PARTNER] = $gameVariables.value(VAR_PARTNER_NAME);
+}
+
+// Counts a monster encounter when the partner is a monster; an already present number is kept.
+function recordMonsterPartnerCount() {
+  if ($gameVariables.value(VAR_HSTATE_PENDING_MONSTER_H) != 0) return;
+
+  const partnerWeapon = $dataWeapons[$gameVariables.value(VAR_PARTNER_WEAPON_ID)];
+  // BUGFIX: crashed when the partner weapon id was 0 or out of range.
+  if (!partnerWeapon) return;
+  if (!partnerWeapon.meta['monster']) return;
+
+  $gameVariables.setValue(VAR_HSTATE_PENDING_MONSTER_H, 1);
+}
+
+// Adds the given head count to the partner count (suppressed for the same person).
+function recordDistinctPartnerCount(actorId) {
+  const partnerHRecords = readPartnerRecords(actorId);
+  const partnerRecordIndex = $gameVariables.value(VAR_PARTNER_WEAPON_ID) - 300;
+  if (partnerHRecords[partnerRecordIndex] != 0) return;
+
+  $gameVariables.setValue(VAR_HSTATE_PENDING_DISTINCT_PARTNERS,
+    $gameVariables.value(VAR_HSTATE_PENDING_DISTINCT_PARTNERS) + $gameVariables.value(VAR_LAST_H_COUNT));
+}
+
+// Records the H count with every partner.
+function recordPartnerHCount(actorId) {
+  const hasAnyHCount = $gameVariables.value(VAR_H_VAGINAL_COUNT) >= 1
+    || $gameVariables.value(VAR_H_ANAL_COUNT) >= 1
+    || $gameVariables.value(VAR_H_FELLATION_COUNT) >= 1;
+  if (!hasAnyHCount) return;
+
+  readPartnerRecords(actorId)[$gameVariables.value(VAR_PARTNER_WEAPON_ID) - 300] += 1;
+}
+
+// Creampie decision; a coin toss decides and skills / states may override it.
+function rollInternalEjaculation(actor) {
+  const actorBattleSkills = actor.battleSkillsRaw();
+  // Skill 871 / state 73 always finish inside, skill 872 / state 74 never do (the latter wins).
+  const forceAllInternal = actorBattleSkills.includes(871) || actor.isStateAffected(73);
+  const forceNoneInternal = actorBattleSkills.includes(872) || actor.isStateAffected(74);
+  const rollInternalCount = (hCount) => countInternalRounds(hCount, forceAllInternal, forceNoneInternal);
+
+  // Whether vaginal, anal or oral finished inside; an existing number in the target variable wins.
+  for (const internalSlot of INTERNAL_COUNT_SLOTS) {
+    recordInternalCountFor(internalSlot.countVarId, internalSlot.pendingVarId, rollInternalCount);
+  }
+}
+
+// The three target variables of the internal rolls, in the order the original rolled them.
+const INTERNAL_COUNT_SLOTS = [
+  { countVarId: VAR_H_VAGINAL_COUNT, pendingVarId: VAR_HSTATE_PENDING_VAGINAL_INTERNAL },
+  { countVarId: VAR_H_ANAL_COUNT, pendingVarId: VAR_HSTATE_PENDING_ANAL_INTERNAL },
+  { countVarId: VAR_H_FELLATION_COUNT, pendingVarId: VAR_HSTATE_PENDING_FELLATION_INTERNAL }
+];
+
+// Number of rounds that finished inside; every coin is flipped so the random sequence stays the same.
+function countInternalRounds(hCount, forceAllInternal, forceNoneInternal) {
+  let internalCount = 0;
+  for (let round = 1; round <= hCount; round++) {
+    if (COIN_FLIP_VALUES[getRandomIndex(COIN_FLIP_VALUES.length)] == 1) internalCount += 1;
+  };
+
+  if (forceNoneInternal) return 0;
+  if (forceAllInternal) return hCount;
+  return internalCount;
+}
+
+// Records the internal count of one body part.
+function recordInternalCountFor(hCountVarId, internalVarId, rollInternalCount) {
+  const hCount = $gameVariables.value(hCountVarId);
+  if (!(hCount >= 1)) return;
+  if ($gameVariables.value(internalVarId) != 0) return;
+
+  const computedInternal = rollInternalCount(hCount);
+  if (!(computedInternal >= 1)) return;
+
+  $gameVariables.setValue(internalVarId, $gameVariables.value(internalVarId) + computedInternal);
+}
+
+// Count to development value table (the order of the original is kept).
+const DEVELOPMENT_SOURCE_VARS = [406, 407, 408, 410, 408, 408, 411, 412, 416, 413, 421, 426, 414];
+const DEVELOPMENT_TARGET_VARS = [431, 432, 433, 435, 438, 437, 436, 436, 436, 434, 434, 439, 434];
+
+function applyDevelopmentTable(actor) {
+  const reproductionRate = actor.elementRate(ELEMENT_REPRODUCTION);
+  const amplified = reproductionRate >= 1.1;
+
+  for (let devIndex = 0; devIndex < DEVELOPMENT_SOURCE_VARS.length; devIndex++) {
+    const sourceValue = $gameVariables.value(DEVELOPMENT_SOURCE_VARS[devIndex]);
+    if (sourceValue < 1) continue;
+
+    const baseDevelopmentValue = amplified ? sourceValue + Math.round(reproductionRate) : sourceValue;
+    const targetVarId = DEVELOPMENT_TARGET_VARS[devIndex];
+    $gameVariables.setValue(targetVarId, $gameVariables.value(targetVarId) + baseDevelopmentValue);
+  };
+  return reproductionRate;
+}
+
+function notifyReproductionBonus(reproductionRate) {
+  const reproductionLabel = colorTaggedText(27, '<Reproduction>');
+  const bonusPoints = '+' + Math.round(reproductionRate);
+  const bonusPtsLabel = colorTaggedText(27, bonusPoints);
+  appendHStateMessage(`${reproductionLabel}補正。各開発度/経験度加算値に${bonusPtsLabel}` + '\n', 3);
+}
+
+// Applies the semen state.
+const BODY_FLUID_STATE_SETTINGS = [
+  { pendingVarId: 411, stateId: 84 },
+  { pendingVarId: 408, stateId: 85 },
+  { pendingVarId: 419, stateId: 86 }
+];
+
+function applyBodyFluidStates(actor) {
+  for (const setting of BODY_FLUID_STATE_SETTINGS) {
+    if ($gameVariables.value(setting.pendingVarId) >= 1) actor.addState(setting.stateId);
+  };
+}
+
+// Adds a development bonus on a count gain according to the rank of each development value (skills 51-56).
+const DEV_RANK_BONUS_SETTINGS = [
+  { sourceVarId: 406, skillId: 51, targetVarId: 434, threshold: 2 },
+  { sourceVarId: 407, skillId: 52, targetVarId: 434, threshold: 3 },
+  { sourceVarId: 408, skillId: 53, targetVarId: 434, threshold: 3 },
+  { sourceVarId: 410, skillId: 55, targetVarId: 434, threshold: 2 },
+  { sourceVarId: 411, skillId: 56, targetVarId: 434, threshold: 3 },
+  { sourceVarId: 412, skillId: 56, targetVarId: 434, threshold: 4 },
+  { sourceVarId: 413, skillId: 51, targetVarId: 431, threshold: 2 },
+  { sourceVarId: 413, skillId: 52, targetVarId: 432, threshold: 4 },
+  { sourceVarId: 418, skillId: 54, targetVarId: 434, threshold: 4 },
+  { sourceVarId: 419, skillId: 54, targetVarId: 434, threshold: 5 },
+  { sourceVarId: 420, skillId: 54, targetVarId: 434, threshold: 5 }
+];
+
+function applyDevelopmentRankBonus(actor) {
+  for (const setting of DEV_RANK_BONUS_SETTINGS) {
+    const masteryLevel = actor.skillMasteryLevel(setting.skillId);
+    if (masteryLevel < setting.threshold) continue;
+
+    const sourceValue = $gameVariables.value(setting.sourceVarId);
+    if (sourceValue < 1) continue;
+
+    $gameVariables.setValue(setting.targetVarId,
+      $gameVariables.value(setting.targetVarId) + sourceValue * masteryLevel);
+  };
+}
+
+// Multiplies on a count gain according to the development rank (skills 51-59); runs last.
+function applyDevelopmentRankMultiplier(actor) {
+  for (let skillIndex = 1; skillIndex <= 9; skillIndex++) {
+    const masteryLevel = actor.skillMasteryLevel(skillIndex + 50);
+    if (masteryLevel < 1) continue;
+
+    const devVarId = skillIndex + VAR_HSTATE_PENDING_DEVELOPMENT_BASE;
+    const devValue = $gameVariables.value(devVarId);
+    if (devValue < 2) continue;
+
+    $gameVariables.setValue(devVarId, devValue * masteryLevel);
+  };
+}
+
+// Amplifies the arousal value with the sexual development value.
+function applyEstrusAmplification(actor) {
+  const sensualityLevel = actor.skillMasteryLevel(SKILL_H_SEXUAL_DEV);
+  if (sensualityLevel < 1) return;
+
+  const pendingEstrus = $gameVariables.value(VAR_HSTATE_AROUSAL);
+  if (!(pendingEstrus >= 1)) return;
+
+  $gameVariables.setValue(VAR_HSTATE_AROUSAL, pendingEstrus + pendingEstrus * sensualityLevel);
+}
+
+// At arousal 100 the climax count rises; squirting / incontinence follow the sexual development rank.
+function applyClimaxCountIncrements(actor) {
+  applyClimaxCounts(actor);
+  applyClimaxFluidChances(actor);
+}
+
+// Climax count of this call; from skebe-ko upwards it also follows the body part counts.
+function applyClimaxCounts(actor) {
+  if (!($gameVariables.value(VAR_HSTATE_AROUSAL) >= 100)) return;
+
+  addClimaxCount(VAR_H_CLIMAX_COUNT, 1);
+  if (!actor.isLearnedSkill(SKILL_H_SKILLED)) return;
+
+  // CHANGED: the original consumed an unused random number (getRandomIndex). The gain
+  //          is vaginal (406) + anal (407) + fellatio (408) as the comment above describes.
+  const aggregateHCount = $gameVariables.value(VAR_H_VAGINAL_COUNT)
+    + $gameVariables.value(VAR_H_ANAL_COUNT)
+    + $gameVariables.value(VAR_H_FELLATION_COUNT);
+  addClimaxCount(VAR_H_CLIMAX_COUNT, aggregateHCount);
+}
+
+// Squirting / incontinence rolls; both need a climax and rank 3 of the sexual development.
+function applyClimaxFluidChances(actor) {
+  const sensualityLevel = actor.skillMasteryLevel(SKILL_H_SEXUAL_DEV);
+  if (sensualityLevel < 3) return;
+  if (!($gameVariables.value(VAR_H_CLIMAX_COUNT) >= 1)) return;
+
+  const sensualityBonus = sensualityLevel * 10;
+  if (getRandomIndex(SQUIRT_ROLL_RANGE) + sensualityBonus >= SQUIRT_THRESHOLD) {
+    addClimaxCount(VAR_H_SQUIRT_COUNT, 1);
+  };
+  if (getRandomIndex(SQUIRT_ROLL_RANGE) + sensualityBonus >= INCONTINENCE_THRESHOLD) {
+    addClimaxCount(VAR_H_INCONTINENCE_COUNT, 1);
+  };
+}
+
+// Squirting / incontinence roll settings.
+const SQUIRT_ROLL_RANGE = 101;
+const SQUIRT_THRESHOLD = 80;
+const INCONTINENCE_THRESHOLD = 110;
+
+function addClimaxCount(climaxVarId, amount) {
+  $gameVariables.setValue(climaxVarId, $gameVariables.value(climaxVarId) + amount);
+}
+
+// Pays out the prostitution income accumulated during the scene.
+function grantProstitutionIncome() {
+  const prostitutionMoney = $gameVariables.value(VAR_HSTATE_PROSTITUTION_MONEY);
+  if (prostitutionMoney < 1) return;
+  $gameParty.gainGold(Math.ceil(prostitutionMoney));
+}
+
+// Refreshes the libido information.
 seiyoku_hanei = function () {
 
-  var actor = $gameActors.actor($gameVariables.value(20));
-  var start = 1; var end = 30;
-  for (var i = start; i <= end; i++) {
-    $gameVariables.value($gameVariables.value(20) + 380)[i] += $gameVariables.value(i + 400);
-    if ($gameVariables.value($gameVariables.value(20) + 380)[i] < 0) {
-      $gameVariables.value($gameVariables.value(20) + 380)[i] = 0;
-    };
-  };
-  if ([406, 407, 417, 418, 419, 420].some(function (id) { return $gameVariables.value(id) >= 1 })) {
-    $gameVariables.value($gameVariables.value(20) + 380)[61] += 1;
-  };
-  //売春時のゴールド獲得処理
-  if ($gameVariables.value(427) >= 1) {
-    $gameParty.gainGold(Math.ceil($gameVariables.value(427)));
-  };
-  //強姦時に当日強姦回数に+。戦闘中に放心付与
-  if ($gameVariables.value(418) >= 1) {
-    $gameVariables.value($gameVariables.value(20) + 380)[71] += 1;
-    if ($gameParty.inBattle() && !actor.battleSkillsRaw().includes(846)) {
-      actor.addState(64);
-    };
-  };
-  if (!actor.battleSkillsRaw().includes(867)) {
-    if (!$gameParty.inBattle() && $gameVariables.value(414) >= 1) {//絶頂で発情鎮静。戦闘中はコモン113で行う
-      var value1 = 0;
-      if (actor.isLearnedSkill(61)) { value1 += getRandomIndex(1) };
-      if (actor.isLearnedSkill(62)) { value1 += getRandomIndex(2) };
-      if (actor.isLearnedSkill(63)) { value1 += getRandomIndex(3) };
-      if (actor.isLearnedSkill(64)) { value1 += getRandomIndex(4) };
-      if (actor.isLearnedSkill(65)) { value1 += getRandomIndex(5) };
-      if (actor.isLearnedSkill(66)) { value1 += getRandomIndex(6) };
-      if (actor.isLearnedSkill(67)) { value1 += getRandomIndex(6) };
-      if (actor.isLearnedSkill(68)) { value1 += getRandomIndex(6) };
-      if (actor.isLearnedSkill(69)) { value1 += getRandomIndex(6) };
-      $gameVariables.value($gameVariables.value(20) + 380)[2] = value1;
-    };
-  };
-  if ($gameVariables.value($gameVariables.value(20) + 380)[2] >= 51) {
-    if (!actor.isStateAffected(61)) {
-      var value1 = `${actor.name()}は\\C[27]発情\\C[0]している…。`;
-      if ($gameSwitches.value(154)) {
-        $gameVariables.setValue(539, `${value1}\n`);
-        $gameVariables.setValue(540, $gameVariables.value(540) + 1);
-      } else {
-        TickerManager.show(value1);
-      };
-    };
-    actor.addState(61);
-  } else {
-    if (actor.isStateAffected(61)) {
-      var value1 = `${actor.name()}の\\C[27]発情\\C[0]が静まった…。`;
-      if ($gameSwitches.value(154)) {
-        $gameVariables.setValue(539, `${value1}\n`);
-        $gameVariables.setValue(540, $gameVariables.value(540) + 1);
-      } else {
-        TickerManager.show(value1);
-      };
-    };
-    actor.removeState(61);
+  const { actorId, actor } = readCurrentActor();
+  if (!actor) return;
+
+  const hStateValues = readHStateValues(actorId);
+  applyPendingToHStateValues(hStateValues);
+
+  if (hasAnyHCountToday()) {
+    hStateValues[HSTATE_INDEX_TODAY_COUNT] += 1;
   };
 
+  grantProstitutionIncome();
+
+  const battleSkills = actor.battleSkillsRaw();
+  applyRapeStateOnBattle(actor, hStateValues, battleSkills);
+  calmEstrusOutsideBattle(actor, hStateValues, battleSkills);
+  updateEstrusState(actor, hStateValues);
+
+  recordHSkillRankUps(actor);
+  writeBackHStateValues(hStateValues);
+};
+
+// Adds the 401-430 gains to H state array 1-30 (negative results stop at 0).
+function applyPendingToHStateValues(hStateValues) {
+  for (let index = 1; index <= 30; index++) {
+    hStateValues[index] += $gameVariables.value(index + VAR_HSTATE_ECSTASY_BASE);
+    if (hStateValues[index] < 0) {
+      hStateValues[index] = 0;
+    };
+  };
+}
+
+// Whether any of the daily H, rape or head count variables is set.
+const DAILY_H_COUNT_TRIGGER_VARS = [406, 407, 417, 418, 419, 420];
+
+function hasAnyHCountToday() {
+  return DAILY_H_COUNT_TRIGGER_VARS.some((varId) => $gameVariables.value(varId) >= 1);
+}
+
+// Raises the daily rape count; applies a daze state during battle.
+function applyRapeStateOnBattle(actor, hStateValues, battleSkills) {
+  if (!($gameVariables.value(VAR_HSTATE_PENDING_RAPE) >= 1)) return;
+
+  hStateValues[HSTATE_INDEX_RAPE_TODAY] += 1;
+  if ($gameParty.inBattle() && !battleSkills.includes(846)) {
+    actor.addState(64);
+  };
+}
+
+// Climax calms the estrus; handled by common event 113 during battle.
+function calmEstrusOutsideBattle(actor, hStateValues, battleSkills) {
+  if (battleSkills.includes(867)) return;
+  if ($gameParty.inBattle()) return;
+  if (!($gameVariables.value(VAR_H_CLIMAX_COUNT) >= 1)) return;
+
+  let calmValue = 0;
+  // the calming value rises with the learned skills 61-69
+  for (let skillIndex = 0; skillIndex < CALM_RANDOM_MAX_BY_SKILL.length; skillIndex++) {
+    if (!actor.isLearnedSkill(61 + skillIndex)) continue;
+    calmValue += getRandomIndex(CALM_RANDOM_MAX_BY_SKILL[skillIndex]);
+  };
+  hStateValues[HSTATE_INDEX_ESTRUS] = calmValue;
+}
+
+const CALM_RANDOM_MAX_BY_SKILL = [1, 2, 3, 4, 5, 6, 6, 6, 6];
+
+// Applies or removes the estrus state according to the arousal value (message only on a transition).
+function updateEstrusState(actor, hStateValues) {
+  if (hStateValues[HSTATE_INDEX_ESTRUS] >= ESTRUS_STATE_THRESHOLD) {
+    if (!actor.isStateAffected(STATE_ESTRUS)) notifyEstrusStarted(actor);
+    actor.addState(STATE_ESTRUS);
+    return;
+  };
+
+  if (actor.isStateAffected(STATE_ESTRUS)) notifyEstrusCalmed(actor);
+  actor.removeState(STATE_ESTRUS);
+}
+
+// Arousal value from which the estrus state is applied.
+const ESTRUS_STATE_THRESHOLD = 50 + 1;
+
+function notifyEstrusStarted(actor) {
+  const actorName = actor.name();
+  const estrusLabel = colorTaggedText(27, `発情`);
+  notifyEstrusChange(`${actorName}は${estrusLabel}している…。`);
+}
+
+function notifyEstrusCalmed(actor) {
+  const actorName = actor.name();
+  const estrusLabel = colorTaggedText(27, `発情`);
+  notifyEstrusChange(`${actorName}の${estrusLabel}が静まった…。`);
+}
+
+// Estrus messages; accumulated text or ticker.
+function notifyEstrusChange(estrusMessage) {
+  if (stackMessageForDisplay(estrusMessage)) return;
+
+  TickerManager.show(estrusMessage);
+}
+
+// Reflects the mastery gain of skills 51-59 and records the ones that ranked up.
+function recordHSkillRankUps(actor) {
   valueHskillLearnArr = [];
-  var start = 1; var end = 9;
-  for (var i = start; i <= end; i++) {
-    var value1 = actor.skillMasteryLevel(i + 50);
-    actor.gainSkillMasteryUses(i + 50, $gameVariables.value(i + 430));
-    var value2 = actor.skillMasteryLevel(i + 50);
-    if (value1 != value2 && value1 >= 1) {
-      valueHskillLearnArr.push(i + 50);
+  for (let skillId = SKILL_H_DEV_FIRST; skillId <= SKILL_H_DEV_LAST; skillId++) {
+    const masteryLevelBefore = actor.skillMasteryLevel(skillId);
+    actor.gainSkillMasteryUses(skillId, $gameVariables.value(skillId + HSTATE_ARRAY_VAR_OFFSET));
+    const masteryLevelAfter = actor.skillMasteryLevel(skillId);
+    if (masteryLevelBefore != masteryLevelAfter && masteryLevelBefore >= 1) {
+      valueHskillLearnArr.push(skillId);
     };
   };
-  var start = 1; var end = 30;
-  for (var i = start; i <= end; i++) {
-    $gameVariables.setValue(400 + i, $gameVariables.value($gameVariables.value(20) + 380)[i]);
+}
+
+// Writes H state array 1-30 back into variables 401-430.
+function writeBackHStateValues(hStateValues) {
+  for (let index = 1; index <= 30; index++) {
+    $gameVariables.setValue(VAR_HSTATE_ECSTASY_BASE + index, hStateValues[index]);
+  };
+}
+
+//---------------------------------------------------------------------------
+// Item / skill usage, daily fertility, history lists
+//---------------------------------------------------------------------------
+
+// Libido value update from a skill / item use: a,b,this.item().id,1
+const LIBIDO_USE_LIMIT_SKILL_DEFAULT = 18;
+const LIBIDO_USE_LIMIT_SKILL_NON_GIRL = 61;
+const ITEM_USE_PARTNER_WEAPON_ID = 306;
+
+// Gives the item back and explains why it cannot be used.
+function rejectItemUseWithMessage(actor, entry, refusalText, refusalReasonText) {
+  rejectItemUse(actor, entry);
+  const actorName = actor.name();
+  const refusalReasonPrefix = refusalReasonText || '';
+  TickerManager.show(`${refusalReasonPrefix}${actorName}${refusalText}`);
+}
+
+// Libido items require the skill returned by resolveLibidoUseLimitSkill; a refusal also drops the ticker switch.
+function canUseLibidoItem(actor, entry) {
+  const requiredSkillId = resolveLibidoUseLimitSkill(entry.meta, actor);
+  if (actor.isLearnedSkill(requiredSkillId)) return true;
+
+  rejectItemUseWithMessage(actor, entry, `には使用する事が出来ない…。`, `条件を満たしていない為、`);
+  $gameSwitches.setValue(SW_TICKER_MESSAGE, false);
+  return false;
+}
+
+seiyoku_itemHanei = function (unusedArg1, targetItem, itemOrSkillId, isSkill) {
+
+  const databaseEntries = isSkill == 1 ? $dataSkills : $dataItems;
+  const targetActorId = targetItem.actorId();
+  $gameVariables.setValue(VAR_CURRENT_ACTOR_ID, targetActorId);
+
+  const actor = $gameActors.actor(targetActorId);
+  if (!actor) return;
+
+  const entry = databaseEntries[itemOrSkillId];
+  if (!isHeroineActor(targetActorId)) {
+    rejectItemUseWithMessage(actor, entry, `には使用する事が出来ない…。`);
+    return;
   };
 
+  // Shows the used item name; no passive reflection on item use.
+  if (!canUseLibidoItem(actor, entry)) return;
+
+  applyItemLibidoJudgement(targetActorId, entry.meta);
+  reportItemUse(actor, entry, databaseEntries);
 };
 
-//☆☆スキルアイテム使用による性欲数値更新a,b,this.item().id,1
-seiyoku_itemHanei = function (id1, id2, id3, id4) {
+// Whether the actor is a heroine (meta['Heroine']).
+function isHeroineActor(actorId) {
+  const targetActorData = $dataActors[actorId];
+  return !!(targetActorData && targetActorData.meta['Heroine']);
+}
 
-  if (id4 == 1) {
-    var valueItems = $dataSkills;
-  } else {
-    var valueItems = $dataItems;
+// Gives the item back when it cannot be used.
+function rejectItemUse(actor, entry) {
+  $gameParty.gainItem(entry, +1);
+}
+
+// Skill id required for the use; girls are checked against a different skill.
+function resolveLibidoUseLimitSkill(itemMeta, actor) {
+  const limitSkillId = readMetaNumber(itemMeta, '性欲度使用制限', LIBIDO_USE_LIMIT_SKILL_DEFAULT);
+  return isGirl(actor) ? limitSkillId : LIBIDO_USE_LIMIT_SKILL_NON_GIRL;
+}
+
+// Applies the H judgement value of the item and runs the whole libido update.
+function applyItemLibidoJudgement(actorId, itemMeta) {
+  resetPendingHStateVariables();
+  h_exp(actorId, '0_1_0', ITEM_USE_PARTNER_WEAPON_ID, false, true, false);
+
+  const itemJudgement = itemMeta['HitemJudgement'].split(',');
+  $gameVariables.setValue(Number(itemJudgement[0]), Number(itemJudgement[1]));
+  $gameSwitches.setValue(SW_TICKER_MESSAGE, true);
+
+  valueWordSet0 = ``;
+  seiyoku_genkai();
+  seiyoku_kanniHyouji();
+  seiyoku_hanei();
+  $gameVariables.setValue(VAR_LAST_H_COUNT, 0);
+  $gameVariables.setValue(VAR_PARTNER_WEAPON_ID, 0);
+  resetPendingHStateVariables();
+  $gameVariables.setValue(VAR_MESSAGE_STACK, ' ');
+  $gameSwitches.setValue(SW_BATTLE_RECORD_VISIBLE, false);
+}
+
+// Shows the remaining count only on item use.
+function reportItemUse(actor, entry, databaseEntries) {
+  if (databaseEntries == $dataItems) {
+    const itemName = entry.name;
+    const ownedItemCount = $gameParty.numItems(entry);
+    TickerManager.show(`${itemName}：${ownedItemCount}個`);
   };
-  $gameVariables.setValue(20, id2.actorId());
-  if ($dataActors[id2.actorId()].meta['Heroine']) {
-    var actor = $gameActors.actor($gameVariables.value(20));
-    //使用アイテム名表示。アイテム使用時はパッシブ反映しない。
-    if (valueItems[id3].meta['性欲度使用制限']) {
-      var value2 = Number(valueItems[id3].meta['性欲度使用制限']);
-    } else {
-      var value2 = 18;
-    };
-    if (!isGirl($gameActors.actor($gameVariables.value(20)))) {
-      var value2 = 61;
-    };
-    if ($gameActors.actor($gameVariables.value(20)).isLearnedSkill(value2)) {
-      for (var i = 401; i <= 440; i++) { $gameVariables.setValue(i, 0) };
-      h_exp($gameVariables.value(20), '0_1_0', 306, false, true, false);
-      var value1 = valueItems[id3].meta['HitemJudgement'].split(',');
-      $gameVariables.setValue(Number(value1[0]), Number(value1[1]));
-      $gameSwitches.setValue(475, true);
-      valueWordSet0 = ``;
-      seiyoku_genkai();
-      seiyoku_kanniHyouji();
-      seiyoku_hanei();
-      $gameVariables.setValue(339, 0);
-      $gameVariables.setValue(340, 0);
-      for (var i = 401; i <= 440; i++) { $gameVariables.setValue(i, 0) };
-      $gameVariables.setValue(506, ' ');
-      $gameSwitches.setValue(130, false);
-      if (valueItems == $dataItems) {
-        var value1 = `${valueItems[id3].name}：${$gameParty.numItems(valueItems[id3])}個`;
-        TickerManager.show(value1);
-      };
-    } else {
-      $gameParty.gainItem(valueItems[id3], +1);
-      var value1 = `条件を満たしていない為、${actor.name()}には使用する事が出来ない…。`;
-      TickerManager.show(value1);
-    };
-    $gameSwitches.setValue(475, false);
-  } else {
-    $gameParty.gainItem(valueItems[id3], +1);
-    var value1 = `${actor.name()}には使用する事が出来ない…。`;
-    TickerManager.show(value1);
-  };
+  $gameSwitches.setValue(SW_TICKER_MESSAGE, false);
+}
 
-};
+// Fertility of the day.
+const FERTILIZER_SKILL_ID = 65;           // unlocked by skebe-ko
+const FERTILITY_RANDOM_MAX = 11;
+const FERTILITY_MONSTER_BONUS_MAX = 51;
 
-//☆☆当日受精率設定
 jusei_todayrate = function () {
 
-  var value1 = 65;//スケベっこで解放
-  var list = $gameVariables.value(247);
-  list.forEach(function (id) {
-    var actor = $gameActors.actor(id);
-    if (actor.isLearnedSkill(value1)) {
-      $gameVariables.value(id + 380)[3] = getRandomIndex(11);
-      if (actor.battleSkillsRaw().includes(870)) {
-        $gameVariables.value(id + 380)[3] += getRandomIndex(51);
-      };
-    } else {
-      $gameVariables.value(id + 380)[3] = 0;
-    };
-  }, this);
+  forEachHeroineId((actorId) => {
+    const actor = $gameActors.actor(actorId);
+    if (!actor) return;
+    applyTodayFertility(actor);
+  });
 
 };
 
-//☆☆キャラの各種遍歴代入actor_Hhennreki(3);valueWordSet
-actor_Hhennreki = function (id1) {
+function applyTodayFertility(actor) {
+  const hStateValues = readHStateValues(actor.actorId());
 
-  var value1 = `付与されているHステート\n`;
-  for (var i = 1; i <= 10; i++) { eval("valueWordSet" + i + " = value1") };
-  var value1 = 1;
-  var actor = $gameActors.actor($gameVariables.value(20));
-  var list = valueHstateDisplay;
-  list.forEach(function (id) {
-    if (actor.isStateAffected(id)) {
-      var value2 = `${$dataStates[id].description}`;
-      if (actor.getStateCounter(id) != undefined) {
-        value2 += `\\C[27]進行度:${actor.getStateCounter(id)}\\C[0]`;
-      };
-      value2 += `\n`;
-      eval("valueWordSet" + value1 + " += value2");
-      valueCountSet1 += 1;
-      if (valueCountSet1 % 8 == 0) { value1 += 1 };
-    };
-  }, this);
-};
+  if (!actor.isLearnedSkill(FERTILIZER_SKILL_ID)) {
+    hStateValues[HSTATE_INDEX_FERTILITY] = 0;
+    return;
+  };
 
-//☆☆キャラの各種遍歴代入前実行2actor_Hhennreki2Before(4,5,6);
-//選択肢番号は、実際の配列番号+1にしている。
-actor_Hhennreki2Before = function (id1) {
+  let fertilityRate = getRandomIndex(FERTILITY_RANDOM_MAX);
+  if (actor.battleSkillsRaw().includes(870)) {
+    fertilityRate += getRandomIndex(FERTILITY_MONSTER_BONUS_MAX);
+  };
+  hStateValues[HSTATE_INDEX_FERTILITY] = fertilityRate;
+}
 
-  var actor = $gameActors.actor($gameVariables.value(20));
-  if (4 == id1) {
-    var value1 = `\\I[526]\\C[27]男性遍歴　　　　　　\\C[0]　　 　　　　　　　　　　　　　　　`;
+// Actor history entry, actor_Hhennreki(3);valueWordSet
+const H_STATE_HISTORY_PAGE_HEADER = `付与されているHステート\n`;
+const H_STATE_HISTORY_LINES_PER_PAGE = 8;
+const H_STATE_HISTORY_PAGE_COUNT = 10;
+
+actor_Hhennreki = function (unusedArg1) {
+
+  for (let pageIndex = 1; pageIndex <= H_STATE_HISTORY_PAGE_COUNT; pageIndex++) {
+    window['valueWordSet' + pageIndex] = H_STATE_HISTORY_PAGE_HEADER;
   };
-  if (5 == id1) {
-    var value1 = `\\I[428]\\C[27]出産履歴　　　　　　\\C[0]　　 　　　　　　　　　　　　　　　`;
-  };
-  if (6 == id1) {
-    var value1 = `\\I[556]\\C[27]シーン履歴（直近100件）\\C[0]　　　　　　　　　　　　　　　　`;
-  };
-  const id = 1;
-  const choiceParams = {
-    text: `\\FS[25]${value1}`,
-    value: 0
-  };
-  $gameSystem.addCustomChoice(id, choiceParams);
-  if (4 == id1 && $gameVariables.value($gameVariables.value(20) + 380)[41] != 0) {//41は名前を入れている
-    if (actor.isLearnedSkill(67)) {
-      var value1 = `\\C[27]初体験の相手:\\C[0]`;
-    } else {
-      var value1 = `\\C[30]処女を奪った相手:\\C[0]`;
-    };
-    value1 += `${$gameVariables.value($gameVariables.value(20) + 380)[41]}`;
-    const id = 1;
-    const choiceParams = {
-      text: `\\FS[25]${value1}`,
-      value: 1
-    };
-    $gameSystem.addCustomChoice(id, choiceParams);
-  };
-  if (5 == id1 && $gameVariables.value($gameVariables.value(20) + 380)[49] >= 1) {//49はidを入れている
-    if (actor.isLearnedSkill(67)) {
-      var value1 = `\\C[27]初子の父親:\\C[0]`;
-    } else {
-      var value1 = `\\C[30]初子を産んだ男:\\C[0]`;
-    };
-    value1 += `${$dataWeapons[$gameVariables.value($gameVariables.value(20) + 380)[49]].name}`;
-    const id = 1;
-    const choiceParams = {
-      text: `\\FS[25]${value1}`,
-      value: 1
-    };
-    $gameSystem.addCustomChoice(id, choiceParams);
+
+  const actor = currentHStateActor();
+  if (!actor) return;
+
+  let wordSetIndex = 1;
+  for (const stateId of valueHstateDisplay) {
+    if (!actor.isStateAffected(stateId)) continue;
+
+    const stateLine = buildHStateHistoryLine(actor, stateId);
+    window['valueWordSet' + wordSetIndex] += stateLine;
+    valueCountSet1 += 1;
+    if (valueCountSet1 % H_STATE_HISTORY_LINES_PER_PAGE == 0) { wordSetIndex += 1 };
   };
 
 };
 
-//☆☆キャラの各種遍歴代入2actor_Hhennreki2(4,5,6);
-actor_Hhennreki2 = function (id1) {
-
-  if (4 == id1 || 5 == id1) {
-    var actor = $gameActors.actor($gameVariables.value(20));
-    var arr1 = [0];
-    var arr2 = $gameVariables.value(360 + $gameVariables.value(20));
-    if (4 == id1) { var value1 = 1; var value3 = 300; var value4 = 100 };
-    if (5 == id1) { var value1 = 201; var value3 = 100; var value4 = -100 };
-    var j = 0;
-    if (id1 == 4 || id1 == 5) {
-      for (var i = value1; i <= value1 + 99; i++) {
-        j += 1;
-        if (arr2[i] >= 1) {
-          var value2 = `\\C[16]${$dataWeapons[i + value3].name}\\C[0]:`;
-          if ($dataWeapons[i + value3].meta['Profession']) {
-            var value2 = `[${$dataWeapons[i + value3].meta['Profession']}]\\C[16]${$dataWeapons[i + value3].name}\\C[0]:`;
-          } else {
-            if ($dataWeapons[i + value3].meta['FamilyName']) {
-              var value2 = `\\C[16]${$dataWeapons[i + value3].name} = $dataWeapons[i+value3].meta['FamilyName']\\C[0]:`;
-            };
-          };
-          if (actor.isLearnedSkill(67)) {
-            value2 += `\\C[27]${arr2[i]}\\C[0]回`;
-          } else {
-            value2 += `\\C[1]${arr2[i]}\\C[0]回`;
-          };
-          if ($gameSwitches.value(164)) {
-            if (id1 == 4) {
-              if (arr2[i + value4] >= 1) {
-                value2 += `\\I[374]？`;
-              }
-            }
-          };
-          const id = 1;
-          const choiceParams = {
-            text: `\\FS[25]${value2}`,
-            value: j + 1
-          };
-          $gameSystem.addCustomChoice(id, choiceParams);
-        };
-      };
-    };
+// One history line of an H state (description + progress).
+function buildHStateHistoryLine(actor, stateId) {
+  let stateDescText = $dataStates[stateId].description;
+  const stateCounter = actor.getStateCounter(stateId);
+  if (stateCounter != undefined) {
+    const progressLabel = '進行度';
+    stateDescText += colorTaggedText(27, progressLabel + ':' + stateCounter);
   };
-  if (id1 == 6) {
-    var arr1 = $gameVariables.value(174)[$gameVariables.value(20)];
-    if (arr1 != 0) {
-      for (var i = arr1.length - 1; i >= 1; i--) {
-        const id = 1;
-        const choiceParams = {
-          text: `\\FS[25]${arr1[i]}`,
-          value: i + 1
-        };
-        $gameSystem.addCustomChoice(id, choiceParams);
-      };
-    };
+  return stateDescText + '\n';
+}
+
+// Actor history pre-pass 2, actor_Hhennreki2Before(4,5,6);
+// The choice numbers are the real array indices plus one.
+// Trailing spaces keep the three headers aligned; they are layout, not text.
+const HISTORY_HEADER_GAP = '　　　　　　';
+const HISTORY_HEADER_PADDING = '　　 　　　　　　　　　　　　　　　';
+const HISTORY_HEADER_PADDING_LONG = '　　　　　　　　　　　　　　　　';
+
+const HISTORY_HEADERS = {
+  4: `\\I[526]` + colorTaggedText(27, `男性遍歴` + HISTORY_HEADER_GAP) + HISTORY_HEADER_PADDING,
+  5: `\\I[428]` + colorTaggedText(27, `出産履歴` + HISTORY_HEADER_GAP) + HISTORY_HEADER_PADDING,
+  6: `\\I[556]` + colorTaggedText(27, `シーン履歴（直近100件）`) + HISTORY_HEADER_PADDING_LONG,
+};
+
+actor_Hhennreki2Before = function (displayTypeId) {
+
+  const { actorId, actor } = readCurrentActor();
+  if (!actor) return;
+
+  const hStateValues = readHStateValues(actorId);
+  const historyHeader = HISTORY_HEADERS[displayTypeId];
+  $gameSystem.addCustomChoice(1, { text: '\\FS[25]' + historyHeader, value: 0 });
+
+  if (displayTypeId == 4 && hStateValues[HSTATE_INDEX_FIRST_PARTNER] != 0) {// 41 holds a name
+    addCustomChoice(buildFirstPartnerChoice(actor, hStateValues));
+  };
+  if (displayTypeId == 5 && hStateValues[HSTATE_INDEX_FIRST_CHILD_PARTNER] >= 1) {// 49 holds an id
+    addCustomChoice(buildFirstChildChoice(actor, hStateValues));
   };
 
 };
 
-//☆☆汎用Ｈシーン時に文字ＢＧＶ。<汎用シーン性感低:>scene_textBgv($gameVariables.value(318),640,384);
-const defaultSexualEcstasyHi = [`「アッ…」`, `「ンっ…」`, `「ンンっ…」`, `（ピクっ…\\I[12]）`];
-const defaultSexualEcstasyMiddle = [`「アッ…\\I[12]」`, `「ンっ…」`, `「ンンっ…\\I[12]」`, `（ピクっ…\\I[12]）`];
+function addCustomChoice(text) {
+  $gameSystem.addCustomChoice(1, { text: `\\FS[25]${text}`, value: 1 });
+}
+
+// First partner (the wording changes with skill 67).
+function buildFirstPartnerChoice(actor, hStateValues) {
+  const knowsPartner = actor.isLearnedSkill(SKILL_PARTNER_KNOWN);
+  const firstPartnerText = knowsPartner ? `初体験の相手:` : `処女を奪った相手:`;
+  const firstPartnerLabel = colorTaggedText(knowsPartner ? 27 : 30, firstPartnerText);
+  const firstPartnerValue = hStateValues[HSTATE_INDEX_FIRST_PARTNER];
+  return `${firstPartnerLabel}${firstPartnerValue}`;
+}
+
+// Father of the first child (the wording changes with skill 67).
+function buildFirstChildChoice(actor, hStateValues) {
+  const knowsPartner = actor.isLearnedSkill(SKILL_PARTNER_KNOWN);
+  const firstChildText = knowsPartner ? `初子の父親:` : `初子を産んだ男:`;
+  const firstChildLabel = colorTaggedText(knowsPartner ? 27 : 30, firstChildText);
+  const firstChildPartnerId = hStateValues[HSTATE_INDEX_FIRST_CHILD_PARTNER];
+  const firstChildFatherName = $dataWeapons[firstChildPartnerId].name;
+  return `${firstChildLabel}${firstChildFatherName}`;
+}
+
+// Actor history 2, actor_Hhennreki2(4,5,6);
+const HISTORY_LIST_SETTINGS = {
+  4: { startIndex: 1, nameOffset: 300, reverseOffset: 100 },
+  5: { startIndex: 201, nameOffset: 100, reverseOffset: -100 },
+};
+const HISTORY_LIST_ENTRY_COUNT = 100;
+
+actor_Hhennreki2 = function (displayTypeId) {
+
+  const listSettings = HISTORY_LIST_SETTINGS[displayTypeId];
+  if (listSettings) {
+    appendPartnerHistoryChoices(displayTypeId, listSettings);
+    return;
+  };
+  if (displayTypeId != 6) return;
+  appendSceneHistoryChoices();
+};
+
+// Male history / birth history list.
+function appendPartnerHistoryChoices(displayTypeId, listSettings) {
+  const { actorId, actor } = readCurrentActor();
+  if (!actor) return;
+
+  const partnerHRecords = readPartnerRecords(actorId);
+  const knowsAll = actor.isLearnedSkill(SKILL_PARTNER_KNOWN);
+
+  for (let index = 0; index < HISTORY_LIST_ENTRY_COUNT; index++) {
+    const recordIndex = listSettings.startIndex + index;
+    if (!(partnerHRecords[recordIndex] >= 1)) continue;
+
+    const entryText = buildPartnerHistoryEntry(displayTypeId, listSettings, partnerHRecords, recordIndex, knowsAll);
+    $gameSystem.addCustomChoice(1, { text: `\\FS[25]${entryText}`, value: index + 2 });
+  };
+}
+
+// Marks a partner that also recorded the other direction of the scene.
+const REVERSE_RECORD_MARKER = `\\I[374]`;
+
+// History text of one partner.
+// Coloured partner label of the history list; the profession and the family name win in that order.
+function buildPartnerHistoryLabel(partnerWeapon) {
+  const partnerMeta = partnerWeapon.meta;
+  const profession = partnerMeta['Profession'];
+  const familyName = partnerMeta['FamilyName'];
+
+  if (profession) return `[${profession}]` + colorTaggedText(16, partnerWeapon.name);
+  if (familyName) return colorTaggedText(16, `${partnerWeapon.name} = ${familyName}`);
+  return colorTaggedText(16, partnerWeapon.name);
+}
+
+function buildPartnerHistoryEntry(displayTypeId, listSettings, partnerHRecords, recordIndex, knowsAll) {
+  const partnerWeapon = $dataWeapons[recordIndex + listSettings.nameOffset];
+  let entryText = buildPartnerHistoryLabel(partnerWeapon) + `:`;
+
+  const hCount = partnerHRecords[recordIndex];
+  entryText += colorTaggedText(knowsAll ? 27 : 1, `${hCount}`) + `回`;
+
+  const hasReverseRecord = partnerHRecords[recordIndex + listSettings.reverseOffset] >= 1;
+  if ($gameSwitches.value(SW_HISTORY_DETAIL) && displayTypeId == 4 && hasReverseRecord) {
+    entryText += REVERSE_RECORD_MARKER + `？`;
+  };
+  return entryText;
+}
+
+// Scene history (last 100 entries); the array starts at 1.
+function appendSceneHistoryChoices() {
+  const sceneHistoryArray = $gameVariables.value(VAR_HISTORY_SCENE_ARRAY);
+  const actorId = $gameVariables.value(VAR_CURRENT_ACTOR_ID);
+  const sceneHistory = sceneHistoryArray ? sceneHistoryArray[actorId] : 0;
+  if (!sceneHistory || sceneHistory.length <= 0) return;
+
+  for (let index = sceneHistory.length - 1; index >= 1; index--) {
+    const sceneText = sceneHistory[index];
+    $gameSystem.addCustomChoice(1, { text: '\\FS[25]' + sceneText, value: index + 1 });
+  };
+}
+
+//---------------------------------------------------------------------------
+// Generic H scene text BGV / single word phrases
+//---------------------------------------------------------------------------
+
+// Generic H scene text BGV, <generic scene arousal low:>scene_textBgv($gameVariables.value(318),640,384);
+// Moan icon; it sits inside the moan strings because the icon belongs mid-sentence.
+const moanIcon = `\\I[12]`;
+const defaultSexualEcstasyHi = [`「アッ…」`, `「ンっ…」`, `「ンンっ…」`, `（ピクっ…${moanIcon}）`];
+const defaultSexualEcstasyMiddle = [
+  `「アッ…${moanIcon}」`, `「ンっ…」`, `「ンンっ…${moanIcon}」`,
+  `（ピクっ…${moanIcon}）`
+];
 const defaultSexualEcstasyLow = ['「ヤァッ…！」', '「ダメっ…！」', '「ヤメッ…！」',
   '「アっ…、ァァ…」', '（ビクンッ）'];
 const textWindowIdOptionsSceneTextBgv = [28, 29, 30, 31, 32, 33, 34, 35, 36];
 const additionalXOffsetOptionsSceneTextBgv = [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, -50, -60, -70, -80, -90, -100, -110, -120, -130, -140, -150];
+const DEFAULT_SCENE_TEXT_PICTURE_IDS = [121, 122, 123, 124, 125, 126, 127, 128, 129, 130];
+const SCENE_TEXT_X_OFFSETS_SMALL = [50, 100, 150, 200, 0, -50, -100, -150, -200];
+const SCENE_TEXT_X_OFFSETS_LARGE = [100, 200, 300, 400, 0, -100, -200, -300, -400];
+const SCENE_TEXT_Y_OFFSETS = [100, 150, 200, 0, -100, -200, -300, -350];
+const SCENE_TEXT_WAIT_SHORT = [80, 90, 100, 110, 120];
+const SCENE_TEXT_WAIT_LONG = [100, 110, 120, 130, 140, 150, 160];
+
+// Reveals the text picture; moveSceneTextPicture then slides it into its final place.
+// Scale the scene text picture starts with, and the larger one used without a wait.
+const SCENE_TEXT_SCALE = 100;
+const SCENE_TEXT_START_SCALE = 150;
+
+function showSceneTextPicture(showSize, pictureId, startX, startY) {
+  $gameScreen.showPicture(pictureId, "", 1, startX, startY, showSize, showSize, 255, 0);
+}
+
+function moveSceneTextPicture(pictureId, targetX, targetY, waitTime) {
+  $gameScreen.movePicture(pictureId, 1, targetX, targetY, 100, 100, 0, 0, waitTime);
+}
+
 scene_textBgv = function (actorId, baseX, baseY, offsetMode, waitMode, fontSetting) {
 
   const gameActor = $gameActors.actor(actorId);
-  const dataActor = gameActor.actor();
-  //const actorNickname = actor.nickname();
+  if (!gameActor) return;
+
+  const chosenPhrase = pickSceneTextPhrase(gameActor);
+  const chosenPictureId = reserveSceneTextPictureId();
+  const chosenXOffset = pickRandomValue(offsetMode == 1 ? SCENE_TEXT_X_OFFSETS_SMALL : SCENE_TEXT_X_OFFSETS_LARGE);
+  const chosenYOffset = pickRandomValue(SCENE_TEXT_Y_OFFSETS);
+  const chosenWaitTime = pickRandomValue(waitMode == 0 ? SCENE_TEXT_WAIT_SHORT : SCENE_TEXT_WAIT_LONG);
+
+  $gameScreen.setDTextPicture(`${chosenPhrase}`, pickRandomValue(textWindowIdOptionsSceneTextBgv));
+  $gameScreen.dWindowFrame = 'ON';
+  if (fontSetting != 0) { $gameScreen.setDtextFont(fontSetting); };
+  $gameScreen.dTextAlign = 1;
+
+  const targetX = baseX + chosenXOffset;
+  const targetY = baseY + chosenYOffset;
+  // With a wait the line slides in from the side, otherwise it shrinks from the larger start scale.
+  const slideInXOffset = waitMode != 0 ? pickRandomValue(additionalXOffsetOptionsSceneTextBgv) : 0;
+  const startScale = waitMode != 0 ? SCENE_TEXT_SCALE : SCENE_TEXT_START_SCALE;
+
+  showSceneTextPicture(startScale, chosenPictureId, targetX + slideInXOffset, targetY);
+  moveSceneTextPicture(chosenPictureId, targetX, targetY, chosenWaitTime);
+};
+
+// Moaning lines that follow the learned skills (concatenated with the lines of variable 707).
+function pickSceneTextPhrase(gameActor) {
   let ecstasyPhrases = [];
   let combinedEcstasyArray = [];
 
-  if ($gameSwitches.value(119)) {
-    if (gameActor.isLearnedSkill(68)) {
-      ecstasyPhrases = dataActor.meta['SexualEcstasyHi']
-        ? dataActor.meta['SexualEcstasyHi'].split(',')
-        : defaultSexualEcstasyHi;
-    } else {
-      if (gameActor.isLearnedSkill(65)) {
-        ecstasyPhrases = dataActor.meta['SexualEcstasyMiddle']
-          ? dataActor.meta['SexualEcstasyMiddle'].split(',')
-          : defaultSexualEcstasyMiddle;
-      } else {
-
-        ecstasyPhrases = dataActor.meta['SexualEcstasyLow']
-          ? dataActor.meta['SexualEcstasyLow'].split(',')
-          : defaultSexualEcstasyLow;
-      }
-    }
+  if ($gameSwitches.value(SW_ECSTASY_VOICE)) {
+    const actorMeta = gameActor.actor().meta;
+    ecstasyPhrases = readEcstasyPhrases(gameActor, actorMeta);
   } else {
-    combinedEcstasyArray = $gameVariables.value(707);
-  }
-  if (ecstasyPhrases == 0) { } else { combinedEcstasyArray = combinedEcstasyArray.concat(ecstasyPhrases); }
-  const chosenPhrase = combinedEcstasyArray[getRandomIndex(combinedEcstasyArray.length)];
-  if ($gameVariables.value(299) == 0) {
-    $gameVariables.setValue(299, [121, 122, 123, 124, 125, 126, 127, 128, 129, 130]);
-  }
-  let availablePictureIds = $gameVariables.value(299);
-  const chosenPictureId = availablePictureIds[getRandomIndex(availablePictureIds.length)]; //ID
-  let foundIndex = availablePictureIds.findIndex(idItem => idItem === chosenPictureId);
+    combinedEcstasyArray = $gameVariables.value(VAR_H_SCENE_PHRASES) || [];
+  };
+
+  if (ecstasyPhrases.length > 0) {
+    combinedEcstasyArray = combinedEcstasyArray.concat(ecstasyPhrases);
+  };
+  return combinedEcstasyArray[getRandomIndex(combinedEcstasyArray.length)] || '';
+}
+
+// Skills 68 and 65 change the line grade.
+// Highest grade first: the first learned skill decides the phrase list.
+const ECSTASY_PHRASE_GRADES = [
+  { skillId: 68, metaKey: 'SexualEcstasyHi', defaultPhrases: defaultSexualEcstasyHi },
+  { skillId: 65, metaKey: 'SexualEcstasyMiddle', defaultPhrases: defaultSexualEcstasyMiddle },
+  { skillId: 0, metaKey: 'SexualEcstasyLow', defaultPhrases: defaultSexualEcstasyLow }
+];
+
+function readEcstasyPhrases(gameActor, actorMeta) {
+  for (const phraseGrade of ECSTASY_PHRASE_GRADES) {
+    if (phraseGrade.skillId >= 1 && !gameActor.isLearnedSkill(phraseGrade.skillId)) continue;
+
+    const gradePhrases = actorMeta[phraseGrade.metaKey];
+    return gradePhrases ? gradePhrases.split(',') : phraseGrade.defaultPhrases;
+  };
+}
+
+// Reserves one usable text picture id (the used id is removed from the array).
+function reserveSceneTextPictureId() {
+  let availablePictureIds = $gameVariables.value(VAR_H_SCENE_PICTURE_SLOTS);
+  if (availablePictureIds == 0 || !availablePictureIds || availablePictureIds.length === 0) {
+    availablePictureIds = DEFAULT_SCENE_TEXT_PICTURE_IDS;
+    $gameVariables.setValue(VAR_H_SCENE_PICTURE_SLOTS, availablePictureIds);
+  };
+
+  const chosenPictureId = pickRandomValue(availablePictureIds);
+  const foundIndex = availablePictureIds.findIndex((idItem) => idItem === chosenPictureId);
   if (foundIndex >= 0) {
     availablePictureIds.splice(foundIndex, 1);
-  }
-  const offsetBaseX = baseX;
-  const offsetBaseY = baseY;
-  let xOffsetOptions, yOffsetOptions;
-  if (offsetMode == 1) {
-    xOffsetOptions = [50, 100, 150, 200, 0, -50, -100, -150, -200];
-    yOffsetOptions = [100, 150, 200, 0, -100, -200, -300, -350];
-  } else {
-    xOffsetOptions = [100, 200, 300, 400, 0, -100, -200, -300, -400];
-    yOffsetOptions = [100, 150, 200, 0, -100, -200, -300, -350];
-  }
-  const chosenXOffset = xOffsetOptions[getRandomIndex(xOffsetOptions.length)]; //x offset
-  const chosenYOffset = yOffsetOptions[getRandomIndex(yOffsetOptions.length)]; //y offset
-  let waitTimeOptions, chosenWaitTime;
-  if (waitMode == 0) {
-    waitTimeOptions = [80, 90, 100, 110, 120]; // wait durations
-    chosenWaitTime = waitTimeOptions[getRandomIndex(waitTimeOptions.length)];
-  } else {
-    waitTimeOptions = [100, 110, 120, 130, 140, 150, 160];
-    chosenWaitTime = waitTimeOptions[getRandomIndex(waitTimeOptions.length)];
-  }
-  const chosenTextWindowId = textWindowIdOptionsSceneTextBgv[getRandomIndex(textWindowIdOptionsSceneTextBgv.length)];
-  $gameScreen.setDTextPicture(`${chosenPhrase}`, chosenTextWindowId);
-  $gameScreen.dWindowFrame = 'ON';
-  if (fontSetting == 0) { } else { $gameScreen.setDtextFont(fontSetting); }
-  $gameScreen.dTextAlign = 1;
-  if (waitMode == 0) {
-    $gameScreen.showPicture(chosenPictureId, "", 1, offsetBaseX + chosenXOffset, offsetBaseY + chosenYOffset, 150, 150, 255, 0);
-    $gameScreen.movePicture(chosenPictureId, 1, offsetBaseX + chosenXOffset, offsetBaseY + chosenYOffset, 100, 100, 0, 0, chosenWaitTime);
-  } else {
-    const additionalXOffset = additionalXOffsetOptionsSceneTextBgv[getRandomIndex(additionalXOffsetOptionsSceneTextBgv.length)];
-    $gameScreen.showPicture(chosenPictureId, "", 1, offsetBaseX + chosenXOffset + additionalXOffset, offsetBaseY + chosenYOffset, 100, 100, 255, 0);
-    $gameScreen.movePicture(chosenPictureId, 1, offsetBaseX + chosenXOffset, offsetBaseY + chosenYOffset, 100, 100, 0, 0, chosenWaitTime);
-  }
-};
+  };
+  return chosenPictureId;
+}
 
-//☆☆CGの一部分で一言台詞pic_oneWord(valueSerialPictureId,x,y,25,60,arr1);
+// One-word line on part of the CG, pic_oneWord(valueSerialPictureId,x,y,25,60,arr1);
+const PICTURE_ONE_WORD_OFFSET_RANGE = 201;
+const PICTURE_ONE_WORD_OFFSET_HALF = 100;
+
 pic_oneWord = function (pictureSlot, baseX, baseY, textMotionParam, moveDuration, textOptions, fontSetting) {
 
   picture_motion1(textMotionParam >= 100 ? "smooth" : "linear", [0]);
-  //var arr2 = [-50, 0, 50, -100, 100];
-  const randomXOffset = getRandomIndex(201) - 100;
-  const randomYOffset = getRandomIndex(201) - 100;
-  const chosenText = textOptions[getRandomIndex(textOptions.length)];
+  const randomXOffset = getRandomIndex(PICTURE_ONE_WORD_OFFSET_RANGE) - PICTURE_ONE_WORD_OFFSET_HALF;
+  const randomYOffset = getRandomIndex(PICTURE_ONE_WORD_OFFSET_RANGE) - PICTURE_ONE_WORD_OFFSET_HALF;
+  const chosenText = pickRandomValue(textOptions);
+
   $gameScreen.setDTextPicture(chosenText, textMotionParam);
   $gameScreen.dWindowFrame = 'ON';
   if (fontSetting !== 0) { $gameScreen.setDtextFont(fontSetting) };
   $gameScreen.dTextAlign = 1;
-  const actualBaseX = baseX;
-  const actualBaseY = baseY;
-  $gameScreen.showPicture(pictureSlot, "", 1, actualBaseX + randomXOffset, actualBaseY + randomYOffset, 50, 50, 255, 0);
-  $gameScreen.movePicture(pictureSlot, 1, actualBaseX + randomXOffset, actualBaseY + randomYOffset, 150, 150, 0, 0, moveDuration);
+  $gameScreen.showPicture(pictureSlot, "", 1, baseX + randomXOffset, baseY + randomYOffset, 50, 50, 255, 0);
+  $gameScreen.movePicture(pictureSlot, 1, baseX + randomXOffset, baseY + randomYOffset, 150, 150, 0, 0, moveDuration);
 
 };
 
-//出産時の計算式
+//---------------------------------------------------------------------------
+// Childbirth calculation
+//---------------------------------------------------------------------------
+const PREGNANCY_FALLBACK_PARTNER_SLOT = 102;
+const PREGNANCY_CHILD_SLOT_OFFSET = 100;
+
+// Birth calculation.
 actor_pregnancyCalculation = function (actorId) {
 
-  $gameVariables.setValue(20, actorId);
+  $gameVariables.setValue(VAR_CURRENT_ACTOR_ID, actorId);
   const actor = $gameActors.actor(actorId);
-  if (!actor.isStateAffected(83)) {
-    return;
-  };
-  
-  //actor.addStateCounter(83, +10);
-  //const randomValue = getRandomIndex(101);
-  if (true) {
-    actor.removeState(83);
-    actor.removeStateCounter(83);
-    $gameVariables.setValue(94, actor.name());
-  };
-  if ( actor.isStateAffected(83)) {
-    return;
-  }
+  if (!actor) return;
+  if (!actor.isStateAffected(STATE_PREGNANT)) return;
 
-  //妊娠時の一時的なサイズ増量表現を消去させる
-  const actorId380 = actorId + 380;
-  const hRecordsCount = $gameVariables.value(actorId380)[0];
-  hRecordsCount[42] = 0;
-  hRecordsCount[43] = 0;
-  hRecordsCount[44] = 0;
-  hRecordsCount[45] = 0;
+  // clears the pregnancy and continues with the birth
+  actor.removeState(STATE_PREGNANT);
+  actor.removeStateCounter(STATE_PREGNANT);
+  $gameVariables.setValue(VAR_ACTOR_NAME_MIRROR, actor.name());
 
-  //妊娠相手を特定する
-  const potentialPartners = [];
-  const actorId360 = actorId + 360;
-  const partnerHRecords = $gameVariables.value(actorId360);
-  for (let partnerIndex = 101; partnerIndex <= 200; partnerIndex++) {
-    if (partnerHRecords[partnerIndex] >= 1) {
-      potentialPartners.push(partnerIndex);
-    }
-  };
-  const selectedPartner = potentialPartners[getRandomIndex(potentialPartners.length)];
-  const finalPartner = (selectedPartner == 0) ? 102 : selectedPartner;
-  partnerHRecords[finalPartner + 100] += 1;
-  if (hRecordsCount[49] == 0) {
-    hRecordsCount[49] = finalPartner + 200;
-  };
+  // removes the temporary size gain of the pregnancy
+  clearPregnancySwell(actorId);
 
-  //受精相手を特定するための配列を0にする。
-  const startPartner = 101;
-  const endPartner = 200;
-  for (let partnerIndex = startPartner; partnerIndex <= endPartner; partnerIndex++) {
-    if (partnerHRecords[partnerIndex] >= 1) {
-      partnerHRecords[partnerIndex] = 0;
-    }
-  };
+  recordBirthFather(actorId);
 };
 
-//☆☆Hプロフィール表示時立ち絵
+function clearPregnancySwell(actorId) {
+  const hStateValues = readHStateValues(actorId);
+  for (let offset = 0; offset < 4; offset++) {
+    hStateValues[HSTATE_INDEX_PREGNANCY_SWELL + offset] = 0;
+  };
+}
+
+// Counts the birth for the father and stores him as the first child partner.
+function recordBirthFather(actorId) {
+  const fatherSlot = pickFatherSlot(actorId);
+  const partnerHRecords = readPartnerRecords(actorId);
+  partnerHRecords[fatherSlot + PREGNANCY_CHILD_SLOT_OFFSET] += 1;
+
+  const hStateValues = readHStateValues(actorId);
+  if (hStateValues[HSTATE_INDEX_FIRST_CHILD_PARTNER] == 0) {
+    hStateValues[HSTATE_INDEX_FIRST_CHILD_PARTNER] = fatherSlot + PARTNER_CHILD_SLOT_OFFSET;
+  };
+
+  // resets the array used to identify the fertilising partner
+  clearFertilizationPartnerRecords(partnerHRecords);
+}
+
+// Picks one father from the fertilisation records 101-200 (102 when there is none).
+function pickFatherSlot(actorId) {
+  const partnerHRecords = readPartnerRecords(actorId);
+  const potentialPartners = [];
+  for (let partnerIndex = PARTNER_RECORD_SLOT_FIRST_INDEX; partnerIndex <= PARTNER_RECORD_SLOT_LAST_INDEX; partnerIndex++) {
+    if (partnerHRecords[partnerIndex] >= 1) potentialPartners.push(partnerIndex);
+  };
+
+  const selectedPartner = potentialPartners[getRandomIndex(potentialPartners.length)];
+  return selectedPartner ? selectedPartner : PREGNANCY_FALLBACK_PARTNER_SLOT;
+}
+
+function clearFertilizationPartnerRecords(partnerHRecords) {
+  for (let partnerIndex = PARTNER_RECORD_SLOT_FIRST_INDEX; partnerIndex <= PARTNER_RECORD_SLOT_LAST_INDEX; partnerIndex++) {
+    if (partnerHRecords[partnerIndex] >= 1) partnerHRecords[partnerIndex] = 0;
+  };
+}
+
+//---------------------------------------------------------------------------
+// H profile standing picture (tachie)
+//---------------------------------------------------------------------------
+// Standing picture shown by the H profile.
 const HSTATES_BACKGROUND1 = "HstatesBackGround1";
 const HSTATES_FRAME = "HstatesFrame";
 const HSTATES_ACTOR_BUST_WHITE = "HstatesActorBustWhite";
@@ -2067,7 +3034,7 @@ const HSTATES_ACTOR_BUST = "HstatesActorBust";
 const HSTATES_ACTOR_HEAD = "HstatesActorHead";
 const HSTATES_BG_SHINE1 = "hStates_bgShine1";
 const HSTATES_BODY_SHINE1 = "hStates_bodyShine1";
-const HSTATES_BACKGROUND = "HstatesBackGround"; // Used with variable suffix
+const HSTATES_BACKGROUND = "HstatesBackGround"; // the variable value is appended to the name
 const HSTATES_ACTOR_FACE = "HstatesActorFace";
 const CACHED_ANIMATION_FRAMES = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 2, 1, 4, 5, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
 const fadeDurationsMap = {
@@ -2079,21 +3046,43 @@ const faceVariantMap = {
   1: "a",
   5: "b"
 };
+
+const H_TACHIE_BASE_PICTURE_ID = 111;     // base picture id of the standing picture
+const H_TACHIE_DEFAULT_HUE = '#00d0ff';
+const H_TACHIE_FADE_PICTURE_NAME = "HscenePose054";
+// Layers of the standing picture (relative ids from basePicId) and their positions
+const H_TACHIE_LAYERS = {
+  backgroundFade: 13,
+  backBody: 6,
+  bust: 7,
+  head: 8,
+  face: 9,
+  bustWhite: 10,
+  frame: 11,
+  faceVariant: 12,
+  backgroundFore: 3,
+  backgroundBase: 4,
+  frameBack: 5
+};
+
 actor_hStatesTachie = function (mode) {
 
-  const actorId = $gameVariables.value(20);
-  const gameActor = $gameActors.actor(actorId); // bad using global dinamic! but the function was called from common event
+  const actorId = $gameVariables.value(VAR_CURRENT_ACTOR_ID);
+  const gameActor = $gameActors.actor(actorId);// expected to be called from a common event
+  if (!gameActor) return;
+
   if (!isGirl(gameActor)) {
     tachie_hyouji2(gameActor);
-  } else {
-    const basePicId = 111;
-    if (mode == 1) {
-      setupActorHStatesTachieMode1(basePicId, actorId, gameActor);
-    } else {
-      updateActorHStatesTachieMode2(basePicId, actorId);
-    }
-  }
+    return;
+  };
+
+  if (mode == 1) {
+    setupActorHStatesTachieMode1(H_TACHIE_BASE_PICTURE_ID, actorId, gameActor);
+    return;
+  };
+  updateActorHStatesTachieMode2(H_TACHIE_BASE_PICTURE_ID, actorId);
 };
+
 function setupActorHStatesTachieMode1(basePicId, actorId, gameActor) {
   setActorStateBasedOnSkillsHStatesTachie(gameActor);
   setupHStatesPictures(basePicId, actorId);
@@ -2104,416 +3093,518 @@ function setupActorHStatesTachieMode1(basePicId, actorId, gameActor) {
 }
 
 function setupHStatesPictures(basePicId, actorId) {
-  $gameScreen.showPicture(basePicId + 4, HSTATES_BACKGROUND1, 1, 1024, 384, 100, 100, 255, 0);
-  $gameScreen.showPicture(basePicId + 6, HSTATES_ACTOR_BODY + actorId + "_" + $gameVariables.value(192), 1, 1024, 400, 100, 100, 0, 0);
-  $gameScreen.showPicture(basePicId + 9, HSTATES_ACTOR_FACE + actorId, 1, 1024, 384, 100, 100, 0, 0);
-  //let defaultHue = '#00d0ff';
-  $gameScreen.showPicture(basePicId + 10, HSTATES_ACTOR_BUST_WHITE, 1, 1024, 384, 0, 0, 0, 0);
-  $gameScreen.showPicture(basePicId + 11, HSTATES_FRAME, 1, 1024, 384, 100, 100, 255, 0);
-  $gameScreen.showPicture(basePicId + 5, HSTATES_FRAME, 1, 1024, 384, 100, 100, 255, 0);
+  $gameScreen.showPicture(basePicId + H_TACHIE_LAYERS.backgroundBase, HSTATES_BACKGROUND1, 1, 1024, 384, 100, 100, 255, 0);
+  $gameScreen.showPicture(basePicId + H_TACHIE_LAYERS.backBody, HSTATES_ACTOR_BODY + actorId + "_" + $gameVariables.value(VAR_H_STAGE_VARIANT), 1, 1024, 400, 100, 100, 0, 0);
+  $gameScreen.showPicture(basePicId + H_TACHIE_LAYERS.face, HSTATES_ACTOR_FACE + actorId, 1, 1024, 384, 100, 100, 0, 0);
+  $gameScreen.showPicture(basePicId + H_TACHIE_LAYERS.bustWhite, HSTATES_ACTOR_BUST_WHITE, 1, 1024, 384, 0, 0, 0, 0);
+  $gameScreen.showPicture(basePicId + H_TACHIE_LAYERS.frame, HSTATES_FRAME, 1, 1024, 384, 100, 100, 255, 0);
+  $gameScreen.showPicture(basePicId + H_TACHIE_LAYERS.frameBack, HSTATES_FRAME, 1, 1024, 384, 100, 100, 255, 0);
 }
 
 function setupAnimatedActorBust(basePicId, actorId) {
-  let actorBustName = HSTATES_ACTOR_BUST + actorId;
+  const actorBustName = HSTATES_ACTOR_BUST + actorId;
+  const bustPictureId = basePicId + H_TACHIE_LAYERS.bust;
   $gameScreen.setPicturesAnimation(5, 1, "横", 3);
-  $gameScreen.showPicture(basePicId + 7, actorBustName, 1, 1024, 384, 100, 100, 255, 0);
-  $gameScreen.picture(basePicId + 7).startAnimationFrame(3, true, CACHED_ANIMATION_FRAMES);
+  $gameScreen.showPicture(bustPictureId, actorBustName, 1, 1024, 384, 100, 100, 255, 0);
+  $gameScreen.picture(bustPictureId).startAnimationFrame(3, true, CACHED_ANIMATION_FRAMES);
 }
 
+// The head is replaced according to the physique flag (index 32 of array 440).
 function setupActorHead(basePicId, actorId) {
-  let headVariant;
-  if ($gameVariables.value(actorId + 440)[32] == 2) {
-    headVariant = 1;
-  } else {
-    headVariant = 2;
-  }
+  const headVariant = readHStatesHeadVariant(actorId);
+  $gameScreen.showPicture(basePicId + H_TACHIE_LAYERS.head,
+    HSTATES_ACTOR_HEAD + actorId + "_" + headVariant, 1, 1024, 368, 100, 100, 0, 0);
+}
 
-  $gameScreen.showPicture(basePicId + 8, HSTATES_ACTOR_HEAD + actorId + "_" + headVariant, 1, 1024, 368, 100, 100, 0, 0);
+function readHStatesHeadVariant(actorId) {
+  return readPartnerBodyValues(actorId)[HSTATE_BODY_INDEX_HEAD_VARIANT] == 2 ? 1 : 2;
 }
 
 function animatePictures(basePicId) {
-  $gameScreen.movePicture(basePicId + 6, 1, 1024, 400, 100, 100, 255, 0, 10);
-  $gameScreen.movePicture(basePicId + 7, 1, 1024, 384, 100, 100, 255, 0, 10);
-  $gameScreen.movePicture(basePicId + 8, 1, 1024, 368, 100, 100, 255, 0, 10);
-  $gameScreen.movePicture(basePicId + 9, 1, 1024, 384, 100, 100, 255, 0, 10);
-  $gameScreen.movePicture(basePicId + 10, 1, 1024, 384, 100, 100, 200, 0, 30);
+  $gameScreen.movePicture(basePicId + H_TACHIE_LAYERS.backBody, 1, 1024, 400, 100, 100, 255, 0, 10);
+  $gameScreen.movePicture(basePicId + H_TACHIE_LAYERS.bust, 1, 1024, 384, 100, 100, 255, 0, 10);
+  $gameScreen.movePicture(basePicId + H_TACHIE_LAYERS.head, 1, 1024, 368, 100, 100, 255, 0, 10);
+  $gameScreen.movePicture(basePicId + H_TACHIE_LAYERS.face, 1, 1024, 384, 100, 100, 255, 0, 10);
+  $gameScreen.movePicture(basePicId + H_TACHIE_LAYERS.bustWhite, 1, 1024, 384, 100, 100, 200, 0, 30);
 
-  for (let pictureId = basePicId + 6; pictureId <= basePicId + 9; pictureId++) {
+  applyBlessToPictures(basePicId + H_TACHIE_LAYERS.backBody,
+    basePicId + H_TACHIE_LAYERS.face);
+}
+
+// Applies the sway effect only to the pictures that are visible.
+function applyBlessToPictures(firstPictureId, lastPictureId) {
+  for (let pictureId = firstPictureId; pictureId <= lastPictureId; pictureId++) {
     if ($gameScreen.picture(pictureId)) {
       tachie_bless(pictureId, 0);
     }
-  }
+  };
 }
 
 function setupParticleEffects(gameActorMeta) {
-  let actorHue = '#00d0ff';
-  if (gameActorMeta['tachieHue2']) {
-    actorHue = gameActorMeta['tachieHue2'];
-  }
+  const actorHue = gameActorMeta['tachieHue2'] ? gameActorMeta['tachieHue2'] : H_TACHIE_DEFAULT_HUE;
+  const particle = $gameScreen._particle;
 
-  $gameScreen._particle.particleSet(0, HSTATES_BG_SHINE1, 'picture:116', 'def', 'above'); //55
-  $gameScreen._particle.particleSet(0, HSTATES_BODY_SHINE1, 'picture:118', 'def', 'above'); //58
-  $gameScreen._particle.particleUpdate([HSTATES_BODY_SHINE1, 'pos', 0, 20]);
-  $gameScreen._particle.particleUpdate([HSTATES_BODY_SHINE1, 'color', actorHue, actorHue + '@0.5', actorHue]);
-  //scale1-15 alfa1-0 speed1-1 #eb00ff
+  particle.particleSet(0, HSTATES_BG_SHINE1, 'picture:116', 'def', 'above');
+  particle.particleSet(0, HSTATES_BODY_SHINE1, 'picture:118', 'def', 'above');
+  particle.particleUpdate([HSTATES_BODY_SHINE1, 'pos', 0, 20]);
+  particle.particleUpdate([HSTATES_BODY_SHINE1, 'color', actorHue, actorHue + '@0.5', actorHue]);
 }
+
+// Particle / background update for the current stage (variable 191).
+const H_TACHIE_BACKGROUND_FADE_DURATION_HIGH = 30;
+const H_TACHIE_STAGE_MIN = 1;
+const H_TACHIE_STAGE_FACE_VARIANT = [1, 5];
 
 function updateActorHStatesTachieMode2(basePicId, actorId) {
-  const hStageSexualDesireMod = $gameVariables.value(191);
+  const hStage = $gameVariables.value(VAR_H_STAGE_STATE);
 
-  //パーティクルの変化設定
-  //Animate フレーム設定がシビアなので使えない
-  //if(actor.isLearnedSkill(62)){$gameVariables.setValue(191,2)};//反抗
-  //if(actor.isLearnedSkill(64)){$gameVariables.setValue(191,3)};//自失
-  //if(actor.isLearnedSkill(66)){$gameVariables.setValue(191,4)};//卑猥
-  //if(actor.isLearnedSkill(68)){$gameVariables.setValue(191,5);$gameVariables.setValue(192,2)};//通常目光
-  //if(actor.isLearnedSkill(70)){$gameVariables.setValue(191,6)};//あへ
-
-  if (hStageSexualDesireMod >= 1) {
-    const alphaStart = '0.7';
-    const alphaEnd = '0.3';
-    $gameScreen._particle.particleUpdate([HSTATES_BODY_SHINE1, 'alpha', alphaStart, alphaEnd + '@0.5', '0']);
-  }
-  if (hStageSexualDesireMod >= 2) {
-    $gameScreen.movePicture(basePicId + 10, 1, 1024, 384, 100, 100, 150, 0, 60);
-    const speedStart = '0.5';
-    const speedEnd = '0.5';
-    $gameScreen._particle.particleUpdate([HSTATES_BODY_SHINE1, 'speed', speedStart, speedEnd + '@0.5', speedEnd]);
-  }
-  if (hStageSexualDesireMod >= 3) {
-    $gameScreen.movePicture(basePicId + 10, 1, 1024, 384, 100, 100, 50, 0, 60);
-    const scaleStart = '10';
-    const scaleEnd = '6';
-    $gameScreen._particle.particleUpdate([HSTATES_BODY_SHINE1, 'scale', scaleStart, scaleEnd + '@0.5', scaleEnd]);
-    $gameScreen._particle.particleUpdate([HSTATES_BODY_SHINE1, 'color', '#eb00ff', '#eb00ff@0.1', '#ffffff']);
-  }
-  if (hStageSexualDesireMod >= 4) {
-    $gameScreen._particle.particleUpdate([HSTATES_BODY_SHINE1, 'emitterLifetime', '1']);
-  }
-  if (hStageSexualDesireMod >= 4) {
-    $gameScreen.movePicture(basePicId + 10, 1, 1024, 384, 100, 100, 0, 0, 60);
-    $gameScreen._particle.particleClear(HSTATES_BG_SHINE1);
-    $gameScreen._particle.particleSet(0, 'hStates_bgShine2', 'picture:57', 'def', 'blow');
-  }
-
-  //デバック用
-  //$gameScreen.movePicture(value1+10,1,1024,384,100,100,0,0,60);
-  //$gameScreen._particle.particleUpdate(['hStates_bodyShine1','emitterLifetime','1']);
-
-  if (hStageSexualDesireMod >= 2) {
-    const fadeDuration = hStageSexualDesireMod >= 5 ? 30 : fadeDurationsMap[hStageSexualDesireMod] || 0;
-    $gameScreen.showPicture(basePicId + 13, HSTATES_BACKGROUND + hStageSexualDesireMod, 1, 1024, 384, 100, 100, 255, 0);
-    picture_fade1(basePicId + 13, "fadeOut", "HscenePose054", fadeDuration, 5);
-  }
-
-  if (hStageSexualDesireMod >= 2) {
-    $gameScreen.showPicture(basePicId + 3, HSTATES_BACKGROUND + hStageSexualDesireMod, 1, 1024, 384, 100, 100, 0, 0);
-    $gameScreen.movePicture(basePicId + 4, 1, 1024, 384, 100, 100, 0, 0, 120);
-    $gameScreen.movePicture(basePicId + 3, 1, 1024, 384, 100, 100, 255, 0, 120);
-  }
+  applyHStageParticleEffects(basePicId, hStage);
+  applyHStageBackgroundFade(basePicId, hStage);
+  applyHStageBackgroundTransition(basePicId, hStage);
 
   bless_erase();
+  updateHStageFacePicture(basePicId, actorId, hStage);
 
-  let facePictureId = HSTATES_ACTOR_FACE + actorId + "_" + hStageSexualDesireMod;
-  $gameScreen.setPicturesAnimation(5, 1, "横", 5);
-  $gameScreen.showPicture(basePicId + 9, facePictureId, 1, 1024, 384, 100, 100, 255, 0);
-  $gameScreen.picture(basePicId + 9).startAnimationFrame(1, false, [1]);
+  $gameScreen.movePicture(basePicId + H_TACHIE_LAYERS.frame, 1, 1024, 384, 100, 100, 0, 0, 60);
+  applyBlessToPictures(basePicId + H_TACHIE_LAYERS.backBody,
+    basePicId + H_TACHIE_LAYERS.face);
 
-  if (hStageSexualDesireMod == 1 || hStageSexualDesireMod == 5) {
-    let faceVariantSuffix = faceVariantMap[hStageSexualDesireMod];
-    $gameScreen.showPicture(basePicId + 12, HSTATES_ACTOR_FACE + actorId + faceVariantSuffix, 1, 1024, 384, 100, 100, 0, 3);
-    $gameScreen.movePicture(basePicId + 12, 1, 1024, 384, 100, 100, 150, 3, 180);
+  if ($gameScreen.picture(basePicId + H_TACHIE_LAYERS.bust)) {
+    hcg_piston(basePicId + H_TACHIE_LAYERS.bust, 9, 1, 2);
+  };
+}
+
+// Glow settings per stage (alpha / speed / scale / color / emitterLifetime).
+function applyHStageParticleEffects(basePicId, hStage) {
+  const particle = $gameScreen._particle;
+  const bustWhitePictureId = basePicId + H_TACHIE_LAYERS.bustWhite;
+
+  if (hStage >= 1) {
+    particle.particleUpdate([HSTATES_BODY_SHINE1, 'alpha', '0.7', '0.3' + '@0.5', '0']);
   }
-  $gameScreen.movePicture(basePicId + 11, 1, 1024, 384, 100, 100, 0, 0, 60);
-  for (let pictureId = basePicId + 6, max = basePicId + 9; pictureId <= max; pictureId++) {
-    if ($gameScreen.picture(pictureId)) {
-      tachie_bless(pictureId, 0);
-    }
+  if (hStage >= 2) {
+    $gameScreen.movePicture(bustWhitePictureId, 1, 1024, 384, 100, 100, 150, 0, 60);
+    particle.particleUpdate([HSTATES_BODY_SHINE1, 'speed', '0.5', '0.5' + '@0.5', '0.5']);
   }
-  if ($gameScreen.picture(basePicId + 7)) {
-    hcg_piston(basePicId + 7, 9, 1, 2);
+  if (hStage >= 3) {
+    $gameScreen.movePicture(bustWhitePictureId, 1, 1024, 384, 100, 100, 50, 0, 60);
+    particle.particleUpdate([HSTATES_BODY_SHINE1, 'scale', '10', '6' + '@0.5', '6']);
+    particle.particleUpdate([HSTATES_BODY_SHINE1, 'color', '#eb00ff', '#eb00ff@0.1', '#ffffff']);
+  }
+  if (hStage >= 4) {
+    particle.particleUpdate([HSTATES_BODY_SHINE1, 'emitterLifetime', '1']);
+    $gameScreen.movePicture(bustWhitePictureId, 1, 1024, 384, 100, 100, 0, 0, 60);
+    particle.particleClear(HSTATES_BG_SHINE1);
+    particle.particleSet(0, 'hStates_bgShine2', 'picture:57', 'def', 'blow');
   }
 }
+
+// Fades the background in from stage 2 upwards.
+function applyHStageBackgroundFade(basePicId, hStage) {
+  if (hStage < 2) return;
+
+  const fadeDuration = hStage >= 5 ? H_TACHIE_BACKGROUND_FADE_DURATION_HIGH : fadeDurationsMap[hStage] || 0;
+  $gameScreen.showPicture(basePicId + H_TACHIE_LAYERS.backgroundFade,
+    HSTATES_BACKGROUND + hStage, 1, 1024, 384, 100, 100, 255, 0);
+  picture_fade1(basePicId + H_TACHIE_LAYERS.backgroundFade, "fadeOut", H_TACHIE_FADE_PICTURE_NAME, fadeDuration, 5);
+}
+
+// Switches the foreground background from stage 2 upwards.
+function applyHStageBackgroundTransition(basePicId, hStage) {
+  if (hStage < 2) return;
+
+  $gameScreen.showPicture(basePicId + H_TACHIE_LAYERS.backgroundFore,
+    HSTATES_BACKGROUND + hStage, 1, 1024, 384, 100, 100, 0, 0);
+  $gameScreen.movePicture(basePicId + H_TACHIE_LAYERS.backgroundBase, 1, 1024, 384, 100, 100, 0, 0, 120);
+  $gameScreen.movePicture(basePicId + H_TACHIE_LAYERS.backgroundFore, 1, 1024, 384, 100, 100, 255, 0, 120);
+}
+
+// Expression variants (different names are layered on stages 1 and 5).
+function updateHStageFacePicture(basePicId, actorId, hStage) {
+  $gameScreen.setPicturesAnimation(5, 1, "横", 5);
+  $gameScreen.showPicture(basePicId + H_TACHIE_LAYERS.face,
+    HSTATES_ACTOR_FACE + actorId + "_" + hStage, 1, 1024, 384, 100, 100, 255, 0);
+  $gameScreen.picture(basePicId + H_TACHIE_LAYERS.face).startAnimationFrame(1, false, [1]);
+
+  if (!H_TACHIE_STAGE_FACE_VARIANT.includes(hStage)) return;
+
+  const faceVariantSuffix = faceVariantMap[hStage];
+  $gameScreen.showPicture(basePicId + H_TACHIE_LAYERS.faceVariant,
+    HSTATES_ACTOR_FACE + actorId + faceVariantSuffix, 1, 1024, 384, 100, 100, 0, 3);
+  $gameScreen.movePicture(basePicId + H_TACHIE_LAYERS.faceVariant, 1, 1024, 384, 100, 100, 150, 3, 180);
+}
+
+// Derives the standing picture stage (191) and the expression variant (192) from the learned skills.
+const H_TACHIE_STAGE_BY_SKILL = [
+  { skillId: 70, stage: 6, variant: 1 },
+  { skillId: 68, stage: 5, variant: 2 },
+  { skillId: 66, stage: 4, variant: 1 },
+  { skillId: 64, stage: 3, variant: 1 },
+  { skillId: 62, stage: 2, variant: 1 }
+];
+const H_TACHIE_DEFAULT_STAGE = 1;
 
 function setActorStateBasedOnSkillsHStatesTachie(actor) {
-  $gameVariables.setValue(192, 1);
+  $gameVariables.setValue(VAR_H_STAGE_VARIANT, 1);
 
-  switch (true) {
-    case actor.isLearnedSkill(70):
-      $gameVariables.setValue(191, 6); // あへ
-      break;
-    case actor.isLearnedSkill(68):
-      $gameVariables.setValue(191, 5); // 通常目光
-      $gameVariables.setValue(192, 2);
-      break;
-    case actor.isLearnedSkill(66):
-      $gameVariables.setValue(191, 4); // 卑猥
-      break;
-    case actor.isLearnedSkill(64):
-      $gameVariables.setValue(191, 3); // 自失
-      break;
-    case actor.isLearnedSkill(62):
-      $gameVariables.setValue(191, 2); // 反抗
-      break;
-    default:
-      $gameVariables.setValue(191, 1);
-  }
+  const stageSetting = H_TACHIE_STAGE_BY_SKILL.find((setting) => actor.isLearnedSkill(setting.skillId));
+  if (!stageSetting) {
+    $gameVariables.setValue(VAR_H_STAGE_STATE, H_TACHIE_DEFAULT_STAGE);
+    return;
+  };
 
-  //$gameVariables.setValue(192,2);//デバッグ用
-  //$gameVariables.setValue(191,3);
+  $gameVariables.setValue(VAR_H_STAGE_STATE, stageSetting.stage);
+  if (stageSetting.variant != 1) {
+    $gameVariables.setValue(VAR_H_STAGE_VARIANT, stageSetting.variant);
+  };
 }
 
-//☆☆性欲度情報をリセット
-seiyoku_parameterReset = function (id1) {
+//---------------------------------------------------------------------------
+// Libido parameter reset, battle harassment, sex direction dispatch
+//---------------------------------------------------------------------------
 
-  var actor = $gameActors.actor($gameVariables.value(20));
-  if (id1 == 1) {//選択肢作成
-    var start = 401; var end = 440;
-    for (var i = start; i <= end; i++) {
-      if (i != 405) {
-        if (i >= 401 && i <= 430) {
-          $gameVariables.setValue(i, $gameVariables.value($gameVariables.value(20) + 380)[i - 400]);
-        } else {
-          $gameVariables.setValue(i, actor.skillMasteryLevel(i - 380));
-          if (!actor.isLearnedSkill(i - 380)) { $gameVariables.setValue(i, 0) };
-        };
-      }
-    };
-    const id = 1;
-    const choiceParams = {
-      text: `一括で未経験に変更　　　　　　　　　　　　　　　　　　`,
-      value: 0
-    };
-    $gameSystem.addCustomChoice(id, choiceParams);
-    for (var i = 401; i <= 439; i++) {//431-439経験値
-      //if(i != 402 || i != 403 || i != 404 || i != 405 || i != 428 || i != 429){
-      if ([402, 403, 404, 405, 428, 429].some(function (id2) { return id2 == i })) { } else {
-        var value3 = $dataSystem.variables[i];
-        //var value3 = value3.replace("　", "");
-        //var value3 = value3.replace("　", "");
-        //var value3 = value3.replace("　", "");
-        //var value3 = value3.replace(" ", "");
-        var value3 = `${value3}${$gameVariables.value(i)}`;
-        const id = 1;
-        const choiceParams = {
-          text: value3,
-          value: i
-        };
-        $gameSystem.addCustomChoice(id, choiceParams);
-      };
-    };
-  };
-  if (id1 == 2) {//反映
-    var start = $gameVariables.value(19) - 400;
-    var end = $gameVariables.value(19) - 400;
-    if ($gameVariables.value(19) == 0) {
-      var start = 1; var end = 30;
-    };
-    if ($gameVariables.value(19) == 0 || $gameVariables.value(19) - 400 >= 1 && $gameVariables.value(19) - 400 <= 30) {
-      for (var i = start; i <= end; i++) {
-        if ($gameVariables.value($gameVariables.value(20) + 380)[i] >= 1) {
-          $gameVariables.value($gameVariables.value(20) + 380)[i] = 0;
-          $gameVariables.setValue(i + 400, 0)
-          var value3 = $dataSystem.variables[i + 400];
-          var value3 = value3.replace("　", "");
-          var value3 = value3.replace("　", "");
-          var value3 = value3.replace("　", "");
-          var value3 = value3.replace(" ", "");
-          var value3 = value3.replace(":", "");
-          var value1 = `\\C[1]${value3}\\C[0]がリセットされました…`;
-          CommonPopupManager.showInfo({}, value1, null);
-          if (i == 6) {
-            $gameVariables.value($gameVariables.value(20) + 380)[41] = 0;
-            var value1 = `\\C[2]初体験相手\\C[0]がリセットされました…`;
-            CommonPopupManager.showInfo({}, value1, null);
-          };
-        };
-      };
-    };
-    if ($gameVariables.value(19) == 0) {
-      var start = 31; var end = 40;
-    };
-    if ($gameVariables.value(19) == 0 || $gameVariables.value(19) - 400 >= 31 && $gameVariables.value(19) - 400 <= 40) {
-      for (var i = start; i <= end; i++) {
-        if (actor.isLearnedSkill(i + 20)) {
-          actor.setSkillMasteryUses(i + 20, 0);
-          actor.setSkillMasteryLevel(i + 20, 0);
-          actor.forgetSkill(i + 20);
-          var value1 = `${$dataSkills[i + 20].name}忘却…`;
-          CommonPopupManager.showInfo({}, value1, null);
-        };
-      };
-    };
-    hskill_learn(2);//該当するHスキル忘却
-  };
+// Resets the libido information.
+const RESET_MODE_CHOICES = 1;             // build the choice window
+const RESET_MODE_APPLY = 2;               // apply the choice
+// Index range of the H state array that the reset covers (1-30) and of the skill part (31-40).
+const HSTATE_INDEX_FIRST = 1;
+const HSTATE_INDEX_LAST = 30;
+const RESET_SKILL_FIRST = 31;
+const RESET_SKILL_LAST = 40;
 
+const RESET_SKIPPED_VAR_IDS = [402, 403, 404, 405, 428, 429];
+const RESET_SKILL_OFFSET = 20;
+
+seiyoku_parameterReset = function (resetModeId) {
+
+  const { actorId, actor } = readCurrentActor();
+  if (!actor) return;
+
+  const hStateValues = readHStateValues(actorId);
+  if (resetModeId == RESET_MODE_CHOICES) {
+    fillResetChoicesValues(actor, hStateValues);
+    addResetCustomChoices();
+  };
+  if (resetModeId != RESET_MODE_APPLY) return;
+
+  applyResetSelection(actor, hStateValues);
+  hskill_learn(2);// forget the matching H skills
 };
 
-//☆☆拘束前のセクハラ演出
+// Publishes the current values (401-430) and the skill masteries (431-439) for the choice window.
+function fillResetChoicesValues(actor, hStateValues) {
+  for (let varId = VAR_HSTATE_PENDING_FIRST; varId <= VAR_HSTATE_PENDING_LAST; varId++) {
+    if (varId == VAR_HSTATE_EXPOSURE_LIMIT) continue;
+
+    if (varId <= VAR_HSTATE_PENDING_DEVELOPMENT_BASE) {
+      $gameVariables.setValue(varId, hStateValues[varId - VAR_HSTATE_ECSTASY_BASE]);
+      continue;
+    };
+
+    const skillId = varId - HSTATE_ARRAY_VAR_OFFSET;
+    $gameVariables.setValue(varId, actor.isLearnedSkill(skillId) ? actor.skillMasteryLevel(skillId) : 0);
+  };
+}
+
+function addResetCustomChoices() {
+  $gameSystem.addCustomChoice(1, { text: `一括で未経験に変更　　　　　　　　　　　　　　　　　　`, value: 0 });
+  for (let varId = VAR_HSTATE_PENDING_FIRST; varId <= VAR_SUPPRESSION_TARGET_LAST; varId++) {// experience values 431-439
+    if (RESET_SKIPPED_VAR_IDS.includes(varId)) continue;
+    const statName = $dataSystem.variables[varId];
+    const statValue = $gameVariables.value(varId);
+    $gameSystem.addCustomChoice(1, { text: `${statName}${statValue}`, value: varId });
+  };
+}
+
+// Resets the H state / skill matching the selected variable id.
+function applyResetSelection(actor, hStateValues) {
+  const selectedVarId = $gameVariables.value(VAR_PENDING_HSTATE_INPUT);
+
+  if (isHStateResetTarget(selectedVarId)) {
+    resetHStateRange(actor, hStateValues, selectedVarId, HSTATE_INDEX_FIRST, HSTATE_INDEX_LAST);
+  };
+  if (isSkillResetTarget(selectedVarId)) {
+    resetSkillRange(actor, selectedVarId, RESET_SKILL_FIRST, RESET_SKILL_LAST);
+  };
+}
+
+// Whether the variable id is an H state reset target (1-30).
+function isHStateResetTarget(selectedVarId) {
+  return selectedVarId == 0 || isInRange(selectedVarId - VAR_HSTATE_ECSTASY_BASE, HSTATE_INDEX_FIRST, HSTATE_INDEX_LAST);
+}
+
+// Whether the variable id is a skill reset target (31-40).
+function isSkillResetTarget(selectedVarId) {
+  return selectedVarId == 0 || isInRange(selectedVarId - VAR_HSTATE_ECSTASY_BASE, RESET_SKILL_FIRST, RESET_SKILL_LAST);
+}
+
+function isInRange(value, minValue, maxValue) {
+  return value >= minValue && value <= maxValue;
+}
+
+// Index range of a reset request: 0 resets the given full range, any other value
+// names one entry of the 401-440 variable block.
+function readResetRange(selectedVarId, minIndex, maxIndex) {
+  if (selectedVarId == 0) return { startIndex: minIndex, endIndex: maxIndex };
+  const selectedIndex = selectedVarId - VAR_HSTATE_ECSTASY_BASE;
+  return { startIndex: selectedIndex, endIndex: selectedIndex };
+}
+
+// H state reset (0 means the whole range).
+function resetHStateRange(actor, hStateValues, selectedVarId, minIndex, maxIndex) {
+  const { startIndex, endIndex } = readResetRange(selectedVarId, minIndex, maxIndex);
+
+  for (let index = startIndex; index <= endIndex; index++) {
+    if (!(hStateValues[index] >= 1)) continue;
+
+    hStateValues[index] = 0;
+    $gameVariables.setValue(index + VAR_HSTATE_ECSTASY_BASE, 0);
+
+    const variableNameText = cleanVariableLabel($dataSystem.variables[index + VAR_HSTATE_ECSTASY_BASE]);
+    showResetNotice(colorTaggedText(1, variableNameText) + `がリセットされました…`);
+
+    if (index == HSTATE_INDEX_SEX_COUNT) {
+      hStateValues[HSTATE_INDEX_FIRST_PARTNER] = 0;
+      showResetNotice(colorTaggedText(2, `初体験相手`) + `がリセットされました…`);
+    };
+  };
+}
+
+// Forget H skills (0 means the whole range).
+function resetSkillRange(actor, selectedVarId, minIndex, maxIndex) {
+  const { startIndex, endIndex } = readResetRange(selectedVarId, minIndex, maxIndex);
+
+  for (let index = startIndex; index <= endIndex; index++) {
+    const skillId = index + RESET_SKILL_OFFSET;
+    if (!actor.isLearnedSkill(skillId)) continue;
+
+    actor.setSkillMasteryUses(skillId, 0);
+    actor.setSkillMasteryLevel(skillId, 0);
+    actor.forgetSkill(skillId);
+    const skillName = $dataSkills[skillId].name;
+    showResetNotice(`${skillName}忘却…`);
+  };
+}
+
+function showResetNotice(resetMessage) {
+  CommonPopupManager.showInfo({}, resetMessage, null);
+}
+
+// Harassment scene before the restraint.
+const SEKUHARA_STATE_ID = 81;
+const SEKUHARA_STATE_COUNTER_BONUS = 10;
+const SEKUHARA_STATE_SWITCH_ID = 437;
+const SEKUHARA_OVERLAY_PICTURE_ID = 54;
+const SEKUHARA_OVERLAY_PICTURE_NAME = 'Screen_Width512Black'; // used when only the right half shows the H CG
+const SEKUHARA_PICTURE_ID_BASE = 60;
+const SEKUHARA_DEFAULT_IMAGE_DURATION = 180;
+const SEKUHARA_IMAGE_SETTINGS = [
+  { exposureThreshold: 1000, imageDuration: 120, poseVariant: 6 },
+  { exposureThreshold: 800, imageDuration: 140, poseVariant: 5 },
+  { exposureThreshold: 600, imageDuration: 150, poseVariant: 4 },
+  { exposureThreshold: 400, imageDuration: 160, poseVariant: 3 },
+  { exposureThreshold: 200, imageDuration: 170, poseVariant: 2 }
+];
+const SEKUHARA_SKIPPED_POSE_INDEXES_FOR_BUST = 2;
+const SEKUHARA_POSE_INDEX_WITH_MOVIE = 9;
+const SEKUHARA_POSE_INDEX_REQUIRED_STAGE = 6;
+const SEKUHARA_POSE_INDEX_PREGNANT = 8;
+const SEKUHARA_POSE_INDEX_WITH_PISTON = 4;
+const SEKUHARA_SINGLE_VARIANT_POSE_INDEXES = [1, 2, 4, 5, 6, 8];
+
 actor_battleSekughara1 = function () {
 
-  var actor = $gameActors.actor($gameVariables.value(20));
-  var value1 = 81;
-  actor.addState(value1);
-  if (actor._stateCounter[value1] >= 1) {
-    actor.addStateCounter(value1, +10);
+  const { actorId, actor } = readCurrentActor();
+  if (!actor) return;
+
+  const stateCounter = addSekuharaState(actor);
+  const hStateValues = readHStateValues(actorId);
+  const arousalValue = hStateValues[HSTATE_INDEX_AROUSAL];
+
+  if (isSekuharaSwitchEnabled(arousalValue, stateCounter)) {
+    $gameSwitches.setValue(SEKUHARA_STATE_SWITCH_ID, true);
+  };
+
+  $gameScreen.showPicture(SEKUHARA_OVERLAY_PICTURE_ID, SEKUHARA_OVERLAY_PICTURE_NAME, 1, 1024 - 100, 384, 100, 100, 0, 0);
+  $gameScreen.movePicture(SEKUHARA_OVERLAY_PICTURE_ID, 1, 1024 - 50, 384, 100, 100, 200, 0, 60);
+
+  valuePic1 = SEKUHARA_PICTURE_ID_BASE;
+  const imageSetting = resolveSekuharaImageSetting(arousalValue);
+  const enemyType = $gameSwitches.value(SW_GOBLIN_ENEMY) ? 2 : 1;// depends on the partner: 1 human, 2 goblin, 3 giant
+
+  showSekuharaPoses(actor, actorId, imageSetting, enemyType);
+
+  $gameVariables.setValue(VAR_H_SCENE_TEXT_X, actorId);// text HBGV
+  $gameVariables.setValue(VAR_H_SCENE_PICTURE_PARAMS, [640 + 400, 384 + 20, 1, 60, 0, 0]);
+  $gameSwitches.setValue(SW_ECSTASY_VOICE, true);
+
+};
+
+// Applies the harassment state and returns the elapsed counter.
+function addSekuharaState(actor) {
+  actor.addState(SEKUHARA_STATE_ID);
+  if (actor._stateCounter[SEKUHARA_STATE_ID] >= 1) {
+    actor.addStateCounter(SEKUHARA_STATE_ID, +SEKUHARA_STATE_COUNTER_BONUS);
   } else {
-    actor.setStateCounter(value1, 1);
+    actor.setStateCounter(SEKUHARA_STATE_ID, 1);
   };
-  var value2 = $gameVariables.value($gameVariables.value(20) + 380)[4];
-  var value3 = $gameVariables.value($gameVariables.value(20) + 380)[1];
-  var value4 = Math.ceil((value3 + 1) / 10);//0の場合の対策で+1
-  var value5 = getRandomIndex(101);
-  value4 += actor._stateCounter[value1];
-  if (value4 >= value5) {
-    $gameSwitches.setValue(437, true);
-  };
-  var value1 = 54;
-  var value2 = 'Screen_Width512Black';//右側のみＨＣＧの際に使用
-  $gameScreen.showPicture(value1, value2, 1, 1024 - 100, 384, 100, 100, 0, 0);
-  $gameScreen.movePicture(value1, 1, 1024 - 50, 384, 100, 100, 200, 0, 60);
-  valuePic1 = 60;
-  var value4 = $gameVariables.value(20);
-  var value5 = $gameVariables.value($gameVariables.value(20) + 380)[1];
-  var value6 = 1;//相手によって変更.1ヒト2ゴブ3巨人
-  if ($gameSwitches.value(248)) { var value6 = 2 };
-  var value7 = 180; var value8 = 1;
-  if (value5 >= 200) { var value7 = 170; var value8 = 2 };
-  if (value5 >= 400) { var value7 = 160; var value8 = 3 };
-  if (value5 >= 600) { var value7 = 150; var value8 = 4 };
-  if (value5 >= 800) { var value7 = 140; var value8 = 5 };
-  if (value5 >= 1000) { var value7 = 120; var value8 = 6 };
-  for (var i = 1; i < 10; i++) {
-    var value9 = 0;
-    if (i == 2 && $gameVariables.value($gameVariables.value(20) + 440)[18] == 0) { var value9 = 1 };
-    if (i == 6 && value8 <= 3) { var value9 = 1 };
-    if (i == 8 && !actor.isStateAffected(83)) { var value9 = 1 };
-    if (i == 10 && value8 <= 3) { var value9 = 1 };
-    if (value9 == 0) {
-      if ([1, 2, 4, 5, 6, 8, 10].some(function (id) { return i == id })) { var value8 = 1 };
-      if (i == 3 && value8 >= 5) { var value8 = 2 };
-      if (i == 5 && $gameVariables.value($gameVariables.value(20) + 440)[32] >= 1) { var value8 = 2 };
-      if (i != 9) {
-        var value2 = 'Zev_BattleSekuharaActor' + value4 + '_' + i + '_' + value8;
-      } else {
-        var value8 = value6
-        $gameScreen.setPicturesAnimation(2, value7, '連番', 30);
-        var value2 = 'Zev_BattleSekuharaActor' + value4 + '_' + i + '_' + value8 + '_0';
-      };
-      $gameScreen.showPicture(valuePic1 + i, value2, 1, 640 + 400, 384 + 50, 100, 100, 0, 0);
-      if (i == 9) {
-        $gameScreen.picture(valuePic1 + i).startAnimationFrame(1, true, [2, 3]);
-      };
-      $gameScreen.movePicture(valuePic1 + i, 1, 640 + 400, 384 + 20, 100, 100, 255, 0, 40);
-      if (i == 9 || i == 4) {
-        hcg_piston(valuePic1 + i, 9, 2, 2);
-      } else {
-        tachie_bless(valuePic1 + i, 1);
-      };
-    };
-  };
-  var value1 = $gameVariables.value(20);//文字HBGV
-  $gameVariables.setValue(318, value1);
-  $gameVariables.setValue(706, [640 + 400, 384 + 20, 1, 60, 0, 0]);
-  $gameSwitches.setValue(119, true);
-
-};
-
-//☆☆H時の音や効果 BGSライン。通常1,Ｈ2-9,天候10,Bgv10+アクターID//
-sex_direction = function (actionType, pistonIntensity, patternVariant) {
-
-  let voicePatternNum = 0;
-  if ($gameVariables.value(530) >= 1) {
-    $gameVariables.setValue(20, $gameVariables.value(530));
-    if ($dataActors[$gameVariables.value(20)].meta['HvoicePattern']) {
-      voicePatternNum = Number($dataActors[$gameVariables.value(20)].meta['HvoicePattern']);
-      if (pistonIntensity == 0) {
-        if ($gameActors.actor($gameVariables.value(530)).isLearnedSkill(65)) {
-          pistonIntensity = 2;
-        } else {
-          pistonIntensity = 1;
-        }
-      }
-    }
-  }
-
-  // Delegate each actionType to a standalone function (with 'SexDirection' suffix)
-  switch (actionType) {
-    case 99:
-      actionType99SexDirection();
-      break;
-    case 0:
-      actionType0SexDirection();
-      break;
-    case 1: // ピストン弱
-      actionType1SexDirection(pistonIntensity, patternVariant, voicePatternNum);
-      break;
-    case 2: // ピストン強
-      actionType2SexDirection(pistonIntensity, patternVariant, voicePatternNum);
-      break;
-    case 3: // 愛液
-      actionType3SexDirection(pistonIntensity, patternVariant, voicePatternNum);
-      break;
-    case 4: // キス
-      actionType4SexDirection(pistonIntensity, patternVariant, voicePatternNum);
-      break;
-    case 5: // フェラ
-      actionType5SexDirection(pistonIntensity, patternVariant, voicePatternNum);
-      break;
-    case 6: // 揉み
-      actionType6SexDirection(pistonIntensity, patternVariant, voicePatternNum);
-      break;
-    case 7: // 機械振動
-      actionType7SexDirection(pistonIntensity, patternVariant, voicePatternNum);
-      break;
-    case 8: // 機械振動激しく
-      actionType8SexDirection(pistonIntensity, patternVariant, voicePatternNum);
-      break;
-    case 11: // 挿入
-      actionType11SexDirection(pistonIntensity, patternVariant, voicePatternNum);
-      break;
-    case 12: // 射精
-      actionType12SexDirection(pistonIntensity, patternVariant, voicePatternNum);
-      break;
-    case 13: // 射精以外で終了
-      actionType13SexDirection(pistonIntensity, patternVariant, voicePatternNum);
-      break;
-    case 51: // 写真撮影
-      actionType51SexDirection(pistonIntensity, patternVariant, voicePatternNum);
-      break;
-    case 52: // 眼パチ閉
-      actionType52SexDirection(pistonIntensity, patternVariant, voicePatternNum);
-      break;
-    case 53: // 眼パチ開く
-      actionType53SexDirection(pistonIntensity, patternVariant, voicePatternNum);
-      break;
-    case 54: // 薄くピンク点灯
-      actionType54SexDirection(pistonIntensity, patternVariant, voicePatternNum);
-      break;
-    default:
-      break;
-  }
-};
-
-function actionType99SexDirection() {
-  // (actionType 99)
-  // Stop all BGS and set variable 194.
-  AudioManager.stopAllBgs();
-  $gameVariables.setValue(194, 1);
+  return actor._stateCounter[SEKUHARA_STATE_ID];
 }
 
+// Whether switch 437 should be raised from the libido value and the counter.
+function isSekuharaSwitchEnabled(arousalValue, stateCounter) {
+  const exposureThreshold = Math.ceil((arousalValue + 1) / 10) + stateCounter;// the +1 guards the zero case
+  return exposureThreshold >= getRandomIndex(101);
+}
+
+// Display time and pose stage according to the libido value.
+function resolveSekuharaImageSetting(arousalValue) {
+  const matchedSetting = SEKUHARA_IMAGE_SETTINGS.find((setting) => arousalValue >= setting.exposureThreshold);
+  return matchedSetting || { imageDuration: SEKUHARA_DEFAULT_IMAGE_DURATION, poseVariant: 1 };
+}
+
+// Shows poses 1-9.
+function showSekuharaPoses(actor, actorId, imageSetting, enemyType) {
+  const physiqueStateValues = readPartnerBodyValues(actorId);
+  // CHANGED: the original reused poseVariant outside the loop (it leaked into the later poses).
+  //          The result is carried over to the next pose to keep that behaviour.
+  let poseVariant = imageSetting.poseVariant;
+
+  for (let poseIndex = 1; poseIndex < 10; poseIndex++) {
+    if (isSekuharaPoseSkipped(poseIndex, poseVariant, physiqueStateValues, actor)) continue;
+
+    poseVariant = resolveSekuharaPoseVariant(poseIndex, poseVariant, physiqueStateValues, enemyType);
+    showSekuharaPose(actorId, poseIndex, poseVariant, imageSetting.imageDuration);
+  };
+}
+
+// Whether this pose is skipped.
+function isSekuharaPoseSkipped(poseIndex, poseVariant, physiqueStateValues, actor) {
+  if (poseIndex == SEKUHARA_SKIPPED_POSE_INDEXES_FOR_BUST && physiqueStateValues[HSTATE_BODY_INDEX_BUST_FLAG] == 0) return true;
+  if (poseIndex == SEKUHARA_POSE_INDEX_REQUIRED_STAGE && poseVariant <= 3) return true;
+  if (poseIndex == SEKUHARA_POSE_INDEX_PREGNANT && !actor.isStateAffected(STATE_PREGNANT)) return true;
+  return false;
+}
+
+// Variant number per pose (the order dependency of the original is kept).
+function resolveSekuharaPoseVariant(poseIndex, imageSettingVariant, physiqueStateValues, enemyType) {
+  let poseVariant = imageSettingVariant;
+  if (SEKUHARA_SINGLE_VARIANT_POSE_INDEXES.includes(poseIndex)) { poseVariant = 1 };
+  if (poseIndex == 3 && poseVariant >= 5) { poseVariant = 2 };
+  if (poseIndex == 5 && physiqueStateValues[HSTATE_BODY_INDEX_HEAD_VARIANT] >= 1) { poseVariant = 2 };
+  if (poseIndex == SEKUHARA_POSE_INDEX_WITH_MOVIE) { poseVariant = enemyType };
+  return poseVariant;
+}
+
+// Animation mode name the picture plugin expects for the movie pose.
+const SEKUHARA_ANIMATION_MODE = '連番';
+
+// Image name of a harassment pose; the movie pose uses a numbered sequence.
+function buildSekuharaImageName(actorId, poseIndex, poseVariant, isMovie) {
+  const imageName = 'Zev_BattleSekuharaActor' + actorId + '_' + poseIndex + '_' + poseVariant;
+  return isMovie ? imageName + '_0' : imageName;
+}
+
+function showSekuharaPose(actorId, poseIndex, poseVariant, imageDuration) {
+  const pictureId = valuePic1 + poseIndex;
+  const isMovie = poseIndex == SEKUHARA_POSE_INDEX_WITH_MOVIE;
+  if (isMovie) {
+    $gameScreen.setPicturesAnimation(2, imageDuration, SEKUHARA_ANIMATION_MODE, 30);
+  };
+
+  const secuharaImageName = buildSekuharaImageName(actorId, poseIndex, poseVariant, isMovie);
+  $gameScreen.showPicture(pictureId, secuharaImageName, 1, 640 + 400, 384 + 50, 100, 100, 0, 0);
+  if (isMovie) {
+    $gameScreen.picture(pictureId).startAnimationFrame(1, true, [2, 3]);
+  };
+  $gameScreen.movePicture(pictureId, 1, 640 + 400, 384 + 20, 100, 100, 255, 0, 40);
+
+  if (isMovie || poseIndex == SEKUHARA_POSE_INDEX_WITH_PISTON) {
+    hcg_piston(pictureId, 9, 2, 2);
+    return;
+  };
+  tachie_bless(pictureId, 1);
+}
+
+//---------------------------------------------------------------------------
+// H action direction (BGS lines and sound effects)
+//---------------------------------------------------------------------------
+
+// H sounds and effects BGS line. Normal 1, H 2-9, weather 10, Bgv 10 + actor id
+const ACTION_TYPE_NO_OP = 99;             // stop every BGS
+const ACTION_TYPE_FLASH = 0;
+const ACTION_TYPE_PISTON_WEAK = 1;
+const ACTION_TYPE_PISTON_STRONG = 2;
+const ACTION_TYPE_FLUID = 3;
+const ACTION_TYPE_KISS = 4;
+const ACTION_TYPE_FELLATIO = 5;
+const ACTION_TYPE_BUST_KNEAD = 6;
+const ACTION_TYPE_VIBRATION = 7;
+const ACTION_TYPE_VIBRATION_STRONG = 8;
+const ACTION_TYPE_INSERTION = 11;
+const ACTION_TYPE_EJACULATION = 12;
+const ACTION_TYPE_NO_EJACULATION = 13;
+const ACTION_TYPE_PHOTOGRAPH = 51;
+const ACTION_TYPE_EYES_CLOSE = 52;
+const ACTION_TYPE_EYES_OPEN = 53;
+const ACTION_TYPE_PINK_FLASH = 54;
+
+const H_PINK_FLASH_PICTURE_ID = 111;      // CHANGED: keeps the existing behaviour of reusing picture id 111
+const H_PHOTOGRAPH_PICTURE_NAME = 'ScreenWhiteOut';
+const H_BLACK_OUT_PICTURE_NAME = 'ScreenBlackOut';
+const H_FLASH_COLOR_PINK = [255, 119, 255];
+
+sex_direction = function (actionType, pistonIntensity, patternVariant) {
+
+  const voiceInfo = readHSceneVoiceInfo($gameVariables.value(VAR_H_SCENE_ACTOR), pistonIntensity);
+  // intensity 0 is derived from the skill (resolved before the table lookup)
+  const resolvedPistonIntensity = voiceInfo.resolvedPistonIntensity != null
+    ? voiceInfo.resolvedPistonIntensity
+    : pistonIntensity;
+
+  routeSexAction(actionType, resolvedPistonIntensity, patternVariant, voiceInfo.voicePatternNum);
+};
+
+// Dispatches the action type to its handler; unknown types do nothing.
+function routeSexAction(actionType, pistonIntensity, patternVariant, voicePatternNum) {
+  const handler = SEX_ACTION_HANDLERS[actionType];
+  if (!handler) return;
+  handler(pistonIntensity, patternVariant, voicePatternNum);
+}
+
+// Voice pattern number and the piston intensity derived from the skill when 0 is given.
+function readHSceneVoiceInfo(actorId, pistonIntensity) {
+  if (actorId < 1) return { voicePatternNum: 0, resolvedPistonIntensity: null };
+
+  $gameVariables.setValue(VAR_CURRENT_ACTOR_ID, actorId);
+
+  const actorData = $dataActors[actorId];
+  if (!actorData || !actorData.meta['HvoicePattern']) {
+    return { voicePatternNum: 0, resolvedPistonIntensity: null };
+  };
+
+  const voicePatternNum = Number(actorData.meta['HvoicePattern']);
+  if (pistonIntensity != 0) return { voicePatternNum, resolvedPistonIntensity: null };
+
+  const actor = $gameActors.actor(actorId);
+  const resolvedPistonIntensity = actor && actor.isLearnedSkill(SKILL_H_SKILLED) ? 2 : 1;
+  return { voicePatternNum, resolvedPistonIntensity };
+}
+
+function actionType99SexDirection() {
+  //   Stops every BGS and sets variable 194 (line number) back to 1.
+  AudioManager.stopAllBgs();
+  $gameVariables.setValue(VAR_H_STAGE_MESSAGE, 1);
+}
+
+const H_DIRECT_PARTICLE_NAME = 'hScene_Direct1';
+
 function actionType0SexDirection() {
-  // (actionType 0)
-  // Clear particles and start flash effect with direct particle setting.
-  const directParticleNames = ['hScene_Direct1'];
-  for (let i = 0; i < directParticleNames.length; i++) {
-    $gameScreen._particle.particleClear(directParticleNames[i]);
-  }
-  let flashDuration = getRandomIndex(41) + 180;
+  $gameScreen._particle.particleClear(H_DIRECT_PARTICLE_NAME);
+  const flashDuration = getRandomIndex(41) + 180;
   const flashIntensity = getRandomIndex(21) + 40;
-  $gameScreen.startFlash([255, 119, 255, flashDuration], flashIntensity);
-  const directParticleName = 'hScene_Direct1';
-  $gameScreen._particle.particleSet(0, directParticleName, 'screen', 'def', 'screen');
+  $gameScreen.startFlash([H_FLASH_COLOR_PINK[0], H_FLASH_COLOR_PINK[1], H_FLASH_COLOR_PINK[2], flashDuration], flashIntensity);
+  $gameScreen._particle.particleSet(0, H_DIRECT_PARTICLE_NAME, 'screen', 'def', 'screen');
 }
 
 class SexActionSoundEffectBase {
@@ -2523,9 +3614,9 @@ class SexActionSoundEffectBase {
     this.voicePatternNum = voicePatternNum;
   }
 
-  // default values are for sex action 3, FluidSoundEffect
+  //   Defaults target actionType 3 (fluid / love juice).
 
-  // first play bgs getters
+  //   First BGS setup
   get soundName() {
     return "21_LoveJuice";
   }
@@ -2542,12 +3633,12 @@ class SexActionSoundEffectBase {
     return 80;
   }
 
-  // optional second play bgs getters
+  //   Optional second BGS setup
   get playSecond() {
     return true;
   }
   get soundName2() {
-    this.soundName;
+    return this.soundName;
   }
   get volumeRandomIndexMax2() {
     return this.volumeRandomIndexMax;
@@ -2562,17 +3653,16 @@ class SexActionSoundEffectBase {
     return 50;
   }
 
+  //   Advances the BGS line setting.
   updateBgsLineSetting() {
-    // Automatically update the BGS line configuration variable
-    $gameVariables.setValue(194, $gameVariables.value(194) + 1);
-    $gameSystem.setBgsLine($gameVariables.value(194));
+    $gameVariables.setValue(VAR_H_STAGE_MESSAGE, $gameVariables.value(VAR_H_STAGE_MESSAGE) + 1);
+    $gameSystem.setBgsLine($gameVariables.value(VAR_H_STAGE_MESSAGE));
   }
 
   playBgs(soundName, volumeOffset, pitchOffset, volumeRandomIndexMax, pitchRandomIndexMax) {
-    const sound = soundName;
     const volume = getRandomIndex(volumeRandomIndexMax) + volumeOffset;
     const pitch = getRandomIndex(pitchRandomIndexMax) + pitchOffset;
-    AudioManager.playBgs({ "name": sound, "volume": volume, "pitch": pitch, "pan": 0 });
+    AudioManager.playBgs({ "name": soundName, "volume": volume, "pitch": pitch, "pan": 0 });
   }
 
   get patternStrength() {
@@ -2606,11 +3696,12 @@ class SexActionSoundEffectBase {
     return [1, 2];
   }
 
+  //   Picks the pattern number for the variant.
   getPatternOption() {
-    $gameSystem.setBgsLine(10 + $gameVariables.value(20));
+    $gameSystem.setBgsLine(10 + $gameVariables.value(VAR_CURRENT_ACTOR_ID));
     let patternOptions = this.patternOptions0;
     this._patternStrength = this.patternStrength;
-    
+
     if (this.patternVariant === 1) {
       patternOptions = this.patternOptions1;
     }
@@ -2622,11 +3713,9 @@ class SexActionSoundEffectBase {
     }
     return patternOptions[getRandomIndex(patternOptions.length)];
   }
-  
+
   playPatternBGS() {
-    if (!this.isValidToPlayPatternBgs) {
-      return;
-    }
+    if (!this.isValidToPlayPatternBgs) return;
 
     const patternName = this.getPatternSoundName(this.getPatternOption());
     const patternVolume = getRandomIndex(this.patternVolumeRandomIndexMax) + this.patternVolumeOffset;
@@ -2634,33 +3723,26 @@ class SexActionSoundEffectBase {
     AudioManager.playBgs({ "name": patternName, "volume": patternVolume, "pitch": patternPitch, "pan": 0 });
   }
 
-  // Abstract method that must be implemented by subclasses
+  //   Shared body used by the subclasses that inherit play().
   play() {
     this.updateBgsLineSetting();
     this.playBgs(this.soundName, this.volumeOffset, this.pitchOffset, this.volumeRandomIndexMax, this.pitchRandomIndexMax);
 
     if (this.playSecond) {
       this.updateBgsLineSetting();
+      // CHANGED: the getters were called as functions, which raised a TypeError.
       this.playBgs(this.soundName2, this.volumeOffset2, this.pitchOffset2, this.volumeRandomIndexMax2, this.pitchRandomIndexMax2);
     }
-      
-    // Modified selection placeholder code:
-    playVoicePatternBGS();
+
+    this.playPatternBGS();
   }
 }
 
 class FluidSoundEffect extends SexActionSoundEffectBase {
-  // this params are using as default for base class
-  constructor(pistonIntensity, patternVariant, voicePatternNum) {
-    super(pistonIntensity, patternVariant, voicePatternNum);
-  }
+  //   The defaults already target the love juice setting
 }
 
 class Piston1SoundEffect extends SexActionSoundEffectBase {
-  constructor(pistonIntensity, patternVariant, voicePatternNum) {
-    super(pistonIntensity, patternVariant, voicePatternNum);
-  }
-
   get soundName() {
     return "21_Piston1";
   }
@@ -2689,15 +3771,10 @@ class Piston1SoundEffect extends SexActionSoundEffectBase {
     return 100;
   }
 }
+
 class Piston2SoundEffect extends Piston1SoundEffect {
-  constructor(pistonIntensity, patternVariant, voicePatternNum) {
-    super(pistonIntensity, patternVariant, voicePatternNum);
-  }
   get pitchOffset() {
     return 120;
-  }
-  get playSecond() {
-    return false;
   }
   get patternVolumeOffset() {
     return 70;
@@ -2708,59 +3785,39 @@ class Piston2SoundEffect extends Piston1SoundEffect {
 }
 
 class KissSoundEffect extends SexActionSoundEffectBase {
-  constructor(pistonIntensity, patternVariant, voicePatternNum) {
-    super(pistonIntensity, patternVariant, voicePatternNum);
-  }
-
-  _patternStrength = 1;
   get patternStrength() {
     return 1;
   }
-
   get patternOptions2() {
     return [1, 2, 3, 4, 5, 6];
   }
-
   get patternPitchRandomIndexMax() {
     return 31;
   }
-
   get patternPitchOffset() {
     return 90;
   }
 }
 
 class FellatioSoundEffect extends SexActionSoundEffectBase {
-  constructor(pistonIntensity, patternVariant, voicePatternNum) {
-    super(pistonIntensity, patternVariant, voicePatternNum);
-  }
-
   get patternStrength() {
     return 3;
   }
-
   get patternOptions1() {
     return [1, 2, 3, 4, 5, 6, 7, 8];
   }
-
   get patternOptions2() {
     return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   }
-
   get isValidToPlayPatternBgs() {
     return this.voicePatternNum >= 1;
   }
-
   get patternPitchOffset() {
     return 90;
   }
 }
 
 class BustKneadSoundEffect extends SexActionSoundEffectBase {
-  constructor(pistonIntensity, patternVariant, voicePatternNum) {
-    super(pistonIntensity, patternVariant, voicePatternNum);
-  }
-
   get soundName() {
     return "21_BustKnead";
   }
@@ -2770,17 +3827,12 @@ class BustKneadSoundEffect extends SexActionSoundEffectBase {
   get volumeOffset() {
     return 10;
   }
-
   get playSecond() {
     return false;
   }
 }
 
 class HandyMassager2SoundEffect extends SexActionSoundEffectBase {
-  constructor(pistonIntensity, patternVariant, voicePatternNum) {
-    super(pistonIntensity, patternVariant, voicePatternNum);
-  }
-
   get soundName() {
     return "21_HandyMassager2";
   }
@@ -2793,17 +3845,12 @@ class HandyMassager2SoundEffect extends SexActionSoundEffectBase {
   get pitchRandomIndexMax() {
     return 21;
   }
-
   get playSecond() {
     return false;
   }
 }
 
 class VibratorSoundEffect extends SexActionSoundEffectBase {
-  constructor(pistonIntensity, patternVariant, voicePatternNum) {
-    super(pistonIntensity, patternVariant, voicePatternNum);
-  }
-
   get soundName() {
     return "21_HandyMassager2";
   }
@@ -2819,68 +3866,53 @@ class VibratorSoundEffect extends SexActionSoundEffectBase {
   get pitchOffset() {
     return 100;
   }
-
   get playSecond() {
     return false;
   }
 }
 
 function actionType1SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
-  // (actionType 1) ピストン弱
-  const piston1SoundEffect = new Piston1SoundEffect(pistonIntensity, patternVariant, voicePatternNum);
-  piston1SoundEffect.play();  
+  playSexActionSoundEffect(Piston1SoundEffect, pistonIntensity, patternVariant, voicePatternNum);
 }
 
 function actionType2SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
-  // (actionType 2) ピストン強
-  const piston2SoundEffect = new Piston2SoundEffect(pistonIntensity, patternVariant, voicePatternNum);
-  piston2SoundEffect.play();
+  playSexActionSoundEffect(Piston2SoundEffect, pistonIntensity, patternVariant, voicePatternNum);
 }
 
-// Function for action type 3: 愛液 (Liquid/Erotic fluid effect)
-// This function plays background sounds according to the given parameters and applies a secondary sound layer
 function actionType3SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
-  // (actionType 3) 愛液
-  const fluidSoundEffect = new FluidSoundEffect(pistonIntensity, patternVariant, voicePatternNum);
-  fluidSoundEffect.play();
+  playSexActionSoundEffect(FluidSoundEffect, pistonIntensity, patternVariant, voicePatternNum);
 }
 
-// Function for action type 4: キス (Kiss effect)
-// This function plays background sounds for a kissing effect including primary and secondary sound layers,
-// and then, if applicable, plays a patterned sound based on the input parameters.
 function actionType4SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
-  const KissSoundEffect = new FluidSoundEffect(pistonIntensity, patternVariant, voicePatternNum);
-  KissSoundEffect.play();
+  playSexActionSoundEffect(KissSoundEffect, pistonIntensity, patternVariant, voicePatternNum);
 }
 
 function actionType5SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
-  // (actionType 5) フェラ
-  const fellatioSoundEffect = new FellatioSoundEffect(pistonIntensity, patternVariant, voicePatternNum);
-  fellatioSoundEffect.play();
+  playSexActionSoundEffect(FellatioSoundEffect, pistonIntensity, patternVariant, voicePatternNum);
 }
 
 function actionType6SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
-  // (actionType 6) 揉み
-  const bustKneadSoundEffect = new BustKneadSoundEffect(pistonIntensity, patternVariant, voicePatternNum);
-  bustKneadSoundEffect.play();
+  playSexActionSoundEffect(BustKneadSoundEffect, pistonIntensity, patternVariant, voicePatternNum);
 }
 
 function actionType7SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
-  // (actionType 7) 機械振動
-  const handyMassager2SoundEffect = new HandyMassager2SoundEffect(pistonIntensity, patternVariant, voicePatternNum);
-  handyMassager2SoundEffect.play();
+  playSexActionSoundEffect(HandyMassager2SoundEffect, pistonIntensity, patternVariant, voicePatternNum);
 }
 
 function actionType8SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
-  // (actionType 8) 機械振動激しく
-  const vibratorSoundEffect = new VibratorSoundEffect(pistonIntensity, patternVariant, voicePatternNum);
-  vibratorSoundEffect.play();
+  playSexActionSoundEffect(VibratorSoundEffect, pistonIntensity, patternVariant, voicePatternNum);
 }
+
+// Insertion / ejaculation sound effects; the wait time changes how they play.
+const INSERTION_SE_OPTIONS = ['Z_zamen1', 'Z_zamen2'];
+const EJACULATION_SE_OPTIONS = ['Z_zamen'];
+const INSERTION_SE_VOLUME_RANDOM_MAX = 21;
+const INSERTION_SE_PITCH_RANDOM_MAX = 41;
+
 class InsertionSoundEffect {
 
-  // Options used for sound effects
-  get seOptions() { 
-    return ['Z_zamen1', 'Z_zamen2'] 
+  get seOptions() {
+    return INSERTION_SE_OPTIONS;
   };
 
   get maxRandomIndexSexWait() {
@@ -2888,17 +3920,16 @@ class InsertionSoundEffect {
   }
 
   get noWaitSePitch() {
-    return getRandomIndex(41) + 80;
+    return getRandomIndex(INSERTION_SE_PITCH_RANDOM_MAX) + 80;
   }
 
-
-  // Helper function to play a random sound effect
+  //   Plays a random sound effect.
   playRandomSE(seName, seVolume, sePitch, seOptions) {
-    seOptions = seOptions || this.seOptions;
-    seName = seName || seOptions[getRandomIndex(seOptions.length)];
-    seVolume = seVolume || getRandomIndex(21) + 100;
-    sePitch = sePitch || getRandomIndex(41) + 80;
-    AudioManager.playSe({ name: seName, volume: seVolume, pitch: sePitch, pan: 0 });
+    const options = seOptions || this.seOptions;
+    const soundName = seName || options[getRandomIndex(options.length)];
+    const volume = seVolume || getRandomIndex(INSERTION_SE_VOLUME_RANDOM_MAX) + 100;
+    const pitch = sePitch || getRandomIndex(INSERTION_SE_PITCH_RANDOM_MAX) + 80;
+    AudioManager.playSe({ name: soundName, volume: volume, pitch: pitch, pan: 0 });
   };
 
   prePlay() {
@@ -2906,26 +3937,24 @@ class InsertionSoundEffect {
   };
 
   play() {
-    prePlay();
+    this.prePlay();
 
     const flashDuration = getRandomIndex(41) + 160;
     const shakeIntensity = getRandomIndex(21) + 50;
+    $gameScreen.startFlash([H_FLASH_COLOR_PINK[0], H_FLASH_COLOR_PINK[1], H_FLASH_COLOR_PINK[2], flashDuration], shakeIntensity);
 
     if (valueSexWait >= 1) {
-      $gameScreen.startFlash([255, 119, 255, flashDuration], shakeIntensity);
       this.playRandomSE();
       this.playRandomSE();
-
       valueSexWait = 0;
-    } else {
-      // When no wait is set, play flash, shake and one SE, then update wait.
-      const shakeDuration = getRandomIndex(5) + 6;
-      $gameScreen.startFlash([255, 119, 255, flashDuration], shakeIntensity);
-      $gameScreen.startShake(shakeDuration, shakeDuration, shakeIntensity);
-      this.playRandomSE(null, null, this.noWaitSePitch, null);
+      return;
+    };
 
-      valueSexWait = getRandomIndex(this.maxRandomIndexSexWait) + 20;
-    }
+    // When there is no wait time, sway once and only play, then draw the next wait time.
+    const shakeDuration = getRandomIndex(5) + 6;
+    $gameScreen.startShake(shakeDuration, shakeDuration, shakeIntensity);
+    this.playRandomSE(null, null, this.noWaitSePitch, null);
+    valueSexWait = getRandomIndex(this.maxRandomIndexSexWait) + 20;
   }
 }
 
@@ -2937,13 +3966,13 @@ class NoEjaculationSoundEffect extends InsertionSoundEffect {
   prePlay() {
     AudioManager.stopAllBgs();
     adv_partDirectSet(0);
-    sex_direction(0); // 結束：集中線終了
+    sex_direction(0); // closure: end of the concentration lines
   }
 }
 
 class EjaculationSoundEffect extends NoEjaculationSoundEffect {
-  get seOptions() { 
-    return ['Z_zamen'];
+  get seOptions() {
+    return EJACULATION_SE_OPTIONS;
   }
 
   get noWaitSePitch() {
@@ -2952,194 +3981,187 @@ class EjaculationSoundEffect extends NoEjaculationSoundEffect {
 }
 
 function actionType11SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
-  // (actionType 11) 挿入
-  const insertionSE = new InsertionSoundEffect(pistonIntensity, patternVariant, voicePatternNum);
-  insertionSE.play();
+  playSexActionSoundEffect(InsertionSoundEffect, pistonIntensity, patternVariant, voicePatternNum);
 }
 
 function actionType12SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
-  // (actionType 12) 射精
-  const ejaculationSE = new EjaculationSoundEffect(pistonIntensity, patternVariant, voicePatternNum);
-  ejaculationSE.play();
+  playSexActionSoundEffect(EjaculationSoundEffect, pistonIntensity, patternVariant, voicePatternNum);
 }
 
 function actionType13SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
-  // (actionType 13) 射精以外で終了.
-  const noEjaculationSE = new NoEjaculationSoundEffect(pistonIntensity, patternVariant, voicePatternNum);
-  noEjaculationSE.prePlay();
+  new NoEjaculationSoundEffect().prePlay();
 }
 
 function actionType51SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
-  // (actionType 51) 写真撮影
-  const whiteOutPictureName = 'ScreenWhiteOut';
-  $gameScreen.showPicture(pistonIntensity, whiteOutPictureName, 1, 640, 384, 100, 100, 250, 0);
+  // Photography; the picture id reuses the intensity.
+  $gameScreen.showPicture(pistonIntensity, H_PHOTOGRAPH_PICTURE_NAME, 1, 640, 384, 100, 100, 250, 0);
   $gameScreen.movePicture(pistonIntensity, 1, 640, 384, 100, 100, 0, 0, 20);
-  const photographSound = 'ZH_Photograph';
-  AudioManager.playSe({ "name": photographSound, "volume": 100, "pitch": 100, "pan": 0 });
+  AudioManager.playSe({ "name": 'ZH_Photograph', "volume": 100, "pitch": 100, "pan": 0 });
   valueSexWait = 30;
 }
 
-// Refactored helper function for both 眼パチ閉 and 眼パチ開く
+// Eye blink helper; fadeType is "fadeIn" (close) or "fadeOut" (open).
 function actionTypeEyesSexDirection(pistonIntensity, patternVariant, voicePatternNum, fadeType) {
-  // fadeType: use "fadeIn" for 眼パチ閉, "fadeOut" for 眼パチ開く
-  const blackOutPictureName = 'ScreenBlackOut';
-  $gameScreen.showPicture(pistonIntensity, blackOutPictureName, 1, 640, 384, 100, 100, 255, 0);
-  const sceneCloseOpenEyes = 'SceneCloseOpenEyes';
-  picture_fade1(pistonIntensity, fadeType, sceneCloseOpenEyes, patternVariant, 5);
+  $gameScreen.showPicture(pistonIntensity, H_BLACK_OUT_PICTURE_NAME, 1, 640, 384, 100, 100, 255, 0);
+  picture_fade1(pistonIntensity, fadeType, 'SceneCloseOpenEyes', patternVariant, 5);
   valueSexWait = patternVariant;
 }
 
-// (actionType 52) 眼パチ閉
 function actionType52SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
   actionTypeEyesSexDirection(pistonIntensity, patternVariant, voicePatternNum, "fadeIn");
 }
 
-// (actionType 53) 眼パチ開く
 function actionType53SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
   actionTypeEyesSexDirection(pistonIntensity, patternVariant, voicePatternNum, "fadeOut");
 }
 
-function actionType54SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
-  // (actionType 54) 薄くピンク点灯
-  $gameScreen.setPicturesAnimation(2, patternVariant / 2, "横", patternVariant);
-  const pinkFlashPictureName = 'ScreenPinkFlash';
-  $gameScreen.showPicture(111, pinkFlashPictureName, 1, 640, 384, 100, 100, pistonIntensity, 3);
-  $gameScreen.picture(111).startAnimationFrame(1, true, [1, 1, 1, 2]);
+// Every action type plays its sound effect from this one place.
+function playSexActionSoundEffect(SoundEffectClass, pistonIntensity, patternVariant, voicePatternNum) {
+  new SoundEffectClass(pistonIntensity, patternVariant, voicePatternNum).play();
 }
 
-//ADVＨパート演出クリアも。0実行1終了
-adv_HpartDirectPlay = function (effectType) {
-  switch (effectType) {
-    case 0: {
-      adv_HpartDirectPlay_Clear();
-      break;
-    }
-    case 1: { // 感じる
-      adv_HpartDirectPlay_Feel();
-      break;
-    }
-    case 2: { // 激しく感じる
-      adv_HpartDirectPlay_StrongFeel();
-      break;
-    }
-    case 3: { // 絶頂激しく感じる永続クリア必須
-      adv_HpartDirectPlay_ExtremeClimax();
-      break;
-    }
-    case 4: { // 軽く感じる
-      adv_HpartDirectPlay_LightFeel();
-      break;
-    }
-    case 5: { // 乳見せ
-      adv_HpartDirectPlay_ShowBreasts();
-      break;
-    }
-    default: {
-      // Do nothing for unknown effect types
-      break;
-    }
-  }
+function actionType54SexDirection(pistonIntensity, patternVariant, voicePatternNum) {
+  // faint pink light
+  const pinkFlashPictureName = 'ScreenPinkFlash';
+  $gameScreen.setPicturesAnimation(2, patternVariant / 2, "横", patternVariant);
+  $gameScreen.showPicture(H_PINK_FLASH_PICTURE_ID, pinkFlashPictureName, 1, 640, 384, 100, 100, pistonIntensity, 3);
+  $gameScreen.picture(H_PINK_FLASH_PICTURE_ID).startAnimationFrame(1, true, [1, 1, 1, 2]);
+}
+
+// Action type -> handler. The actionType value comes from the common events of the game.
+const SEX_ACTION_HANDLERS = {
+  [ACTION_TYPE_NO_OP]: actionType99SexDirection,
+  [ACTION_TYPE_FLASH]: actionType0SexDirection,
+  [ACTION_TYPE_PISTON_WEAK]: actionType1SexDirection,
+  [ACTION_TYPE_PISTON_STRONG]: actionType2SexDirection,
+  [ACTION_TYPE_FLUID]: actionType3SexDirection,
+  [ACTION_TYPE_KISS]: actionType4SexDirection,
+  [ACTION_TYPE_FELLATIO]: actionType5SexDirection,
+  [ACTION_TYPE_BUST_KNEAD]: actionType6SexDirection,
+  [ACTION_TYPE_VIBRATION]: actionType7SexDirection,
+  [ACTION_TYPE_VIBRATION_STRONG]: actionType8SexDirection,
+  [ACTION_TYPE_INSERTION]: actionType11SexDirection,
+  [ACTION_TYPE_EJACULATION]: actionType12SexDirection,
+  [ACTION_TYPE_NO_EJACULATION]: actionType13SexDirection,
+  [ACTION_TYPE_PHOTOGRAPH]: actionType51SexDirection,
+  [ACTION_TYPE_EYES_CLOSE]: actionType52SexDirection,
+  [ACTION_TYPE_EYES_OPEN]: actionType53SexDirection,
+  [ACTION_TYPE_PINK_FLASH]: actionType54SexDirection
 };
 
+//---------------------------------------------------------------------------
+// ADV H part effects
+//---------------------------------------------------------------------------
+
+// ADV H part effect clear. 0 runs, 1 finishes
+const ADVDIRECT_CLEAR = 0;
+const ADVDIRECT_FEEL = 1;
+const ADVDIRECT_STRONG_FEEL = 2;
+const ADVDIRECT_EXTREME_CLIMAX = 3;
+const ADVDIRECT_LIGHT_FEEL = 4;
+const ADVDIRECT_SHOW_BREASTS = 5;
+
+// Effect type -> entry point; the type values are passed by the common events.
+const ADVDIRECT_HANDLERS = {
+  [ADVDIRECT_CLEAR]: adv_HpartDirectPlay_Clear,
+  [ADVDIRECT_FEEL]: adv_HpartDirectPlay_Feel,                       // feel
+  [ADVDIRECT_STRONG_FEEL]: adv_HpartDirectPlay_StrongFeel,          // feel strongly
+  [ADVDIRECT_EXTREME_CLIMAX]: adv_HpartDirectPlay_ExtremeClimax,    // climax strongly, permanent clear required
+  [ADVDIRECT_LIGHT_FEEL]: adv_HpartDirectPlay_LightFeel,            // feel lightly
+  [ADVDIRECT_SHOW_BREASTS]: adv_HpartDirectPlay_ShowBreasts         // show breasts
+};
+
+adv_HpartDirectPlay = function (effectType) {
+  const effectHandler = ADVDIRECT_HANDLERS[effectType];
+  // Unknown types do nothing
+  if (!effectHandler) return;
+  effectHandler();
+};
+
+const ADVDIRECT_PARTICLE_NAMES_TO_CLEAR = ['Ecstasy_c1', 'lines_heightH1'];
+
 function adv_HpartDirectPlay_Clear() {
-  // Case 0: Clear particles
-  const particleNamesToClear = ['Ecstasy_c1', 'lines_heightH1'];
-  for (let index = 0; index < particleNamesToClear.length; index++) {
-    $gameScreen._particle.particleClear(particleNamesToClear[index]);
-  }
+  for (const particleName of ADVDIRECT_PARTICLE_NAMES_TO_CLEAR) {
+    $gameScreen._particle.particleClear(particleName);
+  };
 }
 
-// Base class for ADV H part direct play effects
+// Shared base of the ADV H part effects; options override the look and the volume.
 class AdvHPartDirectPlayEffect {
   constructor(options = {}) {
     this.particleName = 'Ecstasy_c1';
-    // options: alpha (string), scaleUpdate (array of two strings), soundPitchOffset (number), filterDuration (number)
+    // options: alpha (string), scaleUpdate ([start, end]), soundPitchOffset (number), filterDuration (number)
     this.alpha = options.alpha || '0.4';
-    this.scaleUpdate = options.scaleUpdate; // e.g. ['10','40'] – if not given, no scale update is made.
+    this.scaleUpdate = options.scaleUpdate;
     this.soundPitchOffset = options.soundPitchOffset || 60;
     this.filterDuration = options.filterDuration || 40;
   }
 
-  get heartbeatSoundOptions(){
+  get heartbeatSoundOptions() {
     return ['Z_HeartBeatDarty'];
   }
-  
+
   final() {
     filter_direct(9, 640 - 128, 368, this.filterDuration);
   }
-  
+
   play() {
-    // Play the particle effect
     $gameScreen._particle.particlePlay(0, this.particleName, 'screen', 'def', 'spriteset');
     $gameScreen._particle.particleUpdate([this.particleName, 'alpha', this.alpha, '0']);
     if (this.scaleUpdate !== undefined) {
       $gameScreen._particle.particleUpdate([this.particleName, 'scale', this.scaleUpdate[0], this.scaleUpdate[1]]);
     }
+
     const heartbeatSoundOptions = this.heartbeatSoundOptions;
     const selectedHeartbeatSound = heartbeatSoundOptions[getRandomIndex(heartbeatSoundOptions.length)];
     const soundVolume = getRandomIndex(21) + 100;
     const soundPitch = getRandomIndex(41) + this.soundPitchOffset;
     AudioManager.playSe({ name: selectedHeartbeatSound, volume: soundVolume, pitch: soundPitch, pan: 0 });
-    final();
+    this.final();
   }
 }
 
-/*:
- * Function: adv_HpartDirectPlay_Feel
- * @description Case 1: 感じる
- */
+// 1: feel
 class AdvHPartDirectPlay_FeelEffect extends AdvHPartDirectPlayEffect {
   constructor() {
     super({
-      alpha: '0.4',         // set alpha to 0.4
-      // No scale update needed for "感じる"
-      soundPitchOffset: 60,   // sound pitch offset for Feel is 60
-      filterDuration: 40      // filter duration set to 40
+      alpha: '0.4',
+      soundPitchOffset: 60,
+      filterDuration: 40
     });
   }
 }
 
-/*:
- * Function: adv_HpartDirectPlay_StrongFeel
- * @description Case 2: 激しく感じる
- */
+// 2: feel strongly (with a scale change)
 class AdvHPartDirectPlay_StrongFeelEffect extends AdvHPartDirectPlayEffect {
   constructor() {
     super({
-      alpha: '0.4',         // set alpha to 0.4
-      scaleUpdate: ['10', '40'],  // update scale from 10 to 40
-      soundPitchOffset: 40,   // sound pitch offset for Strong Feel is 40
-      filterDuration: 60      // filter duration set to 60
+      alpha: '0.4',
+      scaleUpdate: ['10', '40'],
+      soundPitchOffset: 40,
+      filterDuration: 60
     });
   }
 }
 
-/*:
- * Function: adv_HpartDirectPlay_LightFeel
- * @description Case 4: 軽く感じる
- */
+// 4: feel lightly
 class AdvHPartDirectPlay_LightFeelEffect extends AdvHPartDirectPlayEffect {
   constructor() {
     super({
-      alpha: '0.3',         // lighter effect: set alpha to 0.3
-      // No scale update needed for "軽く感じる"
-      soundPitchOffset: 80,   // sound pitch offset for Light Feel is 80
-      filterDuration: 30      // filter duration set to 30
+      alpha: '0.3',
+      soundPitchOffset: 80,
+      filterDuration: 30
     });
   }
 }
 
-/*:
- * Function: adv_HpartDirectPlay_ShowBreasts
- * @description Case 4: 乳見せ
- */
+// 5: show breasts (flash only)
 class Adv_HpartDirectPlay_ShowBreastsEffect extends AdvHPartDirectPlayEffect {
   constructor() {
     super({
-      alpha: '0.2',         // lighter effect: set alpha to 0.3
-      // No scale update needed for "軽く感じる"
-      soundPitchOffset: 80,   // sound pitch offset for Light Feel is 80
-      filterDuration: 0      // filter duration set to 0 , not using here
+      alpha: '0.2',
+      soundPitchOffset: 80,
+      filterDuration: 0
     });
   }
 
@@ -3148,99 +4170,96 @@ class Adv_HpartDirectPlay_ShowBreastsEffect extends AdvHPartDirectPlayEffect {
   }
 
   final() {
-    $gameScreen.startFlash([255, 119, 255, 200], 60); // override standart final action with own specific
+    $gameScreen.startFlash([H_FLASH_COLOR_PINK[0], H_FLASH_COLOR_PINK[1], H_FLASH_COLOR_PINK[2], 200], 60);
   }
 }
 
-// Modified functions using the refactored base class and extended instances
-
 function adv_HpartDirectPlay_Feel() {
-  // Case 1: 感じる
   new AdvHPartDirectPlay_FeelEffect().play();
 }
 
 function adv_HpartDirectPlay_StrongFeel() {
-  // Case 2: 激しく感じる
   new AdvHPartDirectPlay_StrongFeelEffect().play();
 }
 
 function adv_HpartDirectPlay_LightFeel() {
-  // Case 4: 軽く感じる
   new AdvHPartDirectPlay_LightFeelEffect().play();
 }
 
 function adv_HpartDirectPlay_ShowBreasts() {
-  // Case 5: 乳見せ
   new Adv_HpartDirectPlay_ShowBreastsEffect().play();
 }
 
+const EXTREME_CLIMAX_WORD = '絶頂';
+const EXTREME_CLIMAX_PISTON_PICTURE_ID = 57;
+
+// 3: climax strongly; released on the second call.
 function adv_HpartDirectPlay_ExtremeClimax() {
-  // Case 3: 絶頂激しく感じる永続クリア必須
-  if (valueWordSet0 == '絶頂') {
-    filter_direct(1, 640, 384, 0.03);
-    valueWordSet0 = 0;
-    adv_HpartDirectPlay_Clear();
-    adv_partDirectSet(0);
-    $gameScreen.eraseParallax(7);
-    $gameScreen.erasePicture(51);
-    $gameScreen.erasePicture(57);
-  } else {
-    valueWordSet0 = '絶頂';
-    const pistonPictureId = 57;
-    let pistonMultiplier;
-    if ($gameActors.actor($gameVariables.value(20)).isLearnedSkill(66)) {
-      pistonMultiplier = 2;
-    } else {
-      pistonMultiplier = 1;
-    }
-    hcg_piston(pistonPictureId, 5, 1, 1);
-    filter_direct(1, 640, 384, 0.01);
-    adv_partDirectSet(2);
-    const particleName = 'Ecstasy_c1';
-    $gameScreen._particle.particlePlay(0, particleName, 'screen', 'def', 'spritset');
-    $gameScreen._particle.particleUpdate([particleName, 'scale', '10', '20']);
-    $gameScreen._particle.particleUpdate([particleName, 'alpha', '0.30', '0']);
-  }
+  if (valueWordSet0 == EXTREME_CLIMAX_WORD) {
+    clearExtremeClimax();
+    return;
+  };
+  startExtremeClimax();
 }
 
-//☆☆性欲スキルで確立上昇最大50%
+function clearExtremeClimax() {
+  filter_direct(1, 640, 384, 0.03);
+  valueWordSet0 = 0;
+  adv_HpartDirectPlay_Clear();
+  adv_partDirectSet(0);
+  $gameScreen.eraseParallax(7);
+  $gameScreen.erasePicture(51);
+  $gameScreen.erasePicture(EXTREME_CLIMAX_PISTON_PICTURE_ID);
+}
+
+function startExtremeClimax() {
+  valueWordSet0 = EXTREME_CLIMAX_WORD;
+  hcg_piston(EXTREME_CLIMAX_PISTON_PICTURE_ID, 5, 1, 1);
+  filter_direct(1, 640, 384, 0.01);
+  adv_partDirectSet(2);
+
+  const particleName = 'Ecstasy_c1';
+  // NOTE: the original spelled it "spritset" (that behaviour is kept)
+  $gameScreen._particle.particlePlay(0, particleName, 'screen', 'def', 'spritset');
+  $gameScreen._particle.particleUpdate([particleName, 'scale', '10', '20']);
+  $gameScreen._particle.particleUpdate([particleName, 'alpha', '0.30', '0']);
+}
+
+//---------------------------------------------------------------------------
+// Libido skill probability up
+//---------------------------------------------------------------------------
+// Chance based gain from the libido skills; 50% at most
 const skillRangeSeiyokuSkillProbabilityUp = [61, 62, 63, 64, 65, 66, 67, 68, 69, 70];
+const SEIYOKU_SKILL_PROBABILITY_STEP = 5;
+
 seiyoku_skillProbabilityUp = function () {
-  const actorId = $gameVariables.value(20);
+
+  const actorId = $gameVariables.value(VAR_CURRENT_ACTOR_ID);
   if (actorId === 0) {
-    $gameVariables.setValue(21, 1);
-    return; // Early return if no valid actor
-  }
+    $gameVariables.setValue(VAR_H_SCENE_SPOKEN_TEXT, 1);
+    return;
+  };
 
-  const gameActor = $gameActors.actor(actorId);
-
-  seiyoku_skillProbabilityUp1(gameActor);
-}
-seiyoku_skillProbabilityUp1 = function (gameActor) {
-  if (!gameActor) {
-    valueCountSet3 = 0;
-    return; // Protect against non-existent actor
-  }
-
-  // Define skill range
-  
-  // Calculate probability increase with a standard loop
-  let totalProbabilityIncrease = 0;
-  for (skillId of skillRangeSeiyokuSkillProbabilityUp) {
-    if (gameActor.isLearnedSkill(skillId)) {
-      totalProbabilityIncrease += 5;
-    }
-  }
-  
-  // Store the result
-  valueCountSet3 = totalProbabilityIncrease;
+  seiyoku_skillProbabilityUp1($gameActors.actor(actorId));
 };
 
-//☆☆エネミーステートでドロップ
-//enemy_drop = function(user,enemy){
+seiyoku_skillProbabilityUp1 = function (gameActor) {
 
+  if (!gameActor) {
+    valueCountSet3 = 0;
+    return;
+  };
 
+  valueCountSet3 = countLearnedSeiyokuSkills(gameActor) * SEIYOKU_SKILL_PROBABILITY_STEP;
+};
 
-//};
+// Number of learned libido skills.
+function countLearnedSeiyokuSkills(gameActor) {
+  let learnedCount = 0;
+  for (const skillId of skillRangeSeiyokuSkillProbabilityUp) {
+    if (gameActor.isLearnedSkill(skillId)) learnedCount += 1;
+  };
+  return learnedCount;
+}
 
 //}());

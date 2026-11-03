@@ -90,11 +90,14 @@ Galv.VNC = Galv.VNC || {};        // Galv's stuff
 (function() {
 
 
-Galv.VNC.width = Number(PluginManager.parameters('Galv_VisualNovelChoices')["Command Width"]);
-Galv.VNC.height = Number(PluginManager.parameters('Galv_VisualNovelChoices')["Command Height"]);
-Galv.VNC.alwaysMid = PluginManager.parameters('Galv_VisualNovelChoices')["Always Middle"].toLowerCase() == 'true' ? true : false;
-Galv.VNC.msgGap = Number(PluginManager.parameters('Galv_VisualNovelChoices')["Message Gap"]);
-Galv.VNC.disableBtn = Number(PluginManager.parameters('Galv_VisualNovelChoices')["Disabled Button"]);
+// BUGFIX: these lookups used 'Galv_VisualNovelChoices', but the plugin is registered
+// as "GALV_VisualNovelChoices" in plugins.js. They only resolved because the core
+// lowercases the name in PluginManager.parameters - use the registered name.
+Galv.VNC.width = Number(PluginManager.parameters('GALV_VisualNovelChoices')["Command Width"]);
+Galv.VNC.height = Number(PluginManager.parameters('GALV_VisualNovelChoices')["Command Height"]);
+Galv.VNC.alwaysMid = PluginManager.parameters('GALV_VisualNovelChoices')["Always Middle"].toLowerCase() == 'true' ? true : false;
+Galv.VNC.msgGap = Number(PluginManager.parameters('GALV_VisualNovelChoices')["Message Gap"]);
+Galv.VNC.disableBtn = Number(PluginManager.parameters('GALV_VisualNovelChoices')["Disabled Button"]);
 
 // Cache
 Galv.VNC.Scene_Boot_loadSystemImages = Scene_Boot.loadSystemImages;

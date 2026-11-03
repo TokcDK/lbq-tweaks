@@ -136,8 +136,14 @@
                 return t !== tween;
             });
         };
+        // Object.keys() used to be called twice per tween per frame. The key set of
+        // a tween's finishParams is fixed for the lifetime of that params object, so
+        // it is cached on the tween state and revalidated by identity.
         Group.prototype.update = function () {
             var _this = this;
+            // The emptied _items array is a deliberate side channel: _beginAnimation
+            // runs caller callbacks that may add()/remove() during this loop, so the
+            // snapshot + concat structure is kept as-is.
             var items = this._items.slice();
             this._items.length = 0;
             this._items = items
@@ -146,16 +152,26 @@
                         state = _a[1];
                     if (tween.finished) return false;
                     ++state.timer;
+                    var finishParams = state.finishParams;
+                    if (state._keysRef !== finishParams) {
+                        state._keysRef = finishParams;
+                        state._keys = Object.keys(finishParams);
+                    }
+                    var keys = state._keys;
+                    var klen = keys.length;
                     if (state.timer < state.duration) {
                         var n_1 = state.easingFunc(state.timer / state.duration);
-                        Object.keys(state.finishParams).forEach(function (key) {
+                        var startParams = state.startParams;
+                        for (var k = 0; k < klen; k++) {
+                            var key = keys[k];
                             tween.target[key] =
-                                state.startParams[key] + (state.finishParams[key] - state.startParams[key]) * n_1;
-                        });
+                                startParams[key] + (finishParams[key] - startParams[key]) * n_1;
+                        }
                     } else {
-                        Object.keys(state.finishParams).forEach(function (key) {
-                            tween.target[key] = state.finishParams[key];
-                        });
+                        for (var k2 = 0; k2 < klen; k2++) {
+                            var key2 = keys[k2];
+                            tween.target[key2] = finishParams[key2];
+                        }
                     }
                     return state.timer < state.duration || _this._beginAnimation(tween, state);
                 })

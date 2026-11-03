@@ -14,6 +14,12 @@
  * @plugindesc ※TRP_Particle_Presetより下に配置
  * @help
  * 【更新履歴】
+ * 2.33 2024/08/03 メンバー入替後の戦闘開始時に発生するエラー修正
+ * 2.32 2022/03/29 グループエディタでエスケープ文字(\)対応(\V[1]など変数使用可)
+ * 2.30 2023/01/22 他シーン用のパーティクルをクリア時の不具合修正
+ * 2.29 2022/12/11 戦闘中に待機中アクターにステート付与時に発生する不具合の修正
+ * 2.28 2022/12/05 戦闘不能などステート全解除時にパーティクルが残る不具合の修正
+ * 2.27 2022/09/07 グループ機能追加時のセーブデータ互換性の対応
  * 2.25 2022/07/31 タグ情報管理の不具合修正
  *                 スキルのパーティクル表示設定で「user」に対応
  * 2.24 2022/06/24 敵のステートに関連する内部処理の変更
@@ -860,7 +866,9 @@ Game_Screen.prototype.initialize = function(){
 };
 Game_Screen.prototype.tryCreateParticle = function(){
 	if(!this._particle){
-		this._particle = new Game_Particle();		
+		this._particle = new Game_Particle();
+	}else{
+		this._particle.ensureVariables();
 	}
 };
 
@@ -962,10 +970,26 @@ if(!disableState){
 		_Game_Battler_addNewState.call(this,stateId);
 
 		var state = $dataStates[stateId];
-		if(state && state.meta){
+		if(state && state.meta && this.isBattleMember()){
 			this.setupStateParticles(state);
 		}
 	};
+
+
+	var _Game_Battler_clearStates = Game_Battler.prototype.clearStates;
+	Game_Battler.prototype.clearStates = function(){
+		var states = this._states ? this._states.concat() : null;
+		_Game_Battler_clearStates.call(this,...arguments);
+
+		if(states){
+			for(const stateId of states){
+				if(!this._states || !this._states.contains(stateId)){
+					var state = $dataStates[stateId];
+					if(state)this.eraseStateParticles(state);
+				}
+			}
+		}
+	}
 
 	var _Game_BattlerBase_eraseState = Game_BattlerBase.prototype.eraseState;
 	Game_BattlerBase.prototype.eraseState = function(stateId) {
@@ -1465,6 +1489,9 @@ Game_Particle.prototype.initialize = function() {
 	this.resetMaxParticles();
 };
 
+Game_Particle.prototype.ensureVariables = function(){
+};
+
 Game_Particle.EVENT_ID_REGEXP = /-EID$/;
 Game_Particle.prototype.processArgsEventId = function(args,eventId){
 	var length = args.length;
@@ -1594,12 +1621,7 @@ Game_Particle.prototype.update = function(){
         var key = keys[i];
         var data = this._data[key];
         if(!data || data.destroy){
-        	keys.splice(i,1);
-        	delete this._data[key];
-
-        	if(Game_Particle.displayObjects[key]){
-        		delete Game_Particle.displayObjects[key];
-        	}
+        	this._remove(key,keys,true);
         	destroyed = true;
         }else if(data.animations){
         	this.updateAnimations(key,data);
@@ -1609,6 +1631,21 @@ Game_Particle.prototype.update = function(){
     	this.truncateTagInfo();
     }
 };
+Game_Particle.prototype._remove = function(key,keys=this._keys,skipTruncateTagInfo=false){
+	var idx = keys.indexOf(key);
+	if(idx<0)return;
+
+	keys.splice(idx,1);
+	delete this._data[key];
+
+	if(Game_Particle.displayObjects[key]){
+		delete Game_Particle.displayObjects[key];
+	}
+	if(!skipTruncateTagInfo){
+		this.truncateTagInfo();
+	}
+};
+
 Game_Particle.prototype.updateReservedCommands = function(){
 	var length = this._reservedCommands.length;
     for(var i = 0; i<length; i=(i+1)|0){
@@ -1644,8 +1681,12 @@ Game_Particle.prototype.particleSet = function(eventId,id,target,name,z,x,y,imag
 	id = this.idWithSuffix(id);
 	
 	if(!!this._data[id]){
-		this.particleOn(id);
-		return;
+		if(this._data[id].destroy){
+			this._remove(id);
+		}else{
+			this.particleOn(id);
+			return;
+		}
 	}
 
 	var data = this.particleData(eventId,id,target,name,z,x,y,image);
@@ -2824,6 +2865,10 @@ ParticleSystem.prototype.addEmitterToParent = function(emitter,scene){
 	case TARGET_TYPES.attachEnemy:
 	case TARGET_TYPES.battleWeather:
 		target = emitter.target();
+		if(!target){
+			emitter.destroy();
+			return emitter;
+		}
 		container.z = z;
 		parent = target.parent || this.battleField(scene);
 		if(z<=Z_INDEX.below){
@@ -3728,7 +3773,8 @@ ParticleEmitter.prototype.updatePosition = function(){
 
 	if(this._isWeather)return;
 
-	if(this._updatePos){
+	if (this._updatePos && !!$dataMap)
+	{
 		this._updatePosition(scrolled);
 	}
 };
@@ -3778,7 +3824,8 @@ ParticleEmitter.prototype._updateFollowScroll = function(){
 	return scrolled;
 };
 
-ParticleEmitter.prototype._updatePosition = function(scrolled){
+ParticleEmitter.prototype._updatePosition = function (scrolled)
+{
 	var x,y;
 	var target = this._target;
 	switch(this._targetType){

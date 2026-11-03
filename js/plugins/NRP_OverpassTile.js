@@ -547,9 +547,10 @@ Game_Event.prototype.setupPageSettings = function() {
  * Game_Followers
  */
 Game_Followers.prototype.updateOverPathOnLocate = function() {
-    this._data.forEach(follower => {
-        follower.updateOverPathOnLocate();
-    })
+    var list = this._data;
+    for (var i = 0; i < list.length; i++) {
+        list[i].updateOverPathOnLocate();
+    }
 };
 
 /**

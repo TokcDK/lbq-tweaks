@@ -478,12 +478,25 @@ Game_System.prototype.setShowEquipBattleSkills = function(value) {
 
 Yanfly.EBS.Game_BattlerBase_states = Game_BattlerBase.prototype.states;
 Game_BattlerBase.prototype.states = function() {
+    // PERF: states() is called constantly by the engine, and this override did
+    // an array copy plus an O(n^2) .filter(Yanfly.Util.onlyUnique) every time.
+    // The Set keeps the identical "first occurrence wins" result in O(n).
     var array = Yanfly.EBS.Game_BattlerBase_states.call(this);
     if (this.isActor()) {
-      array = array.concat(this.equipSkillStates());
+      var skillStates = this.equipSkillStates();
+      for (var i = 0; i < skillStates.length; ++i) {
+        array.push(skillStates[i]);
+      }
       this.sortEquippedStates(array);
     }
-    return array.filter(Yanfly.Util.onlyUnique);
+    var seen = new Set();
+    var result = [];
+    for (var j = 0; j < array.length; ++j) {
+      if (seen.has(array[j])) continue;
+      seen.add(array[j]);
+      result.push(array[j]);
+    }
+    return result;
 };
 
 Game_BattlerBase.prototype.sortEquippedStates = function(array) {
@@ -491,7 +504,7 @@ Game_BattlerBase.prototype.sortEquippedStates = function(array) {
       var p1 = a.priority;
       var p2 = b.priority;
       if (p1 !== p2) return p2 - p1;
-      return a - b;
+      return 0;
     });
 };
 
@@ -721,6 +734,7 @@ Game_Actor.prototype.paramPlus = function(paramId) {
 
 Game_Actor.prototype.equipSkillStates = function() {
     var array = [];
+    var seen = new Set();
     var battleSkillsRaw = this.battleSkillsRaw();
     var length = battleSkillsRaw.length;
     for (var s = 0; s < length; ++s) {
@@ -729,7 +743,8 @@ Game_Actor.prototype.equipSkillStates = function() {
       for (var i = 0; i < skill.equipStates.length; ++i) {
         var state = $dataStates[skill.equipStates[i]];
         if (!state) continue;
-        if (array.contains(state)) continue;
+        if (seen.has(state)) continue;
+        seen.add(state);
         array.push(state);
       }
     }
@@ -738,11 +753,14 @@ Game_Actor.prototype.equipSkillStates = function() {
 };
 
 Game_Actor.prototype.sortEquipStates = function(array) {
+    // `a - b` on state objects was always NaN, which the engine orders as
+    // "equal"; returning 0 explicitly is the same ordering without the
+    // comparator fallback.
     array.sort(function(a, b) {
       var p1 = a.priority;
       var p2 = b.priority;
       if (p1 !== p2) return p2 - p1;
-      return a - b;
+      return 0;
     });
 }
 

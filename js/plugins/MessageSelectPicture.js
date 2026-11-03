@@ -133,13 +133,19 @@
     };
 
     Window_ChoiceList.prototype.updateSelectPicture = function() {
-        $gameMessage.getSelectPictures().forEach(function(data) {
+        var list = $gameMessage.getSelectPictures();
+        if (!list || list.length === 0) return;
+        // The selected message index does not depend on the picture, so resolve it
+        // once per frame instead of once per picture (it scans hiddenIndexList).
+        var selected = this.findMessageIndex();
+        for (var i = 0; i < list.length; i++) {
+            var data = list[i];
             var picture = $gameScreen.picture(data.pictureId);
             if (!picture) {
-                return;
+                continue;
             }
-            picture.setOpacity(data.index === this.findMessageIndex() ? 255 : 0);
-        }, this);
+            picture.setOpacity(data.index === selected ? 255 : 0);
+        }
     };
 
     // for MPP_ChoiceEX.js start
