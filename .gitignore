@@ -6,6 +6,8 @@
 *.rpgsave
 *.webm
 *.7z
+*.rar
+*.zip
 *.png
 *.old
 
