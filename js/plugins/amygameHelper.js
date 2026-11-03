@@ -3973,7 +3973,7 @@
   const DEPLOYED_ACTOR_START_VAR = 75; // 登場キャラ始点
   const DEPLOYED_ACTOR_END_VAR = 76; // 登場キャラ終点
   const HEROINE_ID_LIST_VAR = 247; // ヒロインID配列
-  const CURRENT_ACTOR_VAR = 20; // 汎用「対象キャラ」
+  const CURRENT_ACTOR_VAR = 20; // 汎用「対象キャラ」のアクターID (an id, not an actor object)
   const LEAD_ACTOR_VAR = 530; // 主格キャラ
   const SPAWNED_EVENT_TABLE_VAR = 292; // スポーンしたイベントID表
   const NPC_PRESET_TABLE_VAR = 163; // NPC外見プリセット表
@@ -4064,6 +4064,12 @@
   }
   function forEachHeroine(callback) {
     varValue(HEROINE_ID_LIST_VAR).forEach(callback);
+  }
+  // Variable 20 stores an actor id; `currentActor()` resolves it to the actor object.
+  // Use `currentActorId()` wherever an id is expected ($gameActors.actor, addActor,
+  // varValue(380 + id), cut-in / standing-picture helpers, ...).
+  function currentActorId() {
+    return varValue(CURRENT_ACTOR_VAR);
   }
   function currentActor() {
     return actorFromVariable(CURRENT_ACTOR_VAR);
@@ -4446,11 +4452,9 @@
   function forEachCostumeSlot(callback) {
     range(1, 40).forEach(callback);
   }
-  function decorateWithActorName(message) {
-    const actorName = currentActor().name();
+  function actorMessage(message) {
     return currentActor().name() + message;
   }
-  
   /** 「はメインクラス2ndジョブ＜\j[2X]＞に目覚めた！」 + common event 45. */
   function setSecondJobAwakeningMessage(interp, jobIndex, leadingSpaces) {
     setSelfVar(interp, CURRENT_ACTOR_VAR, jobIndex);
@@ -5197,12 +5201,12 @@
 
   // Replaces (3x): data/CommonEvents.json:common-event:64
   AGH_refreshCurrentActor = function () {
-    $gameActors.actor(varValue(CURRENT_ACTOR_VAR)).refresh();
+    $gameActors.actor(currentActorId()).refresh();
   };
 
   // Replaces (2x): data/CommonEvents.json:common-event:64
   AGH_addCurrentActorToParty = function () {
-    $gameParty.addActor(varValue(CURRENT_ACTOR_VAR));
+    $gameParty.addActor(currentActorId());
   };
 
   // Replaces (2x): data/CommonEvents.json:common-event:64
@@ -5212,7 +5216,7 @@
 
   // Replaces (4x): data/CommonEvents.json:common-event:64
   AGH_teachSkillToCurrentActor = function (skillId) {
-    $gameActors.actor(varValue(CURRENT_ACTOR_VAR)).learnSkill(skillId);
+    $gameActors.actor(currentActorId()).learnSkill(skillId);
   };
 
   // Replaces (8x): data/CommonEvents.json:common-event:30, :64, :104, ...
@@ -6057,34 +6061,34 @@
 
   // Replaces (1x): data/CommonEvents.json:common-event:104
   AGH_requestBattleMasturbationCutIn = function (interp) {
-    const cutInImageName = `Zev_BattleMasturbation${varValue(CURRENT_ACTOR_VAR)}_1`;
+    const cutInImageName = `Zev_BattleMasturbation${currentActorId()}_1`;
     requestCutIn(interp, "味方カットイン", ["Ｈシーン演出", cutInImageName, 270, 1.5, 1.2, 25, 60]);
   };
 
   // Replaces (2x): data/CommonEvents.json:common-event:104, data/CommonEvents.json:common-event:140
   AGH_prepareAllyCutIn = function (interp, pictureId) {
-    prepareCutIn(interp, "味方カットイン", pictureId, varValue(CURRENT_ACTOR_VAR));
+    prepareCutIn(interp, "味方カットイン", pictureId, currentActorId());
   };
 
   // Replaces (1x): data/CommonEvents.json:common-event:140
   AGH_prepareEnemyCutIn = function (interp) {
-    prepareCutIn(interp, "敵カットイン", 0, varValue(CURRENT_ACTOR_VAR));
+    prepareCutIn(interp, "敵カットイン", 0, currentActorId());
   };
 
   // Replaces (1x): data/CommonEvents.json:common-event:129
   AGH_prepareEnemyCutIn2 = function (interp) {
-    prepareCutIn(interp, "敵カットイン", 8, varValue(CURRENT_ACTOR_VAR));
+    prepareCutIn(interp, "敵カットイン", 8, currentActorId());
   };
 
   // Replaces (2x): data/Map003.json:map-event:81:page:1, data/Map003.json:map-event:82:page:1
   AGH_prepareAllyCutIn2 = function (interp) {
-    prepareCutIn(interp, "味方カットイン", 7, varValue(CURRENT_ACTOR_VAR));
+    prepareCutIn(interp, "味方カットイン", 7, currentActorId());
   };
 
   // Replaces (2x): data/CommonEvents.json:common-event:138
   AGH_prepareAllyCutInWithAbilityKind = function (interp) {
     setVar(182, 13);
-    prepareCutIn(interp, "味方カットイン", 1, varValue(CURRENT_ACTOR_VAR));
+    prepareCutIn(interp, "味方カットイン", 1, currentActorId());
   };
 
   // Replaces (2x): data/CommonEvents.json:common-event:138
@@ -6342,7 +6346,7 @@
   AGH_loadCostumeSlotsFromPartyStat = function () {
     // 現在衣装を呼び出し
     forEachCostumeSlot((slotIndex) => {
-      setVar(slotIndex + 460, varValue(varValue(CURRENT_ACTOR_VAR) + 440)[slotIndex]);
+      setVar(slotIndex + 460, varValue(currentActorId() + 440)[slotIndex]);
     });
   };
 
@@ -6358,7 +6362,7 @@
   AGH_saveCostumeSlotsToPartyStat = function () {
     // 衣装情報を更新
     forEachCostumeSlot((slotIndex) => {
-      varValue(varValue(CURRENT_ACTOR_VAR) + 440)[slotIndex] = varValue(slotIndex + 460);
+      varValue(currentActorId() + 440)[slotIndex] = varValue(slotIndex + 460);
     });
   };
 
@@ -6376,24 +6380,24 @@
 
   // Replaces (3x): data/CommonEvents.json:common-event:167
   AGH_recordCostumeClothTotal = function () {
-    const currentActorId = varValue(CURRENT_ACTOR_VAR);
-    varValue(currentActorId + 440)[41] = Number($dataItems[varValue(19)].meta["TotalCloth"]);
-    varValue(348)[currentActorId] = varValue(currentActorId + 440)[41];
+    const actorId = currentActorId();
+    varValue(actorId + 440)[41] = Number($dataItems[varValue(19)].meta["TotalCloth"]);
+    varValue(348)[actorId] = varValue(actorId + 440)[41];
   };
 
   // Replaces (3x): data/CommonEvents.json:common-event:167
   AGH_saveCharacterIdToStatBlock = function () {
-    varValue(varValue(CURRENT_ACTOR_VAR) + 440)[0] = varValue(19);
+    varValue(currentActorId() + 440)[0] = varValue(19);
   };
 
   // Replaces (2x): data/CommonEvents.json:common-event:167
   AGH_configureCurrentActorStatusLine = function (interp) {
-    const currentActorId = varValue(CURRENT_ACTOR_VAR);
+    const actorId = currentActorId();
     const icon155 = icon(155);
     const costumeStatusIcon = `${icon155}`;
     const actorName = currentActor().name();
-    const exposureValue = varValue(currentActorId + 380)[4]; // 380+actorId slot 4: exposure value
-    const exposureLimit = varValue(currentActorId + 380)[5]; // 380+actorId slot 5: exposure limit
+    const exposureValue = varValue(actorId + 380)[4]; // 380+actorId slot 4: exposure value
+    const exposureLimit = varValue(actorId + 380)[5]; // 380+actorId slot 5: exposure limit
     setSelfVar(
       interp,
       519,
@@ -6410,11 +6414,11 @@
     noWeaponSwitchId,
     noWeaponVariableId
   ) {
-    if (varValue(varValue(CURRENT_ACTOR_VAR) + 380)[weaponSlotIndex] != 0) {
+    if (varValue(currentActorId() + 380)[weaponSlotIndex] != 0) {
       AGH_enableSwitch(hasWeaponSwitchId);
       setVar(
         weaponNameVariableId,
-        $dataWeapons[varValue(varValue(CURRENT_ACTOR_VAR) + 380)[weaponIndex]].name
+        $dataWeapons[varValue(currentActorId() + 380)[weaponIndex]].name
       );
     } else {
       AGH_disableSwitch(noWeaponSwitchId);
@@ -6424,7 +6428,7 @@
 
   // Replaces (2x): data/CommonEvents.json:common-event:256
   AGH_clearWeaponSlot = function (weaponSlotIndex) {
-    varValue(varValue(CURRENT_ACTOR_VAR) + 380)[weaponSlotIndex] = 0;
+    varValue(currentActorId() + 380)[weaponSlotIndex] = 0;
   };
 
   // Replaces (3x): data/CommonEvents.json:common-event:205
@@ -6437,7 +6441,7 @@
 
   // Replaces (2x): data/CommonEvents.json:common-event:241
   AGH_setWeaponUniqueAndAddWeaponUnique = function (setValue) {
-    const actorVariableId = varValue(CURRENT_ACTOR_VAR);
+    const actorVariableId = currentActorId();
     const weaponId = actorVariableId + 80;
     weapon_uniqueSet(actorVariableId);
     valueCountSet3 = setValue;
@@ -7945,14 +7949,14 @@
   // Replaces (3x): data/Map007.json:map-event:4:page:1, :6:page:1, :23:page:1
   AGH_showStandingPictureForCurrentActor = function (interp) {
     AGH_enableSwitch(42);
-    tachie_hyouji1(varValue(CURRENT_ACTOR_VAR));
+    tachie_hyouji1(currentActorId());
     callStandingPicturePlugin(interp);
   };
 
   // Replaces (2x): data/Map007.json:map-event:4:page:1, data/Map007.json:map-event:6:page:1
   AGH_showStandingPicture1 = function () {
     AGH_enableSwitch(42);
-    tachie_hyouji1(varValue(CURRENT_ACTOR_VAR));
+    tachie_hyouji1(currentActorId());
   };
 
   // Replaces (2x): data/CommonEvents.json:common-event:301
@@ -8576,10 +8580,10 @@
     // `valueDanjonTreasure<n>` globals are only written by
     // AGH_iterateItemsValueDanjonTreasure, which no event calls, so the original
     // eval threw ReferenceError; look the pool up on window and bail out instead.
-    const treasurePool = window[`valueDanjonTreasure${varValue(CURRENT_ACTOR_VAR)}`];
+    const treasurePool = window[`valueDanjonTreasure${currentActorId()}`];
     if (!Array.isArray(treasurePool)) return;
     //treasureKindPool is only read by the commented debug log below
-    //const treasureKindPool = eval(`valueDanjonTrSyurui${varValue(CURRENT_ACTOR_VAR)}`);
+    //const treasureKindPool = eval(`valueDanjonTrSyurui${currentActorId()}`);
     //console.log(treasurePool);
     //console.log(treasureKindPool);
     const pickedTreasureId = treasurePool[getRandomIndex(treasurePool.length)];
@@ -8865,7 +8869,7 @@
 
   // Replaces (5x): data/CommonEvents.json:common-event:87, data/CommonEvents.json:common-event:256
   AGH_flagIfAnySlotFilled = function (firstSlotIndex, lastSlotIndex, switchId) {
-    const costumeSlotValues = varValue(360 + varValue(CURRENT_ACTOR_VAR));
+    const costumeSlotValues = varValue(360 + currentActorId());
     const maxSlotValue = range(firstSlotIndex, lastSlotIndex)
       .map((slotIndex) => costumeSlotValues[slotIndex])
       .filter((slotValue) => slotValue >= 1)
@@ -9119,8 +9123,8 @@
 
   // Replaces (2x): data/CommonEvents.json:common-event:235, data/CommonEvents.json:common-event:313
   AGH_setCurrentActorRankUpMessage = function (withIcon) {
-    const actorName = setString(varValue(CURRENT_ACTOR_VAR));
-	const rarityRank = withIcon ? skillIconName(405) : valueCountSet1;
+    const actorName = setString(currentActorId());
+    const rarityRank = withIcon ? skillIconName(405) : valueCountSet1;
     const rarityup = ruby("昇格", "レアリティ・アップ");
     setVar(21, `${actorName}は、<${rarityRank}>に${rarityup}した！`);
   };
@@ -9129,13 +9133,13 @@
   AGH_setActorResetConfirmMessage = function () {
     setVar(
       21,
-      decorateWithActorName("を初期化します。よろしいですか？\n（H履歴は影響ありませんが、\n各種開発度ランクはリセットされます。\nサブジョブのレベルは完全にはリセットされません）")
+      actorMessage("を初期化します。よろしいですか？\n（H履歴は影響ありませんが、\n各種開発度ランクはリセットされます。\nサブジョブのレベルは完全にはリセットされません）")
     );
   };
 
   // Replaces (1x): data/CommonEvents.json:common-event:254
   AGH_setActorResetDoneMessage = function () {
-    setVar(21, decorateWithActorName("のリセット処理が完了しました。"));
+    setVar(21, actorMessage("のリセット処理が完了しました。"));
   };
 
   // Replaces (1x): data/CommonEvents.json:common-event:313
@@ -9146,7 +9150,7 @@
   // Replaces (1x): data/CommonEvents.json:common-event:259
   AGH_setJobUnlockRequirementMessage = function () {
     const className = $dataClasses[varValue(21)].name;
-    setVar(801, decorateWithActorName(`は[${className}]のジョブ解放条件を満たしていません…。\n`));
+    setVar(801, actorMessage(`は[${className}]のジョブ解放条件を満たしていません…。` + '\n'));
   };
 
   // Replaces (1x): data/CommonEvents.json:common-event:361
