@@ -9117,11 +9117,11 @@
    * Actor announcement messages (reuses the shared helpers)
    * ========================================================================== */
 
-  // Replaces (1x): data/CommonEvents.json:common-event:235
-  AGH_setCurrentActorRankUpMessage = function () {
+  // Replaces (2x): data/CommonEvents.json:common-event:235, data/CommonEvents.json:common-event:313
+  AGH_setCurrentActorRankUpMessage = function (withIcon) {
     const actorName = setString(varValue(CURRENT_ACTOR_VAR));
+	const rarityRank = withIcon ? skillIconName(405) : valueCountSet1;
     const rarityup = ruby("昇格", "レアリティ・アップ");
-	const rarityRank = valueCountSet1;
     setVar(21, `${actorName}は、<${rarityRank}>に${rarityup}した！`);
   };
 
@@ -9142,10 +9142,7 @@
 
   // Replaces (1x): data/CommonEvents.json:common-event:313
   AGH_setCurrentActorRankUpMessageWithIcon = function () {
-    const actorName = setString(varValue(CURRENT_ACTOR_VAR));
-    const rarityRank = skillIconName(405);
-    const rarityup = ruby("昇格", "レアリティ・アップ");
-    setVar(21, `${actorName}は、${rarityRank}に${rarityup}した！`);
+    AGH_setCurrentActorRankUpMessage(true);
   };
 
   // Replaces (1x): data/CommonEvents.json:common-event:259
