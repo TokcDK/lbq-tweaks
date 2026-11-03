@@ -9121,7 +9121,8 @@
   AGH_setCurrentActorRankUpMessage = function () {
     const actorName = setString(varValue(CURRENT_ACTOR_VAR));
     const rarityup = ruby("昇格", "レアリティ・アップ");
-    setVar(21, `${actorName}は、<${valueCountSet1}>に${rarityup}した！`);
+	const rarityRank = valueCountSet1;
+    setVar(21, `${actorName}は、<${rarityRank}>に${rarityup}した！`);
   };
 
   // Replaces (1x): data/CommonEvents.json:common-event:254
@@ -9141,10 +9142,10 @@
 
   // Replaces (1x): data/CommonEvents.json:common-event:313
   AGH_setCurrentActorRankUpMessageWithIcon = function () {
-    const setString2 = setString(varValue(CURRENT_ACTOR_VAR));
-    const skillIcon405 = skillIconName(405);
-    const ruby2 = ruby("昇格", "レアリティ・アップ");
-    setVar(21, `${setString2}は、${skillIcon405}に${ruby2}した！`);
+    const actorName = setString(varValue(CURRENT_ACTOR_VAR));
+    const rarityRank = skillIconName(405);
+    const rarityup = ruby("昇格", "レアリティ・アップ");
+    setVar(21, `${actorName}は、${rarityRank}に${rarityup}した！`);
   };
 
   // Replaces (1x): data/CommonEvents.json:common-event:259
