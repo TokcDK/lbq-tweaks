@@ -4395,7 +4395,7 @@
     setVar(QUEST_OBJECTIVE_VAR, text);
   }
   function showTicker(message) {
-    TickerManager.show(`${message}`);
+    TickerManager.show(message);
   }
   function showCommonInfo(text) {
     CommonPopupManager.showInfo({}, text, null);
@@ -4435,8 +4435,7 @@
     AGH_enableSwitch(125);
   }
   function pushActorBattleLog(suffix) {
-    const actorName = currentActor().name();
-    pushBattleLog(`${actorName}${suffix}`);
+    pushBattleLog(currentActor().name() + suffix);
   }
   function runShowInfoPlugin(interp, message) {
     callPluginCommand(interp, "ShowInfo", message);
@@ -4449,8 +4448,9 @@
   }
   function decorateWithActorName(message) {
     const actorName = currentActor().name();
-    return `${actorName}${message}`;
+    return currentActor().name() + message;
   }
+  
   /** 「はメインクラス2ndジョブ＜\j[2X]＞に目覚めた！」 + common event 45. */
   function setSecondJobAwakeningMessage(interp, jobIndex, leadingSpaces) {
     setSelfVar(interp, CURRENT_ACTOR_VAR, jobIndex);
@@ -9129,9 +9129,7 @@
   AGH_setActorResetConfirmMessage = function () {
     setVar(
       21,
-      decorateWithActorName(
-        "を初期化します。よろしいですか？\n（H履歴は影響ありませんが、\n各種開発度ランクはリセットされます。\nサブジョブのレベルは完全にはリセットされません）"
-      )
+      decorateWithActorName("を初期化します。よろしいですか？\n（H履歴は影響ありませんが、\n各種開発度ランクはリセットされます。\nサブジョブのレベルは完全にはリセットされません）")
     );
   };
 
