@@ -15,7 +15,9 @@
  * only exists while that plugin is enabled) and destroying twice throws.
  * This plugin defines an idempotent Bitmap#destroy plus Bitmap#destroyIfDynamic,
  * which never touches ImageManager bitmaps (they carry `_url` and are shared
- * through ImageManager._imageCache).
+ * through ImageManager._imageCache). It also spares the one cached bitmap that
+ * does NOT carry `_url`: the blank singleton from ImageManager.loadEmptyBitmap,
+ * which every sprite with an empty file name points at.
  *
  * Freed automatically:
  *  - Window_Base.createContents: allocates a new Bitmap on every call, and
@@ -50,11 +52,39 @@
             this.__baseTexture.destroy();
             this.__baseTexture = null;
         }
+        // BUGFIX: shrink the canvas instead of dropping it. rpg_core's lazy
+        // `_baseTexture` getter calls _createBaseTexture(this.__canvas) and then
+        // reads source.width, so a freed bitmap that something still references
+        // (renderer, tilemap, another sprite) threw
+        // "Cannot read properties of null (reading 'width')". A 1x1 blank costs
+        // nothing and renders nothing.
         if (this.__canvas) {
-            this.__canvas.width = 0;
-            this.__canvas.height = 0;
-            this.__canvas = null;
+            this.__canvas.width = 1;
+            this.__canvas.height = 1;
         }
+    };
+
+    /**
+     * ImageManager hands out one shared blank Bitmap ('empty') to every sprite
+     * whose file name is empty: events with no graphic, a map without a
+     * parallax, erased pictures, blank tileset slots. It is built with
+     * `new Bitmap()`, so it looks dynamic, but it outlives the sprite that uses
+     * it. Destroying it left a dead entry behind and the next
+     * ShaderTilemap.refreshTileset() -> `x._baseTexture` threw
+     * "Cannot read properties of null (reading 'width')".
+     *
+     * The singleton is tagged on the way out instead of looked up in a cache:
+     * YEP_X_CoreUpdatesOpt replaces loadEmptyBitmap three times and stores the
+     * bitmap in ImageManager.cache or ImageManager._imageCache depending on
+     * which core-update params are on, so no single lookup is reliable.
+     */
+    var _ImageManager_loadEmptyBitmap = ImageManager.loadEmptyBitmap;
+    ImageManager.loadEmptyBitmap = function() {
+        var bitmap = _ImageManager_loadEmptyBitmap.apply(this, arguments);
+        if (bitmap) {
+            bitmap.__shared = true;
+        }
+        return bitmap;
     };
 
     /**
@@ -63,7 +93,7 @@
      * ImageManager._imageCache, so they must be left alone.
      */
     Bitmap.prototype.destroyIfDynamic = function() {
-        if (!this._url) {
+        if (!this._url && !this.__shared) {
             this.destroy();
         }
     };
