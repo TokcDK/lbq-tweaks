@@ -13,7 +13,9 @@
     'use strict';
 
     // Maximum logic updates allowed per single rAF tick (2 = max 33.3ms catch-up instead of 250ms)
-    const MAX_UPDATES_PER_FRAME = 2;
+	// with MAX_UPDATES_PER_FRAME = 2, anything below 30 fps still runs in slow motion (20 fps → 66 % speed) 
+	// because catch-up is capped at two ticks. Raising it to 3 covers 20 fps but weakens the anti-spiral cap
+    const MAX_UPDATES_PER_FRAME = 3;
 
     SceneManager.updateMain = function() {
         if (Utils.isMobileSafari()) {
