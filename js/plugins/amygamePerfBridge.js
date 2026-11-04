@@ -19,6 +19,9 @@
  * is thrown away. Capturing the functions here and restoring them once all
  * plugins have run keeps the optimized bodies while leaving everything that
  * is layered on top of YEP_X_CoreUpdatesOpt untouched.
+ *
+ * The restore runs from Scene_Boot.start, so every plugin below this one must
+ * alias that method (all of them do today) for the restore to happen.
  * ============================================================================
  */
 
@@ -26,6 +29,9 @@
     // Methods an optimization plugin implements and YEP_X_CoreUpdatesOpt later
     // overwrites. Only methods nothing is stacked on top of are listed: a
     // method whose final owner is another plugin must keep that plugin's body.
+    // A method is also skipped when it reads a field that only the optimization
+    // plugin's own initializer sets (e.g. Tilemap._tileWidthHalf comes from
+    // FSDK's Tilemap.initialize, which MPP_MapLight/DP_MapZoom have replaced).
     var TARGETS = [
         'Tilemap.prototype.update',
         'TilingSprite.prototype.update',
@@ -35,18 +41,11 @@
         'Scene_Base.prototype.updateChildren',
         'Scene_ItemBase.prototype.applyItem',
         'Sprite_Animation.prototype.updateFrame',
-        'Utils.isOptionValid',
         'Bitmap.prototype._createCanvas',
         'Bitmap.prototype.checkDirty',
         'Bitmap.prototype._requestImage',
         'Sprite.prototype._renderCanvas',
         'Sprite.prototype._renderWebGL',
-        'Tilemap.prototype._drawAutotile',
-        'Tilemap.prototype._drawTableEdge',
-        'Tilemap.prototype._drawShadow',
-        'ShaderTilemap.prototype._drawAutotile',
-        'ShaderTilemap.prototype._drawTableEdge',
-        'ShaderTilemap.prototype._drawShadow',
         'TilingSprite.prototype._refresh',
         'Decrypter.decryptArrayBuffer',
         'Graphics.printLoadingError',
@@ -54,7 +53,6 @@
         'Graphics.printError',
         'JsonEx._encode',
         'JsonEx._decode',
-        'ImageManager.loadNormalBitmap',
         'ImageManager.requestNormalBitmap',
         'AudioManager.createBuffer',
         'Game_Interpreter.requestImages',
