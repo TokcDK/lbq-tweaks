@@ -155,9 +155,16 @@ if (pStopDrawOutOfScreen) {
     const _Sprite_Character_update = Sprite_Character.prototype.update;
     Sprite_Character.prototype.update = function() {
         // 移動命令中は除外、画面外なら最小限の情報だけを更新
-        if (!this._character.isMoveRouteForcing() && isOutOfScreenSprite(this)) {
-            this.setFrame(0, 0, 0, 0);
+        // BUGFIX: アニメ／フキダシの再生中は停止しない。update を丸ごと飛ばすと
+        // updateBalloon が endBalloon を呼べず、画面外に出た瞬間のフキダシが
+        // 画面端に残り続ける（Sprite_Balloon は自分では消えない）。
+        if (!this._character.isMoveRouteForcing()
+            && !isPlayingEffect(this)
+            && isOutOfScreenSprite(this)) {
+            // BUGFIX: setFrame(0,0,0,0) は再開時に updateFrame とテクスチャ更新を
+            // 強制するので visible で隠す（Sprite_Base.updateVisibility が戻す）
             this.updatePosition();
+            this.visible = false;
             return;
         }
 
@@ -165,26 +172,51 @@ if (pStopDrawOutOfScreen) {
     };
 
     /**
+     * ●アニメ・フキダシの再生中か？（画面外でも更新を止めてはいけない）
+     */
+    function isPlayingEffect(sprite) {
+        const character = sprite._character;
+        return sprite.isAnimationPlaying() || sprite.isBalloonPlaying()
+            || character.animationId() > 0 || character.balloonId() > 0;
+    }
+
+    /**
      * ●スプライトの位置が画面内かどうか？
      */
     function isOutOfScreenSprite(sprite) {
-        const x = sprite.x;
-        const y = sprite.y;
-
-        // 画像の幅を考慮
-        let halfWidth = 0;
-        let height = 0;
-        if (sprite.bitmap) {
-            halfWidth = sprite.bitmap.width / 2 * sprite.scale.x;
-            height = sprite.bitmap.height * sprite.scale.y;
+        // BUGFIX: sprite.x/y はタイルマップ内の座標なので、親の変換を通して
+        // 画面座標に直す。$gameScreen.zoomScale() で割るだけでは、DP_MapZoom が
+        // Spriteset_Base の scale/x で拡大する分だけ可視範囲がずれる。
+        // 座標はキャラクターから直接取る（sprite.x/y は前フレームの値）
+        const parent = sprite.parent;
+        if (!parent) {
+            return false;
         }
+        const character = sprite._character;
+        const m = parent.worldTransform;
+        const cx = character.screenX();
+        const cy = character.screenY();
+        const x = m.a * cx + m.c * cy + m.tx;
+        const y = m.b * cx + m.d * cy + m.ty;
 
-        // Ｘ座標は中央、Ｙ座標は足元が基準なのでそこも考慮
-        // ズームアウト処理も考慮
+        // 画像の幅を考慮（Ｘ座標は中央、Ｙ座標は足元が基準）
+        // 拡大率は親の変換に含まれているので画面上の実寸に直す
+        let w = sprite.width;
+        let h = sprite.height;
+        if (!w || !h) {
+            // updateFrame 前は frame が 0 なので bitmap で代用
+            if (sprite.bitmap) {
+                w = sprite.bitmap.width;
+                h = sprite.bitmap.height;
+            }
+        }
+        const halfWidth = w / 2 * Math.abs(m.a);
+        const height = h * Math.abs(m.d);
+
         if (x + halfWidth + pOutOfScreenMargin < 0
-            || x - halfWidth - pOutOfScreenMargin > (Graphics.width / $gameScreen.zoomScale())
+            || x - halfWidth - pOutOfScreenMargin > Graphics.width
             || y + pOutOfScreenMargin < 0
-            || y - height - pOutOfScreenMargin > (Graphics.height / $gameScreen.zoomScale())) {
+            || y - height - pOutOfScreenMargin > Graphics.height) {
             return true;
         }
         return false;
