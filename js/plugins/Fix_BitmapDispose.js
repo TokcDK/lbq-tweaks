@@ -19,9 +19,17 @@
  * does NOT carry `_url`: the blank singleton from ImageManager.loadEmptyBitmap,
  * which every sprite with an empty file name points at.
  *
+ * destroy() releases the GL texture but leaves the Bitmap itself usable: the
+ * BaseTexture is disposed rather than destroyed and the canvas is shrunk to
+ * 1x1. A PIXI.Texture that something still holds therefore keeps working (it
+ * draws nothing) instead of crashing the renderer with
+ * "Cannot read properties of null (reading 'videoWidth')".
+ *
  * Freed automatically:
  *  - Window_Base.createContents: allocates a new Bitmap on every call, and
  *    CommonPopupCore calls it once per popup on a full-screen window.
+ *  - Window._refreshBack / _refreshFrame / _refreshCursor: a new Bitmap per
+ *    resize, and the message window resizes on almost every message.
  *  - Sprite_Picture.updateBitmap: DTextPicture / FacePicture / MpiComposePicture
  *    / OriginalTimer rebuild the picture bitmap on every picture name change.
  *  - Scene_Map / Scene_Battle terminate: the spriteset is only detached from the
@@ -43,24 +51,29 @@
     // MV has no Bitmap#destroy; MPP_MessageEX adds one but only while enabled.
     // This replaces it with an idempotent version that also avoids waking the
     // lazy `_baseTexture` getter (which would upload a texture just to free it).
+    //
+    // It disposes the BaseTexture instead of destroying it. BaseTexture#destroy
+    // sets `source = null`, and the PIXI.Texture built from it can still be
+    // installed on a sprite -- a shared bitmap, a pooled sprite, a scene that
+    // kept a reference -- so the next bind threw in the middle of the render
+    // pass:
+    //   TextureManager.updateTexture -> glTexture.upload(texture.source)
+    //   Texture.upload -> source.videoWidth        (source === null)
+    // dispose() frees the GL allocation and leaves the texture usable, and the
+    // canvas is shrunk to 1x1 first so the re-upload is 4 bytes and completely
+    // transparent: a stale reference degrades to an invisible quad, never a
+    // crash. Nothing has to be nulled, so no accessor can walk into a corpse.
     Bitmap.prototype.destroy = function() {
         if (this.__disposed) {
             return;
         }
         this.__disposed = true;
-        if (this.__baseTexture) {
-            this.__baseTexture.destroy();
-            this.__baseTexture = null;
-        }
-        // BUGFIX: shrink the canvas instead of dropping it. rpg_core's lazy
-        // `_baseTexture` getter calls _createBaseTexture(this.__canvas) and then
-        // reads source.width, so a freed bitmap that something still references
-        // (renderer, tilemap, another sprite) threw
-        // "Cannot read properties of null (reading 'width')". A 1x1 blank costs
-        // nothing and renders nothing.
         if (this.__canvas) {
             this.__canvas.width = 1;
             this.__canvas.height = 1;
+        }
+        if (this.__baseTexture) {
+            this.__baseTexture.dispose();
         }
     };
 
@@ -154,6 +167,34 @@
         }
         _Window_Base_createContents.apply(this, arguments);
     };
+
+    //-----------------------------------------------------------------------
+    // Window (back / frame / cursor bitmaps)
+    //-----------------------------------------------------------------------
+
+    // _refreshBack / _refreshFrame / _refreshCursor each draw a brand new Bitmap
+    // and assign it to their sprite, dropping the previous one. They run on
+    // every resize, and the message window resizes on almost every message
+    // (MPP_MessageEX.startMessage, MessageWindowPopup.resetLayout), so three
+    // window-sized textures leaked per line of dialogue.
+    function patchWindowPartRefresh(method, spriteName) {
+        var original = Window.prototype[method];
+        if (!original) {
+            return;
+        }
+        Window.prototype[method] = function() {
+            var sprite = this[spriteName];
+            var previous = sprite ? sprite.bitmap : null;
+            original.apply(this, arguments);
+            if (previous && sprite.bitmap !== previous) {
+                previous.destroyIfDynamic();
+            }
+        };
+    }
+
+    patchWindowPartRefresh('_refreshBack', '_windowBackSprite');
+    patchWindowPartRefresh('_refreshFrame', '_windowFrameSprite');
+    patchWindowPartRefresh('_refreshCursor', '_windowCursorSprite');
 
     //-----------------------------------------------------------------------
     // Sprite_Picture
