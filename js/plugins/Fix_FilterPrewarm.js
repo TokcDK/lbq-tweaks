@@ -30,7 +30,8 @@
     var WARMUP = [
         ['BlurFilter', function() { return new PIXI.filters.BlurFilter(0.5); }],
         ['ColorMatrixFilter', function() { return new PIXI.filters.ColorMatrixFilter(); }],
-        ['VoidFilter', function() { return new PIXI.filters.VoidFilter(); }]
+        ['VoidFilter', function() { return new PIXI.filters.AlphaFilter(); }],
+        ['AlphaFilter', function() { return new PIXI.filters.AlphaFilter(); }]
     ];
 
     function prewarmFilters() {
