@@ -441,13 +441,15 @@ function Scene_Formation() {
     };
     
     Window_Formation.prototype.checkBlt = function(){
-        var bitmap2 = new Bitmap(1,1);
+        // update() から毎フレーム呼ばれるので、Bitmap は使い回す。
+        // new Bitmap(1,1) を毎フレーム作ると canvas と BaseTexture が
+        // その都度確保され、GC まで GPU リソースが残る。
+        var bitmap2 = this._checkBltBitmap || (this._checkBltBitmap = new Bitmap(1,1));
         $gameParty.allMembers().forEach(function(actor){
             var bitmap = ImageManager.loadCharacter(actor.characterName());
             bitmap2.blt(bitmap,0,0,bitmap.width,bitmap.height,0,0);
             bitmap = null;
         });
-        bitmap2 = null;
     };
 
     Window_Formation.prototype.update = function(){
@@ -572,13 +574,13 @@ function Scene_Formation() {
     
     Window_FormationStatus.prototype.checkBlt = function(){
         var bitmap = null;
-        var bitmap2 = new Bitmap(1,1);
+        // update() から毎フレーム呼ばれるので、Bitmap は使い回す。
+        var bitmap2 = this._checkBltBitmap || (this._checkBltBitmap = new Bitmap(1,1));
         $gameParty.allMembers().forEach(function(actor){
             bitmap = ImageManager.loadFace(actor.faceName());
             bitmap2.blt(bitmap,0,0,bitmap.width,bitmap.height,0,0);
         });
         bitmap = null;
-        bitmap2 = null;
     };
     
     Window_FormationStatus.prototype.refreshContents = function(){

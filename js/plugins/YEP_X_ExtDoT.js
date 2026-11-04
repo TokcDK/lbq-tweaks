@@ -300,13 +300,24 @@ Game_Battler.prototype.regenerateAll = function() {
 
 Game_Battler.prototype.processDamageOverTimeStates = function() {
   if (!$gameParty.inBattle()) return;
-  var result = JsonEx.makeDeepCopy(this._result);
+  // BUGFIX: 以前は毎回 JsonEx.makeDeepCopy(this._result) していた。
+  // regenerateAll は戦闘中フレーム毎に全バトラー分呼ばれるので、
+  // JSON の stringify/parse が毎フレーム走っていた。
+  // _result の中身は数値と真偽値だけなので、浅いコピーで十分。
+  var result = this._result;
+  var saved = {};
+  for (var key in result) {
+    saved[key] = result[key];
+  }
   var states = this.states();
   while (states.length > 0) {
     var state = states.shift();
     if (state) {
       this.processDamageOverTimeStateEffect(state);
     }
+  }
+  for (var key in saved) {
+    result[key] = saved[key];
   }
   this._result = result;
 };
