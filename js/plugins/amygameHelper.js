@@ -4074,6 +4074,9 @@
   function currentActor() {
     return actorFromVariable(CURRENT_ACTOR_VAR);
   }
+  function currentActorName() {
+    return currentActor().name();
+  }
   function spawnedEventId(slotIndex) {
     return varValue(SPAWNED_EVENT_TABLE_VAR)[slotIndex];
   }
@@ -4440,9 +4443,6 @@
     setVar(706, [640 - 128, 386, layerPreset, speed, 0, "eromangasimaji"]);
     AGH_enableSwitch(125);
   }
-  function pushActorBattleLog(suffix) {
-    pushBattleLog(currentActor().name() + suffix);
-  }
   function runShowInfoPlugin(interp, message) {
     callPluginCommand(interp, "ShowInfo", message);
   }
@@ -4452,13 +4452,10 @@
   function forEachCostumeSlot(callback) {
     range(1, 40).forEach(callback);
   }
-  function actorMessage(message) {
-    return currentActor().name() + message;
-  }
   /** 「はメインクラス2ndジョブ＜\j[2X]＞に目覚めた！」 + common event 45. */
   function setSecondJobAwakeningMessage(interp, jobIndex, leadingSpaces) {
     setSelfVar(interp, CURRENT_ACTOR_VAR, jobIndex);
-    const awakeningActorName = currentActor().name(); // the actor that awakens
+    const awakeningActorName = currentActorName(); // the actor that awakens
     const secondJobName = jobName(jobIndex + 20);
     const secondJob = colorTaggedText(2, `＜${secondJobName}＞`);
     const actorName = leadingSpaces + colorTaggedText(16, awakeningActorName);
@@ -6395,7 +6392,7 @@
     const actorId = currentActorId();
     const icon155 = icon(155);
     const costumeStatusIcon = `${icon155}`;
-    const actorName = currentActor().name();
+    const actorName = currentActorName();
     const exposureValue = varValue(actorId + 380)[4]; // 380+actorId slot 4: exposure value
     const exposureLimit = varValue(actorId + 380)[5]; // 380+actorId slot 5: exposure limit
     setSelfVar(
@@ -6461,34 +6458,38 @@
 
   // Replaces (3x): data/CommonEvents.json:common-event:106, data/CommonEvents.json:common-event:109
   AGH_pushBoundBattleLog = function () {
-    pushActorBattleLog("は拘束された！");
+    const actorName = currentActorName();
+    pushBattleLog(`${actorName}は拘束された！`);
   };
 
   // Replaces (1x): data/CommonEvents.json:common-event:109
   AGH_pushAttackedBattleLog = function () {
-    pushActorBattleLog("は襲い掛かられた！");
+    const actorName = currentActorName();
+    pushBattleLog(`${actorName}は襲い掛かられた！`);
   };
 
   // Replaces (1x): data/CommonEvents.json:common-event:109
   AGH_pushEscapedBattleLog = function () {
-    pushActorBattleLog("は拘束から逃れた！");
+    const actorName = currentActorName();
+    pushBattleLog(`${actorName}は拘束から逃れた！`);
   };
 
   // Replaces (1x): data/CommonEvents.json:common-event:110
   AGH_pushAssaultedBattleLog = function () {
-    pushActorBattleLog("は犯されている…。");
+    const actorName = currentActorName();
+    pushBattleLog(`${actorName}は犯されている…。`);
   };
 
   // Replaces (2x): data/CommonEvents.json:common-event:111, data/CommonEvents.json:common-event:112
   AGH_showAlreadyNudeInfo = function () {
-    const actorName = currentActor().name();
+    const actorName = currentActorName();
     showInfoOrBattleLog(`しかし${actorName}は既に全裸であった…`);
   };
 
   // Replaces (1x): data/CommonEvents.json:common-event:112
   AGH_showNoEffectExposureInfo = function () {
     const exposureValue = value1;
-    const actorName = currentActor().name();
+    const actorName = currentActorName();
     showInfoOrBattleLog(`しかし${actorName}には効果が無かった。　（現在露出値:${exposureValue}）`);
   };
 
@@ -8990,7 +8991,7 @@
   const PARTNER_CALL_STATE_ID = 234;
 
   function setActorBattleCry(interp, partnerActorId, defaultLine, partnerCallLineBuilder) {
-    const speakerName = currentActor().name();
+    const speakerName = currentActorName();
     const isPartnerCalled = $gameActors.actor(partnerActorId).isStateAffected(
       PARTNER_CALL_STATE_ID
     );
@@ -9131,15 +9132,17 @@
 
   // Replaces (1x): data/CommonEvents.json:common-event:254
   AGH_setActorResetConfirmMessage = function () {
+    const actorName = currentActorName();
     setVar(
       21,
-      actorMessage("を初期化します。よろしいですか？\n（H履歴は影響ありませんが、\n各種開発度ランクはリセットされます。\nサブジョブのレベルは完全にはリセットされません）")
+      `${actorName}を初期化します。よろしいですか？\n（H履歴は影響ありませんが、\n各種開発度ランクはリセットされます。\nサブジョブのレベルは完全にはリセットされません）`
     );
   };
 
   // Replaces (1x): data/CommonEvents.json:common-event:254
   AGH_setActorResetDoneMessage = function () {
-    setVar(21, actorMessage("のリセット処理が完了しました。"));
+    const actorName = currentActorName();
+    setVar(21, `${actorName}のリセット処理が完了しました。`);
   };
 
   // Replaces (1x): data/CommonEvents.json:common-event:313
@@ -9149,8 +9152,9 @@
 
   // Replaces (1x): data/CommonEvents.json:common-event:259
   AGH_setJobUnlockRequirementMessage = function () {
+    const actorName = currentActorName();
     const className = $dataClasses[varValue(21)].name;
-    setVar(801, actorMessage(`は[${className}]のジョブ解放条件を満たしていません…。` + '\n'));
+    setVar(801, `${actorName}は[${className}]のジョブ解放条件を満たしていません…。` + '\n');
   };
 
   // Replaces (1x): data/CommonEvents.json:common-event:361
