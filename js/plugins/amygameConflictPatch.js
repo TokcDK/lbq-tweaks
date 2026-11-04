@@ -20,6 +20,11 @@
  * 3. Scene_Base.createWindowLayer
  *    AddFavouriteEquipsToEquipScene replaces the method, dropping
  *    YEP_X_ActSeqPack2's BattleManager.setWindowLayer call.
+ * 4. Graphics.render
+ *    YEP_X_CoreUpdatesOpt replaces the method, dropping the negative
+ *    _skipCount clamp that GraphicsRenderFix and FSDK_EngineTuner install.
+ *    Without it a backwards Date.now() jump sets _skipCount below zero and the
+ *    "if (_skipCount === 0)" test never renders again - a permanent freeze.
  * ============================================================================
  */
 
@@ -47,5 +52,12 @@
         if (this._windowLayer && BattleManager.setWindowLayer) {
             BattleManager.setWindowLayer(this._windowLayer);
         }
+    };
+
+    // 4. GraphicsRenderFix: a negative _skipCount must never freeze rendering
+    var _Graphics_render = Graphics.render;
+    Graphics.render = function(stage) {
+        if (this._skipCount < 0) this._skipCount = 0;
+        _Graphics_render.call(this, stage);
     };
 })();

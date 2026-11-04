@@ -1,6 +1,13 @@
 /*:
  * @plugindesc Fixes MV's 15-frame accumulator death spiral and stops redundant rendering on 120Hz/144Hz+ monitors.
  * @author Senior MV Expert
+ *
+ * @help
+ * Replaces SceneManager.updateMain, so it must load AFTER YEP_X_CoreUpdatesOpt
+ * (which replaces the same method) and BEFORE WaitFPS, which aliases whatever
+ * updateMain is current in order to measure FPS. Loading it after WaitFPS
+ * leaves WaitFPS' counter frozen at 0, and every "WaitFPS" command then waits
+ * its full maxWaitTime instead of proceeding as soon as the framerate is fine.
  */
 (function() {
     'use strict';
@@ -15,6 +22,9 @@
             this.renderScene();
         } else {
             const newTime = this._getTimeInMsWithoutMobileSafari();
+            // SceneManager.resume() resets _currentTime, but a scene replaced
+            // without it would otherwise produce a NaN delta and stall forever.
+            if (this._currentTime === undefined) this._currentTime = newTime;
             let fTime = (newTime - this._currentTime) / 1000;
             const maxFTime = this._deltaTime * MAX_UPDATES_PER_FRAME;
             if (fTime > maxFTime) fTime = maxFTime;
@@ -28,7 +38,11 @@
             }
 
             let updated = false;
-            while (this._accumulator >= this._deltaTime) {
+            // A frame that lasts exactly MAX_UPDATES_PER_FRAME ticks must still
+            // fit that many updates: after the first subtraction the remainder
+            // is ~1e-18 short of _deltaTime and the second update is lost, which
+            // made a steady 30fps game run at 75% speed.
+            while (this._accumulator >= this._deltaTime - 1e-9) {
                 this.updateInputData();
                 this.changeScene();
                 this.updateScene();
