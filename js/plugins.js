@@ -4,6 +4,7 @@ var $plugins =
 [
 {"name":"KODERA_optimization","status":true,"description":"1.0.3 Speed up core RPG Maker engine","parameters":{}},
 {"name":"SA_CoreSpeedImprovement","status":true,"description":"v18.1 SA Core Speed Improvement (Define at the top)","parameters":{"Enable CWC-cache":"false","Minimum CWC-cache holding count":"15","Logging level":"0"}},
+{"name":"Fix_EventXyScan","status":true,"description":"eventsXy/eventsXyNt/tileEventsXy without events() + .filter() closures. Must load after SA_CoreSpeedImprovement and before EaseEventLoad (whose opt1 spatial index should win if enabled).","parameters":{}},
 {"name":"FSDK_EngineTuner","status":true,"description":"R1.02||Provides fixes in features that may be less utilized.","parameters":{"engine":"","renderingMode":"auto","visuals":"","removeVideoCheckOnTouch":"false","removeBackgroundBlurOnMenus":"false","gameplay":"","dontInitFollowers":"false"}},
 {"name":"Irina_PerformanceUpgrade","status":true,"description":"<PerformanceUpgrade> for RPG Maker MV version 1.6.2.","parameters":{"":"","AnimationHue":"true","BlurMenuBackground":"true","BlurIntensity":"0.5","CacheTextColors":"true","EnemyHue":"true","PixiContainerFlush":"true","SkipUnnecessarySnapshots":"true"}},
 {"name":"SA_AnotherRouteSearch","status":false,"description":"v20.1 SA Another route search","parameters":{"Stop if unreachable dest":"true","Stop if unreachable route":"true","Max search count":"2000","Logging level":"0"}},
