@@ -159,17 +159,20 @@
     // Sprite_Picture
     //-----------------------------------------------------------------------
 
+    // loadBitmap() replaces this.bitmap when the picture name changes, and the
+    // bitmap is dropped when the picture is erased. Free the one that was
+    // actually replaced -- destroying the one that is *about to* be replaced is
+    // wrong: TKM_TachieManager allocates `new Bitmap(1, 1)` once for a
+    // "TKMtachie_" picture and reuses it across loadBitmap() calls (it only
+    // allocates when `!bitmap.isTachie`, and destroy() leaves that flag set), so
+    // the sprite kept rendering a texture whose BaseTexture had been freed.
     var _Sprite_Picture_updateBitmap = Sprite_Picture.prototype.updateBitmap;
     Sprite_Picture.prototype.updateBitmap = function() {
-        var picture = this.picture();
-        // loadBitmap() replaces this.bitmap whenever the picture name changes,
-        // and the bitmap is dropped outright when the picture is erased.
-        if (!picture || this._pictureName !== picture.name()) {
-            if (this.bitmap) {
-                this.bitmap.destroyIfDynamic();
-            }
-        }
+        var previous = this.bitmap;
         _Sprite_Picture_updateBitmap.apply(this, arguments);
+        if (previous && previous !== this.bitmap) {
+            previous.destroyIfDynamic();
+        }
     };
 
     //-----------------------------------------------------------------------
