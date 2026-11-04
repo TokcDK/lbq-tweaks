@@ -327,6 +327,7 @@ var $plugins =
 {"name":"MessageWindowPopup","status":true,"description":"フキダシウィンドウプラグイン","parameters":{"フォントサイズ":"26","余白":"10","自動設定":"false","フェイス倍率":"75","ウィンドウ連携":"true","行間":"4","ウィンドウ透過":"false","フォントサイズ増減幅":"12","フォントサイズ上限":"96","フォントサイズ下限":"24","画面内に収める":"true","振動の速さ":"5","振動時間":"60","テールを使わない":"false","最小横幅取得変数ID":"0","最小高さ取得変数ID":"0","lowerLimitX":"0","upperLimitX":"0","lowerLimitY":"0","upperLimitY":"0","tailImage":"Window_Tail","tailImageAdjustY":"0"}},
 {"name":"Fix_MVGameLoop","status":true,"description":"Fixes MV's 15-frame accumulator death spiral and stops redundant rendering on 120Hz/144Hz+ monitors. Must stay directly above WaitFPS.","parameters":{}},
 {"name":"WaitFPS","status":true,"description":"WaitFPS","parameters":{"momentFPSThreshold":"60","meanFPSFrames":"3","meanFPSThreshold":"50","maxWaitTime":"60"}},
+{"name":"Fix_ParallelEventThrottle","status":true,"description":"Restarts a finished parallel event list every 4th frame instead of every frame. Must load after FSDK_EngineTuner, which replaces updateParallel/Game_CommonEvent.update without aliasing.","parameters":{}},
 {"name":"------------------------","status":false,"description":"----------------------------------------------------------------------------------","parameters":{}},
 {"name":"DirectivityShake","status":true,"description":"指向性シェイクプラグイン","parameters":{}},
 {"name":"RandomShake","status":true,"description":"イベントコマンド「画面のシェイク」にランダムに揺らす機能を追加します。","parameters":{"SwitchNumber":"27"}},
