@@ -30,8 +30,10 @@
     var WARMUP = [
         ['BlurFilter', function() { return new PIXI.filters.BlurFilter(0.5); }],
         ['ColorMatrixFilter', function() { return new PIXI.filters.ColorMatrixFilter(); }],
-        ['VoidFilter', function() { return new PIXI.filters.AlphaFilter(); }],
-        ['AlphaFilter', function() { return new PIXI.filters.AlphaFilter(); }]
+        // PIXI 4.5.7 renamed VoidFilter to AlphaFilter; the old name is a getter
+        // that only logs a deprecation warning, so build the class directly.
+        // Listing AlphaFilter again would compile the same program twice.
+        ['VoidFilter', function() { return new PIXI.filters.AlphaFilter(); }]
     ];
 
     function prewarmFilters() {
