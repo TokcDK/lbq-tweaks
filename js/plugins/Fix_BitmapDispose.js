@@ -65,6 +65,26 @@
     };
 
     /**
+     * A deferred bitmap (Bitmap.load, and every Bitmap_Video, which sets
+     * `_defer = true`) has no canvas, and once it is destroyed -- or its image
+     * has not arrived -- it has no `_image` either. The lazy `_baseTexture`
+     * getter then called _createBaseTexture(null), and PIXI accepted it: the
+     * BaseTexture was created with `source === null` and only threw later, when
+     * the renderer bound it.
+     *   TextureManager.updateTexture -> glTexture.upload(texture.source)
+     *   Texture.upload -> source.videoWidth   (source === null)
+     * Give it an empty 1x1 canvas so the frame survives.
+     */
+    var _Bitmap_createBaseTexture = Bitmap.prototype._createBaseTexture;
+    Bitmap.prototype._createBaseTexture = function(source) {
+        if (!source) {
+            this._createCanvas();
+            source = this.__canvas;
+        }
+        return _Bitmap_createBaseTexture.call(this, source);
+    };
+
+    /**
      * ImageManager hands out one shared blank Bitmap ('empty') to every sprite
      * whose file name is empty: events with no graphic, a map without a
      * parallax, erased pictures, blank tileset slots. It is built with
@@ -91,11 +111,18 @@
      * Frees the GPU texture of a bitmap built with `new Bitmap(w, h)`.
      * ImageManager bitmaps carry `_url` and are shared through
      * ImageManager._imageCache, so they must be left alone.
+     *
+     * Bitmap_Video is skipped as well: it owns a <video> element and a
+     * VideoBaseTexture, and MoviePicture.js drives that lifecycle itself
+     * (loadVideo / clearVideo). Its destroy() also is not idempotent -- it
+     * leaves `_loadingState` at 'loaded', so a second call runs pause() on the
+     * `_video` it just nulled. `isVideo` only exists on that class.
      */
     Bitmap.prototype.destroyIfDynamic = function() {
-        if (!this._url && !this.__shared) {
-            this.destroy();
+        if (this._url || this.__shared || typeof this.isVideo === 'function') {
+            return;
         }
+        this.destroy();
     };
 
     function disposeDynamicBitmaps(node) {
