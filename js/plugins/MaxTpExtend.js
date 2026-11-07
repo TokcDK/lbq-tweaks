@@ -67,7 +67,8 @@
      * @returns {String} meta value
      */
     var getMetaValue = function(object, tagName) {
-        return object && object.meta.hasOwnProperty(tagName) ? convertEscapeCharacters(object.meta[tagName]) : null;
+        return object && object.meta && object.meta.hasOwnProperty(tagName) ?
+            convertEscapeCharacters(object.meta[tagName]) : null;
     };
 
     /**
@@ -86,13 +87,24 @@
     };
 
     /**
-     * Convert escape characters.(require any window object)
+     * Convert escape characters.
+     * A scene's window layer can legitimately have no child window while game
+     * logic is still running: YEP_CoreEngine's "Collection Clear" empties the
+     * scene in Scene_Base.terminate, and YEP_X_CoreUpdatesOpt hooks the
+     * WindowLayer's 'removed' event to drop its children, yet
+     * Scene_Battle.terminate calls $gameParty.onBattleEnd() (state removal ->
+     * refresh -> maxTp) afterwards. Conversion only needs $gameVariables /
+     * $gameActors, which every Window_Base carries on its prototype, so fall
+     * back to that instead of dereferencing a window that is not there.
      * @param text Target text
      * @returns {String} Converted text
      */
     var convertEscapeCharacters = function(text) {
-        var windowLayer = SceneManager._scene._windowLayer;
-        return windowLayer ? windowLayer.children[0].convertEscapeCharacters(text.toString()) : text;
+        var scene = SceneManager._scene;
+        var windowLayer = scene && scene._windowLayer;
+        var window = windowLayer && windowLayer.children[0];
+        var converter = window && window.convertEscapeCharacters ? window : Window_Base.prototype;
+        return converter.convertEscapeCharacters(text.toString());
     };
 
     /**
@@ -108,7 +120,9 @@
         return this.findMaxTpTraits().reduce(function(tp, traitObj) {
             var meta = getMetaValues(traitObj, ['最大TP', 'MaxTp']);
             if (meta) {
-                tp = tp + parseInt(meta) || 0;
+                // Without the parentheses a single unparsable tag (NaN) resets
+                // the sum of every tag collected so far back to 0.
+                tp += parseInt(meta, 10) || 0;
             }
             return tp;
         }, 0);
