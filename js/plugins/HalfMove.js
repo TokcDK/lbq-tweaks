@@ -913,9 +913,17 @@ OverpassTile.jsを当プラグインより上に定義してください。
     };
 
     Game_Map.prototype.eventsXyUnitNt = function (x, y) {
-        return this.events().filter(function (event) {
-            return event.posExpansionNt(x, y);
-        });
+        // This runs for every movement check of every character, so walk the
+        // sparse _events array directly instead of going through events()
+        // (which allocates a filtered copy) and .filter() (a second array plus
+        // a closure). Same order, same result, one allocation.
+        var source = this._events;
+        var result = [];
+        for (var i = 0, len = source.length; i < len; i++) {
+            var event = source[i];
+            if (event && event.posExpansionNt(x, y)) result.push(event);
+        }
+        return result;
     };
 
     Game_Map.prototype.isPassableByHalfRegionAndTag = function (floatX, floatY) {
@@ -1797,10 +1805,18 @@ OverpassTile.jsを当プラグインより上に定義してください。
         var result = _Game_Event_isCollidedWithEvents.apply(this, arguments);
         if (result) return true;
         var events = $gameMap.eventsXyUnitNt(x, y);
-        var collidedEvents = events.filter(function (event) {
-            return event !== this && !event.isHalfThrough(y) && (!paramEventOverlap || event.isNormalPriority());
-        }.bind(this));
-        if (collidedEvents.length === 0) return false;
+        // Only "is there at least one" is needed here; the old
+        // filter().bind() built an array and a bound closure per call.
+        var collided = false;
+        for (var i = 0, len = events.length; i < len; i++) {
+            var event = events[i];
+            if (event !== this && !event.isHalfThrough(y) &&
+                (!paramEventOverlap || event.isNormalPriority())) {
+                collided = true;
+                break;
+            }
+        }
+        if (!collided) return false;
         return !paramEventOverlap || this.isNormalPriority();
     };
 

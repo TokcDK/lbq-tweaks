@@ -443,6 +443,16 @@ function HzChoiceEvent(){}
 
 
 
+        // 描画内容が前フレームと同じなら再描画しない。
+        // この画面のビットマップは 1280x768 の全画面サイズで、clear() するたびに
+        // GPU テクスチャの再アップロード（約3.9MB）が走る。毎フレーム無条件に
+        // clear すると rAF ハンドラが数百ms単位で詰まる。
+        var drawKey = this.uiDrawKey();
+        if(this._uiDrawKey === drawKey) {
+            return true;
+        }
+        this._uiDrawKey = drawKey;
+
         // UIのクリア
         var bitmap = SceneManager._scene._spriteset._hzChoiceScreen.bitmap;
         bitmap.clear();
@@ -505,6 +515,22 @@ function HzChoiceEvent(){}
             }
         });
         return true;
+    };
+
+    // 描画結果に影響する値だけを並べたシグネチャ。
+    // screenX/screenY は $gameMap の表示位置（スクロール）とズームにしか依存しないので、
+    // これが同じなら同じ絵になる。
+    HzChoiceEvent.prototype.uiDrawKey = function() {
+        var zoom  = $gameScreen.zoomScale ? $gameScreen.zoomScale() : 1;
+        var zoomX = $gameScreen.zoomX ? $gameScreen.zoomX() : 0;
+        var zoomY = $gameScreen.zoomY ? $gameScreen.zoomY() : 0;
+        var selectedId = this._selectedEvent ? this._selectedEvent.eventId() : 0;
+        // プレイヤーの実座標も含める（範囲円の中心がここなので、
+        // タイル間の移動中も取りこぼさない）。
+        return [$gameMap.displayX(), $gameMap.displayY(),
+                $gamePlayer.screenX(), $gamePlayer.screenY(),
+                zoom, zoomX, zoomY,
+                selectedId, this._maxDist, this._choiceEvents.length].join(",");
     };
 
     // 決定時の処理
@@ -631,6 +657,7 @@ function HzChoiceEvent(){}
     HzChoiceEvent.prototype.terminate = function() {
         var bitmap = SceneManager._scene._spriteset._hzChoiceScreen.bitmap;
         bitmap.clear();
+        this._uiDrawKey = null;
     };
 
     // プレイヤーからの距離でソート
@@ -685,6 +712,9 @@ function HzChoiceEvent(){}
 
     // スクロール更新
     HzChoiceEvent.prototype.updateScroll = function() {
+        // スクロール中以外は減算しない（従来は毎フレーム減り続けて -Infinity まで
+        // 落ちていた）。
+        if(this._scrollCount < 0) return;
         this._scrollCount --;
         if(this._scrollCount >= 0) {
             if(this._scrollSpeedX > 0) {

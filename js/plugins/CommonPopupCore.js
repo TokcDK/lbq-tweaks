@@ -202,6 +202,11 @@ function CommonPopupManager() {
     };
     
     Sprite_Popup.prototype.createBitmap = function(){
+        // BUGFIX: the popup sprite is pooled, so the bitmap from the previous
+        // popup has to be released or VRAM grows with every popup shown.
+        if (this.bitmap && this.bitmap !== this._arg.bitmap && this.bitmap.destroyIfDynamic){
+            this.bitmap.destroyIfDynamic();
+        }
         if (this._arg.bitmap){
             this.bitmap = this._arg.bitmap;
         }else{
@@ -239,6 +244,8 @@ function CommonPopupManager() {
                     w = bitmap.width > this._bitmap.width ? bitmap.width : w;
                     h = bitmap.height > this._bitmap.height ? bitmap.height : h;
                     if (w > this._bitmap.width || h > this._bitmap.height){
+                        // BUGFIX: the bitmap created a few lines above is dropped here
+                        if (this.bitmap.destroyIfDynamic){ this.bitmap.destroyIfDynamic(); }
                         this.bitmap = new Bitmap(w,h);
                     }
                 }
