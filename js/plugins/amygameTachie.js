@@ -553,10 +553,12 @@ function calculateRightEntryXPosition() {
 }
 
 function processCostumeChangeAtype2TachieDousa(targetPicId, changeCostumeId, changeCostumeParam) {
+  // The target picture usually does not exist yet: type 2 runs before the
+  // following type 0 shows it, and the previous id is often erased first.
+  // Only the attribute save/restore needs the picture, so never bail out here —
+  // doing so skips the costume change and its item grant (e.g. CE329 swimsuit).
   const targetPic = $gameScreen.picture(targetPicId);
-  if (!targetPic) return;
-
-  const cachedAttributes = readTachiePictureAttributesFrom(targetPic);
+  const cachedAttributes = targetPic ? readTachiePictureAttributesFrom(targetPic) : null;
 
   if (changeCostumeId >= 1) {
     kisekae_tyokusetusitei(changeCostumeId, changeCostumeParam);
@@ -566,7 +568,7 @@ function processCostumeChangeAtype2TachieDousa(targetPicId, changeCostumeId, cha
 
   syncActorEventImage($gameVariables.value(TACHIE_VAR_EQUIP_ACTOR_ID));
 
-  restoreTachiePictureAttributes(targetPic, cachedAttributes);
+  if (targetPic) restoreTachiePictureAttributes(targetPic, cachedAttributes);
 }
 
 //ピクチャの現在属性を退避する(valueTacieSetは消費しない)
