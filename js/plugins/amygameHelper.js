@@ -5114,14 +5114,13 @@
 
   // Replaces (1x): data/CommonEvents.json:common-event:158
   AGH_addExposureStateToHeroines = function (interp) {
-    const exposureOverride = varValue(207); // 101 = 露出縛りなし
+    const permittedOutfitId = varValue(207); // 101 = 露出縛りなし
     forEachHeroine((heroineId) => {
-      let shouldAddState = exposureOverride === 101;
-      if (!shouldAddState && exposureOverride >= 1 && exposureOverride === varValue(heroineId + 440)[41]) {
-        shouldAddState = true;
-      }
+      const wornOutfitId = varValue(heroineId + 440)[41];
+      // 207 は「その場所で露出と見なさない衣装」。それ以外を着ている時だけ状態78を付与する。
+      const isPermitted = permittedOutfitId === 101 || (permittedOutfitId >= 1 && permittedOutfitId === wornOutfitId);
       const isExposureShort = varValue(heroineId + 380)[4] < varValue(heroineId + 380)[5];
-      if (shouldAddState && isExposureShort && $gameParty.members().contains($gameActors.actor(heroineId))) {
+      if (!isPermitted && isExposureShort && $gameParty.members().contains($gameActors.actor(heroineId))) {
         $gameActors.actor(heroineId).addState(78);
       }
     });

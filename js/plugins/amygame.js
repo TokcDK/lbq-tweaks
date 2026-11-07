@@ -6282,9 +6282,12 @@ fade_wipeDirect = function (wipeTypeId) {
       actorIds.some(
         (actorId) => actorId >= 1 && actorId == Number(permissionActor)
       );
-    if (!hasPermission)
-      for (const actorId of actorIds)
-        if (actorId >= 1) restoreActorTownClothing(actorId);
+    if (!hasPermission) {
+      // Variable 520 is indexed by actor id and stores the permitted outfit id,
+      // so the index (not the stored value) identifies the actor to restore.
+      for (let actorId = 0; actorId < actorIds.length; actorId++)
+        if (actorIds[actorId] >= 1) restoreActorTownClothing(actorId);
+    }
     $gameVariables.setValue(GAME_VARIABLE.OUTFIT_PERMISSION_FLAGS, Array(21).fill(0));
   };
 
@@ -9407,7 +9410,7 @@ function evaluateTitleCandidate(item, achievementRecords) {
       GAME_VARIABLE.PROCESSED_ITEM_ID
     );
     const itemName = `\x1bIIN[${processedEntryId}]`;
-    const messageText = `${actorName}は${itemName}着替えた。`;
+    const messageText = `${actorName}は${itemName}に着替えた。`;
     CommonPopupManager.showInfo({}, messageText, null);
   }
   function heroineSkillConditionMet(actor, skillMeta) {
