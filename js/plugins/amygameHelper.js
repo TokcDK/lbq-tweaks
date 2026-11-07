@@ -14562,6 +14562,16 @@
     }
   };
 
+  // Replaces (1x): CommonEvents.json:common-event:222|エクストラコマンド
+	AGH_showQuickmenus = function(showMenus) {
+		const alpha = showMenus ? 255 : 0;
+		pic_move1(2,0,0,100,100,alpha,5);
+		pic_move1(3,0,0,100,100,alpha,5);
+		pic_move1(4,0,0,100,100,alpha,5);
+		pic_move1(47,0,0,100,100,alpha,5);
+	}
+  
+
   // Replaces (1x): CommonEvents.json:common-event:232|ショップ処理先頭で処理
   AGH_initValueRandomSet = function () {
     valueRandomSet = 20;
