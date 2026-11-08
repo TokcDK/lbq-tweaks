@@ -3779,20 +3779,28 @@ abNomal_Clear = function (
     return 7;
   }
 
-  // Weighted rarity draw: ten base entries, one extra "1" per round and the bonus
-  // entries of addRarityCheckValues for the first 45 rounds. Rarities above
-  // maxRarity leave the pool instead of being downgraded to it - downgrading piled
-  // their weight on the cap tier, which then outdrew the tier below (rarity 7 came
-  // up ~1.9x as often as rarity 6 without the unlock titles).
+  // Draw weight per rarity. Every rank is ~1.5x rarer than the one below it, so the
+  // steps are visible in play; the old table only fell ~12% per rank inside the
+  // normal band (21.8/19.7/17.5/15.4/13.2), which read as "all the same". Ranks 1-5
+  // keep their combined 87% share, only redistributed, and 6-10 keep their old odds.
+  // Index 0 is unused.
+  const RARITY_DRAW_WEIGHTS = [0, 640, 420, 280, 180, 120, 85, 60, 44, 32, 8];
+
+  // Weighted rarity draw over the unlocked tiers. Rarities above maxRarity are not
+  // in the pool at all - downgrading them onto the cap made the cap outdraw the tier
+  // below (rarity 7 came up ~1.9x as often as rarity 6 without the unlock titles).
   function drawGachaRarity(maxRarity) {
-    const rarityArray = DEFAULT_RARITY_LIST.slice();
-    for (let round = 1; round <= 50; round++) {
-      rarityArray.push(1);
-      if (round > 45) continue;
-      addRarityCheckValues(rarityArray, round);
+    let totalWeight = 0;
+    for (let rarity = 1; rarity <= maxRarity; rarity++) {
+      totalWeight += RARITY_DRAW_WEIGHTS[rarity];
     }
-    const drawableRarities = rarityArray.filter((value) => value <= maxRarity);
-    return drawableRarities[getRandomIndex(drawableRarities.length)];
+
+    let roll = getRandomIndex(totalWeight);
+    for (let rarity = 1; rarity <= maxRarity; rarity++) {
+      roll -= RARITY_DRAW_WEIGHTS[rarity];
+      if (roll < 0) return rarity;
+    }
+    return maxRarity;
   }
 
   // "<Rarity:icon>" tag followed by the "<icon tag[id]>" name tag of the drawn entry.
@@ -3835,7 +3843,6 @@ item_gacha = function () {
 
   //アイテム武器防具抽選スクリプト。id12アイテム1武器2防具3all
   //id13がall。10まで。value1としてid決定
-  const DEFAULT_RARITY_LIST = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
     gacha_naiyou = function (valueItemsType, rarity) {
     valueItems = pickGachaDatabase(valueItemsType);
 
@@ -3862,24 +3869,6 @@ item_gacha = function () {
     }
     valueGachaId = eligibleItemIndices[getRandomIndex(eligibleItemIndices.length)];
   };
-
-  const rarityChecks = [
-    { threshold: 45, value: 2 },
-    { threshold: 40, value: 3 },
-    { threshold: 35, value: 4 },
-    { threshold: 30, value: 5 },
-    { threshold: 9, value: 6 },
-    { threshold: 7, value: 7 },
-    { threshold: 5, value: 8 },
-    { threshold: 3, value: 9 }
-  ];
-  function addRarityCheckValues(rarityArray, currentValue) {
-    rarityChecks.forEach((check) => {
-      if (currentValue <= check.threshold) {
-        rarityArray.push(check.value);
-      }
-    });
-  }
 
   // One loot choice of the gacha list: the icon+name choice plus the two picture
   // placeholders that carry the entry description and the shared "詳細情報" block.
