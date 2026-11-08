@@ -22,9 +22,20 @@
   const DAILY_CATEGORY = "デイリークエスト";
   const EXTRA_CATEGORY = "ＥＸ受注クエスト";
   const QUEST_ITEM_CATEGORY_ID = 108;
+  const UNKNOWN_QUEST_LABEL = "？？？";
   const WAR_COIN_ITEM_ID = 10;
   const DELIVERY_PLACEHOLDER_ITEM_ID = 5;
   const SPECIAL_REWARD_COUNT = 9; // QuestSpcialPrice1..9
+
+  // Quest board / acceptance diagnostics. The board silently reports
+  // "今は受けられるクエストが無いようだ…" whenever the published state is empty, so these
+  // logs are the fastest way to tell an empty state from a broken town/filter.
+  // Set to true to print them again. Kept global so amygameQuestSystem's quest_settei
+  // log follows the same switch.
+  QUEST_DEBUG = false;
+  questDebug = function (label, payload) {
+    if (QUEST_DEBUG) console.log(`[quest] ${label}`, payload);
+  };
 
   function questTypeConfig(questTypeId) {
     if (questTypeId == null) return null;
@@ -441,12 +452,36 @@
     CommonPopupManager.showInfo({}, messageText, null);
   }
 
+  // Shared refresh of the quest state. A throw here used to surface as a board that
+  // reports "no quests" for every town, so report it before it propagates.
+  function refreshQuestState() {
+    try {
+      itemGet_afterProcess();
+    } catch (error) {
+      console.error("[quest] itemGet_afterProcess failed", error);
+      throw error;
+    }
+  }
+
   quest_jutyuu = function (questTypeId, questId) {
-    itemGet_afterProcess();
+    refreshQuestState();
     $gameSwitches.setValue(QUEST_SWITCH.TEMPORARY_RESULT, false);
     const config = questTypeConfig(questTypeId);
     if (!config) return;
-    const status = acceptQuest($dataItems[questId], questId, config);
+    const item = $dataItems[questId];
+    const status = acceptQuest(item, questId, config);
+    questDebug("accept", {
+      questTypeId: questTypeId,
+      questId: questId,
+      itemName: item ? item.name : null,
+      status: status,
+      standard: isStandardQuest(item, config),
+      availableFlag: flagIsSet(valueQuestArray5, questId - config.baseId),
+      marker: completionMarkerFor(questId, config)
+        ? completionMarkerFor(questId, config).name
+        : null,
+      owned: !!item && $gameParty.hasItem(item)
+    });
     if (!status) return;
     if (status === "owned")
       $gameSwitches.setValue(QUEST_SWITCH.TEMPORARY_RESULT, true);
@@ -462,21 +497,32 @@
   };
 
   function acceptQuestFromBulk(item, questId, config) {
-    if (acceptQuest(item, questId, config) !== "new") return;
+    const status = acceptQuest(item, questId, config);
+    if (status !== "new") return status;
     showAcceptanceResult("new", questId, config.category === DAILY_CATEGORY);
     $gameSwitches.setValue(QUEST_SWITCH.TEMPORARY_RESULT, true);
+    return status;
   }
 
   quest_jutyuu2 = function (questTypeId) {
-    itemGet_afterProcess();
+    refreshQuestState();
     const config = questTypeConfig(questTypeId);
     if (config && config.category === DAILY_CATEGORY)
       $gameSwitches.setValue(QUEST_SWITCH.DAILY_QUESTS_ACCEPTED, true);
     $gameSwitches.setValue(QUEST_SWITCH.TEMPORARY_RESULT, false);
     if (!config) return;
     const items = $dataItems;
+    const accepted = [];
     for (let questId = 1; questId < items.length; questId++)
-      acceptQuestFromBulk(items[questId], questId, config);
+      if (acceptQuestFromBulk(items[questId], questId, config) === "new")
+        accepted.push(questId);
+    questDebug("autoAccept", {
+      questTypeId: questTypeId,
+      category: config.category,
+      availableFlags: countQuestFlags(),
+      accepted: accepted,
+      temporaryResult: $gameSwitches.value(QUEST_SWITCH.TEMPORARY_RESULT)
+    });
     showAutoAcceptDailySummary(config);
   };
 
@@ -510,7 +556,8 @@
   function questBoardLabel(item, questId, config, town) {
     if (!isStandardQuest(item, config) || !questMatchesTown(item.meta, town))
       return null;
-    if (!flagIsSet(valueQuestArray5, questId - config.baseId)) return "？？？";
+    if (!flagIsSet(valueQuestArray5, questId - config.baseId))
+      return UNKNOWN_QUEST_LABEL;
     const party = $gameParty;
     const marker = completionMarkerFor(questId, config);
     if (!marker || party.hasItem(marker) || party.hasItem(item)) return null;
@@ -523,15 +570,24 @@
   }
 
   quest_jutyuuDisplay = function (questTypeId) {
-    itemGet_afterProcess();
+    refreshQuestState();
     // Publish empty results as well; callers must not reuse a previous town's list.
     valueWordArray = [];
     valueCountArray = [];
     valueCountSet1 = 0;
     const config = questTypeConfig(questTypeId);
-    if (!config) return;
+    if (!config) {
+      questDebug("display:no-config", { questTypeId: questTypeId });
+      return;
+    }
     const town = currentTownQuestContext();
-    if (!town) return;
+    if (!town) {
+      questDebug("display:no-town", {
+        questTypeId: questTypeId,
+        townWeaponId: $gameVariables.value(QUEST_VARIABLE.TOWN_INFORMATION_WEAPON_ID)
+      });
+      return;
+    }
     const items = $dataItems;
     const labels = valueWordArray;
     const questIds = valueCountArray;
@@ -542,7 +598,24 @@
       questIds.push(questId);
       if (labels.length >= 12) break;
     }
+    questDebug("display", {
+      questTypeId: questTypeId,
+      category: config.category,
+      townWeaponId: $gameVariables.value(QUEST_VARIABLE.TOWN_INFORMATION_WEAPON_ID),
+      townMapSwitch: town.mapSwitchId,
+      mapSwitchOn: $gameSwitches.value(town.mapSwitchId),
+      availableFlags: countQuestFlags(),
+      labels: labels.length,
+      unknown: labels.filter((label) => label === UNKNOWN_QUEST_LABEL).length,
+      questIds: questIds
+    });
   };
+
+  // Number of quests whose start conditions are met (valueQuestArray5 == 1).
+  function countQuestFlags() {
+    if (!Array.isArray(valueQuestArray5)) return "not-an-array";
+    return valueQuestArray5.filter((flag) => flag == 1).length;
+  }
 
   function formatQuestStartConditions(conditions) {
     if (typeof conditions !== "string") return "";
@@ -573,6 +646,12 @@
     const iconIndex = item.iconIndex;
     const itemIcon = `\x1bI[${iconIndex}]`;
     const conditions = valueQuestArray7 && valueQuestArray7[index];
+    questDebug("single", {
+      questItemId: questItemId,
+      index: index,
+      available: available,
+      category: item.meta["SGカテゴリ"]
+    });
     const infoText =
       itemIcon + `${questName}\n` + formatQuestStartConditions(conditions);
     if (available) $gameSwitches.setValue(QUEST_SWITCH.TEMPORARY_RESULT, true);

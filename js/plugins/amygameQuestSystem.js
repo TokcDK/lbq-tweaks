@@ -860,11 +860,25 @@ var QuestSystem = (function() {
       initializeQuestItemReferenceArray(config.arraySize);
     }
 
+    var processed = 0;
     for (var itemIndex = config.start; itemIndex <= config.end; itemIndex++) {
       var questItem = $dataItems[itemIndex];
       if (!questItem || questItem.name === '') continue;
 
       processQuestItem(questItem, itemIndex, config.offset);
+      processed++;
+    }
+    // Follows QUEST_DEBUG in amygameQuest.js (loaded later, so guard the lookup).
+    if (typeof questDebug === 'function') {
+      var available = 0;
+      for (var slot = config.start - config.offset; slot <= config.end - config.offset; slot++) {
+        if (valueQuestArray5[slot] == 1) available++;
+      }
+      questDebug('settei', {
+        range: rangeConfigId,
+        processed: processed,
+        availableSlots: available
+      });
     }
   }
 
