@@ -3771,16 +3771,28 @@ abNomal_Clear = function (
     return getItemEquipmentSource(randomValueItemsType > 1 ? 2 : randomValueItemsType);
   }
 
+  // Highest rarity the gacha may draw: SSR (8) needs the 100-pull title item, UR/LR
+  // (9, 10) the 200-pull one.
+  function gachaRarityCap() {
+    if ($gameParty.hasItem($dataItems[657], true)) return 10;
+    if ($gameParty.hasItem($dataItems[656], true)) return 8;
+    return 7;
+  }
+
   // Weighted rarity draw: ten base entries, one extra "1" per round and the bonus
-  // entries of addRarityCheckValues for the first 45 rounds.
-  function drawGachaRarity() {
+  // entries of addRarityCheckValues for the first 45 rounds. Rarities above
+  // maxRarity leave the pool instead of being downgraded to it - downgrading piled
+  // their weight on the cap tier, which then outdrew the tier below (rarity 7 came
+  // up ~1.9x as often as rarity 6 without the unlock titles).
+  function drawGachaRarity(maxRarity) {
     const rarityArray = DEFAULT_RARITY_LIST.slice();
     for (let round = 1; round <= 50; round++) {
       rarityArray.push(1);
       if (round > 45) continue;
       addRarityCheckValues(rarityArray, round);
     }
-    return rarityArray[getRandomIndex(rarityArray.length)];
+    const drawableRarities = rarityArray.filter((value) => value <= maxRarity);
+    return drawableRarities[getRandomIndex(drawableRarities.length)];
   }
 
   // "<Rarity:icon>" tag followed by the "<icon tag[id]>" name tag of the drawn entry.
@@ -3791,7 +3803,7 @@ abNomal_Clear = function (
     return rarityColorTag + colorTaggedText(16, `${nameTag}[${gachaItemId}]`);
   }
 item_gacha = function () {
-    //内容のほうで開始時点ではレアリティを8に制限
+    //内容のほうで開始時点ではレアリティ7まで（称号取得で解放）
     gacha_naiyou(3, 0);
     if (!(valueGachaId >= 1)) return;
 
@@ -3829,14 +3841,8 @@ item_gacha = function () {
 
     let chosenRarity = rarity;
     if (rarity < 1) {
-      chosenRarity = drawGachaRarity();
-      //ガチャ称号取得でＵＲ，ＬＲ解放
-      if (!$gameParty.hasItem($dataItems[657], true) && chosenRarity >= 9) {
-        chosenRarity = 8;
-      }
-      if (!$gameParty.hasItem($dataItems[656], true) && chosenRarity >= 8) {
-        chosenRarity = 7;
-      }
+      //ガチャ称号取得でＵＲ，ＬＲ解放。解放前のレアリティは抽選母数から外す。
+      chosenRarity = drawGachaRarity(gachaRarityCap());
     }
 
     if ($gameParty.inBattle()) {
@@ -3844,17 +3850,17 @@ item_gacha = function () {
       return;
     }
 
-    // The leading 0 keeps the original "nothing eligible" chance: drawing it runs the
-    // rarity-1 fallback below.
-    const eligibleItemIndices = [0].concat(collectGachaItemIndicesByRarity(chosenRarity));
-    const selectedItemIndex = eligibleItemIndices[getRandomIndex(eligibleItemIndices.length)];
-    if (selectedItemIndex === 0) {
+    // Only a genuinely empty pool falls back. The old leading 0 burned one draw out
+    // of every poolSize+1 and handed that share to rarity 1, which hit the small
+    // pools hardest.
+    const eligibleItemIndices = collectGachaItemIndicesByRarity(chosenRarity);
+    if (eligibleItemIndices.length === 0) {
       //レアリティ1でmax1アイテムを作らない。
       const fallbackIndices = collectRarityOneFallbackIndices();
       valueGachaId = fallbackIndices[getRandomIndex(fallbackIndices.length)];
       return;
     }
-    valueGachaId = selectedItemIndex;
+    valueGachaId = eligibleItemIndices[getRandomIndex(eligibleItemIndices.length)];
   };
 
   const rarityChecks = [
@@ -3917,7 +3923,6 @@ item_gacha = function () {
     $gameScreen.showPicture(pictureId, "", 0, pictureX, pictureY, 100, 100, 0, 0);
   }
 
-  //レアリティ一覧作成
   //レアリティ一覧作成
   item_gachaitiran1 = function (lotteryRarity) {
     let choiceIndex = 1;

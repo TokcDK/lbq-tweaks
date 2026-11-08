@@ -18744,6 +18744,8 @@
     rarity = array[getRandomIndex(array.length)];
     gacha_naiyou(3, rarity);
     const databaseEntry = valueItems[valueGachaId];
+    // An empty pool leaves valueGachaId unset; gainItem would throw on undefined.
+    if (!databaseEntry) return;
     $gameParty.gainItem(databaseEntry, 1);
     const coloredText = colorTaggedText(24, `\x1bI[${databaseEntry.iconIndex}]${databaseEntry.name}`);
     rarity = `${coloredText}を入手した！`;
@@ -18757,6 +18759,8 @@
     rarity = array[getRandomIndex(array.length)];
     gacha_naiyou(3, rarity);
     const databaseEntry = valueItems[valueGachaId];
+    // An empty pool leaves valueGachaId unset; gainItem would throw on undefined.
+    if (!databaseEntry) return;
     $gameParty.gainItem(databaseEntry, 1);
     const coloredText = colorTaggedText(24, `\x1bI[${databaseEntry.iconIndex}]${databaseEntry.name}`);
     rarity = `${coloredText}を入手した！`;
@@ -18938,7 +18942,7 @@
     $gameVariables.setValue(HELPER_VARIABLE.RANDOM_WORK_2, "＜獲得アイテム一覧＞\n");
     $gameVariables.setValue(HELPER_VARIABLE.RANDOM_WORK_3, 0);
     $gameSwitches.setValue(HELPER_SWITCH.TEMPORARY_FLAG, true);
-    $gameVariables.setValue(21, 0);
+    $gameVariables.setValue(HELPER_VARIABLE.RANDOM_WORK_1, 0);
     for (let i = 1; i <= 10; i++) {
       item_gacha();
     }
