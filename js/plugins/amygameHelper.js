@@ -5520,17 +5520,24 @@
   // matches an entry of the in-map quest-progress list (variable 173), switch 414
   // ("movement blocked") is ON — and OFF again when this event's <MQProgress>
   // note equals that entry, i.e. when this event is the quest target itself.
+  // Quick-menu buttons are pictures, and PictureCallCommon runs their common
+  // event through setup(list, null), so _eventId is 0 there: there is no map
+  // event to compare with and such a call is never the quest target, so the
+  // lock applies (same as the map exit events that call CE 299).
   AGH_setQuestTargetMovementSwitch = function (interp) {
+    const mapEvent = $gameMap.event(interp._eventId);
+    const currentMapEvent = mapEvent ? mapEvent.event() : null;
     const questProgressList = varValue(173);
+    if (!Array.isArray(questProgressList)) return;
+    const eventProgress =
+      currentMapEvent && currentMapEvent.meta
+        ? currentMapEvent.meta["MQProgress"]
+        : null;
     const mainQuestProgress = varValue(135);
-    const currentMapEvent = $gameMap.event(interp._eventId).event();
     questProgressList.forEach((questProgressId) => {
       if (mainQuestProgress != questProgressId) return;
       $gameSwitches.setValue(414, true);
-      if (
-        currentMapEvent.meta["MQProgress"] &&
-        Number(currentMapEvent.meta["MQProgress"]) == questProgressId
-      ) {
+      if (eventProgress && Number(eventProgress) == questProgressId) {
         $gameSwitches.setValue(414, false);
       }
     });
