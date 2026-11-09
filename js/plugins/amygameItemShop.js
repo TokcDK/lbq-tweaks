@@ -2009,9 +2009,35 @@ function debugSelectPictures(stage, cursor, choiceWindow) {
     entries: panel.length,
     visible: visibleIds,
     pic: selected ? [selected.index, selected.pictureId, picture ? picture._opacity : 'gone'] : null,
+    picMethod: picture && picture.opacity ? picture.opacity() : null,
     text: picture && picture.dTextInfo ? picture.dTextInfo.value.length : null,
     sprite: spriteInfo
   }));
+}
+
+// DEBUG (temporary): is Sprite_Picture.updateOther reaching these pictures?
+if (typeof Sprite_Picture !== 'undefined') {
+  const _itemShopSpriteUpdateOther = Sprite_Picture.prototype.updateOther;
+  Sprite_Picture.prototype.updateOther = function () {
+    _itemShopSpriteUpdateOther.apply(this, arguments);
+    if (!AGH_choicePanelPictures.length) return;
+    if (Graphics.frameCount % 60) return;
+    const picture = this.picture();
+    if (!picture) return;
+    const entry = AGH_choicePanelPictures.filter(function (panelEntry) {
+      return panelEntry.picture === picture;
+    })[0];
+    if (!entry) return;
+    console.log('[SPRITE]', JSON.stringify({
+      id: this._pictureId,
+      index: entry.index,
+      spriteOpacity: this.opacity,
+      alpha: this.alpha,
+      visible: this.visible,
+      picOpacity: picture._opacity,
+      picMethod: picture.opacity()
+    }));
+  };
 }
 
 // valueCountSet3 is the discount rate in percent.
