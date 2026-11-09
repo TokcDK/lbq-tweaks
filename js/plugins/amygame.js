@@ -6154,6 +6154,8 @@ fade_wipeDirect = function (wipeTypeId) {
         text: tipChoiceLabel,
         value: tipIndex + 1
       });
+      // Both slots start hidden; MessageSelectPicture reveals only the ones
+      // bound to the highlighted choice.
       showTipDescriptionPicture(tipNames, tipDescriptions, tipIndex, pictureIdOffset);
       showTipImagePicture(tipPictures, tipIndex, pictureIdOffset);
       pictureIdOffset += TIP_PICTURE_SLOTS_PER_TIP;
@@ -6180,7 +6182,7 @@ fade_wipeDirect = function (wipeTypeId) {
       10,
       100,
       100,
-      255,
+      0,
       0
     );
     $gameMessage.setSelectPictureId(tipIndex, descriptionPictureId);
@@ -6200,7 +6202,7 @@ fade_wipeDirect = function (wipeTypeId) {
       0,
       100,
       100,
-      255,
+      0,
       0
     );
     $gameMessage.setSelectPictureId(tipIndex, imagePictureId);
