@@ -1965,29 +1965,18 @@ Window_ChoiceList.prototype.select = function (index) {
   AGH_revealChoicePanel(index);
 };
 
-let _itemShopPanelCursor = -1;
-let _itemShopLastLog = -1;
-
 const _itemShopChoiceListUpdate = Window_ChoiceList.prototype.update;
 Window_ChoiceList.prototype.update = function () {
   _itemShopChoiceListUpdate.apply(this, arguments);
   if (!AGH_choicePanelPictures.length) return;
   if (!this.active || this.index() < 0) return;
-  _itemShopPanelCursor = this.index();
-  AGH_choicePanelPictures.forEach(function (entry) {
-    trapPanelPictureOpacity(entry.picture); // DEBUG (temporary)
-  });
-  AGH_revealChoicePanel(_itemShopPanelCursor);
-  // DEBUG (temporary): sample on every cursor move, plus once a second.
-  if (_itemShopPanelCursor !== _itemShopLastLog || Graphics.frameCount % 60 === 0) {
-    _itemShopLastLog = _itemShopPanelCursor;
-    debugSelectPictures('frame', _itemShopPanelCursor, this);
-  }
+  const cursor = this.index();
+  AGH_revealChoicePanel(cursor);
   // MPP_SimpleTouch3 redraws the highlight from _cursorX/_cursorY and overwrites
   // whatever the core set, but its per-frame step does not run for this window, so
   // the highlight stayed on the row the list opened with. Snap it to the item.
-  const itemRect = this.itemRect ? this.itemRect(_itemShopPanelCursor) : null;
-  if (itemRect && (!this._cursorRect || this._cursorRect.y !== itemRect.y)) {
+  const itemRect = this.itemRect(cursor);
+  if (!this._cursorRect || this._cursorRect.y !== itemRect.y) {
     const scrollX = this._scrollX || 0;
     const scrollY = this._scrollY || 0;
     this._cursorX = this._targetCursorX = itemRect.x + scrollX;
@@ -2000,144 +1989,6 @@ Window_ChoiceList.prototype.update = function () {
     }
   }
 };
-
-// DEBUG (temporary): reports what the book description panel actually does in game.
-function debugSelectPictures(stage, cursor, choiceWindow) {
-  if (typeof console === 'undefined') return;
-  const panel = AGH_choicePanelPictures;
-  if (!panel || !panel.length) return;
-  const selected = panel.filter(function (entry) { return entry.index === cursor; })[0];
-  const picture = selected ? selected.picture : null;
-  let spriteInfo = selected ? 'no-picture' : 'no-entry';
-  if (picture) {
-    const scene = SceneManager._scene;
-    const spriteset = scene && scene._spriteset;
-    const container = spriteset && spriteset._pictureContainer;
-    const sprite = container ? container.children.filter(function (child) {
-      return child._pictureId === selected.pictureId;
-    })[0] : null;
-    spriteInfo = sprite ? {
-      visible: sprite.visible,
-      opacity: sprite.opacity,
-      x: sprite.x,
-      y: sprite.y,
-      size: sprite.bitmap ? [sprite.bitmap.width, sprite.bitmap.height] : null,
-      frame: sprite._frameWindow ? sprite._frameWindow.opacity : 'none'
-    } : 'no-sprite';
-  }
-  const visibleIds = panel.filter(function (entry) {
-    return entry.picture && entry.picture._opacity === 255;
-  }).map(function (entry) { return entry.pictureId; });
-  console.log('[SELECTPIC]', stage, JSON.stringify({
-    cursor: cursor,
-    active: choiceWindow ? choiceWindow.active : null,
-    open: choiceWindow ? choiceWindow.isOpen() : null,
-    entries: panel.length,
-    visible: visibleIds,
-    pic: selected ? [selected.index, selected.pictureId, picture ? picture._opacity : 'gone'] : null,
-    picMethod: picture && picture.opacity ? picture.opacity() : null,
-    text: picture && picture.dTextInfo ? picture.dTextInfo.value.length : null,
-    sprite: spriteInfo,
-    // [index, active, visible, y, h, cursorRect, scrollY, originY, itemY, itemH,
-    //  rows, cursorVisible, cursorY, targetY, cursorSprite] per choice window.
-    wins: debugChoiceWindows(),
-    // [id, x, y, opacity, targetX, targetY] of every visible picture.
-    pics: debugVisiblePictures()
-  }));
-}
-
-// DEBUG (temporary): position and target of every visible picture.
-function debugVisiblePictures() {
-  const scene = typeof SceneManager !== 'undefined' ? SceneManager._scene : null;
-  const container = scene && scene._spriteset && scene._spriteset._pictureContainer;
-  if (!container || !container.children) return null;
-  const out = [];
-  container.children.forEach(function (child) {
-    if (!child || !child._isPicture || !child.picture) return;
-    const picture = child.picture();
-    if (!picture || !picture._opacity) return;
-    // [id, name, x, y, opacity, targetX, targetY, origin, scaleX, scaleY, w, h]
-    out.push([child._pictureId, picture.name ? picture.name() : '',
-      Math.round(picture._x), Math.round(picture._y), picture._opacity,
-      Math.round(picture._targetX), Math.round(picture._targetY),
-      picture._origin, Math.round(picture._scaleX), Math.round(picture._scaleY),
-      child.bitmap ? child.bitmap.width : 0, child.bitmap ? child.bitmap.height : 0]);
-  });
-  return out;
-}
-
-// DEBUG (temporary): cursor state of every Window_ChoiceList currently on screen.
-function debugChoiceWindows() {
-  if (typeof Window_ChoiceList === 'undefined') return null;
-  const scene = typeof SceneManager !== 'undefined' ? SceneManager._scene : null;
-  const layer = scene && scene._windowLayer;
-  if (!layer || !layer.children) return null;
-  return layer.children.filter(function (child) {
-    return child instanceof Window_ChoiceList;
-  }).map(function (child) {
-    const rect = child._cursorRect;
-    return {
-      i: child.index(), act: child.active ? 1 : 0, vis: child.visible ? 1 : 0,
-      y: child.y, h: child.height,
-      rect: rect ? [rect.x, rect.y, rect.width, rect.height] : null,
-      scrollY: child._scrollY,
-      originY: child.origin ? child.origin.y : null,
-      itemY: child.itemRect ? child.itemRect(child.index()).y : null,
-      itemH: child.itemHeight ? child.itemHeight() : null,
-      rows: child.maxPageRows ? child.maxPageRows() : null,
-      curVisible: child.isCursorVisible ? child.isCursorVisible() : null,
-      curY: child._cursorY, tgtY: child._targetCursorY,
-      spr: child._windowCursorSprite
-        ? [child._windowCursorSprite.x, child._windowCursorSprite.y,
-           child._windowCursorSprite.opacity]
-        : null
-    };
-  });
-}
-
-// DEBUG (temporary): names whoever resets a panel picture opacity to 0.
-function trapPanelPictureOpacity(picture) {
-  if (!picture || picture.__opacityTrapped) return;
-  let value = picture._opacity;
-  picture.__opacityTrapped = true;
-  Object.defineProperty(picture, '_opacity', {
-    configurable: true,
-    get: function () { return value; },
-    set: function (next) {
-      if (next === 0 && value !== 0) {
-        // The reveal itself zeroes the other entries; only outside writes matter.
-        const stack = new Error().stack || '';
-        if (stack.indexOf('AGH_revealChoicePanel') < 0) {
-          console.log('[PANELZERO]', JSON.stringify({ from: value, to: next }), stack);
-        }
-      }
-      value = next;
-    }
-  });
-}
-
-// DEBUG (temporary): what the sprite copies for the highlighted entry, once a second.
-if (typeof Sprite_Picture !== 'undefined') {
-  const _itemShopSpriteUpdateOther = Sprite_Picture.prototype.updateOther;
-  Sprite_Picture.prototype.updateOther = function () {
-    _itemShopSpriteUpdateOther.apply(this, arguments);
-    if (Graphics.frameCount % 60) return;
-    const picture = this.picture();
-    if (!picture) return;
-    const pictureId = this._pictureId;
-    const entry = AGH_choicePanelPictures.filter(function (panelEntry) {
-      return panelEntry.pictureId === pictureId;
-    })[0];
-    if (!entry || entry.index !== _itemShopPanelCursor) return;
-    console.log('[SPRITE]', JSON.stringify({
-      id: pictureId,
-      spriteOpacity: this.opacity,
-      visible: this.visible,
-      picOpacity: picture._opacity,
-      picMethod: picture.opacity()
-    }));
-  };
-}
 
 // valueCountSet3 is the discount rate in percent.
 function applyShopDiscount(price) {

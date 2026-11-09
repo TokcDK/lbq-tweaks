@@ -6161,8 +6161,6 @@ fade_wipeDirect = function (wipeTypeId) {
       showTipImagePicture(tipPictures, tipIndex, pictureIdOffset);
       pictureIdOffset += TIP_PICTURE_SLOTS_PER_TIP;
     }
-    // DEBUG (temporary)
-    if (typeof debugSelectPictures === 'function') debugSelectPictures('tips-build', 0);
   }
 
   // The tip title and its description sit one slot after the tip image.
