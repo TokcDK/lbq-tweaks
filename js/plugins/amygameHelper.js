@@ -14147,35 +14147,21 @@
     });
   };
 
-  // Picture id -> Sprite_Picture of the current spriteset.
-  AGH_choicePanelSprites = function () {
-    const sprites = {};
-    const scene = typeof SceneManager !== 'undefined' ? SceneManager._scene : null;
-    const container = scene && scene._spriteset && scene._spriteset._pictureContainer;
-    if (!container) return sprites;
-    container.children.forEach(function (child) {
-      if (child && child._isPicture) sprites[child._pictureId] = child;
-    });
-    return sprites;
-  };
-
   // Called from the Window_ChoiceList#select/update hooks in amyGameItemShop.js.
-  // The Game_Picture opacity alone is not enough: while a choice list is open the
-  // spriteset does not reliably copy it onto the sprite, so the sprite and the DText
-  // frame window behind it are pushed here as well (both render-time values).
+  // PictureMotion's updateMove snaps _opacity back to _targetOpacity on every frame
+  // while its motion is idle, so the target has to move with the value or the panel
+  // is reverted to the opacity the picture was created with.
   AGH_revealChoicePanel = function (choiceIndex) {
-    const sprites = AGH_choicePanelSprites();
     AGH_choicePanelPictures.forEach(function (entry) {
+      const picture = entry.picture;
+      if (!picture) return;
       const opacity = entry.index === choiceIndex ? 255 : 0;
-      if (entry.picture && entry.picture.setOpacity) {
-        entry.picture.setOpacity(opacity);
+      if (picture.setOpacity) {
+        picture.setOpacity(opacity);
+      } else {
+        picture._opacity = opacity;
       }
-      const sprite = sprites[entry.pictureId];
-      if (!sprite) return;
-      sprite.opacity = opacity;
-      if (sprite._frameWindow && sprite.updateFrameWindow) {
-        sprite.updateFrameWindow();
-      }
+      picture._targetOpacity = opacity;
     });
   };
 

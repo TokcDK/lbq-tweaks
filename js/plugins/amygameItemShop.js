@@ -2023,7 +2023,7 @@ function debugSelectPictures(stage, cursor, choiceWindow) {
   }));
 }
 
-// DEBUG (temporary): every Window_ChoiceList currently in the window layer.
+// DEBUG (temporary): cursor state of every Window_ChoiceList currently on screen.
 function debugChoiceWindows() {
   if (typeof Window_ChoiceList === 'undefined') return null;
   const scene = typeof SceneManager !== 'undefined' ? SceneManager._scene : null;
@@ -2032,9 +2032,23 @@ function debugChoiceWindows() {
   return layer.children.filter(function (child) {
     return child instanceof Window_ChoiceList;
   }).map(function (child) {
-    return [child.index(), child.active ? 1 : 0, child.visible ? 1 : 0,
-      child.x, child.y, child.width, child.height,
-      child._windowCursorSprite ? child._windowCursorSprite.y : null];
+    const rect = child._cursorRect;
+    return {
+      i: child.index(), act: child.active ? 1 : 0, vis: child.visible ? 1 : 0,
+      y: child.y, h: child.height,
+      rect: rect ? [rect.x, rect.y, rect.width, rect.height] : null,
+      scrollY: child._scrollY,
+      originY: child.origin ? child.origin.y : null,
+      itemY: child.itemRect ? child.itemRect(child.index()).y : null,
+      itemH: child.itemHeight ? child.itemHeight() : null,
+      rows: child.maxPageRows ? child.maxPageRows() : null,
+      curVisible: child.isCursorVisible ? child.isCursorVisible() : null,
+      curY: child._cursorY, tgtY: child._targetCursorY,
+      spr: child._windowCursorSprite
+        ? [child._windowCursorSprite.x, child._windowCursorSprite.y,
+           child._windowCursorSprite.opacity]
+        : null
+    };
   });
 }
 
