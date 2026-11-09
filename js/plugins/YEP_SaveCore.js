@@ -1348,10 +1348,12 @@ Scene_File.prototype.createConfirmWindow = function() {
 
 Scene_File.prototype.onSavefileOk = function() {
     this._actionWindow.activate();
-    if (this.mode() === 'load') {
-      this._actionWindow.select(0);
-    } else if (this.mode() === 'save') {
+    // BUGFIX: クイックメニューのロード(CE225)はセーブ禁止にしてこの画面を開くため、
+    // コマンド1(セーブ)が灰色で実行できない。押せないコマンドを既定にしない。
+    if (this.mode() === 'save' && this._actionWindow.isSaveEnabled()) {
       this._actionWindow.select(1);
+    } else {
+      this._actionWindow.select(0);
     }
 };
 
