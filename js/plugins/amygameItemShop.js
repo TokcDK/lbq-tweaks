@@ -1905,7 +1905,6 @@ otherShop_preparation1 = function(buyPriceVarId,lotteryRarity,sortFlag){
 };
 
 // Book shop, goods only (no choices)
-// Book shop, goods only (no choices)
 bookShop_preparert2 = function(databaseTypeId,bookShopId,sortFlag){
   openItemDatabaseShopByTag('bookShop', bookShopId, databaseTypeId, sortFlag);
 };
@@ -1939,9 +1938,8 @@ function addBookChoice(bookItem, itemId) {
   const paddedBookName = padBookName(bookItem.name);
   const ownedLabel = buildBookOwnedLabel(ownedCount);
   const bookListText = `${paddedBookName}${ownedLabel} `
-    // NOTE: the original wrote "\G" with a single backslash, which the message system
-    // shows as a bare "G" instead of the currency unit. Kept as-is.
-    + colorTaggedText(2, bookPrice.toLocaleString()) + `G`;
+    // \G is the gold-unit message escape; a single backslash is eaten by JS.
+    + colorTaggedText(2, bookPrice.toLocaleString()) + `\\G`;
   const bookDescriptionText = buildBookDescriptionText(bookItem);
 
   $gameSystem.addCustomChoice(1, { text: bookListText, value: valueCountSet2 });

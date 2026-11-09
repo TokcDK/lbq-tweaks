@@ -14119,6 +14119,18 @@
     valueCountSet2 = 0; //件数
     valueCountSet3 = 0; //割引率
     valueScriptArray1 = [];
+    valueScriptArray2 = [];
+  };
+
+  // Replaces (1x): CommonEvents.json:common-event:183|本屋コモン
+  // Rebuilds the list on every shop loop: choice value 1 is the first book (0 = cancel),
+  // valueScriptArray2 maps that value back to the item id for the purchase step.
+  AGH_prepareBookShopChoices = function () {
+    AGH_setCountSetPair(101, 1);
+    valueScriptArray2 = [0];
+    valueScriptArray1.forEach(function (bookShopId) {
+      bookShop_preparert(bookShopId);
+    });
   };
 
   // Replaces (1x): CommonEvents.json:common-event:184|水汲みコモン
