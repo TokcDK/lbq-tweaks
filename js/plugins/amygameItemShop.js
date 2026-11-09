@@ -1965,11 +1965,17 @@ Window_ChoiceList.prototype.select = function (index) {
   AGH_revealChoicePanel(index);
 };
 
+let _itemShopPanelCursor = -1;
+
 const _itemShopChoiceListUpdate = Window_ChoiceList.prototype.update;
 Window_ChoiceList.prototype.update = function () {
   _itemShopChoiceListUpdate.apply(this, arguments);
   if (!AGH_choicePanelPictures.length) return;
   if (!this.active || this.index() < 0) return;
+  _itemShopPanelCursor = this.index();
+  AGH_choicePanelPictures.forEach(function (entry) {
+    trapPanelPictureOpacity(entry.picture); // DEBUG (temporary)
+  });
   AGH_revealChoicePanel(this.index());
   // DEBUG (temporary): steady-state sample, once a second.
   if (Graphics.frameCount % 60 === 0) debugSelectPictures('frame', this.index(), this);
@@ -2011,28 +2017,64 @@ function debugSelectPictures(stage, cursor, choiceWindow) {
     pic: selected ? [selected.index, selected.pictureId, picture ? picture._opacity : 'gone'] : null,
     picMethod: picture && picture.opacity ? picture.opacity() : null,
     text: picture && picture.dTextInfo ? picture.dTextInfo.value.length : null,
-    sprite: spriteInfo
+    sprite: spriteInfo,
+    // [index, active, visible, x, y, w, h, cursorY] of every choice window on screen.
+    wins: debugChoiceWindows()
   }));
 }
 
-// DEBUG (temporary): is Sprite_Picture.updateOther reaching these pictures?
+// DEBUG (temporary): every Window_ChoiceList currently in the window layer.
+function debugChoiceWindows() {
+  if (typeof Window_ChoiceList === 'undefined') return null;
+  const scene = typeof SceneManager !== 'undefined' ? SceneManager._scene : null;
+  const layer = scene && scene._windowLayer;
+  if (!layer || !layer.children) return null;
+  return layer.children.filter(function (child) {
+    return child instanceof Window_ChoiceList;
+  }).map(function (child) {
+    return [child.index(), child.active ? 1 : 0, child.visible ? 1 : 0,
+      child.x, child.y, child.width, child.height,
+      child._windowCursorSprite ? child._windowCursorSprite.y : null];
+  });
+}
+
+// DEBUG (temporary): names whoever resets a panel picture opacity to 0.
+function trapPanelPictureOpacity(picture) {
+  if (!picture || picture.__opacityTrapped) return;
+  let value = picture._opacity;
+  picture.__opacityTrapped = true;
+  Object.defineProperty(picture, '_opacity', {
+    configurable: true,
+    get: function () { return value; },
+    set: function (next) {
+      if (next === 0 && value !== 0) {
+        // The reveal itself zeroes the other entries; only outside writes matter.
+        const stack = new Error().stack || '';
+        if (stack.indexOf('AGH_revealChoicePanel') < 0) {
+          console.log('[PANELZERO]', JSON.stringify({ from: value, to: next }), stack);
+        }
+      }
+      value = next;
+    }
+  });
+}
+
+// DEBUG (temporary): what the sprite copies for the highlighted entry, once a second.
 if (typeof Sprite_Picture !== 'undefined') {
   const _itemShopSpriteUpdateOther = Sprite_Picture.prototype.updateOther;
   Sprite_Picture.prototype.updateOther = function () {
     _itemShopSpriteUpdateOther.apply(this, arguments);
-    if (!AGH_choicePanelPictures.length) return;
     if (Graphics.frameCount % 60) return;
     const picture = this.picture();
     if (!picture) return;
+    const pictureId = this._pictureId;
     const entry = AGH_choicePanelPictures.filter(function (panelEntry) {
-      return panelEntry.picture === picture;
+      return panelEntry.pictureId === pictureId;
     })[0];
-    if (!entry) return;
+    if (!entry || entry.index !== _itemShopPanelCursor) return;
     console.log('[SPRITE]', JSON.stringify({
-      id: this._pictureId,
-      index: entry.index,
+      id: pictureId,
       spriteOpacity: this.opacity,
-      alpha: this.alpha,
       visible: this.visible,
       picOpacity: picture._opacity,
       picMethod: picture.opacity()
