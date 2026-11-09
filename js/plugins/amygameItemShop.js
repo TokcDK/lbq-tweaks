@@ -1945,8 +1945,10 @@ function addBookChoice(bookItem, itemId) {
   $gameSystem.addCustomChoice(1, { text: bookListText, value: valueCountSet2 });
   $gameScreen.setDTextPicture(bookDescriptionText, 28);
   $gameScreen.dWindowFrame = 'ON';
-  $gameScreen.showPicture(valueCountSet1, "", 0, 10, 606, 100, 100, 255, 0);
-  $gameMessage.setSelectPictureId(valueCountSet2, valueCountSet1);
+  // Shown hidden; MessageSelectPicture reveals only the picture bound to the
+  // highlighted choice, and that binding is the 0-based index (valueCountSet2 is 1-based).
+  $gameScreen.showPicture(valueCountSet1, "", 0, 10, 606, 100, 100, 0, 0);
+  $gameMessage.setSelectPictureId(valueCountSet2 - 1, valueCountSet1);
   valueCountSet1 += 1;
   valueCountSet2 += 1;
   valueScriptArray2.push(itemId);
