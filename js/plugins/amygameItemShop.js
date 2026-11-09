@@ -1983,11 +1983,21 @@ Window_ChoiceList.prototype.update = function () {
     _itemShopLastLog = _itemShopPanelCursor;
     debugSelectPictures('frame', _itemShopPanelCursor, this);
   }
-  // Core Window.update never refreshes the cursor, only select() does; a window
-  // whose index moved without select() keeps the highlight on the old row.
-  const itemRect = this.itemRect(_itemShopPanelCursor);
-  if (!this._cursorRect || this._cursorRect.y !== itemRect.y) {
-    this.updateCursor();
+  // MPP_SimpleTouch3 redraws the highlight from _cursorX/_cursorY and overwrites
+  // whatever the core set, but its per-frame step does not run for this window, so
+  // the highlight stayed on the row the list opened with. Snap it to the item.
+  const itemRect = this.itemRect ? this.itemRect(_itemShopPanelCursor) : null;
+  if (itemRect && (!this._cursorRect || this._cursorRect.y !== itemRect.y)) {
+    const scrollX = this._scrollX || 0;
+    const scrollY = this._scrollY || 0;
+    this._cursorX = this._targetCursorX = itemRect.x + scrollX;
+    this._cursorY = this._targetCursorY = itemRect.y + scrollY;
+    this._cursorMoveDuration = 0;
+    if (this.refreshSmoothCursor) {
+      this.refreshSmoothCursor();
+    } else {
+      this.updateCursor();
+    }
   }
 };
 
@@ -2046,8 +2056,12 @@ function debugVisiblePictures() {
     if (!child || !child._isPicture || !child.picture) return;
     const picture = child.picture();
     if (!picture || !picture._opacity) return;
-    out.push([child._pictureId, Math.round(picture._x), Math.round(picture._y),
-      picture._opacity, Math.round(picture._targetX), Math.round(picture._targetY)]);
+    // [id, name, x, y, opacity, targetX, targetY, origin, scaleX, scaleY, w, h]
+    out.push([child._pictureId, picture.name ? picture.name() : '',
+      Math.round(picture._x), Math.round(picture._y), picture._opacity,
+      Math.round(picture._targetX), Math.round(picture._targetY),
+      picture._origin, Math.round(picture._scaleX), Math.round(picture._scaleY),
+      child.bitmap ? child.bitmap.width : 0, child.bitmap ? child.bitmap.height : 0]);
   });
   return out;
 }
