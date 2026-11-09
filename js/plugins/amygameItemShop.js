@@ -1954,17 +1954,29 @@ function addBookChoice(bookItem, itemId) {
   valueScriptArray2.push(itemId);
 }
 
-// Only a cursor move changes the selection, so the description panel is switched
-// there (the registry itself lives in amyGameHelper.js).
+// Two Window_ChoiceList instances exist at once in this project, and the inactive
+// one is deselected (select(-1)) after the list opens, which would blank the panel.
+// Only the window that owns the list may switch it, and it re-asserts the panel
+// every frame so nothing can leave it blank.
 const _itemShopChoiceListSelect = Window_ChoiceList.prototype.select;
 Window_ChoiceList.prototype.select = function (index) {
   _itemShopChoiceListSelect.apply(this, arguments);
+  if (!this.active) return;
   AGH_revealChoicePanel(index);
-  debugSelectPictures('select', index);
+};
+
+const _itemShopChoiceListUpdate = Window_ChoiceList.prototype.update;
+Window_ChoiceList.prototype.update = function () {
+  _itemShopChoiceListUpdate.apply(this, arguments);
+  if (!AGH_choicePanelPictures.length) return;
+  if (!this.active || this.index() < 0) return;
+  AGH_revealChoicePanel(this.index());
+  // DEBUG (temporary): steady-state sample, once a second.
+  if (Graphics.frameCount % 60 === 0) debugSelectPictures('frame', this.index(), this);
 };
 
 // DEBUG (temporary): reports what the book description panel actually does in game.
-function debugSelectPictures(stage, cursor) {
+function debugSelectPictures(stage, cursor, choiceWindow) {
   if (typeof console === 'undefined') return;
   const panel = AGH_choicePanelPictures;
   if (!panel || !panel.length) return;
@@ -1992,6 +2004,8 @@ function debugSelectPictures(stage, cursor) {
   }).map(function (entry) { return entry.pictureId; });
   console.log('[SELECTPIC]', stage, JSON.stringify({
     cursor: cursor,
+    active: choiceWindow ? choiceWindow.active : null,
+    open: choiceWindow ? choiceWindow.isOpen() : null,
     entries: panel.length,
     visible: visibleIds,
     pic: selected ? [selected.index, selected.pictureId, picture ? picture._opacity : 'gone'] : null,
@@ -1999,15 +2013,6 @@ function debugSelectPictures(stage, cursor) {
     sprite: spriteInfo
   }));
 }
-
-// DEBUG (temporary): steady-state sample, once a second while a panel is open.
-const _itemShopChoiceListUpdate = Window_ChoiceList.prototype.update;
-Window_ChoiceList.prototype.update = function () {
-  _itemShopChoiceListUpdate.apply(this, arguments);
-  if (!AGH_choicePanelPictures.length) return;
-  if (Graphics.frameCount % 60) return;
-  debugSelectPictures('frame', this.index());
-};
 
 // valueCountSet3 is the discount rate in percent.
 function applyShopDiscount(price) {
