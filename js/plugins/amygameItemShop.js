@@ -1945,39 +1945,34 @@ function addBookChoice(bookItem, itemId) {
   $gameSystem.addCustomChoice(1, { text: bookListText, value: valueCountSet2 });
   $gameScreen.setDTextPicture(bookDescriptionText, 28);
   $gameScreen.dWindowFrame = 'ON';
-  // Shown hidden; MessageSelectPicture reveals only the picture bound to the
-  // highlighted choice, and that binding is the 0-based index (valueCountSet2 is 1-based).
+  // Shown hidden; the choice cursor reveals the picture of the highlighted book
+  // (AGH_revealChoicePanel, driven by Window_ChoiceList#select).
   $gameScreen.showPicture(valueCountSet1, "", 0, 10, 606, 100, 100, 0, 0);
-  $gameMessage.setSelectPictureId(valueCountSet2 - 1, valueCountSet1);
+  AGH_registerChoicePanelPicture(valueCountSet2 - 1, valueCountSet1);
   valueCountSet1 += 1;
   valueCountSet2 += 1;
   valueScriptArray2.push(itemId);
 }
 
-// MPP_ChoiceEX's custom lists never reach MessageSelectPicture's opacity pass: the
-// plugin drives it from Window_ChoiceList#update, which these lists do not go
-// through, so every description picture kept its creation opacity (all of them
-// visible, or, shown hidden, none). Switch them on the cursor move instead.
+// Only a cursor move changes the selection, so the description panel is switched
+// there (the registry itself lives in amyGameHelper.js).
 const _itemShopChoiceListSelect = Window_ChoiceList.prototype.select;
 Window_ChoiceList.prototype.select = function (index) {
   _itemShopChoiceListSelect.apply(this, arguments);
-  if (this.updateSelectPicture) this.updateSelectPicture();
+  AGH_revealChoicePanel(index);
   debugSelectPictures('select', index);
 };
 
-// DEBUG (temporary): reports what the select-picture panels actually do in game.
+// DEBUG (temporary): reports what the book description panel actually does in game.
 function debugSelectPictures(stage, cursor) {
   if (typeof console === 'undefined') return;
-  const bindings = $gameMessage.getSelectPictures ? $gameMessage.getSelectPictures() : [];
-  if (!bindings.length) return;
-  const scene = SceneManager._scene;
-  const choiceWindow = scene && scene._messageWindow ? scene._messageWindow._choiceWindow : null;
-  const messageIndex = choiceWindow && choiceWindow.findMessageIndex
-    ? choiceWindow.findMessageIndex() : null;
-  const selected = bindings.filter(function (data) { return data.index === messageIndex; })[0];
-  const picture = selected ? $gameScreen.picture(selected.pictureId) : null;
-  let spriteInfo = selected ? 'no-picture' : 'no-binding';
+  const panel = AGH_choicePanelPictures;
+  if (!panel || !panel.length) return;
+  const selected = panel.filter(function (entry) { return entry.index === cursor; })[0];
+  const picture = selected ? selected.picture : null;
+  let spriteInfo = selected ? 'no-picture' : 'no-entry';
   if (picture) {
+    const scene = SceneManager._scene;
     const spriteset = scene && scene._spriteset;
     const container = spriteset && spriteset._pictureContainer;
     const sprite = container ? container.children.filter(function (child) {
@@ -1989,33 +1984,28 @@ function debugSelectPictures(stage, cursor) {
       x: sprite.x,
       y: sprite.y,
       size: sprite.bitmap ? [sprite.bitmap.width, sprite.bitmap.height] : null,
-      name: sprite._pictureName ? 'set' : 'empty',
       frame: sprite._frameWindow ? sprite._frameWindow.opacity : 'none'
     } : 'no-sprite';
   }
+  const visibleIds = panel.filter(function (entry) {
+    return entry.picture && entry.picture._opacity === 255;
+  }).map(function (entry) { return entry.pictureId; });
   console.log('[SELECTPIC]', stage, JSON.stringify({
     cursor: cursor,
-    index: choiceWindow ? choiceWindow.index() : null,
-    msgIndex: messageIndex,
-    hidden: $gameMessage.hiddenIndexList
-      ? $gameMessage.hiddenIndexList.filter(Boolean).length : null,
-    open: choiceWindow ? choiceWindow.isOpen() : null,
-    openness: choiceWindow ? choiceWindow._openness : null,
-    bindings: bindings.length,
+    entries: panel.length,
+    visible: visibleIds,
     pic: selected ? [selected.index, selected.pictureId, picture ? picture._opacity : 'gone'] : null,
     text: picture && picture.dTextInfo ? picture.dTextInfo.value.length : null,
     sprite: spriteInfo
   }));
 }
 
-// DEBUG (temporary): logs once per cursor change, after the frame update ran.
-let _itemShopDebugCursor = -99;
+// DEBUG (temporary): steady-state sample, once a second while a panel is open.
 const _itemShopChoiceListUpdate = Window_ChoiceList.prototype.update;
 Window_ChoiceList.prototype.update = function () {
   _itemShopChoiceListUpdate.apply(this, arguments);
-  if (!$gameMessage.getSelectPictures || !$gameMessage.getSelectPictures().length) return;
-  if (this.index() === _itemShopDebugCursor) return;
-  _itemShopDebugCursor = this.index();
+  if (!AGH_choicePanelPictures.length) return;
+  if (Graphics.frameCount % 60) return;
   debugSelectPictures('frame', this.index());
 };
 

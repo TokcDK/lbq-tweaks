@@ -14122,12 +14122,47 @@
     valueScriptArray2 = [];
   };
 
+  // ---------------------------------------------------------------------------
+  // Choice panel pictures
+  // One picture per list entry, switched by the choice cursor. MessageSelectPicture
+  // cannot drive these lists: several Window_ChoiceList instances update at the
+  // same time here, and the inactive ones re-run its opacity pass every frame and
+  // blank every bound picture.
+  // ---------------------------------------------------------------------------
+  AGH_choicePanelPictures = [];
+
+  AGH_resetChoicePanel = function () {
+    AGH_choicePanelPictures = [];
+    // Drop stale bindings so the plugin's own pass leaves these pictures alone.
+    if ($gameMessage.clearSelectPictures) {
+      $gameMessage.clearSelectPictures();
+    }
+  };
+
+  AGH_registerChoicePanelPicture = function (choiceIndex, pictureId) {
+    AGH_choicePanelPictures.push({
+      index: choiceIndex,
+      pictureId: pictureId,
+      picture: $gameScreen.picture(pictureId)
+    });
+  };
+
+  // Called from the Window_ChoiceList#select hook in amyGameItemShop.js.
+  AGH_revealChoicePanel = function (choiceIndex) {
+    AGH_choicePanelPictures.forEach(function (entry) {
+      if (entry.picture && entry.picture.setOpacity) {
+        entry.picture.setOpacity(entry.index === choiceIndex ? 255 : 0);
+      }
+    });
+  };
+
   // Replaces (1x): CommonEvents.json:common-event:183|本屋コモン
   // Rebuilds the list on every shop loop: choice value 1 is the first book (0 = cancel),
   // valueScriptArray2 maps that value back to the item id for the purchase step.
   AGH_prepareBookShopChoices = function () {
     AGH_setCountSetPair(101, 1);
     valueScriptArray2 = [0];
+    AGH_resetChoicePanel();
     valueScriptArray1.forEach(function (bookShopId) {
       bookShop_preparert(bookShopId);
     });

@@ -6147,6 +6147,7 @@ fade_wipeDirect = function (wipeTypeId) {
     const tipDescriptions = $gameVariables.value(GAME_VARIABLE.TIP_TEXTS);
     const tipPictures = $gameVariables.value(GAME_VARIABLE.TIP_PICTURES);
     // Every tip reserves two picture slots, so the offset grows by two per entry.
+    AGH_resetChoicePanel();
     let pictureIdOffset = TIP_PICTURE_ID_BASE;
     for (let tipIndex = 0; tipIndex < tipNames.length; tipIndex++) {
       const tipChoiceLabel = buildTipChoiceLabel(tipNames[tipIndex]);
@@ -6187,7 +6188,8 @@ fade_wipeDirect = function (wipeTypeId) {
       0,
       0
     );
-    $gameMessage.setSelectPictureId(tipIndex, descriptionPictureId);
+    // Revealed by the choice cursor (AGH_revealChoicePanel).
+    AGH_registerChoicePanelPicture(tipIndex, descriptionPictureId);
   }
 
   // Optional illustration of the tip; the entry carries its file name and flags in [0].
@@ -6207,7 +6209,7 @@ fade_wipeDirect = function (wipeTypeId) {
       0,
       0
     );
-    $gameMessage.setSelectPictureId(tipIndex, imagePictureId);
+    AGH_registerChoicePanelPicture(tipIndex, imagePictureId);
   };
 
   //ダンジョンから脱出スクリプト
