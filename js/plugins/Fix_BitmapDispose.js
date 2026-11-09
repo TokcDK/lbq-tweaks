@@ -160,12 +160,21 @@
     // createContents() always allocates a fresh Bitmap and drops the previous
     // one. CommonPopupCore calls it once per popup on a full-screen window, so
     // that alone is ~3 MB of VRAM per popup shown.
+    //
+    // Free only the bitmap the previous createContents() installed here, never
+    // `this.contents` itself: KMS_QuickNotification / KMS_MapActiveMessage draw
+    // into a SHARED scratch Bitmap, point `contents` at it, then call
+    // createContents() and blit from the scratch buffer afterwards. Destroying
+    // that buffer shrinks it to 1x1 permanently, blanking every popup (including
+    // the startup \V[61] version text) for the rest of the session.
     var _Window_Base_createContents = Window_Base.prototype.createContents;
     Window_Base.prototype.createContents = function() {
-        if (this.contents && this.contents.destroyIfDynamic) {
-            this.contents.destroyIfDynamic();
+        var owned = this.__ownedContents;
+        if (owned && owned.destroyIfDynamic) {
+            owned.destroyIfDynamic();
         }
         _Window_Base_createContents.apply(this, arguments);
+        this.__ownedContents = this.contents;
     };
 
     //-----------------------------------------------------------------------
