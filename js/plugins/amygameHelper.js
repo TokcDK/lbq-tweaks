@@ -7214,7 +7214,8 @@
 
   // Replaces (4x): data/CommonEvents.json:common-event:21, data/CommonEvents.json:common-event:173, :183, Map003.json:map-event:83:page:1
   AGH_fadePicture1Pic98 = function (choicePictureName) {
-    showPic(100, "ScreenFoundationChoice", 0 + 300, 0, 100, 100, 0, 0);
+    // The 300 is the start Y, not X: the foundation slides up from below.
+    showPic(100, "ScreenFoundationChoice", 0, 0 + 300, 100, 100, 0, 0);
     movePic(100, 0, 0, 100, 100, 255, 120, 0);
     showPic(99, choicePictureName, 300 + 20, 0, 200, 200, 0, 0);
     movePic(99, 300, 0, 200, 200, 255, 120, 0);
