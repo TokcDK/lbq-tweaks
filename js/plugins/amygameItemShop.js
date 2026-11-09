@@ -1972,31 +1972,51 @@ function debugSelectPictures(stage, cursor) {
   if (!bindings.length) return;
   const scene = SceneManager._scene;
   const choiceWindow = scene && scene._messageWindow ? scene._messageWindow._choiceWindow : null;
-  const shown = bindings.slice(0, 3).map(function (data) {
-    const picture = $gameScreen.picture(data.pictureId);
-    return [data.index, data.pictureId, picture ? picture._opacity : 'gone'];
-  });
+  const messageIndex = choiceWindow && choiceWindow.findMessageIndex
+    ? choiceWindow.findMessageIndex() : null;
+  const selected = bindings.filter(function (data) { return data.index === messageIndex; })[0];
+  const picture = selected ? $gameScreen.picture(selected.pictureId) : null;
+  let spriteInfo = selected ? 'no-picture' : 'no-binding';
+  if (picture) {
+    const spriteset = scene && scene._spriteset;
+    const container = spriteset && spriteset._pictureContainer;
+    const sprite = container ? container.children.filter(function (child) {
+      return child._pictureId === selected.pictureId;
+    })[0] : null;
+    spriteInfo = sprite ? {
+      visible: sprite.visible,
+      opacity: sprite.opacity,
+      x: sprite.x,
+      y: sprite.y,
+      size: sprite.bitmap ? [sprite.bitmap.width, sprite.bitmap.height] : null,
+      name: sprite._pictureName ? 'set' : 'empty',
+      frame: sprite._frameWindow ? sprite._frameWindow.opacity : 'none'
+    } : 'no-sprite';
+  }
   console.log('[SELECTPIC]', stage, JSON.stringify({
     cursor: cursor,
-    bindings: bindings.length,
     index: choiceWindow ? choiceWindow.index() : null,
+    msgIndex: messageIndex,
+    hidden: $gameMessage.hiddenIndexList
+      ? $gameMessage.hiddenIndexList.filter(Boolean).length : null,
     open: choiceWindow ? choiceWindow.isOpen() : null,
     openness: choiceWindow ? choiceWindow._openness : null,
-    visible: choiceWindow ? choiceWindow.visible : null,
-    shown: shown
+    bindings: bindings.length,
+    pic: selected ? [selected.index, selected.pictureId, picture ? picture._opacity : 'gone'] : null,
+    text: picture && picture.dTextInfo ? picture.dTextInfo.value.length : null,
+    sprite: spriteInfo
   }));
 }
 
-// DEBUG (temporary): proves whether Window_ChoiceList#update reaches these lists.
-let _itemShopChoiceUpdateSeen = false;
+// DEBUG (temporary): logs once per cursor change, after the frame update ran.
+let _itemShopDebugCursor = -99;
 const _itemShopChoiceListUpdate = Window_ChoiceList.prototype.update;
 Window_ChoiceList.prototype.update = function () {
   _itemShopChoiceListUpdate.apply(this, arguments);
-  if (!_itemShopChoiceUpdateSeen && $gameMessage.getSelectPictures &&
-      $gameMessage.getSelectPictures().length) {
-    _itemShopChoiceUpdateSeen = true;
-    debugSelectPictures('update', null);
-  }
+  if (!$gameMessage.getSelectPictures || !$gameMessage.getSelectPictures().length) return;
+  if (this.index() === _itemShopDebugCursor) return;
+  _itemShopDebugCursor = this.index();
+  debugSelectPictures('frame', this.index());
 };
 
 // valueCountSet3 is the discount rate in percent.
