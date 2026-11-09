@@ -1954,6 +1954,51 @@ function addBookChoice(bookItem, itemId) {
   valueScriptArray2.push(itemId);
 }
 
+// MPP_ChoiceEX's custom lists never reach MessageSelectPicture's opacity pass: the
+// plugin drives it from Window_ChoiceList#update, which these lists do not go
+// through, so every description picture kept its creation opacity (all of them
+// visible, or, shown hidden, none). Switch them on the cursor move instead.
+const _itemShopChoiceListSelect = Window_ChoiceList.prototype.select;
+Window_ChoiceList.prototype.select = function (index) {
+  _itemShopChoiceListSelect.apply(this, arguments);
+  if (this.updateSelectPicture) this.updateSelectPicture();
+  debugSelectPictures('select', index);
+};
+
+// DEBUG (temporary): reports what the select-picture panels actually do in game.
+function debugSelectPictures(stage, cursor) {
+  if (typeof console === 'undefined') return;
+  const bindings = $gameMessage.getSelectPictures ? $gameMessage.getSelectPictures() : [];
+  if (!bindings.length) return;
+  const scene = SceneManager._scene;
+  const choiceWindow = scene && scene._messageWindow ? scene._messageWindow._choiceWindow : null;
+  const shown = bindings.slice(0, 3).map(function (data) {
+    const picture = $gameScreen.picture(data.pictureId);
+    return [data.index, data.pictureId, picture ? picture._opacity : 'gone'];
+  });
+  console.log('[SELECTPIC]', stage, JSON.stringify({
+    cursor: cursor,
+    bindings: bindings.length,
+    index: choiceWindow ? choiceWindow.index() : null,
+    open: choiceWindow ? choiceWindow.isOpen() : null,
+    openness: choiceWindow ? choiceWindow._openness : null,
+    visible: choiceWindow ? choiceWindow.visible : null,
+    shown: shown
+  }));
+}
+
+// DEBUG (temporary): proves whether Window_ChoiceList#update reaches these lists.
+let _itemShopChoiceUpdateSeen = false;
+const _itemShopChoiceListUpdate = Window_ChoiceList.prototype.update;
+Window_ChoiceList.prototype.update = function () {
+  _itemShopChoiceListUpdate.apply(this, arguments);
+  if (!_itemShopChoiceUpdateSeen && $gameMessage.getSelectPictures &&
+      $gameMessage.getSelectPictures().length) {
+    _itemShopChoiceUpdateSeen = true;
+    debugSelectPictures('update', null);
+  }
+};
+
 // valueCountSet3 is the discount rate in percent.
 function applyShopDiscount(price) {
   if (valueCountSet3 == 0) return price;

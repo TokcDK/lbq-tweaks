@@ -14131,6 +14131,8 @@
     valueScriptArray1.forEach(function (bookShopId) {
       bookShop_preparert(bookShopId);
     });
+    // DEBUG (temporary)
+    if (typeof debugSelectPictures === 'function') debugSelectPictures('build', 0);
   };
 
   // Replaces (1x): CommonEvents.json:common-event:184|水汲みコモン
