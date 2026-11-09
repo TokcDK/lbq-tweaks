@@ -1966,6 +1966,7 @@ Window_ChoiceList.prototype.select = function (index) {
 };
 
 let _itemShopPanelCursor = -1;
+let _itemShopLastLog = -1;
 
 const _itemShopChoiceListUpdate = Window_ChoiceList.prototype.update;
 Window_ChoiceList.prototype.update = function () {
@@ -1976,9 +1977,18 @@ Window_ChoiceList.prototype.update = function () {
   AGH_choicePanelPictures.forEach(function (entry) {
     trapPanelPictureOpacity(entry.picture); // DEBUG (temporary)
   });
-  AGH_revealChoicePanel(this.index());
-  // DEBUG (temporary): steady-state sample, once a second.
-  if (Graphics.frameCount % 60 === 0) debugSelectPictures('frame', this.index(), this);
+  AGH_revealChoicePanel(_itemShopPanelCursor);
+  // DEBUG (temporary): sample on every cursor move, plus once a second.
+  if (_itemShopPanelCursor !== _itemShopLastLog || Graphics.frameCount % 60 === 0) {
+    _itemShopLastLog = _itemShopPanelCursor;
+    debugSelectPictures('frame', _itemShopPanelCursor, this);
+  }
+  // Core Window.update never refreshes the cursor, only select() does; a window
+  // whose index moved without select() keeps the highlight on the old row.
+  const itemRect = this.itemRect(_itemShopPanelCursor);
+  if (!this._cursorRect || this._cursorRect.y !== itemRect.y) {
+    this.updateCursor();
+  }
 };
 
 // DEBUG (temporary): reports what the book description panel actually does in game.
@@ -2018,9 +2028,28 @@ function debugSelectPictures(stage, cursor, choiceWindow) {
     picMethod: picture && picture.opacity ? picture.opacity() : null,
     text: picture && picture.dTextInfo ? picture.dTextInfo.value.length : null,
     sprite: spriteInfo,
-    // [index, active, visible, x, y, w, h, cursorY] of every choice window on screen.
-    wins: debugChoiceWindows()
+    // [index, active, visible, y, h, cursorRect, scrollY, originY, itemY, itemH,
+    //  rows, cursorVisible, cursorY, targetY, cursorSprite] per choice window.
+    wins: debugChoiceWindows(),
+    // [id, x, y, opacity, targetX, targetY] of every visible picture.
+    pics: debugVisiblePictures()
   }));
+}
+
+// DEBUG (temporary): position and target of every visible picture.
+function debugVisiblePictures() {
+  const scene = typeof SceneManager !== 'undefined' ? SceneManager._scene : null;
+  const container = scene && scene._spriteset && scene._spriteset._pictureContainer;
+  if (!container || !container.children) return null;
+  const out = [];
+  container.children.forEach(function (child) {
+    if (!child || !child._isPicture || !child.picture) return;
+    const picture = child.picture();
+    if (!picture || !picture._opacity) return;
+    out.push([child._pictureId, Math.round(picture._x), Math.round(picture._y),
+      picture._opacity, Math.round(picture._targetX), Math.round(picture._targetY)]);
+  });
+  return out;
 }
 
 // DEBUG (temporary): cursor state of every Window_ChoiceList currently on screen.
