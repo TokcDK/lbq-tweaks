@@ -448,7 +448,6 @@
 
 	Scene_Status.prototype.createBust = function() {
 		this._bust = new Sprite_TempTachiePicture();
-		this._bust.setPictureId(id)
 		this._bust.anchor.x = 0.5;
 		this._bust.x = Moghunter.scStatus_BustX;
 		this._bust.y = Number($dataActors[this._actor._actorId].meta.scStatusBustY) - $gameVariables.value(119)//Moghunter.scStatus_BustY;
