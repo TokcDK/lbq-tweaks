@@ -1997,6 +1997,46 @@ Window_ChoiceList.prototype.update = function () {
   }
 };
 
+// DEBUG (temporary): why a choice window's highlight stops following its index.
+// Reports, for the active choice window only, which of the two highlight paths is
+// live (cursor sprite vs GALV's VN buttons in the contents) and whether the smooth
+// cursor pass in Window_Selectable#update is still running.
+if (typeof Window_Selectable !== 'undefined' && typeof Graphics !== 'undefined') {
+  let _itemShopSelUpdateCount = 0;
+  const _itemShopSelectableUpdate = Window_Selectable.prototype.update;
+  Window_Selectable.prototype.update = function () {
+    _itemShopSelUpdateCount++;
+    _itemShopSelectableUpdate.apply(this, arguments);
+  };
+
+  const _itemShopChoiceListUpdateDbg = Window_ChoiceList.prototype.update;
+  Window_ChoiceList.prototype.update = function () {
+    _itemShopChoiceListUpdateDbg.apply(this, arguments);
+    if (!this.active) return;
+    const index = this.index();
+    const changed = this._itemShopDbgIndex !== index;
+    if (!changed && Graphics.frameCount % 120) return;
+    this._itemShopDbgIndex = index;
+    const rect = this._cursorRect || {};
+    console.log('[CH]', JSON.stringify({
+      i: index,
+      owner: this === AGH_choicePanelWindow ? 1 : 0,
+      vis: this.visible ? 1 : 0,
+      vn: $gameSystem.vnChoices ? 1 : 0,
+      ih: this.itemHeight(),
+      mi: this.maxItems(),
+      dur: this._cursorMoveDuration,
+      cy: this._cursorY,
+      ty: this._targetCursorY,
+      ry: rect.y,
+      rh: rect.height,
+      spr: this._windowCursorSprite ? this._windowCursorSprite.opacity : null,
+      vnIdx: this._vnIndex,
+      upd: _itemShopSelUpdateCount
+    }));
+  };
+}
+
 // valueCountSet3 is the discount rate in percent.
 function applyShopDiscount(price) {
   if (valueCountSet3 == 0) return price;
