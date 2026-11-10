@@ -1954,23 +1954,30 @@ function addBookChoice(bookItem, itemId) {
   valueScriptArray2.push(itemId);
 }
 
-// Two Window_ChoiceList instances exist at once in this project, and the inactive
-// one is deselected (select(-1)) after the list opens, which would blank the panel.
-// Only the window that owns the list may switch it, and it re-asserts the panel
-// every frame so nothing can leave it blank.
+// The panel belongs to ONE choice window: two Window_ChoiceList instances are open
+// at once here and the inactive one is deselected (select(-1)) after the list
+// opens, which would blank the panel. The owner is claimed on the first active
+// update after the panel is built; every other choice window in the game (the
+// G-key menu, the title setup list, ordinary message choices) is left untouched,
+// because these are prototype hooks and must not move a foreign window's cursor.
 const _itemShopChoiceListSelect = Window_ChoiceList.prototype.select;
 Window_ChoiceList.prototype.select = function (index) {
   _itemShopChoiceListSelect.apply(this, arguments);
-  if (!this.active) return;
+  if (this !== AGH_choicePanelWindow) return;
   AGH_revealChoicePanel(index);
 };
 
 const _itemShopChoiceListUpdate = Window_ChoiceList.prototype.update;
 Window_ChoiceList.prototype.update = function () {
   _itemShopChoiceListUpdate.apply(this, arguments);
-  if (!AGH_choicePanelPictures.length) return;
-  if (!this.active || this.index() < 0) return;
+  if (this !== AGH_choicePanelWindow) {
+    if (!AGH_choicePanelFresh || !AGH_choicePanelPictures.length) return;
+    if (!this.active) return;
+    AGH_choicePanelWindow = this;
+    AGH_choicePanelFresh = false;
+  }
   const cursor = this.index();
+  if (cursor < 0) return;
   AGH_revealChoicePanel(cursor);
   // MPP_SimpleTouch3 redraws the highlight from _cursorX/_cursorY and overwrites
   // whatever the core set, but its per-frame step does not run for this window, so

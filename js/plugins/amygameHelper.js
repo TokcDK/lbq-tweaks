@@ -14129,15 +14129,21 @@
   // cannot drive these lists: several Window_ChoiceList instances update at the
   // same time here, and the inactive ones re-run its opacity pass every frame and
   // blank every bound picture.
+  //
+  // AGH_choicePanelWindow is the single choice window that owns the panel. The
+  // hooks in amyGameItemShop.js check it before doing anything, so the panel of one
+  // list can never reach the choice windows of any other menu.
   // ---------------------------------------------------------------------------
   AGH_choicePanelPictures = [];
+  AGH_choicePanelWindow = null;
+  // True between building a panel and the list being shown: only that window may
+  // claim ownership, so a list built elsewhere in the game cannot take it over.
+  AGH_choicePanelFresh = false;
 
   AGH_resetChoicePanel = function () {
     AGH_choicePanelPictures = [];
-    // Drop stale bindings so the plugin's own pass leaves these pictures alone.
-    if ($gameMessage.clearSelectPictures) {
-      $gameMessage.clearSelectPictures();
-    }
+    AGH_choicePanelWindow = null;
+    AGH_choicePanelFresh = true;
   };
 
   AGH_registerChoicePanelPicture = function (choiceIndex, pictureId) {

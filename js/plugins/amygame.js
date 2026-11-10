@@ -6155,8 +6155,9 @@ fade_wipeDirect = function (wipeTypeId) {
         text: tipChoiceLabel,
         value: tipIndex + 1
       });
-      // Both slots start hidden; MessageSelectPicture reveals only the ones
-      // bound to the highlighted choice.
+      // Both slots start hidden and are revealed by the choice cursor
+      // (AGH_revealChoicePanel); MessageSelectPicture's own pass never reaches
+      // this list.
       showTipDescriptionPicture(tipNames, tipDescriptions, tipIndex, pictureIdOffset);
       showTipImagePicture(tipPictures, tipIndex, pictureIdOffset);
       pictureIdOffset += TIP_PICTURE_SLOTS_PER_TIP;
