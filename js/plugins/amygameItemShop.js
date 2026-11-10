@@ -1960,16 +1960,23 @@ function addBookChoice(bookItem, itemId) {
 // update after the panel is built; every other choice window in the game (the
 // G-key menu, the title setup list, ordinary message choices) is left untouched,
 // because these are prototype hooks and must not move a foreign window's cursor.
-const _itemShopChoiceListSelect = Window_ChoiceList.prototype.select;
+// Window_ChoiceList defines neither update nor select itself: both come from
+// Window_Selectable, and plugins loaded later (MPP_SimpleTouch3's smooth cursor,
+// NRP_LoopCursor) replace those inherited methods. Installing an own property that
+// calls a function captured here would SHADOW those patches for every choice list
+// in the game - which is what froze the highlight: the smooth cursor step never ran,
+// so _cursorY stayed on the row the list opened with while the index moved. Resolve
+// the inherited method at call time instead.
+const _itemShopChoiceListParent = Object.getPrototypeOf(Window_ChoiceList.prototype);
+
 Window_ChoiceList.prototype.select = function (index) {
-  _itemShopChoiceListSelect.apply(this, arguments);
+  _itemShopChoiceListParent.select.apply(this, arguments);
   if (this !== AGH_choicePanelWindow) return;
   AGH_revealChoicePanel(index);
 };
 
-const _itemShopChoiceListUpdate = Window_ChoiceList.prototype.update;
 Window_ChoiceList.prototype.update = function () {
-  _itemShopChoiceListUpdate.apply(this, arguments);
+  _itemShopChoiceListParent.update.apply(this, arguments);
   if (this !== AGH_choicePanelWindow) {
     if (!AGH_choicePanelFresh || !AGH_choicePanelPictures.length) return;
     if (!this.active) return;
@@ -1979,9 +1986,10 @@ Window_ChoiceList.prototype.update = function () {
   const cursor = this.index();
   if (cursor < 0) return;
   AGH_revealChoicePanel(cursor);
-  // MPP_SimpleTouch3 redraws the highlight from _cursorX/_cursorY and overwrites
-  // whatever the core set, but its per-frame step does not run for this window, so
-  // the highlight stayed on the row the list opened with. Snap it to the item.
+  // Safety net only: while MPP_SimpleTouch3 is animating the cursor, leave it be.
+  // If it has settled and the rect still disagrees with the item, snap it so the
+  // highlight cannot stay on an old row.
+  if (this._cursorMoveDuration > 0) return;
   const itemRect = this.itemRect(cursor);
   if (!this._cursorRect || this._cursorRect.y !== itemRect.y) {
     const scrollX = this._scrollX || 0;
@@ -1996,46 +2004,6 @@ Window_ChoiceList.prototype.update = function () {
     }
   }
 };
-
-// DEBUG (temporary): why a choice window's highlight stops following its index.
-// Reports, for the active choice window only, which of the two highlight paths is
-// live (cursor sprite vs GALV's VN buttons in the contents) and whether the smooth
-// cursor pass in Window_Selectable#update is still running.
-if (typeof Window_Selectable !== 'undefined' && typeof Graphics !== 'undefined') {
-  let _itemShopSelUpdateCount = 0;
-  const _itemShopSelectableUpdate = Window_Selectable.prototype.update;
-  Window_Selectable.prototype.update = function () {
-    _itemShopSelUpdateCount++;
-    _itemShopSelectableUpdate.apply(this, arguments);
-  };
-
-  const _itemShopChoiceListUpdateDbg = Window_ChoiceList.prototype.update;
-  Window_ChoiceList.prototype.update = function () {
-    _itemShopChoiceListUpdateDbg.apply(this, arguments);
-    if (!this.active) return;
-    const index = this.index();
-    const changed = this._itemShopDbgIndex !== index;
-    if (!changed && Graphics.frameCount % 120) return;
-    this._itemShopDbgIndex = index;
-    const rect = this._cursorRect || {};
-    console.log('[CH]', JSON.stringify({
-      i: index,
-      owner: this === AGH_choicePanelWindow ? 1 : 0,
-      vis: this.visible ? 1 : 0,
-      vn: $gameSystem.vnChoices ? 1 : 0,
-      ih: this.itemHeight(),
-      mi: this.maxItems(),
-      dur: this._cursorMoveDuration,
-      cy: this._cursorY,
-      ty: this._targetCursorY,
-      ry: rect.y,
-      rh: rect.height,
-      spr: this._windowCursorSprite ? this._windowCursorSprite.opacity : null,
-      vnIdx: this._vnIndex,
-      upd: _itemShopSelUpdateCount
-    }));
-  };
-}
 
 // valueCountSet3 is the discount rate in percent.
 function applyShopDiscount(price) {
