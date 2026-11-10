@@ -441,5 +441,6 @@ var $plugins =
 {"name":"Fix_FilterPrewarm","status":true,"description":"Compiles BlurFilter / ColorMatrixFilter / VoidFilter during Scene_Boot.start so the first menu open or tinted sprite does not pay the GLSL compile. Must load after FilterController provides PIXI.filters.","parameters":{}},
 {"name":"Fix_BitmapDispose","status":true,"description":"Frees the GPU texture of dynamically created Bitmaps (new Bitmap(w,h)) when a picture, damage popup or spriteset is discarded. Must load after MPP_MessageEX, DTextPicture, CommonPopupCore and BattleEffectPopup.","parameters":{}},
 {"name":"StatusActorLeftRight","status":true,"description":"Lets the Status screen switch party members with Left/Right.","parameters":{}},
+{"name":"EquipActorLeftRight","status":true,"description":"Lets the Equip screen switch party members with Left/Right.","parameters":{}},
 {"name":"amyGameConflictPatch","status":true,"description":"Restores behaviour lost when later plugins replace core methods without aliasing. Must stay last.","parameters":{}}
 ];
