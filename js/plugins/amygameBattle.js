@@ -987,14 +987,11 @@ const BATTLE_STANDING_PICTURE_X = 640;        // 旧バストアップの基準x
 // 立ち絵サイズ変更(変数120)と同じ規則で、倍率に比例して下へずらすと頭が画面上端に来る
 const BATTLE_STANDING_PICTURE_Y = BATTLE_STANDING_PICTURE_SCALE * 9;
 // 表情の部位(パーツ33)。tachie_settei1() は戦闘中ほぼ「気まずい」顔(4)を選ぶので、
-// 攻撃前は与ダメージ表情(amygameTachie.js の damageFaceExpressionsMap[2])に固定する
+// 攻撃前は与ダメージ表情(amygameTachie.js の damageFaceExpressionsMap[2])に固定する。
+// 8 = 怒った目+開いた口。同じ目口の48は頬の赤みと汗の飛沫が描き込まれていて気まずく
+// 見えるので使わない(赤みだけの差分画像は無い)。
 const BATTLE_STANDING_PICTURE_FACE_SLOT = 33;
 const BATTLE_STANDING_PICTURE_ATTACK_FACE = 8;
-// 表情の最大番号(img/tachies/actorN_33_*)。デバッグ用ホットキーの送り幅に使う
-const BATTLE_STANDING_PICTURE_FACE_MAX = { 1: 53, 2: 52 };
-let battleStandingPictureFaceValue = BATTLE_STANDING_PICTURE_ATTACK_FACE;
-let battleStandingPictureActorId = 0;
-let showBattleStandingPicturePreviewMark = '';
 
 // 立ち絵を攻撃前表示として出す。表示できたらtrue(呼び出し側はトークフェイスを描かない)
 function drawBattleStandingPicture(gameActor, horizontalShift, verticalShift, moveOffsetX, moveOffsetY, duration) {
@@ -1003,7 +1000,6 @@ function drawBattleStandingPicture(gameActor, horizontalShift, verticalShift, mo
 
   const actorId = gameActor.actorId();
   const characterName = 'actor' + actorId;
-  battleStandingPictureActorId = actorId;
   // 立ち絵がまだ組まれていない(マップで一度も表示していない)時は従来の表示に任せる
   if (!(characterName in tachieData.CharList)) return false;
 
@@ -1075,7 +1071,7 @@ function refreshBattleStandingPictureParts(gameActor) {
     tachie_naibusyori1(characterName, partSlot, $gameVariables.value(partSlot + workVarBase));
   }
   // 表情は tachie_settei1() の選択を上書きする(上のループの後でないと効かない)
-  tachie_naibusyori1(characterName, BATTLE_STANDING_PICTURE_FACE_SLOT, battleStandingPictureFaceValue);
+  tachie_naibusyori1(characterName, BATTLE_STANDING_PICTURE_FACE_SLOT, BATTLE_STANDING_PICTURE_ATTACK_FACE);
 }
 
 // トークフェイスのバストアップ(8枚)が残っていれば消す
@@ -1088,61 +1084,6 @@ function eraseTalkfaceBustUpLayers(basePictureId) {
   }
 }
 
-// TEMP: 攻撃前立ち絵の表情を実機で選ぶためのデバッグ用ホットキー。
-// 戦闘中に F8 / F7 で表情(パーツ33)を前後に送り、F9 で表示を消す。押すたびにピクチャを
-// 出し直すので攻撃の合間でも確認できる。決まった番号を BATTLE_STANDING_PICTURE_ATTACK_FACE
-// に書いたら、このブロックは不要。
-function stepBattleStandingPictureFace(step) {
-  const actorId = battleStandingPictureActorId || $gameVariables.value(20);
-  const faceMax = BATTLE_STANDING_PICTURE_FACE_MAX[actorId];
-  if (!faceMax) {
-    console.log('[standingPicture] face: 対象のアクターが分からない', { actorId: actorId });
-    return;
-  }
-  battleStandingPictureActorId = actorId;
-  battleStandingPictureFaceValue += step;
-  if (battleStandingPictureFaceValue < 1) battleStandingPictureFaceValue = faceMax;
-  if (battleStandingPictureFaceValue > faceMax) battleStandingPictureFaceValue = 1;
-  showBattleStandingPicturePreview(actorId);
-  console.log('[standingPicture] face ->', battleStandingPictureFaceValue, '(1..' + faceMax + ')');
-}
-
-// 立ち絵40番を出し直す。TKMはピクチャ名が変わった時だけ組み直すので、名前に印を交互に付ける
-function showBattleStandingPicturePreview(actorId) {
-  const tachieData = typeof $TKMvar === 'object' && $TKMvar !== null ? $TKMvar.tachie : null;
-  if (!tachieData || !tachieData.CharList || !tachieData.PicData) return;
-  const characterName = 'actor' + actorId;
-  if (!(characterName in tachieData.CharList)) return;
-  const picData = tachieData.PicData[BATTLE_STANDING_PICTURE_SLOT];
-  picData.picNum = BATTLE_STANDING_PICTURE_ID;
-  picData.char = characterName;
-  tachie_naibusyori1(characterName, BATTLE_STANDING_PICTURE_FACE_SLOT, battleStandingPictureFaceValue);
-  showBattleStandingPicturePreviewMark = showBattleStandingPicturePreviewMark ? '' : '.';
-  $gameScreen.showPicture(BATTLE_STANDING_PICTURE_ID,
-    'TKMtachie_' + characterName + '_' + showBattleStandingPicturePreviewMark, 1,
-    BATTLE_STANDING_PICTURE_X, BATTLE_STANDING_PICTURE_Y,
-    BATTLE_STANDING_PICTURE_SCALE, BATTLE_STANDING_PICTURE_SCALE, 255, 0);
-}
-
-function eraseBattleStandingPicturePreview() {
-  if (!$gameScreen.picture(BATTLE_STANDING_PICTURE_ID)) return;
-  tachie_bless(BATTLE_STANDING_PICTURE_ID, 0);
-  $gameScreen.erasePicture(BATTLE_STANDING_PICTURE_ID);
-}
-
-(function installBattleStandingPictureDebugKeys() {
-  if (typeof document === 'undefined' || document.standingPictureDebugKeys) return;
-  document.standingPictureDebugKeys = true;
-  document.addEventListener('keydown', function (event) {
-    if (!window.DEBUG_BATTLE_CLOTHES) return;
-    if (!(SceneManager._scene instanceof Scene_Battle)) return;
-    if (event.key === 'F8') stepBattleStandingPictureFace(1);
-    else if (event.key === 'F7') stepBattleStandingPictureFace(-1);
-    else if (event.key === 'F9') eraseBattleStandingPicturePreview();
-    else return;
-    event.preventDefault();
-  });
-})();
 battle_bustUp1 = function (gameActor, basePictureId, baseMoveX, baseMoveY, baseDurationOffset) {
   if (!gameActor) {
     return;
