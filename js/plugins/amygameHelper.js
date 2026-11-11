@@ -42,6 +42,7 @@
     TOWN_INFO_ITEM_ID: 230, // 街情報アイテム指定変数
     DUNGEON_INFO_ITEM_ID: 240, // ダンジョン毎情報アイテム指定変数
     DAMAGED_CLOTHES_NAME: 243, // 衣装破損時部位指定アイテム名
+    DAMAGED_CLOTHES_ITEM_ID: 244, // 衣装破損時部位指定アイテムID
     HEROINE_ACTOR_IDS: 247, // ヒロインID配列
     CHARACTER_ACTOR_IDS: 248, // キャラID配列
     DYNAMIC_EVENT_IDS: 292, // イベント用動的生成ID配列
@@ -2557,6 +2558,71 @@
       $gameTemp.reserveCommonEvent(commonEventId);
     }
     return value;
+  };
+
+  // Per-hit clothing damage for the heroines (states 602 + 62/70). Nothing else
+  // tore clothes in battle, so state 62 (the gate of the CE109 assault flow)
+  // could only come from a map trap. Chance is the share of the target's max HP
+  // the hit actually removed, with a bonus for raw physical hits.
+  const BATTLE_CLOTHES_DAMAGE_RATE = 2; // chance = damage / MHP * this
+  const BATTLE_CLOTHES_DAMAGE_PHYSICAL_RATE = 1.5; // raw physical bonus
+  const BATTLE_CLOTHES_DAMAGE_MAX_CHANCE = 0.75;
+  const BATTLE_CLOTHES_PART_SLOTS = [20, 21, 22, 23, 25, 28]; // 衣装通常破損(CE112)と同じ部位
+  // Global chance modifier, read from a game variable so a modder can tune it
+  // in-game or from a save without touching the code. In percent:
+  //   0 / unset -> 100 (default), 200 -> twice as likely (hardcore),
+  //   10000 -> every HP-damaging hit tears a part (testing).
+  const BATTLE_CLOTHES_DAMAGE_MODIFIER_VAR = 613;
+  const BATTLE_CLOTHES_DAMAGE_ALWAYS_PERCENT = 10000;
+
+  // Replaces (1x, state 602): the CE109 reserve plus the clothing damage roll.
+  AGH_stateRespondGirlDamage = function (action, user, target, stateId, value) {
+    // The reserve has to run first: CE109 keys on state 62, so a hit that breaks
+    // the clothes must not also start the assault scene in the same frame.
+    value = AGH_stateRespondReserveCommonEventOnState(user, target, stateId, value, 62, 109);
+    AGH_rollBattleClothesDamage(action, target, value);
+    return value;
+  };
+
+  AGH_rollBattleClothesDamage = function (action, target, value) {
+    if (!$gameParty.inBattle() || !action) return;
+    // HP damage only: type 3/5 (recover / drain) are not a hit that tears cloth.
+    if (!action.isHpEffect() || !action.isDamage() || !(value > 0)) return;
+    if (!(target instanceof Game_Actor) || target.hp <= 0) return;
+    if (!isGirl(target)) return;
+
+    const rawModifier = Number($gameVariables.value(BATTLE_CLOTHES_DAMAGE_MODIFIER_VAR));
+    const modifier = rawModifier > 0 ? rawModifier : 100;
+    if (modifier < BATTLE_CLOTHES_DAMAGE_ALWAYS_PERCENT) {
+      const scale = modifier / 100;
+      let chance = (value / target.mhp) * BATTLE_CLOTHES_DAMAGE_RATE * scale;
+      if (action.isPhysical()) chance *= BATTLE_CLOTHES_DAMAGE_PHYSICAL_RATE;
+      const maxChance = Math.min(1, BATTLE_CLOTHES_DAMAGE_MAX_CHANCE * scale);
+      if (Math.random() >= Math.min(chance, maxChance)) return;
+    }
+    AGH_breakBattleClothes(target.actorId());
+  };
+
+  // Tears one clothing part, mirroring CE112 衣装通常破損 without its map-only
+  // presentation (tachie redraw, torn piece picture, choice branch).
+  AGH_breakBattleClothes = function (actorId) {
+    const actor = $gameActors.actor(actorId);
+    if (!actor) return;
+    const actorHState = $gameVariables.value(actorId + 380); // 露出度配列
+    if (!actorHState || actorHState[4] <= 0) return; // 既に全露出
+
+    $gameVariables.setValue(HELPER_VARIABLE.SELECTED_ACTOR_ID, actorId);
+    AGH_loadCostumeSlotsFromPartyStat(); // 440配列 -> 460作業用変数
+    clothes_hason1(BATTLE_CLOTHES_PART_SLOTS, 0);
+    // 143 is clothes_hason1's "a part broke" latch; CE112 and tachie_clothesHason
+    // both drop it again right after use, so do the same here.
+    $gameSwitches.setValue(143, false);
+    // 244 is zeroed by clothes_hason1 and set again only when a part was torn.
+    if (!($gameVariables.value(HELPER_VARIABLE.DAMAGED_CLOTHES_ITEM_ID) >= 1)) return;
+
+    actor.addState(62); // 破損。付与効果で70 衣装破損へ連鎖する
+    rosyutu_genzai(); // 露出値の再計算
+    AGH_readVariableActorChoiceCostumeNormalDamage(); // 戦闘ログ「◯◯の△△が破損した！」
   };
 
   // Replaces (1x, state 610): the enemy-side damage formula, the kill tally and
