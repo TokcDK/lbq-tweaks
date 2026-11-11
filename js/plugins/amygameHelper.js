@@ -2622,10 +2622,18 @@
 
     actor.addState(62); // 破損。付与効果で70 衣装破損へ連鎖する
     rosyutu_genzai(); // 露出値の再計算
+    // CE112 lets tachie_settei2() re-derive the bust-up layer numbers right
+    // after the tear. In battle those globals are read by the message portrait
+    // (AddPluginSystemByVillaA) and by battle_bustUp1, so refresh them here once
+    // instead of relying on every consumer to do it.
+    if (typeof updateClothingGlobals === 'function') {
+      updateClothingGlobals(actor, $gameVariables.value(actorId + 440));
+    }
     AGH_readVariableActorChoiceCostumeNormalDamage(); // 戦闘ログ「◯◯の△△が破損した！」
 
-    // TEMP: proves the clothing array really changed, so a stale bust-up can be
-    // told apart from a break that silently did nothing.
+    // TEMP: proves the clothing array really changed and that the globals the
+    // bust-up reads followed it, so a stale image can be told from a break that
+    // silently did nothing.
     if (window.DEBUG_BATTLE_CLOTHES) {
       const clothing = $gameVariables.value(actorId + 440) || [];
       console.log('[breakClothes]', {
@@ -2634,7 +2642,14 @@
         exposure: ($gameVariables.value(actorId + 380) || [])[4],
         state62: actor.isStateAffected(62),
         clothingArray: { item: clothing[0], coat: clothing[28], frontHair: clothing[32], totalCloth: clothing[41] },
-        coatWorkVar: $gameVariables.value(460 + 28)
+        globals: {
+          lining: valueLiningCloth[actorId],
+          backHair: valueBackHairCloth[actorId],
+          cloth: valueBustUpCloth[actorId],
+          bustUp: valueBustUpCloth2[actorId],
+          coat: valueCoatCloth[actorId],
+          frontHair: valueFrontHairCloth[actorId]
+        }
       });
     }
   };

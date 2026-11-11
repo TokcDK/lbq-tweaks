@@ -1114,7 +1114,7 @@ function processFaceImageBattleBustUpBattleBustUp(basePictureId, actorId, faceIm
   // Get the proper face image name and flag for display
   const result = getFaceImageNameBattleBustUp(actorId, index, faceImageName);
   faceImageName = result.faceImageName;
-  showPictureFlag = result.showPictureFlag;
+  const showPictureFlag = result.showPictureFlag;
 
   if (showPictureFlag === true) {
     $gameScreen.showPicture(
@@ -1136,6 +1136,13 @@ function processFaceImageBattleBustUpBattleBustUp(basePictureId, actorId, faceIm
     } else {
       tachie_bless(basePictureId + index, 3);
     }
+  } else if ($gameScreen.picture(basePictureId + index)) {
+    // A hidden layer is simply not drawn, but the copy from the previous draw
+    // is still on screen - that is how the coat that had just been torn off
+    // kept showing. The picture ids are stable (86..93), so stop its breath
+    // animation and erase it.
+    tachie_bless(basePictureId + index, 0);
+    $gameScreen.erasePicture(basePictureId + index);
   }
 }
 

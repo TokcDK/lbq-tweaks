@@ -309,6 +309,8 @@
 		if(nameIndex >= 0){
 			const valId = Number(actorCustomMessageSPClothValId[nameIndex][1])
                                  if(valId >= 1){
+                                   // TEMP: identifies which path draws the bust-up image
+                                   if(window.DEBUG_BATTLE_CLOTHES){const c=$gameVariables.value(valId+440)||[];console.log('[msgPortrait]',{name:name,valId:valId,globals:{lining:valueLiningCloth[valId],backHair:valueBackHairCloth[valId],cloth:valueBustUpCloth[valId],bustUp:valueBustUpCloth2[valId],coat:valueCoatCloth[valId],frontHair:valueFrontHairCloth[valId]},clothingArray:{coat:c[28],frontHair:c[32],totalCloth:c[41]}})};
 			           if(valueBustUpCloth[valId] == 1){
                                      $gameMessage._IZSTPicShowParam[1] = 384;
                                      $gameMessage._IZSTPicMoveParam[1] = 384;
