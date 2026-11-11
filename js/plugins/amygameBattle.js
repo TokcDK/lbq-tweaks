@@ -982,7 +982,7 @@ battle_bustUp = function (basePictureId, baseMoveX, baseMoveY, baseDurationOffse
 const BATTLE_STANDING_PICTURE_BASE_ID = 86;   // 攻撃前表示のバストアップ基準ピクチャID
 const BATTLE_STANDING_PICTURE_ID = 40;        // 専用の立ち絵枠(TKMの立ち絵40番。アクターは21〜27しか使わない)
 const BATTLE_STANDING_PICTURE_SLOT = BATTLE_STANDING_PICTURE_ID - 1;
-const BATTLE_STANDING_PICTURE_SCALE = 105;     // %。90〜95で旧バストアップと同じ上半身の切り取り
+const BATTLE_STANDING_PICTURE_SCALE = 105;     // %。旧バストアップ(上半身)に合わせた拡大率
 const BATTLE_STANDING_PICTURE_X = 640;        // 旧バストアップの基準x。呼び出し元のオフセットで右へ寄る
 // 立ち絵サイズ変更(変数120)と同じ規則で、倍率に比例して下へずらすと頭が画面上端に来る
 const BATTLE_STANDING_PICTURE_Y = BATTLE_STANDING_PICTURE_SCALE * 9;
@@ -1012,28 +1012,39 @@ function drawBattleStandingPicture(gameActor, horizontalShift, verticalShift, mo
   tachieData.preloadBitmap(BATTLE_STANDING_PICTURE_SLOT);
   eraseTalkfaceBustUpLayers(BATTLE_STANDING_PICTURE_BASE_ID);
 
+  // 男性の立ち絵は絵ごとに頭の位置が違う。マップの通常レイアウト(スイッチ200オフ)と
+  // 同じく <TachiePoseYposition> 分だけ下げて、顔が画面上端で切れないようにする。
+  // ヒロインは105%・Y=945で見た目を調整済みなのでそのまま。
+  const actorData = gameActor.actor();
+  const poseYOffset = !isGirl(gameActor) && actorData
+    ? Number(actorData.meta['TachiePoseYposition']) || 0
+    : 0;
+  const baseY = BATTLE_STANDING_PICTURE_Y - poseYOffset;
+
   const startShiftX = isFinite(horizontalShift) ? horizontalShift : 0;
   const startShiftY = isFinite(verticalShift) ? verticalShift : 0;
   const scale = BATTLE_STANDING_PICTURE_SCALE;
   const targetX = BATTLE_STANDING_PICTURE_X + moveOffsetX;
-  const targetY = BATTLE_STANDING_PICTURE_Y + moveOffsetY;
+  const targetY = baseY + moveOffsetY;
 
   $gameScreen.showPicture(BATTLE_STANDING_PICTURE_ID, 'TKMtachie_' + characterName + '_', 1,
-    BATTLE_STANDING_PICTURE_X + startShiftX, BATTLE_STANDING_PICTURE_Y + startShiftY + moveOffsetY,
+    BATTLE_STANDING_PICTURE_X + startShiftX, baseY + startShiftY + moveOffsetY,
     scale, scale, 255, 0);
   $gameScreen.movePicture(BATTLE_STANDING_PICTURE_ID, 1, targetX, targetY, scale, scale, 255, 0, duration + 10);
   tachie_bless(BATTLE_STANDING_PICTURE_ID, 1);
   return true;
 }
 
-// 立ち絵の部位番号を作り直す。衣装だけでなく表情も tachie_settei1() に決めさせるので、
-// マップの立ち絵と同じ見た目(破れた服・その場に合った表情)になる。
+// 立ち絵の部位番号を作り直す。ヒロインは衣装だけでなく表情も tachie_settei1() に
+// 決めさせるので、マップの立ち絵と同じ見た目(破れた服・その場に合った表情)になる。
+// 男性は衣装・露出の変動が無いので、現在衣装のスロットをそのまま貼るだけ。
 // tachie_settei3() と違い、アクター自身の立ち絵ピクチャには触らない。
 function refreshBattleStandingPictureParts(gameActor) {
   // すべて amygameTachie.js / amygameSeiyoku.js 側の関数(このファイルより後で読み込まれる)
   if (typeof tachie_naibusyori1 !== 'function' || typeof tachie_settei1 !== 'function') return;
   if (typeof resetTemporaryClothingSlots !== 'function' || typeof copyClothingSlotsToWorkVariables !== 'function') return;
-  if (typeof rosyutu_genkai1 !== 'function' || typeof rosyutu_genzai1 !== 'function') return;
+  const heroine = isGirl(gameActor);
+  if (heroine && (typeof rosyutu_genkai1 !== 'function' || typeof rosyutu_genzai1 !== 'function')) return;
 
   const actorId = gameActor.actorId();
   const actorClothingData = $gameVariables.value(actorId + 440);
@@ -1041,10 +1052,12 @@ function refreshBattleStandingPictureParts(gameActor) {
 
   resetTemporaryClothingSlots();
   copyClothingSlotsToWorkVariables(actorClothingData);
-  rosyutu_genkai1(gameActor);
-  rosyutu_genzai1(actorId);
-  // 衣装固定(23)中は立ち絵の衣装を組み替えない。tachie_settei3 と同じ条件
-  if (!gameActor.isStateAffected(23)) tachie_settei1(gameActor);
+  if (heroine) {
+    rosyutu_genkai1(gameActor);
+    rosyutu_genzai1(actorId);
+    // 衣装固定(23)中は立ち絵の衣装を組み替えない。tachie_settei3 と同じ条件
+    if (!gameActor.isStateAffected(23)) tachie_settei1(gameActor);
+  }
 
   const characterName = 'actor' + actorId;
   // 部位1..40 = 衣装スロット1..40。460 = CLOTHING_PART_VAR_BASE_ID (amygameTachie.js)
@@ -1053,7 +1066,10 @@ function refreshBattleStandingPictureParts(gameActor) {
     tachie_naibusyori1(characterName, partSlot, $gameVariables.value(partSlot + workVarBase));
   }
   // 表情は tachie_settei1() の選択を上書きする(上のループの後でないと効かない)
-  tachie_naibusyori1(characterName, BATTLE_STANDING_PICTURE_FACE_SLOT, BATTLE_STANDING_PICTURE_ATTACK_FACE);
+  // 男性の表情差分は1種類しか無いので、あるがままを使う
+  if (heroine) {
+    tachie_naibusyori1(characterName, BATTLE_STANDING_PICTURE_FACE_SLOT, BATTLE_STANDING_PICTURE_ATTACK_FACE);
+  }
 }
 
 // トークフェイスのバストアップ(8枚)が残っていれば消す
@@ -1070,10 +1086,8 @@ battle_bustUp1 = function (gameActor, basePictureId, baseMoveX, baseMoveY, baseD
   if (!gameActor) {
     return;
   };
-  // Get the acting actor's ID from the game variables
-  if (!isGirl(gameActor)) {
-    return;
-  };
+  // Men have no talkface art at all, so only the standing picture applies to them.
+  const heroine = isGirl(gameActor);
 
   // The bust-up layers are picked from the value*Cloth[] globals, and only
   // tachie_settei3() ever refreshes them. Nothing calls it in battle, so after
@@ -1082,7 +1096,7 @@ battle_bustUp1 = function (gameActor, basePictureId, baseMoveX, baseMoveY, baseD
   // tachie_settei3 reads) so the image always matches the damaged state.
   // The literal is used on purpose: CLOTHING_ACTOR_DATA_VAR_BASE_ID lives in
   // amygameTachie.js, which is loaded after this file.
-  if (typeof updateClothingGlobals === 'function') {
+  if (heroine && typeof updateClothingGlobals === 'function') {
     updateClothingGlobals(gameActor, $gameVariables.value(gameActor.actorId() + 440));
   }
 
@@ -1106,9 +1120,15 @@ battle_bustUp1 = function (gameActor, basePictureId, baseMoveX, baseMoveY, baseD
   // bust-up: the talkface art has one image per outfit and no damaged variant, so
   // a heroine whose clothes were torn still looked fully dressed. The standing
   // picture is built from the per-slot clothing parts, so it is always current.
+  // Men have no talkface art at all, so for them this is the whole display.
   // Everything else (H scenes, the choice portraits) keeps the talkface layers.
   const usedStandingPicture = basePictureId === BATTLE_STANDING_PICTURE_BASE_ID
     && drawBattleStandingPicture(gameActor, horizontalShift, verticalShift, moveOffsetX, moveOffsetY, extraMoveDuration);
+
+  // Men stop here: the standing picture (if it could be drawn) is the display.
+  if (!heroine) {
+    return;
+  }
 
   // Loop through each face image part (from 0 to 7)
   if (!usedStandingPicture) {
