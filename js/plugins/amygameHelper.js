@@ -2633,50 +2633,6 @@
       updateClothingGlobals(actor, $gameVariables.value(actorId + 440));
     }
     AGH_readVariableActorChoiceCostumeNormalDamage(); // 戦闘ログ「◯◯の△△が破損した！」
-
-    // TEMP: proves the clothing array really changed and that the globals the
-    // bust-up reads followed it, so a stale image can be told from a break that
-    // silently did nothing.
-    if (window.DEBUG_BATTLE_CLOTHES) {
-      const clothing = $gameVariables.value(actorId + 440) || [];
-      console.log('[breakClothes]', {
-        actorId: actorId,
-        brokenItemId: $gameVariables.value(HELPER_VARIABLE.DAMAGED_CLOTHES_ITEM_ID),
-        exposure: ($gameVariables.value(actorId + 380) || [])[4],
-        state62: actor.isStateAffected(62),
-        clothingArray: { item: clothing[0], coat: clothing[28], frontHair: clothing[32], totalCloth: clothing[41] },
-        globals: {
-          lining: valueLiningCloth[actorId],
-          backHair: valueBackHairCloth[actorId],
-          cloth: valueBustUpCloth[actorId],
-          bustUp: valueBustUpCloth2[actorId],
-          coat: valueCoatCloth[actorId],
-          frontHair: valueFrontHairCloth[actorId]
-        }
-      });
-    }
-  };
-
-  // Debug aid: lists every picture currently on screen with its id and asset
-  // name. Call AGH_dumpScreenPictures() from the F12 console while the image
-  // under inspection is visible - it names the exact picture behind it.
-  AGH_dumpScreenPictures = function () {
-    const pictures = $gameScreen._pictures || [];
-    const rows = [];
-    for (let pictureId = 1; pictureId < pictures.length; pictureId++) {
-      const picture = pictures[pictureId];
-      if (!picture) continue;
-      rows.push({
-        id: pictureId,
-        name: picture._name,
-        opacity: picture._opacity,
-        x: Math.round(picture._x),
-        y: Math.round(picture._y),
-        scale: picture._scaleX
-      });
-    }
-    console.table(rows);
-    return rows;
   };
 
   // Replaces (1x, state 610): the enemy-side damage formula, the kill tally and

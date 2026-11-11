@@ -10,10 +10,6 @@
 
     let wasExecuted = false;
 
-    // Console tracing for the battle clothing damage / bust-up work. Set to
-    // false (or delete the checks) once the visual state is confirmed in game.
-    window.DEBUG_BATTLE_CLOTHES = true;
-
     // Battle clothing damage rate modifier, game variable 613 (percent).
     // 0 = default 100%, 200 = twice as likely, 10000 = every damaging hit tears
     // a part. Forced on every save load so an existing save picks it up.

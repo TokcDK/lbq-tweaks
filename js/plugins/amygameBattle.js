@@ -1023,24 +1023,6 @@ function drawBattleStandingPicture(gameActor, horizontalShift, verticalShift, mo
     scale, scale, 255, 0);
   $gameScreen.movePicture(BATTLE_STANDING_PICTURE_ID, 1, targetX, targetY, scale, scale, 255, 0, duration + 10);
   tachie_bless(BATTLE_STANDING_PICTURE_ID, 1);
-
-  // TEMP: shows the framing and the expression part the draw picked
-  if (window.DEBUG_BATTLE_CLOTHES) {
-    // CharList is indexed by layer, and layer n is part slot n+1 (partsNameArr = "1".."41")
-    const parts = tachieData.CharList[characterName] || [];
-    const partOfSlot = slot => parts[slot - 1];
-    console.log('[standingPicture]', {
-      actorId: actorId,
-      pictureId: BATTLE_STANDING_PICTURE_ID,
-      from: { x: BATTLE_STANDING_PICTURE_X + startShiftX, y: BATTLE_STANDING_PICTURE_Y + startShiftY + moveOffsetY },
-      to: { x: targetX, y: targetY, scale: scale },
-      expressionPart: partOfSlot(33),
-      // 460+33 = 表情。上書き前の tachie_settei1() の選択(参考値)
-      settei1Expression: $gameVariables.value(460 + BATTLE_STANDING_PICTURE_FACE_SLOT),
-      coatPart: partOfSlot(28),
-      torsoParts: { innerTop: partOfSlot(21), top: partOfSlot(23), top2: partOfSlot(25) }
-    });
-  }
   return true;
 }
 
@@ -1103,7 +1085,6 @@ battle_bustUp1 = function (gameActor, basePictureId, baseMoveX, baseMoveY, baseD
   if (typeof updateClothingGlobals === 'function') {
     updateClothingGlobals(gameActor, $gameVariables.value(gameActor.actorId() + 440));
   }
-  if (window.DEBUG_BATTLE_CLOTHES) logBattleBustUpStateBattleBustUp(gameActor);
 
   // Setup picture motion and compute picture scale & vertical shift
   let pictureScale;
@@ -1155,36 +1136,6 @@ battle_bustUp1 = function (gameActor, basePictureId, baseMoveX, baseMoveY, baseD
     picture_motion1("smooth", [0]);
   }
 };
-
-// TEMP: prints the layer inputs the bust-up is about to draw, so a real-game
-// battle shows whether the clothing globals lag behind the clothing array.
-function logBattleBustUpStateBattleBustUp(gameActor) {
-  const actorId = gameActor.actorId();
-  const clothing = $gameVariables.value(actorId + 440) || [];
-  const exposure = ($gameVariables.value(actorId + 380) || [])[4];
-  // the eight pictures this draw will show, null when the layer is hidden
-  const layers = [];
-  for (let index = 0; index <= 7; index++) {
-    const resolved = getFaceImageNameBattleBustUp(actorId, index, actorId + 'Actor_' + valueFaceSelect);
-    layers.push(resolved.showPictureFlag ? resolved.faceImageName : null);
-  }
-  console.log('[bustUp]', {
-    actorId: actorId,
-    exposure: exposure,
-    brokenState62: gameActor.isStateAffected(62),
-    // layers drawn: 0 Lining(2) 1 BackHair(4) 2 Cloth(41) 3 BustUp(41) 4 Coat(28) 7 FrontHair(32)
-    globals: {
-      lining: valueLiningCloth[actorId],
-      backHair: valueBackHairCloth[actorId],
-      cloth: valueBustUpCloth[actorId],
-      bustUp: valueBustUpCloth2[actorId],
-      coat: valueCoatCloth[actorId],
-      frontHair: valueFrontHairCloth[actorId]
-    },
-    clothingArray: { item: clothing[0], coat: clothing[28], frontHair: clothing[32], totalCloth: clothing[41] },
-    layers: layers
-  });
-}
 
 //---------------------------------------------------------------------
 // Setup scale and vertical shift based on the current battle conditions.
