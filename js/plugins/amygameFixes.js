@@ -13,7 +13,7 @@
     // Battle clothing damage rate modifier, game variable 613 (percent).
     // 0 = default 100%, 200 = twice as likely, 10000 = every damaging hit tears
     // a part. Forced on every save load so an existing save picks it up.
-    const BATTLE_CLOTHES_DAMAGE_PERCENT = 10000;
+    const BATTLE_CLOTHES_DAMAGE_PERCENT = 0;
 
     function applyBattleClothesDamagePercent() {
         if (!$gameVariables) return;
