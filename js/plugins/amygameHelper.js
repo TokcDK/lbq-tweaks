@@ -2623,9 +2623,12 @@
     actor.addState(62); // 破損。付与効果で70 衣装破損へ連鎖する
     rosyutu_genzai(); // 露出値の再計算
     // CE112 lets tachie_settei2() re-derive the bust-up layer numbers right
-    // after the tear. In battle those globals are read by the message portrait
-    // (AddPluginSystemByVillaA) and by battle_bustUp1, so refresh them here once
-    // instead of relying on every consumer to do it.
+    // after the tear. On the map that goes through charagra_choice1(), which is
+    // what drops the worn outfit item and switches the bust-up to the bare
+    // Cloth1 art once there is nothing left to cover her. Nothing runs it in
+    // battle, so do both steps here; battle_bustUp1 and the message portrait
+    // then read consistent globals.
+    if (typeof charagra_choice1 === 'function') charagra_choice1(actorId);
     if (typeof updateClothingGlobals === 'function') {
       updateClothingGlobals(actor, $gameVariables.value(actorId + 440));
     }
@@ -2652,6 +2655,28 @@
         }
       });
     }
+  };
+
+  // Debug aid: lists every picture currently on screen with its id and asset
+  // name. Call AGH_dumpScreenPictures() from the F12 console while the image
+  // under inspection is visible - it names the exact picture behind it.
+  AGH_dumpScreenPictures = function () {
+    const pictures = $gameScreen._pictures || [];
+    const rows = [];
+    for (let pictureId = 1; pictureId < pictures.length; pictureId++) {
+      const picture = pictures[pictureId];
+      if (!picture) continue;
+      rows.push({
+        id: pictureId,
+        name: picture._name,
+        opacity: picture._opacity,
+        x: Math.round(picture._x),
+        y: Math.round(picture._y),
+        scale: picture._scaleX
+      });
+    }
+    console.table(rows);
+    return rows;
   };
 
   // Replaces (1x, state 610): the enemy-side damage formula, the kill tally and

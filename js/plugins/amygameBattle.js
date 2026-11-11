@@ -1038,6 +1038,12 @@ function logBattleBustUpStateBattleBustUp(gameActor) {
   const actorId = gameActor.actorId();
   const clothing = $gameVariables.value(actorId + 440) || [];
   const exposure = ($gameVariables.value(actorId + 380) || [])[4];
+  // the eight pictures this draw will show, null when the layer is hidden
+  const layers = [];
+  for (let index = 0; index <= 7; index++) {
+    const resolved = getFaceImageNameBattleBustUp(actorId, index, actorId + 'Actor_' + valueFaceSelect);
+    layers.push(resolved.showPictureFlag ? resolved.faceImageName : null);
+  }
   console.log('[bustUp]', {
     actorId: actorId,
     exposure: exposure,
@@ -1051,7 +1057,8 @@ function logBattleBustUpStateBattleBustUp(gameActor) {
       coat: valueCoatCloth[actorId],
       frontHair: valueFrontHairCloth[actorId]
     },
-    clothingArray: { item: clothing[0], coat: clothing[28], frontHair: clothing[32], totalCloth: clothing[41] }
+    clothingArray: { item: clothing[0], coat: clothing[28], frontHair: clothing[32], totalCloth: clothing[41] },
+    layers: layers
   });
 }
 
