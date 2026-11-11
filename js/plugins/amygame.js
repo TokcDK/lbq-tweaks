@@ -3771,10 +3771,11 @@ abNomal_Clear = function (
     return getItemEquipmentSource(randomValueItemsType > 1 ? 2 : randomValueItemsType);
   }
 
-  // Highest rarity the gacha may draw: SSR (8) needs the 100-pull title item, UR/LR
-  // (9, 10) the 200-pull one.
+  // Highest rarity the gacha may draw. One title item per tier: 656 (100 pulls) opens
+  // SSR (8), 657 (200 pulls) opens UR (9) only, 658 (300 pulls) opens LR (10).
   function gachaRarityCap() {
-    if ($gameParty.hasItem($dataItems[657], true)) return 10;
+    if ($gameParty.hasItem($dataItems[658], true)) return 10;
+    if ($gameParty.hasItem($dataItems[657], true)) return 9;
     if ($gameParty.hasItem($dataItems[656], true)) return 8;
     return 7;
   }
