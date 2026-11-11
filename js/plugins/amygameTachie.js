@@ -933,6 +933,15 @@ function writeBackClothingData(actorClothingData) {
   }
 }
 
+// バストアップの胴体を覆う部位(インナー上/服上/服上2)
+const BUST_UP_TORSO_SLOT_IDS = [21, 23, 25];
+
+// バストアップで上半身が素肌かどうか。統合衣装(41)は1枚絵しか持たず破損差分が
+// 存在しないため、覆う部位が全て外れたら立ち絵と同じく素肌差分に切り替える。
+function isBustUpTorsoBare(actorClothingData) {
+  return BUST_UP_TORSO_SLOT_IDS.every(function (slotId) { return actorClothingData[slotId] == 0; });
+}
+
 // 衣装関連のグローバル値を更新する(女性キャラのみ)
 function updateClothingGlobals(gameActor, actorClothingData) {
   const actorId = gameActor.actorId();
@@ -940,7 +949,9 @@ function updateClothingGlobals(gameActor, actorClothingData) {
   valueBackHairCloth[actorId] = gameActor.isStateAffected(23) ? 1 : actorClothingData[4];
   valueCoatCloth[actorId] = actorClothingData[28];
   valueFrontHairCloth[actorId] = actorClothingData[32];
-  const bustUpClothValue = actorClothingData[41];
+  let bustUpClothValue = actorClothingData[41];
+  // 41は統合衣装の会話グラ用ID。負値はレイヤー非表示の指示なので触らない。
+  if (bustUpClothValue >= 0 && isBustUpTorsoBare(actorClothingData)) bustUpClothValue = 1;
   valueBustUpCloth[actorId] = bustUpClothValue;
   valueBustUpCloth2[actorId] = bustUpClothValue;
 }
