@@ -983,6 +983,18 @@ battle_bustUp1 = function (gameActor, basePictureId, baseMoveX, baseMoveY, baseD
     return;
   };
 
+  // The bust-up layers are picked from the value*Cloth[] globals, and only
+  // tachie_settei3() ever refreshes them. Nothing calls it in battle, so after
+  // the clothes were torn the image kept drawing the intact outfit. Re-derive
+  // them from the actor's current clothing array (440+actorId, the same slots
+  // tachie_settei3 reads) so the image always matches the damaged state.
+  // The literal is used on purpose: CLOTHING_ACTOR_DATA_VAR_BASE_ID lives in
+  // amygameTachie.js, which is loaded after this file.
+  if (typeof updateClothingGlobals === 'function') {
+    updateClothingGlobals(gameActor, $gameVariables.value(gameActor.actorId() + 440));
+  }
+  if (window.DEBUG_BATTLE_CLOTHES) logBattleBustUpStateBattleBustUp(gameActor);
+
   // Setup picture motion and compute picture scale & vertical shift
   let pictureScale;
   let verticalShift;
@@ -1019,6 +1031,29 @@ battle_bustUp1 = function (gameActor, basePictureId, baseMoveX, baseMoveY, baseD
     picture_motion1("smooth", [0]);
   }
 };
+
+// TEMP: prints the layer inputs the bust-up is about to draw, so a real-game
+// battle shows whether the clothing globals lag behind the clothing array.
+function logBattleBustUpStateBattleBustUp(gameActor) {
+  const actorId = gameActor.actorId();
+  const clothing = $gameVariables.value(actorId + 440) || [];
+  const exposure = ($gameVariables.value(actorId + 380) || [])[4];
+  console.log('[bustUp]', {
+    actorId: actorId,
+    exposure: exposure,
+    brokenState62: gameActor.isStateAffected(62),
+    // layers drawn: 0 Lining(2) 1 BackHair(4) 2 Cloth(41) 3 BustUp(41) 4 Coat(28) 7 FrontHair(32)
+    globals: {
+      lining: valueLiningCloth[actorId],
+      backHair: valueBackHairCloth[actorId],
+      cloth: valueBustUpCloth[actorId],
+      bustUp: valueBustUpCloth2[actorId],
+      coat: valueCoatCloth[actorId],
+      frontHair: valueFrontHairCloth[actorId]
+    },
+    clothingArray: { item: clothing[0], coat: clothing[28], frontHair: clothing[32], totalCloth: clothing[41] }
+  });
+}
 
 //---------------------------------------------------------------------
 // Setup scale and vertical shift based on the current battle conditions.

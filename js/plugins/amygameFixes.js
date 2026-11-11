@@ -10,6 +10,30 @@
 
     let wasExecuted = false;
 
+    // Console tracing for the battle clothing damage / bust-up work. Set to
+    // false (or delete the checks) once the visual state is confirmed in game.
+    window.DEBUG_BATTLE_CLOTHES = true;
+
+    // Battle clothing damage rate modifier, game variable 613 (percent).
+    // 0 = default 100%, 200 = twice as likely, 10000 = every damaging hit tears
+    // a part. Forced on every save load so an existing save picks it up.
+    const BATTLE_CLOTHES_DAMAGE_PERCENT = 10000;
+
+    function applyBattleClothesDamagePercent() {
+        if (!$gameVariables) return;
+        $gameVariables.setValue(613, BATTLE_CLOTHES_DAMAGE_PERCENT);
+    }
+
+    // DataManager.loadGameWithoutRescue is the single funnel for every save load
+    // (continue, load menu, autoload) and $gameVariables is already the loaded
+    // one when it returns, so this is the earliest reliable point.
+    const _DataManager_loadGameWithoutRescue = DataManager.loadGameWithoutRescue;
+    DataManager.loadGameWithoutRescue = function (savefileId) {
+        const loaded = _DataManager_loadGameWithoutRescue.apply(this, arguments);
+        if (loaded) applyBattleClothesDamagePercent();
+        return loaded;
+    };
+
     // skills added on new game begin but can be missing if game saved in old version
     const skillIdsToCheck = [
         22, // object detection
@@ -50,6 +74,8 @@
     * @runs after saved game loaded, wasExecuted control it to run once
     */
     runOldSavegameFixes = function () {
+        applyBattleClothesDamagePercent(); // same value as on save load, also for a new game
+
         console.debug(
             'run_old_savegame_fixes fired!'
         );
