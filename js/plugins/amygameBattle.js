@@ -982,7 +982,7 @@ battle_bustUp = function (basePictureId, baseMoveX, baseMoveY, baseDurationOffse
 const BATTLE_STANDING_PICTURE_BASE_ID = 86;   // 攻撃前表示のバストアップ基準ピクチャID
 const BATTLE_STANDING_PICTURE_ID = 40;        // 専用の立ち絵枠(TKMの立ち絵40番。アクターは21〜27しか使わない)
 const BATTLE_STANDING_PICTURE_SLOT = BATTLE_STANDING_PICTURE_ID - 1;
-const BATTLE_STANDING_PICTURE_SCALE = 93;     // %。90〜95で旧バストアップと同じ上半身の切り取り
+const BATTLE_STANDING_PICTURE_SCALE = 105;     // %。90〜95で旧バストアップと同じ上半身の切り取り
 const BATTLE_STANDING_PICTURE_X = 640;        // 旧バストアップの基準x。呼び出し元のオフセットで右へ寄る
 // 立ち絵サイズ変更(変数120)と同じ規則で、倍率に比例して下へずらすと頭が画面上端に来る
 const BATTLE_STANDING_PICTURE_Y = BATTLE_STANDING_PICTURE_SCALE * 9;
