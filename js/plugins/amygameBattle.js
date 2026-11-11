@@ -296,7 +296,8 @@ function sumAddPowerCustomSkillAddPowerSet(ids, isEligible, entryOf, bonusOf) {
 }
 
 //攻撃時に連撃計算とスキルID代入
-const ak1PicIdsToErase = [51, 52, 53, 54, 55, 56, 57, 58, 86, 87, 88, 89, 90, 91, 92, 93, 98, 99];
+// 40 = 攻撃前表示に使う立ち絵のピクチャ(下のBATTLE_STANDING_PICTURE_ID)
+const ak1PicIdsToErase = [40, 51, 52, 53, 54, 55, 56, 57, 58, 86, 87, 88, 89, 90, 91, 92, 93, 98, 99];
 const ak1ElementIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 16, 17, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 34];
 const ak1ElementDisplayValues = [131, 133, 135, 137, 139, 141, 143, 145, 147, 367, 369, 147, 149, 371, 373, 375, 377, 379, 381, 383, 385, 387, 389, 130];
 const ak1DamageFlashDesignationData = [255, 255, 255, 0];
@@ -974,6 +975,104 @@ battle_bustUp = function (basePictureId, baseMoveX, baseMoveY, baseDurationOffse
   const actor = $gameActors.actor(actorId);
   battle_bustUp1(actor, basePictureId, baseMoveX, baseMoveY, baseDurationOffset);
 }
+
+// 攻撃前の表示はトークフェイスのバストアップではなくTKM立ち絵で行う。トークフェイスは
+// 統合衣装ごとに1枚絵しか持たず破損差分が無いため、衣装が破れても着たままに見える。
+// 立ち絵は部位ごとの衣装から組まれるので常に現在の状態になる。
+const BATTLE_STANDING_PICTURE_BASE_ID = 86;   // 攻撃前表示のバストアップ基準ピクチャID
+const BATTLE_STANDING_PICTURE_ID = 40;        // 専用の立ち絵枠(TKMの立ち絵40番。アクターは21〜27しか使わない)
+const BATTLE_STANDING_PICTURE_SLOT = BATTLE_STANDING_PICTURE_ID - 1;
+const BATTLE_STANDING_PICTURE_SCALE = 93;     // %。90〜95で旧バストアップと同じ上半身の切り取り
+const BATTLE_STANDING_PICTURE_X = 640;        // 旧バストアップの基準x。呼び出し元のオフセットで右へ寄る
+// 立ち絵サイズ変更(変数120)と同じ規則で、倍率に比例して下へずらすと頭が画面上端に来る
+const BATTLE_STANDING_PICTURE_Y = BATTLE_STANDING_PICTURE_SCALE * 9;
+
+// 立ち絵を攻撃前表示として出す。表示できたらtrue(呼び出し側はトークフェイスを描かない)
+function drawBattleStandingPicture(gameActor, horizontalShift, verticalShift, moveOffsetX, moveOffsetY, duration) {
+  const tachieData = typeof $TKMvar === 'object' && $TKMvar !== null ? $TKMvar.tachie : null;
+  if (!tachieData || !tachieData.CharList || !tachieData.PicData) return false;
+
+  const actorId = gameActor.actorId();
+  const characterName = 'actor' + actorId;
+  // 立ち絵がまだ組まれていない(マップで一度も表示していない)時は従来の表示に任せる
+  if (!(characterName in tachieData.CharList)) return false;
+
+  const picData = tachieData.PicData[BATTLE_STANDING_PICTURE_SLOT];
+  picData.picNum = BATTLE_STANDING_PICTURE_ID;
+  picData.char = characterName;
+  // 衣装と表情を今の状態から作り直す(CharList と、この枠のビットマップも更新される)
+  refreshBattleStandingPictureParts(gameActor);
+  // 値が変わらなかった部位は tachie_naibusyori1() では埋まらないので、枠ごと組み直す
+  tachieData.preloadBitmap(BATTLE_STANDING_PICTURE_SLOT);
+  eraseTalkfaceBustUpLayers(BATTLE_STANDING_PICTURE_BASE_ID);
+
+  const startShiftX = isFinite(horizontalShift) ? horizontalShift : 0;
+  const startShiftY = isFinite(verticalShift) ? verticalShift : 0;
+  const scale = BATTLE_STANDING_PICTURE_SCALE;
+  const targetX = BATTLE_STANDING_PICTURE_X + moveOffsetX;
+  const targetY = BATTLE_STANDING_PICTURE_Y + moveOffsetY;
+
+  $gameScreen.showPicture(BATTLE_STANDING_PICTURE_ID, 'TKMtachie_' + characterName + '_', 1,
+    BATTLE_STANDING_PICTURE_X + startShiftX, BATTLE_STANDING_PICTURE_Y + startShiftY + moveOffsetY,
+    scale, scale, 255, 0);
+  $gameScreen.movePicture(BATTLE_STANDING_PICTURE_ID, 1, targetX, targetY, scale, scale, 255, 0, duration + 10);
+  tachie_bless(BATTLE_STANDING_PICTURE_ID, 1);
+
+  // TEMP: shows the framing and the expression part the draw picked
+  if (window.DEBUG_BATTLE_CLOTHES) {
+    // CharList is indexed by layer, and layer n is part slot n+1 (partsNameArr = "1".."41")
+    const parts = tachieData.CharList[characterName] || [];
+    const partOfSlot = slot => parts[slot - 1];
+    console.log('[standingPicture]', {
+      actorId: actorId,
+      pictureId: BATTLE_STANDING_PICTURE_ID,
+      from: { x: BATTLE_STANDING_PICTURE_X + startShiftX, y: BATTLE_STANDING_PICTURE_Y + startShiftY + moveOffsetY },
+      to: { x: targetX, y: targetY, scale: scale },
+      expressionPart: partOfSlot(33),
+      coatPart: partOfSlot(28),
+      torsoParts: { innerTop: partOfSlot(21), top: partOfSlot(23), top2: partOfSlot(25) }
+    });
+  }
+  return true;
+}
+
+// 立ち絵の部位番号を作り直す。衣装だけでなく表情も tachie_settei1() に決めさせるので、
+// マップの立ち絵と同じ見た目(破れた服・その場に合った表情)になる。
+// tachie_settei3() と違い、アクター自身の立ち絵ピクチャには触らない。
+function refreshBattleStandingPictureParts(gameActor) {
+  // すべて amygameTachie.js / amygameSeiyoku.js 側の関数(このファイルより後で読み込まれる)
+  if (typeof tachie_naibusyori1 !== 'function' || typeof tachie_settei1 !== 'function') return;
+  if (typeof resetTemporaryClothingSlots !== 'function' || typeof copyClothingSlotsToWorkVariables !== 'function') return;
+  if (typeof rosyutu_genkai1 !== 'function' || typeof rosyutu_genzai1 !== 'function') return;
+
+  const actorId = gameActor.actorId();
+  const actorClothingData = $gameVariables.value(actorId + 440);
+  if (!actorClothingData) return;
+
+  resetTemporaryClothingSlots();
+  copyClothingSlotsToWorkVariables(actorClothingData);
+  rosyutu_genkai1(gameActor);
+  rosyutu_genzai1(actorId);
+  // 衣装固定(23)中は立ち絵の衣装を組み替えない。tachie_settei3 と同じ条件
+  if (!gameActor.isStateAffected(23)) tachie_settei1(gameActor);
+
+  const characterName = 'actor' + actorId;
+  // 部位1..40 = 衣装スロット1..40。460 = CLOTHING_PART_VAR_BASE_ID (amygameTachie.js)
+  const workVarBase = 460;
+  for (let partSlot = 1; partSlot <= 40; partSlot++) {
+    tachie_naibusyori1(characterName, partSlot, $gameVariables.value(partSlot + workVarBase));
+  }
+}
+
+// トークフェイスのバストアップ(8枚)が残っていれば消す
+function eraseTalkfaceBustUpLayers(basePictureId) {
+  for (let index = 0; index <= 7; index++) {
+    const pictureId = basePictureId + index;
+    if (!$gameScreen.picture(pictureId)) continue;
+    tachie_bless(pictureId, 0);
+    $gameScreen.erasePicture(pictureId);
+  }
+}
 battle_bustUp1 = function (gameActor, basePictureId, baseMoveX, baseMoveY, baseDurationOffset) {
   if (!gameActor) {
     return;
@@ -1011,21 +1110,35 @@ battle_bustUp1 = function (gameActor, basePictureId, baseMoveX, baseMoveY, baseD
   const extraMoveDuration = baseDurationOffset;
   const actorFaceBaseName = actorId + 'Actor_' + valueFaceSelect;
 
+  // The pre-attack display uses the TKM standing picture instead of the talkface
+  // bust-up: the talkface art has one image per outfit and no damaged variant, so
+  // a heroine whose clothes were torn still looked fully dressed. The standing
+  // picture is built from the per-slot clothing parts, so it is always current.
+  // Everything else (H scenes, the choice portraits) keeps the talkface layers.
+  const usedStandingPicture = basePictureId === BATTLE_STANDING_PICTURE_BASE_ID
+    && drawBattleStandingPicture(gameActor, horizontalShift, verticalShift, moveOffsetX, moveOffsetY, extraMoveDuration);
+
   // Loop through each face image part (from 0 to 7)
-  for (let i = 0; i <= 7; i++) {
-    processFaceImageBattleBustUpBattleBustUp(
-      basePictureId, actorId, actorFaceBaseName, i,
+  if (!usedStandingPicture) {
+    for (let i = 0; i <= 7; i++) {
+      processFaceImageBattleBustUpBattleBustUp(
+        basePictureId, actorId, actorFaceBaseName, i,
+        horizontalShift, verticalShift,
+        moveOffsetX, moveOffsetY, pictureScale, extraMoveDuration
+      );
+    }
+  }
+
+  // Process hypnosis effect if actor is affected by hypnosis state (782). The eye
+  // overlay is placed for the talkface layers, so it is skipped with the standing
+  // picture (that path is the pre-attack display only).
+  if (!usedStandingPicture) {
+    processHypnosisEffectBattleBustUpBattleBustUp(
+      basePictureId, gameActor,
       horizontalShift, verticalShift,
       moveOffsetX, moveOffsetY, pictureScale, extraMoveDuration
     );
   }
-
-  // Process hypnosis effect if actor is affected by hypnosis state (782)
-  processHypnosisEffectBattleBustUpBattleBustUp(
-    basePictureId, gameActor,
-    horizontalShift, verticalShift,
-    moveOffsetX, moveOffsetY, pictureScale, extraMoveDuration
-  );
 
   if ($gameVariables.value(276) > 0) {
     picture_motion1("smooth", [0]);
@@ -1427,7 +1540,7 @@ actor_kousokukaijo3 = function (actorId) {
 };
 
 //アビリティ後にＣＧ消去
-const skillAfter1picEraseIds = [51, 52, 53, 54, 55, 56, 57, 86, 87, 88, 89, 90, 91, 92, 93, 98, 99];
+const skillAfter1picEraseIds = [40, 51, 52, 53, 54, 55, 56, 57, 86, 87, 88, 89, 90, 91, 92, 93, 98, 99];
 skill_after1 = function (user, skillId) {
 
   if (valueAttackCount !== 0) {
