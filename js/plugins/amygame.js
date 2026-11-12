@@ -3337,6 +3337,16 @@ abNomal_Clear = function (
     { meta: "TrapDisplay", switchId: 135 }
   ];
 
+  //取得後などで表示画像が消えたページ(最初のページには画像がある)のイベント。
+  //使用済みイベントに探知アイコンを出し続けないために使う。
+  function isUsedEventPage(event, eventData) {
+    const firstImage = eventData.pages && eventData.pages[0] && eventData.pages[0].image;
+    if (!firstImage || (firstImage.tileId <= 0 && firstImage.characterName === "")) {
+      return false;
+    }
+    return !event.characterName() && !event.tileId();
+  }
+
   //オブジェクト探知とトラップ視認実行
   search_object = function () {
     //IDの上限(100/200)で打ち切ると、それを超えるIDのイベントを取りこぼす
@@ -3348,6 +3358,11 @@ abNomal_Clear = function (
         continue;
       }
       if ($gameSelfSwitches.value([$gameMap.mapId(), event.eventId(), "B"])) {
+        continue;
+      }
+      //使用済み(画像が消えた)イベントはアイコンを出さない
+      if (isUsedEventPage(event, eventData)) {
+        event.clearIconOnEvent();
         continue;
       }
 
