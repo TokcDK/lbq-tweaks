@@ -20055,11 +20055,11 @@
   };
 
   // Replaces (1x): Map007.json:event:32|EV032|page:1
-  AGH_eventStatueOrbC = function () {
-    const primaryCounter = "statue_orb_c" + "-" + valueCountSet1;
+  AGH_eventStatueOrbC = function (eventId) {
+    const primaryCounter = "statue_orb_c" + "-" + eventId;
     $gameScreen._particle.particleClear(primaryCounter);
-    if (!!$gameMap.event(valueCountSet1)) {
-      $gameMap.eraseEvent(valueCountSet1);
+    if (!!$gameMap.event(eventId)) {
+      $gameMap.eraseEvent(eventId);
     }
   };
 
@@ -20082,17 +20082,15 @@
 
   // Replaces (1x): Map007.json:event:58|EV058|page:1
   AGH_eventDomeBed = function () {
-    let event;
     for (let id1 = 1; id1 <= 200; id1++) {
       const mapEvent = $gameMap.event(id1);
-      if (!!mapEvent) {
-        if (mapEvent.event().meta["DomeBed"]) {
-          event = mapEvent;
-          event.setDirectionFix(false);
-          event.setDirection(2);
-          event.setDirectionFix(true);
-        }
+      if (!mapEvent || !mapEvent.event().meta["DomeBed"]) {
+        continue;
       }
+
+      mapEvent.setDirectionFix(false);
+      mapEvent.setDirection(2);
+      mapEvent.setDirectionFix(true);
     }
   };
 
