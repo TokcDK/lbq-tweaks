@@ -6149,9 +6149,10 @@
     prepareCutIn(interp, "味方カットイン", pictureId, currentActorId());
   };
 
-  // Replaces (1x): data/CommonEvents.json:common-event:140
-  AGH_prepareEnemyCutIn = function (interp) {
-    prepareCutIn(interp, "敵カットイン", 0, currentActorId());
+  // Replaces (2x): data/CommonEvents.json:common-event:140, data/Troops.json:troop:1
+  // pictureId is the cut-in slot prepared by the event before the plugin call.
+  AGH_prepareEnemyCutIn = function (interp, pictureId = 0) {
+    prepareCutIn(interp, "敵カットイン", pictureId, currentActorId());
   };
 
   // Replaces (1x): data/CommonEvents.json:common-event:129
@@ -13252,11 +13253,14 @@
     valueBossAction = valueCountSet1;
   };
 
-  // Replaces (1x): CommonEvents.json:common-event:129|ボス覚醒行動
-  AGH_handleScriptSnippetEnemyMiddleChange = function () {
+  // Replaces (2x): CommonEvents.json:common-event:129|ボス覚醒行動 (EnemyMiddleChange),
+  //                Troops.json:troop:1|こうもり*2:page:0 (EnemyEntryChange)
+  // Shared preset read by common event 128: which meta tag selects the enemy to
+  // transform, which state is granted and which troop slot is transformed.
+  AGH_setValueWordEnemyTransform = function (metaKey) {
     valueWordSet7 = 0; //会話イベント指定変数
     valueWordSet8 = 551; //付与ステートid
-    valueWordSet9 = "EnemyMiddleChange"; //meta判定
+    valueWordSet9 = metaKey; //meta判定
     valueWordSet10 = 0; //変身するかしないか判定
   };
 
@@ -20442,4 +20446,235 @@
   function numericCaseValue(value) {
     return value == null ? value : Number(value);
   }
+
+  /* ============================================================================
+   * Troop battle events (data/Troops.json)
+   * ========================================================================== */
+
+  const TROOP_STATE_DEAD = 1; // 戦闘不能
+  const TROOP_STATE_BOUND = 63; // 拘束
+  const TROOP_STATE_RESCUER = 89; // 拘束解除する味方
+  const TROOP_STATE_TRAINING_DOLL = 420; // 木人
+  const TROOP_STATE_PLEADING = 472; // 命乞い
+
+  const INTIMIDATION_SKILL_ID = 774; // 覇気＜OFF＞
+  const INTIMIDATION_SWITCH_ID = 139; // 覇気オンオフ
+  const INTIMIDATION_ANIMATION_ID = 120;
+  const LEADERSHIP_SKILL_ID = 779; // 統率＜OFF＞
+  const FIGHTING_SPIRIT_SKILL_ID = 778; // 闘志＜OFF＞
+  const SUPPORT_SKILL_ANIMATION_ID = 271;
+
+  // Replaces (1x): Troops.json:troop:1|こうもり*2:page:0
+  // Red after-image left on the actor picked by the mid-battle transform intro.
+  AGH_highlightSelectedActorResidual = function (interp) {
+    interp.sVal(HELPER_VARIABLE.SELECTED_ACTOR_ID, 1);
+    const actor = actorFromVariable(HELPER_VARIABLE.SELECTED_ACTOR_ID);
+    actor.residual().setValid(true);
+    actor.residual().setColorTone([255, 0, 0, 255]);
+    actor.residual().setOpacity(200);
+  };
+
+  // Replaces (1x): Troops.json:troop:1|こうもり*2:page:0
+  // The intro drives MOG_BattleCamera by itself, so the automatic camera is off.
+  AGH_disableBattleCamera = function () {
+    $gameSystem._cam_data[0] = false;
+  };
+
+  // Replaces (2x): Troops.json:troop:1|こうもり*2:page:0
+  // Thin event-facing alias for the internal pushBattleLog above.
+  AGH_pushBattleLog = function (text) {
+    pushBattleLog(text);
+  };
+
+  // Replaces (1x): Troops.json:troop:1|こうもり*2:page:0
+  AGH_playGasScreenAnimation = function () {
+    $gameScreen.startAnimation(640, 386, 205, false);
+  };
+
+  // Replaces (1x): Troops.json:troop:1|こうもり*2:page:0
+  AGH_setBattleVictoryMeBoss = function () {
+    $gameSystem.setVictoryMe({ name: "21_BattleWinBoss", volume: 50, pitch: 100, pan: 0 });
+  };
+
+  // Replaces (1x): Troops.json:troop:1|こうもり*2:page:0
+  AGH_setBattleVictoryMe = function () {
+    $gameSystem.setVictoryMe({ name: "21_BattleWin", volume: 90, pitch: 100, pan: 0 });
+  };
+
+  // Replaces (1x): Troops.json:troop:1|こうもり*2:page:0
+  // 覇気: with the switch on, a mastered intimidation skill whose
+  // level*10 + actor level reaches the strongest enemy wipes out the troop.
+  AGH_applyIntimidationSkill = function () {
+    const actor = $gameActors.actor($gameVariables.value(HELPER_VARIABLE.VIEWPOINT_ACTOR_ID));
+    const intimidationLevel = actor.skillMasteryLevel(INTIMIDATION_SKILL_ID);
+    const intimidationReachesTroop =
+      $gameSwitches.value(INTIMIDATION_SWITCH_ID) &&
+      intimidationLevel * 10 + actor.level >= $gameTroop.highestLevel();
+    if (!intimidationReachesTroop) return;
+    $gameTroop.members().forEach(function (enemy) {
+      enemy.startAnimation(INTIMIDATION_ANIMATION_ID, true, 0);
+      enemy.addState(TROOP_STATE_DEAD);
+    });
+  };
+
+  // 統率/闘志 share the same curve: +2% per mastery level, at least one level.
+  function readSupportSkillBoost(skillId) {
+    const actor = $gameActors.actor($gameVariables.value(HELPER_VARIABLE.PROTAGONIST_ACTOR_ID));
+    const masteryLevel = actor.skillMasteryLevel(skillId) || 1;
+    return { actor: actor, boostPercent: 10 + masteryLevel * 2 };
+  }
+
+  function pushSupportSkillLog(skillId, effectText) {
+    const skillName = $dataSkills[skillId].name;
+    AGH_pushBattleLog(`${skillName}が発動！ ${effectText}`);
+  }
+
+  // Replaces (1x): Troops.json:troop:1|こうもり*2:page:0
+  AGH_applyLeadershipSkill = function () {
+    const supportSkill = readSupportSkillBoost(LEADERSHIP_SKILL_ID);
+    const actor = supportSkill.actor;
+    const statRate = 1 + supportSkill.boostPercent / 100;
+    $gameParty.battleMembers().forEach(function (member) {
+      member.addMaxHp(Math.round(actor.param(0) * statRate));
+      member.addMaxMp(Math.round(actor.param(1) * statRate));
+      member.addAtk(Math.round(actor.param(2) * statRate));
+      member.addDef(Math.round(actor.param(3) * statRate));
+      member.addMat(Math.round(actor.param(4) * statRate));
+      member.addMdf(Math.round(actor.param(5) * statRate));
+      member.addAgi(Math.round(actor.param(6) * statRate));
+      member.addLuk(Math.round(actor.param(7) * statRate));
+      member.startAnimation(SUPPORT_SKILL_ANIMATION_ID, false, 0);
+    });
+    const boostLabel = colorTaggedText(10, `${supportSkill.boostPercent}%`);
+    pushSupportSkillLog(LEADERSHIP_SKILL_ID, `パーティメンバーの全ステータスが${boostLabel}上昇！`);
+  };
+
+  // Replaces (1x): Troops.json:troop:1|こうもり*2:page:0
+  AGH_applyFightingSpiritSkill = function () {
+    const supportSkill = readSupportSkillBoost(FIGHTING_SPIRIT_SKILL_ID);
+    const tpGain = supportSkill.boostPercent;
+    $gameParty.battleMembers().forEach(function (member) {
+      member.gainTp(tpGain);
+      member.startAnimation(SUPPORT_SKILL_ANIMATION_ID, false, 0);
+    });
+    const tpLabel = colorTaggedText(10, `${tpGain}`);
+    pushSupportSkillLog(FIGHTING_SPIRIT_SKILL_ID, `パーティメンバーのTPが${tpLabel}上昇！`);
+  };
+
+  // Replaces (1x): Troops.json:troop:1|こうもり*2:page:0
+  // Enemy cut-in shown once the boss battle starts (slot 6). The original
+  // preset valueCountSet1 to 99 for its own `>= 1` guard; kept as-is.
+  AGH_prepareBossBattleCutIn = function (interp) {
+    valueCountSet1 = 99;
+    prepareCutIn(interp, "敵カットイン", 6, currentActorId());
+  };
+
+  // Replaces (1x): Troops.json:troop:1|こうもり*2:page:1
+  // Turns the temporary flag on when every troop member pleads for mercy and
+  // none of them is a training doll, so the "spare them?" offer can be shown.
+  AGH_setSwitchAllEnemiesPleading = function () {
+    $gameSwitches.setValue(HELPER_SWITCH.TEMPORARY_FLAG, false);
+    const troopMembers = $gameTroop.members();
+    const pleadingCount = troopMembers.filter(function (member) {
+      return (
+        member.isStateAffected(TROOP_STATE_PLEADING) &&
+        !member.isStateAffected(TROOP_STATE_TRAINING_DOLL)
+      );
+    }).length;
+    if (pleadingCount !== troopMembers.length) return;
+    $gameSwitches.setValue(HELPER_SWITCH.TEMPORARY_FLAG, true);
+  };
+
+  // Replaces (1x): Troops.json:troop:1|こうもり*2:page:1
+  // Bust-up of the selected heroine next to the "spare them?" text.
+  AGH_showFleeOfferBustUp = function () {
+    const actor = $gameActors.actor($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID));
+    if (!isGirl(actor)) return;
+    valueFaceSelect = 3;
+    const pictureMoveY = $gameMessage._IZSTPicMoveParam[1];
+    battle_bustUp1(actor, 101, 500, pictureMoveY - 384, 40);
+  };
+
+  // Replaces (1x): Troops.json:troop:7|Boss:page:0
+  // NOTE: that page sets no condition at all, so MV never activates it. The
+  // original guard `!actor.restriction() > 0` was also always false, and no
+  // actor carries the legacy `拘束解除` meta tag any more - the branch stays
+  // inert, it is only kept for parity with the old event.
+  AGH_rescueBoundActor = function (interp) {
+    const boundActor = $gameActors.actor($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID));
+    const battleMembers = $gameParty.battleMembers();
+    for (let i = 0; i < battleMembers.length; i++) {
+      const member = battleMembers[i];
+      if (member.restriction() > 0 || member.isStateAffected(TROOP_STATE_BOUND)) continue;
+      const rescueMessageList = $dataActors[member.actorId()].meta["拘束解除"];
+      if (!rescueMessageList) continue;
+      const rescueMessages = rescueMessageList.split(",");
+      $gameParty.members()[boundActor.index()].startAnimation(351, false, 0);
+      interp.sVal(525, rescueMessages[getRandomIndex(rescueMessages.length)]);
+      const messageText = `${member.name()}は${boundActor.name()}の拘束を解きに掛かった！${$gameVariables.value(525)}`;
+      AGH_pushBattleLog(messageText);
+      boundActor.addState(TROOP_STATE_RESCUER);
+      interp.wait(60);
+      break;
+    }
+  };
+
+  // Replaces (1x): Troops.json:troop:7|Boss:page:0
+  AGH_resolveBoundActorRescue = function (interp) {
+    const boundActor = $gameActors.actor($gameVariables.value(HELPER_VARIABLE.SELECTED_ACTOR_ID));
+    if (!boundActor.isStateAffected(TROOP_STATE_RESCUER)) return;
+    const successMessageList = $dataActors[boundActor.actorId()].meta["拘束解除成功"];
+    if (!successMessageList) return;
+    const successMessages = successMessageList.split(",");
+    interp.sVal(525, successMessages[getRandomIndex(successMessages.length)]);
+    AGH_pushBattleLog(`${boundActor.name()}${$gameVariables.value(525)}`);
+    boundActor.removeState(TROOP_STATE_RESCUER);
+    boundActor.removeState(TROOP_STATE_BOUND);
+  };
+
+  // Replaces (1x): Troops.json:troop:9|<one>木人:page:0
+  // Preset index 2 = action; 4 is 命乞い.
+  AGH_applyTrainingDollPleaAction = function () {
+    const trainingDollSettings = $gameVariables.value(HELPER_VARIABLE.TRAINING_DOLL_SETTINGS);
+    if (trainingDollSettings[2] != 4) return;
+    $gameTroop.members()[0].addState(TROOP_STATE_PLEADING);
+  };
+
+  // Replaces (1x): Troops.json:troop:9|<one>木人:page:0
+  // Preset index 1 = element, stored as state 51..57 (火→風→土→水→光→闇→无).
+  AGH_applyTrainingDollElementState = function () {
+    const trainingDollSettings = $gameVariables.value(HELPER_VARIABLE.TRAINING_DOLL_SETTINGS);
+    for (let elementIndex = 1; elementIndex <= 7; elementIndex++) {
+      if (trainingDollSettings[1] != elementIndex) continue;
+      $gameTroop.members()[0].addState(elementIndex + 50);
+    }
+  };
+
+  // Replaces (1x): Troops.json:troop:9|<one>木人:page:0
+  // Preset index 4 = starting HP in percent of max HP, index 3 = starting TP.
+  AGH_resetTrainingDollBattleMembers = function () {
+    const trainingDollSettings = $gameVariables.value(HELPER_VARIABLE.TRAINING_DOLL_SETTINGS);
+    $gameParty.battleMembers().forEach(function (actor) {
+      const startingHp = Math.round(actor.param(0) / 100) * trainingDollSettings[4];
+      actor.gainHp(-999999);
+      actor.gainHp(startingHp);
+      actor.gainTp(-1000);
+      actor.gainTp(trainingDollSettings[3]);
+    });
+  };
+
+  // Replaces (1x): Troops.json:troop:9|<one>木人:page:0
+  AGH_setTrainingDollLevel = function () {
+    const trainingDollSettings = $gameVariables.value(HELPER_VARIABLE.TRAINING_DOLL_SETTINGS);
+    $gameTroop.members()[0].changeLevel(trainingDollSettings[5]);
+  };
+
+  // Replaces (1x): Troops.json:troop:9|<one>木人:page:0
+  // Preset index 6 = one extra state, stored relative to 木人(420).
+  AGH_addTrainingDollState = function () {
+    const trainingDollSettings = $gameVariables.value(HELPER_VARIABLE.TRAINING_DOLL_SETTINGS);
+    const extraStateIndex = 6;
+    if (!(trainingDollSettings[extraStateIndex] >= 1)) return;
+    $gameTroop.members()[0].addState(trainingDollSettings[extraStateIndex] + TROOP_STATE_TRAINING_DOLL);
+  };
 })();
