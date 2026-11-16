@@ -20468,10 +20468,10 @@
   // Red after-image left on the actor picked by the mid-battle transform intro.
   AGH_highlightSelectedActorResidual = function (interp) {
     interp.sVal(HELPER_VARIABLE.SELECTED_ACTOR_ID, 1);
-    const actor = actorFromVariable(HELPER_VARIABLE.SELECTED_ACTOR_ID);
-    actor.residual().setValid(true);
-    actor.residual().setColorTone([255, 0, 0, 255]);
-    actor.residual().setOpacity(200);
+    const actorResidual = actorFromVariable(HELPER_VARIABLE.SELECTED_ACTOR_ID).residual();
+    actorResidual.setValid(true);
+    actorResidual.setColorTone([255, 0, 0, 255]);
+    actorResidual.setOpacity(200);
   };
 
   // Replaces (1x): Troops.json:troop:1|こうもり*2:page:0
@@ -20611,7 +20611,9 @@
       const rescueMessages = rescueMessageList.split(",");
       $gameParty.members()[boundActor.index()].startAnimation(351, false, 0);
       interp.sVal(525, rescueMessages[getRandomIndex(rescueMessages.length)]);
-      const messageText = `${member.name()}は${boundActor.name()}の拘束を解きに掛かった！${$gameVariables.value(525)}`;
+      const memberName = member.name();
+      const actorName = boundActor.name();
+      const messageText = `${memberName}は${actorName}の拘束を解きに掛かった！` + $gameVariables.value(525);
       AGH_pushBattleLog(messageText);
       boundActor.addState(TROOP_STATE_RESCUER);
       interp.wait(60);
@@ -20627,7 +20629,7 @@
     if (!successMessageList) return;
     const successMessages = successMessageList.split(",");
     interp.sVal(525, successMessages[getRandomIndex(successMessages.length)]);
-    AGH_pushBattleLog(`${boundActor.name()}${$gameVariables.value(525)}`);
+    AGH_pushBattleLog(boundActor.name() + $gameVariables.value(525));
     boundActor.removeState(TROOP_STATE_RESCUER);
     boundActor.removeState(TROOP_STATE_BOUND);
   };
