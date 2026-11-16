@@ -20526,7 +20526,7 @@
 
   function pushSupportSkillLog(skillId, effectText) {
     const skillName = $dataSkills[skillId].name;
-    AGH_pushBattleLog(`${skillName}が発動！ ${effectText}`);
+    pushBattleLog(`${skillName}が発動！ ${effectText}`);
   }
 
   // Replaces (1x): Troops.json:troop:1|こうもり*2:page:0
@@ -20614,7 +20614,7 @@
       const memberName = member.name();
       const actorName = boundActor.name();
       const messageText = `${memberName}は${actorName}の拘束を解きに掛かった！` + $gameVariables.value(525);
-      AGH_pushBattleLog(messageText);
+      pushBattleLog(messageText);
       boundActor.addState(TROOP_STATE_RESCUER);
       interp.wait(60);
       break;
@@ -20629,7 +20629,7 @@
     if (!successMessageList) return;
     const successMessages = successMessageList.split(",");
     interp.sVal(525, successMessages[getRandomIndex(successMessages.length)]);
-    AGH_pushBattleLog(boundActor.name() + $gameVariables.value(525));
+    pushBattleLog(boundActor.name() + $gameVariables.value(525));
     boundActor.removeState(TROOP_STATE_RESCUER);
     boundActor.removeState(TROOP_STATE_BOUND);
   };
