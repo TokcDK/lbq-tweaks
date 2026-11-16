@@ -20051,7 +20051,7 @@
     const playerRealX = $gamePlayer._realX;
     const playerRealY = $gamePlayer._realY + 1;
     $gameMap.spawnEvent(122, playerRealX, playerRealY, true);
-    valueCountSet1 = $gameMap.getLastSpawnEventId();
+    return $gameMap.getLastSpawnEventId();
   };
 
   // Replaces (1x): Map007.json:event:32|EV032|page:1
